@@ -131,12 +131,9 @@ public:
 	// read/write handlers
 	uint8_t oki_r(offs_t offset);
 	void oki_w(offs_t offset, uint8_t data);
-	void wrio_w(uint8_t data);
-	void mix_w(uint8_t data);
+	virtual void wrio_w(uint8_t data);
+	virtual void mix_w(uint8_t data);
 	void overall_volume_w(uint8_t data);
-
-	template <typename... T> void set_oki1_tag(T &&... args) { m_oki1_region.set_tag(std::forward<T>(args)...); }
-	template <typename... T> void set_oki2_tag(T &&... args) { m_oki2_region.set_tag(std::forward<T>(args)...); }
 
 protected:
 	// device level overrides
@@ -149,16 +146,6 @@ protected:
 	// devices
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;    // JSA IIIs only
-
-	// memory regions
-	optional_memory_region m_oki1_region;
-	optional_memory_region m_oki2_region;
-
-	// memory banks
-	optional_memory_bank m_oki1_banklo;         // JSA III(s) only
-	optional_memory_bank m_oki1_bankhi;         // JSA III(s)
-	optional_memory_bank m_oki2_banklo;         // JSA IIIs only
-	optional_memory_bank m_oki2_bankhi;         // JSA IIIs only
 
 	// internal state
 	double              m_oki6295_volume;
@@ -176,8 +163,8 @@ public:
 
 	// read/write handlers
 	uint8_t rdio_r();
-	void wrio_w(uint8_t data);
-	void mix_w(uint8_t data);
+	virtual void wrio_w(uint8_t data);
+	virtual void mix_w(uint8_t data);
 	void tms5220_voice(uint8_t data);
 	uint8_t pokey_r(offs_t offset);
 	void pokey_w(offs_t offset, uint8_t data);
@@ -235,9 +222,14 @@ public:
 
 	void atarijsa3_map(address_map &map) ATTR_COLD;
 	void jsa3_oki1_map(address_map &map) ATTR_COLD;
+
+	template <typename... T> void set_oki_bankregion(T &&... args) { m_oki_bankregion.set_tag(std::forward<T>(args)...); }
+
 protected:
 	// derived construction/destruction
 	atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override ATTR_COLD;
 
 public:
 	// read/write handlers
@@ -247,8 +239,19 @@ protected:
 	// device level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void wrio_w(uint8_t data) override;
+	virtual void mix_w(uint8_t data) override;
 
 	required_ioport m_jsaiii;
+
+	// memory regions
+	required_memory_region m_oki_bankregion;
+
+	// memory banks
+	optional_memory_bank m_oki1_banklo;         // JSA III(s) only
+	optional_memory_bank m_oki1_bankhi;         // JSA III(s)
+	optional_memory_bank m_oki2_banklo;         // JSA IIIs only
+	optional_memory_bank m_oki2_bankhi;         // JSA IIIs only
 };
 
 

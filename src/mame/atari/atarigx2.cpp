@@ -454,8 +454,7 @@ void atarigx2_state::atarigx2(machine_config &config)
 	ATARI_JSA_IIIS(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_5);
 	m_jsa->test_read_cb().set_ioport("SERVICE").bit(6);
-	m_jsa->set_oki1_tag("jsa:oki");
-	m_jsa->set_oki2_tag("jsa:oki");
+	m_jsa->set_oki_bankregion("jsa:oki");
 	m_jsa->add_route(0, "speaker", 0.7, 0);
 	m_jsa->add_route(1, "speaker", 0.7, 1);
 }
@@ -1234,6 +1233,14 @@ void atarigx2_state::init_rrreveng()
 	// Keep the not-working/protection flags pending full runtime validation.
 	init_spclords();
 	downcast<atari_136095_0072_device &>(*m_xga).set_polynomial_high(0xf000);
+
+	// we need to give the sound CPU time to respond, or the music dies
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe06000, 0xe06003,
+		write8smo_delegate(*this, [this] (u8 data)
+		{
+			m_jsa->main_command_w(data);
+			m_maincpu->spin_until_time(attotime::from_usec(50));
+		}, "rrreveng_sound_command"), 0xff000000);
 }
 
 

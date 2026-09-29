@@ -610,7 +610,7 @@ void beathead_state::beathead(machine_config &config)
 	ATARI_JSA_III(config, m_jsa);
 	m_jsa->test_read_cb().set_ioport("IN2").bit(6);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.6);
-	m_jsa->set_oki1_tag("jsa:oki");
+	m_jsa->set_oki_bankregion("jsa:oki");
 }
 
 
