@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli, Angelo Salese
-#ifndef MAME_BUS_A800_SPARTA_H
-#define MAME_BUS_A800_SPARTA_H
+#ifndef MAME_BUS_A800_CART_SPARTA_H
+#define MAME_BUS_A800_CART_SPARTA_H
 
 #pragma once
 
@@ -60,4 +60,4 @@ DECLARE_DEVICE_TYPE(A800_ROM_SPARTADOS,       a800_rom_spartados_device)
 DECLARE_DEVICE_TYPE(A800_ROM_SPARTADOS_128KB, a800_rom_spartados_128kb_device)
 
 
-#endif // MAME_BUS_A800_SPARTA_H
+#endif // MAME_BUS_A800_CART_SPARTA_H

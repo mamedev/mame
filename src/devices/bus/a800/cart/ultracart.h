@@ -1,8 +1,8 @@
 // license: BSD-3-Clause
 // copyright-holders: Fabio Priuli, Angelo Salese
 
-#ifndef MAME_BUS_A800_ULTRACART_H
-#define MAME_BUS_A800_ULTRACART_H
+#ifndef MAME_BUS_A800_CART_ULTRACART_H
+#define MAME_BUS_A800_CART_ULTRACART_H
 
 #pragma once
 
@@ -52,4 +52,4 @@ DECLARE_DEVICE_TYPE(A800_ROM_BLIZZARD_32KB,   a800_rom_blizzard_32kb_device)
 DECLARE_DEVICE_TYPE(A800_ROM_ADAWLIAH,        a800_rom_adawliah_device)
 
 
-#endif // MAME_BUS_A800_ULTRACART_H
+#endif // MAME_BUS_A800_CART_ULTRACART_H

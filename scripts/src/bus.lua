@@ -286,26 +286,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/a800/sio/a8sio.h,BUSES["A800_SIO"] = true
----------------------------------------------------
-
-if BUSES["A800_SIO"] then
-	files {
-		MAME_DIR .. "src/devices/bus/a800/sio/a8sio.cpp",
-		MAME_DIR .. "src/devices/bus/a800/sio/a8sio.h",
-		MAME_DIR .. "src/devices/bus/a800/sio/atari810.cpp",
-		MAME_DIR .. "src/devices/bus/a800/sio/atari810.h",
-		MAME_DIR .. "src/devices/bus/a800/sio/atari1050.cpp",
-		MAME_DIR .. "src/devices/bus/a800/sio/atari1050.h",
-		MAME_DIR .. "src/devices/bus/a800/sio/atarifdc.cpp",
-		MAME_DIR .. "src/devices/bus/a800/sio/atarifdc.h",
-		MAME_DIR .. "src/devices/bus/a800/sio/cassette.cpp",
-		MAME_DIR .. "src/devices/bus/a800/sio/cassette.h"
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/bus/a800/cart/a800_slot.h,BUSES["A800_CART"] = true
 ---------------------------------------------------
 
@@ -345,6 +325,27 @@ if BUSES["A800_CART"] then
 		MAME_DIR .. "src/devices/bus/a800/cart/ultracart.h",
 		MAME_DIR .. "src/devices/bus/a800/cart/williams.cpp",
 		MAME_DIR .. "src/devices/bus/a800/cart/williams.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/a800/sio/a8sio.h,BUSES["A800_SIO"] = true
+---------------------------------------------------
+
+if BUSES["A800_SIO"] then
+	files {
+		MAME_DIR .. "src/devices/bus/a800/sio/a8sio.cpp",
+		MAME_DIR .. "src/devices/bus/a800/sio/a8sio.h",
+		MAME_DIR .. "src/devices/bus/a800/sio/atari810.cpp",
+		MAME_DIR .. "src/devices/bus/a800/sio/atari810.h",
+		MAME_DIR .. "src/devices/bus/a800/sio/atari1050.cpp",
+		MAME_DIR .. "src/devices/bus/a800/sio/atari1050.h",
+		MAME_DIR .. "src/devices/bus/a800/sio/atarifdc.cpp",
+		MAME_DIR .. "src/devices/bus/a800/sio/atarifdc.h",
+		MAME_DIR .. "src/devices/bus/a800/sio/cassette.cpp",
+		MAME_DIR .. "src/devices/bus/a800/sio/cassette.h"
 	}
 end
 
