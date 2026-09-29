@@ -20,6 +20,7 @@ public:
 	void set_data_rom(const uint8_t *data_rom);
 	void clear();
 	u8 mailbox_r(offs_t offset);
+	void mailbox_from_main_w(offs_t offset, uint8_t data);
 	void mailbox_w(offs_t offset, uint8_t data);
 	void command_w(uint8_t command);
 	

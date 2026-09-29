@@ -434,7 +434,28 @@ void bkungfu_mcu_device::execute_slot(uint8_t slot)
 
 u8 bkungfu_mcu_device::mailbox_r(offs_t offset)
 {
+	// this will read the various trigger addresses, checking if they're 0xfe
+	// presumably this is written by the MCU to signal the task has been completed
+
+	// read address is 0x00 for most commands
+	// 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28, 0x2c for the 'HUD' commands
+
+	// it also checks 0102, 0106, 0118, 011c before sending command 0x0c to draw high score data?
+	// we initialize these to 0xfe when the MCU is 'reset'
+
+	if (!machine().side_effects_disabled())
+		logerror("%s: mailbox_r %04x\n", machine().describe_context(), offset);
+
 	return m_mailbox[offset];
+}
+
+void bkungfu_mcu_device::mailbox_from_main_w(offs_t offset, uint8_t data)
+{
+	if (offset < 0x800)
+		mailbox_w(offset, data);
+
+	if (offset == 0x00)
+		command_w(data);
 }
 
 void bkungfu_mcu_device::mailbox_w(offs_t offset, uint8_t data)

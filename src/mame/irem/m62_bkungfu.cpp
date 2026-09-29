@@ -35,8 +35,6 @@ private:
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
-	uint8_t bkungfu_blitter_r(offs_t offset);
-	void bkungfu_blitter_w(offs_t offset, uint8_t data);
 	void mcu_vram_w(offs_t offset, uint8_t data);
 	void mcu_level_vram_w(offs_t offset, uint8_t data);
 
@@ -44,9 +42,6 @@ private:
 	DECLARE_VIDEO_START(bkungfu);
 
 	void bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data);
-
-	// done this way so it can be viewed win the debugger with save state registration
-	uint8_t m_blittercmdram[0x800];
 
 	required_device<bkungfu_mcu_device> m_mcu;
 
@@ -84,23 +79,6 @@ VIDEO_START_MEMBER(m62_bkungfu_state,bkungfu)
 /*******************************************************************************
     Blitter
 *******************************************************************************/
-
-uint8_t m62_bkungfu_state::bkungfu_blitter_r(offs_t offset)
-{
-	// this will read the various trigger addresses, checking if they're 0xfe
-	// presumably this is written by the MCU to signal the task has been completed
-
-	// read address is 0x00 for most commands
-	// 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28, 0x2c for the 'HUD' commands
-
-	// it also checks 0102, 0106, 0118, 011c before sending command 0x0c to draw high score data?
-	// we initialize these to 0xfe when the MCU is 'reset'
-
-	if (!machine().side_effects_disabled())
-		logerror("%s: bkungfu_blitter_r %04x\n", machine().describe_context(), offset);
-
-	return m_mcu->mailbox_r(offset);
-}
 
 void m62_bkungfu_state::bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data)
 {
@@ -149,14 +127,6 @@ void m62_bkungfu_state::machine_reset()
 	m62_state::machine_reset();
 }
 
-void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
-{
-	if (offset < 0x800)
-		m_mcu->mailbox_w(offset, data);
-
-	if (offset == 0x00)
-		m_mcu->command_w(data);
-}
 
 /*******************************************************************************
     Address Maps
@@ -168,7 +138,7 @@ void m62_bkungfu_state::mem_map(address_map& map)
 	map(0xc000, 0xc0ff).ram().share("spriteram");
 	map(0xc100, 0xc1ff).ram();
 
-	map(0xc800, 0xcfff).rw(FUNC(m62_bkungfu_state::bkungfu_blitter_r), FUNC(m62_bkungfu_state::bkungfu_blitter_w));
+	map(0xc800, 0xcfff).rw(m_mcu, FUNC(bkungfu_mcu_device::mailbox_r), FUNC(bkungfu_mcu_device::mailbox_from_main_w));
 	map(0xe000, 0xefff).ram();
 }
 
