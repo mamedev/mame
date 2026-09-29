@@ -31,7 +31,7 @@ private:
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
-	void mcu_level_vram_w(offs_t offset, uint8_t data);
+	void tilemap_ram_w(offs_t offset, uint8_t data);
 	void bkungfu_blitter_tilemap_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bkungfu_bg_tile_info);
@@ -72,29 +72,7 @@ VIDEO_START_MEMBER(m62_bkungfu_state,bkungfu)
     Blitter
 *******************************************************************************/
 
-void m62_bkungfu_state::bkungfu_blitter_tilemap_w(offs_t offset, uint8_t data)
-{
-	// the tilemap needs to be 256 tiles wide for the backgrounds, which are copied in a single command
-	// however the blitter commands seem to only have enough co-ordinates for the current 64 tile page
-	// and the higher bits aren't communicated to the MCU, so assume they mirror across all pages for now
-	//
-	// It's also possible the tilemap is still 64 tiles wide, like kungfum and the MCU is loading in
-	// backgrounds as needed, even if the command to draw the background is only sent at the start of
-	// a level.  The draw-in time on the background might give clues to this.
-
-	int xpart = offset & 0x7f;
-	int ypart = offset & ~0x7f;
-
-	for (int page = 0; page < 0x200; page += 0x80)
-	{
-		int realoffset = (ypart << 2) | xpart | page;
-
-		m_bkungfu_tileram[realoffset] = data;
-		m_bg_tilemap->mark_tile_dirty(realoffset >> 1);
-	}
-}
-
-void m62_bkungfu_state::mcu_level_vram_w(offs_t offset, uint8_t data)
+void m62_bkungfu_state::tilemap_ram_w(offs_t offset, uint8_t data)
 {
 	if (offset < m_bkungfu_tileram.bytes())
 	{
@@ -138,8 +116,7 @@ void m62_bkungfu_state::bkungfu(machine_config& config)
 	m_maincpu->set_addrmap(AS_IO, &m62_bkungfu_state::io_map);
 
 	BKUNG_MCU(config, m_mcu, 0);
-	m_mcu->vram_w().set(FUNC(m62_bkungfu_state::bkungfu_blitter_tilemap_w));
-	m_mcu->level_vram_w().set(FUNC(m62_bkungfu_state::mcu_level_vram_w));
+	m_mcu->tilemap_ram_w().set(FUNC(m62_bkungfu_state::tilemap_ram_w));
 
 	MCFG_VIDEO_START_OVERRIDE(m62_bkungfu_state,bkungfu)
 }

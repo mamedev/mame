@@ -192,8 +192,7 @@ DEFINE_DEVICE_TYPE(BKUNG_MCU, bkungfu_mcu_device, "bkung_mcu", "Irem Beyond Kung
 
 bkungfu_mcu_device::bkungfu_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BKUNG_MCU, tag, owner, clock)
-	, m_vram_w(*this)
-	, m_level_vram_w(*this)
+	, m_tilemap_ram_w(*this)
 	, m_mailbox_out_w(*this)
 	, m_data_rom(*this, "blitterdat")
 {
@@ -251,6 +250,27 @@ uint8_t bkungfu_mcu_device::read_data(uint16_t address) const
 	return m_data_rom[address];
 }
 
+void bkungfu_mcu_device::vram_page_w(offs_t offset, uint8_t data)
+{
+	// the tilemap needs to be 256 tiles wide for the backgrounds, which are copied in a single command
+	// however the blitter commands seem to only have enough co-ordinates for the current 64 tile page
+	// and the higher bits aren't communicated to the MCU, so assume they mirror across all pages for now
+	//
+	// It's also possible the tilemap is still 64 tiles wide, like kungfum and the MCU is loading in
+	// backgrounds as needed, even if the command to draw the background is only sent at the start of
+	// a level.  The draw-in time on the background might give clues to this.
+
+	int xpart = offset & 0x7f;
+	int ypart = offset & ~0x7f;
+
+	for (int page = 0; page < 0x200; page += 0x80)
+	{
+		int realoffset = (ypart << 2) | xpart | page;
+		m_tilemap_ram_w(realoffset, data);
+	}
+}
+
+
 uint8_t bkungfu_mcu_device::decrypt_data(uint16_t address) const
 {
     if (address >= 0x8000)
@@ -268,12 +288,12 @@ uint8_t bkungfu_mcu_device::decrypt_data(uint16_t address) const
 
 void bkungfu_mcu_device::write_number(int x, int y, uint8_t number)
 {
-	m_vram_w(((y * 0x40 + x) << 1) & 0x0fff, (number & 0x0f) + 0x30);
+	vram_page_w(((y * 0x40 + x) << 1) & 0x0fff, (number & 0x0f) + 0x30);
 }
 
 void bkungfu_mcu_device::write_floor_dot(int which, bool lit)
 {
-	m_vram_w(((3 * 0x40 + 0x20 + which * 2) << 1) & 0x0fff, lit ? 0xd5 : 0xd6);
+	vram_page_w(((3 * 0x40 + 0x20 + which * 2) << 1) & 0x0fff, lit ? 0xd5 : 0xd6);
 }
 
 void bkungfu_mcu_device::write_lifebar(int xbase, int ybase, uint8_t energy, bool boss)
@@ -283,7 +303,7 @@ void bkungfu_mcu_device::write_lifebar(int xbase, int ybase, uint8_t energy, boo
 	{
 		uint8_t const part = segment < full_segments ? 8 : segment == full_segments ? energy & 7 : 0;
 		uint8_t const tile = part ? uint8_t((boss ? 0xcc : 0xc4) + 8 - part) : 0xc2;
-		m_vram_w(((ybase * 0x40 + xbase + segment) << 1) & 0x0fff, tile);
+		vram_page_w(((ybase * 0x40 + xbase + segment) << 1) & 0x0fff, tile);
 	}
 }
 
@@ -373,8 +393,8 @@ void bkungfu_mcu_device::draw_text(uint16_t table_offset, bool use_mailbox)
 		else
 		{
 			uint16_t position = (uint16_t(m_mailbox[position_high]) << 8) | m_mailbox[position_low];
-			m_vram_w(position & 0x0fff, value);
-			m_vram_w((position + 1) & 0x0fff, m_mailbox[attribute]);
+			vram_page_w(position & 0x0fff, value);
+			vram_page_w((position + 1) & 0x0fff, m_mailbox[attribute]);
 			position = (position & ~0x007f) | ((position + 2) & 0x007f);
 			mailbox_out(position_low, position & 0xff);
 			mailbox_out(position_high, position >> 8);
@@ -389,10 +409,10 @@ void bkungfu_mcu_device::draw_credits_continue()
 
 	uint16_t const position = (uint16_t(m_mailbox[3]) << 8) | m_mailbox[2];
 	uint8_t const attribute = m_mailbox[4];
-	m_vram_w(position & 0x0fff, (m_mailbox[1] >> 4) + 0x30);
-	m_vram_w((position + 1) & 0x0fff, attribute);
-	m_vram_w((position + 2) & 0x0fff, (m_mailbox[1] & 0x0f) + 0x30);
-	m_vram_w((position + 3) & 0x0fff, attribute);
+	vram_page_w(position & 0x0fff, (m_mailbox[1] >> 4) + 0x30);
+	vram_page_w((position + 1) & 0x0fff, attribute);
+	vram_page_w((position + 2) & 0x0fff, (m_mailbox[1] & 0x0f) + 0x30);
+	vram_page_w((position + 3) & 0x0fff, attribute);
 }
 
 void bkungfu_mcu_device::clear_tilemap()
@@ -402,8 +422,8 @@ void bkungfu_mcu_device::clear_tilemap()
 
 	for (uint16_t position = 0; position < 0x1000; position += 2)
 	{
-		m_vram_w(position, m_mailbox[2]);
-		m_vram_w(position + 1, m_mailbox[1]);
+		vram_page_w(position, m_mailbox[2]);
+		vram_page_w(position + 1, m_mailbox[1]);
 	}
 }
 
@@ -523,8 +543,8 @@ void bkungfu_mcu_device::draw_object(uint8_t id)
 		int const column = cell % width;
 		int const row = cell / width;
 		uint16_t const destination = (pos + row * 0x80 + column * 2) & 0xfff;
-		m_vram_w(destination, tiles[cell]);
-		m_vram_w(destination + 1, attrs[cell]);
+		vram_page_w(destination, tiles[cell]);
+		vram_page_w(destination + 1, attrs[cell]);
 	}
 }
 
@@ -533,8 +553,8 @@ void bkungfu_mcu_device::draw_level_column_row(int column, int row, uint8_t tile
 	int const offset = ((row + 6) * 256 + column * 4) * 2;
 	for (int x = 0; x < 4; x++)
 	{
-		m_level_vram_w(offset + x * 2, tile);
-		m_level_vram_w(offset + x * 2 + 1, attr);
+		m_tilemap_ram_w(offset + x * 2, tile);
+		m_tilemap_ram_w(offset + x * 2 + 1, attr);
 	}
 }
 
@@ -601,8 +621,8 @@ void bkungfu_mcu_device::draw_level_strip(int column, int row)
 	{
 		int const stream = band * 2 + x / 2;
 		int const index = bandrow * 2 + x % 2;
-		m_level_vram_w(offset + x * 2, tiles[stream][index]);
-		m_level_vram_w(offset + x * 2 + 1, attrs[stream][index]);
+		m_tilemap_ram_w(offset + x * 2, tiles[stream][index]);
+		m_tilemap_ram_w(offset + x * 2 + 1, attrs[stream][index]);
 	}
 }
 
@@ -708,8 +728,8 @@ void bkungfu_mcu_device::command_w(uint8_t command)
 			position = low | (uint16_t(high) << 8);
 			continue;
 		}
-		m_vram_w(position & 0x0fff, value);
-		m_vram_w((position + 1) & 0x0fff, attribute);
+		vram_page_w(position & 0x0fff, value);
+		vram_page_w((position + 1) & 0x0fff, attribute);
 		position = (position & ~0x007f) | ((position + 2) & 0x007f);
 	}
 

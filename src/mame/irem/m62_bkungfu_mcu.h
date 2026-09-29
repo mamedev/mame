@@ -15,8 +15,7 @@ class bkungfu_mcu_device : public device_t
 public:
 	bkungfu_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	auto vram_w() { return m_vram_w.bind(); }
-	auto level_vram_w() { return m_level_vram_w.bind(); }
+	auto tilemap_ram_w() { return m_tilemap_ram_w.bind(); }
 	void clear();
 	u8 mailbox_r(offs_t offset);
 	void mailbox_from_main_w(offs_t offset, uint8_t data);
@@ -49,9 +48,9 @@ private:
 	void write_number(int x, int y, uint8_t number);
 	void write_lifebar(int xbase, int ybase, uint8_t energy, bool boss);
 	void write_floor_dot(int which, bool lit);
+	void vram_page_w(offs_t offset, uint8_t data);
 
-	devcb_write8 m_vram_w;
-	devcb_write8 m_level_vram_w;
+	devcb_write8 m_tilemap_ram_w;
 	devcb_write8 m_mailbox_out_w;
 	uint8_t m_mailbox[0x800];
 	uint16_t m_timer = 0;
