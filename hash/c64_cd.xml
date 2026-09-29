@@ -5,10 +5,11 @@ license:CC0-1.0
 -->
 <softwarelist name="c64_cd" description="Commodore 64 CD-ROMs">
 
-	<software name="firstcd" supported="no">
+	<software name="firstcd">
 		<description>1st CD-Edition</description>
 		<year>1989</year>
 		<publisher>Rainbow Arts</publisher>
+		<info name="usage" value="mame c64p -tape cdaudio -cdrom firstcd"/>
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -17,10 +18,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cdgames" supported="no">
+	<software name="cdgames">
 		<description>The CD Games Pack</description>
 		<year>1989</year>
 		<publisher>Codemasters</publisher>
+		<info name="usage" value="mame c64p -joy2 cdgames -cdrom cdgames -cass cdgames"/>
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
