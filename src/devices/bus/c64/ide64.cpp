@@ -70,6 +70,26 @@ void c64_ide64_cartridge_device::device_add_mconfig(machine_config &config)
 
 
 //-------------------------------------------------
+//  ROM( c64_ide64 )
+//-------------------------------------------------
+
+ROM_START( c64_ide64 )
+	ROM_REGION( 0x1f, DS1302_TAG, 0 )
+	ROM_LOAD( "ds1302.u4", 0x00, 0x1f, CRC(3399de09) SHA1(abfcee87b934b78c0d0b37e3655c8197fd9b4549) )
+ROM_END
+
+
+//-------------------------------------------------
+//  device_rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const tiny_rom_entry *c64_ide64_cartridge_device::device_rom_region() const
+{
+	return ROM_NAME( c64_ide64 );
+}
+
+
+//-------------------------------------------------
 //  INPUT_PORTS( c64_ide64 )
 //-------------------------------------------------
 

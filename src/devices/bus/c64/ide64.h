@@ -42,6 +42,7 @@ protected:
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_c64_expansion_card_interface overrides
