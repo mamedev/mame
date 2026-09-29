@@ -9,7 +9,7 @@ video reference: https://www.youtube.com/watch?v=Efr9EQkbCSQ
 
 TODO:
 - determine the purpose of the optional fifth/sixth level composition pointers
-- model C50 execution timing rather than using high-level synchronous command handlers
+- model MCU execution timing rather than using high-level synchronous command handlers
 - test mode doesn't work (there are strings for it in the MCU data ROM, is the MCU involved?)
 
 NOTES ON MCU DATA ROM FORMAT
@@ -193,13 +193,13 @@ fill opcode.
 
 #include "machine/timer.h"
 
-// C50 replacement firmware, owning the external data-ROM cipher, level/object
+// MCU replacement firmware, owning the external data-ROM cipher, level/object
 // commands and HUD mailbox jobs.  It is a MAME device rather than video glue
 // so its state and VRAM bus can be carried forward to a clocked FPGA model.
-class bkungfu_c50_device : public device_t
+class bkungfu_mcu_device : public device_t
 {
 public:
-	bkungfu_c50_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	bkungfu_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto vram_w() { return m_vram_w.bind(); }
 	auto level_vram_w() { return m_level_vram_w.bind(); }
@@ -260,7 +260,7 @@ private:
 	TIMER_CALLBACK_MEMBER(leveldraw_next);
 };
 
-DECLARE_DEVICE_TYPE(BKUNG_C50, bkungfu_c50_device)
+DECLARE_DEVICE_TYPE(BKUNG_MCU, bkungfu_mcu_device)
 
 namespace {
 
@@ -269,7 +269,7 @@ class m62_bkungfu_state : public m62_state
 public:
 	m62_bkungfu_state(const machine_config &mconfig, device_type type, const char *tag)
 		: m62_state(mconfig, type, tag)
-		, m_c50(*this, "c50")
+		, m_mcu(*this, "mcu")
 		, m_bkungfu_tileram(*this, "tileram", 256*32*2, ENDIANNESS_LITTLE)
 		, m_blitterdatarom(*this, "blitterdat")
 	{ }
@@ -285,9 +285,9 @@ private:
 
 	uint8_t bkungfu_blitter_r(offs_t offset);
 	void bkungfu_blitter_w(offs_t offset, uint8_t data);
-	void c50_vram_w(offs_t offset, uint8_t data);
-	void c50_level_vram_w(offs_t offset, uint8_t data);
-	void c50_mailbox_w(offs_t offset, uint8_t data);
+	void mcu_vram_w(offs_t offset, uint8_t data);
+	void mcu_level_vram_w(offs_t offset, uint8_t data);
+	void mcu_mailbox_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bkungfu_bg_tile_info);
 	DECLARE_VIDEO_START(bkungfu);
@@ -297,7 +297,7 @@ private:
 	// done this way so it can be viewed win the debugger with save state registration
 	uint8_t m_blittercmdram[0x800];
 
-	required_device<bkungfu_c50_device> m_c50;
+	required_device<bkungfu_mcu_device> m_mcu;
 
 	memory_share_creator<uint8_t> m_bkungfu_tileram;
 
@@ -306,17 +306,17 @@ private:
 
 } // anonymous namespace
 
-DEFINE_DEVICE_TYPE(BKUNG_C50, bkungfu_c50_device, "bkung_c50", "Irem Beyond Kung-Fu C50")
+DEFINE_DEVICE_TYPE(BKUNG_MCU, bkungfu_mcu_device, "bkung_mcu", "Irem Beyond Kung-Fu MCU")
 
-bkungfu_c50_device::bkungfu_c50_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BKUNG_C50, tag, owner, clock)
+bkungfu_mcu_device::bkungfu_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, BKUNG_MCU, tag, owner, clock)
 	, m_vram_w(*this)
 	, m_level_vram_w(*this)
 	, m_mailbox_out_w(*this)
 {
 }
 
-void bkungfu_c50_device::device_start()
+void bkungfu_mcu_device::device_start()
 {
 	save_item(NAME(m_mailbox));
 	save_item(NAME(m_timer));
@@ -334,10 +334,10 @@ void bkungfu_c50_device::device_start()
 	save_item(NAME(m_leveldraw_row));
 	save_item(NAME(m_leveldraw_column));
 	save_item(NAME(m_leveldraw_number));
-	m_leveldraw_timer = timer_alloc(FUNC(bkungfu_c50_device::leveldraw_next), this);
+	m_leveldraw_timer = timer_alloc(FUNC(bkungfu_mcu_device::leveldraw_next), this);
 }
 
-void bkungfu_c50_device::device_reset()
+void bkungfu_mcu_device::device_reset()
 {
 	std::fill(std::begin(m_mailbox), std::end(m_mailbox), 0);
 	m_timer = 0;
@@ -358,19 +358,19 @@ void bkungfu_c50_device::device_reset()
 	m_leveldraw_timer->adjust(attotime::never);
 }
 
-void bkungfu_c50_device::clear()
+void bkungfu_mcu_device::clear()
 {
 	m_initialized = false;
 }
 
-void bkungfu_c50_device::set_data_rom(const uint8_t *data_rom)
+void bkungfu_mcu_device::set_data_rom(const uint8_t *data_rom)
 {
 	m_data_rom = data_rom;
 }
 
-uint8_t bkungfu_c50_device::decrypt_data(uint16_t address) const
+uint8_t bkungfu_mcu_device::decrypt_data(uint16_t address) const
 {
-	// Recovered C50 data-ROM key.  It belongs to the coprocessor rather than
+	// Recovered MCU data-ROM key.  It belongs to the coprocessor rather than
 	// the Z80-facing driver.  Each external-ROM read is decoded independently;
 	// there is no plaintext image or cipher state retained by the device.
 	static constexpr uint8_t key[256] = {
@@ -403,17 +403,17 @@ uint8_t bkungfu_c50_device::decrypt_data(uint16_t address) const
 	return (index & 1) ? uint8_t(key[index] - cipher) : uint8_t(cipher ^ key[index]);
 }
 
-void bkungfu_c50_device::write_number(int x, int y, uint8_t number)
+void bkungfu_mcu_device::write_number(int x, int y, uint8_t number)
 {
 	m_vram_w(((y * 0x40 + x) << 1) & 0x0fff, (number & 0x0f) + 0x30);
 }
 
-void bkungfu_c50_device::write_floor_dot(int which, bool lit)
+void bkungfu_mcu_device::write_floor_dot(int which, bool lit)
 {
 	m_vram_w(((3 * 0x40 + 0x20 + which * 2) << 1) & 0x0fff, lit ? 0xd5 : 0xd6);
 }
 
-void bkungfu_c50_device::write_lifebar(int xbase, int ybase, uint8_t energy, bool boss)
+void bkungfu_mcu_device::write_lifebar(int xbase, int ybase, uint8_t energy, bool boss)
 {
 	int const full_segments = (energy & 0x78) >> 3;
 	for (int segment = 0; segment < 8; segment++)
@@ -424,7 +424,7 @@ void bkungfu_c50_device::write_lifebar(int xbase, int ybase, uint8_t energy, boo
 	}
 }
 
-void bkungfu_c50_device::update_slot(uint8_t slot)
+void bkungfu_mcu_device::update_slot(uint8_t slot)
 {
 	if (!m_initialized)
 		return;
@@ -458,18 +458,18 @@ void bkungfu_c50_device::update_slot(uint8_t slot)
 	}
 }
 
-void bkungfu_c50_device::complete(uint16_t offset)
+void bkungfu_mcu_device::complete(uint16_t offset)
 {
 	mailbox_out(offset, 0xfe);
 }
 
-void bkungfu_c50_device::mailbox_out(uint16_t offset, uint8_t data)
+void bkungfu_mcu_device::mailbox_out(uint16_t offset, uint8_t data)
 {
 	m_mailbox[offset] = data;
 	m_mailbox_out_w(offset, data);
 }
 
-void bkungfu_c50_device::draw_text(uint16_t table_offset, bool use_mailbox)
+void bkungfu_mcu_device::draw_text(uint16_t table_offset, bool use_mailbox)
 {
 	if (!m_running || !m_data_rom)
 		return;
@@ -519,7 +519,7 @@ void bkungfu_c50_device::draw_text(uint16_t table_offset, bool use_mailbox)
 	}
 }
 
-void bkungfu_c50_device::draw_credits_continue()
+void bkungfu_mcu_device::draw_credits_continue()
 {
 	if (!m_running)
 		return;
@@ -532,7 +532,7 @@ void bkungfu_c50_device::draw_credits_continue()
 	m_vram_w((position + 3) & 0x0fff, attribute);
 }
 
-void bkungfu_c50_device::clear_tilemap()
+void bkungfu_mcu_device::clear_tilemap()
 {
 	if (!m_running)
 		return;
@@ -544,7 +544,7 @@ void bkungfu_c50_device::clear_tilemap()
 	}
 }
 
-void bkungfu_c50_device::execute_slot(uint8_t slot)
+void bkungfu_mcu_device::execute_slot(uint8_t slot)
 {
 	uint8_t const trigger = m_mailbox[slot];
 	uint8_t const p1 = m_mailbox[slot + 1];
@@ -567,7 +567,7 @@ void bkungfu_c50_device::execute_slot(uint8_t slot)
 	complete(slot);
 }
 
-void bkungfu_c50_device::mailbox_w(offs_t offset, uint8_t data)
+void bkungfu_mcu_device::mailbox_w(offs_t offset, uint8_t data)
 {
 	if (offset >= std::size(m_mailbox))
 		return;
@@ -577,7 +577,7 @@ void bkungfu_c50_device::mailbox_w(offs_t offset, uint8_t data)
 		execute_slot(offset);
 }
 
-uint8_t bkungfu_c50_device::decode_payload(uint16_t address) const
+uint8_t bkungfu_mcu_device::decode_payload(uint16_t address) const
 {
 	uint8_t const value = decrypt_data(address);
 	uint8_t const sum = uint8_t((address & 0xff) + (address >> 8));
@@ -588,12 +588,12 @@ uint8_t bkungfu_c50_device::decode_payload(uint16_t address) const
 	return uint8_t(base - value - ((value & 1) ? 0 : 2));
 }
 
-uint16_t bkungfu_c50_device::decode_payload_word(uint16_t address) const
+uint16_t bkungfu_mcu_device::decode_payload_word(uint16_t address) const
 {
 	return decode_payload(address) | (uint16_t(decode_payload(address + 1)) << 8);
 }
 
-void bkungfu_c50_device::draw_object(uint8_t id)
+void bkungfu_mcu_device::draw_object(uint8_t id)
 {
 	if (!m_data_rom || id < 0x80 || id > 0x90)
 		return;
@@ -639,7 +639,7 @@ void bkungfu_c50_device::draw_object(uint8_t id)
 	}
 }
 
-void bkungfu_c50_device::draw_level_column_row(int column, int row, uint8_t tile, uint8_t attr)
+void bkungfu_mcu_device::draw_level_column_row(int column, int row, uint8_t tile, uint8_t attr)
 {
 	int const offset = ((row + 6) * 256 + column * 4) * 2;
 	for (int x = 0; x < 4; x++)
@@ -649,7 +649,7 @@ void bkungfu_c50_device::draw_level_column_row(int column, int row, uint8_t tile
 	}
 }
 
-void bkungfu_c50_device::draw_level_strip(int column, int row)
+void bkungfu_mcu_device::draw_level_strip(int column, int row)
 {
 	if (!m_data_rom)
 		return;
@@ -720,7 +720,7 @@ void bkungfu_c50_device::draw_level_strip(int column, int row)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(bkungfu_c50_device::leveldraw_next)
+TIMER_CALLBACK_MEMBER(bkungfu_mcu_device::leveldraw_next)
 {
 	draw_level_strip(m_leveldraw_column, m_leveldraw_row);
 	if (++m_leveldraw_row == 26)
@@ -734,7 +734,7 @@ TIMER_CALLBACK_MEMBER(bkungfu_c50_device::leveldraw_next)
 		complete(0);
 }
 
-void bkungfu_c50_device::command_w(uint8_t command)
+void bkungfu_mcu_device::command_w(uint8_t command)
 {
 	if (command == 0xfe)
 	{
@@ -803,7 +803,7 @@ void bkungfu_c50_device::command_w(uint8_t command)
 		return;
 
 	// Pre-level setup: decode the ROM-described base HUD.  This is an
-	// explicit C50 command, not a completion synthesized by the Z80 driver.
+	// explicit MCU command, not a completion synthesized by the Z80 driver.
 	if (!m_data_rom)
 		return;
 
@@ -913,12 +913,12 @@ void m62_bkungfu_state::bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data)
 	}
 }
 
-void m62_bkungfu_state::c50_vram_w(offs_t offset, uint8_t data)
+void m62_bkungfu_state::mcu_vram_w(offs_t offset, uint8_t data)
 {
 	bkungfu_blitter_tilemap_w(offset & 0x0fff, data);
 }
 
-void m62_bkungfu_state::c50_level_vram_w(offs_t offset, uint8_t data)
+void m62_bkungfu_state::mcu_level_vram_w(offs_t offset, uint8_t data)
 {
 	if (offset < m_bkungfu_tileram.bytes())
 	{
@@ -927,7 +927,7 @@ void m62_bkungfu_state::c50_level_vram_w(offs_t offset, uint8_t data)
 	}
 }
 
-void m62_bkungfu_state::c50_mailbox_w(offs_t offset, uint8_t data)
+void m62_bkungfu_state::mcu_mailbox_w(offs_t offset, uint8_t data)
 {
 	if (offset < 0x800)
 		m_blittercmdram[offset] = data;
@@ -939,7 +939,7 @@ void m62_bkungfu_state::machine_start()
 
 	save_item(NAME(m_blittercmdram));
 
-	m_c50->set_data_rom(&m_blitterdatarom[0]);
+	m_mcu->set_data_rom(&m_blitterdatarom[0]);
 }
 
 void m62_bkungfu_state::machine_reset()
@@ -957,11 +957,11 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 
 	m_blittercmdram[offset] = data;
 	if (offset < 0x800)
-		m_c50->mailbox_w(offset, data);
+		m_mcu->mailbox_w(offset, data);
 
 	if (offset == 0x00)
 	{
-		m_c50->command_w(data);
+		m_mcu->command_w(data);
 		if (data == 0x14)
 		{
 			logerror("%s: Command %02x: blitter: draw text from ROM\n", machine().describe_context(), data);
@@ -1011,7 +1011,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			uint8_t param2 = m_blittercmdram[0x002];
 			logerror("%s: Command %02x: blitter: start of level cmd 2 (do draw?) %02x %02x\n", machine().describe_context(), data, param1, param2);
 
-			// The C50 device owns the progressive strip draw and completes C800
+			// The MCU device owns the progressive strip draw and completes C800
 			// when its last 4-tile column has been written.
 		}
 		else if (data == 0x01)
@@ -1022,7 +1022,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// it happens twice at the start of each stage, once before any level animations are complete
 			// the param is different each time +8 the 2nd time, as to point to the 'with animations complete' state of the tilemap
 
-			logerror("%s: Command %02x: C50 select level table entry %02x\n", machine().describe_context(), data, m_blittercmdram[0x001]);
+			logerror("%s: Command %02x: MCU select level table entry %02x\n", machine().describe_context(), data, m_blittercmdram[0x001]);
 		}
 		else if (data == 0x0a)
 		{
@@ -1062,7 +1062,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			// definitions are either coming from internal MCU ROM or the encrypted area
 
 			logerror("%s: Command %02x: blitter: draw title animation element (flames / level animations) %02x %02x\n", machine().describe_context(), data, m_blittercmdram[0x001], m_blittercmdram[0x002]);
-			// The C50 device decodes the object record and writes its tilemap.
+			// The MCU device decodes the object record and writes its tilemap.
 		}
 		else if (data == 0xfe)
 		{
@@ -1142,7 +1142,7 @@ void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 			}
 			}
 
-			// The C50 sees the same shared RAM writes.  Its mailbox model runs
+			// The MCU sees the same shared RAM writes.  Its mailbox model runs
 			// this job when it sees the trigger byte and writes 0xfe on completion.
 		}
 
@@ -1203,10 +1203,10 @@ void m62_bkungfu_state::bkungfu(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m62_bkungfu_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &m62_bkungfu_state::io_map);
 
-	BKUNG_C50(config, m_c50, 0);
-	m_c50->vram_w().set(FUNC(m62_bkungfu_state::c50_vram_w));
-	m_c50->level_vram_w().set(FUNC(m62_bkungfu_state::c50_level_vram_w));
-	m_c50->mailbox_out_w().set(FUNC(m62_bkungfu_state::c50_mailbox_w));
+	BKUNG_MCU(config, m_mcu, 0);
+	m_mcu->vram_w().set(FUNC(m62_bkungfu_state::mcu_vram_w));
+	m_mcu->level_vram_w().set(FUNC(m62_bkungfu_state::mcu_level_vram_w));
+	m_mcu->mailbox_out_w().set(FUNC(m62_bkungfu_state::mcu_mailbox_w));
 
 	MCFG_VIDEO_START_OVERRIDE(m62_bkungfu_state,bkungfu)
 }
