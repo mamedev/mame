@@ -273,9 +273,10 @@ uint8_t arduboy_state::intflash_r(offs_t offset)
 void arduboy_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x77ff).r(FUNC(arduboy_state::intflash_r));
-
-	// bootloader sits at 0x7800-0x7fff.
-	// note though that very old bootloaders are 3k
+	// bootloader can be 3k or 2k, depending on the device
+	// and who flashed what to the system.
+	// running the bootloaders will require full spm emulation,
+	// which the AVR8 core doesn't have yet.
 }
 
 void arduboy_state::data_map(address_map &map)
@@ -602,8 +603,8 @@ ROM_START( arduboy )
 	ROM_REGION( 0x800, "eeprom", ROMREGION_ERASE00 )
 ROM_END
 
-// for documentation purposes: the Arduboy FX bootloader.
-// CRC(4c49b0f5) SHA1(66a7411c46c04a8089a7ddfb5ffd9809dd08a21f)
+// for documentation purposes: the Arduboy FX bootloader, which is 3k
+// CRC(4cce6edf) SHA1(bc5a5f850b56916328d189d51844b1b334d83713)
 
 } // anonymous namespace
 
