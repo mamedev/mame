@@ -194,9 +194,7 @@ private:
 	bool m_base_rowscan_invert;
 
 	// display memory: one "page" is 8 pixels tall, one line is 128 pixels long
-	uint8_t m_gddram[128 * 8];
+	std::unique_ptr<u8[]> m_gddram;
 };
-
-
 
 #endif
