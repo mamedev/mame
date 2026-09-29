@@ -1932,6 +1932,98 @@ static INPUT_PORTS_START( tetris )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" ) /* Listed as "Unused" */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( iqpipe )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+
+	PORT_START("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ))
+	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ))
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_8C ))
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_9C ))
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_10C ))
+	PORT_DIPSETTING(    0x05, "1 Coin/11 Credits")
+	PORT_DIPSETTING(    0x04, "1 Coin/12 Credits")
+	PORT_DIPSETTING(    0x03, "1 Coin/13 Credits")
+	PORT_DIPSETTING(    0x02, "1 Coin/14 Credits")
+	PORT_DIPSETTING(    0x01, "1 Coin/15 Credits")
+	PORT_DIPSETTING(    0x00, "Free Play")
+	// the coinage code seems buggy, the coinage will never be
+	// any less than value set in this dip, lower values default to this
+	PORT_DIPNAME( 0xf0, 0xf0, "Minimum Coinage" ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ))
+	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ))
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_8C ))
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_9C ))
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_10C ))
+	PORT_DIPSETTING(    0x50, "1 Coin/11 Credits")
+	PORT_DIPSETTING(    0x40, "1 Coin/12 Credits")
+	PORT_DIPSETTING(    0x30, "1 Coin/13 Credits")
+	PORT_DIPSETTING(    0x20, "1 Coin/14 Credits")
+	PORT_DIPSETTING(    0x10, "1 Coin/15 Credits")
+	PORT_DIPSETTING(    0x00, "Free Play")
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( beautyb )
+	PORT_INCLUDE( iqpipe )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x80, 0x00, "Non-Standard Pieces" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 /* System 18 Bootlegs */
 static INPUT_PORTS_START( base18 )
 	PORT_START("P1")
@@ -4352,9 +4444,9 @@ GAME( 1989, eswatbl3,    eswat,     eswatbl,       eswat,    segas1x_bootleg_sta
 GAME( 1988, tetrisbl,    tetris,    tetrisbl,      tetris,   segas1x_bootleg_state,  init_dduxbl,     ROT0,   "bootleg", "Tetris (bootleg)", 0 )
 GAME( 1987, timescanbl,  timescan,  tetrisbl,      tetris,   segas1x_bootleg_state,  empty_init,      ROT0,   "bootleg", "Time Scanner (bootleg)", MACHINE_NOT_WORKING ) // encrypted
 
-/* Tetris-based hardware */
-GAME( 1991, beautyb,     0,         beautyb,       tetris,   segas1x_bootleg_state,  init_beautyb,    ROT0,   "AMT", "Beauty Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1991, iqpipe,      0,         iqpipe,        tetris,   segas1x_bootleg_state,  init_beautyb,    ROT0,   "AMT", "IQ Pipe", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+/* Tetris-derived hardware - unknown if these really have the System16 paging or just write the registers anyway */
+GAME( 1991, beautyb,     0,         beautyb,       beautyb,  segas1x_bootleg_state,  init_beautyb,    ROT0,   "AMT", "Beauty Block", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, iqpipe,      0,         iqpipe,        iqpipe,   segas1x_bootleg_state,  init_beautyb,    ROT0,   "AMT", "IQ Pipe", MACHINE_IMPERFECT_GRAPHICS ) // ranking graphics may be incorrect when scrolling?
 
 /* System 18 bootlegs */
 GAME( 1990, mwalkbl,     mwalk,     mwalkbl,       mwalkbl,  segas1x_bootleg_state,  init_sys18bl_oki,ROT0,   "bootleg", "Michael Jackson's Moonwalker (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
