@@ -436,7 +436,6 @@ void arduboy_state::apply_delay_sleep_hack()
 	}   \
 	else  \
 	{   \
-		printf("%s: invalid hexbyte on load: %02x (@ %08x)\n", tag(), xin, (uint32_t)image.ftell()); \
 		return std::make_pair(image_error::BADSOFTWARE, "invalid hex byte");    \
 	}   \
 }
