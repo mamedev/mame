@@ -542,7 +542,7 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
 	switch (m_addressing_mode)
 	{
 		case SSD1306_ADDRESSING_MODE_PAGE:
-			m_column_address_pointer ++;
+			m_column_address_pointer++;
 			if (m_column_address_pointer >= 128)
 			{
 				m_column_address_pointer = m_pagemode_column_start_address;
@@ -550,12 +550,12 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
 			break;
 
 		case SSD1306_ADDRESSING_MODE_HORIZONTAL:
-			m_column_address_pointer ++;
+			m_column_address_pointer++;
 			if (m_column_address_pointer > std::min((int)m_hvmode_column_end_address, 127))
 			{
 				m_column_address_pointer = m_hvmode_column_start_address;
 
-				m_page_address_pointer ++;
+				m_page_address_pointer++;
 				if (m_page_address_pointer > std::min((int)m_hvmode_page_end_address, 7))
 				{
 					m_page_address_pointer = m_hvmode_page_start_address;
@@ -564,11 +564,11 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
 			break;
 
 		case SSD1306_ADDRESSING_MODE_VERTICAL:
-			m_page_address_pointer ++;
+			m_page_address_pointer++;
 			if (m_page_address_pointer > std::min((int)m_hvmode_page_end_address, 7))
 			{
 				m_page_address_pointer = m_hvmode_page_start_address;
-				m_column_address_pointer ++;
+				m_column_address_pointer++;
 				if (m_column_address_pointer > std::min((int)m_hvmode_column_end_address, 127))
 				{
 					m_column_address_pointer = m_hvmode_column_start_address;

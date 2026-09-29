@@ -257,7 +257,7 @@ void arduboy_state::port_e_w(uint8_t data)
 
 uint8_t arduboy_state::port_f_r()
 {
-	return ioport("PORTF")->read() & 0xF0;
+	return ioport("PORTF")->read() & 0xf0;
 }
 
 void arduboy_state::port_f_w(uint8_t data)
