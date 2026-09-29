@@ -61,6 +61,9 @@ manager.machine.screens
 manager.machine.cassettes
     Returns a device enumerator that will iterate over
     :ref:`cassette image devices <luascript-ref-cassdev>` in the system.
+manager.machine.cdplayers
+    Returns a device enumerator that will iterate over
+    :ref:`audio CD player devices <luascript-ref-cdplayerdev>` in the system.
 manager.machine.images
     Returns a device enumerator that will iterate over
     :ref:`media image devices <luascript-ref-diimage>` in the system.
@@ -96,6 +99,14 @@ emu.cassette_enumerator(device, [depth])
     :ref:`cassette image devices <luascript-ref-cassdev>` in the sub-tree
     starting at the specified device.  The specified device will be included if
     it is a cassette image device.  If the depth is provided, it must be an
+    integer specifying the maximum number of levels to iterate below the
+    specified device (i.e. 1 will limit iteration to the device and its
+    immediate children).
+emu.cdplayer_enumerator(device, [depth])
+    Returns a device enumerator that will iterate over
+    :ref:`audio CD player devices <luascript-ref-cdplayerdev>` in the sub-tree
+    starting at the specified device.  The specified device will be included if
+    it is an audio CD player device.  If the depth is provided, it must be an
     integer specifying the maximum number of levels to iterate below the
     specified device (i.e. 1 will limit iteration to the device and its
     immediate children).
@@ -590,6 +601,65 @@ cassette.position (read-only)
 cassette.length (read-only)
     The length of the tape as a floating-point number in units of seconds, or
     zero (0) if no tape image is mounted.
+
+
+.. _luascript-ref-cdplayerdev:
+
+Audio CD player device
+----------------------
+
+Wraps MAME’s ``cd_player_device`` class, representing an audio CD player whose
+output is fed to the emulated system, for example through a cassette or
+joystick port adapter.
+
+Instantiation
+~~~~~~~~~~~~~
+
+manager.machine.cdplayers[tag]
+    Gets an audio CD player device by tag relative to the root machine device,
+    or ``nil`` if no such device exists or it is not an audio CD player device.
+
+Base classes
+~~~~~~~~~~~~
+
+* :ref:`luascript-ref-device`
+* :ref:`luascript-ref-diimage`
+
+Methods
+~~~~~~~
+
+cdplayer:play()
+    Starts or resumes playback from the current position.
+cdplayer:pause()
+    Pauses playback, keeping the current position.
+cdplayer:stop()
+    Stops playback and returns to the start of the current track.
+cdplayer:previous_track()
+    Returns to the start of the current track if playback is more than two
+    seconds into it, otherwise moves to the start of the previous track.
+cdplayer:next_track()
+    Moves to the start of the next track.
+
+Properties
+~~~~~~~~~~
+
+cdplayer.is_stopped (read-only)
+    A Boolean indicating whether the player is stopped.
+cdplayer.is_playing (read-only)
+    A Boolean indicating whether the player is playing.
+cdplayer.is_paused (read-only)
+    A Boolean indicating whether the player is paused.
+cdplayer.track (read/write)
+    The current track number, starting at one.  Setting it moves to the start
+    of that track without changing whether the player is playing.
+cdplayer.track_count (read-only)
+    The number of tracks on the disc, or zero (0) if no disc image is mounted.
+cdplayer.position (read-only)
+    The current position as a floating-point number in units of seconds
+    relative to the start of the current track.
+cdplayer.length (read-only)
+    The length of the current track as a floating-point number in units of
+    seconds, or zero (0) if no disc image is mounted.
 
 
 .. _luascript-ref-diimage:

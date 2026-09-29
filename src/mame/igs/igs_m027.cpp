@@ -3415,6 +3415,24 @@ ROM_START( lhzb3106c5m )
 	ROM_LOAD( "igs_s2402.u26", 0x000000, 0x200000, CRC(84bc2f3e) SHA1(49dcf5eaa39accd5c6bf01782fd4221298cb43ed) ) // 1ST AND 2ND HALF IDENTICAL
 ROM_END
 
+ROM_START( lhzb3p ) // IGS PCB N0-0241
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "d9_igs027a.u13", 0x0000, 0x4000, CRC(75645f8c) SHA1(738fba64a906f4f10e78e332ad30b8da9dc86b21) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "lhzb3jqb_v_200c5m.u9", 0x00000, 0x80000, CRC(024b910b) SHA1(8406a0bbd615f728aaa55a160de9427059ada195) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "igs_m2403_image_v101.u17", 0x000000, 0x80000,CRC(a82398a9) SHA1(4d2987f57096b7f24ce6571ed3be6dcb33bce88d) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "m2401.u18", 0x000000, 0x400000,  CRC(81428f18) SHA1(9fb19c8a79cc3443642f4b044e04735df2cb45be) )
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "igs_s2402_speech_v100.u14", 0x000000, 0x100000, CRC(56083fe2) SHA1(62afd651809bf5e639bfda6e5579dbf4b903b664) )
+ROM_END
+
 // This board is a bit different to the others. Main OSC is 22.1184MHz.
 // Everything is the same except no IGS027A. Instead there is a QFP128 chip in the place where the 027A would be.
 // It's clear this is a 027A replacement. The PCB still has the silk-screening for the pin numbers on the 027A but no QFP pads for it.
@@ -4967,3 +4985,4 @@ GAME(  200?, jhg3d,         0,        m027_1ppi<false>, base,     igs_m027_state
 GAME(  200?, tarzan2,       jking02,  m027_1ppi<false>, base,     igs_m027_state, init_tarzan2,  ROT0, "IGS", "Tarzan II (V101XB)", MACHINE_NOT_WORKING )
 GAME(  2006, magtree,       crzybugs, m027_1ppi<false>, base,     igs_m027_state, init_magtree,  ROT0, "IGS", "Magic Tree (V200PR)", MACHINE_NOT_WORKING )
 GAME(  2006, tswx,          0,        m027_1ppi<false>, base,     igs_m027_state, init_tswxp,    ROT0, "IGS", "Taishan Wuxian", MACHINE_NOT_WORKING )
+GAME(  199?, lhzb3p,        0,        m027_1ppi<false>, base,     igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III Jiaqiang Ban (V200C5N)", MACHINE_NOT_WORKING )

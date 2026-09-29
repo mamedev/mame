@@ -137,23 +137,10 @@ ROM sockets:  UA3   2K or 4K character
 
     TODO:
 
-    - accurate video timing for non-CRTC models
-    - High Speed Graphics board
-    - keyboard layouts
-        - Swedish
-        - German
-    - SuperPET
-        - 6809
-        - OS/9 MMU
     - 8296
         - PLA dumps
-        - high resolution graphics
-            The RAM is accessed by writing the value #$83 into $E888. This is a register
-            in the CRTC memory space that is intercepted by the board and serves as a
-            latch to drive jumpers on the 8296D mainboard. Because the ROMs are banked
-            out this way, all video memory manipulation must happen with interrupts
-            disabled. Normal ROM operation is restored by writing #$0F into $E888.
         - Malvern Particle Sizer OEM variant
+	- The original PET 2001 board's screen "snow", when the CPU writes during display, is not emulated.
 
 */
 
@@ -198,7 +185,7 @@ namespace {
 class pet_state : public driver_device
 {
 public:
-	pet_state(const machine_config &mconfig, device_type type, const char *tag, size_t videoram_size = 0x400) :
+	pet_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, M6502_TAG),
 		m_via(*this, M6522_TAG),
@@ -219,15 +206,17 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, M6502_TAG),
 		m_char_rom(*this, "charom"),
-		m_video_ram(*this, "video_ram", videoram_size, ENDIANNESS_LITTLE),
+		m_video_ram(*this, "video_ram"),
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
 		m_sync_timer(nullptr),
-		m_sync_period(attotime::zero),
 		m_key(0),
 		m_sync(0),
 		m_graphic(0),
 		m_blanktv(0),
+		m_via_cb2(0),
+		m_pia1_pa7(0),
+		m_via_pa(0xff),
 		m_user_diag(1)
 	{ }
 
@@ -252,8 +241,10 @@ public:
 	void pet2001(machine_config &config);
 	void pet2001n32(machine_config &config);
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	uint8_t cart_r(offs_t offset);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
+	void video_ram_w(offs_t offset, uint8_t data);
 
 	void via_pa_w(uint8_t data);
 	uint8_t via_pb_r();
@@ -278,7 +269,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void base_mem(address_map &map) ATTR_COLD;
 	void pet2001_mem(address_map &map) ATTR_COLD;
+	void pet40_mem(address_map &map) ATTR_COLD;
+	void pet80_mem(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -303,34 +297,19 @@ protected:
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
-	memory_share_creator<uint8_t> m_video_ram;
+	optional_shared_ptr<uint8_t> m_video_ram;
 	required_ioport_array<10> m_row;
 	required_ioport m_lock;
 
 	emu_timer *m_sync_timer;
-	attotime m_sync_period;
 
 	void update_speaker();
 
-	enum
-	{
-		SEL0 = 0,
-		SEL1,
-		SEL2,
-		SEL3,
-		SEL4,
-		SEL5,
-		SEL6,
-		SEL7,
-		SEL8,
-		SEL9,
-		SELA,
-		SELB,
-		SELC,
-		SELD,
-		SELE,
-		SELF
-	};
+	static constexpr int VIDEO_TEXT_X = 48;
+	static constexpr int VIDEO_TEXT_Y = 20;
+	static constexpr int VIDEO_SYNC_X = VIDEO_TEXT_X + 320;
+	static constexpr int VIDEO_ON_Y = VIDEO_TEXT_Y - 1;
+	static constexpr int VIDEO_OFF_Y = VIDEO_TEXT_Y + 199;
 
 	// keyboard state
 	uint8_t m_key;
@@ -353,8 +332,8 @@ protected:
 class pet2001b_state : public pet_state
 {
 public:
-	pet2001b_state(const machine_config &mconfig, device_type type, const char *tag, size_t videoram_size = 0x400) :
-		pet_state(mconfig, type, tag, videoram_size)
+	pet2001b_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pet_state(mconfig, type, tag)
 	{ }
 
 	void pet2001b(machine_config &config, bool with_b000 = true);
@@ -382,7 +361,7 @@ class pet80_state : public pet2001b_state
 {
 public:
 	pet80_state(const machine_config &mconfig, device_type type, const char *tag) :
-		pet2001b_state(mconfig, type, tag, 0x800)
+		pet2001b_state(mconfig, type, tag)
 	{ }
 
 	void pet80(machine_config &config);
@@ -423,11 +402,14 @@ public:
 		m_ue5_rom(*this, "ue5_eprom"),
 		m_ue6_rom(*this, "ue6_eprom"),
 		m_pla1(*this, PLA1_TAG),
-		m_pla2(*this, PLA2_TAG)
+		m_pla2(*this, PLA2_TAG),
+		m_hre_dil(*this, "HRE_DIL"),
+		m_hre_present(false)
 	{ }
 
 	void cbm8296d(machine_config &config);
 	void cbm8296(machine_config &config);
+	void cbm8296gd(machine_config &config);
 
 	MC6845_UPDATE_ROW( cbm8296_update_row );
 
@@ -441,6 +423,7 @@ private:
 	required_memory_region m_ue6_rom;
 	required_device<pla_device> m_pla1;
 	required_device<pla_device> m_pla2;
+	optional_ioport m_hre_dil;
 
 	virtual void machine_reset() override ATTR_COLD;
 
@@ -455,6 +438,9 @@ private:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
+	void pla_ram_select(int &ramsela, int &ramsel9, int &ramon);
+
+	bool m_hre_present;
 	uint8_t m_cr;
 	uint8_t m_hre;
 	void cbm8296_mem(address_map &map) ATTR_COLD;
@@ -497,159 +483,48 @@ void pet_state::update_speaker()
 }
 
 
-//-------------------------------------------------
-//  read -
-//-------------------------------------------------
-
-uint8_t pet_state::read(offs_t offset)
+uint8_t pet_state::cart_r(offs_t offset)
 {
-	int sel = offset >> 12;
-	int norom = m_exp->norom_r(offset, sel);
-	uint8_t data = 0;
+	generic_slot_device *const cart = offset < 0x1000 ? m_cart_9000.target() :
+		offset < 0x2000 ? m_cart_a000.target() : m_cart_b000.target();
+	return cart && cart->exists() ? cart->read_rom(offset & 0xfff) : m_rom->base()[offset];
+}
 
-	data = m_exp->read(offset, data, sel);
-
-	switch (sel)
-	{
-	case SEL0: case SEL1: case SEL2: case SEL3: case SEL4: case SEL5: case SEL6: case SEL7:
-		if (offset < m_ram->size())
-		{
-			data = m_ram->pointer()[offset];
-		}
-		break;
-
-	case SEL8:
-		if (!(offset & 0x800))
-		{
-			data = m_video_ram[offset & (m_video_ram.length() - 1)];
-		}
-		break;
-
-	case SEL9:
-		if (norom)
-		{
-			if (m_cart_9000 && m_cart_9000->exists())
-				data = m_cart_9000->read_rom(offset & 0xfff);
-			else
-				data = m_rom->base()[offset - 0x9000];
-		}
-		break;
-
-	case SELA:
-		if (norom)
-		{
-			if (m_cart_a000 && m_cart_a000->exists())
-				data = m_cart_a000->read_rom(offset & 0xfff);
-			else
-				data = m_rom->base()[offset - 0x9000];
-		}
-		break;
-
-	case SELB:
-		if (norom)
-		{
-			if (m_cart_b000 && m_cart_b000->exists())
-				data = m_cart_b000->read_rom(offset & 0xfff);
-			else
-				data = m_rom->base()[offset - 0x9000];
-		}
-		break;
-
-	case SELC: case SELD: case SELF:
-		if (norom)
-		{
-			data = m_rom->base()[offset - 0x9000];
-		}
-		break;
-
-	case SELE:
-		if (BIT(offset, 11))
-		{
-			data = 0xff;
-
-			if (BIT(offset, 4))
-			{
-				data &= m_pia1->read(offset & 0x03);
-			}
-			if (BIT(offset, 5))
-			{
-				data &= m_pia2->read(offset & 0x03);
-			}
-			if (BIT(offset, 6))
-			{
-				data &= m_via->read(offset & 0x0f);
-			}
-			if (m_crtc && BIT(offset, 7) && BIT(offset, 0))
-			{
-				data &= m_crtc->register_r();
-			}
-		}
-		else if (norom)
-		{
-			data = m_rom->base()[offset - 0x9000];
-		}
-		break;
-	}
-
+uint8_t pet_state::io_r(offs_t offset)
+{
+	uint8_t data = 0xff;
+	if (BIT(offset, 4))
+		data &= m_pia1->read(offset & 0x03);
+	if (BIT(offset, 5))
+		data &= m_pia2->read(offset & 0x03);
+	if (BIT(offset, 6))
+		data &= m_via->read(offset & 0x0f);
+	if (m_crtc && BIT(offset, 7) && BIT(offset, 0))
+		data &= m_crtc->register_r();
 	return data;
 }
 
-
-//-------------------------------------------------
-//  write -
-//-------------------------------------------------
-
-void pet_state::write(offs_t offset, uint8_t data)
+void pet_state::io_w(offs_t offset, uint8_t data)
 {
-	int sel = offset >> 12;
-
-	m_exp->write(offset, data, sel);
-
-	switch (sel)
+	if (BIT(offset, 4))
+		m_pia1->write(offset & 0x03, data);
+	if (BIT(offset, 5))
+		m_pia2->write(offset & 0x03, data);
+	if (BIT(offset, 6))
+		m_via->write(offset & 0x0f, data);
+	if (m_crtc && BIT(offset, 7))
 	{
-	case SEL0: case SEL1: case SEL2: case SEL3: case SEL4: case SEL5: case SEL6: case SEL7:
-		if (offset < m_ram->size())
-		{
-			m_ram->pointer()[offset] = data;
-		}
-		break;
-
-	case SEL8:
-		if (!(offset & 0x800))
-		{
-			m_video_ram[offset & (m_video_ram.length() - 1)] = data;
-		}
-		break;
-
-	case SELE:
-		if (BIT(offset, 11))
-		{
-			if (BIT(offset, 4))
-			{
-				m_pia1->write(offset & 0x03, data);
-			}
-			if (BIT(offset, 5))
-			{
-				m_pia2->write(offset & 0x03, data);
-			}
-			if (BIT(offset, 6))
-			{
-				m_via->write(offset & 0x0f, data);
-			}
-			if (m_crtc && BIT(offset, 7))
-			{
-				if (BIT(offset, 0))
-				{
-					m_crtc->register_w(data);
-				}
-				else
-				{
-					m_crtc->address_w(data);
-				}
-			}
-		}
-		break;
+		if (BIT(offset, 0))
+			m_crtc->register_w(data);
+		else
+			m_crtc->address_w(data);
 	}
+}
+
+void pet_state::video_ram_w(offs_t offset, uint8_t data)
+{
+	m_screen->update_now();
+	m_video_ram[offset] = data;
 }
 
 //-------------------------------------------------
@@ -727,14 +602,42 @@ void cbm8296_state::read_pla2_eprom(offs_t offset, int phi2, int brw, int casena
 
 
 //-------------------------------------------------
+//  pla_ram_select -
+//-------------------------------------------------
+
+void cbm8296_state::pla_ram_select(int &ramsela, int &ramsel9, int &ramon)
+{
+	if (m_hre_present && BIT(m_hre, 7))
+	{
+		ramsel9 = BIT(m_hre, 0);
+		ramsela = BIT(m_hre, 1);
+		ramon = BIT(m_hre, 2);
+	}
+	else if (m_hre_present)
+	{
+		ramsela = BIT(m_hre_dil->read(), 0);
+		ramsel9 = BIT(m_hre_dil->read(), 1);
+		ramon = 1;
+	}
+	else
+	{
+		ramsela = BIT(m_via_pa, 0);
+		ramsel9 = BIT(m_via_pa, 1);
+		ramon = BIT(m_via_pa, 2);
+	}
+}
+
+
+//-------------------------------------------------
 //  read -
 //-------------------------------------------------
 
 uint8_t cbm8296_state::read(offs_t offset)
 {
-	int norom = m_exp->norom_r(offset, offset >> 12) && !BIT(m_cr, 7);
+	int norom = !BIT(m_cr, 7);
 	int phi2 = 1, brw = 1, noscreen = 1, noio = BIT(m_cr, 6);
-	int ramsela = BIT(m_via_pa, 0), ramsel9 = BIT(m_via_pa, 1), ramon = BIT(m_via_pa, 2);
+	int ramsela, ramsel9, ramon;
+	pla_ram_select(ramsela, ramsel9, ramon);
 	int cswff = 1, cs9 = 1, csa = 1, csio = 1, cse = 1, cskb = 1, fa12 = 1, fa15 = 1, casena1 = 1, casena2 = 1, endra = 1;
 
 	read_pla1_eprom(offset, phi2, brw, noscreen, noio, ramsela, ramsel9, ramon, norom,
@@ -813,9 +716,10 @@ uint8_t cbm8296_state::read(offs_t offset)
 
 void cbm8296_state::write(offs_t offset, uint8_t data)
 {
-	int norom = m_exp->norom_r(offset, offset >> 12) && !BIT(m_cr, 7);
+	int norom = !BIT(m_cr, 7);
 	int phi2 = 1, brw = 0, noscreen = 1, noio = BIT(m_cr, 6);
-	int ramsela = BIT(m_via_pa, 0), ramsel9 = BIT(m_via_pa, 1), ramon = BIT(m_via_pa, 2);
+	int ramsela, ramsel9, ramon;
+	pla_ram_select(ramsela, ramsel9, ramon);
 	int cswff = 1, cs9 = 1, csa = 1, csio = 1, cse = 1, cskb = 1, fa12 = 1, fa15 = 1, casena1 = 1, casena2 = 1, endra = 1;
 
 	read_pla1_eprom(offset, phi2, brw, noscreen, noio, ramsela, ramsel9, ramon, norom,
@@ -854,7 +758,7 @@ void cbm8296_state::write(offs_t offset, uint8_t data)
 		}
 		if (BIT(offset, 7))
 		{
-			if (BIT(offset, 3))
+			if (m_hre_present && BIT(offset, 3))
 			{
 				m_hre = data;
 			}
@@ -881,9 +785,30 @@ void cbm8296_state::write(offs_t offset, uint8_t data)
 //  ADDRESS MAPS
 //**************************************************************************
 
+void pet_state::base_mem(address_map &map)
+{
+	map(0x0000, 0xffff).noprw();
+	map(0x9000, 0xffff).rom().region(M6502_TAG, 0);
+	map(0x9000, 0xbfff).r(FUNC(pet_state::cart_r));
+	map(0xe800, 0xefff).rw(FUNC(pet_state::io_r), FUNC(pet_state::io_w));
+}
+
 void pet_state::pet2001_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(pet_state::read), FUNC(pet_state::write));
+	base_mem(map);
+	map(0x8000, 0x83ff).mirror(0x400).readonly().share("video_ram").w(FUNC(pet_state::video_ram_w));
+}
+
+void pet_state::pet40_mem(address_map &map)
+{
+	base_mem(map);
+	map(0x8000, 0x83ff).mirror(0x400).ram().share("video_ram");
+}
+
+void pet_state::pet80_mem(address_map &map)
+{
+	base_mem(map);
+	map(0x8000, 0x87ff).ram().share("video_ram");
 }
 
 
@@ -1009,7 +934,7 @@ INPUT_PORTS_START( petb )
 	PORT_START( "ROW0" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Crsr Right Left") PORT_CODE(KEYCODE_PGUP) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Crsr Right Left") PORT_CODE(KEYCODE_PGDN) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('-') PORT_CHAR('=')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('(')
@@ -1020,7 +945,6 @@ INPUT_PORTS_START( petb )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9_PAD)      PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91") PORT_CODE(KEYCODE_DEL) PORT_CHAR('^')
-
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0_PAD)      PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('\'')
@@ -1061,7 +985,7 @@ INPUT_PORTS_START( petb )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4_PAD)      PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Crsr Down Up") PORT_CODE(KEYCODE_PGDN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Crsr Down Up") PORT_CODE(KEYCODE_PGUP) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T)          PORT_CHAR('t') PORT_CHAR('T')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)          PORT_CHAR('e') PORT_CHAR('E')
@@ -1115,6 +1039,29 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( petb_de )
 	PORT_INCLUDE( petb )
+
+	PORT_MODIFY( "ROW1" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL)        PORT_CHAR(0x00df)
+
+	PORT_MODIFY( "ROW2" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(0x00f6) PORT_CHAR(0x00d6)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(';') PORT_CHAR('+')
+
+	PORT_MODIFY( "ROW3" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00fc) PORT_CHAR(0x00dc)
+
+	PORT_MODIFY( "ROW4" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)          PORT_CHAR('z') PORT_CHAR('Z')
+
+	PORT_MODIFY( "ROW5" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(0x00e4) PORT_CHAR(0x00c4)
+
+	PORT_MODIFY( "ROW7" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)          PORT_CHAR('y') PORT_CHAR('Y')
+
+	PORT_MODIFY( "ROW9" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('@')
 INPUT_PORTS_END
 
 
@@ -1123,8 +1070,147 @@ INPUT_PORTS_START( petb_fr )
 INPUT_PORTS_END
 
 
+INPUT_PORTS_START( cbm8296d )
+	PORT_START( "ROW0" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Text  Graphic") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Crsr Right Left") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR(0x00b4) PORT_CHAR('`')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5)          PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('"')
+
+	PORT_START( "ROW1" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9_PAD)      PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Crsr Down Up") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)          PORT_CHAR('0') PORT_CHAR('=')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('/')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
+
+	PORT_START( "ROW2" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5_PAD)      PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(0x00f6) PORT_CHAR(0x00d6)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('#') PORT_CHAR('\'')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)          PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC)        PORT_CHAR(UCHAR_MAMEKEY(ESC))
+
+	PORT_START( "ROW3" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6_PAD)      PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00e4) PORT_CHAR(0x00c4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)          PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)          PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
+
+	PORT_START( "ROW4" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL)        PORT_CHAR(']') PORT_CHAR('\\')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('+') PORT_CHAR('*')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)          PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)          PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)          PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB)        PORT_CHAR('\t')
+
+	PORT_START( "ROW5" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4_PAD)      PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(0x00fc) PORT_CHAR(0x00dc)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("[  \xE2\x86\x91") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('[') PORT_CHAR('^')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T)          PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)          PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
+
+	PORT_START( "ROW6" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3_PAD)      PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Shift (Right)") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Scroll Up  Scroll Down") PORT_CODE(KEYCODE_F5)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR(':')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Shift (Left)") PORT_CODE(KEYCODE_LSHIFT)
+
+	PORT_START( "ROW7" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2_PAD)      PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Stop Run") PORT_CODE(KEYCODE_END)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Set Top  Set Bottom") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0_PAD)      PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR(';')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V)          PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)          PORT_CHAR('y') PORT_CHAR('Y')
+
+	PORT_START( "ROW8" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1_PAD)      PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Del Line  Ins Line") PORT_CODE(KEYCODE_F3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Del  Inst") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+
+	PORT_START( "ROW9" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Erase End  Erase Begin") PORT_CODE(KEYCODE_F4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)      PORT_CHAR(0x00df) PORT_CHAR('?')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Home  Clr Screen") PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR(0x00a7)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<') PORT_CHAR('>')
+
+	PORT_START( "LOCK" )
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( cbm8296gd )
+	PORT_INCLUDE( cbm8296d )
+
+	PORT_START( "HRE_DIL" )
+	PORT_DIPNAME( 0x01, 0x01, "JU3 /RAMSEL A" ) PORT_DIPLOCATION("DIL:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "JU4 /RAMSEL 9" ) PORT_DIPLOCATION("DIL:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "JU7 /SEL EXP to /CS9" ) PORT_DIPLOCATION("DIL:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "JU6 /SEL EXP to /CSA" ) PORT_DIPLOCATION("DIL:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 INPUT_PORTS_START( petb_se )
 	PORT_INCLUDE( petb )
+
+	PORT_MODIFY( "ROW2" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)      PORT_CHAR(0x00f6) PORT_CHAR(0x00d6)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(';') PORT_CHAR('+')
+
+	PORT_MODIFY( "ROW3" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR(0x00e4) PORT_CHAR(0x00c4)
+
+	PORT_MODIFY( "ROW4" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('@')
+
+	PORT_MODIFY( "ROW5" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR(0x00e5) PORT_CHAR(0x00c5)
 INPUT_PORTS_END
 
 
@@ -1206,6 +1292,9 @@ void pet_state::via_pb_w(uint8_t data)
 
 void pet_state::via_ca2_w(int state)
 {
+	if (!m_crtc)
+		m_screen->update_now();
+
 	m_graphic = state;
 }
 
@@ -1324,6 +1413,9 @@ void pet_state::pia1_ca2_w(int state)
 {
 	m_ieee->host_eoi_w(state);
 
+	if (!m_crtc)
+		m_screen->update_now();
+
 	m_blanktv = state;
 }
 
@@ -1341,9 +1433,11 @@ void pet_state::user_diag_w(int state)
 
 TIMER_CALLBACK_MEMBER( pet_state::sync_tick )
 {
-	m_sync = !m_sync;
+	m_sync = param;
 
 	m_pia1->cb1_w(m_sync);
+
+	m_sync_timer->adjust(m_screen->time_until_pos(m_sync ? VIDEO_OFF_Y : VIDEO_ON_Y, VIDEO_SYNC_X), !m_sync);
 }
 
 
@@ -1355,23 +1449,25 @@ uint32_t pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 {
 	pen_t const *const pen = m_palette->pens();
 
-	for (int y = 0; y < 200; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (int sx = 0; sx < 40; sx++)
+		int const line = y - VIDEO_TEXT_Y;
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			int const sy = y / 8;
-			offs_t const video_addr = (sy * 40) + sx;
-			uint8_t const lsd = m_video_ram[video_addr];
+			int const column = x - VIDEO_TEXT_X;
+			int color = 0;
 
-			int const ra = y & 0x07;
-			offs_t const char_addr = (m_graphic << 10) | ((lsd & 0x7f) << 3) | ra;
-			uint8_t data = m_char_rom->base()[char_addr];
-
-			for (int x = 0; x < 8; x++, data <<= 1)
+			if (line >= 0 && line < 200 && column >= 0 && column < 320)
 			{
-				int const color = (BIT(data, 7) ^ BIT(lsd, 7)) && m_blanktv;
-				bitmap.pix(y, (sx * 8) + x) = pen[color];
+				uint8_t const lsd = m_video_ram[((line >> 3) * 40) + (column >> 3)];
+				offs_t const char_addr = (m_graphic << 10) | ((lsd & 0x7f) << 3) | (line & 0x07);
+				uint8_t const data = m_char_rom->base()[char_addr];
+
+				color = (BIT(data, ~column & 7) ^ BIT(lsd, 7)) && m_blanktv;
 			}
+
+			bitmap.pix(y, x) = pen[color];
 		}
 	}
 
@@ -1478,6 +1574,30 @@ MC6845_UPDATE_ROW( cbm8296_state::cbm8296_update_row )
 	int x = 0;
 	const pen_t *pen = m_palette->pens();
 
+	if (m_hre_present && !BIT(ma, 12))
+	{
+		bool const no_row = !BIT(ra, 3);
+
+		for (int column = 0; column < x_count; column++)
+		{
+			for (int clkvla = 0; clkvla < 2; clkvla++)
+			{
+				offs_t const scr = (((ma + column) & 0xfff) << 1) | clkvla;
+				offs_t const addr = (0x8000 + ((scr & 0x1fc0) << 3) + ((ra & 0x07) << 6) + (scr & 0x3f)) & 0xffff;
+				offs_t const drma = 0x8000 | (addr & 0x7e00) | BIT(addr, 0) << 8 | (addr & 0x1fe) >> 1;
+				u8 data = m_ram->pointer()[drma];
+
+				for (int bit = 0; bit < 8; bit++, data <<= 1)
+				{
+					int const video = BIT(data, 7) && no_row && de;
+					bitmap.pix(vbp + y, hbp + x++) = pen[video];
+				}
+			}
+		}
+
+		return;
+	}
+
 	for (int column = 0; column < x_count; column++)
 	{
 		u8 const rra = ra & 0x07;
@@ -1533,6 +1653,8 @@ void cbm8296d_ieee488_devices(device_slot_interface &device)
 void pet_state::machine_start()
 {
 	// initialize memory
+	if (m_video_ram)
+		m_maincpu->space(AS_PROGRAM).install_ram(0, std::min<offs_t>(m_ram->size(), 0x8000) - 1, m_ram->pointer());
 	uint8_t data = 0xff;
 
 	for (offs_t offset = 0; offset < m_ram->size(); offset++)
@@ -1543,10 +1665,13 @@ void pet_state::machine_start()
 
 	data = 0xff;
 
-	for (offs_t offset = 0; offset < m_video_ram.length(); offset++)
+	if (m_video_ram)
 	{
-		m_video_ram[offset] = data;
-		if (!(offset % 64)) data ^= 0xff;
+		for (offs_t offset = 0; offset < m_video_ram.length(); offset++)
+		{
+			m_video_ram[offset] = data;
+			if (!(offset % 64)) data ^= 0xff;
+		}
 	}
 
 	if (!m_sync_timer)
@@ -1557,6 +1682,9 @@ void pet_state::machine_start()
 	save_item(NAME(m_sync));
 	save_item(NAME(m_graphic));
 	save_item(NAME(m_blanktv));
+	save_item(NAME(m_via_cb2));
+	save_item(NAME(m_pia1_pa7));
+	save_item(NAME(m_via_pa));
 	save_item(NAME(m_user_diag));
 }
 
@@ -1564,8 +1692,12 @@ void pet_state::machine_reset()
 {
 	m_ieee->host_ren_w(0);
 
-	if (m_sync_period != attotime::zero)
-		m_sync_timer->adjust(machine().time() + m_sync_period, 0, m_sync_period);
+	if (!m_crtc)
+	{
+		m_sync = 0;
+		m_pia1->cb1_w(m_sync);
+		m_sync_timer->adjust(m_screen->time_until_pos(VIDEO_ON_Y, VIDEO_SYNC_X), 1);
+	}
 }
 
 void cbm8296_state::machine_start()
@@ -1573,12 +1705,16 @@ void cbm8296_state::machine_start()
 	pet_state::machine_start();
 
 	// state saving
+	m_hre = 0x0f;
+
 	save_item(NAME(m_cr));
-	save_item(NAME(m_via_pa));
+	save_item(NAME(m_hre));
 }
 
 void cbm8296_state::machine_reset()
 {
+	pet_state::machine_reset();
+
 	m_cr = 0;
 	m_via_pa = 0xff;
 }
@@ -1661,8 +1797,10 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_cassette2->read_handler().set(M6522_TAG, FUNC(via6522_device::write_cb1));
 
 	PET_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/16, pet_expansion_cards, nullptr);
-	m_exp->dma_read_callback().set(FUNC(pet_state::read));
-	m_exp->dma_write_callback().set(FUNC(pet_state::write));
+	m_exp->set_program_space(m_maincpu, AS_PROGRAM);
+	m_exp->halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_exp->reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
+	m_exp->irq_callback().set("mainirq", FUNC(input_merger_device::in_w<5>));
 
 	PET_USER_PORT(config, m_user, pet_user_port_cards, nullptr);
 	m_user->pb_handler().set(m_via, FUNC(via6522_device::write_ca1));
@@ -1697,9 +1835,8 @@ void pet_state::pet(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
-	m_screen->set_raw(XTAL(8'000'000)/2, 320, 0, 320, 200, 0, 200);
+	m_screen->set_raw(XTAL(8'000'000), 512, 0, 448, 260, 0, 240);
 	m_screen->set_screen_update(FUNC(pet_state::screen_update));
-	m_sync_period = attotime::from_hz(120);
 
 	m_user->p5_handler().set(FUNC(pet_state::user_diag_w));
 }
@@ -1749,14 +1886,7 @@ void pet_state::pet2001n32(machine_config &config)
 
 void pet_state::cbm3000(machine_config &config)
 {
-	pet2001n(config, false);
-	// video hardware
-	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(320, 200);
-	m_screen->set_visarea(0, 320-1, 0, 200-1);
-	m_screen->set_screen_update(FUNC(pet_state::screen_update));
-	m_sync_period = attotime::from_hz(100);
+	pet2001n(config);
 }
 
 void pet_state::cbm3008(machine_config &config)
@@ -1804,14 +1934,6 @@ void pet2001b_state::pet2001b32(machine_config &config)
 void pet2001b_state::cbm3032b(machine_config &config)
 {
 	pet2001b(config);
-	// video hardware
-	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(320, 200);
-	m_screen->set_visarea(0, 320-1, 0, 200-1);
-	m_screen->set_screen_update(FUNC(pet_state::screen_update));
-	m_sync_period = attotime::from_hz(100);
-
 	_32k(config);
 }
 
@@ -1837,11 +1959,11 @@ void pet2001b_state::pet4032(machine_config &config)
 void pet2001b_state::pet4032f(machine_config &config)
 {
 	pet4000(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet40_mem);
 
 	// video hardware
 	m_screen->set_raw(XTAL(16'000'000)/2, 400, 0, 320, 333, 0, 200);
 	m_screen->set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
-	m_sync_period = attotime::never;
 
 	MC6845(config, m_crtc, XTAL(16'000'000)/16);
 	m_crtc->set_screen(SCREEN_TAG);
@@ -1862,13 +1984,6 @@ void pet2001b_state::pet4032f(machine_config &config)
 void pet_state::cbm4000(machine_config &config)
 {
 	pet2001n(config, false);
-	// video hardware
-	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(320, 200);
-	m_screen->set_visarea(0, 320-1, 0, 200-1);
-	m_screen->set_screen_update(FUNC(pet_state::screen_update));
-	m_sync_period = attotime::from_hz(100);
 }
 
 void pet_state::cbm4016(machine_config &config)
@@ -1888,11 +2003,11 @@ void pet_state::cbm4032(machine_config &config)
 void pet_state::cbm4032f(machine_config &config)
 {
 	cbm4000(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet40_mem);
 
 	// video hardware
 	m_screen->set_raw(XTAL(16'000'000)/2, 400, 0, 320, 400, 0, 200);
 	m_screen->set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
-	m_sync_period = attotime::never;
 
 	MC6845(config, m_crtc, XTAL(16'000'000)/16);
 	m_crtc->set_screen(SCREEN_TAG);
@@ -1925,13 +2040,6 @@ void pet2001b_state::pet4032b(machine_config &config)
 void pet2001b_state::cbm4000b(machine_config &config)
 {
 	pet2001b(config, false);
-	// video hardware
-	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(320, 200);
-	m_screen->set_visarea(0, 320-1, 0, 200-1);
-	m_screen->set_screen_update(FUNC(pet_state::screen_update));
-	m_sync_period = attotime::from_hz(100);
 }
 
 void pet2001b_state::cbm4032b(machine_config &config)
@@ -1943,10 +2051,11 @@ void pet2001b_state::cbm4032b(machine_config &config)
 void pet80_state::pet80(machine_config &config)
 {
 	base_pet_devices(config, "c8050");
+	m_pia1->readpb_handler().set(FUNC(pet80_state::pia1_pb_r));
 
 	// basic machine hardware
 	M6502(config, m_maincpu, XTAL(16'000'000)/16);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet2001_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet80_mem);
 
 	// video hardware
 	SCREEN(config, m_screen);
@@ -2028,6 +2137,12 @@ void cbm8296_state::cbm8296d(machine_config &config)
 	ieee8.set_default_option("c8250lp");
 }
 
+void cbm8296_state::cbm8296gd(machine_config &config)
+{
+	cbm8296d(config);
+	m_hre_present = true;
+}
+
 
 
 //**************************************************************************
@@ -2071,7 +2186,7 @@ ROM_START( pet2001j )
 	ROM_LOAD( "901447-07.h7", 0x6800, 0x0800, CRC(c4f47ad1) SHA1(d440f2510bc52e20c3d6bc8b9ded9cea7f462a9c) )
 
 	ROM_REGION( 0x800, "charom", 0 )
-	ROM_LOAD( "901447-12.uf10", 0x000, 0x800, CRC(2c9c8d89) SHA1(7443cdc9df326300bb928f2dbfe735d7be6cdfb2) )
+	ROM_LOAD( "901447-12.a2", 0x000, 0x800, CRC(2c9c8d89) SHA1(7443cdc9df326300bb928f2dbfe735d7be6cdfb2) )
 ROM_END
 
 #define rom_pet20018 rom_pet2001
@@ -2155,7 +2270,7 @@ ROM_START( pet4032f )
 	ROMX_LOAD( "901465-23.ud5", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(1) ) // BASIC 4
 	ROM_LOAD( "901465-20.ud6", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud7", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
-	ROM_LOAD( "901499-01.ud7", 0x5000, 0x0800, CRC(5f85bdf8) SHA1(8cbf086c1ce4dfb2a2fe24c47476dfb878493dee) )   // Screen Editor (40 columns, CRTC 60Hz, Normal Keyb?)
+	ROM_LOAD( "901499-01.ud8", 0x5000, 0x0800, CRC(5f85bdf8) SHA1(8cbf086c1ce4dfb2a2fe24c47476dfb878493dee) )   // Screen Editor (40 columns, CRTC 60Hz, Normal Keyb?)
 	ROM_LOAD( "901465-22.ud9", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x800, "charom", 0 )
@@ -2199,7 +2314,7 @@ ROM_START( cbm4032f )
 	ROMX_LOAD( "901465-23.ud5", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc), ROM_BIOS(1) ) // BASIC 4
 	ROM_LOAD( "901465-20.ud6", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud7", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
-	ROM_LOAD( "901498-01.ud7", 0x5000, 0x0800, CRC(3370e359) SHA1(05af284c914d53a52987b5f602466de75765f650) )   // Screen Editor (40 columns, CRTC 50Hz, Normal Keyb?)
+	ROM_LOAD( "901498-01.ud8", 0x5000, 0x0800, CRC(3370e359) SHA1(05af284c914d53a52987b5f602466de75765f650) )   // Screen Editor (40 columns, CRTC 50Hz, Normal Keyb?)
 	ROM_LOAD( "901465-22.ud9", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x800, "charom", 0 )
@@ -2589,13 +2704,13 @@ COMP( 1981, cbm8032,       pet8032,  0,      pet8032,    petb,    pet80_state,  
 COMP( 1981, cbm8032_de,    pet8032,  0,      pet8032,    petb_de, pet80_state,    empty_init, "Commodore Business Machines", "CBM 8032 (Germany)",        MACHINE_SUPPORTS_SAVE )
 COMP( 1981, cbm8032_fr,    pet8032,  0,      pet8032,    petb_fr, pet80_state,    empty_init, "Commodore Business Machines", "CBM 8032 (France)",         MACHINE_SUPPORTS_SAVE )
 COMP( 1981, cbm8032_se,    pet8032,  0,      pet8032,    petb_se, pet80_state,    empty_init, "Commodore Business Machines", "CBM 8032 (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )
-COMP( 1981, superpet,      pet8032,  0,      superpet,   petb,    superpet_state, empty_init, "Commodore Business Machines", "SuperPET SP-9000",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, mmf9000,       pet8032,  0,      superpet,   petb,    superpet_state, empty_init, "Commodore Business Machines", "MicroMainFrame 9000",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, mmf9000_se,    pet8032,  0,      superpet,   petb_se, superpet_state, empty_init, "Commodore Business Machines", "MicroMainFrame 9000 (Sweden/Finland)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, superpet,      pet8032,  0,      superpet,   petb,    superpet_state, empty_init, "Commodore Business Machines", "SuperPET SP-9000",          MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mmf9000,       pet8032,  0,      superpet,   petb,    superpet_state, empty_init, "Commodore Business Machines", "MicroMainFrame 9000",       MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mmf9000_se,    pet8032,  0,      superpet,   petb_se, superpet_state, empty_init, "Commodore Business Machines", "MicroMainFrame 9000 (Sweden/Finland)",         MACHINE_SUPPORTS_SAVE )
 COMP( 1981, cbm8096,       pet8032,  0,      cbm8096,    petb,    cbm8096_state,  empty_init, "Commodore Business Machines", "CBM 8096",     MACHINE_SUPPORTS_SAVE )
 COMP( 1984, cbm8296,       0,        0,      cbm8296,    petb,    cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296",     MACHINE_SUPPORTS_SAVE )
 COMP( 1984, cbm8296ed,     cbm8296,  0,      cbm8296d,   petb,    cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296 ExecuDesk",        MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296d,      cbm8296,  0,      cbm8296d,   petb,    cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296-D",   MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296d_de,   cbm8296,  0,      cbm8296d,   petb_de, cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296-D (Germany)",      MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296gd,     cbm8296,  0,      cbm8296d,   petb,    cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296GD",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1984, cbm8296dgv_de, cbm8296,  0,      cbm8296d,   petb,    cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296-D GV? (Germany)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296d,      cbm8296,  0,      cbm8296d,   cbm8296d, cbm8296_state, empty_init, "Commodore Business Machines", "CBM 8296-D",   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296d_de,   cbm8296,  0,      cbm8296d,   cbm8296d, cbm8296_state, empty_init, "Commodore Business Machines", "CBM 8296-D (Germany)",      MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296gd,     cbm8296,  0,      cbm8296gd,  cbm8296gd, cbm8296_state, empty_init, "Commodore Business Machines", "CBM 8296GD",   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296dgv_de, cbm8296,  0,      cbm8296d,   petb_de, cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296-D GV? (Germany)",  MACHINE_SUPPORTS_SAVE )

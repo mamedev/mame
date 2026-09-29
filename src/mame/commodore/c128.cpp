@@ -1762,6 +1762,7 @@ void c128_state::softlists(machine_config &config, const char *filter)
 	SOFTWARE_LIST(config, "flop_list_c64_misc").set_compatible("c64_flop_misc").set_filter(filter);
 	SOFTWARE_LIST(config, "hdd_list").set_original("c64_hdd").set_filter(filter);
 	SOFTWARE_LIST(config, "sdcard_list").set_original("cbm_sd").set_filter(filter);
+	SOFTWARE_LIST(config, "cd_list").set_original("c64_cd").set_filter(filter);
 }
 
 

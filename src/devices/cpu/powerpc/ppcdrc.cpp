@@ -46,7 +46,7 @@
 #define MODE_USER                       0x04
 
 // Mask for the actual part of a vTLB entry that needs to cause a recompile
-#define VTLB_MAPPING_MASK               (~vtlb_entry(FLAGS_MASK) | FLAG_VALID)
+#define VTLB_MAPPING_MASK               (~vtlb_entry(POWERPC_MIN_PAGE_MASK) | FLAG_VALID)   // physical page and valid bit only; the 603 tag bits above FLAGS_MASK may change without remapping
 
 // exit codes
 #define EXECUTE_OUT_OF_CYCLES           0

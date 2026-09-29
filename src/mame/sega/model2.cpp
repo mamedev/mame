@@ -2451,6 +2451,10 @@ void model2_state::sound_ready_w(int state)
 
 /* Model 2 sound board emulation */
 
+// TODO: modernize, bit 3-0 same as model3.cpp and flashbeats.cpp
+// - bit 4 looks always high in at least vstriker, which rules out being banking related
+// - none of the Model 2 games actually has more than 0x800000 of sample data (wtf),
+//   so this will actually never trigger ...
 void model2_state::model2snd_ctrl(u16 data)
 {
 	// handle sample banking
@@ -3105,6 +3109,7 @@ void model2c_state::topskatr(machine_config &config)
 	io.an_port_callback<1>().set_ioport("SLIDE");
 
 	DSB2(config, m_dsb2);
+	// TODO: should be chained with SCSP EXTS not being direct
 	m_dsb2->add_route(0, "speaker", 1.0, 0);
 	m_dsb2->add_route(1, "speaker", 1.0, 1);
 

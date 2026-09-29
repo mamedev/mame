@@ -1092,6 +1092,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		{
 			if (ula_en)
 			{
+				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07, 1);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, 1);
 			}
@@ -1104,6 +1105,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
 			if (ula_en)
 			{
+				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07, 1);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, 1);
 			}
@@ -1116,6 +1118,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			if (layer2_en) m_layer2->draw_mix(screen, bitmap, m_blendprio_bitmap, clip320x256, m_nr_15_layer_priority & 1);
 			if (ula_en)
 			{
+				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192);
 				else m_ula_scr->draw(screen, bitmap, clip256x192);
 			}

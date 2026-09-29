@@ -300,6 +300,10 @@ machine.cassettes (read-only)
     A :ref:`device enumerator <luascript-ref-devenum>` that yields all
     :ref:`cassette image devices <luascript-ref-cassdev>` in the emulated
     system.
+machine.cdplayers (read-only)
+    A :ref:`device enumerator <luascript-ref-devenum>` that yields all
+    :ref:`audio CD player devices <luascript-ref-cdplayerdev>` in the emulated
+    system.
 machine.images (read-only)
     A :ref:`device enumerator <luascript-ref-devenum>` that yields all
     :ref:`media image devices <luascript-ref-diimage>` in the emulated system.

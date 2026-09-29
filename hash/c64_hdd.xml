@@ -31,4 +31,39 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ide64">
+		<description>IDE64</description>
+		<year>2019</year>
+		<publisher>Singular Crew</publisher>
+
+		<!-- 64MB CompactFlash -->
+		<part name="hdd" interface="ata_cf">
+			<diskarea name="harddriv">
+				<disk name="ide64" sha1="58282e83616d6eaf338cc385093069a217724152" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=knZyPXcelYM -->
+	<software name="rush">
+		<description>Rush</description>
+		<year>2008</year>
+		<publisher>Singular Crew</publisher>
+		<info name="usage" value="mame c64p -cart ide64 -hard rush -cdrom rush"/>
+
+		<!-- 64MB CompactFlash -->
+		<part name="hdd" interface="ata_cf">
+			<diskarea name="harddriv">
+				<disk name="rush" sha1="f79396a2568b928f70acd4680e4dcbe129bfcbe9" writeable="yes" />
+			</diskarea>
+		</part>
+
+		<!-- Audio CD -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="audio" sha1="13868fd8d7db137e08b8b4a86741e574dc55dcbd" />
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>

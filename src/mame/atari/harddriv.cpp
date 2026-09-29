@@ -1653,7 +1653,7 @@ void harddriv_state::dsk(machine_config &config)
 	EEPROM_2816(config, m_dsk_30c); // MK48Z02
 
 	/* ASIC65 */
-	ASIC65(config, m_asic65, ASIC65_STANDARD);
+	ASIC65(config, m_asic65, 20'000'000, ASIC65_STANDARD);
 }
 
 
@@ -1666,7 +1666,7 @@ void harddriv_state::dsk2(machine_config &config)
 	m_dsp32->set_addrmap(AS_PROGRAM, &harddriv_state::dsk2_dsp32_map);
 
 	/* ASIC65 */
-	ASIC65(config, m_asic65, ASIC65_STANDARD);
+	ASIC65(config, m_asic65, 20'000'000, ASIC65_STANDARD);
 }
 
 
@@ -1933,7 +1933,7 @@ void steeltal_board_device_state::device_add_mconfig(machine_config &config) //t
 	config.device_remove("rdac");
 	config.device_remove("speaker");
 
-	ASIC65(config, m_asic65, ASIC65_STEELTAL);         /* ASIC65 on DSPCOM board */
+	ASIC65(config, m_asic65, 20'000'000, ASIC65_STEELTAL);         /* ASIC65 on DSPCOM board */
 
 	/* sund hardware */
 	SPEAKER(config, "mono").front_center();
