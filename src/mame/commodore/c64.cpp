@@ -1944,6 +1944,7 @@ void c64_state::ntsc(machine_config &config)
 	SOFTWARE_LIST(config, "quik_list").set_original("c64_quik").set_filter("NTSC");
 	SOFTWARE_LIST(config, "hdd_list").set_original("c64_hdd").set_filter("NTSC");
 	SOFTWARE_LIST(config, "sdcard_list").set_original("cbm_sd").set_filter("NTSC");
+	SOFTWARE_LIST(config, "cd_list").set_original("c64_cd").set_filter("NTSC");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -2116,6 +2117,7 @@ void c64_state::pal(machine_config &config)
 	SOFTWARE_LIST(config, "quik_list").set_original("c64_quik").set_filter("PAL");
 	SOFTWARE_LIST(config, "hdd_list").set_original("c64_hdd").set_filter("PAL");
 	SOFTWARE_LIST(config, "sdcard_list").set_original("cbm_sd").set_filter("PAL");
+	SOFTWARE_LIST(config, "cd_list").set_original("c64_cd").set_filter("PAL");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");
@@ -2196,6 +2198,7 @@ void c64gs_state::pal_gs(machine_config &config)
 	config.device_remove("quik_list");
 	config.device_remove("hdd_list");
 	config.device_remove("sdcard_list");
+	config.device_remove("cd_list");
 }
 
 
@@ -2222,6 +2225,7 @@ void clipper_state::clipper(machine_config &config)
 	config.device_remove("quik_list");
 	config.device_remove("hdd_list");
 	config.device_remove("sdcard_list");
+	config.device_remove("cd_list");
 }
 
 

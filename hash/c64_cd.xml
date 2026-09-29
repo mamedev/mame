@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="c64_cd" description="Commodore 64 CD-ROMs">
+
+	<software name="firstcd" supported="no">
+		<description>1st CD-Edition</description>
+		<year>1989</year>
+		<publisher>Rainbow Arts</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="firstcd" sha1="3e9d8f257a2b6b8db75bbfd4713cd564f333b1a8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cdgames" supported="no">
+		<description>The CD Games Pack</description>
+		<year>1989</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cdgames" sha1="f8b3fe22daa3e04ad7334a13e57b55f6a4238f37" />
+			</diskarea>
+		</part>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="224810">
+                <rom name="cd_loader_software.tap" size="224810" crc="86628615" sha1="faec6e7b68b13eb7a1e2218c85254ab60ff169d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
