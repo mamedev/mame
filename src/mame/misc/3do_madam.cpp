@@ -1250,14 +1250,17 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				const u8 op_mode = (m_cel.pxor << 1) | m_cel.useav;
 
 				// Determine Projector fill action outside the loop
-				// TODO: rectangle fills only for now, check if hits at > 1.5 actually
-				// (cpubach may care for musical score)
-				const s32 abs_hdx = std::abs(m_cel.hdx);
-				const s32 abs_vdy = std::abs(m_cel.vdy);
+				// TODO: rectangle fills only for now
+				// - cpubach uses "hdx=0 hdy=-1 vdx=256 vdy=1" for musical score horizontal lines
+				// - eyetyph HP bars becomes hdx=~1.6, which won't hit this
+				// - virtuoso definitely wants to disable this thru ACCW=0 "hdx=-10 hdy=0 vdx=0 vdy=8.75"
+				//   when player is very close to walls behind him.
+				const double abs_hdx = std::abs(m_cel.hdx);
+				const double abs_vdy = std::abs(m_cel.vdy);
 				const bool projector_fill = (abs_hdx >= 2.0 || abs_vdy >= 2.0) && m_cel.hddx == 0.0 && m_cel.hddy == 0.0;
 
-				const double proj_x_max = projector_fill ? std::abs(abs_hdx) : 0.0;
-				const double proj_y_max = projector_fill ? std::abs(abs_vdy) : 0.0;
+				const double proj_x_max = projector_fill ? std::max<double>(abs_hdx, 1.0) : 0.0;
+				const double proj_y_max = projector_fill ? std::max<double>(abs_vdy, 1.0) : 0.0;
 
 				const double proj_x_dir = m_cel.hdx >= 0.0 ? 1 : -1;
 				const double proj_y_dir = m_cel.vdy >= 0.0 ? 1 : -1;

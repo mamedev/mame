@@ -191,6 +191,11 @@ int c64_partner_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, i
 {
 	int game = 1;
 
+	if ((offset & 0xff00) == 0xde00)
+	{
+		game = 0;
+	}
+
 	if (m_a0 && BIT(offset, 15))
 	{
 		switch ((offset >> 13) & 0x03)
@@ -200,8 +205,6 @@ int c64_partner_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, i
 			break;
 		}
 	}
-
-	// TODO if I/O1=0, GAME=0
 
 	return game;
 }

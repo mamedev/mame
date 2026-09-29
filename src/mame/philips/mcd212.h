@@ -268,6 +268,7 @@ protected:
 	bool m_blink_active = false;
 
 	static const uint32_t s_4bpp_color[16];
+	static const uint32_t s_4bpp_display_color[16];
 
 	uint8_t get_weight_factor(const uint32_t Matte_idx);
 	uint8_t get_matte_op(const uint32_t Matte_idx);

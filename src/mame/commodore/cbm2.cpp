@@ -21,7 +21,6 @@
 #include "machine/mos6526.h"
 #include "machine/mos6551.h"
 #include "machine/pic8259.h"
-#include "machine/pla.h"
 #include "machine/ram.h"
 #include "sound/mos6581.h"
 #include "video/mc6845.h"
@@ -64,10 +63,10 @@ namespace {
 class cbm2_state : public driver_device
 {
 public:
-	cbm2_state(const machine_config &mconfig, device_type type, const char *tag) :
+	cbm2_state(const machine_config &mconfig, device_type type, const char *tag, size_t video_ram_size = 0x800) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "u13"),
-		m_pla1(*this, PLA1_TAG),
+		m_mem_view(*this, "mem_view"),
 		m_crtc(*this, MC68B45_TAG),
 		m_palette(*this, "palette"),
 		m_sid(*this, MOS6581_TAG),
@@ -93,13 +92,12 @@ public:
 		m_charom(*this, "charom"),
 		m_buffer_ram(*this, "buffer_ram", 0x800, ENDIANNESS_LITTLE),
 		m_extbuf_ram(*this, "extbuf_ram", 0x800, ENDIANNESS_LITTLE),
-		m_video_ram(*this, "video_ram", 0x800, ENDIANNESS_LITTLE),
+		m_video_ram(*this, "video_ram", video_ram_size, ENDIANNESS_LITTLE),
 		m_pa(*this, "PA%u", 0),
 		m_pb(*this, "PB%u", 0),
 		m_lock(*this, "LOCK"),
 		m_charset(*this, "CHARSET"),
 		m_dramon(1),
-		m_video_ram_size(0x800),
 		m_graphics(1),
 		m_todclk(0),
 		m_refresh_cycle(0),
@@ -108,7 +106,7 @@ public:
 	{ }
 
 	required_device<m6509_device> m_maincpu;
-	required_device<pla_device> m_pla1;
+	memory_view m_mem_view;
 	optional_device<mc6845_device> m_crtc;
 	optional_device<palette_device> m_palette;
 	required_device<mos6581_device> m_sid;
@@ -149,20 +147,15 @@ public:
 	DECLARE_MACHINE_START( cbm2x_pal );
 	DECLARE_MACHINE_RESET( cbm2 );
 
-	virtual void read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
-		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4);
-
-	void bankswitch(offs_t offset, int eras, int ecas, int refen, int cas, int ras, int *sysioen, int *dramen,
-		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *buframcs, int *extbufcs, int *vidramcs,
-		int *diskromcs, int *csbank1, int *csbank2, int *csbank3, int *basiccs, int *knbcs, int *kernalcs,
-		int *crtccs, int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs);
-
 	uint8_t read_keyboard();
 	void set_busy2(int state);
 	void cpu_sync_w(int state);
+	void update_mem_view();
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+	uint8_t ext_cia_r(offs_t offset);
+	void ext_cia_w(offs_t offset, uint8_t data);
 	uint8_t ext_read(offs_t offset);
 	void ext_write(offs_t offset, uint8_t data);
 
@@ -203,7 +196,6 @@ public:
 	int m_busy2;
 
 	// video state
-	size_t m_video_ram_size;
 	int m_graphics;
 	int m_ntsc;
 
@@ -236,6 +228,7 @@ public:
 	void b256(machine_config &config);
 	void cbm610(machine_config &config);
 	void cbm2_mem(address_map &map) ATTR_COLD;
+	void system_mem(address_map &map) ATTR_COLD;
 	void ext_io(address_map &map) ATTR_COLD;
 	void ext_mem(address_map &map) ATTR_COLD;
 };
@@ -247,9 +240,6 @@ public:
 	cbm2hp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: cbm2_state(mconfig, type, tag)
 	{ }
-
-	virtual void read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
-		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4) override;
 
 	uint8_t tpi2_pc_r();
 	void b256hp(machine_config &config);
@@ -264,48 +254,32 @@ public:
 class p500_state : public cbm2_state
 {
 public:
-	p500_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cbm2_state(mconfig, type, tag),
-			m_pla2(*this, PLA2_TAG),
-			m_vic(*this, MOS6569_TAG),
-			m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_LITTLE),
-			m_statvid(1),
-			m_vicdotsel(1),
-			m_vicbnksel(0x03)
+	p500_state(const machine_config &mconfig, device_type type, const char *tag) :
+		cbm2_state(mconfig, type, tag, 0x400),
+		m_vic(*this, MOS6569_TAG),
+		m_color_ram(*this, "color_ram", 0x400, ENDIANNESS_LITTLE),
+		m_dram_view(*this, "dram_view"),
+		m_statvid(1),
+		m_vicdotsel(1),
+		m_vicbnksel(0x03)
 	{ }
 
-	required_device<pla_device> m_pla2;
 	required_device<mos6566_device> m_vic;
 	memory_share_creator<uint8_t> m_color_ram;
+	memory_view m_dram_view;
 
 	DECLARE_MACHINE_START( p500 );
 	DECLARE_MACHINE_START( p500_ntsc );
 	DECLARE_MACHINE_START( p500_pal );
 	DECLARE_MACHINE_RESET( p500 );
 
-	void read_pla1(offs_t offset, int busy2, int clrnibcsb, int procvid, int refen, int ba, int aec, int srw,
-		int *datxen, int *dramxen, int *clrniben, int *segf, int *_64kcasen, int *casenb, int *viddaten, int *viddat_tr);
-
-	void read_pla2(offs_t offset, offs_t va, int ba, int vicen, int ae, int segf, int bank0,
-		int *clrnibcsb, int *extbufcs, int *discromcs, int *buframcs, int *charomcs, int *procvid, int *viccs, int *vidmatcs);
-
-	void bankswitch(offs_t offset, offs_t va, int srw, int ba, int ae, int busy2, int refen,
-		int *datxen, int *dramxen, int *clrniben, int *_64kcasen, int *casenb, int *viddaten, int *viddat_tr,
-		int *clrnibcs, int *extbufcs, int *discromcs, int *buframcs, int *charomcs, int *viccs, int *vidmatcs,
-		int *csbank1, int *csbank2, int *csbank3, int *basiclocs, int *basichics, int *kernalcs,
-		int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs, int *aec, int *vsysaden);
-
-	uint8_t read_memory(offs_t offset, offs_t va, int ba, int ae);
-	void write_memory(offs_t offset, uint8_t data, int ba, int ae);
-
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	void update_ram_view();
 
 	uint8_t vic_videoram_r(offs_t offset);
-	uint8_t vic_colorram_r(offs_t offset);
 
 	void tpi1_ca_w(int state);
 	void tpi1_cb_w(int state);
+	void tpi1_pb_w(uint8_t data);
 
 	uint8_t tpi2_pc_r();
 	void tpi2_pc_w(uint8_t data);
@@ -326,23 +300,6 @@ public:
 
 
 
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define P3 BIT(offset, 19)
-#define P2 BIT(offset, 18)
-#define P1 BIT(offset, 17)
-#define P0 BIT(offset, 16)
-#define A15 BIT(offset, 15)
-#define A14 BIT(offset, 14)
-#define A13 BIT(offset, 13)
-#define A12 BIT(offset, 12)
-#define A11 BIT(offset, 11)
-#define A10 BIT(offset, 10)
-#define A0 BIT(offset, 0)
-#define VA12 BIT(va, 12)
-
 static void cbmb_quick_sethiaddress(address_space &space, uint16_t hiaddress)
 {
 	space.write_byte(0xf0046, hiaddress & 0xff);
@@ -359,311 +316,34 @@ QUICKLOAD_LOAD_MEMBER(p500_state::quickload_p500)
 	return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbmb_quick_sethiaddress);
 }
 
-//**************************************************************************
-//  ADDRESS DECODING
-//**************************************************************************
-
-//-------------------------------------------------
-//  read_pla - low profile PLA read
-//-------------------------------------------------
-
-void cbm2_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
-	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4)
+uint8_t cbm2_state::ram_r(offs_t offset)
 {
-	uint32_t input = P0 << 15 | P1 << 14 | P2 << 13 | P3 << 12 | m_busy2 << 11 | eras << 10 | ecas << 9 | refen << 8 | cas << 7 | ras << 6;
-	uint32_t data = m_pla1->read(input);
-
-	*casseg1 = BIT(data, 0);
-	*rasseg1 = BIT(data, 1);
-	*rasseg2 = BIT(data, 2);
-	*casseg2 = BIT(data, 3);
-	*rasseg4 = BIT(data, 4);
-	*casseg4 = BIT(data, 5);
-	*casseg3 = BIT(data, 6);
-	*rasseg3 = BIT(data, 7);
+	return offset < m_ram->size() ? m_ram->pointer()[offset] : 0xff;
 }
 
-
-//-------------------------------------------------
-//  read_pla - high profile PLA read
-//-------------------------------------------------
-
-void cbm2hp_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
-	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4)
+void cbm2_state::ram_w(offs_t offset, uint8_t data)
 {
-	uint32_t input = ras << 13 | cas << 12 | refen << 11 | eras << 10 | ecas << 9 | m_busy2 << 8 | P3 << 3 | P2 << 2 | P1 << 1 | P0;
-	uint32_t data = m_pla1->read(input);
-
-	*casseg1 = BIT(data, 0);
-	*casseg2 = BIT(data, 1);
-	*casseg3 = BIT(data, 2);
-	*casseg4 = BIT(data, 3);
-	*rasseg1 = BIT(data, 4);
-	*rasseg2 = BIT(data, 5);
-	*rasseg3 = BIT(data, 6);
-	*rasseg4 = BIT(data, 7);
+	if (offset < m_ram->size())
+		m_ram->pointer()[offset] = data;
 }
 
-
-//-------------------------------------------------
-//  bankswitch -
-//-------------------------------------------------
-
-void cbm2_state::bankswitch(offs_t offset, int eras, int ecas, int refen, int cas, int ras, int *sysioen, int *dramen,
-	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *buframcs, int *extbufcs, int *vidramcs,
-	int *diskromcs, int *csbank1, int *csbank2, int *csbank3, int *basiccs, int *knbcs, int *kernalcs,
-	int *crtccs, int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs)
+uint8_t cbm2_state::ext_cia_r(offs_t offset)
 {
-	int rasseg1 = 1, rasseg2 = 1, rasseg3 = 1, rasseg4 = 1;
-
-	this->read_pla(offset, ras, cas, refen, eras, ecas, casseg1, casseg2, casseg3, casseg4, &rasseg1, &rasseg2, &rasseg3, &rasseg4);
-
-	int decoden = 0;
-	*sysioen = !(P0 && P1 && P2 && P3) && m_busen1;
-	*dramen = !((!(P0 && P1 && P2 && P3)) && m_busen1);
-
-	if (!decoden && !*sysioen)
-	{
-		switch ((offset >> 13) & 0x07)
-		{
-		case 0:
-			switch ((offset >> 11) & 0x03)
-			{
-			case 0: *buframcs = 0; break;
-			case 1: *extbufcs = 0; break;
-			case 2: // fallthru
-			case 3: *diskromcs = 0; break;
-			}
-			break;
-
-		case 1: *csbank1 = 0; break;
-		case 2: *csbank2 = 0; break;
-		case 3: *csbank3 = 0; break;
-		case 4: *basiccs = 0; break;
-		case 5: *knbcs = 0; break;
-		case 6:
-			switch ((offset >> 11) & 0x03)
-			{
-			case 2: *vidramcs = 0; break;
-			case 3:
-				switch ((offset >> 8) & 0x07)
-				{
-				case 0: *crtccs = 0; break;
-				case 1: *cs1 = 0; break;
-				case 2: *sidcs = 0; break;
-				case 3: *extprtcs = 0; break;
-				case 4: *ciacs = 0; break;
-				case 5: *aciacs = 0; break;
-				case 6: *tript1cs = 0; break;
-				case 7: *tript2cs = 0; break;
-				}
-				break;
-			}
-			break;
-
-		case 7: *kernalcs = 0; break;
-		}
-	}
+	return m_ext_cia ? m_ext_cia->read(offset) : 0xff;
 }
 
-
-//-------------------------------------------------
-//  read -
-//-------------------------------------------------
-
-uint8_t cbm2_state::read(offs_t offset)
+void cbm2_state::ext_cia_w(offs_t offset, uint8_t data)
 {
-	int eras = 1, ecas = 1, refen = 0, cas = 0, ras = 1, sysioen = 1, dramen = 1;
-	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, buframcs = 1, extbufcs = 1, vidramcs = 1;
-	int diskromcs = 1, csbank1 = 1, csbank2 = 1, csbank3 = 1, basiccs = 1, knbcs = 1, kernalcs = 1;
-	int crtccs = 1, cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
+	if (!m_ext_cia)
+		return;
 
-	bankswitch(offset, eras, ecas, refen, cas, ras, &sysioen, &dramen,
-		&casseg1, &casseg2, &casseg3, &casseg4, &buframcs, &extbufcs, &vidramcs,
-		&diskromcs, &csbank1, &csbank2, &csbank3, &basiccs, &knbcs, &kernalcs,
-		&crtccs, &cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs);
+	if (offset < 4)
+		m_ext_cia_port[offset] = data;
 
-	uint8_t data = 0xff;
+	m_ext_cia->write(offset, data);
 
-	if (!dramen)
-	{
-		if (!casseg1)
-		{
-			data = m_ram->pointer()[offset & 0xffff];
-		}
-		if (!casseg2)
-		{
-			data = m_ram->pointer()[0x10000 | (offset & 0xffff)];
-		}
-		if (!casseg3 && (m_ram->size() > 0x20000))
-		{
-			data = m_ram->pointer()[0x20000 | (offset & 0xffff)];
-		}
-		if (!casseg4 && (m_ram->size() > 0x30000))
-		{
-			data = m_ram->pointer()[0x30000 | (offset & 0xffff)];
-		}
-	}
-
-	if (!sysioen)
-	{
-		if (!buframcs)
-		{
-			data = m_buffer_ram[offset & 0x7ff];
-		}
-		if (!extbufcs && m_extbuf_ram)
-		{
-			data = m_extbuf_ram[offset & 0x7ff];
-		}
-		if (!vidramcs)
-		{
-			data = m_video_ram[offset & 0x7ff];
-		}
-		if (!basiccs || !knbcs)
-		{
-			data = m_basic->base()[offset & 0x3fff];
-		}
-		if (!kernalcs)
-		{
-			data = m_kernal->base()[offset & 0x1fff];
-		}
-		if (!crtccs)
-		{
-			if (A0)
-			{
-				data = m_crtc->register_r();
-			}
-			else
-			{
-				data = m_crtc->status_r();
-			}
-		}
-		if (!sidcs)
-		{
-			data = m_sid->read(offset & 0x1f);
-		}
-		if (!extprtcs && m_ext_cia)
-		{
-			data = m_ext_cia->read(offset & 0x0f);
-		}
-		if (!ciacs)
-		{
-			data = m_cia->read(offset & 0x0f);
-		}
-		if (!aciacs)
-		{
-			data = m_acia->read(offset & 0x03);
-		}
-		if (!tript1cs)
-		{
-			data = m_tpi1->read(offset & 0x07);
-		}
-		if (!tript2cs)
-		{
-			data = m_tpi2->read(offset & 0x07);
-		}
-
-		data = m_exp->read(offset & 0x1fff, data, csbank1, csbank2, csbank3);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  write -
-//-------------------------------------------------
-
-void cbm2_state::write(offs_t offset, uint8_t data)
-{
-	int eras = 1, ecas = 1, refen = 0, cas = 0, ras = 1, sysioen = 1, dramen = 1;
-	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, buframcs = 1, extbufcs = 1, vidramcs = 1;
-	int diskromcs = 1, csbank1 = 1, csbank2 = 1, csbank3 = 1, basiccs = 1, knbcs = 1, kernalcs = 1;
-	int crtccs = 1, cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
-
-	bankswitch(offset, eras, ecas, refen, cas, ras, &sysioen, &dramen,
-		&casseg1, &casseg2, &casseg3, &casseg4, &buframcs, &extbufcs, &vidramcs,
-		&diskromcs, &csbank1, &csbank2, &csbank3, &basiccs, &knbcs, &kernalcs,
-		&crtccs, &cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs);
-
-	if (!dramen)
-	{
-		if (!casseg1)
-		{
-			m_ram->pointer()[offset & 0xffff] = data;
-		}
-		if (!casseg2)
-		{
-			m_ram->pointer()[0x10000 | (offset & 0xffff)] = data;
-		}
-		if (!casseg3 && (m_ram->size() > 0x20000))
-		{
-			m_ram->pointer()[0x20000 | (offset & 0xffff)] = data;
-		}
-		if (!casseg4 && (m_ram->size() > 0x30000))
-		{
-			m_ram->pointer()[0x30000 | (offset & 0xffff)] = data;
-		}
-	}
-
-	if (!sysioen)
-	{
-		if (!buframcs)
-		{
-			m_buffer_ram[offset & 0x7ff] = data;
-		}
-		if (!extbufcs && m_extbuf_ram)
-		{
-			m_extbuf_ram[offset & 0x7ff] = data;
-		}
-		if (!vidramcs)
-		{
-			m_video_ram[offset & 0x7ff] = data;
-		}
-		if (!crtccs)
-		{
-			if (A0)
-			{
-				m_crtc->register_w(data);
-			}
-			else
-			{
-				m_crtc->address_w(data);
-			}
-		}
-		if (!sidcs)
-		{
-			m_sid->write(offset & 0x1f, data);
-		}
-		if (!extprtcs && m_ext_cia)
-		{
-			if ((offset & 0x0f) < 4)
-				m_ext_cia_port[offset & 0x03] = data;
-
-			m_ext_cia->write(offset & 0x0f, data);
-
-			if ((offset & 0x0d) == 0x01)
-				ext_cia_pb_w(ext_cia_pb_out());
-		}
-		if (!ciacs)
-		{
-			m_cia->write(offset & 0x0f, data);
-		}
-		if (!aciacs)
-		{
-			m_acia->write(offset & 0x03, data);
-		}
-		if (!tript1cs)
-		{
-			m_tpi1->write(offset & 0x07, data);
-		}
-		if (!tript2cs)
-		{
-			m_tpi2->write(offset & 0x07, data);
-		}
-
-		m_exp->write(offset & 0x1fff, data, csbank1, csbank2, csbank3);
-	}
+	if ((offset & 0x0d) == 0x01)
+		ext_cia_pb_w(ext_cia_pb_out());
 }
 
 
@@ -692,337 +372,9 @@ void cbm2_state::ext_write(offs_t offset, uint8_t data)
 }
 
 
-//-------------------------------------------------
-//  read_pla1 - P500 PLA #1 read
-//-------------------------------------------------
-
-void p500_state::read_pla1(offs_t offset, int busy2, int clrnibcsb, int procvid, int refen, int ba, int aec, int srw,
-	int *datxen, int *dramxen, int *clrniben, int *segf, int *_64kcasen, int *casenb, int *viddaten, int *viddat_tr)
+void p500_state::update_ram_view()
 {
-	int sphi2 = m_vic->phi0_r();
-	int bras = 1;
-
-	uint32_t input = P0 << 15 | P2 << 14 | bras << 13 | P1 << 12 | P3 << 11 | busy2 << 10 | m_statvid << 9 | sphi2 << 8 |
-			clrnibcsb << 7 | m_dramon << 6 | procvid << 5 | refen << 4 | m_vicdotsel << 3 | ba << 2 | aec << 1 | srw;
-
-	uint32_t data = m_pla1->read(input);
-
-	*datxen = BIT(data, 0);
-	*dramxen = BIT(data, 1);
-	*clrniben = BIT(data, 2);
-	*segf = BIT(data, 3);
-	*_64kcasen = BIT(data, 4);
-	*casenb = BIT(data, 5);
-	*viddaten = BIT(data, 6);
-	*viddat_tr = BIT(data, 7);
-}
-
-
-//-------------------------------------------------
-//  read_pla2 - P500 PLA #2 read
-//-------------------------------------------------
-
-void p500_state::read_pla2(offs_t offset, offs_t va, int ba, int vicen, int ae, int segf, int bank0,
-	int *clrnibcsb, int *extbufcs, int *discromcs, int *buframcs, int *charomcs, int *procvid, int *viccs, int *vidmatcs)
-{
-	int sphi2 = m_vic->phi0_r();
-	int bcas = 1;
-
-	uint32_t input = VA12 << 15 | ba << 14 | A13 << 13 | A15 << 12 | A14 << 11 | A11 << 10 | A10 << 9 | A12 << 8 |
-			sphi2 << 7 | vicen << 6 | m_statvid << 5 | m_vicdotsel << 4 | ae << 3 | segf << 2 | bcas << 1 | bank0;
-
-	uint32_t data = m_pla2->read(input);
-
-	*clrnibcsb = BIT(data, 0);
-	*extbufcs = BIT(data, 1);
-	*discromcs = BIT(data, 2);
-	*buframcs = BIT(data, 3);
-	*charomcs = BIT(data, 4);
-	*procvid = BIT(data, 5);
-	*viccs = BIT(data, 6);
-	*vidmatcs = BIT(data, 7);
-}
-
-
-//-------------------------------------------------
-//  bankswitch -
-//-------------------------------------------------
-
-void p500_state::bankswitch(offs_t offset, offs_t va, int srw, int ba, int ae, int busy2, int refen,
-	int *datxen, int *dramxen, int *clrniben, int *_64kcasen, int *casenb, int *viddaten, int *viddat_tr,
-	int *clrnibcs, int *extbufcs, int *discromcs, int *buframcs, int *charomcs, int *viccs, int *vidmatcs,
-	int *csbank1, int *csbank2, int *csbank3, int *basiclocs, int *basichics, int *kernalcs,
-	int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs, int *aec, int *vsysaden)
-{
-	int sphi2 = m_vic->phi0_r();
-	int sphi1 = !sphi2;
-	//int ba = !m_vic->ba_r();
-	//int ae = m_vic->aec_r();
-	int bcas = 0;
-
-	*aec = !((m_statvid || ae) && sphi2);
-	*vsysaden = sphi1 || ba;
-
-	int clrnibcsb = 1, procvid = 1, segf = 1;
-
-	read_pla1(offset, busy2, clrnibcsb, procvid, refen, ba, *aec, srw,
-		datxen, dramxen, clrniben, &segf, _64kcasen, casenb, viddaten, viddat_tr);
-
-	int bank0 = 1, vicen = 1;
-
-	if (!*aec && !segf)
-	{
-		switch ((offset >> 13) & 0x07)
-		{
-		case 0: bank0 = 0; break;
-		case 1: *csbank1 = 0; break;
-		case 2: *csbank2 = 0; break;
-		case 3: *csbank3 = 0; break;
-		case 4: *basiclocs = 0; break;
-		case 5: *basichics = 0; break;
-		case 6:
-			if (A12 && A11)
-			{
-				switch ((offset >> 8) & 0x07)
-				{
-				case 0: vicen = 0; break;
-				case 1: *cs1 = 0; break;
-				case 2: *sidcs = 0; break;
-				case 3: *extprtcs = 0; break;
-				case 4: *ciacs = 0; break;
-				case 5: *aciacs = 0; break;
-				case 6: *tript1cs = 0; break;
-				case 7: *tript2cs = 0; break;
-				}
-			}
-			break;
-
-		case 7: *kernalcs = 0; break;
-		}
-	}
-
-	int vidmatcsb = 1;
-
-	read_pla2(offset, va, ba, vicen, ae, segf, bank0,
-		&clrnibcsb, extbufcs, discromcs, buframcs, charomcs, &procvid, viccs, &vidmatcsb);
-
-	*clrnibcs = clrnibcsb || bcas;
-	*vidmatcs = vidmatcsb || bcas;
-
-	read_pla1(offset, busy2, clrnibcsb, procvid, refen, ba, *aec, srw,
-		datxen, dramxen, clrniben, &segf, _64kcasen, casenb, viddaten, viddat_tr);
-}
-
-
-//-------------------------------------------------
-//  read_memory -
-//-------------------------------------------------
-
-uint8_t p500_state::read_memory(offs_t offset, offs_t va, int ba, int ae)
-{
-	int srw = 1, busy2 = 1, refen = 0;
-
-	int datxen = 1, dramxen = 1, clrniben = 1, _64kcasen = 1, casenb = 1, viddaten = 1, viddat_tr = 1;
-	int clrnibcs = 1, extbufcs = 1, discromcs = 1, buframcs = 1, charomcs = 1, viccs = 1, vidmatcs = 1;
-	int csbank1 = 1, csbank2 = 1, csbank3 = 1, basiclocs = 1, basichics = 1, kernalcs = 1;
-	int cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
-	int aec = 1, vsysaden = 1;
-
-	bankswitch(offset, va, srw, ba, ae, busy2, refen,
-		&datxen, &dramxen, &clrniben, &_64kcasen, &casenb, &viddaten, &viddat_tr,
-		&clrnibcs, &extbufcs, &discromcs, &buframcs, &charomcs, &viccs, &vidmatcs,
-		&csbank1, &csbank2, &csbank3, &basiclocs, &basichics, &kernalcs,
-		&cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs, &aec, &vsysaden);
-
-	uint8_t data = 0xff;
-
-	if (clrniben)
-	{
-		if (!clrnibcs && !vsysaden)
-		{
-			data = m_color_ram[offset & 0x3ff];
-		}
-	}
-
-	if (!dramxen)
-	{
-		if (casenb)
-		{
-			switch (offset >> 16)
-			{
-			case 1: data = m_ram->pointer()[0x10000 + (offset & 0xffff)]; break;
-			case 2: if (m_ram->size() > 0x20000) data = m_ram->pointer()[0x20000 + (offset & 0xffff)]; break;
-			case 3: if (m_ram->size() > 0x30000) data = m_ram->pointer()[0x30000 + (offset & 0xffff)]; break;
-			}
-		}
-	}
-
-	if (!datxen)
-	{
-		if (!_64kcasen && !aec)
-		{
-			data = m_ram->pointer()[offset & 0xffff];
-		}
-		if (!buframcs)
-		{
-			data = m_buffer_ram[offset & 0x7ff];
-		}
-		if (!vidmatcs && !vsysaden && !viddaten && viddat_tr)
-		{
-			data = m_video_ram[offset & 0x3ff];
-		}
-		if (!basiclocs || !basichics)
-		{
-			data = m_basic->base()[offset & 0x3fff];
-		}
-		if (!kernalcs)
-		{
-			data = m_kernal->base()[offset & 0x1fff];
-		}
-		if (!charomcs && !vsysaden && !viddaten && viddat_tr)
-		{
-			data = m_charom->base()[offset & 0xfff];
-		}
-		if (!viccs && !viddaten && viddat_tr)
-		{
-			data = m_vic->read(offset & 0x3f);
-		}
-		if (!sidcs)
-		{
-			data = m_sid->read(offset & 0x1f);
-		}
-		if (!ciacs)
-		{
-			data = m_cia->read(offset & 0x0f);
-		}
-		if (!aciacs)
-		{
-			data = m_acia->read(offset & 0x03);
-		}
-		if (!tript1cs)
-		{
-			data = m_tpi1->read(offset & 0x07);
-		}
-		if (!tript2cs)
-		{
-			data = m_tpi2->read(offset & 0x07);
-		}
-
-		data = m_exp->read(offset & 0x1fff, data, csbank1, csbank2, csbank3);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  write_memory -
-//-------------------------------------------------
-
-void p500_state::write_memory(offs_t offset, uint8_t data, int ba, int ae)
-{
-	int srw = 0, busy2 = 1, refen = 0;
-	offs_t va = 0xffff;
-
-	int datxen = 1, dramxen = 1, clrniben = 1, _64kcasen = 1, casenb = 1, viddaten = 1, viddat_tr = 1;
-	int clrnibcs = 1, extbufcs = 1, discromcs = 1, buframcs = 1, charomcs = 1, viccs = 1, vidmatcs = 1;
-	int csbank1 = 1, csbank2 = 1, csbank3 = 1, basiclocs = 1, basichics = 1, kernalcs = 1;
-	int cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
-	int aec = 1, vsysaden = 1;
-
-	bankswitch(offset, va, srw, ba, ae, busy2, refen,
-		&datxen, &dramxen, &clrniben, &_64kcasen, &casenb, &viddaten, &viddat_tr,
-		&clrnibcs, &extbufcs, &discromcs, &buframcs, &charomcs, &viccs, &vidmatcs,
-		&csbank1, &csbank2, &csbank3, &basiclocs, &basichics, &kernalcs,
-		&cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs, &aec, &vsysaden);
-
-	if (clrniben)
-	{
-		if (!clrnibcs && !vsysaden)
-		{
-			m_color_ram[offset & 0x3ff] = data & 0x0f;
-		}
-	}
-
-	if (!dramxen)
-	{
-		if (casenb)
-		{
-			switch (offset >> 16)
-			{
-			case 1: m_ram->pointer()[0x10000 + (offset & 0xffff)] = data; break;
-			case 2: if (m_ram->size() > 0x20000) m_ram->pointer()[0x20000 + (offset & 0xffff)] = data; break;
-			case 3: if (m_ram->size() > 0x30000) m_ram->pointer()[0x30000 + (offset & 0xffff)] = data; break;
-			}
-		}
-	}
-
-	if (!datxen)
-	{
-		if (!_64kcasen && !aec)
-		{
-			m_ram->pointer()[offset & 0xffff] = data;
-		}
-		if (!buframcs)
-		{
-			m_buffer_ram[offset & 0x7ff] = data;
-		}
-		if (!vidmatcs && !vsysaden && !viddaten && !viddat_tr)
-		{
-			m_video_ram[offset & 0x3ff] = data;
-		}
-		if (!viccs && !viddaten && !viddat_tr)
-		{
-			m_vic->write(offset & 0x3f, data);
-		}
-		if (!sidcs)
-		{
-			m_sid->write(offset & 0x1f, data);
-		}
-		if (!ciacs)
-		{
-			m_cia->write(offset & 0x0f, data);
-		}
-		if (!aciacs)
-		{
-			m_acia->write(offset & 0x03, data);
-		}
-		if (!tript1cs)
-		{
-			m_tpi1->write(offset & 0x07, data);
-		}
-		if (!tript2cs)
-		{
-			m_tpi2->write(offset & 0x07, data);
-		}
-
-		m_exp->write(offset & 0x1fff, data, csbank1, csbank2, csbank3);
-	}
-}
-
-
-//-------------------------------------------------
-//  read -
-//-------------------------------------------------
-
-uint8_t p500_state::read(offs_t offset)
-{
-	int ba = 0, ae = 1;
-	offs_t va = 0xffff;
-
-	return read_memory(offset, va, ba, ae);
-}
-
-
-//-------------------------------------------------
-//  write -
-//-------------------------------------------------
-
-void p500_state::write(offs_t offset, uint8_t data)
-{
-	int ba = 0, ae = 1;
-
-	write_memory(offset, data, ba, ae);
+	m_dram_view.select(!m_dramon ? 0 : m_ram->size() > 0x20000 ? 2 : 1);
 }
 
 
@@ -1032,75 +384,20 @@ void p500_state::write(offs_t offset, uint8_t data)
 
 uint8_t p500_state::vic_videoram_r(offs_t offset)
 {
-	int srw = 1, busy2 = 1, refen = 0;
-	int ba = !m_vic->ba_r(), ae = m_vic->aec_r();
-	int datxen = 1, dramxen = 1, clrniben = 1, _64kcasen = 1, casenb = 1, viddaten = 1, viddat_tr = 1;
-	int clrnibcs = 1, extbufcs = 1, discromcs = 1, buframcs = 1, charomcs = 1, viccs = 1, vidmatcs = 1;
-	int csbank1 = 1, csbank2 = 1, csbank3 = 1, basiclocs = 1, basichics = 1, kernalcs = 1;
-	int cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
-	int aec = 1, vsysaden = 1;
-
-	bankswitch(0, offset, srw, ba, ae, busy2, refen,
-		&datxen, &dramxen, &clrniben, &_64kcasen, &casenb, &viddaten, &viddat_tr,
-		&clrnibcs, &extbufcs, &discromcs, &buframcs, &charomcs, &viccs, &vidmatcs,
-		&csbank1, &csbank2, &csbank3, &basiclocs, &basichics, &kernalcs,
-		&cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs, &aec, &vsysaden);
-
-	uint8_t data = 0xff;
-//  uint8_t clrnib = 0xf;
-
-	if (vsysaden)
+	if (m_vic->phi0_r())
 	{
-		if (!_64kcasen && !aec && !viddaten && !viddat_tr)
-		{
-			data = m_ram->pointer()[(m_vicbnksel << 14) | offset];
-		}
-/*      if (!clrnibcs)
-        {
-            clrnib = m_color_ram[offset & 0x3ff];
-        }*/
-		if (!vidmatcs)
-		{
-			data = m_video_ram[offset & 0x3ff];
-		}
-		if (!charomcs)
-		{
-			data = m_charom->base()[offset & 0xfff];
-		}
+		if (m_statvid)
+			return m_video_ram[offset & 0x03ff];
+
+		return m_ram->pointer()[(m_vicbnksel << 14) | offset];
 	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic_videoram_r -
-//-------------------------------------------------
-
-uint8_t p500_state::vic_colorram_r(offs_t offset)
-{
-	int srw = 1, busy2 = 1, refen = 0;
-	int ba = !m_vic->ba_r(), ae = m_vic->aec_r();
-	int datxen = 1, dramxen = 1, clrniben = 1, _64kcasen = 1, casenb = 1, viddaten = 1, viddat_tr = 1;
-	int clrnibcs = 1, extbufcs = 1, discromcs = 1, buframcs = 1, charomcs = 1, viccs = 1, vidmatcs = 1;
-	int csbank1 = 1, csbank2 = 1, csbank3 = 1, basiclocs = 1, basichics = 1, kernalcs = 1;
-	int cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
-	int aec = 1, vsysaden = 1;
-
-	bankswitch(0, offset, srw, ba, ae, busy2, refen,
-		&datxen, &dramxen, &clrniben, &_64kcasen, &casenb, &viddaten, &viddat_tr,
-		&clrnibcs, &extbufcs, &discromcs, &buframcs, &charomcs, &viccs, &vidmatcs,
-		&csbank1, &csbank2, &csbank3, &basiclocs, &basichics, &kernalcs,
-		&cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs, &aec, &vsysaden);
-
-	uint8_t data = 0x0f;
-
-	if (!clrnibcs)
+	else
 	{
-		data = m_color_ram[offset & 0x3ff];
-	}
+		if (m_vicdotsel)
+			return m_charom->base()[offset & 0x0fff];
 
-	return data;
+		return m_ram->pointer()[(m_vicbnksel << 14) | offset];
+	}
 }
 
 
@@ -1113,9 +410,30 @@ uint8_t p500_state::vic_colorram_r(offs_t offset)
 //  ADDRESS_MAP( cbm2_mem )
 //-------------------------------------------------
 
+void cbm2_state::system_mem(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x07ff).ram().share(m_buffer_ram);
+	map(0x0800, 0x0fff).ram().share(m_extbuf_ram);
+	map(0x8000, 0xbfff).rom().region("basic", 0);
+	map(0xd000, 0xd7ff).ram().share(m_video_ram);
+	map(0xd800, 0xd801).mirror(0xfe).m(m_crtc, FUNC(mc6845_device::map));
+	map(0xda00, 0xda1f).mirror(0xe0).rw(m_sid, FUNC(mos6581_device::read), FUNC(mos6581_device::write));
+	map(0xdb00, 0xdb0f).mirror(0xf0).rw(FUNC(cbm2_state::ext_cia_r), FUNC(cbm2_state::ext_cia_w));
+	map(0xdc00, 0xdc0f).mirror(0xf0).rw(m_cia, FUNC(mos6526_device::read), FUNC(mos6526_device::write));
+	map(0xdd00, 0xdd03).mirror(0xfc).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xde00, 0xde07).mirror(0xf8).rw(m_tpi1, FUNC(tpi6525_device::read), FUNC(tpi6525_device::write));
+	map(0xdf00, 0xdf07).mirror(0xf8).rw(m_tpi2, FUNC(tpi6525_device::read), FUNC(tpi6525_device::write));
+	map(0xe000, 0xffff).rom().region("kernal", 0);
+}
+
 void cbm2_state::cbm2_mem(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(FUNC(cbm2_state::read), FUNC(cbm2_state::write));
+	map.unmap_value_high();
+	map(0x00000, 0xfffff).view(m_mem_view);
+	m_mem_view[0](0x10000, 0x4ffff).rw(FUNC(cbm2_state::ram_r), FUNC(cbm2_state::ram_w));
+	m_mem_view[0](0xf0000, 0xfffff).m(*this, FUNC(cbm2_state::system_mem));
+	m_mem_view[1](0x00000, 0x0ffff).mirror(0xf0000).m(*this, FUNC(cbm2_state::system_mem));
 }
 
 
@@ -1148,7 +466,25 @@ void cbm2_state::ext_io(address_map &map)
 
 void p500_state::p500_mem(address_map &map)
 {
-	map(0x00000, 0xfffff).rw(FUNC(p500_state::read), FUNC(p500_state::write));
+	map.unmap_value_high();
+	map(0x00000, 0x0ffff).rw(m_ram, FUNC(ram_device::read), FUNC(ram_device::write));
+	map(0x10000, 0x3ffff).view(m_dram_view);
+	m_dram_view[0](0x10000, 0x3ffff).unmaprw();
+	m_dram_view[1](0x10000, 0x1ffff).ram();
+	m_dram_view[1](0x20000, 0x3ffff).unmaprw();
+	m_dram_view[2](0x10000, 0x3ffff).ram();
+	map(0xf0000, 0xf07ff).ram().share(m_buffer_ram);
+	map(0xf8000, 0xfbfff).rom().region("basic", 0);
+	map(0xfc000, 0xfcfff).rom().region("charom", 0);
+	map(0xfd000, 0xfd3ff).ram().share(m_video_ram);
+	map(0xfd400, 0xfd7ff).ram().share(m_color_ram).lw8(NAME([this] (offs_t offset, uint8_t data) { m_color_ram[offset] = data & 0x0f; }));
+	map(0xfd800, 0xfd83f).mirror(0xc0).rw(m_vic, FUNC(mos6566_device::read), FUNC(mos6566_device::write));
+	map(0xfda00, 0xfda1f).mirror(0xe0).rw(m_sid, FUNC(mos6581_device::read), FUNC(mos6581_device::write));
+	map(0xfdc00, 0xfdc0f).mirror(0xf0).rw(m_cia, FUNC(mos6526_device::read), FUNC(mos6526_device::write));
+	map(0xfdd00, 0xfdd03).mirror(0xfc).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xfde00, 0xfde07).mirror(0xf8).rw(m_tpi1, FUNC(tpi6525_device::read), FUNC(tpi6525_device::write));
+	map(0xfdf00, 0xfdf07).mirror(0xf8).rw(m_tpi2, FUNC(tpi6525_device::read), FUNC(tpi6525_device::write));
+	map(0xfe000, 0xfffff).rom().region("kernal", 0);
 }
 
 
@@ -1168,7 +504,7 @@ void p500_state::vic_videoram_map(address_map &map)
 
 void p500_state::vic_colorram_map(address_map &map)
 {
-	map(0x000, 0x3ff).r(FUNC(p500_state::vic_colorram_r));
+	map(0x000, 0x3ff).readonly().share(m_color_ram);
 }
 
 
@@ -1664,6 +1000,7 @@ void cbm2_state::tpi1_pb_w(uint8_t data)
 	// memory
 	m_dramon = BIT(data, 4);
 	if (m_busy2) m_busen1 = m_dramon;
+	update_mem_view();
 
 	// cassette
 	m_cassette->write(BIT(data, 5));
@@ -1683,6 +1020,12 @@ void p500_state::tpi1_ca_w(int state)
 void p500_state::tpi1_cb_w(int state)
 {
 	m_vicdotsel = state;
+}
+
+void p500_state::tpi1_pb_w(uint8_t data)
+{
+	cbm2_state::tpi1_pb_w(data);
+	update_ram_view();
 }
 
 //-------------------------------------------------
@@ -1900,6 +1243,12 @@ uint8_t cbm2_state::cia_pb_r()
 //  tpi6525_interface ext_tpi_intf
 //-------------------------------------------------
 
+void cbm2_state::update_mem_view()
+{
+	if (m_mem_view.exists())
+		m_mem_view.select(m_busen1 ? 0 : 1);
+}
+
 void cbm2_state::set_busy2(int state)
 {
 	m_busy2 = state;
@@ -1916,6 +1265,7 @@ void cbm2_state::set_busy2(int state)
 
 		m_busen1 = 0;
 	}
+	update_mem_view();
 }
 
 uint8_t cbm2_state::ext_tpi_pb_r()
@@ -2114,6 +1464,7 @@ MACHINE_START_MEMBER( cbm2_state, cbm2 )
 	// state saving
 	save_item(NAME(m_dramon));
 	save_item(NAME(m_busen1));
+	machine().save().register_postload(save_prepost_delegate(FUNC(cbm2_state::update_mem_view), this));
 	save_item(NAME(m_busy2));
 	save_item(NAME(m_graphics));
 	save_item(NAME(m_ntsc));
@@ -2185,9 +1536,8 @@ MACHINE_START_MEMBER( cbm2_state, cbm2x_pal )
 
 MACHINE_START_MEMBER( p500_state, p500 )
 {
-	m_video_ram_size = 0x400;
-
 	MACHINE_START_CALL_MEMBER(cbm2);
+	machine().save().register_postload(save_prepost_delegate(FUNC(p500_state::update_ram_view), this));
 
 	// state saving
 	save_item(NAME(m_statvid));
@@ -2224,6 +1574,7 @@ MACHINE_RESET_MEMBER( cbm2_state, cbm2 )
 {
 	m_dramon = 1;
 	m_busen1 = 1;
+	update_mem_view();
 	m_busy2 = 1;
 	m_graphics = 1;
 
@@ -2237,6 +1588,7 @@ MACHINE_RESET_MEMBER( cbm2_state, cbm2 )
 MACHINE_RESET_MEMBER( p500_state, p500 )
 {
 	MACHINE_RESET_CALL_MEMBER(cbm2);
+	update_ram_view();
 
 	m_statvid = 1;
 	m_vicdotsel = 1;
@@ -2307,15 +1659,12 @@ void p500_state::p500_ntsc(machine_config &config)
 	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// devices
-	PLS100(config, m_pla1);
-	PLS100(config, m_pla2);
-
 	TPI6525(config, m_tpi1);
 	m_tpi1->out_irq_cb().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	m_tpi1->in_pa_cb().set(FUNC(cbm2_state::tpi1_pa_r));
 	m_tpi1->out_pa_cb().set(FUNC(cbm2_state::tpi1_pa_w));
 	m_tpi1->in_pb_cb().set(FUNC(cbm2_state::tpi1_pb_r));
-	m_tpi1->out_pb_cb().set(FUNC(cbm2_state::tpi1_pb_w));
+	m_tpi1->out_pb_cb().set(FUNC(p500_state::tpi1_pb_w));
 	m_tpi1->out_ca_cb().set(FUNC(p500_state::tpi1_ca_w));
 	m_tpi1->out_cb_cb().set(FUNC(p500_state::tpi1_cb_w));
 
@@ -2378,6 +1727,7 @@ void p500_state::p500_ntsc(machine_config &config)
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, nullptr);
 
 	CBM2_EXPANSION_SLOT(config, m_exp, XTAL(14'318'181)/14, cbm2_expansion_cards, nullptr);
+	m_exp->set_program_space(m_maincpu, AS_PROGRAM);
 
 	CBM2_USER_PORT(config, m_user, cbm2_user_port_cards, nullptr);
 	m_user->irq_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
@@ -2397,7 +1747,6 @@ void p500_state::p500_ntsc(machine_config &config)
 	_128k(config);
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart").set_filter("NTSC");
 	SOFTWARE_LIST(config, "flop_list").set_original("p500_flop").set_filter("NTSC");
 }
 
@@ -2440,15 +1789,12 @@ void p500_state::p500_pal(machine_config &config)
 	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// devices
-	PLS100(config, m_pla1);
-	PLS100(config, m_pla2);
-
 	TPI6525(config, m_tpi1);
 	m_tpi1->out_irq_cb().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	m_tpi1->in_pa_cb().set(FUNC(cbm2_state::tpi1_pa_r));
 	m_tpi1->out_pa_cb().set(FUNC(cbm2_state::tpi1_pa_w));
 	m_tpi1->in_pb_cb().set(FUNC(cbm2_state::tpi1_pb_r));
-	m_tpi1->out_pb_cb().set(FUNC(cbm2_state::tpi1_pb_w));
+	m_tpi1->out_pb_cb().set(FUNC(p500_state::tpi1_pb_w));
 	m_tpi1->out_ca_cb().set(FUNC(p500_state::tpi1_ca_w));
 	m_tpi1->out_cb_cb().set(FUNC(p500_state::tpi1_cb_w));
 
@@ -2508,6 +1854,7 @@ void p500_state::p500_pal(machine_config &config)
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, nullptr);
 
 	CBM2_EXPANSION_SLOT(config, m_exp, XTAL(17'734'472)/18, cbm2_expansion_cards, nullptr);
+	m_exp->set_program_space(m_maincpu, AS_PROGRAM);
 
 	CBM2_USER_PORT(config, m_user, cbm2_user_port_cards, nullptr);
 	m_user->irq_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
@@ -2527,7 +1874,6 @@ void p500_state::p500_pal(machine_config &config)
 	_128k(config);
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart").set_filter("PAL");
 	SOFTWARE_LIST(config, "flop_list").set_original("p500_flop").set_filter("PAL");
 }
 
@@ -2572,9 +1918,6 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	m_sid->potx().set(FUNC(p500_state::sid_potx_r));
 	m_sid->poty().set(FUNC(p500_state::sid_poty_r));
 	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
-
-	// devices
-	PLS100(config, m_pla1);
 
 	TPI6525(config, m_tpi1);
 	m_tpi1->out_irq_cb().set("mainirq", FUNC(input_merger_device::in_w<1>));
@@ -2638,6 +1981,7 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, nullptr);
 
 	CBM2_EXPANSION_SLOT(config, m_exp, XTAL(18'000'000)/9, cbm2_expansion_cards, nullptr);
+	m_exp->set_program_space(m_maincpu, AS_PROGRAM);
 
 	CBM2_USER_PORT(config, m_user, cbm2_user_port_cards, nullptr);
 	m_user->irq_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
@@ -3113,7 +2457,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT    CLASS         INIT    COMPANY                         FULLNAME                        FLAGS
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT    CLASS         INIT        COMPANY                         FULLNAME                    FLAGS
 COMP( 1983, p500,      0,      0,      p500_ntsc, cbm2,    p500_state,   empty_init, "Commodore Business Machines",  "P500 (NTSC)",              MACHINE_SUPPORTS_SAVE )
 COMP( 1983, p500p,     p500,   0,      p500_pal,  cbm2,    p500_state,   empty_init, "Commodore Business Machines",  "P500 (PAL)",               MACHINE_SUPPORTS_SAVE )
 COMP( 1983, b500,      0,      0,      b128,      cbm2,    cbm2_state,   empty_init, "Commodore Business Machines",  "B500",                     MACHINE_SUPPORTS_SAVE )

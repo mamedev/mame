@@ -14,6 +14,14 @@
         - 5 display tubes containing an unknown number of RGB LEDs behind
           a diffuser
 
+    TODO:
+    - investigate and fix audio routing:
+      cabinet sports 2 front speakers + 1 subwoofer *per player side*,
+      splitted and amplified thru an unknown middleman device.
+    - dot matrix disable hookup;
+    - has a random DSB2 bug where triggering service mode during attract
+      will erratically playback a song instead of muting output;
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -177,13 +185,6 @@ class flashbeats_state : public driver_device
 	static constexpr int LANE_COUNT = 5;
 	static constexpr int LANE_LEN = 47;        // LEDs per lane (even bytes 0..92 of each 0x60 row at 0xa0c000)
 
-	// DMD framebuffer: sub 0x75ec copies shifting slices of the 0xa02800 staging
-	// canvas (itself filled by the sprite-blit at 0x749e) into 0xa00000, one row
-	// per DMD_PITCH bytes, dispatched by 0x7642(r5=0) from the scene handler's
-	// per-tick scroll loop.
-	static constexpr offs_t DMD_BASE  = 0xa00000;
-	static constexpr offs_t DMD_PITCH = 0x80;    // bytes/row = DMD_W * 2
-
 public:
 	flashbeats_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
@@ -254,6 +255,7 @@ private:
 	uint16_t adc1_r() { return m_spectrum->adc_r(spectrum_band(), 1); }
 	uint8_t spectrum_mux_r();
 	void spectrum_mux_w(uint8_t data);
+	void sound_control_w(offs_t offset, uint8_t data);
 	void update_lanes();
 	void update_dmd();
 	TIMER_DEVICE_CALLBACK_MEMBER(lane_update_timer);
@@ -356,10 +358,11 @@ void flashbeats_state::update_lanes()
 void flashbeats_state::update_dmd()
 {
 	auto const disp8 = util::big_endian_cast<uint8_t const>(m_dispram.target());
+	const u16 pitch = 0x80;
 
 	for (int y = 0; y < DMD_H; y++)
 		for (int x = 0; x < DMD_W; x++)
-			m_dmd[y * DMD_W + x] = disp8[(DMD_BASE + y * DMD_PITCH + x * 2) & 0xffff] & 0x0f;
+			m_dmd[y * DMD_W + x] = disp8[(y * pitch + x * 2) & 0xffff] & 0x0f;
 }
 
 // Polls display RAM on a fixed-rate timer. Both the DMD and the lanes are pure
@@ -426,6 +429,15 @@ uint8_t flashbeats_state::spectrum_mux_r()
 	return m_spectrum_mux;
 }
 
+// 1--- ---- unknown, always high
+// -x-- ---- unknown, written as 0xf0 during POST, low otherwise
+// --x- ---- high with dot matrix off in output test
+//           (note: becomes on again by cycling with service once)
+// ---x ---- demo sound source
+// ---1 ---- internal
+// ---0 ---- external
+// ---- x--- unknown, always high except at POST
+// ---- -xxx spectrum output select
 void flashbeats_state::spectrum_mux_w(uint8_t data)
 {
 	m_spectrum_mux = data;
@@ -443,22 +455,21 @@ void flashbeats_state::flashbeats_map(address_map &map)
 	map(0xa18000, 0xa18001).rw(FUNC(flashbeats_state::spectrum_mux_r), FUNC(flashbeats_state::spectrum_mux_w)).umask16(0xff00);
 }
 
+// NOTE: sound handling is virtually same as model2.cpp and model3.cpp
+void flashbeats_state::sound_control_w(offs_t offset, uint8_t data)
+{
+	// TODO: bits 3-0 used, again
+}
+
+// We assume using the same waitstate weights as Saturn, applied to SCSP area only
+// Game looks dependant on this, would hiccup BGM beat at coin-in
 void flashbeats_state::main_scsp_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).ram().share("sound_ram");
-	map(0x100000, 0x100fff).rw("scsp", FUNC(scsp_device::read), FUNC(scsp_device::write));
-	// The sound 68000 writes a status/handshake nibble here (values 0x08/0x0c/
-	// 0x0e/0x0f/0x0d... from PC 0x6001b0/0x6005e0) very early in init; it was
-	// hitting unmapped space and faulting. Back it with RAM so init proceeds.
-	map(0x400000, 0x400001).ram();
+	map(0x000000, 0x0fffff).before_delay(NAME([](offs_t) { return 1; })).ram().share("sound_ram");
+	map(0x100000, 0x100fff).before_delay(NAME([](offs_t) { return 1; })).rw("scsp", FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x400001, 0x400001).w(FUNC(flashbeats_state::sound_control_w));
 	map(0x600000, 0x67ffff).rom().region("scspcpu", 0);
-	// Sample ROM (rom3) exposed to the sound-68000, Model 2 style (see model2_snd:
-	// 0x800000-0x9fffff = "samples"). rom3 lives at offset 0x80000 in the "scspcpu"
-	// region (after rom4's 0x80000 of code). The firmware stages PCM from here into
-	// sound_ram (the SCSP wave/DSP DRAM) itself; the SCSP then plays it from RAM, so
-	// the DSP keeps its writable work area (mapping rom3 straight into scsp_mem as
-	// ROM droned because the DSP read/writes that same space).
-	map(0x800000, 0x9fffff).rom().region("scspcpu", 0x80000);
+	map(0x800000, 0x9fffff).rom().region("samples", 0);
 }
 
 void flashbeats_state::scsp_mem(address_map &map)
@@ -577,48 +588,40 @@ void flashbeats_state::scsp_irq(offs_t offset, uint8_t data)
 	m_scspcpu->set_input_line(offset, data);
 }
 
-// Input mappings
-// 3 bits seem genuinely dead (scanner never reads them) and left PORT_BIT(..., IPT_UNUSED).
 static INPUT_PORTS_START( flashbeats )
+	// SW does a shrl.b rotxl.b when moving input reads to work RAM buffer at $ff'0010+,
+	// discarding bit 7. We reflect this with IPT_UNKNOWN, but they are clearly unused by this game.
+
 	// 315-5296 port A -- @0x400000.
 	PORT_START("IN_A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Attack 1") PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Attack 2") PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Attack 1") PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Attack 2") PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 Attack 3") PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Attack 4") PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Attack 5") PORT_PLAYER(2)
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )  // dead lines (scanner never reads)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Attack 4") PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Attack 5") PORT_PLAYER(2)
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	// 315-5296 port B -- @0x400002.
-	// bit 2 is the cabinet's TEST/diagnostics button (opens the ">Exit" test
-	// menu from attract, and doubles as select/confirm once inside it). Bit 3
-	// is the coin-door SERVICE button (credits up, and advances the test-menu
-	// cursor exactly what a Sega service switch does; it was mislabeled COIN1
-	// at first). Bits 0-1 are the real coin chutes 1/2. Bit 6 = start. Bits 4-5
-	// are Select1 (up) and Select2 (down); bit 7 is unknown (unconfirmed, not
-	// dead -- scanner does read it).
 	PORT_START("IN_B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW ) PORT_NAME("Test")  // TEST button (menu open/select)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service")  // SERVICE button (credit + menu advance)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Select 1 (Up)") PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Select 2 (Down)") PORT_PLAYER(1)
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Select 1 (Up)") PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Select 2 (Down)") PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unconfirmed, not a dead line
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	// 315-5296 port D -- @0x400006.
-	// Bits 0-4 quiet in attract - P2's 5 lane buttons (mirrors port A's P1 layout).
-	// Bit 7 is unknown (unconfirmed, not dead). Bits 5-6 are dead lines (scanner
-	// never reads them).
 	PORT_START("IN_D")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Attack 1") PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Attack 2") PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Attack 3") PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Attack 4") PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Attack 5") PORT_PLAYER(1)
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNUSED )  // dead lines (scanner never reads)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unconfirmed, not a dead line
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	// DIP SW1 on 315-5296 port G (read @boot, PC 0x622, active-low: ON = 0).
 	// Only the low nibble (sw1-4) is consumed; setting #N reads back as
@@ -646,19 +649,7 @@ static INPUT_PORTS_START( flashbeats )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
 
-	// DIP SW2 on 315-5296 port H (read @boot, PC 0x650-0x69e, active-low). The
-	// H8 inverts, masks each field and adds 1 -> credit counts 1-4. Bit 7 is
-	// cabinet-documented "ADVERTISE SOUND" (Japanese label: 内部/外部, "internal/
-	// external"). This is a sound-source selector, not a demo-sounds mute -
-	// confirmed by a full 24-bit input sweep during attract mode that found no
-	// input bit (DIP or otherwise) silences advertise sound.
-	// Traced the boot read itself (PC 0x69C-0x6A8): bit 7 does gate a conditional
-	// write, but its target (0xfff438) sits above the H8/3007's on-chip RAM
-	// ceiling (0xfff1f per the Hitachi H8/300H family memory map) and below the
-	// internal I/O register block (0xfff20+) -- i.e. unmapped space in the
-	// current emulation, so the write is a no-op here and has no observable
-	// effect either way. Left as the literal cabinet-documented labels rather
-	// than DEF_STR( Demo_Sounds ) pending further hardware RE.
+	// DIP SW2 on 315-5296 port H (read @boot, PC 0x650-0x69e, active-low).
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Credits To Start (1P)" )  PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "1" )
@@ -676,7 +667,9 @@ static INPUT_PORTS_START( flashbeats )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
-	PORT_DIPNAME( 0x80, 0x80, "Advertise Sound" )        PORT_DIPLOCATION("SW2:8")
+	// "ADVERTISE SOUND" (Japanese label: 内部/外部, "internal/external")
+	// TODO: understand the context of this as speaker standpoint.
+	PORT_DIPNAME( 0x80, 0x80, "Demo Sound Source" )        PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, "Internal" )
 	PORT_DIPSETTING(    0x00, "External" )
 INPUT_PORTS_END
@@ -691,9 +684,11 @@ ROM_START( flsbeats )
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_LOAD16_WORD_SWAP( "epr-21609_rom1.ic18", 0x000000, 0x080000, CRC(130a0a62) SHA1(400f24304959547b188ed874653ae2e1e77092fe) )
 
-	ROM_REGION(0x280000, "scspcpu", 0)
+	ROM_REGION(0x080000, "scspcpu", 0)
 	ROM_LOAD16_WORD_SWAP( "epr-21610_rom4.ic14", 0x000000, 0x080000, CRC(c877e0e6) SHA1(595f143fb3789852a4af9d2920cbaefabecfa45c) )
-	ROM_LOAD16_WORD_SWAP( "epr-21611_rom3.ic4", 0x080000, 0x200000, CRC(2f5dc574) SHA1(f0b8d076b0fc8e94582de0ca17ecd5c8b90bedc4) )
+
+	ROM_REGION16_BE( 0x200000, "samples", 0)
+	ROM_LOAD16_WORD_SWAP( "epr-21611_rom3.ic4", 0x000000, 0x200000, CRC(2f5dc574) SHA1(f0b8d076b0fc8e94582de0ca17ecd5c8b90bedc4) )
 
 	ROM_REGION(0x20000, "dsb2:mpegcpu", 0)
 	ROM_LOAD16_WORD_SWAP( "epr-21612.ic2", 0x000000, 0x020000, CRC(6912e1cb) SHA1(3497d6ae0b9be00116a3278f46d738c4c6f26d20) )
@@ -713,4 +708,4 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  MACHINE     INPUT       CLASS             INIT        MONITOR  COMPANY  FULLNAME       FLAGS
-GAME( 1998, flsbeats, 0,      flashbeats, flashbeats, flashbeats_state, empty_init, ROT0,    "Sega",  "Flash Beats", 0 )
+GAME( 1998, flsbeats, 0,      flashbeats, flashbeats, flashbeats_state, empty_init, ROT0,    "Sega",  "Flash Beats (Japan)", MACHINE_IMPERFECT_SOUND ) // cabinet mixing

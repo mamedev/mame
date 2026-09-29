@@ -1692,10 +1692,10 @@ static INPUT_PORTS_START( model3 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button B") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Button B") PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_PLAYER(1)
@@ -6253,7 +6253,7 @@ ROM_END
 
 /* Model 3 sound board emulation */
 
-// TODO: bits 3-0 also used here
+// TODO: bits 3-0 also used here, akin to model2.cpp and flashbeats.cpp
 // cfr. spikeout/spikeofe sound test
 // (hint: use p1 inputs ignore Sega wacky instructions)
 void model3_state::sound_control_w(uint8_t data)

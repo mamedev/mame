@@ -38,16 +38,12 @@ public:
 	pet_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~pet_expansion_slot_device();
 
-	auto dma_read_callback() { return m_read_dma.bind(); }
-	auto dma_write_callback() { return m_write_dma.bind(); }
+	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }
 	auto halt_callback() { return m_write_halt.bind(); }
 	auto reset_callback() { return m_write_reset.bind(); }
 	auto irq_callback() { return m_write_irq.bind(); }
 
 	// computer interface
-	int norom_r(offs_t offset, int sel);
-	uint8_t read(offs_t offset, uint8_t data, int &sel);
-	void write(offs_t offset, uint8_t data, int &sel);
 	int diag_r();
 	void irq_w(int state);
 
@@ -58,27 +54,7 @@ public:
 	void reset_w(int state) { m_write_reset(state); }
 	void card_irq_w(int state) { m_write_irq(state); }
 	int phi2();
-
-	enum
-	{
-		SEL_NONE = -1,
-		SEL0 = 0,
-		SEL1,
-		SEL2,
-		SEL3,
-		SEL4,
-		SEL5,
-		SEL6,
-		SEL7,
-		SEL8,
-		SEL9,
-		SELA,
-		SELB,
-		SELC,
-		SELD,
-		SELE,
-		SELF
-	};
+	memory_view &window() { return m_window; }
 
 protected:
 	// device_t implementation
@@ -86,8 +62,8 @@ protected:
 
 	device_pet_expansion_card_interface *m_card;
 
-	devcb_read8  m_read_dma;
-	devcb_write8 m_write_dma;
+	required_address_space m_program;
+	memory_view m_window;
 	devcb_write_line m_write_halt;
 	devcb_write_line m_write_reset;
 	devcb_write_line m_write_irq;
@@ -108,9 +84,6 @@ protected:
 	device_pet_expansion_card_interface(const machine_config &mconfig, device_t &device);
 
 	// runtime
-	virtual int pet_norom_r(offs_t offset, int sel) { return 1; }
-	virtual uint8_t pet_bd_r(offs_t offset, uint8_t data, int &sel) { return data; }
-	virtual void pet_bd_w(offs_t offset, uint8_t data, int &sel) { }
 	virtual int pet_diag_r() { return 1; }
 	virtual void pet_irq_w(int state) { }
 

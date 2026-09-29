@@ -589,8 +589,11 @@ uint8_t upd765_family_device::msr_r()
 		break;
 	case PHASE_EXEC:
 		msr |= MSR_CB;
-		if((spec & SPEC_ND) && xfer_in_progress)
+		if((spec & SPEC_ND) && xfer_in_progress) {
 			msr |= MSR_EXM;
+			if(!fifo_write)
+				msr |= MSR_DIO;
+		}
 		if(internal_drq) {
 			msr |= MSR_RQM;
 			if(!fifo_write)

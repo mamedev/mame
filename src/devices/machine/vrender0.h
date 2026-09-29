@@ -94,6 +94,9 @@ public:
 	void set_uart_external_clock(const XTAL uclk) { m_uart_uclk = uclk.value(); }
 	template <int Port> void rx_w(int state) { m_uart[Port]->rx_w((u8)state); }
 
+	// psattack
+	template <unsigned N> auto light_pen_cb() { return m_light_pen_cb[N].bind(); }
+
 	// handlers
 	bool crt_is_blanked() { return BIT(m_crtcregs[0], 9); }
 	bool crt_active_vblank_irq();
@@ -122,6 +125,7 @@ private:
 	required_device<vr0sound_device> m_vr0snd;
 	required_device_array<vr0uart_device, 2> m_uart;
 	required_shared_ptr<u32> m_crtcregs;
+	devcb_read16::array<4> m_light_pen_cb;
 	required_address_space m_host_space;
 	memory_share_creator<u16> m_textureram;
 	memory_share_creator<u16> m_frameram;
@@ -132,6 +136,38 @@ private:
 	u32 m_inten = 0;
 	u8 m_int_high = 0;
 	u32 m_intst = 0;
+
+	// bare numbers indicate <reserved> IRQSs
+	enum {
+		IRQ_TIMER0 = 0,
+		IRQ_TIMER1,
+		IRQ_WAVE_SYNTH,
+		IRQ_SIO,
+		IRQ_4,
+		IRQ_EXTINT0,
+		IRQ_EXTINT1,
+		IRQ_DMA0,
+		IRQ_DMA1,
+		IRQ_TIMER2,
+		IRQ_TIMER3,
+		IRQ_EXTINT2,
+		IRQ_EXTINT3,
+		IRQ_UART0_ERROR,
+		IRQ_UART0_RX,
+		IRQ_UART0_TX,
+		IRQ_UART1_ERROR,
+		IRQ_UART1_RX,
+		IRQ_UART1_TX,
+		IRQ_19,
+		IRQ_20,
+		IRQ_21,
+		IRQ_22,
+		// NOTE: <reserved> with blue text, like Wave Synthesizer interrupt
+		IRQ_23,
+		IRQ_VBLANK,
+		IRQ_25,
+		IRQ_PWM
+	};
 
 	struct vr0_timer
 	{
@@ -189,6 +225,7 @@ private:
 	void crtc_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void crtc_update();
 	inline bool crt_is_interlaced();
+	u8 m_lightc;
 
 	// Misc
 	u32 sysid_r();

@@ -1,12 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 
+/*
+
+	TODO:
+
+	- clipper
+		- printer
+
+*/
+
 #include "emu.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 #include "bus/cbmiec/cbmiec.h"
 #include "bus/cbmiec/c1541.h"
+#include "bus/cbmiec/clipper_fdd.h"
 #include "bus/c64/exp.h"
 #include "bus/vic20/user.h"
 #include "bus/pet/cass.h"
@@ -34,6 +44,46 @@ namespace {
 #define CONTROL1_TAG    "joy1"
 #define CONTROL2_TAG    "joy2"
 #define PET_USER_PORT_TAG     "user"
+
+static const rgb_t PALETTE_PET64[16] =
+{
+	rgb_t(0x00, 0x00, 0x00),
+	rgb_t(0x40, 0xff, 0x90),
+	rgb_t(0x14, 0x50, 0x2d),
+	rgb_t(0x28, 0x9f, 0x5a),
+	rgb_t(0x18, 0x60, 0x36),
+	rgb_t(0x20, 0x80, 0x48),
+	rgb_t(0x10, 0x40, 0x24),
+	rgb_t(0x30, 0xbf, 0x6c),
+	rgb_t(0x18, 0x60, 0x36),
+	rgb_t(0x10, 0x40, 0x24),
+	rgb_t(0x20, 0x80, 0x48),
+	rgb_t(0x14, 0x50, 0x2d),
+	rgb_t(0x1e, 0x78, 0x44),
+	rgb_t(0x30, 0xbf, 0x6c),
+	rgb_t(0x1e, 0x78, 0x44),
+	rgb_t(0x28, 0x9f, 0x5a)
+};
+
+static const rgb_t PALETTE_CLIPPER[16] =
+{
+	rgb_t(0x00, 0x00, 0x00),
+	rgb_t(0xff, 0xd8, 0x20),
+	rgb_t(0x50, 0x44, 0x0a),
+	rgb_t(0x9f, 0x87, 0x14),
+	rgb_t(0x60, 0x51, 0x0c),
+	rgb_t(0x80, 0x6c, 0x10),
+	rgb_t(0x40, 0x36, 0x08),
+	rgb_t(0xbf, 0xa2, 0x18),
+	rgb_t(0x60, 0x51, 0x0c),
+	rgb_t(0x40, 0x36, 0x08),
+	rgb_t(0x80, 0x6c, 0x10),
+	rgb_t(0x50, 0x44, 0x0a),
+	rgb_t(0x78, 0x65, 0x0f),
+	rgb_t(0xbf, 0xa2, 0x18),
+	rgb_t(0x78, 0x65, 0x0f),
+	rgb_t(0x9f, 0x87, 0x14)
+};
 
 class c64_state : public driver_device
 {
@@ -96,6 +146,9 @@ public:
 
 	[[maybe_unused]] void check_interrupts();
 	int read_pla(offs_t offset, offs_t va, int rw, int aec, int ba);
+	virtual int exp_exrom_r(offs_t offset, int sphi2, int ba, int rw) { return m_exp->exrom_r(offset, sphi2, ba, rw, m_loram, m_hiram); }
+	virtual uint8_t exp_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) { return m_exp->cd_r(offset, data, sphi2, ba, roml, romh, io1, io2); }
+	virtual void exp_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) { m_exp->cd_w(offset, data, sphi2, ba, roml, romh, io1, io2); }
 	uint8_t read_memory(offs_t offset, offs_t va, int aec, int ba);
 	void write_memory(offs_t offset, uint8_t data, int aec, int ba);
 
@@ -232,10 +285,31 @@ class clipper_state : public c64_state
 {
 public:
 	clipper_state(const machine_config &mconfig, device_type type, const char *tag)
-		: c64_state(mconfig, type, tag)
+		: c64_state(mconfig, type, tag),
+		m_sb(*this, "sb"),
+		m_combo(*this, "COMBO"),
+		m_extra(*this, "EXTRA")
 	{ }
 
 	void clipper(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	virtual int exp_exrom_r(offs_t offset, int sphi2, int ba, int rw) override { return 0; }
+	virtual uint8_t exp_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
+	virtual void exp_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
+
+private:
+	required_region_ptr<uint8_t> m_sb;
+	required_ioport m_combo;
+	required_ioport m_extra;
+
+	uint8_t m_bank;
+
+	uint8_t cia1_pa_r();
+	uint8_t cia1_pb_r();
 };
 
 
@@ -472,7 +546,7 @@ int c64_state::read_pla(offs_t offset, offs_t va, int rw, int aec, int ba)
 	//int aec = !m_vic->aec_r();
 	int sphi2 = m_vic->phi0_r();
 	int game = m_exp->game_r(offset, sphi2, ba, rw, m_loram, m_hiram);
-	int exrom = m_exp->exrom_r(offset, sphi2, ba, rw, m_loram, m_hiram);
+	int exrom = exp_exrom_r(offset, sphi2, ba, rw);
 	int cas = 0;
 
 	uint32_t input = VA12 << 15 | VA13 << 14 | game << 13 | exrom << 12 | rw << 11 | aec << 10 | ba << 9 | A12 << 8 |
@@ -564,7 +638,7 @@ uint8_t c64_state::read_memory(offs_t offset, offs_t va, int aec, int ba)
 
 	int roml = BIT(plaout, PLA_OUT_ROML);
 	int romh = BIT(plaout, PLA_OUT_ROMH);
-	return m_exp->cd_r(offset, data, sphi2, ba, roml, romh, io1, io2);
+	return exp_cd_r(offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
 
@@ -635,7 +709,7 @@ void c64_state::write_memory(offs_t offset, uint8_t data, int aec, int ba)
 
 	int roml = BIT(plaout, PLA_OUT_ROML);
 	int romh = BIT(plaout, PLA_OUT_ROMH);
-	m_exp->cd_w(offset, data, sphi2, ba, roml, romh, io1, io2);
+	exp_cd_w(offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
 
@@ -898,8 +972,135 @@ INPUT_PORTS_END
 //-------------------------------------------------
 
 static INPUT_PORTS_START( clipper )
-	PORT_INCLUDE( c64 )
-	// TODO extra keys
+	PORT_START( "ROW0" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x93") PORT_CODE(KEYCODE_DOWN)          PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F5") PORT_CODE(KEYCODE_F5)                PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)                PORT_CHAR(UCHAR_MAMEKEY(F3))
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)                PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F7") PORT_CODE(KEYCODE_F7)                PORT_CHAR(UCHAR_MAMEKEY(F7))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x92") PORT_CODE(KEYCODE_RIGHT)         PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER)         PORT_CHAR(13)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INST DEL") PORT_CODE(KEYCODE_BACKSPACE)   PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+
+	PORT_START( "ROW1" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT (Left)") PORT_CODE(KEYCODE_LSHIFT)  PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)         PORT_CHAR('E')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)         PORT_CHAR('S')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)         PORT_CHAR('Z')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4)         PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)         PORT_CHAR('A')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)         PORT_CHAR('W')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3)         PORT_CHAR('3') PORT_CHAR('#')
+
+	PORT_START( "ROW2" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X)         PORT_CHAR('X')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T)         PORT_CHAR('T')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)         PORT_CHAR('F')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C)         PORT_CHAR('C')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6)         PORT_CHAR('6') PORT_CHAR('&')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)         PORT_CHAR('D')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)         PORT_CHAR('R')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5)         PORT_CHAR('5') PORT_CHAR('%')
+
+	PORT_START( "ROW3" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V)         PORT_CHAR('V')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U)         PORT_CHAR('U')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)         PORT_CHAR('H')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B)         PORT_CHAR('B')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8)         PORT_CHAR('8') PORT_CHAR('(')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)         PORT_CHAR('G')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)         PORT_CHAR('Y')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7)         PORT_CHAR('7') PORT_CHAR('\'')
+
+	PORT_START( "ROW4" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N)         PORT_CHAR('N')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)         PORT_CHAR('O')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)         PORT_CHAR('K')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M)         PORT_CHAR('M')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)         PORT_CHAR('0')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)         PORT_CHAR('J')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I)         PORT_CHAR('I')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)         PORT_CHAR('9') PORT_CHAR(')')
+
+	PORT_START( "ROW5" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA)     PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00FC) PORT_CHAR(0x00DC)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)     PORT_CHAR(0x00F6) PORT_CHAR(0x00D6)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP)      PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)    PORT_CHAR('-')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)         PORT_CHAR('L')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P)         PORT_CHAR('P')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)     PORT_CHAR('+')
+
+	PORT_START( "ROW6" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH)                             PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91 \xC3\x9F") PORT_CODE(KEYCODE_END) PORT_CHAR(0x2191) PORT_CHAR(0x00DF)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)                         PORT_CHAR(':') PORT_CHAR(';')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT (Right)") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_HOME)           PORT_CHAR(UCHAR_MAMEKEY(HOME))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)                             PORT_CHAR(0x00E4) PORT_CHAR(0x00C4)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)                        PORT_CHAR('*') PORT_CHAR('=')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN)                              PORT_CHAR(0x00A7)
+
+	PORT_START( "ROW7" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RUN STOP") PORT_CODE(KEYCODE_ESC)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)                                 PORT_CHAR('Q')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("PDC") PORT_CODE(KEYCODE_LALT)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE)                             PORT_CHAR(' ')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2)                                 PORT_CHAR('2') PORT_CHAR('"')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("CTRL")        PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90 \xC2\xB0") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(0x2190) PORT_CHAR(0x00B0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1)                                 PORT_CHAR('1') PORT_CHAR('!')
+
+	PORT_START( "COMBO" )
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)          PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F4") PORT_CODE(KEYCODE_F4)          PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F6") PORT_CODE(KEYCODE_F6)          PORT_CHAR(UCHAR_MAMEKEY(F6))
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F8") PORT_CODE(KEYCODE_F8)          PORT_CHAR(UCHAR_MAMEKEY(F8))
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F9") PORT_CODE(KEYCODE_F9)          PORT_CHAR(UCHAR_MAMEKEY(F9))
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F10") PORT_CODE(KEYCODE_F10)        PORT_CHAR(UCHAR_MAMEKEY(F10))
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F11") PORT_CODE(KEYCODE_F11)        PORT_CHAR(UCHAR_MAMEKEY(F11))
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F12") PORT_CODE(KEYCODE_F12)        PORT_CHAR(UCHAR_MAMEKEY(F12))
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91") PORT_CODE(KEYCODE_UP)       PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90") PORT_CODE(KEYCODE_LEFT)     PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)  PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)  PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)  PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)  PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)  PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)  PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)  PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)  PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)  PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)  PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad \xC3\x97") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK))
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad \xC3\xB7") PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD))
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad -") PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD))
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad +") PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad =") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad .") PORT_CODE(KEYCODE_DEL_PAD) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+	PORT_BIT( 0xfc000000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START( "EXTRA" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F13") PORT_CODE(KEYCODE_F13)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F14") PORT_CODE(KEYCODE_F14)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F15") PORT_CODE(KEYCODE_F15)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F16")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F17")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F18")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F19")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START( "RESTORE" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REST") PORT_CODE(KEYCODE_TAB) PORT_WRITE_LINE_MEMBER(FUNC(c64_state::write_restore))
+
+	PORT_START( "LOCK" )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START( "JOYSWAP" )
+	PORT_CONFNAME( 0x01, 0x00, "Swap joystick ports" )
+	PORT_CONFSETTING( 0x01, "Joystick in swapped port" )
+	PORT_CONFSETTING( 0x00, "Joystick in assigned port" )
 INPUT_PORTS_END
 
 
@@ -1442,6 +1643,17 @@ void sx1541_iec_devices(device_slot_interface &device)
 }
 
 
+//-------------------------------------------------
+//  SLOT_INTERFACE( clipper_iec_devices )
+//-------------------------------------------------
+
+void clipper_iec_devices(device_slot_interface &device)
+{
+	cbm_iec_devices(device);
+	device.option_add("clipper_fdd", CLIPPER_FDD);
+}
+
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -1505,6 +1717,94 @@ void c64_state::machine_reset()
 {
 	m_user->write_3(0);
 	m_user->write_3(1);
+}
+
+
+void clipper_state::machine_start()
+{
+	c64_state::machine_start();
+
+	save_item(NAME(m_bank));
+}
+
+
+void clipper_state::machine_reset()
+{
+	c64_state::machine_reset();
+
+	m_bank = 0;
+}
+
+
+uint8_t clipper_state::cia1_pa_r()
+{
+	uint8_t data = 0xff;
+	vcs_control_port_device *cur2 = m_portswap->read() ? m_joy1 : m_joy2;
+
+	uint8_t joy_b = cur2->read_joy();
+
+	data &= (0xf0 | (joy_b & 0x0f));
+	data &= ~(!BIT(joy_b, 5) << 4);
+
+	if (!BIT(m_cia1->pb_r(), 7)) data &= m_extra->read();
+
+	return data;
+}
+
+
+uint8_t clipper_state::cia1_pb_r()
+{
+	static constexpr uint8_t SHIFT = 0x0f, PDC = 0x3d, F1 = 0x04, F3 = 0x05, F5 = 0x06, F7 = 0x03, DOWN = 0x07, RIGHT = 0x02;
+	static constexpr uint8_t COMBO[26][2] =
+	{
+		{ SHIFT, F1 }, { SHIFT, F3 }, { SHIFT, F5 }, { SHIFT, F7 },
+		{ PDC, F1 }, { PDC, F3 }, { PDC, F5 }, { PDC, F7 },
+		{ SHIFT, DOWN }, { SHIFT, RIGHT },
+		{ 0x23, 0x23 }, { 0x38, 0x38 }, { 0x3b, 0x3b }, { 0x08, 0x08 }, { 0x0b, 0x0b },
+		{ 0x10, 0x10 }, { 0x13, 0x13 }, { 0x18, 0x18 }, { 0x1b, 0x1b }, { 0x20, 0x20 },
+		{ 0x31, 0x31 }, { 0x37, 0x37 }, { 0x2b, 0x2b }, { 0x28, 0x28 }, { SHIFT, 0x31 }, { 0x2c, 0x2c }
+	};
+
+	uint8_t data = c64_state::cia1_pb_r();
+	uint8_t cia1_pa = m_cia1->pa_r();
+	uint32_t combo = m_combo->read();
+
+	for (int i = 0; i < 26; i++)
+	{
+		if (!BIT(combo, i))
+		{
+			for (uint8_t key : COMBO[i])
+			{
+				if (!BIT(cia1_pa, key >> 3)) data &= ~(1 << (key & 7));
+			}
+		}
+	}
+
+	return data;
+}
+
+
+uint8_t clipper_state::exp_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+{
+	offs_t addr = (m_bank << 13) | (offset & 0x1fff);
+
+	if (!roml && addr < m_sb.bytes())
+	{
+		data = m_sb[addr];
+	}
+
+	return c64_state::exp_cd_r(offset, data, sphi2, ba, roml, romh, io1, io2);
+}
+
+
+void clipper_state::exp_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+{
+	if (!io1 && (offset & 0xff) == 0x18)
+	{
+		m_bank = data & 0x07;
+	}
+
+	c64_state::exp_cd_w(offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
 
@@ -1657,7 +1957,8 @@ void c64_state::ntsc(machine_config &config)
 void c64_state::pet64(machine_config &config)
 {
 	ntsc(config);
-	// TODO monochrome green palette
+
+	subdevice<mos6566_device>(MOS6567_TAG)->set_palette(PALETTE_PET64);
 }
 
 
@@ -1906,10 +2207,21 @@ void clipper_state::clipper(machine_config &config)
 {
 	pal(config);
 
-	// TODO extra hardware
+	subdevice<mos6566_device>(MOS6569_TAG)->set_palette(PALETTE_CLIPPER);
+
+	m_cia1->pa_rd_callback().set(FUNC(clipper_state::cia1_pa_r));
+	m_cia1->pb_rd_callback().set(FUNC(clipper_state::cia1_pb_r));
+
+	CBM_IEC_SLOT(config.replace(), "iec8", 8, clipper_iec_devices, "clipper_fdd");
 
 	// software list
 	SOFTWARE_LIST(config, "flop525").set_original("clipper_flop");
+	config.device_remove("cass_list");
+	config.device_remove("flop525_orig");
+	config.device_remove("flop525_misc");
+	config.device_remove("quik_list");
+	config.device_remove("hdd_list");
+	config.device_remove("sdcard_list");
 }
 
 
@@ -2250,6 +2562,9 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( clipper )
+	ROM_REGION( 0x2000, "basic", 0 )
+	ROM_LOAD( "901226-01.u3", 0x0000, 0x2000, CRC(f833d117) SHA1(79015323128650c742a3694c9429aa91f355905e) )
+
 	ROM_REGION( 0x2000, "kernal", 0 )
 	ROM_LOAD( "kernal.bin", 0x0000, 0x2000, CRC(13ca39ca) SHA1(d668e7980887a5b90fad693eba35fac49c7ad941) )
 
@@ -2258,10 +2573,6 @@ ROM_START( clipper )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "906114-01.u17", 0x00, 0xf5, CRC(54c89351) SHA1(efb315f560b6f72444b8f0b2ca4b0ccbcd144a1b) )
-
-	ROM_REGION( 0x4000, "fdc", 0 )
-	ROM_LOAD( "fdc.bin", 0x0000, 0x2000, CRC(44b0b1fc) SHA1(effcf165cb4ea32540a8a8c12781303dc36fa4b2) )
-	ROM_LOAD( "fdc_12.bin", 0x2000, 0x2000, CRC(397a2219) SHA1(7eefcc871a805f45be4ba016fe9fc7d25318c431) )
 
 	ROM_REGION( 0x6000, "sb", 0 )
 	ROM_LOAD( "sb1.bin", 0x0000, 0x2000, CRC(400040be) SHA1(b290216f49b24355a1a2b25adfa96709c5d9c049) )
@@ -2284,14 +2595,14 @@ COMP( 1982, c64,      0,      0,      ntsc,    c64,     c64_state,     empty_ini
 COMP( 1982, c64_jp,   c64,    0,      ntsc,    c64,     c64_state,     empty_init, "Commodore Business Machines", "Commodore 64 (Japan)",                    MACHINE_SUPPORTS_SAVE )
 COMP( 1982, c64p,     c64,    0,      pal,     c64,     c64_state,     empty_init, "Commodore Business Machines", "Commodore 64 (PAL)",                      MACHINE_SUPPORTS_SAVE )
 COMP( 1982, c64_se,   c64,    0,      pal,     c64sw,   c64_state,     empty_init, "Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, pet64,    c64,    0,      pet64,   c64,     c64_state,     empty_init, "Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",                MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS )
-COMP( 1983, edu64,    c64,    0,      pet64,   c64,     c64_state,     empty_init, "Commodore Business Machines", "Educator 64 (NTSC)",                      MACHINE_SUPPORTS_SAVE | MACHINE_WRONG_COLORS )
+COMP( 1983, pet64,    c64,    0,      pet64,   c64,     c64_state,     empty_init, "Commodore Business Machines", "PET 64 / CBM 4064 (NTSC)",                MACHINE_SUPPORTS_SAVE )
+COMP( 1983, edu64,    c64,    0,      pet64,   c64,     c64_state,     empty_init, "Commodore Business Machines", "Educator 64 (NTSC)",                      MACHINE_SUPPORTS_SAVE )
 COMP( 1984, sx64,     c64,    0,      ntsc_sx, c64,     sx64_state,    empty_init, "Commodore Business Machines", "SX-64 / Executive 64 (NTSC)",             MACHINE_SUPPORTS_SAVE )
 COMP( 1984, sx64p,    c64,    0,      pal_sx,  c64,     sx64_state,    empty_init, "Commodore Business Machines", "SX-64 / Executive 64 (PAL)",              MACHINE_SUPPORTS_SAVE )
 COMP( 1984, vip64,    c64,    0,      pal_sx,  c64sw,   sx64_state,    empty_init, "Commodore Business Machines", "VIP-64 (Sweden/Finland)",                 MACHINE_SUPPORTS_SAVE )
 COMP( 1984, dx64,     c64,    0,      ntsc_dx, c64,     sx64_state,    empty_init, "Commodore Business Machines", "DX-64 (Prototype)",                       MACHINE_NOT_WORKING )
 COMP( 1984, tesa6240, c64,    0,      pal_sx,  c64,     sx64_state,    empty_init, "Tesa Etikett",                "Etikettendrucker 6240",                   MACHINE_NOT_WORKING )
-COMP( 1984, clipper,  c64,    0,      clipper, clipper, clipper_state, empty_init, "Professional Data Computer",  "Clipper",                                 MACHINE_NOT_WORKING )
+COMP( 1984, clipper,  c64,    0,      clipper, clipper, clipper_state, empty_init, "Professional Data Computer",  "Clipper",                                 MACHINE_SUPPORTS_SAVE )
 COMP( 1986, c64c,     c64,    0,      ntsc_c,  c64,     c64c_state,    empty_init, "Commodore Business Machines", "Commodore 64C (NTSC)",                    MACHINE_SUPPORTS_SAVE )
 COMP( 1986, c64cp,    c64,    0,      pal_c,   c64,     c64c_state,    empty_init, "Commodore Business Machines", "Commodore 64C (PAL)",                     MACHINE_SUPPORTS_SAVE )
 COMP( 1988, c64c_es,  c64,    0,      pal_c,   c64sw,   c64c_state,    empty_init, "Commodore Business Machines", "Commodore 64C (Spain)",                   MACHINE_SUPPORTS_SAVE )

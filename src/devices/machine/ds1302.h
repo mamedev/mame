@@ -63,6 +63,8 @@ private:
 	void input_bit();
 	void output_bit();
 
+	optional_region_ptr<uint8_t> m_default_data;
+
 	const uint8_t m_ram_size;
 
 	int m_ce;
