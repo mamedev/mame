@@ -22,6 +22,10 @@
       increasing the coordinate mask in k053247_sprites_draw() from 0x3ff to 0xfff
       fixes this but breaks other games (e.g. Vendetta).
 
+    TODO:
+    - Incorrect timing in attract sequence
+      ex: Title logo animation is faster than it's should be.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -63,6 +67,7 @@ public:
 		, m_k053251(*this, "k053251")
 		, m_k053252(*this, "k053252")
 		, m_screen(*this, "screen")
+		, m_eepromout(*this, "EEPROMOUT")
 		, m_led(*this, "led0")
 	{ }
 
@@ -114,6 +119,9 @@ private:
 	required_device<k053251_device> m_k053251;
 	required_device<k053252_device> m_k053252;
 	required_device<screen_device> m_screen;
+
+	required_ioport m_eepromout;
+
 	output_finder<> m_led;
 };
 
@@ -145,26 +153,26 @@ void overdriv_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		/* bit 0 is data */
 		/* bit 1 is clock (active high) */
 		/* bit 2 is cs (active low) */
-		ioport("EEPROMOUT")->write(data, 0xff);
+		m_eepromout->write(data, 0xff);
 	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::cpuA_scanline)
 {
 	const int timer_threshold = 168; // fwiw matches 0 on mask ROM check, so IF it's a timer irq then should be close ...
-	int scanline = param;
+	const int scanline = param;
 
-	m_fake_timer ++;
+	m_fake_timer++;
 
 	// TODO: irqs routines are TOO slow right now, it ends up firing spurious irqs for whatever reason (shared ram fighting?)
 	//       this is a temporary solution to get rid of deprecat lib and the crashes, but also makes the game timer to be too slow.
 	//       Update: gameplay is actually too fast compared to timer, first attract mode shouldn't even surpass first blue car on right.
-	if(scanline == 256) // vblank-out irq
+	if (scanline == 256) // vblank-out irq
 	{
 		// m_screen->frame_number() & 1
 		m_maincpu->set_input_line(4, HOLD_LINE);
 	}
-	else if(m_fake_timer >= timer_threshold) // timer irq
+	else if (m_fake_timer >= timer_threshold) // timer irq
 	{
 		m_fake_timer -= timer_threshold;
 		m_maincpu->set_input_line(5, HOLD_LINE);
@@ -181,13 +189,13 @@ void overdriv_state::cpuA_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 probably enables the second 68000 */
-		m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bit 1 is clear during service mode - function unknown */
 
 		m_led = BIT(data, 3);
-		machine().bookkeeping().coin_counter_w(0, data & 0x10);
-		machine().bookkeeping().coin_counter_w(1, data & 0x20);
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 5));
 
 		//logerror("%s: write %04x to cpuA_ctrl_w\n",machine().describe_context(),data);
 	}
@@ -205,7 +213,7 @@ void overdriv_state::cpuB_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = enable sprite ROM reading */
-		m_k053246->k053246_set_objcha_line( (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+		m_k053246->k053246_set_objcha_line(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 1 used but unknown (irq enable?) */
 
@@ -217,8 +225,6 @@ void overdriv_state::soundirq_w(uint16_t data)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
-
-
 
 
 void overdriv_state::sub_irq4_assert_w(uint16_t data)
@@ -285,7 +291,7 @@ uint32_t overdriv_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	for (int i = 0; i < 2; i++)
 	{
-		int prev_colorbase = m_zoom_colorbase[i];
+		const int prev_colorbase = m_zoom_colorbase[i];
 		m_zoom_colorbase[i] = m_k053251->get_palette_index(k053251_device::CI4 - i);
 
 		if (m_zoom_colorbase[i] != prev_colorbase)
@@ -295,9 +301,10 @@ uint32_t overdriv_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	screen.priority().fill(0, cliprect);
 
 	m_k051316[0]->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	// TODO: K053250
 	m_k051316[1]->zoom_draw(screen, bitmap, cliprect, 0, 1);
 
-	m_k053246->k053247_sprites_draw(bitmap,cliprect);
+	m_k053246->k053247_sprites_draw(bitmap, cliprect);
 	return 0;
 }
 
@@ -337,7 +344,7 @@ TIMER_CALLBACK_MEMBER(overdriv_state::objdma_end_cb)
 
 void overdriv_state::objdma_w(uint8_t data)
 {
-	if(data & 0x10)
+	if (data & 0x10)
 		m_objdma_end_timer->adjust(attotime::from_usec(100));
 
 	m_k053246->k053246_w(5, data);
@@ -642,6 +649,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAMEL( 1990, overdriv,         0, overdriv, overdriv, overdriv_state, empty_init, ROT90, "Konami", "Over Drive (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // US version
-GAMEL( 1990, overdriva, overdriv, overdriv, overdriv, overdriv_state, empty_init, ROT90, "Konami", "Over Drive (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?
-GAMEL( 1990, overdrivb, overdriv, overdriv, overdriv, overdriv_state, empty_init, ROT90, "Konami", "Over Drive (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?
+GAMEL( 1990, overdriv,         0, overdriv, overdriv, overdriv_state, empty_init, ROT90, "Konami", "Over Drive (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // US version
+GAMEL( 1990, overdriva, overdriv, overdriv, overdriv, overdriv_state, empty_init, ROT90, "Konami", "Over Drive (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?
+GAMEL( 1990, overdrivb, overdriv, overdriv, overdriv, overdriv_state, empty_init, ROT90, "Konami", "Over Drive (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_overdriv ) // Overseas?
