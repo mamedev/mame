@@ -17,7 +17,6 @@ public:
 
 	auto vram_w() { return m_vram_w.bind(); }
 	auto level_vram_w() { return m_level_vram_w.bind(); }
-	void set_data_rom(const uint8_t *data_rom);
 	void clear();
 	u8 mailbox_r(offs_t offset);
 	void mailbox_from_main_w(offs_t offset, uint8_t data);
@@ -53,8 +52,7 @@ private:
 	devcb_write8 m_vram_w;
 	devcb_write8 m_level_vram_w;
 	devcb_write8 m_mailbox_out_w;
-	const uint8_t *m_data_rom = nullptr;
-	uint8_t m_mailbox[0x800]{};
+	uint8_t m_mailbox[0x800];
 	uint16_t m_timer = 0;
 	uint32_t m_p1score = 0;
 	uint32_t m_topscore = 0;
@@ -71,6 +69,7 @@ private:
 	uint8_t m_leveldraw_column = 0;
 	uint8_t m_leveldraw_number = 0;
 	emu_timer *m_leveldraw_timer = nullptr;
+	required_region_ptr<uint8_t> m_data_rom;
 
 	TIMER_CALLBACK_MEMBER(leveldraw_next);
 };

@@ -23,15 +23,11 @@ public:
 		: m62_state(mconfig, type, tag)
 		, m_mcu(*this, "mcu")
 		, m_bkungfu_tileram(*this, "tileram", 256*32*2, ENDIANNESS_LITTLE)
-		, m_blitterdatarom(*this, "blitterdat")
 	{ }
 
 	void bkungfu(machine_config& config);
 
 private:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
@@ -46,8 +42,6 @@ private:
 	required_device<bkungfu_mcu_device> m_mcu;
 
 	memory_share_creator<uint8_t> m_bkungfu_tileram;
-
-	required_region_ptr<uint8_t> m_blitterdatarom;
 };
 
 /*******************************************************************************
@@ -116,18 +110,6 @@ void m62_bkungfu_state::mcu_level_vram_w(offs_t offset, uint8_t data)
 	}
 }
 
-void m62_bkungfu_state::machine_start()
-{
-	m62_state::machine_start();
-	m_mcu->set_data_rom(&m_blitterdatarom[0]);
-}
-
-void m62_bkungfu_state::machine_reset()
-{
-	m62_state::machine_reset();
-}
-
-
 /*******************************************************************************
     Address Maps
 *******************************************************************************/
@@ -184,7 +166,7 @@ ROM_START( bkungfu )
 	ROM_REGION( 0x1000, "mcu", 0 )
 	ROM_LOAD( "mcu",     0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "blitterdat", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "mcu:blitterdat", ROMREGION_ERASEFF )
 	ROM_LOAD( "km-z.4h", 0x0000, 0x8000, CRC(252bb4a9) SHA1(2a69ee113950ea58895b42102bbb5263865ace9d) )
 
 	ROM_REGION( 0x10000, "irem_audio:iremsound", 0 )

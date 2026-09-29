@@ -195,6 +195,7 @@ bkungfu_mcu_device::bkungfu_mcu_device(const machine_config &mconfig, const char
 	, m_vram_w(*this)
 	, m_level_vram_w(*this)
 	, m_mailbox_out_w(*this)
+	, m_data_rom(*this, "blitterdat")
 {
 }
 
@@ -243,11 +244,6 @@ void bkungfu_mcu_device::device_reset()
 void bkungfu_mcu_device::clear()
 {
 	m_initialized = false;
-}
-
-void bkungfu_mcu_device::set_data_rom(const uint8_t *data_rom)
-{
-	m_data_rom = data_rom;
 }
 
 uint8_t bkungfu_mcu_device::decrypt_data(uint16_t address) const
