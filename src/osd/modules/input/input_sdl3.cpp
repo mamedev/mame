@@ -979,7 +979,7 @@ public:
 	bool reconnect_match(std::string_view g, char const *s) const
 	{
 		return
-				(0 > m_instance) &&
+				(SDL_JoystickID(-1) == m_instance) &&
 				(id() == g) &&
 				((s && serial() && (*serial() == s)) || (!s && !serial()));
 	}
@@ -997,9 +997,10 @@ protected:
 			m_serial = serial;
 	}
 
+	// SDL3 joystick IDs are unsigned, so an unset instance (-1) is tested for by equality, never by sign
 	void set_instance(SDL_JoystickID instance)
 	{
-		assert(0 > m_instance);
+		assert(SDL_JoystickID(-1) == m_instance);
 		assert(0 <= instance);
 
 		m_instance = instance;
