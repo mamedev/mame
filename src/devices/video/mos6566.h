@@ -159,6 +159,7 @@ public:
 	mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <class T> void set_cpu(T &&tag) { m_cpu.set_tag(tag); }
+	void set_palette(const rgb_t (&palette)[16]) { m_palette = palette; }
 	auto irq_callback() { return m_write_irq.bind(); }
 	auto ba_callback() { return m_write_ba.bind(); }
 	auto aec_callback() { return m_write_aec.bind(); }
@@ -252,6 +253,8 @@ protected:
 	devcb_write8           m_write_k;
 
 	required_device<cpu_device> m_cpu;
+
+	const rgb_t *m_palette;
 
 	emu_timer *m_fast_timer;
 

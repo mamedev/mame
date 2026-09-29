@@ -1621,6 +1621,8 @@ if BUSES["CBMIEC"] then
 		MAME_DIR .. "src/devices/bus/cbmiec/c1526.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/c5181.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/c5181.h",
+		MAME_DIR .. "src/devices/bus/cbmiec/clipper_fdd.cpp",
+		MAME_DIR .. "src/devices/bus/cbmiec/clipper_fdd.h",
 	}
 
 	dependency {
