@@ -14,9 +14,12 @@
 
 #include "exp.h"
 #include "bus/ata/ataintf.h"
+#include "bus/ata/atapicdr.h"
 #include "machine/ds1302.h"
 #include "machine/intelfsh.h"
 #include "imagedev/harddriv.h"
+#include "sound/cdda.h"
+#include "speaker.h"
 
 
 
@@ -26,8 +29,7 @@
 
 // ======================> c64_ide64_cartridge_device
 
-class c64_ide64_cartridge_device : public device_t,
-									public device_c64_expansion_card_interface
+class c64_ide64_cartridge_device : public device_t, public device_c64_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -51,12 +53,14 @@ protected:
 private:
 	required_device<atmel_29c010_device> m_flash_rom;
 	required_device<ds1302_device> m_rtc;
-	required_device<ata_interface_device> m_ata;
+	required_device<ata_interface_device> m_ata0;
+	required_device<ata_interface_device> m_ata1;
 	required_ioport m_jp1;
 	memory_share_creator<uint8_t> m_ram;
 
 	uint8_t m_bank;
 	uint16_t m_ata_data;
+	uint8_t m_ata_selected;
 	int m_wp;
 	int m_enable;
 };

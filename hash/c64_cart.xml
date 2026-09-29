@@ -6788,17 +6788,21 @@ Fails [MOS6526], [SID] and [cassette] checks
 
 	<software name="ide64">
 		<description>IDE64 (v4.1, IDEDOS v0.90)</description>
-		<year>2011</year>
+		<year>2019</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ide64" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="1" />
 
 			<dataarea name="ide64:u3" size="0x20000">
-				<rom name="u3" size="0x20000" crc="a52ff8fa" sha1="65fb2dc7d6bc6e96c4d60aca7eb103e7d1e58412" />
+				<rom name="idedos20190819.rom" size="0x20000" crc="8792bf2d" sha1="1b97505b07aaea1ed4404e5f5ac7550ec02854b7" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="idedos_util.d64" size="174848" crc="94f27ea4" sha1="1119da8fd7304e3cea4d37828a4ce53a0f6bad09" />
 			</dataarea>
 		</part>
 	</software>
