@@ -248,7 +248,7 @@ void bkungfu_mcu_device::clear()
 
 uint8_t bkungfu_mcu_device::decrypt_data(uint16_t address) const
 {
-    if (!m_data_rom || address >= 0x8000)
+    if (address >= 0x8000)
         return 0xff;
 
     uint8_t const cipher = m_data_rom[address];
@@ -332,7 +332,7 @@ void bkungfu_mcu_device::mailbox_out(uint16_t offset, uint8_t data)
 
 void bkungfu_mcu_device::draw_text(uint16_t table_offset, bool use_mailbox)
 {
-	if (!m_running || !m_data_rom)
+	if (!m_running)
 		return;
 
 	uint16_t data_address;
@@ -482,7 +482,7 @@ uint16_t bkungfu_mcu_device::decode_payload_word(uint16_t address) const
 
 void bkungfu_mcu_device::draw_object(uint8_t id)
 {
-	if (!m_data_rom || id < 0x80 || id > 0x90)
+	if (id < 0x80 || id > 0x90)
 		return;
 
 	uint16_t const recaddr = decrypt_data(0x100 + 2 * (id - 0x80)) | (uint16_t(decrypt_data(0x100 + 2 * (id - 0x80) + 1)) << 8);
@@ -538,9 +538,6 @@ void bkungfu_mcu_device::draw_level_column_row(int column, int row, uint8_t tile
 
 void bkungfu_mcu_device::draw_level_strip(int column, int row)
 {
-	if (!m_data_rom)
-		return;
-
 	draw_level_column_row(column, row, 0x05, 0x19);
 	int const source_entry = (column & ~1) + ((row >= 10) ? 1 : 0);
 	int const source_row = (row < 10)
@@ -687,11 +684,6 @@ void bkungfu_mcu_device::command_w(uint8_t command)
 		return;
 	}
 	if (command != 0x0a)
-		return;
-
-	// Pre-level setup: decode the ROM-described base HUD.  This is an
-	// explicit MCU command, not a completion synthesized by the Z80 driver.
-	if (!m_data_rom)
 		return;
 
 	uint16_t stream = m_data_rom[0x140] | (uint16_t(m_data_rom[0x141]) << 8);
