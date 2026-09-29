@@ -182,9 +182,13 @@ private:
 		u32 src = 0;
 		u32 dst = 0;
 		u32 size = 0;
-		u32 ctrl = 0;
+		u16 ctrl = 0;
+
+		emu_timer *timer = nullptr;
 	};
 	vr0_dma m_dma[2];
+
+	template <unsigned Which> TIMER_CALLBACK_MEMBER(dma_step_cb);
 
 	devcb_write_line m_int_cb;
 	devcb_write_line::array<2> m_write_tx;
