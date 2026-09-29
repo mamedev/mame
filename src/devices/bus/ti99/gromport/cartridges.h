@@ -16,6 +16,7 @@
 #include "emuopts.h"
 
 #include "utilfwd.h"
+#include <map>
 
 
 // declared in formats/rpk.h
@@ -32,6 +33,7 @@ class ti99_cartridge_device : public device_t, public device_cartrom_image_inter
 	friend class ti99_gkracker_device;
 	friend class ti99_cartridge_pcb;
 	friend class ti99_gromemu_cartridge;
+	friend class ti99_gigacart_cartridge;
 
 public:
 	ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -63,6 +65,8 @@ protected:
 	void call_unload() override;
 
 	void prepare_cartridge();
+	bool is_gigacart() const;
+	std::string validate_gigacart();
 
 	// device_image_interface
 	bool is_reset_on_load() const noexcept override       { return false; }
@@ -77,7 +81,7 @@ private:
 	class rpk;
 
 	static std::error_condition rpk_open(emu_options &options, util::random_read &stream, const char *system_name, std::unique_ptr<rpk> &result);
-	static std::error_condition rpk_load_rom_resource(const rpk_socket &socket, std::unique_ptr<ti99_rpk_socket> &result);
+	static std::error_condition rpk_load_rom_resource(const rpk_socket &socket, std::unique_ptr<ti99_rpk_socket> &result, uint64_t max_length);
 	static std::unique_ptr<ti99_rpk_socket> rpk_load_ram_resource(emu_options &options, const rpk_socket &socket, const char *system_name);
 
 	class rpk
@@ -89,12 +93,13 @@ private:
 
 		int         get_type(void) { return m_type; }
 		uint8_t*      get_contents_of_socket(const char *socket_name);
-		int         get_resource_length(const char *socket_name);
+		uint64_t    get_resource_length(const char *socket_name);
 		void        close();
 
 	private:
 		emu_options&            m_options;      // need this to find the path to the nvram files
 		int                     m_type;
+		std::map<std::string, std::string> m_features;
 		//const char*             m_system_name;  // need this to find the path to the nvram files
 		std::unordered_map<std::string,std::unique_ptr<ti99_rpk_socket>> m_sockets;
 
@@ -104,12 +109,12 @@ private:
 	class ti99_rpk_socket
 	{
 	public:
-		ti99_rpk_socket(const char *id, int length, std::vector<uint8_t> &&contents);
-		ti99_rpk_socket(const char *id, int length, std::vector<uint8_t> &&contents, std::string &&pathname);
+		ti99_rpk_socket(const char *id, uint64_t length, std::vector<uint8_t> &&contents);
+		ti99_rpk_socket(const char *id, uint64_t length, std::vector<uint8_t> &&contents, std::string &&pathname);
 		~ti99_rpk_socket() {}
 
 		const char*     id() { return m_id; }
-		int             get_content_length() { return m_length; }
+		uint64_t        get_content_length() { return m_length; }
 		uint8_t*          get_contents() { return &m_contents[0]; }
 		bool            persistent_ram() { return !m_pathname.empty(); }
 		const char*     get_pathname() { return m_pathname.c_str(); }
@@ -117,7 +122,7 @@ private:
 
 	private:
 		const char*     m_id;
-		uint32_t          m_length;
+		uint64_t          m_length;
 		std::vector<uint8_t> m_contents;
 		const std::string m_pathname;
 	};
@@ -126,7 +131,9 @@ private:
 	int     get_index_from_tagname();
 
 	// Common static cartridge states (no need to save in state)
-	uint32_t    m_rom_size;
+	uint64_t    m_rom_size;
+	unsigned    m_bank_data_bits = 0;
+	uint32_t    m_initial_bank = 0;
 	uint32_t    m_ram_size;
 	bool        m_has_buffered_ram;
 
@@ -327,6 +334,14 @@ public:
 };
 
 /********************** GROM emulation cartridge  ************************************/
+
+class ti99_gigacart_cartridge : public ti99_cartridge_pcb
+{
+public:
+	void readz(offs_t offset, uint8_t *value) override;
+	void write(offs_t offset, uint8_t data) override;
+	const int get_maximum_bank_count() override { return 1 << 20; }
+};
 
 class ti99_gromemu_cartridge : public ti99_cartridge_pcb
 {

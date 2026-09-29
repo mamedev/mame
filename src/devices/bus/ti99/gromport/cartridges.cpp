@@ -14,6 +14,7 @@
 ***************************************************************************/
 #include "emu.h"
 #include "cartridges.h"
+#include "gigacart.h"
 
 #include "fileio.h"
 
@@ -60,7 +61,10 @@ enum
 	PCB_PAGED377,
 	PCB_PAGEDCRU,
 	PCB_GROMEMU,
-	PCB_PAGED7
+	PCB_PAGED7,
+	PCB_GIGACART_ROM,
+	PCB_GIGACART_GROM,
+	PCB_GIGACART_CPLD
 };
 
 static char const *const pcbdefs[] =
@@ -77,6 +81,9 @@ static char const *const pcbdefs[] =
 	"pagedcru",     // PCB_PAGEDCRU
 	"gromemu",      // PCB_GROMEMU
 	"paged7",       // PCB_PAGED7
+	"gigacart-rom",
+	"gigacart-grom",
+	"gigacart-cpld",
 	nullptr
 };
 
@@ -90,6 +97,9 @@ static const pcb_type sw_pcbdefs[] =
 	{ PCB_MBX, "mbx" },
 	{ PCB_GROMEMU, "gromemu" },
 	{ PCB_PAGED7, "paged7" },
+	{ PCB_GIGACART_ROM, "gigacart-rom" },
+	{ PCB_GIGACART_GROM, "gigacart-grom" },
+	{ PCB_GIGACART_CPLD, "gigacart-cpld" },
 	{ 0, nullptr}
 };
 
@@ -114,9 +124,42 @@ ti99_cartridge_device::ti99_cartridge_device(const machine_config &mconfig, cons
 {
 }
 
+bool ti99_cartridge_device::is_gigacart() const
+{
+	return m_pcbtype >= PCB_GIGACART_ROM && m_pcbtype <= PCB_GIGACART_CPLD;
+}
+
+std::string ti99_cartridge_device::validate_gigacart()
+{
+	auto feature = [this](char const *name) -> char const * {
+		if (loaded_through_softlist()) return get_feature(name);
+		auto const entry = m_rpk->m_features.find(name);
+		return entry == m_rpk->m_features.end() ? nullptr : entry->second.c_str();
+	};
+	auto length = [this](char const *region, char const *socket) -> uint64_t {
+		return loaded_through_softlist() ? get_software_region_length(region) : m_rpk->get_resource_length(socket);
+	};
+	char const *width = feature("bank_data_bits");
+	if (!width || !gigacart::parse_width(width, m_bank_data_bits))
+		return "Gigacart requires bank_data_bits from 1 through 8";
+	char const *initial = feature("initial_bank");
+	if (!gigacart::parse_initial(initial ? initial : "first", m_bank_data_bits, m_initial_bank))
+		return "Gigacart initial_bank must be first, last, or a decimal bank within the declared range";
+	uint64_t const size = length("rom", "rom_socket");
+	if (!gigacart::valid_size(size, m_bank_data_bits))
+		return "Gigacart ROM must contain a power-of-two number of whole 8 KiB banks within the declared capacity";
+	if (size > std::numeric_limits<size_t>::max()) return "Gigacart ROM exceeds this build's host address space";
+	uint64_t const grom = length("grom", "grom_socket");
+	if (m_pcbtype == PCB_GIGACART_GROM ? (grom == 0 || grom > 0xa000 || (grom & 0x1fff)) : grom != 0)
+		return "Gigacart GROM socket does not match the selected boot hardware";
+	if (length("ram", "ram_socket") || length("nvram", "rom2_socket") || length("rom2", "rom2_socket"))
+		return "Gigacart does not support cartridge RAM or a second ROM socket";
+	return {};
+}
+
 void ti99_cartridge_device::prepare_cartridge()
 {
-	int rom1_length = 0;
+	uint64_t rom1_length = 0;
 	int rom2_length = 0;
 
 	uint8_t* gromdump_ptr;
@@ -165,7 +208,7 @@ void ti99_cartridge_device::prepare_cartridge()
 	}
 
 	rom1_length = loaded_through_softlist() ? get_software_region_length("rom") : m_rpk->get_resource_length("rom_socket");
-	if (rom1_length > 32*1048576)
+	if (!is_gigacart() && rom1_length > 32*1048576)
 	{
 		LOGMASKED(LOG_WARN, "Cartridge ROM size exceeds 32 MiB; truncated.\n");
 		rom1_length = 32*1048576;
@@ -243,7 +286,7 @@ void ti99_cartridge_device::prepare_cartridge()
 		if (m_pcb->get_maximum_bank_count() > 1)
 			LOGMASKED(LOG_CONFIG, "ROM bank mask=0x%04x\n", m_pcb->m_rom_mask);
 
-		if (m_rom_size > m_pcb->get_maximum_bank_count() * m_pcb->get_bank_size())
+		if (m_rom_size > uint64_t(m_pcb->get_maximum_bank_count()) * m_pcb->get_bank_size())
 			LOGMASKED(LOG_WARN, "WARNING: ROM dump exceeds the banking range of this cartridge type.\n");
 	}
 	else
@@ -324,6 +367,8 @@ std::pair<std::error_condition, std::string> ti99_cartridge_device::call_load()
 		LOGMASKED(LOG_CONFIG, "Using softlists\n");
 		int i = 0;
 		const char* pcb = get_feature("pcb");
+		m_pcbtype = 0;
+		if (!pcb) return { image_error::INVALIDIMAGE, "Missing cartridge PCB type" };
 		do
 		{
 			if (strcmp(pcb, sw_pcbdefs[i].name)==0)
@@ -348,8 +393,19 @@ std::pair<std::error_condition, std::string> ti99_cartridge_device::call_load()
 		m_pcbtype = m_rpk->get_type();
 	}
 
+	if (is_gigacart())
+	{
+		std::string const error = validate_gigacart();
+		if (!error.empty()) { m_rpk.reset(); return { image_error::INVALIDIMAGE, error }; }
+	}
+
 	switch (m_pcbtype)
 	{
+	case PCB_GIGACART_ROM:
+	case PCB_GIGACART_GROM:
+	case PCB_GIGACART_CPLD:
+		m_pcb = std::make_unique<ti99_gigacart_cartridge>();
+		break;
 	case PCB_STANDARD:
 		LOGMASKED(LOG_CONFIG, "Standard PCB\n");
 		m_pcb = std::make_unique<ti99_standard_cartridge>();
@@ -400,7 +456,10 @@ std::pair<std::error_condition, std::string> ti99_cartridge_device::call_load()
 		break;
 	}
 
-	prepare_cartridge();
+	if (!m_pcb) return { image_error::INVALIDIMAGE, "Unsupported cartridge PCB type" };
+	try { prepare_cartridge(); }
+	catch (std::bad_alloc const &) { m_pcb.reset(); m_rpk.reset(); return { std::errc::not_enough_memory, "Cannot allocate cartridge ROM" }; }
+	if (is_gigacart()) m_rom_page = m_initial_bank;
 	m_pcb->set_cartridge(this);
 	m_pcb->set_tag(tag());
 	m_connector->insert();
@@ -478,7 +537,7 @@ void ti99_cartridge_device::set_gromlines(line_state mline, line_state moline, l
 {
 	if (m_pcb != nullptr)
 	{
-		if (m_pcbtype == PCB_GROMEMU)
+		if (m_pcbtype == PCB_GROMEMU || m_pcbtype == PCB_GIGACART_CPLD)
 		{
 			m_grom_selected = (gsq == ASSERT_LINE);
 			m_grom_read_mode = (mline == ASSERT_LINE);
@@ -1518,6 +1577,53 @@ void ti99_gromemu_cartridge::gromemuwrite(offs_t offset, uint8_t data)
 
 
 /****************************************************************************
+    Hardware reference: Mike Brent (Tursi)'s Gigacart project:
+    https://github.com/tursilion/gigacart
+    Runtime CPLD: cart/cpld.seahorseCELoad/design.vhd
+    Related GROM-emulation background: https://github.com/tursilion/ubergrom
+    Jon Guidry supplied cartridge hardware observations and dump validation.
+
+    Gigacart: address-selected low 12 bank bits plus 1-8 low data bits.
+    Tursi's runtime CPLD uses two data bits. On the TI-99/4A each CPU word
+    write reaches us twice, low byte first. Both byte writes latch the bank.
+    The CPLD boot variant exposes the final 256 flash bytes as GROM page 4,
+    independently of the ROM bank. It has an 8-bit wrapping address register
+    and leaves address readback to the real console GROMs.
+****************************************************************************/
+
+void ti99_gigacart_cartridge::readz(offs_t offset, uint8_t *value)
+{
+	if (romspace_selected())
+		*value = m_rom_ptr[gigacart::image_offset(rom_page(), offset, m_cart->m_rom_size)];
+	else if (m_cart->m_pcbtype == PCB_GIGACART_GROM)
+		gromreadz(value);
+	else if (m_cart->m_pcbtype == PCB_GIGACART_CPLD && m_cart->m_grom_selected
+		&& m_cart->m_grom_read_mode && !m_cart->m_grom_address_mode)
+	{
+		if ((m_cart->m_grom_address & 0xff00) == 0x8000)
+			*value = m_rom_ptr[m_cart->m_rom_size - 256 + (m_cart->m_grom_address & 255)];
+		if (!m_cart->machine().side_effects_disabled())
+			m_cart->m_grom_address = (m_cart->m_grom_address & 0xff00) | ((m_cart->m_grom_address + 1) & 255);
+	}
+}
+
+void ti99_gigacart_cartridge::write(offs_t offset, uint8_t data)
+{
+	if (romspace_selected())
+		// Keep the physical latch; image mirroring is applied only on reads.
+		m_cart->m_rom_page = gigacart::select(offset, data, m_cart->m_bank_data_bits);
+	else if (m_cart->m_pcbtype == PCB_GIGACART_GROM)
+		gromwrite(data);
+	else if (m_cart->m_pcbtype == PCB_GIGACART_CPLD && m_cart->m_grom_selected
+		&& !m_cart->m_grom_read_mode && m_cart->m_grom_address_mode)
+	{
+		// Hardware shifts every address byte; only the preceding byte's page
+		// bits are retained. There is no first/second-byte flip-flop.
+		m_cart->m_grom_address = ((m_cart->m_grom_address & 0xe0) == 0x80 ? 0x8000 : 0) | data;
+	}
+}
+
+/****************************************************************************
 
     RPK loader
 
@@ -1557,7 +1663,7 @@ uint8_t* ti99_cartridge_device::rpk::get_contents_of_socket(const char *socket_n
 /*
     Deliver the length of the contents of the socket by name of the socket.
 */
-int ti99_cartridge_device::rpk::get_resource_length(const char *socket_name)
+uint64_t ti99_cartridge_device::rpk::get_resource_length(const char *socket_name)
 {
 	auto socket = m_sockets.find(socket_name);
 	if (socket == m_sockets.end()) return 0;
@@ -1600,12 +1706,12 @@ void ti99_cartridge_device::rpk::close()
     not a network socket)
 ***************************************************************/
 
-ti99_cartridge_device::ti99_rpk_socket::ti99_rpk_socket(const char* id, int length, std::vector<uint8_t> &&contents, std::string &&pathname)
+ti99_cartridge_device::ti99_rpk_socket::ti99_rpk_socket(const char* id, uint64_t length, std::vector<uint8_t> &&contents, std::string &&pathname)
 	: m_id(id), m_length(length), m_contents(std::move(contents)), m_pathname(std::move(pathname))
 {
 }
 
-ti99_cartridge_device::ti99_rpk_socket::ti99_rpk_socket(const char* id, int length, std::vector<uint8_t> &&contents)
+ti99_cartridge_device::ti99_rpk_socket::ti99_rpk_socket(const char* id, uint64_t length, std::vector<uint8_t> &&contents)
 	: ti99_rpk_socket(id, length, std::move(contents), "")
 {
 }
@@ -1613,12 +1719,12 @@ ti99_cartridge_device::ti99_rpk_socket::ti99_rpk_socket(const char* id, int leng
 /*
     Load a rom resource and put it in a pcb socket instance.
 */
-std::error_condition ti99_cartridge_device::rpk_load_rom_resource(const rpk_socket &socket, std::unique_ptr<ti99_rpk_socket> &result)
+std::error_condition ti99_cartridge_device::rpk_load_rom_resource(const rpk_socket &socket, std::unique_ptr<ti99_rpk_socket> &result, uint64_t max_length)
 {
 	LOGMASKED(LOG_RPK, "[RPK handler] Loading ROM contents for socket '%s' from file %s\n", socket.id(), socket.filename());
 
 	std::vector<uint8_t> contents;
-	std::error_condition err =  socket.read_file(contents);
+	std::error_condition err = socket.read_file(contents, max_length);
 	if (err)
 		return err;
 
@@ -1684,16 +1790,35 @@ std::error_condition ti99_cartridge_device::rpk_open(emu_options &options, util:
 
 	// specify the PCB
 	newrpk->m_type = file->pcb_type() + 1;
+	newrpk->m_features = file->pcb_features();
 	LOGMASKED(LOG_RPK, "[RPK handler] Cartridge says it has PCB type '%s'\n", pcbdefs[file->pcb_type()]);
 
+	bool const giga = newrpk->m_type >= PCB_GIGACART_ROM && newrpk->m_type <= PCB_GIGACART_CPLD;
+	unsigned bits = 0;
+	if (giga)
+	{
+		auto const width = newrpk->m_features.find("bank_data_bits");
+		if (width == newrpk->m_features.end() || !gigacart::parse_width(width->second, bits))
+			return rpk_reader::error::INVALID_LAYOUT;
+		auto const initial = newrpk->m_features.find("initial_bank");
+		uint32_t bank;
+		if (initial != newrpk->m_features.end() && !gigacart::parse_initial(initial->second, bits, bank))
+			return rpk_reader::error::INVALID_LAYOUT;
+	}
 	for (const rpk_socket &socket : file->sockets())
 	{
+		if (giga && (socket.type() != rpk_socket::socket_type::ROM
+			|| (socket.id() != "rom_socket" && !(newrpk->m_type == PCB_GIGACART_GROM && socket.id() == "grom_socket"))
+			|| newrpk->m_sockets.count(socket.id())))
+			return rpk_reader::error::INVALID_LAYOUT;
 		std::unique_ptr<ti99_rpk_socket> ti99_socket;
 
 		switch (socket.type())
 		{
 		case rpk_socket::socket_type::ROM:
-			err = rpk_load_rom_resource(socket, ti99_socket);
+			err = rpk_load_rom_resource(socket, ti99_socket, giga
+				? (socket.id() == "grom_socket" ? 0xa000 : uint64_t(gigacart::bank_count(bits)) * 8192)
+				: ~uint64_t(0));
 			if (err)
 				return err;
 			newrpk->add_socket(socket.id().c_str(), std::move(ti99_socket));

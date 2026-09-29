@@ -19,6 +19,7 @@
 #include <cassert>
 #include <list>
 #include <optional>
+#include <map>
 
 
 /***************************************************************************
@@ -54,7 +55,7 @@ public:
 	std::uint32_t length() const noexcept { assert(m_type == socket_type::RAM || m_type == socket_type::PERSISTENT_RAM); return m_length; }
 
 	// methods
-	std::error_condition read_file(std::vector<std::uint8_t> &result) const;
+	std::error_condition read_file(std::vector<std::uint8_t> &result, std::uint64_t max_length = ~std::uint64_t(0)) const;
 
 private:
 	rpk_file &                              m_rpk;
@@ -84,11 +85,13 @@ public:
 
 	// accessors
 	int pcb_type() const { return m_pcb_type; }
+	const std::map<std::string, std::string> &pcb_features() const { return m_pcb_features; }
 	const std::list<rpk_socket> &sockets() const { return m_sockets; }
 
 private:
 	util::archive_file::ptr     m_zipfile;
 	int                         m_pcb_type;
+	std::map<std::string, std::string> m_pcb_features;
 	std::list<rpk_socket>       m_sockets;
 
 	// accesors

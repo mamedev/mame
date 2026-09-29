@@ -66,6 +66,7 @@ project("mametests")
 		MAME_DIR .. "tests/lib/util/corestr.cpp",
 		MAME_DIR .. "tests/lib/util/options.cpp",
 		MAME_DIR .. "tests/emu/attotime.cpp",
+		MAME_DIR .. "tests/emu/gigacart.cpp",
 		MAME_DIR .. "tests/emu/video/rgbutil.cpp",
 	}
 
