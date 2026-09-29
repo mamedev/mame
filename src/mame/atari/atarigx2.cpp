@@ -473,7 +473,17 @@ void atarigx2_state::atarigx2_0x400(machine_config &config)
 	ATARI_RLE_OBJECTS(config, m_rle, modesc_0x400);
 }
 
-
+void atarigx2_state::atarigx2_0x400_rrreveng(machine_config &config)
+{
+	atarigx2_0x400(config);
+	ATARI_JSA_III(config.replace(), m_jsa);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_5);
+	m_jsa->test_read_cb().set_ioport("SERVICE").bit(6);
+	m_jsa->set_oki_bankregion("jsa:oki");
+	m_jsa->set_larger_bank();
+	m_jsa->add_route(0, "speaker", 0.7, 0);
+	m_jsa->add_route(1, "speaker", 0.7, 1);
+}
 
 /*************************************
  *
@@ -1261,6 +1271,6 @@ GAME( 1992, motofrenft,  motofren, atarigx2_0x200, motofren, atarigx2_state, ini
 GAME( 1992, motofrenfta, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version, Jul 22, 1992)", MACHINE_NODEVICE_LAN )
 GAME( 1992, motofrenmf,  motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", MACHINE_NODEVICE_LAN )
 
-GAME( 1993, rrreveng,   0,        atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Sep 06, 1994)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
-GAME( 1993, rrrevenga,  rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
-GAME( 1993, rrrevengb,  rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME( 1993, rrreveng,   0,        atarigx2_0x400_rrreveng, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Sep 06, 1994)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME( 1993, rrrevenga,  rrreveng, atarigx2_0x400_rrreveng, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME( 1993, rrrevengb,  rrreveng, atarigx2_0x400_rrreveng, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )

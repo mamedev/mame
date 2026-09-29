@@ -222,6 +222,7 @@ public:
 
 	void atarijsa3_map(address_map &map) ATTR_COLD;
 	void jsa3_oki1_map(address_map &map) ATTR_COLD;
+	void set_larger_bank() { m_larger_bank = true; }
 
 	template <typename... T> void set_oki_bankregion(T &&... args) { m_oki_bankregion.set_tag(std::forward<T>(args)...); }
 
@@ -250,6 +251,8 @@ protected:
 	// memory banks
 	required_memory_bank m_oki1_banklo;         // JSA III(s) only
 	required_memory_bank m_oki1_bankhi;         // JSA III(s)
+
+	bool m_larger_bank;
 };
 
 

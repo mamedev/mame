@@ -28,11 +28,11 @@
         * Guardians of the 'Hood
         * Road Riot 4WD
         * Steel Talons
+        * Road Riot's Revenge Rally (with different banking)
 
     JSA IIIs (stereo), used by:
         * Space Lords
         * Moto Frenzy
-        * Road Riot's Revenge Rally
 
 ****************************************************************************
 
@@ -934,6 +934,7 @@ atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, device
 	, m_oki_bankregion(*this, finder_base::DUMMY_TAG)
 	, m_oki1_banklo(*this, "oki1lo")
 	, m_oki1_bankhi(*this, "oki1hi")
+	, m_larger_bank(false)
 {
 }
 
@@ -941,7 +942,15 @@ void atari_jsa_iii_device::device_start()
 {
 	atari_jsa_oki_base_device::device_start();
 
-	if (m_oki_bankregion->bytes() >= 0x80000)
+	if (m_larger_bank)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			m_oki1_banklo->configure_entry(i, m_oki_bankregion->base() + 0x00000 + (i * 0x40000));
+			m_oki1_bankhi->configure_entry(i, m_oki_bankregion->base() + 0x20000 + (i * 0x40000));
+		}
+	}
+	else if (m_oki_bankregion->bytes() >= 0x80000)
 	{
 		m_oki1_banklo->configure_entries(0, 2, m_oki_bankregion->base() + 0x00000, 0x00000);
 		m_oki1_banklo->configure_entries(2, 2, m_oki_bankregion->base() + 0x20000, 0x20000);
@@ -953,9 +962,18 @@ void atari_jsa_iii_device::mix_w(uint8_t data)
 {
 	atari_jsa_oki_base_device::mix_w(data);
 
-	// update the (left) OKI bank (JSA III/IIIs only)
-	if (m_oki1_banklo != nullptr)
-		m_oki1_banklo->set_entry((m_oki1_banklo->entry() & 1) | ((data >> 3) & 2));
+	if (m_larger_bank)
+	{
+		int bank = (m_oki1_banklo->entry() & 1) | ((data >> 3) & 2);
+		m_oki1_banklo->set_entry(bank);
+		m_oki1_bankhi->set_entry(bank);
+	}
+	else
+	{
+		// update the (left) OKI bank (JSA III/IIIs only)
+		if (m_oki1_banklo != nullptr)
+			m_oki1_banklo->set_entry((m_oki1_banklo->entry() & 1) | ((data >> 3) & 2));
+	}
 
 }
 
@@ -963,9 +981,18 @@ void atari_jsa_iii_device::wrio_w(uint8_t data)
 {
 	atari_jsa_oki_base_device::wrio_w(data);
 
-	// update the (left) OKI bank (JSA III/IIIs only)
-	if (m_oki1_banklo != nullptr)
-		m_oki1_banklo->set_entry((m_oki1_banklo->entry() & 2) | ((data >> 1) & 1));
+	if (m_larger_bank)
+	{
+		int bank = (m_oki1_banklo->entry() & 2) | ((data >> 1) & 1);
+		m_oki1_banklo->set_entry(bank);
+		m_oki1_bankhi->set_entry(bank);
+	}
+	else
+	{
+		// update the (left) OKI bank (JSA III/IIIs only)
+		if (m_oki1_banklo != nullptr)
+			m_oki1_banklo->set_entry((m_oki1_banklo->entry() & 2) | ((data >> 1) & 1));
+	}
 }
 
 //-------------------------------------------------
