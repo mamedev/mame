@@ -19,6 +19,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <numbers>
 #include <vector>
 
 
@@ -230,9 +231,10 @@ float const *sinc_table()
 		std::vector<float> result(cd_audio_comparator::TAPS * SINC_PHASES + 1);
 		for (int i = 0; i < int(result.size()); i++)
 		{
+			constexpr double PI = std::numbers::pi;
 			double const d = double(i) / SINC_PHASES - half;
-			double const sinc = (d == 0.0) ? 1.0 : std::sin(M_PI * d) / (M_PI * d);
-			result[i] = float(sinc * (0.5 + 0.5 * std::cos(M_PI * d / half)));
+			double const sinc = (d == 0.0) ? 1.0 : std::sin(PI * d) / (PI * d);
+			result[i] = float(sinc * (0.5 + 0.5 * std::cos(PI * d / half)));
 		}
 		return result;
 	}();
