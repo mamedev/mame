@@ -246,15 +246,17 @@ void bkungfu_mcu_device::clear()
 	m_initialized = false;
 }
 
+uint8_t bkungfu_mcu_device::read_data(uint16_t address) const
+{
+	return m_data_rom[address];
+}
+
 uint8_t bkungfu_mcu_device::decrypt_data(uint16_t address) const
 {
     if (address >= 0x8000)
         return 0xff;
 
     uint8_t const cipher = m_data_rom[address];
-    if (address < 0x153d)
-        return cipher;
-
     uint8_t const index = uint8_t((address & 0xff) + (address >> 8));
 
     if (index & 1)
@@ -485,13 +487,13 @@ void bkungfu_mcu_device::draw_object(uint8_t id)
 	if (id < 0x80 || id > 0x90)
 		return;
 
-	uint16_t const recaddr = decrypt_data(0x100 + 2 * (id - 0x80)) | (uint16_t(decrypt_data(0x100 + 2 * (id - 0x80) + 1)) << 8);
+	uint16_t const recaddr = read_data(0x100 + 2 * (id - 0x80)) | (uint16_t(read_data(0x100 + 2 * (id - 0x80) + 1)) << 8);
 	if (recaddr == 0 || recaddr >= 0x8000 - 5)
 		return;
 
-	uint8_t const width = decrypt_data(recaddr);
-	uint16_t const pos = (decrypt_data(recaddr + 1) | (uint16_t(decrypt_data(recaddr + 2)) << 8)) & 0xfff;
-	uint16_t dataptr = decrypt_data(recaddr + 3) | (uint16_t(decrypt_data(recaddr + 4)) << 8);
+	uint8_t const width = read_data(recaddr);
+	uint16_t const pos = (read_data(recaddr + 1) | (uint16_t(read_data(recaddr + 2)) << 8)) & 0xfff;
+	uint16_t dataptr = read_data(recaddr + 3) | (uint16_t(read_data(recaddr + 4)) << 8);
 	if (width == 0 || width > 0x20 || dataptr >= 0x8000)
 		return;
 
@@ -544,7 +546,7 @@ void bkungfu_mcu_device::draw_level_strip(int column, int row)
 		? row + ((column & 1) ? 10 : 0)
 		: row - 10 + ((column & 1) ? 16 : 0);
 	uint16_t const table = 0x200 + ((m_leveldraw_number & 0x0f) << 1);
-	uint16_t const block = decrypt_data(table) | (uint16_t(decrypt_data(table + 1)) << 8);
+	uint16_t const block = read_data(table) | (uint16_t(read_data(table + 1)) << 8);
 	uint16_t const entry = block + source_entry * 2;
 	if (block < 0x153d || entry >= 0x8000 - 1)
 		return;

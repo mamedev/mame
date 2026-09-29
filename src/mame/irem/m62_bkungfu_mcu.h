@@ -36,6 +36,7 @@ private:
 	void execute_slot(uint8_t slot);
 	void complete(uint16_t offset);
 	void mailbox_out(uint16_t offset, uint8_t data);
+	uint8_t read_data(uint16_t address) const;
 	uint8_t decrypt_data(uint16_t address) const;
 	uint8_t decode_payload(uint16_t address) const;
 	uint16_t decode_payload_word(uint16_t address) const;
