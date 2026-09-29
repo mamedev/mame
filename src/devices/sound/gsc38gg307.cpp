@@ -100,6 +100,12 @@ void gsc38gg307_device::device_reset()
 	m_fma_status = 0;
 	m_fma_stream = 0;
 	m_fma_dspa = 0;
+	m_fma_dsp_cvr = 0;
+	m_fma_atten_index = std::size(m_fma_atten);
+	m_fma_atten[0] = 0x00;
+	m_fma_atten[1] = 0x80;
+	m_fma_atten[2] = 0x80;
+	m_fma_atten[3] = 0x00;
 	m_fma_dclkl_latch = 0;
 	m_fma_audio_header = 0;
 	m_pending_fma_stream_change = false;
@@ -310,6 +316,11 @@ void gsc38gg307_device::sound_stream_update(sound_stream &stream)
 {
 	const int samples = stream.samples();
 
+	const float r2r = atten_gain(0);
+	const float l2r = atten_gain(1);
+	const float r2l = atten_gain(2);
+	const float l2l = atten_gain(3);
+
 	for (int i = 0; i < samples; i++)
 	{
 		int16_t l = 0, r = 0;
@@ -319,8 +330,8 @@ void gsc38gg307_device::sound_stream_update(sound_stream &stream)
 			r = m_audio_samples[1][m_audio_head];
 			m_audio_head++;
 		}
-		stream.put_int(0, i, l, 32768);
-		stream.put_int(1, i, r, 32768);
+		stream.put(0, i, (l * l2l + r * r2l) / 32768.0f);
+		stream.put(1, i, (l * l2r + r * r2r) / 32768.0f);
 	}
 
 	// drop the consumed prefix now and then so the vectors do not grow forever
@@ -330,6 +341,41 @@ void gsc38gg307_device::sound_stream_update(sound_stream &stream)
 			chan.erase(chan.begin(), chan.begin() + m_audio_head);
 		m_audio_head = 0;
 	}
+}
+
+void gsc38gg307_device::dsp_w(uint8_t data)
+{
+	switch (m_fma_dspa)
+	{
+	case 1: // CVR
+		m_fma_dsp_cvr = data;
+		if (data == 0x93)
+			m_fma_atten_index = 0;
+		break;
+
+	case 7: // TXL
+		if (m_fma_dsp_cvr == 0x93 && m_fma_atten_index < std::size(m_fma_atten))
+		{
+			m_stream->update();
+			m_fma_atten[m_fma_atten_index++] = data;
+			LOGMASKED(LOG_FMA, "FMA attenuation %02x %02x %02x %02x\n",
+					m_fma_atten[0], m_fma_atten[1], m_fma_atten[2], m_fma_atten[3]);
+		}
+		break;
+
+	default:
+		break;
+	}
+}
+
+float gsc38gg307_device::atten_gain(int index) const
+{
+	const uint8_t atten = m_fma_atten[index];
+	if (BIT(atten, 7))
+	{
+		return 0.0f;
+	}
+	return powf(10.0f, -(atten & 0x7f) / 20.0f);
 }
 
 //**************************************************************************
@@ -467,7 +513,7 @@ void gsc38gg307_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		break;
 
 	case 0x12:
-		// DSP56001 data port, used for the attenuation ramp
+		dsp_w(uint8_t(data));
 		break;
 	default:
 		break;
