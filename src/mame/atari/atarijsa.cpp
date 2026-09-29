@@ -934,8 +934,6 @@ atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, device
 	, m_oki_bankregion(*this, finder_base::DUMMY_TAG)
 	, m_oki1_banklo(*this, "oki1lo")
 	, m_oki1_bankhi(*this, "oki1hi")
-	, m_oki2_banklo(*this, "oki2lo")
-	, m_oki2_bankhi(*this, "oki2hi")
 {
 }
 
@@ -943,38 +941,17 @@ void atari_jsa_iii_device::device_start()
 {
 	atari_jsa_oki_base_device::device_start();
 
-	// configure JSA III ADPCM banking
-	if (m_oki1_banklo.found() && m_oki1_bankhi.found())
-		if (!m_oki_bankregion)
-			fatalerror("oki1 region must be configured for JSA III");
-
-	if (m_oki1_banklo.found() && m_oki1_bankhi.found() && m_oki_bankregion->bytes() >= 0x80000)
+	if (m_oki_bankregion->bytes() >= 0x80000)
 	{
 		m_oki1_banklo->configure_entries(0, 2, m_oki_bankregion->base() + 0x00000, 0x00000);
 		m_oki1_banklo->configure_entries(2, 2, m_oki_bankregion->base() + 0x20000, 0x20000);
 		m_oki1_bankhi->set_base(m_oki_bankregion->base() + 0x60000);
-	}
-
-	// configure JSA IIIs ADPCM banking
-	if (m_oki2_banklo.found() && m_oki2_bankhi.found())
-		if (!m_oki_bankregion)
-			fatalerror("oki region must be configured for JSA IIIs");
-
-	if (m_oki2_banklo.found() && m_oki2_bankhi.found() && m_oki_bankregion->bytes() >= 0x80000)
-	{
-		m_oki2_banklo->configure_entries(0, 2, m_oki_bankregion->base() + 0x00000, 0x00000);
-		m_oki2_banklo->configure_entries(2, 2, m_oki_bankregion->base() + 0x20000, 0x20000);
-		m_oki2_bankhi->set_base(m_oki_bankregion->base() + 0x60000);
 	}
 }
 
 void atari_jsa_iii_device::mix_w(uint8_t data)
 {
 	atari_jsa_oki_base_device::mix_w(data);
-
-	// update the right OKI bank (JSA IIIs only)
-	if (m_oki2_banklo != nullptr)
-		m_oki2_banklo->set_entry((data >> 6) & 3);
 
 	// update the (left) OKI bank (JSA III/IIIs only)
 	if (m_oki1_banklo != nullptr)
@@ -1065,7 +1042,31 @@ ioport_constructor atari_jsa_iii_device::device_input_ports() const
 
 atari_jsa_iiis_device::atari_jsa_iiis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: atari_jsa_iii_device(mconfig, ATARI_JSA_IIIS, tag, owner, clock)
+	, m_oki2_banklo(*this, "oki2lo")
+	, m_oki2_bankhi(*this, "oki2hi")
 {
+}
+
+void atari_jsa_iiis_device::device_start()
+{
+	atari_jsa_iii_device::device_start();
+
+	if (m_oki_bankregion->bytes() >= 0x80000)
+	{
+		m_oki2_banklo->configure_entries(0, 2, m_oki_bankregion->base() + 0x00000, 0x00000);
+		m_oki2_banklo->configure_entries(2, 2, m_oki_bankregion->base() + 0x20000, 0x20000);
+		m_oki2_bankhi->set_base(m_oki_bankregion->base() + 0x60000);
+	}
+}
+
+
+void atari_jsa_iiis_device::mix_w(uint8_t data)
+{
+	atari_jsa_iii_device::mix_w(data);
+
+	// update the right OKI bank (JSA IIIs only)
+	if (m_oki2_banklo != nullptr)
+		m_oki2_banklo->set_entry((data >> 6) & 3);
 }
 
 

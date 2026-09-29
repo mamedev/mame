@@ -248,10 +248,8 @@ protected:
 	required_memory_region m_oki_bankregion;
 
 	// memory banks
-	optional_memory_bank m_oki1_banklo;         // JSA III(s) only
-	optional_memory_bank m_oki1_bankhi;         // JSA III(s)
-	optional_memory_bank m_oki2_banklo;         // JSA IIIs only
-	optional_memory_bank m_oki2_bankhi;         // JSA IIIs only
+	required_memory_bank m_oki1_banklo;         // JSA III(s) only
+	required_memory_bank m_oki1_bankhi;         // JSA III(s)
 };
 
 
@@ -267,6 +265,11 @@ public:
 protected:
 	// device level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void mix_w(uint8_t data) override;
+
+	required_memory_bank m_oki2_banklo;         // JSA IIIs only
+	required_memory_bank m_oki2_bankhi;         // JSA IIIs only
 };
 
 
