@@ -432,6 +432,11 @@ void bkungfu_mcu_device::execute_slot(uint8_t slot)
 	complete(slot);
 }
 
+u8 bkungfu_mcu_device::mailbox_r(offs_t offset)
+{
+	return m_mailbox[offset];
+}
+
 void bkungfu_mcu_device::mailbox_w(offs_t offset, uint8_t data)
 {
 	if (offset >= std::size(m_mailbox))

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Andrea Bogazzi
 
 #ifndef MAME_IREM_M62_BKUNGFU_MCU_H
 #define MAME_IREM_M62_BKUNGFU_MCU_H
@@ -17,12 +17,12 @@ public:
 
 	auto vram_w() { return m_vram_w.bind(); }
 	auto level_vram_w() { return m_level_vram_w.bind(); }
-	auto mailbox_out_w() { return m_mailbox_out_w.bind(); }
 	void set_data_rom(const uint8_t *data_rom);
 	void clear();
+	u8 mailbox_r(offs_t offset);
 	void mailbox_w(offs_t offset, uint8_t data);
 	void command_w(uint8_t command);
-
+	
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

@@ -39,7 +39,6 @@ private:
 	void bkungfu_blitter_w(offs_t offset, uint8_t data);
 	void mcu_vram_w(offs_t offset, uint8_t data);
 	void mcu_level_vram_w(offs_t offset, uint8_t data);
-	void mcu_mailbox_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bkungfu_bg_tile_info);
 	DECLARE_VIDEO_START(bkungfu);
@@ -82,8 +81,6 @@ VIDEO_START_MEMBER(m62_bkungfu_state,bkungfu)
 	m62_start(tilemap_get_info_delegate(*this, FUNC(m62_bkungfu_state::get_bkungfu_bg_tile_info)), 32, 0, 8, 8, 256, 32);
 }
 
-
-
 /*******************************************************************************
     Blitter
 *******************************************************************************/
@@ -102,7 +99,7 @@ uint8_t m62_bkungfu_state::bkungfu_blitter_r(offs_t offset)
 	if (!machine().side_effects_disabled())
 		logerror("%s: bkungfu_blitter_r %04x\n", machine().describe_context(), offset);
 
-	return m_blittercmdram[offset];
+	return m_mcu->mailbox_r(offset);
 }
 
 void m62_bkungfu_state::bkungfu_blitter_tilemap_w(uint16_t offset, uint8_t data)
@@ -141,32 +138,19 @@ void m62_bkungfu_state::mcu_level_vram_w(offs_t offset, uint8_t data)
 	}
 }
 
-void m62_bkungfu_state::mcu_mailbox_w(offs_t offset, uint8_t data)
-{
-	if (offset < 0x800)
-		m_blittercmdram[offset] = data;
-}
-
 void m62_bkungfu_state::machine_start()
 {
 	m62_state::machine_start();
-
-	save_item(NAME(m_blittercmdram));
-
 	m_mcu->set_data_rom(&m_blitterdatarom[0]);
 }
 
 void m62_bkungfu_state::machine_reset()
 {
 	m62_state::machine_reset();
-
-	for (int i = 0; i < 0x800; i++)
-		m_blittercmdram[i] = 0x00;
 }
 
 void m62_bkungfu_state::bkungfu_blitter_w(offs_t offset, uint8_t data)
 {
-	m_blittercmdram[offset] = data;
 	if (offset < 0x800)
 		m_mcu->mailbox_w(offset, data);
 
@@ -211,7 +195,6 @@ void m62_bkungfu_state::bkungfu(machine_config& config)
 	BKUNG_MCU(config, m_mcu, 0);
 	m_mcu->vram_w().set(FUNC(m62_bkungfu_state::mcu_vram_w));
 	m_mcu->level_vram_w().set(FUNC(m62_bkungfu_state::mcu_level_vram_w));
-	m_mcu->mailbox_out_w().set(FUNC(m62_bkungfu_state::mcu_mailbox_w));
 
 	MCFG_VIDEO_START_OVERRIDE(m62_bkungfu_state,bkungfu)
 }
