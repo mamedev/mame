@@ -1,24 +1,31 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, ElSemi
-/***************************************************************************
+/**************************************************************************************************
 
-    MagicEyes VRender0 SoC peripherals
+MagicEyes VRender0 SoC peripherals
 
-    Device by Angelo Salese
-    Based off original crystal.cpp by ElSemi
+Device by Angelo Salese
+Based off original crystal.cpp by ElSemi
 
-    TODO:
-    - Improve encapsulation, still needs a few trampolines from host driver;
-    - Proper PIO emulation;
-    - Output CRTC border color;
-    - Add VCLK select;
-    - Implement dynamic clock via PLL
+TODO:
+- Improve encapsulation, still needs a few trampolines from host driver;
+- Proper PIO emulation;
+- Output CRTC border color;
+- Add VCLK select;
+- Implement dynamic clock via PLL
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "vrender0.h"
 
+#define LOG_CRTC     (1U << 1)
+#define LOG_DMA      (1U << 2)
+
+#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
+#include "logmacro.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -197,10 +204,13 @@ void vrender0soc_device::device_start()
 
 	save_item(STRUCT_MEMBER(m_timer, control));
 	save_item(STRUCT_MEMBER(m_timer, count));
+
 	save_item(STRUCT_MEMBER(m_dma, src));
 	save_item(STRUCT_MEMBER(m_dma, dst));
 	save_item(STRUCT_MEMBER(m_dma, size));
 	save_item(STRUCT_MEMBER(m_dma, ctrl));
+	m_dma[0].timer = timer_alloc(FUNC(vrender0soc_device::dma_step_cb<0>), this);
+	m_dma[1].timer = timer_alloc(FUNC(vrender0soc_device::dma_step_cb<1>), this);
 
 	// TODO: register CRTC
 	save_item(NAME(m_lightc));
@@ -218,9 +228,10 @@ void vrender0soc_device::device_reset()
 	//m_FlipCount = 0;
 	m_int_high = 0;
 
-	for (auto &dma: m_dma)
+	for (auto &dma : m_dma)
 	{
 		dma.ctrl = 0;
+		dma.timer->adjust(attotime::never);
 	}
 	for (auto &tmr : m_timer)
 	{
@@ -361,8 +372,7 @@ void vrender0soc_device::timer_start(int which)
 //  logerror("timer %d start, pd = %x tcv = %x period = %s\n", which, pd, tcv, period.as_string());
 }
 
-template<int Which>
-TIMER_CALLBACK_MEMBER(vrender0soc_device::timer_cb)
+template<int Which> TIMER_CALLBACK_MEMBER(vrender0soc_device::timer_cb)
 {
 	static const int num[] = { IRQ_TIMER0, IRQ_TIMER1, IRQ_TIMER2, IRQ_TIMER3 };
 	vr0_timer &tmr = m_timer[Which];
@@ -375,14 +385,12 @@ TIMER_CALLBACK_MEMBER(vrender0soc_device::timer_cb)
 	int_req(num[Which]);
 }
 
-template<int Which>
-u32 vrender0soc_device::tmcon_r()
+template<int Which> u32 vrender0soc_device::tmcon_r()
 {
 	return m_timer[Which].control;
 }
 
-template<int Which>
-void vrender0soc_device::tmcon_w(offs_t offset, u32 data, u32 mem_mask)
+template<int Which> void vrender0soc_device::tmcon_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	vr0_timer &tmr = m_timer[Which];
 	u32 const old = tmr.control;
@@ -403,14 +411,12 @@ void vrender0soc_device::tmcon_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 }
 
-template<int Which>
-u16 vrender0soc_device::tmcnt_r()
+template<int Which> u16 vrender0soc_device::tmcnt_r()
 {
 	return m_timer[Which].count & 0xffff;
 }
 
-template<int Which>
-void vrender0soc_device::tmcnt_w(offs_t offset, u16 data, u16 mem_mask)
+template<int Which> void vrender0soc_device::tmcnt_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_timer[Which].count);
 }
@@ -438,77 +444,99 @@ template<int Which> u32 vrender0soc_device::dmasa_r() { return m_dma[Which].src;
 template<int Which> void vrender0soc_device::dmasa_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_dma[Which].src); }
 template<int Which> u32 vrender0soc_device::dmada_r() { return m_dma[Which].dst; }
 template<int Which> void vrender0soc_device::dmada_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_dma[Which].dst); }
-template<int Which> u32 vrender0soc_device::dmatc_r() { return m_dma[Which].size; }
-template<int Which> void vrender0soc_device::dmatc_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_dma[Which].size); }
+template<int Which> u32 vrender0soc_device::dmatc_r() { return m_dma[Which].size & 0xff'ffff; }
+template<int Which> void vrender0soc_device::dmatc_w(offs_t offset, u32 data, u32 mem_mask) {
+	COMBINE_DATA(&m_dma[Which].size);
+	m_dma[Which].size &= 0xff'ffff;
+}
 template<int Which> u32 vrender0soc_device::dmac_r() { return m_dma[Which].ctrl; }
-template<int Which>
-void vrender0soc_device::dmac_w(offs_t offset, u32 data, u32 mem_mask)
+
+// -x-- ---- ---- DMAENx enable
+// --x- ---- ---- DMAPOLx request active polarity (0: high, 1: low)
+// ---x ---- ---- DMAWRENx Counter write enable (0: disable, 1: enable)
+// ---- xx-- ---- DMAMODEx transfer mode
+// ---- 0x-- ----          Single transfer
+// ---- 10-- ----          Repeat with reload counter
+// ---- 11-- ----          Repeat with reload counter and registers
+// ---- --x- ---- DMASHOLDx Source address hold (0: in/decrease, 1: fix address)
+// ---- ---x ---- SMASDIRx  Source address direction (0: increase, 1: decrease)
+// ---- ---- x--- DMADHOLDx Destination address hold (0: in/decrease, 1: fix address)
+// ---- ---- -x-- DMADIRx   Destination address direction (0: increase, 1: decrease)
+// ---- ---- --xx DMATRWIDTHx Transfer width
+// ---- ---- --00 8 bit
+// ---- ---- --01 16 bit
+// ---- ---- --1x 32 bit
+template<int Which> void vrender0soc_device::dmac_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	vr0_dma &dma = m_dma[Which];
-	// Control register format: (per DMA controller)
-	// Bit                                     Description
-	// 1111 1111 1111 1111 0000 0000 0000 0000
-	// fedc ba98 7654 3210 fedc ba98 7654 3210
-	// xxxx xxxx xxxx xxxx xxxx x--- ---- ---- Reserved
-	// ---- ---- ---- ---- ---- -x-- ---- ---- DMA enable
-	// ---- ---- ---- ---- ---- --x- ---- ---- DMA request active polarity (0: high, 1: low)
-	// ---- ---- ---- ---- ---- ---x ---- ---- DMA Counter write enable (0: disable, 1: enable)
-	// ---- ---- ---- ---- ---- ---- xx-- ---- DMA transfer mode
-	// ---- ---- ---- ---- ---- ---- 0*-- ---- Single transfer
-	// ---- ---- ---- ---- ---- ---- 10-- ---- Repeat with reload counter
-	// ---- ---- ---- ---- ---- ---- 11-- ---- Repeat with reload counter and registers
-	// ---- ---- ---- ---- ---- ---- --x- ---- DMA Source address hold (0: in/decrease, 1: fix address)
-	// ---- ---- ---- ---- ---- ---- ---x ---- DMA Source address direction (0: increase, 1: decrease)
-	// ---- ---- ---- ---- ---- ---- ---- x--- DMA Destination address hold (0: in/decrease, 1: fix address)
-	// ---- ---- ---- ---- ---- ---- ---- -x-- DMA Destination address direction (0: increase, 1: decrease)
-	// ---- ---- ---- ---- ---- ---- ---- --xx DMA Transfer width
-	// ---- ---- ---- ---- ---- ---- ---- --00 8 bit
-	// ---- ---- ---- ---- ---- ---- ---- --01 16 bit
-	// ---- ---- ---- ---- ---- ---- ---- --1* 32 bit
-	// *: Don't care
 
-	if (BIT(data ^ dma.ctrl, 10) && BIT(data, 10))   //DMAOn
+	if (ACCESSING_BITS_0_15)
 	{
-		u32 const ctr = data;
-		u32 const src = dma.src;
-		u32 const dst = dma.dst;
-		u32 const cnt = dma.size;
-		int const src_inc = dma_setup_hold(ctr, 5, 4);
-		int const dst_inc = dma_setup_hold(ctr, 3, 2);
+		// DMAENx
+		if (BIT(data ^ dma.ctrl, 10) && BIT(data, 10))
+		{
+			if (data & 0x80)
+				popmessage("machine/vrender0.cpp: DMA%d with repeat mode %02x", Which, data & 0xc0);
 
-		if ((ctr & 0xc0) != 0)
-			popmessage("DMA%d with unhandled mode %02x, contact MAMEdev", Which, ctr);
+			if (dma.size == 0)
+				popmessage("machine/vrender0.cpp: DMA%d attempt with zero size length", Which);
 
-		if (BIT(ctr, 1))  //32 bits
-		{
-			for (int i = 0; i < cnt; ++i)
-			{
-				u32 const v = m_host_space->read_dword(src + i * src_inc);
-				m_host_space->write_dword(dst + i * dst_inc, v);
-			}
+			LOGMASKED(LOG_DMA, "DMA%d src %08x dst %08x size: %06x ctrl: %03x\n"
+				, Which, dma.src, dma.dst, dma.size, data);
+
+			m_dma[Which].timer->adjust(attotime::from_ticks(2, this->clock()));
 		}
-		else if (BIT(ctr, 0)) //16 bits
-		{
-			for (int i = 0; i < cnt; ++i)
-			{
-				u16 const v = m_host_space->read_word(src + i * src_inc);
-				m_host_space->write_word(dst + i * dst_inc, v);
-			}
-		}
-		else    //8 bits
-		{
-			for (int i = 0; i < cnt; ++i)
-			{
-				u8 const v = m_host_space->read_byte(src + i * src_inc);
-				m_host_space->write_byte(dst + i * dst_inc, v);
-			}
-		}
-		data &= ~(1 << 10);
-		// TODO: insta-DMA
-		dma.size = 0;
-		int_req(IRQ_DMA0 + Which);
+
+		COMBINE_DATA(&dma.ctrl);
 	}
-	COMBINE_DATA(&dma.ctrl);
+}
+
+// TODO: sketchy details
+// - is burst or cycle steal?
+// - how many cycles it actually takes to complete a transfer?
+// - how live updating works, and the implications of repeat latches;
+// - if a dma size of 0 is really ignored or it rolls over at max (definitely need use case);
+// - why psattack mixes in transfers with both HOLDs enabled (where src is ATA and dst is frame RAM),
+//   is it just flushing PIO data or there's more of it?
+template <unsigned Which> TIMER_CALLBACK_MEMBER(vrender0soc_device::dma_step_cb)
+{
+	vr0_dma &dma = m_dma[Which];
+
+	if (!BIT(dma.ctrl, 10))
+		return;
+
+	// transfer ends at zero, not at rolling over (cfr. psattack)
+	if (dma.size == 0)
+	{
+		dma.ctrl &= ~(1 << 10);
+		int_req(IRQ_DMA0 + Which);
+		return;
+	}
+
+	u32 const src = dma.src;
+	u32 const dst = dma.dst;
+	int const src_inc = dma_setup_hold(dma.ctrl, 5, 4);
+	int const dst_inc = dma_setup_hold(dma.ctrl, 3, 2);
+
+	switch(dma.ctrl & 3)
+	{
+		case 0:
+			m_host_space->write_byte(dst, m_host_space->read_byte(src));
+			break;
+		case 1:
+			m_host_space->write_word(dst, m_host_space->read_word(src));
+			break;
+		case 2:
+		default:
+			m_host_space->write_dword(dst, m_host_space->read_dword(src));
+			break;
+	}
+
+	dma.src += src_inc;
+	dma.dst += dst_inc;
+	dma.size --;
+
+	m_dma[Which].timer->adjust(attotime::from_ticks(4, this->clock()));
 }
 
 /*
@@ -517,26 +545,58 @@ void vrender0soc_device::dmac_w(offs_t offset, u32 data, u32 mem_mask)
  *
  */
 
+// [0] CRTC Status / Mode CRTMOD
+// x--- ---- ---- ---- Horizontal Sync Status (active low)
+// -x-- ---- ---- ---- Vertical Display Enable Status (1 when in display area)
+// --x- ---- ---- ---- Horizontal & Vertical Blank period (active low)
+// ---x ---- ---- ---- External video signal status
+// ---- --x- ---- ---- Screen Blank Enable
+// ---- ---x ---- ---- CRTC write protect 0x04~0x27
+// ---- ---- x--- ---- Horizontal Scan Line Number (0: 525 1: 625)
+// ---- ---- -x-- ---- Color Burst Frequency
+// ---- ---- -0-- ---- 3.58 MHz
+// ---- ---- -1-- ---- 4.43 MHz
+// ---- ---- ---- x--- Select Display Start Field in interlace mode
+// ---- ---- ---- 0--- NTSC: odd PAL: even
+// ---- ---- ---- 1--- NTSC: even PAL: odd
+// ---- ---- ---- --xx Vertical Sync width generation
+// ---- ---- ---- --00 Serration only
+// ---- ---- ---- --01 Pre-equalization and serration
+// ---- ---- ---- --10 Post-equalization and serration
+// ---- ---- ---- --11 Pre/Post-equalization and serration
 u32 vrender0soc_device::crtc_r(offs_t offset)
 {
 	u32 res = m_crtcregs[offset];
-	u32 const hdisp = (m_crtcregs[0x0c / 4] + 1);
-	u32 vdisp = (m_crtcregs[0x1c / 4] + 1);
 	switch (offset)
 	{
 		case 0: // CRTC Status / Mode
+		{
+			res &= 0x03ff;
+			u32 const hdisp = (m_crtcregs[0x0c / 4] + 1);
+			u32 vdisp = (m_crtcregs[0x1c / 4] + 1);
+
 			if (crt_is_interlaced()) // Interlace
 				vdisp <<= 1;
 
-			if (m_screen->vpos() <= vdisp) // Vertical display enable status
-				res |=  0x4000;
+			const int vpos = m_screen->vpos();
+			const int hpos = m_screen->hpos();
 
-			if (m_screen->hpos() > hdisp) // horizontal & vertical blank period
-				res &= ~0x2000;
-			else
-				res |=  0x2000;
+			// Vertical display enable status
+			if (vpos <= vdisp)
+				res |= 1 << 14;
+
+			// horizontal & vertical blank period
+			if (hpos <= hdisp && vpos <= vdisp)
+				res |= 1 << 13;
+
+			// horizontal sync status
+			// TODO: sync not display, depends on the auto stuff in CRTC calcs, particularly front porch
+			// (donghaer sets zero there)
+			if (hpos <= hdisp)
+				res |= 1 << 15;
 
 			break;
+		}
 		default:
 			break;
 	}
@@ -553,6 +613,8 @@ void vrender0soc_device::crtc_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 		case 0: // CRTC Status / Mode Register (CRTMOD)
 			mem_mask &= ~0xfffffc00; // Bit 31-10 Reserved
+			// TODO: blank screen bit 9 should be routed to video device
+			// (if anything ever bothered with it)
 			break;
 		case 0x04: // CRTC Timing Control Register (CRTTIM)
 			mem_mask &= ~0xffffc000; // Bit 31-14 Reserved
@@ -672,10 +734,10 @@ void vrender0soc_device::crtc_update()
 	// TODO: divider setting = 0 is reserved, guess it just desyncs the signal?
 	pixel_clock /= (m_crtcregs[0x04 / 4] & 7) + 1;
 
-	//logerror("DCLK divider %d\n",(m_crtcregs[0x04 / 4] & 7) + 1);
-	//logerror("VCLK select %d\n",(m_crtcregs[0x04 / 4] & 8));
-	//logerror("CBCLK divider %d\n",((m_crtcregs[0x04 / 4] & 0x70) >> 4) + 1);
-	//logerror("ivclk speed %d\n",(m_crtcregs[0x04 / 4] & 0x80));
+	LOGMASKED(LOG_CRTC, "DCLK divider %d\n",(m_crtcregs[0x04 / 4] & 7) + 1);
+	LOGMASKED(LOG_CRTC, "VCLK select %d\n",(m_crtcregs[0x04 / 4] & 8));
+	LOGMASKED(LOG_CRTC, "CBCLK divider %d\n",((m_crtcregs[0x04 / 4] & 0x70) >> 4) + 1);
+	LOGMASKED(LOG_CRTC, "ivclk speed %d\n",(m_crtcregs[0x04 / 4] & 0x80));
 
 	if (!interlace_mode)
 	{
@@ -687,7 +749,7 @@ void vrender0soc_device::crtc_update()
 
 	vtot += 9;
 
-	//logerror("%dX%d %dX%d %d\n",htot, vtot, hdisp, vdisp, pixel_clock);
+	LOGMASKED(LOG_CRTC, "total: %dx%d display: %dx%d clock: %d\n",htot, vtot, hdisp, vdisp, pixel_clock);
 
 	rectangle const visarea(0, hdisp - 1, 0, vdisp - 1);
 	m_screen->configure(htot, vtot, visarea, attotime::from_ticks(vtot * htot, pixel_clock));
@@ -703,14 +765,14 @@ u32 vrender0soc_device::sysid_r()
 	return 0x00000a00;
 }
 
+// -x-- ---- Main Clock select (0 -> External Clock)
+// --xx x--- Reserved for Chip Test Mode (related to JTAG)
+// ---- -xx- Local ROM Data Bus Width (01 -> 16 bit)
+// ---- ---x Local Memory Bus Width (0 -> 16 bit)
 u32 vrender0soc_device::cfgr_r()
 {
-	// TODO: this truly needs real HW verification,
-	//       only Cross Puzzle reads this so far so leaving a logerror
-	// -x-- ---- Main Clock select (0 -> External Clock)
-	// --xx x--- Reserved for Chip Test Mode
-	// ---- -xx- Local ROM Data Bus Width (01 -> 16 bit)
-	// ---- ---x Local Memory Bus Width (0 -> 16 bit)
+	// TODO: convert as devcb_read8, these are strapping pins
+	// only Cross Puzzle reads this so far so leaving a logerror
 	if (!machine().side_effects_disabled())
 		logerror("%s: read CFGR\n", machine().describe_context());
 	return 0x00000041;

@@ -27,12 +27,9 @@
     - Move flash memory implementation into machine/intelfsh.cpp
     - provide NVRAM defaults where applicable;
     - add an actual reset button (helps with inp record/playback);
-    - donghaer: needs "raster effect" for 2 players mode split screen, but no
-      interrupt is actually provided for the task so apparently not a timer
-      related effect;
-    - wulybuly: strips off main RAM to texture transfers except for text after
-      the first couple of frames;
-    - maldaiza: PIC protection.
+    - donghaer: very randomly corrupts itself during gameplay, or outright crashes;
+    - wulybuly: inputs, not extensively tested;
+    - maldaiza: PIC protection, inputs, requires superhuman mashing which looks quite off;
     - urachamu: some animation timings seems off, like bat hit animation before starting a given game.
       They were actually too fast before adding 30 Hz vblank for interlace mode, even if the game don't
       really read crtc blanking reg or use any other interrupt but the coin ones;
