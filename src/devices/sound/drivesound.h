@@ -11,52 +11,52 @@
     and 5.25" drives, call
 
      * enable_sound() or enable_sound(true) or enable_sound(nullptr)
-    
+
     on the instances of floppy_connector, usually appearing in device_add_mconfig
     of the device where the drives are connected. If you prefer custom sounds
     for the drive, call
-    
+
      * enable_sound(const char* key)
-     
+
     where key refers to the value of the name attribute which belongs to some
     element in the floppy.xml file. The first element whose form factor
     matches the current drive and whose name attribute matches the key is
-    selected.    
-    
+    selected.
+
     Document type definition:
-	
-	<!ELEMENT drivesound (drive)+>
-	<!ELEMENT drive (spin | step | seek)+>
-	
-	<!ELEMENT spin EMPTY>
-	<!ELEMENT step EMPTY>
-	<!ELEMENT seek EMPTY>
-	
-	-------------
-	<!ATTLIST drive name CDATA #REQUIRED>
-	<!ATTLIST drive description CDATA #IMPLIED>
-	<!ATTLIST drive path CDATA #REQUIRED>
-	<!ATTLIST drive formfactor (3 | 3.5 | 5.25 | 8) #REQUIRED>
-	----- or -----
-	<!ATTLIST drive base CDATA #REQUIRED>
-	-------------
-	
-	<!ATTLIST spin phase (start | run | stop) #REQUIRED>
-	<!ATTLIST spin mode (empty | loaded) #REQUIRED>
-	<!ATTLIST spin file CDATA #REQUIRED>
-	
-	<!ATTLIST step from CDATA #IMPLIED>
-	<!ATTLIST step to CDATA #IMPLIED>
+
+    <!ELEMENT drivesound (drive)+>
+    <!ELEMENT drive (spin | step | seek)+>
+
+    <!ELEMENT spin EMPTY>
+    <!ELEMENT step EMPTY>
+    <!ELEMENT seek EMPTY>
+
+    -------------
+    <!ATTLIST drive name CDATA #REQUIRED>
+    <!ATTLIST drive description CDATA #IMPLIED>
+    <!ATTLIST drive path CDATA #REQUIRED>
+    <!ATTLIST drive formfactor (3 | 3.5 | 5.25 | 8) #REQUIRED>
+    ----- or -----
+    <!ATTLIST drive base CDATA #REQUIRED>
+    -------------
+
+    <!ATTLIST spin phase (firststart | start | run | stop) #REQUIRED>
+    <!ATTLIST spin mode (empty | loaded) #REQUIRED>
+    <!ATTLIST spin file CDATA #REQUIRED>
+
+    <!ATTLIST step from CDATA #IMPLIED>
+    <!ATTLIST step to CDATA #IMPLIED>
     <!ATTLIST step dir (in | out | both) #IMPLIED>
-	<!ATTLIST step file CDATA #REQUIRED>
-	
-	<!ATTLIST seek from CDATA #IMPLIED>
-	<!ATTLIST seek to CDATA #IMPLIED>
+    <!ATTLIST step file CDATA #REQUIRED>
+
+    <!ATTLIST seek from CDATA #IMPLIED>
+    <!ATTLIST seek to CDATA #IMPLIED>
     <!ATTLIST seek nomrate CDATA #REQUIRED>
     <!ATTLIST seek maxrate CDATA #REQUIRED>
     <!ATTLIST seek dir (in | out | both) #IMPLIED>
-	<!ATTLIST seek file CDATA #REQUIRED>
-    
+    <!ATTLIST seek file CDATA #REQUIRED>
+
     If the custom samples cannot be found, the default samples are used. If
     those cannot be found either, sound is disabled.
 
@@ -65,7 +65,7 @@
 
     * If 3" samples are requested but not found, 3.5" samples are used.
     * If 3.5" or 8" samples are requested but not found, 5.25" samples are used.
-    
+
     Attributes:
 
     name: Key by which this sample set is referred (should be unique per form factor)
@@ -73,13 +73,13 @@
     path: subdirectory in the samples path where the samples are stored
     formfactor: Drive form factor for which this sample set applies
     base: Value of name attribute of another drive element or "none"
-    
+
     from / to: Range of tracks for which this sample applies (default: 0/99). May
                be negative or outside of physical range.
     nomrate: Rate in milliseconds of head steps in this seek sample
     maxrate: Longest rate for which this sample may be pitched down
     in / out: Direction of head movement (towards center / rim)
-    
+
 *********************************************************************/
 
 #ifndef MAME_SOUND_DRIVESOUND_H
@@ -95,13 +95,13 @@ public:
 	floppy_sound_samples();
 
 	/* Clear the sample list. Recommended to be used at code locations that
-       may be called several times (like device_add_mconfig). 
-    */
+	   may be called several times (like device_add_mconfig).
+	*/
 	void clear() { m_fulllist.clear(); }
 
-	/* Set the form factor for the following add operations. 
-	   All following add operations assume that the samples are found in the 
-	   provided directory. May be called several times in order to add samples 
+	/* Set the form factor for the following add operations.
+	   All following add operations assume that the samples are found in the
+	   provided directory. May be called several times in order to add samples
 	   for different form factors.
 	*/
 	void set_form_factor(int form_factor, const char* dir);
@@ -127,25 +127,25 @@ public:
 
 	/*  For spinning motor samples. See the spin type enum for type values. */
 	void add_spin_sample(const char* filename, int type);
-	
+
 	/*  Stepper sound for single steps, used in the track range from start to
-        end; when start and end are omitted, 0 and 99 are assumed, covering the
-        whole disk. The dir parameter can be used to distinguish between steps
-        towards the center or towards the rim.
-    */
+	    end; when start and end are omitted, 0 and 99 are assumed, covering the
+	    whole disk. The dir parameter can be used to distinguish between steps
+	    towards the center or towards the rim.
+	*/
 	void add_step_sample(const char* filename, int dir=BOTH);
 	void add_step_sample(const char* filename, int start, int end, int dir=BOTH);
-		
+
 	/*  Stepper sound for continuous movement for a rate not exceeding max_rate.
-        The pitch is adjusted according to the ratio of the actual rate and
-        the nominal rate, thus, the sample is played back at natural speed when
-        the actual rate matches the nominal rate. The sample is selected whose
-        maximum rate is the minimum among those whose maximum rate is higher
-        than the actual rate, and if its range contains the current track number.
-        When not specified, the range covers the whole disk (0..99).
-        The dir parameter can be used to distinguish between seeks
-        towards the center or towards the rim.
-    */
+	    The pitch is adjusted according to the ratio of the actual rate and
+	    the nominal rate, thus, the sample is played back at natural speed when
+	    the actual rate matches the nominal rate. The sample is selected whose
+	    maximum rate is the minimum among those whose maximum rate is higher
+	    than the actual rate, and if its range contains the current track number.
+	    When not specified, the range covers the whole disk (0..99).
+	    The dir parameter can be used to distinguish between seeks
+	    towards the center or towards the rim.
+	*/
 	void add_seek_sample(const char* filename, int nominal_rate, int max_rate, int dir=BOTH);
 	void add_seek_sample(const char* filename, int nominal_rate, int max_rate, int mintrack, int maxtrack, int dir=BOTH);
 
