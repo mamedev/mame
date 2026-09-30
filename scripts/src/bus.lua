@@ -5089,6 +5089,8 @@ if BUSES["S100"] then
 		MAME_DIR .. "src/devices/bus/s100/polyvti.h",
 		MAME_DIR .. "src/devices/bus/s100/seals8k.cpp",
 		MAME_DIR .. "src/devices/bus/s100/seals8k.h",
+		MAME_DIR .. "src/devices/bus/s100/superslave.cpp",
+		MAME_DIR .. "src/devices/bus/s100/superslave.h",
 		MAME_DIR .. "src/devices/bus/s100/vectordualmode.cpp",
 		MAME_DIR .. "src/devices/bus/s100/vectordualmode.h",
 		MAME_DIR .. "src/devices/bus/s100/wunderbus.cpp",

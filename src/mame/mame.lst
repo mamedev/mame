@@ -438,9 +438,6 @@ victor9k
 @source:adc/super6.cpp
 super6
 
-@source:adc/superslave.cpp
-superslv
-
 @source:adds/4000_260.cpp
 4000_260
 
