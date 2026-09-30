@@ -45,9 +45,12 @@ class t6721a_device : public device_t,
 						public device_sound_interface
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
 	t6721a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// static configuration helpers
+	auto rom_handler() { return m_read_rom.bind(); }
+	auto bsy_handler() { return m_write_bsy.bind(); }
 	auto eos_handler() { return m_write_eos.bind(); }
 	auto phi2_handler() { return m_write_phi2.bind(); }
 	auto dtrd_handler() { return m_write_dtrd.bind(); }
@@ -59,10 +62,13 @@ public:
 	void di_w(int state);
 
 	int eos_r();
+	int bsy_r();
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_clock_changed() override;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream) override;
@@ -84,12 +90,66 @@ private:
 		CMD_SAGN
 	};
 
+	TIMER_CALLBACK_MEMBER(serial_tick);
+	TIMER_CALLBACK_MEMBER(frame_tick);
+	TIMER_CALLBACK_MEMBER(busy_tick);
+	TIMER_CALLBACK_MEMBER(eos_tick);
+
+	void set_busy(unsigned clocks);
+	void set_eos(int state);
+	void set_apd(int state);
+	void stop();
+	void begin_serial(bool rom_read);
+	void accept_bit(int bit);
+	void silent_frame();
+	void end_of_speech();
+	void decode_frame();
+	unsigned frame_samples() const;
+
+	devcb_read8 m_read_rom;
+	devcb_write_line m_write_bsy;
 	devcb_write_line m_write_eos;
 	devcb_write_line m_write_phi2;
 	devcb_write_line m_write_dtrd;
 	devcb_write_line m_write_apd;
 
 	sound_stream *m_stream;
+	emu_timer *m_serial_timer;
+	emu_timer *m_frame_timer;
+	emu_timer *m_busy_timer;
+	emu_timer *m_eos_timer;
+
+	uint8_t m_status;
+	uint8_t m_command;
+	uint8_t m_arguments;
+	uint8_t m_speed;
+	uint8_t m_condition1;
+	uint8_t m_condition2;
+	uint32_t m_address;
+	uint32_t m_rom_bit;
+	uint8_t m_rom_data;
+	bool m_rom_read;
+	bool m_serial_rom;
+	bool m_speaking;
+	bool m_first_frame;
+	bool m_all_ones;
+	bool m_busy;
+	bool m_eos;
+	bool m_apd;
+	bool m_di;
+	uint8_t m_serial_bits;
+	uint8_t m_nibble_bit;
+	uint8_t m_parameter;
+	uint8_t m_parameter_bits;
+	uint16_t m_parameters[12];
+	uint16_t m_sample;
+	uint16_t m_samples;
+	uint16_t m_pitch_count;
+	uint16_t m_noise;
+	int32_t m_glottal[2];
+	int32_t m_previous[12];
+	int32_t m_target[12];
+	int32_t m_delay[10];
 };
 
 

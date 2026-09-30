@@ -5,7 +5,6 @@
     TODO:
 
     - clean up TED
-    - T6721 speech chip
 
 */
 
@@ -1076,9 +1075,17 @@ void c16_state::c232(machine_config &config)
 void c16_state::v364(machine_config &config)
 {
 	plus4n(config);
-	T6721A(config, T6721A_TAG, XTAL(640'000)).add_route(ALL_OUTPUTS, "mono", 0.25);
+	t6721a_device &speech(T6721A(config, T6721A_TAG, 640_kHz_XTAL));
+	speech.add_route(ALL_OUTPUTS, "mono", 0.25);
+	speech.eos_handler().set(m_vslsi, FUNC(mos8706_device::eos_w));
+	speech.apd_handler().set(m_vslsi, FUNC(mos8706_device::apd_w));
+	speech.phi2_handler().set(m_vslsi, FUNC(mos8706_device::phi2_w));
+	speech.dtrd_handler().set(m_vslsi, FUNC(mos8706_device::dtrd_w));
 
 	MOS8706(config, m_vslsi, XTAL(14'318'181)/16);
+	m_vslsi->command_handler().set(speech, FUNC(t6721a_device::write));
+	m_vslsi->di_handler().set(speech, FUNC(t6721a_device::di_w));
+	m_vslsi->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
 }
 
 
