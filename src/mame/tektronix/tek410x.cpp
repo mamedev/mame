@@ -4,18 +4,20 @@
 
     Tektronix 4107A/4109A
 
-    Skeleton driver.
-
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
 #include "machine/i8255.h"
 #include "machine/mc68681.h"
+#include "machine/nvram.h"
 #include "tek410x_kbd.h"
 #include "video/crt9007.h"
 #include "emupal.h"
 #include "screen.h"
+
+#include <algorithm>
+#include <memory>
 
 
 namespace {
@@ -28,6 +30,9 @@ public:
 		, m_duart(*this, "duart%u", 0U)
 		, m_keyboard(*this, "keyboard")
 		, m_vpac(*this, "vpac")
+		, m_palette(*this, "palette")
+		, m_dialog_ram(*this, "dialog")
+		, m_chargen(*this, "chargen")
 		, m_ppi_pc(0)
 		, m_kb_rdata(true)
 		, m_kb_tdata(true)
@@ -38,9 +43,17 @@ public:
 		, m_y_position(0)
 		, m_x_cursor(0)
 		, m_y_cursor(0)
+		, m_dialog_top(0)
+		, m_dialog_bottom(0)
+		, m_hdelay(0)
+		, m_vdelay(0)
+		, m_row_height(1)
+		, m_visible_rows(0)
+		, m_wben(false)
+		, m_row_column(0)
+		, m_row_count(0)
 	{ }
 
-	void tek4109a(machine_config &config);
 	void tek4107a(machine_config &config);
 
 protected:
@@ -48,9 +61,24 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	static constexpr unsigned X_PAN_OFFSET = 39;
+	static constexpr unsigned COLORMAP_DIALOG = 16;
+	static constexpr unsigned COLORMAP_CURSOR_BG = 24;
+	static constexpr unsigned COLORMAP_CURSOR_FG = 25;
+	static constexpr unsigned COLORMAP_CROSSHAIR = 27;
+
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	u8 vpac_r(offs_t offset);
+	void vpac_w(offs_t offset, u8 data);
+	u8 dialog_dma_r(offs_t offset);
+	void vpac_wben_w(int state);
+
+	u16 colormap_r(offs_t offset);
+	void colormap_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 gfxram_r(offs_t offset, u16 mem_mask = ~0);
+	void gfxram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void write_pixel(offs_t pixel, u8 data);
 
 	u16 nmi_enable_r();
 	u16 nmi_disable_r();
@@ -75,10 +103,14 @@ private:
 
 	void tek4107a_io(address_map &map) ATTR_COLD;
 	void tek4107a_mem(address_map &map) ATTR_COLD;
+	void vpac_map(address_map &map) ATTR_COLD;
 
 	required_device_array<scn2681_device, 2> m_duart;
 	required_device<tek410x_keyboard_device> m_keyboard;
 	required_device<crt9007_device> m_vpac;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<u16> m_dialog_ram;
+	required_region_ptr<u8> m_chargen;
 
 	u8 m_ppi_pc;
 	bool m_kb_rdata;
@@ -91,11 +123,184 @@ private:
 	u16 m_y_position;
 	u16 m_x_cursor;
 	u16 m_y_cursor;
+	u8 m_dialog_top;
+	u8 m_dialog_bottom;
+	u8 m_hdelay;
+	u8 m_vdelay;
+	u8 m_row_height;
+	u8 m_visible_rows;
+
+	std::unique_ptr<u8[]> m_gfxram;
+	u16 m_colormap[32];
+
+	bool m_wben;
+	u8 m_row_column;
+	u8 m_row_count;
+	u16 m_row_buffer[128];
+	u16 m_rows[64][128];
 };
 
 u8 tek4107a_state::vpac_r(offs_t offset)
 {
 	return m_vpac->read(offset + 0x20);
+}
+
+void tek4107a_state::vpac_w(offs_t offset, u8 data)
+{
+	switch (offset)
+	{
+	case 0x02: m_hdelay = data; break;
+	case 0x05: m_vdelay = data - 1; break;
+	case 0x07: m_visible_rows = data + 1; break;
+	case 0x08: m_row_height = (data & 0x1f) + 1; break;
+	}
+
+	m_vpac->write(offset, data);
+}
+
+u8 tek4107a_state::dialog_dma_r(offs_t offset)
+{
+	if (!m_wben)
+		return m_dialog_ram[offset & 0x0ffe] >> (BIT(offset, 0) ? 8 : 0);
+
+	u16 const data = m_dialog_ram[offset & 0x0fff];
+
+	if (!machine().side_effects_disabled() && m_row_column < 128)
+	{
+		if (m_row_column && (m_row_buffer[m_row_column - 1] & 0xef) == 0x80)
+			m_row_buffer[m_row_column] = m_row_buffer[m_row_column - 1];
+		else
+			m_row_buffer[m_row_column] = data;
+		m_row_column++;
+	}
+
+	return u8(data);
+}
+
+void tek4107a_state::vpac_wben_w(int state)
+{
+	if (state && !m_wben)
+	{
+		m_row_column = 0;
+		if (m_vpac->screen().vpos() == 0)
+			m_row_count = 0;
+	}
+	else if (!state && m_wben)
+	{
+		if (m_row_count < 64)
+			std::copy(std::begin(m_row_buffer), std::end(m_row_buffer), std::begin(m_rows[m_row_count]));
+		m_row_count++;
+	}
+	m_wben = state;
+}
+
+u16 tek4107a_state::colormap_r(offs_t offset)
+{
+	return m_colormap[offset];
+}
+
+void tek4107a_state::colormap_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_colormap[offset]);
+	m_colormap[offset] &= 0x0fff;
+
+	u16 const color = m_colormap[offset];
+	m_palette->set_pen_color(offset, pal4bit(color >> 8), pal4bit(color >> 4), pal4bit(color));
+}
+
+u16 tek4107a_state::gfxram_r(offs_t offset, u16 mem_mask)
+{
+	offs_t const pixel = (BIT(m_graphics_control, 11) << 18) | (offset << 1) | (ACCESSING_BITS_0_7 ? 0 : 1);
+	u8 const data = m_gfxram[pixel];
+
+	return (data << 8) | data;
+}
+
+void tek4107a_state::gfxram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	offs_t const pixel = offset << 1;
+
+	if (ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15)
+	{
+		for (int i = 0; i < 16; i++)
+			write_pixel((pixel & ~0xf) | i, data & 0x0f);
+	}
+	else if (ACCESSING_BITS_0_7)
+		write_pixel(pixel, data & 0x0f);
+	else
+		write_pixel(pixel | 1, (data >> 8) & 0x0f);
+}
+
+void tek4107a_state::write_pixel(offs_t pixel, u8 data)
+{
+	u8 const shift = m_graphics_control >> 12;
+	u8 const protect = (m_graphics_control >> 4) & 0x0f;
+	u8 const old = m_gfxram[pixel];
+	u8 src = data;
+	u8 dst = old;
+
+	switch (shift)
+	{
+	case 0: case 1: case 2: case 3:
+		src = (data << shift) & 0x0f;
+		break;
+	case 4: case 5: case 6: case 7:
+		src = data >> (shift - 4);
+		break;
+	case 8:
+		src = 0x0;
+		break;
+	case 9:
+		src = 0x0;
+		dst = 0xf;
+		break;
+	case 10:
+		src = 0xf;
+		break;
+	case 11:
+		src = 0xf;
+		dst = 0x0;
+		break;
+	case 12:
+		src = 0xf;
+		dst = 0xa;
+		break;
+	case 13:
+		src = 0xf;
+		dst = 0x5;
+		break;
+	case 14:
+		src = 0xf;
+		dst = 0xc;
+		break;
+	case 15:
+		src = 0xf;
+		dst = 0x3;
+		break;
+	}
+
+	u8 result = 0;
+	switch ((m_graphics_control >> 1) & 7)
+	{
+	case 0: result = src; break;
+	case 1: result = dst ^ src; break;
+	case 2: result = dst | src; break;
+	case 3: result = dst & src; break;
+	case 4: result = 0x0; break;
+	case 5: result = 0x5; break;
+	case 6: result = 0xa; break;
+	case 7: result = 0xf; break;
+	}
+
+	result = (result & ~protect) | (old & protect);
+
+	if (BIT(m_graphics_control, 0))
+	{
+		m_gfxram[pixel & 0x3ffff] = result;
+		m_gfxram[pixel | 0x40000] = result;
+	}
+	else
+		m_gfxram[pixel] = result;
 }
 
 u16 tek4107a_state::nmi_enable_r()
@@ -178,7 +383,8 @@ void tek4107a_state::ycur_w(u16 data)
 
 void tek4107a_state::tbwin_w(u16 data)
 {
-	// TODO
+	m_dialog_top = (data >> 8) & 0x1f;
+	m_dialog_bottom = m_dialog_top + (data & 0x1f);
 }
 
 u16 tek4107a_state::gcntl_r()
@@ -219,16 +425,25 @@ u8 tek4107a_state::font_r()
 void tek4107a_state::tek4107a_mem(address_map &map)
 {
 	map(0x00000, 0x3ffff).ram();
-	map(0x40000, 0x7ffff).ram().share("gfxram");
+	map(0x10000, 0x10fff).ram().share("nvram");
+	map(0x18000, 0x19fff).ram().share(m_dialog_ram);
+	map(0x1f000, 0x1f03f).rw(FUNC(tek4107a_state::colormap_r), FUNC(tek4107a_state::colormap_w));
+	map(0x40000, 0x7ffff).r(FUNC(tek4107a_state::gfxram_r));
 	map(0x80000, 0xbffff).rom().region("firmware", 0);
+	map(0x40000, 0xbffff).w(FUNC(tek4107a_state::gfxram_w));
 	map(0xf0000, 0xfffff).rom().region("firmware", 0x30000);
+}
+
+void tek4107a_state::vpac_map(address_map &map)
+{
+	map(0x0000, 0x3fff).r(FUNC(tek4107a_state::dialog_dma_r));
 }
 
 void tek4107a_state::tek4107a_io(address_map &map)
 {
 	map(0x0000, 0x001f).rw(m_duart[0], FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
 	map(0x0000, 0x001f).rw(m_duart[1], FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0xff00);
-	map(0x0080, 0x00bf).r(FUNC(tek4107a_state::vpac_r)).w(m_vpac, FUNC(crt9007_device::write)).umask16(0x00ff);
+	map(0x0080, 0x00bf).rw(FUNC(tek4107a_state::vpac_r), FUNC(tek4107a_state::vpac_w)).umask16(0x00ff);
 	map(0x00c0, 0x00c1).w(FUNC(tek4107a_state::xpos_w));
 	map(0x00c2, 0x00c3).w(FUNC(tek4107a_state::ypos_w));
 	map(0x00c4, 0x00c5).w(FUNC(tek4107a_state::xcur_w));
@@ -253,16 +468,86 @@ INPUT_PORTS_END
 
 void tek4107a_state::video_start()
 {
+	m_gfxram = make_unique_clear<u8[]>(0x80000);
+	std::fill_n(m_colormap, std::size(m_colormap), 0);
+
+	save_pointer(NAME(m_gfxram), 0x80000);
+	save_item(NAME(m_colormap));
 	save_item(NAME(m_graphics_control));
 	save_item(NAME(m_alpha_control));
 	save_item(NAME(m_x_position));
 	save_item(NAME(m_y_position));
 	save_item(NAME(m_x_cursor));
 	save_item(NAME(m_y_cursor));
+	save_item(NAME(m_dialog_top));
+	save_item(NAME(m_dialog_bottom));
+	save_item(NAME(m_hdelay));
+	save_item(NAME(m_vdelay));
+	save_item(NAME(m_row_height));
+	save_item(NAME(m_visible_rows));
+	save_item(NAME(m_wben));
+	save_item(NAME(m_row_column));
+	save_item(NAME(m_row_count));
+	save_item(NAME(m_row_buffer));
+	save_item(NAME(m_rows));
 }
 
 u32 tek4107a_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	pen_t const *const pens = m_palette->pens();
+	rectangle const &visarea = screen.visible_area();
+	bool const char_blink = BIT(m_alpha_control, 0);
+	bool const cursor_blink = BIT(m_alpha_control, 1);
+	bool const block_cursor = BIT(m_alpha_control, 2);
+	bool const opaque = BIT(m_alpha_control, 3);
+	int const dialog_x = m_hdelay * 8;
+
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		unsigned const gy = (m_y_position - 1 - (y - visarea.top())) & 0x1ff;
+		int const dialog_y = y - m_vdelay;
+		unsigned const row = dialog_y / m_row_height;
+		unsigned const line = dialog_y % m_row_height;
+		bool const dialog = dialog_y >= 0 && row >= m_dialog_top && row <= m_dialog_bottom && row < 64;
+
+		if (dialog_y < 0 || row >= m_visible_rows)
+		{
+			std::fill_n(&bitmap.pix(y, cliprect.left()), cliprect.width(), rgb_t::black());
+			continue;
+		}
+
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		{
+			unsigned const gx = (m_x_position + X_PAN_OFFSET + x - visarea.left()) & 0x3ff;
+			unsigned index = m_gfxram[(gy << 10) | gx];
+
+			if (dialog && x >= dialog_x)
+			{
+				unsigned const col = (x - dialog_x) / 8;
+				u16 const cell = m_rows[row][col & 0x7f];
+				u8 const pixels = m_chargen[((cell & 0xff) << 4) | (line & 0x0f)];
+				unsigned const fg = (cell >> 8) & 7;
+				unsigned const bg = (cell >> 11) & 7;
+				bool on = BIT(pixels, 7 - ((x - dialog_x) & 7)) || (BIT(cell, 15) && line == m_row_height - 1);
+
+				if (BIT(cell, 14) && char_blink)
+					on = false;
+
+				if (cursor_blink && m_vpac->cursor_active(col, row) && (block_cursor || line >= m_row_height - 2))
+					index = on ? COLORMAP_CURSOR_FG : COLORMAP_CURSOR_BG;
+				else if (on)
+					index = COLORMAP_DIALOG + fg;
+				else if (bg || opaque)
+					index = COLORMAP_DIALOG + bg;
+			}
+
+			if ((gx == m_x_cursor) != (gy == m_y_cursor))
+				index = COLORMAP_CROSSHAIR;
+
+			bitmap.pix(y, x) = pens[index];
+		}
+	}
+
 	return 0;
 }
 
@@ -310,6 +595,8 @@ void tek4107a_state::tek4107a(machine_config &config)
 	SCN2681(config, m_duart[1], 14.7456_MHz_XTAL / 4);
 	m_duart[1]->irq_cb().set("maincpu", FUNC(i80186_cpu_device::int2_w));
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.in_pb_callback().set_constant(0x30);
 	ppi.out_pc_callback().set(FUNC(tek4107a_state::ppi_pc_w));
@@ -320,24 +607,18 @@ void tek4107a_state::tek4107a(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_raw(25.2_MHz_XTAL, 800, 0, 640, 525, 0, 480);
+	screen.set_raw(25.2_MHz_XTAL, 800, 112, 752, 525, 38, 518);
 	screen.set_screen_update(FUNC(tek4107a_state::screen_update));
 
 	CRT9007(config, m_vpac, 25.2_MHz_XTAL / 8);
 	m_vpac->set_screen("screen");
 	m_vpac->set_character_width(8);
+	m_vpac->set_addrmap(0, &tek4107a_state::vpac_map);
+	m_vpac->wben_callback().set(FUNC(tek4107a_state::vpac_wben_w));
 	m_vpac->int_callback().set("maincpu", FUNC(i80186_cpu_device::int1_w));
 
-	PALETTE(config, "palette").set_entries(64);
-	GFXDECODE(config, "gfxdecode", "palette", gfx_tek4107a);
-}
-
-void tek4107a_state::tek4109a(machine_config &config)
-{
-	tek4107a(config);
-
-	/* video hardware */
-	subdevice<palette_device>("palette")->set_entries(4096);
+	PALETTE(config, m_palette).set_entries(32);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_tek4107a);
 }
 
 /* ROMs */
@@ -380,4 +661,4 @@ ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY      FULLNAME           FLAGS
 COMP( 1983, tek4107a, 0,        0,      tek4107a, tek4107a, tek4107a_state, empty_init, "Tektronix", "Tektronix 4107A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1983, tek4109a, tek4107a, 0,      tek4109a, tek4107a, tek4107a_state, empty_init, "Tektronix", "Tektronix 4109A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1983, tek4109a, tek4107a, 0,      tek4107a, tek4107a, tek4107a_state, empty_init, "Tektronix", "Tektronix 4109A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
