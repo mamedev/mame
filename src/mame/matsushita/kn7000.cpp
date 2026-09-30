@@ -5,10 +5,10 @@
     Technics SX-KN7000 and related MN10300-based keyboards
 
     All five machines are built around a Panasonic MN103002A (MN1030 series),
-    running Panasonic's "MILK" object framework. LCD, control panel and floppy
-    are emulated. The tone generators' registers are decoded, but they produce
-    no sound: the wave ROMs are undumped and the ADSP-21065L effects DSP is not
-    emulated.
+    running Panasonic's "MILK" object framework. LCD, control panel, floppy and
+    SD are emulated. The tone generators' registers are decoded, but they
+    produce no sound: the wave ROMs are undumped and the ADSP-21065L effects
+    DSP is not emulated.
 
     Design notes: https://arqueologiadigital.github.io/technics-docs/kn7000-driver-internals/
 
@@ -64,6 +64,7 @@
 #include "imagedev/floppy.h"
 #include "machine/input_merger.h"
 #include "machine/intelfsh.h"
+#include "machine/spi_sdcard.h"
 #include "machine/upd765.h"
 
 #include "screen.h"
@@ -108,9 +109,7 @@ public:
 		, m_tempoknob(*this, "TEMPO_KNOB")
 	{ }
 
-	void kn7000(machine_config &config) ATTR_COLD;
 	void kn2400(machine_config &config) ATTR_COLD;
-	void kn2600(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(kbd_key);
 	DECLARE_INPUT_CHANGED_MEMBER(volume_changed);
@@ -168,7 +167,6 @@ private:
 	u16 m_tg_wave_addr[2];
 
 	void kn2400_map(address_map &map) ATTR_COLD;
-	void kn7000_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update_gray(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -183,6 +181,57 @@ private:
 	u16 sdmbx_r();
 	void sdmbx_w(u16 data);
 	void update_volume();
+};
+
+
+// The models with the SD sub-CPU interface: SX-KN7000 and SX-KN2600
+class kn_sd_state : public kn_state
+{
+public:
+	kn_sd_state(const machine_config &mconfig, device_type type, const char *tag)
+		: kn_state(mconfig, type, tag)
+		, m_sdcard(*this, "sdcard")
+		, m_sdsw(*this, "CPSD_SDSW")
+		, m_sdcover(*this, "SDCOVER")
+		, m_sd_leds(*this, "sd_led%u", 0U)
+	{ }
+
+	void kn7000(machine_config &config) ATTR_COLD;
+	void kn2600(machine_config &config) ATTR_COLD;
+
+	DECLARE_INPUT_CHANGED_MEMBER(sd_cover_changed);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	required_device<spi_sdcard_device> m_sdcard;
+	required_ioport m_sdsw;
+	required_ioport m_sdcover;
+	output_finder<2> m_sd_leds; // SD in use, SD play/pause
+
+	emu_timer *m_sd_insert_timer = nullptr; // the power-on card-detect hack, see machine_reset()
+	emu_timer *m_sd_inuse_off = nullptr;
+	u8 m_sd_miso = 1; // the card's DO line
+	u16 m_gpio8004 = 0xffff;
+	u32 m_sdport = 0;
+
+	void sd_add(machine_config &config) ATTR_COLD;
+	void sd_map(address_map &map) ATTR_COLD;
+	void kn7000_map(address_map &map) ATTR_COLD;
+	void kn2600_map(address_map &map) ATTR_COLD;
+
+	void sd_update_carddetect();
+	void sd_sdmbx_w(u16 data);
+	void sd_miso_w(int state);
+	void sd_card_changed(int state);
+	u32 sdport_r();
+	void sdport_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u16 gpio8004_r();
+	void gpio8004_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	TIMER_CALLBACK_MEMBER(sd_insert);
+	TIMER_CALLBACK_MEMBER(sd_inuse_off);
 };
 
 
@@ -310,12 +359,27 @@ void kn6000_state::kn6000_map(address_map &map)
 	fdc_map(map);
 }
 
-void kn_state::kn7000_map(address_map &map)
+void kn_sd_state::sd_map(address_map &map)
+{
+	map(0x36008004, 0x36008005).rw(FUNC(kn_sd_state::gpio8004_r), FUNC(kn_sd_state::gpio8004_w));
+	map(0x9805000c, 0x9805000d).w(FUNC(kn_sd_state::sd_sdmbx_w));
+	map(0x9cc00008, 0x9cc0000b).rw(FUNC(kn_sd_state::sdport_r), FUNC(kn_sd_state::sdport_w));
+}
+
+void kn_sd_state::kn7000_map(address_map &map)
 {
 	table_map(map);
 	tg_map<0>(map, 0x98040000);
 	tg_map<1>(map, 0x98050000);
 	fdc_map(map);
+	sd_map(map);
+}
+
+void kn_sd_state::kn2600_map(address_map &map)
+{
+	kn24_map(map);
+	sd_map(map);
+	map(0x98070000, 0x98070001).r(FUNC(kn_sd_state::strap_r<0x8007>));
 }
 
 
@@ -436,6 +500,90 @@ void kn_state::update_volume()
 	m_tonegen->set_output_gain(ALL_OUTPUTS, v * v);
 }
 
+// The SD slot has a hinged cover, and the firmware reads card-detect through
+// the cover switch: high on IRQ4 means no card or cover open.
+void kn_sd_state::sd_update_carddetect()
+{
+	const bool cover_open = BIT(m_sdcover->read(), 0);
+	const bool card = m_sdcard->get_card_present();
+	m_maincpu->set_input_line(mn10300_device::IRQ4, (!cover_open && card) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+// The firmware talks SPI (mode 3) to the card a byte at a time through this
+// mailbox; each write clocks a byte out and the reply in, then raises the sub
+// tone generator's interrupt. A deselected card leaves DO pulled up.
+void kn_sd_state::sd_sdmbx_w(u16 data)
+{
+	m_sd_leds[0] = 1;
+	m_sd_inuse_off->adjust(attotime::from_msec(250));
+
+	u8 reply = 0;
+	for (int bit = 7; bit >= 0; bit--)
+	{
+		m_sdcard->spi_clock_w(0);
+		m_sdcard->spi_mosi_w(BIT(data, bit));
+		m_sdcard->spi_clock_w(1);
+		reply = (reply << 1) | m_sd_miso;
+	}
+	m_sdmbx_out = BIT(m_gpio8004, 1) ? 0xff : reply;
+	m_maincpu->set_input_line(mn10300_device::IRQ5, HOLD_LINE);
+}
+
+// An image loaded or unloaded at run time; during the power-on hold-off the
+// timer reports the card
+void kn_sd_state::sd_card_changed(int state)
+{
+	if (m_sd_insert_timer && !m_sd_insert_timer->enabled())
+		sd_update_carddetect();
+}
+
+void kn_sd_state::sd_miso_w(int state)
+{
+	m_sd_miso = state ? 1 : 0;
+}
+
+// The SD transport panel: the six buttons, active low, are read in bits 5-0 and
+// the play/pause LED is written in bits 7-6
+u32 kn_sd_state::sdport_r()
+{
+	return (m_sdport & ~u32(0x3f)) | (m_sdsw->read() & 0x3f);
+}
+
+void kn_sd_state::sdport_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_sdport);
+	m_sd_leds[1] = (m_sdport & 0xc0) ? 1 : 0;
+}
+
+u16 kn_sd_state::gpio8004_r()
+{
+	return m_gpio8004;
+}
+
+// Bit 1 is the card's SPI chip select, active low
+void kn_sd_state::gpio8004_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_gpio8004);
+	m_sdcard->spi_ss_w(BIT(~m_gpio8004, 1));
+}
+
+TIMER_CALLBACK_MEMBER(kn_sd_state::sd_insert)
+{
+	sd_update_carddetect();
+}
+
+TIMER_CALLBACK_MEMBER(kn_sd_state::sd_inuse_off)
+{
+	m_sd_leds[0] = 0;
+}
+
+INPUT_CHANGED_MEMBER(kn_sd_state::sd_cover_changed)
+{
+	if (!m_sd_insert_timer->enabled())
+		sd_update_carddetect();
+}
+
+
 //**************************************************************************
 //  Video
 //**************************************************************************
@@ -519,6 +667,36 @@ void kn_state::machine_start()
 void kn_state::machine_reset()
 {
 	update_volume();
+}
+
+void kn_sd_state::machine_start()
+{
+	kn_state::machine_start();
+
+	m_sd_insert_timer = timer_alloc(FUNC(kn_sd_state::sd_insert), this);
+	m_sd_inuse_off = timer_alloc(FUNC(kn_sd_state::sd_inuse_off), this);
+
+	save_item(NAME(m_sd_miso));
+	save_item(NAME(m_gpio8004));
+	save_item(NAME(m_sdport));
+}
+
+void kn_sd_state::machine_reset()
+{
+	kn_state::machine_reset();
+
+	// HACK: the firmware's SD state machine runs on a card-detect transition, so
+	// the card is reported absent at reset and inserted 6 seconds later.
+	// FIXME: find what it really waits for at power on
+	m_maincpu->set_input_line(mn10300_device::IRQ4, ASSERT_LINE);
+	if (!BIT(m_sdcover->read(), 0) && m_sdcard->get_card_present())
+		m_sd_insert_timer->adjust(attotime::from_seconds(6));
+	else
+		m_sd_insert_timer->enable(false);
+
+	m_gpio8004 = 0xffff;
+	m_sdcard->spi_ss_w(0);
+	m_sdcard->spi_clock_w(1);           // mode 3: the clock idles high
 }
 
 // The KN6000 and KN6500 read their library at 0x4c000000 without writing it
@@ -618,6 +796,23 @@ INPUT_PORTS_START(kn)
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_OTHER) PORT_GM_C7 PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kn_state::kbd_key), 0x3c)
 INPUT_PORTS_END
 
+INPUT_PORTS_START(kn_sd)
+	PORT_INCLUDE(kn)
+
+	PORT_START("CPSD_SDSW")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SD Volume -")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SD Volume +")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SD Stop")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SD Play/Pause")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SD Skip/Search <<")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("SD Skip/Search >>")
+
+	PORT_START("SDCOVER")
+	PORT_CONFNAME(0x01, 0x00, "SD Slot Cover") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kn_sd_state::sd_cover_changed), 0)
+	PORT_CONFSETTING(   0x00, "Closed")
+	PORT_CONFSETTING(   0x01, "Open")
+INPUT_PORTS_END
+
 
 //**************************************************************************
 //  Machine configurations
@@ -703,17 +898,26 @@ void kn_state::configure_tonegen()
 	m_tonegen->add_route(1, "speaker", 1.0, 1);
 }
 
-void kn_state::kn7000(machine_config &config)
+void kn_sd_state::sd_add(machine_config &config)
+{
+	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sd();
+	m_sdcard->spi_miso_callback().set(FUNC(kn_sd_state::sd_miso_w));
+	m_sdcard->card_present_callback().set(FUNC(kn_sd_state::sd_card_changed));
+}
+
+void kn_sd_state::kn7000(machine_config &config)
 {
 	kn_common(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &kn_state::kn7000_map);
-	m_screen->set_screen_update(FUNC(kn_state::screen_update_rgb565));
+	m_maincpu->set_addrmap(AS_PROGRAM, &kn_sd_state::kn7000_map);
+	m_screen->set_screen_update(FUNC(kn_sd_state::screen_update_rgb565));
 	KN7000_CPANEL(config, m_cpanel);
 	configure_cpanel();
 	KN7000_TONEGEN(config, m_tonegen);
 	configure_tonegen();
 	custom_flash_add(config);
 	fdc_add(config);
+	sd_add(config);
 	config.set_default_layout(layout_kn7000);
 }
 
@@ -744,7 +948,8 @@ void kn_state::kn24_common(machine_config &config)
 	configure_tonegen();
 }
 
-// The KN2400 has the floppy drive
+// The KN2400 has the floppy drive, the KN2600 the card slot and IC404 with the
+// SD sub-CPU's program
 void kn_state::kn2400(machine_config &config)
 {
 	kn24_common(config);
@@ -752,10 +957,13 @@ void kn_state::kn2400(machine_config &config)
 	fdc_add(config);
 }
 
-void kn_state::kn2600(machine_config &config)
+// FIXME: identified as a KN2600, the firmware runs its SD start-up and then leaves
+// the LCD blank; its SD sub-CPU (IC404) is not dumped
+void kn_sd_state::kn2600(machine_config &config)
 {
 	kn24_common(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &kn_state::kn24_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kn_sd_state::kn2600_map);
+	sd_add(config);
 }
 
 
@@ -1027,8 +1235,8 @@ ROM_END
 
 
 //   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY     FULLNAME      FLAGS
-SYST(2002, kn7000, 0,      0,      kn7000,  kn,    kn_state,     empty_init, "Technics", "SX-KN7000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST(2002, kn7000, 0,      0,      kn7000,  kn_sd, kn_sd_state,  empty_init, "Technics", "SX-KN7000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 SYST(1999, kn6000, 0,      0,      kn6000,  kn,    kn6000_state, empty_init, "Technics", "SX-KN6000", ROT180 | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 SYST(2001, kn6500, 0,      0,      kn6000,  kn,    kn6000_state, empty_init, "Technics", "SX-KN6500", ROT180 | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 SYST(2000, kn2400, 0,      0,      kn2400,  kn,    kn_state,     empty_init, "Technics", "SX-KN2400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST(2000, kn2600, kn2400, 0,      kn2600,  kn,    kn_state,     empty_init, "Technics", "SX-KN2600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST(2000, kn2600, kn2400, 0,      kn2600,  kn_sd, kn_sd_state,  empty_init, "Technics", "SX-KN2600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
