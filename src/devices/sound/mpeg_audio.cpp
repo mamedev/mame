@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    MPEG audio support.  Only layer2 and variants for now.
+    MPEG audio support.  Only layer1, layer2 and variants for now.
 
 ***************************************************************************/
 
@@ -98,7 +98,14 @@ retry_sync:
 
 	switch(layer) {
 	case 1:
-		abort();
+		try {
+			read_header_layer1();
+			read_data_layer1();
+			decode_layer1(output, output_samples);
+		} catch(limit_hit) {
+			return false;
+		}
+		break;
 	case 2:
 		try {
 			read_header_mpeg2(variant == 2);
@@ -163,22 +170,30 @@ void mpeg_audio::read_header_amm(bool layer25)
 		m_joint_bands = m_total_bands;
 }
 
-void mpeg_audio::read_header_mpeg2(bool layer25)
+int mpeg_audio::read_header_fields(int &stereo_mode, int &stereo_mode_ext)
 {
 	int prot = gb(1);
 	int bitrate_index = gb(4);
 	m_sampling_rate = gb(2);
 	gb(1); // padding
 	gb(1);
-	m_last_frame_number = 36;
-	int stereo_mode = gb(2);
-	int stereo_mode_ext = gb(2);
+	stereo_mode = gb(2);
+	stereo_mode_ext = gb(2);
 	gb(2); // copyright, original
 	gb(2); // emphasis
 	if(!prot)
 		gb(16); // crc
 
 	m_channel_count = stereo_mode != 3 ? 2 : 1;
+
+	return bitrate_index;
+}
+
+void mpeg_audio::read_header_mpeg2(bool layer25)
+{
+	int stereo_mode, stereo_mode_ext;
+	int bitrate_index = read_header_fields(stereo_mode, stereo_mode_ext);
+	m_last_frame_number = 36;
 
 	m_param_index = s_layer2_param_index[m_channel_count-1][m_sampling_rate][bitrate_index];
 	assert(m_param_index != -1);
@@ -189,6 +204,57 @@ void mpeg_audio::read_header_mpeg2(bool layer25)
 		m_joint_bands = s_joint_band_counts[stereo_mode_ext];
 	if(m_joint_bands > m_total_bands)
 		m_joint_bands = m_total_bands;
+}
+
+void mpeg_audio::read_header_layer1()
+{
+	int stereo_mode, stereo_mode_ext;
+	read_header_fields(stereo_mode, stereo_mode_ext);
+
+	m_total_bands = 32;
+	m_joint_bands = m_total_bands;
+	if(stereo_mode == 1) // joint stereo
+		m_joint_bands = s_joint_band_counts[stereo_mode_ext];
+}
+
+void mpeg_audio::read_data_layer1()
+{
+	memset(m_amp_values, 0, sizeof(m_amp_values));
+	for(int band=0; band < m_total_bands; band++)
+		for(int chan=0; chan < m_channel_count; chan++)
+			m_band_param[chan][band] = (band < m_joint_bands || !chan) ? gb(4) : m_band_param[0][band];
+
+	for(int band=0; band < m_total_bands; band++)
+		for(int chan=0; chan < m_channel_count; chan++)
+			if(m_band_param[chan][band])
+				m_amp_values[chan][0][band] = s_scalefactors[gb(6)];
+}
+
+double mpeg_audio::read_layer1_sample(int allocation)
+{
+	int bits = allocation + 1;
+	int val = gb(bits);
+	return double(2*val - (1 << bits) + 2) / ((1 << bits) - 1);
+}
+
+void mpeg_audio::decode_layer1(short *output, int &output_samples)
+{
+	output_samples = 0;
+
+	for(int step=0; step<12; step++) {
+		for(int band=0; band < m_total_bands; band++) {
+			double val = 0;
+			for(int chan=0; chan<m_channel_count; chan++) {
+				if((band < m_joint_bands || !chan) && m_band_param[chan][band])
+					val = read_layer1_sample(m_band_param[chan][band]);
+				m_subbuffer[chan][band] = val * m_amp_values[chan][0][band];
+			}
+		}
+
+		synthesize(output);
+		output += 32*m_channel_count;
+		output_samples += 32;
+	}
 }
 
 void mpeg_audio::read_data_mpeg2()
@@ -210,18 +276,7 @@ void mpeg_audio::decode_mpeg2(short *output, int &output_samples)
 			build_next_segments(upper_step);
 			for(int lower_step = 0; lower_step < 3; lower_step++) {
 				retrieve_subbuffer(lower_step);
-
-				for(int chan=0; chan<m_channel_count; chan++) {
-					double resynthesis_buffer[32];
-					idct32(m_subbuffer[chan], m_audio_buffer[chan] + m_audio_buffer_pos[chan]);
-					resynthesis(m_audio_buffer[chan] + m_audio_buffer_pos[chan] + 16, resynthesis_buffer);
-					scale_and_clamp(resynthesis_buffer, output + chan, m_channel_count);
-					m_audio_buffer_pos[chan] -= 32;
-					if(m_audio_buffer_pos[chan]<0) {
-						memmove(m_audio_buffer[chan]+17*32, m_audio_buffer[chan], 15*32*sizeof(m_audio_buffer[chan][0]));
-						m_audio_buffer_pos[chan] = 16*32;
-					}
-				}
+				synthesize(output);
 				output += 32*m_channel_count;
 				output_samples += 32;
 				frame_number++;
@@ -229,6 +284,21 @@ void mpeg_audio::decode_mpeg2(short *output, int &output_samples)
 					return;
 			}
 		}
+}
+
+void mpeg_audio::synthesize(short *output)
+{
+	for(int chan=0; chan<m_channel_count; chan++) {
+		double resynthesis_buffer[32];
+		idct32(m_subbuffer[chan], m_audio_buffer[chan] + m_audio_buffer_pos[chan]);
+		resynthesis(m_audio_buffer[chan] + m_audio_buffer_pos[chan] + 16, resynthesis_buffer);
+		scale_and_clamp(resynthesis_buffer, output + chan, m_channel_count);
+		m_audio_buffer_pos[chan] -= 32;
+		if(m_audio_buffer_pos[chan]<0) {
+			memmove(m_audio_buffer[chan]+17*32, m_audio_buffer[chan], 15*32*sizeof(m_audio_buffer[chan][0]));
+			m_audio_buffer_pos[chan] = 16*32;
+		}
+	}
 }
 
 const int mpeg_audio::s_sample_rates[8] = { 44100, 48000, 32000, 0, 22050, 24000, 16000, 0 };
