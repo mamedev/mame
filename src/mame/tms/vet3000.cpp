@@ -32,8 +32,21 @@
     replace the character sets.
 
         ------------------------------------------------------------
-    The TMS9128 is clocked at 10.738635 MHz (60 Hz NTSC timing); the
-    MC6809 runs at 3.579545 MHz / 4 = 894.886 kHz.
+    The design derives from the "Build This Video Titler" project by
+    Jack Flack (Radio-Electronics, November 1985 to March 1986), sold in
+    the US as the MFJ-1480B "Video Effects Titler (VET)". The chip set,
+    memory map, I/O decoding, expansion connector pinout and keyboard
+    matrix match the published schematics.
+
+        ------------------------------------------------------------
+    The TMS9128 is clocked at 10.738635 MHz (60 Hz NTSC timing) by an
+    MC4044/MC4024 PLL locked to 3 x the 3.579545 MHz chroma oscillator
+    (a CA3126 with its markings removed). In genlock mode the PLL tracks
+    the external video instead. The MC6809 is clocked by the VDP CPUCLK
+    output (master / 3), so E = 894.886 kHz.
+
+    The VDP /INT output is not connected: the firmware polls the status
+    register, and the 6809 /IRQ line only comes from CN1.
 
 ***************************************************************************/
 
@@ -187,18 +200,17 @@ INPUT_PORTS_END
 
 void vet3000_state::vet3000(machine_config &config)
 {
-	constexpr XTAL MAIN_CLOCK = 3.579545_MHz_XTAL;
-	constexpr XTAL VDP_CLOCK = 10.738635_MHz_XTAL;
+	constexpr XTAL VDP_CLOCK = 10.738635_MHz_XTAL; /* PLL, 3 x 3.579545 MHz */
 
 	/* basic machine hardware */
-	MC6809(config, m_maincpu, MAIN_CLOCK);
+	MC6809(config, m_maincpu, VDP_CLOCK / 3); /* VDP CPUCLK output */
 	m_maincpu->set_addrmap(AS_PROGRAM, &vet3000_state::program_map);
 
 	/* video hardware */
 	tms9128_device &vdp(TMS9128(config, "tms9128", VDP_CLOCK)); /* TMS9128NL on the board */
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	/* /INT is not connected */
 	SCREEN(config, "screen");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
