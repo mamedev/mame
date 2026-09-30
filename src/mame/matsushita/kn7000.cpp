@@ -5,8 +5,8 @@
     Technics SX-KN7000 and related MN10300-based keyboards
 
     All five machines are built around a Panasonic MN103002A (MN1030 series),
-    running Panasonic's "MILK" object framework. LCD, control panel, floppy and
-    SD are emulated. The tone generators' registers are decoded, but they
+    running Panasonic's "MILK" object framework. LCD, control panel, floppy, SD
+    and MIDI are emulated. The tone generators' registers are decoded, but they
     produce no sound: the wave ROMs are undumped and the ADSP-21065L effects
     DSP is not emulated.
 
@@ -60,6 +60,9 @@
 #include "kn7000_cpanel.h"
 #include "kn_tonegen.h"
 
+#include "bus/midi/midi.h"
+#include "bus/midi/midiinport.h"
+#include "bus/midi/midioutport.h"
 #include "cpu/mn10300/mn10300.h"
 #include "imagedev/floppy.h"
 #include "machine/input_merger.h"
@@ -85,6 +88,53 @@
 
 namespace {
 
+// Byte-to-bit bridge between an SIO channel and a MIDI port, 31250 baud 8N1
+class kn7000_sio_uart_device : public device_t, public device_serial_interface
+{
+public:
+	kn7000_sio_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	auto tx_cb() { return m_tx_cb.bind(); }
+	auto rx_cb() { return m_rx_cb.bind(); }
+
+	void write(u8 data) { transmit_register_setup(data); }
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+
+	// device_serial_interface implementation
+	virtual void tra_callback() override { m_tx_cb(transmit_register_get_data_bit()); }
+	virtual void rcv_complete() override;
+
+private:
+	devcb_write_line m_tx_cb;
+	devcb_write8 m_rx_cb;
+};
+
+DEFINE_DEVICE_TYPE_PRIVATE(KN7000_SIO_UART, kn7000_sio_uart_device, kn7000_sio_uart_device, "kn7000_sio_uart", "KN7000 MIDI UART")
+
+kn7000_sio_uart_device::kn7000_sio_uart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, KN7000_SIO_UART, tag, owner, clock)
+	, device_serial_interface(mconfig, *this)
+	, m_tx_cb(*this)
+	, m_rx_cb(*this)
+{
+}
+
+void kn7000_sio_uart_device::device_start()
+{
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rate(31250);
+}
+
+void kn7000_sio_uart_device::rcv_complete()
+{
+	receive_register_extract();
+	m_rx_cb(get_received_char());
+}
+
+
 // Common to all five models
 class kn_state : public driver_device
 {
@@ -98,6 +148,7 @@ public:
 		, m_lcdbuf(*this, "lcdbuf")
 		, m_customflash(*this, "custom_data")
 		, m_fdc(*this, "fdc")
+		, m_midi_uart(*this, "midi_uart%u", 0U)
 		, m_wave_main_y(*this, "waveform_main_y")
 		, m_wave_main_x(*this, "waveform_main_x")
 		, m_wave_sub_y(*this, "waveform_sub_y")
@@ -143,11 +194,12 @@ protected:
 	u16 m_sdmbx_out = 0xff;
 
 private:
-	enum { SIO_PANEL = 0 };
+	enum { SIO_PANEL = 0, SIO_MIDI1 = 1, SIO_MIDI2 = 2 };
 
 	required_shared_ptr<u32> m_lcdbuf;
 	optional_device<fujitsu_29lv160b_device> m_customflash;
 	optional_device<n82077aa_device> m_fdc;
+	required_device_array<kn7000_sio_uart_device, 2> m_midi_uart;
 	optional_memory_region m_wave_main_y;
 	optional_memory_region m_wave_main_x;
 	optional_memory_region m_wave_sub_y;
@@ -836,14 +888,30 @@ void kn_state::kn_common(machine_config &config)
 	m_maincpu->set_reset_pc(0x48400000);
 	m_maincpu->set_vector_base(0x50000000);
 	m_maincpu->set_sio_bit_rate<SIO_PANEL>(200'000, false);
+	m_maincpu->set_sio_bit_rate<SIO_MIDI1>(31'250, true);
+	m_maincpu->set_sio_bit_rate<SIO_MIDI2>(31'250, true);
 	m_maincpu->sio_tx_cb<SIO_PANEL>().set(m_cpanel, FUNC(kn_cpanel_base_device::tx_byte));
 	m_maincpu->sio_rx_enable_cb<SIO_PANEL>().set(m_cpanel, FUNC(kn_cpanel_base_device::rx_enable));
+	m_maincpu->sio_tx_cb<SIO_MIDI1>().set(m_midi_uart[0], FUNC(kn7000_sio_uart_device::write));
+	m_maincpu->sio_tx_cb<SIO_MIDI2>().set(m_midi_uart[1], FUNC(kn7000_sio_uart_device::write));
 
 	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(640, 240);
 	m_screen->set_visarea_full();
+
+	KN7000_SIO_UART(config, m_midi_uart[0]);
+	m_midi_uart[0]->tx_cb().set("mdout1", FUNC(midi_port_device::write_txd));
+	m_midi_uart[0]->rx_cb().set(m_maincpu, FUNC(mn10300_device::sio_rx_w<SIO_MIDI1>));
+	MIDI_PORT(config, "mdin1", midiin_slot, "midiin").rxd_handler().set(m_midi_uart[0], FUNC(kn7000_sio_uart_device::rx_w));
+	MIDI_PORT(config, "mdout1", midiout_slot, "midiout");
+
+	KN7000_SIO_UART(config, m_midi_uart[1]);
+	m_midi_uart[1]->tx_cb().set("mdout2", FUNC(midi_port_device::write_txd));
+	m_midi_uart[1]->rx_cb().set(m_maincpu, FUNC(mn10300_device::sio_rx_w<SIO_MIDI2>));
+	MIDI_PORT(config, "mdin2", midiin_slot, "midiin").rxd_handler().set(m_midi_uart[1], FUNC(kn7000_sio_uart_device::rx_w));
+	MIDI_PORT(config, "mdout2", midiout_slot, "midiout");
 
 	SPEAKER(config, "speaker", 2).front();
 
