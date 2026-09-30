@@ -899,7 +899,7 @@ void sh3_base_device::irda_7709_map(address_map& map)
 	map(0x0400014e, 0x0400014f).rw(FUNC(sh3_base_device::scfdr1_r), FUNC(sh3_base_device::scfdr1_w));
 }
 
-void sh3_base_device::scif_7709_map(address_map& map)
+void sh7709_base_device::scif_7709_map(address_map& map)
 {
 	map(0x04000150, 0x0400015f).m(m_scif, FUNC(sh7709_scif_device::map));
 }
@@ -957,7 +957,6 @@ bool sh34_base_device::memory_translate(int spacenum, int intention, offs_t& add
 
 sh3_base_device::sh3_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
 	: sh34_base_device(mconfig, type, tag, owner, clock, endianness, address_map_constructor(FUNC(sh3_base_device::sh3_internal_map), this))
-	, m_scif(*this, "scif")
 {
 	m_cpu_type = CPU_TYPE_SH3;
 	m_am = SH34_AM;
@@ -967,13 +966,20 @@ sh3_base_device::~sh3_base_device()
 {
 }
 
-void sh3_base_device::device_add_mconfig(machine_config &config)
+
+sh7709_base_device::sh7709_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
+	: sh3_base_device(mconfig, type, tag, owner, clock, endianness)
+	, m_scif(*this, "scif")
 {
-	// Only the SH7709/SH7709S actually map this (see scif_7709_map) but it is harmless
-	// on the SH7708 variants. The peripheral clock is derived from the CPU clock by
-	// the CPG, which isn't emulated - the default matches what the CV1000 boards use,
-	// drivers for other systems can override it with set_scif_clock().
-	SH7709_SCIF(config, m_scif, DERIVED_CLOCK(1, 8));
+}
+
+void sh7709_base_device::device_add_mconfig(machine_config &config)
+{
+	sh3_base_device::device_add_mconfig(config);
+
+	// Clocked from the peripheral clock, which is CPU clock / 4 with the
+	// reset FRQCR setting.
+	SH7709_SCIF(config, m_scif, DERIVED_CLOCK(1, 4));
 }
 
 
@@ -990,7 +996,7 @@ sh4_base_device::~sh4_base_device()
 
 
 sh3_device::sh3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
-	: sh3_base_device(mconfig, SH3, tag, owner, clock, endianness)
+	: sh7709_base_device(mconfig, SH3, tag, owner, clock, endianness)
 {
 }
 
@@ -1000,7 +1006,7 @@ sh7708s_device::sh7708s_device(const machine_config& mconfig, const char* tag, d
 }
 
 sh7709_device::sh7709_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
-	: sh3_base_device(mconfig, SH7709, tag, owner, clock, endianness)
+	: sh7709_base_device(mconfig, SH7709, tag, owner, clock, endianness)
 {
 }
 

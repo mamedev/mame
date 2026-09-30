@@ -631,21 +631,12 @@ class sh3_base_device : public sh34_base_device
 public:
 	virtual ~sh3_base_device();
 
-	// SCIF channel 2 (SH7709/SH7709S only)
-	auto scif_txd_handler() { return m_scif.lookup()->write_txd(); }
-	void scif_rxd_w(int state) { m_scif->rxd_w(state); }
-
-	// Peripheral clock feeding the SCIF baud rate generator, defaults to CPU clock / 8.
-	void set_scif_clock(uint32_t clock) { m_scif.lookup()->set_clock(clock); }
-	void set_scif_clock(const XTAL &xtal) { m_scif.lookup()->set_clock(xtal); }
-
 protected:
 	// construction/destruction
 	sh3_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	void sh3_internal_map(address_map &map) ATTR_COLD;
 	virtual void sh3_register_map(address_map& map) ATTR_COLD {}
@@ -672,7 +663,6 @@ protected:
 	void da_7709_map(address_map& map) ATTR_COLD;
 	void port_7709_map(address_map& map) ATTR_COLD;
 	void irda_7709_map(address_map& map) ATTR_COLD;
-	void scif_7709_map(address_map& map) ATTR_COLD;
 	void udi_7709s_map(address_map& map) ATTR_COLD;
 
 	// CCN
@@ -1152,9 +1142,6 @@ protected:
 	uint8_t m_scfrdr1;
 	uint8_t m_scfcr1;
 	uint16_t m_scfdr1;
-
-	// SCIF 7709
-	required_device<sh7709_scif_device> m_scif;
 
 	// UDI 7709S
 	uint16_t m_sdir;
@@ -1806,7 +1793,26 @@ protected:
 };
 
 
-class sh3_device : public sh3_base_device
+// SH7709/SH7709S family, which adds a FIFO equipped SCIF (channel 2)
+class sh7709_base_device : public sh3_base_device
+{
+public:
+	auto scif_txd_handler() { return m_scif.lookup()->write_txd(); }
+	void scif_rxd_w(int state) { m_scif->rxd_w(state); }
+
+protected:
+	sh7709_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
+
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void scif_7709_map(address_map& map) ATTR_COLD;
+
+private:
+	required_device<sh7709_scif_device> m_scif;
+};
+
+// Note that sh3_device register map is modeled after SH7709.
+class sh3_device : public sh7709_base_device
 {
 public:
 	sh3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness = ENDIANNESS_LITTLE);
@@ -1822,7 +1828,7 @@ public:
 	virtual void sh3_register_map(address_map& map) override ATTR_COLD;
 };
 
-class sh7709_device : public sh3_base_device
+class sh7709_device : public sh7709_base_device
 {
 public:
 	sh7709_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock, endianness_t endianness = ENDIANNESS_LITTLE);

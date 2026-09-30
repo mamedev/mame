@@ -16,7 +16,7 @@
 class sh7709_scif_device : public device_t, public device_serial_interface
 {
 public:
-	sh7709_scif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	sh7709_scif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Serial data out (to the peripheral's RXD).
 	auto write_txd() { return m_txd_cb.bind(); }

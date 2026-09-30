@@ -17,15 +17,21 @@
         -> 15              <- xx xx       identification, value is only shown
         -> 21                             start reporting
 
-    Once reporting the panel streams continuously:
+    Once reporting the panel sends:
 
-        10                                pen up, sent repeatedly
+        10                                pen up
         11 xh xl yh yl                    pen down
 
     Coordinates are 10 bits, the high bytes carry only the top two bits - the
     game rejects a packet whose high byte is greater than 3 and resynchronises.
     Seven consecutive pen up bytes are needed before the game considers the
-    touch released, so the stream must not go idle between reports.
+    touch released.  An idle line doesn't break the run or time anything out.
+
+    The real panel's report rate is unknown.  The game drains the receive FIFO
+    one byte per task tick, slower than a continuous stream arrives at 9600
+    baud, so this sends a report when the pen goes down or moves, a burst of
+    pen up bytes on release, and repeats the current state after a period
+    without changes.
 
 ***************************************************************************/
 
@@ -47,13 +53,13 @@
 // representable, the game's own calibration screen just never needs the edges.
 static INPUT_PORTS_START( cv1k_touchscreen )
 	PORT_START("TOUCH")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Touch Screen")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Touch Screen") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cv1k_touchscreen_device::input_changed), cv1k_touchscreen_device::INPUT_BUTTON)
 
 	PORT_START("TOUCH_X")
-	PORT_BIT( 0x3ff, 0x204, IPT_LIGHTGUN_X ) PORT_MINMAX(0x06e, 0x39b) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
+	PORT_BIT( 0x3ff, 0x204, IPT_LIGHTGUN_X ) PORT_MINMAX(0x06e, 0x39b) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cv1k_touchscreen_device::input_changed), cv1k_touchscreen_device::INPUT_AXIS)
 
 	PORT_START("TOUCH_Y")
-	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x069, 0x397) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15)
+	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x069, 0x397) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(45) PORT_KEYDELTA(15) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cv1k_touchscreen_device::input_changed), cv1k_touchscreen_device::INPUT_AXIS)
 INPUT_PORTS_END
 
 
@@ -66,10 +72,12 @@ cv1k_touchscreen_device::cv1k_touchscreen_device(const machine_config &mconfig, 
 	, m_touch(*this, "TOUCH")
 	, m_touch_x(*this, "TOUCH_X")
 	, m_touch_y(*this, "TOUCH_Y")
+	, m_report_timer(nullptr)
 	, m_tx_head(0)
 	, m_tx_count(0)
 	, m_streaming(false)
 	, m_got_enq(false)
+	, m_report_pending(false)
 {
 }
 
@@ -80,11 +88,17 @@ ioport_constructor cv1k_touchscreen_device::device_input_ports() const
 
 void cv1k_touchscreen_device::device_start()
 {
+	m_report_timer = timer_alloc(FUNC(cv1k_touchscreen_device::report), this);
+
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rate(clock());
+
 	save_item(NAME(m_tx_buffer));
 	save_item(NAME(m_tx_head));
 	save_item(NAME(m_tx_count));
 	save_item(NAME(m_streaming));
 	save_item(NAME(m_got_enq));
+	save_item(NAME(m_report_pending));
 }
 
 void cv1k_touchscreen_device::device_reset()
@@ -93,9 +107,9 @@ void cv1k_touchscreen_device::device_reset()
 	m_tx_head = m_tx_count = 0;
 	m_streaming = false;
 	m_got_enq = false;
+	m_report_pending = false;
 
-	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rate(clock());
+	m_report_timer->adjust(attotime::never);
 
 	receive_register_reset();
 	transmit_register_reset();
@@ -119,34 +133,61 @@ void cv1k_touchscreen_device::queue_byte(uint8_t data)
 	m_tx_count++;
 }
 
-void cv1k_touchscreen_device::queue_report()
+INPUT_CHANGED_MEMBER(cv1k_touchscreen_device::input_changed)
 {
-	if (!BIT(m_touch->read(), 0))
+	if (!m_streaming)
+		return;
+
+	// Moving the pointer without touching doesn't produce a report.
+	if (param == INPUT_AXIS && !BIT(m_touch->read(), 0))
+		return;
+
+	// Several fields can change in the same frame, report them once.
+	m_report_timer->adjust(attotime::zero);
+}
+
+TIMER_CALLBACK_MEMBER(cv1k_touchscreen_device::report)
+{
+	if (!m_streaming)
+		return;
+
+	// Don't let reports pile up behind one that is still being sent,
+	// tra_complete() sends it once the queue has drained.
+	if (m_tx_count || !is_transmit_register_empty())
 	{
-		queue_byte(RSP_PEN_UP);
+		m_report_pending = true;
 		return;
 	}
+	m_report_pending = false;
 
-	const uint16_t x = m_touch_x->read() & 0x3ff;
-	const uint16_t y = m_touch_y->read() & 0x3ff;
+	if (BIT(m_touch->read(), 0))
+	{
+		const uint16_t x = m_touch_x->read() & 0x3ff;
+		const uint16_t y = m_touch_y->read() & 0x3ff;
 
-	LOGMASKED(LOG_REPORT, "report %03x, %03x\n", x, y);
+		LOGMASKED(LOG_REPORT, "report %03x, %03x\n", x, y);
 
-	queue_byte(RSP_PEN_DWN);
-	queue_byte((x >> 8) & 0x03);
-	queue_byte(x & 0xff);
-	queue_byte((y >> 8) & 0x03);
-	queue_byte(y & 0xff);
+		queue_byte(RSP_PEN_DWN);
+		queue_byte((x >> 8) & 0x03);
+		queue_byte(x & 0xff);
+		queue_byte((y >> 8) & 0x03);
+		queue_byte(y & 0xff);
+	}
+	else
+	{
+		LOGMASKED(LOG_REPORT, "pen up\n");
+		for (unsigned i = 0; i < RELEASE_PEN_UPS; i++)
+			queue_byte(RSP_PEN_UP);
+	}
+	start_transmit();
+
+	m_report_timer->adjust(attotime::from_msec(IDLE_REPORT_MSEC));
 }
 
 void cv1k_touchscreen_device::start_transmit()
 {
 	if (!is_transmit_register_empty())
 		return;
-
-	// The panel never lets the line go idle once it has been told to report.
-	if (!m_tx_count && m_streaming)
-		queue_report();
 
 	if (!m_tx_count)
 		return;
@@ -180,6 +221,8 @@ void cv1k_touchscreen_device::rcv_complete()
 	case CMD_RESET:
 		LOGMASKED(LOG_COMMAND, "reset\n");
 		m_streaming = false;
+		m_report_pending = false;
+		m_report_timer->adjust(attotime::never);
 		m_tx_head = m_tx_count = 0;
 		queue_byte(RSP_ACK);
 		break;
@@ -207,6 +250,7 @@ void cv1k_touchscreen_device::rcv_complete()
 	case CMD_STREAM:
 		LOGMASKED(LOG_COMMAND, "start reporting\n");
 		m_streaming = true;
+		m_report_timer->adjust(attotime::zero);
 		break;
 
 	default:
@@ -225,4 +269,7 @@ void cv1k_touchscreen_device::tra_callback()
 void cv1k_touchscreen_device::tra_complete()
 {
 	start_transmit();
+
+	if (!m_tx_count && m_report_pending)
+		m_report_timer->adjust(attotime::zero);
 }

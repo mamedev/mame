@@ -265,7 +265,7 @@ void sh7709_scif_device::scfcr_w(uint8_t data)
 
 uint16_t sh7709_scif_device::scfdr_r()
 {
-	return (uint16_t(m_rx_count) << 8) | m_tx_count;
+	return (uint16_t(m_tx_count) << 8) | m_rx_count;
 }
 
 
@@ -373,18 +373,18 @@ void sh7709_scif_device::rcv_complete()
 	if (!(m_scscr & SCSCR_RE))
 		return;
 
+	// The SCIF has no overrun error, data arriving while the FIFO is full is
+	// silently lost (SH7709S hardware manual 16.2.2).
+	if (m_rx_count >= FIFO_LENGTH)
+	{
+		LOGMASKED(LOG_ERROR, "receive FIFO full, dropping %02x\n", get_received_char());
+		return;
+	}
+
 	if (is_receive_framing_error())
 		m_scssr |= SCSSR_FER | SCSSR_ER;
 	if (is_receive_parity_error())
 		m_scssr |= SCSSR_PER | SCSSR_ER;
-
-	if (m_rx_count >= FIFO_LENGTH)
-	{
-		LOGMASKED(LOG_ERROR, "receive FIFO overrun, dropping %02x\n", get_received_char());
-		m_scssr |= SCSSR_ER;
-		update_interrupts();
-		return;
-	}
 
 	m_rx_fifo[(m_rx_head + m_rx_count) % FIFO_LENGTH] = get_received_char();
 	m_rx_count++;

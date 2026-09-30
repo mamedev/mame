@@ -223,7 +223,6 @@ public:
 		m_nand(*this, "nand"),
 		m_eeprom(*this, "eeprom"),
 		m_ymz770(*this, "ymz770"),
-		m_touchscreen(*this, "touchscreen"),
 		m_ram(*this, "mainram"),
 		m_rombase(*this, "maincpu"),
 		m_eepromout(*this, "EEPROMOUT"),
@@ -252,7 +251,6 @@ private:
 	required_device<samsung_k9f1g08u0m_device> m_nand;
 	required_device<rtc9701_device> m_eeprom;
 	required_device<ymz770_device> m_ymz770;
-	optional_device<cv1k_touchscreen_device> m_touchscreen;
 
 	required_shared_ptr<u64> m_ram;
 	required_region_ptr<u64> m_rombase;
@@ -622,9 +620,9 @@ void cv1k_state::cv1k_touch(machine_config &config)
 	cv1k(config);
 
 	// Touch panel on P5, wired to SCIF channel 2 of the SH3.
-	CV1K_TOUCHSCREEN(config, m_touchscreen, 4800);
-	m_touchscreen->txd_handler().set(m_maincpu, FUNC(sh3_base_device::scif_rxd_w));
-	m_maincpu->scif_txd_handler().set(m_touchscreen, FUNC(cv1k_touchscreen_device::rxd_w));
+	cv1k_touchscreen_device &touch(CV1K_TOUCHSCREEN(config, "touchscreen", 9600));
+	touch.txd_handler().set(m_maincpu, FUNC(sh7709s_device::scif_rxd_w));
+	m_maincpu->scif_txd_handler().set(touch, FUNC(cv1k_touchscreen_device::rxd_w));
 
 	config.set_default_layout(layout_cv1k_touch);
 }
