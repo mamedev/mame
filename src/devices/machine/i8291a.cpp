@@ -688,7 +688,6 @@ void i8291a_device::handle_command()
 		} else {
 			update_state(m_lp_state, listener_primary_state::LPIS);
 			update_state(m_l_state, listener_state::LIDS);
-			m_address_status &= ~(REG_ADDRESS_STATUS_MJMN);
 		}
 
 		if (addr_matched && (m_address_mode & 3) == 1 && m_rl_state == remote_local_state::LWLS)
