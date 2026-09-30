@@ -73,6 +73,7 @@ private:
 	bool m_dir;
 	bool m_dor;
 	bool m_si;
+	bool m_input_pending;
 	bool m_so;
 };
 
