@@ -203,14 +203,16 @@ void i8291a_device::device_start()
 
 uint8_t i8291a_device::din_r()
 {
-	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, m_din);
+	// Removing the byte releases the handshake (p. 3-8); in this model the next byte can be latched before the read returns
+	const uint8_t data = m_din;
+	LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, data);
 	if (!machine().side_effects_disabled()) {
 		m_din_flag = false;
 		m_ints1 &= ~REG_INTS1_BI;
 		update_int();
 		run_fsm();
 	}
-	return m_din;
+	return data;
 }
 
 void i8291a_device::update_int()
@@ -762,7 +764,8 @@ void i8291a_device::run_ah_fsm()
 		m_cpt_flag = false;
 		m_apt_flag = false;
 		//LOG("m_rdy: %d m_cpt_flag: %d m_apt_flag: %d, m_din_flag %d\n", m_rdy, m_cpt_flag, m_apt_flag, m_din_flag);
-		if (m_atn || m_rdy)
+		// F3 = ATN + rdy as a level; m_rdy is only recomputed after this pass
+		if (m_atn || rdy())
 			update_state(m_ah_state, acceptor_handshake_state::ACRS);
 		break;
 
@@ -780,6 +783,8 @@ void i8291a_device::run_ah_fsm()
 		break;
 	case acceptor_handshake_state::ACDS:
 
+		// TODO: T3' (Figure A-1): m_rdy is from the previous pass, so once VALID or NON-VALID clears the flag this
+		// moves to AWNS instead of re-reading the command byte; re-running the FSM when m_rdy changes stops hp9816a booting
 		if (!m_rdy) {
 			update_state(m_ah_state, acceptor_handshake_state::AWNS);
 			break;
@@ -1032,7 +1037,7 @@ void i8291a_device::run_fsm()
 				(m_rl_state_old == remote_local_state::RWLS && m_rl_state == remote_local_state::REMS))
 			m_ints2 |= REG_INTS2_REMC;
 
-		m_rdy = !m_apt_flag && !m_cpt_flag && !m_din_flag;
+		m_rdy = rdy();
 		update_int();
 	} while (m_state_changed);
 	m_ignore_ext_signals = false;
