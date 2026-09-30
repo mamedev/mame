@@ -628,7 +628,7 @@ void mcs51_cpu_device::transmit_receive(int source)
 
 	switch (mode)
 	{
-		// 8 bit shift register - rate set by clock freq / 12
+		// 8 bit shifter - rate set by clock freq / 12
 		case 0:
 			if (source == 0)
 				transmit_receive_mode0();
