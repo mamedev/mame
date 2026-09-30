@@ -37419,6 +37419,9 @@ ecssi5pi
 @source:pc/champ2.cpp
 champ2
 
+@source:pc/cmultigame.cpp
+cmultigame
+
 @source:pc/compc.cpp
 compc10
 pc10iii
