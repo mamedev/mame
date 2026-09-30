@@ -143,7 +143,7 @@ void menu_main::populate()
 	if (cassette_device_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("menu-main", "Tape Control"), 0, (void *)TAPE_CONTROL);
 
-	if (cd_player_device_enumerator(machine().root_device()).first() != nullptr)
+	if (cd_player_interface_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("menu-main", "CD Player Control"), 0, (void *)CD_CONTROL);
 
 	if (pty_interface_enumerator(machine().root_device()).first() != nullptr)

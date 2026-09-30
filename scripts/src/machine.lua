@@ -41,8 +41,6 @@ files {
 	MAME_DIR .. "src/devices/imagedev/cartrom.h",
 	MAME_DIR .. "src/devices/imagedev/cassette.cpp",
 	MAME_DIR .. "src/devices/imagedev/cassette.h",
-	MAME_DIR .. "src/devices/imagedev/cdplayer.cpp",
-	MAME_DIR .. "src/devices/imagedev/cdplayer.h",
 	MAME_DIR .. "src/devices/imagedev/cdromimg.cpp",
 	MAME_DIR .. "src/devices/imagedev/cdromimg.h",
 	MAME_DIR .. "src/devices/imagedev/diablo.cpp",
