@@ -430,7 +430,7 @@ void news_38xx_state::iop_map(address_map &map)
 
 	map(0x2e000000, 0x2eefffff).r(FUNC(news_38xx_state::iop_bus_error_r)).mirror(0x10000000); // Expansion I/O
 
-	// NWB-512 Monochrome Framebuffer (816x1024)
+	// NWB-512 Monochrome Framebuffer
 	map(0x2ef00000, 0x2effffff).m(m_fb, FUNC(nwb_512_device::map));
 }
 
@@ -1016,7 +1016,7 @@ ROM_END
 
 INPUT_PORTS_START(nws3860)
 	PORT_START("SW1")
-	PORT_DIPNAME(0x07000000, 0x07000000, "Display") PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME(0x07000000, 0x03000000, "Display") PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(0x07000000, "Console")
 	PORT_DIPSETTING(0x06000000, "NWB-225A")
 	PORT_DIPSETTING(0x03000000, "NWB-512")

@@ -546,9 +546,9 @@ namespace
 		map(0x03000000, 0x0300ffff).rom().region("eprom", 0).mirror(0x007f0000);
 
 		// IOP bus expansion I/O
-		map(0x20000000, 0x20efffff).rw(FUNC(news_iop_state::extio_bus_error_r),FUNC(news_iop_state::extio_bus_error_w)).mirror(0x1f000000);
+		map(0x20000000, 0x20efffff).rw(FUNC(news_iop_state::extio_bus_error_r), FUNC(news_iop_state::extio_bus_error_w)).mirror(0x1f000000);
 
-		// NWB-512 Monochrome Framebuffer (816x1024)
+		// NWB-512 Monochrome Framebuffer
 		map(0x20f00000, 0x20ffffff).m(m_fb, FUNC(nwb_512_device::map));
 
 		// Expansion slot SCC (bus errors here kill iopboot, so the probe process may not use bus errors, at least not with the same setup as extio)
@@ -1096,7 +1096,7 @@ namespace
 
 	static INPUT_PORTS_START(nws8xx)
 		PORT_START("FRONT_PANEL")
-			PORT_DIPNAME(0x07, 0x07, "Display")
+			PORT_DIPNAME(0x07, 0x03, "Display")
 				PORT_DIPLOCATION("FRONT_PANEL:1,2,3")
 				PORT_DIPSETTING(0x07, "Console")
 				PORT_DIPSETTING(0x06, "NWB-225A")

@@ -32,8 +32,9 @@
 
 #define LOG_ROP_CONFIG 1 << 1
 #define LOG_ROP 1 << 2
+#define LOG_CTRL 1 << 3
 
-#define VERBOSE (LOG_GENERAL | LOG_ROP_CONFIG | LOG_ROP)
+#define VERBOSE (LOG_CTRL|LOG_ROP_CONFIG)
 #include "logmacro.h"
 
 #include <format>
@@ -642,13 +643,13 @@ void nwb_512_device::ctrl_w(uint8_t data) // confirmed 8-bit write
 	// NWS-1580 uses a newer version of the framebuffer that uses a similar ROP engine, these definitions
 	// can be found in the NWS-1580 service manual.
 	const bool enabled = data & 0x1;
-	LOG("Write FB control = 0x%x (%s)\n", data, machine().describe_context());
-	LOG("\t%s framebuffer\n", enabled ? "enable" : "reset");
-	LOG("\t%s kanji ROM\n", data & 0x2 ? "enable" : "disable"); // TODO: not for first-gen fb?
-	LOG("\t%s v-sync interrupt\n", data & 0x8 ? "enable" : "disable");
-	LOG("\t%s command completion interrupt\n", data & 0x10 ? "enable" : "disable");
-	LOG("\treserved %s\n", data & 0x20 ? "set" : "cleared");
-	LOG("\tdimmer setting = 0x%x\n", (data & 0xC0) >> 6);
+	LOGMASKED(LOG_CTRL, "Write FB control = 0x%x (%s)\n", data, machine().describe_context());
+	LOGMASKED(LOG_CTRL, "\t%s framebuffer\n", enabled ? "enable" : "reset");
+	LOGMASKED(LOG_CTRL, "\t%s kanji ROM\n", data & 0x2 ? "enable" : "disable"); // TODO: not for first-gen fb?
+	LOGMASKED(LOG_CTRL, "\t%s v-sync interrupt\n", data & 0x8 ? "enable" : "disable");
+	LOGMASKED(LOG_CTRL, "\t%s command completion interrupt\n", data & 0x10 ? "enable" : "disable");
+	LOGMASKED(LOG_CTRL, "\treserved %s\n", data & 0x20 ? "set" : "cleared");
+	LOGMASKED(LOG_CTRL, "\tdimmer setting = 0x%x\n", (data & 0xC0) >> 6);
 
 	m_state.ctrl = data;
 	if (!enabled)
