@@ -55,7 +55,7 @@ public:
 	{
 	}
 
-	void fsa1st(machine_config &config);
+	void fsa1st(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

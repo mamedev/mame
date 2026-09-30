@@ -171,7 +171,6 @@ protected:
 	};
 
 	// overrides
-	virtual void driver_start() override;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
@@ -1059,7 +1058,7 @@ static void attache_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-void attache_state::driver_start()
+void attache_state::machine_start()
 {
 	uint8_t *RAM = m_ram->pointer();
 
@@ -1091,10 +1090,7 @@ void attache_state::driver_start()
 	save_pointer(m_attr_ram,"Attribute RAM",128*32);
 	save_pointer(m_gfx_ram,"Graphics RAM",128*32*5);
 	save_pointer(m_cmos_ram,"CMOS RAM",64);
-}
 
-void attache_state::machine_start()
-{
 	// initialise RAM
 	memset(m_cmos_ram,0,64);
 	memset(m_attr_ram,0,128*32);

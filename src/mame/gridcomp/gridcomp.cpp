@@ -40,7 +40,6 @@
 
     to do:
 
-    - EAROM (X2210D)
     - modem (incl. DTMF generator)
     - proper serial port connection (incl. PAL 16R4 300135-02)
     - proper custom DMA logic timing
@@ -113,6 +112,7 @@ public:
 		, m_ram(*this, RAM_TAG)
 		, m_tms9914(*this, "hpib")
 		, m_keyboard(*this, "keyboard")
+		, m_machine_id_rom(*this, "machine_id_rom")
 		, m_test_rom(*this, "test_rom")
 		, m_app_roms(*this, "app_rom%u", 0U)
 	{ }
@@ -139,6 +139,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<tms9914_device> m_tms9914;
 	required_device<grid_keyboard_device> m_keyboard;
+	required_device<gridrom_socket_device> m_machine_id_rom;
 	required_device<gridrom_socket_device> m_test_rom;
 	optional_device_array<gridrom_socket_device, 4> m_app_roms;
 
@@ -156,6 +157,9 @@ private:
 
 	void grid_dma_w(offs_t offset, uint8_t data);
 	uint8_t grid_dma_r(offs_t offset);
+
+	void grid_rtc_w(offs_t offset, uint8_t data);
+	uint8_t grid_rtc_machine_id_r(offs_t offset);
 
 	void split_board_w(offs_t offset, uint8_t data);
 
@@ -225,6 +229,24 @@ uint8_t gridcomp_state::grid_dma_r(offs_t offset)
 	int ret = m_tms9914->read(7);
 	// LOG("DMA %02x == %02x\n", offset, ret);
 	return ret;
+}
+
+
+void gridcomp_state::grid_rtc_w(offs_t offset, uint8_t data)
+{
+	m_rtc->write(offset, data);
+}
+
+uint8_t gridcomp_state::grid_rtc_machine_id_r(offs_t offset)
+{
+	uint8_t const machine_id_byte = m_machine_id_rom->read(offset >> 1);
+	uint8_t const machine_id_nibble = BIT(offset, 0)
+		? (machine_id_byte & 0xf0)
+		: ((machine_id_byte & 0x0f) << 4);
+
+	uint8_t const rtc_nibble = m_rtc->read(offset) & 0x0f;
+
+	return machine_id_nibble | rtc_nibble;
 }
 
 void gridcomp_state::split_board_w(offs_t offset, uint8_t data)
@@ -333,7 +355,7 @@ void gridcomp_state::grid1101_map(address_map &map)
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
 	map(0xdfec0, 0xdfecf).rw(FUNC(gridcomp_state::grid_modem_r), FUNC(gridcomp_state::grid_modem_w)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff00, 0xdff1f).rw(m_uart8274, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
-	map(0xdff40, 0xdff5f).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write)).umask16(0xff00);
+	map(0xdff40, 0xdff5f).rw(FUNC(gridcomp_state::grid_rtc_machine_id_r), FUNC(gridcomp_state::grid_rtc_w)).umask16(0xff00);
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::read), FUNC(tms9914_device::write)).umask16(0x00ff);
 	map(0xdffc0, 0xdffcf).rw(m_keyboard, FUNC(grid_keyboard_device::read), FUNC(grid_keyboard_device::write)).umask16(0x00ff); // Intel 8741 MCU
 	map(0xe0000, 0xeffff).rw(FUNC(gridcomp_state::grid_dma_r), FUNC(gridcomp_state::grid_dma_w)); // DMA
@@ -354,7 +376,7 @@ void gridcomp_state::grid1121_map(address_map &map)
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
 	map(0xdfec0, 0xdfecf).rw(FUNC(gridcomp_state::grid_modem_r), FUNC(gridcomp_state::grid_modem_w)).umask16(0x00ff); // incl. DTMF generator
 	map(0xdff00, 0xdff1f).rw(m_uart8274, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
-	map(0xdff40, 0xdff5f).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write)).umask16(0xff00);
+	map(0xdff40, 0xdff5f).rw(FUNC(gridcomp_state::grid_rtc_machine_id_r), FUNC(gridcomp_state::grid_rtc_w)).umask16(0xff00);
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::read), FUNC(tms9914_device::write)).umask16(0x00ff);
 	map(0xdffc0, 0xdffcf).rw(m_keyboard, FUNC(grid_keyboard_device::read), FUNC(grid_keyboard_device::write)).umask16(0x00ff); // Intel 8741 MCU
 	map(0xfc000, 0xfffff).rom().region("user1", 0);
@@ -463,6 +485,10 @@ void gridcomp_state::grid1101(machine_config &config)
 	I8255(config, "modem");
 
 	RAM(config, m_ram).set_default_size("256K").set_default_value(0);
+
+	GRIDROM_SOCKET(config, m_machine_id_rom, gridrom_slot, "machine_id_rom");
+	m_machine_id_rom->set_image_names("machine-id-rom", "machine-id-rom");
+	m_machine_id_rom->set_acceptable_sizes({8});
 
 	// It is unknown how much address space is allocated for the test ROM on real Compass.
 	// Based on the assumption that the test ROM should be no larger than 64KB (C000:0 to CFFF:F),

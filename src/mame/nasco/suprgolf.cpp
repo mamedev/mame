@@ -665,6 +665,7 @@ void suprgolf_state::init_suprgolf()
 {
 	uint8_t *ROM = memregion("user2")->base();
 
+	// HACK: stuff not understood with the RMW plane
 	ROM[0x74f4-0x4000] = 0x00;
 	ROM[0x74f5-0x4000] = 0x00;
 	ROM[0x74fa+(0x4000*3)-0x4000] = 0x20; // patch ROM check
@@ -674,6 +675,7 @@ void suprgolf_state::init_suprgolfj()
 {
 	uint8_t *ROM = memregion("user2")->base();
 
+	// HACK: stuff not understood with the RMW plane
 	ROM[0x74f4-0x4000] = 0x00;
 	ROM[0x74f5-0x4000] = 0x00;
 	ROM[0x6d72+(0x4000*3)-0x4000] = 0x20; // patch ROM check

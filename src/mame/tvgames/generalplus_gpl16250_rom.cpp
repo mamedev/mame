@@ -862,7 +862,9 @@ void gameu_handheld_game_state::init_gameu50()
 {
 	init_gameu();
 
-	// why do we need these? it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise, which can't be correct
+	// HACK: why do we need these?
+	// it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise,
+	// which can't be correct
 	u16 *ROM = (u16*)memregion("maincpu")->base();
 	int base = 0x19c9a;
 	ROM[(base + 0x00) / 2] = 0xf165;
@@ -884,7 +886,9 @@ void gameu_handheld_game_state::init_gameu108()
 
 	u16 *ROM = (u16*)memregion("maincpu")->base();
 
-	// why do we need these? it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise, which can't be correct
+	// HACK: why do we need these?
+	// it will jump to 0 after the menu selection (prior to fadeout and bank select) otherwise,
+	// which can't be correct
 	ROM[(0x1aa48) / 2] = 0xf165;
 	ROM[(0x1aa4a) / 2] = 0xf165;
 	ROM[(0x1aa4c) / 2] = 0xf165;

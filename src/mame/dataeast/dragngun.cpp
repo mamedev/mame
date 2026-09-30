@@ -1734,6 +1734,7 @@ void dragngun_state::init_dragngun()
 {
 	dragngun_init_common();
 
+	// TODO: get rid of this patch
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
 	ROM[0x01b32c/4] = 0xe1a00000; // bl $ee000: NOP test switch lock
 }
@@ -1742,6 +1743,7 @@ void dragngun_state::init_dragngunj()
 {
 	dragngun_init_common();
 
+	// TODO: get rid of this patch
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
 	ROM[0x01a1b4/4] = 0xe1a00000; // bl $ee000: NOP test switch lock
 }

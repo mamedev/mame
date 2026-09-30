@@ -563,13 +563,13 @@ void adsp21xx_device::device_start()
 	state_add(ADSP2100_SR1_SEC, "SR1_SEC",   m_alt.sr.srx.sr1.u);
 
 	for (int ireg = 0; ireg < 8; ireg++)
-		state_add(ADSP2100_I0 + ireg, string_format("I%d", ireg).c_str(), m_i[ireg]).mask(0x3fff).callimport();
+		state_add(ADSP2100_I0 + ireg, string_format("I%d", ireg), m_i[ireg]).mask(0x3fff).callimport();
 
 	for (int lreg = 0; lreg < 8; lreg++)
-		state_add(ADSP2100_L0 + lreg, string_format("L%d", lreg).c_str(), m_l[lreg]).mask(0x3fff).callimport();
+		state_add(ADSP2100_L0 + lreg, string_format("L%d", lreg), m_l[lreg]).mask(0x3fff).callimport();
 
 	for (int mreg = 0; mreg < 8; mreg++)
-		state_add(ADSP2100_M0 + mreg, string_format("M%d", mreg).c_str(), m_m[mreg]).signed_mask(0x3fff);
+		state_add(ADSP2100_M0 + mreg, string_format("M%d", mreg), m_m[mreg]).signed_mask(0x3fff);
 
 	state_add(ADSP2100_PX,      "PX",        m_px);
 	state_add(ADSP2100_CNTR,    "CNTR",      m_cntr).mask(0x3fff);
@@ -586,7 +586,7 @@ void adsp21xx_device::device_start()
 	state_add(ADSP2100_ICNTL,   "ICNTL",     m_icntl).mask(0x1f).callimport();
 
 	for (int irqnum = 0; irqnum < 4; irqnum++)
-		state_add(ADSP2100_IRQSTATE0 + irqnum, string_format("IRQ%d", irqnum).c_str(), m_irq_state[irqnum]).mask(1).callimport();
+		state_add(ADSP2100_IRQSTATE0 + irqnum, string_format("IRQ%d", irqnum), m_irq_state[irqnum]).mask(1).callimport();
 
 	state_add(ADSP2100_FLAGIN,  "FLAGIN",    m_flagin).mask(1);
 	state_add(ADSP2100_FLAGOUT, "FLAGOUT",   m_flagout).mask(1);

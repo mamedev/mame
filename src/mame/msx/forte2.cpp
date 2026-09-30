@@ -59,8 +59,8 @@ public:
 		m_inputs(*this, "IN0")
 	{ }
 
-	void init_pesadelo();
-	void pesadelo(machine_config &config);
+	void init_pesadelo() ATTR_COLD;
+	void pesadelo(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

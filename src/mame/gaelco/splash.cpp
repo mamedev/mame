@@ -746,6 +746,7 @@ void roldfrog_state::init_rebus()
 {
 	init_roldfrog();
 
+	// HACK: unemulated copy protection
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	m_sprite_attr2_shift = 0;

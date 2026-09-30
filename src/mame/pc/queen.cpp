@@ -50,7 +50,7 @@ public:
 	{
 	}
 
-	void queen(machine_config &config);
+	void queen(machine_config &config) ATTR_COLD;
 
 private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;

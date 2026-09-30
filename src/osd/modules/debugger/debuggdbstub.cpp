@@ -1051,7 +1051,7 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 				if ( reg.state_name != nullptr )
 				{
 					for ( const auto &entry: m_state->state_entries() )
-						if ( strcmp(entry->symbol(), reg.state_name) == 0 )
+						if ( entry->symbol() == reg.state_name )
 						{
 							entry_found = entry.get();
 							break;
@@ -1371,6 +1371,8 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_M(const char *buf)
 	for ( int i = 0; i < length; i++ )
 		tspace->write_byte(offset + i, data[i]);
 
+	m_machine->debugger().refresh_display();
+
 	return REPLY_OK;
 }
 
@@ -1439,6 +1441,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 		text_buffer &textbuf = m_debugger_console->get_console_textbuf();
 		text_buffer_clear(textbuf);
 		m_debugger_console->execute_command(command, false);
+		m_machine->debugger().refresh_display();
 		uint32_t nlines = text_buffer_num_lines(textbuf);
 		if ( nlines == 0 )
 			return REPLY_OK;

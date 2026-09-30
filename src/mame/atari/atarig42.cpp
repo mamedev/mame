@@ -605,7 +605,7 @@ void atarig42_0x200_state::atarig42_0x200(machine_config &config)
 	m_adc->in_callback<1>().set_ioport("A2D1");
 
 	/* ASIC65 */
-	ASIC65(config, m_asic65, ASIC65_ROMBASED);
+	ASIC65(config, m_asic65, 20'000'000, ASIC65_ROMBASED);
 }
 
 void atarig42_0x400_state::atarig42_0x400(machine_config &config)
@@ -614,7 +614,7 @@ void atarig42_0x400_state::atarig42_0x400(machine_config &config)
 	ATARI_RLE_OBJECTS(config, m_rle, modesc_0x400);
 
 	/* ASIC65 */
-	ASIC65(config, m_asic65, ASIC65_GUARDIANS);
+	ASIC65(config, m_asic65, 20'000'000, ASIC65_GUARDIANS);
 }
 
 

@@ -1084,7 +1084,7 @@ public:
 
 	static const boot_state_info boot_state_infos_award[];
 
-	void nforcepc(machine_config &config);
+	void nforcepc(machine_config &config) ATTR_COLD;
 
 	nforcepc_state(const machine_config &mconfig, device_type type, const char *tag);
 

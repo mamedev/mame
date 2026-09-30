@@ -64,13 +64,8 @@ The CD-Rom is MKE-style, akin to CDTV CR-511B and Creative Soundblaster a.k.a. S
 */
 
 #include "emu.h"
+
 #include "3do.h"
-
-#include "cpu/arm7/arm7.h"
-
-#include "debugger.h"
-#include "screen.h"
-
 
 
 

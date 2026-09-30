@@ -6,17 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    http://www.6502.org/users/sjgray/computer/hsg/index.html
-
-    - version A (EF9365, 512x512 interlaced, 1 page)
-    - version B (EF9366, 512x256 non-interlaced, 2 pages)
-
-*/
-
 #include "emu.h"
 #include "hsg.h"
 
@@ -72,7 +61,7 @@ const tiny_rom_entry *cbm8000_hsg_device::device_rom_region() const
 void cbm8000_hsg_a_device::hsg_a_map(address_map &map)
 {
 	map.global_mask(0x7fff);
-	map(0x0000, 0x7fff).ram();
+	map(0x0000, 0x7fff).ram().share("vram");
 }
 
 
@@ -83,7 +72,7 @@ void cbm8000_hsg_a_device::hsg_a_map(address_map &map)
 void cbm8000_hsg_b_device::hsg_b_map(address_map &map)
 {
 	map.global_mask(0x3fff);
-	map(0x0000, 0x3fff).ram();
+	map(0x0000, 0x3fff).rw(FUNC(cbm8000_hsg_b_device::vram_r), FUNC(cbm8000_hsg_b_device::vram_w));
 }
 
 
@@ -94,11 +83,11 @@ void cbm8000_hsg_b_device::hsg_b_map(address_map &map)
 void cbm8000_hsg_a_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
-	screen.set_screen_update(EF9365_TAG, FUNC(ef9365_device::screen_update));
+	screen.set_screen_update(FUNC(cbm8000_hsg_a_device::screen_update));
 	screen.set_size(512, 512);
 	screen.set_visarea(0, 512-1, 0, 512-1);
 	screen.set_refresh_hz(25);
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	PALETTE(config, m_palette, palette_device::MONOCHROME_INVERTED);
 
 	EF9365(config, m_gdc, 1750000);
 	m_gdc->set_screen(SCREEN_TAG);
@@ -111,11 +100,11 @@ void cbm8000_hsg_a_device::device_add_mconfig(machine_config &config)
 void cbm8000_hsg_b_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
-	screen.set_screen_update(EF9366_TAG, FUNC(ef9365_device::screen_update));
+	screen.set_screen_update(FUNC(cbm8000_hsg_b_device::screen_update));
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-1);
 	screen.set_refresh_hz(50);
-	PALETTE(config, "palette", palette_device::MONOCHROME);
+	PALETTE(config, m_palette, palette_device::MONOCHROME_INVERTED);
 
 	EF9365(config, m_gdc, 1750000); //EF9366
 	m_gdc->set_screen(SCREEN_TAG);
@@ -139,6 +128,9 @@ cbm8000_hsg_device::cbm8000_hsg_device(const machine_config &mconfig, device_typ
 	device_t(mconfig, type, tag, owner, clock),
 	device_pet_expansion_card_interface(mconfig, *this),
 	m_gdc(*this, EF9365_TAG),
+	m_palette(*this, "palette"),
+	m_vram(*this, "vram", 0x8000, ENDIANNESS_LITTLE),
+	m_mode(0),
 	m_9000(*this, "9000"),
 	m_a000(*this, "a000")
 {
@@ -161,6 +153,7 @@ cbm8000_hsg_b_device::cbm8000_hsg_b_device(const machine_config &mconfig, const 
 
 void cbm8000_hsg_device::device_start()
 {
+	save_item(NAME(m_mode));
 }
 
 
@@ -171,93 +164,65 @@ void cbm8000_hsg_device::device_start()
 void cbm8000_hsg_device::device_reset()
 {
 	m_gdc->reset();
+
+	m_mode = 0;
+
+	auto &view = m_slot->window()[0];
+	view.install_rom(0x9000, 0x9fff, m_9000->base());
+	view.install_rom(0xa000, 0xaeff, m_a000->base());
+	view.nop_readwrite(0xaf00, 0xafff);
+	view.install_write_handler(0xaf00, 0xaf00, write8smo_delegate(*this, FUNC(cbm8000_hsg_device::mode_w)));
+	view.install_readwrite_handler(0xaf70, 0xaf7f,
+		read8sm_delegate(*m_gdc, FUNC(ef9365_device::data_r)),
+		write8sm_delegate(*m_gdc, FUNC(ef9365_device::data_w)));
+	m_slot->window().select(0);
 }
 
 
 //-------------------------------------------------
-//  pet_norom_r - NO ROM read
+//  screen_update -
 //-------------------------------------------------
 
-int cbm8000_hsg_device::pet_norom_r(offs_t offset, int sel)
+uint32_t cbm8000_hsg_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return !(offset >= 0x9000 && offset < 0xaf00);
+	pen_t const *const pen = m_palette->pens();
+	offs_t const base = display_base();
+
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			uint8_t const data = m_vram[(base + (y << 6) + (x >> 3)) & 0x7fff];
+
+			bitmap.pix(y, x) = pen[BIT(data, ~x & 7)];
+		}
+	}
+
+	return 0;
 }
 
 
 //-------------------------------------------------
-//  pet_bd_r - buffered data read
+//  vram_r -
 //-------------------------------------------------
 
-uint8_t cbm8000_hsg_device::pet_bd_r(offs_t offset, uint8_t data, int &sel)
+uint8_t cbm8000_hsg_b_device::vram_r(offs_t offset)
 {
-	switch (sel)
-	{
-	case pet_expansion_slot_device::SEL9:
-		data = m_9000->base()[offset & 0xfff];
-		break;
-
-	case pet_expansion_slot_device::SELA:
-		if (offset < 0xaf00)
-		{
-			data = m_a000->base()[offset & 0xfff];
-		}
-		else if (offset == 0xaf10)
-		{
-			/*
-
-			    bit     description
-
-			    0       light pen
-			    1
-			    2
-			    3
-			    4
-			    5
-			    6
-			    7
-
-			*/
-		}
-		else if (offset == 0xad30)
-		{
-			// hard copy
-		}
-		else if (offset >= 0xaf70 && offset < 0xaf80)
-		{
-			data = m_gdc->data_r(offset & 0x0f);
-		}
-		break;
-	}
-
-	return data;
+	return m_vram[BIT(m_mode, 1) << 14 | offset];
 }
 
 
 //-------------------------------------------------
-//  pet_bd_w - buffered data write
+//  vram_w -
 //-------------------------------------------------
 
-void cbm8000_hsg_device::pet_bd_w(offs_t offset, uint8_t data, int &sel)
+void cbm8000_hsg_b_device::vram_w(offs_t offset, uint8_t data)
 {
-	if (offset == 0xaf00)
-	{
-		/*
+	m_vram[BIT(m_mode, 1) << 14 | offset] = data;
+}
 
-		    bit     description
 
-		    0       hard copy (0=active)
-		    1       operating page select (version B)
-		    2
-		    3       read-modify-write (1=active)
-		    4       display switch (1=graphic)
-		    5       display page select (version B)
-		    6
-		    7
-
-		*/
-	}
-	else if (offset >= 0xaf70 && offset < 0xaf80)
-	{
-		m_gdc->data_w(offset & 0x0f, data);
-	}
+void cbm8000_hsg_device::mode_w(uint8_t data)
+{
+	m_mode = data;
 }

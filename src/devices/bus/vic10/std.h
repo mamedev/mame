@@ -31,10 +31,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
-
-	// device_vic10_expansion_card_interface overrides
-	virtual uint8_t vic10_cd_r(offs_t offset, uint8_t data, int lorom, int uprom, int exram) override;
-	virtual void vic10_cd_w(offs_t offset, uint8_t data, int lorom, int uprom, int exram) override;
+	virtual void device_reset() override ATTR_COLD;
 };
 
 

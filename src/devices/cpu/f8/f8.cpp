@@ -152,7 +152,7 @@ void f8_cpu_device::device_start()
 
 	u8 *regs = static_cast<u8 *>(memshare("regs")->ptr());
 	for (int r = 0; r < 9; r++)
-		state_add(F8_R0 + r, string_format("R%d", r).c_str(), regs[r]);
+		state_add(F8_R0 + r, string_format("R%d", r), regs[r]);
 	state_add(F8_J, "J", regs[9]);
 	state_add<u16>(F8_H, "H",
 		[regs]() { return u16(regs[10]) << 8 | regs[11]; },

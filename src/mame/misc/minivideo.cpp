@@ -27,8 +27,9 @@
 */
 
 #include "emu.h"
+#include "cpu/h8/h8325.h"
+
 #include "emupal.h"
-#include "cpu/h8/h83002.h"
 #include "screen.h"
 
 
@@ -92,7 +93,7 @@ void minivideo_state::machine_reset()
 
 void minivideo_state::minivideo(machine_config &config)
 {
-	H83002(config, m_maincpu, 20_MHz_XTAL);  // TODO: correct CPU type, should be HD6473258P10 (H8/325); unknown divider
+	H8325(config, m_maincpu, 20_MHz_XTAL);
 
 	// all wrong
 	screen_device& screen(SCREEN(config, "screen"));

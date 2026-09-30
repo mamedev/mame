@@ -808,7 +808,7 @@ void sammymdl_state::init_animalc()
 {
 	u8 *rom = memregion("mainbios")->base();
 
-	// video timing loops
+	// HACK: video timing loops
 	rom[0x015d9] = 0x00;
 	rom[0x015da] = 0x00;
 	rom[0x01605] = 0x00;
@@ -816,7 +816,7 @@ void sammymdl_state::init_animalc()
 	rom[0x01750] = 0x00;
 	rom[0x01751] = 0x00;
 
-	// force jump out of BIOS loop
+	// HACK: force jump out of BIOS loop
 	rom[0x005ac] = 0xc3;
 }
 
@@ -881,7 +881,7 @@ void sammymdl_state::init_itazuram()
 {
 	u8 *rom = memregion("mainbios")->base();
 
-	// force jump out of BIOS loop
+	// HACK: force jump out of BIOS loop
 	rom[0x005ac] = 0xc3;
 }
 
@@ -983,7 +983,7 @@ void sammymdl_state::init_haekaka()
 {
 	u8 *rom = memregion("mainbios")->base();
 
-	// force jump out of BIOS loop
+	// HACK: force jump out of BIOS loop
 	rom[0x005ac] = 0xc3;
 }
 

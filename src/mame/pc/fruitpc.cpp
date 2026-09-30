@@ -45,7 +45,7 @@ public:
 		, m_inp(*this, "INP%u", 1U)
 	{ }
 
-	void fruitpc(machine_config &config);
+	void fruitpc(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<pci_root_device> m_pciroot;

@@ -91,7 +91,26 @@ void wdxt_gen_device::drq3_w(int state)
 
 uint8_t wdxt_gen_device::rd322_r()
 {
-	return 0xff;
+    return 0xf3 | m_config->read();
+}
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+static INPUT_PORTS_START( wdxt_gen )
+    PORT_START("CONFIG")
+    PORT_CONFNAME(0x0c, 0x0c, "Hard Disk Type")
+    PORT_CONFSETTING(0x00, "733 cylinders, 5 heads")
+    PORT_CONFSETTING(0x04, "640 cylinders, 6 heads")
+    PORT_CONFSETTING(0x08, "306 cylinders, 4 heads (10 MB)")
+    PORT_CONFSETTING(0x0c, "615 cylinders, 4 heads (20 MB)")
+INPUT_PORTS_END
+
+ioport_constructor wdxt_gen_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( wdxt_gen );
 }
 
 
@@ -138,6 +157,7 @@ wdxt_gen_device::wdxt_gen_device(const machine_config &mconfig, const char *tag,
 	, m_host(*this, "u11")
 	, m_hdc(*this, "hdc")
 	, m_mcu(*this, "mcu")
+	, m_config(*this, "CONFIG")
 {
 }
 

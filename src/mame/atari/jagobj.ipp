@@ -587,7 +587,7 @@ uint32_t jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, int
 				break;
 
 			default:
-				fprintf(stderr, "Unhandled bitmap source depth = %d\n", depthlog);
+				popmessage("jagobj.ipp: Unhandled bitmap source depth = %d\n", depthlog);
 				break;
 		}
 
@@ -825,7 +825,7 @@ uint32_t jaguar_state::process_scaled_bitmap(uint16_t *scanline, uint32_t *objda
 				}
 
 				default:
-					fprintf(stderr, "Unhandled scaled bitmap source depth = %d\n", depthlog);
+					popmessage("jagobj.ipp: Unhandled scaled bitmap source depth = %d\n", depthlog);
 					break;
 			}
 		}
@@ -901,7 +901,7 @@ uint32_t jaguar_state::process_branch(uint32_t *objdata, u32 object_pointer, int
 			break;
 
 		default:
-			fprintf(stderr, "Invalid branch!\n");
+			popmessage("jagobj.ipp: Invalid branch!\n");
 			// OP treats any other branch type as a NOP
 			// - totalcar (which crashes anyway)
 			taken = 0;
@@ -1051,7 +1051,7 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 
 			// shouldn't happen
 			default:
-				fprintf(stderr, "jagobj: undocumented/illegal %08X %08X\n", objdata[0], objdata[1]);
+				popmessage("jagobj.ipp: undocumented/illegal %08X %08X\n", objdata[0], objdata[1]);
 				//done = 1;
 				object_pointer += 8;
 				break;

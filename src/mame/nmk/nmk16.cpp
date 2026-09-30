@@ -6253,7 +6253,7 @@ void nmk16_state::init_acrobatmbl()
     NEW: 4eb9 0000 3510
 */
 
-	// patch PIC protection for now. TODO: remove and hook up PIC once dumped
+	// HACK: patch PIC protection for now.
 	u16 *rom = (u16 *)memregion("maincpu")->base();
 	rom[0x6c8/2] = 0x0000;
 	rom[0x6ca/2] = 0x2d84;
@@ -6263,6 +6263,7 @@ void nmk16_state::init_acrobatmbl()
 
 void nmk16_state::init_macrossbl()
 {
+	// HACK: get rid of this
 	// the protection (?) does some calculation of the data it finds in the 0x98000 - 0x9bfff range
 	// and checks the result equals a hard-coded value (0xe400). Given it isn't known what the
 	// game expects there (maybe some part of the strange extra program ROMs), for now the expected

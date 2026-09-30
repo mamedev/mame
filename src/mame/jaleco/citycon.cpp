@@ -539,6 +539,7 @@ void citycon_state::init_citycon()
 {
 	uint8_t *rom = memregion("chars")->base();
 
+	// TODO: modernize video
 	/*
 	  City Connection controls the text color code for each _scanline_, not
 	  for each character as happens in most games. To handle that conveniently,

@@ -839,7 +839,7 @@ SYSTEM SUPER22 VIDEO(C) 8646962700 (8646972700)
   |               |-----| |-----| |-----| |-----|  |         |  |  |
   |   |---------|                                  |  C399   |  |--|
   |   |         |         |-----| |-----| |-----|  |         |   |
-  |   |  C387   |         |C400 | |C400 | |C400 |  |         |   |
+  |   |  C397   |         |C400 | |C400 | |C400 |  |         |   |
   |   |         |         |-----| |-----| |-----|  |---------|  |--|
 |--|  |         |                    |-----|            N341256 |  |
 |  |  |---------|                    |C406 |  |-----|   N341256 |  |
@@ -867,13 +867,11 @@ Notes:
       C361         : Namco custom C361 (QFP120)
       C374         : Namco custom C374 (QFP160)
       C381         : Namco custom C381 (x2, QFP144)
-      C387         : Namco custom C387 (QFP160)
       C395         : Namco custom C395 (QFP168)
+      C397         : Namco custom C397 (QFP160)
       C399         : Namco custom C399 (QFP160)
       C400         : Namco custom C400 (x4, QFP100)
-                     - x3 on 1st Revision
       C401         : Namco custom C401 (x4, QFP64)
-                     - x5 on 1st Revision
       C404         : Namco custom C404 (QFP208)
       C406         : Namco custom C406 (TQFP120)
       C407         : Namco custom C407 (QFP64) NOTE! On Revision A & B, this position is populated by an
@@ -3482,7 +3480,12 @@ static INPUT_PORTS_START( adillor )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	// enabled with DSW4-8; P1 Start becomes frame advance while paused
+	// not on the dev panel, but also not wired in the cabinet, so hidden behind
+	// the dev machine config
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_NAME("Dev Freeze Toggle")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("OPT.0")
 	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(0x100) PORT_KEYDELTA(0x10)
@@ -3518,7 +3521,12 @@ static INPUT_PORTS_START( adillor )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Right") // when in normal testmode, press this to enter the extra testmode
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Up")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Down")
-	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
+	// left/right above are the coarse step; these two are the fine step
+	// without them most fields cannot reach every value
+	// eg. in SPRITE CG TEST the CHR NO index moves by 8 with Right and by 1 with Fine Inc.
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Fine Dec")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Fine Inc")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x00)
 INPUT_PORTS_END
 
@@ -6322,7 +6330,7 @@ void propcycl_state::init_propcycl()
 {
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
 
-	// patch out strange routine (uninitialized-eeprom related?)
+	// HACK: patch out strange routine (uninitialized-eeprom related?)
 	// maybe needs more accurate 28C64 eeprom device emulation
 	ROM[0x1992c/4] = 0x4e754e75;
 
@@ -6344,7 +6352,7 @@ void propcycl_state::init_propcycl()
 
 void propcycl_state::init_propcyclj()
 {
-	// see init_propcycl for notes
+	// HACK: see init_propcycl for notes
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
 
 	ROM[0x1990a/4] = 0x4e754e75;

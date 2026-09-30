@@ -20,6 +20,10 @@
 #include "emu.h"
 #include "315-5881_crypt.h"
 
+#define VERBOSE (0)
+#include "logmacro.h"
+
+
 DEFINE_DEVICE_TYPE(SEGA315_5881_CRYPT, sega_315_5881_crypt_device, "sega315_5881", "Sega 315-5881 Encryption")
 
 // TODO: standard hookup doesn't work properly (causes a crash in LA Machine Gun)
@@ -128,14 +132,14 @@ void sega_315_5881_crypt_device::addrhi_w(offs_t offset, uint16_t data, uint16_t
 
 void sega_315_5881_crypt_device::subkey_le_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	logerror("subkey_le_w %08x (%08x)\n", data, mem_mask);
+	LOG("subkey_le_w %08x (%08x)\n", data, mem_mask);
 	set_subkey(data & 0xffff);
 }
 
 void sega_315_5881_crypt_device::subkey_be_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t subkey;
-	logerror("subkey_be_w %08x (%08x)\n", data, mem_mask);
+	LOG("subkey_be_w %08x (%08x)\n", data, mem_mask);
 	// endian swap the sub-key for big endian CPUs
 	subkey = ((data & 0xff00) >> 8) | ((data & 0x00ff) << 8);
 	set_subkey(subkey);

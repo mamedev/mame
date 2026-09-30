@@ -374,7 +374,7 @@ void xtensa_device::device_start()
 	state_add(XTENSA_LOOPCOUNT, "LoopCount", m_extreg_lcount);
 
 	for (int i = 0; i < 16; i++)
-		state_add(XTENSA_A0 + i, string_format("a%d", i).c_str(), m_a[i]);
+		state_add(XTENSA_A0 + i, string_format("a%d", i), m_a[i]);
 
 	save_item(NAME(m_a_real));
 	save_item(NAME(m_a));

@@ -60,17 +60,17 @@ public:
 	static const boot_state_info boot_state_infos_phoenix_ver40_rev6[];
 	static const boot_state_info boot_state_infos_award[];
 
-	void pcipc(machine_config &config);
-	void pcipcs7(machine_config &config);
-	void pcipctx(machine_config &config);
-	void pcinv3(machine_config &config);
-	void pciagp(machine_config &config);
-	void se440bx2(machine_config &config);
+	void pcipc(machine_config &config) ATTR_COLD;
+	void pcipcs7(machine_config &config) ATTR_COLD;
+	void pcipctx(machine_config &config) ATTR_COLD;
+	void pcinv3(machine_config &config) ATTR_COLD;
+	void pciagp(machine_config &config) ATTR_COLD;
+	void se440bx2(machine_config &config) ATTR_COLD;
 
 	pcipc_state(const machine_config &mconfig, device_type type, const char *tag);
 
 protected:
-	void x86_softlists(machine_config &config);
+	void x86_softlists(machine_config &config) ATTR_COLD;
 
 private:
 	void pcipc_map(address_map &map) ATTR_COLD;

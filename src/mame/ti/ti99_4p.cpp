@@ -174,9 +174,11 @@ public:
 		m_rom6_upper(false)
 	{ }
 
-	void ti99_4p_60hz(machine_config &config);
-	void driver_start() override;
-	void driver_reset() override;
+	void ti99_4p_60hz(machine_config &config) ATTR_COLD;
+
+protected:
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 private:
 	void ready_line(int state);
@@ -943,7 +945,7 @@ void ti99_4p_state::external_operation(offs_t offset, uint8_t data)
 
 /*****************************************************************************/
 
-void ti99_4p_state::driver_start()
+void ti99_4p_state::machine_start()
 {
 	m_peribox->senila(CLEAR_LINE);
 	m_peribox->senilb(CLEAR_LINE);
@@ -986,7 +988,7 @@ void ti99_4p_state::video_interrupt_in(int state)
 /*
     Reset the machine.
 */
-void ti99_4p_state::driver_reset()
+void ti99_4p_state::machine_reset()
 {
 	m_cpu->set_ready(ASSERT_LINE);
 	m_cpu->set_hold(CLEAR_LINE);

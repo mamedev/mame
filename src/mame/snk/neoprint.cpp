@@ -915,7 +915,8 @@ ROM_START( npeurver2 ) // NP 1.30 19970430 string
 	// c5-c8 not populated
 ROM_END
 
-/* FIXME: get rid of these two, probably something to do with irq3 and camera / printer devices */
+// FIXME: get rid of these patches
+// probably something to do with irq3 and camera / printer devices
 void neoprint_state::init_npcartv1()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();

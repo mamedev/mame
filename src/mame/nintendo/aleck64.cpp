@@ -1151,6 +1151,7 @@ void aleck64_state::init_aleck64()
 {
 	uint8_t *rom = memregion("user2")->base();
 
+	// HACK: what is this for?
 	rom[0x67c] = 0;
 	rom[0x67d] = 0;
 	rom[0x67e] = 0;

@@ -126,9 +126,15 @@
 
 
 DEFINE_DEVICE_TYPE(RAIDEN2COP, raiden2cop_device, "raiden2cop", "Seibu COP (Raiden 2)")
+DEFINE_DEVICE_TYPE(SEIBUCOP_V1, seibucop_v1_device, "seibucop_v1", "Seibu COP (Seibu Cup Soccer)")
 
 raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RAIDEN2COP, tag, owner, clock),
+	: raiden2cop_device(mconfig, RAIDEN2COP, tag, owner, clock, false)
+{
+}
+
+raiden2cop_device::raiden2cop_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool cupsoc)
+	: device_t(mconfig, type, tag, owner, clock),
 	cop_latch_addr(0),
 	cop_latch_trigger(0),
 	cop_latch_value(0),
@@ -178,7 +184,8 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 
 	m_videoramout_cb(*this),
 	m_paletteramout_cb(*this),
-	m_host_cpu(*this, finder_base::DUMMY_TAG)
+	m_host_cpu(*this, finder_base::DUMMY_TAG),
+	m_cupsoc_mode(cupsoc)
 {
 	memset(cop_func_trigger, 0, sizeof(uint16_t)*(0x100/8));
 	memset(cop_func_value, 0, sizeof(uint16_t)*(0x100/8));
@@ -192,6 +199,11 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *
 	memset(cop_itoa_digits, 0, sizeof(uint8_t)*10);
 
 	memset(cop_regs, 0, sizeof(uint32_t)*8);
+}
+
+seibucop_v1_device::seibucop_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: raiden2cop_device(mconfig, SEIBUCOP_V1, tag, owner, clock, true)
+{
 }
 
 
@@ -499,6 +511,7 @@ int raiden2cop_device::find_trigger_match(uint16_t triggerval, uint16_t mask)
 			{
 				if (triggerval == 0x0204 || triggerval == 0x0205 || triggerval == 0x0905 ||
 					triggerval == 0x130e || triggerval == 0x138e || triggerval == 0x118e ||
+					triggerval == 0x330e ||
 					triggerval == 0x3bb0 ||
 					triggerval == 0x42c2 ||
 					triggerval == 0x5105 || triggerval == 0x5905 ||
@@ -1472,6 +1485,30 @@ void raiden2cop_device::LEGACY_cop_cmd_w(offs_t offset, uint16_t data)
 		return;
 	}
 
+	/* 0x330e / 0x338e - same atan2 as the slot above, but the last microcode
+	   words use offset $38 instead of $34.
+	   Seibu Cup Soccer uploads this entry at ROM $00B828:
+	     338e 0005 bf7f 0030 | 0984 0aa4 0d82 0aa2 039c 0b9c 0b9c 0a9a
+	   Decoding 0x0aa4 and 0x0aa2 with the rule used by the disassembler above
+	   (reg = (word >> 5) & 3) gives register 1, while the sibling entry at
+	   $00B960 uses 0x0ac4/0x0ac2, that is register 2. Bit 10 of the trigger is
+	   clear in both, so there is no upper-register remapping: the chip reads
+	   cop_regs[1] here.
+	   The game issues 330e from a single site, $006C28, in the sliding tackle
+	   branch. The CPU fallback right after it ($006C3A) compares against the
+	   ball pointer, which suggests the programmer meant register 2, but the
+	   microcode table the game itself uploads is what the chip executes.
+	   No handler existed for this signature upstream, and legionna, heatbrl,
+	   godzilla, denjinmk and grainbow upload the same entry, so the branch is
+	   confined to cupsoc and leaves them untouched. */
+	if (m_cupsoc_mode &&
+		check_command_matches(command, 0x984, 0xaa4, 0xd82, 0xaa2, 0x39c, 0xb9c, 0xb9c, 0xa9a, 5, 0xbf7f))
+	{
+		executed = 1;
+		LEGACY_execute_130e_cupsoc(offset, data);
+		return;
+	}
+
 	/* Pythagorean theorem, hypotenuse direction - 130e / 138e */
 	//(heatbrl)  | 5 | bf7f | 138e | 984 aa4 d82 aa2 39b b9a b9a b9a
 	if (check_command_matches(command, 0x984, 0xaa4, 0xd82, 0xaa2, 0x39b, 0xb9a, 0xb9a, 0xb9a, 5, 0xbf7f))
@@ -1492,7 +1529,12 @@ void raiden2cop_device::LEGACY_cop_cmd_w(offs_t offset, uint16_t data)
 	if (check_command_matches(command, 0xf9c, 0xb9c, 0xb9c, 0xb9c, 0xb9c, 0xb9c, 0xb9c, 0x99c, 4, 0x007f))
 	{
 		executed = 1;
-		execute_3b30(offset, data);
+		// cupsoc consumes the dx/dy latched by the last angle command instead of
+		// recomputing them, which is what the TODO on execute_3b30 asks about.
+		if (m_cupsoc_mode)
+			execute_3b30_latched(offset, data);
+		else
+			execute_3b30(offset, data);
 		return;
 	}
 
@@ -1604,7 +1646,11 @@ void raiden2cop_device::LEGACY_cop_cmd_w(offs_t offset, uint16_t data)
 	if (check_command_matches(command, 0x984, 0xac4, 0xd82, 0xac2, 0x39b, 0xb9a, 0xb9a, 0xa9a, 5, 0xb07f))
 	{
 		executed = 1;
-		LEGACY_execute_e30e(offset, data);
+		// the _cupsoc variant latches dx/dy and lets the trigger length decide
+		if (m_cupsoc_mode)
+			LEGACY_execute_e30e_cupsoc(offset, data);
+		else
+			LEGACY_execute_e30e(offset, data);
 		return;
 	}
 
@@ -1624,8 +1670,9 @@ void raiden2cop_device::LEGACY_cop_cmd_w(offs_t offset, uint16_t data)
 
 	if (check_command_matches(command, 0xa80, 0x984, 0x082, 0x000, 0x000, 0x000, 0x000, 0x000, 5, 0xfefb))
 	{
-		//executed = 1;
-		printf("5105\n");
+		// cupsoc issues this command; the handler was never called before
+		executed = 1;
+		execute_5105(offset, data);
 		return;
 	}
 
@@ -1636,14 +1683,16 @@ void raiden2cop_device::LEGACY_cop_cmd_w(offs_t offset, uint16_t data)
 
 	if (check_command_matches(command, 0x9c8, 0xa84, 0x0a2, 0x000, 0x000, 0x000, 0x000, 0x000, 5, 0xfffb))
 	{
-		//executed = 1;
-		printf("5905\n");
+		// cupsoc issues this command; the handler was never called before
+		executed = 1;
+		execute_5905(offset, data);
 		return;
 	}
 
 	// player to ball collision
 	if (check_command_matches(command, 0xa88, 0x994, 0x088, 0x000, 0x000, 0x000, 0x000, 0x000, 5, 0xfefb))
 	{
+		executed = 1;
 		execute_f105(offset,data);
 		return;
 	}

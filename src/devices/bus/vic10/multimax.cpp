@@ -29,6 +29,7 @@ DEFINE_DEVICE_TYPE(VIC10_MULTIMAX, vic10_multimax_device, "vic10_multimax", "VIC
 
 vic10_multimax_device::vic10_multimax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VIC10_MULTIMAX, tag, owner, clock), device_vic10_expansion_card_interface(mconfig, *this),
+	m_exram(*this, "exram", 0x800, ENDIANNESS_LITTLE),
 	m_latch(0)
 {
 }
@@ -46,56 +47,51 @@ void vic10_multimax_device::device_start()
 
 
 //-------------------------------------------------
+//  device_post_load - called after loading a state
+//-------------------------------------------------
+
+void vic10_multimax_device::device_post_load()
+{
+	update_banks();
+}
+
+
+//-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
 void vic10_multimax_device::device_reset()
 {
 	m_latch = 0;
+
+	m_slot->exram()[0].install_write_handler(0x000, 0x7ff, write8smo_delegate(*this, FUNC(vic10_multimax_device::latch_w)));
+	m_slot->exram()[1].install_ram(0x000, 0x7ff, m_exram.target());
+
+	update_banks();
 }
 
 
 //-------------------------------------------------
-//  vic10_cd_r - cartridge data read
+//  latch_w - bank latch write
 //-------------------------------------------------
 
-uint8_t vic10_multimax_device::vic10_cd_r(offs_t offset, uint8_t data, int lorom, int uprom, int exram)
+void vic10_multimax_device::latch_w(uint8_t data)
 {
-	if (!lorom)
-	{
-		data = m_lorom[((m_latch & 0x3f) << 14) | (offset & 0x1fff)];
-	}
-	else if (!uprom)
-	{
-		data = m_lorom[((m_latch & 0x3f) << 14) | 0x2000 | (offset & 0x1fff)];
-	}
-	else if (!exram)
-	{
-		if (m_latch)
-		{
-			data = m_exram[offset & 0x7ff];
-		}
-	}
+	m_latch = data;
 
-	return data;
+	update_banks();
 }
 
 
 //-------------------------------------------------
-//  vic10_cd_w - cartridge data write
+//  update_banks -
 //-------------------------------------------------
 
-void vic10_multimax_device::vic10_cd_w(offs_t offset, uint8_t data, int lorom, int uprom, int exram)
+void vic10_multimax_device::update_banks()
 {
-	if (!exram)
-	{
-		if (m_latch)
-		{
-			m_exram[offset & 0x7ff] = data;
-		}
-		else
-		{
-			m_latch = data;
-		}
-	}
+	uint8_t *const rom = &m_slot->memregion("lorom")->base()[(m_latch & 0x3f) << 14];
+
+	m_slot->lorom().install_rom(0x0000, 0x1fff, rom);
+	m_slot->uprom().install_rom(0x0000, 0x1fff, rom + 0x2000);
+	m_slot->exram().select(m_latch ? 1 : 0);
 }

@@ -59,7 +59,9 @@ tiki100_bus_device::tiki100_bus_device(const machine_config &mconfig, const char
 	m_nmi_cb(*this),
 	m_busrq_cb(*this),
 	m_in_mrq_cb(*this, 0),
-	m_out_mrq_cb(*this)
+	m_out_mrq_cb(*this),
+	m_in_iorq_cb(*this, 0),
+	m_out_iorq_cb(*this)
 {
 }
 

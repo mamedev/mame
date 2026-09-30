@@ -13,7 +13,8 @@
     No datasheet is available, so the register behaviour was worked out from
     the CDi_MiSTer FPGA core by Andre Zeps: the decoding itself is done with
     mpeg_audio, and the DSP56001, which the driver uses for the attenuation
-    ramp rather than for decoding, is not emulated.
+    ramp rather than for decoding, is not emulated.  Its attenuation host
+    command is handled directly.
 
 *******************************************************************************/
 
@@ -87,6 +88,8 @@ private:
 	void audio_es_write(const uint8_t *data, size_t length);
 	void reset_audio_decoder();
 	void update_intreq();
+	void dsp_w(uint8_t data);
+	float atten_gain(int index) const;
 
 	uint32_t fma_dclk() const;
 
@@ -104,6 +107,9 @@ private:
 	uint16_t m_fma_ivec = 0;
 	uint8_t  m_fma_stream = 0;
 	uint8_t  m_fma_dspa = 0;
+	uint8_t  m_fma_dsp_cvr = 0;
+	uint8_t  m_fma_atten_index = 0;
+	uint8_t  m_fma_atten[4]{};  // R2R, L2R, R2L, L2L
 	bool     m_fma_dsp_enable = false;
 	uint16_t m_fma_dclkl_latch = 0;
 	uint32_t m_fma_audio_header = 0;

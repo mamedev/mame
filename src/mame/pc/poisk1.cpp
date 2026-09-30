@@ -84,9 +84,9 @@ public:
 		, m_kbdio(*this, "Y%u", 1)
 	{ }
 
-	void poisk1(machine_config &config);
+	void poisk1(machine_config &config) ATTR_COLD;
 
-	void init_poisk1();
+	void init_poisk1() ATTR_COLD;
 
 	void fdc_config(device_t *device);
 

@@ -41,40 +41,6 @@ vic1111_device::vic1111_device(const machine_config &mconfig, const char *tag, d
 
 void vic1111_device::device_start()
 {
-}
-
-
-//-------------------------------------------------
-//  vic20_cd_r - cartridge data read
-//-------------------------------------------------
-
-uint8_t vic1111_device::vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
-{
-	if (!blk1)
-	{
-		data = m_ram[offset];
-	}
-	else if (!blk2)
-	{
-		data = m_ram[0x2000 + offset];
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic20_cd_w - cartridge data write
-//-------------------------------------------------
-
-void vic1111_device::vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
-{
-	if (!blk1)
-	{
-		m_ram[offset] = data;
-	}
-	else if (!blk2)
-	{
-		m_ram[0x2000 + offset] = data;
-	}
+	m_slot->blk1().install_ram(0x0000, 0x1fff, &m_ram[0x0000]);
+	m_slot->blk2().install_ram(0x0000, 0x1fff, &m_ram[0x2000]);
 }

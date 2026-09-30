@@ -226,6 +226,7 @@ void phoenix_state::phoenix_videoram_w(offs_t offset, uint8_t data)
 	}
 
 	/* as part of the protection, Survival executes code from $43a4 */
+	// TODO: handle in opcodes_map not here
 	rom[offset + 0x4000] = data;
 }
 

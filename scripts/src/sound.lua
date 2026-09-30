@@ -79,6 +79,20 @@ end
 
 
 ---------------------------------------------------
+-- Zero-crossing comparator for line-level audio
+--@src/devices/sound/zcross.h,SOUNDS["ZCROSS"] = true
+---------------------------------------------------
+
+if SOUNDS["ZCROSS"] then
+	files {
+		MAME_DIR .. "src/devices/sound/zcross.cpp",
+		MAME_DIR .. "src/devices/sound/zcross.h",
+	}
+end
+
+
+
+---------------------------------------------------
 -- Discrete component audio
 --@src/devices/sound/discrete.h,SOUNDS["DISCRETE"] = true
 ---------------------------------------------------

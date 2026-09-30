@@ -252,9 +252,10 @@ uint32_t jailbrek_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	rectangle clip = cliprect;
 	if (m_k005849->ctrl_r(3) & 0x80)
 	{
-		bitmap.fill(0, clip);
+		bitmap.fill(0, cliprect);
 
 		// clip screen edges
+		clip = screen.visible_area();
 		clip.min_x += 8;
 		clip.max_x -= 8;
 		clip &= cliprect;

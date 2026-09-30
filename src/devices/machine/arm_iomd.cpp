@@ -176,7 +176,6 @@ arm_iomd_device::arm_iomd_device(const machine_config &mconfig, device_type type
 arm_iomd20_device::arm_iomd20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm_iomd_device(mconfig, ARM_IOMD20, tag, owner, clock)
 	, m_mouse_pos{}
-	, m_mouse_flag{}
 {
 	m_id = 0xd4e7;
 	m_version = 0;
@@ -367,6 +366,12 @@ void arm_iomd_device::device_reset()
 	m_fiq_status = 0x80;
 	m_fiq_mask = 0;
 	// ...
+}
+
+void arm_iomd20_device::device_reset()
+{
+	m_mouse_flag[0] = false;
+	m_mouse_flag[1] = false;
 }
 
 void arm7500fe_iomd_device::device_reset()

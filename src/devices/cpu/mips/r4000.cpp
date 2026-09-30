@@ -177,7 +177,7 @@ void r4000_base_device::device_start()
 #else
 	state_add(MIPS3_R0,        "R0",       m_r[0]).callimport().formatstr("%016X");
 	for (unsigned i = 1; i < 32; i++)
-		state_add(MIPS3_R0 + i, util::string_format("R%d", i).c_str(), m_r[i]);
+		state_add(MIPS3_R0 + i, util::string_format("R%d", i), m_r[i]);
 #endif
 
 	state_add(MIPS3_HI,        "HI",       m_hi).formatstr("%016X");
@@ -187,7 +187,7 @@ void r4000_base_device::device_start()
 	state_add(MIPS3_FCR30,     "FCR30",    m_fcr30).formatstr("%08X");
 	state_add(MIPS3_FCR31,     "FCR31",    m_fcr31).formatstr("%08X");
 	for (unsigned i = 0; i < 32; i++)
-		state_add(MIPS3_F0 + i, util::string_format("F%d", i).c_str(), m_f[i]);
+		state_add(MIPS3_F0 + i, util::string_format("F%d", i), m_f[i]);
 
 	set_icountptr(m_icount);
 
