@@ -38,7 +38,9 @@ TODO:
   to access this because it's a daisy chain setup with the CTC?
 - even if I hack that the title screen speech doesn't work properly - is there a timing register like Little Robin?
 - Verify when m_ppi_to_pic_command is set and cleared. It's currently guessed but seems to work fine this way.
-- After The War DIP switches are wrong.
+- The PIC startup delay is patched in all sets, otherwise the PIC isn't ready yet when the 68000 reads the
+  DIP switches (only once, at boot). The PIC probably holds the 68000 in reset during that delay (port B
+  bits 6 and 7 are pulled low for its duration, which is also what the watchdog does).
 
 ----------------------------------------
 
@@ -346,6 +348,54 @@ static INPUT_PORTS_START( megaphx )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( afterwar )
+	PORT_INCLUDE(megaphx)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME(0x07, 0x06, DEF_STR( Coin_A )) PORT_DIPLOCATION("SW1:!1,!2,!3")
+	PORT_DIPSETTING(   0x07, DEF_STR( 5C_1C ))
+	PORT_DIPSETTING(   0x03, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(   0x05, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(   0x01, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(   0x06, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(   0x02, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(   0x04, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(   0x00, DEF_STR( 1C_4C ))
+	PORT_DIPNAME(0x38, 0x30, DEF_STR( Coin_B )) PORT_DIPLOCATION("SW1:!4,!5,!6")
+	PORT_DIPSETTING(   0x38, DEF_STR( 5C_1C ))
+	PORT_DIPSETTING(   0x18, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(   0x28, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(   0x08, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(   0x30, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(   0x10, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(   0x20, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(   0x00, DEF_STR( 1C_4C ))
+	PORT_DIPNAME(0xc0, 0x80, DEF_STR( Lives ))  PORT_DIPLOCATION("SW1:!7,!8")
+	PORT_DIPSETTING(   0x00, "1")
+	PORT_DIPSETTING(   0x40, "2")
+	PORT_DIPSETTING(   0x80, "3")
+	PORT_DIPSETTING(   0xc0, "4")
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME(0x01, 0x00, DEF_STR( Demo_Sounds )) PORT_DIPLOCATION("SW2:!1")
+	PORT_DIPSETTING(   0x01, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x00, DEF_STR( On ))
+	PORT_SERVICE_DIPLOC(0x02, IP_ACTIVE_HIGH, "SW2:!2")
+	PORT_DIPNAME(0x0c, 0x04, "Radioactivity Speed") PORT_DIPLOCATION("SW2:!3,!4") // rate at which the radioactivity level bar fills up (3:4:5:6), game over when full
+	PORT_DIPSETTING(   0x00, "Slow")
+	PORT_DIPSETTING(   0x04, DEF_STR( Normal ))
+	PORT_DIPSETTING(   0x08, "Fast")
+	PORT_DIPSETTING(   0x0c, "Fastest")
+	PORT_DIPNAME(0x30, 0x10, DEF_STR( Difficulty )) PORT_DIPLOCATION("SW2:!5,!6") // damage dealt to and received from enemies, attract mode uses normal
+	PORT_DIPSETTING(   0x00, DEF_STR( Easy ))
+	PORT_DIPSETTING(   0x10, DEF_STR( Normal ))
+	PORT_DIPSETTING(   0x20, DEF_STR( Hard ))
+	PORT_DIPSETTING(   0x30, DEF_STR( Hardest ))
+	PORT_DIPUNUSED_DIPLOC(0x40, 0x00, "SW2:!7")
+	PORT_DIPUNUSED_DIPLOC(0x80, 0x00, "SW2:!8")
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( hamboy )
 	PORT_INCLUDE(megaphx)
 
@@ -557,6 +607,7 @@ ROM_START( afterwar )
 
 	ROM_REGION( 0x400, "pic", 0 )
 	ROM_LOAD( "pic16c54.bin", 0x000, 0x400, CRC(89e74d49) SHA1(29b5a37000ddc59242c95cc4973371ba18233076) )
+	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (PIC issue?), otherwise the DIP switches are always read as 0
 
 	ROM_REGION( 0x300, "pals", 0 )
 	ROM_LOAD( "b3_palce20v8h.bin",   0x000, 0x157, NO_DUMP )
@@ -673,7 +724,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1991, afterwar, 0, hamboy,  hamboy,   megaphx_state, empty_init, ROT0, "Dinamic / Inder", "After the War", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, afterwar, 0, hamboy,  afterwar, megaphx_state, empty_init, ROT0, "Dinamic / Inder", "After the War", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, megaphx,  0, megaphx, megaphx,  megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Mega Phoenix",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, hamboy,   0, hamboy,  hamboy,   megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Hammer Boy",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
