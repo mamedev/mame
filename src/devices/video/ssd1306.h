@@ -37,6 +37,9 @@ public:
 	ssd1306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual uint32_t palette_entries() const noexcept override;
+	
+	// scrolling and alternate scan modes still need to be implemented
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	void set_external_oscillator(bool use_external_oscillator);
 	void set_intf_mode(uint8_t mode);

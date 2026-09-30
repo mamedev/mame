@@ -4,8 +4,8 @@
 
     Arduboy hardware
 
-    This is a homebrew ATMega handheld system, based around the ATMega32u4,
-    which provides us with an excellent AVR emulation test case.
+    This is a homebrew ATMega handheld system based around the ATMega32U4,
+	similarly to the Arduino Leonardo.
 
     The vanilla Arduboy expects you to upload or flash software to it. Such software is
     virtually always in Intel HEX format, so we have to support that.
@@ -21,6 +21,7 @@
     - Two yellow LEDs for serial activity, software driven
     - One red LED for charge indication
     - Super thin battery that will probably inflate and explode
+		- Battery type: LiPo, 104461, 3.7 volts, 180 mAh
         - NOTE: The system will NOT power on if the battery is dead or missing.
           If you want to remove the battery, then the easiest reversable hack
           is to jump a 10uF capacitor across BATT+ and ground. This will keep
@@ -71,18 +72,22 @@
     Driver status:
     -----------------------------
     Preliminary (MACHINE_NOT_WORKING).
+    
+	The AVR8 core causes these known issues with Arduboy software:
+	- Timer 0 carry-over behavior is not correct, which affects
+	  micros() and other Arduino APIs depending on it, like delay().
+	  This causes delay() to return instantly.
+	- The speaker is usually driven by Timer 3. When games try to play sounds, they
+	  either play no sound at all, or they try to set up timer 3 in such a way
+	  that an interrupt fires. When that happens, execution ends up in the middle of an
+	  interrupt vector, then falls through to whatever jump is below it,
+	  which typically reboots.
+	- The Arduboy FX needs the spm opcode and all related functionality to be implemented.
+	  If it isn't there, then the menu will crash or hang when you try to load a game.
 
-    The AVR8 core is missing a lot of features that the Arduboy platform
-    as a whole needs. In particular, the Arudino APIs like delay() do not
-    work like they're supposed to, so software basically runs "1988 DOS game on a
-    Pentium 4" levels of fast, or bootloops.
-
-    Games based off the Arduboy2 library can work and are somewhat playable.
+	Games based off the Arduboy2 library can work and are somewhat playable.
     This may be because they use the sleep opcode instead of relying on
     specific timer values.
-
-    MACHINE_IMPERFECT_GRAPHICS should be set until SSD1306 features are
-    fully implemented. There are many modes that Arduboy games don't use.
 
 ****************************************************************************/
 
@@ -114,7 +119,10 @@ public:
 		  m_speaker(*this, "speaker"),
 		  m_ssd1306(*this, "ssd1306"),
 		  m_cart(*this, "gameprg"),
-		  m_spi_flash(*this, "spi_flash")
+		  m_spi_flash(*this, "spi_flash"),
+		  m_portb_buttons(*this, "PORTB"),
+		  m_porte_buttons(*this, "PORTE"),
+		  m_portf_buttons(*this, "PORTF")
 	{ }
 
 	void arduboy_base(machine_config &config);
@@ -138,15 +146,17 @@ private:
 	// this is stubbed in for the Arduboy FX; do nullpointer checks before accessing it
 	optional_device<generic_spi_flash_device> m_spi_flash;
 
+	required_ioport m_portb_buttons;
+	required_ioport m_porte_buttons;
+	required_ioport m_portf_buttons;
+
 	uint8_t port_b_r();
 	void port_b_w(uint8_t data);
 	uint8_t port_c_r();
 	void port_c_w(uint8_t data);
 	uint8_t port_d_r();
 	void port_d_w(uint8_t data);
-	uint8_t port_e_r();
 	void port_e_w(uint8_t data);
-	uint8_t port_f_r();
 	void port_f_w(uint8_t data);
 
 	uint8_t intflash_r(offs_t offset);
@@ -192,22 +202,20 @@ void arduboy_state::machine_reset()
 
 uint8_t arduboy_state::port_b_r()
 {
-	int spi_miso = m_spi_flash ? (m_spi_flash->so_r() ? (1 << 3) : 0) : 0;
-	int button_a = ioport("PORTB")->read() & (1 << 4);
-
-	return spi_miso | button_a;
+	return	(m_spi_flash ? m_spi_flash->so_r() ? (1 << 3) : 0 : 0) |  
+			m_portb_buttons->read();
 }
 
 void arduboy_state::port_b_w(uint8_t data)
 {
-	m_rx_led     = data & (1 << 0);
-	int spi_sck  = data & (1 << 1);
-	int spi_mosi = data & (1 << 2);
+	m_rx_led     = BIT(data, 0);
+	int spi_sck  = BIT(data, 1);
+	int spi_mosi = BIT(data, 2);
 	// B.3 = MISO
 	// B.4 = button B
-	m_rgbled_r   = data & (1 << 5);
-	m_rgbled_g   = data & (1 << 6);
-	m_rgbled_b   = data & (1 << 7);
+	m_rgbled_r   = BIT(data, 5);
+	m_rgbled_g   = BIT(data, 6);
+	m_rgbled_b   = BIT(data, 7);
 
 	if (m_spi_flash) m_spi_flash->si_w(spi_mosi);
 	m_ssd1306->spi_si_w(spi_mosi);
@@ -215,7 +223,6 @@ void arduboy_state::port_b_w(uint8_t data)
 	if (m_spi_flash) m_spi_flash->sck_w(spi_sck);
 	m_ssd1306->spi_sck_w(spi_sck);
 }
-
 
 uint8_t arduboy_state::port_c_r()
 {
@@ -225,9 +232,9 @@ uint8_t arduboy_state::port_c_r()
 
 void arduboy_state::port_c_w(uint8_t data)
 {
-	int speaker_positive  = (data & (1<<6));
-	int speaker_negative  = (data & (1<<7));
-	m_speaker->level_w( (speaker_positive ^ speaker_negative) ? 1 : 0 );
+	int speaker_positive = BIT(data, 6);
+	int speaker_negative = BIT(data, 7);
+	m_speaker->level_w(speaker_positive ^ speaker_negative);
 }
 
 uint8_t arduboy_state::port_d_r()
@@ -238,26 +245,16 @@ uint8_t arduboy_state::port_d_r()
 
 void arduboy_state::port_d_w(uint8_t data)
 {
-	if (m_spi_flash) m_spi_flash->cs_w(data & (1 << 1));
-	m_ssd1306->dc_w(data & (1 << 4));
-	m_tx_led = data & (1 << 5);
-	m_ssd1306->spi_cs_w(data & (1 << 6));
-	m_ssd1306->rst_w(data & (1 << 7));
-}
-
-uint8_t arduboy_state::port_e_r()
-{
-	return ioport("PORTE")->read() & 0x40;
+	if (m_spi_flash) m_spi_flash->cs_w(BIT(data, 1));
+	m_ssd1306->dc_w(BIT(data, 4));
+	m_tx_led = BIT(data, 5);
+	m_ssd1306->spi_cs_w(BIT(data, 6));
+	m_ssd1306->rst_w(BIT(data, 7));
 }
 
 void arduboy_state::port_e_w(uint8_t data)
 {
 	logerror("%s: write to read-only port e\n", machine().describe_context());
-}
-
-uint8_t arduboy_state::port_f_r()
-{
-	return ioport("PORTF")->read() & 0xf0;
 }
 
 void arduboy_state::port_f_w(uint8_t data)
@@ -282,18 +279,35 @@ void arduboy_state::prg_map(address_map &map)
 void arduboy_state::data_map(address_map &map)
 {
 	// TODO: 32u4 flash registers. the Arduboy FX needs it
-
 	map(0x0100, 0x0aff).ram(); // on-chip 2.5kbytes RAM
 }
 
 static INPUT_PORTS_START( arduboy )
 	PORT_START("PORTB")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED  )
 
 	PORT_START("PORTE")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED  )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED  )
 
 	PORT_START("PORTF")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
@@ -314,8 +328,8 @@ void arduboy_state::arduboy_base(machine_config &config)
 	m_maincpu->gpio_in<atmega328_device::GPIOB>().set(FUNC(arduboy_state::port_b_r));
 	m_maincpu->gpio_in<atmega328_device::GPIOC>().set(FUNC(arduboy_state::port_c_r));
 	m_maincpu->gpio_in<atmega328_device::GPIOD>().set(FUNC(arduboy_state::port_d_r));
-	m_maincpu->gpio_in<atmega328_device::GPIOE>().set(FUNC(arduboy_state::port_e_r));
-	m_maincpu->gpio_in<atmega328_device::GPIOF>().set(FUNC(arduboy_state::port_f_r));
+	m_maincpu->gpio_in<atmega328_device::GPIOE>().set([this]() { return m_porte_buttons->read(); });
+	m_maincpu->gpio_in<atmega328_device::GPIOF>().set([this]() { return m_portf_buttons->read(); });
 
 	m_maincpu->gpio_out<atmega328_device::GPIOB>().set(FUNC(arduboy_state::port_b_w));
 	m_maincpu->gpio_out<atmega328_device::GPIOC>().set(FUNC(arduboy_state::port_c_w));
@@ -609,4 +623,4 @@ ROM_END
 } // anonymous namespace
 
 //   YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY    FULLNAME
-CONS(2015, arduboy, 0,      0,      arduboy,  arduboy, arduboy_state, empty_init, "Arduboy", "Arduboy", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING)
+CONS(2015, arduboy, 0,      0,      arduboy,  arduboy, arduboy_state, empty_init, "Arduboy", "Arduboy", MACHINE_NOT_WORKING)
