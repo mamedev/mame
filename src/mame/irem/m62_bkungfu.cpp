@@ -42,6 +42,8 @@ private:
 	memory_share_creator<uint8_t> m_bkungfu_tileram;
 };
 
+
+
 /*******************************************************************************
     Video
 *******************************************************************************/
@@ -67,6 +69,8 @@ VIDEO_START_MEMBER(m62_bkungfu_state,bkungfu)
 {
 	m62_start(tilemap_get_info_delegate(*this, FUNC(m62_bkungfu_state::get_bkungfu_bg_tile_info)), 32, 0, 8, 8, 256, 32);
 }
+
+
 
 /*******************************************************************************
     Blitter
@@ -105,6 +109,8 @@ void m62_bkungfu_state::io_map(address_map &map)
 	map(0x83, 0x83).w(FUNC(m62_bkungfu_state::kidniki_background_bank_w));
 	//map(0x84, 0x84).nopw();
 }
+
+
 
 /*******************************************************************************
     Machine Configs
