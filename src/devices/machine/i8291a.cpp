@@ -122,14 +122,7 @@ void i8291a_device::device_reset()
 	m_nba = false;
 	m_send_eoi = false;
 	m_ist = false;
-	m_eoi = false;
-	m_ifc = false;
-	m_srq = false;
-	m_dav = false;
-	m_ndac = false;
-	m_nrfd = false;
-	m_atn = false;
-	m_ren = false;
+	// the bus input copies stay: the bus only calls *_w() on a level change
 	update_state(m_t_state, talker_state::TIDS);
 	update_state(m_tp_state, talker_primary_state::TPIS);
 	update_state(m_tsp_state, talker_serial_poll_state::SPIS);
