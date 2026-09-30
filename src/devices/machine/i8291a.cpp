@@ -256,6 +256,7 @@ uint8_t i8291a_device::ints1_r()
 
 	if (!machine().side_effects_disabled()) {
 		LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, ret);
+		// TODO: reading ISR1 should not affect DREQ (p. 3-11)
 		m_ints1 = 0;
 		update_int();
 	}
@@ -422,6 +423,7 @@ void i8291a_device::aux_mode_w(uint8_t data)
 
 		case AUXCMD_PON:
 			LOGMASKED(LOG_REG, "AUXCMD_PON\n");
+			// TODO: pon keeps the auxiliary mode registers, which device_reset() clears (p. 3-14)
 			device_reset();
 			break;
 		}
@@ -689,6 +691,7 @@ void i8291a_device::handle_command()
 			if (addr_matched && (m_address_mode & 3) == 1 && m_l_state == listener_state::LIDS)
 				update_state(m_l_state, listener_state::LADS);
 		} else {
+			// TODO: Figure A-1 has no LADS exit on another device's listen address (p. 3-29)
 			update_state(m_lp_state, listener_primary_state::LPIS);
 			update_state(m_l_state, listener_state::LIDS);
 		}
@@ -719,6 +722,7 @@ void i8291a_device::handle_command()
 			if ((m_address_mode & 3) == 3)
 				update_state(m_t_state, talker_state::TIDS);
 		} else {
+			// TODO: Figure A-1 leaves TPAS and LPAS on any other primary command; needs F4 and the LADS exit
 			update_state(m_tp_state, talker_primary_state::TPIS);
 			update_state(m_t_state, talker_state::TIDS);
 		}
