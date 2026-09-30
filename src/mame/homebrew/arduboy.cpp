@@ -284,30 +284,15 @@ void arduboy_state::data_map(address_map &map)
 
 static INPUT_PORTS_START( arduboy )
 	PORT_START("PORTB")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED  )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED  )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED  )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED  )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED  )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0xef, IP_ACTIVE_HIGH, IPT_UNUSED  )
 
 	PORT_START("PORTE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED  )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED  )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED  )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED  )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED  )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED  )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0xbf, IP_ACTIVE_HIGH, IPT_UNUSED  )
 
 	PORT_START("PORTF")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED  )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED  )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED  )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
@@ -328,8 +313,8 @@ void arduboy_state::arduboy_base(machine_config &config)
 	m_maincpu->gpio_in<atmega328_device::GPIOB>().set(FUNC(arduboy_state::port_b_r));
 	m_maincpu->gpio_in<atmega328_device::GPIOC>().set(FUNC(arduboy_state::port_c_r));
 	m_maincpu->gpio_in<atmega328_device::GPIOD>().set(FUNC(arduboy_state::port_d_r));
-	m_maincpu->gpio_in<atmega328_device::GPIOE>().set([this]() { return m_porte_buttons->read(); });
-	m_maincpu->gpio_in<atmega328_device::GPIOF>().set([this]() { return m_portf_buttons->read(); });
+	m_maincpu->gpio_in<atmega328_device::GPIOE>().set_ioport(m_porte_buttons);
+	m_maincpu->gpio_in<atmega328_device::GPIOF>().set_ioport(m_portf_buttons);
 
 	m_maincpu->gpio_out<atmega328_device::GPIOB>().set(FUNC(arduboy_state::port_b_w));
 	m_maincpu->gpio_out<atmega328_device::GPIOC>().set(FUNC(arduboy_state::port_c_w));

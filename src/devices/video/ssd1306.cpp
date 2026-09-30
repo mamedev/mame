@@ -183,7 +183,7 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 		case 0x20: // set addressing mode
 			if (!populate_fifo_until_n_bytes(data, 2)) return;
 
-			m_addressing_mode = m_command_fifo[1] & 3;
+			m_addressing_mode = BIT(m_command_fifo[1], 0, 2);
 			switch (m_addressing_mode)
 			{
 				case SSD1306_ADDRESSING_MODE_PAGE:
@@ -203,8 +203,8 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 		case 0x21: // h/v addressing mode: set column start/end address
 			if (!populate_fifo_until_n_bytes(data, 3)) return;
 
-			m_hvmode_column_start_address = m_command_fifo[1] & 0x7f;
-			m_hvmode_column_end_address   = m_command_fifo[2] & 0x7f;
+			m_hvmode_column_start_address = BIT(m_command_fifo[1], 0, 7);
+			m_hvmode_column_end_address   = BIT(m_command_fifo[2], 0, 7);
 
 			if (m_addressing_mode == SSD1306_ADDRESSING_MODE_HORIZONTAL ||
 				m_addressing_mode == SSD1306_ADDRESSING_MODE_VERTICAL)
@@ -216,8 +216,8 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 		case 0x22: // h/v addressing mode: set page start/end address
 			if (!populate_fifo_until_n_bytes(data, 3)) return;
 
-			m_hvmode_page_start_address = m_command_fifo[1] & 7;
-			m_hvmode_page_end_address = m_command_fifo[2] & 7;
+			m_hvmode_page_start_address = BIT(m_command_fifo[1], 0, 3);
+			m_hvmode_page_end_address = BIT(m_command_fifo[2], 0, 3);
 
 			if (m_addressing_mode == SSD1306_ADDRESSING_MODE_HORIZONTAL ||
 				m_addressing_mode == SSD1306_ADDRESSING_MODE_VERTICAL)
@@ -231,11 +231,11 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 			if (!populate_fifo_until_n_bytes(data, 7)) return;
 
 			m_horizontal_scroll_pending = true;
-			m_horizontal_scrolling_left_pending = m_command_fifo[0] & 1;
+			m_horizontal_scrolling_left_pending = BIT(m_command_fifo[0], 0);
 			DUMMY_BYTE_CHECK(1, 0);
-			m_horizontal_scroll_page_start_address_pending = m_command_fifo[2] & 7;
-			m_horizontal_scroll_interval_pending = m_command_fifo[3] & 7;
-			m_horizontal_scroll_page_end_address_pending = m_command_fifo[4] & 7;
+			m_horizontal_scroll_page_start_address_pending = BIT(m_command_fifo[2], 0, 3);
+			m_horizontal_scroll_interval_pending = BIT(m_command_fifo[3], 0, 3);
+			m_horizontal_scroll_page_end_address_pending = BIT(m_command_fifo[4], 0, 3);
 			DUMMY_BYTE_CHECK(5, 0);
 			DUMMY_BYTE_CHECK(6, 0xff);
 			break;
@@ -246,12 +246,12 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 
 			m_horizontal_scroll_pending = true;
 			m_vertical_scroll_pending = true;
-			m_horizontal_scrolling_left_pending = m_command_fifo[0] & 1;
+			m_horizontal_scrolling_left_pending = BIT(m_command_fifo[0], 0);
 			DUMMY_BYTE_CHECK(1, 0);
-			m_horizontal_scroll_page_start_address_pending = m_command_fifo[2] & 7;
-			m_horizontal_scroll_interval_pending = m_command_fifo[3] & 7;
-			m_horizontal_scroll_page_end_address_pending = m_command_fifo[4] & 7;
-			m_vertical_scroll_offset_pending = m_command_fifo[5] & 0x3f;
+			m_horizontal_scroll_page_start_address_pending = BIT(m_command_fifo[2], 0, 3);
+			m_horizontal_scroll_interval_pending = BIT(m_command_fifo[3], 0, 3);
+			m_horizontal_scroll_page_end_address_pending = BIT(m_command_fifo[4], 0, 3);
+			m_vertical_scroll_offset_pending = BIT(m_command_fifo[5], 0, 6);
 			break;
 
 		case 0x2e: // scroll disable
@@ -289,49 +289,50 @@ void ssd1306_device::exec_command_ax(uint8_t data)
 		case 0xa1: // remap SEG0 column: false = SEG0 is 0, true = SEG0 is 127
 			if (!populate_fifo_until_n_bytes(data, 1)) return;
 
-			m_seg0_column_remapped = m_command_fifo[0] & 1;
+			m_seg0_column_remapped = BIT(m_command_fifo[0], 0);
 			break;
 
 		case 0xa3: // vertical scroll parameters
 			if (!populate_fifo_until_n_bytes(data, 3)) return;
 
-			m_vertical_scroll_top_fixed_rows        = m_command_fifo[1] & 0x3f;
-			m_vertical_scroll_bottom_scrolled_rows  = m_command_fifo[2] & 0x7f;
+			m_vertical_scroll_top_fixed_rows        = BIT(m_command_fifo[1], 0, 6);
+			m_vertical_scroll_bottom_scrolled_rows  = BIT(m_command_fifo[2], 0, 7);
 			break;
 
 		case 0xa4:
 		case 0xa5: // draw GDDRAM contents, or blank display
 			if (!populate_fifo_until_n_bytes(data, 1)) return;
 
-			m_display_blanking = m_command_fifo[0] & 1;
+			m_display_blanking = BIT(m_command_fifo[0], 0);
 			break;
 
 		case 0xa6:
 		case 0xa7: // normal/inverted pixels
 			if (!populate_fifo_until_n_bytes(data, 1)) return;
 
-			m_inverting_pixels = m_command_fifo[0] & 1;
+			m_inverting_pixels = BIT(m_command_fifo[0], 0);
 			break;
 
 		case 0xa8: // mux ratio (max lines to draw)
-			if (!populate_fifo_until_n_bytes(data, 3)) return;
-
-			m_command_fifo[1] &= 0x3f;
-
-			if (m_command_fifo[1] < 15)
 			{
-				logerror("%s: invalid mux ratio: %02x\n", m_command_fifo[1]);
-				return;
-			}
+				if (!populate_fifo_until_n_bytes(data, 3)) return;
 
-			m_mux_ratio = m_command_fifo[1];
+				int mux_ratio = BIT(m_command_fifo[1], 0, 6);
+				if (mux_ratio < 15)
+				{
+					logerror("%s: invalid mux ratio: %02x\n", mux_ratio);
+					return;
+				}
+
+				m_mux_ratio = mux_ratio;
+			}
 			break;
 
 		case 0xae:
 		case 0xaf: // enable/disable display completely
 			if (!populate_fifo_until_n_bytes(data, 1)) return;
 
-			m_display_enabled = m_command_fifo[0] & 1;
+			m_display_enabled = BIT(m_command_fifo[0], 0);
 			break;
 
 		default:
@@ -347,33 +348,33 @@ void ssd1306_device::exec_command_dx(uint8_t data)
 		case 0xd3: // display offset (shifts image down by n lines vertically)
 			if (!populate_fifo_until_n_bytes(data, 2)) return;
 
-			m_display_offset = m_command_fifo[1] & 0x3f;
+			m_display_offset = BIT(m_command_fifo[1], 0, 6);
 			break;
 
 		case 0xd5: // clock divider and internal oscillator frequency select
 			if (!populate_fifo_until_n_bytes(data, 2)) return;
 
-			m_clk_div  = m_command_fifo[1] & 0xf;
-			m_osc_freq = m_command_fifo[1] >> 4;
+			m_clk_div  = BIT(m_command_fifo[1], 0, 4);
+			m_osc_freq = BIT(m_command_fifo[1], 4, 4);
 			break;
 
 		case 0xd9: // precharge phase 1/2 control (affects scan rate)
 			if (!populate_fifo_until_n_bytes(data, 2)) return;
 
-			m_phase_1_period = m_command_fifo[1] & 0xf;
-			m_phase_2_period = m_command_fifo[1] >> 4;
+			m_phase_1_period = BIT(m_command_fifo[1], 0, 4);
+			m_phase_2_period = BIT(m_command_fifo[1], 4, 4);
 			break;
 
 		case 0xda: // COM pin (row) scan direction and mode
 			if (!populate_fifo_until_n_bytes(data, 2)) return;
 
-			if (!(m_command_fifo[1] & 2))
+			if (BIT(m_command_fifo[1], 1) == 0)
 			{
 				logerror("%s: command da, byte 1: bit 1 should have been set, but wasn't.\n",
 						machine().describe_context());
 			}
-			m_row_scan_interleaved  = (m_command_fifo[1] & 0x10);
-			m_row_scan_split_invert = (m_command_fifo[1] & 0x20);
+			m_row_scan_interleaved  = BIT(m_command_fifo[1], 4);
+			m_row_scan_split_invert = BIT(m_command_fifo[1], 5);
 			break;
 
 		case 0xdb: // VcomH deselect level (only hardware needs this)
@@ -384,7 +385,7 @@ void ssd1306_device::exec_command_dx(uint8_t data)
 				logerror("%s: command db, byte 1: bits other than 4-7 were set.\n",
 						machine().describe_context());
 			}
-			m_vcomh_deselect_level = m_command_fifo[1] & 0x70;
+			m_vcomh_deselect_level = BIT(m_command_fifo[1], 4, 3);
 			break;
 
 		default:
@@ -407,9 +408,10 @@ void ssd1306_device::exec_command(uint8_t data)
 			{
 				if (!populate_fifo_until_n_bytes(data, 1)) return;
 
-				uint8_t low4        = m_command_fifo[0] & 0xf;
-				uint8_t keep_mask   = m_command_fifo[0] & 0x10 ? 0x0f : 0xf0;
-				uint8_t shift_value = m_command_fifo[0] & 0x10 ? 4    : 0;
+				uint8_t low4        = BIT(m_command_fifo[0], 0, 4);
+				bool    upper_half  = BIT(m_command_fifo[0], 4);
+				uint8_t keep_mask   = upper_half ? 0x0f : 0xf0;
+				uint8_t shift_value = upper_half ? 4    : 0;
 
 				m_pagemode_column_start_address =
 					(m_pagemode_column_start_address & keep_mask) |
@@ -432,7 +434,7 @@ void ssd1306_device::exec_command(uint8_t data)
 		case 0x70:
 			if (!populate_fifo_until_n_bytes(data, 1)) return;
 
-			m_display_start_line = m_command_fifo[0] & 0x3f;
+			m_display_start_line = BIT(m_command_fifo[0], 0, 6);
 			break;
 
 		case 0x80:
