@@ -856,4 +856,4 @@ GAME( 2001, donghaer, crysbios, crystal,  crystal,  crystal_state, init_donghaer
 GAME( 2002, urachamu, crysbios, crystal,  urachamu, crystal_state, empty_init,    ROT0, "GamToU",              "Urachacha Mudaeri (Korea)", 0 ) // lamps, verify game timings
 GAME( 2003, topbladv, crysbios, crystal,  topbladv, crystal_state, init_topbladv, ROT0, "Sonokong / Expotato", "Top Blade V", 0 )
 GAME( 200?, wulybuly, crysbios, crystal,  wulybuly, crystal_state, empty_init,    ROT0, "<unknown>",           "Wully Bully", MACHINE_NOT_WORKING )
-GAME( 2002, maldaiza, crysbios, crystal,  crystal,  crystal_state, init_maldaiza, ROT0, "GamToU",              "Maldaliza", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // controls
+GAME( 2002, maldaiza, crysbios, crystal,  crystal,  crystal_state, init_maldaiza, ROT0, "GamToU",              "Maldaliza!", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // controls
