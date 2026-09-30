@@ -718,12 +718,31 @@ void atari_136094_0004a_device::write16(offs_t offset, uint16_t data)
 		}
 	}
 
-	// extra protection?
 	if (offset == PR_CHAR0 || offset == PR_CHAR1 || offset == PR_CHAR2)
 	{
+		/*
+		The protection device must perform the transformations shown below
+		
+		0x2694 -> 0xbcc8 (Sauron, Diablo)
+		0x6ee0 -> 0xaed5 (Blizzard, Talon)
+		0x34f7 -> 0x9d79 (Chaos)
+		0x32b9 -> 0xfd10 (Vertigo)
+		0x4d5a -> 0x82a3 (Armadon)
+
+		the xor/bitswap covers these cases
+
+		0x8016 is a special case, and is ignored
+
+		*/
+
 		// Preserve the existing handling of the trailing configuration word.
-	   if (data != 0x8016)
+		if (data != 0x8016)
+		{
+			if ((data != 0x2694) && (data != 0x6ee0) && (data != 0x34f7) && (data != 0x32b9) && (data != 0x4d5a))
+				fatalerror("Unknown Character Protection Value %04x\n", data);
+
 			m_taps = bitswap<16>(data, 15, 10, 9, 14, 13, 8, 11, 12, 0, 3, 1, 5, 2, 4, 7, 6) ^ 0xd4c6;
+		}
 	}
 }
 
