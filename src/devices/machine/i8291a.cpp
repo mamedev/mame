@@ -73,11 +73,12 @@ i8291a_device::i8291a_device(const machine_config &mconfig, const char *tag,
 	m_ifc{false},
 	m_eoi{false},
 	m_dio{0},
-	m_nrfd_out{false},
-	m_ndac_out{false},
-	m_dav_out{false},
-	m_srq_out{false},
-	m_eoi_out{false},
+	// released, like the bus at power-up: set_*() only writes on change
+	m_nrfd_out{true},
+	m_ndac_out{true},
+	m_dav_out{true},
+	m_srq_out{true},
+	m_eoi_out{true},
 	m_pon{false},
 	m_rdy{false},
 	m_lpe{false},
@@ -140,6 +141,13 @@ void i8291a_device::device_reset()
 	update_state(m_sh_state, source_handshake_state::SIDS);
 	update_state(m_ah_state, acceptor_handshake_state::AIDS);
 	update_state(m_lp_state, listener_primary_state::LPIS);
+
+	// pon: AIDS and SIDS release NRFD, NDAC and DAV (Figure A-1); EOI and DIO are released too, as the bus keeps our last level
+	set_nrfd(false);
+	set_ndac(false);
+	set_dav(false);
+	set_eoi(false);
+	m_dio_write_func(0xff);
 }
 
 void i8291a_device::device_start()
