@@ -80,7 +80,7 @@ ssd1306_device::ssd1306_device(const machine_config &mconfig, const char *tag, d
 
 void ssd1306_device::device_start()
 {
-	m_gddram = std::make_unique<u8[]>(128 * 8);
+	m_gddram = std::make_unique<uint8_t[]>(128 * 8);
 	memset(m_gddram.get(), 0, 128 * 8);
 }
 
