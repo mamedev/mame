@@ -45,13 +45,15 @@ public:
 		, m_y_cursor(0)
 		, m_dialog_top(0)
 		, m_dialog_bottom(0)
-		, m_hdelay(0)
-		, m_vdelay(0)
-		, m_row_height(1)
-		, m_visible_rows(0)
 		, m_wben(false)
 		, m_row_column(0)
 		, m_row_count(0)
+		, m_drb(true)
+		, m_drb_count(0)
+		, m_drb_line(0)
+		, m_row_height(0xff)
+		, m_cur_row(0xff)
+		, m_cur_scan(0)
 	{ }
 
 	void tek4107a(machine_config &config);
@@ -66,13 +68,15 @@ private:
 	static constexpr unsigned COLORMAP_CURSOR_BG = 24;
 	static constexpr unsigned COLORMAP_CURSOR_FG = 25;
 	static constexpr unsigned COLORMAP_CROSSHAIR = 27;
+	static constexpr unsigned SCAN_LINES = 525;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	u8 vpac_r(offs_t offset);
-	void vpac_w(offs_t offset, u8 data);
 	u8 dialog_dma_r(offs_t offset);
 	void vpac_wben_w(int state);
+	void vpac_vlt_w(int state);
+	void vpac_drb_w(int state);
 
 	u16 colormap_r(offs_t offset);
 	void colormap_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -125,10 +129,6 @@ private:
 	u16 m_y_cursor;
 	u8 m_dialog_top;
 	u8 m_dialog_bottom;
-	u8 m_hdelay;
-	u8 m_vdelay;
-	u8 m_row_height;
-	u8 m_visible_rows;
 
 	std::unique_ptr<u8[]> m_gfxram;
 	u16 m_colormap[32];
@@ -138,24 +138,22 @@ private:
 	u8 m_row_count;
 	u16 m_row_buffer[128];
 	u16 m_rows[64][128];
+
+	bool m_drb;
+	u8 m_drb_count;
+	u16 m_drb_line;
+	u8 m_row_height;
+	u8 m_cur_row;
+	u8 m_cur_scan;
+	u8 m_line_row[SCAN_LINES];
+	u8 m_line_scan[SCAN_LINES];
+	u16 m_line_start[SCAN_LINES];
+	u16 m_line_end[SCAN_LINES];
 };
 
 u8 tek4107a_state::vpac_r(offs_t offset)
 {
 	return m_vpac->read(offset + 0x20);
-}
-
-void tek4107a_state::vpac_w(offs_t offset, u8 data)
-{
-	switch (offset)
-	{
-	case 0x02: m_hdelay = data; break;
-	case 0x05: m_vdelay = data - 1; break;
-	case 0x07: m_visible_rows = data + 1; break;
-	case 0x08: m_row_height = (data & 0x1f) + 1; break;
-	}
-
-	m_vpac->write(offset, data);
 }
 
 u8 tek4107a_state::dialog_dma_r(offs_t offset)
@@ -192,6 +190,57 @@ void tek4107a_state::vpac_wben_w(int state)
 		m_row_count++;
 	}
 	m_wben = state;
+}
+
+void tek4107a_state::vpac_vlt_w(int state)
+{
+	int const y = m_vpac->screen().vpos();
+
+	if (y >= std::size(m_line_row))
+		return;
+
+	if (!state)
+	{
+		m_line_end[y] = m_vpac->screen().hpos();
+		return;
+	}
+
+	if (y == 0)
+	{
+		std::fill(std::begin(m_line_row), std::end(m_line_row), 0xff);
+		m_drb_count = 0;
+		m_cur_row = 0xff;
+	}
+
+	if (!m_drb)
+	{
+		if (m_drb_count)
+		{
+			if (m_drb_count > 1)
+				m_row_height = y - m_drb_line;
+			m_drb_line = y;
+			m_cur_row = m_drb_count - 1;
+			m_cur_scan = 0;
+		}
+		if (m_drb_count < 0xff)
+			m_drb_count++;
+	}
+	else if (m_cur_row != 0xff && m_cur_scan < 0xff)
+	{
+		m_cur_scan++;
+	}
+
+	if (m_cur_row != 0xff && m_cur_scan < m_row_height)
+	{
+		m_line_row[y] = m_cur_row;
+		m_line_scan[y] = m_cur_scan;
+		m_line_start[y] = m_vpac->screen().hpos();
+	}
+}
+
+void tek4107a_state::vpac_drb_w(int state)
+{
+	m_drb = state;
 }
 
 u16 tek4107a_state::colormap_r(offs_t offset)
@@ -443,7 +492,7 @@ void tek4107a_state::tek4107a_io(address_map &map)
 {
 	map(0x0000, 0x001f).rw(m_duart[0], FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
 	map(0x0000, 0x001f).rw(m_duart[1], FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0xff00);
-	map(0x0080, 0x00bf).rw(FUNC(tek4107a_state::vpac_r), FUNC(tek4107a_state::vpac_w)).umask16(0x00ff);
+	map(0x0080, 0x00bf).r(FUNC(tek4107a_state::vpac_r)).w(m_vpac, FUNC(crt9007_device::write)).umask16(0x00ff);
 	map(0x00c0, 0x00c1).w(FUNC(tek4107a_state::xpos_w));
 	map(0x00c2, 0x00c3).w(FUNC(tek4107a_state::ypos_w));
 	map(0x00c4, 0x00c5).w(FUNC(tek4107a_state::xcur_w));
@@ -470,6 +519,10 @@ void tek4107a_state::video_start()
 {
 	m_gfxram = make_unique_clear<u8[]>(0x80000);
 	std::fill_n(m_colormap, std::size(m_colormap), 0);
+	std::fill(std::begin(m_line_row), std::end(m_line_row), 0xff);
+	std::fill(std::begin(m_line_scan), std::end(m_line_scan), 0);
+	std::fill(std::begin(m_line_start), std::end(m_line_start), 0);
+	std::fill(std::begin(m_line_end), std::end(m_line_end), 0);
 
 	save_pointer(NAME(m_gfxram), 0x80000);
 	save_item(NAME(m_colormap));
@@ -481,15 +534,21 @@ void tek4107a_state::video_start()
 	save_item(NAME(m_y_cursor));
 	save_item(NAME(m_dialog_top));
 	save_item(NAME(m_dialog_bottom));
-	save_item(NAME(m_hdelay));
-	save_item(NAME(m_vdelay));
-	save_item(NAME(m_row_height));
-	save_item(NAME(m_visible_rows));
 	save_item(NAME(m_wben));
 	save_item(NAME(m_row_column));
 	save_item(NAME(m_row_count));
 	save_item(NAME(m_row_buffer));
 	save_item(NAME(m_rows));
+	save_item(NAME(m_drb));
+	save_item(NAME(m_drb_count));
+	save_item(NAME(m_drb_line));
+	save_item(NAME(m_row_height));
+	save_item(NAME(m_cur_row));
+	save_item(NAME(m_cur_scan));
+	save_item(NAME(m_line_row));
+	save_item(NAME(m_line_scan));
+	save_item(NAME(m_line_start));
+	save_item(NAME(m_line_end));
 }
 
 u32 tek4107a_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -500,28 +559,29 @@ u32 tek4107a_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	bool const cursor_blink = BIT(m_alpha_control, 1);
 	bool const block_cursor = BIT(m_alpha_control, 2);
 	bool const opaque = BIT(m_alpha_control, 3);
-	int const dialog_x = m_hdelay * 8;
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		unsigned const gy = (m_y_position - 1 - (y - visarea.top())) & 0x1ff;
-		int const dialog_y = y - m_vdelay;
-		unsigned const row = dialog_y / m_row_height;
-		unsigned const line = dialog_y % m_row_height;
-		bool const dialog = dialog_y >= 0 && row >= m_dialog_top && row <= m_dialog_bottom && row < 64;
+		unsigned const row = (y < std::size(m_line_row)) ? m_line_row[y] : 0xff;
 
-		if (dialog_y < 0 || row >= m_visible_rows)
+		if (row == 0xff)
 		{
 			std::fill_n(&bitmap.pix(y, cliprect.left()), cliprect.width(), rgb_t::black());
 			continue;
 		}
+
+		unsigned const line = m_line_scan[y];
+		int const dialog_x = m_line_start[y];
+		int const dialog_end = m_line_end[y];
+		bool const dialog = row >= m_dialog_top && row <= m_dialog_bottom && row < 64;
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			unsigned const gx = (m_x_position + X_PAN_OFFSET + x - visarea.left()) & 0x3ff;
 			unsigned index = m_gfxram[(gy << 10) | gx];
 
-			if (dialog && x >= dialog_x)
+			if (dialog && x >= dialog_x && x < dialog_end)
 			{
 				unsigned const col = (x - dialog_x) / 8;
 				u16 const cell = m_rows[row][col & 0x7f];
@@ -607,7 +667,7 @@ void tek4107a_state::tek4107a(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_raw(25.2_MHz_XTAL, 800, 112, 752, 525, 38, 518);
+	screen.set_raw(25.2_MHz_XTAL, 800, 112, 752, SCAN_LINES, 38, 518);
 	screen.set_screen_update(FUNC(tek4107a_state::screen_update));
 
 	CRT9007(config, m_vpac, 25.2_MHz_XTAL / 8);
@@ -615,6 +675,8 @@ void tek4107a_state::tek4107a(machine_config &config)
 	m_vpac->set_character_width(8);
 	m_vpac->set_addrmap(0, &tek4107a_state::vpac_map);
 	m_vpac->wben_callback().set(FUNC(tek4107a_state::vpac_wben_w));
+	m_vpac->vlt_callback().set(FUNC(tek4107a_state::vpac_vlt_w));
+	m_vpac->drb_callback().set(FUNC(tek4107a_state::vpac_drb_w));
 	m_vpac->int_callback().set("maincpu", FUNC(i80186_cpu_device::int1_w));
 
 	PALETTE(config, m_palette).set_entries(32);
