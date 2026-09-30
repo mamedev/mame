@@ -15,13 +15,16 @@ class bkungfu_mcu_device : public device_t
 public:
 	bkungfu_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	// configuration
 	auto tilemap_ram_w() { return m_tilemap_ram_w.bind(); }
+
+	// live interface
 	void clear();
 	u8 mailbox_r(offs_t offset);
 	void mailbox_from_main_w(offs_t offset, uint8_t data);
 	void mailbox_w(offs_t offset, uint8_t data);
 	void command_w(uint8_t command);
-	
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -50,28 +53,28 @@ private:
 	void write_floor_dot(int which, bool lit);
 	void vram_page_w(offs_t offset, uint8_t data);
 
+	TIMER_CALLBACK_MEMBER(leveldraw_next);
+
 	devcb_write8 m_tilemap_ram_w;
 	devcb_write8 m_mailbox_out_w;
 	uint8_t m_mailbox[0x800];
-	uint16_t m_timer = 0;
-	uint32_t m_p1score = 0;
-	uint32_t m_topscore = 0;
-	uint32_t m_p2score = 0;
-	uint8_t m_lives = 0;
-	uint8_t m_player_energy = 0;
-	uint8_t m_boss_energy = 0;
-	uint8_t m_floorcount = 0;
-	uint8_t m_floorcount_state = 0;
-	uint8_t m_valid = 0;
-	bool m_initialized = false;
-	bool m_running = false;
-	uint8_t m_leveldraw_row = 0;
-	uint8_t m_leveldraw_column = 0;
-	uint8_t m_leveldraw_number = 0;
-	emu_timer *m_leveldraw_timer = nullptr;
+	uint16_t m_timer;
+	uint32_t m_p1score;
+	uint32_t m_topscore;
+	uint32_t m_p2score;
+	uint8_t m_lives;
+	uint8_t m_player_energy;
+	uint8_t m_boss_energy;
+	uint8_t m_floorcount;
+	uint8_t m_floorcount_state;
+	uint8_t m_valid;
+	bool m_initialized;
+	bool m_running;
+	uint8_t m_leveldraw_row;
+	uint8_t m_leveldraw_column;
+	uint8_t m_leveldraw_number;
+	emu_timer *m_leveldraw_timer;
 	required_region_ptr<uint8_t> m_data_rom;
-
-	TIMER_CALLBACK_MEMBER(leveldraw_next);
 };
 
 #endif // MAME_IREM_M62_BKUNGFU_MCU_H

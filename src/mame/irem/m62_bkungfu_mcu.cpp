@@ -2,25 +2,21 @@
 // copyright-holders:David Haywood, Andrea Bogazzi
 
 /* MCU simulation code for IREM's Beyond Kung Fu
- 
+
    The MCU is fully in charge of the tilemap layer, copying text strings
    and background data from a partially encrypted external ROM
 
    The exact MCU type is not confirmed
+
+   TODO:
+   - determine the purpose of the optional fifth/sixth level composition pointers
+   - background draw timing isn't 100% correct, although this has no impact on overall game timing
+   - does the hardware really have twice the VRAM as the other boards?
+   - test mode doesn't work (there are strings for it in the MCU data ROM, is the MCU involved, or is it incomplete)
 */
 
 #include "emu.h"
 #include "m62_bkungfu_mcu.h"
-
-/*
-
-TODO:
-- determine the purpose of the optional fifth/sixth level composition pointers
-- background draw timing isn't 100% correct, although this has no impact on overall game timing
-- does the hardware really have twice the VRAM as the other boards?
-- test mode doesn't work (there are strings for it in the MCU data ROM, is the MCU involved, or is it incomplete)
-
-*/
 
 DEFINE_DEVICE_TYPE(BKUNG_MCU, bkungfu_mcu_device, "bkung_mcu", "Irem Beyond Kung-Fu MCU")
 
@@ -28,6 +24,22 @@ bkungfu_mcu_device::bkungfu_mcu_device(const machine_config &mconfig, const char
 	: device_t(mconfig, BKUNG_MCU, tag, owner, clock)
 	, m_tilemap_ram_w(*this)
 	, m_mailbox_out_w(*this)
+	, m_timer(0)
+	, m_p1score(0)
+	, m_topscore(0)
+	, m_p2score(0)
+	, m_lives(0)
+	, m_player_energy(0)
+	, m_boss_energy(0)
+	, m_floorcount(0)
+	, m_floorcount_state(0)
+	, m_valid(0)
+	, m_initialized(false)
+	, m_running(false)
+	, m_leveldraw_row(0)
+	, m_leveldraw_column(0)
+	, m_leveldraw_number(0)
+	, m_leveldraw_timer(nullptr)
 	, m_data_rom(*this, "blitterdat")
 {
 }
@@ -107,17 +119,17 @@ void bkungfu_mcu_device::vram_page_w(offs_t offset, uint8_t data)
 
 uint8_t bkungfu_mcu_device::decrypt_data(uint16_t address) const
 {
-    if (address >= 0x8000)
-        return 0xff;
+	if (address >= 0x8000)
+		return 0xff;
 
-    uint8_t const cipher = m_data_rom[address];
-    uint8_t const index = uint8_t((address & 0xff) + (address >> 8));
+	uint8_t const cipher = m_data_rom[address];
+	uint8_t const index = uint8_t((address & 0xff) + (address >> 8));
 
-    if (index & 1)
-        return uint8_t(
-            (index ^ ((index & 2) ? 0x7e : 0x12)) - 0x20 - cipher);
+	if (index & 1)
+		return uint8_t(
+			(index ^ ((index & 2) ? 0x7e : 0x12)) - 0x20 - cipher);
 
-    return uint8_t(cipher ^ index ^ ((index & 2) ? 0x5e : 0xae));
+	return uint8_t(cipher ^ index ^ ((index & 2) ? 0x5e : 0xae));
 }
 
 void bkungfu_mcu_device::write_number(int x, int y, uint8_t number)
@@ -467,8 +479,90 @@ TIMER_CALLBACK_MEMBER(bkungfu_mcu_device::leveldraw_next)
 
 void bkungfu_mcu_device::command_w(uint8_t command)
 {
-	if (command == 0xfe)
+	switch (command)
 	{
+	case 0x01:
+		m_leveldraw_number = m_mailbox[1];
+		complete(0);
+		break;
+
+	case 0x02:
+		m_leveldraw_row = 0;
+		m_leveldraw_column = 0;
+		m_leveldraw_timer->adjust(attotime::from_usec(LEVEL_DRAW_STEP_USEC));
+		break;
+
+	case 0x05:
+		// Observed after command 0x0f for later-stage animation objects.
+		// Its additional effect, if any, is not known yet.
+		complete(0);
+		break;
+
+	case 0x08:
+		clear_tilemap();
+		clear();
+		complete(0);
+		break;
+
+	case 0x0a:
+	{
+		uint16_t stream = m_data_rom[0x140] | (uint16_t(m_data_rom[0x141]) << 8);
+		uint16_t position = 0;
+		uint8_t attribute = 0;
+		for (;;)
+		{
+			uint8_t const value = m_data_rom[stream++];
+			if (value == 0x00)
+				break;
+			if (value == 0x01)
+			{
+				attribute = m_data_rom[stream++];
+				continue;
+			}
+			if (value == 0x02)
+			{
+				uint8_t const low = m_data_rom[stream++];
+				uint8_t const high = m_data_rom[stream++];
+				position = low | (uint16_t(high) << 8);
+				continue;
+			}
+			vram_page_w(position & 0x0fff, value);
+			vram_page_w((position + 1) & 0x0fff, attribute);
+			position = (position & ~0x007f) | ((position + 2) & 0x007f);
+		}
+
+		m_initialized = true;
+		for (uint8_t slot = 0x10; slot <= 0x2c; slot += 4)
+		{
+			if (m_valid & (1U << ((slot - 0x10) >> 2)))
+				update_slot(slot);
+		}
+		complete(0);
+		break;
+	}
+
+	case 0x0c:
+		draw_text(0, true);
+		complete(0);
+		break;
+
+	case 0x0d:
+	case 0x14:
+		draw_text(uint16_t(m_mailbox[1]) << 1, false);
+		complete(0);
+		break;
+
+	case 0x0f:
+		draw_object(m_mailbox[1]);
+		complete(0);
+		break;
+
+	case 0x10:
+		draw_credits_continue();
+		complete(0);
+		break;
+
+	case 0xfe:
 		m_running = true;
 		for (uint8_t slot = 0x10; slot <= 0x2c; slot += 4)
 			complete(slot);
@@ -477,90 +571,6 @@ void bkungfu_mcu_device::command_w(uint8_t command)
 		complete(0x118);
 		complete(0x11c);
 		complete(0);
-		return;
+		break;
 	}
-	if (command == 0x08)
-	{
-		clear_tilemap();
-		clear();
-		complete(0);
-		return;
-	}
-	if (command == 0x14 || command == 0x0d)
-	{
-		draw_text(uint16_t(m_mailbox[1]) << 1, false);
-		complete(0);
-		return;
-	}
-	if (command == 0x0c)
-	{
-		draw_text(0, true);
-		complete(0);
-		return;
-	}
-	if (command == 0x10)
-	{
-		draw_credits_continue();
-		complete(0);
-		return;
-	}
-	if (command == 0x05)
-	{
-		// Observed after command 0x0f for later-stage animation objects.
-		// Its additional effect, if any, is not known yet.
-		complete(0);
-		return;
-	}
-	if (command == 0x01)
-	{
-		m_leveldraw_number = m_mailbox[1];
-		complete(0);
-		return;
-	}
-	if (command == 0x02)
-	{
-		m_leveldraw_row = 0;
-		m_leveldraw_column = 0;
-		m_leveldraw_timer->adjust(attotime::from_usec(LEVEL_DRAW_STEP_USEC));
-		return;
-	}
-	if (command == 0x0f)
-	{
-		draw_object(m_mailbox[1]);
-		complete(0);
-		return;
-	}
-	if (command != 0x0a)
-		return;
-
-	uint16_t stream = m_data_rom[0x140] | (uint16_t(m_data_rom[0x141]) << 8);
-	uint16_t position = 0;
-	uint8_t attribute = 0;
-	for (;;)
-	{
-		uint8_t const value = m_data_rom[stream++];
-		if (value == 0x00)
-			break;
-		if (value == 0x01)
-		{
-			attribute = m_data_rom[stream++];
-			continue;
-		}
-		if (value == 0x02)
-		{
-			uint8_t const low = m_data_rom[stream++];
-			uint8_t const high = m_data_rom[stream++];
-			position = low | (uint16_t(high) << 8);
-			continue;
-		}
-		vram_page_w(position & 0x0fff, value);
-		vram_page_w((position + 1) & 0x0fff, attribute);
-		position = (position & ~0x007f) | ((position + 2) & 0x007f);
-	}
-
-	m_initialized = true;
-	for (uint8_t slot = 0x10; slot <= 0x2c; slot += 4)
-		if (m_valid & (1U << ((slot - 0x10) >> 2)))
-			update_slot(slot);
-	complete(0);
 }
