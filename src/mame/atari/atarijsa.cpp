@@ -960,7 +960,8 @@ void atari_jsa_iii_device::device_start()
 {
 	atari_jsa_oki_base_device::device_start();
 
-	configue_banks(m_oki1_banklo, m_oki1_bankhi);
+	if (m_oki1)
+		configue_banks(m_oki1_banklo, m_oki1_bankhi);
 }
 
 void atari_jsa_iii_device::set_bank(memory_bank* lobank, memory_bank* hibank, int bank)
@@ -980,15 +981,21 @@ void atari_jsa_iii_device::set_bank(memory_bank* lobank, memory_bank* hibank, in
 void atari_jsa_iii_device::mix_w(uint8_t data)
 {
 	atari_jsa_oki_base_device::mix_w(data);
-	int bank = (m_oki1_banklo->entry() & 1) | ((data >> 3) & 2);
-	set_bank(m_oki1_banklo, m_oki1_bankhi, bank);
+	if (m_oki1)
+	{
+		int bank = (m_oki1_banklo->entry() & 1) | ((data >> 3) & 2);
+		set_bank(m_oki1_banklo, m_oki1_bankhi, bank);
+	}
 }
 
 void atari_jsa_iii_device::wrio_w(uint8_t data)
 {
 	atari_jsa_oki_base_device::wrio_w(data);
-	int bank = (m_oki1_banklo->entry() & 2) | ((data >> 1) & 1);
-	set_bank(m_oki1_banklo, m_oki1_bankhi, bank);
+	if (m_oki1)
+	{
+		int bank = (m_oki1_banklo->entry() & 2) | ((data >> 1) & 1);
+		set_bank(m_oki1_banklo, m_oki1_bankhi, bank);
+	}
 }
 
 //-------------------------------------------------
@@ -1073,15 +1080,21 @@ atari_jsa_iiis_device::atari_jsa_iiis_device(const machine_config &mconfig, cons
 void atari_jsa_iiis_device::device_start()
 {
 	atari_jsa_iii_device::device_start();
-	configue_banks(m_oki2_banklo, m_oki2_bankhi);
+
+	if (m_oki2)
+		configue_banks(m_oki2_banklo, m_oki2_bankhi);
 }
 
 void atari_jsa_iiis_device::mix_w(uint8_t data)
 {
 	// update the right OKI bank (JSA IIIs only)
 	atari_jsa_iii_device::mix_w(data);
-	int bank = (data >> 6) & 3;
-	set_bank(m_oki2_banklo, m_oki2_bankhi, bank);
+
+	if (m_oki2)
+	{
+		int bank = (data >> 6) & 3;
+		set_bank(m_oki2_banklo, m_oki2_bankhi, bank);
+	}
 }
 
 //-------------------------------------------------

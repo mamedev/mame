@@ -247,12 +247,12 @@ protected:
 
 	required_ioport m_jsaiii;
 
-	// memory regions
-	required_memory_region m_oki_bankregion;
+	// memory regions - optional because offtwall removes the oki
+	optional_memory_region m_oki_bankregion;
 
-	// memory banks
-	required_memory_bank m_oki1_banklo;         // JSA III(s) only
-	required_memory_bank m_oki1_bankhi;         // JSA III(s)
+	// memory banks - optional because offtwall removes the oki
+	optional_memory_bank m_oki1_banklo;         // JSA III(s) only
+	optional_memory_bank m_oki1_bankhi;         // JSA III(s)
 
 	bool m_larger_bank;
 
