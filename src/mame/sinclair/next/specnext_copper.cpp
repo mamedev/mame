@@ -40,6 +40,7 @@ specnext_copper_device::specnext_copper_device(const machine_config &mconfig, co
 	: device_t(mconfig, SPECNEXT_COPPER, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_disasm_interface(mconfig, *this)
+	, device_state_interface(mconfig, *this)
 	, m_space_config("program", ENDIANNESS_BIG, 8, 11, 0, address_map_constructor(FUNC(specnext_copper_device::copper_map), this))
 	, m_timer(nullptr)
 	, m_frame_timer(nullptr)
@@ -164,6 +165,7 @@ void specnext_copper_device::device_start()
 	m_frame_timer = timer_alloc(FUNC(specnext_copper_device::frame_timer_callback), this);
 
 	m_in_until_pos_cb.resolve_safe(attotime::zero);
+	state_add(STATE_GENPC, "PC", m_copper_list_addr);
 
 	save_item(NAME(m_copper_en));
 	save_item(NAME(m_copper_list_addr));
