@@ -2449,6 +2449,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/heathzenith/h17/h17_fdc_base.h,BUSES["HEATHZENITH_H17_FDC"] = true
+---------------------------------------------------
+
+if BUSES["HEATHZENITH_H17_FDC"] then
+	files {
+		MAME_DIR .. "src/devices/bus/heathzenith/h17/h17_fdc_base.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h17/h17_fdc_base.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/heathzenith/h19/tlb.h,BUSES["HEATHZENITH_H19"] = true
 ---------------------------------------------------
 
@@ -2476,6 +2488,8 @@ if BUSES["HEATHZENITH_H8"] then
 		MAME_DIR .. "src/devices/bus/heathzenith/h8/h8bus.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_1.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_1.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_17.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_17.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_5.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h8/h_8_5.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h8/ha_8_6.cpp",

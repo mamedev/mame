@@ -54,19 +54,24 @@ protected:
 
 	void uart_rts(u8 data);
 	void uart_tx_empty(u8 data);
-	void irq_callback(int state);
+	void console_rxrdy_w(int state);
+	void console_dtr_w(int state);
+	void update_console_int();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 
 	required_device<i8251_device>          m_uart;
 	required_device<i8251_device>          m_console;
+	required_device<rs232_port_device>     m_rs232;
 	required_device<cassette_image_device> m_cass_player;
 	required_device<cassette_image_device> m_cass_recorder;
 
 	u8   m_cass_data[4];
 	bool m_cassbit;
 	bool m_cassold;
+	bool m_console_rxrdy;
+	bool m_console_dtr_n;
 };
 
 h_8_5_device::h_8_5_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -74,6 +79,7 @@ h_8_5_device::h_8_5_device(const machine_config &mconfig, const char *tag, devic
 	, device_h8bus_card_interface(mconfig, *this)
 	, m_uart(*this, "uart")
 	, m_console(*this, "console")
+	, m_rs232(*this, "rs232")
 	, m_cass_player(*this, "cassette_player")
 	, m_cass_recorder(*this, "cassette_recorder")
 {
@@ -128,15 +134,46 @@ void h_8_5_device::uart_tx_empty(u8 data)
 	m_cass_recorder->change_state(bool(data) ? CASSETTE_STOPPED : CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
 }
 
-void h_8_5_device::irq_callback(int state)
+void h_8_5_device::console_rxrdy_w(int state)
 {
 	LOGFUNC("%s: state: %d\n", FUNCNAME, state);
 
-	set_slot_int3(state);
+	m_console_rxrdy = bool(state);
+
+	update_console_int();
+}
+
+void h_8_5_device::console_dtr_w(int state)
+{
+	LOGLINES("%s: state: %d\n", FUNCNAME, state);
+
+	m_console_dtr_n = bool(state);
+
+	m_rs232->write_dtr(state);
+
+	update_console_int();
+}
+
+void h_8_5_device::update_console_int()
+{
+	// Traced on the H-8-5 schematic (595-2032-01):
+	// IC124 pin 24 (/DTR) goes to IC122B, a NAND with its other input at +5V,
+	// so it inverts.  IC122B pin 6 drives the RS-232 DTR transistor Q107 and
+	// the INT ON jumper, which feeds IC129D pin 12.  IC124 pin 14 (RxRDY) goes
+	// to IC129D pin 13, and IC129D drives the RxR interrupt pad.  The INT OFF
+	// jumper setting is not modelled.
+	//
+	// /DTR is active low, so m_console_dtr_n is false while it is asserted.
+	set_slot_int3((m_console_rxrdy && !m_console_dtr_n) ? 1 : 0);
 }
 
 void h_8_5_device::device_start()
 {
+	m_console_rxrdy = false;
+	m_console_dtr_n = true;
+
+	save_item(NAME(m_console_rxrdy));
+	save_item(NAME(m_console_dtr_n));
 	save_item(NAME(m_cass_data));
 	save_item(NAME(m_cassbit));
 	save_item(NAME(m_cassold));
@@ -200,9 +237,10 @@ void h_8_5_device::device_add_mconfig(machine_config &config)
 
 	m_console->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_console->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
-	m_console->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	// /DTR goes to the port and also gates the console interrupt.
+	m_console->dtr_handler().set(FUNC(h_8_5_device::console_dtr_w));
 	// The RxRdy pin on the 8251 USART is normally jumpered to generate a level 3 i/o interrupt.
-	m_console->rxrdy_handler().set(FUNC(h_8_5_device::irq_callback));
+	m_console->rxrdy_handler().set(FUNC(h_8_5_device::console_rxrdy_w));
 
 	// Console UART clock is 16X the baud rate.
 	clock_device &console_clock(CLOCK(config, "console_clock", 600*16));
