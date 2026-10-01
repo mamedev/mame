@@ -800,7 +800,7 @@ bool m68hc05_device::test_il()
 void m68hc05_device::burn_cycles(unsigned count)
 {
 	// calculate new timer values (fixed prescaler of four)
-	unsigned const ps_opt(4);
+	unsigned const ps_opt(2);
 	unsigned const ps_mask((1 << ps_opt) - 1);
 	unsigned const increments((count + (m_prescaler & ps_mask)) >> ps_opt);
 	u32 const new_counter(u32(m_counter) + increments);
