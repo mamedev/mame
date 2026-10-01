@@ -150,6 +150,7 @@ void scc66470_device::device_start()
 
 	m_dca_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scc66470_device::process_dca), this));
 
+	save_item(NAME(m_working_dcp));
 	save_item(NAME(m_csr));
 	save_item(NAME(m_dcr));
 	save_item(NAME(m_vsr));
