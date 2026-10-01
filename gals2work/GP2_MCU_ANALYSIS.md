@@ -1,5 +1,9 @@
 # Gals Panic 2 — MCU Protection Analysis
 
+> Historical analysis. See `IMAGE_FORMAT.md` for the verified image decoding
+> results. The hard-coded `imlist` matches the Asia background ROM, not the
+> Japanese one. Address banking alone cannot correct this regional mismatch.
+
 ## Architecture
 
 ```

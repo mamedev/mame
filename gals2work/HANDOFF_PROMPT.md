@@ -1,3 +1,47 @@
+# Gals Panic II — image decoding resolved (2026-10-01)
+
+The earlier prompt below is retained as historical context. Its conclusion
+that the data is raw/uncompressed, its width guesses, RGB555 ordering, and
+its proposed missing per-row transform are superseded.
+
+Read **IMAGE_FORMAT.md** first. `decode_bg15.py` successfully decodes all
+**287 Asia type-0x0020 images**. The header is six bytes: type, height minus
+one, width minus one, all big-endian. Packets use bit 7 for repeat versus
+literal and the low seven bits for count minus one. Colors are GRB555.
+There is no missing XOR/delta transform for this format.
+
+The principal mistake was using the Asia `imlist` offsets while running
+**galpani2j**. The handoff's raw dumps therefore start inside unrelated
+Japanese image streams. Correct Asia addresses reveal the headers and
+clean pictures immediately. `--index` now rejects mismatched ROM data.
+The decoder also produces clean Japanese pictures with independently
+verified offsets (example: 0x001ff17a); the Japanese index table remains
+to be reconstructed.
+
+`verify_native.lua` runs the actual Japanese 68000 B1C6 routine against a
+correct Asia B5 payload copied into volatile emulated ROM memory. Its
+65,536 output words match the standalone decoder exactly. This validates
+the packet interpretation. The test requires a valid coroutine save area
+and uses source = image offset + 6. Chunk yields remain runnable and do
+not need repeated MCU reactivation.
+
+Useful deliverables:
+- `decode_bg15.py`: reproducible decoder and Asia table validation.
+- `export_rom.lua`: bank-independent, endian-correct ROM export.
+- `verify_native.lua`: native CPU comparison harness.
+- `verified_bg15_manifest.json`: all 287 validated Asia images.
+- `verified_japan_bg15_candidates.json`: 47 Japanese 256x256 streams.
+- `decode_attempts/SOLVED_asia_b5.png`: clean illustration.
+- `decode_attempts/SOLVED_japan_1ff17a.png`: clean Japanese picture.
+
+Next work is MCU/driver integration and regional offset mapping. The
+current driver retains the old forced job after ~30 seconds and a
+hard-coded framebuffer page. No C++ driver changes were made here.
+
+---
+
+## Original handoff — historical, unverified conclusions
+
 # Gals Panic 2 Image Decompression — Handoff for Continuation
 
 ## The Problem

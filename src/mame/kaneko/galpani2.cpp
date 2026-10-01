@@ -226,21 +226,83 @@ void galpani2_state::galpani2_mcu_nmi1()
 			break;
 		}
 
-		//case 0x10: //? Clear gal?
-		//case 0x14: //? Display gal?
-		//until
-		//case 0x50: //? Display gal?
-		//case 0x68: //? Display "Changed" monster?
-		//until
-		//case 0x6E: //? Display "Changed" monster?
-		//case 0x85: //? Do what?
-		// TODO: these commands should populate the blocked decompression tasks
-		// on the sub CPU (IDs 0x5a-0x9c) with correct param blocks and activate
-		// them by clearing bit 7. The param block needs source ROM offset,
-		// destination bg15 address, and image dimensions. See gals2work/NOTES.md.
-		default:
-			logerror("MCU master %02x:%06x: unhandled command %02x\n", slot, address, command);
+		default: {
+			// Display commands: set up a decompression task on the sub CPU.
+			// Read the image from the most recent cmd=0x0c lookup result,
+			// parse the 6-byte type-0x0020 header, and configure a B1C6 task.
+			uint32_t tbase = sspace.read_dword(0x1094a8);
+			uint32_t sbase = sspace.read_dword(0x1094ac);
+			if (!tbase || !sbase)
+				break;
+
+			// Find a blocked decompression task (IDs 0x5a-0x9c, type B1C6)
+			for (int ti = 0; ti < 0x200; ti += 0x10)
+			{
+				uint8_t tflags = sspace.read_byte(tbase + ti);
+				uint16_t tid = sspace.read_word(tbase + ti + 2);
+				if ((tflags & 0xc0) != 0xc0 || tid < 0x5a || tid > 0x9c)
+					continue;
+
+				// Read the last image lookup result (banked address from cmd=0x0c)
+				// stored by the slave handler at the command area
+				uint32_t banked_addr = sspace.read_dword(0x1018ac);
+				if (!banked_addr)
+					break;
+
+				// Convert banked address back to raw ROM offset for header read
+				uint32_t rom_offset = banked_addr;
+				if (rom_offset >= 0x800000)
+					rom_offset -= 0x800000;
+
+				// Read the 6-byte image header: type(w), last_y(w), last_x(w)
+				// Need to set the correct bank first
+				uint32_t bank = (rom_offset >> 23) & 3;
+				sspace.write_word(0x7c0000, bank);
+				uint32_t hdr_addr = 0x800000 | (rom_offset & 0x7fffff);
+				uint16_t img_type = sspace.read_word(hdr_addr);
+				uint16_t last_y = sspace.read_word(hdr_addr + 2);
+				uint16_t last_x = sspace.read_word(hdr_addr + 4);
+
+				if (img_type != 0x0020)
+				{
+					logerror("MCU cmd=%02x: image at %06x type=%04x (not 0x0020), skipping\n",
+						command, rom_offset, img_type);
+					break;
+				}
+
+				uint16_t width = last_x + 1;
+				uint16_t height = last_y + 1;
+
+				// Set up param block at a safe RAM location
+				// Use sub CPU RAM near end: 0x13F000
+				uint32_t pblock = 0x13F000;
+				sspace.write_dword(pblock + 0x0, rom_offset + 6);  // source: after 6-byte header
+				sspace.write_dword(pblock + 0x4, 0x004c0000);     // dest: bg15 page 3
+				sspace.write_word(pblock + 0x8, last_x);           // width - 1 (for dbra)
+				sspace.write_word(pblock + 0xa, last_y);           // height - 1 (for dbra)
+				sspace.write_word(pblock + 0xe, last_y);           // skip = height-1 (all rows visible)
+
+				// Set param pointer in task entry
+				sspace.write_dword(tbase + ti + 0x8, pblock);
+
+				// Ensure save area is set (offset 0xC)
+				uint32_t save = sspace.read_dword(tbase + ti + 0xc);
+				if (!save)
+				{
+					// Compute save area from base + slot offset
+					save = sbase + (ti / 0x10) * 0x400;
+					sspace.write_dword(tbase + ti + 0xc, save);
+				}
+
+				// Activate: clear bit 7
+				sspace.write_byte(tbase + ti, tflags & 0x7f);
+
+				logerror("MCU cmd=%02x: activated task %04x, image %dx%d at ROM %06x+6\n",
+					command, tid, width, height, rom_offset);
+				break;
+			}
 			break;
+		}
 
 		}
 
@@ -254,75 +316,6 @@ void galpani2_state::galpani2_mcu_nmi1()
 
 void galpani2_state::galpani2_mcu_nmi2()
 {
-	// Activate a decompression task and snapshot bg15 before/after
-	address_space &ss = m_subcpu->space(AS_PROGRAM);
-	static int bg15_phase = 0;
-	static int bg15_timer = 0;
-	bg15_timer++;
-
-	if (bg15_phase == 0 && bg15_timer == 1800) // ~30 seconds
-	{
-		// Snapshot bg15 BEFORE
-		FILE *f = fopen("/tmp/gp2_bg15_before.bin", "wb");
-		if (f) { for (uint32_t a = 0x4c0000; a < 0x500000; a++) { uint8_t b = ss.read_byte(a); fwrite(&b, 1, 1, f); } fclose(f); }
-
-		// Activate task 0x5a with image 0 params
-		uint32_t tbase = ss.read_dword(0x1094a8);
-		if (tbase) {
-			uint32_t pblock = 0x13F000; // near end of sub CPU RAM, less likely to be overwritten
-			ss.write_dword(pblock + 0, 0x0044250c); // image 0xD3 (referenced by game descriptor)
-			ss.write_dword(pblock + 4, 0x004c0000); // dest page 3
-			ss.write_word(pblock + 8, 0x0100);       // width 256 columns
-			ss.write_word(pblock + 0xa, 0x00f0);     // height 240 rows
-			ss.write_word(pblock + 0xe, 0x00f0);     // skip = height (makes D2=0, all rows visible)
-			for (int ti = 0; ti < 0x200; ti += 0x10) {
-				uint8_t tf = ss.read_byte(tbase + ti);
-				uint16_t tid = ss.read_word(tbase + ti + 2);
-				if ((tf & 0xc0) == 0xc0 && tid == 0x005a) {
-					ss.write_dword(tbase + ti + 8, pblock);
-					ss.write_byte(tbase + ti, tf & 0x7f);
-					logerror("BG15 SNAP: activated task 0x5a\n");
-					break;
-				}
-			}
-		}
-		bg15_phase = 1;
-	}
-	else if (bg15_phase == 1)
-	{
-		// Re-activate blocked task continuously
-		uint32_t tbase = ss.read_dword(0x1094a8);
-		if (tbase) {
-			for (int ti = 0; ti < 0x200; ti += 0x10) {
-				uint8_t tf = ss.read_byte(tbase + ti);
-				uint16_t tid = ss.read_word(tbase + ti + 2);
-				if ((tf & 0xc0) == 0xc0 && tid == 0x005a) {
-					uint32_t cp = ss.read_dword(tbase + ti + 4);
-					if (cp != 0) {
-						ss.write_byte(tbase + ti, tf & 0x7f);
-						static int reactivation_count = 0;
-						if (++reactivation_count <= 3) {
-							uint32_t pp = ss.read_dword(tbase + ti + 8);
-							logerror("REACTIVATE task5a: cp=%06x param=%06x", cp, pp);
-							if (pp >= 0x100000 && pp < 0x140000) {
-								logerror(" src=%08x dst=%08x w=%04x h=%04x skip=%04x",
-									ss.read_dword(pp), ss.read_dword(pp+4),
-									ss.read_word(pp+8), ss.read_word(pp+0xa), ss.read_word(pp+0xe));
-							}
-							logerror("\n");
-						}
-					}
-				}
-			}
-		}
-		if (bg15_timer >= 3600) { // 30 seconds of re-activation
-			FILE *f = fopen("/tmp/gp2_bg15_after.bin", "wb");
-			if (f) { for (uint32_t a = 0x4c0000; a < 0x500000; a++) { uint8_t b = ss.read_byte(a); fwrite(&b, 1, 1, f); } fclose(f); }
-			logerror("BG15 SNAP: saved before/after\n");
-			bg15_phase = 2;
-		}
-	}
-
 	static const uint32_t imlist[794] = {
 		0x000ccbf4, 0x000eac7e, 0x0010db66, 0x00125050, 0x0012b3b6, 0x00132140, 0x00137cae, 0x0013f256, 0x00144ac4, 0x0014dc5c, 0x00153bf8, 0x00158cae, 0x0015e5b2, 0x001672a6, 0x00170c5e, 0x0017306c,
 		0x00173a88, 0x00174d44, 0x001759da, 0x0017693e, 0x001773f4, 0x0017802c, 0x0017abd6, 0x0017baca, 0x0017d37a, 0x0017e97e, 0x0017ff34, 0x00180cfe, 0x00181e5c, 0x00183be0, 0x001858b2, 0x00186dae,

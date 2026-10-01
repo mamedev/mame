@@ -1,5 +1,24 @@
 # Gals Panic 2 Protection Emulation — Working Notes
 
+## Verified correction — 2026-10-01
+
+The historical image-format conclusions below are superseded by
+`IMAGE_FORMAT.md`. Type `0x0020` images ARE run-length compressed, have a
+six-byte header, and use GRB555 colors. The handoff's raw images were dumped
+from the Japanese set at offsets from the Asia `imlist`, so they begin inside
+unrelated image payloads. Their apparent widths and proposed stateful
+transforms are misleading.
+
+`decode_bg15.py` validates all 287 Asia type-0x20 images. A native B1C6 run on
+the verified Asia B5 payload matches its 65,536 output words byte for byte.
+The decoder also handles Japanese images when given their actual offsets.
+The Japanese program's decompressor yields with flag `0x40` during chunks;
+it does not require MCU reactivation for every chunk. Its coroutine register
+save area must be initialized. Full MCU integration remains outstanding.
+
+The unmodified experimental driver currently injects a bad decompression job
+after roughly 30 seconds; treat that block as debugging code, not emulation.
+
 ## What's Done
 
 ### Fix 1: Image address banking (COMMITTED)

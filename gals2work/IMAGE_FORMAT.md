@@ -1,56 +1,154 @@
-# Gals Panic 2 — Image Format Investigation
+# Gals Panic II — verified type-0x20 image decoding
 
-## Image Storage
+Verified on 2026-10-01. This replaces the earlier raw-pixel, width-sweep,
+RGB555, and per-row-transform hypotheses.
 
-Images are in the **subdata ROM** region (32MB, banked at sub CPU 0x800000).
-The `imlist[794]` table in the MCU simulation maps image indices to ROM offsets.
+## Result and evidence
 
-Image sizes vary: 25KB to 140KB. No header at the start of image data — the
-previous image's data runs right up to the next.
+- All **287 type-0x0020 images** in the Asia driver's 794-entry `imlist`
+  decode to the pixel count in their headers, within their ROM boundaries.
+- The other 507 table entries have other types, principally 0x0030 and
+  0x0050; this decoder does not claim to handle them.
+- **47 Japanese 256x256 image headers** found at their actual ROM offsets
+  also decode with the same algorithm. These are candidates with verified
+  pixel streams, not a reconstructed Japanese image-index table.
+- Running the actual Japanese 68000 **B1C6** routine on the correct Asia B5
+  payload produces **65,536 words identical** to the standalone decoder.
+  The harness patches only volatile emulated ROM memory, supplies a real
+  coroutine save area, and exits before the driver's 30-second debug job.
+- Output SHA-256 (131,072 bytes, big-endian words, bit 15 masked):
+  `f4b6c7aaf66966aa6b87a95c4431caa94a561be30bcab5ba9761c7b37f901651`.
 
-## Image Grid Table (Sub CPU ROM 0xA504)
+## Why the old investigation failed
 
-9 columns × 10 rows. Each cell at byte offset `(col * 256 + row * 16)`:
+The driver's hard-coded `imlist[794]` matches **galpani2 (Asia)** data.
+The old `raw_image_01.bin` and `raw_image_b5.bin` were captured from
+**galpani2j (Japan)** at the Asia offsets. Their initial bytes match the
+Japanese ROM at those offsets, but those addresses land inside other
+image streams, not at image headers.
 
-| Offset | Size | Field | Notes |
-|--------|------|-------|-------|
-| +0 | word | image_index | Used for pointer table lookup |
-| +2 | word | f1 | Y position/start (row pairs differ by ~37-47) |
-| +4 | word | f2 | X column parameter (always == f3) |
-| +6 | word | f3 | Same as f2 |
-| +8 | word | f4 | Y end/total (sometimes == f1) |
+At Asia offset 0x000eac7e, the actual header is `0020 00ef 013f`.
+At the same Japanese offset, the bytes begin `197e 427f 4abf`, which are
+image payload data. Trying to decode them as a fresh packet stream loses
+synchronization. Viewing compressed literal payloads as raw pixels can
+still show recognizable fragments, with drift from packet control bytes.
 
-Row pairs (0+1, 2+3, 4+5, 6+7) have consecutive image indices and matching
-f2/f3 values, suggesting top/bottom halves of pictures.
+The dump command also interpreted length arguments as hexadecimal:
+`raw_image_01.bin` is 0x143080 = 1,323,136 bytes, not 143,080 bytes;
+`raw_image_b5.bin` is 0x120000 = 1,179,648 bytes, not 61,820 bytes.
+The true Asia image lengths of 143,080 and 61,820 bytes came from adjacent
+Asia offsets, not from those Japanese dumps.
 
-## Raw Byte Analysis
+## Header
 
-Image 0xB5 (title screen, 61820 bytes) rendered as raw bytes at width **490**
-shows a visible grayscale landscape. This proves the data is NOT RLE compressed.
+Six bytes, big-endian:
 
-| Image | Size | imlist offset | Notes |
-|-------|------|--------------|-------|
-| 0xB5 | 61820 bytes | 0x2CFB1E | Title screen, visible at w=490 |
-| 0xD3 | 57462 bytes | 0x44250C | Gameplay image |
-| 0x00 | 123018 bytes | 0x0CCBF4 | First image (largest) |
+| Offset | Meaning |
+|---|---|
+| +0 | Type word: 0x0020 |
+| +2 | Height minus one |
+| +4 | Width minus one |
+| +6 | First compressed packet |
 
-## What Failed
+Examples:
 
-- B1C6 decompression (native 68000): produces noise
-- B0E0 3-byte RLE format: structured but no picture
-- GRAP2 byte-level RLE (from GP3): structured but no picture
-- 3-plane split (R/G/B channels): doesn't resolve
-- Raw 16-bit words at any width/endianness: noise
-- Raw bytes at standard widths (256, 320, 512): noise
+| Asia index | Offset | Dimensions | Consumed including header | Next table entry |
+|---|---|---|---|---|
+| 0x00 | 0x000ccbf4 | 320x240 | 123,018 bytes | 0x000eac7e |
+| 0x01 | 0x000eac7e | 320x240 | 143,079 bytes | 0x0010db66 |
+| 0xb5 | 0x002cfb1e | 256x256 | 61,819 bytes | 0x002dec9a |
+| 0xd3 | 0x0044250c | 256x256 | 57,461 bytes | 0x00450582 |
 
-## What Works
+The first assets include abstract/title graphics; index 1 is not the blue
+anime garment seen in the old Japanese raw dump. B5 is a clean illustration,
+and D3 is a clean photograph.
 
-- Raw bytes at width **490** show faint image structure
-- 490 × 126 ≈ 61740 bytes ≈ full image 0xB5 size
+## Packets and colors
 
-## Open Questions
+Read one control byte. The pixel count is `(control & 0x7f) + 1`.
 
-1. Why width 490? (not a power of 2 or standard resolution)
-2. Where is the palette data? (if 8-bit indexed)
-3. The grid table f1-f4 fields — how do they map to pixel positions?
-4. Does the MCU apply a transform (XOR, bit rotation, palette lookup)?
+- Bit 7 clear: read that many individual big-endian 16-bit color words.
+- Bit 7 set: read one big-endian 16-bit color word and repeat it.
+
+Stop when the header's rectangle is filled. Some genuine final repeat
+runs extend beyond that rectangle, just as the native routine permits.
+Some entries also contain an unreachable trailing black repeat packet
+and/or an alignment byte. Their details are retained in the manifest;
+there is no end-marker scan or guessed width.
+
+Colors are **GRB555**, matching `palette_device::GRB_555` in the driver:
+G = bits 10..14, R = bits 5..9, B = bits 0..4. Native B1C6 sets bit 15 on
+written framebuffer words; it is excluded from color conversion.
+
+For standalone previews, the linear decoded words are rendered at the
+header's width and height. A clockwise 90-degree rotation makes the B5
+and verified Japanese examples upright. Hardware framebuffer addressing,
+page selection, and image composition require separate integration work.
+
+## Reproduce
+
+Run from the repository root. The exporter reads the entire ROM region,
+independent of the currently selected bank, and converts host-order 16-bit
+region storage to logical big-endian bytes.
+
+```sh
+SDL_VIDEODRIVER=dummy ./mame galpani2 -video none -sound none -nothrottle \
+  -skip_gameinfo -autoboot_delay 0 -autoboot_script gals2work/export_rom.lua \
+  -seconds_to_run 2 -cfg_directory /tmp/gp2_codex_cfg \
+  -nvram_directory /tmp/gp2_codex_nvram
+
+python3 gals2work/decode_bg15.py gals2work/galpani2_subdata_logical.bin \
+  --validate-table --manifest gals2work/verified_bg15_manifest.json
+
+python3 gals2work/decode_bg15.py gals2work/galpani2_subdata_logical.bin \
+  --index 0xb5 --rotate 90 --scale 2 \
+  --output gals2work/decode_attempts/SOLVED_asia_b5.png \
+  --words gals2work/decoded_b5_words.bin
+
+SDL_VIDEODRIVER=dummy ./mame galpani2j -video none -sound none -nothrottle \
+  -skip_gameinfo -autoboot_delay 0 -autoboot_script gals2work/verify_native.lua \
+  -seconds_to_run 12 -cfg_directory /tmp/gp2_codex_cfg \
+  -nvram_directory /tmp/gp2_codex_nvram
+
+cmp gals2work/decoded_b5_words.bin gals2work/native_b5_words.bin
+```
+
+For Japan, first run `export_rom.lua` with `galpani2j`, then use a verified
+header offset, e.g.:
+
+```sh
+python3 gals2work/decode_bg15.py gals2work/galpani2j_subdata_logical.bin \
+  --offset 0x1ff17a --rotate 90 --scale 2 \
+  --output gals2work/decode_attempts/SOLVED_japan_1ff17a.png
+```
+
+PNG creation uses Pillow. Binary decoding and table validation use only
+Python's standard library. `--index` and `--validate-table` reject ROM data
+that does not match the Asia table's first header.
+
+## Remaining emulator work
+
+The decoder succeeds independently; the game driver is still incomplete.
+Use the existing disassembly to implement the MCU's image selection,
+descriptor processing, task parameters, and completion handshake. Do not
+assume the Japanese sub-CPU addresses apply to the Asia program.
+
+For B1C6, the source must point **after the six-byte image header**.
+The harness verified a raw framebuffer destination, +8/+a counters of
+0x00ff, and +e = 0x00ff for a complete 256x256 image. A task entered directly
+must also have a valid register save pointer at task-entry +0x0c.
+
+The native code advances its line/column base by **0x400 bytes**. Do not
+infer a 0x200-byte full stride just from a `lea ($200,A0),A0` that follows
+0x200 bytes of post-increment writes. The actual raster mapping and
+0x314000 page register are not established by this decoding result.
+
+B1C6's chunk yields set the task to 0x40, leaving it runnable. It blocks
+with 0xc0 at completion. Continually reactivating a completed task restarts
+its image job; it is unnecessary for normal chunk progress.
+
+The current C++ driver still contains the previous forced test at about
+30 seconds, with a header included in its source and a mismatched regional
+image offset. That experimental block and the hard-coded page-3 renderer
+must be addressed during integration. No C++ driver changes were made in
+this investigation.
