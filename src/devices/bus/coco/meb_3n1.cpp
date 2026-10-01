@@ -104,7 +104,8 @@ namespace
 		rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
 		rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
- 		MSM6242(config, m_rtc,  XTAL(32'768), false /* 12 hour */);
+ 		MSM6242(config, m_rtc,  XTAL(32'768));
+		m_rtc->set_default_24h(false);
 
 		CENTRONICS(config, m_centronics, centronics_devices, "printer");
 		m_centronics->busy_handler().set(FUNC(disto_3n1_device::busy_w));

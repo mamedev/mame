@@ -46,7 +46,7 @@ class msm6242_device : public device_t, public device_rtc_interface
 {
 public:
 	// construction/destruction
-	msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0, bool default_24h = true);
+	msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto out_int_handler() { return m_out_int_handler.bind(); }
 
@@ -54,8 +54,11 @@ public:
 	void write(offs_t offset, u8 data);
 	u8 read(offs_t offset);
 
+	// configuration
+	msm6242_device &set_default_24h(bool default_24h);
+
 protected:
-	msm6242_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool default_24h = true);
+	msm6242_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -106,7 +109,7 @@ class rtc62421_device : public msm6242_device
 {
 public:
 	// construction/destruction
-	rtc62421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, bool default_24h = true);
+	rtc62421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 // ======================> rtc62423_device
@@ -115,7 +118,7 @@ class rtc62423_device : public msm6242_device
 {
 public:
 	// construction/destruction
-	rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0, bool default_24h = true);
+	rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 // ======================> rtc72421_device
@@ -124,7 +127,7 @@ class rtc72421_device : public msm6242_device
 {
 public:
 	// construction/destruction
-	rtc72421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, bool default_24h = true);
+	rtc72421_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 // ======================> rtc72423_device
@@ -133,7 +136,7 @@ class rtc72423_device : public msm6242_device
 {
 public:
 	// construction/destruction
-	rtc72423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, bool default_24h = true);
+	rtc72423_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
