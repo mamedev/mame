@@ -335,11 +335,6 @@ void mc68340_timer_module_device::device_reset()
 	module_reset();
 }
 
-void mc68340_timer_module_device::device_post_load()
-{
-	m_tout_out_cb((m_sr & REG_SR_OUT) ? 1 : 0);
-}
-
 void mc68340_timer_module_device::module_reset()
 {
 	m_cr = 0x0000;

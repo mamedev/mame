@@ -35,21 +35,21 @@ private:
 
 	struct channel_state
 	{
-		uint16_t mcr;
-		uint16_t intr;
-		uint16_t ccr;
-		uint8_t csr;
-		uint8_t fcr;
-		uint32_t sar;
-		uint32_t dar;
-		uint32_t btc;
-		uint8_t dreq;
-		uint8_t done_in;
-		uint8_t dack;
-		uint8_t done_out;
+		uint16_t mcr = 0;
+		uint16_t intr = 0;
+		uint16_t ccr = 0;
+		uint8_t csr = 0;
+		uint8_t fcr = 0;
+		uint32_t sar = 0;
+		uint32_t dar = 0;
+		uint32_t btc = 0;
+		uint8_t dreq = 0;
+		uint8_t done_in = 0;
+		uint8_t dack = 0;
+		uint8_t done_out = 0;
 	};
 
-	channel_state m_channel[2]{};
+	channel_state m_channel[2];
 	m68340_cpu_device *m_cpu;
 	devcb_write_line::array<2> m_dack_out_cb;
 	devcb_write_line::array<2> m_done_out_cb;

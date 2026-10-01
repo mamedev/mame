@@ -211,11 +211,11 @@ treatment are reconstructions.
 	</element>
 	<element name="coin_label_pound" defstate="0">
 		<rect><color alpha="0.0" /></rect>
-		<text string="&#xa3;1"><bounds x="0.110" y="0.715" width="0.060" height="0.060" /><color state="0" red="0.22" green="0.02" blue="0.02" /><color state="255" red="0.90" green="0.16" blue="0.12" /><color state="256" red="0.00" green="0.00" blue="0.00" /></text>
+		<text string="£1"><bounds x="0.110" y="0.715" width="0.060" height="0.060" /><color state="0" red="0.22" green="0.02" blue="0.02" /><color state="255" red="0.90" green="0.16" blue="0.12" /><color state="256" red="0.00" green="0.00" blue="0.00" /></text>
 	</element>
 	<element name="coin_label_two_pounds" defstate="0">
 		<rect><color alpha="0.0" /></rect>
-		<text string="&#xa3;2"><bounds x="0.205" y="0.715" width="0.060" height="0.060" /><color state="0" red="0.22" green="0.02" blue="0.02" /><color state="255" red="0.90" green="0.16" blue="0.12" /><color state="256" red="0.00" green="0.00" blue="0.00" /></text>
+		<text string="£2"><bounds x="0.205" y="0.715" width="0.060" height="0.060" /><color state="0" red="0.22" green="0.02" blue="0.02" /><color state="255" red="0.90" green="0.16" blue="0.12" /><color state="256" red="0.00" green="0.00" blue="0.00" /></text>
 	</element>
 
 	<element name="label_a"><text string="A"><color red="0.00" green="0.00" blue="0.00" /></text></element>

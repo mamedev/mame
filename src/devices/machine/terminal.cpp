@@ -329,8 +329,8 @@ void generic_terminal_device::kbd_put(u8 data)
 
 void generic_terminal_device::device_add_mconfig(machine_config &config)
 {
-	const uint16_t width = TERMINAL_WIDTH * 8;
-	const uint16_t height = TERMINAL_HEIGHT * 10;
+	constexpr uint16_t width = TERMINAL_WIDTH * 8;
+	constexpr uint16_t height = TERMINAL_HEIGHT * 10;
 
 	screen_device &screen(SCREEN(config, TERMINAL_SCREEN_TAG));
 	screen.set_raw(width * height * 50, width, 0, width, height, 0, height);

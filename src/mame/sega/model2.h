@@ -133,7 +133,6 @@ protected:
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_0229crypt;
 	optional_shared_ptr<u32> m_0229ram;
-	bool m_doa_dummy = true;
 	optional_memory_region m_copro_data;
 
 	required_ioport m_in0;
@@ -158,6 +157,7 @@ protected:
 	u8 m_lightgun_mux = 0;
 
 	u8 m_prot_a = 0;
+	bool m_doa_dummy = true;
 
 	u32 m_intreq = 0;
 	u32 m_intena = 0;

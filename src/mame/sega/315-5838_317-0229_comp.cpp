@@ -106,6 +106,7 @@ DEFINE_DEVICE_TYPE(SEGA315_5838_COMP, sega_315_5838_comp_device, "sega315_5838",
 
 sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, SEGA315_5838_COMP, tag, owner, clock),
+	m_variant(variant::SEGA_315_5838),
 	m_source_cb(*this, 0xffff)
 {
 }

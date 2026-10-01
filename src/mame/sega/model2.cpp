@@ -7602,8 +7602,7 @@ void model2_state::doa_source_w(offs_t offset, u32 data, u32 mem_mask)
 u16 model2_state::sega_0229_source_r(offs_t offset)
 {
 	// The source is a 32 KiB window of little-endian i960 RAM.
-	u32 const data = m_0229ram[(offset & 0x3fff) >> 1];
-	return data >> (BIT(offset, 0) * 16);
+	return util::little_endian_cast<u16 const>(&m_0229ram[0])[offset & 0x3fff];
 }
 
 u32 model2_state::doa_unk_r()
@@ -7618,7 +7617,7 @@ u32 model2_state::doa_unk_r()
 void model2_state::model2_0229_mem(address_map &map)
 {
 	// The protection registers overlay the end of the source RAM window.
-	map(0x01d80000, 0x01d87fff).ram().share("0229ram");
+	map(0x01d80000, 0x01d87fff).ram().share(m_0229ram);
 	map(0x01d87ff0, 0x01d87ff3).w(FUNC(model2_state::doa_source_w));
 	map(0x01d87ff4, 0x01d87ff7).w(m_0229crypt, FUNC(sega_315_5838_comp_device::table_w));
 	map(0x01d87ff8, 0x01d87ffb).r(FUNC(model2_state::doa_prot_r));

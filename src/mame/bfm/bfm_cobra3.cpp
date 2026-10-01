@@ -245,7 +245,7 @@ void bfm_cobra3_state::output_latch_w(u16 data, u16 mem_mask)
 
 	if (m_initial_tube_fill[0].found() && m_initial_tube_fill[1].found() && BIT(m_strobein[2]->read(), 2))
 	{
-		u8 const rising = BIT(m_output_latch, 4, 3) & ~BIT(previous, 4, 3);
+		u8 const rising = BIT(m_output_latch, 4, 3) & BIT(~previous, 4, 3);
 
 		if (BIT(rising, 0) && m_twenty_p_tube_level) // triac A: 20p payslide
 			m_twenty_p_tube_level--;
@@ -815,7 +815,7 @@ static INPUT_PORTS_START( cobra3_payslide )
 	PORT_CONFSETTING(    0x04, "Fitted" )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_DOOR ) PORT_NAME("Cash Door Open") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Back and Front Doors Open") PORT_CODE(KEYCODE_T) PORT_TOGGLE
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Refill/Volume Setup Mode") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Refill/Volume Setup Mode") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("TUBE0")
@@ -964,7 +964,7 @@ static INPUT_PORTS_START( c3_ppays )
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_DOOR ) PORT_NAME("Cash Door Open") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_DOOR ) PORT_NAME("Back and Front Doors Open") PORT_CODE(KEYCODE_T) PORT_TOGGLE
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Refill/Volume Setup Mode") PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Refill/Volume Setup Mode") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 
 	PORT_MODIFY("STROBE4")
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "DIL:!03" )

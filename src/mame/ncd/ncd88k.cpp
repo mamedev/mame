@@ -621,9 +621,9 @@ u32 ncd88k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 {
 	u32 const *pixel_pointer = m_vram;
 
-	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+	for (int y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
 	{
-		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 4)
+		for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x += 4)
 		{
 			u32 const pixel_data = *pixel_pointer++;
 
@@ -644,9 +644,9 @@ u32 ncdmcx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rec
 {
 	u32 const *pixel_pointer = m_vram;
 
-	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+	for (int y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
 	{
-		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 4)
+		for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x += 4)
 		{
 			u32 const pixel_data = *pixel_pointer++;
 

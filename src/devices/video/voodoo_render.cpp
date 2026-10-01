@@ -843,7 +843,7 @@ void rasterizer_texture::recompute(voodoo_regs const &regs, u8 *ram, u32 mask, r
 	for (int lod = 0; lod <= 8; lod++)
 	{
 		lodstart[lod] = offset;
-		if (m_lodmask & (1 << lod))
+		if (BIT(m_lodmask, lod))
 		{
 			u32 size = ((m_wmask >> lod) + 1) * ((m_hmask >> lod) + 1);
 			if (lod >= 3 && size < 4) size = 4;

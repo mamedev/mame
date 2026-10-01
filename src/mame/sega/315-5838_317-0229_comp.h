@@ -45,17 +45,17 @@ private:
 	variant m_variant = variant::SEGA_315_5838;
 	devcb_read16 m_source_cb;
 
-	u16 m_tree[24]{};
-	u8 m_dictionary[256]{};
-	u8 m_tree_words = 0;
-	u16 m_dictionary_bytes = 0;
-	bool m_upload_dictionary = false;
+	u16 m_tree[24];
+	u8 m_dictionary[256];
+	u8 m_tree_words;
+	u16 m_dictionary_bytes;
+	bool m_upload_dictionary;
 
-	u32 m_source = 0;
-	u16 m_word = 0;
-	u8 m_bits = 0;
-	u16 m_output = 0xffff;
-	bool m_abort = false;
+	u32 m_source;
+	u16 m_word;
+	u8 m_bits;
+	u16 m_output;
+	bool m_abort;
 
 	u16 decipher(u16 ciphertext) const;
 	u8 decompress_byte();

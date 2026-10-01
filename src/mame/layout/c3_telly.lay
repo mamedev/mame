@@ -396,7 +396,7 @@ highlighting here indicates the coin-channel acceptance state for convenience.
 		<rect>
 			<color alpha="0.0" />
 		</rect>
-		<text string="&#xa3;1">
+		<text string="£1">
 			<bounds x="0.2015" y="0.640" width="0.055" height="0.065" />
 			<color state="0" red="0.22" green="0.02" blue="0.02" />
 			<color state="255" red="0.90" green="0.16" blue="0.12" />
