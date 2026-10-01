@@ -310,17 +310,17 @@ void arduboy_state::arduboy_base(machine_config &config)
 	m_maincpu->set_high_fuses(0xd3); // actually d2, but games will run without the bootloader
 	m_maincpu->set_extended_fuses(0xc2);
 
-	m_maincpu->gpio_in<atmega328_device::GPIOB>().set(FUNC(arduboy_state::port_b_r));
-	m_maincpu->gpio_in<atmega328_device::GPIOC>().set(FUNC(arduboy_state::port_c_r));
-	m_maincpu->gpio_in<atmega328_device::GPIOD>().set(FUNC(arduboy_state::port_d_r));
-	m_maincpu->gpio_in<atmega328_device::GPIOE>().set_ioport(m_porte_buttons);
-	m_maincpu->gpio_in<atmega328_device::GPIOF>().set_ioport(m_portf_buttons);
+	m_maincpu->gpio_in<atmega32u4_device::GPIOB>().set(FUNC(arduboy_state::port_b_r));
+	m_maincpu->gpio_in<atmega32u4_device::GPIOC>().set(FUNC(arduboy_state::port_c_r));
+	m_maincpu->gpio_in<atmega32u4_device::GPIOD>().set(FUNC(arduboy_state::port_d_r));
+	m_maincpu->gpio_in<atmega32u4_device::GPIOE>().set_ioport(m_porte_buttons);
+	m_maincpu->gpio_in<atmega32u4_device::GPIOF>().set_ioport(m_portf_buttons);
 
-	m_maincpu->gpio_out<atmega328_device::GPIOB>().set(FUNC(arduboy_state::port_b_w));
-	m_maincpu->gpio_out<atmega328_device::GPIOC>().set(FUNC(arduboy_state::port_c_w));
-	m_maincpu->gpio_out<atmega328_device::GPIOD>().set(FUNC(arduboy_state::port_d_w));
-	m_maincpu->gpio_out<atmega328_device::GPIOE>().set(FUNC(arduboy_state::port_e_w));
-	m_maincpu->gpio_out<atmega328_device::GPIOF>().set(FUNC(arduboy_state::port_f_w));
+	m_maincpu->gpio_out<atmega32u4_device::GPIOB>().set(FUNC(arduboy_state::port_b_w));
+	m_maincpu->gpio_out<atmega32u4_device::GPIOC>().set(FUNC(arduboy_state::port_c_w));
+	m_maincpu->gpio_out<atmega32u4_device::GPIOD>().set(FUNC(arduboy_state::port_d_w));
+	m_maincpu->gpio_out<atmega32u4_device::GPIOE>().set(FUNC(arduboy_state::port_e_w));
+	m_maincpu->gpio_out<atmega32u4_device::GPIOF>().set(FUNC(arduboy_state::port_f_w));
 
 	NVRAM(config, "intflash", nvram_device::DEFAULT_ALL_1);
 
