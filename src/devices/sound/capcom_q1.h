@@ -2,11 +2,11 @@
 // copyright-holders:Vas Crabb
 /*********************************************************
 
-    Capcom System QSound™
+    Capcom-Q1 DL 1425 DSP
 
 *********************************************************/
-#ifndef MAME_SOUND_QSOUND_H
-#define MAME_SOUND_QSOUND_H
+#ifndef MAME_SOUND_CAPCOM_Q1_H
+#define MAME_SOUND_CAPCOM_Q1_H
 
 #pragma once
 
@@ -14,15 +14,15 @@
 #include "cpu/dsp16/dsp16.h"
 
 
-class qsound_device : public device_t, public device_sound_interface, public device_rom_interface<24>
+class capcom_q1_device : public device_t, public device_sound_interface, public device_rom_interface<24>
 {
 public:
 	// default 60MHz clock (divided by 2 for DSP core clock, and then by 1248 for sample rate)
-	qsound_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 60'000'000);
-	virtual ~qsound_device();
+	capcom_q1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+	virtual ~capcom_q1_device();
 
-	void qsound_w(offs_t offset, u8 data);
-	u8 qsound_r();
+	void write(offs_t offset, u8 data);
+	u8 read();
 
 protected:
 	// device_t implementation
@@ -66,14 +66,14 @@ private:
 	u8 m_ock, m_old, m_ready, m_channel;
 };
 
-DECLARE_DEVICE_TYPE(QSOUND, qsound_device)
+DECLARE_DEVICE_TYPE(CAPCOM_Q1, capcom_q1_device)
 
-// alias QSOUND to QSOUND_HLE by default
-// define QSOUND_LLE to use the DSP emulation
-#if !defined(QSOUND_LLE)
-#include "qsoundhle.h"
-#define qsound_device qsound_hle_device
-#define QSOUND QSOUND_HLE
-#endif // QSOUND_LLE
+// alias CAPCOM_Q1 to CAPCOM_Q1_HLE by default
+// define CAPCOM_Q1_LLE to use the DSP emulation
+#if !defined(CAPCOM_Q1_LLE)
+#include "capcom_q1_hle.h"
+#define capcom_q1_device capcom_q1_hle_device
+#define CAPCOM_Q1 CAPCOM_Q1_HLE
+#endif // CAPCOM_Q1_LLE
 
-#endif // MAME_SOUND_QSOUND_H
+#endif // MAME_SOUND_CAPCOM_Q1_H
