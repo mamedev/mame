@@ -17413,13 +17413,23 @@ c65
 
 @source:commodore/c128.cpp
 c128
+c128_ch
 c128_de
+c128_fr
+c128_it
+c128_no
 c128_se
 c128cr
 c128d
 c128d81
 c128dcr
+c128dcr_ch
 c128dcr_de
+c128dcr_dk
+c128dcr_es
+c128dcr_fr
+c128dcr_it
+c128dcr_no
 c128dcr_se
 c128dcrp
 c128dp

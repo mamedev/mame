@@ -67,6 +67,8 @@ public:
 		m_rom(*this, M8502_TAG),
 		m_charom(*this, "charom"),
 		m_color_ram(*this, "color_ram", 0x800, ENDIANNESS_LITTLE),
+		m_vdc_ram(*this, "vdc_ram"),
+		m_vdc_ram_config(*this, "VDC_RAM"),
 		m_row(*this, "ROW%u", 0),
 		m_k(*this, "K%u", 0),
 		m_lock(*this, "LOCK"),
@@ -74,6 +76,7 @@ public:
 		m_40_80(*this, "40_80"),
 		m_portswap(*this, "JOYSWAP"),
 		m_charom_jumper(*this, "CHAROM_A12"),
+		m_vdc_ram_64k(true),
 		m_z80en(0),
 		m_loram(1),
 		m_hiram(1),
@@ -119,6 +122,8 @@ public:
 	required_memory_region m_rom;
 	required_memory_region m_charom;
 	memory_share_creator<uint8_t> m_color_ram;
+	required_shared_ptr<uint8_t> m_vdc_ram;
+	required_ioport m_vdc_ram_config;
 	required_ioport_array<8> m_row;
 	required_ioport_array<3> m_k;
 	required_ioport m_lock;
@@ -126,6 +131,8 @@ public:
 	required_ioport m_40_80;
 	optional_ioport m_portswap;
 	required_ioport m_charom_jumper;
+	bool m_vdc_ram_64k;
+	DECLARE_INPUT_CHANGED_MEMBER(vdc_ram_changed);
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -145,6 +152,8 @@ public:
 	void write(offs_t offset, uint8_t data);
 	uint8_t vic_videoram_r(offs_t offset);
 	uint8_t vic_colorram_r(offs_t offset);
+	uint8_t vdc_videoram_r(offs_t offset);
+	void vdc_videoram_w(offs_t offset, uint8_t data);
 
 	void mmu_z80en_w(int state);
 	void mmu_busack_w(int state);
@@ -254,6 +263,7 @@ public:
 	void c128d81(machine_config &config);
 	void m8502_mem(address_map &map) ATTR_COLD;
 	void vdc_videoram_map(address_map &map) ATTR_COLD;
+	void vdc_videoram_map_64k(address_map &map) ATTR_COLD;
 	void vic_colorram_map(address_map &map) ATTR_COLD;
 	void vic_videoram_map(address_map &map) ATTR_COLD;
 	void z80_io(address_map &map) ATTR_COLD;
@@ -751,7 +761,27 @@ void c128_state::vic_colorram_map(address_map &map)
 
 void c128_state::vdc_videoram_map(address_map &map)
 {
-	map(0x0000, 0xffff).ram();
+	map(0x0000, 0xffff).rw(FUNC(c128_state::vdc_videoram_r), FUNC(c128_state::vdc_videoram_w)).share(m_vdc_ram);
+}
+
+void c128_state::vdc_videoram_map_64k(address_map &map)
+{
+	map(0x0000, 0xffff).ram().share(m_vdc_ram);
+}
+
+uint8_t c128_state::vdc_videoram_r(offs_t offset)
+{
+	return m_vdc_ram[m_vdc_ram_64k ? offset : (((offset & 0x7e00) >> 1) | (offset & 0x00ff))];
+}
+
+void c128_state::vdc_videoram_w(offs_t offset, uint8_t data)
+{
+	m_vdc_ram[m_vdc_ram_64k ? offset : (((offset & 0x7e00) >> 1) | (offset & 0x00ff))] = data;
+}
+
+INPUT_CHANGED_MEMBER(c128_state::vdc_ram_changed)
+{
+	m_vdc_ram_64k = bool(newval);
 }
 
 
@@ -907,6 +937,11 @@ static INPUT_PORTS_START( c128 )
 	PORT_CONFNAME( 0x01, 0x00, "Character ROM A12" )
 	PORT_CONFSETTING( 0x00, "128/64" )
 	PORT_CONFSETTING( 0x01, "CAPS LOCK" )
+
+	PORT_START( "VDC_RAM" )
+	PORT_CONFNAME( 0x01, 0x00, "VDC RAM" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(c128_state::vdc_ram_changed), 0)
+	PORT_CONFSETTING( 0x00, "16K" )
+	PORT_CONFSETTING( 0x01, "64K" )
 INPUT_PORTS_END
 
 
@@ -931,7 +966,7 @@ static INPUT_PORTS_START( c128_de )
 	PORT_MODIFY( "ROW5" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(",  <  { ; }") PORT_CODE(KEYCODE_COMMA)              PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"§  \u2191  { ü }") PORT_CODE(KEYCODE_OPENBRACE)   PORT_CHAR(U'§') PORT_CHAR(0x2191) // U+2191 = ↑
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8":  [  { ä }") PORT_CODE(KEYCODE_COLON)            PORT_CHAR(':') PORT_CHAR('[')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8":  [  { ö }") PORT_CODE(KEYCODE_COLON)            PORT_CHAR(':') PORT_CHAR('[')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(".  >  { : }") PORT_CODE(KEYCODE_STOP)               PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("-  { '  ` }") PORT_CODE(KEYCODE_EQUALS)             PORT_CHAR('-')
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"+  { ß ? }") PORT_CODE(KEYCODE_MINUS)             PORT_CHAR('+')
@@ -940,7 +975,7 @@ static INPUT_PORTS_START( c128_de )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("/  ?  { -  _ }") PORT_CODE(KEYCODE_SLASH)           PORT_CHAR('/') PORT_CHAR('?')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"Σ  π  { ] \\ }") PORT_CODE(KEYCODE_DEL)           PORT_CHAR(U'Σ') PORT_CHAR(U'π')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("=  { # ' }") PORT_CODE(KEYCODE_BACKSLASH)           PORT_CHAR('=')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8";  ]  { ö }") PORT_CODE(KEYCODE_QUOTE)            PORT_CHAR(';') PORT_CHAR(']')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8";  ]  { ä }") PORT_CODE(KEYCODE_QUOTE)            PORT_CHAR(';') PORT_CHAR(']')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("*  `  { +  * }") PORT_CODE(KEYCODE_CLOSEBRACE)      PORT_CHAR('*') PORT_CHAR('`')
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\\  { [  \u2191 }") PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('\\') // U+2191 = ↑
 
@@ -960,7 +995,6 @@ INPUT_PORTS_END
 //-------------------------------------------------
 //  INPUT_PORTS( c128_fr )
 //-------------------------------------------------
-#ifdef UNUSED_CODE
 static INPUT_PORTS_START( c128_fr )
 	PORT_INCLUDE( c128 )
 
@@ -1010,12 +1044,10 @@ static INPUT_PORTS_START( c128_fr )
 	PORT_MODIFY( "CAPS" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CAPS LOCK ASCII/CC") PORT_CODE(KEYCODE_F8) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(c128_state::caps_lock), 0)
 INPUT_PORTS_END
-#endif
 
 //-------------------------------------------------
 //  INPUT_PORTS( c128_it )
 //-------------------------------------------------
-#ifdef UNUSED_CODE
 static INPUT_PORTS_START( c128_it )
 	PORT_INCLUDE( c128 )
 
@@ -1059,7 +1091,6 @@ static INPUT_PORTS_START( c128_it )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("_  { <  > }") PORT_CODE(KEYCODE_TILDE)             PORT_CHAR('_')
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"1  !  { £  1 }") PORT_CODE(KEYCODE_1)            PORT_CHAR('1') PORT_CHAR('!')
 INPUT_PORTS_END
-#endif
 
 //-------------------------------------------------
 //  INPUT_PORTS( c128_se )
@@ -1075,14 +1106,14 @@ static INPUT_PORTS_START( c128_se )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("7  '  { 7  / }") PORT_CODE(KEYCODE_7)     PORT_CHAR('7') PORT_CHAR('\'')
 
 	PORT_MODIFY( "ROW5" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"]  { â }") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(']')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"[  { ä }") PORT_CODE(KEYCODE_COLON)     PORT_CHAR('[')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"]  { å }") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(']')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"[  { ö }") PORT_CODE(KEYCODE_COLON)     PORT_CHAR('[')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)                            PORT_CHAR('=')
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)                             PORT_CHAR('-')
 
 	PORT_MODIFY( "ROW6" )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(";  +") PORT_CODE(KEYCODE_BACKSLASH)       PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"£  { ö }") PORT_CODE(KEYCODE_QUOTE)     PORT_CHAR(U'£')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"£  { ä }") PORT_CODE(KEYCODE_QUOTE)     PORT_CHAR(U'£')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("@") PORT_CODE(KEYCODE_CLOSEBRACE)         PORT_CHAR('@')
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(":  *") PORT_CODE(KEYCODE_BACKSLASH2)      PORT_CHAR(':') PORT_CHAR('*')
 
@@ -1098,6 +1129,159 @@ static INPUT_PORTS_START( c128_se )
 	PORT_CONFSETTING( 0x01, "CAPS LOCK" )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( c128_no )
+	PORT_INCLUDE( c128 )
+
+	PORT_MODIFY( "ROW5" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"@  { å  Å }") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8":  [  { ø  Ø }") PORT_CODE(KEYCODE_COLON)     PORT_CHAR(':') PORT_CHAR('[')
+
+	PORT_MODIFY( "ROW6" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("=  { @ }") PORT_CODE(KEYCODE_BACKSLASH)                         PORT_CHAR('=')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8";  ]  { æ  Æ }") PORT_CODE(KEYCODE_QUOTE)                             PORT_CHAR(';') PORT_CHAR(']')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"£  { :  ; }") PORT_CODE(KEYCODE_BACKSLASH2)                        PORT_CHAR(U'£')
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( c128_dk )
+	PORT_INCLUDE( c128 )
+
+	PORT_MODIFY( "ROW4" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("0  { @ }") PORT_CODE(KEYCODE_0)         PORT_CHAR('0')
+
+	PORT_MODIFY( "ROW5" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"@  { å  Å }") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8":  [  { æ  Æ }") PORT_CODE(KEYCODE_COLON)     PORT_CHAR(':') PORT_CHAR('[')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("-  { = }") PORT_CODE(KEYCODE_EQUALS)    PORT_CHAR('-')
+
+	PORT_MODIFY( "ROW6" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("=  { ; }") PORT_CODE(KEYCODE_BACKSLASH)                         PORT_CHAR('=')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8";  ]  { ø  Ø }") PORT_CODE(KEYCODE_QUOTE)                             PORT_CHAR(';') PORT_CHAR(']')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"£  { : }") PORT_CODE(KEYCODE_BACKSLASH2)                        PORT_CHAR(U'£')
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( c128_es )
+	PORT_INCLUDE( c128 )
+
+	PORT_MODIFY( "ROW4" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"0  { ¿ }") PORT_CODE(KEYCODE_0)         PORT_CHAR('0')
+
+	PORT_MODIFY( "ROW5" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"@  { ç  Ç }") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8":  [  { ñ  Ñ }") PORT_CODE(KEYCODE_COLON)     PORT_CHAR(':') PORT_CHAR('[')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("-  { * }") PORT_CODE(KEYCODE_EQUALS)    PORT_CHAR('-')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("+  { @ }") PORT_CODE(KEYCODE_MINUS)     PORT_CHAR('+')
+
+	PORT_MODIFY( "ROW6" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"↑  π  { ¨ }") PORT_CODE(KEYCODE_DEL)                               PORT_CHAR(0x2191,'^') PORT_CHAR(U'π')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("=  { ;  ] }") PORT_CODE(KEYCODE_BACKSLASH)                         PORT_CHAR('=')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(";  ]  { :  [ }") PORT_CODE(KEYCODE_QUOTE)                             PORT_CHAR(';') PORT_CHAR(']')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"*  { ´ }") PORT_CODE(KEYCODE_CLOSEBRACE)                        PORT_CHAR('*')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"£  { =  £ }") PORT_CODE(KEYCODE_BACKSLASH2)                        PORT_CHAR(U'£')
+
+	PORT_MODIFY( "ROW7" )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"←  { ¡ }") PORT_CODE(KEYCODE_TILDE)                             PORT_CHAR(0x2190)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( c128_ch )
+	PORT_INCLUDE( c128 )
+
+	PORT_MODIFY( "ROW1" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Z  { Y }") PORT_CODE(KEYCODE_Z)         PORT_CHAR('Z')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"4  $  { ç }") PORT_CODE(KEYCODE_4)         PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("3  #  { * }") PORT_CODE(KEYCODE_3)         PORT_CHAR('3') PORT_CHAR('#')
+
+	PORT_MODIFY( "ROW3" )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Y  { Z }") PORT_CODE(KEYCODE_Y)         PORT_CHAR('Y')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("7  '  { / }") PORT_CODE(KEYCODE_7)         PORT_CHAR('7') PORT_CHAR('\'')
+
+	PORT_MODIFY( "ROW4" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("0  { = }") PORT_CODE(KEYCODE_0)         PORT_CHAR('0')
+
+	PORT_MODIFY( "ROW5" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(",  <  { ; }") PORT_CODE(KEYCODE_COMMA)     PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"@  { ü  è }") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8":  [  { ö  é }") PORT_CODE(KEYCODE_COLON)     PORT_CHAR(':') PORT_CHAR('[')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(".  >  { : }") PORT_CODE(KEYCODE_STOP)      PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("-  { ^  ` }") PORT_CODE(KEYCODE_EQUALS)    PORT_CHAR('-')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("+  { '  ? }") PORT_CODE(KEYCODE_MINUS)     PORT_CHAR('+')
+
+	PORT_MODIFY( "ROW6" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("/  ?  { - }") PORT_CODE(KEYCODE_SLASH)                             PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"↑  π  { [  # }") PORT_CODE(KEYCODE_DEL)                               PORT_CHAR(0x2191,'^') PORT_CHAR(U'π')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("=  { $  @ }") PORT_CODE(KEYCODE_BACKSLASH)                         PORT_CHAR('=')
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8";  ]  { ä  à }") PORT_CODE(KEYCODE_QUOTE)                             PORT_CHAR(';') PORT_CHAR(']')
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"*  { ¨  ! }") PORT_CODE(KEYCODE_CLOSEBRACE)                        PORT_CHAR('*')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"£  { ]  ↑ }") PORT_CODE(KEYCODE_BACKSLASH2)                        PORT_CHAR(U'£')
+
+	PORT_MODIFY( "ROW7" )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"←  { <  > }") PORT_CODE(KEYCODE_TILDE)                             PORT_CHAR(0x2190)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("1  !  { + }") PORT_CODE(KEYCODE_1)                                 PORT_CHAR('1') PORT_CHAR('!')
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( c128dcr )
+	PORT_INCLUDE( c128 )
+
+	PORT_MODIFY( "VDC_RAM" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( c128dcr_de )
+	PORT_INCLUDE( c128_de )
+
+	PORT_MODIFY( "VDC_RAM" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( c128dcr_fr )
+	PORT_INCLUDE( c128_fr )
+
+	PORT_MODIFY( "VDC_RAM" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( c128dcr_it )
+	PORT_INCLUDE( c128_it )
+
+	PORT_MODIFY( "VDC_RAM" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( c128dcr_dk )
+	PORT_INCLUDE( c128_dk )
+
+	PORT_MODIFY( "VDC_RAM" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( c128dcr_no )
+	PORT_INCLUDE( c128_no )
+
+	PORT_MODIFY( "VDC_RAM" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( c128dcr_es )
+	PORT_INCLUDE( c128_es )
+
+	PORT_MODIFY( "VDC_RAM" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( c128dcr_ch )
+	PORT_INCLUDE( c128_ch )
+
+	PORT_MODIFY( "VDC_RAM" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( c128dcr_se )
+	PORT_INCLUDE( c128_se )
+
+	PORT_MODIFY( "VDC_RAM" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
 
 
 //**************************************************************************
@@ -1438,7 +1622,7 @@ uint8_t c128_state::cia2_pa_r()
 
 	*/
 
-	uint8_t data = 0;
+	uint8_t data = 0x38;
 
 	// user port
 	data |= m_user_pa2 << 2;
@@ -1728,6 +1912,7 @@ void c128_state::machine_start()
 	save_item(NAME(m_charom_caps));
 	save_item(NAME(m_user_pa2));
 	save_item(NAME(m_user_pb));
+	save_item(NAME(m_vdc_ram_64k));
 }
 
 
@@ -1735,6 +1920,7 @@ void c128_state::machine_reset()
 {
 	m_reset = 1;
 	m_charom_caps = m_charom_jumper->read();
+	m_vdc_ram_64k = bool(m_vdc_ram_config->read());
 
 	m_user->write_3(0);
 	m_user->write_3(1);
@@ -1927,6 +2113,7 @@ void c128_state::c128(machine_config &config)
 void c128_state::c128dcr(machine_config &config)
 {
 	ntsc(config);
+	m_vdc->set_addrmap(0, &c128_state::vdc_videoram_map_64k);
 	cbm_iec_slot_device::add(config, m_iec, nullptr);
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
@@ -2111,6 +2298,7 @@ void c128_state::c128pal(machine_config &config)
 void c128_state::c128dcrp(machine_config &config)
 {
 	pal(config);
+	m_vdc->set_addrmap(0, &c128_state::vdc_videoram_map_64k);
 	cbm_iec_slot_device::add(config, m_iec, nullptr);
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
@@ -2152,6 +2340,10 @@ ROM_START( c128 )
 	ROMX_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441), ROM_BIOS(4) )
 	ROMX_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(4) )
 	ROMX_LOAD( "kernal-dolphin128.u35", 0xc000, 0x4000, CRC(6f4ebff0) SHA1(0eeae6182d49136594b4f473917420607a828ec0), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 5, "r3", "Revision 3" )
+	ROMX_LOAD( "318018-03.u33", 0x4000, 0x4000, CRC(65e696d2) SHA1(3e6b2204249a79dcab5475aa4656492de1715c66), ROM_BIOS(5) )
+	ROMX_LOAD( "318019-03.u34", 0x8000, 0x4000, CRC(f46f976c) SHA1(1977b9d014ff52ef43cb1d4ae481af25672dbfed), ROM_BIOS(5) )
+	ROMX_LOAD( "318020-04.u35", 0xc000, 0x4000, CRC(98f2a2ed) SHA1(8dde7ef95194b0be13f093dd6400832a46fded0c), ROM_BIOS(5) )
 
 	ROM_REGION( 0x2000, "charom", 0 )
 	ROM_LOAD( "390059-01.u18", 0x0000, 0x2000, CRC(6aaaafe6) SHA1(29ed066d513f2d5c09ff26d9166ba23c2afb2b3f) )
@@ -2184,6 +2376,18 @@ ROM_START( c128_de )
 	ROMX_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441), ROM_BIOS(1) )
 	ROMX_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(1) )
 	ROMX_LOAD( "315078-02.u35", 0xc000, 0x4000, CRC(b275bb2e) SHA1(78ac5dcdd840b092ba1ee6d19b33af079613291f), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "r4_03", "Revision 4 (315078-03)" )
+	ROMX_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441), ROM_BIOS(2) )
+	ROMX_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(2) )
+	ROMX_LOAD( "315078-03.u35", 0xc000, 0x4000, CRC(bff7550b) SHA1(3629b3fa28b6a30bcc027b647f26654929ed1b0f), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "r4_03p7", "Revision 4 (315078-03, alternate)" )
+	ROMX_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441), ROM_BIOS(3) )
+	ROMX_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(3) )
+	ROMX_LOAD( "315078-03p7.u35", 0xc000, 0x4000, CRC(ea3b0096) SHA1(eda00e3e88dd0de87a83f0166c9436dd3afc2808), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 4, "r4_da4", "Revision 4 (SN#DA4-246431)" )
+	ROMX_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441), ROM_BIOS(4) )
+	ROMX_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0), ROM_BIOS(4) )
+	ROMX_LOAD( "kernal-da4.u35", 0xc000, 0x4000, CRC(a144c701) SHA1(b4adec20cd9d5af7f3d8391692e61204cfb008dc), ROM_BIOS(4) )
 
 	ROM_REGION( 0x2000, "charom", 0 )
 	ROM_LOAD( "315079-01.u18", 0x00000, 0x2000, CRC(fe5a2db1) SHA1(638f8aff51c2ac4f99a55b12c4f8c985ef4bebd3) )
@@ -2267,9 +2471,14 @@ ROM_END
 
 ROM_START( c128dcr_de )
 	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_DEFAULT_BIOS("318077-01")
 	ROM_LOAD( "318022-02.u34", 0x4000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )
-	ROM_LOAD( "318077-01.u32", 0x0000, 0x4000, CRC(eb6e2c8f) SHA1(6b3d891fedabb5335f388a5d2a71378472ea60f4) )
-	ROM_CONTINUE(              0xc000, 0x4000 )
+	ROM_SYSTEM_BIOS( 0, "318077-01", "318077-01" )
+	ROMX_LOAD( "318077-01.u32", 0x0000, 0x4000, CRC(eb6e2c8f) SHA1(6b3d891fedabb5335f388a5d2a71378472ea60f4), ROM_BIOS(0) )
+	ROM_CONTINUE(               0xc000, 0x4000 )
+	ROM_SYSTEM_BIOS( 1, "318077-03", "318077-03" )
+	ROMX_LOAD( "318077-03.u32", 0x0000, 0x4000, CRC(467fc604) SHA1(c31da180d3830f6286a90d996fd43b5d422b0b69), ROM_BIOS(1) )
+	ROM_CONTINUE(               0xc000, 0x4000 )
 
 	ROM_REGION( 0x2000, "charom", 0 )
 	ROM_LOAD( "315079-01.u18", 0x0000, 0x2000, CRC(fe5a2db1) SHA1(638f8aff51c2ac4f99a55b12c4f8c985ef4bebd3) )
@@ -2298,6 +2507,204 @@ ROM_START( c128dcr_se )
 	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
 ROM_END
 
+
+//-------------------------------------------------
+//  ROM( c128dcr_fr )
+//-------------------------------------------------
+
+ROM_START( c128dcr_fr )
+	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_LOAD( "318022-02.u34", 0x4000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )
+	ROM_LOAD( "dcr_french.u32", 0x0000, 0x4000, CRC(e026976a) SHA1(52e462d2c04b9dcd6a0fcbf85b93a8c433dd531c) )
+	ROM_CONTINUE(              0xc000, 0x4000 )
+
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "325167-01.u18", 0x0000, 0x2000, CRC(bad36b88) SHA1(9119b27a1bf885fa4c76fff5d858c74c194dd2b8) )
+
+	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
+	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
+	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( c128dcr_it )
+//-------------------------------------------------
+
+ROM_START( c128dcr_it )
+	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_LOAD( "318022-02.u34", 0x4000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )
+	ROM_LOAD( "318079-01.u32", 0x0000, 0x4000, CRC(3ce809f6) SHA1(a28ef8ec3af319c74d6b248086def6f2b6e17c4c) )
+	ROM_CONTINUE(              0xc000, 0x4000 )
+
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "325167-01.u18", 0x0000, 0x2000, CRC(bad36b88) SHA1(9119b27a1bf885fa4c76fff5d858c74c194dd2b8) )
+
+	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
+	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
+	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( c128_fr )
+//-------------------------------------------------
+
+ROM_START( c128_fr )
+	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_LOAD( "251913-01.u32", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )
+	ROM_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441) )
+	ROM_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0) )
+	ROM_LOAD( "325166-02.u35", 0xc000, 0x4000, CRC(23e4cc41) SHA1(a7b1ca6c21ea184113e65ad5adbe21a748d6f610) )
+
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "325167-01.u18", 0x0000, 0x2000, CRC(bad36b88) SHA1(9119b27a1bf885fa4c76fff5d858c74c194dd2b8) )
+
+	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
+	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
+	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( c128_it )
+//-------------------------------------------------
+
+ROM_START( c128_it )
+	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_LOAD( "251913-01.u32", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )
+	ROM_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441) )
+	ROM_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0) )
+	ROM_LOAD( "325168-02.u35", 0xc000, 0x4000, CRC(7ac0fe7d) SHA1(811c6447edf461e1b6b14677d37abea1b99fc433) )
+
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "325167-01.u18", 0x0000, 0x2000, CRC(bad36b88) SHA1(9119b27a1bf885fa4c76fff5d858c74c194dd2b8) )
+
+	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
+	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
+	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( c128_no )
+//-------------------------------------------------
+
+ROM_START( c128_no )
+	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_LOAD( "325179-01.u32", 0x0000, 0x4000, CRC(06da7d24) SHA1(4708d6678cfff5be9b6a217aa45102d4f4dc20c7) )
+	ROM_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441) )
+	ROM_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0) )
+	ROM_LOAD( "325177-02.u35", 0xc000, 0x4000, CRC(6565577a) SHA1(ff57f6e26cb8d9ab5f270a1772c7bdb6cbbfc716) )
+
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "325178-01.u18", 0x0000, 0x2000, CRC(f9b1b65e) SHA1(a75f862ed4c0d82962b45ceba2fed57ae70a31bd) )
+
+	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
+	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
+	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( c128_ch )
+//-------------------------------------------------
+
+ROM_START( c128_ch )
+	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_LOAD( "251913-01.u32", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )
+	ROM_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441) )
+	ROM_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0) )
+	ROM_DEFAULT_BIOS("325172-02")
+	ROM_SYSTEM_BIOS( 0, "325172-01", "325172-01" )
+	ROMX_LOAD( "325172-01.u35", 0xc000, 0x4000, CRC(d311dab1) SHA1(98c34e0dec9f52d7862b56bb287d2573eb3f6364), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "325172-02", "325172-02" )
+	ROMX_LOAD( "325172-02.u35", 0xc000, 0x4000, CRC(f4a5b644) SHA1(6068c96b5067bdea1e8911f37079481bae7b1ef5), ROM_BIOS(1) )
+
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "325173-01d.u18", 0x0000, 0x2000, CRC(b7821651) SHA1(c995aeb892becc312389f745d030397e1c26c532) )
+
+	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
+	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
+	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( c128dcr_dk )
+//-------------------------------------------------
+
+ROM_START( c128dcr_dk )
+	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_LOAD( "318022-02.u34", 0x4000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )
+	ROM_LOAD( "318082-01.u32", 0x0000, 0x4000, CRC(1075c9dd) SHA1(20563a25380dee082afac2736274221d1f818e56) )
+	ROM_CONTINUE(              0xc000, 0x4000 )
+
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "325175-01.u18", 0x0000, 0x2000, CRC(7f98aaf9) SHA1(4ccd4e16bf3c48a0716df6fc690e6ab531a257a5) )
+
+	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
+	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
+	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( c128dcr_es )
+//-------------------------------------------------
+
+ROM_START( c128dcr_es )
+	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_LOAD( "318022-02.u34", 0x4000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )
+	ROM_LOAD( "dcr_spanish.u32", 0x0000, 0x4000, CRC(7fd6f919) SHA1(3427209954d131daf9a92607d8761f55d8ca0bc2) )
+	ROM_CONTINUE(              0xc000, 0x4000 )
+
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "325171-01.u18", 0x0000, 0x2000, CRC(069761a5) SHA1(528a1bb86bc162e4d2e0cc90e50fecea793f9d0f) )
+
+	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
+	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
+	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( c128dcr_no )
+//-------------------------------------------------
+
+ROM_START( c128dcr_no )
+	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_LOAD( "318022-02.u34", 0x4000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )
+	ROM_LOAD( "318083-01.u32", 0x0000, 0x4000, CRC(26f869d5) SHA1(8ac8fdc837510d0f7c0e141872d0e1113e79a95b) )
+	ROM_CONTINUE(              0xc000, 0x4000 )
+
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "325178-01.u18", 0x0000, 0x2000, CRC(f9b1b65e) SHA1(a75f862ed4c0d82962b45ceba2fed57ae70a31bd) )
+
+	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
+	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
+	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( c128dcr_ch )
+//-------------------------------------------------
+
+ROM_START( c128dcr_ch )
+	ROM_REGION( 0x10000, M8502_TAG, 0 )
+	ROM_LOAD( "318022-02.u34", 0x4000, 0x8000, CRC(af1ae1e8) SHA1(953dcdf5784a6b39ef84dd6fd968c7a03d8d6816) )
+	ROM_LOAD( "318081-01.u32", 0x0000, 0x4000, CRC(8788a335) SHA1(515928bc8316e942cf1df02a774078b21ae4ea40) )
+	ROM_CONTINUE(              0xc000, 0x4000 )
+
+	ROM_REGION( 0x2000, "charom", 0 )
+	ROM_LOAD( "325173-01d.u18", 0x0000, 0x2000, CRC(b7821651) SHA1(c995aeb892becc312389f745d030397e1c26c532) )
+
+	ROM_REGION( 0xc88, MOS8721_TAG, 0 )
+	// converted from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/c128/8721-reduced.zip/8721-reduced.txt
+	ROM_LOAD( "8721r3.u11", 0x000, 0xc88, CRC(154db186) SHA1(ccadcdb1db3b62c51dc4ce60fe6f96831586d297) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -2309,19 +2716,26 @@ ROM_END
 //    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT    CLASS       INIT        COMPANY                        FULLNAME                               FLAGS
 COMP( 1985, c128,       0,      0,      c128,     c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (NTSC)",                MACHINE_SUPPORTS_SAVE )
 COMP( 1985, c128p,      0,      0,      c128pal,  c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (PAL)",                 MACHINE_SUPPORTS_SAVE )
+COMP( 1985, c128_ch,    c128,   0,      c128pal,  c128_ch, c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (Switzerland)", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, c128_de,    c128,   0,      c128pal,  c128_de, c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (Germany)",             MACHINE_SUPPORTS_SAVE )
-//COMP( 1985, c128_fr,    c128,   0,      c128pal,  c128_fr, c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (France)", MACHINE_SUPPORTS_SAVE )
-//COMP( 1985, c128_no,    c128,   0,      c128pal,  c128_it, c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (Norway)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, c128_fr,    c128,   0,      c128pal,  c128_fr, c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (France)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, c128_it,    c128,   0,      c128pal,  c128_it, c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (Italy)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, c128_no,    c128,   0,      c128pal,  c128_no, c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (Norway)", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, c128_se,    c128,   0,      c128pal,  c128_se, c128_state, empty_init, "Commodore Business Machines", "Commodore 128 (Sweden/Finland)",      MACHINE_SUPPORTS_SAVE )
 COMP( 1986, c128d,      c128,   0,      c128,     c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128D (NTSC, prototype)",    MACHINE_SUPPORTS_SAVE )
 COMP( 1986, c128dp,     c128,   0,      c128pal,  c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128D (PAL)",                MACHINE_SUPPORTS_SAVE )
 
 COMP( 1986, c128cr,     c128,   0,      c128,     c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128CR (NTSC, prototype)",   MACHINE_SUPPORTS_SAVE )
 
-COMP( 1987, c128dcr,    c128,   0,      c128dcr,  c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (NTSC)",             MACHINE_SUPPORTS_SAVE )
-COMP( 1987, c128dcrp,   c128,   0,      c128dcrp, c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (PAL)",              MACHINE_SUPPORTS_SAVE )
-COMP( 1987, c128dcr_de, c128,   0,      c128dcrp, c128_de, c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (Germany)",          MACHINE_SUPPORTS_SAVE )
-//COMP( 1986, c128dcr_it, c128,   0,      c128dcrp, c128_it, c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (Italy)", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, c128dcr_se, c128,   0,      c128dcrp, c128_se, c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (Sweden/Finland)",   MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr,    c128,   0,      c128dcr,  c128dcr,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (NTSC)",             MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcrp,   c128,   0,      c128dcrp, c128dcr,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (PAL)",              MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr_ch, c128,   0,      c128dcrp, c128dcr_ch, c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (Switzerland)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr_de, c128,   0,      c128dcrp, c128dcr_de, c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (Germany)",          MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr_dk, c128,   0,      c128dcrp, c128dcr_dk, c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (Denmark)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr_es, c128,   0,      c128dcrp, c128dcr_es, c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (Spain)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr_fr, c128,   0,      c128dcrp, c128dcr_fr, c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (France)",           MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr_it, c128,   0,      c128dcrp, c128dcr_it, c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (Italy)",            MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr_no, c128,   0,      c128dcrp, c128dcr_no, c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (Norway)", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, c128dcr_se, c128,   0,      c128dcrp, c128dcr_se, c128_state, empty_init, "Commodore Business Machines", "Commodore 128DCR (Sweden/Finland)",   MACHINE_SUPPORTS_SAVE )
 
 COMP( 1986, c128d81,    c128,   0,      c128d81,  c128,    c128_state, empty_init, "Commodore Business Machines", "Commodore 128D/81 (NTSC, prototype)", MACHINE_SUPPORTS_SAVE )
