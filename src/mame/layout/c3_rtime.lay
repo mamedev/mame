@@ -200,7 +200,7 @@ arrangement has not been confirmed.
 			local coin_acceptor_lamp
 			local name_panel_label = { item = view.items["name_panel_label"], level = 0 }
 			local name_panel_lamp_count = 0
-			for _, item in ipairs(lamp_items) do
+			for _, item in pairs(lamp_items) do
 				local lamp = { output = file.device:output(string.format("lamp%u", item.number)), face = view.items[item.face], highlight = item.highlight and view.items[item.highlight] or nil, name_panel = item.number == 14 or item.number == 16 }
 				lamp.level = lamp.output:get() ~= 0 and maximum_level or 0
 				lamp.face:set_element_state_callback(state_callback(lamp))
@@ -221,7 +221,7 @@ arrangement has not been confirmed.
 				{ item = view.items["coin_20p_label"], output = file.device:output("coin_lockout2") },
 				{ item = view.items["coin_10p_label"], output = file.device:output("coin_lockout3") }
 			}
-			for _, label in ipairs(coin_labels) do
+			for _, label in pairs(coin_labels) do
 				label.item:set_element_state_callback(coin_label_state_callback(label, coin_acceptor_lamp))
 			end
 
@@ -231,7 +231,7 @@ arrangement has not been confirmed.
 				local elapsed = (current_time - previous_time):as_double()
 				previous_time = emu.attotime(current_time)
 				local name_panel_level = 0
-				for _, lamp in ipairs(lamps) do
+				for _, lamp in pairs(lamps) do
 					local target = lamp.output:get() ~= 0 and maximum_level or 0
 					if elapsed < 0 or elapsed > 0.25 then lamp.level = target
 					elseif target ~= lamp.level then

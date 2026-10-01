@@ -752,7 +752,7 @@ highlighting here indicates the coin-channel acceptance state for convenience.
 					local name_panel_label = { item = view.items["name_panel_label"], level = 0 }
 					local name_panel_lamp_count = 0
 
-					for _, item in ipairs(lamp_items) do
+					for _, item in pairs(lamp_items) do
 						local lamp = {
 							output = file.device:output(string.format("lamp%u", item.number)),
 							face = view.items[item.face],
@@ -781,7 +781,7 @@ highlighting here indicates the coin-channel acceptance state for convenience.
 						{ item = view.items["coin_c_label"], lockout = file.device:output("coin_lockout2") },
 						{ item = view.items["coin_d_label"], lockout = file.device:output("coin_lockout3") }
 					}
-					for _, label in ipairs(coin_labels) do
+					for _, label in pairs(coin_labels) do
 						label.item:set_element_state_callback(coin_label_state_callback(label, coin_acceptor_lamp))
 					end
 
@@ -794,7 +794,7 @@ highlighting here indicates the coin-channel acceptance state for convenience.
 							local time_discontinuity = elapsed < 0 or elapsed > 0.25
 							local name_panel_level = 0
 
-							for _, lamp in ipairs(lamps) do
+							for _, lamp in pairs(lamps) do
 									local target = lamp.output:get() ~= 0 and maximum_level or 0
 									if time_discontinuity then
 										lamp.level = target
