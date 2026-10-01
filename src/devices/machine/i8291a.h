@@ -95,6 +95,7 @@ private:
 	void update_int();
 	void handle_command();
 	void run_fsm();
+	bool rdy() const { return !m_apt_flag && !m_cpt_flag && !m_din_flag; }
 	void run_sh_fsm();
 	void run_ah_fsm();
 	void run_dt_fsm();
