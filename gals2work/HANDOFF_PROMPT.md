@@ -58,3 +58,16 @@ Row pairs share the same x_col value. The grid tiles compose the full-screen pic
 
 ### Related working game:
 Gals Panic 3 (`src/mame/kaneko/galpani3.cpp`) uses GRAP2 chips with byte-level RLE compression. GP3 is working. GP2 does NOT use GRAP2 format — the raw bytes show the image directly without RLE decompression.
+
+## Update: 8bpp at 320 bytes/row shows clearest silhouette
+
+Image 0xB5 at **320 bytes per row, 8bpp** (one byte per pixel, palette-indexed)
+shows a clear figure silhouette when rotated 90°. See `B5_8bpp_w320_rot90.png`.
+
+Image 1 at **480 bytes/row, 16bpp** (240 pixels) also shows blue clothing
+detail in the first ~30 rows when zoomed. See `ZOOM_w480_240px_rot90.png`.
+
+254 unique byte values used — full 8-bit range. No palette found yet.
+Trailing 60 bytes after pixel data don't form a valid palette.
+
+The puzzle: WHERE is the 256-color palette that maps byte indices to RGB colors?
