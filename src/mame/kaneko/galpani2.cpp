@@ -234,10 +234,14 @@ void galpani2_state::galpani2_mcu_nmi1()
 		//until
 		//case 0x6E: //? Display "Changed" monster?
 		//case 0x85: //? Do what?
+		// TODO: these commands should populate the blocked decompression tasks
+		// on the sub CPU (IDs 0x5a-0x9c) with correct param blocks and activate
+		// them by clearing bit 7. The param block needs source ROM offset,
+		// destination bg15 address, and image dimensions. See gals2work/NOTES.md.
 		default:
-			machine().debug_break();
-			logerror("MCU master %02x:%04x: unknown command %02x\n", slot, address, command);
+			logerror("MCU master %02x:%06x: unhandled command %02x\n", slot, address, command);
 			break;
+
 		}
 
 		/* Raise a "job done" flag */
@@ -315,14 +319,18 @@ void galpani2_state::galpani2_mcu_nmi2()
 		case 0x0c: {
 			uint16_t img = sspace.read_word(address);
 			uint32_t iadr = img < 794 ? imlist[img] : 0;
-			logerror("MCU slave %02x:%06x: image address lookup %04x -> %08x\n", slot, address, img, iadr);
-			sspace.write_dword(address+2, iadr);
+			// Convert raw ROM offset to banked sub CPU address:
+			// bank = bits 23+ of offset (0-3), banked addr = 0x800000 + (offset & 0x7fffff)
+			uint32_t bank = (iadr >> 23) & 3;
+			uint32_t banked = 0x800000 | (iadr & 0x7fffff);
+			logerror("MCU slave %02x:%06x: image lookup %04x -> bank %d addr %08x\n", slot, address, img, bank, banked);
+			sspace.write_word(0x7c0000, bank); // set ROM bank select
+			sspace.write_dword(address+2, banked);
 			break;
 		}
 
 		default:
-			machine().debug_break();
-			logerror("MCU slave %02x:%06x: unknown command %02x\n", slot, address, command);
+			logerror("MCU slave %02x:%06x: unhandled command %02x\n", slot, address, command);
 			break;
 		}
 
