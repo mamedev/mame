@@ -5,9 +5,9 @@
     Technics SX-KN7000 and related MN10300-based keyboards
 
     All five machines are built around a Panasonic MN103002A (MN1030 series),
-    running Panasonic's "MILK" object framework. LCD and control panel are
-    emulated. The tone generators' registers are decoded, but they produce no
-    sound: the wave ROMs are undumped and the ADSP-21065L effects DSP is not
+    running Panasonic's "MILK" object framework. LCD, control panel and floppy
+    are emulated. The tone generators' registers are decoded, but they produce
+    no sound: the wave ROMs are undumped and the ADSP-21065L effects DSP is not
     emulated.
 
     Design notes: https://arqueologiadigital.github.io/technics-docs/kn7000-driver-internals/
@@ -61,7 +61,10 @@
 #include "kn_tonegen.h"
 
 #include "cpu/mn10300/mn10300.h"
+#include "imagedev/floppy.h"
+#include "machine/input_merger.h"
 #include "machine/intelfsh.h"
+#include "machine/upd765.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -93,6 +96,7 @@ public:
 		, m_tonegen(*this, "tonegen")
 		, m_lcdbuf(*this, "lcdbuf")
 		, m_customflash(*this, "custom_data")
+		, m_fdc(*this, "fdc")
 		, m_wave_main_y(*this, "waveform_main_y")
 		, m_wave_main_x(*this, "waveform_main_x")
 		, m_wave_sub_y(*this, "waveform_sub_y")
@@ -118,10 +122,12 @@ protected:
 	void kn_common(machine_config &config) ATTR_COLD;
 	void kn24_common(machine_config &config) ATTR_COLD;
 	void custom_flash_add(machine_config &config) ATTR_COLD;
+	void fdc_add(machine_config &config) ATTR_COLD;
 	void configure_cpanel() ATTR_COLD;
 	void configure_tonegen() ATTR_COLD;
 	void common_map(address_map &map) ATTR_COLD;
 	void table_map(address_map &map) ATTR_COLD;
+	void fdc_map(address_map &map) ATTR_COLD;
 	template <int Tg> void tg_map(address_map &map, offs_t base) ATTR_COLD;
 	void single_tg_map(address_map &map) ATTR_COLD;
 	void kn24_map(address_map &map) ATTR_COLD;
@@ -142,6 +148,7 @@ private:
 
 	required_shared_ptr<u32> m_lcdbuf;
 	optional_device<fujitsu_29lv160b_device> m_customflash;
+	optional_device<n82077aa_device> m_fdc;
 	optional_memory_region m_wave_main_y;
 	optional_memory_region m_wave_main_x;
 	optional_memory_region m_wave_sub_y;
@@ -160,6 +167,7 @@ private:
 	u16 m_tg_wave_bank[2];
 	u16 m_tg_wave_addr[2];
 
+	void kn2400_map(address_map &map) ATTR_COLD;
 	void kn7000_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update_gray(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -280,10 +288,26 @@ void kn_state::kn24_map(address_map &map)
 	single_tg_map(map);
 }
 
+void kn_state::fdc_map(address_map &map)
+{
+	map(0x98010000, 0x98010003).rw(m_fdc, FUNC(n82077aa_device::dma_r), FUNC(n82077aa_device::dma_w));
+	map(0x98020004, 0x98020004).rw(m_fdc, FUNC(n82077aa_device::dor_r), FUNC(n82077aa_device::dor_w));
+	map(0x98020008, 0x98020008).rw(m_fdc, FUNC(n82077aa_device::msr_r), FUNC(n82077aa_device::dsr_w));
+	map(0x9802000a, 0x9802000a).rw(m_fdc, FUNC(n82077aa_device::fifo_r), FUNC(n82077aa_device::fifo_w));
+	map(0x9802000e, 0x9802000e).rw(m_fdc, FUNC(n82077aa_device::dir_r), FUNC(n82077aa_device::ccr_w));
+}
+
+void kn_state::kn2400_map(address_map &map)
+{
+	kn24_map(map);
+	fdc_map(map);
+}
+
 void kn6000_state::kn6000_map(address_map &map)
 {
 	table_map(map);
 	single_tg_map(map);
+	fdc_map(map);
 }
 
 void kn_state::kn7000_map(address_map &map)
@@ -291,6 +315,7 @@ void kn_state::kn7000_map(address_map &map)
 	table_map(map);
 	tg_map<0>(map, 0x98040000);
 	tg_map<1>(map, 0x98050000);
+	fdc_map(map);
 }
 
 
@@ -598,6 +623,12 @@ INPUT_PORTS_END
 //  Machine configurations
 //**************************************************************************
 
+void kn_floppies(device_slot_interface &device)
+{
+	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
+
 void kn_state::kn_common(machine_config &config)
 {
 	MN103002A(config, m_maincpu, 32_MHz_XTAL);
@@ -643,6 +674,19 @@ void kn_state::custom_flash_add(machine_config &config)
 	FUJITSU_29LV160B(config, m_customflash);
 }
 
+void kn_state::fdc_add(machine_config &config)
+{
+	// IC103: a custom part (C1DB00000607) compatible with the N82077AA
+	N82077AA(config, m_fdc, 24'000'000);
+	// INTRQ and DRQ share IRQ1: the firmware moves each sector byte through the
+	// DACK slot at 0x98010000 from its interrupt handler
+	input_merger_device &fdc_irq(INPUT_MERGER_ANY_HIGH(config, "fdc_irq"));
+	fdc_irq.output_handler().set_inputline(m_maincpu, mn10300_device::IRQ1);
+	m_fdc->intrq_wr_callback().set(fdc_irq, FUNC(input_merger_device::in_w<0>));
+	m_fdc->drq_wr_callback().set(fdc_irq, FUNC(input_merger_device::in_w<1>));
+	FLOPPY_CONNECTOR(config, "fdc:0", kn_floppies, "35hd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
+}
+
 void kn_state::configure_cpanel()
 {
 	m_cpanel->atn().set_inputline(m_maincpu, mn10300_device::IRQ3);
@@ -669,6 +713,7 @@ void kn_state::kn7000(machine_config &config)
 	KN7000_TONEGEN(config, m_tonegen);
 	configure_tonegen();
 	custom_flash_add(config);
+	fdc_add(config);
 	config.set_default_layout(layout_kn7000);
 }
 
@@ -683,6 +728,7 @@ void kn6000_state::kn6000(machine_config &config)
 	KN6000_TONEGEN(config, m_tonegen);
 	configure_tonegen();
 	custom_flash_add(config);
+	fdc_add(config);
 }
 
 void kn_state::kn24_common(machine_config &config)
@@ -698,10 +744,12 @@ void kn_state::kn24_common(machine_config &config)
 	configure_tonegen();
 }
 
+// The KN2400 has the floppy drive
 void kn_state::kn2400(machine_config &config)
 {
 	kn24_common(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &kn_state::kn24_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kn_state::kn2400_map);
+	fdc_add(config);
 }
 
 void kn_state::kn2600(machine_config &config)
