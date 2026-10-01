@@ -238,7 +238,7 @@ uint32_t arcompact_device::handleop32_MAX_do_op(arcompact_device &o, uint32_t sr
 	if (set_flags) // TODO: verify
 	{
 		o.do_flags_nz(alu);
-		o.do_flags_overflow(alu, src1, src2);
+		o.do_flags_overflow_sub(alu, src1, src2);
 		if ((int32_t)src2 >= (int32_t)src1)
 			o.status32_set_c();
 		else
@@ -277,7 +277,7 @@ uint32_t arcompact_device::handleop32_MIN_do_op(arcompact_device &o, uint32_t sr
 	if (set_flags) // TODO: verify
 	{
 		o.do_flags_nz(alu);
-		o.do_flags_overflow(alu, src1, src2);
+		o.do_flags_overflow_sub(alu, src1, src2);
 		if ((int32_t)src2 <= (int32_t)src1)
 			o.status32_set_c();
 		else

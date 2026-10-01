@@ -275,7 +275,7 @@ void arcompact_device::device_start()
 		state_add(i, arcompact_disassembler::regnames[i - 0x100], m_debugger_temp).callimport().callexport().formatstr("%08X");
 	}
 
-	m_irq_pending = false;
+	m_pending_ints = 0;
 
 	set_icountptr(m_icount);
 
@@ -285,7 +285,7 @@ void arcompact_device::device_start()
 	save_item(NAME(m_delaylinks));
 	save_item(NAME(m_delayjump));
 	save_item(NAME(m_allow_loop_check));
-	save_item(NAME(m_irq_pending));
+	save_item(NAME(m_pending_ints));
 	save_item(NAME(m_status32));
 	save_item(NAME(m_status32_l1));
 	save_item(NAME(m_status32_l2));
@@ -376,7 +376,7 @@ void arcompact_device::device_reset()
 
 	m_delayactive = false;
 	m_delayjump = 0x00000000;
-	m_irq_pending = false;
+	m_pending_ints = 0;
 
 	for (auto& elem : m_regs)
 		elem = 0;
@@ -404,9 +404,9 @@ void arcompact_device::device_reset()
 void arcompact_device::execute_set_input(int irqline, int state)
 {
 	if (state == ASSERT_LINE)
-		m_irq_pending = true;
+		m_pending_ints |= (1 << irqline);
 	else
-		m_irq_pending = false;
+		m_pending_ints &= ~(1 << irqline);
 }
 
 /*****************************************************************************/
