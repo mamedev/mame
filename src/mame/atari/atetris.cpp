@@ -104,12 +104,14 @@ Notes:
 
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs48/mcs48.h"
+#include "cpu/z80/z80.h"
 #include "machine/eeprompar.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/msm5205.h"
 #include "sound/pokey.h"
 #include "sound/sn76496.h"
+#include "sound/um348x.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -214,6 +216,34 @@ protected:
 	required_device_array<generic_latch_8_device, 2> m_soundlatch;
 	required_device_array<sn76496_base_device, 4> m_sn;
 };
+
+class atetris_um3482_state : public atetris_state
+{
+public:
+	atetris_um3482_state(const machine_config &mconfig, device_type type, const char *tag) :
+		atetris_state(mconfig, type, tag),
+		m_pokey(*this, "pokey%u", 1U),
+		m_audiocpu(*this, "audiocpu"),
+		m_soundlatch(*this, "soundlatch%u", 1U),
+		m_melody(*this, "melody")
+	{
+	}
+
+	void atetb3482(machine_config &config) ATTR_COLD;
+
+private:
+	template <unsigned N> void sound_w(offs_t offset, uint8_t data);
+	void melody_ctrl_w(uint8_t data);
+
+	void atetb3482_map(address_map &map) ATTR_COLD;
+	void atetb3482_sound_map(address_map &map) ATTR_COLD;
+
+	required_device_array<pokey_device, 2> m_pokey;
+	required_device<z80_device> m_audiocpu;
+	required_device_array<generic_latch_8_device, 2> m_soundlatch;
+	required_device<um3482a_device> m_melody;
+};
+
 
 class atetris_m5205_state : public atetris_mcu_state
 {
@@ -433,6 +463,34 @@ void atetris_mcu_state::atetrisb3_map(address_map &map)
 }
 
 
+void atetris_um3482_state::atetb3482_map(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1fff).ram().w(FUNC(atetris_um3482_state::videoram_w)).share(m_videoram);
+	map(0x2000, 0x20ff).mirror(0x0300).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0x2400, 0x25ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
+	map(0x2800, 0x280f).mirror(0x03e0).r(m_pokey[0], FUNC(pokey_device::read)).w(FUNC(atetris_um3482_state::sound_w<0>));
+	map(0x2810, 0x281f).mirror(0x03e0).r(m_pokey[1], FUNC(pokey_device::read)).w(FUNC(atetris_um3482_state::sound_w<1>));
+	map(0x3000, 0x3000).mirror(0x03ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x3400, 0x3400).mirror(0x03ff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write8));
+	map(0x3800, 0x3800).mirror(0x03ff).w(FUNC(atetris_um3482_state::irq_ack_w));
+	map(0x3c00, 0x3c00).mirror(0x03ff).w(FUNC(atetris_um3482_state::coincount_w));
+	map(0x4000, 0x7fff).bankr(m_slapstic_bank);
+	map(0x8000, 0xffff).rom();
+}
+
+
+// The Z80 polls both latches and never enables interrupts
+void atetris_um3482_state::atetb3482_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("audiocpu", 0); // Same 8K repeated four times
+	map(0x8000, 0x9fff).ram();
+	map(0xa000, 0xa000).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)); // Value
+	map(0xc000, 0xc000).r(m_soundlatch[0], FUNC(generic_latch_8_device::read)); // Pokey register
+	map(0xf000, 0xf000).w(FUNC(atetris_um3482_state::melody_ctrl_w));
+}
+
+
 void atetris_state::atetrisb5_map(address_map &map) // TODO: Pokeys and Slapstic are substituted by a big TTL board and an additional 2716 EPROM
 {
 	map(0x0000, 0x0fff).ram();
@@ -503,6 +561,32 @@ void atetris_mcu_state::mcu_reg_w(offs_t offset, uint8_t data)
 	m_soundlatch[0]->write(offset | 0x20);
 	m_soundlatch[1]->write(data);
 }
+
+
+/*  The board has no Pokeys. A pair of latches captures the register the game
+	meant to write and the value, and the sound Z80 polls them to index a
+	dispatch table in its own ROM. The write still reaches the Pokey device
+	because the game reads that address range back for the controls. */
+template <unsigned N>
+void atetris_um3482_state::sound_w(offs_t offset, uint8_t data)
+{
+	m_pokey[N]->write(offset, data);
+
+	m_soundlatch[0]->write(offset);
+	m_soundlatch[1]->write(data);
+}
+
+
+//  The bit assignment is from the sound Z80's ROM, not traced on the PCB.
+void atetris_um3482_state::melody_ctrl_w(uint8_t data)
+{
+	m_melody->ce_w(BIT(data, 0));
+	m_melody->as_w(BIT(data, 3));
+	m_melody->lp_w(BIT(data, 4));
+	m_melody->sl_w(BIT(data, 5));
+}
+
+
 
 
 
@@ -679,6 +763,28 @@ void atetris_mcu_state::atetrisb3_11mhz(machine_config &config)
 
 	m_mcu->set_clock(11_MHz_XTAL);
 }
+
+void atetris_um3482_state::atetb3482(machine_config &config)
+{
+	atetris(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &atetris_um3482_state::atetb3482_map);
+
+	// Re-added without audio routes: the board has no Pokeys, but the game
+	// still reads them for the controls
+	POKEY(config.replace(), m_pokey[0], MASTER_CLOCK / 8).allpot_r().set_ioport("IN0");
+	POKEY(config.replace(), m_pokey[1], MASTER_CLOCK / 8).allpot_r().set_ioport("IN1");
+
+	Z80(config, m_audiocpu, BOOTLEG_CLOCK / 4); // Unverified clock
+	m_audiocpu->set_addrmap(AS_PROGRAM, &atetris_um3482_state::atetb3482_sound_map);
+
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
+
+	UM3482A(config, m_melody, 100'000); // On-chip RC oscillator
+	m_melody->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
 
 void atetris_m5205_state::atetb5205(machine_config &config)
 {
@@ -891,7 +997,20 @@ M ||_______________| |______________|      74LS00    74LS74 74LS161 |
   |                                                                 |
 N |PAL16R4 74LS74 14017 74LS08 74LS32 74LS04 PAL16R4 82S123 74LS32  |
   |_________________________________________________________________|
-    1      2      3       4       5       6       7      8      9
+	1      2      3       4       5       6       7      8      9
+
+  Sound path:
+
+  The board has no Pokeys. A pair of latches captures the 6502's writes to the
+  Pokey range, holding the register number and the value, and the Z80 at L1
+  polls them at 0xc000 and 0xa000. It indexes a dispatch table at 0x1000-0x1fff
+  in its own ROM whose entries are page numbers, and jumps to page * 0x100.
+  Only Pokey's AUDC1 to AUDC4 and two AUDF registers appear in that table.
+
+  Each routine drives a control latch at 0xf000 wired to the UM3482A at F1,
+  reaching its CE, AS, LP and SL pins on bits 0, 3, 4 and 5. A song is reached
+  by pulsing SL; the routine at 0x0800 does that four times before starting
+  playback. The bit assignment is read off the firmware, not traced.
 */
 ROM_START( atetb3482 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -900,33 +1019,11 @@ ROM_START( atetb3482 )
 	ROM_REGION( 0x10000, "tiles", 0 )
 	ROM_LOAD( "tet-d2.8e", 0x0000, 0x10000, CRC(84a1939f) SHA1(d8577985fc8ed4e74f74c68b7c00c4855b7c3270) )
 
-	ROM_REGION( 0x8000, "soundcpu", 0 ) // Not hooked up
+	ROM_REGION( 0x8000, "audiocpu", 0 )
 	ROM_LOAD( "tet-d3-z80.1k", 0x0000, 0x8000, CRC(ce51c82b) SHA1(f90ed16f817e6b2a22b69db20348386b9c1ecb67) ) // Same 8K repeated four times
 
-	// See http://www.seanriddle.com/um348x/ and http://arcadehacker.blogspot.com/2020/07/um3481a-series-multi-instrument-melody.html for notes about the UM3482
-	ROM_REGION( 0x01f0, "um3482", 0 ) // Not hooked up
-
-	/* Notes (3584 bits, which matches the datasheet's 512 7-bit notes).
-	   Raw dump from visual decap, needs further analysis. */
-	ROM_LOAD( "um3482araw.1f", 0x0000, 0x01c0, BAD_DUMP CRC(5871d564) SHA1(4203b6513ad08ece26177778e5defeb862d1a81d) )
-
-	/* 16 entry by 9-bit ROM
-	   Song starting locations?  Chip has 16 songs max, 512 total notes.
-	   All 16 entries have data, but only 12 songs on chip.
-	   Dump from visual decap with values padded to 16 bits, needs further analysis. */
-	ROM_LOAD( "offsets.bin", 0x0000, 0x0020, BAD_DUMP CRC(f39aff3c) SHA1(255dcea154ed04c6d1968b09e188ca5fc8821721) )
-
-	/* 16 entry by 7-bit ROM.
-	   Tempo for each song?
-	   All 16 entries have data, but only 12 songs on chip.
-	   Dump from visual decap with values padded to 8 bits, needs further analysis. */
-	ROM_LOAD( "tempos.bin", 0x0000, 0x0010, BAD_DUMP CRC(c3a37f74) SHA1(67eac8c6530c202760d492f3e52c44f9cd183b46) )
-
 	ROM_REGION( 0x20, "proms", ROMREGION_ERASE00 )
-	ROM_LOAD( "n82s123an.8n", 0x00, 0x20, NO_DUMP ) 
-
-	ROM_REGION( 0x200, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD( "x2804ap.4j", 0x000, 0x200, NO_DUMP )
+	ROM_LOAD( "n82s123an.8n", 0x00, 0x20, NO_DUMP )
 
 	// Not dumped, unused
 	ROM_REGION( 0x71c, "plds", 0 )
@@ -1070,7 +1167,7 @@ GAME( 1988, atetrisb2, atetris, atetrisb2,       atetris,  atetris_state,       
 GAME( 1988, atetrisb3, atetris, atetrisb3,       atetris,  atetris_mcu_state,    empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 3)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1988, atetrisb4, atetris, atetris,         atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 4)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1988, atetrisb5, atetris, atetrisb5,       atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 5)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1988, atetb3482, atetris, atetris,         atetris,  atetris_state,        empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 6, with UM3482)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1988, atetb3482, atetris, atetb3482,       atetris,  atetris_um3482_state, empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 6, with UM3482)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1988, atetb5205, atetris, atetb5205,       atetris,  atetris_m5205_state,  empty_init, ROT0,   "bootleg",     "Tetris (bootleg set 7, with OKI M5205)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1988, link,      atetris, atetrisb3_11mhz, atetris,  atetris_mcu_state,    empty_init, ROT0,   "bootleg",     "Link (Korean bootleg of Atari Tetris)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1989, atetrisbp, atetris, atetrisbp,       atetris,  atetris_bartop_state, empty_init, ROT0,   "Atari Games", "Tetris (bartop, prototype)",             MACHINE_SUPPORTS_SAVE )
