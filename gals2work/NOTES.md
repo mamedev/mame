@@ -191,3 +191,28 @@ The MCU needs to:
 4. Activate the task and continuously re-activate it (cooperative handshake)
 
 This is the final missing piece for bg15 picture rendering.
+
+## DECOMPRESSION FORMAT INVESTIGATION STATUS
+
+### What we tried
+- Original format (bit7=RLE, bit7_clear=literal): 678 unique colors/1000 → noise
+- Reversed format (bit7=literal, bit7_clear=RLE): 151 unique colors/2000 → horizontal bands
+- Width sweep: best row-major width=151 (92% horizontal similarity)
+- Height sweep: best column-major height=87 (90% vertical similarity)
+- Tried GRB, RGB, BGR color formats
+- Tried with/without header bytes (0-12 byte skip)
+
+### Key finding
+The REVERSED format produces far fewer unique colors (151 vs 678) and shows 
+clear color banding, suggesting it's CLOSER to correct but still not right.
+The actual decompression routine at B1C6 may have additional complexity not 
+captured by the simple bit-7 split:
+- Maybe the count field is split differently (not just bit 7)
+- Maybe there are additional command types (skip, reference, etc.)
+- Maybe the byte after the command is used differently
+
+### What's needed
+- Step-by-step trace of B1C6 with actual ROM data on a real (or MAME debugger) 
+  68000, comparing output pixels with our C++ implementation
+- Or: check the OTHER decompression routines (B0E0, B47C, B69E, etc.) — maybe 
+  image 0xD3 uses a DIFFERENT decompression type

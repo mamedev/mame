@@ -254,6 +254,84 @@ void galpani2_state::galpani2_mcu_nmi1()
 
 void galpani2_state::galpani2_mcu_nmi2()
 {
+	// Direct bg15 decompression: replicate the B1C6 decompression in C++
+	address_space &ss = m_subcpu->space(AS_PROGRAM);
+	static bool bg15_decomp_done = false;
+	static int bg15_wait_frames = 0;
+	if (!bg15_decomp_done && ++bg15_wait_frames == 1500) // ~25 seconds, during title screen
+	{
+		bg15_decomp_done = true;
+
+		// Decompress image 0xD3 (from imlist[211] = 0x44250C) to bg15 page 3
+		uint32_t rom_offset = 0x0044250c;
+		uint32_t bank = (rom_offset >> 23) & 3;
+		ss.write_word(0x7c0000, bank);
+		uint32_t src = 0x800000 | (rom_offset & 0x7fffff);
+		uint32_t dst_base = 0x4c0000; // bg15 page 3
+		int width = 40; // try small strip
+		int height = 30;
+
+		logerror("BG15 DECOMP: image 0xD3 src=%06x dst=%06x w=%d h=%d\n", src, dst_base, width, height);
+
+		int col = 0, row = 0;
+		int pixels_written = 0;
+		for (int iter = 0; iter < 500000 && col < width; iter++)
+		{
+			uint8_t cmd = ss.read_byte(src++);
+			bool bit7 = (cmd & 0x80) != 0;
+			int count = cmd & 0x7f;
+
+			if (bit7)
+			{
+				// RLE: read one pixel, repeat count+1 times down column
+				uint8_t hi = ss.read_byte(src); src++;
+				uint8_t lo = ss.read_byte(src); src++;
+				uint16_t pixel = (hi << 8) | lo;
+				for (int i = 0; i <= count && col < width; i++)
+				{
+					if (row < height)
+					{
+						ss.write_word(dst_base + col * 0x400 + row * 2, pixel | 0x8000);
+						pixels_written++;
+					}
+					row++;
+					if (row >= height) { row = 0; col++; }
+				}
+			}
+			else
+			{
+				// Literal: read count+1 pixels, write sequentially down column
+				for (int i = 0; i <= count && col < width; i++)
+				{
+					uint8_t hi2 = ss.read_byte(src); src++;
+					uint8_t lo2 = ss.read_byte(src); src++;
+					uint16_t pixel = (hi2 << 8) | lo2;
+					if (row < height)
+					{
+						ss.write_word(dst_base + col * 0x400 + row * 2, pixel | 0x8000);
+						pixels_written++;
+					}
+					row++;
+					if (row >= height) { row = 0; col++; }
+				}
+			}
+		}
+		logerror("BG15 DECOMP: done, %d pixels written, reached col=%d row=%d\n", pixels_written, col, row);
+
+		// Dump the decompressed data as raw binary for offline rendering
+		FILE *f = fopen("/tmp/gp2_decomp_page3.bin", "wb");
+		if (f)
+		{
+			for (uint32_t a = 0x4c0000; a < 0x500000; a++)
+			{
+				uint8_t b = ss.read_byte(a);
+				fwrite(&b, 1, 1, f);
+			}
+			fclose(f);
+			logerror("BG15 DECOMP: dumped page 3 to /tmp/gp2_decomp_page3.bin\n");
+		}
+	}
+
 	static const uint32_t imlist[794] = {
 		0x000ccbf4, 0x000eac7e, 0x0010db66, 0x00125050, 0x0012b3b6, 0x00132140, 0x00137cae, 0x0013f256, 0x00144ac4, 0x0014dc5c, 0x00153bf8, 0x00158cae, 0x0015e5b2, 0x001672a6, 0x00170c5e, 0x0017306c,
 		0x00173a88, 0x00174d44, 0x001759da, 0x0017693e, 0x001773f4, 0x0017802c, 0x0017abd6, 0x0017baca, 0x0017d37a, 0x0017e97e, 0x0017ff34, 0x00180cfe, 0x00181e5c, 0x00183be0, 0x001858b2, 0x00186dae,
