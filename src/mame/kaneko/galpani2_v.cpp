@@ -100,7 +100,7 @@ void galpani2_state::copybg15(screen_device &screen, bitmap_rgb32 &bitmap, const
 {
 	// bg15 layout: 256 columns × 256 rows per page, 0x200 bytes (0x100 words) per column
 	// Page offset from 0x314000 register (TODO: capture dynamically)
-	uint16_t* ram = m_bg15 + 0xc0000/2; // page 3 at 0x4C0000 (where the game fills)
+	uint16_t* ram = m_bg15 + 0xc0000/2; // page 3 at 0x4C0000
 
 	pen_t const *const clut = &m_bg15palette->pen(0);
 	for (int xx = 0; xx < 320; xx++)
