@@ -252,3 +252,26 @@ This means either:
 The 21 pixels from the first test (with skip=0) showed REAL colors
 (orange/green) suggesting SOME data is correct, but the full output
 is noise.
+
+## IMAGE GRID TABLE at 0xA504
+
+Format: 9 columns × 10 rows, each cell at offset (col*256 + row*16).
+Each cell = 5 words (10 bytes):
+- [0] image_index (for pointer table lookup → image data)
+- [1] f1: Y position or start offset
+- [2] f2: column/X parameter (always == f3)
+- [3] f3: same as f2
+- [4] f4: Y end or total offset
+
+Row pairs (0+1, 2+3, 4+5, 6+7) have consecutive image indices
+and matching f2/f3 values. The f1 difference between pair members
+is ~37-47, suggesting top/bottom halves of a picture.
+
+This table IS the dimension/position data — the fields describe
+WHERE each image tile goes in the bg15 framebuffer.
+
+## RAW BYTE IMAGE at width 490
+
+Image 0xB5 rendered as raw bytes at width 490 shows a visible
+landscape. NOT RLE compressed. 61820 bytes = ~490×126 pixels.
+The format may be direct 8-bit or bitplane data.
