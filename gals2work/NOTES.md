@@ -216,3 +216,39 @@ captured by the simple bit-7 split:
   68000, comparing output pixels with our C++ implementation
 - Or: check the OTHER decompression routines (B0E0, B47C, B69E, etc.) — maybe 
   image 0xD3 uses a DIFFERENT decompression type
+
+## SKIP PARAMETER FIX (critical for decompression)
+
+The B1C6 decompression visible-row check at B216:
+```asm
+B216: cmp.w D6, D2   ; D2 - D6
+B218: bls $B264      ; branch if D2 <= D6 (visible)
+```
+
+D6 = height counter (starts at height, counts down via dbra)  
+D2 = height - skip
+
+With skip=0: D2=height → only row 0 is visible (D6==D2 on first pixel only)
+With skip=height: D2=0 → ALL rows visible (D6 >= 0 always)
+
+The "skip" param at (A4+0xE) controls how many rows to SKIP at the TOP of
+each column. The visible window is the BOTTOM (height - skip) rows.
+
+## NATIVE DECOMPRESSION TEST RESULTS
+
+Activated task 0x5a (B1C6) with:
+- source: imlist[0] and imlist[0xD3] (both tested)
+- dest: 0x4C0000 (bg15 page 3)
+- width: 256, height: 240, skip: 240
+
+Result: 61,696 pixels written (256 × 241 = full page)
+BUT the output is GARBLED NOISE for both image sources.
+
+This means either:
+- B1C6 is wrong for these images (should use B47C/B69E/B0E0?)
+- The param block fields don't mean what we assumed
+- The source ROM offsets need different preprocessing
+
+The 21 pixels from the first test (with skip=0) showed REAL colors
+(orange/green) suggesting SOME data is correct, but the full output
+is noise.

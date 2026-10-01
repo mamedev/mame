@@ -254,81 +254,72 @@ void galpani2_state::galpani2_mcu_nmi1()
 
 void galpani2_state::galpani2_mcu_nmi2()
 {
-	// Direct bg15 decompression: replicate the B1C6 decompression in C++
+	// Activate a decompression task and snapshot bg15 before/after
 	address_space &ss = m_subcpu->space(AS_PROGRAM);
-	static bool bg15_decomp_done = false;
-	static int bg15_wait_frames = 0;
-	if (!bg15_decomp_done && ++bg15_wait_frames == 1500) // ~25 seconds, during title screen
+	static int bg15_phase = 0;
+	static int bg15_timer = 0;
+	bg15_timer++;
+
+	if (bg15_phase == 0 && bg15_timer == 1800) // ~30 seconds
 	{
-		bg15_decomp_done = true;
+		// Snapshot bg15 BEFORE
+		FILE *f = fopen("/tmp/gp2_bg15_before.bin", "wb");
+		if (f) { for (uint32_t a = 0x4c0000; a < 0x500000; a++) { uint8_t b = ss.read_byte(a); fwrite(&b, 1, 1, f); } fclose(f); }
 
-		// Decompress image 0xD3 (from imlist[211] = 0x44250C) to bg15 page 3
-		uint32_t rom_offset = 0x0044250c;
-		uint32_t bank = (rom_offset >> 23) & 3;
-		ss.write_word(0x7c0000, bank);
-		uint32_t src = 0x800000 | (rom_offset & 0x7fffff);
-		uint32_t dst_base = 0x4c0000; // bg15 page 3
-		int width = 40; // try small strip
-		int height = 30;
-
-		logerror("BG15 DECOMP: image 0xD3 src=%06x dst=%06x w=%d h=%d\n", src, dst_base, width, height);
-
-		int col = 0, row = 0;
-		int pixels_written = 0;
-		for (int iter = 0; iter < 500000 && col < width; iter++)
-		{
-			uint8_t cmd = ss.read_byte(src++);
-			bool bit7 = (cmd & 0x80) != 0;
-			int count = cmd & 0x7f;
-
-			if (bit7)
-			{
-				// RLE: read one pixel, repeat count+1 times down column
-				uint8_t hi = ss.read_byte(src); src++;
-				uint8_t lo = ss.read_byte(src); src++;
-				uint16_t pixel = (hi << 8) | lo;
-				for (int i = 0; i <= count && col < width; i++)
-				{
-					if (row < height)
-					{
-						ss.write_word(dst_base + col * 0x400 + row * 2, pixel | 0x8000);
-						pixels_written++;
-					}
-					row++;
-					if (row >= height) { row = 0; col++; }
-				}
-			}
-			else
-			{
-				// Literal: read count+1 pixels, write sequentially down column
-				for (int i = 0; i <= count && col < width; i++)
-				{
-					uint8_t hi2 = ss.read_byte(src); src++;
-					uint8_t lo2 = ss.read_byte(src); src++;
-					uint16_t pixel = (hi2 << 8) | lo2;
-					if (row < height)
-					{
-						ss.write_word(dst_base + col * 0x400 + row * 2, pixel | 0x8000);
-						pixels_written++;
-					}
-					row++;
-					if (row >= height) { row = 0; col++; }
+		// Activate task 0x5a with image 0 params
+		uint32_t tbase = ss.read_dword(0x1094a8);
+		if (tbase) {
+			uint32_t pblock = 0x13F000; // near end of sub CPU RAM, less likely to be overwritten
+			ss.write_dword(pblock + 0, 0x0044250c); // image 0xD3 (referenced by game descriptor)
+			ss.write_dword(pblock + 4, 0x004c0000); // dest page 3
+			ss.write_word(pblock + 8, 0x0100);       // width 256 columns
+			ss.write_word(pblock + 0xa, 0x00f0);     // height 240 rows
+			ss.write_word(pblock + 0xe, 0x00f0);     // skip = height (makes D2=0, all rows visible)
+			for (int ti = 0; ti < 0x200; ti += 0x10) {
+				uint8_t tf = ss.read_byte(tbase + ti);
+				uint16_t tid = ss.read_word(tbase + ti + 2);
+				if ((tf & 0xc0) == 0xc0 && tid == 0x005a) {
+					ss.write_dword(tbase + ti + 8, pblock);
+					ss.write_byte(tbase + ti, tf & 0x7f);
+					logerror("BG15 SNAP: activated task 0x5a\n");
+					break;
 				}
 			}
 		}
-		logerror("BG15 DECOMP: done, %d pixels written, reached col=%d row=%d\n", pixels_written, col, row);
-
-		// Dump the decompressed data as raw binary for offline rendering
-		FILE *f = fopen("/tmp/gp2_decomp_page3.bin", "wb");
-		if (f)
-		{
-			for (uint32_t a = 0x4c0000; a < 0x500000; a++)
-			{
-				uint8_t b = ss.read_byte(a);
-				fwrite(&b, 1, 1, f);
+		bg15_phase = 1;
+	}
+	else if (bg15_phase == 1)
+	{
+		// Re-activate blocked task continuously
+		uint32_t tbase = ss.read_dword(0x1094a8);
+		if (tbase) {
+			for (int ti = 0; ti < 0x200; ti += 0x10) {
+				uint8_t tf = ss.read_byte(tbase + ti);
+				uint16_t tid = ss.read_word(tbase + ti + 2);
+				if ((tf & 0xc0) == 0xc0 && tid == 0x005a) {
+					uint32_t cp = ss.read_dword(tbase + ti + 4);
+					if (cp != 0) {
+						ss.write_byte(tbase + ti, tf & 0x7f);
+						static int reactivation_count = 0;
+						if (++reactivation_count <= 3) {
+							uint32_t pp = ss.read_dword(tbase + ti + 8);
+							logerror("REACTIVATE task5a: cp=%06x param=%06x", cp, pp);
+							if (pp >= 0x100000 && pp < 0x140000) {
+								logerror(" src=%08x dst=%08x w=%04x h=%04x skip=%04x",
+									ss.read_dword(pp), ss.read_dword(pp+4),
+									ss.read_word(pp+8), ss.read_word(pp+0xa), ss.read_word(pp+0xe));
+							}
+							logerror("\n");
+						}
+					}
+				}
 			}
-			fclose(f);
-			logerror("BG15 DECOMP: dumped page 3 to /tmp/gp2_decomp_page3.bin\n");
+		}
+		if (bg15_timer >= 3600) { // 30 seconds of re-activation
+			FILE *f = fopen("/tmp/gp2_bg15_after.bin", "wb");
+			if (f) { for (uint32_t a = 0x4c0000; a < 0x500000; a++) { uint8_t b = ss.read_byte(a); fwrite(&b, 1, 1, f); } fclose(f); }
+			logerror("BG15 SNAP: saved before/after\n");
+			bg15_phase = 2;
 		}
 	}
 
