@@ -384,6 +384,23 @@ if opt_tool(CPUS, "JAGUAR") then
 end
 
 --------------------------------------------------
+-- Jaleco FPU math coprocessor (F-1 Super Battle)
+--@src/devices/cpu/jalfpu/jalfpu.h,CPUS["JALFPU"] = true
+--------------------------------------------------
+
+if CPUS["JALFPU"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/jalfpu/jalfpu.cpp",
+		MAME_DIR .. "src/devices/cpu/jalfpu/jalfpu.h",
+	}
+end
+
+if opt_tool(CPUS, "JALFPU") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/jalfpu/jalfpu_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/jalfpu/jalfpu_dasm.h")
+end
+
+--------------------------------------------------
 -- MIT CADR cpu
 --@src/devices/cpu/cadr/cadr.h,CPUS["CADR"] = true
 --------------------------------------------------
@@ -2083,6 +2100,7 @@ end
 --------------------------------------------------
 
 if CPUS["M6805"] then
+	MACHINES["ADBHOST"] = true
 	files {
 		MAME_DIR .. "src/devices/cpu/m6805/m6805.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m6805.h",
@@ -2779,6 +2797,23 @@ if opt_tool(CPUS, "AVR8") then
 end
 
 --------------------------------------------------
+-- Toshiba T6M53 ASIC
+--@src/devices/cpu/t6m53/t6m53.h,CPUS["T6M53"] = true
+--------------------------------------------------
+
+if CPUS["T6M53"] then
+    files {
+        MAME_DIR .. "src/devices/cpu/t6m53/t6m53.cpp",
+        MAME_DIR .. "src/devices/cpu/t6m53/t6m53.h",
+    }
+end
+
+if opt_tool(CPUS, "T6M53") then
+    table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.cpp")
+    table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.h")
+end
+
+--------------------------------------------------
 -- Texas Instruments TMS1000 series
 --@src/devices/cpu/tms1000/tms1000.h,CPUS["TMS1000"] = true
 --@src/devices/cpu/tms1000/tms1000c.h,CPUS["TMS1000"] = true
@@ -3072,6 +3107,8 @@ if CPUS["TLCS900"] then
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp94c241_serial.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.h",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061_serial.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061_serial.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c063.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c063.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp96c141.cpp",

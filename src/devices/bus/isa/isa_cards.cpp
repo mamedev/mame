@@ -36,6 +36,7 @@
 #include "acb2072.h"
 #include "cl_sh260.h"
 #include "dsi32.h"
+#include "fddda.h"
 #include "hdc.h"
 #include "lrk330.h"
 #include "omti8621.h"

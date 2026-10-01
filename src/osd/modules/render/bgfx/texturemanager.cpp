@@ -133,11 +133,11 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(
 			if (handle.idx == bgfx::kInvalidHandle)
 				return handle;
 
-			if (iter->second.width == width && iter->second.height == height)
+			if (iter->second.width == width && iter->second.height == height && iter->second.rowpixels == rowpixels)
 			{
 				// Size matches, so let's just swap the old handle into the new location
-				m_mame_textures[key] = { handle, seqid, width, height };
-				m_mame_textures[old_key] = { BGFX_INVALID_HANDLE, 0, 0, 0 };
+				m_mame_textures[key] = { handle, seqid, width, height, rowpixels };
+				m_mame_textures[old_key] = { BGFX_INVALID_HANDLE, 0, 0, 0, 0 };
 
 				if (iter->second.seqid == seqid)
 				{
@@ -156,7 +156,7 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(
 				}
 			}
 			bgfx::destroy(handle);
-			m_mame_textures[old_key] = { BGFX_INVALID_HANDLE, 0, 0, 0 };
+			m_mame_textures[old_key] = { BGFX_INVALID_HANDLE, 0, 0, 0, 0 };
 		}
 	}
 	else
@@ -168,7 +168,7 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(
 			if (handle.idx == bgfx::kInvalidHandle)
 				return handle;
 
-			if (iter->second.width == width && iter->second.height == height)
+			if (iter->second.width == width && iter->second.height == height && iter->second.rowpixels == rowpixels)
 			{
 				if (iter->second.seqid == seqid)
 				{
@@ -198,7 +198,7 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(
 	handle = bgfx::createTexture2D(adjusted_width, height, false, 1, dst_format, flags, nullptr);
 	bgfx::updateTexture2D(handle, 0, 0, 0, 0, adjusted_width, uint16_t(height), mem, pitch);
 
-	m_mame_textures[key] = { handle, seqid, width, height };
+	m_mame_textures[key] = { handle, seqid, width, height, rowpixels };
 	return handle;
 }
 

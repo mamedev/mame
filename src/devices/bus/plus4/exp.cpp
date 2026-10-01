@@ -12,18 +12,122 @@
 
 
 //**************************************************************************
-//  MACROS/CONSTANTS
-//**************************************************************************
-
-#define LOG 0
-
-
-
-//**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(PLUS4_EXPANSION_SLOT, plus4_expansion_slot_device, "plus4_expansion_slot", "Plus/4 Expansion Port")
+
+
+
+//**************************************************************************
+//  PLUS4 EXPANSION WINDOW
+//**************************************************************************
+
+plus4_expansion_window::plus4_expansion_window(device_t &device, const char *name, offs_t start, offs_t end)
+	: m_view(device, name)
+	, m_video_view(device, std::string(name) + "_video")
+	, m_start(start)
+	, m_end(end)
+	, m_video_start(0)
+	, m_hole_start(0)
+	, m_hole_end(0)
+	, m_has_video(false)
+	, m_has_hole(false)
+	, m_video_installed(false)
+{
+}
+
+plus4_expansion_window::plus4_expansion_window(device_t &device, const char *name, offs_t start, offs_t end, offs_t video_start)
+	: m_view(device, name)
+	, m_video_view(device, std::string(name) + "_video")
+	, m_start(start)
+	, m_end(end)
+	, m_video_start(video_start)
+	, m_hole_start(0)
+	, m_hole_end(0)
+	, m_has_video(true)
+	, m_has_hole(false)
+	, m_video_installed(false)
+{
+}
+
+plus4_expansion_window::plus4_expansion_window(device_t &device, const char *name, offs_t start, offs_t end, offs_t video_start, offs_t hole_start, offs_t hole_end)
+	: m_view(device, name)
+	, m_video_view(device, std::string(name) + "_video")
+	, m_start(start)
+	, m_end(end)
+	, m_video_start(video_start)
+	, m_hole_start(hole_start)
+	, m_hole_end(hole_end)
+	, m_has_video(true)
+	, m_has_hole(true)
+	, m_video_installed(false)
+{
+}
+
+void plus4_expansion_window::install_views(address_space_installer &program, address_space_installer *video)
+{
+	program.install_view(m_start, m_end, m_view);
+	m_view[0];
+
+	if (m_has_video && video)
+	{
+		video->install_view(m_video_start, m_video_start + (m_end - m_start), m_video_view);
+		m_video_view[0];
+		m_video_installed = true;
+	}
+}
+
+void plus4_expansion_window::select(int slot)
+{
+	m_view.select(slot);
+
+	if (m_video_installed)
+		m_video_view.select(slot);
+}
+
+void plus4_expansion_window::unmap()
+{
+	m_view.disable();
+
+	if (m_video_installed)
+		m_video_view.disable();
+}
+
+void plus4_expansion_window::variant::install_rom(offs_t start, offs_t end, offs_t mirror, void *baseptr)
+{
+	uint8_t *const base = reinterpret_cast<uint8_t *>(baseptr);
+
+	for (offs_t m = 0; ; m = ((m | ~mirror) + 1) & mirror)
+	{
+		if (m_window.m_has_hole)
+		{
+			if (start < m_window.m_hole_start)
+				install_rom_segment(start | m, std::min(end, m_window.m_hole_start - 1) | m, base);
+
+			if (end > m_window.m_hole_end)
+			{
+				offs_t const first = std::max(start, m_window.m_hole_end + 1);
+				install_rom_segment(first | m, end | m, base + (first - start));
+			}
+		}
+		else
+		{
+			install_rom_segment(start | m, end | m, base);
+		}
+
+		if (m == mirror)
+			break;
+	}
+}
+
+void plus4_expansion_window::variant::install_rom_segment(offs_t start, offs_t end, uint8_t *base)
+{
+	m_window.m_view[m_slot].install_rom(m_window.m_start + start, m_window.m_start + end, base);
+
+	if (m_window.m_video_installed)
+		m_window.m_video_view[m_slot].install_rom(m_window.m_video_start + start, m_window.m_video_start + end, base);
+}
 
 
 
@@ -35,24 +139,14 @@ DEFINE_DEVICE_TYPE(PLUS4_EXPANSION_SLOT, plus4_expansion_slot_device, "plus4_exp
 //  device_plus4_expansion_card_interface - constructor
 //-------------------------------------------------
 
-device_plus4_expansion_card_interface::device_plus4_expansion_card_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "plus4exp"),
-	m_c1l_size(0),
-	m_c1h_size(0),
-	m_c2l_size(0),
-	m_c2h_size(0)
-{
-	m_slot = dynamic_cast<plus4_expansion_slot_device *>(device.owner());
-}
-
-
-//-------------------------------------------------
-//  ~device_plus4_expansion_card_interface - destructor
-//-------------------------------------------------
-
-device_plus4_expansion_card_interface::~device_plus4_expansion_card_interface()
+device_plus4_expansion_card_interface::device_plus4_expansion_card_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "plus4exp")
+	, m_slot(nullptr)
 {
 }
+
+
+device_plus4_expansion_card_interface::~device_plus4_expansion_card_interface() = default;
 
 
 
@@ -69,11 +163,41 @@ plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &m
 	device_single_card_slot_interface<device_plus4_expansion_card_interface>(mconfig, *this),
 	device_cartrom_image_interface(mconfig, *this),
 	m_write_irq(*this),
-	m_read_dma_cd(*this, 0xff),
-	m_write_dma_cd(*this),
 	m_write_aec(*this),
-	m_card(nullptr)
+	m_card(nullptr),
+	m_root(find_root(owner)),
+	m_c1l(*this, "c1l", 0x8000, 0xbfff, 0x18000),
+	m_c1h(*this, "c1h", 0xc000, 0xffff, 0x1c000, 0x3c00, 0x3f1f),
+	m_c2l(*this, "c2l", 0x8000, 0xbfff, 0x18000),
+	m_c2h(*this, "c2h", 0xc000, 0xffff, 0x1c000, 0x3c00, 0x3f1f),
+	m_io(*this, "io", 0xfd00, 0xfeff)
 {
+}
+
+
+//-------------------------------------------------
+//  add_passthrough - add a pass-through slot
+//  on a card
+//-------------------------------------------------
+
+void plus4_expansion_slot_device::add_passthrough(machine_config &config, const char *tag)
+{
+	auto &slot = PLUS4_EXPANSION_SLOT(config, tag, DERIVED_CLOCK(1, 1), plus4_expansion_cards, nullptr);
+	slot.irq_wr_callback().set(DEVICE_SELF_OWNER, FUNC(plus4_expansion_slot_device::irq_w));
+	slot.aec_wr_callback().set(DEVICE_SELF_OWNER, FUNC(plus4_expansion_slot_device::aec_w));
+}
+
+
+//-------------------------------------------------
+//  find_root - locate the slot that owns the
+//  memory views
+//-------------------------------------------------
+
+plus4_expansion_slot_device *plus4_expansion_slot_device::find_root(device_t *owner)
+{
+	plus4_expansion_slot_device *const parent = owner ? dynamic_cast<plus4_expansion_slot_device *>(owner->owner()) : nullptr;
+
+	return parent ? parent->m_root : this;
 }
 
 
@@ -84,6 +208,9 @@ plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &m
 void plus4_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
+
+	if (m_card)
+		m_card->set_slot(*this);
 }
 
 
@@ -96,22 +223,13 @@ std::pair<std::error_condition, std::string> plus4_expansion_slot_device::call_l
 	if (m_card)
 	{
 		if (!loaded_through_softlist())
-		{
-			// TODO
 			return std::make_pair(image_error::UNSUPPORTED, "Plus/4 Expansion software must be loaded from the software list");
-		}
-		else
-		{
-			load_software_region("c1l", m_card->m_c1l);
-			load_software_region("c1h", m_card->m_c1h);
-			load_software_region("c2l", m_card->m_c2l);
-			load_software_region("c2h", m_card->m_c2h);
-			m_card->m_c1l_size = get_software_region_length("c1l");
-			m_card->m_c1h_size = get_software_region_length("c1h");
-			m_card->m_c2l_size = get_software_region_length("c2l");
-			m_card->m_c2h_size = get_software_region_length("c2h");
 
-			if ((m_card->m_c1l_size & (m_card->m_c1l_size - 1)) || (m_card->m_c1h_size & (m_card->m_c1h_size - 1)) || (m_card->m_c2l_size & (m_card->m_c2l_size - 1)) || (m_card->m_c2h_size & (m_card->m_c2h_size - 1)))
+		for (const char *tag : { "c1l", "c1h", "c2l", "c2h" })
+		{
+			uint32_t const size = get_software_region_length(tag);
+
+			if (size & (size - 1))
 				return std::make_pair(image_error::INVALIDLENGTH, "All ROM sizes must be powers of 2");
 		}
 	}
@@ -127,34 +245,6 @@ std::pair<std::error_condition, std::string> plus4_expansion_slot_device::call_l
 std::string plus4_expansion_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot("standard");
-}
-
-
-//-------------------------------------------------
-//  cd_r - cartridge data read
-//-------------------------------------------------
-
-uint8_t plus4_expansion_slot_device::cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
-{
-	if (m_card != nullptr)
-	{
-		data = m_card->plus4_cd_r(offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
-	}
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  cd_w - cartridge data write
-//-------------------------------------------------
-
-void plus4_expansion_slot_device::cd_w(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
-{
-	if (m_card != nullptr)
-	{
-		m_card->plus4_cd_w(offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
-	}
 }
 
 

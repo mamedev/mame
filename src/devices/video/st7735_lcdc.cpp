@@ -13,6 +13,12 @@
 // what are the differences with ST7715 and ST7735SV? (and other models)
 // PWCTR1 has only 2 params on the SV at least
 
+// GM2/GM1/GM0 pins select between 2 modes
+// 132RGB x 152 or 128RGB x 160
+// 
+// however some of the users of this are setting slightly offset co-ordinates (+1/2 pixels)
+// that would take it beyond those bounds?
+
 
 DEFINE_DEVICE_TYPE(ST7735, st7735_lcdc_device, "st7735", "Sitronix ST7735 LCD Controller")
 
@@ -38,7 +44,7 @@ u32 st7735_lcdc_device::render_to_bitmap(screen_device &screen, bitmap_rgb32 &bi
 			{
 				int const count = (y * 0x200) + x;
 
-				u16 const dat = get_u16be(&m_displaybuffer[count * 2]);
+				u16 const dat = m_displaybuffer[count & 0xffff];
 
 				int const b = ((dat >> 0) & 0x1f) << 3;
 				int const g = ((dat >> 5) & 0x3f) << 2;
@@ -161,11 +167,11 @@ void st7735_lcdc_device::lcdc_data_w(u8 data)
 		case 0: m_posminy = data << 8 | (m_posminy & 0xff); break;
 		case 1: m_posminy = (m_posminy & 0xff00) | data; break;
 		case 2: m_posmaxy = data << 8 | (m_posmaxy & 0xff); break;
-		case 3:
-			m_posmaxy = (m_posmaxy & 0xff00) | data; m_posy = m_posminy;
+		case 3:	m_posmaxy = (m_posmaxy & 0xff00) | data;
 			logerror("Y Min %04x Y Max %04x\n", m_posminy, m_posmaxy);
 			break;
 		}
+		m_posy = m_posminy;
 	}
 	else if (m_command == 0x2a)
 	{
@@ -174,25 +180,43 @@ void st7735_lcdc_device::lcdc_data_w(u8 data)
 		case 0: m_posminx = data << 8 | (m_posminx & 0xff); break;
 		case 1: m_posminx = (m_posminx & 0xff00) | data; break;
 		case 2: m_posmaxx = data << 8 | (m_posmaxx & 0xff); break;
-		case 3:
-			m_posmaxx = (m_posmaxx & 0xff00) | data; m_posx = m_posminx << 1;
+		case 3:	m_posmaxx = (m_posmaxx & 0xff00) | data;
 			logerror("X Min %04x X Max %04x\n", m_posminx, m_posmaxx);
 			break;
 		}
+		m_posx = m_posminx;
 	}
 	else if (m_command == 0x2c)
 	{
-		m_displaybuffer[((m_posx + (m_posy * 0x400))) & 0x1ffff] = data;
+		m_pixellatch = (m_pixellatch << 8) | data;
 
-		m_posx++;
-		if (m_posx > ((m_posmaxx << 1) + 1))
+		if (m_commandstep & 1)
 		{
-			m_posx = m_posminx << 1;
-			m_posy++;
+			// dphh8630: MADCTL set to a8 (MY 1 MX 0 MV 1 ML 0 RGB 1 MH 0) (and similar devices)
+			// touma560: MADCTL set to 48 (MY 0 MX 1 MV 0 ML 0 RGB 1 MH 0)
+			// qpet:     MADCTL set to c8 (MY 1 MX 1 MV 0 ML 0 RGB 1 MH 0)
+			// toumapet: MADCTL set to 08 (MY 0 MX 0 MV 0 ML 0 RGB 1 MH 0)
+			// touma558: MADCTL set to 00 (MY 0 MX 0 MV 0 ML 0 RGB 0 MH 0) (is this being correctly set, the RGB order is the same as others?)
 
-			if (m_posy > m_posmaxy)
+			if (BIT(m_madctl, 5)) // MV
 			{
-				m_posy = m_posminy;
+				m_displaybuffer[((m_posx + (m_posy * 0x200))) & 0xffff] = m_pixellatch;
+			}
+			else
+			{
+				m_displaybuffer[((m_posy + ((129 - m_posx) * 0x200))) & 0xffff] = m_pixellatch;
+			}
+
+			m_posx++;
+			if (m_posx > m_posmaxx)
+			{
+				m_posx = m_posminx;
+				m_posy++;
+
+				if (m_posy > m_posmaxy)
+				{
+					m_posy = m_posminy;
+				}
 			}
 		}
 	}
@@ -200,7 +224,18 @@ void st7735_lcdc_device::lcdc_data_w(u8 data)
 	{
 		switch (m_commandstep)
 		{
-		case 0: logerror("MADCTL set to %02x\n", data); break;
+		case 0:
+		{
+			m_madctl = data;
+			u8 my = BIT(m_madctl, 7);
+			u8 mx = BIT(m_madctl, 6);
+			u8 mv = BIT(m_madctl, 5);
+			u8 ml = BIT(m_madctl, 4);
+			u8 rgb = BIT(m_madctl, 3);
+			u8 mh = BIT(m_madctl, 2);
+			logerror("MADCTL set to %02x (MY %d MX %d MV %d ML %d RGB %d MH %d)\n", data, my, mx, mv, ml, rgb, mh);
+			break;
+		}
 		default: logerror("unexpected parameter for command %02x\n", m_command); break;
 		}
 	}
@@ -335,7 +370,7 @@ void st7735_lcdc_device::lcdc_data_w(u8 data)
 
 void st7735_lcdc_device::device_start()
 {
-	m_displaybuffer = make_unique_clear<u8 []>(256 * 256 * 2);
+	m_displaybuffer = make_unique_clear<u16 []>(256 * 256);
 	m_posx = 0;
 	m_posy = 0;
 	m_posminx = 0;
@@ -346,8 +381,11 @@ void st7735_lcdc_device::device_start()
 	m_commandstep = 0;
 	m_displayon = 0;
 	m_sleep = 1;
+	m_madctl = 0;
+	m_pixelbyte = 0;
+	m_pixellatch = 0;
 
-	save_pointer(NAME(m_displaybuffer), 256 * 256 * 2);
+	save_pointer(NAME(m_displaybuffer), 256 * 256);
 	save_item(NAME(m_posx));
 	save_item(NAME(m_posy));
 	save_item(NAME(m_posminx));
@@ -358,6 +396,7 @@ void st7735_lcdc_device::device_start()
 	save_item(NAME(m_commandstep));
 	save_item(NAME(m_displayon));
 	save_item(NAME(m_sleep));
+	save_item(NAME(m_madctl));
 }
 
 void st7735_lcdc_device::device_reset()

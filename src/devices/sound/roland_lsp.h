@@ -82,7 +82,7 @@ protected:
 	static instruction decode(u32 word);
 
 	static s32 saturate(s32 value) { return std::clamp<s32>(value, -0x800000, 0x7fffff); }
-	static s32 narrow(s32 value) { return s32(u32(value) << 8) >> 8; }
+	static s32 narrow(s32 value) { return util::sext(value, 24); }
 	static s32 add(s32 accumulator, s32 term) { return s32(u32(accumulator) + u32(term)); }
 
 	void program_map(address_map &map) ATTR_COLD;

@@ -17,6 +17,8 @@
 #include "bitmap_printer.h"
 #include "corestr.h"
 
+#include <algorithm>
+
 /***************************************************************************
     DEVICE DECLARATION
 ***************************************************************************/
@@ -99,6 +101,14 @@ bitmap_printer_device::bitmap_printer_device(const machine_config &mconfig, devi
 	m_vdpi(0),
 	m_clear_pos(0),
 	m_newpage_flag(0),
+	m_continuous_feed(false),
+	m_feed_hi(0),
+	m_feed_lo(0),
+	m_roll_dirty(false),
+	m_roll_collected(false),
+	m_roll_first(0),
+	m_roll_last(0),
+	m_feed_forward(true),
 	m_led_state{0,1,1,1,1},
 	m_num_leds(1),
 	m_pf_stepper_ratio0(1),
@@ -129,7 +139,19 @@ bitmap_printer_device::bitmap_printer_device(const machine_config &mconfig, cons
 void bitmap_printer_device::device_start()
 {
 	m_page_bitmap.allocate(m_paper_width, m_paper_height);
-	m_page_bitmap.fill(0xffffff);  // Start with a white piece of paper
+	m_page_bitmap.fill(paper_color);  // Start with a white piece of paper
+
+	if (m_continuous_feed)
+	{
+		m_roll_bitmap.allocate(m_paper_width, m_paper_height);
+		m_roll_bitmap.fill(paper_color);
+		save_item(NAME(m_roll_bitmap));
+		save_item(NAME(m_roll_dirty));
+		save_item(NAME(m_roll_collected));
+		save_item(NAME(m_roll_first));
+		save_item(NAME(m_roll_last));
+		save_item(NAME(m_feed_forward));
+	}
 
 	save_item(NAME(m_page_bitmap));
 	save_item(NAME(m_xpos));
@@ -151,11 +173,36 @@ void bitmap_printer_device::device_start()
 	save_item(NAME(m_vdpi));
 	save_item(NAME(m_clear_pos));
 	save_item(NAME(m_newpage_flag));
+	save_item(NAME(m_continuous_feed));
+	save_item(NAME(m_feed_hi));
+	save_item(NAME(m_feed_lo));
+}
+
+void bitmap_printer_device::device_stop()
+{
+	if (!m_continuous_feed)
+		return;
+
+	flush_roll();
+
+	int const live = m_feed_forward ? (m_feed_hi - m_paper_height + 1) : m_feed_lo;
+
+	for (int row = 0; row < m_paper_height; row++)
+	{
+		if (row_has_ink(m_page_bitmap, row))
+		{
+			write_roll_page(m_page_bitmap, live);
+			break;
+		}
+	}
 }
 
 void bitmap_printer_device::device_reset_after_children()
 {
 	m_ypos = get_top_margin();
+
+	if (m_continuous_feed)
+		reset_feed_marks();
 }
 
 void bitmap_printer_device::device_reset()
@@ -171,6 +218,123 @@ int bitmap_printer_device::calc_scroll_y(bitmap_rgb32& bitmap)
 	return bitmap.height() - m_distfrombottom - m_ypos;
 }
 
+int bitmap_printer_device::wrap_row(int y) const
+{
+	if (!m_continuous_feed)
+		return y;
+
+	int const h = m_paper_height;
+	int const w = y % h;
+	return (w < 0) ? w + h : w;
+}
+
+void bitmap_printer_device::reset_feed_marks()
+{
+	m_feed_hi = m_ypos + m_distfrombottom;
+	m_feed_lo = m_ypos - m_distfrombottom;
+}
+
+void bitmap_printer_device::clear_roll_rows(int from_row, int to_row, u32 color)
+{
+	if (to_row < from_row)
+		return;
+
+	from_row = std::max(from_row, to_row - m_paper_height + 1);
+
+	for (int y = from_row; y <= to_row; y++)
+		m_page_bitmap.plot_box(0, wrap_row(y), m_paper_width, 1, color);
+}
+
+bool bitmap_printer_device::row_has_ink(bitmap_rgb32 &bitmap, int row) const
+{
+	u32 const *const line = &bitmap.pix(row, 0);
+	return std::any_of(line, line + m_paper_width, [] (u32 pixel) { return pixel != paper_color; });
+}
+
+void bitmap_printer_device::write_roll_page(bitmap_rgb32 &bitmap, int first_row)
+{
+	// page height follows the printing, not the ring. Only the outside is
+	// trimmed - blank rows between two parts of a plot are its layout
+	int top = 0, bottom = m_paper_height - 1;
+
+	while ((top <= bottom) && !row_has_ink(bitmap, wrap_row(first_row + top)))
+		top++;
+
+	if (top > bottom)
+		return;  // nothing on this stretch of roll
+
+	while (!row_has_ink(bitmap, wrap_row(first_row + bottom)))
+		bottom--;
+
+	// or a job that drew one line files a one-pixel-tall page
+	top = std::max(top - m_distfrombottom, 0);
+	bottom = std::min(bottom + m_distfrombottom, m_paper_height - 1);
+
+	bitmap_rgb32 page(m_paper_width, bottom - top + 1);
+
+	for (int y = top; y <= bottom; y++)
+		std::copy_n(&bitmap.pix(wrap_row(first_row + y), 0), m_paper_width, &page.pix(y - top, 0));
+
+	write_bitmap_to_file(page);
+}
+
+bool bitmap_printer_device::flush_roll()
+{
+	bool const saved = m_roll_dirty;
+
+	if (m_roll_dirty)
+		write_roll_page(m_roll_bitmap, m_roll_first);
+
+	m_roll_bitmap.fill(paper_color);
+	m_roll_dirty = false;
+	m_roll_collected = false;
+
+	return saved;
+}
+
+bool bitmap_printer_device::retire_roll_rows(int from_row, int to_row, bool forward)
+{
+	bool saved = false;
+
+	if (to_row < from_row)
+		return false;
+
+	from_row = std::max(from_row, to_row - m_paper_height + 1);
+
+	for (int i = 0; i <= to_row - from_row; i++)
+	{
+		int const src = forward ? (from_row + i - m_paper_height) : (to_row - i + m_paper_height);
+		int const row = wrap_row(src);
+
+		// the two directions retire from opposite ends of the roll, a whole
+		// paper length apart, so a reversal mid-lap has to close the pending
+		// image out rather than blend two stretches of roll into one page
+		if (m_roll_collected && (src != m_roll_last + 1) && (src != m_roll_first - 1))
+			saved |= flush_roll();
+
+		std::copy_n(&m_page_bitmap.pix(row, 0), m_paper_width, &m_roll_bitmap.pix(row, 0));
+
+		if (m_roll_collected)
+		{
+			m_roll_first = std::min(m_roll_first, src);
+			m_roll_last = std::max(m_roll_last, src);
+		}
+		else
+		{
+			m_roll_first = m_roll_last = src;
+			m_roll_collected = true;
+		}
+
+		if (row_has_ink(m_page_bitmap, row))
+			m_roll_dirty = true;
+
+		if (row == (forward ? m_paper_height - 1 : 0))
+			saved |= flush_roll();
+	}
+
+	return saved;
+}
+
 uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 							 bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -182,12 +346,16 @@ uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 
 	copyscrollbitmap(bitmap, m_page_bitmap, 0, nullptr, 1, &scrolly, cliprect);
 
-	// draw a line on the very top of the top edge of page
-	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos, m_paper_width, 2, top_edge_color);
-	// draw a line on the bottom edge of page
-	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos + m_paper_height, m_paper_width, 2, bottom_edge_color);
-	// cover up visible parts of current page at the bottom
-	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos + m_paper_height + 2, m_paper_width, m_distfrombottom, coverup_color);
+	// an endless roll has no page edges, and the buffer wrap isn't a seam
+	if (!m_continuous_feed)
+	{
+		// draw a line on the very top of the top edge of page
+		bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos, m_paper_width, 2, top_edge_color);
+		// draw a line on the bottom edge of page
+		bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos + m_paper_height, m_paper_width, 2, bottom_edge_color);
+		// cover up visible parts of current page at the bottom
+		bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos + m_paper_height + 2, m_paper_width, m_distfrombottom, coverup_color);
+	}
 
 	draw_printhead(bitmap, std::max(m_xpos, 0) , bitmap.height() - m_distfrombottom);
 
@@ -343,7 +511,8 @@ void bitmap_printer_device::draw_inch_marks(bitmap_rgb32& bitmap)
 
 void bitmap_printer_device::draw_pixel(int x, int y, int pixelval)
 {
-	if (y >= m_page_bitmap.height()) y = m_page_bitmap.height() - 1;
+	if (m_continuous_feed) y = wrap_row(y);
+	else if (y >= m_page_bitmap.height()) y = m_page_bitmap.height() - 1;
 	if (x >= m_page_bitmap.width()) x = m_page_bitmap.width() - 1;
 
 	m_page_bitmap.pix(y, x) = pixelval;
@@ -353,7 +522,8 @@ void bitmap_printer_device::draw_pixel(int x, int y, int pixelval)
 
 int bitmap_printer_device::get_pixel(int x, int y)
 {
-	if (y >= m_page_bitmap.height()) y = m_page_bitmap.height() - 1;
+	if (m_continuous_feed) y = wrap_row(y);
+	else if (y >= m_page_bitmap.height()) y = m_page_bitmap.height() - 1;
 	if (x >= m_page_bitmap.width()) x = m_page_bitmap.width() - 1;
 
 	return m_page_bitmap.pix(y, x);
@@ -361,7 +531,8 @@ int bitmap_printer_device::get_pixel(int x, int y)
 
 unsigned int& bitmap_printer_device::pix(int y, int x)    // reversed y x
 {
-	if (y >= m_page_bitmap.height()) y = m_page_bitmap.height() - 1;
+	if (m_continuous_feed) y = wrap_row(y);
+	else if (y >= m_page_bitmap.height()) y = m_page_bitmap.height() - 1;
 	if (x >= m_page_bitmap.width()) x = m_page_bitmap.width() - 1;
 
 	return m_page_bitmap.pix(y,x);
@@ -373,6 +544,11 @@ unsigned int& bitmap_printer_device::pix(int y, int x)    // reversed y x
 
 void bitmap_printer_device::write_snapshot_to_file()
 {
+	write_bitmap_to_file(m_page_bitmap);
+}
+
+void bitmap_printer_device::write_bitmap_to_file(bitmap_rgb32 &bitmap)
+{
 	machine().popmessage("writing printer snapshot");
 
 	emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -383,7 +559,7 @@ void bitmap_printer_device::write_snapshot_to_file()
 		static const rgb_t png_palette[] = { rgb_t::white(), rgb_t::black() };
 
 		// save the paper into a png
-		util::png_write_bitmap(file, nullptr, m_page_bitmap, 2, png_palette);
+		util::png_write_bitmap(file, nullptr, bitmap, 2, png_palette);
 	}
 }
 
@@ -397,6 +573,46 @@ int bitmap_printer_device::get_bottom_margin() { return m_bottom_margin_ioport->
 bool bitmap_printer_device::check_new_page()
 {
 	bool retval = false;
+
+	if (m_continuous_feed)
+	{
+		// endless roll: m_ypos never resets, only the storage row wraps, and
+		// fresh paper is decided in roll coordinates rather than buffer rows.
+		// Y is bidirectional, so the pen coming back over a row it has
+		// already drawn on must leave that ink alone
+		int const head = m_ypos + m_distfrombottom;
+		int const tail = m_ypos - m_distfrombottom;
+
+		// rows are retired as the clear is about to recycle them. Filing them
+		// on the lap change instead loses ink: the head leads the pen by
+		// m_distfrombottom, so those rows go into the file blank and what the
+		// pen draws on them afterwards is cleared a lap later. Either end can
+		// be the one exposing new paper - the pf ratio's sign decides which.
+		//
+		// the live window can never be wider than the ring: let the two marks
+		// drift more than a paper length apart and rows a lap apart share a
+		// buffer row while both count as visited, so the pen silently
+		// overdraws ink that no file ever received
+		if (head > m_feed_hi)
+		{
+			retval |= retire_roll_rows(m_feed_hi + 1, head, true);
+			clear_roll_rows(m_feed_hi + 1, head);
+			m_feed_hi = head;
+			m_feed_lo = std::max(m_feed_lo, m_feed_hi - m_paper_height + 1);
+			m_feed_forward = true;
+		}
+
+		if (tail < m_feed_lo)
+		{
+			retval |= retire_roll_rows(tail, m_feed_lo - 1, false);
+			clear_roll_rows(tail, m_feed_lo - 1);
+			m_feed_lo = tail;
+			m_feed_hi = std::min(m_feed_hi, m_feed_lo + m_paper_height - 1);
+			m_feed_forward = false;
+		}
+
+		return retval;
+	}
 
 	// idea here is that you update the position, then check the page, this will do the saving of the page
 	// if this routine returns true, means there's a new page and you should clear the yposition

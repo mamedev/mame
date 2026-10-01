@@ -67,14 +67,6 @@ void csc_device::device_start()
 	save_pointer(NAME(m_vram), 0x80000);
 }
 
-void csc_device::device_reset()
-{
-	if (m_csc_panel_id >= 4)
-	{
-		m_screen->set_raw(21604953, 800, 0, 640, 449, 0, 400);
-	}
-}
-
 void csc_device::device_add_mconfig(machine_config &config)
 {
 	PALETTE(config, m_palette).set_entries(256);
@@ -83,6 +75,16 @@ void csc_device::device_add_mconfig(machine_config &config)
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
 	m_screen->set_screen_update(FUNC(csc_device::screen_update_csc));
 	m_screen->screen_vblank().set(FUNC(csc_device::csc_irq_w));
+}
+
+void csc_device::device_config_complete()
+{
+	if (m_csc_panel_id >= 4)
+	{
+		// grayscale panels are 640x400; these parameters are not real, we only know the
+		// refresh rate is ~60.15 Hz
+		subdevice<screen_device>(m_screen.finder_tag())->set_raw(21604953, 800, 0, 640, 449, 0, 400);
+	}
 }
 
 void csc_device::set_panel_id(int panel_id)
@@ -232,8 +234,10 @@ u32 csc_device::screen_update_csc(screen_device &screen, bitmap_rgb32 &bitmap, c
 	const auto vram8 = util::big_endian_cast<u8 const>(&m_vram[0]);
 	const auto vram16 = util::big_endian_cast<u16 const>(&m_vram[0]);
 	const pen_t *pens = m_palette->pens();
-	const int vres = BIT(m_csc_regs[CSC_PANEL_SETUP], CSC_PANELSETUP_480) ? 480 : 400;
 	const int dispoffs = ((m_csc_regs[CSC_PANEL_SETUP] & CSC_PANELSETUP_COLOR400_MASK) == (1 << CSC_PANELSETUP_COLOR)) ? 40 : 0;
+	// a 400-line panel can't scan more lines than it has, whatever the guest programs
+	const int vres = std::min(BIT(m_csc_regs[CSC_PANEL_SETUP], CSC_PANELSETUP_480) ? 480 : 400,
+			m_screen->visible_area().height() - dispoffs);
 
 	if (dispoffs)
 	{

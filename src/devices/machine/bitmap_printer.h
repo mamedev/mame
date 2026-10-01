@@ -60,6 +60,8 @@ public:
 	void set_pf_stepper_ratio(int ratio0, int ratio1);
 	void set_cr_stepper_ratio(int ratio0, int ratio1);
 
+	void set_continuous_feed(bool continuous) { m_continuous_feed = continuous; }
+
 	int m_cr_direction; // direction of carriage
 	int m_xpos;
 	int m_ypos;
@@ -69,6 +71,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_reset_after_children() override;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
@@ -84,10 +87,12 @@ private:
 	required_ioport m_draw_marks_ioport;
 
 	bitmap_rgb32 m_page_bitmap; // page bitmap
+	bitmap_rgb32 m_roll_bitmap; // continuous feed: rows retired from the page bitmap, held until a lap is ready to write
 
 	static constexpr int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
 	static constexpr int m_distfrombottom = 50;  // print position from bottom of screen
 	static constexpr int MAX_LEDS = 5;
+	static constexpr u32 paper_color = 0xffffff;
 
 	int m_printhead_color;
 	int m_printhead_bordercolor;
@@ -101,6 +106,14 @@ private:
 	int m_vdpi;
 	int m_clear_pos;
 	int m_newpage_flag;  // used to keep printhead at the top of page until actual printing
+	bool m_continuous_feed;
+	int m_feed_hi;  // continuous feed: roll coordinates of the paper already
+	int m_feed_lo;  // visited, never more than a paper length apart
+	bool m_roll_dirty;
+	bool m_roll_collected;
+	int m_roll_first;      // roll coordinates of the collected run, so a
+	int m_roll_last;       // discontiguous row can be spotted and close it out
+	bool m_feed_forward;   // which end of the roll last exposed new paper
 	int m_led_state[MAX_LEDS];
 	int m_num_leds;
 	int m_pf_stepper_ratio0;
@@ -111,6 +124,14 @@ private:
 	void draw_printhead(bitmap_rgb32 &bitmap, int x, int y);
 	u32 dimcolor(u32 incolor, int factor);
 
+	int wrap_row(int y) const;
+	void reset_feed_marks();
+	void clear_roll_rows(int from_row, int to_row, u32 color = 0xffffff);
+	bool flush_roll();
+	bool retire_roll_rows(int from_row, int to_row, bool forward);
+	bool row_has_ink(bitmap_rgb32 &bitmap, int row) const;
+	void write_roll_page(bitmap_rgb32 &bitmap, int first_row);
+	void write_bitmap_to_file(bitmap_rgb32 &bitmap);
 	int calc_scroll_y(bitmap_rgb32& bitmap);
 	uint32_t screen_update_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

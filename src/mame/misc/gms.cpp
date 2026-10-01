@@ -3355,6 +3355,9 @@ ROM_START( tbss )
 	ROM_REGION( 0x100000, "gfx2", ROMREGION_ERASE00)
 	// u29 not populated
 	ROM_LOAD( "u39", 0x80000, 0x80000, CRC(4be91081) SHA1(0a3691bb2c7b5ba7fb5617cb16aacecb2fa93519) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c46.u136", 0x00, 0x080, CRC(2c2e0cde) SHA1(ec59968b95131b35137fd948ae73e0d022dfc4b3) )
 ROM_END
 
 // 神机妙算 (Shénjī Miàosuàn)
@@ -3428,7 +3431,7 @@ void gms_2layers_state::init_rbspm()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
-	// 0x REPAIR
+	// HACK: 0x REPAIR
 	rom[0x00520 / 2] = 0x600a;
 	rom[0x00772 / 2] = 0x4e71;
 	rom[0x00774 / 2] = 0x4e71;
@@ -3439,6 +3442,7 @@ void gms_2layers_state::init_ssanguoj()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
+	// HACK: patch protection check
 	rom[0x2fc0 / 2] = 0x6000; // loops endlessly after ROM / RAM test
 }
 
@@ -3446,6 +3450,7 @@ void gms_2layers_state::init_sball2k1()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
+	// HACK: patch protection checks
 	rom[0x14f6c / 2] = 0x4e71; // U135 ERROR
 	rom[0x14f6e / 2] = 0x4e71; // U135 ERROR
 	rom[0x14f9a / 2] = 0x6000; // U136 ERROR
@@ -3457,7 +3462,7 @@ void gms_3layers_state::init_baile()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
-	// U135 ERROR
+	// HACK: U135 ERROR
 	rom[0xb494 / 2] = 0x6000;
 	rom[0xb4a6 / 2] = 0x4e71;
 	rom[0xb4a8 / 2] = 0x4e71;
@@ -3469,7 +3474,7 @@ void gms_3layers_state::init_jinpaish()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
-	// U135 ERROR
+	// HACK: U135 ERROR
 	rom[0x319f0 / 2] = 0x4e71;
 	rom[0x319f2 / 2] = 0x4e71;
 	rom[0x31a0a / 2] = 0x6000;
@@ -3478,7 +3483,7 @@ void gms_3layers_state::init_jinpaish()
 	rom[0x31f4a / 2] = 0x4e71;
 	rom[0x31f4c / 2] = 0x4e71;
 
-	// U181 ERROR
+	// HACK: U181 ERROR
 	rom[0x31f64 / 2] = 0x6000;
 	rom[0x31f74 / 2] = 0x4e71;
 	rom[0x31f76 / 2] = 0x4e71;
@@ -3488,13 +3493,13 @@ void gms_3layers_state::init_sc2in1()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
-	// U135 ERROR
+	// HACK: U135 ERROR
 	rom[0x45f46 / 2] = 0x4e71;
 	rom[0x45f48 / 2] = 0x4e71;
 	rom[0x46818 / 2] = 0x4e71;
 	rom[0x4681a / 2] = 0x4e71;
 
-	// U181 ERROR
+	// HACK: U181 ERROR
 	rom[0x45f70 / 2] = 0x4e71;
 	rom[0x45f72 / 2] = 0x4e71;
 	rom[0x46842 / 2] = 0x4e71;
@@ -3505,7 +3510,7 @@ void gms_3layers_state::init_yyhm()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
-	// REPAIR ERROR
+	// HACK: REPAIR ERROR
 	rom[0x9a2 / 2] = 0x6000;
 	rom[0x9b4 / 2] = 0x4e71;
 	rom[0x9b6 / 2] = 0x4e71;
@@ -3519,6 +3524,7 @@ void gms_2layers_state::init_super555()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
+	// HACK: patch protection check
 	rom[0x46f54 / 2] = 0x6000; // loops endlessly after ROM / RAM test
 	rom[0x4782e / 2] = 0x6000; // 0x0A U135 ERROR
 }
@@ -3527,6 +3533,7 @@ void gms_2layers_state::init_ballch()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
+	// HACK: patch protection check
 	rom[0x1225e / 2] = 0x6000; // U64 U136 ERROR
 	rom[0x122b4 / 2] = 0x6000; // "
 	rom[0x12ee6 / 2] = 0x6026; // U135 ERROR
@@ -3536,6 +3543,7 @@ void gms_2layers_state::init_cots()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
+	// HACK: patch protection checks
 	rom[0x1868e / 2] = 0x6000; // U64 U136 ERROR
 	rom[0x198f6 / 2] = 0x62fe; // "
 	rom[0x19566 / 2] = 0x62fe; // A88 ERROR U135 ERROR
@@ -3549,6 +3557,7 @@ void gms_2layers_state::init_sscs()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
+	// HACK: patch protection checks
 	rom[0x1c06 / 2] = 0x6008; // loops endlessly later on
 	rom[0x32b2 / 2] = 0x6000; // loops endlessly after ROM / RAM test
 	rom[0xcc1c / 2] = 0x6000; // U135 ERROR
@@ -3565,6 +3574,7 @@ void gms_2layers_state::init_sscs0118()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
+	// HACK: patch protection checks
 	rom[0x1af6 / 2] = 0x6008; // loops endlessly later on
 	rom[0x3d22 / 2] = 0x6000; // loops endlessly after ROM / RAM test
 	rom[0xd6b2 / 2] = 0x6000; // U135 ERROR
@@ -3583,6 +3593,7 @@ void gms_2layers_state::init_cjdlz()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
+	// HACK: patch protection checks
 	rom[0x00518 / 2] = 0x4e71; // 0xD REPAIR
 	rom[0x0c628 / 2] = 0x6000; // 0x99 REPAIR
 	rom[0x0c8e6 / 2] = 0x4e71; // loop
@@ -3597,6 +3608,7 @@ void gms_2layers_state::init_smwc()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
+	// HACK: patch protection checks
 	rom[0x00518 / 2] = 0x4e71; // 0xD REPAIR
 	rom[0x0a348 / 2] = 0x6000; // 0x99 REPAIR
 	rom[0x0a610 / 2] = 0x4e71; // loop
@@ -3613,6 +3625,7 @@ void gms_2layers_state::init_hgly()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
+	// HACK: patch protection checks
 	rom[0x0feda / 2] = 0x6004; // U35 ERROR
 	rom[0x10128 / 2] = 0x6004; // U36 ERROR
 	rom[0x1393e / 2] = 0x6000; // U64 ERROR
@@ -3623,6 +3636,7 @@ void gms_2layers_state::init_tbss()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
+	// HACK: patch protection checks
 	rom[0x11ba / 2] = 0x6000;
 	rom[0x12c2 / 2] = 0x6000;
 	rom[0x1634 / 2] = 0x6000;
@@ -3637,6 +3651,7 @@ void gms_2layers_state::init_sglc()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
+	// HACK: patch protection check
 	rom[0x129a2 / 2] = 0x4e71;
 }
 
@@ -3644,6 +3659,7 @@ void gms_2layers_state::init_sjms()
 {
 	uint16_t *rom = &memregion("maincpu")->as_u16();
 
+	// HACK: patch protection checks
 	rom[0x11ba / 2] = 0x6000;
 	rom[0x12c2 / 2] = 0x6000;
 	rom[0x1630 / 2] = 0x6000;

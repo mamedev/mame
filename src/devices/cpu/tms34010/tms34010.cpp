@@ -731,11 +731,11 @@ void tms340x0_device::device_start()
 
 		for (int regnum = 0; regnum < 15; regnum++)
 		{
-			state_add(TMS34010_A0 + regnum, string_format("A%d", regnum).c_str(), m_regs[regnum].reg);
+			state_add(TMS34010_A0 + regnum, string_format("A%d", regnum), m_regs[regnum].reg);
 		}
 		for (int regnum = 0; regnum < 15; regnum++)
 		{
-			state_add(TMS34010_B0 + regnum, string_format("B%d", regnum).c_str(), m_regs[30 - regnum].reg);
+			state_add(TMS34010_B0 + regnum, string_format("B%d", regnum), m_regs[30 - regnum].reg);
 		}
 	}
 

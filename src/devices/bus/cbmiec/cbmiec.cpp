@@ -476,28 +476,39 @@ int cbm_iec_device::get_signal(int signal)
 //-------------------------------------------------
 
 // slot devices
+#include "c1526.h"
 #include "c1541.h"
 #include "c1541_clones.h"
 #include "c1571.h"
 #include "c1581.h"
+#include "c5181.h"
 #include "c64_nl10.h"
 #include "cmdhd.h"
 #include "diag264_lb_iec.h"
 #include "dolphindos.h"
-#include "sd2iec.h"
+#include "dps1101.h"
 #include "fd2000.h"
 #include "interpod.h"
+#include "mcs801.h"
+#include "mcs810.h"
+#include "mcs820.h"
 #include "minichief.h"
+#include "mps1000.h"
+#include "mps1200.h"
+#include "mps1224.h"
+#include "mps1270a.h"
+#include "mps2020.h"
+#include "mps801.h"
+#include "mps803.h"
 #include "prodos.h"
 #include "prologicdos.h"
 #include "rapidos.h"
+#include "sd2iec.h"
 #include "serialbox.h"
 #include "turbotrans.h"
 #include "vic1515.h"
 #include "vic1520.h"
-#include "c1526.h"
-#include "mps1200.h"
-#include "c5181.h"
+#include "vic1525.h"
 
 void cbm_iec_devices(device_slot_interface &device)
 {
@@ -538,12 +549,23 @@ void cbm_iec_devices(device_slot_interface &device)
 void cbm_iec_printer_devices(device_slot_interface &device)
 {
 	device.option_add("c1526", C1526);
+	device.option_add("dps1101", DPS1101);
 	device.option_add("interpod", CBM_INTERPOD);
+	device.option_add("mcs801", MCS801);
+	device.option_add("mcs810", MCS810);
+	device.option_add("mcs820", MCS820);
+	device.option_add("mps801", MPS801);
 	device.option_add("mps802", C1526);
+	device.option_add("mps803", MPS803);
+	device.option_add("mps1000", MPS1000);
 	device.option_add("mps1200", MPS1200);
+	device.option_add("mps1224", MPS1224);
 	device.option_add("mps1250", MPS1250);
+	device.option_add("mps1270a", MPS1270A);
+	device.option_add("mps2020", MPS2020);
 	device.option_add("nl10", C64_NL10_INTERFACE);
 	device.option_add("serialbox", CBM_SERIAL_BOX);
 	device.option_add("vic1515", VIC1515);
 	device.option_add("vic1520", VIC1520);
+	device.option_add("vic1525", VIC1525);
 }

@@ -31,11 +31,15 @@ protected:
 private:
 	bitmap_rgb32 m_bitmap;
 
+	static constexpr u8 CUSTOM_CLUT_BASE = 0;
+	static constexpr u8 FIXED_CLUT_BASE = 32;
+
 	bool m_is_dac_enabled;
 	struct {
 		u8 r, g, b;
-	} m_custom_clut[32];
+	} m_clut[32 + 32]; // part 1: custom CLUT, part 2: fixed CLUT
 
+	u16 m_clut_mask;
 	bool m_is_pal;
 	u16 m_display_hclocks;
 };

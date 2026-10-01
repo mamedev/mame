@@ -112,6 +112,13 @@ mc6845_device::mc6845_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
+void mc6845_device::map(address_map &map)
+{
+	map(0x0, 0x0).rw(FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x1, 0x1).rw(FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
+
+
 void mc6845_device::device_post_load()
 {
 	recompute_parameters(true);
@@ -380,7 +387,8 @@ void mc6845_device::recompute_parameters(bool postload)
 				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 			if (!m_reconfigure_cb.isnull())
-				m_reconfigure_cb(horiz_pix_total, vert_pix_total, visarea, refresh);
+				m_reconfigure_cb(horiz_pix_total, vert_pix_total, visarea, refresh,
+						hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos);
 
 			m_has_valid_parameters = true;
 		}

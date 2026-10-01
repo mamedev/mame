@@ -6,7 +6,6 @@ license:CC0-1.0
     Known cartridges (*=dumped) (#=sourced)
 
     *Guitar Favorites (K7357)
-
     *Barbie Guitar Party (K9901)
     *Hot Wheels: Road Tunes (K9902)
     *SpongeBob SquarePants: Surf's Up (K9903)
@@ -16,7 +15,6 @@ license:CC0-1.0
     *Nashville Hits (K9905)
     *Rock 101 (K9906)
     *American Idol: Guitar Greats (K9907)
-
 
     cartridge pinout (not identical to I Can Play Piano)
 
@@ -44,7 +42,6 @@ license:CC0-1.0
     43 D9       44 D1
     45 D8       46 D0
     47 ground   48 Gnd
-
 -->
 
 <softwarelist name="icanguit" description="Mattel I Can Play Guitar cartridges">

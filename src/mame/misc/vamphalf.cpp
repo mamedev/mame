@@ -3247,7 +3247,7 @@ void vamphalf_qdsp_state::init_yorijori()
 	m_semicom_prot_data[1] = 3;
 
 	u8 *romx = (u8 *)memregion("maincpu")->base();
-	// prevent code dying after a trap 33 by patching it out, why?
+	// HACK: prevent code dying after a trap 33 by patching it out
 	romx[BYTE4_XOR_BE(0x8ff0)] = 3;
 	romx[BYTE4_XOR_BE(0x8ff1)] = 0;
 

@@ -633,13 +633,13 @@ void m6805_hmos_device::burn_cycles(unsigned count)
 template <std::size_t N> void m6805_hmos_device::add_port_latch_state()
 {
 	if (m_port_mask[N] != 0xff)
-		state_add(M68705_LATCHA + N, util::string_format("LATCH%c", 'A' + N).c_str(), m_port_latch[N]).mask(~m_port_mask[N] & 0xff).formatstr("%02X");
+		state_add(M68705_LATCHA + N, util::string_format("LATCH%c", 'A' + N), m_port_latch[N]).mask(~m_port_mask[N] & 0xff).formatstr("%02X");
 }
 
 template <std::size_t N> void m6805_hmos_device::add_port_ddr_state()
 {
 	if (m_port_mask[N] != 0xff)
-		state_add(M68705_DDRA + N, util::string_format("DDR%c", 'A' + N).c_str(), m_port_ddr[N]).mask(~m_port_mask[N] & 0xff).formatstr("%02X");
+		state_add(M68705_DDRA + N, util::string_format("DDR%c", 'A' + N), m_port_ddr[N]).mask(~m_port_mask[N] & 0xff).formatstr("%02X");
 }
 
 void m68705_device::internal_map(address_map &map)

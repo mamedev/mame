@@ -23,12 +23,12 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void at586x3(machine_config &config);
-	void at586(machine_config &config);
-	void at586m55(machine_config &config);
+	void at586x3(machine_config &config) ATTR_COLD;
+	void at586(machine_config &config) ATTR_COLD;
+	void at586m55(machine_config &config) ATTR_COLD;
 
 protected:
-	void at_softlists(machine_config &config);
+	void at_softlists(machine_config &config) ATTR_COLD;
 
 	void boot_state_w(uint8_t data);
 

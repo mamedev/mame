@@ -9,7 +9,8 @@ license:CC0-1.0
 <!--
 
 TODO:
-- Make SW list to follow a stricter alphabetical order (couldn't care less)
+- Make SW list to follow a stricter alphabetical order (couldn't care less about who dumped what,
+  it's also recipe for confusion moving stuff ...)
 
 ## Undumped/missing list (Japan, retail):
 
@@ -52,7 +53,6 @@ TODO:
 (mostly Satakore rereleases, move serials in XML if they are identical
  examples: T-7663G, T-20506G, T-18716G, T-3104G, T-15024G)
 
-- 2do Arukoto wa Sando-R (Japan) (Satakore) [T-6804G]
 - Advanced World War: Sennen Teikoku no Metsubou (Japan) (Satakore) [GS-9190]
 - Air Management '96 (Japan) (Koei the Best) [T-7668G]
 - Albert Odyssey Gaiden: Legend of Eldean (Japan) (Satakore) [T-1517G]
@@ -127,6 +127,7 @@ TODO:
 - Pro Yakyuu Greatest Nine '98 (Japan) (Satakore) [GS-9208]
 - Puyo Puyo Sun (Japan) (Satakore) [T-6609G]
 - Puyo Puyo Tsuu (Japan) (Satakore) [T-6604G]
+- Puzzle & Action: 2-do Aru Koto wa Sand-R (Japan) (Satakore) [T-6804G]
 - Puzzle Bobble 2X (Japan) (Satakore) [T-1114G]
 - Puzzle Bobble 2X + Space Invaders (Japan) [T-1111G]
 - Real Bout Garou Densetsu Special (Japan) (Doukonban) [T-3119G]
@@ -1176,25 +1177,6 @@ Olympic Soccer (Fra) T-7904H-09
 
 
 <!-- !ReDump images -->
-
-	<software name="sandr" supported="partial">
-		<description>2do Arukotoha Sand-R (Japan)</description>
-		<year>1996</year>
-		<publisher>CRI</publisher>
-		<notes><![CDATA[
-Equivalent to stv:sandor, essentially sharing the same issues if any.
-https://mametesters.org/view.php?id=7417
-]]></notes>
-		<info name="serial" value="T-6802G"/>
-		<info name="release" value="19960405"/>
-		<info name="alt_title" value="2度あることはサンドアール"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="2do arukotoha sand-r (japan)" sha1="3f993b00c63e0bd4efd1769858bf4cbf73a4522c" />
-			</diskarea>
-		</part>
-	</software>
 
 	<software name="6inchmyd" supported="no">
 		<description>6 Inch My Darling (Japan)</description>
@@ -3038,6 +3020,7 @@ Hangs on river stage (retest me)
 	<!-- Identifying Enemy Zero (Japan) (Disc 3) (Game Disc)... -->
 
 	<!-- Redump gives no indication of how these pair up.. -->
+	<!-- TODO: split these up in separate sets -->
 	<software name="enemy0j" cloneof="enemy0" supported="no">
 		<description>Enemy Zero (Japan)</description>
 		<year>1996</year>
@@ -5858,6 +5841,25 @@ Runs too slow, enables [SCU] hblank-in irq
 		</part>
 	</software>
 
+	<software name="sandr" supported="partial">
+		<description>Puzzle &amp; Action: 2-do Aru Koto wa Sand-R (Japan)</description>
+		<year>1996</year>
+		<publisher>CRI</publisher>
+		<notes><![CDATA[
+Equivalent to stv:sandr, essentially sharing the same issues if any.
+https://mametesters.org/view.php?id=7417
+]]></notes>
+		<info name="serial" value="T-6802G"/>
+		<info name="release" value="19960405"/>
+		<info name="alt_title" value="2度あることはサンドアール"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="2do arukotoha sand-r (japan)" sha1="3f993b00c63e0bd4efd1769858bf4cbf73a4522c" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Identifying Puzzle Bobble 2X (Japan) (2M)... -->
 	<software name="pbobbl2x" cloneof="bam2" supported="no">
 		<description>Puzzle Bobble 2X (Japan, 2M)</description>
@@ -6311,6 +6313,7 @@ Runs too slow, enables [SCU] hblank-in irq
 	<!-- Identifying Sakura Taisen 2 - Kimi, Shini Tamou Kotonakare (Japan) (Disc 3) (4M, 5M)... -->
 	<!-- Identifying Sakura Taisen 2 - Kimi, Shini Tamou Kotonakare (Japan) (Disc 3) (Rev A) (12M)... -->
 	<!-- Identifying Sakura Taisen 2 - Kimi, Shini Tamou Kotonakare (Japan) (Disc 3)... -->
+	<!-- TODO: separate into different sets -->
 	<software name="sakurat2" supported="no">
 		<description>Sakura Taisen 2 - Kimi, Shini Tamou Kotonakare (Japan)</description>
 		<year>1998</year>
@@ -14035,22 +14038,6 @@ Black screen, [CD-Block]
 
 <!-- !linlhutz sets -->
 
-	<!-- Identifying 2do Arukotoha Sand-R (T-6802G)... -->
-	<software name="sandra" cloneof="sandr" supported="no">
-		<description>2do Arukotoha Sand-R (Japan, alt)</description>
-		<year>1996</year>
-		<publisher>CRI</publisher>
-		<info name="serial" value="T-6802G"/>
-		<info name="release" value="19960405"/>
-		<info name="alt_title" value="2度あることはサンドアール"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="2do arukotoha sand-r (t-6802g)" sha1="2ee57e1b943b96cd5adedf0cc629f934dd99acb3" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Identifying 2Tax Gold (T-4305G)... -->
 	<software name="2taxgold" supported="no">
 		<description>2Tax Gold (Japan)</description>
@@ -18922,6 +18909,21 @@ Known to use [SCUDSP]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="puyo puyo tsuu (satakore) (t-6604g)" sha1="52b2519e270c15f4bcdf2214305a9ae35864d0bf" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sandra" cloneof="sandr" supported="partial">
+		<description>Puzzle &amp; Action: 2-do Aru Koto wa Sand-R (Japan, alt)</description>
+		<year>1996</year>
+		<publisher>CRI</publisher>
+		<info name="serial" value="T-6802G"/>
+		<info name="release" value="19960405"/>
+		<info name="alt_title" value="2度あることはサンドアール"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="2do arukotoha sand-r (t-6802g)" sha1="2ee57e1b943b96cd5adedf0cc629f934dd99acb3" />
 			</diskarea>
 		</part>
 	</software>
@@ -25514,7 +25516,7 @@ Not extensively tested
 
 	<!-- Identifying Super Real Mahjong P V (J) (T-16501G)... -->
 	<software name="srmp5" supported="no">
-		<description>Super Real Mahjong P V (Japan)</description>
+		<description>Super Real Mahjong P.V (Japan)</description>
 		<year>1995</year>
 		<publisher>Seta</publisher>
 		<info name="serial" value="T-16501G"/>
@@ -37732,7 +37734,7 @@ Doesn't accept any input on System Memory requirement screen
 	</software>
 
 
-<!-- Misc images to sort -->
+<!-- !Misc demo discs to sort -->
 
 	<!-- Identifying bootleg... -->
 	<software name="bootlegc" supported="no">

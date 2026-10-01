@@ -119,6 +119,9 @@ bgfx_screen_chains
     * ``crt-geom`` -- lightweight CRT simulation
     * ``crt-geom-deluxe`` -- more detailed CRT simulation
     * ``lcd-grid`` -- LCD matrix simulation
+    * ``depixelize`` -- vectorizing upscaler for pixel art (Kopf & Lischinski,
+      "Depixelizing Pixel Art"); smooth contours, best on clean low-resolution
+      graphics
 
     We make a distinction between emulated screens (which we’ll call a *screen*)
     and output windows or monitors (which we’ll call a *window*, set by the

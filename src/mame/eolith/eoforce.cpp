@@ -84,7 +84,7 @@ public:
 	{
 	}
 
-	void burnstrk(machine_config &config);
+	void burnstrk(machine_config &config) ATTR_COLD;
 
 private:
 	void main_io(address_map &map) ATTR_COLD;
@@ -184,7 +184,7 @@ ROM_START( burnstrk )
 	DISK_IMAGE("burning_striker", 0, BAD_DUMP SHA1(3bd84bcd4dfeb480915cd7de969d53a38e5e9e45))
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 GAME(2003, burnstrk, 0, burnstrk, 0, eoforce_state, empty_init, ROT0, "Eolith", "Burning Striker", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING)

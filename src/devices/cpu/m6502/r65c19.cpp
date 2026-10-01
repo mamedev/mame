@@ -119,7 +119,7 @@ void c39_device::device_start()
 	c19_init();
 
 	for (int i = 0; i < 8; i++)
-		state_add(C39_BSR0 + i, string_format("BSR%d", i).c_str(), downcast<mi_banked &>(*m_mintf).m_bsr[i]);
+		state_add(C39_BSR0 + i, string_format("BSR%d", i), downcast<mi_banked &>(*m_mintf).m_bsr[i]);
 }
 
 void r65c19_device::c19_init()

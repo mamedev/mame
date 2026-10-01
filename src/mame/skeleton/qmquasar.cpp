@@ -24,11 +24,10 @@ public:
 	{
 	}
 
-	void quasar(machine_config &config);
-	void technox(machine_config &config);
+	void quasar(machine_config &config) ATTR_COLD;
+	void technox(machine_config &config) ATTR_COLD;
 
-protected:
-	virtual void driver_start() override;
+	void init_quasar() ATTR_COLD;
 
 private:
 	HD44780_PIXEL_UPDATE(quasar_pixel_update);
@@ -129,7 +128,7 @@ ROM_START(technox)
 	ROM_LOAD("nm27c010_v105.ic51", 0x00000, 0x20000, CRC(d669570e) SHA1(0645a1b022ed25a836152933e6df32da4448f49a))
 ROM_END
 
-void qmquasar_state::driver_start()
+void qmquasar_state::init_quasar()
 {
 	memory_region *rgn = memregion("program");
 	u8 *rom = rgn->base();
@@ -146,5 +145,5 @@ void qmquasar_state::driver_start()
 
 } // anonymous namespace
 
-SYST(1993, qmquasar, 0, 0, quasar,  qmquasar, qmquasar_state, empty_init, "Quasimidi Musikelektronik GmbH", "Quasimidi Quasar", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-SYST(1995, technox,  0, 0, technox, qmquasar, qmquasar_state, empty_init, "Quasimidi Musikelektronik GmbH", "TechnoX",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1993, qmquasar, 0, 0, quasar,  qmquasar, qmquasar_state, init_quasar, "Quasimidi Musikelektronik GmbH", "Quasimidi Quasar", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1995, technox,  0, 0, technox, qmquasar, qmquasar_state, init_quasar, "Quasimidi Musikelektronik GmbH", "TechnoX",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

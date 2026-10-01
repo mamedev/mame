@@ -552,7 +552,7 @@ void nec_common_device::device_start()
 	if (m_chip_type == V33_TYPE)
 		state_add(NEC_XA, "XA", m_xa);
 
-	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
+	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%16s").noshow();
 
@@ -602,6 +602,7 @@ void nec_common_device::state_import(const device_state_entry &entry)
 				m_ip = m_debugger_temp & 0x0000f;
 			}
 			m_prev_ip = m_ip;
+			CHANGE_PC;
 			break;
 
 		case NEC_PSW:

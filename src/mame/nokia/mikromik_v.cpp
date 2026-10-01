@@ -149,7 +149,7 @@ void mm1_state::mm1_video(machine_config &config)
 	I8275(config, m_crtc, XTAL(18'720'000)/8);
 	m_crtc->set_character_width(HORIZONTAL_CHARACTER_PIXELS);
 	m_crtc->set_display_callback(FUNC(mm1_state::crtc_display_pixels));
-	m_crtc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq0_w));
+	m_crtc->drq_wr_callback().set(FUNC(mm1_state::crtc_drq_w));
 	m_crtc->set_screen("screen");
 }
 

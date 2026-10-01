@@ -13,13 +13,14 @@
 
 #include "sh2.h"
 #include "sh7014_adc.h"
-#include "sh7014_wdt.h"
 #include "sh7014_bsc.h"
 #include "sh7014_dmac.h"
 #include "sh7014_intc.h"
 #include "sh7014_mtu.h"
 #include "sh7014_port.h"
 #include "sh7014_sci.h"
+#include "sh7014_wdt.h"
+
 
 class sh7014_device : public sh2_device
 {

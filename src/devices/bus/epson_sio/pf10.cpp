@@ -40,7 +40,11 @@ void epson_pf10_device::cpu_mem(address_map &map)
 
 ROM_START( pf10 )
 	ROM_REGION(0x2000, "maincpu", 0)
-	ROM_LOAD("k3pf1.bin", 0x0000, 0x2000, CRC(eef4593a) SHA1(bb176e4baf938fe58c2d32f7c46d7bb7b0627755))
+	ROM_DEFAULT_BIOS("v4")
+	ROM_SYSTEM_BIOS( 0, "v3", "Version 3" )
+	ROMX_LOAD( "k3pf1.bin", 0x0000, 0x2000, CRC(eef4593a) SHA1(bb176e4baf938fe58c2d32f7c46d7bb7b0627755), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v4", "Version 4" )
+	ROMX_LOAD( "k4pf1.bin", 0x0000, 0x2000, CRC(6765b9b9) SHA1(0f9057660b8078b10dcf548beaaab5703bef9320), ROM_BIOS(1) )
 ROM_END
 
 const tiny_rom_entry *epson_pf10_device::device_rom_region() const

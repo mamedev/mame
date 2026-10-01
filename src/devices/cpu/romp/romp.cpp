@@ -153,7 +153,7 @@ void romp_device::device_start()
 	state_add(SCR + CS,   "CS",   m_scr[CS]);
 
 	for (unsigned i = 0; i < std::size(m_gpr); i++)
-		state_add(GPR + i, util::string_format("R%d", i).c_str(), m_gpr[i]);
+		state_add(GPR + i, util::string_format("R%d", i), m_gpr[i]);
 
 	// register state for saving
 	save_item(NAME(m_scr));

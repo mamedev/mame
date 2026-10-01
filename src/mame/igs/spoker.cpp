@@ -2616,7 +2616,7 @@ void jinhulu2_state::init_jinhulu2100gi()
 {
 	init_jinhulu2120gi();
 
-	// TODO: hack! Investigate what's going on.
+	// HACK: Investigate what's going on.
 	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0x00] = rom[0x0f];

@@ -39,6 +39,7 @@ void sh7014_intc_device::device_start()
 	save_item(NAME(m_isr));
 	save_item(NAME(m_irq_type));
 	save_item(NAME(m_nmi_input));
+	save_item(NAME(m_irq_input));
 	save_item(NAME(m_pending_irqs));
 	save_item(NAME(m_irq_levels));
 }
@@ -55,6 +56,7 @@ void sh7014_intc_device::device_reset()
 	m_iprh = 0;
 	m_icr = m_isr = 0;
 	m_nmi_input = false;
+	m_irq_input = 0;
 
 	std::fill(std::begin(m_irq_type), std::end(m_irq_type), IRQ_LEVEL);
 	std::fill(std::begin(m_irq_levels), std::end(m_irq_levels), 0);
@@ -252,15 +254,31 @@ void sh7014_intc_device::set_interrupt(int vector, int state)
 		} else if ((vector >= INT_VECTOR_IRQ0 && vector <= INT_VECTOR_IRQ3) || vector == INT_VECTOR_IRQ6 || vector == INT_VECTOR_IRQ7) {
 			const int irq = vector - INT_VECTOR_IRQ0;
 
-			if (state == ASSERT_LINE) {
-				if (m_irq_type[irq] == IRQ_LEVEL)
+			if (m_irq_type[irq] == IRQ_LEVEL) {
+				if (state == ASSERT_LINE)
 					m_isr |= 1 << (7 - irq);
-			} else if (state == CLEAR_LINE) {
-				if (m_irq_type[irq] == IRQ_LEVEL)
+				else if (state == CLEAR_LINE)
 					m_isr &= ~(1 << (7 - irq));
+			} else if (state == ASSERT_LINE && !BIT(m_irq_input, irq)) {
+				m_isr |= 1 << (7 - irq);
 			}
+
+			if (state == ASSERT_LINE)
+				m_irq_input |= 1 << irq;
+			else if (state == CLEAR_LINE)
+				m_irq_input &= ~(1 << irq);
 		}
 	}
+
+	update_irq_state();
+}
+
+void sh7014_intc_device::interrupt_taken(int vector)
+{
+	if ((vector >= INT_VECTOR_IRQ0 && vector <= INT_VECTOR_IRQ3) || vector == INT_VECTOR_IRQ6 || vector == INT_VECTOR_IRQ7)
+		m_isr &= ~(1 << (7 - (vector - INT_VECTOR_IRQ0)));
+	else if (vector != -1)
+		m_pending_irqs[vector >> 5] &= ~(1 << (vector & 31));
 
 	update_irq_state();
 }

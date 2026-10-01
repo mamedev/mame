@@ -541,8 +541,9 @@ void atari_rle_objects_device::draw_rle(bitmap_ind16 &bitmap, const rectangle &c
 	x -= scaled_xoffs;
 	y -= scaled_yoffs;
 
-	// draw it with appropriate flipping
-	u32 const palettebase = m_palettebase + color;
+	// draw it with appropriate flipping; the pen base is aligned to the
+	// object's depth (color and pixel bits cannot overlap)
+	u32 const palettebase = (m_palettebase + color) & ~u32((1 << info.bpp) - 1);
 	if (!hflip)
 		draw_rle_zoom(bitmap, clip, info, palettebase, x, y, xscale << 4, yscale << 4);
 	else

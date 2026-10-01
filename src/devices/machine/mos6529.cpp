@@ -34,6 +34,7 @@ DEFINE_DEVICE_TYPE(MOS6529, mos6529_device, "mos6529", "MOS 6529")
 mos6529_device::mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MOS6529, tag, owner, clock),
 	m_input(0),
+	m_output(0xff),
 	m_p_handler(*this)
 {
 }
@@ -45,6 +46,8 @@ mos6529_device::mos6529_device(const machine_config &mconfig, const char *tag, d
 
 void mos6529_device::device_start()
 {
+	save_item(NAME(m_input));
+	save_item(NAME(m_output));
 }
 
 
@@ -54,7 +57,7 @@ void mos6529_device::device_start()
 
 uint8_t mos6529_device::read()
 {
-	return m_input;
+	return m_input & m_output;
 }
 
 
@@ -64,6 +67,8 @@ uint8_t mos6529_device::read()
 
 void mos6529_device::write(uint8_t data)
 {
+	m_output = data;
+
 	for (int bit = 0; bit < 8; bit++)
 		m_p_handler[bit](BIT(data, bit));
 }

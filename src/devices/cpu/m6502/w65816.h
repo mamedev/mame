@@ -49,6 +49,9 @@ public:
 	auto wdm_handler() { return m_wdm_w.bind(); }
 	auto sync_cb() { return m_sync_w.bind(); }
 	bool get_sync() const { return m_sync; }
+	// the program counter as it stands part way through an instruction, i.e. the address
+	// following the last instruction byte fetched (pc() reports the start of the instruction)
+	uint32_t get_live_pc() const { return (m_PB << 16) | m_PC; }
 
 protected:
 	w65816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -150,7 +153,7 @@ protected:
 	devcb_write8 m_wdm_w;
 	devcb_write_line m_sync_w;
 
-	address_space_config m_program_config, m_sprogram_config, m_vector_config;
+	address_space_config m_program_config, m_sprogram_config, m_vector_config, m_data_config;
 
 	uint16_t m_PPC;             // previous program counter (bank-less)
 	uint16_t m_NPC;             // next start-of-instruction program counter
@@ -328,9 +331,11 @@ enum {
 	W65816_P,
 	W65816_S,
 	W65816_D,
-	W65816_DB,
 	W65816_PB,
+	W65816_DB,
 	W65816_E,
+	W65816_IRQ,
+	W65816_NMI,
 	W65816_IR
 };
 

@@ -28,6 +28,7 @@ mesh_device::mesh_device(const machine_config &mconfig, const char *tag, device_
 	, nscsi_device_interface(mconfig, *this)
 	, m_xfer_count(0)
 	, m_xfer_started(false)
+	, m_selected(false)
 	, m_fifo_count(0)
 	, m_sequence(0)
 	, m_exception(0)
@@ -82,6 +83,7 @@ void mesh_device::device_start()
 
 	save_item(NAME(m_xfer_count));
 	save_item(NAME(m_xfer_started));
+	save_item(NAME(m_selected));
 	save_item(NAME(m_fifo));
 	save_item(NAME(m_fifo_count));
 	save_item(NAME(m_sequence));
@@ -106,6 +108,7 @@ void mesh_device::device_start()
 
 void mesh_device::device_reset()
 {
+	m_selected = false;
 	reset_sequence_state();
 	fifo_clear();
 	m_exception = 0;
@@ -307,11 +310,13 @@ void mesh_device::start_sequence(u8 data)
 		m_state = sequence_state::XFER_WAIT_REQ;
 		m_scsi_bus->data_w(m_scsi_refid, 0);
 		m_scsi_bus->ctrl_wait(m_scsi_refid, S_REQ, S_REQ);
-		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
+		// Information transfer commands also control ATN, before releasing ACK.
+		m_scsi_bus->ctrl_w(m_scsi_refid, (m_sequence & SEQ_ATN) ? S_ATN : 0, S_ATN | S_ACK);
 		step(false);
 		break;
 
 	case SEQ_BUS_FREE:
+		m_selected = false;
 		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK | S_REQ | S_BSY | S_SEL | S_ATN);
 		m_scsi_bus->data_w(m_scsi_refid, 0);
 		m_state = sequence_state::BUS_FREE_WAIT;
@@ -348,6 +353,12 @@ void mesh_device::step(bool timeout)
 	}
 
 	m_stepping++;
+
+	if (check_disconnect())
+	{
+		m_stepping--;
+		return;
+	}
 
 	u32 const ctrl = m_scsi_bus->ctrl_r();
 	u32 const data = m_scsi_bus->data_r();
@@ -408,6 +419,7 @@ void mesh_device::step(bool timeout)
 	case sequence_state::SELECT_WAIT_BSY:
 		if (ctrl & S_BSY)
 		{
+			m_selected = true;
 			m_scsi_bus->data_w(m_scsi_refid, 0);
 			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_SEL);
 			command_done();
@@ -446,6 +458,8 @@ void mesh_device::step(bool timeout)
 		break;
 	}
 
+	// A bus write may have notified us recursively
+	check_disconnect();
 	m_stepping--;
 }
 
@@ -478,9 +492,25 @@ void mesh_device::finish_error(u8 mask)
 	m_timer->reset();
 	m_state = sequence_state::IDLE;
 	m_error |= mask;
-	m_cmd_done = false;
+	// An error terminates the sequence too. Firmware and DBDMA can wait for
+	// CmdDone before examining the error and exception bits.
+	m_cmd_done = true;
 	update_lines();
 	update_drq();
+}
+
+bool mesh_device::check_disconnect()
+{
+	// MESH reports UnExpDisc if the target drops BSY after selection and
+	// before software issues BusFree, even if the sequencer is idle.
+	if (m_selected && !(m_scsi_bus->ctrl_r() & S_BSY))
+	{
+		m_selected = false;
+		finish_error(ERR_UNEXP_DISC);
+		return true;
+	}
+
+	return false;
 }
 
 void mesh_device::do_information_transfer()
@@ -506,6 +536,12 @@ void mesh_device::do_information_transfer()
 
 	for (;;)
 	{
+		// Releasing ACK can make the target disconnect in the bus callback
+		if (check_disconnect())
+		{
+			return;
+		}
+
 		u32 const ctrl = m_scsi_bus->ctrl_r();
 
 		if (m_state == sequence_state::XFER_WAIT_REQ_FALSE)

@@ -2,10 +2,10 @@
 // copyright-holders:R. Belmont, Olivier Galibert
 /***************************************************************************
 
-	w65816.cpp
+    w65816.cpp
 
-	Western Design Center W65C816, the 16-bit successor to the 6502
-	Emulation by R. Belmont based on m6502 by Olivier Galibert
+    Western Design Center W65C816, the 16-bit successor to the 6502
+    Emulation by R. Belmont based on m6502 by Olivier Galibert
 
 ***************************************************************************/
 
@@ -27,6 +27,7 @@ w65816_device::w65816_device(const machine_config &mconfig, device_type type, co
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 24),
 	m_sprogram_config("decrypted_opcodes", ENDIANNESS_LITTLE, 8, 24),
 	m_vector_config("vectors", ENDIANNESS_LITTLE, 8, 5),
+	m_data_config("data", ENDIANNESS_LITTLE, 8, 24),
 	m_mintf(nullptr)
 {
 }
@@ -41,12 +42,17 @@ void w65816_device::device_start()
 
 void w65816_device::init()
 {
-	space(AS_PROGRAM).specific(m_mintf->m_program);
-	m_mintf->m_cprogram = m_mintf->m_program;
+	if(has_space(AS_DATA)) {
+		space(AS_DATA).specific(m_mintf->m_program);
+		space(AS_PROGRAM).specific(m_mintf->m_cprogram);
+	} else {
+		space(AS_PROGRAM).specific(m_mintf->m_program);
+		m_mintf->m_cprogram = m_mintf->m_program;
+	}
 	if(has_space(AS_OPCODES))
 		space(AS_OPCODES).specific(m_mintf->m_csprogram);
 	else
-		m_mintf->m_csprogram = m_mintf->m_program;
+		m_mintf->m_csprogram = m_mintf->m_cprogram;
 
 	if(has_space(AS_VECTORS)) {
 		space(AS_VECTORS).specific(m_mintf->m_vectors);
@@ -63,9 +69,11 @@ void w65816_device::init()
 	state_add(W65816_P,        "P",         m_P).callimport();
 	state_add(W65816_S,        "SP",        m_SP).callimport();
 	state_add(W65816_D,        "D",         m_D);
-	state_add(W65816_DB,       "DB",        m_DB);
 	state_add(W65816_PB,       "PB",        m_PB);
-	state_add(W65816_E,        "E",         m_E).callimport();
+	state_add(W65816_DB,       "DB",        m_DB);
+	state_add(W65816_E,        "e",         m_E).mask(1).callimport().formatstr("%1X");
+	state_add(W65816_IRQ,      "IRQ",       m_irq_state).mask(1).callimport().formatstr("%1X");
+	state_add(W65816_NMI,      "NMI",       m_nmi_state).mask(1).callimport().formatstr("%1X");
 	state_add(W65816_IR,       "IR",        m_IR);
 
 	save_item(NAME(m_PPC));
@@ -218,6 +226,8 @@ device_memory_interface::space_config_vector w65816_device::memory_space_config(
 {
 	space_config_vector r;
 	r.emplace_back(AS_PROGRAM, &m_program_config);
+	if(has_configured_map(AS_DATA))
+		r.emplace_back(AS_DATA, &m_data_config);
 	if(has_configured_map(AS_OPCODES))
 		r.emplace_back(AS_OPCODES, &m_sprogram_config);
 	if(has_configured_map(AS_VECTORS))
@@ -296,14 +306,14 @@ void w65816_device::state_string_export(const device_state_entry &entry, std::st
 	case STATE_GENFLAGS:
 	case W65816_P:
 		str = string_format("%c%c%c%c%c%c%c%c",
-						m_P & F_N ? 'N' : '.',
-						m_P & F_V ? 'V' : '.',
-						m_E ? 'E' : (m_P & F_M ? 'M' : '.'),
-						m_E ? '-' : (m_P & F_X ? 'X' : '.'),
-						m_P & F_D ? 'D' : '.',
-						m_P & F_I ? 'I' : '.',
-						m_P & F_Z ? 'Z' : '.',
-						m_P & F_C ? 'C' : '.');
+						m_P & F_N ? 'n' : '.',
+						m_P & F_V ? 'v' : '.',
+						m_P & F_M ? (m_E ? ' ' : 'm') : '.',
+						m_P & F_X ? (m_E ? 'b' : 'x') : '.',
+						m_P & F_D ? 'd' : '.',
+						m_P & F_I ? 'i' : '.',
+						m_P & F_Z ? 'z' : '.',
+						m_P & F_C ? 'c' : '.');
 		break;
 	}
 }
@@ -723,7 +733,7 @@ uint8_t w65816_device::mi_default::read_vector(uint16_t adr)
 	// configures AS_VECTORS gets to redirect them.
 	if(m_has_vectors)
 		return m_vectors.read_interruptible(adr & 0x1f);
-	return m_program.read_interruptible(adr);
+	return m_cprogram.read_interruptible(adr);
 }
 
 void w65816_device::mi_default::write(uint32_t adr, uint8_t val)

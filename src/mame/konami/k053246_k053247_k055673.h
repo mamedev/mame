@@ -79,6 +79,7 @@ public:
 	void k053247_sprites_draw(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	u16 k053247_read_register(offs_t offset);
 	void k053247_set_z_rejection(s32 zcode); // common to k053246/7
+	void k053247_set_gx_topmost(bitmap_ind8 *topmost, const bool *shadow_enable); // GX mixer only
 	void k053247_get_ram(u16 **ram);
 	int k053247_get_dx(void);
 	int k053247_get_dy(void);
@@ -99,6 +100,8 @@ public:
 	s32   m_dx, m_dy;
 	u8    m_objcha_line;
 	s32   m_z_rejection;
+	bitmap_ind8 *m_gx_topmost;
+	const bool *m_gx_topmost_shadow;
 
 	sprite_delegate m_k053247_cb;
 

@@ -42,10 +42,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	// device_plus4_expansion_card_interface overrides
-	virtual uint8_t plus4_cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
-	virtual void plus4_cd_w(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
-
 	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
 private:
@@ -74,15 +70,12 @@ private:
 		LED_ACT
 	};
 
-	bool tpi1_selected(offs_t offset);
-
 	required_device<m6510t_device> m_maincpu;
 	required_device<tpi6525_device> m_tpi0;
 	required_device<tpi6525_device> m_tpi1;
 	required_device<c64h156_device> m_ga;
 	required_device<pls100_device> m_pla;
 	required_device<floppy_image_device> m_floppy;
-	required_device<plus4_expansion_slot_device> m_exp;
 	required_ioport m_jp1;
 	output_finder<2> m_leds;
 

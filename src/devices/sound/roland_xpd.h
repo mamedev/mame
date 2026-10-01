@@ -34,7 +34,6 @@ private:
 	std::string constant(offs_t pc) const;
 
 	static bool continuation(offs_t pc, const data_buffer &opcodes);
-	static void append(std::string &r, const std::string &e);
 	static void function(std::string &r, int fn, int mode, const std::string &k);
 	void parallel(std::string &r, offs_t pc, int st, int word) const;
 };

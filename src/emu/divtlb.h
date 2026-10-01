@@ -58,6 +58,7 @@ public:
 	// flushing
 	void vtlb_flush_dynamic();
 	void vtlb_flush_address(offs_t address);
+	void vtlb_flush_fixed(offs_t address, offs_t mask);
 
 	// accessors
 	const vtlb_entry *vtlb_table() const;

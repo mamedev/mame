@@ -1161,8 +1161,8 @@ void mazerbla_state::init_greatgun()
 
 //  m_game_id = GREATGUN;
 
-	//  patch VCU test
-	//  VCU test starts at PC=0x56f
+	// HACK: patch VCU test
+	// VCU test starts at PC=0x56f
 	rom[0x05b6] = 0;
 	rom[0x05b7] = 0;
 	//  so we also need to patch ROM checksum test

@@ -17,8 +17,6 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define STEP 0x08000
-
 
 
 //**************************************************************************
@@ -88,22 +86,21 @@ void dave_device::device_start()
 	m_timer_50hz = timer_alloc(FUNC(dave_device::update_50hz_timer), this);
 	m_timer_50hz->adjust(attotime::from_hz(2000), 0, attotime::from_hz(2000));
 
+	for (int i = 0; i < 3; i++)
+		m_timer_tone[i] = timer_alloc(FUNC(dave_device::update_tone_channel), this);
+
 	// state saving
 	save_item(NAME(m_segment));
 	save_item(NAME(m_irq_status));
 	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_period));
-	save_item(NAME(m_count));
 	save_item(NAME(m_level));
 	save_item(NAME(m_level_or));
 	save_item(NAME(m_level_and));
 	save_item(NAME(m_mame_volumes));
+	save_item(NAME(m_dac));
 
-	for (auto & elem : m_period)
-		elem = (STEP * machine().sample_rate()) / 125000;
-
-	for (auto & elem : m_count)
-		elem = (STEP * machine().sample_rate()) / 125000;
+	for (auto & elem : m_dac)
+		elem = 0;
 
 	for (auto & elem : m_level)
 		elem = 0;
@@ -131,6 +128,9 @@ void dave_device::device_start()
 
 void dave_device::device_reset()
 {
+	for (int i = 0; i < 3; i++)
+		start_tone_channel(i);
+
 	m_write_irq(CLEAR_LINE);
 
 	for (auto & elem : m_segment)
@@ -175,6 +175,107 @@ TIMER_CALLBACK_MEMBER(dave_device::update_50hz_timer)
 
 
 //-------------------------------------------------
+//  update_tone_channel -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(dave_device::update_tone_channel)
+{
+	int channel = param;
+
+	/* a silent channel cannot change the outputs, so do not resample for it */
+	if ((m_regs[8 + channel] & 0x3f) || (m_regs[12 + channel] & 0x3f))
+	{
+		m_sound_stream_var->update();
+
+		m_level[channel] ^= 0xffffffff;
+
+		update_dac();
+	}
+	else
+	{
+		m_level[channel] ^= 0xffffffff;
+	}
+
+	/*  a tone channel can clock the selectable interrupt, which inverts its
+	    state and requests an interrupt on every edge of the channel */
+	if (((m_regs[7]>>5) & 0x03) == (channel + 2))
+	{
+		m_irq_status ^= IRQ_50HZ_DIVIDER;
+		m_irq_status |= IRQ_50HZ_LATCH;
+
+		update_interrupt();
+	}
+
+	start_tone_channel(channel);
+}
+
+
+//-------------------------------------------------
+//  start_tone_channel -
+//-------------------------------------------------
+
+void dave_device::start_tone_channel(int channel)
+{
+	int count = (m_regs[channel<<1] | ((m_regs[(channel<<1)+1] & 0x0f)<<8)) + 1;
+
+	m_timer_tone[channel]->adjust(attotime::from_ticks(count, clock()/32), channel);
+}
+
+
+//-------------------------------------------------
+//  sync_tone_channel -
+//-------------------------------------------------
+
+void dave_device::sync_tone_channel(int channel, int state)
+{
+	m_sound_stream_var->update();
+
+	if (state)
+	{
+		// the channel is held in sync, with its output low
+		m_timer_tone[channel]->adjust(attotime::never);
+
+		m_level[channel] = 0;
+	}
+	else
+	{
+		start_tone_channel(channel);
+	}
+
+	update_dac();
+}
+
+
+//-------------------------------------------------
+//  update_dac -
+//-------------------------------------------------
+
+void dave_device::update_dac()
+{
+	int left = 0;
+	int right = 0;
+
+	for (int i = 0; i < 4; i++)
+	{
+		left += ((m_level[i] & m_level_and[i<<1]) | m_level_or[i<<1]) & (m_regs[8+i] & 0x3f);
+		right += ((m_level[i] & m_level_and[(i<<1)+1]) | m_level_or[(i<<1)+1]) & (m_regs[12+i] & 0x3f);
+	}
+
+	if (left != m_dac[0])
+	{
+		m_dac[0] = left;
+		m_write_lh(left);
+	}
+
+	if (right != m_dac[1])
+	{
+		m_dac[1] = right;
+		m_write_rh(right);
+	}
+}
+
+
+//-------------------------------------------------
 //  memory_space_config - return a description of
 //  any address spaces owned by this device
 //-------------------------------------------------
@@ -199,69 +300,26 @@ void dave_device::sound_stream_update(sound_stream &stream)
 	 4 = channel 2 left volume, 5 = channel 2 right volume
 	 6 = noise channel left volume, 7 = noise channel right volume */
 	int output_volumes[8];
-	int left_volume;
-	int right_volume;
 
-	//logerror("sound update!\n");
+	/* setup output volumes for each channel */
+	/* channel 0 */
+	output_volumes[0] = ((m_level[0] & m_level_and[0]) | m_level_or[0]) & m_mame_volumes[0];
+	output_volumes[1] = ((m_level[0] & m_level_and[1]) | m_level_or[1]) & m_mame_volumes[4];
+	/* channel 1 */
+	output_volumes[2] = ((m_level[1] & m_level_and[2]) | m_level_or[2]) & m_mame_volumes[1];
+	output_volumes[3] = ((m_level[1] & m_level_and[3]) | m_level_or[3]) & m_mame_volumes[5];
+	/* channel 2 */
+	output_volumes[4] = ((m_level[2] & m_level_and[4]) | m_level_or[4]) & m_mame_volumes[2];
+	output_volumes[5] = ((m_level[2] & m_level_and[5]) | m_level_or[5]) & m_mame_volumes[6];
+	/* channel 3 */
+	output_volumes[6] = ((m_level[3] & m_level_and[6]) | m_level_or[6]) & m_mame_volumes[3];
+	output_volumes[7] = ((m_level[3] & m_level_and[7]) | m_level_or[7]) & m_mame_volumes[7];
+
+	int left_volume = output_volumes[0] + output_volumes[2] + output_volumes[4] + output_volumes[6];
+	int right_volume = output_volumes[1] + output_volumes[3] + output_volumes[5] + output_volumes[7];
 
 	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
-		int vol[4];
-
-		/* vol[] keeps track of how long each square wave stays */
-		/* in the 1 position during the sample period. */
-		vol[0] = vol[1] = vol[2] = vol[3] = 0;
-
-		for (int i = 0; i < 3; i++)
-		{
-			if ((m_regs[7] & (1 << i))==0)
-			{
-				if (m_level[i]) vol[i] += m_count[i];
-				m_count[i] -= STEP;
-				/* Period[i] is the half period of the square wave. Here, in each */
-				/* loop I add Period[i] twice, so that at the end of the loop the */
-				/* square wave is in the same status (0 or 1) it was at the start. */
-				/* vol[i] is also incremented by Period[i], since the wave has been 1 */
-				/* exactly half of the time, regardless of the initial position. */
-				/* If we exit the loop in the middle, Output[i] has to be inverted */
-				/* and vol[i] incremented only if the exit status of the square */
-				/* wave is 1. */
-				while (m_count[i] <= 0)
-				{
-					m_count[i] += m_period[i];
-					if (m_count[i] > 0)
-					{
-						m_level[i] ^= 0x0ffffffff;
-						if (m_level[i]) vol[i] += m_period[i];
-						break;
-					}
-					m_count[i] += m_period[i];
-					vol[i] += m_period[i];
-				}
-				if (m_level[i])
-					vol[i] -= m_count[i];
-			}
-		}
-
-		/* update volume outputs */
-
-		/* setup output volumes for each channel */
-		/* channel 0 */
-		output_volumes[0] = ((m_level[0] & m_level_and[0]) | m_level_or[0]) & m_mame_volumes[0];
-		output_volumes[1] = ((m_level[0] & m_level_and[1]) | m_level_or[1]) & m_mame_volumes[4];
-		/* channel 1 */
-		output_volumes[2] = ((m_level[1] & m_level_and[2]) | m_level_or[2]) & m_mame_volumes[1];
-		output_volumes[3] = ((m_level[1] & m_level_and[3]) | m_level_or[3]) & m_mame_volumes[5];
-		/* channel 2 */
-		output_volumes[4] = ((m_level[2] & m_level_and[4]) | m_level_or[4]) & m_mame_volumes[2];
-		output_volumes[5] = ((m_level[2] & m_level_and[5]) | m_level_or[5]) & m_mame_volumes[6];
-		/* channel 3 */
-		output_volumes[6] = ((m_level[3] & m_level_and[6]) | m_level_or[6]) & m_mame_volumes[3];
-		output_volumes[7] = ((m_level[3] & m_level_and[7]) | m_level_or[7]) & m_mame_volumes[7];
-
-		left_volume = output_volumes[0] + output_volumes[2] + output_volumes[4] + output_volumes[6];
-		right_volume = output_volumes[1] + output_volumes[3] + output_volumes[5] + output_volumes[7];
-
 		stream.put_int(0, sampindex, left_volume, 32768 * 4);
 		stream.put_int(1, sampindex, right_volume, 32768 * 4);
 	}
@@ -400,39 +458,10 @@ void dave_device::io_w(offs_t offset, uint8_t data)
 		/* channel 2 down-counter */
 		case 0xa4:
 		case 0xa5:
-			{
-				int count = 0;
-				int channel_index = (offset>>1)&3;
-
-				/* Fout = 125,000 / (n+1) Hz */
-
-				/* sample rate/clock */
-
-
-				/* get down-count */
-				switch (offset & 0x01)
-				{
-					case 0:
-					{
-						count = (data & 0x0ff) | ((m_regs[(offset & 0x1f) + 1] & 0x0f)<<8);
-					}
-					break;
-
-					case 1:
-					{
-						count = (m_regs[(offset & 0x1f) - 1] & 0x0ff) | ((data & 0x0f)<<8);
-
-					}
-					break;
-				}
-
-				count++;
-
-
-				m_period[channel_index] = ((STEP  * machine().sample_rate())/125000) * count;
-
-				m_regs[offset & 0x1f] = data;
-			}
+			/*  Fout = 125,000 / (n+1) Hz, so the channel toggles every n+1 ticks
+			    of the 250 kHz tone clock. A new count only takes effect on the
+			    next toggle, so a running channel is left alone here. */
+			m_regs[offset & 0x1f] = data;
 			break;
 
 		/* channel 0 left volume */
@@ -452,12 +481,16 @@ void dave_device::io_w(offs_t offset, uint8_t data)
 		/* noise channel right volume */
 		case 0xaf:
 			{
+				m_sound_stream_var->update();
+
 				/* update mame version of volume from data written */
 				/* 0x03f->0x07e00. Max is 0x07fff */
 				/* I believe the volume is linear - to be checked! */
 				m_mame_volumes[(offset & 0x1f) - 8] = (data & 0x03f) << 9;
 
 				m_regs[offset & 0x1f] = data;
+
+				update_dac();
 			}
 			break;
 
@@ -472,6 +505,8 @@ void dave_device::io_w(offs_t offset, uint8_t data)
 			        the final volume calculation, regardless of wave state
 			    use => the volume value is dependant on the wave state and is included
 			        in the final volume calculation */
+
+			m_sound_stream_var->update();
 
 			//logerror("selectable int ");
 			switch ((data>>5) & 0x03)
@@ -491,18 +526,25 @@ void dave_device::io_w(offs_t offset, uint8_t data)
 				break;
 
 				case 2:
-				{
-					//logerror("tone channel 0\n");
-				}
-				break;
-
 				case 3:
 				{
-					//logerror("tone channel 1\n");
+					/*  clocked by a tone channel instead, which also holds the
+					    interrupt off while that channel is in sync - EXOS uses
+					    this as the programmable timeout in its cassette routines */
+					//logerror("tone channel %u\n", ((data>>5) & 0x01));
+					m_timer_50hz->adjust(attotime::never);
 				}
 				break;
 			}
 
+			/*  syncing a tone channel holds its output low and stops its counter,
+			    releasing it restarts the counter - a write that leaves the sync
+			    bit alone must not disturb a running channel */
+			for (int i = 0; i < 3; i++)
+			{
+				if (BIT(data, i) != BIT(m_regs[7], i))
+					sync_tone_channel(i, BIT(data, i));
+			}
 
 			/* turn L.H audio output into D/A, outputting value in R8 */
 			if (data & (1<<3))
@@ -581,6 +623,8 @@ void dave_device::io_w(offs_t offset, uint8_t data)
 			}
 
 			m_regs[offset & 0x1f] = data;
+
+			update_dac();
 		}
 		break;
 

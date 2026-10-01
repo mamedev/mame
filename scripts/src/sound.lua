@@ -79,6 +79,20 @@ end
 
 
 ---------------------------------------------------
+-- Zero-crossing comparator for line-level audio
+--@src/devices/sound/zcross.h,SOUNDS["ZCROSS"] = true
+---------------------------------------------------
+
+if SOUNDS["ZCROSS"] then
+	files {
+		MAME_DIR .. "src/devices/sound/zcross.cpp",
+		MAME_DIR .. "src/devices/sound/zcross.h",
+	}
+end
+
+
+
+---------------------------------------------------
 -- Discrete component audio
 --@src/devices/sound/discrete.h,SOUNDS["DISCRETE"] = true
 ---------------------------------------------------
@@ -1388,6 +1402,18 @@ end
 
 
 ---------------------------------------------------
+-- Yamaha YM3413 LDSP
+--@src/devices/sound/ym3413.h,SOUNDS["YM3413"] = true
+---------------------------------------------------
+
+if SOUNDS["YM3413"] then
+	files {
+		MAME_DIR .. "src/devices/sound/ym3413.cpp",
+		MAME_DIR .. "src/devices/sound/ym3413.h",
+	}
+end
+
+---------------------------------------------------
 -- Yamaha FM synthesizers
 --@src/devices/sound/ym2154.h,SOUNDS["YM2154"] = true
 --@src/devices/sound/ymopm.h,SOUNDS["YM2151"] = true
@@ -1726,6 +1752,18 @@ if SOUNDS["UPD934G"] then
 end
 
 ---------------------------------------------------
+--
+--@src/devices/sound/gsc38gg307.h,SOUNDS["GSC38GG307"] = true
+--------------------------------------------------
+
+if SOUNDS["GSC38GG307"] then
+	files {
+		MAME_DIR .. "src/devices/sound/gsc38gg307.cpp",
+		MAME_DIR .. "src/devices/sound/gsc38gg307.h",
+	}
+end
+
+--------------------------------------------------
 --
 --@src/devices/sound/iopspu.h,SOUNDS["IOPSPU"] = true
 ---------------------------------------------------

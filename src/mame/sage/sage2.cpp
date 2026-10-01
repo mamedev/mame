@@ -16,7 +16,6 @@
 
     TODO:
 
-    - floppy loading
     - TMS9914 IEEE-488 controller
     - board 2 (4x 2651 USART)
     - Winchester controller
@@ -185,7 +184,7 @@ void sage2_state::ppi0_pc_w(uint8_t data)
 	m_fdc->tc_w(BIT(data, 0));
 
 	// floppy ready
-	m_fdc->ready_w(BIT(data, 1));
+	m_fdc->ready_w(!BIT(data, 1));
 
 	// floppy interrupt enable
 	m_fdie = BIT(data, 2);
@@ -203,7 +202,7 @@ void sage2_state::ppi0_pc_w(uint8_t data)
 	if (m_floppy) m_floppy->mon_w(BIT(data, 5));
 
 	// FDC reset
-	if(BIT(data, 7)) m_fdc->reset();
+	m_fdc->reset_w(BIT(data, 7));
 }
 
 
@@ -259,10 +258,10 @@ uint8_t sage2_state::ppi1_pb_r()
 	uint8_t data = 0;
 
 	// floppy interrupt
-	data = m_fdc->get_irq();
+	data |= m_fdc->get_irq();
 
 	// floppy write protected
-	data = (m_floppy ? m_floppy->wpt_r() : 1) << 1;
+	data |= (m_floppy ? m_floppy->wpt_r() : 1) << 1;
 
 	// RS-232 ring indicator
 
@@ -359,7 +358,7 @@ void sage2_state::fdc_irq(int state)
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
@@ -509,22 +508,8 @@ ROM_END
 
 
 //**************************************************************************
-//  DRIVER INITIALIZATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  DRIVER_INIT( sage2 )
-//-------------------------------------------------
-
-void sage2_state::init_sage2()
-{
-}
-
-
-
-//**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT        COMPANY            FULLNAME   FLAGS
-COMP( 1982, sage2,  0,      0,      sage2,   sage2, sage2_state, init_sage2, "Sage Technology", "Sage II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1982, sage2,  0,      0,      sage2,   sage2, sage2_state, empty_init, "Sage Technology", "Sage II", MACHINE_NO_SOUND )

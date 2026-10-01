@@ -1,356 +1,287 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Samuel Neves, Peter Wilhelmsen, Morten Shearman Kirkegaard
+/***************************************************************************
 
-/* Sega Compression (and encryption) device
+    Sega 315-5838 / 317-0229 / 317-0230 / 317-0231
+    Fixed word substitution followed by programmable prefix decompression.
 
-    315-5838 - Decathlete (ST-V)
-    317-0229 - Dead or Alive (Model 2A)
-    317-0229 - Name Club / Name Club Ver 2 (ST-V) (tested as RCDD2 in the service menu!)
-    317-0230 - Winnie The Pooh Vol 2 / 3
-    317-0231 - Print Club Love Love / Print Club Love Love Ver 2 (ST-V)
+    315-5838: DecAthlete (graphics)
+    317-0229: Dead or Alive (startup string), Name Club 1/2 (printer data)
+    317-0230: Print Club Pooh 2/3, Nightmare Before Christmas
+    317-0231: Print Club Love Love 1/2, Sony Creative 5/6
+    The protected Print Club startup blocks are graphics descriptors, not
+    executable code. These associations identify functional transforms;
+    chip markings have not been independently confirmed for every board.
 
-    Several Print Club (ST-V) carts have
-    an unpopulated space marked '317-0229' on the PCB
+    Word transform
+    --------------
+    Each encrypted 16-bit word is transformed independently. There is no
+    evolving key, feedback or address dependence in the word function.
+    Number input bits x0..x15, with x0 least significant. Form four 3-bit
+    values (the first element below is the least significant bit):
 
-    Package Type: TQFP100
+        A = [x5 ^ x12, x7 ^ x9, x14]
+        B = [x6,       x8,      x15]
+        C = [x1 ^ x8,  x7,      x12]
+        D = [x3,       x4,      x10]
 
-    Decathlete accesses the chip at 2 different addresses.
+    Route these through four bijective, eight-entry substitution tables.
+    Table output bits 0..2 go to [0,1,7], [2,5,9], [4,10,13] and [6,11,15]
+    of the resulting word. Routing and table values depend on the variant:
 
-    Dead of Alive has the source data in RAM, not ROM.
-    This is similar to how some 5881 games were set up, with the ST-V versions decrypting
-    data directly from ROM and the Model 2 ones using a RAM source buffer.
+        315-5838: A B C D        317-0229: D C A B
+        317-0230: C D B A        317-0231: B A D C
 
-    Decathlete decompresses all graphic data with the chip.
+    The four remaining output bits [3,8,12,14] are affine functions of
+    [x0, x0^x2, x11^x14, x4^x13, 1]. Each parameter mask selects terms to
+    XOR. CIPHERS below contains the routing, substitutions and affine masks
+    for all variants, including a uniform representation of DecAthlete.
 
-    The Name Club games use the chip for decompressing data for the printer (full size
-    versions of the graphics?)
+    Compression and interface
+    -------------------------
+    The transformed words contain compressed bits, consumed MSB first.
+    A mode write with bit 7 clear starts a 24-halfword tree upload. Pairs
+    describe (code length in the high byte, dictionary index in the low
+    byte), followed by a 12-bit-aligned starting code. Mode bit 7 set starts
+    a 256-byte dictionary upload, high byte first in each written halfword.
+    Mode bit 15 does not change these observed operations.
 
-    Print Club Love Love decrypts some start up code/data required for booting.
+    For a code length n, shift the starting pattern right by 12-n. The next
+    distinct pattern is the exclusive upper bound; the final group extends
+    to 2^n. The dictionary index is the group's base index plus the code's
+    offset from its start. Repeated final descriptors must not terminate
+    the range: several variants finish before length 12. The dictionary is
+    a byte alphabet, not an LZ history or a cryptographic key.
 
-    Dead or Alive decrypts a string that is checked on startup, nothing else.
+    Source writes set the word address and discard buffered compressed
+    bits. Output reads return two decoded bytes, high byte first. The host
+    supplies encrypted words through a callback, so cartridge banking and
+    RAM byte order stay in the drivers. Model 2's discarded initial read is
+    also a bus-level detail, not an extra character in the compressed text.
 
-*/
+    Recovery method
+    ---------------
+    The useful known plaintext was the Print Club graphics metadata. Its
+    unprotected maps reference 16x16, 8-bit tiles in increments of eight.
+    Thus (maximum tile reference / 8 + 1) * 256 gives a graphics block's
+    size. Contiguous blocks ending at the maps determine their addresses.
+    This reconstructs protected (address, length-in-longwords) descriptors.
+
+    Re-encoding these bytes with the uploaded tables gives compressed
+    plaintext bits aligned with encrypted ROM words. It is these word
+    pairs, not final graphics bytes, that constrain the substitution.
+    Pooh 2/3 supplied 42 complete pairs plus partial tails; Love Love supplied
+    56 complete pairs. For each output bit, enumerate supports of at most
+    five input bits and fit constant, linear and quadratic terms over GF(2).
+    Retain all nullspace solutions, then check the resulting candidates for
+    bijectivity, unused bits and samples withheld from fitting. Pooh left
+    two candidate circuits; only one was bijective. Love Love's fit was
+    unique in this function class. Both admit the four-lane structure above.
+
+    DOA compares 48 characters, encoding only 187 compressed bits. Its first
+    discarded halfword is not assumed to contain two spaces. The shared
+    lane structure restricts these bits to twelve complete candidates.
+    Only one passes Name Club 2's independent RCDD2 test: 563,044 decoded
+    bytes repeated 33 times, expected result 0x12477c39. That routine has
+    only about eleven effective checksum bits, so it discriminates these
+    candidates rather than proving uniqueness over arbitrary algorithms.
+    The additional Nightmare and Sony Creative sets validate descriptor
+    contents not used in recovering the transforms.
+
+    As a control, recompressing 128 DecAthlete bytes observed from working
+    MAME gives 47 complete pairs. The same quadratic fit recovers its whole
+    transform, agreeing with the original implementation on all 65,536
+    inputs. This uses an emulator plaintext oracle, not new hardware data.
+    All four functions are bijective; their table-driven representation was
+    exhaustively compared with the recovered Boolean functions. Finite
+    samples establish uniqueness only within the tested function classes,
+    and do not establish physical gate layout or exact device timing.
+
+***************************************************************************/
 
 #include "emu.h"
 #include "315-5838_317-0229_comp.h"
 
 DEFINE_DEVICE_TYPE(SEGA315_5838_COMP, sega_315_5838_comp_device, "sega315_5838", "Sega 315-5838 / 317-0229 Compression and Encryption")
 
-sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+sega_315_5838_comp_device::sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, SEGA315_5838_COMP, tag, owner, clock),
-	device_rom_interface(mconfig, *this),
-	m_hackmode(0)
+	m_source_cb(*this, 0xffff)
 {
 }
 
 void sega_315_5838_comp_device::device_start()
 {
+	save_item(NAME(m_tree));
+	save_item(NAME(m_dictionary));
+	save_item(NAME(m_tree_words));
+	save_item(NAME(m_dictionary_bytes));
+	save_item(NAME(m_upload_dictionary));
+	save_item(NAME(m_source));
+	save_item(NAME(m_word));
+	save_item(NAME(m_bits));
+	save_item(NAME(m_output));
+	save_item(NAME(m_abort));
 }
 
 void sega_315_5838_comp_device::device_reset()
 {
-	m_srcoffset = 0;
-	m_srcstart = 0;
+	std::fill(std::begin(m_tree), std::end(m_tree), 0);
+	std::fill(std::begin(m_dictionary), std::end(m_dictionary), 0);
+	m_tree_words = 0;
+	m_dictionary_bytes = 0;
+	m_upload_dictionary = false;
+	m_source = 0;
+	m_word = 0;
+	m_bits = 0;
+	m_output = 0xffff;
 	m_abort = false;
 }
 
-/**************************
-*
-* Decathlete
-*
-**************************/
-
-// this part is likely specific to the decathlete type chip and will differ for the others
-uint16_t sega_315_5838_comp_device::decipher(uint16_t c)
+u16 sega_315_5838_comp_device::decipher(u16 ciphertext) const
 {
-	// TODO: use BIT macros instead of working in bytes
-	uint16_t p = 0;
-	uint16_t x[16];
-
-	for (int b = 0; b < 16; ++b)
+	static constexpr cipher_parameters CIPHERS[] =
 	{
-		x[b] = (c >> b) & 1;
+		{ // 315-5838
+			{ 0, 1, 2, 3 },
+			{ { 6, 7, 2, 0, 5, 1, 3, 4 }, { 5, 3, 7, 2, 1, 6, 4, 0 },
+			  { 2, 0, 6, 1, 3, 7, 4, 5 }, { 6, 5, 7, 4, 1, 3, 0, 2 } },
+			{ 0b10100, 0b11000, 0b00010, 0b10101 }
+		},
+		{ // 317-0229
+			{ 3, 2, 0, 1 },
+			{ { 6, 0, 5, 4, 7, 2, 1, 3 }, { 5, 6, 1, 3, 7, 0, 4, 2 },
+			  { 2, 6, 0, 1, 3, 4, 7, 5 }, { 6, 5, 7, 4, 1, 3, 0, 2 } },
+			{ 0b10010, 0b10001, 0b00100, 0b11010 }
+		},
+		{ // 317-0230
+			{ 2, 3, 1, 0 },
+			{ { 6, 2, 7, 0, 5, 3, 1, 4 }, { 5, 3, 7, 2, 1, 6, 4, 0 },
+			  { 2, 1, 3, 5, 6, 0, 4, 7 }, { 6, 1, 3, 5, 7, 0, 2, 4 } },
+			{ 0b10100, 0b11000, 0b00010, 0b10101 }
+		},
+		{ // 317-0231
+			{ 1, 0, 3, 2 },
+			{ { 6, 0, 5, 4, 7, 2, 1, 3 }, { 5, 1, 6, 3, 7, 4, 0, 2 },
+			  { 2, 1, 3, 5, 6, 0, 4, 7 }, { 6, 3, 1, 5, 7, 2, 0, 4 } },
+			{ 0b10010, 0b10001, 0b00100, 0b11010 }
+		}
+	};
+	static constexpr u8 OUTPUT_BITS[4][3] = { { 0, 1, 7 }, { 2, 5, 9 }, { 4, 10, 13 }, { 6, 11, 15 } };
+	static constexpr u8 AFFINE_BITS[4] = { 3, 8, 12, 14 };
+
+	auto const x = [ciphertext](unsigned bit) { return BIT(ciphertext, bit); };
+	u8 const lanes[4] =
+	{
+		u8((x(5) ^ x(12)) | ((x(7) ^ x(9)) << 1) | (x(14) << 2)),
+		u8(x(6) | (x(8) << 1) | (x(15) << 2)),
+		u8((x(1) ^ x(8)) | (x(7) << 1) | (x(12) << 2)),
+		u8(x(3) | (x(4) << 1) | (x(10) << 2))
+	};
+	u8 const affine = x(0) | ((x(0) ^ x(2)) << 1) | ((x(11) ^ x(14)) << 2) | ((x(4) ^ x(13)) << 3) | 16;
+	cipher_parameters const &cipher = CIPHERS[unsigned(m_variant)];
+	u16 result = 0;
+	for (unsigned group = 0; group < 4; ++group)
+	{
+		u8 const value = cipher.sboxes[group][lanes[cipher.routing[group]]];
+		for (unsigned bit = 0; bit < 3; ++bit)
+			result |= BIT(value, bit) << OUTPUT_BITS[group][bit];
+
+		u8 parity = affine & cipher.affine[group];
+		parity ^= parity >> 4;
+		parity ^= parity >> 2;
+		parity ^= parity >> 1;
+		result |= BIT(parity, 0) << AFFINE_BITS[group];
 	}
-
-	p |= (x[7] ^ x[9] ^ x[14] ? 0 : x[5] ^ x[12]) ^ x[14];
-	p |= (((x[7] ^ x[9])&(x[12] ^ x[14] ^ x[5])) ^ x[14] ^ 1) << 1;
-	p |= ((x[6] & x[8]) ^ (x[6] & x[15]) ^ (x[8] & x[15]) ^ 1) << 2;
-	p |= (x[11] ^ x[14] ^ 1) << 3;
-	p |= ((x[7] & (x[1] ^ x[8] ^ x[12])) ^ x[12]) << 4;
-	p |= ((x[6] | x[8]) ^ (x[8] & x[15])) << 5;
-	p |= (x[4] ^ (x[3] | x[10])) << 6;
-	p |= ((x[14] & (x[5] ^ x[12])) ^ x[7] ^ x[9] ^ 1) << 7;
-	p |= (x[4] ^ x[13] ^ 1) << 8;
-	p |= (x[6] ^ (x[8] | (x[15] ^ 1))) << 9;
-	p |= (x[7] ^ (x[12] | (x[1] ^ x[8] ^ x[7] ^ 1))) << 10;
-	p |= (x[3] ^ x[10] ^ 1) << 11;
-	p |= (x[0] ^ x[2]) << 12;
-	p |= (x[8] ^ x[1] ? x[12] : x[7]) << 13;
-	p |= (x[0] ^ x[11] ^ x[14] ^ 1) << 14;
-	p |= (x[10] ^ 1) << 15;
-
-	return p;
+	return result;
 }
 
-
-uint8_t sega_315_5838_comp_device::get_decompressed_byte(void)
+void sega_315_5838_comp_device::source_w(u32 data, u32 mem_mask)
 {
-	if (m_hackmode == HACK_MODE_NONE)
-	{
-		// real algorithm, when we have a cipher function
-		for (;;)
-		{
-			if (m_abort)
-			{
-				return 0xff;
-			}
-
-			if (m_num_bits_compressed == 0)
-			{
-				m_val_compressed = decipher(source_word_r());
-				m_num_bits_compressed = 16;
-			}
-
-			m_num_bits_compressed--;
-			m_val <<= 1;
-			m_val |= 1 & (m_val_compressed >> m_num_bits_compressed);
-			m_num_bits++;
-
-			for (int i = 0; i < 12; i++)
-			{
-				if (m_num_bits != m_compstate.tree[i].len) continue;
-				if (m_val < (m_compstate.tree[i].pattern >> (12 - m_num_bits))) continue;
-				if (
-					(m_num_bits < 12) &&
-					(m_val >= (m_compstate.tree[i + 1].pattern >> (12 - m_num_bits)))
-					) continue;
-
-				int j = m_compstate.tree[i].idx + m_val - (m_compstate.tree[i].pattern >> (12 - m_num_bits));
-
-				m_val = 0;
-				m_num_bits = 0;
-
-				return m_compstate.dictionary[j];
-			}
-		}
-	}
-	else
-	{
-		// modes where we don't have the real cipher yet, to aid with data logging etc.
-		// this code will go away eventually
-		uint8_t ret = 0;
-
-		// scrreader is words, this is bytes, for unknown compression we want to log the same number of bytes as we read, so log every other access
-		if (!(m_srcoffset & 1))
-		{
-			uint16_t temp = read_word((m_srcoffset*2)^2);
-			logerror("%s: read data %04x\n", machine().describe_context(), temp);
-#ifdef SEGA315_DUMP_DEBUG
-			if (m_fp)
-			{
-				fwrite(&temp, 1, 2, m_fp);
-			}
-#endif
-		}
-
-		if (m_hackmode == HACK_MODE_DOA)
-		{
-			// this is the single decompressed string DOA needs, note, 2 spaces at start, might indicate a dummy read like with 5881 on Model 2
-			// it reads 50 bytes from the device.  PC = 2C20 is a pass, PC = 2C28 is a fail
-			const uint8_t prot[51] = "  TECMO LTD.  DEAD OR ALIVE  1996.10.22  VER. 1.00";
-			if (m_srcoffset<50) ret = prot[m_srcoffset];
-			else ret = 0x00;
-			logerror("%s: doa read %08x %c\n", machine().describe_context(), m_srcoffset, ret);
-		}
-		else if (m_hackmode == HACK_MODE_NO_KEY)
-		{
-			ret = machine().rand();
-		}
-
-		m_srcoffset++;
-		m_srcoffset &= 0x007fffff;
-		return ret;
-	}
-}
-
-uint16_t sega_315_5838_comp_device::data_r()
-{
-	return (get_decompressed_byte() << 8) | (get_decompressed_byte() << 0);
-}
-
-uint16_t sega_315_5838_comp_device::source_word_r()
-{
-	uint16_t tempdata = read_word((m_srcoffset*2)^2);
-	m_srcoffset++;
-	m_srcoffset &= 0x007fffff;
-
-	if (m_srcoffset == m_srcstart) // if we've wrapped around to where we started something has gone wrong with the transfer, abandon
-		m_abort = true;
-
-#ifdef SEGA315_DUMP_DEBUG
-	if (m_fp)
-	{
-		fwrite(&tempdata, 1, 2, m_fp);
-	}
-#endif
-
-	return tempdata;
-}
-
-void sega_315_5838_comp_device::set_prot_addr(uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&m_srcoffset);
-	m_srcoffset &= 0x007fffff;
-	m_srcstart = m_srcoffset;
+	COMBINE_DATA(&m_source);
+	m_source &= 0x007f'ffff;
+	m_word = 0;
+	m_bits = 0;
 	m_abort = false;
-
-	m_num_bits_compressed = 0;
-	m_val_compressed = 0;
-	m_num_bits = 0;
-	m_val = 0;
 }
 
-void sega_315_5838_comp_device::debug_helper(int id)
+void sega_315_5838_comp_device::table_w(offs_t offset, u16 data)
 {
-#ifdef SEGA315_DUMP_DEBUG
-
-	if (m_fp)
+	if (!BIT(offset, 0))
 	{
-		fclose(m_fp);
-	}
-
-	if (1)
-	{
-		char filename[256];
-		sprintf(filename, "%d_%08x_table_tree_len", id, m_srcoffset * 2);
-		m_fp = fopen(filename, "w+b");
-		for (int i = 0; i < 12; i++)
-		{
-			fwrite(&m_compstate.tree[i].len, 1, 1, m_fp);
-		}
-		fclose(m_fp);
-	}
-
-	if (1)
-	{
-		char filename[256];
-		sprintf(filename, "%d_%08x_table_tree_idx", id, m_srcoffset * 2);
-		m_fp = fopen(filename, "w+b");
-		for (int i = 0; i < 12; i++)
-		{
-			fwrite(&m_compstate.tree[i].idx, 1, 1, m_fp);
-		}
-		fclose(m_fp);
-	}
-
-	if (1)
-	{
-		char filename[256];
-		sprintf(filename, "%d_%08x_table_tree_pattern", id, m_srcoffset * 2);
-		m_fp = fopen(filename, "w+b");
-		for (int i = 0; i < 12; i++)
-		{
-			fwrite(&m_compstate.tree[i].pattern, 1, 2, m_fp);
-		}
-		fclose(m_fp);
-	}
-
-	if (1)
-	{
-		char filename[256];
-		sprintf(filename, "%d_%08x_table_dictionary", id, m_srcoffset * 2);
-		m_fp = fopen(filename, "w+b");
-		for (int i = 0; i < 256; i++)
-		{
-			fwrite(&m_compstate.dictionary[i], 1, 1, m_fp);
-		}
-		fclose(m_fp);
-	}
-
-	if (1)
-	{
-		char filename[256];
-		sprintf(filename, "%d_%08x_table_data", id, m_srcoffset * 2);
-		m_fp = fopen(filename, "w+b");
-		// leave open for writing
-
-	}
-
-#endif
-}
-
-
-void sega_315_5838_comp_device::set_table_upload_mode_w(uint16_t val)
-{
-	m_compstate.mode = val;
-
-	if (!(m_compstate.mode & 0x80)) // 0x8000 and 0x0000
-	{
-		m_compstate.it2 = 0;
-	}
-	else // 0x8080 and 0x0080
-	{
-		m_compstate.id = 0;
-	}
-}
-
-void sega_315_5838_comp_device::upload_table_data_w(uint16_t val)
-{
-	if (!(m_compstate.mode & 0x80)) // 0x8000 and 0x0000
-	{
-		assert(m_compstate.it2 / 2 < 12);
-
-		if ((m_compstate.it2 & 1) == 0)
-		{
-			m_compstate.tree[m_compstate.it2 / 2].len = (0xFF00 & val) >> 8;
-			m_compstate.tree[m_compstate.it2 / 2].idx = (0x00FF & val) >> 0;
-		}
+		m_upload_dictionary = BIT(data, 7);
+		if (m_upload_dictionary)
+			m_dictionary_bytes = 0;
 		else
-		{
-			m_compstate.tree[m_compstate.it2 / 2].pattern = val;
-		}
-		m_compstate.it2++;
+			m_tree_words = 0;
 	}
-	else // 0x8080 and 0x0080
+	else if (m_upload_dictionary)
 	{
-		assert(m_compstate.id < 255);
-
-		m_compstate.dictionary[m_compstate.id++] = (0xFF00 & val) >> 8;
-		m_compstate.dictionary[m_compstate.id++] = (0x00FF & val) >> 0;
+		if (m_dictionary_bytes < std::size(m_dictionary))
+		{
+			m_dictionary[m_dictionary_bytes++] = data >> 8;
+			m_dictionary[m_dictionary_bytes++] = data & 0xff;
+		}
+	}
+	else if (m_tree_words < std::size(m_tree))
+	{
+		m_tree[m_tree_words++] = data;
 	}
 }
 
-void sega_315_5838_comp_device::write_prot_data(uint32_t data, uint32_t mem_mask, int rev_words)
+u8 sega_315_5838_comp_device::decompress_byte()
 {
-	if (mem_mask==0xffff0000)
+	if (m_abort || m_tree_words != std::size(m_tree) || m_dictionary_bytes != std::size(m_dictionary))
+		return 0xff;
+
+	u16 code = 0;
+	for (unsigned length = 1; length <= 12; ++length)
 	{
-		if (rev_words == 0)
+		if (!m_bits)
 		{
-			set_table_upload_mode_w(data >> 16);
+			m_word = decipher(m_source_cb(m_source));
+			m_source = (m_source + 1) & 0x007f'ffff;
+			m_bits = 16;
 		}
-		else
+		code = (code << 1) | BIT(m_word, --m_bits);
+
+		for (unsigned entry = 0; entry < std::size(m_tree); entry += 2)
 		{
-			upload_table_data_w(data >> 16);
+			if (BIT(m_tree[entry], 8, 8) != length)
+				continue;
+
+			u16 const first = m_tree[entry + 1] >> (12 - length);
+			u16 limit = 1U << length;
+			for (unsigned next = entry + 2; next < std::size(m_tree); next += 2)
+			{
+				if (m_tree[next + 1] != m_tree[entry + 1])
+				{
+					limit = m_tree[next + 1] >> (12 - length);
+					break;
+				}
+			}
+
+			if (code >= first && code < limit)
+			{
+				unsigned const index = BIT(m_tree[entry], 0, 8) + code - first;
+				if (index < std::size(m_dictionary))
+					return m_dictionary[index];
+			}
 		}
 	}
-	else if (mem_mask == 0x0000ffff)
-	{
-		if (rev_words == 0)
-		{
-			upload_table_data_w(data & 0xffff);
-		}
-		else
-		{
-			set_table_upload_mode_w(data & 0xffff);
-		}
-	}
-	else
-	{
-		fatalerror("write_prot_data invalid mem_mask\b");
-	}
+
+	// Invalid tables or data must not loop forever or read past the dictionary.
+	logerror("Invalid compressed code at source word %06x\n", m_source);
+	m_abort = true;
+	return 0xff;
 }
 
-void sega_315_5838_comp_device::data_w_doa(offs_t offset, uint32_t data, uint32_t mem_mask) { write_prot_data(data, mem_mask, 1); }
-void sega_315_5838_comp_device::data_w(offs_t offset, uint32_t data, uint32_t mem_mask) { write_prot_data(data, mem_mask, 0); }
-void sega_315_5838_comp_device::srcaddr_w(offs_t offset, uint32_t data, uint32_t mem_mask) { set_prot_addr(data, mem_mask); }
-
+u16 sega_315_5838_comp_device::data_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_output = u16(decompress_byte()) << 8;
+		m_output |= decompress_byte();
+	}
+	return m_output;
+}

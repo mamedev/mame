@@ -11,7 +11,7 @@ namespace {
 const char *const ACCUMULATOR[4] = { "", "accA", "accB", "accA!" };
 
 // offsets 1 to 4 read a power of two instead of memory, so the coefficient becomes an immediate
-const int IMMEDIATE[5] = { 0, 7, 12, 17, 22 };
+constexpr int IMMEDIATE[5] = { 0, 7, 12, 17, 22 };
 
 void operand(std::ostream &stream, u8 offset)
 {
@@ -24,7 +24,7 @@ void operand(std::ostream &stream, u8 offset)
 void product(std::ostream &stream, u8 offset, u8 coefficient, int shift)
 {
 	operand(stream, offset);
-	util::stream_format(stream, "*%c%02x>>%d", BIT(coefficient, 7) ? '-' : '+', BIT(coefficient, 7) ? -s8(coefficient) & 0xff : coefficient, shift);
+	util::stream_format(stream, "*%c%02x>>%d", BIT(coefficient, 7) ? '-' : '+', BIT(coefficient, 7) ? (-s8(coefficient) & 0xff) : coefficient, shift);
 }
 
 void slot_source(std::ostream &stream, int slot, u8 coefficient)

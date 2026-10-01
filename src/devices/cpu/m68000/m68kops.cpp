@@ -18,28 +18,30 @@ void m68000_musashi_device::xf000_1111_071234fc()
 void m68000_musashi_device::xf200_fpgen_l_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u16 w2 = OPER_I_16();
-		switch((w2 >> 13) & 0x7)
-		{
-			case 0x0:   // FPU ALU FP, FP
-			case 0x2:   // FPU ALU ea, FP
-				fpgen_rm_reg(w2);
-				break;
-			case 0x3:   // FMOVE FP, ea
-				fmove_reg_mem(w2);
-				break;
-			case 0x4:   // FMOVEM ea, FPCR
-			case 0x5:   // FMOVEM FPCR, ea
-				fmove_fpcr(w2);
-				break;
-			case 0x6:   // FMOVEM ea, list
-			case 0x7:   // FMOVEM list, ea
-				fmovem(w2);
-				break;
-			default:
-				m68ki_exception_1111();
-				break;
+		switch((w2 >> 13) & 0x7) {
+		case 0x0:   // FPU ALU FP, FP
+		case 0x2:   // FPU ALU ea, FP
+			fpgen_rm_reg(w2);
+			break;
+		case 0x3:   // FMOVE FP, ea
+			fmove_reg_mem(w2);
+			break;
+		case 0x4:   // FMOVEM ea, FPCR
+		case 0x5:   // FMOVEM FPCR, ea
+			fmove_fpcr(w2);
+			break;
+		case 0x6:   // FMOVEM ea, list
+		case 0x7:   // FMOVEM list, ea
+			fmovem(w2);
+			break;
+		default:
+			m68ki_exception_1111();
+			break;
 		}
 	} else {
 		m68ki_exception_1111();
@@ -50,6 +52,9 @@ void m68000_musashi_device::xf200_fpgen_l_234f()
 void m68000_musashi_device::xf240_fscc_d_b_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u32 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		DY() = (DY() & 0xffffff00) | v;
@@ -62,6 +67,9 @@ void m68000_musashi_device::xf240_fscc_d_b_234f()
 void m68000_musashi_device::xf250_fscc_b_ai_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AY_AI_8(), v);
@@ -74,6 +82,9 @@ void m68000_musashi_device::xf250_fscc_b_ai_234f()
 void m68000_musashi_device::xf258_fscc_b_pi_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AY_PI_8(), v);
@@ -86,6 +97,9 @@ void m68000_musashi_device::xf258_fscc_b_pi_234f()
 void m68000_musashi_device::xf25f_fscc_b_pi7_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_A7_PI_8(), v);
@@ -98,6 +112,9 @@ void m68000_musashi_device::xf25f_fscc_b_pi7_234f()
 void m68000_musashi_device::xf260_fscc_b_pd_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AY_PD_8(), v);
@@ -110,6 +127,9 @@ void m68000_musashi_device::xf260_fscc_b_pd_234f()
 void m68000_musashi_device::xf267_fscc_b_pd7_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_A7_PD_8(), v);
@@ -122,6 +142,9 @@ void m68000_musashi_device::xf267_fscc_b_pd7_234f()
 void m68000_musashi_device::xf268_fscc_b_di_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AY_DI_8(), v);
@@ -134,6 +157,9 @@ void m68000_musashi_device::xf268_fscc_b_di_234f()
 void m68000_musashi_device::xf270_fscc_b_ix_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AY_IX_8(), v);
@@ -146,6 +172,9 @@ void m68000_musashi_device::xf270_fscc_b_ix_234f()
 void m68000_musashi_device::xf278_fscc_b_aw_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AW_8(), v);
@@ -158,6 +187,9 @@ void m68000_musashi_device::xf278_fscc_b_aw_234f()
 void m68000_musashi_device::xf279_fscc_b_al_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m_fpu_just_reset = 0;
 		const u8 v = test_condition(OPER_I_16() & 0x3f) ? 0xff : 0x00;
 		m68ki_write_8(EA_AL_8(), v);
@@ -170,6 +202,9 @@ void m68000_musashi_device::xf279_fscc_b_al_234f()
 void m68000_musashi_device::xf248_fdbcc_l_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		fdbcc();
 	} else {
 		m68ki_exception_1111();
@@ -180,6 +215,9 @@ void m68000_musashi_device::xf248_fdbcc_l_234f()
 void m68000_musashi_device::xf27a_ftrap_w_l_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m68881_ftrap();
 	} else {
 		m68ki_exception_1111();
@@ -190,6 +228,9 @@ void m68000_musashi_device::xf27a_ftrap_w_l_234f()
 void m68000_musashi_device::xf27b_ftrap_l_l_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m68881_ftrap();
 	} else {
 		m68ki_exception_1111();
@@ -200,6 +241,9 @@ void m68000_musashi_device::xf27b_ftrap_l_l_234f()
 void m68000_musashi_device::xf27c_ftrap_l_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		m68881_ftrap();
 	} else {
 		m68ki_exception_1111();
@@ -210,6 +254,9 @@ void m68000_musashi_device::xf27c_ftrap_l_234f()
 void m68000_musashi_device::xf280_fbcc_w_w_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		fbcc16();
 	} else {
 		m68ki_exception_1111();
@@ -220,6 +267,9 @@ void m68000_musashi_device::xf280_fbcc_w_w_234f()
 void m68000_musashi_device::xf2c0_fbcc_l_l_234f()
 {
 	if(m_has_fpu) {
+		if(fpu_check_pending_exception()) {
+			return;
+		}
 		fbcc32();
 	} else {
 		m68ki_exception_1111();
@@ -6142,14 +6192,12 @@ void m68000_musashi_device::xebd0_bfexts_l_ai_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6185,14 +6233,12 @@ void m68000_musashi_device::xebe8_bfexts_l_di_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6228,14 +6274,12 @@ void m68000_musashi_device::xebf0_bfexts_l_ix_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6271,14 +6315,12 @@ void m68000_musashi_device::xebf8_bfexts_l_aw_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6314,14 +6356,12 @@ void m68000_musashi_device::xebf9_bfexts_l_al_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6357,14 +6397,12 @@ void m68000_musashi_device::xebfa_bfexts_l_pcdi_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6400,14 +6438,12 @@ void m68000_musashi_device::xebfb_bfexts_l_pcix_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6470,14 +6506,12 @@ void m68000_musashi_device::xe9d0_bfextu_l_ai_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6512,14 +6546,12 @@ void m68000_musashi_device::xe9e8_bfextu_l_di_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6554,14 +6586,12 @@ void m68000_musashi_device::xe9f0_bfextu_l_ix_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6596,14 +6626,12 @@ void m68000_musashi_device::xe9f8_bfextu_l_aw_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6638,14 +6666,12 @@ void m68000_musashi_device::xe9f9_bfextu_l_al_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6680,14 +6706,12 @@ void m68000_musashi_device::xe9fa_bfextu_l_pcdi_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6722,14 +6746,12 @@ void m68000_musashi_device::xe9fb_bfextu_l_pcix_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6806,8 +6828,8 @@ void m68000_musashi_device::xedd0_bfffo_l_ai_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (local_offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(local_offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -6851,8 +6873,8 @@ void m68000_musashi_device::xede8_bfffo_l_di_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (local_offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(local_offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -6896,8 +6918,8 @@ void m68000_musashi_device::xedf0_bfffo_l_ix_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (local_offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(local_offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -6941,8 +6963,8 @@ void m68000_musashi_device::xedf8_bfffo_l_aw_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (local_offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(local_offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -6986,8 +7008,8 @@ void m68000_musashi_device::xedf9_bfffo_l_al_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (local_offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(local_offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -7031,8 +7053,8 @@ void m68000_musashi_device::xedfa_bfffo_l_pcdi_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (local_offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(local_offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -7076,8 +7098,8 @@ void m68000_musashi_device::xedfb_bfffo_l_pcix_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (local_offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(local_offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -7150,14 +7172,12 @@ void m68000_musashi_device::xefd0_bfins_l_ai_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -7212,14 +7232,12 @@ void m68000_musashi_device::xefe8_bfins_l_di_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -7274,14 +7292,12 @@ void m68000_musashi_device::xeff0_bfins_l_ix_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -7336,14 +7352,12 @@ void m68000_musashi_device::xeff8_bfins_l_aw_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -7398,14 +7412,12 @@ void m68000_musashi_device::xeff9_bfins_l_al_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -9593,7 +9605,7 @@ void m68000_musashi_device::x00fa_chk2cmp2_b_234fc()
 	s32 upper_bound = m68ki_read_pcrel_8(ea + 1);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80) {
+	if(lower_bound & 0x80) {
 		lower_bound = (s32)(s8)lower_bound;
 		upper_bound = (s32)(s8)upper_bound;
 
@@ -9621,7 +9633,7 @@ void m68000_musashi_device::x00fb_chk2cmp2_b_234fc()
 	s32 upper_bound = m68ki_read_pcrel_8(ea + 1);
 
 		// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80) {
+	if(lower_bound & 0x80) {
 		lower_bound = (s32)(s8)lower_bound;
 		upper_bound = (s32)(s8)upper_bound;
 
@@ -9649,7 +9661,7 @@ void m68000_musashi_device::x00d0_chk2cmp2_b_ai_234fc()
 	s32 upper_bound = m68ki_read_8(ea + 1);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80) {
+	if(lower_bound & 0x80) {
 		lower_bound = (s32)(s8)lower_bound;
 		upper_bound = (s32)(s8)upper_bound;
 
@@ -9677,7 +9689,7 @@ void m68000_musashi_device::x00e8_chk2cmp2_b_di_234fc()
 	s32 upper_bound = m68ki_read_8(ea + 1);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80) {
+	if(lower_bound & 0x80) {
 		lower_bound = (s32)(s8)lower_bound;
 		upper_bound = (s32)(s8)upper_bound;
 
@@ -9705,7 +9717,7 @@ void m68000_musashi_device::x00f0_chk2cmp2_b_ix_234fc()
 	s32 upper_bound = m68ki_read_8(ea + 1);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80) {
+	if(lower_bound & 0x80) {
 		lower_bound = (s32)(s8)lower_bound;
 		upper_bound = (s32)(s8)upper_bound;
 
@@ -9733,7 +9745,7 @@ void m68000_musashi_device::x00f8_chk2cmp2_b_aw_234fc()
 	s32 upper_bound = m68ki_read_8(ea + 1);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80) {
+	if(lower_bound & 0x80) {
 		lower_bound = (s32)(s8)lower_bound;
 		upper_bound = (s32)(s8)upper_bound;
 
@@ -9761,7 +9773,7 @@ void m68000_musashi_device::x00f9_chk2cmp2_b_al_234fc()
 	s32 upper_bound = m68ki_read_8(ea + 1);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80) {
+	if(lower_bound & 0x80) {
 		lower_bound = (s32)(s8)lower_bound;
 		upper_bound = (s32)(s8)upper_bound;
 
@@ -9789,7 +9801,7 @@ void m68000_musashi_device::x02fa_chk2cmp2_w_234fc()
 	s32 upper_bound = m68ki_read_pcrel_16(ea + 2);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x8000) {
+	if(lower_bound & 0x8000) {
 		lower_bound = (s32)(s16)lower_bound;
 		upper_bound = (s32)(s16)upper_bound;
 
@@ -9817,7 +9829,7 @@ void m68000_musashi_device::x02fb_chk2cmp2_w_234fc()
 	s32 upper_bound = m68ki_read_pcrel_16(ea + 2);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x8000) {
+	if(lower_bound & 0x8000) {
 		lower_bound = (s32)(s16)lower_bound;
 		upper_bound = (s32)(s16)upper_bound;
 
@@ -9845,7 +9857,7 @@ void m68000_musashi_device::x02d0_chk2cmp2_w_ai_234fc()
 	s32 upper_bound = m68ki_read_16(ea + 2);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x8000) {
+	if(lower_bound & 0x8000) {
 		lower_bound = (s32)(s16)lower_bound;
 		upper_bound = (s32)(s16)upper_bound;
 
@@ -9873,7 +9885,7 @@ void m68000_musashi_device::x02e8_chk2cmp2_w_di_234fc()
 	s32 upper_bound = m68ki_read_16(ea + 2);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x8000) {
+	if(lower_bound & 0x8000) {
 		lower_bound = (s32)(s16)lower_bound;
 		upper_bound = (s32)(s16)upper_bound;
 
@@ -9901,7 +9913,7 @@ void m68000_musashi_device::x02f0_chk2cmp2_w_ix_234fc()
 	s32 upper_bound = m68ki_read_16(ea + 2);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x8000) {
+	if(lower_bound & 0x8000) {
 		lower_bound = (s32)(s16)lower_bound;
 		upper_bound = (s32)(s16)upper_bound;
 
@@ -9929,7 +9941,7 @@ void m68000_musashi_device::x02f8_chk2cmp2_w_aw_234fc()
 	s32 upper_bound = m68ki_read_16(ea + 2);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x8000) {
+	if(lower_bound & 0x8000) {
 		lower_bound = (s32)(s16)lower_bound;
 		upper_bound = (s32)(s16)upper_bound;
 
@@ -9957,7 +9969,7 @@ void m68000_musashi_device::x02f9_chk2cmp2_w_al_234fc()
 	s32 upper_bound = m68ki_read_16(ea + 2);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x8000) {
+	if(lower_bound & 0x8000) {
 		lower_bound = (s32)(s16)lower_bound;
 		upper_bound = (s32)(s16)upper_bound;
 
@@ -9982,7 +9994,7 @@ void m68000_musashi_device::x04fa_chk2cmp2_l_234fc()
 	s64 upper_bound = m68ki_read_pcrel_32(ea + 4);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80000000) {
+	if(lower_bound & 0x80000000) {
 		lower_bound = (s64)(s32)lower_bound;
 		upper_bound = (s64)(s32)upper_bound;
 		compare = (s64)(s32)compare;
@@ -10005,7 +10017,7 @@ void m68000_musashi_device::x04fb_chk2cmp2_l_234fc()
 	s64 upper_bound = m68ki_read_pcrel_32(ea + 4);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80000000) {
+	if(lower_bound & 0x80000000) {
 		lower_bound = (s64)(s32)lower_bound;
 		upper_bound = (s64)(s32)upper_bound;
 		compare = (s64)(s32)compare;
@@ -10028,7 +10040,7 @@ void m68000_musashi_device::x04d0_chk2cmp2_l_ai_234fc()
 	s64 upper_bound = m68ki_read_32(ea + 4);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80000000) {
+	if(lower_bound & 0x80000000) {
 		lower_bound = (s64)(s32)lower_bound;
 		upper_bound = (s64)(s32)upper_bound;
 		compare = (s64)(s32)compare;
@@ -10051,7 +10063,7 @@ void m68000_musashi_device::x04e8_chk2cmp2_l_di_234fc()
 	s64 upper_bound = m68ki_read_32(ea + 4);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80000000) {
+	if(lower_bound & 0x80000000) {
 		lower_bound = (s64)(s32)lower_bound;
 		upper_bound = (s64)(s32)upper_bound;
 		compare = (s64)(s32)compare;
@@ -10074,7 +10086,7 @@ void m68000_musashi_device::x04f0_chk2cmp2_l_ix_234fc()
 	s64 upper_bound = m68ki_read_32(ea + 4);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80000000) {
+	if(lower_bound & 0x80000000) {
 		lower_bound = (s64)(s32)lower_bound;
 		upper_bound = (s64)(s32)upper_bound;
 		compare = (s64)(s32)compare;
@@ -10097,7 +10109,7 @@ void m68000_musashi_device::x04f8_chk2cmp2_l_aw_234fc()
 	s64 upper_bound = m68ki_read_32(ea + 4);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80000000) {
+	if(lower_bound & 0x80000000) {
 		lower_bound = (s64)(s32)lower_bound;
 		upper_bound = (s64)(s32)upper_bound;
 		compare = (s64)(s32)compare;
@@ -10120,7 +10132,7 @@ void m68000_musashi_device::x04f9_chk2cmp2_l_al_234fc()
 	s64 upper_bound = m68ki_read_32(ea + 4);
 
 	// for signed compare, the arithmetically smaller value is the lower bound
-	if (lower_bound & 0x80000000) {
+	if(lower_bound & 0x80000000) {
 		lower_bound = (s64)(s32)lower_bound;
 		upper_bound = (s64)(s32)upper_bound;
 		compare = (s64)(s32)compare;
@@ -20284,30 +20296,28 @@ void m68000_musashi_device::x4e7a_movec_l_1()
 			REG_DA()[(word2 >> 12) & 15] = m_vbr;
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
-						return;
-					case 0xc0c: // MPCR
-						REG_DA()[(word2 >> 12) & 15] = m_mpcr;
-						return;
-					case 0xc0d: // EDRAMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_edrambar;
-						return;
-					case 0xc0e: // SECMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_secmbar;
-						return;
-					case 0xc0f: // MBAR
-						REG_DA()[(word2 >> 12) & 15] = m_mbar;
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
+					return;
+				case 0xc0c: // MPCR
+					REG_DA()[(word2 >> 12) & 15] = m_mpcr;
+					return;
+				case 0xc0d: // EDRAMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_edrambar;
+					return;
+				case 0xc0e: // SECMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_secmbar;
+					return;
+				case 0xc0f: // MBAR
+					REG_DA()[(word2 >> 12) & 15] = m_mbar;
+					return;
 				}
 			}
 
@@ -20352,30 +20362,28 @@ void m68000_musashi_device::x4e7a_movec_l_23f()
 			REG_DA()[(word2 >> 12) & 15] = m_m_flag ? REG_ISP() : REG_SP();
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
-						return;
-					case 0xc0c: // MPCR
-						REG_DA()[(word2 >> 12) & 15] = m_mpcr;
-						return;
-					case 0xc0d: // EDRAMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_edrambar;
-						return;
-					case 0xc0e: // SECMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_secmbar;
-						return;
-					case 0xc0f: // MBAR
-						REG_DA()[(word2 >> 12) & 15] = m_mbar;
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
+					return;
+				case 0xc0c: // MPCR
+					REG_DA()[(word2 >> 12) & 15] = m_mpcr;
+					return;
+				case 0xc0d: // EDRAMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_edrambar;
+					return;
+				case 0xc0e: // SECMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_secmbar;
+					return;
+				case 0xc0f: // MBAR
+					REG_DA()[(word2 >> 12) & 15] = m_mbar;
+					return;
 				}
 			}
 
@@ -20445,30 +20453,28 @@ void m68000_musashi_device::x4e7a_movec_l_4()
 			REG_DA()[(word2 >> 12) & 15] = m_mmu_srp_aptr;
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
-						return;
-					case 0xc0c: // MPCR
-						REG_DA()[(word2 >> 12) & 15] = m_mpcr;
-						return;
-					case 0xc0d: // EDRAMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_edrambar;
-						return;
-					case 0xc0e: // SECMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_secmbar;
-						return;
-					case 0xc0f: // MBAR
-						REG_DA()[(word2 >> 12) & 15] = m_mbar;
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
+					return;
+				case 0xc0c: // MPCR
+					REG_DA()[(word2 >> 12) & 15] = m_mpcr;
+					return;
+				case 0xc0d: // EDRAMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_edrambar;
+					return;
+				case 0xc0e: // SECMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_secmbar;
+					return;
+				case 0xc0f: // MBAR
+					REG_DA()[(word2 >> 12) & 15] = m_mbar;
+					return;
 				}
 			}
 
@@ -20525,30 +20531,28 @@ void m68000_musashi_device::x4e7a_movec_l_c()
 			REG_DA()[(word2 >> 12) & 15] = m_mmu_acr3;
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
-						return;
-					case 0xc0c: // MPCR
-						REG_DA()[(word2 >> 12) & 15] = m_mpcr;
-						return;
-					case 0xc0d: // EDRAMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_edrambar;
-						return;
-					case 0xc0e: // SECMBAR
-						REG_DA()[(word2 >> 12) & 15] = m_secmbar;
-						return;
-					case 0xc0f: // MBAR
-						REG_DA()[(word2 >> 12) & 15] = m_mbar;
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					REG_DA()[(word2 >> 12) & 15] = m_rombar[word2 & 1];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					REG_DA()[(word2 >> 12) & 15] = m_rambar[word2 & 1];
+					return;
+				case 0xc0c: // MPCR
+					REG_DA()[(word2 >> 12) & 15] = m_mpcr;
+					return;
+				case 0xc0d: // EDRAMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_edrambar;
+					return;
+				case 0xc0e: // SECMBAR
+					REG_DA()[(word2 >> 12) & 15] = m_secmbar;
+					return;
+				case 0xc0f: // MBAR
+					REG_DA()[(word2 >> 12) & 15] = m_mbar;
+					return;
 				}
 			}
 
@@ -20567,7 +20571,7 @@ void m68000_musashi_device::x4e7b_movec_l_1()
 		u32 word2 = OPER_I_16();
 
 		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
-		switch (word2 & 0xfff) {
+		switch(word2 & 0xfff) {
 		case 0x000:            /* SFC */
 			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
@@ -20581,30 +20585,28 @@ void m68000_musashi_device::x4e7b_movec_l_1()
 			m_vbr = REG_DA()[(word2 >> 12) & 15];
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0c: // MPCR
-						m_mpcr = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0d: // EDRAMBAR
-						m_edrambar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0e: // SECMBAR
-						m_secmbar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0f: // MBAR
-						m_mbar = REG_DA()[(word2 >> 12) & 15];
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0c: // MPCR
+					m_mpcr = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0d: // EDRAMBAR
+					m_edrambar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0e: // SECMBAR
+					m_secmbar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0f: // MBAR
+					m_mbar = REG_DA()[(word2 >> 12) & 15];
+					return;
 				}
 			}
 
@@ -20623,7 +20625,7 @@ void m68000_musashi_device::x4e7b_movec_l_2f()
 		u32 word2 = OPER_I_16();
 
 		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
-		switch (word2 & 0xfff) {
+		switch(word2 & 0xfff) {
 		case 0x000:            /* SFC */
 			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
@@ -20634,7 +20636,7 @@ void m68000_musashi_device::x4e7b_movec_l_2f()
 			/* 68030 can write all bits except 5-7, 040 can write all */
 			m_cacr = REG_DA()[(word2 >> 12) & 15] & 0x0f;
 
-			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
+			if(m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
 				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
@@ -20665,30 +20667,29 @@ void m68000_musashi_device::x4e7b_movec_l_2f()
 			}
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
+			if(m_cpu_type == CPU_TYPE_COLDFIRE)
 			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0c: // MPCR
-						m_mpcr = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0d: // EDRAMBAR
-						m_edrambar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0e: // SECMBAR
-						m_secmbar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0f: // MBAR
-						m_mbar = REG_DA()[(word2 >> 12) & 15];
-						return;
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0c: // MPCR
+					m_mpcr = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0d: // EDRAMBAR
+					m_edrambar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0e: // SECMBAR
+					m_secmbar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0f: // MBAR
+					m_mbar = REG_DA()[(word2 >> 12) & 15];
+					return;
 				}
 			}
 
@@ -20707,7 +20708,7 @@ void m68000_musashi_device::x4e7b_movec_l_3()
 		u32 word2 = OPER_I_16();
 
 		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
-		switch (word2 & 0xfff) {
+		switch(word2 & 0xfff) {
 		case 0x000:            /* SFC */
 			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
@@ -20719,7 +20720,7 @@ void m68000_musashi_device::x4e7b_movec_l_3()
 			   writable; bits 5-7 and 14-31 are reserved and must read back as 0. */
 			m_cacr = REG_DA()[(word2 >> 12) & 15] & 0x3f1f;
 
-			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
+			if(m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
 				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
@@ -20749,30 +20750,29 @@ void m68000_musashi_device::x4e7b_movec_l_3()
 			}
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
+			if(m_cpu_type == CPU_TYPE_COLDFIRE)
 			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0c: // MPCR
-						m_mpcr = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0d: // EDRAMBAR
-						m_edrambar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0e: // SECMBAR
-						m_secmbar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0f: // MBAR
-						m_mbar = REG_DA()[(word2 >> 12) & 15];
-						return;
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0c: // MPCR
+					m_mpcr = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0d: // EDRAMBAR
+					m_edrambar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0e: // SECMBAR
+					m_secmbar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0f: // MBAR
+					m_mbar = REG_DA()[(word2 >> 12) & 15];
+					return;
 				}
 			}
 
@@ -20791,7 +20791,7 @@ void m68000_musashi_device::x4e7b_movec_l_4()
 		u32 word2 = OPER_I_16();
 
 		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
-		switch (word2 & 0xfff) {
+		switch(word2 & 0xfff) {
 		case 0x000:            /* SFC */
 			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
@@ -20829,12 +20829,9 @@ void m68000_musashi_device::x4e7b_movec_l_4()
 		case 0x003:         /* TC */
 			m_mmu_tc = REG_DA()[(word2 >> 12) & 15];
 
-			if (m_mmu_tc & 0x8000)
-			{
+			if(m_mmu_tc & 0x8000) {
 				m_pmmu_enabled = 1;
-			}
-			else
-			{
+			} else {
 				m_pmmu_enabled = 0;
 			}
 			m_can_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
@@ -20861,30 +20858,28 @@ void m68000_musashi_device::x4e7b_movec_l_4()
 			m_mmu_srp_aptr = REG_DA()[(word2 >> 12) & 15];
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0c: // MPCR
-						m_mpcr = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0d: // EDRAMBAR
-						m_edrambar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0e: // SECMBAR
-						m_secmbar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0f: // MBAR
-						m_mbar = REG_DA()[(word2 >> 12) & 15];
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0c: // MPCR
+					m_mpcr = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0d: // EDRAMBAR
+					m_edrambar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0e: // SECMBAR
+					m_secmbar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0f: // MBAR
+					m_mbar = REG_DA()[(word2 >> 12) & 15];
+					return;
 				}
 			}
 
@@ -20903,7 +20898,7 @@ void m68000_musashi_device::x4e7b_movec_l_c()
 		u32 word2 = OPER_I_16();
 
 		m68ki_trace_t0();          /* auto-disable (see m68kcpu.h) */
-		switch (word2 & 0xfff) {
+		switch(word2 & 0xfff) {
 		case 0x000:            /* SFC */
 			m_sfc = REG_DA()[(word2 >> 12) & 15] & 7;
 			break;
@@ -20914,7 +20909,7 @@ void m68000_musashi_device::x4e7b_movec_l_c()
 			/* 68030 can write all bits except 5-7, 040 can write all */
 			m_cacr = REG_DA()[(word2 >> 12) & 15] & 0x0f;
 
-			if (m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
+			if(m_cacr & (M68K_CACR_CI | M68K_CACR_CEI)) {
 				m68ki_ic_clear();
 				m_cacr &= ~(M68K_CACR_CI | M68K_CACR_CEI);
 			}
@@ -20956,30 +20951,28 @@ void m68000_musashi_device::x4e7b_movec_l_c()
 			m_mmu_acr3 = REG_DA()[(word2 >> 12) & 15];
 			break;
 		default:
-			if (m_cpu_type == CPU_TYPE_COLDFIRE)
-			{
-				switch(word2 & 0xfff)
-				{
-					case 0xc00: // ROMBAR0
-					case 0xc01:
-						m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc04: // RAMBAR0
-					case 0xc05: // RAMBAR1
-						m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0c: // MPCR
-						m_mpcr = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0d: // EDRAMBAR
-						m_edrambar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0e: // SECMBAR
-						m_secmbar = REG_DA()[(word2 >> 12) & 15];
-						return;
-					case 0xc0f: // MBAR
-						m_mbar = REG_DA()[(word2 >> 12) & 15];
-						return;
+			if(m_cpu_type == CPU_TYPE_COLDFIRE) {
+				switch(word2 & 0xfff) {
+				case 0xc00: // ROMBAR0
+				case 0xc01:
+					m_rombar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc04: // RAMBAR0
+				case 0xc05: // RAMBAR1
+					m_rambar[word2 & 1] = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0c: // MPCR
+					m_mpcr = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0d: // EDRAMBAR
+					m_edrambar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0e: // SECMBAR
+					m_secmbar = REG_DA()[(word2 >> 12) & 15];
+					return;
+				case 0xc0f: // MBAR
+					m_mbar = REG_DA()[(word2 >> 12) & 15];
+					return;
 				}
 			}
 
@@ -26110,12 +26103,9 @@ void m68000_musashi_device::xf510_pflushan_l_4fc()
 void m68000_musashi_device::xf000_pmmu_l_23fc()
 {
 	// 68851/68030 MMU instructions; all of these are F-line exceptions on the 68040
-	if (m_has_pmmu)
-	{
+	if(m_has_pmmu) {
 		m68851_mmu_ops();
-	}
-	else
-	{
+	} else {
 		m68ki_exception_1111();
 	}
 
@@ -26125,17 +26115,12 @@ void m68000_musashi_device::xf548_ptest_l_4()
 {
 	if(m_has_pmmu)
 	{
-		if(m_s_flag)
-		{
+		if(m_s_flag) {
 			m68040_ptest();
-		}
-		else
-		{
+		} else {
 			m68ki_exception_privilege_violation();
 		}
-	}
-	else
-	{
+	} else {
 		m68ki_exception_1111();
 	}
 
@@ -27235,8 +27220,7 @@ void m68000_musashi_device::x4e73_rte_l_71()
 			m_instr_mode = INSTRUCTION_YES;
 			m_run_mode = RUN_MODE_NORMAL;
 		} else {
-			if (format_word == 0x8) /* 68010 - type 1000 stack frame */
-			{
+			if(format_word == 0x8) { /* 68010 - type 1000 stack frame */
 				new_sr = m68ki_pull_16();
 				new_pc = m68ki_pull_32();
 				m68ki_fake_pull_16();  /* format word */
@@ -27257,9 +27241,7 @@ void m68000_musashi_device::x4e73_rte_l_71()
 				m68ki_set_sr(new_sr);
 				m_instr_mode = INSTRUCTION_YES;
 				m_run_mode = RUN_MODE_NORMAL;
-			}
-			else
-			{
+			} else {
 				m_instr_mode = INSTRUCTION_YES;
 				m_run_mode = RUN_MODE_NORMAL;
 				/* Not handling bus fault (9) */
@@ -27271,7 +27253,32 @@ void m68000_musashi_device::x4e73_rte_l_71()
 	}
 
 }
-void m68000_musashi_device::x4e73_rte_l_234fc()
+void m68000_musashi_device::x4e73_rte_l_c()
+{
+	if (m_s_flag)
+	{
+		u32 const frame = m68ki_read_32(REG_A()[7]);
+		if ((frame >> 28) >= 4 && (frame >> 28) <= 7)
+		{
+			u32 const new_pc = m68ki_read_32(REG_A()[7] + 4);
+			REG_A()[7] += 8 + ((frame >> 28) & 3);
+			m68ki_jump(new_pc);
+			m68ki_set_sr(frame & 0xffff);
+			m_instr_mode = INSTRUCTION_YES;
+			m_run_mode = RUN_MODE_NORMAL;
+		}
+		else
+		{
+			m68ki_exception_format_error();
+		}
+	}
+	else
+	{
+		m68ki_exception_privilege_violation();
+	}
+
+}
+void m68000_musashi_device::x4e73_rte_l_234f()
 {
 	if(m_s_flag) {
 		u32 new_sr;
@@ -31862,7 +31869,7 @@ void m68000_musashi_device::xf400_cinv_l_4()
 	u8 cache = (ir >> 6) & 3;
 	//  u8 scope = (ir >> 3) & 3;
 	//  logerror("68040 %s: pc=%08x ir=%04x cache=%d scope=%d register=%d\n", ir & 0x0020 ? "cpush" : "cinv", m_ppc, ir, cache, scope, ir & 7);
-	switch (cache) {
+	switch(cache) {
 	case 1:
 		// TODO: data cache
 		break;
@@ -33726,7 +33733,8 @@ const m68000_musashi_device::opcode_handler_ptr m68000_musashi_device::m68k_hand
 	&m68000_musashi_device::x4e72_stop_071234fc,
 	&m68000_musashi_device::x4e73_rte_l_0,
 	&m68000_musashi_device::x4e73_rte_l_71,
-	&m68000_musashi_device::x4e73_rte_l_234fc,
+	&m68000_musashi_device::x4e73_rte_l_c,
+	&m68000_musashi_device::x4e73_rte_l_234f,
 	&m68000_musashi_device::x4e74_rtd_l_1234fc,
 	&m68000_musashi_device::x4e75_rts_l_071234fc,
 	&m68000_musashi_device::x4e76_trapv_071234fc,
@@ -35326,7 +35334,7 @@ const m68000_musashi_device::opcode_handler_struct m68000_musashi_device::m68k_o
 	{ 0x50e8, 0xfff8, { 16,  22,  16,  11,  10,  11,  11,   6}},
 	{ 0x50f0, 0xfff8, { 18,  24,  18,  13,  12,  13,  13,   6}},
 	{ 0x51c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x51c8, 0xfff8, { 12,  14,  10,   6,   4,   4,   4,   4}},
+	{ 0x51c8, 0xfff8, { 12,  14,  10,   6,   6,   4,   4,   4}},
 	{ 0x51d0, 0xfff8, { 12,  18,  12,  10,   9,  10,  10,   6}},
 	{ 0x51d8, 0xfff8, { 12,  18,  12,  10,   9,  10,  10,   6}},
 	{ 0x51e0, 0xfff8, { 14,  20,  14,  11,  10,  11,  11,   6}},
@@ -35814,7 +35822,8 @@ const m68000_musashi_device::opcode_handler_struct m68000_musashi_device::m68k_o
 	{ 0x4e72, 0xffff, {  4,  13,   4,   8,   8,   8,   8,   8}},
 	{ 0x4e73, 0xffff, { 20, 255, 255, 255, 255, 255, 255, 255}},
 	{ 0x4e73, 0xffff, {255,  39,  24, 255, 255, 255, 255, 255}},
-	{ 0x4e73, 0xffff, {255, 255, 255,  20,  20,  20,  20,  20}},
+	{ 0x4e73, 0xffff, {255, 255, 255, 255, 255, 255, 255,  14}},
+	{ 0x4e73, 0xffff, {255, 255, 255,  20,  20,  20,  20, 255}},
 	{ 0x4e74, 0xffff, {255, 255,  16,  10,  10,  10,  10,  10}},
 	{ 0x4e75, 0xffff, { 16,  15,  16,  10,  10,  10,  10,  10}},
 	{ 0x4e76, 0xffff, {  4,  10,   4,   4,   4,   4,   4,   4}},

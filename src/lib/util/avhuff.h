@@ -26,6 +26,7 @@
 
 #define AVHUFF_USE_FLAC     (1)
 
+constexpr uint8_t AVHUFF_MAX_CHANNELS = 16;
 
 // errors
 enum avhuff_error
@@ -128,7 +129,7 @@ public:
 		bitmap_yuy16 *  video = nullptr;            // pointer to video bitmap
 		uint32_t        maxsamples = 0;             // maximum number of samples per channel
 		uint32_t *      actsamples = nullptr;       // actual number of samples per channel
-		int16_t *       audio[16];                  // pointer to individual audio channels
+		int16_t *       audio[AVHUFF_MAX_CHANNELS]; // pointer to individual audio channels
 		uint32_t        maxmetalength = 0;          // maximum length of metadata
 		uint32_t *      actmetalength = nullptr;    // actual length of metadata
 		uint8_t *       metadata = nullptr;         // pointer to metadata buffer

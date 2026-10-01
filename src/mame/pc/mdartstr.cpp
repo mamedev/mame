@@ -565,7 +565,7 @@ public:
 		, m_speaker(*this, "speaker")
 	{ }
 
-	void mdartstr(machine_config &config);
+	void mdartstr(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<i386sx_device> m_maincpu;

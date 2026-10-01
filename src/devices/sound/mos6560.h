@@ -41,8 +41,8 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define MOS6560_VRETRACERATE 60
-#define MOS6561_VRETRACERATE 50
+#define MOS6560_VRETRACERATE ((double)MOS6560_CLOCK / MOS6560_LINES / MOS6560_CYCLES)
+#define MOS6561_VRETRACERATE ((double)MOS6561_CLOCK / MOS6561_LINES / MOS6561_CYCLES)
 
 #define MOS6560_MAME_XPOS  4           /* xleft not displayed */
 #define MOS6560_MAME_YPOS  10          /* y up not displayed */
@@ -59,11 +59,11 @@
 
 #define MOS6560_XSIZE   (4+201)        /* 4 left not visible */
 #define MOS6560_YSIZE   (10+251)       /* 10 not visible */
-/* cycles 65 */
+#define MOS6560_CYCLES  65
 
 #define MOS6561_XSIZE   (20+229)       /* 20 left not visible */
 #define MOS6561_YSIZE   (10+302)       /* 10 not visible */
-/* cycles 71 */
+#define MOS6561_CYCLES  71
 
 
 /* the following values depend on the VIC clock,

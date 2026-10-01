@@ -64,33 +64,26 @@ vic20_speakeasy_device::vic20_speakeasy_device(const machine_config &mconfig, co
 
 void vic20_speakeasy_device::device_start()
 {
+	m_slot->io2().install_readwrite_handler(0x000, 0x3ff, read8smo_delegate(*this, FUNC(vic20_speakeasy_device::io2_r)), write8smo_delegate(*this, FUNC(vic20_speakeasy_device::io2_w)));
 }
 
 
 //-------------------------------------------------
-//  vic20_cd_r - cartridge data read
+//  io2_r - I/O 2 read
 //-------------------------------------------------
 
-uint8_t vic20_speakeasy_device::vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+uint8_t vic20_speakeasy_device::io2_r()
 {
-	if (!io2)
-	{
-		return m_votrax->request() << 7;
-	}
-
-	return data;
+	return m_votrax->request() << 7;
 }
 
 
 //-------------------------------------------------
-//  vic20_cd_w - cartridge data write
+//  io2_w - I/O 2 write
 //-------------------------------------------------
 
-void vic20_speakeasy_device::vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void vic20_speakeasy_device::io2_w(uint8_t data)
 {
-	if (!io2)
-	{
-		m_votrax->write(data & 0x3f);
-		m_votrax->inflection_w(data >> 6);
-	}
+	m_votrax->write(data & 0x3f);
+	m_votrax->inflection_w(data >> 6);
 }

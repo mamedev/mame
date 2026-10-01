@@ -4113,17 +4113,17 @@ ROM_END
 
 void cclimber_state::init_cclimber()
 {
-	u8 *rom = memregion("maincpu")->base();
-	u8 *prom = memregion("decryption_prom")->base();
+	u8 const *const rom = memregion("maincpu")->base();
+	u8 const *const prom = memregion("decryption_prom")->base();
 
 	for (int A = 0x0000; A < 0x6000; A++)
 	{
-		unsigned char src = rom[A];
+		u8 const src = rom[A];
 
 		// pick the offset in the table from bit 0 of the address and bits 0 1 2 4 6 7 of the source data
-		int j = (src & 0x01) | ((src & 0x04) >> 1) | ((src & 0x10) >> 1) | ((src & 0x40) >> 4) | ((A & 1) << 6) | ((src & 0x02) << 3) | ((src & 0x80) >> 2);
+		int j = (BIT(A, 0) << 6) | bitswap<6>(src, 7, 1, 4, 6, 2, 0);
 
-		unsigned char prm = prom[j];
+		u8 const prm = prom[j];
 
 		// decode the opcodes
 		m_decrypted_opcodes[A] = (src & 0xaa) | (prm & 0x01) | ((prm & 0x02) << 1) | ((prm & 0x04) << 4) | ((prm & 0x08) << 1);

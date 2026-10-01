@@ -85,6 +85,7 @@ using util::BIT;
 #include "cpu/ie15/ie15dasm.h"
 #include "cpu/interdata16/dasm16.h"
 #include "cpu/jaguar/jagdasm.h"
+#include "cpu/jalfpu/jalfpu_dasm.h"
 #include "cpu/ks0164/ks0164d.h"
 #include "cpu/lc57/lc57d.h"
 #include "cpu/lc58/lc58d.h"
@@ -184,6 +185,7 @@ using util::BIT;
 #include "cpu/st9/st9dasm.h"
 #include "cpu/superfx/sfx_dasm.h"
 #include "cpu/t11/t11dasm.h"
+#include "cpu/t6m53/t6m53_dasm.h"
 #include "cpu/tlcs870/tlcs870d.h"
 #include "cpu/tlcs90/tlcs90d.h"
 #include "cpu/tlcs900/dasm900.h"
@@ -524,6 +526,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "interdata16",     be,  0, []() -> util::disasm_interface * { return new interdata16_disassembler; } },
 	{ "jaguardsp",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::variant::DSP); } },
 	{ "jaguargpu",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::variant::GPU); } },
+	{ "jalfpu",          le, -2, []() -> util::disasm_interface * { return new jaleco_fpu_disassembler; } },
 	{ "konami",          be,  0, []() -> util::disasm_interface * { return new konami_disassembler; } },
 	{ "ks0164",          be,  0, []() -> util::disasm_interface * { return new ks0164_disassembler; } },
 	{ "kl1839vm1",       be,  0, []() -> util::disasm_interface * { return new kl1839vm1_disassembler; } },
@@ -664,6 +667,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "st9p",            be,  0, []() -> util::disasm_interface * { return new st9p_disassembler; } },
 	{ "superfx",         le,  0, []() -> util::disasm_interface * { return new superfx_disassembler(&superfx_unidasm); } },
 	{ "t11",             le,  0, []() -> util::disasm_interface * { return new t11_disassembler; } },
+    { "t6m53",           be,  0, []() -> util::disasm_interface * { return new t6m53_disassembler; } },
 	{ "tlcs870",         le,  0, []() -> util::disasm_interface * { return new tlcs870_disassembler; } },
 	{ "tlcs900",         le,  0, []() -> util::disasm_interface * { return new tlcs900_disassembler; } },
 	{ "tmp90c051",       le,  0, []() -> util::disasm_interface * { return new tmp90c051_disassembler; } },

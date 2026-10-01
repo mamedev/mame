@@ -132,7 +132,7 @@ public:
 		, m_mb(*this, "mb")
 	{ }
 
-	void tetriskr(machine_config &config);
+	void tetriskr(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

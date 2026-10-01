@@ -54,7 +54,7 @@ private:
 	class state_item
 	{
 	public:
-		state_item(int index, const char *name, u8 valuechars);
+		template <typename T> state_item(int index, T &&name, u8 valuechars);
 		state_item(const state_item &) = default;
 		state_item(state_item &&) = default;
 		state_item &operator=(const state_item &) = default;

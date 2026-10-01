@@ -571,7 +571,7 @@ void cmd_hd_device::cbm_iec_reset(int state)
 {
 	if (m_sb_reset_ena && !state)
 	{
-		device_reset();
+		reset();
 	}
 }
 

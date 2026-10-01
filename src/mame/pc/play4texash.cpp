@@ -43,7 +43,7 @@ public:
 	{ }
 
 
-	void play4texash(machine_config &config);
+	void play4texash(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

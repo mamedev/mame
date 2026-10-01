@@ -47,11 +47,11 @@ public:
 	template <unsigned N> DECLARE_INPUT_CHANGED_MEMBER(dtr_source);
 	template <unsigned N> DECLARE_INPUT_CHANGED_MEMBER(rts_source);
 
-	void dcebridge(machine_config &config);
+	void dcebridge(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void driver_start() override;
-	virtual void driver_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	template <unsigned N> void dcd(int state);
@@ -108,7 +108,7 @@ void dcebridge_state::dcebridge(machine_config &config)
 }
 
 
-void dcebridge_state::driver_start()
+void dcebridge_state::machine_start()
 {
 	save_item(NAME(m_dcd));
 	save_item(NAME(m_dsr));
@@ -116,7 +116,7 @@ void dcebridge_state::driver_start()
 }
 
 
-void dcebridge_state::driver_reset()
+void dcebridge_state::machine_reset()
 {
 	update_dtr<0>();
 	update_rts<0>();

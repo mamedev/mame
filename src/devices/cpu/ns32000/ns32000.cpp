@@ -205,7 +205,7 @@ template <int HighBits, int Width> void ns32000_device<HighBits, Width>::device_
 
 	// general registers
 	for (unsigned i = 0; i < 8; i++)
-		state_add(index++, util::string_format("R%d", i).c_str(), m_r[i]);
+		state_add(index++, util::string_format("R%d", i), m_r[i]);
 
 	// floating point registers
 	if (m_fpu)

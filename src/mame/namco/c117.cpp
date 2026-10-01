@@ -37,9 +37,9 @@ namco_c117_device::namco_c117_device(const machine_config &mconfig, const char *
 	device_t(mconfig, NAMCO_C117, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_subres_cb(*this),
+	m_watchdog_cb(*this),
 	m_program_config("program", ENDIANNESS_BIG, 8, 23),
-	m_cpuexec{ { *this, finder_base::DUMMY_TAG }, { *this, finder_base::DUMMY_TAG } },
-	m_watchdog(*this, "watchdog")
+	m_cpuexec{ { *this, finder_base::DUMMY_TAG }, { *this, finder_base::DUMMY_TAG } }
 {
 }
 
@@ -86,19 +86,10 @@ void namco_c117_device::device_reset()
 
 	m_subres = m_wdog = 0;
 	m_subres_cb(ASSERT_LINE);
+	m_watchdog_cb(CLEAR_LINE);
 
 	// reset the main CPU so it picks up the reset vector from the correct bank
 	m_cpuexec[0]->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-}
-
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-void namco_c117_device::device_add_mconfig(machine_config &config)
-{
-	WATCHDOG_TIMER(config, m_watchdog);
 }
 
 
@@ -126,14 +117,6 @@ void namco_c117_device::sub_w(offs_t offset, uint8_t data)
 		m_program.write_byte(remap(1, offset), data);
 	else
 		register_w(1, offset, data);
-}
-
-// FIXME: the sound CPU watchdog is probably in CUS121, and definitely isn't in CUS117
-// however, until the watchdog is a device and it's possible to have two independent
-// watchdogs in a machine, it's easiest to handle it here
-void namco_c117_device::sound_watchdog_w(uint8_t data)
-{
-	kick_watchdog(2);
 }
 
 
@@ -164,7 +147,7 @@ void namco_c117_device::register_w(int whichcpu, offs_t offset, uint8_t data)
 				unknown_reg = true;
 			break;
 		case 9:  // F200 - kick watchdog
-			kick_watchdog(whichcpu);
+			m_watchdog_cb(whichcpu);
 			break;
 //      case 10: // F400 - unknown but used
 //          break;
@@ -202,18 +185,4 @@ void namco_c117_device::bankswitch(int whichcpu, int whichbank, int a0, uint8_t 
 		bank = (bank & 0x1fe000) | ((data & 0x03) * 0x200000);
 	else
 		bank = (bank & 0x600000) | (data * 0x2000);
-}
-
-void namco_c117_device::kick_watchdog(int whichcpu)
-{
-	// FIXME: change to 3 once sound CPU watchdog is separated from this device
-	static const int ALL_CPU_MASK = 7;
-
-	m_wdog |= (1 << whichcpu);
-
-	if (m_wdog == ALL_CPU_MASK || !m_subres)
-	{
-		m_wdog = 0;
-		m_watchdog->watchdog_reset();
-	}
 }

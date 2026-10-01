@@ -38,6 +38,8 @@ protected:
 	void rts(s32 param);
 
 private:
+	TIMER_CALLBACK_MEMBER(rx_timeout);
+
 	devcb_write_line m_clk_cb;
 	devcb_write_line m_txd_cb;
 
@@ -47,6 +49,7 @@ private:
 	devcb_write_line m_tx_cb;
 
 	// state machine
+	emu_timer *m_rx_timeout;
 	emu_timer *m_rts;
 	u8 m_state;
 

@@ -149,6 +149,9 @@ license:CC0-1.0
 		<description>Big Blue Reader 128 v4.10</description>
 		<year>1993</year>
 		<publisher>SOGWAP</publisher>
+		<notes><![CDATA[
+Before loading FORMAT.128, disable automatic write verification with this command: OPEN9,9,15,"U0>V1":CLOSE9. Otherwise MS-DOS disk formatting fails.
+]]></notes>
 		<info name="protection" value="none" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
@@ -793,6 +796,19 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="lunix-c128-reu.d64" size="174848" crc="234af728" sha1="741127341c1bef3dbe5f137680f6df2547f5d02e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vdcmaniac" supported="no">
+		<description>vdcmaniac (v1.0.2)</description>
+		<year>2026</year>
+		<publisher>xahmol</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="vdcmaniac.d81" size="819200" crc="da64c227" sha1="9f81e9a10274f514b74b54c980f532cc23862ad0" />
 			</dataarea>
 		</part>
 	</software>

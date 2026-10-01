@@ -404,6 +404,7 @@ void poker72_state::init_poker72()
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x8000);
 	m_rombank->set_entry(0);
 
+	// HACK: what is this for?
 	//rom[0x4a9] = 0x28;
 	rom[0x4aa] = 0x00;
 }

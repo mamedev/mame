@@ -43,6 +43,95 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// ======================> vic20_expansion_window
+
+class vic20_expansion_window
+{
+public:
+	class variant
+	{
+	public:
+		void install_rom(offs_t start, offs_t end, void *baseptr) { install_rom(start, end, 0, baseptr); }
+		void install_rom(offs_t start, offs_t end, offs_t mirror, void *baseptr)
+		{ install([&] (address_space_installer &space, offs_t base) { space.install_rom(base + start, base + end, mirror, baseptr); }); }
+
+		void install_writeonly(offs_t start, offs_t end, void *baseptr) { install_writeonly(start, end, 0, baseptr); }
+		void install_writeonly(offs_t start, offs_t end, offs_t mirror, void *baseptr)
+		{ install([&] (address_space_installer &space, offs_t base) { space.install_writeonly(base + start, base + end, mirror, baseptr); }); }
+
+		void install_ram(offs_t start, offs_t end, void *baseptr) { install_ram(start, end, 0, baseptr); }
+		void install_ram(offs_t start, offs_t end, offs_t mirror, void *baseptr)
+		{ install([&] (address_space_installer &space, offs_t base) { space.install_ram(base + start, base + end, mirror, baseptr); }); }
+
+		void install_read_bank(offs_t start, offs_t end, memory_bank *bank) { install_read_bank(start, end, 0, bank); }
+		void install_read_bank(offs_t start, offs_t end, offs_t mirror, memory_bank *bank)
+		{ install([&] (address_space_installer &space, offs_t base) { space.install_read_bank(base + start, base + end, mirror, bank); }); }
+
+		void install_readwrite_bank(offs_t start, offs_t end, memory_bank *bank) { install_readwrite_bank(start, end, 0, bank); }
+		void install_readwrite_bank(offs_t start, offs_t end, offs_t mirror, memory_bank *bank)
+		{ install([&] (address_space_installer &space, offs_t base) { space.install_readwrite_bank(base + start, base + end, mirror, bank); }); }
+
+		template <typename R> void install_read_handler(offs_t start, offs_t end, R &&rhandler) { install_read_handler(start, end, 0, std::forward<R>(rhandler)); }
+		template <typename R> void install_read_handler(offs_t start, offs_t end, offs_t mirror, R &&rhandler)
+		{ install([&] (address_space_installer &space, offs_t base) { space.install_read_handler(base + start, base + end, 0, mirror, 0, rhandler); }); }
+
+		template <typename W> void install_write_handler(offs_t start, offs_t end, W &&whandler) { install_write_handler(start, end, 0, std::forward<W>(whandler)); }
+		template <typename W> void install_write_handler(offs_t start, offs_t end, offs_t mirror, W &&whandler)
+		{ install([&] (address_space_installer &space, offs_t base) { space.install_write_handler(base + start, base + end, 0, mirror, 0, whandler); }); }
+
+		template <typename R, typename W> void install_readwrite_handler(offs_t start, offs_t end, R &&rhandler, W &&whandler) { install_readwrite_handler(start, end, 0, std::forward<R>(rhandler), std::forward<W>(whandler)); }
+		template <typename R, typename W> void install_readwrite_handler(offs_t start, offs_t end, offs_t mirror, R &&rhandler, W &&whandler)
+		{ install([&] (address_space_installer &space, offs_t base) { space.install_readwrite_handler(base + start, base + end, 0, mirror, 0, rhandler, whandler); }); }
+
+	private:
+		friend class vic20_expansion_window;
+
+		variant(vic20_expansion_window &window, int slot) : m_window(window), m_slot(slot) { }
+
+		template <typename F> void install(F &&f)
+		{
+			f(m_window.m_view[m_slot], m_window.m_start);
+
+			if (m_window.m_video_installed)
+				f(m_window.m_video_view[m_slot], m_window.m_video_start);
+		}
+
+		vic20_expansion_window &m_window;
+		int const m_slot;
+	};
+
+	vic20_expansion_window(device_t &device, const char *name, offs_t start, offs_t end);
+	vic20_expansion_window(device_t &device, const char *name, offs_t start, offs_t end, offs_t video_start);
+
+	variant operator[](int slot) { return variant(*this, slot); }
+
+	void select(int slot);
+	void unmap();
+
+	template <typename... T> void install_rom(T &&... args) { (*this)[0].install_rom(std::forward<T>(args)...); select(0); }
+	template <typename... T> void install_writeonly(T &&... args) { (*this)[0].install_writeonly(std::forward<T>(args)...); select(0); }
+	template <typename... T> void install_ram(T &&... args) { (*this)[0].install_ram(std::forward<T>(args)...); select(0); }
+	template <typename... T> void install_read_bank(T &&... args) { (*this)[0].install_read_bank(std::forward<T>(args)...); select(0); }
+	template <typename... T> void install_readwrite_bank(T &&... args) { (*this)[0].install_readwrite_bank(std::forward<T>(args)...); select(0); }
+	template <typename... T> void install_read_handler(T &&... args) { (*this)[0].install_read_handler(std::forward<T>(args)...); select(0); }
+	template <typename... T> void install_write_handler(T &&... args) { (*this)[0].install_write_handler(std::forward<T>(args)...); select(0); }
+	template <typename... T> void install_readwrite_handler(T &&... args) { (*this)[0].install_readwrite_handler(std::forward<T>(args)...); select(0); }
+
+private:
+	friend class vic20_expansion_slot_device;
+
+	void install_views(address_space &program, address_space *video);
+
+	memory_view m_view;
+	memory_view m_video_view;
+	offs_t const m_start;
+	offs_t const m_end;
+	offs_t const m_video_start;
+	bool const m_has_video;
+	bool m_video_installed;
+};
+
+
 // ======================> vic20_expansion_slot_device
 
 class device_vic20_expansion_card_interface;
@@ -61,17 +150,26 @@ public:
 	}
 	vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void add_passthrough(machine_config &config, const char *_tag);
+	static void add_passthrough(machine_config &config, const char *tag);
+
+	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_video_space(T &&tag, int spacenum) { m_video.set_tag(std::forward<T>(tag), spacenum); }
 
 	auto irq_wr_callback() { return m_write_irq.bind(); }
 	auto nmi_wr_callback() { return m_write_nmi.bind(); }
 	auto res_wr_callback() { return m_write_res.bind(); }
 
-	// computer interface
-	uint8_t cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);
-	void cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);
-
 	// cartridge interface
+	vic20_expansion_window &ram1() { return m_root->m_ram1; }
+	vic20_expansion_window &ram2() { return m_root->m_ram2; }
+	vic20_expansion_window &ram3() { return m_root->m_ram3; }
+	vic20_expansion_window &blk1() { return m_root->m_blk1; }
+	vic20_expansion_window &blk2() { return m_root->m_blk2; }
+	vic20_expansion_window &blk3() { return m_root->m_blk3; }
+	vic20_expansion_window &blk5() { return m_root->m_blk5; }
+	vic20_expansion_window &io2() { return m_root->m_io2; }
+	vic20_expansion_window &io3() { return m_root->m_io3; }
+
 	void irq_w(int state) { m_write_irq(state); }
 	void nmi_w(int state) { m_write_nmi(state); }
 	void res_w(int state) { m_write_res(state); }
@@ -79,7 +177,6 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;
@@ -91,11 +188,31 @@ protected:
 	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
+	std::error_condition load_region(util::random_read &file, const char *tag, offs_t offset, size_t length);
+
+	optional_address_space m_program;
+	optional_address_space m_video;
+
 	devcb_write_line   m_write_irq;
 	devcb_write_line   m_write_nmi;
 	devcb_write_line   m_write_res;
 
 	device_vic20_expansion_card_interface *m_card;
+
+private:
+	vic20_expansion_slot_device *find_root(device_t *owner);
+
+	vic20_expansion_slot_device *const m_root;
+
+	vic20_expansion_window m_ram1;
+	vic20_expansion_window m_ram2;
+	vic20_expansion_window m_ram3;
+	vic20_expansion_window m_blk1;
+	vic20_expansion_window m_blk2;
+	vic20_expansion_window m_blk3;
+	vic20_expansion_window m_blk5;
+	vic20_expansion_window m_io2;
+	vic20_expansion_window m_io3;
 };
 
 
@@ -110,18 +227,13 @@ public:
 	// construction/destruction
 	virtual ~device_vic20_expansion_card_interface();
 
-	virtual uint8_t vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { return data; }
-	virtual void vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { }
-
 protected:
 	device_vic20_expansion_card_interface(const machine_config &mconfig, device_t &device);
 
-	std::unique_ptr<uint8_t[]> m_blk1;
-	std::unique_ptr<uint8_t[]> m_blk2;
-	std::unique_ptr<uint8_t[]> m_blk3;
-	std::unique_ptr<uint8_t[]> m_blk5;
+	vic20_expansion_slot_device *m_slot;
 
-	vic20_expansion_slot_device *const m_slot;
+private:
+	void set_slot(vic20_expansion_slot_device &slot) { m_slot = &slot; }
 };
 
 

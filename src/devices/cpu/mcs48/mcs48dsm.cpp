@@ -194,13 +194,8 @@ offs_t mcs48_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 					else
 						util::stream_format(stream, "illegal");
 			break;
-		case 0x76:  if (!m_i802x)
-					{
-						util::stream_format(stream, "jf1  $%03X", ((pc + 1) & 0x700) | params.r8(cpc++));
-						flags = STEP_COND;
-					}
-					else
-						util::stream_format(stream, "illegal");
+		case 0x76:  util::stream_format(stream, m_i802x ? "jnc  $%03X" : "jf1  $%03X", ((pc + 1) & 0x700) | params.r8(cpc++));
+					flags = STEP_COND;
 			break;
 		case 0x77:      util::stream_format(stream, "rr   a");                                              break;
 		case 0x78:      util::stream_format(stream, "addc a,r0");                                           break;

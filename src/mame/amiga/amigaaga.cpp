@@ -589,6 +589,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		11,
 		11,
 		// fmode 3: dxgalaga (title) wants +20, fatman_a (title) +24
+		// TODO: chaose_a wants +60/+61 (!) in gameplay
 		24
 	};
 	const int default_bit_offset[] = { 15, 31, 31, 63 };

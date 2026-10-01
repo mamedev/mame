@@ -164,6 +164,9 @@ protected:
 	uint32_t m_joystick_data = 0;
 
 private:
+	// External 16-bit transfer latches: Tom/GPU, Jerry/DSP.
+	u32 m_risc_read_latch[2]{};
+	u16 m_risc_write_latch[2]{};
 	uint32_t m_misc_control_data = 0;
 	bool m_eeprom_enable = false;
 	uint32_t *m_gpu_jump_address = 0;
@@ -229,22 +232,16 @@ private:
 	[[maybe_unused]] uint32_t main_gpu_wait_r();
 	[[maybe_unused]] void area51_main_speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	[[maybe_unused]] void area51mx_main_speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint16_t gpuctrl_r16(offs_t offset, uint16_t mem_mask = ~0);
-	void gpuctrl_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template <unsigned Which> u16 risc_host_r(offs_t offset);
+	template <unsigned Which> void risc_host_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	uint16_t blitter_r16(offs_t offset, uint16_t mem_mask = ~0);
 	void blitter_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t serial_r16(offs_t offset);
-	void serial_w16(offs_t offset, uint16_t data);
-	uint16_t dspctrl_r16(offs_t offset, uint16_t mem_mask = ~0);
-	void dspctrl_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t joystick_r16(offs_t offset);
 	void joystick_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t shared_ram_r(offs_t offset);
 	void shared_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t rom_base_r(offs_t offset);
 	uint32_t wave_rom_r(offs_t offset);
-	uint32_t dsp_ram_r(offs_t offset);
-	void dsp_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t gpu_clut_r(offs_t offset);
 	void gpu_clut_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t gpu_ram_r(offs_t offset);
@@ -252,8 +249,6 @@ private:
 	uint16_t shared_ram_r16(offs_t offset);
 	void shared_ram_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t cart_base_r16(offs_t offset);
-	uint16_t dsp_ram_r16(offs_t offset);
-	void dsp_ram_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t gpu_clut_r16(offs_t offset);
 	void gpu_clut_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t gpu_ram_r16(offs_t offset);

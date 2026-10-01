@@ -38,12 +38,14 @@ enum gdb_register_type
 	TYPE_CODE_POINTER,
 	TYPE_DATA_POINTER,
 	TYPE_I387_EXT,
+	TYPE_UINT,      // described as uint<bitsize>, so a segment register does not print as negative
 };
 static const char *const gdb_register_type_str[] = {
 	"int",
 	"code_ptr",
 	"data_ptr",
 	"i387_ext",
+	"uint",
 };
 struct gdb_register_map
 {
@@ -53,6 +55,7 @@ struct gdb_register_map
 		const char *feature_name;
 		struct gdb_register_description
 		{
+			// a null state_name is a placeholder: reads zero, ignores writes, override_bitsize required
 			const char *state_name;
 			const char *gdb_name;
 			bool stop_packet;
@@ -125,6 +128,55 @@ static const gdb_register_map gdb_register_map_i486 =
 				{ "EAX",     "foseg",  false, TYPE_INT },
 				{ "EAX",     "fooff",  false, TYPE_INT },
 				{ "EAX",     "fop",    false, TYPE_INT },
+			}
+		}
+	}
+};
+
+//-------------------------------------------------------------------------
+// The NEC V20/V30 family seen as an 8086 with NEC's register names; fs, gs and
+// the x87 are placeholders because GDB will not take an i386 core without them.
+static const gdb_register_map gdb_register_map_nec =
+{
+	"i8086",
+	{
+		{
+			"org.gnu.gdb.i386.core",
+			{
+				{ "AW",    "eax",    false, TYPE_UINT },
+				{ "CW",    "ecx",    false, TYPE_UINT },
+				{ "DW",    "edx",    false, TYPE_UINT },
+				{ "BW",    "ebx",    false, TYPE_UINT },
+				// not data_ptr: GDB would size it by the 32-bit pointer width and misalign the g packet
+				{ "SP",    "esp",    true,  TYPE_UINT },
+				{ "BP",    "ebp",    true,  TYPE_UINT },
+				{ "IX",    "esi",    false, TYPE_UINT },
+				{ "IY",    "edi",    false, TYPE_UINT },
+				{ "GENPC", "eip",    true,  TYPE_CODE_POINTER, 32 },
+				// 16 bits on every core, though one exports it through a 32-bit temporary
+				{ "PSW",   "eflags", false, TYPE_UINT, 16 },
+				{ "PS",    "cs",     false, TYPE_UINT },
+				{ "SS",    "ss",     false, TYPE_UINT },
+				{ "DS0",   "ds",     false, TYPE_UINT },
+				{ "DS1",   "es",     false, TYPE_UINT },
+				{ nullptr, "fs",     false, TYPE_INT, 32 },
+				{ nullptr, "gs",     false, TYPE_INT, 32 },
+				{ nullptr, "st0",    false, TYPE_I387_EXT, 80 },
+				{ nullptr, "st1",    false, TYPE_I387_EXT, 80 },
+				{ nullptr, "st2",    false, TYPE_I387_EXT, 80 },
+				{ nullptr, "st3",    false, TYPE_I387_EXT, 80 },
+				{ nullptr, "st4",    false, TYPE_I387_EXT, 80 },
+				{ nullptr, "st5",    false, TYPE_I387_EXT, 80 },
+				{ nullptr, "st6",    false, TYPE_I387_EXT, 80 },
+				{ nullptr, "st7",    false, TYPE_I387_EXT, 80 },
+				{ nullptr, "fctrl",  false, TYPE_INT, 32 },
+				{ nullptr, "fstat",  false, TYPE_INT, 32 },
+				{ nullptr, "ftag",   false, TYPE_INT, 32 },
+				{ nullptr, "fiseg",  false, TYPE_INT, 32 },
+				{ nullptr, "fioff",  false, TYPE_INT, 32 },
+				{ nullptr, "foseg",  false, TYPE_INT, 32 },
+				{ nullptr, "fooff",  false, TYPE_INT, 32 },
+				{ nullptr, "fop",    false, TYPE_INT, 32 },
 			}
 		}
 	}
@@ -653,6 +705,16 @@ static const gdb_register_map gdb_register_map_psxcpu =
 //-------------------------------------------------------------------------
 static const std::map<std::string, const gdb_register_map &> gdb_register_maps = {
 	{ "i486",       gdb_register_map_i486 },
+	{ "v20",        gdb_register_map_nec },
+	{ "v30",        gdb_register_map_nec },
+	{ "v33",        gdb_register_map_nec },
+	{ "v33a",       gdb_register_map_nec },
+	{ "v25",        gdb_register_map_nec },
+	{ "v35",        gdb_register_map_nec },
+	{ "v40",        gdb_register_map_nec },
+	{ "v50",        gdb_register_map_nec },
+	{ "v53",        gdb_register_map_nec },
+	{ "v53a",       gdb_register_map_nec },
 	{ "arm7_le",    gdb_register_map_arm7 },
 	{ "r4600",      gdb_register_map_r4600 },
 	{ "ppc601",     gdb_register_map_ppc601 },
@@ -810,7 +872,8 @@ private:
 		int gdb_regnum;
 		gdb_register_type gdb_type;
 		int gdb_bitsize;
-		const device_state_entry *state_entry;
+		const device_state_entry *state_entry;  // nullptr for a placeholder
+		bool is_placeholder() const { return state_entry == nullptr; }
 	};
 	std::vector<gdb_register> m_gdb_registers;
 	std::set<int> m_stop_reply_registers;
@@ -926,11 +989,12 @@ void debug_gdbstub::generate_target_xml()
 			target_xml += string_format("  <feature name=\"%s\">\n", feature_name);
 		}
 
+		std::string const type_name = (reg.gdb_type == TYPE_UINT) ? string_format("uint%d", reg.gdb_bitsize) : std::string(gdb_register_type_str[reg.gdb_type]);
 		// the group is the device's absolute path (the feature name without its "mame." prefix)
 		if ( reg.gdb_feature_name.compare(0, 5, "mame.") == 0 )
-			target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\" group=\"%s\"/>\n", reg.gdb_name, reg.gdb_bitsize, gdb_register_type_str[reg.gdb_type], reg.gdb_feature_name.c_str() + 5);
+			target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\" group=\"%s\"/>\n", reg.gdb_name, reg.gdb_bitsize, type_name, reg.gdb_feature_name.c_str() + 5);
 		else
-			target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\"/>\n", reg.gdb_name, reg.gdb_bitsize, gdb_register_type_str[reg.gdb_type]);
+			target_xml += string_format("    <reg name=\"%s\" bitsize=\"%d\" type=\"%s\"/>\n", reg.gdb_name, reg.gdb_bitsize, type_name);
 	}
 	if (!feature_name.empty())
 		target_xml += "  </feature>\n";
@@ -984,31 +1048,38 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 			for ( const auto &reg: feature.registers )
 			{
 				const device_state_entry *entry_found = nullptr;
-				for ( const auto &entry: m_state->state_entries() )
-					if ( strcmp(entry->symbol(), reg.state_name) == 0 )
-					{
-						entry_found = entry.get();
-						break;
-					}
-				if ( entry_found != nullptr )
+				if ( reg.state_name != nullptr )
 				{
-					gdb_register new_reg;
-					new_reg.gdb_feature_name = feature.feature_name;
-					new_reg.gdb_name = reg.gdb_name;
-					new_reg.gdb_regnum = cur_gdb_regnum;
-					new_reg.gdb_type = reg.gdb_type;
-					if ( reg.override_bitsize != -1 )
-						new_reg.gdb_bitsize = reg.override_bitsize;
-					else
-						new_reg.gdb_bitsize = entry_found->datasize() * 8;
-					new_reg.state_entry = entry_found;
-					m_gdb_registers.push_back(std::move(new_reg));
-					if ( reg.stop_packet )
-						m_stop_reply_registers.insert(cur_gdb_regnum);
-					cur_gdb_regnum++;
+					for ( const auto &entry: m_state->state_entries() )
+						if ( entry->symbol() == reg.state_name )
+						{
+							entry_found = entry.get();
+							break;
+						}
+					if ( entry_found == nullptr )
+					{
+						osd_printf_info("gdbstub: could not find register [%s]\n", reg.gdb_name);
+						continue;
+					}
 				}
+				else if ( reg.override_bitsize <= 0 || (reg.override_bitsize % 8) != 0 )
+				{
+					fatalerror("gdbstub: placeholder register [%s] needs a bitsize that is a multiple of 8\n", reg.gdb_name);
+				}
+				gdb_register new_reg;
+				new_reg.gdb_feature_name = feature.feature_name;
+				new_reg.gdb_name = reg.gdb_name;
+				new_reg.gdb_regnum = cur_gdb_regnum;
+				new_reg.gdb_type = reg.gdb_type;
+				if ( reg.override_bitsize != -1 )
+					new_reg.gdb_bitsize = reg.override_bitsize;
 				else
-					osd_printf_info("gdbstub: could not find register [%s]\n", reg.gdb_name);
+					new_reg.gdb_bitsize = entry_found->datasize() * 8;
+				new_reg.state_entry = entry_found;
+				m_gdb_registers.push_back(std::move(new_reg));
+				if ( reg.stop_packet )
+					m_stop_reply_registers.insert(cur_gdb_regnum);
+				cur_gdb_regnum++;
 			}
 
 		// append the visible state entries of every other device
@@ -1300,6 +1371,8 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_M(const char *buf)
 	for ( int i = 0; i < length; i++ )
 		tspace->write_byte(offset + i, data[i]);
 
+	m_machine->debugger().refresh_display();
+
 	return REPLY_OK;
 }
 
@@ -1368,6 +1441,7 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 		text_buffer &textbuf = m_debugger_console->get_console_textbuf();
 		text_buffer_clear(textbuf);
 		m_debugger_console->execute_command(command, false);
+		m_machine->debugger().refresh_display();
 		uint32_t nlines = text_buffer_num_lines(textbuf);
 		if ( nlines == 0 )
 			return REPLY_OK;
@@ -1661,6 +1735,8 @@ void debug_gdbstub::handle_packet()
 std::string debug_gdbstub::get_register_string(int gdb_regnum)
 {
 	const gdb_register &reg = m_gdb_registers[gdb_regnum];
+	if ( reg.is_placeholder() )
+		return std::string(reg.gdb_bitsize / 4, '0');
 	const char *fmt = (reg.gdb_bitsize == 64) ? "%016" PRIx64
 					: (reg.gdb_bitsize == 32) ? "%08"  PRIx64
 					: (reg.gdb_bitsize == 16) ? "%04"  PRIx64
@@ -1682,6 +1758,13 @@ std::string debug_gdbstub::get_register_string(int gdb_regnum)
 bool debug_gdbstub::parse_register_string(uint64_t *pvalue, const char *buf, int gdb_regnum)
 {
 	const gdb_register &reg = m_gdb_registers[gdb_regnum];
+	if ( reg.is_placeholder() )
+	{
+		if ( strlen(buf) < size_t(reg.gdb_bitsize / 4) )
+			return false;
+		*pvalue = 0;
+		return true;
+	}
 	const char *fmt = (reg.gdb_bitsize == 64) ? "%016" PRIx64
 					: (reg.gdb_bitsize == 32) ? "%08"  PRIx64
 					: (reg.gdb_bitsize == 16) ? "%04"  PRIx64
@@ -1704,6 +1787,8 @@ bool debug_gdbstub::parse_register_string(uint64_t *pvalue, const char *buf, int
 void debug_gdbstub::set_register_value(int gdb_regnum, uint64_t value)
 {
 	const gdb_register &reg = m_gdb_registers[gdb_regnum];
+	if ( reg.is_placeholder() )
+		return;
 	reg.state_entry->set_value(value);
 }
 

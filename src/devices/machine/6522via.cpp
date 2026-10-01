@@ -736,7 +736,10 @@ u8 via6522_device::read(offs_t offset)
 		}
 		if (m_t2_active && m_t2->enabled())
 		{
-			val = uint16_t(attotime_to_clocks(m_t2->remaining()) - IFR_DELAY) & 0xff;
+			// Do not wrap before t2_tick sets IFR.  Mac OS reads T2CH, then IFR,
+			// and skips T2CL if the high byte is zero.  An early wrap makes it
+			// read T2CL and clear a newly arrived interrupt without servicing it.
+			val = std::max<s64>(0, s64(attotime_to_clocks(m_t2->remaining())) - IFR_DELAY) & 0xff;
 		}
 		else
 		{
@@ -754,7 +757,8 @@ u8 via6522_device::read(offs_t offset)
 	case VIA_T2CH:
 		if (m_t2_active && m_t2->enabled())
 		{
-			val = uint16_t(attotime_to_clocks(m_t2->remaining()) - IFR_DELAY) >> 8;
+			// Hold at zero through the delayed IFR window, as for T2CL.
+			val = std::max<s64>(0, s64(attotime_to_clocks(m_t2->remaining())) - IFR_DELAY) >> 8;
 		}
 		else
 		{

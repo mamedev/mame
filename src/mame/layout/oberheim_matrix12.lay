@@ -1,0 +1,1858 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:m1macrophage
+-->
+<mamelayout version="2">
+	<element name="txt_master">
+		<rect><color red="0.30" green="0.30" blue="0.30"/></rect>
+		<text string=" MASTER" align="1"><color red="0.80" green="0.80" blue="0.80"/></text>
+	</element>
+	<element name="txt_volume"><text string="VOLUME"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_tune_page"><text string="TUNE PAGE"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_master_page"><text string="MASTER PAGE"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+
+	<element name="txt_programmer">
+		<rect><color red="0.30" green="0.30" blue="0.30"/></rect>
+		<text string=" PROGRAMMER" align="1"><color red="0.80" green="0.80" blue="0.80"/></text>
+	</element>
+	<element name="txt_patch_l"><text string="PATCH" align="1"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_patch_name"><text string="PATCH NAME" align="1"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_voice"><text string="VOICE"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_voice_1"><text string="1-2"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_voice_2"><text string="3-4"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_voice_3"><text string="5-6"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_voice_4"><text string="7-8"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_voice_5"><text string="9-10"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_voice_6"><text string="11-12"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_curr_page"><text string="CURRENT PAGE" align="1"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_modulation_page">
+		<text string="MODULATION PAGE" align="2"><color red="0.65" green="0.80" blue="0.40"/></text>
+	</element>
+	<element name="txt_multi_patch_page">
+		<text string="MULTI PATCH PAGE" align="1"><color red="0.70" green="0.70" blue="0.70"/></text>
+	</element>
+	<element name="txt_single"><text string="SINGLE"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_patch"><text string="PATCH"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_multi_grey"><text string="MULTI"><color red="0.70" green="0.70" blue="0.70"/></text></element>
+	<element name="txt_patch_grey"><text string="PATCH"><color red="0.70" green="0.70" blue="0.70"/></text></element>
+	<element name="txt_store"><text string="STORE"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_patch_edit"><text string="PATCH EDIT"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_voices_1_6"><text string="VOICES 1-6" align="1"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_voices_7_12"><text string="VOICES 7-12" align="1"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+
+	<element name="txt_plus"><text string="+"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_minus"><text string="-"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<repeat count="10">
+		<param name="num" start="0" increment="1"/>
+		<element name="txt_~num~"><text string="~num~"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	</repeat>
+
+	<element name="txt_mod_src_x_sel">
+		<rect><color red="0.30" green="0.30" blue="0.30"/></rect>
+		<text string=" MODULATION SOURCE/X SELECT" align="1"><color red="0.80" green="0.80" blue="0.80"/></text>
+	</element>
+	<element name="txt_mod_src_sel">
+		<text string="MODULATION SOURCE SELECT" align="1"><color red="0.90" green="0.90" blue="0.90"/></text>
+	</element>
+	<element name="txt_x_sel"><text string="X SELECT" align="1"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_release"><text string="RELEASE"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_mod_label_a1"><text string="LEVER 1"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_mod_label_a2"><text string="LEVER 2"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_mod_label_a3"><text string="PEDAL 1"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_mod_label_a4"><text string="PEDAL 2"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_mod_label_a5"><text string="VIB"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_mod_label_a6"><text string="KEYBOARD"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_mod_label_a7"><text string="LAG"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_mod_label_a8"><text string="VELOCITY"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_mod_label_b1"><text string="VELOCITY"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_mod_label_b2"><text string="PRESSURE"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_mod_label_b3"><text string="ENV X"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_mod_label_b4"><text string="LFO X"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_mod_label_b5"><text string="TRACK X"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_mod_label_b6"><text string="RAMP X"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_sel_label_b1"><text string="9"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_sel_label_b2"><text string="0"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_sel_label_b3"><text string="+"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_sel_label_b4"><text string="-"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_sel_label_b5"><text string="QUANTIZE"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_sel_label_b6"><text string="CLEAR"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+
+	<element name="txt_audio_out">
+		<rect><color red="0.30" green="0.30" blue="0.30"/></rect>
+		<text string="AUDIO OUT"><color red="0.90" green="0.90" blue="0.90"/></text>
+	</element>
+	<element name="txt_left"><text string="LEFT" align="1"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_mono"><text string="MONO"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_right"><text string="RIGHT" align="2"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+
+	<element name="txt_trigger"><text string="TRIGGER"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_trig_in"><text string="IN"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_pedal_input"><text string="PEDAL INPUT"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_advance"><text string="ADVANCE"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_chain"><text string="CHAIN"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+
+	<element name="txt_cassette"><text string="CASSETTE"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_to"><text string="TO" align="1"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_from"><text string="FROM" align="2"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+
+	<element name="txt_midi">
+		<rect><color red="0.30" green="0.30" blue="0.30"/></rect>
+		<text string="MIDI"><color red="0.90" green="0.90" blue="0.90"/></text>
+	</element>
+	<element name="txt_midi_in"><text string="IN" align="1"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_midi_out"><text string="OUT"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_midi_thru"><text string="THRU" align="2"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+
+	<element name="txt_mem_protect"><text string="MEMORY PROTECT"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_on"><text string="ON" align="1"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_off"><text string="OFF" align="1"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+
+	<element name="txt_page_mod">
+		<rect><color red="0.30" green="0.30" blue="0.30"/></rect>
+		<text string=" PAGE MODIFIER" align="1"><color red="0.80" green="0.80" blue="0.80"/></text>
+	</element>
+	<element name="txt_switch_mode"><text string="SWITCH MODE" align="1"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="txt_modulation"><text string="MODULATION" align="1"><color red="0.65" green="0.80" blue="0.40"/></text></element>
+	<element name="txt_page_select"><text string="PAGE SELECT" align="1"><color red="0.65" green="0.80" blue="0.40"/></text></element>
+	<element name="txt_on_off"><text string="ON / OFF" align="1"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_value_x"><text string="VALUE X" align="1"><color red="1.0" green="1.0" blue="1.0"/></text></element>
+	<element name="txt_page_2"><text string="PAGE 2" align="1"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+
+	<element name="txt_page_sel">
+		<rect><color red="0.30" green="0.30" blue="0.30"/></rect>
+		<text string=" SINGLE/MULTI PATCH PAGE SELECT" align="1"><color red="0.80" green="0.80" blue="0.80"/></text>
+	</element>
+	<element name="txt_levers">
+		<rect><color red="0.20" green="0.20" blue="0.20"/></rect>
+		<text string=" LEVERS" align="1"><color red="0.80" green="0.80" blue="0.80"/></text>
+	</element>
+
+	<element name="case_grey"><rect><color red="0.30" green="0.30" blue="0.30"/></rect></element>
+	<element name="case_dark"><rect><color red="0.20" green="0.20" blue="0.20"/></rect></element>
+	<element name="case_shadow"><rect><color red="0.10" green="0.10" blue="0.10"/></rect></element>
+	<element name="wood"><rect><color red="0.50" green="0.25" blue="0.10"/></rect></element>
+	<element name="dark_wood"><rect><color red="0.25" green="0.10" blue="0.05"/></rect></element>
+	<element name="blue_line"><rect><color red="0.25" green="0.50" blue="0.70"/></rect></element>
+	<element name="white_line"><rect><color red="0.75" green="0.75" blue="0.75"/></rect></element>
+	<element name="cyan_line"><rect><color red="0.65" green="0.75" blue="0.75"/></rect></element>
+	<element name="grey_line"><rect><color red="0.60" green="0.60" blue="0.60"/></rect></element>
+	<element name="green_line"><rect><color red="0.60" green="0.70" blue="0.30"/></rect></element>
+	<element name="black_rect"><rect><color red="0" green="0" blue="0"/></rect></element>
+	<element name="transparent"><rect><color red="0" green="0" blue="0" alpha="0"/></rect></element>
+
+	<element name="plugin_warning" defstate="1">
+		<rect state="1"><color red="1" green="1" blue="0" alpha="0.2"/></rect>
+		<text state="1" string="*** to control levers and knobs with a mouse, enable the layout plugin ***">
+			<color red="0.9" green="0.9" blue="0.9"/>
+		</text>
+	</element>
+
+	<element name="patch_edit_lines">
+		<image><data><![CDATA[
+			<svg width="150" height="28">
+				<g stroke="#a6bfbf" stroke-width="1" fill="none">
+					<polyline points=" 24,1  24,14  13,23  13,27"/>
+					<polyline points=" 45,1  45,14  38,20  38,27"/>
+					<polyline points=" 66,1  66,14  63,17  63,27"/>
+					<polyline points=" 84,1  84,14  87,17  87,27"/>
+					<polyline points="105,1 105,14 112,20 112,27"/>
+					<polyline points="126,1 126,14 137,23 137,27"/>
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="led">
+		<disk>
+			<color state="0" red="0.45" green="0.25" blue="0.25"/>
+			<color state="1" red="0.85" green="0.35" blue="0.40"/>
+		</disk>
+	</element>
+
+	<element name="button">
+		<image state="0"><data><![CDATA[
+			<svg width="25" height="25">
+				<rect x="0.5" y="0.5" width="24" height="24" rx="1" ry="1" fill="#393939" stroke="#000000" stroke-width="1"/>
+				<circle cx="12.5" cy="12.5" r="9" fill="#424242" stroke="#212121" stroke-width="1"/>
+			</svg>
+		]]></data></image>
+		<image state="1"><data><![CDATA[
+			<svg width="25" height="25">
+				<rect x="0.5" y="0.5" width="24" height="24" rx="1" ry="1" fill="#303030" stroke="#000000" stroke-width="1"/>
+				<circle cx="12.5" cy="12.5" r="8.5" fill="#353535" stroke="#212121" stroke-width="1"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="red_button">
+		<image state="0"><data><![CDATA[
+			<svg width="25" height="25">
+				<rect x="0.5" y="0.5" width="24" height="24" rx="2" ry="2" fill="#aa350f" stroke="#000000" stroke-width="1"/>
+				<circle cx="12.5" cy="12.5" r="9" fill="#b64624" stroke="#4a1505" stroke-width="1"/>
+			</svg>
+		]]></data></image>
+		<image state="1"><data><![CDATA[
+			<svg width="25" height="25">
+				<rect x="0.5" y="0.5" width="24" height="24" rx="1" ry="1" fill="#8e2c0c" stroke="#000000" stroke-width="1"/>
+				<circle cx="12.5" cy="12.5" r="8.5" fill="#91381c" stroke="#4a1505" stroke-width="1"/>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="knob">
+		<image state="0"><data><![CDATA[
+			<svg width="39" height="39">
+				<circle cx="19.5" cy="19.5" r="19.5" fill="#252525" stroke-width="0"/>
+				<circle cx="19.5" cy="19.5" r="9" fill="#424242" stroke="#303030" stroke-width="4"/>
+			</svg>
+		]]></data></image>
+		<image state="1"><data><![CDATA[
+			<svg width="39" height="39">
+				<circle cx="19.5" cy="19.5" r="19.5" fill="#303030" stroke-width="0"/>
+				<circle cx="19.5" cy="19.5" r="9" fill="#575757" stroke="#404040" stroke-width="4"/>
+				<polygon fill="#808080" points="1,19.5 7,16 7,23"/>
+				<polygon fill="#808080" points="38,19.5 32,16 32,23"/>
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="knob_dot"><disk><color red="0.70" green="0.70" blue="0.70"/></disk></element>
+	<element name="knob_value"><simplecounter digits="1"><color red="0.90" green="0.90" blue="0.90"/></simplecounter></element>
+
+	<group name="knob">
+		<element ref="knob" id="~knob_id~"><bounds x="0" y="0" width="39" height="39"/></element>
+		<element ref="knob_dot" id="~knob_id~_dot"><bounds x="17" y="3" width="5" height="5"/></element>
+	</group>
+
+	<element name="vfd_background"><rect><color red="0.05" green="0.50" blue="0.35"/></rect></element>
+	<element name="vfd_char"><led14seg><color red="0.00" green="1.00" blue="0.80"/></led14seg></element>
+	<element name="vfd_line">
+		<rect>
+			<color state="0" red="0.00" green="1.00" blue="0.80" alpha="0.13"/>
+			<color state="1" red="0.00" green="1.00" blue="0.80" alpha="0.80"/>
+		</rect>
+	</element>
+
+	<group name="vfd">
+		<element ref="vfd_background">
+			<bounds x="0" y="0" width="295" height="30"/>
+		</element>
+		<repeat count="40">
+			<param name="char_i" start="1" increment="1"/>
+			<param name="char_x" start="7" increment="7"/>
+			<element ref="vfd_char" name="vfd_~vfd_id~_char_~char_i~">
+				<bounds x="~char_x~" y="10" width="6" height="9"/>
+			</element>
+			<element ref="vfd_line" name="vfd_~vfd_id~_line_~char_i~">
+				<bounds x="~char_x~" y="22" width="5" height="1"/>
+			</element>
+		</repeat>
+	</group>
+
+	<element name="lever_well">
+		<rect>
+			<bounds x="0" y="0" width="70" height="80"/>
+			<color red="0.15" green="0.15" blue="0.15"/>
+		</rect>
+		<rect>
+			<bounds x="4" y="4" width="62" height="72"/>
+			<color red="0.00" green="0.00" blue="0.00"/>
+		</rect>
+	</element>
+	<element name="lever_bg"><rect><color red="0.10" green="0.10" blue="0.10"/></rect></element>
+	<element name="lever_knob"><rect><color red="0.20" green="0.20" blue="0.20"/></rect></element>
+
+	<group name="lever">
+		<element ref="lever_bg" id="~lever_id~"><bounds x="0" y="0" width="28" height="72"/></element>
+		<element ref="lever_knob" id="~lever_id~_knob">
+			<animate inputtag="~lever_id~" inputmask="0xffff"/>
+			<bounds state="100" x="0" y="0" width="28" height="14"/>
+			<bounds state="0" x="0" y="58" width="28" height="14"/>
+		</element>
+	</group>
+
+	<element name="whitekey">
+		<rect>
+			<color state="0" red="0.90" green="0.90" blue="0.90"/>
+			<color state="1" red="0.50" green="0.50" blue="0.50"/>
+		</rect>
+	</element>
+
+	<element name="blackkey">
+		<rect>
+			<bounds x="0" y="0" width="21" height="135"/>
+			<color red="0.05" green="0.05" blue="0.05"/>
+		</rect>
+		<rect>
+			<bounds x="2" y="8" width="17" height="125"/>
+			<color state="0" red="0.20" green="0.20" blue="0.20"/>
+			<color state="1" red="0.50" green="0.50" blue="0.50"/>
+		</rect>
+	</element>
+
+	<group name="keyboard_octave">
+		<bounds x="0" y="0" width="245" height="210"/>
+		<element ref="whitekey"><bounds x="1" y="0" width="33" height="210"/></element><!-- C -->
+		<element ref="whitekey"><bounds x="36" y="0" width="33" height="210"/></element><!-- D -->
+		<element ref="whitekey"><bounds x="71" y="0" width="33" height="210"/></element><!-- E -->
+		<element ref="whitekey"><bounds x="106" y="0" width="33" height="210"/></element><!-- F -->
+		<element ref="whitekey"><bounds x="141" y="0" width="33" height="210"/></element><!-- G -->
+		<element ref="whitekey"><bounds x="176" y="0" width="33" height="210"/></element><!-- A -->
+		<element ref="whitekey"><bounds x="211" y="0" width="33" height="210"/></element><!-- B -->
+		<element ref="blackkey"><bounds x="21" y="0" width="21" height="135"/></element><!-- C# -->
+		<element ref="blackkey"><bounds x="63" y="0" width="21" height="135"/></element><!-- D# -->
+		<element ref="blackkey"><bounds x="125" y="0" width="21" height="135"/></element><!-- F# -->
+		<element ref="blackkey"><bounds x="164" y="0" width="21" height="135"/></element><!-- G# -->
+		<element ref="blackkey"><bounds x="204" y="0" width="21" height="135"/></element><!-- A# -->
+	</group>
+
+	<group name="case">
+		<bounds x="0" y="0" width="1500" height="750"/>
+
+		<!-- Case -->
+
+		<element ref="wood"><bounds x="8" y="8" width="22" height="735"/></element>
+		<element ref="dark_wood"><bounds x="30" y="526" width="14" height="210"/></element>
+		<element ref="wood"><bounds x="1470" y="8" width="22" height="735"/></element>
+		<element ref="dark_wood"><bounds x="1456" y="526" width="14" height="210"/></element>
+
+		<element ref="case_dark"><bounds x="30" y="12" width="1440" height="22"/></element>
+		<element ref="case_grey"><bounds x="30" y="34" width="1440" height="386"/></element>
+		<element ref="case_dark"><bounds x="30" y="420" width="1440" height="86"/></element>
+		<element ref="case_shadow"><bounds x="30" y="506" width="1440" height="20"/></element>
+
+		<!-- I/O labels -->
+
+		<element ref="white_line"><bounds x="190" y="49" width="80" height="1"/></element>
+		<element ref="txt_audio_out"><bounds x="208" y="46" width="44" height="8"/></element>
+		<element ref="txt_left"><bounds x="190" y="37" width="24" height="6"/></element>
+		<element ref="txt_mono"><bounds x="215" y="37" width="30" height="6"/></element>
+		<element ref="txt_right"><bounds x="246" y="37" width="24" height="6"/></element>
+
+		<element ref="txt_trigger"><bounds x="814" y="37" width="36" height="6"/></element>
+		<element ref="txt_trig_in"><bounds x="814" y="43" width="36" height="6"/></element>
+		<element ref="txt_pedal_input"><bounds x="848" y="47" width="44" height="6"/></element>
+		<element ref="txt_1"><bounds x="850" y="37" width="8" height="6"/></element>
+		<element ref="txt_2"><bounds x="880" y="37" width="8" height="6"/></element>
+		<element ref="txt_advance"><bounds x="892" y="37" width="30" height="6"/></element>
+		<element ref="txt_chain"><bounds x="894" y="43" width="26" height="6"/></element>
+
+		<element ref="txt_cassette"><bounds x="1050" y="47" width="38" height="6"/></element>
+		<element ref="txt_to"><bounds x="1053" y="37" width="14" height="6"/></element>
+		<element ref="txt_from"><bounds x="1068" y="37" width="24" height="6"/></element>
+
+		<element ref="white_line"><bounds x="1115" y="49" width="90" height="1"/></element>
+		<element ref="txt_midi"><bounds x="1150" y="46" width="20" height="8"/></element>
+		<element ref="txt_midi_in"><bounds x="1115" y="37" width="14" height="6"/></element>
+		<element ref="txt_midi_out"><bounds x="1150" y="37" width="20" height="6"/></element>
+		<element ref="txt_midi_thru"><bounds x="1181" y="37" width="24" height="6"/></element>
+
+		<element ref="txt_mem_protect"><bounds x="1222" y="47" width="50" height="6"/></element>
+		<element ref="txt_on"><bounds x="1230" y="37" width="14" height="6"/></element>
+		<element ref="txt_off"><bounds x="1255" y="37" width="16" height="6"/></element>
+
+		<!-- Levers -->
+
+		<element ref="case_dark"><bounds x="44" y="526" width="148" height="210"/></element>
+
+		<element ref="blue_line"><bounds x="54" y="535" width="126" height="10"/></element>
+		<element ref="txt_levers"><bounds x="80" y="533" width="54" height="14"/></element>
+
+		<element ref="txt_2"><bounds x="92" y="563" width="15" height="8"/></element>
+		<element ref="txt_1"><bounds x="124" y="563" width="15" height="8"/></element>
+
+		<element ref="lever_well"><bounds x="78" y="574" width="70" height="80"/></element>
+		<param name="lever_id" value="lever_2"/>
+		<group ref="lever"><bounds x="84" y="578" width="28" height="72"/></group>
+		<param name="lever_id" value="lever_1"/>
+		<group ref="lever"><bounds x="114" y="578" width="28" height="72"/></group>
+
+		<element ref="blue_line"><bounds x="54" y="710" width="126" height="3"/></element>
+
+		<!-- Keyboard -->
+		<repeat count="5">
+			<param name="kbd_x" start="194" increment="245"/>
+			<group ref="keyboard_octave"><bounds x="~kbd_x~" y="526" width="245" height="210"/></group>
+		</repeat>
+		<element ref="whitekey"><bounds x="1420" y="526" width="33" height="210"/></element>
+	</group>
+
+	<group name="edit_panel">
+		<bounds x="0" y="0" width="1500" height="450"/>
+
+		<!-- *** "Master" section *** -->
+
+		<element ref="blue_line"><bounds x="188" y="68" width="305" height="10"/></element>
+		<element ref="txt_master"><bounds x="214" y="66" width="58" height="14"/></element>
+
+		<!-- "Volume" knob -->
+		<element ref="txt_volume"><bounds x="215" y="88" width="39" height="8"/></element>
+		<param name="knob_id" value="volume_knob"/>
+		<group ref="knob"><bounds x="215" y="98" width="39" height="39"/></group>
+		<element ref="knob_value" id="volume_knob_value" inputtag="volume_knob" inputmask="0xffff" inputraw="yes">
+			<bounds x="223" y="113" width="23" height="9"/>
+		</element>
+		<element ref="transparent" clickthrough="no"><bounds x="221" y="111" width="27" height="13"/></element>
+
+		<!-- "Tune page" button -->
+		<element ref="txt_tune_page"><bounds x="318" y="88" width="45" height="8"/></element>
+		<element ref="button" inputtag="switches_1" inputmask="0x40">
+			<bounds x="328" y="105" width="25" height="25"/>
+		</element>
+
+		<!-- "Master page" button -->
+		<element ref="txt_master_page"><bounds x="412" y="88" width="45" height="8"/></element>
+		<element ref="button" inputtag="switches_1" inputmask="0x80">
+			<bounds x="422" y="105" width="25" height="25"/>
+		</element>
+
+
+		<!-- *** "Programmer" section *** -->
+
+		<element ref="blue_line"><bounds x="188" y="151" width="305" height="10"/></element>
+		<element ref="txt_programmer"><bounds x="214" y="149" width="98" height="14"/></element>
+
+		<!-- Labels above the VFD. -->
+		<element ref="txt_patch_l"><bounds x="207" y="174" width="20" height="5"/></element>
+		<element ref="txt_patch_name"><bounds x="247" y="174" width="35" height="5"/></element>
+		<repeat count="6">
+			<param name="num" start="1" increment="1"/>
+			<param name="txt_x" start="291" increment="21"/>
+			<element ref="txt_voice"><bounds x="~txt_x~" y="168" width="20" height="5"/></element>
+			<element ref="txt_voice_~num~"><bounds x="~txt_x~" y="174" width="20" height="5"/></element>
+		</repeat>
+		<element ref="txt_curr_page"><bounds x="440" y="174" width="35" height="5"/></element>
+
+		<!-- VFD -->
+		<param name="vfd_id" value="1"/>
+		<group ref="vfd"><bounds x="198" y="182" width="295" height="30"/></group>
+
+		<!-- Labels below and to the right of the VFD. -->
+		<element ref="txt_modulation_page"><bounds x="434" y="215" width="40" height="4"/></element>
+		<element ref="green_line"><bounds x="488" y="214" width="1" height="3"/></element>
+		<element ref="green_line"><bounds x="476" y="216" width="13" height="1"/></element>
+		<element ref="txt_multi_patch_page"><bounds x="441" y="221" width="40" height="4"/></element>
+		<element ref="grey_line"><bounds x="429" y="214" width="1" height="8"/></element>
+		<element ref="grey_line"><bounds x="429" y="222" width="10" height="1"/></element>
+
+		<!-- "Single patch" button -->
+		<element ref="cyan_line"><bounds x="208" y="213" width="1" height="26"/></element>
+		<element ref="txt_single"><bounds x="191" y="268" width="35" height="8"/></element>
+		<element ref="txt_patch"><bounds x="191" y="277" width="35" height="8"/></element>
+		<element ref="button" inputtag="switches_2" inputmask="0x01">
+			<bounds x="196" y="240" width="25" height="25"/>
+		</element>
+
+		<!-- "Multi patch" button -->
+		<element ref="cyan_line"><bounds x="208" y="226" width="45" height="1"/></element>
+		<element ref="cyan_line"><bounds x="253" y="226" width="1" height="13"/></element>
+		<element ref="txt_multi_grey"><bounds x="236" y="268" width="35" height="8"/></element>
+		<element ref="txt_patch_grey"><bounds x="236" y="277" width="35" height="8"/></element>
+		<element ref="button" inputtag="switches_2" inputmask="0x02">
+			<bounds x="241" y="240" width="25" height="25"/>
+		</element>
+
+		<!-- "Store" button -->
+		<element ref="txt_store"><bounds x="191" y="322" width="35" height="8"/></element>
+		<element ref="red_button" inputtag="switches_1" inputmask="0x10">
+			<bounds x="196" y="294" width="25" height="25"/>
+		</element>
+
+		<!-- "Patch edit" buttons -->
+		<element ref="txt_patch_edit"><bounds x="328" y="268" width="50" height="8"/></element>
+		<element ref="patch_edit_lines"><bounds x="278" y="212" width="150" height="28"/></element>
+		<element ref="black_rect"><bounds x="278" y="240" width="150" height="25"/></element>
+		<repeat count="6">
+			<param name="button_x" start="278" increment="25"/>
+			<param name="input_mask" start="0x04" lshift="1"/>
+			<element ref="button" inputtag="switches_2" inputmask="~input_mask~">
+				<bounds x="~button_x~" y="240" width="25" height="25"/>
+			</element>
+		</repeat>
+
+		<!-- "Voices" button -->
+		<element ref="button" inputtag="switches_6" inputmask="0x80">
+			<bounds x="449" y="240" width="25" height="25"/>
+		</element>
+		<element ref="txt_voices_1_6"><bounds x="439" y="271" width="45" height="8"/></element>
+		<element ref="led" name="led_voices_1_6"><bounds x="484" y="271" width="9" height="9"/></element>
+		<element ref="txt_voices_7_12"><bounds x="439" y="286" width="45" height="8"/></element>
+		<element ref="led" name="led_voices_7_12"><bounds x="484" y="286" width="9" height="9"/></element>
+
+		<!-- Numeric keypad -->
+		<!-- 7 -->
+		<element ref="black_rect"><bounds x="328" y="294" width="75" height="100"/></element>
+		<element ref="button" inputtag="switches_0" inputmask="0x80">
+			<bounds x="328" y="294" width="25" height="25"/>
+		</element>
+		<element ref="txt_7"><bounds x="328" y="301" width="25" height="11"/></element>
+		<!-- 8 -->
+		<element ref="button" inputtag="switches_1" inputmask="0x01">
+			<bounds x="353" y="294" width="25" height="25"/>
+		</element>
+		<element ref="txt_8"><bounds x="353" y="301" width="25" height="11"/></element>
+		<!-- 9 -->
+		<element ref="button" inputtag="switches_1" inputmask="0x02">
+			<bounds x="378" y="294" width="25" height="25"/>
+		</element>
+		<element ref="txt_9"><bounds x="378" y="301" width="25" height="11"/></element>
+		<!-- 4, 5, 6 - 1, 2, 3 -->
+		<repeat count="2">
+			<param name="button_y" start="319" increment="25"/>
+			<param name="num_y" start="326" increment="25"/>
+			<param name="num_start" start="4" increment="-3"/>
+			<param name="input_mask_start" start="0x10" rshift="3"/>
+			<repeat count="3">
+				<param name="button_x" start="328" increment="25"/>
+				<param name="input_mask" start="~input_mask_start~" lshift="1"/>
+				<param name="num" start="~num_start~" increment="1"/>
+				<element ref="button" inputtag="switches_0" inputmask="~input_mask~">
+					<bounds x="~button_x~" y="~button_y~" width="25" height="25"/>
+				</element>
+				<element ref="txt_~num~"><bounds x="~button_x~" y="~num_y~" width="25" height="11"/></element>
+			</repeat>
+		</repeat>
+		<!-- -  -->
+		<element ref="button" inputtag="switches_1" inputmask="0x08">
+			<bounds x="328" y="369" width="25" height="25"/>
+		</element>
+		<element ref="txt_minus"><bounds x="328" y="376" width="25" height="11"/></element>
+		<!-- 0 -->
+		<element ref="button" inputtag="switches_0" inputmask="0x01">
+			<bounds x="353" y="369" width="25" height="25"/>
+		</element>
+		<element ref="txt_0"><bounds x="353" y="376" width="25" height="11"/></element>
+		<!-- + -->
+		<element ref="button" inputtag="switches_1" inputmask="0x04">
+			<bounds x="378" y="369" width="25" height="25"/>
+		</element>
+		<element ref="txt_plus"><bounds x="378" y="376" width="25" height="11"/></element>
+
+		<element ref="blue_line"><bounds x="188" y="405" width="305" height="3"/></element>
+
+
+		<!-- *** "Modulation source / x select" section *** -->
+
+		<element ref="blue_line"><bounds x="523" y="68" width="360" height="10"/></element>
+		<element ref="txt_mod_src_x_sel"><bounds x="549" y="66" width="204" height="14"/></element>
+
+		<!-- "Modulation source select" LED -->
+		<element ref="txt_mod_src_sel"><bounds x="535" y="84" width="125" height="8"/></element>
+		<element ref="led" name="led_mod_sorc"><bounds x="523" y="84" width="9" height="9"/></element>
+		<element ref="white_line"><bounds x="527" y="94" width="1" height="3"/></element>
+		<element ref="white_line"><bounds x="527" y="97" width="5" height="1"/></element>
+
+		<!-- "X select" LED -->
+		<element ref="txt_x_sel"><bounds x="535" y="135" width="125" height="8"/></element>
+		<element ref="led" name="led_x_sel"><bounds x="523" y="135" width="9" height="9"/></element>
+		<element ref="white_line"><bounds x="527" y="132" width="1" height="2"/></element>
+		<element ref="white_line"><bounds x="527" y="132" width="5" height="1"/></element>
+
+		<!-- Buttons -->
+		<element ref="black_rect"><bounds x="530" y="102" width="350" height="25"/></element>
+		<repeat count="8">
+			<param name="num" start="1" increment="1"/>
+			<param name="button_x" start="530" increment="25"/>
+			<param name="input_mask" start="0x01" lshift="1"/>
+
+			<element ref="txt_mod_label_a~num~"><bounds x="~button_x~" y="95" width="25" height="5"/></element>
+			<element ref="button" inputtag="switches_5" inputmask="~input_mask~">
+				<bounds x="~button_x~" y="102" width="25" height="25"/>
+			</element>
+			<element ref="txt_~num~"><bounds x="~button_x~" y="130" width="25" height="5"/></element>
+		</repeat>
+		<element ref="txt_release"><bounds x="730" y="89" width="25" height="5"/></element>
+		<repeat count="6">
+			<param name="num" start="1" increment="1"/>
+			<param name="button_x" start="730" increment="25"/>
+			<param name="input_mask" start="0x01" lshift="1"/>
+			<element ref="txt_mod_label_b~num~"><bounds x="~button_x~" y="95" width="25" height="5"/></element>
+			<element ref="button" inputtag="switches_6" inputmask="~input_mask~">
+				<bounds x="~button_x~" y="102" width="25" height="25"/>
+			</element>
+			<element ref="txt_sel_label_b~num~"><bounds x="~button_x~" y="130" width="25" height="5"/></element>
+		</repeat>
+
+
+		<!-- *** "Page modifier" section *** -->
+
+		<element ref="blue_line"><bounds x="523" y="151" width="360" height="10"/></element>
+		<element ref="txt_page_mod"><bounds x="549" y="149" width="104" height="14"/></element>
+
+		<!-- Top "switch mode" LEDs -->
+		<element ref="txt_switch_mode"><bounds x="523" y="214" width="60" height="8"/></element>
+		<element ref="led" name="led_mod"><bounds x="523" y="226" width="9" height="9"/></element>
+		<element ref="txt_modulation"><bounds x="534" y="225" width="35" height="5"/></element>
+		<element ref="txt_page_select"><bounds x="534" y="230" width="35" height="5"/></element>
+		<element ref="led" name="led_on_off_a"><bounds x="523" y="241" width="9" height="9"/></element>
+		<element ref="txt_on_off"><bounds x="534" y="243" width="30" height="5"/></element>
+
+		<!-- Bottom "switch mode" LEDs -->
+		<element ref="txt_switch_mode"><bounds x="523" y="307" width="60" height="8"/></element>
+		<element ref="led" name="led_value"><bounds x="523" y="319" width="9" height="9"/></element>
+		<element ref="txt_value_x"><bounds x="534" y="321" width="30" height="5"/></element>
+		<element ref="led" name="led_on_off_b"><bounds x="523" y="334" width="9" height="9"/></element>
+		<element ref="txt_on_off"><bounds x="534" y="336" width="30" height="5"/></element>
+
+		<!-- "Page 2" button -->
+		<element ref="led" name="led_page_2"><bounds x="523" y="352" width="9" height="9"/></element>
+		<element ref="txt_page_2"><bounds x="534" y="352" width="45" height="8"/></element>
+		<element ref="button" inputtag="switches_1" inputmask="0x20">
+			<bounds x="530" y="365" width="25" height="25"/>
+		</element>
+
+		<!-- VFDs -->
+		<param name="vfd_id" value="2"/>
+		<group ref="vfd"><bounds x="571" y="182" width="295" height="30"/></group>
+		<param name="vfd_id" value="3"/>
+		<group ref="vfd"><bounds x="571" y="275" width="295" height="30"/></group>
+
+		<!-- Buttons and encoders below the VFDs. -->
+		<repeat count="6">
+			<param name="num" start="1" increment="1"/>
+			<param name="txt_x" start="594" increment="48"/>
+			<param name="line_x" start="598" increment="48"/>
+			<param name="knob_x" start="579" increment="48"/>
+			<param name="button_x" start="586" increment="48"/>
+			<param name="input_mask" start="1" lshift="1"/>
+
+			<element ref="cyan_line"><bounds x="~line_x~" y="213" width="1" height="11"/></element>
+			<element ref="cyan_line"><bounds x="~line_x~" y="251" width="1" height="23"/></element>
+			<element ref="cyan_line"><bounds x="~line_x~" y="306" width="1" height="10"/></element>
+			<element ref="cyan_line"><bounds x="~line_x~" y="343" width="1" height="13"/></element>
+
+			<element ref="button" inputtag="switches_3" inputmask="~input_mask~">
+				<bounds x="~button_x~" y="225" width="25" height="25"/>
+			</element>
+			<element ref="button" inputtag="switches_4" inputmask="~input_mask~">
+				<bounds x="~button_x~" y="317" width="25" height="25"/>
+			</element>
+
+			<param name="knob_id" value="encoder_knob_~num~"/>
+			<group ref="knob"><bounds x="~knob_x~" y="357" width="39" height="39"/></group>
+			<element ref="txt_~num~"><bounds x="~txt_x~" y="398" width="9" height="6"/></element>
+		</repeat>
+
+		<element ref="blue_line"><bounds x="523" y="405" width="360" height="3"/></element>
+	</group>
+
+
+	<!-- Diagrams and other elements on the "page select" section -->
+
+	<element name="vco1_page_sel_label">
+		<rect><bounds x="0" y="0" width="100" height="9"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+		<text string="VCO1" align="1"><bounds x="0" y="0" width="30" height="9"/><color red="0.90" green="0.90" blue="0.90"/></text>
+		<text string="TRANS" align="1"><bounds x="26" y="0" width="30" height="9"/><color red="0.70" green="0.70" blue="0.70"/></text>
+	</element>
+
+	<element name="vco1_page_sel_diagram">
+		<image><data><![CDATA[
+			<svg width="195" height="55">
+				<g stroke-width="1" stroke="#a6bfbf" fill="none">
+					<rect x="12.5" y="3.5" width="60" height="16" rx="1" ry="1"/>
+					<line x1="73" y1="7.5" x2="124" y2="7.5"/>
+					<line x1="73" y1="11.5" x2="124" y2="11.5"/>
+					<line x1="73" y1="15.5" x2="82" y2="15.5"/>
+
+					<rect x="81.5" y="13.5" width="25" height="7" rx="1" ry="1"/>
+					<line x1="107" y1="15.5" x2="124" y2="15.5"/>
+
+					<rect x="124.5" y="3.5" width="15" height="16" rx="1" ry="1"/>
+					<line x1="131.5" y1="20" x2="131.5" y2="34"/>
+					<line x1="140" y1="11.5" x2="147" y2="11.5"/>
+
+					<rect x="147.5" y="3.5" width="32" height="16" rx="1" ry="1"/>
+
+					<g transform="translate(31, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+					<g transform="translate(63, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+					</g>
+					<g transform="translate(94, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+					<g transform="translate(160, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="vco1_page_sel_text">
+		<rect><bounds x="0" y="0" width="195" height="55"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+
+		<text string="VCO1"><bounds x="16" y="8" width="30" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="TRIANGLE" align="2"><bounds x="42" y="5" width="30" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="SAWTOOTH" align="2"><bounds x="42" y="9" width="30" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="PULSE" align="2"><bounds x="42" y="13" width="30" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="PWM"><bounds x="84" y="13" width="20" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="MIX"><bounds x="125" y="8" width="15" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="VCA"><bounds x="153" y="8" width="20" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="1"><bounds x="30" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="2"><bounds x="62" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="4"><bounds x="93" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="6"><bounds x="159" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="FREQUENCY"><bounds x="11" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="DETUNE"><bounds x="43" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="PULSE WIDTH"><bounds x="74" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="WAVESHAPE"><bounds x="111" y="35" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="SELECT"><bounds x="111" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="VOLUME"><bounds x="140" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="FREQUENCY"><bounds x="24" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="24" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="PULSE WIDTH"><bounds x="87" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="87" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="VOLUME"><bounds x="153" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="153" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+	</element>
+
+	<element name="vco2_page_sel_label">
+		<rect><bounds x="0" y="0" width="100" height="9"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+		<text string="VCO2" align="1"><bounds x="0" y="0" width="30" height="9"/><color red="0.90" green="0.90" blue="0.90"/></text>
+		<text string="PAN" align="1"><bounds x="26" y="0" width="30" height="9"/><color red="0.70" green="0.70" blue="0.70"/></text>
+	</element>
+
+	<element name="vco2_page_sel_diagram">
+		<image><data><![CDATA[
+			<svg width="195" height="55">
+				<g stroke-width="1" stroke="#a6bfbf" fill="none">
+					<rect x="12.5" y="3.5" width="60" height="16" rx="1" ry="1"/>
+					<line x1="17" y1="20" x2="17" y2="29"/>
+					<line x1="73" y1="7.5" x2="124" y2="7.5"/>
+					<line x1="73" y1="11.5" x2="124" y2="11.5"/>
+					<line x1="73" y1="15.5" x2="82" y2="15.5"/>
+
+					<rect x="81.5" y="13.5" width="25" height="7" rx="1" ry="1"/>
+					<line x1="107" y1="15.5" x2="124" y2="15.5"/>
+
+					<polyline points="116,26 116,20 124,20"/>
+					<rect x="124.5" y="3.5" width="15" height="21" rx="1" ry="1"/>
+					<line x1="131.5" y1="25" x2="131.5" y2="34"/>
+					<line x1="140" y1="11.5" x2="147" y2="11.5"/>
+
+					<rect x="147.5" y="3.5" width="32" height="16" rx="1" ry="1"/>
+
+					<g transform="translate(31, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+					<g transform="translate(63, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+					</g>
+					<g transform="translate(94, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+					<g transform="translate(160, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="vco2_page_sel_text">
+		<rect><bounds x="0" y="0" width="195" height="55"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+
+		<text string="VCO2"><bounds x="16" y="8" width="30" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="SYNC"><bounds x="9" y="30" width="17" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="TRIANGLE" align="2"><bounds x="42" y="5" width="30" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="SAWTOOTH" align="2"><bounds x="42" y="9" width="30" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="PULSE" align="2"><bounds x="42" y="13" width="30" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="PWM"><bounds x="84" y="13" width="20" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="MIX"><bounds x="125" y="10" width="15" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="NOISE" align="2"><bounds x="101" y="27" width="21" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="VCA"><bounds x="153" y="8" width="20" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="1"><bounds x="30" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="2"><bounds x="62" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="4"><bounds x="93" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="6"><bounds x="159" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="FREQUENCY"><bounds x="11" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="DETUNE"><bounds x="43" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="PULSE WIDTH"><bounds x="74" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="WAVESHAPE"><bounds x="111" y="35" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="SELECT"><bounds x="111" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="VOLUME"><bounds x="140" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="FREQUENCY"><bounds x="24" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="24" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="PULSE WIDTH"><bounds x="87" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="87" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="VOLUME"><bounds x="153" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="153" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+	</element>
+
+	<element name="fm_lag_page_sel_label">
+		<rect><bounds x="0" y="0" width="100" height="9"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+		<text string="FM/LAG" align="1"><bounds x="0" y="0" width="40" height="9"/><color red="0.90" green="0.90" blue="0.90"/></text>
+		<text string="V. ASSIGN" align="1"><bounds x="35" y="0" width="30" height="9"/><color red="0.70" green="0.70" blue="0.70"/></text>
+	</element>
+
+	<element name="fm_lag_page_sel_diagram">
+		<image><data><![CDATA[
+			<svg width="195" height="55">
+				<g stroke-width="1" stroke="#a6bfbf" fill="none">
+					<rect x="20.5" y="3.5" width="42" height="16" rx="1" ry="1"/>
+					<line x1="63" x2="81" y1="11.5" y2="11.5"/>
+
+					<rect x="69.5" y="3.5" width="15" height="16" rx="1" ry="1"/>
+					<line x1="77.5" x2="77.5" y1="20" y2="27"/>
+					<circle cx="72" cy="11.5" r="1.5" stroke="none" fill="#a6bfbf"/>
+					<circle cx="81" cy="7.5" r="1.5" stroke="none" fill="#a6bfbf"/>
+					<line x1="82" x2="90" y1="7.5" y2="7.5"/>
+					<circle cx="81" cy="15.5" r="1.5" stroke="none" fill="#a6bfbf"/>
+					<line x1="82" x2="98" y1="15.5" y2="15.5"/>
+
+					<polyline points="111,27 111,11.5, 121,11.5"/>
+					<rect x="121.5" y="3.5" width="42" height="16" rx="1" ry="1"/>
+					<line x1="164" x2="169" y1="11.5" y2="11.5"/>
+
+					<g transform="translate(41, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+					<g transform="translate(142, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="fm_lag_page_sel_text">
+		<rect><bounds x="0" y="0" width="195" height="55"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+
+		<text string="FM VCA"><bounds x="23" y="8" width="36" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="DESTINATION"><bounds x="58" y="28" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="LAG IN"><bounds x="94" y="28" width="34" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="LAG"><bounds x="129" y="8" width="26" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="LAG OUT" align="1"><bounds x="171" y="9" width="22" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="1"><bounds x="40" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="5"><bounds x="141" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="FM AMPLITUDE"><bounds x="21" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="RATE"><bounds x="122" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="FM AMPLITUDE"><bounds x="34" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="34" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="RATE"><bounds x="135" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="135" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+	</element>
+
+	<element name="track_x_page_sel_label">
+		<rect><bounds x="0" y="0" width="100" height="9"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+		<text string="TRACK X" align="1"><bounds x="0" y="0" width="40" height="9"/><color red="0.90" green="0.90" blue="0.90"/></text>
+		<text string="ZONE X" align="1"><bounds x="40" y="0" width="30" height="9"/><color red="0.70" green="0.70" blue="0.70"/></text>
+	</element>
+
+	<element name="track_x_page_sel_diagram">
+		<image><data><![CDATA[
+			<svg width="195" height="55">
+				<g stroke-width="1" stroke="#a6bfbf" fill="none">
+					<polyline points="19,23 19,11.5 36,11.5"/>
+					<rect x="36.5" y="3.5" width="116" height="16" rx="1" ry="1"/>
+					<line x1="153" x2="161" y1="11.5" y2="11.5"/>
+
+					<g transform="translate(55, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+					</g>
+					<g transform="translate(74, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+					</g>
+					<g transform="translate(93, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+					</g>
+					<g transform="translate(112, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+					</g>
+					<g transform="translate(131, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+					</g>
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="track_x_page_sel_text">
+		<rect><bounds x="0" y="0" width="195" height="55"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+
+		<text string="IN"><bounds x="11" y="24" width="16" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="TRACKING GEN."><bounds x="57" y="8" width="75" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="OUT" align="1"><bounds x="163" y="9" width="9" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="2"><bounds x="54" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="3"><bounds x="73" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="4"><bounds x="92" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="5"><bounds x="111" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="6"><bounds x="130" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="POINT 1"><bounds x="35" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="POINT 2"><bounds x="54" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="POINT 3"><bounds x="73" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="POINT 4"><bounds x="92" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="POINT 5"><bounds x="111" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+	</element>
+
+	<element name="vcf_vca_page_sel_label">
+		<rect><bounds x="0" y="0" width="100" height="9"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+		<text string="VCF/VCA" align="1"><bounds x="0" y="0" width="40" height="9"/><color red="0.90" green="0.90" blue="0.90"/></text>
+		<text string="VOLUME" align="1"><bounds x="38" y="0" width="50" height="9"/><color red="0.70" green="0.70" blue="0.70"/></text>
+	</element>
+
+	<element name="vcf_vca_page_sel_diagram">
+		<image><data><![CDATA[
+			<svg width="195" height="55">
+				<g stroke-width="1" stroke="#a6bfbf" fill="none">
+					<rect x="6.5" y="3.5" width="87" height="16" rx="1" ry="1"/>
+					<line x1="94" x2="100" y1="11.5" y2="11.5"/>
+
+					<rect x="99.5" y="3.5" width="30" height="16" rx="1" ry="1"/>
+					<line x1="130" x2="136" y1="11.5" y2="11.5"/>
+
+					<rect x="135.5" y="3.5" width="30" height="16" rx="1" ry="1"/>
+					<line x1="166" x2="171" y1="11.5" y2="11.5"/>
+
+					<g transform="translate(26, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+					<g transform="translate(56, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+					<g transform="translate(86, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+					</g>
+					<g transform="translate(116, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+					<g transform="translate(151, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="vcf_vca_page_sel_text">
+		<rect><bounds x="0" y="0" width="195" height="55"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+
+		<text string="MULTIMODE VCF"><bounds x="15" y="8" width="71" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="VCA1"><bounds x="104" y="8" width="23" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="VCA2"><bounds x="139" y="8" width="23" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="VOICE"><bounds x="172" y="7" width="13" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="OUT"><bounds x="172" y="11" width="13" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="1"><bounds x="25" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="2"><bounds x="55" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="3"><bounds x="85" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="5"><bounds x="115" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="6"><bounds x="150" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="FREQUENCY"><bounds x="6" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="RESONANCE"><bounds x="36" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="MODE (15)"><bounds x="66" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="VOLUME"><bounds x="96" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="VOLUME"><bounds x="131" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="FREQUENCY"><bounds x="18" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="18" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="RESONANCE"><bounds x="49" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="49" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="VOLUME"><bounds x="109" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="109" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="VOLUME"><bounds x="144" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="144" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+	</element>
+
+	<element name="env_x_page_sel_label">
+		<rect><bounds x="0" y="0" width="100" height="9"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+		<text string="ENV X" align="1"><bounds x="0" y="0" width="30" height="9"/><color red="0.90" green="0.90" blue="0.90"/></text>
+		<text string="VIB" align="1"><bounds x="28" y="0" width="30" height="9"/><color red="0.70" green="0.70" blue="0.70"/></text>
+	</element>
+
+	<element name="env_x_page_sel_diagram">
+		<image><data><![CDATA[
+			<svg width="195" height="55">
+				<g stroke-width="1" stroke="#a6bfbf" fill="none">
+					<polyline points="10,24 10,11.5 24,11.5"/>
+
+					<rect x="24.5" y="3.5" width="117" height="16" rx="1" ry="1"/>
+					<line x1="142" x2="148" y1="11.5" y2="11.5"/>
+
+					<rect x="147.5" y="3.5" width="27" height="16" rx="1" ry="1"/>
+					<line x1="175" x2="180" y1="11.5" y2="11.5"/>
+
+					<g transform="translate(29, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+					<g transform="translate(56, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+					<g transform="translate(82, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+					<g transform="translate(110, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+					</g>
+					<g transform="translate(130, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+					<g transform="translate(160, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="env_x_page_sel_text">
+		<rect><bounds x="0" y="0" width="195" height="55"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+
+		<text string="TRIGGER"><bounds x="0" y="25" width="21" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="IN"><bounds x="0" y="29" width="21" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="ENVELOPE GENERATOR"><bounds x="36" y="8" width="93" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="VCA"><bounds x="149" y="8" width="22" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="OUT" align="1"><bounds x="182" y="9" width="9" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="1"><bounds x="28" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="2"><bounds x="55" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="3"><bounds x="81" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="4"><bounds x="109" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="5"><bounds x="129" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="6"><bounds x="159" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="DELAY"><bounds x="9" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="ATTACK"><bounds x="36" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="DECAY"><bounds x="62" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="SUSTAIN"><bounds x="90" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="RELEASE"><bounds x="110" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="AMPLITUDE"><bounds x="140" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="DELAY"><bounds x="22" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="22" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="ATTACK"><bounds x="49" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="49" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="DECAY"><bounds x="75" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="75" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="RELEASE"><bounds x="123" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="123" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="AMPLITUDE"><bounds x="153" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="153" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+	</element>
+
+	<element name="lfo_x_page_sel_label">
+		<rect><bounds x="0" y="0" width="100" height="9"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+		<text string="LFO X" align="1"><bounds x="0" y="0" width="30" height="9"/><color red="0.90" green="0.90" blue="0.90"/></text>
+		<text string="DETUNE" align="1"><bounds x="28" y="0" width="30" height="9"/><color red="0.70" green="0.70" blue="0.70"/></text>
+	</element>
+
+	<element name="lfo_x_page_sel_diagram">
+		<image><data><![CDATA[
+			<svg width="195" height="55">
+				<g stroke-width="1" stroke="#a6bfbf" fill="none">
+					<rect x="22.5" y="3.5" width="77" height="16" rx="1" ry="1"/>
+					<line x1="100" x2="116" y1="11.5" y2="11.5"/>
+
+					<rect x="116.5" y="3.5" width="31" height="16" rx="1" ry="1"/>
+					<line x1="148" x2="158" y1="11.5" y2="11.5"/>
+
+					<g transform="translate(29, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+					<g transform="translate(60, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+					</g>
+					<g transform="translate(91, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+					</g>
+					<g transform="translate(131, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+						<polyline stroke="#99b34d" points="0,4 14,4 14,24"/>
+					</g>
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="lfo_x_page_sel_text">
+		<rect><bounds x="0" y="0" width="195" height="55"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+
+		<text string="LFO"><bounds x="48" y="8" width="25" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="VCA"><bounds x="120" y="8" width="25" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="OUT" align="1"><bounds x="160" y="9" width="9" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="1"><bounds x="28" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="2"><bounds x="59" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="4"><bounds x="90" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="6"><bounds x="130" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="SPEED"><bounds x="9" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="WAVESHAPE"><bounds x="40" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="RETRIG"><bounds x="71" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="AMPLITUDE"><bounds x="111" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="SPEED"><bounds x="22" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="22" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="AMPLITUDE"><bounds x="124" y="45" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+		<text string="MODULATION"><bounds x="124" y="49" width="41" height="4"/><color red="0.65" green="0.80" blue="0.40"/></text>
+	</element>
+
+	<element name="ramp_x_page_sel_label">
+		<rect><bounds x="0" y="0" width="100" height="9"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+		<text string="RAMP X" align="1"><bounds x="0" y="0" width="40" height="9"/><color red="0.90" green="0.90" blue="0.90"/></text>
+	</element>
+
+	<element name="ramp_x_page_sel_diagram">
+		<image><data><![CDATA[
+			<svg width="195" height="55">
+				<g stroke-width="1" stroke="#a6bfbf" fill="none">
+					<line x1="30" x2="35" y1="11.5" y2="11.5"/>
+					<rect x="35.5" y="3.5" width="38" height="16" rx="1" ry="1"/>
+					<line x1="74" x2="82" y1="11.5" y2="11.5"/>
+
+					<g transform="translate(55, 20)">
+						<line x1="0" x2="0" y1="0" y2="7"/>
+						<circle cy="12.5" r="5.5"/>
+						<line stroke="#cccccc" x1="-3" y1="16" x2="-1" y2="14"/>
+					</g>
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="ramp_x_page_sel_text">
+		<rect><bounds x="0" y="0" width="195" height="55"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+
+		<text string="TRIGGER" align="2"><bounds x="4" y="9" width="25" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="RAMP"><bounds x="39" y="8" width="31" height="7"/><color red="1.0" green="1.0" blue="1.0"/></text>
+		<text string="OUT" align="1"><bounds x="84" y="9" width="9" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="2"><bounds x="54" y="30" width="4" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+
+		<text string="RATE"><bounds x="35" y="39" width="41" height="4"/><color red="1.0" green="1.0" blue="1.0"/></text>
+	</element>
+
+	<element name="misc_page_sel_label">
+		<rect><bounds x="0" y="0" width="100" height="9"/><color red="0" green="0" blue="0" alpha="0"/></rect>
+		<text string="NAME" align="1"><bounds x="0" y="0" width="30" height="9"/><color red="0.90" green="0.90" blue="0.90"/></text>
+		<text string="NAME" align="1"><bounds x="25" y="0" width="30" height="9"/><color red="0.70" green="0.70" blue="0.70"/></text>
+	</element>
+
+	<group name="page_sel_button">
+		<bounds x="0" y="0" width="150" height="25"/>
+		<element ref="button" inputtag="~buttontag~" inputmask="~buttonmask~">
+			<bounds x="0" y="0" width="25" height="25"/>
+		</element>
+		<element ref="led" name="led_~page~"><bounds x="31" y="11" width="9" height="9"/></element>
+		<element ref="~page~_page_sel_label"><bounds x="43" y="11" width="100" height="9"/></element>
+	</group>
+
+	<group name="page_sel_section">
+		<bounds x="0" y="0" width="195" height="70"/>
+		<element ref="~page~_page_sel_diagram"><bounds x="0" y="0" width="195" height="55"/></element>
+		<element ref="~page~_page_sel_text"><bounds x="0" y="0" width="195" height="55"/></element>
+		<group ref="page_sel_button"><bounds x="0" y="45" width="150" height="25"/></group>
+		<element ref="blue_line"><bounds x="25" y="67" width="167" height="3"/></element>
+	</group>
+
+	<!-- "Single/multi patch page select" section -->
+	<group name="patch_page_sel_panel">
+		<bounds x="0" y="0" width="1500" height="450"/>
+
+		<element ref="blue_line"><bounds x="913" y="68" width="400" height="10"/></element>
+		<element ref="txt_page_sel"><bounds x="942" y="66" width="224" height="14"/></element>
+
+		<param name="page" value="vco1"/>
+		<param name="buttontag" value="switches_3"/>
+		<param name="buttonmask" value="0x40"/>
+		<group ref="page_sel_section"><bounds x="914" y="92" width="195" height="70"/></group>
+
+		<param name="page" value="vco2"/>
+		<param name="buttontag" value="switches_3"/>
+		<param name="buttonmask" value="0x80"/>
+		<group ref="page_sel_section"><bounds x="914" y="174" width="195" height="70"/></group>
+
+		<param name="page" value="fm_lag"/>
+		<param name="buttontag" value="switches_4"/>
+		<param name="buttonmask" value="0x40"/>
+		<group ref="page_sel_section"><bounds x="914" y="256" width="195" height="70"/></group>
+
+		<param name="page" value="track_x"/>
+		<param name="buttontag" value="switches_4"/>
+		<param name="buttonmask" value="0x80"/>
+		<group ref="page_sel_section"><bounds x="914" y="338" width="195" height="70"/></group>
+
+		<param name="page" value="vcf_vca"/>
+		<param name="buttontag" value="switches_7"/>
+		<param name="buttonmask" value="0x01"/>
+		<group ref="page_sel_section"><bounds x="1120" y="92" width="195" height="70"/></group>
+
+		<param name="page" value="env_x"/>
+		<param name="buttontag" value="switches_7"/>
+		<param name="buttonmask" value="0x02"/>
+		<group ref="page_sel_section"><bounds x="1120" y="174" width="195" height="70"/></group>
+
+		<param name="page" value="lfo_x"/>
+		<param name="buttontag" value="switches_7"/>
+		<param name="buttonmask" value="0x04"/>
+		<group ref="page_sel_section"><bounds x="1120" y="256" width="195" height="70"/></group>
+
+		<param name="page" value="ramp_x"/>
+		<param name="buttontag" value="switches_7"/>
+		<param name="buttonmask" value="0x08"/>
+		<group ref="page_sel_section"><bounds x="1120" y="338" width="195" height="70"/></group>
+		<element ref="case_grey"><bounds x="1218" y="405" width="5" height="5"/></element>
+
+		<param name="page" value="misc"/>
+		<param name="buttontag" value="switches_7"/>
+		<param name="buttonmask" value="0x10"/>
+		<group ref="page_sel_button"><bounds x="1222" y="384" width="150" height="25"/></group>
+
+		<!-- Connection from VCO1 output to VCF input. -->
+		<element ref="cyan_line"><bounds x="1093" y="100" width="33" height="1"/></element>
+
+		<!-- Connection from VCO2 output to VCF input. -->
+		<element ref="cyan_line"><bounds x="1093" y="185" width="16" height="1"/></element>
+		<element ref="cyan_line"><bounds x="1109" y="106" width="1" height="80"/></element>
+		<element ref="cyan_line"><bounds x="1110" y="106" width="16" height="1"/></element>
+
+		<!-- Connection from FM destination to VCO1 frequency. -->
+		<element ref="cyan_line"><bounds x="1003" y="253" width="1" height="11"/></element>
+		<element ref="cyan_line"><bounds x="908" y="253" width="96" height="1"/></element>
+		<element ref="cyan_line"><bounds x="908" y="115" width="1" height="138"/></element>
+		<element ref="cyan_line"><bounds x="908" y="115" width="37" height="1"/></element>
+
+		<!-- Connection from VCO2 triangle to FM input. -->
+		<element ref="cyan_line"><bounds x="993" y="171" width="1" height="10"/></element>
+		<element ref="cyan_line"><bounds x="900" y="171" width="93" height="1"/></element>
+		<element ref="cyan_line"><bounds x="900" y="171" width="1" height="96"/></element>
+		<element ref="cyan_line"><bounds x="900" y="267" width="34" height="1"/></element>
+
+		<!-- Connection from FM destination to VCF frequency. -->
+		<element ref="cyan_line"><bounds x="1011" y="253" width="1" height="19"/></element>
+		<element ref="cyan_line"><bounds x="1012" y="253" width="105" height="1"/></element>
+		<element ref="cyan_line"><bounds x="1117" y="115" width="1" height="139"/></element>
+		<element ref="cyan_line"><bounds x="1118" y="115" width="28" height="1"/></element>
+	</group>
+
+	<!-- A compact variation of the "single/multi patch page select" section. -->
+	<group name="compact_patch_page_sel_panel">
+		<bounds x="0" y="0" width="1500" height="450"/>
+
+		<element ref="blue_line"><bounds x="913" y="68" width="400" height="10"/></element>
+		<element ref="txt_page_sel"><bounds x="942" y="66" width="224" height="14"/></element>
+
+		<param name="page" value="vco1"/>
+		<param name="buttontag" value="switches_3"/>
+		<param name="buttonmask" value="0x40"/>
+		<group ref="page_sel_button"><bounds x="914" y="102" width="150" height="25"/></group>
+
+		<param name="page" value="vco2"/>
+		<param name="buttontag" value="switches_3"/>
+		<param name="buttonmask" value="0x80"/>
+		<group ref="page_sel_button"><bounds x="914" y="136" width="150" height="25"/></group>
+
+		<param name="page" value="fm_lag"/>
+		<param name="buttontag" value="switches_4"/>
+		<param name="buttonmask" value="0x40"/>
+		<group ref="page_sel_button"><bounds x="914" y="170" width="150" height="25"/></group>
+
+		<param name="page" value="track_x"/>
+		<param name="buttontag" value="switches_4"/>
+		<param name="buttonmask" value="0x80"/>
+		<group ref="page_sel_button"><bounds x="914" y="204" width="150" height="25"/></group>
+
+		<param name="page" value="vcf_vca"/>
+		<param name="buttontag" value="switches_7"/>
+		<param name="buttonmask" value="0x01"/>
+		<group ref="page_sel_button"><bounds x="914" y="238" width="150" height="25"/></group>
+
+		<param name="page" value="env_x"/>
+		<param name="buttontag" value="switches_7"/>
+		<param name="buttonmask" value="0x02"/>
+		<group ref="page_sel_button"><bounds x="914" y="272" width="150" height="25"/></group>
+
+		<param name="page" value="lfo_x"/>
+		<param name="buttontag" value="switches_7"/>
+		<param name="buttonmask" value="0x04"/>
+		<group ref="page_sel_button"><bounds x="914" y="306" width="150" height="25"/></group>
+
+		<param name="page" value="ramp_x"/>
+		<param name="buttontag" value="switches_7"/>
+		<param name="buttonmask" value="0x08"/>
+		<group ref="page_sel_button"><bounds x="914" y="340" width="150" height="25"/></group>
+
+		<param name="page" value="misc"/>
+		<param name="buttontag" value="switches_7"/>
+		<param name="buttonmask" value="0x10"/>
+		<group ref="page_sel_button"><bounds x="914" y="374" width="150" height="25"/></group>
+
+		<element ref="blue_line"><bounds x="914" y="405" width="360" height="3"/></element>
+	</group>
+
+
+	<!-- View of the entire synthesizer. -->
+	<view name="Full">
+		<bounds x="0" y="0" width="1500" height="750"/>
+		<group ref="case"><bounds x="0" y="0" width="1500" height="750"/></group>
+		<group ref="edit_panel"><bounds x="0" y="0" width="1500" height="450"/></group>
+		<group ref="patch_page_sel_panel"><bounds x="0" y="0" width="1500" height="450"/></group>
+
+		<collection name="warnings">
+			<element ref="plugin_warning" id="plugin_warning"><bounds x="475" y="15" width="550" height="16"/></element>
+		</collection>
+	</view>
+
+	<!-- The compact view includes the edit panel and a compact variation of the page select panel. -->
+	<view name="Compact">
+		<bounds x="150" y="50" width="920" height="365"/>
+		<element ref="case_grey"><bounds x="150" y="50" width="920" height="365"/></element>
+		<group ref="edit_panel"><bounds x="0" y="0" width="1500" height="450"/></group>
+		<group ref="compact_patch_page_sel_panel"><bounds x="0" y="0" width="1500" height="450"/></group>
+
+		<collection name="warnings">
+			<element ref="plugin_warning" id="plugin_warning"><bounds x="460" y="52" width="300" height="9"/></element>
+		</collection>
+	</view>
+
+	<!-- A view for just the editing panel: the part of the synth with all VFDs and most buttons. -->
+	<view name="Edit">
+		<bounds x="180" y="50" width="710" height="365"/>
+		<element ref="case_grey"><bounds x="180" y="50" width="710" height="365"/></element>
+		<group ref="edit_panel"><bounds x="0" y="0" width="1500" height="450"/></group>
+
+		<collection name="warnings">
+			<element ref="plugin_warning" id="plugin_warning"><bounds x="385" y="52" width="300" height="9"/></element>
+		</collection>
+	</view>
+
+	<!-- A view with just the page select panel. Includes all diagrams and the page select buttons. -->
+	<view name="Pages">
+		<bounds x="888" y="55" width="445" height="365"/>
+		<element ref="case_grey"><bounds x="888" y="55" width="445" height="365"/></element>
+		<group ref="patch_page_sel_panel"><bounds x="0" y="0" width="1500" height="450"/></group>
+	</view>
+
+
+	<script><![CDATA[
+		file:set_resolve_tags_callback(
+			function()
+				local full_mgr = slider_manager:new(file.views["Full"])
+				local compact_mgr = slider_manager:new(file.views["Compact"])
+				local edit_mgr = slider_manager:new(file.views["Edit"])
+
+				for i, mgr in ipairs({full_mgr, compact_mgr, edit_mgr}) do
+					mgr:add_knob("volume_knob", "volume_knob", 1.6, HORIZONTAL, "volume_knob_dot")
+					mgr:get_layout_item("volume_knob_value"):set_color_callback(
+						function()
+							return emu.render_color(0, 0, 0, 0)
+						end)
+
+					for i = 1, 6 do
+						local knob_id = "encoder_knob_" .. i
+						mgr:add_encoder(knob_id, knob_id, 0.8, HORIZONTAL, knob_id .. "_dot")
+					end
+
+					mgr:get_layout_item("plugin_warning"):set_state(0)
+				end
+
+				for i = 1, 2 do
+					local lever_id = "lever_" .. i
+					full_mgr:add_sprung_slider(lever_id, lever_id .. "_knob", lever_id)
+				end
+			end)
+
+		-----------------------------------------------------------------------
+		-- Slider and knob library starts.
+		-- Can be copied as-is to other layouts.
+		-- version: 13
+		-----------------------------------------------------------------------
+
+		-- Constants.
+		VERTICAL = 0
+		HORIZONTAL = 1
+
+		-- slider_manager class.
+		slider_manager = {}
+
+		function slider_manager:new(view)
+			local obj = {
+				-- Configuration. Can be overwritten in the resolve_tags callback.
+				KNOB_DOT_ANGLE_SPAN = 150,  -- -/+ 150 degrees from top center.
+				UPDATE_CLICK_STATE = true,
+
+				view = view,
+				widgets = {},   -- Stores slider and knob information.
+				pointers = {},  -- Tracks pointer state.
+				frame_id = 0,   -- Current frame identifier.
+
+				-- No setmetatable in the layout plugin. Manually copy methods.
+
+				add_slider = self.add_slider,
+				add_sprung_slider = self.add_sprung_slider,
+				add_knob = self.add_knob,
+				add_encoder = self.add_encoder,
+				add_slider_internal = self.add_slider_internal,
+				add_knob_internal = self.add_knob_internal,
+
+				get_layout_item = self.get_layout_item,
+				get_port_field = self.get_port_field,
+				clamp = self.clamp,
+
+				set_click_state = self.set_click_state,
+				release_pointer = self.release_pointer,
+				pointer_updated = self.pointer_updated,
+
+				get_knob_dot_bounds = self.get_knob_dot_bounds,
+				configure_knob_dots = self.configure_knob_dots,
+
+				pointer_left = self.pointer_left,
+				pointer_aborted = self.pointer_aborted,
+				forget_pointers = self.forget_pointers,
+				track_frame_id = self.track_frame_id }
+
+			view:set_prepare_items_callback(
+				function()
+					obj:track_frame_id()
+				end)
+
+			view:set_recomputed_callback(
+				function()
+					obj:configure_knob_dots()
+				end)
+
+			view:set_pointer_updated_callback(
+				function(type, id, dev, x, y, btn, dn, up, cnt)
+					obj:pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+				end)
+
+			view:set_pointer_left_callback(
+				function(type, id, dev, x, y, up, cnt)
+					obj:pointer_left(type, id, dev, x, y, up, cnt)
+				end)
+
+			view:set_pointer_aborted_callback(
+				function(type, id, dev, x, y, up, cnt)
+					obj:pointer_aborted(type, id, dev, x, y, up, cnt)
+				end)
+
+			view:set_forget_pointers_callback(
+				function()
+					obj:forget_pointers()
+				end)
+
+			return obj
+		end
+
+		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
+		-- The click area's vertical size must exactly span the range of the
+		-- knob's movement.
+		function slider_manager:add_slider(clickarea_id, knob_id, port_name)
+			local field = self:get_port_field(port_name)
+			if not field or field.is_analog or field.analog_wraps then
+				emu.print_error("Slider port '" .. port_name .. "' must be " ..
+					"an IPT_ADJUSTER. It must not use PORT_WRAPS.")
+				return
+			end
+			self:add_slider_internal(clickarea_id, knob_id, field)
+		end
+
+		-- A spring-loaded slider or wheel.
+		-- See docs for `add_slider()`.
+		function slider_manager:add_sprung_slider(clickarea_id, knob_id, port_name)
+			local field = self:get_port_field(port_name)
+			if not field or not field.is_analog or not field.centerdelta or field.centerdelta == 0 or field.analog_wraps then
+				emu.print_error("Slider port '" .. port_name .. "' must be " ..
+					"an analog port that auto-centers. It must not use PORT_WRAPS.")
+				return
+			end
+			self:add_slider_internal(clickarea_id, knob_id, field)
+		end
+
+		-- A sweep between the attached field's min and max values requires
+		-- moving the pointer by `scale * clickarea.height` pixels, when drag
+		-- direction is VERTICAL. Replace `height` with `width` when HORIZONTAL.
+		--
+		-- `dot_id` is optional. If not nil, this script will take control of the
+		-- element's position as the knob rotates. The distance of the dot from
+		-- the center of `clickarea` will be preserved during rotation.
+		-- It is suggested you place the dot at the top-center of the knob.
+		function slider_manager:add_knob(clickarea_id, port_name, scale, drag_direction, dot_id)
+			local field = self:get_port_field(port_name)
+			if not field or field.is_analog or field.analog_wraps then
+				emu.print_error("Knob port '" .. port_name .."' must be an " ..
+					"IPT_ADJUSTER and must not use PORT_WRAPS.")
+				return
+			end
+			self:add_knob_internal(clickarea_id, field, scale, drag_direction, dot_id)
+		end
+
+		-- See `add_knob()` for info on `scale` and `dot_id`.
+		-- It is assumed a full turn of the encoder changes the port value by:
+		-- (maxvalue - minvalue).
+		function slider_manager:add_encoder(clickarea_id, port_name, scale, drag_direction, dot_id)
+			local field = self:get_port_field(port_name)
+			if not field or not field.analog_wraps then
+				emu.print_error("Encoder port '" .. port_name .."' must either be " ..
+					"an IPT_ADJUSTER or IPT_POSITIONAL[_V], and it must use PORT_WRAPS.")
+				return
+			end
+			self:add_knob_internal(clickarea_id, field, scale, drag_direction, dot_id)
+		end
+
+		function slider_manager:add_slider_internal(clickarea_id, knob_id, field)
+			table.insert(self.widgets, {
+				clickarea   = self:get_layout_item(clickarea_id),
+				slider_knob = self:get_layout_item(knob_id),
+				field       = field,
+				is_knob     = false })
+		end
+
+		function slider_manager:add_knob_internal(clickarea_id, field, scale, drag_direction, dot_id)
+			table.insert(self.widgets, {
+				clickarea     = self:get_layout_item(clickarea_id),
+				field         = field,
+				is_knob       = true,
+				scale         = scale,
+				is_horizontal = (drag_direction == HORIZONTAL),
+				knob_dot      = dot_id and self:get_layout_item(dot_id) })
+		end
+
+		function slider_manager:get_layout_item(item_id)
+			local item = self.view.items[item_id]
+			if item == nil then
+				emu.print_error("Layout element: '" .. item_id .. "' not found.")
+			end
+			return item
+		end
+
+		function slider_manager:get_port_field(port_name)
+			local port = file.device:ioport(port_name)
+			if port == nil then
+				emu.print_error("Port: '" .. port_name .. "' not found.")
+				return nil
+			end
+			local field = nil
+			local num_fields = 0
+			for k, val in pairs(port.fields) do
+				field = val
+				num_fields = num_fields + 1
+			end
+			if not field then
+				emu.print_error("Port '" .. port_name .. "' does not contain a field.")
+				return null
+			end
+			if num_fields > 1 then
+				emu.print_error("Port '" .. port_name .. "' contains more than 1 field.")
+				return nil
+			end
+			return field
+		end
+
+		function slider_manager:clamp(x, minval, maxval)
+			if x < minval then
+				return minval
+			elseif x > maxval then
+				return maxval
+			else
+				return x
+			end
+		end
+
+		function slider_manager:set_click_state(widget, state)
+			if self.UPDATE_CLICK_STATE then
+				if widget.is_knob then
+					widget.clickarea:set_state(state)
+				else
+					widget.slider_knob:set_state(state)
+				end
+			end
+		end
+
+		function slider_manager:release_pointer(pointer_id)
+			if self.pointers[pointer_id] then
+				local widget = self.widgets[self.pointers[pointer_id].selected_widget]
+				self:set_click_state(widget, 0)
+				local field = widget.field
+				if field.is_analog and not field.analog_wraps then
+					field:clear_value()
+				end
+			end
+			self.pointers[pointer_id] = nil
+		end
+
+		function slider_manager:pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+			-- If a button is not pressed, reset the state of the current pointer.
+			if btn & 1 == 0 then
+				self:release_pointer(id)
+				return
+			end
+
+			-- If a button was just pressed, find the affected widget, if any.
+			if dn & 1 ~= 0 then
+				for i = 1, #self.widgets do
+					local found, relative
+					if self.widgets[i].slider_knob and self.widgets[i].slider_knob.bounds:includes(x, y) then
+						found = true
+						relative = true
+					elseif self.widgets[i].clickarea.bounds:includes(x, y) then
+						found = true
+						relative = false
+					end
+					if found then
+						self:set_click_state(self.widgets[i], 1)
+						local start_value = self.widgets[i].field.port:read()
+						self.pointers[id] = {
+							selected_widget = i,
+							relative = relative,
+							start_x = x,
+							start_y = y,
+							start_value = start_value,
+							last_frame_value = start_value,
+							last_frame_id = self.frame_id }
+						break
+					end
+				end
+			end
+
+			-- If there is no widget selected by the current pointer, we are done.
+			if self.pointers[id] == nil then
+				return
+			end
+
+			-- A widget is selected. Update its state based on the pointer's position.
+
+			local pointer = self.pointers[id]
+			local widget = self.widgets[pointer.selected_widget]
+
+			local min_value = widget.field.minvalue
+			local max_value = widget.field.maxvalue
+			local value_range = max_value - min_value
+
+			local new_value
+			if widget.is_knob then
+				if widget.is_horizontal then
+					local step_x = value_range / (widget.scale * widget.clickarea.bounds.width)
+					new_value = pointer.start_value + (x - pointer.start_x) * step_x
+				else
+					local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
+					new_value = pointer.start_value + (pointer.start_y - y) * step_y
+				end
+
+				-- Limit large changes for encoder inputs on a single frame, to ensure
+				-- that the direction of change is not ambiguous to the driver.
+				if widget.field.analog_wraps then
+					-- If frame tracking was perfect, the limit could be (value_range / 2 - 1).
+					-- But, occasionally, the frame boundary won't exactly match the change of
+					-- frame_id. Using the max_delta below ensures there is no ambiguity even
+					-- in those cases.
+					local max_delta = (value_range / 2.0 - 1.0) / 2.0
+					new_value = self:clamp(new_value, pointer.last_frame_value - max_delta, pointer.last_frame_value + max_delta)
+
+					if self.frame_id ~= pointer.last_frame_id then
+						pointer.last_frame_id = self.frame_id
+						pointer.last_frame_value = new_value
+					end
+				end
+			else
+				local knob_half_height = widget.slider_knob.bounds.height / 2
+				local min_y = widget.clickarea.bounds.y0 + knob_half_height
+				local max_y = widget.clickarea.bounds.y1 - knob_half_height
+
+				if pointer.relative then
+					-- User clicked on the knob. The new value will depend on how
+					--  much the knob was dragged.
+					new_value = pointer.start_value - value_range * (y - pointer.start_y) / (max_y - min_y)
+				else
+					-- User clicked elsewhere on the slider. The new value will depend on
+					-- the absolute position of the click.
+					new_value = max_value - value_range * (y - min_y) / (max_y - min_y)
+				end
+			end
+
+			new_value = math.floor(new_value + 0.5)
+			if widget.field.analog_wraps then
+				new_value = (new_value - min_value) % (value_range + 1) + min_value
+			else
+				new_value = self:clamp(new_value, min_value, max_value)
+			end
+
+			if widget.field.is_analog then
+				widget.field:set_value(new_value)
+			else
+				widget.field.user_value = new_value
+			end
+		end
+
+		-- Rotates the position of the knob indicator around the knob's center.
+		-- This will only work well for circular indicators (dots), since the
+		-- indicator itself is not being rotated.
+		function slider_manager:get_knob_dot_bounds(widget)
+			local dot = widget.knob_dot_cache
+			local value = (widget.field.port:read() - dot.value_min) / dot.value_range
+			local angle = dot.angle_min + value * dot.angle_range
+			local rx = -dot.center_y * math.sin(angle) * dot.aspect
+			local ry = dot.center_y * math.cos(angle)
+			local x = rx + dot.dx
+			local y = ry + dot.dy
+			return emu.render_bounds(x, y, x + dot.width, y + dot.height)
+		end
+
+		function slider_manager:configure_knob_dots()
+			for i = 1, #self.widgets do
+				local dot = self.widgets[i].knob_dot
+				if dot then
+					-- Remove bounds callback, since we need to access the
+					-- configured bounds.
+					dot:set_bounds_callback(nil)
+
+					local field = self.widgets[i].field
+					local knob_bounds = self.widgets[i].clickarea.bounds
+					local dot_bounds = dot.bounds
+
+					local angle_max, angle_min
+					if field.analog_wraps then
+						angle_max = 2.0 * math.pi
+						angle_min = 0
+					else
+						angle_max = self.KNOB_DOT_ANGLE_SPAN * 2.0 * math.pi / 360.0
+						angle_min = -angle_max
+					end
+
+					-- Compute the distance of the knob dot from the knob center.
+					local dot_x = dot_bounds.x0 + dot_bounds.width / 2.0
+					local dot_y = dot_bounds.y0 + dot_bounds.height / 2.0
+					local knob_x = knob_bounds.x0 + knob_bounds.width / 2.0
+					local knob_y = knob_bounds.y0 + knob_bounds.height / 2.0
+					local radius = math.sqrt((dot_y - knob_y) ^ 2 + (dot_x - knob_x) ^ 2)
+
+					self.widgets[i].knob_dot_cache = {
+						width       = dot_bounds.width,
+						height      = dot_bounds.height,
+						aspect      = dot_bounds.aspect,
+						value_min   = field.minvalue,
+						value_range = field.maxvalue - field.minvalue,
+						angle_min   = angle_min,
+						angle_range = angle_max - angle_min,
+						center_y    = -radius,
+						dx = knob_bounds.x0 + (knob_bounds.width - dot_bounds.width) / 2.0,
+						dy = knob_bounds.y0 + (knob_bounds.height - dot_bounds.height) / 2.0 }
+
+					dot:set_bounds_callback(
+						function()
+							return self:get_knob_dot_bounds(self.widgets[i])
+						end)
+				end
+			end
+		end
+
+		function slider_manager:pointer_left(type, id, dev, x, y, up, cnt)
+			self:release_pointer(id)
+		end
+
+		function slider_manager:pointer_aborted(type, id, dev, x, y, up, cnt)
+			self:release_pointer(id)
+		end
+
+		function slider_manager:forget_pointers()
+			for id, pointer in pairs(self.pointers) do
+				self:release_pointer(id)
+			end
+			self.pointers = {}
+		end
+
+		function slider_manager:track_frame_id()
+			self.frame_id = (self.frame_id + 1) % 1000000
+			-- 1M is arbitrary. Just need to ensure the same frame ID does not
+			-- repeat between a pointer press and release.
+		end
+		-----------------------------------------------------------------------
+		-- Slider and knob library ends.
+		-----------------------------------------------------------------------
+	]]></script>
+</mamelayout>

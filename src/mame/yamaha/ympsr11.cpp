@@ -275,4 +275,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1986, psr11, 0, 0, psr11, psr11, yamaha_psr11_state, empty_init, "Yamaha", "Portatone PSR-11", MACHINE_SUPPORTS_SAVE)
+SYST(1986, psr11, 0, 0, psr11, psr11, yamaha_psr11_state, empty_init, "Yamaha", "PortaTone PSR-11", MACHINE_SUPPORTS_SAVE)

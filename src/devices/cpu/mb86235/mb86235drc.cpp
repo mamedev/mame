@@ -334,6 +334,8 @@ void mb86235_device::static_generate_entry_point()
 	alloc_handle(m_entry, "entry");
 	UML_HANDLE(block, *m_entry);                                                            // handle  entry
 
+	UML_SETFMOD(block, uml::ROUND_ROUND);
+
 	load_fast_iregs(block);                                                                 // <load fastregs>
 
 	/* generate a hash jump via the current mode and PC */

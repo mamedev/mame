@@ -381,13 +381,13 @@ offs_t we32100_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		}
 		else if (!BIT(op, 0))
 		{
-			util::stream_format(stream, "%-8s0x%08x,", BIT(op, 4) ? "SPOPRT" : "SPOPRD", swapendian_int32(opcodes.r32(pc)));
+			util::stream_format(stream, "%-8s0x%08x,", BIT(op, 2) ? "SPOPRT" : "SPOPRD", swapendian_int32(opcodes.r32(pc)));
 			pc += 4;
 			dasm_src(stream, pc, opcodes);
 		}
 		else
 		{
-			util::stream_format(stream, "%-8s0x%08x,", BIT(op, 4) ? "SPOPT2" : "SPOPD2", swapendian_int32(opcodes.r32(pc)));
+			util::stream_format(stream, "%-8s0x%08x,", BIT(op, 2) ? "SPOPT2" : "SPOPD2", swapendian_int32(opcodes.r32(pc)));
 			pc += 4;
 			dasm_src(stream, pc, opcodes);
 			stream << ",";
@@ -620,7 +620,7 @@ offs_t we32100_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		}
 		else
 		{
-			util::stream_format(stream, "%-8s", BIT(op, 0) ? "BCC" : "BCC");
+			util::stream_format(stream, "%-8s", BIT(op, 0) ? "BCCB" : "BCCH");
 			dasm_bdisp(stream, pc, opcodes, BIT(op, 0));
 		}
 		flags |= STEP_COND;
@@ -643,7 +643,7 @@ offs_t we32100_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case 0x60:
 		if (!BIT(op, 1))
 		{
-			stream << "RVS";
+			stream << "RVC";
 			flags |= STEP_OUT;
 		}
 		else

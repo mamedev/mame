@@ -3348,6 +3348,7 @@ Crashes with NTSC machines after EOA logo (verify)
 		<description>FIFA International Soccer (Europe, USA)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Extended Play Productions" />
 		<info name="language" value="English" />
 		<info name="language" value="French" />
 		<info name="language" value="German" />
@@ -7517,6 +7518,7 @@ Unemulated HeartBeat peripheral
 		<description>Rings of Power (Europe, USA)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Naughty Dog"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_nhlpa"/>
 			<feature name="pcb" value="?? (Electronic Arts)"/>
@@ -27691,10 +27693,15 @@ Incompatible with Teradrive TMSS (missing "SEGA" header at $100)
 		</part>
 	</software>
 
+	<!-- This is a later rev, having numbers in password screen (the USA version don't) -->
 	<software name="populous">
 		<description>Populous (Europe)</description>
-		<year>1991</year>
+		<year>1990</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Bullfrog Productions" />
+		<!-- Original release: UK release Nov '90, rest of Europe Dec '90 -->
+		<info name="release" value="199011xx"/>
+		<info name="serial" value="E097SMXI"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
 				<rom name="populous (euro).bin" size="524288" crc="83d56f64" sha1="fe388caefbad7c08b699ed2d0e8a62ff1d697a16"/>
@@ -27706,6 +27713,7 @@ Incompatible with Teradrive TMSS (missing "SEGA" header at $100)
 		<description>Populous (Japan)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
+		<info name="developer" value="Bullfrog Productions" />
 		<info name="serial" value="G-4057"/>
 		<info name="release" value="19910809"/>
 		<info name="alt_title" value="ポピュラス"/>
@@ -27716,10 +27724,15 @@ Incompatible with Teradrive TMSS (missing "SEGA" header at $100)
 		</part>
 	</software>
 
+	<!-- Released before EA agreed with Sega as 3rd party, technically unlicensed title -->
 	<software name="populousu" cloneof="populous">
 		<description>Populous (USA)</description>
-		<year>1991</year>
-		<publisher>Sega</publisher>
+		<year>1990</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Bullfrog Productions" />
+		<info name="release" value="199007xx"/>
+		<!-- EA serial -->
+		<info name="serial" value="701601"/>
 		<sharedfeat name="incompatibility" value="TMSS"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">

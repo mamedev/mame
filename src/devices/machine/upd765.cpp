@@ -589,8 +589,11 @@ uint8_t upd765_family_device::msr_r()
 		break;
 	case PHASE_EXEC:
 		msr |= MSR_CB;
-		if((spec & SPEC_ND) && xfer_in_progress)
+		if((spec & SPEC_ND) && xfer_in_progress) {
 			msr |= MSR_EXM;
+			if(!fifo_write)
+				msr |= MSR_DIO;
+		}
 		if(internal_drq) {
 			msr |= MSR_RQM;
 			if(!fifo_write)
@@ -2206,6 +2209,8 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 
 		case SCAN_ID:
 			LOGSTATE("SCAN_ID\n");
+			st1 &= ~ST1_MA;
+			st1 |= ST1_ND;
 			if(!sector_matches()) {
 				LOGSTATE("SEARCH_ADDRESS_MARK_HEADER\n");
 				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
@@ -2217,7 +2222,7 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 				fi.sub_state = COMMAND_DONE;
 				break;
 			}
-			st1 &= ~ST1_MA;
+			st1 &= ~ST1_ND;
 			xfer_in_progress = true;
 			LOGRW("writing sector %02x %02x %02x %02x\n",
 						cur_live.idbuf[0],
@@ -3695,8 +3700,11 @@ void hd63266f_device::start_command(int cmd)
 		break;
 	}
 
-	// execute the command immediately if there's no motor on delay
-	if(motor_on_counter == 0) {
+	// execute the command immediately if there's no motor on delay.  The delay is counted
+	// in index pulses, and a drive holding no disk never gives any, so a drive that reports
+	// itself not ready has to be let through to fail on its own.
+	if(motor_on_counter == 0 || !get_ready(command[1] & 3)) {
+		motor_on_counter = 0;
 		upd765_family_device::start_command(cmd);
 	} else
 		delayed_command = cmd;

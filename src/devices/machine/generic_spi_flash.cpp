@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-// HLE-like implementation for SPI Flash ROMs using byte interface rather than SPI signals
+// HLE-like implementation for SPI flash ROMs.  Most hosts use the byte
+// interface; the pin-level adapter supports software-driven SPI buses.
 
 #include "emu.h"
 #include "generic_spi_flash.h"
@@ -33,6 +34,13 @@ void generic_spi_flash_device::device_start()
 	save_item(NAME(m_spi_state_step));
 	save_item(NAME(m_spi_statusreg));
 	save_item(NAME(m_spi_configreg));
+	save_item(NAME(m_bitbang_cs));
+	save_item(NAME(m_bitbang_sck));
+	save_item(NAME(m_bitbang_si));
+	save_item(NAME(m_bitbang_so));
+	save_item(NAME(m_bitbang_input));
+	save_item(NAME(m_bitbang_output));
+	save_item(NAME(m_bitbang_bits));
 
 	m_spi_statusreg = 0;
 	m_spi_configreg = 0;
@@ -44,6 +52,14 @@ void generic_spi_flash_device::device_reset()
 	m_spi_addr = 0;
 	m_spi_state = 0;
 	m_spi_latch = 0;
+	m_spi_state_step = 0;
+	m_bitbang_cs = 1;
+	m_bitbang_sck = 0;
+	m_bitbang_si = 1;
+	m_bitbang_so = 1;
+	m_bitbang_input = 0;
+	m_bitbang_output = 0xff;
+	m_bitbang_bits = 0;
 }
 
 void generic_spi_flash_device::get_command(u8 data)
@@ -115,6 +131,13 @@ void generic_spi_flash_device::get_command(u8 data)
 		LOGMASKED(LOG_SPI, "Set SPI to COMMAND_35_RDSR2\n");
 		m_spi_state = COMMAND_35_RDSR2;
 	}
+	else if (data == COMMAND_50_VSR_WREN)
+	{
+		// TODO: Model the volatile status-register write-enable latch when
+		// software depends on it.  Current users write an already-zero status.
+		LOGMASKED(LOG_SPI, "Accept volatile status register write enable\n");
+		m_spi_state = READY_FOR_COMMAND;
+	}
 	else if (data == COMMAND_66_ENABLE_RESET)
 	{
 		LOGMASKED(LOG_SPI, "Set SPI to ENABLE_RESET\n");
@@ -162,6 +185,98 @@ void generic_spi_flash_device::get_command(u8 data)
 	}
 
 	m_spi_state_step = 0;
+}
+
+u8 generic_spi_flash_device::next_bitbang_byte() const
+{
+	switch (m_spi_state)
+	{
+	case COMMAND_03_READ:
+		if (m_spi_state_step >= 3 && m_spiptr && m_length)
+			return m_spiptr[m_spi_addr & (m_length - 1)];
+		break;
+
+	case COMMAND_05_RDSR:
+		return m_spi_state_step ? 0x00 : m_spi_statusreg;
+
+	case COMMAND_0B_FAST_READ:
+		if (m_spi_state_step >= 4 && m_spiptr && m_length)
+			return m_spiptr[m_spi_addr & (m_length - 1)];
+		break;
+
+	case COMMAND_15_RDCR:
+		return m_spi_configreg;
+
+	case COMMAND_35_RDSR2:
+		return m_spi_statusreg;
+
+	case COMMAND_9F_RDID:
+		if (m_spi_state_step < std::size(m_idbytes))
+			return m_idbytes[m_spi_state_step];
+		break;
+
+	case COMMAND_EB_4READ:
+		if (m_spi_state_step >= 6 && m_spiptr && m_length)
+			return m_spiptr[m_spi_addr & (m_length - 1)];
+		break;
+	}
+
+	return 0xff;
+}
+
+void generic_spi_flash_device::cs_w(int state)
+{
+	state = state ? 1 : 0;
+	if (m_bitbang_cs == state)
+		return;
+
+	m_bitbang_cs = state;
+	m_spi_state = READY_FOR_COMMAND;
+	m_spi_state_step = 0;
+	m_bitbang_input = 0;
+	m_bitbang_output = 0xff;
+	m_bitbang_bits = 0;
+	m_bitbang_so = 1;
+}
+
+void generic_spi_flash_device::sck_w(int state)
+{
+	state = state ? 1 : 0;
+	if (m_bitbang_sck == state)
+		return;
+
+	if (!m_bitbang_cs)
+	{
+		if (state)
+		{
+			m_bitbang_input = (m_bitbang_input << 1) | m_bitbang_si;
+			if (++m_bitbang_bits == 8)
+				write(m_bitbang_input);
+		}
+		else if (m_bitbang_bits == 8)
+		{
+			m_bitbang_input = 0;
+			m_bitbang_output = next_bitbang_byte();
+			m_bitbang_bits = 0;
+			m_bitbang_so = BIT(m_bitbang_output, 7);
+		}
+		else
+		{
+			m_bitbang_so = BIT(m_bitbang_output, 7 - m_bitbang_bits);
+		}
+	}
+
+	m_bitbang_sck = state;
+}
+
+void generic_spi_flash_device::si_w(int state)
+{
+	m_bitbang_si = state ? 1 : 0;
+}
+
+int generic_spi_flash_device::so_r() const
+{
+	return m_bitbang_cs ? 1 : m_bitbang_so;
 }
 
 void generic_spi_flash_device::process_read_command(u8 data)
@@ -271,7 +386,7 @@ void generic_spi_flash_device::process_sector_erase_command(u8 data)
 		LOGMASKED(LOG_SPI, "SPI set to Erase Sector with address %08x\n", m_spi_addr);
 		break;
 	default:
-		LOGMASKED(LOG_SPI, "%s unexpected byte %02x when writing sector erase address\n", data);
+		LOGMASKED(LOG_SPI, "unexpected byte %02x when writing sector erase address\n", data);
 		break;
 	}
 }
@@ -474,4 +589,3 @@ bool generic_spi_flash_device::nvram_write(util::write_stream &file)
 	auto const [err, actual] = util::write(file, m_spiptr, m_length);
 	return !err;
 }
-

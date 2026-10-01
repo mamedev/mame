@@ -44,6 +44,7 @@ protected:
 	virtual void cbm_iec_atn(int state) override;
 	virtual void cbm_iec_clk(int state) override;
 	virtual void cbm_iec_data(int state) override;
+	virtual void cbm_iec_reset(int state) override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;

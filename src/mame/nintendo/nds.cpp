@@ -1865,8 +1865,8 @@ void nds_state::update_vram_mapping()
 
 	if (m_gba_mode)
 	{
-		// bank A holds the GBA's 96K of VRAM
-		map_vram_bank(VRAM_REGION_BG_A, 0, 4, 0);
+		// bank A holds the GBA's 96K of VRAM; the bitmap modes reach 16K into the OBJ tiles
+		map_vram_bank(VRAM_REGION_BG_A, 0, 5, 0);
 		map_vram_bank(VRAM_REGION_OBJ_A, 0, 2, 0x10000/4);
 		return;
 	}

@@ -53,24 +53,12 @@ void f108_device::device_add_mconfig(machine_config &config)
 	m_ata->irq_handler().set(FUNC(f108_device::ata_irq_w));
 
 	NSCSI_BUS(config, m_scsibus);
-	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
-		[](device_t *device)
-		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^^primetimeii:speaker", 1.0, 0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^^primetimeii:speaker", 1.0, 1);
-		});
-	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, nullptr);
+	// ... bus devices to be populated by drivers ...
+
 	NCR53C96(config, m_ncr1, 40_MHz_XTAL);
 	m_scsibus->set_external_device(7, m_ncr1);
 	m_ncr1->set_busmd(ncr53c96_device::BUSMD_1);
 
-	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
-	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68040");
 
 	SCC85C30(config, m_scc, 31.3344_MHz_XTAL/4);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
@@ -127,7 +115,7 @@ void f108_device::device_reset()
 
 	// put ROM mirror at 0
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	const u32 memory_size = std::min((u32)0x3fffff, m_rom_size);
+	const u32 memory_size = std::min((u32)0x400000, m_rom_size);
 	const u32 memory_end = memory_size - 1;
 	offs_t memory_mirror = memory_end & ~(memory_size - 1);
 

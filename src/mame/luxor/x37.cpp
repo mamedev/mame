@@ -9,14 +9,6 @@
 
 */
 
-/*
-
-    TODO
-
-    - tst.w 0xfffffc
-
-*/
-
 #include "emu.h"
 #include "bus/abckb/abckb.h"
 #include "bus/nscsi/devices.h"

@@ -19,9 +19,16 @@ public:
 		return m_spi_latch;
 	}
 
+	// SPI mode 0 pin-level interface for bit-banged hosts.
+	void cs_w(int state);
+	void sck_w(int state);
+	void si_w(int state);
+	int so_r() const;
+
 	void set_ready()
 	{
 		m_spi_state = READY_FOR_COMMAND;
+		m_spi_state_step = 0;
 	}
 
 	void write(u8 data);
@@ -67,6 +74,7 @@ private:
 		COMMAND_31_UNKNOWN = 0x31,
 
 		COMMAND_35_RDSR2 = 0x35,
+		COMMAND_50_VSR_WREN = 0x50,
 
 		COMMAND_66_ENABLE_RESET = 0x66,
 
@@ -98,6 +106,7 @@ private:
 	void process_status2_read_command(u8 data);
 	void process_status_rdid_command(u8 data);
 	void process_config_read_command(u8 data);
+	u8 next_bitbang_byte() const;
 
 	u32 m_spi_addr;
 	u8 m_spi_state;
@@ -105,6 +114,13 @@ private:
 	u8 m_spi_state_step;
 	u8 m_spi_statusreg;
 	u8 m_spi_configreg;
+	u8 m_bitbang_cs;
+	u8 m_bitbang_sck;
+	u8 m_bitbang_si;
+	u8 m_bitbang_so;
+	u8 m_bitbang_input;
+	u8 m_bitbang_output;
+	u8 m_bitbang_bits;
 
 	// config
 	u8 *m_spiptr;

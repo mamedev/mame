@@ -1418,7 +1418,7 @@ void n64_periphs::pi_dma_tick()
 {
 	bool update_bm = false;
 	uint16_t *cart16;
-	uint16_t *dram16 = (uint16_t*)&m_rdram[0];
+	auto const dram16 = util::big_endian_cast<uint16_t>(&m_rdram[0]);
 
 	uint32_t cart_addr = (pi_cart_addr & 0x0fffffff) >> 1;
 	uint32_t dram_addr = (pi_dram_addr & 0x007fffff) >> 1;
@@ -1460,7 +1460,7 @@ void n64_periphs::pi_dma_tick()
 		{
 			for(int i = 0; i < dma_length / 2; i++)
 			{
-				dram16[BYTE_XOR_BE(dram_addr + i)] = cart16[BYTE_XOR_BE(cart_addr + i)];
+				dram16[dram_addr + i] = cart16[BYTE_XOR_BE(cart_addr + i)];
 			}
 
 			pi_cart_addr += dma_length;
@@ -1476,7 +1476,7 @@ void n64_periphs::pi_dma_tick()
 		{
 			for(int i = 0; i < dma_length / 2; i++)
 			{
-				cart16[BYTE_XOR_BE(cart_addr + i)] = dram16[BYTE_XOR_BE(dram_addr + i)];
+				cart16[BYTE_XOR_BE(cart_addr + i)] = dram16[dram_addr + i];
 			}
 
 			pi_cart_addr += dma_length;
