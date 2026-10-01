@@ -139,3 +139,55 @@
 - `gp2_bg15_full.bin` — 2MB bg15 framebuffer dump (from C++ at ~70s)
 - `gp2_sub_dispatch_full.bin` — sub CPU task dispatch table dump
 - `GP2_MCU_ANALYSIS.md` — earlier analysis document
+
+## LATEST FINDING: Slave command 0x02 and bg15 stride
+
+### Slave command 0x02 ("HELP")
+At sub CPU code 0x680E (the "else" branch when b5d4 validation fails):
+- The sub CPU writes **slave command 0x02** to the slave command area at $101012
+- The data is a "HELP" buffer (literal "HELP" = 0x48454C50) at save_area+0x180
+- The buffer contains: word A2 addr, longword 0x100, word 4
+- This is the sub CPU REQUESTING the MCU to process image data
+- **Currently unhandled** in the MCU NMI2 simulation!
+
+### Correct bg15 stride: 0x200 bytes (0x100 words) per column
+At 0x6978: `lea ($200,A0), A0` — column advance in the bg15 fill
+- 128 longwords per column = 256 words = 512 bytes = 0x200 bytes
+- 256 columns at 0x200 = 0x20000 bytes per page half
+- Renderer should use: `ram[(xx * 0x100) + yy]`
+- NOT 0x800 (the original) or 0x200 (my first attempt)
+
+### Page 3 fill and page select
+- The fill at 0x685A writes to page 3 (0x4C0000)
+- The page select register 0x314000 (currently nopw) switches display pages
+- The renderer hardcodes page 1 offset — should be dynamic based on 0x314000
+
+## CRITICAL FINDING: Image Descriptor Script Format
+
+The image data pointer at 0x4EF8 (stored by handler at 0x66C8) is NOT
+raw pixel data — it's an **image descriptor script**:
+
+```
+FFFC 00D3 0000 0039 FFFF FFFF   ← place image 0xD3 at Y=0x39
+FFFC 00D3 0000 0056 FFFF FFFF   ← place image 0xD3 at Y=0x56
+00D4 FFFF FFFF                   ← image 0xD4, end
+FFFC ...                         ← more entries
+```
+
+Format per entry:
+- 0xFFFC = marker for "place image"
+- word = image index (into imlist[] / cmd=0x0c lookup)
+- 0x0000 = separator?
+- word = Y position in bg15
+- 0xFFFF 0xFFFF = end of row/group
+
+The MCU needs to:
+1. Read the descriptor script from the sub CPU program ROM
+2. For each entry, resolve the image index via imlist[] to get subdata ROM offset
+3. Set up the decompression task's param block with:
+   - source = subdata ROM offset
+   - destination = bg15 page address + position
+   - dimensions from the image header in subdata ROM
+4. Activate the task and continuously re-activate it (cooperative handshake)
+
+This is the final missing piece for bg15 picture rendering.

@@ -98,17 +98,16 @@ void galpani2_state::copybg8(screen_device &screen, bitmap_rgb32 &bitmap, const 
 // (or is this just wrong format / layout due to protection?)
 void galpani2_state::copybg15(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t* ram = m_bg15 + 0x40000/2;
-
-	//int x = 0;
-	//int y = 0;
+	// bg15 layout: 256 columns × 256 rows per page, 0x200 bytes (0x100 words) per column
+	// Page offset from 0x314000 register (TODO: capture dynamically)
+	uint16_t* ram = m_bg15 + 0xc0000/2; // page 3 at 0x4C0000 (where the game fills)
 
 	pen_t const *const clut = &m_bg15palette->pen(0);
 	for (int xx = 0; xx < 320; xx++)
 	{
 		for (int yy = 0; yy < 240; yy++)
 		{
-			uint16_t pen = ram[(xx * 0x800) + yy];
+			uint16_t pen = ram[(xx * 0x100) + yy];
 			bitmap.pix(yy, xx) = clut[pen & 0x7fff];
 		}
 	}
