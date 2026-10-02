@@ -18,6 +18,13 @@ void kn6000_expansion_connector::device_start()
 {
 }
 
+void kn6000_expansion_connector::program_map(address_space_installer &space)
+{
+	device_kn6000_expansion_interface *const card = get_card_device();
+	if (card)
+		card->program_map(space);
+}
+
 device_kn6000_expansion_interface::device_kn6000_expansion_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "kn6000exp")
 {
