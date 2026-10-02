@@ -170,10 +170,17 @@ void galpani2_state::copybg15(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap
 		// framebuffer x=0 at screen x=48, the BG8 window's left edge.
 		int const scrollx = regs[0x400 / 2] + 0x42;
 		int const scrolly = regs[0xc00 / 2] + 0x0b;
+
+		// For the foreground photo plane, clip to the gameplay field area.
+		// The 512-pixel-wide framebuffer wraps around, and stale photo data
+		// from the inactive half appears at the border/HUD positions.
+		// The field spans 256 columns starting at m_field_origin_x.
+		int const field_min_x = (layer == 3) ? m_field_origin_x : cliprect.min_x;
+		int const field_max_x = (layer == 3) ? (m_field_origin_x + 255) : cliprect.max_x;
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			int const sy = (y + scrolly) & 0xff;
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = field_min_x; x <= field_max_x; x++)
 			{
 				uint16_t const pen = ram[sy * 0x200 + ((x + scrollx) & 0x1ff)];
 				// Native decoders set bit 15; native clear jobs remove it while
