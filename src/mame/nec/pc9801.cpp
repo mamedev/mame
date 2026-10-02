@@ -13,8 +13,7 @@ TODO:
 - C-Bus SCSI support, remove IDE ROM loads where doesn't belong by default;
 \- load actual IDE BIOSes from IPL romsets where applicable (pc9801bx onward, all pc9821)
 - Port over pc88va SASI version in common C-Bus option;
-- Remove kludge for POR bit in a20_ctrl_w fn;
-\- Causes "SYSTEM SHUTDOWN"s on OS installs/reboots (soft reset the machine manually);
+- Remove SHUT1 workaround for BIOS protected-mode self-test failures in a20_ctrl_w;
 - DAC1BIT has a bit of clicking with start/end of samples, is it fixable or just a btanb?
 - Incomplete FDC inner semantics with the dual ports;
 \- floppy sounds never silences when drive is idle (disabled for the time being);
@@ -368,11 +367,12 @@ void pc9801vm_state::a20_ctrl_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0x00)
 	{
-		uint8_t por;
-		/* reset POR bit */
-		// TODO: is there any other way that doesn't involve direct r/w of ppi address?
-		por = m_ppi_sys->read(2) & ~0x20;
-		m_ppi_sys->write(2, por);
+		// Preserve SHUT1 when SHUT0 selects a system restart. Clearing it would
+		// make the BIOS report SYSTEM SHUTDOWN instead of rebooting.
+		// We still need this kludge for protected-mode self-test returns.
+		const uint8_t shut = m_ppi_sys->read(2);
+		if (!BIT(shut, 7))
+			m_ppi_sys->write(2, shut & ~0x20);
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_gate_a20 = 0;
 	}
