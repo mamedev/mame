@@ -125,6 +125,7 @@ private:
 	uint8_t input_mux_r();
 	uint8_t key_matrix_r();
 	uint8_t sound_cmd_r();
+	uint8_t get_key_matrix_value(uint16_t in_value);
 	void outportb_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
@@ -222,52 +223,68 @@ void kingdrby_state::video_start()
 	m_sc1_tilemap->set_transparent_pen(0);
 }
 
-static const uint8_t hw_sprite[16] =
-{
-	0x34, 0x34, 0x34, 0x34, 0x34, 0x34, 0x34, 0x22,
-	0x22, 0x22, 0x22, 0x22, 0x22, 0x11, 0x22, 0x22
-};
-
 void kingdrby_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const uint8_t hw_sprite[16] = {
+		0x34, 0x34, 0x34, 0x34, 0x34, 0x34, 0x34, 0x22,
+		0x22, 0x22, 0x22, 0x22, 0x22, 0x11, 0x22, 0x22
+	};
+
 	uint8_t *spriteram = m_spriteram;
 	int count = 0;
 
-	/*sprites not fully understood.*/
-	for(count=0;count<0x48;count+=4)
+	for(count = 0; count < 0x48; count+=4)
 	{
-		int x,y,spr_offs,colour,fx,dx,dy,h,w;
+		int x, y, spr_offs, colour, fx, dx, dy, h, w;
 
 		spr_offs = (spriteram[count]);
-		spr_offs &=0x7f;
-		spr_offs*=4;
-		colour = (spriteram[count+3] & 0xf0)>>4;
+		spr_offs &= 0x7f;
+		spr_offs *= 4;
+		colour = (spriteram[count + 3] & 0xf0)>>4;
 		fx = spriteram[count] & 0x80;
-		y = (spriteram[count+1] == 0) ? 0 : 0x100-spriteram[count+1];
-		x = spriteram[count+2] - ((spriteram[count+3] & 1)<<8);
+		y = (spriteram[count + 1] == 0) ? 0 : 0x100-spriteram[count + 1];
+		x = spriteram[count + 2] - ((spriteram[count + 3] & 1) << 8);
 
-		/* TODO: hardcoded via a table, there must be some other way to do this */
+		// TODO: hardcoded via a table, there must be some other way to do this (proms?)
 		h = (hw_sprite[colour] & 0xf0) >> 4;
 		w = (hw_sprite[colour] & 0x0f) >> 0;
 
 		if(h == 1 && w == 1)
 		{
 			spr_offs /= 4;
-			/* TODO: horse number signs */
+			// TODO: horse number signs
 			spr_offs  = 0x16c + (((spr_offs & 8) << 2) ^ 0x20) + ((spr_offs & 4) << 2) + (spr_offs & 3);
 		}
 
 		if(fx)
 		{
-			for(dy=0;dy<h;dy++)
-				for(dx=0;dx<w;dx++)
-					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,spr_offs++,colour,1,0,((x+16*w)-(dx+1)*16),(y+dy*16),0);
+			for(dy = 0; dy < h; dy++)
+			{
+				for(dx = 0; dx < w; dx++)
+				{
+					m_gfxdecode->gfx(0)->transpen(
+						bitmap,cliprect,
+						spr_offs++,
+						colour,
+						1, 0,
+						((x + 16 * w) - (dx + 1) * 16),(y + dy * 16), 0);
+				}
+			}
 		}
 		else
 		{
-			for(dy=0;dy<h;dy++)
-				for(dx=0;dx<w;dx++)
-					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,spr_offs++,colour,0,0,(x+dx*16),(y+dy*16),0);
+			for(dy = 0; dy < h; dy++)
+			{
+				for(dx = 0; dx < w; dx++)
+				{
+					m_gfxdecode->gfx(0)->transpen(
+						bitmap, cliprect,
+						spr_offs++,
+						colour,
+						0, 0,
+						(x + dx * 16), (y + dy * 16), 0);
+				}
+			}
 		}
 	}
 }
@@ -286,11 +303,11 @@ uint32_t kingdrby_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	clip.set(visarea.min_x, 255, 192, visarea.max_y);
 	clip &= cliprect;
 
-	/*TILEMAP_DRAW_CATEGORY + TILEMAP_DRAW_OPAQUE doesn't suit well?*/
-	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	// TODO: TILEMAP_DRAW_CATEGORY + TILEMAP_DRAW_OPAQUE doesn't suit well for this
+	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap,cliprect);
-	m_sc1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1),0);
-	m_sc0w_tilemap->draw(screen, bitmap, clip, 0,0);
+	m_sc1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
+	m_sc0w_tilemap->draw(screen, bitmap, clip, 0, 0);
 
 	return 0;
 }
@@ -326,9 +343,8 @@ uint8_t kingdrby_state::hopper_io_r()
 
 void kingdrby_state::hopper_io_w(uint8_t data)
 {
-	m_p1_hopper = (data & 0x8)<<3;
-	m_p2_hopper = (data & 0x4)<<5;
-//  printf("%02x\n",data);
+	m_p1_hopper = BIT(data, 3) << 3;
+	m_p2_hopper = BIT(data, 2) << 5;
 }
 
 void kingdrby_state::sound_cmd_w(uint8_t data)
@@ -355,56 +371,29 @@ uint8_t kingdrby_state::input_mux_r()
 		return ioport("MUX1")->read();
 }
 
+// Convert MAME input system into the raw value this expects from bet keys
+uint8_t kingdrby_state::get_key_matrix_value(uint16_t in_value)
+{
+	int i;
+
+	for (i = 0; i < 15; i++)
+	{
+		if (in_value & 1 << i)
+			return i + 1;
+	}
+
+	return 0;
+}
+
 uint8_t kingdrby_state::key_matrix_r()
 {
-	uint16_t p1_val,p2_val;
-	uint8_t p1_res,p2_res;
+	const uint16_t p1_val = ioport("KEY_1P")->read();
+	const uint16_t p2_val = ioport("KEY_2P")->read();
 
-	p1_val = ioport("KEY_1P")->read();
-	p2_val = ioport("KEY_2P")->read();
+	const uint8_t p1_res = get_key_matrix_value(p1_val);
+	const uint8_t p2_res = get_key_matrix_value(p2_val);
 
-	p1_res = 0;
-	p2_res = 0;
-
-	switch(p1_val)
-	{
-		case 0x0001: p1_res = 0x01; break;
-		case 0x0002: p1_res = 0x02; break;
-		case 0x0004: p1_res = 0x03; break;
-		case 0x0008: p1_res = 0x04; break;
-		case 0x0010: p1_res = 0x05; break;
-		case 0x0020: p1_res = 0x06; break;
-		case 0x0040: p1_res = 0x07; break;
-		case 0x0080: p1_res = 0x08; break;
-		case 0x0100: p1_res = 0x09; break;
-		case 0x0200: p1_res = 0x0a; break;
-		case 0x0400: p1_res = 0x0b; break;
-		case 0x0800: p1_res = 0x0c; break;
-		case 0x1000: p1_res = 0x0d; break;
-		case 0x2000: p1_res = 0x0e; break;
-		case 0x4000: p1_res = 0x0f; break;
-	}
-
-	switch(p2_val)
-	{
-		case 0x0001: p2_res = 0x01; break;
-		case 0x0002: p2_res = 0x02; break;
-		case 0x0004: p2_res = 0x03; break;
-		case 0x0008: p2_res = 0x04; break;
-		case 0x0010: p2_res = 0x05; break;
-		case 0x0020: p2_res = 0x06; break;
-		case 0x0040: p2_res = 0x07; break;
-		case 0x0080: p2_res = 0x08; break;
-		case 0x0100: p2_res = 0x09; break;
-		case 0x0200: p2_res = 0x0a; break;
-		case 0x0400: p2_res = 0x0b; break;
-		case 0x0800: p2_res = 0x0c; break;
-		case 0x1000: p2_res = 0x0d; break;
-		case 0x2000: p2_res = 0x0e; break;
-		case 0x4000: p2_res = 0x0f; break;
-	}
-
-	return p1_res | (p2_res<<4);
+	return p1_res | (p2_res << 4);
 }
 
 uint8_t kingdrby_state::sound_cmd_r()
@@ -412,21 +401,19 @@ uint8_t kingdrby_state::sound_cmd_r()
 	return m_sound_cmd;
 }
 
-static const uint8_t led_map[16] =
-	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
-
+// offset = directly tied with the button (i.e. offset 1 = 1-2, offset 2 = 1-3 etc.)
+// data = xxxx ---- p2 array
+//        ---- xxxx p1 array
+// they goes from 0 to 5, to indicate the number.
+// If one player bets on something, the other led will toggle between p1 and p2 bets.
 void kingdrby_state::led_array_w(offs_t offset, uint8_t data)
 {
-	/*
-	offset = directly tied with the button (i.e. offset 1 = 1-2, offset 2 = 1-3 etc.)
-	data = xxxx ---- p2 array
-	       ---- xxxx p1 array
-	they goes from 0 to 5, to indicate the number.
-	If one player bets something, the other led will toggle between p1 and p2 bets.
-	*/
+	const uint8_t led_map[16] = {
+		0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07,
+		0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x00
+	};
 	m_digits[0xf + offset] = led_map[(data & 0xf0) >> 4];
 	m_digits[0x0 + offset] = led_map[(data & 0x0f) >> 0];
-
 }
 
 /*************************************
@@ -534,7 +521,6 @@ void kingdrby_state::outportb_w(uint8_t data)
  *************************************/
 
 static INPUT_PORTS_START( kingdrby )
-	/*this might be different.*/
 	PORT_START("HPIO")  // ppi0 (5000)
 	PORT_DIPNAME( 0x01, 0x01, "HPIO" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -554,8 +540,8 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) //1p hopper i/o
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) //2p hopper i/o
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) //1p hopper I/O
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) //2p hopper I/O
 
 	PORT_START("IN1")   // ppi0 (5001)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) //?
@@ -612,7 +598,7 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("MUX0")  // ppi1 (6002)
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPNAME( 0x01, 0x01, "MUX0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -638,7 +624,7 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("MUX1")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPNAME( 0x01, 0x01, "MUX1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -664,7 +650,7 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPNAME( 0x01, 0x01, "DSW" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -691,7 +677,6 @@ static INPUT_PORTS_START( kingdrby )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kingdrbb )
-	/*this might be different.*/
 	PORT_START("HPIO")  // ppi0 (5000)
 	PORT_DIPNAME( 0x01, 0x01, "HPIO" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -711,8 +696,8 @@ static INPUT_PORTS_START( kingdrbb )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) //1p hopper i/o
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) //2p hopper i/o
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) //1p hopper I/O
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) //2p hopper I/O
 
 	PORT_START("IN0")   // ppi0 (5001)
 	PORT_DIPNAME( 0x01, 0x01, "IN0" )
@@ -815,7 +800,7 @@ static INPUT_PORTS_START( kingdrbb )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
+	PORT_DIPNAME( 0x01, 0x01, "DSW" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
