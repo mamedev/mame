@@ -1438,7 +1438,9 @@ void namcos10_state::namcos10_mgexio(machine_config &config)
 		r |= m_mgexio_hopper[0]->line_r() << 4; // hopper (l)
 		r |= m_mgexio_hopper[1]->line_r() << 5; // hopper (r)
 		r |= m_mgexio_hopper[2]->line_r() << 6; // hopper (c)
-		r |= 1 << 7; // TODO: pusher motor, how does this work?
+		// pusher motor. Pulsing it at 2 Hz makes games boot
+		// to attract mode. Without it, games give a IO error.
+		r |= (int(machine().time().as_double() * 4) & 1) << 7;
 		return r;
 	});
 
