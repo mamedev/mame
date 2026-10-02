@@ -138,11 +138,17 @@ void galpani2_state::machine_start()
 	save_item(NAME(m_old_mcu_nmi1));
 	save_item(NAME(m_old_mcu_nmi2));
 	save_item(NAME(m_girl_bitmap_pending_addr));
+	// Only SE uses the bound source; retain the normal sets' save layout.
+	if (m_bg_image_prefix_count)
+		save_item(NAME(m_girl_bitmap_pending_source));
 	save_item(NAME(m_girl_bitmap_delay));
 }
 
 void galpani2_state::machine_reset()
 {
+	m_girl_bitmap_pending_addr = 0;
+	m_girl_bitmap_pending_source = 0;
+	m_girl_bitmap_delay = 0;
 	machine().scheduler().perfect_quantum(attotime::from_usec(50)); //initial mcu xchk
 }
 
@@ -227,8 +233,8 @@ void galpani2_state::galpani2_mcu_init_w(uint8_t data)
 }
 
 // Generate a girl-area bitmap from BG15 plane 3's decoded photo.
-// The real MCU has an internal mask from its undumped ROM; this is
-// an HLE approximation that treats nonblack photo pixels as "girl".
+// The MCU firmware is undumped and its original mask source is unknown.
+// This HLE approximation treats nonblack photo pixels as "girl".
 // The bitmap is 256x224 bits (7,168 bytes), MSB first, 8 longwords
 // per row. The consumer at main ROM 13578 expands each bit into
 // BG8 plane 0 as 0x80A0 (girl) or 0x00A0 (non-girl), then the
@@ -236,6 +242,125 @@ void galpani2_state::galpani2_mcu_init_w(uint8_t data)
 // Returns the popcount before edge removal.
 static constexpr int      FIELD_COLS         = 256;
 static constexpr int      FIELD_ROWS         = 224;
+
+uint32_t galpani2_state::se_current_girl_image_offset()
+{
+	address_space &main = m_maincpu->space(AS_PROGRAM);
+	address_space &sub = m_subcpu->space(AS_PROGRAM);
+
+	// SE's native preparation at main 15554..1562A chooses a predecessor
+	// script at A09A and the current picture script at A09C. They can differ
+	// after a level change. Follow the current script's transparent overlay
+	// instead of answering with whichever RGB decode happens to run first.
+	uint16_t const script = main.read_word(0x10a09c);
+	uint32_t const table = sub.read_dword(BIT(sub.read_byte(0x10b5d3), 3) ? 0x4a0a : 0x4a06);
+	if (table >= 0x3fffe || script > sub.read_word(table)
+		|| table + 2 + uint32_t(script) * 2 >= 0x3fffe)
+		return 0;
+
+	uint32_t position = table + sub.read_word(table + 2 + script * 2);
+	for (unsigned i = 0; i < 64 && position < 0x3fffc; ++i, position += 2)
+	{
+		uint16_t const operation = sub.read_word(position);
+		if (operation == 0xfffe || operation == 0xffff)
+			break;
+		if (operation != 0xfffb)
+			continue;
+		uint16_t const image = sub.read_word(position + 2);
+		if (image < m_bg_image_prefix_count)
+			return m_bg_image_prefix_offsets[image];
+		if (uint32_t(image) - m_bg_image_prefix_count < m_bg_image_count)
+			return m_bg_image_offsets[image - m_bg_image_prefix_count];
+		break;
+	}
+	return 0;
+}
+
+// SE draws a transparent girl over an opaque background in the same RGB
+// framebuffer. Derive the HLE mask from the requested overlay stream, before
+// that compositing loses its coverage information. The MCU firmware remains
+// undumped; overlay coverage approximates the requested mask, whose original
+// source and generation method are not established.
+bool galpani2_state::generate_se_girl_bitmap(uint32_t image_offset)
+{
+	memory_region &rom = *memregion("subdata");
+	if (image_offset + 6 > rom.bytes())
+		return false;
+
+	// ROM_REGION16_BE stores host-order words. Packet bytes need their
+	// logical big-endian order, including unaligned literal colors.
+	auto byte = [&rom](uint32_t offset) -> uint8_t {
+		return rom.as_u16(offset / 2) >> ((offset & 1) ? 0 : 8);
+	};
+	auto word = [&byte](uint32_t offset) -> uint16_t {
+		return (uint16_t(byte(offset)) << 8) | byte(offset + 1);
+	};
+
+	uint16_t const kind = word(image_offset);
+	uint32_t position = image_offset + 2;
+	if (kind == 0x20)
+	{
+		// The SE scripts request a 256x240 opaque background first, then
+		// a 256x256 transparent girl. Only the latter answers the mask job.
+		if (word(position) != 255 || word(position + 2) != 255)
+			return false;
+		position += 4;
+	}
+	else if (kind != 0x30 && kind != 0x50)
+		return false;
+
+	std::array<uint8_t, FIELD_COLS * FIELD_ROWS / 8> bitmap{};
+	uint32_t pixel = 0;
+	uint16_t total = 0;
+	while (pixel < 256 * 256)
+	{
+		if (position >= rom.bytes())
+			return false;
+		uint8_t const control = byte(position++);
+		uint32_t count = control & ((kind == 0x50) ? 0x3f : 0x7f);
+		if (kind == 0x50 && BIT(control, 6))
+		{
+			if (position >= rom.bytes())
+				return false;
+			count = (count << 8) | byte(position++);
+		}
+		count = std::min(count + 1, 256U * 256U - pixel);
+		bool const skip = kind != 0x20 && BIT(control, 7);
+		bool const repeat = kind == 0x20 && BIT(control, 7);
+		uint32_t const bytes = skip ? 0 : (repeat ? 2 : count * 2);
+		if (position + bytes > rom.bytes())
+			return false;
+
+		for (uint32_t i = 0; i < count; ++i, ++pixel)
+		{
+			uint16_t const color = skip ? 0 : word(position + (repeat ? 0 : i * 2));
+			// Native SE field RAM starts at row 8, while the RGB image's
+			// FFFD Y register adds another 8 rows in the video sampler.
+			// Thus its 224 field rows use source rows 16..239 in either half.
+			if (color && pixel >= 16 * 256 && pixel < 240 * 256)
+			{
+				uint32_t const bit = pixel - 16 * 256;
+				bitmap[bit / 8] |= 0x80 >> (bit & 7);
+				++total;
+			}
+		}
+		position += bytes;
+	}
+	if (!total)
+		return false;
+
+	address_space &mspace = m_maincpu->space(AS_PROGRAM);
+	for (unsigned i = 0; i < bitmap.size(); ++i)
+		mspace.write_byte(GIRL_BITMAP_ADDR + i, bitmap[i]);
+	// Publish the count last. The native initial expansion / later merge
+	// owns BG8 flags, border trimming, capture counts and percentage updates.
+	mspace.write_word(m_girl_bitmap_pending_addr + 2, GIRL_BITMAP_OFFSET);
+	mspace.write_word(m_girl_bitmap_pending_addr, total);
+	logerror("MCU SE girl bitmap: source %08x, %u pixels\n", image_offset, unsigned(total));
+	m_girl_bitmap_pending_addr = 0;
+	m_girl_bitmap_pending_source = 0;
+	return true;
+}
 
 uint16_t galpani2_state::generate_girl_bitmap(address_space &mspace)
 {
@@ -280,19 +405,9 @@ uint16_t galpani2_state::generate_girl_bitmap(address_space &mspace)
 
 				// A girl pixel has bit 15 set and a meaningful color.
 				// GRB555 0x0001 is near-black decoder padding; exclude it.
-				// Also detect stale pixels from the previous photo using
-				// double-buffer comparison: the game alternates 256-pixel
-				// halves. If the active pixel matches the inactive half at
-				// the same row, it hasn't been overwritten by the current
-				// decode yet and should be excluded.
-				bool girl = BIT(pen, 15) && (pen & 0x7fff) > 1;
-				if (girl)
-				{
-					int const other_col = bg15_col ^ 0x100; // opposite half
-					uint16_t const other = ram[bg15_row * 0x200 + other_col];
-					if (pen == other)
-						girl = false;  // same as inactive half → stale
-				}
+				// Matching the inactive half does not imply stale data:
+				// complete native decodes can write the same color in both.
+				bool const girl = BIT(pen, 15) && (pen & 0x7fff) > 1;
 				if (girl)
 				{
 					bits |= (1u << bit);
@@ -372,6 +487,19 @@ void galpani2_state::galpani2_mcu_nmi1()
 			continue;
 
 		default: {
+			if (m_bg_image_prefix_count)
+			{
+				// The first overlay lookup may belong to the predecessor
+				// picture. Bind this mask job to the native current script.
+				// Retain the existing overlay-lookup response boundary;
+				// original MCU latency and mask provenance remain unknown.
+				mspace.write_word(address, 0);
+				m_girl_bitmap_pending_addr = address;
+				m_girl_bitmap_pending_source = se_current_girl_image_offset();
+				logerror("MCU SE mask request %02x: current script %04x -> %08x\n",
+					command, mspace.read_word(0x10a09c), m_girl_bitmap_pending_source);
+				continue;
+			}
 			// Girl-area bitmap request (e.g. 0x1B English, 0x47 Asia).
 			// The consumer at main ROM 134f0 waits for a nonzero word
 			// at the parameter address, reads it as girl_total, then
@@ -434,6 +562,22 @@ void galpani2_state::galpani2_mcu_nmi2()
 			// It then queues the appropriate native decompressor with this raw offset.
 			logerror("MCU slave %02x:%06x: image lookup %04x -> %08x\n", slot, address, img, iadr);
 			sspace.write_dword(address + 2, iadr);
+			if (m_bg_image_prefix_count && m_girl_bitmap_pending_addr && iadr
+				&& m_girl_bitmap_pending_source)
+			{
+				memory_region &rom = *memregion("subdata");
+				// Opaque 256x240 backgrounds precede overlays. Preserve
+				// the response boundary without confusing that first
+				// overlay's identity with the requested current mask.
+				if (iadr + 6 <= rom.bytes())
+				{
+					uint16_t const kind = rom.as_u16(iadr / 2);
+					if (kind == 0x30 || kind == 0x50
+						|| (kind == 0x20 && rom.as_u16(iadr / 2 + 1) == 255
+							&& rom.as_u16(iadr / 2 + 2) == 255))
+						generate_se_girl_bitmap(m_girl_bitmap_pending_source);
+				}
+			}
 			break;
 		}
 

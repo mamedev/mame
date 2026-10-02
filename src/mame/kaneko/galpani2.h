@@ -85,9 +85,12 @@ private:
 	// Deferred girl-bitmap HLE: the bitmap is generated after the
 	// photo decode completes, not at MCU command time when BG15 may
 	// still contain stale data from the previous round.
+	// SE instead binds its requested overlay at command time and publishes
+	// that stream's coverage at the existing overlay-lookup boundary.
 	static constexpr uint32_t GIRL_BITMAP_OFFSET = 0xe000;
 	static constexpr uint32_t GIRL_BITMAP_ADDR   = 0x10e000;
 	uint32_t m_girl_bitmap_pending_addr = 0;
+	uint32_t m_girl_bitmap_pending_source = 0;
 	int      m_girl_bitmap_delay = 0;
 
 	void galpani2_mcu_init_w(uint8_t data);
@@ -110,6 +113,8 @@ private:
 	void galpani2_mcu_nmi1();
 	void galpani2_mcu_nmi2();
 	uint16_t generate_girl_bitmap(address_space &mspace);
+	uint32_t se_current_girl_image_offset();
+	bool generate_se_girl_bitmap(uint32_t image_offset);
 	void galpani2_mem1(address_map &map) ATTR_COLD;
 	void galpani2_mem2(address_map &map) ATTR_COLD;
 };

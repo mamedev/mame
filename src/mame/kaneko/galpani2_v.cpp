@@ -154,6 +154,8 @@ void galpani2_state::copybg15(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap
 	pen_t const *const clut = &m_bg15palette->pen(0);
 	int const mask_scrollx = *m_bg8_scrollx[1] + 0x42;
 	int const mask_scrolly = *m_bg8_scrolly[1] + 0x0b;
+	int const shape_scrollx = *m_bg8_scrollx[0] + 0x43;
+	int const shape_scrolly = *m_bg8_scrolly[0] + 0x0b;
 	for (int layer = 0; layer < 4; layer++)
 	{
 		uint16_t const *const ram = &m_bg15[layer * 0x20000];
@@ -193,6 +195,8 @@ void galpani2_state::copybg15(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap
 					continue;
 
 				uint16_t color = pen & 0x7fff;
+				int opacity = brightness;
+				pen_t backdrop = bitmap.pix(y, x);
 				// The normal game's foreground photo is plane 3. Covered field
 				// colors select its solid silhouette; captured cells reveal RGB
 				// even while their flashing palette colors retain bit 15.
@@ -201,12 +205,39 @@ void galpani2_state::copybg15(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap
 				if (layer == 3)
 				{
 					uint16_t const mask = m_bg8[1][((y + mask_scrolly) & 0xff) * 512 + ((x + mask_scrollx) & 0x1ff)];
-					if (!BIT(mask, 11) && !bg8_captured_field(mask) && BIT(m_bg8_palette_ram[mask & 0xff], 15))
-						color = regs[0xc06 / 2] & 0x7fff;
+					// SE composites its background and girl into both RGB planes.
+					// Its plane-1 covered palette applies across the whole field;
+					// plane 0's 8050/4050 flags supply the remaining girl shape.
+					// Restrict color substitution to those flags, preserving the
+					// background and revealed cells outside the covered silhouette.
+					uint16_t const shape = m_bg8[0][((y + shape_scrolly) & 0xff) * 512 + ((x + shape_scrollx) & 0x1ff)];
+					bool const girl_shape = !m_bg_image_prefix_count
+						|| ((shape & 0xc000) && (shape & 0xff) == (m_mask_girl_pen & 0xff));
+					bool const color_field = !BIT(mask, 11) && BIT(m_bg8_palette_ram[mask & 0xff], 15);
+					if (color_field)
+					{
+						uint16_t const cycle_color = regs[0xc06 / 2] & 0x7fff;
+						if (bg8_captured_field(mask))
+						{
+							// SE reveals the photo through the cycling color. Its
+							// lower RGB plane contains the same photo, so blending
+							// over that plane would eliminate the capture tint.
+							if (m_bg_image_prefix_count)
+								backdrop = clut[cycle_color];
+						}
+						else if (girl_shape)
+						{
+							color = cycle_color;
+							// Covered SE girl pixels are solid, even while C10
+							// supplies the partial-photo mix used after capture.
+							if (m_bg_image_prefix_count)
+								opacity = 0xff;
+						}
+					}
 				}
-				bitmap.pix(y, x) = (brightness == 0xff)
+				bitmap.pix(y, x) = (opacity == 0xff)
 					? clut[color]
-					: alpha_blend_r32(bitmap.pix(y, x), clut[color], brightness);
+					: alpha_blend_r32(backdrop, clut[color], opacity);
 				priority_bitmap.pix(y, x) = priority;
 			}
 		}
@@ -233,7 +264,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	// the photo decode completes and re-expand it into BG8 plane 0.
 	// The placeholder (girl_total=1, empty bitmap) was written at MCU
 	// command time so the consumer's polling loop exited immediately.
-	if (m_girl_bitmap_pending_addr)
+	if (m_girl_bitmap_pending_addr && !m_bg_image_prefix_count)
 	{
 		if (m_girl_bitmap_delay > 0)
 			m_girl_bitmap_delay--;
