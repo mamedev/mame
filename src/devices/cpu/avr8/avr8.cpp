@@ -1728,7 +1728,7 @@ void avr8_device<NumTimers>::timer0_tick_fast_pwm()
 		// TODO: set 0C0B
 	}
 
-	if (m_r[TCNT0] == 0xFF)
+	if (m_r[TCNT0] == 0xff)
 	{
 		m_r[TIFR0] |= TIFR0_TOV0_MASK;
 		update_interrupt(INTIDX_TOV0);

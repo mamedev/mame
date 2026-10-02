@@ -5,7 +5,7 @@
     Arduboy hardware
 
     This is a homebrew ATMega handheld system based around the ATMega32U4,
-	similarly to the Arduino Leonardo.
+    similarly to the Arduino Leonardo.
 
     The vanilla Arduboy expects you to upload or flash software to it. Such software is
     virtually always in Intel HEX format, so we have to support that.
@@ -21,7 +21,7 @@
     - Two yellow LEDs for serial activity, software driven
     - One red LED for charge indication
     - Super thin battery that will probably inflate and explode
-		- Battery type: LiPo, 104461, 3.7 volts, 180 mAh
+        - Battery type: LiPo, 104461, 3.7 volts, 180 mAh
         - NOTE: The system will NOT power on if the battery is dead or missing.
           If you want to remove the battery, then the easiest reversable hack
           is to jump a 10uF capacitor across BATT+ and ground. This will keep
@@ -60,11 +60,11 @@
 
     About the Arduboy FX:
     -----------------------------
-    The Arduboy FX has a 16 mbyte flash chip on board that can store multiple games.
+    The Arduboy FX has a 16 Mbyte flash chip on board that can store multiple games.
     However, since the ATMega can only execute from its own internal 32kbyte flash,
     the games must be copied there every time.
 
-    Some FX games support reading data from the 16 mbyte flash. Those games are
+    Some FX games support reading data from the 16 Mbyte flash. Those games are
     distributed as .arduboy files, which are standard ZIP files containing a
     JSON manifest, the main game code as a .hex, and the game resources as
     .bin files.
@@ -72,28 +72,26 @@
     Driver status:
     -----------------------------
     Preliminary (MACHINE_NOT_WORKING).
-    
-	The AVR8 core causes these known issues with Arduboy software:
-	- Timer 0 carry-over behavior is not correct, which affects
-	  micros() and other Arduino APIs depending on it, like delay().
-	  This causes delay() to return instantly.
-	- The speaker is usually driven by Timer 3. When games try to play sounds, they
-	  either play no sound at all, or they try to set up timer 3 in such a way
-	  that an interrupt fires. When that happens, execution ends up in the middle of an
-	  interrupt vector, then falls through to whatever jump is below it,
-	  which typically reboots.
-	- The Arduboy FX needs the spm opcode and all related functionality to be implemented.
-	  If it isn't there, then the menu will crash or hang when you try to load a game.
 
-	Games based off the Arduboy2 library can work and are somewhat playable.
+    The AVR8 core causes these known issues with Arduboy software:
+    - Timer 0 carry-over behavior is not correct, which affects
+      micros() and other Arduino APIs depending on it, like delay().
+      This causes delay() to return instantly.
+    - The speaker is usually driven by Timer 3. When games try to play sounds, they
+      either play no sound at all, or they try to set up timer 3 in such a way
+      that an interrupt fires. When that happens, execution ends up in the middle of an
+      interrupt vector, then falls through to whatever jump is below it,
+      which typically reboots.
+    - The Arduboy FX needs the spm opcode and all related functionality to be implemented.
+      If it isn't there, then the menu will crash or hang when you try to load a game.
+
+    Games based off the Arduboy2 library can work and are somewhat playable.
     This may be because they use the sleep opcode instead of relying on
     specific timer values.
 
 ****************************************************************************/
 
 #include "emu.h"
-
-#include "speaker.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -103,53 +101,43 @@
 #include "sound/spkrdev.h"
 #include "video/ssd1306.h"
 
+#include "speaker.h"
+
 // this hack is here for testing/development in THIS DRIVER ONLY!
 // enabling this for production could cause confusion with other
 // Arduino-based systems, which will have the incorrect delay() behavior.
 #define DELAY_HACK_ENABLE (0)
+
 namespace {
 
 class arduboy_state : public driver_device
 {
 public:
-	arduboy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_screen(*this, "screen"),
-		  m_speaker(*this, "speaker"),
-		  m_ssd1306(*this, "ssd1306"),
-		  m_cart(*this, "gameprg"),
-		  m_spi_flash(*this, "spi_flash"),
-		  m_portb_buttons(*this, "PORTB"),
-		  m_porte_buttons(*this, "PORTE"),
-		  m_portf_buttons(*this, "PORTF")
+	arduboy_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_speaker(*this, "speaker"),
+		m_ssd1306(*this, "ssd1306"),
+		m_cart(*this, "gameprg"),
+		m_spi_flash(*this, "spi_flash"),
+		m_portb_buttons(*this, "PORTB"),
+		m_porte_buttons(*this, "PORTE"),
+		m_portf_buttons(*this, "PORTF")
 	{ }
 
-	void arduboy_base(machine_config &config);
-	void arduboy(machine_config &config);
-
-	void prg_map(address_map &map) ATTR_COLD;
-	void data_map(address_map &map) ATTR_COLD;
+	void arduboy(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+	void arduboy_base(machine_config &config) ATTR_COLD;
+
+	void prg_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
+
 private:
-	required_device<atmega32u4_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<ssd1306_device> m_ssd1306;
-
-	optional_device<generic_slot_device> m_cart; // required for arduboy, not for ardbyfx
-
-	// this is stubbed in for the Arduboy FX; do nullpointer checks before accessing it
-	optional_device<generic_spi_flash_device> m_spi_flash;
-
-	required_ioport m_portb_buttons;
-	required_ioport m_porte_buttons;
-	required_ioport m_portf_buttons;
-
 	uint8_t port_b_r();
 	void port_b_w(uint8_t data);
 	uint8_t port_c_r();
@@ -166,6 +154,20 @@ private:
 #endif
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gameprg_load);
+
+	required_device<atmega32u4_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<ssd1306_device> m_ssd1306;
+
+	optional_device<generic_slot_device> m_cart; // required for arduboy, not for ardbyfx
+
+	// this is stubbed in for the Arduboy FX; do nullpointer checks before accessing it
+	optional_device<generic_spi_flash_device> m_spi_flash;
+
+	required_ioport m_portb_buttons;
+	required_ioport m_porte_buttons;
+	required_ioport m_portf_buttons;
 
 	bool m_rx_led;
 	bool m_tx_led;
@@ -202,7 +204,7 @@ void arduboy_state::machine_reset()
 
 uint8_t arduboy_state::port_b_r()
 {
-	return	(m_spi_flash ? m_spi_flash->so_r() ? (1 << 3) : 0 : 0) |  
+	return  (m_spi_flash ? m_spi_flash->so_r() ? (1 << 3) : 0 : 0) |
 			m_portb_buttons->read();
 }
 
@@ -351,13 +353,13 @@ void arduboy_state::arduboy(machine_config &config)
 
 #if DELAY_HACK_ENABLE
 
-// There is a bug somewhere that causes the Arduino delay() function and its 
+// There is a bug somewhere that causes the Arduino delay() function and its
 // variants to return immediately instead of properly delaying.
 // This looks for the delay() function and replaces it with a "sleep" opcode,
 // which should hack around this limitation for the time being.
 void arduboy_state::apply_delay_sleep_hack()
 {
-	const uint8_t delay_pattern[] = 
+	const uint8_t delay_pattern[] =
 	{
 		0x8f, 0x92, // push r8
 		0x9f, 0x92, // push r9
@@ -380,17 +382,17 @@ void arduboy_state::apply_delay_sleep_hack()
 	const uint8_t delay_replacement[] =
 	{
 		0xcf, 0x92,           // push       R12
-       	0xdf, 0x92,           // push       R13
+		0xdf, 0x92,           // push       R13
 		0xef, 0x92,           // push       R14
-       	0xff, 0x92,           // push       R15
-       	0xc1, 0x2c,           // mov        R12,R1
-       	0xd1, 0x2c,           // mov        R13,R1
-       	0x76, 0x01,           // movw       R15R14,R13R12
-       	0x21, 0xe0,           // ldi        R18,0x1
-        //  LAB_code_0317
+		0xff, 0x92,           // push       R15
+		0xc1, 0x2c,           // mov        R12,R1
+		0xd1, 0x2c,           // mov        R13,R1
+		0x76, 0x01,           // movw       R15R14,R13R12
+		0x21, 0xe0,           // ldi        R18,0x1
+		//  LAB_code_0317
 		0x23, 0xbf,           // out        DAT_mem_0053,R18
 		0x88, 0x95,           // sleep
-		0x13, 0xbe,           // out        DAT_mem_0053,R1 
+		0x13, 0xbe,           // out        DAT_mem_0053,R1
 		0x3f, 0xef,           // ser        R19
 		0xc3, 0x1a,           // sub        R12,R19
 		0xd3, 0x0a,           // sbc        R13,R1
@@ -436,14 +438,14 @@ void arduboy_state::apply_delay_sleep_hack()
 	}   \
 	else  \
 	{   \
-		return std::make_pair(image_error::BADSOFTWARE, "invalid hex byte");    \
+		return std::make_pair(image_error::INVALIDIMAGE, "invalid hex byte");    \
 	}   \
 }
 
 #define FREAD_BOUNDSCHECK(img, bufptr, count) \
 	if (img.fread(bufptr,count) != count) \
 	{ \
-		return std::make_pair(image_error::BADSOFTWARE, "file read error or premature EOF"); \
+		return std::make_pair(image_error::INVALIDIMAGE, "file read error or premature EOF"); \
 	}
 
 DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
@@ -461,7 +463,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 
 	if (!image.is_filetype("hex"))
 	{
-		return std::make_pair(image_error::BADSOFTWARE, "cart must be bin or hex");
+		return std::make_pair(image_error::INVALIDIMAGE, "cart must be bin or hex");
 	}
 
 	// oh boy oh boy! someone gave us a .hex. and that's gonna be super painful.
@@ -478,7 +480,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 		FREAD_BOUNDSCHECK(image, buf, 1);
 		if (buf[0] != ':')
 		{
-			return std::make_pair(image_error::BADSOFTWARE, "hexdump line did not start with ':'");
+			return std::make_pair(image_error::INVALIDIMAGE, "hexdump line did not start with ':'");
 		}
 
 		memset(buf, 0, sizeof(buf));
@@ -486,7 +488,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 
 		if (sscanf(buf, "%02X%04X%02X", &num_bytes, &address, &record_type) == EOF)
 		{
-			return std::make_pair(image_error::BADSOFTWARE, "record parse error");
+			return std::make_pair(image_error::INVALIDIMAGE, "record parse error");
 		}
 
 		// while the intel hex standard can support data lines greater than 16 bytes,
@@ -494,7 +496,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 		// so complain if we see anything else
 		if (num_bytes > 16)
 		{
-			return std::make_pair(image_error::BADSOFTWARE, "record greater than 16 bytes");
+			return std::make_pair(image_error::INVALIDIMAGE, "record greater than 16 bytes");
 		}
 
 		if (num_bytes != 0)
@@ -531,13 +533,13 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 		unsigned int expected_checksum;
 		if (sscanf(buf, "%02X", &expected_checksum) == EOF)
 		{
-			return std::make_pair(image_error::BADSOFTWARE, "checksum parse error");
+			return std::make_pair(image_error::INVALIDIMAGE, "checksum parse error");
 		}
 
 		uint8_t actual_checksum = (~checksum + 1) & 0xff;
 		if (actual_checksum != expected_checksum)
 		{
-			return std::make_pair(image_error::BADSOFTWARE, "checksum mismatch");
+			return std::make_pair(image_error::INVALIDIMAGE, "checksum mismatch");
 		}
 
 		// we've finally parsed the entire line, that's cause for celebration.
@@ -556,7 +558,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 		{
 			// lots of other record types in the hex format,
 			// but arduboy games never use them
-			return std::make_pair(image_error::BADSOFTWARE, "invalid/unimplemented hexdump record type");
+			return std::make_pair(image_error::INVALIDIMAGE, "invalid/unimplemented hexdump record type");
 		}
 
 		if (!(
@@ -564,7 +566,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 				(0x0000 <= (address + num_bytes) && (address + num_bytes) <= 0x77ff)
 			 ))
 		{
-			return std::make_pair(image_error::BADSOFTWARE, "hex record writes out of bounds");
+			return std::make_pair(image_error::INVALIDIMAGE, "hex record writes out of bounds");
 		}
 
 		// all that just to do this. whew
@@ -583,7 +585,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 
 			if (!(buf[0] == 0x0d || buf[0] == 0x0a))
 			{
-				return std::make_pair(image_error::BADSOFTWARE, "hit bad newline character");
+				return std::make_pair(image_error::INVALIDIMAGE, "hit bad newline character");
 			}
 		}
 
@@ -591,7 +593,7 @@ DEVICE_IMAGE_LOAD_MEMBER(arduboy_state::gameprg_load)
 	}
 
 	// we shouldn't end up here as EOF checks in the while loop should catch this for us
-	return std::make_pair(image_error::BADSOFTWARE, "hexdump hit premature EOF");
+	return std::make_pair(image_error::INVALIDIMAGE, "hexdump hit premature EOF");
 }
 
 ROM_START( arduboy )

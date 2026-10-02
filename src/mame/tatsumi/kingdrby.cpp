@@ -125,7 +125,7 @@ private:
 	uint8_t input_mux_r();
 	uint8_t key_matrix_r();
 	uint8_t sound_cmd_r();
-	uint8_t get_key_matrix_value(uint16_t in_value);
+	static uint8_t get_key_matrix_value(uint16_t in_value);
 	void outportb_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
 	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
@@ -225,29 +225,22 @@ void kingdrby_state::video_start()
 
 void kingdrby_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const uint8_t hw_sprite[16] = {
+	constexpr uint8_t hw_sprite[16] = {
 		0x34, 0x34, 0x34, 0x34, 0x34, 0x34, 0x34, 0x22,
 		0x22, 0x22, 0x22, 0x22, 0x22, 0x11, 0x22, 0x22
 	};
 
-	uint8_t *spriteram = m_spriteram;
-	int count = 0;
-
-	for(count = 0; count < 0x48; count+=4)
+	for(int count = 0; count < 0x48; count+=4)
 	{
-		int x, y, spr_offs, colour, fx, dx, dy, h, w;
+		int spr_offs = (m_spriteram[count] & 0x7f) * 4;
+		int colour = (m_spriteram[count + 3] & 0xf0) >> 4;
+		int fx = m_spriteram[count] & 0x80;
+		int y = (m_spriteram[count + 1] == 0) ? 0 : (0x100 - m_spriteram[count + 1]);
+		int x = m_spriteram[count + 2] - ((m_spriteram[count + 3] & 1) << 8);
 
-		spr_offs = (spriteram[count]);
-		spr_offs &= 0x7f;
-		spr_offs *= 4;
-		colour = (spriteram[count + 3] & 0xf0)>>4;
-		fx = spriteram[count] & 0x80;
-		y = (spriteram[count + 1] == 0) ? 0 : 0x100-spriteram[count + 1];
-		x = spriteram[count + 2] - ((spriteram[count + 3] & 1) << 8);
-
-		// TODO: hardcoded via a table, there must be some other way to do this (proms?)
-		h = (hw_sprite[colour] & 0xf0) >> 4;
-		w = (hw_sprite[colour] & 0x0f) >> 0;
+		// TODO: hardcoded via a table, there must be some other way to do this (PROMs?)
+		int h = (hw_sprite[colour] >> 4) & 0x0f;
+		int w = (hw_sprite[colour] >> 0) & 0x0f;
 
 		if(h == 1 && w == 1)
 		{
@@ -258,24 +251,24 @@ void kingdrby_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 		if(fx)
 		{
-			for(dy = 0; dy < h; dy++)
+			for(int dy = 0; dy < h; dy++)
 			{
-				for(dx = 0; dx < w; dx++)
+				for(int dx = 0; dx < w; dx++)
 				{
 					m_gfxdecode->gfx(0)->transpen(
 						bitmap,cliprect,
 						spr_offs++,
 						colour,
 						1, 0,
-						((x + 16 * w) - (dx + 1) * 16),(y + dy * 16), 0);
+						((x + 16 * w) - (dx + 1) * 16), (y + dy * 16), 0);
 				}
 			}
 		}
 		else
 		{
-			for(dy = 0; dy < h; dy++)
+			for(int dy = 0; dy < h; dy++)
 			{
-				for(dx = 0; dx < w; dx++)
+				for(int dx = 0; dx < w; dx++)
 				{
 					m_gfxdecode->gfx(0)->transpen(
 						bitmap, cliprect,
@@ -292,20 +285,19 @@ void kingdrby_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 uint32_t kingdrby_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const rectangle &visarea = screen.visible_area();
-	rectangle clip;
 	m_sc0_tilemap->set_scrollx(0, m_vram[0x342]);
 	m_sc0_tilemap->set_scrolly(0, m_vram[0x341]);
 	m_sc1_tilemap->set_scrollx(0, m_vram[0x342]);
 	m_sc1_tilemap->set_scrolly(0, m_vram[0x341]);
 	m_sc0w_tilemap->set_scrolly(0, 32);
 
-	/* maybe it needs two window tilemaps? (one at the top, the other at the bottom)*/
-	clip.set(visarea.min_x, 255, 192, visarea.max_y);
+	// maybe it needs two window tilemaps? (one at the top, the other at the bottom)
+	rectangle clip(visarea.left(), 255, 192, visarea.bottom());
 	clip &= cliprect;
 
 	// TODO: TILEMAP_DRAW_CATEGORY + TILEMAP_DRAW_OPAQUE doesn't suit well for this
 	m_sc0_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_sc1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
 	m_sc0w_tilemap->draw(screen, bitmap, clip, 0, 0);
 
@@ -371,14 +363,12 @@ uint8_t kingdrby_state::input_mux_r()
 		return ioport("MUX1")->read();
 }
 
-// Convert MAME input system into the raw value this expects from bet keys
+// Convert MAME port bitfield into the decoded value this expects from bet keys
 uint8_t kingdrby_state::get_key_matrix_value(uint16_t in_value)
 {
-	int i;
-
-	for (i = 0; i < 15; i++)
+	for (int i = 0; i < 15; i++)
 	{
-		if (in_value & 1 << i)
+		if (BIT(in_value, i))
 			return i + 1;
 	}
 
@@ -408,7 +398,7 @@ uint8_t kingdrby_state::sound_cmd_r()
 // If one player bets on something, the other led will toggle between p1 and p2 bets.
 void kingdrby_state::led_array_w(offs_t offset, uint8_t data)
 {
-	const uint8_t led_map[16] = {
+	constexpr uint8_t led_map[16] = {
 		0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07,
 		0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x00
 	};
@@ -426,8 +416,8 @@ void kingdrby_state::master_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom();
 	map(0x3000, 0x33ff).ram().mirror(0xc00).share("share1");
-	map(0x4000, 0x43ff).ram().w(FUNC(kingdrby_state::sc0_vram_w)).share("vram");
-	map(0x5000, 0x53ff).ram().w(FUNC(kingdrby_state::sc0_attr_w)).share("attr");
+	map(0x4000, 0x43ff).ram().w(FUNC(kingdrby_state::sc0_vram_w)).share(m_vram);
+	map(0x5000, 0x53ff).ram().w(FUNC(kingdrby_state::sc0_attr_w)).share(m_attr);
 }
 
 void kingdrby_state::master_io_map(address_map &map)
@@ -444,7 +434,7 @@ void kingdrby_state::slave_map(address_map &map)
 	map(0x5000, 0x5003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
 	map(0x6000, 0x6003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
 	map(0x7000, 0x73ff).ram().share("share1");
-	map(0x7400, 0x74ff).ram().share("spriteram");
+	map(0x7400, 0x74ff).ram().share(m_spriteram);
 	map(0x7600, 0x7600).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x7601, 0x7601).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x7801, 0x780f).w(FUNC(kingdrby_state::led_array_w));
@@ -465,7 +455,7 @@ void kingdrby_state::slave_1986_map(address_map &map)
 	map(0x5000, 0x5003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));    /* I/O Ports */
 //  map(0x6000, 0x6003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write)); /* I/O Ports */
 	map(0x7000, 0x73ff).ram().share("share1");
-	map(0x7400, 0x74ff).ram().share("spriteram");
+	map(0x7400, 0x74ff).ram().share(m_spriteram);
 	map(0x7600, 0x7600).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x7601, 0x7601).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x7800, 0x7800).portr("KEY0");
