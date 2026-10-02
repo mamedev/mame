@@ -328,6 +328,8 @@ inline u32 saturn_cd_hle_device::dataxfer_long_r()
 				xferoffs += 4;
 
 				// did we run out of sector?
+				// TODO: why bare xfersect without xfersectpos adder?
+				// - groovef/vfkidsk would use that, no apparent change in their own issues
 				if (xferoffs >= transpart->blocks[xfersect]->size)
 				{
 					LOG("Finished xfer of block %d of %d\n", xfersect+1, xfersectnum);
@@ -1097,8 +1099,12 @@ void saturn_cd_hle_device::cmd_ffwd_rew_disc()
 {
 	// FFWD / REW
 	// cr1 bit 0 determines if this is a Fast Forward (0) or a Rewind (1) command
+	// Speed is roughly 3 seconds per 1 minute of pickup going in either direction.
+
 	// TODO: unemulated, can be triggered thru Multiplayer by holding on relevant keys
-	// ...
+	// probably unused beyond that.
+	hirqreg |= CMOK;
+	cr_standard_return(cd_stat);
 }
 
 void saturn_cd_hle_device::cmd_get_subcode_q_rw_channel()
@@ -1698,7 +1704,7 @@ void saturn_cd_hle_device::cmd_get_and_delete_sector_data()
 	uint32_t sectofs = cr2;
 	uint32_t bufnum = cr3 >> 8;
 
-	LOGCMD("%s: Get and delete sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
+	LOGCMD("%s: Get and delete sector data (SN %d SO %d BN %d)\n", machine().describe_context(), sectnum, sectofs, bufnum);
 
 	if (bufnum >= MAX_FILTERS)
 	{
@@ -1776,42 +1782,66 @@ void saturn_cd_hle_device::cmd_put_sector_data()
 	cr_standard_return(cd_stat);
 }
 
-void saturn_cd_hle_device::cmd_move_sector_data()
+void saturn_cd_hle_device::cmd_copy_sector_data()
 {
-	popmessage("saturn_cd_hle.cpp: cmd_move_sector_data() (unemulated)");
+	popmessage("saturn_cd_hle.cpp: cmd_copy_sector_data() (unemulated)");
+	// TODO: essentially same as below minus the deallocation and a guard against being in buffull state
+	// Needs use case, obviously
 	hirqreg |= (CMOK);
 }
 
-void saturn_cd_hle_device::cmd_copy_sector_data()
+void saturn_cd_hle_device::cmd_move_sector_data()
 {
-	// swordsor and riglord2 uses this
-	// TODO: incomplete
+	// swordsor and riglord2 uses this, extensively as a ring buffer
+	// (to the point they would crash/hang or throw bad sound if not done right)
 	uint32_t src_filter = (cr3 >> 8) & 0xff;
+	uint32_t src_offs = cr2;
 	uint32_t dst_filter = cr1 & 0xff;
-	uint32_t sectnum = cr4 & 0xff;
+	uint32_t sectnum = cr4;
 
-	//cd_stat |= CD_STAT_TRANS;
-	//transpart = &partitions[dst_filter];
+	LOGCMD("%s: Move sector data src %02x dst %02x offs %04x length %04x\n", machine().describe_context(), src_filter, dst_filter, src_offs, sectnum);
 
-	for (int i = 0; i < sectnum; i++)
+	if (src_filter >= MAX_FILTERS || dst_filter >= MAX_FILTERS)
 	{
-		// allocate the dst blocks
-		partitions[dst_filter].blocks[i] = cd_alloc_block(&partitions[dst_filter].bnum[i]);
-		if(partitions[dst_filter].size == -1)
-			partitions[dst_filter].size = 0;
-		partitions[dst_filter].size += partitions[dst_filter].blocks[i]->size;
-		partitions[dst_filter].numblks++;
-
-		//copy data
-		for(int j = 0; j < sectlenin; j++)
-			partitions[dst_filter].blocks[i]->data[j] = partitions[src_filter].blocks[i]->data[j];
-
-		//deallocate the src blocks
-		//partitions[src_filter].size -= partitions[src_filter].blocks[i]->size;
-		//cd_free_block(partitions[src_filter].blocks[i]);
-		//partitions[src_filter].blocks[i] = (blockT *)nullptr;
-		//partitions[src_filter].bnum[i] = 0xff;
+		LOGWARN("CD: invalid copy number\n");
+		cr_standard_return(CD_STAT_REJECT);
+		hirqreg |= (CMOK);
+		return;
 	}
+
+	cd_getsectoroffsetnum(src_filter, &src_offs, &sectnum);
+
+	partitionT *src_part = &partitions[src_filter];
+	partitionT *dst_part = &partitions[dst_filter];
+
+	// TODO: check against source being actually populated here
+
+	for (int i = src_offs; i < src_offs + sectnum; i++)
+	{
+		if (dst_part->numblks >= MAX_BLOCKS || i >= MAX_BLOCKS)
+			throw emu_fatalerror("Move Sector Data: out of bounds %d %d", i, dst_part->numblks);
+
+		// allocate the dst block
+		dst_part->blocks[dst_part->numblks] = cd_alloc_block(&src_part->bnum[i]);
+		if(dst_part->size == -1)
+			dst_part->size = 0;
+		dst_part->size += src_part->blocks[i]->size;
+		dst_part->bnum[dst_part->numblks] = src_part->bnum[i];
+
+		// copy
+		memcpy(&dst_part->blocks[dst_part->numblks]->data[0], &src_part->blocks[i]->data[0], sectlenin);
+
+		dst_part->numblks++;
+
+		// deallocate the src block
+		src_part->size -= src_part->blocks[i]->size;
+		cd_free_block(src_part->blocks[i]);
+		src_part->blocks[i] = (blockT *)nullptr;
+		src_part->bnum[i] = 0xff;
+		src_part->numblks --;
+	}
+
+	cd_defragblocks(src_part);
 
 	hirqreg |= (CMOK|ECPY);
 	cr_standard_return(cd_stat);
@@ -2135,8 +2165,8 @@ void saturn_cd_hle_device::cd_exec_command()
 		case 0x62: cmd_delete_sector_data(); break;
 		case 0x63: cmd_get_and_delete_sector_data(); break;
 		case 0x64: cmd_put_sector_data(); break;
-		case 0x65: cmd_move_sector_data(); break;
-		case 0x66: cmd_copy_sector_data(); break;
+		case 0x65: cmd_copy_sector_data(); break;
+		case 0x66: cmd_move_sector_data(); break;
 		case 0x67: cmd_get_sector_data_copy_or_move_error(); break;
 
 		case 0x70: cmd_change_directory(); break;
@@ -2170,7 +2200,8 @@ TIMER_CALLBACK_MEMBER( saturn_cd_hle_device::sh1_command_cb )
 {
 	// yield current command until we managed to handle the new status change
 	// - cnc* definitely wants former at FMV playbacks
-	// TODO: do we need to yield for seek as well? asenna dislikes the idea
+	// TODO: do we need to yield for seek as well?
+	// - asenna dislikes the idea
 	if (m_status_change_in_progress)
 	{
 		m_sh1_timer->adjust(attotime::from_hz(get_timing_command()));
