@@ -126,10 +126,13 @@ void galpani2_state::copybg8(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap,
 			}
 			if (pixel_foreground != foreground)
 				continue;
-			// Palette color 0x0001 supplies RGB pass-through in the photo field.
-			// Plane 0's low palette bank window retains its coverage when the
-			// palette fades to 0x0001, or the other framebuffer half leaks.
-			bool const passthrough = ((color == 0x0001) && (layer || BIT(pen, 7)))
+			// Palette colors 0x0000 and 0x0001 are transparent, letting the
+			// BG15 photo show through. The game uses 0x0001 for revealed
+			// field cells during gameplay, and 0x0000 (via pen 0x50E5) for
+			// the full-photo reward display after completing a level.
+			// Plane 0's low palette bank window retains its coverage when
+			// the palette fades to 0x0001, or the other framebuffer half leaks.
+			bool const passthrough = ((color <= 0x0001) && (layer || BIT(pen, 7)))
 				|| (layer == 1 && bg8_captured_field(pen));
 			// UI words remain opaque, including flagged black colors.
 			bool const covered_field = BIT(color, 15) && !BIT(pen, 11);
