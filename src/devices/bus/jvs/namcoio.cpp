@@ -1371,20 +1371,16 @@ protected:
 
 
 ROM_START( namco_fca11 )
-	ROM_REGION( 0x040000, "iocpu2", 0 ) // 256KB internal flash ROM
+	ROM_REGION( 0x040000, "iocpu", 0 ) // 256KB internal flash ROM
 	ROM_LOAD( "fcaf11.ic4",      0x030000, 0x010000, CRC(13d936df) SHA1(fbb2191263b2b326f1f49729767ee6fae2db21f7) ) // almost good dump, all JVS related code and data is in place
 	ROM_FILL(                    0x000000, 0x034000, 0x67 ) // dump was made from $0000 to $ffff, not $fc0000. The ROM only appears in memory from $4000-$ffff
-
-	ROM_REGION( 0x040000, "iocpu", 0 )
-	ROM_LOAD( "asc3_io-c.ic14",  0x000000, 0x020000, CRC(2f272a7b) SHA1(9d7ebe274c0d26f5f38747224d42d0375e2ed14c) )
-	ROM_COPY( "iocpu2",          0x039040, 0x001082, 0x00003b ) // patch ASCA3 ROM to report FCA11 description
 
 	ROM_REGION( 0x10000, "pic", 0 ) // I/O board PIC16F84 code
 	ROM_LOAD( "fcap11.ic2",      0x000000, 0x004010, CRC(1b2592ce) SHA1(a1a487361053af564f6ec67e545413e370a3b38c) )
 ROM_END
 
 class namco_fca_11_device :
-	public namco_asca_3_device
+	public jvs_hle_device
 {
 public:
 	namco_fca_11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) :
@@ -1394,18 +1390,18 @@ public:
 
 protected:
 	namco_fca_11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-		namco_asca_3_device(mconfig, type, tag, owner, clock),
-		m_iocpu2(*this, "iocpu2")
+		jvs_hle_device(mconfig, type, tag, owner, clock),
+		m_iocpu(*this, "iocpu")
 	{
 	}
 
 	// device_t
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD
 	{
-		namco_asca_3_device::device_add_mconfig(config);
+		jvs_hle_device::device_add_mconfig(config);
 
-		MB90F574(config, m_iocpu2, 4.9152_MHz_XTAL);
-		m_iocpu2->set_addrmap(AS_PROGRAM, &namco_fca_11_device::iocpu2_program_map);
+		MB90F574(config, m_iocpu, 4.9152_MHz_XTAL);
+		m_iocpu->set_addrmap(AS_PROGRAM, &namco_fca_11_device::iocpu_program_map);
 	}
 
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD
@@ -1415,35 +1411,47 @@ protected:
 
 	virtual void device_reset() override ATTR_COLD
 	{
-		namco_asca_3_device::device_reset();
+		jvs_hle_device::device_reset();
 
-		m_iocpu2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		m_iocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
 	// device_jvs_interface
 	virtual void rxd(int state) override
 	{
-		namco_asca_3_device::rxd(state);
+		jvs_hle_device::rxd(state);
 
-		m_iocpu2->uart<1>().sin(state);
+		m_iocpu->uart<1>().sin(state);
 	}
 
-	void iocpu2_program_map(address_map &map)
+	// jvs_hle_device
+	virtual const char* device_id() override
 	{
-		map(0x004000, 0x00ffff).rom().region("iocpu2", 0x034000);
-		map(0xfc0000, 0xffffff).rom().region("iocpu2", 0);
+		return "namco ltd.;FCA-1;Ver1.01;JPN,Multipurpose + Rotary Encoder"; // string and feature check at 0x39040
 	}
 
-	required_device<mb90f574_device> m_iocpu2;
+	virtual uint8_t player_count() override { return 1; }
+	virtual uint8_t switch_count() override { return 16; }
+	virtual uint8_t coin_slots() override { return 2; }
+	virtual uint8_t analog_input_channels() override { return 7; }
+	virtual uint8_t analog_input_bits() override { return 0; }
+	virtual uint8_t rotary_input_channels() override { return 2; }
+	virtual uint8_t output_slots() override { return 6; }
+	virtual uint8_t analog_output_channels() override { return 4; }
+
+	void iocpu_program_map(address_map &map)
+	{
+		map(0x004000, 0x00ffff).rom().region("iocpu", 0x034000);
+		map(0xfc0000, 0xffffff).rom().region("iocpu", 0);
+	}
+
+	required_device<mb90f574_device> m_iocpu;
 };
 
 
 ROM_START( namco_fca10 )
-	ROM_REGION( 0x040000, "iocpu2", ROMREGION_ERASE00 ) // 256KB internal flash ROM
+	ROM_REGION( 0x040000, "iocpu", ROMREGION_ERASE00 ) // 256KB internal flash ROM
 	ROM_LOAD( "fcaf10.bin",      0x000000, 0x040000, NO_DUMP )
-
-	ROM_REGION( 0x040000, "iocpu", 0 )
-	ROM_LOAD( "asc3_io-c.ic14",  0x000000, 0x020000, CRC(2f272a7b) SHA1(9d7ebe274c0d26f5f38747224d42d0375e2ed14c) )
 
 	ROM_REGION( 0x10000, "pic", 0 ) // I/O board PIC16F84 code
 	ROM_LOAD( "fcap10.ic2",      0x000000, 0x004010, NO_DUMP )
@@ -1465,26 +1473,18 @@ protected:
 		return ROM_NAME(namco_fca10);
 	}
 
-	virtual void device_start() override ATTR_COLD
+	// jvs_hle_device
+	virtual const char* device_id() override
 	{
-		namco_fca_11_device::device_start();
-
-		// patch ASCA3 ROM to report FCA10 description
-		auto iocpu = memregion("iocpu")->base();
-		for (int i = 0; i < 0x30; i++)
-			iocpu[BYTE_XOR_BE(i + 0x108d)] = "FCA-1;Ver1.00;JPN,Multipurpose + Rotary Encoder"[i];
+		return "FCA-1;Ver1.00;JPN,Multipurpose + Rotary Encoder";
 	}
 };
 
 
 ROM_START( namco_fcb )
-	ROM_REGION( 0x040000, "iocpu2", 0 ) // 256KB internal flash ROM
+	ROM_REGION( 0x040000, "iocpu", 0 ) // 256KB internal flash ROM
 	ROM_LOAD( "fcb1_io-0b.ic4",  0x034000, 0x00c000, BAD_DUMP CRC(5e25b73f) SHA1(fa805a422ff8793989b0ce901cc868ec1a87c7ac) ) // most JVS handling code is in undumped area
 	ROM_FILL(                    0x000000, 0x034000, 0x67 ) // dump was made from $0000 to $ffff, not $fc0000. The ROM only appears in memory from $4000-$ffff
-
-	ROM_REGION( 0x040000, "iocpu", 0 )
-	ROM_LOAD( "asc3_io-c.ic14",  0x000000, 0x020000, CRC(2f272a7b) SHA1(9d7ebe274c0d26f5f38747224d42d0375e2ed14c) )
-	ROM_COPY( "iocpu2",          0x03436a, 0x001082, 0x00003b ) // patch ASCA3 ROM to report FCB description
 
 	ROM_REGION( 0x10000, "pic", 0 ) // I/O board PIC16F84 code
 	ROM_LOAD( "fcb_pic",         0x000000, 0x004010, NO_DUMP )
@@ -1505,6 +1505,24 @@ protected:
 	{
 		return ROM_NAME(namco_fcb);
 	}
+
+	// jvs_hle_device
+	virtual const char* device_id() override
+	{
+		return "namco ltd.;FCB;Ver1.02;JPN,TouchPanel&Multipurpose"; // string and feature check at 0x03436a
+	}
+
+	virtual uint8_t player_count() override { return 1; }
+	virtual uint8_t switch_count() override { return 16; }
+	virtual uint8_t coin_slots() override { return 2; }
+	virtual uint8_t analog_input_channels() override { return 7; }
+	virtual uint8_t analog_input_bits() override { return 10; }
+	virtual uint8_t rotary_input_channels() override { return 2; }
+	virtual uint8_t screen_position_input_channels() override { return 1; }
+	virtual uint8_t screen_position_input_xbits() override { return 10; }
+	virtual uint8_t screen_position_input_ybits() override { return 10; }
+	virtual uint8_t output_slots() override { return 6; }
+	virtual uint8_t analog_output_channels() override { return 2; }
 };
 
 
