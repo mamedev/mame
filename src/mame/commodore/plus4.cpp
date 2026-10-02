@@ -150,12 +150,6 @@ protected:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload) { return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress); }
 
-	bool m_iec_atn;
-	bool m_iec_clk;
-	bool m_iec_data;
-	emu_timer *m_iec_sync_timer;
-	TIMER_CALLBACK_MEMBER(iec_sync_tick);
-
 	enum
 	{
 		VIEW_RAM = 0,
@@ -621,6 +615,9 @@ uint8_t plus4_state::cpu_r()
 
 	*/
 
+	if (!m_iec->sample_ready(*m_maincpu))
+		return 0xff;
+
 	uint8_t data = 0x2f;
 
 	// cassette read
@@ -651,6 +648,9 @@ uint8_t c16_state::cpu_r()
 	    7       IEC DATA IN
 
 	*/
+
+	if (!m_iec->sample_ready(*m_maincpu))
+		return 0xff;
 
 	uint8_t data = 0;
 
@@ -686,28 +686,19 @@ void plus4_state::cpu_w(uint8_t data)
 	//logerror("%s cpu write %02x\n", machine().describe_context(), data);
 
 	// serial data
-	m_iec_data = !BIT(data, 0);
+	m_iec->host_data_w(!BIT(data, 0));
 
 	// serial clock
-	m_iec_clk = !BIT(data, 1);
+	m_iec->host_clk_w(!BIT(data, 1));
 
 	// serial attention
-	m_iec_atn = !BIT(data, 2);
+	m_iec->host_atn_w(!BIT(data, 2));
 
 	// cassette motor
 	m_cassette->motor_w(BIT(data, 3));
 
 	// cassette write
 	m_cassette->write(!BIT(data, 1));
-
-	m_iec_sync_timer->adjust(attotime::zero);
-}
-
-TIMER_CALLBACK_MEMBER(plus4_state::iec_sync_tick)
-{
-	m_iec->host_atn_w(m_iec_atn);
-	m_iec->host_clk_w(m_iec_clk);
-	m_iec->host_data_w(m_iec_data);
 }
 
 
@@ -790,8 +781,6 @@ void plus4_datassette_devices(device_slot_interface &device)
 
 void plus4_state::machine_start()
 {
-	m_iec_sync_timer = timer_alloc(FUNC(plus4_state::iec_sync_tick), this);
-
 	// initialize memory
 	uint8_t data = 0xff;
 

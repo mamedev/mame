@@ -19,7 +19,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="barbaria" supported="no">
+	<software name="barbaria">
 		<description>Barbarian: The Ultimate Warrior</description>
 		<year>1988</year>
 		<publisher>Melbourne House</publisher>
@@ -33,14 +33,10 @@ Fails to LOAD "$",8
 		</part>
 	</software>
 
-	<software name="basil" supported="no">
+	<software name="basil">
 		<description>Basil: The Great Mouse Detective</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics</publisher>
-		<notes><![CDATA[
-LOAD "BASIL",8,1
-Black screen after load, hangs with CIA-2 $DD00 bit 7 stuck high (side effect of protection gone wrong?)
-]]></notes>
 		<info name="protection" value="cyan" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -54,8 +50,7 @@ Black screen after load, hangs with CIA-2 $DD00 bit 7 stuck high (side effect of
 		<year>1988</year>
 		<publisher>Capcom</publisher>
 		<notes><![CDATA[
-LOAD "BIONIC",8,1
-Fails loading
+Loads but game does not start
 ]]></notes>
 		<info name="video" value="PAL" />
 		<part name="flop1" interface="floppy_5_25">
@@ -107,14 +102,10 @@ Fails loading
 		</part>
 	</software>
 
-	<software name="dotc" supported="no">
+	<software name="dotc">
 		<description>Defender of the Crown</description>
 		<year>1987</year>
 		<publisher>Cinemaware</publisher>
-		<notes><![CDATA[
-LOAD "*",8,1
-Shows "V-MAX!" screen then punts back to BASIC prompt
-]]></notes>
 		<info name="protection" value="vmaxv2" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
@@ -147,14 +138,10 @@ Shows "V-MAX!" screen then punts back to BASIC prompt
 		</part>
 	</software>
 
-	<software name="grnberet" supported="no">
+	<software name="grnberet">
 		<description>Green Beret</description>
 		<year>1986</year>
 		<publisher>Ocean</publisher>
-		<notes><![CDATA[
-LOAD "0:*",8,1
-Black screen during loading
-]]></notes>
 		<info name="video" value="PAL" />
 
 		<part name="flop1" interface="floppy_5_25">
@@ -194,14 +181,10 @@ Resets to BASIC, LOAD "$",8 non-functional
 		</part>
 	</software>
 
-	<software name="miamivic" supported="no">
+	<software name="miamivic">
 		<description>Miami Vice</description>
 		<year>1986</year>
 		<publisher>Ocean</publisher>
-		<notes><![CDATA[
-LOAD "*",8,1
-Punts to BASIC, or just fails loading
-]]></notes>
 		<info name="video" value="PAL" />
 		<info name="protection" value="cyan" />
 
@@ -224,15 +207,10 @@ Punts to BASIC, or just fails loading
 		</part>
 	</software>
 
-	<software name="rambo2" supported="no">
+	<software name="rambo2">
 		<description>Rambo: First Blood Part II</description>
 		<year>1985</year>
 		<publisher>Ocean</publisher>
-		<notes><![CDATA[
-DOES NOT WORK IN VICE EITHER
-LOAD "0:*",8,1
-Locks up during boot
-]]></notes>
 		<info name="video" value="PAL" />
 		<info name="protection" value="xrom" />
 
@@ -261,14 +239,10 @@ Hangs on loading transition between trademarks and title
 		</part>
 	</software>
 
-	<software name="rambo3" supported="no">
+	<software name="rambo3">
 		<description>Rambo III (PAL)</description>
 		<year>1988</year>
 		<publisher>Ocean</publisher>
-		<notes><![CDATA[
-LOAD "0:*",8,1
-Punts to BASIC
-]]></notes>
 		<info name="video" value="PAL" />
 		<info name="protection" value="ocean" />
 
@@ -334,7 +308,7 @@ LOAD "STRIP POKER",8
 		<publisher>Grand Slam</publisher>
 		<notes><![CDATA[
 LOAD "*",8,1
-Crashes at the end of loading sequence
+Crashes after changing to side B
 ]]></notes>
 		<info name="video" value="PAL" />
 		<info name="protection" value="custom_dos" />
@@ -353,13 +327,12 @@ Crashes at the end of loading sequence
 		</part>
 	</software>
 
-	<software name="toutrun" supported="no">
+	<software name="toutrun" supported="partial">
 		<description>Turbo Out Run</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
-LOAD "*",8,1
-Punts to BASIC
+Graphics issues
 ]]></notes>
 		<info name="video" value="PAL" />
 		<info name="protection" value="sload" />
@@ -380,14 +353,10 @@ Punts to BASIC
 
 <!-- !Compilations -->
 
-	<software name="gameset" supported="no">
+	<software name="gameset">
 		<description>Game Set and Match</description>
 		<year>1987</year>
 		<publisher>Ocean</publisher>
-		<notes><![CDATA[
-LOAD "0:*",8,1
-All games fails loading
-]]></notes>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 Side 1"/>
