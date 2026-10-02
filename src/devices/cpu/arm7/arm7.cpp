@@ -81,6 +81,7 @@ DEFINE_DEVICE_TYPE(ARM7_BE,      arm7_be_cpu_device,      "arm7_be",      "ARM7 
 DEFINE_DEVICE_TYPE(ARM710A,      arm710a_cpu_device,      "arm710a",      "ARM710a")
 DEFINE_DEVICE_TYPE(ARM710A_BE,   arm710a_be_cpu_device,   "arm710a_be",   "ARM710a (big)")
 DEFINE_DEVICE_TYPE(ARM710T,      arm710t_cpu_device,      "arm710t",      "ARM710T")
+DEFINE_DEVICE_TYPE(ARM720T,      arm720t_cpu_device,      "arm720t",      "ARM720T")
 DEFINE_DEVICE_TYPE(ARM7500,      arm7500_cpu_device,      "arm7500",      "ARM7500")
 DEFINE_DEVICE_TYPE(ARM9,         arm9_cpu_device,         "arm9",         "ARM9")
 DEFINE_DEVICE_TYPE(ARM920T,      arm920t_cpu_device,      "arm920t",      "ARM920T")
@@ -220,6 +221,13 @@ arm710t_cpu_device::arm710t_cpu_device(const machine_config &mconfig, const char
 	m_copro_id = ARM9_COPRO_ID_MFR_ARM
 			   | ARM9_COPRO_ID_PART_ARM710
 			   | 0x00800000;
+}
+
+
+arm720t_cpu_device::arm720t_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: arm7_cpu_device(mconfig, ARM720T, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
+{
+	m_copro_id = 0x41807204; // ARM720T revision 4
 }
 
 
