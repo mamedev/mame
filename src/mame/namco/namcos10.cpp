@@ -3832,7 +3832,7 @@ ROM_START( dicerom )
 	ROM_LOAD( "k9f2808u0c.8e", 0x0000000, 0x1080000, CRC(fbf25cb9) SHA1(20388b71508d60333dc4bd64ec03c255cc48f1cc) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(cd50578f) SHA1(6bba539f978edd629bcfb5ef8332ab5d3aed3d26) ) // every block is the previous one shifted by one 16-bit word, never accessed by the game so far
+	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(cd50578f) SHA1(6bba539f978edd629bcfb5ef8332ab5d3aed3d26) ) // verified with a second dump: the chip holds no game data (one 18 KB sequence sliding by one word per block, rest is programmer fill) and the game never selects it
 ROM_END
 
 ROM_START( gahaha )
