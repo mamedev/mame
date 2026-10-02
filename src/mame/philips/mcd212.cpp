@@ -1146,10 +1146,9 @@ int mcd212_device::ram_dtack_cycle_count()
 
 int mcd212_device::rom_dtack_cycle_count()
 {
-	static const int s_dd_values[4] = { 2, 3, 4, 5 };
-	if (!BIT(m_csrw[0], CSR1W_DD_BIT))
-		return 7;
-	return s_dd_values[(m_csrw[0] & CSR1W_DD2) >> CSR1W_DD2_SHIFT];
+	static const uint8_t s_dd_clks[4] = { 4, 6, 8, 10 };
+	const uint8_t clks = BIT(m_csrw[0], CSR1W_DD_BIT) ? s_dd_clks[(m_csrw[0] & CSR1W_DD2) >> CSR1W_DD2_SHIFT] : 12;
+	return std::max(int(clks >> 1) - 4, 0);
 }
 
 void mcd212_device::device_reset()
