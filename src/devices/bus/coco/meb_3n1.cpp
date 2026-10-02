@@ -17,7 +17,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 
-//#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 #define ACIA_PORT_TAG "rs232"
@@ -47,7 +47,6 @@ namespace
 			required_device<mos6551_device> m_acia;
 			required_device<msm6242_device> m_rtc;
 			u8 m_rtc_address;
-			u8 m_double_write;
 			required_device<centronics_device> m_centronics;
 			required_device<output_latch_device> m_latch;
 			u8 m_centronics_busy;
@@ -68,7 +67,6 @@ namespace
 		, m_acia(*this, "acia")
 		, m_rtc(*this, "rtc")
 		, m_rtc_address(0)
-		, m_double_write(0)
 		, m_centronics(*this, "centronics")
 		, m_latch(*this, "latch")
 		, m_centronics_busy(0)
@@ -83,7 +81,6 @@ namespace
 	{
 		// save state
 		save_item(NAME(m_rtc_address));
-		save_item(NAME(m_double_write));
 		save_item(NAME(m_centronics_busy));
 	}
 
@@ -165,17 +162,13 @@ namespace
 				m_rtc_address = data;
 				break;
 
-			case 0x02: /* FF52 */
-			case 0x03: /* FF53 */
-				if ((m_rtc_address == data) && !m_double_write)
-				{
-					m_double_write = 1;
-					m_latch->write(data);
-					m_centronics->write_strobe(1);
-					m_centronics->write_strobe(0);
-				}
+ 			case 0x02: /* FF52 */
+				m_latch->write(data);
+				m_centronics->write_strobe(1);
+				m_centronics->write_strobe(0);
+				break;
 
-				m_rtc_address = data;
+			case 0x03: /* FF53 */
 				break;
 
 			case 0x04: /* FF54 */
@@ -185,8 +178,6 @@ namespace
 				m_acia->write(offset % 0x02, data);
 				break;
 		}
-
-		m_double_write = 0;
 	}
 
 
