@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="tiki100" description="TIKI-100 disk images">
+<softwarelist name="tiki100_flop" description="TIKI-100 disk images">
 
 	<software name="assist">
 		<description>Assistent (Norway)</description>

@@ -17,6 +17,7 @@
 #include "ui/ui.h"
 
 #include "imagedev/cassette.h"
+#include "imagedev/cdromimg.h"
 
 #include "debugger.h"
 #include "drivenum.h"
@@ -1081,6 +1082,9 @@ void lua_engine::initialize()
 	emu["cassette_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<cassette_device_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<cassette_device_enumerator>(dev, maxdepth); });
+	emu["cdplayer_enumerator"] = sol::overload(
+			[] (device_t &dev) { return devenum<cd_player_interface_enumerator>(dev); },
+			[] (device_t &dev, int maxdepth) { return devenum<cd_player_interface_enumerator>(dev, maxdepth); });
 	emu["image_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<image_interface_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<image_interface_enumerator>(dev, maxdepth); });
@@ -1629,6 +1633,7 @@ void lua_engine::initialize()
 	machine_type["palettes"] = sol::property([] (running_machine &m) { return devenum<palette_interface_enumerator>(m.root_device()); });
 	machine_type["screens"] = sol::property([] (running_machine &m) { return devenum<screen_device_enumerator>(m.root_device()); });
 	machine_type["cassettes"] = sol::property([] (running_machine &m) { return devenum<cassette_device_enumerator>(m.root_device()); });
+	machine_type["cdplayers"] = sol::property([] (running_machine &m) { return devenum<cd_player_interface_enumerator>(m.root_device()); });
 	machine_type["images"] = sol::property([] (running_machine &m) { return devenum<image_interface_enumerator>(m.root_device()); });
 	machine_type["slots"] = sol::property([](running_machine &m) { return devenum<slot_interface_enumerator>(m.root_device()); });
 	machine_type["sounds"] = sol::property([](running_machine &m) { return devenum<sound_interface_enumerator>(m.root_device()); });
@@ -2125,6 +2130,23 @@ void lua_engine::initialize()
 	cass_type["speaker_state"] = sol::property(&cassette_image_device::speaker_on, &cassette_image_device::set_speaker);
 	cass_type["position"] = sol::property(&cassette_image_device::get_position);
 	cass_type["length"] = sol::property([] (cassette_image_device &c) { return c.exists() ? c.get_length() : 0.0; });
+
+
+	auto cdplayer_type = sol().registry().new_usertype<device_cd_player_interface>("cdplayer", sol::no_constructor);
+	cdplayer_type["play"] = &device_cd_player_interface::play;
+	cdplayer_type["pause"] = &device_cd_player_interface::pause;
+	cdplayer_type["stop"] = &device_cd_player_interface::stop;
+	cdplayer_type["previous_track"] = &device_cd_player_interface::previous_track;
+	cdplayer_type["next_track"] = &device_cd_player_interface::next_track;
+	cdplayer_type["is_stopped"] = sol::property([] (device_cd_player_interface &c) { return c.state() == device_cd_player_interface::transport::STOPPED; });
+	cdplayer_type["is_playing"] = sol::property([] (device_cd_player_interface &c) { return c.state() == device_cd_player_interface::transport::PLAYING; });
+	cdplayer_type["is_paused"] = sol::property([] (device_cd_player_interface &c) { return c.state() == device_cd_player_interface::transport::PAUSED; });
+	cdplayer_type["track"] = sol::property(&device_cd_player_interface::track, &device_cd_player_interface::select_track);
+	cdplayer_type["track_count"] = sol::property(&device_cd_player_interface::track_count);
+	cdplayer_type["position"] = sol::property([] (device_cd_player_interface &c) { return double(c.track_elapsed_frames()) / device_cd_player_interface::FRAMES_PER_SECOND; });
+	cdplayer_type["length"] = sol::property([] (device_cd_player_interface &c) { return double(c.track_length_frames()) / device_cd_player_interface::FRAMES_PER_SECOND; });
+	cdplayer_type["device"] = sol::property(static_cast<device_t & (device_cd_player_interface::*)()>(&device_cd_player_interface::device));
+	cdplayer_type["image"] = sol::property([] (device_cd_player_interface &c) -> device_image_interface & { return c.cd_image(); });
 
 
 	auto image_type = sol().registry().new_usertype<device_image_interface>("image", sol::no_constructor);

@@ -185,7 +185,7 @@ namespace {
 class pet_state : public driver_device
 {
 public:
-	pet_state(const machine_config &mconfig, device_type type, const char *tag, size_t videoram_size = 0x400) :
+	pet_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, M6502_TAG),
 		m_via(*this, M6522_TAG),
@@ -206,7 +206,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, M6502_TAG),
 		m_char_rom(*this, "charom"),
-		m_video_ram(*this, "video_ram", videoram_size, ENDIANNESS_LITTLE),
+		m_video_ram(*this, "video_ram"),
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
 		m_sync_timer(nullptr),
@@ -241,8 +241,10 @@ public:
 	void pet2001(machine_config &config);
 	void pet2001n32(machine_config &config);
 
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	uint8_t cart_r(offs_t offset);
+	uint8_t io_r(offs_t offset);
+	void io_w(offs_t offset, uint8_t data);
+	void video_ram_w(offs_t offset, uint8_t data);
 
 	void via_pa_w(uint8_t data);
 	uint8_t via_pb_r();
@@ -267,7 +269,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void base_mem(address_map &map) ATTR_COLD;
 	void pet2001_mem(address_map &map) ATTR_COLD;
+	void pet40_mem(address_map &map) ATTR_COLD;
+	void pet80_mem(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -292,7 +297,7 @@ protected:
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
-	memory_share_creator<uint8_t> m_video_ram;
+	optional_shared_ptr<uint8_t> m_video_ram;
 	required_ioport_array<10> m_row;
 	required_ioport m_lock;
 
@@ -305,26 +310,6 @@ protected:
 	static constexpr int VIDEO_SYNC_X = VIDEO_TEXT_X + 320;
 	static constexpr int VIDEO_ON_Y = VIDEO_TEXT_Y - 1;
 	static constexpr int VIDEO_OFF_Y = VIDEO_TEXT_Y + 199;
-
-	enum
-	{
-		SEL0 = 0,
-		SEL1,
-		SEL2,
-		SEL3,
-		SEL4,
-		SEL5,
-		SEL6,
-		SEL7,
-		SEL8,
-		SEL9,
-		SELA,
-		SELB,
-		SELC,
-		SELD,
-		SELE,
-		SELF
-	};
 
 	// keyboard state
 	uint8_t m_key;
@@ -347,8 +332,8 @@ protected:
 class pet2001b_state : public pet_state
 {
 public:
-	pet2001b_state(const machine_config &mconfig, device_type type, const char *tag, size_t videoram_size = 0x400) :
-		pet_state(mconfig, type, tag, videoram_size)
+	pet2001b_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pet_state(mconfig, type, tag)
 	{ }
 
 	void pet2001b(machine_config &config, bool with_b000 = true);
@@ -376,7 +361,7 @@ class pet80_state : public pet2001b_state
 {
 public:
 	pet80_state(const machine_config &mconfig, device_type type, const char *tag) :
-		pet2001b_state(mconfig, type, tag, 0x800)
+		pet2001b_state(mconfig, type, tag)
 	{ }
 
 	void pet80(machine_config &config);
@@ -498,162 +483,48 @@ void pet_state::update_speaker()
 }
 
 
-//-------------------------------------------------
-//  read -
-//-------------------------------------------------
-
-uint8_t pet_state::read(offs_t offset)
+uint8_t pet_state::cart_r(offs_t offset)
 {
-	int sel = offset >> 12;
-	int norom = m_exp->norom_r(offset, sel);
-	uint8_t data = 0;
+	generic_slot_device *const cart = offset < 0x1000 ? m_cart_9000.target() :
+		offset < 0x2000 ? m_cart_a000.target() : m_cart_b000.target();
+	return cart && cart->exists() ? cart->read_rom(offset & 0xfff) : m_rom->base()[offset];
+}
 
-	data = m_exp->read(offset, data, sel);
-
-	switch (sel)
-	{
-	case SEL0: case SEL1: case SEL2: case SEL3: case SEL4: case SEL5: case SEL6: case SEL7:
-		if (offset < m_ram->size())
-		{
-			data = m_ram->pointer()[offset];
-		}
-		break;
-
-	case SEL8:
-		if (!(offset & 0x800))
-		{
-			data = m_video_ram[offset & (m_video_ram.length() - 1)];
-		}
-		break;
-
-	case SEL9:
-		if (norom)
-		{
-			if (m_cart_9000 && m_cart_9000->exists())
-				data = m_cart_9000->read_rom(offset & 0xfff);
-			else
-				data = m_rom->base()[offset - 0x9000];
-		}
-		break;
-
-	case SELA:
-		if (norom)
-		{
-			if (m_cart_a000 && m_cart_a000->exists())
-				data = m_cart_a000->read_rom(offset & 0xfff);
-			else
-				data = m_rom->base()[offset - 0x9000];
-		}
-		break;
-
-	case SELB:
-		if (norom)
-		{
-			if (m_cart_b000 && m_cart_b000->exists())
-				data = m_cart_b000->read_rom(offset & 0xfff);
-			else
-				data = m_rom->base()[offset - 0x9000];
-		}
-		break;
-
-	case SELC: case SELD: case SELF:
-		if (norom)
-		{
-			data = m_rom->base()[offset - 0x9000];
-		}
-		break;
-
-	case SELE:
-		if (BIT(offset, 11))
-		{
-			data = 0xff;
-
-			if (BIT(offset, 4))
-			{
-				data &= m_pia1->read(offset & 0x03);
-			}
-			if (BIT(offset, 5))
-			{
-				data &= m_pia2->read(offset & 0x03);
-			}
-			if (BIT(offset, 6))
-			{
-				data &= m_via->read(offset & 0x0f);
-			}
-			if (m_crtc && BIT(offset, 7) && BIT(offset, 0))
-			{
-				data &= m_crtc->register_r();
-			}
-		}
-		else if (norom)
-		{
-			data = m_rom->base()[offset - 0x9000];
-		}
-		break;
-	}
-
+uint8_t pet_state::io_r(offs_t offset)
+{
+	uint8_t data = 0xff;
+	if (BIT(offset, 4))
+		data &= m_pia1->read(offset & 0x03);
+	if (BIT(offset, 5))
+		data &= m_pia2->read(offset & 0x03);
+	if (BIT(offset, 6))
+		data &= m_via->read(offset & 0x0f);
+	if (m_crtc && BIT(offset, 7) && BIT(offset, 0))
+		data &= m_crtc->register_r();
 	return data;
 }
 
-
-//-------------------------------------------------
-//  write -
-//-------------------------------------------------
-
-void pet_state::write(offs_t offset, uint8_t data)
+void pet_state::io_w(offs_t offset, uint8_t data)
 {
-	int sel = offset >> 12;
-
-	m_exp->write(offset, data, sel);
-
-	switch (sel)
+	if (BIT(offset, 4))
+		m_pia1->write(offset & 0x03, data);
+	if (BIT(offset, 5))
+		m_pia2->write(offset & 0x03, data);
+	if (BIT(offset, 6))
+		m_via->write(offset & 0x0f, data);
+	if (m_crtc && BIT(offset, 7))
 	{
-	case SEL0: case SEL1: case SEL2: case SEL3: case SEL4: case SEL5: case SEL6: case SEL7:
-		if (offset < m_ram->size())
-		{
-			m_ram->pointer()[offset] = data;
-		}
-		break;
-
-	case SEL8:
-		if (!(offset & 0x800))
-		{
-			if (!m_crtc)
-				m_screen->update_now();
-
-			m_video_ram[offset & (m_video_ram.length() - 1)] = data;
-		}
-		break;
-
-	case SELE:
-		if (BIT(offset, 11))
-		{
-			if (BIT(offset, 4))
-			{
-				m_pia1->write(offset & 0x03, data);
-			}
-			if (BIT(offset, 5))
-			{
-				m_pia2->write(offset & 0x03, data);
-			}
-			if (BIT(offset, 6))
-			{
-				m_via->write(offset & 0x0f, data);
-			}
-			if (m_crtc && BIT(offset, 7))
-			{
-				if (BIT(offset, 0))
-				{
-					m_crtc->register_w(data);
-				}
-				else
-				{
-					m_crtc->address_w(data);
-				}
-			}
-		}
-		break;
+		if (BIT(offset, 0))
+			m_crtc->register_w(data);
+		else
+			m_crtc->address_w(data);
 	}
+}
+
+void pet_state::video_ram_w(offs_t offset, uint8_t data)
+{
+	m_screen->update_now();
+	m_video_ram[offset] = data;
 }
 
 //-------------------------------------------------
@@ -763,7 +634,7 @@ void cbm8296_state::pla_ram_select(int &ramsela, int &ramsel9, int &ramon)
 
 uint8_t cbm8296_state::read(offs_t offset)
 {
-	int norom = m_exp->norom_r(offset, offset >> 12) && !BIT(m_cr, 7);
+	int norom = !BIT(m_cr, 7);
 	int phi2 = 1, brw = 1, noscreen = 1, noio = BIT(m_cr, 6);
 	int ramsela, ramsel9, ramon;
 	pla_ram_select(ramsela, ramsel9, ramon);
@@ -845,7 +716,7 @@ uint8_t cbm8296_state::read(offs_t offset)
 
 void cbm8296_state::write(offs_t offset, uint8_t data)
 {
-	int norom = m_exp->norom_r(offset, offset >> 12) && !BIT(m_cr, 7);
+	int norom = !BIT(m_cr, 7);
 	int phi2 = 1, brw = 0, noscreen = 1, noio = BIT(m_cr, 6);
 	int ramsela, ramsel9, ramon;
 	pla_ram_select(ramsela, ramsel9, ramon);
@@ -914,9 +785,30 @@ void cbm8296_state::write(offs_t offset, uint8_t data)
 //  ADDRESS MAPS
 //**************************************************************************
 
+void pet_state::base_mem(address_map &map)
+{
+	map(0x0000, 0xffff).noprw();
+	map(0x9000, 0xffff).rom().region(M6502_TAG, 0);
+	map(0x9000, 0xbfff).r(FUNC(pet_state::cart_r));
+	map(0xe800, 0xefff).rw(FUNC(pet_state::io_r), FUNC(pet_state::io_w));
+}
+
 void pet_state::pet2001_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(pet_state::read), FUNC(pet_state::write));
+	base_mem(map);
+	map(0x8000, 0x83ff).mirror(0x400).readonly().share("video_ram").w(FUNC(pet_state::video_ram_w));
+}
+
+void pet_state::pet40_mem(address_map &map)
+{
+	base_mem(map);
+	map(0x8000, 0x83ff).mirror(0x400).ram().share("video_ram");
+}
+
+void pet_state::pet80_mem(address_map &map)
+{
+	base_mem(map);
+	map(0x8000, 0x87ff).ram().share("video_ram");
 }
 
 
@@ -1761,6 +1653,8 @@ void cbm8296d_ieee488_devices(device_slot_interface &device)
 void pet_state::machine_start()
 {
 	// initialize memory
+	if (m_video_ram)
+		m_maincpu->space(AS_PROGRAM).install_ram(0, std::min<offs_t>(m_ram->size(), 0x8000) - 1, m_ram->pointer());
 	uint8_t data = 0xff;
 
 	for (offs_t offset = 0; offset < m_ram->size(); offset++)
@@ -1771,10 +1665,13 @@ void pet_state::machine_start()
 
 	data = 0xff;
 
-	for (offs_t offset = 0; offset < m_video_ram.length(); offset++)
+	if (m_video_ram)
 	{
-		m_video_ram[offset] = data;
-		if (!(offset % 64)) data ^= 0xff;
+		for (offs_t offset = 0; offset < m_video_ram.length(); offset++)
+		{
+			m_video_ram[offset] = data;
+			if (!(offset % 64)) data ^= 0xff;
+		}
 	}
 
 	if (!m_sync_timer)
@@ -1900,8 +1797,7 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_cassette2->read_handler().set(M6522_TAG, FUNC(via6522_device::write_cb1));
 
 	PET_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/16, pet_expansion_cards, nullptr);
-	m_exp->dma_read_callback().set(FUNC(pet_state::read));
-	m_exp->dma_write_callback().set(FUNC(pet_state::write));
+	m_exp->set_program_space(m_maincpu, AS_PROGRAM);
 	m_exp->halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	m_exp->reset_callback().set_inputline(m_maincpu, INPUT_LINE_RESET);
 	m_exp->irq_callback().set("mainirq", FUNC(input_merger_device::in_w<5>));
@@ -2063,6 +1959,7 @@ void pet2001b_state::pet4032(machine_config &config)
 void pet2001b_state::pet4032f(machine_config &config)
 {
 	pet4000(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet40_mem);
 
 	// video hardware
 	m_screen->set_raw(XTAL(16'000'000)/2, 400, 0, 320, 333, 0, 200);
@@ -2106,6 +2003,7 @@ void pet_state::cbm4032(machine_config &config)
 void pet_state::cbm4032f(machine_config &config)
 {
 	cbm4000(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet40_mem);
 
 	// video hardware
 	m_screen->set_raw(XTAL(16'000'000)/2, 400, 0, 320, 400, 0, 200);
@@ -2157,7 +2055,7 @@ void pet80_state::pet80(machine_config &config)
 
 	// basic machine hardware
 	M6502(config, m_maincpu, XTAL(16'000'000)/16);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet2001_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet80_mem);
 
 	// video hardware
 	SCREEN(config, m_screen);

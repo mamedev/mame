@@ -322,7 +322,7 @@ void apple2gs_cards(device_slot_interface &device)
 	device.option_add("4play", A2BUS_4PLAY);                   // 4Play Joystick Card (Rev. B)
 	device.option_add("snesmax", A2BUS_SNES_MAX);              // SNES MAX controller adapter
 //  device.option_add("magicmusician", A2BUS_MAGICMUSICIAN);   // Magic Musician Card
-//  device.option_add("pcxport", A2BUS_PCXPORTER);             // Applied Engineering PC Transporter
+	device.option_add("pcxport", A2BUS_PCXPORTER);             // Applied Engineering PC Transporter
 	device.option_add("byte8251", A2BUS_BYTE8251);             // BYTE Magazine 8251 serial card
 	device.option_add("noisemaker", A2BUS_NOISEMAKER);         // ADS Noisemaker II
 	device.option_add("smaster", A2BUS_SMASTER);               // Covox Sound Master

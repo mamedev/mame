@@ -8,6 +8,8 @@
 #include "emu.h"
 #include "cdda.h"
 
+#include <algorithm>
+
 static constexpr int MAX_SECTORS = 4;
 static constexpr int MAX_SCAN_SECTORS = 2;
 
@@ -311,4 +313,150 @@ cdda_device::cdda_device(const machine_config &mconfig, const char *tag, device_
 	, m_stream(nullptr)
 	, m_audio_end_cb(*this)
 {
+}
+
+
+device_cdda_player_interface::device_cdda_player_interface(const machine_config &mconfig, device_t &device)
+	: device_cd_player_interface(mconfig, device)
+	, m_cd_image(device, "cdrom")
+	, m_cdda(device, "cdda")
+	, m_track(0)
+{
+}
+
+void device_cdda_player_interface::add_cd_player(machine_config &config)
+{
+	CDROM(config, m_cd_image).set_interface("cdrom");
+
+	CDDA(config, m_cdda).set_cdrom_tag(m_cd_image);
+	m_cdda->audio_end_cb().set(device(), FUNC(device_cdda_player_interface::audio_end));
+	m_cdda->add_route(0, DEVICE_SELF, 1.0, 0);
+	m_cdda->add_route(1, DEVICE_SELF, 1.0, 1);
+}
+
+void device_cdda_player_interface::interface_pre_start()
+{
+	m_media_notifier = m_cd_image->add_media_change_notifier(
+			[this] (device_image_interface::media_change_event ev)
+			{
+				m_cdda->stop_audio();
+				m_track = 0;
+			});
+
+	device().save_item(NAME(m_track));
+}
+
+void device_cdda_player_interface::audio_end(int state)
+{
+	if (state)
+		m_track = 0;
+}
+
+int device_cdda_player_interface::current_track()
+{
+	return m_cdda->audio_active() ? m_cd_image->get_track(m_cdda->get_audio_lba()) : m_track;
+}
+
+void device_cdda_player_interface::seek_track(int track)
+{
+	m_track = track;
+
+	if (m_cdda->audio_active())
+	{
+		bool const paused = m_cdda->audio_paused();
+		m_cdda->start_audio(track_start(track), disc_end() - track_start(track));
+		if (paused)
+			m_cdda->pause_audio(1);
+	}
+}
+
+cdrom_image_device &device_cdda_player_interface::cd_image()
+{
+	return *m_cd_image;
+}
+
+device_cd_player_interface::transport device_cdda_player_interface::state()
+{
+	if (!m_cdda->audio_active())
+		return transport::STOPPED;
+
+	return m_cdda->audio_paused() ? transport::PAUSED : transport::PLAYING;
+}
+
+int device_cdda_player_interface::track()
+{
+	return current_track() + 1;
+}
+
+int device_cdda_player_interface::track_count()
+{
+	return m_cd_image->get_last_track();
+}
+
+u32 device_cdda_player_interface::track_elapsed_frames()
+{
+	return m_cdda->audio_active() ? m_cdda->get_audio_lba() - track_start(current_track()) : 0;
+}
+
+u32 device_cdda_player_interface::track_length_frames()
+{
+	if (!m_cd_image->exists())
+		return 0;
+
+	int const track = current_track();
+	return ((track + 1 < track_count()) ? track_start(track + 1) : disc_end()) - track_start(track);
+}
+
+void device_cdda_player_interface::play()
+{
+	if (!m_cd_image->exists())
+		return;
+
+	if (!m_cdda->audio_active())
+		m_cdda->start_audio(track_start(m_track), disc_end() - track_start(m_track));
+	else if (m_cdda->audio_paused())
+		m_cdda->pause_audio(0);
+}
+
+void device_cdda_player_interface::pause()
+{
+	if (state() == transport::PLAYING)
+		m_cdda->pause_audio(1);
+}
+
+void device_cdda_player_interface::stop()
+{
+	if (!m_cdda->audio_active())
+		return;
+
+	m_track = current_track();
+	m_cdda->stop_audio();
+}
+
+void device_cdda_player_interface::previous_track()
+{
+	if (!m_cd_image->exists())
+		return;
+
+	int const track = current_track();
+	if (track_elapsed_frames() >= 2 * FRAMES_PER_SECOND)
+		seek_track(track);
+	else
+		seek_track(std::max(track - 1, 0));
+}
+
+void device_cdda_player_interface::next_track()
+{
+	if (!m_cd_image->exists())
+		return;
+
+	int const track = current_track();
+	if (track + 1 < track_count())
+		seek_track(track + 1);
+}
+
+void device_cdda_player_interface::select_track(int track)
+{
+	if (m_cd_image->exists() && track_count() > 0)
+		seek_track(std::clamp(track, 1, track_count()) - 1);
 }

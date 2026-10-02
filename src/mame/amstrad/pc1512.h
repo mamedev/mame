@@ -209,9 +209,10 @@ public:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void pc1512hd(machine_config &config);
 	void pc1512(machine_config &config);
 	void pc1512dd(machine_config &config);
+	void pc1512hd10(machine_config &config);
+	void pc1512hd20(machine_config &config);
 	void pc1512_io(address_map &map) ATTR_COLD;
 	void pc1512_mem(address_map &map) ATTR_COLD;
 

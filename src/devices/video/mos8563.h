@@ -37,6 +37,8 @@ public:
 
 	MC6845_UPDATE_ROW( vdc_update_row );
 
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 protected:
 	mos8563_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -73,11 +75,20 @@ protected:
 	uint8_t   m_word_count;           /* 0x1e */
 	uint8_t   m_data;                 /* 0x1f */
 	uint16_t  m_block_addr;           /* 0x20/0x21 */
-	uint16_t  m_de_begin;             /* 0x22/0x23 */
+	uint8_t   m_de_begin;             /* 0x22 */
+	uint8_t   m_de_end;               /* 0x23 */
 	uint8_t   m_dram_refresh;         /* 0x24 */
 	uint8_t   m_sync_polarity;        /* 0x25 */
 
 	int m_revision;
+	uint8_t m_draw_ra;
+	uint16_t m_attr_row_addr;
+	uint16_t m_bitmap_addr;
+
+	offs_t vram_address(offs_t offset) const;
+	void update_char_width();
+	static int displayed_width(uint8_t r22);
+	static bool semigraphics_gap(uint8_t r22);
 
 	virtual void update_cursor_state() override;
 	virtual uint8_t draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
