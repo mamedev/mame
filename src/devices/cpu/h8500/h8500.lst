@@ -56,21 +56,37 @@ macro prefetch_noirq
 	prefetch_start
 	prefetch_done_noirq();
 
+# Timing: each instruction byte fetched costs a state (read8i/read_imm), each operand
+# access a state (read16/write16), and internal() makes up the rest.  The branch, call,
+# return, trap, SCB, LDM/STM, LINK/UNLK and NOP times add up to the H8/500 Programming
+# Manual's table 2-8 (5)/(6) for a 16-bit 2-state bus, with one more state for a branch
+# to an odd address (table 2-9).
+
+# prefetch at a branch target, one more state when it is odd (table 2-9)
+macro prefetch_target
+	internal(m_pc & 1);
+	prefetch
+
+macro prefetch_target_noirq
+	internal(m_pc & 1);
+	prefetch_noirq
+
 macro cycles %value
 	internal(%value);
 
 # target PC in m_tmp1
 macro bxx_any %cond
 	prefetch_start
-	m_tmp3 = read8i((m_tmp1 & 0xffff) | (m_cp << 16));
+	m_tmp3 = m_program->read_byte((m_tmp1 & 0xffff) | (m_cp << 16));
 	if(%cond) {
-		internal(4);
+		internal(4 + (m_tmp1 & 1));
 		prefetch_switch((m_tmp1 & 0xffff) | (m_cp << 16), m_tmp3);
 	}
 	prefetch_done();
 
 macro bxx_8 %cond
 	m_tmp1 = s8(read_imm8());
+	internal(1);
 	m_tmp1 = (m_pc + m_tmp1) & 0xffff;
 	bxx_any %cond
 
@@ -211,12 +227,11 @@ macro take_exception %vector
 
 # NOP
 00    ff    nop           s        -      -
-	internal(2);
+	internal(1);
 	prefetch
 
 # SCB/F
 01b8  fff8  scb_f         s        -      -
-	internal(3);
 	m_tmp1 = m_ir[1] & 7;
 	m_tmp2 = (r16_r(m_tmp1) - 1) & 0xffff;
 	r16_w(m_tmp1, m_tmp2);
@@ -227,15 +242,15 @@ macro take_exception %vector
 	m_tmp1 = read_imm8();
 	for (m_tmp2 = 0; m_tmp2 < 8; m_tmp2++) {
 		if (BIT(m_tmp1, m_tmp2)) {
-			internal(4);
+			internal(3);
 			pop_16 m_tmp3
 			if (m_tmp2 != 7) {
 				r16_w(m_tmp2, m_tmp3);
 			}
 		}
 	}
+	internal(4);
 	prefetch
-	internal(6);
 
 # PJSR #imm24
 03    ff    pjsr          s        -      -
@@ -246,36 +261,32 @@ macro take_exception %vector
 		push_16 m_cp
 		m_cp = m_tmp1;
 		m_pc = m_tmp2;
-		prefetch
-		internal(15);
+		internal(9);
+		prefetch_target
 	} else {
 		take_exception 2
 	}
 
 # SCB/NE
 06b8  fff8  scb_ne        s        -      -
-	internal(3);
 	if (m_sr & SR_Z) {
 		m_tmp1 = m_ir[1] & 7;
 		m_tmp2 = (r16_r(m_tmp1) - 1) & 0xffff;
 		r16_w(m_tmp1, m_tmp2);
 		bxx_8 (m_tmp2 != 0xffff)
 	} else {
-		internal(1);
 		read_imm8();
 		prefetch
 	}
 
 # SCB/EQ
 07b8  fff8  scb_eq        s        -      -
-	internal(3);
 	if (!(m_sr & SR_Z)) {
 		m_tmp1 = m_ir[1] & 7;
 		m_tmp2 = (r16_r(m_tmp1) - 1) & 0xffff;
 		r16_w(m_tmp1, m_tmp2);
 		bxx_8 (m_tmp2 != 0xffff)
 	} else {
-		internal(1);
 		read_imm8();
 		prefetch
 	}
@@ -287,8 +298,8 @@ macro take_exception %vector
 	push_exception_frame
 	m_sr &= ~SR_T;
 	set_exception_pc
-	cycles 2
-	prefetch_noirq
+	internal(h8_maximum_mode() ? 13 : 10);
+	prefetch_target_noirq
 
 # TRAP/VS
 09    ff    trap_vs       s        -      -
@@ -298,8 +309,8 @@ macro take_exception %vector
 		push_exception_frame
 		m_sr &= ~SR_T;
 		set_exception_pc
-		cycles 2
-		prefetch_noirq
+		internal(h8_maximum_mode() ? 15 : 12);
+		prefetch_target_noirq
 	} else {
 		cycles 2
 		prefetch
@@ -310,36 +321,35 @@ macro take_exception %vector
 	pop_16 m_sr
 	m_sr &= SR_MASK;
 	update_irq_filter();
-	cycles 2
 	if (h8_maximum_mode()) {
 		pop_16 m_cp
-		cycles 2
+		cycles 1
 	}
 	pop_16 m_pc
-	cycles 11
-	prefetch_noirq
+	cycles 10
+	prefetch_target_noirq
 
 # BSR rel8
 0e    ff    bsr           s        -      -
 	m_tmp1 = s8(read_imm8());
 	m_tmp1 = (m_pc + m_tmp1) & 0xffff;
+	cycles 2
 	do_jsr
-	cycles 5
 
 # UNLK FP
 0f    ff    unlk          s        -      -
 	r16_w(7, r16_r(6));
 	pop_16 m_tmp1
 	r16_w(6, m_tmp1);
+	cycles 3
 	prefetch
-	cycles 5
 
 # JMP #imm16
 10    ff    jmp           s        -      -
 	m_tmp1 = read_imm16();
 	m_pc = m_tmp1;
-	cycles 7
-	prefetch
+	cycles 4
+	prefetch_target
 
 # PRTD #xx:8
 1114  ffff  prtd          s        -      -
@@ -348,8 +358,8 @@ macro take_exception %vector
 		pop_16 m_cp
 		pop_16 m_pc
 		r16_w(7, (r16_r(7) + m_tmp1) & 0xffff);
-		cycles 13
-		prefetch
+		cycles 8
+		prefetch_target
 	} else {
 		take_exception 2
 	}
@@ -359,8 +369,8 @@ macro take_exception %vector
 	if (h8_maximum_mode()) {
 		pop_16 m_cp
 		pop_16 m_pc
-		cycles 12
-		prefetch
+		cycles 8
+		prefetch_target
 	} else {
 		take_exception 2
 	}
@@ -372,8 +382,8 @@ macro take_exception %vector
 		pop_16 m_cp
 		pop_16 m_pc
 		r16_w(7, (r16_r(7) + m_tmp1) & 0xffff);
-		cycles 13
-		prefetch
+		cycles 7
+		prefetch_target
 	} else {
 		take_exception 2
 	}
@@ -383,8 +393,8 @@ macro take_exception %vector
 	if (h8_maximum_mode()) {
 		m_cp = r16_r(m_ir[1]) & 0xff;
 		m_pc = r16_r(m_ir[1] + 1);
-		cycles 8
-		prefetch
+		cycles 6
+		prefetch_target
 	} else {
 		take_exception 2
 	}
@@ -398,8 +408,8 @@ macro take_exception %vector
 		push_16 m_cp
 		m_cp = m_tmp1;
 		m_pc = m_tmp2;
-		prefetch
-		internal(13);
+		internal(9);
+		prefetch_target
 	} else {
 		take_exception 2
 	}
@@ -407,46 +417,46 @@ macro take_exception %vector
 # JSR @Rn
 11d8  fff8  jsr_rn        s        -      -
 	m_tmp1 = r16_r(m_ir[1]);
-	cycles 9
+	cycles 2
 	do_jsr
 
 # JMP @Rn
 11d0  fff8  jmp_rn        s        -      -
 	m_pc = r16_r(m_ir[1]);
-	cycles 6
-	prefetch
+	cycles 4
+	prefetch_target
 
 # JMP @(disp8:Rn)
 11e0  fff8  jmp_d8r       s        -      -
 	m_tmp1 = s8(read_imm8());
 	m_pc = (r16_r(m_ir[1]) + m_tmp1) & 0xffff;
-	cycles 7
-	prefetch
+	cycles 4
+	prefetch_target
 
 # JSR @(disp8:Rn)
 11e8  fff8  jsr_d8r       s        -      -
 	m_tmp2 = s8(read_imm8());
 	m_tmp1 = (r16_r(m_ir[1]) + m_tmp2) & 0xffff;
-	cycles 9
+	cycles 1
 	do_jsr
 
 # JMP @(disp16:Rn)
 11f0  fff8  jmp_d16r      s        -      -
 	m_tmp1 = read_imm16();
 	m_pc = (r16_r(m_ir[1]) + m_tmp1) & 0xffff;
-	cycles 8
-	prefetch
+	cycles 4
+	prefetch_target
 
 # JSR @(disp16:Rn)
 11f8  fff8  jsr_d16r      s        -      -
 	m_tmp2 = read_imm16();
 	m_tmp1 = (r16_r(m_ir[1]) + m_tmp2) & 0xffff;
-	cycles 10
+	cycles 1
 	do_jsr
 
 # STM #imm8
 12    ff    stm           s        -      -
-	cycles 6
+	cycles 4
 	m_tmp1 = read_imm8();
 	for (m_tmp2 = 7; m_tmp2 != -1; m_tmp2--) {
 		if (BIT(m_tmp1, m_tmp2)) {
@@ -456,7 +466,7 @@ macro take_exception %vector
 				m_tmp3 = (m_tmp3 - 2) & 0xffff;
 			}
 			push_16 m_tmp3
-			cycles 3
+			cycles 2
 		}
 	}
 	prefetch
@@ -468,8 +478,8 @@ macro take_exception %vector
 		m_tmp2 = read_imm16();
 		m_cp = m_tmp1;
 		m_pc = m_tmp2;
-		cycles 9
-		prefetch
+		cycles 5
+		prefetch_target
 	} else {
 		take_exception 2
 	}
@@ -479,8 +489,8 @@ macro take_exception %vector
 	m_tmp1 = s8(read_imm8());
 	pop_16 m_pc
 	r16_w(7, (r16_r(7) + m_tmp1) & 0xffff);
-	cycles 9
-	prefetch
+	cycles 6
+	prefetch_target
 
 # LINK FP, #xx:8
 17    ff    link          s        -      -
@@ -488,20 +498,20 @@ macro take_exception %vector
 	push_16 r16_r(6)
 	r16_w(6, r16_r(7));
 	r16_w(7, (r16_r(7) + m_tmp1) & 0xffff);
-	cycles 2
+	cycles 3
 	prefetch
 
 # JSR @aa:16
 18    ff    jsr           s        -      -
 	m_tmp1 = read_imm16();
+	cycles 1
 	do_jsr
-	cycles 9
 
 # RTS
 19    ff    rts           s        -      -
 	pop_16 m_pc
-	cycles 8
-	prefetch
+	cycles 6
+	prefetch_target
 
 # SLEEP
 1a    ff    sleep         s        -      -
@@ -523,15 +533,15 @@ macro take_exception %vector
 	m_tmp1 = s16(read_imm16());
 	pop_16 m_pc
 	r16_w(7, (r16_r(7) + m_tmp1) & 0xffff);
-	cycles 9
-	prefetch
+	cycles 5
+	prefetch_target
 
 # BSR rel16
 1e    ff    bsr_rel16     s        -      -
 	m_tmp1 = s16(read_imm16());
 	m_tmp1 = (m_pc + m_tmp1) & 0xffff;
 	push_16 m_pc
-	cycles 9
+	cycles 1
 	bxx_any true
 
 # LINK FP, #xxxx:16
@@ -540,7 +550,7 @@ macro take_exception %vector
 	push_16 r16_r(6)
 	r16_w(6, r16_r(7));
 	r16_w(7, (r16_r(7) + m_tmp1) & 0xffff);
-	cycles 2
+	cycles 3
 	prefetch
 
 20    ff    bt            s        -      -

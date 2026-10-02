@@ -190,7 +190,6 @@ u8 h8500_device::read_imm8()
 	if (!access_to_be_redone_noclear()) {
 		m_pc = (m_pc + 1) & 0xffff;
 	}
-	internal(1);
 	return val;
 }
 
