@@ -160,6 +160,11 @@ void arcompact_device::arcompact_auxreg200_AUX_IRQ_LVL_w(uint32_t data)
 
 void arcompact_device::arcompact_auxreg_map(address_map& map)
 {
+	if (m_has_dsp)
+	{
+		map(0x80, 0x9f).rw(FUNC(arcompact_device::dsp_aux_r), FUNC(arcompact_device::dsp_aux_w));
+		map(0x41, 0x41).lrw32(NAME([this]() { return m_macmode; }), NAME([this](u32 data) { m_macmode = (m_macmode & (BIT(data, 1) ? 0U : 0x120U)) | (data & ~0x122U); }));
+	}
 	//map(0x000000000, 0x000000000) // STATUS register in ARCtangent-A4 format (legacy)
 	//map(0x000000001, 0x000000001) // SEMAPHORE (for multi-cpu comms)
 	map(0x000000002, 0x000000002).rw(FUNC(arcompact_device::arcompact_auxreg002_LPSTART_r), FUNC(arcompact_device::arcompact_auxreg002_LPSTART_w));
@@ -275,17 +280,21 @@ void arcompact_device::device_start()
 		state_add(i, arcompact_disassembler::regnames[i - 0x100], m_debugger_temp).callimport().callexport().formatstr("%08X");
 	}
 
-	m_irq_pending = false;
+	m_pending_ints = 0;
 
 	set_icountptr(m_icount);
 
 	save_item(NAME(m_pc));
 	save_item(NAME(m_regs));
+	save_item(NAME(m_xy_aux));
+	save_item(NAME(m_xy_mem));
+	save_item(NAME(m_macmode));
+	save_item(NAME(m_mac_acc));
 	save_item(NAME(m_delayactive));
 	save_item(NAME(m_delaylinks));
 	save_item(NAME(m_delayjump));
 	save_item(NAME(m_allow_loop_check));
-	save_item(NAME(m_irq_pending));
+	save_item(NAME(m_pending_ints));
 	save_item(NAME(m_status32));
 	save_item(NAME(m_status32_l1));
 	save_item(NAME(m_status32_l2));
@@ -373,10 +382,16 @@ void arcompact_device::state_import(const device_state_entry& entry)
 void arcompact_device::device_reset()
 {
 	m_pc = m_INTVECTORBASE = m_default_vector_base;
+	std::fill(std::begin(m_xy_aux), std::end(m_xy_aux), 0);
+	for (auto &bank : m_xy_mem)
+		for (auto &plane : bank)
+			std::fill(std::begin(plane), std::end(plane), 0);
+	m_macmode = 0;
+	m_mac_acc[0] = m_mac_acc[1] = 0;
 
 	m_delayactive = false;
 	m_delayjump = 0x00000000;
-	m_irq_pending = false;
+	m_pending_ints = 0;
 
 	for (auto& elem : m_regs)
 		elem = 0;
@@ -404,9 +419,9 @@ void arcompact_device::device_reset()
 void arcompact_device::execute_set_input(int irqline, int state)
 {
 	if (state == ASSERT_LINE)
-		m_irq_pending = true;
+		m_pending_ints |= (1 << irqline);
 	else
-		m_irq_pending = false;
+		m_pending_ints &= ~(1 << irqline);
 }
 
 /*****************************************************************************/
@@ -1796,23 +1811,23 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 					case 0x0c:
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// Unknown Extension Op
+// MULDW - dual signed 16-bit multiplication
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_general(op, handleop32_UNKNOWN_05_0c_do_op);
+						return handleop32_general(op, handleop32_MULDW_do_op);
 					}
 					case 0x10:
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// Unknown Extension Op
+// MACDW - dual signed 16-bit multiply/accumulate
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_general(op, handleop32_UNKNOWN_05_10_do_op);
+						return handleop32_general(op, handleop32_MACDW_do_op);
 					}
 					case 0x14:
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// Unknown Extension Op
+// MSUBDW - dual signed 16-bit multiply/subtract
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_general(op, handleop32_UNKNOWN_05_14_do_op);
+						return handleop32_general(op, handleop32_MSUBDW_do_op);
 					}
 					case 0x28:
 					{
@@ -2946,4 +2961,129 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 		}
 	}
 	return 0;
+}
+
+// Subset of the ARC XY/DSP extension used by Leapster firmware. Other data
+// transforms, burst modes and accumulator access registers remain unimplemented.
+// Core registers 32..55 alias four address generators
+// in each memory. u0/u1 select a post-modifier; nu leaves the address alone.
+uint32_t arcompact_device::read_reg(unsigned reg)
+{
+	return m_has_dsp && reg >= 32 && reg < 56 ? xy_read(reg) : m_regs[reg];
+}
+
+void arcompact_device::write_reg(unsigned reg, uint32_t data)
+{
+	if (m_has_dsp && reg >= 32 && reg < 56)
+		xy_write(reg, data);
+	else
+		m_regs[reg] = data;
+}
+
+void arcompact_device::xy_update(unsigned index, uint32_t modifier)
+{
+	// The modulus counts accesses (words, or halfwords for 16-bit format).
+	// Zero selects linear addressing; non-power-of-two rings are aligned to
+	// the next power of two.
+	int const increment = int16_t(modifier);
+	u32 const length = (modifier >> 16) & 0x0fff;
+	u32 const address = m_xy_aux[index];
+	if (length)
+	{
+		u32 const base = address & ~(std::bit_ceil(length) - 1);
+		int const offset = (int(address - base) + increment) % int(length);
+		m_xy_aux[index] = base + (offset < 0 ? offset + length : offset);
+	}
+	else
+		m_xy_aux[index] += increment;
+}
+
+uint32_t arcompact_device::xy_read(unsigned reg)
+{
+	unsigned const index = reg < 48 ? (reg - 32) / 2 : reg - 48;
+	unsigned const which = reg < 48 ? reg & 1 : 0;
+	u32 const modifier = m_xy_aux[8 + index * 2 + which];
+	u32 const address = m_xy_aux[index];
+	u32 const *memory = m_xy_mem[m_xy_aux[0x18] & 1][index / 4];
+	u32 result;
+	if (BIT(modifier, 29))
+	{
+		result = (memory[(address / 2) & 0x3ff] >> ((address & 1) * 16)) & 0xffff;
+		result <<= 16;
+	}
+	else
+		result = memory[address & 0x3ff];
+	if (reg < 48)
+		xy_update(index, modifier);
+	return result;
+}
+
+void arcompact_device::xy_write(unsigned reg, uint32_t data)
+{
+	unsigned const index = reg < 48 ? (reg - 32) / 2 : reg - 48;
+	unsigned const which = reg < 48 ? reg & 1 : 0;
+	u32 const modifier = m_xy_aux[8 + index * 2 + which];
+	u32 const address = m_xy_aux[index];
+	u32 *memory = m_xy_mem[m_xy_aux[0x18] & 1][index / 4];
+	if (BIT(modifier, 29))
+	{
+		unsigned const shift = (address & 1) * 16;
+		data >>= 16;
+		memory[(address / 2) & 0x3ff] = (memory[(address / 2) & 0x3ff] & ~(0xffffU << shift)) | ((data & 0xffff) << shift);
+	}
+	else
+		memory[address & 0x3ff] = data;
+	if (reg < 48)
+		xy_update(index, modifier);
+}
+
+uint32_t arcompact_device::dsp_aux_r(offs_t offset)
+{
+	// Bursts complete synchronously, so XYCONFIG's busy bit is clear.
+	return m_xy_aux[offset] & (offset == 0x18 ? ~0x10U : ~0U);
+}
+
+void arcompact_device::dsp_aux_w(offs_t offset, uint32_t data)
+{
+	m_xy_aux[offset] = data;
+	if (offset == 0x1b)
+	{
+		u32 const system = m_xy_aux[0x19];
+		u32 const xy = m_xy_aux[0x1a];
+		u32 const size = (data & 0xffff) + 1;
+		u32 *memory = m_xy_mem[m_xy_aux[0x18] & 1][BIT(data, 29)];
+		for (u32 i = 0; i < size; i += 4)
+		{
+			u32 &word = memory[(xy + i / 4) & 0x3ff];
+			if (BIT(data, 30))
+				word = m_program->read_dword(system + i);
+			else
+				m_program->write_dword(system + i, word);
+		}
+	}
+}
+
+// Dual signed 16-bit multiply, accumulate and subtract. Keep the two
+// accumulators separate; only the returned packed result is saturated.
+uint32_t arcompact_device::dsp_multiply(uint32_t src1, uint32_t src2, int operation, bool set_flags)
+{
+	if (!m_has_dsp)
+		fatalerror("ARC dual multiply extension not configured at %08x", m_pc);
+	u32 result = 0;
+	for (int lane = 0; lane < 2; ++lane)
+	{
+		int64_t const product = int64_t(int16_t(src1 >> (lane * 16))) * int16_t(src2 >> (lane * 16));
+		if (!operation)
+			m_mac_acc[lane] = product;
+		else
+			m_mac_acc[lane] += operation * product;
+		int64_t const scaled = (m_mac_acc[lane] + (BIT(m_macmode, 2) ? 0x4000 : 0)) >> (BIT(m_macmode, 3) ? 15 : 16);
+		int64_t const sample = std::clamp<int64_t>(scaled, -32768, 32767);
+		if (sample != scaled)
+			m_macmode |= lane ? 0x100 : 0x20;
+		result |= u32(u16(sample)) << (lane * 16);
+	}
+	if (set_flags)
+		do_flags_nz(result);
+	return result;
 }
