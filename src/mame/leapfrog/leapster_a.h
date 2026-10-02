@@ -85,32 +85,32 @@ private:
 	sound_stream *m_stream;
 	address_space *m_space;
 	devcb_write8 m_pcm_irq_cb;
-	emu_timer *m_pcm_timer[2]{};
-	uint32_t m_pcm_control[2]{};
-	uint32_t m_pcm_base[2]{};
-	uint32_t m_pcm_position[2]{};
-	int32_t m_legacy_sample = 0;
-	uint8_t m_legacy_phase = 0;
+	emu_timer *m_pcm_timer[2];
+	uint32_t m_pcm_control[2];
+	uint32_t m_pcm_base[2];
+	uint32_t m_pcm_position[2];
+	int32_t m_legacy_sample;
+	uint8_t m_legacy_phase;
 
-	uint32_t m_lfc_codebook_page = 0;
-	uint32_t m_lfc_pointer = 0;
-	uint16_t m_lfc_mode = 0;
-	uint16_t m_lfc_flags = 0;
-	uint16_t m_lfc_position = 192;
-	uint16_t m_lfc_skip = 0;
-	uint8_t m_lfc_end = 0;
-	double m_lfc_coeff[3][10]{};
-	double m_lfc_history[10]{};
-	double m_lfc_samples[192]{};
+	uint32_t m_lfc_codebook_page;
+	uint32_t m_lfc_pointer;
+	uint16_t m_lfc_mode;
+	uint16_t m_lfc_flags;
+	uint16_t m_lfc_position;
+	uint16_t m_lfc_skip;
+	uint8_t m_lfc_end;
+	double m_lfc_coeff[3][10];
+	double m_lfc_history[10];
+	double m_lfc_samples[192];
 
-	uint32_t m_data_source_start[8]{};
-	uint32_t m_data_source_end[8]{};
-	uint16_t m_volume[8]{};
-	uint16_t m_pitch[5]{};
+	uint32_t m_data_source_start[8];
+	uint32_t m_data_source_end[8];
+	uint16_t m_volume[8];
+	uint16_t m_pitch[5];
 
-	bool m_channel_triggered[8]{};
-	float m_channel_dx[8]{};
-	float m_channel_index[8]{};
+	bool m_channel_triggered[8];
+	float m_channel_dx[8];
+	float m_channel_index[8];
 };
 
 DECLARE_DEVICE_TYPE(LEAPSTER_SOUND, leapster_snd_device)

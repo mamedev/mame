@@ -143,10 +143,6 @@ void leapster_snd_device::lfc_start()
 	m_channel_triggered[7] = (m_lfc_mode <= 2) && m_lfc_codebook_page;
 }
 
-// Layout inferred from paired original Leapster WAV/LPC development assets.
-// Level4 has four pulses restricted to even sample positions, Level6 six
-// pulses, and Level8 eight. Their amplitudes use a shared gain and a vector
-// of ratios to the first pulse. Unvoiced blocks select signed noise vectors.
 void leapster_snd_device::lfc_excitation(double *samples, bool voiced)
 {
 	uint64_t code = lfc_read_word();
