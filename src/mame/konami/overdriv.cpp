@@ -7,20 +7,13 @@
     driver by Nicola Salmoria
 
     Notes:
-    - irq source for main CPU aren't understood, needs HW tests.
-    - Missing road (two unemulated K053250)
+    - CCU frame-counter and VBLANK edge timing need cycle-level verification.
+    - K053250 DMA timing, clipping and descriptor flags need hardware verification.
+    - K053249 commands are approximated without its internal program.
+    - K053246 DMA duration and sprite coordinate wrapping need hardware verification.
     - Visible area and relative placement of sprites and tiles is most likely wrong.
-    - Test mode doesn't work well with 3 IRQ5 per frame, the ROM check doesn't work
-      and the coin A setting isn't shown. It's OK with 1 IRQ5 per frame.
     - The "Continue?" sprites are not visible until you press start
     - priorities
-
-    The issues below are both IRQ timing, and relate to when the sprites get
-    copied across by the DMA
-    - Some flickering sprites, this might be an interrupt/timing issue
-    - The screen is cluttered with sprites which aren't supposed to be visible,
-      increasing the coordinate mask in k053247_sprites_draw() from 0x3ff to 0xfff
-      fixes this but breaks other games (e.g. Vendetta).
 
 ***************************************************************************/
 
@@ -46,6 +39,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 #include "overdriv.lh"
 
 namespace {
@@ -60,9 +55,12 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_k051316(*this, "k051316_%u", 1)
 		, m_k053246(*this, "k053246")
+		, m_k053250(*this, "k053250_%u", 1)
 		, m_k053251(*this, "k053251")
 		, m_k053252(*this, "k053252")
 		, m_screen(*this, "screen")
+		, m_spriteram(*this, "spriteram")
+		, m_alu_ram(*this, "alu_ram")
 		, m_led(*this, "led0")
 	{ }
 
@@ -82,6 +80,7 @@ private:
 	void sub_irq4_assert_w(uint16_t data);
 	void sub_irq5_assert_w(uint16_t data);
 	void objdma_w(uint8_t data);
+	void alu_w(uint8_t data);
 	TIMER_CALLBACK_MEMBER(objdma_end_cb);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -100,10 +99,13 @@ private:
 	uint16_t  m_road_colorbase[2]{};
 	uint16_t  m_sprite_colorbase = 0;
 	emu_timer *m_objdma_end_timer = nullptr;
+	bitmap_ind8 m_layer_priority;
+	bitmap_ind16 m_zoom_bitmap;
+	int m_sprite_priority_base = 0;
 
 	/* misc */
 	uint16_t  m_cpuB_ctrl = 0;
-	int32_t   m_fake_timer = 0;
+	uint8_t   m_ccu_frame = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -111,9 +113,12 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<k051316_device, 2> m_k051316;
 	required_device<k053247_device> m_k053246;
+	required_device_array<k053250_device, 2> m_k053250;
 	required_device<k053251_device> m_k053251;
 	required_device<k053252_device> m_k053252;
 	required_device<screen_device> m_screen;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_alu_ram;
 	output_finder<> m_led;
 };
 
@@ -151,23 +156,25 @@ void overdriv_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::cpuA_scanline)
 {
-	const int timer_threshold = 168; // fwiw matches 0 on mask ROM check, so IF it's a timer irq then should be close ...
-	int scanline = param;
-
-	m_fake_timer ++;
-
-	// TODO: irqs routines are TOO slow right now, it ends up firing spurious irqs for whatever reason (shared ram fighting?)
-	//       this is a temporary solution to get rid of deprecat lib and the crashes, but also makes the game timer to be too slow.
-	//       Update: gameplay is actually too fast compared to timer, first attract mode shouldn't even surpass first blue car on right.
-	if(scanline == 256) // vblank-out irq
-	{
-		// m_screen->frame_number() & 1
-		m_maincpu->set_input_line(4, HOLD_LINE);
-	}
-	else if(m_fake_timer >= timer_threshold) // timer irq
-	{
-		m_fake_timer -= timer_threshold;
+	// U407 latches VBLANK on IRQ5. U302 latches the CCU FCNT output on IRQ4.
+	// Both latches are cleared by the corresponding CPU interrupt acknowledge.
+	if (param == m_screen->visible_area().max_y + 1)
 		m_maincpu->set_input_line(5, HOLD_LINE);
+
+	// TODO: move FCNT generation into the CCU when its counters are implemented.
+	// Register 7 bit 1 enables the two-bit frame counter; bit 0 selects its output.
+	// Over Drive writes 3, selecting a rising edge every four frames.
+	const int vsync_start = m_screen->height() - ((m_k053252->read(0x0c) >> 4) + 1);
+	if (param == vsync_start)
+	{
+		const uint8_t control = m_k053252->read(7);
+		if (BIT(control, 1))
+		{
+			const bool previous = BIT(m_ccu_frame, BIT(control, 0));
+			m_ccu_frame = (m_ccu_frame + 1) & 3;
+			if (!previous && BIT(m_ccu_frame, BIT(control, 0)))
+				m_maincpu->set_input_line(4, HOLD_LINE);
+		}
 	}
 }
 
@@ -242,11 +249,9 @@ void overdriv_state::sub_irq5_assert_w(uint16_t data)
 
 K053246_CB_MEMBER(overdriv_state::sprite_callback)
 {
-	int pri = (color & 0xffe0) >> 5;   /* ??????? */
-	if (pri)
-		priority_mask = 0x02;
-	else
-		priority_mask = 0x00;
+	const int pri = (color >> 5) & 0x3f;
+	const int masked = std::clamp(pri - m_sprite_priority_base, 0, 31);
+	priority_mask = util::make_bitmask<uint32_t>(masked);
 
 	color = m_sprite_colorbase + (color & 0x001f);
 }
@@ -280,8 +285,8 @@ K051316_CB_MEMBER(overdriv_state::zoom_callback_2)
 uint32_t overdriv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_sprite_colorbase  = m_k053251->get_palette_index(k053251_device::CI0);
-	m_road_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI1);
-	m_road_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
+	m_road_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI1);
+	m_road_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI2);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -295,9 +300,41 @@ uint32_t overdriv_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	screen.priority().fill(0, cliprect);
 
 	m_k051316[0]->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_k051316[1]->zoom_draw(screen, bitmap, cliprect, 0, 1);
+	m_layer_priority.fill(m_k053251->get_priority(k053251_device::CI4), cliprect);
+	m_k051316[1]->zoom_draw(screen, m_zoom_bitmap, cliprect, 0, 1);
+	const uint8_t zoom_priority = m_k053251->get_priority(k053251_device::CI3);
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			if (screen.priority().pix(y, x) && zoom_priority <= m_layer_priority.pix(y, x))
+			{
+				bitmap.pix(y, x) = m_zoom_bitmap.pix(y, x);
+				m_layer_priority.pix(y, x) = zoom_priority;
+			}
+		}
+	}
+	m_k053250[1]->draw(bitmap, cliprect, m_road_colorbase[1], k053250_device::DRAW_FLAG_USE_PRIORITY, m_layer_priority, 0);
+	m_k053250[0]->draw(bitmap, cliprect, m_road_colorbase[0], k053250_device::DRAW_FLAG_USE_PRIORITY, m_layer_priority, 0);
 
-	m_k053246->k053247_sprites_draw(bitmap,cliprect);
+	// The mixer has six-bit priorities. pdrawgfx reserves value 31 for sprite
+	// occupancy, so render disjoint ranges of up to 31 background priorities.
+	// Each pass retains the sprite chip's independent front-to-back ordering.
+	for (m_sprite_priority_base = 0; m_sprite_priority_base < 64; m_sprite_priority_base += 31)
+	{
+		bool active = false;
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		{
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			{
+				const int pri = m_layer_priority.pix(y, x) - m_sprite_priority_base;
+				screen.priority().pix(y, x) = (pri >= 0 && pri < 31) ? pri : 31;
+				active = active || (pri >= 0 && pri < 31);
+			}
+		}
+		if (active)
+			m_k053246->k053247_sprites_draw(bitmap, cliprect);
+	}
 	return 0;
 }
 
@@ -337,29 +374,106 @@ TIMER_CALLBACK_MEMBER(overdriv_state::objdma_end_cb)
 
 void overdriv_state::objdma_w(uint8_t data)
 {
-	if(data & 0x10)
+	if ((data & 0x10) && !(m_k053246->k053246_read_register(5) & 0x10))
+	{
+		// K053246 reads the external 2128 SRAM pair when OBJ DMA is requested.
+		// The CPU builds the next list there after receiving the completion IRQ.
+		uint16_t *dst;
+		m_k053246->k053247_get_ram(&dst);
+		std::copy_n(&m_spriteram[0], 0x800, dst);
 		m_objdma_end_timer->adjust(attotime::from_usec(100));
+	}
 
 	m_k053246->k053246_w(5, data);
+}
+
+void overdriv_state::alu_w(uint8_t data)
+{
+	// K053249 has the Konami CPU pinout, but its internal program is unavailable.
+	// These operations are inferred from the display CPU's callers and software
+	// geometry routines. Timing, exceptional arithmetic and other commands are unknown.
+	const auto read_word = [this] (unsigned address) { return m_alu_ram[(address & 0x3fff) >> 1]; };
+	const auto write_word = [this] (unsigned address, uint16_t value) { m_alu_ram[(address & 0x3fff) >> 1] = value; };
+	const auto read_long = [&read_word] (unsigned address) { return (uint32_t(read_word(address)) << 16) | read_word(address + 2); };
+	const auto write_long = [&write_word] (unsigned address, uint32_t value)
+	{
+		write_word(address, value >> 16);
+		write_word(address + 2, value);
+	};
+	// Zero is a placeholder for division by zero; the hardware result is unknown.
+	const auto divide = [] (int64_t numerator, int16_t denominator) -> uint32_t
+	{
+		return denominator ? numerator / denominator : 0;
+	};
+
+	switch (data)
+	{
+	case 0x18:
+		write_long(0xbfcc, divide(int64_t(int16_t(read_word(0xbfc8))) * 0x10000, read_word(0xbfca)));
+		break;
+
+	case 0x1b:
+		write_long(0xbfea, divide(int32_t(read_long(0xbfe4)), read_word(0xbfe8)));
+		break;
+
+	case 0x1d:
+	case 0x1e:
+	{
+		const uint16_t control = read_word(0xbf98);
+		const unsigned count = control & 0xff;
+		const unsigned stride = read_word(0xbffc) & 0xff;
+		unsigned address = read_word(0xbffe);
+		const auto cosine = [&read_word] (unsigned angle) -> int16_t
+		{
+			angle &= 0xff;
+			return read_word(0xbe80 + 2 * std::min(angle, 0x100 - angle));
+		};
+		const int32_t cos = cosine(control >> 8);
+		const int32_t sin = cosine((control >> 8) - 0x40);
+		const int32_t focal_length = read_long(0xbf94);
+		for (unsigned i = 0; i < count; i++, address += stride)
+		{
+			if (data == 0x1d)
+			{
+				const int32_t x = int16_t(read_word(address + 2));
+				const int32_t z = int16_t(read_word(address + 6));
+				// Q14 normalization is inferred; intermediate rounding needs hardware tests.
+				write_word(address + 0x0a, (int64_t(x) * cos + int64_t(z) * sin) >> 14);
+				write_word(address + 0x0c, (int64_t(z) * cos - int64_t(x) * sin) >> 14);
+			}
+			else
+			{
+				const int16_t z = read_word(address + 0x0c);
+				write_long(address + 0x0e, divide(int64_t(int16_t(read_word(address + 0x0a))) * focal_length, z));
+				write_long(address + 0x12, divide(int64_t(int16_t(read_word(address + 0x04))) * focal_length, z));
+			}
+		}
+		break;
+	}
+
+	default:
+		logerror("%s: unknown K053249 command %02x\n", machine().describe_context(), data);
+		break;
+	}
 }
 
 void overdriv_state::sub_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x083fff).ram(); /* work RAM */
-	map(0x0c0000, 0x0c1fff).ram(); //.rw("k053250_1", FUNC(k053250_device::ram_r), FUNC(k053250_device::ram_w));
-	map(0x100000, 0x10000f).rw("k053250_1", FUNC(k053250_device::reg_r), FUNC(k053250_device::reg_w));
-	map(0x108000, 0x10800f).rw("k053250_2", FUNC(k053250_device::reg_r), FUNC(k053250_device::reg_w));
-	map(0x118000, 0x118fff).rw(m_k053246, FUNC(k053247_device::k053247_word_r), FUNC(k053247_device::k053247_word_w)); // data gets copied to sprite chip with DMA..
+	map(0x0c0000, 0x0c3fff).ram().share("roadram");
+	map(0x100000, 0x10000f).rw(m_k053250[0], FUNC(k053250_device::reg_r), FUNC(k053250_device::reg_w));
+	map(0x108000, 0x10800f).rw(m_k053250[1], FUNC(k053250_device::reg_r), FUNC(k053250_device::reg_w));
+	map(0x118000, 0x118fff).ram().share(m_spriteram);
 	map(0x120000, 0x120001).r(m_k053246, FUNC(k053247_device::k053246_r));
 	map(0x128000, 0x128001).rw(FUNC(overdriv_state::cpuB_ctrl_r), FUNC(overdriv_state::cpuB_ctrl_w)); /* enable K053247 ROM reading, plus something else */
 	map(0x130000, 0x130007).rw(m_k053246, FUNC(k053247_device::k053246_r), FUNC(k053247_device::k053246_w));
 	map(0x130005, 0x130005).w(FUNC(overdriv_state::objdma_w));
-	//map(0x140000, 0x140001) used in later stages, set after writes at 0x208000-0x20bfff range
+	map(0x140001, 0x140001).w(FUNC(overdriv_state::alu_w));
 	map(0x200000, 0x203fff).ram().share("share1");
-	map(0x208000, 0x20bfff).ram(); // sprite indirect table?
-	map(0x218000, 0x219fff).r("k053250_1", FUNC(k053250_device::rom_r));
-	map(0x220000, 0x221fff).r("k053250_2", FUNC(k053250_device::rom_r));
+	map(0x208000, 0x20bfff).ram().share(m_alu_ram);
+	map(0x218000, 0x219fff).r(m_k053250[0], FUNC(k053250_device::rom_r));
+	map(0x220000, 0x221fff).r(m_k053250[1], FUNC(k053250_device::rom_r));
 }
 
 void overdriv_state::sound_ack_w(uint8_t data)
@@ -418,12 +532,14 @@ INPUT_PORTS_END
 void overdriv_state::machine_start()
 {
 	m_objdma_end_timer = timer_alloc(FUNC(overdriv_state::objdma_end_cb), this);
+	m_screen->register_screen_bitmap(m_layer_priority);
+	m_screen->register_screen_bitmap(m_zoom_bitmap);
 
 	save_item(NAME(m_cpuB_ctrl));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_zoom_colorbase));
 	save_item(NAME(m_road_colorbase));
-	save_item(NAME(m_fake_timer));
+	save_item(NAME(m_ccu_frame));
 }
 
 void overdriv_state::machine_reset()
@@ -434,7 +550,7 @@ void overdriv_state::machine_reset()
 	m_zoom_colorbase[1] = 0;
 	m_road_colorbase[0] = 0;
 	m_road_colorbase[1] = 0;
-	m_fake_timer = 0;
+	m_ccu_frame = 0;
 
 	/* start with cpu B halted */
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -493,8 +609,10 @@ void overdriv_state::overdriv(machine_config &config)
 
 	K053251(config, m_k053251);
 
-	K053250(config, "k053250_1", "palette", m_screen, 0, 0);
-	K053250(config, "k053250_2", "palette", m_screen, 0, 0);
+	// U90 drives the common 6264 RAM pair; U98 observes the same data bus.
+	// Their SEL0 inputs are high (U90) and low (U98), respectively.
+	K053250(config, m_k053250[0], "palette", m_screen, 104, 16).set_ram("^roadram", 1);
+	K053250(config, m_k053250[1], "palette", m_screen, 104, 16).set_ram("^roadram", 0);
 
 	K053252(config, m_k053252, 24_MHz_XTAL / 4);
 	m_k053252->set_offsets(13*8, 2*8);
