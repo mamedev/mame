@@ -1321,11 +1321,13 @@ void mos6526_device::write(offs_t offset, uint8_t data)
 	{
 	case PRA:
 		m_pra = data;
+		m_pa_in = m_read_pa(0);
 		update_pa();
 		break;
 
 	case PRB:
 		m_prb = data;
+		m_pb_in = m_read_pb(0);
 		update_pb();
 
 		m_prb_access = 1;
@@ -1333,11 +1335,13 @@ void mos6526_device::write(offs_t offset, uint8_t data)
 
 	case DDRA:
 		m_ddra = data;
+		m_pa_in = m_read_pa(0);
 		update_pa();
 		break;
 
 	case DDRB:
 		m_ddrb = data;
+		m_pb_in = m_read_pb(0);
 		update_pb();
 		break;
 
