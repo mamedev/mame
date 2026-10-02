@@ -5838,6 +5838,20 @@ if BUSES["TECHNICS_KN5000"] then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/technics/kn6000/kn6000_expansion.h,BUSES["TECHNICS_KN6000"] = true
+---------------------------------------------------
+
+if BUSES["TECHNICS_KN6000"] then
+	files {
+		MAME_DIR .. "src/devices/bus/technics/kn6000/kn6000_expansion.cpp",
+		MAME_DIR .. "src/devices/bus/technics/kn6000/kn6000_expansion.h",
+		MAME_DIR .. "src/devices/bus/technics/kn6000/hdsx3.cpp",
+		MAME_DIR .. "src/devices/bus/technics/kn6000/hdsx3.h",
+	}
+end
+
 
 ---------------------------------------------------
 --
