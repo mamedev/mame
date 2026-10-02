@@ -337,7 +337,7 @@ void mcd212_device::process_ica()
 	// LCT depends on the current frame parity
 	uint32_t addr[2];
 	addr[0] = addr[1] = !BIT(m_csrr[0], CSR1R_PA_BIT) ? 0x200 : 0x202;
-	bool active[2] = { bool(BIT(m_dcr[0], DCR_ICA_BIT)), bool(BIT(m_dcr[1], DCR_ICA_BIT)) };
+	bool active[2] = { ica_enabled(0), ica_enabled(1) };
 
 	for (int i = 0; i < max_to_process && (active[0] | active[1]); i++)
 	{
@@ -969,9 +969,9 @@ TIMER_CALLBACK_MEMBER(mcd212_device::ica_tick)
 	// Process ICA
 	process_ica();
 
-	if (BIT(m_dcr[0], DCR_DCA_BIT))
+	if (dca_enabled(0))
 		m_dca[0] = get_dcp<0>();
-	if (BIT(m_dcr[1], DCR_DCA_BIT))
+	if (dca_enabled(1))
 		m_dca[1] = get_dcp<1>();
 
 	m_ica_timer->adjust(screen().time_until_pos(0, 0));
@@ -995,9 +995,9 @@ TIMER_CALLBACK_MEMBER(mcd212_device::ica_tick)
 TIMER_CALLBACK_MEMBER(mcd212_device::dca_tick)
 {
 	// Process DCA
-	if (BIT(m_dcr[1], DCR_DCA_BIT))
+	if (dca_enabled(1))
 		process_dca<1>();
-	if (BIT(m_dcr[0], DCR_DCA_BIT))
+	if (dca_enabled(0))
 		process_dca<0>();
 
 	int scanline = screen().vpos() / 2;
@@ -1036,7 +1036,6 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			// If PAL and 'Standard' bit set, insert a 20-line border on the top/bottom
 			if ((scanline - m_ica_height < 20) || (scanline >= (m_total_height - 20)))
 			{
-				std::fill_n(out, 768, s_4bpp_display_color[0]);
 				draw_line = false;
 			}
 		}
@@ -1080,6 +1079,10 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			}
 
 			draw_cursor(out);
+		}
+		else
+		{
+			std::fill_n(out, 768, s_4bpp_display_color[0]);
 		}
 
 		if (BIT(m_dcr[0], DCR_SM_BIT))

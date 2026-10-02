@@ -276,6 +276,8 @@ protected:
 
 	int get_screen_width();
 	int get_border_width();
+	bool ica_enabled(int channel) const { return BIT(m_dcr[0], DCR_DE_BIT) && BIT(m_dcr[channel], DCR_ICA_BIT); }
+	bool dca_enabled(int channel) const { return ica_enabled(channel) && BIT(m_dcr[channel], DCR_DCA_BIT); }
 	uint32_t get_backdrop_plane(int x, int y);
 
 	template <int Path> void set_vsr(uint32_t value);
