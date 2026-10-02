@@ -15,7 +15,7 @@ Note! This document is a Work-In-Progress and will be updated from time to time 
 This document covers all the known Namco System 10 games, including....
 *Aim For Cash (AFC2 Ver.A)                                                    (C) Namco, 2004
 Ball Pom Line  (no sticker, ROM VER. B0 FEB 09 2005 15:29:02)                 (C) Namco, 2005
-Dice ROM (no sticker, ROM VER.A2)                                             (C) Namco, 2004
+Dice ROM (DCR 1 Ver.A)                                                        (C) Namco, 2004
 ***Drum Master                                                                (C) Namco, 2001
 ***Drum Master 2                                                              (C) Namco, 2001
 ***Drum Master 3                                                              (C) Namco, 2002
@@ -3832,7 +3832,9 @@ ROM_START( dicerom )
 	ROM_LOAD( "k9f2808u0c.8e", 0x0000000, 0x1080000, CRC(fbf25cb9) SHA1(20388b71508d60333dc4bd64ec03c255cc48f1cc) )
 
 	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(cd50578f) SHA1(6bba539f978edd629bcfb5ef8332ab5d3aed3d26) ) // verified with a second dump: the chip holds no game data (one 18 KB sequence sliding by one word per block, rest is programmer fill) and the game never selects it
+	// The chip holds no game data and the game never selects it.
+	// Every block is the previous one shifted by one 16-bit word.
+	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(cd50578f) SHA1(6bba539f978edd629bcfb5ef8332ab5d3aed3d26) ) 
 ROM_END
 
 ROM_START( gahaha )
@@ -4503,7 +4505,7 @@ GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_sta
 GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, slotouji,  0,        ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // May 2 2003
 GAME( 2003, slotoujia, slotouji, ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
-GAME( 2004, dicerom,   0,        ns10_dicerom,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Dice ROM (Japan, Ver.A2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER.A2 in test mode, boots but stops with "ERROR 3-2 BACKUP MEMORY (MGEXIO)"
+GAME( 2004, dicerom,   0,        ns10_dicerom,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Dice ROM (Japan, Ver.A2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER.A2 WED SEP 8 2004 10:01:23 in test mode, boots but requires MGEXIO to proceed
 GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2005, ballpom,   0,        ns10_ballpom,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed
