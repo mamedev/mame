@@ -27,6 +27,7 @@ DECLARE_DEVICE_TYPE(M68705U3, m68705u3_device)
 //DECLARE_DEVICE_TYPE(M68705U5, m68705u5_device) // Secured EPROM
 
 DECLARE_DEVICE_TYPE(M146805E2, m146805e2_device)
+DECLARE_DEVICE_TYPE(M146805F2, m146805f2_device)
 
 class m6805_timer
 {
@@ -467,6 +468,12 @@ class m146805e2_device : public m146805_device
 {
 public:
 	m146805e2_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+};
+
+class m146805f2_device : public m146805_device
+{
+public:
+	m146805f2_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 };
 
 #define M6805_INT_TIMER             (M6805_IRQ_LINE + 1)
