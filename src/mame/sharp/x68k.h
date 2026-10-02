@@ -168,6 +168,7 @@ protected:
 		uint8_t irqstatus = 0;
 		uint8_t vector = 0;
 	} m_ioc;
+	bool m_hdd_irq = false;
 	uint8_t m_ppi_portc = 0;
 	bool m_exp_irq2[2]{};
 	bool m_exp_irq4[2]{};
