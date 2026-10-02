@@ -1499,6 +1499,7 @@ Image Fight has serious [VDP1] [VDP2] video bugs (missing layers, misaligned lay
 		<publisher>NCS</publisher>
 		<notes><![CDATA[
 Throws a not ready [CD-Block] transfer fatalerror when reaching gameplay (check commands, may be missing a CD_STAT_WAIT somewhere)
+[VDP2] draws with bad scaling around the third attract cycle
 ]]></notes>
 		<info name="serial" value="T-2501G"/>
 		<info name="release" value="19970221"/>
@@ -13991,11 +13992,14 @@ Black screen, [CD-Block]
 		</part>
 	</software>
 
-	<!-- Identifying Yoshimoto Mah-jong Club (JAP) (DW0474)... -->
 	<software name="yoshimj" supported="no">
 		<description>Yoshimoto Mahjong Club (Japan)</description>
 		<year>1998</year>
 		<publisher>Psikyo</publisher>
+		<notes><![CDATA[
+No BGM sound in main menu [SCSP] or [CD-Block]
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-20403G"/>
 		<info name="release" value="19981217"/>
 		<info name="alt_title" value="よしもと麻雀倶楽部"/>
