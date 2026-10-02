@@ -13,7 +13,6 @@ TODO:
 - C-Bus SCSI support, remove IDE ROM loads where doesn't belong by default;
 \- load actual IDE BIOSes from IPL romsets where applicable (pc9801bx onward, all pc9821)
 - Port over pc88va SASI version in common C-Bus option;
-- Remove SHUT1 workaround for BIOS protected-mode self-test failures in a20_ctrl_w;
 - DAC1BIT has a bit of clicking with start/end of samples, is it fixable or just a btanb?
 - Incomplete FDC inner semantics with the dual ports;
 \- floppy sounds never silences when drive is idle (disabled for the time being);
@@ -43,7 +42,6 @@ TODO (pc9801us / pc9801fs):
 \- wants specifically (the internal) SCSI?
 
 TODO (pc9801bx2):
-- "SYSTEM SHUTDOWN" at POST, SDIP related, soft reset to bypass;
 - Accesses $8f0-$8f2 PMC area, shared with 98NOTE machines;
 - A non-fatal "MEMORY ERROR" is always thrown no matter the RAM size afterwards, related?
 - unemulated conventional or EMS RAM bank, definitely should have one given the odd minimum RAM
@@ -367,12 +365,6 @@ void pc9801vm_state::a20_ctrl_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0x00)
 	{
-		// Preserve SHUT1 when SHUT0 selects a system restart. Clearing it would
-		// make the BIOS report SYSTEM SHUTDOWN instead of rebooting.
-		// We still need this kludge for protected-mode self-test returns.
-		const uint8_t shut = m_ppi_sys->read(2);
-		if (!BIT(shut, 7))
-			m_ppi_sys->write(2, shut & ~0x20);
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_gate_a20 = 0;
 	}
