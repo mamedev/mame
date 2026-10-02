@@ -20,6 +20,8 @@ public:
 
 	void set_default_vector_base(uint32_t address) { m_default_vector_base = address & 0xfffffc00; }
 
+	void set_dsp(bool enabled) { m_has_dsp = enabled; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -334,9 +336,9 @@ private:
 	static uint32_t handleop32_ASRS_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static uint32_t handleop32_ADDSDW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static uint32_t handleop32_SUBSDW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
-	static uint32_t handleop32_UNKNOWN_05_0c_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
-	static uint32_t handleop32_UNKNOWN_05_10_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
-	static uint32_t handleop32_UNKNOWN_05_14_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_MULDW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_MACDW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_MSUBDW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 
 	// arcompact_execute_ops_05_2f_sop.cpp
 	static uint32_t handleop32_NORM_do_op(arcompact_device &o, uint32_t src, bool set_flags);
@@ -555,6 +557,21 @@ private:
 
 	// config
 	uint32_t m_default_vector_base;
+
+	uint32_t dsp_aux_r(offs_t offset);
+	void dsp_aux_w(offs_t offset, uint32_t data);
+	uint32_t read_reg(unsigned reg);
+	void write_reg(unsigned reg, uint32_t data);
+	uint32_t xy_read(unsigned reg);
+	void xy_write(unsigned reg, uint32_t data);
+	void xy_update(unsigned index, uint32_t modifier);
+	uint32_t dsp_multiply(uint32_t src1, uint32_t src2, int operation, bool set_flags);
+
+	bool m_has_dsp = false;
+	uint32_t m_xy_aux[0x20]{};
+	uint32_t m_xy_mem[2][2][0x400]{};
+	uint32_t m_macmode = 0;
+	int64_t m_mac_acc[2]{};
 
 	// internal state
 	uint32_t m_pc;

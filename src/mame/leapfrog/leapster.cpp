@@ -294,6 +294,10 @@ private:
 
 	uint32_t leapster_int_flag_r();
 	void leapster_int_flag_w(uint32_t data);
+	void pcm_irq_w(uint8_t data);
+	uint32_t int_enable_r() { return m_int_enable; }
+	void int_enable_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0U);
+	void update_pcm_irq();
 
 	uint32_t leapster_adc_r(uint32_t offset);
 	void leapster_adc_w(uint32_t offset, uint32_t data);
@@ -350,6 +354,7 @@ private:
 	bool m_touchscreen_initted;
 
 	uint32_t m_int_fired_flags;
+	uint32_t m_int_enable = 0;
 
 	uint32_t m_current_eeprom_command;
 
@@ -621,6 +626,24 @@ uint32_t leapster_state::leapster_int_flag_r()
 void leapster_state::leapster_int_flag_w(uint32_t data)
 {
 	m_int_fired_flags &= ~data;
+	update_pcm_irq();
+}
+
+void leapster_state::pcm_irq_w(uint8_t data)
+{
+	m_int_fired_flags |= uint32_t(data) << 20;
+	update_pcm_irq();
+}
+
+void leapster_state::int_enable_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&m_int_enable);
+	update_pcm_irq();
+}
+
+void leapster_state::update_pcm_irq()
+{
+	m_maincpu->set_input_line(0x13, (m_int_fired_flags & m_int_enable & 0x00300000) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 // ADC: I/O registers 0x0180'0090 - 0x0180'00ab, Drives IRQ vector 0x10
@@ -957,6 +980,29 @@ void leapster_state::machine_start()
 	memset(m_cartridge_eeprom, 0, sizeof(m_system_eeprom));
 
 	save_item(NAME(m_1a_data));
+	save_item(NAME(m_1a_pointer));
+	save_item(NAME(m_timer_ticks));
+	save_item(NAME(m_timer_control));
+	save_item(NAME(m_timer_max));
+	save_item(NAME(m_framebuffer_base));
+	save_item(NAME(m_display_format));
+	save_item(NAME(m_display_stride));
+	save_item(NAME(m_dma_src_addr));
+	save_item(NAME(m_dma_scanline_count));
+	save_item(NAME(m_dma_start_offset));
+	save_item(NAME(m_dma_stride));
+	save_item(NAME(m_clock_div));
+	save_item(NAME(m_adc_channel_control));
+	save_item(NAME(m_adc_fifo));
+	save_item(NAME(m_adc_fifo_base));
+	save_item(NAME(m_adc_fifo_head));
+	save_item(NAME(m_adc_fifo_empty));
+	save_item(NAME(m_touchscreen_initted));
+	save_item(NAME(m_int_fired_flags));
+	save_item(NAME(m_int_enable));
+	save_item(NAME(m_current_eeprom_command));
+	save_item(NAME(m_system_eeprom));
+	save_item(NAME(m_cartridge_eeprom));
 
 	m_sound->set_address_space(&m_maincpu->space());
 }
@@ -964,6 +1010,8 @@ void leapster_state::machine_start()
 void leapster_state::machine_reset()
 {
 	m_1a_pointer = 0;
+	m_int_fired_flags = 0;
+	m_int_enable = 0;
 	for (int i = 0; i < 0x800; i++)
 		m_1a_data[i] = 0;
 
@@ -1006,6 +1054,8 @@ void leapster_state::leapster_map(address_map &map)
 	map(0x0180'0030, 0x0180'003f).rw(FUNC(leapster_state::leapster_eeprom_r), FUNC(leapster_state::leapster_eeprom_w));
 
 	map(0x0180'0080, 0x0180'0083).rw(FUNC(leapster_state::leapster_int_flag_r), FUNC(leapster_state::leapster_int_flag_w));
+	map(0x0180'0084, 0x0180'0087).rw(FUNC(leapster_state::int_enable_r), FUNC(leapster_state::int_enable_w));
+	map(0x0180'3000, 0x0180'300f).rw(m_sound, FUNC(leapster_snd_device::pcm_r), FUNC(leapster_snd_device::pcm_w));
 
 	map(0x0180'0090, 0x0180'00ab).rw(FUNC(leapster_state::leapster_adc_r), FUNC(leapster_state::leapster_adc_w));
 
@@ -1019,6 +1069,7 @@ void leapster_state::leapster_map(address_map &map)
 
 	map(0x0180'2070, 0x0180'2073).w(FUNC(leapster_state::leapster_1802070_w));
 	map(0x0180'2078, 0x0180'207b).r(FUNC(leapster_state::leapster_1802078_r));
+	map(0x0180'20e0, 0x0180'20e7).w(m_sound, FUNC(leapster_snd_device::lfc_codebook_w)).umask32(0x0000ffff);
 
 	map(0x0180'4000, 0x0180'4fff).m(m_sound, FUNC(leapster_snd_device::map));
 
@@ -1173,6 +1224,7 @@ void leapster_state::leapster(machine_config &config)
 	// Basic machine hardware
 	// CPU is ArcTangent-A5 '5.1' (ARCompact core)
 	ARCA5(config, m_maincpu, 96000000);
+	m_maincpu->set_dsp(true);
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapster_state::leapster_map);
 	m_maincpu->set_addrmap(AS_IO, &leapster_state::leapster_aux);
 	m_maincpu->set_default_vector_base(0x40000000);
@@ -1187,6 +1239,7 @@ void leapster_state::leapster(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	LEAPSTER_SOUND(config, m_sound, 96000000);
 	m_sound->add_route(ALL_OUTPUTS, "mono", 1.00);
+	m_sound->pcm_irq_cb().set(FUNC(leapster_state::pcm_irq_w));
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 0x800).set_endianness(ENDIANNESS_BIG);
 

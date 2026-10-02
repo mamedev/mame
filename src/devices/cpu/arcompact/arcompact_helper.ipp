@@ -193,7 +193,9 @@ inline uint32_t arcompact_device::handleop32_general(uint32_t op, ophandler32 op
 		uint8_t breg = common32_get_breg(op);
 		uint8_t creg = common32_get_creg(op);
 		int size = check_limm(breg, creg);
-		m_regs[common32_get_areg(op)] = ophandler(*this, m_regs[breg], m_regs[creg], common32_get_F(op));
+		u32 const src1 = read_reg(breg);
+		u32 const src2 = read_reg(creg);
+		write_reg(common32_get_areg(op), ophandler(*this, src1, src2, common32_get_F(op)));
 		return m_pc + size;
 	}
 
@@ -201,14 +203,14 @@ inline uint32_t arcompact_device::handleop32_general(uint32_t op, ophandler32 op
 	{
 		uint8_t breg = common32_get_breg(op);
 		int size = check_limm(breg);
-		m_regs[common32_get_areg(op)] = ophandler(*this, m_regs[breg], common32_get_u6(op), common32_get_F(op));
+		write_reg(common32_get_areg(op), ophandler(*this, read_reg(breg), common32_get_u6(op), common32_get_F(op)));
 		return m_pc + size;
 	}
 	case 0x02:
 	{
 		uint8_t breg = common32_get_breg(op);
 		int size = check_limm(breg);
-		m_regs[breg] = ophandler(*this, m_regs[breg], common32_get_s12(op), common32_get_F(op));
+		write_reg(breg, ophandler(*this, read_reg(breg), common32_get_s12(op), common32_get_F(op)));
 		return m_pc + size;
 	}
 	case 0x03:
@@ -221,7 +223,11 @@ inline uint32_t arcompact_device::handleop32_general(uint32_t op, ophandler32 op
 			uint8_t creg = common32_get_creg(op);
 			int size = check_limm(breg, creg);
 			if (check_condition(common32_get_condition(op)))
-				m_regs[breg] = ophandler(*this, m_regs[breg], m_regs[creg], common32_get_F(op));
+			{
+				u32 const src1 = read_reg(breg);
+				u32 const src2 = read_reg(creg);
+				write_reg(breg, ophandler(*this, src1, src2, common32_get_F(op)));
+			}
 			return m_pc + size;
 		}
 		case 0x01:
@@ -229,7 +235,7 @@ inline uint32_t arcompact_device::handleop32_general(uint32_t op, ophandler32 op
 			uint8_t breg = common32_get_breg(op);
 			int size = check_limm(breg);
 			if (check_condition(common32_get_condition(op)))
-				m_regs[breg] = ophandler(*this, m_regs[breg], common32_get_u6(op), common32_get_F(op));
+				write_reg(breg, ophandler(*this, read_reg(breg), common32_get_u6(op), common32_get_F(op)));
 			return m_pc + size;
 		}
 		}
