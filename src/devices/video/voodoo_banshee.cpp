@@ -1683,49 +1683,39 @@ void voodoo_banshee_device::screen_to_screen_blit(u32 srcx, u32 srcy)
 	s32 const dstx0 = (dx > 0) ? s32(m_blt_dst_x) : (s32(m_blt_dst_x) - width + 1);
 	s32 const dsty0 = (dy > 0) ? s32(m_blt_dst_y) : (s32(m_blt_dst_y) - height + 1);
 
-	// the destination is clipped to clip0 or clip1
+	// clip the destination to clip0 or clip1, moving the source corner with it
 	u32 const clipmin = m_2d_regs.read(BIT(cmd, 23) ? banshee_2d_regs::clip1Min : banshee_2d_regs::clip0Min);
 	u32 const clipmax = m_2d_regs.read(BIT(cmd, 23) ? banshee_2d_regs::clip1Max : banshee_2d_regs::clip0Max);
-	s32 const clipx0 = BIT(clipmin, 0, 12), clipy0 = BIT(clipmin, 16, 12);
-	s32 const clipx1 = BIT(clipmax, 0, 12), clipy1 = BIT(clipmax, 16, 12);
+	s32 const x0 = std::max<s32>(dstx0, BIT(clipmin, 0, 12)), x1 = std::min<s32>(dstx0 + width, BIT(clipmax, 0, 12));
+	s32 const y0 = std::max<s32>(dsty0, BIT(clipmin, 16, 12)), y1 = std::min<s32>(dsty0 + height, BIT(clipmax, 16, 12));
+	s32 const sx = srcx0 + (x0 - dstx0), sy = srcy0 + (y0 - dsty0);
+	s32 const span = (x1 - x0) * bpp;
 
-	// copy through a temporary buffer, so that overlapping rectangles need no particular order
-	std::vector<u8> temp(size_t(width) * height * bpp);
-	for (s32 y = 0; y < height; y++)
-		for (s32 x = 0; x < width; x++)
-		{
-			u8 *t = &temp[(size_t(y) * width + x) * bpp];
-			u32 const addr = srcbase + (srcy0 + y) * srcstride + (srcx0 + x) * bpp;
-			if (addr + bpp <= m_fbmask + 1)
-				memcpy(t, &m_fbram[addr], bpp);
-			else
-				memset(t, 0, bpp);
-		}
-	for (s32 y = 0; y < height; y++)
+	// ROP3 of source and destination, a byte at a time; the pattern is taken as 0
+	u8 const r0 = BIT(rop, 0) ? 0xff : 0, r1 = BIT(rop, 1) ? 0xff : 0;
+	u8 const r2 = BIT(rop, 2) ? 0xff : 0, r3 = BIT(rop, 3) ? 0xff : 0;
+
+	// rows (and bytes) go in the direction the command gives, as on the hardware, so that
+	// overlapping rectangles copy correctly without a temporary buffer
+	s64 const fbsize = s64(m_fbmask) + 1;
+	for (s32 i = 0; i < y1 - y0 && span > 0; i++)
 	{
-		s32 const py = dsty0 + y;
-		if (py < clipy0 || py >= clipy1)
+		s32 const row = (dy > 0) ? i : (y1 - y0 - 1 - i);
+		s64 const srcrow = s64(srcbase) + s64(sy + row) * srcstride + s64(sx) * bpp;
+		s64 const dstrow = s64(dstbase) + s64(y0 + row) * dststride + s64(x0) * bpp;
+		if (srcrow < 0 || dstrow < 0 || srcrow + span > fbsize || dstrow + span > fbsize)
 			continue;
-		for (s32 x = 0; x < width; x++)
-		{
-			s32 const px = dstx0 + x;
-			if (px < clipx0 || px >= clipx1)
-				continue;
-			u32 const addr = dstbase + py * dststride + px * bpp;
-			if (addr + bpp > m_fbmask + 1)
-				continue;
-
-			// ROP3 of source and destination; the pattern is taken as 0
-			u8 const *t = &temp[(size_t(y) * width + x) * bpp];
-			for (u32 b = 0; b < bpp; b++)
+		u8 const *const s = &m_fbram[srcrow];
+		u8 *const d = &m_fbram[dstrow];
+		if (rop == 0xcc)
+			memmove(d, s, span);
+		else
+			for (s32 b = 0; b < span; b++)
 			{
-				u8 const src = t[b], dst = m_fbram[addr + b];
-				u8 result = 0;
-				for (int bit = 0; bit < 8; bit++)
-					result |= BIT(rop, BIT(src, bit) * 2 + BIT(dst, bit)) << bit;
-				m_fbram[addr + b] = result;
+				s32 const k = (dx > 0) ? b : (span - 1 - b);
+				u8 const src = s[k], dst = d[k];
+				d[k] = (~src & ~dst & r0) | (~src & dst & r1) | (src & ~dst & r2) | (src & dst & r3);
 			}
-		}
 	}
 
 	// advance dstXY after the command, as a line-by-line copy needs
