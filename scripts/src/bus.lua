@@ -2449,13 +2449,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/heathzenith/h17/h17_fdc_base.h,BUSES["HEATHZENITH_H17_FDC"] = true
+--@src/devices/bus/heathzenith/h8x_common/h17_fdc_base.h,BUSES["HEATHZENITH_H8X_COMMON"] = true
 ---------------------------------------------------
 
-if BUSES["HEATHZENITH_H17_FDC"] then
+if BUSES["HEATHZENITH_H8X_COMMON"] then
 	files {
-		MAME_DIR .. "src/devices/bus/heathzenith/h17/h17_fdc_base.cpp",
-		MAME_DIR .. "src/devices/bus/heathzenith/h17/h17_fdc_base.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8x_common/h17_fdc_base.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h8x_common/h17_fdc_base.h",
 	}
 end
 

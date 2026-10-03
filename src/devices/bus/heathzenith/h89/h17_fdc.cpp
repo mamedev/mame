@@ -9,14 +9,14 @@
     and the FMWE line write-enables the 1k of floppy RAM on the CPU board.
 
     The controller logic is shared with the H8's H-8-17 card, see
-    bus/heathzenith/h17/h17_fdc_base.cpp.
+    bus/heathzenith/h8x_common/h17_fdc_base.cpp.
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "h17_fdc.h"
 
-#include "bus/heathzenith/h17/h17_fdc_base.h"
+#include "bus/heathzenith/h8x_common/h17_fdc_base.h"
 
 
 namespace {

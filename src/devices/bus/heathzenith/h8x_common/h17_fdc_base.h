@@ -15,8 +15,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_BUS_HEATHZENITH_H17_H17_FDC_BASE_H
-#define MAME_BUS_HEATHZENITH_H17_H17_FDC_BASE_H
+#ifndef MAME_BUS_HEATHZENITH_H8X_COMMON_H17_FDC_BASE_H
+#define MAME_BUS_HEATHZENITH_H8X_COMMON_H17_FDC_BASE_H
 
 #pragma once
 
@@ -101,4 +101,4 @@ protected:
 	static attotime fm_bit_time()  { return attotime::from_hz(USRT_TX_CLOCK); }
 };
 
-#endif // MAME_BUS_HEATHZENITH_H17_H17_FDC_BASE_H
+#endif // MAME_BUS_HEATHZENITH_H8X_COMMON_H17_FDC_BASE_H
