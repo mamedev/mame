@@ -398,6 +398,55 @@ Graphics issues
 		</part>
 	</software>
 
+	<software name="sys3prem">
+		<description>The System 3 Premier Collection</description>
+		<year>1991</year>
+		<publisher>System 3</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Last Ninja Remix Disk 1 Side 1"/>
+			<dataarea name="flop" size="279582">
+				<rom name="LastNinjaRemix_Disk1_s0.g64" size="279582" crc="947455be" sha1="4c9629e0e2ed30949b571fa1b5ba3dc1af387fb1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Last Ninja Remix Disk 1 Side 2"/>
+			<dataarea name="flop" size="279582">
+				<rom name="LastNinjaRemix_Disk1_s1.g64" size="279582" crc="ae61cc41" sha1="d1fed3317b45e49b8fd41e5a9d6252bdec8e82a4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Last Ninja Remix Disk 2"/>
+			<dataarea name="flop" size="287512">
+				<rom name="LastNinjaRemix_Disk2_s0.g64" size="287512" crc="ab41236a" sha1="d32ef3c90f1420748d2379571d70695771299c06"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Flimbo's Quest"/>
+			<dataarea name="flop" size="279582">
+				<rom name="FlimbosQuest-InternationalKarate_s0.g64" size="279582" crc="447e1438" sha1="474eac773f912fdd2384e7c4fba7d81391a559f4"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="International Karate"/>
+			<dataarea name="flop" size="279582">
+				<rom name="FlimbosQuest-InternationalKarate_s1.g64" size="279582" crc="7e444496" sha1="eb51e75511ba59b82bf5ca698ee6ec3f0af08a98"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Myth: History in the Making"/>
+			<dataarea name="flop" size="279582">
+				<rom name="Myth-Dominator_s0.g64" size="279582" crc="2ccb820c" sha1="cd788a232c135287925939fb303a5d507778016a"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Dominator"/>
+			<dataarea name="flop" size="279582">
+				<rom name="Myth-Dominator_s1.g64" size="279582" crc="0f040334" sha1="8fb771cea14cfc294ab6f68b22442a841facb256"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !Applications -->
 
 	<software name="basickaa">
