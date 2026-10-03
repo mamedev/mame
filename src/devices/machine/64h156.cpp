@@ -6,21 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - get these running and we're golden
-        + Bounty Bob Strikes Back (aligned halftracks)
-        - Quiwi (speed change within track)
-        - Defender of the Crown (V-MAX! v2, density checks)
-        - Test Drive / Cabal (HLS, sub-cycle jitter)
-        - Galaxian (?, needs 100% accurate VIA)
-
-	https://www.commodoregames.net/copyprotection/protection-methods.asp
-
-*/
-
 #include "emu.h"
 #include "64h156.h"
 
