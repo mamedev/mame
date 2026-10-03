@@ -1,8 +1,8 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese
 
-#ifndef MAME_BUS_A800_CORINA_H
-#define MAME_BUS_A800_CORINA_H
+#ifndef MAME_BUS_A800_CART_CORINA_H
+#define MAME_BUS_A800_CART_CORINA_H
 
 #pragma once
 
@@ -57,4 +57,4 @@ private:
 DECLARE_DEVICE_TYPE(A800_ROM_CORINA,      a800_rom_corina_device)
 DECLARE_DEVICE_TYPE(A800_ROM_CORINA_SRAM, a800_rom_corina_sram_device)
 
-#endif // MAME_BUS_A800_CORINA_H
+#endif // MAME_BUS_A800_CART_CORINA_H

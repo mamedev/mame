@@ -1,8 +1,8 @@
 // license: BSD-3-Clause
 // copyright-holders: Fabio Priuli, Angelo Salese
 
-#ifndef MAME_BUS_A800_BBSB_H
-#define MAME_BUS_A800_BBSB_H
+#ifndef MAME_BUS_A800_CART_BBSB_H
+#define MAME_BUS_A800_CART_BBSB_H
 
 #pragma once
 
@@ -49,4 +49,4 @@ protected:
 DECLARE_DEVICE_TYPE(A800_ROM_BBSB,        a800_rom_bbsb_device)
 DECLARE_DEVICE_TYPE(A5200_ROM_BBSB,       a5200_rom_bbsb_device)
 
-#endif // MAME_BUS_A800_BBSB_H
+#endif // MAME_BUS_A800_CART_BBSB_H

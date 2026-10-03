@@ -1,8 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller
 
-#ifndef MAME_BUS_A800_ATARIFDC_H
-#define MAME_BUS_A800_ATARIFDC_H
+#ifndef MAME_BUS_A800_SIO_ATARIFDC_H
+#define MAME_BUS_A800_SIO_ATARIFDC_H
 
 #include "a8sio.h"
 
@@ -75,4 +75,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ATARI_FDC, atari_fdc_device)
 
-#endif // MAME_BUS_A800_ATARIFDC_H
+#endif // MAME_BUS_A800_SIO_ATARIFDC_H

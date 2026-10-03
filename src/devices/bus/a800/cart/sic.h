@@ -1,8 +1,8 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese
 
-#ifndef MAME_BUS_A800_SIC_H
-#define MAME_BUS_A800_SIC_H
+#ifndef MAME_BUS_A800_CART_SIC_H
+#define MAME_BUS_A800_CART_SIC_H
 
 #pragma once
 
@@ -61,4 +61,4 @@ DECLARE_DEVICE_TYPE(A800_SIC_128KB, a800_sic_128kb_device)
 DECLARE_DEVICE_TYPE(A800_SIC_256KB, a800_sic_256kb_device)
 DECLARE_DEVICE_TYPE(A800_SIC_512KB, a800_sic_512kb_device)
 
-#endif // MAME_BUS_A800_SIC_H
+#endif // MAME_BUS_A800_CART_SIC_H

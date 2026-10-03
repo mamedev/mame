@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli, Angelo Salese
-#ifndef MAME_BUS_A800_A800_SLOT_H
-#define MAME_BUS_A800_A800_SLOT_H
+#ifndef MAME_BUS_A800_CART_A800_SLOT_H
+#define MAME_BUS_A800_CART_A800_SLOT_H
 
 #pragma once
 
@@ -234,4 +234,4 @@ private:
 DECLARE_DEVICE_TYPE(A800_CART_SLOT,  a800_cart_slot_device)
 DECLARE_DEVICE_TYPE(A5200_CART_SLOT, a5200_cart_slot_device)
 
-#endif // MAME_BUS_A800_A800_SLOT_H
+#endif // MAME_BUS_A800_CART_A800_SLOT_H
