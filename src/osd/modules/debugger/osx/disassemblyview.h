@@ -14,6 +14,11 @@
 
 #import <Cocoa/Cocoa.h>
 
+enum
+{
+	MENU_SHOW_SOURCE,
+	MENU_SHOW_DISASM
+};
 
 @interface MAMEDisassemblyView : MAMEDebugView <MAMEDebugViewSubviewSupport, MAMEDebugViewExpressionSupport>
 {
@@ -33,9 +38,10 @@
 - (void)setExpression:(NSString *)exp;
 
 - (debug_view_disasm_source const *)source;
-- (offs_t)selectedAddress;
+- (NSNumber *)selectedAddress;
 
 - (IBAction)showRightColumn:(id)sender;
+- (IBAction)sourceDebugChanged:(id)sender;
 
 - (void)insertActionItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index;
 - (void)insertSubviewItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index;

@@ -24,13 +24,21 @@
 #include "screen.h"
 #include "sound.h"
 #include "uiinput.h"
+#include "dvsourcecode.h"
+#include "srcdbg_info.h"
 
 #include "corestr.h"
 #include "osdepend.h"
 #include "xmlfile.h"
+#include "line_idx_file.h"
 
 #include <cstdio>
 
+#define LOG_SRCDBG   (1U << 1)
+// need to set LOG_OUTPUT_FUNC or LOG_OUTPUT_STREAM because there's no logerror outside devices
+#define LOG_OUTPUT_FUNC osd_printf_verbose
+#define VERBOSE      (0)
+#include "logmacro.h"
 
 const size_t debugger_cpu::NUM_TEMP_VARIABLES = 10;
 
@@ -491,10 +499,15 @@ device_debug::device_debug(device_t &device)
 	, m_state(nullptr)
 	, m_disasm(nullptr)
 	, m_flags(0)
+	, m_symtable_device(nullptr)
+	, m_symtable_srcdbg_globals(nullptr)
+	, m_symtable_srcdbg_locals(nullptr)
 	, m_symtable(nullptr)
 	, m_stepaddr(0)
 	, m_stepsleft(0)
 	, m_delay_steps(0)
+	, m_step_source_start(nullptr)
+	, m_outs_encountered_return(false)
 	, m_stopaddr(0)
 	, m_stoptime(attotime::zero)
 	, m_stopirq(0)
@@ -545,40 +558,51 @@ device_debug::device_debug(device_t &device)
 		// add global symbol for cycles and totalcycles
 		if (m_exec != nullptr)
 		{
-			m_symtable = std::make_unique<symbol_table>(device.machine(), symbol_table::CPU_STATE, &device.machine().debugger().cpu().global_symtable(), &device);
-
-			m_symtable->add("cycles", [this]() { return m_exec->cycles_remaining(); });
-			m_symtable->add("totalcycles", symbol_table::READ_ONLY, &m_total_cycles);
-			m_symtable->add("lastinstructioncycles", [this]() { return m_total_cycles - m_last_total_cycles; });
+			m_symtable_device = std::make_unique<symbol_table>(device.machine(), symbol_table::CPU_STATE, &device.machine().debugger().cpu().global_symtable(), &device);
+			m_symtable = m_symtable_device.get();
+			
+			m_symtable_device->add("cycles", [this]() { return m_exec->cycles_remaining(); });
+			m_symtable_device->add("totalcycles", symbol_table::READ_ONLY, &m_total_cycles);
+			m_symtable_device->add("lastinstructioncycles", [this]() { return m_total_cycles - m_last_total_cycles; });
 
 			// add entries to enable/disable unmap reporting for each space
 			if (m_memory != nullptr)
 			{
 				if (m_memory->has_space(AS_PROGRAM))
-					m_symtable->add(
+					m_symtable_device->add(
 							"logunmap",
 							[&space = m_memory->space(AS_PROGRAM)] () { return space.log_unmap(); },
 							[&space = m_memory->space(AS_PROGRAM)] (u64 value) { return space.set_log_unmap(bool(value)); });
 				if (m_memory->has_space(AS_DATA))
-					m_symtable->add(
+					m_symtable_device->add(
 							"logunmap",
 							[&space = m_memory->space(AS_DATA)] () { return space.log_unmap(); },
 							[&space = m_memory->space(AS_DATA)] (u64 value) { return space.set_log_unmap(bool(value)); });
 				if (m_memory->has_space(AS_IO))
-					m_symtable->add(
+					m_symtable_device->add(
 							"logunmap",
 							[&space = m_memory->space(AS_IO)] () { return space.log_unmap(); },
 							[&space = m_memory->space(AS_IO)] (u64 value) { return space.set_log_unmap(bool(value)); });
 				if (m_memory->has_space(AS_OPCODES))
-					m_symtable->add(
+					m_symtable_device->add(
 							"logunmap",
 							[&space = m_memory->space(AS_OPCODES)] () { return space.log_unmap(); },
 							[&space = m_memory->space(AS_OPCODES)] (u64 value) { return space.set_log_unmap(bool(value)); });
 			}
+
+			// If there are symbols from source-level debugging information, add them
+			// at the front of the chain and reposition m_symtable
+			if (strcmp(m_device.basetag(), "maincpu") == 0 &&
+				(m_device.machine().debugger().get_srcdbg_info() != nullptr))
+			{
+				srcdbg_info & srcdbg_info = *m_device.machine().debugger().get_srcdbg_info();
+				srcdbg_info.complete_local_relative_initialization();
+				update_symbols_from_srcdbg(srcdbg_info);
+			}
 		}
 
 		// Use own table for CPU and the global for others
-		symbol_table *symtable = m_symtable != nullptr ? m_symtable.get() : &device.machine().debugger().cpu().global_symtable();
+		symbol_table *symtable = m_symtable_device != nullptr ? m_symtable_device.get() : &device.machine().debugger().cpu().global_symtable();
 
 		// add all registers into it
 		for (const auto &entry : m_state->state_entries())
@@ -603,8 +627,8 @@ device_debug::device_debug(device_t &device)
 		m_flags = DEBUG_FLAG_OBSERVING | DEBUG_FLAG_HISTORY;
 
 		// if no curpc, add one
-		if (m_state && !m_symtable->find("curpc"))
-			m_symtable->add("curpc", std::bind(&device_state_interface::pcbase, m_state));
+		if (m_state && !m_symtable_device->find("curpc"))
+			m_symtable_device->add("curpc", std::bind(&device_state_interface::pcbase, m_state));
 	}
 
 	// set up trace
@@ -625,6 +649,41 @@ device_debug::~device_debug()
 	registerpoint_clear_all();
 	exceptionpoint_clear_all();
 }
+
+
+//-------------------------------------------------
+//  update_symbols_from_srcdbg - called to intialize
+//  symbol table chain to include symbols from
+//  source-level debugging AND to update source-
+//  level debugging symbols when the offset changes
+//-------------------------------------------------
+
+void device_debug::update_symbols_from_srcdbg(const srcdbg_info & srcdbg_info)
+{
+	m_symtable_srcdbg_globals.reset();
+	m_symtable_srcdbg_locals.reset();
+
+	// Establish the following symbol table parent chain:
+	// m_symtable (new) = m_symtable_srcdbg_locals -> m_symtable_srcdbg_globals -> m_symtable (old) = m_symtable_device
+	m_symtable_srcdbg_globals = std::make_unique<symbol_table>(
+		m_symtable_device->machine(),
+		symbol_table::SRCDBG_GLOBALS,
+		m_symtable_device.get(),
+		&m_device);
+	m_symtable_srcdbg_locals = std::make_unique<symbol_table>(
+		m_symtable_device->machine(),
+		symbol_table::SRCDBG_LOCALS,
+		m_symtable_srcdbg_globals.get(),
+		&m_device);
+	m_symtable = m_symtable_srcdbg_locals.get();
+
+	// Populate the globals & locals symbol tables
+	srcdbg_info.get_srcdbg_symbols(
+		m_symtable_srcdbg_globals.get(),
+		m_symtable_srcdbg_locals.get(),
+		m_state);
+}
+
 
 void device_debug::write_tracking(address_space &space, offs_t address, u64 data)
 {
@@ -936,9 +995,19 @@ void device_debug::instruction_hook(offs_t curpc)
 			// decrement the count
 			m_stepsleft--;
 
-			// if we hit 0, stop
+			// if we hit 0, stop unless source stepping requires we continue
 			if (m_stepsleft == 0)
-				debugcpu.set_execution_stopped();
+			{
+				if (((m_flags & DEBUG_FLAG_SOURCE_STEPPING) == 0) ||
+					is_source_stepping_complete(curpc))
+				{
+					debugcpu.set_execution_stopped();
+				}
+				else
+				{
+					m_stepsleft++;
+				}
+			}
 
 			// update every 100 steps until we are within 200 of the end
 			else if ((m_flags & (DEBUG_FLAG_STEPPING_OUT | DEBUG_FLAG_STEPPING_BRANCH_TRUE | DEBUG_FLAG_STEPPING_BRANCH_FALSE)) == 0 && (m_stepsleft < 200 || m_stepsleft % 100 == 0))
@@ -987,6 +1056,22 @@ void device_debug::instruction_hook(offs_t curpc)
 	// handle step out/over on the instruction we are about to execute
 	if ((m_flags & (DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT | DEBUG_FLAG_STEPPING_BRANCH)) != 0 && (m_flags & (DEBUG_FLAG_CALL_IN_PROGRESS | DEBUG_FLAG_TEST_IN_PROGRESS)) == 0)
 		prepare_for_step_overout(m_state->pcbase());
+
+	// Once source-level stepping starts, initialize bookkeeping
+	if ((m_flags & DEBUG_FLAG_SOURCE_STEPPING) != 0 &&
+		m_step_source_start == nullptr &&
+		machine.debugger().get_srcdbg_info() != nullptr)
+	{
+		// keep track of the first encountered file/line of user source.
+		file_line curloc;
+		if (machine.debugger().get_srcdbg_info()->address_to_file_line(curpc, curloc))
+		{
+			m_step_source_start = std::make_unique<file_line>(curloc);
+		}
+
+		// Source-stepping-out will set this first time a return is executed
+		m_outs_encountered_return = false;
+	}
 
 	// no longer in debugger code
 	debugcpu.set_within_instruction(false);
@@ -1040,6 +1125,49 @@ void device_debug::wait_hook()
 
 
 //-------------------------------------------------
+//  is_source_stepping_complete - helper to
+//  maintain bookkeeping during source-level stepping
+//  and determine if the stepping is complete
+//-------------------------------------------------
+
+bool device_debug::is_source_stepping_complete(offs_t pc)
+{
+	running_machine &machine = m_device.machine();
+	assert ((m_flags & DEBUG_FLAG_SOURCE_STEPPING) != 0);
+	assert (machine.debugger().get_srcdbg_info() != nullptr);
+
+	// When source-stepping, stop if we're currently on a user source line AND either
+	// i) we started outside a user source line, or
+	// ii) current source line is different from where we started, or
+	// iii) we just returned from source line where we started (e.g., recursive return to same line)
+	file_line file_line_cur;
+	bool has_file_line_cur = machine.debugger().get_srcdbg_info()->address_to_file_line(pc, file_line_cur);
+	bool ret = has_file_line_cur &&
+		(
+			(m_step_source_start == nullptr) ||           // i)
+			(file_line_cur != *m_step_source_start) ||    // ii)
+			m_outs_encountered_return                     // iii)
+		);
+
+	if (ret)
+	{
+		// We're stopping, so reset the source stepping state.
+		m_step_source_start.reset(nullptr);
+		m_outs_encountered_return = false;
+	}
+	else if ((m_flags & DEBUG_FLAG_STEPPING_OUT) != 0)
+	{
+		// We've done a step-out and are still slipping until we hit
+		// an appropriate source line.  Slip via step-overs so we
+		// don't think we're done after subsequent, deeper call-nesting
+		m_flags |= DEBUG_FLAG_STEPPING_OVER;
+	}
+
+	return ret;
+}
+
+
+//-------------------------------------------------
 //  ignore - ignore/observe a given device
 //-------------------------------------------------
 
@@ -1088,7 +1216,7 @@ void device_debug::suspend(bool suspend)
 //  requested number of instructions
 //-------------------------------------------------
 
-void device_debug::single_step(int numsteps)
+void device_debug::single_step(int numsteps, bool source_stepping)
 {
 	assert(m_exec != nullptr);
 
@@ -1097,6 +1225,10 @@ void device_debug::single_step(int numsteps)
 	m_delay_steps = 0;
 	m_flags |= DEBUG_FLAG_STEPPING;
 	m_flags &= ~(DEBUG_FLAG_CALL_IN_PROGRESS | DEBUG_FLAG_TEST_IN_PROGRESS);
+	if (source_stepping)
+	{
+		m_flags |= DEBUG_FLAG_SOURCE_STEPPING;
+	}
 	m_device.machine().debugger().cpu().set_execution_running();
 }
 
@@ -1106,7 +1238,7 @@ void device_debug::single_step(int numsteps)
 //  the requested number of instructions
 //-------------------------------------------------
 
-void device_debug::single_step_over(int numsteps)
+void device_debug::single_step_over(int numsteps, bool source_stepping)
 {
 	assert(m_exec != nullptr);
 
@@ -1115,6 +1247,10 @@ void device_debug::single_step_over(int numsteps)
 	m_delay_steps = 0;
 	m_flags |= DEBUG_FLAG_STEPPING_OVER;
 	m_flags &= ~(DEBUG_FLAG_CALL_IN_PROGRESS | DEBUG_FLAG_TEST_IN_PROGRESS);
+	if (source_stepping)
+	{
+		m_flags |= DEBUG_FLAG_SOURCE_STEPPING;
+	}
 	m_device.machine().debugger().cpu().set_execution_running();
 }
 
@@ -1124,7 +1260,7 @@ void device_debug::single_step_over(int numsteps)
 //  out of the current function
 //-------------------------------------------------
 
-void device_debug::single_step_out()
+void device_debug::single_step_out(bool source_stepping)
 {
 	assert(m_exec != nullptr);
 
@@ -1134,6 +1270,10 @@ void device_debug::single_step_out()
 	m_delay_steps = 0;
 	m_flags |= DEBUG_FLAG_STEPPING_OUT;
 	m_flags &= ~(DEBUG_FLAG_CALL_IN_PROGRESS | DEBUG_FLAG_TEST_IN_PROGRESS);
+	if (source_stepping)
+	{
+		m_flags |= DEBUG_FLAG_SOURCE_STEPPING;
+	}
 	m_device.machine().debugger().cpu().set_execution_running();
 }
 
@@ -1927,10 +2067,22 @@ void device_debug::prepare_for_step_overout(offs_t pc)
 	{
 		// make sure to also reset the number of steps for conditionals that may be single-instruction loops
 		if (test_cond || !step_out)
+		{
 			m_stepsleft = 100;
+		}
+		else if ((m_flags & DEBUG_FLAG_SOURCE_STEPPING) != 0)
+		{
+			// Stepping out completed at the disassembly level, but we're
+			// doing source-level stepping.  Call it done here, but retain
+			// m_flags so is_source_stepping_complete can perform
+			// source-level slipping.
+			m_stepsleft = 1;
+			m_outs_encountered_return = true;
+		}
 		else
 		{
-			// add extra instructions for delay slots
+			// Stepping out completed at the disassembly level, and we're
+			// doing disassembly-level stepping.  Add extra instructions for delay slots
 			int extraskip = (dasmresult & util::disasm_interface::OVERINSTMASK) >> util::disasm_interface::OVERINSTSHIFT;
 			m_stepsleft = extraskip + 1;
 
@@ -2061,6 +2213,9 @@ device_debug::tracer::tracer(device_debug &debug, std::unique_ptr<std::ostream> 
 	, m_nextdex(0)
 	, m_trace_over(trace_over)
 	, m_trace_over_target(~0)
+	, m_opened_srcdbg_file_index(-1)
+	, m_opened_srcdbg_file(std::make_unique<util::line_indexed_file>())
+
 {
 	memset(m_history, 0, sizeof(m_history));
 }
@@ -2084,6 +2239,11 @@ device_debug::tracer::~tracer()
 
 void device_debug::tracer::update(offs_t pc)
 {
+	// debug_view_disasm sets m_dasm_width to DEFAULT_DASM_WIDTH=50,
+	// and provides a mutator for m_dasm_width (but is unused).
+	// 50 seems excessive for a trace file, using 20 here.
+	static constexpr int DASM_PAD_TO_LENGTH = 20;
+
 	// are we in trace over mode and in a subroutine?
 	if (m_trace_over && m_trace_over_target != ~0)
 	{
@@ -2122,9 +2282,16 @@ void device_debug::tracer::update(offs_t pc)
 	offs_t next_pc, size;
 	u32 dasmresult;
 	buffer.disassemble(pc, instruction, next_pc, size, dasmresult);
+	if (instruction.size() < DASM_PAD_TO_LENGTH)
+	{
+		instruction.append(std::string(DASM_PAD_TO_LENGTH - instruction.size(), ' '));
+	}
+
+	std::string srcdbg_line;
+	get_srcdbg_line(pc, srcdbg_line);
 
 	// output the result
-	util::stream_format(*m_file, "%s: %s\n", buffer.pc_to_string(pc), instruction);
+	util::stream_format(*m_file, "%s: %s%s\n", buffer.pc_to_string(pc), instruction, srcdbg_line);
 
 	// do we need to step the trace over this instruction?
 	if (m_trace_over && (dasmresult & util::disasm_interface::SUPPORTED) != 0 && (dasmresult & util::disasm_interface::STEP_OVER) != 0)
@@ -2143,6 +2310,50 @@ void device_debug::tracer::update(offs_t pc)
 	m_nextdex = (m_nextdex + 1) % TRACE_LOOPS;
 	m_history[m_nextdex] = pc;
 	m_file->flush();
+}
+
+
+//-------------------------------------------------
+//  get_srcdbg_line - given a pc, find the
+//	corresponding source line
+//-------------------------------------------------
+
+void device_debug::tracer::get_srcdbg_line(offs_t pc, std::string & srcdbg_line)
+{
+	if (m_debug.m_device.machine().debugger().get_srcdbg_info() == nullptr)
+	{
+		return;
+	}
+
+	srcdbg_info & srcdbg_info = *m_debug.m_device.machine().debugger().get_srcdbg_info();
+	file_line loc;
+	if (!srcdbg_info.address_to_file_line(pc, loc))
+	{
+		return;
+	}
+	
+	if (loc.file_index() != m_opened_srcdbg_file_index)
+	{
+		const srcdbg_provider_base::source_file_path * path;
+		if (!srcdbg_info.file_index_to_path(loc.file_index(), &path))
+		{
+			return;
+		}
+		const char * local_path = path->local();
+		if (local_path == nullptr)
+		{
+			return;
+		}
+
+		int spaces_per_tab = m_debug.device().machine().options().srcdbg_spaces_per_tab();
+		std::error_condition err = m_opened_srcdbg_file->open(local_path, spaces_per_tab);
+		m_opened_srcdbg_file_index = loc.file_index();
+		if (err)
+		{
+			return;
+		}
+	}
+	srcdbg_line = m_opened_srcdbg_file->get_line_text(loc.line_number());
 }
 
 
