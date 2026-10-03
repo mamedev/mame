@@ -122,19 +122,17 @@ uint32_t arcompact_device::handleop32_ASR_multiple_do_op(arcompact_device &o, ui
 
 uint32_t arcompact_device::handleop32_ROR_multiple_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	uint32_t result = src1 >> (src2 & 0x1f);
-	result |= src1 << (31 - (src2 & 0x1f));
+	unsigned const shift = src2 & 0x1f;
+	uint32_t const result = std::rotr(src1, shift);
 
 	if (set_flags)
 	{
 		o.do_flags_nz(result);
-		if (src2 != 0)
-		{
-			if (src1 & (1 << (src2 - 1)))
-				o.status32_set_c();
-			else
-				o.status32_clear_c();
-		}
+		// ARCv1 clears C for a zero effective rotation.
+		if (shift && BIT(src1, shift - 1))
+			o.status32_set_c();
+		else
+			o.status32_clear_c();
 	}
 	return result;
 }
@@ -156,9 +154,12 @@ uint32_t arcompact_device::handleop32_ROR_multiple_do_op(arcompact_device &o, ui
 
 void arcompact_device::handleop32_MUL64_do_op(arcompact_device &o, uint32_t src1, uint32_t src2)
 {
-	uint64_t result = (int32_t)src1 * (int32_t)src2;
+	// The Leapster's CPU seems to also store the lower 32-bits of result in MMID. See comment in handleop_MUL64_S_0_b_c
+
+	uint64_t result = (int64_t)(int32_t)src1 * (int64_t)(int32_t)src2;
 	o.m_regs[REG_MLO] = result & 0xffffffff;
-	o.m_regs[REG_MMID] = (result >> 16) & 0xffffffff;
+//  o.m_regs[REG_MMID] = (result >> 16) & 0xffffffff;
+	o.m_regs[REG_MMID] = result & 0xffffffff;
 	o.m_regs[REG_MHI] = (result >> 32) & 0xffffffff;
 }
 
@@ -180,9 +181,12 @@ void arcompact_device::handleop32_MUL64_do_op(arcompact_device &o, uint32_t src1
 
 void arcompact_device::handleop32_MULU64_do_op(arcompact_device &o, uint32_t src1, uint32_t src2)
 {
-	uint64_t result = src1 * src2;
+	// The Leapster's CPU seems to also store the lower 32-bits of result in MMID. See comment in handleop_MUL64_S_0_b_c
+
+	uint64_t result = (uint64_t)src1 * (uint64_t)src2;
 	o.m_regs[REG_MLO] = result & 0xffffffff;
-	o.m_regs[REG_MMID] = (result >> 16) & 0xffffffff;
+//  o.m_regs[REG_MMID] = (result >> 16) & 0xffffffff;
+	o.m_regs[REG_MMID] = result & 0xffffffff;
 	o.m_regs[REG_MHI] = (result >> 32) & 0xffffffff;
 }
 
@@ -329,23 +333,22 @@ uint32_t arcompact_device::handleop32_SUBSDW_do_op(arcompact_device &o, uint32_t
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// Unknown Extension Ops
+// Dual 16-bit DSP multiply/accumulate instructions
 //
-// the Leapster BIOS makes use of these in one small area of the code
-// probably dual-16bit ops, but also making use of a bunch of AUX ports for data?
+// Used with XY memory operands by the Leapster software resampler and mixer.
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_UNKNOWN_05_0c_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
+uint32_t arcompact_device::handleop32_MULDW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	fatalerror("UNKNOWN_05_0c unhandled");
+	return o.dsp_multiply(src1, src2, 0, set_flags);
 }
 
-uint32_t arcompact_device::handleop32_UNKNOWN_05_10_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
+uint32_t arcompact_device::handleop32_MACDW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	fatalerror("UNKNOWN_05_10 unhandled");
+	return o.dsp_multiply(src1, src2, 1, set_flags);
 }
 
-uint32_t arcompact_device::handleop32_UNKNOWN_05_14_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
+uint32_t arcompact_device::handleop32_MSUBDW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	fatalerror("UNKNOWN_05_14 unhandled");
+	return o.dsp_multiply(src1, src2, -1, set_flags);
 }
