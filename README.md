@@ -43,7 +43,7 @@ for a build including a small subset of supported systems.
 
 See the [Compiling MAME](http://docs.mamedev.org/initialsetup/compilingmame.html) page on our documentation site for more information, including prerequisites for macOS and popular Linux distributions.
 
-For recent versions of macOS you need to install [Xcode](https://developer.apple.com/xcode/) including command-line tools and [SDL 2.0](https://github.com/libsdl-org/SDL/releases/latest).
+For recent versions of macOS you need to install [Xcode](https://developer.apple.com/xcode/) including command-line tools and [SDL 3](https://github.com/libsdl-org/SDL/releases/latest). Homebrew `sdl3` plus `USE_LIBSDL=1` matches the macOS CI. Apple Silicon is the usual host; documented minimums stay macOS 14.5, Xcode 16.2, and C++20.
 
 For Windows users, we provide a ready-made [build environment](http://www.mamedev.org/tools/) based on MinGW-w64.
 

@@ -350,14 +350,15 @@ Apple macOS
 -----------
 
 You’ll need a few prerequisites to get started.  Make sure you’re on macOS 14.5
-“Sonoma” or later and Xcode 16.2 or later.  You will need SDL 2 version 2.0.14
-or later.  You’ll also need to install Python 3 – it’s currently included with
-the Xcode command line tools, but you can also install a stand-alone version or
-get it via the Homebrew package manager.
+“Sonoma” or later and Xcode 16.2 or later.  MAME requires C++20, as on other
+platforms.  Apple Silicon (arm64) is the usual build host; Intel Macs remain
+supported.  The macOS OSD uses SDL 3 (not SDL 2).  You’ll also need Python 3 –
+it’s currently included with the Xcode command line tools, but you can also
+install a stand-alone version or get it via the Homebrew package manager.
 
 * Install **Xcode** from the Mac App Store or
   `ADC <https://developer.apple.com/download/more/>`_ (AppleID required).
-* To find the corresponding Xcode for your MacOS release please visit
+* To find the corresponding Xcode for your macOS release please visit
   `xcodereleases.com <https://xcodereleases.com>`_ to find the latest version of
   Xcode available to you.
 * Launch **Xcode**. It will download a few additional prerequisites.  Let this
@@ -366,15 +367,21 @@ get it via the Homebrew package manager.
 * Type **xcode-select --install** to install additional tools necessary for MAME
   (also available as a package on ADC).
 
-Next you’ll need to get SDL 2 installed.
+Install SDL 3 with Homebrew.  This is the path used by the macOS CI job
+(``brew install sdl3`` and **USE_LIBSDL=1** in ``.github/workflows/ci-macos.yml``)::
 
-* Go to `this site <http://libsdl.org/download-2.0.php>`_ and download the
-  *macOS* .dmg file
-* If the .dmg doesn’t open automatically, open it
-* Click “Macintosh HD” (or whatever your Mac’s hard disk is named) in the left
-  pane of a **Finder** window, then open the **Library** folder and drag the
-  **SDL2.framework** folder from the SDL disk image into the **Frameworks**
-  folder. You will have to authenticate with your user password.
+    brew install sdl3 pkgconf
+    make USE_LIBSDL=1
+
+If ``pkg-config`` can see the ``sdl3`` package, the build system selects the
+Homebrew library automatically.  Passing **USE_LIBSDL=1** still matches CI
+explicitly.
+
+Alternatively, download the official SDL 3 macOS package from
+`the SDL releases page <https://github.com/libsdl-org/SDL/releases/latest>`_
+and install the **SDL3.xcframework** (not **SDL2.framework**) under
+**/Library/Frameworks**.  The default search path is
+``/Library/Frameworks/SDL3.xcframework/macos-arm64_x86_64/``.
 
 If you don’t already have it, get Python 3 set up:
 
@@ -390,7 +397,34 @@ If you don’t already have it, get Python 3 set up:
 
 Finally to begin compiling, use Terminal to navigate to where you have the MAME
 source tree (*cd* command) and follow the normal compilation instructions from
-above in All Platforms.
+above in All Platforms.  A typical command on Apple Silicon is
+**make USE_LIBSDL=1 -j$(sysctl -n hw.ncpu)**.
+
+Apple Silicon object files still land under an ``x64`` directory name (for
+example ``build/osx_clang/obj/x64/Release``).  That is leftover makefile
+layout, not a sign the binary is Intel.  Renaming those directories is a wider
+build-system change and is not required to compile.
+
+.. _compiling-macos-universal:
+
+Universal (arm64 + x86_64) binaries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A single compile with multiple ``-arch`` flags fails because of precompiled
+headers (`issue 14755 <https://github.com/mamedev/mame/issues/14755>`_).
+Build each architecture separately, then combine them with **lipo**.  On an
+Apple Silicon Mac::
+
+    make USE_LIBSDL=1 -j$(sysctl -n hw.ncpu)
+    mv mame mame-arm64
+    make REGENIE=1 USE_LIBSDL=1 ARCHOPTS="-target x86_64-apple-macos11" \
+        BUILDDIR=build-x64 UNAME="Darwin x86_64 i386" UNAME_M=x86_64 \
+        UNAME_P=i386 -j$(sysctl -n hw.ncpu)
+    mv mame mame-x64
+    lipo -create mame-arm64 mame-x64 -output mame
+
+The ``UNAME`` overrides were needed when this recipe was first worked out and
+may no longer be required on current trees.
 
 
 .. _compiling-emscripten:
@@ -708,7 +742,8 @@ SDL_FRAMEWORK_PATH
     Search path for SDL framework.
 USE_LIBSDL
     Set to **1** to use shared library style SDL on targets where framework is
-    default.
+    default.  On macOS this is the Homebrew ``sdl3`` path and matches
+    ``ci-macos.yml``.
 USE_SYSTEM_LIB_ASIO
     Set to **1** to prefer the system installation of the Asio C++ asynchronous
     I/O library over the version provided with the MAME source.

@@ -23,7 +23,9 @@ permissions:
 
 jobs:
   build-macos:
-    runs-on: macOS-latest
+    # macos-26 is Apple Silicon with Xcode 26.x.  Pinned so macos-latest
+    # cannot silently move CI onto a newer image (for example Xcode 27).
+    runs-on: macos-26
     steps:
     - uses: actions/checkout@main
       with:
