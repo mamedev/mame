@@ -47,6 +47,9 @@ public:
 		m_ram_bank = bank;
 	}
 
+	// Whether to display the previous DMA transfer rather than the latest one.
+	void set_dma_delay(bool delay) { m_dma_delay = delay; }
+
 	uint16_t reg_r(offs_t offset);
 	void reg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t ram_r(offs_t offset);
@@ -65,6 +68,7 @@ private:
 	// configuration
 	int m_offx = 0, m_offy = 0;
 	unsigned m_ram_bank = 0;
+	bool m_dma_delay = true;
 
 	// internal state
 	required_region_ptr<uint8_t> m_rom;
