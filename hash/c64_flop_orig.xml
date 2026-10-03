@@ -163,24 +163,6 @@ Loads but game does not start
 		</part>
 	</software>
 
-	<software name="jacknpr" supported="no">
-		<description>Jack the Nipper</description>
-		<year>1986</year>
-		<publisher>Gremlin Graphics</publisher>
-		<notes><![CDATA[
-LOAD "*",8,1
-Resets to BASIC, LOAD "$",8 non-functional
-]]></notes>
-		<info name="video" value="PAL" />
-		<info name="protection" value="cyan" />
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="333744">
-				<rom name="jack_the_nipper[gremlin_1986](cyan1)(pal).g64" size="333744" crc="14c6f53d" sha1="6427cc16ed360890034f84182a9db02b2e568f0a"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="miamivic">
 		<description>Miami Vice</description>
 		<year>1986</year>
