@@ -290,7 +290,7 @@ void mscbar_state::unkrgm_data_map(address_map &map)
     map(0xf800, 0xf801).w("ay1", FUNC(ay8910_device::address_data_w));
     map(0xf802, 0xf803).w("ay2", FUNC(ay8910_device::address_data_w)); 
 	map(0xfc00, 0xfc01).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0xf000, 0xf7ff).ram().share("nvram"); /* HM6116LP-3: 2kb of Static RAM */
+	map(0xf000, 0xf7ff).ram().share("nvram"); /* 2kb of Static RAM */
 
 }
 
