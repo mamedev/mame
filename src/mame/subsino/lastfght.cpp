@@ -567,6 +567,7 @@ void lastfght_state::lastfght(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	SS9804(config, m_sound, 32_MHz_XTAL);
+	m_sound->set_divider(4608); // 6944 Hz measured on the real board (the 44.1/48 MHz boards divide by 6144)
 	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
