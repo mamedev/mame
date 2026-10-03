@@ -41,6 +41,7 @@ public:
 
 	void atarigx2_0x200(machine_config &config) ATTR_COLD;
 	void atarigx2_0x400(machine_config &config) ATTR_COLD;
+	void atarigx2_0x400_rrreveng(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -63,7 +64,7 @@ private:
 	void atarigx2(machine_config &config) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
 
-	required_device<atari_jsa_iiis_device> m_jsa;
+	required_device<atari_jsa_iii_device> m_jsa;
 	optional_device<atari_xga_device> m_xga;
 
 	required_shared_ptr<uint32_t> m_mo_command;
