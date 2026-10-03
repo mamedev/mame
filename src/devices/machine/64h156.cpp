@@ -269,6 +269,8 @@ void c64h156_device::live_run(const attotime &limit)
 	if(cur_live.state == IDLE || cur_live.next_state != -1)
 		return;
 
+	bool settled = false;
+
 	for(;;) {
 		switch(cur_live.state) {
 		case RUNNING: {
@@ -276,6 +278,9 @@ void c64h156_device::live_run(const attotime &limit)
 
 			if (cur_live.tm > limit)
 				return;
+
+			if (settled)
+				skip_idle_cycles(limit);
 
 			if ((cur_live.tm + m_period) > limit)
 				return;
@@ -366,6 +371,7 @@ void c64h156_device::live_run(const attotime &limit)
 			}
 
 			cur_live.tm += m_period;
+			settled = !bit;
 			break;
 		}
 
@@ -383,6 +389,33 @@ void c64h156_device::live_run(const attotime &limit)
 			break;
 		}
 		}
+	}
+}
+
+void c64h156_device::skip_idle_cycles(const attotime &limit)
+{
+	// cycles that neither advance the cell counter nor see a flux reversal leave every output unchanged
+	int cycles = 15 - cur_live.cycle_counter;
+	if (cur_live.oe)
+		cycles = std::min(cycles, cur_live.cycles_until_random_flux - cur_live.zero_counter - 1);
+	if (cycles <= 0)
+		return;
+
+	attotime end = cur_live.tm + m_period * cycles;
+	while (cycles > 0 && (end > limit || (cur_live.oe && end > cur_live.edge)))
+	{
+		cycles--;
+		end -= m_period;
+	}
+	if (!cycles)
+		return;
+
+	cur_live.tm = end;
+	cur_live.cycle_counter += cycles;
+	if (cur_live.oe)
+	{
+		cur_live.zero_counter += cycles;
+		cur_live.filter_counter = std::min(cur_live.filter_counter + cycles, CYCLES_TIME_DOMAIN_FILTER);
 	}
 }
 
