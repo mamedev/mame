@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:
+Gaelco FUTBOL-3 kiddie rides: external credits/time display board and PCB outputs
+-->
+<mamelayout version="2">
+
+	<element name="background">
+		<rect><color red="0.06" green="0.06" blue="0.07" /></rect>
+	</element>
+
+	<element name="panel">
+		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.12" blue="0.06" /></led7seg>
+	</element>
+
+	<element name="lamp" defstate="0">
+		<disk state="0"><color red="0.22" green="0.17" blue="0.03" /></disk>
+		<disk state="1"><color red="1.0" green="0.82" blue="0.15" /></disk>
+	</element>
+
+	<element name="motor" defstate="0">
+		<disk state="0"><color red="0.04" green="0.18" blue="0.05" /></disk>
+		<disk state="1"><color red="0.15" green="1.0" blue="0.25" /></disk>
+	</element>
+
+	<element name="aux" defstate="0">
+		<disk state="0"><color red="0.05" green="0.08" blue="0.2" /></disk>
+		<disk state="1"><color red="0.3" green="0.5" blue="1.0" /></disk>
+	</element>
+
+	<element name="text_credits"><text string="CREDITS"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_time"><text string="TIME"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_lamp1"><text string="LAMP 1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_lamp2"><text string="LAMP 2"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_motor"><text string="MOTOR"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_aux"><text string="AUX (Q4)"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+
+	<view name="Display Board and Outputs">
+		<bounds x="0" y="0" width="240" height="160" />
+		<element ref="background"><bounds x="0" y="0" width="240" height="160" /></element>
+
+		<!-- credits display -->
+		<element ref="text_credits"><bounds x="10" y="6" width="100" height="12" /></element>
+		<element ref="panel"><bounds x="15" y="22" width="90" height="62" /></element>
+		<element name="digit0" ref="digit"><bounds x="22" y="28" width="36" height="50" /></element>
+		<element name="digit1" ref="digit"><bounds x="62" y="28" width="36" height="50" /></element>
+
+		<!-- time left display -->
+		<element ref="text_time"><bounds x="130" y="6" width="100" height="12" /></element>
+		<element ref="panel"><bounds x="135" y="22" width="90" height="62" /></element>
+		<element name="digit2" ref="digit"><bounds x="142" y="28" width="36" height="50" /></element>
+		<element name="digit3" ref="digit"><bounds x="182" y="28" width="36" height="50" /></element>
+
+		<!-- 74HCT273 outputs -->
+		<element name="lamp0" ref="lamp"><bounds x="21" y="100" width="22" height="22" /></element>
+		<element ref="text_lamp1"><bounds x="7" y="127" width="50" height="10" /></element>
+		<element name="lamp1" ref="lamp"><bounds x="79" y="100" width="22" height="22" /></element>
+		<element ref="text_lamp2"><bounds x="65" y="127" width="50" height="10" /></element>
+		<element name="motor" ref="motor"><bounds x="137" y="100" width="22" height="22" /></element>
+		<element ref="text_motor"><bounds x="123" y="127" width="50" height="10" /></element>
+		<element name="aux" ref="aux"><bounds x="195" y="100" width="22" height="22" /></element>
+		<element ref="text_aux"><bounds x="179" y="127" width="54" height="10" /></element>
+	</view>
+
+</mamelayout>
