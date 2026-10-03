@@ -20,7 +20,7 @@ class ss9904_device : public device_t, public device_sound_interface, public dev
 public:
 	ss9904_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// clock divider producing the sample rate (measured: 6144 on SS9904 @ 44.1 MHz, 4608 on SS9804 @ 32 MHz)
+	// clock divider producing the sample rate (6144 measured on the 44.1 and 48 MHz boards, 4608 on Last Fighting's 32 MHz board)
 	void set_divider(u32 divider) { m_divider = divider; }
 
 	// force the ROM address scrambler on/off instead of taking it from the init command
