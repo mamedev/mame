@@ -227,7 +227,7 @@ void namcos21_3d_device::blit_single_quad(int sx[4], int sy[4], int zcode[4], u1
 		return;
 		
 //TODO!!!
-
+#define GAL3
 #ifdef GAL3
 	const u16 palbase = 0x3c00; 
 

@@ -395,11 +395,6 @@ void namco_c139_local_device::read_data(unsigned data_size)
 				m_reg[REG_6_RXOFFSET] = rx_size;
 
 
-			//	m_reg[REG_4_RXSIZE] = rx_size ;
-				
-	
-				rx_size & 0xFF; // HACK otherwise get 0x1027 for 0x27 and it counts the lot!
-
 			}
 			// prevent overflow
 			m_reg[REG_4_RXSIZE] &= 0x0fff;

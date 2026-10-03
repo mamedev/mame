@@ -933,7 +933,7 @@ void gal3_state::mst_cpu_map(address_map &map)
 	map(0x44800000, 0x44800003).r(FUNC(gal3_state::led_mst_r)).w(FUNC(gal3_state::led_mst_w)); //LEDs
 	map(0x48000000, 0x48000003).rw(FUNC(gal3_state::maincpu_readirq1), FUNC(gal3_state::maincpu_wipeirq1));
 	map(0x4c000000, 0x4c000003).rw(FUNC(gal3_state::maincpu_readirq3), FUNC(gal3_state::maincpu_wipeirq3));
-	map(0x5fff0000, 0x5fff7fff).mirror(0x10000).ram().share("share1");  //CRAM (TODO - whats pointing it here?)
+	map(0x5fff0000, 0x5fff7fff).ram().share("share1");  //CRAM (TODO - whats pointing it here?)
 	map(0x60000000, 0x60007fff).mirror(0x10000).ram().share("share1");  //CRAM
 	map(0x80000000, 0x8007ffff).ram(); //512K Local RAM
 /// map(0xc0000000, 0xc000000b).nopw();    //upload?
