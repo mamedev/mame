@@ -186,6 +186,9 @@ if CPUS["ARM7"] then
 		MAME_DIR .. "src/devices/cpu/arm7/arm7help.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7tdrc.hxx",
 		MAME_DIR .. "src/devices/cpu/arm7/cecalls.hxx",
+		MAME_DIR .. "src/devices/cpu/arm7/arm1176.hxx",
+		MAME_DIR .. "src/devices/cpu/arm7/arm1176vfp.hxx",
+		MAME_DIR .. "src/devices/cpu/arm7/arm7v6.hxx",
 	}
 end
 

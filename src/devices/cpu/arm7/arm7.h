@@ -56,7 +56,7 @@ public:
 	// the address to 26 bits instead.
 	void set_address_exception(bool enable) { m_address_exception = enable; }
 
-	uint32_t vector_base() const;
+	virtual uint32_t vector_base() const;
 
 protected:
 	enum arm_arch_flag : uint32_t;
@@ -197,6 +197,8 @@ protected:
 	int loadDec(uint32_t pat, uint32_t rbv, uint32_t s, int mode);
 	int storeInc(uint32_t pat, uint32_t rbv, int mode);
 	int storeDec(uint32_t pat, uint32_t rbv, int mode);
+	virtual bool handle_coprocessor(uint32_t insn) { return false; }
+	virtual void prefetch_abort(uint32_t pc) { }
 	void HandleCoProcDO(uint32_t insn);
 	void HandleCoProcRT(uint32_t insn);
 	void HandleCoProcDT(uint32_t insn);
@@ -210,6 +212,14 @@ protected:
 	void HandleSMulLong(uint32_t insn);
 	void HandleUMulLong(uint32_t insn);
 	void HandleMemBlock(uint32_t insn);
+
+	void armv6_media(uint32_t insn);
+	void armv6_exclusive(uint32_t insn);
+	void armv6_cps(uint32_t insn);
+	uint32_t m_exclusive_address = 0;
+	uint8_t m_exclusive_size = 0;
+	bool m_exclusive_valid = false;
+	memory_passthrough_handler m_exclusive_tap;
 
 	void arm7ops_0123(uint32_t insn);
 	void arm7ops_0123_v4(uint32_t insn);
@@ -233,7 +243,7 @@ protected:
 	void write_r15_psr26(uint32_t value, bool write_pc);
 	bool ldm_loads_base(uint32_t insn, uint32_t rb) const;
 	bool check_data_address(offs_t &addr);
-	bool translate_vaddr_to_paddr(offs_t &addr, const int flags);
+	virtual bool translate_vaddr_to_paddr(offs_t &addr, const int flags);
 	bool page_table_finish_translation(offs_t &vaddr, const uint8_t type, const uint32_t lvl1, const uint32_t lvl2, const int flags, const uint32_t lvl1a, const uint32_t lvl2a);
 	bool page_table_translate(offs_t &vaddr, const int flags);
 	tlb_entry *tlb_map_entry(const offs_t vaddr, const int flags);
@@ -498,14 +508,48 @@ protected:
 class arm1176jzf_s_cpu_device : public arm11_cpu_device
 {
 public:
-	// construction/destruction
 	arm1176jzf_s_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	virtual bool get_vfp_flag() const override { return true; }
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual uint32_t arm7_rt_r_callback(offs_t offset) override;
 	virtual void arm7_rt_w_callback(offs_t offset, uint32_t data) override;
+	virtual bool translate_vaddr_to_paddr(offs_t &addr, const int flags) override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
+	virtual void prefetch_abort(uint32_t pc) override;
+	virtual uint32_t arm7_cpu_read32(offs_t addr) override;
+	virtual uint32_t arm7_cpu_read16(offs_t addr) override;
+	virtual uint8_t arm7_cpu_read8(offs_t addr) override;
+	virtual void arm7_cpu_write32(offs_t addr, uint32_t data) override;
+	virtual void arm7_cpu_write16(offs_t addr, uint16_t data) override;
+	virtual void arm7_cpu_write8(offs_t addr, uint8_t data) override;
+	virtual bool handle_coprocessor(uint32_t insn) override;
 
-protected:
-	virtual void device_reset() override ATTR_COLD;
+	bool walk_page_table(offs_t &addr, int flags, bool side_effects);
+	bool data_address(offs_t &addr, unsigned size, bool write);
+	bool translation_fault(uint32_t addr, uint32_t status, int flags, bool side_effects);
+	uint32_t read_data(uint32_t addr, unsigned size);
+	void write_data(uint32_t addr, uint32_t data, unsigned size);
+	void undefined_coprocessor();
+	bool vfp_enabled(bool system_register = false);
+	void vfp_execute(uint32_t insn);
+
+	virtual uint32_t vector_base() const override;
+	uint32_t m_vbar = 0;
+	uint32_t m_aux_control = 0;
+	uint32_t m_cpacr = 0;
+	uint32_t m_ttbr1 = 0;
+	uint32_t m_ttbcr = 0;
+	uint32_t m_context_id = 0;
+	uint32_t m_thread_id[3] = {};
+	uint32_t m_ifar = 0;
+	uint32_t m_prrr = 0;
+	uint32_t m_nmrr = 0;
+	uint32_t m_vfp_regs[32] = {};
+	uint32_t m_fpscr = 0;
+	uint32_t m_fpexc = 0;
 };
 
 class igs036_cpu_device : public arm946es_cpu_device
