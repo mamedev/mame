@@ -60,6 +60,7 @@
 #include "sound/okim6295.h"
 #include "speaker.h"
 #include "mscbar.lh"
+#include "unkrgm.lh"
 
 
 namespace {
@@ -324,7 +325,7 @@ void mscbar_state::unkrgm(machine_config &config)
     HOPPER(config, m_hopper, attotime::from_msec(100));
 	
 	/* Video */
-	config.set_default_layout(layout_mscbar);
+	config.set_default_layout(layout_unkrgm);
 
 	/* Keyboard & display interface */
 	i8279_device &kbdc(I8279(config, "i8279", XTAL(10'738'000) / 6));
@@ -349,14 +350,19 @@ void mscbar_state::mscbar(machine_config &config)
 {
 	unkrgm(config);
 	i80c51_device &maincpu(I80C51(config.replace(), "maincpu", XTAL(10'738'000)));   // Actual cpu is at89c51-24pc
-	maincpu.set_addrmap(AS_PROGRAM, &mscbar_state::mscbar_program_map);
+    maincpu.set_addrmap(AS_PROGRAM, &mscbar_state::mscbar_program_map);
 	maincpu.set_addrmap(AS_DATA, &mscbar_state::mscbar_data_map);
 	maincpu.port_in_cb<1>().set_ioport("P1");
 	maincpu.port_in_cb<1>().set(FUNC(mscbar_state::p1_port_r));
     maincpu.port_out_cb<1>().set(FUNC(mscbar_state::p1_port_w));
 	maincpu.port_in_cb<3>().set_ioport("P3");
 	maincpu.port_out_cb<3>().set(FUNC(mscbar_state::p3_port_w));
-    OKIM6295(config, m_oki,  XTAL(10'738'000) / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.00);  // Clock frequency & pin 7 not verified
+   	
+	/* sound hardware */
+	OKIM6295(config, m_oki,  XTAL(10'738'000) / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.00);  // Clock frequency & pin 7 not verified
+
+	/* Video */
+	config.set_default_layout(layout_mscbar);
 
 }
 
