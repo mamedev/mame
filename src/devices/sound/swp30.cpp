@@ -3799,7 +3799,12 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 	}
 
 	if(BIT(opcode, 0x3d)) {
-		UML_DSAR(block, I0, mem(&m_p), 15);
+		// m_p / 32768, truncated towards zero
+		UML_DMOV(block, I0, mem(&m_p));
+		UML_DSAR(block, I1, I0, 63);
+		UML_DAND(block, I1, I1, 0x7fff);
+		UML_DADD(block, I0, I0, I1);
+		UML_DSAR(block, I0, I0, 15);
 		UML_MOV(block, mem(&m_memw_value[index2]), I0);
 	}
 
@@ -4003,7 +4008,10 @@ void swp30_device::meg_state::step()
 
 	if(BIT(opcode, 0x3d)) {
 		m_memw_active[m_delay_2] = true;
-		m_memw_value[m_delay_2] = m_p >> 15;
+		// Truncated towards zero, like pack24.  Rounding down keeps
+		// negative values from ever decaying to zero in a feedback loop,
+		// and a reverb goes on ringing after its input has stopped.
+		m_memw_value[m_delay_2] = m_p / 32768;
 	} else
 		m_memw_active[m_delay_2] = false;
 
