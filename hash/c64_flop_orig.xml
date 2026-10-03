@@ -1042,4 +1042,17 @@ Graphics issues
 		</part>
 	</software>
 
+	<software name="nero1">
+		<description>Nero 1 (Finland)</description>
+		<year>1986</year>
+		<publisher>Bio-Syntax Method</publisher>
+		<sharedfeat name="compatibility" value="PAL,NTSC"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="Nero1_s0.g64" size="279582" crc="531afd2d" sha1="ba950eab2dc9f5663bd95f877926d42d9bed5a9f"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
