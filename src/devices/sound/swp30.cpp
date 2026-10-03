@@ -448,7 +448,7 @@ void swp30_device::streaming_block::read_16(memory_access<25, 2, -2, ENDIANNESS_
 		// 32103210 32103210 32103210
 		// bbbbaaaa ddddcccc ........
 		u32 l0 = wave.read_dword(adr);
-		u32 l1 = wave.read_dword(adr);
+		u32 l1 = wave.read_dword(adr+1);
 		val0 = l0;
 		val1 = l0 >> 16;
 		val2 = l1;
@@ -751,7 +751,11 @@ std::pair<s16, bool> swp30_device::streaming_block::step(memory_access<25, 2, -2
 				if(m_pos_dec >= 0x8000)
 					m_pos ++;
 				m_pos_dec &= 0x7fff;
-				m_dpcm_pos = 3;
+				// The loop end is followed by a copy of the first three deltas,
+				// so decoding carries on from where it had got to.  Restarting
+				// at 3 drops a delta whenever the position crossed the loop
+				// point by two samples.
+				m_dpcm_pos -= m_loop_size;
 			} else {
 				m_done = true;
 				m_last = result;
