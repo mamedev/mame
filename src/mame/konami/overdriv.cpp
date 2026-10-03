@@ -19,8 +19,6 @@
 
 #include "emu.h"
 
-#include "machine/k053252.h"
-#include "machine/timer.h"
 #include "k053246_k053247_k055673.h"
 #include "k053250.h"
 #include "k053251.h"
@@ -30,7 +28,9 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/adc0804.h"
 #include "machine/eepromser.h"
+#include "machine/k053252.h"
 #include "machine/rescap.h"
+#include "machine/timer.h"
 #include "sound/k053260.h"
 #include "sound/ymopm.h"
 #include "video/k051316.h"
@@ -59,20 +59,21 @@ public:
 		, m_k053251(*this, "k053251")
 		, m_k053252(*this, "k053252")
 		, m_screen(*this, "screen")
+		, m_eeprom(*this, "eeprom")
 		, m_spriteram(*this, "spriteram")
 		, m_alu_ram(*this, "alu_ram")
 		, m_led(*this, "led0")
 	{ }
 
-	void overdriv(machine_config &config);
+	void overdriv(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void cpuA_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void eeprom_w(offs_t offset, uint8_t data);
+	void cpuA_ctrl_w(offs_t offset, uint8_t data);
 	uint16_t cpuB_ctrl_r();
 	void cpuB_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void soundirq_w(uint16_t data);
@@ -114,6 +115,7 @@ private:
 	required_device<k053251_device> m_k053251;
 	required_device<k053252_device> m_k053252;
 	required_device<screen_device> m_screen;
+	required_device<eeprom_serial_er5911_device> m_eeprom;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_alu_ram;
 	output_finder<> m_led;
@@ -128,27 +130,26 @@ private:
 
 static const uint16_t overdriv_default_eeprom[64] =
 {
-	0x7758,0xFFFF,0x0078,0x9000,0x0078,0x7000,0x0078,0x5000,
-	0x5441,0x4B51,0x3136,0x4655,0x4AFF,0x0300,0x0270,0x0250,
-	0x00B4,0x0300,0xB403,0x00B4,0x0300,0xB403,0x00B4,0x0300,
-	0xB403,0x00B4,0x0300,0xB403,0x00B4,0x0300,0xB403,0x00B4,
-	0x0300,0xB403,0x00B4,0x0300,0xB403,0x00B4,0x0300,0xB403,
-	0x00B4,0x0300,0xB403,0x00B4,0x0300,0xB403,0x00B4,0x0300,
-	0xB403,0x00B4,0x0300,0xB403,0x00B4,0x0300,0xB403,0x00B4,
-	0x0300,0xB403,0x00B4,0x0300,0xB403,0x00B4,0x0300,0xB403
+	0x7758, 0xffff, 0x0078, 0x9000, 0x0078, 0x7000, 0x0078, 0x5000,
+	0x5441, 0x4b51, 0x3136, 0x4655, 0x4aff, 0x0300, 0x0270, 0x0250,
+	0x00b4, 0x0300, 0xb403, 0x00b4, 0x0300, 0xb403, 0x00b4, 0x0300,
+	0xb403, 0x00b4, 0x0300, 0xb403, 0x00b4, 0x0300, 0xb403, 0x00b4,
+	0x0300, 0xb403, 0x00b4, 0x0300, 0xb403, 0x00b4, 0x0300, 0xb403,
+	0x00b4, 0x0300, 0xb403, 0x00b4, 0x0300, 0xb403, 0x00b4, 0x0300,
+	0xb403, 0x00b4, 0x0300, 0xb403, 0x00b4, 0x0300, 0xb403, 0x00b4,
+	0x0300, 0xb403, 0x00b4, 0x0300, 0xb403, 0x00b4, 0x0300, 0xb403
 };
 
 
-void overdriv_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void overdriv_state::eeprom_w(offs_t offset, uint8_t data)
 {
-	//logerror("%s: write %04x to eeprom_w\n",machine().describe_context(),data);
-	if (ACCESSING_BITS_0_7)
-	{
-		/* bit 0 is data */
-		/* bit 1 is clock (active high) */
-		/* bit 2 is cs (active low) */
-		ioport("EEPROMOUT")->write(data, 0xff);
-	}
+	//logerror("%s: write %04x to eeprom_w\n", machine().describe_context(), data);
+	// bit 0 is data
+	// bit 1 is clock (active high)
+	// bit 2 is cs (active low)
+	m_eeprom->di_write(BIT(data, 0));
+	m_eeprom->clk_write(BIT(data, 1));
+	m_eeprom->cs_write(BIT(data, 2));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::cpuA_scanline)
@@ -178,21 +179,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::cpuA_scanline)
 	}
 }
 
-void overdriv_state::cpuA_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void overdriv_state::cpuA_ctrl_w(offs_t offset, uint8_t data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		/* bit 0 probably enables the second 68000 */
-		m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	// bit 0 probably enables the second 68000
+	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 
-		/* bit 1 is clear during service mode - function unknown */
+	// bit 1 is clear during service mode - function unknown
 
-		m_led = BIT(data, 3);
-		machine().bookkeeping().coin_counter_w(0, data & 0x10);
-		machine().bookkeeping().coin_counter_w(1, data & 0x20);
+	m_led = BIT(data, 3);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5));
 
-		//logerror("%s: write %04x to cpuA_ctrl_w\n",machine().describe_context(),data);
-	}
+	//logerror("%s: write %04x to cpuA_ctrl_w\n", machine().describe_context(), data);
 }
 
 uint16_t overdriv_state::cpuB_ctrl_r()
@@ -206,12 +204,12 @@ void overdriv_state::cpuB_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask
 
 	if (ACCESSING_BITS_0_7)
 	{
-		/* bit 0 = enable sprite ROM reading */
-		m_k053246->k053246_set_objcha_line( (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+		// bit 0 = enable sprite ROM reading
+		m_k053246->k053246_set_objcha_line(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 
-		/* bit 1 used but unknown (irq enable?) */
+		// bit 1 used but unknown (IRQ enable?)
 
-		/* other bits unused? */
+		// other bits unused?
 	}
 }
 
@@ -298,14 +296,17 @@ uint32_t overdriv_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_layer_priority.fill(m_k053251->get_priority(k053251_device::CI4), cliprect);
 	m_k051316[1]->zoom_draw(screen, m_zoom_bitmap, cliprect, 0, 1);
 	const uint8_t zoom_priority = m_k053251->get_priority(k053251_device::CI3);
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		auto const *const screen_pri = &screen.priority().pix(y);
+		auto *const layer_pri = &m_layer_priority.pix(y);
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			if (screen.priority().pix(y, x) && zoom_priority <= m_layer_priority.pix(y, x))
+			if (screen_pri[x] && zoom_priority <= layer_pri[x])
 			{
-				bitmap.pix(y, x) = m_zoom_bitmap.pix(y, x);
-				m_layer_priority.pix(y, x) = zoom_priority;
+				dst[x] = m_zoom_bitmap.pix(y, x);
+				layer_pri[x] = zoom_priority;
 			}
 		}
 	}
@@ -318,12 +319,14 @@ uint32_t overdriv_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	for (m_sprite_priority_base = 0; m_sprite_priority_base < 64; m_sprite_priority_base += 31)
 	{
 		bool active = false;
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			auto *const screen_pri = &screen.priority().pix(y);
+			auto const *const layer_pri = &m_layer_priority.pix(y);
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
-				const int pri = m_layer_priority.pix(y, x) - m_sprite_priority_base;
-				screen.priority().pix(y, x) = (pri >= 0 && pri < 31) ? pri : 31;
+				const int pri = layer_pri[x] - m_sprite_priority_base;
+				screen_pri[x] = (pri >= 0 && pri < 31) ? pri : 31;
 				active = active || (pri >= 0 && pri < 31);
 			}
 		}
@@ -342,22 +345,22 @@ void overdriv_state::main_map(address_map &map)
 	map(0x0c0000, 0x0c0001).portr("INPUTS");
 	map(0x0c0002, 0x0c0003).portr("SYSTEM");
 	map(0x0e0000, 0x0e0001).nopw();            /* unknown (always 0x30) */
-	map(0x100000, 0x10001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); /* 053252? (LSB) */
+	map(0x100000, 0x10001f).umask16(0x00ff).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)); /* 053252? (LSB) */
 	map(0x140000, 0x140001).nopw(); //watchdog reset?
 	map(0x180001, 0x180001).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));
-	map(0x1c0000, 0x1c001f).w(m_k051316[0], FUNC(k051316_device::ctrl_w)).umask16(0xff00);
-	map(0x1c8000, 0x1c801f).w(m_k051316[1], FUNC(k051316_device::ctrl_w)).umask16(0xff00);
-	map(0x1d0000, 0x1d001f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
-	map(0x1d8000, 0x1d8003).rw("k053260_1", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x1e0000, 0x1e0003).rw("k053260_2", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
+	map(0x1c0000, 0x1c001f).umask16(0xff00).w(m_k051316[0], FUNC(k051316_device::ctrl_w));
+	map(0x1c8000, 0x1c801f).umask16(0xff00).w(m_k051316[1], FUNC(k051316_device::ctrl_w));
+	map(0x1d0000, 0x1d001f).umask16(0xff00).w(m_k053251, FUNC(k053251_device::write));
+	map(0x1d8000, 0x1d8003).umask16(0x00ff).rw("k053260_1", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
+	map(0x1e0000, 0x1e0003).umask16(0x00ff).rw("k053260_2", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
 	map(0x1e8000, 0x1e8001).w(FUNC(overdriv_state::soundirq_w));
-	map(0x1f0000, 0x1f0001).w(FUNC(overdriv_state::cpuA_ctrl_w));  /* halt cpu B, coin counter, start lamp, other? */
-	map(0x1f8000, 0x1f8001).w(FUNC(overdriv_state::eeprom_w));
+	map(0x1f0000, 0x1f0001).umask16(0x00ff).w(FUNC(overdriv_state::cpuA_ctrl_w));  /* halt cpu B, coin counter, start lamp, other? */
+	map(0x1f8000, 0x1f8001).umask16(0x00ff).w(FUNC(overdriv_state::eeprom_w));
 	map(0x200000, 0x203fff).ram().share("share1");
-	map(0x210000, 0x210fff).rw(m_k051316[0], FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0xff00);
-	map(0x218000, 0x218fff).rw(m_k051316[1], FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0xff00);
-	map(0x220000, 0x220fff).r(m_k051316[0], FUNC(k051316_device::rom_r)).umask16(0xff00);
-	map(0x228000, 0x228fff).r(m_k051316[1], FUNC(k051316_device::rom_r)).umask16(0xff00);
+	map(0x210000, 0x210fff).umask16(0xff00).rw(m_k051316[0], FUNC(k051316_device::read), FUNC(k051316_device::write));
+	map(0x218000, 0x218fff).umask16(0xff00).rw(m_k051316[1], FUNC(k051316_device::read), FUNC(k051316_device::write));
+	map(0x220000, 0x220fff).umask16(0xff00).r(m_k051316[0], FUNC(k051316_device::rom_r));
+	map(0x228000, 0x228fff).umask16(0xff00).r(m_k051316[1], FUNC(k051316_device::rom_r));
 	map(0x230000, 0x230001).w(FUNC(overdriv_state::sub_irq6_assert_w));
 	map(0x238000, 0x238001).w(FUNC(overdriv_state::sub_irq5_assert_w));
 }
@@ -392,7 +395,7 @@ void overdriv_state::alu_w(uint8_t data)
 	// Zero is a placeholder for division by zero; the hardware result is unknown.
 	const auto divide = [] (int64_t numerator, int16_t denominator) -> uint32_t
 	{
-		return denominator ? numerator / denominator : 0;
+		return denominator ? (numerator / denominator) : 0;
 	};
 
 	switch (data)
@@ -510,11 +513,6 @@ static INPUT_PORTS_START( overdriv )
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(50)
 	// POST checks if paddle is at center otherwise throws a "VOLUME ERROR"
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
 INPUT_PORTS_END
 
 
@@ -540,7 +538,7 @@ void overdriv_state::machine_reset()
 	m_road_colorbase[1] = 0;
 	m_ccu_frame = 0;
 
-	/* start with cpu B halted */
+	// start with CPU B halted
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 

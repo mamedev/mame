@@ -13,6 +13,10 @@ k053250_device::k053250_device(const machine_config &mconfig, const char *tag, d
 	device_t(mconfig, K053250, tag, owner, clock),
 	device_gfx_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
+	m_offx(0),
+	m_offy(0),
+	m_ram_bank(0),
+	m_dma_delay(true),
 	m_rom(*this, DEVICE_SELF),
 	m_shared_ram(*this, finder_base::DUMMY_TAG)
 {
@@ -122,8 +126,10 @@ void k053250_device::pdraw_scanline(BitmapType &bitmap, const pen_t *pal_base, u
 			src_fx = end_pixel * src_fdx + FIXPOINT_PRECISION_HALF;
 		}
 		else
+		{
 			// the point five bias is to ensure even distribution of stretched or shrinked pixels
 			src_fx = FIXPOINT_PRECISION_HALF;
+		}
 
 		// adjust flipped source
 		if (flip)
@@ -246,10 +252,10 @@ void k053250_device::draw_common(BitmapType &bitmap, const rectangle &cliprect, 
 	uint8_t ctrl = m_regs[4];                                     // register four is the main control register
 
 	// copy visible boundary values to more accessible locations
-	int dst_minx = cliprect.min_x;
-	int dst_maxx = cliprect.max_x;
-	int dst_miny = cliprect.min_y;
-	int dst_maxy = cliprect.max_y;
+	int dst_minx = cliprect.left();
+	int dst_maxx = cliprect.right();
+	int dst_miny = cliprect.top();
+	int dst_maxy = cliprect.bottom();
 
 	int orientation = 0;    // orientation defaults to no swapping and no flipping
 	int dst_height = 512;   // virtual bitmap height defaults to 512 pixels

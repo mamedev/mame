@@ -265,7 +265,6 @@ void dt7_state::write_port_2(u8 data)
 		// chain 1: 2P side, mirroring chain 0 (controls, system byte, 1P start echo, gate)
 		m_shift_chain[1] = ~u32(p2 | (m_sys2port->read() << 8) | ((p1 & 0x80) << 16));
 	}
-
 	else if (!(m_ioport_state & 0x08) && (data & 0x08))
 	{
 		m_shift_chain[0] = (m_shift_chain[0] >> 1) | 0x80000000;
@@ -309,7 +308,7 @@ void dt7_state::dt7_68k_0_mem(address_map &map)
 
 	dt7_shared_mem(map);
 
-	map(0x610000, 0x61ffff).rw(FUNC(dt7_state::dt7_shared_ram_r), FUNC(dt7_state::shared_ram_w)).umask16(0x00ff);
+	map(0x610000, 0x61ffff).umask16(0x00ff).rw(FUNC(dt7_state::dt7_shared_ram_r), FUNC(dt7_state::shared_ram_w));
 }
 
 void dt7_state::dt7_shared_mem(address_map &map)
