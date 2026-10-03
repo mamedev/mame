@@ -174,7 +174,9 @@ Overall screen brightness / contrast (see test mode)
  - Could convert ram back to 16-bit and use a palette lookup at the final blit.. probably easiest / quickest.
 
 Touchscreen
- - Used for mmmbanc, needs SH3 serial support.
+ - mmmbanc has a serial touch panel on P5, hooked up to SCIF channel 2 of the SH3.
+   See cv1k_touch.cpp for the protocol.  The game holds its own calibration data and
+   has a calibration screen behind the Service 4 input (long press).
 
 Remaining Video issues
  - mmpork startup screen flicker - the FOR USE IN JAPAN screen doesn't appear on the real PCB
@@ -195,6 +197,7 @@ Removed games
 
 #include "emu.h"
 
+#include "cv1k_touch.h"
 #include "cv1k_v.h"
 
 #include "cpu/sh/sh3comn.h"
@@ -205,6 +208,8 @@ Removed games
 
 #include "screen.h"
 #include "speaker.h"
+
+#include "cv1k_touch.lh"
 
 namespace {
 
@@ -227,6 +232,7 @@ public:
 
 	void cv1k(machine_config &config);
 	void cv1k_d(machine_config &config);
+	void cv1k_touch(machine_config &config);
 
 	void init_mushisam();
 	void init_ibara();
@@ -608,6 +614,18 @@ void cv1k_state::cv1k_d(machine_config &config)
 	cv1k(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cv1k_state::cv1k_d_map);
 	m_blitter->set_mainramsize(0x1000000);
+}
+
+void cv1k_state::cv1k_touch(machine_config &config)
+{
+	cv1k(config);
+
+	// Touch panel on P5, wired to SCIF channel 2 of the SH3.
+	cv1k_touchscreen_device &touch(CV1K_TOUCHSCREEN(config, "touchscreen", 9600));
+	touch.txd_handler().set(m_maincpu, FUNC(sh7709s_device::scif_rxd_w));
+	m_maincpu->scif_txd_handler().set(touch, FUNC(cv1k_touchscreen_device::rxd_w));
+
+	config.set_default_layout(layout_cv1k_touch);
 }
 
 
@@ -1162,4 +1180,4 @@ GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT27
 //GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",                 "DoDonPachi SaiDaiOuJou (Japan, 2012/ 4/20)",                                           MACHINE_IMPERFECT_TIMING )
 
 // CMDL01 Medal Mahjong Moukari Bancho
-GAME( 2007, mmmbanc,    0,        cv1k,   mmmbanc, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)",   "Medal Mahjong Moukari Bancho (Japan, 2007/06/05 MASTER VER.)",                         MACHINE_NOT_WORKING )
+GAME( 2007, mmmbanc,    0,        cv1k_touch, mmmbanc, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)",   "Medal Mahjong Moukari Bancho (Japan, 2007/06/05 MASTER VER.)",                  MACHINE_IMPERFECT_TIMING )
