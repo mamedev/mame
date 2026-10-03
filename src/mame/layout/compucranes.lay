@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+
+Compumatic "GANCHONEW" crane machines.
+
+Four 7-segment digits (plus decimal point) on the small "Plumadig" display
+board, wired to outputs 1-32 of its serial LED driver, first byte sent =
+leftmost digit.
+
+The top view shows the simulated position of the gantry (crane_lr: 0 = left,
+100 = right; crane_fb: 0 = front, 100 = back) and the claw height (crane_z:
+0 = up, 100 = down).  The prize chute is on the front left corner, which is
+where the crane parks.  The top view is only illustrative, not to scale.
+-->
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.15" blue="0.1" /></led7seg>
+	</element>
+
+	<element name="black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="panel"><rect><color red="0.10" green="0.10" blue="0.12" /></rect></element>
+	<element name="floor"><rect><color red="0.16" green="0.22" blue="0.30" /></rect></element>
+	<element name="chute"><rect><color red="0.02" green="0.02" blue="0.02" /></rect></element>
+	<element name="rail"><rect><color red="0.75" green="0.75" blue="0.75" /></rect></element>
+	<element name="track"><rect><color red="0.25" green="0.25" blue="0.25" /></rect></element>
+	<element name="claw"><rect><color red="0.95" green="0.75" blue="0.10" /></rect></element>
+
+	<element name="txt_display"><text string="PLUMADIG"><color red="0.45" green="0.45" blue="0.45" /></text></element>
+	<element name="txt_back"><text string="BACK"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="txt_front"><text string="FRONT"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="txt_chute"><text string="PRIZE"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+	<element name="txt_claw"><text string="CLAW"><color red="0.6" green="0.6" blue="0.6" /></text></element>
+
+	<group name="display">
+		<element ref="black"><bounds x="0" y="0" width="180" height="56" /></element>
+		<element name="digit0" ref="digit"><bounds x="10" y="8" width="30" height="40" /></element>
+		<element name="digit1" ref="digit"><bounds x="50" y="8" width="30" height="40" /></element>
+		<element name="digit2" ref="digit"><bounds x="95" y="8" width="30" height="40" /></element>
+		<element name="digit3" ref="digit"><bounds x="135" y="8" width="30" height="40" /></element>
+	</group>
+
+	<view name="Display and Crane">
+		<bounds x="0" y="0" width="220" height="262" />
+		<element ref="panel"><bounds x="0" y="0" width="220" height="262" /></element>
+
+		<group ref="display"><bounds x="20" y="10" width="180" height="56" /></group>
+		<element ref="txt_display"><bounds x="85" y="68" width="50" height="8" /></element>
+
+		<!-- top view of the cabinet -->
+		<element ref="txt_back"><bounds x="20" y="84" width="150" height="8" /></element>
+		<element ref="floor"><bounds x="20" y="94" width="150" height="150" /></element>
+		<element ref="chute"><bounds x="20" y="214" width="30" height="30" /></element>
+		<element ref="txt_chute"><bounds x="21" y="226" width="28" height="7" /></element>
+		<element ref="txt_front"><bounds x="20" y="246" width="150" height="8" /></element>
+
+		<!-- gantry rail, moves front/back -->
+		<element ref="rail">
+			<animate name="crane_fb" />
+			<bounds state="0" x="20" y="228" width="150" height="2" />
+			<bounds state="100" x="20" y="108" width="150" height="2" />
+		</element>
+		<!-- trolley rail, moves left/right -->
+		<element ref="rail">
+			<animate name="crane_lr" />
+			<bounds state="0" x="34" y="94" width="2" height="150" />
+			<bounds state="100" x="154" y="94" width="2" height="150" />
+		</element>
+
+		<!-- claw height -->
+		<element ref="txt_claw"><bounds x="176" y="84" width="30" height="8" /></element>
+		<element ref="track"><bounds x="186" y="94" width="10" height="150" /></element>
+		<element ref="claw">
+			<animate name="crane_z" />
+			<bounds state="0" x="184" y="94" width="14" height="10" />
+			<bounds state="100" x="184" y="234" width="14" height="10" />
+		</element>
+	</view>
+
+	<view name="Display Only">
+		<bounds x="0" y="0" width="180" height="56" />
+		<group ref="display"><bounds x="0" y="0" width="180" height="56" /></group>
+	</view>
+
+</mamelayout>
