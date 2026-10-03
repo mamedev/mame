@@ -35,6 +35,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override;
 
 	// device_execute_interface overrides
 	virtual void execute_run() override;
@@ -58,17 +59,43 @@ private:
 	void write_operand(int ordinal, uint8_t data);
 	uint16_t read_exgtfr_register(uint8_t reg);
 	void write_exgtfr_register(uint8_t reg, uint16_t value);
+	uint8_t read_konami_opcode();
 
 	// instructions
 	void lmul();
 	void divx();
+	void daa_konami();
 
 	// miscellaneous
 	void set_lines(uint8_t data);
+	void begin_instruction_timing(uint8_t opcode);
 	void execute_one();
+	void finish_instruction_timing(int cycle_count);
+	int documented_instruction_cycles() const;
+
+	struct timing_scope
+	{
+		konami_cpu_device &cpu;
+		int const cycle_count;
+		timing_scope(konami_cpu_device &device) : cpu(device), cycle_count(device.m_icount) { }
+		~timing_scope() { cpu.finish_instruction_timing(cycle_count); }
+	};
 
 	uint8_t m_bcount;
 	uint8_t m_temp_im;
+	uint8_t m_dp_exgtfr_low;
+	uint8_t m_pc_transfer_opcode;
+	bool m_pc_transfer_opcode_valid;
+	bool m_timing_active;
+	uint8_t m_timing_opcode;
+	uint8_t m_timing_postbyte;
+	uint8_t m_timing_operand1;
+	uint8_t m_timing_cc;
+	uint8_t m_timing_a;
+	uint8_t m_timing_b;
+	uint16_t m_timing_u;
+	uint16_t m_timing_x;
+	int m_timing_elapsed;
 };
 
 #define KONAMI_IRQ_LINE  M6809_IRQ_LINE   /* 0 - IRQ line number */
