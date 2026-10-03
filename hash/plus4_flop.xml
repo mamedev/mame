@@ -39,6 +39,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="typingpra" cloneof="typingpr">
+		<description>Typing Professor (alt)</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="TypingProfessor_s1.g64" size="279582" crc="5e20caa1" sha1="ffa7916b0c785a9ee2dee8a1ff179c7821beebe2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zork2">
 		<description>Zork II: The Wizard of Frobozz (R48)</description>
 		<year>1984</year>
