@@ -834,8 +834,8 @@ void es550x_device::generate_ulaw(es550x_voice *voice, s32 *dest)
 			s32 val2 = read_sample(voice, get_integer_addr(accum, 1));
 
 			// decompress u-law
-			val1 = m_ulaw_lookup[val1 >> (16 - ULAW_MAXBITS)];
-			val2 = m_ulaw_lookup[val2 >> (16 - ULAW_MAXBITS)];
+			val1 = m_ulaw_lookup[val1 >> (16 - ULAW_MAXBITS)] << filter_shift();
+			val2 = m_ulaw_lookup[val2 >> (16 - ULAW_MAXBITS)] << filter_shift();
 
 			// interpolate
 			val1 = interpolate(val1, val2, accum);
@@ -849,6 +849,7 @@ void es550x_device::generate_ulaw(es550x_voice *voice, s32 *dest)
 				update_envelopes(voice);
 
 			// apply volumes and add
+			val1 >>= filter_shift();
 			dest[0] += get_sample(val1, voice->lvol);
 			dest[1] += get_sample(val1, voice->rvol);
 
@@ -864,8 +865,8 @@ void es550x_device::generate_ulaw(es550x_voice *voice, s32 *dest)
 			s32 val2 = read_sample(voice, get_integer_addr(accum, 1));
 
 			// decompress u-law
-			val1 = m_ulaw_lookup[val1 >> (16 - ULAW_MAXBITS)];
-			val2 = m_ulaw_lookup[val2 >> (16 - ULAW_MAXBITS)];
+			val1 = m_ulaw_lookup[val1 >> (16 - ULAW_MAXBITS)] << filter_shift();
+			val2 = m_ulaw_lookup[val2 >> (16 - ULAW_MAXBITS)] << filter_shift();
 
 			// interpolate
 			val1 = interpolate(val1, val2, accum);
@@ -879,6 +880,7 @@ void es550x_device::generate_ulaw(es550x_voice *voice, s32 *dest)
 				update_envelopes(voice);
 
 			// apply volumes and add
+			val1 >>= filter_shift();
 			dest[0] += get_sample(val1, voice->lvol);
 			dest[1] += get_sample(val1, voice->rvol);
 
@@ -916,8 +918,8 @@ void es550x_device::generate_pcm(es550x_voice *voice, s32 *dest)
 		if (!(voice->control & CONTROL_DIR))
 		{
 			// fetch two samples
-			s32 val1 = (s16)read_sample(voice, get_integer_addr(accum));
-			s32 val2 = (s16)read_sample(voice, get_integer_addr(accum, 1));
+			s32 val1 = (s16)read_sample(voice, get_integer_addr(accum)) << filter_shift();
+			s32 val2 = (s16)read_sample(voice, get_integer_addr(accum, 1)) << filter_shift();
 
 			// interpolate
 			val1 = interpolate(val1, val2, accum);
@@ -931,6 +933,7 @@ void es550x_device::generate_pcm(es550x_voice *voice, s32 *dest)
 				update_envelopes(voice);
 
 			// apply volumes and add
+			val1 >>= filter_shift();
 			dest[0] += get_sample(val1, voice->lvol);
 			dest[1] += get_sample(val1, voice->rvol);
 
@@ -942,8 +945,8 @@ void es550x_device::generate_pcm(es550x_voice *voice, s32 *dest)
 		else
 		{
 			// fetch two samples
-			s32 val1 = (s16)read_sample(voice, get_integer_addr(accum));
-			s32 val2 = (s16)read_sample(voice, get_integer_addr(accum, 1));
+			s32 val1 = (s16)read_sample(voice, get_integer_addr(accum)) << filter_shift();
+			s32 val2 = (s16)read_sample(voice, get_integer_addr(accum, 1)) << filter_shift();
 
 			// interpolate
 			val1 = interpolate(val1, val2, accum);
@@ -957,6 +960,7 @@ void es550x_device::generate_pcm(es550x_voice *voice, s32 *dest)
 				update_envelopes(voice);
 
 			// apply volumes and add
+			val1 >>= filter_shift();
 			dest[0] += get_sample(val1, voice->lvol);
 			dest[1] += get_sample(val1, voice->rvol);
 
