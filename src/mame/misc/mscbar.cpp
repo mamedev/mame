@@ -237,8 +237,8 @@ m_p1_out = data;
 
 void mscbar_state::p3_port_w(uint8_t data)  // bit 3 and 5 are used.
 {
-	m_leds[31] = BIT(data, 3);
-    m_leds[30] = BIT(data, 5);
+	m_leds[30] = BIT(data, 3);
+    m_leds[31] = BIT(data, 5);
 }
 
 
