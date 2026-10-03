@@ -38,9 +38,10 @@
     1, 1, 1, 1, 3/2 and 2 with truncation.  The encoder keeps the output within
     about +-600 and returns to zero at the end of each sample.
 
-    Sample rate: 32 MHz / 4608 = 6944 Hz measured on Last Fighting (SS9804),
-    44.1 MHz / 6144 = 7178 Hz measured on Xiao Ao Jiang Hu (SS9904).  Whether
-    the divider depends on the chip type or on a strap is not known.
+    Sample rate: clock / 6144 - 44.1 MHz / 6144 = 7178 Hz measured on Xiao Ao
+    Jiang Hu (SS9904) and 48 MHz / 6144 = 7812.5 Hz measured on a Queen Bee
+    board (SS9804).  Last Fighting (SS9804 0001, 32 MHz) is the exception at
+    32 MHz / 4608 = 6944 Hz; its driver sets that divider explicitly.
 
     The real output ramps about half way to the new value during the preceding
     sample period before stepping to it (a gentle low-pass); not emulated.
@@ -108,7 +109,7 @@ ss9904_device::ss9904_device(const machine_config &mconfig, const char *tag, dev
 }
 
 ss9804_device::ss9804_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: ss9904_device(mconfig, SS9804, tag, owner, clock, 4608)
+	: ss9904_device(mconfig, SS9804, tag, owner, clock, 6144)
 {
 }
 
