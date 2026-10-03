@@ -226,12 +226,16 @@ int pcap_module::netdev_pcap::send(void const *buf, int len)
 {
 	if (!m_p)
 	{
-		printf("send invoked, but no pcap context\n");
+		osd_printf_verbose("send invoked, but no pcap context\n");
 		return 0;
 	}
-	int ret = (*m_module.pcap_sendpacket_dl)(m_p, reinterpret_cast<const u_char *>(buf), len);
-	printf("sent packet length %d, returned %d\n", len, ret);
-	return !ret ? len : 0;
+	int const ret = (*m_module.pcap_sendpacket_dl)(m_p, reinterpret_cast<const u_char *>(buf), len);
+	if (ret)
+	{
+		osd_printf_verbose("pcap_sendpacket failed for a %d byte packet and returned %d\n", len, ret);
+		return 0;
+	}
+	return len;
 }
 
 int pcap_module::netdev_pcap::recv_dev(uint8_t **buf)
