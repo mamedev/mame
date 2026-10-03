@@ -6,7 +6,7 @@
 
     TODO:
 
-    - road layer, has twelve rotation registers!
+    - Verify ground line-buffer timing and address-generator overflow against hardware.
 
 ***************************************************************************/
 
@@ -67,8 +67,7 @@ private:
 	void apache3_v30_map(address_map &map) ATTR_COLD;
 	void apache3_z80_map(address_map &map) ATTR_COLD;
 
-	void draw_sky(bitmap_rgb32 &bitmap, const rectangle &cliprect, int palette_base, int start_offset);
-	[[maybe_unused]] void draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect);
+	void draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect);
 
 	required_device<m68000_base_device> m_subcpu;
 	required_device<cpu_device> m_subcpu2;
@@ -79,10 +78,10 @@ private:
 
 	required_ioport m_vr1;
 
-	uint16_t m_apache3_rotate_ctrl[12];
-	int m_apache3_rot_idx;
-	std::unique_ptr<uint8_t[]> m_apache3_road_x_ram;
-	uint8_t m_apache3_road_z;
+	uint16_t m_apache3_rotate_ctrl[12]{};
+	int m_apache3_rot_idx = 0;
+	std::unique_ptr<uint16_t[]> m_apache3_road_x_ram;
+	uint8_t m_apache3_road_z = 0;
 };
 
 
@@ -93,95 +92,65 @@ void apache3_state::apache3_road_z_w(uint16_t data)
 
 void apache3_state::apache3_road_x_w(offs_t offset, uint8_t data)
 {
-	// Note: Double buffered. Yes, this is correct :)
+	// The data bus selects the row; retain the full displacement on the address bus.
+	// TODO: model the hardware line-buffer bank switching.
 	m_apache3_road_x_ram[data] = offset;
 }
 
-void apache3_state::draw_sky(bitmap_rgb32 &bitmap,const rectangle &cliprect, int palette_base, int start_offset)
-{
-	// all TODO
-	if (start_offset&0x8000)
-		start_offset=-(0x10000 - start_offset);
-
-	start_offset=-start_offset;
-
-	start_offset-=48;
-	for (int y=0; y<256; y++) {
-		for (int x=0; x<320; x++) {
-			int col=palette_base + y + start_offset;
-			if (col<palette_base) col=palette_base;
-			if (col>palette_base+127) col=palette_base+127;
-
-			bitmap.pix(y, x) = m_palette->pen(col);
-		}
-	}
-}
-
-/* Draw the sky and ground, applying rotation (eventually). Experimental! */
+// The 68000 routine at 0x8e06 writes three affine accumulators. Ground X
+// has a 32-bit origin; ground Y and sky Y have overlapping 24-bit origins.
+// All increments and origins have eight fractional bits. In particular,
+// registers 1/5 and 9/10 are NOT independent position/rotation parameters.
 void apache3_state::draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect)
 {
-	if (0)
+	const auto &r = m_apache3_rotate_ctrl;
+	const int64_t x0 = int32_t((uint32_t(r[0]) << 16) | r[4]);
+	const int64_t y0 = int32_t(int16_t(r[1])) * 256 + (r[5] & 0xff);
+	const int64_t sky0 = int32_t(int16_t(r[9])) * 256 + (r[10] & 0xff);
+
+	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		uint16_t gva = 0x180; // TODO
-		uint8_t sky_val = m_apache3_rotate_ctrl[1] & 0xff;
-
-		for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
+		int64_t gx = x0 + y * int16_t(r[6]) + cliprect.min_x * int16_t(r[2]);
+		int64_t gy = y0 + y * int16_t(r[7]) + cliprect.min_x * int16_t(r[3]);
+		int64_t sky = sky0 + y * int16_t(r[11]) + cliprect.min_x * int16_t(r[8]);
+		for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
 		{
-			uint16_t rgdb = 0;//m_apache3_road_x_ram[gva & 0xff];
-			uint16_t gha = 0xf60; // test
-			int ln = (((m_apache3_prom[gva & 0x7f] & 0x7f) + (m_apache3_road_z & 0x7f)) >> 5) & 3;
-
-			if (gva & 0x100)
+			const unsigned gva = (gy >> 8) & 0x1ff;
+			if (BIT(gva, 8))
 			{
-				/* Sky */
-				for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
-				{
-					dst.pix(y, x) = m_palette->pen(0x100 + (sky_val & 0x7f));
-
-					/* Update horizontal counter? */
-					gha = (gha + 1) & 0xfff;
-				}
+				dst.pix(y, x) = m_palette->pen(0x100 + std::clamp<int64_t>((sky >> 8) + 128, 0, 127));
 			}
 			else
 			{
-				/* Ground */
-				for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
-				{
-					uint16_t hval = (rgdb + gha) & 0xfff; // Not quite
-
-					if (hval & 0x800)
-						hval ^= 0x1ff; // TEST
-					//else
-						//hval = hval;
-
-					uint8_t pixels = m_apache3_g_ram[(((gva & 0xff) << 7) | ((hval >> 2) & 0x7f))];
-					int pix_sel = hval & 3;
-
-					uint8_t colour = (pixels >> (pix_sel << 1)) & 3;
-					colour = (BIT(hval, 11) << 4) | (colour << 2) | ln;
-
-					/* Draw the pixel */
-					dst.pix(y, x) = m_palette->pen(0x200 + colour);
-
-					/* Update horizontal counter */
-					gha = (gha + 1) & 0xfff;
-				}
+				// ATF-012A sheet 2: Z80 data selects the row, while the
+				// address bus supplies the 15-bit horizontal displacement.
+				unsigned h = ((gx >> 8) + m_apache3_road_x_ram[gva]) & 0xfff;
+				if (BIT(h, 11))
+					h ^= 0x7ff;
+				// IC120 compares the upper magnitude bits; IC59 is
+				// disabled outside the pattern, pulling the address high.
+				if (h & 0x600)
+					h |= 0x1ff;
+				const uint8_t pixels = m_apache3_g_ram[(gva << 7) | ((h >> 2) & 0x7f)];
+				const unsigned pixel = (pixels >> ((h & 3) * 2)) & 3;
+				const unsigned line = ((m_apache3_prom[gva & 0x7f] + m_apache3_road_z) >> 5) & 3;
+				dst.pix(y, x) = m_palette->pen(0x200 + (BIT(h, 11) << 4) + (pixel << 2) + line);
 			}
-
-			/* Update sky counter */
-			sky_val++;
-			gva = (gva + 1) & 0x1ff;
+			gx += int16_t(r[2]);
+			gy += int16_t(r[3]);
+			sky += int16_t(r[8]);
 		}
 	}
 }
-
 
 void apache3_state::video_start()
 {
 	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(apache3_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
-	m_apache3_road_x_ram = std::make_unique<uint8_t[]>(512);
+	m_apache3_road_x_ram = std::make_unique<uint16_t[]>(256);
 
 	m_tx_layer->set_transparent_pen(0);
+	save_pointer(NAME(m_apache3_road_x_ram), 256);
+	save_item(NAME(m_apache3_road_z));
 }
 
 uint32_t apache3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -193,9 +162,8 @@ uint32_t apache3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	bitmap.fill(m_palette->pen(0), cliprect);
 	screen.priority().fill(0, cliprect);
 	m_sprites->draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
-	draw_sky(bitmap, cliprect, 256, m_apache3_rotate_ctrl[1]);
+	draw_ground(bitmap, cliprect);
 	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), 0);
-//  draw_ground(bitmap, cliprect);
 	m_sprites->draw_sprites(bitmap,cliprect,0, (m_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
 	m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
