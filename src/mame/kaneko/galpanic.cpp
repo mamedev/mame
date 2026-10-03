@@ -163,11 +163,11 @@ void galpanic_state::draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &clipre
 {
 	for (int sy = cliprect.min_y; sy <= cliprect.max_y; sy++)
 	{
-		u16 const *const src = &m_fgvideoram[(sy << 8) & 0xff00];
+		u16 const *const src = &m_fgvideoram[((flip_screen() ? 223 - sy : sy) << 8) & 0xff00];
 		u16 *const dst = &bitmap.pix(sy);
 		for (int sx = cliprect.min_x; sx <= cliprect.max_x; sx++)
 		{
-			u16 const color = src[sx & 0xff];
+			u16 const color = src[(flip_screen() ? 255 - sx : sx) & 0xff];
 			if (color)
 				dst[sx] = color;
 		}
@@ -177,7 +177,7 @@ void galpanic_state::draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &clipre
 u32 galpanic_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// copy the temporary bitmap to the screen
-	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_bitmap, flip_screen(), flip_screen(), 0, flip_screen() ? -32 : 0, cliprect);
 
 	draw_fgbitmap(bitmap, cliprect);
 
@@ -219,6 +219,10 @@ void galpanic_state::m6295_bankswitch_w(offs_t offset, u16 data, u16 mem_mask)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_okibank->set_entry((data >> 8) & 0x0f);
+
+		// set by the game from the SW1:2 DIP (code at 0x522 in galpanic)
+		flip_screen_set(BIT(data, 14));
+		m_pandora->flip_screen_set(BIT(data, 14));
 
 		// used before title screen
 		m_pandora->set_clear_bitmap(BIT(data, 15));
@@ -274,7 +278,7 @@ void galpanic_state::oki_map(address_map &map)
 static INPUT_PORTS_START( galpanic )
 	PORT_START("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SW1:1" )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2") // flip screen? - code at 0x000522
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Reverse ) ) PORT_DIPLOCATION("SW1:2") // screen flip, latched at 0x900000 bit 14 - code at 0x000522
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x0004, IP_ACTIVE_LOW, "SW1:3" )
@@ -308,7 +312,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( galpanica )
 	PORT_START("DSW1")
-	COINAGE_TEST_LOC        // Unknown DSW switch 2 is flip screen? - code at 0x00060a
+	COINAGE_TEST_LOC        // DSW switch 2 is flip screen ("Reverse") - code at 0x00060a
 	GALS_PANIC_JOYSTICK_4WAY(1)
 
 	PORT_START("DSW2")
@@ -463,7 +467,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1990, galpanic,  0,        galpanic,  galpanic,  galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (unprotected, ver. 2.0)",MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galpanica, galpanic, galpanic,  galpanic,  galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (unprotected)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galpanicb, galpanic, galpanica, galpanica, galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (ULA protected, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galpanicc, galpanic, galpanica, galpanica, galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (ULA protected, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanic,  0,        galpanic,  galpanic,  galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (unprotected, ver. 2.0)",MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanica, galpanic, galpanic,  galpanic,  galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (unprotected)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanicb, galpanic, galpanica, galpanica, galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (ULA protected, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galpanicc, galpanic, galpanica, galpanica, galpanic_state, empty_init, ROT90, "Kaneko", "Gals Panic (ULA protected, set 2)", MACHINE_SUPPORTS_SAVE )
