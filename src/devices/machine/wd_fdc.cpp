@@ -3150,7 +3150,7 @@ wd1772_device::wd1772_device(const machine_config &mconfig, const char *tag, dev
 
 	step_times = wd1772_step_times;
 	delay_register_commit = 16;
-	delay_command_commit = 48;
+	delay_command_commit = 36; // 48 is too high on emax
 	disable_mfm = false;
 	has_enmf = false;
 	bus_invert_value = 0x00;
