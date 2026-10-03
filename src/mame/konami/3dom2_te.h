@@ -35,7 +35,7 @@ public:
 	uint32_t read(offs_t offset);
 	void write(offs_t offset, uint32_t data);
 
-	uint32_t *tram_ptr() const { return &m_tram[0]; }
+	uint32_t *tram_ptr() const { return m_tram.get(); }
 
 	enum te_reg_wmode
 	{
