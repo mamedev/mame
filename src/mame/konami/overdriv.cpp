@@ -598,11 +598,11 @@ void overdriv_state::overdriv(machine_config &config)
 
 	// U90 drives the common 6264 RAM pair; U98 observes the same data bus.
 	// Their SEL0 inputs are high (U90) and low (U98), respectively.
-	K053250(config, m_k053250[0], "palette", m_screen, 86, 16).set_ram("^roadram", 1);
+	K053250(config, m_k053250[0], "palette", m_screen, 86, 16).set_ram("roadram", 1);
 
 	// Align road line 0xd0 with sprite X=0x70 at the projection origin.
 	// The programmed road/sprite X scrolls are 0x57 and -0x2d respectively.
-	K053250(config, m_k053250[1], "palette", m_screen, 95, 16).set_ram("^roadram", 0);
+	K053250(config, m_k053250[1], "palette", m_screen, 95, 16).set_ram("roadram", 0);
 
 	// Road and sprite DMA latch the same scene in the display CPU's IRQ4.
 	// Display the completed road transfer without an additional DMA's delay.
