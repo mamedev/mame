@@ -17,7 +17,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 
-#define VERBOSE (LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
 #define ACIA_PORT_TAG "rs232"
@@ -126,15 +126,17 @@ namespace
 				break;
 
 			case 0x02:  /* FF52 */
-			case 0x03:  /* FF53 */
 				result = m_centronics_busy << 7;
+				break;
+
+			case 0x03:  /* FF53 */
 				break;
 
 			case 0x04: /* FF54 */
 			case 0x05: /* FF55 */
 			case 0x06: /* FF56 */
 			case 0x07: /* FF57 */
-				result = m_acia->read(offset % 0x02);
+				result = m_acia->read(offset & 0x03);
 				break;
 		}
 
@@ -175,7 +177,7 @@ namespace
 			case 0x05: /* FF55 */
 			case 0x06: /* FF56 */
 			case 0x07: /* FF57 */
-				m_acia->write(offset % 0x02, data);
+				m_acia->write(offset & 0x03, data);
 				break;
 		}
 	}
