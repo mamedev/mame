@@ -45,13 +45,10 @@ Fails to LOAD "$",8
 		</part>
 	</software>
 
-	<software name="bionicco" supported="no">
+	<software name="bionicco">
 		<description>Bionic Commando</description>
 		<year>1988</year>
 		<publisher>Capcom</publisher>
-		<notes><![CDATA[
-Loads but game does not start
-]]></notes>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -203,14 +200,10 @@ Loads but game does not start
 		</part>
 	</software>
 
-	<software name="rambo2n" cloneof="rambo2" supported="no">
+	<software name="rambo2n" cloneof="rambo2">
 		<description>Rambo: First Blood Part II (NTSC)</description>
 		<year>1985</year>
 		<publisher>Thunder Mountain</publisher>
-		<notes><![CDATA[
-LOAD "0:*",8,1
-Hangs on loading transition between trademarks and title
-]]></notes>
 		<info name="protection" value="signature" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 
@@ -242,7 +235,7 @@ Hangs on loading transition between trademarks and title
 		</part>
 	</software>
 
-	<software name="rambo3n" cloneof="rambo3" supported="no">
+	<software name="rambo3n" cloneof="rambo3">
 		<description>Rambo III (NTSC)</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
@@ -280,31 +273,6 @@ LOAD "STRIP POKER",8
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="strip_poker[artworx_1984](pal).g64" size="333744" crc="4a66bc83" sha1="68d66ee9f357c3964303e94c625ff9587f5df7c2"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="terramex" supported="no">
-		<description>Terramex</description>
-		<year>1988</year>
-		<publisher>Grand Slam</publisher>
-		<notes><![CDATA[
-LOAD "*",8,1
-Crashes after changing to side B
-]]></notes>
-		<info name="protection" value="custom_dos" />
-		<sharedfeat name="compatibility" value="PAL"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="333744">
-				<rom name="terramex_s1[grandslam_1988].g64" size="333744" crc="cc38f968" sha1="985eb00dcda7cb2499120b1801ca18df5cf2827e"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="333744">
-				<rom name="terramex_s2[grandslam_1988].g64" size="333744" crc="78408a59" sha1="f23fdea7292a95b076cc0a23c81e2e214e42129a"/>
 			</dataarea>
 		</part>
 	</software>
