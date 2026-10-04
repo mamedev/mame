@@ -219,7 +219,7 @@ void pmac6200_state::pmac6200(machine_config &config)
 	m_primetimeii->set_scsi_tag("f108:ncr53c96");
 	m_primetimeii->set_capella_tag("capella");
 
-	VALKYRIE(config, m_video, C32M); // TODO: confirm on real hardware
+	VALKYRIE(config, m_video, C32M);
 	m_video->write_irq().set(m_primetimeii, FUNC(primetime_device::via2_irq_w<0x40>));
 
 	ADB_BUS(config, m_adbbus);
