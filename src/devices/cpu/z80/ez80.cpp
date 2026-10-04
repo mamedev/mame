@@ -34,6 +34,17 @@ ez80_device::ez80_device(const machine_config &mconfig, device_type type, const 
 }
 
 ez80_device::ez80_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: ez80_device(mconfig, EZ80, tag, owner, clock)
+	: z80_device(mconfig, EZ80, tag, owner, clock),
+      m_program_config("program", ENDIANNESS_LITTLE, 8, 24, 0),
+      m_opcodes_config("opcodes", ENDIANNESS_LITTLE, 8, 24, 0)
 {
+}
+
+device_memory_interface::space_config_vector ez80_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_OPCODES, &m_opcodes_config),
+		std::make_pair(AS_IO, &m_io_config)
+	};
 }
