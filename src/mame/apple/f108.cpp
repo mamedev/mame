@@ -55,12 +55,12 @@ void f108_device::device_add_mconfig(machine_config &config)
 	NSCSI_BUS(config, m_scsibus);
 	// ... bus devices to be populated by drivers ...
 
-	NCR53C96(config, m_ncr1, 40_MHz_XTAL);
+	NCR53C96(config, m_ncr1, DERIVED_CLOCK(1, 2));
 	m_scsibus->set_external_device(7, m_ncr1);
 	m_ncr1->set_busmd(ncr53c96_device::BUSMD_1);
 
 
-	SCC85C30(config, m_scc, 31.3344_MHz_XTAL/4);
+	SCC85C30(config, m_scc, 8_MHz_XTAL);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(FUNC(f108_device::scc_irq_w));
 	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
