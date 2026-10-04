@@ -528,7 +528,7 @@ protected:
 		ATMEGA644_INT_SPM_RDY
 	};
 
-	// IRQ vectors for the ATMega640, 1280, 1281, 2560, 2561 series.
+	// Interrupt vectors for the ATMega640, 1280, 1281, 2560, 2561 series.
 	// Vector size is 2 words (=4 bytes).
 	// See https://content.arduino.cc/assets/ATmega640-1280-1281-2560-2561-Datasheet-DS40002211A.pdf
 	enum : uint8_t
@@ -705,10 +705,10 @@ protected:
 
 	struct interrupt_condition
 	{
-		uint8_t  m_irq_type; 	 // one of the INTIDX_x universal IRQ mappings
-		uint8_t  m_intindex;     // IRQ vector number
-		uint8_t  m_intreg;       // register containing IRQ flag
-		uint8_t  m_intmask;      // bitmask for the IRQ flag itself
+		uint8_t  m_intidx; 	     // one of the INTIDX_x universal interrupt mappings
+		uint8_t  m_intvector;    // interrupt vector number
+		uint8_t  m_intreg;       // register containing interrupt enable flag
+		uint8_t  m_intmask;      // bitmask for the interrupt enable flag itself
 		uint8_t  m_regindex;     // event indication register containing event flag e.g., TOV0
 		uint8_t  m_regmask;      // bitmask for the event flag itself
 	};
@@ -783,9 +783,9 @@ protected:
 	// other internal states
 	int m_icount;
 
-	// IRQs
-	uint8_t m_irq_statuses[INTIDX_COUNT];   // persistent, must be savestate-able
-	std::unique_ptr<interrupt_condition[]> m_irq_cond_table; // rebuilt at device_start
+	// Interrupt handling tables
+	uint8_t m_int_statuses[INTIDX_COUNT];   // persistent, must be savestate-able
+	std::unique_ptr<interrupt_condition[]> m_int_conditions_table; // rebuilt at device_start
 	uint8_t m_vector_size_in_words; // populated on construct. usually 2; chips with smaller flash will set this to 1
 
 	// memory access
@@ -797,22 +797,22 @@ protected:
 	void unimplemented_opcode(uint32_t op);
 
 	// interrupt handlers
-	void fire_irqs();
-	inline bool irqcond_entry_is_terminator(interrupt_condition condition);
-	void populate_irq_cond_table();
-	void update_irq(uint8_t intidx);
+	void fire_interrupts();
+	inline bool interrupt_condition_entry_is_terminator(interrupt_condition condition);
+	void populate_interrupt_condition_table();
+	void update_interrupt(uint8_t intidx);
 	
 	/**
-	 * Set IRQ flag for the given intidx. If the IRQ is also enabled,
+	 * Set interrupt flag for the given intidx. If the interrupt is also enabled,
 	 * set it to fire.
 	 */
-	void set_irq(uint8_t intidx);
+	void set_interrupt(uint8_t intidx);
 	
 	/**
-	 * Clear IRQ flag for the given intidx. If the IRQ was pending,
+	 * Clear interrupt flag for the given intidx. If the interrupt was pending,
 	 * then disable it.
 	 */
-	void clear_irq(uint8_t intidx);
+	void clear_interrupt(uint8_t intidx);
 
 	// ops
 	void populate_ops();
@@ -926,8 +926,8 @@ protected:
 	static const interrupt_condition s_mega32u4_int_conditions[];
 
 	// override this in subclasses and return the intended int_conditions tables above.
-	// the table will be read on device init to populate m_irq_cond_table.
-	virtual const interrupt_condition* irq_conditions();
+	// the table will be read on device init to populate m_int_conditions_table.
+	virtual const interrupt_condition* interrupt_conditions();
 };
 
 // ======================> avr8_device
@@ -1356,7 +1356,7 @@ public:
 	void atmega32u4_internal_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual const interrupt_condition* irq_conditions() override;
+	virtual const interrupt_condition* interrupt_conditions() override;
 	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
 	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
 	{
@@ -1378,7 +1378,7 @@ public:
 	void atmega644_internal_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual const interrupt_condition* irq_conditions() override;
+	virtual const interrupt_condition* interrupt_conditions() override;
 	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
 	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
 	{
@@ -1400,7 +1400,7 @@ public:
 	void atmega1284_internal_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual const interrupt_condition* irq_conditions() override;
+	virtual const interrupt_condition* interrupt_conditions() override;
 	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
 	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
 	{
@@ -1422,7 +1422,7 @@ public:
 	void atmega1280_internal_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual const interrupt_condition* irq_conditions() override;
+	virtual const interrupt_condition* interrupt_conditions() override;
 	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
 	{
 		mosi_mask = 0x04; // PB2
@@ -1443,7 +1443,7 @@ public:
 	void atmega2560_internal_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual const interrupt_condition* irq_conditions() override;
+	virtual const interrupt_condition* interrupt_conditions() override;
 	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
 	{
 		mosi_mask = 0x04; // PB2

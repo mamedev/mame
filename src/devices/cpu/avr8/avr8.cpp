@@ -49,11 +49,12 @@
 #define LOG_ASYNC           (1U << 25)
 #define LOG_TWI             (1U << 26)
 #define LOG_UART            (1U << 27)
-#define LOG_IRQ             (1U << 28)
+#define LOG_INTERRUPTS      (1U << 28)
 #define LOG_TIMERS          (LOG_TIMER0 | LOG_TIMER1 | LOG_TIMER2 | LOG_TIMER3 | LOG_TIMER4 | LOG_TIMER5)
 #define LOG_TIMER_TICKS     (LOG_TIMER0_TICK | LOG_TIMER1_TICK | LOG_TIMER2_TICK | LOG_TIMER3_TICK | LOG_TIMER4_TICK | LOG_TIMER5_TICK)
 #define LOG_ALL             (LOG_UNKNOWN | LOG_BOOT | LOG_TIMERS | LOG_EEPROM | LOG_GPIO | LOG_WDOG | LOG_CLOCK | LOG_POWER \
-							 | LOG_OSC | LOG_PINCHG | LOG_EXTMEM | LOG_ADC | LOG_DIGINPUT | LOG_ASYNC | LOG_TWI | LOG_UART | LOG_IRQ)
+							 | LOG_OSC | LOG_PINCHG | LOG_EXTMEM | LOG_ADC | LOG_DIGINPUT | LOG_ASYNC | LOG_TWI | LOG_UART \
+							 | LOG_INTERRUPTS)
 
 #define VERBOSE             (0)
 //#define LOG_OUTPUT_FUNC     osd_printf_info
@@ -1125,9 +1126,9 @@ void avr8_base_device::device_start()
 	populate_bool_flag_cache();
 	populate_shift_flag_cache();
 
-	populate_irq_cond_table();
-	std::fill_n(m_irq_statuses, INTIDX_COUNT, 0);
-	save_item(NAME(m_irq_statuses));
+	populate_interrupt_condition_table();
+	std::fill_n(m_int_statuses, INTIDX_COUNT, 0);
+	save_item(NAME(m_int_statuses));
 }
 
 template <int NumTimers>
@@ -1216,11 +1217,11 @@ void avr8_base_device::device_reset()
 
 	m_sleeping = false;
 
-	// clear any pending IRQs (the register zero loop above will have already
+	// clear any pending interrupts (the register zero loop above will have already
 	// acknowledged any pending and disabled any that could have fired)
 	for (int i = 0; i < INTIDX_COUNT; i++)
 	{
-		m_irq_statuses[i] = 0;
+		m_int_statuses[i] = 0;
 	}
 }
 
@@ -1352,82 +1353,80 @@ const avr8_base_device::interrupt_condition avr8_base_device::s_int_conditions[]
 	{ 0,             0,                0,         0,                  0,        0, } // end of list
 };
 
-const avr8_base_device::interrupt_condition* avr8_base_device::irq_conditions()
+const avr8_base_device::interrupt_condition* avr8_base_device::interrupt_conditions()
 {
 	return s_int_conditions;
 }
 
-void avr8_base_device::update_irq(uint8_t intidx)
+void avr8_base_device::update_interrupt(uint8_t intidx)
 {
-	// it's preferred you go through set_irq() or clear_irq() directly
+	// it's preferred you go through set_interrupt() or clear_interrupt() directly
 	// when that's the only operation that will be performed in that context.
 	// failure to do this might lead to unwanted side effects.
-	interrupt_condition condition = m_irq_cond_table[intidx];
-	if (!(0 <= condition.m_irq_type && condition.m_irq_type < INTIDX_COUNT))
+	interrupt_condition condition = m_int_conditions_table[intidx];
+	if (!(0 <= condition.m_intidx && condition.m_intidx < INTIDX_COUNT))
 	{
-		fatalerror("tried to update unmapped IRQ %d\n", intidx);
+		fatalerror("tried to update unmapped interrupt %d\n", intidx);
 	}
 
 	if (m_r[condition.m_regindex] & condition.m_regmask)
 	{
-		set_irq(intidx);
+		set_interrupt(intidx);
 	}
 	else
 	{
-		clear_irq(intidx);
+		clear_interrupt(intidx);
 	}
 }
 
-void avr8_base_device::set_irq(uint8_t intidx)
+void avr8_base_device::set_interrupt(uint8_t intidx)
 {
-	interrupt_condition condition = m_irq_cond_table[intidx];
-	if (!(0 <= condition.m_irq_type && condition.m_irq_type < INTIDX_COUNT))
+	interrupt_condition condition = m_int_conditions_table[intidx];
+	if (!(0 <= condition.m_intidx && condition.m_intidx < INTIDX_COUNT))
 	{
-		fatalerror("tried to set unmapped IRQ %d\n", intidx);
+		fatalerror("tried to set unmapped interrupt %d\n", intidx);
 	}
 
 	m_r[condition.m_regindex] |= condition.m_regmask;
 	if (m_r[condition.m_intreg] & condition.m_intmask)
 	{
-		m_irq_statuses[intidx] = 1;
+		m_int_statuses[intidx] = 1;
 	}
 }
 
-void avr8_base_device::clear_irq(uint8_t intidx)
+void avr8_base_device::clear_interrupt(uint8_t intidx)
 {
-	interrupt_condition condition = m_irq_cond_table[intidx];
-	if (!(0 <= condition.m_irq_type && condition.m_irq_type < INTIDX_COUNT))
+	interrupt_condition condition = m_int_conditions_table[intidx];
+	if (!(0 <= condition.m_intidx && condition.m_intidx < INTIDX_COUNT))
 	{
-		fatalerror("tried to ack unmapped IRQ %d\n", intidx);
+		fatalerror("tried to clear unmapped interrupt %d\n", intidx);
 	}
 
-	// Clear IRQ event flag that raised the interrupt.
-	// This will either happen because the MCU took the interrupt (if IRQs on),
-	// or if the interrupt was manually acknowledged (if IRQs off).
+	// Clear event flag that raised the interrupt.
+	// This will either happen because the MCU took the interrupt (if interrupts on),
+	// or if the interrupt was manually acknowledged (if interrupts off).
 	m_r[condition.m_regindex] &= ~condition.m_regmask;
 
-	m_irq_statuses[intidx] = 0;
+	m_int_statuses[intidx] = 0;
 }
 
-void avr8_base_device::fire_irqs()
+void avr8_base_device::fire_interrupts()
 {
-	int irq_winner_idx = -1;
-	bool irq_firing = false;
+	int interrupt_winner_idx = -1;
+	bool interrupt_firing = false;
 
 	if (BIT(m_r[SREG], SREG_I) == 0)
 	{
-		// IRQs are off globally (cli opcode, another IRQ handler running, etc.).
-		// Defer all IRQs until next pass.
 		return;
 	}
 
-	// Basic rules for IRQ handling on the AVR8 series:
+	// Basic rules for interrupts handling on the AVR8 series:
 	//
-	// - When multiple IRQs arrive at the same time, the one with the lowest
+	// - When multiple interrupts arrive at the same time, the one with the lowest
 	//   vector entry will win the race.
 	//
-	// - When an interrupt arrives when IRQs are disabled, it stays pending
-	//   and its flag stays 1. The IRQ stays pending until the MCU fires it,
+	// - When an interrupt arrives when interrupts are disabled, it stays pending
+	//   and its flag stays 1. The interrupt stays pending until the MCU fires it,
 	//   or it's manually acknowledged (e.g., TOV0 is set to 1 by the user
 	//   while interrupts are disabled).
 	//
@@ -1435,64 +1434,64 @@ void avr8_base_device::fire_irqs()
 	//   one or more of them loses the race; they simply get deferred until later.
 	//
 	// - The winning interrupt always clears its respective register flag
-	//   and gets acknowledged. The IRQ enable flag will stay set regardless.
+	//   and gets acknowledged. The interrupt enable flag will stay set regardless.
 	//
 	// - There should never be a case where we need a tiebreaker, i.e., every interrupt
 	//   should be mapped to its own unique vector.
 	for (int i = 0; i < INTIDX_COUNT; i++)
 	{
-		if (!m_irq_statuses[i]) continue;
+		if (!m_int_statuses[i]) continue;
 
-		interrupt_condition condition = m_irq_cond_table[i];
-		if (!(0 <= condition.m_irq_type && condition.m_irq_type < INTIDX_COUNT))
+		interrupt_condition condition = m_int_conditions_table[i];
+		if (!(0 <= condition.m_intidx && condition.m_intidx < INTIDX_COUNT))
 		{
-			fatalerror("internal IRQ %d set to fire, but wasn't mapped to anything", i);
+			fatalerror("interrupt %d set to fire, but wasn't mapped to anything", i);
 		}
 
 		if (!(m_r[condition.m_intreg] & condition.m_intmask))
 		{
-			logerror("%s: avr8 standard IRQ %d scheduled but its IRQ flag at %02x is disabled\n",
+			logerror("%s: avr8 standard interrupt %d scheduled but its enable flag at %02x is cleared\n",
 					 machine().describe_context(),
 					 i,
-					 condition.m_intindex
+					 condition.m_intreg
 					 );
 			continue;
 		}
 
-		irq_firing = true;
-		if (irq_winner_idx == -1)
+		interrupt_firing = true;
+		if (interrupt_winner_idx == -1)
 		{
-			irq_winner_idx = i;
+			interrupt_winner_idx = i;
 		}
-		else if (condition.m_intindex >= m_irq_cond_table[irq_winner_idx].m_intindex)
+		else if (condition.m_intvector >= m_int_conditions_table[interrupt_winner_idx].m_intvector)
 		{
-			LOGMASKED(LOG_IRQ, "IRQ %d already losing the race, currently winning is %d\n", i, irq_winner_idx);
+			LOGMASKED(LOG_INTERRUPTS, "interrupt %d already losing the race, currently winning is %d\n", i, interrupt_winner_idx);
 		}
 		else
 		{
-			LOGMASKED(LOG_IRQ, "IRQ %d now losing the race, currently winning is %d\n", i, irq_winner_idx);
-			irq_winner_idx = i;
+			LOGMASKED(LOG_INTERRUPTS, "interrupt %d now losing the race, currently winning is %d\n", i, interrupt_winner_idx);
+			interrupt_winner_idx = i;
 		}
 	}
 
-	if (irq_firing)
+	if (interrupt_firing)
 	{
-		LOGMASKED(LOG_IRQ, "IRQ %d won the race, firing it.\n", irq_winner_idx);
+		LOGMASKED(LOG_INTERRUPTS, "interrupt %d won the race, firing it.\n", interrupt_winner_idx);
 		
 		m_r[SREG] &= ~SREG_MASK_I;
 		push((m_pc >> 1) & 0x00ff);
 		push((m_pc >> 9) & 0x00ff);
 		// TODO: 24-bit address pushes for 2560 and friends that use bigger flash space
 
-		m_pc = m_irq_cond_table[irq_winner_idx].m_intindex * (2 * m_vector_size_in_words);
+		m_pc = m_int_conditions_table[interrupt_winner_idx].m_intvector * (2 * m_vector_size_in_words);
 
 		m_sleeping = false;
 
-		clear_irq(irq_winner_idx);
+		clear_interrupt(interrupt_winner_idx);
 	}
 }
 
-inline bool avr8_base_device::irqcond_entry_is_terminator(interrupt_condition condition)
+inline bool avr8_base_device::interrupt_condition_entry_is_terminator(interrupt_condition condition)
 {
 	return std::all_of(
 				(uint8_t*)&condition,
@@ -1500,21 +1499,21 @@ inline bool avr8_base_device::irqcond_entry_is_terminator(interrupt_condition co
 				[] (uint8_t value) { return value == 0; });
 }
 
-void avr8_base_device::populate_irq_cond_table()
+void avr8_base_device::populate_interrupt_condition_table()
 {
-	const avr8_base_device::interrupt_condition* irq_conds = irq_conditions();
+	const avr8_base_device::interrupt_condition* int_conds = interrupt_conditions();
 	
-	m_irq_cond_table = std::make_unique<avr8_base_device::interrupt_condition[]>(INTIDX_COUNT);
+	m_int_conditions_table = std::make_unique<avr8_base_device::interrupt_condition[]>(INTIDX_COUNT);
 
-	// unwire all IRQ vectors by default
 	for (int i = 0; i < INTIDX_COUNT; i++)
 	{
-		m_irq_cond_table[i].m_irq_type = INTIDX_COUNT;
+		// unwire all vectors by default
+		m_int_conditions_table[i].m_intidx = INTIDX_COUNT;
 	}
 
-	for (int i = 0; !irqcond_entry_is_terminator(irq_conds[i]); i++)
+	for (int i = 0; !interrupt_condition_entry_is_terminator(int_conds[i]); i++)
 	{
-		std::memcpy(&m_irq_cond_table[irq_conds[i].m_irq_type], &irq_conds[i], sizeof(avr8_base_device::interrupt_condition));
+		std::memcpy(&m_int_conditions_table[int_conds[i].m_intidx], &int_conds[i], sizeof(avr8_base_device::interrupt_condition));
 	}
 }
 
@@ -1542,7 +1541,7 @@ bool atmega328_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) 
 
 const avr8_base_device::interrupt_condition avr8_base_device::s_mega32u4_int_conditions[] =
 {
-	// irq id        vector                  irq reg   irq reg mask        flag reg  flag reg mask
+	// intidx        vector                  irq reg   irq reg mask        flag reg  flag reg mask
 	{ INTIDX_SPI,    ATMEGA32U4_INT_SPI_STC, SPCR,     SPCR_SPIE_MASK,     SPSR,     SPSR_SPIF_MASK,   },
 	{ INTIDX_OCF0B,  ATMEGA32U4_INT_T0COMPB, TIMSK0,   TIMSK0_OCIE0B_MASK, TIFR0,    TIFR0_OCF0B_MASK, },
 	{ INTIDX_OCF0A,  ATMEGA32U4_INT_T0COMPA, TIMSK0,   TIMSK0_OCIE0A_MASK, TIFR0,    TIFR0_OCF0A_MASK, },
@@ -1557,7 +1556,7 @@ const avr8_base_device::interrupt_condition avr8_base_device::s_mega32u4_int_con
 	{ 0,             0,                      0,        0,                  0,        0, } // end of list
 };
 
-const avr8_base_device::interrupt_condition* atmega32u4_device::irq_conditions()
+const avr8_base_device::interrupt_condition* atmega32u4_device::interrupt_conditions()
 {
 	return s_mega32u4_int_conditions;
 }
@@ -1595,12 +1594,12 @@ const avr8_base_device::interrupt_condition avr8_base_device::s_mega640_int_cond
 	{ 0,             0,                      0,        0,                  0,        0, } // end of list
 };
 
-const avr8_base_device::interrupt_condition* atmega1280_device::irq_conditions()
+const avr8_base_device::interrupt_condition* atmega1280_device::interrupt_conditions()
 {
 	return s_mega640_int_conditions;
 }
 
-const avr8_base_device::interrupt_condition* atmega2560_device::irq_conditions()
+const avr8_base_device::interrupt_condition* atmega2560_device::interrupt_conditions()
 {
 	return s_mega640_int_conditions;
 }
@@ -1627,12 +1626,12 @@ const avr8_base_device::interrupt_condition avr8_base_device::s_mega644_int_cond
 	{ 0,              0,                      0,        0,                  0,        0, } // end of list
 };
 
-const avr8_base_device::interrupt_condition* atmega644_device::irq_conditions()
+const avr8_base_device::interrupt_condition* atmega644_device::interrupt_conditions()
 {
 	return s_mega644_int_conditions;
 }
 
-const avr8_base_device::interrupt_condition* atmega1284_device::irq_conditions()
+const avr8_base_device::interrupt_condition* atmega1284_device::interrupt_conditions()
 {
 	return s_mega644_int_conditions;
 }
@@ -1691,7 +1690,7 @@ void avr8_device<NumTimers>::spi_tick()
 	if (m_spi_prescale_countdown < 0)
 	{
 		m_r[SPDR] = m_spi_rx_shift;
-		set_irq(INTIDX_SPI);
+		set_interrupt(INTIDX_SPI);
 		m_spi_active = false;
 	}
 }
@@ -1704,7 +1703,7 @@ void avr8_device<NumTimers>::timer0_tick_norm()
 	if (m_r[TCNT0] == 0xff)
 	{
 		m_r[TCNT0] = 0;
-		set_irq(INTIDX_TOV0);
+		set_interrupt(INTIDX_TOV0);
 	}
 	else
 	{
@@ -1729,13 +1728,13 @@ void avr8_device<NumTimers>::timer0_tick_ctc_norm()
 
 	if (m_r[TCNT0] == m_r[OCR0A] - 1)
 	{
-		set_irq(s_int0[AVR8_REG_A]);
+		set_interrupt(s_int0[AVR8_REG_A]);
 		m_r[TCNT0] = 0;
 	}
 	else if (m_r[TCNT0] == m_r[OCR0B] - 1)
 	{
 		m_r[TIFR0] |= s_ocf0[AVR8_REG_B];
-		set_irq(s_int0[AVR8_REG_B]);
+		set_interrupt(s_int0[AVR8_REG_B]);
 		m_r[TCNT0]++;
 	}
 	else
@@ -1802,7 +1801,7 @@ void avr8_device<NumTimers>::timer0_tick_fast_pwm()
 
 	if (m_r[TCNT0] == 0xff)
 	{
-		set_irq(INTIDX_TOV0);
+		set_interrupt(INTIDX_TOV0);
 
 		m_r[TCNT0] = 0;
 
@@ -1871,7 +1870,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 		if (timer1_count == 0xffff)
 		{
 			LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 CTC_OCR, TOP, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-			set_irq(INTIDX_TOV1);
+			set_interrupt(INTIDX_TOV1);
 			timer1_count = 0;
 			increment = 0;
 		}
@@ -1907,12 +1906,12 @@ inline void avr8_device<NumTimers>::timer1_tick()
 			}
 
 			m_r[TIFR1] |= s_ocf1[AVR8_REG_A];
-			update_irq(s_int1[AVR8_REG_A]);
+			update_interrupt(s_int1[AVR8_REG_A]);
 		}
 		else if (timer1_count == 0)
 		{
 			LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 CTC_OCR, BOTTOM, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-			clear_irq(INTIDX_TOV1);
+			clear_interrupt(INTIDX_TOV1);
 		}
 
 		if (timer1_count == m_ocr1[AVR8_REG_B])
@@ -1938,7 +1937,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 			}
 
 			m_r[TIFR1] |= s_ocf1[AVR8_REG_B];
-			update_irq(s_int1[AVR8_REG_B]);
+			update_interrupt(s_int1[AVR8_REG_B]);
 		}
 		break;
 
@@ -1946,7 +1945,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 		if (timer1_count == m_ocr1[AVR8_REG_A])
 		{
 			LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 FAST_PWM_OCR, OCR1A, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-			set_irq(INTIDX_TOV1);
+			set_interrupt(INTIDX_TOV1);
 			timer1_count = 0;
 			increment = 0;
 
@@ -1975,12 +1974,12 @@ inline void avr8_device<NumTimers>::timer1_tick()
 			}
 
 			m_r[TIFR1] |= s_ocf1[AVR8_REG_A];
-			update_irq(s_int1[AVR8_REG_A]);
+			update_interrupt(s_int1[AVR8_REG_A]);
 		}
 		else if (timer1_count == 0)
 		{
 			LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 FAST_PWM_OCR, BOTTOM A, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-			clear_irq(INTIDX_TOV1);
+			clear_interrupt(INTIDX_TOV1);
 
 			switch (ChannelModeA)
 			{
@@ -2030,7 +2029,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 			}
 
 			m_r[TIFR1] |= s_ocf1[AVR8_REG_B];
-			update_irq(s_int1[AVR8_REG_B]);
+			update_interrupt(s_int1[AVR8_REG_B]);
 		}
 		else if (timer1_count == 0)
 		{
@@ -2085,12 +2084,12 @@ inline void avr8_device<NumTimers>::timer1_tick()
 			}
 
 			m_r[TIFR1] |= s_ocf1[AVR8_REG_A];
-			update_irq(s_int1[AVR8_REG_A]);
+			update_interrupt(s_int1[AVR8_REG_A]);
 		}
 		else if (timer1_count == 0)
 		{
 			LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 FAST_PWM_ICR, BOTTOM A, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-			clear_irq(INTIDX_TOV1);
+			clear_interrupt(INTIDX_TOV1);
 
 			switch (ChannelModeA)
 			{
@@ -2139,7 +2138,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 			}
 
 			m_r[TIFR1] |= s_ocf1[AVR8_REG_B];
-			update_irq(s_int1[AVR8_REG_B]);
+			update_interrupt(s_int1[AVR8_REG_B]);
 		}
 		else if (timer1_count == 0)
 		{
@@ -2165,7 +2164,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 
 		if (timer1_count == icr1)
 		{
-			set_irq(INTIDX_TOV1);
+			set_interrupt(INTIDX_TOV1);
 			timer1_count = 0;
 			increment = 0;
 		}
@@ -2287,11 +2286,11 @@ void avr8_device<NumTimers>::timer2_tick_norm()
 	LOGMASKED(LOG_TIMER2, "%s: timer2_tick_norm; WGM02_NORMAL\n", machine().describe_context());
 	if (m_r[TCNT2] == 0xff)
 	{
-		set_irq(INTIDX_TOV2);
+		set_interrupt(INTIDX_TOV2);
 	}
 	else
 	{
-		clear_irq(INTIDX_TOV2);
+		clear_interrupt(INTIDX_TOV2);
 	}
 	m_r[TCNT2]++;
 	m_timer_prescale_count[2] -= m_timer_prescale[2];
@@ -2344,7 +2343,7 @@ void avr8_device<NumTimers>::timer2_tick_fast_pwm_cmp()
 	else if (count == 0)
 	{
 		m_r[TIFR2] &= ~TIFR2_TOV2_MASK;
-		clear_irq(INTIDX_TOV2);
+		clear_interrupt(INTIDX_TOV2);
 	}
 
 	if (count == m_r[OCR2B])
@@ -2354,7 +2353,7 @@ void avr8_device<NumTimers>::timer2_tick_fast_pwm_cmp()
 
 	count += increment;
 
-	update_irq(INTIDX_TOV2);
+	update_interrupt(INTIDX_TOV2);
 	m_r[TCNT2] = count;
 	m_timer_prescale_count[2] -= m_timer_prescale[2];
 }
@@ -2443,7 +2442,7 @@ void avr8_device<NumTimers>::timer4_tick()
 		LOGMASKED(LOG_TIMER4, "%s: timer4: tick WGM4_CTC_OCR: %d\n", machine().describe_context(), count);
 		if (count == 0xffff)
 		{
-			set_irq(INTIDX_TOV4);
+			set_interrupt(INTIDX_TOV4);
 			count = 0;
 			increment = 0;
 		}
@@ -2695,7 +2694,7 @@ void avr8_device<NumTimers>::change_spcr(uint8_t data)
 	if (changed & SPCR_SPIE_MASK)
 	{
 		// Check for SPI interrupt condition
-		update_irq(INTIDX_SPI);
+		update_interrupt(INTIDX_SPI);
 	}
 
 	if (low_to_high & SPCR_SPE_MASK)
@@ -2915,9 +2914,9 @@ void avr8_device<NumTimers>::tifr0_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER0, "%s: TIFR0 = %02x\n", machine().describe_context(), data);
 	
-	if (data & TIFR0_OCF0A_MASK) clear_irq(INTIDX_OCF0A);
-	if (data & TIFR0_OCF0B_MASK) clear_irq(INTIDX_OCF0B);
-	if (data & TIFR0_TOV0_MASK) clear_irq(INTIDX_TOV0);
+	if (data & TIFR0_OCF0A_MASK) clear_interrupt(INTIDX_OCF0A);
+	if (data & TIFR0_OCF0B_MASK) clear_interrupt(INTIDX_OCF0B);
+	if (data & TIFR0_TOV0_MASK) clear_interrupt(INTIDX_TOV0);
 }
 
 template <int NumTimers>
@@ -2925,10 +2924,10 @@ void avr8_device<NumTimers>::tifr1_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER1, "%s: TIFR1 = %02x\n", machine().describe_context(), data);
 
-	if (data & TIFR1_ICF1_MASK) clear_irq(INTIDX_ICF1);
-	if (data & TIFR1_OCF1A_MASK) clear_irq(INTIDX_OCF1A);
-	if (data & TIFR1_OCF1B_MASK) clear_irq(INTIDX_OCF1B);
-	if (data & TIFR1_TOV1_MASK) clear_irq(INTIDX_TOV1);
+	if (data & TIFR1_ICF1_MASK) clear_interrupt(INTIDX_ICF1);
+	if (data & TIFR1_OCF1A_MASK) clear_interrupt(INTIDX_OCF1A);
+	if (data & TIFR1_OCF1B_MASK) clear_interrupt(INTIDX_OCF1B);
+	if (data & TIFR1_TOV1_MASK) clear_interrupt(INTIDX_TOV1);
 }
 
 template <int NumTimers>
@@ -2936,9 +2935,9 @@ void avr8_device<NumTimers>::tifr2_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER2, "%s: TIFR2 = %02x\n", machine().describe_context(), data);
 	
-	if (m_r[TIFR2] & TIFR2_OCF2A_MASK) clear_irq(INTIDX_OCF2A);
-	if (m_r[TIFR2] & TIFR2_OCF2B_MASK) clear_irq(INTIDX_OCF2B);
-	if (m_r[TIFR2] & TIFR2_TOV2_MASK) clear_irq(INTIDX_TOV2);
+	if (m_r[TIFR2] & TIFR2_OCF2A_MASK) clear_interrupt(INTIDX_OCF2A);
+	if (m_r[TIFR2] & TIFR2_OCF2B_MASK) clear_interrupt(INTIDX_OCF2B);
+	if (m_r[TIFR2] & TIFR2_TOV2_MASK) clear_interrupt(INTIDX_TOV2);
 }
 
 template <int NumTimers>
@@ -3181,9 +3180,9 @@ void avr8_device<NumTimers>::timsk0_w(uint8_t data)
 	LOGMASKED(LOG_TIMER0, "%s: TIMSK0 = %02x\n", machine().describe_context(), data);
 	m_r[TIMSK0] = data;
 	
-	update_irq(INTIDX_OCF0A);
-	update_irq(INTIDX_OCF0B);
-	update_irq(INTIDX_TOV0);
+	update_interrupt(INTIDX_OCF0A);
+	update_interrupt(INTIDX_OCF0B);
+	update_interrupt(INTIDX_TOV0);
 }
 
 template <int NumTimers>
@@ -3191,10 +3190,10 @@ void avr8_device<NumTimers>::timsk1_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER1, "%s: TIMSK1 = %02x\n", machine().describe_context(), data);
 	m_r[TIMSK1] = data;
-	update_irq(INTIDX_ICF1);
-	update_irq(INTIDX_OCF1A);
-	update_irq(INTIDX_OCF1B);
-	update_irq(INTIDX_TOV1);
+	update_interrupt(INTIDX_ICF1);
+	update_interrupt(INTIDX_OCF1A);
+	update_interrupt(INTIDX_OCF1B);
+	update_interrupt(INTIDX_TOV1);
 }
 
 template <int NumTimers>
@@ -3203,9 +3202,9 @@ void avr8_device<NumTimers>::timsk2_w(uint8_t data)
 	LOGMASKED(LOG_TIMER2, "%s: TIMSK2 = %02x\n", machine().describe_context(), data);
 	m_r[TIMSK2] = data;
 
-	update_irq(INTIDX_OCF2A);
-	update_irq(INTIDX_OCF2B);
-	update_irq(INTIDX_TOV2);
+	update_interrupt(INTIDX_OCF2A);
+	update_interrupt(INTIDX_OCF2B);
+	update_interrupt(INTIDX_TOV2);
 }
 
 template <int NumTimers>
@@ -3214,11 +3213,11 @@ void avr8_device<NumTimers>::timsk3_w(uint8_t data)
 	LOGMASKED(LOG_TIMER3, "%s: TIMSK3 = %02x\n", machine().describe_context(), data);
 	m_r[TIMSK3] = data;
 
-	// TODO: implement timer 3. trying to fire these IRQs will crash arduboy games!
+	// TODO: implement timer 3. trying to fire these interrupts will crash arduboy games!
 
-	// update_irq(INTIDX_OCF3A);
-	// update_irq(INTIDX_OCF3B);
-	// update_irq(INTIDX_TOV3);
+	// update_interrupt(INTIDX_OCF3A);
+	// update_interrupt(INTIDX_OCF3B);
+	// update_interrupt(INTIDX_TOV3);
 }
 
 template <int NumTimers>
@@ -3227,11 +3226,11 @@ void avr8_device<NumTimers>::timsk4_w(uint8_t data)
 	LOGMASKED(LOG_TIMER4, "%s: TIMSK4 = %02x\n", machine().describe_context(), data);
 	m_r[TIMSK4] = data;
 
-	// TODO: implement timer 4. trying to fire these IRQs will crash arduboy games!
+	// TODO: implement timer 4. trying to fire these interrupts will crash arduboy games!
 
-	// update_irq(INTIDX_OCF4A);
-	// update_irq(INTIDX_OCF4B);
-	// update_irq(INTIDX_TOV4);
+	// update_interrupt(INTIDX_OCF4A);
+	// update_interrupt(INTIDX_OCF4B);
+	// update_interrupt(INTIDX_TOV4);
 }
 
 template <int NumTimers>
@@ -3242,9 +3241,9 @@ void avr8_device<NumTimers>::timsk5_w(uint8_t data)
 
 	// TODO: implement timer 5
 
-	// update_irq(INTIDX_OCF5A);
-	// update_irq(INTIDX_OCF5B);
-	// update_irq(INTIDX_TOV5);
+	// update_interrupt(INTIDX_OCF5A);
+	// update_interrupt(INTIDX_OCF5B);
+	// update_interrupt(INTIDX_TOV5);
 }
 
 template <int NumTimers>
@@ -3900,15 +3899,15 @@ void avr8_device<NumTimers>::execute_run()
 		// external context; only take the actual interrupt here, at a safe instruction boundary
 		if (m_r[PCIFR])
 		{
-			update_irq(INTIDX_PCINT0);
-			update_irq(INTIDX_PCINT1);
-			update_irq(INTIDX_PCINT2);
+			update_interrupt(INTIDX_PCINT0);
+			update_interrupt(INTIDX_PCINT1);
+			update_interrupt(INTIDX_PCINT2);
 		}
 
 		if (m_r[EIFR])
 		{
-			update_irq(INTIDX_INT0);
-			update_irq(INTIDX_INT1);
+			update_interrupt(INTIDX_INT0);
+			update_interrupt(INTIDX_INT1);
 		}
 
 		m_icount -= m_opcycles;
@@ -3964,7 +3963,7 @@ void avr8_device<NumTimers>::execute_run()
 				}
 			}
 
-			fire_irqs();
+			fire_interrupts();
 		}
 	}
 }
