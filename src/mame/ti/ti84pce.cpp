@@ -34,7 +34,6 @@ private:
 	required_shared_ptr<uint8_t> m_nvram;
     
     void mem_map(address_map &map);
-    uint8_t btns_r(offs_t cols);
     uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
