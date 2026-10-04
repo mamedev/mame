@@ -1210,6 +1210,11 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 			clipvert[i].y += 0.0005f;
 	}
 
+	// A quad clipped to three vertices is still rendered as a fan of four;
+	// repeat the last vertex rather than reading an unset clipvert[3].
+	if (numverts == 3)
+		clipvert[3] = clipvert[2];
+
 	mz_poly_extra_data& extra = m_state.m_poly->object_data().next();
 
 	if (ctrl_word & 0x01000000)
