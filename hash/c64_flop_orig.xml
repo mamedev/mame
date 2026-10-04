@@ -333,12 +333,12 @@ Graphics issues
 		</part>
 	</software>
 
-	<software name="10thfrm" supported="no">
+	<software name="10thfrm">
 		<description>10th Frame</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="usage" value="Requires dongle in cassette port (or just press PLAY on tape)" />
 		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="requirement" value="tape:access"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="319232">
@@ -590,7 +590,6 @@ Graphics issues
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="319232">
 				<rom name="MaskII_s0.g64" size="319232" crc="48d3e2c0" sha1="6440d807e8ebeb95d4257b5867875fbcb0906e5c"/>
 			</dataarea>
@@ -606,19 +605,6 @@ Graphics issues
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="319232">
 				<rom name="MiamiVice_s0.g64" size="319232" crc="092aa033" sha1="621c67d24ef622dfb01c9b4d2004a200a6cc487f"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="nemesis">
-		<description>Nemesis the Warlock</description>
-		<year>1987</year>
-		<publisher>Martech</publisher>
-		<sharedfeat name="compatibility" value="PAL"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="311302">
-				<rom name="NemesisTheWarlock_s0.g64" size="311302" crc="99df1184" sha1="f8d78893f20a194ef6543d195e12b2ac4407f628" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -689,7 +675,6 @@ Graphics issues
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="319232">
 				<rom name="StreetHassle_s0.g64" size="319232" crc="9a0967c0" sha1="4ce5d59772ee911b8d058c2fa700a87649376d52"/>
 			</dataarea>
@@ -703,7 +688,6 @@ Graphics issues
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="319232">
 				<rom name="Tarzan_s0.g64" size="319232" crc="077bafbd" sha1="72f01b8179c595ad20c656572d346a3dca36255f"/>
 			</dataarea>
@@ -1305,7 +1289,6 @@ Graphics issues
 		<sharedfeat name="compatibility" value="PAL,NTSC"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="303372">
 				<rom name="EasyFinanceI_s0.g64" size="303372" crc="685f65d1" sha1="7d96138456925eed8b12099883488e1f3516a749"/>
 			</dataarea>
@@ -1352,7 +1335,6 @@ Graphics issues
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="319232">
 				<rom name="LaserBASIC_s0.g64" size="319232" crc="6d2aa409" sha1="71f337e2e5d77f592bb45541fff3c44caf36506e"/>
 			</dataarea>
@@ -1366,7 +1348,6 @@ Graphics issues
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="319232">
 				<rom name="MiniOfficeII_s0.g64" size="319232" crc="e723caaf" sha1="4a64e3e63b5b19446ef5e464f575620b5a72e688"/>
 			</dataarea>
@@ -1406,7 +1387,6 @@ Graphics issues
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="279582">
 				<rom name="Teksti64_s0.g64" size="279582" crc="5615c3fe" sha1="f35ee0e5be443e051f9fb8a786336feebe5daacf"/>
 			</dataarea>

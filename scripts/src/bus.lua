@@ -4682,6 +4682,8 @@ end
 
 if BUSES["PET"] then
 	files {
+		MAME_DIR .. "src/devices/bus/pet/access.cpp",
+		MAME_DIR .. "src/devices/bus/pet/access.h",
 		MAME_DIR .. "src/devices/bus/pet/cass.cpp",
 		MAME_DIR .. "src/devices/bus/pet/cass.h",
 		MAME_DIR .. "src/devices/bus/pet/c2n.cpp",
