@@ -136,6 +136,7 @@ private:
 	void zeus_register_update(offs_t offset);
 	int zeus_fifo_process(const uint32_t *data, int numwords);
 	void zeus_draw_model(uint32_t texdata, bool logit);
+	uint16_t zeus_vertex_intensity(uint32_t packed_normal);
 
 	void log_fifo_command(const uint32_t *data, int numwords, const char *suffix);
 	void log_waveram(uint32_t length_and_base);
@@ -157,6 +158,7 @@ private:
 	int16_t     m_zeus_matrix[3][3]{};
 	int32_t     m_zeus_point[3]{};
 	int16_t     m_zeus_light[3]{};
+	bool        m_zeus_light_valid = false;
 	void *      m_zeus_renderbase = 0;
 	uint32_t    m_zeus_palbase = 0;
 	uint32_t    m_zeus_unkbase = 0;

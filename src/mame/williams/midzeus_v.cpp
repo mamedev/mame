@@ -256,6 +256,8 @@ void midzeus_state::video_start()
 	save_item(NAME(m_zeus_matrix));
 	save_item(NAME(m_zeus_point));
 	save_item(NAME(m_zeus_light));
+	save_item(NAME(m_zeus_light_valid));
+	save_item(NAME(m_zeus_unkbase));
 	save_item(NAME(m_zeus_palbase));
 	save_item(NAME(m_zeus_objdata));
 	save_item(NAME(m_zeus_cliprect.min_x));
@@ -893,6 +895,7 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 			m_zeus_light[0] = (int16_t)(data[1] & 0xffff);
 			m_zeus_light[1] = (int16_t)(data[1] >> 16);
 			m_zeus_light[2] = (int16_t)(data[0] & 0xffff);
+			m_zeus_light_valid = true;
 			break;
 		// 0x25: display control?
 		// 0x28: same for mk4b
@@ -1059,6 +1062,47 @@ void midzeus_state::zeus_draw_model(uint32_t texdata, bool logit)
  *
  *************************************/
 
+// Experimental response-table model derived from MK4 command-stream research.
+// TODO: Confirm the shift, signed saturation, output scale and enable condition
+// against measured Zeus results. This does not execute the uploaded microcode.
+// MK4-specific contrast curves, asset filters and rim-light overrides are omitted.
+uint16_t midzeus_state::zeus_vertex_intensity(uint32_t packed_normal)
+{
+	// Long-format quads contain three signed ten-bit components per vertex.
+	// Preserve the previous unlit value when no usable response is available.
+	if (!m_zeus_light_valid || !(packed_normal & 0x3fffffff) || (m_zeus_unkbase >> 24) < 15)
+		return 0xffff;
+
+	uint32_t const block = (m_zeus_unkbase % WAVERAM0_WIDTH)
+			+ ((m_zeus_unkbase >> 12) % WAVERAM0_HEIGHT) * WAVERAM0_WIDTH;
+	if (block > WAVERAM0_WIDTH * WAVERAM0_HEIGHT - 16)
+		return 0xffff;
+
+	int32_t const normal[3] =
+	{
+		util::sext(BIT(packed_normal, 0, 10), 10),
+		util::sext(BIT(packed_normal, 10, 10), 10),
+		util::sext(BIT(packed_normal, 20, 10), 10)
+	};
+
+	// N dot (transpose(M) * L), without a translation or intermediate shift.
+	// The complete s10 * s16 * s16 sum fits in a signed 46-bit accumulator.
+	int64_t dot = 0;
+	for (unsigned column = 0; column < 3; ++column)
+	{
+		int64_t model_light = 0;
+		for (unsigned row = 0; row < 3; ++row)
+			model_light += int64_t(m_zeus_matrix[row][column]) * m_zeus_light[row];
+		dot += normal[column] * model_light;
+	}
+
+	int64_t const scaled = dot >> 26;
+	uint32_t const index = uint32_t(std::clamp<int64_t>(scaled, -64, 63)) & 0x7f;
+	const void *const table = waveram0_ptr_from_block_addr(m_zeus_unkbase);
+	return uint16_t(WAVERAM_READ8(table, index)) << 8;
+}
+
+
 void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, uint32_t texdata, bool logit)
 {
 	poly_vertex clipvert[8];
@@ -1116,23 +1160,12 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 				return;
 		}
 
-		if (long_fmt)
-		{
-#if 0
-			// TODO: Lighting
-			uint32_t inormal = databuffer[10 + i];
-			int32_t xn = util::sext((inormal >>  0) & 0x3ff, 10);
-			int32_t yn = util::sext((inormal >> 10) & 0x3ff, 10);
-			int32_t zn = util::sext((inormal >> 20) & 0x3ff, 10);
-#endif
-		}
-
 		vert[i].x = x;
 		vert[i].y = y;
 		vert[i].p[0] = z;
 		vert[i].p[1] = u << ushift;
 		vert[i].p[2] = v << vshift;
-		vert[i].p[3] = 0xffff;
+		vert[i].p[3] = long_fmt ? m_state.zeus_vertex_intensity(databuffer[10 + i]) : 0xffff;
 
 #if (VERBOSE & LOG_QUAD)
 		if (logit)
