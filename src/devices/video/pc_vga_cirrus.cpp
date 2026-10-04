@@ -480,7 +480,7 @@ void cirrus_gd5428_vga_device::gc_map(address_map &map)
 				m_blt_system_count = 0;
 				m_blt_system_buffer = 0;
 			}
-			else if(data & 0x02)
+			else if (BIT(data, 1))
 			{
 				if(m_blt_mode & 0x04)  // blit source is system memory
 					start_system_bitblt();
