@@ -1223,14 +1223,14 @@ Hi-score table is corrupt (dump really?)
 
 <!-- !Demos -->
 
-	<software name="2ndreal" supported="no">
+	<!-- https://www.youtube.com/watch?v=HiWbKQ_gUKQ -->
+	<software name="2ndreal" supported="partial">
 		<description>Second Reality</description>
 		<year>1997</year>
 		<publisher>Smash Designs &amp; The Obsessed Maniacs</publisher>
 		<notes><![CDATA[
 LOAD "SECOND REALITY*",8
-https://www.youtube.com/watch?v=HiWbKQ_gUKQ
-First screen has [VIC] background stripes, ship transition clips in between, bad transition to title screen, hangs or crash there
+Runs until disk side change prompt
 ]]></notes>
 		<info name="usage" value="Set SID as soundcard in selection screen (press right ctrl 3 times then enter key)" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
@@ -1246,6 +1246,45 @@ First screen has [VIC] background stripes, ship transition clips in between, bad
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="174848">
 				<rom name="2nd2.d64" size="174848" crc="222c5b50" sha1="ea440448a32fe7a2e952e3265450b10c25233729"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crazydem" supported="no">
+		<description>Crazy Demo</description>
+		<year>2024</year>
+		<publisher>Wyndex</publisher>
+		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="crazydemo-wyndex.d81" size="819200" crc="8285e39e" sha1="45fdc49f90ecce7abe7247c6744cd0c0d902dab2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scpukick" supported="no">
+		<description>SuperCPU Kicks!</description>
+		<year>1999</year>
+		<publisher>DMAgic</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="scpu1.d64" size="174848" crc="ae5378c0" sha1="6fe8efc36029167d39acd8f9af585a38ce4d624e"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="scpu2.d64" size="174848" crc="754f3d8f" sha1="0e2cd1c50117b6ef27e2325e67b9c1500fb1173f"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="scpu3.d64" size="174848" crc="bdd6952c" sha1="a958773689452491848093dd71c17b1858c2184f"/>
 			</dataarea>
 		</part>
 	</software>
