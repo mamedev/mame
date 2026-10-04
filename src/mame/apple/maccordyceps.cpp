@@ -185,14 +185,14 @@ void pmac6200_state::pmac6200(machine_config &config)
 	PPC603(config, m_maincpu, 75_MHz_XTAL);
 	// BUS_RETRY: TurboSCSI stalls the CPU until DRQ
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS | PPCDRC_BUS_RETRY);
-	m_maincpu->set_bus_frequency(XTAL(75_MHz_XTAL)); // FSB freq to Capella
+	m_maincpu->set_bus_frequency(75_MHz_XTAL / 2); // FSB freq to Capella
 	m_maincpu->set_addrmap(AS_PROGRAM, &pmac6200_state::pmac6200_map);
 	config.set_perfect_quantum(m_maincpu); // chimes of death without it
 
 	CAPELLA(config, m_capella, 75_MHz_XTAL);
 	m_capella->set_maincpu_tag("maincpu");
 
-	F108(config, m_f108, 75_MHz_XTAL / 2); // 68040 bus speed is 37.5 MHz, half of FSB frequency
+	F108(config, m_f108, 75_MHz_XTAL / 2); // 68040 bus speed is 37.5 MHz, same as the FSB
 	m_f108->set_maincpu_tag("maincpu");
 	m_f108->set_primetimeii_tag("primetimeii");
 	m_f108->set_rom_tag("bootrom");
