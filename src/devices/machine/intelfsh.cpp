@@ -145,7 +145,8 @@ DEFINE_DEVICE_TYPE(CAT28F020,                cat28f020_device,                "c
 
 DEFINE_DEVICE_TYPE(TC58FVT800,               tc58fvt800_device,               "tc58fvt800",               "Toshiba TC58FVT800 Flash")
 
-DEFINE_DEVICE_TYPE(WINBOND_W29C020C,         winbond_w29c020c_device,               "winbond_w29c020c",               "Winbond W29C020C Flash")
+DEFINE_DEVICE_TYPE(WINBOND_W29C020C,         winbond_w29c020c_device,         "winbond_w29c020c",         "Winbond W29C020C Flash")
+DEFINE_DEVICE_TYPE(WINBOND_W29GL032CB,       winbond_w29gl032cb_device,       "winbond_w29gl032cb",       "Winbond W29GL032CB Flash")
 
 
 //**************************************************************************
@@ -363,6 +364,9 @@ winbond_w29c020c_device::winbond_w29c020c_device(const machine_config &mconfig, 
 	m_addrmask = 0xffff;
 	m_page_size = 0x80;
 }
+
+winbond_w29gl032cb_device::winbond_w29gl032cb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, WINBOND_W29GL032CB, tag, owner, clock, 0x400000, MFG_WINBOND, 0x1a00) { m_bot_boot_sector = true; }
 
 //-------------------------------------------------
 //  device_start - device-specific startup
