@@ -46,10 +46,10 @@ Fails to LOAD "$",8
 	</software>
 
 	<software name="bionicco">
-		<description>Bionic Commando</description>
+		<description>Bionic Commando (NTSC)</description>
 		<year>1988</year>
 		<publisher>Capcom</publisher>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="bionic_commando[capcom_1988].g64" size="333744" crc="b216989d" sha1="f1feb2dcb2af5af56051187ffda495c92e967302"/>
