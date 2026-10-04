@@ -545,15 +545,17 @@ void via6522_device::shift_out()
 	// Only shift out msb on falling edge
 	if (!shift_clock_level())
 	{
-		LOGSHIFT(" %s shift Out SR: %02x->", tag(), m_sr);
+		uint8_t old_sr = m_sr;
 		m_out_cb2 = (m_sr >> 7) & 1;
 		m_sr =  (m_sr << 1) | m_out_cb2;
-		LOGSHIFT("%02x CB2: %d\n", m_sr, m_out_cb2);
+		m_shift_counter = (m_shift_counter - 1) & 7;
+		LOGSHIFT("Shift Out SR bit %d (%d): %02x->%02x\n", m_shift_counter, m_out_cb2, old_sr, m_sr);
 
 		m_cb2_handler(m_out_cb2);
 
-		if (m_shift_counter == 1 && SO_EXT_CONTROL(m_acr))
+		if (m_shift_counter == 0 && SO_EXT_CONTROL(m_acr))
 		{
+			m_shift_done = true;
 			LOGINT("SHIFT EXT out INT request ");
 			set_int(INT_SR); // IRQ on last falling edge for external clock (mode 7)
 		}
@@ -564,14 +566,12 @@ void via6522_device::shift_out()
 		{
 			if (m_shift_counter == 0 && (SO_O2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr)))
 			{
+				m_shift_done = true;
 				LOGINT("SHIFT O2/T2 out INT request ");
 				set_int(INT_SR); // IRQ on last raising edge for internal clock (mode 5-6)
 			}
 		}
 	}
-	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all edges
-	if (m_shift_counter == 0x0f)
-		m_shift_done = true;
 }
 
 void via6522_device::shift_in()
@@ -579,12 +579,14 @@ void via6522_device::shift_in()
 	// Only shift in data on raising edge
 	if (shift_clock_level())
 	{
-		LOGSHIFT("%s shift In SR: %02x->", tag(), m_sr);
+		uint8_t old_sr = m_sr;
 		m_sr =  (m_sr << 1) | (m_in_cb2 & 1);
-		LOGSHIFT("%02x\n", m_sr);
+		m_shift_counter = (m_shift_counter - 1) & 7;
+		LOGSHIFT("Shift In SR bit %d (%d): %02x->%02x\n", m_shift_counter, m_in_cb2 & 1, old_sr, m_sr);
 
 		if (m_shift_counter == 0 && !SR_DISABLED(m_acr))
 		{
+			m_shift_done = true;
 			LOGINT("SHIFT in INT request ");
 			if (SI_EXT_CONTROL(m_acr))
 			{
@@ -598,9 +600,6 @@ void via6522_device::shift_in()
 			}
 		}
 	}
-	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all edges
-	if (m_shift_counter == 0x0f)
-		m_shift_done = true;
 }
 
 TIMER_CALLBACK_MEMBER(via6522_device::shift_irq_tick)
@@ -615,7 +614,7 @@ TIMER_CALLBACK_MEMBER(via6522_device::shift_tick)
 	// CB1 parks once the eight bits are done while T2 keeps running
 	if (!shift_blocked())
 	{
-		LOGSHIFT("SHIFT timer event CB1 %s edge, %d\n", m_out_cb1 & 1 ? "falling" : "raising", m_shift_counter);
+		LOGSHIFT("SHIFT timer event CB1 %s\n", m_out_cb1 & 1 ? "falling" : "raising");
 		m_out_cb1 ^= 1;
 		m_cb1_handler(m_out_cb1);
 
@@ -862,13 +861,13 @@ u8 via6522_device::read(offs_t offset)
 			{
 				if ((m_ifr & INT_SR) || (m_shift_done && !SR_DISABLED(m_acr)))
 				{
-					m_shift_counter = 0x0f;
+					m_shift_counter = 8;
 					m_shift_done = false;
 				}
 			}
 			else
 			{
-				m_shift_counter = m_in_cb1 ? 0x0f : 0x10;
+				m_shift_counter = 8;
 				m_shift_done = false;
 			}
 
@@ -1068,10 +1067,7 @@ void via6522_device::write(offs_t offset, u8 data)
 		m_sr = data;
 		LOGSHIFT("Write SR: %02x\n", m_sr);
 
-		if (!(SI_EXT_CONTROL(m_acr) || SO_EXT_CONTROL(m_acr)))
-			m_shift_counter = 0x0f;
-		else
-			m_shift_counter = m_in_cb1 ? 0x0f : 0x10;
+		m_shift_counter = 8;
 		m_shift_done = SR_DISABLED(m_acr);
 
 		LOGINT("SR INT ");
@@ -1318,12 +1314,12 @@ void via6522_device::write_cb1(int state)
 		// The shifter shift is not controlled by PCR
 		if (SO_EXT_CONTROL(m_acr))
 		{
-			LOGSHIFT("SHIFT OUT EXT/CB1 falling edge, %d\n",  m_shift_counter);
+			LOGSHIFT("SHIFT OUT EXT/CB1 falling edge, %d (CB1: %d)\n", m_shift_counter, m_in_cb1);
 			shift_out();
 		}
 		else if (SI_EXT_CONTROL(m_acr) || SR_DISABLED(m_acr))
 		{
-			LOGSHIFT("SHIFT IN EXT/CB1 raising edge, %d\n", m_shift_counter);
+			LOGSHIFT("SHIFT IN EXT/CB1 raising edge, %d (CB1: %d)\n", m_shift_counter, m_in_cb1);
 			shift_in();
 		}
 	}
