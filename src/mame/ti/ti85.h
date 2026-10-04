@@ -133,10 +133,10 @@ private:
 	uint8_t m_ti84pcse_portF = 0;
     uint32_t m_ti84p_rtc_currtime = 0;
     uint32_t m_ti84p_rtc_basetime = 0;
-	int m_ti_video_memory_size = 0;
-	int m_ti_screen_x_size = 0;
-	int m_ti_screen_y_size = 0;
-	int m_ti_number_of_frames = 0;
+	int m_lcdmem_size = 0;
+	int m_lcdwidth = 0;
+	int m_lcdheight = 0;
+	int m_framecount = 0;
 	std::unique_ptr<uint8_t[]> m_frames;
 	uint8_t * m_bios = nullptr;
 	emu_timer *m_ti85_timer = nullptr;
@@ -226,6 +226,7 @@ private:
 	DECLARE_MACHINE_START(ti84pse);
 	DECLARE_MACHINE_START(ti84pcse);
 	DECLARE_MACHINE_START(ti84p);
+    void ti8x_init_common();
 	void ti83p_init_common();
 	void ti8xpse_init_common();
 
@@ -272,6 +273,7 @@ private:
 
     void ti8x_update_int();
 	void ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram);
+    void ti8x_update_memory();
 	void update_ti85_memory();
     void update_ti83_memory();
 	void update_ti83p_memory();

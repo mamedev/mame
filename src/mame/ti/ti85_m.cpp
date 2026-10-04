@@ -118,6 +118,37 @@ void ti85_state::ti8x_update_int()
         m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
+void ti85_state::ti8x_update_memory() {
+    switch (m_model) {
+        case TI83:
+            update_ti83_memory();
+            break;
+
+        case TI83P:
+        case TI73:
+            update_ti83p_memory();
+            break;
+            
+        case TI83PSE:
+        case TI84P:
+        case TI84PSE:
+            update_ti83pse_memory();
+            break;
+
+        case TI84PCSE:
+            update_ti84pcse_memory();
+            break;
+
+        case TI86:
+            update_ti86_memory();
+            break;
+
+        default:
+            update_ti85_memory();
+            break;
+    }
+}
+
 void ti85_state::update_ti85_memory ()
 {
 	membank("bank2")->set_base(m_bios + 0x004000*m_ti8x_memory_page_1);
@@ -270,21 +301,7 @@ void ti85_state::machine_start()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_bios = memregion("bios")->base();
 
-	m_timer_interrupt_mask = 0;
-	m_timer_interrupt_status = 0;
-	m_ON_interrupt_mask = 0;
-	m_ON_interrupt_status = 0;
-	m_ON_pressed = 0;
-	m_power_mode = 0;
-	m_keypad_mask = 0;
-	m_ti8x_memory_page_1 = 0;
-	m_LCD_memory_base = 0;
-	m_LCD_status = 0;
-	m_LCD_mask = 0;
-	m_video_buffer_width = 0;
-	m_interrupt_speed = 0;
-	m_port4_bit0 = 0;
-	m_ti81_port_7_data = 0;
+    ti8x_init_common();
 
 	m_ti85_timer = timer_alloc(FUNC(ti85_state::ti85_timer_callback), this);
 	m_ti85_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
@@ -378,13 +395,6 @@ void ti85_state::ti83p_membank3_w(offs_t offset, uint8_t data)
 
 MACHINE_RESET_MEMBER(ti85_state,ti83p)
 {
-	m_PCR = 0x00;
-
-	m_ti8x_memory_page_1 = 0;
-	m_ti8x_memory_page_2 = 0;
-	m_ti8x_memory_page_3 = 0;
-	m_ti83p_port4 = 1;
-	m_booting = true;
 	if ((m_model == TI83P) || (m_model == TI73))
 	{
 		update_ti83p_memory();
@@ -402,21 +412,7 @@ MACHINE_START_MEMBER(ti85_state,ti83)
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_bios = memregion("bios")->base();
 
-	m_timer_interrupt_mask = 0;
-	m_timer_interrupt_status = 0;
-	m_ON_interrupt_mask = 0;
-	m_ON_interrupt_status = 0;
-	m_ON_pressed = 0;
-	m_ti8x_memory_page_1 = 0;
-	m_ti8x_memory_page_2 = 0;
-	m_LCD_memory_base = 0;
-	m_LCD_status = 0;
-	m_LCD_mask = 0;
-	m_power_mode = 0;
-	m_keypad_mask = 0;
-	m_video_buffer_width = 0;
-	m_interrupt_speed = 0;
-	m_port4_bit0 = 0;
+	ti8x_init_common();
 
 	m_ti8x_ram = std::make_unique<uint8_t[]>(32*1024);
 	memset(m_ti8x_ram.get(), 0, sizeof(uint8_t)*32*1024);
@@ -433,6 +429,8 @@ MACHINE_START_MEMBER(ti85_state,ti83)
 	m_ti83_1st_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
 	m_ti83_2nd_timer = timer_alloc(FUNC(ti85_state::ti83_timer2_callback), this);
 	m_ti83_2nd_timer->adjust(attotime::from_hz(512), 0, attotime::from_hz(512));
+
+    save_pointer(NAME(m_ti8x_ram), 32*1024);
 }
 
 MACHINE_START_MEMBER(ti85_state,ti83p)
@@ -447,13 +445,14 @@ MACHINE_START_MEMBER(ti85_state,ti73)
     ti83p_init_common();
 }
 
-void ti85_state::ti83p_init_common()
+void ti85_state::ti8x_init_common()
 {
 	m_timer_interrupt_mask = 0;
 	m_timer_interrupt_status = 0;
 	m_ON_interrupt_mask = 0;
 	m_ON_interrupt_status = 0;
 	m_ON_pressed = 0;
+    m_PCR = 0;
 	m_ti8x_memory_page_1 = 0;
 	m_ti8x_memory_page_2 = 0;
 	m_ti8x_memory_page_3 = 0;
@@ -464,9 +463,35 @@ void ti85_state::ti83p_init_common()
 	m_keypad_mask = 0;
 	m_video_buffer_width = 0;
 	m_interrupt_speed = 0;
-	m_ti83p_port4 = 1;
-	m_flash_unlocked = 0;
+	m_port4_bit0 = 0;
+    
+	save_item(NAME(m_timer_interrupt_mask));
+	save_item(NAME(m_timer_interrupt_status));
+	save_item(NAME(m_ON_interrupt_mask));
+	save_item(NAME(m_ON_interrupt_status));
+	save_item(NAME(m_ON_pressed));
+    save_item(NAME(m_PCR));
+	save_item(NAME(m_ti8x_memory_page_1));
+	save_item(NAME(m_ti8x_memory_page_2));
+	save_item(NAME(m_ti8x_memory_page_3));
+	save_item(NAME(m_LCD_memory_base));
+	save_item(NAME(m_LCD_status));
+	save_item(NAME(m_LCD_mask));
+	save_item(NAME(m_power_mode));
+	save_item(NAME(m_keypad_mask));
+	save_item(NAME(m_video_buffer_width));
+	save_item(NAME(m_interrupt_speed));
+	save_item(NAME(m_port4_bit0));
+    
+	machine().save().register_postload(save_prepost_delegate(FUNC(ti85_state::ti8x_update_memory), this));
+}
 
+void ti85_state::ti83p_init_common()
+{
+    ti8x_init_common();
+
+    m_ti83p_port4 = 1;
+	m_flash_unlocked = 0;
 	m_booting = true;
 
 	ti85_state::update_ti83p_memory();
@@ -477,38 +502,29 @@ void ti85_state::ti83p_init_common()
 	m_ti83_2nd_timer->adjust(attotime::from_hz(512), 0, attotime::from_hz(512));
 
 	/* save states and debugging */
-	save_item(NAME(m_timer_interrupt_status));
-	save_item(NAME(m_timer_interrupt_mask));
-    save_item(NAME(m_flash_unlocked));
-	save_item(NAME(m_ti8x_memory_page_1));
-	save_item(NAME(m_ti8x_memory_page_2));
-	save_item(NAME(m_ti8x_memory_page_3));
-	save_item(NAME(m_ti83p_port4));
 	save_item(NAME(m_booting));
+    save_item(NAME(m_flash_unlocked));
+	save_item(NAME(m_ti83p_port4));
 }
 
 void ti85_state::ti8xpse_init_common()
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_timer_interrupt_mask = 0;
-	m_timer_interrupt_status = 0;
-	m_ctimer_interrupt_status = 0;
-	m_ON_interrupt_mask = 0;
-	m_ON_interrupt_status = 0;
-	m_ON_pressed = 0;
-	m_ti8x_memory_page_1 = 0;
-	m_ti8x_memory_page_2 = 0;
-	m_ti8x_memory_page_3 = 0;
-	m_LCD_memory_base = 0;
-	m_LCD_status = 0;
-	m_LCD_mask = 0;
-	m_power_mode = 0;
-	m_keypad_mask = 0;
-	m_video_buffer_width = 0;
-	m_interrupt_speed = 0;
-	m_ti83p_port4 = 1;
+    ti8x_init_common();
+
+    m_ti83p_port4 = 1;
 	m_flash_unlocked = 0;
+    m_ctimer_interrupt_status = 0;
+	m_ti83pse_port21 = 0;
+	m_ti83pse_port27 = 0;
+	m_ti83pse_port28 = 0;
+	m_ti84pcse_portE = 0;
+	m_ti84pcse_portF = 0;
+	m_ti84p_rtc_control = 0;
+	m_ti84p_rtc_currtime = 0;
+	m_ti84p_rtc_basetime = 0;
+	m_booting = true;
 
 	ti85_state::update_ti83pse_memory();
 
@@ -524,47 +540,43 @@ void ti85_state::ti8xpse_init_common()
     m_ti84p_rtc = timer_alloc(FUNC(ti85_state::rtc_tick), this);
     m_ti84p_rtc->adjust(attotime(1, 0), 0, attotime(1, 0));
 
-		/* save states and debugging */
-	save_item(NAME(m_ctimer_interrupt_status));
-	save_item(NAME(m_timer_interrupt_status));
-	save_item(NAME(m_timer_interrupt_mask));
-    save_item(NAME(m_flash_unlocked));
-	save_item(NAME(m_ti8x_memory_page_1));
-	save_item(NAME(m_ti8x_memory_page_2));
-	save_item(NAME(m_ti8x_memory_page_3));
-	save_item(NAME(m_ti83p_port4));
+	/* save states and debugging */
+	save_item(NAME(m_booting));
+    save_item(NAME(m_ctimer_interrupt_status));
 	save_item(NAME(m_ti84pcse_portE));
 	save_item(NAME(m_ti84pcse_portF));
-}
+	save_item(NAME(m_ti83pse_port21));
+	save_item(NAME(m_ti83pse_port27));
+	save_item(NAME(m_ti83pse_port28));
 
+    if (m_model == TI84P || m_model == TI84PSE || m_model == TI84PCSE) {
+	    save_item(NAME(m_ti84p_rtc_control));
+	    save_item(NAME(m_ti84p_rtc_currtime));
+	    save_item(NAME(m_ti84p_rtc_basetime));
+    }
+}
 
 MACHINE_START_MEMBER(ti85_state,ti83pse)
 {
-	m_model = TI84PSE;
+	m_model = TI83PSE;
+	ti8xpse_init_common();
+}
 
+MACHINE_START_MEMBER(ti85_state,ti84p)
+{
+	m_model = TI84P;
 	ti8xpse_init_common();
 }
 
 MACHINE_START_MEMBER(ti85_state,ti84pse)
 {
-	m_model = TI83PSE;
-
+	m_model = TI84PSE;
 	ti8xpse_init_common();
 }
-
 
 MACHINE_START_MEMBER(ti85_state,ti84pcse)
 {
 	m_model = TI84PCSE;
-
-	ti8xpse_init_common();
-}
-
-
-MACHINE_START_MEMBER(ti85_state,ti84p)
-{
-	m_model = TI84P;
-
 	ti8xpse_init_common();
 }
 
@@ -572,22 +584,9 @@ MACHINE_START_MEMBER(ti85_state,ti86)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_bios = memregion("bios")->base();
+    m_model = TI86;
 
-	m_timer_interrupt_mask = 0;
-	m_timer_interrupt_status = 0;
-	m_ON_interrupt_mask = 0;
-	m_ON_interrupt_status = 0;
-	m_ON_pressed = 0;
-	m_ti8x_memory_page_1 = 0;
-	m_ti8x_memory_page_2 = 0;
-	m_LCD_memory_base = 0;
-	m_LCD_status = 0;
-	m_LCD_mask = 0;
-	m_power_mode = 0;
-	m_keypad_mask = 0;
-	m_video_buffer_width = 0;
-	m_interrupt_speed = 0;
-	m_port4_bit0 = 0;
+    ti8x_init_common();
 
 	m_ti8x_ram = std::make_unique<uint8_t[]>(128*1024);
 	memset(m_ti8x_ram.get(), 0, sizeof(uint8_t)*128*1024);
@@ -596,14 +595,14 @@ MACHINE_START_MEMBER(ti85_state,ti86)
 
 	membank("bank1")->set_base(m_bios);
 	membank("bank2")->set_base(m_bios + 0x04000);
-
 	membank("bank4")->set_base(m_ti8x_ram.get());
 	subdevice<nvram_device>("nvram")->set_base(m_ti8x_ram.get(), sizeof(uint8_t)*128*1024);
 
 	m_ti85_timer = timer_alloc(FUNC(ti85_state::ti85_timer_callback), this);
 	m_ti85_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+    
+    save_pointer(NAME(m_ti8x_ram), 128*1024);
 }
-
 
 /* I/O ports handlers */
 

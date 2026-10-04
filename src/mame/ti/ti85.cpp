@@ -862,7 +862,7 @@ void ti85_state::ti84pcse(machine_config &config)
 	screen.set_orientation(ROT90);
 	screen.set_screen_update("ili9335", FUNC(ili9335_device::screen_update));
 
-	ILI9335(config, "ili9335", 0).set_screen(screen);;
+	ILI9335(config, "ili9335", 0).set_screen(screen);
 
 	TI8X_LINK_PORT(config, m_link_port, default_ti8x_link_devices, nullptr);
 

@@ -173,4 +173,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME   PARENT   COMPAT  MACHINE   INPUT  STATE       INIT        COMPANY              FULLNAME    FLAGS
-COMP( 1995, ti80,  0,       0,      ti80,     ti80,  ti80_state, empty_init, "Texas Instruments", "TI-80",    MACHINE_NO_SOUND_HW )
+COMP( 1995, ti80,  0,       0,      ti80,     ti80,  ti80_state, empty_init, "Texas Instruments", "TI-80",    MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
