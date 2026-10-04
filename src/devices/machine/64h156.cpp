@@ -203,10 +203,7 @@ void c64h156_device::commit(const attotime &tm)
 void c64h156_device::live_delay(int state)
 {
 	cur_live.next_state = state;
-	if(cur_live.tm != machine().time())
-		t_gen->adjust(cur_live.tm - machine().time());
-	else
-		live_sync();
+	t_gen->adjust(cur_live.tm - machine().time());
 }
 
 void c64h156_device::live_sync()
@@ -369,6 +366,7 @@ void c64h156_device::live_run(const attotime &limit)
 			m_write_sync(cur_live.sync);
 			m_write_byte(cur_live.byte);
 
+			cur_live.tm += m_period;
 			cur_live.state = RUNNING;
 			checkpoint();
 			break;
