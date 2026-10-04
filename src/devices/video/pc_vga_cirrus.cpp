@@ -474,8 +474,13 @@ void cirrus_gd5428_vga_device::gc_map(address_map &map)
 		NAME([this](offs_t offset, u8 data) {
 			m_blt_status = data & ~0xf2;
 			if (BIT(data, 2))
+			{
 				m_blt_status &= ~9;
-			if(data & 0x02)
+				m_blt_system_transfer = false;
+				m_blt_system_count = 0;
+				m_blt_system_buffer = 0;
+			}
+			else if (BIT(data, 1))
 			{
 				if(m_blt_mode & 0x04)  // blit source is system memory
 					start_system_bitblt();
@@ -1119,20 +1124,21 @@ void cirrus_gd5428_vga_device::blit_dword()
 // colour-expanded BitBLTs from system memory are on a byte boundary, unused bits are ignored
 void cirrus_gd5428_vga_device::blit_byte()
 {
-	// TODO: add support for reverse direction
-	uint8_t x,pixel;
-
-	for(x=0;x<8;x++)
+	// Width is stored as a byte count minus one.  Each source bit expands
+	// to one pixel; GR10/11 supply the second byte only in 16-bit mode.
+	const unsigned bytes_per_pixel = BIT(m_blt_mode, 4) ? 2 : 1;
+	for (unsigned bit = 0; bit < 8; bit++)
 	{
-		// use GR0/1/10/11 background/foreground regs
-		if(m_blt_dest_current & 1)
-			pixel = ((m_blt_system_buffer & (0x00000001 << (7-x))) >> (7-x)) ? m_gr11 : m_gr10;
-		else
-			pixel = ((m_blt_system_buffer & (0x00000001 << (7-x))) >> (7-x)) ? vga.gc.enable_set_reset : vga.gc.set_reset;
-		if(m_blt_pixel_count <= m_blt_width - 1)
-			copy_pixel(pixel,vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
-		m_blt_dest_current++;
-		m_blt_pixel_count++;
+		const bool foreground = BIT(m_blt_system_buffer, 7 - bit);
+		for (unsigned byte = 0; byte < bytes_per_pixel; byte++)
+		{
+			const u8 pixel = byte ? (foreground ? m_gr11 : m_gr10) :
+				(foreground ? vga.gc.enable_set_reset : vga.gc.set_reset);
+			if (m_blt_pixel_count <= m_blt_width)
+				copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
+			m_blt_dest_current++;
+			m_blt_pixel_count++;
+		}
 	}
 	if(m_blt_pixel_count > m_blt_width)
 	{
@@ -1156,6 +1162,15 @@ void cirrus_gd5428_vga_device::copy_pixel(uint8_t src, uint8_t dst)
 	case 0x00:  // BLACK
 		res = 0x00;
 		break;
+	case 0x05:  // SRCAND
+		res = src & dst;
+		break;
+	case 0x06:  // DST
+		res = dst;
+		break;
+	case 0x09:  // SDna
+		res = src & ~dst;
+		break;
 	case 0x0b:  // DSTINVERT
 		res = ~dst;
 		break;
@@ -1175,6 +1190,24 @@ void cirrus_gd5428_vga_device::copy_pixel(uint8_t src, uint8_t dst)
 	case 0x6d:  // SRCPAINT / DSo
 		// zorro2:picasso2p on VGA Workbench (upper right icon)
 		res = src | dst;
+		break;
+	case 0x90:  // NOTSRCAND
+		res = ~(src & dst);
+		break;
+	case 0x95:  // NOTSRCINVERT
+		res = ~(src ^ dst);
+		break;
+	case 0xad:  // SDno
+		res = src | ~dst;
+		break;
+	case 0xd0:  // NOTSRCCOPY
+		res = ~src;
+		break;
+	case 0xd6:  // MERGEPAINT
+		res = ~src | dst;
+		break;
+	case 0xda:  // NOTSRCPAINT
+		res = ~(src | dst);
 		break;
 	default:
 		popmessage("pc_vga_cirrus: Unsupported BitBLT ROP mode %02x",m_blt_rop);
@@ -1278,17 +1311,28 @@ uint8_t cirrus_gd5428_vga_device::mem_r(offs_t offset)
 			data = vga.memory[(offset+addr) % vga.svga_intf.vram_size];
 		else
 		{
+			// Unchained packed pixels still use the VGA data path.  Each
+			// plane/latch holds one of four adjacent eight-bit pixels.
+			if (!machine().side_effects_disabled())
 			{
-				int i;
-
-				for(i=0;i<4;i++)
+				for (unsigned plane = 0; plane < 4; plane++)
+					vga.gc.latch[plane] = vga.memory[(offset * 4 + plane + addr) % vga.svga_intf.vram_size];
+			}
+			if (vga.gc.read_mode)
+			{
+				for (unsigned bit = 0; bit < 8; bit++)
 				{
-					if(vga.sequencer.map_mask & 1 << i)
-						data |= vga.memory[((offset*4+i)+addr) % vga.svga_intf.vram_size];
+					u8 colour = 0;
+					for (unsigned plane = 0; plane < 4; plane++)
+						colour |= BIT(vga.gc.latch[plane], bit) << plane;
+					if ((colour & vga.gc.color_dont_care) == (vga.gc.color_compare & vga.gc.color_dont_care))
+						data |= 1 << bit;
 				}
 			}
-		return data;
+			else
+				data = vga.gc.latch[vga.gc.read_map_sel];
 		}
+		return data;
 	}
 
 	switch(vga.gc.memory_map_sel & 0x03)
@@ -1496,7 +1540,8 @@ void cirrus_gd5428_vga_device::mem_w(offs_t offset, uint8_t data)
 			for(i=0;i<4;i++)
 			{
 				if(vga.sequencer.map_mask & 1 << i)
-					vga.memory[((offset*4+i)+addr) % vga.svga_intf.vram_size] = data;
+					vga.memory[((offset*4+i)+addr) % vga.svga_intf.vram_size] =
+						BIT(vga.sequencer.data[4], 2) ? vga_latch_write(i, data) : data;
 			}
 		}
 	}
