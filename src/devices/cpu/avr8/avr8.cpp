@@ -829,6 +829,7 @@ avr8_base_device::avr8_base_device(const machine_config &mconfig, const char *ta
 	, m_pc(0)
 	, m_addr_mask((addr_mask << 1) | 1)
 	, m_sleeping(false)
+	, m_sei_delay_pending(false)
 	, m_vector_size_in_words(vector_size_in_words)
 {
 }
@@ -1106,6 +1107,7 @@ void avr8_base_device::device_start()
 	// Misc.
 	save_item(NAME(m_addr_mask));
 	save_item(NAME(m_sleeping));
+	save_item(NAME(m_sei_delay_pending));
 	save_item(NAME(m_opcycles));
 
 	// set our instruction counter
@@ -1216,6 +1218,7 @@ void avr8_base_device::device_reset()
 	}
 
 	m_sleeping = false;
+	m_sei_delay_pending = false;
 
 	// clear any pending interrupts (the register zero loop above will have already
 	// acknowledged any pending and disabled any that could have fired)
@@ -3893,6 +3896,7 @@ void avr8_device<NumTimers>::execute_run()
 			m_opcycles = m_op_cycles[op];
 			((this)->*(m_op_funcs[op]))(op);
 			m_pc += 2;
+			m_sei_delay_pending = false;
 		}
 
 		// pin_w() may have latched a PCIFR/EIFR flag from an arbitrary (possibly mid-instruction)
@@ -3963,7 +3967,10 @@ void avr8_device<NumTimers>::execute_run()
 				}
 			}
 
-			fire_interrupts();
+			if (!m_sei_delay_pending)
+			{
+				fire_interrupts();
+			}
 		}
 	}
 }

@@ -779,6 +779,7 @@ protected:
 	// internal CPU state
 	uint32_t m_addr_mask;
 	bool m_sleeping;
+	bool m_sei_delay_pending;
 
 	// other internal states
 	int m_icount;
