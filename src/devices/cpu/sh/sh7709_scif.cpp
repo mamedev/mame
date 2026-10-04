@@ -18,7 +18,9 @@
     - Serial clock input/output (SCSCR CKE) is ignored, the internal baud rate
       generator is always used.
     - No modem control (SCFCR MCE, SCSPTR), no loopback, no break generation.
-    - DR (receive data ready below the trigger level) is never raised.
+    - The FIFO error counts in the upper byte of SCSSR are four bits wide; what
+      the hardware reports with sixteen erroneous bytes queued is unknown, here
+      the count saturates at 15.
 
 ***************************************************************************/
 
@@ -55,12 +57,17 @@ void sh7709_scif_device::device_start()
 	save_item(NAME(m_scssr));
 	save_item(NAME(m_scfcr));
 	save_item(NAME(m_rx_fifo));
+	save_item(NAME(m_rx_err));
 	save_item(NAME(m_tx_fifo));
 	save_item(NAME(m_rx_head));
 	save_item(NAME(m_rx_count));
 	save_item(NAME(m_tx_head));
 	save_item(NAME(m_tx_count));
 	save_item(NAME(m_clock_speed));
+	save_item(NAME(m_rxd));
+
+	m_rx_timeout = timer_alloc(FUNC(sh7709_scif_device::rx_timeout), this);
+	m_rxd = 1;
 }
 
 void sh7709_scif_device::device_reset()
@@ -72,11 +79,13 @@ void sh7709_scif_device::device_reset()
 	m_scfcr = 0x00;
 
 	std::fill(std::begin(m_rx_fifo), std::end(m_rx_fifo), 0);
+	std::fill(std::begin(m_rx_err), std::end(m_rx_err), 0);
 	std::fill(std::begin(m_tx_fifo), std::end(m_tx_fifo), 0);
-	m_rx_head = m_rx_count = 0;
-	m_tx_head = m_tx_count = 0;
+	clear_rx_fifo();
+	clear_tx_fifo();
 
 	m_clock_speed = attotime::never;
+	m_rx_timeout->adjust(attotime::never);
 
 	receive_register_reset();
 	transmit_register_reset();
@@ -153,20 +162,23 @@ void sh7709_scif_device::scscr_w(uint8_t data)
 			(data & SCSCR_RE) ? " re" : "",
 			data & SCSCR_CKE);
 
+	const uint8_t old = m_scscr;
 	m_scscr = data;
 
+	// Clearing TE or RE only stops the transmitter or receiver.  SCSSR and the
+	// FIFOs keep their contents, they are only emptied through SCFCR TFRST and
+	// RFRST (SH7709S hardware manual 16.3.2).
 	if (!(m_scscr & SCSCR_TE))
 	{
-		m_tx_head = m_tx_count = 0;
 		transmit_register_reset();
 		m_txd_cb(1);
+
+		if (old & SCSCR_TE)
+			m_scssr |= SCSSR_TEND;
 	}
 
 	if (!(m_scscr & SCSCR_RE))
-	{
-		m_rx_head = m_rx_count = 0;
 		receive_register_reset();
-	}
 
 	update_status();
 	update_tx_state();
@@ -174,6 +186,12 @@ void sh7709_scif_device::scscr_w(uint8_t data)
 
 void sh7709_scif_device::scftdr_w(uint8_t data)
 {
+	if (m_scfcr & SCFCR_TFRST)
+	{
+		LOGMASKED(LOG_ERROR, "scftdr_w %02x: transmit FIFO held in reset\n", data);
+		return;
+	}
+
 	if (m_tx_count >= FIFO_LENGTH)
 	{
 		LOGMASKED(LOG_ERROR, "scftdr_w %02x: transmit FIFO overrun\n", data);
@@ -199,7 +217,8 @@ uint16_t sh7709_scif_device::scssr_r()
 
 void sh7709_scif_device::scssr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	// A status bit that has been read as 1 is cleared by writing 0 to it.
+	// A status bit that has been read as 1 is cleared by writing 0 to it.  FER,
+	// PER and the error counts are read only, they follow the receive FIFO.
 	const uint16_t old = m_scssr;
 	m_scssr &= data | ~(SCSSR_RW & mem_mask);
 
@@ -225,6 +244,7 @@ uint8_t sh7709_scif_device::scfrdr_r()
 
 	if (!machine().side_effects_disabled())
 	{
+		m_rx_err[m_rx_head] = 0;
 		m_rx_head = (m_rx_head + 1) % FIFO_LENGTH;
 		m_rx_count--;
 
@@ -247,15 +267,16 @@ void sh7709_scif_device::scfcr_w(uint8_t data)
 
 	m_scfcr = data;
 
+	// TFRST and RFRST hold their FIFO empty for as long as they are set.
 	if (data & SCFCR_RFRST)
 	{
-		m_rx_head = m_rx_count = 0;
+		clear_rx_fifo();
 		receive_register_reset();
 	}
 
 	if (data & SCFCR_TFRST)
 	{
-		m_tx_head = m_tx_count = 0;
+		clear_tx_fifo();
 		transmit_register_reset();
 	}
 
@@ -285,11 +306,38 @@ unsigned sh7709_scif_device::tx_trigger() const
 	return LEVELS[(m_scfcr & SCFCR_TTRG) >> 4];
 }
 
+void sh7709_scif_device::clear_rx_fifo()
+{
+	std::fill(std::begin(m_rx_err), std::end(m_rx_err), 0);
+	m_rx_head = m_rx_count = 0;
+}
+
+void sh7709_scif_device::clear_tx_fifo()
+{
+	m_tx_head = m_tx_count = 0;
+}
+
 void sh7709_scif_device::update_status()
 {
-	// RDF reflects the receive FIFO having reached its trigger level.  DR - data
-	// present but below the trigger level and idle for 15 etu - is deliberately
-	// never raised, see the TODO at the top of the file.
+	// FER and PER describe the byte at the head of the receive FIFO, the one
+	// SCFRDR returns next.  The upper byte counts the erroneous bytes queued.
+	unsigned fer_count = 0, per_count = 0;
+	for (unsigned i = 0; i < m_rx_count; i++)
+	{
+		const uint8_t err = m_rx_err[(m_rx_head + i) % FIFO_LENGTH];
+		if (err & SCSSR_FER)
+			fer_count++;
+		if (err & SCSSR_PER)
+			per_count++;
+	}
+
+	m_scssr &= ~(SCSSR_PERN | SCSSR_FERN | SCSSR_FER | SCSSR_PER);
+	m_scssr |= std::min(per_count, 15U) << 12;
+	m_scssr |= std::min(fer_count, 15U) << 8;
+	if (m_rx_count)
+		m_scssr |= m_rx_err[m_rx_head];
+
+	// RDF reflects the receive FIFO having reached its trigger level.
 	if (m_rx_count >= rx_trigger())
 		m_scssr |= SCSSR_RDF;
 	else
@@ -308,15 +356,17 @@ void sh7709_scif_device::update_status()
 
 void sh7709_scif_device::update_interrupts()
 {
-	m_eri_cb((m_scssr & SCSSR_ER) ? 1 : 0);
-	m_bri_cb((m_scssr & SCSSR_BRK) ? 1 : 0);
-	m_rxi_cb(((m_scscr & SCSCR_RIE) && (m_scssr & (SCSSR_RDF | SCSSR_DR))) ? 1 : 0);
+	// RIE enables all three receive side interrupts.
+	const bool rie = m_scscr & SCSCR_RIE;
+	m_eri_cb((rie && (m_scssr & SCSSR_ER)) ? 1 : 0);
+	m_bri_cb((rie && (m_scssr & SCSSR_BRK)) ? 1 : 0);
+	m_rxi_cb((rie && (m_scssr & (SCSSR_RDF | SCSSR_DR))) ? 1 : 0);
 	m_txi_cb(((m_scscr & SCSCR_TIE) && (m_scssr & SCSSR_TDFE)) ? 1 : 0);
 }
 
 void sh7709_scif_device::update_tx_state()
 {
-	if (!(m_scscr & SCSCR_TE) || !m_tx_count || !is_transmit_register_empty())
+	if (!(m_scscr & SCSCR_TE) || (m_scfcr & SCFCR_TFRST) || !m_tx_count || !is_transmit_register_empty())
 		return;
 
 	const uint8_t data = m_tx_fifo[m_tx_head];
@@ -363,6 +413,7 @@ void sh7709_scif_device::update_clock()
 
 void sh7709_scif_device::rxd_w(int state)
 {
+	m_rxd = state;
 	device_serial_interface::rx_w(state);
 }
 
@@ -373,25 +424,72 @@ void sh7709_scif_device::rcv_complete()
 	if (!(m_scscr & SCSCR_RE))
 		return;
 
+	const uint8_t data = get_received_char();
+	uint8_t err = 0;
+	if (is_receive_framing_error())
+		err |= SCSSR_FER;
+	if (is_receive_parity_error())
+		err |= SCSSR_PER;
+
+	// The DR timeout runs from the end of the last received frame.
+	m_rx_timeout->adjust(m_clock_speed.is_never() ? attotime::never : m_clock_speed * 15);
+
+	// While BRK is set no further data is transferred to the receive FIFO
+	// (SH7709S hardware manual 16.2.7, 16.3.2).
+	if (m_scssr & SCSSR_BRK)
+	{
+		LOGMASKED(LOG_ERROR, "break pending, dropping %02x\n", data);
+		return;
+	}
+
+	if (m_scfcr & SCFCR_RFRST)
+	{
+		LOGMASKED(LOG_ERROR, "receive FIFO held in reset, dropping %02x\n", data);
+		return;
+	}
+
 	// The SCIF has no overrun error, data arriving while the FIFO is full is
 	// silently lost (SH7709S hardware manual 16.2.2).
 	if (m_rx_count >= FIFO_LENGTH)
 	{
-		LOGMASKED(LOG_ERROR, "receive FIFO full, dropping %02x\n", get_received_char());
+		LOGMASKED(LOG_ERROR, "receive FIFO full, dropping %02x\n", data);
 		return;
 	}
 
-	if (is_receive_framing_error())
-		m_scssr |= SCSSR_FER | SCSSR_ER;
-	if (is_receive_parity_error())
-		m_scssr |= SCSSR_PER | SCSSR_ER;
+	if (err)
+		m_scssr |= SCSSR_ER;
 
-	m_rx_fifo[(m_rx_head + m_rx_count) % FIFO_LENGTH] = get_received_char();
+	// A framing error on an all zero frame with the line still at space is a
+	// break.  The break frame itself is stored, later ones are not.
+	if ((err & SCSSR_FER) && !data && !m_rxd)
+	{
+		LOGMASKED(LOG_ERROR, "break detected\n");
+		m_scssr |= SCSSR_BRK;
+	}
+
+	const unsigned slot = (m_rx_head + m_rx_count) % FIFO_LENGTH;
+	m_rx_fifo[slot] = data;
+	m_rx_err[slot] = err;
 	m_rx_count++;
 
-	LOGMASKED(LOG_TXRX, "received %02x (%d queued)\n", m_rx_fifo[(m_rx_head + m_rx_count - 1) % FIFO_LENGTH], m_rx_count);
+	LOGMASKED(LOG_TXRX, "received %02x%s%s (%d queued)\n", data,
+			(err & SCSSR_FER) ? " FER" : "",
+			(err & SCSSR_PER) ? " PER" : "",
+			m_rx_count);
 
 	update_status();
+}
+
+TIMER_CALLBACK_MEMBER(sh7709_scif_device::rx_timeout)
+{
+	// DR: data below the receive trigger level and no new frame for 15 etu
+	// after the last stop bit.
+	if (m_rx_count && (m_rx_count < rx_trigger()) && !is_receive_register_synchronized())
+	{
+		LOGMASKED(LOG_TXRX, "receive timeout, %d bytes below trigger\n", m_rx_count);
+		m_scssr |= SCSSR_DR;
+		update_interrupts();
+	}
 }
 
 void sh7709_scif_device::tra_callback()

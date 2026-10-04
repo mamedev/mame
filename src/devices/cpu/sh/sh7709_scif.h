@@ -73,6 +73,8 @@ private:
 		SCSSR_TDFE = 1 << 5,
 		SCSSR_TEND = 1 << 6,
 		SCSSR_ER   = 1 << 7,
+		SCSSR_FERN = 0xf << 8,  // number of framing errors in the receive FIFO
+		SCSSR_PERN = 0xf << 12, // number of parity errors in the receive FIFO
 
 		// Bits software is allowed to clear by writing 0 after reading 1.
 		SCSSR_RW   = SCSSR_DR | SCSSR_RDF | SCSSR_BRK | SCSSR_TDFE | SCSSR_ER
@@ -109,6 +111,10 @@ private:
 	void update_tx_state();
 	void update_data_format();
 	void update_clock();
+	void clear_rx_fifo();
+	void clear_tx_fifo();
+
+	TIMER_CALLBACK_MEMBER(rx_timeout);
 
 	devcb_write_line m_txd_cb;
 	devcb_write_line m_eri_cb;
@@ -123,11 +129,14 @@ private:
 	uint8_t m_scfcr;
 
 	uint8_t m_rx_fifo[FIFO_LENGTH];
+	uint8_t m_rx_err[FIFO_LENGTH];  // SCSSR_FER/SCSSR_PER of each received byte
 	uint8_t m_tx_fifo[FIFO_LENGTH];
 	uint8_t m_rx_head, m_rx_count;
 	uint8_t m_tx_head, m_tx_count;
 
 	attotime m_clock_speed;
+	emu_timer *m_rx_timeout;
+	int m_rxd;
 };
 
 DECLARE_DEVICE_TYPE(SH7709_SCIF, sh7709_scif_device)
