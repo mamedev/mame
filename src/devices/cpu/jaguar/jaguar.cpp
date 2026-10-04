@@ -1475,7 +1475,8 @@ void jaguar_cpu_device::endian_w(offs_t offset, u32 data, u32 mem_mask)
 	if (ACCESSING_BITS_0_7)
 	{
 		// sburnout sets bit 1 == 0
-		if ((m_io_end & 0x7) != 0x7)
+		logerror("%s: endian setup %08x\n", this->tag(), m_io_end);
+		if ((m_io_end & 0x5) != 0x5)
 			throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
 	}
 }
