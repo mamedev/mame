@@ -923,6 +923,7 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 			return true;
 
 		case 0x018: // SLWx
+		case 0x218: // SRWx
 		case 0x01c: // ANDx
 		case 0x03c: // ANDCx
 		case 0x07c: // NORx
@@ -941,7 +942,6 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 			}
 			return true;
 
-		case 0x218: // SRWx
 		case 0x318: // SRAWx
 			desc.set_gpr_used(G_RS(op));
 			desc.set_gpr_used(G_RB(op));
