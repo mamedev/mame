@@ -30,9 +30,6 @@ public:
 	void set_extended_fuses(uint8_t byte);
 	void set_lock_bits(uint8_t byte);
 
-	// public interfaces
-	virtual void update_interrupt(int source);
-
 	// GPIO
 	enum gpio_t : int
 	{
@@ -64,7 +61,14 @@ public:
 	};
 
 protected:
-	avr8_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t address_mask, address_map_constructor internal_map);
+	avr8_base_device(const machine_config &mconfig,
+					 const char *tag,
+					 device_t *owner,
+					 uint32_t clock,
+					 const device_type type,
+					 uint32_t address_mask,
+					 uint8_t vector_size_in_words,
+					 address_map_constructor internal_map);
 
 	typedef void (avr8_base_device::*op_func) (uint16_t op);
 
@@ -524,6 +528,72 @@ protected:
 		ATMEGA644_INT_SPM_RDY
 	};
 
+	// IRQ vectors for the ATMega640, 1280, 1281, 2560, 2561 series.
+	// Vector size is 2 words (=4 bytes).
+	// See https://content.arduino.cc/assets/ATmega640-1280-1281-2560-2561-Datasheet-DS40002211A.pdf
+	enum : uint8_t
+	{
+		ATMEGA640_INT_RESET = 0,
+		ATMEGA640_INT_INT0,
+		ATMEGA640_INT_INT1,
+		ATMEGA640_INT_INT2,
+		ATMEGA640_INT_INT3,
+		ATMEGA640_INT_INT4,
+		ATMEGA640_INT_INT5,
+		ATMEGA640_INT_INT6,
+		ATMEGA640_INT_INT7,
+		ATMEGA640_INT_PCINT0,
+		ATMEGA640_INT_PCINT1,
+		ATMEGA640_INT_PCINT2,
+		ATMEGA640_INT_WDT,
+		ATMEGA640_INT_T2COMPA,
+		ATMEGA640_INT_T2COMPB,
+		ATMEGA640_INT_T2OVF,
+		ATMEGA640_INT_T1CAPT,
+		ATMEGA640_INT_T1COMPA,
+		ATMEGA640_INT_T1COMPB,
+		ATMEGA640_INT_T1COMPC,
+		ATMEGA640_INT_T1OVF,
+		ATMEGA640_INT_T0COMPA,
+		ATMEGA640_INT_T0COMPB,
+		ATMEGA640_INT_T0OVF,
+		ATMEGA640_INT_SPI_STC,
+		ATMEGA640_INT_USART0_RX,
+		ATMEGA640_INT_USART0_UDRE,
+		ATMEGA640_INT_USART0_TX,
+		ATMEGA640_INT_ANALOG_COMP,
+		ATMEGA640_INT_ADC,
+		ATMEGA640_INT_EE_RDY,
+		ATMEGA640_INT_T3CAPT,
+		ATMEGA640_INT_T3COMPA,
+		ATMEGA640_INT_T3COMPB,
+		ATMEGA640_INT_T3COMPC,
+		ATMEGA640_INT_T3OVF,
+		ATMEGA640_INT_USART1_RX,
+		ATMEGA640_INT_USART1_UDRE,
+		ATMEGA640_INT_USART1_TX,
+		ATMEGA640_INT_TWI,
+		ATMEGA640_INT_SPM_RDY,
+		ATMEGA640_INT_T4CAPT,
+		ATMEGA640_INT_T4COMPA,
+		ATMEGA640_INT_T4COMPB,
+		ATMEGA640_INT_T4COMPC,
+		ATMEGA640_INT_T4OVF,
+		ATMEGA640_INT_T5CAPT,
+		ATMEGA640_INT_T5COMPA,
+		ATMEGA640_INT_T5COMPB,
+		ATMEGA640_INT_T5COMPC,
+		ATMEGA640_INT_T5OVF,
+		ATMEGA640_INT_USART2_RX,
+		ATMEGA640_INT_USART2_UDRE,
+		ATMEGA640_INT_USART2_TX,
+		ATMEGA640_INT_USART3_RX,
+		ATMEGA640_INT_USART3_UDRE,
+		ATMEGA640_INT_USART3_TX,
+	};
+
+	// Vectors for the ATMega16U4 and ATMega32U4.
+	// Vector size is 2 words (=4 bytes).
 	enum : uint8_t
 	{
 		ATMEGA32U4_INT_RESET = 0,
@@ -635,17 +705,18 @@ protected:
 
 	struct interrupt_condition
 	{
-		uint8_t m_intindex;
-		uint8_t m_intreg;
-		uint8_t m_intmask;
-		uint8_t m_regindex;
-		uint8_t m_regmask;
+		uint8_t  m_irq_type; 	 // one of the INTIDX_x universal IRQ mappings
+		uint8_t  m_intindex;     // IRQ vector number
+		uint8_t  m_intreg;       // register containing IRQ flag
+		uint8_t  m_intmask;      // bitmask for the IRQ flag itself
+		uint8_t  m_regindex;     // event indication register containing event flag e.g., TOV0
+		uint8_t  m_regmask;      // bitmask for the event flag itself
 	};
 
 	// maps a GPIO port to its pin-change interrupt group, if it has one:
 	// pcmsk_reg is the PCMSKn register gating which pins in the port raise the interrupt,
 	// group is the bit position shared by PCICR/PCIFR for that group (also INTIDX's implicit ordering),
-	// intidx is the INTIDX_PCINTn value to pass to update_interrupt()
+	// intidx is the INTIDX_PCINTn value when signalling an interrupt
 	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const { return false; }
 
 	// PORTB bit masks for the hardware SPI pins (default: ATmega88/168/328 mapping)
@@ -707,11 +778,15 @@ protected:
 
 	// internal CPU state
 	uint32_t m_addr_mask;
-	bool m_interrupt_pending;
 	bool m_sleeping;
 
 	// other internal states
 	int m_icount;
+
+	// IRQs
+	uint8_t m_irq_statuses[INTIDX_COUNT];   // persistent, must be savestate-able
+	std::unique_ptr<interrupt_condition[]> m_irq_cond_table; // rebuilt at device_start
+	uint8_t m_vector_size_in_words; // populated on construct. usually 2; chips with smaller flash will set this to 1
 
 	// memory access
 	inline void push(uint8_t val);
@@ -721,8 +796,23 @@ protected:
 	// utility
 	void unimplemented_opcode(uint32_t op);
 
-	// interrupts
-	void set_irq_line(uint16_t vector, int state);
+	// interrupt handlers
+	void fire_irqs();
+	inline bool irqcond_entry_is_terminator(interrupt_condition condition);
+	void populate_irq_cond_table();
+	void update_irq(uint8_t intidx);
+	
+	/**
+	 * Set IRQ flag for the given intidx. If the IRQ is also enabled,
+	 * set it to fire.
+	 */
+	void set_irq(uint8_t intidx);
+	
+	/**
+	 * Clear IRQ flag for the given intidx. If the IRQ was pending,
+	 * then disable it.
+	 */
+	void clear_irq(uint8_t intidx);
 
 	// ops
 	void populate_ops();
@@ -830,9 +920,14 @@ protected:
 	address_space *m_program;
 	address_space *m_data;
 
-	static const interrupt_condition s_int_conditions[INTIDX_COUNT];
-	static const interrupt_condition s_mega644_int_conditions[INTIDX_COUNT];
-	static const interrupt_condition s_mega32u4_int_conditions[INTIDX_COUNT];
+	static const interrupt_condition s_int_conditions[];
+	static const interrupt_condition s_mega640_int_conditions[];
+	static const interrupt_condition s_mega644_int_conditions[];
+	static const interrupt_condition s_mega32u4_int_conditions[];
+
+	// override this in subclasses and return the intended int_conditions tables above.
+	// the table will be read on device init to populate m_irq_cond_table.
+	virtual const interrupt_condition* irq_conditions();
 };
 
 // ======================> avr8_device
@@ -871,7 +966,14 @@ public:
 	template<uint8_t Pin> auto adc_in() { return m_adc_in_cb[Pin].bind(); }
 
 protected:
-	avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t address_mask, address_map_constructor internal_map);
+	avr8_device(const machine_config &mconfig,
+				const char *tag,
+				device_t *owner,
+				uint32_t clock,
+				const device_type type,
+				uint32_t address_mask,
+				uint8_t vector_size_in_words,
+				address_map_constructor internal_map);
 
 	typedef delegate<void (void)> timer_func;
 
@@ -1222,7 +1324,6 @@ public:
 	// construction/destruction
 	atmega168_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void update_interrupt(int source) override;
 	void atmega168_internal_map(address_map &map) ATTR_COLD;
 
 protected:
@@ -1237,7 +1338,6 @@ public:
 	// construction/destruction
 	atmega328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void update_interrupt(int source) override;
 	void atmega328_internal_map(address_map &map) ATTR_COLD;
 
 protected:
@@ -1253,10 +1353,10 @@ public:
 	// construction/destruction
 	atmega32u4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void update_interrupt(int source) override;
 	void atmega32u4_internal_map(address_map &map) ATTR_COLD;
 
 protected:
+	virtual const interrupt_condition* irq_conditions() override;
 	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
 	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
 	{
@@ -1275,10 +1375,10 @@ public:
 	// construction/destruction
 	atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void update_interrupt(int source) override;
 	void atmega644_internal_map(address_map &map) ATTR_COLD;
 
 protected:
+	virtual const interrupt_condition* irq_conditions() override;
 	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
 	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
 	{
@@ -1297,10 +1397,10 @@ public:
 	// construction/destruction
 	atmega1284_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void update_interrupt(int source) override;
 	void atmega1284_internal_map(address_map &map) ATTR_COLD;
 
 protected:
+	virtual const interrupt_condition* irq_conditions() override;
 	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
 	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
 	{
@@ -1319,10 +1419,10 @@ public:
 	// construction/destruction
 	atmega1280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void update_interrupt(int source) override;
 	void atmega1280_internal_map(address_map &map) ATTR_COLD;
 
 protected:
+	virtual const interrupt_condition* irq_conditions() override;
 	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
 	{
 		mosi_mask = 0x04; // PB2
@@ -1340,10 +1440,10 @@ public:
 	// construction/destruction
 	atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void update_interrupt(int source) override;
 	void atmega2560_internal_map(address_map &map) ATTR_COLD;
 
 protected:
+	virtual const interrupt_condition* irq_conditions() override;
 	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
 	{
 		mosi_mask = 0x04; // PB2

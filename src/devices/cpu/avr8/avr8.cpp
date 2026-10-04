@@ -49,10 +49,11 @@
 #define LOG_ASYNC           (1U << 25)
 #define LOG_TWI             (1U << 26)
 #define LOG_UART            (1U << 27)
+#define LOG_IRQ             (1U << 28)
 #define LOG_TIMERS          (LOG_TIMER0 | LOG_TIMER1 | LOG_TIMER2 | LOG_TIMER3 | LOG_TIMER4 | LOG_TIMER5)
 #define LOG_TIMER_TICKS     (LOG_TIMER0_TICK | LOG_TIMER1_TICK | LOG_TIMER2_TICK | LOG_TIMER3_TICK | LOG_TIMER4_TICK | LOG_TIMER5_TICK)
 #define LOG_ALL             (LOG_UNKNOWN | LOG_BOOT | LOG_TIMERS | LOG_EEPROM | LOG_GPIO | LOG_WDOG | LOG_CLOCK | LOG_POWER \
-							 | LOG_OSC | LOG_PINCHG | LOG_EXTMEM | LOG_ADC | LOG_DIGINPUT | LOG_ASYNC | LOG_TWI | LOG_UART)
+							 | LOG_OSC | LOG_PINCHG | LOG_EXTMEM | LOG_ADC | LOG_DIGINPUT | LOG_ASYNC | LOG_TWI | LOG_UART | LOG_IRQ)
 
 #define VERBOSE             (0)
 //#define LOG_OUTPUT_FUNC     osd_printf_info
@@ -502,7 +503,6 @@ enum
 #define ADCSRA_ADSC         ((m_r[ADCSRA] & ADCSRA_ADSC_MASK) >> 6)
 #define ADCSRA_ADEN         ((m_r[ADCSRA] & ADCSRA_ADEN_MASK) >> 7)
 
-
 //**************************************************************************
 //  DEVICE INTERFACE
 //**************************************************************************
@@ -723,7 +723,7 @@ void attiny15_device::attiny15_internal_map(address_map &map)
 //-------------------------------------------------
 
 atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA88, 0x0fff, address_map_constructor(FUNC(atmega88_device::atmega88_internal_map), this))
+	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA88, 0x0fff, 1, address_map_constructor(FUNC(atmega88_device::atmega88_internal_map), this))
 {
 }
 
@@ -743,7 +743,7 @@ bool atmega88_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) c
 //-------------------------------------------------
 
 atmega168_device::atmega168_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA168, 0x1fff, address_map_constructor(FUNC(atmega168_device::atmega168_internal_map), this))
+	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA168, 0x1fff, 2, address_map_constructor(FUNC(atmega168_device::atmega168_internal_map), this))
 {
 }
 
@@ -752,7 +752,7 @@ atmega168_device::atmega168_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 atmega328_device::atmega328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA328, 0x3fff, address_map_constructor(FUNC(atmega328_device::atmega328_internal_map), this))
+	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA328, 0x3fff, 2, address_map_constructor(FUNC(atmega328_device::atmega328_internal_map), this))
 {
 }
 
@@ -761,7 +761,7 @@ atmega328_device::atmega328_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 atmega32u4_device::atmega32u4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<4>(mconfig, tag, owner, clock, ATMEGA32U4, 0x3fff, address_map_constructor(FUNC(atmega32u4_device::atmega32u4_internal_map), this))
+	: avr8_device<4>(mconfig, tag, owner, clock, ATMEGA32U4, 0x3fff, 2, address_map_constructor(FUNC(atmega32u4_device::atmega32u4_internal_map), this))
 {
 }
 
@@ -771,7 +771,7 @@ atmega32u4_device::atmega32u4_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 atmega644_device::atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA644, 0x7fff, address_map_constructor(FUNC(atmega644_device::atmega644_internal_map), this))
+	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA644, 0x7fff, 2, address_map_constructor(FUNC(atmega644_device::atmega644_internal_map), this))
 {
 }
 
@@ -780,7 +780,7 @@ atmega644_device::atmega644_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 atmega1284_device::atmega1284_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA1284, 0xffff, address_map_constructor(FUNC(atmega1284_device::atmega1284_internal_map), this))
+	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA1284, 0xffff, 2, address_map_constructor(FUNC(atmega1284_device::atmega1284_internal_map), this))
 {
 }
 
@@ -789,7 +789,7 @@ atmega1284_device::atmega1284_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<6>(mconfig, tag, owner, clock, ATMEGA1280, 0xffff, address_map_constructor(FUNC(atmega1280_device::atmega1280_internal_map), this))
+	: avr8_device<6>(mconfig, tag, owner, clock, ATMEGA1280, 0xffff, 2, address_map_constructor(FUNC(atmega1280_device::atmega1280_internal_map), this))
 {
 }
 
@@ -798,7 +798,7 @@ atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<6>(mconfig, tag, owner, clock, ATMEGA2560, 0x1ffff, address_map_constructor(FUNC(atmega2560_device::atmega2560_internal_map), this))
+	: avr8_device<6>(mconfig, tag, owner, clock, ATMEGA2560, 0x1ffff, 2, address_map_constructor(FUNC(atmega2560_device::atmega2560_internal_map), this))
 {
 }
 
@@ -807,7 +807,7 @@ atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 attiny15_device::attiny15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<2>(mconfig, tag, owner, clock, ATTINY15, 0x01ff, address_map_constructor(FUNC(attiny15_device::attiny15_internal_map), this))
+	: avr8_device<2>(mconfig, tag, owner, clock, ATTINY15, 0x01ff, 1, address_map_constructor(FUNC(attiny15_device::attiny15_internal_map), this))
 {
 }
 
@@ -815,7 +815,7 @@ attiny15_device::attiny15_device(const machine_config &mconfig, const char *tag,
 //  avr8_base_device - constructor
 //-------------------------------------------------
 
-avr8_base_device::avr8_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t addr_mask, address_map_constructor internal_map)
+avr8_base_device::avr8_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t addr_mask, uint8_t vector_size_in_words, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 22)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0, internal_map)
@@ -827,14 +827,14 @@ avr8_base_device::avr8_base_device(const machine_config &mconfig, const char *ta
 	, m_r(*this, "regs")
 	, m_pc(0)
 	, m_addr_mask((addr_mask << 1) | 1)
-	, m_interrupt_pending(false)
 	, m_sleeping(false)
+	, m_vector_size_in_words(vector_size_in_words)
 {
 }
 
 template <int NumTimers>
-avr8_device<NumTimers>::avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t addr_mask, address_map_constructor internal_map)
-	: avr8_base_device(mconfig, tag, owner, clock, type, addr_mask, internal_map)
+avr8_device<NumTimers>::avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t addr_mask, uint8_t vector_size_in_words, address_map_constructor internal_map)
+	: avr8_base_device(mconfig, tag, owner, clock, type, addr_mask, vector_size_in_words, internal_map)
 	, m_gpio_out_cb(*this)
 	, m_gpio_in_cb(*this, 0)
 	, m_adc_in_cb(*this, 0)
@@ -1104,7 +1104,6 @@ void avr8_base_device::device_start()
 
 	// Misc.
 	save_item(NAME(m_addr_mask));
-	save_item(NAME(m_interrupt_pending));
 	save_item(NAME(m_sleeping));
 	save_item(NAME(m_opcycles));
 
@@ -1125,6 +1124,10 @@ void avr8_base_device::device_start()
 	populate_sbc_flag_cache();
 	populate_bool_flag_cache();
 	populate_shift_flag_cache();
+
+	populate_irq_cond_table();
+	std::fill_n(m_irq_statuses, INTIDX_COUNT, 0);
+	save_item(NAME(m_irq_statuses));
 }
 
 template <int NumTimers>
@@ -1211,8 +1214,14 @@ void avr8_base_device::device_reset()
 		m_r[i] = 0;
 	}
 
-	m_interrupt_pending = false;
 	m_sleeping = false;
+
+	// clear any pending IRQs (the register zero loop above will have already
+	// acknowledged any pending and disabled any that could have fired)
+	for (int i = 0; i < INTIDX_COUNT; i++)
+	{
+		m_irq_statuses[i] = 0;
+	}
 }
 
 template <int NumTimers>
@@ -1320,75 +1329,192 @@ inline uint8_t avr8_base_device::pop()
 //  IRQ HANDLING
 //**************************************************************************
 
-void avr8_base_device::set_irq_line(uint16_t vector, int state)
+
+const avr8_base_device::interrupt_condition avr8_base_device::s_int_conditions[] =
 {
-	if (state)
+	// irq id        vector            irq reg    irq reg mask        flag reg  flag reg mask
+	{ INTIDX_SPI,    AVR8_INT_SPI_STC, SPCR,      SPCR_SPIE_MASK,     SPSR,     SPSR_SPIF_MASK   },
+	{ INTIDX_OCF0B,  AVR8_INT_T0COMPB, TIMSK0,    TIMSK0_OCIE0B_MASK, TIFR0,    TIFR0_OCF0B_MASK },
+	{ INTIDX_OCF0A,  AVR8_INT_T0COMPA, TIMSK0,    TIMSK0_OCIE0A_MASK, TIFR0,    TIFR0_OCF0A_MASK },
+	{ INTIDX_TOV0,   AVR8_INT_T0OVF,   TIMSK0,    TIMSK0_TOIE0_MASK,  TIFR0,    TIFR0_TOV0_MASK  },
+	{ INTIDX_ICF1,   AVR8_INT_T1CAPT,  TIMSK1,    TIMSK1_ICIE1_MASK,  TIFR1,    TIFR1_ICF1_MASK  },
+	{ INTIDX_OCF1B,  AVR8_INT_T1COMPB, TIMSK1,    TIMSK1_OCIE1B_MASK, TIFR1,    TIFR1_OCF1B_MASK },
+	{ INTIDX_OCF1A,  AVR8_INT_T1COMPA, TIMSK1,    TIMSK1_OCIE1A_MASK, TIFR1,    TIFR1_OCF1A_MASK },
+	{ INTIDX_TOV1,   AVR8_INT_T1OVF,   TIMSK1,    TIMSK1_TOIE1_MASK,  TIFR1,    TIFR1_TOV1_MASK  },
+	{ INTIDX_OCF2B,  AVR8_INT_T2COMPB, TIMSK2,    TIMSK2_OCIE2B_MASK, TIFR2,    TIFR2_OCF2B_MASK },
+	{ INTIDX_OCF2A,  AVR8_INT_T2COMPA, TIMSK2,    TIMSK2_OCIE2A_MASK, TIFR2,    TIFR2_OCF2A_MASK },
+	{ INTIDX_TOV2,   AVR8_INT_T2OVF,   TIMSK2,    TIMSK2_TOIE2_MASK,  TIFR2,    TIFR2_TOV2_MASK },
+	{ INTIDX_PCINT0, AVR8_INT_PCINT0,  PCICR,     PCICR_PCIE0_MASK,   PCIFR,    PCIFR_PCIF0_MASK },
+	{ INTIDX_PCINT1, AVR8_INT_PCINT1,  PCICR,     PCICR_PCIE1_MASK,   PCIFR,    PCIFR_PCIF1_MASK },
+	{ INTIDX_PCINT2, AVR8_INT_PCINT2,  PCICR,     PCICR_PCIE2_MASK,   PCIFR,    PCIFR_PCIF2_MASK },
+	{ INTIDX_INT0,   AVR8_INT_INT0,    EIMSK,     EIMSK_INT0_MASK,    EIFR,     EIFR_INTF0_MASK },
+	{ INTIDX_INT1,   AVR8_INT_INT1,    EIMSK,     EIMSK_INT1_MASK,    EIFR,     EIFR_INTF1_MASK },
+	{ 0,             0,                0,         0,                  0,        0, } // end of list
+};
+
+const avr8_base_device::interrupt_condition* avr8_base_device::irq_conditions()
+{
+	return s_int_conditions;
+}
+
+void avr8_base_device::update_irq(uint8_t intidx)
+{
+	// it's preferred you go through set_irq() or clear_irq() directly
+	// when that's the only operation that will be performed in that context.
+	// failure to do this might lead to unwanted side effects.
+	interrupt_condition condition = m_irq_cond_table[intidx];
+	if (!(0 <= condition.m_irq_type && condition.m_irq_type < INTIDX_COUNT))
 	{
-		if (BIT(m_r[SREG], SREG_I))
+		fatalerror("tried to update unmapped IRQ %d\n", intidx);
+	}
+
+	if (m_r[condition.m_regindex] & condition.m_regmask)
+	{
+		set_irq(intidx);
+	}
+	else
+	{
+		clear_irq(intidx);
+	}
+}
+
+void avr8_base_device::set_irq(uint8_t intidx)
+{
+	interrupt_condition condition = m_irq_cond_table[intidx];
+	if (!(0 <= condition.m_irq_type && condition.m_irq_type < INTIDX_COUNT))
+	{
+		fatalerror("tried to set unmapped IRQ %d\n", intidx);
+	}
+
+	m_r[condition.m_regindex] |= condition.m_regmask;
+	if (m_r[condition.m_intreg] & condition.m_intmask)
+	{
+		m_irq_statuses[intidx] = 1;
+	}
+}
+
+void avr8_base_device::clear_irq(uint8_t intidx)
+{
+	interrupt_condition condition = m_irq_cond_table[intidx];
+	if (!(0 <= condition.m_irq_type && condition.m_irq_type < INTIDX_COUNT))
+	{
+		fatalerror("tried to ack unmapped IRQ %d\n", intidx);
+	}
+
+	// Clear IRQ event flag that raised the interrupt.
+	// This will either happen because the MCU took the interrupt (if IRQs on),
+	// or if the interrupt was manually acknowledged (if IRQs off).
+	m_r[condition.m_regindex] &= ~condition.m_regmask;
+
+	m_irq_statuses[intidx] = 0;
+}
+
+void avr8_base_device::fire_irqs()
+{
+	int irq_winner_idx = -1;
+	bool irq_firing = false;
+
+	if (BIT(m_r[SREG], SREG_I) == 0)
+	{
+		// IRQs are off globally (cli opcode, another IRQ handler running, etc.).
+		// Defer all IRQs until next pass.
+		return;
+	}
+
+	// Basic rules for IRQ handling on the AVR8 series:
+	//
+	// - When multiple IRQs arrive at the same time, the one with the lowest
+	//   vector entry will win the race.
+	//
+	// - When an interrupt arrives when IRQs are disabled, it stays pending
+	//   and its flag stays 1. The IRQ stays pending until the MCU fires it,
+	//   or it's manually acknowledged (e.g., TOV0 is set to 1 by the user
+	//   while interrupts are disabled).
+	//
+	//   The same thing happens when multiple interrupts are pending, and
+	//   one or more of them loses the race; they simply get deferred until later.
+	//
+	// - The winning interrupt always clears its respective register flag
+	//   and gets acknowledged. The IRQ enable flag will stay set regardless.
+	//
+	// - There should never be a case where we need a tiebreaker, i.e., every interrupt
+	//   should be mapped to its own unique vector.
+	for (int i = 0; i < INTIDX_COUNT; i++)
+	{
+		if (!m_irq_statuses[i]) continue;
+
+		interrupt_condition condition = m_irq_cond_table[i];
+		if (!(0 <= condition.m_irq_type && condition.m_irq_type < INTIDX_COUNT))
 		{
-			m_r[SREG] &= ~SREG_MASK_I;
-			push((m_pc >> 1) & 0x00ff);
-			push((m_pc >> 9) & 0x00ff);
-			m_pc = vector << 1;
-			m_sleeping = false;
+			fatalerror("internal IRQ %d set to fire, but wasn't mapped to anything", i);
+		}
+
+		if (!(m_r[condition.m_intreg] & condition.m_intmask))
+		{
+			logerror("%s: avr8 standard IRQ %d scheduled but its IRQ flag at %02x is disabled\n",
+					 machine().describe_context(),
+					 i,
+					 condition.m_intindex
+					 );
+			continue;
+		}
+
+		irq_firing = true;
+		if (irq_winner_idx == -1)
+		{
+			irq_winner_idx = i;
+		}
+		else if (condition.m_intindex >= m_irq_cond_table[irq_winner_idx].m_intindex)
+		{
+			LOGMASKED(LOG_IRQ, "IRQ %d already losing the race, currently winning is %d\n", i, irq_winner_idx);
 		}
 		else
 		{
-			m_interrupt_pending = true;
+			LOGMASKED(LOG_IRQ, "IRQ %d now losing the race, currently winning is %d\n", i, irq_winner_idx);
+			irq_winner_idx = i;
 		}
 	}
-}
 
-const avr8_base_device::interrupt_condition avr8_base_device::s_int_conditions[avr8_base_device::INTIDX_COUNT] =
-{
-	{ AVR8_INT_SPI_STC, SPCR,   SPCR_SPIE_MASK,     SPSR,    SPSR_SPIF_MASK },
-	{ AVR8_INT_T0COMPB, TIMSK0, TIMSK0_OCIE0B_MASK, TIFR0,   TIFR0_OCF0B_MASK },
-	{ AVR8_INT_T0COMPA, TIMSK0, TIMSK0_OCIE0A_MASK, TIFR0,   TIFR0_OCF0A_MASK },
-	{ AVR8_INT_T0OVF,   TIMSK0, TIMSK0_TOIE0_MASK,  TIFR0,   TIFR0_TOV0_MASK },
-	{ AVR8_INT_T1CAPT,  TIMSK1, TIMSK1_ICIE1_MASK,  TIFR1,   TIFR1_ICF1_MASK },
-	{ AVR8_INT_T1COMPB, TIMSK1, TIMSK1_OCIE1B_MASK, TIFR1,   TIFR1_OCF1B_MASK },
-	{ AVR8_INT_T1COMPA, TIMSK1, TIMSK1_OCIE1A_MASK, TIFR1,   TIFR1_OCF1A_MASK },
-	{ AVR8_INT_T1OVF,   TIMSK1, TIMSK1_TOIE1_MASK,  TIFR1,   TIFR1_TOV1_MASK },
-	{ AVR8_INT_T2COMPB, TIMSK2, TIMSK2_OCIE2B_MASK, TIFR2,   TIFR2_OCF2B_MASK },
-	{ AVR8_INT_T2COMPA, TIMSK2, TIMSK2_OCIE2A_MASK, TIFR2,   TIFR2_OCF2A_MASK },
-	{ AVR8_INT_T2OVF,   TIMSK2, TIMSK2_TOIE2_MASK,  TIFR2,   TIFR2_TOV2_MASK },
-	{ AVR8_INT_PCINT0,  PCICR,  PCICR_PCIE0_MASK,   PCIFR,   PCIFR_PCIF0_MASK },
-	{ AVR8_INT_PCINT1,  PCICR,  PCICR_PCIE1_MASK,   PCIFR,   PCIFR_PCIF1_MASK },
-	{ AVR8_INT_PCINT2,  PCICR,  PCICR_PCIE2_MASK,   PCIFR,   PCIFR_PCIF2_MASK },
-	{ AVR8_INT_INT0,    EIMSK,  EIMSK_INT0_MASK,    EIFR,    EIFR_INTF0_MASK },
-	{ AVR8_INT_INT1,    EIMSK,  EIMSK_INT1_MASK,    EIFR,    EIFR_INTF1_MASK }
-};
-
-void avr8_base_device::update_interrupt(int source)
-{
-	const interrupt_condition &condition = s_int_conditions[source];
-
-	int intstate = 0;
-	if (m_r[condition.m_intreg] & condition.m_intmask)
-		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
-
-	set_irq_line(condition.m_intindex, intstate);
-
-	if (intstate)
+	if (irq_firing)
 	{
-		m_r[condition.m_regindex] &= ~condition.m_regmask;
+		LOGMASKED(LOG_IRQ, "IRQ %d won the race, firing it.\n", irq_winner_idx);
+		
+		m_r[SREG] &= ~SREG_MASK_I;
+		push((m_pc >> 1) & 0x00ff);
+		push((m_pc >> 9) & 0x00ff);
+		// TODO: 24-bit address pushes for 2560 and friends that use bigger flash space
+
+		m_pc = m_irq_cond_table[irq_winner_idx].m_intindex * (2 * m_vector_size_in_words);
+
+		m_sleeping = false;
+
+		clear_irq(irq_winner_idx);
 	}
 }
 
-//TODO: review this!
-void atmega168_device::update_interrupt(int source)
+inline bool avr8_base_device::irqcond_entry_is_terminator(interrupt_condition condition)
 {
-	const interrupt_condition &condition = s_int_conditions[source];
+	return std::all_of(
+				(uint8_t*)&condition,
+				(uint8_t*)&condition + sizeof(interrupt_condition),
+				[] (uint8_t value) { return value == 0; });
+}
 
-	int intstate = 0;
-	if (m_r[condition.m_intreg] & condition.m_intmask)
-		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
+void avr8_base_device::populate_irq_cond_table()
+{
+	const avr8_base_device::interrupt_condition* irq_conds = irq_conditions();
+	
+	m_irq_cond_table = std::make_unique<avr8_base_device::interrupt_condition[]>(INTIDX_COUNT);
 
-	set_irq_line(condition.m_intindex << 1, intstate);
-
-	if (intstate)
+	// unwire all IRQ vectors by default
+	for (int i = 0; i < INTIDX_COUNT; i++)
 	{
-		m_r[condition.m_regindex] &= ~condition.m_regmask;
+		m_irq_cond_table[i].m_irq_type = INTIDX_COUNT;
+	}
+
+	for (int i = 0; !irqcond_entry_is_terminator(irq_conds[i]); i++)
+	{
+		std::memcpy(&m_irq_cond_table[irq_conds[i].m_irq_type], &irq_conds[i], sizeof(avr8_base_device::interrupt_condition));
 	}
 }
 
@@ -1403,22 +1529,6 @@ bool atmega168_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) 
 	}
 }
 
-void atmega328_device::update_interrupt(int source)
-{
-	const interrupt_condition &condition = s_int_conditions[source];
-
-	int intstate = 0;
-	if (m_r[condition.m_intreg] & condition.m_intmask)
-		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
-
-	set_irq_line(condition.m_intindex << 1, intstate);
-
-	if (intstate)
-	{
-		m_r[condition.m_regindex] &= ~condition.m_regmask;
-	}
-}
-
 bool atmega328_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const
 {
 	switch (port)
@@ -1430,36 +1540,26 @@ bool atmega328_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) 
 	}
 }
 
-
-const avr8_base_device::interrupt_condition avr8_base_device::s_mega32u4_int_conditions[avr8_base_device::INTIDX_COUNT] =
+const avr8_base_device::interrupt_condition avr8_base_device::s_mega32u4_int_conditions[] =
 {
-	{ ATMEGA32U4_INT_SPI_STC, SPCR,   SPCR_SPIE_MASK,     SPSR,    SPSR_SPIF_MASK },
-	{ ATMEGA32U4_INT_T0COMPB, TIMSK0, TIMSK0_OCIE0B_MASK, TIFR0,   TIFR0_OCF0B_MASK },
-	{ ATMEGA32U4_INT_T0COMPA, TIMSK0, TIMSK0_OCIE0A_MASK, TIFR0,   TIFR0_OCF0A_MASK },
-	{ ATMEGA32U4_INT_T0OVF,   TIMSK0, TIMSK0_TOIE0_MASK,  TIFR0,   TIFR0_TOV0_MASK },
-	{ ATMEGA32U4_INT_T1CAPT,  TIMSK1, TIMSK1_ICIE1_MASK,  TIFR1,   TIFR1_ICF1_MASK },
-	{ ATMEGA32U4_INT_T1COMPB, TIMSK1, TIMSK1_OCIE1B_MASK, TIFR1,   TIFR1_OCF1B_MASK },
-	{ ATMEGA32U4_INT_T1COMPA, TIMSK1, TIMSK1_OCIE1A_MASK, TIFR1,   TIFR1_OCF1A_MASK },
-	{ ATMEGA32U4_INT_T1OVF,   TIMSK1, TIMSK1_TOIE1_MASK,  TIFR1,   TIFR1_TOV1_MASK },
-	{ ATMEGA32U4_INT_PCINT0,  PCICR,  PCICR_PCIE0_MASK,   PCIFR,   PCIFR_PCIF0_MASK },
-	{ ATMEGA32U4_INT_INT0,    EIMSK,  EIMSK_INT0_MASK,    EIFR,    EIFR_INTF0_MASK },
-	{ ATMEGA32U4_INT_INT1,    EIMSK,  EIMSK_INT1_MASK,    EIFR,    EIFR_INTF1_MASK }
+	// irq id        vector                  irq reg   irq reg mask        flag reg  flag reg mask
+	{ INTIDX_SPI,    ATMEGA32U4_INT_SPI_STC, SPCR,     SPCR_SPIE_MASK,     SPSR,     SPSR_SPIF_MASK,   },
+	{ INTIDX_OCF0B,  ATMEGA32U4_INT_T0COMPB, TIMSK0,   TIMSK0_OCIE0B_MASK, TIFR0,    TIFR0_OCF0B_MASK, },
+	{ INTIDX_OCF0A,  ATMEGA32U4_INT_T0COMPA, TIMSK0,   TIMSK0_OCIE0A_MASK, TIFR0,    TIFR0_OCF0A_MASK, },
+	{ INTIDX_TOV0,   ATMEGA32U4_INT_T0OVF,   TIMSK0,   TIMSK0_TOIE0_MASK,  TIFR0,    TIFR0_TOV0_MASK, },
+	{ INTIDX_ICF1,   ATMEGA32U4_INT_T1CAPT,  TIMSK1,   TIMSK1_ICIE1_MASK,  TIFR1,    TIFR1_ICF1_MASK, },
+	{ INTIDX_OCF1B,  ATMEGA32U4_INT_T1COMPB, TIMSK1,   TIMSK1_OCIE1B_MASK, TIFR1,    TIFR1_OCF1B_MASK, },
+	{ INTIDX_OCF1A,  ATMEGA32U4_INT_T1COMPA, TIMSK1,   TIMSK1_OCIE1A_MASK, TIFR1,    TIFR1_OCF1A_MASK, },
+	{ INTIDX_TOV1,   ATMEGA32U4_INT_T1OVF,   TIMSK1,   TIMSK1_TOIE1_MASK,  TIFR1,    TIFR1_TOV1_MASK, },
+	{ INTIDX_PCINT0, ATMEGA32U4_INT_PCINT0,  PCICR,    PCICR_PCIE0_MASK,   PCIFR,    PCIFR_PCIF0_MASK, },
+	{ INTIDX_INT0,   ATMEGA32U4_INT_INT0,    EIMSK,    EIMSK_INT0_MASK,    EIFR,     EIFR_INTF0_MASK, },
+	{ INTIDX_INT1,   ATMEGA32U4_INT_INT1,    EIMSK,    EIMSK_INT1_MASK,    EIFR,     EIFR_INTF1_MASK, },
+	{ 0,             0,                      0,        0,                  0,        0, } // end of list
 };
 
-void atmega32u4_device::update_interrupt(int source)
+const avr8_base_device::interrupt_condition* atmega32u4_device::irq_conditions()
 {
-	const interrupt_condition &condition = s_mega32u4_int_conditions[source];
-
-	int intstate = 0;
-	if (m_r[condition.m_intreg] & condition.m_intmask)
-		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
-
-	set_irq_line(condition.m_intindex << 1, intstate);
-
-	if (intstate)
-	{
-		m_r[condition.m_regindex] &= ~condition.m_regmask;
-	}
+	return s_mega32u4_int_conditions;
 }
 
 bool atmega32u4_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const
@@ -1473,40 +1573,68 @@ bool atmega32u4_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group)
 	}
 }
 
-const avr8_base_device::interrupt_condition avr8_base_device::s_mega644_int_conditions[avr8_base_device::INTIDX_COUNT] =
+const avr8_base_device::interrupt_condition avr8_base_device::s_mega640_int_conditions[avr8_base_device::INTIDX_COUNT] =
 {
-	{ ATMEGA644_INT_SPI_STC, SPCR,   SPCR_SPIE_MASK,     SPSR,    SPSR_SPIF_MASK },
-	{ ATMEGA644_INT_T0COMPB, TIMSK0, TIMSK0_OCIE0B_MASK, TIFR0,   TIFR0_OCF0B_MASK },
-	{ ATMEGA644_INT_T0COMPA, TIMSK0, TIMSK0_OCIE0A_MASK, TIFR0,   TIFR0_OCF0A_MASK },
-	{ ATMEGA644_INT_T0OVF,   TIMSK0, TIMSK0_TOIE0_MASK,  TIFR0,   TIFR0_TOV0_MASK },
-	{ ATMEGA644_INT_T1CAPT,  TIMSK1, TIMSK1_ICIE1_MASK,  TIFR1,   TIFR1_ICF1_MASK },
-	{ ATMEGA644_INT_T1COMPB, TIMSK1, TIMSK1_OCIE1B_MASK, TIFR1,   TIFR1_OCF1B_MASK },
-	{ ATMEGA644_INT_T1COMPA, TIMSK1, TIMSK1_OCIE1A_MASK, TIFR1,   TIFR1_OCF1A_MASK },
-	{ ATMEGA644_INT_T1OVF,   TIMSK1, TIMSK1_TOIE1_MASK,  TIFR1,   TIFR1_TOV1_MASK },
-	{ ATMEGA644_INT_T2COMPB, TIMSK2, TIMSK2_OCIE2B_MASK, TIFR2,   TIFR2_OCF2B_MASK },
-	{ ATMEGA644_INT_T2COMPA, TIMSK2, TIMSK2_OCIE2A_MASK, TIFR2,   TIFR2_OCF2A_MASK },
-	{ ATMEGA644_INT_T2OVF,   TIMSK2, TIMSK2_TOIE2_MASK,  TIFR2,   TIFR2_TOV2_MASK },
-	{ ATMEGA644_INT_PCINT0,  PCICR,  PCICR_PCIE0_MASK,   PCIFR,   PCIFR_PCIF0_MASK },
-	{ ATMEGA644_INT_PCINT1,  PCICR,  PCICR_PCIE1_MASK,   PCIFR,   PCIFR_PCIF1_MASK },
-	{ ATMEGA644_INT_PCINT2,  PCICR,  PCICR_PCIE2_MASK,   PCIFR,   PCIFR_PCIF2_MASK },
-	{ ATMEGA644_INT_INT0,    EIMSK,  EIMSK_INT0_MASK,    EIFR,    EIFR_INTF0_MASK },
-	{ ATMEGA644_INT_INT1,    EIMSK,  EIMSK_INT1_MASK,    EIFR,    EIFR_INTF1_MASK }
+	// irq id        vector                  irq reg   irq reg mask        flag reg  flag reg mask
+	{ INTIDX_SPI,  	 ATMEGA640_INT_SPI_STC,  SPCR,     SPCR_SPIE_MASK,     SPSR,     SPSR_SPIF_MASK },
+	{ INTIDX_OCF0B,  ATMEGA640_INT_T0COMPB,  TIMSK0,   TIMSK0_OCIE0B_MASK, TIFR0,    TIFR0_OCF0B_MASK },
+	{ INTIDX_OCF0A,  ATMEGA640_INT_T0COMPA,  TIMSK0,   TIMSK0_OCIE0A_MASK, TIFR0,    TIFR0_OCF0A_MASK },
+	{ INTIDX_TOV0,   ATMEGA640_INT_T0OVF,  	 TIMSK0,   TIMSK0_TOIE0_MASK,  TIFR0,    TIFR0_TOV0_MASK },
+	{ INTIDX_ICF1, 	 ATMEGA640_INT_T1CAPT,   TIMSK1,   TIMSK1_ICIE1_MASK,  TIFR1,    TIFR1_ICF1_MASK },
+	{ INTIDX_OCF1B,  ATMEGA640_INT_T1COMPB,  TIMSK1,   TIMSK1_OCIE1B_MASK, TIFR1,    TIFR1_OCF1B_MASK },
+	{ INTIDX_OCF1A,  ATMEGA640_INT_T1COMPA,  TIMSK1,   TIMSK1_OCIE1A_MASK, TIFR1,    TIFR1_OCF1A_MASK },
+	{ INTIDX_TOV1,   ATMEGA640_INT_T1OVF,    TIMSK1,   TIMSK1_TOIE1_MASK,  TIFR1,    TIFR1_TOV1_MASK },
+	{ INTIDX_OCF2B,  ATMEGA640_INT_T2COMPB,  TIMSK2,   TIMSK2_OCIE2B_MASK, TIFR2,    TIFR2_OCF2B_MASK },
+	{ INTIDX_OCF2A,  ATMEGA640_INT_T2COMPA,  TIMSK2,   TIMSK2_OCIE2A_MASK, TIFR2,    TIFR2_OCF2A_MASK },
+	{ INTIDX_TOV2,   ATMEGA640_INT_T2OVF,    TIMSK2,   TIMSK2_TOIE2_MASK,  TIFR2,    TIFR2_TOV2_MASK },
+	{ INTIDX_PCINT0, ATMEGA640_INT_PCINT0,   PCICR,    PCICR_PCIE0_MASK,   PCIFR,    PCIFR_PCIF0_MASK },
+	{ INTIDX_PCINT1, ATMEGA640_INT_PCINT1,   PCICR,    PCICR_PCIE1_MASK,   PCIFR,    PCIFR_PCIF1_MASK },
+	{ INTIDX_PCINT2, ATMEGA640_INT_PCINT2,   PCICR,    PCICR_PCIE2_MASK,   PCIFR,    PCIFR_PCIF2_MASK },
+	{ INTIDX_INT0,   ATMEGA640_INT_INT0,     EIMSK,    EIMSK_INT0_MASK,    EIFR,     EIFR_INTF0_MASK },
+	{ INTIDX_INT1,   ATMEGA640_INT_INT1,     EIMSK,    EIMSK_INT1_MASK,    EIFR,     EIFR_INTF1_MASK },
+	{ 0,             0,                      0,        0,                  0,        0, } // end of list
 };
 
-void atmega644_device::update_interrupt(int source)
+const avr8_base_device::interrupt_condition* atmega1280_device::irq_conditions()
 {
-	const interrupt_condition &condition = s_mega644_int_conditions[source];
+	return s_mega640_int_conditions;
+}
 
-	int intstate = 0;
-	if (m_r[condition.m_intreg] & condition.m_intmask)
-		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
+const avr8_base_device::interrupt_condition* atmega2560_device::irq_conditions()
+{
+	return s_mega640_int_conditions;
+}
 
-	set_irq_line(condition.m_intindex << 1, intstate);
+const avr8_base_device::interrupt_condition avr8_base_device::s_mega644_int_conditions[avr8_base_device::INTIDX_COUNT] =
+{
+	//  irq id        vector                  irq reg   irq reg mask        flag reg  flag reg mask
+	{ INTIDX_SPI,     ATMEGA644_INT_SPI_STC,  SPCR,     SPCR_SPIE_MASK,     SPSR,     SPSR_SPIF_MASK },
+	{ INTIDX_OCF0B,   ATMEGA644_INT_T0COMPB,  TIMSK0,   TIMSK0_OCIE0B_MASK, TIFR0,    TIFR0_OCF0B_MASK },
+	{ INTIDX_OCF0A,   ATMEGA644_INT_T0COMPA,  TIMSK0,   TIMSK0_OCIE0A_MASK, TIFR0,    TIFR0_OCF0A_MASK },
+	{ INTIDX_TOV0,    ATMEGA644_INT_T0OVF,    TIMSK0,   TIMSK0_TOIE0_MASK,  TIFR0,    TIFR0_TOV0_MASK },
+	{ INTIDX_ICF1,    ATMEGA644_INT_T1CAPT,   TIMSK1,   TIMSK1_ICIE1_MASK,  TIFR1,    TIFR1_ICF1_MASK },
+	{ INTIDX_OCF1B,   ATMEGA644_INT_T1COMPB,  TIMSK1,   TIMSK1_OCIE1B_MASK, TIFR1,    TIFR1_OCF1B_MASK },
+	{ INTIDX_OCF1A,   ATMEGA644_INT_T1COMPA,  TIMSK1,   TIMSK1_OCIE1A_MASK, TIFR1,    TIFR1_OCF1A_MASK },
+	{ INTIDX_TOV1,    ATMEGA644_INT_T1OVF,    TIMSK1,   TIMSK1_TOIE1_MASK,  TIFR1,    TIFR1_TOV1_MASK },
+	{ INTIDX_OCF2B,   ATMEGA644_INT_T2COMPB,  TIMSK2,   TIMSK2_OCIE2B_MASK, TIFR2,    TIFR2_OCF2B_MASK },
+	{ INTIDX_OCF2A,   ATMEGA644_INT_T2COMPA,  TIMSK2,   TIMSK2_OCIE2A_MASK, TIFR2,    TIFR2_OCF2A_MASK },
+	{ INTIDX_TOV2,    ATMEGA644_INT_T2OVF,    TIMSK2,   TIMSK2_TOIE2_MASK,  TIFR2,    TIFR2_TOV2_MASK },
+	{ INTIDX_PCINT0,  ATMEGA644_INT_PCINT0,   PCICR,    PCICR_PCIE0_MASK,   PCIFR,    PCIFR_PCIF0_MASK },
+	{ INTIDX_PCINT1,  ATMEGA644_INT_PCINT1,   PCICR,    PCICR_PCIE1_MASK,   PCIFR,    PCIFR_PCIF1_MASK },
+	{ INTIDX_PCINT2,  ATMEGA644_INT_PCINT2,   PCICR,    PCICR_PCIE2_MASK,   PCIFR,    PCIFR_PCIF2_MASK },
+	{ INTIDX_INT0,    ATMEGA644_INT_INT0,     EIMSK,    EIMSK_INT0_MASK,    EIFR,     EIFR_INTF0_MASK },
+	{ INTIDX_INT1,    ATMEGA644_INT_INT1,     EIMSK,    EIMSK_INT1_MASK,    EIFR,     EIFR_INTF1_MASK },
+	{ 0,              0,                      0,        0,                  0,        0, } // end of list
+};
 
-	if (intstate)
-	{
-		m_r[condition.m_regindex] &= ~condition.m_regmask;
-	}
+const avr8_base_device::interrupt_condition* atmega644_device::irq_conditions()
+{
+	return s_mega644_int_conditions;
+}
+
+const avr8_base_device::interrupt_condition* atmega1284_device::irq_conditions()
+{
+	return s_mega644_int_conditions;
 }
 
 bool atmega644_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const
@@ -1520,22 +1648,6 @@ bool atmega644_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) 
 	}
 }
 
-void atmega1284_device::update_interrupt(int source)
-{
-	const interrupt_condition &condition = s_mega644_int_conditions[source];
-
-	int intstate = 0;
-	if (m_r[condition.m_intreg] & condition.m_intmask)
-		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
-
-	set_irq_line(condition.m_intindex << 1, intstate);
-
-	if (intstate)
-	{
-		m_r[condition.m_regindex] &= ~condition.m_regmask;
-	}
-}
-
 bool atmega1284_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const
 {
 	switch (port)
@@ -1546,43 +1658,6 @@ bool atmega1284_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group)
 	default: return false;
 	}
 }
-
-//TODO: review this!
-void atmega1280_device::update_interrupt(int source)
-{
-	const interrupt_condition &condition = s_mega644_int_conditions[source];
-
-	int intstate = 0;
-	if (m_r[condition.m_intreg] & condition.m_intmask)
-		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
-
-	if (intstate) logerror("interrupt %d is 1\n", source);
-	set_irq_line(condition.m_intindex << 1, intstate);
-
-	if (intstate)
-	{
-		m_r[condition.m_regindex] &= ~condition.m_regmask;
-	}
-}
-
-//TODO: review this!
-void atmega2560_device::update_interrupt(int source)
-{
-	const interrupt_condition &condition = s_mega644_int_conditions[source];
-
-	int intstate = 0;
-	if (m_r[condition.m_intreg] & condition.m_intmask)
-		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
-
-	if (intstate) logerror("interrupt %d is 1\n", source);
-	set_irq_line(condition.m_intindex << 1, intstate);
-
-	if (intstate)
-	{
-		m_r[condition.m_regindex] &= ~condition.m_regmask;
-	}
-}
-
 
 //**************************************************************************
 //  PERIPHERAL HANDLING
@@ -1616,9 +1691,8 @@ void avr8_device<NumTimers>::spi_tick()
 	if (m_spi_prescale_countdown < 0)
 	{
 		m_r[SPDR] = m_spi_rx_shift;
-		m_r[SPSR] |= SPSR_SPIF_MASK;
+		set_irq(INTIDX_SPI);
 		m_spi_active = false;
-		update_interrupt(INTIDX_SPI);
 	}
 }
 
@@ -1630,8 +1704,7 @@ void avr8_device<NumTimers>::timer0_tick_norm()
 	if (m_r[TCNT0] == 0xff)
 	{
 		m_r[TCNT0] = 0;
-		m_r[TIFR0] |= TIFR0_TOV0_MASK;
-		update_interrupt(INTIDX_TOV0);
+		set_irq(INTIDX_TOV0);
 	}
 	else
 	{
@@ -1656,14 +1729,13 @@ void avr8_device<NumTimers>::timer0_tick_ctc_norm()
 
 	if (m_r[TCNT0] == m_r[OCR0A] - 1)
 	{
-		m_r[TIFR0] |= s_ocf0[AVR8_REG_A];
-		update_interrupt(s_int0[AVR8_REG_A]);
+		set_irq(s_int0[AVR8_REG_A]);
 		m_r[TCNT0] = 0;
 	}
 	else if (m_r[TCNT0] == m_r[OCR0B] - 1)
 	{
 		m_r[TIFR0] |= s_ocf0[AVR8_REG_B];
-		update_interrupt(s_int0[AVR8_REG_B]);
+		set_irq(s_int0[AVR8_REG_B]);
 		m_r[TCNT0]++;
 	}
 	else
@@ -1730,8 +1802,7 @@ void avr8_device<NumTimers>::timer0_tick_fast_pwm()
 
 	if (m_r[TCNT0] == 0xff)
 	{
-		m_r[TIFR0] |= TIFR0_TOV0_MASK;
-		update_interrupt(INTIDX_TOV0);
+		set_irq(INTIDX_TOV0);
 
 		m_r[TCNT0] = 0;
 
@@ -1800,8 +1871,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 		if (timer1_count == 0xffff)
 		{
 			LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 CTC_OCR, TOP, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-			m_r[TIFR1] |= TIFR1_TOV1_MASK;
-			update_interrupt(INTIDX_TOV1);
+			set_irq(INTIDX_TOV1);
 			timer1_count = 0;
 			increment = 0;
 		}
@@ -1837,13 +1907,12 @@ inline void avr8_device<NumTimers>::timer1_tick()
 			}
 
 			m_r[TIFR1] |= s_ocf1[AVR8_REG_A];
-			update_interrupt(s_int1[AVR8_REG_A]);
+			update_irq(s_int1[AVR8_REG_A]);
 		}
 		else if (timer1_count == 0)
 		{
 			LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 CTC_OCR, BOTTOM, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-			m_r[TIFR1] &= ~TIFR1_TOV1_MASK;
-			update_interrupt(INTIDX_TOV1);
+			clear_irq(INTIDX_TOV1);
 		}
 
 		if (timer1_count == m_ocr1[AVR8_REG_B])
@@ -1869,7 +1938,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 			}
 
 			m_r[TIFR1] |= s_ocf1[AVR8_REG_B];
-			update_interrupt(s_int1[AVR8_REG_B]);
+			update_irq(s_int1[AVR8_REG_B]);
 		}
 		break;
 
@@ -1877,8 +1946,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 		if (timer1_count == m_ocr1[AVR8_REG_A])
 		{
 			LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 FAST_PWM_OCR, OCR1A, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-			m_r[TIFR1] |= TIFR1_TOV1_MASK;
-			update_interrupt(INTIDX_TOV1);
+			set_irq(INTIDX_TOV1);
 			timer1_count = 0;
 			increment = 0;
 
@@ -1907,13 +1975,12 @@ inline void avr8_device<NumTimers>::timer1_tick()
 			}
 
 			m_r[TIFR1] |= s_ocf1[AVR8_REG_A];
-			update_interrupt(s_int1[AVR8_REG_A]);
+			update_irq(s_int1[AVR8_REG_A]);
 		}
 		else if (timer1_count == 0)
 		{
 			LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 FAST_PWM_OCR, BOTTOM A, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-			m_r[TIFR1] &= ~TIFR1_TOV1_MASK;
-			update_interrupt(INTIDX_TOV1);
+			clear_irq(INTIDX_TOV1);
 
 			switch (ChannelModeA)
 			{
@@ -1963,7 +2030,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 			}
 
 			m_r[TIFR1] |= s_ocf1[AVR8_REG_B];
-			update_interrupt(s_int1[AVR8_REG_B]);
+			update_irq(s_int1[AVR8_REG_B]);
 		}
 		else if (timer1_count == 0)
 		{
@@ -2018,13 +2085,12 @@ inline void avr8_device<NumTimers>::timer1_tick()
 			}
 
 			m_r[TIFR1] |= s_ocf1[AVR8_REG_A];
-			update_interrupt(s_int1[AVR8_REG_A]);
+			update_irq(s_int1[AVR8_REG_A]);
 		}
 		else if (timer1_count == 0)
 		{
 			LOGMASKED(LOG_TIMER1_TICK, "%s: timer1 WGM1 FAST_PWM_ICR, BOTTOM A, new count %04x, OCR1A/B %04x/%04x, ICR1 %04x\n", machine().describe_context(), timer1_count, m_ocr1[AVR8_REG_A], m_ocr1[AVR8_REG_B], icr1);
-			m_r[TIFR1] &= ~TIFR1_TOV1_MASK;
-			update_interrupt(INTIDX_TOV1);
+			clear_irq(INTIDX_TOV1);
 
 			switch (ChannelModeA)
 			{
@@ -2073,7 +2139,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 			}
 
 			m_r[TIFR1] |= s_ocf1[AVR8_REG_B];
-			update_interrupt(s_int1[AVR8_REG_B]);
+			update_irq(s_int1[AVR8_REG_B]);
 		}
 		else if (timer1_count == 0)
 		{
@@ -2099,8 +2165,7 @@ inline void avr8_device<NumTimers>::timer1_tick()
 
 		if (timer1_count == icr1)
 		{
-			m_r[TIFR1] |= TIFR1_TOV1_MASK;
-			update_interrupt(INTIDX_TOV1);
+			set_irq(INTIDX_TOV1);
 			timer1_count = 0;
 			increment = 0;
 		}
@@ -2222,10 +2287,13 @@ void avr8_device<NumTimers>::timer2_tick_norm()
 	LOGMASKED(LOG_TIMER2, "%s: timer2_tick_norm; WGM02_NORMAL\n", machine().describe_context());
 	if (m_r[TCNT2] == 0xff)
 	{
-		m_r[TIFR2] |= TIFR2_TOV2_MASK;
+		set_irq(INTIDX_TOV2);
+	}
+	else
+	{
+		clear_irq(INTIDX_TOV2);
 	}
 	m_r[TCNT2]++;
-	update_interrupt(INTIDX_TOV2);
 	m_timer_prescale_count[2] -= m_timer_prescale[2];
 }
 
@@ -2276,6 +2344,7 @@ void avr8_device<NumTimers>::timer2_tick_fast_pwm_cmp()
 	else if (count == 0)
 	{
 		m_r[TIFR2] &= ~TIFR2_TOV2_MASK;
+		clear_irq(INTIDX_TOV2);
 	}
 
 	if (count == m_r[OCR2B])
@@ -2285,7 +2354,7 @@ void avr8_device<NumTimers>::timer2_tick_fast_pwm_cmp()
 
 	count += increment;
 
-	update_interrupt(INTIDX_TOV2);
+	update_irq(INTIDX_TOV2);
 	m_r[TCNT2] = count;
 	m_timer_prescale_count[2] -= m_timer_prescale[2];
 }
@@ -2374,8 +2443,7 @@ void avr8_device<NumTimers>::timer4_tick()
 		LOGMASKED(LOG_TIMER4, "%s: timer4: tick WGM4_CTC_OCR: %d\n", machine().describe_context(), count);
 		if (count == 0xffff)
 		{
-			m_r[TIFR4] |= TIFR4_TOV4_MASK;
-			update_interrupt(INTIDX_TOV4);
+			set_irq(INTIDX_TOV4);
 			count = 0;
 			increment = 0;
 		}
@@ -2627,7 +2695,7 @@ void avr8_device<NumTimers>::change_spcr(uint8_t data)
 	if (changed & SPCR_SPIE_MASK)
 	{
 		// Check for SPI interrupt condition
-		update_interrupt(INTIDX_SPI);
+		update_irq(INTIDX_SPI);
 	}
 
 	if (low_to_high & SPCR_SPE_MASK)
@@ -2846,31 +2914,31 @@ template <int NumTimers>
 void avr8_device<NumTimers>::tifr0_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER0, "%s: TIFR0 = %02x\n", machine().describe_context(), data);
-	m_r[TIFR0] &= ~(data & TIFR0_MASK);
-	update_interrupt(INTIDX_OCF0A);
-	update_interrupt(INTIDX_OCF0B);
-	update_interrupt(INTIDX_TOV0);
+	
+	if (data & TIFR0_OCF0A_MASK) clear_irq(INTIDX_OCF0A);
+	if (data & TIFR0_OCF0B_MASK) clear_irq(INTIDX_OCF0B);
+	if (data & TIFR0_TOV0_MASK) clear_irq(INTIDX_TOV0);
 }
 
 template <int NumTimers>
 void avr8_device<NumTimers>::tifr1_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER1, "%s: TIFR1 = %02x\n", machine().describe_context(), data);
-	m_r[TIFR1] &= ~(data & TIFR1_MASK);
-	update_interrupt(INTIDX_ICF1);
-	update_interrupt(INTIDX_OCF1A);
-	update_interrupt(INTIDX_OCF1B);
-	update_interrupt(INTIDX_TOV1);
+
+	if (data & TIFR1_ICF1_MASK) clear_irq(INTIDX_ICF1);
+	if (data & TIFR1_OCF1A_MASK) clear_irq(INTIDX_OCF1A);
+	if (data & TIFR1_OCF1B_MASK) clear_irq(INTIDX_OCF1B);
+	if (data & TIFR1_TOV1_MASK) clear_irq(INTIDX_TOV1);
 }
 
 template <int NumTimers>
 void avr8_device<NumTimers>::tifr2_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER2, "%s: TIFR2 = %02x\n", machine().describe_context(), data);
-	m_r[TIFR2] &= ~(data & TIFR2_MASK);
-	update_interrupt(INTIDX_OCF2A);
-	update_interrupt(INTIDX_OCF2B);
-	update_interrupt(INTIDX_TOV2);
+	
+	if (m_r[TIFR2] & TIFR2_OCF2A_MASK) clear_irq(INTIDX_OCF2A);
+	if (m_r[TIFR2] & TIFR2_OCF2B_MASK) clear_irq(INTIDX_OCF2B);
+	if (m_r[TIFR2] & TIFR2_TOV2_MASK) clear_irq(INTIDX_TOV2);
 }
 
 template <int NumTimers>
@@ -2945,7 +3013,7 @@ template <int NumTimers>
 void avr8_device<NumTimers>::spdr_w(uint8_t data)
 {
 	m_r[SPDR] = data;
-	m_r[SPSR] &= ~SPSR_SPIF_MASK;
+	m_r[SPSR] &= ~SPSR_SPIF_MASK; // note: can't clear this flag by writing 1 there
 	m_spi_rx_shift = 0;
 	m_spi_active = true;
 	m_spi_prescale_countdown = 7;
@@ -3112,9 +3180,10 @@ void avr8_device<NumTimers>::timsk0_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER0, "%s: TIMSK0 = %02x\n", machine().describe_context(), data);
 	m_r[TIMSK0] = data;
-	update_interrupt(INTIDX_OCF0A);
-	update_interrupt(INTIDX_OCF0B);
-	update_interrupt(INTIDX_TOV0);
+	
+	update_irq(INTIDX_OCF0A);
+	update_irq(INTIDX_OCF0B);
+	update_irq(INTIDX_TOV0);
 }
 
 template <int NumTimers>
@@ -3122,10 +3191,10 @@ void avr8_device<NumTimers>::timsk1_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER1, "%s: TIMSK1 = %02x\n", machine().describe_context(), data);
 	m_r[TIMSK1] = data;
-	update_interrupt(INTIDX_ICF1);
-	update_interrupt(INTIDX_OCF1A);
-	update_interrupt(INTIDX_OCF1B);
-	update_interrupt(INTIDX_TOV1);
+	update_irq(INTIDX_ICF1);
+	update_irq(INTIDX_OCF1A);
+	update_irq(INTIDX_OCF1B);
+	update_irq(INTIDX_TOV1);
 }
 
 template <int NumTimers>
@@ -3133,9 +3202,10 @@ void avr8_device<NumTimers>::timsk2_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER2, "%s: TIMSK2 = %02x\n", machine().describe_context(), data);
 	m_r[TIMSK2] = data;
-	update_interrupt(INTIDX_OCF2A);
-	update_interrupt(INTIDX_OCF2B);
-	update_interrupt(INTIDX_TOV2);
+
+	update_irq(INTIDX_OCF2A);
+	update_irq(INTIDX_OCF2B);
+	update_irq(INTIDX_TOV2);
 }
 
 template <int NumTimers>
@@ -3143,9 +3213,12 @@ void avr8_device<NumTimers>::timsk3_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER3, "%s: TIMSK3 = %02x\n", machine().describe_context(), data);
 	m_r[TIMSK3] = data;
-	update_interrupt(INTIDX_OCF3A);
-	update_interrupt(INTIDX_OCF3B);
-	update_interrupt(INTIDX_TOV3);
+
+	// TODO: implement timer 3. trying to fire these IRQs will crash arduboy games!
+
+	// update_irq(INTIDX_OCF3A);
+	// update_irq(INTIDX_OCF3B);
+	// update_irq(INTIDX_TOV3);
 }
 
 template <int NumTimers>
@@ -3153,9 +3226,12 @@ void avr8_device<NumTimers>::timsk4_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER4, "%s: TIMSK4 = %02x\n", machine().describe_context(), data);
 	m_r[TIMSK4] = data;
-	update_interrupt(INTIDX_OCF4A);
-	update_interrupt(INTIDX_OCF4B);
-	update_interrupt(INTIDX_TOV4);
+
+	// TODO: implement timer 4. trying to fire these IRQs will crash arduboy games!
+
+	// update_irq(INTIDX_OCF4A);
+	// update_irq(INTIDX_OCF4B);
+	// update_irq(INTIDX_TOV4);
 }
 
 template <int NumTimers>
@@ -3163,9 +3239,12 @@ void avr8_device<NumTimers>::timsk5_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER5, "%s: TIMSK5 = %02x\n", machine().describe_context(), data);
 	m_r[TIMSK5] = data;
-	update_interrupt(INTIDX_OCF5A);
-	update_interrupt(INTIDX_OCF5B);
-	update_interrupt(INTIDX_TOV5);
+
+	// TODO: implement timer 5
+
+	// update_irq(INTIDX_OCF5A);
+	// update_irq(INTIDX_OCF5B);
+	// update_irq(INTIDX_TOV5);
 }
 
 template <int NumTimers>
@@ -3821,15 +3900,15 @@ void avr8_device<NumTimers>::execute_run()
 		// external context; only take the actual interrupt here, at a safe instruction boundary
 		if (m_r[PCIFR])
 		{
-			update_interrupt(INTIDX_PCINT0);
-			update_interrupt(INTIDX_PCINT1);
-			update_interrupt(INTIDX_PCINT2);
+			update_irq(INTIDX_PCINT0);
+			update_irq(INTIDX_PCINT1);
+			update_irq(INTIDX_PCINT2);
 		}
 
 		if (m_r[EIFR])
 		{
-			update_interrupt(INTIDX_INT0);
-			update_interrupt(INTIDX_INT1);
+			update_irq(INTIDX_INT0);
+			update_irq(INTIDX_INT1);
 		}
 
 		m_icount -= m_opcycles;
@@ -3884,6 +3963,8 @@ void avr8_device<NumTimers>::execute_run()
 					m_timer_prescale_count[5] -= m_timer_prescale[5];
 				}
 			}
+
+			fire_irqs();
 		}
 	}
 }
