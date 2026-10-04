@@ -75,8 +75,8 @@ private:
 		uint16_t dest_words_left = 0;
 		uint16_t mask1 = 0;
 		uint16_t mask2 = 0;
-		bool prime = false; // /PRED - when src phase > dst phase, there are two source words needed to set first dst
-		bool prime_pending = false;
+		bool prime = false;
+		bool prime_pending = false; // /PRED - when src phase > dst phase, there are two source words needed to get/set first dst/src
 	} m_state;
 
 	// TODO: split by what is mapped and what is a helper
@@ -88,6 +88,7 @@ private:
 	void rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void check_operation_start(offs_t offset);
+	uint16_t fifo_r(offs_t offset, uint16_t mem_mask);
 	void fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void set_pixel(uint16_t x, uint16_t y, bool on);
 	uint16_t execute_rop(uint8_t opcode, uint16_t source, uint16_t destination);

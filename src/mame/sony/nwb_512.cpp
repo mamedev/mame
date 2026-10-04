@@ -4,7 +4,7 @@
 /*
  * Sony NWB-512 Monochrome Framebuffer and NWP-512D 15" Monochrome CRT Monitor
  *
- * The NWB-512 is a NEWS expansion card (model DSC-001) that provides a single-plane monochrome output at 816x1024
+ * The NWB-512 is a NEWS expansion card (board DSC-001) that provides a single-plane monochrome output at 816x1024
  * resolution. It has hardware-accelerated graphics, provided by the Sony CXD1029 raster operation controller, and pairs
  * with the NWP-512D 15" monochrome CRT display.
  *
@@ -16,15 +16,20 @@
  *  - All NWS-3800 machines
  *
  * Sources:
- *  - NWS-1510/1530/1580 Service Manual
+ *  - http://bitsavers.org/pdf/sony/news/1580/9-974-300-11_NWS-1510_1530_1580_EK_Model_Service_Manual_1989.pdf
+ *     Note: The service manual for the 1500 series describes in detail how the raster operations generally work.
+ *     However, while the newer framebuffers use a similar raster engine (using the WSC-SBLT that is an upgraded
+ *     version of the CXD1029) and operate in a similar way, the surrounding details are different.
+ *     I might not have captured/reverse engineered all of those differences accurately yet.
  *  - http://bitsavers.org/pdf/sony/news/Sony_NEWS_Technical_Manual_3ed_199103.pdf
  *
  * TODO:
- *   - Convert to NEWS I/O Bus slot device instead of regular device
+ *   - Add NEWS I/O Bus slot and convert this to it instead of regular device
  *   - Cycle-accurate timing
- *   - The service manual for the 1500 series describes in detail how the raster operations generally work. However,
- *     while the newer framebuffers use the same raster engine (using the WSC-SBLT that is the equivalent of 2 CXD1029s),
- *     the surrounding details are different, and I might not have captured all of those differences accurately yet.
+ *   - Interrupt support for CPU-only models (iopboot, mrx, and the monitor don't use them because they have the free cycles to poll)
+ *   - Dimmer support
+ *   - Refactoring for multiplanar framebuffer support (NWB-225A color framebuffer, etc.). The implementation uses the same raster operation controller,
+ *     so the eventual drivers for those (when ROM dumps and board pictures are available) will be able to share code with the NWB-512.
  */
 
 #include "emu.h"
@@ -34,7 +39,7 @@
 #define LOG_ROP 1 << 2
 #define LOG_CTRL 1 << 3
 
-#define VERBOSE (LOG_CTRL|LOG_ROP_CONFIG)
+#define VERBOSE (LOG_CTRL|LOG_ROP_CONFIG|LOG_GENERAL)
 #include "logmacro.h"
 
 #include <format>
@@ -126,13 +131,12 @@ void nwb_512_device::device_add_mconfig(machine_config &config)
 
 void nwb_512_device::map(address_map &map)
 {
-	map(0x02000, 0x02001).w(FUNC(nwb_512_device::shift_w));       // shift count when only "load shift" is asserted
-	map(0x08000, 0x0ffff).w(FUNC(nwb_512_device::destination_w)); // A13 = load shift, A14 = start execution
+	map(0x00000, 0x0ffff).w(FUNC(nwb_512_device::destination_w)); // A13 = load shift, A14 = start execution, not sure about A15
+	map(0x1a000, 0x1bfff).w(FUNC(nwb_512_device::pixel_w));
 	map(0x20000, 0x27fff).w(FUNC(nwb_512_device::source_w));      // A13 = load shift, A14 = start execution
 	map(0x40000, 0x55fff).w(FUNC(nwb_512_device::limit_w));       // A16 = source-space select (FB vs host), A14 = start execution
-	map(0x1a000, 0x1bfff).w(FUNC(nwb_512_device::pixel_w));
 	map(0x60000, 0x60fff).w(FUNC(nwb_512_device::rop_config_w));  // rop configuration TODO: is the end addr correct here?
-	map(0x70000, 0x70fff).w(FUNC(nwb_512_device::fifo_w));
+	map(0x70000, 0x70fff).rw(FUNC(nwb_512_device::fifo_r), FUNC(nwb_512_device::fifo_w));
 	map(0x80000, 0x80001).rw(FUNC(nwb_512_device::status_r), FUNC(nwb_512_device::ctrl_w));
 	map(0xa0000, 0xa0000).w(FUNC(nwb_512_device::planemask_w));
 
@@ -167,14 +171,6 @@ void nwb_512_device::reset_state()
 
 void nwb_512_device::check_operation_start(offs_t offset)
 {
-	// The later framebuffers implement the ability to read out framebuffer data back to the I/O bus.
-	// I have not found any way to trigger this yet, so this might not be possible on the NWB-512.
-	// The NEWS-OS 4 framebuffer driver does not expose any ioctls for reading from the framebuffer.
-	if (m_state.fb_read && !m_state.fb_write)
-	{
-		fatalerror("nwb512: fb read only not implemented!");
-	}
-
 	logerror("op arm: %-7s func=0x%x %s %s src=(0x%x,0x%x) dst=(0x%x,0x%x) lim=(0x%x,0x%x)\n",
 			 (m_state.fb_read && m_state.fb_write) ? "FB->FB" : (!m_state.fb_read && m_state.fb_write) ? "host->FB"
 															: (m_state.fb_read && !m_state.fb_write)   ? "FB->host"
@@ -186,78 +182,80 @@ void nwb_512_device::check_operation_start(offs_t offset)
 			 m_state.destination_x, m_state.destination_y,
 			 m_state.limit_x, m_state.limit_y);
 
-	if (offset & (0x4000 >> 1)) // word offset
+	if (!(offset & (0x4000 >> 1))) // word offset
 	{
-		LOG("Operation started\n");
+		return;
+	}
 
-		m_state.busy = true;
-		// Adjust source and destination coordinates for the reverse direction if necessary,
-		// because the left edge is always inclusive (right edge exclusive).
-		if (!m_state.x_direction)
+	LOG("Operation started\n");
+
+	m_state.busy = true;
+	// Adjust source and destination coordinates for the reverse direction if necessary,
+	// because the left edge is always inclusive (right edge exclusive).
+	if (!m_state.x_direction)
+	{
+		--m_state.destination_x;
+		--m_state.source_x;
+		--m_state.limit_x;
+	}
+
+	m_state.current_x = m_state.destination_x;
+
+	const uint16_t width = m_state.x_direction ? m_state.limit_x - m_state.destination_x  // fwd: [dest, limit)
+												: m_state.destination_x - m_state.limit_x; // rev: [limit, dest)
+	const uint16_t src_phase = m_state.x_direction ? m_state.source_x & 15 : 15 - (m_state.source_x & 15);
+	const uint16_t dest_phase = m_state.x_direction ? m_state.destination_x & 15 : 15 - (m_state.destination_x & 15);
+
+	m_state.prime = src_phase > dest_phase;
+	m_state.prime_pending = m_state.prime;
+	m_state.source_words_per_row = (src_phase + width + 15) >> 4;
+	m_state.dest_words_per_row = (dest_phase + width + 15) >> 4;
+	m_state.source_words_left = m_state.source_words_per_row;
+	m_state.dest_words_left = m_state.dest_words_per_row;
+	LOG("Source words per row: %d, Destination words per row: %d\n", m_state.source_words_per_row, m_state.dest_words_per_row);
+
+	if (std::abs(m_state.dest_words_per_row - m_state.source_words_per_row) > 1)
+	{
+		fatalerror("nwb512: source (0x%x) and destination (0x%x) words per row not aligned!", m_state.dest_words_per_row, m_state.source_words_per_row);
+	}
+
+	// Update masks to preserve framebuffer contents that shouldn't be modified
+	uint16_t x_lo, x_hi;
+	if (m_state.x_direction)
+	{
+		x_lo = m_state.destination_x;
+		x_hi = m_state.limit_x - 1;
+	}
+	else
+	{
+		x_lo = m_state.limit_x + 1;
+		x_hi = m_state.destination_x;
+	}
+	m_state.mask1 = ~(0xffff >> (x_lo & 0xf));
+	m_state.mask2 = 0xffff >> ((x_hi & 0xf) + 1);
+
+	// TODO: This executes copies immediately, faster than real hardware.
+	if (m_state.fb_read && m_state.fb_write)
+	{
+		uint16_t source_x = m_state.source_x;
+		uint16_t source_y = m_state.source_y;
+
+		while (m_state.busy)
 		{
-			--m_state.destination_x;
-			--m_state.source_x;
-			--m_state.limit_x;
-		}
+			const uint16_t source_data = coordinate_to_data(source_x, source_y);
 
-		m_state.current_x = m_state.destination_x;
+			const uint16_t destination_y_snapshot = m_state.destination_y; // if the row is advanced, we need to reset the source - TODO: should this be in end_row?
+			LOGMASKED(LOG_ROP, "ROP for sx = 0x%x sy = 0x%x data = 0x%x\n", source_x, source_y, source_data);
+			rop_cycle(source_data); // When the ROP is done, this function will clear m_state.busy
 
-		const uint16_t width = m_state.x_direction ? m_state.limit_x - m_state.destination_x  // fwd: [dest, limit)
-												   : m_state.destination_x - m_state.limit_x; // rev: [limit, dest)
-		const uint16_t src_phase = m_state.x_direction ? m_state.source_x & 15 : 15 - (m_state.source_x & 15);
-		const uint16_t dest_phase = m_state.x_direction ? m_state.destination_x & 15 : 15 - (m_state.destination_x & 15);
-
-		m_state.prime = src_phase > dest_phase;
-		m_state.prime_pending = m_state.prime;
-		m_state.source_words_per_row = (src_phase + width + 15) >> 4;
-		m_state.dest_words_per_row = (dest_phase + width + 15) >> 4;
-		m_state.source_words_left = m_state.source_words_per_row;
-		m_state.dest_words_left = m_state.dest_words_per_row;
-		LOG("Source words per row: %d, Destination words per row: %d\n", m_state.source_words_per_row, m_state.dest_words_per_row);
-
-		if (std::abs(m_state.dest_words_per_row - m_state.source_words_per_row) > 1)
-		{
-			fatalerror("nwb512: source (0x%x) and destination (0x%x) words per row not aligned!", m_state.dest_words_per_row, m_state.source_words_per_row);
-		}
-
-		// Update masks to preserve framebuffer contents that shouldn't be modified
-		uint16_t x_lo, x_hi;
-		if (m_state.x_direction)
-		{
-			x_lo = m_state.destination_x;
-			x_hi = m_state.limit_x - 1;
-		}
-		else
-		{
-			x_lo = m_state.limit_x + 1;
-			x_hi = m_state.destination_x;
-		}
-		m_state.mask1 = ~(0xffff >> (x_lo & 0xf));
-		m_state.mask2 = 0xffff >> ((x_hi & 0xf) + 1);
-
-		// TODO: This executes copies immediately, faster than real hardware.
-		if (m_state.fb_read && m_state.fb_write)
-		{
-			uint16_t source_x = m_state.source_x;
-			uint16_t source_y = m_state.source_y;
-
-			while (m_state.busy)
+			if (m_state.destination_y != destination_y_snapshot)
 			{
-				const uint16_t source_data = coordinate_to_data(source_x, source_y);
-
-				const uint16_t destination_y_snapshot = m_state.destination_y; // if the row is advanced, we need to reset the source - TODO: should this be in end_row?
-				LOGMASKED(LOG_ROP, "ROP for sx = 0x%x sy = 0x%x data = 0x%x\n", source_x, source_y, source_data);
-				rop_cycle(source_data); // When the ROP is done, this function will clear m_state.busy
-
-				if (m_state.destination_y != destination_y_snapshot)
-				{
-					source_x = m_state.source_x;
-					source_y += m_state.y_direction ? 1 : -1;
-				}
-				else
-				{
-					source_x += m_state.x_direction ? 16 : -16;
-				}
+				source_x = m_state.source_x;
+				source_y += m_state.y_direction ? 1 : -1;
+			}
+			else
+			{
+				source_x += m_state.x_direction ? 16 : -16;
 			}
 		}
 	}
@@ -269,15 +267,16 @@ void nwb_512_device::destination_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 	m_state.destination_x = x_address(data);
 	m_state.destination_y = y_address(offset);
+	LOG("Destination set to (0x%x, 0x%x) x word offset = 0x%x\n", m_state.destination_x, m_state.destination_y, (m_state.destination_x - 1) >> 4);
 
 	if (offset & (0x2000 >> 1))
 	{
 		// Determine how much we need to shift source by to align it with destination
+		// TODO: double-check that the math works here for both xfwd and xrev
 		m_state.shift = (m_state.destination_x - m_state.source_x) & 15;
 		LOG("destination_w: Calculated shift: 0x%x - 0x%x & 15 = 0x%x\n", m_state.destination_x, m_state.source_x, m_state.shift);
 	}
 
-	LOG("Destination set to (0x%x, 0x%x) x word offset = 0x%x\n", m_state.destination_x, m_state.destination_y, (m_state.destination_x - 1) >> 4);
 	check_operation_start(offset);
 }
 
@@ -292,6 +291,7 @@ void nwb_512_device::source_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (offset & (0x2000 >> 1))
 	{
 		// how much do we need to shift source by to align it with destination?
+		// TODO: double-check that the math works here for both xfwd and xrev
 		m_state.shift = (m_state.destination_x % 16 - m_state.source_x % 16) & 0xf; // direction determined by x direction
 		LOG("source_w: Calculated shift: 0x%x % 16 - 0x%x % 16 = 0x%x\n", m_state.destination_x, m_state.source_x, m_state.shift);
 	}
@@ -305,13 +305,22 @@ void nwb_512_device::limit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	check_mem_mask(mem_mask);
 	LOG("limit_w(0x%x, 0x%x, 0x%x)\n", offset, data, mem_mask);
 
-	// TODO: this probably applies to other register writes
-	const bool fb_read = offset & (0x10000 >> 1);
-	if (m_state.fb_read != fb_read)
+	// TODO: this feels like a hack
+	const bool op_start = offset & (0x4000 >> 1);
+	const bool fb_read = op_start ? offset & (0x10000 >> 1) : true;
+	const bool fb_write = op_start;
+	if (fb_read != m_state.fb_read || fb_write != m_state.fb_write)
 	{
-		m_state.fb_read = fb_read;
-		LOG("limit_w override for source: offset = 0x%x fbread = %s fbwrite = %s\n", offset, m_state.fb_read ? "true" : "false", m_state.fb_write ? "true" : "false");
+		LOG("limit_w: override arm=%d%d -> limit=%d%d\n", m_state.fb_read, m_state.fb_write, fb_read, fb_write);
 	}
+	m_state.fb_read = fb_read;
+	m_state.fb_write = fb_write;
+
+	// if (m_state.fb_read != fb_read)
+	// {
+	// 	m_state.fb_read = fb_read;
+	// 	LOG("limit_w override for source: offset = 0x%x fbread = %s fbwrite = %s\n", offset, m_state.fb_read ? "true" : "false", m_state.fb_write ? "true" : "false");
+	// }
 
 	m_state.limit_x = x_address(data);
 	m_state.limit_y = y_address(offset);
@@ -367,8 +376,6 @@ void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	//       and see if that means this check can come back
 	if (m_state.busy)
 	{
-		// `m_state.limit_y`, `m_state.dest_words_left`, `m_state.source_words_left`, `m_state.destination_y`,
-		// and a running count of `fifo_w`
 		LOG("IOP tried to reconfigure while op was in progress\n");
 		LOG("limit_y = 0x%x dest_words_left = 0x%x source_words_left = 0x%x destination_y = 0x%x\n", m_state.limit_y, m_state.dest_words_left, m_state.source_words_left, m_state.destination_y);
 		// fatalerror("IOP tried to reconfigure while op was in progress!");
@@ -588,10 +595,41 @@ void nwb_512_device::rop_cycle(uint16_t data)
 	}
 }
 
+uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
+{
+	LOG("(%s) fifo_r(0x%x, 0x%x)\n", machine().describe_context(), offset, mem_mask);
+	check_mem_mask(mem_mask);
+	if (m_state.fb_write || !m_state.fb_read) {
+		fatalerror("Wrong mode for read");
+	}
+
+	uint16_t word = 0;
+
+	// word = shift(sxa, sya)
+	// sxa += 16
+	// dxa += 16
+	// if (dxa > lxa) end row (reload X, Y++, carry = 0, re-prime if needed)
+	// if no more rows, busy = 0 (or will get interrupted)
+
+	return word;
+}
+
 void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOG("(%s) fifo_w(0x%x, 0x%x, 0x%x)\n", machine().describe_context(), offset, data, mem_mask);
 	check_mem_mask(mem_mask);
+	if (m_state.fb_read && !m_state.fb_write)
+	{
+		// A write to this port when armed for reading starts the process
+		m_state.busy = true; // TODO: exact value
+		if (m_state.prime_pending) {
+			m_state.prime_pending = false;
+			// prime carry (do first read and shift)
+		}
+
+		return;
+	}
+
 	if (m_state.pixel_mode)
 	{
 		fatalerror("word write in pixel mode");
@@ -648,7 +686,7 @@ void nwb_512_device::ctrl_w(uint8_t data) // confirmed 8-bit write
 	LOGMASKED(LOG_CTRL, "\t%s kanji ROM\n", data & 0x2 ? "enable" : "disable"); // TODO: not for first-gen fb?
 	LOGMASKED(LOG_CTRL, "\t%s v-sync interrupt\n", data & 0x8 ? "enable" : "disable");
 	LOGMASKED(LOG_CTRL, "\t%s command completion interrupt\n", data & 0x10 ? "enable" : "disable");
-	LOGMASKED(LOG_CTRL, "\treserved %s\n", data & 0x20 ? "set" : "cleared");
+	LOGMASKED(LOG_CTRL, "\tunknown %s\n", data & 0x20 ? "set" : "cleared");
 	LOGMASKED(LOG_CTRL, "\tdimmer setting = 0x%x\n", (data & 0xC0) >> 6);
 
 	m_state.ctrl = data;
