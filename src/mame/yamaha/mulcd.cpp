@@ -13,11 +13,21 @@
 
 #include "mulcd.lh"
 
-DEFINE_DEVICE_TYPE(MULCD,   mulcd_device,   "mulcd",   "Yamaha MU/VL70/FS1R common LCD")
+DEFINE_DEVICE_TYPE(MULCD,   mulcd_device,   "mulcd",   "Yamaha MU/VL70 common LCD")
+DEFINE_DEVICE_TYPE(FS1RLCD, fs1rlcd_device, "fs1rlcd", "Yamaha FS1R LCD")
 
 ROM_START( mulcd )
 	ROM_REGION( 525261, "screen", 0)
 	ROM_LOAD( "mulcd.svg", 0, 525261, CRC(fb3c68ed) SHA1(e18bd29d25b8e5d025ec107adc37021e1f5e85e1))
+
+	ROM_REGION( 0x1000, "cgrom", 0)
+	ROM_LOAD( "hd44780u_b04.bin", 0x0000, 0x1000, CRC(126ed6da) SHA1(2ff0899bfee7795ba52a3d56c96edf31d9e6a3f9))
+ROM_END
+
+// Same module with the FS1R glass icons
+ROM_START( fs1rlcd )
+	ROM_REGION( 445176, "screen", 0)
+	ROM_LOAD( "fs1rlcd.svg", 0, 445176, CRC(291dc3aa) SHA1(23d0926fd8991913f41a73c0f2f84c5f345d375f))
 
 	ROM_REGION( 0x1000, "cgrom", 0)
 	ROM_LOAD( "hd44780u_b04.bin", 0x0000, 0x1000, CRC(126ed6da) SHA1(2ff0899bfee7795ba52a3d56c96edf31d9e6a3f9))
@@ -28,8 +38,18 @@ const tiny_rom_entry *mulcd_device::device_rom_region() const
 	return ROM_NAME(mulcd);
 }
 
+const tiny_rom_entry *fs1rlcd_device::device_rom_region() const
+{
+	return ROM_NAME(fs1rlcd);
+}
+
 mulcd_device::mulcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	hd44780_base_device(mconfig, MULCD, tag, owner, clock),
+	mulcd_device(mconfig, MULCD, tag, owner, clock)
+{
+}
+
+mulcd_device::mulcd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	hd44780_base_device(mconfig, type, tag, owner, clock),
 	m_outputs(*this, "%03x.%d.%d", 0U, 0U, 0U),
 	m_contrast(*this, "contrast"),
 	m_led_outputs(*this, "LED%d", 0U)
@@ -88,4 +108,9 @@ void mulcd_device::device_add_mconfig(machine_config &config)
 	screen.set_screen_update(FUNC(mulcd_device::mu_screen_update));
 
 	config.set_default_layout(layout_mulcd);
+}
+
+fs1rlcd_device::fs1rlcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	mulcd_device(mconfig, FS1RLCD, tag, owner, clock)
+{
 }
