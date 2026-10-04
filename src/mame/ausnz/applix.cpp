@@ -23,7 +23,6 @@
 
     TODO:
     - Cassette interface (coded but not working)
-    - Use kbtro device (tried and failed)
     - Optional SCSI controller NCR5380 and hard drive (max 40mb)
     - Joystick
     - Audio: it could be better
