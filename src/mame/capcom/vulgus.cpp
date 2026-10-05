@@ -44,7 +44,6 @@ All Clocks and Vsync verified by Corrado Tomaselli (August 2012)
 
 TODO:
 - spriteram can only be written during vblank
-- 1942iti sprite glitches and soft locks/resets
 
 ***************************************************************************/
 
@@ -93,6 +92,8 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 	virtual void main_map(address_map &map) ATTR_COLD;
 	virtual void update_scroll();
+	virtual void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs);
 
 private:
 	required_device<cpu_device> m_audiocpu;
@@ -119,7 +120,6 @@ private:
 	void palette(palette_device &palette) const ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
@@ -140,6 +140,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void main_map(address_map &map) override ATTR_COLD;
 	virtual void update_scroll() override;
+	virtual void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:
 	required_memory_bank m_rombank;
@@ -301,33 +302,58 @@ void vulgus_state::palette_bank_w(uint8_t data)
 
 ***************************************************************************/
 
-void vulgus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void vulgus_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 
-	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	int code = (m_spriteram[offs] & 0x7f) | (BIT(m_spriteram[offs + 1], 5) << 7) | (BIT(m_spriteram[offs], 7) << 8);
+	int const color = m_spriteram[offs + 1] & 0x0f;
+	int sy = m_spriteram[offs + 2];
+	int sx = m_spriteram[offs + 3] - (BIT(m_spriteram[offs + 1], 4) << 8);
+	bool const flip = flip_screen() ? true : false;
+	int dir = 1;
+
+	if (flip)
 	{
-		int code = (m_spriteram[offs] & 0x7f) | (BIT(m_spriteram[offs + 1], 5) << 7) | (BIT(m_spriteram[offs], 7) << 8);
-		int const color = m_spriteram[offs + 1] & 0x0f;
-		int sy = m_spriteram[offs + 2];
-		int sx = m_spriteram[offs + 3] - (BIT(m_spriteram[offs + 1], 4) << 8);
-		bool const flip = flip_screen() ? true : false;
-		int dir = 1;
+		sx = 240 - sx;
+		sy = 240 - sy;
+		dir = -1;
+	}
 
-		if (flip)
-		{
-			sx = 240 - sx;
-			sy = 240 - sy;
-			dir = -1;
-		}
+	// draw sprite rows (16*16, 16*32, 16*64, or 16*256)
+	int const size = (m_spriteram[offs + 1] & 0xc0) >> 6;
+	int const row = (size == 3) ? 16 : (1 << size);
+	code &= ~(row - 1);
 
-		// draw sprite rows (16*16, 16*32, 16*64, or 16*256)
-		int const size = (m_spriteram[offs + 1] & 0xc0) >> 6;
-		int const row = (size == 3) ? 16 : (1 << size);
-		code &= ~(row - 1);
+	for (int i = 0; i < row; i++)
+		gfx->transpen(bitmap, cliprect, code + i, color, flip, flip, sx, sy + 16 * i * dir, 15);
+}
 
-		for (int i = 0; i < row; i++)
-			gfx->transpen(bitmap, cliprect, code + i, color, flip, flip, sx, sy + 16 * i * dir, 15);
+void vulgus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+		draw_sprite(bitmap, cliprect, offs);
+}
+
+void _1942iti_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// The game relies on the 1942 sprite hardware (see 1942_v.cpp): only 24 sprites are
+	// fetched per scanline, sprites 0-15 are always used, and the last 8 are either 16-23
+	// or 24-31 depending on V7, so they only show on the upper or lower half of the screen.
+	// Vulgus itself uses sprites 16-23 anywhere on the screen (and never 24-31), so the
+	// bootleg PCB was presumably modified for this.
+	// Lower numbered sprites have priority, so draw them in reverse order.
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		rectangle const clip(cliprect.min_x, cliprect.max_x, y, y);
+		uint8_t const v = flip_screen() ? ~(y - 1) : (y - 1);
+		int const last = BIT(v, 7) ? 31 : 23;
+
+		for (int i = last; i > last - 8; i--)
+			draw_sprite(bitmap, clip, i * 4);
+
+		for (int i = 15; i >= 0; i--)
+			draw_sprite(bitmap, clip, i * 4);
 	}
 }
 
@@ -816,7 +842,9 @@ ROM_START( mach9 )
 	ROM_LOAD( "82s129_8n.bin",    0x0600, 0x0100, CRC(4921635c) SHA1(aee37d6cdc36acf0f11ff5f93e7b16e4b12f6c39) ) // video timing? (not used)
 ROM_END
 
-// Same PCB as 'mach9'
+// Same PCB as 'mach9'.
+// The program is 1942 (Revision A), patched for the different scroll registers and background RAM layout,
+// and with the ROM checksum test removed.
 ROM_START( 1942iti )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "2764.n4",             0x00000, 0x2000, CRC(0720ef77) SHA1(59466c22f8c37b80762c95049521fc5d31cf0932) )
@@ -824,7 +852,7 @@ ROM_START( 1942iti )
 	ROM_LOAD( "2764.n6",             0x04000, 0x2000, CRC(2b2faee6) SHA1(bcd2e5675b863df8be8bc813e25f4aa65a969359) )
 	ROM_LOAD( "2764.n7",             0x06000, 0x2000, CRC(bd3cbb4c) SHA1(9da177d68d39b56375975b8700cc0cc8b48211fe) )
 	ROM_LOAD( "daughter_27128.3",    0x10000, 0x4000, CRC(835f7b24) SHA1(24b66827f08c43fbf5b9517d638acdfc38e1b1e7) )
-	ROM_LOAD( "daughter_2764.2",     0x14000, 0x2000, CRC(9eca91e1) SHA1(48ccb608519debb681fa4f78985a074e05040edc) )
+	ROM_LOAD( "daughter_2764.2",     0x14000, 0x2000, BAD_DUMP CRC(821c6481) SHA1(06becb6bf8b4bde3a458098498eecad566a87711) ) // Taken from 1942a, original was bitrotted
 	ROM_LOAD( "daughter_27128.1",    0x18000, 0x4000, CRC(c661c8eb) SHA1(d5acf045d5773b01430bb54bc92ccd291318d2d7) )
 
 	ROM_REGION( 0x10000, "audiocpu", ROMREGION_ERASEFF )
@@ -863,9 +891,9 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1984, vulgus,  0,      vulgus, vulgus,  vulgus_state,   empty_init,   ROT270, "Capcom",          "Vulgus (set 1)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1984, vulgusa, vulgus, vulgus, vulgus,  vulgus_state,   empty_init,   ROT90,  "Capcom",          "Vulgus (set 2)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1984, vulgusj, vulgus, vulgus, vulgus,  vulgus_state,   empty_init,   ROT270, "Capcom",          "Vulgus (Japan?)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1984, mach9,   vulgus, vulgus, vulgus,  vulgus_state,   empty_init,   ROT270, "bootleg (Itisa)", "Mach-9 (bootleg of Vulgus)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vulgus,  0,      vulgus, vulgus,  vulgus_state,   empty_init, ROT270, "Capcom",          "Vulgus (set 1)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vulgusa, vulgus, vulgus, vulgus,  vulgus_state,   empty_init, ROT90,  "Capcom",          "Vulgus (set 2)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, vulgusj, vulgus, vulgus, vulgus,  vulgus_state,   empty_init, ROT270, "Capcom",          "Vulgus (Japan?)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1984, mach9,   vulgus, vulgus, vulgus,  vulgus_state,   empty_init, ROT270, "bootleg (Itisa)", "Mach-9 (bootleg of Vulgus)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, 1942iti, 1942,   vulgus, 1942iti, _1942iti_state, empty_init,   ROT270, "bootleg (Itisa)", "1942 (bootleg on Vulgus hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1984, 1942iti, 1942,   vulgus, 1942iti, _1942iti_state, empty_init, ROT270, "bootleg (Itisa)", "1942 (bootleg on Vulgus hardware)", MACHINE_SUPPORTS_SAVE )
