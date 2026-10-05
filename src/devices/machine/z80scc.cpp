@@ -1465,8 +1465,11 @@ uint8_t z80scc_channel::do_sccreg_rr0()
  * codes for the I-Field in the SDLC Receive Mode. */
 uint8_t z80scc_channel::do_sccreg_rr1()
 {
-	LOGR("%s <- %02x\n", FUNCNAME, m_rr1);
-	return m_rr1;
+	uint8_t rr1 = m_rr1;
+	if (m_rx_fifo_wp != m_rx_fifo_rp)
+		rr1 = (rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo_rp];
+	LOGR("%s <- %02x\n", FUNCNAME, rr1);
+	return rr1;
 }
 
 /* From Zilog SCC/ESCC USers manual, UM010902-0609:
