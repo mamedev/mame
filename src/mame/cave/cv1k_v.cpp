@@ -242,8 +242,7 @@ inline void cv1k_blitter_device::gfx_upload_shadow_copy(address_space &space, of
 	m_maincpu->m_sh2_state->icount -= num_sram_clk * 2;
 	m_blit_delay_ns += num_sram_clk * CV1K_SRAM_CLK_NANOSEC;
 	// Upload operations are written to VRAM as they arrive, and the Blitter will wait
-	// with Bus Request between each 64 byte chunk. See Blitter Operations section of
-	// https://cave.buffis.com/docs/CV1000_Blitter_Research_by_buffi.pdf
+	// with Bus Request between each 64 byte chunk. See "Blitter Research by buffi".
 	const int num_chunk_gaps = (chunk_offset + num_bytes) / OPERATION_CHUNK_SIZE_BYTES;
 	m_blit_delay_ns += num_chunk_gaps * CV1K_UPLOAD_CHUNK_GAP_NANOSEC;
 	m_blit_idle_op_bytes = 0;
@@ -512,8 +511,7 @@ inline void cv1k_blitter_device::gfx_draw_shadow_copy(address_space &space, offs
 	//   - 20 CLK of overhead between read and write of each destination VRAM row.
 	//   - 11 CLK of overhead after each write to a destination VRAM row.
 	// - 12 CLK of additional overhead per sprite at the end of writing.
-	// Note: Details are from https://buffis.com/docs/CV1000_Blitter_Research_by_buffi.pdf
-	//       There may be mistakes.
+	// Note: Details are from "Blitter Research by buffi". There may be mistakes.
 	const u32 num_vram_clk = src_dimx * src_dimy / 4 + dst_dimx * dst_dimy / 2 + src_num_vram_rows * 6 + dst_num_vram_rows * (20 + 11) + 12;
 	m_blit_delay_ns += num_vram_clk * CV1K_VRAM_CLK_NANOSEC;
 }
