@@ -117,6 +117,7 @@ private:
 	// rendering
 	void render_frame();
 	void draw_sprite(const decoded_sprite &spr, int cx, int cy, u32 palette, u32 zoomx, u32 zoomy, bool flipx, bool flipy, bool transparency);
+	void draw_sprite_quad(const decoded_sprite &spr, const double (&qx)[4], const double (&qy)[4], u32 palette, bool flipx, bool flipy, bool transparency);
 };
 
 
