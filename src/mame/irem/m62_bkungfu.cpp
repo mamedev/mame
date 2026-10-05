@@ -7,6 +7,9 @@ Beyond Kung-Fu
 Irem M62-based unreleased Kung-Fu Master sequel
 video reference: https://www.youtube.com/watch?v=Efr9EQkbCSQ
 
+	TODO:
+	- priority issue with main sprite against steps at the end of some stages
+
 *******************************************************************************/
 
 #include "emu.h"

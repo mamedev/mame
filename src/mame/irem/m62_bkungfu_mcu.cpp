@@ -1,18 +1,177 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Andrea Bogazzi
 
-/* MCU simulation code for IREM's Beyond Kung Fu
+/*	MCU simulation code for IREM's Beyond Kung Fu
 
-   The MCU is fully in charge of the tilemap layer, copying text strings
-   and background data from a partially encrypted external ROM
+	The MCU is fully in charge of the tilemap layer, copying text strings
+	and background data from a partially encrypted external ROM
 
-   The exact MCU type is not confirmed
+	The exact MCU type is not confirmed
 
-   TODO:
-   - determine the purpose of the optional fifth/sixth level composition pointers
-   - background draw timing isn't 100% correct, although this has no impact on overall game timing
-   - does the hardware really have twice the VRAM as the other boards?
-   - test mode doesn't work (there are strings for it in the MCU data ROM, is the MCU involved, or is it incomplete)
+	TODO:
+
+	- determine the purpose of the optional fifth/sixth level composition pointers
+	- background draw timing isn't 100% correct, although this has no impact on overall game timing
+	- does the hardware really have twice the VRAM as the other boards?
+	- test mode doesn't work (there are strings for it in the MCU data ROM, is the MCU involved, or is it incomplete)
+
+	NOTES:
+
+	Command 0x01 at offset 0x00 uses the table at 0x200
+
+	The Z80 parameter is the direct table index and advances modulo eight in the
+	order 1,2,3,4,5,6,7,0.  Consequently slot 0 below is gameplay stage 8, slots
+	1-7 are gameplay stages 1-7, and redraw slots 8-15 have the same ordering.
+	Older notes below use "Stage 1-8" as shorthand for table slots 0-7.
+
+	Table for levels
+	These point to tilemap structures in their initial state, before objects at
+	the start of each stage have been animated.
+
+	0200  4D 18 | 184d
+	0202  DD 17 | 17dd
+	0204  6D 17 | 176d
+	0206  FD 16 | 16fd
+	0208  8D 16 | 168d
+	020A  1D 16 | 161d
+	020C  AD 15 | 15ad
+	020E  3D 15 | 153d
+
+	2nd Tables for levels
+	These point to tilemap structures with moving objects (doors, trapdoors) in
+	their post-animated state, used to redraw the level when the level name text
+	needs to be removed without resetting the moving pieces to their original state
+
+	0210  4D 18 | 184d
+	0212  DD 17 | 17dd
+	0214  6D 17 | 176d
+	0216  7D 1A | 1a7d
+	0218  0D 1A | 1a0d
+	021A  9D 19 | 199d
+	021C  2D 19 | 192d
+	021E  BD 18 | 18bd
+
+	This initial / redraw after animation table use can be confirmed by looking at the pairs
+
+	0200  4D 18 | 184d / 0210  4D 18 | 184d  - identical in both states (Stage 1 data)
+	0202  DD 17 | 17dd / 0212  DD 17 | 17dd  - identical in both states (Stage 2 data)
+	0204  6D 17 | 176d / 0214  6D 17 | 176d  - identical in both states (Stage 3 data)
+	0206  FD 16 | 16fd / 0216  7D 1A | 1a7d  - different (Stage 4 data)
+	0208  8D 16 | 168d / 0218  0D 1A | 1a0d  - different (Stage 5 data)
+	020A  1D 16 | 161d / 021A  9D 19 | 199d  - different (Stage 6 data)
+	020C  AD 15 | 15ad / 021C  2D 19 | 192d  - different (Stage 7 data)
+	020E  3D 15 | 153d / 021E  BD 18 | 18bd  - different (Stage 8 data)
+
+	The game has 8 stages, the first 3 stages do not contain animated objects
+	The remaining stages have animated objects (animated with different commands) that close behind the player when they first enter the stage
+
+	Stage 4 contains a door on the very right of the tilemap
+	Stage 5 contains a trap door on the very left of the tilemap
+	Stage 6 contains a trap door on the very right of the tilemap
+	Stage 7 contains a trap door on the very left of the tilemap
+	Stage 8 contains a trap door on the very right of the tilemap
+
+	if you sort by address pointed to you get
+
+	020E  3D 15 | 153d
+	020C  AD 15 | 15ad
+	020A  1D 16 | 161d
+	0208  8D 16 | 168d
+	0206  FD 16 | 16fd
+	0204  6D 17 | 176d / 0214  6D 17 | 176d
+	0202  DD 17 | 17dd / 0212  DD 17 | 17dd
+	0200  4D 18 | 184d / 0210  4D 18 | 184d
+	021E  BD 18 | 18bd
+	021C  2D 19 | 192d
+	021A  9D 19 | 199d
+	0218  0D 1A | 1a0d
+	0216  7D 1A | 1a7d
+
+	so each of these blocks is 0x70 bytes long giving the following ranges
+
+	153d - 15ac
+	15ad - 161c
+	161d - 168c
+	168d - 16fc
+	16fd - 176c
+	176d - 17dc
+	17dd - 184c
+	184d - 18bc
+	18bd - 192c
+	192d - 199c
+	199d - 1a0d
+	1a0d - 1a7d
+	1a7d - 1aec
+
+	data from 1aed - 7fff is referenced by these tables, see further notes below
+
+	When the levels are drawn they're drawn in 4 tile wide strips, from top to
+	bottom, left to right each screen has 8 of these strips each level is 7 screens
+	wide.  This drawing is not instant, the draw-in can be seen on hardware footage.
+
+
+	All multi-byte values described below are little-endian.  Bytes at ROM offsets
+	0000-153c are plaintext.  Starting at 153d, each byte is independently decoded
+	with a 256-byte key table K.  For ROM address A:
+
+		s = (A_low + A_high) & ff
+		first = (s & 1) ? (K[s] - cipher) : (cipher ^ K[s])
+
+	This transform is address-local: it has no feedback from preceding bytes and
+	can be performed as data is read.  No shorter generator for K is known.
+
+	Level/object payload bytes and the pointers stored inside those payloads use a
+	second address-dependent transform after the first one:
+
+		if (s & 1)
+			value = 60 - first
+		else
+			value = ((first & 20) ? a0 : 60) - first
+					- ((first & 1) ? 0 : 2)
+
+	All arithmetic is modulo 256.  Structure tokens are recognised at the stage
+	used by their format, rather than blindly applying the payload transform to
+	every byte.
+
+	The level directory at 0200 contains sixteen pointers.  Each points to a
+	70-byte block of 56 two-byte entry pointers.  Consecutive entry pairs describe
+	two adjacent four-tile-wide columns: the even entry supplies the upper ten
+	tile rows and the odd entry supplies the lower sixteen rows.  Each entry points
+	to a 0000-terminated list of payload-encoded pointers.  The first four select
+	the tile streams; optional fifth and sixth pointers select unresolved seven-
+	byte records associated with the six boundaries between the seven screens.
+	Each main stream supplies two adjacent tiles per row; four streams therefore
+	form the eight tiles across the column pair.  Upper streams contain 20 literal
+	cells and lower streams contain 32.  In a level stream, 00 terminates the
+	stream, 01 followed by a payload byte changes the current attribute, and all
+	other payload bytes are tile codes.  The current attribute is written beside
+	every tile code in tilemap RAM.
+
+	Object IDs 80-90 select seventeen pointers in the table at 0100.  The selected
+	five-byte record is:
+
+		width, destination_low, destination_high, stream_low, stream_high
+
+	The object stream is row-major and wraps after the record's width.  Token 5f
+	is followed by a payload-encoded attribute; 5e or 60 terminates the stream;
+	other bytes are payload-encoded tile codes.  This same format describes both
+	title dragons, both flame animation frames and the later-stage moving objects.
+
+	ROM text commands use a two-byte pointer table indexed by the command's text
+	number.  Text streams use 00 as terminator, 01 followed by an attribute, 02
+	followed by a little-endian tilemap position, and literal tile bytes otherwise.
+	The fixed HUD uses the same grammar through the pointer at 0140.  Command 0c
+	uses an equivalent stream prepared by the Z80 in shared RAM.  Text positions
+	advance by two bytes per character and wrap within a 64-tile (0x80-byte) row.
+
+	The data format contains the tile codes and palette attributes.  In tilemap
+	RAM they are emitted as adjacent bytes, tile first and attribute second.  The
+	tile byte supplies code bits 0-7; attribute bits 5-7 supply code bits 8-10 and
+	attribute bits 0-4 select the palette.  The separate background-bank latch
+	supplies code bit 11.  The solid-colour low tile codes 04-0b in each bank are
+	ordinary tiles aligned with the palette colours; they do not require a special
+	fill opcode.
+
 */
 
 #include "emu.h"
