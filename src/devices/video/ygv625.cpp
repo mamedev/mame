@@ -24,9 +24,24 @@
           bit 15      X flip
       +12 bits 15..8  vertical zoom factor, 0x40 = 1.0
           bits 7..0   horizontal zoom factor, 0x40 = 1.0
-      +14 bit 14      last entry of the display list
+          (quadrilateral mode: bits 7..0 index the corner table instead,
+          entry = 0x2000 + index * 8; the games set bits 15..8 to 0x84/0xc4)
+      +14 bit 15      quadrilateral mode: the sprite is mapped onto the four
+                      corners given by the corner table entry: Y (positive
+                      upwards) and X pairs for the bottom-left, top-left,
+                      top-right and bottom-right corners, 11-bit two's
+                      complement pixel offsets from the centre position.
+                      Used for rotating/distorting sprites: wanpakup's sinking
+                      ships, mmhammer's tumbling characters and spinning
+                      banner, docchift's bouncing ball (verified against
+                      recordings of the real machines)
+          bit 14      last entry of the display list
           bit 13      entry disabled
           bit 12      entry enabled
+
+    Window layout: 0x0000-0x1fff attribute table (512 entries), 0x2000-
+    corner table (16 bytes per entry), 0x3800-0x38ff colour table,
+    0x3c00- registers.
 
     Registers (word offsets from 0x3c00):
 
@@ -82,6 +97,7 @@
 #include "screen.h"
 
 #include <algorithm>
+#include <cmath>
 
 #define LOG_REGS   (1U << 1)
 #define LOG_SPRITE (1U << 2)
@@ -609,6 +625,111 @@ void ygv625_device::draw_sprite(const decoded_sprite &spr, int cx, int cy, u32 p
 
 
 //-------------------------------------------------
+//  draw_sprite_quad - map the sprite onto an
+//  arbitrary quadrilateral (corners TL, TR, BR, BL
+//  in screen coordinates), used for rotated and
+//  perspective-distorted sprites
+//-------------------------------------------------
+
+void ygv625_device::draw_sprite_quad(const decoded_sprite &spr, const double (&qx)[4], const double (&qy)[4], u32 palette, bool flipx, bool flipy, bool transparency)
+{
+	if (!spr.valid || spr.pixels.empty())
+		return;
+
+	const u32 stride = ((spr.width + 15) / 16) * 16;
+
+	rgb_t clut[256];
+	if (spr.depth <= 8)
+		for (u32 i = 0; i < (1u << spr.depth); i++)
+			clut[i] = lookup_colour(palette, spr.depth, i);
+
+	int transparent = -1;
+	if (transparency)
+		transparent = (spr.depth == 16) ? 0x0001 : (spr.has_transparent ? spr.transparent : 0);
+
+	// P(s,t) = P0 + s*e + t*f + s*t*g with s, t in [0,1) across the texture
+	const double ex = qx[1] - qx[0], ey = qy[1] - qy[0];
+	const double fx = qx[3] - qx[0], fy = qy[3] - qy[0];
+	const double gx = qx[0] - qx[1] + qx[2] - qx[3], gy = qy[0] - qy[1] + qy[2] - qy[3];
+	const double area = ex * fy - ey * fx;
+	if (std::abs(area) < 0.5 && std::abs(gx) + std::abs(gy) < 0.5)
+		return;
+
+	const int xmax = m_bitmap.width(), ymax = m_bitmap.height();
+	const int bx0 = std::max<int>(0, int(std::floor(std::min({qx[0], qx[1], qx[2], qx[3]}))));
+	const int bx1 = std::min<int>(xmax - 1, int(std::ceil(std::max({qx[0], qx[1], qx[2], qx[3]}))));
+	const int by0 = std::max<int>(0, int(std::floor(std::min({qy[0], qy[1], qy[2], qy[3]}))));
+	const int by1 = std::min<int>(ymax - 1, int(std::ceil(std::max({qy[0], qy[1], qy[2], qy[3]}))));
+
+	const double k2 = gx * fy - gy * fx;
+	const double kef = ex * fy - ey * fx;
+
+	for (int py = by0; py <= by1; py++)
+	{
+		u32 *dst = &m_bitmap.pix(py);
+		for (int px = bx0; px <= bx1; px++)
+		{
+			const double hx = (px + 0.5) - qx[0], hy = (py + 0.5) - qy[0];
+			const double k1 = kef + (hx * gy - hy * gx);
+			const double k0 = hx * ey - hy * ex;
+			// solve k2*t^2 + k1*t + k0 = 0 for t, then s from the row equation; the
+			// quads are usually nearly parallelograms (k2 ~ 0), so use the stable
+			// form of the quadratic formula to keep the small root accurate
+			double s = -1.0, t = -1.0;
+			bool found = false;
+			auto solve_s = [&](double tt, double &ss) -> bool
+			{
+				const double dx = ex + gx * tt, dy = ey + gy * tt;
+				if (std::abs(dx) < 1e-9 && std::abs(dy) < 1e-9)
+					return false;
+				ss = (std::abs(dx) >= std::abs(dy)) ? (hx - fx * tt) / dx : (hy - fy * tt) / dy;
+				return (ss >= 0.0 && ss < 1.0 && tt >= 0.0 && tt < 1.0);
+			};
+			if (k2 == 0.0)
+			{
+				if (k1 == 0.0)
+					continue;
+				t = -k0 / k1;
+				found = solve_s(t, s);
+			}
+			else
+			{
+				const double disc = k1 * k1 - 4.0 * k0 * k2;
+				if (disc < 0.0)
+					continue;
+				const double w = std::sqrt(disc);
+				const double q = -0.5 * (k1 + ((k1 >= 0.0) ? w : -w));
+				// root 1: q / k2 (the large one when k2 is small), root 2: k0 / q
+				if (q != 0.0)
+				{
+					t = k0 / q;
+					found = solve_s(t, s);
+				}
+				if (!found)
+				{
+					t = q / k2;
+					found = solve_s(t, s);
+				}
+			}
+			if (!found)
+				continue;
+			if (s < 0.0 || s >= 1.0 || t < 0.0 || t >= 1.0)
+				continue;
+
+			int sx = std::min<int>(spr.width - 1, int(s * spr.width));
+			int sy = std::min<int>(spr.height - 1, int(t * spr.height));
+			if (flipx) sx = spr.width - 1 - sx;
+			if (flipy) sy = spr.height - 1 - sy;
+			const u16 v = spr.pixels[sy * stride + sx];
+			if (int(v) == transparent)
+				continue;
+			dst[px] = (spr.depth == 16) ? rgb565(v) : clut[v];
+		}
+	}
+}
+
+
+//-------------------------------------------------
 //  render_frame - walk the attribute table
 //-------------------------------------------------
 
@@ -630,13 +751,36 @@ void ygv625_device::render_frame()
 			int x = a[5] & 0xfff;
 			if (y & 0x800) y -= 0x1000;
 			if (x & 0x800) x -= 0x1000;
-			const u32 zoomy = a[6] >> 8;
-			const u32 zoomx = a[6] & 0xff;
 
 			if (addr < m_cg.length())
 			{
 				const decoded_sprite &spr = get_sprite(addr, width, height);
-				draw_sprite(spr, x, y, palette, zoomx, zoomy, BIT(a[5], 15), BIT(a[4], 15), BIT(a[0], 11));
+				if (flags & 0x8000)
+				{
+					// quadrilateral mode: +12 bits 7..0 index a 16 byte entry of the
+					// corner table at 0x2000.  Each corner is two words, Y (positive
+					// upwards) then X, 11-bit two's complement pixel offsets from the
+					// centre position, in the order bottom-left, top-left, top-right,
+					// bottom-right.
+					const u16 *q = &m_ram[0x1000 + (a[6] & 0xff) * 4];
+					double sx[4], sy[4];
+					for (int c = 0; c < 4; c++)
+					{
+						int cy = q[c * 2] & 0x7ff, cx = q[c * 2 + 1] & 0x7ff;
+						if (cx & 0x400) cx -= 0x800;
+						if (cy & 0x400) cy -= 0x800;
+						sx[c] = x + cx;
+						sy[c] = y - cy;
+					}
+					// draw_sprite_quad wants TL, TR, BR, BL
+					const double qx[4] = { sx[1], sx[2], sx[3], sx[0] };
+					const double qy[4] = { sy[1], sy[2], sy[3], sy[0] };
+					draw_sprite_quad(spr, qx, qy, palette, BIT(a[5], 15), BIT(a[4], 15), BIT(a[0], 11));
+				}
+				else
+				{
+					draw_sprite(spr, x, y, palette, a[6] & 0xff, a[6] >> 8, BIT(a[5], 15), BIT(a[4], 15), BIT(a[0], 11));
+				}
 			}
 		}
 		if (flags & 0x4000)
