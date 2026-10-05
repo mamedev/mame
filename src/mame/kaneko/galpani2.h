@@ -79,8 +79,6 @@ private:
 	uint16_t m_mask_girl_pen = 0x80a0;
 	uint16_t m_mask_nongirl_pen = 0x00a0;
 	uint8_t  m_mask_captured_lo = 0xa0;  // SE writes 0x60 to plane 0 on capture
-	uint32_t m_girl_total_addr = 0x109e28;  // where the game stores girl_total
-	uint32_t m_other_total_addr = 0x109e2a;
 
 	// Deferred girl-bitmap HLE: the bitmap is generated after the
 	// photo decode completes, not at MCU command time when BG15 may
@@ -91,7 +89,8 @@ private:
 	static constexpr uint32_t GIRL_BITMAP_ADDR   = 0x10e000;
 	uint32_t m_girl_bitmap_pending_addr = 0;
 	uint32_t m_girl_bitmap_pending_source = 0;
-	int      m_girl_bitmap_delay = 0;
+	uint32_t m_girl_bitmap_script_state = 0;
+	uint32_t m_girl_bitmap_pending_param = 0;
 
 	void galpani2_mcu_init_w(uint8_t data);
 	void galpani2_mcu_nmi1_w(uint8_t data);
@@ -113,6 +112,7 @@ private:
 	void galpani2_mcu_nmi1();
 	void galpani2_mcu_nmi2();
 	uint16_t generate_girl_bitmap(address_space &mspace);
+	void update_girl_bitmap();
 	uint32_t se_current_girl_image_offset();
 	bool generate_se_girl_bitmap(uint32_t image_offset);
 	void galpani2_mem1(address_map &map) ATTR_COLD;

@@ -134,6 +134,18 @@ void galpani2_state::machine_start()
 	membank("subdatabank")->configure_entries(0, 0x2000000/0x0800000, ROM, 0x0800000);
 	membank("subdatabank")->set_entry(0);
 
+	// Native image-script task 12 begins with LEA <four script records>,A0.
+	// The records move between program revisions; read the dispatch entry
+	// rather than assuming one region's work-RAM addresses in the mask HLE.
+	address_space &sub = m_subcpu->space(AS_PROGRAM);
+	uint32_t const script_handler = sub.read_dword(0x400 + 0x12 + 2);
+	if (script_handler < 0x3fffa && sub.read_word(script_handler) == 0x41f9)
+	{
+		uint32_t const records = sub.read_dword(script_handler + 2);
+		if (records >= 0x100000 && records < 0x13ff40)
+			m_girl_bitmap_script_state = records + 3 * 0x30;
+	}
+
 	save_item(NAME(m_eeprom_word));
 	save_item(NAME(m_old_mcu_nmi1));
 	save_item(NAME(m_old_mcu_nmi2));
@@ -141,14 +153,15 @@ void galpani2_state::machine_start()
 	// Only SE uses the bound source; retain the normal sets' save layout.
 	if (m_bg_image_prefix_count)
 		save_item(NAME(m_girl_bitmap_pending_source));
-	save_item(NAME(m_girl_bitmap_delay));
+	// Preserve the original sets' saved-item key and 32-bit layout.
+	save_item(m_girl_bitmap_pending_param, "m_girl_bitmap_delay");
 }
 
 void galpani2_state::machine_reset()
 {
 	m_girl_bitmap_pending_addr = 0;
 	m_girl_bitmap_pending_source = 0;
-	m_girl_bitmap_delay = 0;
+	m_girl_bitmap_pending_param = 0;
 	machine().scheduler().perfect_quantum(attotime::from_usec(50)); //initial mcu xchk
 }
 
@@ -179,14 +192,11 @@ void galpani2_state::init_special()
 	m_bg_image_prefix_offsets = special_extra_image_offsets;
 	m_bg_image_prefix_count = std::size(special_extra_image_offsets);
 
-	// SE uses different field layout: origin at x=32 (not 48), mask pens
-	// 0050/8050 (not 00A0/80A0), and girl counters at different addresses.
+	// SE uses field origin x=32 and mask pens 0050/8050.
 	m_field_origin_x = 32;
 	m_mask_girl_pen = 0x8050;
 	m_mask_nongirl_pen = 0x0050;
 	m_mask_captured_lo = 0x60;  // SE writes 0060 to plane 0 on capture
-	m_girl_total_addr = 0x10a0e6;
-	m_other_total_addr = 0x10a0e8;
 }
 
 static void galpani2_write_kaneko(cpu_device *cpu)
@@ -432,6 +442,38 @@ uint16_t galpani2_state::generate_girl_bitmap(address_space &mspace)
 	return popcount;
 }
 
+void galpani2_state::update_girl_bitmap()
+{
+	if (!m_girl_bitmap_pending_addr || m_bg_image_prefix_count || !m_girl_bitmap_pending_param)
+		return;
+
+	address_space &sub = m_subcpu->space(AS_PROGRAM);
+	// The native RGB3 script record's +4 becomes FFFF only after
+	// the final decoder has completed. This includes the sparse overlay,
+	// which can add coverage after the primary 256x256 picture is decoded.
+	uint32_t const state = m_girl_bitmap_script_state;
+	if (!state || sub.read_word(state + 4) != 0xffff || BIT(sub.read_byte(state + 0x1e), 3))
+		return;
+
+	// Script completion precedes the interrupt's display-register update.
+	// Wait until the visible field samples the half that was just decoded;
+	// otherwise the old half can supply part or all of this round's mask.
+	uint32_t const destination = sub.read_dword(m_girl_bitmap_pending_param + 4);
+	uint16_t const *const regs = &m_bg15[0x80000 + 3 * 0x20000];
+	if (destination < 0x4c0000 || destination >= 0x500000
+		|| ((regs[0x400 / 2] + 0x42 + m_field_origin_x) & 0x1ff) != ((destination / 2) & 0x1ff))
+		return;
+
+	address_space &main = m_maincpu->space(AS_PROGRAM);
+	uint16_t const total = generate_girl_bitmap(main);
+	main.write_word(m_girl_bitmap_pending_addr + 2, GIRL_BITMAP_OFFSET);
+	main.write_word(m_girl_bitmap_pending_addr, total);
+	logerror("MCU girl bitmap: native RGB3 script complete at %06x, reply %u pixels\n",
+		unsigned(destination), unsigned(total));
+	m_girl_bitmap_pending_addr = 0;
+	m_girl_bitmap_pending_param = 0;
+}
+
 void galpani2_state::galpani2_mcu_nmi1()
 {
 	address_space &mspace = m_maincpu->space(AS_PROGRAM);
@@ -505,24 +547,17 @@ void galpani2_state::galpani2_mcu_nmi1()
 			// at the parameter address, reads it as girl_total, then
 			// reads the next word as a RAM pointer for the packed bitmap.
 			//
-			// Phase 1: return a placeholder immediately so the consumer
-			// exits its polling loop. The placeholder bitmap is ALL GIRL
-			// (every cell covered) so the photo stays hidden until phase 2
-			// narrows the mask to the actual silhouette. girl_total matches
-			// the full field so the percentage starts at 0%.
-			// Phase 2 (in screen_update): once the photo decode completes,
-			// regenerate the real bitmap and re-expand it into BG8 plane 0,
-			// then update the girl_total with the correct count.
-			logerror("MCU master %02x:%06x: girl bitmap cmd %02x placeholder\n",
+			// Keep the reply pending until the native RGB3 script finishes.
+			// The next RGB3 lookup binds this request to its script. The
+			// main CPU then expands and trims the final mask itself; no
+			// placeholder field or delayed host counter rewrite is needed.
+			// This remains an HLE framebuffer sampler: the undumped MCU's
+			// original mask source and response timing are not established.
+			logerror("MCU master %02x:%06x: girl bitmap cmd %02x pending\n",
 				slot, address, command);
-			// Write all-ones bitmap (all girl = entire field covered)
-			for (int i = 0; i < FIELD_ROWS * FIELD_COLS / 8; i++)
-				mspace.write_byte(GIRL_BITMAP_ADDR + i, 0xff);
-			mspace.write_word(address, FIELD_COLS * FIELD_ROWS);  // full field as girl_total
-			mspace.write_word(address + 2, GIRL_BITMAP_OFFSET);
-			// Schedule phase 2 regeneration
+			mspace.write_word(address, 0);
 			m_girl_bitmap_pending_addr = address;
-			m_girl_bitmap_delay = 300;  // wait for decode + consumer edge removal
+			m_girl_bitmap_pending_param = 0;
 			continue;  // skip the generic FFFF write below
 		}
 
@@ -562,6 +597,18 @@ void galpani2_state::galpani2_mcu_nmi2()
 			// It then queues the appropriate native decompressor with this raw offset.
 			logerror("MCU slave %02x:%06x: image lookup %04x -> %08x\n", slot, address, img, iadr);
 			sspace.write_dword(address + 2, iadr);
+			if (!m_bg_image_prefix_count && m_girl_bitmap_pending_addr && !m_girl_bitmap_pending_param
+				&& m_girl_bitmap_script_state && iadr && address >= 0x100090 && address < 0x13ff00)
+			{
+				// The native interpreter saves D0-D7/A0-A3/A5 at its work
+				// area's +100 while awaiting lookup. RGB3's parameter block
+				// is at +90. Verify saved D5/A5 so an unrelated RGB lookup
+				// cannot bind this mask request, even if its image ID matches.
+				uint32_t const work = address - 0x90;
+				if (sspace.read_dword(work + 0x114) == 0x90
+					&& sspace.read_dword(work + 0x130) == m_girl_bitmap_script_state)
+					m_girl_bitmap_pending_param = address + 2;
+			}
 			if (m_bg_image_prefix_count && m_girl_bitmap_pending_addr && iadr
 				&& m_girl_bitmap_pending_source)
 			{
@@ -888,7 +935,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt2)
 	int scanline = param;
 
 	if(scanline == 240)
+	{
+		update_girl_bitmap();
 		m_subcpu->set_input_line(5, HOLD_LINE);
+	}
 
 	if(scanline == 128)
 		m_subcpu->set_input_line(4, HOLD_LINE);
