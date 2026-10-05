@@ -288,13 +288,13 @@ GFXDECODE_END
 static constexpr int COLORTABLE_SOURCE[] =
 {
 	0, 1, 2, 3, 4, 5, 6, 7,
-	0, 0, 1, 2, 3, 4, 5, 6,  // not sure about these, but they are only used
-	0, 7, 0, 1, 2, 3, 4, 5,  // to change the text color. During the game,
-	0, 6, 7, 0, 1, 2, 3, 4,  // only color 0 is used, which is correct.
-	0, 5, 6, 7, 0, 1, 2, 3,
-	0, 4, 5, 6, 7, 0, 1, 2,
-	0, 3, 4, 5, 6, 7, 0, 1,
-	0, 2, 3, 4, 5, 6, 7, 0
+	0, 1, 2, 3, 0, 1, 2, 3,  // not sure about these, but they are only used
+	0, 1, 0, 1, 4, 5, 4, 5,  // to change the text color. During the game,
+	0, 1, 0, 1, 0, 1, 0, 1,  // only color 0 is used, which is correct.
+	0, 0, 2, 2, 4, 4, 6, 6,
+	0, 0, 2, 2, 0, 0, 2, 2,
+	0, 0, 0, 0, 4, 4, 4, 4,
+	0, 0, 0, 0, 0, 0, 0, 0
 };
 
 void spcforce_state::palette(palette_device &palette) const
