@@ -2,7 +2,7 @@
 <!--
 license:CC0-1.0
 copyright-holders:
-Gaelco kiddie rides, later PCB: lamps and motor
+Gaelco kiddie rides, later PCB: lamps, motor and gift motor
 -->
 <mamelayout version="2">
 
@@ -21,7 +21,7 @@ Gaelco kiddie rides, later PCB: lamps and motor
 	</element>
 
 	<element name="text_lamps"><text string="LAMPS 1-4"><color red="0.7" green="0.7" blue="0.7" /></text></element>
-	<element name="text_lamp5"><text string="LAMP 5"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_gift"><text string="GIFT MOTOR"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 	<element name="text_motor"><text string="MOTOR"><color red="0.7" green="0.7" blue="0.7" /></text></element>
 
 	<view name="Outputs">
@@ -34,8 +34,8 @@ Gaelco kiddie rides, later PCB: lamps and motor
 		<element name="lamp3" ref="lamp"><bounds x="212" y="30" width="36" height="36" /></element>
 		<element ref="text_lamps"><bounds x="90" y="76" width="100" height="12" /></element>
 
-		<element name="lamp4" ref="lamp"><bounds x="72" y="120" width="36" height="36" /></element>
-		<element ref="text_lamp5"><bounds x="60" y="166" width="60" height="12" /></element>
+		<element name="gift_motor" ref="motor"><bounds x="72" y="120" width="36" height="36" /></element>
+		<element ref="text_gift"><bounds x="45" y="166" width="90" height="12" /></element>
 
 		<element name="motor" ref="motor"><bounds x="172" y="120" width="36" height="36" /></element>
 		<element ref="text_motor"><bounds x="160" y="166" width="60" height="12" /></element>

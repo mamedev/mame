@@ -75,15 +75,20 @@
 
   Later kiddie ride PCB, with the 'I3' program: RA0 and RA2 are swapped (the program only lowers RA2 around the
   M6295 accesses) and there is no external display board, the latch drives four lamps that run a light sequence
-  during a ride. Each credit adds ride time, and the songs in phrases 8 and 9 play on alternate rides. The 'I4'
-  program drops the after ride phase: when the time runs out, the lamps and the music stop but the motor keeps
-  running for about 16 seconds, unless the stop input is activated.
+  during a ride. Each credit adds ride time, and the songs in phrases 8 and 9 play on alternate rides. With the
+  gift DIP switch on, a gift motor runs after the ride until the gift delivered input closes, or for about 16
+  seconds. The 'I4' program drops the gift: when the time runs out, the lamps and the music stop but the motor
+  keeps running for about 16 seconds, unless the stop input is activated.
+  The Gaelco kiddie ride manual (12 VAC series, 1995) gives the same DIP switch settings, and this connector:
+  JP1 = 15 pin [12VAC, GND, GND, speaker, speaker, coin, push 1, push 2, push aux, motor (to an external driver),
+				light 4 or gift motor (selected with a jumper), light 3, light 2, light 1, coin counter]
 
   TODO:
   - Verify the M6295 SS pin: with PIN7_HIGH the known songs of 'mueve', 'donpepito' and 'obladi' play at their
 	original tempo, with PIN7_LOW they would be 20% slower.
-  - Verify the DIP switch order and the connector assignment of the inputs and outputs.
-  - Dump the 'FUTBOL.N' PIC of the REF.920505 PCB, and find out what SW2 and SW3 do.
+  - Verify the DIP switch order of the original PCB, and which latch output goes to each connector pin.
+  - Dump the 'FUTBOL.N' PIC of the REF.920505 PCB, and find out what SW2 does. SW3 (MOT/LAMP) is probably the
+	jumper of the kiddie ride manual that turns light 4 into the gift motor output.
   - Find out which of Q4 and Q7 drive the MOT and POT pins of the kiddie rides, and what POT does.
   - Find out what the crane outputs drive and what its D2 and D4 lines are.
   - Find out what the pinball outputs Q3 to Q7 drive, and which switch each of its D2, D5 and D7 lines is.
@@ -493,6 +498,7 @@ public:
 	kiddie_i_state(const machine_config &mconfig, device_type type, const char *tag) :
 		gaelcof3_state(mconfig, type, tag),
 		m_lamp(*this, "lamp%u", 0U),
+		m_gift_motor(*this, "gift_motor"),
 		m_motor_out(*this, "motor")
 	{
 		m_oki_cs = 2;
@@ -505,7 +511,8 @@ protected:
 	virtual void update_outputs() override;
 
 private:
-	output_finder<5> m_lamp;
+	output_finder<4> m_lamp;
+	output_finder<> m_gift_motor;
 	output_finder<> m_motor_out;
 };
 
@@ -514,7 +521,7 @@ void kiddie_i_state::update_outputs()
 	for (int i = 0; i < 4; i++)
 		m_lamp[i] = BIT(m_latch, i);
 	machine().bookkeeping().coin_counter_w(0, BIT(m_latch, 4));
-	m_lamp[4] = BIT(m_latch, 5);
+	m_gift_motor = BIT(m_latch, 5);
 	m_motor_out = BIT(m_latch, 6);
 }
 
@@ -637,10 +644,10 @@ static INPUT_PORTS_START( i3 ) // 'I3' kiddie ride program
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) // only read after a ride, ends the after ride phase
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Gift Delivered") // push aux, only read while the gift motor runs
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW1") // order not verified, read only at power on
+	PORT_START("DSW1") // read only at power on
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
@@ -654,9 +661,9 @@ static INPUT_PORTS_START( i3 ) // 'I3' kiddie ride program
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "After Ride Phase" ) PORT_DIPLOCATION("SW1:6") // also phrase 6 after the attract one
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Gift" ) PORT_DIPLOCATION("SW1:6") // also phrase 6 after the attract one
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED ) // not connected, pulled up
 INPUT_PORTS_END
 
