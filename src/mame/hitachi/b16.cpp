@@ -429,6 +429,7 @@ static void b16_floppies(device_slot_interface &device)
 {
 	device.option_add("525dd", FLOPPY_525_DD);
 	device.option_add("525hd", FLOPPY_525_HD); // Y-E Data YD-380 (B16 EX onward)
+	device.option_add("35hd", FLOPPY_35_HD); // Optional 3.5" HD drive
 }
 
 void b16_state::floppy_formats(format_registration &fr)
@@ -452,7 +453,16 @@ void b16_state::machine_start()
 void b16_state::machine_reset()
 {
 	// Keep the selected drive's native speed (300 RPM DD or 360 RPM HD).
+	// Japanese 1.23MB mode uses 360 RPM
 	m_fdc->set_rate(m_fdc_rate);
+	if (m_fdc_rate == 500'000)
+	{
+		for (auto &connector : m_floppy)
+		{
+			if (auto *floppy = connector->get_device(); floppy && floppy->get_form_factor() == floppy_image::FF_35)
+				floppy->set_rpm(360);
+		}
+	}
 	m_dma_page = 0;
 	m_port78 = 0;
 	m_port80 = 0;
