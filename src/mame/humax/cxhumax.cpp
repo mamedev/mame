@@ -3,24 +3,323 @@
 /***************************************************************************
     HUMAX HDCI-2000 ( Conexant CX2417x )
 
-    http://www.humaxdigital.com/global/products/product_stb_satellite_hdci2000.asp
+    https://web.archive.org/web/20120715015717/http://www.humaxdigital.com/global/products/product_stb_satellite_hdci2000.asp
 
     Running on Nucleus PLUS - ARM7TDMI ADS v. 1.14
     some Conexant/Nucleus goodies may be found at http://code.google.com/p/cherices/
 
     runs up to frame 280 or so...
 
+    Features:
+    - DVB-S2 and DVB-S compliant;
+    - 1080i, 720p, 576p video formats, MPEG-2 & MPEG-4 AVC/H.264;
+    - Multi-format Audio Decoder, MPEG/MusiCam Layer I & II;
+    - DVB Common Interface (2 slot) support;
+    - HDMI with HDCP;
+    - DiseqC 1.0, 1.2, USALS compatible;
+    - LNB IN 13/18 Volt 500 mA Max;
+    - LNB OUT;
+    - USB 2.0;
+    - TV and VCR SCART;
+    - RCA outputs, YPbPr component out;
+    - S/PDIF;
+    - RS-232C;
+    - 4MB of Flash Memory, 64MB of Graphic and 32 MB of system DRAM;
+    - 8KB EEPROM;
+
 ****************************************************************************/
 
 #include "emu.h"
-#include "cxhumax.h"
+
+#include "cpu/arm7/arm7.h"
+#include "machine/i2cmem.h"
+#include "machine/intelfsh.h"
+#include "machine/terminal.h"
 
 #include "emupal.h"
 #include "screen.h"
 
-
 #define VERBOSE ( 0 )
 #include "logmacro.h"
+
+namespace {
+
+class cxhumax_state : public driver_device
+{
+public:
+	static constexpr unsigned MAX_CX_TIMERS = 16;
+
+	struct cx_timer_t
+	{
+		uint32_t value = 0U;
+		uint32_t limit = 0U;
+		uint32_t mode = 0U;
+		uint32_t timebase = 0U;
+		emu_timer *timer = nullptr;
+	};
+
+	struct cx_timer_regs_t
+	{
+		cx_timer_t timer[MAX_CX_TIMERS]{};
+		uint32_t timer_irq = 0U;
+	};
+
+	cxhumax_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_flash(*this, "flash"),
+		m_ram(*this, "ram"),
+		m_terminal(*this, "terminal"),
+		m_overlay_view(*this, "overlay_view"),
+		m_i2cmem(*this, "eeprom")
+	{
+	}
+
+	void cxhumax(machine_config &config);
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<intel_28f320j3d_device> m_flash;
+	required_shared_ptr<uint32_t> m_ram;
+	required_device<generic_terminal_device> m_terminal;
+	memory_view m_overlay_view;
+
+	void flash_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t flash_r(offs_t offset, uint32_t mem_mask = ~0);
+
+	void cx_hsx_w(offs_t offset, uint32_t data);
+	uint32_t cx_hsx_r(offs_t offset);
+
+	void cx_romdescr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_romdescr_r(offs_t offset);
+	void cx_isaromdescr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_isaromdescr_r(offs_t offset);
+	void cx_isadescr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_isadescr_r(offs_t offset);
+	void cx_rommap_w(offs_t offset, uint32_t data);
+	uint32_t cx_rommap_r(offs_t offset);
+	void cx_rommode_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_rommode_r(offs_t offset);
+	void cx_xoemask_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_xoemask_r(offs_t offset);
+	void cx_pci_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_pci_r(offs_t offset);
+	void cx_extdesc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_extdesc_r(offs_t offset);
+
+	void cx_remap_w(offs_t offset, uint32_t data);
+	void cx_scratch_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_scratch_r(offs_t offset);
+
+	void cx_timers_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_timers_r(offs_t offset);
+
+	void cx_uart2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_uart2_r(offs_t offset);
+
+	void cx_pll_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_pll_r(offs_t offset);
+	void cx_clkdiv_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_clkdiv_r(offs_t offset);
+	void cx_pllprescale_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_pllprescale_r(offs_t offset);
+
+	void cx_chipcontrol_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_chipcontrol_r(offs_t offset);
+
+	void cx_intctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_intctrl_r(offs_t offset);
+
+	void cx_ss_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_ss_r(offs_t offset);
+
+	void cx_i2c0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_i2c0_r(offs_t offset);
+	void cx_i2c1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_i2c1_r(offs_t offset);
+	void cx_i2c2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_i2c2_r(offs_t offset);
+
+	void cx_mc_cfg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_mc_cfg_r(offs_t offset);
+
+	void cx_drm0_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_drm0_r(offs_t offset);
+	void cx_drm1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_drm1_r(offs_t offset);
+
+	void cx_hdmi_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_hdmi_r(offs_t offset);
+
+	void cx_gxa_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t cx_gxa_r(offs_t offset);
+
+	uint32_t dummy_flash_r();
+
+	uint32_t m_romdescr_reg = 0U;
+	uint32_t m_isaromdescr_regs[0x0C/4]{};
+	uint32_t m_isadescr_regs[0x10/4]{};
+	uint32_t m_rommode_reg = 0U;
+	uint32_t m_xoemask_reg = 0U;
+	uint32_t m_pci_regs[0x08/4]{};
+	uint32_t m_extdesc_regs[0x80/4]{};
+
+	uint32_t m_scratch_reg = 0U;
+	cx_timer_regs_t m_timer_regs{};
+
+	uint32_t m_uart2_regs[0x30/4]{};
+
+	uint32_t m_pll_regs[0x14/4]{};
+	uint32_t m_clkdiv_regs[0x18/4]{};
+	uint32_t m_pllprescale_reg = 0U;
+
+	uint32_t m_intctrl_regs[0x38/4]{};
+
+	uint32_t m_ss_regs[0x18/4]{};
+	uint8_t m_ss_tx_fifo[8]{};              // 8 entries (size hardcoded to 8 bits per entry - TODO)
+
+	uint32_t m_i2c0_regs[0x20/4]{};
+	uint32_t m_i2c1_regs[0x20/4]{};
+	required_device<i2cmem_device> m_i2cmem;
+	uint32_t m_i2c2_regs[0x20/4]{};
+
+	void i2cmem_start();
+	void i2cmem_stop();
+	uint8_t i2cmem_read_byte(int last);
+	void i2cmem_write_byte(uint8_t data);
+
+	uint32_t m_mccfg_regs[0x0C/4]{};
+
+	uint32_t m_chipcontrol_regs[0x74/4]{};
+
+	uint32_t m_drm0_regs[0xfc/4]{};
+	uint32_t m_drm1_regs[0xfc/4]{};
+
+	uint32_t m_hdmi_regs[0x400/4]{};
+
+	uint32_t m_gxa_cmd_regs[0x130/4]{};
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(timer_tick);
+	void cxhumax_map(address_map &map) ATTR_COLD;
+
+	// TODO: convert to actual chipset emulation
+	static constexpr unsigned INTDEST    = 0;   // Interrupt destination (1=IRQ, 0=FIQ)
+	static constexpr unsigned INTENABLE  = 1;   // Enables the interrupt generation
+	static constexpr unsigned INTIRQ     = 2;   // Normal interrupt
+	static constexpr unsigned INTFIQ     = 3;   // Fast interrupt
+	static constexpr unsigned INTSTATCLR = 4;   // Read: interrupt status, Write: clear pending interrupt
+	static constexpr unsigned INTSTATSET = 5;   // Read: interrupt status, Write: sets a pending interrupt
+	static constexpr unsigned INTGROUP1 = 0;
+	static constexpr unsigned INTGROUP2 = 1;
+
+	uint32_t INTREG(uint32_t group, uint32_t index) {
+		return (group << 3) | index;
+	}
+
+	static constexpr unsigned GXA_CMD_RW_REGISTER         = 0x00;
+	static constexpr unsigned GXA_CMD_QMARK               = 0x02;
+	static constexpr unsigned GXA_CMD_PALETTE_FETCH       = 0x03;
+	static constexpr unsigned GXA_CMD_VFILTER_COEFF_FETCH = 0x04;
+	static constexpr unsigned GXA_CMD_HFILTER_COEFF_FETCH = 0x05;
+	static constexpr unsigned GXA_CMD_BLT_21              = 0x21;
+	static constexpr unsigned GXA_CMD_BLT_23              = 0x23;
+	static constexpr unsigned GXA_CMD_BLT_25              = 0x25;
+	static constexpr unsigned GXA_CMD_BLT_27              = 0x27;
+	static constexpr unsigned GXA_CMD_BLT_2B              = 0x2b;
+	static constexpr unsigned GXA_CMD_BLT_2F              = 0x2f;
+	static constexpr unsigned GXA_CMD_LINE_30             = 0x30;
+	static constexpr unsigned GXA_CMD_LINE_32             = 0x32;
+	static constexpr unsigned GXA_CMD_BLT_31              = 0x31;
+	static constexpr unsigned GXA_CMD_BLT                 = 0x33;
+	static constexpr unsigned GXA_CMD_LINE_34             = 0x34;
+	static constexpr unsigned GXA_CMD_LINE_36             = 0x36;
+	static constexpr unsigned GXA_CMD_BLT_35              = 0x35;
+	static constexpr unsigned GXA_CMD_BLT_37              = 0x37;
+	static constexpr unsigned GXA_CMD_LINE_3A             = 0x3a;
+	static constexpr unsigned GXA_CMD_BLT_3B              = 0x3b;
+	static constexpr unsigned GXA_CMD_LINE_3E             = 0x3e;
+	static constexpr unsigned GXA_CMD_BLT_3F              = 0x3f;
+	static constexpr unsigned GXA_CMD_SBLT_ABLEND         = 0x71;
+	static constexpr unsigned GXA_CMD_SBLT_ROP            = 0x7b;
+
+	static constexpr unsigned GXA_CMD_REG = 0x07;
+
+	static constexpr unsigned GXA_CFG2_REG   = 0x3f;
+	static constexpr unsigned IRQ_STAT_QMARK = 21;
+	static constexpr unsigned IRQ_EN_QMARK   = 17;
+
+	static constexpr unsigned INT_UART2_BIT  = (1 << 1);
+	static constexpr unsigned INT_TIMER_BIT  = (1 << 7);
+	static constexpr unsigned INT_PWM_BIT    = (1 << 14);
+	static constexpr unsigned INT_PIO103_BIT = (1 << 15);
+
+	static constexpr unsigned PCI_CFG_ADDR_REG = 0;
+	static constexpr unsigned PCI_CFG_DATA_REG = 1;
+
+	static constexpr unsigned TIMER_VALUE      = 0;
+	static constexpr unsigned TIMER_LIMIT      = 1;
+	static constexpr unsigned TIMER_MODE       = 2;
+	static constexpr unsigned TIMER_TIMEBASE   = 3;
+
+	static constexpr unsigned UART_FIFO_REG       = 0;
+	static constexpr unsigned UART_IRQE_REG       = 1;
+	static constexpr unsigned UART_IRQE_TIDE_BIT  = (1<<6);
+	static constexpr unsigned UART_BRDL_REG       = 0;
+	static constexpr unsigned UART_BRDU_REG       = 1;
+	static constexpr unsigned UART_FIFC_REG       = 2;
+	static constexpr unsigned UART_FRMC_REG       = 3;
+	static constexpr unsigned UART_FRMC_BDS_BIT   = (1<<7);
+	static constexpr unsigned UART_STAT_REG       = 5;
+	static constexpr unsigned UART_STAT_TSR_BIT   = (1<<5);
+	static constexpr unsigned UART_STAT_TID_BIT   = (1<<6);
+
+	static constexpr unsigned SREG_MPG_0_INTFRAC_REG = 0;
+	static constexpr unsigned SREG_MPG_1_INTFRAC_REG = 1;
+	static constexpr unsigned SREG_ARM_INTFRAC_REG   = 2;
+	static constexpr unsigned SREG_MEM_INTFRAC_REG   = 3;
+	static constexpr unsigned SREG_USB_INTFRAC_REG   = 4;
+
+	static constexpr unsigned SREG_DIV_0_REG  = 0;
+	static constexpr unsigned SREG_DIV_1_REG  = 1;
+	static constexpr unsigned SREG_DIV_2_REG  = 2;
+	static constexpr unsigned SREG_DIV_3_REG  = 3;
+	static constexpr unsigned SREG_DIV_4_REG  = 4;
+	static constexpr unsigned SREG_DIV_5_REG  = 5;
+
+	static constexpr unsigned PIN_CONFIG_0_REG     = 0;   // Pin Configuration 0 Register
+	static constexpr unsigned SREG_MODE_REG        = 3;   // SREG Mode Register
+	static constexpr unsigned PIN_ALT_FUNC_REG     = 4;   // Alternate Pin Function Select Register
+	static constexpr unsigned PLL_LOCK_STAT_0_REG  = 9;   // Resource Lock Register
+	static constexpr unsigned PLL_IO_CTL_REG       = 20;  // IO Control Register
+	static constexpr unsigned SREG_TEST_REG        = 28;  // Test Register
+
+	static constexpr unsigned I2C_MODE_REG  = 0;
+	static constexpr unsigned I2C_CTRL_REG  = 1;
+	static constexpr unsigned I2C_STAT_REG  = 2;
+	static constexpr unsigned I2C_RDATA_REG = 3;
+
+	static constexpr unsigned I2C_WACK_BIT  = (1 << 1);
+	static constexpr unsigned I2C_INT_BIT   = (1 << 0);
+
+	static constexpr unsigned SS_CNTL_REG = 0;
+	static constexpr unsigned SS_FIFC_REG = 1;
+	static constexpr unsigned SS_BAUD_REG = 2;
+	static constexpr unsigned SS_FIFO_REG = 4;
+	static constexpr unsigned SS_STAT_REG = 5;
+
+	static constexpr unsigned MC_CFG0   = 0;
+	static constexpr unsigned MC_CFG1   = 1;
+	static constexpr unsigned MC_CFG2   = 2;
+
+	static constexpr unsigned DRM_ACTIVE_X_REG  = 1;
+	static constexpr unsigned DRM_ACTIVE_Y_REG  = 2;
+	static constexpr unsigned DRM_BCKGND_REG    = 3;
+	static constexpr unsigned DRM_OSD_PTR_REG   = 32;
+};
+
 
 uint32_t cxhumax_state::cx_gxa_r(offs_t offset)
 {
@@ -135,7 +434,8 @@ void cxhumax_state::cx_remap_w(offs_t offset, uint32_t data)
 {
 	if(!(data&1)) {
 		LOG("%s: (REMAP) %08X -> %08X\n", machine().describe_context(), 0xE0400014 + (offset << 2), data);
-		memset(m_ram, 0, 0x400000); // workaround :P
+		m_overlay_view.disable();
+		//memset(m_ram, 0, 0x400000); // workaround :P
 	}
 }
 
@@ -241,6 +541,7 @@ void cxhumax_state::cx_xoemask_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	COMBINE_DATA(&m_xoemask_reg);
 }
 
+// TODO: really a Conexant CX2417x host bridge
 uint32_t cxhumax_state::cx_pci_r(offs_t offset)
 {
 	uint32_t data = 0;
@@ -867,7 +1168,7 @@ static inline uint32_t ycc_to_rgb(uint32_t ycc)
 	return rgb_t(clamp16_shift8(r), clamp16_shift8(g), clamp16_shift8(b));
 }
 
-uint32_t cxhumax_state::screen_update_cxhumax(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cxhumax_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint32_t osd_pointer = m_drm1_regs[DRM_OSD_PTR_REG];
 
@@ -916,6 +1217,8 @@ uint32_t cxhumax_state::screen_update_cxhumax(screen_device &screen, bitmap_rgb3
 void cxhumax_state::cxhumax_map(address_map &map)
 {
 	map(0x00000000, 0x03ffffff).ram().share("ram").mirror(0x40000000);           // 64?MB RAM
+	map(0x00000000, 0x03ffffff).view(m_overlay_view);
+	m_overlay_view[0](0x00000000, 0x03ffffff).r(FUNC(cxhumax_state::flash_r));
 	map(0xe0000000, 0xe000ffff).rw(FUNC(cxhumax_state::cx_hsx_r), FUNC(cxhumax_state::cx_hsx_w));                       // HSX
 	map(0xe0010000, 0xe0010003).rw(FUNC(cxhumax_state::cx_romdescr_r), FUNC(cxhumax_state::cx_romdescr_w));             // ROM Descriptor
 	map(0xe0010004, 0xe001000f).rw(FUNC(cxhumax_state::cx_isaromdescr_r), FUNC(cxhumax_state::cx_isaromdescr_w));       // ISA/ROM Descriptors
@@ -965,10 +1268,12 @@ void cxhumax_state::machine_start()
 void cxhumax_state::machine_reset()
 {
 	m_i2c0_regs[0x08/4] = 0x08; // SDA high
+	m_i2c1_regs[0x08/4] = 0x08; // SDA high
 	m_i2c2_regs[0x08/4] = 0x08; // SDA high
 
-	uint8_t* FLASH = memregion("flash")->base();
-	memcpy(m_ram,FLASH,0x400000);
+	m_overlay_view.select(0);
+	//uint8_t* FLASH = memregion("flash")->base();
+	//memcpy(m_ram,FLASH,0x400000);
 
 	m_chipcontrol_regs[PIN_CONFIG_0_REG] =
 		1 << 0  | /* Short Reset: 0=200ms delay ; 1=1ms delay */
@@ -1027,6 +1332,7 @@ void cxhumax_state::machine_reset()
 
 void cxhumax_state::cxhumax(machine_config &config)
 {
+	// ARM926 according to datasheet
 	ARM920T(config, m_maincpu, 180000000); // CX24175 (RevC up?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cxhumax_state::cxhumax_map);
 
@@ -1040,7 +1346,7 @@ void cxhumax_state::cxhumax(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(1920, 1080);
 	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(cxhumax_state::screen_update_cxhumax));
+	screen.set_screen_update(FUNC(cxhumax_state::screen_update));
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
@@ -1048,13 +1354,15 @@ void cxhumax_state::cxhumax(machine_config &config)
 }
 
 ROM_START( hxhdci2k )
+	// NOTE: was ROM_LOAD16_WORD_SWAP, loads better with regular ROM_LOAD
 	ROM_REGION( 0x400000, "flash", 0 )
 	ROM_SYSTEM_BIOS( 0, "fw10005", "HDCI REV 1.0 RHDXSCI 1.00.05" ) /* 19 AUG 2008 */
-	ROM_LOAD16_WORD_SWAP( "28f320j3d.bin", 0x000000, 0x400000, BAD_DUMP CRC(63d98942) SHA1(c5b8d701677a3edc25f203854f44953b19c9158d) )
+	ROM_LOAD( "28f320j3d.bin", 0x000000, 0x400000, BAD_DUMP CRC(63d98942) SHA1(c5b8d701677a3edc25f203854f44953b19c9158d) )
 
 	ROM_REGION( 0x2000, "eeprom", 0 )
 	ROM_LOAD( "24lc64.bin", 0x0000, 0x2000, NO_DUMP)
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME           FLAGS
-SYST( 2008, hxhdci2k, 0,      0,      cxhumax, cxhumax, cxhumax_state, empty_init, "HUMAX", "HUMAX HDCI-2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+} // anonymous namespace
+
+SYST( 2008, hxhdci2k, 0,      0,      cxhumax, cxhumax, cxhumax_state, empty_init, "Humax", "HDCI-2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
