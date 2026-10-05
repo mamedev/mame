@@ -251,6 +251,7 @@ protected:
 	void check_dma_request();
 	void check_receive_interrupt();
 	bool rx_special_condition(uint8_t status) const;
+	bool rx_holds_special_condition() const;
 
 	emu_timer *m_baudtimer;
 	uint16_t m_brg_counter;
