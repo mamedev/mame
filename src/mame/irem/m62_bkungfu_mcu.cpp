@@ -40,7 +40,7 @@
 	2nd Tables for levels
 	These point to tilemap structures with moving objects (doors, trapdoors) in
 	their post-animated state, used to redraw the level when the level name text
-	needs to be removed without resetting the moving pieces to their original state
+	needs to be removed without resetting the moving pieces to their original state.
 
 	0210  4D 18 | 184d
 	0212  DD 17 | 17dd
@@ -51,7 +51,7 @@
 	021C  2D 19 | 192d
 	021E  BD 18 | 18bd
 
-	This initial / redraw after animation table use can be confirmed by looking at the pairs
+	This initial / redraw after animation table use can be confirmed by looking at the pairs.
 
 	0200  4D 18 | 184d / 0210  4D 18 | 184d  - identical in both states (Stage 1 data)
 	0202  DD 17 | 17dd / 0212  DD 17 | 17dd  - identical in both states (Stage 2 data)
@@ -62,8 +62,9 @@
 	020C  AD 15 | 15ad / 021C  2D 19 | 192d  - different (Stage 7 data)
 	020E  3D 15 | 153d / 021E  BD 18 | 18bd  - different (Stage 8 data)
 
-	The game has 8 stages, the first 3 stages do not contain animated objects
-	The remaining stages have animated objects (animated with different commands) that close behind the player when they first enter the stage
+	The game has 8 stages, the first 3 stages do not contain animated objects.
+	The remaining stages have animated objects (animated with different commands)
+	that close behind the player when they first enter the stage.
 
 	Stage 4 contains a door on the very right of the tilemap
 	Stage 5 contains a trap door on the very left of the tilemap
