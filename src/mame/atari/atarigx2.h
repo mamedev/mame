@@ -39,9 +39,9 @@ public:
 	void init_rrreveng() ATTR_COLD;
 	void init_motofren() ATTR_COLD;
 
-	void atarigx2_0x200(machine_config &config) ATTR_COLD;
-	void atarigx2_0x400(machine_config &config) ATTR_COLD;
-	void atarigx2_0x400_rrreveng(machine_config &config) ATTR_COLD;
+	void atarigx2_0x200_jsa3s(machine_config &config) ATTR_COLD;
+	void atarigx2_0x400_jsa3(machine_config &config) ATTR_COLD;
+	void atarigx2_0x400_jsa3s(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -60,6 +60,10 @@ private:
 	TILEMAP_MAPPER_MEMBER(atarigx2_playfield_scan);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void atarigx2_mo_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	void add_jsa3(machine_config &config) ATTR_COLD;
+	void add_jsa3s(machine_config &config) ATTR_COLD;
+	void atarigx2_0x400(machine_config &config) ATTR_COLD;
 
 	void atarigx2(machine_config &config) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;

@@ -938,7 +938,7 @@ atari_jsa_iii_device::atari_jsa_iii_device(const machine_config &mconfig, device
 {
 }
 
-void atari_jsa_iii_device::configue_banks(memory_bank* lobank, memory_bank* hibank)
+void atari_jsa_iii_device::configue_banks(memory_bank *lobank, memory_bank *hibank)
 {
 	if (m_larger_bank)
 	{
@@ -964,7 +964,7 @@ void atari_jsa_iii_device::device_start()
 		configue_banks(m_oki1_banklo, m_oki1_bankhi);
 }
 
-void atari_jsa_iii_device::set_bank(memory_bank* lobank, memory_bank* hibank, int bank)
+void atari_jsa_iii_device::set_bank(memory_bank *lobank, memory_bank *hibank, int bank)
 {
 	// update the (left) OKI bank (JSA III/IIIs only)
 	if (m_larger_bank)

@@ -242,8 +242,8 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void wrio_w(uint8_t data) override;
 	virtual void mix_w(uint8_t data) override;
-	void configue_banks(memory_bank* lobank, memory_bank* hibank);
-	void set_bank(memory_bank* lobank, memory_bank* hibank, int bank);
+	void configue_banks(memory_bank *lobank, memory_bank *hibank);
+	void set_bank(memory_bank *lobank, memory_bank *hibank, int bank);
 
 	required_ioport m_jsaiii;
 
