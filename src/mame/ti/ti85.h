@@ -101,6 +101,7 @@ private:
 	uint8_t m_LCD_memory_base = 0;
 	uint8_t m_LCD_contrast = 0;
 	uint8_t m_LCD_status = 0;
+	uint8_t m_LCD_mask = 0;
 	uint8_t m_timer_interrupt_mask = 0;
 	uint8_t m_timer_interrupt_status = 0;
 	uint8_t m_ctimer_interrupt_status = 0;
@@ -112,7 +113,6 @@ private:
 	uint8_t m_ti8x_memory_page_2 = 0;
 	uint8_t m_ti8x_memory_page_3 = 0;
 	bool m_booting = false;
-	uint8_t m_LCD_mask = 0;
 	uint8_t m_power_mode = 0;
 	uint8_t m_cpu_speed = 0;
 	uint8_t m_keypad_mask = 0;
@@ -273,7 +273,7 @@ private:
 
     void ti8x_update_int();
 	void ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram);
-    void ti8x_update_memory();
+    void update_ti8x_memory();
 	void update_ti85_memory();
     void update_ti83_memory();
 	void update_ti83p_memory();

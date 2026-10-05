@@ -118,7 +118,7 @@ void ti85_state::ti8x_update_int()
         m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-void ti85_state::ti8x_update_memory() {
+void ti85_state::update_ti8x_memory() {
     switch (m_model) {
         case TI83:
             update_ti83_memory();
@@ -132,10 +132,12 @@ void ti85_state::ti8x_update_memory() {
         case TI83PSE:
         case TI84P:
         case TI84PSE:
+            m_maincpu->set_unscaled_clock(m_cpu_speed ? 15000000 : 6000000);
             update_ti83pse_memory();
             break;
 
         case TI84PCSE:
+            m_maincpu->set_unscaled_clock(m_cpu_speed ? 15000000 : 6000000);
             update_ti84pcse_memory();
             break;
 
@@ -453,10 +455,12 @@ void ti85_state::ti8x_init_common()
 	m_ON_interrupt_status = 0;
 	m_ON_pressed = 0;
     m_PCR = 0;
+    m_ti8x_port2 = 0;
 	m_ti8x_memory_page_1 = 0;
 	m_ti8x_memory_page_2 = 0;
 	m_ti8x_memory_page_3 = 0;
 	m_LCD_memory_base = 0;
+    m_LCD_contrast = 0;
 	m_LCD_status = 0;
 	m_LCD_mask = 0;
 	m_power_mode = 0;
@@ -471,10 +475,12 @@ void ti85_state::ti8x_init_common()
 	save_item(NAME(m_ON_interrupt_status));
 	save_item(NAME(m_ON_pressed));
     save_item(NAME(m_PCR));
+    save_item(NAME(m_ti8x_port2));
 	save_item(NAME(m_ti8x_memory_page_1));
 	save_item(NAME(m_ti8x_memory_page_2));
 	save_item(NAME(m_ti8x_memory_page_3));
 	save_item(NAME(m_LCD_memory_base));
+    save_item(NAME(m_LCD_contrast));
 	save_item(NAME(m_LCD_status));
 	save_item(NAME(m_LCD_mask));
 	save_item(NAME(m_power_mode));
@@ -483,7 +489,7 @@ void ti85_state::ti8x_init_common()
 	save_item(NAME(m_interrupt_speed));
 	save_item(NAME(m_port4_bit0));
     
-	machine().save().register_postload(save_prepost_delegate(FUNC(ti85_state::ti8x_update_memory), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(ti85_state::update_ti8x_memory), this));
 }
 
 void ti85_state::ti83p_init_common()
@@ -491,6 +497,7 @@ void ti85_state::ti83p_init_common()
     ti8x_init_common();
 
     m_ti83p_port4 = 1;
+    m_ti83p_port5 = 0;
 	m_flash_unlocked = 0;
 	m_booting = true;
 
@@ -505,6 +512,7 @@ void ti85_state::ti83p_init_common()
 	save_item(NAME(m_booting));
     save_item(NAME(m_flash_unlocked));
 	save_item(NAME(m_ti83p_port4));
+    save_item(NAME(m_ti83p_port5));
 }
 
 void ti85_state::ti8xpse_init_common()
@@ -543,6 +551,7 @@ void ti85_state::ti8xpse_init_common()
 	/* save states and debugging */
 	save_item(NAME(m_booting));
     save_item(NAME(m_ctimer_interrupt_status));
+    save_item(NAME(m_cpu_speed));
 	save_item(NAME(m_ti84pcse_portE));
 	save_item(NAME(m_ti84pcse_portF));
 	save_item(NAME(m_ti83pse_port21));
