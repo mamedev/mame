@@ -154,7 +154,7 @@ void bkungfu_mcu_device::write_lifebar(int xbase, int ybase, uint8_t energy, boo
 	int const full_segments = (energy & 0x78) >> 3;
 	for (int segment = 0; segment < 8; segment++)
 	{
-		uint8_t const part = segment < full_segments ? 8 : segment == full_segments ? energy & 7 : 0;
+		uint8_t const part = (segment < full_segments) ? 8 : (segment == full_segments) ? (energy & 7) : 0;
 		uint8_t const tile = part ? uint8_t((boss ? 0xcc : 0xc4) + 8 - part) : 0xc2;
 		vram_page_w(((ybase * 0x40 + xbase + segment) << 1) & 0x0fff, tile);
 	}
@@ -237,8 +237,8 @@ void bkungfu_mcu_device::draw_text(uint16_t table_offset, bool use_mailbox)
 	}
 
 	// Allow at most one full pass through the source, including command operands.
-	uint32_t remaining = data_mask + 1;
-	while (remaining)
+	int32_t remaining = data_mask + 1;
+	while (remaining > 0)
 	{
 		uint8_t const value = data[data_address++ & data_mask];
 		remaining--;
@@ -280,9 +280,9 @@ void bkungfu_mcu_device::draw_credits_continue()
 
 	uint16_t const position = (uint16_t(m_mailbox[3]) << 8) | m_mailbox[2];
 	uint8_t const attribute = m_mailbox[4];
-	vram_page_w(position & 0x0fff, (m_mailbox[1] >> 4) + 0x30);
+	vram_page_w(position & 0x0fff, (m_mailbox[1] >> 4) | 0x30);
 	vram_page_w((position + 1) & 0x0fff, attribute);
-	vram_page_w((position + 2) & 0x0fff, (m_mailbox[1] & 0x0f) + 0x30);
+	vram_page_w((position + 2) & 0x0fff, (m_mailbox[1] & 0x0f) | 0x30);
 	vram_page_w((position + 3) & 0x0fff, attribute);
 }
 
@@ -306,15 +306,33 @@ void bkungfu_mcu_device::execute_slot(uint8_t slot)
 	uint8_t const p3 = m_mailbox[slot + 3];
 	switch (slot)
 	{
-	case 0x10: m_p1score = (uint32_t(p1) << 16) | (uint32_t(p2) << 8) | p3; break;
-	case 0x14: m_p2score = (uint32_t(p1) << 16) | (uint32_t(p2) << 8) | p3; break;
-	case 0x18: m_topscore = (uint32_t(p1) << 16) | (uint32_t(p2) << 8) | p3; break;
-	case 0x1c: m_timer = (uint16_t(p1) << 8) | p2; break;
-	case 0x20: m_floorcount = p1; m_floorcount_state = trigger; break;
-	case 0x24: m_lives = p1; break;
-	case 0x28: m_player_energy = p1; break;
-	case 0x2c: m_boss_energy = p1; break;
-	default: return;
+	case 0x10:
+		m_p1score = (uint32_t(p1) << 16) | (uint32_t(p2) << 8) | p3;
+		break;
+	case 0x14:
+		m_p2score = (uint32_t(p1) << 16) | (uint32_t(p2) << 8) | p3;
+		break;
+	case 0x18:
+		m_topscore = (uint32_t(p1) << 16) | (uint32_t(p2) << 8) | p3;
+		break;
+	case 0x1c:
+		m_timer = (uint16_t(p1) << 8) | p2;
+		break;
+	case 0x20:
+		m_floorcount = p1;
+		m_floorcount_state = trigger;
+		break;
+	case 0x24:
+		m_lives = p1;
+		break;
+	case 0x28:
+		m_player_energy = p1;
+		break;
+	case 0x2c:
+		m_boss_energy = p1;
+		break;
+	default:
+		return;
 	}
 	m_valid |= uint8_t(1U << ((slot - 0x10) >> 2));
 	update_slot(slot);
@@ -534,9 +552,9 @@ void bkungfu_mcu_device::command_w(uint8_t command)
 		uint16_t stream = m_data_rom[0x140] | (uint16_t(m_data_rom[0x141]) << 8);
 		uint16_t position = 0;
 		uint8_t attribute = 0;
-		uint32_t remaining = m_data_rom_mask + 1;
+		int32_t remaining = m_data_rom_mask + 1;
 		bool terminated = false;
-		while (remaining)
+		while (remaining > 0)
 		{
 			uint8_t const value = read_data(stream++);
 			remaining--;
