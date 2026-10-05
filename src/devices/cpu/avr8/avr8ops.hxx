@@ -1119,7 +1119,7 @@ void avr8_base_device::op_setf(uint16_t op)
 		m_sei_delay_pending = true;
 	}
 
-	m_r[SREG] |= 1 << ((op >> 4) & 0x07);
+	m_r[SREG] |= 1 << which_flag;
 }
 
 void avr8_base_device::op_clrf(uint16_t op)
