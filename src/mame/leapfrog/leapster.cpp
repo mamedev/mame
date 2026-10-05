@@ -1223,7 +1223,8 @@ void leapster_state::leapster(machine_config &config)
 {
 	// Basic machine hardware
 	// CPU is ArcTangent-A5 '5.1' (ARCompact core)
-	ARCA5(config, m_maincpu, 96000000);
+	// "/ 2" gives a closer speed/framerate to real hardware videos, unknown if the CPU runs slower, or if waitstates are involved.
+	ARCA5(config, m_maincpu, 96000000 / 2);
 	m_maincpu->set_dsp(true);
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapster_state::leapster_map);
 	m_maincpu->set_addrmap(AS_IO, &leapster_state::leapster_aux);
