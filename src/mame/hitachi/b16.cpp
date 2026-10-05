@@ -8,7 +8,7 @@ Hitachi B(asic Master?) 16000 series?
 TODO:
 - Barely anything is known about the HW;
 - hookup proper keyboard;
-- Confirm $80 video/status signals (bit 4 on EX-II, bit 5 on the earlier ROM);
+- Confirm exact $80 video/status signals (bit 4 on EX-II, bit 5 on the earlier ROM);
 - Confirm whether the motor-enable line is shared by both floppy drives;
 - b16ex2: confirm kanji hookup;
 
@@ -131,6 +131,7 @@ private:
 	u8 m_dma_page = 0;
 	uint8_t m_keyb_scancode = 0;
 	u32 m_fdc_rate = 250'000;
+	u8 m_port80_vblank_mask = 0xb0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
@@ -334,9 +335,12 @@ void b16_state::b16_io(address_map &map)
 		})
 	);
 	// Configuration/video control latch; timing status is not writable.
-	// TODO: confirm the source/polarity of bit 4, currently driven by vblank.
+	// B16 ROM polls bit 5; B16EXII ROM polls bit 4.
+	// TODO: confirm the source/polarity of these vblank-derived status bits.
 	map(0x80, 0x80).lrw8(
-		NAME([this] () { return (m_port80 & 0x6f) | (m_screen->vblank() ? 0x90 : 0x00); }),
+		NAME([this] () {
+			return (m_port80 & ~m_port80_vblank_mask) | (m_screen->vblank() ? m_port80_vblank_mask : 0x00);
+		}),
 		NAME([this] (u8 data) { m_port80 = data; })
 	);
 //  map(0x00a0, 0x00bf) DMA upper segments or video clut
@@ -541,6 +545,7 @@ void b16_state::b16ex2(machine_config &config)
 	m_fdc->subdevice<floppy_connector>("0")->set_default_option("525hd");
 	m_fdc->subdevice<floppy_connector>("1")->set_default_option("525hd");
 	m_fdc_rate = 500'000;
+	m_port80_vblank_mask = 0x90;
 	I80286(config.replace(), m_maincpu, XTAL(16'000'000) / 2); // A80286-8 / S
 	m_maincpu->set_addrmap(AS_PROGRAM, &b16_state::b16ex2_map);
 	m_maincpu->set_addrmap(AS_IO, &b16_state::b16_io);
