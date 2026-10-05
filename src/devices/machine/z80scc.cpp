@@ -2632,12 +2632,13 @@ void z80scc_channel::receive_data(uint8_t data)
 	if (m_rx_fifo_wp + 1 == m_rx_fifo_rp || ( (m_rx_fifo_wp + 1 == m_rx_fifo_sz) && (m_rx_fifo_rp == 0) ))
 	{
 		// receive overrun error detected
-		m_rx_error_fifo[m_rx_fifo_wp] |= RR1_RX_OVERRUN_ERROR;
+		int const newest = (m_rx_fifo_wp ? m_rx_fifo_wp : m_rx_fifo_sz) - 1;
+		m_rx_error_fifo[newest] |= RR1_RX_OVERRUN_ERROR;
 
 		// store received character but do not step the fifo
-		m_rx_data_fifo[m_rx_fifo_wp] = data;
+		m_rx_data_fifo[newest] = data;
 
-		LOGRCV("Receive_data() Error %02x\n", m_rx_error_fifo[m_rx_fifo_wp] & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
+		LOGRCV("Receive_data() Error %02x\n", m_rx_error_fifo[newest] & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
 	}
 	else
 	{
