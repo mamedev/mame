@@ -437,6 +437,8 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
+	for (auto & elem : m_int_source)
+		elem = 0;
 }
 
 scc8030_device::scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -809,8 +811,7 @@ int z80scc_device::update_extint(int index)
 	{
 		LOGINT(" - All interrupts serviced\n");
 
-		// Reset IP bit for external interrupts in both internal structure and rr3
-		// - External and Special interripts has the same prio, just add channel offset
+		// Reset IP bit for external interrupts in both internal structure and rr3, just add channel offset
 		m_int_state[z80scc_channel::INT_EXTERNAL_PRIO + (index == CHANNEL_A ? 0 : 3 )] = 0;
 		// Based on the fact that prio levels are aligned with the bitorder of rr3 we can do this...
 		m_chanA->m_rr3 &= ~(1 << (z80scc_channel::INT_EXTERNAL_PRIO + ((index == CHANNEL_A) ? 3 : 0)));
@@ -1821,9 +1822,20 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		  Receive FIFO, the data is lost */
 		LOGCMD("WR0_ERROR_RESET - not implemented\n");
 		m_rr1 &= ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR);
+		{
+			int const rx = INT_RECEIVE_PRIO + (m_index == z80scc_device::CHANNEL_A ? 0 : 3);
+			uint8_t const rx_ip = 1 << (INT_RECEIVE_PRIO + ((m_index == z80scc_device::CHANNEL_A) ? 3 : 0));
+			if ((m_uart->m_chanA->m_rr3 & rx_ip) && (m_uart->m_int_source[rx] == INT_SPECIAL))
+			{
+				m_uart->m_int_state[rx] &= ~Z80_DAISY_INT;
+				m_uart->m_chanA->m_rr3 &= ~rx_ip;
+			}
+		}
 		if ((m_rx_fifo_wp != m_rx_fifo_rp) && rx_holds_special_condition()
 				&& rx_special_condition(m_rx_error_fifo[m_rx_fifo_rp]))
 			m_rx_fifo_rp_step(); // Reset error state in fifo and unlock it. unlock == step to next slot in fifo.
+		check_receive_interrupt();
+		m_uart->check_interrupts();
 		break;
 	case WR0_SEND_ABORT: // Flush transmitter and Send 8-13 bits of '1's, used with SDLC
 		LOGCMD("WR0_SEND_ABORT - not implemented\n");
@@ -2425,17 +2437,20 @@ uint8_t z80scc_channel::data_read()
 		uint8_t const status = m_rx_error_fifo[m_rx_fifo_rp];
 		m_rr1 = (m_rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_PARITY_ERROR)) | status;
 
-		// trigger interrupt and lock the fifo if an error is present
 		if (rx_special_condition(status))
-		{
 			logerror("Rx Error %02x\n", status & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
-			if ((m_wr1 & WR1_RX_INT_MODE_MASK) != WR1_RX_INT_DISABLE)
-				m_uart->trigger_interrupt(m_index, INT_SPECIAL);
+
+		// trigger interrupt and lock the fifo if an error is present, in the modes that do
+		if (rx_special_condition(status) && rx_holds_special_condition())
+		{
+			m_uart->trigger_interrupt(m_index, INT_SPECIAL);
 		}
-		if (!rx_special_condition(status) || !rx_holds_special_condition())
+		else
 		{
 			// decrease RX FIFO pointer
 			m_rx_fifo_rp_step();
+
+			check_receive_interrupt();
 		}
 
 		check_dma_request();
@@ -3102,7 +3117,11 @@ void z80scc_channel::check_receive_interrupt()
 			break;
 
 		case WR1_RX_INT_ALL:
-			m_uart->trigger_interrupt(m_index, INT_RECEIVE);
+			{
+				uint8_t const status = m_rx_error_fifo[m_rx_fifo_rp]
+						| (m_rr1 & RR1_RX_OVERRUN_ERROR);
+				m_uart->trigger_interrupt(m_index, rx_special_condition(status) ? INT_SPECIAL : INT_RECEIVE);
+			}
 			break;
 		}
 	}

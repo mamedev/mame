@@ -183,7 +183,7 @@ protected:
 		INT_TRANSMIT_PRIO       = 1,
 		INT_EXTERNAL_PRIO       = 0,
 		INT_RECEIVE_PRIO        = 2,
-		INT_SPECIAL_PRIO        = 0,
+		INT_SPECIAL_PRIO        = 2,
 	};
 
 	// Read registers
