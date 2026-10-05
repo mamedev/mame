@@ -27,6 +27,9 @@ public:
 
 	void bkungfu(machine_config& config);
 
+protected:
+	virtual void video_start() override ATTR_COLD;
+
 private:
 	void mem_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
@@ -35,7 +38,6 @@ private:
 	void bkungfu_blitter_tilemap_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bkungfu_bg_tile_info);
-	DECLARE_VIDEO_START(bkungfu);
 
 	required_device<bkungfu_mcu_device> m_mcu;
 
@@ -65,7 +67,7 @@ TILE_GET_INFO_MEMBER(m62_bkungfu_state::get_bkungfu_bg_tile_info)
 		tileinfo.category = 0;
 }
 
-VIDEO_START_MEMBER(m62_bkungfu_state,bkungfu)
+void m62_bkungfu_state::video_start()
 {
 	m62_start(tilemap_get_info_delegate(*this, FUNC(m62_bkungfu_state::get_bkungfu_bg_tile_info)), 32, 0, 8, 8, 256, 32);
 }
@@ -123,10 +125,10 @@ void m62_bkungfu_state::bkungfu(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &m62_bkungfu_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &m62_bkungfu_state::io_map);
 
-	BKUNG_MCU(config, m_mcu, 0);
+	BKUNGFU_MCU(config, m_mcu, 0);
 	m_mcu->tilemap_ram_w().set(FUNC(m62_bkungfu_state::tilemap_ram_w));
 
-	MCFG_VIDEO_START_OVERRIDE(m62_bkungfu_state,bkungfu)
+	MCFG_VIDEO_START_REMOVE()
 }
 
 

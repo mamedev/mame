@@ -18,12 +18,14 @@
 #include "emu.h"
 #include "m62_bkungfu_mcu.h"
 
-DEFINE_DEVICE_TYPE(BKUNG_MCU, bkungfu_mcu_device, "bkung_mcu", "Irem Beyond Kung-Fu MCU")
+DEFINE_DEVICE_TYPE(BKUNGFU_MCU, bkungfu_mcu_device, "bkungfu_mcu", "Irem Beyond Kung-Fu MCU")
 
 bkungfu_mcu_device::bkungfu_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BKUNG_MCU, tag, owner, clock)
+	: device_t(mconfig, BKUNGFU_MCU, tag, owner, clock)
 	, m_tilemap_ram_w(*this)
 	, m_mailbox_out_w(*this)
+	, m_mailbox_mask(0)
+	, m_data_rom_mask(0)
 	, m_timer(0)
 	, m_p1score(0)
 	, m_topscore(0)
@@ -46,6 +48,11 @@ bkungfu_mcu_device::bkungfu_mcu_device(const machine_config &mconfig, const char
 
 void bkungfu_mcu_device::device_start()
 {
+	assert(std::has_single_bit(std::size(m_mailbox)));
+	assert(std::has_single_bit(m_data_rom.bytes()));
+	m_mailbox_mask = std::size(m_mailbox) - 1;
+	m_data_rom_mask = m_data_rom.bytes() - 1;
+
 	save_item(NAME(m_mailbox));
 	save_item(NAME(m_timer));
 	save_item(NAME(m_p1score));
@@ -93,7 +100,7 @@ void bkungfu_mcu_device::clear()
 
 uint8_t bkungfu_mcu_device::read_data(uint16_t address) const
 {
-	return m_data_rom[address];
+	return m_data_rom[address & m_data_rom_mask];
 }
 
 void bkungfu_mcu_device::vram_page_w(offs_t offset, uint8_t data)
@@ -122,7 +129,7 @@ uint8_t bkungfu_mcu_device::decrypt_data(uint16_t address) const
 	if (address >= 0x8000)
 		return 0xff;
 
-	uint8_t const cipher = m_data_rom[address];
+	uint8_t const cipher = read_data(address);
 	uint8_t const index = uint8_t((address & 0xff) + (address >> 8));
 
 	if (index & 1)
@@ -194,6 +201,7 @@ void bkungfu_mcu_device::complete(uint16_t offset)
 
 void bkungfu_mcu_device::mailbox_out(uint16_t offset, uint8_t data)
 {
+	offset &= m_mailbox_mask;
 	m_mailbox[offset] = data;
 	m_mailbox_out_w(offset, data);
 }
@@ -205,6 +213,7 @@ void bkungfu_mcu_device::draw_text(uint16_t table_offset, bool use_mailbox)
 
 	uint16_t data_address;
 	const uint8_t *data;
+	uint32_t data_mask;
 	uint8_t position_low;
 	uint8_t position_high;
 	uint8_t attribute;
@@ -212,29 +221,44 @@ void bkungfu_mcu_device::draw_text(uint16_t table_offset, bool use_mailbox)
 	{
 		data_address = 0x100;
 		data = m_mailbox;
+		data_mask = m_mailbox_mask;
 		position_low = 3;
 		position_high = 4;
 		attribute = 5;
 	}
 	else
 	{
-		data_address = m_data_rom[table_offset] | (uint16_t(m_data_rom[table_offset + 1]) << 8);
+		data_address = read_data(table_offset) | (uint16_t(read_data(table_offset + 1)) << 8);
 		data = m_data_rom;
+		data_mask = m_data_rom_mask;
 		position_low = 2;
 		position_high = 3;
 		attribute = 4;
 	}
 
-	for (uint8_t value = data[data_address++]; value != 0; value = data[data_address++])
+	// Allow at most one full pass through the source, including command operands.
+	uint32_t remaining = data_mask + 1;
+	while (remaining)
 	{
+		uint8_t const value = data[data_address++ & data_mask];
+		remaining--;
+		if (value == 0)
+			return;
+
 		if (value == 0x01)
 		{
-			mailbox_out(attribute, data[data_address++]);
+			if (remaining < 1)
+				break;
+			remaining--;
+			mailbox_out(attribute, data[data_address++ & data_mask]);
 		}
 		else if (value == 0x02)
 		{
-			mailbox_out(position_low, data[data_address++]);
-			mailbox_out(position_high, data[data_address++]);
+			if (remaining < 2)
+				break;
+			remaining -= 2;
+			mailbox_out(position_low, data[data_address++ & data_mask]);
+			mailbox_out(position_high, data[data_address++ & data_mask]);
 		}
 		else
 		{
@@ -246,6 +270,7 @@ void bkungfu_mcu_device::draw_text(uint16_t table_offset, bool use_mailbox)
 			mailbox_out(position_high, position >> 8);
 		}
 	}
+	logerror("%s: Invalid text stream (missing terminator or truncated command)\n", machine().describe_context());
 }
 
 void bkungfu_mcu_device::draw_credits_continue()
@@ -301,7 +326,7 @@ u8 bkungfu_mcu_device::mailbox_r(offs_t offset)
 	if (!machine().side_effects_disabled())
 		logerror("%s: mailbox_r %04x\n", machine().describe_context(), offset);
 
-	return m_mailbox[offset];
+	return m_mailbox[offset & m_mailbox_mask];
 }
 
 void bkungfu_mcu_device::mailbox_from_main_w(offs_t offset, uint8_t data)
@@ -509,26 +534,44 @@ void bkungfu_mcu_device::command_w(uint8_t command)
 		uint16_t stream = m_data_rom[0x140] | (uint16_t(m_data_rom[0x141]) << 8);
 		uint16_t position = 0;
 		uint8_t attribute = 0;
-		for (;;)
+		uint32_t remaining = m_data_rom_mask + 1;
+		bool terminated = false;
+		while (remaining)
 		{
-			uint8_t const value = m_data_rom[stream++];
+			uint8_t const value = read_data(stream++);
+			remaining--;
 			if (value == 0x00)
+			{
+				terminated = true;
 				break;
+			}
 			if (value == 0x01)
 			{
-				attribute = m_data_rom[stream++];
+				if (remaining < 1)
+					break;
+				remaining--;
+				attribute = read_data(stream++);
 				continue;
 			}
 			if (value == 0x02)
 			{
-				uint8_t const low = m_data_rom[stream++];
-				uint8_t const high = m_data_rom[stream++];
+				if (remaining < 2)
+					break;
+				remaining -= 2;
+				uint8_t const low = read_data(stream++);
+				uint8_t const high = read_data(stream++);
 				position = low | (uint16_t(high) << 8);
 				continue;
 			}
 			vram_page_w(position & 0x0fff, value);
 			vram_page_w((position + 1) & 0x0fff, attribute);
 			position = (position & ~0x007f) | ((position + 2) & 0x007f);
+		}
+		if (!terminated)
+		{
+			logerror("%s: Invalid initialization stream (missing terminator or truncated command)\n", machine().describe_context());
+			complete(0);
+			break;
 		}
 
 		m_initialized = true;

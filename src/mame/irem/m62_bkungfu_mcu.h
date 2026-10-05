@@ -8,7 +8,7 @@
 
 #include "machine/timer.h"
 
-DECLARE_DEVICE_TYPE(BKUNG_MCU, bkungfu_mcu_device)
+DECLARE_DEVICE_TYPE(BKUNGFU_MCU, bkungfu_mcu_device)
 
 class bkungfu_mcu_device : public device_t
 {
@@ -58,6 +58,8 @@ private:
 	devcb_write8 m_tilemap_ram_w;
 	devcb_write8 m_mailbox_out_w;
 	uint8_t m_mailbox[0x800];
+	uint32_t m_mailbox_mask;
+	uint32_t m_data_rom_mask;
 	uint16_t m_timer;
 	uint32_t m_p1score;
 	uint32_t m_topscore;
