@@ -10,8 +10,7 @@ Three board system consisting of a P5TX-LA PC motherboard, a Taito main board an
 TODO:
 - The Retro Web MB pic lists a Winbond w83877tf Super I/O but neither BIOSes properly init that,
   eventually failing with p5txla later on with PnP sequence. Missing power on default?
-- p5txla: Rage VGA chip sets up screen with 8x1, making MAME unresponsive.
-          Needs x86 VGA legacy map bridge to fix.
+- p5txla: Conflicting serial/parallel ports at POST, Cute Mouse loading hangs due of it;
 - pf2012: verify ISA irq 7 source (particularly ACK, PORT_IMPULSE(1) won't work),
           pinpoint coin counters output and verify tc0510nio write 4 EEPROM style write
           on coin insertion;
@@ -71,18 +70,20 @@ Taito W Rom Board:
 #include "emu.h"
 
 #include "bus/isa/isa_cards.h"
+#include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/null_modem.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/sun_kbd.h"
 #include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
-#include "machine/w83877tf.h"
-#include "machine/8042kbdc.h"
+#include "machine/at_keybc.h"
 #include "machine/ds128x.h"
 #include "machine/i82371sb.h"
 #include "machine/i82439tx.h"
 #include "machine/pci.h"
+#include "machine/w83877tf.h"
 #include "video/atirage.h"
 
 // Specific to taitowlf
@@ -382,7 +383,8 @@ public:
 	isa16_p5txla_mb(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	required_device<ds12885_device> m_rtc;
-	required_device<kbdc8042_device> m_kbdc;
+	required_device<at_keyboard_controller_device> m_keybc;
+	required_device<pc_kbdc_device> m_pc_kbdc;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -401,7 +403,8 @@ isa16_p5txla_mb::isa16_p5txla_mb(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, ISA16_P5TXLA_MB, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, m_rtc(*this, "rtc")
-	, m_kbdc(*this, "kbdc")
+	, m_keybc(*this, "keybc")
+	, m_pc_kbdc(*this, "kbd")
 {
 }
 
@@ -413,13 +416,19 @@ void isa16_p5txla_mb::device_add_mconfig(machine_config &config)
 	//m_rtc->irq().set(m_pic8259_2, FUNC(pic8259_device::ir0_w));
 	m_rtc->set_century_index(0x32);
 
-	KBDC8042(config, m_kbdc);
-	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
-	m_kbdc->system_reset_callback().set_inputline(":maincpu", INPUT_LINE_RESET);
-	m_kbdc->gate_a20_callback().set_inputline(":maincpu", INPUT_LINE_A20);
-	m_kbdc->input_buffer_full_callback().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
+	// VT82C42, AT style
+	// Doesn't work with ibm BIOS, award15 does. ptl untested
+	AT_KEYBOARD_CONTROLLER(config, m_keybc, XTAL(12'000'000));
+	m_keybc->set_default_bios_tag("award15");
+	m_keybc->hot_res().set_inputline(":maincpu", INPUT_LINE_RESET);
+	m_keybc->gate_a20().set_inputline(":maincpu", INPUT_LINE_A20);
+	m_keybc->kbd_irq().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
+	m_keybc->kbd_clk().set(m_pc_kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_keybc->kbd_data().set(m_pc_kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
 
-	// TODO: above doesn't work, try with LLE core instead
+	PC_KBDC(config, m_pc_kbdc, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
+	m_pc_kbdc->out_clock_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_clk_w));
+	m_pc_kbdc->out_data_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_data_w));
 }
 
 
@@ -441,7 +450,8 @@ void isa16_p5txla_mb::remap(int space_id, offs_t start, offs_t end)
 
 void isa16_p5txla_mb::device_map(address_map &map)
 {
-	map(0x00, 0x0f).rw(m_kbdc, FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
+	map(0x00, 0x00).rw(m_keybc, FUNC(at_keyboard_controller_device::data_r), FUNC(at_keyboard_controller_device::data_w));
+	map(0x04, 0x04).rw(m_keybc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w));
 	map(0x10, 0x1f).w(m_rtc, FUNC(mc146818_device::address_w)).umask32(0x00ff00ff);
 	map(0x10, 0x1f).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask32(0xff00ff00);
 }

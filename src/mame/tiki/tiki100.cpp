@@ -20,10 +20,8 @@
 
     TODO:
 
-    - winchester hard disk
     - analog/digital I/O
     - light pen
-    - 8088 CPU card
 
 */
 
@@ -726,6 +724,8 @@ void tiki100_state::tiki100(machine_config &config)
 	m_exp->busrq_wr_callback().set(FUNC(tiki100_state::busrq_w));
 	m_exp->mrq_rd_callback().set(FUNC(tiki100_state::mrq_r));
 	m_exp->mrq_wr_callback().set(FUNC(tiki100_state::mrq_w));
+	m_exp->iorq_rd_callback().set(FUNC(tiki100_state::iorq_r));
+	m_exp->iorq_wr_callback().set(FUNC(tiki100_state::iorq_w));
 	TIKI100_BUS_SLOT(config, "slot1", m_exp, tiki100_cards, "8088");
 	TIKI100_BUS_SLOT(config, "slot2", m_exp, tiki100_cards, "hdc");
 	TIKI100_BUS_SLOT(config, "slot3", m_exp, tiki100_cards, nullptr);
@@ -793,7 +793,7 @@ void tiki100_state::tiki100(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software list
-	SOFTWARE_LIST(config, "flop_list").set_original("tiki100");
+	SOFTWARE_LIST(config, "flop_list").set_original("tiki100_flop");
 }
 
 /* ROMs */

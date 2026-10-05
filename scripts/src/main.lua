@@ -160,6 +160,7 @@ end
 		"softfloat3",
 		"wdlfft",
 		"ymfm",
+		"residfp",
 		ext_lib("jpeg"),
 		"7z",
 	}

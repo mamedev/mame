@@ -1585,6 +1585,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/ssd1306.h,VIDEOS["SSD1306"] = true
+--------------------------------------------------
+
+if VIDEOS["SSD1306"] then
+	files {
+		MAME_DIR .. "src/devices/video/ssd1306.cpp",
+		MAME_DIR .. "src/devices/video/ssd1306.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/st7626.h,VIDEOS["ST7626"] = true
 --------------------------------------------------
 

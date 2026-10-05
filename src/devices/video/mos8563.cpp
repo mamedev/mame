@@ -6,18 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - mos8563
-        - horizontal scroll
-        - vertical scroll
-        - bitmap modes
-        - display enable begin/end
-
-*/
-
 #include "emu.h"
 #include "mos8563.h"
 
@@ -36,11 +24,11 @@
 #define HSS_DBL                     BIT(m_horiz_scroll, 4)
 #define HSS_SEMI                    BIT(m_horiz_scroll, 5)
 #define HSS_ATTR                    BIT(m_horiz_scroll, 6)
-#define HSS_TEXT                    BIT(m_horiz_scroll, 7)
+#define HSS_BITMAP                  BIT(m_horiz_scroll, 7)
 
 #define ATTR_COLOR                  (attr & 0x0f)
-#define ATTR_BACKGROUND             (attr & 0x0f)
-#define ATTR_FOREGROUND             (attr >> 4)
+#define ATTR_BACKGROUND             (attr >> 4)
+#define ATTR_FOREGROUND             (attr & 0x0f)
 #define ATTR_BLINK                  BIT(attr, 4)
 #define ATTR_UNDERLINE              BIT(attr, 5)
 #define ATTR_REVERSE                BIT(attr, 6)
@@ -118,7 +106,7 @@ void mos8563_device::device_start()
 	m_char_blink_state = false;
 	m_char_blink_count = 0;
 	m_attribute_addr = 0;
-	m_horiz_char = 0;
+	m_horiz_char = 0x78;
 	m_vert_char_disp = 0;
 	m_vert_scroll = 0;
 	m_horiz_scroll = 0;
@@ -130,6 +118,10 @@ void mos8563_device::device_start()
 	m_data = 0;
 	m_block_addr = 0;
 	m_de_begin = 0;
+	m_de_end = 0;
+	m_draw_ra = 0;
+	m_attr_row_addr = 0;
+	m_bitmap_addr = 0;
 	m_dram_refresh = 0;
 	m_sync_polarity = 0;
 
@@ -140,7 +132,7 @@ void mos8563_device::device_start()
 
 	for (offs_t offset = 0; offset < 0x10000; offset++)
 	{
-		write_videoram(offset, data);
+		space(0).write_byte(offset, data);
 		data ^= 0xff;
 	}
 
@@ -177,6 +169,10 @@ void mos8563_device::device_start()
 	save_item(NAME(m_data));
 	save_item(NAME(m_block_addr));
 	save_item(NAME(m_de_begin));
+	save_item(NAME(m_de_end));
+	save_item(NAME(m_draw_ra));
+	save_item(NAME(m_attr_row_addr));
+	save_item(NAME(m_bitmap_addr));
 	save_item(NAME(m_dram_refresh));
 	save_item(NAME(m_sync_polarity));
 	save_item(NAME(m_revision));
@@ -216,14 +212,22 @@ device_memory_interface::space_config_vector mos8563_device::memory_space_config
 }
 
 
+offs_t mos8563_device::vram_address(offs_t offset) const
+{
+	if (BIT(m_char_base_addr, 4))
+		return offset & 0xffff;
+	else
+		return (offset & 0x80ff) | ((offset & 0x3f00) << 1) | (offset & 0x0100);
+}
+
 inline uint8_t mos8563_device::read_videoram(offs_t offset)
 {
-	return space(0).read_byte(offset);
+	return space(0).read_byte(vram_address(offset));
 }
 
 inline void mos8563_device::write_videoram(offs_t offset, uint8_t data)
 {
-	space(0).write_byte(offset, data);
+	space(0).write_byte(vram_address(offset), data);
 }
 
 
@@ -287,14 +291,14 @@ uint8_t mos8563_device::register_r()
 		case 0x19:  ret = m_horiz_scroll; break;
 		case 0x1a:  ret = m_color; break;
 		case 0x1b:  ret = m_row_addr_incr; break;
-		case 0x1c:  ret = m_char_base_addr | 0x1f; break;
+		case 0x1c:  ret = m_char_base_addr | 0x0f; break;
 		case 0x1d:  ret = m_underline_ras | 0xe0; break;
 		case 0x1e:  ret = m_word_count; break;
 		case 0x1f:  ret = read_videoram(m_update_addr++); break;
 		case 0x20:  ret = (m_block_addr      >> 8) & 0xff; break;
 		case 0x21:  ret = (m_block_addr      >> 0) & 0xff; break;
-		case 0x22:  ret = (m_de_begin        >> 8) & 0xff; break;
-		case 0x23:  ret = (m_de_begin        >> 0) & 0xff; break;
+		case 0x22:  ret = m_de_begin; break;
+		case 0x23:  ret = m_de_end; break;
 		case 0x24:  ret = m_dram_refresh | 0xf0; break;
 		case 0x25:  ret = m_sync_polarity | 0x3f; break;
 	}
@@ -331,20 +335,19 @@ void mos8563_device::register_w(uint8_t data)
 		case 0x13:  m_update_addr      = ((data & 0xff) << 0) | (m_update_addr & 0xff00); break;
 		case 0x14:  m_attribute_addr   = ((data & 0xff) << 8) | (m_attribute_addr & 0x00ff); break;
 		case 0x15:  m_attribute_addr   = ((data & 0xff) << 0) | (m_attribute_addr & 0xff00); break;
-		case 0x16:  m_horiz_char       =   data & 0xff; break;
+		case 0x16:
+			m_horiz_char = data & 0xff;
+			update_char_width();
+			break;
 		case 0x17:  m_vert_char_disp   =   data & 0x1f; break;
 		case 0x18:  m_vert_scroll      =   data & 0xff; break;
 		case 0x19:
-			{
-			int dbl = HSS_DBL;
 			m_horiz_scroll = data & 0xff;
-			if (dbl && !HSS_DBL) { m_clk_scale = 4; recompute_parameters(true); }
-			if (!dbl && HSS_DBL) { m_clk_scale = 8; recompute_parameters(true); }
+			update_char_width();
 			break;
-			}
 		case 0x1a:  m_color            =   data & 0xff; break;
 		case 0x1b:  m_row_addr_incr    =   data & 0xff; break;
-		case 0x1c:  m_char_base_addr   =   data & 0xe0; break;
+		case 0x1c:  m_char_base_addr   =   data & 0xf0; break;
 		case 0x1d:  m_underline_ras    =   data & 0x1f; break;
 		case 0x1e:
 			m_word_count = data & 0xff;
@@ -357,8 +360,8 @@ void mos8563_device::register_w(uint8_t data)
 			break;
 		case 0x20:  m_block_addr       = ((data & 0xff) << 8) | (m_block_addr & 0x00ff); break;
 		case 0x21:  m_block_addr       = ((data & 0xff) << 0) | (m_block_addr & 0xff00); break;
-		case 0x22:  m_de_begin         = ((data & 0xff) << 8) | (m_de_begin & 0x00ff); break;
-		case 0x23:  m_de_begin         = ((data & 0xff) << 0) | (m_de_begin & 0xff00); break;
+		case 0x22:  m_de_begin         =   data & 0xff; break;
+		case 0x23:  m_de_end           =   data & 0xff; break;
 		case 0x24:  m_dram_refresh     =   data & 0x0f; break;
 		case 0x25:  m_sync_polarity    =   data & 0xc0; break;
 	}
@@ -380,6 +383,21 @@ TIMER_CALLBACK_MEMBER(mos8563_device::block_copy_tick)
 	else
 	{
 		m_update_ready_bit = 1;
+	}
+}
+
+
+void mos8563_device::update_char_width()
+{
+	int const total = m_horiz_char >> 4;
+	int const clocks = std::max(HSS_DBL ? (total * 2) : (total + 1), 1);
+	int const pixels = std::max(HSS_DBL ? total : (total + 1), 1);
+
+	if ((clocks != m_clk_scale) || (pixels != m_hpixels_per_column))
+	{
+		m_clk_scale = clocks;
+		set_hpixels_per_column(pixels);
+		recompute_parameters(true);
 	}
 }
 
@@ -408,23 +426,114 @@ void mos8563_device::update_cursor_state()
 
 uint8_t mos8563_device::draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t ra = mc6845_device::draw_scanline(y, bitmap, cliprect);
+	if (y == 0)
+	{
+		m_draw_ra = m_vert_scroll & 0x1f;
+		m_attr_row_addr = m_attribute_addr;
+		m_bitmap_addr = m_current_disp_addr + (m_vert_scroll & 0x1f) * (m_horiz_disp + m_row_addr_incr);
+	}
+
+	uint8_t ra = m_draw_ra;
+
+	int cursor_visible = check_cursor_visible(ra, m_current_disp_addr);
+	int8_t cursor_x = cursor_visible ? (m_cursor_addr - m_current_disp_addr) : -1;
+	int de = (y <= m_max_visible_y) ? 1 : 0;
+	int vbp = m_vert_pix_total - m_vsync_off_pos;
+	if (vbp < 0) vbp = 0;
+	int hbp = m_horiz_pix_total - m_hsync_off_pos;
+	if (hbp < 0) hbp = 0;
+
+	m_update_row_cb(bitmap, cliprect, HSS_BITMAP ? m_bitmap_addr : m_current_disp_addr, ra, y, m_horiz_disp, cursor_x, de, hbp, vbp);
+
+	m_bitmap_addr = (m_bitmap_addr + m_horiz_disp + m_row_addr_incr) & 0xffff;
 
 	if (ra == m_max_ras_addr)
-		m_current_disp_addr = (m_current_disp_addr + m_row_addr_incr) & 0x3fff;
+	{
+		m_draw_ra = 0;
+		m_current_disp_addr = (m_current_disp_addr + m_horiz_disp + m_row_addr_incr) & 0xffff;
+		m_attr_row_addr = (m_attr_row_addr + m_horiz_disp + m_row_addr_incr) & 0xffff;
+	}
+	else
+	{
+		m_draw_ra = (ra + 1) & 0x1f;
+	}
 
 	return ra;
 }
 
 
+uint32_t mos8563_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(pen(m_color & 0x0f), cliprect);
+
+	if (((m_de_begin > m_horiz_char_total) || (m_de_begin == m_de_end)) && (m_de_end <= m_horiz_char_total))
+		return 0;
+
+	return mc6845_device::screen_update(screen, bitmap, cliprect);
+}
+
+
+int mos8563_device::displayed_width(uint8_t r22)
+{
+	int const total = r22 >> 4;
+	int const disp = r22 & 0x0f;
+
+	if (total < 8)
+		return (disp < total) ? (disp + 1) : (disp == total) ? 0 : (total + 1);
+	else if (disp < 7)
+		return std::min(8, disp + total - 6);
+	else if (disp == 7)
+		return 0;
+	else
+		return (disp <= total) ? (disp - 7) : 8;
+}
+
+
+bool mos8563_device::semigraphics_gap(uint8_t r22)
+{
+	int const total = r22 >> 4;
+	int const disp = r22 & 0x0f;
+
+	return (total >= 7) && (((disp < 8) && (disp + total <= 14)) || ((disp >= 8) && (disp <= total)));
+}
+
+
 MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 {
-	ra += (m_vert_scroll & 0x0f);
-	ra &= 0x0f;
-
 	uint8_t cth = (m_horiz_char >> 4) + (HSS_DBL ? 0 : 1);
-	uint8_t cdh = (m_horiz_char & 0x0f) + (HSS_DBL ? 0 : 1);
 	uint8_t cdv = m_vert_char_disp;
+
+	if ((m_horiz_scroll & 0x0f) + HSS_DBL > (m_horiz_char >> 4))
+		return;
+
+	uint8_t r22 = m_horiz_char;
+	if (HSS_DBL && !BIT(r22, 3) && (r22 >= 0x10))
+		r22 -= 0x10;
+
+	int displayed = displayed_width(r22);
+	uint8_t semi_test = 0;
+	uint8_t semi_type = 0;
+	bool const semi_forced = HSS_DBL && ((m_horiz_char >> 4) == (m_horiz_char & 0x0f));
+
+	if (HSS_SEMI || semi_forced)
+	{
+		if (semi_forced)
+		{
+			if ((m_horiz_char & 0x0f) <= 8)
+				displayed = 1;
+		}
+		else if (!displayed)
+		{
+			displayed = 8;
+		}
+
+		semi_test = 0x80 >> (displayed - 1);
+		semi_type = semigraphics_gap(r22) ? 0xff : 0x00;
+	}
+
+	uint8_t const dmask = ~(0xff >> std::min(displayed, 8));
+	int const gap_total = (m_horiz_char >> 4) - 6;
+	uint8_t const d2mask = (gap_total > (HSS_DBL ? 2 : 1)) ? ~(0xff >> std::min(gap_total, 8)) : 0x00;
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -436,11 +545,14 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 
 		if (HSS_ATTR)
 		{
-			offs_t attr_addr = m_attribute_addr + ma + column;
+			offs_t attr_addr = m_attr_row_addr + column;
 			attr = read_videoram(attr_addr);
 		}
 
-		if (HSS_TEXT)
+		uint8_t data;
+		uint8_t gap = 0;
+
+		if (HSS_BITMAP)
 		{
 			if (HSS_ATTR)
 			{
@@ -448,15 +560,13 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 				bg = ATTR_BACKGROUND;
 			}
 
-			if (VSS_RVS) code ^= 0xff;
+			data = (ra > cdv) ? 0 : code;
+			data &= dmask;
 
-			for (int bit = 0; bit < cdh; bit++)
+			if (data & semi_test)
 			{
-				int x = (m_horiz_scroll & 0x0f) - cth + (column * cth) + bit;
-				if (x < 0) x = 0;
-				int color = BIT(code, 7) ? fg : bg;
-
-				bitmap.pix(vbp + y, hbp + x) = pen(de ? color : 0);
+				data |= semi_test - 1;
+				gap = semi_type;
 			}
 		}
 		else
@@ -470,32 +580,40 @@ MC6845_UPDATE_ROW( mos8563_device::vdc_update_row )
 
 			if (m_max_ras_addr < 16)
 			{
-				font_addr = ((m_char_base_addr & 0xe0) << 8) | (ATTR_ALTERNATE_CHARSET << 12) | (code << 4) | (ra & 0x0f);
+				font_addr = ((m_char_base_addr & 0xe0) << 8) + (ATTR_ALTERNATE_CHARSET << 12) + (code << 4) + ra;
 			}
 			else
 			{
-				font_addr = ((m_char_base_addr & 0xc0) << 8) | (ATTR_ALTERNATE_CHARSET << 13) | (code << 5) | (ra & 0x1f);
+				font_addr = ((m_char_base_addr & 0xc0) << 8) + (ATTR_ALTERNATE_CHARSET << 13) + (code << 5) + ra;
 			}
 
-			uint8_t data = read_videoram(font_addr);
+			data = (ra > cdv) ? 0 : read_videoram(font_addr);
+			data &= dmask;
 
-			if (ra >= cdv) data = 0;
-			if (ATTR_UNDERLINE && (ra == m_underline_ras)) data = 0xff;
-			if (ATTR_BLINK && !m_char_blink_state) data = 0;
-			if (ATTR_REVERSE) data ^= 0xff;
-			if (column == cursor_x) data ^= 0xff;
-			if (VSS_RVS) data ^= 0xff;
+			if (ATTR_UNDERLINE && (ra == m_underline_ras)) { data = 0xff; gap = 0xff; }
+			if (ATTR_BLINK && !m_char_blink_state) { data = 0; gap = 0; }
 
-			for (int bit = 0; bit < cdh; bit++)
+			if (data & semi_test)
 			{
-				int x = (m_horiz_scroll & 0x0f) - cth + (column * cth) + bit;
-				if (x < 0) x = 0;
-				int color = BIT(data, 7) ? fg : bg;
-
-				bitmap.pix(vbp + y, hbp + x) = pen(de ? color : 0);
-
-				if ((bit < 8) || !HSS_SEMI) data <<= 1;
+				data |= semi_test - 1;
+				gap = semi_type;
 			}
+
+			if (ATTR_REVERSE) { data ^= 0xff; gap ^= 0xff; }
+			if (column == cursor_x) { data ^= 0xff; gap ^= 0xff; }
+		}
+
+		if (VSS_RVS) { data ^= 0xff; gap ^= 0xff; }
+
+		gap &= d2mask;
+
+		for (int bit = 0; bit < cth; bit++)
+		{
+			int x = (m_horiz_scroll & 0x0f) - cth + 1 + (column * cth) + bit;
+			int color = BIT((bit < 8) ? data : gap, 7 - (bit & 7)) ? fg : bg;
+
+			if (x >= 0 && x < x_count * cth && bitmap.cliprect().contains(hbp + x, vbp + y))
+				bitmap.pix(vbp + y, hbp + x) = pen(de ? color : (m_color & 0x0f));
 		}
 	}
 }

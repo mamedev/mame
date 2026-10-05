@@ -616,7 +616,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 		</part>
 	</software>
 
-	<software name="magicvce" supported="partial">
+	<software name="magicvce">
 		<description>Magic Voice</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>

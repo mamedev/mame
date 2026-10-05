@@ -503,7 +503,7 @@ protected:
 	void sib_byte(uint8_t mod, uint32_t* out_ea, uint8_t* out_segment);
 	void modrm_to_EA(uint8_t mod_rm, uint32_t* out_ea, uint8_t* out_segment);
 	uint32_t GetNonTranslatedEA(uint8_t modrm,uint8_t *seg);
-	uint32_t GetEA(uint8_t modrm, int rwn);
+	uint32_t GetEA(uint8_t modrm, int rwn, int size = 1);
 	uint32_t Getx87EA(uint8_t modrm, int rwn);
 	void i386_check_sreg_validity(int reg);
 	int i386_limit_check(int seg, uint32_t offset, int size = 1);

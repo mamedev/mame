@@ -2278,7 +2278,9 @@ void saturn_state::vdp1_process_list()
 
 		current_sprite.CMDCTRL = (m_vdp1_vram[position * (0x20/4)+0] & 0xffff0000) >> 16;
 
-		if (current_sprite.CMDCTRL == 0x8000)
+		// The END bit terminates the list regardless of the other bits.
+		// (SGL terminates its sorted list with 0xffff)
+		if (current_sprite.CMDCTRL & 0x8000)
 		{
 			if (VDP1_LOG) logerror ("List Terminator (0x8000) Encountered, Sprite List Process END\n");
 			goto end; // end of list
@@ -2333,9 +2335,9 @@ void saturn_state::vdp1_process_list()
 				}
 				else
 				{
-					if (VDP1_LOG) logerror ("Attempted return from no subroutine, aborting\n");
+					// A return with no subroutine is a NOP (Yabause and Mednafen agree)
+					if (VDP1_LOG) logerror ("Attempted return from no subroutine, continuing\n");
 					position++;
-					goto end; // end of list
 				}
 				break;
 			case 0x4000:
@@ -2374,9 +2376,8 @@ void saturn_state::vdp1_process_list()
 				}
 				else
 				{
-					if (VDP1_LOG) logerror ("Attempted return from no subroutine, aborting\n");
+					if (VDP1_LOG) logerror ("Attempted return from no subroutine, continuing\n");
 					position++;
-					goto end; // end of list
 				}
 				break;
 		}

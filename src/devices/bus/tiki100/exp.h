@@ -119,6 +119,8 @@ public:
 	auto busrq_wr_callback() { return m_busrq_cb.bind(); }
 	auto mrq_rd_callback() { return m_in_mrq_cb.bind(); }
 	auto mrq_wr_callback() { return m_out_mrq_cb.bind(); }
+	auto iorq_rd_callback() { return m_in_iorq_cb.bind(); }
+	auto iorq_wr_callback() { return m_out_iorq_cb.bind(); }
 
 	void add_card(device_tiki100bus_card_interface &card);
 
@@ -137,6 +139,8 @@ public:
 	void busrq_w(int state) { m_busrq_cb(state); }
 	uint8_t exin_mrq_r(offs_t offset) { return m_in_mrq_cb(offset); }
 	void exin_mrq_w(offs_t offset, uint8_t data) { m_out_mrq_cb(offset, data); }
+	uint8_t exin_iorq_r(offs_t offset) { return m_in_iorq_cb(offset); }
+	void exin_iorq_w(offs_t offset, uint8_t data) { m_out_iorq_cb(offset, data); }
 
 protected:
 	// device_t implementation
@@ -150,6 +154,8 @@ private:
 	devcb_write_line   m_busrq_cb;
 	devcb_read8        m_in_mrq_cb;
 	devcb_write8       m_out_mrq_cb;
+	devcb_read8        m_in_iorq_cb;
+	devcb_write8       m_out_iorq_cb;
 
 	card_vector m_device_list;
 };

@@ -31,6 +31,15 @@ protected:
 	// override this to return false when the device shouldn't respond
 	virtual bool is_present() const { return true; }
 
+	// override this to return false when the first byte of a write is data
+	// rather than a sub-address
+	virtual bool has_subaddress() const { return true; }
+
+	// override these to be told about START and STOP conditions, e.g. when
+	// the device's messages are delimited rather than fixed-length
+	virtual void i2c_start() { }
+	virtual void i2c_stop() { }
+
 	// override this to properly identify your device in logging
 	virtual const char *get_tag();
 

@@ -48,7 +48,7 @@ public:
 	{
 	}
 
-	void roundup5(machine_config &config);
+	void roundup5(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;

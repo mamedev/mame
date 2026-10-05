@@ -41,8 +41,6 @@ files {
 	MAME_DIR .. "src/devices/imagedev/cartrom.h",
 	MAME_DIR .. "src/devices/imagedev/cassette.cpp",
 	MAME_DIR .. "src/devices/imagedev/cassette.h",
-	MAME_DIR .. "src/devices/imagedev/cdplayer.cpp",
-	MAME_DIR .. "src/devices/imagedev/cdplayer.h",
 	MAME_DIR .. "src/devices/imagedev/cdromimg.cpp",
 	MAME_DIR .. "src/devices/imagedev/cdromimg.h",
 	MAME_DIR .. "src/devices/imagedev/diablo.cpp",
@@ -1571,6 +1569,18 @@ if MACHINES["FGA002"] then
 	files {
 		MAME_DIR .. "src/devices/machine/fga002.cpp",
 		MAME_DIR .. "src/devices/machine/fga002.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/fs8806.h,MACHINES["FS8806"] = true
+---------------------------------------------------
+
+if MACHINES["FS8806"] then
+	files {
+		MAME_DIR .. "src/devices/machine/fs8806.cpp",
+		MAME_DIR .. "src/devices/machine/fs8806.h",
 	}
 end
 

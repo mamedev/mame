@@ -2639,6 +2639,7 @@ void mos6566_device::write(offs_t offset, uint8_t data)
 	case 0x1a:                          /* irq mask */
 		m_reg[offset] = data;
 		set_interrupt(0);   // beamrider needs this
+		clear_interrupt(0);
 		break;
 
 	case 0x11:

@@ -1,0 +1,43 @@
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
+/**********************************************************************
+
+    Commodore MCS 810 Color Printer emulation
+
+**********************************************************************/
+
+#ifndef MAME_BUS_CBMIEC_MCS810_H
+#define MAME_BUS_CBMIEC_MCS810_H
+
+#pragma once
+
+#include "cbmiec.h"
+
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> mcs810_device
+
+class mcs810_device : public device_t, public device_cbm_iec_interface
+{
+public:
+	// construction/destruction
+	mcs810_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
+
+// device type definition
+DECLARE_DEVICE_TYPE(MCS810, mcs810_device)
+
+
+#endif // MAME_BUS_CBMIEC_MCS810_H

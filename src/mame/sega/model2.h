@@ -71,6 +71,7 @@ public:
 		m_timers(*this, "timer%u", 0U),
 		m_cryptdevice(*this, "315_5881"),
 		m_0229crypt(*this, "317_0229"),
+		m_0229ram(*this, "0229ram"),
 		m_copro_data(*this, "copro_data"),
 		m_in0(*this, "IN0"),
 		m_gears(*this, "GEARS"),
@@ -96,7 +97,6 @@ public:
 	void init_pltkids();
 	void init_rchase2();
 	void init_manxttdx();
-	void init_doa();
 	void init_zerogun();
 	void init_sgt24h();
 	void init_srallyc();
@@ -132,6 +132,7 @@ protected:
 	required_device_array<timer_device, 4> m_timers;
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_0229crypt;
+	optional_shared_ptr<u32> m_0229ram;
 	optional_memory_region m_copro_data;
 
 	required_ioport m_in0;
@@ -155,7 +156,8 @@ protected:
 	u8 m_gearsel = 0;
 	u8 m_lightgun_mux = 0;
 
-	int m_prot_a = 0;
+	u8 m_prot_a = 0;
+	bool m_doa_dummy = true;
 
 	u32 m_intreq = 0;
 	u32 m_intena = 0;
@@ -201,7 +203,9 @@ protected:
 	void irq_update();
 	void horizontal_sync_w(u16 data);
 	void vertical_sync_w(u16 data);
-	u32 doa_prot_r(offs_t offset, u32 mem_mask = ~0);
+	u16 doa_prot_r();
+	void doa_source_w(offs_t offset, u32 data, u32 mem_mask = ~0U);
+	u16 sega_0229_source_r(offs_t offset);
 	u32 doa_unk_r();
 
 	void raster_init(memory_region *texture_rom);
@@ -244,7 +248,6 @@ protected:
 
 	void sj25_0207_01(machine_config &config) ATTR_COLD;
 
-	void sega_0229_map(address_map &map) ATTR_COLD;
 	void drive_io_map(address_map &map) ATTR_COLD;
 	void drive_map(address_map &map) ATTR_COLD;
 	void geo_sharc_map(address_map &map) ATTR_COLD;

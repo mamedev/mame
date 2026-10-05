@@ -64,10 +64,10 @@ private:
 
 	int atn_ack() { return !m_bus->atn_r() ^ m_atna; }
 
-	TIMER_CALLBACK_MEMBER(iec_sync_tick);
+	void update_iec();
+	uint8_t via_r(offs_t offset);
 	TIMER_CALLBACK_MEMBER(mtr_on_tick);
 
-	emu_timer *m_iec_sync_timer;
 	emu_timer *m_mtr_on_timer;
 
 	int m_iec_clk;
