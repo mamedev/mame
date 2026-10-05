@@ -120,7 +120,6 @@ void msm6242_device::device_start()
 	save_item(NAME(m_irq_type));
 	save_item(NAME(m_tick));
 	save_item(NAME(m_last_update_time));
-	save_item(NAME(m_default_24h));
 }
 
 
