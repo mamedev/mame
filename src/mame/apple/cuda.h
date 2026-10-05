@@ -34,7 +34,7 @@ public:
 	u8 get_via_data() { return m_via_data; }
 	void set_via_data(u8 dat) { m_via_data = dat; }
 	void set_adb_line(int linestate) { m_adb_in = (linestate == ASSERT_LINE); }
-	void set_adb_power(int linestate) { m_adb_power = (linestate == ASSERT_LINE); }
+	void set_adb_power(int linestate) { m_adb_power = (linestate == CLEAR_LINE); }
 	void set_iic_sda(u8 data) { m_iic_sda = (data & 1); }
 	int get_adb_dtime() { return m_adb_dtime; }
 

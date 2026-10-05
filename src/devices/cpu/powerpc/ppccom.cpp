@@ -235,6 +235,7 @@ ppc_device::ppc_device(
 	, m_program_config("program", ENDIANNESS_BIG, data_bits, address_bits, 0, internal_map)
 	, c_bus_frequency(0)
 	, c_serial_clock(0)
+	, c_rtc_clock(7'812'500)
 	, m_core(nullptr)
 	, m_bus_freq_multiplier(1)
 	, m_flavor(flavor)
@@ -453,6 +454,18 @@ inline void ppc_device::set_timebase(uint64_t newtb)
 
 
 /*-------------------------------------------------
+    get_rtc - return the 601 RTC
+-------------------------------------------------*/
+
+inline uint64_t ppc_device::get_rtc()
+{
+	const uint64_t elapsed = total_cycles() - m_rtc_zero_cycles;
+	const uint64_t rate = uint64_t(c_rtc_clock) * 128;
+	return (elapsed / clock()) * rate + (elapsed % clock()) * rate / clock();
+}
+
+
+/*-------------------------------------------------
     get_decremeter - return the current
     decrementer value
 -------------------------------------------------*/
@@ -503,8 +516,9 @@ void ppc_device::set_decrementer(uint32_t newdec)
 
 /*-------------------------------------------------
     The 601's decrementer, like the 601-specific
-    RTC mechanism, counts nanoseconds, not bus
-    clocks.  This implementation allows pmac6100
+    RTC mechanism, counts 128 per RTC input clock
+    (nanoseconds at the nominal 7.8125 MHz), not
+    bus clocks.  This implementation allows pmac6100
     to Gestalt itself properly (the boot ROM counts
     decrementer ticks vs. instruction execution).
 -------------------------------------------------*/
@@ -512,12 +526,14 @@ void ppc_device::set_decrementer(uint32_t newdec)
 uint32_t ppc601_device::get_decrementer()
 {
 	const int64_t cycles_until_zero = (int64_t)m_dec_zero_cycles - (int64_t)total_cycles();
-	return (uint32_t)(cycles_until_zero * 1'000'000'000LL / clock());
+	const int64_t rate = int64_t(c_rtc_clock) * 128;
+	return (uint32_t)(cycles_until_zero * rate / clock());
 }
 
 void ppc601_device::set_decrementer(uint32_t newdec)
 {
-	m_dec_zero_cycles = total_cycles() + (uint64_t)newdec * clock() / 1'000'000'000;
+	const uint64_t rate = uint64_t(c_rtc_clock) * 128;
+	m_dec_zero_cycles = total_cycles() + (uint64_t)newdec * clock() / rate;
 	m_decrementer_int_timer->adjust(cycles_to_attotime(m_dec_zero_cycles - total_cycles()));
 }
 
@@ -527,7 +543,7 @@ TIMER_CALLBACK_MEMBER(ppc601_device::decrementer_int_callback)
 	m_core->irq_pending |= 0x02;
 
 	// advance by another full tick
-	m_dec_zero_cycles += ((uint64_t)1 << 32) * clock() / 1'000'000'000;
+	m_dec_zero_cycles += ((uint64_t)1 << 32) * clock() / (uint64_t(c_rtc_clock) * 128);
 	m_decrementer_int_timer->adjust(cycles_to_attotime(m_dec_zero_cycles - total_cycles()));
 }
 
@@ -2018,15 +2034,11 @@ void ppc_device::ppccom_execute_mfspr()
 				return;
 
 			case SPR601_RTCUR_PWR:
-				m_core->param1 = (total_cycles() - m_rtc_zero_cycles) / clock();
+				m_core->param1 = get_rtc() / 1'000'000'000;
 				return;
 
 			case SPR601_RTCLR_PWR:
-				{
-					// get fractional seconds and convert to nanoseconds
-					const uint64_t remainder = (total_cycles() - m_rtc_zero_cycles) % clock();
-					m_core->param1 = (remainder * 1'000'000'000ULL) / clock();
-				}
+				m_core->param1 = get_rtc() % 1'000'000'000;
 				return;
 		}
 	}

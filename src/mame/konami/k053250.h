@@ -47,6 +47,9 @@ public:
 		m_ram_bank = bank;
 	}
 
+	// Whether to display the previous DMA transfer rather than the latest one.
+	void set_dma_delay(bool delay) { m_dma_delay = delay; }
+
 	uint16_t reg_r(offs_t offset);
 	void reg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t ram_r(offs_t offset);
@@ -63,18 +66,19 @@ protected:
 
 private:
 	// configuration
-	int m_offx = 0, m_offy = 0;
-	unsigned m_ram_bank = 0;
+	int m_offx, m_offy;
+	unsigned m_ram_bank;
+	bool m_dma_delay;
 
 	// internal state
 	required_region_ptr<uint8_t> m_rom;
 	optional_shared_ptr<uint16_t> m_shared_ram;
 	std::vector<uint8_t> m_unpacked_rom;
 	std::vector<uint16_t> m_ram;
-	uint16_t *m_buffer[2]{};
-	uint8_t m_regs[8]{};
-	uint8_t m_page = 0;
-	int32_t m_frame = 0;
+	uint16_t *m_buffer[2];
+	uint8_t m_regs[8];
+	uint8_t m_page;
+	int32_t m_frame;
 
 	// internal helpers
 	void unpack_nibbles();

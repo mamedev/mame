@@ -93,6 +93,7 @@ public:
 		m_iec_atn(1),
 		m_iec_clk(1),
 		m_iec_data(1),
+		m_iec_retry_ba(-1),
 		m_iec_srq_out(1),
 		m_cass_rd(1),
 		m_iec_srq(1),
@@ -142,7 +143,6 @@ public:
 	uint8_t read_memory(offs_t offset, offs_t vma, int ba, int aec, int z80io);
 	void write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io);
 	inline void update_iec();
-	TIMER_CALLBACK_MEMBER(iec_sync_tick);
 
 	uint8_t z80_r(offs_t offset);
 	void z80_w(offs_t offset, uint8_t data);
@@ -235,8 +235,8 @@ public:
 	bool m_iec_atn;
 	bool m_iec_clk;
 	bool m_iec_data;
+	s8 m_iec_retry_ba;
 	bool m_iec_srq_out;
-	emu_timer *m_iec_sync_timer;
 
 	// interrupt state
 	int m_exp_dma;
@@ -635,6 +635,16 @@ uint8_t c128_state::read(offs_t offset)
 {
 	int ba = m_vic->ba_r(), aec = 1, z80io = 1;
 	offs_t vma = 0;
+
+	if (((offset & 0xff0f) == 0xdd00) && !machine().side_effects_disabled())
+	{
+		if (m_iec_retry_ba >= 0)
+			ba = m_iec_retry_ba;
+
+		m_iec_retry_ba = m_iec->sample_ready(*m_subcpu) ? -1 : ba;
+		if (m_iec_retry_ba >= 0)
+			return 0xff;
+	}
 
 	uint8_t data = read_memory(offset, vma, ba, aec, z80io);
 
@@ -1752,14 +1762,6 @@ void c128_state::update_cia1_flag()
 	m_cia1->flag_w(m_cass_rd & m_iec_srq);
 }
 
-TIMER_CALLBACK_MEMBER(c128_state::iec_sync_tick)
-{
-	m_iec->host_atn_w(m_iec_atn);
-	m_iec->host_clk_w(m_iec_clk);
-	m_iec->host_data_w(m_iec_data);
-	m_iec->host_srq_w(m_iec_srq_out);
-}
-
 inline void c128_state::update_iec()
 {
 	int fsdir = m_mmu->fsdir_r();
@@ -1786,7 +1788,10 @@ inline void c128_state::update_iec()
 
 	m_iec_srq_out = srq_out;
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	m_iec->host_atn_w(m_iec_atn);
+	m_iec->host_clk_w(m_iec_clk);
+	m_iec->host_data_w(m_iec_data);
+	m_iec->host_srq_w(m_iec_srq_out);
 }
 
 void c128_state::iec_srq_w(int state)
@@ -1869,8 +1874,6 @@ void c128d81_iec_devices(device_slot_interface &device)
 
 void c128_state::machine_start()
 {
-	m_iec_sync_timer = timer_alloc(FUNC(c128_state::iec_sync_tick), this);
-
 	// initialize memory
 	uint8_t data = 0xff;
 
@@ -1901,6 +1904,7 @@ void c128_state::machine_start()
 	save_item(NAME(m_iec_atn));
 	save_item(NAME(m_iec_clk));
 	save_item(NAME(m_iec_data));
+	save_item(NAME(m_iec_retry_ba));
 	save_item(NAME(m_iec_srq_out));
 	save_item(NAME(m_exp_dma));
 	save_item(NAME(m_vic_ba));
@@ -1919,6 +1923,7 @@ void c128_state::machine_start()
 void c128_state::machine_reset()
 {
 	m_reset = 1;
+	m_iec_retry_ba = -1;
 	m_charom_caps = m_charom_jumper->read();
 	m_vdc_ram_64k = bool(m_vdc_ram_config->read());
 

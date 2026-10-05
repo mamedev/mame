@@ -785,7 +785,7 @@ void ppc_device::static_generate_entry_point()
 	uml::code_label skip = 1;
 
 	// begin generating
-	drcuml_block &block(m_drcuml->begin_invariant_block(20));
+	drcuml_block &block(m_drcuml->begin_invariant_block(32));
 
 	// forward references
 	alloc_handle(m_drcuml.get(), &m_nocode, "nocode");
@@ -810,6 +810,18 @@ void ppc_device::static_generate_entry_point()
 	UML_MOV(block, I1, 0);                                                      // mov     i1,0
 	UML_CALLH(block, *m_exception_norecover[EXCEPTION_EI]);                     // callh   exception_norecover
 	UML_LABEL(block, skip);                                                     // skip:
+
+	if (m_cap & PPCCAP_OEA)
+	{
+		// Keep the CPU asleep between slices until an enabled interrupt is taken.
+		// The saved PC is already the instruction after the MTMSR that set POW.
+		uml::code_label const awake = 2;
+		UML_TEST(block, MSR32, MSROEA_POW);
+		UML_JMPc(block, COND_Z, awake);
+		UML_MOV(block, mem(&m_core->icount), 0);
+		UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);
+		UML_LABEL(block, awake);
+	}
 
 	// generate a hash jump via the current mode and PC
 	UML_HASHJMP(block, mem(&m_core->mode), mem(&m_core->pc), *m_nocode);        // hashjmp <mode>,<pc>,nocode
@@ -4372,8 +4384,9 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 				UML_JMPc(block, COND_Z, nosleep);                               // jmp     nosleep,z
 				UML_TEST(block, mem(&m_core->irq_pending), ~uint32_t(0));       // test    [irq_pending],~0
 				UML_JMPc(block, COND_NZ, nosleep);                              // jmp     nosleep,nz
-				UML_MOV(block, mem(&m_core->pc), desc->pc);                     // mov     [pc],desc->pc
+				UML_MOV(block, mem(&m_core->pc), desc->pc + 4);                 // resume after MTMSR when the interrupt wakes the CPU
 				save_fast_iregs(block);                                         // <save fastregs>
+				save_fast_fregs(block);
 				UML_MOV(block, mem(&m_core->icount), 0);                        // mov     [icount],0
 				UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);                         // exit    EXECUTE_OUT_OF_CYCLES
 				UML_LABEL(block, nosleep);                                      // nosleep:

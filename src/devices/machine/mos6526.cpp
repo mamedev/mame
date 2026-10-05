@@ -740,6 +740,7 @@ void mos6526_device::update_interrupt()
 
 	m_icr &= ~clear;
 	m_icr |= icr;
+	m_icr_new = icr;
 }
 
 
@@ -775,6 +776,15 @@ void mos6526_device::clock_pipeline()
 
 	// the IR flag (ICR bit 7) and the /IRQ pad are one SR latch, not a shift
 	// chain, so an ICR read cannot leave a stale stage to re-assert behind it
+	// a source forming in the cycle an ICR read acknowledges the reported flags
+	// is a new interrupt, and must not inherit the old one's set history, or
+	// /IRQ never releases and an edge-triggered NMI is lost for good
+	if (m_icr_read && !irq_one_cycle_early() && (m_icr_new & m_imr))
+	{
+		m_ir_set_prev = 0;
+		m_ir_set_prev2 = 0;
+	}
+
 	int const ir_set = (m_icr & m_imr) ? 1 : 0;
 	int const ir_set_model = irq_one_cycle_early() ? ir_set : m_ir_set_prev;
 	int const ir_clr_model = (m_icr_read || (icr_read_loses_tb() && m_icr_read_prev)) ? 1 : 0;
@@ -944,6 +954,7 @@ void mos6526_device::device_start()
 	save_item(NAME(m_icr_read_prev));
 	save_item(NAME(m_ir_clr_pending));
 	save_item(NAME(m_icr_delay));
+	save_item(NAME(m_icr_new));
 	save_item(NAME(m_icr_sticky));
 	save_item(NAME(m_icr_sticky_next));
 	save_item(NAME(m_imr));
@@ -1033,6 +1044,7 @@ void mos6526_device::device_reset()
 	m_icr_read_prev = false;
 	m_ir_clr_pending = false;
 	m_icr_delay = 0;
+	m_icr_new = 0;
 	m_icr_sticky = 0;
 	m_icr_sticky_next = 0;
 

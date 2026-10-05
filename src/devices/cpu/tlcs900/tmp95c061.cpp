@@ -194,7 +194,7 @@ void tmp95c061_device::device_config_complete()
 void tmp95c061_device::device_resolve_objects()
 {
 	m_nmi_state = CLEAR_LINE;
-	for( int i = 0; i < TLCS900_NUM_INPUTS; i++ )
+	for (int i = 0; i < TLCS900_NUM_INPUTS; i++)
 	{
 		m_level[i] = CLEAR_LINE;
 	}
@@ -341,93 +341,93 @@ static const struct {
 static constexpr u8 NUM_MASKABLE_IRQS = sizeof(tmp95c061_irq_vector_map) / 3;
 
 
-int tmp95c061_device::tlcs900_process_hdma( int channel )
+int tmp95c061_device::tlcs900_process_hdma(int channel)
 {
-	uint8_t vector = ( m_dma_vector[channel] & 0x1f ) << 2;
+	uint8_t vector = (m_dma_vector[channel] & 0x1f) << 2;
 
 	/* Check if any HDMA actions should be performed */
-	if ( vector >= 0x28 && vector != 0x3c && vector < 0x74 )
+	if (vector >= 0x28 && vector != 0x3c && vector < 0x74)
 	{
 		int irq = 0;
 
-		while( irq < NUM_MASKABLE_IRQS && tmp95c061_irq_vector_map[irq].vector != vector )
+		while (irq < NUM_MASKABLE_IRQS && tmp95c061_irq_vector_map[irq].vector != vector)
 			irq++;
 
 		/* Check if our interrupt flip-flop is set */
-		if ( irq < NUM_MASKABLE_IRQS && m_int_reg[tmp95c061_irq_vector_map[irq].reg] & tmp95c061_irq_vector_map[irq].iff )
+		if (irq < NUM_MASKABLE_IRQS && m_int_reg[tmp95c061_irq_vector_map[irq].reg] & tmp95c061_irq_vector_map[irq].iff)
 		{
-			switch( m_dmam[channel].b.l & 0x1f )
+			switch (m_dmam[channel].b.l & 0x1f)
 			{
 			case 0x00:
-				WRMEM( m_dmad[channel].d, RDMEM( m_dmas[channel].d ) );
+				WRMEM(m_dmad[channel].d, RDMEM(m_dmas[channel].d));
 				m_dmad[channel].d += 1;
 				m_cycles += 8;
 				break;
 			case 0x01:
-				WRMEMW( m_dmad[channel].d, RDMEMW( m_dmas[channel].d ) );
+				WRMEMW(m_dmad[channel].d, RDMEMW(m_dmas[channel].d));
 				m_dmad[channel].d += 2;
 				m_cycles += 8;
 				break;
 			case 0x02:
-				WRMEML( m_dmad[channel].d, RDMEML( m_dmas[channel].d ) );
+				WRMEML(m_dmad[channel].d, RDMEML(m_dmas[channel].d));
 				m_dmad[channel].d += 4;
 				m_cycles += 12;
 				break;
 			case 0x04:
-				WRMEM( m_dmad[channel].d, RDMEM( m_dmas[channel].d ) );
+				WRMEM(m_dmad[channel].d, RDMEM(m_dmas[channel].d));
 				m_dmad[channel].d -= 1;
 				m_cycles += 8;
 				break;
 			case 0x05:
-				WRMEMW( m_dmad[channel].d, RDMEMW( m_dmas[channel].d ) );
+				WRMEMW(m_dmad[channel].d, RDMEMW(m_dmas[channel].d));
 				m_dmad[channel].d -= 2;
 				m_cycles += 8;
 				break;
 			case 0x06:
-				WRMEML( m_dmad[channel].d, RDMEML( m_dmas[channel].d ) );
+				WRMEML(m_dmad[channel].d, RDMEML(m_dmas[channel].d));
 				m_dmad[channel].d -= 4;
 				m_cycles += 12;
 				break;
 			case 0x08:
-				WRMEM( m_dmad[channel].d, RDMEM( m_dmas[channel].d ) );
+				WRMEM(m_dmad[channel].d, RDMEM(m_dmas[channel].d));
 				m_dmas[channel].d += 1;
 				m_cycles += 8;
 				break;
 			case 0x09:
-				WRMEMW( m_dmad[channel].d, RDMEMW( m_dmas[channel].d ) );
+				WRMEMW(m_dmad[channel].d, RDMEMW(m_dmas[channel].d));
 				m_dmas[channel].d += 2;
 				m_cycles += 8;
 				break;
 			case 0x0a:
-				WRMEML( m_dmad[channel].d, RDMEML( m_dmas[channel].d ) );
+				WRMEML(m_dmad[channel].d, RDMEML(m_dmas[channel].d));
 				m_dmas[channel].d += 4;
 				m_cycles += 12;
 				break;
 			case 0x0c:
-				WRMEM( m_dmad[channel].d, RDMEMW( m_dmas[channel].d ) );
+				WRMEM(m_dmad[channel].d, RDMEMW(m_dmas[channel].d));
 				m_dmas[channel].d -= 1;
 				m_cycles += 8;
 				break;
 			case 0x0d:
-				WRMEMW( m_dmad[channel].d, RDMEMW( m_dmas[channel].d ) );
+				WRMEMW(m_dmad[channel].d, RDMEMW(m_dmas[channel].d));
 				m_dmas[channel].d -= 2;
 				m_cycles += 8;
 				break;
 			case 0x0e:
-				WRMEML( m_dmad[channel].d, RDMEML( m_dmas[channel].d ) );
+				WRMEML(m_dmad[channel].d, RDMEML(m_dmas[channel].d));
 				m_dmas[channel].d -= 4;
 				m_cycles += 12;
 				break;
 			case 0x10:
-				WRMEM( m_dmad[channel].d, RDMEMW( m_dmas[channel].d ) );
+				WRMEM(m_dmad[channel].d, RDMEMW(m_dmas[channel].d));
 				m_cycles += 8;
 				break;
 			case 0x11:
-				WRMEMW( m_dmad[channel].d, RDMEMW( m_dmas[channel].d ) );
+				WRMEMW(m_dmad[channel].d, RDMEMW(m_dmas[channel].d));
 				m_cycles += 8;
 				break;
 			case 0x12:
-				WRMEML( m_dmad[channel].d, RDMEML( m_dmas[channel].d ) );
+				WRMEML(m_dmad[channel].d, RDMEML(m_dmas[channel].d));
 				m_cycles += 12;
 				break;
 			case 0x14:
@@ -438,10 +438,10 @@ int tmp95c061_device::tlcs900_process_hdma( int channel )
 
 			m_dmac[channel].w.l -= 1;
 
-			if ( m_dmac[channel].w.l == 0 )
+			if (m_dmac[channel].w.l == 0)
 			{
 				m_dma_vector[channel] = 0;
-				switch( channel )
+				switch (channel)
 				{
 				case 0:
 					m_int_reg[INTETC10] |= 0x08;
@@ -471,15 +471,15 @@ int tmp95c061_device::tlcs900_process_hdma( int channel )
 void tmp95c061_device::tlcs900_check_hdma()
 {
 	/* HDMA can only be performed if interrupts are allowed */
-	if ( ( m_sr.b.h & 0x70 ) != 0x70 )
+	if ((m_sr.b.h & 0x70) != 0x70)
 	{
-		if ( ! tlcs900_process_hdma( 0 ) )
+		if (! tlcs900_process_hdma(0))
 		{
-			if ( ! tlcs900_process_hdma( 1 ) )
+			if (! tlcs900_process_hdma(1))
 			{
-				if ( ! tlcs900_process_hdma( 2 ) )
+				if (! tlcs900_process_hdma(2))
 				{
-					tlcs900_process_hdma( 3 );
+					tlcs900_process_hdma(3);
 				}
 			}
 		}
@@ -490,13 +490,13 @@ void tmp95c061_device::tlcs900_check_hdma()
 /* Databook 3.4: a micro-DMA start consumes the interrupt request, so the CPU
    does not dispatch that vector and the HALT state is not released by it.
    Vectors below 0x28 are not micro-DMA capable, and 0x3c (INTRTC) is not. */
-bool tmp95c061_device::hdma_owns_vector( uint8_t vector ) const
+bool tmp95c061_device::hdma_owns_vector(uint8_t vector) const
 {
-	if ( ! ( vector >= 0x28 && vector != 0x3c && vector < 0x74 ) )
+	if (!(vector >= 0x28 && vector != 0x3c && vector < 0x74))
 		return false;
 
-	for ( int ch = 0; ch < 4; ch++ )
-		if ( ( ( m_dma_vector[ch] & 0x1f ) << 2 ) == vector )
+	for (int ch = 0; ch < 4; ch++)
+		if (((m_dma_vector[ch] & 0x1f) << 2) == vector)
 			return true;
 
 	return false;
@@ -505,15 +505,15 @@ bool tmp95c061_device::hdma_owns_vector( uint8_t vector ) const
 void tmp95c061_device::tlcs900_check_irqs()
 {
 	/* Check for NMI */
-	if ( m_nmi_state == ASSERT_LINE )
+	if (m_nmi_state == ASSERT_LINE)
 	{
 		tlcs900_intnest_accept();
 
 		m_xssp.d -= 4;
-		WRMEML( m_xssp.d, m_pc.d );
+		WRMEML(m_xssp.d, m_pc.d);
 		m_xssp.d -= 2;
-		WRMEMW( m_xssp.d, m_sr.w.l );
-		m_pc.d = RDMEML( 0xffff00 + 0x20 );
+		WRMEMW(m_xssp.d, m_sr.w.l);
+		m_pc.d = RDMEML(0xffff00 + 0x20);
 		m_cycles += 18;
 		m_prefetch_clear = true;
 
@@ -526,20 +526,20 @@ void tmp95c061_device::tlcs900_check_irqs()
 
 	/* Check regular irqs */
 	int irq_vectors[9] = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-	for( int i = 0; i < NUM_MASKABLE_IRQS; i++ )
+	for (int i = 0; i < NUM_MASKABLE_IRQS; i++)
 	{
-		if ( m_int_reg[tmp95c061_irq_vector_map[i].reg] & tmp95c061_irq_vector_map[i].iff )
+		if (m_int_reg[tmp95c061_irq_vector_map[i].reg] & tmp95c061_irq_vector_map[i].iff)
 		{
-			if ( hdma_owns_vector( tmp95c061_irq_vector_map[i].vector ) )
+			if (hdma_owns_vector(tmp95c061_irq_vector_map[i].vector))
 				continue;
 
-			switch( tmp95c061_irq_vector_map[i].iff )
+			switch (tmp95c061_irq_vector_map[i].iff)
 			{
 			case 0x80:
-				irq_vectors[ ( m_int_reg[ tmp95c061_irq_vector_map[i].reg ] >> 4 ) & 0x07 ] = i;
+				irq_vectors[(m_int_reg[tmp95c061_irq_vector_map[i].reg] >> 4) & 0x07] = i;
 				break;
 			case 0x08:
-				irq_vectors[ m_int_reg[ tmp95c061_irq_vector_map[i].reg ] & 0x07 ] = i;
+				irq_vectors[m_int_reg[tmp95c061_irq_vector_map[i].reg] & 0x07] = i;
 				break;
 			}
 		}
@@ -548,9 +548,9 @@ void tmp95c061_device::tlcs900_check_irqs()
 	/* Check highest allowed priority irq */
 	int irq = -1;
 	int level = 0;
-	for ( int i = std::max( 1, ( ( m_sr.b.h & 0x70 ) >> 4 ) ); i < 7; i++ )
+	for (int i = std::max(1, ((m_sr.b.h & 0x70) >> 4)); i < 7; i++)
 	{
-		if ( irq_vectors[i] >= 0 )
+		if (irq_vectors[i] >= 0)
 		{
 			irq = irq_vectors[i];
 			level = i + 1;
@@ -558,41 +558,41 @@ void tmp95c061_device::tlcs900_check_irqs()
 	}
 
 	/* Take irq */
-	if ( irq >= 0 )
+	if (irq >= 0)
 	{
 		uint8_t vector = tmp95c061_irq_vector_map[irq].vector;
 
 		tlcs900_intnest_accept();
 
 		m_xssp.d -= 4;
-		WRMEML( m_xssp.d, m_pc.d );
+		WRMEML(m_xssp.d, m_pc.d);
 		m_xssp.d -= 2;
-		WRMEMW( m_xssp.d, m_sr.w.l );
+		WRMEMW(m_xssp.d, m_sr.w.l);
 
 		/* Mask off any lower priority interrupts  */
-		m_sr.b.h = ( m_sr.b.h & 0x8f ) | ( level << 4 );
+		m_sr.b.h = (m_sr.b.h & 0x8f) | (level << 4);
 
-		m_pc.d = RDMEML( 0xffff00 + vector );
+		m_pc.d = RDMEML(0xffff00 + vector);
 		m_cycles += 18;
 		m_prefetch_clear = true;
 
 		m_halted = 0;
 
 		/* Clear taken IRQ */
-		m_int_reg[ tmp95c061_irq_vector_map[irq].reg ] &= ~ tmp95c061_irq_vector_map[irq].iff;
+		m_int_reg[tmp95c061_irq_vector_map[irq].reg] &= ~tmp95c061_irq_vector_map[irq].iff;
 	}
 }
 
 
 void tmp95c061_device::tlcs900_handle_ad()
 {
-	if ( m_ad_cycles_left > 0 )
+	if (m_ad_cycles_left > 0)
 	{
 		m_ad_cycles_left -= m_cycles;
-		if ( m_ad_cycles_left <= 0 )
+		if (m_ad_cycles_left <= 0)
 		{
 			/* Store A/D converted value */
-			if ( ( m_ad_mode & 0x10 ) == 0 )
+			if ((m_ad_mode & 0x10) == 0)
 			{
 				/* conversion channel fixed */
 				m_ad_result[m_ad_mode & 0x03] = m_an_read[m_ad_mode & 0x03](0) & 0x3ff;
@@ -600,7 +600,7 @@ void tmp95c061_device::tlcs900_handle_ad()
 			else
 			{
 				/* conversion channel sweep */
-				switch( m_ad_mode & 0x03 )
+				switch (m_ad_mode & 0x03)
 				{
 				case 0x03:  /* AN3 */
 					m_ad_result[3] = m_an_read[3](0) & 0x3ff;
@@ -618,15 +618,15 @@ void tmp95c061_device::tlcs900_handle_ad()
 			}
 
 			/* Clear BUSY flag, set END flag */
-			m_ad_mode &= ~ 0x40;
+			m_ad_mode &= ~0x40;
 			m_ad_mode |= 0x80;
 
 			m_int_reg[INTE0AD] |= 0x80;
 			m_check_irqs = 1;
 
 			/* AD repeat mode */
-			if ( m_ad_mode & 0x20 )
-				m_ad_cycles_left = ( m_ad_mode & 0x08 ) ? 320 : 160;
+			if (m_ad_mode & 0x20)
+				m_ad_cycles_left = (m_ad_mode & 0x08) ? 320 : 160;
 		}
 	}
 }
@@ -640,12 +640,12 @@ enum ff_change
 };
 
 
-void tmp95c061_device::tlcs900_change_tff( int which, int change )
+void tmp95c061_device::tlcs900_change_tff(int which, int change)
 {
-	switch( which )
+	switch (which)
 	{
 	case 1:
-		switch( change )
+		switch (change)
 		{
 		case FF_CLEAR:
 			m_to1 = 0;
@@ -660,7 +660,7 @@ void tmp95c061_device::tlcs900_change_tff( int which, int change )
 		break;
 
 	case 3:
-		switch( change )
+		switch (change)
 		{
 		case FF_CLEAR:
 			m_to3 = 0;
@@ -694,39 +694,39 @@ void tmp95c061_device::tlcs900_handle_timers()
 	uint32_t  old_pre = m_timer_pre;
 
 	/* Is the pre-scaler active */
-	if ( m_trun & 0x80 )
+	if (m_trun & 0x80)
 		m_timer_pre += m_cycles;
 
 	/* Timer 0 */
-	if ( m_trun & 0x01 )
+	if (m_trun & 0x01)
 	{
-		switch( m_t8_mode[0] & 0x03 )
+		switch (m_t8_mode[0] & 0x03)
 		{
 		case 0x00:  /* TIO */
 			break;
 		case 0x01:  /* T1 */
-			m_timer_change[0] += ( m_timer_pre >> PRESCALE_T1 ) - ( old_pre >> PRESCALE_T1 );
+			m_timer_change[0] += (m_timer_pre >> PRESCALE_T1) - (old_pre >> PRESCALE_T1);
 			break;
 		case 0x02:  /* T4 */
-			m_timer_change[0] += ( m_timer_pre >> PRESCALE_T4 ) - ( old_pre >> PRESCALE_T4 );
+			m_timer_change[0] += (m_timer_pre >> PRESCALE_T4) - (old_pre >> PRESCALE_T4);
 			break;
 		case 0x03:  /* T16 */
-			m_timer_change[0] += ( m_timer_pre >> PRESCALE_T16 ) - ( old_pre >> PRESCALE_T16 );
+			m_timer_change[0] += (m_timer_pre >> PRESCALE_T16) - (old_pre >> PRESCALE_T16);
 			break;
 		}
 
-		for( ; m_timer_change[0] > 0; m_timer_change[0]-- )
+		for (; m_timer_change[0] > 0; m_timer_change[0]--)
 		{
 			m_timer_8[0] += 1;
-			if ( m_timer_8[0] == m_t8_reg[0] )
+			if (m_timer_8[0] == m_t8_reg[0])
 			{
-				if ( ( m_trun & 0x02 ) && ( m_t8_mode[0] & 0x0c ) == 0x00 )
+				if ((m_trun & 0x02) && (m_t8_mode[0] & 0x0c) == 0x00)
 				{
 					m_timer_change[1] += 1;
 				}
 
 				/* In 16bit timer mode the timer should not be reset */
-				if ( ( m_t8_mode[0] & 0xc0 ) != 0x40 )
+				if ((m_t8_mode[0] & 0xc0) != 0x40)
 				{
 					m_timer_8[0] = 0;
 					m_int_reg[INTET10] |= 0x08;
@@ -736,38 +736,38 @@ void tmp95c061_device::tlcs900_handle_timers()
 	}
 
 	/* Timer 1 */
-	if ( m_trun & 0x02 )
+	if (m_trun & 0x02)
 	{
-		switch( ( m_t8_mode[0] >> 2 ) & 0x03 )
+		switch ((m_t8_mode[0] >> 2) & 0x03)
 		{
 		case 0x00:  /* TO0TRG */
 			break;
 		case 0x01:  /* T1 */
-			m_timer_change[1] += ( m_timer_pre >> PRESCALE_T1 ) - ( old_pre >> PRESCALE_T1 );
+			m_timer_change[1] += (m_timer_pre >> PRESCALE_T1) - (old_pre >> PRESCALE_T1);
 			break;
 		case 0x02:  /* T16 */
-			m_timer_change[1] += ( m_timer_pre >> PRESCALE_T16 ) - ( old_pre >> PRESCALE_T16 );
+			m_timer_change[1] += (m_timer_pre >> PRESCALE_T16) - (old_pre >> PRESCALE_T16);
 			break;
 		case 0x03:  /* T256 */
-			m_timer_change[1] += ( m_timer_pre >> PRESCALE_T256 ) - ( old_pre >> PRESCALE_T256 );
+			m_timer_change[1] += (m_timer_pre >> PRESCALE_T256) - (old_pre >> PRESCALE_T256);
 			break;
 		}
 
-		for( ; m_timer_change[1] > 0; m_timer_change[1]-- )
+		for (; m_timer_change[1] > 0; m_timer_change[1]--)
 		{
 			m_timer_8[1] += 1;
-			if ( m_timer_8[1] == m_t8_reg[1] )
+			if (m_timer_8[1] == m_t8_reg[1])
 			{
 				m_timer_8[1] = 0;
 				m_int_reg[INTET10] |= 0x80;
 
-				if ( m_t8_invert & 0x02 )
+				if (m_t8_invert & 0x02)
 				{
-					tlcs900_change_tff( 1, FF_INVERT );
+					tlcs900_change_tff(1, FF_INVERT);
 				}
 
 				/* In 16bit timer mode also reset timer 0 */
-				if ( ( m_t8_mode[0] & 0xc0 ) == 0x40 )
+				if ((m_t8_mode[0] & 0xc0) == 0x40)
 				{
 					m_timer_8[0] = 0;
 				}
@@ -776,34 +776,34 @@ void tmp95c061_device::tlcs900_handle_timers()
 	}
 
 	/* Timer 2 */
-	if ( m_trun & 0x04 )
+	if (m_trun & 0x04)
 	{
-		switch( m_t8_mode[1] & 0x03 )
+		switch (m_t8_mode[1] & 0x03)
 		{
 		case 0x00:  /* invalid */
 		case 0x01:  /* T1 */
-			m_timer_change[2] += ( m_timer_pre >> PRESCALE_T1 ) - ( old_pre >> PRESCALE_T1 );
+			m_timer_change[2] += (m_timer_pre >> PRESCALE_T1) - (old_pre >> PRESCALE_T1);
 			break;
 		case 0x02:  /* T4 */
-			m_timer_change[2] += ( m_timer_pre >> PRESCALE_T4 ) - ( old_pre >> PRESCALE_T4 );
+			m_timer_change[2] += (m_timer_pre >> PRESCALE_T4) - (old_pre >> PRESCALE_T4);
 			break;
 		case 0x03:  /* T16 */
-			m_timer_change[2] += ( m_timer_pre >> PRESCALE_T16 ) - ( old_pre >> PRESCALE_T16 );
+			m_timer_change[2] += (m_timer_pre >> PRESCALE_T16) - (old_pre >> PRESCALE_T16);
 			break;
 		}
 
-		for( ; m_timer_change[2] > 0; m_timer_change[2]-- )
+		for (; m_timer_change[2] > 0; m_timer_change[2]--)
 		{
 			m_timer_8[2] += 1;
-			if ( m_timer_8[2] == m_t8_reg[2] )
+			if (m_timer_8[2] == m_t8_reg[2])
 			{
-				if ( ( m_trun & 0x08 ) && ( m_t8_mode[1] & 0x0c ) == 0x00 )
+				if ((m_trun & 0x08) && (m_t8_mode[1] & 0x0c) == 0x00)
 				{
 					m_timer_change[3] += 1;
 				}
 
 				/* In 16bit timer mode the timer should not be reset */
-				if ( ( m_t8_mode[1] & 0xc0 ) != 0x40 )
+				if ((m_t8_mode[1] & 0xc0) != 0x40)
 				{
 					m_timer_8[2] = 0;
 					m_int_reg[INTET32] |= 0x08;
@@ -813,38 +813,38 @@ void tmp95c061_device::tlcs900_handle_timers()
 	}
 
 	/* Timer 3 */
-	if ( m_trun & 0x08 )
+	if (m_trun & 0x08)
 	{
-		switch( ( m_t8_mode[1] >> 2 ) & 0x03 )
+		switch ((m_t8_mode[1] >> 2) & 0x03)
 		{
 		case 0x00:  /* TO2TRG */
 			break;
 		case 0x01:  /* T1 */
-			m_timer_change[3] += ( m_timer_pre >> PRESCALE_T1 ) - ( old_pre >> PRESCALE_T1 );
+			m_timer_change[3] += (m_timer_pre >> PRESCALE_T1) - (old_pre >> PRESCALE_T1);
 			break;
 		case 0x02:  /* T16 */
-			m_timer_change[3] += ( m_timer_pre >> PRESCALE_T16 ) - ( old_pre >> PRESCALE_T16 );
+			m_timer_change[3] += (m_timer_pre >> PRESCALE_T16) - (old_pre >> PRESCALE_T16);
 			break;
 		case 0x03:  /* T256 */
-			m_timer_change[3] += ( m_timer_pre >> PRESCALE_T256 ) - ( old_pre >> PRESCALE_T256 );
+			m_timer_change[3] += (m_timer_pre >> PRESCALE_T256) - (old_pre >> PRESCALE_T256);
 			break;
 		}
 
-		for( ; m_timer_change[3] > 0; m_timer_change[3]-- )
+		for (; m_timer_change[3] > 0; m_timer_change[3]--)
 		{
 			m_timer_8[3] += 1;
-			if ( m_timer_8[3] == m_t8_reg[3] )
+			if (m_timer_8[3] == m_t8_reg[3])
 			{
 				m_timer_8[3] = 0;
 				m_int_reg[INTET32] |= 0x80;
 
-				if ( m_t8_invert & 0x20 )
+				if (m_t8_invert & 0x20)
 				{
-					tlcs900_change_tff( 3, FF_INVERT );
+					tlcs900_change_tff(3, FF_INVERT);
 				}
 
 				/* In 16bit timer mode also reset timer 2 */
-				if ( ( m_t8_mode[1] & 0xc0 ) == 0x40 )
+				if ((m_t8_mode[1] & 0xc0) == 0x40)
 				{
 					m_timer_8[2] = 0;
 				}
@@ -858,11 +858,11 @@ void tmp95c061_device::tlcs900_handle_timers()
 
 void tmp95c061_device::execute_set_input(int input, int level)
 {
-	switch( input )
+	switch (input)
 	{
 	case INPUT_LINE_NMI:
 	case TLCS900_NMI:
-		if ( m_level[TLCS900_NMI] == CLEAR_LINE && level == ASSERT_LINE )
+		if (m_level[TLCS900_NMI] == CLEAR_LINE && level == ASSERT_LINE)
 		{
 			m_nmi_state = level;
 		}
@@ -874,15 +874,15 @@ void tmp95c061_device::execute_set_input(int input, int level)
 
 	case TLCS900_INT0:
 		/* Is INT0 functionality enabled? */
-		if ( m_iimc & 0x04 )
+		if (m_iimc & 0x04)
 		{
-			if ( m_iimc & 0x02 )
+			if (m_iimc & 0x02)
 			{
 				/* Rising edge detect */
-				if ( m_level[TLCS900_INT0] == CLEAR_LINE && level == ASSERT_LINE )
+				if (m_level[TLCS900_INT0] == CLEAR_LINE && level == ASSERT_LINE)
 				{
 					/* Leave HALT state */
-					if ( ! hdma_owns_vector( 0x28 ) )
+					if (! hdma_owns_vector(0x28))
 						m_halted = 0;
 					m_int_reg[INTE0AD] |= 0x08;
 				}
@@ -890,19 +890,19 @@ void tmp95c061_device::execute_set_input(int input, int level)
 			else
 			{
 				/* Level detect */
-				if ( level == ASSERT_LINE )
+				if (level == ASSERT_LINE)
 					m_int_reg[INTE0AD] |= 0x08;
 				else
-					m_int_reg[INTE0AD] &= ~ 0x08;
+					m_int_reg[INTE0AD] &= ~0x08;
 			}
 		}
 		m_level[TLCS900_INT0] = level;
 		break;
 
 	case TLCS900_INT4:
-		if ( ! ( m_port_control[PORT_B] & 0x01 ) )
+		if (!(m_port_control[PORT_B] & 0x01))
 		{
-			if ( m_level[TLCS900_INT4] == CLEAR_LINE && level == ASSERT_LINE )
+			if (m_level[TLCS900_INT4] == CLEAR_LINE && level == ASSERT_LINE)
 			{
 				m_int_reg[INTE45] |= 0x08;
 			}
@@ -911,9 +911,9 @@ void tmp95c061_device::execute_set_input(int input, int level)
 		break;
 
 	case TLCS900_INT5:
-		if ( ! ( m_port_control[PORT_B] & 0x02 ) )
+		if (!(m_port_control[PORT_B] & 0x02))
 		{
-			if ( m_level[TLCS900_INT5] == CLEAR_LINE && level == ASSERT_LINE )
+			if (m_level[TLCS900_INT5] == CLEAR_LINE && level == ASSERT_LINE)
 			{
 				m_int_reg[INTE45] |= 0x80;
 			}
@@ -926,21 +926,21 @@ void tmp95c061_device::execute_set_input(int input, int level)
 	// set_input_line() on either was a no-op.  Ungated: which port B pin
 	// carries them is not settled here, and no driver gated them before.
 	case TLCS900_INT6:
-		if ( m_level[TLCS900_INT6] == CLEAR_LINE && level == ASSERT_LINE )
+		if (m_level[TLCS900_INT6] == CLEAR_LINE && level == ASSERT_LINE)
 			m_int_reg[INTE67] |= 0x08;
 		m_level[TLCS900_INT6] = level;
 		break;
 
 	case TLCS900_INT7:
-		if ( m_level[TLCS900_INT7] == CLEAR_LINE && level == ASSERT_LINE )
+		if (m_level[TLCS900_INT7] == CLEAR_LINE && level == ASSERT_LINE)
 			m_int_reg[INTE67] |= 0x80;
 		m_level[TLCS900_INT7] = level;
 		break;
 
 	case TLCS900_TIO:   /* External timer input for timer 0 */
-		if ( ( m_trun & 0x01 ) && ( m_t8_mode[0] & 0x03 ) == 0x00 )
+		if ((m_trun & 0x01) && (m_t8_mode[0] & 0x03) == 0x00)
 		{
-			if ( m_level[TLCS900_TIO] == CLEAR_LINE && level == ASSERT_LINE )
+			if (m_level[TLCS900_TIO] == CLEAR_LINE && level == ASSERT_LINE)
 			{
 				m_timer_change[0] += 1;
 			}
@@ -958,29 +958,29 @@ uint8_t tmp95c061_device::trun_r()
 
 void tmp95c061_device::trun_w(uint8_t data)
 {
-	if ( ! ( data & 0x01 ) )
+	if (!(data & 0x01))
 	{
 		m_timer_8[0] = 0;
 		m_timer_change[0] = 0;
 	}
-	if ( ! ( data & 0x02 ) )
+	if (!(data & 0x02))
 	{
 		m_timer_8[1] = 0;
 		m_timer_change[1] = 0;
 	}
-	if ( ! ( data & 0x04 ) )
+	if (!(data & 0x04))
 	{
 		m_timer_8[2] = 0;
 		m_timer_change[2] = 0;
 	}
-	if ( ! ( data & 0x08 ) )
+	if (!(data & 0x08))
 	{
 		m_timer_8[3] = 0;
 		m_timer_change[3] = 0;
 	}
-	if ( ! ( data & 0x10 ) )
+	if (!(data & 0x10))
 		m_timer_8[4] = 0;
-	if ( ! ( data & 0x20 ) )
+	if (!(data & 0x20))
 		m_timer_8[5] = 0;
 
 	m_trun = data;
@@ -1003,28 +1003,28 @@ uint8_t tmp95c061_device::tffcr_r()
 
 void tmp95c061_device::tffcr_w(uint8_t data)
 {
-	switch( data & 0x0c )
+	switch (data & 0x0c)
 	{
 	case 0x00:
-		tlcs900_change_tff( 1, FF_INVERT );
+		tlcs900_change_tff(1, FF_INVERT);
 		break;
 	case 0x04:
-		tlcs900_change_tff( 1, FF_SET );
+		tlcs900_change_tff(1, FF_SET);
 		break;
 	case 0x08:
-		tlcs900_change_tff( 1, FF_CLEAR );
+		tlcs900_change_tff(1, FF_CLEAR);
 		break;
 	}
-	switch( data & 0xc0 )
+	switch (data & 0xc0)
 	{
 	case 0x00:
-		tlcs900_change_tff( 3, FF_INVERT );
+		tlcs900_change_tff(3, FF_INVERT);
 		break;
 	case 0x40:
-		tlcs900_change_tff( 3, FF_SET );
+		tlcs900_change_tff(3, FF_SET);
 		break;
 	case 0x80:
-		tlcs900_change_tff( 3, FF_CLEAR );
+		tlcs900_change_tff(3, FF_CLEAR);
 		break;
 	}
 
@@ -1247,14 +1247,14 @@ uint8_t tmp95c061_device::admod_r()
 void tmp95c061_device::admod_w(uint8_t data)
 {
 	// Preserve read-only bits
-	data = ( m_ad_mode & 0xc0 ) | ( data & 0x3f );
+	data = (m_ad_mode & 0xc0) | (data & 0x3f);
 
 	// Check for A/D request start */
-	if ( data & 0x04 )
+	if (data & 0x04)
 	{
 		data &= ~0x04;
 		data |= 0x40;
-		m_ad_cycles_left = ( data & 0x08 ) ? 320 : 160;
+		m_ad_cycles_left = (data & 0x08) ? 320 : 160;
 	}
 
 	m_ad_mode = data;
@@ -1268,10 +1268,10 @@ uint8_t tmp95c061_device::inte_r(offs_t offset)
 
 void tmp95c061_device::inte_w(offs_t offset, uint8_t data)
 {
-	if ( data & 0x80 )
-		data = ( data & 0x7f ) | ( m_int_reg[offset] & 0x80 );
-	if ( data & 0x08 )
-		data = ( data & 0xf7 ) | ( m_int_reg[offset] & 0x08 );
+	if (data & 0x80)
+		data = (data & 0x7f) | (m_int_reg[offset] & 0x80);
+	if (data & 0x08)
+		data = (data & 0xf7) | (m_int_reg[offset] & 0x08);
 
 	m_int_reg[offset] = data;
 	m_check_irqs = 1;

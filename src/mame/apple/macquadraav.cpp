@@ -16,8 +16,17 @@
     16-bit stereo sound input and output are supported as is video input
     from NTSC, PAL, and SECAM sources.
 
+    The AT&T DSP3210 is a full bus master on the 68040 bus (physical
+    addresses only): it sees DRAM at 0, one alias of the host I/O space
+    ($F0000000-$F07FFFFF -> $50800000+, through which the Real Time
+    Manager hands it the PSC's sndPhase register), and bus-errors on
+    everything else.  Reset comes from the PSC's DSPOVERRUN latch, the
+    frame interrupt from the PSC's sound engine on IR1N (acknowledged on
+    IACK1), and the DSP rings the host by toggling BIO0.  There is no
+    host window into the DSP: all exchange goes through shared DRAM.
+
     TODO:
-    - DSP3210 core
+    - Sound input from a real source (the PSC feeds converter noise)
     - Probably other things
 
 ****************************************************************************/
@@ -37,7 +46,7 @@
 #include "bus/nubus/cards.h"
 #include "bus/nubus/nubus.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/dsp32/dsp32.h"
+#include "cpu/dsp32/dsp3210.h"
 #include "cpu/m68000/m68040.h"
 #include "machine/am79c940.h"
 #include "machine/ncr53c90.h"
@@ -70,6 +79,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_scsibus(*this, "scsi"),
 		m_ncr(*this, "ncr53c94"),
+		m_dsp(*this, "dsp"),
 		m_enet_prom{},
 		m_enet_prom_initialized(false)
 	{
@@ -92,6 +102,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr53c94_device> m_ncr;
+	required_device<dsp3210_device> m_dsp;
 	std::array<u8, 8> m_enet_prom;
 	bool m_enet_prom_initialized;
 
@@ -105,12 +116,20 @@ private:
 	u8 scsi_r(offs_t offset);
 	void scsi_w(offs_t offset, u8 data);
 	u8 enet_prom_r(offs_t offset);
+
+	void dsp_map(address_map &map) ATTR_COLD;
+	u32 dsp_io_r(offs_t offset, u32 mem_mask);
+	void dsp_io_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 dsp_fault_r(offs_t offset);
+	void dsp_fault_w(offs_t offset, u32 data);
 };
 
 void quadraav_state::machine_start()
 {
 	m_ymca->set_ram_info((u32 *) m_ram->pointer(), m_ram->size());
 	m_psc->set_scsi_device(m_ncr);
+	// the DSP sees DRAM at its physical addresses
+	m_dsp->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
 	// Use the same Apple OUI convention as the NuBus Ethernet cards.  The
 	// configuration manager persists this address and allows user overrides.
 	const u32 suffix = machine().rand();
@@ -176,6 +195,35 @@ u8 quadraav_state::enet_prom_r(offs_t offset)
 	return bitswap<8>(m_enet_prom[index], 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
+// the DSP's alias of the host I/O space
+u32 quadraav_state::dsp_io_r(offs_t offset, u32 mem_mask)
+{
+	return m_maincpu->space(AS_PROGRAM).read_dword(0x5080'0000 + (offset << 2), mem_mask);
+}
+
+void quadraav_state::dsp_io_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	m_maincpu->space(AS_PROGRAM).write_dword(0x5080'0000 + (offset << 2), data, mem_mask);
+}
+
+// nothing else answers the DSP: a bus error, which the DSP kernel's own
+// handlers turn into an 'xbus' crash dump
+u32 quadraav_state::dsp_fault_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+	{
+		logerror("DSP bus error reading %08x\n", offset << 2);
+		m_dsp->bus_error();
+	}
+	return 0;
+}
+
+void quadraav_state::dsp_fault_w(offs_t offset, u32 data)
+{
+	logerror("DSP bus error writing %08x = %08x\n", offset << 2, data);
+	m_dsp->bus_error();
+}
+
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
@@ -191,6 +239,13 @@ void quadraav_state::quadraav_map(address_map &map)
 	map(0x50f1c000, 0x50f1c1ff).lrw8(
 		NAME([this](offs_t offset) { return m_mace->read(offset >> 4); }),
 		NAME([this](offs_t offset, u8 data) { m_mace->write(offset >> 4, data); }));
+}
+
+// DRAM is installed over the fault handler in machine_start, once its size is known
+void quadraav_state::dsp_map(address_map &map)
+{
+	map(0x0000'0000, 0xffff'ffff).rw(FUNC(quadraav_state::dsp_fault_r), FUNC(quadraav_state::dsp_fault_w));
+	map(0xf000'0000, 0xf07f'ffff).rw(FUNC(quadraav_state::dsp_io_r), FUNC(quadraav_state::dsp_io_w));
 }
 
 /***************************************************************************
@@ -220,6 +275,15 @@ void quadraav_state::macqd840(machine_config &config)
 	m_psc->set_maincpu_tag("maincpu");
 	m_psc->set_space("maincpu", AS_PROGRAM);
 	m_psc->set_mace_tag("mace");
+	m_psc->set_dsp_tag("dsp");
+
+	// BIO7 = BIO4 = 0: processor mode, on-chip window at $50030000, fetch
+	// from external memory at 0 - the boot ROM is never used
+	DSP3210(config, m_dsp, 66.6667_MHz_XTAL);
+	m_dsp->set_addrmap(AS_PROGRAM, &quadraav_state::dsp_map);
+	m_dsp->set_reset_straps(0);
+	m_dsp->bio_out_cb().set(m_psc, FUNC(psc_device::dsp_bio_w));
+	m_dsp->iack_cb<1>().set(m_psc, FUNC(psc_device::dsp_iack1_w));
 
 	AM79C940(config, m_mace, 0);
 	m_mace->irq_out().set(m_psc, FUNC(psc_device::enet_irq_w));
@@ -306,6 +370,8 @@ void quadraav_state::macqd660(machine_config &config)
 
 	// Set the machine ID.
 	m_ymca->set_cpu_id(0xb);
+
+	m_dsp->set_clock(55'500'000);
 
 	// The 660AV uses a completely different clock generator for ? reason.
 	m_civic->use_icd_clockgen();
