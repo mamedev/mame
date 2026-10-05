@@ -89,7 +89,7 @@ private:
 	uint32_t m_pcm_control[2];
 	uint32_t m_pcm_base[2];
 	uint32_t m_pcm_position[2];
-	int32_t m_legacy_sample;
+	int32_t m_legacy_history[16];
 	uint8_t m_legacy_phase;
 
 	uint32_t m_lfc_codebook_page;
@@ -99,7 +99,7 @@ private:
 	uint16_t m_lfc_position;
 	uint16_t m_lfc_skip;
 	uint8_t m_lfc_end;
-	double m_lfc_coeff[3][10];
+	double m_lfc_coeff[2][10];
 	double m_lfc_history[10];
 	double m_lfc_samples[192];
 

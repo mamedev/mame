@@ -37,13 +37,16 @@
            Level4 positions are even samples; Level6/8 can address all 32 positions.
            The first pulse sets the amplitude; the shape gives ratios for the others.
            Coincident pulses add; noise vectors, gains and shapes come from the codebook.
-           Reflection coefficients are interpolated for each 32-sample subframe,
-           then converted to prediction coefficients by the step-up recursion.
+           A record's reflection coefficients are converted to prediction coefficients
+           by the step-up recursion and held, without interpolation, for the whole
+           192-sample frame of excitation that the same record's control word describes
+           (the payload of which arrives one record later).
+
            Excitation drives the synthesis filter, retaining ten samples of history.
            Control 0x0fc0 terminates the stream after its pending excitation payload.
            A zero control word inside a stream is valid and does not terminate it.
-           The current decoder discards 256 startup samples and drains a 192-sample tail.
-           Interpolation and pipeline alignment were fitted empirically to source WAVs.
+           The decoder discards 256 startup samples and drains a 192-sample tail; the
+           resulting output aligns sample-exactly with the source recordings.
            Fixed-point arithmetic, saturation and exact hardware timing remain unverified.
 
     School House Rock! America Rock and Grammar Rock also use their own software
@@ -57,6 +60,12 @@
     the DAC. The observed 0x7f01 configuration runs at 32 kHz, with an interrupt
     after each half-buffer. Other control settings and analog filtering need
     further hardware verification.
+
+    The 8 kHz legacy mix is raised to the 32 kHz stream rate with a 64-tap
+    polyphase interpolation filter (3.9 kHz cutoff, images below -30 dB,
+    1 ms delay). Whether the hardware interpolates or simply repeats samples
+    is unverified; repeating them leaves the speech band mirrored at 4-12 kHz
+    only 3-6 dB down, which is audible as a metallic, harsh edge.
 
 
 */
@@ -183,33 +192,28 @@ void leapster_snd_device::lfc_excitation(double *samples, bool voiced)
 
 void leapster_snd_device::lfc_synth(double *samples)
 {
-	// Approximation fitted to the source recordings. Hardware interpolation,
-	// fixed-point rounding, saturation and exact pipeline/tail timing are TODO.
-	for (int block = 0; block < 6; ++block)
+	// The frame's excitation is the one described by the previous record, so it
+	// is filtered with that record's coefficients (m_lfc_coeff[0]), held for all
+	// 192 samples. Fixed-point rounding and saturation behaviour are TODO.
+	double a[10]{};
+	for (int order = 0; order < 10; ++order)
 	{
-		double const phase = (144.0 + 32.0 * block) / 192.0;
-		int const first = phase < 1.0 ? 0 : 1;
-		double const fraction = phase - first;
-		double a[10]{};
-		for (int order = 0; order < 10; ++order)
-		{
-			double const k = m_lfc_coeff[first][order] * (1.0 - fraction) + m_lfc_coeff[first + 1][order] * fraction;
-			double old[10];
-			std::copy_n(a, 10, old);
-			for (int i = 0; i < order; ++i)
-				a[i] = old[i] - k * old[order - 1 - i];
-			a[order] = k;
-		}
-		for (int i = 0; i < 32; ++i)
-		{
-			double value = samples[32 * block + i];
-			for (int j = 0; j < 10; ++j)
-				value += a[j] * m_lfc_history[j];
-			for (int j = 9; j > 0; --j)
-				m_lfc_history[j] = m_lfc_history[j - 1];
-			m_lfc_history[0] = value;
-			samples[32 * block + i] = std::clamp(value, -32768.0, 32767.0);
-		}
+		double const k = m_lfc_coeff[0][order];
+		double old[10];
+		std::copy_n(a, 10, old);
+		for (int i = 0; i < order; ++i)
+			a[i] = old[i] - k * old[order - 1 - i];
+		a[order] = k;
+	}
+	for (int i = 0; i < 192; ++i)
+	{
+		double value = samples[i];
+		for (int j = 0; j < 10; ++j)
+			value += a[j] * m_lfc_history[j];
+		for (int j = 9; j > 0; --j)
+			m_lfc_history[j] = m_lfc_history[j - 1];
+		m_lfc_history[0] = value;
+		samples[i] = std::clamp(value, -32768.0, 32767.0);
 	}
 }
 
@@ -218,12 +222,12 @@ bool leapster_snd_device::lfc_frame()
 	if (m_lfc_end == 2)
 		return false;
 	std::fill_n(m_lfc_samples, 192, 0.0);
+	// The record read last time becomes the current one; its excitation payload
+	// is in the record read now.
 	std::copy_n(m_lfc_coeff[1], 10, m_lfc_coeff[0]);
-	std::copy_n(m_lfc_coeff[2], 10, m_lfc_coeff[1]);
 	if (m_lfc_end)
 	{
 		// Drain the synthesis filter after the terminal record's pending blocks.
-		std::copy_n(m_lfc_coeff[2], 10, m_lfc_coeff[0]);
 		m_lfc_end = 2;
 	}
 	else
@@ -239,7 +243,7 @@ bool leapster_snd_device::lfc_frame()
 			uint32_t table = 0x880;
 			for (int i = 0; i < 10; ++i)
 			{
-				m_lfc_coeff[2][i] = lfc_table(table + 2 * BIT(code, 0, bits[i]));
+				m_lfc_coeff[1][i] = lfc_table(table + 2 * BIT(code, 0, bits[i]));
 				code >>= bits[i];
 				table += 2 << bits[i];
 			}
@@ -340,7 +344,7 @@ void leapster_snd_device::device_start()
 	save_item(NAME(m_pcm_control));
 	save_item(NAME(m_pcm_base));
 	save_item(NAME(m_pcm_position));
-	save_item(NAME(m_legacy_sample));
+	save_item(NAME(m_legacy_history));
 	save_item(NAME(m_legacy_phase));
 
 	save_item(NAME(m_lfc_codebook_page));
@@ -370,7 +374,7 @@ void leapster_snd_device::device_reset()
 	std::fill_n(m_pcm_position, 2, 0);
 	for (auto *timer : m_pcm_timer)
 		timer->adjust(attotime::never);
-	m_legacy_sample = 0;
+	std::fill_n(m_legacy_history, 16, 0);
 	m_legacy_phase = 0;
 	m_lfc_codebook_page = 0;
 }
@@ -461,12 +465,28 @@ int32_t leapster_snd_device::legacy_sample()
 
 void leapster_snd_device::sound_stream_update(sound_stream &stream)
 {
+	// 4x polyphase interpolation of the 8 kHz legacy mix: 64-tap Kaiser-windowed
+	// sinc (beta 6, 3.9 kHz cutoff), each phase normalised to unity DC gain.
+	// Output phase p after 8 kHz sample m: sum_j INTERP[p][j] * x[m - j].
+	static constexpr double INTERP[4][16] = {
+		{ -0.0005094, +0.0025431, -0.0068394, +0.0143336, -0.0260942, +0.0440515, -0.0745725, +0.1565483, +0.9505791, -0.0801511, +0.0273811, -0.0095530, +0.0023707, +0.0001665, -0.0006333, +0.0003789 },
+		{ -0.0010008, +0.0042238, -0.0112934, +0.0245213, -0.0474114, +0.0872235, -0.1680786, +0.4713854, +0.7696265, -0.1867429, +0.0869947, -0.0441397, +0.0216283, -0.0095494, +0.0035005, -0.0008878 },
+		{ -0.0008878, +0.0035005, -0.0095494, +0.0216283, -0.0441397, +0.0869947, -0.1867429, +0.7696265, +0.4713854, -0.1680786, +0.0872235, -0.0474114, +0.0245213, -0.0112934, +0.0042238, -0.0010008 },
+		{ +0.0003789, -0.0006333, +0.0001665, +0.0023707, -0.0095530, +0.0273811, -0.0801511, +0.9505791, +0.1565483, -0.0745725, +0.0440515, -0.0260942, +0.0143336, -0.0068394, +0.0025431, -0.0005094 }
+	};
+
 	for (int i = 0; i < stream.samples(); ++i)
 	{
 		if (!m_legacy_phase)
-			m_legacy_sample = legacy_sample();
+		{
+			std::copy_backward(m_legacy_history, m_legacy_history + 15, m_legacy_history + 16);
+			m_legacy_history[0] = legacy_sample();
+		}
+		double interpolated = 0.0;
+		for (int j = 0; j < 16; ++j)
+			interpolated += INTERP[m_legacy_phase][j] * m_legacy_history[j];
 		m_legacy_phase = (m_legacy_phase + 1) & 3;
-		int32_t sample = m_legacy_sample;
+		int32_t sample = std::clamp<int32_t>(std::lround(interpolated), -32768, 32767);
 		if (BIT(m_pcm_control[0], 0))
 			m_space->write_word(m_pcm_base[0] + m_pcm_position[0], u16(sample));
 		if (BIT(m_pcm_control[1], 0))
