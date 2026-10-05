@@ -126,6 +126,7 @@ protected:
 
 private:
 	uint8_t m_crtc_vreg[0x100]{}, m_crtc_index = 0;
+	u16 m_tvram_attr_latch = 0;
 	uint8_t m_port78 = 0;
 	uint8_t m_port80 = 0;
 	u8 m_dma_page = 0;
@@ -149,6 +150,8 @@ private:
 
 	std::unique_ptr<u8[]> m_ig_ram;
 
+	u16 tvram_r(offs_t offset);
+	void tvram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u8 ig_ram_r(offs_t offset);
 	void ig_ram_w(offs_t offset, uint8_t data);
 	void crtc_address_w(uint8_t data);
@@ -186,6 +189,7 @@ void b16_state::video_start()
 
 	save_item(NAME(m_crtc_vreg));
 	save_item(NAME(m_crtc_index));
+	save_item(NAME(m_tvram_attr_latch));
 }
 
 
@@ -205,8 +209,7 @@ uint32_t b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			for(int yi = 0; yi < mc6845_tile_height; yi++)
 			{
 				u8 gfx_data = 0;
-				// TODO: incorrect select (will print gibberish after the system bootup message)
-				// system doesn't bother to clear kanji upper addresses, may opt-out thru a global register.
+				// TODO: confirm global character/kanji display control.
 				if (BIT(hi_vram, 5))
 				{
 					// TODO: apply bitswap at device_init time, move this calculation out of this inner loop.
@@ -237,6 +240,20 @@ uint32_t b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
+u16 b16_state::tvram_r(offs_t offset)
+{
+	if (offset < 0x2000 && BIT(m_port78, 2) && !machine().side_effects_disabled())
+		m_tvram_attr_latch = m_vram[offset + 0x2000];
+	return m_vram[offset];
+}
+
+void b16_state::tvram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_vram[offset]);
+	if (offset < 0x2000 && BIT(m_port78, 2))
+		m_vram[offset + 0x2000] = m_tvram_attr_latch;
+}
+
 u8 b16_state::ig_ram_r(offs_t offset)
 {
 	// swap bit 0 for now, so we can see a setup thru debugger later on.
@@ -259,7 +276,7 @@ void b16_state::b16_map(address_map &map)
 	// TODO: amount of work RAM depends on model type
 	map(0x00000, 0x9ffff).ram();
 	map(0xa0000, 0xaffff).ram(); // bitmap?
-	map(0xb0000, 0xb7fff).ram().share("vram");
+	map(0xb0000, 0xb7fff).ram().rw(FUNC(b16_state::tvram_r), FUNC(b16_state::tvram_w)).share("vram");
 	map(0xb8000, 0xbbfff).rw(FUNC(b16_state::ig_ram_r), FUNC(b16_state::ig_ram_w)).umask16(0xffff);
 	map(0xfc000, 0xfffff).rom().region("ipl", 0);
 }
@@ -319,6 +336,7 @@ void b16_state::b16_io(address_map &map)
 			// bit 2: FDC reset?
 			m_port78 = data;
 			// Bit 0 is set before spin-up and cleared by the BIOS motor timeout.
+			// Bit 2 enables character/attribute transfer.
 			// A common motor-enable line for the two drives is assumed.
 			for (auto &connector : m_floppy)
 				if (floppy_image_device *const floppy = connector->get_device())
@@ -470,6 +488,7 @@ void b16_state::machine_reset()
 	m_dma_page = 0;
 	m_port78 = 0;
 	m_port80 = 0;
+	m_tvram_attr_latch = 0;
 	m_dma->dreq0_w(0);
 	m_fdc->tc_w(false);
 }
