@@ -24,8 +24,9 @@ TODO:
 - Subscribe to I/O $43f handling, add a category subscription for specific cards (SASI and SCSI);
 - Support for PCI bridging on later machines (cfr. pc9821cx3)
 \- "local bus bridge", handles RAM stuff on its own, definitely not a pure southbridge.
-\- set_ids_bridge(0x10330001, <rev>, 0x068000, 0x10330001) should be for 486 targets
-\- set_ids_bridge(0x10330002, <rev>, 0x068000, 0x10330002) for Pentium
+\- set_ids(0x10330001, <rev>, 0x068000, 0x10330001) should be C-Bus to PCI bridge (Cバスブリッヂ)
+\- set_ids(0x10330002, <rev>, 0x068000, 0x10330002) should be C-Bus slots bridge (ﾛｰｶﾙﾊﾞｽﾌﾞﾘｯﾁﾞ,
+   1st gen PCI/486 targets only)
 
 **************************************************************************************************/
 
