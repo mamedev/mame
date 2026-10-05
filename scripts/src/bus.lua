@@ -286,55 +286,66 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/a800/a800_slot.h,BUSES["A800"] = true
+--@src/devices/bus/a800/cart/a800_slot.h,BUSES["A800_CART"] = true
 ---------------------------------------------------
 
-if BUSES["A800"] then
+if BUSES["A800_CART"] then
 	files {
-		MAME_DIR .. "src/devices/bus/a800/a8sio.cpp",
-		MAME_DIR .. "src/devices/bus/a800/a8sio.h",
-		MAME_DIR .. "src/devices/bus/a800/atari810.cpp",
-		MAME_DIR .. "src/devices/bus/a800/atari810.h",
-		MAME_DIR .. "src/devices/bus/a800/atari1050.cpp",
-		MAME_DIR .. "src/devices/bus/a800/atari1050.h",
-		MAME_DIR .. "src/devices/bus/a800/atarifdc.cpp",
-		MAME_DIR .. "src/devices/bus/a800/atarifdc.h",
-		MAME_DIR .. "src/devices/bus/a800/cassette.cpp",
-		MAME_DIR .. "src/devices/bus/a800/cassette.h",
-		MAME_DIR .. "src/devices/bus/a800/a800_slot.cpp",
-		MAME_DIR .. "src/devices/bus/a800/a800_slot.h",
-		MAME_DIR .. "src/devices/bus/a800/a800_carts.cpp",
-		MAME_DIR .. "src/devices/bus/a800/a800_carts.h",
-		MAME_DIR .. "src/devices/bus/a800/rom.cpp",
-		MAME_DIR .. "src/devices/bus/a800/rom.h",
-		MAME_DIR .. "src/devices/bus/a800/a5200_supercart.cpp",
-		MAME_DIR .. "src/devices/bus/a800/a5200_supercart.h",
-		MAME_DIR .. "src/devices/bus/a800/atrax.cpp",
-		MAME_DIR .. "src/devices/bus/a800/atrax.h",
-		MAME_DIR .. "src/devices/bus/a800/bbsb.cpp",
-		MAME_DIR .. "src/devices/bus/a800/bbsb.h",
-		MAME_DIR .. "src/devices/bus/a800/corina.cpp",
-		MAME_DIR .. "src/devices/bus/a800/corina.h",
-		MAME_DIR .. "src/devices/bus/a800/maxflash.cpp",
-		MAME_DIR .. "src/devices/bus/a800/maxflash.h",
-		MAME_DIR .. "src/devices/bus/a800/oss.cpp",
-		MAME_DIR .. "src/devices/bus/a800/oss.h",
-		MAME_DIR .. "src/devices/bus/a800/phoenix.cpp",
-		MAME_DIR .. "src/devices/bus/a800/phoenix.h",
-		MAME_DIR .. "src/devices/bus/a800/rtime8.cpp",
-		MAME_DIR .. "src/devices/bus/a800/rtime8.h",
-		MAME_DIR .. "src/devices/bus/a800/sic.cpp",
-		MAME_DIR .. "src/devices/bus/a800/sic.h",
-		MAME_DIR .. "src/devices/bus/a800/sparta.cpp",
-		MAME_DIR .. "src/devices/bus/a800/sparta.h",
-		MAME_DIR .. "src/devices/bus/a800/supercharger.cpp",
-		MAME_DIR .. "src/devices/bus/a800/supercharger.h",
-		MAME_DIR .. "src/devices/bus/a800/telelink2.cpp",
-		MAME_DIR .. "src/devices/bus/a800/telelink2.h",
-		MAME_DIR .. "src/devices/bus/a800/ultracart.cpp",
-		MAME_DIR .. "src/devices/bus/a800/ultracart.h",
-		MAME_DIR .. "src/devices/bus/a800/williams.cpp",
-		MAME_DIR .. "src/devices/bus/a800/williams.h",
+		MAME_DIR .. "src/devices/bus/a800/cart/a800_slot.cpp",
+		MAME_DIR .. "src/devices/bus/a800/cart/a800_slot.h",
+		MAME_DIR .. "src/devices/bus/a800/cart/a800_carts.cpp",
+		MAME_DIR .. "src/devices/bus/a800/cart/a800_carts.h",
+		MAME_DIR .. "src/devices/bus/a800/cart/rom.cpp",
+		MAME_DIR .. "src/devices/bus/a800/cart/rom.h",
+		MAME_DIR .. "src/devices/bus/a800/cart/a5200_supercart.cpp",
+		MAME_DIR .. "src/devices/bus/a800/cart/a5200_supercart.h",
+		MAME_DIR .. "src/devices/bus/a800/cart/atrax.cpp",
+		MAME_DIR .. "src/devices/bus/a800/cart/atrax.h",
+		MAME_DIR .. "src/devices/bus/a800/cart/bbsb.cpp",
+		MAME_DIR .. "src/devices/bus/a800/cart/bbsb.h",
+		MAME_DIR .. "src/devices/bus/a800/cart/corina.cpp",
+		MAME_DIR .. "src/devices/bus/a800/cart/corina.h",
+		MAME_DIR .. "src/devices/bus/a800/cart/maxflash.cpp",
+		MAME_DIR .. "src/devices/bus/a800/cart/maxflash.h",
+		MAME_DIR .. "src/devices/bus/a800/cart/oss.cpp",
+		MAME_DIR .. "src/devices/bus/a800/cart/oss.h",
+		MAME_DIR .. "src/devices/bus/a800/cart/phoenix.cpp",
+		MAME_DIR .. "src/devices/bus/a800/cart/phoenix.h",
+		MAME_DIR .. "src/devices/bus/a800/cart/rtime8.cpp",
+		MAME_DIR .. "src/devices/bus/a800/cart/rtime8.h",
+		MAME_DIR .. "src/devices/bus/a800/cart/sic.cpp",
+		MAME_DIR .. "src/devices/bus/a800/cart/sic.h",
+		MAME_DIR .. "src/devices/bus/a800/cart/sparta.cpp",
+		MAME_DIR .. "src/devices/bus/a800/cart/sparta.h",
+		MAME_DIR .. "src/devices/bus/a800/cart/supercharger.cpp",
+		MAME_DIR .. "src/devices/bus/a800/cart/supercharger.h",
+		MAME_DIR .. "src/devices/bus/a800/cart/telelink2.cpp",
+		MAME_DIR .. "src/devices/bus/a800/cart/telelink2.h",
+		MAME_DIR .. "src/devices/bus/a800/cart/ultracart.cpp",
+		MAME_DIR .. "src/devices/bus/a800/cart/ultracart.h",
+		MAME_DIR .. "src/devices/bus/a800/cart/williams.cpp",
+		MAME_DIR .. "src/devices/bus/a800/cart/williams.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/a800/sio/a8sio.h,BUSES["A800_SIO"] = true
+---------------------------------------------------
+
+if BUSES["A800_SIO"] then
+	files {
+		MAME_DIR .. "src/devices/bus/a800/sio/a8sio.cpp",
+		MAME_DIR .. "src/devices/bus/a800/sio/a8sio.h",
+		MAME_DIR .. "src/devices/bus/a800/sio/atari810.cpp",
+		MAME_DIR .. "src/devices/bus/a800/sio/atari810.h",
+		MAME_DIR .. "src/devices/bus/a800/sio/atari1050.cpp",
+		MAME_DIR .. "src/devices/bus/a800/sio/atari1050.h",
+		MAME_DIR .. "src/devices/bus/a800/sio/atarifdc.cpp",
+		MAME_DIR .. "src/devices/bus/a800/sio/atarifdc.h",
+		MAME_DIR .. "src/devices/bus/a800/sio/cassette.cpp",
+		MAME_DIR .. "src/devices/bus/a800/sio/cassette.h"
 	}
 end
 

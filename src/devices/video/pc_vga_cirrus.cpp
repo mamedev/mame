@@ -1477,56 +1477,40 @@ void cirrus_gd5428_vga_device::mem_w(offs_t offset, uint8_t data)
 		else
 			offset &= 0xffff;
 
-		// GR0 (and GR10 in 15/16bpp modes) = background colour in write mode 5
-		// GR1 (and GR11 in 15/16bpp modes) = foreground colour in write modes 4 or 5
-		if(vga.gc.write_mode == 4)
+		// GR0 (and GR10 for 16-bit) = background colour in write mode 5
+		// GR1 (and GR11 for 16-bit) = foreground colour in write modes 4 or 5
+		// GRB = colour expansion width
+		// SR2 = pixel mask for the eight expanded pixels, MSB first
+		if (vga.gc.write_mode == 4)
 		{
-			int i;
-
-			for(i=0;i<8;i++)
+			const unsigned bytes_per_pixel = BIT(gc_mode_ext, 4) ? 2 : 1;
+			const u32 destination = (addr + offset) * 8 * bytes_per_pixel;
+			for (unsigned pixel = 0; pixel < 8; pixel++)
 			{
-				if(svga.rgb8_en)
+				if (BIT(vga.sequencer.map_mask, 7 - pixel) && BIT(data, 7 - pixel))
 				{
-					if(data & (0x01 << (7-i)))
-						vga.memory[((addr+offset)*8+i) % vga.svga_intf.vram_size] = vga.gc.enable_set_reset;
-				}
-				else if(svga.rgb15_en || svga.rgb16_en)
-				{
-					if(data & (0x01 << (7-i)))
-					{
-						vga.memory[((addr+offset)*16+(i*2)) % vga.svga_intf.vram_size] = vga.gc.enable_set_reset;
-						vga.memory[((addr+offset)*16+(i*2)+1) % vga.svga_intf.vram_size] = m_gr11;
-					}
+					const u32 pixel_address = destination + pixel * bytes_per_pixel;
+					vga.memory[pixel_address % vga.svga_intf.vram_size] = vga.gc.enable_set_reset;
+					if (bytes_per_pixel == 2)
+						vga.memory[(pixel_address + 1) % vga.svga_intf.vram_size] = m_gr11;
 				}
 			}
 			return;
 		}
 
-		if(vga.gc.write_mode == 5)
+		if (vga.gc.write_mode == 5)
 		{
-			int i;
-
-			for(i=0;i<8;i++)
+			const unsigned bytes_per_pixel = BIT(gc_mode_ext, 4) ? 2 : 1;
+			const u32 destination = (addr + offset) * 8 * bytes_per_pixel;
+			for (unsigned pixel = 0; pixel < 8; pixel++)
 			{
-				if(svga.rgb8_en)
+				if (BIT(vga.sequencer.map_mask, 7 - pixel))
 				{
-					if(data & (0x01 << (7-i)))
-						vga.memory[((addr+offset)*8+i) % vga.svga_intf.vram_size] = vga.gc.enable_set_reset;
-					else
-						vga.memory[((addr+offset)*8+i) % vga.svga_intf.vram_size] = vga.gc.set_reset;
-				}
-				else if(svga.rgb15_en || svga.rgb16_en)
-				{
-					if(data & (0x01 << (7-i)))
-					{
-						vga.memory[((addr+offset)*16+(i*2)) % vga.svga_intf.vram_size] = vga.gc.enable_set_reset;
-						vga.memory[((addr+offset)*16+(i*2)+1) % vga.svga_intf.vram_size] = m_gr11;
-					}
-					else
-					{
-						vga.memory[((addr+offset)*16+(i*2)) % vga.svga_intf.vram_size] = vga.gc.set_reset;
-						vga.memory[((addr+offset)*16+(i*2)+1) % vga.svga_intf.vram_size] = m_gr10;
-					}
+					const bool foreground = BIT(data, 7 - pixel);
+					const u32 pixel_address = destination + pixel * bytes_per_pixel;
+					vga.memory[pixel_address % vga.svga_intf.vram_size] = foreground ? vga.gc.enable_set_reset : vga.gc.set_reset;
+					if (bytes_per_pixel == 2)
+						vga.memory[(pixel_address + 1) % vga.svga_intf.vram_size] = foreground ? m_gr11 : m_gr10;
 				}
 			}
 			return;

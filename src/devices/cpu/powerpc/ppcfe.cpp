@@ -1029,12 +1029,6 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 				desc.set_can_cause_exception();
 				desc.set_privileged();
 			}
-			if ((m_ppc.m_cap & PPCCAP_4XX) && spr == SPR4XX_TBLU)
-				desc.cycles = POWERPC_COUNT_READ_TBL;
-			else if ((m_ppc.m_cap & PPCCAP_VEA) && spr == SPRVEA_TBL_R)
-				desc.cycles = POWERPC_COUNT_READ_TBL;
-			else if ((m_ppc.m_cap & PPCCAP_OEA) && spr == SPROEA_DEC)
-				desc.cycles = POWERPC_COUNT_READ_DEC;
 			return true;
 
 		case 0x053: // MFMSR
@@ -1063,9 +1057,6 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 			if (!(m_ppc.m_cap & PPCCAP_VEA))
 				return false;
 			desc.set_gpr_modified(G_RD(op));
-			spr = compute_spr(G_SPR(op));
-			if (spr == SPRVEA_TBL_R)
-				desc.cycles = POWERPC_COUNT_READ_TBL;
 			return true;
 
 		case 0x068: // NEGx

@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_A800_A8SIO_H
-#define MAME_BUS_A800_A8SIO_H
+#ifndef MAME_BUS_A800_SIO_A8SIO_H
+#define MAME_BUS_A800_SIO_A8SIO_H
 
 #pragma once
 
@@ -88,4 +88,4 @@ public:
 	a8sio_device  *m_a8sio;
 };
 
-#endif // MAME_BUS_A800_A8SIO_H
+#endif // MAME_BUS_A800_SIO_A8SIO_H

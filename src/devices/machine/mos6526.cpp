@@ -142,7 +142,7 @@ DEFINE_DEVICE_TYPE(MOS8520,  mos8520_device,  "mos8520",  "MOS 8520 CIA")
 
 void mos6526_device::update_pa()
 {
-	uint8_t pa = m_pra | (m_pa_in & ~m_ddra);
+	uint8_t pa = m_pra | ~m_ddra;
 
 	if (m_pa != pa)
 	{
@@ -158,7 +158,7 @@ void mos6526_device::update_pa()
 
 void mos6526_device::update_pb()
 {
-	uint8_t pb = m_prb | (m_pb_in & ~m_ddrb);
+	uint8_t pb = m_prb | ~m_ddrb;
 
 	if (CRA_PBON)
 	{

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli, Angelo Salese
-#ifndef MAME_BUS_A800_A800_CARTS_H
-#define MAME_BUS_A800_A800_CARTS_H
+#ifndef MAME_BUS_A800_CART_A800_CARTS_H
+#define MAME_BUS_A800_CART_A800_CARTS_H
 
 #pragma once
 
@@ -25,4 +25,4 @@ void a800_left(device_slot_interface &device);
 void a800_right(device_slot_interface &device);
 void a5200_carts(device_slot_interface &device);
 
-#endif // MAME_BUS_A800_A800_CARTS_H
+#endif // MAME_BUS_A800_CART_A800_CARTS_H

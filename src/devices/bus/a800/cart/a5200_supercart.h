@@ -1,8 +1,8 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese
 
-#ifndef MAME_BUS_A800_A5200_SUPERCART_H
-#define MAME_BUS_A800_A5200_SUPERCART_H
+#ifndef MAME_BUS_A800_CART_A5200_SUPERCART_H
+#define MAME_BUS_A800_CART_A5200_SUPERCART_H
 
 #pragma once
 
@@ -28,5 +28,5 @@ protected:
 
 DECLARE_DEVICE_TYPE(A5200_ROM_SUPERCART, a5200_rom_supercart_device)
 
-#endif // MAME_BUS_A800_A5200_SUPERCART_H
+#endif // MAME_BUS_A800_CART_A5200_SUPERCART_H
 
