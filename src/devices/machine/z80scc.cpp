@@ -1818,7 +1818,8 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		  of these modes is selected and this command is issued before the data has been read from the
 		  Receive FIFO, the data is lost */
 		LOGCMD("WR0_ERROR_RESET - not implemented\n");
-		if (m_rx_fifo_wp != m_rx_fifo_rp)
+		m_rr1 &= ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR);
+		if ((m_rx_fifo_wp != m_rx_fifo_rp) && rx_special_condition(m_rx_error_fifo[m_rx_fifo_rp]))
 			m_rx_fifo_rp_step(); // Reset error state in fifo and unlock it. unlock == step to next slot in fifo.
 		break;
 	case WR0_SEND_ABORT: // Flush transmitter and Send 8-13 bits of '1's, used with SDLC
@@ -2431,15 +2432,6 @@ uint8_t z80scc_channel::data_read()
 		{
 			// decrease RX FIFO pointer
 			m_rx_fifo_rp_step();
-
-			// if RX FIFO empty reset RX interrupt status
-			if (m_rx_fifo_wp == m_rx_fifo_rp)
-			{
-				LOGRCV("Rx FIFO empty, resetting status and interrupt state");
-				m_uart->m_int_state[INT_RECEIVE_PRIO + (m_index == z80scc_device::CHANNEL_A ? 0 : 3 )] = 0;
-				m_uart->m_chanA->m_rr3 &= ~(1 << (INT_RECEIVE_PRIO + ((m_index == z80scc_device::CHANNEL_A) ? 3 : 0)));
-				m_uart->check_interrupts();
-			}
 		}
 
 		check_dma_request();
@@ -2466,8 +2458,19 @@ void z80scc_channel::m_rx_fifo_rp_step()
 		if (m_rx_fifo_rp == m_rx_fifo_wp)
 		{
 				// no more characters available in the FIFO
+				LOGRCV("Rx FIFO empty, resetting status and interrupt state");
 				m_rr0 &= ~ RR0_RX_CHAR_AVAILABLE;
+				m_uart->m_int_state[INT_RECEIVE_PRIO + (m_index == z80scc_device::CHANNEL_A ? 0 : 3 )] = 0;
+				m_uart->m_chanA->m_rr3 &= ~(1 << (INT_RECEIVE_PRIO + ((m_index == z80scc_device::CHANNEL_A) ? 3 : 0)));
+				m_uart->check_interrupts();
 		}
+}
+
+bool z80scc_channel::rx_special_condition(uint8_t status) const
+{
+	uint8_t const special = RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR
+			| ((m_wr1 & WR1_PARITY_IS_SPEC_COND) ? RR1_PARITY_ERROR : 0);
+	return (status & special) != 0;
 }
 
 /* Step TX read pointer */
