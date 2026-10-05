@@ -457,6 +457,10 @@ protected:
 	int m_int_state[6]; // interrupt state
 	int m_int_source[6]; // interrupt source
 
+	static constexpr int INT_PRIORITY[6] = {
+			z80scc_channel::INT_RECEIVE_PRIO, z80scc_channel::INT_TRANSMIT_PRIO, z80scc_channel::INT_EXTERNAL_PRIO,
+			3 + z80scc_channel::INT_RECEIVE_PRIO, 3 + z80scc_channel::INT_TRANSMIT_PRIO, 3 + z80scc_channel::INT_EXTERNAL_PRIO };
+
 	int const m_variant;
 	uint8_t m_wr0_ptrbits;
 	const char *m_cputag;

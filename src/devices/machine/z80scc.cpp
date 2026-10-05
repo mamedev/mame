@@ -1488,12 +1488,12 @@ uint8_t z80scc_channel::do_sccreg_rr2()
 	// If we are chan B we have to modify the vector regardless of the VIS bit
 	if (m_index == z80scc_device::CHANNEL_B)
 	{
-		int i = 0;
-
 		LOGINT(" - Channel B so we might need to update the vector modification\n");
 		// loop over all interrupt sources
-		for (auto & elem : m_uart->m_int_state)
+		for (int const i : z80scc_device::INT_PRIORITY)
 		{
+			auto &elem = m_uart->m_int_state[i];
+
 			// find the first channel with an interrupt requested
 			if (elem & Z80_DAISY_INT)
 			{
@@ -1507,7 +1507,6 @@ uint8_t z80scc_channel::do_sccreg_rr2()
 				}
 				break;
 			}
-			i++;
 		}
 	}
 	return m_rr2;
