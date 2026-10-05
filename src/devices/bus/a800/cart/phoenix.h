@@ -1,8 +1,8 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese
 
-#ifndef MAME_BUS_A800_PHOENIX_H
-#define MAME_BUS_A800_PHOENIX_H
+#ifndef MAME_BUS_A800_CART_PHOENIX_H
+#define MAME_BUS_A800_CART_PHOENIX_H
 
 #pragma once
 
@@ -67,4 +67,4 @@ DECLARE_DEVICE_TYPE(A800_ROM_PHOENIX,         a800_rom_phoenix_device)
 DECLARE_DEVICE_TYPE(A800_ROM_BLIZZARD_16KB,   a800_rom_blizzard_16kb_device)
 DECLARE_DEVICE_TYPE(A800_ROM_PHOENIX_AST2K,   a800_rom_phoenix_ast2k_device)
 
-#endif // MAME_BUS_A800_PHOENIX_H
+#endif // MAME_BUS_A800_CART_PHOENIX_H

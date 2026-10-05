@@ -1,8 +1,8 @@
 // license: BSD-3-Clause
 // copyright-holders: Fabio Priuli, Angelo Salese
 
-#ifndef MAME_BUS_A800_WILLIAMS_H
-#define MAME_BUS_A800_WILLIAMS_H
+#ifndef MAME_BUS_A800_CART_WILLIAMS_H
+#define MAME_BUS_A800_CART_WILLIAMS_H
 
 #pragma once
 
@@ -66,4 +66,4 @@ DECLARE_DEVICE_TYPE(A800_ROM_EXPRESS,     a800_rom_express_device)
 DECLARE_DEVICE_TYPE(A800_ROM_DIAMOND,     a800_rom_diamond_device)
 DECLARE_DEVICE_TYPE(A800_ROM_TURBO,       a800_rom_turbo_device)
 
-#endif // MAME_BUS_A800_WILLIAMS_H
+#endif // MAME_BUS_A800_CART_WILLIAMS_H

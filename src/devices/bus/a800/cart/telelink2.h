@@ -1,8 +1,8 @@
 // license: BSD-3-Clause
 // copyright-holders: Fabio Priuli, Angelo Salese
 
-#ifndef MAME_BUS_A800_TELELINK2_H
-#define MAME_BUS_A800_TELELINK2_H
+#ifndef MAME_BUS_A800_CART_TELELINK2_H
+#define MAME_BUS_A800_CART_TELELINK2_H
 
 #pragma once
 
@@ -31,4 +31,4 @@ private:
 
 DECLARE_DEVICE_TYPE(A800_ROM_TELELINK2,   a800_rom_telelink2_device)
 
-#endif // MAME_BUS_A800_TELELINK2_H
+#endif // MAME_BUS_A800_CART_TELELINK2_H

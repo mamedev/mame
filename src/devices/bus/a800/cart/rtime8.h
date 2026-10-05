@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_BUS_A800_RTIME8_H
-#define MAME_BUS_A800_RTIME8_H
+#ifndef MAME_BUS_A800_CART_RTIME8_H
+#define MAME_BUS_A800_CART_RTIME8_H
 
 #pragma once
 
@@ -29,4 +29,4 @@ private:
 
 DECLARE_DEVICE_TYPE(A800_RTIME8, a800_rtime8_device)
 
-#endif // MAME_BUS_A800_RTIME8_H
+#endif // MAME_BUS_A800_CART_RTIME8_H

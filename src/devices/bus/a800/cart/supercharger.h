@@ -1,8 +1,8 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese
 
-#ifndef MAME_BUS_A800_SUPERCHARGER_H
-#define MAME_BUS_A800_SUPERCHARGER_H
+#ifndef MAME_BUS_A800_CART_SUPERCHARGER_H
+#define MAME_BUS_A800_CART_SUPERCHARGER_H
 
 #pragma once
 
@@ -32,4 +32,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(A800_SUPER_CHARGER, a800_supercharger_device)
 
-#endif // MAME_BUS_A800_SUPERCHARGER_H
+#endif // MAME_BUS_A800_CART_SUPERCHARGER_H

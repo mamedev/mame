@@ -1,8 +1,8 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese
 
-#ifndef MAME_BUS_A800_ATRAX_H
-#define MAME_BUS_A800_ATRAX_H
+#ifndef MAME_BUS_A800_CART_ATRAX_H
+#define MAME_BUS_A800_CART_ATRAX_H
 
 #pragma once
 
@@ -31,4 +31,4 @@ private:
 
 DECLARE_DEVICE_TYPE(A800_ROM_ATRAX,        a800_rom_atrax_device)
 
-#endif // MAME_BUS_A800_ATRAX_H
+#endif // MAME_BUS_A800_CART_ATRAX_H
