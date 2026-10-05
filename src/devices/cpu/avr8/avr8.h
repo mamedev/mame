@@ -67,7 +67,6 @@ protected:
 					 uint32_t clock,
 					 const device_type type,
 					 uint32_t address_mask,
-					 uint8_t vector_size_in_words,
 					 address_map_constructor internal_map);
 
 	typedef void (avr8_base_device::*op_func) (uint16_t op);
@@ -787,8 +786,10 @@ protected:
 	// Interrupt handling tables
 	uint8_t m_int_statuses[INTIDX_COUNT];   // persistent, must be savestate-able
 	std::unique_ptr<interrupt_condition[]> m_int_conditions_table; // rebuilt at device_start
-	uint8_t m_vector_size_in_words; // populated on construct. usually 2; chips with smaller flash will set this to 1
 
+	// Interrupt handling size for the AVR8s is usually 2; some devices will only use 1
+	virtual uint8_t vector_size_in_words() const { return 2; }
+	
 	// memory access
 	inline void push(uint8_t val);
 	inline uint8_t pop();
@@ -928,7 +929,7 @@ protected:
 
 	// override this in subclasses and return the intended int_conditions tables above.
 	// the table will be read on device init to populate m_int_conditions_table.
-	virtual const interrupt_condition* interrupt_conditions();
+	virtual const interrupt_condition* interrupt_conditions() { return s_int_conditions; }
 };
 
 // ======================> avr8_device
@@ -973,7 +974,6 @@ protected:
 				uint32_t clock,
 				const device_type type,
 				uint32_t address_mask,
-				uint8_t vector_size_in_words,
 				address_map_constructor internal_map);
 
 	typedef delegate<void (void)> timer_func;
@@ -1315,6 +1315,7 @@ public:
 
 protected:
 	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
+	virtual uint8_t vector_size_in_words() const override { return 1; }
 };
 
 // ======================> atmega168_device
@@ -1357,7 +1358,7 @@ public:
 	void atmega32u4_internal_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual const interrupt_condition* interrupt_conditions() override;
+	virtual const interrupt_condition* interrupt_conditions() override { return s_mega32u4_int_conditions; }
 	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
 	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
 	{
@@ -1379,7 +1380,7 @@ public:
 	void atmega644_internal_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual const interrupt_condition* interrupt_conditions() override;
+	virtual const interrupt_condition* interrupt_conditions() override { return s_mega644_int_conditions; }
 	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
 	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
 	{
@@ -1401,7 +1402,7 @@ public:
 	void atmega1284_internal_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual const interrupt_condition* interrupt_conditions() override;
+	virtual const interrupt_condition* interrupt_conditions() override { return s_mega644_int_conditions; }
 	virtual bool pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const override;
 	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
 	{
@@ -1423,7 +1424,7 @@ public:
 	void atmega1280_internal_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual const interrupt_condition* interrupt_conditions() override;
+	virtual const interrupt_condition* interrupt_conditions() override { return s_mega640_int_conditions; }
 	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
 	{
 		mosi_mask = 0x04; // PB2
@@ -1444,7 +1445,7 @@ public:
 	void atmega2560_internal_map(address_map &map) ATTR_COLD;
 
 protected:
-	virtual const interrupt_condition* interrupt_conditions() override;
+	virtual const interrupt_condition* interrupt_conditions() override { return s_mega640_int_conditions; }
 	virtual void spi_pins(uint8_t &mosi_mask, uint8_t &miso_mask, uint8_t &sck_mask) const override
 	{
 		mosi_mask = 0x04; // PB2
@@ -1462,6 +1463,8 @@ public:
 	// construction/destruction
 	attiny15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void attiny15_internal_map(address_map &map) ATTR_COLD;
+protected:
+	virtual uint8_t vector_size_in_words() const override { return 1; }
 };
 
 /***************************************************************************

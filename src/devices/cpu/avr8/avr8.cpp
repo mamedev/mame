@@ -724,7 +724,7 @@ void attiny15_device::attiny15_internal_map(address_map &map)
 //-------------------------------------------------
 
 atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA88, 0x0fff, 1, address_map_constructor(FUNC(atmega88_device::atmega88_internal_map), this))
+	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA88, 0x0fff, address_map_constructor(FUNC(atmega88_device::atmega88_internal_map), this))
 {
 }
 
@@ -744,7 +744,7 @@ bool atmega88_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) c
 //-------------------------------------------------
 
 atmega168_device::atmega168_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA168, 0x1fff, 2, address_map_constructor(FUNC(atmega168_device::atmega168_internal_map), this))
+	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA168, 0x1fff, address_map_constructor(FUNC(atmega168_device::atmega168_internal_map), this))
 {
 }
 
@@ -753,7 +753,7 @@ atmega168_device::atmega168_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 atmega328_device::atmega328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA328, 0x3fff, 2, address_map_constructor(FUNC(atmega328_device::atmega328_internal_map), this))
+	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA328, 0x3fff, address_map_constructor(FUNC(atmega328_device::atmega328_internal_map), this))
 {
 }
 
@@ -762,7 +762,7 @@ atmega328_device::atmega328_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 atmega32u4_device::atmega32u4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<4>(mconfig, tag, owner, clock, ATMEGA32U4, 0x3fff, 2, address_map_constructor(FUNC(atmega32u4_device::atmega32u4_internal_map), this))
+	: avr8_device<4>(mconfig, tag, owner, clock, ATMEGA32U4, 0x3fff, address_map_constructor(FUNC(atmega32u4_device::atmega32u4_internal_map), this))
 {
 }
 
@@ -772,7 +772,7 @@ atmega32u4_device::atmega32u4_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 atmega644_device::atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA644, 0x7fff, 2, address_map_constructor(FUNC(atmega644_device::atmega644_internal_map), this))
+	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA644, 0x7fff, address_map_constructor(FUNC(atmega644_device::atmega644_internal_map), this))
 {
 }
 
@@ -781,7 +781,7 @@ atmega644_device::atmega644_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 atmega1284_device::atmega1284_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA1284, 0xffff, 2, address_map_constructor(FUNC(atmega1284_device::atmega1284_internal_map), this))
+	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA1284, 0xffff, address_map_constructor(FUNC(atmega1284_device::atmega1284_internal_map), this))
 {
 }
 
@@ -790,7 +790,7 @@ atmega1284_device::atmega1284_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<6>(mconfig, tag, owner, clock, ATMEGA1280, 0xffff, 2, address_map_constructor(FUNC(atmega1280_device::atmega1280_internal_map), this))
+	: avr8_device<6>(mconfig, tag, owner, clock, ATMEGA1280, 0xffff, address_map_constructor(FUNC(atmega1280_device::atmega1280_internal_map), this))
 {
 }
 
@@ -799,7 +799,7 @@ atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<6>(mconfig, tag, owner, clock, ATMEGA2560, 0x1ffff, 2, address_map_constructor(FUNC(atmega2560_device::atmega2560_internal_map), this))
+	: avr8_device<6>(mconfig, tag, owner, clock, ATMEGA2560, 0x1ffff, address_map_constructor(FUNC(atmega2560_device::atmega2560_internal_map), this))
 {
 }
 
@@ -808,7 +808,7 @@ atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 attiny15_device::attiny15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<2>(mconfig, tag, owner, clock, ATTINY15, 0x01ff, 1, address_map_constructor(FUNC(attiny15_device::attiny15_internal_map), this))
+	: avr8_device<2>(mconfig, tag, owner, clock, ATTINY15, 0x01ff, address_map_constructor(FUNC(attiny15_device::attiny15_internal_map), this))
 {
 }
 
@@ -816,7 +816,7 @@ attiny15_device::attiny15_device(const machine_config &mconfig, const char *tag,
 //  avr8_base_device - constructor
 //-------------------------------------------------
 
-avr8_base_device::avr8_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t addr_mask, uint8_t vector_size_in_words, address_map_constructor internal_map)
+avr8_base_device::avr8_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t addr_mask, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 22)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0, internal_map)
@@ -830,13 +830,12 @@ avr8_base_device::avr8_base_device(const machine_config &mconfig, const char *ta
 	, m_addr_mask((addr_mask << 1) | 1)
 	, m_sleeping(false)
 	, m_sei_delay_pending(false)
-	, m_vector_size_in_words(vector_size_in_words)
 {
 }
 
 template <int NumTimers>
-avr8_device<NumTimers>::avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t addr_mask, uint8_t vector_size_in_words, address_map_constructor internal_map)
-	: avr8_base_device(mconfig, tag, owner, clock, type, addr_mask, vector_size_in_words, internal_map)
+avr8_device<NumTimers>::avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t addr_mask, address_map_constructor internal_map)
+	: avr8_base_device(mconfig, tag, owner, clock, type, addr_mask, internal_map)
 	, m_gpio_out_cb(*this)
 	, m_gpio_in_cb(*this, 0)
 	, m_adc_in_cb(*this, 0)
@@ -1347,19 +1346,14 @@ const avr8_base_device::interrupt_condition avr8_base_device::s_int_conditions[]
 	{ INTIDX_TOV1,   AVR8_INT_T1OVF,   TIMSK1,    TIMSK1_TOIE1_MASK,  TIFR1,    TIFR1_TOV1_MASK  },
 	{ INTIDX_OCF2B,  AVR8_INT_T2COMPB, TIMSK2,    TIMSK2_OCIE2B_MASK, TIFR2,    TIFR2_OCF2B_MASK },
 	{ INTIDX_OCF2A,  AVR8_INT_T2COMPA, TIMSK2,    TIMSK2_OCIE2A_MASK, TIFR2,    TIFR2_OCF2A_MASK },
-	{ INTIDX_TOV2,   AVR8_INT_T2OVF,   TIMSK2,    TIMSK2_TOIE2_MASK,  TIFR2,    TIFR2_TOV2_MASK },
+	{ INTIDX_TOV2,   AVR8_INT_T2OVF,   TIMSK2,    TIMSK2_TOIE2_MASK,  TIFR2,    TIFR2_TOV2_MASK  },
 	{ INTIDX_PCINT0, AVR8_INT_PCINT0,  PCICR,     PCICR_PCIE0_MASK,   PCIFR,    PCIFR_PCIF0_MASK },
 	{ INTIDX_PCINT1, AVR8_INT_PCINT1,  PCICR,     PCICR_PCIE1_MASK,   PCIFR,    PCIFR_PCIF1_MASK },
 	{ INTIDX_PCINT2, AVR8_INT_PCINT2,  PCICR,     PCICR_PCIE2_MASK,   PCIFR,    PCIFR_PCIF2_MASK },
-	{ INTIDX_INT0,   AVR8_INT_INT0,    EIMSK,     EIMSK_INT0_MASK,    EIFR,     EIFR_INTF0_MASK },
-	{ INTIDX_INT1,   AVR8_INT_INT1,    EIMSK,     EIMSK_INT1_MASK,    EIFR,     EIFR_INTF1_MASK },
-	{ 0,             0,                0,         0,                  0,        0, } // end of list
+	{ INTIDX_INT0,   AVR8_INT_INT0,    EIMSK,     EIMSK_INT0_MASK,    EIFR,     EIFR_INTF0_MASK  },
+	{ INTIDX_INT1,   AVR8_INT_INT1,    EIMSK,     EIMSK_INT1_MASK,    EIFR,     EIFR_INTF1_MASK  },
+	{ 0,             0,                0,         0,                  0,        0, 				 } // end of list
 };
-
-const avr8_base_device::interrupt_condition* avr8_base_device::interrupt_conditions()
-{
-	return s_int_conditions;
-}
 
 void avr8_base_device::update_interrupt(uint8_t intidx)
 {
@@ -1486,7 +1480,7 @@ void avr8_base_device::fire_interrupts()
 		push((m_pc >> 9) & 0x00ff);
 		// TODO: 24-bit address pushes for 2560 and friends that use bigger flash space
 
-		m_pc = m_int_conditions_table[interrupt_winner_idx].m_intvector * (2 * m_vector_size_in_words);
+		m_pc = m_int_conditions_table[interrupt_winner_idx].m_intvector * (2 * vector_size_in_words());
 
 		m_sleeping = false;
 
@@ -1559,11 +1553,6 @@ const avr8_base_device::interrupt_condition avr8_base_device::s_mega32u4_int_con
 	{ 0,             0,                      0,        0,                  0,        0, } // end of list
 };
 
-const avr8_base_device::interrupt_condition* atmega32u4_device::interrupt_conditions()
-{
-	return s_mega32u4_int_conditions;
-}
-
 bool atmega32u4_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const
 {
 	switch (port)
@@ -1597,16 +1586,6 @@ const avr8_base_device::interrupt_condition avr8_base_device::s_mega640_int_cond
 	{ 0,             0,                      0,        0,                  0,        0, } // end of list
 };
 
-const avr8_base_device::interrupt_condition* atmega1280_device::interrupt_conditions()
-{
-	return s_mega640_int_conditions;
-}
-
-const avr8_base_device::interrupt_condition* atmega2560_device::interrupt_conditions()
-{
-	return s_mega640_int_conditions;
-}
-
 const avr8_base_device::interrupt_condition avr8_base_device::s_mega644_int_conditions[avr8_base_device::INTIDX_COUNT] =
 {
 	//  irq id        vector                  irq reg   irq reg mask        flag reg  flag reg mask
@@ -1628,16 +1607,6 @@ const avr8_base_device::interrupt_condition avr8_base_device::s_mega644_int_cond
 	{ INTIDX_INT1,    ATMEGA644_INT_INT1,     EIMSK,    EIMSK_INT1_MASK,    EIFR,     EIFR_INTF1_MASK },
 	{ 0,              0,                      0,        0,                  0,        0, } // end of list
 };
-
-const avr8_base_device::interrupt_condition* atmega644_device::interrupt_conditions()
-{
-	return s_mega644_int_conditions;
-}
-
-const avr8_base_device::interrupt_condition* atmega1284_device::interrupt_conditions()
-{
-	return s_mega644_int_conditions;
-}
 
 bool atmega644_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const
 {
