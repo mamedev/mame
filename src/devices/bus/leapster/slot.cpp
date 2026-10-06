@@ -11,7 +11,7 @@
 DEFINE_DEVICE_TYPE(LEAPSTER_SLOT, leapster_slot_device, "leapster_slot", "LeapFrog Leapster Cartridge Slot")
 
 //**************************************************************************
-//    JAKKS GAMEKEY cartridges Interface
+//    LeapFrog Leapster cartridges Interface
 //**************************************************************************
 
 //-------------------------------------------------
