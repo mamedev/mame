@@ -120,6 +120,7 @@ mw-9.rom = ST M27C1001 / GFX
 #include "emu.h"
 
 #include "kabuki.h" // needed for decoding functions only
+#include "pkladies_decrypt.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74157.h"
@@ -337,9 +338,17 @@ public:
 	void pkladiesbl(machine_config &config);
 
 	void init_pkladiesbl();
+	void init_pkladiesbl_encrypted();
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<msm5205_device> m_msm;
+	memory_passthrough_handler m_decrypt_tap;
+	bool m_decrypt_prefix = false;
+	bool m_decrypt_unknown = false;
 
 	void io_map(address_map &map) ATTR_COLD;
 };
@@ -1747,6 +1756,20 @@ void mitchell_state::machine_start()
 	save_item(NAME(m_irq_source));
 }
 
+void pkladiesbl_state::machine_start()
+{
+	mitchell_state::machine_start();
+	save_item(NAME(m_decrypt_prefix));
+	save_item(NAME(m_decrypt_unknown));
+}
+
+void pkladiesbl_state::machine_reset()
+{
+	mitchell_state::machine_reset();
+	m_decrypt_prefix = false;
+	m_decrypt_unknown = false;
+}
+
 void spangbl_state::machine_start()
 {
 	m_soundbank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
@@ -2163,7 +2186,7 @@ ROM_END
 
 ROM_START( pkladiesbl )
 	ROM_REGION( 0x50000*2, "maincpu", 0 )
-	// only 1.ic112 is encrypted (only opcodes). Encryption scheme seems to involve XORs and bitswaps, based on addresses.
+	// 1.ic112: extra opcode encryption at 0x0100-0x3fff; address- and prefix-selected substitution tables.
 	ROM_LOAD( "1.ic112", 0x50000, 0x08000, CRC(ca4cfaf9) SHA1(97ad3c526e4494f347db45c986ba23aff07e6321) )
 	ROM_CONTINUE(0x00000,0x08000)
 	ROM_LOAD( "2.ic126", 0x60000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )
@@ -2197,7 +2220,7 @@ ROM_END
 
 ROM_START( pkladiesblu )  // uncensored encrypted bootleg. ROMs 1, 2, 3, 16 & 17 are identical to set pkladiesbl
 	ROM_REGION( 0x50000*2, "maincpu", 0 )
-	// only pklbu1.bin is encrypted (only opcodes). Encryption scheme seems to involve XORs and bitswaps, based on addresses.
+	// pklbu1.bin: extra opcode encryption at 0x0100-0x3fff; address- and prefix-selected substitution tables.
 	ROM_LOAD( "pklbu1.bin", 0x50000, 0x08000, CRC(ca4cfaf9) SHA1(97ad3c526e4494f347db45c986ba23aff07e6321) )
 	ROM_CONTINUE(0x00000,0x08000)
 	ROM_LOAD( "pklbu2.bin", 0x60000, 0x10000, CRC(5c73e9b6) SHA1(5fbfb4c79e2df8e1edd3f29ac63f9961dd3724b1) )
@@ -3228,6 +3251,42 @@ void pkladiesbl_state::init_pkladiesbl()
 	m_input_type = 0;
 	bootleg_decode();
 }
+
+// Experimental, ROM-inferred translation of the protected Z80's M1 fetches.
+// Ordinary operand/data accesses must retain the original ROM bytes. Upper ROM
+// and banked code already use the split opcode/data streams in bootleg_decode().
+// The tables are partial. Repeated prefixes and DD/FD-CB forms are unverified.
+// Debugger peeks leave the latch untouched and currently see encrypted bytes.
+void pkladiesbl_state::init_pkladiesbl_encrypted()
+{
+	init_pkladiesbl();
+	m_decrypt_tap = m_maincpu->space(AS_OPCODES).install_read_tap(
+		0x0000, 0xffff, "pkladies_experimental_decode",
+		[this] (offs_t address, u8 &data, u8 mem_mask)
+		{
+			if (machine().side_effects_disabled())
+				return;
+			if (address < 0x0100 || address >= 0x4000)
+			{
+				m_decrypt_prefix = false;
+				return;
+			}
+
+			const int plain = pkladies_decrypt::decode(address, data, m_decrypt_prefix);
+
+			if (plain < 0)
+			{
+				if (!m_decrypt_unknown)
+					osd_printf_warning("Poker Ladies: unknown opcode mapping at %04X, cipher=%02X, prefix=%d\n", address, data, m_decrypt_prefix);
+				m_decrypt_unknown = true;
+				m_decrypt_prefix = false;
+				return;
+			}
+			m_decrypt_prefix = !m_decrypt_prefix && (plain == 0xcb || plain == 0xdd || plain == 0xed || plain == 0xfd);
+			data = plain;
+		});
+}
+
 void mitchell_state::init_marukin()
 {
 	m_input_type = 1;
@@ -3297,55 +3356,55 @@ void mstworld_state::init_mstworld()
  *
  *************************************/
 
-GAME( 1988, mgakuen,     0,        mgakuen,    mgakuen,    mitchell_state,   init_mgakuen,    ROT0,   "Yuga",                      "Mahjong Gakuen", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, 7toitsu,     mgakuen,  mgakuen,    mgakuen,    mitchell_state,   init_mgakuen,    ROT0,   "Yuga",                      "Chi-Toitsu", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mgakuen,     0,        mgakuen,    mgakuen,    mitchell_state,   init_mgakuen,              ROT0,   "Yuga",                      "Mahjong Gakuen", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, 7toitsu,     mgakuen,  mgakuen,    mgakuen,    mitchell_state,   init_mgakuen,              ROT0,   "Yuga",                      "Chi-Toitsu",     MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, mgakuen2,    0,        marukin,    marukin,    mitchell_state,   init_mgakuen2,   ROT0,   "Face",                      "Mahjong Gakuen 2 Gakuen-chou no Fukushuu", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mgakuen2,    0,        marukin,    marukin,    mitchell_state,   init_mgakuen2,             ROT0,   "Face",                      "Mahjong Gakuen 2 Gakuen-chou no Fukushuu", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, pkladies,    0,        marukin,    pkladies,   mitchell_state,   init_pkladies,   ROT0,   "Mitchell",                  "Poker Ladies", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesl,   pkladies, marukin,    pkladies,   mitchell_state,   init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 510)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesla,  pkladies, marukin,    pkladies,   mitchell_state,   init_pkladies,   ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 401)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesbl,  pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, encrypted)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? need to figure out CPU 'decryption' / ordering
-GAME( 1989, pkladiesblu, pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Uncensored bootleg, encrypted)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? need to figure out CPU 'decryption' / ordering
-GAME( 1989, pkladiesbl2, pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, not encrypted)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? needs inputs, EEPROM (?), MSM5205 hook up, GFX fixes
+GAME( 1989, pkladies,    0,        marukin,    pkladies,   mitchell_state,   init_pkladies,             ROT0,   "Mitchell",                  "Poker Ladies",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesl,   pkladies, marukin,    pkladies,   mitchell_state,   init_pkladies,             ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 510)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesla,  pkladies, marukin,    pkladies,   mitchell_state,   init_pkladies,             ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 401)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesbl,  pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl_encrypted, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, encrypted)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // experimental partial opcode decoder
+GAME( 1989, pkladiesblu, pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl_encrypted, ROT0,   "bootleg",                   "Poker Ladies (Uncensored bootleg, encrypted)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // experimental partial opcode decoder
+GAME( 1989, pkladiesbl2, pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl,           ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, not encrypted)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? needs inputs, EEPROM (?), MSM5205 hook up, GFX fixes
 
-GAME( 1989, dokaben,     0,        pang,       pang,       mitchell_state,   init_dokaben,    ROT0,   "Capcom",                    "Dokaben (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dokaben,     0,        pang,       pang,       mitchell_state,   init_dokaben,              ROT0,   "Capcom",                    "Dokaben (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, dokaben2,    0,        pang,       pang,       mitchell_state,   init_dokaben,    ROT0,   "Capcom",                    "Dokaben 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dokaben2,    0,        pang,       pang,       mitchell_state,   init_dokaben,              ROT0,   "Capcom",                    "Dokaben 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, pang,        0,        pang,       pang,       mitchell_state,   init_pang,       ROT0,   "Mitchell",                  "Pang (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbros,       pang,     pang,       pang,       mitchell_state,   init_pang,       ROT0,   "Mitchell (Capcom license)", "Buster Bros. (USA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pompingw,    pang,     pang,       pang,       mitchell_state,   init_pang,       ROT0,   "Mitchell",                  "Pomping World (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangb,       pang,     pang,       pang,       mitchell_state,   init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangbold,    pang,     pang,       pang,       mitchell_state,   init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangba,      pang,     pangba,     pangdsw,    spangbl_state,    init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangb2,      pang,     pang,       pang,       mitchell_state,   init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangbb,      pang,     spangbl,    pangdsw,    spangbl_state,    init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 5)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangbp,      pang,     pang,       pang,       mitchell_state,   init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 6)", MACHINE_NOT_WORKING ) // Missing the contents of a battery backed RAM
-GAME( 1989, pangbc,      pang,     spangbl,    pangdsw,    spangbl_state,    init_pangb,      ROT0,   "bootleg",                   "Pang (bootleg, set 7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pang,        0,        pang,       pang,       mitchell_state,   init_pang,                 ROT0,   "Mitchell",                  "Pang (World)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbros,       pang,     pang,       pang,       mitchell_state,   init_pang,                 ROT0,   "Mitchell (Capcom license)", "Buster Bros. (USA)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pompingw,    pang,     pang,       pang,       mitchell_state,   init_pang,                 ROT0,   "Mitchell",                  "Pomping World (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangb,       pang,     pang,       pang,       mitchell_state,   init_pangb,                ROT0,   "bootleg",                   "Pang (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangbold,    pang,     pang,       pang,       mitchell_state,   init_pangb,                ROT0,   "bootleg",                   "Pang (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangba,      pang,     pangba,     pangdsw,    spangbl_state,    init_pangb,                ROT0,   "bootleg",                   "Pang (bootleg, set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangb2,      pang,     pang,       pang,       mitchell_state,   init_pangb,                ROT0,   "bootleg",                   "Pang (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangbb,      pang,     spangbl,    pangdsw,    spangbl_state,    init_pangb,                ROT0,   "bootleg",                   "Pang (bootleg, set 5)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangbp,      pang,     pang,       pang,       mitchell_state,   init_pangb,                ROT0,   "bootleg",                   "Pang (bootleg, set 6)", MACHINE_NOT_WORKING ) // Missing the contents of a battery backed RAM
+GAME( 1989, pangbc,      pang,     spangbl,    pangdsw,    spangbl_state,    init_pangb,                ROT0,   "bootleg",                   "Pang (bootleg, set 7)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, cworld,      0,        pang,       qtono1,     mitchell_state,   init_cworld,     ROT0,   "Capcom",                    "Capcom World (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cworld,      0,        pang,       qtono1,     mitchell_state,   init_cworld,               ROT0,   "Capcom",                    "Capcom World (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, hatena,      0,        pang,       qtono1,     mitchell_state,   init_hatena,     ROT0,   "Capcom",                    "Adventure Quiz 2 - Hatena? no Daibouken (Japan 900228)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hatena,      0,        pang,       qtono1,     mitchell_state,   init_hatena,               ROT0,   "Capcom",                    "Adventure Quiz 2 - Hatena? no Daibouken (Japan 900228)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, spang,       0,        pangnv,     pang,       mitchell_state,   init_spang,      ROT0,   "Mitchell",                  "Super Pang (World 900914)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, sbbros,      spang,    pangnv,     pang,       mitchell_state,   init_sbbros,     ROT0,   "Mitchell (Capcom license)", "Super Buster Bros. (USA 901001)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spangj,      spang,    pangnv,     pang,       mitchell_state,   init_spangj,     ROT0,   "Mitchell",                  "Super Pang (Japan 901023)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spangbl,     spang,    spangbl,    spangbl,    spangbl_state,    init_spangbl,    ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different sound hardware
-GAME( 1990, spangbl2,    spang,    spangbl,    spangbl,    spangbl_state,    init_spangbl,    ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg, set 2)", MACHINE_NOT_WORKING )
+GAME( 1990, spang,       0,        pangnv,     pang,       mitchell_state,   init_spang,                ROT0,   "Mitchell",                  "Super Pang (World 900914)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1990, sbbros,      spang,    pangnv,     pang,       mitchell_state,   init_sbbros,               ROT0,   "Mitchell (Capcom license)", "Super Buster Bros. (USA 901001)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spangj,      spang,    pangnv,     pang,       mitchell_state,   init_spangj,               ROT0,   "Mitchell",                  "Super Pang (Japan 901023)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spangbl,     spang,    spangbl,    spangbl,    spangbl_state,    init_spangbl,              ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different sound hardware
+GAME( 1990, spangbl2,    spang,    spangbl,    spangbl,    spangbl_state,    init_spangbl,              ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg, set 2)", MACHINE_NOT_WORKING )
 
-GAME( 1994, mstworld,    0,        mstworld,   mstworld,   mstworld_state,   init_mstworld,   ROT0,   "bootleg (TCH)",             "Monsters World (bootleg of Super Pang)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mstworld2,   mstworld, mstworld2,  mstworld2,  spangbl_state,    init_spangbl,    ROT0,   "bootleg",                   "Monsters World 2 (bootleg of Super Pang)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // GFX garbage at title screen with clean NVRAM
+GAME( 1994, mstworld,    0,        mstworld,   mstworld,   mstworld_state,   init_mstworld,             ROT0,   "bootleg (TCH)",             "Monsters World (bootleg of Super Pang)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mstworld2,   mstworld, mstworld2,  mstworld2,  spangbl_state,    init_spangbl,              ROT0,   "bootleg",                   "Monsters World 2 (bootleg of Super Pang)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // GFX garbage at title screen with clean NVRAM
 
-GAME( 1990, marukin,     0,        marukin,    marukin,    mitchell_state,   init_marukin,    ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 911128)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, marukina,    marukin,  marukin,    marukin,    mitchell_state,   init_marukin,    ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 901017)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, marukin,     0,        marukin,    marukin,    mitchell_state,   init_marukin,              ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 911128)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, marukina,    marukin,  marukin,    marukin,    mitchell_state,   init_marukin,              ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 901017)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, qtono1,      0,        pang,       qtono1,     mitchell_state,   init_qtono1,     ROT0,   "Capcom",                    "Quiz Tonosama no Yabou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, qtono1,      0,        pang,       qtono1,     mitchell_state,   init_qtono1,               ROT0,   "Capcom",                    "Quiz Tonosama no Yabou (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, qsangoku,    0,        pang,       qtono1,     mitchell_state,   init_qsangoku,   ROT0,   "Capcom",                    "Quiz Sangokushi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, qsangoku,    0,        pang,       qtono1,     mitchell_state,   init_qsangoku,             ROT0,   "Capcom",                    "Quiz Sangokushi (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, block,       0,        pangnv,     blockjoy,   mitchell_state,   init_block,      ROT270, "Capcom",                    "Block Block (World 911219 Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockr1,     block,    pangnv,     blockjoy,   mitchell_state,   init_block,      ROT270, "Capcom",                    "Block Block (World 911106 Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockr2,     block,    pangnv,     block,      mitchell_state,   init_block,      ROT270, "Capcom",                    "Block Block (World 910910)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockj,      block,    pangnv,     block,      mitchell_state,   init_block,      ROT270, "Capcom",                    "Block Block (Japan 910910)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockbl,     block,    pangnv,     block,      mitchell_state,   init_blockbl,    ROT270, "bootleg",                   "Block Block (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, block,       0,        pangnv,     blockjoy,   mitchell_state,   init_block,                ROT270, "Capcom",                    "Block Block (World 911219 Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockr1,     block,    pangnv,     blockjoy,   mitchell_state,   init_block,                ROT270, "Capcom",                    "Block Block (World 911106 Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockr2,     block,    pangnv,     block,      mitchell_state,   init_block,                ROT270, "Capcom",                    "Block Block (World 910910)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockj,      block,    pangnv,     block,      mitchell_state,   init_block,                ROT270, "Capcom",                    "Block Block (Japan 910910)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockbl,     block,    pangnv,     block,      mitchell_state,   init_blockbl,              ROT270, "bootleg",                   "Block Block (bootleg)",               MACHINE_SUPPORTS_SAVE )
