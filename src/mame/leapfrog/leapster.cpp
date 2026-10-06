@@ -195,9 +195,10 @@ PCB - LEAPSTER-TV:
 
 #include "emu.h"
 
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "bus/leapster/slot.h"
 #include "cpu/arcompact/arcompact.h"
+#include "machine/nvram.h"
+
 #include "leapster_a.h"
 
 #include "emupal.h"
@@ -216,6 +217,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
 		m_palette(*this, "palette"),
+		m_nvram(*this, "nvram"),
 		m_sound(*this, "leapster_snd"),
 		m_buttons(*this, "BUTTONS"),
 		m_touch(*this, {"TOUCHX", "TOUCHY", "TOUCH"})
@@ -266,7 +268,7 @@ private:
 	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+	//DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	TIMER_CALLBACK_MEMBER(leapster_timer_overflow);
 	TIMER_CALLBACK_MEMBER(leapster_touch_adc_update);
@@ -358,12 +360,13 @@ private:
 
 	uint32_t m_current_eeprom_command;
 
-	uint8_t m_system_eeprom[512];
+	std::unique_ptr<uint8_t[]> m_system_eeprom;
 	uint8_t m_cartridge_eeprom[2048];
 
 	required_device<arcompact_device> m_maincpu;
-	required_device<generic_slot_device> m_cart;
+	required_device<leapster_slot_device> m_cart;
 	required_device<palette_device> m_palette;
+	required_device<nvram_device> m_nvram;
 	required_device<leapster_snd_device> m_sound;
 
 	required_ioport m_buttons;
@@ -510,9 +513,10 @@ uint32_t leapster_state::leapster_1809004_r()
 
 uint32_t leapster_state::leapster_eeprom_r(uint32_t offset)
 {
-	if(offset == 2) {
+	if(offset == 2)
+	{
 		// This is really hacky and needs a better defined solution to identify the target bank
-		uint8_t *eepromBank = BIT(m_current_eeprom_command, 8, 8) == 0x26 ? m_system_eeprom : m_cartridge_eeprom;
+		uint8_t *eepromBank = BIT(m_current_eeprom_command, 8, 8) == 0x26 ? m_system_eeprom.get() : m_cartridge_eeprom;
 		return eepromBank[m_current_eeprom_command >> 16];
 	}
 
@@ -529,7 +533,7 @@ void leapster_state::leapster_eeprom_w(uint32_t offset, uint32_t data)
 		case 1:
 			if(data == 2)
 			{
-				uint8_t *eepromBank = BIT(m_current_eeprom_command, 8, 8) == 0x26 ? m_system_eeprom : m_cartridge_eeprom;
+				uint8_t *eepromBank = BIT(m_current_eeprom_command, 8, 8) == 0x26 ? m_system_eeprom.get() : m_cartridge_eeprom;
 				eepromBank[m_current_eeprom_command >> 16] = m_current_eeprom_command & 0xff;
 			}
 
@@ -947,6 +951,7 @@ uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rg
 	return 0;
 }
 
+/*
 DEVICE_IMAGE_LOAD_MEMBER( leapster_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
@@ -956,14 +961,23 @@ DEVICE_IMAGE_LOAD_MEMBER( leapster_state::cart_load )
 
 	return std::make_pair(std::error_condition(), std::string());
 }
+*/
 
 void leapster_state::machine_start()
 {
-	std::string region_tag;
-	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	printf("start\n");
 
-	if (m_cart_rom)
+	if (m_cart)
+		printf("m_cart is here\n");
+
+
+	// if there's a cart, override the standard banking
+	if (m_cart && m_cart->exists())
 	{
+		printf("cart\n");
+
+		std::string region_tag;
+		m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(LEAPSTER_ROM_REGION_TAG).c_str());
 		m_maincpu->space(AS_PROGRAM).install_rom(0x8000'0000, 0x8000'0000 + m_cart_rom->bytes() - 1, m_cart_rom->base());
 		m_cart_bit = 0;
 	}
@@ -976,9 +990,10 @@ void leapster_state::machine_start()
 
 	m_adc_timer = timer_alloc(FUNC(leapster_state::leapster_touch_adc_update), this);
 
-	memset(m_system_eeprom, 0, sizeof(m_system_eeprom));
-	memset(m_cartridge_eeprom, 0, sizeof(m_system_eeprom));
+	m_system_eeprom = make_unique_clear<uint8_t[]>(512);
+	m_nvram->set_base(m_system_eeprom.get(), 512);
 
+	memset(m_cartridge_eeprom, 0, sizeof(m_cartridge_eeprom));
 	save_item(NAME(m_1a_data));
 	save_item(NAME(m_1a_pointer));
 	save_item(NAME(m_timer_ticks));
@@ -1001,7 +1016,7 @@ void leapster_state::machine_start()
 	save_item(NAME(m_int_fired_flags));
 	save_item(NAME(m_int_enable));
 	save_item(NAME(m_current_eeprom_command));
-	save_item(NAME(m_system_eeprom));
+	save_pointer(NAME(m_system_eeprom), 512);
 	save_item(NAME(m_cartridge_eeprom));
 
 	m_sound->set_address_space(&m_maincpu->space());
@@ -1253,8 +1268,11 @@ void leapster_state::leapster(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 0x800).set_endianness(ENDIANNESS_BIG);
 
+	NVRAM(config, m_nvram);
+
 	// Cartridge
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "leapster_cart", "bin").set_device_load(FUNC(leapster_state::cart_load));
+	//LEAPSTER_CARTSLOT(config, "cartslot", leapster_cartslot_device, "leapster_cart", "bin");// .set_device_load(FUNC(leapster_state::cart_load));
+	LEAPSTER_SLOT(config, "cartslot", leapster_cart, nullptr);
 
 	// Software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("leapster");
