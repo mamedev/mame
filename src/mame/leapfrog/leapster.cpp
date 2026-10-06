@@ -354,6 +354,7 @@ private:
 	bool m_adc_fifo_empty;
 
 	bool m_touchscreen_initted;
+	uint32_t m_released_counter;
 
 	uint32_t m_int_fired_flags;
 	uint32_t m_int_enable = 0;
@@ -808,7 +809,8 @@ void leapster_state::leapster_dma_w(uint32_t offset, uint32_t data)
 {
 	switch (offset)
 	{
-		case 0: {
+		case 0:
+		{
 			if (data == 0x1b)
 			{
 				uint32_t dmaDst = 0x0300'0000 + m_framebuffer_base + m_dma_start_offset;
@@ -906,7 +908,8 @@ void leapster_state::leapster_timer_w(uint32_t offset, uint32_t data)
 
 	switch (BIT(offset, 2, 2))
 	{
-		case 0: { // Tick count
+		case 0:
+		{ // Tick count
 			m_timer_ticks[index] = data;
 			uint32_t ticks_until_overflow = data >= m_timer_max[index] ? 0 : m_timer_max[index] - data;
 			m_overflow_timer[index]->reset(attotime::from_ticks(ticks_until_overflow, 16'000'000));
@@ -915,7 +918,8 @@ void leapster_state::leapster_timer_w(uint32_t offset, uint32_t data)
 		case 1: // Control register
 			m_timer_control[index] = data;
 			break;
-		case 2: { // Max ticks
+		case 2:
+		{ // Max ticks
 			m_timer_max[index] = data;
 			m_timer_ticks[index] += m_overflow_timer[index]->elapsed().as_ticks(16'000'000);
 			uint32_t ticks_until_overflow = m_timer_ticks[index] >= data ? 0 : data - m_timer_ticks[index];
@@ -1008,6 +1012,7 @@ void leapster_state::machine_start()
 	save_item(NAME(m_adc_fifo_head));
 	save_item(NAME(m_adc_fifo_empty));
 	save_item(NAME(m_touchscreen_initted));
+	save_item(NAME(m_released_counter));
 	save_item(NAME(m_int_fired_flags));
 	save_item(NAME(m_int_enable));
 	save_item(NAME(m_current_eeprom_command));
@@ -1051,6 +1056,7 @@ void leapster_state::machine_reset()
 	m_adc_fifo_empty = true;
 
 	m_touchscreen_initted = false;
+	m_released_counter = 30;
 }
 
 void leapster_state::leapster_map(address_map &map)
@@ -1134,8 +1140,6 @@ TIMER_CALLBACK_MEMBER(leapster_state::leapster_timer_overflow)
 	}
 }
 
-uint32_t releasedCounter = 30;
-
 TIMER_CALLBACK_MEMBER(leapster_state::leapster_touch_adc_update)
 {
 	uint16_t pressure;
@@ -1145,12 +1149,13 @@ TIMER_CALLBACK_MEMBER(leapster_state::leapster_touch_adc_update)
 	adc_x = m_touch[0]->read();
 	adc_y = m_touch[1]->read();
 
-	if(!m_touch[2]->read()) {
+	if(!m_touch[2]->read())
+	{
 		pressure = 0x7FF;
 	}
 	else
 	{
-		releasedCounter = 0;
+		m_released_counter = 0;
 		pressure = 0;
 	}
 
