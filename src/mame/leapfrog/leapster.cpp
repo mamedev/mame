@@ -1059,11 +1059,11 @@ void leapster_state::leapster_map(address_map &map)
 
 	map(0x0180'0090, 0x0180'00ab).rw(FUNC(leapster_state::leapster_adc_r), FUNC(leapster_state::leapster_adc_w));
 
-	map(0x01801000, 0x01801003).r(FUNC(leapster_state::leapster_1801000_r));
-	map(0x01801004, 0x01801007).r(FUNC(leapster_state::leapster_1801004_r));
-	map(0x01801008, 0x0180100b).r(FUNC(leapster_state::leapster_1801008_r));
-	map(0x0180100c, 0x0180100f).r(FUNC(leapster_state::leapster_180100c_r));
-	map(0x01801018, 0x0180101b).r(FUNC(leapster_state::leapster_1801018_r));
+	map(0x0180'1000, 0x0180'1003).r(FUNC(leapster_state::leapster_1801000_r));
+	map(0x0180'1004, 0x0180'1007).r(FUNC(leapster_state::leapster_1801004_r));
+	map(0x0180'1008, 0x0180'100b).r(FUNC(leapster_state::leapster_1801008_r));
+	map(0x0180'100c, 0x0180'100f).r(FUNC(leapster_state::leapster_180100c_r));
+	map(0x0180'1018, 0x0180'101b).r(FUNC(leapster_state::leapster_1801018_r));
 
 	map(0x0180'004c, 0x0180'004f).r(FUNC(leapster_state::leapster_180004c_r));
 
@@ -1077,16 +1077,16 @@ void leapster_state::leapster_map(address_map &map)
 
 	map(0x0180'8800, 0x0180'881b).rw(FUNC(leapster_state::leapster_dma_r), FUNC(leapster_state::leapster_dma_w));
 
-	map(0x01809004, 0x01809007).r(FUNC(leapster_state::leapster_1809004_r));
-	map(0x01809008, 0x0180900b).rw(FUNC(leapster_state::leapster_cpu_clock_r), FUNC(leapster_state::leapster_cpu_clock_w));
+	map(0x0180'9004, 0x0180'9007).r(FUNC(leapster_state::leapster_1809004_r));
+	map(0x0180'9008, 0x0180'900b).rw(FUNC(leapster_state::leapster_cpu_clock_r), FUNC(leapster_state::leapster_cpu_clock_w));
 
-	map(0x0180b000, 0x0180b003).r(FUNC(leapster_state::leapster_180b000_r));
-	map(0x0180b004, 0x0180b007).r(FUNC(leapster_state::leapster_180b004_r));
-	map(0x0180b008, 0x0180b00b).r(FUNC(leapster_state::leapster_180b008_r));
+	map(0x0180'b000, 0x0180'b003).r(FUNC(leapster_state::leapster_180b000_r));
+	map(0x0180'b004, 0x0180'b007).r(FUNC(leapster_state::leapster_180b004_r));
+	map(0x0180'b008, 0x0180'b00b).r(FUNC(leapster_state::leapster_180b008_r));
 
 	map(0x0180'd000, 0x0180'd8ff).rw(FUNC(leapster_state::leapster_timer_r), FUNC(leapster_state::leapster_timer_w));
 
-	map(0x0180d514, 0x0180d517).r(FUNC(leapster_state::leapster_180d514_r));
+	map(0x0180'd514, 0x0180'd517).r(FUNC(leapster_state::leapster_180d514_r));
 
 	// VRAM, also used for stack prior to MQX boot
 	map(0x0300'0000, 0x0300'ffff).ram();
@@ -1096,8 +1096,8 @@ void leapster_state::leapster_map(address_map &map)
 	map(0x0301'0000, 0x0302'ffff).nopw();
 
 	map(0x3c00'0000, 0x3c1f'ffff).ram(); // Main memory
-	map(0x3c200000, 0x3fffffff).ram();
-	// map(0x80000000, 0x807fffff).bankr("cartrom"); // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
+	map(0x3c20'0000, 0x3fff'ffff).ram();
+	// map(0x8000'0000, 0x807f'ffff).bankr("cartrom"); // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
 }
 
 
@@ -1178,44 +1178,47 @@ INPUT_CHANGED_MEMBER(leapster_state::leapster_touch_down)
 {
 	if (m_touchscreen_initted && (m_adc_channel_control[0] & 0x8000))
 	{
-//      uint16_t adc_x;
-//      uint16_t adc_y;
-//
-//      // Movement without a touch down
-//      if (param && !m_touch[2]->read())
-//      {
-//          return;
-//      }
-//
-//      // Touch release
-//      if (!param && !newval)
-//      {
-//          adc_x = 0x7ff;
-//          adc_y = 0x7ff;
-//      }
-//      else
-//      {
-//          adc_x = m_touch[0]->read();
-//          adc_y = m_touch[0]->read();
-//      }
-//
-//      printf("Touch at %02X, %02X\n", m_touch[0]->read(), m_touch[1]->read());
-//
-//      adc_fifo_push(0, adc_x);
-//      adc_fifo_push(0, adc_y);
-//      adc_fifo_push(0, 0); // Unk
-//      adc_fifo_push(0, 0); // Unk
-//      adc_fifo_push(0, adc_x);
-//      adc_fifo_push(0, adc_y);
-//
-//      adc_fifo_push(0, adc_x);
-//      adc_fifo_push(0, adc_y);
-//      adc_fifo_push(0, 0); // Unk
-//      adc_fifo_push(0, 0); // Unk
-//      adc_fifo_push(0, adc_x);
-//      adc_fifo_push(0, adc_y);
-//
-//      fire_adc_interrupt();
+		if (0) // unused for now
+		{
+			uint16_t adc_x;
+			uint16_t adc_y;
+
+			// Movement without a touch down
+			if (param && !m_touch[2]->read())
+			{
+				return;
+			}
+
+			// Touch release
+			if (!param && !newval)
+			{
+				adc_x = 0x7ff;
+				adc_y = 0x7ff;
+			}
+			else
+			{
+				adc_x = m_touch[0]->read();
+				adc_y = m_touch[0]->read();
+			}
+
+			logerror("Touch at %02X, %02X\n", m_touch[0]->read(), m_touch[1]->read());
+
+			adc_fifo_push(0, adc_x);
+			adc_fifo_push(0, adc_y);
+			adc_fifo_push(0, 0); // Unk
+			adc_fifo_push(0, 0); // Unk
+			adc_fifo_push(0, adc_x);
+			adc_fifo_push(0, adc_y);
+
+			adc_fifo_push(0, adc_x);
+			adc_fifo_push(0, adc_y);
+			adc_fifo_push(0, 0); // Unk
+			adc_fifo_push(0, 0); // Unk
+			adc_fifo_push(0, adc_x);
+			adc_fifo_push(0, adc_y);
+
+			fire_adc_interrupt();
+		}
 	}
 }
 
