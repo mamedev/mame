@@ -111,6 +111,46 @@
 #define LOGREGS(...)   LOGMASKED(LOG_REGS,   __VA_ARGS__)
 #define LOGWINDOW(...) LOGMASKED(LOG_WINDOW, __VA_ARGS__)
 
+/*
+   Gaelco coin control with voltmeter used on Goldart machines.
+   Includes a two-digit 7-segment display, but no other detail is known.
+*/
+class goldart_coincontrol_device : public device_t
+{
+public:
+	goldart_coincontrol_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
+DEFINE_DEVICE_TYPE(GOLDART_COINCONTROL, goldart_coincontrol_device, "goldart_ctrl", "Gaelco Goldart Coin Control")
+
+goldart_coincontrol_device::goldart_coincontrol_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, GOLDART_COINCONTROL, tag, owner, clock)
+{ }
+
+void goldart_coincontrol_device::device_start()
+{
+}
+
+void goldart_coincontrol_device::device_reset()
+{
+}
+
+ROM_START(goldart_ctrl)
+	ROM_REGION( 0x2000, "mcu", ROMREGION_ERASE00 )
+	ROM_LOAD( "m-vg_17919_pic16c54.bin", 0x00000, 0x2000, CRC(9f27564b) SHA1(2a45188cbb6475a466c5813afb0eaabf070d90ec) )
+ROM_END
+
+const tiny_rom_entry *goldart_coincontrol_device::device_rom_region() const
+{
+	return ROM_NAME(goldart_ctrl);
+}
+
 
 namespace {
 
@@ -529,6 +569,9 @@ void goldart_state::goldart(machine_config &config)
 	OKIM6295(config, m_oki, 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->set_addrmap(0, &goldart_state::oki_map);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	// External coin control PCB
+	GOLDART_COINCONTROL(config, "coin_ctrl");
 }
 
 
