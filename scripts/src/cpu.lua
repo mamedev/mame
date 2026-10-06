@@ -1707,6 +1707,8 @@ if CPUS["MIPS3"] then
 		MAME_DIR .. "src/devices/cpu/mips/o2dprintf.hxx",
 		MAME_DIR .. "src/devices/cpu/mips/ps2vu.cpp",
 		MAME_DIR .. "src/devices/cpu/mips/ps2vu.h",
+		MAME_DIR .. "src/devices/cpu/mips/ps2vufloat.h",
+		MAME_DIR .. "src/devices/cpu/mips/ps2vupipeline.h",
 		MAME_DIR .. "src/devices/cpu/mips/ps2vif1.cpp",
 		MAME_DIR .. "src/devices/cpu/mips/ps2vif1.h",
 		MAME_DIR .. "src/devices/cpu/mips/r4000.cpp",
