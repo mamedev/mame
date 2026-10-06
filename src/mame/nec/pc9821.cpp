@@ -680,6 +680,7 @@ void pc9821_state::pc9821_map(address_map &map)
 	map(0x000e8000, 0x000fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 
 	map(0x00100000, 0x00efffff).rw("simm", FUNC(pc9801_61_simm_device::read_ext), FUNC(pc9801_61_simm_device::write_ext));
+	map(0x00f00000, 0x00f7ffff).rw("cbus", FUNC(pc98_cbus_root_device::mem_15m_r), FUNC(pc98_cbus_root_device::mem_15m_w));
 	map(0x00f00000, 0xffffffff).view(m_pegc_vram_view);
 	m_pegc_vram_view[0](0x00f00000, 0x00f7ffff).ram().share("ext_gvram");
 	m_pegc_vram_view[0](0xfff00000, 0xfff7ffff).ram().share("ext_gvram");
@@ -1320,11 +1321,29 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	// file bay with built-in CD-Rom (4x)
 	// HDD with pre-installed software (850MB, 1.2GB)
 
-	// C-Bus x 3
+	// "general purpose slot" x 3, 1 fitted (all PCI?)
 	// PC-9821CB-B04, on dedicated bus (Fax/Modem 14'400 bps) and IrDA board (115'200 bps)
 	// Optional PC-9821C3-B02 MIDI board, on dedicated bus
+
+	// TODO: config space not really provided, assume same as 3rd gen PCI
+	// Inited with 00 -> 06 -> 07 -> 05 order, which would match this arrangement
 	PCI_ROOT(config, "pci");
-	// ...
+//  WILDCAT_HOST(config, "pci:00.0", 0, "maincpu", 128*1024*1024);
+	// set_ids_host(0x10040007, xx, 0x00000000);
+
+	// 内蔵ｱｸｾﾗﾚｰﾀﾌﾞﾘｯﾁﾞ / built-in accelerator bridge according to undocumented mem
+//  PC98_VLBRIDGE(config, "pci:05.0", 0);
+	// set_ids(0x10330016, xx, 0x068000 or 0x030002, 0x10330016);
+
+	// Cバスブリッヂ
+//  PC98_CBUS_BRIDGE(config, "pci:06.0", 0);
+	// set_ids(0x10330001, xx, 0x068000, 0x10330001);
+
+	// 98ｸﾞﾗﾌｨｯｸｽ
+//  PC98_COREGRAPH(config, "pci:07.0", 0);
+	// set_ids(0x10330009, xx, 0x038000, 0x10330009);
+
+	// PCI slot(s) starts at 0xb
 }
 
 //void pc9821_mate_x_state::pc9821xs(machine_config &config)

@@ -288,6 +288,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 	m_rpm(0),
 	m_angular_speed(0),
 	m_revolution_count(0),
+	m_stopped_position(0),
 	m_cyl(0),
 	m_subcyl(0),
 	m_amplifier_freakout_time(attotime::from_usec(16)),
@@ -591,6 +592,7 @@ void floppy_image_device::device_start()
 	save_item(NAME(m_revolution_start_time));
 	save_item(NAME(m_rev_time));
 	save_item(NAME(m_revolution_count));
+	save_item(NAME(m_stopped_position));
 	save_item(NAME(m_cyl));
 	save_item(NAME(m_subcyl));
 	save_item(NAME(m_cache_start_time));
@@ -613,6 +615,7 @@ void floppy_image_device::device_reset()
 
 	m_revolution_start_time = attotime::never;
 	m_revolution_count = 0;
+	m_stopped_position = 0;
 	m_mon = 1;
 	set_ready(true);
 	if(m_motor_always_on && m_image)
@@ -660,6 +663,7 @@ void floppy_image_device::init_floppy_load(bool write_supported)
 	m_write_transition_times.clear();
 	m_revolution_start_time = m_mon ? attotime::never : machine().time();
 	m_revolution_count = 0;
+	m_stopped_position = 0;
 
 	index_resync(0);
 
@@ -830,7 +834,7 @@ void floppy_image_device::mon_w(int state)
 	/* off -> on */
 	if (!m_mon && m_image)
 	{
-		m_revolution_start_time = machine().time();
+		m_revolution_start_time = position_to_time(machine().time(), -int(m_stopped_position));
 		cache_clear();
 		if (m_motor_always_on) {
 			// Drives with motor that is always spinning are immediately ready when a disk is loaded
@@ -844,6 +848,11 @@ void floppy_image_device::mon_w(int state)
 
 	/* on -> off */
 	else {
+		if (!m_revolution_start_time.is_never())
+		{
+			attotime base;
+			m_stopped_position = find_position(base, machine().time());
+		}
 		if(m_image_dirty)
 			commit_image();
 		cache_clear();

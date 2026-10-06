@@ -234,4 +234,4 @@ DECLARE_DEVICE_TYPE_NS(MSYSTEMS_HLE_SERIAL_MOUSE,  bus::rs232, hle_msystems_mous
 DECLARE_DEVICE_TYPE_NS(ROTATABLE_HLE_SERIAL_MOUSE, bus::rs232, hle_rotatable_mouse_device)
 DECLARE_DEVICE_TYPE_NS(SGI_HLE_SERIAL_MOUSE,       bus::rs232, hle_sgi_mouse_device)
 
-#endif // MAME_BUS_RS232_SER_MOUSE_H
+#endif // MAME_BUS_RS232_HLEMOUSE_H

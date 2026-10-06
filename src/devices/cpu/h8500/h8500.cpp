@@ -190,7 +190,6 @@ u8 h8500_device::read_imm8()
 	if (!access_to_be_redone_noclear()) {
 		m_pc = (m_pc + 1) & 0xffff;
 	}
-	internal(1);
 	return val;
 }
 
@@ -296,7 +295,40 @@ u32 h8500_device::ea_addr()
 
 	m_ea_addr_cache = addr;
 	m_ea_addr_cached = true;
+	internal(ea_overhead());
 	return addr;
+}
+
+// Instruction execution cycles (H8/520 Hardware Manual table A-7, which applies to the whole
+// H8/500 family) for a 16-bit 2-state bus: on top of the instruction's own bytes and its operand
+// accesses, a memory operand takes 2 more states for @Rn and @-Rn, 3 for @Rn+, and 1 for the
+// displacement and absolute modes.
+int h8500_device::ea_overhead() const
+{
+	const u8 ea = m_ir[0];
+	int states;
+	switch (ea & 0xf0) {
+	case 0xb0: case 0xd0: states = 2; break;   // @-Rn, @Rn
+	case 0xc0: states = 3; break;              // @Rn+
+	default: states = 1; break;                // @(d:8,Rn), @(d:16,Rn), @aa:8, @aa:16
+	}
+	return states + ea_align();
+}
+
+// Table A-8 (b): one more state for some addressing modes, depending on whether the instruction
+// starts at an even or an odd address
+int h8500_device::ea_align() const
+{
+	const u8 ea = m_ir[0];
+	const bool odd = BIT(m_ppc, 0);
+	switch (ea & 0xf0) {
+	case 0xb0: case 0xc0: case 0xd0: case 0xf0: return odd ? 0 : 1;   // @-Rn, @Rn+, @Rn, @(d:16,Rn)
+	case 0xe0: return odd ? 1 : 0;                                      // @(d:8,Rn)
+	default:
+		if (ea == 0x15 || ea == 0x1d) return odd ? 0 : 1;               // @aa:16
+		if (ea == 0x05 || ea == 0x0d) return odd ? 1 : 0;               // @aa:8
+		return 0;
+	}
 }
 
 void h8500_device::ea_commit()

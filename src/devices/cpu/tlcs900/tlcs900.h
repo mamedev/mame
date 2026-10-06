@@ -77,12 +77,12 @@ protected:
 	int m_am8_16;
 	address_space_config m_program_config;
 
-	uint8_t RDMEM(offs_t addr) { return m_program->read_byte( addr ); }
-	uint16_t RDMEMW(offs_t addr) { return m_program->read_word_unaligned( addr ); }
-	uint32_t RDMEML(offs_t addr) { return m_program->read_dword_unaligned( addr ); }
-	void WRMEM(offs_t addr, uint8_t data) { m_program->write_byte( addr, data ); }
-	void WRMEMW(offs_t addr,uint16_t data) { m_program->write_word_unaligned( addr, data ); }
-	void WRMEML(offs_t addr,uint32_t data) { m_program->write_dword_unaligned( addr, data ); }
+	uint8_t RDMEM(offs_t addr) { return m_program->read_byte(addr); }
+	uint16_t RDMEMW(offs_t addr) { return m_program->read_word_unaligned(addr); }
+	uint32_t RDMEML(offs_t addr) { return m_program->read_dword_unaligned(addr); }
+	void WRMEM(offs_t addr, uint8_t data) { m_program->write_byte(addr, data); }
+	void WRMEMW(offs_t addr,uint16_t data) { m_program->write_word_unaligned(addr, data); }
+	void WRMEML(offs_t addr,uint32_t data) { m_program->write_dword_unaligned(addr, data); }
 
 	/* registers */
 	PAIR    m_xwa[4];
@@ -183,7 +183,7 @@ protected:
 	/* Bump INTNEST.  Called where a device pushes the SR/PC frame that op_RETI
 	   will later unwind.  NMI counts, because it pushes and unwinds the same way;
 	   SWI/TRAP do not, because they need not return through RETI. */
-	void tlcs900_intnest_accept() { if ( m_intnest < 0xffff ) m_intnest++; }
+	void tlcs900_intnest_accept() { if (m_intnest < 0xffff) m_intnest++; }
 
 	virtual void tlcs900_check_hdma() = 0;
 	virtual void tlcs900_check_irqs() = 0;
@@ -205,71 +205,71 @@ protected:
 	virtual int tlcs900_djnz_true_cycles() const { return 4; }
 	virtual int tlcs900_shift_cycles(uint8_t n) const { return 2 * n; }
 
-	int condition_true( uint8_t cond );
-	uint8_t *get_reg8_current( uint8_t reg );
-	uint16_t *get_reg16_current( uint8_t reg );
-	uint32_t *get_reg32_current( uint8_t reg );
-	PAIR *get_reg( uint8_t reg );
-	uint8_t *get_reg8( uint8_t reg );
-	uint16_t *get_reg16( uint8_t reg );
-	uint32_t *get_reg32( uint8_t reg );
-	void parity8( uint8_t a );
-	void parity16( uint16_t a );
-	void parity32( uint32_t a );
-	uint8_t adc8( uint8_t a, uint8_t b);
-	uint16_t adc16( uint16_t a, uint16_t b);
-	uint32_t adc32( uint32_t a, uint32_t b);
-	uint8_t add8( uint8_t a, uint8_t b);
-	uint16_t add16( uint16_t a, uint16_t b);
-	uint32_t add32( uint32_t a, uint32_t b);
-	uint8_t sbc8( uint8_t a, uint8_t b);
-	uint16_t sbc16( uint16_t a, uint16_t b);
-	uint32_t sbc32( uint32_t a, uint32_t b);
-	uint8_t sub8( uint8_t a, uint8_t b);
-	uint16_t sub16( uint16_t a, uint16_t b);
-	uint32_t sub32( uint32_t a, uint32_t b);
-	uint8_t and8( uint8_t a, uint8_t b);
-	uint16_t and16( uint16_t a, uint16_t b);
-	uint32_t and32( uint32_t a, uint32_t b);
-	uint8_t or8( uint8_t a, uint8_t b);
-	uint16_t or16( uint16_t a, uint16_t b);
-	uint32_t or32( uint32_t a, uint32_t b);
-	uint8_t xor8( uint8_t a, uint8_t b);
-	uint16_t xor16( uint16_t a, uint16_t b);
-	uint32_t xor32( uint32_t a, uint32_t b);
-	void ldcf8( uint8_t a, uint8_t b );
-	void ldcf16( uint8_t a, uint16_t b );
-	void andcf8( uint8_t a, uint8_t b );
-	void andcf16( uint8_t a, uint16_t b );
-	void orcf8( uint8_t a, uint8_t b );
-	void orcf16( uint8_t a, uint16_t b );
-	void xorcf8( uint8_t a, uint8_t b );
-	void xorcf16( uint8_t a, uint16_t b );
-	uint8_t rl8( uint8_t a, uint8_t s );
-	uint16_t rl16( uint16_t a, uint8_t s );
-	uint32_t rl32( uint32_t a, uint8_t s );
-	uint8_t rlc8( uint8_t a, uint8_t s );
-	uint16_t rlc16( uint16_t a, uint8_t s );
-	uint32_t rlc32( uint32_t a, uint8_t s );
-	uint8_t rr8( uint8_t a, uint8_t s );
-	uint16_t rr16( uint16_t a, uint8_t s );
-	uint32_t rr32( uint32_t a, uint8_t s );
-	uint8_t rrc8( uint8_t a, uint8_t s );
-	uint16_t rrc16( uint16_t a, uint8_t s );
-	uint32_t rrc32( uint32_t a, uint8_t s );
-	uint8_t sla8( uint8_t a, uint8_t s );
-	uint16_t sla16( uint16_t a, uint8_t s );
-	uint32_t sla32( uint32_t a, uint8_t s );
-	uint8_t sra8( uint8_t a, uint8_t s );
-	uint16_t sra16( uint16_t a, uint8_t s );
-	uint32_t sra32( uint32_t a, uint8_t s );
-	uint8_t srl8( uint8_t a, uint8_t s );
-	uint16_t srl16( uint16_t a, uint8_t s );
-	uint32_t srl32( uint32_t a, uint8_t s );
-	uint16_t div8( uint16_t a, uint8_t b );
-	uint32_t div16( uint32_t a, uint16_t b );
-	uint16_t divs8( int16_t a, int8_t b );
-	uint32_t divs16( int32_t a, int16_t b );
+	int condition_true(uint8_t cond);
+	uint8_t *get_reg8_current(uint8_t reg);
+	uint16_t *get_reg16_current(uint8_t reg);
+	uint32_t *get_reg32_current(uint8_t reg);
+	PAIR *get_reg(uint8_t reg);
+	uint8_t *get_reg8(uint8_t reg);
+	uint16_t *get_reg16(uint8_t reg);
+	uint32_t *get_reg32(uint8_t reg);
+	void parity8(uint8_t a);
+	void parity16(uint16_t a);
+	void parity32(uint32_t a);
+	uint8_t adc8(uint8_t a, uint8_t b);
+	uint16_t adc16(uint16_t a, uint16_t b);
+	uint32_t adc32(uint32_t a, uint32_t b);
+	uint8_t add8(uint8_t a, uint8_t b);
+	uint16_t add16(uint16_t a, uint16_t b);
+	uint32_t add32(uint32_t a, uint32_t b);
+	uint8_t sbc8(uint8_t a, uint8_t b);
+	uint16_t sbc16(uint16_t a, uint16_t b);
+	uint32_t sbc32(uint32_t a, uint32_t b);
+	uint8_t sub8(uint8_t a, uint8_t b);
+	uint16_t sub16(uint16_t a, uint16_t b);
+	uint32_t sub32(uint32_t a, uint32_t b);
+	uint8_t and8(uint8_t a, uint8_t b);
+	uint16_t and16(uint16_t a, uint16_t b);
+	uint32_t and32(uint32_t a, uint32_t b);
+	uint8_t or8(uint8_t a, uint8_t b);
+	uint16_t or16(uint16_t a, uint16_t b);
+	uint32_t or32(uint32_t a, uint32_t b);
+	uint8_t xor8(uint8_t a, uint8_t b);
+	uint16_t xor16(uint16_t a, uint16_t b);
+	uint32_t xor32(uint32_t a, uint32_t b);
+	void ldcf8(uint8_t a, uint8_t b);
+	void ldcf16(uint8_t a, uint16_t b);
+	void andcf8(uint8_t a, uint8_t b);
+	void andcf16(uint8_t a, uint16_t b);
+	void orcf8(uint8_t a, uint8_t b);
+	void orcf16(uint8_t a, uint16_t b);
+	void xorcf8(uint8_t a, uint8_t b);
+	void xorcf16(uint8_t a, uint16_t b);
+	uint8_t rl8(uint8_t a, uint8_t s);
+	uint16_t rl16(uint16_t a, uint8_t s);
+	uint32_t rl32(uint32_t a, uint8_t s);
+	uint8_t rlc8(uint8_t a, uint8_t s);
+	uint16_t rlc16(uint16_t a, uint8_t s);
+	uint32_t rlc32(uint32_t a, uint8_t s);
+	uint8_t rr8(uint8_t a, uint8_t s);
+	uint16_t rr16(uint16_t a, uint8_t s);
+	uint32_t rr32(uint32_t a, uint8_t s);
+	uint8_t rrc8(uint8_t a, uint8_t s);
+	uint16_t rrc16(uint16_t a, uint8_t s);
+	uint32_t rrc32(uint32_t a, uint8_t s);
+	uint8_t sla8(uint8_t a, uint8_t s);
+	uint16_t sla16(uint16_t a, uint8_t s);
+	uint32_t sla32(uint32_t a, uint8_t s);
+	uint8_t sra8(uint8_t a, uint8_t s);
+	uint16_t sra16(uint16_t a, uint8_t s);
+	uint32_t sra32(uint32_t a, uint8_t s);
+	uint8_t srl8(uint8_t a, uint8_t s);
+	uint16_t srl16(uint16_t a, uint8_t s);
+	uint32_t srl32(uint32_t a, uint8_t s);
+	uint16_t div8(uint16_t a, uint8_t b);
+	uint32_t div16(uint32_t a, uint16_t b);
+	uint16_t divs8(int16_t a, int8_t b);
+	uint32_t divs16(int32_t a, int16_t b);
 	void op_ADCBMI();
 	void op_ADCBMR();
 	void op_ADCBRI();

@@ -467,7 +467,7 @@ void saturn_scu_device::trigger_dma_direct(uint8_t level)
 		m_dma[level].src_add, m_dma[level].dst_add, m_dma[level].rup ? "RUP" : "", m_dma[level].wup ? "WUP" : "");
 
 	// stv:vmahjong loads game IPL twice at startup, one with cache the other without.
-	if (m_dma_status & 0x30 << level)
+	if (m_dma_status & 0x30 << (level * 4))
 	{
 		LOG("In-flight DMA%d attempt!\n", level);
 		return;
@@ -537,7 +537,7 @@ void saturn_scu_device::trigger_dma_indirect(uint8_t level)
 	LOGMASKED(LOG_DMA_MOVE, "DMA%d indirect W %08x RA %d WA %d\n",
 		level, m_dma[level].dst, m_dma[level].src_add, m_dma[level].dst_add);
 
-	if (m_dma_status & 0x30 << level)
+	if (m_dma_status & 0x30 << (level * 4))
 	{
 		LOG("In-flight DMA%d attempt!\n", level);
 		return;

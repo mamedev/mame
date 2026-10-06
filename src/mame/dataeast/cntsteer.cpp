@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail,Pierpaolo Prazzoli, David Haywood, Angelo Salese
+// copyright-holders:Bryan McPhail,Pierpaolo Prazzoli, David Haywood, Angelo Salese, R. Belmont
 /**************************************************************************************
 
     Counter Steer                   (c) 1985 Data East Corporation
@@ -7,34 +7,21 @@
     Gekitsui Oh                     (c) 1985 Data East Corporation
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
-    Improvements by Pierpaolo Prazzoli, David Haywood, Angelo Salese
+    Improvements by Pierpaolo Prazzoli, David Haywood, Angelo Salese, R. Belmont
 
     todo:
     both games
-        - correct ROZ rotation (single register that controls both);
         - flip screen support;
-        - according to a side-by-side test, sound should be "darker" by some octaves,
-          likely that a sound filter is needed;
-        - tilemap paging may be wrong
-          Maybe upper scroll bits also controls startdx/dy?
+        - verify sound clocks and analogue filtering against PCB recordings;
     zerotrgt:
-        - ROZ is misaligned in attract mode ranking (should be X +576 not -576)
-        - ROZ doesn't align with tanks in stage 2 (red circles should follow them)
+        - verify ROZ rotation/scale and scroll-register decoding;
+        - verify alignment of the stage 2 tank sprites with the background target circles;
     cntsteer:
-        - In Back Rotate Test, rotation is tested with the following arrangement
-          (upper bits of rotation parameter):
-          04 -> 05 -> 02 -> 03 -> 00 -> 01 -> 06 -> 07 -> 04 and backwards
-          Anything with bit 0 set is tested from 0xff to 0, with bit 0 clear that's 0 -> 0xff, fun.
-        - scrolling goes backwards on gameplay;
-        - tilemap should flash when gameplay timer is running out;
-        - understand why background mirroring causes wrong gfxs at end of title screen sequence.
-          Uses $2000-$2fff and should just draw the same USA flag as the ones shown at start of the
-          sequence;
-        - color decoding slightly off, needs resnet;
-        - Understand how irq communication works between CPUs. Buffer $415-6 seems involved in the
-          protocol.
-          We currently have slave CPU irq hooked up to vblank, might or might not be correct.
-        - sound keeps ringing once it start executing SOUND TEST;
+        - verify background flashing when the gameplay timer is running out;
+        - determine palette resistor weights;
+        - investigate sustained sound in SOUND TEST;
+        - looks too easy and fast, downclocking both 6809 to half clock makes it more reasonable,
+          missing halt/bus grant really?
     cleanup
         - split state objects, consider using composable devices rather than inherit one with the
           other (has HMC20 + VSC30 custom chips);
@@ -55,6 +42,7 @@
 #include "tilemap.h"
 
 #include <numbers>
+#include <utility>
 
 
 namespace {
@@ -73,7 +61,8 @@ public:
 		m_subcpu(*this, "subcpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_throttle(*this, "AN_THROTTLE")
 	{ }
 
 	/* memory pointers */
@@ -107,6 +96,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	optional_ioport m_throttle;
 
 	void zerotrgt_vregs_w(offs_t offset, uint8_t data);
 	void cntsteer_vregs_w(offs_t offset, uint8_t data);
@@ -114,14 +104,16 @@ public:
 	void cntsteer_foreground_attr_w(offs_t offset, uint8_t data);
 	void cntsteer_background_w(offs_t offset, uint8_t data);
 	uint8_t cntsteer_background_mirror_r(offs_t offset);
+	void cntsteer_background_mirror_w(offs_t offset, uint8_t data);
 	void gekitsui_sub_irq_ack(uint8_t data);
 	void zerotrgt_ctrl_w(offs_t offset, uint8_t data);
 	void cntsteer_sub_irq_w(uint8_t data);
-	void cntsteer_sub_nmi_w(uint8_t data);
+	void cntsteer_main_irq_ack(uint8_t data);
 	void cntsteer_main_irq_w(uint8_t data);
 	uint8_t cntsteer_adx_r();
 	void nmimask_w(uint8_t data);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	ioport_value throttle_r();
 	void init_zerotrgt();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -135,7 +127,6 @@ public:
 	void zerotrgt_palette(palette_device &palette) const;
 	uint32_t screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void subcpu_vblank_irq(int state);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	void zerotrgt_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cntsteer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -171,12 +162,12 @@ void cntsteer_state::zerotrgt_palette(palette_device &palette) const
 	{
 		int bit0, bit1, bit2;
 
-		// red component
+		// green component
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		int const g = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
-		// green component
+		// red component
 		bit0 = (color_prom[i] >> 4) & 0x01;
 		bit1 = (color_prom[i] >> 5) & 0x01;
 		bit2 = (color_prom[i] >> 6) & 0x01;
@@ -210,7 +201,7 @@ TILE_GET_INFO_MEMBER(cntsteer_state::get_fg_tile_info)
 
 VIDEO_START_MEMBER(cntsteer_state,cntsteer)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cntsteer_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cntsteer_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cntsteer_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS_FLIP_X, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
@@ -229,7 +220,7 @@ VIDEO_START_MEMBER(cntsteer_state,zerotrgt)
 }
 
 /*
-Sprite list:
+Zero Target sprite list:
 
 [0] xxxx xxxx Y attribute
 [1] xx-- ---- sprite number bank
@@ -292,7 +283,9 @@ void cntsteer_state::zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 /*
 [00] --x- ---- magnify
      ---x ---- double height
-     ---- -x-- flipy
+     ---- -x-- flip x
+     ---- --x- flip y
+     ---- ---x draw sprite (active high)
 
 [80] -xxx ---- palette entry
      ---- --xx upper tile bank
@@ -382,7 +375,7 @@ uint32_t cntsteer_state::screen_update_zerotrgt(screen_device &screen, bitmap_in
 		p3 = 65536 * 1 * sin(2 * PI * (rot_val) / 1024);
 		p4 = -65536 * 1 * cos(2 * PI * (rot_val) / 1024);
 
-		x = -256 - (m_scrollx | m_scrollx_hi);
+		x = 256 + (m_scrollx | m_scrollx_hi);
 		y = 256 + (m_scrolly | m_scrolly_hi);
 
 		m_bg_tilemap->draw_roz(screen, bitmap, cliprect,
@@ -405,38 +398,38 @@ uint32_t cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_in
 		bitmap.fill(m_palette->pen(8 * m_bg_color_bank), cliprect);
 	else
 	{
-		int p1, p2, p3, p4;
-		int rot_val, x, y;
+		// The rotation register is a fractional pixel increment, not an angle.
+		// One axis always advances by a whole pixel, so the scale decreases
+		// towards the diagonals.  The control bits select the eight octants.
+		int incxx = 0x10000;
+		int incxy = m_rotation_x * 0x100;
+		if (!BIT(m_rotation_sign, 0))
+			incxy = -incxy;
+		if (BIT(m_rotation_sign, 1))
+		{
+			std::swap(incxx, incxy);
+			incxy = -incxy;
+		}
+		if (BIT(m_rotation_sign, 2))
+		{
+			incxx = -incxx;
+			incxy = -incxy;
+		}
 
-		rot_val = (m_rotation_x) | ((m_rotation_sign & 3) << 8);
-		rot_val = (m_rotation_sign & 4) ? (rot_val) : (-rot_val);
-//      popmessage("%d %02x %02x", rot_val, m_rotation_sign, m_rotation_x);
+		// Both scroll coordinates exchange axes with the rotation.
+		int scrollx = m_scrollx | m_scrollx_hi;
+		int scrolly = m_scrolly | m_scrolly_hi;
+		if (BIT(m_rotation_sign, 1))
+			std::swap(scrollx, scrolly);
 
-		/*
-		(u, v) = (a + cx + dy, b - dx + cy) when (x, y)=screen and (u, v) = tilemap
-		*/
-		/*
-		     1
-		0----|----0
-		    -1
-		     0
-		0----|----1
-		     0
-		*/
-		/*65536*z*cos(a), 65536*z*sin(a), -65536*z*sin(a), 65536*z*cos(a)*/
-		constexpr double PI = std::numbers::pi;
-		p1 = -65536 * 1 * cos(2 * PI * (rot_val) / 1024);
-		p2 = -65536 * 1 * sin(2 * PI * (rot_val) / 1024);
-		p3 = 65536 * 1 * sin(2 * PI * (rot_val) / 1024);
-		p4 = -65536 * 1 * cos(2 * PI * (rot_val) / 1024);
-
-		x = 256 + (m_scrollx | m_scrollx_hi);
-		y = 256 - (m_scrolly | m_scrolly_hi);
+		// Anchor the transform at screen (256, 256), then apply scrolling.
+		int const startx = scrollx * 0x10000 - 256 * (incxx - incxy);
+		int const starty = scrolly * 0x10000 - 256 * (incxy + incxx);
 
 		m_bg_tilemap->draw_roz(screen, bitmap, cliprect,
-						(x << 16), (y << 16),
-						p1, p2,
-						p3, p4,
+						startx, starty,
+						incxx, incxy,
+						-incxy, incxx,
 						1,
 						0, 0);
 	}
@@ -448,6 +441,8 @@ uint32_t cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_in
 }
 
 /*
+Zero Target video registers (current decoding):
+
 [0] = scroll y
 [1] = scroll x
 [2] = -x-- ---- disable roz layer (Used when you lose a life / start a new play)
@@ -457,7 +452,7 @@ uint32_t cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_in
       --xx ---- high word scrolling y bits
       ---- -x-- flip screen bit (inverted)
       ---- ---x rotation sign (landscape should be turning right (0) == / , turning left (1) == \)
-[4] = xxxx xxxx rotation factor?
+[4] = xxxx xxxx rotation magnitude (hardware transfer function unverified)
 */
 void cntsteer_state::zerotrgt_vregs_w(offs_t offset, uint8_t data)
 {
@@ -528,13 +523,17 @@ void cntsteer_state::cntsteer_background_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-/* checks area $2000-$2fff with this address config. */
+// The $2000-$2fff window exchanges the row and column address lines on
+// both reads and writes. POST checks this against the linear $1000 window.
 uint8_t cntsteer_state::cntsteer_background_mirror_r(offs_t offset)
 {
 	return m_videoram2[bitswap<16>(offset,15,14,13,12,5,4,3,2,1,0,11,10,9,8,7,6)];
 }
 
-// TODO: $2000-$2fff on write most likely also selects the alt rotated tiles at 0x1**/0x3**
+void cntsteer_state::cntsteer_background_mirror_w(offs_t offset, uint8_t data)
+{
+	cntsteer_background_w(bitswap<16>(offset,15,14,13,12,5,4,3,2,1,0,11,10,9,8,7,6), data);
+}
 
 /*************************************
  *
@@ -560,14 +559,14 @@ void cntsteer_state::zerotrgt_ctrl_w(offs_t offset, uint8_t data)
 
 void cntsteer_state::cntsteer_sub_irq_w(uint8_t data)
 {
-	//m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-//  printf("%02x IRQ\n", data);
+	// The main CPU posts a command at shared RAM $0415, then interrupts
+	// the sub CPU. Gameplay waits for the reply before continuing.
+	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-void cntsteer_state::cntsteer_sub_nmi_w(uint8_t data)
+void cntsteer_state::cntsteer_main_irq_ack(uint8_t data)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-//  popmessage("%02x", data);
 }
 
 void cntsteer_state::cntsteer_main_irq_w(uint8_t data)
@@ -576,6 +575,7 @@ void cntsteer_state::cntsteer_main_irq_w(uint8_t data)
 }
 
 /* Convert weird input handling with MAME standards.*/
+// TODO: convert to IPT_POSITIONAL
 uint8_t cntsteer_state::cntsteer_adx_r()
 {
 	uint8_t res = 0, adx_val;
@@ -642,7 +642,7 @@ void cntsteer_state::cntsteer_cpu1_map(address_map &map)
 	map(0x1000, 0x11ff).ram().share("spriteram");
 	map(0x2000, 0x23ff).ram().w(FUNC(cntsteer_state::cntsteer_foreground_vram_w)).share("videoram");
 	map(0x2400, 0x27ff).ram().w(FUNC(cntsteer_state::cntsteer_foreground_attr_w)).share("colorram");
-	map(0x3000, 0x3000).w(FUNC(cntsteer_state::cntsteer_sub_nmi_w));
+	map(0x3000, 0x3000).w(FUNC(cntsteer_state::cntsteer_main_irq_ack));
 	map(0x3001, 0x3001).w(FUNC(cntsteer_state::cntsteer_sub_irq_w));
 	map(0x8000, 0xffff).rom();
 }
@@ -651,7 +651,7 @@ void cntsteer_state::cntsteer_cpu2_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("share1");
 	map(0x1000, 0x1fff).ram().w(FUNC(cntsteer_state::cntsteer_background_w)).share("videoram2");
-	map(0x2000, 0x2fff).rw(FUNC(cntsteer_state::cntsteer_background_mirror_r), FUNC(cntsteer_state::cntsteer_background_w));
+	map(0x2000, 0x2fff).rw(FUNC(cntsteer_state::cntsteer_background_mirror_r), FUNC(cntsteer_state::cntsteer_background_mirror_w));
 	map(0x3000, 0x3000).portr("DSW0");
 	map(0x3001, 0x3001).r(FUNC(cntsteer_state::cntsteer_adx_r));
 	map(0x3002, 0x3002).portr("P1");
@@ -668,19 +668,6 @@ void cntsteer_state::cntsteer_cpu2_map(address_map &map)
 void cntsteer_state::nmimask_w(uint8_t data)
 {
 	m_nmimask = data & 0x80;
-}
-
-void cntsteer_state::subcpu_vblank_irq(int state)
-{
-	// TODO: hack for bus request: DP is enabled with 0xff only during POST, and disabled once that critical operations are performed.
-	//       That's my best guess so far about how Slave is supposed to stop execution on Master CPU, the lack of any realistic write
-	//       between these operations brings us to this.
-	//       Game currently returns error on MIX CPU RAM because halt-ing BACK CPU doesn't happen when it should of course ...
-//  uint8_t dp_r = (uint8_t)m_subcpu->state_int(M6809_DP);
-//  m_maincpu->set_input_line(INPUT_LINE_HALT, dp_r ? ASSERT_LINE : CLEAR_LINE);
-
-	if (state)
-		m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(cntsteer_state::sound_interrupt)
@@ -777,9 +764,19 @@ INPUT_CHANGED_MEMBER(cntsteer_state::coin_inserted)
 	m_subcpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
+// 4-bit ADC port, needs to be custom and reversed because IPT_PEDAL (sic) can't coexist with
+// other stuff in the middle ...
+ioport_value cntsteer_state::throttle_r()
+{
+	return m_throttle->read() & 0xf;
+}
+
 static INPUT_PORTS_START( cntsteer )
+	PORT_START("AN_THROTTLE")
+	PORT_BIT( 0x0f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0x0f) PORT_SENSITIVITY(10) PORT_KEYDELTA(10)
+
 	PORT_START("P1")
-	PORT_BIT( 0x0f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x0f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) //todo
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(cntsteer_state::throttle_r))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
@@ -792,7 +789,7 @@ static INPUT_PORTS_START( cntsteer )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("AN_STEERING")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(10) PORT_KEYDELTA(2)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(10) PORT_KEYDELTA(100)
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cntsteer_state::coin_inserted), 0)
@@ -1008,7 +1005,6 @@ void cntsteer_state::cntsteer(machine_config &config)
 	screen.set_screen_update(FUNC(cntsteer_state::screen_update_cntsteer));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI); // ?
-	screen.screen_vblank().append(FUNC(cntsteer_state::subcpu_vblank_irq)); // ?
 
 	config.set_perfect_quantum(m_subcpu);
 

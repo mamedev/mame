@@ -215,12 +215,7 @@ public:
 
 	int m_user_pa2;
 	int m_user_pb;
-
-	bool m_iec_atn;
-	bool m_iec_clk;
-	bool m_iec_data;
-	emu_timer *m_iec_sync_timer;
-	TIMER_CALLBACK_MEMBER(iec_sync_tick);
+	s8 m_iec_retry_ba;
 
 	void pal(machine_config &config);
 	void ntsc(machine_config &config);
@@ -720,6 +715,16 @@ void c64_state::write_memory(offs_t offset, uint8_t data, int aec, int ba)
 uint8_t c64_state::read(offs_t offset)
 {
 	int aec = 1, ba = m_vic->ba_r();
+
+	if (((offset & 0xff0f) == 0xdd00) && !machine().side_effects_disabled())
+	{
+		if (m_iec_retry_ba >= 0)
+			ba = m_iec_retry_ba;
+
+		m_iec_retry_ba = m_iec->sample_ready(*m_maincpu) ? -1 : ba;
+		if (m_iec_retry_ba >= 0)
+			return 0xff;
+	}
 
 	// VIC address bus is floating
 	offs_t va = 0x3fff;
@@ -1404,13 +1409,6 @@ uint8_t c64_state::cia2_pa_r()
 	return data;
 }
 
-TIMER_CALLBACK_MEMBER(c64_state::iec_sync_tick)
-{
-	m_iec->host_atn_w(m_iec_atn);
-	m_iec->host_clk_w(m_iec_clk);
-	m_iec->host_data_w(m_iec_data);
-}
-
 void c64_state::cia2_pa_w(uint8_t data)
 {
 	/*
@@ -1436,10 +1434,9 @@ void c64_state::cia2_pa_w(uint8_t data)
 	m_user->write_m(BIT(data, 2));
 
 	// IEC bus
-	m_iec_atn = !BIT(data, 3);
-	m_iec_clk = !BIT(data, 4);
-	m_iec_data = !BIT(data, 5);
-	m_iec_sync_timer->adjust(attotime::zero);
+	m_iec->host_atn_w(!BIT(data, 3));
+	m_iec->host_clk_w(!BIT(data, 4));
+	m_iec->host_data_w(!BIT(data, 5));
 }
 
 uint8_t c64_state::cia2_pb_r()
@@ -1665,8 +1662,7 @@ void clipper_iec_devices(device_slot_interface &device)
 
 void c64_state::machine_start()
 {
-	m_iec_sync_timer = timer_alloc(FUNC(c64_state::iec_sync_tick), this);
-
+	m_iec_retry_ba = -1;
 	m_exp_dma = CLEAR_LINE;
 	m_vic_ba = ASSERT_LINE;
 
@@ -1710,11 +1706,14 @@ void c64_state::machine_start()
 	save_item(NAME(m_iec_srq));
 	save_item(NAME(m_user_pa2));
 	save_item(NAME(m_user_pb));
+	save_item(NAME(m_iec_retry_ba));
 }
 
 
 void c64_state::machine_reset()
 {
+	m_iec_retry_ba = -1;
+
 	m_user->write_3(0);
 	m_user->write_3(1);
 }
