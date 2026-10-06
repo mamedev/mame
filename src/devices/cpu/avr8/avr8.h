@@ -1302,7 +1302,6 @@ DECLARE_DEVICE_TYPE(ATMEGA644,  atmega644_device)
 DECLARE_DEVICE_TYPE(ATMEGA1284, atmega1284_device)
 DECLARE_DEVICE_TYPE(ATMEGA1280, atmega1280_device)
 DECLARE_DEVICE_TYPE(ATMEGA2560, atmega2560_device)
-DECLARE_DEVICE_TYPE(ATTINY15,   attiny15_device)
 
 // ======================> atmega88_device
 
@@ -1453,18 +1452,6 @@ protected:
 		sck_mask  = 0x02; // PB1
 	}
 	virtual uint8_t eearh_mask() const override { return 0x0f; } // 4096-byte EEPROM
-};
-
-// ======================> attiny15_device
-
-class attiny15_device : public avr8_device<2>
-{
-public:
-	// construction/destruction
-	attiny15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void attiny15_internal_map(address_map &map) ATTR_COLD;
-protected:
-	virtual uint8_t vector_size_in_words() const override { return 1; }
 };
 
 /***************************************************************************

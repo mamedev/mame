@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli, Angelo Salese
 
-#ifndef MAME_BUS_A800_ROM_H
-#define MAME_BUS_A800_ROM_H
+#ifndef MAME_BUS_A800_CART_ROM_H
+#define MAME_BUS_A800_CART_ROM_H
 
 #pragma once
 
@@ -99,4 +99,4 @@ DECLARE_DEVICE_TYPE(A5200_ROM,            a5200_rom_device)
 DECLARE_DEVICE_TYPE(A5200_ROM_2CHIPS,     a5200_rom_2chips_device)
 
 
-#endif // MAME_BUS_A800_ROM_H
+#endif // MAME_BUS_A800_CART_ROM_H

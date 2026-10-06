@@ -11,8 +11,8 @@ Known cassette players:
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_A800_CASSETTE_H
-#define MAME_BUS_A800_CASSETTE_H
+#ifndef MAME_BUS_A800_SIO_CASSETTE_H
+#define MAME_BUS_A800_SIO_CASSETTE_H
 
 #pragma once
 
@@ -51,4 +51,4 @@ protected:
 DECLARE_DEVICE_TYPE(A8SIO_CASSETTE, a8sio_cassette_device)
 
 
-#endif // MAME_BUS_A800_CASSETTE_H
+#endif // MAME_BUS_A800_SIO_CASSETTE_H

@@ -1,8 +1,8 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese
 
-#ifndef MAME_BUS_A800_MAXFLASH_H
-#define MAME_BUS_A800_MAXFLASH_H
+#ifndef MAME_BUS_A800_CART_MAXFLASH_H
+#define MAME_BUS_A800_CART_MAXFLASH_H
 
 #pragma once
 
@@ -50,4 +50,4 @@ protected:
 DECLARE_DEVICE_TYPE(A800_MAXFLASH_128KB, a800_maxflash_128kb_device)
 DECLARE_DEVICE_TYPE(A800_MAXFLASH_1MB, a800_maxflash_1mb_device)
 
-#endif // MAME_BUS_A800_MAXFLASH_H
+#endif // MAME_BUS_A800_CART_MAXFLASH_H

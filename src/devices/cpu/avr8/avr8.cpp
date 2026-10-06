@@ -516,7 +516,6 @@ DEFINE_DEVICE_TYPE(ATMEGA644,  atmega644_device,  "atmega644",  "Atmel ATmega644
 DEFINE_DEVICE_TYPE(ATMEGA1284, atmega1284_device, "atmega1284", "Atmel ATmega1284")
 DEFINE_DEVICE_TYPE(ATMEGA1280, atmega1280_device, "atmega1280", "Atmel ATmega1280")
 DEFINE_DEVICE_TYPE(ATMEGA2560, atmega2560_device, "atmega2560", "Atmel ATmega2560")
-DEFINE_DEVICE_TYPE(ATTINY15,   attiny15_device,   "attiny15",   "Atmel ATtiny15")
 
 //**************************************************************************
 //  INTERNAL ADDRESS MAP
@@ -714,10 +713,6 @@ void atmega2560_device::atmega2560_internal_map(address_map &map)
 	map(0x0121, 0x0121).w(FUNC(atmega2560_device::tccr5b_w));
 }
 
-void attiny15_device::attiny15_internal_map(address_map &map)
-{
-	avr8_device::base_internal_map(map);
-}
 
 //-------------------------------------------------
 //  atmega88_device - constructor
@@ -800,15 +795,6 @@ atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *
 
 atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: avr8_device<6>(mconfig, tag, owner, clock, ATMEGA2560, 0x1ffff, address_map_constructor(FUNC(atmega2560_device::atmega2560_internal_map), this))
-{
-}
-
-//-------------------------------------------------
-//  attiny15_device - constructor
-//-------------------------------------------------
-
-attiny15_device::attiny15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<2>(mconfig, tag, owner, clock, ATTINY15, 0x01ff, address_map_constructor(FUNC(attiny15_device::attiny15_internal_map), this))
 {
 }
 
