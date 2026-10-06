@@ -115,7 +115,7 @@ const uint8_t bomberman_decryption_table[256] = {
 const uint8_t lethalth_decryption_table[256] = {
 	0x7f,0x26,0x5d,xxxx,0xba,xxxx,0x1e,0x5e, 0xb8,0x49,0xbc,0xe8,0x01,xxxx,0x4a,0x25, /* 00 */
 // ssss !!!! !!!!      !!!!      !!!! !!!!  !!!! gggg !!!! !!!! !!!!           !!!!
-	xxxx,0xbd,xxxx,0x22,0x10,xxxx,0x02,0x57, 0x70,xxxx,0x7c,xxxx,0xe7,0x52,xxxx,0xa9, /* 10 */
+	xxxx,0xbd,xxxx,0x22,xxxx,xxxx,0x02,0x57, 0x70,xxxx,0x7c,xxxx,0xe7,0x52,xxxx,0xa9, /* 10 */
 //                !!!!           !!!! !!!!            ????      !!!! !!!!      gggg
 	xxxx,xxxx,0xc6,0x06,0xa0,0xfe,0xcf,0x8e, 0x43,0x8f,0x2d,0x8c,0xd4,0x85,0x75,0xa2, /* 20 */
 //           !!!! !!!!      !!!! !!!! !!!!  !!!!           gggg           !!!! !!!!
@@ -143,8 +143,8 @@ const uint8_t lethalth_decryption_table[256] = {
 // !!!! !!!! !!!! !!!! !!!! !!!! !!!! !!!!       gggg                !!!!      !!!!
 	xxxx,0xb6,xxxx,0xea,xxxx,0x73,0xe5,0x58, 0x00,0xf7,xxxx,0x74,xxxx,0x76,xxxx,0xa3, /* E0 */
 //                !!!!      gggg !!!! !!!!       !!!!      !!!!      ????      !!!!
-	xxxx,0x5a,0xf6,0x32,0x46,0x2a,xxxx,xxxx, 0x53,0x4b,0x90,0x35,0x51,0x68,0x99,0x13, /* F0 */
-//      !!!! !!!! !!!! !!!! !!!!            !!!!           ???? !!!! !!!!
+	xxxx,0x5a,0xf6,0x32,0x46,0x2a,xxxx,xxxx, 0x53,0x4b,0x90,0x35,0x51,0x68,0x99,0x10, /* F0 */
+//      !!!! !!!! !!!! !!!! !!!!            !!!!           ???? !!!! !!!!      ssss
 };
 /*
 missing opcode:
@@ -156,6 +156,7 @@ c5 -> (18d56 - from 1844f) (71,76,7a,7d,7e) -> to handle level number (a008d=00-
 af -> (7d) (strange 71) ->
 ed -> (p76,7c,7e) ->
 fb -> 0x35 ???
+14 -> ? (was 0x10, which belongs to ff)
 
 "!!!!" -> checked against gussun
 "gggg" -> very probably
@@ -174,6 +175,7 @@ very probably:
 e5 -> 0x73
 2b -> 0x8c
 47 -> 0xd3
+ff -> 0x10
 
 sure:
 00 -> 0x7f
