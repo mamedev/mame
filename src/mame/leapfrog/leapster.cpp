@@ -949,14 +949,14 @@ uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rg
 				bytes[1] = m_maincpu->space().read_byte(0x0300'0000 + m_framebuffer_base + i * m_display_stride + j * 3 + 1);
 				bytes[2] = m_maincpu->space().read_byte(0x0300'0000 + m_framebuffer_base + i * m_display_stride + j * 3 + 2);
 
-				bitmap.pix(i, j * 2) = pal444(bytes[0] | ((bytes[1] & 0xF0) << 4), 8, 4, 0);
-				bitmap.pix(i, j * 2 + 1) = pal444((bytes[2] << 4) | (bytes[1] & 0x0F), 0, 8, 4);
+				bitmap.pix(i, j * 2) = pal444(bytes[0] | ((bytes[1] & 0xf0) << 4), 8, 4, 0);
+				bitmap.pix(i, j * 2 + 1) = pal444((bytes[2] << 4) | (bytes[1] & 0x0f), 0, 8, 4);
 			}
 		}
 	}
 	else if (BIT(m_display_format, 0, 30) == 3) // Used in touch cal
 	{
-		for (int i = cliprect.min_y; i < cliprect.max_y; i++)
+		for (int i = cliprect.min_y; i <= cliprect.max_y; i++)
 		{
 			for (int j = cliprect.min_x; j < (cliprect.max_x + 1); j++)
 			{
@@ -1154,7 +1154,7 @@ TIMER_CALLBACK_MEMBER(leapster_state::leapster_touch_adc_update)
 
 	if(!m_touch[2]->read())
 	{
-		pressure = 0x7FF;
+		pressure = 0x7ff;
 	}
 	else
 	{
