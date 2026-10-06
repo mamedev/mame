@@ -120,7 +120,6 @@ mw-9.rom = ST M27C1001 / GFX
 #include "emu.h"
 
 #include "kabuki.h" // needed for decoding functions only
-#include "pkladies_decrypt.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74157.h"
@@ -348,7 +347,6 @@ private:
 	required_device<msm5205_device> m_msm;
 	memory_passthrough_handler m_decrypt_tap;
 	bool m_decrypt_prefix = false;
-	bool m_decrypt_unknown = false;
 
 	void io_map(address_map &map) ATTR_COLD;
 };
@@ -1760,14 +1758,12 @@ void pkladiesbl_state::machine_start()
 {
 	mitchell_state::machine_start();
 	save_item(NAME(m_decrypt_prefix));
-	save_item(NAME(m_decrypt_unknown));
 }
 
 void pkladiesbl_state::machine_reset()
 {
 	mitchell_state::machine_reset();
 	m_decrypt_prefix = false;
-	m_decrypt_unknown = false;
 }
 
 void spangbl_state::machine_start()
@@ -3252,39 +3248,208 @@ void pkladiesbl_state::init_pkladiesbl()
 	bootleg_decode();
 }
 
-// Experimental, ROM-inferred translation of the protected Z80's M1 fetches.
-// Ordinary operand/data accesses must retain the original ROM bytes. Upper ROM
-// and banked code already use the split opcode/data streams in bootleg_decode().
-// The tables are partial. Repeated prefixes and DD/FD-CB forms are unverified.
-// Debugger peeks leave the latch untouched and currently see encrypted bytes.
+// The encrypted bootlegs' CPU module substitutes M1 fetches in 0x0100-0x3fff,
+// selecting one of eight tables by address and by whether the previous M1 fetch
+// was a CB/DD/ED/FD prefix. -1 marks an entry that is still unknown.
+// TODO: only 526 of the 2048 entries are known; repeated prefixes and DD/FD CB forms are unverified
+
+constexpr unsigned pkladies_address_key(u16 address)
+{
+	const unsigned x = address & 0xff;
+	const bool special = (x & 0x1a) == 0x1a;
+	unsigned low;
+	switch (x >> 6)
+	{
+	case 0: low = special ? 2 : ((x & 1) ? 0 : 3); break;
+	case 1: low = special ? 0 : ((x & 8) ? ((x & 1) ? 0 : 3) : ((x & 1) ? 2 : 1)); break;
+	case 2: low = (special || (x & 4)) ? 2 : 1; break;
+	default: low = (x & 0x20) ? ((x & 2) ? 3 : 1) : 2; break;
+	}
+	const bool high = !(address & 0x100) &&
+			(((address & 0x1000) && !(address & 0x400)) ||
+			 ((address & 0x2000) && !(address & 0x1000)));
+	return low ^ 2 ^ (high ? 1 : 0);
+}
+
+constexpr s16 PKLADIES_OPCODE_TABLE[8][256] = {
+	{ // plane 0: key 0, prefix 0
+		-1, -1, -1, 0x29, -1, -1, -1, -1, 0x5f, 0x0f, 0x38, -1, 0x3e, 0x30, -1, 0x07,
+		-1, -1, 0xd5, -1, 0xb6, 0x1e, -1, 0x22, 0xd8, 0x83, 0xd0, -1, 0x09, -1, -1, 0xc9,
+		-1, 0x11, -1, 0x7a, -1, -1, -1, -1, -1, 0x12, -1, 0x35, -1, 0xc1, 0xfb, -1,
+		0xb8, -1, 0xba, -1, -1, -1, -1, -1, -1, -1, 0xf5, 0x3d, 0x3a, -1, -1, -1,
+		0x67, 0xcb, 0xc3, 0xfe, -1, -1, -1, 0x85, -1, -1, 0x2f, -1, -1, 0x0e, -1, -1,
+		-1, -1, 0xb7, 0xb9, -1, 0x34, -1, -1, -1, 0x28, 0x01, -1, -1, -1, 0x06, -1,
+		-1, 0x04, -1, -1, 0xf3, -1, 0x56, 0x7e, -1, -1, 0x77, 0xe6, 0x4e, 0x21, -1, -1,
+		0x48, 0x54, -1, -1, -1, 0xd3, -1, -1, 0x23, -1, -1, -1, -1, -1, 0xdb, 0xcc,
+		0xc0, 0xb4, -1, -1, -1, 0x7d, 0xc6, 0x7c, 0x1a, -1, -1, -1, 0xe5, -1, 0xc4, -1,
+		0x18, -1, -1, -1, -1, -1, 0xb0, 0x2c, 0x57, 0xaf, 0x16, 0x78, 0x5d, -1, -1, 0xda,
+		0x10, -1, -1, -1, -1, 0x81, -1, -1, -1, -1, -1, -1, 0xee, -1, 0x31, 0x20,
+		0x2a, -1, -1, -1, -1, 0xcd, 0xfd, -1, -1, -1, -1, -1, 0x32, 0x17, -1, 0x19,
+		-1, 0xe1, -1, -1, -1, -1, 0x46, 0x4f, 0x5e, 0xc2, -1, -1, -1, -1, -1, -1,
+		0xca, 0xc5, 0x36, -1, -1, -1, 0xf6, 0xdd, -1, 0xeb, -1, -1, 0x00, 0x2b, -1, -1,
+		-1, -1, 0x79, 0x3c, 0x13, 0xc8, -1, -1, -1, -1, 0x6f, -1, 0xd1, 0xed, -1, -1,
+		0x0d, -1, 0xb1, -1, 0x47, -1, 0x08, -1, 0x14, -1, -1, -1, -1, -1, -1, -1,
+	},
+	{ // plane 1: key 1, prefix 0
+		-1, -1, -1, -1, -1, 0x3c, -1, -1, 0x3d, -1, 0x73, 0x81, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, 0x72, -1, -1, -1, -1, 0xeb, -1, 0xdd, -1, -1, -1,
+		-1, 0x21, 0x79, -1, -1, 0x07, -1, 0xdb, -1, 0xe1, 0x7b, -1, 0xe5, 0x13, 0x3e, -1,
+		-1, 0xb6, -1, -1, -1, 0x2f, -1, 0xc3, 0x31, -1, -1, -1, 0xfd, 0x4f, 0x39, 0x38,
+		0x86, -1, -1, 0xbe, 0x0c, 0xa7, -1, 0x17, 0x34, -1, -1, -1, -1, 0x4e, -1, -1,
+		0xfb, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0xcc, -1, -1, -1, -1, 0xaf,
+		-1, -1, 0xca, -1, 0x1b, -1, -1, 0xfe, -1, 0xd6, -1, -1, -1, 0x10, -1, -1,
+		0x67, 0xee, -1, 0x6f, 0xc2, -1, -1, -1, 0x28, -1, -1, 0xc8, 0xe9, -1, -1, 0x0d,
+		0x19, -1, -1, 0xda, 0x0e, 0xb7, -1, -1, -1, 0xc0, -1, 0x7e, -1, -1, -1, 0xd5,
+		-1, 0xf1, 0x36, -1, 0xc5, -1, -1, -1, -1, 0x35, -1, -1, 0x00, -1, 0x29, 0x7d,
+		0x78, -1, -1, -1, 0x20, -1, 0x12, -1, -1, -1, -1, -1, 0xc9, 0xf3, 0x32, 0x7c,
+		0x05, -1, -1, 0x16, 0xd1, -1, -1, -1, -1, -1, -1, 0xe6, -1, 0xf6, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x22, 0x01, 0x47, 0x1e, 0xcb, 0x0f,
+		-1, 0xd3, -1, 0xf5, 0x09, 0x5f, 0x56, 0x18, 0x30, -1, 0xc4, 0x14, 0x06, -1, 0xc6, -1,
+		-1, 0x5e, -1, -1, -1, -1, 0x2b, 0x2a, -1, -1, -1, -1, 0x23, 0xed, 0xcd, -1,
+		0x1a, 0x77, -1, -1, -1, -1, -1, -1, -1, -1, 0xc1, 0x11, 0x3a, -1, 0x46, -1,
+	},
+	{ // plane 2: key 2, prefix 0
+		0x22, -1, -1, 0x06, -1, -1, -1, -1, 0xe1, -1, -1, -1, -1, -1, -1, 0x1a,
+		-1, 0xc4, 0x2b, -1, 0xd8, 0xe6, -1, 0x13, 0xaf, -1, -1, -1, -1, 0xc3, 0x30, 0x17,
+		-1, 0x32, -1, -1, -1, 0xcd, -1, 0xca, 0xf1, -1, -1, -1, -1, 0x19, -1, 0x2a,
+		-1, -1, -1, -1, -1, 0x62, 0xdb, -1, -1, -1, -1, -1, -1, 0x3d, 0x7d, -1,
+		-1, 0x3e, -1, -1, -1, 0x21, -1, -1, -1, -1, -1, -1, -1, 0x29, -1, -1,
+		-1, -1, 0x47, 0x6b, -1, 0x54, 0x23, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		0x7e, 0x2f, 0xfd, -1, 0x38, -1, -1, -1, -1, 0xb5, -1, -1, 0xc9, -1, 0x10, 0xee,
+		-1, -1, -1, -1, -1, 0xc2, 0xd3, -1, 0x7a, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, 0xeb, 0xd1, -1, 0xe5, -1, 0x09, -1, -1, 0x05, 0xa6, 0xb9, -1,
+		0x3c, 0xd5, -1, 0x31, 0xc1, -1, -1, -1, -1, 0xc0, -1, 0x36, -1, -1, -1, -1,
+		0xf3, 0x01, -1, 0xc6, -1, -1, -1, -1, 0x1e, -1, -1, -1, 0xb7, -1, -1, -1,
+		0xb6, 0xdd, 0x73, -1, -1, -1, -1, -1, -1, -1, 0x28, 0xc8, -1, -1, -1, -1,
+		0xcb, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x11, 0x18, -1, -1, -1,
+		0x4f, 0xfb, 0x3a, 0x0f, 0x07, -1, 0x5e, 0x0e, 0x77, -1, -1, 0x78, -1, -1, 0x4e, 0x0d,
+		-1, -1, 0x81, -1, -1, -1, -1, -1, 0x16, 0x00, -1, 0x79, 0x5f, 0xed, -1, -1,
+		0xb1, 0x91, -1, -1, -1, -1, -1, 0xf5, 0xfe, 0xc5, -1, -1, -1, -1, 0x20, -1,
+	},
+	{ // plane 3: key 3, prefix 0
+		-1, -1, -1, -1, 0x56, -1, 0x32, -1, -1, -1, -1, 0x23, -1, -1, -1, -1,
+		0x5f, -1, -1, -1, 0xa3, -1, -1, 0xc1, 0x2f, -1, -1, 0xc2, -1, -1, 0x4f, -1,
+		-1, 0x09, -1, 0x19, -1, -1, 0x10, 0x0d, -1, -1, -1, 0x05, 0x21, 0x47, 0xe6, -1,
+		-1, -1, -1, 0x77, -1, -1, 0xcb, 0x17, -1, 0x16, -1, -1, -1, -1, -1, -1,
+		0x3d, -1, -1, -1, -1, 0x0c, -1, -1, -1, -1, 0xe1, -1, 0xc6, -1, 0x1b, 0x11,
+		-1, -1, -1, -1, 0x36, -1, 0x7c, -1, -1, -1, -1, -1, -1, 0xd3, -1, 0xd6,
+		-1, 0x01, 0xd5, -1, 0x07, -1, -1, -1, 0xb5, -1, -1, -1, -1, 0xf3, 0xcd, -1,
+		-1, -1, -1, 0x31, -1, -1, 0x13, -1, 0x3c, -1, -1, -1, -1, -1, -1, 0x6f,
+		0xca, 0xfe, 0x7d, -1, -1, -1, -1, -1, 0xd1, -1, 0x1e, -1, 0x5e, -1, 0xc5, -1,
+		0xfb, 0x3a, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x22, 0x30, 0x14, 0x57,
+		0x2a, 0x29, -1, -1, -1, 0xc9, 0x7e, -1, -1, -1, -1, 0x86, -1, 0xeb, -1, -1,
+		0xe5, 0xdd, -1, 0x2b, -1, -1, 0xcc, -1, -1, 0xb1, 0x3e, -1, -1, -1, -1, -1,
+		-1, 0x81, 0x0f, -1, -1, -1, -1, -1, 0xe9, -1, 0x7a, 0x28, -1, -1, -1, -1,
+		-1, 0xee, -1, 0x79, -1, 0x5d, 0x7b, -1, 0xc3, 0xc4, -1, -1, 0x00, 0xb6, 0x20, -1,
+		-1, -1, 0xfd, -1, -1, 0x78, 0x24, -1, -1, 0x67, -1, 0x34, 0xf1, 0xed, -1, -1,
+		-1, -1, -1, -1, 0xb7, 0x06, 0x18, 0x0e, 0xaf, -1, -1, -1, 0x1a, -1, 0x46, -1,
+	},
+	{ // plane 4: key 0, prefix 1
+		-1, -1, -1, -1, -1, -1, 0x04, -1, -1, -1, -1, -1, -1, -1, -1, 0x72,
+		-1, 0x75, 0x7e, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, 0xe9, 0x05, -1, 0x12, -1, 0xfc, -1, 0x46, -1,
+		-1, -1, -1, -1, -1, -1, 0x21, -1, -1, -1, -1, 0x74, -1, -1, -1, -1,
+		0x6e, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x19, -1,
+		-1, -1, -1, -1, -1, -1, 0x02, -1, -1, -1, -1, -1, -1, -1, 0x34, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		0x66, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x38, 0xb0, -1, -1,
+		0xb6, -1, -1, -1, 0x73, -1, -1, 0x4e, -1, -1, -1, -1, 0xe5, 0x77, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x36, -1, -1,
+		-1, 0x5e, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x09, -1, 0xb4,
+		-1, -1, -1, -1, 0x03, -1, -1, -1, 0x23, -1, 0x29, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, 0x53, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x56, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x71, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, 0x2b, -1, -1, -1, -1, -1, -1, 0xe1, -1, -1,
+	},
+	{ // plane 5: key 1, prefix 1
+		-1, -1, -1, -1, -1, 0x7e, -1, 0xb0, -1, -1, -1, -1, -1, -1, 0x23, -1,
+		-1, -1, -1, -1, -1, -1, -1, 0x71, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, 0x36, -1, -1, -1, -1, -1, -1, 0x09, -1, -1, -1, -1, -1,
+		-1, -1, 0x66, -1, -1, 0x03, -1, -1, -1, -1, -1, 0xe1, -1, -1, -1, -1,
+		-1, 0xe9, -1, -1, -1, -1, 0x56, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0xe5, -1, -1, 0x60,
+		-1, -1, -1, -1, -1, -1, -1, 0x6e, -1, -1, -1, -1, -1, -1, 0x72, -1,
+		-1, -1, -1, -1, -1, -1, -1, 0x29, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		0x4e, -1, -1, -1, -1, -1, 0x70, -1, 0x75, -1, 0x19, -1, -1, 0x68, -1, 0x58,
+		0xb6, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x53, -1, 0x73, -1,
+		0x02, -1, -1, -1, 0x46, -1, -1, 0x86, -1, -1, -1, 0x5e, -1, -1, -1, -1,
+		-1, -1, 0xbe, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x0b,
+		-1, -1, -1, -1, -1, -1, -1, 0x21, -1, -1, -1, -1, -1, 0x74, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, 0x04, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, 0x77, -1, -1, -1, -1, -1, -1, -1,
+	},
+	{ // plane 6: key 2, prefix 1
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x46, 0x44, -1, -1, -1, -1,
+		-1, 0x34, -1, -1, -1, 0x56, -1, -1, -1, -1, -1, -1, 0x19, -1, 0x5e, -1,
+		0x48, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x75, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, 0x50, -1, -1, -1, 0xb6, -1, -1, -1,
+		-1, -1, -1, -1, -1, 0x4e, -1, -1, -1, -1, -1, 0x6e, -1, -1, -1, -1,
+		-1, -1, -1, -1, 0x73, -1, -1, -1, -1, -1, 0x71, -1, -1, -1, -1, -1,
+		0x77, -1, 0x09, -1, 0x23, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		0x29, 0xe5, -1, 0x7e, -1, -1, -1, 0x74, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, 0x36, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, 0x03, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0xe1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x01, -1, -1, -1, -1, -1,
+		-1, -1, 0x43, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x72, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, 0x45, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, 0x66, 0x21, -1, -1, -1, -1, -1, -1, 0x05, -1, 0xb0, -1, -1, -1, -1,
+	},
+	{ // plane 7: key 3, prefix 1
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, 0x35, -1, 0xe9, 0x74, -1, -1, -1,
+		-1, 0x7e, -1, 0x75, -1, -1, -1, -1, 0xb4, -1, 0x46, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, 0xb0, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		0x4e, -1, -1, -1, -1, -1, 0x19, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x38, 0x66,
+		-1, -1, -1, -1, -1, 0x29, -1, -1, -1, -1, -1, 0x6e, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, 0x77, -1, -1, -1, -1, 0xe5, -1,
+		-1, -1, -1, -1, -1, -1, 0xb6, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x71, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x02, 0x36, -1, 0x23,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0xc5,
+		-1, 0x01, -1, -1, -1, -1, -1, -1, -1, -1, 0x21, -1, -1, 0xe1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, 0x03, -1, -1, -1, 0x70, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0x12, -1, -1, -1, -1, -1,
+		-1, 0x04, 0x09, -1, -1, -1, -1, 0x05, -1, -1, -1, -1, -1, -1, -1, -1,
+	},
+};
+
+constexpr int pkladies_decode(u16 address, u8 cipher, bool prefix)
+{
+	return PKLADIES_OPCODE_TABLE[pkladies_address_key(address) + (prefix ? 4 : 0)][cipher];
+}
+
 void pkladiesbl_state::init_pkladiesbl_encrypted()
 {
 	init_pkladiesbl();
+
+	// FIXME: debugger reads decode with the current prefix latch, so bytes following a prefix disassemble incorrectly
 	m_decrypt_tap = m_maincpu->space(AS_OPCODES).install_read_tap(
-		0x0000, 0xffff, "pkladies_experimental_decode",
-		[this] (offs_t address, u8 &data, u8 mem_mask)
-		{
-			if (machine().side_effects_disabled())
-				return;
-			if (address < 0x0100 || address >= 0x4000)
+			0x0000, 0xffff,
+			"pkladies_decrypt",
+			[this] (offs_t address, u8 &data, u8 mem_mask)
 			{
-				m_decrypt_prefix = false;
-				return;
-			}
+				if ((address < 0x0100) || (address >= 0x4000))
+				{
+					if (!machine().side_effects_disabled())
+						m_decrypt_prefix = false;
+					return;
+				}
 
-			const int plain = pkladies_decrypt::decode(address, data, m_decrypt_prefix);
-
-			if (plain < 0)
-			{
-				if (!m_decrypt_unknown)
-					osd_printf_warning("Poker Ladies: unknown opcode mapping at %04X, cipher=%02X, prefix=%d\n", address, data, m_decrypt_prefix);
-				m_decrypt_unknown = true;
-				m_decrypt_prefix = false;
-				return;
-			}
-			m_decrypt_prefix = !m_decrypt_prefix && (plain == 0xcb || plain == 0xdd || plain == 0xed || plain == 0xfd);
-			data = plain;
-		});
+				const int plain = pkladies_decode(address, data, m_decrypt_prefix);
+				if (!machine().side_effects_disabled())
+				{
+					if (plain < 0)
+						logerror("unknown opcode mapping at %04X, cipher=%02X, prefix=%d\n", address, data, m_decrypt_prefix);
+					m_decrypt_prefix = !m_decrypt_prefix && ((plain == 0xcb) || (plain == 0xdd) || (plain == 0xed) || (plain == 0xfd));
+				}
+				if (plain >= 0)
+					data = plain;
+			});
 }
 
 void mitchell_state::init_marukin()
@@ -3357,23 +3522,23 @@ void mstworld_state::init_mstworld()
  *************************************/
 
 GAME( 1988, mgakuen,     0,        mgakuen,    mgakuen,    mitchell_state,   init_mgakuen,              ROT0,   "Yuga",                      "Mahjong Gakuen", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, 7toitsu,     mgakuen,  mgakuen,    mgakuen,    mitchell_state,   init_mgakuen,              ROT0,   "Yuga",                      "Chi-Toitsu",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, 7toitsu,     mgakuen,  mgakuen,    mgakuen,    mitchell_state,   init_mgakuen,              ROT0,   "Yuga",                      "Chi-Toitsu", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, mgakuen2,    0,        marukin,    marukin,    mitchell_state,   init_mgakuen2,             ROT0,   "Face",                      "Mahjong Gakuen 2 Gakuen-chou no Fukushuu", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, pkladies,    0,        marukin,    pkladies,   mitchell_state,   init_pkladies,             ROT0,   "Mitchell",                  "Poker Ladies",                                   MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesl,   pkladies, marukin,    pkladies,   mitchell_state,   init_pkladies,             ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 510)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesla,  pkladies, marukin,    pkladies,   mitchell_state,   init_pkladies,             ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 401)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pkladiesbl,  pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl_encrypted, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, encrypted)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // experimental partial opcode decoder
-GAME( 1989, pkladiesblu, pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl_encrypted, ROT0,   "bootleg",                   "Poker Ladies (Uncensored bootleg, encrypted)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // experimental partial opcode decoder
+GAME( 1989, pkladies,    0,        marukin,    pkladies,   mitchell_state,   init_pkladies,             ROT0,   "Mitchell",                  "Poker Ladies", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesl,   pkladies, marukin,    pkladies,   mitchell_state,   init_pkladies,             ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 510)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesla,  pkladies, marukin,    pkladies,   mitchell_state,   init_pkladies,             ROT0,   "Leprechaun",                "Poker Ladies (Leprechaun ver. 401)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pkladiesbl,  pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl_encrypted, ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, encrypted)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? CPU decryption incomplete
+GAME( 1989, pkladiesblu, pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl_encrypted, ROT0,   "bootleg",                   "Poker Ladies (Uncensored bootleg, encrypted)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? CPU decryption incomplete
 GAME( 1989, pkladiesbl2, pkladies, pkladiesbl, pkladiesbl, pkladiesbl_state, init_pkladiesbl,           ROT0,   "bootleg",                   "Poker Ladies (Censored bootleg, not encrypted)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // by Playmark? needs inputs, EEPROM (?), MSM5205 hook up, GFX fixes
 
 GAME( 1989, dokaben,     0,        pang,       pang,       mitchell_state,   init_dokaben,              ROT0,   "Capcom",                    "Dokaben (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, dokaben2,    0,        pang,       pang,       mitchell_state,   init_dokaben,              ROT0,   "Capcom",                    "Dokaben 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, pang,        0,        pang,       pang,       mitchell_state,   init_pang,                 ROT0,   "Mitchell",                  "Pang (World)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bbros,       pang,     pang,       pang,       mitchell_state,   init_pang,                 ROT0,   "Mitchell (Capcom license)", "Buster Bros. (USA)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pang,        0,        pang,       pang,       mitchell_state,   init_pang,                 ROT0,   "Mitchell",                  "Pang (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bbros,       pang,     pang,       pang,       mitchell_state,   init_pang,                 ROT0,   "Mitchell (Capcom license)", "Buster Bros. (USA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pompingw,    pang,     pang,       pang,       mitchell_state,   init_pang,                 ROT0,   "Mitchell",                  "Pomping World (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pangb,       pang,     pang,       pang,       mitchell_state,   init_pangb,                ROT0,   "bootleg",                   "Pang (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pangbold,    pang,     pang,       pang,       mitchell_state,   init_pangb,                ROT0,   "bootleg",                   "Pang (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
@@ -3387,9 +3552,9 @@ GAME( 1989, cworld,      0,        pang,       qtono1,     mitchell_state,   ini
 
 GAME( 1990, hatena,      0,        pang,       qtono1,     mitchell_state,   init_hatena,               ROT0,   "Capcom",                    "Adventure Quiz 2 - Hatena? no Daibouken (Japan 900228)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, spang,       0,        pangnv,     pang,       mitchell_state,   init_spang,                ROT0,   "Mitchell",                  "Super Pang (World 900914)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1990, sbbros,      spang,    pangnv,     pang,       mitchell_state,   init_sbbros,               ROT0,   "Mitchell (Capcom license)", "Super Buster Bros. (USA 901001)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spangj,      spang,    pangnv,     pang,       mitchell_state,   init_spangj,               ROT0,   "Mitchell",                  "Super Pang (Japan 901023)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spang,       0,        pangnv,     pang,       mitchell_state,   init_spang,                ROT0,   "Mitchell",                  "Super Pang (World 900914)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, sbbros,      spang,    pangnv,     pang,       mitchell_state,   init_sbbros,               ROT0,   "Mitchell (Capcom license)", "Super Buster Bros. (USA 901001)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, spangj,      spang,    pangnv,     pang,       mitchell_state,   init_spangj,               ROT0,   "Mitchell",                  "Super Pang (Japan 901023)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, spangbl,     spang,    spangbl,    spangbl,    spangbl_state,    init_spangbl,              ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different sound hardware
 GAME( 1990, spangbl2,    spang,    spangbl,    spangbl,    spangbl_state,    init_spangbl,              ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg, set 2)", MACHINE_NOT_WORKING )
 
@@ -3405,6 +3570,6 @@ GAME( 1991, qsangoku,    0,        pang,       qtono1,     mitchell_state,   ini
 
 GAME( 1991, block,       0,        pangnv,     blockjoy,   mitchell_state,   init_block,                ROT270, "Capcom",                    "Block Block (World 911219 Joystick)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, blockr1,     block,    pangnv,     blockjoy,   mitchell_state,   init_block,                ROT270, "Capcom",                    "Block Block (World 911106 Joystick)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockr2,     block,    pangnv,     block,      mitchell_state,   init_block,                ROT270, "Capcom",                    "Block Block (World 910910)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockj,      block,    pangnv,     block,      mitchell_state,   init_block,                ROT270, "Capcom",                    "Block Block (Japan 910910)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blockbl,     block,    pangnv,     block,      mitchell_state,   init_blockbl,              ROT270, "bootleg",                   "Block Block (bootleg)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockr2,     block,    pangnv,     block,      mitchell_state,   init_block,                ROT270, "Capcom",                    "Block Block (World 910910)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockj,      block,    pangnv,     block,      mitchell_state,   init_block,                ROT270, "Capcom",                    "Block Block (Japan 910910)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blockbl,     block,    pangnv,     block,      mitchell_state,   init_blockbl,              ROT270, "bootleg",                   "Block Block (bootleg)", MACHINE_SUPPORTS_SAVE )
