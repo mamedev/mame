@@ -98,6 +98,8 @@
 
 #include <algorithm>
 #include <cmath>
+#include <utility>
+#include <vector>
 
 #define LOG_REGS   (1U << 1)
 #define LOG_SPRITE (1U << 2)
@@ -109,12 +111,123 @@
 DEFINE_DEVICE_TYPE(YGV625, ygv625_device, "ygv625", "Yamaha YGV625 PVDC6R")
 
 
+namespace {
+
+//-------------------------------------------------
+//  16x16 block scan orders: each function maps
+//  the n-th decoded value of a block to its
+//  (row, column).  All of them work ping-pong:
+//  every other line is walked in the opposite
+//  direction, and the two sub-block orders also
+//  visit their sub-blocks ping-pong.
+//-------------------------------------------------
+
+// rows
+std::pair<u32, u32> scan_rows(u32 index)
+{
+	const u32 row = index >> 4;
+	u32 col = index & 15;
+	if (BIT(row, 0))
+		col = 15 - col;
+	return { row, col };
+}
+
+// columns
+std::pair<u32, u32> scan_columns(u32 index)
+{
+	const u32 col = index >> 4;
+	u32 row = index & 15;
+	if (BIT(col, 0))
+		row = 15 - row;
+	return { row, col };
+}
+
+// 8x4 sub-blocks visited row by row, each one scanned column by column
+std::pair<u32, u32> scan_8x4(u32 index)
+{
+	const u32 si = index >> 5;              // sub-block number 0..7
+	const u32 by = si >> 1;
+	const u32 bx = BIT(by, 0) ? 1 - BIT(si, 0) : BIT(si, 0);
+	const u32 j = (index >> 2) & 7;         // column within the sub-block
+	const u32 c = BIT(by, 0) ? 7 - j : j;
+	u32 r = index & 3;
+	if (BIT(j + si, 0))
+		r = 3 - r;
+	return { by * 4 + r, bx * 8 + c };
+}
+
+// 4x8 sub-blocks visited column by column, each one scanned row by row
+std::pair<u32, u32> scan_4x8(u32 index)
+{
+	const u32 si = index >> 5;              // sub-block number 0..7
+	const u32 bx = si >> 1;
+	const u32 by = BIT(bx, 0) ? 1 - BIT(si, 0) : BIT(si, 0);
+	const u32 j = (index >> 2) & 7;         // row within the sub-block
+	const u32 r = BIT(bx, 0) ? 7 - j : j;
+	u32 c = index & 3;
+	if (BIT(j + si, 0))
+		c = 3 - c;
+	return { by * 8 + r, bx * 4 + c };
+}
+
+// indexed by the 2-bit scan field at the start of each block
+using scan_func = std::pair<u32, u32> (*)(u32 index);
+constexpr scan_func SCAN_ORDERS[4] = { &scan_rows, &scan_columns, &scan_8x4, &scan_4x8 };
+
+} // anonymous namespace
+
+
+// a decoded sprite, pixels are palette indices (indexed formats) or
+// RGB565 words (direct colour)
+struct ygv625_device::decoded_sprite
+{
+	u16 width = 0;
+	u16 height = 0;
+	u8 format = 0;
+	u8 depth = 0;           // bits per pixel for indexed formats, 16 for direct colour
+	u8 transparent = 0;     // transparent colour index from the sprite header
+	bool has_transparent = false;
+	bool valid = false;
+	std::vector<u16> pixels;
+};
+
+
+// bit reader over CG memory (MSB first)
+class ygv625_device::bit_reader
+{
+public:
+	bit_reader(const u8 *base, u32 size, u32 byte_offset) : m_base(base), m_size(size), m_pos(u64(byte_offset) * 8) { }
+
+	u32 read(u32 bits);
+	u64 pos() const { return m_pos; }
+	bool overrun() const { return m_pos > u64(m_size) * 8; }
+
+private:
+	const u8 *m_base;
+	u32 m_size;
+	u64 m_pos;
+};
+
+
+// SPINET plane decoding parameters
+struct ygv625_device::plane_params
+{
+	u8 cmax, cth, esc, wn;
+};
+
+
 ygv625_device::ygv625_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, YGV625, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_cg(*this, finder_base::DUMMY_TAG),
+	m_ram(*this, "ram", 0x2000 * 2, ENDIANNESS_BIG),
+	m_cache(4096),
 	m_cg_read_data(0),
 	m_cg_read_ready(false)
+{
+}
+
+ygv625_device::~ygv625_device()
 {
 }
 
@@ -125,8 +238,6 @@ ygv625_device::ygv625_device(const machine_config &mconfig, const char *tag, dev
 
 void ygv625_device::device_start()
 {
-	m_ram = std::make_unique<u16[]>(0x2000);
-	std::fill_n(m_ram.get(), 0x2000, 0);
 	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 
 	m_bitmap.allocate(512, 512);
@@ -136,13 +247,11 @@ void ygv625_device::device_start()
 	for (u32 scan = 0; scan < 4; scan++)
 		for (u32 i = 0; i < 256; i++)
 		{
-			u32 row, col;
-			scan_position(scan, i, row, col);
+			const auto [row, col] = SCAN_ORDERS[scan](i);
 			m_scan_tables[scan][i][0] = row;
 			m_scan_tables[scan][i][1] = col;
 		}
 
-	save_pointer(NAME(m_ram), 0x2000);
 	save_item(NAME(m_regs));
 	save_item(NAME(m_cg_read_data));
 	save_item(NAME(m_cg_read_ready));
@@ -157,63 +266,6 @@ void ygv625_device::device_reset()
 {
 	m_cg_read_ready = false;
 	m_cg_read_data = 0;
-}
-
-
-//-------------------------------------------------
-//  scan_position - row/column of the n-th pixel
-//  of a 16x16 block for the given scan order
-//-------------------------------------------------
-
-void ygv625_device::scan_position(u32 scan, u32 index, u32 &row, u32 &col)
-{
-	switch (scan)
-	{
-	case 0: // rows, boustrophedon
-	{
-		row = index >> 4;
-		col = index & 15;
-		if (row & 1)
-			col = 15 - col;
-		break;
-	}
-	case 1: // columns, boustrophedon
-	{
-		col = index >> 4;
-		row = index & 15;
-		if (col & 1)
-			row = 15 - row;
-		break;
-	}
-	case 2: // 8x4 sub-blocks visited in row boustrophedon order, columns inside scanned vertically
-	{
-		u32 si = index >> 5;              // sub-block number 0..7
-		u32 by = si >> 1;
-		u32 bx = (by & 1) ? 1 - (si & 1) : (si & 1);
-		u32 j = (index >> 2) & 7;         // column index within the sub-block
-		u32 c = (by & 1) ? 7 - j : j;
-		u32 r = index & 3;
-		if ((j + si) & 1)
-			r = 3 - r;
-		row = by * 4 + r;
-		col = bx * 8 + c;
-		break;
-	}
-	default: // 4x8 sub-blocks visited in column boustrophedon order, rows inside scanned horizontally
-	{
-		u32 si = index >> 5;
-		u32 bx = si >> 1;
-		u32 by = (bx & 1) ? 1 - (si & 1) : (si & 1);
-		u32 j = (index >> 2) & 7;         // row index within the sub-block
-		u32 r = (bx & 1) ? 7 - j : j;
-		u32 c = index & 3;
-		if ((j + si) & 1)
-			c = 3 - c;
-		row = by * 8 + r;
-		col = bx * 4 + c;
-		break;
-	}
-	}
 }
 
 
@@ -249,28 +301,26 @@ bool ygv625_device::read_overrides(bit_reader &br, plane_params &p, const plane_
 {
 	p = base;
 
-	u32 nflags = 2 + ((flag_layout >> 1) & 1) + (flag_layout & 1);
-	u32 flags = br.read(nflags);
+	const u32 nflags = 2 + BIT(flag_layout, 1) + BIT(flag_layout, 0);
+	const u32 flags = br.read(nflags);
 
-	// expand the flags into a mask of overridden parameters: bit 0 cmax, 1 cth, 2 esc, 3 Wn
+	// expand the flags (MSB first) into a mask of overridden parameters:
+	// bit 0 cmax, 1 cth, 2 esc, 3 Wn
 	u32 over = 0;
-	u32 shift = nflags - 1;
-	auto take = [&flags, &shift]() { u32 f = (flags >> shift) & 1; shift--; return f; };
-	if (take())
-		over |= (flag_layout & 2) ? 0x1 : 0x3;
-	if (take())
-		over |= (flag_layout & 1) ? 0x4 : 0xc;
-	if (flag_layout & 2)
-		if (take())
-			over |= 0x2;
-	if (flag_layout & 1)
-		if (take())
-			over |= 0x8;
+	int bit = nflags - 1;
+	if (BIT(flags, bit--))
+		over |= BIT(flag_layout, 1) ? 0x1 : 0x3;
+	if (BIT(flags, bit--))
+		over |= BIT(flag_layout, 0) ? 0x4 : 0xc;
+	if (BIT(flag_layout, 1) && BIT(flags, bit--))
+		over |= 0x2;
+	if (BIT(flag_layout, 0) && BIT(flags, bit--))
+		over |= 0x8;
 
-	if (over & 1) p.cmax = br.read(3) + 1;
-	if (over & 2) p.cth = br.read(3) + 1;
-	if (over & 4) p.esc = br.read(3) + 1;
-	if (over & 8) p.wn = br.read(3) + 1;
+	if (BIT(over, 0)) p.cmax = br.read(3) + 1;
+	if (BIT(over, 1)) p.cth = br.read(3) + 1;
+	if (BIT(over, 2)) p.esc = br.read(3) + 1;
+	if (BIT(over, 3)) p.wn = br.read(3) + 1;
 	return true;
 }
 
@@ -318,7 +368,7 @@ bool ygv625_device::decode_plane(bit_reader &br, const plane_params &p, int p0, 
 		{
 			u32 w = (tok == 2) ? p.cth : p.cmax;
 			int v = br.read(w);
-			if (v & (1 << (w - 1)))
+			if (BIT(v, w - 1))
 				v -= 1 << w;
 			cur += v;
 			if (v)
@@ -515,18 +565,16 @@ bool ygv625_device::decode_sprite(decoded_sprite &spr, u32 addr)
 
 
 //-------------------------------------------------
-//  get_sprite - cached decode
+//  get_sprite - cached decode, least recently
+//  used sprites are dropped once the cache is full
 //-------------------------------------------------
 
 const ygv625_device::decoded_sprite &ygv625_device::get_sprite(u32 addr, u16 width, u16 height)
 {
 	const u64 key = (u64(addr) << 20) | (u64(width) << 10) | height;
-	auto it = m_cache.find(key);
+	auto const it = m_cache.find(key);
 	if (it != m_cache.end())
 		return it->second;
-
-	if (m_cache.size() > 4096)
-		m_cache.clear();
 
 	decoded_sprite &spr = m_cache[key];
 	spr.width = width;
