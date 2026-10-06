@@ -133,6 +133,17 @@ void pc98_cbus_root_device::mem_slot_w(offs_t offset, u16 data, u16 mem_mask)
 	space(AS_PROGRAM).write_word((offset << 1) + 0xc'0000, data, mem_mask);
 }
 
+// 15 MiB hole on 24-bit C-Bus hosts.
+u16 pc98_cbus_root_device::mem_15m_r(offs_t offset, u16 mem_mask)
+{
+	return space(AS_PROGRAM).read_word((offset << 1) + 0xf0'0000, mem_mask);
+}
+
+void pc98_cbus_root_device::mem_15m_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	space(AS_PROGRAM).write_word((offset << 1) + 0xf0'0000, data, mem_mask);
+}
+
 u16 pc98_cbus_root_device::io_r(offs_t offset, u16 mem_mask)
 {
 	return space(AS_IO).read_word(offset << 1, mem_mask);

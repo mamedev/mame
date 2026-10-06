@@ -124,7 +124,7 @@ public:
 	void aoh(machine_config &config) ATTR_COLD;
 	void coolmini(machine_config &config) ATTR_COLD;
 	void mrkicker(machine_config &config) ATTR_COLD;
-	void solitaire(machine_config &config) ATTR_COLD;
+	void solitair(machine_config &config) ATTR_COLD;
 
 	void init_vamphalf() ATTR_COLD;
 	void init_vamphalfr1() ATTR_COLD;
@@ -149,7 +149,8 @@ public:
 	void init_aoh() ATTR_COLD;
 	void init_boonggab() ATTR_COLD;
 	void init_mrkicker() ATTR_COLD;
-	void init_solitaire() ATTR_COLD;
+	void init_solitair() ATTR_COLD;
+	void init_solitaira() ATTR_COLD;
 
 	ioport_value boonggab_photo_sensors_r();
 
@@ -237,7 +238,7 @@ private:
 	void suplup_io(address_map &map) ATTR_COLD;
 	void jmpbreak_io(address_map &map) ATTR_COLD;
 	void worldadv_io(address_map &map) ATTR_COLD;
-	void solitaire_io(address_map &map) ATTR_COLD;
+	void solitair_io(address_map &map) ATTR_COLD;
 	void mrdig_io(address_map &map) ATTR_COLD;
 	void aoh_map(address_map &map) ATTR_COLD;
 	void aoh_io(address_map &map) ATTR_COLD;
@@ -622,7 +623,7 @@ void vamphalf_state::worldadv_io(address_map &map)
 	map(0x1e0, 0x1e0).r(FUNC(vamphalf_state::eeprom_r));
 }
 
-void vamphalf_state::solitaire_io(address_map &map)
+void vamphalf_state::solitair_io(address_map &map)
 {
 	map(0x000, 0x000).r(FUNC(vamphalf_state::eeprom_r));
 	map(0x030, 0x030).portr("P1_P2");
@@ -1099,7 +1100,7 @@ static INPUT_PORTS_START( yorijori )
 	PORT_SERVICE_NO_TOGGLE( 0x00800000, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( solitaire )
+static INPUT_PORTS_START( solitair )
 	PORT_START("P1_P2") // when you have no more moves, hold down “Turn Up Card” & “Register” and you get a count down to end that round / game
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("Column 1 / 2 Credit Start") // L1 Button in test mode
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("Column 2 / 3 Credit Start") // L2 Button in test mode
@@ -1261,11 +1262,11 @@ void vamphalf_state::jmpbreak(machine_config &config)
 	sound_ym_oki(config);
 }
 
-void vamphalf_state::solitaire(machine_config &config)
+void vamphalf_state::solitair(machine_config &config)
 {
 	common(config);
 
-	m_maincpu->set_addrmap(AS_IO, &vamphalf_state::solitaire_io);
+	m_maincpu->set_addrmap(AS_IO, &vamphalf_state::solitair_io);
 
 	sound_ym_oki(config);
 }
@@ -2051,10 +2052,28 @@ ROMs:
 
 */
 
-ROM_START( solitaire ) // Version 2.5
+ROM_START( solitair ) // Version 2.5
 	ROM_REGION32_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) // Hyperstone CPU Code
 	// 0 - 0x80000 empty
 	ROM_LOAD( "rom2.bin",               0x080000, 0x080000, CRC(304e4338) SHA1(6b2817d7505c943ca7cdfa9176c9504e30936235) ) // 27c040
+
+	ROM_REGION32_BE( 0x800000, "gfx", 0 )  // gfx data, all mx29f1610mc
+	ROM_LOAD32_WORD_SWAP( "romu00.bin", 0x000000, 0x200000, CRC(7fee63ac) SHA1(ef22145da9ce3100c8736e9a77e59da4f984aaba) )
+	ROM_LOAD32_WORD_SWAP( "roml00.bin", 0x000002, 0x200000, CRC(0d973625) SHA1(b482a97732a6117d9c1c7507118e111ac4f7f3f1) )
+	ROM_LOAD32_WORD_SWAP( "romu01.bin", 0x400000, 0x200000, CRC(f3f3f3e5) SHA1(9a0d91351903b70049fbbc76a9ccff1a382ecbfd) )
+	ROM_LOAD32_WORD_SWAP( "roml01.bin", 0x400002, 0x200000, CRC(5bba95b8) SHA1(6d884a694cbbad6768e606afd5b234a07a3b5b50) )
+
+	ROM_REGION( 0x80000, "oki1", 0 ) // Oki Samples
+	ROM_LOAD( "vrom1.bin",              0x000000, 0x040000, CRC(bbbf4ac8) SHA1(b37f945143a9ed7a372a953ef93dbea01c4fcce4) ) // 27c020
+
+	ROM_REGION( 0x2dd, "plds", 0 )
+	ROM_LOAD( "palce22v10.gal1",        0x000000, 0x0002dd, NO_DUMP ) // Protected
+ROM_END
+
+ROM_START( solitaira ) // Version 2.?
+	ROM_REGION32_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) // Hyperstone CPU Code
+	// 0 - 0x80000 empty
+	ROM_LOAD( "rom2.bin",               0x080000, 0x080000, CRC(88c9207d) SHA1(40a069d1d5a08bf182931642930f4b7ee8e11757) ) // 27c040
 
 	ROM_REGION32_BE( 0x800000, "gfx", 0 )  // gfx data, all mx29f1610mc
 	ROM_LOAD32_WORD_SWAP( "romu00.bin", 0x000000, 0x200000, CRC(7fee63ac) SHA1(ef22145da9ce3100c8736e9a77e59da4f984aaba) )
@@ -3394,10 +3413,16 @@ void vamphalf_state::init_worldadv()
 	m_palshift = 0;
 }
 
-void vamphalf_state::init_solitaire()
+void vamphalf_state::init_solitair()
 {
-	// TODO: speedup
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x05d1c0, 0x05d1c1, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x8810, 0x5d1c0>))));
+
+	m_palshift = 0;
+}
+
+void vamphalf_state::init_solitaira()
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x05cee4, 0x05cee5, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x8810, 0x5cee4>))));
 
 	m_palshift = 0;
 }
@@ -3428,7 +3453,8 @@ GAME( 1999, newxpanga,  newxpang, jmpbreak,  common,    vamphalf_state,       in
 
 GAME( 1999, worldadv,   0,        worldadv,  common,    vamphalf_state,       init_worldadv,  ROT0,   "Logic / F2 System",             "World Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // cfr. vamphalf_prot.cpp
 
-GAME( 1999, solitaire,  0,        solitaire, solitaire, vamphalf_state,       init_solitaire, ROT0,   "F2 System",                     "Solitaire (version 2.5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, solitair,   0,        solitair,  solitair,  vamphalf_state,       init_solitair,  ROT0,   "F2 System",                     "Solitaire (version 2.5, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, solitaira,  solitair, solitair,  solitair,  vamphalf_state,       init_solitaira, ROT0,   "F2 System",                     "Solitaire (version 2.5, set 2)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1999, suplup,     0,        suplup,    common,    vamphalf_state,       init_suplup,    ROT0,   "Omega System",                  "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, luplup,     suplup,   suplup,    common,    vamphalf_state,       init_luplup,    ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)",       MACHINE_SUPPORTS_SAVE )

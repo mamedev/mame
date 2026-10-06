@@ -4401,6 +4401,18 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
+	<software name="dream">
+		<description>Dream: Land of Giants (prototype)</description>
+		<year>199?</year>
+		<publisher>Rare</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="Dream.sfc" size="2097152" crc="058de651" sha1="2675d7afe886f20462337aa1ee3aa5c3135fff3a" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="firearm">
 		<!-- Notes: released on the snesorama boards in 2010 without any documentation, due to the bad internal size it is likely a compiled binary -->
 		<description>Firearm (USA, prototype)</description> <!-- it supposedly had the date stamp 19931217 but it is not confirmed -->
@@ -7579,6 +7591,24 @@ more investigation needed...
 		</part>
 	</software>
 
+	<software name="valken_rb" cloneof="cybernat">
+		<description>Assault Suits Valken (USA) (Retro-Bit)</description>
+		<year>2024</year>
+		<publisher>Retro-Bit</publisher>
+		<info name="developer" value="Opus" />
+		<info name="developer" value="NCS" />
+		<info name="serial" value="RB-CT-1016" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SNES-LROM-RAM-V03 20240110 RB INNEX-C01" />
+			<feature name="u0" value="29F160TE-90PFTN 0503 F59" />
+			<feature name="lockout" value="ATMEL2206 TINY13A" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="29f160te-90pftn 0503 f59.u0" size="2097152" crc="b802fc5e" sha1="2aa3c2e950c66524b7c481faeabc11355085f4ec" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="asterix">
 		<description>Astérix (Europe)</description>
 		<year>1993</year>
@@ -8445,6 +8475,24 @@ more investigation needed...
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-ul-0.u1" size="1048576" crc="8b18ac01" sha1="bf56f12bdde3e2233d7ffcaf4825b10d92632b77" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btoadsdd_rb" cloneof="btoadsdd">
+		<description>Battletoads &amp; Double Dragon - The Ultimate Team (USA) (Retro-Bit)</description>
+		<year>2023</year>
+		<publisher>Retro-Bit</publisher>
+		<info name="developer" value="Rare" />
+		<info name="serial" value="RB-CT-1006" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SNES-LROM-RAM-V03 20230421 RB INNEX-C01" />
+			<feature name="u0" value="00TA 70PF" />
+			<feature name="u7" value="SN74HC00 N1AT216A" />
+			<feature name="lockout" value="TINY13A" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="00ta 70pf.u0" size="1048576" crc="f7433e03" sha1="b392d00f78e04a35e1c95c1eb5f11bdd0d843efa" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -67545,6 +67593,23 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="zero_lrg" cloneof="zero">
+		<description>Zero the Kamikaze Squirrel (USA) (Limited Run Games)</description>
+		<year>2024</year>
+		<publisher>Limited Run Games</publisher>
+		<info name="developer" value="Iguana Entertainment" />
+		<info name="serial" value="SNES-ZKS" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SNES-LROM-RAM-V04 RB INNEX-C01 20240413" />
+			<feature name="u0" value="29F800TA-70PFTN 1110 F72S E1" />
+			<feature name="u1" value="29F800TA-70PFTN 1105 F20S E1" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="Zero the Kamikaze Squirrel (USA) (Limited Run Games).sfc" size="2097152" crc="c98fb63a" sha1="b01c1558aac43775b2dbe980775218ead36bc7a2" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zico">
 		<description>Zico Soccer (Japan)</description>
 		<year>1994</year>
@@ -67621,11 +67686,11 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 
 	<software name="zombies_lrg" cloneof="zombies">
 		<description>Zombies Ate My Neighbors (USA, Limited Run Games)</description>
-		<year>2021</year>
+		<year>2022</year>
 		<publisher>Limited Run Games</publisher>
 		<info name="developer" value="LucasFilms Games" />
 		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SNES-LROM-RAM-V04 RB INNEX-C01" />
+			<feature name="pcb" value="SNES-LROM-RAM-V04 RB INNEX-C01 20220929" />
 			<feature name="u0" value="U0 EPROM [HY29F800BT-70 0041A]" />
 			<feature name="u1" value="U1 EPROM" /> <!-- empty socket -->
 			<feature name="u2" value="U2 EPROM" /> <!-- empty socket -->

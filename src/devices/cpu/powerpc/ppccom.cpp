@@ -235,6 +235,7 @@ ppc_device::ppc_device(
 	, m_program_config("program", ENDIANNESS_BIG, data_bits, address_bits, 0, internal_map)
 	, c_bus_frequency(0)
 	, c_serial_clock(0)
+	, c_rtc_clock(7'812'500)
 	, m_core(nullptr)
 	, m_bus_freq_multiplier(1)
 	, m_flavor(flavor)
@@ -453,6 +454,18 @@ inline void ppc_device::set_timebase(uint64_t newtb)
 
 
 /*-------------------------------------------------
+    get_rtc - return the 601 RTC
+-------------------------------------------------*/
+
+inline uint64_t ppc_device::get_rtc()
+{
+	const uint64_t elapsed = total_cycles() - m_rtc_zero_cycles;
+	const uint64_t rate = uint64_t(c_rtc_clock) * 128;
+	return (elapsed / clock()) * rate + (elapsed % clock()) * rate / clock();
+}
+
+
+/*-------------------------------------------------
     get_decremeter - return the current
     decrementer value
 -------------------------------------------------*/
@@ -503,8 +516,9 @@ void ppc_device::set_decrementer(uint32_t newdec)
 
 /*-------------------------------------------------
     The 601's decrementer, like the 601-specific
-    RTC mechanism, counts nanoseconds, not bus
-    clocks.  This implementation allows pmac6100
+    RTC mechanism, counts 128 per RTC input clock
+    (nanoseconds at the nominal 7.8125 MHz), not
+    bus clocks.  This implementation allows pmac6100
     to Gestalt itself properly (the boot ROM counts
     decrementer ticks vs. instruction execution).
 -------------------------------------------------*/
@@ -512,12 +526,14 @@ void ppc_device::set_decrementer(uint32_t newdec)
 uint32_t ppc601_device::get_decrementer()
 {
 	const int64_t cycles_until_zero = (int64_t)m_dec_zero_cycles - (int64_t)total_cycles();
-	return (uint32_t)(cycles_until_zero * 1'000'000'000LL / clock());
+	const int64_t rate = int64_t(c_rtc_clock) * 128;
+	return (uint32_t)(cycles_until_zero * rate / clock());
 }
 
 void ppc601_device::set_decrementer(uint32_t newdec)
 {
-	m_dec_zero_cycles = total_cycles() + (uint64_t)newdec * clock() / 1'000'000'000;
+	const uint64_t rate = uint64_t(c_rtc_clock) * 128;
+	m_dec_zero_cycles = total_cycles() + (uint64_t)newdec * clock() / rate;
 	m_decrementer_int_timer->adjust(cycles_to_attotime(m_dec_zero_cycles - total_cycles()));
 }
 
@@ -527,7 +543,7 @@ TIMER_CALLBACK_MEMBER(ppc601_device::decrementer_int_callback)
 	m_core->irq_pending |= 0x02;
 
 	// advance by another full tick
-	m_dec_zero_cycles += ((uint64_t)1 << 32) * clock() / 1'000'000'000;
+	m_dec_zero_cycles += ((uint64_t)1 << 32) * clock() / (uint64_t(c_rtc_clock) * 128);
 	m_decrementer_int_timer->adjust(cycles_to_attotime(m_dec_zero_cycles - total_cycles()));
 }
 
@@ -1468,21 +1484,34 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, bool debug
 		m_core->mmu603_hash[1] = hashbase | ((~hash << 6) & hashmask);
 		m_core->mmu603_key = (segreg >> (29 + transpriv)) & 1;   // SRR1[KEY]: SR[Ks] for a supervisor access, SR[Kp] for a user access
 
-		// Entries loaded by tlbld/tlbli carry per-mode permissions derived from the PTE's PP bits and the segment key
+		// Entries loaded by tlbld/tlbli carry per-mode permissions derived from the PTE's PP bits and the segment key.
+		// The 603 has separate instruction and data TLBs that software reloads independently (and possibly from
+		// different page tables), so an entry only answers for the TLB that loaded it: a page held by the other
+		// TLB alone still takes the miss exception so the software table search can run.
 		if ((entry & (FLAG_FIXED | FLAG_VALID)) == (FLAG_FIXED | FLAG_VALID))
 		{
-			if (entry & (1 << (intention & (TR_TYPE | TR_USER))))
+			if (entry & ((transtype == TR_FETCH) ? VTLB_603_ITLB : VTLB_603_DTLB))
+			{
+				if (entry & (1 << (intention & (TR_TYPE | TR_USER))))
+				{
+					address = (entry & 0xfffff000) | (address & 0x00000fff);
+					return 0x001;
+				}
+
+				// A store to a page whose C bit is clear takes the TLB miss on store exception so the handler
+				// can check protection and set C (603e User's Manual Table 5-4).
+				// Anything else the hardware refuses on a TLB hit is a page protection violation (Table 5-3)
+				if (transtype == TR_WRITE && !(entry & VTLB_603_CHANGED))
+					return DSISR_NOT_FOUND | DSISR_STORE;
+				return DSISR_PROTECTED | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
+			}
+
+			// let the debugger see through the other TLB's translation
+			if (debug)
 			{
 				address = (entry & 0xfffff000) | (address & 0x00000fff);
 				return 0x001;
 			}
-
-			// A store to a page whose C bit is clear takes the TLB miss on store exception so the handler
-			// can check protection and set C (603e User's Manual Table 5-4).
-			// Anything else the hardware refuses on a TLB hit is a page protection violation (Table 5-3)
-			if (transtype == TR_WRITE && !(entry & VTLB_603_CHANGED))
-				return DSISR_NOT_FOUND | DSISR_STORE;
-			return DSISR_PROTECTED | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
 		}
 		return DSISR_NOT_FOUND | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
 	}
@@ -1870,28 +1899,58 @@ void ppc_device::ppccom_execute_tlbl()
 	uint8_t const ks = (segreg >> 30) & 1;
 	uint8_t const kp = (segreg >> 29) & 1;
 
+	// tlbli only fills the instruction TLB and tlbld only the data TLB, so an entry grants just the
+	// accesses its own TLB is asked about.
 	vtlb_entry flags = FLAG_VALID;
-	if (page_access_allowed(TR_READ, ks, pp))
+	if (isitlb)
 	{
-		flags |= READ_ALLOWED | FETCH_ALLOWED;
+		flags |= VTLB_603_ITLB;
+		if (page_access_allowed(TR_READ, ks, pp))
+		{
+			flags |= FETCH_ALLOWED;
+		}
+		if (page_access_allowed(TR_READ, kp, pp))
+		{
+			flags |= USER_FETCH_ALLOWED;
+		}
 	}
-	if (page_access_allowed(TR_READ, kp, pp))
+	else
 	{
-		flags |= USER_READ_ALLOWED | USER_FETCH_ALLOWED;
+		flags |= VTLB_603_DTLB;
+		if (page_access_allowed(TR_READ, ks, pp))
+		{
+			flags |= READ_ALLOWED;
+		}
+		if (page_access_allowed(TR_READ, kp, pp))
+		{
+			flags |= USER_READ_ALLOWED;
+		}
+
+		// A store to a page with C = 0 must take the TLB miss on store exception so the handler can set C.
+		if (rpa & 0x80)
+		{
+			flags |= VTLB_603_CHANGED;
+			if (page_access_allowed(TR_WRITE, ks, pp))
+			{
+				flags |= WRITE_ALLOWED;
+			}
+			if (page_access_allowed(TR_WRITE, kp, pp))
+			{
+				flags |= USER_WRITE_ALLOWED;
+			}
+		}
 	}
 
-	// A store to a page with C = 0 must take the TLB miss on store exception so the handler can set C.
-	if (rpa & 0x80)
+	// The VTLB has a single entry per effective page, so the instruction and data TLB entries for a page
+	// share it.  Keep the other TLB's permissions when it already maps the page to the same physical page;
+	// otherwise the new translation takes over and the other TLB simply misses again.
+	vtlb_entry const old = vtlb_table()[address >> 12];
+	if (((old & (FLAG_FIXED | FLAG_VALID)) == (FLAG_FIXED | FLAG_VALID)) && (((old ^ rpa) & 0xfffff000) == 0))
 	{
-		flags |= VTLB_603_CHANGED;
-		if (page_access_allowed(TR_WRITE, ks, pp))
-		{
-			flags |= WRITE_ALLOWED;
-		}
-		if (page_access_allowed(TR_WRITE, kp, pp))
-		{
-			flags |= USER_WRITE_ALLOWED;
-		}
+		vtlb_entry const other = isitlb
+				? (VTLB_603_DTLB | VTLB_603_CHANGED | READ_ALLOWED | WRITE_ALLOWED | USER_READ_ALLOWED | USER_WRITE_ALLOWED)
+				: (VTLB_603_ITLB | FETCH_ALLOWED | USER_FETCH_ALLOWED);
+		flags |= old & other;
 	}
 
 	// load the entry
@@ -1975,15 +2034,11 @@ void ppc_device::ppccom_execute_mfspr()
 				return;
 
 			case SPR601_RTCUR_PWR:
-				m_core->param1 = (total_cycles() - m_rtc_zero_cycles) / clock();
+				m_core->param1 = get_rtc() / 1'000'000'000;
 				return;
 
 			case SPR601_RTCLR_PWR:
-				{
-					// get fractional seconds and convert to nanoseconds
-					const uint64_t remainder = (total_cycles() - m_rtc_zero_cycles) % clock();
-					m_core->param1 = (remainder * 1'000'000'000ULL) / clock();
-				}
+				m_core->param1 = get_rtc() % 1'000'000'000;
 				return;
 		}
 	}

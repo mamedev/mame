@@ -60,6 +60,8 @@ pugixml - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 rapidjson - [The MIT License (MIT)](http://opensource.org/licenses/MIT), [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause) (msinttypes), JSON license (JSON_checker)
 
+residfp - [The GNU General Public License, version 2 or later](https://opensource.org/licenses/GPL-2.0)
+
 softfloat3 - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 
 sol2 - [The MIT License (MIT)](http://opensource.org/licenses/MIT)

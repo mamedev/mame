@@ -181,7 +181,10 @@ void scudsp_cpu_device::set_dest_mem_reg( uint32_t mode, uint32_t value )
 			m_ct3 &= 0x3f;
 			break;
 		case 0x4:   /* RX */
+			// the multiplier works on whatever is in RX, however it got there
+			// - vkyoute2 loads RX with MVI #$10000 for the translation column of its transform
 			m_rx.ui = value;
+			m_update_mul = 1;
 			break;
 		case 0x5:   /* PL */
 			m_pl.ui = value;

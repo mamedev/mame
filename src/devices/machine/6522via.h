@@ -145,7 +145,13 @@ protected:
 	uint8_t m_acr;
 
 private:
-	uint16_t get_counter1_value();
+	uint64_t clocks_since(const attotime &start) const;
+	uint16_t get_counter1_value() const;
+	uint16_t get_counter2_value() const;
+	void reanchor_counter1();
+	bool shift_blocked() const;
+	bool shift_clock_level() const;
+	uint32_t t2_underflow_delay() const;
 	void counter2_decrement();
 
 	void set_pa_line(int line, int state);
@@ -191,6 +197,9 @@ private:
 	uint8_t m_t1lh;
 	uint8_t m_t2cl;
 	uint8_t m_t2ch;
+	bool m_shift_done;
+	uint16_t m_t1_value;
+	uint16_t m_t2_start;
 	uint8_t m_t2ll;
 	uint8_t m_t2lh;
 
@@ -205,6 +214,7 @@ private:
 	int m_t1_pb7;
 	emu_timer *m_t2;
 	attotime m_time2;
+	attotime m_t2_load;
 	uint8_t m_t2_active;
 	emu_timer *m_ca2_timer;
 	emu_timer *m_cb2_timer;

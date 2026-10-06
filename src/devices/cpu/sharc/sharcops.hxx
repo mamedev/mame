@@ -31,11 +31,12 @@
 #define UIREG(x)    uint32_t(m_core->r[x].r)
 #define FREG(x)     (m_core->r[x].f)
 
+// The ADSP-2106x circular buffer occupies [B, B+L), so a post-modified index that reaches B+L wraps.
 #define UPDATE_CIRCULAR_BUFFER_PM(x)                        \
 	{                                                       \
 		if (PM_REG_L(x) != 0)                               \
 		{                                                   \
-			if (PM_REG_I(x) > PM_REG_B(x)+PM_REG_L(x))      \
+			if (PM_REG_I(x) >= PM_REG_B(x)+PM_REG_L(x))     \
 			{                                               \
 				PM_REG_I(x) -= PM_REG_L(x);                 \
 			}                                               \
@@ -50,7 +51,7 @@
 	{                                                       \
 		if (DM_REG_L(x) != 0)                               \
 		{                                                   \
-			if (DM_REG_I(x) > DM_REG_B(x)+DM_REG_L(x))      \
+			if (DM_REG_I(x) >= DM_REG_B(x)+DM_REG_L(x))     \
 			{                                               \
 				DM_REG_I(x) -= DM_REG_L(x);                 \
 			}                                               \

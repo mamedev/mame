@@ -173,7 +173,7 @@ Notes on possible shutms11 BIOS bugs:
 **************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/i386/i386.h"
+
 #include "bus/isa/isa_cards.h"
 #include "bus/pci/pci_slot.h"
 #include "bus/pc_kbd/keyboards.h"
@@ -182,6 +182,7 @@ Notes on possible shutms11 BIOS bugs:
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/sun_kbd.h"
 #include "bus/rs232/terminal.h"
+#include "cpu/i386/i386.h"
 #include "machine/intelfsh.h"
 #include "machine/it8705f.h"
 #include "machine/pci.h"
@@ -206,12 +207,12 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void sis630(machine_config &config);
+	void sis630(machine_config &config) ATTR_COLD;
 
-	void asuspolo(machine_config &config);
-	void asuscusc(machine_config &config);
-	void gamecstl(machine_config &config);
-	void zidav630e(machine_config &config);
+	void asuspolo(machine_config &config) ATTR_COLD;
+	void asuscusc(machine_config &config) ATTR_COLD;
+	void gamecstl(machine_config &config) ATTR_COLD;
+	void zidav630e(machine_config &config) ATTR_COLD;
 
 private:
 

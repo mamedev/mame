@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "cpu/dsp32/dsp3210.h"
 #include "cpu/m68000/m68040.h"
 #include "machine/6522via.h"
 #include "machine/am79c940.h"
@@ -24,6 +25,7 @@ public:
 	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
 	void set_scsi_device(ncr53c94_device *device) { m_ncr = device; }
 	template <typename T> void set_mace_tag(T &&tag) { m_mace.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_dsp_tag(T &&tag) { m_dsp.set_tag(std::forward<T>(tag)); }
 
 	// interface routines
 	auto write_cb1() { return m_cb1.bind(); }   // ADB clock
@@ -58,6 +60,9 @@ public:
 	void enet_tx_drq_w(int state);
 	void enet_rx_drq_w(int state);
 
+	void dsp_bio_w(u8 data);    // the DSP's BIO output register: BIO0 is the doorbell
+	void dsp_iack1_w(int state);    // the DSP's IACK1: a rising edge acknowledges the frame interrupt
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -81,6 +86,8 @@ protected:
 	required_device<dac_16bit_r2r_device> m_dac_l, m_dac_r;
 
 private:
+	static constexpr u32 OUT_RING_SIZE = 8192;  // stereo samples staged for the DACs
+
 	u16 mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 mac_via2_r(offs_t offset);
@@ -112,6 +119,12 @@ private:
 	void via1_irq(int state);
 	TIMER_CALLBACK_MEMBER(mac_6015_tick);
 	TIMER_CALLBACK_MEMBER(singer_tick);
+	TIMER_CALLBACK_MEMBER(frame_tick);
+	u32 snd_rate() const;
+	u32 snd_size() const;
+	u32 snd_phase() const;
+	void arm_frame_timer();
+	void dsp_overrun_w(u8 data);
 
 	u16 m_psc_regs[0x2000 / 4];
 
@@ -124,9 +137,22 @@ private:
 
 	s32 m_drq, m_scsi_irq, m_fdc_irq;
 
-	u32 m_audio_out_ptr;
-	u32 m_audio_out_offset;
-	u32 m_audio_out_length;
+	// sound engine: the PSC streams the RAM double buffers to and from
+	// the Singer codec one half buffer at a time, on a frame tick that
+	// also drives the DSP
+	u16 m_snd_com;              // sndComCtl
+	u32 m_singer_ctl;           // singerCtl
+	u32 m_snd_in_base, m_snd_out_base;
+	u16 m_snd_size;             // samples per half buffer
+	u8 m_dsp_overrun;           // DSPOVERRUN: bit 0 DSPRESET, 1 DSPRESETEN, 2 FRMOVRN
+	bool m_dsp_held;            // the DSP's RESTN is asserted
+	u8 m_dsp_bio;               // the DSP's BIO output register, for the BIO0 edge
+	bool m_frame_irq;           // INT1 (the DSP's IR1N) asserted, awaiting IACK1
+	bool m_dsp_iack1;           // the DSP's IACK1 level, for the rising edge
+	u64 m_in_samples;           // input samples produced (the dither sequence)
+	s16 m_out_ring[OUT_RING_SIZE][2];
+	u32 m_out_head, m_out_tail;
+	emu_timer *m_frame_timer;
 
 	u32 m_l3if, m_l3ier, m_l4if, m_l4ier, m_l5if, m_l5ier, m_l6if, m_l6ier;
 
@@ -143,6 +169,7 @@ private:
 
 	required_address_space m_space;
 	ncr53c94_device *m_ncr;
+	optional_device<dsp3210_device> m_dsp;
 };
 
 // device type definition

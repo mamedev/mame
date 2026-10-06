@@ -7,27 +7,18 @@
     driver by Nicola Salmoria
 
     Notes:
-    - irq source for main CPU aren't understood, needs HW tests.
-    - Missing road (two unemulated K053250)
+    - CCU frame-counter and VBLANK edge timing need cycle-level verification.
+    - K053250 DMA timing, clipping and descriptor flags need hardware verification.
+    - K053249 commands are approximated without its internal program.
+    - K053246 DMA duration and sprite coordinate wrapping need hardware verification.
     - Visible area and relative placement of sprites and tiles is most likely wrong.
-    - Test mode doesn't work well with 3 IRQ5 per frame, the ROM check doesn't work
-      and the coin A setting isn't shown. It's OK with 1 IRQ5 per frame.
     - The "Continue?" sprites are not visible until you press start
     - priorities
-
-    The issues below are both IRQ timing, and relate to when the sprites get
-    copied across by the DMA
-    - Some flickering sprites, this might be an interrupt/timing issue
-    - The screen is cluttered with sprites which aren't supposed to be visible,
-      increasing the coordinate mask in k053247_sprites_draw() from 0x3ff to 0xfff
-      fixes this but breaks other games (e.g. Vendetta).
 
 ***************************************************************************/
 
 #include "emu.h"
 
-#include "machine/k053252.h"
-#include "machine/timer.h"
 #include "k053246_k053247_k055673.h"
 #include "k053250.h"
 #include "k053251.h"
@@ -37,7 +28,9 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/adc0804.h"
 #include "machine/eepromser.h"
+#include "machine/k053252.h"
 #include "machine/rescap.h"
+#include "machine/timer.h"
 #include "sound/k053260.h"
 #include "sound/ymopm.h"
 #include "video/k051316.h"
@@ -45,6 +38,8 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include <algorithm>
 
 #include "overdriv.lh"
 
@@ -60,32 +55,35 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_k051316(*this, "k051316_%u", 1)
 		, m_k053246(*this, "k053246")
+		, m_k053250(*this, "k053250_%u", 1)
 		, m_k053251(*this, "k053251")
 		, m_k053252(*this, "k053252")
 		, m_screen(*this, "screen")
+		, m_eeprom(*this, "eeprom")
+		, m_spriteram(*this, "spriteram")
+		, m_alu_ram(*this, "alu_ram")
 		, m_led(*this, "led0")
 	{ }
 
-	void overdriv(machine_config &config);
+	void overdriv(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void cpuA_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void eeprom_w(offs_t offset, uint8_t data);
+	void cpuA_ctrl_w(offs_t offset, uint8_t data);
 	uint16_t cpuB_ctrl_r();
 	void cpuB_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void soundirq_w(uint16_t data);
 	void sound_ack_w(uint8_t data);
-	void sub_irq4_assert_w(uint16_t data);
+	void sub_irq6_assert_w(uint16_t data);
 	void sub_irq5_assert_w(uint16_t data);
 	void objdma_w(uint8_t data);
-	TIMER_CALLBACK_MEMBER(objdma_end_cb);
+	void alu_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	[[maybe_unused]] INTERRUPT_GEN_MEMBER(cpuB_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cpuA_scanline);
 
 	K051316_CB_MEMBER(zoom_callback_1);
@@ -99,11 +97,13 @@ private:
 	uint16_t  m_zoom_colorbase[2]{};
 	uint16_t  m_road_colorbase[2]{};
 	uint16_t  m_sprite_colorbase = 0;
-	emu_timer *m_objdma_end_timer = nullptr;
+	bitmap_ind8 m_layer_priority;
+	bitmap_ind16 m_zoom_bitmap;
+	int m_sprite_priority_base = 0;
 
 	/* misc */
 	uint16_t  m_cpuB_ctrl = 0;
-	int32_t   m_fake_timer = 0;
+	uint8_t   m_ccu_frame = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -111,9 +111,13 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<k051316_device, 2> m_k051316;
 	required_device<k053247_device> m_k053246;
+	required_device_array<k053250_device, 2> m_k053250;
 	required_device<k053251_device> m_k053251;
 	required_device<k053252_device> m_k053252;
 	required_device<screen_device> m_screen;
+	required_device<eeprom_serial_er5911_device> m_eeprom;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_alu_ram;
 	output_finder<> m_led;
 };
 
@@ -126,71 +130,67 @@ private:
 
 static const uint16_t overdriv_default_eeprom[64] =
 {
-	0x7758,0xFFFF,0x0078,0x9000,0x0078,0x7000,0x0078,0x5000,
-	0x5441,0x4B51,0x3136,0x4655,0x4AFF,0x0300,0x0270,0x0250,
-	0x00B4,0x0300,0xB403,0x00B4,0x0300,0xB403,0x00B4,0x0300,
-	0xB403,0x00B4,0x0300,0xB403,0x00B4,0x0300,0xB403,0x00B4,
-	0x0300,0xB403,0x00B4,0x0300,0xB403,0x00B4,0x0300,0xB403,
-	0x00B4,0x0300,0xB403,0x00B4,0x0300,0xB403,0x00B4,0x0300,
-	0xB403,0x00B4,0x0300,0xB403,0x00B4,0x0300,0xB403,0x00B4,
-	0x0300,0xB403,0x00B4,0x0300,0xB403,0x00B4,0x0300,0xB403
+	0x7758, 0xffff, 0x0078, 0x9000, 0x0078, 0x7000, 0x0078, 0x5000,
+	0x5441, 0x4b51, 0x3136, 0x4655, 0x4aff, 0x0300, 0x0270, 0x0250,
+	0x00b4, 0x0300, 0xb403, 0x00b4, 0x0300, 0xb403, 0x00b4, 0x0300,
+	0xb403, 0x00b4, 0x0300, 0xb403, 0x00b4, 0x0300, 0xb403, 0x00b4,
+	0x0300, 0xb403, 0x00b4, 0x0300, 0xb403, 0x00b4, 0x0300, 0xb403,
+	0x00b4, 0x0300, 0xb403, 0x00b4, 0x0300, 0xb403, 0x00b4, 0x0300,
+	0xb403, 0x00b4, 0x0300, 0xb403, 0x00b4, 0x0300, 0xb403, 0x00b4,
+	0x0300, 0xb403, 0x00b4, 0x0300, 0xb403, 0x00b4, 0x0300, 0xb403
 };
 
 
-void overdriv_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void overdriv_state::eeprom_w(offs_t offset, uint8_t data)
 {
-	//logerror("%s: write %04x to eeprom_w\n",machine().describe_context(),data);
-	if (ACCESSING_BITS_0_7)
-	{
-		/* bit 0 is data */
-		/* bit 1 is clock (active high) */
-		/* bit 2 is cs (active low) */
-		ioport("EEPROMOUT")->write(data, 0xff);
-	}
+	//logerror("%s: write %04x to eeprom_w\n", machine().describe_context(), data);
+	// bit 0 is data
+	// bit 1 is clock (active high)
+	// bit 2 is cs (active low)
+	m_eeprom->di_write(BIT(data, 0));
+	m_eeprom->clk_write(BIT(data, 1));
+	m_eeprom->cs_write(BIT(data, 2));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::cpuA_scanline)
 {
-	const int timer_threshold = 168; // fwiw matches 0 on mask ROM check, so IF it's a timer irq then should be close ...
-	int scanline = param;
-
-	m_fake_timer ++;
-
-	// TODO: irqs routines are TOO slow right now, it ends up firing spurious irqs for whatever reason (shared ram fighting?)
-	//       this is a temporary solution to get rid of deprecat lib and the crashes, but also makes the game timer to be too slow.
-	//       Update: gameplay is actually too fast compared to timer, first attract mode shouldn't even surpass first blue car on right.
-	if(scanline == 256) // vblank-out irq
-	{
-		// m_screen->frame_number() & 1
-		m_maincpu->set_input_line(4, HOLD_LINE);
-	}
-	else if(m_fake_timer >= timer_threshold) // timer irq
-	{
-		m_fake_timer -= timer_threshold;
+	// U407 latches VBLANK on IRQ5. U302 latches the CCU FCNT output on IRQ4.
+	// Both latches are cleared by the corresponding CPU interrupt acknowledge.
+	if (param == m_screen->visible_area().max_y + 1)
 		m_maincpu->set_input_line(5, HOLD_LINE);
-	}
-}
 
-INTERRUPT_GEN_MEMBER(overdriv_state::cpuB_interrupt)
-{
-	// this doesn't get turned on until the irq has happened? wrong irq?
-}
-
-void overdriv_state::cpuA_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
+	// TODO: move FCNT generation into the CCU when its counters are implemented.
+	// Register 7 bit 1 enables the two-bit frame counter; bit 0 selects its output.
+	// Over Drive writes 3, selecting a rising edge every four frames.
+	const int vsync_start = m_screen->height() - ((m_k053252->read(0x0c) >> 4) + 1);
+	if (param == vsync_start)
 	{
-		/* bit 0 probably enables the second 68000 */
-		m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		// U302 latches VSYNC on the sub CPU's IRQ4, independently of FCNT.
+		m_subcpu->set_input_line(4, HOLD_LINE);
 
-		/* bit 1 is clear during service mode - function unknown */
-
-		m_led = BIT(data, 3);
-		machine().bookkeeping().coin_counter_w(0, data & 0x10);
-		machine().bookkeeping().coin_counter_w(1, data & 0x20);
-
-		//logerror("%s: write %04x to cpuA_ctrl_w\n",machine().describe_context(),data);
+		const uint8_t control = m_k053252->read(7);
+		if (BIT(control, 1))
+		{
+			const bool previous = BIT(m_ccu_frame, BIT(control, 0));
+			m_ccu_frame = (m_ccu_frame + 1) & 3;
+			if (!previous && BIT(m_ccu_frame, BIT(control, 0)))
+				m_maincpu->set_input_line(4, HOLD_LINE);
+		}
 	}
+}
+
+void overdriv_state::cpuA_ctrl_w(offs_t offset, uint8_t data)
+{
+	// bit 0 probably enables the second 68000
+	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+
+	// bit 1 is clear during service mode - function unknown
+
+	m_led = BIT(data, 3);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5));
+
+	//logerror("%s: write %04x to cpuA_ctrl_w\n", machine().describe_context(), data);
 }
 
 uint16_t overdriv_state::cpuB_ctrl_r()
@@ -204,12 +204,12 @@ void overdriv_state::cpuB_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask
 
 	if (ACCESSING_BITS_0_7)
 	{
-		/* bit 0 = enable sprite ROM reading */
-		m_k053246->k053246_set_objcha_line( (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+		// bit 0 = enable sprite ROM reading
+		m_k053246->k053246_set_objcha_line(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 
-		/* bit 1 used but unknown (irq enable?) */
+		// bit 1 used but unknown (IRQ enable?)
 
-		/* other bits unused? */
+		// other bits unused?
 	}
 }
 
@@ -221,10 +221,10 @@ void overdriv_state::soundirq_w(uint16_t data)
 
 
 
-void overdriv_state::sub_irq4_assert_w(uint16_t data)
+void overdriv_state::sub_irq6_assert_w(uint16_t data)
 {
-	// used in-game
-	m_subcpu->set_input_line(4, HOLD_LINE);
+	// HOSTINT1: the main CPU has prepared the next frame's shared data.
+	m_subcpu->set_input_line(6, HOLD_LINE);
 }
 
 void overdriv_state::sub_irq5_assert_w(uint16_t data)
@@ -242,11 +242,9 @@ void overdriv_state::sub_irq5_assert_w(uint16_t data)
 
 K053246_CB_MEMBER(overdriv_state::sprite_callback)
 {
-	int pri = (color & 0xffe0) >> 5;   /* ??????? */
-	if (pri)
-		priority_mask = 0x02;
-	else
-		priority_mask = 0x00;
+	const int pri = (color >> 5) & 0x3f;
+	const int masked = std::clamp(pri - m_sprite_priority_base, 0, 31);
+	priority_mask = util::make_bitmask<uint32_t>(masked);
 
 	color = m_sprite_colorbase + (color & 0x001f);
 }
@@ -280,8 +278,8 @@ K051316_CB_MEMBER(overdriv_state::zoom_callback_2)
 uint32_t overdriv_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_sprite_colorbase  = m_k053251->get_palette_index(k053251_device::CI0);
-	m_road_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI1);
-	m_road_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
+	m_road_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI1);
+	m_road_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI2);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -295,9 +293,46 @@ uint32_t overdriv_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	screen.priority().fill(0, cliprect);
 
 	m_k051316[0]->zoom_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	m_k051316[1]->zoom_draw(screen, bitmap, cliprect, 0, 1);
+	m_layer_priority.fill(m_k053251->get_priority(k053251_device::CI4), cliprect);
+	m_k051316[1]->zoom_draw(screen, m_zoom_bitmap, cliprect, 0, 1);
+	const uint8_t zoom_priority = m_k053251->get_priority(k053251_device::CI3);
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		auto const *const screen_pri = &screen.priority().pix(y);
+		auto *const layer_pri = &m_layer_priority.pix(y);
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		{
+			if (screen_pri[x] && zoom_priority <= layer_pri[x])
+			{
+				dst[x] = m_zoom_bitmap.pix(y, x);
+				layer_pri[x] = zoom_priority;
+			}
+		}
+	}
+	m_k053250[1]->draw(bitmap, cliprect, m_road_colorbase[1], k053250_device::DRAW_FLAG_USE_PRIORITY, m_layer_priority, 0);
+	m_k053250[0]->draw(bitmap, cliprect, m_road_colorbase[0], k053250_device::DRAW_FLAG_USE_PRIORITY, m_layer_priority, 0);
 
-	m_k053246->k053247_sprites_draw(bitmap,cliprect);
+	// The mixer has six-bit priorities. pdrawgfx reserves value 31 for sprite
+	// occupancy, so render disjoint ranges of up to 31 background priorities.
+	// Each pass retains the sprite chip's independent front-to-back ordering.
+	for (m_sprite_priority_base = 0; m_sprite_priority_base < 64; m_sprite_priority_base += 31)
+	{
+		bool active = false;
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+		{
+			auto *const screen_pri = &screen.priority().pix(y);
+			auto const *const layer_pri = &m_layer_priority.pix(y);
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
+			{
+				const int pri = layer_pri[x] - m_sprite_priority_base;
+				screen_pri[x] = (pri >= 0 && pri < 31) ? pri : 31;
+				active = active || (pri >= 0 && pri < 31);
+			}
+		}
+		if (active)
+			m_k053246->k053247_sprites_draw(bitmap, cliprect);
+	}
 	return 0;
 }
 
@@ -310,56 +345,127 @@ void overdriv_state::main_map(address_map &map)
 	map(0x0c0000, 0x0c0001).portr("INPUTS");
 	map(0x0c0002, 0x0c0003).portr("SYSTEM");
 	map(0x0e0000, 0x0e0001).nopw();            /* unknown (always 0x30) */
-	map(0x100000, 0x10001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); /* 053252? (LSB) */
+	map(0x100000, 0x10001f).umask16(0x00ff).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)); /* 053252? (LSB) */
 	map(0x140000, 0x140001).nopw(); //watchdog reset?
 	map(0x180001, 0x180001).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));
-	map(0x1c0000, 0x1c001f).w(m_k051316[0], FUNC(k051316_device::ctrl_w)).umask16(0xff00);
-	map(0x1c8000, 0x1c801f).w(m_k051316[1], FUNC(k051316_device::ctrl_w)).umask16(0xff00);
-	map(0x1d0000, 0x1d001f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
-	map(0x1d8000, 0x1d8003).rw("k053260_1", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
-	map(0x1e0000, 0x1e0003).rw("k053260_2", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
+	map(0x1c0000, 0x1c001f).umask16(0xff00).w(m_k051316[0], FUNC(k051316_device::ctrl_w));
+	map(0x1c8000, 0x1c801f).umask16(0xff00).w(m_k051316[1], FUNC(k051316_device::ctrl_w));
+	map(0x1d0000, 0x1d001f).umask16(0xff00).w(m_k053251, FUNC(k053251_device::write));
+	map(0x1d8000, 0x1d8003).umask16(0x00ff).rw("k053260_1", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
+	map(0x1e0000, 0x1e0003).umask16(0x00ff).rw("k053260_2", FUNC(k053260_device::main_read), FUNC(k053260_device::main_write));
 	map(0x1e8000, 0x1e8001).w(FUNC(overdriv_state::soundirq_w));
-	map(0x1f0000, 0x1f0001).w(FUNC(overdriv_state::cpuA_ctrl_w));  /* halt cpu B, coin counter, start lamp, other? */
-	map(0x1f8000, 0x1f8001).w(FUNC(overdriv_state::eeprom_w));
+	map(0x1f0000, 0x1f0001).umask16(0x00ff).w(FUNC(overdriv_state::cpuA_ctrl_w));  /* halt cpu B, coin counter, start lamp, other? */
+	map(0x1f8000, 0x1f8001).umask16(0x00ff).w(FUNC(overdriv_state::eeprom_w));
 	map(0x200000, 0x203fff).ram().share("share1");
-	map(0x210000, 0x210fff).rw(m_k051316[0], FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0xff00);
-	map(0x218000, 0x218fff).rw(m_k051316[1], FUNC(k051316_device::read), FUNC(k051316_device::write)).umask16(0xff00);
-	map(0x220000, 0x220fff).r(m_k051316[0], FUNC(k051316_device::rom_r)).umask16(0xff00);
-	map(0x228000, 0x228fff).r(m_k051316[1], FUNC(k051316_device::rom_r)).umask16(0xff00);
-	map(0x230000, 0x230001).w(FUNC(overdriv_state::sub_irq4_assert_w));
+	map(0x210000, 0x210fff).umask16(0xff00).rw(m_k051316[0], FUNC(k051316_device::read), FUNC(k051316_device::write));
+	map(0x218000, 0x218fff).umask16(0xff00).rw(m_k051316[1], FUNC(k051316_device::read), FUNC(k051316_device::write));
+	map(0x220000, 0x220fff).umask16(0xff00).r(m_k051316[0], FUNC(k051316_device::rom_r));
+	map(0x228000, 0x228fff).umask16(0xff00).r(m_k051316[1], FUNC(k051316_device::rom_r));
+	map(0x230000, 0x230001).w(FUNC(overdriv_state::sub_irq6_assert_w));
 	map(0x238000, 0x238001).w(FUNC(overdriv_state::sub_irq5_assert_w));
-}
-
-TIMER_CALLBACK_MEMBER(overdriv_state::objdma_end_cb)
-{
-	m_subcpu->set_input_line(6, HOLD_LINE);
 }
 
 void overdriv_state::objdma_w(uint8_t data)
 {
-	if(data & 0x10)
-		m_objdma_end_timer->adjust(attotime::from_usec(100));
+	if ((data & 0x10) && !(m_k053246->k053246_read_register(5) & 0x10))
+	{
+		// K053246 reads the external 2128 SRAM pair when OBJ DMA is requested.
+		// The next HOSTINT1 starts preparation of a new list; DMA does not raise IRQ6.
+		uint16_t *dst;
+		m_k053246->k053247_get_ram(&dst);
+		std::copy_n(&m_spriteram[0], 0x800, dst);
+	}
 
 	m_k053246->k053246_w(5, data);
+}
+
+void overdriv_state::alu_w(uint8_t data)
+{
+	// K053249 has the Konami CPU pinout, but its internal program is unavailable.
+	// These operations are inferred from the display CPU's callers and software
+	// geometry routines. Timing, exceptional arithmetic and other commands are unknown.
+	const auto read_word = [this] (unsigned address) { return m_alu_ram[(address & 0x3fff) >> 1]; };
+	const auto write_word = [this] (unsigned address, uint16_t value) { m_alu_ram[(address & 0x3fff) >> 1] = value; };
+	const auto read_long = [&read_word] (unsigned address) { return (uint32_t(read_word(address)) << 16) | read_word(address + 2); };
+	const auto write_long = [&write_word] (unsigned address, uint32_t value)
+	{
+		write_word(address, value >> 16);
+		write_word(address + 2, value);
+	};
+	// Zero is a placeholder for division by zero; the hardware result is unknown.
+	const auto divide = [] (int64_t numerator, int16_t denominator) -> uint32_t
+	{
+		return denominator ? (numerator / denominator) : 0;
+	};
+
+	switch (data)
+	{
+	case 0x18:
+		write_long(0xbfcc, divide(int64_t(int16_t(read_word(0xbfc8))) * 0x10000, read_word(0xbfca)));
+		break;
+
+	case 0x1b:
+		write_long(0xbfea, divide(int32_t(read_long(0xbfe4)), read_word(0xbfe8)));
+		break;
+
+	case 0x1d:
+	case 0x1e:
+	{
+		const uint16_t control = read_word(0xbf98);
+		const unsigned count = control & 0xff;
+		const unsigned stride = read_word(0xbffc) & 0xff;
+		unsigned address = read_word(0xbffe);
+		const auto cosine = [&read_word] (unsigned angle) -> int16_t
+		{
+			angle &= 0xff;
+			return read_word(0xbe80 + 2 * std::min(angle, 0x100 - angle));
+		};
+		const int32_t cos = cosine(control >> 8);
+		const int32_t sin = cosine((control >> 8) - 0x40);
+		const int32_t focal_length = read_long(0xbf94);
+		for (unsigned i = 0; i < count; i++, address += stride)
+		{
+			if (data == 0x1d)
+			{
+				const int32_t x = int16_t(read_word(address + 2));
+				const int32_t z = int16_t(read_word(address + 6));
+				// Q14 normalization is inferred; intermediate rounding needs hardware tests.
+				write_word(address + 0x0a, (int64_t(x) * cos + int64_t(z) * sin) >> 14);
+				write_word(address + 0x0c, (int64_t(z) * cos - int64_t(x) * sin) >> 14);
+			}
+			else
+			{
+				const int16_t z = read_word(address + 0x0c);
+				write_long(address + 0x0e, divide(int64_t(int16_t(read_word(address + 0x0a))) * focal_length, z));
+				write_long(address + 0x12, divide(int64_t(int16_t(read_word(address + 0x04))) * focal_length, z));
+			}
+		}
+		break;
+	}
+
+	default:
+		logerror("%s: unknown K053249 command %02x\n", machine().describe_context(), data);
+		break;
+	}
 }
 
 void overdriv_state::sub_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x083fff).ram(); /* work RAM */
-	map(0x0c0000, 0x0c1fff).ram(); //.rw("k053250_1", FUNC(k053250_device::ram_r), FUNC(k053250_device::ram_w));
-	map(0x100000, 0x10000f).rw("k053250_1", FUNC(k053250_device::reg_r), FUNC(k053250_device::reg_w));
-	map(0x108000, 0x10800f).rw("k053250_2", FUNC(k053250_device::reg_r), FUNC(k053250_device::reg_w));
-	map(0x118000, 0x118fff).rw(m_k053246, FUNC(k053247_device::k053247_word_r), FUNC(k053247_device::k053247_word_w)); // data gets copied to sprite chip with DMA..
+	map(0x0c0000, 0x0c3fff).ram().share("roadram");
+	map(0x100000, 0x10000f).rw(m_k053250[0], FUNC(k053250_device::reg_r), FUNC(k053250_device::reg_w));
+	map(0x108000, 0x10800f).rw(m_k053250[1], FUNC(k053250_device::reg_r), FUNC(k053250_device::reg_w));
+	map(0x118000, 0x118fff).ram().share(m_spriteram);
 	map(0x120000, 0x120001).r(m_k053246, FUNC(k053247_device::k053246_r));
 	map(0x128000, 0x128001).rw(FUNC(overdriv_state::cpuB_ctrl_r), FUNC(overdriv_state::cpuB_ctrl_w)); /* enable K053247 ROM reading, plus something else */
 	map(0x130000, 0x130007).rw(m_k053246, FUNC(k053247_device::k053246_r), FUNC(k053247_device::k053246_w));
 	map(0x130005, 0x130005).w(FUNC(overdriv_state::objdma_w));
-	//map(0x140000, 0x140001) used in later stages, set after writes at 0x208000-0x20bfff range
+	map(0x140001, 0x140001).w(FUNC(overdriv_state::alu_w));
 	map(0x200000, 0x203fff).ram().share("share1");
-	map(0x208000, 0x20bfff).ram(); // sprite indirect table?
-	map(0x218000, 0x219fff).r("k053250_1", FUNC(k053250_device::rom_r));
-	map(0x220000, 0x221fff).r("k053250_2", FUNC(k053250_device::rom_r));
+	map(0x208000, 0x20bfff).ram().share(m_alu_ram);
+	map(0x218000, 0x219fff).r(m_k053250[0], FUNC(k053250_device::rom_r));
+	map(0x220000, 0x221fff).r(m_k053250[1], FUNC(k053250_device::rom_r));
 }
 
 void overdriv_state::sound_ack_w(uint8_t data)
@@ -407,23 +513,19 @@ static INPUT_PORTS_START( overdriv )
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(50)
 	// POST checks if paddle is at center otherwise throws a "VOLUME ERROR"
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::di_write))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::clk_write))
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_er5911_device::cs_write))
 INPUT_PORTS_END
 
 
 void overdriv_state::machine_start()
 {
-	m_objdma_end_timer = timer_alloc(FUNC(overdriv_state::objdma_end_cb), this);
+	m_screen->register_screen_bitmap(m_layer_priority);
+	m_screen->register_screen_bitmap(m_zoom_bitmap);
 
 	save_item(NAME(m_cpuB_ctrl));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_zoom_colorbase));
 	save_item(NAME(m_road_colorbase));
-	save_item(NAME(m_fake_timer));
+	save_item(NAME(m_ccu_frame));
 }
 
 void overdriv_state::machine_reset()
@@ -434,30 +536,28 @@ void overdriv_state::machine_reset()
 	m_zoom_colorbase[1] = 0;
 	m_road_colorbase[0] = 0;
 	m_road_colorbase[1] = 0;
-	m_fake_timer = 0;
+	m_ccu_frame = 0;
 
-	/* start with cpu B halted */
+	// start with CPU B halted
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
 void overdriv_state::overdriv(machine_config &config)
 {
-	/* basic machine hardware */
 	M68000(config, m_maincpu, 24_MHz_XTAL / 2); /* 12 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &overdriv_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(overdriv_state::cpuA_scanline), "screen", 0, 1);
 
 	M68000(config, m_subcpu, 24_MHz_XTAL / 2);  /* 12 MHz */
 	m_subcpu->set_addrmap(AS_PROGRAM, &overdriv_state::sub_map);
-	//m_subcpu->set_vblank_int("screen", FUNC(overdriv_state::cpuB_interrupt));
-	/* IRQ 5 and 6 are generated by the main CPU. */
-	/* IRQ 5 is used only in test mode, to request the checksums of the gfx ROMs. */
+	// IRQ4 comes from VSYNC; IRQ5 and IRQ6 are generated by the main CPU.
+	// IRQ 5 is used only in test mode, to request the checksums of the gfx ROMs.
 
-	/* 1.789 MHz?? This might be the right speed, but ROM testing */
-	/* takes a little too much (the counter wraps from 0000 to 9999). */
-	/* This might just mean that the video refresh rate is less than */
-	/* 60 fps, that's how I fixed it for now. */
+	// 1.789 MHz?? This might be the right speed, but ROM testing
+	// takes a little too much (the counter wraps from 0000 to 9999).
+	// This might just mean that the video refresh rate is less than
+	// 60 fps, that's how I fixed it for now.
 	MC6809E(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &overdriv_state::sound_map);
 
@@ -467,7 +567,7 @@ void overdriv_state::overdriv(machine_config &config)
 
 	ADC0804(config, "adc", RES_K(10), CAP_P(150)).vin_callback().set_ioport("PADDLE");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 305, 264, 0, 224);
 	screen.set_screen_update(FUNC(overdriv_state::screen_update));
@@ -477,7 +577,8 @@ void overdriv_state::overdriv(machine_config &config)
 
 	K053246(config, m_k053246, 24_MHz_XTAL);
 	m_k053246->set_sprite_callback(FUNC(overdriv_state::sprite_callback));
-	m_k053246->set_config(NORMAL_PLANE_ORDER, 77, 22);
+	// OBJSET X scroll is -45: sprite X=0 must land at visible X=104.
+	m_k053246->set_config(NORMAL_PLANE_ORDER, 59, 22);
 	m_k053246->set_palette("palette");
 
 	K051316(config, m_k051316[0], 24_MHz_XTAL / 2);
@@ -493,13 +594,22 @@ void overdriv_state::overdriv(machine_config &config)
 
 	K053251(config, m_k053251);
 
-	K053250(config, "k053250_1", "palette", m_screen, 0, 0);
-	K053250(config, "k053250_2", "palette", m_screen, 0, 0);
+	// U90 drives the common 6264 RAM pair; U98 observes the same data bus.
+	// Their SEL0 inputs are high (U90) and low (U98), respectively.
+	K053250(config, m_k053250[0], "palette", m_screen, 86, 16).set_ram("roadram", 1);
+
+	// Align road line 0xd0 with sprite X=0x70 at the projection origin.
+	// The programmed road/sprite X scrolls are 0x57 and -0x2d respectively.
+	K053250(config, m_k053250[1], "palette", m_screen, 95, 16).set_ram("roadram", 0);
+
+	// Road and sprite DMA latch the same scene in the display CPU's IRQ4.
+	// Display the completed road transfer without an additional DMA's delay.
+	m_k053250[0]->set_dma_delay(false);
+	m_k053250[1]->set_dma_delay(false);
 
 	K053252(config, m_k053252, 24_MHz_XTAL / 4);
 	m_k053252->set_offsets(13*8, 2*8);
 
-	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));

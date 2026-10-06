@@ -106,7 +106,7 @@ const tiny_rom_entry *c64_currah_speech_cartridge_device::device_rom_region() co
 void c64_currah_speech_cartridge_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
-	SP0256(config, m_nsp, 4000000); // ???
+	SP0256(config, m_nsp, DERIVED_CLOCK(4, 1));
 	m_nsp->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
@@ -123,9 +123,12 @@ void c64_currah_speech_cartridge_device::device_add_mconfig(machine_config &conf
 void c64_currah_speech_cartridge_device::set_osc1(int voice, int intonation)
 {
 	int dotclock = m_slot->dotclock();
+	int clock = dotclock / (2 << voice);
 
-	// TODO intonation and correct dividers
-	m_nsp->set_clock(dotclock / (2 << voice));
+	if (intonation)
+		clock = clock * 107 / 100;
+
+	m_nsp->set_clock(clock);
 }
 
 
@@ -163,6 +166,8 @@ void c64_currah_speech_cartridge_device::device_reset()
 {
 	m_game = 1;
 	m_exrom = 1;
+
+	set_osc1(0, 0);
 }
 
 

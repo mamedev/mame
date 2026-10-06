@@ -24,15 +24,25 @@ in the video).
 Grand Striker has an IRQ2 which is probably network related.
 
 TODO:
-- Finish hooking up the inputs
+- Finish hooking up the inputs;
 - MB60553 words 1, 2, 5 and 6 of the line table and registers 2/3 are
-  never used by these games, so their function is unknown
-- Priorities are wrong. I suspect they need sprite orthogonality
-- Missing mixer registers (mainly layer enable/disable)
-- Tecmo World Cup '94 has missing protection emulation for draw buy-in
-  (as seen by code snippet 0x42ee, referenced in other places as well)
-  It's unknown how the game logic should be at current stage.
-- Tecmo World Cup '94 also has no name entry whatsoever.
+  never used by these games, so their function is unknown;
+- fix MB60553 priority not actually being set internally
+  (required by gstriker coin-up menu, where the title should stay above
+  the playfield but behind the ball cursor and "human cup" lettering);
+- vgoalsoc: stray R/Ws at $15'0000-3 come from the sprite table updater at
+  $69326 when a slot entry is 0 (the address computed from $140800 runs past
+  the end of sprite RAM), harmless and not protection related;
+- vgoalsoc: intermediate MB60553 strip of garbage after player wins
+  first round, in team select (verify);
+- twcup94: the order of the MCU-driven attract mode segments is a best guess,
+  see the protection notes;
+
+Notes:
+- vgoalsoc: white flashes during attract mode has a right column black border
+  wrt running feet just afterwards (btanb);
+- vgoalsoc: draws insert coin / credit at Y 224-240 of the text layer when not
+  actually displayed. Another left-over btanb;
 
 ******************************************************************************/
 
@@ -177,8 +187,8 @@ Frequencies: 68k is XTAL_32MHZ/2
 
 #include "emu.h"
 
-#include "vs9209.h"
 #include "mb60553.h"
+#include "vs9209.h"
 #include "vs920a.h"
 #include "vsystem_spr.h"
 
@@ -198,14 +208,12 @@ Frequencies: 68k is XTAL_32MHZ/2
 
 
 // configurable logging
-#define LOG_MIXER      (1U << 1)
 #define LOG_PROTECTION (1U << 2)
 
-//#define VERBOSE (LOG_GENERAL | LOG_MIXER | LOG_PROTECTION)
+//#define VERBOSE (LOG_GENERAL | LOG_PROTECTION)
 
 #include "logmacro.h"
 
-#define LOGMIXER(...)      LOGMASKED(LOG_MIXER,      __VA_ARGS__)
 #define LOGPROTECTION(...) LOGMASKED(LOG_PROTECTION, __VA_ARGS__)
 
 
@@ -281,12 +289,11 @@ private:
 	// common
 	void sh_bankswitch_w(uint8_t data);
 
-	// vgoalsoc and twrldc
+	// vgoalsoc and twcup94
 	void twcup94_prot_reg_w(uint8_t data);
 
 	// vgoalsoc only
-	uint16_t vbl_toggle_r();
-	void vbl_toggle_w(uint16_t data);
+	void vgoalsoc_mcu_tick_w(uint8_t data);
 
 	uint32_t pri_callback(uint32_t color);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -297,6 +304,7 @@ private:
 	void sound_io_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 	void twcup94_map(address_map &map) ATTR_COLD;
+	void vgoal_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -313,7 +321,26 @@ void gstriker_state::video_start()
 
 uint32_t gstriker_state::pri_callback(uint32_t color)
 {
-	return BIT(color, 5) ? 0 : GFX_PMASK_2;
+	// B would be bit 4 in the color index (0x0100 translated to palette offset)
+	// - vgoalsoc team select: ec00 3000 e000
+	// (wants cup to be behind sprites, cursor in front of text layer)
+	// - gstriker gameplay: 2400 1000 3000
+	// (wants ball to go above the "GOAL!" text layer)
+	const u8 pri = BIT(color, 4);
+
+	const u8 sprite_pri = m_mixerregs[4] >> (12 - (pri * 4)) & 0xf;
+	const u8 layer_a_pri = (m_mixerregs[5] >> 12) & 0xf;
+	const u8 layer_b_pri = (m_mixerregs[6] >> 12) & 0xf;
+
+	u16 res = 0;
+
+	if (sprite_pri < layer_a_pri)
+		res |= GFX_PMASK_1;
+
+	if (sprite_pri < layer_b_pri)
+		res |= GFX_PMASK_2;
+
+	return res;
 }
 
 void gstriker_state::screen_vblank(int state)
@@ -327,24 +354,31 @@ void gstriker_state::screen_vblank(int state)
 	}
 }
 
-
+/*
+Mixer registers:
+[0] xxxx ---- ---- ---- sprite palette base
+[0] ---- --xx ---- ---- <unknown purpose>
+    ---- --00 ---- ---- (twcup94)
+    ---- --01 ---- ---- (vgoalsoc)
+    ---- --10 ---- ---- (gstriker)
+[1] xxxx ---- ---- ---- MB60553 palette base
+[2] xxxx ---- ---- ---- VS920A palette base
+[4] AAAA BBBB ---- ---- sprite priority number A/B
+[5] xxxx ---- ---- ---- MB60553 priority number
+[6] xxxx ---- ---- ---- VS920A layer priority number
+[8] ---- -xxx xxxx xxxx back layer color index
+[9] xxxx xxxx ---- ---- <unknown>, always 0x9400? May be video sync related.
+*/
 uint32_t gstriker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_mixerregs[8] & 0x07ff, cliprect); // complete guess, causes green behind test grid in twc94 and blue behind title screen on gstriker
+	// guess: gives green behind test grid in twc94 and blue behind title screen on gstriker
+	bitmap.fill(m_mixerregs[8] & 0x07ff, cliprect);
 	screen.priority().fill(0, cliprect);
-
-	/*
-	[4] AAAA BBBB ---- ---- sprite priority number A/B?
-	[5] xxxx ---- ---- ---- background layer priority number?
-	[6] xxxx ---- ---- ---- foreground layer priority number?
-	*/
-	LOGMIXER("%04x %04x %04x %04x %04x %04x %04x %04x | %04x %04x %04x %04x %04x %04x %04x %04x", m_mixerregs[0], m_mixerregs[1], m_mixerregs[2], m_mixerregs[3], m_mixerregs[4], m_mixerregs[5], m_mixerregs[6], m_mixerregs[7], m_mixerregs[8], m_mixerregs[9], m_mixerregs[10], m_mixerregs[11], m_mixerregs[12], m_mixerregs[13], m_mixerregs[14], m_mixerregs[15]);
 
 	m_spr->set_pal_base((m_mixerregs[0] & 0xf000) >> 8);
 	m_bg->set_pal_base((m_mixerregs[1] & 0xf000) >> 8);
 	m_tx->set_pal_base((m_mixerregs[2] & 0xf000) >> 8);
 
-	// Sandwiched screen/sprite0/score/sprite1. Surely wrong, probably needs sprite orthogonality
 	m_bg->draw(screen, bitmap, cliprect, 1);
 	m_tx->draw(screen, bitmap, cliprect, 2);
 
@@ -397,6 +431,10 @@ void gstriker_state::twcup94_map(address_map &map)
 	map(0x1c0000, 0x1c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette").mirror(0x00f000);
 
 	map(0x200000, 0x20000f).rw(m_bg, FUNC(mb60553_zooming_tilemap_device::regs_r), FUNC(mb60553_zooming_tilemap_device::regs_w));
+	// control MB60553 behaviour?
+	// - 0x0b (during POST) then 0x08 in gstriker, on demand
+	// - 0x12 vgoalsoc, on transitions
+	// - 0x02 twcup94, every frame
 	map(0x200010, 0x200011).nopw();
 	map(0x200020, 0x200021).nopw();
 	map(0x200040, 0x20005f).ram().share(m_mixerregs);
@@ -410,6 +448,12 @@ void gstriker_state::gstriker_map(address_map &map)
 {
 	twcup94_map(map);
 	map(0x200060, 0x200063).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
+}
+
+void gstriker_state::vgoal_map(address_map &map)
+{
+	twcup94_map(map);
+	map(0x200090, 0x200091).w(FUNC(gstriker_state::vgoalsoc_mcu_tick_w)).umask16(0xff00); // vblank handler toggles bit 3 once per frame
 }
 
 void gstriker_state::sound_map(address_map &map)
@@ -733,6 +777,7 @@ void gstriker_state::twc94(machine_config &config)
 void gstriker_state::vgoal(machine_config &config)
 {
 	twc94(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gstriker_state::vgoal_map);
 	m_spr->set_transpen(0xf); // different vs. the other games, TODO: find register
 }
 
@@ -1025,13 +1070,63 @@ ROM_END
 
 
 /******************************************************************************************
-Simple protection check concept. The M68k writes a command and the MCU
-returns the PC at address 0xffc000.
-The problem is that only the concept is easy, beating this protection requires a good
-amount of time without a trojan...
+MCU protection
+
+The 68000 and the H8/325 share the work RAM.  To call the MCU the 68000 clears the longword
+at $ffc000, writes a command byte to $ffc00f (and to VS9209 port F, which is set for input),
+drops VS9209 port H bit 1 (twcup94 drops bit 2 as well, vgoalsoc raises it), spins until the
+longword becomes non-zero, then pushes it and executes RTS: the MCU hands back the address
+of the routine the 68000 is to run next.  The vblank handler pulses bit 2 low on its own
+every frame, so bit 1 is the command strobe.
+
+Every routine the MCU returns is still in the 68000 ROM, it just isn't referenced by any
+code there.  The tables below were put together by matching those unreferenced routines to
+the call sites (what the caller does with D0/CCR afterwards, what each routine reads and
+writes) and then checking the result by running the games.
+
+twcup94 (set 1 addresses):
+- $890  protection call routine
+- 53 -> $a4c    boot: enter the task scheduler
+- 68 -> $4edc   update the player's record (team, wins, goals, round) when a match was won;
+                called once at time up and once more after a penalty shootout, the routine
+                handles both cases itself by looking at the "shootout finished" flag.  Without
+                it the record never qualifies for the Top Eleven ranking at game over.
+- 61 -> $3af4   time up: show the result, carry set if the match is drawn (penalty shootout)
+- 65 -> $3f26   shootout result
+- 62 -> $5098   tournament table: mark the beaten team as eliminated and decide one more
+                match of the round (also handles the 2 player mode)
+- 72 -> $409e   next match / continue / game over decision, result in D0
+- 75 -> $5088   advance the round counter, Z set when the tournament is complete (ending)
+- attract mode: the loop at $10c4c calls 6e, then 6b or 69 on alternate iterations, then
+  displays the Top Eleven and the four team pictures itself.  6e is skipped when the ROM
+  has no recorded demo at $74000, and $10dc8 (6a, 79, fade, 6f) is only reachable through
+  the MCU, so 6e -> $10dc8, with the Tecmo logo, the two recorded demo matches (3 byte
+  records: frames, P1 inputs, P2 inputs, at $74000 and $74800) and the title and photo
+  screens distributed over 6a/79/6f/6b/69.  The order chosen here is a guess; the segment
+  at $115de (an older 1 player demo expecting 2 byte records, dropped from set 3) is not
+  used.
+- unknown commands return a plain RTS
+
+vgoalsoc:
+- $1bc90 protection call routine.  The call sites are JMPs rather than JSRs: every state of
+  the game flow at $60000 ends by asking the MCU where to go next, so the MCU holds the
+  state transitions.  There are exactly as many unreferenced entry points (all starting
+  with a NOP, right after a JMP) as there are call sites.
+- 50 -> $1900   boot: enter the task scheduler
+- 43 -> $6a000  power on hardware check screen (jumps back to $1b0e itself)
+- 42 -> $6274e  start pressed: countdown for the team select, clears sprites, issues 3d
+- 3d -> $6275c  team select
+- 79 -> $6072e  "versus" screen, then start the match
+- 74 -> $650d8  time up, show the score
+- 65 -> $6532c  results table, next round or game over
+- 33 -> $63416  name entry (the ranking position was computed just before the call)
+- 70 -> $63a48  ranking display task: shows the table and blinks the entry being edited
+                until the name entry task kills it (also used by attract mode).  Returning
+                the name entry routine here ran name entry twice and broke it.
+- unknown commands return a plain RTS at $586
+- the MCU also runs the two frame timers at $ffe900 (see vgoalsoc_mcu_tick_w)
 
 Misc Notes:
--Protection routine is at 0x890
 -An original feature of this game is that if you enter into service mode the game gives you
 the possibility to test various stuff on a pre-registered play such as the speed or
 the zooming. To use it, you should use Player 2 Start button to show the test screens
@@ -1047,13 +1142,12 @@ void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 	m_prot_reg[1] = m_prot_reg[0];
 	m_prot_reg[0] = data;
 
-	// Command byte is also written to VS9209 port F, which is set for input only.
-	// Does the MCU somehow strobe it out of there?
-	uint8_t mcu_data = m_work_ram[0x00f / 2] & 0x00ff;
-
-	if( ((m_prot_reg[1] & 4) == 0) && ((m_prot_reg[0] & 4) == 4) )
+	// respond on the falling edge of the command strobe
+	if (BIT(m_prot_reg[1], 1) && !BIT(m_prot_reg[0], 1))
 	{
-		switch( m_gametype )
+		const uint8_t mcu_data = m_work_ram[0x00f / 2] & 0x00ff;
+
+		switch (m_gametype)
 		{
 			case TECMO_WCUP94_MCU:
 				switch (mcu_data)
@@ -1061,59 +1155,20 @@ void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 					#define NULL_SUB 0x0000828e
 					case 0x53: PC(0x00000a4c); break; // boot -> main loop
 
-					/*
-					    68 and 62 could be sprite or sound changes, or ?
-					    68(),61()
-					    if( !carry )
-					    {
-					        68(),65()
-					    }
-					    else
-					    {
-					        62(),72()
-					    }
-					*/
-					case 0x68: PC(NULL_SUB); break; // time up doesn't block long enough for pk shootout
-					case 0x61: PC(0x00003af4); break; // after time up, pk shootout???
-					case 0x65: PC(0x00003f26); break;
+					case 0x68: PC(0x00004edc); break; // record the won match
+					case 0x61: PC(0x00003af4); break; // time up, carry = drawn
+					case 0x65: PC(0x00003f26); break; // shootout result
+					case 0x62: PC(0x00005098); break; // tournament table update
+					case 0x72: PC(0x0000409e); break; // continue / next match / game over
+					case 0x75: PC(0x00005088); break; // next round, Z = tournament won
 
-					// 62->72
-					case 0x62: PC(NULL_SUB); break; // after losing shootout, continue ???
-					case 0x72: PC(0x0000409e); break; // game over
-
-					/*
-					    Attract mode is pre programmed loop called from main
-					    that runs through top11->demoplay
-					    (NOTE: sprites for demo play are being drawn at 0x141000,
-					    this address is used in a few places, and there's some activity
-					    further up around 0x1410b0.)
-
-					    The loop begins with three prot calls:
-					    one always present (may be diversion to 0x0010dc8 unreachable code
-					    and prot cases 6a,79,6f) and two alternating calls.
-					    The loop is 6e -> [6b|69] -> top11 -> (4 segment)playdemo
-
-					    These are the likely suspects for attract mode:
-					    0x0010E28 red Tecmo on black
-					    0x0010EEC bouncing ball and player with game title
-					    0x00117A2 single segment demo play with player sprites at 0x140000
-					    0x001120A sliding display of player photos
-					    0x0010DC8 unreachable code at end of attract loop with cases 6a,79,6f
-
-					*/
-					case 0x6e: PC(0x00010e28); break; // loop
-					case 0x6b: PC(0x00010eec); break; // attract even
-					case 0x69: PC(0x0001120a); break; // attract odd
-
-					// In "continue" screen
-					// if( w@FFE078 & 80) 75
-					// *** after 75 beq
-					case 0x75: PC(0x005088); break; // match adder, and check if limit is reached for ending
-
-					// unreachable code at end of attract loop 6a->79->6f
-					case 0x6a: PC(NULL_SUB); break;
-					case 0x79: PC(NULL_SUB); break;
-					case 0x6f: PC(NULL_SUB); break;
+					// attract mode
+					case 0x6e: PC(0x00010dc8); break; // intro block: 6a, 79, fade, 6f
+					case 0x6a: PC(0x00010e28); break; // Tecmo logo
+					case 0x79: PC(0x000117a2); break; // demo match ROK vs JPN
+					case 0x6f: PC(0x0001194e); break; // demo match GER vs BRA
+					case 0x6b: PC(0x00010eec); break; // title screen
+					case 0x69: PC(0x0001120a); break; // player photos
 
 					default:
 						LOGPROTECTION("Unknown MCU CMD %04x\n", mcu_data);
@@ -1126,25 +1181,24 @@ void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 
 			// same as above but with +0x10 displacement offsets
 			case TECMO_WCUP94A_MCU:
-
 				switch (mcu_data)
 				{
 					#define NULL_SUB 0x0000829e
-					case 0x53: PC(0x00000a5c); break; // POST
+					case 0x53: PC(0x00000a5c); break;
 
-					case 0x68: PC(NULL_SUB); break; // time up doesn't block long enough for pk shootout
-					case 0x61: PC(0x00003b04); break; // after time up, pk shootout???
+					case 0x68: PC(0x00004eec); break;
+					case 0x61: PC(0x00003b04); break;
 					case 0x65: PC(0x00003f36); break;
+					case 0x62: PC(0x000050a8); break;
+					case 0x72: PC(0x000040ae); break;
+					case 0x75: PC(0x00005098); break;
 
-					case 0x62: PC(NULL_SUB); break; // after losing shootout, continue ???
-					case 0x72: PC(0x000040ae); break; // game over
-
-					case 0x75: PC(0x005098); break; // match adder, and check if limit is reached for ending
-
-					// attract mode
-					case 0x6e: PC(0x00010e38); break; // loop
-					case 0x6b: PC(0x00010efc); break; // attract even
-					case 0x69: PC(0x0001121a); break; // attract odd
+					case 0x6e: PC(0x00010dd8); break;
+					case 0x6a: PC(0x00010e38); break;
+					case 0x79: PC(0x000117b2); break;
+					case 0x6f: PC(0x0001195e); break;
+					case 0x6b: PC(0x00010efc); break;
+					case 0x69: PC(0x0001121a); break;
 
 					default:
 						LOGPROTECTION("Unknown MCU CMD %04x\n", mcu_data);
@@ -1155,27 +1209,26 @@ void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 				}
 				break;
 
-			// Variable displacements (newer set?)
+			// variable displacements (newer set, the unused demo segment is gone)
 			case TECMO_WCUP94B_MCU:
-
 				switch (mcu_data)
 				{
-					#define NULL_SUB (0x00830a)
-					case 0x53: PC(0x000a80); break; // POST
+					#define NULL_SUB 0x0000830a
+					case 0x53: PC(0x00000a80); break;
 
-					case 0x68: PC(NULL_SUB); break; // time up doesn't block long enough for pk shootout
-					case 0x61: PC(0x003b72); break; // after time up, pk shootout???
-					case 0x65: PC(0x003fa4); break;
+					case 0x68: PC(0x00004f5a); break;
+					case 0x61: PC(0x00003b72); break;
+					case 0x65: PC(0x00003fa4); break;
+					case 0x62: PC(0x00005116); break;
+					case 0x72: PC(0x0000411c); break;
+					case 0x75: PC(0x00005106); break;
 
-					case 0x62: PC(NULL_SUB); break; // after losing shootout, continue ???
-					case 0x72: PC(0x411c); break; // game over
-
-					case 0x75: PC(0x5106); break; // match adder, and check if limit is reached for ending
-
-					// attract mode
-					case 0x6e: PC(0x00010ef0); break; // loop
-					case 0x6b: PC(0x00010fb4); break; // attract even
-					case 0x69: PC(0x000112d2); break; // attract odd
+					case 0x6e: PC(0x00010e90); break;
+					case 0x6a: PC(0x00010ef0); break;
+					case 0x79: PC(0x000116a6); break;
+					case 0x6f: PC(0x00011852); break;
+					case 0x6b: PC(0x00010fb4); break;
+					case 0x69: PC(0x000112d2); break;
 
 					default:
 						LOGPROTECTION("Unknown MCU CMD %04x\n", mcu_data);
@@ -1185,23 +1238,22 @@ void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 					#undef NULL_SUB
 				}
 				break;
-
 
 			case VGOAL_SOCCER_MCU:
 				switch (mcu_data)
 				{
-					case 0x33: PC(0x00063416); break; // *after game over, is this right?
-					case 0x3d: PC(0x0006275c); break; // after sprite ram init, team select
-					case 0x42: PC(0x0006274e); break; // after press start, init sprite ram
-					case 0x43: PC(0x0006a000); break; // POST
-					case 0x50: PC(0x00001900); break; // enter main loop
+					case 0x50: PC(0x00001900); break; // boot -> main loop
+					case 0x43: PC(0x0006a000); break; // hardware check screen
+					case 0x42: PC(0x0006274e); break; // start pressed
+					case 0x3d: PC(0x0006275c); break; // team select
+					case 0x79: PC(0x0006072e); break; // versus screen, start match
+					case 0x74: PC(0x000650d8); break; // time up
 					case 0x65: PC(0x0006532c); break; // results
-					case 0x70: PC(0x00063416); break; // *attract loop ends, what should happen after "standings" display?
-					case 0x74: PC(0x000650d8); break; // after time up, show scores and continue
-					case 0x79: PC(0x0006072e); break; // after select, start match
+					case 0x33: PC(0x00063416); break; // name entry
+					case 0x70: PC(0x00063a48); break; // ranking display
 
 					default:
-						LOGPROTECTION("Unknown MCU CMD %04x\n",mcu_data);
+						LOGPROTECTION("Unknown MCU CMD %04x\n", mcu_data);
 						PC(0x00000586); // rts
 						break;
 				}
@@ -1211,51 +1263,52 @@ void gstriker_state::twcup94_prot_reg_w(uint8_t data)
 }
 
 /*
-    vgoalsoc uses a set of programmable timers.
-    There is a code implementation for at 00065f00 that appears to have
-    been RTSed out.
-    I'm guessing it was replaced with an external implementation.
-
-    This does indicate though that the protection could be performing
-    other more complicated functions.
-
-    The tick count is usually set to 0x3c => it's driven off vblank?
-    More likely these timers are driven entirely by the MCU.
+    vgoalsoc frame timers.  The 68000 has a routine for them at $65f02: a zero terminated
+    list of active timers at $ffe900, a tick count and its reload value per timer at $ffe908,
+    and the count that the game waits on at $ffe928.  The call at $65f00 was replaced by an
+    RTS and the MCU does the work instead, so that routine is used as the specification here.
+    The vblank handler toggles bit 3 at $200090 once per frame, which is taken as the tick.
 */
-//m_work_ram[ (0xffe900 - 0xffc00) ]
-#define COUNTER1_ENABLE m_work_ram[0x2900 / 2] >> 8
-#define COUNTER2_ENABLE (m_work_ram[0x2900 / 2] & 0xff)
-#define TICK_1 m_work_ram[0x2908 / 2]
-#define TICKCOUNT_1 m_work_ram[0x290a / 2]
-#define TICK_2 m_work_ram[0x290c / 2]
-#define TICKCOUNT_3 m_work_ram[0x290e / 2]
-#define COUNTER_1 m_work_ram[0x2928 / 2]
-#define COUNTER_2 m_work_ram[0x292a / 2]
-uint16_t gstriker_state::vbl_toggle_r()
+void gstriker_state::vgoalsoc_mcu_tick_w(uint8_t data)
 {
-	return 0xff;
-}
-
-void gstriker_state::vbl_toggle_w(uint16_t data)
-{
-	if (COUNTER1_ENABLE == 1)
+	auto const rd8 = [this] (offs_t a) { return uint8_t(m_work_ram[a >> 1] >> (BIT(a, 0) ? 0 : 8)); };
+	auto const wr8 = [this] (offs_t a, uint8_t v)
 	{
-		TICK_1 = (TICK_1 - 1) & 0xff;   // 8bit
-		if (TICK_1 <= 0)
-		{
-			TICK_1 = TICKCOUNT_1;
-			COUNTER_1 = (COUNTER_1 - 1);// & 0xff; has to be 16bit for continue timer.
-		}
-	}
+		if (BIT(a, 0))
+			m_work_ram[a >> 1] = (m_work_ram[a >> 1] & 0xff00) | v;
+		else
+			m_work_ram[a >> 1] = (m_work_ram[a >> 1] & 0x00ff) | (v << 8);
+	};
 
-	if (COUNTER2_ENABLE == 2)
+	for (int i = 0; ; )
 	{
-		TICK_2  = (TICK_2 - 1) & 0xff;
-		if (TICK_2 <= 0)
+		const uint8_t n = rd8(0x2900 + i);
+		if (n == 0 || n > 2)
+			break;
+
+		uint16_t &tick = m_work_ram[(0x2908 + (n - 1) * 4) / 2];
+		const uint16_t reload = m_work_ram[(0x290a + (n - 1) * 4) / 2];
+		uint16_t &count = m_work_ram[(0x2928 + (n - 1) * 2) / 2];
+
+		if (tick == 0)
+			tick = reload;
+		tick--;
+		if (tick == 0)
 		{
-			TICK_2 = TICKCOUNT_3;
-			COUNTER_2 = (COUNTER_2 - 1);// & 0xff;
+			count--;
+			if (BIT(count, 15))
+			{
+				// expired: take it out of the list and look at this slot again
+				int j = i;
+				do
+				{
+					wr8(0x2900 + j, rd8(0x2900 + j + 1));
+					j++;
+				} while (rd8(0x2900 + j) != 0);
+				continue;
+			}
 		}
+		i++;
 	}
 }
 
@@ -1286,9 +1339,6 @@ void gstriker_state::init_vgoalsoc()
 {
 	m_gametype = VGOAL_SOCCER_MCU;
 	mcu_init();
-
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x200090, 0x200091, write16smo_delegate(*this, FUNC(gstriker_state::vbl_toggle_w))); // vblank toggle
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200090, 0x200091, read16smo_delegate(*this, FUNC(gstriker_state::vbl_toggle_r)));
 }
 
 } // anonymous namespace
@@ -1297,9 +1347,9 @@ void gstriker_state::init_vgoalsoc()
 /*** GAME DRIVERS ************************************************************/
 
 // on flyer, company name is "Human Entertainment" and subtitle is "Human Cup '93"
-GAME( 1993, gstriker,  0,        gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human Amusement", "Grand Striker - Human Cup (Europe, Oceania)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gstrikera, gstriker, gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human Amusement", "Grand Striker - Human Cup (Americas)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human Amusement", "Grand Striker - Human Cup (Japan)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstriker,  0,        gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human Amusement", "Grand Striker: Human Cup (Europe, Oceania)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstrikera, gstriker, gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human Amusement", "Grand Striker: Human Cup (Americas)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gstrikerj, gstriker, gstriker, gstriker, gstriker_state, empty_init, ROT0, "Human Amusement", "Grand Striker: Human Cup (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // Similar, but not identical hardware, appear to be protected by an MCU
 GAME( 1994, vgoalsoc,  0,        vgoal, vgoalsoc, gstriker_state, init_vgoalsoc, ROT0, "Tecmo", "V Goal Soccer (Europe)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // has ger/hol/arg/bra/ita/eng/spa/fra

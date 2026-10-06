@@ -69,9 +69,9 @@
 #include "sound/dac.h"
 #include "sound/pokey.h"
 
-#include "bus/a800/a800_slot.h"
-#include "bus/a800/a800_carts.h"
-#include "bus/a800/a8sio.h"
+#include "bus/a800/cart/a800_slot.h"
+#include "bus/a800/cart/a800_carts.h"
+#include "bus/a800/sio/a8sio.h"
 #include "bus/vcs_ctrl/ctrl.h"
 
 #include "screen.h"

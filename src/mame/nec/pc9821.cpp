@@ -680,6 +680,7 @@ void pc9821_state::pc9821_map(address_map &map)
 	map(0x000e8000, 0x000fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 
 	map(0x00100000, 0x00efffff).rw("simm", FUNC(pc9801_61_simm_device::read_ext), FUNC(pc9801_61_simm_device::write_ext));
+	map(0x00f00000, 0x00f7ffff).rw("cbus", FUNC(pc98_cbus_root_device::mem_15m_r), FUNC(pc98_cbus_root_device::mem_15m_w));
 	map(0x00f00000, 0xffffffff).view(m_pegc_vram_view);
 	m_pegc_vram_view[0](0x00f00000, 0x00f7ffff).ram().share("ext_gvram");
 	m_pegc_vram_view[0](0xfff00000, 0xfff7ffff).ram().share("ext_gvram");

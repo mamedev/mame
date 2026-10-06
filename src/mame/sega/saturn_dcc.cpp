@@ -14,7 +14,7 @@ TODO:
 - should probably handle sync barriers from here as well;
 - complete irq acknowledge support for slave CPU;
 
-Known games to be very tight on interleaving, acts bad with -drc:
+Known games to be very tight on interleaving, most of these were acting bad with -drc:
 (not necessarily DCC fault)
 - blastwnd (before FMV, wants an INTERLEAVE_DURATION of zero somehow)
 - choroqpk (car selection)

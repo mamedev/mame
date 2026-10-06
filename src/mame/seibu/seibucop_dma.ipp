@@ -168,11 +168,21 @@ void raiden2cop_device::dma_zsorting(uint16_t data)
 		uint16_t val;
 	};
 
-	std::vector<sort_entry> entries(data);
-	for(int i=0; i<data; i++) {
+	// cupsoc passes the entry count minus one: its own code decrements the object
+	// count before writing the trigger, so with the plain value the last entry is
+	// never sorted. raiden2.cpp maps the same trigger, hence the gate.
+	const int n = m_cupsoc_mode ? (data + 1) : data;
+
+	std::vector<sort_entry> entries(n);
+	for(int i=0; i<n; i++) {
 		sort_entry &e = entries[i];
 		e.val = m_host_space->read_word(cop_sort_lookup + 2*i);
-		e.sorting_key = m_host_space->read_dword(cop_sort_ram_addr + e.val);
+		// The key is the signed word at the long-aligned address. Signed matters: an
+		// object within 3 pixels of the ball has key $FFFF, which read unsigned sorts
+		// to the far end of the list exactly when it is on the ball.
+		e.sorting_key = m_cupsoc_mode
+			? (int32_t)(int16_t)m_host_space->read_word((cop_sort_ram_addr + e.val) & ~3)
+			: (int32_t)m_host_space->read_dword(cop_sort_ram_addr + e.val);
 	}
 	switch(cop_sort_param) {
 	case 2:
@@ -183,6 +193,6 @@ void raiden2cop_device::dma_zsorting(uint16_t data)
 		break;
 	}
 
-	for(int i=0; i<data; i++)
+	for(int i=0; i<n; i++)
 		m_host_space->write_word(cop_sort_lookup + 2*i, entries[i].val);
 }

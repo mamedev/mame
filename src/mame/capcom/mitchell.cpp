@@ -2443,7 +2443,10 @@ ROM_START( pangbold )
 	ROM_LOAD( "1.1a",      0x00000, 0x10000, CRC(b6463907) SHA1(b79e0dca10c639b7f0ea9cbc49300b80708d46fa) )
 ROM_END
 
-// Similar to "pangbold" but with data on a battery backed 256Kbit RAM (undumped), on a small sub-board with the Z84 and a PLD (also undumped, was protected).
+/* Similar to "pangbold" but with data on a battery-backed 256Kbit RAM (undumped), on a small sub-board with
+   the Z84 and a PAL16L8ACN (also undumped, which was protected). The three chips are inside a black plastic
+   case protected by a photoresistor (as an anti-tamper measure). If any light enters the plastic box, the
+   RAM gets erased. */
 ROM_START( pangbp )
 	ROM_REGION( 2*0x50000, "maincpu", 0 )
 	ROM_LOAD( "pangbp_nvr.bin", 0x00000, 0x08000, NO_DUMP ) // Opcodes + data (?) on battery backed RAM (the battery was dead, so it's undumped)
