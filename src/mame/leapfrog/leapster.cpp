@@ -244,9 +244,9 @@ private:
 			fatalerror("ADC FIFO full!\n");
 		}
 
-		m_adc_fifo[m_adc_fifo_head] = (channel << 16) | (data << 5);
+		m_adc_fifo.get()[m_adc_fifo_head] = (channel << 16) | (data << 5);
 		m_adc_fifo_head += 1;
-		m_adc_fifo_head %= sizeof(m_adc_fifo) / sizeof(*m_adc_fifo);
+		m_adc_fifo_head %= ADC_FIFO_SIZE;
 		m_adc_fifo_empty = false;
 	}
 
@@ -257,9 +257,9 @@ private:
 			return 0;
 		}
 
-		uint32_t ret = m_adc_fifo[m_adc_fifo_base];
+		uint32_t ret = m_adc_fifo.get()[m_adc_fifo_base];
 		m_adc_fifo_base += 1;
-		m_adc_fifo_base %= sizeof(m_adc_fifo) / sizeof(*m_adc_fifo);;
+		m_adc_fifo_base %= ADC_FIFO_SIZE;
 		m_adc_fifo_empty = m_adc_fifo_head == m_adc_fifo_base;
 
 		return ret;
@@ -327,10 +327,10 @@ private:
 	uint16_t m_1a_data[0x800];
 	int m_1a_pointer;
 
-	uint32_t m_timer_ticks[3]{};
-	uint32_t m_timer_control[3]{};
-	uint32_t m_timer_max[3]{};
-	emu_timer *m_overflow_timer[3]{};
+	uint32_t m_timer_ticks[3];
+	uint32_t m_timer_control[3];
+	uint32_t m_timer_max[3];
+	emu_timer *m_overflow_timer[3];
 	static constexpr int TIMER_IRQS[3] = {0x19, 0x1a, 0x1e};
 
 	uint16_t m_framebuffer_base;
@@ -344,11 +344,12 @@ private:
 
 	uint32_t m_clock_div;
 
-	emu_timer *m_adc_timer{};
+	emu_timer *m_adc_timer;
 
-	uint32_t m_adc_channel_control[4]{};
+	uint32_t m_adc_channel_control[4];
 
-	uint32_t m_adc_fifo[0x10000]{}; // Actual size unknown
+	static constexpr int ADC_FIFO_SIZE = 0x10000;
+	std::unique_ptr<uint32_t[]> m_adc_fifo;
 	uint32_t m_adc_fifo_base;
 	uint32_t m_adc_fifo_head;
 	bool m_adc_fifo_empty;
@@ -357,7 +358,7 @@ private:
 	uint32_t m_released_counter;
 
 	uint32_t m_int_fired_flags;
-	uint32_t m_int_enable = 0;
+	uint32_t m_int_enable;
 
 	uint32_t m_current_eeprom_command;
 
@@ -603,7 +604,7 @@ uint32_t leapster_state::leapster_180d514_r()
 {
 	logerror("%s: leapster_180d514_r (return usually checked against 0x0030d400)\n", machine().describe_context());
 	// leapster -bios 0 does a BRNE in a loop comparing with 0x80
-	return 0x000000A0;
+	return 0x000000a0;
 }
 
 // Official name: GIODataIn
@@ -993,6 +994,8 @@ void leapster_state::machine_start()
 	m_system_eeprom = make_unique_clear<uint8_t[]>(0x200);
 	m_nvram->set_base(m_system_eeprom.get(), 0x200);
 
+	m_adc_fifo = make_unique_clear<uint32_t[]>(ADC_FIFO_SIZE);
+
 	save_item(NAME(m_1a_data));
 	save_item(NAME(m_1a_pointer));
 	save_item(NAME(m_timer_ticks));
@@ -1007,7 +1010,7 @@ void leapster_state::machine_start()
 	save_item(NAME(m_dma_stride));
 	save_item(NAME(m_clock_div));
 	save_item(NAME(m_adc_channel_control));
-	save_item(NAME(m_adc_fifo));
+	save_pointer(NAME(m_adc_fifo), ADC_FIFO_SIZE);
 	save_item(NAME(m_adc_fifo_base));
 	save_item(NAME(m_adc_fifo_head));
 	save_item(NAME(m_adc_fifo_empty));
