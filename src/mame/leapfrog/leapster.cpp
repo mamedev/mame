@@ -220,8 +220,9 @@ public:
 		m_nvram(*this, "nvram"),
 		m_sound(*this, "leapster_snd"),
 		m_buttons(*this, "BUTTONS"),
+		m_force_calibration(*this, "FORCE_CALIBRATION"),
 		m_touch(*this, {"TOUCHX", "TOUCHY", "TOUCH"})
-		{ }
+	{ }
 
 	void leapster(machine_config &config);
 
@@ -368,6 +369,7 @@ private:
 	required_device<leapster_snd_device> m_sound;
 
 	required_ioport m_buttons;
+	required_ioport m_force_calibration;
 	required_ioport_array<3> m_touch;
 
 	memory_region *m_cart_rom = nullptr;
@@ -402,6 +404,11 @@ static INPUT_PORTS_START( leapster )
 
 	PORT_START("TOUCH")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(leapster_state::leapster_touch_down), 0) PORT_NAME("Touchscreen Touch")
+
+	PORT_START("FORCE_CALIBRATION")
+	PORT_CONFNAME(0x01, 0x01, "Force Calibration" )
+	PORT_CONFSETTING(0x01, DEF_STR( Off ) )
+	PORT_CONFSETTING(0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 void leapster_state::leapster_aux0010_w(uint32_t data)
@@ -506,7 +513,7 @@ uint32_t leapster_state::leapster_1801018_r()
 uint32_t leapster_state::leapster_1809004_r()
 {
 	logerror("%s: leapster_1809004_r (return usually checked against 0x00200000)\n", machine().describe_context());
-	return 0x63FF'BFFF | m_cart_bit;
+	return 0x63ff'bfff | m_cart_bit | (m_force_calibration->read() ? 0x4000 : 0);
 }
 
 uint32_t leapster_state::leapster_eeprom_r(uint32_t offset)
@@ -543,7 +550,6 @@ void leapster_state::leapster_eeprom_w(uint32_t offset, uint32_t data)
 				uint8_t* cartridge_eeprom = nullptr;
 				if (m_cart && m_cart->exists())
 					cartridge_eeprom = m_cart->get_cart_nvram();
-
 
 				uint8_t *eepromBank = BIT(m_current_eeprom_command, 8, 8) == 0x26 ? m_system_eeprom.get() : cartridge_eeprom;
 
@@ -1292,6 +1298,9 @@ ROM_START(leapster)
 	ROM_SYSTEM_BIOS( 4, "sp10",  "Spanish v1.0" )   // 152-11546 Leapster Baserom SP v1.0        - Apr 03 2006 06:26:00
 	ROM_LOAD_BIOS( 4, "leapster2_1008.bin", 0x00000, 0x800000, CRC(b43345e7) SHA1(31c27e79568115bf36e5ef668f528e3005054152) )
 	ROM_DEFAULT_BIOS( "uni15" )
+
+	ROM_REGION(0x200, "nvram", ROMREGION_ERASE00) // calibrated defaults
+	ROM_LOAD( "nvram", 0x000, 0x200, CRC(972dafe9) SHA1(ba97757bbe0357a97240e55a16076737c3012985) )
 ROM_END
 
 ROM_START(leapstertv)
