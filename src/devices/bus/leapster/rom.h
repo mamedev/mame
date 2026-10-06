@@ -6,7 +6,7 @@
 #pragma once
 
 #include "slot.h"
-#include "machine/i2cmem.h"
+#include "machine/nvram.h"
 
 // ======================> leapster_rom_plain_device
 
@@ -46,13 +46,16 @@ public:
 protected:
 	leapster_rom_nvram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override;
 
 	// reading and writing
 	virtual uint16_t read_rom(offs_t offset) override;
 	virtual void write_rom(offs_t offset, uint16_t data) override;
 
-	//optional_device<i2cmem_device> m_i2cmem;
+	required_device<nvram_device> m_nvram;
+	std::unique_ptr<uint8_t[]> m_cartridge_eeprom;
 
 	//virtual uint8_t read_cart_seeprom(void) override;
 	//virtual void write_cart_seeprom(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;

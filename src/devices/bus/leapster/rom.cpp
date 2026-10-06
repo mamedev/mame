@@ -23,8 +23,8 @@ leapster_rom_plain_device::leapster_rom_plain_device(const machine_config &mconf
 }
 
 leapster_rom_nvram_device::leapster_rom_nvram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	leapster_rom_plain_device(mconfig, type, tag, owner, clock)
-	//m_i2cmem(*this, "i2cmem")
+	leapster_rom_plain_device(mconfig, type, tag, owner, clock),
+	m_nvram(*this, "nvram")
 {
 }
 
@@ -90,9 +90,15 @@ void leapster_rom_nvram_device::write_cart_seeprom(offs_t offset, uint16_t data,
 
 void leapster_rom_nvram_device::device_add_mconfig(machine_config &config)
 {
-	//I2C_24C04(config, "i2cmem"); // 24LC04
+	NVRAM(config, m_nvram);
 }
 
+void leapster_rom_nvram_device::device_start()
+{
+	leapster_rom_plain_device::device_start();
+	m_cartridge_eeprom = make_unique_clear<uint8_t[]>(2048);
+	m_nvram->set_base(m_cartridge_eeprom.get(), 2048);
+}
 
 /*-------------------------------------------------
  slot interface
