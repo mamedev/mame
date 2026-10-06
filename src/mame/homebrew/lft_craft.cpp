@@ -94,9 +94,9 @@ void lft_craft_state::port_b_w(uint8_t data)
 
 void lft_craft_state::port_c_w(uint8_t data)
 {
-	m_gpio_c = data;
+	m_gpio_c = data & 0x3f;
 	video_update();
-	m_latched_color = data;
+	m_latched_color = m_gpio_c;
 }
 
 void lft_craft_state::port_d_w(uint8_t data)

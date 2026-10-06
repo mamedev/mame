@@ -99,6 +99,8 @@ files {
 	MAME_DIR .. "src/frontend/mame/ui/auditmenu.h",
 	MAME_DIR .. "src/frontend/mame/ui/barcode.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/barcode.h",
+	MAME_DIR .. "src/frontend/mame/ui/cdctrl.cpp",
+	MAME_DIR .. "src/frontend/mame/ui/cdctrl.h",
 	MAME_DIR .. "src/frontend/mame/ui/cheatopt.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/cheatopt.h",
 	MAME_DIR .. "src/frontend/mame/ui/confswitch.cpp",

@@ -435,8 +435,6 @@ void wd2010_device::seek(uint8_t data)
 	m_error = 0;
 	m_status = STATUS_BSY | STATUS_CIP;
 
-	auto_scan_id(data); // has drive number changed?
-
 	int direction; // 0 = towards 0
 	int step_pulses;
 
@@ -526,7 +524,6 @@ void wd2010_device::read_sector(uint8_t data)
 	m_status = STATUS_BSY | STATUS_CIP;
 
 	// Assume: drive NO # has not changed... (else: SCAN_ID; GET CYL#)
-	auto_scan_id(data); // has drive number changed?
 
 	// CYL REGISTERS and INTERNAL CYL. SAME ?
 	// TODO:  < NOT SAME? THEN _SEEK_ >
@@ -634,9 +631,6 @@ void wd2010_device::write_sector(uint8_t data)
 
 	m_status = STATUS_BSY | STATUS_CIP; // Assert BUSY + CIP
 
-	// (When drive changed) : SCAN_ID / GET CYL#
-	auto_scan_id(data); // has drive number changed?
-
 	// Assume YES : CYL.register + internal CYL.register SAME?  (if NO => SEEK!)
 	// Assume : SEEK_COMPLETE = YES
 	m_present_cylinder = CYLINDER;
@@ -705,42 +699,6 @@ void wd2010_device::complete_write_sector(uint8_t data)
 	m_deassert_write_timer->adjust(attotime::from_usec(1), newstatus);
 }
 
-// ******************************************************
-// AUTO SCAN-ID (whenever DRIVE # changes):
-// ******************************************************
-void wd2010_device::auto_scan_id(uint8_t data)
-{
-	static int last_drive;
-	if (DRIVE != last_drive)
-	{
-		// FIXME: geometry of disk not available here. Assume sector size already set (?)
-		update_sdh( SECTOR_SIZE, 0, 0, 1 ); // new sector_size, head, cylinder, sector
-
-		logerror("\n(WD2010) : UNSUPPORTED DRIVE CHANGE (old = %02x, new = %02x) Sector size assumed: %d !\n", last_drive, DRIVE, SECTOR_SIZE);
-	}
-	last_drive = DRIVE;
-	return; // (see NOTES)
-}
-// ******************************************************
-
-// Update SDH register / update present_cylinder.
-void wd2010_device::update_sdh(uint8_t new_sector_size, uint8_t new_head, uint16_t new_cylinder, uint8_t new_sectornr)
-{
-	// Update SECTOR_SIZE, HEAD in SDH with the ID found -
-	m_task_file[TASK_FILE_SDH_REGISTER] &= 0x98; // mask 10011000 (size | head)
-	m_task_file[TASK_FILE_SDH_REGISTER] = ((new_sector_size & 3) << 5) | (new_head & 7);
-
-	// ...update CYLINDER registers with cylinder given -
-	m_task_file[TASK_FILE_CYLINDER_HIGH] = (new_cylinder >> 8) & 0xff;
-	m_task_file[TASK_FILE_CYLINDER_LOW] = (new_cylinder - ((m_task_file[TASK_FILE_CYLINDER_HIGH] << 8) )) & 0xff;
-
-	// ...update SECTOR_NUMBER with sector nr. given -
-	m_task_file[TASK_FILE_SECTOR_NUMBER] = new_sectornr;
-
-	m_present_cylinder = CYLINDER;
-	logerror("UPDATE_SDH - m_present_cylinder = %u\n", m_present_cylinder);
-}
-
 //-------------------------------------------------
 //  scan_id -
 //-------------------------------------------------
@@ -804,8 +762,6 @@ void wd2010_device::format(uint8_t data)
 
 	// m_out_bdrq_cb(0);
 	// m_status &= ~(STATUS_DRQ);
-
-	auto_scan_id(data); // has drive number changed?
 
 	// TODO: Seek to desired cylinder
 	// Assume : SEEK COMPLETE.

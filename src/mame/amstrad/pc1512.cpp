@@ -10,14 +10,6 @@
 */
 
 /*
-
-    TODO:
-
-    - 40291/8908 B ROM on PC1640 HD30 controller card
-
-*/
-
-/*
 HARD DISC INSTALLATION INSTRUCTIONS
 
 Applies to both ten and twenty megabyte versions.
@@ -46,7 +38,7 @@ Select operating system:
 
 If you choose F1 then DOS Plus and GEM will be booted, or if you press F2 then MS-DOS will be booted.
 
-PC1512-HD10: ?
+PC1512-HD10: Tandon TM-252 [-chs 306,4,17 -ss 512]
 PC1512-HD20: Tandon TM-262 [-chs 615,4,17 -ss 512]
 */
 
@@ -91,6 +83,7 @@ PC1640-HD30: Western Digital 95038 [-chs 615,6,17 -ss 512]
 #include "pc1512.h"
 #include "bus/rs232/rs232.h"
 #include "bus/isa/ega.h"
+#include "bus/isa/hdc.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -255,7 +248,7 @@ void pc1512_base_state::system_w(offs_t offset, uint8_t data)
 		break;
 
 	case 6:
-		machine_reset();
+		machine().schedule_soft_reset();
 		break;
 	}
 }
@@ -735,6 +728,14 @@ static INPUT_PORTS_START( pc1512 )
 	PORT_DIPSETTING( 0x00, "Not connected" )
 INPUT_PORTS_END
 
+static DEVICE_INPUT_DEFAULTS_START( pc1512_hd10 )
+	DEVICE_INPUT_DEFAULTS("CONFIG", 0x0c, 0x08)
+DEVICE_INPUT_DEFAULTS_END
+
+static DEVICE_INPUT_DEFAULTS_START( pc1512_hd20 )
+	DEVICE_INPUT_DEFAULTS("CONFIG", 0x0c, 0x0c)
+DEVICE_INPUT_DEFAULTS_END
+
 
 //-------------------------------------------------
 //  INPUT_PORTS( pc1640 )
@@ -1064,6 +1065,7 @@ static void pc1512_isa8_cards(device_slot_interface &device)
 static void pc1640_isa8_cards(device_slot_interface &device)
 {
 	pc_isa8_cards(device);
+	device.option_add("mc0109a", ISA8_MC0109A);
 	// Amstrad MC2400 modem card
     // Amstrad RP5-2 diagnostic ISA card (PC1512/PC1640)
 }
@@ -1311,14 +1313,36 @@ void pc1512_state::pc1512dd(machine_config &config)
 
 
 //-------------------------------------------------
-//  machine_config( pc1512hd )
+//  machine_config( pc1512hd10 )
 //-------------------------------------------------
 
-void pc1512_state::pc1512hd(machine_config &config)
+void pc1512_state::pc1512hd10(machine_config &config)
 {
 	pc1512(config);
 
-	subdevice<isa8_slot_device>("isa3")->set_default_option("wdxt_gen");
+	isa8_slot_device *const isa3 = subdevice<isa8_slot_device>("isa3");
+	isa3->set_default_option("wdxt_gen");
+	isa3->set_option_device_input_defaults(
+			"wdxt_gen",
+			DEVICE_INPUT_DEFAULTS_NAME(pc1512_hd10));
+
+	SOFTWARE_LIST(config, "hdd_list").set_original("pc1512_hdd");
+}
+
+
+//-------------------------------------------------
+//  machine_config( pc1512hd20 )
+//-------------------------------------------------
+
+void pc1512_state::pc1512hd20(machine_config &config)
+{
+	pc1512(config);
+
+	isa8_slot_device *const isa3 = subdevice<isa8_slot_device>("isa3");
+	isa3->set_default_option("wdxt_gen");
+	isa3->set_option_device_input_defaults(
+			"wdxt_gen",
+			DEVICE_INPUT_DEFAULTS_NAME(pc1512_hd20));
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("pc1512_hdd");
 }
@@ -1472,6 +1496,20 @@ void pc1640_state::pc1640hd(machine_config &config)
 }
 
 
+//-------------------------------------------------
+//  machine_config( pc1640hd30 )
+//-------------------------------------------------
+
+void pc1640_state::pc1640hd30(machine_config &config)
+{
+	pc1640(config);
+
+	subdevice<isa8_slot_device>("isa4")->set_default_option("mc0109a");
+
+	SOFTWARE_LIST(config, "hdd_list").set_original("pc1640_hdd");
+}
+
+
 
 //**************************************************************************
 //  ROMS
@@ -1533,12 +1571,12 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY        FULLNAME       FLAGS
-COMP( 1986, pc1512,     0,      0,      pc1512,   pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 SD",   MACHINE_SUPPORTS_SAVE )
-COMP( 1986, pc1512dd,   pc1512, 0,      pc1512dd, pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 DD",   MACHINE_SUPPORTS_SAVE )
-COMP( 1986, pc1512hd10, pc1512, 0,      pc1512hd, pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 HD10", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, pc1512hd20, pc1512, 0,      pc1512hd, pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 HD20", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640,     0,      0,      pc1640,   pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 SD",   MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640dd,   pc1640, 0,      pc1640dd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 DD",   MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640hd20, pc1640, 0,      pc1640hd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 HD20", MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640hd30, pc1640, 0,      pc1640hd, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 HD30", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   CLASS         INIT        COMPANY        FULLNAME       FLAGS
+COMP( 1986, pc1512,     0,      0,      pc1512,     pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 SD",   MACHINE_SUPPORTS_SAVE )
+COMP( 1986, pc1512dd,   pc1512, 0,      pc1512dd,   pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 DD",   MACHINE_SUPPORTS_SAVE )
+COMP( 1986, pc1512hd10, pc1512, 0,      pc1512hd10, pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 HD10", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, pc1512hd20, pc1512, 0,      pc1512hd20, pc1512, pc1512_state, empty_init, "Amstrad plc", "PC1512 HD20", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640,     0,      0,      pc1640,     pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 SD",   MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640dd,   pc1640, 0,      pc1640dd,   pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 DD",   MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640hd20, pc1640, 0,      pc1640hd,   pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 HD20", MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640hd30, pc1640, 0,      pc1640hd30, pc1640, pc1640_state, empty_init, "Amstrad plc", "PC1640 HD30", MACHINE_SUPPORTS_SAVE )

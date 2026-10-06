@@ -78,7 +78,7 @@ void cmd_hd_device::mem_map(address_map &map)
 	m_ram_view[0](0x4000, 0x7fff).lr8(NAME([this](offs_t offset) { return m_ram[0xc000 | offset]; })).lw8(NAME([this](offs_t offset, uint8_t data) { m_ram[0xc000 + offset] = data; }));
 	m_ram_view[1](0x4000, 0x7fff).lr8(NAME([this](offs_t offset) { return m_ram[0x4000 | offset]; })).lw8(NAME([this](offs_t offset, uint8_t data) { m_ram[0x4000 + offset] = data; }));
 	map(0x8000, 0xffff).lr8(NAME([this](offs_t offset) { return m_ram[0x8000 + offset]; })).lw8(NAME([this](offs_t offset, uint8_t data) { if (m_wpram) m_ram[0x8000 + offset] = data; }));
-	map(0x8000, 0x800f).mirror(0x1f0).m(m_via0, FUNC(via6522_device::map));
+	map(0x8000, 0x800f).mirror(0x1f0).r(FUNC(cmd_hd_device::via0_r)).w(m_via0, FUNC(via6522_device::write));
 	map(0x8400, 0x840f).mirror(0x1f0).m(m_via1, FUNC(via6522_device::map));
 	map(0x8800, 0x8803).mirror(0x1fc).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x8c00, 0x8c0f).mirror(0x1f0).rw(m_rtc, FUNC(rtc72421_device::read), FUNC(rtc72421_device::write));
@@ -131,6 +131,14 @@ void cmd_hd_device::via0_pa_w(uint8_t data)
 	m_sb_reset_ena = BIT(data, 5);
 }
 
+uint8_t cmd_hd_device::via0_r(offs_t offset)
+{
+	if (!offset && !m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
+	return m_via0->read(offset);
+}
+
 uint8_t cmd_hd_device::via0_pb_r()
 {
 	/*
@@ -180,24 +188,24 @@ void cmd_hd_device::via0_pb_w(uint8_t data)
 	m_fst_dir = BIT(data, 5);
 	m_iec_atn = BIT(data, 6);
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 void cmd_hd_device::via0_cb1_w(int state)
 {
 	m_fst_clk = state;
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 void cmd_hd_device::via0_cb2_w(int state)
 {
 	m_fst_data = state;
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
-TIMER_CALLBACK_MEMBER(cmd_hd_device::iec_sync_tick)
+void cmd_hd_device::update_iec()
 {
 	bool const atn = m_bus->atn_r();
 	m_via0->write_ca1(atn);
@@ -496,7 +504,6 @@ cmd_hd_device::cmd_hd_device(const machine_config &mconfig, const char *tag, dev
 
 void cmd_hd_device::device_start()
 {
-	m_iec_sync_timer = timer_alloc(FUNC(cmd_hd_device::iec_sync_tick), this);
 	m_ack_clear_timer = timer_alloc(FUNC(cmd_hd_device::clear_ack_tick), this);
 	
 	m_leds[LED_PWR] = 1;
@@ -539,7 +546,7 @@ void cmd_hd_device::device_reset()
 
 void cmd_hd_device::cbm_iec_srq(int state)
 {
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 
@@ -549,7 +556,7 @@ void cmd_hd_device::cbm_iec_srq(int state)
 
 void cmd_hd_device::cbm_iec_atn(int state)
 {
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 
@@ -559,7 +566,7 @@ void cmd_hd_device::cbm_iec_atn(int state)
 
 void cmd_hd_device::cbm_iec_data(int state)
 {
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 

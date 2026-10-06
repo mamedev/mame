@@ -1610,6 +1610,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/ssd1306.h,VIDEOS["SSD1306"] = true
+--------------------------------------------------
+
+if VIDEOS["SSD1306"] then
+	files {
+		MAME_DIR .. "src/devices/video/ssd1306.cpp",
+		MAME_DIR .. "src/devices/video/ssd1306.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/st7626.h,VIDEOS["ST7626"] = true
 --------------------------------------------------
 
@@ -1665,6 +1677,18 @@ if VIDEOS["T6A04"] then
 	files {
 		MAME_DIR .. "src/devices/video/t6a04.cpp",
 		MAME_DIR .. "src/devices/video/t6a04.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/t6b79.h,VIDEOS["T6B79"] = true
+--------------------------------------------------
+
+if VIDEOS["T6B79"] then
+	files {
+		MAME_DIR .. "src/devices/video/t6b79.cpp",
+		MAME_DIR .. "src/devices/video/t6b79.h",
 	}
 end
 

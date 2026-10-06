@@ -6,21 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - get these running and we're golden
-        + Bounty Bob Strikes Back (aligned halftracks)
-        - Quiwi (speed change within track)
-        - Defender of the Crown (V-MAX! v2, density checks)
-        - Test Drive / Cabal (HLS, sub-cycle jitter)
-        - Galaxian (?, needs 100% accurate VIA)
-
-	https://www.commodoregames.net/copyprotection/protection-methods.asp
-
-*/
-
 #include "emu.h"
 #include "64h156.h"
 
@@ -218,10 +203,7 @@ void c64h156_device::commit(const attotime &tm)
 void c64h156_device::live_delay(int state)
 {
 	cur_live.next_state = state;
-	if(cur_live.tm != machine().time())
-		t_gen->adjust(cur_live.tm - machine().time());
-	else
-		live_sync();
+	t_gen->adjust(cur_live.tm - machine().time());
 }
 
 void c64h156_device::live_sync()
@@ -269,6 +251,8 @@ void c64h156_device::live_run(const attotime &limit)
 	if(cur_live.state == IDLE || cur_live.next_state != -1)
 		return;
 
+	bool settled = false;
+
 	for(;;) {
 		switch(cur_live.state) {
 		case RUNNING: {
@@ -276,6 +260,9 @@ void c64h156_device::live_run(const attotime &limit)
 
 			if (cur_live.tm > limit)
 				return;
+
+			if (settled)
+				skip_idle_cycles(limit);
 
 			if ((cur_live.tm + m_period) > limit)
 				return;
@@ -366,6 +353,7 @@ void c64h156_device::live_run(const attotime &limit)
 			}
 
 			cur_live.tm += m_period;
+			settled = !bit;
 			break;
 		}
 
@@ -378,11 +366,39 @@ void c64h156_device::live_run(const attotime &limit)
 			m_write_sync(cur_live.sync);
 			m_write_byte(cur_live.byte);
 
+			cur_live.tm += m_period;
 			cur_live.state = RUNNING;
 			checkpoint();
 			break;
 		}
 		}
+	}
+}
+
+void c64h156_device::skip_idle_cycles(const attotime &limit)
+{
+	// cycles that neither advance the cell counter nor see a flux reversal leave every output unchanged
+	int cycles = 15 - cur_live.cycle_counter;
+	if (cur_live.oe)
+		cycles = std::min(cycles, cur_live.cycles_until_random_flux - cur_live.zero_counter - 1);
+	if (cycles <= 0)
+		return;
+
+	attotime end = cur_live.tm + m_period * cycles;
+	while (cycles > 0 && (end > limit || (cur_live.oe && end > cur_live.edge)))
+	{
+		cycles--;
+		end -= m_period;
+	}
+	if (!cycles)
+		return;
+
+	cur_live.tm = end;
+	cur_live.cycle_counter += cycles;
+	if (cur_live.oe)
+	{
+		cur_live.zero_counter += cycles;
+		cur_live.filter_counter = std::min(cur_live.filter_counter + cycles, CYCLES_TIME_DOMAIN_FILTER);
 	}
 }
 

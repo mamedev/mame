@@ -10,7 +10,7 @@ TeleVideo 9320 appears to run on similar hardware with a 2681 DUART replacing th
 
 #include "emu.h"
 //#include "bus/rs232/rs232.h"
-#include "cpu/g65816/g65816.h"
+#include "cpu/m6502/w65816.h"
 #include "machine/mos6551.h"
 #include "machine/nvram.h"
 #include "video/scn2674.h"
@@ -42,7 +42,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<g65816_device> m_maincpu;
+	required_device<w65816_device> m_maincpu;
 	required_device<scn2672_device> m_crtc;
 	required_device<screen_device> m_screen;
 	memory_view m_char_view;
@@ -199,7 +199,7 @@ INPUT_PORTS_END
 
 void tv965_state::tv965(machine_config &config)
 {
-	G65816(config, m_maincpu, 44.4528_MHz_XTAL / 10);
+	W65816(config, m_maincpu, 44.4528_MHz_XTAL / 10);
 	m_maincpu->set_addrmap(AS_DATA, &tv965_state::mem_map);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tv965_state::program_map);
 
@@ -213,7 +213,7 @@ void tv965_state::tv965(machine_config &config)
 	SCN2672(config, m_crtc, 44.4528_MHz_XTAL / 10);
 	m_crtc->set_character_width(10);
 	m_crtc->set_display_callback(FUNC(tv965_state::draw_character));
-	m_crtc->intr_callback().set_inputline(m_maincpu, G65816_LINE_NMI);
+	m_crtc->intr_callback().set_inputline(m_maincpu, w65816_device::NMI_LINE);
 	m_crtc->set_screen(m_screen);
 
 	mos6551_device &acia1(MOS6551(config, "acia1"));

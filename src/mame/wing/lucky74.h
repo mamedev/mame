@@ -30,7 +30,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void sound_start() override;
 
 private:
 	uint8_t custom_09R81P_port_r(offs_t offset);

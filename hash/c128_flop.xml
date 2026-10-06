@@ -119,6 +119,20 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="thaibxnga" cloneof="thaibxng">
+		<description>Thai Boxing (alt)</description>
+		<year>1986</year>
+		<publisher>Anco</publisher>
+		<info name="usage" value="Only boots with a 1541 drive"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="295442">
+				<rom name="ThaiBoxing_s0.g64" size="295442" crc="bd26bb80" sha1="cc9c0d2da2986bfae78f34bad664a204ef4a4297"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Applications -->
 
 	<software name="10yrhvsc">
@@ -796,6 +810,32 @@ Before loading FORMAT.128, disable automatic write verification with this comman
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="lunix-c128-reu.d64" size="174848" crc="234af728" sha1="741127341c1bef3dbe5f137680f6df2547f5d02e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vdcmaniac" supported="no">
+		<description>vdcmaniac (v1.0.2)</description>
+		<year>2026</year>
+		<publisher>xahmol</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="vdcmaniac.d81" size="819200" crc="da64c227" sha1="9f81e9a10274f514b74b54c980f532cc23862ad0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pocketw2">
+		<description>Pocket Writer 2</description>
+		<year>1986</year>
+		<publisher>Digital Solutions</publisher>
+		<sharedfeat name="compatibility" value="PAL,NTSC"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="287512">
+				<rom name="PocketWriter2_s1.g64" size="287512" crc="bbc03711" sha1="e84a52c7dc9af54beb64a568f9e33e6112edee97"/>
 			</dataarea>
 		</part>
 	</software>

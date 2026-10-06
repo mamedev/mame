@@ -153,7 +153,7 @@ protected:
 	devcb_write8 m_wdm_w;
 	devcb_write_line m_sync_w;
 
-	address_space_config m_program_config, m_sprogram_config, m_vector_config;
+	address_space_config m_program_config, m_sprogram_config, m_vector_config, m_data_config;
 
 	uint16_t m_PPC;             // previous program counter (bank-less)
 	uint16_t m_NPC;             // next start-of-instruction program counter

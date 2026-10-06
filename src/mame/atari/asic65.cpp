@@ -553,7 +553,7 @@ void asic65_device::asic65_io_map(address_map &map)
 void asic65_device::device_add_mconfig(machine_config &config)
 {
 	/* ASIC65 */
-	TMS320C10(config, m_ourcpu, 20'000'000);
+	TMS320C10(config, m_ourcpu, DERIVED_CLOCK(1, 1));
 	m_ourcpu->set_addrmap(AS_PROGRAM, &asic65_device::asic65_program_map);
 	m_ourcpu->set_addrmap(AS_IO, &asic65_device::asic65_io_map);
 	m_ourcpu->bio().set(FUNC(asic65_device::get_bio));
