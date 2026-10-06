@@ -93,6 +93,27 @@ function cheat.startplugin()
 	local breaks = {}
 	local inputs = {}
 
+	-- Use the shared UI setting in patched MAME, or a session-only fallback.
+	local show_comments_fallback = true
+	local function comments_option()
+		return manager.ui.options.entries.show_cheat_comments
+	end
+	local function show_cheat_comments()
+		local entry = comments_option()
+		if entry then
+			return entry:value()
+		end
+		return show_comments_fallback
+	end
+	local function set_show_cheat_comments(value)
+		local entry = comments_option()
+		if entry then
+			entry:value(value)
+		else
+			show_comments_fallback = value
+		end
+	end
+
 	local function load_cheats()
 		local filename = emu.romname()
 		local newcheats = {}
@@ -711,6 +732,7 @@ function cheat.startplugin()
 		menu[#menu + 1] = {_("Set hotkeys"), "", ""}
 		menu[#menu + 1] = {_("Reset All"), "", ""}
 		menu[#menu + 1] = {_("Reload All"), "", ""}
+		menu[#menu + 1] = {_("Show Cheat Comments"), show_cheat_comments() and _("On") or _("Off"), show_cheat_comments() and "l" or "r"}
 		return menu
 	end
 
@@ -729,6 +751,19 @@ function cheat.startplugin()
 					hotkeymenu = false
 					return true
 				end
+			end
+			return false
+		end
+		if index == #cheats + 5 then
+			if event == "left" or event == "right" or event == "clear" or event == "select" then
+				local value
+				if event == "select" then
+					value = not show_cheat_comments()
+				else
+					value = event ~= "left"
+				end
+				set_show_cheat_comments(value)
+				return true
 			end
 			return false
 		end
@@ -761,7 +796,7 @@ function cheat.startplugin()
 			return false
 		end
 		if event == "up" or event == "down" or event == "comment" then
-			if cheat.comment then
+			if show_cheat_comments() and cheat.comment then
 				manager.machine:popmessage(string.format(_("Cheat Comment:\n%s"), cheat.comment))
 			end
 		elseif event == "left" then
