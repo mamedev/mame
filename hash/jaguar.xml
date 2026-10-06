@@ -3,6 +3,9 @@
 <!--
 license:CC0-1.0
 
+TODO:
+- supported="partial" by default because we don't yet have a proper cart bus slot.
+
 Undumped:
   CD Diagnostic Cartridge
   Cybermorph (Rev. 0)(serial "J9000 700700")
@@ -157,8 +160,9 @@ Optionally uses [UART] JagLink
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Several HUD elements have wrong pitch, HUD blending looks ugly
-HUD automap draws garbage [blitter]
+[blitter] phrase mode: several HUD elements have wrong pitch
+HUD automap draws garbage
+HUD blending looks ugly
 No sound (fixed, serial clock)
 Randomly crashes during gameplay (verify, may be fixed)
 Access [cart] EEPROM
@@ -261,11 +265,10 @@ Title screen has black dots of garbage on top (btanb)
 		<publisher>ScatoLOGIC</publisher>
 		<notes><![CDATA[
 4 Play logo has [blitter] SRCSHADE bug on rolling section (red-ish, should be same-ish color as logo)
-Heavy GFX corruptions after 4 Play logo ([object] pitch = 3 16bpp) (fixed)
 Has CRY color bugs on main menu (uses [blitter] !TOPBEN)
-Some chars have [blitter] pitch width issues (similar to cybermor)
+[blitter] phrase mode issues in briefing and gameplay
 Black screen after selecting a mode, both 68k and [GPU] stalls on sharedram (worked around, details in machine_start)
-Missing graphics during gameplay, logic also seems busted
+Missing graphics during gameplay, logic also seems busted (verify, may be fixed)
 Access [cart] EEPROM
 Access [paddle] interface
 ]]></notes>
@@ -295,13 +298,11 @@ Boot looks timing sensitive, fails to boot after 68k waitstate handling without 
 		</part>
 	</software>
 
-	<software name="breakout" supported="no">
+	<software name="breakout" supported="partial">
 		<description>Breakout 2000</description>
 		<year>1996</year>
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
-Has severe RMW issues in both versions of the game when breaking blocks (fixed, [blitter] pitch)
-Sometimes BGM stops working after clearing a stage
 Access [cart] EEPROM
 ]]></notes>
 
@@ -321,6 +322,7 @@ Access [cart] EEPROM
 		<publisher>B&amp;C Computervision</publisher>
 		<notes><![CDATA[
 [object] flickers during gameplay
+[blitter] phrase mode for goal GFXs
 Access [cart] EEPROM
 ]]></notes>
 
@@ -432,11 +434,9 @@ Reads [Jerry] ASISTAT
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Huge GFX issues ([object] pitch = 4 16bpp) (fixed)
 [blitter] corrupted text chars, needs proper phrase mode
 Offset HUD elements in gameplay
 Submerged 3d elements in playfield, wants [blitter] GOURZ? (fixed, mostly)
-No sound (fixed, DSP JPIT irqs)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -526,7 +526,6 @@ Access [cart] EEPROM
 		<publisher>Virgin Interactibe</publisher>
 		<notes><![CDATA[
 Strips of uneven mask in right overscan for gameplay
-[object] uses plenty of pitch == 0 in 4bpp mode (namely at fight start, strips of yellow/blue bars)
 Access [cart] EEPROM, doesn't initialize properly i.e. needs to reset it if any other game is loaded
 ]]></notes>
 
@@ -577,8 +576,6 @@ Overscan bug on rightmost side of playfield
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Heavy pitch GFX issues ([object] pitch = 3 16bpp) (fixed)
-No sound (fixed, serial clock)
 Flickering [object] sprites on main menu
 Runs too fast
 Access [cart] EEPROM
@@ -656,9 +653,9 @@ Runs too fast
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-GFX issues on gameplay ([object] pitch = 0 4bpp and pitch = 3 16bpp)
 Text is solid squares [blitter] BCOMPEN?
 Missing objects during gameplay, [blitter] GOURZ?
+[blitter] phrase mode for some OSD elements in gameplay
 ]]></notes>
 
 		<info name="serial" value="J9009E 700709-002"/>
@@ -690,7 +687,7 @@ Reload after saving doesn't work, access [cart] EEPROM (verify, should be fixed)
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Has heavy pitch GFX issues (unhandled [object] pitch = 4 16bpp) (fixed)
+Has [object] or [blitter] pitch issues in ship select transitions
 Uses a mix of [blitter] BCOMPEN and GOURD + GOURZ, zooming transitions are off
 Uses [GPU] irq 3
 Access [cart] EEPROM
@@ -713,7 +710,6 @@ Has Z clipping issues during gameplay [blitter]
 		<notes><![CDATA[
 Black screen after briefing, or by selecting demo mode, sometimes forgets to change BGM too
 No sound (fixed, serial clock)
-Bad pitch GFXs on attract mode, after title ([object] pitch = 4 24bpp) (fixed)
 ]]></notes>
 
 		<info name="serial" value="J9026E 700726-002"/>
@@ -731,7 +727,6 @@ Bad pitch GFXs on attract mode, after title ([object] pitch = 4 24bpp) (fixed)
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
 Stretched title screen pixel width
-Several pitch issues (title logo on main menu [object] pitch = 3 16bpp) (fixed)
 Hangs after selecting weapon, heavy sound serial reads in [DSP]
 Uses [GPU] irqs 0,2,3
 Access [cart] EEPROM
@@ -785,7 +780,7 @@ Draws an incorrect pitch GFX, doesn't do much else ([object] pitch = 2 16bpp)
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Background pitch issue on gameplay
+[blitter] phrase mode: background pitch issue in gameplay
 [DSP] sound test produces no sound, can potentially crash on multiple triggers
 Virtual mode has same GFX bugs as missilvr
 No BGMs (fixed, [DSP] irq 0)
@@ -1093,6 +1088,7 @@ Weapon shop doesn't seem to do anything except showing a cabinet (verify)
 Some items in options overruns text drawing (drone option "too many enemies")
 Non functional inputs when getting an high score
 Access [cart] EEPROM, can crash with an invalid one and accessing high scores
+Crashes by soft reset (F3)
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1372,7 +1368,6 @@ RSoD on Jaguar logo
 		<notes><![CDATA[
 Overstretched pixel width
 Garbage effect at "out of time" during gameplay, reads the line buffer for a zoom effect while keeping [object] stalled
-Triggers [object] pitch = 0 8bpp at start of gameplay
 Reads back [object] processor data during gameplay
 Access [cart] EEPROM
 Uses [GPU] irq 3
@@ -1671,6 +1666,7 @@ Just a PoC, not even a game
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
 [DSP] no sound, eventually throws random gibberish to its endian port (i.e. 0x22001861) when pressing 'C'
+Probably wants own [cart] scheme, looks an ICE debugger break
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
