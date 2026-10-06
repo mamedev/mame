@@ -764,25 +764,27 @@ uint64_t naomi_gdrom_board::i2cmem_dimm_r()
 {
 	uint8_t ret;
 
-	ret = m_i2c0->read_sda();
-	ret |= m_i2c1->read_sda();
+	ret = m_i2c0->read_sda() & m_i2c1->read_sda();
 	ret = ret << 1;
-	if (picbus_used == true)
+
+	if (picbus_used)
 		ret |= ((picbus | picbus_pullup) & 0xf) << 2;
 	else
 		ret |= m_eeprom->do_read() << 5;
+
 	return ret;
 }
 
 void naomi_gdrom_board::i2cmem_dimm_w(uint64_t data)
 {
-	if (data & 0x40000)
-	{
-		m_i2c0->write_sda((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-		m_i2c1->write_sda((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-	}
-	m_i2c0->write_scl((data & 0x1) ? ASSERT_LINE : CLEAR_LINE);
-	m_i2c1->write_scl((data & 0x1) ? ASSERT_LINE : CLEAR_LINE);
+	const int sda = (data & 0x40000) ? BIT(data, 1) : 1;
+	const int scl = (data & 0x10000) ? BIT(data, 0) : 1;
+
+	m_i2c0->write_sda(sda);
+	m_i2c1->write_sda(sda);
+	m_i2c0->write_scl(scl);
+	m_i2c1->write_scl(scl);
+
 	if (data & 0x0200)
 	{
 		picbus_used = true;

@@ -58,302 +58,6 @@ void jaguar_state::jagobj_init()
 	(dst) = (m_blend_cc[((dst) & 0xff00) | (((src) >> 8) & 0xff)] << 8) | m_blend_y[(((dst) & 0xff) << 8) | ((src) & 0xff)];
 
 
-
-/*************************************
- *
- *  4bpp bitmap renderers
- *
- *************************************/
-
-inline void jaguar_state::bitmap_4_draw(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint8_t flags, int32_t dxpos, uint16_t *clutbase)
-{
-	if (firstpix & 7)
-	{
-		uint32_t pixsrc = src[firstpix >> 3];
-		while (firstpix & 7)
-		{
-			int pix = (pixsrc >> ((~firstpix & 7) << 2)) & 0x0f;
-			if ((!(flags & 4) || pix) && (uint32_t)xpos < 760)
-			{
-				if (!(flags & 2))
-					scanline[xpos] = clutbase[BYTE_XOR_BE(pix)];
-				else
-					BLEND(scanline[xpos], clutbase[BYTE_XOR_BE(pix)]);
-			}
-			xpos += dxpos;
-			firstpix++;
-		}
-	}
-
-	firstpix >>= 3;
-	iwidth >>= 3;
-	iwidth -= firstpix;
-
-	while (iwidth-- > 0)
-	{
-		uint32_t pix = src[firstpix++];
-		if (!(flags & 4) || pix)
-		{
-			if ((!(flags & 4) || (pix & 0xf0000000)) && (uint32_t)xpos < 760)
-			{
-				if (!(flags & 2))
-					scanline[xpos] = clutbase[BYTE_XOR_BE(pix >> 28)];
-				else
-					BLEND(scanline[xpos], clutbase[BYTE_XOR_BE(pix >> 28)]);
-			}
-			xpos += dxpos;
-
-			if ((!(flags & 4) || (pix & 0x0f000000)) && (uint32_t)xpos < 760)
-			{
-				if (!(flags & 2))
-					scanline[xpos] = clutbase[BYTE_XOR_BE((pix >> 24) & 0x0f)];
-				else
-					BLEND(scanline[xpos], clutbase[BYTE_XOR_BE((pix >> 24) & 0x0f)]);
-			}
-			xpos += dxpos;
-
-			if ((!(flags & 4) || (pix & 0x00f00000)) && (uint32_t)xpos < 760)
-			{
-				if (!(flags & 2))
-					scanline[xpos] = clutbase[BYTE_XOR_BE((pix >> 20) & 0x0f)];
-				else
-					BLEND(scanline[xpos], clutbase[BYTE_XOR_BE((pix >> 20) & 0x0f)]);
-			}
-			xpos += dxpos;
-
-			if ((!(flags & 4) || (pix & 0x000f0000)) && (uint32_t)xpos < 760)
-			{
-				if (!(flags & 2))
-					scanline[xpos] = clutbase[BYTE_XOR_BE((pix >> 16) & 0x0f)];
-				else
-					BLEND(scanline[xpos], clutbase[BYTE_XOR_BE((pix >> 16) & 0x0f)]);
-			}
-			xpos += dxpos;
-
-			if ((!(flags & 4) || (pix & 0x0000f000)) && (uint32_t)xpos < 760)
-			{
-				if (!(flags & 2))
-					scanline[xpos] = clutbase[BYTE_XOR_BE((pix >> 12) & 0x0f)];
-				else
-					BLEND(scanline[xpos], clutbase[BYTE_XOR_BE((pix >> 12) & 0x0f)]);
-			}
-			xpos += dxpos;
-
-			if ((!(flags & 4) || (pix & 0x00000f00)) && (uint32_t)xpos < 760)
-			{
-				if (!(flags & 2))
-					scanline[xpos] = clutbase[BYTE_XOR_BE((pix >> 8) & 0x0f)];
-				else
-					BLEND(scanline[xpos], clutbase[BYTE_XOR_BE((pix >> 8) & 0x0f)]);
-			}
-			xpos += dxpos;
-
-			if ((!(flags & 4) || (pix & 0x000000f0)) && (uint32_t)xpos < 760)
-			{
-				if (!(flags & 2))
-					scanline[xpos] = clutbase[BYTE_XOR_BE((pix >> 4) & 0x0f)];
-				else
-					BLEND(scanline[xpos], clutbase[BYTE_XOR_BE((pix >> 4) & 0x0f)]);
-			}
-			xpos += dxpos;
-
-			if ((!(flags & 4) || (pix & 0x0000000f)) && (uint32_t)xpos < 760)
-			{
-				if (!(flags & 2))
-					scanline[xpos] = clutbase[BYTE_XOR_BE(pix & 0x0f)];
-				else
-					BLEND(scanline[xpos], clutbase[BYTE_XOR_BE(pix & 0x0f)]);
-			}
-			xpos += dxpos;
-		}
-		else
-			xpos += dxpos << 3;
-	}
-}
-
-void jaguar_state::bitmap_4_0(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase)
-{
-	bitmap_4_draw(scanline, firstpix, iwidth, src, xpos, 0, 1, clutbase);
-}
-
-void jaguar_state::bitmap_4_1(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase)
-{
-	bitmap_4_draw(scanline, firstpix, iwidth, src, xpos, 1, -1, clutbase);
-}
-
-void jaguar_state::bitmap_4_2(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase)
-{
-	bitmap_4_draw(scanline, firstpix, iwidth, src, xpos, 2, 1, clutbase);
-}
-
-void jaguar_state::bitmap_4_3(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase)
-{
-	bitmap_4_draw(scanline, firstpix, iwidth, src, xpos, 3, -1, clutbase);
-}
-
-void jaguar_state::bitmap_4_4(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase)
-{
-	bitmap_4_draw(scanline, firstpix, iwidth, src, xpos, 4, 1, clutbase);
-}
-
-void jaguar_state::bitmap_4_5(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase)
-{
-	bitmap_4_draw(scanline, firstpix, iwidth, src, xpos, 5, -1, clutbase);
-}
-
-void jaguar_state::bitmap_4_6(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase)
-{
-	bitmap_4_draw(scanline, firstpix, iwidth, src, xpos, 6, 1, clutbase);
-}
-
-void jaguar_state::bitmap_4_7(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase)
-{
-	bitmap_4_draw(scanline, firstpix, iwidth, src, xpos, 7, -1, clutbase);
-}
-
-void (jaguar_state::*const jaguar_state::bitmap4[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t, uint16_t *) =
-{
-	&jaguar_state::bitmap_4_0,
-	&jaguar_state::bitmap_4_1,
-	&jaguar_state::bitmap_4_2,
-	&jaguar_state::bitmap_4_3,
-	&jaguar_state::bitmap_4_4,
-	&jaguar_state::bitmap_4_5,
-	&jaguar_state::bitmap_4_6,
-	&jaguar_state::bitmap_4_7
-};
-
-
-
-/*************************************
- *
- *  8bpp bitmap renderers
- *
- *************************************/
-
-inline void jaguar_state::bitmap_8_draw(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint8_t flags, int32_t dxpos, uint16_t *clutbase)
-{
-	if (firstpix & 3)
-	{
-		uint32_t pixsrc = src[firstpix >> 2];
-		while (firstpix & 3)
-		{
-			uint8_t pix = pixsrc >> ((~firstpix & 3) << 3);
-			if ((!(flags & 4) || pix) && (uint32_t)xpos < 760)
-			{
-				if (!(flags & 2))
-					scanline[xpos] = clutbase[BYTE_XOR_BE(pix)];
-				else
-					BLEND(scanline[xpos], clutbase[BYTE_XOR_BE(pix)]);
-			}
-			xpos += dxpos;
-			firstpix++;
-		}
-	}
-
-	firstpix >>= 2;
-	iwidth >>= 2;
-	iwidth -= firstpix;
-
-	while (iwidth-- > 0)
-	{
-		uint32_t pix = src[firstpix++];
-		if (!(flags & 4) || pix)
-		{
-			if ((!(flags & 4) || (pix & 0xff000000)) && (uint32_t)xpos < 760)
-			{
-				if (!(flags & 2))
-					scanline[xpos] = clutbase[BYTE_XOR_BE(pix >> 24)];
-				else
-					BLEND(scanline[xpos], clutbase[BYTE_XOR_BE(pix >> 24)]);
-			}
-			xpos += dxpos;
-
-			if ((!(flags & 4) || (pix & 0x00ff0000)) && (uint32_t)xpos < 760)
-			{
-				if (!(flags & 2))
-					scanline[xpos] = clutbase[BYTE_XOR_BE((pix >> 16) & 0xff)];
-				else
-					BLEND(scanline[xpos], clutbase[BYTE_XOR_BE((pix >> 16) & 0xff)]);
-			}
-			xpos += dxpos;
-
-			if ((!(flags & 4) || (pix & 0x0000ff00)) && (uint32_t)xpos < 760)
-			{
-				if (!(flags & 2))
-					scanline[xpos] = clutbase[BYTE_XOR_BE((pix >> 8) & 0xff)];
-				else
-					BLEND(scanline[xpos], clutbase[BYTE_XOR_BE((pix >> 8) & 0xff)]);
-			}
-			xpos += dxpos;
-
-			if ((!(flags & 4) || (pix & 0x000000ff)) && (uint32_t)xpos < 760)
-			{
-				if (!(flags & 2))
-					scanline[xpos] = clutbase[BYTE_XOR_BE(pix & 0xff)];
-				else
-					BLEND(scanline[xpos], clutbase[BYTE_XOR_BE(pix & 0xff)]);
-			}
-			xpos += dxpos;
-		}
-		else
-			xpos += dxpos << 2;
-	}
-}
-
-void jaguar_state::bitmap_8_0(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase)
-{
-	bitmap_8_draw(scanline, firstpix, iwidth, src, xpos, 0, 1, clutbase);
-}
-
-void jaguar_state::bitmap_8_1(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase)
-{
-	bitmap_8_draw(scanline, firstpix, iwidth, src, xpos, 1, -1, clutbase);
-}
-
-void jaguar_state::bitmap_8_2(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase)
-{
-	bitmap_8_draw(scanline, firstpix, iwidth, src, xpos, 2, 1, clutbase);
-}
-
-void jaguar_state::bitmap_8_3(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase)
-{
-	bitmap_8_draw(scanline, firstpix, iwidth, src, xpos, 3, -1, clutbase);
-}
-
-void jaguar_state::bitmap_8_4(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase)
-{
-	bitmap_8_draw(scanline, firstpix, iwidth, src, xpos, 4, 1, clutbase);
-}
-
-void jaguar_state::bitmap_8_5(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase)
-{
-	bitmap_8_draw(scanline, firstpix, iwidth, src, xpos, 5, -1, clutbase);
-}
-
-void jaguar_state::bitmap_8_6(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase)
-{
-	bitmap_8_draw(scanline, firstpix, iwidth, src, xpos, 6, 1, clutbase);
-}
-
-void jaguar_state::bitmap_8_7(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase)
-{
-	bitmap_8_draw(scanline, firstpix, iwidth, src, xpos, 7, -1, clutbase);
-}
-
-void (jaguar_state::*const jaguar_state::bitmap8[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t, uint16_t *) =
-{
-	&jaguar_state::bitmap_8_0,
-	&jaguar_state::bitmap_8_1,
-	&jaguar_state::bitmap_8_2,
-	&jaguar_state::bitmap_8_3,
-	&jaguar_state::bitmap_8_4,
-	&jaguar_state::bitmap_8_5,
-	&jaguar_state::bitmap_8_6,
-	&jaguar_state::bitmap_8_7
-};
-
-
 static inline uint8_t lookup_pixel(const uint32_t *src, int i, int pitch, int depth)
 {
 	int ppl     = 32 / depth;
@@ -383,18 +87,21 @@ uint32_t jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, int
 	uint32_t *src = (uint32_t *)memory_base(data << 3);
 
 	/* debug logging */
+	// TODO: get rid of this confusing duplication, merge below
 	{
 		/* second phrase */
 		uint32_t upper2 = objdata[2];
 		uint32_t lower2 = objdata[3];
 
 		/* extract data */
+		// NOTE: the bit ranges provided by JTRM are inclusive
+		// i.e. 38-44 for _index means 7 bits not 6.
 		int16_t xpos = util::sext(lower2 & 0xfff, 12);
 		uint8_t depth = 1 << ((lower2 >> 12) & 7);
 		uint8_t pitch = (lower2 >> 15) & 7;
 		uint32_t dwidth = (lower2 >> 18) & 0x3ff;
 		int32_t iwidth = (lower2 >> 28) | ((upper2 & 0x3f) << 4);
-		uint8_t _index = (upper2 >> 6) & 0x3f;
+		uint8_t _index = (upper2 >> 6) & 0x7f;
 		// bit 0: REFLECT (a.k.a. flip X)
 		// bit 1: RMW
 		// bit 2: TRANS(parent)
@@ -433,6 +140,7 @@ uint32_t jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, int
 		//  popmessage("jagobj.ipp: iwidth == 0!");
 
 		/* switch off the depth */
+		// TODO: cleanup, should gain some performance by clever functional programming.
 		switch (depthlog)
 		{
 			/* 1bpp case */
@@ -505,86 +213,138 @@ uint32_t jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, int
 
 			/* 4bpp case */
 			case 2:
-				/* only handle pitch=1 for now */
-				if (pitch != 1)
-					logerror("Unhandled pitch = %d at 4bpp\n", pitch);
+			{
+				// NOTE: worms has plenty of bit 3 high for backgrounds, ignored when calculating CLUT
+				uint16_t *clut = (uint16_t *)&m_gpu_clut[0] + (_index & 0xf0);
 				xpos += firstpix * dxpos;
 
-				(this->*bitmap4[flags])(scanline, firstpix, iwidth, src, xpos, (uint16_t *)&m_gpu_clut[0] + (_index & 0xf8));
+				/* non-blending */
+				if (!(flags & 2))
+				{
+					for (i = firstpix; i < iwidth; i++)
+					{
+						uint8_t pix = lookup_pixel(src, i, pitch, 4);
+
+						if (xpos >= 0 && xpos < 760 && (pix || !(flags & 4)))
+							scanline[xpos] = clut[BYTE_XOR_BE(pix)];
+						xpos += dxpos;
+					}
+				}
+
+				/* blending */
+				else
+				{
+					for (i = firstpix; i < iwidth; i++)
+					{
+						uint8_t pix = lookup_pixel(src, i, pitch, 4);
+
+						if (xpos >= 0 && xpos < 760 && (pix || !(flags & 4)))
+							BLEND(scanline[xpos], clut[BYTE_XOR_BE(pix)]);
+						xpos += dxpos;
+					}
+				}
 				break;
+			}
 
 			/* 8bpp case */
 			case 3:
-				/* only handle pitch=1 for now */
-				if (pitch != 1)
-					logerror("Unhandled pitch = %d at 8bpp\n", pitch);
+			{
+				// NOTE: doesn't read from index, avsp cares for player gun colors
+				uint16_t *clut = (uint16_t *)&m_gpu_clut[0]; //+ (_index & 0xf8);
 				xpos += firstpix * dxpos;
 
-				(this->*bitmap8[flags])(scanline, firstpix, iwidth, src, xpos, (uint16_t *)&m_gpu_clut[0]);
+				// TODO: remove lookup_pixel roundtrip for this color mode
+				/* non-blending */
+				if (!(flags & 2))
+				{
+					for (i = firstpix; i < iwidth; i++)
+					{
+						uint8_t pix = lookup_pixel(src, i, pitch, 8);
+
+						if (xpos >= 0 && xpos < 760 && (pix || !(flags & 4)))
+							scanline[xpos] = clut[BYTE_XOR_BE(pix)];
+						xpos += dxpos;
+					}
+				}
+
+				/* blending */
+				else
+				{
+					for (i = firstpix; i < iwidth; i++)
+					{
+						uint8_t pix = lookup_pixel(src, i, pitch, 8);
+
+						if (xpos >= 0 && xpos < 760 && (pix || !(flags & 4)))
+							BLEND(scanline[xpos], clut[BYTE_XOR_BE(pix)]);
+						xpos += dxpos;
+					}
+				}
 				break;
+			}
 
 			/* 16bpp case */
 			case 4:
+			{
+				// TODO: firstpix matters only on <= 8bpp objects
+				// firstpix &= 0x3e;
+				xpos += firstpix * dxpos;
+
+				while (iwidth > 0)
 				{
-					// TODO: firstpix matters only on <= 8bpp objects
-					// firstpix &= 0x3e;
-					xpos += firstpix * dxpos;
+					uint64_t datax = ((u64)src[firstpix] << 32) | (src[firstpix + 1]);
+					firstpix += pitch << 1;
 
-					while (iwidth > 0)
+					for (i = 0; i < 4 && iwidth > 0; i++, iwidth--)
 					{
-						uint64_t datax = ((u64)src[firstpix] << 32) | (src[firstpix + 1]);
-						firstpix += pitch << 1;
-
-						for (i = 0; i < 4 && iwidth > 0; i++, iwidth--)
+						u16 pix = (datax >> ((3 - i) * 16)) & 0xffff;
+						if ((!(flags & 4) || pix) && xpos == std::clamp(xpos, (int16_t)0, (int16_t)759))
 						{
-							u16 pix = (datax >> ((3 - i) * 16)) & 0xffff;
-							if ((!(flags & 4) || pix) && xpos == std::clamp(xpos, (int16_t)0, (int16_t)759))
-							{
-								if (!(flags & 2))
-									scanline[xpos] = pix;
-								else
-									BLEND(scanline[xpos], pix);
-							}
-
-							xpos += dxpos;
+							if (!(flags & 2))
+								scanline[xpos] = pix;
+							else
+								BLEND(scanline[xpos], pix);
 						}
-					}
 
+						xpos += dxpos;
+					}
 				}
+
 				break;
+			}
 
 			/* 24bpp case */
 			// - ironsold on title screen and attract mode
 			case 5:
+			{
+				// TODO: firstpix matters only on <= 8bpp objects
+				//firstpix &= 0x3e;
+				xpos += firstpix * dxpos;
+				//iwidth -= firstpix;
+
+				while (iwidth > 0)
 				{
-					// TODO: firstpix matters only on <= 8bpp objects
-					//firstpix &= 0x3e;
-					xpos += firstpix * dxpos;
-					//iwidth -= firstpix;
+					uint64_t datax = ((u64)src[firstpix] << 32) | (src[firstpix + 1]);
+					firstpix += pitch << 1;
 
-					while (iwidth > 0)
+					for (i = 0; i < 2 && iwidth > 0; i++, iwidth--)
 					{
-						uint64_t datax = ((u64)src[firstpix] << 32) | (src[firstpix + 1]);
-						firstpix += pitch << 1;
+						u32 pix = (datax >> ((1 - i) * 32)) & 0xffffffff;
 
-						for (i = 0; i < 2 && iwidth > 0; i++, iwidth--)
+						// NOTE: 24bpp shouldn't support RMW
+						if ((!(flags & 6) || pix) && xpos == std::clamp(xpos, (int16_t)0, (int16_t)759))
 						{
-							u32 pix = (datax >> ((1 - i) * 32)) & 0xffffffff;
-
-							// NOTE: 24bpp shouldn't support RMW
-							if ((!(flags & 6) || pix) && xpos == std::clamp(xpos, (int16_t)0, (int16_t)759))
-							{
-								scanline[xpos + 0] = pix >> 16;
-								scanline[xpos + 1] = pix & 0xffff;
-								//else
-								//  BLEND(scanline[xpos], pix);
-							}
-
-							xpos += dxpos * 2;
+							scanline[xpos + 0] = pix >> 16;
+							scanline[xpos + 1] = pix & 0xffff;
+							//else
+							//  BLEND(scanline[xpos], pix);
 						}
+
+						xpos += dxpos * 2;
 					}
 				}
+
 				break;
+			}
 
 			default:
 				popmessage("jagobj.ipp: Unhandled bitmap source depth = %d\n", depthlog);
