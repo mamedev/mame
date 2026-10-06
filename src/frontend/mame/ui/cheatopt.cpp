@@ -14,6 +14,7 @@
 #include "ui/ui.h"
 
 #include "cheat.h"
+#include "emuopts.h"
 #include "mame.h"
 
 
@@ -23,7 +24,8 @@ namespace ui {
 #define ITEMREF_CHEATS_ENABLE               ((void *) 0x0001)
 #define ITEMREF_CHEATS_RESET_ALL            ((void *) 0x0002)
 #define ITEMREF_CHEATS_RELOAD_ALL           ((void *) 0x0003)
-#define ITEMREF_CHEATS_FIRST_ITEM           ((void *) 0x0004)
+#define ITEMREF_CHEATS_SHOW_COMMENTS        ((void *) 0x0004)
+#define ITEMREF_CHEATS_FIRST_ITEM           ((void *) 0x0005)
 
 
 /*-------------------------------------------------
@@ -46,6 +48,15 @@ bool menu_cheat::handle(event const *ev)
 		{
 			// handle global enable toggle
 			mame_machine_manager::instance()->cheat().set_enable(ev->iptkey == IPT_UI_RIGHT || (ev->iptkey == IPT_UI_CLEAR), false);
+			changed = true;
+		}
+	}
+	else if (ev->itemref == ITEMREF_CHEATS_SHOW_COMMENTS)
+	{
+		if ((ev->iptkey == IPT_UI_LEFT) || (ev->iptkey == IPT_UI_RIGHT) || (ev->iptkey == IPT_UI_CLEAR))
+		{
+			ui().options().set_value(OPTION_SHOW_CHEAT_COMMENTS, ev->iptkey != IPT_UI_LEFT, OPTION_PRIORITY_CMDLINE);
+			ui().save_ui_options();
 			changed = true;
 		}
 	}
@@ -88,7 +99,7 @@ bool menu_cheat::handle(event const *ev)
 			case IPT_UI_UP:
 			case IPT_UI_DOWN:
 				string = curcheat->comment();
-				if (string && *string)
+				if (ui().options().show_cheat_comments() && string && *string)
 					machine().popmessage(_("Cheat Comment:\n%s"), string);
 				break;
 		}
@@ -160,6 +171,7 @@ void menu_cheat::populate()
 	{
 		// add global enable toggle
 		item_append_on_off(_("Enable Cheats"), mame_machine_manager::instance()->cheat().enabled(), 0, (void *)ITEMREF_CHEATS_ENABLE);
+		item_append_on_off(_("Show Cheat Comments"), ui().options().show_cheat_comments(), 0, ITEMREF_CHEATS_SHOW_COMMENTS);
 		item_append(menu_item_type::SEPARATOR);
 
 		// add a reset all option

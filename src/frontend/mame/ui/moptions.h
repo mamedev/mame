@@ -45,6 +45,7 @@
 #define OPTION_UI_FOLLOW_FOCUS        "ui_follow_focus"
 
 // core UI options
+#define OPTION_SHOW_CHEAT_COMMENTS     "show_cheat_comments"
 #define OPTION_INFOS_SIZE             "infos_text_size"
 #define OPTION_FONT_ROWS              "font_rows"
 #define OPTION_UI_BORDER_COLOR        "ui_border_color"
@@ -120,6 +121,7 @@ public:
 	bool ui_follow_focus() const { return bool_value(OPTION_UI_FOLLOW_FOCUS); }
 
 	// UI options
+	bool show_cheat_comments() const { return bool_value(OPTION_SHOW_CHEAT_COMMENTS); }
 	float infos_size() const { return float_value(OPTION_INFOS_SIZE); }
 	int font_rows() const { return int_value(OPTION_FONT_ROWS); }
 

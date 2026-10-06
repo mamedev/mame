@@ -51,6 +51,7 @@ const options_entry ui_options::s_option_entries[] =
 	{ OPTION_UI_FOLLOW_FOCUS,               "0",                option_type::BOOLEAN,    "open menus in active window" },
 
 	// UI options
+	{ OPTION_SHOW_CHEAT_COMMENTS,            "1",            option_type::BOOLEAN,     "Show cheat comment popups" },
 	{ nullptr,                              nullptr,            option_type::HEADER,     "UI OPTIONS" },
 	{ OPTION_INFOS_SIZE "(0.20-1.00)",      "0.75",             option_type::FLOAT,      "UI right panel infos text size (0.20 - 1.00)" },
 	{ OPTION_FONT_ROWS "(25-40)",           "30",               option_type::INTEGER,    "UI font lines per screen (25 - 40)" },

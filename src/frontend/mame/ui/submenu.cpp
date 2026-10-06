@@ -39,6 +39,7 @@ std::vector<submenu::option> submenu::misc_options()
 			{ option_type::UI,   N_("Re-select last system launched"),                           OPTION_REMEMBER_LAST },
 			{ option_type::UI,   N_("Enlarge images in the right panel"),                        OPTION_ENLARGE_SNAPS },
 			{ option_type::EMU,  N_("Cheats"),                                                   OPTION_CHEAT },
+			{ option_type::UI,   N_("Show Cheat Comments"),                                      OPTION_SHOW_CHEAT_COMMENTS },
 			{ option_type::EMU,  N_("Show mouse pointer"),                                       OPTION_UI_MOUSE },
 			{ option_type::EMU,  N_("Confirm quit from emulation"),                              OPTION_CONFIRM_QUIT },
 			{ option_type::EMU,  N_("Skip system information screen"),                           OPTION_SKIP_GAMEINFO },
