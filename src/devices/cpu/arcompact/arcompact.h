@@ -22,6 +22,8 @@ public:
 
 	void set_dsp(bool enabled) { m_has_dsp = enabled; }
 
+	void set_memory_access_alignment(uint32_t word, uint32_t dword) { m_word_alignment_mask = word; m_dword_alignment_mask = dword; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -505,26 +507,21 @@ private:
 		m_regs[REG_PCL] = m_pc & 0xfffffffc; // always 32-bit aligned
 	}
 
-	// On ARCtangent-A5/ARC600, the effect of unaligned data access is system dependent. The Leapster
-	//   seems to simply ignore misaligned bits. This has been tested and confirmed on a Leapster 2.
-	//   This is required to emulate, as the Leapster's Flash implementation has a bug that causes
-	//   it to dereference a null pointer, read a garbage pointer from that dereference, and do
-	//   a misaligned memory access with it.
 	uint32_t READ32(uint32_t address)
 	{
-		return m_program->read_dword(address & 0xfffffffc);
+		return m_program->read_dword(address & m_dword_alignment_mask);
 	}
 	void WRITE32(uint32_t address, uint32_t data)
 	{
-		m_program->write_dword(address & 0xfffffffc, data);
+		m_program->write_dword(address & m_dword_alignment_mask, data);
 	}
 	uint16_t READ16(uint32_t address)
 	{
-		return m_program->read_word(address & 0xfffffffe);
+		return m_program->read_word(address & m_word_alignment_mask);
 	}
 	void WRITE16(uint32_t address, uint16_t data)
 	{
-		m_program->write_word(address & 0xfffffffe, data);
+		m_program->write_word(address & m_word_alignment_mask, data);
 	}
 	uint8_t READ8(uint32_t address)
 	{
@@ -554,9 +551,6 @@ private:
 	uint32_t handleop32_general_nowriteback_forced_flag(uint32_t op, ophandler32_ff ophandler);
 	uint32_t handleop32_general_SOP_group(uint32_t op, ophandler32_sop ophandler);
 	void arcompact_handle_ld_helper(uint32_t op, uint8_t areg, uint8_t breg, uint32_t s, uint8_t X, uint8_t Z, uint8_t a);
-
-	// config
-	uint32_t m_default_vector_base;
 
 	uint32_t dsp_aux_r(offs_t offset);
 	void dsp_aux_w(offs_t offset, uint32_t data);
@@ -600,6 +594,11 @@ private:
 	uint32_t m_INTVECTORBASE;
 	uint32_t m_AUX_IRQ_LV12;
 	uint32_t m_AUX_IRQ_LEV;
+
+	// config
+	uint32_t m_default_vector_base;
+	uint32_t m_dword_alignment_mask;
+	uint32_t m_word_alignment_mask;
 };
 
 DECLARE_DEVICE_TYPE(ARCA5, arcompact_device)

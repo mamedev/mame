@@ -1229,6 +1229,12 @@ void leapster_state::leapster(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapster_state::leapster_map);
 	m_maincpu->set_addrmap(AS_IO, &leapster_state::leapster_aux);
 	m_maincpu->set_default_vector_base(0x40000000);
+	// On ARCtangent-A5/ARC600, the effect of unaligned data access is implementation dependent.
+	// The Leapster seems to simply ignore misaligned bits. This has been tested and confirmed on
+	// a Leapster 2.  This is required to emulate, as the Leapster's Flash implementation has a bug
+	// that causes it to dereference a null pointer, read a garbage pointer from that dereference,
+	// and do a misaligned memory access with it.
+	m_maincpu->set_memory_access_alignment(0xfffffffe, 0xfffffffc);
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen").set_lcd());

@@ -227,6 +227,8 @@ arcompact_device::arcompact_device(const machine_config& mconfig, const char* ta
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0) // some docs describe these as 'middle endian'
 	, m_io_config("io", ENDIANNESS_LITTLE, 32, 32, -2, address_map_constructor(FUNC(arcompact_device::arcompact_auxreg_map), this))
 	, m_default_vector_base(0)
+	, m_dword_alignment_mask(0xffffffff)
+	, m_word_alignment_mask(0xffffffff)
 {
 }
 
