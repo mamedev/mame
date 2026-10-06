@@ -37,7 +37,7 @@ leapster_rom_nvram_device::leapster_rom_nvram_device(const machine_config &mconf
  mapper specific handlers
  -------------------------------------------------*/
 
-// plain
+// plain cartridge
 
 uint16_t leapster_rom_plain_device::read_cart(offs_t offset)
 {
@@ -59,7 +59,7 @@ void leapster_rom_plain_device::write_rom(offs_t offset, uint16_t data)
 	logerror("leapster_rom_plain_device::write_rom %08x %04x\n", offset, data);
 }
 
-// i2c base
+// cartridge with NVRAM (exact NVRAM/EEPROM type unknown)
 
 void leapster_rom_nvram_device::write_rom(offs_t offset, uint16_t data)
 {
@@ -87,8 +87,10 @@ void leapster_rom_nvram_device::device_add_mconfig(machine_config &config)
 void leapster_rom_nvram_device::device_start()
 {
 	leapster_rom_plain_device::device_start();
+
 	m_cartridge_eeprom = make_unique_clear<uint8_t[]>(2048);
 	m_nvram->set_base(m_cartridge_eeprom.get(), 2048);
+	save_pointer(NAME(m_cartridge_eeprom.get()), 2048);
 }
 
 /*-------------------------------------------------
