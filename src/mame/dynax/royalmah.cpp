@@ -168,6 +168,7 @@ public:
 	void jansou(machine_config &config) ATTR_COLD;
 	void ippatsu(machine_config &config) ATTR_COLD;
 	void janyoup2(machine_config &config) ATTR_COLD;
+	void ndblbet(machine_config &config) ATTR_COLD;
 	void seljan(machine_config &config) ATTR_COLD;
 
 	void init_jansou() ATTR_COLD;
@@ -220,6 +221,7 @@ private:
 	void royalmah_palette(palette_device &palette) const ATTR_COLD;
 
 	void ippatsu_map(address_map &map) ATTR_COLD;
+	void ndblbet_map(address_map &map) ATTR_COLD;
 	void seljan_map(address_map &map) ATTR_COLD;
 
 	void ippatsu_iomap(address_map &map) ATTR_COLD;
@@ -836,6 +838,13 @@ void royalmah_state::ippatsu_map(address_map &map)
 	royalmah_map(map);
 
 	map(0x8000, 0xbfff).mirror(0x4000).rom();
+}
+
+void royalmah_state::ndblbet_map(address_map &map)
+{
+	royalmah_map(map);
+
+	map(0xf000, 0xffff).rom().region("maincpu", 0x7000);
 }
 
 void royalmah_state::seljan_map(address_map &map)
@@ -4298,6 +4307,13 @@ void royalmah_state::janyoup2(machine_config &config)
 	crtc.set_char_width(4);
 }
 
+void royalmah_state::ndblbet(machine_config &config)
+{
+	janyoup2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &royalmah_state::ndblbet_map);
+}
+
 void royalmah_state::seljan(machine_config &config)
 {
 	janyoup2(config);
@@ -4694,14 +4710,11 @@ ROM_START( janputera ) // FRM-03 + PS-101 PCBs
 ROM_END
 
 /*
-Janyou Part I
-(c)1983 Shonan
-
 this set comes from a loose set of ROMs, so no PCB info available
-has 'OU PART 1' and 'ULY 1 1983 BY SHONAN' strings
-shows no title, so it's an educated guess based on Shonan's known games' list and code similarity with janyoup2
+has hacked out 'OU PART 1' and 'ULY 1 1983 BY SHONAN' strings
+shows "Double Bet" title
 */
-ROM_START( janyou )
+ROM_START( dblbet ) // almost identical to dblbeta, changes only double up condition (5 draws)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d", 0x0000, 0x2000, CRC(eb7dda8c) SHA1(cf6fae80168ddef78f283aa55a3388bbc54e3506) ) // 2764
 	ROM_LOAD( "3", 0x2000, 0x1000, CRC(2f0a1da4) SHA1(3d407e668f1510ebe357bde51ba7c2160878a8cd) ) // 2732
@@ -4714,7 +4727,22 @@ ROM_START( janyou )
 	ROM_LOAD( "mb7051",  0x0000, 0x0020, CRC(bc9b0be5) SHA1(dbbf0639c5928abe175578439009a45a3298b316) ) // no label
 ROM_END
 
-ROM_START( janyoua ) // on small Paradise PS-8907 riser PCB, along with a scratched off 40-pin chip, 3 banks of 8 switches and various scratched off other smaller chips
+ROM_START( dblbeta ) // almost identical to dblbet, changes only double up condition (5 loses)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "db1.p1", 0x0000, 0x1000, CRC(ac8d5c9d) SHA1(a0742f02da2cd9ef069c54828b974d43ecdd28f8) )
+	ROM_LOAD( "db2.p2", 0x1000, 0x1000, CRC(ff0a16a3) SHA1(15b90462605b6f940be9d81777d320aaf6f4d853) )
+	ROM_LOAD( "db3.p3", 0x2000, 0x1000, CRC(33a20aeb) SHA1(bc89613b276c9ee53d6acc9fa055b8834354d342) )
+	ROM_LOAD( "db4.p4", 0x3000, 0x1000, CRC(538cbe03) SHA1(8634332d883033a5800901be664036c08fced61b) )
+	ROM_LOAD( "db5.p5", 0x4000, 0x1000, CRC(16c09c73) SHA1(ea712f9ca3200ca27434e4200187b488e24f4c65) )
+	ROM_LOAD( "db6.p6", 0x5000, 0x1000, CRC(8ce5e09a) SHA1(5f134e218ddf2ad8849ed8915bb780a9cb6f6381) )
+	ROM_LOAD( "db7.p7", 0x6000, 0x1000, CRC(0e060269) SHA1(1e626f25fc86f4cace36919c827c84d36706293e) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom.6k",  0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
+ROM_END
+
+// on small Paradise PS-8907 riser PCB, along with a scratched off 40-pin chip, 3 banks of 8 switches and various scratched off other smaller chips
+ROM_START( ndblbet ) // various new features
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b.u5", 0x0000, 0x8000, CRC(54f27f8c) SHA1(27693e6c633ef5c1e655269d83b4a0161f581be3) )
 
@@ -6712,8 +6740,9 @@ GAME( 1981?, openmj,      royalmj,  royalmah, royalmah,   royalmah_state,       
 GAME( 1982,  royalmah,    royalmj,  royalmah, royalmah,   royalmah_state,         empty_init,    ROT0,   "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
 GAME( 1984?, chalgirl,    0,        chalgirl, royalmah,   royalmah_prgbank_state, init_chalgirl, ROT0,   "bootleg",                    "Challenge Girl (Falcon bootleg)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // verify ROM loading / banking, bad girl colors
 GAME( 1983,  seljan,      0,        seljan,   seljan,     royalmah_state,         empty_init,    ROT0,   "Jem / Dyna Corp",            "Sel-Jan (Japan)",                       0 )
-GAME( 1983,  janyou,      royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Shonan",                     "Janyou Part I (Double Bet, set 1)",     0 )
-GAME( 1983,  janyoua,     royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Shonan",                     "Janyou Part I (Double Bet, set 2)",     MACHINE_NOT_WORKING ) // resets in various places, probably protected
+GAME( 1983,  dblbet,      royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "bootleg",                    "Double Bet (bootleg of Janyou Part 1, set 1)", 0 )
+GAME( 1983,  dblbeta,     royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "bootleg",                    "Double Bet (bootleg of Janyou Part 1, set 2)", 0 )
+GAME( 1983,  ndblbet,     royalmj,  ndblbet,  janyoup2,   royalmah_state,         empty_init,    ROT0,   "bootleg (PS / Met)",         "New Double Bet Mojhong (ver 3.6)",      0 ) // sic
 GAME( 1983,  janyoup2,    royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
 GAME( 1983,  janyoup2a,   royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983, no title screen)",0 )
 GAME( 1983,  janyoup2702, royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.02, July 1 1983)",0 )
