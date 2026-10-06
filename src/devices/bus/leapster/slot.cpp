@@ -216,9 +216,14 @@ void leapster_slot_device::write_cart(offs_t offset, uint16_t data)
  read seeprom
  -------------------------------------------------*/
 
-
-uint8_t* leapster_slot_device::get_cart_nvram(void)
+uint8_t leapster_slot_device::read_nvram(uint16_t offset)
 {
-	return m_cart->get_cart_nvram();
+	return m_cart->read_nvram(offset);
 }
+
+void leapster_slot_device::write_nvram(uint16_t offset, uint8_t data)
+{
+	m_cart->write_nvram(offset, data);
+}
+
 

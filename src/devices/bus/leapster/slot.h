@@ -30,7 +30,8 @@ public:
 	virtual uint16_t read_cart(offs_t offset) { return 0xffff; }
 	virtual void write_cart(offs_t offset, uint16_t data) { }
 
-	virtual uint8_t *get_cart_nvram(void) { return nullptr; }
+	virtual uint8_t read_nvram(uint16_t offset) { return 0xff; }
+	virtual void write_nvram(uint16_t offset, uint8_t data) { }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	uint8_t* get_rom_base() { return m_rom; }
@@ -78,10 +79,11 @@ public:
 	static int get_cart_type(const uint8_t *ROM, uint32_t len);
 
 	// reading and writing
-	uint16_t read_cart(offs_t offset);
-	void write_cart(offs_t offset, uint16_t data);
+    uint16_t read_cart(offs_t offset);
+    void write_cart(offs_t offset, uint16_t data);
 
-	virtual uint8_t *get_cart_nvram(void);
+	uint8_t read_nvram(uint16_t offset);
+	void write_nvram(uint16_t offset, uint8_t data);
 
 	bool has_cart() { return m_cart ? true : false; }
 

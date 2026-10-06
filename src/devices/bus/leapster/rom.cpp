@@ -71,11 +71,16 @@ uint16_t leapster_rom_nvram_device::read_rom(offs_t offset)
 	return m_rom[offset & (m_rom_size - 1)];
 }
 
-uint8_t* leapster_rom_nvram_device::get_cart_nvram(void)
-{
-	logerror("leapster_rom_nvram_device::get_cart_nvram\n");
 
-	return m_cartridge_eeprom.get();
+
+uint8_t leapster_rom_nvram_device::read_nvram(uint16_t offset)
+{
+	return m_cartridge_eeprom.get()[offset & (NVRAM_SIZE-1)];
+}
+
+void leapster_rom_nvram_device::write_nvram(uint16_t offset, uint8_t data)
+{
+	m_cartridge_eeprom.get()[offset & (NVRAM_SIZE-1)] = data;
 }
 
 
@@ -88,9 +93,9 @@ void leapster_rom_nvram_device::device_start()
 {
 	leapster_rom_plain_device::device_start();
 
-	m_cartridge_eeprom = make_unique_clear<uint8_t[]>(2048);
-	m_nvram->set_base(m_cartridge_eeprom.get(), 2048);
-	save_pointer(NAME(m_cartridge_eeprom.get()), 2048);
+	m_cartridge_eeprom = make_unique_clear<uint8_t[]>(NVRAM_SIZE);
+	m_nvram->set_base(m_cartridge_eeprom.get(), NVRAM_SIZE);
+	save_pointer(NAME(m_cartridge_eeprom.get()), NVRAM_SIZE);
 }
 
 /*-------------------------------------------------

@@ -21,7 +21,8 @@ public:
 	virtual uint16_t read_cart(offs_t offset) override;
 	virtual void write_cart(offs_t offset, uint16_t data) override;
 
-	virtual uint8_t *get_cart_nvram(void) override { return nullptr; }
+	virtual uint8_t read_nvram(uint16_t offset) override { return 0xff; }
+	virtual void write_nvram(uint16_t offset, uint8_t data) override { }
 
 	virtual uint16_t read_rom(offs_t offset);
 	virtual void write_rom(offs_t offset, uint16_t data);
@@ -56,7 +57,12 @@ protected:
 	required_device<nvram_device> m_nvram;
 	std::unique_ptr<uint8_t[]> m_cartridge_eeprom;
 
-	virtual uint8_t *get_cart_nvram(void) override;
+	virtual uint8_t read_nvram(uint16_t offset) override;
+	virtual void write_nvram(uint16_t offset, uint8_t data) override;
+
+private:
+	static constexpr int NVRAM_SIZE = 0x800;
+
 };
 
 // device type definition

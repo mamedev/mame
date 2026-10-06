@@ -288,7 +288,6 @@ private:
 	void leapster_1802070_w(uint32_t data);
 	uint32_t leapster_1802078_r();
 
-	uint8_t* get_eeprom();
 	uint32_t leapster_eeprom_r(uint32_t offset);
 	void leapster_eeprom_w(uint32_t offset, uint32_t data);
 
@@ -517,29 +516,17 @@ uint32_t leapster_state::leapster_1809004_r()
 	return 0x63ff'bfff | m_cart_bit | (m_force_calibration->read() ? 0x4000 : 0);
 }
 
-
-uint8_t* leapster_state::get_eeprom()
-{
-	// This is seems hacky and needs a better defined solution to identify the target bank
-	uint8_t *cartridge_eeprom = nullptr;
-	if (m_cart && m_cart->exists())
-		cartridge_eeprom = m_cart->get_cart_nvram();
-
-	uint8_t *eeprom_bank = BIT(m_current_eeprom_command, 8, 8) == 0x26 ? m_system_eeprom.get() : cartridge_eeprom;
-
-	return eeprom_bank;
-}
-
 uint32_t leapster_state::leapster_eeprom_r(uint32_t offset)
 {
 	if(offset == 2)
 	{
-		uint8_t *eeprom_bank = get_eeprom();
-
-		if (eeprom_bank)
-			return eeprom_bank[m_current_eeprom_command >> 16];
+		uint16_t eeprom_address = m_current_eeprom_command >> 16;
+		// This is seems hacky and needs a better defined solution to identify the target bank
+		if (BIT(m_current_eeprom_command, 8, 8) == 0x26)
+			return m_system_eeprom.get()[eeprom_address & 0x1ff];
 		else
-			return 0;
+			if (m_cart && m_cart->exists())
+				return m_cart->read_nvram(eeprom_address);
 	}
 
 	return 0;
@@ -555,10 +542,15 @@ void leapster_state::leapster_eeprom_w(uint32_t offset, uint32_t data)
 		case 1:
 			if(data == 2)
 			{
-				uint8_t *eeprom_bank = get_eeprom();
+				uint16_t eeprom_address = m_current_eeprom_command >> 16;
+				uint8_t eeprom_data = m_current_eeprom_command & 0xff;
 
-				if (eeprom_bank)
-					eeprom_bank[m_current_eeprom_command >> 16] = m_current_eeprom_command & 0xff;
+				// This is seems hacky and needs a better defined solution to identify the target bank
+				if (BIT(m_current_eeprom_command, 8, 8) == 0x26)
+					m_system_eeprom.get()[eeprom_address & 0x1ff] = eeprom_data;
+				else
+					if (m_cart && m_cart->exists())
+						m_cart->write_nvram(eeprom_address, eeprom_data);
 			}
 
 			break;
@@ -994,8 +986,8 @@ void leapster_state::machine_start()
 
 	m_adc_timer = timer_alloc(FUNC(leapster_state::leapster_touch_adc_update), this);
 
-	m_system_eeprom = make_unique_clear<uint8_t[]>(512);
-	m_nvram->set_base(m_system_eeprom.get(), 512);
+	m_system_eeprom = make_unique_clear<uint8_t[]>(0x200);
+	m_nvram->set_base(m_system_eeprom.get(), 0x200);
 
 	save_item(NAME(m_1a_data));
 	save_item(NAME(m_1a_pointer));
@@ -1019,7 +1011,7 @@ void leapster_state::machine_start()
 	save_item(NAME(m_int_fired_flags));
 	save_item(NAME(m_int_enable));
 	save_item(NAME(m_current_eeprom_command));
-	save_pointer(NAME(m_system_eeprom), 512);
+	save_pointer(NAME(m_system_eeprom), 0x200);
 
 	m_sound->set_address_space(&m_maincpu->space());
 }
