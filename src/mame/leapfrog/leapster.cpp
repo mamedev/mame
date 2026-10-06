@@ -288,6 +288,7 @@ private:
 	void leapster_1802070_w(uint32_t data);
 	uint32_t leapster_1802078_r();
 
+	uint8_t* get_eeprom();
 	uint32_t leapster_eeprom_r(uint32_t offset);
 	void leapster_eeprom_w(uint32_t offset, uint32_t data);
 
@@ -516,19 +517,27 @@ uint32_t leapster_state::leapster_1809004_r()
 	return 0x63ff'bfff | m_cart_bit | (m_force_calibration->read() ? 0x4000 : 0);
 }
 
+
+uint8_t* leapster_state::get_eeprom()
+{
+	// This is seems hacky and needs a better defined solution to identify the target bank
+	uint8_t *cartridge_eeprom = nullptr;
+	if (m_cart && m_cart->exists())
+		cartridge_eeprom = m_cart->get_cart_nvram();
+
+	uint8_t *eeprom_bank = BIT(m_current_eeprom_command, 8, 8) == 0x26 ? m_system_eeprom.get() : cartridge_eeprom;
+
+	return eeprom_bank;
+}
+
 uint32_t leapster_state::leapster_eeprom_r(uint32_t offset)
 {
 	if(offset == 2)
 	{
-		// This is really hacky and needs a better defined solution to identify the target bank
-		uint8_t* cartridge_eeprom = nullptr;
-		if (m_cart && m_cart->exists())
-			cartridge_eeprom = m_cart->get_cart_nvram();
+		uint8_t *eeprom_bank = get_eeprom();
 
-		uint8_t *eepromBank = BIT(m_current_eeprom_command, 8, 8) == 0x26 ? m_system_eeprom.get() : cartridge_eeprom;
-
-		if (eepromBank)
-			return eepromBank[m_current_eeprom_command >> 16];
+		if (eeprom_bank)
+			return eeprom_bank[m_current_eeprom_command >> 16];
 		else
 			return 0;
 	}
@@ -546,15 +555,10 @@ void leapster_state::leapster_eeprom_w(uint32_t offset, uint32_t data)
 		case 1:
 			if(data == 2)
 			{
-				// This is really hacky and needs a better defined solution to identify the target bank
-				uint8_t* cartridge_eeprom = nullptr;
-				if (m_cart && m_cart->exists())
-					cartridge_eeprom = m_cart->get_cart_nvram();
+				uint8_t *eeprom_bank = get_eeprom();
 
-				uint8_t *eepromBank = BIT(m_current_eeprom_command, 8, 8) == 0x26 ? m_system_eeprom.get() : cartridge_eeprom;
-
-				if (eepromBank)
-					eepromBank[m_current_eeprom_command >> 16] = m_current_eeprom_command & 0xff;
+				if (eeprom_bank)
+					eeprom_bank[m_current_eeprom_command >> 16] = m_current_eeprom_command & 0xff;
 			}
 
 			break;
