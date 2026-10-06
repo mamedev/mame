@@ -32,6 +32,13 @@ a000-a3ff   R/W X/Y scroll position of each character (can be scrolled up
 
 TODO:
 - fix cliprect for sprites that goes out of screen if possible
+- verify clocks and screen raw params, the only known XTAL is 6.144MHz, and
+  sound pitch currently matches PCB video
+- 8035 T0 pin source, what's "SN76496 status" in the comment? not the ready pin
+- spcforce high pitch beep for a few seconds if you let attract mode run for a
+  few loops before playing, it only does it once and not with the other romsets,
+  maybe BTANB?
+- meteors has a Galaxian style starfield according to PCB video
 
 ***************************************************************************/
 
@@ -75,22 +82,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void sn76496_latch_w(uint8_t data);
-	uint8_t sn76496_select_r();
-	void sn76496_select_w(uint8_t data);
-	template <uint8_t Which> void write_sn_ready(int state);
-	int t0_r();
-	void soundtrigger_w(uint8_t data);
-	void misc_outputs_w(uint8_t data);
-	void unknown_w(int state);
-
-	void palette(palette_device &palette) const;
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	void main_map(address_map &map) ATTR_COLD;
-	void sound_map(address_map &map) ATTR_COLD;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<ls259_device> m_mainlatch;
 	required_device<i8035_device> m_audiocpu;
@@ -106,8 +97,45 @@ private:
 	uint8_t m_sn76496_latch = 0;
 	uint8_t m_sn76496_select = 0;
 	uint8_t m_sn_ready[3]{};
+
+	void sn76496_latch_w(uint8_t data);
+	uint8_t sn76496_select_r();
+	void sn76496_select_w(uint8_t data);
+	template <uint8_t Which> void write_sn_ready(int state);
+	int t0_r();
+	void soundtrigger_w(uint8_t data);
+	void misc_outputs_w(uint8_t data);
+	void unknown_w(int state);
+
+	void palette(palette_device &palette) const;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
+
+void spcforce_state::machine_start()
+{
+	save_item(NAME(m_sn76496_latch));
+	save_item(NAME(m_sn76496_select));
+	save_item(NAME(m_sn_ready));
+}
+
+
+void spcforce_state::palette(palette_device &palette) const
+{
+	for (int i = 0; i < 64; i++)
+	{
+		// masked entries are used to change the text color, during the game only color 7 is used
+		int const mask = bitswap<3>(i, 3, 4, 5);
+		int const data = i & mask;
+		rgb_t const color = rgb_t(pal1bit(data >> 0), pal1bit(data >> 1), pal1bit(data >> 2));
+
+		palette.set_pen_color(i, color);
+	}
+}
 
 uint32_t spcforce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -121,7 +149,7 @@ uint32_t spcforce_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		int sx = 8 * (offs % 32) + ((m_scrollram[offs] >> 4) & 0x0f);
 
 		int const code = m_videoram[offs] + ((m_colorram[offs] & 0x01) << 8);
-		int const col  = (~m_colorram[offs] >> 4) & 0x07;
+		int const col  = (m_colorram[offs] >> 4) & 0x07;
 
 		if (flip)
 		{
@@ -138,13 +166,6 @@ uint32_t spcforce_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-void spcforce_state::machine_start()
-{
-	save_item(NAME(m_sn76496_latch));
-	save_item(NAME(m_sn76496_select));
-	save_item(NAME(m_sn_ready));
-}
 
 void spcforce_state::sn76496_latch_w(uint8_t data)
 {
@@ -284,31 +305,6 @@ static GFXDECODE_START( gfx_spcforce )
 GFXDECODE_END
 
 
-// 1-bit RGB palette
-static constexpr int COLORTABLE_SOURCE[] =
-{
-	0, 1, 2, 3, 4, 5, 6, 7,
-	0, 1, 2, 3, 0, 1, 2, 3,  // not sure about these, but they are only used
-	0, 1, 0, 1, 4, 5, 4, 5,  // to change the text color. During the game,
-	0, 1, 0, 1, 0, 1, 0, 1,  // only color 0 is used, which is correct.
-	0, 0, 2, 2, 4, 4, 6, 6,
-	0, 0, 2, 2, 0, 0, 2, 2,
-	0, 0, 0, 0, 4, 4, 4, 4,
-	0, 0, 0, 0, 0, 0, 0, 0
-};
-
-void spcforce_state::palette(palette_device &palette) const
-{
-	for (int i = 0; i < std::size(COLORTABLE_SOURCE); i++)
-	{
-		int const data = COLORTABLE_SOURCE[i];
-		rgb_t const color = rgb_t(pal1bit(data >> 0), pal1bit(data >> 1), pal1bit(data >> 2));
-
-		palette.set_pen_color(i, color);
-	}
-}
-
-
 void spcforce_state::spcforce(machine_config &config)
 {
 	// basic machine hardware
@@ -332,16 +328,13 @@ void spcforce_state::spcforce(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	screen.set_raw(6.144_MHz_XTAL, 384, 0, 256, 264, 0, 224);
 	screen.set_screen_update(FUNC(spcforce_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set("vblirq", FUNC(input_merger_device::in_w<0>));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spcforce);
-	PALETTE(config, m_palette, FUNC(spcforce_state::palette), std::size(COLORTABLE_SOURCE));
+	PALETTE(config, m_palette, FUNC(spcforce_state::palette), 8*8);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -472,7 +465,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1980, spcforce, 0,        spcforce, spcforce, spcforce_state, empty_init, ROT270, "Venture Line",     "Space Force (set 1)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, spcforc2, spcforce, spcforce, spcforc2, spcforce_state, empty_init, ROT270, "bootleg? (Elcon)", "Space Force (set 2)", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, meteor,   spcforce, spcforce, spcforc2, spcforce_state, empty_init, ROT270, "Venture Line",     "Meteoroids",          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 19??, meteors,  spcforce, meteors,  spcforc2, spcforce_state, empty_init, ROT0,   "Amusement World",  "Meteors",             MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spcforce, 0,        spcforce, spcforce, spcforce_state, empty_init, ROT270, "Venture Line",     "Space Force (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, spcforc2, spcforce, spcforce, spcforc2, spcforce_state, empty_init, ROT270, "bootleg? (Elcon)", "Space Force (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, meteor,   spcforce, spcforce, spcforc2, spcforce_state, empty_init, ROT270, "Venture Line",     "Meteoroids",          MACHINE_SUPPORTS_SAVE )
+GAME( 1981, meteors,  spcforce, meteors,  spcforc2, spcforce_state, empty_init, ROT0,   "Amusement World",  "Meteors",             MACHINE_SUPPORTS_SAVE )
