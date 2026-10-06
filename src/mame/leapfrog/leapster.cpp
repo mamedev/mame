@@ -939,9 +939,9 @@ uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rg
 
 	if (BIT(m_display_format, 0, 30) == 4)
 	{
-		for (int i = 0; i < 160; i++)
+		for (int i = cliprect.min_y; i <= cliprect.max_y; i++)
 		{
-			for (int j = 0; j < 80; j++)
+			for (int j = cliprect.min_x; j < (cliprect.max_x + 1) / 2; j++)
 			{
 				uint8_t bytes[3];
 
@@ -956,9 +956,9 @@ uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rg
 	}
 	else if (BIT(m_display_format, 0, 30) == 3) // Used in touch cal
 	{
-		for (int i = 0; i < 160; i++)
+		for (int i = cliprect.min_y; i < cliprect.max_y; i++)
 		{
-			for (int j = 0; j < 160; j++)
+			for (int j = cliprect.min_x; j < (cliprect.max_x + 1); j++)
 			{
 				uint8_t byte;
 
