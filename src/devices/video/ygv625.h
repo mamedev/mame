@@ -29,15 +29,14 @@
 
 #pragma once
 
-#include <memory>
-#include <unordered_map>
-#include <vector>
+#include "lrucache.h"
 
 
 class ygv625_device : public device_t, public device_video_interface
 {
 public:
 	ygv625_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	virtual ~ygv625_device();
 
 	// configuration: memory region holding the CG (character generator) data
 	template <typename T> void set_cg_region(T &&tag) { m_cg.set_tag(std::forward<T>(tag)); }
@@ -54,45 +53,16 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	// a decoded sprite, pixels are palette indices (indexed formats) or
-	// RGB565 words (direct colour)
-	struct decoded_sprite
-	{
-		u16 width = 0;
-		u16 height = 0;
-		u8 format = 0;
-		u8 depth = 0;           // bits per pixel for indexed formats, 16 for direct colour
-		u8 transparent = 0;     // transparent colour index from the sprite header
-		bool has_transparent = false;
-		bool valid = false;
-		std::vector<u16> pixels;
-	};
-
-	// bit reader over CG memory (MSB first)
-	class bit_reader
-	{
-	public:
-		bit_reader(const u8 *base, u32 size, u32 byte_offset) : m_base(base), m_size(size), m_pos(u64(byte_offset) * 8) { }
-		u32 read(u32 bits);
-		u64 pos() const { return m_pos; }
-		bool overrun() const { return m_pos > u64(m_size) * 8; }
-	private:
-		const u8 *m_base;
-		u32 m_size;
-		u64 m_pos;
-	};
-
-	struct plane_params
-	{
-		u8 cmax, cth, esc, wn;
-	};
+	struct decoded_sprite;
+	class bit_reader;
+	struct plane_params;
 
 	required_region_ptr<u8> m_cg;
+	memory_share_creator<u16> m_ram;       // 0x2000 words: attribute table, quad table, palette RAM
 
-	std::unique_ptr<u16[]> m_ram;          // 0x2000 words: attribute table, quad table, palette RAM
 	u16 m_regs[0x200];
 	bitmap_rgb32 m_bitmap;
-	std::unordered_map<u64, decoded_sprite> m_cache;
+	util::lru_cache_map<u64, decoded_sprite> m_cache;
 
 	u16 m_cg_read_data;
 	bool m_cg_read_ready;
@@ -108,7 +78,6 @@ private:
 	bool decode_rgb(decoded_sprite &spr, u32 addr);
 	bool read_overrides(bit_reader &br, plane_params &p, const plane_params &base, u32 flag_layout);
 	bool decode_plane(bit_reader &br, const plane_params &p, int p0, u32 mod, u16 *out);
-	static void scan_position(u32 scan, u32 index, u32 &row, u32 &col);
 
 	// palette lookup
 	rgb_t lookup_colour(u32 palette, u32 depth, u32 index) const;
