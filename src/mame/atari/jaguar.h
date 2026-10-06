@@ -209,11 +209,6 @@ private:
 	emu_timer *m_blitter_done_timer = nullptr;
 	uint8_t m_blitter_status = 0;
 
-	static void (jaguar_state::*const bitmap4[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t, uint16_t *);
-	static void (jaguar_state::*const bitmap8[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t, uint16_t *);
-	static void (jaguar_state::*const bitmap16[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t);
-	static void (jaguar_state::*const bitmap32[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t);
-
 	uint32_t misc_control_r();
 	void misc_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t gpuctrl_r(offs_t offset, uint32_t mem_mask = ~0);
