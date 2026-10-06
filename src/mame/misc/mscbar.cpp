@@ -1,8 +1,11 @@
 // license::BSD-3-Clause
 // copyright-holders:flama12333
 /*************************************************************************
- unkrgm
+ unkrgm (unknown board origin)
  No info.
+ mcu:at89s51
+ eeprom:w27c512
+ gals:16v8b
 
  mscbar
   Product name: 小方玛丽板
@@ -10,7 +13,7 @@
   The board has a single marking J373.
   String: COPYRIGHT BY WIN WAY ELEC. CORP. CLEMENT CHANG, MUSIC by: SunKiss Chen
 
-  Mainboard
+Mainboard
   Size 18 x 16.5cm.
   3V6 BAT - backup battery to keep nvram
   U1 AT89C51-24PC - internal rom.
@@ -277,6 +280,10 @@ void mscbar_state::mscbar_adpcm_bank(uint8_t data)
 
 		m_oki->set_rom_bank(data & 0x07);
 }
+void mscbar_state::unkrgm_program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+}
 
 void mscbar_state::mscbar_program_map(address_map &map)
 {
@@ -294,8 +301,6 @@ void mscbar_state::unkrgm_data_map(address_map &map)
 
 }
 
-
-
 void mscbar_state::mscbar_data_map(address_map &map)
 {
 	map(0x8000, 0x8001).w("ay1", FUNC(ay8910_device::address_data_w));
@@ -309,7 +314,7 @@ void mscbar_state::mscbar_data_map(address_map &map)
 
 void mscbar_state::unkrgm(machine_config &config)
 {
-	i80c51_device &maincpu(I80C51(config, "maincpu", XTAL(10'738'000))); // actual cpu is at89s51
+	i80c51_device &maincpu(I80C51(config, "maincpu", XTAL(10'738'000))); // actual cpu is at89s51.
 	maincpu.set_addrmap(AS_PROGRAM, &mscbar_state::mscbar_program_map);
 	maincpu.set_addrmap(AS_DATA, &mscbar_state::unkrgm_data_map);
 
@@ -375,16 +380,11 @@ void mscbar_state::machine_start()
 
 ROM_START( unkrgm )
 
-
-
-	ROM_REGION( 0x01000, "maincpu", 0 ) // actual CPU is a at89s51.
-	ROM_LOAD( "at89s51.bin", 0x00000, 0x01000, CRC(6B35111C) SHA1(81dbf4a53b05c2aa1013796c727149f6dfb2fb97) ) 
-
-	ROM_REGION( 0x10000, "eeprom", 0 )
-	ROM_LOAD( "w27c512_autoresets_2credits.bin", 0x00000, 0x10000, CRC(C5BA2975) SHA1(f61feeebcc10d7513df5f24a5e9a02c6415b465a) )
-	
-	ROM_REGION( 0x800, "nvram", 0 )
-	ROM_LOAD( "nvram", 0x000, 0x800, CRC(C69A5ADD) SHA1(484e356da2651f5bcb31d6fb99fa6cd8eed471bf) ) // pre-initialized
+	ROM_REGION( 0x01000, "maincpu", 0 )
+	ROM_LOAD( "w27c512_autoresets_2credits.bin", 0x00000, 0x10000, CRC(C5DB01C8) SHA1(009976bff493ee0856a8d6c93a538b3bb3a17448) )
+   
+    ROM_REGION( 0x800, "nvram", 0 )
+	ROM_LOAD( "nvram", 0x000, 0x800, CRC(C69A5ADD) SHA1(484e356da2651f5bcb31d6fb99fa6cd8eed471bf) ) // pre-initialized. 
 	
 	ROM_REGION( 0x023D, "gals", 0 )
 	ROM_LOAD( "gal16v8b.jed", 0x0000, 0x023D, CRC(4E8A3074) SHA1(42519321f2b29c843ced6fc9a105a031cd1d3272) )
@@ -415,7 +415,7 @@ ROM_END
 
 
 //    YEAR  NAME    PARENT   MACHINE   INPUT   STATE           INIT         ROT   COMPANY               FULLNAME                                                  FLAGS
-GAME( 20??, unkrgm, 0,       unkrgm,   unkrgm,  mscbar_state,  empty_init, ROT0,  "Unknown", "unknown Roulette Gambling Machine'",                                MACHINE_NOT_WORKING  ) 
+GAME( 20??, unkrgm, 0,       unkrgm,   unkrgm,  mscbar_state,  empty_init, ROT0,  "Unknown",           "unknown Roulette Gambling Machine'",                      MACHINE_NOT_WORKING  ) 
 GAME( 20??, mscbar, unkrgm,  mscbar,   mscbar,  mscbar_state,  empty_init, ROT0,  "WIN WAY ELEC CORP", "unknown Labeled 'MUSICBAR VER 201'",                      MACHINE_NOT_WORKING  ) 
 
 
