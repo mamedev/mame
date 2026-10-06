@@ -121,8 +121,8 @@ const uint8_t lethalth_decryption_table[256] = {
 //           !!!! !!!!      !!!! !!!! !!!!  !!!!           gggg           !!!! !!!!
 	0x3d,xxxx,xxxx,0x38,0x7e,0x89,0xd1,0x80, 0x3b,0x72,0x07,xxxx,0x42,0x37,0x0a,0x18, /* 30 */
 // gggg           !!!! ???? !!!! !!!! !!!!  !!!! !!!! !!!!           ssss !!!!
-	0x88,0xb4,0x98,0x8b,0xb9,0x9c,0xad,0x0e, 0x2b,xxxx,0xbf,xxxx,0x55,xxxx,0x56,0xb0, /* 40 */
-// !!!!      pppp !!!! !!!! !!!! !!!!       gggg      !!!!      !!!!      !!!! !!!!
+	0x88,0xb4,0x98,0x8b,0xb9,0x9c,0xad,0xd3, 0x2b,xxxx,0xbf,xxxx,0x55,xxxx,0x56,0xb0, /* 40 */
+// !!!!      pppp !!!! !!!! !!!! !!!! ssss  gggg      !!!!      !!!!      !!!! !!!!
 	0x93,0x91,xxxx,0xeb,xxxx,0x50,0x41,0x29, 0x47,xxxx,xxxx,0x60,xxxx,0xab,xxxx,xxxx, /* 50 */
 // pppp !!!! !!!!      !!!!      !!!! !!!!                      !!!!      !!!!
 	0xc3,0xe2,0xd0,0xb2,0x11,0x79,xxxx,0x08, 0x82,0xfb,xxxx,0x2c,0x23,xxxx,0x28,0x0d, /* 60 */
@@ -156,6 +156,9 @@ c5 -> (18d56 - from 1844f) (71,76,7a,7d,7e) -> to handle level number (a008d=00-
 af -> (7d) (strange 71) ->
 ed -> (p76,7c,7e) ->
 fb -> 0x35 ???
+
+47 -> 0xd3 (was 0x0e) - quizf1 1000:55be "ror bw,cl" in the answer shuffle
+      and 1000:c540 "rol aw,cl" in the season-end fuel gauge
 
 "!!!!" -> checked against gussun
 "gggg" -> very probably
