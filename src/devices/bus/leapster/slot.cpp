@@ -126,10 +126,8 @@ static const char *leapster_get_slot(int type)
 
 std::pair<std::error_condition, std::string> leapster_slot_device::call_load()
 {
-	printf("call load\n");
 	if (m_cart)
 	{
-		printf("m_cart");
 
 		uint32_t const len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
@@ -146,7 +144,6 @@ std::pair<std::error_condition, std::string> leapster_slot_device::call_load()
 		{
 			// attempt to detect cart type without softlist assistance
 			m_type = get_cart_type(ROM, len);
-			printf("loose\n");
 		}
 		else
 		{
@@ -154,8 +151,6 @@ std::pair<std::error_condition, std::string> leapster_slot_device::call_load()
 			const char *pcb_name = get_feature("slot");
 			if (pcb_name)
 				m_type = leapster_get_pcb_id(pcb_name);
-
-			printf("softlist\n");
 		}
 	}
 
@@ -193,8 +188,6 @@ std::string leapster_slot_device::get_default_card_software(get_default_card_sof
 		int const type = get_cart_type(&rom[0], len);
 		char const *const slot_string = leapster_get_slot(type);
 
-		//printf("type: %s\n", slot_string);
-
 		return std::string(slot_string);
 	}
 
@@ -223,20 +216,9 @@ void leapster_slot_device::write_cart(offs_t offset, uint16_t data)
  read seeprom
  -------------------------------------------------*/
 
-#if 0
-uint8_t leapster_slot_device::read_cart_seeprom(void)
-{
-	return m_cart->read_cart_seeprom();
-}
-#endif
 
-/*-------------------------------------------------
- write seeprom
- -------------------------------------------------*/
-
-#if 0
-void leapster_slot_device::write_cart_seeprom(offs_t offset, uint16_t data, uint16_t mem_mask)
+uint8_t* leapster_slot_device::get_cart_nvram(void)
 {
-	m_cart->write_cart_seeprom(offset, data);
+	return m_cart->get_cart_nvram();
 }
-#endif
+

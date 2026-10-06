@@ -71,22 +71,13 @@ uint16_t leapster_rom_nvram_device::read_rom(offs_t offset)
 	return m_rom[offset & (m_rom_size - 1)];
 }
 
-#if 0
-uint8_t leapster_rom_nvram_device::read_cart_seeprom(void)
+uint8_t* leapster_rom_nvram_device::get_cart_nvram(void)
 {
-	logerror("leapster_rom_nvram_device::read_cart_seeprom\n");
+	logerror("leapster_rom_nvram_device::get_cart_nvram\n");
 
-	return m_i2cmem->read_sda();
+	return m_cartridge_eeprom.get();
 }
 
-void leapster_rom_nvram_device::write_cart_seeprom(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (BIT(mem_mask, 1))
-		m_i2cmem->write_scl(BIT(data, 1));
-	if (BIT(mem_mask, 0))
-		m_i2cmem->write_sda(BIT(data, 0));
-}
-#endif
 
 void leapster_rom_nvram_device::device_add_mconfig(machine_config &config)
 {
