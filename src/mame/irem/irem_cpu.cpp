@@ -157,9 +157,6 @@ af -> (7d) (strange 71) ->
 ed -> (p76,7c,7e) ->
 fb -> 0x35 ???
 
-47 -> 0xd3 (was 0x0e) - quizf1 1000:55be "ror bw,cl" in the answer shuffle
-      and 1000:c540 "rol aw,cl" in the season-end fuel gauge
-
 "!!!!" -> checked against gussun
 "gggg" -> very probably
 "pppp" -> probably
@@ -176,6 +173,7 @@ very probably:
 48 -> 0x2b
 e5 -> 0x73
 2b -> 0x8c
+47 -> 0xd3
 
 sure:
 00 -> 0x7f
