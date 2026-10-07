@@ -13,7 +13,7 @@
 #include "parallel.h"
 
 #include "bus/centronics/ctronics.h"
-#include "cpu/pic16c62x/pic16c62x.h"
+#include "cpu/pic16_mid/pic16_mid.h"
 
 
 namespace {

@@ -105,7 +105,7 @@ super555: https://www.youtube.com/watch?v=CCUKdbQ5O-U
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/i80c51.h"
-#include "cpu/pic16x8x/pic16x8x.h"
+#include "cpu/pic16_mid/pic16_mid.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"

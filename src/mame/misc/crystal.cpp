@@ -135,7 +135,7 @@ Notes:
 
 #include "emu.h"
 
-#include "cpu/pic16x8x/pic16x8x.h"
+#include "cpu/pic16_mid/pic16_mid.h"
 #include "cpu/se3208/se3208.h"
 #include "machine/ds1302.h"
 #include "machine/eepromser.h"
@@ -196,7 +196,7 @@ private:
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
 	required_device<ds1302_device> m_ds1302;
-	optional_device<pic16x8x_device> m_pic;
+	optional_device<pic16_mid_device> m_pic;
 
 	required_ioport m_dsw;
 	required_ioport m_system;
