@@ -16,8 +16,106 @@ The targets are found by the names of the input fields, wherever they are:
 		<text state="1" string="This view requires the layout plugin."><color red="1" green="0.4" blue="0.4" /></text>
 	</element>
 
+	<!-- radii relative to the outer edge of the double ring: double 0.89-1, triple 0.57-0.67, bull 0.07-0.16, catch ring 1-1.25 -->
 	<element name="board">
-		<image><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="2.5" height="2.5" viewBox="-1.25 -1.25 2.5 2.5"><circle cx="0" cy="0" r="1.25" fill="#101010"/><circle cx="0" cy="0" r="1.24" fill="none" stroke="#707070" stroke-width="0.02"/><path d="M-0.089 -0.563A0.57 0.57 0 0 1 0.089 -0.563L0.025 -0.158A0.16 0.16 0 0 0 -0.025 -0.158Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.105 -0.662A0.67 0.67 0 0 1 0.105 -0.662L0.089 -0.563A0.57 0.57 0 0 0 -0.089 -0.563Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.139 -0.879A0.89 0.89 0 0 1 0.139 -0.879L0.105 -0.662A0.67 0.67 0 0 0 -0.105 -0.662Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.156 -0.988A1 1 0 0 1 0.156 -0.988L0.139 -0.879A0.89 0.89 0 0 0 -0.139 -0.879Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.089 -0.563A0.57 0.57 0 0 1 0.259 -0.508L0.073 -0.143A0.16 0.16 0 0 0 0.025 -0.158Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.105 -0.662A0.67 0.67 0 0 1 0.304 -0.597L0.259 -0.508A0.57 0.57 0 0 0 0.089 -0.563Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.139 -0.879A0.89 0.89 0 0 1 0.404 -0.793L0.304 -0.597A0.67 0.67 0 0 0 0.105 -0.662Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.156 -0.988A1 1 0 0 1 0.454 -0.891L0.404 -0.793A0.89 0.89 0 0 0 0.139 -0.879Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.259 -0.508A0.57 0.57 0 0 1 0.403 -0.403L0.113 -0.113A0.16 0.16 0 0 0 0.073 -0.143Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.304 -0.597A0.67 0.67 0 0 1 0.474 -0.474L0.403 -0.403A0.57 0.57 0 0 0 0.259 -0.508Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.404 -0.793A0.89 0.89 0 0 1 0.629 -0.629L0.474 -0.474A0.67 0.67 0 0 0 0.304 -0.597Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.454 -0.891A1 1 0 0 1 0.707 -0.707L0.629 -0.629A0.89 0.89 0 0 0 0.404 -0.793Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.403 -0.403A0.57 0.57 0 0 1 0.508 -0.259L0.143 -0.073A0.16 0.16 0 0 0 0.113 -0.113Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.474 -0.474A0.67 0.67 0 0 1 0.597 -0.304L0.508 -0.259A0.57 0.57 0 0 0 0.403 -0.403Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.629 -0.629A0.89 0.89 0 0 1 0.793 -0.404L0.597 -0.304A0.67 0.67 0 0 0 0.474 -0.474Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.707 -0.707A1 1 0 0 1 0.891 -0.454L0.793 -0.404A0.89 0.89 0 0 0 0.629 -0.629Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.508 -0.259A0.57 0.57 0 0 1 0.563 -0.089L0.158 -0.025A0.16 0.16 0 0 0 0.143 -0.073Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.597 -0.304A0.67 0.67 0 0 1 0.662 -0.105L0.563 -0.089A0.57 0.57 0 0 0 0.508 -0.259Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.793 -0.404A0.89 0.89 0 0 1 0.879 -0.139L0.662 -0.105A0.67 0.67 0 0 0 0.597 -0.304Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.891 -0.454A1 1 0 0 1 0.988 -0.156L0.879 -0.139A0.89 0.89 0 0 0 0.793 -0.404Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.563 -0.089A0.57 0.57 0 0 1 0.563 0.089L0.158 0.025A0.16 0.16 0 0 0 0.158 -0.025Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.662 -0.105A0.67 0.67 0 0 1 0.662 0.105L0.563 0.089A0.57 0.57 0 0 0 0.563 -0.089Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.879 -0.139A0.89 0.89 0 0 1 0.879 0.139L0.662 0.105A0.67 0.67 0 0 0 0.662 -0.105Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.988 -0.156A1 1 0 0 1 0.988 0.156L0.879 0.139A0.89 0.89 0 0 0 0.879 -0.139Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.563 0.089A0.57 0.57 0 0 1 0.508 0.259L0.143 0.073A0.16 0.16 0 0 0 0.158 0.025Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.662 0.105A0.67 0.67 0 0 1 0.597 0.304L0.508 0.259A0.57 0.57 0 0 0 0.563 0.089Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.879 0.139A0.89 0.89 0 0 1 0.793 0.404L0.597 0.304A0.67 0.67 0 0 0 0.662 0.105Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.988 0.156A1 1 0 0 1 0.891 0.454L0.793 0.404A0.89 0.89 0 0 0 0.879 0.139Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.508 0.259A0.57 0.57 0 0 1 0.403 0.403L0.113 0.113A0.16 0.16 0 0 0 0.143 0.073Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.597 0.304A0.67 0.67 0 0 1 0.474 0.474L0.403 0.403A0.57 0.57 0 0 0 0.508 0.259Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.793 0.404A0.89 0.89 0 0 1 0.629 0.629L0.474 0.474A0.67 0.67 0 0 0 0.597 0.304Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.891 0.454A1 1 0 0 1 0.707 0.707L0.629 0.629A0.89 0.89 0 0 0 0.793 0.404Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.403 0.403A0.57 0.57 0 0 1 0.259 0.508L0.073 0.143A0.16 0.16 0 0 0 0.113 0.113Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.474 0.474A0.67 0.67 0 0 1 0.304 0.597L0.259 0.508A0.57 0.57 0 0 0 0.403 0.403Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.629 0.629A0.89 0.89 0 0 1 0.404 0.793L0.304 0.597A0.67 0.67 0 0 0 0.474 0.474Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.707 0.707A1 1 0 0 1 0.454 0.891L0.404 0.793A0.89 0.89 0 0 0 0.629 0.629Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.259 0.508A0.57 0.57 0 0 1 0.089 0.563L0.025 0.158A0.16 0.16 0 0 0 0.073 0.143Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.304 0.597A0.67 0.67 0 0 1 0.105 0.662L0.089 0.563A0.57 0.57 0 0 0 0.259 0.508Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.404 0.793A0.89 0.89 0 0 1 0.139 0.879L0.105 0.662A0.67 0.67 0 0 0 0.304 0.597Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.454 0.891A1 1 0 0 1 0.156 0.988L0.139 0.879A0.89 0.89 0 0 0 0.404 0.793Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.089 0.563A0.57 0.57 0 0 1 -0.089 0.563L-0.025 0.158A0.16 0.16 0 0 0 0.025 0.158Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.105 0.662A0.67 0.67 0 0 1 -0.105 0.662L-0.089 0.563A0.57 0.57 0 0 0 0.089 0.563Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.139 0.879A0.89 0.89 0 0 1 -0.139 0.879L-0.105 0.662A0.67 0.67 0 0 0 0.105 0.662Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M0.156 0.988A1 1 0 0 1 -0.156 0.988L-0.139 0.879A0.89 0.89 0 0 0 0.139 0.879Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.089 0.563A0.57 0.57 0 0 1 -0.259 0.508L-0.073 0.143A0.16 0.16 0 0 0 -0.025 0.158Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.105 0.662A0.67 0.67 0 0 1 -0.304 0.597L-0.259 0.508A0.57 0.57 0 0 0 -0.089 0.563Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.139 0.879A0.89 0.89 0 0 1 -0.404 0.793L-0.304 0.597A0.67 0.67 0 0 0 -0.105 0.662Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.156 0.988A1 1 0 0 1 -0.454 0.891L-0.404 0.793A0.89 0.89 0 0 0 -0.139 0.879Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.259 0.508A0.57 0.57 0 0 1 -0.403 0.403L-0.113 0.113A0.16 0.16 0 0 0 -0.073 0.143Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.304 0.597A0.67 0.67 0 0 1 -0.474 0.474L-0.403 0.403A0.57 0.57 0 0 0 -0.259 0.508Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.404 0.793A0.89 0.89 0 0 1 -0.629 0.629L-0.474 0.474A0.67 0.67 0 0 0 -0.304 0.597Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.454 0.891A1 1 0 0 1 -0.707 0.707L-0.629 0.629A0.89 0.89 0 0 0 -0.404 0.793Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.403 0.403A0.57 0.57 0 0 1 -0.508 0.259L-0.143 0.073A0.16 0.16 0 0 0 -0.113 0.113Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.474 0.474A0.67 0.67 0 0 1 -0.597 0.304L-0.508 0.259A0.57 0.57 0 0 0 -0.403 0.403Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.629 0.629A0.89 0.89 0 0 1 -0.793 0.404L-0.597 0.304A0.67 0.67 0 0 0 -0.474 0.474Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.707 0.707A1 1 0 0 1 -0.891 0.454L-0.793 0.404A0.89 0.89 0 0 0 -0.629 0.629Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.508 0.259A0.57 0.57 0 0 1 -0.563 0.089L-0.158 0.025A0.16 0.16 0 0 0 -0.143 0.073Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.597 0.304A0.67 0.67 0 0 1 -0.662 0.105L-0.563 0.089A0.57 0.57 0 0 0 -0.508 0.259Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.793 0.404A0.89 0.89 0 0 1 -0.879 0.139L-0.662 0.105A0.67 0.67 0 0 0 -0.597 0.304Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.891 0.454A1 1 0 0 1 -0.988 0.156L-0.879 0.139A0.89 0.89 0 0 0 -0.793 0.404Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.563 0.089A0.57 0.57 0 0 1 -0.563 -0.089L-0.158 -0.025A0.16 0.16 0 0 0 -0.158 0.025Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.662 0.105A0.67 0.67 0 0 1 -0.662 -0.105L-0.563 -0.089A0.57 0.57 0 0 0 -0.563 0.089Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.879 0.139A0.89 0.89 0 0 1 -0.879 -0.139L-0.662 -0.105A0.67 0.67 0 0 0 -0.662 0.105Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.988 0.156A1 1 0 0 1 -0.988 -0.156L-0.879 -0.139A0.89 0.89 0 0 0 -0.879 0.139Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.563 -0.089A0.57 0.57 0 0 1 -0.508 -0.259L-0.143 -0.073A0.16 0.16 0 0 0 -0.158 -0.025Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.662 -0.105A0.67 0.67 0 0 1 -0.597 -0.304L-0.508 -0.259A0.57 0.57 0 0 0 -0.563 -0.089Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.879 -0.139A0.89 0.89 0 0 1 -0.793 -0.404L-0.597 -0.304A0.67 0.67 0 0 0 -0.662 -0.105Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.988 -0.156A1 1 0 0 1 -0.891 -0.454L-0.793 -0.404A0.89 0.89 0 0 0 -0.879 -0.139Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.508 -0.259A0.57 0.57 0 0 1 -0.403 -0.403L-0.113 -0.113A0.16 0.16 0 0 0 -0.143 -0.073Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.597 -0.304A0.67 0.67 0 0 1 -0.474 -0.474L-0.403 -0.403A0.57 0.57 0 0 0 -0.508 -0.259Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.793 -0.404A0.89 0.89 0 0 1 -0.629 -0.629L-0.474 -0.474A0.67 0.67 0 0 0 -0.597 -0.304Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.891 -0.454A1 1 0 0 1 -0.707 -0.707L-0.629 -0.629A0.89 0.89 0 0 0 -0.793 -0.404Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.403 -0.403A0.57 0.57 0 0 1 -0.259 -0.508L-0.073 -0.143A0.16 0.16 0 0 0 -0.113 -0.113Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.474 -0.474A0.67 0.67 0 0 1 -0.304 -0.597L-0.259 -0.508A0.57 0.57 0 0 0 -0.403 -0.403Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.629 -0.629A0.89 0.89 0 0 1 -0.404 -0.793L-0.304 -0.597A0.67 0.67 0 0 0 -0.474 -0.474Z" fill="#1c1c1c" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.707 -0.707A1 1 0 0 1 -0.454 -0.891L-0.404 -0.793A0.89 0.89 0 0 0 -0.629 -0.629Z" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.259 -0.508A0.57 0.57 0 0 1 -0.089 -0.563L-0.025 -0.158A0.16 0.16 0 0 0 -0.073 -0.143Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.304 -0.597A0.67 0.67 0 0 1 -0.105 -0.662L-0.089 -0.563A0.57 0.57 0 0 0 -0.259 -0.508Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.404 -0.793A0.89 0.89 0 0 1 -0.139 -0.879L-0.105 -0.662A0.67 0.67 0 0 0 -0.304 -0.597Z" fill="#efe3c2" stroke="#a0a0a0" stroke-width="0.006"/><path d="M-0.454 -0.891A1 1 0 0 1 -0.156 -0.988L-0.139 -0.879A0.89 0.89 0 0 0 -0.404 -0.793Z" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><circle cx="0" cy="0" r="0.16" fill="#1f8f3a" stroke="#a0a0a0" stroke-width="0.006"/><circle cx="0" cy="0" r="0.07" fill="#cc2222" stroke="#a0a0a0" stroke-width="0.006"/></svg>]]></data></image>
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="2.5" height="2.5" viewBox="-1.25 -1.25 2.5 2.5">
+				<circle cx="0" cy="0" r="1.25" fill="#101010" />
+				<circle cx="0" cy="0" r="1.24" fill="none" stroke="#707070" stroke-width="0.02" />
+				<g stroke="#a0a0a0" stroke-width="0.006">
+					<g fill="#1c1c1c">
+						<path d="M-0.089 -0.563A0.57 0.57 0 0 1 0.089 -0.563L0.025 -0.158A0.16 0.16 0 0 0 -0.025 -0.158Z" />
+						<path d="M-0.139 -0.879A0.89 0.89 0 0 1 0.139 -0.879L0.105 -0.662A0.67 0.67 0 0 0 -0.105 -0.662Z" />
+						<path d="M0.259 -0.508A0.57 0.57 0 0 1 0.403 -0.403L0.113 -0.113A0.16 0.16 0 0 0 0.073 -0.143Z" />
+						<path d="M0.404 -0.793A0.89 0.89 0 0 1 0.629 -0.629L0.474 -0.474A0.67 0.67 0 0 0 0.304 -0.597Z" />
+						<path d="M0.508 -0.259A0.57 0.57 0 0 1 0.563 -0.089L0.158 -0.025A0.16 0.16 0 0 0 0.143 -0.073Z" />
+						<path d="M0.793 -0.404A0.89 0.89 0 0 1 0.879 -0.139L0.662 -0.105A0.67 0.67 0 0 0 0.597 -0.304Z" />
+						<path d="M0.563 0.089A0.57 0.57 0 0 1 0.508 0.259L0.143 0.073A0.16 0.16 0 0 0 0.158 0.025Z" />
+						<path d="M0.879 0.139A0.89 0.89 0 0 1 0.793 0.404L0.597 0.304A0.67 0.67 0 0 0 0.662 0.105Z" />
+						<path d="M0.403 0.403A0.57 0.57 0 0 1 0.259 0.508L0.073 0.143A0.16 0.16 0 0 0 0.113 0.113Z" />
+						<path d="M0.629 0.629A0.89 0.89 0 0 1 0.404 0.793L0.304 0.597A0.67 0.67 0 0 0 0.474 0.474Z" />
+						<path d="M0.089 0.563A0.57 0.57 0 0 1 -0.089 0.563L-0.025 0.158A0.16 0.16 0 0 0 0.025 0.158Z" />
+						<path d="M0.139 0.879A0.89 0.89 0 0 1 -0.139 0.879L-0.105 0.662A0.67 0.67 0 0 0 0.105 0.662Z" />
+						<path d="M-0.259 0.508A0.57 0.57 0 0 1 -0.403 0.403L-0.113 0.113A0.16 0.16 0 0 0 -0.073 0.143Z" />
+						<path d="M-0.404 0.793A0.89 0.89 0 0 1 -0.629 0.629L-0.474 0.474A0.67 0.67 0 0 0 -0.304 0.597Z" />
+						<path d="M-0.508 0.259A0.57 0.57 0 0 1 -0.563 0.089L-0.158 0.025A0.16 0.16 0 0 0 -0.143 0.073Z" />
+						<path d="M-0.793 0.404A0.89 0.89 0 0 1 -0.879 0.139L-0.662 0.105A0.67 0.67 0 0 0 -0.597 0.304Z" />
+						<path d="M-0.563 -0.089A0.57 0.57 0 0 1 -0.508 -0.259L-0.143 -0.073A0.16 0.16 0 0 0 -0.158 -0.025Z" />
+						<path d="M-0.879 -0.139A0.89 0.89 0 0 1 -0.793 -0.404L-0.597 -0.304A0.67 0.67 0 0 0 -0.662 -0.105Z" />
+						<path d="M-0.403 -0.403A0.57 0.57 0 0 1 -0.259 -0.508L-0.073 -0.143A0.16 0.16 0 0 0 -0.113 -0.113Z" />
+						<path d="M-0.629 -0.629A0.89 0.89 0 0 1 -0.404 -0.793L-0.304 -0.597A0.67 0.67 0 0 0 -0.474 -0.474Z" />
+					</g>
+					<g fill="#efe3c2">
+						<path d="M0.089 -0.563A0.57 0.57 0 0 1 0.259 -0.508L0.073 -0.143A0.16 0.16 0 0 0 0.025 -0.158Z" />
+						<path d="M0.139 -0.879A0.89 0.89 0 0 1 0.404 -0.793L0.304 -0.597A0.67 0.67 0 0 0 0.105 -0.662Z" />
+						<path d="M0.403 -0.403A0.57 0.57 0 0 1 0.508 -0.259L0.143 -0.073A0.16 0.16 0 0 0 0.113 -0.113Z" />
+						<path d="M0.629 -0.629A0.89 0.89 0 0 1 0.793 -0.404L0.597 -0.304A0.67 0.67 0 0 0 0.474 -0.474Z" />
+						<path d="M0.563 -0.089A0.57 0.57 0 0 1 0.563 0.089L0.158 0.025A0.16 0.16 0 0 0 0.158 -0.025Z" />
+						<path d="M0.879 -0.139A0.89 0.89 0 0 1 0.879 0.139L0.662 0.105A0.67 0.67 0 0 0 0.662 -0.105Z" />
+						<path d="M0.508 0.259A0.57 0.57 0 0 1 0.403 0.403L0.113 0.113A0.16 0.16 0 0 0 0.143 0.073Z" />
+						<path d="M0.793 0.404A0.89 0.89 0 0 1 0.629 0.629L0.474 0.474A0.67 0.67 0 0 0 0.597 0.304Z" />
+						<path d="M0.259 0.508A0.57 0.57 0 0 1 0.089 0.563L0.025 0.158A0.16 0.16 0 0 0 0.073 0.143Z" />
+						<path d="M0.404 0.793A0.89 0.89 0 0 1 0.139 0.879L0.105 0.662A0.67 0.67 0 0 0 0.304 0.597Z" />
+						<path d="M-0.089 0.563A0.57 0.57 0 0 1 -0.259 0.508L-0.073 0.143A0.16 0.16 0 0 0 -0.025 0.158Z" />
+						<path d="M-0.139 0.879A0.89 0.89 0 0 1 -0.404 0.793L-0.304 0.597A0.67 0.67 0 0 0 -0.105 0.662Z" />
+						<path d="M-0.403 0.403A0.57 0.57 0 0 1 -0.508 0.259L-0.143 0.073A0.16 0.16 0 0 0 -0.113 0.113Z" />
+						<path d="M-0.629 0.629A0.89 0.89 0 0 1 -0.793 0.404L-0.597 0.304A0.67 0.67 0 0 0 -0.474 0.474Z" />
+						<path d="M-0.563 0.089A0.57 0.57 0 0 1 -0.563 -0.089L-0.158 -0.025A0.16 0.16 0 0 0 -0.158 0.025Z" />
+						<path d="M-0.879 0.139A0.89 0.89 0 0 1 -0.879 -0.139L-0.662 -0.105A0.67 0.67 0 0 0 -0.662 0.105Z" />
+						<path d="M-0.508 -0.259A0.57 0.57 0 0 1 -0.403 -0.403L-0.113 -0.113A0.16 0.16 0 0 0 -0.143 -0.073Z" />
+						<path d="M-0.793 -0.404A0.89 0.89 0 0 1 -0.629 -0.629L-0.474 -0.474A0.67 0.67 0 0 0 -0.597 -0.304Z" />
+						<path d="M-0.259 -0.508A0.57 0.57 0 0 1 -0.089 -0.563L-0.025 -0.158A0.16 0.16 0 0 0 -0.073 -0.143Z" />
+						<path d="M-0.404 -0.793A0.89 0.89 0 0 1 -0.139 -0.879L-0.105 -0.662A0.67 0.67 0 0 0 -0.304 -0.597Z" />
+					</g>
+					<g fill="#cc2222">
+						<path d="M-0.105 -0.662A0.67 0.67 0 0 1 0.105 -0.662L0.089 -0.563A0.57 0.57 0 0 0 -0.089 -0.563Z" />
+						<path d="M-0.156 -0.988A1 1 0 0 1 0.156 -0.988L0.139 -0.879A0.89 0.89 0 0 0 -0.139 -0.879Z" />
+						<path d="M0.304 -0.597A0.67 0.67 0 0 1 0.474 -0.474L0.403 -0.403A0.57 0.57 0 0 0 0.259 -0.508Z" />
+						<path d="M0.454 -0.891A1 1 0 0 1 0.707 -0.707L0.629 -0.629A0.89 0.89 0 0 0 0.404 -0.793Z" />
+						<path d="M0.597 -0.304A0.67 0.67 0 0 1 0.662 -0.105L0.563 -0.089A0.57 0.57 0 0 0 0.508 -0.259Z" />
+						<path d="M0.891 -0.454A1 1 0 0 1 0.988 -0.156L0.879 -0.139A0.89 0.89 0 0 0 0.793 -0.404Z" />
+						<path d="M0.662 0.105A0.67 0.67 0 0 1 0.597 0.304L0.508 0.259A0.57 0.57 0 0 0 0.563 0.089Z" />
+						<path d="M0.988 0.156A1 1 0 0 1 0.891 0.454L0.793 0.404A0.89 0.89 0 0 0 0.879 0.139Z" />
+						<path d="M0.474 0.474A0.67 0.67 0 0 1 0.304 0.597L0.259 0.508A0.57 0.57 0 0 0 0.403 0.403Z" />
+						<path d="M0.707 0.707A1 1 0 0 1 0.454 0.891L0.404 0.793A0.89 0.89 0 0 0 0.629 0.629Z" />
+						<path d="M0.105 0.662A0.67 0.67 0 0 1 -0.105 0.662L-0.089 0.563A0.57 0.57 0 0 0 0.089 0.563Z" />
+						<path d="M0.156 0.988A1 1 0 0 1 -0.156 0.988L-0.139 0.879A0.89 0.89 0 0 0 0.139 0.879Z" />
+						<path d="M-0.304 0.597A0.67 0.67 0 0 1 -0.474 0.474L-0.403 0.403A0.57 0.57 0 0 0 -0.259 0.508Z" />
+						<path d="M-0.454 0.891A1 1 0 0 1 -0.707 0.707L-0.629 0.629A0.89 0.89 0 0 0 -0.404 0.793Z" />
+						<path d="M-0.597 0.304A0.67 0.67 0 0 1 -0.662 0.105L-0.563 0.089A0.57 0.57 0 0 0 -0.508 0.259Z" />
+						<path d="M-0.891 0.454A1 1 0 0 1 -0.988 0.156L-0.879 0.139A0.89 0.89 0 0 0 -0.793 0.404Z" />
+						<path d="M-0.662 -0.105A0.67 0.67 0 0 1 -0.597 -0.304L-0.508 -0.259A0.57 0.57 0 0 0 -0.563 -0.089Z" />
+						<path d="M-0.988 -0.156A1 1 0 0 1 -0.891 -0.454L-0.793 -0.404A0.89 0.89 0 0 0 -0.879 -0.139Z" />
+						<path d="M-0.474 -0.474A0.67 0.67 0 0 1 -0.304 -0.597L-0.259 -0.508A0.57 0.57 0 0 0 -0.403 -0.403Z" />
+						<path d="M-0.707 -0.707A1 1 0 0 1 -0.454 -0.891L-0.404 -0.793A0.89 0.89 0 0 0 -0.629 -0.629Z" />
+					</g>
+					<g fill="#1f8f3a">
+						<path d="M0.105 -0.662A0.67 0.67 0 0 1 0.304 -0.597L0.259 -0.508A0.57 0.57 0 0 0 0.089 -0.563Z" />
+						<path d="M0.156 -0.988A1 1 0 0 1 0.454 -0.891L0.404 -0.793A0.89 0.89 0 0 0 0.139 -0.879Z" />
+						<path d="M0.474 -0.474A0.67 0.67 0 0 1 0.597 -0.304L0.508 -0.259A0.57 0.57 0 0 0 0.403 -0.403Z" />
+						<path d="M0.707 -0.707A1 1 0 0 1 0.891 -0.454L0.793 -0.404A0.89 0.89 0 0 0 0.629 -0.629Z" />
+						<path d="M0.662 -0.105A0.67 0.67 0 0 1 0.662 0.105L0.563 0.089A0.57 0.57 0 0 0 0.563 -0.089Z" />
+						<path d="M0.988 -0.156A1 1 0 0 1 0.988 0.156L0.879 0.139A0.89 0.89 0 0 0 0.879 -0.139Z" />
+						<path d="M0.597 0.304A0.67 0.67 0 0 1 0.474 0.474L0.403 0.403A0.57 0.57 0 0 0 0.508 0.259Z" />
+						<path d="M0.891 0.454A1 1 0 0 1 0.707 0.707L0.629 0.629A0.89 0.89 0 0 0 0.793 0.404Z" />
+						<path d="M0.304 0.597A0.67 0.67 0 0 1 0.105 0.662L0.089 0.563A0.57 0.57 0 0 0 0.259 0.508Z" />
+						<path d="M0.454 0.891A1 1 0 0 1 0.156 0.988L0.139 0.879A0.89 0.89 0 0 0 0.404 0.793Z" />
+						<path d="M-0.105 0.662A0.67 0.67 0 0 1 -0.304 0.597L-0.259 0.508A0.57 0.57 0 0 0 -0.089 0.563Z" />
+						<path d="M-0.156 0.988A1 1 0 0 1 -0.454 0.891L-0.404 0.793A0.89 0.89 0 0 0 -0.139 0.879Z" />
+						<path d="M-0.474 0.474A0.67 0.67 0 0 1 -0.597 0.304L-0.508 0.259A0.57 0.57 0 0 0 -0.403 0.403Z" />
+						<path d="M-0.707 0.707A1 1 0 0 1 -0.891 0.454L-0.793 0.404A0.89 0.89 0 0 0 -0.629 0.629Z" />
+						<path d="M-0.662 0.105A0.67 0.67 0 0 1 -0.662 -0.105L-0.563 -0.089A0.57 0.57 0 0 0 -0.563 0.089Z" />
+						<path d="M-0.988 0.156A1 1 0 0 1 -0.988 -0.156L-0.879 -0.139A0.89 0.89 0 0 0 -0.879 0.139Z" />
+						<path d="M-0.597 -0.304A0.67 0.67 0 0 1 -0.474 -0.474L-0.403 -0.403A0.57 0.57 0 0 0 -0.508 -0.259Z" />
+						<path d="M-0.891 -0.454A1 1 0 0 1 -0.707 -0.707L-0.629 -0.629A0.89 0.89 0 0 0 -0.793 -0.404Z" />
+						<path d="M-0.304 -0.597A0.67 0.67 0 0 1 -0.105 -0.662L-0.089 -0.563A0.57 0.57 0 0 0 -0.259 -0.508Z" />
+						<path d="M-0.454 -0.891A1 1 0 0 1 -0.156 -0.988L-0.139 -0.879A0.89 0.89 0 0 0 -0.404 -0.793Z" />
+					</g>
+					<circle cx="0" cy="0" r="0.16" fill="#1f8f3a" />
+					<circle cx="0" cy="0" r="0.07" fill="#cc2222" />
+				</g>
+			</svg>
+		]]></data></image>
 	</element>
 
 	<element name="num1"><text string="1"><color red="1" green="1" blue="1" /></text></element>
@@ -41,195 +139,682 @@ The targets are found by the names of the input fields, wherever they are:
 	<element name="num19"><text string="19"><color red="1" green="1" blue="1" /></text></element>
 	<element name="num20"><text string="20"><color red="1" green="1" blue="1" /></text></element>
 
-	<element name="hl0"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.178" height="0.412" viewBox="-0.089 -0.57 0.178 0.412"><path d="M-0.089 -0.563A0.57 0.57 0 0 1 0.089 -0.563L0.025 -0.158A0.16 0.16 0 0 0 -0.025 -0.158Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl1"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.21" height="0.107" viewBox="-0.105 -0.67 0.21 0.107"><path d="M-0.105 -0.662A0.67 0.67 0 0 1 0.105 -0.662L0.089 -0.563A0.57 0.57 0 0 0 -0.089 -0.563Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl2"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.278" height="0.228" viewBox="-0.139 -0.89 0.278 0.228"><path d="M-0.139 -0.879A0.89 0.89 0 0 1 0.139 -0.879L0.105 -0.662A0.67 0.67 0 0 0 -0.105 -0.662Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl3"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.313" height="0.121" viewBox="-0.156 -1 0.313 0.121"><path d="M-0.156 -0.988A1 1 0 0 1 0.156 -0.988L0.139 -0.879A0.89 0.89 0 0 0 -0.139 -0.879Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl4"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.234" height="0.42" viewBox="0.025 -0.563 0.234 0.42"><path d="M0.089 -0.563A0.57 0.57 0 0 1 0.259 -0.508L0.073 -0.143A0.16 0.16 0 0 0 0.025 -0.158Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl5"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.215" height="0.154" viewBox="0.089 -0.662 0.215 0.154"><path d="M0.105 -0.662A0.67 0.67 0 0 1 0.304 -0.597L0.259 -0.508A0.57 0.57 0 0 0 0.089 -0.563Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl6"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.299" height="0.282" viewBox="0.105 -0.879 0.299 0.282"><path d="M0.139 -0.879A0.89 0.89 0 0 1 0.404 -0.793L0.304 -0.597A0.67 0.67 0 0 0 0.105 -0.662Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl7"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.315" height="0.195" viewBox="0.139 -0.988 0.315 0.195"><path d="M0.156 -0.988A1 1 0 0 1 0.454 -0.891L0.404 -0.793A0.89 0.89 0 0 0 0.139 -0.879Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl8"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.33" height="0.395" viewBox="0.073 -0.508 0.33 0.395"><path d="M0.259 -0.508A0.57 0.57 0 0 1 0.403 -0.403L0.113 -0.113A0.16 0.16 0 0 0 0.073 -0.143Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl9"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.215" height="0.194" viewBox="0.259 -0.597 0.215 0.194"><path d="M0.304 -0.597A0.67 0.67 0 0 1 0.474 -0.474L0.403 -0.403A0.57 0.57 0 0 0 0.259 -0.508Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl10"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.325" height="0.319" viewBox="0.304 -0.793 0.325 0.319"><path d="M0.404 -0.793A0.89 0.89 0 0 1 0.629 -0.629L0.474 -0.474A0.67 0.67 0 0 0 0.304 -0.597Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl11"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.303" height="0.262" viewBox="0.404 -0.891 0.303 0.262"><path d="M0.454 -0.891A1 1 0 0 1 0.707 -0.707L0.629 -0.629A0.89 0.89 0 0 0 0.404 -0.793Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl12"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.395" height="0.33" viewBox="0.113 -0.403 0.395 0.33"><path d="M0.403 -0.403A0.57 0.57 0 0 1 0.508 -0.259L0.143 -0.073A0.16 0.16 0 0 0 0.113 -0.113Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl13"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.194" height="0.215" viewBox="0.403 -0.474 0.194 0.215"><path d="M0.474 -0.474A0.67 0.67 0 0 1 0.597 -0.304L0.508 -0.259A0.57 0.57 0 0 0 0.403 -0.403Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl14"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.319" height="0.325" viewBox="0.474 -0.629 0.319 0.325"><path d="M0.629 -0.629A0.89 0.89 0 0 1 0.793 -0.404L0.597 -0.304A0.67 0.67 0 0 0 0.474 -0.474Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl15"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.262" height="0.303" viewBox="0.629 -0.707 0.262 0.303"><path d="M0.707 -0.707A1 1 0 0 1 0.891 -0.454L0.793 -0.404A0.89 0.89 0 0 0 0.629 -0.629Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl16"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.42" height="0.234" viewBox="0.143 -0.259 0.42 0.234"><path d="M0.508 -0.259A0.57 0.57 0 0 1 0.563 -0.089L0.158 -0.025A0.16 0.16 0 0 0 0.143 -0.073Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl17"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.154" height="0.215" viewBox="0.508 -0.304 0.154 0.215"><path d="M0.597 -0.304A0.67 0.67 0 0 1 0.662 -0.105L0.563 -0.089A0.57 0.57 0 0 0 0.508 -0.259Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl18"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.282" height="0.299" viewBox="0.597 -0.404 0.282 0.299"><path d="M0.793 -0.404A0.89 0.89 0 0 1 0.879 -0.139L0.662 -0.105A0.67 0.67 0 0 0 0.597 -0.304Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl19"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.195" height="0.315" viewBox="0.793 -0.454 0.195 0.315"><path d="M0.891 -0.454A1 1 0 0 1 0.988 -0.156L0.879 -0.139A0.89 0.89 0 0 0 0.793 -0.404Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl20"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.412" height="0.178" viewBox="0.158 -0.089 0.412 0.178"><path d="M0.563 -0.089A0.57 0.57 0 0 1 0.563 0.089L0.158 0.025A0.16 0.16 0 0 0 0.158 -0.025Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl21"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.107" height="0.21" viewBox="0.563 -0.105 0.107 0.21"><path d="M0.662 -0.105A0.67 0.67 0 0 1 0.662 0.105L0.563 0.089A0.57 0.57 0 0 0 0.563 -0.089Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl22"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.228" height="0.278" viewBox="0.662 -0.139 0.228 0.278"><path d="M0.879 -0.139A0.89 0.89 0 0 1 0.879 0.139L0.662 0.105A0.67 0.67 0 0 0 0.662 -0.105Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl23"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.121" height="0.313" viewBox="0.879 -0.156 0.121 0.313"><path d="M0.988 -0.156A1 1 0 0 1 0.988 0.156L0.879 0.139A0.89 0.89 0 0 0 0.879 -0.139Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl24"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.42" height="0.234" viewBox="0.143 0.025 0.42 0.234"><path d="M0.563 0.089A0.57 0.57 0 0 1 0.508 0.259L0.143 0.073A0.16 0.16 0 0 0 0.158 0.025Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl25"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.154" height="0.215" viewBox="0.508 0.089 0.154 0.215"><path d="M0.662 0.105A0.67 0.67 0 0 1 0.597 0.304L0.508 0.259A0.57 0.57 0 0 0 0.563 0.089Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl26"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.282" height="0.299" viewBox="0.597 0.105 0.282 0.299"><path d="M0.879 0.139A0.89 0.89 0 0 1 0.793 0.404L0.597 0.304A0.67 0.67 0 0 0 0.662 0.105Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl27"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.195" height="0.315" viewBox="0.793 0.139 0.195 0.315"><path d="M0.988 0.156A1 1 0 0 1 0.891 0.454L0.793 0.404A0.89 0.89 0 0 0 0.879 0.139Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl28"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.395" height="0.33" viewBox="0.113 0.073 0.395 0.33"><path d="M0.508 0.259A0.57 0.57 0 0 1 0.403 0.403L0.113 0.113A0.16 0.16 0 0 0 0.143 0.073Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl29"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.194" height="0.215" viewBox="0.403 0.259 0.194 0.215"><path d="M0.597 0.304A0.67 0.67 0 0 1 0.474 0.474L0.403 0.403A0.57 0.57 0 0 0 0.508 0.259Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl30"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.319" height="0.325" viewBox="0.474 0.304 0.319 0.325"><path d="M0.793 0.404A0.89 0.89 0 0 1 0.629 0.629L0.474 0.474A0.67 0.67 0 0 0 0.597 0.304Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl31"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.262" height="0.303" viewBox="0.629 0.404 0.262 0.303"><path d="M0.891 0.454A1 1 0 0 1 0.707 0.707L0.629 0.629A0.89 0.89 0 0 0 0.793 0.404Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl32"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.33" height="0.395" viewBox="0.073 0.113 0.33 0.395"><path d="M0.403 0.403A0.57 0.57 0 0 1 0.259 0.508L0.073 0.143A0.16 0.16 0 0 0 0.113 0.113Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl33"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.215" height="0.194" viewBox="0.259 0.403 0.215 0.194"><path d="M0.474 0.474A0.67 0.67 0 0 1 0.304 0.597L0.259 0.508A0.57 0.57 0 0 0 0.403 0.403Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl34"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.325" height="0.319" viewBox="0.304 0.474 0.325 0.319"><path d="M0.629 0.629A0.89 0.89 0 0 1 0.404 0.793L0.304 0.597A0.67 0.67 0 0 0 0.474 0.474Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl35"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.303" height="0.262" viewBox="0.404 0.629 0.303 0.262"><path d="M0.707 0.707A1 1 0 0 1 0.454 0.891L0.404 0.793A0.89 0.89 0 0 0 0.629 0.629Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl36"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.234" height="0.42" viewBox="0.025 0.143 0.234 0.42"><path d="M0.259 0.508A0.57 0.57 0 0 1 0.089 0.563L0.025 0.158A0.16 0.16 0 0 0 0.073 0.143Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl37"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.215" height="0.154" viewBox="0.089 0.508 0.215 0.154"><path d="M0.304 0.597A0.67 0.67 0 0 1 0.105 0.662L0.089 0.563A0.57 0.57 0 0 0 0.259 0.508Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl38"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.299" height="0.282" viewBox="0.105 0.597 0.299 0.282"><path d="M0.404 0.793A0.89 0.89 0 0 1 0.139 0.879L0.105 0.662A0.67 0.67 0 0 0 0.304 0.597Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl39"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.315" height="0.195" viewBox="0.139 0.793 0.315 0.195"><path d="M0.454 0.891A1 1 0 0 1 0.156 0.988L0.139 0.879A0.89 0.89 0 0 0 0.404 0.793Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl40"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.178" height="0.412" viewBox="-0.089 0.158 0.178 0.412"><path d="M0.089 0.563A0.57 0.57 0 0 1 -0.089 0.563L-0.025 0.158A0.16 0.16 0 0 0 0.025 0.158Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl41"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.21" height="0.107" viewBox="-0.105 0.563 0.21 0.107"><path d="M0.105 0.662A0.67 0.67 0 0 1 -0.105 0.662L-0.089 0.563A0.57 0.57 0 0 0 0.089 0.563Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl42"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.278" height="0.228" viewBox="-0.139 0.662 0.278 0.228"><path d="M0.139 0.879A0.89 0.89 0 0 1 -0.139 0.879L-0.105 0.662A0.67 0.67 0 0 0 0.105 0.662Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl43"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.313" height="0.121" viewBox="-0.156 0.879 0.313 0.121"><path d="M0.156 0.988A1 1 0 0 1 -0.156 0.988L-0.139 0.879A0.89 0.89 0 0 0 0.139 0.879Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl44"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.234" height="0.42" viewBox="-0.259 0.143 0.234 0.42"><path d="M-0.089 0.563A0.57 0.57 0 0 1 -0.259 0.508L-0.073 0.143A0.16 0.16 0 0 0 -0.025 0.158Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl45"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.215" height="0.154" viewBox="-0.304 0.508 0.215 0.154"><path d="M-0.105 0.662A0.67 0.67 0 0 1 -0.304 0.597L-0.259 0.508A0.57 0.57 0 0 0 -0.089 0.563Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl46"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.299" height="0.282" viewBox="-0.404 0.597 0.299 0.282"><path d="M-0.139 0.879A0.89 0.89 0 0 1 -0.404 0.793L-0.304 0.597A0.67 0.67 0 0 0 -0.105 0.662Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl47"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.315" height="0.195" viewBox="-0.454 0.793 0.315 0.195"><path d="M-0.156 0.988A1 1 0 0 1 -0.454 0.891L-0.404 0.793A0.89 0.89 0 0 0 -0.139 0.879Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl48"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.33" height="0.395" viewBox="-0.403 0.113 0.33 0.395"><path d="M-0.259 0.508A0.57 0.57 0 0 1 -0.403 0.403L-0.113 0.113A0.16 0.16 0 0 0 -0.073 0.143Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl49"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.215" height="0.194" viewBox="-0.474 0.403 0.215 0.194"><path d="M-0.304 0.597A0.67 0.67 0 0 1 -0.474 0.474L-0.403 0.403A0.57 0.57 0 0 0 -0.259 0.508Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl50"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.325" height="0.319" viewBox="-0.629 0.474 0.325 0.319"><path d="M-0.404 0.793A0.89 0.89 0 0 1 -0.629 0.629L-0.474 0.474A0.67 0.67 0 0 0 -0.304 0.597Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl51"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.303" height="0.262" viewBox="-0.707 0.629 0.303 0.262"><path d="M-0.454 0.891A1 1 0 0 1 -0.707 0.707L-0.629 0.629A0.89 0.89 0 0 0 -0.404 0.793Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl52"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.395" height="0.33" viewBox="-0.508 0.073 0.395 0.33"><path d="M-0.403 0.403A0.57 0.57 0 0 1 -0.508 0.259L-0.143 0.073A0.16 0.16 0 0 0 -0.113 0.113Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl53"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.194" height="0.215" viewBox="-0.597 0.259 0.194 0.215"><path d="M-0.474 0.474A0.67 0.67 0 0 1 -0.597 0.304L-0.508 0.259A0.57 0.57 0 0 0 -0.403 0.403Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl54"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.319" height="0.325" viewBox="-0.793 0.304 0.319 0.325"><path d="M-0.629 0.629A0.89 0.89 0 0 1 -0.793 0.404L-0.597 0.304A0.67 0.67 0 0 0 -0.474 0.474Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl55"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.262" height="0.303" viewBox="-0.891 0.404 0.262 0.303"><path d="M-0.707 0.707A1 1 0 0 1 -0.891 0.454L-0.793 0.404A0.89 0.89 0 0 0 -0.629 0.629Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl56"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.42" height="0.234" viewBox="-0.563 0.025 0.42 0.234"><path d="M-0.508 0.259A0.57 0.57 0 0 1 -0.563 0.089L-0.158 0.025A0.16 0.16 0 0 0 -0.143 0.073Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl57"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.154" height="0.215" viewBox="-0.662 0.089 0.154 0.215"><path d="M-0.597 0.304A0.67 0.67 0 0 1 -0.662 0.105L-0.563 0.089A0.57 0.57 0 0 0 -0.508 0.259Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl58"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.282" height="0.299" viewBox="-0.879 0.105 0.282 0.299"><path d="M-0.793 0.404A0.89 0.89 0 0 1 -0.879 0.139L-0.662 0.105A0.67 0.67 0 0 0 -0.597 0.304Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl59"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.195" height="0.315" viewBox="-0.988 0.139 0.195 0.315"><path d="M-0.891 0.454A1 1 0 0 1 -0.988 0.156L-0.879 0.139A0.89 0.89 0 0 0 -0.793 0.404Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl60"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.412" height="0.178" viewBox="-0.57 -0.089 0.412 0.178"><path d="M-0.563 0.089A0.57 0.57 0 0 1 -0.563 -0.089L-0.158 -0.025A0.16 0.16 0 0 0 -0.158 0.025Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl61"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.107" height="0.21" viewBox="-0.67 -0.105 0.107 0.21"><path d="M-0.662 0.105A0.67 0.67 0 0 1 -0.662 -0.105L-0.563 -0.089A0.57 0.57 0 0 0 -0.563 0.089Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl62"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.228" height="0.278" viewBox="-0.89 -0.139 0.228 0.278"><path d="M-0.879 0.139A0.89 0.89 0 0 1 -0.879 -0.139L-0.662 -0.105A0.67 0.67 0 0 0 -0.662 0.105Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl63"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.121" height="0.313" viewBox="-1 -0.156 0.121 0.313"><path d="M-0.988 0.156A1 1 0 0 1 -0.988 -0.156L-0.879 -0.139A0.89 0.89 0 0 0 -0.879 0.139Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl64"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.42" height="0.234" viewBox="-0.563 -0.259 0.42 0.234"><path d="M-0.563 -0.089A0.57 0.57 0 0 1 -0.508 -0.259L-0.143 -0.073A0.16 0.16 0 0 0 -0.158 -0.025Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl65"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.154" height="0.215" viewBox="-0.662 -0.304 0.154 0.215"><path d="M-0.662 -0.105A0.67 0.67 0 0 1 -0.597 -0.304L-0.508 -0.259A0.57 0.57 0 0 0 -0.563 -0.089Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl66"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.282" height="0.299" viewBox="-0.879 -0.404 0.282 0.299"><path d="M-0.879 -0.139A0.89 0.89 0 0 1 -0.793 -0.404L-0.597 -0.304A0.67 0.67 0 0 0 -0.662 -0.105Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl67"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.195" height="0.315" viewBox="-0.988 -0.454 0.195 0.315"><path d="M-0.988 -0.156A1 1 0 0 1 -0.891 -0.454L-0.793 -0.404A0.89 0.89 0 0 0 -0.879 -0.139Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl68"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.395" height="0.33" viewBox="-0.508 -0.403 0.395 0.33"><path d="M-0.508 -0.259A0.57 0.57 0 0 1 -0.403 -0.403L-0.113 -0.113A0.16 0.16 0 0 0 -0.143 -0.073Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl69"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.194" height="0.215" viewBox="-0.597 -0.474 0.194 0.215"><path d="M-0.597 -0.304A0.67 0.67 0 0 1 -0.474 -0.474L-0.403 -0.403A0.57 0.57 0 0 0 -0.508 -0.259Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl70"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.319" height="0.325" viewBox="-0.793 -0.629 0.319 0.325"><path d="M-0.793 -0.404A0.89 0.89 0 0 1 -0.629 -0.629L-0.474 -0.474A0.67 0.67 0 0 0 -0.597 -0.304Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl71"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.262" height="0.303" viewBox="-0.891 -0.707 0.262 0.303"><path d="M-0.891 -0.454A1 1 0 0 1 -0.707 -0.707L-0.629 -0.629A0.89 0.89 0 0 0 -0.793 -0.404Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl72"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.33" height="0.395" viewBox="-0.403 -0.508 0.33 0.395"><path d="M-0.403 -0.403A0.57 0.57 0 0 1 -0.259 -0.508L-0.073 -0.143A0.16 0.16 0 0 0 -0.113 -0.113Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl73"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.215" height="0.194" viewBox="-0.474 -0.597 0.215 0.194"><path d="M-0.474 -0.474A0.67 0.67 0 0 1 -0.304 -0.597L-0.259 -0.508A0.57 0.57 0 0 0 -0.403 -0.403Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl74"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.325" height="0.319" viewBox="-0.629 -0.793 0.325 0.319"><path d="M-0.629 -0.629A0.89 0.89 0 0 1 -0.404 -0.793L-0.304 -0.597A0.67 0.67 0 0 0 -0.474 -0.474Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl75"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.303" height="0.262" viewBox="-0.707 -0.891 0.303 0.262"><path d="M-0.707 -0.707A1 1 0 0 1 -0.454 -0.891L-0.404 -0.793A0.89 0.89 0 0 0 -0.629 -0.629Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl76"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.234" height="0.42" viewBox="-0.259 -0.563 0.234 0.42"><path d="M-0.259 -0.508A0.57 0.57 0 0 1 -0.089 -0.563L-0.025 -0.158A0.16 0.16 0 0 0 -0.073 -0.143Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl77"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.215" height="0.154" viewBox="-0.304 -0.662 0.215 0.154"><path d="M-0.304 -0.597A0.67 0.67 0 0 1 -0.105 -0.662L-0.089 -0.563A0.57 0.57 0 0 0 -0.259 -0.508Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl78"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.299" height="0.282" viewBox="-0.404 -0.879 0.299 0.282"><path d="M-0.404 -0.793A0.89 0.89 0 0 1 -0.139 -0.879L-0.105 -0.662A0.67 0.67 0 0 0 -0.304 -0.597Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl79"><image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.315" height="0.195" viewBox="-0.454 -0.988 0.315 0.195"><path d="M-0.454 -0.891A1 1 0 0 1 -0.156 -0.988L-0.139 -0.879A0.89 0.89 0 0 0 -0.404 -0.793Z" fill="#ffee33" fill-opacity="0.75"/></svg>]]></data></image></element>
-	<element name="hl_bull"><disk state="1"><color red="1" green="0.93" blue="0.2" alpha="0.75" /></disk></element>
-	<element name="hl_bullseye"><disk state="1"><color red="1" green="0.93" blue="0.2" alpha="0.75" /></disk></element>
+	<!-- target highlights, drawn in white and coloured where they're used -->
+	<element name="hl0">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.178" height="0.412" viewBox="-0.089 -0.57 0.178 0.412">
+				<path d="M-0.089 -0.563A0.57 0.57 0 0 1 0.089 -0.563L0.025 -0.158A0.16 0.16 0 0 0 -0.025 -0.158Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl1">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.21" height="0.107" viewBox="-0.105 -0.67 0.21 0.107">
+				<path d="M-0.105 -0.662A0.67 0.67 0 0 1 0.105 -0.662L0.089 -0.563A0.57 0.57 0 0 0 -0.089 -0.563Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl2">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.278" height="0.228" viewBox="-0.139 -0.89 0.278 0.228">
+				<path d="M-0.139 -0.879A0.89 0.89 0 0 1 0.139 -0.879L0.105 -0.662A0.67 0.67 0 0 0 -0.105 -0.662Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl3">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.313" height="0.121" viewBox="-0.156 -1 0.313 0.121">
+				<path d="M-0.156 -0.988A1 1 0 0 1 0.156 -0.988L0.139 -0.879A0.89 0.89 0 0 0 -0.139 -0.879Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl4">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.234" height="0.42" viewBox="0.025 -0.563 0.234 0.42">
+				<path d="M0.089 -0.563A0.57 0.57 0 0 1 0.259 -0.508L0.073 -0.143A0.16 0.16 0 0 0 0.025 -0.158Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl5">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.215" height="0.154" viewBox="0.089 -0.662 0.215 0.154">
+				<path d="M0.105 -0.662A0.67 0.67 0 0 1 0.304 -0.597L0.259 -0.508A0.57 0.57 0 0 0 0.089 -0.563Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl6">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.299" height="0.282" viewBox="0.105 -0.879 0.299 0.282">
+				<path d="M0.139 -0.879A0.89 0.89 0 0 1 0.404 -0.793L0.304 -0.597A0.67 0.67 0 0 0 0.105 -0.662Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl7">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.315" height="0.195" viewBox="0.139 -0.988 0.315 0.195">
+				<path d="M0.156 -0.988A1 1 0 0 1 0.454 -0.891L0.404 -0.793A0.89 0.89 0 0 0 0.139 -0.879Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl8">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.33" height="0.395" viewBox="0.073 -0.508 0.33 0.395">
+				<path d="M0.259 -0.508A0.57 0.57 0 0 1 0.403 -0.403L0.113 -0.113A0.16 0.16 0 0 0 0.073 -0.143Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl9">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.215" height="0.194" viewBox="0.259 -0.597 0.215 0.194">
+				<path d="M0.304 -0.597A0.67 0.67 0 0 1 0.474 -0.474L0.403 -0.403A0.57 0.57 0 0 0 0.259 -0.508Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl10">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.325" height="0.319" viewBox="0.304 -0.793 0.325 0.319">
+				<path d="M0.404 -0.793A0.89 0.89 0 0 1 0.629 -0.629L0.474 -0.474A0.67 0.67 0 0 0 0.304 -0.597Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl11">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.303" height="0.262" viewBox="0.404 -0.891 0.303 0.262">
+				<path d="M0.454 -0.891A1 1 0 0 1 0.707 -0.707L0.629 -0.629A0.89 0.89 0 0 0 0.404 -0.793Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl12">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.395" height="0.33" viewBox="0.113 -0.403 0.395 0.33">
+				<path d="M0.403 -0.403A0.57 0.57 0 0 1 0.508 -0.259L0.143 -0.073A0.16 0.16 0 0 0 0.113 -0.113Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl13">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.194" height="0.215" viewBox="0.403 -0.474 0.194 0.215">
+				<path d="M0.474 -0.474A0.67 0.67 0 0 1 0.597 -0.304L0.508 -0.259A0.57 0.57 0 0 0 0.403 -0.403Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl14">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.319" height="0.325" viewBox="0.474 -0.629 0.319 0.325">
+				<path d="M0.629 -0.629A0.89 0.89 0 0 1 0.793 -0.404L0.597 -0.304A0.67 0.67 0 0 0 0.474 -0.474Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl15">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.262" height="0.303" viewBox="0.629 -0.707 0.262 0.303">
+				<path d="M0.707 -0.707A1 1 0 0 1 0.891 -0.454L0.793 -0.404A0.89 0.89 0 0 0 0.629 -0.629Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl16">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.42" height="0.234" viewBox="0.143 -0.259 0.42 0.234">
+				<path d="M0.508 -0.259A0.57 0.57 0 0 1 0.563 -0.089L0.158 -0.025A0.16 0.16 0 0 0 0.143 -0.073Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl17">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.154" height="0.215" viewBox="0.508 -0.304 0.154 0.215">
+				<path d="M0.597 -0.304A0.67 0.67 0 0 1 0.662 -0.105L0.563 -0.089A0.57 0.57 0 0 0 0.508 -0.259Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl18">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.282" height="0.299" viewBox="0.597 -0.404 0.282 0.299">
+				<path d="M0.793 -0.404A0.89 0.89 0 0 1 0.879 -0.139L0.662 -0.105A0.67 0.67 0 0 0 0.597 -0.304Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl19">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.195" height="0.315" viewBox="0.793 -0.454 0.195 0.315">
+				<path d="M0.891 -0.454A1 1 0 0 1 0.988 -0.156L0.879 -0.139A0.89 0.89 0 0 0 0.793 -0.404Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl20">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.412" height="0.178" viewBox="0.158 -0.089 0.412 0.178">
+				<path d="M0.563 -0.089A0.57 0.57 0 0 1 0.563 0.089L0.158 0.025A0.16 0.16 0 0 0 0.158 -0.025Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl21">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.107" height="0.21" viewBox="0.563 -0.105 0.107 0.21">
+				<path d="M0.662 -0.105A0.67 0.67 0 0 1 0.662 0.105L0.563 0.089A0.57 0.57 0 0 0 0.563 -0.089Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl22">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.228" height="0.278" viewBox="0.662 -0.139 0.228 0.278">
+				<path d="M0.879 -0.139A0.89 0.89 0 0 1 0.879 0.139L0.662 0.105A0.67 0.67 0 0 0 0.662 -0.105Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl23">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.121" height="0.313" viewBox="0.879 -0.156 0.121 0.313">
+				<path d="M0.988 -0.156A1 1 0 0 1 0.988 0.156L0.879 0.139A0.89 0.89 0 0 0 0.879 -0.139Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl24">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.42" height="0.234" viewBox="0.143 0.025 0.42 0.234">
+				<path d="M0.563 0.089A0.57 0.57 0 0 1 0.508 0.259L0.143 0.073A0.16 0.16 0 0 0 0.158 0.025Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl25">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.154" height="0.215" viewBox="0.508 0.089 0.154 0.215">
+				<path d="M0.662 0.105A0.67 0.67 0 0 1 0.597 0.304L0.508 0.259A0.57 0.57 0 0 0 0.563 0.089Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl26">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.282" height="0.299" viewBox="0.597 0.105 0.282 0.299">
+				<path d="M0.879 0.139A0.89 0.89 0 0 1 0.793 0.404L0.597 0.304A0.67 0.67 0 0 0 0.662 0.105Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl27">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.195" height="0.315" viewBox="0.793 0.139 0.195 0.315">
+				<path d="M0.988 0.156A1 1 0 0 1 0.891 0.454L0.793 0.404A0.89 0.89 0 0 0 0.879 0.139Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl28">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.395" height="0.33" viewBox="0.113 0.073 0.395 0.33">
+				<path d="M0.508 0.259A0.57 0.57 0 0 1 0.403 0.403L0.113 0.113A0.16 0.16 0 0 0 0.143 0.073Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl29">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.194" height="0.215" viewBox="0.403 0.259 0.194 0.215">
+				<path d="M0.597 0.304A0.67 0.67 0 0 1 0.474 0.474L0.403 0.403A0.57 0.57 0 0 0 0.508 0.259Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl30">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.319" height="0.325" viewBox="0.474 0.304 0.319 0.325">
+				<path d="M0.793 0.404A0.89 0.89 0 0 1 0.629 0.629L0.474 0.474A0.67 0.67 0 0 0 0.597 0.304Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl31">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.262" height="0.303" viewBox="0.629 0.404 0.262 0.303">
+				<path d="M0.891 0.454A1 1 0 0 1 0.707 0.707L0.629 0.629A0.89 0.89 0 0 0 0.793 0.404Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl32">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.33" height="0.395" viewBox="0.073 0.113 0.33 0.395">
+				<path d="M0.403 0.403A0.57 0.57 0 0 1 0.259 0.508L0.073 0.143A0.16 0.16 0 0 0 0.113 0.113Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl33">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.215" height="0.194" viewBox="0.259 0.403 0.215 0.194">
+				<path d="M0.474 0.474A0.67 0.67 0 0 1 0.304 0.597L0.259 0.508A0.57 0.57 0 0 0 0.403 0.403Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl34">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.325" height="0.319" viewBox="0.304 0.474 0.325 0.319">
+				<path d="M0.629 0.629A0.89 0.89 0 0 1 0.404 0.793L0.304 0.597A0.67 0.67 0 0 0 0.474 0.474Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl35">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.303" height="0.262" viewBox="0.404 0.629 0.303 0.262">
+				<path d="M0.707 0.707A1 1 0 0 1 0.454 0.891L0.404 0.793A0.89 0.89 0 0 0 0.629 0.629Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl36">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.234" height="0.42" viewBox="0.025 0.143 0.234 0.42">
+				<path d="M0.259 0.508A0.57 0.57 0 0 1 0.089 0.563L0.025 0.158A0.16 0.16 0 0 0 0.073 0.143Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl37">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.215" height="0.154" viewBox="0.089 0.508 0.215 0.154">
+				<path d="M0.304 0.597A0.67 0.67 0 0 1 0.105 0.662L0.089 0.563A0.57 0.57 0 0 0 0.259 0.508Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl38">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.299" height="0.282" viewBox="0.105 0.597 0.299 0.282">
+				<path d="M0.404 0.793A0.89 0.89 0 0 1 0.139 0.879L0.105 0.662A0.67 0.67 0 0 0 0.304 0.597Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl39">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.315" height="0.195" viewBox="0.139 0.793 0.315 0.195">
+				<path d="M0.454 0.891A1 1 0 0 1 0.156 0.988L0.139 0.879A0.89 0.89 0 0 0 0.404 0.793Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl40">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.178" height="0.412" viewBox="-0.089 0.158 0.178 0.412">
+				<path d="M0.089 0.563A0.57 0.57 0 0 1 -0.089 0.563L-0.025 0.158A0.16 0.16 0 0 0 0.025 0.158Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl41">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.21" height="0.107" viewBox="-0.105 0.563 0.21 0.107">
+				<path d="M0.105 0.662A0.67 0.67 0 0 1 -0.105 0.662L-0.089 0.563A0.57 0.57 0 0 0 0.089 0.563Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl42">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.278" height="0.228" viewBox="-0.139 0.662 0.278 0.228">
+				<path d="M0.139 0.879A0.89 0.89 0 0 1 -0.139 0.879L-0.105 0.662A0.67 0.67 0 0 0 0.105 0.662Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl43">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.313" height="0.121" viewBox="-0.156 0.879 0.313 0.121">
+				<path d="M0.156 0.988A1 1 0 0 1 -0.156 0.988L-0.139 0.879A0.89 0.89 0 0 0 0.139 0.879Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl44">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.234" height="0.42" viewBox="-0.259 0.143 0.234 0.42">
+				<path d="M-0.089 0.563A0.57 0.57 0 0 1 -0.259 0.508L-0.073 0.143A0.16 0.16 0 0 0 -0.025 0.158Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl45">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.215" height="0.154" viewBox="-0.304 0.508 0.215 0.154">
+				<path d="M-0.105 0.662A0.67 0.67 0 0 1 -0.304 0.597L-0.259 0.508A0.57 0.57 0 0 0 -0.089 0.563Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl46">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.299" height="0.282" viewBox="-0.404 0.597 0.299 0.282">
+				<path d="M-0.139 0.879A0.89 0.89 0 0 1 -0.404 0.793L-0.304 0.597A0.67 0.67 0 0 0 -0.105 0.662Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl47">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.315" height="0.195" viewBox="-0.454 0.793 0.315 0.195">
+				<path d="M-0.156 0.988A1 1 0 0 1 -0.454 0.891L-0.404 0.793A0.89 0.89 0 0 0 -0.139 0.879Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl48">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.33" height="0.395" viewBox="-0.403 0.113 0.33 0.395">
+				<path d="M-0.259 0.508A0.57 0.57 0 0 1 -0.403 0.403L-0.113 0.113A0.16 0.16 0 0 0 -0.073 0.143Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl49">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.215" height="0.194" viewBox="-0.474 0.403 0.215 0.194">
+				<path d="M-0.304 0.597A0.67 0.67 0 0 1 -0.474 0.474L-0.403 0.403A0.57 0.57 0 0 0 -0.259 0.508Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl50">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.325" height="0.319" viewBox="-0.629 0.474 0.325 0.319">
+				<path d="M-0.404 0.793A0.89 0.89 0 0 1 -0.629 0.629L-0.474 0.474A0.67 0.67 0 0 0 -0.304 0.597Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl51">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.303" height="0.262" viewBox="-0.707 0.629 0.303 0.262">
+				<path d="M-0.454 0.891A1 1 0 0 1 -0.707 0.707L-0.629 0.629A0.89 0.89 0 0 0 -0.404 0.793Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl52">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.395" height="0.33" viewBox="-0.508 0.073 0.395 0.33">
+				<path d="M-0.403 0.403A0.57 0.57 0 0 1 -0.508 0.259L-0.143 0.073A0.16 0.16 0 0 0 -0.113 0.113Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl53">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.194" height="0.215" viewBox="-0.597 0.259 0.194 0.215">
+				<path d="M-0.474 0.474A0.67 0.67 0 0 1 -0.597 0.304L-0.508 0.259A0.57 0.57 0 0 0 -0.403 0.403Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl54">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.319" height="0.325" viewBox="-0.793 0.304 0.319 0.325">
+				<path d="M-0.629 0.629A0.89 0.89 0 0 1 -0.793 0.404L-0.597 0.304A0.67 0.67 0 0 0 -0.474 0.474Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl55">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.262" height="0.303" viewBox="-0.891 0.404 0.262 0.303">
+				<path d="M-0.707 0.707A1 1 0 0 1 -0.891 0.454L-0.793 0.404A0.89 0.89 0 0 0 -0.629 0.629Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl56">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.42" height="0.234" viewBox="-0.563 0.025 0.42 0.234">
+				<path d="M-0.508 0.259A0.57 0.57 0 0 1 -0.563 0.089L-0.158 0.025A0.16 0.16 0 0 0 -0.143 0.073Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl57">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.154" height="0.215" viewBox="-0.662 0.089 0.154 0.215">
+				<path d="M-0.597 0.304A0.67 0.67 0 0 1 -0.662 0.105L-0.563 0.089A0.57 0.57 0 0 0 -0.508 0.259Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl58">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.282" height="0.299" viewBox="-0.879 0.105 0.282 0.299">
+				<path d="M-0.793 0.404A0.89 0.89 0 0 1 -0.879 0.139L-0.662 0.105A0.67 0.67 0 0 0 -0.597 0.304Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl59">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.195" height="0.315" viewBox="-0.988 0.139 0.195 0.315">
+				<path d="M-0.891 0.454A1 1 0 0 1 -0.988 0.156L-0.879 0.139A0.89 0.89 0 0 0 -0.793 0.404Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl60">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.412" height="0.178" viewBox="-0.57 -0.089 0.412 0.178">
+				<path d="M-0.563 0.089A0.57 0.57 0 0 1 -0.563 -0.089L-0.158 -0.025A0.16 0.16 0 0 0 -0.158 0.025Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl61">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.107" height="0.21" viewBox="-0.67 -0.105 0.107 0.21">
+				<path d="M-0.662 0.105A0.67 0.67 0 0 1 -0.662 -0.105L-0.563 -0.089A0.57 0.57 0 0 0 -0.563 0.089Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl62">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.228" height="0.278" viewBox="-0.89 -0.139 0.228 0.278">
+				<path d="M-0.879 0.139A0.89 0.89 0 0 1 -0.879 -0.139L-0.662 -0.105A0.67 0.67 0 0 0 -0.662 0.105Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl63">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.121" height="0.313" viewBox="-1 -0.156 0.121 0.313">
+				<path d="M-0.988 0.156A1 1 0 0 1 -0.988 -0.156L-0.879 -0.139A0.89 0.89 0 0 0 -0.879 0.139Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl64">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.42" height="0.234" viewBox="-0.563 -0.259 0.42 0.234">
+				<path d="M-0.563 -0.089A0.57 0.57 0 0 1 -0.508 -0.259L-0.143 -0.073A0.16 0.16 0 0 0 -0.158 -0.025Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl65">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.154" height="0.215" viewBox="-0.662 -0.304 0.154 0.215">
+				<path d="M-0.662 -0.105A0.67 0.67 0 0 1 -0.597 -0.304L-0.508 -0.259A0.57 0.57 0 0 0 -0.563 -0.089Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl66">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.282" height="0.299" viewBox="-0.879 -0.404 0.282 0.299">
+				<path d="M-0.879 -0.139A0.89 0.89 0 0 1 -0.793 -0.404L-0.597 -0.304A0.67 0.67 0 0 0 -0.662 -0.105Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl67">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.195" height="0.315" viewBox="-0.988 -0.454 0.195 0.315">
+				<path d="M-0.988 -0.156A1 1 0 0 1 -0.891 -0.454L-0.793 -0.404A0.89 0.89 0 0 0 -0.879 -0.139Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl68">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.395" height="0.33" viewBox="-0.508 -0.403 0.395 0.33">
+				<path d="M-0.508 -0.259A0.57 0.57 0 0 1 -0.403 -0.403L-0.113 -0.113A0.16 0.16 0 0 0 -0.143 -0.073Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl69">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.194" height="0.215" viewBox="-0.597 -0.474 0.194 0.215">
+				<path d="M-0.597 -0.304A0.67 0.67 0 0 1 -0.474 -0.474L-0.403 -0.403A0.57 0.57 0 0 0 -0.508 -0.259Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl70">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.319" height="0.325" viewBox="-0.793 -0.629 0.319 0.325">
+				<path d="M-0.793 -0.404A0.89 0.89 0 0 1 -0.629 -0.629L-0.474 -0.474A0.67 0.67 0 0 0 -0.597 -0.304Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl71">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.262" height="0.303" viewBox="-0.891 -0.707 0.262 0.303">
+				<path d="M-0.891 -0.454A1 1 0 0 1 -0.707 -0.707L-0.629 -0.629A0.89 0.89 0 0 0 -0.793 -0.404Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl72">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.33" height="0.395" viewBox="-0.403 -0.508 0.33 0.395">
+				<path d="M-0.403 -0.403A0.57 0.57 0 0 1 -0.259 -0.508L-0.073 -0.143A0.16 0.16 0 0 0 -0.113 -0.113Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl73">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.215" height="0.194" viewBox="-0.474 -0.597 0.215 0.194">
+				<path d="M-0.474 -0.474A0.67 0.67 0 0 1 -0.304 -0.597L-0.259 -0.508A0.57 0.57 0 0 0 -0.403 -0.403Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl74">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.325" height="0.319" viewBox="-0.629 -0.793 0.325 0.319">
+				<path d="M-0.629 -0.629A0.89 0.89 0 0 1 -0.404 -0.793L-0.304 -0.597A0.67 0.67 0 0 0 -0.474 -0.474Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl75">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.303" height="0.262" viewBox="-0.707 -0.891 0.303 0.262">
+				<path d="M-0.707 -0.707A1 1 0 0 1 -0.454 -0.891L-0.404 -0.793A0.89 0.89 0 0 0 -0.629 -0.629Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl76">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.234" height="0.42" viewBox="-0.259 -0.563 0.234 0.42">
+				<path d="M-0.259 -0.508A0.57 0.57 0 0 1 -0.089 -0.563L-0.025 -0.158A0.16 0.16 0 0 0 -0.073 -0.143Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl77">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.215" height="0.154" viewBox="-0.304 -0.662 0.215 0.154">
+				<path d="M-0.304 -0.597A0.67 0.67 0 0 1 -0.105 -0.662L-0.089 -0.563A0.57 0.57 0 0 0 -0.259 -0.508Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl78">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.299" height="0.282" viewBox="-0.404 -0.879 0.299 0.282">
+				<path d="M-0.404 -0.793A0.89 0.89 0 0 1 -0.139 -0.879L-0.105 -0.662A0.67 0.67 0 0 0 -0.304 -0.597Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl79">
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="0.315" height="0.195" viewBox="-0.454 -0.988 0.315 0.195">
+				<path d="M-0.454 -0.891A1 1 0 0 1 -0.156 -0.988L-0.139 -0.879A0.89 0.89 0 0 0 -0.404 -0.793Z" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+	<element name="hl_bull"><disk state="1" /></element>
+
+	<group name="highlights">
+		<element id="seg:Dart Single 20" ref="hl0"><bounds x="13.93" y="8.16" width="2.14" height="4.944" /></element>
+		<element id="seg:Dart Triple 20" ref="hl1"><bounds x="13.742" y="6.96" width="2.515" height="1.284" /></element>
+		<element id="seg1:Dart Single 20" ref="hl2"><bounds x="13.329" y="4.32" width="3.341" height="2.739" /></element>
+		<element id="seg:Dart Double 20" ref="hl3"><bounds x="13.123" y="3" width="3.754" height="1.451" /></element>
+		<element id="seg:Dart Single 1" ref="hl4"><bounds x="15.3" y="8.244" width="2.805" height="5.045" /></element>
+		<element id="seg:Dart Triple 1" ref="hl5"><bounds x="16.07" y="7.059" width="2.58" height="1.847" /></element>
+		<element id="seg1:Dart Single 1" ref="hl6"><bounds x="16.258" y="4.451" width="3.591" height="3.385" /></element>
+		<element id="seg:Dart Double 1" ref="hl7"><bounds x="16.671" y="3.148" width="3.777" height="2.336" /></element>
+		<element id="seg:Dart Single 18" ref="hl8"><bounds x="15.872" y="8.906" width="3.965" height="4.737" /></element>
+		<element id="seg:Dart Triple 18" ref="hl9"><bounds x="18.105" y="7.836" width="2.58" height="2.327" /></element>
+		<element id="seg1:Dart Single 18" ref="hl10"><bounds x="18.65" y="5.484" width="3.902" height="3.831" /></element>
+		<element id="seg:Dart Double 18" ref="hl11"><bounds x="19.849" y="4.308" width="3.637" height="3.14" /></element>
+		<element id="seg:Dart Single 4" ref="hl12"><bounds x="16.358" y="10.163" width="4.737" height="3.965" /></element>
+		<element id="seg:Dart Triple 4" ref="hl13"><bounds x="19.837" y="9.315" width="2.327" height="2.58" /></element>
+		<element id="seg1:Dart Single 4" ref="hl14"><bounds x="20.685" y="7.448" width="3.831" height="3.902" /></element>
+		<element id="seg:Dart Double 4" ref="hl15"><bounds x="22.552" y="6.515" width="3.14" height="3.637" /></element>
+		<element id="seg:Dart Single 13" ref="hl16"><bounds x="16.711" y="11.895" width="5.045" height="2.805" /></element>
+		<element id="seg:Dart Triple 13" ref="hl17"><bounds x="21.094" y="11.35" width="1.847" height="2.58" /></element>
+		<element id="seg1:Dart Single 13" ref="hl18"><bounds x="22.164" y="10.151" width="3.385" height="3.591" /></element>
+		<element id="seg:Dart Double 13" ref="hl19"><bounds x="24.516" y="9.552" width="2.336" height="3.777" /></element>
+		<element id="seg:Dart Single 6" ref="hl20"><bounds x="16.896" y="13.93" width="4.944" height="2.14" /></element>
+		<element id="seg:Dart Triple 6" ref="hl21"><bounds x="21.756" y="13.742" width="1.284" height="2.515" /></element>
+		<element id="seg1:Dart Single 6" ref="hl22"><bounds x="22.941" y="13.329" width="2.739" height="3.341" /></element>
+		<element id="seg:Dart Double 6" ref="hl23"><bounds x="25.549" y="13.123" width="1.451" height="3.754" /></element>
+		<element id="seg:Dart Single 10" ref="hl24"><bounds x="16.711" y="15.3" width="5.045" height="2.805" /></element>
+		<element id="seg:Dart Triple 10" ref="hl25"><bounds x="21.094" y="16.07" width="1.847" height="2.58" /></element>
+		<element id="seg1:Dart Single 10" ref="hl26"><bounds x="22.164" y="16.258" width="3.385" height="3.591" /></element>
+		<element id="seg:Dart Double 10" ref="hl27"><bounds x="24.516" y="16.671" width="2.336" height="3.777" /></element>
+		<element id="seg:Dart Single 15" ref="hl28"><bounds x="16.358" y="15.872" width="4.737" height="3.965" /></element>
+		<element id="seg:Dart Triple 15" ref="hl29"><bounds x="19.837" y="18.105" width="2.327" height="2.58" /></element>
+		<element id="seg1:Dart Single 15" ref="hl30"><bounds x="20.685" y="18.65" width="3.831" height="3.902" /></element>
+		<element id="seg:Dart Double 15" ref="hl31"><bounds x="22.552" y="19.849" width="3.14" height="3.637" /></element>
+		<element id="seg:Dart Single 2" ref="hl32"><bounds x="15.872" y="16.358" width="3.965" height="4.737" /></element>
+		<element id="seg:Dart Triple 2" ref="hl33"><bounds x="18.105" y="19.837" width="2.58" height="2.327" /></element>
+		<element id="seg1:Dart Single 2" ref="hl34"><bounds x="18.65" y="20.685" width="3.902" height="3.831" /></element>
+		<element id="seg:Dart Double 2" ref="hl35"><bounds x="19.849" y="22.552" width="3.637" height="3.14" /></element>
+		<element id="seg:Dart Single 17" ref="hl36"><bounds x="15.3" y="16.711" width="2.805" height="5.045" /></element>
+		<element id="seg:Dart Triple 17" ref="hl37"><bounds x="16.07" y="21.094" width="2.58" height="1.847" /></element>
+		<element id="seg1:Dart Single 17" ref="hl38"><bounds x="16.258" y="22.164" width="3.591" height="3.385" /></element>
+		<element id="seg:Dart Double 17" ref="hl39"><bounds x="16.671" y="24.516" width="3.777" height="2.336" /></element>
+		<element id="seg:Dart Single 3" ref="hl40"><bounds x="13.93" y="16.896" width="2.14" height="4.944" /></element>
+		<element id="seg:Dart Triple 3" ref="hl41"><bounds x="13.742" y="21.756" width="2.515" height="1.284" /></element>
+		<element id="seg1:Dart Single 3" ref="hl42"><bounds x="13.329" y="22.941" width="3.341" height="2.739" /></element>
+		<element id="seg:Dart Double 3" ref="hl43"><bounds x="13.123" y="25.549" width="3.754" height="1.451" /></element>
+		<element id="seg:Dart Single 19" ref="hl44"><bounds x="11.895" y="16.711" width="2.805" height="5.045" /></element>
+		<element id="seg:Dart Triple 19" ref="hl45"><bounds x="11.35" y="21.094" width="2.58" height="1.847" /></element>
+		<element id="seg1:Dart Single 19" ref="hl46"><bounds x="10.151" y="22.164" width="3.591" height="3.385" /></element>
+		<element id="seg:Dart Double 19" ref="hl47"><bounds x="9.552" y="24.516" width="3.777" height="2.336" /></element>
+		<element id="seg:Dart Single 7" ref="hl48"><bounds x="10.163" y="16.358" width="3.965" height="4.737" /></element>
+		<element id="seg:Dart Triple 7" ref="hl49"><bounds x="9.315" y="19.837" width="2.58" height="2.327" /></element>
+		<element id="seg1:Dart Single 7" ref="hl50"><bounds x="7.448" y="20.685" width="3.902" height="3.831" /></element>
+		<element id="seg:Dart Double 7" ref="hl51"><bounds x="6.515" y="22.552" width="3.637" height="3.14" /></element>
+		<element id="seg:Dart Single 16" ref="hl52"><bounds x="8.906" y="15.872" width="4.737" height="3.965" /></element>
+		<element id="seg:Dart Triple 16" ref="hl53"><bounds x="7.836" y="18.105" width="2.327" height="2.58" /></element>
+		<element id="seg1:Dart Single 16" ref="hl54"><bounds x="5.484" y="18.65" width="3.831" height="3.902" /></element>
+		<element id="seg:Dart Double 16" ref="hl55"><bounds x="4.308" y="19.849" width="3.14" height="3.637" /></element>
+		<element id="seg:Dart Single 8" ref="hl56"><bounds x="8.244" y="15.3" width="5.045" height="2.805" /></element>
+		<element id="seg:Dart Triple 8" ref="hl57"><bounds x="7.059" y="16.07" width="1.847" height="2.58" /></element>
+		<element id="seg1:Dart Single 8" ref="hl58"><bounds x="4.451" y="16.258" width="3.385" height="3.591" /></element>
+		<element id="seg:Dart Double 8" ref="hl59"><bounds x="3.148" y="16.671" width="2.336" height="3.777" /></element>
+		<element id="seg:Dart Single 11" ref="hl60"><bounds x="8.16" y="13.93" width="4.944" height="2.14" /></element>
+		<element id="seg:Dart Triple 11" ref="hl61"><bounds x="6.96" y="13.742" width="1.284" height="2.515" /></element>
+		<element id="seg1:Dart Single 11" ref="hl62"><bounds x="4.32" y="13.329" width="2.739" height="3.341" /></element>
+		<element id="seg:Dart Double 11" ref="hl63"><bounds x="3" y="13.123" width="1.451" height="3.754" /></element>
+		<element id="seg:Dart Single 14" ref="hl64"><bounds x="8.244" y="11.895" width="5.045" height="2.805" /></element>
+		<element id="seg:Dart Triple 14" ref="hl65"><bounds x="7.059" y="11.35" width="1.847" height="2.58" /></element>
+		<element id="seg1:Dart Single 14" ref="hl66"><bounds x="4.451" y="10.151" width="3.385" height="3.591" /></element>
+		<element id="seg:Dart Double 14" ref="hl67"><bounds x="3.148" y="9.552" width="2.336" height="3.777" /></element>
+		<element id="seg:Dart Single 9" ref="hl68"><bounds x="8.906" y="10.163" width="4.737" height="3.965" /></element>
+		<element id="seg:Dart Triple 9" ref="hl69"><bounds x="7.836" y="9.315" width="2.327" height="2.58" /></element>
+		<element id="seg1:Dart Single 9" ref="hl70"><bounds x="5.484" y="7.448" width="3.831" height="3.902" /></element>
+		<element id="seg:Dart Double 9" ref="hl71"><bounds x="4.308" y="6.515" width="3.14" height="3.637" /></element>
+		<element id="seg:Dart Single 12" ref="hl72"><bounds x="10.163" y="8.906" width="3.965" height="4.737" /></element>
+		<element id="seg:Dart Triple 12" ref="hl73"><bounds x="9.315" y="7.836" width="2.58" height="2.327" /></element>
+		<element id="seg1:Dart Single 12" ref="hl74"><bounds x="7.448" y="5.484" width="3.902" height="3.831" /></element>
+		<element id="seg:Dart Double 12" ref="hl75"><bounds x="6.515" y="4.308" width="3.637" height="3.14" /></element>
+		<element id="seg:Dart Single 5" ref="hl76"><bounds x="11.895" y="8.244" width="2.805" height="5.045" /></element>
+		<element id="seg:Dart Triple 5" ref="hl77"><bounds x="11.35" y="7.059" width="2.58" height="1.847" /></element>
+		<element id="seg1:Dart Single 5" ref="hl78"><bounds x="10.151" y="4.451" width="3.591" height="3.385" /></element>
+		<element id="seg:Dart Double 5" ref="hl79"><bounds x="9.552" y="3.148" width="3.777" height="2.336" /></element>
+		<element id="seg:Dart Single Bull" ref="hl_bull"><bounds x="13.08" y="13.08" width="3.84" height="3.84" /></element>
+		<element id="seg:Dart Double Bull" ref="hl_bull"><bounds x="14.16" y="14.16" width="1.68" height="1.68" /></element>
+	</group>
+
+	<group name="dartboard">
+		<element id="board" ref="board"><bounds x="0" y="0" width="30" height="30" /></element>
+		<element ref="num20"><bounds x="13.9" y="0.6" width="2.2" height="1.8" /></element>
+		<element ref="num1"><bounds x="18.072" y="1.261" width="2.2" height="1.8" /></element>
+		<element ref="num18"><bounds x="21.835" y="3.178" width="2.2" height="1.8" /></element>
+		<element ref="num4"><bounds x="24.822" y="6.165" width="2.2" height="1.8" /></element>
+		<element ref="num13"><bounds x="26.739" y="9.928" width="2.2" height="1.8" /></element>
+		<element ref="num6"><bounds x="27.4" y="14.1" width="2.2" height="1.8" /></element>
+		<element ref="num10"><bounds x="26.739" y="18.272" width="2.2" height="1.8" /></element>
+		<element ref="num15"><bounds x="24.822" y="22.035" width="2.2" height="1.8" /></element>
+		<element ref="num2"><bounds x="21.835" y="25.022" width="2.2" height="1.8" /></element>
+		<element ref="num17"><bounds x="18.072" y="26.939" width="2.2" height="1.8" /></element>
+		<element ref="num3"><bounds x="13.9" y="27.6" width="2.2" height="1.8" /></element>
+		<element ref="num19"><bounds x="9.728" y="26.939" width="2.2" height="1.8" /></element>
+		<element ref="num7"><bounds x="5.965" y="25.022" width="2.2" height="1.8" /></element>
+		<element ref="num16"><bounds x="2.978" y="22.035" width="2.2" height="1.8" /></element>
+		<element ref="num8"><bounds x="1.061" y="18.272" width="2.2" height="1.8" /></element>
+		<element ref="num11"><bounds x="0.4" y="14.1" width="2.2" height="1.8" /></element>
+		<element ref="num14"><bounds x="1.061" y="9.928" width="2.2" height="1.8" /></element>
+		<element ref="num9"><bounds x="2.978" y="6.165" width="2.2" height="1.8" /></element>
+		<element ref="num12"><bounds x="5.965" y="3.178" width="2.2" height="1.8" /></element>
+		<element ref="num5"><bounds x="9.728" y="1.261" width="2.2" height="1.8" /></element>
+		<group ref="highlights"><color red="1" green="0.93" blue="0.2" alpha="0.75" /></group>
+	</group>
 
 	<view name="Dartboard" showpointers="yes">
 		<screen index="0"><bounds x="0" y="0" width="40" height="30" /></screen>
-		<element id="board" ref="board"><bounds x="41" y="0" width="30" height="30" /></element>
-		<element ref="num20"><bounds x="54.9" y="0.6" width="2.2" height="1.8" /></element>
-		<element ref="num1"><bounds x="59.072" y="1.261" width="2.2" height="1.8" /></element>
-		<element ref="num18"><bounds x="62.835" y="3.178" width="2.2" height="1.8" /></element>
-		<element ref="num4"><bounds x="65.822" y="6.165" width="2.2" height="1.8" /></element>
-		<element ref="num13"><bounds x="67.739" y="9.928" width="2.2" height="1.8" /></element>
-		<element ref="num6"><bounds x="68.4" y="14.1" width="2.2" height="1.8" /></element>
-		<element ref="num10"><bounds x="67.739" y="18.272" width="2.2" height="1.8" /></element>
-		<element ref="num15"><bounds x="65.822" y="22.035" width="2.2" height="1.8" /></element>
-		<element ref="num2"><bounds x="62.835" y="25.022" width="2.2" height="1.8" /></element>
-		<element ref="num17"><bounds x="59.072" y="26.939" width="2.2" height="1.8" /></element>
-		<element ref="num3"><bounds x="54.9" y="27.6" width="2.2" height="1.8" /></element>
-		<element ref="num19"><bounds x="50.728" y="26.939" width="2.2" height="1.8" /></element>
-		<element ref="num7"><bounds x="46.965" y="25.022" width="2.2" height="1.8" /></element>
-		<element ref="num16"><bounds x="43.978" y="22.035" width="2.2" height="1.8" /></element>
-		<element ref="num8"><bounds x="42.061" y="18.272" width="2.2" height="1.8" /></element>
-		<element ref="num11"><bounds x="41.4" y="14.1" width="2.2" height="1.8" /></element>
-		<element ref="num14"><bounds x="42.061" y="9.928" width="2.2" height="1.8" /></element>
-		<element ref="num9"><bounds x="43.978" y="6.165" width="2.2" height="1.8" /></element>
-		<element ref="num12"><bounds x="46.965" y="3.178" width="2.2" height="1.8" /></element>
-		<element ref="num5"><bounds x="50.728" y="1.261" width="2.2" height="1.8" /></element>
-		<element id="seg:Dart Single 20" ref="hl0"><bounds x="54.93" y="8.16" width="2.14" height="4.944" /></element>
-		<element id="seg:Dart Triple 20" ref="hl1"><bounds x="54.742" y="6.96" width="2.515" height="1.284" /></element>
-		<element id="seg1:Dart Single 20" ref="hl2"><bounds x="54.329" y="4.32" width="3.341" height="2.739" /></element>
-		<element id="seg:Dart Double 20" ref="hl3"><bounds x="54.123" y="3" width="3.754" height="1.451" /></element>
-		<element id="seg:Dart Single 1" ref="hl4"><bounds x="56.3" y="8.244" width="2.805" height="5.045" /></element>
-		<element id="seg:Dart Triple 1" ref="hl5"><bounds x="57.07" y="7.059" width="2.58" height="1.847" /></element>
-		<element id="seg1:Dart Single 1" ref="hl6"><bounds x="57.258" y="4.451" width="3.591" height="3.385" /></element>
-		<element id="seg:Dart Double 1" ref="hl7"><bounds x="57.671" y="3.148" width="3.777" height="2.336" /></element>
-		<element id="seg:Dart Single 18" ref="hl8"><bounds x="56.872" y="8.906" width="3.965" height="4.737" /></element>
-		<element id="seg:Dart Triple 18" ref="hl9"><bounds x="59.105" y="7.836" width="2.58" height="2.327" /></element>
-		<element id="seg1:Dart Single 18" ref="hl10"><bounds x="59.65" y="5.484" width="3.902" height="3.831" /></element>
-		<element id="seg:Dart Double 18" ref="hl11"><bounds x="60.849" y="4.308" width="3.637" height="3.14" /></element>
-		<element id="seg:Dart Single 4" ref="hl12"><bounds x="57.358" y="10.163" width="4.737" height="3.965" /></element>
-		<element id="seg:Dart Triple 4" ref="hl13"><bounds x="60.837" y="9.315" width="2.327" height="2.58" /></element>
-		<element id="seg1:Dart Single 4" ref="hl14"><bounds x="61.685" y="7.448" width="3.831" height="3.902" /></element>
-		<element id="seg:Dart Double 4" ref="hl15"><bounds x="63.552" y="6.515" width="3.14" height="3.637" /></element>
-		<element id="seg:Dart Single 13" ref="hl16"><bounds x="57.711" y="11.895" width="5.045" height="2.805" /></element>
-		<element id="seg:Dart Triple 13" ref="hl17"><bounds x="62.094" y="11.35" width="1.847" height="2.58" /></element>
-		<element id="seg1:Dart Single 13" ref="hl18"><bounds x="63.164" y="10.151" width="3.385" height="3.591" /></element>
-		<element id="seg:Dart Double 13" ref="hl19"><bounds x="65.516" y="9.552" width="2.336" height="3.777" /></element>
-		<element id="seg:Dart Single 6" ref="hl20"><bounds x="57.896" y="13.93" width="4.944" height="2.14" /></element>
-		<element id="seg:Dart Triple 6" ref="hl21"><bounds x="62.756" y="13.742" width="1.284" height="2.515" /></element>
-		<element id="seg1:Dart Single 6" ref="hl22"><bounds x="63.941" y="13.329" width="2.739" height="3.341" /></element>
-		<element id="seg:Dart Double 6" ref="hl23"><bounds x="66.549" y="13.123" width="1.451" height="3.754" /></element>
-		<element id="seg:Dart Single 10" ref="hl24"><bounds x="57.711" y="15.3" width="5.045" height="2.805" /></element>
-		<element id="seg:Dart Triple 10" ref="hl25"><bounds x="62.094" y="16.07" width="1.847" height="2.58" /></element>
-		<element id="seg1:Dart Single 10" ref="hl26"><bounds x="63.164" y="16.258" width="3.385" height="3.591" /></element>
-		<element id="seg:Dart Double 10" ref="hl27"><bounds x="65.516" y="16.671" width="2.336" height="3.777" /></element>
-		<element id="seg:Dart Single 15" ref="hl28"><bounds x="57.358" y="15.872" width="4.737" height="3.965" /></element>
-		<element id="seg:Dart Triple 15" ref="hl29"><bounds x="60.837" y="18.105" width="2.327" height="2.58" /></element>
-		<element id="seg1:Dart Single 15" ref="hl30"><bounds x="61.685" y="18.65" width="3.831" height="3.902" /></element>
-		<element id="seg:Dart Double 15" ref="hl31"><bounds x="63.552" y="19.849" width="3.14" height="3.637" /></element>
-		<element id="seg:Dart Single 2" ref="hl32"><bounds x="56.872" y="16.358" width="3.965" height="4.737" /></element>
-		<element id="seg:Dart Triple 2" ref="hl33"><bounds x="59.105" y="19.837" width="2.58" height="2.327" /></element>
-		<element id="seg1:Dart Single 2" ref="hl34"><bounds x="59.65" y="20.685" width="3.902" height="3.831" /></element>
-		<element id="seg:Dart Double 2" ref="hl35"><bounds x="60.849" y="22.552" width="3.637" height="3.14" /></element>
-		<element id="seg:Dart Single 17" ref="hl36"><bounds x="56.3" y="16.711" width="2.805" height="5.045" /></element>
-		<element id="seg:Dart Triple 17" ref="hl37"><bounds x="57.07" y="21.094" width="2.58" height="1.847" /></element>
-		<element id="seg1:Dart Single 17" ref="hl38"><bounds x="57.258" y="22.164" width="3.591" height="3.385" /></element>
-		<element id="seg:Dart Double 17" ref="hl39"><bounds x="57.671" y="24.516" width="3.777" height="2.336" /></element>
-		<element id="seg:Dart Single 3" ref="hl40"><bounds x="54.93" y="16.896" width="2.14" height="4.944" /></element>
-		<element id="seg:Dart Triple 3" ref="hl41"><bounds x="54.742" y="21.756" width="2.515" height="1.284" /></element>
-		<element id="seg1:Dart Single 3" ref="hl42"><bounds x="54.329" y="22.941" width="3.341" height="2.739" /></element>
-		<element id="seg:Dart Double 3" ref="hl43"><bounds x="54.123" y="25.549" width="3.754" height="1.451" /></element>
-		<element id="seg:Dart Single 19" ref="hl44"><bounds x="52.895" y="16.711" width="2.805" height="5.045" /></element>
-		<element id="seg:Dart Triple 19" ref="hl45"><bounds x="52.35" y="21.094" width="2.58" height="1.847" /></element>
-		<element id="seg1:Dart Single 19" ref="hl46"><bounds x="51.151" y="22.164" width="3.591" height="3.385" /></element>
-		<element id="seg:Dart Double 19" ref="hl47"><bounds x="50.552" y="24.516" width="3.777" height="2.336" /></element>
-		<element id="seg:Dart Single 7" ref="hl48"><bounds x="51.163" y="16.358" width="3.965" height="4.737" /></element>
-		<element id="seg:Dart Triple 7" ref="hl49"><bounds x="50.315" y="19.837" width="2.58" height="2.327" /></element>
-		<element id="seg1:Dart Single 7" ref="hl50"><bounds x="48.448" y="20.685" width="3.902" height="3.831" /></element>
-		<element id="seg:Dart Double 7" ref="hl51"><bounds x="47.515" y="22.552" width="3.637" height="3.14" /></element>
-		<element id="seg:Dart Single 16" ref="hl52"><bounds x="49.906" y="15.872" width="4.737" height="3.965" /></element>
-		<element id="seg:Dart Triple 16" ref="hl53"><bounds x="48.836" y="18.105" width="2.327" height="2.58" /></element>
-		<element id="seg1:Dart Single 16" ref="hl54"><bounds x="46.484" y="18.65" width="3.831" height="3.902" /></element>
-		<element id="seg:Dart Double 16" ref="hl55"><bounds x="45.308" y="19.849" width="3.14" height="3.637" /></element>
-		<element id="seg:Dart Single 8" ref="hl56"><bounds x="49.244" y="15.3" width="5.045" height="2.805" /></element>
-		<element id="seg:Dart Triple 8" ref="hl57"><bounds x="48.059" y="16.07" width="1.847" height="2.58" /></element>
-		<element id="seg1:Dart Single 8" ref="hl58"><bounds x="45.451" y="16.258" width="3.385" height="3.591" /></element>
-		<element id="seg:Dart Double 8" ref="hl59"><bounds x="44.148" y="16.671" width="2.336" height="3.777" /></element>
-		<element id="seg:Dart Single 11" ref="hl60"><bounds x="49.16" y="13.93" width="4.944" height="2.14" /></element>
-		<element id="seg:Dart Triple 11" ref="hl61"><bounds x="47.96" y="13.742" width="1.284" height="2.515" /></element>
-		<element id="seg1:Dart Single 11" ref="hl62"><bounds x="45.32" y="13.329" width="2.739" height="3.341" /></element>
-		<element id="seg:Dart Double 11" ref="hl63"><bounds x="44" y="13.123" width="1.451" height="3.754" /></element>
-		<element id="seg:Dart Single 14" ref="hl64"><bounds x="49.244" y="11.895" width="5.045" height="2.805" /></element>
-		<element id="seg:Dart Triple 14" ref="hl65"><bounds x="48.059" y="11.35" width="1.847" height="2.58" /></element>
-		<element id="seg1:Dart Single 14" ref="hl66"><bounds x="45.451" y="10.151" width="3.385" height="3.591" /></element>
-		<element id="seg:Dart Double 14" ref="hl67"><bounds x="44.148" y="9.552" width="2.336" height="3.777" /></element>
-		<element id="seg:Dart Single 9" ref="hl68"><bounds x="49.906" y="10.163" width="4.737" height="3.965" /></element>
-		<element id="seg:Dart Triple 9" ref="hl69"><bounds x="48.836" y="9.315" width="2.327" height="2.58" /></element>
-		<element id="seg1:Dart Single 9" ref="hl70"><bounds x="46.484" y="7.448" width="3.831" height="3.902" /></element>
-		<element id="seg:Dart Double 9" ref="hl71"><bounds x="45.308" y="6.515" width="3.14" height="3.637" /></element>
-		<element id="seg:Dart Single 12" ref="hl72"><bounds x="51.163" y="8.906" width="3.965" height="4.737" /></element>
-		<element id="seg:Dart Triple 12" ref="hl73"><bounds x="50.315" y="7.836" width="2.58" height="2.327" /></element>
-		<element id="seg1:Dart Single 12" ref="hl74"><bounds x="48.448" y="5.484" width="3.902" height="3.831" /></element>
-		<element id="seg:Dart Double 12" ref="hl75"><bounds x="47.515" y="4.308" width="3.637" height="3.14" /></element>
-		<element id="seg:Dart Single 5" ref="hl76"><bounds x="52.895" y="8.244" width="2.805" height="5.045" /></element>
-		<element id="seg:Dart Triple 5" ref="hl77"><bounds x="52.35" y="7.059" width="2.58" height="1.847" /></element>
-		<element id="seg1:Dart Single 5" ref="hl78"><bounds x="51.151" y="4.451" width="3.591" height="3.385" /></element>
-		<element id="seg:Dart Double 5" ref="hl79"><bounds x="50.552" y="3.148" width="3.777" height="2.336" /></element>
-		<element id="seg:Dart Single Bull" ref="hl_bull"><bounds x="54.08" y="13.08" width="3.84" height="3.84" /></element>
-		<element id="seg:Dart Double Bull" ref="hl_bullseye"><bounds x="55.16" y="14.16" width="1.68" height="1.68" /></element>
-
+		<group ref="dartboard"><bounds x="41" y="0" width="30" height="30" /></group>
 		<element id="warning" ref="warning"><bounds x="41" y="13.5" width="30" height="3" /></element>
 	</view>
 
