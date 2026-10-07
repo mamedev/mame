@@ -220,10 +220,12 @@ int i386_device::i386_limit_check(int seg, uint32_t offset, int size)
 {
 	if(PROTECTED_MODE && !V8086_MODE)
 	{
+		// Include every byte of the access without wrapping a 32-bit offset.
+		const uint64_t last = uint64_t(offset) + size - 1;
 		if((m_sreg[seg].flags & 0x0018) == 0x0010 && m_sreg[seg].flags & 0x0004) // if expand-down data segment
 		{
-			// compare if greater then 0xffffffff when we're passed the access size
-			if((offset <= m_sreg[seg].limit) || ((m_sreg[seg].d)?0:(offset > 0xffff)))
+			const uint32_t upper_limit = m_sreg[seg].d ? 0xffffffffU : 0xffffU;
+			if((offset <= m_sreg[seg].limit) || (last > upper_limit))
 			{
 				LOGMASKED(LOG_LIMIT_CHECK, "Limit check at 0x%08x failed. Segment %04x, limit %08x, offset %08x (expand-down)\n",m_pc,m_sreg[seg].selector,m_sreg[seg].limit,offset);
 				return 1;
@@ -231,7 +233,7 @@ int i386_device::i386_limit_check(int seg, uint32_t offset, int size)
 		}
 		else
 		{
-			if((offset + size - 1) > m_sreg[seg].limit)
+			if(last > m_sreg[seg].limit)
 			{
 				LOGMASKED(LOG_LIMIT_CHECK, "Limit check at 0x%08x failed. Segment %04x, limit %08x, offset %08x\n",m_pc,m_sreg[seg].selector,m_sreg[seg].limit,offset);
 				//machine().debug_break();

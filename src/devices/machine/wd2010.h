@@ -64,8 +64,6 @@ private:
 	void read_sector(uint8_t data);
 	void write_sector(uint8_t data);
 	void scan_id(uint8_t data);
-	void update_sdh(uint8_t new_sector_size, uint8_t new_head, uint16_t new_cylinder, uint8_t new_sectornr);
-	void auto_scan_id(uint8_t data);
 	void format(uint8_t data);
 
 	devcb_write_line    m_out_intrq_cb;

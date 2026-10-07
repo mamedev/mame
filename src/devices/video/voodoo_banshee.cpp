@@ -1567,9 +1567,9 @@ void voodoo_banshee_device::execute_blit(u32 data)
 			break;
 
 		case 1:         // Screen-to-screen blit
-			// TODO
 			if (LOG_BANSHEE_2D)
 				logerror("   blit_2d:screen_to_screen: src X %d, src Y %d\n", data & 0xfff, (data >> 16) & 0xfff);
+			screen_to_screen_blit(BIT(data, 0, 12), BIT(data, 16, 12));
 			break;
 
 		case 2:         // Screen-to-screen stretch blit
@@ -1638,6 +1638,91 @@ void voodoo_banshee_device::execute_blit(u32 data)
 		default:
 			fatalerror("%s: Unsupported 2D unknown command %d", tag(), m_blt_cmd);
 	}
+}
+
+
+//-------------------------------------------------
+//  screen_to_screen_blit -- copy a rectangle
+//  within the frame buffer memory
+//-------------------------------------------------
+
+void voodoo_banshee_device::screen_to_screen_blit(u32 srcx, u32 srcy)
+{
+	static u8 const s_format_bpp[16] = { 1,1,1,2,3,4,1,1,2,2,1,1,1,1,1,1 };
+
+	// the launch data gives the source corner, dstXY and dstSize the destination
+	u32 const cmd = m_2d_regs.read(banshee_2d_regs::command);
+	u32 const srcaddr = m_2d_regs.read(banshee_2d_regs::srcBaseAddr);
+	u32 const dstaddr = m_2d_regs.read(banshee_2d_regs::dstBaseAddr);
+	u32 const srcfmt = m_2d_regs.read(banshee_2d_regs::srcFormat);
+	u32 const dstfmt = m_2d_regs.read(banshee_2d_regs::dstFormat);
+	u32 const srcbase = BIT(srcaddr, 0, 24);
+	u32 const dstbase = BIT(dstaddr, 0, 24);
+
+	// a tiled surface (bit 31 of the base address) has its stride in 128-byte tiles; the 3D
+	// side stores tiled colour buffers linearly with that stride (see reg_colbufstride_w), so
+	// they are read linearly here too
+	u32 const srcstride = BIT(srcaddr, 31) ? BIT(srcfmt, 0, 7) * 128 : BIT(srcfmt, 0, 14);
+	u32 const dststride = BIT(dstaddr, 31) ? BIT(dstfmt, 0, 7) * 128 : BIT(dstfmt, 0, 14);
+	u32 const bpp = s_format_bpp[BIT(dstfmt, 16, 3)];
+	s32 const width = m_blt_dst_width;
+	s32 const height = m_blt_dst_height;
+	u8 const rop = BIT(cmd, 24, 8);
+	if (s_format_bpp[BIT(srcfmt, 16, 4)] != bpp || width <= 0 || height <= 0)
+	{
+		logerror("%s: Unsupported blit_2d:screen_to_screen: src format %08X, dst format %08X, %dx%d\n", tag(), srcfmt, dstfmt, width, height);
+		return;
+	}
+	m_renderer->wait("screen_to_screen_blit");
+
+	// with a negative direction the coordinates give the right/bottom edge
+	s32 const dx = BIT(cmd, 14) ? -1 : 1;
+	s32 const dy = BIT(cmd, 15) ? -1 : 1;
+	s32 const srcx0 = (dx > 0) ? s32(srcx) : (s32(srcx) - width + 1);
+	s32 const srcy0 = (dy > 0) ? s32(srcy) : (s32(srcy) - height + 1);
+	s32 const dstx0 = (dx > 0) ? s32(m_blt_dst_x) : (s32(m_blt_dst_x) - width + 1);
+	s32 const dsty0 = (dy > 0) ? s32(m_blt_dst_y) : (s32(m_blt_dst_y) - height + 1);
+
+	// clip the destination to clip0 or clip1, moving the source corner with it
+	u32 const clipmin = m_2d_regs.read(BIT(cmd, 23) ? banshee_2d_regs::clip1Min : banshee_2d_regs::clip0Min);
+	u32 const clipmax = m_2d_regs.read(BIT(cmd, 23) ? banshee_2d_regs::clip1Max : banshee_2d_regs::clip0Max);
+	s32 const x0 = std::max<s32>(dstx0, BIT(clipmin, 0, 12)), x1 = std::min<s32>(dstx0 + width, BIT(clipmax, 0, 12));
+	s32 const y0 = std::max<s32>(dsty0, BIT(clipmin, 16, 12)), y1 = std::min<s32>(dsty0 + height, BIT(clipmax, 16, 12));
+	s32 const sx = srcx0 + (x0 - dstx0), sy = srcy0 + (y0 - dsty0);
+	s32 const span = (x1 - x0) * bpp;
+
+	// ROP3 of source and destination, a byte at a time; the pattern is taken as 0
+	u8 const r0 = BIT(rop, 0) ? 0xff : 0, r1 = BIT(rop, 1) ? 0xff : 0;
+	u8 const r2 = BIT(rop, 2) ? 0xff : 0, r3 = BIT(rop, 3) ? 0xff : 0;
+
+	// rows (and bytes) go in the direction the command gives, as on the hardware, so that
+	// overlapping rectangles copy correctly without a temporary buffer
+	s64 const fbsize = s64(m_fbmask) + 1;
+	for (s32 i = 0; i < y1 - y0 && span > 0; i++)
+	{
+		s32 const row = (dy > 0) ? i : (y1 - y0 - 1 - i);
+		s64 const srcrow = s64(srcbase) + s64(sy + row) * srcstride + s64(sx) * bpp;
+		s64 const dstrow = s64(dstbase) + s64(y0 + row) * dststride + s64(x0) * bpp;
+		if (srcrow < 0 || dstrow < 0 || srcrow + span > fbsize || dstrow + span > fbsize)
+			continue;
+		u8 const *const s = &m_fbram[srcrow];
+		u8 *const d = &m_fbram[dstrow];
+		if (rop == 0xcc)
+			memmove(d, s, span);
+		else
+			for (s32 b = 0; b < span; b++)
+			{
+				s32 const k = (dx > 0) ? b : (span - 1 - b);
+				u8 const src = s[k], dst = d[k];
+				d[k] = (~src & ~dst & r0) | (~src & dst & r1) | (src & ~dst & r2) | (src & dst & r3);
+			}
+	}
+
+	// advance dstXY after the command, as a line-by-line copy needs
+	if (BIT(cmd, 10))
+		m_blt_dst_x += width * dx;
+	if (BIT(cmd, 11))
+		m_blt_dst_y += height * dy;
 }
 
 

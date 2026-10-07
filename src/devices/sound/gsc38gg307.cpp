@@ -69,7 +69,7 @@ gsc38gg307_device::~gsc38gg307_device()
 void gsc38gg307_device::device_start()
 {
 	m_audio_es = std::make_unique<uint8_t []>(AUDIO_BUFFER_SIZE);
-	m_audio = std::make_unique<mpeg_audio>(m_audio_es.get(), mpeg_audio::L2, false, 0);
+	m_audio = std::make_unique<mpeg_audio>(m_audio_es.get(), mpeg_audio::L1 | mpeg_audio::L2, false, 0);
 
 	m_stream = stream_alloc(0, 2, 44100);
 	m_audio_timer = timer_alloc(FUNC(gsc38gg307_device::audio_tick), this);
@@ -100,6 +100,12 @@ void gsc38gg307_device::device_reset()
 	m_fma_status = 0;
 	m_fma_stream = 0;
 	m_fma_dspa = 0;
+	m_fma_dsp_cvr = 0;
+	m_fma_atten_index = std::size(m_fma_atten);
+	m_fma_atten[0] = 0x00;
+	m_fma_atten[1] = 0x80;
+	m_fma_atten[2] = 0x80;
+	m_fma_atten[3] = 0x00;
 	m_fma_dclkl_latch = 0;
 	m_fma_audio_header = 0;
 	m_pending_fma_stream_change = false;
@@ -199,29 +205,35 @@ void gsc38gg307_device::audio_es_write(const uint8_t *data, size_t length)
 
 void gsc38gg307_device::audio_decode_pending()
 {
-	// layer II bit rates in kbit/s and sample rates in Hz
-	static constexpr int BITRATES[16] = { 0, 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 0 };
+	// layer I and layer II bit rates in kbit/s and sample rates in Hz
+	static constexpr int BITRATES_L1[16] = { 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0 };
+	static constexpr int BITRATES_L2[16] = { 0, 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 0 };
 	static constexpr int SAMPLE_RATES[4] = { 44100, 48000, 32000, 0 };
 
 	// keep roughly a quarter second of samples queued
 	while (audio_available() < 44100 / 4 && audio_es_available() >= 4)
 	{
-		// Find an MPEG-1 layer II frame header on a byte boundary.  The frame
-		// length is 144 * bitrate / sample rate plus the padding byte, and
-		// the next frame starts there whatever the decoder read of this one.
+		// Find an MPEG-1 layer I or layer II frame header on a byte boundary.
+		// The frame length is 12 * bitrate / sample rate four byte slots for
+		// layer I, 144 * bitrate / sample rate bytes for layer II, plus the
+		// padding slot, and the next frame starts there whatever the decoder
+		// read of this one.
 		const uint8_t *const header = &m_audio_es[m_audio_es_head];
-		const int bitrate = BITRATES[header[2] >> 4];
+		const bool layer1 = BIT(header[1], 1);
+		const int bitrate = (layer1 ? BITRATES_L1 : BITRATES_L2)[header[2] >> 4];
 		const int sample_rate = SAMPLE_RATES[(header[2] >> 2) & 3];
 		const bool mono = (header[3] >> 6) == 3;
-		// the decoder has no parameters for these combinations
-		const bool allowed = mono ? (bitrate <= 192) : (bitrate != 32 && bitrate != 48 && bitrate != 56 && bitrate != 80);
-		if (header[0] != 0xff || (header[1] & 0xfe) != 0xfc || !bitrate || !sample_rate || !allowed)
+		// the layer II decoder has no parameters for these combinations
+		const bool allowed = layer1 || (mono ? (bitrate <= 192) : (bitrate != 32 && bitrate != 48 && bitrate != 56 && bitrate != 80));
+		if (header[0] != 0xff || (header[1] & 0xfc) != 0xfc || !bitrate || !sample_rate || !allowed)
 		{
 			m_audio_es_head++;
 			continue;
 		}
 
-		const size_t frame_bytes = size_t(144000) * bitrate / sample_rate + BIT(header[2], 1);
+		const size_t frame_bytes = layer1
+				? (size_t(12000) * bitrate / sample_rate + BIT(header[2], 1)) * 4
+				: size_t(144000) * bitrate / sample_rate + BIT(header[2], 1);
 		if (audio_es_available() < frame_bytes)
 			break;
 
@@ -310,6 +322,11 @@ void gsc38gg307_device::sound_stream_update(sound_stream &stream)
 {
 	const int samples = stream.samples();
 
+	const float r2r = atten_gain(0);
+	const float l2r = atten_gain(1);
+	const float r2l = atten_gain(2);
+	const float l2l = atten_gain(3);
+
 	for (int i = 0; i < samples; i++)
 	{
 		int16_t l = 0, r = 0;
@@ -319,8 +336,8 @@ void gsc38gg307_device::sound_stream_update(sound_stream &stream)
 			r = m_audio_samples[1][m_audio_head];
 			m_audio_head++;
 		}
-		stream.put_int(0, i, l, 32768);
-		stream.put_int(1, i, r, 32768);
+		stream.put(0, i, (l * l2l + r * r2l) / 32768.0f);
+		stream.put(1, i, (l * l2r + r * r2r) / 32768.0f);
 	}
 
 	// drop the consumed prefix now and then so the vectors do not grow forever
@@ -330,6 +347,41 @@ void gsc38gg307_device::sound_stream_update(sound_stream &stream)
 			chan.erase(chan.begin(), chan.begin() + m_audio_head);
 		m_audio_head = 0;
 	}
+}
+
+void gsc38gg307_device::dsp_w(uint8_t data)
+{
+	switch (m_fma_dspa)
+	{
+	case 1: // CVR
+		m_fma_dsp_cvr = data;
+		if (data == 0x93)
+			m_fma_atten_index = 0;
+		break;
+
+	case 7: // TXL
+		if (m_fma_dsp_cvr == 0x93 && m_fma_atten_index < std::size(m_fma_atten))
+		{
+			m_stream->update();
+			m_fma_atten[m_fma_atten_index++] = data;
+			LOGMASKED(LOG_FMA, "FMA attenuation %02x %02x %02x %02x\n",
+					m_fma_atten[0], m_fma_atten[1], m_fma_atten[2], m_fma_atten[3]);
+		}
+		break;
+
+	default:
+		break;
+	}
+}
+
+float gsc38gg307_device::atten_gain(int index) const
+{
+	const uint8_t atten = m_fma_atten[index];
+	if (BIT(atten, 7))
+	{
+		return 0.0f;
+	}
+	return powf(10.0f, -(atten & 0x7f) / 20.0f);
 }
 
 //**************************************************************************
@@ -467,7 +519,7 @@ void gsc38gg307_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		break;
 
 	case 0x12:
-		// DSP56001 data port, used for the attenuation ramp
+		dsp_w(uint8_t(data));
 		break;
 	default:
 		break;

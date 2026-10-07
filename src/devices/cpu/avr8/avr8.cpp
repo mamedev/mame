@@ -510,11 +510,11 @@ enum
 DEFINE_DEVICE_TYPE(ATMEGA88,   atmega88_device,   "atmega88",   "Atmel ATmega88")
 DEFINE_DEVICE_TYPE(ATMEGA168,  atmega168_device,  "atmega168",  "Atmel ATmega168")
 DEFINE_DEVICE_TYPE(ATMEGA328,  atmega328_device,  "atmega328",  "Atmel ATmega328")
+DEFINE_DEVICE_TYPE(ATMEGA32U4, atmega32u4_device, "atmega32u4", "Atmel ATmega32U4")
 DEFINE_DEVICE_TYPE(ATMEGA644,  atmega644_device,  "atmega644",  "Atmel ATmega644")
 DEFINE_DEVICE_TYPE(ATMEGA1284, atmega1284_device, "atmega1284", "Atmel ATmega1284")
 DEFINE_DEVICE_TYPE(ATMEGA1280, atmega1280_device, "atmega1280", "Atmel ATmega1280")
 DEFINE_DEVICE_TYPE(ATMEGA2560, atmega2560_device, "atmega2560", "Atmel ATmega2560")
-DEFINE_DEVICE_TYPE(ATTINY15,   attiny15_device,   "attiny15",   "Atmel ATtiny15")
 
 //**************************************************************************
 //  INTERNAL ADDRESS MAP
@@ -656,6 +656,14 @@ void atmega328_device::atmega328_internal_map(address_map &map)
 	avr8_device::base_internal_map(map);
 }
 
+void atmega32u4_device::atmega32u4_internal_map(address_map &map)
+{
+	avr8_device::base_internal_map(map);
+
+	// fake USB PLL lock so that code that reads it is satisfied
+	map(0x0049, 0x0049).lr8(NAME([this] { return m_r[0x49] | 1; }));
+}
+
 void atmega644_device::atmega644_internal_map(address_map &map)
 {
 	avr8_device::base_internal_map(map);
@@ -704,10 +712,6 @@ void atmega2560_device::atmega2560_internal_map(address_map &map)
 	map(0x0121, 0x0121).w(FUNC(atmega2560_device::tccr5b_w));
 }
 
-void attiny15_device::attiny15_internal_map(address_map &map)
-{
-	avr8_device::base_internal_map(map);
-}
 
 //-------------------------------------------------
 //  atmega88_device - constructor
@@ -748,6 +752,16 @@ atmega328_device::atmega328_device(const machine_config &mconfig, const char *ta
 }
 
 //-------------------------------------------------
+//  atmega32u4_device - constructor
+//-------------------------------------------------
+
+atmega32u4_device::atmega32u4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: avr8_device<4>(mconfig, tag, owner, clock, ATMEGA32U4, 0x3fff, address_map_constructor(FUNC(atmega32u4_device::atmega32u4_internal_map), this))
+{
+}
+
+
+//-------------------------------------------------
 //  atmega644_device - constructor
 //-------------------------------------------------
 
@@ -780,15 +794,6 @@ atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *
 
 atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: avr8_device<6>(mconfig, tag, owner, clock, ATMEGA2560, 0x1ffff, address_map_constructor(FUNC(atmega2560_device::atmega2560_internal_map), this))
-{
-}
-
-//-------------------------------------------------
-//  attiny15_device - constructor
-//-------------------------------------------------
-
-attiny15_device::attiny15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<2>(mconfig, tag, owner, clock, ATTINY15, 0x01ff, address_map_constructor(FUNC(attiny15_device::attiny15_internal_map), this))
 {
 }
 
@@ -1199,6 +1204,8 @@ void avr8_base_device::device_reset()
 template <int NumTimers>
 void avr8_device<NumTimers>::device_reset()
 {
+	avr8_base_device::device_reset();
+
 	m_adc_sample = 0;
 	m_adc_result = 0;
 	m_adc_data = 0;
@@ -1399,6 +1406,49 @@ void atmega328_device::update_interrupt(int source)
 }
 
 bool atmega328_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const
+{
+	switch (port)
+	{
+	case GPIOB: pcmsk_reg = PCMSK0; group = 0; return true;
+	case GPIOC: pcmsk_reg = PCMSK1; group = 1; return true;
+	case GPIOD: pcmsk_reg = PCMSK2; group = 2; return true;
+	default: return false;
+	}
+}
+
+
+const avr8_base_device::interrupt_condition avr8_base_device::s_mega32u4_int_conditions[avr8_base_device::INTIDX_COUNT] =
+{
+	{ ATMEGA32U4_INT_SPI_STC, SPCR,   SPCR_SPIE_MASK,     SPSR,    SPSR_SPIF_MASK },
+	{ ATMEGA32U4_INT_T0COMPB, TIMSK0, TIMSK0_OCIE0B_MASK, TIFR0,   TIFR0_OCF0B_MASK },
+	{ ATMEGA32U4_INT_T0COMPA, TIMSK0, TIMSK0_OCIE0A_MASK, TIFR0,   TIFR0_OCF0A_MASK },
+	{ ATMEGA32U4_INT_T0OVF,   TIMSK0, TIMSK0_TOIE0_MASK,  TIFR0,   TIFR0_TOV0_MASK },
+	{ ATMEGA32U4_INT_T1CAPT,  TIMSK1, TIMSK1_ICIE1_MASK,  TIFR1,   TIFR1_ICF1_MASK },
+	{ ATMEGA32U4_INT_T1COMPB, TIMSK1, TIMSK1_OCIE1B_MASK, TIFR1,   TIFR1_OCF1B_MASK },
+	{ ATMEGA32U4_INT_T1COMPA, TIMSK1, TIMSK1_OCIE1A_MASK, TIFR1,   TIFR1_OCF1A_MASK },
+	{ ATMEGA32U4_INT_T1OVF,   TIMSK1, TIMSK1_TOIE1_MASK,  TIFR1,   TIFR1_TOV1_MASK },
+	{ ATMEGA32U4_INT_PCINT0,  PCICR,  PCICR_PCIE0_MASK,   PCIFR,   PCIFR_PCIF0_MASK },
+	{ ATMEGA32U4_INT_INT0,    EIMSK,  EIMSK_INT0_MASK,    EIFR,    EIFR_INTF0_MASK },
+	{ ATMEGA32U4_INT_INT1,    EIMSK,  EIMSK_INT1_MASK,    EIFR,    EIFR_INTF1_MASK }
+};
+
+void atmega32u4_device::update_interrupt(int source)
+{
+	const interrupt_condition &condition = s_mega32u4_int_conditions[source];
+
+	int intstate = 0;
+	if (m_r[condition.m_intreg] & condition.m_intmask)
+		intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
+
+	set_irq_line(condition.m_intindex << 1, intstate);
+
+	if (intstate)
+	{
+		m_r[condition.m_regindex] &= ~condition.m_regmask;
+	}
+}
+
+bool atmega32u4_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group) const
 {
 	switch (port)
 	{
@@ -1654,8 +1704,30 @@ void avr8_device<NumTimers>::timer0_tick_ctc_set()
 template <int NumTimers>
 void avr8_device<NumTimers>::timer0_tick_fast_pwm()
 {
-	LOGMASKED(LOG_TIMER0 | LOG_UNKNOWN, "%s: WGM02_FAST_PWM: Unimplemented timer0 waveform generation mode\n", machine().describe_context());
-	m_r[TCNT0]++;
+	// FIXME: OC0x values are supposed to be latched when TCNT0 is zero.
+	if (m_r[TCNT0] == m_r[OCR0A] - 1)
+	{
+		// TODO: set 0C0A
+	}
+	else if (m_r[TCNT0] == m_r[OCR0B] - 1)
+	{
+		// TODO: set 0C0B
+	}
+
+	if (m_r[TCNT0] == 0xff)
+	{
+		m_r[TIFR0] |= TIFR0_TOV0_MASK;
+		update_interrupt(INTIDX_TOV0);
+
+		m_r[TCNT0] = 0;
+
+		// TODO: clear both OC0x values here
+	}
+	else
+	{
+		m_r[TCNT0]++;
+	}
+
 	m_timer_prescale_count[0] -= m_timer_prescale[0];
 }
 
@@ -3717,6 +3789,7 @@ void avr8_device<NumTimers>::execute_run()
 	{
 		if (m_sleeping)
 		{
+			debugger_wait_hook();
 			m_opcycles = 1;
 		}
 		else

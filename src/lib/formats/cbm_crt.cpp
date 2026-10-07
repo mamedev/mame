@@ -98,7 +98,7 @@ static char const *const CRT_C64_SLOT_NAMES[_CRT_C64_COUNT] =
 	"rex_ep256",        // 27 - Rex EP256
 	"mikroasm",         // 28 - Mikro Assembler
 	UNSUPPORTED,        // 29 - Final Cartridge Plus
-	UNSUPPORTED,        // 30 - Action Replay 4
+	"ar4x",             // 30 - Action Replay 4
 	"stardos",          // 31 - Stardos
 	"easyflash",        // 32 - EasyFlash
 	UNSUPPORTED,        // 33 - EasyFlash Xbank
@@ -122,8 +122,40 @@ static char const *const CRT_C64_SLOT_NAMES[_CRT_C64_COUNT] =
 	"mach5",            // 51 - MACH 5
 	UNSUPPORTED,        // 52 - Diashow-Maker
 	"pagefox",          // 53 - Pagefox
-	UNSUPPORTED,        // 54 - ?
-	"silverrock"        // 55 - Silverrock
+	"kingsoft",         // 54 - Kingsoft
+	"silverrock",       // 55 - Silverrock
+	UNSUPPORTED,        // 56 - Formel 64
+	UNSUPPORTED,        // 57 - RGCD
+	UNSUPPORTED,        // 58 - RR-Net MK3
+	"easycalcres",      // 59 - Easy Calc Result
+	UNSUPPORTED,        // 60 - GMod2
+	UNSUPPORTED,        // 61 - MAX Basic
+	UNSUPPORTED,        // 62 - GMod3
+	UNSUPPORTED,        // 63 - ZIPP-CODE 48
+	UNSUPPORTED,        // 64 - Blackbox V8
+	UNSUPPORTED,        // 65 - Blackbox V3
+	UNSUPPORTED,        // 66 - Blackbox V4
+	UNSUPPORTED,        // 67 - REX RAM-Floppy
+	UNSUPPORTED,        // 68 - BIS-Plus
+	UNSUPPORTED,        // 69 - SD-BOX
+	UNSUPPORTED,        // 70 - MultiMAX
+	UNSUPPORTED,        // 71 - Blackbox V9
+	UNSUPPORTED,        // 72 - Lt. Kernal Host Adaptor
+	UNSUPPORTED,        // 73 - RAMLink
+	UNSUPPORTED,        // 74 - Drean
+	UNSUPPORTED,        // 75 - IEEE Flash! 64
+	UNSUPPORTED,        // 76 - HES Turtle Graphics II
+	UNSUPPORTED,        // 77 - Freeze Frame MK2
+	"partner",          // 78 - Partner 64
+	UNSUPPORTED,        // 79 - Hyper-BASIC
+	UNSUPPORTED,        // 80 - Universal Cartridge 1
+	UNSUPPORTED,        // 81 - Universal Cartridge 1.5
+	UNSUPPORTED,        // 82 - Universal Cartridge 2
+	UNSUPPORTED,        // 83 - BMP Data Turbo 2000
+	UNSUPPORTED,        // 84 - Profi-DOS
+	UNSUPPORTED,        // 85 - Magic Desk 16K
+	UNSUPPORTED,        // 86 - PTV Megabyter
+	UNSUPPORTED         // 87 - Magic Desk Plus
 };
 
 
@@ -257,9 +289,12 @@ bool cbm_crt_read_data(util::random_read &file, uint8_t *roml, uint8_t *romh)
 		case 0x8000: std::tie(err, actual) = read(file, roml + roml_offset, size); roml_offset += size; break;
 		case 0xa000: std::tie(err, actual) = read(file, romh + romh_offset, size); romh_offset += size; break;
 		case 0xe000: std::tie(err, actual) = read(file, romh + romh_offset, size); romh_offset += size; break;
-		// FIXME: surely one needs to report an error or skip over the data if the load address is not recognised?
+		default:
+			if (file.seek(size, SEEK_CUR))
+				return false;
+			continue;
 		}
-		if (err) // TODO: check size - all bets are off if the address isn't recognised anyway
+		if (err || (actual != size))
 			return false;
 	}
 

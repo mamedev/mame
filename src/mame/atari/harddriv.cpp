@@ -1653,7 +1653,7 @@ void harddriv_state::dsk(machine_config &config)
 	EEPROM_2816(config, m_dsk_30c); // MK48Z02
 
 	/* ASIC65 */
-	ASIC65(config, m_asic65, ASIC65_STANDARD);
+	ASIC65(config, m_asic65, 20'000'000, ASIC65_STANDARD);
 }
 
 
@@ -1666,7 +1666,7 @@ void harddriv_state::dsk2(machine_config &config)
 	m_dsp32->set_addrmap(AS_PROGRAM, &harddriv_state::dsk2_dsp32_map);
 
 	/* ASIC65 */
-	ASIC65(config, m_asic65, ASIC65_STANDARD);
+	ASIC65(config, m_asic65, 20'000'000, ASIC65_STANDARD);
 }
 
 
@@ -1933,7 +1933,7 @@ void steeltal_board_device_state::device_add_mconfig(machine_config &config) //t
 	config.device_remove("rdac");
 	config.device_remove("speaker");
 
-	ASIC65(config, m_asic65, ASIC65_STEELTAL);         /* ASIC65 on DSPCOM board */
+	ASIC65(config, m_asic65, 20'000'000, ASIC65_STEELTAL);         /* ASIC65 on DSPCOM board */
 
 	/* sund hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1941,6 +1941,7 @@ void steeltal_board_device_state::device_add_mconfig(machine_config &config) //t
 	ATARI_JSA_III(config, m_jsa);
 	m_jsa->main_int_cb().set(FUNC(harddriv_state::sound_int_write_line));
 	m_jsa->test_read_cb().set_ioport("IN0").bit(5);
+	downcast<atari_jsa_iii_device &>(*m_jsa).set_oki_bankregion("jsa:oki");
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -4375,7 +4376,7 @@ ROM_START( steeltal )
 	ROM_LOAD16_BYTE( "136087-1018.2t",  0x000000, 0x020000, CRC(a5882384) SHA1(157707b5b114fa584893dec07dc456d4a5520f44) )
 	ROM_LOAD16_BYTE( "136087-1017.2lm", 0x000001, 0x020000, CRC(0a29db30) SHA1(f11ad7fe27989ffd66e9bef2c14ec040a4125d8a) )
 
-	ROM_REGION( 0x80000, "mainpcb:jsa:oki1", 0 )
+	ROM_REGION( 0x80000, "mainpcb:jsa:oki", 0 )
 	ROM_LOAD( "136087-5002.1m",  0x000000, 0x020000, CRC(c904db9c) SHA1(d25fff3da87d2b716cd65fb7dd157c3f1f5e5909) )
 	ROM_LOAD( "136087-5003.1n",  0x020000, 0x020000, CRC(164580b3) SHA1(03118c8323d8a49a65addc61c1402d152d42d7f9) )
 	ROM_LOAD( "136087-5004.1p",  0x040000, 0x020000, CRC(296290a0) SHA1(8a3441a5618233f561531fe456e1f5ed22183421) )
@@ -4438,7 +4439,7 @@ ROM_START( steeltalg )
 	ROM_LOAD16_BYTE( "136087-1018.2t",  0x000000, 0x020000, CRC(a5882384) SHA1(157707b5b114fa584893dec07dc456d4a5520f44) )
 	ROM_LOAD16_BYTE( "136087-1017.2lm", 0x000001, 0x020000, CRC(0a29db30) SHA1(f11ad7fe27989ffd66e9bef2c14ec040a4125d8a) )
 
-	ROM_REGION( 0x80000, "mainpcb:jsa:oki1", 0 )
+	ROM_REGION( 0x80000, "mainpcb:jsa:oki", 0 )
 	ROM_LOAD( "136087-5002.1m",  0x000000, 0x020000, CRC(c904db9c) SHA1(d25fff3da87d2b716cd65fb7dd157c3f1f5e5909) )
 	ROM_LOAD( "136087-5003.1n",  0x020000, 0x020000, CRC(164580b3) SHA1(03118c8323d8a49a65addc61c1402d152d42d7f9) )
 	ROM_LOAD( "136087-5004.1p",  0x040000, 0x020000, CRC(296290a0) SHA1(8a3441a5618233f561531fe456e1f5ed22183421) )
@@ -4501,7 +4502,7 @@ ROM_START( steeltal1 )
 	ROM_LOAD16_BYTE( "136087-1018.2t",  0x000000, 0x020000, CRC(a5882384) SHA1(157707b5b114fa584893dec07dc456d4a5520f44) )
 	ROM_LOAD16_BYTE( "136087-1017.2lm", 0x000001, 0x020000, CRC(0a29db30) SHA1(f11ad7fe27989ffd66e9bef2c14ec040a4125d8a) )
 
-	ROM_REGION( 0x80000, "mainpcb:jsa:oki1", 0 )
+	ROM_REGION( 0x80000, "mainpcb:jsa:oki", 0 )
 	ROM_LOAD( "136087-5002.1m",  0x000000, 0x020000, CRC(c904db9c) SHA1(d25fff3da87d2b716cd65fb7dd157c3f1f5e5909) )
 	ROM_LOAD( "136087-5003.1n",  0x020000, 0x020000, CRC(164580b3) SHA1(03118c8323d8a49a65addc61c1402d152d42d7f9) )
 	ROM_LOAD( "136087-5004.1p",  0x040000, 0x020000, CRC(296290a0) SHA1(8a3441a5618233f561531fe456e1f5ed22183421) )
@@ -4564,7 +4565,7 @@ ROM_START( steeltalp )
 	ROM_LOAD16_BYTE( "rom.2t",  0x00000, 0x20000, CRC(05284504) SHA1(03b81c077f8ff073713f4bcc10b82087743b0d84) )
 	ROM_LOAD16_BYTE( "rom.2lm", 0x00001, 0x20000, CRC(d6e65b87) SHA1(ac4b2f292f6e28a15e3a12f09f6c2f9523e8b178) )
 
-	ROM_REGION( 0x80000, "mainpcb:jsa:oki1", 0 )
+	ROM_REGION( 0x80000, "mainpcb:jsa:oki", 0 )
 	ROM_LOAD( "136087-5002.1m",  0x000000, 0x020000, CRC(c904db9c) SHA1(d25fff3da87d2b716cd65fb7dd157c3f1f5e5909) )
 	ROM_LOAD( "136087-5003.1n",  0x020000, 0x020000, CRC(164580b3) SHA1(03118c8323d8a49a65addc61c1402d152d42d7f9) )
 	ROM_LOAD( "136087-5004.1p",  0x040000, 0x020000, CRC(296290a0) SHA1(8a3441a5618233f561531fe456e1f5ed22183421) )

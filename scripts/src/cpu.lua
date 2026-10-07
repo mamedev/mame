@@ -186,6 +186,9 @@ if CPUS["ARM7"] then
 		MAME_DIR .. "src/devices/cpu/arm7/arm7help.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7tdrc.hxx",
 		MAME_DIR .. "src/devices/cpu/arm7/cecalls.hxx",
+		MAME_DIR .. "src/devices/cpu/arm7/arm1176.hxx",
+		MAME_DIR .. "src/devices/cpu/arm7/arm1176vfp.hxx",
+		MAME_DIR .. "src/devices/cpu/arm7/arm7v6.hxx",
 	}
 end
 
@@ -329,6 +332,27 @@ end
 if opt_tool(CPUS, "DSP32C") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp32/dsp32dis.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp32/dsp32dis.h")
+end
+
+--------------------------------------------------
+-- AT&T DSP3210
+--@src/devices/cpu/dsp32/dsp3210.h,CPUS["DSP3210"] = true
+--------------------------------------------------
+
+if CPUS["DSP3210"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/dsp32/dsp3210.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp32/dsp3210.h",
+		MAME_DIR .. "src/devices/cpu/dsp32/dsp3210dau.h",
+		MAME_DIR .. "src/devices/cpu/dsp32/dsp3210dau.hxx",
+		MAME_DIR .. "src/devices/cpu/dsp32/dsp3210ops.hxx",
+		MAME_DIR .. "src/devices/cpu/dsp32/dsp3210tbl.hxx",
+	}
+end
+
+if opt_tool(CPUS, "DSP3210") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp32/dsp3210dis.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp32/dsp3210dis.h")
 end
 
 --------------------------------------------------
@@ -1683,6 +1707,8 @@ if CPUS["MIPS3"] then
 		MAME_DIR .. "src/devices/cpu/mips/o2dprintf.hxx",
 		MAME_DIR .. "src/devices/cpu/mips/ps2vu.cpp",
 		MAME_DIR .. "src/devices/cpu/mips/ps2vu.h",
+		MAME_DIR .. "src/devices/cpu/mips/ps2vufloat.h",
+		MAME_DIR .. "src/devices/cpu/mips/ps2vupipeline.h",
 		MAME_DIR .. "src/devices/cpu/mips/ps2vif1.cpp",
 		MAME_DIR .. "src/devices/cpu/mips/ps2vif1.h",
 		MAME_DIR .. "src/devices/cpu/mips/r4000.cpp",
@@ -2794,6 +2820,23 @@ end
 if opt_tool(CPUS, "AVR8") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/avr8/avr8dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/avr8/avr8dasm.h")
+end
+
+--------------------------------------------------
+-- Toshiba T6M53 ASIC
+--@src/devices/cpu/t6m53/t6m53.h,CPUS["T6M53"] = true
+--------------------------------------------------
+
+if CPUS["T6M53"] then
+    files {
+        MAME_DIR .. "src/devices/cpu/t6m53/t6m53.cpp",
+        MAME_DIR .. "src/devices/cpu/t6m53/t6m53.h",
+    }
+end
+
+if opt_tool(CPUS, "T6M53") then
+    table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.cpp")
+    table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.h")
 end
 
 --------------------------------------------------

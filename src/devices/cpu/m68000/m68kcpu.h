@@ -1105,6 +1105,8 @@ inline void m68ki_set_s_flag(u32 value)
 	REG_SP() = REG_SP_BASE()[m_s_flag | ((m_s_flag>>1) & m_m_flag)];
 	if ((old_s_flag ^ m_s_flag) & SFLAG_SET)
 	{
+	  // The prefetched word was fetched with the old mode's function code
+		m_pref_addr = ~0;
 		debugger_privilege_hook();
 	}
 }
@@ -1124,6 +1126,8 @@ inline void m68ki_set_sm_flag(u32 value)
 	REG_SP() = REG_SP_BASE()[m_s_flag | ((m_s_flag>>1) & m_m_flag)];
 	if ((old_s_flag ^ m_s_flag) & SFLAG_SET)
 	{
+		/* The prefetched word was fetched with the old mode's function code */
+		m_pref_addr = ~0;
 		debugger_privilege_hook();
 	}
 }
@@ -1137,6 +1141,8 @@ inline void m68ki_set_sm_flag_nosp(u32 value)
 	m_m_flag = value & MFLAG_SET;
 	if ((old_s_flag ^ m_s_flag) & SFLAG_SET)
 	{
+		/* The prefetched word was fetched with the old mode's function code */
+		m_pref_addr = ~0;
 		debugger_privilege_hook();
 	}
 }
@@ -1221,6 +1227,14 @@ inline void m68ki_stack_frame_3word(u32 pc, u32 sr)
  */
 inline void m68ki_stack_frame_0000(u32 pc, u32 sr, u32 vector)
 {
+	if (CPU_TYPE_IS_COLDFIRE())
+	{
+		u32 const format = 4 | (REG_A()[7] & 3);
+		REG_A()[7] &= ~3U;
+		m68ki_push_32(pc);
+		m68ki_push_32((format << 28) | (vector << 18) | sr);
+		return;
+	}
 	/* Stack a 3-word frame if we are 68000 */
 	if(CPU_TYPE_IS_000())
 	{
@@ -1546,7 +1560,7 @@ inline void m68ki_exception_trap(u32 vector)
 {
 	u32 sr = m68ki_init_exception(vector);
 
-	if(CPU_TYPE_IS_010_LESS())
+	if(CPU_TYPE_IS_010_LESS() || CPU_TYPE_IS_COLDFIRE())
 		m68ki_stack_frame_0000(m_pc, sr, vector);
 	else
 		m68ki_stack_frame_0010(sr, vector);

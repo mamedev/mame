@@ -248,7 +248,9 @@ uint8_t vic10_state::sid_potx_r()
 	case 3:
 		if (m_joy1->has_pot_x() && m_joy2->has_pot_x())
 		{
-			data = 1 / (1 / m_joy1->read_pot_x() + 1 / m_joy2->read_pot_x());
+			const unsigned pot1 = m_joy1->read_pot_x();
+			const unsigned pot2 = m_joy2->read_pot_x();
+			data = (pot1 + pot2) ? (pot1 * pot2) / (pot1 + pot2) : 0;
 		}
 		else if (m_joy1->has_pot_x())
 		{
@@ -275,7 +277,9 @@ uint8_t vic10_state::sid_poty_r()
 	case 3:
 		if (m_joy1->has_pot_y() && m_joy2->has_pot_y())
 		{
-			data = 1 / (1 / m_joy1->read_pot_y() + 1 / m_joy2->read_pot_y());
+			const unsigned pot1 = m_joy1->read_pot_y();
+			const unsigned pot2 = m_joy2->read_pot_y();
+			data = (pot1 + pot2) ? (pot1 * pot2) / (pot1 + pot2) : 0;
 		}
 		else if (m_joy1->has_pot_y())
 		{

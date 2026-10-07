@@ -192,14 +192,13 @@ C64 SERIAL BUS
 #include "emu.h"
 #include "cbmiec.h"
 
+#define VERBOSE 0
+#include "logmacro.h"
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
-
 
 static const char *const SIGNAL_NAME[] = { "SRQ", "ATN", "CLK", "DATA", "RESET" };
 
@@ -287,12 +286,11 @@ cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, d
 	m_write_atn(*this),
 	m_write_clk(*this),
 	m_write_data(*this),
-	m_write_reset(*this)
+	m_write_reset(*this),
+	m_update_timer(nullptr)
 {
-	for (auto & elem : m_line)
-	{
-		elem = 1;
-	}
+	m_lines.reset();
+	std::fill(std::begin(m_line), std::end(m_line), 1);
 }
 
 
@@ -302,6 +300,16 @@ cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, d
 
 void cbm_iec_device::device_start()
 {
+	m_update_timer = timer_alloc(FUNC(cbm_iec_device::update_tick), this);
+
+	// a bus hosted by a cartridge has its host CPU outside the bus owner
+	for (device_execute_interface &exec : execute_interface_enumerator(machine().root_device()))
+		m_execs.push_back(&exec);
+
+	save_item(NAME(m_lines.m_time));
+	save_item(NAME(m_lines.m_state));
+	save_item(NAME(m_lines.m_count));
+	save_item(NAME(m_line));
 }
 
 
@@ -338,6 +346,9 @@ void cbm_iec_device::add_device(cbm_iec_slot_device *slot, device_t *target)
 	entry->m_interface->m_bus = this;
 
 	m_device_list.append(*entry);
+	save_item(NAME(entry->m_lines.m_time), m_device_list.count());
+	save_item(NAME(entry->m_lines.m_state), m_device_list.count());
+	save_item(NAME(entry->m_lines.m_count), m_device_list.count());
 }
 
 
@@ -350,12 +361,24 @@ cbm_iec_device::daisy_entry::daisy_entry(device_t *device) :
 	m_device(device),
 	m_interface(nullptr)
 {
-	for (auto & elem : m_line)
-	{
-		elem = 1;
-	}
+	m_lines.reset();
 
 	device->interface(m_interface);
+}
+
+
+//-------------------------------------------------
+//  source_lines::reset -
+//-------------------------------------------------
+
+void cbm_iec_device::source_lines::reset()
+{
+	for (int signal = 0; signal < SIGNAL_COUNT; signal++)
+	{
+		std::fill(std::begin(m_time[signal]), std::end(m_time[signal]), attotime::zero);
+		std::fill(std::begin(m_state[signal]), std::end(m_state[signal]), 1);
+		m_count[signal] = 1;
+	}
 }
 
 
@@ -365,39 +388,83 @@ cbm_iec_device::daisy_entry::daisy_entry(device_t *device) :
 
 void cbm_iec_device::set_signal(device_t *device, int signal, int state)
 {
-	bool changed = false;
+	source_lines *lines = &m_lines;
 
-	if (device == this)
+	if (device != this)
 	{
-		if (m_line[signal] != state)
-		{
-			if (LOG) logerror("CBM IEC: '%s' %s %u\n", tag(), SIGNAL_NAME[signal], state);
-			m_line[signal] = state;
-			changed = true;
-		}
+		daisy_entry *entry = m_device_list.first();
+		while (entry && entry->m_device != device)
+			entry = entry->next();
+		if (!entry)
+			return;
+		lines = &entry->m_lines;
+	}
+
+	state = state ? 1 : 0;
+	u8 &count = lines->m_count[signal];
+	attotime *const times = lines->m_time[signal];
+	u8 *const states = lines->m_state[signal];
+	if (states[count - 1] == state)
+		return;
+
+	// port outputs change after the write cycle, half a cycle after reads sample their inputs
+	attotime const now = machine().time();
+	attotime time = now;
+	device_execute_interface *const exec = machine().scheduler().currently_executing();
+	if (exec)
+	{
+		attotime const cycle = exec->cycles_to_attotime(1);
+		if (!cycle.is_never())
+			time += cycle / 2;
+	}
+	time = std::max(time, times[count - 1]);
+
+	LOG("'%s' %s %u at %s\n", device->tag(), SIGNAL_NAME[signal], state, time.as_string());
+
+	if (times[count - 1] == time)
+	{
+		if (count > 1 && states[count - 2] == state)
+			count--;
+		else
+			states[count - 1] = state;
 	}
 	else
 	{
-		daisy_entry *entry = m_device_list.first();
-
-		while (entry)
+		if (count == EDGE_COUNT)
 		{
-			if (!strcmp(entry->m_device->tag(), device->tag()))
-			{
-				if (entry->m_line[signal] != state)
-				{
-					if (LOG) logerror("CBM IEC: '%s' %s %u\n", device->tag(), SIGNAL_NAME[signal], state);
-					entry->m_line[signal] = state;
-					changed = true;
-				}
-			}
-
-			entry = entry->next();
+			std::copy(times + 1, times + count, times);
+			std::copy(states + 1, states + count, states);
+			count--;
 		}
+		times[count] = time;
+		states[count] = state;
+		count++;
 	}
 
-	if (changed)
+	if (time <= now)
+		update_lines();
+	else if (!m_update_timer->enabled() || m_update_timer->expire() > time)
+		m_update_timer->adjust(time - now);
+}
+
+
+//-------------------------------------------------
+//  update_lines - notify devices of resolved
+//  line changes up to the current time
+//-------------------------------------------------
+
+void cbm_iec_device::update_lines()
+{
+	attotime const now = machine().time();
+
+	for (int signal = 0; signal < SIGNAL_COUNT; signal++)
 	{
+		int const state = get_signal(signal, now);
+		if (m_line[signal] == state)
+			continue;
+
+		m_line[signal] = state;
+
 		switch (signal)
 		{
 		case SRQ:   m_write_srq(state);  break;
@@ -407,39 +474,86 @@ void cbm_iec_device::set_signal(device_t *device, int signal, int state)
 		case RESET: m_write_reset(state);break;
 		}
 
-		daisy_entry *entry = m_device_list.first();
-
-		while (entry)
+		for (daisy_entry *entry = m_device_list.first(); entry; entry = entry->next())
 		{
 			switch (signal)
 			{
-			case SRQ:
-				entry->m_interface->cbm_iec_srq(state);
-				break;
-
-			case ATN:
-				entry->m_interface->cbm_iec_atn(state);
-				break;
-
-			case CLK:
-				entry->m_interface->cbm_iec_clk(state);
-				break;
-
-			case DATA:
-				entry->m_interface->cbm_iec_data(state);
-				break;
-
-			case RESET:
-				entry->m_interface->cbm_iec_reset(state);
-				break;
+			case SRQ:   entry->m_interface->cbm_iec_srq(state);   break;
+			case ATN:   entry->m_interface->cbm_iec_atn(state);   break;
+			case CLK:   entry->m_interface->cbm_iec_clk(state);   break;
+			case DATA:  entry->m_interface->cbm_iec_data(state);  break;
+			case RESET: entry->m_interface->cbm_iec_reset(state); break;
 			}
-
-			entry = entry->next();
 		}
 
-		if (LOG) logerror("CBM IEC: SRQ %u ATN %u CLK %u DATA %u RESET %u\n",
-			get_signal(SRQ), get_signal(ATN), get_signal(CLK), get_signal(DATA), get_signal(RESET));
+		LOG("SRQ %u ATN %u CLK %u DATA %u RESET %u\n",
+			m_line[SRQ], m_line[ATN], m_line[CLK], m_line[DATA], m_line[RESET]);
 	}
+}
+
+
+//-------------------------------------------------
+//  update_tick -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(cbm_iec_device::update_tick)
+{
+	update_lines();
+
+	attotime const now = machine().time();
+	attotime next = attotime::never;
+	auto const find_next = [&now, &next] (source_lines const &lines)
+	{
+		for (int signal = 0; signal < SIGNAL_COUNT; signal++)
+			for (int i = lines.m_count[signal] - 1; (i >= 0) && (lines.m_time[signal][i] > now); i--)
+				next = std::min(next, lines.m_time[signal][i]);
+	};
+
+	find_next(m_lines);
+	for (daisy_entry *entry = m_device_list.first(); entry; entry = entry->next())
+		find_next(entry->m_lines);
+
+	if (next.is_never())
+		m_update_timer->reset();
+	else
+		m_update_timer->adjust(next - now);
+}
+
+
+//-------------------------------------------------
+//  sample_ready - hold a CPU's bus sample until
+//  every other device has passed the point where
+//  its outputs could still change the result
+//-------------------------------------------------
+
+bool cbm_iec_device::sample_ready(cpu_device &cpu)
+{
+	if (!cpu.executing() || machine().side_effects_disabled())
+		return true;
+
+	attotime const time = cpu.local_time();
+	bool ready = !m_update_timer->enabled() || (m_update_timer->expire() > time);
+
+	for (device_execute_interface *const exec : m_execs)
+	{
+		if (!ready)
+			break;
+
+		if ((&exec->device() == &cpu) || exec->suspended(SUSPEND_ANY_REASON & ~SUSPEND_REASON_TIMESLICE))
+			continue;
+
+		attotime const cycle = exec->cycles_to_attotime(1);
+		if (!cycle.is_never())
+			ready = (exec->local_time() + (cycle / 2)) > time;
+	}
+
+	if (!ready)
+	{
+		cpu.yield();
+		cpu.retry_access();
+	}
+
+	return ready;
 }
 
 
@@ -447,25 +561,20 @@ void cbm_iec_device::set_signal(device_t *device, int signal, int state)
 //  get_signal -
 //-------------------------------------------------
 
-int cbm_iec_device::get_signal(int signal)
+int cbm_iec_device::get_signal(int signal, const attotime &time)
 {
-	int state = m_line[signal];
-
-	if (state)
+	auto const source_state = [signal, &time] (source_lines const &lines)
 	{
-		daisy_entry *entry = m_device_list.first();
+		int i = lines.m_count[signal] - 1;
+		while ((i > 0) && (lines.m_time[signal][i] > time))
+			i--;
+		return lines.m_state[signal][i];
+	};
 
-		while (entry)
-		{
-			if (!entry->m_line[signal])
-			{
-				state = 0;
-				break;
-			}
+	int state = source_state(m_lines);
 
-			entry = entry->next();
-		}
-	}
+	for (daisy_entry *entry = m_device_list.first(); state && entry; entry = entry->next())
+		state = source_state(entry->m_lines);
 
 	return state;
 }
@@ -476,28 +585,39 @@ int cbm_iec_device::get_signal(int signal)
 //-------------------------------------------------
 
 // slot devices
+#include "c1526.h"
 #include "c1541.h"
 #include "c1541_clones.h"
 #include "c1571.h"
 #include "c1581.h"
+#include "c5181.h"
 #include "c64_nl10.h"
 #include "cmdhd.h"
 #include "diag264_lb_iec.h"
 #include "dolphindos.h"
-#include "sd2iec.h"
+#include "dps1101.h"
 #include "fd2000.h"
 #include "interpod.h"
+#include "mcs801.h"
+#include "mcs810.h"
+#include "mcs820.h"
 #include "minichief.h"
+#include "mps1000.h"
+#include "mps1200.h"
+#include "mps1224.h"
+#include "mps1270a.h"
+#include "mps2020.h"
+#include "mps801.h"
+#include "mps803.h"
 #include "prodos.h"
 #include "prologicdos.h"
 #include "rapidos.h"
+#include "sd2iec.h"
 #include "serialbox.h"
 #include "turbotrans.h"
 #include "vic1515.h"
 #include "vic1520.h"
-#include "c1526.h"
-#include "mps1200.h"
-#include "c5181.h"
+#include "vic1525.h"
 
 void cbm_iec_devices(device_slot_interface &device)
 {
@@ -538,12 +658,23 @@ void cbm_iec_devices(device_slot_interface &device)
 void cbm_iec_printer_devices(device_slot_interface &device)
 {
 	device.option_add("c1526", C1526);
+	device.option_add("dps1101", DPS1101);
 	device.option_add("interpod", CBM_INTERPOD);
+	device.option_add("mcs801", MCS801);
+	device.option_add("mcs810", MCS810);
+	device.option_add("mcs820", MCS820);
+	device.option_add("mps801", MPS801);
 	device.option_add("mps802", C1526);
+	device.option_add("mps803", MPS803);
+	device.option_add("mps1000", MPS1000);
 	device.option_add("mps1200", MPS1200);
+	device.option_add("mps1224", MPS1224);
 	device.option_add("mps1250", MPS1250);
+	device.option_add("mps1270a", MPS1270A);
+	device.option_add("mps2020", MPS2020);
 	device.option_add("nl10", C64_NL10_INTERFACE);
 	device.option_add("serialbox", CBM_SERIAL_BOX);
 	device.option_add("vic1515", VIC1515);
 	device.option_add("vic1520", VIC1520);
+	device.option_add("vic1525", VIC1525);
 }

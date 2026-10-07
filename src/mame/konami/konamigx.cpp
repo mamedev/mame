@@ -112,6 +112,8 @@
 
 #include "layout/generic.h"
 
+#include "racinfrc.lh"
+
 
 // TODO: check on PCB
 #define MASTER_CLOCK XTAL(24'000'000)
@@ -1071,7 +1073,7 @@ void konamigx_state::gx_base_memmap(address_map &map)
 	map(0x000000, 0x01ffff).rom(); // BIOS ROM
 	map(0x200000, 0x3fffff).rom(); // main program ROM
 	map(0x400000, 0x7fffff).rom(); // data ROM
-	map(0xc00000, 0xc1ffff).ram().share("workram");
+	map(0xc00000, 0xc1ffff).ram().share(m_workram);
 	map(0xd00000, 0xd01fff).r(m_k056832, FUNC(k056832_device::k_5bpp_rom_long_r));
 	map(0xd20000, 0xd23fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0xd40000, 0xd4003f).w(m_k056832, FUNC(k056832_device::word_w));
@@ -1101,13 +1103,13 @@ void konamigx_state::gx_type1_map(address_map &map)
 	map(0xddc000, 0xddcfff).portr("ADC-RDPORT");
 	map(0xdde000, 0xdde003).w(FUNC(konamigx_state::type1_cablamps_w));
 	map(0xe00000, 0xe0001f).rw(m_type1_roz, FUNC(k053936_device::ctrl_r), FUNC(k053936_device::ctrl_w));
-	map(0xe20000, 0xe2000f).writeonly().share("type1_psac4_ctrl"); // 056540 registers (partially understood)
+	map(0xe20000, 0xe2000f).writeonly().share(m_type1_psac4_ctrl); // 056540 registers (partially understood)
 	map(0xe40000, 0xe40003).w(FUNC(konamigx_state::type1_bank_w)); // ROM and palette lookup banks
 	map(0xe80000, 0xe81fff).rw(m_type1_roz, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w)); // chips 21L+19L / S
 	map(0xec0000, 0xedffff).ram().w(FUNC(konamigx_state::konamigx_t1_psacmap_w)).share("psacram");  // chips 20J+23J+18J / S
 	map(0xf00000, 0xf3ffff).r(FUNC(konamigx_state::type1_roz_r1));  // ROM readback
 	map(0xf40000, 0xf7ffff).r(FUNC(konamigx_state::type1_roz_r2));  // ROM readback
-	map(0xf80000, 0xf80fff).ram().share("type1_psac4_lram"); // chip 21Q / S, 056540 line parameters
+	map(0xf80000, 0xf80fff).ram().share(m_type1_psac4_lram); // chip 21Q / S, 056540 line parameters
 	map(0xfc0000, 0xfc00ff).rw(FUNC(konamigx_state::type1_lookup_r), FUNC(konamigx_state::type1_lookup_w)).umask32(0xff00ff00); // chip 22N / S
 }
 
@@ -1130,10 +1132,10 @@ void konamigx_state::gx_type3_map(address_map &map)
 	gx_base_memmap(map);
 	map(0xd90000, 0xd97fff).ram();
 	//map(0xcc0000, 0xcc0007).w(FUNC(konamigx_state::type4_prot_w));
-	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
+	map(0xe00000, 0xe0001f).ram().share(m_k053936_0_ctrl);
 	//map(0xe20000, 0xe20003).nopw();
 	map(0xe40000, 0xe40003).w(FUNC(konamigx_state::type3_bank_w)).umask32(0xffffffff);
-	map(0xe60000, 0xe60fff).ram().share("k053936_0_line");
+	map(0xe60000, 0xe60fff).ram().share(m_k053936_0_linectrl);
 	map(0xe80000, 0xe83fff).ram().share("paletteram");  // main monitor palette
 	map(0xea0000, 0xea3fff).ram().share("subpaletteram");
 	map(0xec0000, 0xec0003).r(FUNC(konamigx_state::type3_sync_r));
@@ -1145,10 +1147,10 @@ void konamigx_state::gx_type4_map(address_map &map)
 	gx_base_memmap(map);
 	map(0xcc0000, 0xcc0007).w(FUNC(konamigx_state::type4_prot_w));
 	map(0xd90000, 0xd97fff).ram();
-	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
+	map(0xe00000, 0xe0001f).ram().share(m_k053936_0_ctrl);
 	map(0xe20000, 0xe20003).nopw();
 	map(0xe40000, 0xe40003).w(FUNC(konamigx_state::type3_bank_w)).umask32(0xffffffff);
-	map(0xe60000, 0xe60fff).ram().share("k053936_0_line");  // 29C & 29G (PSAC2 line control)
+	map(0xe60000, 0xe60fff).ram().share(m_k053936_0_linectrl);  // 29C & 29G (PSAC2 line control)
 	map(0xe80000, 0xe87fff).ram().share("paletteram"); // 11G/13G/15G (main screen palette RAM)
 	map(0xea0000, 0xea7fff).ram().share("subpaletteram"); // 5G/7G/9G (sub screen palette RAM)
 	map(0xec0000, 0xec0003).r(FUNC(konamigx_state::type3_sync_r));      // type 4 polls this too
@@ -1161,7 +1163,7 @@ void konamigx_state::sexyparoebl_map(address_map &map) // TODO: verify everythin
 	map(0x000000, 0x01ffff).rom(); // BIOS ROM
 	map(0x200000, 0x3fffff).rom(); // main program ROM
 	map(0x400000, 0x7fffff).rom(); // data ROM
-	map(0xc00000, 0xc1ffff).ram().share("workram");
+	map(0xc00000, 0xc1ffff).ram().share(m_workram);
 	map(0xd00000, 0xd01fff).r(m_k056832, FUNC(k056832_device::k_5bpp_rom_long_r));
 	map(0xd20000, 0xd23fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0xd40000, 0xd4003f).w(m_k056832, FUNC(k056832_device::word_w));
@@ -1376,14 +1378,14 @@ static INPUT_PORTS_START( racinfrc )
 	PORT_DIPSETTING(          0x08000000, DEF_STR( Unused ) ) // ???
 	PORT_DIPSETTING(          0x00000000, "Upright (Stereo)" )
 	PORT_DIPNAME( 0xe0000000, 0xe0000000, "Car Number & Color" ) PORT_DIPLOCATION("SW1:6,7,8")
-	PORT_DIPSETTING(          0xe0000000, "No. 1 (Red)" )
-	PORT_DIPSETTING(          0xc0000000, "No. 2 (Blue)" )
-	PORT_DIPSETTING(          0xa0000000, "No. 3 (Yellow)" )
-	PORT_DIPSETTING(          0x80000000, "No. 4 (Green)" )
-	PORT_DIPSETTING(          0x60000000, "No. 5 (Red)" )
-	PORT_DIPSETTING(          0x40000000, "No. 6 (Blue)" )
-	PORT_DIPSETTING(          0x20000000, "No. 7 (Yellow)" )
-	PORT_DIPSETTING(          0x00000000, "No. 8 (Green)" )
+	PORT_DIPSETTING(          0xe0000000, "No. 1 (Red/White)" )
+	PORT_DIPSETTING(          0xc0000000, "No. 2 (Blue/White)" )
+	PORT_DIPSETTING(          0xa0000000, "No. 3 (White/Yellow)" )
+	PORT_DIPSETTING(          0x80000000, "No. 4 (Green/White)" )
+	PORT_DIPSETTING(          0x60000000, "No. 5 (White/Red)" )
+	PORT_DIPSETTING(          0x40000000, "No. 6 (White/Blue)" )
+	PORT_DIPSETTING(          0x20000000, "No. 7 (Yellow/White)" )
+	PORT_DIPSETTING(          0x00000000, "No. 8 (White/Green)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( opengolf )
@@ -4205,8 +4207,8 @@ GAME( 1994, konamigx,  0,        konamigx_bios, common,   konamigx_state, init_k
    needs the ROZ layer to be playable
    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-GAME( 1994, racinfrc,  konamigx, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
-GAME( 1994, racinfrcu, racinfrc, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAMEL( 1994, racinfrc,  konamigx, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_racinfrc )
+GAMEL( 1994, racinfrcu, racinfrc, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_racinfrc )
 
 GAME( 1994, opengolf,  konamigx, opengolf,      opengolf, konamigx_state, init_posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAE)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
 GAME( 1994, opengolf2, opengolf, opengolf,      opengolf, konamigx_state, init_posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )

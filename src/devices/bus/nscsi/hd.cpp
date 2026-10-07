@@ -475,6 +475,13 @@ void nscsi_harddisk_device::scsi_command()
 				break;
 			}
 
+			case 0x38: // cache control page (vendor-specific)
+				m_scsi_cmdbuf[pos++] = 0x38; // !PS, page id
+				m_scsi_cmdbuf[pos++] = 0x0e; // page length
+				std::fill_n(&m_scsi_cmdbuf[pos], 14, 0);
+				pos += 14;
+				break;
+
 			default:
 				if (page != 0x3f) {
 					LOG("mode sense page %02x unhandled\n", page);

@@ -7,9 +7,6 @@ PC-9801 S[oftware]DIP interface
 References:
 - https://bitchinbits.foolproofdesigns.com/pc-9821/pc-9821-cheat-sheet/
 
-TODO:
-- Discards saved settings in PC-9821 and later, access thru MMIO?
-
 ===================================================================================================
 
 To enter setup mode:

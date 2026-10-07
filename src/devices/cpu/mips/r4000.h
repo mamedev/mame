@@ -436,6 +436,7 @@ protected:
 	// cp0 state
 	u64 m_cp0[32];
 	u64 m_cp0_timer_zero;
+	u64 m_cp0_random_zero;   // Random counter origin; restarted by a Wired write
 	emu_timer *m_cp0_timer;
 	bool m_hard_reset;
 	bool m_ll_active;

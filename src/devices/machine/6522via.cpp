@@ -99,31 +99,109 @@
 #define CLR_PA_INT()    clear_int(INT_CA1 | ((!CA2_IND_IRQ(m_pcr)) ? INT_CA2: 0))
 #define CLR_PB_INT()    clear_int(INT_CB1 | ((!CB2_IND_IRQ(m_pcr)) ? INT_CB2: 0))
 
-#define IFR_DELAY 3
-
 #define TIMER1_VALUE    (m_t1ll+(m_t1lh<<8))
 #define TIMER2_VALUE    (m_t2ll+(m_t2lh<<8))
 
+namespace {
+
+// T2 runs as an 8-bit timer while it clocks the shift register
+constexpr bool t2_shifter_clocked(u8 acr)
+{
+	return ((acr & 0x0c) == 0x04) || ((acr & 0x1c) == 0x10);
+}
+
+} // anonymous namespace
 
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-uint16_t via6522_device::get_counter1_value()
+// CPU time advances by the truncated clock period, so a second holds slightly
+// more than clock() periods; attotime_to_clocks() would drop one per second
+uint64_t via6522_device::clocks_since(const attotime &start) const
 {
-	uint16_t val;
+	const attotime duration = machine().time() - start;
+	const u64 period = clocks_to_attotime(1).attoseconds();
+	const u64 slack = ATTOSECONDS_PER_SECOND - clock() * period;
 
-	if(m_t1_active)
+	return u64(duration.seconds()) * clock() + (u64(duration.seconds()) * slack + duration.attoseconds()) / period;
+}
+
+uint16_t via6522_device::get_counter1_value() const
+{
+	// reloads in one-shot mode too: latch .. 1, 0, $ffff, latch
+	// hold at 0 until t1_tick has set the interrupt flag
+	if (m_t1_active && (m_t1->expire() <= machine().time()))
+		return 0;
+
+	const u32 period = TIMER1_VALUE + 2;
+	const u64 elapsed = clocks_since(m_time1);
+	const s64 e = elapsed ? s64(elapsed - 1) : 0;
+	const s64 v = (m_t1_value == 0xffff) ? -1 : s64(m_t1_value);
+
+	if (e <= v)
+		return u16(v - e);
+	if (e == v + 1)
+		return 0xffff;
+
+	const u32 phase = u32(u64(e - v - 2) % period);
+
+	return (phase <= TIMER1_VALUE) ? (TIMER1_VALUE - phase) : 0xffff;
+}
+
+void via6522_device::reanchor_counter1()
+{
+	const bool underflow_due = m_t1_active && (m_t1->expire() <= machine().time());
+	const uint16_t value = underflow_due ? 0xffff : get_counter1_value();
+
+	m_time1 = machine().time() - clocks_to_attotime(1);
+	m_t1_value = value;
+}
+
+uint32_t via6522_device::t2_underflow_delay() const
+{
+	if (!t2_shifter_clocked(m_acr))
+		return TIMER2_VALUE + 2;
+
+	return (m_t2_start & 0xff) + (m_t2_start >> 8) * (m_t2ll + 2) + 2;
+}
+
+uint16_t via6522_device::get_counter2_value() const
+{
+	if (T2_COUNT_PB6(m_acr))
 	{
-		val = attotime_to_clocks(m_t1->remaining()) - IFR_DELAY;
-	}
-	else
-	{
-		val = 0xffff - attotime_to_clocks(machine().time() - m_time1);
+		return m_t2cl | (m_t2ch << 8);
 	}
 
-	return val;
+	// 8-bit mode: the low byte reloads from T2LL via $ff, the high byte borrows
+	if (t2_shifter_clocked(m_acr))
+	{
+		const u32 lo0 = m_t2_start & 0xff;
+		const u32 hi0 = m_t2_start >> 8;
+		const u64 elapsed = clocks_since(m_t2_load);
+		const u64 t = elapsed ? elapsed - 1 : 0;
+
+		if (t <= lo0)
+			return (hi0 << 8) | u32(lo0 - t);
+
+		const u32 period = m_t2ll + 2;
+		const u64 since = t - (lo0 + 1);
+		const u32 hi = (hi0 - 1 - u32(since / period)) & 0xff;
+		const u32 r = u32(since % period);
+
+		return (hi << 8) | (r ? ((m_t2ll - (r - 1)) & 0xff) : 0xff);
+	}
+
+	if (m_t2_active && !m_t2->expire().is_never())
+	{
+		// hold at 0 until t2_tick sets IFR: Mac OS reads T2CH, then IFR, and
+		// skips T2CL if the high byte is zero
+		const u64 remaining = attotime_to_clocks(m_t2->remaining());
+		return remaining ? u16(remaining - 1) : 0;
+	}
+
+	return (0x10000 - (clocks_since(m_time2) & 0xffff) - 1);
 }
 
 void via6522_device::counter2_decrement()
@@ -244,6 +322,7 @@ void via6522_device::device_start()
 
 	m_time1 = machine().time();
 	m_time2 = machine().time();
+	m_t2_load = machine().time();
 
 	m_t1 = timer_alloc(FUNC(via6522_device::t1_tick), this);
 	m_t2 = timer_alloc(FUNC(via6522_device::t2_tick), this);
@@ -268,6 +347,9 @@ void via6522_device::device_start()
 	m_t1ch = 0xff;
 	m_t2cl = 0xff;
 	m_t2ch = 0xff;
+	m_shift_done = true;
+	m_t1_value = 0;
+	m_t2_start = 0xffff;
 
 	m_sr = 0;
 	m_pcr = 0;
@@ -318,6 +400,10 @@ void via6522_device::device_start()
 	save_item(NAME(m_t1_pb7));
 	save_item(NAME(m_time2));
 	save_item(NAME(m_t2_active));
+	save_item(NAME(m_shift_done));
+	save_item(NAME(m_t1_value));
+	save_item(NAME(m_t2_start));
+	save_item(NAME(m_t2_load));
 	save_item(NAME(m_shift_counter));
 }
 
@@ -346,6 +432,7 @@ void via6522_device::device_reset()
 	m_t1_active = 0;
 	m_t1_pb7 = 1;
 	m_t2_active = 0;
+	m_shift_done = true;
 
 	output_pa();
 	output_pb();
@@ -430,23 +517,45 @@ void via6522_device::clear_int(int data)
 
 
 /*-------------------------------------------------
+    shift_blocked
+-------------------------------------------------*/
+
+bool via6522_device::shift_blocked() const
+{
+	return m_shift_done && !(SO_T2_RATE(m_acr) || SI_EXT_CONTROL(m_acr) || SO_EXT_CONTROL(m_acr));
+}
+
+
+/*-------------------------------------------------
+    shift_clock_level
+-------------------------------------------------*/
+
+bool via6522_device::shift_clock_level() const
+{
+	return (SI_EXT_CONTROL(m_acr) || SO_EXT_CONTROL(m_acr) || SR_DISABLED(m_acr)) ? bool(m_in_cb1) : bool(m_out_cb1);
+}
+
+
+/*-------------------------------------------------
     shift_out
 -------------------------------------------------*/
 
 void via6522_device::shift_out()
 {
 	// Only shift out msb on falling edge
-	if (m_shift_counter & 1)
+	if (!shift_clock_level())
 	{
-		LOGSHIFT(" %s shift Out SR: %02x->", tag(), m_sr);
+		uint8_t old_sr = m_sr;
 		m_out_cb2 = (m_sr >> 7) & 1;
 		m_sr =  (m_sr << 1) | m_out_cb2;
-		LOGSHIFT("%02x CB2: %d\n", m_sr, m_out_cb2);
+		m_shift_counter = (m_shift_counter - 1) & 7;
+		LOGSHIFT("Shift Out SR bit %d (%d): %02x->%02x\n", m_shift_counter, m_out_cb2, old_sr, m_sr);
 
 		m_cb2_handler(m_out_cb2);
 
-		if (m_shift_counter == 1 && SO_EXT_CONTROL(m_acr))
+		if (m_shift_counter == 0 && SO_EXT_CONTROL(m_acr))
 		{
+			m_shift_done = true;
 			LOGINT("SHIFT EXT out INT request ");
 			set_int(INT_SR); // IRQ on last falling edge for external clock (mode 7)
 		}
@@ -457,25 +566,27 @@ void via6522_device::shift_out()
 		{
 			if (m_shift_counter == 0 && (SO_O2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr)))
 			{
+				m_shift_done = true;
 				LOGINT("SHIFT O2/T2 out INT request ");
 				set_int(INT_SR); // IRQ on last raising edge for internal clock (mode 5-6)
 			}
 		}
 	}
-	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all edges
 }
 
 void via6522_device::shift_in()
 {
 	// Only shift in data on raising edge
-	if (!(m_shift_counter & 1))
+	if (shift_clock_level())
 	{
-		LOGSHIFT("%s shift In SR: %02x->", tag(), m_sr);
+		uint8_t old_sr = m_sr;
 		m_sr =  (m_sr << 1) | (m_in_cb2 & 1);
-		LOGSHIFT("%02x\n", m_sr);
+		m_shift_counter = (m_shift_counter - 1) & 7;
+		LOGSHIFT("Shift In SR bit %d (%d): %02x->%02x\n", m_shift_counter, m_in_cb2 & 1, old_sr, m_sr);
 
 		if (m_shift_counter == 0 && !SR_DISABLED(m_acr))
 		{
+			m_shift_done = true;
 			LOGINT("SHIFT in INT request ");
 			if (SI_EXT_CONTROL(m_acr))
 			{
@@ -489,7 +600,6 @@ void via6522_device::shift_in()
 			}
 		}
 	}
-	m_shift_counter = (m_shift_counter - 1) & 0x0f; // Count all edges
 }
 
 TIMER_CALLBACK_MEMBER(via6522_device::shift_irq_tick)
@@ -501,51 +611,51 @@ TIMER_CALLBACK_MEMBER(via6522_device::shift_irq_tick)
 
 TIMER_CALLBACK_MEMBER(via6522_device::shift_tick)
 {
-	LOGSHIFT("SHIFT timer event CB1 %s edge, %d\n", m_out_cb1 & 1 ? "falling" : "raising", m_shift_counter);
-	m_out_cb1 ^= 1;
-	m_cb1_handler(m_out_cb1);
+	// CB1 parks once the eight bits are done while T2 keeps running
+	if (!shift_blocked())
+	{
+		LOGSHIFT("SHIFT timer event CB1 %s\n", m_out_cb1 & 1 ? "falling" : "raising");
+		m_out_cb1 ^= 1;
+		m_cb1_handler(m_out_cb1);
 
-	// we call shift methods for all edges
-	if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
-	{
-		shift_out();
-	}
-	else if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
-	{
-		shift_in();
+		if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
+		{
+			shift_out();
+		}
+		else if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
+		{
+			shift_in();
+		}
 	}
 
-	// If in continuous mode or the shifter is still shifting we re-arm the timer
-	if (SO_T2_RATE(m_acr) || (m_shift_counter < 0x0f))
+	if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
 	{
-		if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
-		{
-			m_shift_timer->adjust(clocks_to_attotime(1));
-		}
-		else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
-		{
-			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
-		}
-		else // otherwise we stop it
-		{
-			m_shift_timer->adjust(attotime::never);
-		}
+		m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2));
+	}
+	else if ((SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr)) && !m_shift_done)
+	{
+		m_shift_timer->adjust(clocks_to_attotime(1));
+	}
+	else
+	{
+		m_shift_timer->adjust(attotime::never);
 	}
 }
 
 TIMER_CALLBACK_MEMBER(via6522_device::t1_tick)
 {
+	// PB7 toggles on timeout in one-shot mode too, only while PB7 output is enabled
 	if (T1_CONTINUOUS(m_acr))
 	{
-		if (TIMER1_VALUE > 0)
+		if (TIMER1_VALUE > 0 && T1_SET_PB7(m_acr))
 			m_t1_pb7 = !m_t1_pb7;
-		m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
+		m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + 2));
 	}
 	else
 	{
-		m_t1_pb7 = 1;
+		if (T1_SET_PB7(m_acr))
+			m_t1_pb7 = !m_t1_pb7;
 		m_t1_active = 0;
-		m_time1 = machine().time() - clocks_to_attotime(IFR_DELAY - 1);
 	}
 
 	if (T1_SET_PB7(m_acr))
@@ -560,7 +670,7 @@ TIMER_CALLBACK_MEMBER(via6522_device::t1_tick)
 TIMER_CALLBACK_MEMBER(via6522_device::t2_tick)
 {
 	m_t2_active = 0;
-	m_time2 = machine().time() - clocks_to_attotime(IFR_DELAY - 1);
+	m_time2 = machine().time();
 
 	LOGINT("T2 INT request ");
 	set_int(INT_T2);
@@ -734,43 +844,11 @@ u8 via6522_device::read(offs_t offset)
 			LOGINT("T2CL INT ");
 			clear_int(INT_T2);
 		}
-		if (m_t2_active && m_t2->enabled())
-		{
-			// Do not wrap before t2_tick sets IFR.  Mac OS reads T2CH, then IFR,
-			// and skips T2CL if the high byte is zero.  An early wrap makes it
-			// read T2CL and clear a newly arrived interrupt without servicing it.
-			val = std::max<s64>(0, s64(attotime_to_clocks(m_t2->remaining())) - IFR_DELAY) & 0xff;
-		}
-		else
-		{
-			if (T2_COUNT_PB6(m_acr))
-			{
-				val = m_t2cl;
-			}
-			else
-			{
-				val = (0x10000 - (attotime_to_clocks(machine().time() - m_time2) & 0xffff) - 1) & 0xff;
-			}
-		}
+		val = get_counter2_value() & 0xff;
 		break;
 
 	case VIA_T2CH:
-		if (m_t2_active && m_t2->enabled())
-		{
-			// Hold at zero through the delayed IFR window, as for T2CL.
-			val = std::max<s64>(0, s64(attotime_to_clocks(m_t2->remaining())) - IFR_DELAY) >> 8;
-		}
-		else
-		{
-			if (T2_COUNT_PB6(m_acr))
-			{
-				val = m_t2ch;
-			}
-			else
-			{
-				val = (0x10000 - (attotime_to_clocks(machine().time() - m_time2) & 0xffff) - 1) >> 8;
-			}
-		}
+		val = get_counter2_value() >> 8;
 		break;
 
 	case VIA_SR:
@@ -778,25 +856,34 @@ u8 via6522_device::read(offs_t offset)
 		val = m_sr;
 		if (!machine().side_effects_disabled())
 		{
-			if (!(SI_EXT_CONTROL(m_acr) || SO_EXT_CONTROL(m_acr))) {
-				m_out_cb1 = 1;
-				m_cb1_handler(m_out_cb1);
-				m_shift_counter = 0x0f;
+			// an access mid-shift neither restarts the count nor moves the clock
+			if (!(SI_EXT_CONTROL(m_acr) || SO_EXT_CONTROL(m_acr)))
+			{
+				if ((m_ifr & INT_SR) || (m_shift_done && !SR_DISABLED(m_acr)))
+				{
+					m_shift_counter = 8;
+					m_shift_done = false;
+				}
 			}
 			else
-				m_shift_counter = m_in_cb1 ? 0x0f : 0x10;
+			{
+				m_shift_counter = 8;
+				m_shift_done = false;
+			}
 
 			LOGINT("SR INT ");
 			clear_int(INT_SR);
 			LOGSHIFT(" - ACR: %02x ", m_acr);
 			if (SI_O2_CONTROL(m_acr) || SO_O2_CONTROL(m_acr))
 			{
-				m_shift_timer->adjust(clocks_to_attotime(7) / 2); // 7 edges to cb1 change from start of read
+				if (m_shift_timer->expire().is_never())
+					m_shift_timer->adjust(clocks_to_attotime(2));
 				LOGSHIFT(" - read SR starts O2 timer ");
 			}
 			else if (SI_T2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr))
 			{
-				m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
+				if (m_shift_timer->expire().is_never())
+					m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2));
 				LOGSHIFT(" - read SR starts T2 timer ");
 			}
 			else if (!SO_T2_RATE(m_acr))
@@ -919,10 +1006,12 @@ void via6522_device::write(offs_t offset, u8 data)
 
 	case VIA_T1CL:
 	case VIA_T1LL:
+		reanchor_counter1();
 		m_t1ll = data;
 		break;
 
 	case VIA_T1LH:
+		reanchor_counter1();
 		m_t1lh = data;
 		LOGINT("T1LH INT ");
 		clear_int(INT_T1);
@@ -935,14 +1024,16 @@ void via6522_device::write(offs_t offset, u8 data)
 		LOGINT("T1CH INT ");
 		clear_int(INT_T1);
 
-		m_t1_pb7 = 0;
+		m_t1_pb7 = T1_SET_PB7(m_acr) ? 0 : 1;
 
 		if (T1_SET_PB7(m_acr))
 		{
 			output_pb();
 		}
 
-		m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
+		m_time1 = machine().time();
+		m_t1_value = TIMER1_VALUE;
+		m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + 2));
 		m_t1_active = 1;
 		break;
 
@@ -959,12 +1050,14 @@ void via6522_device::write(offs_t offset, u8 data)
 
 		if (!T2_COUNT_PB6(m_acr))
 		{
-			m_t2->adjust(clocks_to_attotime(TIMER2_VALUE + IFR_DELAY));
+			m_t2_start = TIMER2_VALUE;
+			m_t2_load = machine().time();
+			m_t2->adjust(clocks_to_attotime(t2_underflow_delay()));
 			m_t2_active = 1;
 		}
 		else
 		{
-			//m_t2->adjust(clocks_to_attotime(TIMER2_VALUE));
+			m_t2->adjust(attotime::never);
 			m_t2_active = 1;
 			m_time2 = machine().time();
 		}
@@ -974,25 +1067,22 @@ void via6522_device::write(offs_t offset, u8 data)
 		m_sr = data;
 		LOGSHIFT("Write SR: %02x\n", m_sr);
 
-		if (!(SI_EXT_CONTROL(m_acr) || SO_EXT_CONTROL(m_acr))) {
-			m_out_cb1 = 1;
-			m_cb1_handler(m_out_cb1);
-			m_shift_counter = 0x0f;
-		}
-		else
-			m_shift_counter = m_in_cb1 ? 0x0f : 0x10;
+		m_shift_counter = 8;
+		m_shift_done = SR_DISABLED(m_acr);
 
 		LOGINT("SR INT ");
 		clear_int(INT_SR);
 		LOGSHIFT(" - ACR is: %02x ", m_acr);
 		if (SO_O2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime(6) / 2); // 6 edges to cb2 change from start of write
+			if (m_shift_timer->expire().is_never())
+				m_shift_timer->adjust(clocks_to_attotime(2));
 			LOGSHIFT(" - write SR starts O2 timer");
 		}
 		else if (SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2) / 2);
+			if (m_shift_timer->expire().is_never())
+				m_shift_timer->adjust(clocks_to_attotime(m_t2ll + 2));
 			LOGSHIFT(" - write starts T2 timer");
 		}
 		else
@@ -1023,7 +1113,8 @@ void via6522_device::write(offs_t offset, u8 data)
 
 	case VIA_ACR:
 		{
-			uint16_t counter1 = get_counter1_value();
+			uint16_t counter2 = get_counter2_value();
+			bool t2_was_pb6 = bool(T2_COUNT_PB6(m_acr));
 			m_acr = data;
 			LOGSHIFT("Write ACR: %02x ", m_acr);
 
@@ -1042,13 +1133,39 @@ void via6522_device::write(offs_t offset, u8 data)
 			if (SR_DISABLED(m_acr) || SI_EXT_CONTROL(m_acr) || SO_EXT_CONTROL(m_acr))
 			{
 				m_shift_timer->adjust(attotime::never);
+				if (SR_DISABLED(m_acr) && !m_out_cb1)
+				{
+					m_out_cb1 = 1;
+					m_cb1_handler(m_out_cb1);
+				}
 				LOGSHIFT(" Timer stops");
 			}
-
-			if (T1_CONTINUOUS(m_acr))
+			else if ((SO_T2_RATE(m_acr) || SO_T2_CONTROL(m_acr) || SI_T2_CONTROL(m_acr))
+					&& m_shift_timer->expire().is_never())
 			{
-				m_t1->adjust(clocks_to_attotime(counter1 + IFR_DELAY));
-				m_t1_active = 1;
+				// CB1 edges follow the low byte's underflows, starting one period late
+				m_shift_timer->adjust(clocks_to_attotime((counter2 & 0xff) + 3));
+			}
+
+			// the counter carries its value across a clock source change
+			if (bool(T2_COUNT_PB6(m_acr)) != t2_was_pb6)
+			{
+				if (T2_COUNT_PB6(m_acr))
+				{
+					counter2 = (counter2 - 1) & 0xffff;
+					m_t2cl = counter2 & 0xff;
+					m_t2ch = counter2 >> 8;
+					m_t2->adjust(attotime::never);
+				}
+				else if (m_t2_active)
+				{
+					// the new clock source takes effect one cycle after the write
+					m_t2->adjust(clocks_to_attotime(counter2 + 2));
+				}
+				else
+				{
+					m_time2 = machine().time() - clocks_to_attotime(0xfffe - counter2);
+				}
 			}
 
 			if (SI_T2_CONTROL(m_acr) || SI_O2_CONTROL(m_acr) || SI_EXT_CONTROL(m_acr))
@@ -1197,12 +1314,12 @@ void via6522_device::write_cb1(int state)
 		// The shifter shift is not controlled by PCR
 		if (SO_EXT_CONTROL(m_acr))
 		{
-			LOGSHIFT("SHIFT OUT EXT/CB1 falling edge, %d\n",  m_shift_counter);
+			LOGSHIFT("SHIFT OUT EXT/CB1 falling edge, %d (CB1: %d)\n", m_shift_counter, m_in_cb1);
 			shift_out();
 		}
 		else if (SI_EXT_CONTROL(m_acr) || SR_DISABLED(m_acr))
 		{
-			LOGSHIFT("SHIFT IN EXT/CB1 raising edge, %d\n", m_shift_counter);
+			LOGSHIFT("SHIFT IN EXT/CB1 raising edge, %d (CB1: %d)\n", m_shift_counter, m_in_cb1);
 			shift_in();
 		}
 	}

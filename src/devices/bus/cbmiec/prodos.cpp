@@ -56,7 +56,7 @@ const tiny_rom_entry *c1541_professional_dos_v1_device::device_rom_region() cons
 void c1541_professional_dos_v1_device::c1541pd_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x6000).ram();
-	map(0x1800, 0x180f).mirror(0x63f0).m(M6522_0_TAG, FUNC(via6522_device::map));
+	map(0x1800, 0x180f).mirror(0x63f0).r(FUNC(c1541_professional_dos_v1_device::via0_r)).w(M6522_0_TAG, FUNC(via6522_device::write));
 	map(0x1c00, 0x1c0f).mirror(0x63f0).m(M6522_1_TAG, FUNC(via6522_device::map));
 	map(0x8000, 0x9fff).rom().region(M6502_TAG, 0x4000);
 	map(0xa000, 0xbfff).ram();

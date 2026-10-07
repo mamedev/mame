@@ -807,13 +807,25 @@ uint8_t viper_state::i2cdr_r(offs_t offset)
 					// 0x1c: voltage, assume 5v
 					if (m_i2c.addr_latch == 0x1c)
 						return 0x80;
-					const u16 adc_value = m_analog_input[m_i2c.addr_latch & 0x3]->read();
-					// FIXME: upper nibble is currently discarded in port defs
-					// is it expecting 7 bits of data and 1 of parity?
-					// cfr. input tests returning different values for each nibble when both are equal.
-					const u8 adc_nibble = BIT(m_i2c.addr_latch, 2) ? 0 : 8;
+					if (!BIT(m_i2c.addr_latch, 3))
+					{
+						// The low nibble is the ADC0838 multiplexer word: SGL/DIF, ODD/SIGN,
+						// SELECT1, SELECT0. In differential mode, ODD/SIGN = 0 converts
+						// CH(2n) - CH(2n+1) and ODD/SIGN = 1 converts CH(2n+1) - CH(2n); a
+						// negative difference reads as 0. The games read both polarities and
+						// rebuild the position as 0x100 + first - second.
+						// ANn holds CH(2n+1) - CH(2n) as a 9-bit signed value.
+						const s32 diff = util::sext(m_analog_input[m_i2c.addr_latch & 0x3]->read(), 9);
+						res = std::clamp<s32>(BIT(m_i2c.addr_latch, 2) ? diff : -diff, 0, 0xff);
+					}
+					else
+					{
+						const u16 adc_value = m_analog_input[m_i2c.addr_latch & 0x3]->read();
+						// FIXME: single-ended mode, only the supply voltage above is known
+						const u8 adc_nibble = BIT(m_i2c.addr_latch, 2) ? 0 : 8;
 
-					res = (adc_value) >> adc_nibble;
+						res = (adc_value) >> adc_nibble;
+					}
 				}
 				else
 					LOG("I2C: unmapped read access %02x\n", m_i2c.addr_latch);
@@ -1914,16 +1926,16 @@ static INPUT_PORTS_START( viper )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("AN1")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("AN2")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("AN3")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( ppp2nd )
@@ -1991,7 +2003,7 @@ INPUT_PORTS_START( thrild2 )
 
 	// TODO: normal type steering wheel (non-K type)
 	PORT_MODIFY("AN0")
-	PORT_BIT( 0xfff, 0x000, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x800,0x7ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50)
+	PORT_BIT( 0x1ff, 0x000, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_MODIFY("AN1")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
@@ -2005,7 +2017,7 @@ INPUT_PORTS_START( gticlub2 )
 
 	// K-Type steering wheel
 	PORT_MODIFY("AN0")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
+	PORT_BIT( 0x1ff, 0x000, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_MODIFY("AN3")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_NAME("Handbrake Lever") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE
@@ -2331,7 +2343,7 @@ INPUT_PORTS_START( xtrial )
 
 	// virtually identical to gticlub
 	PORT_MODIFY("AN0")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
+	PORT_BIT( 0x1ff, 0x000, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_MODIFY("AN1")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
@@ -2363,7 +2375,7 @@ INPUT_PORTS_START( code1d )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Action Button")
 
 	PORT_MODIFY("AN0")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
+	PORT_BIT( 0x1ff, 0x000, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_MODIFY("AN1")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE

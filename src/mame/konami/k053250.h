@@ -13,6 +13,10 @@
 class k053250_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
+	// Compare the descriptor's six-bit priority against the supplied bitmap.
+	// Lower values win; opaque pixels update the bitmap even at priority zero.
+	static constexpr int DRAW_FLAG_USE_PRIORITY = 1;
+
 	template <typename T, typename U>
 	k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, U &&screen_tag, int offx, int offy)
 		: k053250_device(mconfig, tag, owner, clock)
@@ -37,6 +41,15 @@ public:
 		m_offy = offy;
 	}
 
+	template <typename T> void set_ram(T &&tag, unsigned bank)
+	{
+		m_shared_ram.set_tag(std::forward<T>(tag));
+		m_ram_bank = bank;
+	}
+
+	// Whether to display the previous DMA transfer rather than the latest one.
+	void set_dma_delay(bool delay) { m_dma_delay = delay; }
+
 	uint16_t reg_r(offs_t offset);
 	void reg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t ram_r(offs_t offset);
@@ -44,6 +57,7 @@ public:
 	uint16_t rom_r(offs_t offset);
 
 	void draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, int colorbase, int flags, bitmap_ind8 &priority_bitmap, int priority);
+	void draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int colorbase, int flags, bitmap_ind8 &priority_bitmap, int priority);
 
 protected:
 	// device-level overrides
@@ -52,23 +66,27 @@ protected:
 
 private:
 	// configuration
-	int m_offx = 0, m_offy = 0;
+	int m_offx, m_offy;
+	unsigned m_ram_bank;
+	bool m_dma_delay;
 
 	// internal state
 	required_region_ptr<uint8_t> m_rom;
+	optional_shared_ptr<uint16_t> m_shared_ram;
 	std::vector<uint8_t> m_unpacked_rom;
 	std::vector<uint16_t> m_ram;
-	uint16_t *m_buffer[2]{};
-	uint8_t m_regs[8]{};
-	uint8_t m_page = 0;
-	int32_t m_frame = 0;
+	uint16_t *m_buffer[2];
+	uint8_t m_regs[8];
+	uint8_t m_page;
+	int32_t m_frame;
 
 	// internal helpers
 	void unpack_nibbles();
 	void dma(int limiter);
-	static void pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *pal_base, uint8_t *source,
+	template <typename BitmapType> void draw_common(BitmapType &bitmap, const rectangle &cliprect, int colorbase, int flags, bitmap_ind8 &priority_bitmap, int priority);
+	template <typename BitmapType> static void pdraw_scanline(BitmapType &bitmap, const pen_t *pal_base, uint32_t colorbase, uint8_t *source,
 			const rectangle &cliprect, int linepos, int scroll, int zoom,
-			uint32_t clipmask, uint32_t wrapmask, uint32_t orientation, bitmap_ind8 &priority, uint8_t pri);
+			uint32_t clipmask, uint32_t wrapmask, uint32_t orientation, bitmap_ind8 &priority, uint8_t pri, bool compare_priority);
 };
 
 DECLARE_DEVICE_TYPE(K053250, k053250_device)
