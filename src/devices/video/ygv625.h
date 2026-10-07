@@ -42,7 +42,7 @@ public:
 	template <typename T> void set_cg_region(T &&tag) { m_cg.set_tag(std::forward<T>(tag)); }
 
 	// 16-bit CPU bus interface, 0x2000 words
-	u16 read(offs_t offset, u16 mem_mask = ~0);
+	u16 read(offs_t offset);
 	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -76,8 +76,8 @@ private:
 	bool decode_raw(decoded_sprite &spr, u32 addr, u32 bpp);
 	bool decode_indexed(decoded_sprite &spr, u32 addr);
 	bool decode_rgb(decoded_sprite &spr, u32 addr);
-	bool read_overrides(bit_reader &br, plane_params &p, const plane_params &base, u32 flag_layout);
-	bool decode_plane(bit_reader &br, const plane_params &p, int p0, u32 mod, u16 *out);
+	static void read_overrides(bit_reader &br, plane_params &p, const plane_params &base, u32 flag_layout);
+	static bool decode_plane(bit_reader &br, const plane_params &p, int p0, u32 mod, u16 *out);
 
 	// palette lookup
 	rgb_t lookup_colour(u32 palette, u32 depth, u32 index) const;
