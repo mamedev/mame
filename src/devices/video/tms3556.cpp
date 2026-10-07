@@ -602,7 +602,7 @@ void tms3556_device::draw_line(bitmap_ind16 &bmp, int line)
 {
 	uint16_t *ln = &bmp.pix(line);
 
-	if ((line < TOP_BORDER) || (line >= (TOP_BORDER + 250)))
+	if ((line < TOP_BORDER) || (line >= (TOP_BORDER + active_height())))
 	{
 		/* draw top and bottom borders */
 		draw_line_empty(ln);
@@ -667,7 +667,7 @@ void tms3556_device::interrupt_start_vblank(void)
 void tms3556_device::interrupt()
 {
 	/* check for start of vblank */
-	if (m_scanline == 310)  /*no idea what the real value is*/
+	if (m_scanline == (lines_per_frame() - 3))  /*no idea what the real value is*/
 		interrupt_start_vblank();
 
 	/* render the current line */
@@ -677,6 +677,6 @@ void tms3556_device::interrupt()
 			draw_line(m_bitmap, m_scanline);
 	}
 
-	if (++m_scanline == 313)
+	if (++m_scanline >= lines_per_frame())
 		m_scanline = 0;
 }
