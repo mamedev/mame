@@ -54,6 +54,7 @@ public:
 	auto ach7_cb() { return m_ach_cb[7].bind(); }
 	auto hso_cb() { return m_hso_cb.bind(); }
 	auto serial_tx_cb() { return m_serial_tx_cb.bind(); }
+	auto txd_cb() { return m_txd_cb.bind(); }
 
 	auto in_p0_cb() { return m_in_p0_cb.bind(); }
 	auto out_p1_cb() { return m_out_p1_cb.bind(); }
@@ -61,7 +62,14 @@ public:
 	auto out_p2_cb() { return m_out_p2_cb.bind(); }
 	auto in_p2_cb() { return m_in_p2_cb.bind(); }
 
+	// P1 pins driven by external logic strong enough to override the output
+	// pulldown; these read the pin even with the latch at 0
+	void set_p1_driven_mask(u8 mask) { m_p1_driven_mask = mask; }
+
+	// Byte-level receive, bypassing RXD framing and baud rate timing
 	void serial_w(u8 val);
+	// RXD (P2.1) pin, for the asynchronous serial modes 1-3
+	void rxd_w(int state);
 
 	virtual u8 i8x9x_p0_mask() const noexcept { return 0xff; }
 	virtual bool i8x9x_has_p1() const noexcept { return true; }
@@ -134,12 +142,14 @@ private:
 	devcb_read16::array<8> m_ach_cb;
 	devcb_write8 m_hso_cb;
 	devcb_write8 m_serial_tx_cb;
+	devcb_write_line m_txd_cb;
 
 	devcb_read8 m_in_p0_cb;
 	devcb_write8 m_out_p1_cb;
 	devcb_read8 m_in_p1_cb;
 	devcb_write8 m_out_p2_cb;
 	devcb_read8 m_in_p2_cb;
+	u8 m_p1_driven_mask;
 	//devcb_write16 m_out_p3_p4_cb;
 	//devcb_read16 m_in_p3_p4_cb;
 
@@ -155,9 +165,25 @@ private:
 	bool extint;
 	u8 sbuf, sp_con, sp_stat;
 	u8 serial_send_buf;
-	u64 serial_send_timer;
 	u16 baud_reg;
 	bool brh;
+
+	// Serial port bit engine, scheduled through internal_update. The
+	// deadlines are absolute cycle counts, 0 when idle.
+	u64 tx_next;
+	u64 rx_next;
+	u16 tx_shift;       // TX frame bits still to shift out, LSB first
+	u8 tx_bits;         // number of TX frame bits still to shift out
+	bool tx_busy;       // a frame is being shifted out
+	bool tx_pending;    // SBUF was written while tx_busy
+	u8 tx_pending_buf;
+	bool tx_ti_due;     // next tx_event is mid last data bit, where TI is set
+	int txd_serial;     // TXD level driven by the serial port
+	int txd_pin;        // P2.0/TXD pin level last sent to m_txd_cb
+	int rxd_pin;        // P2.1/RXD pin level
+	bool rx_active;     // a frame is being sampled
+	u8 rx_bit;          // RX frame bit being sampled (0 = start bit)
+	u16 rx_shift;
 
 	u16 timer_value(int timer, u64 current_time) const;
 	u64 timer_time_until(int timer, u64 current_time, u16 timer_value) const;
@@ -167,8 +193,15 @@ private:
 	void trigger_cam(int id, u64 current_time);
 	void set_hso(u8 mask, bool state);
 	void ad_start(u64 current_time);
-	void serial_send(u8 data);
-	void serial_send_done();
+	u32 serial_bit_clocks() const;
+	u8 serial_data_bits() const;
+	void serial_send(u8 data, u64 current_time);
+	void serial_tx_done();
+	void serial_tx_stop();
+	void serial_rx_stop();
+	void update_txd();
+	void tx_event(u64 current_time);
+	void rx_event(u64 current_time);
 };
 
 class c8095_90_device : public i8x9x_device {

@@ -12,18 +12,26 @@
 #include "i8x9x.h"
 #include "i8x9xd.h"
 
+#include <bit>
+
 i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int data_width) :
 	mcs96_device(mconfig, type, tag, owner, clock, data_width, address_map_constructor(FUNC(i8x9x_device::internal_regs), this)),
 	m_ach_cb(*this, 0),
 	m_hso_cb(*this),
 	m_serial_tx_cb(*this),
+	m_txd_cb(*this),
 	m_in_p0_cb(*this, 0),
 	m_out_p1_cb(*this), m_in_p1_cb(*this, 0xff),
 	m_out_p2_cb(*this), m_in_p2_cb(*this, 0xc2),
+	m_p1_driven_mask(0),
 	base_timer2(0), ad_done(0), hsi_mode(0), hsi_status(0), hso_command(0), ad_command(0), hso_active(0), hso_time(0), ad_result(0), pwm_control(0),
 	port1(0), port2(0),
 	ios0(0), ios1(0), ioc0(0), ioc1(0), extint(false),
-	sbuf(0), sp_con(0), sp_stat(0), serial_send_buf(0), serial_send_timer(0), baud_reg(0), brh(false)
+	sbuf(0), sp_con(0), sp_stat(0), serial_send_buf(0), baud_reg(0), brh(false),
+	tx_next(0), rx_next(0),
+	tx_shift(0), tx_bits(0), tx_busy(false), tx_pending(false), tx_pending_buf(0), tx_ti_due(false),
+	txd_serial(1), txd_pin(1), rxd_pin(1),
+	rx_active(false), rx_bit(0), rx_shift(0)
 {
 	for (auto &hso : hso_info)
 	{
@@ -68,6 +76,7 @@ void i8x9x_device::device_start()
 
 	save_item(STRUCT_MEMBER(hso_info, command));
 	save_item(STRUCT_MEMBER(hso_info, time));
+	save_item(STRUCT_MEMBER(hso_info, fire_at));
 	save_item(NAME(hso_cam_hold.command));
 	save_item(NAME(hso_cam_hold.time));
 
@@ -92,9 +101,23 @@ void i8x9x_device::device_start()
 	save_item(NAME(sp_con));
 	save_item(NAME(sp_stat));
 	save_item(NAME(serial_send_buf));
-	save_item(NAME(serial_send_timer));
 	save_item(NAME(baud_reg));
 	save_item(NAME(brh));
+
+	save_item(NAME(tx_next));
+	save_item(NAME(rx_next));
+	save_item(NAME(tx_shift));
+	save_item(NAME(tx_bits));
+	save_item(NAME(tx_busy));
+	save_item(NAME(tx_pending));
+	save_item(NAME(tx_pending_buf));
+	save_item(NAME(tx_ti_due));
+	save_item(NAME(txd_serial));
+	save_item(NAME(txd_pin));
+	save_item(NAME(rxd_pin));
+	save_item(NAME(rx_active));
+	save_item(NAME(rx_bit));
+	save_item(NAME(rx_shift));
 }
 
 void i8x9x_device::device_reset()
@@ -114,11 +137,12 @@ void i8x9x_device::device_reset()
 	pwm_control = 0x00;
 	sp_con &= 0x17;
 	sp_stat &= 0x80;
-	serial_send_timer = 0;
 	brh = false;
 	m_out_p1_cb(0xff);
 	m_out_p2_cb(0xc1);
 	m_hso_cb(0);
+	serial_tx_stop();
+	serial_rx_stop();
 }
 
 void i8x9x_device::commit_hso_cam()
@@ -154,19 +178,231 @@ void i8x9x_device::ad_start(u64 current_time)
 	internal_update(current_time);
 }
 
-void i8x9x_device::serial_send(u8 data)
+u32 i8x9x_device::serial_bit_clocks() const
 {
-	serial_send_buf = data;
-	serial_send_timer = total_cycles() + 9600;
+	// BAUD_RATE bit 15 selects XTAL1 as the clock source. The alternative,
+	// T2CLK, is an external pin that isn't emulated; fall back to the
+	// 9600 clocks per 10-bit frame this core used before bit-level serial.
+	if (!BIT(baud_reg, 15))
+		return 960;
+
+	u32 const divisor = (baud_reg & 0x7fff) + 1;
+	return ((sp_con & 3) == 0 ? 4 : 64) * divisor;
 }
 
-void i8x9x_device::serial_send_done()
+u8 i8x9x_device::serial_data_bits() const
 {
-	serial_send_timer = 0;
+	// Modes 0 and 1 have 8 data bits, modes 2 and 3 have 9
+	return (sp_con & 2) ? 9 : 8;
+}
+
+void i8x9x_device::serial_send(u8 data, u64 current_time)
+{
+	if (tx_busy)
+	{
+		// "New data placed in SBUF (tx) is held and will not be transmitted
+		// until the end of the stop bit has been sent."
+		tx_pending = true;
+		tx_pending_buf = data;
+		return;
+	}
+
+	serial_send_buf = data;
+
+	u8 const mode = sp_con & 3;
+	bool const pen = BIT(sp_con, 2);
+	u16 frame = data;
+	if (mode == 1 && pen)
+		frame = (data & 0x7f) | ((std::popcount<u32>(data & 0x7f) & 1) << 7);
+	else if (mode >= 2)
+		frame |= ((mode == 3 && pen) ? (std::popcount<u32>(data) & 1) : BIT(sp_con, 4)) << 8;
+
+	if (mode == 0)
+	{
+		// Synchronous mode shifts out on RXD with TXD as the clock; only the
+		// timing is emulated
+		tx_shift = 0xffff;
+		tx_bits = 8;
+	}
+	else
+	{
+		// Start bit, data bits (LSB first) and stop bit
+		u8 const bits = serial_data_bits();
+		tx_shift = (frame << 1) | (1 << (bits + 1));
+		tx_bits = bits + 2;
+	}
+	tx_busy = true;
+	tx_event(current_time);
+}
+
+void i8x9x_device::serial_tx_done()
+{
+	sp_con &= ~0x10; // TB8 is cleared after each transmission
 	m_serial_tx_cb(serial_send_buf);
 	pending_irq |= IRQ_SERIAL;
 	sp_stat |= 0x20;
 	check_irq();
+}
+
+void i8x9x_device::serial_tx_stop()
+{
+	tx_next = 0;
+	tx_busy = false;
+	tx_pending = false;
+	tx_ti_due = false;
+	tx_bits = 0;
+	txd_serial = 1;
+	update_txd();
+}
+
+// The serial state, including the next deadline, is updated before the
+// callbacks in serial_tx_done() and update_txd() run. A callback can re-enter
+// internal_update (for instance TXD looped back to RXD), and must not see
+// this event as still due.
+void i8x9x_device::tx_event(u64 current_time)
+{
+	u32 const bit_clocks = serial_bit_clocks();
+
+	// TI is set in the middle of the last data bit
+	if (tx_ti_due)
+	{
+		tx_ti_due = false;
+		tx_next = current_time + bit_clocks / 2;
+		serial_tx_done();
+		return;
+	}
+
+	if (!tx_bits)
+	{
+		// The whole frame has been shifted out
+		tx_next = 0;
+		tx_busy = false;
+		if (tx_pending)
+		{
+			tx_pending = false;
+			serial_send(tx_pending_buf, current_time);
+		}
+		return;
+	}
+
+	bool const async = (sp_con & 3) != 0;
+	int const bit = tx_shift & 1;
+	tx_shift >>= 1;
+	tx_bits--;
+
+	// After the last data bit only the stop bit (modes 1-3) or nothing
+	// (mode 0) remains
+	if (tx_bits == (async ? 1 : 0))
+	{
+		tx_ti_due = true;
+		tx_next = current_time + bit_clocks / 2;
+	}
+	else
+	{
+		tx_next = current_time + bit_clocks;
+	}
+
+	if (async)
+	{
+		txd_serial = bit;
+		update_txd();
+	}
+}
+
+void i8x9x_device::update_txd()
+{
+	// IOC1 bit 5 selects TXD rather than P2.0 on the shared pin
+	int const state = BIT(ioc1, 5) ? txd_serial : BIT(port2, 0);
+	if (state != txd_pin)
+	{
+		txd_pin = state;
+		m_txd_cb(state);
+	}
+}
+
+void i8x9x_device::rxd_w(int state)
+{
+	state = state ? 1 : 0;
+	if (state == rxd_pin)
+		return;
+	rxd_pin = state;
+
+	// A falling edge on an idle line starts a frame when reception is
+	// enabled (REN) in one of the asynchronous modes
+	if (!state && !rx_active && BIT(sp_con, 3) && (sp_con & 3))
+	{
+		// Outside its timeslice the CPU may have run a little past the time
+		// of the edge; count from the edge itself
+		u64 edge_time = total_cycles();
+		if (!executing() && local_time() > machine().time())
+			edge_time -= attotime_to_cycles(local_time() - machine().time());
+
+		rx_active = true;
+		rx_bit = 0;
+		rx_shift = 0;
+		rx_next = edge_time + serial_bit_clocks() / 2;
+		if (executing())
+			internal_update(total_cycles());
+	}
+}
+
+void i8x9x_device::serial_rx_stop()
+{
+	rx_active = false;
+	rx_next = 0;
+}
+
+void i8x9x_device::rx_event(u64 current_time)
+{
+	u8 const bits = serial_data_bits();
+	if (rx_bit == 0)
+	{
+		// The start bit must still be low at mid-bit
+		if (rxd_pin)
+		{
+			serial_rx_stop();
+			return;
+		}
+	}
+	else
+	{
+		rx_shift |= rxd_pin << (rx_bit - 1);
+	}
+
+	// RI is set once the last data bit has been sampled, without waiting
+	// for the stop bit. Its validity isn't checked: the 8X9X has no
+	// framing error flag.
+	if (rx_bit == bits)
+	{
+		serial_rx_stop();
+
+		u8 const mode = sp_con & 3;
+		bool const pen = BIT(sp_con, 2);
+
+		// Mode 2 only accepts frames with the ninth bit set
+		if (mode == 2 && !BIT(rx_shift, 8))
+			return;
+
+		sbuf = rx_shift & 0xff;
+		if (pen)
+		{
+			// SP_STAT bit 7 is RPE, set on an even parity error
+			bool const error = std::popcount<u32>(rx_shift & ((mode == 3) ? 0x1ff : 0xff)) & 1;
+			sp_stat = (sp_stat & 0x7f) | (error ? 0x80 : 0x00);
+		}
+		else if (mode >= 2)
+		{
+			// SP_STAT bit 7 is RB8, the received ninth bit
+			sp_stat = (sp_stat & 0x7f) | (BIT(rx_shift, 8) << 7);
+		}
+		sp_stat |= 0x40;
+		pending_irq |= IRQ_SERIAL;
+		check_irq();
+		return;
+	}
+
+	rx_bit++;
+	rx_next = current_time + serial_bit_clocks();
 }
 
 void i8x9x_device::internal_regs(address_map &map)
@@ -237,7 +473,8 @@ u8 i8x9x_device::hsi_status_r()
 void i8x9x_device::sbuf_w(u8 data)
 {
 	logerror("sbuf %02x (%04x)\n", data, PPC);
-	serial_send(data);
+	serial_send(data, total_cycles());
+	internal_update(total_cycles());
 }
 
 u8 i8x9x_device::sbuf_r()
@@ -271,7 +508,11 @@ u16 i8x9x_device::timer2_r()
 void i8x9x_device::baud_rate_w(u8 data)
 {
 	if (brh)
+	{
 		baud_reg = (baud_reg & 0x00ff) | u16(data) << 8;
+		if (!BIT(baud_reg, 15) && !machine().side_effects_disabled())
+			logerror("Serial baud rate uses unemulated T2CLK source (%04x)\n", baud_reg);
+	}
 	else
 		baud_reg = (baud_reg & 0xff00) | data;
 	if (!machine().side_effects_disabled())
@@ -306,7 +547,7 @@ u8 i8x9x_device::port1_r()
 	if (!i8x9x_has_p1())
 		return 0xff;
 
-	return m_in_p1_cb() & port1;
+	return m_in_p1_cb() & (port1 | m_p1_driven_mask);
 }
 
 void i8x9x_device::port2_w(u8 data)
@@ -314,17 +555,32 @@ void i8x9x_device::port2_w(u8 data)
 	data &= 0xe1 & i8x9x_p2_mask();
 	port2 = data;
 	m_out_p2_cb(data);
+	update_txd();
 }
 
 u8 i8x9x_device::port2_r()
 {
 	// P2.0 and P2.5 are for output only (but can be read back despite what Intel claims?)
-	return (m_in_p2_cb() | 0x25 | ~i8x9x_p2_mask()) & (port2 | (extint ? 0x1e : 0x1a));
+	// P2.1 is also the RXD input, which rxd_w drives
+	return (m_in_p2_cb() | 0x25 | ~i8x9x_p2_mask()) & (port2 | (extint ? 0x1e : 0x1a)) & (rxd_pin ? 0xff : 0xfd);
 }
 
 void i8x9x_device::sp_con_w(u8 data)
 {
+	u8 const old_mode = sp_con & 3;
 	sp_con = data & 0x1f;
+
+	// Changing modes resets the serial port, aborting any transmission or
+	// reception in progress; clearing REN stops a reception in progress
+	if ((sp_con & 3) != old_mode)
+	{
+		serial_tx_stop();
+		serial_rx_stop();
+	}
+	else if (!BIT(sp_con, 3) && rx_active)
+	{
+		serial_rx_stop();
+	}
 }
 
 u8 i8x9x_device::sp_stat_r()
@@ -361,6 +617,7 @@ void i8x9x_device::ios0_w(u8 data)
 void i8x9x_device::ioc1_w(u8 data)
 {
 	ioc1 = data;
+	update_txd();
 }
 
 u8 i8x9x_device::ios1_r()
@@ -507,8 +764,12 @@ void i8x9x_device::internal_update(u64 current_time)
 		check_irq();
 	}
 
-	if(serial_send_timer && current_time >= serial_send_timer)
-		serial_send_done();
+	// Serial port bit events. Each one schedules the next relative to its
+	// own deadline, so bit timing doesn't drift when an update runs late.
+	while(tx_next && current_time >= tx_next)
+		tx_event(tx_next);
+	while(rx_next && current_time >= rx_next)
+		rx_event(rx_next);
 
 	u64 event_time = 0;
 	for(int i=0; i<8; i++) {
@@ -534,8 +795,11 @@ void i8x9x_device::internal_update(u64 current_time)
 	if(ad_done && (!event_time || ad_done < event_time))
 		event_time = ad_done;
 
-	if(serial_send_timer && (!event_time || serial_send_timer < event_time))
-		event_time = serial_send_timer;
+	if(tx_next && (!event_time || tx_next < event_time))
+		event_time = tx_next;
+
+	if(rx_next && (!event_time || rx_next < event_time))
+		event_time = rx_next;
 
 	recompute_bcount(event_time);
 }
