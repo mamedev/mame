@@ -269,7 +269,7 @@ macronix_29f1610mc_device::macronix_29f1610mc_device(const machine_config &mconf
 	: intelfsh8_device(mconfig, MACRONIX_29F1610MC, tag, owner, clock, 0x200000, MFG_MACRONIX, 0xfa) { }
 
 macronix_29f1610mc_16bit_device::macronix_29f1610mc_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, MACRONIX_29F1610MC_16BIT, tag, owner, clock, 0x100000, MFG_MACRONIX, 0xfa) { }
+	: intelfsh16_device(mconfig, MACRONIX_29F1610MC_16BIT, tag, owner, clock, 0x200000, MFG_MACRONIX, 0xfa) { }
 
 macronix_29l001mc_device::macronix_29l001mc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, MACRONIX_29L001MC, tag, owner, clock, 0x20000, MFG_MACRONIX, 0x51) { }
@@ -650,7 +650,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			break;
 		case 0x90:
 			// TODO: W640GB also needs this path
-			if ( m_fast_mode && (m_maker_id == MFG_FUJITSU || (m_maker_id == MFG_ST && (m_device_id == 0x22ed || m_device_id == 0x227e))) ) // reset from fast mode (when fast mode is enabled)
+			if ( m_fast_mode && (m_maker_id == MFG_FUJITSU || (m_maker_id == MFG_MACRONIX && m_device_id == 0xfa) || (m_maker_id == MFG_ST && (m_device_id == 0x22ed || m_device_id == 0x227e))) ) // reset from fast mode (when fast mode is enabled)
 				m_flash_mode = FM_FAST_RESET;
 			else // read ID
 				m_flash_mode = FM_READID;
@@ -691,7 +691,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			m_flash_mode = FM_READSTATUS;
 			break;
 		case 0xa0: // fast program (fast mode must be enabled)
-			if ( m_fast_mode && (m_maker_id == MFG_FUJITSU || (m_maker_id == MFG_ST && (m_device_id == 0x22ed || m_device_id == 0x227e))) )
+			if ( m_fast_mode && (m_maker_id == MFG_FUJITSU || (m_maker_id == MFG_MACRONIX && m_device_id == 0xfa) || (m_maker_id == MFG_ST && (m_device_id == 0x22ed || m_device_id == 0x227e))) )
 			{
 				m_flash_mode = FM_BYTEPROGRAM;
 			}
