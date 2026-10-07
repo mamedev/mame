@@ -55,6 +55,24 @@ software_info_item::software_info_item(std::string &&name, std::string &&value) 
 
 
 //**************************************************************************
+//  SOFTWARE PIECE
+//**************************************************************************
+
+//-------------------------------------------------
+//  software_piece_info - constructor
+//-------------------------------------------------
+
+software_piece_info::software_piece_info(std::string &&index, std::string &&title, std::string &&creator, std::string &&alt_title, std::string &&alt_creator) :
+	m_index(index),
+	m_title(title),
+	m_creator(creator),
+	m_alt_title(alt_title),
+	m_alt_creator(alt_creator)
+{
+}
+
+
+//**************************************************************************
 //  SOFTWARE PART
 //**************************************************************************
 
@@ -737,6 +755,22 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 		else
 		{
 			parse_error("Incomplete feature definition");
+		}
+	}
+
+	// <piece index=''>
+	else if (strcmp(tagname, "piece") == 0)
+	{
+		static char const *const attrnames[] = { "index", "title", "creator", "alt_title", "alt_creator" };
+		auto attrvalues = parse_attributes(attributes, attrnames);
+
+		if (!attrvalues[0].empty() && !attrvalues[1].empty())
+		{
+			m_current_part->m_pieces.emplace_back(std::string(attrvalues[0]), std::string(attrvalues[1]), std::string(attrvalues[2]), std::string(attrvalues[3]), std::string(attrvalues[4]));
+		}
+		else
+		{
+			parse_error("Incomplete piece definition");
 		}
 	}
 
