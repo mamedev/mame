@@ -1899,7 +1899,7 @@ void galaxian_state::thepitm_map(address_map &map)
 void galaxian_state::amidarc_map(address_map &map)
 {
 	thepitm_map(map);
-	map(0x8400, 0x87ff).ram(); // needs a full 2k of RAM
+	map(0x8400, 0x87ff).ram(); // needs 2k of RAM
 }
 
 void pisces_state::porter_map(address_map &map)
