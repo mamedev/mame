@@ -711,11 +711,11 @@ ROM_START( afterwar )
 	ROM_LOAD( "b15_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "b5_palce20v8h.bin",   0x000, 0x157, NO_DUMP )
 	ROM_LOAD( "b26_tibpal22v10.bin", 0x000, 0x2dd, NO_DUMP )
-	ROM_LOAD( "p28_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "p29_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "p30_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "p28_palce16v8h.bin",  0x000, 0x117, BAD_DUMP CRC(45cdc4c0) SHA1(9a0ef475c0b43a08aa6a30bd7997e68db84f6076) ) // Bruteforced and untested
+	ROM_LOAD( "p29_palce16v8h.bin",  0x000, 0x117, BAD_DUMP CRC(589221c9) SHA1(d15d71944b606cb5b4a9c2f7747bb76b6b39b157) ) // Bruteforced and untested
+	ROM_LOAD( "p31_palce16v8h.bin",  0x000, 0x117, BAD_DUMP CRC(54d9ad1e) SHA1(76b8491861a689a8e5435be69f15eeda05c94653) ) // Bruteforced and untested
 	ROM_LOAD( "s31_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "s32_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "s32_palce16v8h.bin",  0x000, 0x117, BAD_DUMP CRC(554b0809) SHA1(4252086c7208bb738442aaf5edfa8641d173e914) ) // Bruteforced and untested
 	ROM_LOAD( "s33_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
 ROM_END
 
@@ -829,7 +829,7 @@ ROM_START( indpds )
 
 	ROM_REGION( 0x2000, "inder_sb:audiocpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x400, "pic", 0 ) // unknown PIC type, probably 16C54
+	ROM_REGION( 0x400, "pic", 0 ) // unknown PIC type, probably PIC16C54
 	ROM_LOAD( "vj_pic_v3.u7", 0x000, 0x400, NO_DUMP )
 
 	ROM_REGION( 0x200, "pals", 0 ) // types unknown
