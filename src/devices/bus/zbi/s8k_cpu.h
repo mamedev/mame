@@ -118,8 +118,8 @@ protected:
 	bool m_is_seg_user = false;
 
 	uint16_t m_nmi_code = 0;
-	bool m_memory_error_enabled = false;
-	bool m_memory_error_latched = false;
+	bool m_memory_error_enabled;
+	bool m_memory_error_latched;
 	int m_normal_mode = 0;
 	int m_dma_on = 0;
 };

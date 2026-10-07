@@ -273,10 +273,6 @@ void zbi_s8k_parity_ram_card_device::device_start()
 	save_pointer(NAME(m_checkbits), m_checksize);
 }
 
-void zbi_s8k_parity_ram_card_device::device_reset()
-{
-}
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS

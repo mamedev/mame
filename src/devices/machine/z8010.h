@@ -101,6 +101,13 @@ protected:
 	};
 
 public:
+	struct memory_result
+	{
+		offs_t address;       // valid only when address_driven is true
+		bool address_driven;  // false when the address outputs are high impedance
+		bool suppress;        // SUP asserted for this memory cycle
+	};
+
 	z8010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto out_segt_cb() { return m_out_segt.bind(); }
@@ -108,13 +115,6 @@ public:
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
-
-	struct memory_result
-	{
-		offs_t address;       // valid only when address_driven is true
-		bool address_driven;  // false when the address outputs are high impedance
-		bool suppress;        // SUP asserted for this memory cycle
-	};
 
 	memory_result translate(offs_t offset, bool write, bool sys, bool dma, int st);
 
@@ -165,7 +165,7 @@ protected:
 	/* running latch of the last IFETCH1 cycle observed on the bus */
 	uint8_t m_if1_seg;
 	uint8_t m_if1_hoffs;
-	bool m_cpu_suppress = false;
+	bool m_cpu_suppress;
 };
 
 // device type definition

@@ -17,6 +17,9 @@ been dumped yet, so currently only high-level emulation is possible.
 
 #include "imagedev/harddriv.h"
 
+#include <algorithm>
+#include <iterator>
+
 //**************************************************************************
 //  DEBUGGING
 //**************************************************************************
@@ -167,6 +170,10 @@ enum : uint16_t
 	SMD_DS_SKE      = 0x1000    /* ports 0-3 seek end */
 };
 
+constexpr uint16_t SMD_FW_VERSION = 0x1234;
+
+namespace {
+
 /* Format ID words */
 enum : uint16_t
 {
@@ -177,10 +184,6 @@ enum : uint16_t
 	SMD_ID_SP          = 0x4000,   /* spare sector */
 	SMD_ID_SECTOR_MASK = 0x3fff
 };
-
-constexpr uint16_t SMD_FW_VERSION = 0x1234;
-
-namespace {
 
 class zbi_s8k_smdc_card_device : public device_t, public device_zbi_card_interface
 {
@@ -293,14 +296,15 @@ zbi_s8k_smdc_card_device::zbi_s8k_smdc_card_device(const machine_config &mconfig
 
 void zbi_s8k_smdc_card_device::smd_init()
 {
-	memset(&m_buffer[0], 0, 512);
-	memset(&m_dt[0], 0, 24);
-	memset(&m_pkt[0], 0, 32);
+	std::fill(std::begin(m_buffer), std::end(m_buffer), 0);
+	std::fill(std::begin(m_dt), std::end(m_dt), 0);
+	std::fill(std::begin(m_pkt), std::end(m_pkt), 0);
 
 	m_cyl[0] = m_cyl[1] = m_cyl[2] = m_cyl[3] = 0;
 	m_format_overflow[0] = m_format_overflow[1] = m_format_overflow[2] = m_format_overflow[3] = false;
 	m_extra_sector[0] = m_extra_sector[1] = m_extra_sector[2] = m_extra_sector[3] = false;
-	memset(m_extra_data, 0, sizeof(m_extra_data));
+	for (auto &data : m_extra_data)
+		std::fill_n(data, sizeof(data), 0);
 
 	m_ie = false;
 	m_iv = 0;
@@ -648,7 +652,7 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 		// A CHD has no representation for the physical sector IDs or their
 		// ECC.  Consume the supplied ID list and initialise the corresponding
 		// data sectors; bad and spare sectors have no LBA in the image.
-		memset(m_buffer, 0, file->get_info().sectorbytes);
+		std::fill_n(m_buffer, file->get_info().sectorbytes, 0);
 		m_format_overflow[unit] = false;
 		m_extra_sector[unit] = false;
 		active_sectors = 0;
@@ -675,7 +679,7 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 			if ((sector & SMD_ID_SECTOR_MASK) >= file->get_info().sectors)
 			{
 				if ((sector & SMD_ID_SECTOR_MASK) == file->get_info().sectors)
-					memset(m_extra_data[unit], 0, file->get_info().sectorbytes);
+					std::fill_n(m_extra_data[unit], file->get_info().sectorbytes, 0);
 				continue;
 			}
 
@@ -788,7 +792,7 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 
 			// Preserve the unused part of a sector for a short final transfer.
 			if (virtual_spare)
-				memcpy(m_buffer, m_extra_data[unit], file->get_info().sectorbytes);
+				std::copy_n(m_extra_data[unit], file->get_info().sectorbytes, m_buffer);
 			else if ((count != file->get_info().sectorbytes) && !file->read(block, m_buffer))
 			{
 				m_es = SMD_ES_NOSECTOR;
@@ -800,7 +804,7 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 				m_buffer[n] = m_bus->ram8_r(dma_idx++);
 
 			if (virtual_spare)
-				memcpy(m_extra_data[unit], m_buffer, file->get_info().sectorbytes);
+				std::copy_n(m_buffer, file->get_info().sectorbytes, m_extra_data[unit]);
 			else if (!file->write(block, m_buffer))
 			{
 				m_es = SMD_ES_NOSECTOR;
@@ -875,7 +879,7 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 			LOGSEEK(" --> seek to block $%d (offset %d)\n", block, block*512);
 
 			if (virtual_spare)
-				memcpy(m_buffer, m_extra_data[unit], file->get_info().sectorbytes);
+				std::copy_n(m_extra_data[unit], file->get_info().sectorbytes, m_buffer);
 			else if (!file->read(block, m_buffer))
 			{
 				m_es = SMD_ES_NOSECTOR;
