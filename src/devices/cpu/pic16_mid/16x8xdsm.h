@@ -9,8 +9,8 @@
 
 */
 
-#ifndef MAME_CPU_PIC16X8X_16X8XDSM_H
-#define MAME_CPU_PIC16X8X_16X8XDSM_H
+#ifndef MAME_CPU_PIC16_MID_16X8XDSM_H
+#define MAME_CPU_PIC16_MID_16X8XDSM_H
 
 #pragma once
 
@@ -43,4 +43,4 @@ private:
 	std::vector<PIC16X8xOpcode> Op;
 };
 
-#endif
+#endif // MAME_CPU_PIC16_MID_16X8XDSM_H
