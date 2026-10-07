@@ -28,6 +28,10 @@ DEFINE_DEVICE_TYPE(CV1K_BLITTER, cv1k_blitter_device, "cv1k_blitter", "Cave CV10
 
 static constexpr int CV1K_VRAM_CLK_NANOSEC = 13;
 static constexpr int CV1K_SRAM_CLK_NANOSEC = 20;
+// Gap between two 64 byte reads of Upload data from Main RAM, while the Blitter
+// requests the bus from the SH-3 again (BREQ/BACK). Measured on PCB at about
+// 1.13us, varying a little with how quickly the CPU acknowledges.
+static constexpr int CV1K_UPLOAD_CHUNK_GAP_NANOSEC = 1130;
 static constexpr int CV1K_VRAM_H_LINE_PERIOD_NANOSEC = 63600;
 static constexpr int CV1K_VRAM_H_LINE_DURATION_NANOSEC = 2160;
 static constexpr int CV1K_FRAME_DURATION_NANOSEC = 16666666;
@@ -204,6 +208,9 @@ inline u16 cv1k_blitter_device::COPY_NEXT_WORD(address_space &space, offs_t &add
 
 inline void cv1k_blitter_device::gfx_upload_shadow_copy(address_space &space, offs_t &addr)
 {
+	// Where this operation starts within the 64 byte chunk the Blitter reads it in.
+	const u32 chunk_offset = (addr - (m_gfx_addr & 0x1fffffff)) & (OPERATION_CHUNK_SIZE_BYTES - 1);
+
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
@@ -227,12 +234,17 @@ inline void cv1k_blitter_device::gfx_upload_shadow_copy(address_space &space, of
 	// and then write it to VRAM.
 	// The number of bytes to read are the sum of a 16b fixed header and the pixel
 	// data (2 byte per pixel). RAM accesses are 32bit, so divide by four for clocks.
-	const int num_sram_clk = (16 + dimx * dimy * 2) / 4;
+	const int num_bytes = 16 + dimx * dimy * 2;
+	const int num_sram_clk = num_bytes / 4;
 	// Due to the way cv1k titles handle the flash read -> decompress -> flush -> invalidate
 	// for data for the blitter it's pretty safe to just steal the bus cycles directly from
 	// the cpu. Each bus cycle is 2 cpu cycles
 	m_maincpu->m_sh2_state->icount -= num_sram_clk * 2;
 	m_blit_delay_ns += num_sram_clk * CV1K_SRAM_CLK_NANOSEC;
+	// Upload operations are written to VRAM as they arrive, and the Blitter will wait
+	// with Bus Request between each 64 byte chunk. See "Blitter Research by buffi".
+	const int num_chunk_gaps = (chunk_offset + num_bytes) / OPERATION_CHUNK_SIZE_BYTES;
+	m_blit_delay_ns += num_chunk_gaps * CV1K_UPLOAD_CHUNK_GAP_NANOSEC;
 	m_blit_idle_op_bytes = 0;
 }
 
@@ -499,8 +511,7 @@ inline void cv1k_blitter_device::gfx_draw_shadow_copy(address_space &space, offs
 	//   - 20 CLK of overhead between read and write of each destination VRAM row.
 	//   - 11 CLK of overhead after each write to a destination VRAM row.
 	// - 12 CLK of additional overhead per sprite at the end of writing.
-	// Note: Details are from https://buffis.com/docs/CV1000_Blitter_Research_by_buffi.pdf
-	//       There may be mistakes.
+	// Note: Details are from "Blitter Research by buffi". There may be mistakes.
 	const u32 num_vram_clk = src_dimx * src_dimy / 4 + dst_dimx * dst_dimy / 2 + src_num_vram_rows * 6 + dst_num_vram_rows * (20 + 11) + 12;
 	m_blit_delay_ns += num_vram_clk * CV1K_VRAM_CLK_NANOSEC;
 }
