@@ -1896,6 +1896,12 @@ void galaxian_state::thepitm_map(address_map &map)
 	map(0xb004, 0xb004).mirror(0x7f8).nopw(); // disable the stars
 }
 
+void galaxian_state::amidarc_map(address_map &map)
+{
+	thepitm_map(map);
+	map(0x8400, 0x87ff).ram(); // needs a full 2k of RAM
+}
+
 void pisces_state::porter_map(address_map &map)
 {
 	mooncrst_map(map);
@@ -5499,6 +5505,19 @@ static INPUT_PORTS_START( amidaru )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( amidarb )
+	PORT_INCLUDE(amidaru)
+
+	// the bootleg gives one life less than the original for each setting
+	PORT_MODIFY("IN1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x00, "255 (Cheat)" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( amidaro )
 	PORT_INCLUDE(amidar)
 
@@ -5536,6 +5555,45 @@ static INPUT_PORTS_START( amidars )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "30000 70000" )
 	PORT_DIPSETTING(    0x04, "50000 80000" )
+INPUT_PORTS_END
+
+
+// the code at 0x4000 rearranges these into the original Konami layout
+static INPUT_PORTS_START( amidarc )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) // also acts as the jump button for player 1
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x80, "4" )
+	PORT_DIPSETTING(    0x40, "5" )
+	PORT_DIPSETTING(    0xc0, "255 (Cheat)" )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x02, "30000 70000" )
+	PORT_DIPSETTING(    0x00, "50000 80000" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coinage ) ) // also enables demo sounds
+	PORT_DIPSETTING(    0x00, "A 1/1 B 1/6" )
+	PORT_DIPSETTING(    0x04, "A 2/1 B 1/3" )
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -7812,6 +7870,12 @@ void galaxian_state::thepitm(machine_config &config)
 {
 	mooncrst(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::thepitm_map);
+}
+
+void galaxian_state::amidarc(machine_config &config)
+{
+	thepitm(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &galaxian_state::amidarc_map);
 }
 
 void pisces_state::porter(machine_config &config)
@@ -14809,7 +14873,7 @@ ROM_START( amidarc ) // on Cirsa 804018 PCB
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "amigal-i-2716.bin",  0x000, 0x800, CRC(2082ad0a) SHA1(c6014d9575e92adf09b0961c2158a779ebe940c4) )
-	ROM_LOAD( "amigal-h-2732.bin",  0x800, 0x800, CRC(8f774d5a) SHA1(215cf47e073e9e2e042d7564d426675e1cd4f884) ) // first half contains corrupt GFX. Bad dump or does the PCB just use the second half?
+	ROM_LOAD( "amigal-h-2732.bin",  0x800, 0x800, CRC(8f774d5a) SHA1(215cf47e073e9e2e042d7564d426675e1cd4f884) ) // 1st half is the same data with extra bits cleared (badly erased reused EPROM), unused: 2716 socket ties pin 21 (A11) high
 	ROM_CONTINUE(                   0x800, 0x800 ) // amigal-h-2732.bin [2/2] == 6.5h of amidarb
 
 	ROM_REGION( 0x20, "proms", 0 )
@@ -17208,9 +17272,9 @@ GAME( 1982, amidar,      0,        turtles,    amidaru,    galaxian_state, init_
 GAME( 1981, amidar1,     amidar,   turtles,    amidar,     galaxian_state, init_turtles,    ROT90,  "Konami",                             "Amidar (older)",                                                         MACHINE_SUPPORTS_SAVE )
 GAME( 1982, amidaru,     amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "Konami (Stern Electronics license)", "Amidar (Stern Electronics)",                                             MACHINE_SUPPORTS_SAVE )
 GAME( 1982, amidaro,     amidar,   turtles,    amidaro,    galaxian_state, init_turtles,    ROT90,  "Konami (Olympia license)",           "Amidar (Olympia)",                                                       MACHINE_SUPPORTS_SAVE )
-GAME( 1982, amidarb,     amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Amidar (bootleg, set 1)",                                                MACHINE_SUPPORTS_SAVE ) // Similar to Amigo bootleg
+GAME( 1982, amidarb,     amidar,   turtles,    amidarb,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Amidar (bootleg, set 1)",                                                MACHINE_SUPPORTS_SAVE ) // Similar to Amigo bootleg
 GAME( 1982, amidarb2,    amidar,   mandingarf, olmandingo, galaxian_state, init_galaxian,   ROT90,  "bootleg",                            "Amidar (bootleg, set 2)",                                                MACHINE_SUPPORTS_SAVE )
-GAME( 1982, amidarc,     amidar,   thepitm,    mandingarf, galaxian_state, init_turtles,    ROT90,  "bootleg (Cirsa)",                    "Amidar (Cirsa bootleg)",                                                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // resets when starting a game
+GAME( 1982, amidarc,     amidar,   amidarc,    amidarc,    galaxian_state, init_turtles,    ROT90,  "bootleg (Cirsa)",                    "Amidar (Cirsa bootleg)",                                                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, amigo,       amidar,   turtles,    amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Amigo (bootleg of Amidar, set 1)",                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1982, amigo2,      amidar,   amigo2,     amidaru,    galaxian_state, init_turtles,    ROT90,  "bootleg",                            "Amigo (bootleg of Amidar, set 2)",                                       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // sound timer might be different?
 GAME( 1982, amidars,     amidar,   scramble,   amidars,    galaxian_state, init_scramble,   ROT90,  "Konami",                             "Amidar (Scramble hardware)",                                             MACHINE_SUPPORTS_SAVE )
