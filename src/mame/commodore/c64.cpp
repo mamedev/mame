@@ -1,15 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 
-/*
-
-	TODO:
-
-	- clipper
-		- printer
-
-*/
-
 #include "emu.h"
 #include "screen.h"
 #include "softlist_dev.h"
@@ -24,6 +15,8 @@
 #include "cpu/m6502/m6510.h"
 #include "imagedev/snapquik.h"
 #include "cbm_snqk.h"
+#include "clipper_prn.h"
+#include "machine/6522via.h"
 #include "machine/input_merger.h"
 #include "machine/mos6526.h"
 #include "machine/pla.h"
@@ -160,6 +153,8 @@ public:
 
 	uint8_t sid_potx_r();
 	uint8_t sid_poty_r();
+	virtual uint8_t sid_r(offs_t offset) { return m_sid->read(offset & 0x1f); }
+	virtual void sid_w(offs_t offset, uint8_t data) { m_sid->write(offset & 0x1f, data); }
 
 	uint8_t cia1_pa_r();
 	void cia1_pa_w(uint8_t data);
@@ -277,6 +272,8 @@ public:
 	clipper_state(const machine_config &mconfig, device_type type, const char *tag)
 		: c64_state(mconfig, type, tag),
 		m_sb(*this, "sb"),
+		m_via(*this, "via"),
+		m_printer(*this, "printer"),
 		m_combo(*this, "COMBO"),
 		m_extra(*this, "EXTRA")
 	{ }
@@ -290,9 +287,13 @@ protected:
 	virtual int exp_exrom_r(offs_t offset, int sphi2, int ba, int rw) override { return 0; }
 	virtual uint8_t exp_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
 	virtual void exp_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) override;
+	virtual uint8_t sid_r(offs_t offset) override;
+	virtual void sid_w(offs_t offset, uint8_t data) override;
 
 private:
 	required_region_ptr<uint8_t> m_sb;
+	required_device<via6522_device> m_via;
+	required_device<clipper_prn_device> m_printer;
 	required_ioport m_combo;
 	required_ioport m_extra;
 
@@ -300,6 +301,7 @@ private:
 
 	uint8_t cia1_pa_r();
 	uint8_t cia1_pb_r();
+	void via_pb_w(uint8_t data);
 };
 
 
@@ -589,7 +591,7 @@ uint8_t c64_state::read_memory(offs_t offset, offs_t va, int aec, int ba)
 		case 5:
 		case 6:
 		case 7: // SID
-			data = m_sid->read(offset & 0x1f);
+			data = sid_r(offset);
 			break;
 
 		case 0x8:
@@ -660,7 +662,7 @@ void c64_state::write_memory(offs_t offset, uint8_t data, int aec, int ba)
 		case 5:
 		case 6:
 		case 7: // SID
-			m_sid->write(offset & 0x1f, data);
+			sid_w(offset, data);
 			break;
 
 		case 0x8:
@@ -1730,6 +1732,28 @@ void clipper_state::machine_reset()
 }
 
 
+uint8_t clipper_state::sid_r(offs_t offset)
+{
+	if ((offset & 0xfff0) == 0xd430)
+		return m_via->read(offset & 0x0f);
+
+	return c64_state::sid_r(offset);
+}
+
+void clipper_state::sid_w(offs_t offset, uint8_t data)
+{
+	if ((offset & 0xfff0) == 0xd430)
+		m_via->write(offset & 0x0f, data);
+	else
+		c64_state::sid_w(offset, data);
+}
+
+void clipper_state::via_pb_w(uint8_t data)
+{
+	m_printer->strobe_w(BIT(data, 6));
+}
+
+
 uint8_t clipper_state::cia1_pa_r()
 {
 	uint8_t data = 0xff;
@@ -2212,6 +2236,13 @@ void clipper_state::clipper(machine_config &config)
 	m_cia1->pb_rd_callback().set(FUNC(clipper_state::cia1_pb_r));
 
 	CBM_IEC_SLOT(config.replace(), "iec8", 8, clipper_iec_devices, "clipper_fdd");
+	CLIPPER_PRN(config, m_printer);
+	m_printer->ack_handler().set(m_via, FUNC(via6522_device::write_ca1));
+
+	MOS6522(config, m_via, XTAL(17'734'472)/18);
+	m_via->writepa_handler().set(m_printer, FUNC(clipper_prn_device::data_w));
+	m_via->writepb_handler().set(FUNC(clipper_state::via_pb_w));
+	m_via->irq_handler().set(m_irq, FUNC(input_merger_device::in_w<3>));
 
 	// software list
 	SOFTWARE_LIST(config, "flop525").set_original("clipper_flop");
@@ -2578,9 +2609,6 @@ ROM_START( clipper )
 	ROM_LOAD( "sb1.bin", 0x0000, 0x2000, CRC(400040be) SHA1(b290216f49b24355a1a2b25adfa96709c5d9c049) )
 	ROM_LOAD( "sb2.bin", 0x2000, 0x2000, CRC(a3d7177a) SHA1(0f50381aecf3c5ea03cce358a3325b3e06939c37) )
 	ROM_LOAD( "sb3.bin", 0x4000, 0x2000, CRC(7b1fc6c6) SHA1(900fe4be8d6348bf68dbda0c7ecefc84bda51202) )
-
-	ROM_REGION( 0x1000, "thdr", 0 )
-	ROM_LOAD( "thdr5.bin", 0x0000, 0x1000, CRC(b4296e62) SHA1(4b6edadbb810c409ece77d5834568fcc2e0bbd61) )
 ROM_END
 
 } // anonymous namespace
