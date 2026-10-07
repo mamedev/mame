@@ -31,8 +31,8 @@
     TODO:
     - the serial ports are driven by the games but nothing is known to be
       connected to them
-    - the YGV625 layer/priority registers and the deformation table are not
-      used by these games and are not emulated
+    - the YGV625 layer/priority registers are not used by these games and
+      are not emulated
 
     Many series of games were done on this platform. As of now, games
     for the following series have been dumped:
@@ -229,6 +229,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include <vector>
+
 
 namespace {
 
@@ -329,7 +331,7 @@ void amuzy_state::amuzy_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
 	map(0x200000, 0x20ffff).ram();
-	map(0x220000, 0x22000f).rw("rtc", FUNC(upd4992_device::read), FUNC(upd4992_device::write)).umask16(0x00ff);
+	map(0x220000, 0x22000f).umask16(0x00ff).rw("rtc", FUNC(upd4992_device::read), FUNC(upd4992_device::write));
 	map(0x400001, 0x400001).rw(m_oki, FUNC(okim9810_device::read_status), FUNC(okim9810_device::write_command));
 	map(0x400003, 0x400003).w(m_oki, FUNC(okim9810_device::write_tmp_register));
 	map(0x600000, 0x603fff).rw("ygv", FUNC(ygv625_device::read), FUNC(ygv625_device::write));
@@ -584,7 +586,7 @@ void amuzy_state::init_amuzy()
 {
 	memory_region *region = memregion("oki");
 	u8 *rom = region->base();
-	const u32 half = 0x100000;
+	constexpr u32 half = 0x100000;
 	std::vector<u8> copy(rom, rom + 2 * half);
 	for (u32 i = 0; i < half; i++)
 	{
