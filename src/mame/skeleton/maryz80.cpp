@@ -30,7 +30,7 @@ Inputs are from mscbar.cpp
 #include "sound/ay8910.h"
 #include "speaker.h"
 
-
+#include "maryz80.lh"
 
 namespace {
 
@@ -48,7 +48,6 @@ public:
 
 	void maryz80(machine_config &config);
 	
-
 protected:
 	virtual void machine_start() override;
 
@@ -63,20 +62,15 @@ private:
 	void ppi_port_b_w(uint8_t data);
 	void ppi_port_c_w(uint8_t data);
 
-//	void out_w(u8 data) ATTR_COLD;
-
-	uint8_t keyboard_r();
 	void io_map(address_map &map);
 	void program_map(address_map &map);
-	void program_map2(address_map &map);
 	uint8_t m_selected_7seg_module = 0;
-	uint8_t m_p1_out = 0xff;
-	
+	uint8_t keyboard_r();
+
 	output_finder<32> m_digits;
 	output_finder<80> m_leds;
 	required_ioport_array<4> m_inputs;
     required_device<hopper_device> m_hopper;
-
 };
 
 static INPUT_PORTS_START( maryz80 )
@@ -148,10 +142,7 @@ static INPUT_PORTS_START( maryz80 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW:7")
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW:8")
 
-
 INPUT_PORTS_END
-
-
 
 void maryz80_state::ay1_port_a_w(uint8_t data) // roulette 1
 {
@@ -180,22 +171,16 @@ void maryz80_state::ay2_port_b_w(uint8_t data) // roulette 3?
 
 void maryz80_state::ppi_port_a_w(uint8_t data) 
 {
-	for (uint8_t i = 4; i < 8; i++)
-	 logerror("Port a Write to %02x\n", data);
-
+        logerror("Port a Write to %02x\n", data);
 }
 
 void maryz80_state::ppi_port_b_w(uint8_t data) 
 {
-	for (uint8_t i = 4; i < 8; i++)
 		 logerror("Port b Write to %02x\n", data);
-
 }
 void maryz80_state::ppi_port_c_w(uint8_t data) 
 {
-	for (uint8_t i = 4; i < 8; i++)
 		 logerror("Port c Write to %02x\n", data);
-	
 }
 
 void maryz80_state::multiplex_7seg_w(uint8_t data)
@@ -225,18 +210,11 @@ void maryz80_state::display_7seg_data_w(uint8_t data)
 	m_digits[2 * m_selected_7seg_module + 1] = patterns[data >> 4];
 }
 
-
 void maryz80_state::program_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("maincpu", 0);
     map(0xc000, 0xc7ff).ram().share("ram1");
     map(0xe000, 0xe7ff).ram().share("ram2");
-
-}
-
-void maryz80_state::program_map2(address_map &map)
-{
-	map(0x0000, 0x3fff).rom().region("maincpu", 0);
 
 }
 
@@ -255,15 +233,12 @@ void maryz80_state::io_map(address_map &map)
 void maryz80_state::machine_start()
 {
 	save_item(NAME(m_selected_7seg_module));
-	save_item(NAME(m_p1_out));
-
 }
 
 void maryz80_state::maryz80(machine_config &config)
 {
-
 	/* basic machine hardware */
-	z80_device &maincpu(Z80(config, "maincpu", XTAL(3'579'545)));
+	z80_device &maincpu(Z80(config, "maincpu", XTAL(3'580'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &maryz80_state::program_map);
 	maincpu.set_addrmap(AS_IO, &maryz80_state::io_map);
     NVRAM(config, "ram1", nvram_device::DEFAULT_ALL_0);
@@ -279,30 +254,32 @@ void maryz80_state::maryz80(machine_config &config)
 	ppi.out_pa_callback().set(FUNC(maryz80_state::ppi_port_c_w));
 
 	pit8253_device &pit(PIT8253(config, "pit1", 0)); // m5l8253p-5; unknown clocks
-	pit.set_clk<0>(XTAL(3'579'545) / 2);
+	pit.set_clk<0>(XTAL(3'580'000) / 2);
 	pit.out_handler<0>().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
 	/* Keyboard & display interface */
-	i8279_device &kbdc(I8279(config, "i8279", XTAL(3'579'545) / 2));
+	i8279_device &kbdc(I8279(config, "i8279", XTAL(3'580'000) / 2));
 	kbdc.out_sl_callback().set(FUNC(maryz80_state::multiplex_7seg_w));   // select  block of 7seg modules by multiplexing the SL scan lines
 	kbdc.in_rl_callback().set(FUNC(maryz80_state::keyboard_r));          // keyboard Return Lines
 	kbdc.out_disp_callback().set(FUNC(maryz80_state::display_7seg_data_w));
 
-  /* sound hardware */
+	/* Video */
+	config.set_default_layout(layout_maryz80);
+
+	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &ay1(AY8910(config, "ay1", XTAL(3'579'545) / 2));
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(3'580'000) / 2));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
     ay1.port_a_write_callback().set(FUNC(maryz80_state::ay1_port_a_w));
 	ay1.port_b_write_callback().set(FUNC(maryz80_state::ay1_port_b_w));
 
-	ay8910_device &ay2(AY8910(config, "ay2", XTAL(3'579'545) / 2));
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(3'580'000) / 2));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.50);
 	ay2.port_a_write_callback().set(FUNC(maryz80_state::ay2_port_a_w)); 
 	ay2.port_b_write_callback().set(FUNC(maryz80_state::ay2_port_b_w));
 
-	HOPPER(config, m_hopper, attotime::from_msec(100));
-
+	HOPPER(config, m_hopper, attotime::from_msec(10));
 }
 
 ROM_START( xiaomali )
