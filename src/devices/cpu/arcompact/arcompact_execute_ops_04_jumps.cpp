@@ -19,6 +19,7 @@ uint32_t arcompact_device::handle_jump_to_addr(bool delay, bool link, uint32_t a
 	{
 		if (link)
 			m_regs[REG_BLINK] = next_addr;
+		m_allow_loop_check = false;
 		return address;
 	}
 }

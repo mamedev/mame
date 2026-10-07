@@ -3248,6 +3248,19 @@ if BUSES["KIM1"] then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/leapster/slot.h,BUSES["LEAPSTER"] = true
+---------------------------------------------------
+
+if BUSES["LEAPSTER"] then
+	files {
+		MAME_DIR .. "src/devices/bus/leapster/slot.cpp",
+		MAME_DIR .. "src/devices/bus/leapster/slot.h",
+		MAME_DIR .. "src/devices/bus/leapster/rom.cpp",
+		MAME_DIR .. "src/devices/bus/leapster/rom.h",
+	}
+end
 
 ---------------------------------------------------
 --

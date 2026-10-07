@@ -46,9 +46,9 @@ uint32_t arcompact_device::handleop32_NORM_do_op(arcompact_device &o, uint32_t s
 	if ((src == 0xffffffff) || (src == 0x00000000))
 		result = 0x1f;
 	else if (src & 0x80000000)
-		result = std::countl_one(src);
+		result = std::countl_one(src) - 1;
 	else
-		result = std::countl_zero(src);
+		result = std::countl_zero(src) - 1;
 
 	if (set_flags)
 		o.do_flags_nz(src);
@@ -169,9 +169,9 @@ uint32_t arcompact_device::handleop32_NORMW_do_op(arcompact_device &o, uint32_t 
 	if ((source == 0x0000ffff) || (source == 0x00000000))
 		result = 0x0f;
 	else if (source & 0x00008000)
-		result = std::countl_one(source) - 0x10;
+		result = std::countl_one(source) - 0x11;
 	else
-		result = std::countl_zero(source) - 0x10;
+		result = std::countl_zero(source) - 0x11;
 
 	if (set_flags)
 		fatalerror("handleop32_NORMW (F set)\n"); // not yet supported

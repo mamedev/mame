@@ -10,6 +10,7 @@ inline uint32_t arcompact_device::branch_common(uint16_t op, bool cond, unsigned
 	{
 		int s = util::sext(op, width);
 		uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 2);
+		m_allow_loop_check = false;
 		return realaddress;
 	}
 	return m_pc + 2;

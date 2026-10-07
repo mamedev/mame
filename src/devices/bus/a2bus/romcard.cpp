@@ -12,11 +12,17 @@
     Apple at various points called it both "ROM Card" and
     "Firmware Card".
 
+    The Applesoft firmware card was originally released with only the
+    five ROMs containing the Applesoft II language, with the F8 socket
+    vacant and disabled.  The Autostart Monitor was later added to
+    occupy the F8 socket, and this is the configuration emulated here.
+
     Some later revisions of DOS 3.3 remove support for the Applesoft
     BASIC firmware card in slot 0 of an original Apple II, though
     they will load Applesoft onto a language card if one is present
-    there.  Compatible revisions print "APPLE II PLUS OR ROMCARD"
-    when successfully booted on any non-Integer BASIC system.
+    there.  Compatible revisions of the DOS 3.3 master disk print
+    "APPLE II PLUS OR ROMCARD" when successfully booted on any
+    non-Integer BASIC system.
 
 *********************************************************************/
 

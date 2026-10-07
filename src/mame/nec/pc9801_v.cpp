@@ -78,10 +78,10 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 
 UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 {
-	draw_text(bitmap, addr, y, wd, pitch, lr, cursor_on, cursor_addr, cursor_bot, cursor_top, false);
+	draw_text(bitmap, addr, y, wd, pitch, lr, cursor_on, cursor_addr, cursor_bot, cursor_top, topline, botline, false);
 }
 
-void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top, bool lower)
+void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top, int topline, int botline, bool lower)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
@@ -188,7 +188,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 			uint8_t gfx_mode = (m_video_ff[ATTRSEL_REG]) ? attr & 0x10 : 0;
 			uint8_t color = (attr & 0xe0) >> 5;
 
-			for(int yi=0;yi<lr;yi++)
+			for(int yi=topline;yi<botline;yi++)
 			{
 				int res_y = y + yi;
 				if((line >= scroll_start) && (line <= scroll_end))
@@ -290,7 +290,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 		}
 	}
 	if(scroll && !lower && (line >= scroll_start) && (line <= scroll_end))
-		return draw_text(bitmap, addr += pitch, y, wd, pitch, lr, cursor_on, cursor_addr, cursor_bot, cursor_top, true);
+		return draw_text(bitmap, addr += pitch, y, wd, pitch, lr, cursor_on, cursor_addr, cursor_bot, cursor_top, topline, botline, true);
 }
 
 /*************************************************

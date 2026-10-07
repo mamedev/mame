@@ -189,7 +189,7 @@
 
 #include "emu.h"
 #include "cpu/pic16c5x/pic16c5x.h"
-#include "cpu/pic16x8x/pic16x8x.h"
+#include "cpu/pic16_mid/pic16_mid.h"
 #include "machine/ds1207.h"
 #include "machine/ds2401.h"
 #include "machine/i2cmem.h"

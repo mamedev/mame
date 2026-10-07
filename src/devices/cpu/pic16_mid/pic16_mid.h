@@ -6,42 +6,29 @@
 
 ************************************************************************/
 
-#ifndef MAME_CPU_PIC16X8X_PIC16X8X_H
-#define MAME_CPU_PIC16X8X_PIC16X8X_H
+#ifndef MAME_CPU_PIC16_MID_PIC16_MID_H
+#define MAME_CPU_PIC16_MID_PIC16_MID_H
 
 #pragma once
 
 enum
 {
-	PIC16X8x_PC = 1,
-	PIC16X8x_W,
-	PIC16X8x_ALU,
-	PIC16X8x_PSCL,
-	PIC16X8x_CONFIG
+	PIC16_MID_PC = 1,
+	PIC16_MID_W,
+	PIC16_MID_ALU,
+	PIC16_MID_PSCL,
+	PIC16_MID_CONFIG
 };
 
 // input lines
 enum
 {
-	PIC16x8x_T0CKI = 0,
-	PIC16x8x_RB0INT
+	PIC16_MID_T0CKI = 0,
+	PIC16_MID_RB0INT
 };
 
-DECLARE_DEVICE_TYPE(PIC16CR83,  pic16cr83_device)
-DECLARE_DEVICE_TYPE(PIC16CR84,  pic16cr84_device)
-DECLARE_DEVICE_TYPE(PIC16F83,   pic16f83_device)
-DECLARE_DEVICE_TYPE(PIC16F84,   pic16f84_device)
-DECLARE_DEVICE_TYPE(PIC16F84A,  pic16f84a_device)
-DECLARE_DEVICE_TYPE(PIC16F628A, pic16f628a_device)
-
-class pic16x8x_device : public cpu_device, public device_nvram_interface
+class pic16_mid_device : public cpu_device
 {
-	enum
-	{
-		PORTA = 0,
-		PORTB
-	};
-
 public:
 	// port a, 5 or 8 bits, 2-way
 	auto read_a() { return m_read_port[PORTA].bind(); }
@@ -51,17 +38,12 @@ public:
 	auto read_b() { return m_read_port[PORTB].bind(); }
 	auto write_b() { return m_write_port[PORTB].bind(); }
 
-	void rom_9(address_map &map) ATTR_COLD;
-	void rom_10(address_map &map) ATTR_COLD;
-	void rom_11(address_map &map) ATTR_COLD;
-	void rom_12(address_map &map) ATTR_COLD;
-
-	void core_regs(address_map &map, u8 mirror = 0) ATTR_COLD;
+	void base_map(address_map &map, u8 mirror = 0) ATTR_COLD;
 	void ram_6(address_map &map) ATTR_COLD;
 	void ram_7(address_map &map) ATTR_COLD;
 
 protected:
-	pic16x8x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, address_map_constructor program_map, address_map_constructor data_map, u16 eeprom_size, u8 status_mask, u8 porta_mask);
+	pic16_mid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, address_map_constructor data_map, u8 status_mask, u8 porta_mask);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -72,17 +54,12 @@ protected:
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); }
 	virtual u32 execute_min_cycles() const noexcept override { return 1; }
 	virtual u32 execute_max_cycles() const noexcept override { return 2; }
-	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == PIC16x8x_T0CKI; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == PIC16_MID_T0CKI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int line, int state) override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
-
-	// device_nvram_interface implementation
-	virtual bool nvram_read(util::read_stream &file) override;
-	virtual bool nvram_write(util::write_stream &file) override;
-	virtual void nvram_default() override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -91,9 +68,6 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-
-	// special function register
-	u8 m_INTCON;
 
 	// special function register access functions
 	u8 tmr0_r();
@@ -108,10 +82,6 @@ protected:
 	void porta_w(u8 data);
 	u8 portb_r();
 	void portb_w(u8 data);
-	u8 eedata_r();
-	void eedata_w(u8 data);
-	u8 eeadr_r();
-	void eeadr_w(u8 data);
 	u8 pclath_r();
 	void pclath_w(u8 data);
 	u8 intcon_r();
@@ -120,23 +90,22 @@ protected:
 	void trisa_w(u8 data);
 	u8 trisb_r();
 	void trisb_w(u8 data);
-	u8 eecon1_r();
-	void eecon1_w(u8 data);
-	u8 eecon2_r();
-	void eecon2_w(u8 data);
 	u8 option_r();
 	void option_w(u8 data);
 
-	virtual void set_eeif();
 	virtual bool irq_active() const;
 	virtual void wdt_reset();
 
+	optional_memory_region m_region;
+
+	// special function register
+	u8 m_INTCON;
+
 private:
-	enum : u8
+	enum
 	{
-		EEPROM_LOCKED,
-		EEPROM_55_WRITTEN,
-		EEPROM_AA_WRITTEN,
+		PORTA = 0,
+		PORTB
 	};
 
 	int m_program_width;
@@ -146,8 +115,6 @@ private:
 
 	memory_access<13, 1, -1, ENDIANNESS_LITTLE>::cache m_program;
 	memory_access< 8, 0,  0, ENDIANNESS_LITTLE>::specific m_data;
-
-	optional_memory_region m_region;
 
 	/******************** CPU Internal Registers *******************/
 	u16     m_PC;
@@ -159,10 +126,7 @@ private:
 	u8      m_TMR0;
 	u8      m_STATUS;
 	u8      m_FSR;
-	u8      m_EEDATA;
-	u8      m_EEADR;
 	u8      m_PCLATH;
-	u8      m_EECON1;
 	u8      m_port_data[2];
 	u8      m_port_tris[2];
 	u8      m_porta_mask;
@@ -185,10 +149,6 @@ private:
 
 	emu_timer *m_wdt_timer;
 
-	std::unique_ptr<u8[]> m_eeprom_data;
-	const u16 m_internal_eeprom_size;
-	u8 m_eeprom_unlock_state;
-
 	// i/o handlers
 	devcb_read8::array<2> m_read_port;
 	devcb_write8::array<2> m_write_port;
@@ -197,16 +157,22 @@ private:
 	int m_debugger_temp;
 
 	// opcode table entry
-	typedef void (pic16x8x_device::*pic16x8x_ophandler)();
-	struct pic16x8x_opcode
+	typedef void (pic16_mid_device::*pic16_ophandler)();
+	struct pic16_opcode
 	{
-		pic16x8x_ophandler function;
+		pic16_ophandler function;
 		u8 cycles;
 		bool affects_alu_flags;
 	};
 
-	static const pic16x8x_opcode s_opcode_main[128];
-	static const pic16x8x_opcode s_opcode_00x[128];
+	static const pic16_opcode s_opcode_main[128];
+	static const pic16_opcode s_opcode_00x[128];
+
+	address_map_constructor rom_map(int program_width);
+	void rom_9(address_map &map) ATTR_COLD;
+	void rom_10(address_map &map) ATTR_COLD;
+	void rom_11(address_map &map) ATTR_COLD;
+	void rom_12(address_map &map) ATTR_COLD;
 
 	void update_timer(int counts);
 	void check_irqs();
@@ -214,10 +180,6 @@ private:
 	// watchdog
 	TIMER_CALLBACK_MEMBER(wdt_timeout);
 	void restart_wdt();
-
-	// EEPROM
-	u8 eeprom_read(offs_t offs);
-	void eeprom_write(offs_t offs, u8 data);
 
 	// helper functions
 	offs_t addr() const;
@@ -276,49 +238,161 @@ private:
 	void op_xorwf();
 };
 
-class pic16x83_device : public pic16x8x_device
+class pic16c62x_device : public pic16_mid_device
 {
-public:
-	pic16x83_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock); //, int program_width);
+protected:
+	pic16c62x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, address_map_constructor data_map);
+
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	void base_map(address_map &map) ATTR_COLD;
+
+	// register file functions
+	u8 pir1_r();
+	void pir1_w(u8 data);
+	u8 cmcon_r();
+	void cmcon_w(u8 data);
+	u8 pie1_r();
+	void pie1_w(u8 data);
+	u8 pcon_r();
+	void pcon_w(u8 data);
+	u8 vrcon_r();
+	void vrcon_w(u8 data);
+
+private:
+	u8 m_PIR1;
+	u8 m_CMCON;
+	u8 m_PIE1;
+	u8 m_PCON;
+	u8 m_VRCON;
 };
 
-class pic16x84_device : public pic16x8x_device
+class pic16c620_device : public pic16c62x_device
 {
 public:
-	pic16x84_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock); //, int program_width);
+	pic16c620_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+private:
+	void data_map(address_map &map);
 };
 
-class pic16cr83_device : public pic16x83_device
+class pic16c620a_device : public pic16c62x_device
+{
+public:
+	pic16c620a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+private:
+	void data_map(address_map &map);
+};
+
+class pic16c621_device : public pic16c62x_device
+{
+public:
+	pic16c621_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+private:
+	void data_map(address_map &map);
+};
+
+class pic16c621a_device : public pic16c62x_device
+{
+public:
+	pic16c621a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+private:
+	void data_map(address_map &map);
+};
+
+class pic16c622_device : public pic16c62x_device
+{
+public:
+	pic16c622_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+private:
+	void data_map(address_map &map);
+};
+
+class pic16c622a_device : public pic16c62x_device
+{
+public:
+	pic16c622a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+private:
+	void data_map(address_map &map);
+};
+
+class pic16_mid_eeprom_device : public pic16_mid_device, public device_nvram_interface
+{
+protected:
+	pic16_mid_eeprom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, address_map_constructor data_map, u16 eeprom_size, u8 status_mask, u8 porta_mask);
+
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// device_nvram_interface overrides
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+	virtual void nvram_default() override;
+
+	void base_map(address_map &map) ATTR_COLD;
+
+	virtual bool irq_active() const override;
+	virtual void set_eeif();
+
+	// register file functions
+	u8 eedata_r();
+	void eedata_w(u8 data);
+	u8 eeadr_r();
+	void eeadr_w(u8 data);
+	u8 eecon1_r();
+	void eecon1_w(u8 data);
+	u8 eecon2_r();
+	void eecon2_w(u8 data);
+
+private:
+	enum : u8
+	{
+		EEPROM_LOCKED,
+		EEPROM_55_WRITTEN,
+		EEPROM_AA_WRITTEN,
+	};
+
+	u8 m_EEDATA;
+	u8 m_EEADR;
+	u8 m_EECON1;
+
+	std::unique_ptr<u8[]> m_eeprom_data;
+	const u16 m_internal_eeprom_size;
+	u8 m_eeprom_unlock_state;
+
+	u8 eeprom_read(offs_t offs);
+	void eeprom_write(offs_t offs, u8 data);
+};
+
+class pic16cr83_device : public pic16_mid_eeprom_device
 {
 public:
 	pic16cr83_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+private:
+	void data_map(address_map &map);
 };
 
-class pic16cr84_device : public pic16x84_device
+class pic16cr84_device : public pic16_mid_eeprom_device
 {
 public:
 	pic16cr84_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+private:
+	void data_map(address_map &map) ATTR_COLD;
 };
 
-class  pic16f83_device : public pic16x83_device
-{
-public:
-	 pic16f83_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-};
+// PIC16F6xx Series
 
-class pic16f84_device : public pic16x84_device
-{
-public:
-	pic16f84_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-};
-
-class pic16f84a_device : public pic16x84_device
-{
-public:
-	pic16f84a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-};
-
-class pic16f628a_device : public pic16x8x_device
+class pic16f628a_device : public pic16_mid_eeprom_device
 {
 public:
 	pic16f628a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -386,4 +460,46 @@ private:
 	u8 m_VRCON;
 };
 
-#endif  // MAME_CPU_PIC16X8X_PIC16X8X_H
+// PIC16F8xx Series
+
+class  pic16f83_device : public pic16_mid_eeprom_device
+{
+public:
+	 pic16f83_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+private:
+	void data_map(address_map &map) ATTR_COLD;
+};
+
+class pic16f84_device : public pic16_mid_eeprom_device
+{
+public:
+	pic16f84_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+private:
+	void data_map(address_map &map) ATTR_COLD;
+};
+
+class pic16f84a_device : public pic16_mid_eeprom_device
+{
+public:
+	pic16f84a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+private:
+	void data_map(address_map &map) ATTR_COLD;
+};
+
+DECLARE_DEVICE_TYPE(PIC16C620,  pic16c620_device)
+DECLARE_DEVICE_TYPE(PIC16C620A, pic16c620a_device)
+DECLARE_DEVICE_TYPE(PIC16C621,  pic16c621_device)
+DECLARE_DEVICE_TYPE(PIC16C621A, pic16c621a_device)
+DECLARE_DEVICE_TYPE(PIC16C622,  pic16c622_device)
+DECLARE_DEVICE_TYPE(PIC16C622A, pic16c622a_device)
+DECLARE_DEVICE_TYPE(PIC16CR83,  pic16cr83_device)
+DECLARE_DEVICE_TYPE(PIC16CR84,  pic16cr84_device)
+DECLARE_DEVICE_TYPE(PIC16F628A, pic16f628a_device)
+DECLARE_DEVICE_TYPE(PIC16F83,   pic16f83_device)
+DECLARE_DEVICE_TYPE(PIC16F84,   pic16f84_device)
+DECLARE_DEVICE_TYPE(PIC16F84A,  pic16f84a_device)
+
+#endif  // MAME_CPU_PIC16_MID_PIC16_MID_H
