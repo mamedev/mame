@@ -6,7 +6,7 @@ license:CC0-1.0
 <softwarelist name="vtech_storio_cart" description="VTech Storio V.Reader cartridges">
 
 	<!-- These are NAND Flash ROMs containing a FAT16 filesystem -->
-	<!-- Some cartridges (PCB 35-115600-027-402) contains no ROM, but just some bridges between edge connector pins. -->
+	<!-- What's That Noise (PCB 35-115600-027-402) contains no ROM, but just some bridges between edge connector pins. -->
 
 	<!--
 
@@ -24,124 +24,140 @@ license:CC0-1.0
 
 	Dumped | Serial          | Name
 	==============================================================================================
-	       | 80-115600(US)   | What's That Noise (it's 52-280800 on VTech catalog)
-	  NA   | 80-115622(SP)   | ¿Qué ruido es ese? (no ROM cartridge)
-	       | 80-115633(UK)   | What's That Noise? (Storio Pack-in cart)
-	       | 80-280000(US)   | Shrek's Vacation
-	       | 80-280003(UK)   | Shrek's Holiday
-	       | 80-280100(US)   | Toy Story 3
-	       | 80-280103(UK)   | Toy Story 3
-	       | 80-280107(??)   | Toy Story 3 (Italy)
-	       | 80-280122(SP)   | Toy Story 3
-	       | 80-280123(??)   | Toy Story 3 (Netherlands)
-	       | 80-280200(US)   | Mr. Men and Little Miss - Mr. Messy and the Missing Sock
-	       | 80-280203(UK)   | Mr. Men and Little Miss - Mr. Messy and the Missing Sock
-	  XX   | 80-280300(US)   | Disney Fairies - Tinkerbell and The Great Fairy Rescue
-	       | 80-280303(UK)   | Disney Fairies - Tinkerbell and The Great Fairy Rescue
-	       | 80-280304(GER)  | Disney Fairies - Tinkerbell Ein Sommer Voller Abenteuer
-	       | 80-280323(??)   | Disney Fairies - Tinkerbell en de Grote Reddingsoperatie (Netherlands)
-	       | 80-280400(US)   | Scooby Doo! - Scooby Doo and a Mummy, Too!
-	       | 80-280403(UK)   | Scooby Doo! - Scooby Doo and a Mummy, Too!
-	       | 80-280405(FR)   | Scooby Doo! - Momie en folie!
-	       | 80-280407(??)   | Scooby Doo! - Scooby-Doo e una mummia a tu per tu! (Italy)
-	  XX   | 80-280422(SP)   | Scooby Doo! - Scooby Doo y la momia
-	       | 80-280600(US)   | Olivia Takes Ballet
-	       | 80-280603(UK)   | Olivia Takes Ballet
-	       | 80-280700(US)   | The Little Engine That Could
-	       | 80-280804(GER)  | Rufus in der Stadt (Storio Pack-in cart)
-	       | 80-280???(??)   | Rufus arriva in città (Italy, Storio Pack-in cart, product code unconfirmed)
-	  XX   | 80-280900(US)   | Dora the Explorer - Dora and the Three Little Pigs
-	       | 80-280903(UK)   | Dora the Explorer - Dora and the Three Little Pigs
-	  XX   | 80-280904(GER)  | Dora - Dora und die drei Schweinchen
-	       | 80-280905(FR)   | Dora l'exploratrice - Dora et les trois petit cochons
-	       | 80-280922(SP)   | Dora la exploradora - Dora y los Tres Cerditos
-	       | 80-280923(??)   | Dora - Dora en de Drie Kleine Biggetjes (Netherlands)
-	  XX   | 80-281000(US)   | Mickey Mouse Clubhouse
-	       | 80-281003(UK)   | Mickey Mouse Clubhouse
-	  XX   | 80-281004(GER)  | Micky Maus Wunderhaus
-	       | 80-281005(FR)   | La Maison de Mickey
-	       | 80-281022(SP)   | La casa de Mickey Mouse
-	       | 80-281023(??)   | Mickey Mouse Clubhuis - Mickey zoekt en vindt! (Netherlands)
-	  XX   | 80-281100(US)   | Disney Princess - Belle's Special Treat / A Gift from the Heart
-	       | 80-281103(UK)   | Disney Princess - Belle's Special Treat / A Gift from the Heart
-	       | 80-281104(GER)  | Disney Princess - Eine besondere Überraschung für Belle / Das Geburtstagsgeschenk
-	       | 80-281105(FR)   | Disney Princess - Une surprise pour Belle / Un cadeau qui vient du coeur
-	       | 80-281107(??)   | Disney Princess - Una sorpresa speciale / Un regalo dal cuore (Italy)
-	       | 80-281122(SP)   | Disney Princess - Historia de Bella / Historia de Cenicienta
-	       | 80-281123(??)   | Disney Princess - Ein Speciale Verrassing / Ein ???? (Netherlands)
-	       | 80-281200(US)   | Disney/Pixar Cars Toon - Tokyo Mater
-	       | 80-281203(UK)   | Disney/Pixar Cars Toon - Tokyo Mater
-	       | 80-281204(GER)  | Disney/Pixar Cars Toon - Hook in Tokyo
-	       | 80-281300(US)   | Sesame Street - The Happy Scientists
-	       | 80-281400(US)   | SpongeBob SquarePants - Model Sponge
-	  XX   | 80-281404(GER)  | SpongeBob Schwammkopf - Ein Schwamm will nach oben
-	       | 80-281405(FR)   | Bob L'éponge - Bob, la star des éponges
-	       | 80-281422(SP)   | Bob Esponja - Modelo Esponja
-	       | 80-281500(US)   | Tangled
-	       | 80-281503(UK)   | Rapunzel
-	  XX   | 80-281504(GER)  | Rapunzel - Neu verföhnt
-	       | 80-281600(US)   | Chuggington - Babysitter Brewster
-	       | 80-281603(UK)   | Chuggington - Babysitter Brewster
-	       | 80-281604(GER)  | Chuggington - Bastian, der Babysitter
-	       | 80-281605(FR)   | Chuggington - Bruno fait du baby-sitting
-	       | 80-281700(US)   | The Penguins of Madagascar - The Helmet
-	       | 80-281703(UK)   | The Penguins of Madagascar - The Helmet
-	       | 80-281723(??)   | De Pinguïns van Madagascar - De Helm (Netherlands)
-	       | 80-281800(US)   | Kung Fu Panda 2
-	       | 80-281803(UK)   | Kung Fu Panda 2
-	  XX   | 80-281900(US)   | Disney/Pixar Cars 2
-	       | 80-281903(UK)   | Disney/Pixar Cars 2
-	       | 80-281904(GER)  | Disney/Pixar Cars 2
-	       | 80-281905(FR)   | Disney/Pixar Cars 2
-	       | 80-281907(??)   | Disney/Pixar Cars 2 (Italy)
-	       | 80-281922(SP)   | Disney/Pixar Cars 2
-	       | 80-281923(??)   | Disney/Pixar Cars 2 (Netherlands)
-	       | 80-282000(US)   | Winnie the Pooh
-	       | 80-282003(UK)   | Winnie the Pooh
-	       | 80-282004(GER)  | Winnie Puuh
-	       | 80-282005(FR)   | Winnie l'ourson
-	       | 80-282022(SP)   | Winnie the Pooh (Found in Spain product catalog, may not have been released)
-	       | 80-282023(??)   | Winnie de Poeh (Netherlands)
-	       | 80-282100(US)   | Super Why! - Attack of the Eraser
-	       | 80-282200(US)   | Madagascar 3 - Europe's Most Wanted
-	       | 80-282204(GER)  | Madagascar 3 - Flucht durch Europa
-	       | 80-282205(FR)   | Madagascar 3 - Bons baisers d'Europe
-	       | 80-282222(SP)   | Madagascar 3 - De marcha por Europa
-	       | 80-282223(??)   | Madagascar 3 - Op Avontuur in Europa (Netherlands)
-	       | 80-282300(US)   | Dinosaur Train - T.Rex Teeth
-	  XX   | 80-282400(US)   | Hello Kitty - Hello Kitty's Surprise
-	       | 80-282403(UK)   | Hello Kitty - Hello Kitty's Surprise
-	       | 80-282404(GER)  | Hello Kitty - Hello Kittys Überraschung!
-	       | 80-282422(SP)   | Hello Kitty - La sorpresa de Hello Kitty
-	       | 80-282423(??)   | Hello Kitty - Hello Kitty's Verrassing! (Netherlands)
-	       | 80-282700(US)   | Thomas and Friends - Up, Up and Away! Diesel's Special Delivery
-	       | 80-282703(UK)   | Thomas and Friends - Up, Up and Away! Diesel's Special Delivery
-	       | 80-282704(GER)  | Thomas und seine Freunde - Auf und davon Diesel ist neidisch
+		   | 80-115600(US)   | What's That Noise (V.Reader Pack-in cart, 2010)
+	       | 80-280000(US)   | DreamWorks Shrek's Vacation
+	       | 80-280003(UK)   | DreamWorks Shrek's Holiday
+	       | 80-280100(US)   | Disney/Pixar Toy Story 3 (Level 1)
+	       | 80-280103(UK)   | Disney/Pixar Toy Story 3 (Level 1)
+		   | 80-280105(FR)   | Disney/Pixar Toy Story 3 (Level 1)
+	       | 80-280107(IT)   | Disney/Pixar Toy Story 3 (Level 1)
+	       | 80-280122(SP)   | Disney/Pixar Toy Story 3 (Level 1)
+	       | 80-280123(NL)   | Disney/Pixar Toy Story 3 (Level 1)
+	       | 80-280200(US)   | Mr. Men and Little Miss - Mr. Messy and the Missing Sock (Level 1)
+	       | 80-280203(UK)   | Mr. Men and Little Miss - Mr. Messy and the Missing Sock (Level 1)
+	  XX   | 80-280300(US)   | Disney Fairies - TinkerBell and The Great Fairy Rescue (Level 3)
+	       | 80-280303(UK)   | Disney Fairies - TinkerBell and The Great Fairy Rescue (Level 3)
+	       | 80-280304(GER)  | Disney Fairies - TinkerBell - Ein Sommer Voller Abenteuer (Level 3)
+	       | 80-280323(NL)   | Disney Fairies - TinkerBell en de Grote Reddingsoperatie (Level 3)
+	       | 80-280400(US)   | Scooby Doo! - Scooby Doo and a Mummy, Too! (s10) (Level 3)
+	       | 80-280403(UK)   | Scooby Doo! - Scooby Doo and a Mummy, Too! (s10) (Level 3)
+	       | 80-280405(FR)   | Scooby Doo! - Momie en folie! (s11) (Level 3)
+	       | 80-280407(IT)   | Scooby Doo! - Scooby-Doo e una mummia a tu per tu! (s12) (Level 3)
+	  XX   | 80-280422(SP)   | Scooby Doo! - Scooby Doo y la momia (s12) (Level 3)
+	       | 80-280600(US)   | Olivia Takes Ballet (Level 2)
+	       | 80-280603(UK)   | Olivia Takes Ballet (Level 2)
+	       | 80-280700(US)   | The Little Engine That Could (Level 1)
+	       | 80-280800(US)   | What's That Noise (V.Reader Pack-in cart, 2011) (All Levels)
+		   | 80-280803(UK)   | What's That Noise? (All Levels)
+	       | 80-280804(GER)  | Rufus in der Stadt! (Storio Pack-in cart) (Level 3)
+		   | 80-280805(FR)   | Rufus, un petit chien en ville (V.Reader/Storio Pack-in cart) (All Levels)
+		   | 80-280807(IT)   | Rufus arriva in città (Storio Pack-in cart) (All Levels)
+	  NA   | 80-280822(SP)   | ¿Qué ruido es ese? (no ROM cartridge, Storio Pack-in cart) (All Levels)
+	       | 80-280823(NL)   | Sam in de Stad! (Storio Pack-in cart) (All Levels)
+	  XX   | 80-280900(US)   | Nickelodeon Dora the Explorer - Dora and the Three Little Pigs (Level 1)
+	       | 80-280903(UK)   | Nickelodeon Dora the Explorer - Dora and the Three Little Pigs (Level 1)
+	  XX   | 80-280904(GER)  | Nickelodeon Dora - Dora und die drei Schweinchen (Level 3)
+	       | 80-280905(FR)   | Nickelodeon Dora l'exploratrice - Dora et les trois petit cochons (Level 1)
+	       | 80-280922(SP)   | Nickelodeon Dora la exploradora - Dora y los Tres cerditos (Level 1)
+	       | 80-280923(NL)   | Nickelodeon Dora - Dora en de Drie Kleine Biggetjes (Level 1)
+	  XX   | 80-281000(US)   | Disney Mickey Mouse Clubhouse (Level 3)
+	       | 80-281003(UK)   | Disney Mickey Mouse Clubhouse (Level 3)
+	  XX   | 80-281004(GER)  | Disney Micky Maus Wunderhaus (Level 3)
+	       | 80-281005(FR)   | Disney La Maison de Mickey (Level 3)
+	       | 80-281022(SP)   | Disney La casa de Mickey Mouse (aka La Casa de Mickey Mouse: Mickey Juega al escondite) (Level 3)
+	       | 80-281023(NL)   | Mickey Mouse Clubhouse (aka Mickey Mouse Clubhouse - Mickey zoekt en vindt!) (Level 3)
+	  XX   | 80-281100(US)   | Disney Princess - Belle's Special Treat / A Gift from the Heart (Level 1)
+	       | 80-281103(UK)   | Disney Princess - Belle's Special Treat / A Gift from the Heart (Level 1)
+	       | 80-281104(GER)  | Disney Princess - Eine besondere Überraschung für Belle / Das Geburtstagsgeschenks (Level 3)
+	       | 80-281105(FR)   | Disney Princess - Une surprise pour Belle / Un cadeau qui vient du coeur (Level 1)
+	       | 80-281107(IT)   | Disney Princess - Una sorpresa speciale / Un regalo dal cuore (Level 1)
+	       | 80-281122(SP)   | Disney Princess - Historia de Bella / Historia de Cenicienta (Level 1)
+	       | 80-281123(NL)   | Disney Princess - Een Speciale Verrassing / Een ???? (Level 2)
+	       | 80-281200(US)   | Disney/Pixar Cars Toon - Tokyo Mater (Level 2)
+	       | 80-281203(UK)   | Disney/Pixar Cars Toon - Tokyo Mater (Level 2)
+	       | 80-281204(GER)  | Disney/Pixar Cars Toon - Hook in Tokyo (Level 3)
+	       | 80-281300(US)   | 123 Sesame Street - The Happy Scientists (Level 1)
+	       | 80-281400(US)   | Nickelodeon SpongeBob SquarePants - Model Sponge (Level 3)
+	  XX   | 80-281404(GER)  | Nickelodeon SpongeBob Schwammkopf - Ein Schwamm will nach oben (Level 3)
+	       | 80-281405(FR)   | Nickelodeon Bob L'éponge - Bob, la star des éponges (Level 3) (copyrighted 2012)
+	       | 80-281422(SP)   | Nickelodeon Bob Esponja - Modelo Esponja (Level 3)
+	       | 80-281500(US)   | Disney Princess - Tangled (Level 2)
+	       | 80-281503(UK)   | Disney Princess - Tangled (Level 2)
+	  XX   | 80-281504(GER)  | Disney Princess - Rapunzel - Neu verföhnt (Level 3)
+		   | 80-281505(FR)   | Disney Princess - Raiponce (Like SPA Pooh, released as a limited run title)
+	       | 80-281600(US)   | Chuggington - Babysitter Brewster (Level 1)
+	       | 80-281603(UK)   | Chuggington - Babysitter Brewster (Level 1)
+	       | 80-281604(GER)  | Chuggington - Bastian, der Babysitter (Level 3)
+	       | 80-281605(FR)   | Chuggington - Bruno fait du baby-sitting (Level 1)
+	       | 80-281700(US)   | DreamWorks/Nickelodeon The Penguins of Madagascar - The Helmet (Level 3)
+	       | 80-281703(UK)   | DreamWorks/Nickelodeon The Penguins of Madagascar - The Helmet (Level 3)
+	       | 80-281723(NL)   | DreamWorks/Nickelodeon De Pinguïns van Madagascar - De Helm (Level 3)
+	       | 80-281800(US)   | DreamWorks Kung Fu Panda 2 (Level 2)
+	       | 80-281803(UK)   | DreamWorks Kung Fu Panda 2 (Level 2)
+	  XX   | 80-281900(US)   | Disney/Pixar Cars 2 (Level 2)
+	       | 80-281903(UK)   | Disney/Pixar Cars 2 (Storio Pack-in cart) (Level 2)
+	       | 80-281904(GER)  | Disney/Pixar Cars 2 (Level 3)
+	       | 80-281905(FR)   | Disney/Pixar Cars 2 (Level 2)
+	       | 80-281907(IT)   | Disney/Pixar Cars 2 (Level 2)
+	       | 80-281922(SP)   | Disney/Pixar Cars 2 (Level 2)
+	       | 80-281923(NL)   | Disney/Pixar Cars 2 (Level 2)
+	       | 80-282000(US)   | Disney Winnie the Pooh (Level 1)
+	       | 80-282003(UK)   | Disney Winnie the Pooh (Level 1)
+	       | 80-282004(GER)  | Disney Winnie Puuh (Level 3)
+	       | 80-282005(FR)   | Disney Winnie l'ourson (Level 1)
+	       | 80-282022(SP)   | Disney Winnie the Pooh (Found in Spain product catalog, released as a limited run title until VTech Spain lost the Winnie the Pooh rights in 2012) (German, French, British and Dutch versions play OK on Spanish Storio)
+	       | 80-282023(NL)   | Disney Winnie de Poeh (Level 1)
+	       | 80-282100(US)   | Super Why! - Attack of the Eraser (Level 2)
+	       | 80-282200(US)   | DreamWorks Madagascar 3 - Europe's Most Wanted (Level 2)
+	       | 80-282204(GER)  | DreamWorks Madagascar 3 - Flucht durch Europa (Level 3)
+	       | 80-282205(FR)   | DreamWorks Madagascar 3 - Bons baisers d'Europe (Level 2)
+	       | 80-282222(SP)   | DreamWorks Madagascar 3 - De marcha por Europa (Level 2)
+	       | 80-282223(NL)   | DreamWorks Madagascar 3 - Op Avontuur in Europa (Level 2)
+	       | 80-282300(US)   | Jim Henson's Dinosaur Train - T.Rex Teeth (Level 2)
+	  XX   | 80-282400(US)   | Hello Kitty - Hello Kitty's Surprise (Level 1)
+	       | 80-282403(UK)   | Hello Kitty - Hello Kitty's Surprise (Level 1)
+	       | 80-282404(GER)  | Hello Kitty - Hello Kittys Überraschung! (Level 3)
+	       | 80-282422(SP)   | Hello Kitty - La sorpresa de Hello Kitty (Level 1)
+	       | 80-282423(NL)   | Hello Kitty - Hello Kitty's Verrassing! (Level 1)
+	       | 80-282700(US)   | Thomas and Friends - Up, Up and Away! Diesel's Special Delivery (Level 1)
+	       | 80-282703(UK)   | Thomas and Friends - Up, Up and Away! Diesel's Special Delivery (Level 1)
+	       | 80-282704(GER)  | Toggolino - Thomas und seine Freunde - Auf und Davon, Diesel ist Neidisch (Level 3)
 
 	       Notes: Storio 1 carts follow an 80-28XXXX(XX) product code sequence. Spain and Netherlands releases use an 80-28XX2X(XX) sequence.
 	       EAN is calculated by using a 341776 prefix, appending the six digit product code, and adding an EAN check number at the end.
 	       EG: 341776 + 280003 + 3 (calculated check digit) = 3417762800033 - Shrek's Holiday (UK.)
 
-	       Two letter Netherlands and Italy suffixes have not yet been confirmed. All items have been confirmed via physical photographs, product code searches,
-	       and online shopping sites, with the exception of Winnie Puuh (Spain) which was listed in a Spanish product catalog and may have not been released.
-
+	       All items have been confirmed via physical photographs, product code searches, and online shopping sites, with the exception of 
+	       Winnie Puuh (Spain) which was listed in a Spanish product catalog and released as a limited run title.
+	
 	       Storio 1 carts come in boxes with an orange stripe in front. Storio carts with a blue stripe in front are only compatible with Storio 2 and later systems.
 
 	-->
-
-	<software name="scoobysp" supported="no">
-		<description>Scooby-Doo!-Scooby-Doo y la momia (Spain)</description>
+	
+	<!-- 
+	Scooby Doo and a Mummy Too!
+	Activities: Read the story, Game Time and Dictionary
+	-->	
+	
+	<software name="scoobys" supported="no">
+		<description>Scooby-Doo!-Scooby-Doo y la momia (Spain) (Storio 2 Compatible)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
+		<info name="serial" value="80-280422(SP)"/>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="80-280422 - scooby-doo-scooby-doo y la momia (SP).bin" size="0x4200000" crc="cd1ee924" sha1="83e561af5910dc547829d54c84fbef60350f4f54" />
 			</dataarea>
 		</part>
 	</software>
-
+		
+	<!-- 
+	Dora and the 3 Little Pigs
+	Activities: Read the Story, Game Time and Dictionary
+	-->	
+		
 	<software name="dora3pig" supported="no">
-		<description>Dora and the 3 Little Pigs (USA)</description>
+		<description>Nickelodeon Dora the Explorer - Dora and the 3 Little Pigs (USA)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-280900(US)"/>
@@ -152,19 +168,25 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="doragr" cloneof="dora3pig" supported="no">
-		<description>Dora und die drei Schweinchen (Germany)</description>
+	<software name="dora3pigg" cloneof="dora3pig" supported="no">
+		<description>Nickelodeon Dora the Explorer - Dora und die drei Schweinchen (Germany) (Storio 2 Compatible)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
+		<info name="serial" value="80-280904(GE)"/>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="80-280904 - Dora und die drei Schweinchen (GER).bin" size="0x4200000" crc="34f85a56" sha1="93b27d5c2a5b9e23470a3cb48099e3aa1f36bde6" />
 			</dataarea>
 		</part>
 	</software>
-
+		
+	<!-- 
+	Mickey Mouse Clubhouse: Mickey Go Seek
+	Activities: Read the story, Game Time and Dictionary
+	-->	
+		
 	<software name="mmclub" supported="no">
-		<description>Mickey Mouse Clubhouse (USA)</description>
+		<description>Disney Mickey Mouse Clubhouse (USA)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-281000(US)"/>
@@ -178,8 +200,9 @@ license:CC0-1.0
 	<!-- this cartridge looked identical to the above, but contained a normal flash chip instead of an OTP device
 	     the data structure is very different, and doesn't start with the FAT16 filesystem?
 	     does the system BIOS detect different cartridge types and handle them in different ways? -->
+
 	<software name="mmcluba" cloneof="mmclub" supported="no">
-		<description>Mickey Mouse Clubhouse (USA, flash chip)</description>
+		<description>Disney Mickey Mouse Clubhouse (USA, flash chip)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-281000(US)"/>
@@ -192,21 +215,29 @@ license:CC0-1.0
 
 
 
-	<software name="mickeychgr" cloneof="mmclub" supported="no">
-		<description>Micky Maus Wunderhaus (Germany)</description>
+	<software name="mmclubg" cloneof="mmclub" supported="no">
+		<description>Disney Micky Maus Wunderhaus (Germany) (Storio 2 Compatible)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
+		<info name="serial" value="80-281004(GE)"/>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="80-281004 - Micky Maus Wunderhaus (GER).bin" size="0x4200000" crc="036fc056" sha1="28f5b7c13eaceadeca5f4e8ec8b1ef2f2d85d1ba" />
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="spongbobgr" supported="no">
-		<description>SpongeBob Schwammkopf - Ein Schwamm will nach oben (Germany)</description>
+		
+	<!-- 
+	Nickelodeon SpongeBob SquarePants: Model Sponge
+	Activities: Read the Story, Game Time and Dictionary
+	English version undumped
+	-->	
+		
+	<software name="spongebobg" supported="no">
+		<description>Nickelodeon SpongeBob Schwammkopf - Ein Schwamm will nach oben (Germany) (Storio 2 Compatible)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
+		<info name="serial" value="80-281404(GE)"/>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="80-281404 - SpongeBob Schwammkopf - Ein Schwamm will nach oben (GER).bin" size="0x4200000" crc="f1a68329" sha1="95c39150ab86233575f4f32574f7077436077adf" />
@@ -214,19 +245,25 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="tangledgr" supported="no">
-		<description>Rapunzel - Neu verföhnt (Germany)</description>
-		<year>20??</year>
+	<software name="tangledg" supported="no">
+		<description>Disney Princess - Rapunzel - Neu verföhnt (Germany) (Storio 2 Compatible)</description>
+		<year>2011</year>
 		<publisher>VTech</publisher>
+		<info name="serial" value="80-281504(GE)"/>
 		<part name="cart" interface="vtech_storio_cart">
 			<dataarea name="rom" size="0x4200000">
 				<rom name="80-281504 - Rapunzel - Neu verfohnt (GER).bin" size="0x4200000" crc="70fd0039" sha1="85823b4fcbcb3ff644154c3c0f3f3bd962846e50" />
 			</dataarea>
 		</part>
 	</software>
+	
+	<!-- 
+	Disney-Pixar Cars 2
+	Activities: Read the story, Game Time, Dictionary, Minigames and Prize Room. 
+	-->
 
 	<software name="cars2" supported="no">
-		<description>Cars 2 (USA)</description>
+		<description>Disney/Pixar Cars 2 (USA)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-281900(US)"/>
@@ -236,7 +273,12 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-
+		
+	<!-- 
+	Hello Kitty
+	Activities: Read the Story, Game Time, Minigames, Gift Room, and Dictionary
+	-->	
+		
 	<software name="hkitty" supported="no">
 		<description>Hello Kitty's Surprise (USA)</description>
 		<year>2012</year>
@@ -248,7 +290,12 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-
+		
+	<!-- 
+	Disney Princess
+	Activities: Read the Story, Game Time and Dictionary
+	-->	
+		
 	<software name="dprinc" supported="no">
 		<description>Disney Princess - A Gift From The Heart &amp; Belle's Special Treat (USA)</description>
 		<year>2010</year>
