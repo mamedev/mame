@@ -213,10 +213,6 @@ public:
 		, m_ram(*this, "ram")
 		, m_iop_ram(*this, "iop_ram")
 		, m_sp_ram(*this, "sp_ram")
-		, m_vu0_imem(*this, "vu0imem")
-		, m_vu0_dmem(*this, "vu0dmem")
-		, m_vu1_imem(*this, "vu1imem")
-		, m_vu1_dmem(*this, "vu1dmem")
 		, m_bios(*this, "bios")
 		, m_vblank_timer(nullptr)
 	{ }
@@ -277,12 +273,9 @@ protected:
 	required_shared_ptr<uint64_t>   m_ram;
 	required_shared_ptr<uint32_t>   m_iop_ram;
 	required_shared_ptr<uint64_t>   m_sp_ram;
-	required_shared_ptr<uint64_t>   m_vu0_imem;
-	required_shared_ptr<uint64_t>   m_vu0_dmem;
-	required_shared_ptr<uint64_t>   m_vu1_imem;
-	required_shared_ptr<uint64_t>   m_vu1_dmem;
 	required_region_ptr<uint32_t>   m_bios;
 
+	uint32_t m_iop_cache_ctrl = 0;
 	uint32_t m_unk_f430_reg = 0;
 	uint32_t m_unk_f440_counter = 0;
 	uint32_t m_unk_f440_reg = 0;
@@ -528,6 +521,7 @@ void ps2sony_state::iop_debug_w(uint32_t data)
 
 void ps2sony_state::machine_start()
 {
+	save_item(NAME(m_iop_cache_ctrl));
 	save_item(NAME(m_unk_f430_reg));
 	save_item(NAME(m_unk_f440_counter));
 	save_item(NAME(m_unk_f440_reg));
@@ -545,6 +539,7 @@ void ps2sony_state::machine_start()
 
 void ps2sony_state::machine_reset()
 {
+	m_iop_cache_ctrl = 0;
 	m_unk_f430_reg = 0;
 	m_unk_f440_reg = 0;
 	m_unk_f440_ret = 0;
@@ -704,10 +699,10 @@ void ps2sony_state::mem_map(address_map &map)
 	map(0x1000f440, 0x1000f447).rw(FUNC(ps2sony_state::unk_f440_r), FUNC(ps2sony_state::unk_f440_w)).umask64(0x00000000ffffffff); // Unknown
 	map(0x1000f520, 0x1000f523).r(m_dmac, FUNC(ps2_dmac_device::disable_mask_r)).umask64(0x00000000ffffffff);
 	map(0x1000f590, 0x1000f593).w(m_dmac, FUNC(ps2_dmac_device::disable_mask_w)).umask64(0x00000000ffffffff);
-	map(0x11000000, 0x11000fff).mirror(0x3000).ram().share(m_vu0_imem);
-	map(0x11004000, 0x11004fff).mirror(0x3000).ram().share(m_vu0_dmem);
-	map(0x11008000, 0x1100bfff).ram().share(m_vu1_imem);
-	map(0x1100c000, 0x1100ffff).ram().share(m_vu1_dmem);
+	map(0x11000000, 0x11000fff).mirror(0x3000).rw(m_vu0, FUNC(sonyvu0_device::micro_r), FUNC(sonyvu0_device::micro_w));
+	map(0x11004000, 0x11004fff).mirror(0x3000).rw(m_vu0, FUNC(sonyvu0_device::data_r), FUNC(sonyvu0_device::data_w));
+	map(0x11008000, 0x1100bfff).rw(m_vu1, FUNC(sonyvu1_device::micro_r), FUNC(sonyvu1_device::micro_w));
+	map(0x1100c000, 0x1100ffff).rw(m_vu1, FUNC(sonyvu1_device::data_r), FUNC(sonyvu1_device::data_w));
 	map(0x12000000, 0x120003ff).mirror(0xc00).rw(m_gs, FUNC(ps2_gs_device::priv_regs0_r), FUNC(ps2_gs_device::priv_regs0_w));
 	map(0x12001000, 0x120013ff).mirror(0xc00).rw(m_gs, FUNC(ps2_gs_device::priv_regs1_r), FUNC(ps2_gs_device::priv_regs1_w));
 	map(0x1c000000, 0x1c1fffff).rw(FUNC(ps2sony_state::ee_iop_ram_r), FUNC(ps2sony_state::ee_iop_ram_w)); // IOP has 2MB EDO RAM per Wikipedia, and writes go up to this point
@@ -723,6 +718,7 @@ void ps2sony_state::iop_map(address_map &map)
 	map(0x1d000000, 0x1d00004f).rw(m_sif, FUNC(ps2_sif_device::iop_r), FUNC(ps2_sif_device::iop_w));
 	map(0x1e000000, 0x1e003fff).nopr();
 	map(0x1f402000, 0x1f40201f).rw(m_iop_cdvd, FUNC(iop_cdvd_device::read), FUNC(iop_cdvd_device::write));
+	map(0x1f800000, 0x1f8003ff).ram(); // 1KB scratchpad
 	map(0x1f801070, 0x1f80107b).rw(m_iop_intc, FUNC(iop_intc_device::read), FUNC(iop_intc_device::write));
 	map(0x1f801080, 0x1f8010f7).rw(m_iop_dma, FUNC(iop_dma_device::bank0_r), FUNC(iop_dma_device::bank0_w));
 	map(0x1f801450, 0x1f801453).noprw();
@@ -733,7 +729,9 @@ void ps2sony_state::iop_map(address_map &map)
 	map(0x1f808200, 0x1f8082ff).rw(m_iop_sio2, FUNC(iop_sio2_device::read), FUNC(iop_sio2_device::write));
 	map(0x1f900000, 0x1f9007ff).rw(m_iop_spu, FUNC(iop_spu_device::read), FUNC(iop_spu_device::write));
 	map(0x1fc00000, 0x1fffffff).rom().region("bios", 0);
-	map(0x1ffe0130, 0x1ffe0133).nopw();
+	// CPU-internal cache control registers (kseg2, not remapped)
+	map(0xfffe0130, 0xfffe0133).lrw32(NAME([this] () { return m_iop_cache_ctrl; }), NAME([this] (uint32_t data) { m_iop_cache_ctrl = data; }));
+	map(0xfffe0140, 0xfffe0147).nopw();
 }
 
 static INPUT_PORTS_START( ps2sony )
@@ -749,6 +747,8 @@ void ps2sony_state::ps2sony(machine_config &config)
 
 	SONYPS2_VU0(config, m_vu0, 294'912'000, m_vu1);
 	SONYPS2_VU1(config, m_vu1, 294'912'000, m_gs);
+	m_vu0->irq().set([this](int state) { if (state) m_intc->raise_interrupt(ps2_intc_device::INT_VU0); });
+	m_vu1->irq().set([this](int state) { if (state) m_intc->raise_interrupt(ps2_intc_device::INT_VU1); });
 
 	SONYPS2_TIMER(config, m_timer[0], 294912000/2, true);
 	SONYPS2_TIMER(config, m_timer[1], 294912000/2, true);

@@ -20,6 +20,8 @@
         - verify background flashing when the gameplay timer is running out;
         - determine palette resistor weights;
         - investigate sustained sound in SOUND TEST;
+        - looks too easy and fast, downclocking both 6809 to half clock makes it more reasonable,
+          missing halt/bus grant really?
     cleanup
         - split state objects, consider using composable devices rather than inherit one with the
           other (has HMC20 + VSC30 custom chips);
@@ -59,7 +61,8 @@ public:
 		m_subcpu(*this, "subcpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_throttle(*this, "AN_THROTTLE")
 	{ }
 
 	/* memory pointers */
@@ -93,6 +96,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	optional_ioport m_throttle;
 
 	void zerotrgt_vregs_w(offs_t offset, uint8_t data);
 	void cntsteer_vregs_w(offs_t offset, uint8_t data);
@@ -109,6 +113,7 @@ public:
 	uint8_t cntsteer_adx_r();
 	void nmimask_w(uint8_t data);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	ioport_value throttle_r();
 	void init_zerotrgt();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -570,6 +575,7 @@ void cntsteer_state::cntsteer_main_irq_w(uint8_t data)
 }
 
 /* Convert weird input handling with MAME standards.*/
+// TODO: convert to IPT_POSITIONAL
 uint8_t cntsteer_state::cntsteer_adx_r()
 {
 	uint8_t res = 0, adx_val;
@@ -758,9 +764,19 @@ INPUT_CHANGED_MEMBER(cntsteer_state::coin_inserted)
 	m_subcpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
+// 4-bit ADC port, needs to be custom and reversed because IPT_PEDAL (sic) can't coexist with
+// other stuff in the middle ...
+ioport_value cntsteer_state::throttle_r()
+{
+	return m_throttle->read() & 0xf;
+}
+
 static INPUT_PORTS_START( cntsteer )
+	PORT_START("AN_THROTTLE")
+	PORT_BIT( 0x0f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0x0f) PORT_SENSITIVITY(10) PORT_KEYDELTA(10)
+
 	PORT_START("P1")
-	PORT_BIT( 0x0f, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x0f) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) //todo
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(cntsteer_state::throttle_r))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
@@ -773,7 +789,7 @@ static INPUT_PORTS_START( cntsteer )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("AN_STEERING")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x01,0xff) PORT_SENSITIVITY(10) PORT_KEYDELTA(2)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(10) PORT_KEYDELTA(100)
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cntsteer_state::coin_inserted), 0)
