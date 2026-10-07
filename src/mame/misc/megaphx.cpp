@@ -164,6 +164,35 @@ Sub / Sound board:
  |                                                                          |
  |__________________________________________________________________________|
 
+----------------------------------------
+
+Development board
+
+Soling VJ68KRAM-A, found with a Hammer Boy PCB set and marked "Development Board".
+It plugs into the 96-pin connector of the main board in place of the ROM board:
+
+  2x AM27C010 (U5, U6, "INDPDS05")  68000 monitor at 0xfc0000
+  8x 128Kx8 SRAM (TMS628128, uPD431000, MOSEL MS88128 modules, 4x uPD43256 modules)
+     1MB replacing the program/data ROMs, more DIP-32 positions unpopulated
+  TMP82C55AP-2                      link to the host PC (JP1, JP2, 2x 74HCT244)
+  18-pin chip labelled "VJ PIC v#3" (the PIC normally found on the ROM board)
+  6x PLDs labelled PU8, PU9, PU10, PU11, PU12 and "VJ68 KMO"
+  2x 74HCTLS245, 2x 74HC373
+
+The monitor lets the host PC download, run and debug code. Data comes in on PPI
+port A and goes out on port B, with the host strobe on PC4, the board acknowledge
+on PC0 (both toggling once per byte) and PC2 set while the board is sending:
+  BE addr.l len.l data   write memory
+  BF addr.l len.l        read memory
+  C0 addr.l              call, returns to the monitor on RTS
+  C1                     ping, answers 00 ff ff ff
+  C3 addr.l              single step, answers the new PC
+  C4                     read registers (A0, D0-D7, A1-A7, SR)
+  C5 regs                write registers (buggy, the count is loaded into D0
+                         instead of D1)
+Hammer Boy still has an unused routine at 0x800a02 that restores the stack pointer
+saved at the entry point and returns, presumably to the monitor.
+
 */
 
 #include "emu.h"
@@ -200,8 +229,11 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-private:
+	void mainboard_map(address_map &map) ATTR_COLD;
+
 	required_device<cpu_device> m_maincpu;
+
+private:
 	required_shared_ptr<uint16_t> m_mainram;
 	required_region_ptr<uint16_t> m_bootrom;
 	required_device<inder_vid_device> m_indervid;
@@ -231,6 +263,22 @@ private:
 	int m_ppi_to_pic_data = 0;
 	int m_pic_to_ppi_clock = 0;
 	int m_pic_to_ppi_data = 0;
+};
+
+class indpds_state : public megaphx_state
+{
+public:
+	indpds_state(const machine_config &mconfig, device_type type, const char *tag) :
+		megaphx_state(mconfig, type, tag),
+		m_hostppi(*this, "hostppi")
+	{ }
+
+	void indpds(machine_config &config) ATTR_COLD;
+
+private:
+	required_device<i8255_device> m_hostppi;
+
+	void indpds_68k_map(address_map &map) ATTR_COLD;
 };
 
 void megaphx_state::machine_start()
@@ -265,14 +313,27 @@ void megaphx_state::install_bootrom(bool enable)
 
 
 
-void megaphx_state::megaphx_68k_map(address_map &map)
+void megaphx_state::mainboard_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).ram().share(m_mainram);
 	map(0x040000, 0x040007).rw("inder_vid:tms", FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 	map(0x050000, 0x050001).w(m_indersb, FUNC(inder_sb_device::megaphx_0x050000_w));
 	map(0x050002, 0x050003).r(m_indersb, FUNC(inder_sb_device::megaphx_0x050002_r));
 	map(0x060000, 0x060007).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+}
+
+void megaphx_state::megaphx_68k_map(address_map &map)
+{
+	mainboard_map(map);
 	map(0x800000, 0x8fffff).rom().region("data", 0x00000);
+	map(0xfc0000, 0xffffff).rom().region("boot", 0x00000);
+}
+
+void indpds_state::indpds_68k_map(address_map &map)
+{
+	mainboard_map(map);
+	map(0x070000, 0x070007).rw(m_hostppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
+	map(0x800000, 0x8fffff).ram(); // location guessed from the ROM board, the PLDs aren't dumped
 	map(0xfc0000, 0xffffff).rom().region("boot", 0x00000);
 }
 
@@ -455,6 +516,32 @@ static INPUT_PORTS_START( yoyospel )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( indpds )
+	PORT_INCLUDE(megaphx)
+
+	// meaning depends on the downloaded software
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "SW1:!1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "SW1:!2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "SW1:!3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "SW1:!4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW1:!5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW1:!6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW1:!7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "SW1:!8")
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x00, "SW2:!1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x00, "SW2:!2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "SW2:!3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "SW2:!4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW2:!5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW2:!6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW2:!7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "SW2:!8")
+INPUT_PORTS_END
+
+
 
 // PIC port a
 //
@@ -583,6 +670,16 @@ void megaphx_state::hamboy(machine_config &config)
 	megaphx(config);
 
 	m_indervid->set_bpp(4);
+}
+
+void indpds_state::indpds(machine_config &config)
+{
+	megaphx(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &indpds_state::indpds_68k_map);
+
+	// TODO: hook up to a host PC
+	I8255(config, m_hostppi); // TMP82C55AP-2
 }
 
 
@@ -721,6 +818,29 @@ ROM_START( yoyospel )
 	ROM_LOAD( "p28_pal16v8.bin",  0x000, 0x117, NO_DUMP )
 ROM_END
 
+
+ROM_START( indpds )
+	ROM_REGION16_BE( 0x40000, "boot", 0 )
+	ROM_LOAD16_BYTE( "indpds05_even_low.u6", 0x00000, 0x20000, CRC(bd1db9e7) SHA1(40deec73ff3988c61db11fb114ca3ce59dc3a0da) )
+	ROM_LOAD16_BYTE( "indpds05_odd_high.u5", 0x00001, 0x20000, CRC(70d4b4c7) SHA1(5080a6411f54c8b25d8e5b95697dc0aa7e4d18e8) )
+
+	// the sound board isn't part of the development board, its ROMs depend on the game being developed
+	ROM_REGION( 0x40000, "inder_sb:user2", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x2000, "inder_sb:audiocpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x400, "pic", 0 ) // unknown PIC type, probably 16C54
+	ROM_LOAD( "vj_pic_v3.u7", 0x000, 0x400, NO_DUMP )
+
+	ROM_REGION( 0x200, "pals", 0 ) // types unknown
+	ROM_LOAD( "pu8.u8",       0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "pu9.u9",       0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "pu10.u10",     0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "pu11.u11",     0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "pu12.u12",     0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "vj68_kmo.u16", 0x000, 0x117, NO_DUMP )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -730,3 +850,6 @@ GAME( 1990, hamboy,   0, hamboy,  hamboy,   megaphx_state, empty_init, ROT0, "Di
 
 // This game would later become Little Robin, although this early version has significant design differences. The game has no music, verified to be the same as the real hardware.
 GAME( 1992, yoyospel, littlerb, megaphx, yoyospel, megaphx_state, empty_init, ROT0, "Inder", "YoYo Spell (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
+// Found with a Hammer Boy PCB set. Needs a host PC to download and run code.
+GAME( 199?, indpds,   0,        indpds,  indpds,   indpds_state,  empty_init, ROT0, "Soling", "VJ68KRAM-A development board (INDPDS05 monitor)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
