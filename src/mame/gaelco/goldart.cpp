@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Tomás García-Merás Capote (ClawGrip)
 
 /*
   _____________________________________________________________________
@@ -98,6 +98,8 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "dartboard.lh"
 
 #include <algorithm>
 
@@ -429,6 +431,7 @@ static INPUT_PORTS_START( goldart )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED ) // expanded bus /WR, /RD
 
 	// dart board matrix, DARTn = row line n / 2 (P1.0-P1.3), return lines 0-7 (n even) or 8-15 (n odd)
+	// the dartboard layout finds the targets by these names
 	PORT_START("DART0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 16")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 16")
@@ -482,7 +485,7 @@ static INPUT_PORTS_START( goldart )
 	PORT_START("DART5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 5")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 5")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Bull")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single Bull")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 4")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 18")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 1")
@@ -658,10 +661,10 @@ ROM_END
 
 } // Anonymous namespace
 
-//    YEAR, NAME,       PARENT,  MACHINE,  INPUT,   CLASS,         INIT,       ROT,  COMPANY,             FULLNAME
+//    YEAR, NAME,       PARENT,  MACHINE,  INPUT,   CLASS,         INIT,       ROT,  COMPANY,             FULLNAME,                             FLAGS,                 LAYOUT
 
-GAME( 1994, goldart,    0,       goldart,  goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (Spain)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1994, goldartfr,  goldart, goldart,  goldart, goldart_state, empty_init, ROT0, "Gaelco / Jeutel",   "Goldart (France, Covielsa license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, goldartgr,  goldart, goldart,  goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (Germany)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1994, goldartpt,  goldart, goldart,  goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (Portugal)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1994, goldartuk,  goldart, goldart,  goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (United Kingdom)",           MACHINE_SUPPORTS_SAVE )
+GAMEL( 1994, goldart,   0,       goldart,  goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (Spain)",                    MACHINE_SUPPORTS_SAVE, layout_dartboard )
+GAMEL( 1994, goldartfr, goldart, goldart,  goldart, goldart_state, empty_init, ROT0, "Gaelco / Jeutel",   "Goldart (France, Covielsa license)", MACHINE_SUPPORTS_SAVE, layout_dartboard )
+GAMEL( 1994, goldartgr, goldart, goldart,  goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (Germany)",                  MACHINE_SUPPORTS_SAVE, layout_dartboard )
+GAMEL( 1994, goldartpt, goldart, goldart,  goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (Portugal)",                 MACHINE_SUPPORTS_SAVE, layout_dartboard )
+GAMEL( 1994, goldartuk, goldart, goldart,  goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (United Kingdom)",           MACHINE_SUPPORTS_SAVE, layout_dartboard )
