@@ -2762,7 +2762,9 @@ s32 swp30_device::mixer_att(s32 sample, s32 att)
 {
 	if(att >= 0xff)
 		return 0;
-	return (sample - ((sample * (att & 0xf)) >> 4)) >> (att >> 4);
+	// The low nibble is in 1/32 steps: 0x0f reaches 17/32, just short of
+	// the next octave (0x10 = 1/2).
+	return (sample - ((sample * (att & 0xf)) >> 5)) >> (att >> 4);
 }
 
 void swp30_device::mixer_step(const std::array<s32, 0x40> &samples_per_chan)
