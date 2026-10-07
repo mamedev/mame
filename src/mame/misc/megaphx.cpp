@@ -714,7 +714,7 @@ ROM_START( afterwar )
 	ROM_LOAD( "p28_palce16v8h.bin",  0x000, 0x117, BAD_DUMP CRC(45cdc4c0) SHA1(9a0ef475c0b43a08aa6a30bd7997e68db84f6076) ) // Bruteforced and untested
 	ROM_LOAD( "p29_palce16v8h.bin",  0x000, 0x117, BAD_DUMP CRC(589221c9) SHA1(d15d71944b606cb5b4a9c2f7747bb76b6b39b157) ) // Bruteforced and untested
 	ROM_LOAD( "p31_palce16v8h.bin",  0x000, 0x117, BAD_DUMP CRC(54d9ad1e) SHA1(76b8491861a689a8e5435be69f15eeda05c94653) ) // Bruteforced and untested
-	ROM_LOAD( "s31_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "s31_palce16v8h.bin",  0x000, 0x117, BAD_DUMP CRC(99eceb58) SHA1(a86ac1809efed26ce742d1ee9be92974667184f9) ) // Bruteforced and untested
 	ROM_LOAD( "s32_palce16v8h.bin",  0x000, 0x117, BAD_DUMP CRC(554b0809) SHA1(4252086c7208bb738442aaf5edfa8641d173e914) ) // Bruteforced and untested
 	ROM_LOAD( "s33_palce16v8h.bin",  0x000, 0x117, NO_DUMP )
 ROM_END
