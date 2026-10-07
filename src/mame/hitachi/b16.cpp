@@ -169,6 +169,7 @@ private:
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	u8 keyboard_data_r();
+	void keyboard_data_w(u8 data);
 	void keyboard_push(u8 data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -323,7 +324,7 @@ void b16_state::b16_io(address_map &map)
 	map(0x20, 0x20).w(FUNC(b16_state::crtc_address_w));
 	map(0x22, 0x22).w(FUNC(b16_state::crtc_data_w));
 //  map(0x28, 0x2b) keyboard, likely thru USART
-	map(0x28, 0x28).r(FUNC(b16_state::keyboard_data_r));
+	map(0x28, 0x28).rw(FUNC(b16_state::keyboard_data_r), FUNC(b16_state::keyboard_data_w));
 	// USART ready bits: transmitter ready/empty, receiver ready while a byte is pending.
 	// TODO: serial framing and keyboard command responses.
 	map(0x2a, 0x2a).lr8(NAME([this] () { return u8(0x05 | (m_keyb_count ? 0x02 : 0x00)); }));
@@ -406,6 +407,12 @@ INPUT_CHANGED_MEMBER(b16_state::key_lock)
 	// FA834/FA83C: 90 = alpha, 92 = kana, with bit 2 selecting Caps Lock.
 	keyboard_push(0x90 | (BIT(m_keyb_locks, 0) ? 0x04 : 0x00)
 		| (BIT(m_keyb_locks, 1) ? 0x02 : 0x00));
+}
+
+void b16_state::keyboard_data_w(u8 data)
+{
+	if (data == 0x10)
+		keyboard_push(0xf0);
 }
 
 void b16_state::keyboard_push(u8 data)
