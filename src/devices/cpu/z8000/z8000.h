@@ -156,7 +156,7 @@ protected:
 	uint32_t  m_ppc;        /* previous program counter */
 	uint32_t  m_pc;         /* program counter */
 	uint8_t   m_pc_b15;     /* bit 15 of the segment word the PC was loaded from */
-	uint8_t   m_addr_b15;   /* bit 15 of the last address operand's segment word */
+	uint8_t   m_addr_b15;   /* bit 15 of the last address operand's segment word (per-instruction, not saved) */
 	uint16_t  m_psapseg;    /* program status pointer, segment (Z8001 only) */
 	uint16_t  m_psapoff;    /* program status pointer, offset */
 	uint16_t  m_fcw;        /* flags and control word */
