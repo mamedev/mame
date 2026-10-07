@@ -497,7 +497,7 @@ void zbi_s8k_cpu10_card_device::reg_scr_w(uint16_t data)
 	}
 
 	if (diff & SCR_CLR_PARITY)
-		memory_error_control_w(BIT(data, 3));
+		memory_error_control_w(!!(data & SCR_CLR_PARITY));
 
 	m_reg_scr = (m_reg_scr & 0xf0) | ( data & 0x0f );   // Mask off read-only nibble
 }
@@ -1172,7 +1172,7 @@ void zbi_s8k_hpcpu_card_device::reg_scr_w(uint16_t data)
 	}
 
 	if (diff & SCR_CLR_PARITY)
-		memory_error_control_w(BIT(data, 3));
+		memory_error_control_w(!!(data & SCR_CLR_PARITY));
 
 	m_reg_scr = (m_reg_scr & 0x0ff0) | ( data & 0xf00f );   // Mask off read-only parts
 }

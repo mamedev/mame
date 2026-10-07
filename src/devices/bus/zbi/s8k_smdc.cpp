@@ -658,14 +658,14 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 		active_sectors = 0;
 		for (unsigned n = 0; n < pkt->CT; n++, dma_idx += 8)
 		{
-			uint16_t const cylinder = m_bus->ram16_r(dma_idx + 2);
-			uint16_t const head = m_bus->ram16_r(dma_idx + 4);
-			uint16_t const sector = m_bus->ram16_r(dma_idx + 6);
+			uint16_t const id_cylinder = m_bus->ram16_r(dma_idx + 2);
+			uint16_t const id_head = m_bus->ram16_r(dma_idx + 4);
+			uint16_t const id_sector = m_bus->ram16_r(dma_idx + 6);
 
-			if (sector & (SMD_ID_FL | SMD_ID_SP))
+			if (id_sector & (SMD_ID_FL | SMD_ID_SP))
 				continue;
 
-			if ((cylinder >= file->get_info().cylinders) || (head >= file->get_info().heads))
+			if ((id_cylinder >= file->get_info().cylinders) || (id_head >= file->get_info().heads))
 			{
 				m_es = SMD_ES_NOSECTOR;
 				pkt->DS |= SMD_DS_FT;
@@ -673,17 +673,17 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 			}
 
 			m_format_overflow[unit] |= ++active_sectors > (file->get_info().sectors + 1);
-			m_extra_sector[unit] |= (sector & SMD_ID_SECTOR_MASK) == file->get_info().sectors;
+			m_extra_sector[unit] |= (id_sector & SMD_ID_SECTOR_MASK) == file->get_info().sectors;
 			// CHD geometry describes active sectors.  IDs beyond that capacity
 			// affect physical track layout but have no image LBA.
-			if ((sector & SMD_ID_SECTOR_MASK) >= file->get_info().sectors)
+			if ((id_sector & SMD_ID_SECTOR_MASK) >= file->get_info().sectors)
 			{
-				if ((sector & SMD_ID_SECTOR_MASK) == file->get_info().sectors)
+				if ((id_sector & SMD_ID_SECTOR_MASK) == file->get_info().sectors)
 					std::fill_n(m_extra_data[unit], file->get_info().sectorbytes, 0);
 				continue;
 			}
 
-			block = ((cylinder * file->get_info().heads) + head) * file->get_info().sectors + (sector & SMD_ID_SECTOR_MASK);
+			block = ((id_cylinder * file->get_info().heads) + id_head) * file->get_info().sectors + (id_sector & SMD_ID_SECTOR_MASK);
 			if (!file->write(block, m_buffer))
 			{
 				m_es = SMD_ES_NOSECTOR;
@@ -717,20 +717,20 @@ void zbi_s8k_smdc_card_device::smd_do_drive(int drv)
 			unsigned const physical_sectors = file->get_info().sectors + 1;
 			unsigned const position = (pkt->SC + n) % physical_sectors;
 			unsigned const track = (pkt->SC + n) / physical_sectors;
-			unsigned const head = (pkt->HD + track) % file->get_info().heads;
-			unsigned const cylinder = pkt->CY + (pkt->HD + track) / file->get_info().heads;
+			unsigned const id_head = (pkt->HD + track) % file->get_info().heads;
+			unsigned const id_cylinder = pkt->CY + (pkt->HD + track) / file->get_info().heads;
 			uint16_t flags = (position == file->get_info().sectors) ? SMD_ID_ET : 0;
 
-			if ((position == file->get_info().sectors) && (head == file->get_info().heads - 1))
+			if ((position == file->get_info().sectors) && (id_head == file->get_info().heads - 1))
 				flags |= SMD_ID_EC;
-			if ((position == file->get_info().sectors) && (head == file->get_info().heads - 1) && (cylinder == file->get_info().cylinders - 1))
+			if ((position == file->get_info().sectors) && (id_head == file->get_info().heads - 1) && (id_cylinder == file->get_info().cylinders - 1))
 				flags |= SMD_ID_EP;
 
 			m_bus->ram16_w(dma_idx + 0, flags);
-			m_bus->ram16_w(dma_idx + 2, cylinder);
-			m_bus->ram16_w(dma_idx + 4, head);
-			uint16_t const sector = (m_format_overflow[unit] && !position) ? 1 : position;
-			m_bus->ram16_w(dma_idx + 6, sector);
+			m_bus->ram16_w(dma_idx + 2, id_cylinder);
+			m_bus->ram16_w(dma_idx + 4, id_head);
+			uint16_t const id_sector = (m_format_overflow[unit] && !position) ? 1 : position;
+			m_bus->ram16_w(dma_idx + 6, id_sector);
 			m_bus->ram16_w(dma_idx + 8, 0);
 			m_bus->ram16_w(dma_idx + 10, 0);
 		}
