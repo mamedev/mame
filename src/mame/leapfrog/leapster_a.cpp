@@ -115,6 +115,22 @@ void leapster_snd_device::do_voice_command(uint8_t command, uint8_t voice)
 	}
 }
 
+uint8_t leapster_snd_device::get_triggered_voices()
+{
+	m_stream->update();
+
+	// Voice 0 doesn't have any special significance so I'm not sure why it's out of place here
+	//   Maybe historical reasons from older revisions of the audio hardware?
+	uint8_t triggered_voices = ((uint8_t) m_channel_triggered[0]) << 7;
+
+	for(int i = 1; i < 8; i++)
+	{
+		triggered_voices |= ((uint8_t) m_channel_triggered[i]) << (i - 1);
+	}
+
+	return triggered_voices;
+}
+
 // The BIOS writes the low and high halves of (codebook_address >> 15).
 // The 0x4f00-byte table must reside at offset 0x900 within that page.
 void leapster_snd_device::lfc_codebook_w(offs_t offset, uint16_t data)
@@ -304,7 +320,7 @@ void leapster_snd_device::voice_end_w(uint32_t off, uint16_t value)
 
 void leapster_snd_device::voice_volume_w(uint32_t off, uint16_t value)
 {
-	if(off % 1)
+	if(off & 1)
 	{
 		LOGMASKED(LOG_SOUND, "%s: voice_volume_w write odd halfword\n", machine().describe_context());
 		return;
@@ -377,6 +393,11 @@ void leapster_snd_device::device_reset()
 	std::fill_n(m_legacy_history, 16, 0);
 	m_legacy_phase = 0;
 	m_lfc_codebook_page = 0;
+
+	std::fill_n(m_data_source_start, 8, 0);
+	std::fill_n(m_data_source_end, 8, 0);
+	std::fill_n(m_volume, 8, 0);
+	std::fill_n(m_pitch, 5, 0);
 }
 
 

@@ -944,16 +944,20 @@ uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rg
 	{
 		for (int i = cliprect.min_y; i <= cliprect.max_y; i++)
 		{
-			for (int j = cliprect.min_x; j < (cliprect.max_x + 1) / 2; j++)
+			for (int j = cliprect.min_x; j <= cliprect.max_x; j++)
 			{
-				uint8_t bytes[3];
+				const uint8_t byte1 = m_maincpu->space().read_byte(0x0300'0000 + m_framebuffer_base + i * m_display_stride + (j >> 1) * 3 + 1);
 
-				bytes[0] = m_maincpu->space().read_byte(0x0300'0000 + m_framebuffer_base + i * m_display_stride + j * 3);
-				bytes[1] = m_maincpu->space().read_byte(0x0300'0000 + m_framebuffer_base + i * m_display_stride + j * 3 + 1);
-				bytes[2] = m_maincpu->space().read_byte(0x0300'0000 + m_framebuffer_base + i * m_display_stride + j * 3 + 2);
-
-				bitmap.pix(i, j * 2) = pal444(bytes[0] | ((bytes[1] & 0xf0) << 4), 8, 4, 0);
-				bitmap.pix(i, j * 2 + 1) = pal444((bytes[2] << 4) | (bytes[1] & 0x0f), 0, 8, 4);
+				if (j & 1)
+				{
+					const uint8_t byte2 = m_maincpu->space().read_byte(0x0300'0000 + m_framebuffer_base + i * m_display_stride + (j >> 1) * 3 + 2);
+					bitmap.pix(i, j) = pal444((byte2 << 4) | (byte1 & 0x0f), 0, 8, 4);
+				}
+				else
+				{
+					const uint8_t byte0 = m_maincpu->space().read_byte(0x0300'0000 + m_framebuffer_base + i * m_display_stride + (j >> 1) * 3);
+					bitmap.pix(i, j) = pal444(byte0 | ((byte1 & 0xf0) << 4), 8, 4, 0);
+				}
 			}
 		}
 	}
@@ -963,10 +967,7 @@ uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rg
 		{
 			for (int j = cliprect.min_x; j < (cliprect.max_x + 1); j++)
 			{
-				uint8_t byte;
-
-				byte = m_maincpu->space().read_byte(0x0300'0000 + m_framebuffer_base + i * m_display_stride + j);
-
+				const uint8_t byte = m_maincpu->space().read_byte(0x0300'0000 + m_framebuffer_base + i * m_display_stride + j);
 				bitmap.pix(i, j) = pal332(byte, 5, 2, 0);
 			}
 		}

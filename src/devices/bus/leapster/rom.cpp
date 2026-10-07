@@ -39,6 +39,10 @@ leapster_rom_nvram_device::leapster_rom_nvram_device(const machine_config &mconf
 
 // plain cartridge
 
+void leapster_rom_plain_device::device_start()
+{
+}
+
 uint16_t leapster_rom_plain_device::read_cart(offs_t offset)
 {
 	return read_rom(offset);
@@ -59,6 +63,16 @@ void leapster_rom_plain_device::write_rom(offs_t offset, uint16_t data)
 	logerror("leapster_rom_plain_device::write_rom %08x %04x\n", offset, data);
 }
 
+uint8_t leapster_rom_plain_device::read_nvram(uint16_t offset)
+{
+	return 0x00;
+}
+
+void leapster_rom_plain_device::write_nvram(uint16_t offset, uint8_t data)
+{
+
+}
+
 // cartridge with NVRAM (exact NVRAM/EEPROM type unknown)
 
 void leapster_rom_nvram_device::write_rom(offs_t offset, uint16_t data)
@@ -70,7 +84,6 @@ uint16_t leapster_rom_nvram_device::read_rom(offs_t offset)
 {
 	return m_rom[offset & (m_rom_size - 1)];
 }
-
 
 
 uint8_t leapster_rom_nvram_device::read_nvram(uint16_t offset)
@@ -92,7 +105,6 @@ void leapster_rom_nvram_device::device_add_mconfig(machine_config &config)
 void leapster_rom_nvram_device::device_start()
 {
 	leapster_rom_plain_device::device_start();
-
 	m_cartridge_eeprom = make_unique_clear<uint8_t[]>(NVRAM_SIZE);
 	m_nvram->set_base(m_cartridge_eeprom.get(), NVRAM_SIZE);
 	save_pointer(NAME(m_cartridge_eeprom.get()), NVRAM_SIZE);

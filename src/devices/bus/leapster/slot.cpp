@@ -80,45 +80,6 @@ void leapster_slot_device::device_start()
 	m_cart = get_card_device();
 }
 
-//-------------------------------------------------
-//  LEAPSTER PCB
-//-------------------------------------------------
-
-struct leapster_slot
-{
-	int                     pcb_id;
-	const char              *slot_option;
-};
-
-// Here, we take the feature attribute from .xml (i.e. the PCB name) and we assign a unique ID to it
-static const leapster_slot slot_list[] =
-{
-	{ LEAPSTER_PLAIN,       "plain" },
-	{ LEAPSTER_NVRAM,       "nvram" },
-};
-
-static int leapster_get_pcb_id(const char *slot)
-{
-	for (auto & elem : slot_list)
-	{
-		if (!strcmp(elem.slot_option, slot))
-			return elem.pcb_id;
-	}
-
-	return 0;
-}
-
-static const char *leapster_get_slot(int type)
-{
-	for (auto & elem : slot_list)
-	{
-		if (elem.pcb_id == type)
-			return elem.slot_option;
-	}
-
-	return "plain";
-}
-
 
 /*-------------------------------------------------
  call load
@@ -126,50 +87,44 @@ static const char *leapster_get_slot(int type)
 
 std::pair<std::error_condition, std::string> leapster_slot_device::call_load()
 {
-	if (m_cart)
+	if (!m_cart)
+		return std::make_pair(std::error_condition(), std::string());
+
+	uint32_t const len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+
+	if (len > 0x100'0000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Cartridges larger than 16MB are not supported");
+
+	m_cart->rom_alloc(len, tag());
+
+	uint8_t *const ROM = m_cart->get_rom_base();
+
+	if (!loaded_through_softlist())
 	{
-
-		uint32_t const len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
-
-		m_cart->rom_alloc(len, tag());
-
-		uint8_t *const ROM = m_cart->get_rom_base();
-
-		if (!loaded_through_softlist())
-			fread(ROM, len);
-		else
-			memcpy(ROM, get_software_region("rom"), len);
-
-		if (!loaded_through_softlist())
-		{
-			// attempt to detect cart type without softlist assistance
-			m_type = get_cart_type(ROM, len);
-		}
-		else
-		{
-			// or for softlist loading, use the type specified
-			const char *pcb_name = get_feature("slot");
-			if (pcb_name)
-				m_type = leapster_get_pcb_id(pcb_name);
-		}
+		const u32 cnt = fread(ROM, len);
+		if (cnt != len)
+			return std::make_pair(std::errc::io_error, "Error reading cartridge file");
+	}
+	else
+	{
+		memcpy(ROM, get_software_region("rom"), len);
 	}
 
+	if (!loaded_through_softlist())
+	{
+		// for now we assume a non-softlisted ROM is a 'plain' cartridge, no NVRAM
+		m_type = LEAPSTER_PLAIN;
+	}
+	else
+	{
+		// or for softlist loading, use the type specified
+		const char *pcb_name = get_feature("slot");
+		if (pcb_name)
+			m_type = leapster_get_pcb_id(pcb_name);
+	}
+	
 	return std::make_pair(std::error_condition(), std::string());
 }
-
-
-/*-------------------------------------------------
- get_cart_type - code to detect cart type from
- fullpath
- -------------------------------------------------*/
-
-int leapster_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
-{
-	// without code analysis we have no way of knowing.
-	int type = LEAPSTER_PLAIN;
-	return type;
-}
-
 
 /*-------------------------------------------------
  get default card software
@@ -177,20 +132,6 @@ int leapster_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 
 std::string leapster_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (hook.image_file())
-	{
-		uint64_t len;
-		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
-		std::vector<uint8_t> rom(len);
-
-		read(*hook.image_file(), &rom[0], len); // FIXME: check error return or read returning short
-
-		int const type = get_cart_type(&rom[0], len);
-		char const *const slot_string = leapster_get_slot(type);
-
-		return std::string(slot_string);
-	}
-
 	return software_get_default_slot("plain");
 }
 

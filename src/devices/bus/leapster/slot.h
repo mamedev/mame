@@ -11,13 +11,6 @@
  TYPE DEFINITIONS
  ***************************************************************************/
 
-/* PCB */
-enum
-{
-	LEAPSTER_PLAIN = 0,
-	LEAPSTER_NVRAM,
-};
-
 // ======================> device_leapster_interface
 
 class device_leapster_interface : public device_interface
@@ -79,8 +72,8 @@ public:
 	static int get_cart_type(const uint8_t *ROM, uint32_t len);
 
 	// reading and writing
-    uint16_t read_cart(offs_t offset);
-    void write_cart(offs_t offset, uint16_t data);
+	uint16_t read_cart(offs_t offset);
+	void write_cart(offs_t offset, uint16_t data);
 
 	uint8_t read_nvram(uint16_t offset);
 	void write_nvram(uint16_t offset, uint8_t data);
@@ -93,6 +86,39 @@ protected:
 
 	int m_type;
 	device_leapster_interface *m_cart;
+
+private:
+	/* PCB */
+	enum
+	{
+		LEAPSTER_PLAIN = 0,
+		LEAPSTER_NVRAM,
+	};
+
+	struct leapster_slot
+	{
+		int                     pcb_id;
+		const char              *slot_option;
+	};
+
+	// Here, we take the feature attribute from .xml (i.e. the PCB name) and we assign a unique ID to it
+	static constexpr leapster_slot slot_list[] =
+	{
+		{ LEAPSTER_PLAIN,       "plain" },
+		{ LEAPSTER_NVRAM,       "rom_nvram" },
+	};
+
+	static int leapster_get_pcb_id(const char *slot)
+	{
+		for (auto & elem : slot_list)
+		{
+			if (!strcmp(elem.slot_option, slot))
+				return elem.pcb_id;
+		}
+
+		return 0;
+	}
+
 };
 
 // device type definition
