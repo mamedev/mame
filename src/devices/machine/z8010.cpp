@@ -91,7 +91,8 @@ z8010_device::z8010_device(const machine_config &mconfig, const char *tag, devic
 	m_iseg(0),
 	m_ihoffs(0),
 	m_if1_seg(0),
-	m_if1_hoffs(0)
+	m_if1_hoffs(0),
+	m_cpu_suppress(false)
 {
 }
 

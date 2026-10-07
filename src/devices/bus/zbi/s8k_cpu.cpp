@@ -75,6 +75,8 @@ s8k_cpu_base::s8k_cpu_base(const machine_config &mconfig, device_type type, cons
 	, m_dipsw(*this, "DIPSW")
 	, m_ns_cb(*this)
 	, m_busack_cb(*this)
+	, m_memory_error_enabled(false)
+	, m_memory_error_latched(false)
 {
 }
 
