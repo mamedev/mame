@@ -343,10 +343,6 @@ private:
 
 	}
 
-	void uart_irq(offs_t offset, uint16_t data, uint16_t mem_mask)
-	{
-
-	}
 
 	// TODO - these are overkill as it's just a bit to set - maybe dont' need to handle both read and write
 	// NEED TO BE BITWISE TOO, not just wipe the lot for every C138 upon reading
@@ -773,7 +769,8 @@ uint32_t gal3_state::screen_update_laserdiscs(screen_device& screen, bitmap_rgb3
 
 			uint32_t data = *src;
 			uint32_t col = palette[data & 0xFFFF];
-			if (col != 0xff009200)
+			//2D or 3D transparency code
+			if ((col != 0xff009200) && (col != 0xFF000000))
 			{
 				*dest = col;
 			}
@@ -1623,7 +1620,7 @@ void gal3_state::gal3(machine_config& config)
 	NAMCOS21_3D(config, m_namcos21_3d[0], 0);
 	//m_namcos21_3d[0]->set_zz_shift_mult(11, 0x200);
 	m_namcos21_3d[0]->set_depth_reverse(false);
-	m_namcos21_3d[0]->set_num_palettes(0x20);
+	m_namcos21_3d[0]->set_num_palettes(0x8);
 //	m_namcos21_3d[0]->set_framebuffer_size(496, 480);
 	m_namcos21_3d[0]->set_framebuffer_size(480, 480);
 
@@ -1637,7 +1634,7 @@ void gal3_state::gal3(machine_config& config)
 	NAMCO_C355SPR(config, m_c355spr[1], 0);
 	m_c355spr[1]->set_screen(m_screen_l);
 	m_c355spr[1]->set_palette(m_palette[1]);
-	m_c355spr[1]->set_scroll_offsets(0x10, 0x19);
+	m_c355spr[1]->set_scroll_offsets(0xa, 0x19);
 	m_c355spr[1]->set_color_base(0x0); // TODO : verify palette offset
 	m_c355spr[1]->set_external_prifill(true);
 
@@ -1645,7 +1642,7 @@ void gal3_state::gal3(machine_config& config)
 	NAMCOS21_3D(config, m_namcos21_3d[1], 0);
 	//m_namcos21_3d[1]->set_zz_shift_mult(11, 0x200);
 	m_namcos21_3d[1]->set_depth_reverse(false);
-	m_namcos21_3d[1]->set_num_palettes(0x10);
+	m_namcos21_3d[1]->set_num_palettes(0x8);
 //	m_namcos21_3d[1]->set_framebuffer_size(496 , 480);
 	m_namcos21_3d[1]->set_framebuffer_size(480, 480);
 
@@ -2134,12 +2131,13 @@ void gal3_state::gal3zlgr_init()
 	uint8_t *rom  = (uint8_t *)memregion("slv_cpu")->base();
 
 	rom[0x2016] = 0x16; // Timing hack to delay the slave 68020 for longer (was 0x4)
-
+	m_is_dragoon = false;
 }
 
 
 void gal3_state::gal3_init()
 {
+	m_c355spr[1]->set_scroll_offsets(0x12, 0x18);
 	m_is_dragoon = true;
 }
 
