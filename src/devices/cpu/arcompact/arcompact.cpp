@@ -9,8 +9,6 @@
   - ARC 600
   - ARC 700
 
- (this is a skeleton core)
-
  ARCompact is a 32-bit CPU that freely mixes 32-bit and 16-bit instructions
 
  Various user customizations could be made as with the ARC A4 based processors
@@ -226,6 +224,8 @@ arcompact_device::arcompact_device(const machine_config& mconfig, const char* ta
 	: cpu_device(mconfig, ARCA5, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0) // some docs describe these as 'middle endian'
 	, m_io_config("io", ENDIANNESS_LITTLE, 32, 32, -2, address_map_constructor(FUNC(arcompact_device::arcompact_auxreg_map), this))
+	, m_has_dsp(false)
+	, m_is_leapster_cpu(false)
 	, m_default_vector_base(0)
 	, m_dword_alignment_mask(0xffffffff)
 	, m_word_alignment_mask(0xffffffff)

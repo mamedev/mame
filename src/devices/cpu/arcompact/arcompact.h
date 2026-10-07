@@ -19,9 +19,8 @@ public:
 	arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_default_vector_base(uint32_t address) { m_default_vector_base = address & 0xfffffc00; }
-
 	void set_dsp(bool enabled) { m_has_dsp = enabled; }
-
+	void set_is_leapster_cpu(bool is_leapster) { m_is_leapster_cpu = is_leapster; }
 	void set_memory_access_alignment(uint32_t word, uint32_t dword) { m_word_alignment_mask = word; m_dword_alignment_mask = dword; }
 
 protected:
@@ -561,11 +560,10 @@ private:
 	void xy_update(unsigned index, uint32_t modifier);
 	uint32_t dsp_multiply(uint32_t src1, uint32_t src2, int operation, bool set_flags);
 
-	bool m_has_dsp = false;
-	uint32_t m_xy_aux[0x20]{};
-	uint32_t m_xy_mem[2][2][0x400]{};
-	uint32_t m_macmode = 0;
-	int64_t m_mac_acc[2]{};
+	uint32_t m_xy_aux[0x20];
+	uint32_t m_xy_mem[2][2][0x400];
+	uint32_t m_macmode;
+	int64_t m_mac_acc[2];
 
 	// internal state
 	uint32_t m_pc;
@@ -596,6 +594,8 @@ private:
 	uint32_t m_AUX_IRQ_LEV;
 
 	// config
+	bool m_has_dsp;
+	bool m_is_leapster_cpu;
 	uint32_t m_default_vector_base;
 	uint32_t m_dword_alignment_mask;
 	uint32_t m_word_alignment_mask;

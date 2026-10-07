@@ -5,7 +5,7 @@
 
 #define LOG_SOUND    (1U << 1)
 
-#define VERBOSE (LOG_SOUND)
+#define VERBOSE (0)
 
 #include "logmacro.h"
 

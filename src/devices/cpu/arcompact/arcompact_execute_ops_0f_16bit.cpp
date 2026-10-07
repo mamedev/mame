@@ -99,18 +99,25 @@ uint32_t arcompact_device::handleop_TST_S_b_c(uint16_t op)
 
 uint32_t arcompact_device::handleop_MUL64_S_0_b_c(uint16_t op)
 {
-	// At 0x4007'6958 in the original Leapster BIOS there is an add instruction that uses the MMID register to attempt to
-	// get the lower 32 bits of a multiplication result. If MMID contains the middle 32 bits, subsequent instructions will
-	// corrupt the heap and cause a hang during boot. This sequence of instructions is still present through the Leapster 2
-	// BIOS. To avoid this for now, the lower 32 bits are also stored in MMID.
-	// TODO: Test on hardware to figure out exactly what's going on
-
 	uint8_t breg = common16_get_and_expand_breg(op);
 	uint8_t creg = common16_get_and_expand_creg(op);
 	uint64_t result = (int64_t)(int32_t)m_regs[breg] * (int64_t)(int32_t)m_regs[creg];
 	m_regs[REG_MLO] = result & 0xffffffff;
-//  m_regs[REG_MMID] = (result >> 16) & 0xffffffff;
-	m_regs[REG_MMID] = result & 0xffffffff;
+
+	if (m_is_leapster_cpu)
+	{
+		// At 0x4007'6958 in the original Leapster BIOS there is an add instruction that uses the MMID register to attempt to
+		// get the lower 32 bits of a multiplication result. If MMID contains the middle 32 bits, subsequent instructions will
+		// corrupt the heap and cause a hang during boot. This sequence of instructions is still present through the Leapster 2
+		// BIOS. To avoid this for now, the lower 32 bits are also stored in MMID.
+		// TODO: Test on hardware to figure out exactly what's going on
+		m_regs[REG_MMID] = result & 0xffffffff;
+	}
+	else
+	{
+		m_regs[REG_MMID] = (result >> 16) & 0xffffffff;
+	}
+
 	m_regs[REG_MHI] = (result >> 32) & 0xffffffff;
 	return m_pc + 2;
 }

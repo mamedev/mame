@@ -252,6 +252,9 @@ private:
 
 	uint32_t adc_fifo_pop()
 	{
+		if (machine().side_effects_disabled())
+			return 0;
+
 		if(m_adc_fifo_empty)
 		{
 			return 0;
@@ -1054,12 +1057,17 @@ void leapster_state::machine_reset()
 		m_adc_channel_control[i] = 0;
 	}
 
+	m_adc_timer->enable(false);
+
 	m_adc_fifo_base = 0;
 	m_adc_fifo_head = 0;
 	m_adc_fifo_empty = true;
 
 	m_touchscreen_initted = false;
 	m_released_counter = 30;
+
+	m_current_eeprom_command = 0;
+	m_clock_div = 0;
 }
 
 void leapster_state::leapster_map(address_map &map)
@@ -1246,6 +1254,7 @@ void leapster_state::leapster(machine_config &config)
 	// "/ 2" gives a closer speed/framerate to real hardware videos, unknown if the CPU runs slower, or if waitstates are involved.
 	ARCA5(config, m_maincpu, 96000000 / 2);
 	m_maincpu->set_dsp(true);
+	m_maincpu->set_is_leapster_cpu(true);
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapster_state::leapster_map);
 	m_maincpu->set_addrmap(AS_IO, &leapster_state::leapster_aux);
 	m_maincpu->set_default_vector_base(0x40000000);
@@ -1334,14 +1343,10 @@ ROM_START(leapsterlmx)
 	ROM_DEFAULT_BIOS( "lmax_2_2" )
 ROM_END
 
-void leapster_state::init_leapster()
-{
-}
-
 } // anonymous namespace
 
 
-CONS( 2003, leapster,    0,        0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-CONS( 2005, leapstertv,  leapster, 0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster TV",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2005, leapsterlmx, leapster, 0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster L-MAX", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2009, leapster2,   leapster, 0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster 2",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2003, leapster,    0,        0, leapster, leapster, leapster_state, empty_init, "LeapFrog", "Leapster",       MACHINE_NOT_WORKING )
+CONS( 2005, leapstertv,  leapster, 0, leapster, leapster, leapster_state, empty_init, "LeapFrog", "Leapster TV",    MACHINE_NOT_WORKING )
+CONS( 2005, leapsterlmx, leapster, 0, leapster, leapster, leapster_state, empty_init, "LeapFrog", "Leapster L-MAX", MACHINE_NOT_WORKING )
+CONS( 2009, leapster2,   leapster, 0, leapster, leapster, leapster_state, empty_init, "LeapFrog", "Leapster 2",     MACHINE_NOT_WORKING )
