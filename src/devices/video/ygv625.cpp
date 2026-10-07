@@ -183,7 +183,6 @@ struct ygv625_device::decoded_sprite
 {
 	u16 width = 0;
 	u16 height = 0;
-	u8 format = 0;
 	u8 depth = 0;           // bits per pixel for indexed formats, 16 for direct colour
 	u8 transparent = 0;     // transparent colour index from the sprite header
 	bool has_transparent = false;
@@ -199,7 +198,6 @@ public:
 	bit_reader(const u8 *base, u32 size, u32 byte_offset) : m_base(base), m_size(size), m_pos(u64(byte_offset) * 8) { }
 
 	u32 read(u32 bits);
-	u64 pos() const { return m_pos; }
 	bool overrun() const { return m_pos > u64(m_size) * 8; }
 
 private:
@@ -245,13 +243,16 @@ void ygv625_device::device_start()
 
 	// precompute the four 16x16 block scan orders
 	for (u32 scan = 0; scan < 4; scan++)
+	{
 		for (u32 i = 0; i < 256; i++)
 		{
 			const auto [row, col] = SCAN_ORDERS[scan](i);
 			m_scan_tables[scan][i][0] = row;
 			m_scan_tables[scan][i][1] = col;
 		}
+	}
 
+	save_item(NAME(m_bitmap));
 	save_item(NAME(m_regs));
 	save_item(NAME(m_cg_read_data));
 	save_item(NAME(m_cg_read_ready));
@@ -297,7 +298,7 @@ u32 ygv625_device::bit_reader::read(u32 bits)
 //  appended after the two main groups.
 //-------------------------------------------------
 
-bool ygv625_device::read_overrides(bit_reader &br, plane_params &p, const plane_params &base, u32 flag_layout)
+void ygv625_device::read_overrides(bit_reader &br, plane_params &p, const plane_params &base, u32 flag_layout)
 {
 	p = base;
 
@@ -317,11 +318,14 @@ bool ygv625_device::read_overrides(bit_reader &br, plane_params &p, const plane_
 	if (BIT(flag_layout, 0) && BIT(flags, bit--))
 		over |= 0x8;
 
-	if (BIT(over, 0)) p.cmax = br.read(3) + 1;
-	if (BIT(over, 1)) p.cth = br.read(3) + 1;
-	if (BIT(over, 2)) p.esc = br.read(3) + 1;
-	if (BIT(over, 3)) p.wn = br.read(3) + 1;
-	return true;
+	if (BIT(over, 0))
+		p.cmax = br.read(3) + 1;
+	if (BIT(over, 1))
+		p.cth = br.read(3) + 1;
+	if (BIT(over, 2))
+		p.esc = br.read(3) + 1;
+	if (BIT(over, 3))
+		p.wn = br.read(3) + 1;
 }
 
 
@@ -367,9 +371,7 @@ bool ygv625_device::decode_plane(bit_reader &br, const plane_params &p, int p0, 
 		else
 		{
 			u32 w = (tok == 2) ? p.cth : p.cmax;
-			int v = br.read(w);
-			if (BIT(v, w - 1))
-				v -= 1 << w;
+			int v = util::sext(br.read(w), w);
 			cur += v;
 			if (v)
 				lastd = v;
@@ -403,8 +405,8 @@ bool ygv625_device::decode_indexed(decoded_sprite &spr, u32 addr)
 	base.wn = (b3 & 7) + 1;
 	const u32 flag_layout = (b2 >> 4) & 3;
 
-	static const u8 depth_table[6] = { 4, 5, 6, 7, 8, 8 };
-	spr.depth = depth_table[std::min<u32>((fmt >> 3) & 7, 5)];
+	constexpr u8 DEPTH_TABLE[] = { 4, 5, 6, 7, 8, 8 };
+	spr.depth = DEPTH_TABLE[std::min<u32>((fmt >> 3) & 7, 5)];
 	const u32 mod = 1 << spr.depth;
 
 	bit_reader br(&m_cg[0], m_cg.length(), pos);
@@ -483,7 +485,7 @@ bool ygv625_device::decode_rgb(decoded_sprite &spr, u32 addr)
 		plane_params p1, p23;
 		read_overrides(br, p1, base1, ff1);
 		const int r0 = br.read(k2 + 1);
-		const int b0 = (br.read(k2) << 1) | br.read(1);
+		const int b0 = br.read(k2 + 1);
 		const int g0 = ((x3 & 1) << k) | glow;
 		read_overrides(br, p23, base23, ff23);
 
@@ -521,11 +523,14 @@ bool ygv625_device::decode_raw(decoded_sprite &spr, u32 addr, u32 bpp)
 	{
 		const u32 bx = bi % bw, by = bi / bw;
 		for (u32 y = 0; y < 16; y++)
+		{
 			for (u32 x = 0; x < 16; x++)
 			{
 				u8 v;
 				if (bpp == 8)
+				{
 					v = cg_byte(pos++);
+				}
 				else
 				{
 					const u8 byte = cg_byte(pos + (x >> 1));
@@ -535,6 +540,7 @@ bool ygv625_device::decode_raw(decoded_sprite &spr, u32 addr, u32 bpp)
 				}
 				spr.pixels[(by * 16 + y) * (bw * 16) + bx * 16 + x] = v;
 			}
+		}
 	}
 	return true;
 }
@@ -547,7 +553,6 @@ bool ygv625_device::decode_raw(decoded_sprite &spr, u32 addr, u32 bpp)
 bool ygv625_device::decode_sprite(decoded_sprite &spr, u32 addr)
 {
 	const u8 fmt = cg_byte(addr);
-	spr.format = fmt;
 	switch (fmt)
 	{
 	case 0x01: return decode_raw(spr, addr, 4);
@@ -624,8 +629,10 @@ void ygv625_device::draw_sprite(const decoded_sprite &spr, int cx, int cy, u32 p
 		return;
 
 	const u32 stride = ((spr.width + 15) / 16) * 16;
-	if (zoomx == 0) zoomx = 0x40;
-	if (zoomy == 0) zoomy = 0x40;
+	if (zoomx == 0)
+		zoomx = 0x40;
+	if (zoomy == 0)
+		zoomy = 0x40;
 
 	// displayed size
 	const int dw = std::max<int>(1, (spr.width * zoomx + 0x20) / 0x40);
@@ -636,8 +643,10 @@ void ygv625_device::draw_sprite(const decoded_sprite &spr, int cx, int cy, u32 p
 	// colour lookup table for indexed sprites
 	rgb_t clut[256];
 	if (spr.depth <= 8)
+	{
 		for (u32 i = 0; i < (1u << spr.depth); i++)
 			clut[i] = lookup_colour(palette, spr.depth, i);
+	}
 
 	// transparent pixel value: the index given in the sprite header, or the
 	// clear colour 0x0001 for direct colour sprites; -1 when the attribute
@@ -653,7 +662,8 @@ void ygv625_device::draw_sprite(const decoded_sprite &spr, int cx, int cy, u32 p
 		if (sy_dst < 0 || sy_dst >= ymax)
 			continue;
 		int sy = (dy * spr.height) / dh;
-		if (flipy) sy = spr.height - 1 - sy;
+		if (flipy)
+			sy = spr.height - 1 - sy;
 		const u16 *src = &spr.pixels[sy * stride];
 		u32 *dst = &m_bitmap.pix(sy_dst);
 		for (int dx = 0; dx < dw; dx++)
@@ -662,7 +672,8 @@ void ygv625_device::draw_sprite(const decoded_sprite &spr, int cx, int cy, u32 p
 			if (sx_dst < 0 || sx_dst >= xmax)
 				continue;
 			int sx = (dx * spr.width) / dw;
-			if (flipx) sx = spr.width - 1 - sx;
+			if (flipx)
+				sx = spr.width - 1 - sx;
 			const u16 v = src[sx];
 			if (int(v) == transparent)
 				continue;
@@ -688,8 +699,10 @@ void ygv625_device::draw_sprite_quad(const decoded_sprite &spr, const double (&q
 
 	rgb_t clut[256];
 	if (spr.depth <= 8)
+	{
 		for (u32 i = 0; i < (1u << spr.depth); i++)
 			clut[i] = lookup_colour(palette, spr.depth, i);
+	}
 
 	int transparent = -1;
 	if (transparency)
@@ -766,8 +779,10 @@ void ygv625_device::draw_sprite_quad(const decoded_sprite &spr, const double (&q
 
 			int sx = std::min<int>(spr.width - 1, int(s * spr.width));
 			int sy = std::min<int>(spr.height - 1, int(t * spr.height));
-			if (flipx) sx = spr.width - 1 - sx;
-			if (flipy) sy = spr.height - 1 - sy;
+			if (flipx)
+				sx = spr.width - 1 - sx;
+			if (flipy)
+				sy = spr.height - 1 - sy;
 			const u16 v = spr.pixels[sy * stride + sx];
 			if (int(v) == transparent)
 				continue;
@@ -795,10 +810,8 @@ void ygv625_device::render_frame()
 			const u32 width = ((a[1] & 0xff) | ((a[5] & 0x1000) ? 0x100 : 0)) + 1;
 			const u32 height = ((a[1] >> 8) | ((a[4] & 0x1000) ? 0x100 : 0)) + 1;
 			const u32 addr = (u32(a[2]) << 16) | a[3];
-			int y = a[4] & 0xfff;
-			int x = a[5] & 0xfff;
-			if (y & 0x800) y -= 0x1000;
-			if (x & 0x800) x -= 0x1000;
+			int y = util::sext(a[4] & 0xfff, 12);
+			int x = util::sext(a[5] & 0xfff, 12);
 
 			if (addr < m_cg.length())
 			{
@@ -814,9 +827,7 @@ void ygv625_device::render_frame()
 					double sx[4], sy[4];
 					for (int c = 0; c < 4; c++)
 					{
-						int cy = q[c * 2] & 0x7ff, cx = q[c * 2 + 1] & 0x7ff;
-						if (cx & 0x400) cx -= 0x800;
-						if (cy & 0x400) cy -= 0x800;
+						int cy = util::sext(q[c * 2] & 0x7ff, 11), cx = util::sext(q[c * 2 + 1] & 0x7ff, 11);
 						sx[c] = x + cx;
 						sy[c] = y - cy;
 					}
@@ -841,7 +852,7 @@ void ygv625_device::render_frame()
 //  read
 //-------------------------------------------------
 
-u16 ygv625_device::read(offs_t offset, u16 mem_mask)
+u16 ygv625_device::read(offs_t offset)
 {
 	if (offset < 0x1e00)
 		return m_ram[offset];
@@ -896,12 +907,15 @@ void ygv625_device::write(offs_t offset, u16 data, u16 mem_mask)
 	switch (reg)
 	{
 	case 0x27: // 0x3c4e control
-		if (data & 0x0020)
+		if (data & mem_mask & 0x0020)
+		{
+			screen().update_partial(screen().vpos());
 			render_frame();
+		}
 		break;
 
 	case 0x36: // 0x3c6c CG read: bit 15 starts the access
-		if (data & 0x8000)
+		if (data & mem_mask & 0x8000)
 		{
 			const u32 addr = (u32(m_regs[0x36] & 0x07ff) << 16) | m_regs[0x37];
 			m_cg_read_data = cg_word(addr);
