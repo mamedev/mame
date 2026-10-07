@@ -10,6 +10,16 @@ NOTE: The actual board uses an AM2910 MPC and 4x AM2901B bit-slice ALUs
 (+2 KB SRAM). However, the firmware ROMs (U131-U136) for these have not
 been dumped yet, so currently only high-level emulation is possible.
 
+NOTE: The disks are CHD images rather than a flux-level model of the
+medium, by choice.  A CHD holds the data of the active sectors only, so
+there is nowhere to keep the sector IDs, their ECC or the spare sector
+that WRITE FORMAT lays down.  READ FORMAT therefore returns IDs made up
+from the image geometry, not the ones that were written, and the little
+format state that is kept (one extra sector and its data) is per drive,
+not per track.  This only matters for low-level formatting; it is modelled
+far enough for the SADIE format diagnostics (SMDFMT, SMDMEDIA) to pass.
+Regular use only reads and writes sectors and is not affected.
+
 **********************************************************************/
 
 #include "emu.h"
