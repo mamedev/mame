@@ -399,7 +399,6 @@ void guxiang_state::machine_start()
 
 void guxiang_state::guxiang(machine_config &config)
 {
-
 	/* basic machine hardware */
 	i80c52_device &maincpu(I80C52(config, "maincpu", XTAL(10'738'635)));
 	maincpu.set_addrmap(AS_PROGRAM, &guxiang_state::program_map);
@@ -417,7 +416,6 @@ void guxiang_state::guxiang(machine_config &config)
 	kbdc1.in_rl_callback().set(FUNC(guxiang_state::keyboard_r));          // keyboard Return Lines
 	kbdc1.out_disp_callback().set(FUNC(guxiang_state::display_7seg_data_w));
 
-
 	i8279_device &kbdc2(I8279(config, "i8279_2", XTAL(10'738'635) / 6)); // divisor not verified
 	kbdc2.out_sl_callback().set(FUNC(guxiang_state::multiplex_7seg2_w));   // select  block of 7seg modules by multiplexing the SL scan lines
 	kbdc2.out_disp_callback().set(FUNC(guxiang_state::display_7seg_data2_w));
@@ -428,9 +426,7 @@ void guxiang_state::guxiang(machine_config &config)
 	ppi1.out_pb_callback().set(FUNC(guxiang_state::ppi1_portb_w));
 	ppi1.out_pc_callback().set(FUNC(guxiang_state::ppi1_portc_w));
 
- //  I8255A(config, "ppi2");
 	i8255_device &ppi2(I8255A(config, "ppi2"));
-
 	ppi2.out_pa_callback().set(FUNC(guxiang_state::ppi2_porta_w));
 	ppi2.out_pb_callback().set(FUNC(guxiang_state::ppi2_portb_w));
 	ppi2.out_pc_callback().set(FUNC(guxiang_state::ppi2_portc_w));
@@ -440,7 +436,6 @@ void guxiang_state::guxiang(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-
 
 	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635) / 6));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -467,14 +462,11 @@ ROM_END
 ROM_START( guxianga )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "w78e065.bin", 0x00000, 0x10000, CRC(F772DCB4) SHA1(08e3efc853e7fb7de5b1fd039367487344f2270d) )
-
-
 ROM_END
-
 
 } // anonymous namespace
 
 
-//    YEAR    NAME         PARENT   MACHINE      INPUT      STATE            INIT        ROT      COMPANY        FULLNAME                                FLAGS
-GAME( 1991,  guxiang,      0,       guxiang,     guxiang,  guxiang_state,     init_dec,   ROT0,    "<unknown>",  "GuXiang (Encrypted) ",                  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
-GAME( 1991,  guxianga,     0,       guxiang,     guxianga,  guxiang_state,     empty_init, ROT0,    "<unknown>",  "GuXiang (Unencrypted) ",                MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+//    YEAR   NAME          PARENT   MACHINE      INPUT      STATE            INIT        ROT      COMPANY        FULLNAME                                FLAGS
+GAME( 1991,  guxiang,      0,       guxiang,     guxiang,   guxiang_state,   init_dec,   ROT0,    "<unknown>",   "GuXiang (Encrypted) ",                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 1991,  guxianga,     0,       guxiang,     guxianga,  guxiang_state,   empty_init, ROT0,    "<unknown>",   "GuXiang (Unencrypted) ",               MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
