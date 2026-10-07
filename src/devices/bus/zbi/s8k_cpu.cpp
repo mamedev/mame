@@ -277,7 +277,8 @@ z8010_device *s8k_cpu_base::select_code_mmu(offs_t offset)
 			if (m_normal_mode)  // Trying to access in normal mode?
 			{
 				mmu = nullptr;
-				segt_interrupt(1);
+				if (!machine().side_effects_disabled())
+					segt_interrupt(1);
 			}
 		}
 		else if (m_is_seg_user)
@@ -327,7 +328,8 @@ z8010_device *s8k_cpu_base::select_data_mmu(offs_t offset, uint8_t sbr, uint8_t 
 				// SEGTRAP!  (the address latches are captured by the
 				// segment trap flip-flop in segt_interrupt)
 				mmu = nullptr;
-				segt_interrupt(1);
+				if (!machine().side_effects_disabled())
+					segt_interrupt(1);
 			}
 			else if (seg_offs < sbr)
 			{

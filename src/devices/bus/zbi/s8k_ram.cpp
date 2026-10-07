@@ -149,8 +149,11 @@ bool zbi_s8k_parity_ram_card_device::check_parity(offs_t offset, uint8_t data, b
 	}
 	else if (BIT(checkbyte, bit) != parity)
 	{
-		m_bus->memerr_w(ASSERT_LINE);
-		m_bus->memerr_w(CLEAR_LINE);
+		if (!machine().side_effects_disabled())
+		{
+			m_bus->memerr_w(ASSERT_LINE);
+			m_bus->memerr_w(CLEAR_LINE);
+		}
 		return false;
 	}
 
