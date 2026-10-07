@@ -2,6 +2,9 @@
 // copyright-holders:David Haywood, Luca Elia, MetalliC
 // emulation of Cave CV1000 blitter hardware
 // programmed to Altera Cyclone EP1C12 FPGA
+// References:
+// - Blitter timings are based on "Blitter Research by buffi"
+//   https://cave.buffis.com/docs/CV1000_Blitter_Research_by_buffi.pdf
 
 #include "emu.h"
 #include "cv1k_v.h"

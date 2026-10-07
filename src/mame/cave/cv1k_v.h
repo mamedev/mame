@@ -12,9 +12,6 @@
 
 #include "cpu/sh/sh7709s.h"
 
-// Blitter timings are based on "Blitter Research by buffi":
-// https://cave.buffis.com/docs/CV1000_Blitter_Research_by_buffi.pdf
-
 class cv1k_blitter_device : public device_t, public device_video_interface
 {
 public:

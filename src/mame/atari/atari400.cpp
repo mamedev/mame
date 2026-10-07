@@ -2431,15 +2431,18 @@ COMP( 1979, a400,    0,      0,      a400,      a800,   a400_state,   empty_init
 COMP( 1979, a400pal, a400,   0,      a400pal,   a800,   a400_state,   empty_init, "Atari", "Atari 400 (PAL)",      0)
 COMP( 1979, a800,    0,      0,      a800,      a800,   a800_state,   empty_init, "Atari", "Atari 800 (NTSC)",     0)
 COMP( 1979, a800pal, a800,   0,      a800pal,   a800,   a800_state,   empty_init, "Atari", "Atari 800 (PAL)",      0)
-COMP( 1982, a1200xl, a800,   0,      a1200xl,   a1200xl,a1200xl_state, empty_init, "Atari", "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
-COMP( 1983, a600xl,  a800xl, 0,      a600xl,    a800,   a600xl_state, empty_init, "Atari", "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM
-COMP( 1983, a800xl,  0,      0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1983, a800xlp, a800xl, 0,      a800xlpal, a800,   a800xl_state, empty_init, "Atari", "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1986, a65xe,   a800xl, 0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 65XE",           MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1986, a65xea,  a800xl, 0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 65XE (Arabic)",  MACHINE_NOT_WORKING )
-COMP( 1986, a130xe,  a800xl, 0,      a130xe,    a800,   a130xe_state, empty_init, "Atari", "Atari 130XE",          MACHINE_NOT_WORKING )      // 128k RAM
-COMP( 1986, a800xe,  a800xl, 0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 800XE",          MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1987, xegs,    0,      0,      xegs,      a800,   xegs_state,   empty_init, "Atari", "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS )  // 64k RAM
+COMP( 1982, a1200xl, a800,   0,      a1200xl,   a1200xl,a1200xl_state,empty_init, "Atari", "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
+
+COMP( 1983, a600xl,  a800xl, 0,      a600xl,    a800,   a600xl_state, empty_init, "Atari", "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM, 1 PBI slot
+COMP( 1983, a800xl,  0,      0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM, 1 PBI slot
+COMP( 1983, a800xlp, a800xl, 0,      a800xlpal, a800,   a800xl_state, empty_init, "Atari", "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM, 1 PBI slot
+
+COMP( 1985, a130xe,  0,      0,      a130xe,    a800,   a130xe_state, empty_init, "Atari", "Atari 130XE",          MACHINE_NOT_WORKING )      // 128k RAM, 1 ECI slot
+COMP( 1985, a65xe,   a130xe, 0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 65XE",           MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM, 0 or 1 ECI slot
+COMP( 1985, a65xea,  a130xe, 0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 65XE (Arabic)",  MACHINE_NOT_WORKING ) // ^ 1 ECI slot
+COMP( 1985, a800xe,  a130xe, 0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 800XE",          MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM, 0 or 1 ECI slot, rebranded 65XE for Central Europe market
+
+COMP( 1987, xegs,    0,      0,      xegs,      a800,   xegs_state,   empty_init, "Atari", "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS )  // 64k RAM, no ECI slot
 
 CONS( 1982, a5200,   0,      0,      a5200,     a5200,  a5200_state,  empty_init, "Atari", "Atari 5200",           0)
 CONS( 1983, a5200a,  a5200,  0,      a5200a,    a5200a, a5200_state,  empty_init, "Atari", "Atari 5200 (2-port)",  0)
