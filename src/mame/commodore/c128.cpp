@@ -143,7 +143,6 @@ public:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	inline void check_interrupts();
 	int read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0);
 	uint8_t read_memory(offs_t offset, offs_t vma, int ba, int aec, int z80io);
 	void write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io);
@@ -315,25 +314,14 @@ enum
 
 QUICKLOAD_LOAD_MEMBER(c128_state::quickload_c128)
 {
-	return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
-}
-
-
-//**************************************************************************
-//  INTERRUPTS
-//**************************************************************************
-
-//-------------------------------------------------
-//  check_interrupts -
-//-------------------------------------------------
-
-inline void c128_state::check_interrupts()
-{
-	//int irq = m_cia1_irq || m_vic_irq || m_exp_irq;
-	//int nmi = m_cia2_irq || !m_restore || m_exp_nmi;
-	//int aec = m_exp_dma && m_z80_busack;
-	//int rdy = m_vic_aec && m_z80en && m_vic_ba;
-	//int busreq = !m_z80en || !(m_z80_busack && !aec)
+	int const loram = m_loram;
+	int const hiram = m_hiram;
+	m_loram = 0;
+	m_hiram = 0;
+	auto const result = general_cbm_loadsnap(image, m_subcpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
+	m_loram = loram;
+	m_hiram = hiram;
+	return result;
 }
 
 
@@ -1956,6 +1944,7 @@ void c128_state::softlists(machine_config &config, const char *filter)
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter(filter);
 	SOFTWARE_LIST(config, "flop_list_c64_orig").set_compatible("c64_flop_orig").set_filter(filter);
 	SOFTWARE_LIST(config, "flop_list_c64_misc").set_compatible("c64_flop_misc").set_filter(filter);
+	SOFTWARE_LIST(config, "quik_list").set_original("c64_quik").set_filter(filter);
 	SOFTWARE_LIST(config, "hdd_list").set_original("c64_hdd").set_filter(filter);
 	SOFTWARE_LIST(config, "sdcard_list").set_original("cbm_sd").set_filter(filter);
 	SOFTWARE_LIST(config, "cd_list").set_original("c64_cd").set_filter(filter);
@@ -2094,7 +2083,9 @@ void c128_state::ntsc(machine_config &config)
 	m_user->pl_handler().set(FUNC(c128_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c128_state::write_user_pa2));
 
-	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c128_state::quickload_c128));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY));
+	quickload.set_load_callback(FUNC(c128_state::quickload_c128));
+	quickload.set_interface("cbm_quik");
 
 	// software lists
 	softlists(config, "NTSC");
@@ -2286,7 +2277,9 @@ void c128_state::pal(machine_config &config)
 	m_user->pl_handler().set(FUNC(c128_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c128_state::write_user_pa2));
 
-	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c128_state::quickload_c128));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY));
+	quickload.set_load_callback(FUNC(c128_state::quickload_c128));
+	quickload.set_interface("cbm_quik");
 
 	// software list
 	softlists(config, "PAL");

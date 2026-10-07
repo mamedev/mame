@@ -501,7 +501,14 @@ enum
 
 QUICKLOAD_LOAD_MEMBER(c64_state::quickload_c64)
 {
-	return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
+	int const loram = m_loram;
+	int const hiram = m_hiram;
+	m_loram = 0;
+	m_hiram = 0;
+	auto const result = general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
+	m_loram = loram;
+	m_hiram = hiram;
+	return result;
 }
 
 

@@ -324,4 +324,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=pT2det24pUA -->
+	<software name="nolimit">
+		<description>No Limit</description>
+		<year>2024</year>
+		<publisher>Aleksi Eeben</publisher>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="63425">
+				<rom name="no_limit.prg" size="63425" crc="20a5f217" sha1="ece4fea9043a6ff1af1727fff764fe10694b8d32"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
