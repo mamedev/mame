@@ -84,6 +84,11 @@ Error codes (TODO: RE them all)
 #include "video/mc6845.h"
 
 #include "formats/pc98_dsk.h"
+#include "formats/pc98fdi_dsk.h"
+#include "formats/dcp_dsk.h"
+#include "formats/dip_dsk.h"
+#include "formats/fdd_dsk.h"
+#include "formats/nfd_dsk.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -458,11 +463,11 @@ void b16_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_PC98_FORMAT);
-//  fr.add(FLOPPY_PC98FDI_FORMAT);
-//  fr.add(FLOPPY_FDD_FORMAT);
-//  fr.add(FLOPPY_DCP_FORMAT);
-//  fr.add(FLOPPY_DIP_FORMAT);
-//  fr.add(FLOPPY_NFD_FORMAT);
+	fr.add(FLOPPY_PC98FDI_FORMAT);
+	fr.add(FLOPPY_FDD_FORMAT);
+	fr.add(FLOPPY_DCP_FORMAT);
+	fr.add(FLOPPY_DIP_FORMAT);
+	fr.add(FLOPPY_NFD_FORMAT);
 }
 
 void b16_state::machine_start()
