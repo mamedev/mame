@@ -993,6 +993,53 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
+	<!-- requires an MSD SD-1/SD-2 disk drive -->
+	<software name="msddcan" supported="no">
+		<description>MSD Dual Cannon</description>
+		<year>198?</year>
+		<publisher>Kracker Jax</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="msd_ddc.d64" size="174848" crc="fa146611" sha1="6d484099bef77f0574a8695ba099d120897767e9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- requires an MSD SD-1/SD-2 disk drive -->
+	<software name="msdprg" supported="no">
+		<description>MSD Programs</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="174848">
+				<rom name="msdprg1.d64" size="174848" crc="ba672c19" sha1="c0ab2b5e412ddedf6e73e5feb5d948f218907cbf"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="174848">
+				<rom name="msdprg2.d64" size="174848" crc="ec6c8131" sha1="a2c87b2ffb98755257ef939fb35678986571f088"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- requires an MSD SD-1/SD-2 disk drive -->
+	<software name="msdutil" supported="no">
+		<description>MSD Utilities</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="175531">
+				<rom name="msdutils.d64" size="175531" crc="8873e254" sha1="2fe8284e06679d07b2e31c3d3ea0942fd5d60c04"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !Operating Systems -->
 
 	<software name="contiki">
