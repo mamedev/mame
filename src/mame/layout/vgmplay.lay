@@ -36,7 +36,7 @@ license:CC0-1.0
 	28: C-140
 	29: K053260
 	30: POKEY
-	31: QSound
+	31: Capcom-Q1 DL 1425
 	32: SCSP
 	33: WonderSwan
 	34: VSU-VUE
@@ -86,7 +86,7 @@ license:CC0-1.0
 	<element name="act_label_c140"><text string="C140" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_k053260"><text string="K053260" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_pokey"><text string="POKEY" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
-	<element name="act_label_qsound"><text string="QSound™" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
+	<element name="act_label_capcom_q1"><text string="Capcom-Q1" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_scsp"><text string="SCSP" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_wswan"><text string="WonderSwan" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
 	<element name="act_label_vsu_vue"><text string="VSU-VUE" align="1"><color red="1.0" green="1.0" blue="1.0" /></text></element>
@@ -261,7 +261,7 @@ license:CC0-1.0
 		<element ref="act_label_c140"><bounds x="34" y="19.2" width="10" height="1.6" /></element>
 		<element ref="act_label_k053260"><bounds x="34" y="22.2" width="10" height="1.6" /></element>
 		<element ref="act_label_pokey"><bounds x="34" y="25.2" width="10" height="1.6" /></element>
-		<element ref="act_label_qsound"><bounds x="34" y="28.2" width="10" height="1.6" /></element>
+		<element ref="act_label_capcom_q1"><bounds x="34" y="28.2" width="10" height="1.6" /></element>
 		<element ref="act_label_scsp"><bounds x="34" y="31.2" width="10" height="1.6" /></element>
 
 		<element ref="act_label_wswan"><bounds x="49" y="1.2" width="10" height="1.6" /></element>
