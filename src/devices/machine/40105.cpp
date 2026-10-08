@@ -127,7 +127,7 @@ void cmos_40105_device::write(u8 data)
 
 void cmos_40105_device::load_input()
 {
-	if (m_fifo_count == 16)
+	if (m_fifo_count == std::size(m_fifo))
 	{
 		logerror("Attempt to load data into full FIFO\n");
 		return;
@@ -139,7 +139,7 @@ void cmos_40105_device::load_input()
 
 	// DIR remains low if FIFO is full, or else briefly pulses low
 	m_write_dir(0);
-	if (m_fifo_count == 16)
+	if (m_fifo_count == std::size(m_fifo))
 		m_dir = false;
 	else
 		m_write_dir(1);
