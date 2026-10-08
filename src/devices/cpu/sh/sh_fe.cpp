@@ -163,6 +163,16 @@ bool sh_common_execution::frontend::describe(opcode_desc &desc, const opcode_des
 	desc.length = 2;
 	desc.cycles = 1;
 
+	/* on the SH-1/SH-2 a branch in a delay slot is a slot illegal instruction: it doesn't branch,
+	   so don't follow it (a run of branches, e.g. memory filled with 0xa5a5, would otherwise be
+	   described recursively without end) */
+	if (desc.in_delay_slot() && (m_sh->m_cpu_type <= CPU_TYPE_SH2) && is_slot_illegal(opcode))
+	{
+		desc.set_will_cause_exception();
+		desc.set_end_sequence();
+		return true;
+	}
+
 	switch (opcode>>12)
 	{
 	case  0:
