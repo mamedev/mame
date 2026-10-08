@@ -148,6 +148,7 @@ public:
 	void cpu_mem_w(offs_t offset, uint8_t data);
 
 	uint8_t vic_videoram_r(offs_t offset);
+	uint8_t vic_charrom_r(offs_t offset);
 	void joy1_trigger_w(int state);
 	uint8_t vic_colorram_r(offs_t offset);
 
@@ -209,8 +210,10 @@ public:
 
 	void pal(machine_config &config);
 	void ntsc(machine_config &config);
+	void ntsc_o(machine_config &config);
 	void pet64(machine_config &config);
 	void cia_config(machine_config &config, int tod_clock);
+	void vic_config(mos6566_device &vic) ATTR_COLD;
 	void c64_mem(address_map &map) ATTR_COLD;
 	void vic_colorram_map(address_map &map) ATTR_COLD;
 	void vic_videoram_map(address_map &map) ATTR_COLD;
@@ -743,6 +746,12 @@ void c64_state::cpu_mem_w(offs_t offset, uint8_t data)
 		return;
 
 	write(offset, data);
+}
+
+
+uint8_t c64_state::vic_charrom_r(offs_t offset)
+{
+	return !BIT(read_pla(offset, offset, 1, 1, m_vic->ba_r()), PLA_OUT_CHAROM);
 }
 
 
@@ -1832,6 +1841,22 @@ void clipper_state::exp_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int
 //**************************************************************************
 
 //-------------------------------------------------
+//  vic_config -
+//-------------------------------------------------
+
+void c64_state::vic_config(mos6566_device &vic)
+{
+	vic.set_cpu(m_maincpu);
+	vic.irq_callback().set(m_irq, FUNC(input_merger_device::in_w<1>));
+	vic.ba_callback().set(FUNC(c64_state::vic_ba_w));
+	vic.charrom_callback().set(FUNC(c64_state::vic_charrom_r));
+	vic.set_screen(SCREEN_TAG);
+	vic.set_addrmap(0, &c64_state::vic_videoram_map);
+	vic.set_addrmap(1, &c64_state::vic_colorram_map);
+}
+
+
+//-------------------------------------------------
 //  cia_config - wire up the two CIAs
 //-------------------------------------------------
 
@@ -1880,18 +1905,10 @@ void c64_state::ntsc(machine_config &config)
 	m_nmi->output_handler().set_inputline(m_maincpu, m6510_device::NMI_LINE);
 
 	// video hardware
-	mos6567_device &mos6567(MOS6567(config, MOS6567_TAG, XTAL(14'318'181)/14));
-	mos6567.set_cpu(m_maincpu);
-	mos6567.irq_callback().set(m_irq, FUNC(input_merger_device::in_w<1>));
-	mos6567.ba_callback().set(FUNC(c64_state::vic_ba_w));
-	mos6567.set_screen(SCREEN_TAG);
-	mos6567.set_addrmap(0, &c64_state::vic_videoram_map);
-	mos6567.set_addrmap(1, &c64_state::vic_colorram_map);
+	vic_config(MOS6567(config, m_vic, XTAL(14'318'181)/14));
 
 	screen_device &screen(SCREEN(config, SCREEN_TAG));
-	screen.set_refresh_hz(VIC6567_VRETRACERATE);
-	screen.set_size(VIC6567_COLUMNS, VIC6567_LINES);
-	screen.set_visarea(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
+	screen.set_raw(mos6566_device::VIC6567_CLOCK * 8, mos6566_device::VIC6567_COLUMNS, mos6566_device::VIC6567_FIRST_COLUMN, mos6566_device::VIC6567_FIRST_COLUMN + mos6566_device::VIC6567_VISIBLECOLUMNS, mos6566_device::VIC6567_LINES, 0, mos6566_device::VIC6567_VISIBLELINES);
 	screen.set_screen_update(MOS6567_TAG, FUNC(mos6567_device::screen_update));
 
 	// sound hardware
@@ -1971,6 +1988,22 @@ void c64_state::ntsc(machine_config &config)
 
 
 //-------------------------------------------------
+//  machine_config( ntsc_o )
+//-------------------------------------------------
+
+void c64_state::ntsc_o(machine_config &config)
+{
+	ntsc(config);
+
+	// video hardware
+	vic_config(MOS6567R56A(config.replace(), m_vic, XTAL(14'318'181)/14));
+
+	screen_device &screen(*subdevice<screen_device>(SCREEN_TAG));
+	screen.set_raw(mos6566_device::VIC6567_CLOCK * 8, mos6566_device::VIC6567R56A_COLUMNS, mos6566_device::VIC6567_FIRST_COLUMN, mos6566_device::VIC6567_FIRST_COLUMN + mos6566_device::VIC6567_VISIBLECOLUMNS, mos6566_device::VIC6567R56A_LINES, 0, mos6566_device::VIC6567_VISIBLELINES);
+}
+
+
+//-------------------------------------------------
 //  machine_config( pet64 )
 //-------------------------------------------------
 
@@ -2021,6 +2054,10 @@ void sx64_state::ntsc_dx(machine_config &config)
 void c64c_state::ntsc_c(machine_config &config)
 {
 	ntsc(config);
+
+	// video hardware
+	vic_config(MOS8562(config.replace(), m_vic, XTAL(14'318'181)/14));
+
 	m_maincpu->set_floating_falloff(0xc0, 1500000);
 	MOS8521(config.replace(), m_cia1, XTAL(14'318'181)/14);
 	MOS8521(config.replace(), m_cia2, XTAL(14'318'181)/14);
@@ -2054,18 +2091,10 @@ void c64_state::pal(machine_config &config)
 	m_nmi->output_handler().set_inputline(m_maincpu, m6510_device::NMI_LINE);
 
 	// video hardware
-	mos6569_device &mos6569(MOS6569(config, MOS6569_TAG, XTAL(17'734'472)/18));
-	mos6569.set_cpu(m_maincpu);
-	mos6569.irq_callback().set(m_irq, FUNC(input_merger_device::in_w<1>));
-	mos6569.ba_callback().set(FUNC(c64_state::vic_ba_w));
-	mos6569.set_screen(SCREEN_TAG);
-	mos6569.set_addrmap(0, &c64_state::vic_videoram_map);
-	mos6569.set_addrmap(1, &c64_state::vic_colorram_map);
+	vic_config(MOS6569(config, m_vic, XTAL(17'734'472)/18));
 
 	screen_device &screen(SCREEN(config, SCREEN_TAG));
-	screen.set_refresh_hz(VIC6569_VRETRACERATE);
-	screen.set_size(VIC6569_COLUMNS, VIC6569_LINES);
-	screen.set_visarea(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);
+	screen.set_raw(mos6566_device::VIC6569_CLOCK * 8, mos6566_device::VIC6569_COLUMNS, mos6566_device::VIC6569_FIRST_COLUMN, mos6566_device::VIC6569_FIRST_COLUMN + mos6566_device::VIC6569_VISIBLECOLUMNS, mos6566_device::VIC6569_LINES, mos6566_device::VIC6569_FIRST_DISP_LINE, mos6566_device::VIC6569_LAST_DISP_LINE + 1);
 	screen.set_screen_update(MOS6569_TAG, FUNC(mos6569_device::screen_update));
 
 	// sound hardware
@@ -2170,6 +2199,10 @@ void sx64_state::pal_sx(machine_config &config)
 void c64c_state::pal_c(machine_config &config)
 {
 	pal(config);
+
+	// video hardware
+	vic_config(MOS8565(config.replace(), m_vic, XTAL(17'734'472)/18));
+
 	m_maincpu->set_floating_falloff(0xc0, 1500000);
 	MOS8521(config.replace(), m_cia1, XTAL(17'734'472)/18);
 	MOS8521(config.replace(), m_cia2, XTAL(17'734'472)/18);
@@ -2193,15 +2226,6 @@ void c64gs_state::pal_gs(machine_config &config)
 	m_maincpu->read_callback().set(FUNC(c64gs_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64gs_state::cpu_w));
 	m_maincpu->set_pulls(0x07, 0xc0);
-
-	// video hardware
-	mos8565_device &mos8565(MOS8565(config.replace(), MOS6569_TAG, XTAL(17'734'472)/18));
-	mos8565.set_cpu(m_maincpu);
-	mos8565.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
-	mos8565.ba_callback().set(FUNC(c64_state::vic_ba_w));
-	mos8565.set_screen(SCREEN_TAG);
-	mos8565.set_addrmap(0, &c64_state::vic_videoram_map);
-	mos8565.set_addrmap(1, &c64_state::vic_colorram_map);
 
 	// devices
 	m_cia1->pa_rd_callback().set(FUNC(c64gs_state::cia1_pa_r));
@@ -2366,6 +2390,13 @@ ROM_END
 //-------------------------------------------------
 
 #define rom_c64p rom_c64
+
+
+//-------------------------------------------------
+//  ROM( c64o )
+//-------------------------------------------------
+
+#define rom_c64o rom_c64
 
 
 //-------------------------------------------------
@@ -2620,6 +2651,7 @@ ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY                        FULLNAME                                   FLAGS
 COMP( 1982, c64,      0,      0,      ntsc,    c64,     c64_state,     empty_init, "Commodore Business Machines", "Commodore 64 (NTSC)",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1982, c64o,     c64,    0,      ntsc_o,  c64,     c64_state,     empty_init, "Commodore Business Machines", "Commodore 64 (NTSC, 6567R56A)",           MACHINE_SUPPORTS_SAVE )
 COMP( 1982, c64_jp,   c64,    0,      ntsc,    c64,     c64_state,     empty_init, "Commodore Business Machines", "Commodore 64 (Japan)",                    MACHINE_SUPPORTS_SAVE )
 COMP( 1982, c64p,     c64,    0,      pal,     c64,     c64_state,     empty_init, "Commodore Business Machines", "Commodore 64 (PAL)",                      MACHINE_SUPPORTS_SAVE )
 COMP( 1982, c64_se,   c64,    0,      pal,     c64sw,   c64_state,     empty_init, "Commodore Business Machines", "Commodore 64 / VIC-64S (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )

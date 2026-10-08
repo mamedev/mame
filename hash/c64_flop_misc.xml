@@ -328,7 +328,7 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
-	<software name="samsjrny" supported="no">
+	<software name="samsjrny">
 		<description>Sam's Journey</description>
 		<year>2017</year>
 		<publisher>RGCD</publisher>
@@ -376,7 +376,7 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
-	<software name="mayhem" supported="no">
+	<software name="mayhem">
 		<description>Mayhem in Monsterland</description>
 		<year>1993</year>
 		<publisher>Apex Computer Productions</publisher>
@@ -1250,6 +1250,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=ZJThHmbOlCw -->
 	<software name="codeboys" supported="no">
 		<description>Codeboys &amp; Endians</description>
 		<year>2025</year>
@@ -1283,6 +1284,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=aNN_OSYS6-Y -->
 	<software name="cycle" supported="no">
 		<description>Cycle</description>
 		<year>2004</year>
@@ -1295,6 +1297,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=tfHazZp5CMU -->
 	<software name="democoder" supported="no">
 		<description>The Demo Coder</description>
 		<year>2024</year>
@@ -1307,6 +1310,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=8b_B0qAZVYQ -->
 	<software name="gorbabst" supported="no">
 		<description>Gorba Boost</description>
 		<year>2025</year>
@@ -1319,6 +1323,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=4mtVDLxgb4A -->
 	<software name="hat" supported="no">
 		<description>The Hat</description>
 		<year>2026</year>
@@ -1339,6 +1344,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=3aJzSySfCZM -->
 	<software name="mojo" supported="no">
 		<description>Mojo</description>
 		<year>2023</year>
@@ -1373,6 +1379,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=BM8anS_5nbA -->
 	<software name="musikrs" supported="no">
 		<description>Musik Run/Stop</description>
 		<year>2014</year>
@@ -1393,7 +1400,8 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
-	<software name="neon" supported="no">
+	<!-- https://www.youtube.com/watch?v=ZazU4H2OZFg -->
+	<software name="neon">
 		<description>Neon</description>
 		<year>2017</year>
 		<publisher>Triad</publisher>
@@ -1413,6 +1421,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=GqEI0T_WoAw -->
 	<software name="nextrnd" supported="no">
 		<description>Next Round</description>
 		<year>2026</year>
@@ -1454,7 +1463,8 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
-	<software name="nine" supported="no">
+	<!-- https://www.youtube.com/watch?v=S3fVhVJ_ZDk -->
+	<software name="nine">
 		<description>Nine</description>
 		<year>2010</year>
 		<publisher>Chorus</publisher>
@@ -1466,6 +1476,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=Sj6ZEwjK1DU -->
 	<software name="nobounds" supported="no">
 		<description>No Bounds</description>
 		<year>2023</year>
@@ -1486,6 +1497,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=x6SfThtldFY -->
 	<software name="otech3" supported="no">
 		<description>O-Tech People III</description>
 		<year>2025</year>
@@ -1498,6 +1510,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=aK8l6_iJWKM -->
 	<software name="rebirth" supported="no">
 		<description>Rebirth</description>
 		<year>2021</year>
@@ -1510,6 +1523,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=vS8LAQbR-DY -->
 	<software name="scpukick" supported="no">
 		<description>SuperCPU Kicks!</description>
 		<year>1999</year>
@@ -1536,6 +1550,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=-9nHNUlqMyQ -->
 	<software name="sledge" supported="no">
 		<description>Christmas Megademo</description>
 		<year>2020</year>
@@ -1570,6 +1585,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=1QXf1RKzlQc -->
 	<software name="trip" supported="no">
 		<description>The Trip</description>
 		<year>2025</year>
@@ -1590,6 +1606,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=GjDReXe9T3w -->
 	<software name="vicious2" supported="no">
 		<description>Vicious Sid 2</description>
 		<year>2012</year>
@@ -1610,6 +1627,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=BT2rrzg_XIc -->
 	<software name="violator" supported="no">
 		<description>The Violators</description>
 		<year>2025</year>
@@ -1630,6 +1648,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=E5l9ecCeKPw -->
 	<software name="weanomaly" supported="no">
 		<description>We Are The Anomaly</description>
 		<year>2025</year>
@@ -1650,6 +1669,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=Y89aByVpBFs -->
 	<software name="witmat2" supported="no">
 		<description>What Is The Matrix 2</description>
 		<year>2024</year>
@@ -1662,6 +1682,7 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=lQDBSzChPjk -->
 	<software name="wonder14" supported="no">
 		<description>Wonderland XIV</description>
 		<year>2023</year>
@@ -1696,7 +1717,8 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
-	<software name="xfile" supported="no">
+	<!-- https://www.youtube.com/watch?v=uFVv1lKUn7Y -->
+	<software name="xfile">
 		<description>The X-File</description>
 		<year>2025</year>
 		<publisher>Chorus</publisher>
@@ -1704,6 +1726,37 @@ Runs until disk side change prompt
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="chorus_x-file.d64" size="174848" crc="01136af8" sha1="d1cd8ff650ff75318da4e5e0bb3ab0650f709f5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=Rcbc72Jd97c -->
+	<software name="lab">
+		<description>The Lab</description>
+		<year>2026</year>
+		<publisher>Elysium</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="196608">
+				<rom name="side1.d64" size="196608" crc="cc979174" sha1="ef71ba6fbe91b8480406791a8c34287fee679dea"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="196608">
+				<rom name="side2.d64" size="196608" crc="c23bc9da" sha1="7ec38dc4d1fc6f1487d50c09221478fb600153b9"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="196608">
+				<rom name="side3.d64" size="196608" crc="e807f324" sha1="9e0fc8f9f3a7e7ad95dc8208d065552339e10734"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="196608">
+				<rom name="extras.d64" size="196608" crc="5233d4ad" sha1="623db03ed802fc4db64f8275729e11257f967d69"/>
 			</dataarea>
 		</part>
 	</software>

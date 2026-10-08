@@ -1174,14 +1174,14 @@ static INPUT_PORTS_START( c128_es )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("+  { @ }") PORT_CODE(KEYCODE_MINUS)     PORT_CHAR('+')
 
 	PORT_MODIFY( "ROW6" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"↑  π  { ¨ }") PORT_CODE(KEYCODE_DEL)                               PORT_CHAR(0x2191,'^') PORT_CHAR(U'π')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2191  π  { ¨ }") PORT_CODE(KEYCODE_DEL)                               PORT_CHAR(0x2191,'^') PORT_CHAR(U'π')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("=  { ;  ] }") PORT_CODE(KEYCODE_BACKSLASH)                         PORT_CHAR('=')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(";  ]  { :  [ }") PORT_CODE(KEYCODE_QUOTE)                             PORT_CHAR(';') PORT_CHAR(']')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"*  { ´ }") PORT_CODE(KEYCODE_CLOSEBRACE)                        PORT_CHAR('*')
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"£  { =  £ }") PORT_CODE(KEYCODE_BACKSLASH2)                        PORT_CHAR(U'£')
 
 	PORT_MODIFY( "ROW7" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"←  { ¡ }") PORT_CODE(KEYCODE_TILDE)                             PORT_CHAR(0x2190)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2190  { ¡ }") PORT_CODE(KEYCODE_TILDE)                             PORT_CHAR(0x2190)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( c128_ch )
@@ -1209,14 +1209,14 @@ static INPUT_PORTS_START( c128_ch )
 
 	PORT_MODIFY( "ROW6" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("/  ?  { - }") PORT_CODE(KEYCODE_SLASH)                             PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"↑  π  { [  # }") PORT_CODE(KEYCODE_DEL)                               PORT_CHAR(0x2191,'^') PORT_CHAR(U'π')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2191  π  { [  # }") PORT_CODE(KEYCODE_DEL)                               PORT_CHAR(0x2191,'^') PORT_CHAR(U'π')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("=  { $  @ }") PORT_CODE(KEYCODE_BACKSLASH)                         PORT_CHAR('=')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8";  ]  { ä  à }") PORT_CODE(KEYCODE_QUOTE)                             PORT_CHAR(';') PORT_CHAR(']')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"*  { ¨  ! }") PORT_CODE(KEYCODE_CLOSEBRACE)                        PORT_CHAR('*')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"£  { ]  ↑ }") PORT_CODE(KEYCODE_BACKSLASH2)                        PORT_CHAR(U'£')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"£  { ]  \u2191 }") PORT_CODE(KEYCODE_BACKSLASH2)                        PORT_CHAR(U'£')
 
 	PORT_MODIFY( "ROW7" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"←  { <  > }") PORT_CODE(KEYCODE_TILDE)                             PORT_CHAR(0x2190)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2190  { <  > }") PORT_CODE(KEYCODE_TILDE)                             PORT_CHAR(0x2190)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("1  !  { + }") PORT_CODE(KEYCODE_1)                                 PORT_CHAR('1') PORT_CHAR('!')
 INPUT_PORTS_END
 
@@ -2001,9 +2001,7 @@ void c128_state::ntsc(machine_config &config)
 	m_vic->set_addrmap(1, &c128_state::vic_colorram_map);
 
 	screen_device &screen_vic(SCREEN(config, SCREEN_VIC_TAG));
-	screen_vic.set_refresh_hz(VIC6567_VRETRACERATE);
-	screen_vic.set_size(VIC6567_COLUMNS, VIC6567_LINES);
-	screen_vic.set_visarea(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
+	screen_vic.set_raw(mos6566_device::VIC6567_CLOCK * 8, mos6566_device::VIC6567_COLUMNS, mos6566_device::VIC6567_FIRST_COLUMN, mos6566_device::VIC6567_FIRST_COLUMN + mos6566_device::VIC6567_VISIBLECOLUMNS, mos6566_device::VIC6567_LINES, 0, mos6566_device::VIC6567_VISIBLELINES);
 	screen_vic.set_screen_update(MOS8564_TAG, FUNC(mos8564_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", MOS8563_TAG, gfx_c128);
@@ -2195,9 +2193,7 @@ void c128_state::pal(machine_config &config)
 	mos8566.set_addrmap(1, &c128_state::vic_colorram_map);
 
 	screen_device &screen_vic(SCREEN(config, SCREEN_VIC_TAG));
-	screen_vic.set_refresh_hz(VIC6569_VRETRACERATE);
-	screen_vic.set_size(VIC6569_COLUMNS, VIC6569_LINES);
-	screen_vic.set_visarea(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);
+	screen_vic.set_raw(mos6566_device::VIC6569_CLOCK * 8, mos6566_device::VIC6569_COLUMNS, mos6566_device::VIC6569_FIRST_COLUMN, mos6566_device::VIC6569_FIRST_COLUMN + mos6566_device::VIC6569_VISIBLECOLUMNS, mos6566_device::VIC6569_LINES, mos6566_device::VIC6569_FIRST_DISP_LINE, mos6566_device::VIC6569_LAST_DISP_LINE + 1);
 	screen_vic.set_screen_update(MOS8566_TAG, FUNC(mos8566_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", MOS8563_TAG, gfx_c128);

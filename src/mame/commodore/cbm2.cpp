@@ -1646,9 +1646,7 @@ void p500_state::p500_ntsc(machine_config &config)
 	mos6567.set_addrmap(1, &p500_state::vic_colorram_map);
 
 	screen_device &screen(SCREEN(config, SCREEN_TAG));
-	screen.set_refresh_hz(VIC6567_VRETRACERATE);
-	screen.set_size(VIC6567_COLUMNS, VIC6567_LINES);
-	screen.set_visarea(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
+	screen.set_raw(mos6566_device::VIC6567_CLOCK * 8, mos6566_device::VIC6567_COLUMNS, mos6566_device::VIC6567_FIRST_COLUMN, mos6566_device::VIC6567_FIRST_COLUMN + mos6566_device::VIC6567_VISIBLECOLUMNS, mos6566_device::VIC6567_LINES, 0, mos6566_device::VIC6567_VISIBLELINES);
 	screen.set_screen_update(MOS6567_TAG, FUNC(mos6567_device::screen_update));
 
 	// sound hardware
@@ -1723,7 +1721,7 @@ void p500_state::p500_ntsc(machine_config &config)
 	m_cassette->read_handler().set(m_cia, FUNC(mos6526_device::flag_w));
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
-	m_joy1->trigger_wr_callback().set(MOS6567_TAG, FUNC(mos6567_device::lp_w));
+	m_joy1->trigger_wr_callback().set(MOS6567_TAG, FUNC(mos6566_device::lp_w));
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, nullptr);
 
 	CBM2_EXPANSION_SLOT(config, m_exp, XTAL(14'318'181)/14, cbm2_expansion_cards, nullptr);
@@ -1776,9 +1774,7 @@ void p500_state::p500_pal(machine_config &config)
 	mos6569.set_addrmap(1, &p500_state::vic_colorram_map);
 
 	screen_device &screen(SCREEN(config, SCREEN_TAG));
-	screen.set_refresh_hz(VIC6569_VRETRACERATE);
-	screen.set_size(VIC6569_COLUMNS, VIC6569_LINES);
-	screen.set_visarea(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);
+	screen.set_raw(mos6566_device::VIC6569_CLOCK * 8, mos6566_device::VIC6569_COLUMNS, mos6566_device::VIC6569_FIRST_COLUMN, mos6566_device::VIC6569_FIRST_COLUMN + mos6566_device::VIC6569_VISIBLECOLUMNS, mos6566_device::VIC6569_LINES, mos6566_device::VIC6569_FIRST_DISP_LINE, mos6566_device::VIC6569_LAST_DISP_LINE + 1);
 	screen.set_screen_update(MOS6569_TAG, FUNC(mos6569_device::screen_update));
 
 	// sound hardware
@@ -1850,7 +1846,7 @@ void p500_state::p500_pal(machine_config &config)
 	m_cassette->read_handler().set(m_cia, FUNC(mos6526_device::flag_w));
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
-	m_joy1->trigger_wr_callback().set(MOS6567_TAG, FUNC(mos6567_device::lp_w));
+	m_joy1->trigger_wr_callback().set(MOS6569_TAG, FUNC(mos6566_device::lp_w));
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, nullptr);
 
 	CBM2_EXPANSION_SLOT(config, m_exp, XTAL(17'734'472)/18, cbm2_expansion_cards, nullptr);
