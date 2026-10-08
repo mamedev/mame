@@ -1476,6 +1476,19 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=FpVQlbPgkUg -->
+	<software name="ninelft">
+		<description>Nine (Lft)</description>
+		<year>2025</year>
+		<publisher>Lft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="lft-nine.d64" size="174848" crc="f7dd4df8" sha1="fff457778278b3dd15b4d2f5d05996b0e0b57460"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- https://www.youtube.com/watch?v=Sj6ZEwjK1DU -->
 	<software name="nobounds" supported="no">
 		<description>No Bounds</description>
