@@ -72,12 +72,9 @@ public:
 		, m_screen(*this, "screen")
 		, m_flash(*this, "flash%u", 1U)
 		, m_xram(*this, "xram")
-
 		, m_dram_dword_out_data(*this, "dram_dword_out_data")
 	    , m_dram_dword_in_data(*this, "dram_dword_in_data")
-
 		, m_timer_val(*this, "timer_val")
-
 		, m_companion(*this, "companion")
 		, m_dac(*this, "dac")
 		, m_buttons(*this, "BUTTONS")
@@ -231,22 +228,8 @@ private:
 	template<int Channel> void add_dma_map(address_map &map, int base) ATTR_COLD;
 	void ext_map(address_map &map) ATTR_COLD;
 
-	required_device<c2_color_cpu_device> m_maincpu;
-	required_device<c2color_cartslot_device> m_cart;
-	memory_region *m_cart_region;
-	required_device<screen_device> m_screen;
-	required_device_array<generic_spi_flash_device, 2> m_flash;
-	required_shared_ptr<u8> m_xram;
-	required_shared_ptr<u8> m_dram_dword_out_data;
-	required_shared_ptr<u8> m_dram_dword_in_data;
-	required_shared_ptr<u8> m_timer_val;
-	required_device<c2_color_companion_device> m_companion;
-	required_device<dac_16bit_r2r_device> m_dac;
-	required_ioport m_buttons;
-	required_ioport m_battery;
-
-
 	emu_timer *m_audio_timer;
+	std::unique_ptr<u8[]> m_flash_data[2]; // set on reset, doesn't need to be saved
 
 	u8 m_companion_sda;
 	u32 m_audio_address;
@@ -259,7 +242,6 @@ private:
 	std::unique_ptr<u8[]> m_osd_attr;
 	bool m_lcd_sleep = true;
 	bool m_lcd_on = false;
-	std::unique_ptr<u8[]> m_flash_data[2];
 
 	u8 m_xram_control;
 	u8 m_ram_access_upper;
@@ -329,6 +311,22 @@ private:
 	s8 m_spi_selected;
 	u8 m_quant[2][128];
 	u8 m_quant_pos;
+
+	// devices
+
+	required_device<c2_color_cpu_device> m_maincpu;
+	required_device<c2color_cartslot_device> m_cart;
+	memory_region *m_cart_region; // shouldn't need this (currently unused)
+	required_device<screen_device> m_screen;
+	required_device_array<generic_spi_flash_device, 2> m_flash;
+	required_shared_ptr<u8> m_xram;
+	required_shared_ptr<u8> m_dram_dword_out_data;
+	required_shared_ptr<u8> m_dram_dword_in_data;
+	required_shared_ptr<u8> m_timer_val;
+	required_device<c2_color_companion_device> m_companion;
+	required_device<dac_16bit_r2r_device> m_dac;
+	required_ioport m_buttons;
+	required_ioport m_battery;
 };
 
 u32 c2_color_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
