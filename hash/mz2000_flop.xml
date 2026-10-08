@@ -191,4 +191,192 @@ Requires Disk BASIC
 		</part>
 	</software>
 
+	<software name="dbbasic" supported="yes">
+		<description>dB-BASIC 1.0</description>
+		<year>1983</year>
+		<publisher>dB-SOFT</publisher>
+		<info name="usage" value="In DISK MONITOR, type l 1,&#34;dB-BASIC&#34;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="db-basic.d88" size="305328" crc="7e929237" sha1="e4333bd908b4a48b1050d39168ca216dfcf9948c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games01" supported="yes">
+		<description>Games Vol. 01</description>
+		<year>200?</year>
+		<publisher>Unknown</publisher>
+		<notes><![CDATA[
+Compilation of (mostly) Carry Soft games.
+SEAFARI: works
+POLARIS: works
+JELDA I: works
+BACTERIA: works
+KICK OFF: works
+DOG FIGHT: works
+SPACE BEE: works
+CHACK N'POP: works
+ULTRA 7BRIDGE: works
+CRAZY DANGO: works
+PUCKMAN: works
+FLIGHT SIMULATOR: works
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="games01.d88" size="305328" crc="f70ef985" sha1="d7321e0e8dc3f892e48779730780019fe33b4b99"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games02" supported="yes">
+		<description>Games Vol. 02</description>
+		<year>200?</year>
+		<publisher>Unknown</publisher>
+		<notes><![CDATA[
+Compilation of (mostly) Carry Soft games.
+HIROTON WARS: works
+SPACE CRUISER: works
+LOVE ANT LOVE: works
+FIGHTER 2000: works
+HP OHSHO 2200: works
+BUG FIRE 2200: works
+PETTER.B 2200: works
+POLAR STAR II: works
+AMA TENNIS 2200: works
+SPECIAL 3D-MAZE: works
+]]>
+</notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="games02.d88" size="305328" crc="4693cabb" sha1="7254718b2490be8d0e9737ae3223f1a717525208"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games03" supported="yes">
+		<description>Games Vol. 03</description>
+		<year>200?</year>
+		<publisher>Unknown</publisher>
+		<notes><![CDATA[
+Compilation of (mostly) Carry Soft games/utilities.
+STARLIGHT ADV 1: works
+STARLIGHT ADV 2: works
+SPC INV: works
+GALAXIAN: works
+DCOPY: works
+MISSILE DEFENDER: works
+]]>
+</notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="games03.d88" size="305328" crc="6657065a" sha1="6e07333ebef702229a85973b6862559a817298f5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games04" supported="yes">
+		<description>Games Vol. 04</description>
+		<year>200?</year>
+		<publisher>Unknown</publisher>
+		<notes><![CDATA[
+Compilation of (mostly)  Carry Soft games.
+JELDA II: works
+PLAZMA LINE: works
+]]>
+</notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="games04.d88" size="305328" crc="afc9fa03" sha1="0baf83732ab7f46a3374574a76c8128981a20910"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="games05" supported="yes">
+		<description>Games Vol. 05</description>
+		<year>200?</year>
+		<publisher>Unknown</publisher>
+		<notes><![CDATA[
+Compilation of (mostly)  Carry Soft games.
+MILKY WAY: works
+FRONT LINE: works
+]]>
+</notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="games05.d88" size="305328" crc="1ed8e173" sha1="fb4ca3973f8b8903c83a67a660c1e1c9b6ebbb2a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ipls2d01" supported="partial">
+		<description>Compilation Disk IPLS2D-001</description>
+		<year>200?</year>
+		<publisher>Unknown</publisher>
+		<notes><![CDATA[
+Compliation of various games and BASIC versions.
+BASIC MZ-1Z001: works
+BASIC SB-5520: not working (probably for MZ-80B?)
+FLIGHT SIMULATOR: works
+HUBASIC V2.0: works
+SUPERCOLOR BASIC: works
+POWER FAIL: works
+HEY SHEEP: works
+PLAZMA LINE: works
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="ipls2d-001.d88" size="305328" crc="b12ecaef" sha1="c5f4508fe8b70570d1ac1d1ecf25cd7970ab2378"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miranda" supported="yes">
+		<description>Miranda</description>
+		<year>200?</year>
+		<publisher>Unknown</publisher>
+		<info name="usage" value="In DISK MONITOR, type l 1,&#34;MIRANDA&#34;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="miranda.d88" size="305328" crc="c5cad887" sha1="ed092e7752c04ab0842c68195b00b98b09ebf388"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mz1z001" supported="partial">
+		<description>BASIC MZ-1Z001 DISK</description>
+		<year>2023</year>
+		<publisher>Sharp</publisher>
+		<notes><![CDATA[This is a disk version of MZ-1Z001 BASIC, not MZ-2Z001 disk BASIC]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="mz1z001.d88" size="305328" crc="31905cb3" sha1="b39554c8cfb50656b6c37f69ae233f237a472582"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1z002dta" supported="no">
+		<description>BASIC MZ-1Z002 Data</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<notes><![CDATA[Requires disk BASIC - presumably MZ-2Z002]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="1z002-data.d88" size="305328" crc="49a3acf0" sha1="afd8430ab420f62667a3888e2669f3ad5f3d3ec5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uootoy" supported="yes">
+		<description>Uootoy</description>
+		<year>1986</year>
+		<publisher>Denjin</publisher>
+		<info name="usage" value="In DISK MONITOR, type l 1,&#34;UOOTOY RUN&#34;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="uootoy.d88" size="305328" crc="cd8d08a2" sha1="f0500bdba64fdfc068897c818220dd24a6933f89"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
