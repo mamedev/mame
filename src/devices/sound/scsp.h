@@ -34,7 +34,7 @@ public:
 	auto midi_out_cb() { return m_midi_out_cb.bind(); }
 
 	// SCSP register access
-	u16 read(offs_t offset);
+	u16 read(offs_t offset, u16 mem_mask = ~0);
 	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	// MIDI I/O access (used for comms on Model 2/3)
@@ -133,6 +133,8 @@ private:
 	u16 m_latched_MSLC_data;
 	u8 m_MidiOutStack[32];
 	u8 m_MidiOutW, m_MidiOutR;
+	bool m_MidiInOverflow;  // MIOVF: a byte arrived while the input FIFO was full
+	u16 m_read_mask;        // mem_mask of the register read in progress
 	u8 m_MidiStack[32];
 	u8 m_MidiW, m_MidiR;
 
