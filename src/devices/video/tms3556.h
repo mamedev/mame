@@ -100,7 +100,7 @@ private:
 	dma_mode_tt m_vdp_acmpxy_mode;
 	uint16_t m_vdp_acmpxy;
 	uint16_t m_vdp_acmp;
-	int m_init_read;
+	bool m_init_read;
 
 	int m_scanline;             // scanline counter
 	int m_blink, m_blink_count; // blinking
