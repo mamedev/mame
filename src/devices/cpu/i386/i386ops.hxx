@@ -1269,7 +1269,7 @@ void i386_device::i386_repeat(int invert_flag)
 		catch (uint64_t e)
 		{
 			m_eip = m_prev_eip;
-			throw e;
+			throw emu_fatalerror("i386_repeat: %llx", e);
 		}
 
 		CYCLES_NUM(cycle_adjustment);
