@@ -1188,8 +1188,8 @@ void cirrus_gd5428_vga_device::copy_pixel(uint8_t src, uint8_t dst, bool foregro
 		// zorro2:picasso2p on VGA Workbench (upper right icon)
 		res = src | dst;
 		break;
-	case 0x90:  // NOTSRCAND
-		res = ~(src & dst);
+	case 0x90:  // NOTSRCERASE
+		res = ~(src | dst);
 		break;
 	case 0x95:  // NOTSRCINVERT
 		res = ~(src ^ dst);
@@ -1203,8 +1203,8 @@ void cirrus_gd5428_vga_device::copy_pixel(uint8_t src, uint8_t dst, bool foregro
 	case 0xd6:  // MERGEPAINT
 		res = ~src | dst;
 		break;
-	case 0xda:  // NOTSRCPAINT
-		res = ~(src | dst);
+	case 0xda:  // NOTSRCAND
+		res = ~(src & dst);
 		break;
 	default:
 		popmessage("pc_vga_cirrus: Unsupported BitBLT ROP mode %02x",m_blt_rop);
