@@ -1,0 +1,290 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+
+<!-- ETRA crosswalk traffic light controller -->
+
+<mamelayout version="2">
+
+	<!-- traffic light lamps (state 1 = lamp lit) -->
+
+	<element name="lamp_red" defstate="0">
+		<disk><color red="0.02" green="0.02" blue="0.02" /></disk>
+		<disk state="0"><bounds x="0.06" y="0.06" width="0.88" height="0.88" /><color red="0.22" green="0.04" blue="0.03" /></disk>
+		<disk state="1"><bounds x="0.06" y="0.06" width="0.88" height="0.88" /><color red="1.00" green="0.13" blue="0.08" /></disk>
+		<disk state="1"><bounds x="0.22" y="0.18" width="0.34" height="0.28" /><color red="1.00" green="0.55" blue="0.45" alpha="0.6" /></disk>
+	</element>
+
+	<element name="lamp_amber" defstate="0">
+		<disk><color red="0.02" green="0.02" blue="0.02" /></disk>
+		<disk state="0"><bounds x="0.06" y="0.06" width="0.88" height="0.88" /><color red="0.23" green="0.14" blue="0.02" /></disk>
+		<disk state="1"><bounds x="0.06" y="0.06" width="0.88" height="0.88" /><color red="1.00" green="0.68" blue="0.05" /></disk>
+		<disk state="1"><bounds x="0.22" y="0.18" width="0.34" height="0.28" /><color red="1.00" green="0.90" blue="0.55" alpha="0.6" /></disk>
+	</element>
+
+	<element name="lamp_green" defstate="0">
+		<disk><color red="0.02" green="0.02" blue="0.02" /></disk>
+		<disk state="0"><bounds x="0.06" y="0.06" width="0.88" height="0.88" /><color red="0.02" green="0.17" blue="0.10" /></disk>
+		<disk state="1"><bounds x="0.06" y="0.06" width="0.88" height="0.88" /><color red="0.10" green="1.00" blue="0.55" /></disk>
+		<disk state="1"><bounds x="0.22" y="0.18" width="0.34" height="0.28" /><color red="0.65" green="1.00" blue="0.85" alpha="0.6" /></disk>
+	</element>
+
+	<!-- pedestrian signal lenses: standing and walking figures (state 1 = lamp lit) -->
+	<element name="ped_red" defstate="0">
+		<rect><color red="0.02" green="0.02" blue="0.02" /></rect>
+		<image state="0"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g fill="#380a08"><circle cx="50" cy="17" r="9"/><polygon points="37,29 63,29 69,60 63,61 59,40 59,63 41,63 41,40 37,61 31,60"/><polygon points="41,63 49,63 49,92 41,92"/><polygon points="51,63 59,63 59,92 51,92"/></g></svg>]]></data></image>
+		<image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g fill="#ff2114"><circle cx="50" cy="17" r="9"/><polygon points="37,29 63,29 69,60 63,61 59,40 59,63 41,63 41,40 37,61 31,60"/><polygon points="41,63 49,63 49,92 41,92"/><polygon points="51,63 59,63 59,92 51,92"/></g></svg>]]></data></image>
+	</element>
+
+	<element name="ped_green" defstate="0">
+		<rect><color red="0.02" green="0.02" blue="0.02" /></rect>
+		<image state="0"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g fill="#052b1a"><circle cx="53" cy="15" r="9"/><polygon points="45,27 59,26 62,56 47,58"/><polygon points="46,29 51,33 40,52 34,48"/><polygon points="58,28 63,31 73,50 67,54"/><polygon points="47,54 55,57 43,92 34,90"/><polygon points="53,54 61,54 74,88 66,92"/></g></svg>]]></data></image>
+		<image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g fill="#1aff8c"><circle cx="53" cy="15" r="9"/><polygon points="45,27 59,26 62,56 47,58"/><polygon points="46,29 51,33 40,52 34,48"/><polygon points="58,28 63,31 73,50 67,54"/><polygon points="47,54 55,57 43,92 34,90"/><polygon points="53,54 61,54 74,88 66,92"/></g></svg>]]></data></image>
+	</element>
+
+	<!-- amber turn arrows (state 1 = lamp lit) -->
+	<element name="arrow_left" defstate="0">
+		<disk><color red="0.02" green="0.02" blue="0.02" /></disk>
+		<image state="0"><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="14,50 46,20 46,38 84,38 84,62 46,62 46,80" fill="#3b2405"/></svg>]]></data></image>
+		<image state="1"><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="14,50 46,20 46,38 84,38 84,62 46,62 46,80" fill="#ffad0d"/></svg>]]></data></image>
+	</element>
+
+	<element name="arrow_right" defstate="0">
+		<disk><color red="0.02" green="0.02" blue="0.02" /></disk>
+		<image state="0"><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="86,50 54,20 54,38 16,38 16,62 54,62 54,80" fill="#3b2405"/></svg>]]></data></image>
+		<image state="1"><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><polygon points="86,50 54,20 54,38 16,38 16,62 54,62 54,80" fill="#ffad0d"/></svg>]]></data></image>
+	</element>
+
+	<element name="housing">
+		<rect><bounds x="0" y="0" width="84" height="240" /><color red="0.09" green="0.09" blue="0.09" /></rect>
+		<rect><bounds x="3" y="3" width="78" height="234" /><color red="0.15" green="0.15" blue="0.15" /></rect>
+	</element>
+
+	<element name="pole"><rect><color red="0.35" green="0.36" blue="0.38" /></rect></element>
+
+	<!-- programming interface -->
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.15" blue="0.08" /></led7seg>
+	</element>
+
+	<element name="panel"><rect><color red="0.12" green="0.13" blue="0.15" /></rect></element>
+	<element name="bezel"><rect><color red="0.02" green="0.02" blue="0.02" /></rect></element>
+	<element name="pedbox"><rect><color red="0.85" green="0.68" blue="0.08" /></rect></element>
+
+	<element name="key" defstate="0">
+		<rect><bounds x="0" y="0" width="64" height="56" /><color red="0.06" green="0.06" blue="0.06" /></rect>
+		<rect state="0"><bounds x="3" y="3" width="58" height="50" /><color red="0.33" green="0.34" blue="0.32" /></rect>
+		<rect state="1"><bounds x="3" y="3" width="58" height="50" /><color red="0.56" green="0.57" blue="0.54" /></rect>
+	</element>
+
+	<element name="button" defstate="0">
+		<disk><bounds x="0" y="0" width="40" height="40" /><color red="0.05" green="0.05" blue="0.05" /></disk>
+		<disk state="0"><bounds x="5" y="5" width="30" height="30" /><color red="0.62" green="0.62" blue="0.66" /></disk>
+		<disk state="1"><bounds x="5" y="5" width="30" height="30" /><color red="0.95" green="0.95" blue="1.00" /></disk>
+	</element>
+
+	<!-- toggle switch: lever down in the default position, up when toggled -->
+	<element name="toggle" defstate="0">
+		<rect><bounds x="0" y="0" width="28" height="56" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<disk><bounds x="4" y="18" width="20" height="20" /><color red="0.55" green="0.55" blue="0.58" /></disk>
+		<rect state="0"><bounds x="11" y="28" width="6" height="20" /><color red="0.85" green="0.85" blue="0.88" /></rect>
+		<disk state="0"><bounds x="8" y="44" width="12" height="12" /><color red="0.85" green="0.85" blue="0.88" /></disk>
+		<rect state="1"><bounds x="11" y="8" width="6" height="20" /><color red="0.85" green="0.85" blue="0.88" /></rect>
+		<disk state="1"><bounds x="8" y="0" width="12" height="12" /><color red="0.85" green="0.85" blue="0.88" /></disk>
+	</element>
+
+	<element name="led_sync" defstate="0">
+		<disk><color red="0.05" green="0.05" blue="0.05" /></disk>
+		<disk state="0"><bounds x="0.15" y="0.15" width="0.7" height="0.7" /><color red="0.15" green="0.12" blue="0.02" /></disk>
+		<disk state="1"><bounds x="0.15" y="0.15" width="0.7" height="0.7" /><color red="1.00" green="0.85" blue="0.10" /></disk>
+	</element>
+
+	<!-- key legends -->
+	<element name="k_R"><text string="R"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="k_M"><text string="M"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="k_N"><text string="N"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="k_K"><text string="K"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="k_A"><text string="A"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="k_B"><text string="B"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="k_C"><text string="C"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="k_D"><text string="D"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="k_E"><text string="E"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<element name="k_F"><text string="F"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	<repeat count="10">
+		<param name="n" start="0" increment="1" />
+		<element name="k_~n~"><text string="~n~"><color red="0.95" green="0.95" blue="0.95" /></text></element>
+	</repeat>
+
+	<!-- other text -->
+	<element name="t_step"><text string="STEP" align="1"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="t_flash"><text string="FLASHING" align="1"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="t_manual"><text string="MANUAL" align="1"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="t_extprg"><text string="EXT. PROG." align="1"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="t_inputs"><text string="EXTERNAL INPUTS / OUTPUT" align="1"><color red="0.60" green="0.62" blue="0.66" /></text></element>
+	<element name="t_syncin"><text string="SYNC IN" align="1"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="t_prg0"><text string="PROG 0" align="1"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="t_prg1"><text string="PROG 1" align="1"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="t_syncout"><text string="SYNC OUT" align="1"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="t_push"><text string="PUSH"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="t_pedestrian"><text string="PEDESTRIAN"><color red="0.05" green="0.05" blue="0.05" /></text></element>
+	<element name="t_grp1a"><text string="1A"><color red="0.60" green="0.62" blue="0.66" /></text></element>
+	<element name="t_grp2a"><text string="2A"><color red="0.60" green="0.62" blue="0.66" /></text></element>
+	<element name="t_grp2b"><text string="2B"><color red="0.60" green="0.62" blue="0.66" /></text></element>
+	<element name="t_grp3a"><text string="3A"><color red="0.60" green="0.62" blue="0.66" /></text></element>
+	<repeat count="3">
+		<param name="b" start="1" increment="1" />
+		<element name="t_board~b~_0"><text string="BOARD ~b~ A"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+		<element name="t_board~b~_1"><text string="BOARD ~b~ B"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	</repeat>
+
+	<!-- six digit display, digit 0 on the left -->
+	<group name="display">
+		<element ref="bezel"><bounds x="0" y="0" width="420" height="104" /></element>
+		<repeat count="6">
+			<param name="d" start="0" increment="1" />
+			<param name="x" start="14" increment="66" />
+			<element name="digit~d~" ref="digit"><bounds x="~x~" y="10" width="56" height="84" /></element>
+		</repeat>
+	</group>
+
+	<!-- one lamp group of a relay board: bits ~r~/~a~/~g~ of board ~b~ -->
+	<group name="relay_head">
+		<element ref="t_board~b~_~grp~"><bounds x="0" y="0" width="84" height="16" /></element>
+		<element ref="housing"><bounds x="0" y="28" width="84" height="240" /></element>
+		<element name="lamp~b~_~r~" ref="lamp_red"><bounds x="10" y="38" width="64" height="64" /></element>
+		<element name="lamp~b~_~a~" ref="lamp_amber"><bounds x="10" y="116" width="64" height="64" /></element>
+		<element name="lamp~b~_~g~" ref="lamp_green"><bounds x="10" y="194" width="64" height="64" /></element>
+	</group>
+
+	<!-- programmer PCB and external connections -->
+	<group name="programmer">
+		<element ref="panel"><bounds x="200" y="20" width="460" height="460" /></element>
+		<group ref="display"><bounds x="220" y="40" width="420" height="104" /></group>
+
+		<repeat count="5">
+			<param name="row" start="4" increment="-1" />
+			<param name="y" start="164" increment="62" />
+			<repeat count="4">
+				<param name="mask" start="0x01" lshift="1" />
+				<param name="x" start="220" increment="76" />
+				<element ref="key" inputtag="KEY~row~" inputmask="~mask~"><bounds x="~x~" y="~y~" width="64" height="56" /></element>
+			</repeat>
+		</repeat>
+
+		<element ref="k_R"><bounds x="236" y="176" width="32" height="32" /></element>
+		<element ref="k_M"><bounds x="312" y="176" width="32" height="32" /></element>
+		<element ref="k_N"><bounds x="388" y="176" width="32" height="32" /></element>
+		<element ref="k_K"><bounds x="464" y="176" width="32" height="32" /></element>
+		<element ref="k_0"><bounds x="236" y="238" width="32" height="32" /></element>
+		<element ref="k_1"><bounds x="312" y="238" width="32" height="32" /></element>
+		<element ref="k_2"><bounds x="388" y="238" width="32" height="32" /></element>
+		<element ref="k_3"><bounds x="464" y="238" width="32" height="32" /></element>
+		<element ref="k_4"><bounds x="236" y="300" width="32" height="32" /></element>
+		<element ref="k_5"><bounds x="312" y="300" width="32" height="32" /></element>
+		<element ref="k_6"><bounds x="388" y="300" width="32" height="32" /></element>
+		<element ref="k_7"><bounds x="464" y="300" width="32" height="32" /></element>
+		<element ref="k_8"><bounds x="236" y="362" width="32" height="32" /></element>
+		<element ref="k_9"><bounds x="312" y="362" width="32" height="32" /></element>
+		<element ref="k_A"><bounds x="388" y="362" width="32" height="32" /></element>
+		<element ref="k_B"><bounds x="464" y="362" width="32" height="32" /></element>
+		<element ref="k_C"><bounds x="236" y="424" width="32" height="32" /></element>
+		<element ref="k_D"><bounds x="312" y="424" width="32" height="32" /></element>
+		<element ref="k_E"><bounds x="388" y="424" width="32" height="32" /></element>
+		<element ref="k_F"><bounds x="464" y="424" width="32" height="32" /></element>
+
+		<!-- front panel switches (which physical switch is which is not verified) -->
+		<element ref="button" inputtag="SW2" inputmask="0x02"><bounds x="532" y="172" width="40" height="40" /></element>
+		<element ref="t_step"><bounds x="580" y="184" width="72" height="16" /></element>
+		<element ref="toggle" inputtag="SW1" inputmask="0x01"><bounds x="538" y="288" width="28" height="56" /></element>
+		<element ref="t_flash"><bounds x="580" y="308" width="72" height="16" /></element>
+		<element ref="toggle" inputtag="SW1" inputmask="0x02"><bounds x="538" y="350" width="28" height="56" /></element>
+		<element ref="t_manual"><bounds x="580" y="370" width="72" height="16" /></element>
+		<element ref="toggle" inputtag="SW1" inputmask="0x04"><bounds x="538" y="412" width="28" height="56" /></element>
+		<element ref="t_extprg"><bounds x="580" y="432" width="72" height="16" /></element>
+
+		<!-- optocoupler inputs and synchronisation output (which input is which is not verified) -->
+		<element ref="panel"><bounds x="200" y="500" width="460" height="100" /></element>
+		<element ref="t_inputs"><bounds x="212" y="508" width="300" height="14" /></element>
+		<element ref="button" inputtag="SW2" inputmask="0x01"><bounds x="214" y="536" width="44" height="44" /></element>
+		<element ref="t_syncin"><bounds x="264" y="551" width="70" height="14" /></element>
+		<element ref="toggle" inputtag="SW0" inputmask="0x01"><bounds x="340" y="530" width="28" height="56" /></element>
+		<element ref="t_prg0"><bounds x="374" y="551" width="60" height="14" /></element>
+		<element ref="toggle" inputtag="SW0" inputmask="0x02"><bounds x="440" y="530" width="28" height="56" /></element>
+		<element ref="t_prg1"><bounds x="474" y="551" width="60" height="14" /></element>
+		<element name="sync_out" ref="led_sync"><bounds x="540" y="546" width="24" height="24" /></element>
+		<element ref="t_syncout"><bounds x="570" y="551" width="80" height="14" /></element>
+	</group>
+
+	<view name="Controller">
+		<bounds left="0" top="0" right="1010" bottom="700" />
+
+		<!-- first pole: first vehicle phase with its turn arrow, pedestrian signal and push
+		     button -->
+		<element ref="pole"><bounds x="175" y="352" width="20" height="348" /></element>
+
+		<!-- relay board 1 (a004) group A, bits 0-2 (group B always shows the same) -->
+		<element ref="t_grp1a"><bounds x="130" y="12" width="110" height="22" /></element>
+		<element ref="housing"><bounds x="130" y="40" width="110" height="312" /></element>
+		<element name="lamp1_0" ref="lamp_red"><bounds x="140" y="52" width="90" height="90" /></element>
+		<element name="lamp1_1" ref="lamp_amber"><bounds x="140" y="151" width="90" height="90" /></element>
+		<element name="lamp1_2" ref="lamp_green"><bounds x="140" y="250" width="90" height="90" /></element>
+
+		<!-- relay board 2 (a008) group B, bit 5: flashes while the first vehicle phase is red
+		     during the pedestrian phase -->
+		<element ref="t_grp2b"><bounds x="20" y="214" width="110" height="22" /></element>
+		<element ref="housing"><bounds x="20" y="238" width="110" height="114" /></element>
+		<element name="lamp2_5" ref="arrow_left"><bounds x="30" y="250" width="90" height="90" /></element>
+
+		<!-- relay board 2 (a008) group B, bits 4 and 6: going by the lamp tables, a walk /
+		     don't walk signal -->
+		<element ref="t_grp2b"><bounds x="100" y="378" width="36" height="22" /></element>
+		<element ref="housing"><bounds x="140" y="368" width="90" height="180" /></element>
+		<element name="lamp2_4" ref="ped_red"><bounds x="149" y="378" width="72" height="72" /></element>
+		<element name="lamp2_6" ref="ped_green"><bounds x="149" y="466" width="72" height="72" /></element>
+
+		<element ref="pedbox"><bounds x="140" y="575" width="90" height="100" /></element>
+		<element ref="t_pedestrian"><bounds x="145" y="583" width="80" height="14" /></element>
+		<element ref="button" inputtag="SW0" inputmask="0x04"><bounds x="160" y="603" width="50" height="50" /></element>
+		<element ref="t_push"><bounds x="160" y="655" width="50" height="14" /></element>
+
+		<!-- second pole: second vehicle phase (green along with the pedestrians) with its turn
+		     arrow -->
+		<element ref="pole"><bounds x="325" y="352" width="20" height="348" /></element>
+
+		<!-- relay board 2 (a008) group A, bits 0-2 -->
+		<element ref="t_grp2a"><bounds x="280" y="12" width="110" height="22" /></element>
+		<element ref="housing"><bounds x="280" y="40" width="110" height="312" /></element>
+		<element name="lamp2_0" ref="lamp_red"><bounds x="290" y="52" width="90" height="90" /></element>
+		<element name="lamp2_1" ref="lamp_amber"><bounds x="290" y="151" width="90" height="90" /></element>
+		<element name="lamp2_2" ref="lamp_green"><bounds x="290" y="250" width="90" height="90" /></element>
+
+		<!-- relay board 3 (a010) group A, bit 1: flashes in step 0, while the second vehicle
+		     phase is red (bits 0 and 2 are never lit) -->
+		<element ref="t_grp3a"><bounds x="390" y="214" width="110" height="22" /></element>
+		<element ref="housing"><bounds x="390" y="238" width="110" height="114" /></element>
+		<element name="lamp3_1" ref="arrow_right"><bounds x="400" y="250" width="90" height="90" /></element>
+
+		<group ref="programmer"><bounds x="530" y="60" width="460" height="580" /></group>
+	</view>
+
+	<view name="Relay Boards">
+		<bounds left="0" top="0" right="804" bottom="438" />
+
+		<group ref="display"><bounds x="192" y="20" width="420" height="104" /></group>
+		<repeat count="3">
+			<param name="b" start="1" increment="1" />
+			<param name="bx" start="20" increment="280" />
+			<repeat count="2">
+				<param name="grp" start="0" increment="1" />
+				<param name="r" start="0" increment="4" />
+				<param name="a" start="1" increment="4" />
+				<param name="g" start="2" increment="4" />
+				<param name="x" start="~bx~" increment="120" />
+				<group ref="relay_head"><bounds x="~x~" y="150" width="84" height="268" /></group>
+			</repeat>
+		</repeat>
+	</view>
+
+</mamelayout>
