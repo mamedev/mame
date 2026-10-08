@@ -29,6 +29,7 @@
     - Complete LCD/OSD palettes, display latching, JPEG formats and audio controls.
     - Barcode reader, radio, USB and cartridge boot selection are not implemented.
     - Flash erase/program behaviour depends on the incomplete generic SPI flash model.
+	- access cart through bus/c2color slot device
 
 *******************************************************************************/
 
@@ -68,7 +69,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_cart(*this, "cartslot")
-		, m_cart_region(nullptr)
 		, m_screen(*this, "screen")
 		, m_flash(*this, "flash%u", 1U)
 		, m_xram(*this, "xram")
@@ -231,18 +231,16 @@ private:
 	emu_timer *m_audio_timer;
 	std::unique_ptr<u8[]> m_flash_data[2]; // set on reset, doesn't need to be saved
 
-	u8 m_companion_sda;
-	u32 m_audio_address;
-	u32 m_audio_remaining;
-	bool m_audio_enabled;
-
 	static constexpr u32 DRAM_SIZE = 0x200000;
 	std::unique_ptr<u8[]> m_dram;
 	std::unique_ptr<u16[]> m_osd_code;
 	std::unique_ptr<u8[]> m_osd_attr;
 	bool m_lcd_sleep = true;
 	bool m_lcd_on = false;
-
+	u8 m_companion_sda;
+	u32 m_audio_address;
+	u32 m_audio_remaining;
+	bool m_audio_enabled;
 	u8 m_xram_control;
 	u8 m_ram_access_upper;
 	u8 m_dramstop;
@@ -292,6 +290,9 @@ private:
 	u8 m_render_unknown;
 	u32 m_audio_remaining_reg;
 	u32 m_audio_address_reg;
+	s8 m_spi_selected;
+	u8 m_quant[2][128];
+	u8 m_quant_pos;
 
 	struct dma_channel
 	{
@@ -308,15 +309,9 @@ private:
 
 	dma_channel m_dma_channel[2];
 
-	s8 m_spi_selected;
-	u8 m_quant[2][128];
-	u8 m_quant_pos;
-
 	// devices
-
 	required_device<c2_color_cpu_device> m_maincpu;
 	required_device<c2color_cartslot_device> m_cart;
-	memory_region *m_cart_region; // shouldn't need this (currently unused)
 	required_device<screen_device> m_screen;
 	required_device_array<generic_spi_flash_device, 2> m_flash;
 	required_shared_ptr<u8> m_xram;
@@ -541,7 +536,7 @@ void c2_color_state::machine_start()
 
 	for (unsigned i = 0; i != 2; ++i)
 	{
-		memory_region *const region = i == 2 ? m_cart_region : memregion(i ? "spi2" : "spi1");
+		memory_region *const region = memregion(i ? "spi2" : "spi1");
 		u32 const length = region ? region->bytes() : 1;
 		m_flash_data[i] = std::make_unique<u8[]>(length);
 		if (region)
@@ -615,7 +610,7 @@ void c2_color_state::spi_select()
 
 u8 c2_color_state::spi_exchange(u8 data)
 {
-	if (m_spi_selected < 0 || (m_spi_selected == 2 && !m_cart_region))
+	if (m_spi_selected < 0 || (m_spi_selected == 2))
 		return 0xff;
 	m_flash[m_spi_selected]->write(data);
 	return m_flash[m_spi_selected]->read();
