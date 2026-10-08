@@ -5914,8 +5914,8 @@ if BUSES["TECHNICS_KN6000"] then
 	files {
 		MAME_DIR .. "src/devices/bus/technics/kn6000/kn6000_expansion.cpp",
 		MAME_DIR .. "src/devices/bus/technics/kn6000/kn6000_expansion.h",
-		MAME_DIR .. "src/devices/bus/technics/kn6000/hdsx3.cpp",
-		MAME_DIR .. "src/devices/bus/technics/kn6000/hdsx3.h",
+		MAME_DIR .. "src/devices/bus/technics/kn6000/hdsx6.cpp",
+		MAME_DIR .. "src/devices/bus/technics/kn6000/hdsx6.h",
 	}
 end
 
