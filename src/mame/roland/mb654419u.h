@@ -26,11 +26,16 @@ public:
 	double output_level();
 
 protected:
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
+
+	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream) override;
-	virtual space_config_vector memory_space_config() const override;
+
+	// device_memory_interface implementation
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 
 private:
 	enum : int
@@ -51,12 +56,12 @@ private:
 		bool dirty;
 	};
 
-	void register_w(u16 address, u16 data);
 	void regs_map(address_map &map) ATTR_COLD;
+	void register_w(u16 address, u16 data);
+	void update_coefficients(int channel);
 
 	// debugger view of the registers: word address = parameter * 0x10 + channel
 	const address_space_config m_regs_config;
-	void update_coefficients(int channel);
 
 	sound_stream *m_stream;
 

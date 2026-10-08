@@ -66,6 +66,9 @@
 #include "emu.h"
 #include "mb654419u.h"
 
+#include <algorithm>
+#include <iterator>
+
 
 #define VERBOSE 0
 #include "logmacro.h"
