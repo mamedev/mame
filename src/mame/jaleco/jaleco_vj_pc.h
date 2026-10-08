@@ -24,6 +24,7 @@ public:
 	void comm_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_sound->comm_w(offset, data, mem_mask); }
 	void ymz_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_sound->ymz_w(offset, data, mem_mask); }
 
+	template <int DeviceId> void render_video_frame(bitmap_rgb32 &bitmap) { m_king_qtaro->render_video_frame<DeviceId>(bitmap); }
 	template <int DeviceId> void video_mix_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_king_qtaro->video_mix_w<DeviceId>(offset, data); }
 	void video_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_king_qtaro->video_control_w(offset, data); }
 
