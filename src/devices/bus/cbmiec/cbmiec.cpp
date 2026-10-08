@@ -597,6 +597,7 @@ int cbm_iec_device::get_signal(int signal, const attotime &time)
 #include "dolphindos.h"
 #include "dps1101.h"
 #include "fd2000.h"
+#include "indusgt.h"
 #include "interpod.h"
 #include "mcs801.h"
 #include "mcs810.h"

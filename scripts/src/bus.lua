@@ -1588,6 +1588,8 @@ if BUSES["CBMIEC"] then
 		MAME_DIR .. "src/devices/bus/cbmiec/c1541.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/c1541_clones.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/c1541_clones.h",
+		MAME_DIR .. "src/devices/bus/cbmiec/indusgt.cpp",
+		MAME_DIR .. "src/devices/bus/cbmiec/indusgt.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/c1571.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/c1571.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/c1571cr.cpp",
@@ -1661,12 +1663,14 @@ if BUSES["CBMIEC"] then
 	dependency {
 		{ MAME_DIR .. "src/devices/bus/cbmiec/cmdhd.cpp", GEN_DIR .. "emu/layout/cmdhd.lh" },
 		{ MAME_DIR .. "src/devices/bus/cbmiec/fd2000.cpp", GEN_DIR .. "emu/layout/fd2000.lh" },
+		{ MAME_DIR .. "src/devices/bus/cbmiec/indusgt.cpp", GEN_DIR .. "emu/layout/indusgt.lh" },
 		{ MAME_DIR .. "src/devices/bus/cbmiec/serialbox.cpp", GEN_DIR .. "emu/layout/serialbox.lh" },
 	}
 
 	custombuildtask {
 		layoutbuildtask("emu/layout", "cmdhd"),
 		layoutbuildtask("emu/layout", "fd2000"),
+		layoutbuildtask("emu/layout", "indusgt"),
 		layoutbuildtask("emu/layout", "serialbox"),
 	}
 end
