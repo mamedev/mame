@@ -65,7 +65,6 @@
 #include "bus/midi/midioutport.h"
 #include "cpu/mn10300/mn10300.h"
 #include "imagedev/floppy.h"
-#include "machine/input_merger.h"
 #include "machine/intelfsh.h"
 #include "machine/spi_sdcard.h"
 #include "machine/upd765.h"
@@ -145,9 +144,9 @@ public:
 		, m_screen(*this, "screen")
 		, m_cpanel(*this, "cpanel")
 		, m_tonegen(*this, "tonegen")
+		, m_fdc(*this, "fdc")
 		, m_lcdbuf(*this, "lcdbuf")
 		, m_customflash(*this, "custom_data")
-		, m_fdc(*this, "fdc")
 		, m_midi_uart(*this, "midi_uart%u", 0U)
 		, m_wave_main_y(*this, "waveform_main_y")
 		, m_wave_main_x(*this, "waveform_main_x")
@@ -190,6 +189,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<kn_cpanel_base_device> m_cpanel;
 	required_device<kn_tonegen_base_device> m_tonegen;
+	optional_device<n82077aa_device> m_fdc;
 
 	u16 m_sdmbx_out = 0xff;
 
@@ -198,7 +198,6 @@ private:
 
 	required_shared_ptr<u32> m_lcdbuf;
 	optional_device<fujitsu_29lv160b_device> m_customflash;
-	optional_device<n82077aa_device> m_fdc;
 	required_device_array<kn7000_sio_uart_device, 2> m_midi_uart;
 	optional_memory_region m_wave_main_y;
 	optional_memory_region m_wave_main_x;
@@ -941,12 +940,7 @@ void kn_state::fdc_add(machine_config &config)
 {
 	// IC103: a custom part (C1DB00000607) compatible with the N82077AA
 	N82077AA(config, m_fdc, 24'000'000);
-	// INTRQ and DRQ share IRQ1: the firmware moves each sector byte through the
-	// DACK slot at 0x98010000 from its interrupt handler
-	input_merger_device &fdc_irq(INPUT_MERGER_ANY_HIGH(config, "fdc_irq"));
-	fdc_irq.output_handler().set_inputline(m_maincpu, mn10300_device::IRQ1);
-	m_fdc->intrq_wr_callback().set(fdc_irq, FUNC(input_merger_device::in_w<0>));
-	m_fdc->drq_wr_callback().set(fdc_irq, FUNC(input_merger_device::in_w<1>));
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, mn10300_device::IRQ2);
 	FLOPPY_CONNECTOR(config, "fdc:0", kn_floppies, "35hd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 }
 
@@ -985,6 +979,9 @@ void kn_sd_state::kn7000(machine_config &config)
 	configure_tonegen();
 	custom_flash_add(config);
 	fdc_add(config);
+	// the firmware moves each sector byte through the DACK slot at 0x98010000
+	// from its IRQ1 handler
+	m_fdc->drq_wr_callback().set_inputline(m_maincpu, mn10300_device::IRQ1);
 	sd_add(config);
 	config.set_default_layout(layout_kn7000);
 }
@@ -1001,6 +998,7 @@ void kn6000_state::kn6000(machine_config &config)
 	configure_tonegen();
 	custom_flash_add(config);
 	fdc_add(config);
+	// FIXME: connect DRQ; the firmware services it in interrupt group 0x0f, whose source is not emulated
 }
 
 void kn_state::kn24_common(machine_config &config)
@@ -1023,6 +1021,7 @@ void kn_state::kn2400(machine_config &config)
 	kn24_common(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &kn_state::kn2400_map);
 	fdc_add(config);
+	m_fdc->drq_wr_callback().set_inputline(m_maincpu, mn10300_device::IRQ1);
 }
 
 // FIXME: identified as a KN2600, the firmware runs its SD start-up and then leaves
