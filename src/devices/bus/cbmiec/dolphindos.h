@@ -29,6 +29,8 @@ public:
 	// construction/destruction
 	c1541_dolphin_dos_v2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	static constexpr flags_type emulation_flags() { return flags::NOT_WORKING; }
+
 protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
