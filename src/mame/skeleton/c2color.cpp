@@ -235,8 +235,8 @@ private:
 	std::unique_ptr<u8[]> m_dram;
 	std::unique_ptr<u16[]> m_osd_code;
 	std::unique_ptr<u8[]> m_osd_attr;
-	bool m_lcd_sleep = true;
-	bool m_lcd_on = false;
+	bool m_lcd_sleep;
+	bool m_lcd_on;
 	u8 m_companion_sda;
 	u32 m_audio_address;
 	u32 m_audio_remaining;
