@@ -154,7 +154,7 @@ const tiny_rom_entry *blue_chip_device::device_rom_region() const
 ROM_START( cmdrc2 )
 	ROM_REGION( 0x4000, M6502_TAG, 0 )
 	ROM_LOAD( "commander_c-ii_8k_rom1.bin", 0x0000, 0x2000, CRC(cb19daf3) SHA1(9fab414451af54d0bed9d4c9fd5fab1b8720c269) )
-	ROM_LOAD( "commander_c-ii_8k_rom2.bin", 0x2000, 0x2000, CRC(ed85a390) SHA1(eecf92fb8cc20a6c86e30f897d09d427509dd3d3) )
+	ROM_LOAD( "commander_c-ii_8k_rom2.bin", 0x2000, 0x2000, BAD_DUMP CRC(ed85a390) SHA1(eecf92fb8cc20a6c86e30f897d09d427509dd3d3) )
 ROM_END
 
 
