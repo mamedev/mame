@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include <queue>
-
 
 ///*************************************************************************
 //  TYPE DEFINITIONS
@@ -65,7 +63,9 @@ private:
 	devcb_write_line m_write_dor;
 	devcb_write8 m_write_q;
 
-	std::queue<u8> m_fifo;
+	u8 m_fifo[16];
+	u8 m_fifo_head;
+	u8 m_fifo_count;
 
 	u8 m_d;
 	u8 m_q;
