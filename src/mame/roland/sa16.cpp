@@ -66,6 +66,10 @@
 #include "emu.h"
 #include "sa16.h"
 
+#include <algorithm>
+#include <cstdlib>
+#include <iterator>
+
 #define LOG_REG    (1U << 1) // register accesses
 #define LOG_WRAM   (1U << 2) // wave RAM accesses
 #define LOG_UNIMPL (1U << 3) // unimplemented register accesses
@@ -155,7 +159,8 @@ void sa16_base_device::regs_map(address_map &map)
 {
 	map(0x0, 0xf).lrw8(
 		NAME([this] (offs_t offset) -> u8 {
-			switch (offset) {
+			switch (offset)
+			{
 			case 0: return m_active_channels & 0xff;
 			case 1: return m_active_channels >> 8;
 			case 2: return m_regs800[m_reg800_roffset] & 0xff;
@@ -165,7 +170,8 @@ void sa16_base_device::regs_map(address_map &map)
 			}
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			switch (offset) {
+			switch (offset)
+			{
 			case 0: m_active_channels = (m_active_channels & 0xff00) | data; break;
 			case 1: m_active_channels = (m_active_channels & 0x00ff) | (data << 8); break;
 			case 8: m_block = data; m_smpcounter = 0; break;
@@ -275,15 +281,15 @@ void sa16_device::device_reset()
 //  voice register helpers
 //-------------------------------------------------
 
-s32 sa16_base_device::voice_counter(int voice) const
+u32 sa16_base_device::voice_counter(int voice) const
 {
-	return s32(u32(m_regs800[voice_reg(voice, 1)]) << 16 | m_regs800[voice_reg(voice, 2)]);
+	return u32(m_regs800[voice_reg(voice, 1)]) << 16 | m_regs800[voice_reg(voice, 2)];
 }
 
-void sa16_base_device::set_voice_counter(int voice, s32 counter)
+void sa16_base_device::set_voice_counter(int voice, u32 counter)
 {
-	m_regs800[voice_reg(voice, 1)] = u32(counter) >> 16;
-	m_regs800[voice_reg(voice, 2)] = u32(counter) & 0xffff;
+	m_regs800[voice_reg(voice, 1)] = counter >> 16;
+	m_regs800[voice_reg(voice, 2)] = counter & 0xffff;
 }
 
 void sa16_base_device::env_level_write(int voice, u8 level)
@@ -295,8 +301,10 @@ void sa16_base_device::env_level_write(int voice, u8 level)
 void sa16_base_device::raise_env_event(int voice)
 {
 	m_voice[voice].m_env_armed = false;
+	const bool was_idle = !m_env_pending;
 	m_env_pending |= 1 << voice;
-	update_int();
+	if (was_idle)
+		update_int();
 }
 
 TIMER_CALLBACK_MEMBER(sa16_base_device::update_tick)
@@ -355,10 +363,13 @@ void sa16_base_device::sound_stream_update(sound_stream &stream)
 			const u16 mode   = m_regs800[voice_reg(v, 4)];
 			const u32 pitch  = m_regs800[voice_reg(v, 0)];
 			const u32 anchor = u32(m_regs800[voice_reg(v, 6)]) | (u32(BIT(mode, 2, 2)) << 16);
-			const s32 loop   = s32(u32(m_regs800[voice_reg(v, 5)]) | (u32(BIT(mode, 4, 2)) << 16));
-			s32 counter = voice_counter(v);
+			const s64 loop   = s64(u32(m_regs800[voice_reg(v, 5)]) | (u32(BIT(mode, 4, 2)) << 16)) << 14;
 
-			const s32 offset = counter >> 14;
+			// The counter is advanced in a wider type, so that passing the end
+			// or the loop point can't overflow, and reduced to 32 bits after
+			s64 counter = voice_counter(v);
+
+			const u32 offset = u32(counter >> 14);
 			const u32 addr = (BIT(mode, 7) ? anchor + offset : anchor - offset) & 0x3ffff;
 			const u32 word = (u32(BIT(mode, 0, 2)) << 18) | addr;
 
@@ -371,9 +382,9 @@ void sa16_base_device::sound_stream_update(sound_stream &stream)
 			if (voice.m_alt_back)
 			{
 				counter += pitch; // alternate loop, playing backwards towards the loop point
-				if (counter >= (loop << 14))
+				if (counter >= loop)
 				{
-					counter = (loop << 14) * 2 - counter;
+					counter = loop * 2 - counter;
 					voice.m_alt_back = false;
 				}
 			}
@@ -388,10 +399,10 @@ void sa16_base_device::sound_stream_update(sound_stream &stream)
 						voice.m_alt_back = true;
 					}
 					else
-						counter += loop << 14;
+						counter += loop;
 				}
 			}
-			set_voice_counter(v, counter);
+			set_voice_counter(v, u32(counter));
 		}
 	}
 }
@@ -408,11 +419,14 @@ u8 sa16_base_device::read(offs_t offset)
 	// 0x1000+: Set byte offset within block. Reads select the word just like
 	// writes do (the firmware sets the offset with a dummy read before reading
 	// ports 4/5).
-	if (offset >= 0x1000) {
+	if (offset >= 0x1000)
+	{
 		if (!machine().side_effects_disabled())
 			m_blockoffset = (offset - 0x1000) << 1;
 		return 0;
-	} else if (offset >= 0x800) { // 800h+ Set register offset
+	}
+	else if (offset >= 0x800) // 800h+ Set register offset
+	{
 		if (!machine().side_effects_disabled())
 		{
 			m_reg800_roffset = offset - 0x800;
@@ -430,7 +444,8 @@ u8 sa16_base_device::read(offs_t offset)
 	case 1: // Envelope event: (voice + 1) of the lowest flagged voice, 0 if none.
 		// No side effect: the flag is cleared by writing the voice's envelope
 		// registers (the firmware reads this port a second time as a dummy).
-		m_stream->update();
+		if (!machine().side_effects_disabled())
+			m_stream->update();
 		value = 0;
 		if (m_env_pending)
 		{
@@ -443,9 +458,10 @@ u8 sa16_base_device::read(offs_t offset)
 		break;
 	case 2:
 		{
-			m_stream->update();
+			if (!machine().side_effects_disabled())
+				m_stream->update();
 			const int block = m_reg800_roffset >> 4;
-			const int reg   = m_reg800_roffset & 0x0F;
+			const int reg   = m_reg800_roffset & 0x0f;
 
 			if (block >= 1 && block <= NUM_VOICES && (reg == 0x03 || reg == 0x07))
 			{
@@ -462,7 +478,8 @@ u8 sa16_base_device::read(offs_t offset)
 		LOGMASKED(LOG_REG, "%s: regs800[%03x].lo => %02x\n", machine().describe_context(), m_reg800_roffset, value);
 		break;
 	case 3:
-		m_stream->update();
+		if (!machine().side_effects_disabled())
+			m_stream->update();
 		value = m_regs800[m_reg800_roffset] >> 8;
 		LOGMASKED(LOG_REG, "%s: regs800[%03x].hi => %02x\n", machine().describe_context(), m_reg800_roffset, value);
 		break;
@@ -499,10 +516,13 @@ u8 sa16_base_device::read(offs_t offset)
 
 void sa16_base_device::write(offs_t offset, u8 data)
 {
-	if (offset >= 0x1000) { // 1000h+: Set offset within block
+	if (offset >= 0x1000) // 1000h+: Set offset within block
+	{
 		m_blockoffset = (offset - 0x1000) << 1;
 		return;
-	} else if (offset >= 0x800) { // 800h+ Set "800"-register number to be written using regs800[] port below
+	}
+	else if (offset >= 0x800) // 800h+ Set "800"-register number to be written using regs800[] port below
+	{
 		m_reg800_woffset = offset - 0x800;
 		LOGMASKED(LOG_REG, "%s: offsetRegister <= %02x\n", machine().describe_context(), m_reg800_woffset);
 		return;
@@ -512,27 +532,27 @@ void sa16_base_device::write(offs_t offset, u8 data)
 	{
 	case 0: // Key-on mask, voices 0-7
 		m_stream->update();
-		m_active_channels = (m_active_channels & 0xFF00) | data;
+		m_active_channels = (m_active_channels & 0xff00) | data;
 		LOGMASKED(LOG_REG, "%s: active_channels[0..7] <= %02x\n", machine().describe_context(), data);
 		break;
 	case 1: // Key-on mask, voices 8-15
 		m_stream->update();
-		m_active_channels = (m_active_channels & 0x00FF) | (data << 8);
+		m_active_channels = (m_active_channels & 0x00ff) | (data << 8);
 		LOGMASKED(LOG_REG, "%s: active_channels[8..F] <= %02x\n", machine().describe_context(), data);
 		break;
 	case 2:
 		LOGMASKED(LOG_REG, "%s: regs800[%03x].lo <= %02x\n", machine().describe_context(), m_reg800_woffset, data);
 		m_stream->update();
-		m_regs800[m_reg800_woffset] = (0xFF00 & m_regs800[m_reg800_woffset]) | data;
+		m_regs800[m_reg800_woffset] = (0xff00 & m_regs800[m_reg800_woffset]) | data;
 		break;
 	case 3:
 		LOGMASKED(LOG_REG, "%s: regs800[%03x].hi <= %02x\n", machine().describe_context(), m_reg800_woffset, data);
 		m_stream->update();
-		m_regs800[m_reg800_woffset] = (0x00FF & m_regs800[m_reg800_woffset]) | data<<8;
+		m_regs800[m_reg800_woffset] = (0x00ff & m_regs800[m_reg800_woffset]) | data<<8;
 		{
 			// The high byte completes a register write
 			const int block = m_reg800_woffset >> 4;
-			const int reg   = m_reg800_woffset & 0x0F;
+			const int reg   = m_reg800_woffset & 0x0f;
 			if (block >= 1 && block <= NUM_VOICES && (reg == 0x03 || reg == 0x07 || reg == 0x08))
 			{
 				// Writing the envelope acknowledges the voice's pending event
@@ -547,7 +567,8 @@ void sa16_base_device::write(offs_t offset, u8 data)
 				if (BIT(m_env_pending, v))
 				{
 					m_env_pending &= ~(1 << v);
-					update_int();
+					if (!m_env_pending)
+						update_int();
 				}
 			}
 			if (block < NUM_VOICES && (reg == 0x01 || reg == 0x02))
@@ -569,10 +590,10 @@ void sa16_base_device::write(offs_t offset, u8 data)
 		m_smpcounter = 0;
 		break;
 	case 0x404: // Sample port low (16-bit value)
-		m_port_smp16 = (0xFF00 & m_port_smp16) | data;
+		m_port_smp16 = (0xff00 & m_port_smp16) | data;
 		break;
 	case 0x405: // Sample port high (16-bit value)
-		m_port_smp16 = (0x00FF & m_port_smp16) | data<<8;
+		m_port_smp16 = (0x00ff & m_port_smp16) | data<<8;
 		LOGMASKED(LOG_REG, "%s: sample port write[%08x] <= %04x\n", machine().describe_context(), block_base() + (m_smpcounter << 1), m_port_smp16 >> 4);
 		wram_w16(block_base() + (m_smpcounter << 1), m_port_smp16 >> 4);
 		m_smpcounter++;
