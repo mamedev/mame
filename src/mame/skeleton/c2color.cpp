@@ -91,7 +91,10 @@ private:
 	virtual void machine_reset() override ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void clear_state();
+
+	// helper functions
 	u8 code_r(offs_t offset);
 	void spi_select();
 	u8 spi_exchange(u8 data);
@@ -102,13 +105,13 @@ private:
 	void jpeg_decode();
 	void audio_control();
 	void update_irq();
+	u8 read_reg_swapped(auto &reg, offs_t offset);
+	void write_reg_swapped(auto &reg, offs_t offset, u8 data);
 
-	u8 companion_r() { u8 data = m_companion_reg; return (data & ~2) | ((BIT(data, 1) && m_companion_sda) ? 2 : 0); }
+	// memory map access
+	u8 companion_r() { u8 data = m_companion_2002; return (data & ~2) | ((BIT(data, 1) && m_companion_sda) ? 2 : 0); }
 	void companion_w(u8 data);
 	void timer_ctrl_w(u8 data);
-
-
-
 	u8 adc_reg1_r() { return m_adc_reg1; }
 	void adc_reg1_w(u8 data) { m_adc_reg1 = data; }
 	u8 adc_r() { return m_adc_reg2; }
@@ -117,13 +120,10 @@ private:
 	void adc_reg3_w(u8 data) { m_adc_reg3 = data; }
 	u8 adc_reg4_r() { return m_adc_reg4; }
 	void adc_reg4_w(u8 data) { m_adc_reg4 = data; }
-
 	u8 xram_control_r() { return m_xram_control; }
 	void xram_control_w(u8 data) { m_xram_control = data; }
 	u8 ram_access_upper_r() { return m_ram_access_upper; }
 	void ram_access_upper_w(u8 data) { m_ram_access_upper = data; }
-
-	
 	u8 osd_codes_r() { return m_osd_codes_reg; }
 	void osd_codes_w(u8 data);
 	void lcd_ctrl_w(u8 data);
@@ -140,10 +140,8 @@ private:
 	void audiocontrol_208c_w(u8 data) {	m_audiocontrol_208c = data;	audio_control(); }
 	u8 audiocontrol_2097_r() { return m_audiocontrol_2097; }
 	void audiocontrol_2097_w(u8 data) {	m_audiocontrol_2097 = data;	audio_control(); }
-
 	u8 dramstop_r() { u8 data = m_dramstop;	return (data & 0x3f) | (BIT(data, 2) ? 0x80 : 0x40); /* DRAM stop / resume acknowledgement. */ }
 	void dramstop_w(u8 data) { m_dramstop = data; }
-
 	u8 spi_select_2152_r() { return (m_spi_select_2152 & 0x7f) | (BIT(m_buttons->read(), 0) ? 0x80 : 0); }
 	void spi_select_2152_w(u8 data) { m_spi_select_2152 = data; spi_select(); }
 	u8 spi_status_r() {	return m_spi_status |= 0x18; /* SPI transmit / receive ready; transfers currently complete immediately. */ }
@@ -157,91 +155,26 @@ private:
 	void audiocontrol_246d_w(u8 data) {	m_audiocontrol_246d = data; audio_control(); }
 	u8 dramaccess_ctrl_r() { return m_dramaccess_ctrl; }
 	void dramaccess_ctrl_w(u8 data) { m_dramaccess_ctrl = data; dram_access(data); }
-
-
 	template <uint8_t Reg> u8 irqack_r() { return m_irqack[Reg]; }
 	template <uint8_t Reg> u8 irqenable_r() { return m_irqenable[Reg]; }
 	template <uint8_t Reg> void irqenable_w(u8 data) {m_irqenable[Reg] = data; update_irq(); }
 	template <uint8_t Reg> u8 irqstatus_r() { return m_irqstatus[Reg]; }
 	template <uint8_t Reg> void irqstatus_w(u8 data) { m_irqstatus[Reg] = data; }
 	template <uint8_t Reg> void irqack_w(u8 data) { m_irqack[Reg] = data; m_irqstatus[Reg] &= ~data; update_irq(); }
-
-	u8 m_dramstop;
-	u8 m_jpeg_decode_trigger;
-	u8 m_quant_ctrl;
-	u8 m_dramaccess_ctrl;
-	u8 m_spi_select_2152;
-	u8 m_spi_select_2155;
-	u8 m_spi_status;
-	u8 m_spi_exchange1;
-	u8 m_osd_codes_reg;
-
-	u8 m_audiocontrol_246d;
-	u8 m_audiocontrol_208c;
-	u8 m_audiocontrol_2097;
-	u8 m_timer_ctrl;
-	u8 m_adc_reg1;
-	u8 m_adc_reg2;
-	u8 m_adc_reg3;
-	u8 m_adc_reg4;
-	u8 m_spi_select_2042;
-	u8 m_companion_reg;
-	u8 m_buttons_reg;
-
-	u8 m_irqack[4];
-	u8 m_irqenable[4];
-	u8 m_irqstatus[4];
-
-	TIMER_CALLBACK_MEMBER(audio_tick);
-
-	void prog_map(address_map &map) ATTR_COLD;
-
-	template<int Channel> void add_dma_map(address_map &map, int base);
-	void ext_map(address_map &map) ATTR_COLD;
-
-	required_device<c2_color_cpu_device> m_maincpu;
-	required_device<c2color_cartslot_device> m_cart;
-	memory_region *m_cart_region;
-	required_device<screen_device> m_screen;
-	required_device_array<generic_spi_flash_device, 2> m_flash;
-	required_shared_ptr<u8> m_xram;
-
-	required_shared_ptr<u8> m_dram_dword_out_data;
-	required_shared_ptr<u8> m_dram_dword_in_data;
-
-	u8 m_xram_control;
-	u8 m_ram_access_upper;
-
-	required_shared_ptr<u8> m_timer_val;
-
-
-	required_device<c2_color_companion_device> m_companion;
-	required_device<dac_16bit_r2r_device> m_dac;
-	required_ioport m_buttons;
-	required_ioport m_battery;
-
-	u8 read_reg_swapped(auto &reg, offs_t offset);
-	void write_reg_swapped(auto &reg, offs_t offset, u8 data);
-
-	
 	u8 dram_dword_out_address_r(offs_t offset) { return read_reg_swapped(m_dram_dword_out_address, offset); }
 	void dram_dword_out_address_w(offs_t offset, u8 data) { write_reg_swapped(m_dram_dword_out_address, offset, data); }
 	u8 dram_dword_in_address_r(offs_t offset) { return read_reg_swapped(m_dram_dword_in_address, offset); }
 	void dram_dword_in_address_w(offs_t offset, u8 data) { write_reg_swapped(m_dram_dword_in_address, offset, data); }
-
 	u8 jpeg_src_r(offs_t offset) { return read_reg_swapped(m_jpeg_src, offset); }
 	void jpeg_src_w(offs_t offset, u8 data) { write_reg_swapped(m_jpeg_src, offset, data); }
 	u8 jpeg_dst_r(offs_t offset) { return read_reg_swapped(m_jpeg_dst, offset); }
 	void jpeg_dst_w(offs_t offset, u8 data) { write_reg_swapped(m_jpeg_dst, offset, data); }
 	u8 jpeg_len_r(offs_t offset) { return read_reg_swapped(m_jpeg_len, offset); }
 	void jpeg_len_w(offs_t offset, u8 data) { write_reg_swapped(m_jpeg_len, offset, data); }
-
 	u8 jpeg_width_r(offs_t offset) { return read_reg_swapped(m_jpeg_width, offset); }
 	void jpeg_width_w(offs_t offset, u8 data) { write_reg_swapped(m_jpeg_width, offset, data); }
 	u8 jpeg_height_r(offs_t offset) { return read_reg_swapped(m_jpeg_height, offset); }
 	void jpeg_height_w(offs_t offset, u8 data) { write_reg_swapped(m_jpeg_height, offset, data); }
-
-
 	u8 render_base_r(offs_t offset) { return read_reg_swapped(m_render_base, offset); }
 	void render_base_w(offs_t offset, u8 data) { write_reg_swapped(m_render_base, offset, data); }
 	u8 render_overlay_r(offs_t offset) { return read_reg_swapped(m_render_overlay, offset); }
@@ -258,7 +191,6 @@ private:
 	void overlay_x_w(offs_t offset, u8 data) { write_reg_swapped(m_overlay_x, offset, data); }
 	u8 overlay_y_r(offs_t offset) { return read_reg_swapped(m_overlay_y, offset); }
 	void overlay_y_w(offs_t offset, u8 data) { write_reg_swapped(m_overlay_y, offset, data); }
-
 	u8 render_osd0_r(offs_t offset) { return read_reg_swapped(m_render_osd0, offset); }
 	void render_osd0_w(offs_t offset, u8 data) { write_reg_swapped(m_render_osd0, offset, data); }
 	u8 render_osd1_r(offs_t offset) { return read_reg_swapped(m_render_osd1, offset); }
@@ -269,18 +201,14 @@ private:
 	void render_osd3_w(u8 data) { m_render_osd3 = data; }
 	u8 render_unknown_r() { return m_render_unknown; }
 	void render_unknown_w(u8 data) { m_render_unknown = data; }
-
 	u8 render_columns_r() { return m_render_columns; }
 	void render_columns_w(u8 data) { m_render_columns = data; }
 	u8 render_rows_r() { return m_render_rows; }
 	void render_rows_w(u8 data) { m_render_rows = data; }
-
-
 	u8 audio_remaining_r(offs_t offset) { return read_reg_swapped(m_audio_remaining_reg, offset); }
 	void audio_remaining_w(offs_t offset, u8 data) { write_reg_swapped(m_audio_remaining_reg, offset, data); }
 	u8 audio_address_r(offs_t offset) { return read_reg_swapped(m_audio_address_reg, offset); }
 	void audio_address_w(offs_t offset, u8 data) { write_reg_swapped(m_audio_address_reg, offset, data); }
-
 	template<int Channel> void dma_unk_w(offs_t offset, u8 data);
 	template<int Channel> u8 dma_unk_r(offs_t offset);
 	template<int Channel> u8 dma_count_r(offs_t offset) { return read_reg_swapped(m_dma_channel[Channel].m_dma_count, offset); }
@@ -296,6 +224,26 @@ private:
 	template<int Channel> void dma_fill_w(offs_t offset, u8 data);
 	template<int Channel> u8 dma_trigger_r(offs_t offset) { return m_dma_channel[Channel].m_dma_trigger; }
 	template<int Channel> void dma_trigger_w(offs_t offset, u8 data);
+
+	TIMER_CALLBACK_MEMBER(audio_tick);
+
+	void prog_map(address_map &map) ATTR_COLD;
+	template<int Channel> void add_dma_map(address_map &map, int base) ATTR_COLD;
+	void ext_map(address_map &map) ATTR_COLD;
+
+	required_device<c2_color_cpu_device> m_maincpu;
+	required_device<c2color_cartslot_device> m_cart;
+	memory_region *m_cart_region;
+	required_device<screen_device> m_screen;
+	required_device_array<generic_spi_flash_device, 2> m_flash;
+	required_shared_ptr<u8> m_xram;
+	required_shared_ptr<u8> m_dram_dword_out_data;
+	required_shared_ptr<u8> m_dram_dword_in_data;
+	required_shared_ptr<u8> m_timer_val;
+	required_device<c2_color_companion_device> m_companion;
+	required_device<dac_16bit_r2r_device> m_dac;
+	required_ioport m_buttons;
+	required_ioport m_battery;
 
 
 	emu_timer *m_audio_timer;
@@ -313,10 +261,34 @@ private:
 	bool m_lcd_on = false;
 	std::unique_ptr<u8[]> m_flash_data[2];
 
+	u8 m_xram_control;
+	u8 m_ram_access_upper;
+	u8 m_dramstop;
+	u8 m_jpeg_decode_trigger;
+	u8 m_quant_ctrl;
+	u8 m_dramaccess_ctrl;
+	u8 m_spi_select_2152;
+	u8 m_spi_select_2155;
+	u8 m_spi_status;
+	u8 m_spi_exchange1;
+	u8 m_osd_codes_reg;
+	u8 m_audiocontrol_246d;
+	u8 m_audiocontrol_208c;
+	u8 m_audiocontrol_2097;
+	u8 m_timer_ctrl;
+	u8 m_adc_reg1;
+	u8 m_adc_reg2;
+	u8 m_adc_reg3;
+	u8 m_adc_reg4;
+	u8 m_spi_select_2042;
+	u8 m_companion_2002;
+	u8 m_buttons_reg;
+	u8 m_irqack[4];
+	u8 m_irqenable[4];
+	u8 m_irqstatus[4];
 	u32 m_dram_dword_out_address;
 	u32 m_dram_dword_in_address;
 	u32 m_render_base;
-
 	u32 m_jpeg_dst;
 	u32 m_jpeg_src;
 	u32 m_jpeg_len;
@@ -494,32 +466,77 @@ void c2_color_state::machine_start()
 	save_pointer(NAME(m_dram), DRAM_SIZE);
 	save_pointer(NAME(m_osd_code), 0x10000);
 	save_pointer(NAME(m_osd_attr), 0x10000);
+
 	save_item(NAME(m_lcd_sleep));
 	save_item(NAME(m_lcd_on));
-	save_item(NAME(m_dma_channel[0].m_dma_fill));
-	save_item(NAME(m_dma_channel[0].m_dma_fill_pos));
-	save_item(NAME(m_spi_selected));
-	save_item(NAME(m_quant));
-	save_item(NAME(m_quant_pos));
 	save_item(NAME(m_companion_sda));
 	save_item(NAME(m_audio_address));
 	save_item(NAME(m_audio_remaining));
 	save_item(NAME(m_audio_enabled));
-
 	save_item(NAME(m_dramstop));
 	save_item(NAME(m_jpeg_decode_trigger));
 	save_item(NAME(m_quant_ctrl));
 	save_item(NAME(m_dramaccess_ctrl));
-
 	save_item(NAME(m_spi_select_2152));
 	save_item(NAME(m_spi_select_2155));
 	save_item(NAME(m_spi_status));
 	save_item(NAME(m_spi_exchange1));
 	save_item(NAME(m_osd_codes_reg));
-
+	save_item(NAME(m_audiocontrol_246d));
+	save_item(NAME(m_audiocontrol_208c));
+	save_item(NAME(m_audiocontrol_2097));
+	save_item(NAME(m_timer_ctrl));
+	save_item(NAME(m_adc_reg1));
+	save_item(NAME(m_adc_reg2));
+	save_item(NAME(m_adc_reg3));
+	save_item(NAME(m_adc_reg4));
+	save_item(NAME(m_spi_select_2042));
+	save_item(NAME(m_companion_2002));
+	save_item(NAME(m_buttons_reg));
+	save_item(NAME(m_dram_dword_out_address));
+	save_item(NAME(m_dram_dword_in_address));
+	save_item(NAME(m_render_base));
+	save_item(NAME(m_jpeg_dst));
+	save_item(NAME(m_jpeg_src));
+	save_item(NAME(m_jpeg_len));
+	save_item(NAME(m_jpeg_width));
+	save_item(NAME(m_jpeg_height));
+	save_item(NAME(m_render_overlay));
+	save_item(NAME(m_render_font));
+	save_item(NAME(m_render_mask));
+	save_item(NAME(m_overlay_width));
+	save_item(NAME(m_overlay_height));
+	save_item(NAME(m_overlay_x));
+	save_item(NAME(m_overlay_y));
+	save_item(NAME(m_render_osd0));
+	save_item(NAME(m_render_osd1));
+	save_item(NAME(m_render_osd2));
+	save_item(NAME(m_render_osd3));
+	save_item(NAME(m_render_columns));
+	save_item(NAME(m_render_rows));
+	save_item(NAME(m_render_unknown));
+	save_item(NAME(m_audio_remaining_reg));
+	save_item(NAME(m_audio_address_reg));
+	save_item(NAME(m_xram_control));
+	save_item(NAME(m_ram_access_upper));
 	save_item(NAME(m_irqack));
 	save_item(NAME(m_irqenable));
 	save_item(NAME(m_irqstatus));
+	save_item(NAME(m_spi_selected));
+	save_item(NAME(m_quant));
+	save_item(NAME(m_quant_pos));
+
+	for (int i = 0; i < 2; i++)
+	{
+		save_item(NAME(m_dma_channel[i].m_dma_trigger), i);
+		save_item(NAME(m_dma_channel[i].m_dma_count), i);
+		save_item(NAME(m_dma_channel[i].m_dma_source_addr), i);
+		save_item(NAME(m_dma_channel[i].m_dma_source), i);
+		save_item(NAME(m_dma_channel[i].m_dma_dest_addr), i);
+		save_item(NAME(m_dma_channel[i].m_dma_dest), i);
+		save_item(NAME(m_dma_channel[i].m_dma_fill), i);
+		save_item(NAME(m_dma_channel[i].m_dma_fill_pos), i);
+	}
 
 	m_audio_timer = timer_alloc(FUNC(c2_color_state::audio_tick), this);
 	machine().save().register_postload(save_prepost_delegate(FUNC(c2_color_state::update_irq), this));
@@ -550,7 +567,7 @@ void c2_color_state::machine_reset()
 	m_dac->write(0x8000);
 	m_ram_access_upper = 1;
 	m_spi_select_2042 = 0x10;
-	m_companion_reg = 0x03;
+	m_companion_2002 = 0x03;
 
 	m_dramstop = 0;
 	m_jpeg_decode_trigger = 0;
@@ -796,7 +813,7 @@ TIMER_CALLBACK_MEMBER(c2_color_state::audio_tick)
 
 void c2_color_state::companion_w(u8 data)
 {
-	m_companion_reg = data;
+	m_companion_2002 = data;
 	if (!BIT(data, 0))
 		m_companion->scl_write(0);
 	m_companion->sda_write(BIT(data, 1));
