@@ -178,9 +178,9 @@ private:
 	bool tx_pending;    // SBUF was written while tx_busy
 	u8 tx_pending_buf;
 	bool tx_ti_due;     // next tx_event is mid last data bit, where TI is set
-	int txd_serial;     // TXD level driven by the serial port
-	int txd_pin;        // P2.0/TXD pin level last sent to m_txd_cb
-	int rxd_pin;        // P2.1/RXD pin level
+	u8 txd_serial;      // TXD level driven by the serial port
+	u8 txd_pin;         // P2.0/TXD pin level last sent to m_txd_cb
+	u8 rxd_pin;         // P2.1/RXD pin level
 	bool rx_active;     // a frame is being sampled
 	u8 rx_bit;          // RX frame bit being sampled (0 = start bit)
 	u16 rx_shift;

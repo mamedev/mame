@@ -384,7 +384,7 @@ void i8x9x_device::rx_event(u64 current_time)
 			return;
 
 		sbuf = rx_shift & 0xff;
-		if (pen)
+		if (pen && mode != 2)
 		{
 			// SP_STAT bit 7 is RPE, set on an even parity error
 			bool const error = std::popcount<u32>(rx_shift & ((mode == 3) ? 0x1ff : 0xff)) & 1;
