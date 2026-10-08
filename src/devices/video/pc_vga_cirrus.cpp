@@ -703,6 +703,7 @@ void cirrus_gd5428_vga_device::device_start()
 	save_item(NAME(m_hidden_dac_phase));
 	save_item(NAME(m_hidden_dac_mode));
 	save_pointer(NAME(gc_bank), 2);
+	save_item(NAME(m_blt_write_mask));
 
 	m_vblank_timer = timer_alloc(FUNC(cirrus_gd5428_vga_device::vblank_timer_cb), this);
 
@@ -718,7 +719,7 @@ void cirrus_gd5430_vga_device::device_start()
 
 void cirrus_gd5446_vga_device::device_start()
 {
-	cirrus_gd5428_vga_device::device_start();
+	cirrus_gd5430_vga_device::device_start();
 	m_chip_id = 0xb8;  // GD5446
 }
 
@@ -731,6 +732,7 @@ void cirrus_gd5428_vga_device::device_reset()
 	gc_bank[0] = gc_bank[1] = 0;
 	m_lock_reg = 0x0f;
 	m_blt_status = 0;
+	m_blt_write_mask = 0;
 	m_cursor_attr = 0x00;  // disable hardware cursor and extra palette
 	m_cursor_x = m_cursor_y = 0;
 	m_cursor_addr = 0;
@@ -965,9 +967,9 @@ void cirrus_gd5428_vga_device::start_bitblt()
 					uint16_t pixel = foreground ? ((m_gr11 << 8) | vga.gc.enable_set_reset) : ((m_gr10 << 8) | vga.gc.set_reset);
 
 					if(m_blt_dest_current & 1)
-						copy_pixel(pixel >> 8, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size], foreground);
+						copy_pixel(pixel >> 8, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size], foreground, x);
 					else
-						copy_pixel(pixel & 0xff, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size], foreground);
+						copy_pixel(pixel & 0xff, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size], foreground, x);
 					if((x % 8) == 7 && !(m_blt_mode & 0x40))  // don't increment if a pattern (it's only 8 bits)
 						m_blt_source_current++;
 				}
@@ -976,14 +978,14 @@ void cirrus_gd5428_vga_device::start_bitblt()
 					const bool foreground = BIT(vga.memory[m_blt_source_current % vga.svga_intf.vram_size], 7 - (x % 8));
 					uint8_t pixel = foreground ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
 
-					copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size], foreground);
+					copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size], foreground, x);
 					if((x % 8) == 7 && !(m_blt_mode & 0x40))  // don't increment if a pattern (it's only 8 bits)
 						m_blt_source_current++;
 				}
 			}
 			else
 			{
-				copy_pixel(vga.memory[m_blt_source_current % vga.svga_intf.vram_size], vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
+				copy_pixel(vga.memory[m_blt_source_current % vga.svga_intf.vram_size], vga.memory[m_blt_dest_current % vga.svga_intf.vram_size], true, x);
 				m_blt_source_current++;
 			}
 
@@ -1019,25 +1021,25 @@ void cirrus_gd5428_vga_device::start_reverse_bitblt()
 					uint16_t pixel = foreground ? ((m_gr11 << 8) | vga.gc.enable_set_reset) : ((m_gr10 << 8) | vga.gc.set_reset);
 
 					if(m_blt_dest_current & 1)
-						copy_pixel(pixel >> 8, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size], foreground);
+						copy_pixel(pixel >> 8, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size], foreground, m_blt_width - x);
 					else
-						copy_pixel(pixel & 0xff, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size], foreground);
+						copy_pixel(pixel & 0xff, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size], foreground, m_blt_width - x);
 					if((x % 8) == 7 && !(m_blt_mode & 0x40))  // don't increment if a pattern (it's only 8 bits)
 						m_blt_source_current--;
 				}
 				else
 				{
 				const bool foreground = BIT(vga.memory[m_blt_source_current % vga.svga_intf.vram_size], 7 - (x % 8));
-					uint8_t pixel = foreground ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
+				uint8_t pixel = foreground ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
 
-				copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size], foreground);
+				copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size], foreground, m_blt_width - x);
 				if((x % 8) == 7 && !(m_blt_mode & 0x40))  // don't decrement if a pattern (it's only 8 bits)
 					m_blt_source_current--;
 				}
 			}
 			else
 			{
-				copy_pixel(vga.memory[m_blt_source_current % vga.svga_intf.vram_size], vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
+				copy_pixel(vga.memory[m_blt_source_current % vga.svga_intf.vram_size], vga.memory[m_blt_dest_current % vga.svga_intf.vram_size], true, m_blt_width - x);
 				m_blt_source_current--;
 			}
 			m_blt_dest_current--;
@@ -1126,7 +1128,7 @@ void cirrus_gd5428_vga_device::blit_byte()
 			const u8 pixel = byte ? (foreground ? m_gr11 : m_gr10) :
 				(foreground ? vga.gc.enable_set_reset : vga.gc.set_reset);
 			if (m_blt_pixel_count <= m_blt_width)
-				copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size], foreground);
+				copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size], foreground, m_blt_pixel_count);
 			m_blt_dest_current++;
 			m_blt_pixel_count++;
 		}
@@ -1144,8 +1146,12 @@ void cirrus_gd5428_vga_device::blit_byte()
 	}
 }
 
-void cirrus_gd5428_vga_device::copy_pixel(uint8_t src, uint8_t dst, bool foreground)
+void cirrus_gd5428_vga_device::copy_pixel(uint8_t src, uint8_t dst, bool foreground, unsigned dst_byte_offset)
 {
+	// GR2F suppresses the first n pixels on each expanded or pattern scan line.
+	if ((m_blt_mode & 0xc0) && dst_byte_offset < m_blt_write_mask * (BIT(m_blt_mode, 4) ? 2 : 1))
+		return;
+
 	uint8_t res = src;
 
 	switch(m_blt_rop)
@@ -1584,12 +1590,12 @@ void cirrus_gd5428_vga_device::mem_w(offs_t offset, uint8_t data)
 void cirrus_gd5430_vga_device::device_reset()
 {
 	cirrus_gd5428_vga_device::device_reset();
-	m_sr17 = 0;
+	m_sr17 = 1;
 }
 
 uint8_t cirrus_gd5430_vga_device::mem_r(offs_t offset)
 {
-	if ((m_sr17 & 0x44) == 0x04 && (offset & ~0xffU) == 0x18000)
+	if (BIT(m_sr17, 2) && (!BIT(m_sr17, 6) || !(vga.sequencer.data[7] & 0xf0)) && (offset & 0x18000) == 0x18000)
 		return mmio_r(offset & 0xff);
 
 	return cirrus_gd5428_vga_device::mem_r(offset);
@@ -1597,7 +1603,7 @@ uint8_t cirrus_gd5430_vga_device::mem_r(offs_t offset)
 
 void cirrus_gd5430_vga_device::mem_w(offs_t offset, uint8_t data)
 {
-	if ((m_sr17 & 0x44) == 0x04 && (offset & ~0xffU) == 0x18000)
+	if (BIT(m_sr17, 2) && (!BIT(m_sr17, 6) || !(vga.sequencer.data[7] & 0xf0)) && (offset & 0x18000) == 0x18000)
 	{
 		mmio_w(offset & 0xff, data);
 		return;
@@ -1609,8 +1615,7 @@ void cirrus_gd5430_vga_device::mem_w(offs_t offset, uint8_t data)
 u8 cirrus_gd5430_vga_device::mmio_register(offs_t offset)
 {
 	if ((offset >= 0x08 && offset <= 0x12) ||
-		(offset >= 0x14 && offset <= 0x18) || offset == 0x1a ||
-		(offset >= 0x1c && offset <= 0x1d) || (offset >= 0x20 && offset <= 0x21))
+		(offset >= 0x14 && offset <= 0x18) || offset == 0x1a)
 		return offset + 0x18;
 
 	switch (offset)
@@ -1626,13 +1631,9 @@ u8 cirrus_gd5430_vga_device::mmio_register(offs_t offset)
 
 u8 cirrus_gd5430_vga_device::mmio_r(offs_t offset)
 {
-	if (offset == 0x00)
-		return vga.gc.set_reset;
-	if (offset == 0x04)
-		return vga.gc.enable_set_reset;
-
-	const u8 index = mmio_register(offset);
-	return index == 0xff ? 0xff : space(GC_REG).read_byte(index);
+	// Only start/status is readable;
+	// the remaining MMIO registers are write-only.
+	return offset == 0x40 ? space(GC_REG).read_byte(0x31) : 0xff;
 }
 
 void cirrus_gd5430_vga_device::mmio_w(offs_t offset, u8 data)
@@ -1661,6 +1662,14 @@ void cirrus_gd5430_vga_device::crtc_map(address_map &map)
 void cirrus_gd5430_vga_device::gc_map(address_map &map)
 {
 	cirrus_gd5428_vga_device::gc_map(map);
+	map(0x2f, 0x2f).lrw8(
+		NAME([this](offs_t offset) {
+			return m_blt_write_mask;
+		}),
+		NAME([this](offs_t offset, u8 data) {
+			m_blt_write_mask = data & 7;
+		})
+	);
 }
 
 void cirrus_gd5430_vga_device::sequencer_map(address_map &map)
