@@ -27,6 +27,7 @@ private:
 	TIMER_CALLBACK_MEMBER(bell_off);
 
 	required_ioport m_modifiers;
+	required_ioport m_layout;
 	required_device<beep_device> m_beeper;
 	emu_timer *m_bell_timer;
 };
