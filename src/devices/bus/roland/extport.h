@@ -27,22 +27,17 @@ both pins as inputs.
 #pragma once
 
 
-class roland_ext_port_device;
-
-
 class device_roland_ext_port_interface : public device_interface
 {
 public:
-	virtual ~device_roland_ext_port_interface() { }
+	virtual ~device_roland_ext_port_interface();
 
 	// data register (S-330: C400)
-	virtual u8 read() { return 0xff; }
-	virtual void write(u8 data, u8 mem_mask) { }
+	virtual u8 read();
+	virtual void write(u8 data, u8 mem_mask);
 
 protected:
 	device_roland_ext_port_interface(const machine_config &mconfig, device_t &device);
-
-	roland_ext_port_device *m_port;
 };
 
 

@@ -17,7 +17,22 @@ DEFINE_DEVICE_TYPE(ROLAND_EXT_PORT, roland_ext_port_device, "roland_ext_port", "
 
 device_roland_ext_port_interface::device_roland_ext_port_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "rolandext")
-	, m_port(dynamic_cast<roland_ext_port_device *>(device.owner()))
+{
+}
+
+
+device_roland_ext_port_interface::~device_roland_ext_port_interface()
+{
+}
+
+
+u8 device_roland_ext_port_interface::read()
+{
+	return 0xff;
+}
+
+
+void device_roland_ext_port_interface::write(u8 data, u8 mem_mask)
 {
 }
 

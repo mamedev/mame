@@ -40,7 +40,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	virtual ioport_constructor device_input_ports() const override { return INPUT_PORTS_NAME(roland_ext_mouse); }
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD { return INPUT_PORTS_NAME(roland_ext_mouse); }
 
 private:
 	required_ioport m_buttons;
