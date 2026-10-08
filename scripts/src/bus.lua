@@ -1370,6 +1370,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/c2color/slot.h,BUSES["C2COLOR"] = true
+---------------------------------------------------
+
+if BUSES["C2COLOR"] then
+	files {
+		MAME_DIR .. "src/devices/bus/c2color/slot.cpp",
+		MAME_DIR .. "src/devices/bus/c2color/slot.h",
+		MAME_DIR .. "src/devices/bus/c2color/carts.cpp",
+		MAME_DIR .. "src/devices/bus/c2color/carts.h",
+		MAME_DIR .. "src/devices/bus/c2color/rom.cpp",
+		MAME_DIR .. "src/devices/bus/c2color/rom.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/c64/exp.h,BUSES["C64"] = true
 --@src/devices/bus/c64/user.h,BUSES["C64"] = true
 ---------------------------------------------------
