@@ -244,6 +244,7 @@ void c64h156_device::live_abort()
 
 	cur_live.sync = 1;
 	cur_live.byte = 1;
+	cur_live.byte_in = 1;
 }
 
 void c64h156_device::live_run(const attotime &limit)
@@ -329,16 +330,15 @@ void c64h156_device::live_run(const attotime &limit)
 				}
 
 				// update signals
-				if (byte != cur_live.byte) {
-					if (!byte || !cur_live.accl) {
-						LOG("%s BYTE %02x\n", cur_live.tm.as_string(), cur_live.shift_reg & 0xff);
-						cur_live.byte = byte;
-						syncpoint = true;
-					}
+				if (byte != cur_live.byte && (!cur_live.accl || (!byte && cur_live.byte_in))) {
+					LOG("%s BYTE %02x\n", cur_live.tm.as_string(), cur_live.shift_reg & 0xff);
+					cur_live.byte = byte;
+					syncpoint = true;
 					if (!byte) {
 						cur_live.accl_yb = cur_live.shift_reg & 0xff;
 					}
 				}
+				cur_live.byte_in = byte;
 
 				if (sync != cur_live.sync) {
 					LOG("%s SYNC %u\n", cur_live.tm.as_string(),sync);
