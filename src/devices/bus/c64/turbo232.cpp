@@ -106,6 +106,7 @@ c64_turbo232_cartridge_device::c64_turbo232_cartridge_device(const machine_confi
 
 void c64_turbo232_cartridge_device::device_start()
 {
+	save_item(NAME(m_es));
 }
 
 

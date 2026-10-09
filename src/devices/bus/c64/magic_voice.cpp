@@ -277,6 +277,7 @@ void c64_magic_voice_cartridge_device::device_start()
 	save_item(NAME(m_tpi_pb));
 	save_item(NAME(m_tpi_pc6));
 	save_item(NAME(m_pd));
+	save_item(NAME(m_ca));
 }
 
 

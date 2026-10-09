@@ -135,6 +135,8 @@ ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, d
 
 void ieee488_device::device_start()
 {
+	save_item(NAME(m_line));
+	save_item(NAME(m_dio));
 }
 
 
@@ -160,6 +162,8 @@ void ieee488_device::add_device(ieee488_slot_device *slot, device_t *target)
 	entry->m_interface->m_slot = slot;
 
 	m_device_list.append(*entry);
+	save_item(NAME(entry->m_line), m_device_list.count());
+	save_item(NAME(entry->m_dio), m_device_list.count());
 }
 
 

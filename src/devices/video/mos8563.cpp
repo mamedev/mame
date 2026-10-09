@@ -177,6 +177,8 @@ void mos8563_device::device_start()
 	save_item(NAME(m_sync_polarity));
 	save_item(NAME(m_revision));
 	save_item(NAME(m_clk_scale));
+	save_item(NAME(m_char_blink_state));
+	save_item(NAME(m_char_blink_count));
 }
 
 void mos8568_device::device_start()
