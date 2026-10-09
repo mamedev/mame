@@ -6299,6 +6299,8 @@ if BUSES["VIC20"] then
 	files {
 		MAME_DIR .. "src/devices/bus/vic20/exp.cpp",
 		MAME_DIR .. "src/devices/bus/vic20/exp.h",
+		MAME_DIR .. "src/devices/bus/vic20/32k.cpp",
+		MAME_DIR .. "src/devices/bus/vic20/32k.h",
 		MAME_DIR .. "src/devices/bus/vic20/fe3.cpp",
 		MAME_DIR .. "src/devices/bus/vic20/fe3.h",
 		MAME_DIR .. "src/devices/bus/vic20/megacart.cpp",
