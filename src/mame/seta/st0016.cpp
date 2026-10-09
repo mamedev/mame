@@ -589,7 +589,7 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 									if (!flipx) { drawxpos = xpos + xloop; }
 									else { drawxpos = (xpos + 8 - 1) - xloop; }
 
-									if (drawxpos > cliprect.max_x)
+									if (drawxpos > cliprect.right())
 										drawxpos -= 512; // wrap around
 
 									if (cliprect.contains(drawxpos, drawypos))
@@ -697,11 +697,11 @@ void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &clipre
 		{
 			tilemap_t *tilemap = m_tilemap[i].tmap;
 			bitmap_ind16 &pixmap = tilemap->pixmap();
-			for (int sy = cliprect.min_y; sy <= cliprect.max_y; sy++)
+			for (int sy = cliprect.top(); sy <= cliprect.bottom(); sy++)
 			{
 				const u16 *const srcline = &pixmap.pix((tilemap->scrolly() + sy - m_spr_dy) & 0xff);
 				u16 *const destline = &bitmap.pix(sy);
-				for (int sx = cliprect.min_x; sx <= cliprect.max_x; sx++)
+				for (int sx = cliprect.left(); sx <= cliprect.right(); sx++)
 				{
 					const u16 pixdata = srcline[(tilemap->scrollx() + sx - m_spr_dx) & 0x1ff];
 					const bool is_trans = (pixdata & 0xf) == 0;

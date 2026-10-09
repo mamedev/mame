@@ -94,9 +94,9 @@ void lft_craft_state::port_b_w(uint8_t data)
 
 void lft_craft_state::port_c_w(uint8_t data)
 {
-	m_gpio_c = data;
+	m_gpio_c = data & 0x3f;
 	video_update();
-	m_latched_color = data;
+	m_latched_color = m_gpio_c;
 }
 
 void lft_craft_state::port_d_w(uint8_t data)
@@ -158,7 +158,9 @@ uint32_t lft_craft_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 		uint8_t *src = &m_pixels[y * LINE_CYCLES];
 		for(int x = 0; x < LINE_CYCLES; x++)
 		{
-			*dst++ = pens[*src++];
+			*dst++ = pens[*src];
+			*src = 0; // otherwise junk persists onscreen
+			src++;
 		}
 	}
 	return 0;

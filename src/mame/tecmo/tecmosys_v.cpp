@@ -33,7 +33,7 @@ void tecmosys_state::tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w(offs_t offset,
 
 void tecmosys_state::render_sprites_to_bitmap(const rectangle &cliprect, u16 extrax, u16 extray )
 {
-	const rectangle scaled_cliprect((cliprect.min_x << 8), ((cliprect.max_x + 1) << 8), (cliprect.min_y << 8), ((cliprect.max_y + 1) << 8));
+	const rectangle scaled_cliprect(cliprect.left() << 8, (cliprect.right() + 1) << 8, cliprect.top() << 8, (cliprect.bottom() + 1) << 8);
 
 	/* render sprites (with priority information) to temp bitmap */
 	m_sprite_bitmap.fill(0x0000, cliprect);
@@ -97,33 +97,33 @@ void tecmosys_state::render_sprites_to_bitmap(const rectangle &cliprect, u16 ext
 		{
 			int drawx_base = x;
 			int srcx = 0;
-			if (drawx_base < cliprect.min_x)
+			if (drawx_base < cliprect.left())
 			{
-				const int remains = cliprect.min_x - drawx_base;
+				const int remains = cliprect.left() - drawx_base;
 				drawx_base += remains;
 				srcx += remains;
 			}
 			if (srcx >= xsize)
 				continue;
 
-			if (drawx_base > cliprect.max_x)
+			if (drawx_base > cliprect.right())
 				continue;
 
 			int drawy = y;
 			int srcy = 0;
-			if (drawy < cliprect.min_y)
+			if (drawy < cliprect.top())
 			{
-				const int remains = cliprect.min_y - drawy;
+				const int remains = cliprect.top() - drawy;
 				drawy += remains;
 				srcy += remains;
 			}
 			if (srcy >= ysize)
 				continue;
 
-			if (drawy > cliprect.max_y)
+			if (drawy > cliprect.bottom())
 				continue;
 
-			for (int ycnt = srcy; (drawy <= cliprect.max_y) && (ycnt < ysize); ycnt++, drawy++)
+			for (int ycnt = srcy; (drawy <= cliprect.bottom()) && (ycnt < ysize); ycnt++, drawy++)
 			{
 				int ressy;
 				if (flipy) ressy = (ysize - 1) - ycnt;
@@ -132,7 +132,7 @@ void tecmosys_state::render_sprites_to_bitmap(const rectangle &cliprect, u16 ext
 				const u32 srcoffs = address + (ressy * xsize);
 				u16 *const dstptr = &m_sprite_bitmap.pix(drawy);
 
-				for (int drawx = drawx_base, xcnt = srcx; (drawx <= cliprect.max_x) && (xcnt < xsize); xcnt++, drawx++)
+				for (int drawx = drawx_base, xcnt = srcx; (drawx <= cliprect.right()) && (xcnt < xsize); xcnt++, drawx++)
 				{
 					int ressx;
 					if (flipx) ressx = (xsize - 1) - xcnt;
@@ -149,7 +149,7 @@ void tecmosys_state::render_sprites_to_bitmap(const rectangle &cliprect, u16 ext
 		{
 			int drawx_base = x << 8;
 			int srcx = 0;
-			while (drawx_base < scaled_cliprect.min_x)
+			while (drawx_base < scaled_cliprect.left())
 			{
 				drawx_base += zoomx;
 				srcx++;
@@ -159,12 +159,12 @@ void tecmosys_state::render_sprites_to_bitmap(const rectangle &cliprect, u16 ext
 			if (srcx >= xsize)
 				continue;
 
-			if (drawx_base >= scaled_cliprect.max_x)
+			if (drawx_base >= scaled_cliprect.right())
 				continue;
 
 			int drawy = y << 8;
 			int srcy = 0;
-			while (drawy < scaled_cliprect.min_y)
+			while (drawy < scaled_cliprect.top())
 			{
 				drawy += zoomy;
 				srcy++;
@@ -174,10 +174,10 @@ void tecmosys_state::render_sprites_to_bitmap(const rectangle &cliprect, u16 ext
 			if (srcy >= ysize)
 				continue;
 
-			if (drawy >= scaled_cliprect.max_y)
+			if (drawy >= scaled_cliprect.bottom())
 				continue;
 
-			for (int ycnt = srcy; (drawy < scaled_cliprect.max_y) && (ycnt < ysize); ycnt++, drawy += zoomy)
+			for (int ycnt = srcy; (drawy < scaled_cliprect.bottom()) && (ycnt < ysize); ycnt++, drawy += zoomy)
 			{
 				int ressy;
 				if (flipy) ressy = (ysize - 1) - ycnt;
@@ -186,7 +186,7 @@ void tecmosys_state::render_sprites_to_bitmap(const rectangle &cliprect, u16 ext
 				const u32 srcoffs = address + (ressy * xsize);
 				u16 *const dstptr = &m_sprite_bitmap.pix(drawy >> 8);
 
-				for (int drawx = drawx_base, xcnt = srcx; (drawx < scaled_cliprect.max_x) && (xcnt < xsize); xcnt++, drawx += zoomx)
+				for (int drawx = drawx_base, xcnt = srcx; (drawx < scaled_cliprect.right()) && (xcnt < xsize); xcnt++, drawx += zoomx)
 				{
 					int ressx;
 					if (flipx) ressx = (xsize - 1) - xcnt;
@@ -204,11 +204,11 @@ void tecmosys_state::render_sprites_to_bitmap(const rectangle &cliprect, u16 ext
 
 void tecmosys_state::tilemap_copy_to_compose(u16 pri, const rectangle &cliprect)
 {
-	for (int y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u16 const *const srcptr = &m_tmp_tilemap_renderbitmap.pix(y);
 		u16 *const dstptr = &m_tmp_tilemap_composebitmap.pix(y);
-		for (int x=cliprect.min_x;x<=cliprect.max_x;x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			if ((srcptr[x]&0xf)!=0x0)
 				dstptr[x] = (srcptr[x]&0x7ff) | pri;
@@ -221,13 +221,13 @@ void tecmosys_state::do_final_mix(bitmap_rgb32 &bitmap, const rectangle &cliprec
 {
 	pen_t const *const paldata = m_palette->pens();
 
-	for (int y=cliprect.min_y;y<=cliprect.max_y;y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u16 const *const srcptr = &m_tmp_tilemap_composebitmap.pix(y);
 		u16 const *const srcptr2 = &m_sprite_bitmap.pix(y);
 
 		u32 *const dstptr = &bitmap.pix(y);
-		for (int x=cliprect.min_x;x<=cliprect.max_x;x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			u16 const pri = srcptr[x] & 0xc000;
 			u16 const pri2 = srcptr2[x] & 0xc000;

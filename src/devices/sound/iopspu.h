@@ -64,7 +64,10 @@ protected:
 	class voice_t
 	{
 	public:
-		voice_t() {}
+		voice_t()
+			: m_unknown{}
+		{
+		}
 
 		void write(uint32_t offset, uint16_t data);
 		uint16_t read(uint32_t offset);

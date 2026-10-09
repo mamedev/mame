@@ -1393,7 +1393,7 @@ void duart_channel::rcv_complete()
 
 void duart_channel::rx_fifo_push(uint8_t data, uint8_t errors)
 {
-	if (rx_fifo_num == (MC68681_RX_FIFO_SIZE + 1))
+	if (rx_fifo_num == MC68681_RX_FIFO_SIZE)
 	{
 		logerror("68681: FIFO overflow\n");
 		SR |= STATUS_OVERRUN_ERROR;
@@ -1731,6 +1731,7 @@ void duart_channel::write_CR(uint8_t data)
 		SR &= ~STATUS_RECEIVER_READY;
 		SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR);
 		SR &= ~STATUS_OVERRUN_ERROR; // is this correct?
+		SR &= ~STATUS_FIFO_FULL;
 		rx_fifo_read_ptr = 0;
 		rx_fifo_write_ptr = 0;
 		rx_fifo_num = 0;

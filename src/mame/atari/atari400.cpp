@@ -69,9 +69,9 @@
 #include "sound/dac.h"
 #include "sound/pokey.h"
 
-#include "bus/a800/a800_slot.h"
-#include "bus/a800/a800_carts.h"
-#include "bus/a800/a8sio.h"
+#include "bus/a800/cart/a800_slot.h"
+#include "bus/a800/cart/a800_carts.h"
+#include "bus/a800/sio/a8sio.h"
 #include "bus/vcs_ctrl/ctrl.h"
 
 #include "screen.h"
@@ -799,16 +799,34 @@ static INPUT_PORTS_START( atari_keyboard )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
 INPUT_PORTS_END
 
-
-
 static INPUT_PORTS_START( a800 )
 	PORT_INCLUDE( atari_artifacting )
 	PORT_INCLUDE( atari_console )
 	PORT_INCLUDE( atari_keyboard )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( a1200xl )
+// all models after a1200xl have an extra help key, with variable position
+// i.e. to the right on a1200xl after the Fn keys, to the left of console keys on a130xe
+static INPUT_PORTS_START( a800xl )
 	PORT_INCLUDE( a800 )
+
+	PORT_MODIFY("keyboard.2")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("HELP") PORT_CODE(KEYCODE_F8)
+INPUT_PORTS_END
+
+// function keys are exclusive to this model
+static INPUT_PORTS_START( a1200xl )
+	PORT_INCLUDE( a800xl )
+
+	// TODO: figure out how to trigger F1 (same path as break key)
+	// press help key on Atari logo to access self-test like later models
+
+	PORT_MODIFY("keyboard.0")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F5)
+
+	PORT_MODIFY("keyboard.2")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F6)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F7)
 
 	// option jumpers, available on a1200xl only
 	// J1 causes a self-test if installed
@@ -2427,19 +2445,22 @@ ROM_END
  **************************************************************/
 
 /*     YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   CLASS       INIT        COMPANY  FULLNAME */
-COMP( 1979, a400,    0,      0,      a400,      a800,   a400_state,   empty_init, "Atari", "Atari 400 (NTSC)",     0)
-COMP( 1979, a400pal, a400,   0,      a400pal,   a800,   a400_state,   empty_init, "Atari", "Atari 400 (PAL)",      0)
-COMP( 1979, a800,    0,      0,      a800,      a800,   a800_state,   empty_init, "Atari", "Atari 800 (NTSC)",     0)
-COMP( 1979, a800pal, a800,   0,      a800pal,   a800,   a800_state,   empty_init, "Atari", "Atari 800 (PAL)",      0)
-COMP( 1982, a1200xl, a800,   0,      a1200xl,   a1200xl,a1200xl_state, empty_init, "Atari", "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
-COMP( 1983, a600xl,  a800xl, 0,      a600xl,    a800,   a600xl_state, empty_init, "Atari", "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM
-COMP( 1983, a800xl,  0,      0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1983, a800xlp, a800xl, 0,      a800xlpal, a800,   a800xl_state, empty_init, "Atari", "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1986, a65xe,   a800xl, 0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 65XE",           MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1986, a65xea,  a800xl, 0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 65XE (Arabic)",  MACHINE_NOT_WORKING )
-COMP( 1986, a130xe,  a800xl, 0,      a130xe,    a800,   a130xe_state, empty_init, "Atari", "Atari 130XE",          MACHINE_NOT_WORKING )      // 128k RAM
-COMP( 1986, a800xe,  a800xl, 0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 800XE",          MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1987, xegs,    0,      0,      xegs,      a800,   xegs_state,   empty_init, "Atari", "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS )  // 64k RAM
+COMP( 1979, a400,    0,      0,      a400,      a800,    a400_state,   empty_init, "Atari", "Atari 400 (NTSC)",     0)
+COMP( 1979, a400pal, a400,   0,      a400pal,   a800,    a400_state,   empty_init, "Atari", "Atari 400 (PAL)",      0)
+COMP( 1979, a800,    0,      0,      a800,      a800,    a800_state,   empty_init, "Atari", "Atari 800 (NTSC)",     0)
+COMP( 1979, a800pal, a800,   0,      a800pal,   a800,    a800_state,   empty_init, "Atari", "Atari 800 (PAL)",      0)
+COMP( 1982, a1200xl, a800,   0,      a1200xl,   a1200xl, a1200xl_state,empty_init, "Atari", "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM, no PBI slot
 
-CONS( 1982, a5200,   0,      0,      a5200,     a5200,  a5200_state,  empty_init, "Atari", "Atari 5200",           0)
-CONS( 1983, a5200a,  a5200,  0,      a5200a,    a5200a, a5200_state,  empty_init, "Atari", "Atari 5200 (2-port)",  0)
+COMP( 1983, a600xl,  a800xl, 0,      a600xl,    a800xl,  a600xl_state, empty_init, "Atari", "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM, 1 PBI slot
+COMP( 1983, a800xl,  0,      0,      a800xl,    a800xl,  a800xl_state, empty_init, "Atari", "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM, 1 PBI slot
+COMP( 1983, a800xlp, a800xl, 0,      a800xlpal, a800xl,  a800xl_state, empty_init, "Atari", "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM, 1 PBI slot
+
+COMP( 1985, a130xe,  0,      0,      a130xe,    a800xl,  a130xe_state, empty_init, "Atari", "Atari 130XE",          MACHINE_NOT_WORKING )      // 128k RAM, 1 ECI slot
+COMP( 1985, a65xe,   a130xe, 0,      a800xl,    a800xl,  a800xl_state, empty_init, "Atari", "Atari 65XE",           MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM, 0 or 1 ECI slot
+COMP( 1985, a65xea,  a130xe, 0,      a800xl,    a800xl,  a800xl_state, empty_init, "Atari", "Atari 65XE (Arabic)",  MACHINE_NOT_WORKING ) // ^ 1 ECI slot
+COMP( 1987, a800xe,  a130xe, 0,      a800xl,    a800xl,  a800xl_state, empty_init, "Atari", "Atari 800XE",          MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM, 0 or 1 ECI slot, rebranded 65XE for Central Europe market
+
+COMP( 1987, xegs,    0,      0,      xegs,      a800xl,  xegs_state,   empty_init, "Atari", "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS )  // 64k RAM, no ECI slot
+
+CONS( 1982, a5200,   0,      0,      a5200,     a5200,   a5200_state,  empty_init, "Atari", "Atari 5200",           0)
+CONS( 1983, a5200a,  a5200,  0,      a5200a,    a5200a,  a5200_state,  empty_init, "Atari", "Atari 5200 (2-port)",  0)

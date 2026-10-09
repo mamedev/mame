@@ -94,6 +94,9 @@ c64_partner_cartridge_device::c64_partner_cartridge_device(const machine_config 
 
 void c64_partner_cartridge_device::device_start()
 {
+	save_item(NAME(m_a0));
+	save_item(NAME(m_a6));
+	save_item(NAME(m_nmi));
 }
 
 

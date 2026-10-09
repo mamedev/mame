@@ -121,9 +121,9 @@ void toaplan_txtilemap_device::draw_tilemap_base(screen_device &screen, BitmapCl
 	m_tilemap->set_flip(m_lineselect[0] & 0x8000 ? 0 : TILEMAP_FLIPX);
 
 	/* line select is used for 'for use in' and '8ing' screen on bbakraid, 'Raizing' logo on batrider */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		clip.min_y = clip.max_y = y;
+		clip.sety(y, y);
 		m_tilemap->set_scrolly(0, m_lineselect[y] - y);
 		m_tilemap->draw(screen, bitmap, clip, 0);
 	}

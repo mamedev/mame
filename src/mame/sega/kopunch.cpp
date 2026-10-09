@@ -210,7 +210,7 @@ uint32_t kopunch_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	// background does not wrap around horizontally
 	rectangle bg_clip = cliprect;
-	bg_clip.max_x = m_scrollx ^ 0xff;
+	bg_clip.setx(bg_clip.left(), m_scrollx ^ 0xff);
 
 	m_bg_tilemap->draw(screen, bitmap, bg_clip, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

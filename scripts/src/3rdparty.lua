@@ -1908,6 +1908,82 @@ project "ymfm"
 
 
 --------------------------------------------------
+-- reSIDfp library objects
+--------------------------------------------------
+
+project "residfp"
+	uuid "8a6f7e6c-56b9-4770-851f-2f8aa62cb3d8"
+	kind "StaticLib"
+
+	configuration { }
+
+	includedirs {
+		MAME_DIR .. "3rdparty/residfp",
+	}
+
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+		configuration { "gmake or ninja or jcdb" }
+			buildoptions_cpp {
+				"-Wno-mismatched-tags",
+			}
+		configuration { }
+	end
+
+	files {
+		MAME_DIR .. "3rdparty/residfp/Dac.cpp",
+		MAME_DIR .. "3rdparty/residfp/Dac.h",
+		MAME_DIR .. "3rdparty/residfp/EnvelopeGenerator.cpp",
+		MAME_DIR .. "3rdparty/residfp/EnvelopeGenerator.h",
+		MAME_DIR .. "3rdparty/residfp/ExternalFilter.cpp",
+		MAME_DIR .. "3rdparty/residfp/ExternalFilter.h",
+		MAME_DIR .. "3rdparty/residfp/Filter.cpp",
+		MAME_DIR .. "3rdparty/residfp/Filter.h",
+		MAME_DIR .. "3rdparty/residfp/Filter6581.cpp",
+		MAME_DIR .. "3rdparty/residfp/Filter6581.h",
+		MAME_DIR .. "3rdparty/residfp/Filter8580.cpp",
+		MAME_DIR .. "3rdparty/residfp/Filter8580.h",
+		MAME_DIR .. "3rdparty/residfp/FilterModelConfig.cpp",
+		MAME_DIR .. "3rdparty/residfp/FilterModelConfig.h",
+		MAME_DIR .. "3rdparty/residfp/FilterModelConfig6581.cpp",
+		MAME_DIR .. "3rdparty/residfp/FilterModelConfig6581.h",
+		MAME_DIR .. "3rdparty/residfp/FilterModelConfig8580.cpp",
+		MAME_DIR .. "3rdparty/residfp/FilterModelConfig8580.h",
+		MAME_DIR .. "3rdparty/residfp/Integrator.h",
+		MAME_DIR .. "3rdparty/residfp/Integrator6581.cpp",
+		MAME_DIR .. "3rdparty/residfp/Integrator6581.h",
+		MAME_DIR .. "3rdparty/residfp/Integrator8580.cpp",
+		MAME_DIR .. "3rdparty/residfp/Integrator8580.h",
+		MAME_DIR .. "3rdparty/residfp/OpAmp.cpp",
+		MAME_DIR .. "3rdparty/residfp/OpAmp.h",
+		MAME_DIR .. "3rdparty/residfp/SID.cpp",
+		MAME_DIR .. "3rdparty/residfp/SID.h",
+		MAME_DIR .. "3rdparty/residfp/Spline.cpp",
+		MAME_DIR .. "3rdparty/residfp/Spline.h",
+		MAME_DIR .. "3rdparty/residfp/State.cpp",
+		MAME_DIR .. "3rdparty/residfp/State.h",
+		MAME_DIR .. "3rdparty/residfp/Voice.h",
+		MAME_DIR .. "3rdparty/residfp/WaveformCalculator.cpp",
+		MAME_DIR .. "3rdparty/residfp/WaveformCalculator.h",
+		MAME_DIR .. "3rdparty/residfp/WaveformGenerator.cpp",
+		MAME_DIR .. "3rdparty/residfp/WaveformGenerator.h",
+		MAME_DIR .. "3rdparty/residfp/array.h",
+		MAME_DIR .. "3rdparty/residfp/siddefs-fp.h",
+		MAME_DIR .. "3rdparty/residfp/version.cc",
+		MAME_DIR .. "3rdparty/residfp/resample/Limiter.h",
+		MAME_DIR .. "3rdparty/residfp/resample/PassThrough.h",
+		MAME_DIR .. "3rdparty/residfp/resample/Resampler.h",
+		MAME_DIR .. "3rdparty/residfp/resample/SincResampler.cpp",
+		MAME_DIR .. "3rdparty/residfp/resample/SincResampler.h",
+		MAME_DIR .. "3rdparty/residfp/resample/TwoPassSincResampler.h",
+		MAME_DIR .. "3rdparty/residfp/resample/ZeroOrderResampler.h",
+		MAME_DIR .. "3rdparty/residfp/residfp/residfp.cpp",
+		MAME_DIR .. "3rdparty/residfp/residfp/residfp.h",
+		MAME_DIR .. "3rdparty/residfp/residfp/residfp_defs.h",
+		MAME_DIR .. "3rdparty/residfp/residfp/sidversion.h",
+	}
+
+
+--------------------------------------------------
 -- asmjit library
 --------------------------------------------------
 

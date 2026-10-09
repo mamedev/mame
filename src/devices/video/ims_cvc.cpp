@@ -193,9 +193,12 @@ u32 g300_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rect
 {
 	offs_t address = m_tos;
 
-	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
-		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x++)
-			bitmap.pix(y, x) = pen_color(m_vram->read(address++ ^ m_swap) & m_mask);
+	for (int y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
+	{
+		auto *const dst = &bitmap.pix(y);
+		for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x++)
+			dst[x] = pen_color(m_vram->read(address++ ^ m_swap) & m_mask);
+	}
 
 	return 0;
 }
@@ -207,8 +210,8 @@ u32 g332_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rect
 	switch (m_control_a & PIXEL_BITS)
 	{
 	case BPP_1:
-		for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
-			for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 8)
+		for (int y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
+			for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x += 8)
 			{
 				u8 pixel_data = m_vram->read(address++ ^ m_swap);
 
@@ -224,8 +227,8 @@ u32 g332_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rect
 		break;
 
 	case BPP_2:
-		for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
-			for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 4)
+		for (int y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
+			for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x += 4)
 			{
 				u8 pixel_data = m_vram->read(address++ ^ m_swap);
 
@@ -237,8 +240,8 @@ u32 g332_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rect
 		break;
 
 	case BPP_4:
-		for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
-			for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 2)
+		for (int y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
+			for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x += 2)
 			{
 				u8 pixel_data = m_vram->read(address++ ^ m_swap);
 
@@ -248,8 +251,8 @@ u32 g332_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rect
 		break;
 
 	case BPP_8:
-		for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
-			for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x++)
+		for (int y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
+			for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x++)
 				bitmap.pix(y, x) = pen_color(m_vram->read(address++ ^ m_swap) & m_mask);
 		break;
 	}
@@ -257,8 +260,8 @@ u32 g332_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rect
 	if (!(m_control_a & CURSOR_DISABLE))
 	{
 		// get cursor origin
-		int const cursor_x = screen.visible_area().min_x + util::sext(m_cursor_start >> 12, 12);
-		int const cursor_y = screen.visible_area().min_y + util::sext(m_cursor_start, 12);
+		int const cursor_x = screen.visible_area().left() + util::sext(m_cursor_start >> 12, 12);
+		int const cursor_y = screen.visible_area().top() + util::sext(m_cursor_start, 12);
 
 		// intersect cursor with screen
 		rectangle cursor(cursor_x, cursor_x + 63, cursor_y, cursor_y + 63);

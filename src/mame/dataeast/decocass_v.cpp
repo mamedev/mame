@@ -698,10 +698,10 @@ void decocass_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_bg_tilemap_l_clip = m_screen->visible_area();
-	m_bg_tilemap_l_clip.max_y = 256 / 2 - 1;
+	m_bg_tilemap_l_clip.sety(m_bg_tilemap_l_clip.top(), 256 / 2 - 1);
 
 	m_bg_tilemap_r_clip = m_screen->visible_area();
-	m_bg_tilemap_r_clip.min_y = 256 / 2;
+	m_bg_tilemap_r_clip.sety(256 / 2, m_bg_tilemap_r_clip.bottom());
 
 	/* background videoram bits D0-D3 are shared with the tileram */
 	m_bgvideoram = m_tileram;

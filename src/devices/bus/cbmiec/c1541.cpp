@@ -302,12 +302,20 @@ const tiny_rom_entry *sx1541_device::device_rom_region() const
 void c1541_device_base::c1541_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x6000).ram();
-	map(0x1800, 0x180f).mirror(0x63f0).m(m_via0, FUNC(via6522_device::map));
+	map(0x1800, 0x180f).mirror(0x63f0).r(FUNC(c1541_device_base::via0_r)).w(m_via0, FUNC(via6522_device::write));
 	map(0x1c00, 0x1c0f).mirror(0x63f0).m(m_via1, FUNC(via6522_device::map));
 	map(0x8000, 0xbfff).mirror(0x4000).rom().region(M6502_TAG, 0);
 }
 
 
+
+uint8_t c1541_device_base::via0_r(offs_t offset)
+{
+	if (!offset && !m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
+	return m_via0->read(offset);
+}
 
 uint8_t c1541_device_base::via0_pb_r()
 {
@@ -341,16 +349,6 @@ uint8_t c1541_device_base::via0_pb_r()
 	data |= !m_bus->atn_r() << 7;
 
 	return data;
-}
-
-TIMER_CALLBACK_MEMBER(c1541_device_base::iec_sync_tick)
-{
-	m_via0->write_ca1(!m_bus->atn_r());
-
-	m_bus->clk_w(this, m_iec_clk);
-
-	bool data = m_iec_data && !m_ga->atn_r();
-	m_bus->data_w(this, data);
 }
 
 void c1541_device_base::via0_pb_w(uint8_t data)
@@ -437,7 +435,9 @@ void c1541_device_base::via1_pb_w(uint8_t data)
 
 void c1541_device_base::atn_w(int state)
 {
-	m_iec_sync_timer->adjust(attotime::zero);
+	m_via0->write_ca1(!m_bus->atn_r());
+	m_bus->clk_w(this, m_iec_clk);
+	m_bus->data_w(this, m_iec_data && !state);
 }
 
 
@@ -492,6 +492,7 @@ void c1541_device_base::device_add_mconfig(machine_config &config)
 	connector.option_add("525ssqd", ALPS_3255190X);
 	connector.set_default_option("525ssqd");
 	connector.set_fixed(true);
+	connector.set_media_change_time(attotime::from_msec(100));
 	connector.set_formats(c1541_device_base::floppy_formats);
 
 	connector.enable_sound("c1541");
@@ -548,7 +549,9 @@ c1541_device_base::c1541_device_base(const machine_config &mconfig, device_type 
 	m_via1(*this, M6522_1_TAG),
 	m_ga(*this, C64H156_TAG),
 	m_address(*this, "ADDRESS"),
-	m_leds(*this, "led%u", 0U)
+	m_leds(*this, "led%u", 0U),
+	m_iec_clk(true),
+	m_iec_data(true)
 {
 }
 
@@ -600,7 +603,6 @@ sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, dev
 void c1541_device_base::device_start()
 {
 	m_mtr_on_timer = timer_alloc(FUNC(c1541_device_base::mtr_on_tick), this);
-	m_iec_sync_timer = timer_alloc(FUNC(c1541_device_base::iec_sync_tick), this);
 
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);

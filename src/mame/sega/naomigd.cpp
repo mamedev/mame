@@ -509,10 +509,8 @@ naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *
 	dimm_des_key(0)
 {
 	image_tag = nullptr;
-	picbus = 0;
-	picbus_pullup = 0xf;
-	picbus_io[0] = 0xf;
-	picbus_io[1] = 0xf;
+	picbus_dimm = 0x0f;
+	picbus_pic = 0x0f;
 	picbus_used = false;
 }
 
@@ -764,37 +762,41 @@ uint64_t naomi_gdrom_board::i2cmem_dimm_r()
 {
 	uint8_t ret;
 
-	ret = m_i2c0->read_sda();
-	ret |= m_i2c1->read_sda();
+	ret = m_i2c0->read_sda() & m_i2c1->read_sda();
 	ret = ret << 1;
-	if (picbus_used == true)
-		ret |= ((picbus | picbus_pullup) & 0xf) << 2;
+
+	if (picbus_used)
+		ret |= (picbus_dimm & picbus_pic) << 2;
 	else
 		ret |= m_eeprom->do_read() << 5;
+
 	return ret;
 }
 
 void naomi_gdrom_board::i2cmem_dimm_w(uint64_t data)
 {
-	if (data & 0x40000)
-	{
-		m_i2c0->write_sda((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-		m_i2c1->write_sda((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-	}
-	m_i2c0->write_scl((data & 0x1) ? ASSERT_LINE : CLEAR_LINE);
-	m_i2c1->write_scl((data & 0x1) ? ASSERT_LINE : CLEAR_LINE);
+	const int sda = (data & 0x40000) ? BIT(data, 1) : 1;
+	const int scl = (data & 0x10000) ? BIT(data, 0) : 1;
+
+	m_i2c0->write_sda(sda);
+	m_i2c1->write_sda(sda);
+	m_i2c0->write_scl(scl);
+	m_i2c1->write_scl(scl);
+
 	if (data & 0x0200)
 	{
 		picbus_used = true;
-		picbus_io[0] = (uint8_t)(~data >> (16 + 5 * 2 - 3)) & 0x8; // clock only for now
-		picbus = (data >> 2) & 0xf;
-		picbus_pullup = (picbus_io[0] & picbus_io[1]) & 0xf; // high if both are inputs
+		// extract pin direction from PCTRA field (pins not driven are pulled up)
+		const uint8_t drive_mask = bitswap<4>(data, 26, 24, 22, 20);
+		// SH4 GPIO pins 2-5 connect to PIC RB0-RB3
+		picbus_dimm = ((data >> 2) & drive_mask) | (~drive_mask & 0x0f);
 		m_maincpu->abort_timeslice();
 		machine().scheduler().perfect_quantum(attotime::from_msec(1));
 	}
 	else
 	{
 		picbus_used = false;
+		picbus_dimm = 0x0f;
 		m_eeprom->di_write((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 		m_eeprom->cs_write((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 		m_eeprom->clk_write((data & 0x8) ? ASSERT_LINE : CLEAR_LINE);
@@ -803,16 +805,14 @@ void naomi_gdrom_board::i2cmem_dimm_w(uint64_t data)
 
 uint8_t naomi_gdrom_board::pic_dimm_r()
 {
-	return picbus | picbus_pullup;
+	return picbus_dimm & picbus_pic;
 }
 
 void naomi_gdrom_board::pic_dimm_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	picbus = data;
+	// pins not driven are pulled up
+	picbus_pic = (data | ~mem_mask) & 0x0f;
 	m_securitycpu->abort_timeslice();
-
-	picbus_io[1] = ~mem_mask; // for each bit specify direction, 0 out 1 in
-	picbus_pullup = (picbus_io[0] & picbus_io[1]) & 0xf; // high if both are inputs
 }
 
 void naomi_gdrom_board::find_file(const char *name, const uint8_t *dir_sector, uint32_t &file_start, uint32_t &file_size)
@@ -981,9 +981,8 @@ void naomi_gdrom_board::device_start()
 	space_6154 = &m_315_6154->space(sega_315_6154_device::AS_PCI_MEMORY);
 
 	save_item(NAME(dimm_cur_address));
-	save_item(NAME(picbus));
-	save_item(NAME(picbus_pullup));
-	save_item(NAME(picbus_io));
+	save_item(NAME(picbus_dimm));
+	save_item(NAME(picbus_pic));
 	save_item(NAME(picbus_used));
 	save_item(NAME(dimm_command));
 	save_item(NAME(dimm_offsetl));
@@ -1000,6 +999,10 @@ void naomi_gdrom_board::device_reset()
 	int dips = m_debug_dipswitches->read();
 
 	naomi_board::device_reset();
+
+	picbus_dimm = 0x0f;
+	picbus_pic = 0x0f;
+	picbus_used = false;
 
 	if (dips & 1)
 	{
@@ -1085,7 +1088,6 @@ void naomi_gdrom_board::device_add_mconfig(machine_config &config)
 	PIC16C622(config, m_securitycpu, PIC_CLOCK);
 	m_securitycpu->read_b().set(FUNC(naomi_gdrom_board::pic_dimm_r));
 	m_securitycpu->write_b().set(FUNC(naomi_gdrom_board::pic_dimm_w));
-	m_securitycpu->set_config(0x3fff - 0x04);
 
 	I2C_24C01(config, m_i2c0);
 	m_i2c0->set_e0(0);
@@ -1149,11 +1151,17 @@ ROM_START( dimm )
 	ROMX_LOAD( "401_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(edb52597108462bcea8eb2a47c19e51e5fb60638), ROM_BIOS(8))
 
 	// dynamically filled with data
-	ROM_REGION(0x1000, "pic", ROMREGION_ERASE00)
+	ROM_REGION(0x4010, "pic", ROMREGION_ERASE00)
+	// configuration word: 0x3ffb
+	ROM_FILL(0x400e, 0x01, 0xfb)
+	ROM_FILL(0x400f, 0x01, 0x3f)
+
 	ROM_REGION(0x80, "i2c_0", ROMREGION_ERASE00)
 	ROM_LOAD("dimmspd.bin", 0x00, 0x80, CRC(45dac6d7) SHA1(4548675f8d31348fa6828d5b4f247af1f072b62d))
+
 	ROM_REGION(0x80, "i2c_1", ROMREGION_ERASE00)
 	ROM_LOAD("dimmspd.bin", 0x00, 0x80, CRC(45dac6d7) SHA1(4548675f8d31348fa6828d5b4f247af1f072b62d))
+
 	ROM_REGION(0x80, "eeprom", ROMREGION_ERASE00)
 	ROM_LOAD("93c46.bin", 0x00, 0x80, CRC(daafbccd) SHA1(1e39983779a62ebc6801ec6f2a5138717a7a5259))
 ROM_END

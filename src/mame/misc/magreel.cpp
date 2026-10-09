@@ -27,7 +27,7 @@ UNDUMPED:
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/pic16c62x/pic16c62x.h"
+#include "cpu/pic16_mid/pic16_mid.h"
 
 #include "screen.h"
 #include "speaker.h"

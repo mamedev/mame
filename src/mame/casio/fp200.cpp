@@ -101,9 +101,10 @@ void fp200_state::video_start()
 
 uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	for(int y = cliprect.min_x; y <= cliprect.max_y; y ++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x ++)
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			const u8 which = x < 80;
 			const u8 x_tile = x >> 3;
@@ -114,7 +115,7 @@ uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 
 			const u8 vram = m_lcd_vram[which][(base_addr + yi * 0x10) & 0x3ff];
 			uint8_t const pix = BIT(vram, xi);
-			bitmap.pix(y, x) = pix;
+			dst[x] = pix;
 		}
 	}
 

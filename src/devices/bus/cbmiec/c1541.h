@@ -53,6 +53,8 @@ protected:
 
 	void c1541_mem(address_map &map) ATTR_COLD;
 
+	uint8_t via0_r(offs_t offset);
+
 private:
 	enum
 	{
@@ -79,9 +81,6 @@ private:
 
 	emu_timer *m_mtr_on_timer;
 	TIMER_CALLBACK_MEMBER(mtr_on_tick);
-	
-	emu_timer *m_iec_sync_timer;
-	TIMER_CALLBACK_MEMBER(iec_sync_tick);
 };
 
 

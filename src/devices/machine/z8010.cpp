@@ -49,6 +49,8 @@ inline void z8010_device::INC_DSC(const uint8_t max_dsc = DSC_SDR_ATTR)
 {
 	if (m_dsc < max_dsc)
 		++m_dsc;
+	else
+		m_dsc = DSC_SDR_BAH;
 }
 
 //-------------------------------------------------
@@ -89,7 +91,8 @@ z8010_device::z8010_device(const machine_config &mconfig, const char *tag, devic
 	m_iseg(0),
 	m_ihoffs(0),
 	m_if1_seg(0),
-	m_if1_hoffs(0)
+	m_if1_hoffs(0),
+	m_cpu_suppress(false)
 {
 }
 
@@ -113,6 +116,7 @@ void z8010_device::device_start()
 	save_item(NAME(m_ihoffs));
 	save_item(NAME(m_if1_seg));
 	save_item(NAME(m_if1_hoffs));
+	save_item(NAME(m_cpu_suppress));
 }
 
 //-------------------------------------------------
@@ -134,6 +138,7 @@ void z8010_device::device_reset()
 	m_ihoffs = 0;
 	m_if1_seg = 0;
 	m_if1_hoffs = 0;
+	m_cpu_suppress = false;
 }
 
 //-------------------------------------------------
@@ -148,6 +153,7 @@ void z8010_device::device_reset()
 // freezes a copy into the instruction seg/offset status registers.
 void z8010_device::ifetch1_observed(offs_t offset)
 {
+	instruction_end();
 	m_if1_seg = (uint8_t)(offset >> 16) & 0x7f;
 	m_if1_hoffs = (uint8_t)(offset >> 8);
 }
@@ -158,6 +164,9 @@ void z8010_device::ifetch1_observed(offs_t offset)
 
 uint16_t z8010_device::segtack_r()
 {
+	// Trap entry follows the violating instruction; its stack accesses must
+	// not inherit that instruction's suppression (datasheet, page 565).
+	instruction_end();
 	if (m_vtype)
 	{
 		m_out_segt(CLEAR_LINE);
@@ -338,7 +347,7 @@ void z8010_device::write(offs_t offset, uint8_t data)
 //  translate - translate memory address
 //-------------------------------------------------
 
-bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int st)
+z8010_device::memory_result z8010_device::translate(offs_t offset, bool write, bool sys, bool dma, int st)
 {
 	bool nsup = true;
 	bool exec;
@@ -361,9 +370,23 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 		(((m_mode & MODE_URS) != 0) != BIT(offset, 22)) ||              // Upper range select?
 		((m_mode & MODE_MST) && (((m_mode & MODE_NMS) == 0) != sys)))   // System/normal mode?
 	{
-		offset = 0;
-		LOG("%s: INVALID MMU STATE! offset: %06x, mode: %02x, sys: %01x\n", machine().describe_context(), offset, m_mode, sys);
-		return false;
+		// An unselected MMU releases its address outputs.  It does not start a
+		// new violation, but CPU suppression already in progress persists.
+		// The board determines what happens when no MMU drives the address bus.
+		return { 0, false, side_effects && !dma && m_cpu_suppress };
+	}
+
+	// SUP persists for the remainder of a CPU instruction.  An intervening
+	// DMA cycle neither inherits nor clears this state.  Continue driving the
+	// address, but do not process a suppressed CPU cycle as a new violation.
+	if (side_effects && !dma && m_cpu_suppress)
+	{
+		if (m_mode & MODE_TRNS)
+		{
+			sdr_entry const &s = SDR_ENTRY((offset >> 16) & 0x3f);
+			offset = (offset & 0xffff) + (offs_t(s.bah) << 16) + (offs_t(s.bal) << 8);
+		}
+		return { offset, true, true };
 	}
 
 	if (m_mode & MODE_TRNS) // Is translation on?
@@ -467,5 +490,9 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 		LOG("MMU TRNS: new offs %06x, seg: %02x, viol: %02x, sup: %01x\n", offset, sn, viol, !nsup);
 	}
 
-	return nsup;
+	// A protection violation suppresses the access, but does not release
+	// the translated address.  Transparent mode also drives the bus.
+	if (side_effects && !dma && !nsup)
+		m_cpu_suppress = true;
+	return { offset, true, !nsup };
 }

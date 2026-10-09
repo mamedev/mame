@@ -268,7 +268,7 @@ void x1_state::draw_fgtilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 						// apply partial update
 						// TODO: not working properly, see top of file
-						if(res_y < cliprect.min_y || res_y > cliprect.max_y)
+						if(!cliprect.containsy(res_y))
 							continue;
 
 						draw_pixel(bitmap, res_y, res_x, pcg_pen, width, 0);
@@ -360,7 +360,7 @@ void x1_state::draw_gfxbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 
 					// apply partial update
 					// TODO: not working properly, see top of file
-					if(y*(mc6845_tile_height)+yi < cliprect.min_y || y*(mc6845_tile_height)+yi > cliprect.max_y)
+					if(!cliprect.containsy(y * mc6845_tile_height + yi))
 						continue;
 
 					// TODO: call a fn subset instead of looping for a width/height that is never hit

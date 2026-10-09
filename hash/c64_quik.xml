@@ -324,4 +324,30 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=pT2det24pUA -->
+	<software name="nolimit">
+		<description>No Limit</description>
+		<year>2024</year>
+		<publisher>Aleksi Eeben</publisher>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="63425">
+				<rom name="no_limit.prg" size="63425" crc="20a5f217" sha1="ece4fea9043a6ff1af1727fff764fe10694b8d32"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=fbXIdK3o3NU-->
+	<software name="rodents">
+		<description>Rodents in the Attic</description>
+		<year>2026</year>
+		<publisher>lft</publisher>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="18248">
+				<rom name="lft-rodents-in-the-attic.prg" size="18248" crc="d42f3100" sha1="15fe873b038b03e7d29f5e1da22481b85cdb0024"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

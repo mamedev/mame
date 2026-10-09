@@ -219,6 +219,8 @@ notes:
 
 - joyman: Pacman maze hack, but they left the dots as is, the music has been mangled as well.
 
+- newpuckx, newpuckxb: Same maze hack than joyman.
+
 - ctrpllrp: Caterpillar is like Piranha in that it was sold as a unique game.  They were hoping no one would notice
   it uses pacman code for it's base.  Unlike Piranha as far as I know they got away with it.
   Differences include new music in the intermissions.
@@ -5689,6 +5691,34 @@ ROM_START( newpuckx )
 ROM_END
 
 
+// Rare bootleg with the same maze hack than joyman.
+ROM_START( newpuckxb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "npc1_2716.bin",      0x0000, 0x0800, CRC(d844b679) SHA1(c4486198b3126bb8e05a308c53787e51065f77ae) )
+	ROM_LOAD( "npc5_2716.bin",      0x0800, 0x0800, CRC(55a581fb) SHA1(a1c0517773162eb6b17d9cd9a0d17881591db8c5) )
+	ROM_LOAD( "npc2_2716.bin",      0x1000, 0x0800, CRC(7d177853) SHA1(9b5ddaaa8b564654f97af193dbcc29f81f230a25) )
+	ROM_LOAD( "npc6_2716.bin",      0x1800, 0x0800, CRC(b3c8d32e) SHA1(8b336fca1300820308cd5c4efc60bf2ba4199302) )
+	ROM_LOAD( "npc3_2716.bin",      0x2000, 0x0800, CRC(9045a44c) SHA1(a97d7016effbd2ace9a7d92ceb04a6ce18fb42f9) )
+	ROM_LOAD( "npc7_2716.bin",      0x2800, 0x0800, CRC(888f3c3e) SHA1(c2b5917bf13071131dd53ea76f0da86706db2d80) )
+	ROM_LOAD( "npc4_2716.bin",      0x3000, 0x0800, CRC(e1b3ea3e) SHA1(753fd9a52bfe32a943048711d9b0b05c97249e54) )
+	ROM_LOAD( "npc8_2716.bin",      0x3800, 0x0800, CRC(5c31050f) SHA1(0061ad952ca488076b95089c2c28ad4edbb0f97e) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "100_2516.bin",     0x0000, 0x0800, CRC(a4bf9b96) SHA1(e69a4f95eafd06b355b6fd71743030d14c155bdb) )
+	ROM_LOAD( "202_2716.bin",     0x0800, 0x0800, CRC(3591b89d) SHA1(79bb456be6c39c1ccd7d077fbe181523131fb300) )
+	ROM_LOAD( "201_2716.bin",     0x1000, 0x0800, CRC(9e39323a) SHA1(be933e691df4dbe7d12123913c3b7b7b585b7a35) )
+	ROM_LOAD( "203_2716.bin",     0x1800, 0x0800, CRC(1b1d9096) SHA1(53771c573051db43e7185b1d188533056290a620) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "82s126.4a",    0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+
+	ROM_REGION( 0x0200, "namco", 0 ) // Sound PROMs
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // Timing - not used
+ROM_END
+
+
 ROM_START( pacheart )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pacheart1.6e", 0x0000, 0x0800, CRC(d844b679) SHA1(c4486198b3126bb8e05a308c53787e51065f77ae) )
@@ -9094,7 +9124,8 @@ GAME( 1981, pacmanmr,  puckman,  pacman,   pacman,   pacman_state,  empty_init, 
 GAME( 1980, pacmanpe,  puckman,  pacman,   pacmanpe, pacman_state,  empty_init,    ROT90,  "bootleg (Petaco SA)",               "Come Come (Petaco SA bootleg of Puck Man)",                MACHINE_SUPPORTS_SAVE ) // might have a speed-up button, check
 GAME( 1980, newpuc2,   puckman,  pacman,   newpuc2,  pacman_state,  empty_init,    ROT90,  "hack",                              "Newpuc2 (set 1)",                                          MACHINE_SUPPORTS_SAVE )
 GAME( 1980, newpuc2b,  puckman,  pacman,   newpuc2b, pacman_state,  empty_init,    ROT90,  "hack",                              "Newpuc2 (set 2)",                                          MACHINE_SUPPORTS_SAVE )
-GAME( 1980, newpuckx,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "New Puck-X",                                               MACHINE_SUPPORTS_SAVE )
+GAME( 1980, newpuckx,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "New Puck-X (set 1)",                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1980, newpuckxb, puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "New Puck-X (set 2)",                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pacheart,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack",                              "Pac-Man (Hearts)",                                         MACHINE_SUPPORTS_SAVE )
 GAME( 1981, bucaner,   puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack (Video Research)",             "Buccaneer (set 1)",                                        MACHINE_SUPPORTS_SAVE )
 GAME( 1981, bucanera,  puckman,  pacman,   pacman,   pacman_state,  empty_init,    ROT90,  "hack (Video Research)",             "Buccaneer (set 2)",                                        MACHINE_SUPPORTS_SAVE )

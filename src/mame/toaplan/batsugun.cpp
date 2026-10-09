@@ -137,12 +137,12 @@ u32 batsugun_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	screen.priority().fill(0, cliprect);
 	m_vdp[1]->render_vdp(m_secondary_render_bitmap, cliprect, screen.priority());
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u16 *const src_vdp0 = &bitmap.pix(y);
 		u16 const *const src_vdp1 = &m_secondary_render_bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			const u16 GPU0_LUTaddr = src_vdp0[x];
 			const u16 GPU1_LUTaddr = src_vdp1[x];

@@ -850,6 +850,13 @@ void funworld_state::funworld_map(address_map &map)
 	map(0xc000, 0xffff).rom();
 }
 
+void multiwin_state::multiwinb_map(address_map &map)
+{
+	funworld_map(map);
+
+	map(0x1000, 0x1000).lr8(NAME([] () -> uint8_t { return 0xff; })); // or it doesn't boot (AI says some 1-Wire device - maybe iButton)
+}
+
 static uint8_t funquiz_question_bank = 0x80;
 
 uint8_t funworld_state::questions_r(offs_t offset)
@@ -3649,6 +3656,12 @@ void multiwin_state::multiwin(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &multiwin_state::multiwin_opcodes_map);
 }
 
+void multiwin_state::multiwinb(machine_config &config)
+{
+	clubcard(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &multiwin_state::multiwinb_map);
+}
 
 class multiwina_state : public funworld_state
 {
@@ -8903,6 +8916,31 @@ void funworld_state::init_impera16()
 	}
 }
 
+void multiwin_state::init_multiwinb()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	std::vector<uint8_t> buffer(&rom[0x8000], &rom[0x10000]);
+
+	for (int i = 0; i < 0x8000; i++)
+	{
+		int const addr = (i & 0x7000)
+				| (BIT(i, 0) ^ BIT(i, 5) ^ BIT(i, 6)) << 0
+				| (BIT(i, 0) ^ BIT(i, 1) ^ BIT(i, 7) ^ BIT(i, 8)) << 1
+				| (BIT(i, 2) ^ BIT(i, 3) ^ BIT(i, 8) ^ BIT(i, 11)) << 2
+				| (BIT(i, 2) ^ BIT(i, 3) ^ BIT(i, 9) ^ BIT(i, 10)) << 3
+				| (BIT(i, 2) ^ BIT(i, 4) ^ BIT(i, 5) ^ BIT(i, 10)) << 4
+				| (BIT(i, 4) ^ BIT(i, 5) ^ BIT(i, 6) ^ BIT(i, 11)) << 5
+				| (BIT(i, 0) ^ BIT(i, 3) ^ BIT(i, 6) ^ BIT(i, 7)) << 6
+				| (BIT(i, 0) ^ BIT(i, 3) ^ BIT(i, 7) ^ BIT(i, 9)) << 7
+				| (BIT(i, 1) ^ BIT(i, 4) ^ BIT(i, 8) ^ BIT(i, 10)) << 8
+				| (BIT(i, 2) ^ BIT(i, 3) ^ BIT(i, 8) ^ BIT(i, 9)) << 9
+				| (BIT(i, 0) ^ BIT(i, 1) ^ BIT(i, 4) ^ BIT(i, 10)) << 10
+				| (BIT(i, 1) ^ BIT(i, 2) ^ BIT(i, 7) ^ BIT(i, 11)) << 11;
+
+		rom[0x8000 + i] = buffer[addr];
+	}
+}
+
 
 /**********************************************
 *                Game Drivers                 *
@@ -9014,7 +9052,7 @@ GAMEL( 199?, jolyjokrm,  jolyjokr, fw1stpal, funworld,  funworld_state, empty_in
 // Encrypted games...
 GAME(  1992, multiwin,   0,        multiwin, funworld,  multiwin_state, driver_init,   ROT0, "Fun World",         "Multi Win (Ver.0167, encrypted)",                 0 ) // original funworld, encrypted.
 GAME(  1991, multiwina,  multiwin, multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Multi Win (Ver.0091, encrypted)",                 MACHINE_IMPERFECT_GRAPHICS ) // different encryption scheme, different tilemap / screen parameters
-GAME(  2001, multiwinb,  multiwin, fw2ndpal, funworld,  funworld_state, empty_init,    ROT0, "Amatic",            "Multi Win (EPM7032, encrypted)",                  MACHINE_NOT_WORKING ) // daughterboard with R65C02 + Altera EPM7032.
+GAME(  2001, multiwinb,  multiwin, multiwinb,funworld,  multiwin_state, init_multiwinb,ROT0, "Amatic",            "Multi Win (EPM7032, encrypted)",                  MACHINE_NOT_WORKING ) // daughterboard with R65C02 + Altera EPM7032.
 GAME(  1993, powercrd,   0,        multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Power Card (Ver 0263, encrypted)",                0 ) // clone of Bonus Card.
 GAME(  1993, megacard,   0,        multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Mega Card (Ver.0210, encrypted)",                 0 )
 GAME(  1993, megacarda,  megacard, multiwina,funworld,  multiwina_state,empty_init,    ROT0, "Fun World",         "Mega Card (Ver.0053, encrypted)",                 0 )

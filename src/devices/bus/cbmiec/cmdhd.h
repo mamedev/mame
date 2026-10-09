@@ -114,8 +114,8 @@ private:
 	bool m_iec_data = 1;
 	bool m_sb_reset_ena = 0;
 
-	emu_timer *m_iec_sync_timer;
-	TIMER_CALLBACK_MEMBER(iec_sync_tick);
+	void update_iec();
+	uint8_t via0_r(offs_t offset);
 	
 	bool m_bdirin = 0;
 	u8 m_sasi_out = 0;

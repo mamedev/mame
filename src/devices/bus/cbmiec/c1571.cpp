@@ -90,7 +90,7 @@ const tiny_rom_entry *c1571_device::device_rom_region() const
 void c1571_device::c1571_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x1800, 0x180f).mirror(0x03f0).m(m_via0, FUNC(via6522_device::map));
+	map(0x1800, 0x180f).mirror(0x03f0).r(FUNC(c1571_device::via0_r)).w(m_via0, FUNC(via6522_device::write));
 	map(0x1c00, 0x1c0f).mirror(0x03f0).rw(FUNC(c1571_device::via1_r), FUNC(c1571_device::via1_w));
 	map(0x2000, 0x2003).mirror(0x1ffc).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
 	map(0x4000, 0x400f).mirror(0x3ff0).rw(m_cia, FUNC(mos6526_device::read), FUNC(mos6526_device::write));
@@ -168,7 +168,7 @@ void c1571_device::via0_pa_w(uint8_t data)
 	// attention out
 	m_iec_atn = !BIT(data, 6);
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 uint8_t c1571_device::via0_pb_r()
@@ -231,7 +231,15 @@ void c1571_device::via0_pb_w(uint8_t data)
 	// attention acknowledge
 	m_ga->atna_w(BIT(data, 4));
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
+}
+
+uint8_t c1571_device::via0_r(offs_t offset)
+{
+	if (!offset && !m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
+	return m_via0->read(offset);
 }
 
 uint8_t c1571_device::via1_r(offs_t offset)
@@ -319,14 +327,14 @@ void c1571_device::cia_cnt_w(int state)
 {
 	m_cnt_out = state;
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 void c1571_device::cia_sp_w(int state)
 {
 	m_sp_out = state;
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 
@@ -403,6 +411,7 @@ void c1571_device::add_base_mconfig(machine_config &config)
 	connector.option_add("525qd", FLOPPY_525_QD);
 	connector.set_default_option("525qd");
 	connector.set_fixed(true);
+	connector.set_media_change_time(attotime::from_msec(100));
 	connector.set_formats(c1571_device::floppy_formats);
 	connector.enable_sound(true);
 }
@@ -501,8 +510,6 @@ c1570_device::c1570_device(const machine_config &mconfig, const char *tag, devic
 
 void c1571_device::device_start()
 {
-	m_iec_sync_timer = timer_alloc(FUNC(c1571_device::iec_sync_tick), this);
-
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);
 	m_floppy->setup_wpt_cb(floppy_image_device::wpt_cb(&c1571_device::wpt_callback, this));
@@ -536,7 +543,7 @@ void c1571_device::device_reset()
 	m_iec_atn = 1;
 	m_iec_clk = 1;
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 
@@ -546,7 +553,7 @@ void c1571_device::device_reset()
 
 void c1571_device::cbm_iec_srq(int state)
 {
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 
@@ -556,7 +563,7 @@ void c1571_device::cbm_iec_srq(int state)
 
 void c1571_device::cbm_iec_atn(int state)
 {
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 
@@ -566,7 +573,7 @@ void c1571_device::cbm_iec_atn(int state)
 
 void c1571_device::cbm_iec_data(int state)
 {
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 
@@ -586,11 +593,6 @@ void c1571_device::cbm_iec_reset(int state)
 //-------------------------------------------------
 //  update_iec -
 //-------------------------------------------------
-
-TIMER_CALLBACK_MEMBER(c1571_device::iec_sync_tick)
-{
-	update_iec();
-}
 
 void c1571_device::update_iec()
 {

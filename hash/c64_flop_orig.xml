@@ -19,7 +19,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="barbaria" supported="no">
+	<software name="barbaria">
 		<description>Barbarian: The Ultimate Warrior</description>
 		<year>1988</year>
 		<publisher>Melbourne House</publisher>
@@ -33,14 +33,10 @@ Fails to LOAD "$",8
 		</part>
 	</software>
 
-	<software name="basil" supported="no">
+	<software name="basil">
 		<description>Basil: The Great Mouse Detective</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics</publisher>
-		<notes><![CDATA[
-LOAD "BASIL",8,1
-Black screen after load, hangs with CIA-2 $DD00 bit 7 stuck high (side effect of protection gone wrong?)
-]]></notes>
 		<info name="protection" value="cyan" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -49,15 +45,11 @@ Black screen after load, hangs with CIA-2 $DD00 bit 7 stuck high (side effect of
 		</part>
 	</software>
 
-	<software name="bionicco" supported="no">
-		<description>Bionic Commando</description>
+	<software name="bionicco">
+		<description>Bionic Commando (NTSC)</description>
 		<year>1988</year>
 		<publisher>Capcom</publisher>
-		<notes><![CDATA[
-LOAD "BIONIC",8,1
-Fails loading
-]]></notes>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="bionic_commando[capcom_1988].g64" size="333744" crc="b216989d" sha1="f1feb2dcb2af5af56051187ffda495c92e967302"/>
@@ -70,7 +62,7 @@ Fails loading
 		<year>1984</year>
 		<publisher>First Star</publisher>
 		<info name="usage" value="Requires joystick in port 1" />
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="boulder_dash[first_star_1984](pal).g64" size="333744" crc="659ad749" sha1="1529cfb26ce01e36869219c874e81b5f7e6cdc49"/>
@@ -99,7 +91,7 @@ Fails loading
 		<description>Commando</description>
 		<year>1985</year>
 		<publisher>Elite</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="commando[elite_1985](pal).g64" size="333744" crc="e5679217" sha1="05be404ba9d6b1685935a44291420014f1c3959f"/>
@@ -107,14 +99,10 @@ Fails loading
 		</part>
 	</software>
 
-	<software name="dotc" supported="no">
+	<software name="dotc">
 		<description>Defender of the Crown</description>
 		<year>1987</year>
 		<publisher>Cinemaware</publisher>
-		<notes><![CDATA[
-LOAD "*",8,1
-Shows "V-MAX!" screen then punts back to BASIC prompt
-]]></notes>
 		<info name="protection" value="vmaxv2" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
@@ -147,15 +135,11 @@ Shows "V-MAX!" screen then punts back to BASIC prompt
 		</part>
 	</software>
 
-	<software name="grnberet" supported="no">
+	<software name="grnberet">
 		<description>Green Beret</description>
 		<year>1986</year>
 		<publisher>Ocean</publisher>
-		<notes><![CDATA[
-LOAD "0:*",8,1
-Black screen during loading
-]]></notes>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -168,7 +152,7 @@ Black screen during loading
 		<description>Impossible Mission</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="impossible_mission[epyx_1984](pal).g64" size="333744" crc="d6cad3cd" sha1="23796cca5d5bbe4f90751aa52085cb69ce67f29f"/>
@@ -176,34 +160,12 @@ Black screen during loading
 		</part>
 	</software>
 
-	<software name="jacknpr" supported="no">
-		<description>Jack the Nipper</description>
-		<year>1986</year>
-		<publisher>Gremlin Graphics</publisher>
-		<notes><![CDATA[
-LOAD "*",8,1
-Resets to BASIC, LOAD "$",8 non-functional
-]]></notes>
-		<info name="video" value="PAL" />
-		<info name="protection" value="cyan" />
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="333744">
-				<rom name="jack_the_nipper[gremlin_1986](cyan1)(pal).g64" size="333744" crc="14c6f53d" sha1="6427cc16ed360890034f84182a9db02b2e568f0a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="miamivic" supported="no">
+	<software name="miamivic">
 		<description>Miami Vice</description>
 		<year>1986</year>
 		<publisher>Ocean</publisher>
-		<notes><![CDATA[
-LOAD "*",8,1
-Punts to BASIC, or just fails loading
-]]></notes>
-		<info name="video" value="PAL" />
 		<info name="protection" value="cyan" />
+		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -224,17 +186,12 @@ Punts to BASIC, or just fails loading
 		</part>
 	</software>
 
-	<software name="rambo2" supported="no">
+	<software name="rambo2">
 		<description>Rambo: First Blood Part II</description>
 		<year>1985</year>
 		<publisher>Ocean</publisher>
-		<notes><![CDATA[
-DOES NOT WORK IN VICE EITHER
-LOAD "0:*",8,1
-Locks up during boot
-]]></notes>
-		<info name="video" value="PAL" />
 		<info name="protection" value="xrom" />
+		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -243,16 +200,12 @@ Locks up during boot
 		</part>
 	</software>
 
-	<software name="rambo2n" cloneof="rambo2" supported="no">
+	<software name="rambo2n" cloneof="rambo2">
 		<description>Rambo: First Blood Part II (NTSC)</description>
 		<year>1985</year>
 		<publisher>Thunder Mountain</publisher>
-		<notes><![CDATA[
-LOAD "0:*",8,1
-Hangs on loading transition between trademarks and title
-]]></notes>
-		<info name="video" value="NTSC" />
 		<info name="protection" value="signature" />
+		<sharedfeat name="compatibility" value="NTSC"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -261,16 +214,12 @@ Hangs on loading transition between trademarks and title
 		</part>
 	</software>
 
-	<software name="rambo3" supported="no">
+	<software name="rambo3">
 		<description>Rambo III (PAL)</description>
 		<year>1988</year>
 		<publisher>Ocean</publisher>
-		<notes><![CDATA[
-LOAD "0:*",8,1
-Punts to BASIC
-]]></notes>
-		<info name="video" value="PAL" />
 		<info name="protection" value="ocean" />
+		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -286,12 +235,12 @@ Punts to BASIC
 		</part>
 	</software>
 
-	<software name="rambo3n" cloneof="rambo3" supported="no">
+	<software name="rambo3n" cloneof="rambo3">
 		<description>Rambo III (NTSC)</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
-		<info name="video" value="NTSC" />
 		<info name="protection" value="vmax3" />
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="rambo_iii[taito_1989](vmax3).g64" size="333744" crc="8e34cbc7" sha1="a83030d9a46a5a7a33b9cfedf6adf0b778f7262b"/>
@@ -303,7 +252,7 @@ Punts to BASIC
 		<description>Street Hassle</description>
 		<year>1987</year>
 		<publisher>Melbourne House</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="street_hassle[melbourne_house_1987](pal).g64" size="333744" crc="92c15c93" sha1="a1bc536294ae1d36ffde644798dc25cd1d514c93"/>
@@ -318,7 +267,7 @@ Punts to BASIC
 		<notes><![CDATA[
 LOAD "STRIP POKER",8
 ]]></notes>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<sharedfeat name="write_protected" value="true" />
 
 		<part name="flop1" interface="floppy_5_25">
@@ -328,41 +277,15 @@ LOAD "STRIP POKER",8
 		</part>
 	</software>
 
-	<software name="terramex" supported="no">
-		<description>Terramex</description>
-		<year>1988</year>
-		<publisher>Grand Slam</publisher>
-		<notes><![CDATA[
-LOAD "*",8,1
-Crashes at the end of loading sequence
-]]></notes>
-		<info name="video" value="PAL" />
-		<info name="protection" value="custom_dos" />
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="333744">
-				<rom name="terramex_s1[grandslam_1988].g64" size="333744" crc="cc38f968" sha1="985eb00dcda7cb2499120b1801ca18df5cf2827e"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="333744">
-				<rom name="terramex_s2[grandslam_1988].g64" size="333744" crc="78408a59" sha1="f23fdea7292a95b076cc0a23c81e2e214e42129a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="toutrun" supported="no">
+	<software name="toutrun" supported="partial">
 		<description>Turbo Out Run</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
-LOAD "*",8,1
-Punts to BASIC
+Graphics issues
 ]]></notes>
-		<info name="video" value="PAL" />
 		<info name="protection" value="sload" />
+		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -378,37 +301,543 @@ Punts to BASIC
 		</part>
 	</software>
 
+	<software name="10thfrm">
+		<description>10th Frame</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="requirement" value="tape:access"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="319232">
+				<rom name="10thFrame_s0.g64" size="319232" crc="ca45efbf" sha1="636131e8e620949c3e0f1d3a77ae3f06c752ff50"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airwolf2">
+		<description>Airwolf 2</description>
+		<year>1988</year>
+		<publisher>Elite Systems</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="Airwolf2_s0.g64" size="279582" crc="42194861" sha1="93b0ef81b1918cbd6f283824f9047772e1a50702"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="avenger2">
+		<description>Avenger: The Way of the Tiger 2</description>
+		<year>1986</year>
+		<publisher>Gremlin Graphics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="319232">
+				<rom name="Avenger-TheWayOfTheTiger2_s0.g64" size="319232" crc="ee49a562" sha1="d906990d2a618a17817df8cd2701aa649e465d80"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chmbshao">
+		<description>Chambers of Shaolin</description>
+		<year>1989</year>
+		<publisher>Grandslam Entertainments</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327162">
+				<rom name="ChambersOfShaolin_s0.g64" size="327162" crc="3973cfdf" sha1="92a98dd2d0996c3f2e14e090895c931f8b6a7705"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrabble">
+		<description>Computer Scrabble</description>
+		<year>1984</year>
+		<publisher>Leisure Genius</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="287512">
+				<rom name="ComputerScrabble_s0.g64" size="287512" crc="bcd50808" sha1="14da34cf4ca85d950a1cf76c333f105cd147ae36"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dandare">
+		<description>Dan Dare: Pilot of the Future</description>
+		<year>1986</year>
+		<publisher>Virgin Games / Electronic Arts</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="DanDare-PilotOfTheFuture_s0.g64" size="279582" crc="48a82d27" sha1="90f0211bd2c0625908b239070b6f4324d93e4ad5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dandare2">
+		<description>Dan Dare II: Mekon's Revenge</description>
+		<year>1988</year>
+		<publisher>Virgin Games</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="319232">
+				<rom name="DanDareII-MekonsRevenge_s0.g64" size="319232" crc="986714cd" sha1="2339db518ff9a42258c9efafee4883042823128a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="darkman">
+		<description>Darkman</description>
+		<year>1991</year>
+		<publisher>Ocean</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="279582">
+				<rom name="Darkman_s0.g64" size="279582" crc="8dd5d965" sha1="10dcd404275865d43d74d4571aef4b6d7b459fbe"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="279582">
+				<rom name="Darkman_s1.g64" size="279582" crc="8f3b5f5f" sha1="2dfe6b79e93004a8bddc35b255b971832540bbdd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="omegastr">
+		<description>Die Omega Story (Germany)</description>
+		<year>1986</year>
+		<publisher>Adam Opel AG / Substract Software</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="279582">
+				<rom name="DieOmegaStory_s0.g64" size="279582" crc="76f14b5d" sha1="77a954fcab6a864079f45f67b0913e4bddd323b2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="279582">
+				<rom name="DieOmegaStory_s1.g64" size="279582" crc="4f0291b3" sha1="98ab2a8556f21f0683a7def67ba1998f746c9842"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinoeggs">
+		<description>Dino Eggs</description>
+		<year>1983</year>
+		<publisher>Micro Fun</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="DinoEggs_s0.g64" size="279582" crc="71e40688" sha1="46d26def5f6af4427bff05fcf6a887c7a00e522b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ferrarif">
+		<description>Ferrari Formula One: Grand Prix Racing Simulation</description>
+		<year>1988</year>
+		<publisher>Electronic Arts / Imagitec Design</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="279582">
+				<rom name="FerrariFormulaOne_s0.g64" size="279582" crc="d37c2fde" sha1="4ea9648dba932e242cef10b4caa8c94c79d215d4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="279582">
+				<rom name="FerrariFormulaOne_s1.g64" size="279582" crc="f2d88960" sha1="e514504f6de2e959cc99b1c439787de7825fe28a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghostbs2">
+		<description>Ghostbusters II</description>
+		<year>1989</year>
+		<publisher>Activision</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="319232">
+				<rom name="GhostbustersII_s0.g64" size="319232" crc="d408e3e1" sha1="8ba66279168fd6612c4cde25d7104db4062811a8"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="319232">
+				<rom name="GhostbustersII_s1.g64" size="319232" crc="26793b27" sha1="a2959b3118e885d78f19878fbf89254fe63f9b3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hate">
+		<description>H.A.T.E.: Hostile All-Terrain Encounter</description>
+		<year>1989</year>
+		<publisher>Gremlin Graphics / Vortex Software</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="HATEHostileAllTerrainEncounter_s0.g64" size="279582" crc="4e30297a" sha1="1c55cddb4fa4d6b79c408e8f0a5e87ce8785f631"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="infodroi">
+		<description>Infodroid</description>
+		<year>1986</year>
+		<publisher>Beyond Software</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="319232">
+				<rom name="Infodroid_s0.g64" size="319232" crc="4e4ad3b1" sha1="131ea708a26dedc00947803dae9473de75593196"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jacknip">
+		<description>Jack the Nipper</description>
+		<year>1986</year>
+		<publisher>Gremlin Graphics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="287512">
+				<rom name="JackTheNipper_s0.g64" size="287512" crc="380b4e22" sha1="be9deb6ecbc96f8b4640082a668451b22414dc79"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jb007spy">
+		<description>James Bond 007: The Spy Who Loved Me</description>
+		<year>1990</year>
+		<publisher>Domark</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="JamesBond007-TheSpyWhoLovedMe_s0.g64" size="279582" crc="771c5816" sha1="6a9a543bee1794ca73db874f74e8956307a4614d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="liverpol">
+		<description>Liverpool</description>
+		<year>1993</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="Liverpool_s0.g64" size="279582" crc="dbbbe5a4" sha1="7710320ab5c837efd206e151dc1951bec1a06735"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mask2">
+		<description>M.A.S.K. II</description>
+		<year>1987</year>
+		<publisher>Gremlin Graphics</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="319232">
+				<rom name="MaskII_s0.g64" size="319232" crc="48d3e2c0" sha1="6440d807e8ebeb95d4257b5867875fbcb0906e5c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miamiv2" cloneof="miamivic">
+		<description>Miami Vice (alt)</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="319232">
+				<rom name="MiamiVice_s0.g64" size="319232" crc="092aa033" sha1="621c67d24ef622dfb01c9b4d2004a200a6cc487f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psi5trad">
+		<description>PSI-5 Trading Company</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="287512">
+				<rom name="PSI5TradingCompany_s0.g64" size="287512" crc="629235fe" sha1="a928789d53f7740c7b7639fae204f990d4bca08d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="287512">
+				<rom name="PSI5TradingCompany_s1.g64" size="287512" crc="09aefebe" sha1="785be767be0cb351657b91febfbb50628d2f5bc9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qbopper">
+		<description>Q-Bopper</description>
+		<year>1983</year>
+		<publisher>Accelerated Software</publisher>
+		<sharedfeat name="compatibility" value="NTSC"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="QBopper_s0.g64" size="279582" crc="0382e463" sha1="99175747bbd31e65c8b19a5aba2cf792cc52ba67"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rackem">
+		<description>Rack 'em</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="287512">
+				<rom name="RackEm_s0.g64" size="287512" crc="105b21a6" sha1="c03fa8c7f620dc823f827cdbc2c592c60030c611"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanatar">
+		<description>Sanatar (Finland)</description>
+		<year>1984</year>
+		<publisher>Amersoft</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="382672">
+				<rom name="Sanatar_s0.g64" size="382672" crc="150a9667" sha1="d845fe984f370817c6bebbd0547450ba35759388"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sthassl2" cloneof="sthassle">
+		<description>Street Hassle (alt)</description>
+		<year>1987</year>
+		<publisher>Melbourne House</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="319232">
+				<rom name="StreetHassle_s0.g64" size="319232" crc="9a0967c0" sha1="4ce5d59772ee911b8d058c2fa700a87649376d52"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tarzan">
+		<description>Tarzan</description>
+		<year>1986</year>
+		<publisher>Martech</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="319232">
+				<rom name="Tarzan_s0.g64" size="319232" crc="077bafbd" sha1="72f01b8179c595ad20c656572d346a3dca36255f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamessum">
+		<description>The Games: Summer Edition</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A Side A"/>
+			<dataarea name="flop" size="279582">
+				<rom name="TheGamesSummerEdition_DiskA_s0.g64" size="279582" crc="f7a10dc3" sha1="2a3b9b9f21f6a1e07f972f9ecafd61cdfb42db90"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A Side B"/>
+			<dataarea name="flop" size="279582">
+				<rom name="TheGamesSummerEdition_DiskA_s1.g64" size="279582" crc="f4da4364" sha1="213fc871d20a3ccf3707f4c4ae7c94fa6dc8a397"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="279582">
+				<rom name="TheGamesSummerEdition_DiskB_s0.g64" size="279582" crc="e68729a7" sha1="108f486bac28ca63cc2d1b4af4732d2715c5759f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="golfcons">
+		<description>The Golf Construction Set</description>
+		<year>1986</year>
+		<publisher>Ariolasoft</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="327162">
+				<rom name="TheGolfConstructionSet_s0.g64" size="327162" crc="da08a201" sha1="e927631b9fa5ffb76b18208e305857a40860064c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="287512">
+				<rom name="TheGolfConstructionSet_s1.g64" size="287512" crc="29a3b759" sha1="704ed80555f1e9bbab77a4b2ba2892bae831ad20"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vixen">
+		<description>Vixen</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="287512">
+				<rom name="Vixen_s0.g64" size="287512" crc="99b87954" sha1="cfcf0402cee79a3b2eb792791c2e7f18e3fc4aea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="warlockv">
+		<description>Warlock the Avenger</description>
+		<year>1991</year>
+		<publisher>U.S. Gold</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="WarlockTheAvenger_s0.g64" size="279582" crc="3ae37306" sha1="22970e854cf0f9179f399d01cc908c20480b2579"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcboxmgr">
+		<description>World Championship Boxing Manager</description>
+		<year>1990</year>
+		<publisher>Goliath Games</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="WorldChampionshipBoxingManager_s0.g64" size="279582" crc="92d6fb43" sha1="eaac42f95bc30f3b40a47c040c7f84eea4313e03"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yespm">
+		<description>Yes Prime Minister: The Computer Game</description>
+		<year>1987</year>
+		<publisher>Mosaic Publishing</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="319232">
+				<rom name="YesPrimeMinister_s0.g64" size="319232" crc="6b2cacc7" sha1="e90476954f2c1fb3afbe67927ef9a83e4d17df2e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="327162">
+				<rom name="YesPrimeMinister_s1.g64" size="327162" crc="4b7628b6" sha1="53ad1aec35630c81e3f0694bef71a69c2ae2038f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="presmiss">
+		<description>The President is Missing</description>
+		<year>1988</year>
+		<publisher>Cosmi</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="279582">
+				<rom name="ThePresidentIsMissing_Disk1_s0.g64" size="279582" crc="93e535f9" sha1="f671d04c432a8ef420159ae507983c7cb4b3e38f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="279582">
+				<rom name="ThePresidentIsMissing_Disk1_s1.g64" size="279582" crc="4e629181" sha1="04dd8940c86f423215d3597b4086a52b4ba20b45"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="279582">
+				<rom name="ThePresidentIsMissing_Disk2_s0.g64" size="279582" crc="60c7ddb7" sha1="63ac5661fe2298144317d78c68cd4010ffb86bd5"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="279582">
+				<rom name="ThePresidentIsMissing_Disk2_s1.g64" size="279582" crc="076be031" sha1="f1032953e88a4455ed0bf304fa3146935408519b"/>
+			</dataarea>
+		</part>
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Audio Tape Side 1"/>
+			<dataarea name="cass" size="17193642">
+				<rom name="ThePresidentIsMissing_Side1.mp3" size="17193642" crc="ea236125" sha1="95a954f70dc4d77417c376498285eba06769cf7b"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Audio Tape Side 2"/>
+			<dataarea name="cass" size="19193703">
+				<rom name="ThePresidentIsMissing_Side2.mp3" size="19193703" crc="18e1e80f" sha1="415bf1deecbef8095caef8abc5daba300e901c07"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !Compilations -->
 
-	<software name="gameset" supported="no">
+	<software name="gameset">
 		<description>Game Set and Match</description>
 		<year>1987</year>
 		<publisher>Ocean</publisher>
-		<notes><![CDATA[
-LOAD "0:*",8,1
-All games fails loading
-]]></notes>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side 1"/>
+			<feature name="part_id" value="Match Point, Super Soccer, Snooker"/>
 			<dataarea name="flop" size="333744">
 				<rom name="game_set_and_match_s1[ocean_1987].g64" size="333744" crc="ca84a09e" sha1="fdd4246db837d74ef136d2c72895c04915384146"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side 2"/>
+			<feature name="part_id" value="World Series Baseball, Ping Pong, Barry McGuigan World Championship Boxing,"/>
 			<dataarea name="flop" size="333744">
 				<rom name="game_set_and_match_s2[ocean_1987].g64" size="333744" crc="85ba1688" sha1="b41e55eca81067d4499e0201454ccbaaec70b672"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 Side 1"/>
+			<feature name="part_id" value="Daley Thompson's Supertest, Jonah Barrington's Squash"/>
 			<dataarea name="flop" size="333744">
 				<rom name="game_set_and_match_s3[ocean_1987].g64" size="333744" crc="c8053e01" sha1="7ae5d1225a8613ea70e8dd2c8d5a3008e3ea4c13"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 Side 2"/>
+			<feature name="part_id" value="Hyper Sports, Basketball"/>
 			<dataarea name="flop" size="333744">
 				<rom name="game_set_and_match_s4[ocean_1987].g64" size="333744" crc="d775e8bb" sha1="6df6c56ff5202544a1075d7966e52b046da2dcaf"/>
 			</dataarea>
@@ -417,32 +846,227 @@ All games fails loading
 
 	<software name="lpactpak">
 		<description>Light Phaser Action Pack</description>
-		<year>198?</year>
+		<year>1990</year>
 		<publisher>Virgin Mastertronic</publisher>
 		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side 1: Baby Blues, Gunslinger"/>
+			<feature name="part_id" value="Baby Blues, Gunslinger"/>
 			<dataarea name="flop" size="279582">
 				<rom name="LightPhaserActionPack_Disk1_s0.g64" size="279582" crc="c57e8ae8" sha1="756a2bd06955625d5ca32c95a638ac7fd2f78b81"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1 Side 2: Goosebusters, Ghost Town"/>
+			<feature name="part_id" value="Goosebusters, Ghost Town"/>
 			<dataarea name="flop" size="279582">
 				<rom name="LightPhaserActionPack_Disk1_s1.g64" size="279582" crc="ad11403f" sha1="9714301c84916e564a8a33b6c18d5856a850e746"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 Side 1: Cosmic Storm"/>
+			<feature name="part_id" value="Cosmic Storm"/>
 			<dataarea name="flop" size="279582">
 				<rom name="LightPhaserActionPack_Disk2_s0.g64" size="279582" crc="69a1b612" sha1="25a755a494a1c7054b39f05a5672f7b593e85dbd"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2 Side 2: Operation Wolf"/>
+			<feature name="part_id" value="Operation Wolf"/>
 			<dataarea name="flop" size="279582">
 				<rom name="LightPhaserActionPack_Disk2_s1.g64" size="279582" crc="7ae53367" sha1="0cdd33bbda435569a0ad41496d40440e5749430b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sys3prem">
+		<description>The System 3 Premier Collection</description>
+		<year>1991</year>
+		<publisher>System 3</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Last Ninja Remix Disk 1 Side 1"/>
+			<dataarea name="flop" size="279582">
+				<rom name="LastNinjaRemix_Disk1_s0.g64" size="279582" crc="947455be" sha1="4c9629e0e2ed30949b571fa1b5ba3dc1af387fb1"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Last Ninja Remix Disk 1 Side 2"/>
+			<dataarea name="flop" size="279582">
+				<rom name="LastNinjaRemix_Disk1_s1.g64" size="279582" crc="ae61cc41" sha1="d1fed3317b45e49b8fd41e5a9d6252bdec8e82a4"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Last Ninja Remix Disk 2"/>
+			<dataarea name="flop" size="287512">
+				<rom name="LastNinjaRemix_Disk2_s0.g64" size="287512" crc="ab41236a" sha1="d32ef3c90f1420748d2379571d70695771299c06"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Flimbo's Quest"/>
+			<dataarea name="flop" size="279582">
+				<rom name="FlimbosQuest-InternationalKarate_s0.g64" size="279582" crc="447e1438" sha1="474eac773f912fdd2384e7c4fba7d81391a559f4"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="International Karate"/>
+			<dataarea name="flop" size="279582">
+				<rom name="FlimbosQuest-InternationalKarate_s1.g64" size="279582" crc="7e444496" sha1="eb51e75511ba59b82bf5ca698ee6ec3f0af08a98"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Myth: History in the Making"/>
+			<dataarea name="flop" size="279582">
+				<rom name="Myth-Dominator_s0.g64" size="279582" crc="2ccb820c" sha1="cd788a232c135287925939fb303a5d507778016a"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Dominator"/>
+			<dataarea name="flop" size="279582">
+				<rom name="Myth-Dominator_s1.g64" size="279582" crc="0f040334" sha1="8fb771cea14cfc294ab6f68b22442a841facb256"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldrbpar4">
+		<description>Leader Board Par 4</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Leader Board, Leader Board Tournament"/>
+			<dataarea name="flop" size="279582">
+				<rom name="LeaderboardPar4_Disk1_s0.g64" size="279582" crc="c0e758e3" sha1="8c6e9f20d76f0f5fa1e02f9392dececa08c8fc07"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Executive Leader Board Side A"/>
+			<dataarea name="flop" size="295442">
+				<rom name="LeaderboardPar4_Disk2_s0.g64" size="295442" crc="aa4f42da" sha1="55dcd68658d6b99404c3dc08f5ecc9f17f3b30ee"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Executive Leader Board Side B"/>
+			<dataarea name="flop" size="279582">
+				<rom name="LeaderboardPar4_Disk2_s1.g64" size="279582" crc="725070e7" sha1="a4724fd12198eb852a272ca1e5650f3afd34abf1"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="World Class Leader Board Side A"/>
+			<dataarea name="flop" size="295442">
+				<rom name="LeaderboardPar4_Disk3_s0.g64" size="295442" crc="4f37d97b" sha1="012aa10927b05fa2f371f6f80682d342a36c2167"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="World Class Leader Board Side B"/>
+			<dataarea name="flop" size="279582">
+				<rom name="LeaderboardPar4_Disk3_s1.g64" size="279582" crc="cb9b7e5c" sha1="8b71628f761fe0b234db248e2bd2804a62f7c0c0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4greatg3">
+		<description>Four Great Games Volume 3</description>
+		<year>1988</year>
+		<publisher>MicroValue</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Equinox, Mousetrap"/>
+			<dataarea name="flop" size="279582">
+				<rom name="FourGreatGamesVolume3_s0.g64" size="279582" crc="b2b0a5c5" sha1="5b69b815e118d4adb29e936cf112f2f6ae512b7d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Darksyde, The Big KO"/>
+			<dataarea name="flop" size="279582">
+				<rom name="FourGreatGamesVolume3_s1.g64" size="279582" crc="19820d10" sha1="9ca4fb53c259f43b5a6bb22e58da1fc924b7f682"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magnif7">
+		<description>The Magnificent Seven</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Wizball, Head over Heels"/>
+			<dataarea name="flop" size="295442">
+				<rom name="TheMagnificentSeven_Wizball_s0.g64" size="295442" crc="d04fb875" sha1="92194288c013575f4576259a54b59c1f1c59f46f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Arkanoid, Cobra"/>
+			<dataarea name="flop" size="311302">
+				<rom name="TheMagnificentSeven_Wizball_s1.g64" size="311302" crc="4d3d6c0b" sha1="969efaea09126646c2cd7c61dc73d5c936f4eb92"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Frankie Goes to Hollywood, Yie Ar Kung Fu"/>
+			<dataarea name="flop" size="303372">
+				<rom name="TheMagnificentSeven_Frankie_s0.g64" size="303372" crc="41d3b08d" sha1="a4cc9a5b14ce0f00a424562ff91db5208a042f6b"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Short Circuit, The Great Escape"/>
+			<dataarea name="flop" size="327162">
+				<rom name="TheMagnificentSeven_Frankie_s1.g64" size="327162" crc="e69ea409" sha1="322e5197012fd3dee6e4653bdd7997030d84143a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nghtmove">
+		<description>Night Moves</description>
+		<year>1990</year>
+		<publisher>Ocean</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Sly Spy Disk 1 Side A"/>
+			<dataarea name="flop" size="279582">
+				<rom name="NightMoves_Disk1_s0.g64" size="279582" crc="b3a5bf7f" sha1="47d27065c352deb28fbf055b0a4e6173af508915"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Sly Spy Disk 1 Side B"/>
+			<dataarea name="flop" size="279582">
+				<rom name="NightMoves_Disk1_s1.g64" size="279582" crc="87fb41a2" sha1="23d5333daed64b77a690ba889b0d38ba6280495e"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Sly Spy Disk 2 Side A"/>
+			<dataarea name="flop" size="279582">
+				<rom name="NightMoves_Disk2_s0.g64" size="279582" crc="b3153f4a" sha1="29303c9484df14d1d56fe789551e9a4bef412ce5"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Sly Spy Disk 2 Side B"/>
+			<dataarea name="flop" size="279582">
+				<rom name="NightMoves_Disk2_s1.g64" size="279582" crc="a97a266e" sha1="3e6597cff0266ffa74210b6454cbc910546d5e63"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Nightbreed Side A"/>
+			<dataarea name="flop" size="279582">
+				<rom name="NightMoves_Disk3_s0.g64" size="279582" crc="f46b456c" sha1="e5100b343f5db774e9bc474b702da5b5007a79c5"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Nightbreed Side B"/>
+			<dataarea name="flop" size="279582">
+				<rom name="NightMoves_Disk3_s1.g64" size="279582" crc="aa6ab5c7" sha1="5942635e01a74bac552316fbf7fae390e9197297"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Midnight Resistance"/>
+			<dataarea name="flop" size="279582">
+				<rom name="NightMoves_Disk4_s0.g64" size="279582" crc="1766c4d4" sha1="e0f77886147f82b977d0c2ed54ef2b0729fd0749"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Shadow Warriors"/>
+			<dataarea name="flop" size="279582">
+				<rom name="NightMoves_Disk4_s1.g64" size="279582" crc="34be5096" sha1="dc1cb7738fd929d6e06e20504c7a37f28036b117"/>
 			</dataarea>
 		</part>
 	</software>
@@ -475,7 +1099,7 @@ All games fails loading
 
 	<software name="flexidraw4">
 		<description>Flexidraw 4.0</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Inkwell Systems</publisher>
 		<info name="usage" value="Requires Inkwell 184-C light pen (inkwell184c) in joystick port 1"/>
 		
@@ -600,13 +1224,176 @@ All games fails loading
 		</part>
 	</software>
 
+	<software name="cmdiary89">
+		<description>Computer Maniac's Diary 1989</description>
+		<year>1988</year>
+		<publisher>Domark / Leisure Electronics Designs / Intelligent Design</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="ComputerManiacsDiary1989_s0.g64" size="279582" crc="9710d942" sha1="033261410645f1b15cd9c55b324f0b1f2f88fbc3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clehti89">
+		<description>C= lehti C-64 ohjelmat 1989 (Finland)</description>
+		<year>1990</year>
+		<publisher>Tecnopress</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="CLehtic64Ohjelmat1989_s0.g64" size="279582" crc="1bdc5100" sha1="0b205d86ec9e5f3e6d6dd0b35e25187b3ecbe57e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="easyfin1">
+		<description>Easy Finance I</description>
+		<year>1983</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="compatibility" value="PAL,NTSC"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="303372">
+				<rom name="EasyFinanceI_s0.g64" size="303372" crc="685f65d1" sha1="7d96138456925eed8b12099883488e1f3516a749"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="huvihyot">
+		<description>Huvia ja hyötyä 64 (Finland)</description>
+		<year>1986</year>
+		<publisher>Tecnopress</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="HuviaJaHyotya64_s0.g64" size="279582" crc="ff57f963" sha1="45634e012b937d669f8707b1f5e9afb16ef92354"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geos15b" cloneof="geos15">
+		<description>GEOS deskTop 1.5 (alt)</description>
+		<year>1988</year>
+		<publisher>Berkeley Softworks</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1: GEOS deskTop 1.5 for the Commodore 64C"/>
+			<dataarea name="flop" size="279582">
+				<rom name="GEOSdeskTop15_s0.g64" size="279582" crc="a2d0fd2d" sha1="6618cb049eefda1e2c039d5fc1c0a8730c651325"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2: GEOS Additional for the Commodore 64C"/>
+			<dataarea name="flop" size="287512">
+				<rom name="GEOSdeskTop15_s1.g64" size="287512" crc="9459075d" sha1="fb44a444cffbcbc1e1b8702cefeec99385bb8ee9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laserbas">
+		<description>Laser BASIC</description>
+		<year>1985</year>
+		<publisher>Ocean</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="319232">
+				<rom name="LaserBASIC_s0.g64" size="319232" crc="6d2aa409" sha1="71f337e2e5d77f592bb45541fff3c44caf36506e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minioff2">
+		<description>Mini Office II (v1.2E)</description>
+		<year>1987</year>
+		<publisher>Database Software</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="319232">
+				<rom name="MiniOfficeII_s0.g64" size="319232" crc="e723caaf" sha1="4a64e3e63b5b19446ef5e464f575620b5a72e688"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pocketw2">
+		<description>Pocket Writer 2</description>
+		<year>1986</year>
+		<publisher>Digital Solutions</publisher>
+		<sharedfeat name="compatibility" value="PAL,NTSC"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="287512">
+				<rom name="PocketWriter2_s0.g64" size="287512" crc="9d61b990" sha1="2e78ed616b6b01b69dd2194fbb6267cb504862f2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="swprotdi">
+		<description>Software Protection Disk</description>
+		<year>1984</year>
+		<publisher>Psidac</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="SoftwareProtectionDisk_s0.g64" size="279582" crc="43b3b31e" sha1="0793490095636cff7c310d9d94ebf902c70dc91c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="teksti64">
+		<description>Teksti 64 (Finland)</description>
+		<year>1983</year>
+		<publisher>PCI-Data</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="Teksti64_s0.g64" size="279582" crc="5615c3fe" sha1="f35ee0e5be443e051f9fb8a786336feebe5daacf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="imagesys">
+		<description>The Image System</description>
+		<year>1986</year>
+		<publisher>CRL Group</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="287512">
+				<rom name="TheImageSystem_s0.g64" size="287512" crc="e4254ee4" sha1="a00ae8a388e44ea0a3d7ee48d4b4c304d07ec7e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tlrubexp">
+		<description>Tony La Russa's Ultimate Baseball: Expansion Disk - Great Teams 1901-1968</description>
+		<year>1991</year>
+		<publisher>Strategic Simulations</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="TonyLaRussasUltimateBaseballExpansionDisk-GreatTeams1901-1968_s0.g64" size="279582" crc="fa725280" sha1="e7ed77ae497dc65873fe929545aa5a687400c669"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !diskmags -->
 
 	<software name="input64_22">
 		<description>INPUT 64 10/86</description>
 		<year>1986</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286164">
 				<rom name="input64-8610.g64" size="286164" crc="52043960" sha1="5c260d975237c6aad87d3629b277f59044f620ee"/>
@@ -618,7 +1405,7 @@ All games fails loading
 		<description>INPUT 64 11/86</description>
 		<year>1986</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8611.g64" size="278234" crc="6edbc714" sha1="aa2f3672d3bf1d09b650f194f5760fdbfe8ced43"/>
@@ -630,7 +1417,7 @@ All games fails loading
 		<description>INPUT 64 12/86</description>
 		<year>1986</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8612.g64" size="278234" crc="5fe6a642" sha1="b70829b2df402ff6f3c0632d4532eaf1314300d0"/>
@@ -642,7 +1429,7 @@ All games fails loading
 		<description>INPUT 64 1/87</description>
 		<year>1987</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8701.g64" size="278234" crc="062cb4c1" sha1="9b06a7d9f934e06574392e9f1b15435ba3a29bbe"/>
@@ -654,7 +1441,7 @@ All games fails loading
 		<description>INPUT 64 2/87</description>
 		<year>1987</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8702.g64" size="278234" crc="619587c5" sha1="3f685030f76e9b23658d055d853f33741d46e289"/>
@@ -666,7 +1453,7 @@ All games fails loading
 		<description>INPUT 64 3/87</description>
 		<year>1987</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8703.g64" size="278234" crc="39c40893" sha1="22f30dbb1e4b554a6348865a6fea15f99454d067"/>
@@ -678,7 +1465,7 @@ All games fails loading
 		<description>INPUT 64 4/87</description>
 		<year>1987</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8704.g64" size="278234" crc="dfcb814a" sha1="dcad7168be21651c91138c825f00b8b55de67f59"/>
@@ -690,7 +1477,7 @@ All games fails loading
 		<description>INPUT 64 5/87</description>
 		<year>1987</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8705.g64" size="278234" crc="94cc9dd3" sha1="0220b14fa8641c18a81129c944e06ba95c35d944"/>
@@ -702,7 +1489,7 @@ All games fails loading
 		<description>INPUT 64 6/87</description>
 		<year>1987</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8706.g64" size="278234" crc="3d0408dc" sha1="e16288ce00593e14ae345a28bb18593b56e80a8d"/>
@@ -714,7 +1501,7 @@ All games fails loading
 		<description>INPUT 64 7/87</description>
 		<year>1987</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8707.g64" size="278234" crc="ce9dfa34" sha1="cd87c56d27b6525a1c4cdf1ac5620652758e9da9"/>
@@ -726,7 +1513,7 @@ All games fails loading
 		<description>INPUT 64 8/87</description>
 		<year>1987</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="309954">
 				<rom name="input64-8708.g64" size="309954" crc="a7c91709" sha1="793ef78e2a883f133c7fe8356adf8ab3d41317e2"/>
@@ -738,7 +1525,7 @@ All games fails loading
 		<description>INPUT 64 9/87</description>
 		<year>1987</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8709.g64" size="278234" crc="53e02004" sha1="91ac02ea88af2b1b9ef4384a7a5b717bc0fa317e"/>
@@ -750,7 +1537,7 @@ All games fails loading
 		<description>INPUT 64 10/87</description>
 		<year>1987</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8710.g64" size="278234" crc="b58a1b2f" sha1="79894cb1eb1ec9e436888526d8cb46ccfa51a64d"/>
@@ -762,7 +1549,7 @@ All games fails loading
 		<description>INPUT 64 11/87</description>
 		<year>1987</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8711.g64" size="278234" crc="3c74fccd" sha1="66ade471b5cce456f22d8cda27a0fe519066460e"/>
@@ -774,7 +1561,7 @@ All games fails loading
 		<description>INPUT 64 12/87</description>
 		<year>1987</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8712.g64" size="278234" crc="0d6b298e" sha1="a828ef7ec17a2a5b88edd6887287b6656c4a8357"/>
@@ -786,7 +1573,7 @@ All games fails loading
 		<description>INPUT 64 1/88</description>
 		<year>1988</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8801.g64" size="278234" crc="baa0e5c2" sha1="618a477d5815544cf4b8200c0530fd9b23eb5e8f"/>
@@ -798,7 +1585,7 @@ All games fails loading
 		<description>INPUT 64 2/88</description>
 		<year>1988</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8802.g64" size="278234" crc="1fc4034a" sha1="ac1e5d3f8eeca92cce1d1a3c5c9ef8c42878e7a9"/>
@@ -810,7 +1597,7 @@ All games fails loading
 		<description>INPUT 64 3/88</description>
 		<year>1988</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8803.g64" size="278234" crc="aea916ea" sha1="74abb9e94943a66480a973887aa361a1ee5d16c3"/>
@@ -822,7 +1609,7 @@ All games fails loading
 		<description>INPUT 64 4/88</description>
 		<year>1988</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8804.g64" size="278234" crc="c9c23646" sha1="57e9f8da108e826e16d6c0ab05378c242bd32295"/>
@@ -834,7 +1621,7 @@ All games fails loading
 		<description>INPUT 64 5/88</description>
 		<year>1988</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8805.g64" size="278234" crc="834972e9" sha1="83e03773b5bbc1ab30c6f3c1bbe36aee4601835f"/>
@@ -846,7 +1633,7 @@ All games fails loading
 		<description>INPUT 64 6/88</description>
 		<year>1988</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8806.g64" size="278234" crc="4f2307fb" sha1="8df019bb6c958174a5925747911eb9d4d4ed9f5a"/>
@@ -858,7 +1645,7 @@ All games fails loading
 		<description>INPUT 64 7/88</description>
 		<year>1988</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8807.g64" size="278234" crc="4e3e15d0" sha1="58c1b92a2c4cba660652d78eb07f7fec279c9acf"/>
@@ -870,7 +1657,7 @@ All games fails loading
 		<description>INPUT 64 8/88</description>
 		<year>1988</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8808.g64" size="278234" crc="c5c6d47b" sha1="9767a58084eb610f56ebab98f7dce619bdba3c4b"/>
@@ -882,7 +1669,7 @@ All games fails loading
 		<description>INPUT 64 9/88</description>
 		<year>1988</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8809a.g64" size="278234" crc="350212d1" sha1="7a65b37f96e0f81cff8dd0c366a1c58e8b588fff"/>
@@ -899,7 +1686,7 @@ All games fails loading
 		<description>INPUT 64 10/88</description>
 		<year>1988</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8810.g64" size="278234" crc="6d872aea" sha1="718afd2e5db020696344c3301bc8980c703839cf"/>
@@ -911,7 +1698,7 @@ All games fails loading
 		<description>INPUT 64 11/88</description>
 		<year>1988</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8811.g64" size="278234" crc="7a674053" sha1="bdfee677d32061b8bf62fa31fdfcb9b10cfa12a1"/>
@@ -923,7 +1710,7 @@ All games fails loading
 		<description>INPUT 64 12/88</description>
 		<year>1988</year>
 		<publisher>Verlag Heinz Heise</publisher>
-		<info name="video" value="PAL" />
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="278234">
 				<rom name="input64-8812a.g64" size="278234" crc="400f9ebe" sha1="ec6465bc4b26238a45ed7fcd0180017210a6bf45"/>
@@ -966,7 +1753,31 @@ All games fails loading
 		</part>
 	</software>
 
-<!-- !Test/Demo disks -->
+	<software name="treenari">
+		<description>Treenari 7-9lk fysiikka ja kemia (Finland)</description>
+		<year>198?</year>
+		<publisher>Kielinauhat</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="303372">
+				<rom name="Treenari7-9FysiikkaJaKemia_s0.g64" size="303372" crc="48e44a0a" sha1="f5a3c573646a2c6b82742606d6d6e2e5bb9f5fb7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="typingpr">
+		<description>Typing Professor</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="compatibility" value="PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="TypingProfessor_s0.g64" size="279582" crc="657de616" sha1="475105ff2792f82df82789428919a4c25aca2051"/>
+			</dataarea>
+		</part>
+	</software>
 
 <!-- !MIDI -->
 
@@ -986,7 +1797,7 @@ All games fails loading
 
 	<software name="cagedart">
 		<description>Caged Artist's FB and DX Editor/Librarian</description>
-		<year>198?</year>
+		<year>1986</year>
 		<publisher>Dr T</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
@@ -1038,6 +1849,19 @@ All games fails loading
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="279582">
 				<rom name="1541_1571_drive_alignment_s1.g64" size="279582" crc="dc31e1b2" sha1="be1043f10d4798472a28e86faaad230d43ca9059"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nero1">
+		<description>Nero 1 (Finland)</description>
+		<year>1986</year>
+		<publisher>Bio-Syntax Method</publisher>
+		<sharedfeat name="compatibility" value="PAL,NTSC"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="Nero1_s0.g64" size="279582" crc="531afd2d" sha1="ba950eab2dc9f5663bd95f877926d42d9bed5a9f"/>
 			</dataarea>
 		</part>
 	</software>

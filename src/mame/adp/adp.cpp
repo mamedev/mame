@@ -613,6 +613,7 @@ void adp_state::funland(machine_config &config)
 	ramdac.set_addrmap(0, &adp_state::ramdac_map);
 
 	m_acrtc->set_addrmap(0, &adp_state::fstation_hd63484_map);
+	m_acrtc->set_auto_configure_screen(false);
 }
 
 void adp_state::fstation(machine_config &config)

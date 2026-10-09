@@ -189,7 +189,7 @@
 
 #include "emu.h"
 #include "cpu/pic16c5x/pic16c5x.h"
-#include "cpu/pic16x8x/pic16x8x.h"
+#include "cpu/pic16_mid/pic16_mid.h"
 #include "machine/ds1207.h"
 #include "machine/ds2401.h"
 #include "machine/i2cmem.h"
@@ -1102,7 +1102,6 @@ void hotslots_state::magicle(machine_config &config)
 	hotslots_base(config);
 
 	pic16f84_device &pic(PIC16F84(config, "pic16f84", 4000000));
-	pic.set_config(0x3ffa); // No protect - No Watchdog - HS Clock
 	pic.read_b().set(FUNC(hotslots_state::pic_portb_r));
 	pic.write_b().set(FUNC(hotslots_state::pic_portb_w));
 
@@ -1312,9 +1311,9 @@ ROM_START( magicrdja )
 	ROM_FILL( 0x4005, 0x01, 0x3f )
 	ROM_FILL( 0x4006, 0x01, 0x88 )
 	ROM_FILL( 0x4007, 0x01, 0x3f )
-	// configuration word: all 0
-	ROM_FILL( 0x400e, 0x01, 0x00 )
-	ROM_FILL( 0x400f, 0x01, 0x00 )
+	// configuration word: all 0 - can't be right, might have been unreadable. set to 0x3ffa for now.
+	ROM_FILL( 0x400e, 0x01, 0xfa )
+	ROM_FILL( 0x400f, 0x01, 0x3f )
 	ROM_LOAD("magicardj_4.01_pic16f84_data.bin",   0x4200, 0x0080, CRC(40961fef) SHA1(8617ef78d50842ea89d81d4db3728b3f799d7530) )
 
 	ROM_REGION( 0x200000, "other", 0 )  // unknown contents
@@ -1538,9 +1537,9 @@ ROM_START( magicle )
 	ROM_FILL( 0x4005, 0x01, 0x3f )
 	ROM_FILL( 0x4006, 0x01, 0x89 )
 	ROM_FILL( 0x4007, 0x01, 0x3f )
-	// configuration word: all 0
-	ROM_FILL( 0x400e, 0x01, 0x00 )
-	ROM_FILL( 0x400f, 0x01, 0x00 )
+	// configuration word: all 0 - can't be right, might have been unreadable. set to 0x3ffa for now.
+	ROM_FILL( 0x400e, 0x01, 0xfa )
+	ROM_FILL( 0x400f, 0x01, 0x3f )
 	ROM_LOAD("magicle_5.03_pic16f84_data.bin",   0x4200, 0x0080, CRC(b3cdf90f) SHA1(0afec6f78320e5fe653073769cdeb32918da061b) )
 
 	ROM_REGION( 0x200000, "other", 0 )  // unknown contents

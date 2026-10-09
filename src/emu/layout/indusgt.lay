@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:Curt Coder
+-->
+<mamelayout version="2">
+	<element name="panel">
+		<rect><color red="0.10" green="0.10" blue="0.10" /></rect>
+		<rect><bounds x="0.004" y="0.025" width="0.992" height="0.95" /><color red="0.18" green="0.18" blue="0.18" /></rect>
+	</element>
+	<element name="display_window">
+		<rect><color red="0.025" green="0.005" blue="0.005" /></rect>
+	</element>
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.08" blue="0.03" /></led7seg>
+	</element>
+	<element name="indicator" defstate="0">
+		<rect state="0"><color red="0.22" green="0.015" blue="0.01" /></rect>
+		<rect state="1"><color red="1.0" green="0.08" blue="0.03" /></rect>
+	</element>
+	<element name="button">
+		<rect><color red="0.045" green="0.045" blue="0.045" /></rect>
+		<rect><bounds x="0.05" y="0.08" width="0.90" height="0.60" /><color red="0.28" green="0.28" blue="0.28" /></rect>
+		<rect><bounds x="0.05" y="0.18" width="0.90" height="0.50" /><color red="0.10" green="0.10" blue="0.10" /></rect>
+	</element>
+	<element name="label_power"><text string="POWER"><color red="0.80" green="0.80" blue="0.77" /></text></element>
+	<element name="label_busy"><text string="BUSY"><color red="0.80" green="0.80" blue="0.77" /></text></element>
+	<element name="label_protect"><text string="PROTECT"><color red="0.80" green="0.80" blue="0.77" /></text></element>
+	<element name="label_drive_type"><text string="DRIVE TYPE"><color red="0.80" green="0.80" blue="0.77" /></text></element>
+	<element name="label_track"><text string="TRACK"><color red="0.80" green="0.80" blue="0.77" /></text></element>
+	<element name="label_error"><text string="ERROR"><color red="0.80" green="0.80" blue="0.77" /></text></element>
+
+	<view name="Indus GT User Interface Panel">
+		<bounds x="0" y="0" width="1000" height="150" />
+		<element ref="panel"><bounds x="0" y="0" width="1000" height="150" /></element>
+		<element ref="display_window"><bounds x="25" y="26" width="140" height="98" /></element>
+		<element name="digit0" ref="digit"><bounds x="37" y="32" width="55" height="86" /></element>
+		<element name="digit1" ref="digit"><bounds x="98" y="32" width="55" height="86" /></element>
+		<element name="power_led" ref="indicator"><bounds x="207" y="49" width="36" height="12" /></element>
+		<element ref="label_power"><bounds x="182" y="89" width="86" height="20" /></element>
+		<element name="led1" ref="indicator"><bounds x="317" y="49" width="36" height="12" /></element>
+		<element ref="label_busy"><bounds x="292" y="89" width="86" height="20" /></element>
+		<element name="protect_led" ref="indicator"><bounds x="427" y="49" width="36" height="12" /></element>
+		<element ref="label_protect"><bounds x="402" y="89" width="86" height="20" /></element>
+		<element ref="label_protect"><bounds x="501" y="31" width="108" height="20" /></element>
+		<element ref="button" inputtag="PANEL" inputmask="0x10"><bounds x="520" y="76" width="70" height="30" /></element>
+		<element ref="label_drive_type"><bounds x="626" y="31" width="108" height="20" /></element>
+		<element ref="button" inputtag="PANEL" inputmask="0x02"><bounds x="645" y="76" width="70" height="30" /></element>
+		<element ref="label_track"><bounds x="751" y="31" width="108" height="20" /></element>
+		<element ref="button" inputtag="PANEL" inputmask="0x04"><bounds x="770" y="76" width="70" height="30" /></element>
+		<element ref="label_error"><bounds x="876" y="31" width="108" height="20" /></element>
+		<element ref="button" inputtag="PANEL" inputmask="0x01"><bounds x="895" y="76" width="70" height="30" /></element>
+	</view>
+</mamelayout>

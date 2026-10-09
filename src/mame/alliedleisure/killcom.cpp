@@ -144,13 +144,12 @@ void killcom_state::video_start()
 
 uint32_t killcom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-		{
-			const uint16_t offset = (y << 8 & 0xff00) | (x & 0xff);
-			bitmap.pix(y, x) = m_videoram[offset] & 0x07;
-		}
+		auto *const dst = &bitmap.pix(y);
+		auto const *const src = &m_videoram[(y << 8) & 0xff00];
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+			dst[x] = src[x & 0xff] & 0x07;
 	}
 
 	return 0;

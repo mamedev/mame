@@ -27,6 +27,8 @@ public:
 	// construction/destruction
 	c64_nl10_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	static constexpr flags_type emulation_flags() { return flags::NOT_WORKING; }
+
 protected:
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;

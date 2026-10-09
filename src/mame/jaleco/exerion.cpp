@@ -438,7 +438,7 @@ uint8_t exerion_state::video_timing_r()
 void exerion_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// loop over all visible scanlines
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t const *src0 = &m_background_gfx[0][m_background_latches[1] * 256];
 		uint16_t const *src1 = &m_background_gfx[1][m_background_latches[3] * 256];
@@ -465,7 +465,7 @@ void exerion_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 		if (!m_cocktail_flip)
 		{
 			// skip processing anything that's not visible
-			for (int x = bg_x_start; x < cliprect.min_x; x++)
+			for (int x = bg_x_start; x < cliprect.left(); x++)
 			{
 				if (!(++xoffs0 & 0x1f)) start0++, stop0++;
 				if (!(++xoffs1 & 0x1f)) start1++, stop1++;
@@ -474,7 +474,7 @@ void exerion_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 			}
 
 			// draw the rest of the scanline fully
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				uint16_t combined = 0;
 
@@ -501,7 +501,7 @@ void exerion_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 		else
 		{
 			// skip processing anything that's not visible
-			for (int x = bg_x_start; x < cliprect.min_x; x++)
+			for (int x = bg_x_start; x < cliprect.left(); x++)
 			{
 				if (!(xoffs0-- & 0x1f)) start0++, stop0++;
 				if (!(xoffs1-- & 0x1f)) start1++, stop1++;
@@ -510,7 +510,7 @@ void exerion_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 			}
 
 			// draw the rest of the scanline fully
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				uint16_t combined = 0;
 
@@ -536,7 +536,7 @@ void exerion_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 		}
 
 		// draw the scanline
-		draw_scanline16(bitmap, cliprect.min_x, y, cliprect.width(), &scanline[cliprect.min_x], nullptr);
+		draw_scanline16(bitmap, cliprect.left(), y, cliprect.width(), &scanline[cliprect.left()], nullptr);
 	}
 }
 
@@ -597,8 +597,8 @@ uint32_t exerion_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	}
 
 	// draw the visible text layer
-	for (int sy = cliprect.min_y / 8; sy <= cliprect.max_y / 8; sy++)
-		for (int sx = cliprect.min_x / 8; sx <= cliprect.max_x / 8; sx++)
+	for (int sy = cliprect.top() / 8; sy <= cliprect.bottom() / 8; sy++)
+		for (int sx = cliprect.left() / 8; sx <= cliprect.right() / 8; sx++)
 		{
 			int const x = m_cocktail_flip ? (63 * 8 - 8 * sx) : 8 * sx;
 			int const y = m_cocktail_flip ? (31 * 8 - 8 * sy) : 8 * sy;

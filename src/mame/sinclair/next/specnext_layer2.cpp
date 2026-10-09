@@ -73,10 +73,10 @@ void specnext_layer2_device::copyprio(screen_device &screen, bitmap_rgb32 &bitma
 	if (!m_layer2_en)
 		return;
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		u8 *prio = &screen.priority().pix(y, cliprect.min_x);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++, prio++)
+		u8 *prio = &screen.priority().pix(y, cliprect.left());
+		for (int x = cliprect.left(); x <= cliprect.right(); x++, prio++)
 		{
 			if (prio[0] & 8)
 				bitmap.pix(y, x) = blendprio.pix(y, x);

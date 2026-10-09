@@ -979,7 +979,7 @@ public:
 	bool reconnect_match(std::string_view g, char const *s) const
 	{
 		return
-				(0 > m_instance) &&
+				!m_instance &&
 				(id() == g) &&
 				((s && serial() && (*serial() == s)) || (!s && !serial()));
 	}
@@ -991,7 +991,7 @@ protected:
 			input_module &module,
 			char const *serial) :
 		sdl_device(std::move(name), std::move(id), module),
-		m_instance(-1)
+		m_instance(0)
 	{
 		if (serial)
 			m_serial = serial;
@@ -999,15 +999,15 @@ protected:
 
 	void set_instance(SDL_JoystickID instance)
 	{
-		assert(0 > m_instance);
-		assert(0 <= instance);
+		assert(!m_instance);
+		assert(0 < instance);
 
 		m_instance = instance;
 	}
 
 	void clear_instance()
 	{
-		m_instance = -1;
+		m_instance = 0;
 	}
 
 private:

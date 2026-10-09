@@ -54,6 +54,9 @@ public:
 	void write(offs_t offset, u8 data);
 	u8 read(offs_t offset);
 
+	// configuration
+	msm6242_device &set_default_24h(bool default_24h);
+
 protected:
 	msm6242_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -79,9 +82,10 @@ private:
 	u8                          m_irq_flag;
 	u8                          m_irq_type;
 	u16                         m_tick;
+	bool                        m_default_24h;
 
 	// incidentals
-	devcb_write_line m_out_int_handler;
+	devcb_write_line            m_out_int_handler;
 	emu_timer *                 m_timer;
 	emu_timer *                 m_timer_irq_clear;
 	u64                         m_last_update_time; // last update time, in clock cycles

@@ -987,10 +987,10 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 {
 	int base_x = BMP_L_OR_R_BORDER;
 	int base_y = m_lines_top_border;
-	int min_x = USE_HORIZONTAL_CLIP ? cliprect.min_x : 0;
-	int max_x = USE_HORIZONTAL_CLIP ? cliprect.max_x : (base_x * 2 + BMP_ACTIVE_VIDEO - 1);
-	int min_y = cliprect.min_y;
-	int max_y = cliprect.max_y;
+	int min_x = USE_HORIZONTAL_CLIP ? cliprect.left() : 0;
+	int max_x = USE_HORIZONTAL_CLIP ? cliprect.right() : (base_x * 2 + BMP_ACTIVE_VIDEO - 1);
+	int min_y = cliprect.top();
+	int max_y = cliprect.bottom();
 	const pixel_t *palette = m_palette;
 
 	/* if the video didn't change, indicate as much */

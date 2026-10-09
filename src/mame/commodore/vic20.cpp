@@ -102,7 +102,8 @@ private:
 
 	void exp_reset_w(int state);
 
-	TIMER_CALLBACK_MEMBER(iec_sync_tick);
+	bool iec_ready(offs_t offset);
+	uint8_t via1_r(offs_t offset);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_vc20);
 
@@ -115,12 +116,6 @@ private:
 	int m_user_joy2;
 	int m_user_light_pen;
 	int m_user_cassette_switch;
-
-	emu_timer *m_iec_sync_timer;
-
-	int m_iec_atn = 0;
-	int m_iec_clk = 0;
-	int m_iec_data = 0;
 
 	void vic20_mem(address_map &map) ATTR_COLD;
 	void vic_colorram_map(address_map &map) ATTR_COLD;
@@ -148,10 +143,10 @@ void vic20_state::vic20_mem(address_map &map)
 	map(0x1000, 0x1fff).ram().share("ram");
 	map(0x8000, 0x8fff).rom().region("charom", 0);
 	map(0x9000, 0x900f).rw(m_vic, FUNC(mos6560_device::read), FUNC(mos6560_device::write));
-	map(0x9010, 0x901f).mirror(0x3c0).m(m_via1, FUNC(via6522_device::map));
+	map(0x9010, 0x901f).mirror(0x3c0).r(FUNC(vic20_state::via1_r)).w(m_via1, FUNC(via6522_device::write));
 	map(0x9020, 0x902f).mirror(0x3c0).m(m_via2, FUNC(via6522_device::map));
 	map(0x9030, 0x903f).mirror(0x3c0).lrw8(
-			NAME([this] (offs_t offset) { return m_via1->read(offset) & m_via2->read(offset); }),
+			NAME([this] (offs_t offset) -> u8 { return iec_ready(offset) ? (m_via1->read(offset) & m_via2->read(offset)) : 0xff; }),
 			NAME([this] (offs_t offset, uint8_t data) { m_via1->write(offset, data); m_via2->write(offset, data); }));
 	map(0x9400, 0x97ff).readonly().share("color_ram").lw8(NAME([this] (offs_t offset, uint8_t data) { m_color_ram[offset] = data & 0x0f; }));
 	map(0xc000, 0xdfff).rom().region("basic", 0);
@@ -327,6 +322,16 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
+bool vic20_state::iec_ready(offs_t offset)
+{
+	return ((offset != 1) && (offset != 15)) || m_iec->sample_ready(*m_maincpu);
+}
+
+uint8_t vic20_state::via1_r(offs_t offset)
+{
+	return iec_ready(offset) ? m_via1->read(offset) : 0xff;
+}
+
 uint8_t vic20_state::via1_pa_r()
 {
 	/*
@@ -389,8 +394,7 @@ void vic20_state::via1_pa_w(uint8_t data)
 
 	// serial attention out
 	m_user->write_9(!BIT(data, 7));
-	m_iec_atn = !BIT(data, 7);
-	m_iec_sync_timer->adjust(attotime::zero);
+	m_iec->host_atn_w(!BIT(data, 7));
 }
 
 void vic20_state::via1_pb_w(uint8_t data)
@@ -515,24 +519,14 @@ void vic20_state::via2_pb_w(uint8_t data)
 void vic20_state::via2_ca2_w(int state)
 {
 	// serial clock out
-	m_iec_clk = !state;
-	m_iec_sync_timer->adjust(attotime::zero);
+	m_iec->host_clk_w(!state);
 }
 
 void vic20_state::via2_cb2_w(int state)
 {
 	// serial data out
-	m_iec_data = !state;
-	m_iec_sync_timer->adjust(attotime::zero);
+	m_iec->host_data_w(!state);
 }
-
-TIMER_CALLBACK_MEMBER(vic20_state::iec_sync_tick)
-{
-	m_iec->host_atn_w(m_iec_atn);
-	m_iec->host_clk_w(m_iec_clk);
-	m_iec->host_data_w(m_iec_data);
-}
-
 
 //-------------------------------------------------
 //  VIC20_EXPANSION_INTERFACE( expansion_intf )
@@ -572,8 +566,6 @@ void vic20_state::machine_start()
 	m_key_row = 0xff;
 	m_key_col = 0xff;
 
-	m_iec_sync_timer = timer_alloc(FUNC(vic20_state::iec_sync_tick), this);
-
 	// state saving
 	save_item(NAME(m_key_row));
 	save_item(NAME(m_key_col));
@@ -583,9 +575,6 @@ void vic20_state::machine_start()
 	save_item(NAME(m_user_joy2));
 	save_item(NAME(m_user_light_pen));
 	save_item(NAME(m_user_cassette_switch));
-	save_item(NAME(m_iec_atn));
-	save_item(NAME(m_iec_clk));
-	save_item(NAME(m_iec_data));
 }
 
 

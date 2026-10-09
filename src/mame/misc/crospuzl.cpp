@@ -15,7 +15,7 @@ TODO:
 
 Notes:
 - Game enables UART1 receive irq, if that irq is enable it just prints
-	"___sysUART1_ISR<LF>___sysUART1_ISR_END<LF>"
+    "___sysUART1_ISR<LF>___sysUART1_ISR_END<LF>"
 
 Original LLM note about RTC:
   It is not on I2C, which is what an earlier pcf8583 attempt assumed and why the
@@ -351,18 +351,10 @@ INPUT_PORTS_END
 
 void crospuzl_state::crospuzl(machine_config &config)
 {
-	// HACK: requires accurate SE3208 cycle counts
-	// The real part runs somewhere around 80 MHz but averages about five cycles
-	// per instruction, while this core retires one per cycle, so it is clocked
-	// at a fifth of that to execute at the right rate.  The software timed delay
-	// loop at 0x024052e6 is the yardstick: sixteen instructions per turn, called
-	// with counts meant to be microseconds - 480 for the 1-Wire reset, 70 for
-	// the presence sample, 6 and 10 for the bit slots - so one microsecond per
-	// turn works out at exactly 16 MHz.  Clock it any faster and the DS2401
-	// never sees a reset long enough to answer.  Revisit once the core counts
-	// cycles.
-	SE3208(config, m_maincpu, 14318180 * 3); // FIXME: 72 MHz-ish
-	m_maincpu->set_clock_scale(0.26);
+	// main program PLL write: 0x5d48
+	// assuming a reference clock of 14'318'180 this gives ~36 MHz
+	// TODO: actual PLL support
+	SE3208(config, m_maincpu, 14'318'180 * (93 + 8) / (18 + 2) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &crospuzl_state::main_map);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 

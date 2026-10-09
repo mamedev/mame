@@ -19,6 +19,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="simpcalca" cloneof="simpcalc">
+		<description>SimpliCalc (alt)</description>
+		<year>198?</year>
+		<publisher>Commodore Electronics Ltd.</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="SimpliCalc_s0.g64" size="279582" crc="9d396edd" sha1="e4c04da4d77a2b42b693cd4fa9ec94d8686fdad8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vicfile">
 		<description>VicFile</description>
 		<year>1981</year>
@@ -47,6 +60,32 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="vicfileb" cloneof="vicfile">
+		<description>VicFile (alt 2)</description>
+		<year>1981</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="VicFile_s0.g64" size="279582" crc="58441062" sha1="0796945c1a8be8992bb15ca1b69db384d4d292c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vicfilec" cloneof="vicfile">
+		<description>VicFile (alt 3)</description>
+		<year>1981</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="VicFile_Alt_s0.g64" size="279582" crc="e1d890aa" sha1="03907aa6806b279a9f2976f259fcdc680ebc2d81"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vicwrite">
 		<description>VicWriter</description>
 		<year>1981</year>
@@ -57,6 +96,19 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="vicwriter[cbm_1981](vic20).g64" size="333744" crc="2a75180c" sha1="54fd41c6f11614d6b1e6763aa64ee92b9cc53f1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vicwritea" cloneof="vicwrite">
+		<description>VicWriter (alt)</description>
+		<year>198?</year>
+		<publisher>Commodore Electronics Ltd.</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="279582">
+				<rom name="VicWriter_s0.g64" size="279582" crc="fb5aef16" sha1="ad6e64315630b2440c3c65eb3725ccd9550b229c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -96,6 +148,20 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="fe3_029.d64" size="174848" crc="f97d1643" sha1="88e18f9d103f76b47a706753057600fd884f0764"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=O7_P8YwZCuQ -->
+	<software name="revicion" supported="no">
+		<description>reVICion</description>
+		<year>2024</year>
+		<publisher>Desire</publisher>
+		<info name="ram" value="35K" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="DSR_Revicion_VIC20_oldschool_demo_PAL.d64" size="174848" crc="077eb3e0" sha1="5fef12a567adff9362994b2aeb9838488d8ef12b"/>
 			</dataarea>
 		</part>
 	</software>

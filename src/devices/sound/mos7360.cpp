@@ -323,6 +323,7 @@ void mos7360_device::device_start()
 	save_item(NAME(m_osc_sign));
 	save_item(NAME(m_osc_out));
 	save_item(NAME(m_noise_sr));
+	save_item(NAME(m_bus_fetch));
 }
 
 
