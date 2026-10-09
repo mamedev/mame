@@ -217,6 +217,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_seeprom(*this, "seeprom")
+		, m_in(*this, "IN%u", 0U)
 	{ }
 
 	void init_gaminator();
@@ -226,9 +227,11 @@ private:
 	void gaminator_map(address_map &map) ATTR_COLD;
 
 	void gamtor_unk_w(uint32_t data);
+	uint32_t inputs_r(offs_t offset) { return m_in[offset]->read(); }
 
 	required_device<mcf5206e_device> m_maincpu;
 	required_device<i2cmem_device> m_seeprom;
+	required_ioport_array<4> m_in;
 };
 
 void gaminator_state::gamtor_unk_w(uint32_t data)
@@ -241,6 +244,8 @@ void gaminator_state::gaminator_map(address_map &map)
 {
 	map(0x00000000, 0x07ffffff).rom();
 	map(0x08000000, 0x0bffffff).ram();
+	map(0x1c070000, 0x1c07000f).r(FUNC(gaminator_state::inputs_r)); // IO-1
+	map(0x1e040000, 0x1e040003).portr("SYS"); // IO-1
 	map(0x1e040008, 0x1e04000b).w(FUNC(gaminator_state::gamtor_unk_w));
 
 	// SRAM-1: CS2 (CSAR2 0x2000, CSMR2 0x0fff0000, CSCR2 0x0d5b = 3 WS, AA, 8-bit port) holds the two battery-backed
@@ -263,7 +268,39 @@ void gaminator_state::gaminator_map(address_map &map)
 	map(0xe0000000, 0xe00001ff).ram(); // NVRAM?
 }
 
+// IO-1: the kernel's input driver (0x6ef30/0x6ee06) reads logical inputs 0x00-0x3f as bit (n & 15) of the 32-bit
+// word at 0x1c070000 + ((n >> 2) & 0x0c), inverted (active low), and inputs 0x40-0x5f as bit (n - 0x40) of
+// 0x1e040000 XOR 0x60. Lines without a known function stay IPT_UNKNOWN at their idle (high) level.
+// The panel keys come from the kernel's key table (bookra ROM 0x6371c, 24-byte entries: key id, input line, lamp
+// output, ...). Their legends are not known yet, so they are named by key id and input line.
 static INPUT_PORTS_START(  gaminator )
+	PORT_START("IN0")
+	PORT_BIT( 0x0000000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Key 0A (in 04)")
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON8 )  PORT_NAME("Key 0D (in 05)")
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Key 0C (in 06)")
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Key 10 (in 07)")
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_NAME("Key 1A (in 08)")
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_NAME("Key 19 (in 09)")
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Key 18 (in 0a)")
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_NAME("Key 17 (in 0b)")
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON5 )  PORT_NAME("Key 16 (in 0c)")
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON6 )  PORT_NAME("Key 08 (in 0d)")
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON7 )  PORT_NAME("Key 09 (in 0e)")
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_START1 )   PORT_NAME("Key 01 (in 0f)")
+	PORT_START("IN1")
+	PORT_BIT( 0x0000007f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON9 )  PORT_NAME("Key 0F (in 17)")
+	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("IN2")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("IN3")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SYS")
+	// logical input 0x40: when it reads 0 at boot (0x496ec) the kernel enters "*** Borrar el RAM ***" and asks to
+	// restart "con la tecla RAMCLEAR en posicion OFF" -> the RAMCLEAR key switch, a toggle
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE PORT_NAME("RAMCLEAR key")
 INPUT_PORTS_END
 
 
