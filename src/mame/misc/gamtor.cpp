@@ -24,7 +24,7 @@
      * 2 x Maxim MAX1488ECPD.
      * 3 x ULN2803A, 3 x ULN2064B.
     - One or two VGA boards (Novomatic P378-1 D9701).
-     * 4 x IS41C16256-35K RAM chips (1MB total).
+     * 4 x IS41C16256-35K RAM chips (256K x 16 each, 2MB total).
      * 14.3181 MHz xtal.
      * ATF16V8C PLD.
      * Chips & Technologies 65550 B.
@@ -58,28 +58,70 @@
 #include "speaker.h"
 
 
-// TODO: Chips & Technologies 65550 with swapped address lines?
-// Needs to be moved to own family file
-// 65550 is used by Apple PowerBook 2400c
-// 65535 is used by IBM PC-110
-
+// VGA-1: Chips & Technologies 65550 (HiQV) on the Novomatic P378-1 VGA board, from the 65550 data sheet rev 1.5
+// (docs/65550.pdf, read from rendered pages):
+// - Bus: the ColdFire (big endian) data bus is wired straight to the little-endian chip, so a CPU byte at lane l
+//   reaches chip byte l ^ 3. That is why the I/O ports appear with A0/A1 inverted; for memory space accesses the
+//   software uses the XR0A endian swap (0x20 = byte 0<>3, 1<>2) to undo it.
+// - Memory space (8MB, VL-bus layout, 3-5): linear frame buffer at 0, BitBLT registers at 0x400000, BitBLT data port
+//   at 0x410000.
+// - Extended modes (XR09 bit 0): CR30-CR33 vertical bits 11-8, CR40 start address bits 19-16 + update on VSYNC,
+//   CR41 offset bits 11-8. XR81 3-0 = display colour mode, XR80 bit 7 = 8-bit DAC.
+// - Video clocks (A-2): Fvco = Fref / RDS / NTSC * VLD * (M+2) / (N+2), Fout = Fvco / PD, Fref 14.31818 MHz.
+// - BitBLT engine (chapter 12 and appendix E).
 class gamtor_vga_device : public svga_device
 {
 public:
 	// construction/destruction
 	gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-//  virtual uint8_t mem_r(offs_t offset) override;
-//  virtual void mem_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t mem_linear_r(offs_t offset) override;
 	virtual void mem_linear_w(offs_t offset,uint8_t data) override;
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+
+	u32 space_r(offs_t offset, u32 mem_mask);
+	void space_w(offs_t offset, u32 data, u32 mem_mask);
 
 protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void io_3cx_map(address_map &map) override ATTR_COLD;
 	virtual void io_3bx_3dx_map(address_map &map) override ATTR_COLD;
+	virtual void crtc_map(address_map &map) override ATTR_COLD;
+	virtual void recompute_params() override;
 
 	virtual uint16_t offset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	bool extended() const { return BIT(m_xr[0x09], 0); }
+	int swap_xor() const { static const int s[4] = { 0, 1, 3, 0 }; return s[(m_xr[0x0a] >> 4) & 3]; }
+	u32 vclk() const;
+	void vblank_cb(screen_device &screen, bool state);
+	void xr_w(u8 data);
+
+	// BitBLT
+	int blt_bpp() const { return ((m_xr[0x20] >> 4) & 3) + 1; }
+	u32 vram_pixel(u32 addr, int bpp) const;
+	void blt_start();
+	void blt_line(int i);
+	void blt_host_push(u8 data);
+	void blt_host_run();
+	static u8 rop3(u8 rop, u8 p, u8 s, u8 d);
+
+	u8 m_xr[0x100], m_fr[0x100], m_mr[0x100];
+	u8 m_xr_idx, m_fr_idx, m_mr_idx;
+	u8 m_cr3x[4], m_cr40, m_cr41;
+	u32 m_ext_start;
+
+	u32 m_br[11];
+	bool m_blt_busy;
+	int m_blt_line;
+	std::vector<u8> m_hostq;
+	u32 m_host_bit;       // mono host stream bit cursor
+	u32 m_host_end;       // end bit of the previous mono line
+	const u8 *m_hline;    // colour host data of the line being drawn
+	u32 m_hline_skip;
 };
 
 DEFINE_DEVICE_TYPE(GAMTOR_VGA, gamtor_vga_device, "gamtor_vga", "CT-65550 SVGA")
@@ -88,13 +130,67 @@ gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, const char *
 	: svga_device(mconfig, GAMTOR_VGA, tag, owner, clock)
 {
 	m_main_if_space_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(gamtor_vga_device::io_3bx_3dx_map), this));
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(gamtor_vga_device::crtc_map), this));
 }
 
-// A0/A1 are inverted (protection or ct55550 feature?)
+void gamtor_vga_device::device_start()
+{
+	svga_device::device_start();
+	screen().register_vblank_callback(vblank_state_delegate(&gamtor_vga_device::vblank_cb, this));
+	save_item(NAME(m_xr)); save_item(NAME(m_fr)); save_item(NAME(m_mr));
+	save_item(NAME(m_xr_idx)); save_item(NAME(m_fr_idx)); save_item(NAME(m_mr_idx));
+	save_item(NAME(m_cr3x)); save_item(NAME(m_cr40)); save_item(NAME(m_cr41)); save_item(NAME(m_ext_start));
+	save_item(NAME(m_br)); save_item(NAME(m_blt_busy)); save_item(NAME(m_blt_line));
+	save_item(NAME(m_host_bit)); save_item(NAME(m_host_end));
+}
+
+void gamtor_vga_device::device_reset()
+{
+	svga_device::device_reset();
+	std::fill(std::begin(m_xr), std::end(m_xr), 0);
+	std::fill(std::begin(m_fr), std::end(m_fr), 0);
+	std::fill(std::begin(m_mr), std::end(m_mr), 0);
+	m_xr_idx = m_fr_idx = m_mr_idx = 0;
+	std::fill(std::begin(m_cr3x), std::end(m_cr3x), 0);
+	m_cr40 = m_cr41 = 0;
+	m_ext_start = 0;
+	std::fill(std::begin(m_br), std::end(m_br), 0);
+	m_blt_busy = false;
+	m_blt_line = 0;
+	m_hostq.clear();
+	m_host_bit = m_host_end = 0;
+	m_hline = nullptr;
+	m_hline_skip = 0;
+}
+
+// A0/A1 inverted: straight data bus to a little-endian chip (see above)
 void gamtor_vga_device::io_3bx_3dx_map(address_map &map)
 {
+	map(0x00 ^ 3, 0x00 ^ 3).lrw8(NAME([this] () { return m_fr_idx; }), NAME([this] (u8 data) { m_fr_idx = data; }));
+	map(0x01 ^ 3, 0x01 ^ 3).lrw8(NAME([this] () { return m_fr[m_fr_idx]; }), NAME([this] (u8 data) { m_fr[m_fr_idx] = data; }));
+	map(0x02 ^ 3, 0x02 ^ 3).lrw8(NAME([this] () { return m_mr_idx; }), NAME([this] (u8 data) { m_mr_idx = data; }));
+	map(0x03 ^ 3, 0x03 ^ 3).lrw8(NAME([this] () { return m_mr[m_mr_idx]; }), NAME([this] (u8 data) { m_mr[m_mr_idx] = data; }));
 	map(0x04 ^ 3, 0x04 ^ 3).rw(FUNC(gamtor_vga_device::crtc_address_r), FUNC(gamtor_vga_device::crtc_address_w));
 	map(0x05 ^ 3, 0x05 ^ 3).rw(FUNC(gamtor_vga_device::crtc_data_r), FUNC(gamtor_vga_device::crtc_data_w));
+	map(0x06 ^ 3, 0x06 ^ 3).lrw8(NAME([this] () { return m_xr_idx; }), NAME([this] (u8 data) { m_xr_idx = data; }));
+	map(0x07 ^ 3, 0x07 ^ 3).lrw8(
+		NAME([this] () -> u8 {
+			switch (m_xr_idx)
+			{
+			case 0x00: return 0x2c; // vendor ID 102Ch (13-1)
+			case 0x01: return 0x10;
+			case 0x02: return 0xe4; // device ID 00E4h
+			case 0x03: return 0x00;
+			case 0x04: // revision ID: "??h" in the data sheet
+				if (!machine().side_effects_disabled())
+					logerror("XR04 revision ID read\n");
+				return 0x00;
+			case 0x08: return 0x00; // configuration: VL-bus
+			case 0x20: return (m_xr[0x20] & ~1) | (m_blt_busy ? 1 : 0);
+			default: return m_xr[m_xr_idx];
+			}
+		}),
+		NAME([this] (u8 data) { xr_w(data); }));
 	map(0x0a ^ 3, 0x0a ^ 3).rw(FUNC(gamtor_vga_device::input_status_1_r), FUNC(gamtor_vga_device::feature_control_w));
 }
 
@@ -115,6 +211,132 @@ void gamtor_vga_device::io_3cx_map(address_map &map)
 	map(0x0f ^ 3, 0x0f ^ 3).rw(FUNC(gamtor_vga_device::gc_data_r), FUNC(gamtor_vga_device::gc_data_w));
 }
 
+void gamtor_vga_device::crtc_map(address_map &map)
+{
+	svga_device::crtc_map(map);
+	map(0x30, 0x33).lrw8(
+		NAME([this] (offs_t offset) { return m_cr3x[offset]; }),
+		NAME([this] (offs_t offset, u8 data) { m_cr3x[offset] = data & 0x0f; recompute_params(); }));
+	map(0x40, 0x40).lrw8(NAME([this] () { return m_cr40; }), NAME([this] (u8 data) { m_cr40 = data & 0x8f; }));
+	map(0x41, 0x41).lrw8(NAME([this] () { return m_cr41; }), NAME([this] (u8 data) { m_cr41 = data & 0x0f; }));
+}
+
+void gamtor_vga_device::xr_w(u8 data)
+{
+	const u8 idx = m_xr_idx;
+	if (idx == 0x20)
+	{
+		// XR20 bit 1: BitBLT reset; bit 0 is the read-only status
+		if (BIT(data, 1))
+		{
+			m_blt_busy = false;
+			m_hostq.clear();
+		}
+		m_xr[0x20] = data & 0x32;
+		return;
+	}
+	m_xr[idx] = data;
+	if (idx == 0x09 || idx == 0x81 || (idx >= 0xc0 && idx <= 0xcf))
+		recompute_params();
+}
+
+u32 gamtor_vga_device::vclk() const
+{
+	// MISC 3-2 selects VCLK0/1/2 (XRC0-C3, XRC4-C7, XRC8-CB)
+	const int sel = (vga.miscellaneous_output >> 2) & 3;
+	if (sel == 3)
+		return 0;
+	const u8 *r = &m_xr[0xc0 + sel * 4];
+	const u32 m = r[0] | ((r[2] & 3) << 8);
+	const u32 n = r[1] | (((r[2] >> 4) & 3) << 8);
+	const u8 div = r[3];
+	if (m == 0 && n == 0 && div == 0)
+		return sel ? 28'322'000 : 25'175'000; // VGA compatible defaults (13-36)
+	double f = 14'318'180.0;
+	if (!BIT(div, 0)) f /= 4.0;          // reference divisor select
+	if (BIT(div, 1)) f /= 5.0;           // NTSC reference divide
+	f *= BIT(div, 2) ? 16.0 : 4.0;       // VCO loop divide
+	f = f * (m + 2) / (n + 2);
+	f /= double(1 << ((div >> 4) & 7));  // post divisor
+	return u32(f);
+}
+
+void gamtor_vga_device::recompute_params()
+{
+	if (!extended())
+	{
+		svga_device::recompute_params();
+		return;
+	}
+	vga.crtc.vert_total = (vga.crtc.vert_total & 0xff) | (m_cr3x[0] << 8);
+	vga.crtc.vert_disp_end = (vga.crtc.vert_disp_end & 0xff) | (m_cr3x[1] << 8);
+	vga.crtc.vert_retrace_start = (vga.crtc.vert_retrace_start & 0xff) | (m_cr3x[2] << 8);
+	vga.crtc.vert_blank_start = (vga.crtc.vert_blank_start & 0xff) | (m_cr3x[3] << 8);
+	const u32 clk = vclk();
+	if (clk)
+		recompute_params_clock(1, clk);
+}
+
+void gamtor_vga_device::vblank_cb(screen_device &screen, bool state)
+{
+	// CR40 bit 7: the extended start address is taken on VSYNC, then the bit clears (10-34)
+	if (state && BIT(m_cr40, 7))
+	{
+		m_ext_start = ((m_cr40 & 0x0f) << 16) | (vga.crtc.start_addr & 0xffff);
+		m_cr40 &= 0x7f;
+		if (m_ext_start)
+			logerror("extended start address %05x (unit not verified yet)\n", m_ext_start);
+	}
+}
+
+uint16_t gamtor_vga_device::offset()
+{
+	// TODO: pinpoint whatever extra register that wants this shifted by 1
+	return vga_device::offset() << 1;
+}
+
+uint32_t gamtor_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	const int mode = m_xr[0x81] & 0x0f;
+	if (!extended() || (mode != 2 && mode != 4 && mode != 5))
+		return svga_device::screen_update(screen, bitmap, cliprect);
+
+	// Offset in quadwords: the game programs CR13 = 0x50 for its 640 byte lines (BitBLT pitch BR00 = 0x280)
+	const u32 pitch = (((m_cr41 & 0x0f) << 8) | (vga.crtc.offset & 0xff)) * 8;
+	const u32 vmask = vga.svga_intf.vram_size - 1;
+	const u8 *mem = vga.memory.get();
+	const bool dac8 = BIT(m_xr[0x80], 7);
+	pen_t pens[256];
+	for (int i = 0; i < 256; i++)
+	{
+		const u8 *c = &vga.dac.color[3 * (i & vga.dac.mask)];
+		pens[i] = dac8 ? rgb_t(c[0], c[1], c[2]) : rgb_t(pal6bit(c[0] & 0x3f), pal6bit(c[1] & 0x3f), pal6bit(c[2] & 0x3f));
+	}
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		u32 *dst = &bitmap.pix(y, cliprect.min_x);
+		u32 a = m_ext_start * 4 + y * pitch; // start address unit (dwords) not verified yet, see vblank_cb
+		if (mode == 2)
+		{
+			a += cliprect.min_x;
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				*dst++ = pens[mem[a++ & vmask]];
+		}
+		else
+		{
+			a += cliprect.min_x * 2;
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++, a += 2)
+			{
+				const u16 p = mem[a & vmask] | (mem[(a + 1) & vmask] << 8);
+				*dst++ = (mode == 4) ? rgb_t(pal5bit(p >> 10), pal5bit(p >> 5), pal5bit(p)) : rgb_t(pal5bit(p >> 11), pal6bit(p >> 5), pal5bit(p));
+			}
+		}
+	}
+	return 0;
+}
+
+// Text-mode window kept from the original driver: the kernel writes its text at the bottom of the memory space
+// (planes 0/1 interleaved, plane 2 = font in MAME's VGA memory layout).
 uint8_t gamtor_vga_device::mem_linear_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
@@ -130,10 +352,253 @@ void gamtor_vga_device::mem_linear_w(offs_t offset, uint8_t data)
 		vga.memory[(offset & 1) | (offset >> 1)] = data;
 }
 
-uint16_t gamtor_vga_device::offset()
+u32 gamtor_vga_device::space_r(offs_t offset, u32 mem_mask)
 {
-	// TODO: pinpoint whatever extra register that wants this shifted by 1
-	return vga_device::offset() << 1;
+	const u32 a = offset << 2;
+	const int sx = swap_xor();
+	u32 chip = 0;
+	if (a < 0x200000)
+	{
+		for (int k = 0; k < 4; k++)
+		{
+			u8 b = 0;
+			if (extended())
+				b = vga.memory[(a + k) & (vga.svga_intf.vram_size - 1)];
+			else if (a + k < 0x20000)
+				b = vga.memory[a + k];
+			else if (a + k >= 0xa0000 && a + k < 0xc0000)
+				b = mem_r(a + k - 0xa0000); // VGA window, as the original driver mapped it (beetlem)
+			chip |= u32(b) << (8 * k);
+		}
+	}
+	else if (a >= 0x400000 && a < 0x400040)
+	{
+		const int r = (a >> 2) & 0x0f;
+		chip = r < 11 ? m_br[r] : 0;
+		if (r == 4)
+			chip = (chip & 0x7fffffff) | (m_blt_busy ? 0x80000000 : 0);
+		return chip; // the XR0A endian swap does not apply to the BitBLT registers (see space_w)
+	}
+	else
+		return 0;
+	// chip byte k leaves on CPU lane bits 8*(k ^ swap)
+	u32 data = 0;
+	for (int k = 0; k < 4; k++)
+		data |= ((chip >> (8 * k)) & 0xff) << (8 * (k ^ sx));
+	return data;
+}
+
+void gamtor_vga_device::space_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	const u32 a = offset << 2;
+	const int sx = swap_xor();
+	u32 chip = 0, cmask = 0;
+	for (int k = 0; k < 4; k++)
+	{
+		chip |= ((data >> (8 * (k ^ sx))) & 0xff) << (8 * k);
+		cmask |= ((mem_mask >> (8 * (k ^ sx))) & 0xff) << (8 * k);
+	}
+
+	if (a < 0x200000)
+	{
+		for (int k = 0; k < 4; k++)
+		{
+			if (!(cmask & (0xff << (8 * k))))
+				continue;
+			const u8 b = chip >> (8 * k);
+			if (extended())
+				vga.memory[(a + k) & (vga.svga_intf.vram_size - 1)] = b;
+			else if (a + k < 0x20000)
+				mem_linear_w(a + k, b);
+			else if (a + k >= 0xa0000 && a + k < 0xc0000)
+				mem_w(a + k - 0xa0000, b); // VGA window, as the original driver mapped it (beetlem)
+		}
+	}
+	else if (a >= 0x400000 && a < 0x400040)
+	{
+		// The XR0A endian swap does not apply here: the game's first BitBLT (0x2e954f4, BR04 = 0x000c00aa) is
+		// programmed while XR0A = 0x20, and its long values only make sense unswapped.
+		chip = data;
+		cmask = mem_mask;
+		const int r = (a >> 2) & 0x0f;
+		if (r >= 11)
+			return;
+		if (m_blt_busy)
+			logerror("BitBLT BR%02X write while busy: line %d of %d, %d bytes queued, BR00 %08x BR03 %08x BR04 %08x BR06 %08x BR08 %08x\n",
+					r, m_blt_line, (m_br[8] >> 16) & 0x1fff, int(m_hostq.size()), m_br[0], m_br[3], m_br[4], m_br[6], m_br[8]);
+		m_br[r] = (m_br[r] & ~cmask) | (chip & cmask);
+		if (r == 8 && (m_br[8] >> 16) & 0x1fff)
+			blt_start(); // a non-zero height starts the operation (E-2)
+	}
+	else if (a >= 0x410000 && a < 0x420000)
+	{
+		for (int k = 0; k < 4; k++)
+			if (cmask & (0xff << (8 * k)))
+				blt_host_push(chip >> (8 * k));
+		blt_host_run();
+	}
+	else
+		logerror("unmapped 65550 memory space write %06x = %08x & %08x\n", a, data, mem_mask);
+}
+
+u8 gamtor_vga_device::rop3(u8 rop, u8 p, u8 s, u8 d)
+{
+	u8 r = 0;
+	for (int k = 0; k < 8; k++)
+		if (BIT(rop, k))
+			r |= (BIT(k, 2) ? p : ~p) & (BIT(k, 1) ? s : ~s) & (BIT(k, 0) ? d : ~d);
+	return r;
+}
+
+u32 gamtor_vga_device::vram_pixel(u32 addr, int bpp) const
+{
+	u32 v = 0;
+	for (int k = 0; k < bpp; k++)
+		v |= u32(vga.memory[(addr + k) & (vga.svga_intf.vram_size - 1)]) << (8 * k);
+	return v;
+}
+
+void gamtor_vga_device::blt_start()
+{
+	const u32 ctl = m_br[4];
+	const int h = (m_br[8] >> 16) & 0x1fff;
+	m_blt_line = 0;
+	m_hostq.clear();
+	m_host_bit = BIT(ctl, 12) ? (m_br[3] >> 16) & 0x3f : 0; // mono: initial discard
+	m_host_end = m_host_bit;
+	if (BIT(ctl, 10))
+	{
+		m_blt_busy = true; // waits for the host CPU on the data port
+		return;
+	}
+	if (BIT(ctl, 12))
+		logerror("BitBLT: monochrome source in the frame buffer not supported (BR04 %08x)\n", ctl);
+	for (int i = 0; i < h; i++)
+		blt_line(i);
+	m_blt_busy = false;
+}
+
+void gamtor_vga_device::blt_host_push(u8 data)
+{
+	if (m_blt_busy)
+		m_hostq.push_back(data);
+}
+
+void gamtor_vga_device::blt_host_run()
+{
+	const u32 ctl = m_br[4];
+	const int h = (m_br[8] >> 16) & 0x1fff;
+	const int bpp = blt_bpp();
+	const u32 wbytes = m_br[8] & 0x1fff;
+	while (m_blt_busy && m_blt_line < h)
+	{
+		if (!BIT(ctl, 12))
+		{
+			// colour host data: the game sends each line in whole quadwords (8x12 glyph, BR00 source offset 0x5a0,
+			// 96 bytes sent), so a line is BR06 2-0 skipped bytes + the line, padded to a quadword
+			const u32 skip = m_br[6] & 7;
+			const u32 len = (skip + wbytes + 7) & ~7;
+			if (m_hostq.size() < len)
+				return;
+			m_hline = m_hostq.data();
+			m_hline_skip = skip;
+			blt_line(m_blt_line++);
+			m_hostq.erase(m_hostq.begin(), m_hostq.begin() + len);
+		}
+		else
+		{
+			// monochrome host data: BR03 alignment, initial discard, left/right clipping (BR03, E.3.3)
+			static const int align_bits[8] = { 1, 1, 8, 16, 32, 64, 1, 1 };
+			const int al = align_bits[(m_br[3] >> 24) & 7];
+			const u32 wpix = wbytes / bpp;
+			u32 start = m_blt_line ? (m_host_end + al - 1) / al * al : m_host_bit;
+			const u32 end = start + (m_br[3] & 0x3f) + wpix + ((m_br[3] >> 8) & 0x3f);
+			if (m_hostq.size() * 8 < end)
+				return;
+			m_host_bit = start + (m_br[3] & 0x3f);
+			m_hline = nullptr;
+			blt_line(m_blt_line++);
+			m_host_end = end;
+		}
+		(void)bpp;
+	}
+	if (m_blt_line >= h)
+	{
+		m_blt_busy = false;
+		m_hostq.clear();
+	}
+}
+
+void gamtor_vga_device::blt_line(int i)
+{
+	const u32 ctl = m_br[4];
+	const u8 rop = ctl & 0xff;
+	const int bpp = blt_bpp();
+	const u32 cmask = bpp == 3 ? 0xffffff : bpp == 2 ? 0xffff : 0xff;
+	const int wpix = (m_br[8] & 0x1fff) / bpp;
+	const bool rl = BIT(ctl, 8), bu = BIT(ctl, 9);
+	const u32 dstoff = (m_br[0] >> 16) & 0x1fff, srcoff = m_br[0] & 0x1fff;
+	const u32 dline = m_br[7] + (bu ? -i : i) * dstoff;
+	const u32 sline = m_br[6] + (bu ? -i : i) * srcoff;
+	const bool mono_src = BIT(ctl, 12), host = BIT(ctl, 10);
+	const bool mono_pat = BIT(ctl, 18), solid = BIT(ctl, 19);
+	const u32 src_fg = (BIT(m_br[3], 27) ? m_br[10] : m_br[2]) & cmask;
+	const u32 src_bg = (BIT(m_br[3], 27) ? m_br[9] : m_br[1]) & cmask;
+	const int py = (((ctl >> 20) & 7) + (bu ? -i : i)) & 7;
+	const u32 pat = m_br[5] & 0x7ffff8;
+	const u32 vmask = vga.svga_intf.vram_size - 1;
+
+	for (int j = 0; j < wpix; j++)
+	{
+		const u32 da = (rl ? dline - j * bpp : dline + j * bpp) & vmask;
+		const int px = (da / bpp) & 7;
+
+		int pbit = 1;
+		u32 p;
+		if (mono_pat)
+		{
+			pbit = solid ? 0 : BIT(vga.memory[(pat + py) & vmask], 7 - px);
+			p = (pbit ? m_br[2] : m_br[1]) & cmask;
+		}
+		else
+			p = vram_pixel(pat + (bpp == 3 ? py * 32 + px * 3 : (py * 8 + px) * bpp), bpp);
+
+		int sbit = 1;
+		u32 s;
+		if (mono_src)
+		{
+			const u32 b = m_host_bit + j;
+			sbit = (host && (b >> 3) < m_hostq.size()) ? BIT(m_hostq[b >> 3], 7 - (b & 7)) : 0;
+			s = sbit ? src_fg : src_bg;
+		}
+		else if (host)
+		{
+			s = 0;
+			for (int k = 0; k < bpp; k++)
+				s |= u32(m_hline[m_hline_skip + j * bpp + k]) << (8 * k);
+		}
+		else
+			s = vram_pixel(rl ? sline - j * bpp : sline + j * bpp, bpp);
+
+		const u32 d = vram_pixel(da, bpp);
+		u32 r = 0;
+		for (int k = 0; k < bpp; k++)
+			r |= u32(rop3(rop, p >> (8 * k), s >> (8 * k), d >> (8 * k))) << (8 * k);
+
+		// per-pixel write masking (BR04 17, 13, 16-14)
+		if (BIT(ctl, 17) && mono_pat && !solid && !pbit)
+			continue;
+		if (BIT(ctl, 13) && mono_src && !sbit)
+			continue;
+		if (BIT(ctl, 14))
+		{
+			const bool eq = (BIT(ctl, 15) ? d : r) == src_bg;
+			if (BIT(ctl, 16) ? !eq : eq)
+				continue;
+		}
+		for (int k = 0; k < bpp; k++)
+			vga.memory[(da + k) & vmask] = r >> (8 * k);
+	}
 }
 
 ROM_START(gamtor_vga)
@@ -259,11 +724,12 @@ void gaminator_state::gaminator_map(address_map &map)
 	//map(0x40000000, 0x40000fff).ram(); // regs
 	map(0x400003b0, 0x400003df).m("vga", FUNC(gamtor_vga_device::io_map));
 
-	// TODO: revisit mapping in VGA core once it enters non-text mode
-	map(0x44000000, 0x4401ffff).rw("vga", FUNC(gamtor_vga_device::mem_linear_r), FUNC(gamtor_vga_device::mem_linear_w));
+	// VGA-1: the 65550 memory space (frame buffer, BitBLT registers, BitBLT data port), see gamtor_vga_device
+	map(0x44000000, 0x447fffff).rw("vga", FUNC(gamtor_vga_device::space_r), FUNC(gamtor_vga_device::space_w));
 
-	// beetlem accesses here, standard layout unlike later games
-	map(0x440a0000, 0x440bffff).rw("vga", FUNC(gamtor_vga_device::mem_r), FUNC(gamtor_vga_device::mem_w));
+	// VGA-2: second VGA board
+	map(0x480003b0, 0x480003df).m("vga2", FUNC(gamtor_vga_device::io_map));
+	map(0x4c000000, 0x4c7fffff).rw("vga2", FUNC(gamtor_vga_device::space_r), FUNC(gamtor_vga_device::space_w));
 
 	map(0xe0000000, 0xe00001ff).ram(); // NVRAM?
 }
@@ -325,7 +791,18 @@ void gaminator_state::gaminator(machine_config &config)
 
 	gamtor_vga_device &vga(GAMTOR_VGA(config, "vga"));
 	vga.set_screen("screen");
-	vga.set_vram_size(0x100000);
+	vga.set_vram_size(0x200000); // 4 x IS41C16256 (256K x 16) = 2MB
+
+	// VGA-2: second P378-1 VGA board (top monitor). The video module (0x2e96b0e) puts board 0 I/O at 0x40000000 and
+	// board 1 at 0x48000000, memory space at I/O + 0x4000000, and stops with "Soporte fisico no existe" (VI/3/1127)
+	// when the board 1 DAC mask does not read back (0x2e95a48).
+	screen_device &screen2(SCREEN(config, "screen2"));
+	screen2.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
+	screen2.set_screen_update("vga2", FUNC(gamtor_vga_device::screen_update));
+
+	gamtor_vga_device &vga2(GAMTOR_VGA(config, "vga2"));
+	vga2.set_screen("screen2");
+	vga2.set_vram_size(0x200000);
 
 	SPEAKER(config, "speaker", 2).front();
 	// unknown sound
