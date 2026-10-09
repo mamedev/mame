@@ -76,7 +76,7 @@ protected:
 
 	// MB654419U TVF: one filter channel per SA-16/RF5C36 voice output; the
 	// caller routes the TVF output onwards
-	void add_tvf(machine_config &config, required_device<mb654419u_device> &tvf);
+	void add_tvf(machine_config &config, required_device<mb654419u_device> &tvf) ATTR_COLD;
 
 protected:
 	required_device<i8x9x_device> m_maincpu;
@@ -158,61 +158,20 @@ public:
 		, m_psram1_bank(*this, "psram1")
 		, m_psram2_bank(*this, "psram2")
 		, m_psram(*this, "psram", 0x20000U, ENDIANNESS_LITTLE)
-		, m_psram_bank(0)
 		, m_keysw(*this, "KEYSW%u", 0U)
-		, m_keyrow(0)
 		, m_leds(*this, "LED%u", 0U)
 		, m_analog(*this, "ACH%u", 0U)
 		, m_tvf(*this, "tvf")
 		, m_cursor_dial(*this, "CURSOR")
 		, m_value_dial(*this, "VALUE")
+		, m_psram_bank(0)
+		, m_keyrow(0)
 	{
 	}
 
-	void w30(machine_config &config);
-
-	// ACH7: A/D converter input from the TVF output, used by the firmware's
-	// output path check
-	u16 analog_dac_value();
+	void w30(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void device_post_load() override ATTR_COLD;
-
-	u8 psram_bank_r();
-	void psram_bank_w(u8 data);
-	void floppy_select_w(u8 data);
-
-	void add_midi(machine_config &config) ATTR_COLD;
-
-	void w30_mem_map(address_map &map) ATTR_COLD;
-	void psram1_map(address_map &map) ATTR_COLD;
-	void psram2_map(address_map &map) ATTR_COLD;
-
-	memory_view m_bank1_view;
-	required_memory_bank m_psram1_bank;
-	required_memory_bank m_psram2_bank;
-	memory_share_creator<u16> m_psram;
-
-	// M60013 keyswitch/LED controller, shared with the S-330
-	u8 keysw_r();
-	void keysw_w(u8 data);
-	u8 leds_r(offs_t offset);
-	void leds_w(offs_t offset, u8 data);
-
-	// Analog inputs on the CPU A/D channels (ACH7 is analog_dac_value)
-	template <int N> u16 analog_r() { return m_analog[N].read_safe(0); }
-
-	u8 m_psram_bank;
-
-	required_ioport_array<4> m_keysw;
-	u8 m_keyrow; // M60013: internal counter for the SCANn outputs
-	u8 m_led_latch[2]; // d800 / d802, read back by the firmware (read-modify-write)
-	output_finder<16> m_leds;
-	optional_ioport_array<5> m_analog;
-	required_device<mb654419u_device> m_tvf;
-
 	// Cursor and Value encoder wheels. Modeled at the dial-count level: the
 	// outputs are sampled from the dial logic on each P1 read.
 	// HSO1/HSO2 hold the "moved" flag in clear.
@@ -223,15 +182,56 @@ protected:
 		bool moved = false; // wheel turned since last clear
 		bool clr_n = true; // /CLR level (HSO)
 	};
-	encoder_state m_cursor_enc;
-	encoder_state m_value_enc;
-	optional_ioport m_cursor_dial;
-	optional_ioport m_value_dial;
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
+
+	void add_midi(machine_config &config) ATTR_COLD;
+
+	void w30_mem_map(address_map &map) ATTR_COLD;
+	void psram1_map(address_map &map) ATTR_COLD;
+	void psram2_map(address_map &map) ATTR_COLD;
+
+	u8 psram_bank_r();
+	void psram_bank_w(u8 data);
+	void floppy_select_w(u8 data);
+
+	// M60013 keyswitch/LED controller, shared with the S-330
+	u8 keysw_r();
+	void keysw_w(u8 data);
+	u8 leds_r(offs_t offset);
+	void leds_w(offs_t offset, u8 data);
+
+	// Analog inputs on the CPU A/D channels
+	template <int N> u16 analog_r() { return m_analog[N].read_safe(0); }
+	// Volume and expression are percentage adjusters, scaled to the 10-bit A/D range
+	template <int N> u16 adjuster_r() { return m_analog[N].read_safe(0) * 0x3ff / 100; }
+	// ACH7: A/D converter input from the TVF output, used by the firmware's
+	// output path check
+	u16 analog_dac_value();
 
 	u8 p1_r();
 	void hso1_w(int state);
 	void hso2_w(int state);
 	void encoder_sample(encoder_state &enc, optional_ioport &dial);
+
+	memory_view m_bank1_view;
+	required_memory_bank m_psram1_bank;
+	required_memory_bank m_psram2_bank;
+	memory_share_creator<u16> m_psram;
+	required_ioport_array<4> m_keysw;
+	output_finder<16> m_leds;
+	optional_ioport_array<5> m_analog;
+	required_device<mb654419u_device> m_tvf;
+	optional_ioport m_cursor_dial;
+	optional_ioport m_value_dial;
+
+	u8 m_psram_bank;
+	u8 m_keyrow; // M60013: internal counter for the SCANn outputs
+	u8 m_led_latch[2]; // d800 / d802, read back by the firmware (read-modify-write)
+	encoder_state m_cursor_enc;
+	encoder_state m_value_enc;
 };
 
 class roland_s330_state : public roland_w30_state
@@ -246,7 +246,7 @@ public:
 	{
 	}
 
-	void s330(machine_config &config);
+	void s330(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -256,8 +256,8 @@ protected:
 	u8 keysw_r();
 
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
-	void init_lcd_palette(palette_device &palette) const;
-	void init_vdp_palette(palette_device &palette) const;
+	void init_lcd_palette(palette_device &palette) const ATTR_COLD;
+	void init_vdp_palette(palette_device &palette) const ATTR_COLD;
 
 	required_device<hd44780_device> m_lcdc;
 	required_ioport m_ctrltype;
@@ -477,7 +477,7 @@ void roland_w30_state::keysw_w(u8 data)
 // clear while the HSO is low.
 void roland_w30_state::encoder_sample(encoder_state &enc, optional_ioport &dial)
 {
-	const u8 cur = static_cast<u8>(dial->read());
+	const u8 cur = u8(dial->read());
 	if (cur != enc.last)
 	{
 		enc.dir = s8(cur - enc.last) < 0; // firmware decodes dir=1 as -1
@@ -767,10 +767,10 @@ static INPUT_PORTS_START(w30)
 	PORT_BIT(0x3ff, 0x000, IPT_PEDAL) PORT_NAME("Aftertouch") PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(32)
 
 	PORT_START("ACH2")
-	PORT_ADJUSTER(1023, "Volume") PORT_MINMAX(0, 1023)
+	PORT_ADJUSTER(100, "Volume")
 
 	PORT_START("ACH3")
-	PORT_ADJUSTER(1023, "Expression Pedal") PORT_MINMAX(0, 1023)
+	PORT_ADJUSTER(100, "Expression Pedal")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(s330)
@@ -800,7 +800,7 @@ static INPUT_PORTS_START(s330)
 
 	// 10-bit A/D input: the firmware scales every TVF voice level by it
 	PORT_START("ACH4")
-	PORT_ADJUSTER(1023, "Volume") PORT_MINMAX(0, 1023)
+	PORT_ADJUSTER(100, "Volume")
 
 	// The S-330 selects the input controller by the panel key held at power-on
 	// (Left=None, Down=Mouse, Right=RC-100). At startup the boot scan happens
@@ -930,8 +930,8 @@ void roland_w30_state::w30(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_w30_state::w30_mem_map);
 	m_maincpu->ach0_cb().set(FUNC(roland_w30_state::analog_r<0>)); // pitch bender
 	m_maincpu->ach1_cb().set(FUNC(roland_w30_state::analog_r<1>)); // keyboard aftertouch
-	m_maincpu->ach2_cb().set(FUNC(roland_w30_state::analog_r<2>)); // volume
-	m_maincpu->ach3_cb().set(FUNC(roland_w30_state::analog_r<3>)); // expression pedal (optional)
+	m_maincpu->ach2_cb().set(FUNC(roland_w30_state::adjuster_r<2>)); // volume
+	m_maincpu->ach3_cb().set(FUNC(roland_w30_state::adjuster_r<3>)); // expression pedal (optional)
 	m_maincpu->ach7_cb().set(FUNC(roland_w30_state::analog_dac_value)); // A/D compare level (shared with S-330)
 	m_maincpu->in_p1_cb().set(FUNC(roland_w30_state::p1_r));
 	// The firmware polls with ORB/ANDB PORT1, which writes the idle wheel
@@ -981,8 +981,8 @@ void roland_s330_state::s330(machine_config &config)
 {
 	C8095_90(config, m_maincpu, 24_MHz_XTAL / 2); // N8097-90
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_s330_state::s330_mem_map);
-	m_maincpu->ach4_cb().set(FUNC(roland_s330_state::analog_r<4>)); // volume (scales the TVF levels)
-	m_maincpu->ach7_cb().set(FUNC(roland_w30_state::analog_dac_value)); // A/D compare level
+	m_maincpu->ach4_cb().set(FUNC(roland_s330_state::adjuster_r<4>)); // volume (scales the TVF levels)
+	m_maincpu->ach7_cb().set(FUNC(roland_s330_state::analog_dac_value)); // A/D compare level
 
 	WD1772(config, m_fdc, 8_MHz_XTAL); // WD1772-02
 
