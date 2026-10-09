@@ -3272,6 +3272,8 @@ if BUSES["KIM1"] then
 		MAME_DIR .. "src/devices/bus/kim1/k1008_vismem.h",
 		MAME_DIR .. "src/devices/bus/kim1/k1016_16k.cpp",
 		MAME_DIR .. "src/devices/bus/kim1/k1016_16k.h",
+		MAME_DIR .. "src/devices/bus/kim1/retrospy_ramrom.cpp",
+		MAME_DIR .. "src/devices/bus/kim1/retrospy_ramrom.h",
 	}
 end
 
