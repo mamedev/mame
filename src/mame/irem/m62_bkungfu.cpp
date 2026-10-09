@@ -39,6 +39,7 @@ private:
 
 	void tilemap_ram_w(offs_t offset, uint8_t data);
 	void bkungfu_blitter_tilemap_w(offs_t offset, uint8_t data);
+	uint32_t screen_update_bkungfu(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
 	TILE_GET_INFO_MEMBER(get_bkungfu_bg_tile_info);
 
@@ -57,6 +58,9 @@ TILE_GET_INFO_MEMBER(m62_bkungfu_state::get_bkungfu_bg_tile_info)
 {
 	int code = m_bkungfu_tileram[(tile_index << 1)];
 	int color = m_bkungfu_tileram[(tile_index << 1) | 1];
+	int is_hud = (tile_index / 256) < 6;
+	// Special case for Game Over message, uses bits 5-7 for priority similar to Kid Nikki but different mask and is limited to color 0
+	int is_msg = (color & 0xe0) == 0x60 && (color & 0x1f) == 0;
 
 	tileinfo.set(0, code | ((color & 0xe0) << 3) | (m_kidniki_background_bank << 11), color & 0x1f, 0);
 
@@ -64,15 +68,31 @@ TILE_GET_INFO_MEMBER(m62_bkungfu_state::get_bkungfu_bg_tile_info)
 	// sprite in the reference footage.  Beyond Kung-Fu therefore has the M62
 	// tile-priority threshold strapped one step above Kung-Fu Master: only
 	// palette pairs 0x0e-0x0f (colors 0x1c-0x1f) cover sprites.
-	if ((tile_index / 256) < 6 || ((color & 0x1f) >> 1) > 0x0d)
-		tileinfo.category = 1;
+	if(is_hud || is_msg)
+		tileinfo.group = 2;
+	else if (((color & 0x1f) >> 1) > 0x0d)
+		tileinfo.group = 1;
 	else
-		tileinfo.category = 0;
+		tileinfo.group = 0;
 }
 
 void m62_bkungfu_state::video_start()
 {
 	m62_start(tilemap_get_info_delegate(*this, FUNC(m62_bkungfu_state::get_bkungfu_bg_tile_info)), 32, 0, 8, 8, 256, 32);
+
+	// Group 0 - Low priority tiles
+	for (int pen = 0; pen <= 7; pen++)
+		m_bg_tilemap->map_pen_to_layer(0, pen, TILEMAP_PIXEL_LAYER1);
+
+	// Group 1 - Partial high priority tiles (ceiling trim, window bars, doorways)
+	for (int pen = 0; pen <= 3; pen++)
+		m_bg_tilemap->map_pen_to_layer(1, pen, TILEMAP_PIXEL_LAYER1);
+	for (int pen = 4; pen <= 7; pen++)
+		m_bg_tilemap->map_pen_to_layer(1, pen, TILEMAP_PIXEL_LAYER0);
+
+	// Group 2 - Full high priority tiles (HUD & Popup Message Boxes)
+	for (int pen = 0; pen <= 7; pen++)
+		m_bg_tilemap->map_pen_to_layer(2, pen, TILEMAP_PIXEL_LAYER0);
 }
 
 
@@ -115,6 +135,23 @@ void m62_bkungfu_state::io_map(address_map &map)
 	//map(0x84, 0x84).nopw();
 }
 
+uint32_t m62_bkungfu_state::screen_update_bkungfu(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+{
+	int i;
+	// Beyond Kung-Fu uses map_pen_to_layer to handle more complex pen priority handling than Kung-Fu Master
+	for (i = 0; i < 6; i++)
+	{
+		m_bg_tilemap->set_scrollx(i, 0);
+	}
+	for (i = 6; i < 32; i++)
+	{
+		m_bg_tilemap->set_scrollx(i, m_m62_background_hscroll);
+	}
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+	draw_sprites(bitmap, cliprect, 0x1f, 0x00, 0x00);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	return 0;
+}
 
 
 /*******************************************************************************
@@ -132,6 +169,7 @@ void m62_bkungfu_state::bkungfu(machine_config& config)
 	m_mcu->tilemap_ram_w().set(FUNC(m62_bkungfu_state::tilemap_ram_w));
 
 	MCFG_VIDEO_START_REMOVE()
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(m62_bkungfu_state::screen_update_bkungfu));
 }
 
 
