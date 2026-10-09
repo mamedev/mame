@@ -49,11 +49,12 @@ private:
 	void port_w(uint8_t data);
 
 	uint8_t tcbm_data_r();
-	void tcbm_data_w(uint8_t data);
+	template <int N> void tcbm_data_w(uint8_t data);
 	uint8_t tpi0_pc_r();
 	void tpi0_pc_w(uint8_t data);
 
 	uint8_t tpi1_pb_r();
+	void tpi1_pb_w(uint8_t data);
 	uint8_t tpi1_pc_r();
 	void tpi1_pc_w(uint8_t data);
 
@@ -80,8 +81,9 @@ private:
 	output_finder<2> m_leds;
 
 	// TCBM bus
-	uint8_t m_tcbm_data;                      // data
+	uint8_t m_tcbm_data[2];                   // data
 	int m_status;                           // status
+	int m_host_status;                      // host status
 	int m_dav;                              // data valid
 	int m_ack;                              // acknowledge
 	int m_dev;                              // device number
