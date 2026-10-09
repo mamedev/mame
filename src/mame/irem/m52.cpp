@@ -397,7 +397,7 @@ void m52_state::colorram_w(offs_t offset, uint8_t data)
    follows: result = popcount(value & 0x7f) ^ (value >> 7) */
 uint8_t m52_state::protection_r()
 {
-	return std::popcount(m_bgxpos[0] & 0x7f) ^ (m_bgxpos[0] >> 7);
+	return std::popcount(m_bgxpos[0] & 0x7fU) ^ (m_bgxpos[0] >> 7);
 }
 
 
