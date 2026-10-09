@@ -331,6 +331,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/a800/pbi/slot.h,BUSES["A800_PBI"] = true
+---------------------------------------------------
+
+if BUSES["A800_PBI"] then
+	files {
+		MAME_DIR .. "src/devices/bus/a800/pbi/kmkide.cpp",
+		MAME_DIR .. "src/devices/bus/a800/pbi/kmkide.h",
+		MAME_DIR .. "src/devices/bus/a800/pbi/options.cpp",
+		MAME_DIR .. "src/devices/bus/a800/pbi/options.h",
+		MAME_DIR .. "src/devices/bus/a800/pbi/slot.cpp",
+		MAME_DIR .. "src/devices/bus/a800/pbi/slot.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/a800/sio/a8sio.h,BUSES["A800_SIO"] = true
 ---------------------------------------------------
 
