@@ -548,46 +548,32 @@ inline void hd63484_device::recompute_parameters()
 
 int hd63484_device::translate_command(uint16_t data)
 {
-	/* annoying switch-case sequence, but it's the only way to get invalid commands ... */
-	switch (data)
-	{
-		case HD63484_COMMAND_ORG:    return COMMAND_ORG;
-		case HD63484_COMMAND_DRD:    return COMMAND_DRD;
-		case HD63484_COMMAND_DWT:    return COMMAND_DWT;
-		case HD63484_COMMAND_RD:     return COMMAND_RD;
-		case HD63484_COMMAND_WT:     return COMMAND_WT;
-		case HD63484_COMMAND_CLR:    return COMMAND_CLR;
-		case HD63484_COMMAND_AMOVE:  return COMMAND_AMOVE;
-		case HD63484_COMMAND_RMOVE:  return COMMAND_RMOVE;
-	}
-
-	switch(data & ~0x3)
-	{
-		case HD63484_COMMAND_DMOD:   return COMMAND_DMOD;
-		case HD63484_COMMAND_MOD:    return COMMAND_MOD;
-		case HD63484_COMMAND_SCLR:   return COMMAND_SCLR;
-	}
-
-	switch(data & ~0xf)
-	{
-		case HD63484_COMMAND_WPTN:   return COMMAND_WPTN;
-		case HD63484_COMMAND_RPTN:   return COMMAND_RPTN;
-	}
-
-	switch(data & ~0x1f)
-	{
-		case HD63484_COMMAND_WPR:    return COMMAND_WPR;
-		case HD63484_COMMAND_RPR:    return COMMAND_RPR;
-	}
-
-	switch(data & ~0x0f03)
+	switch (data & 0xf000) // using top 4 bits for decoding
 	{
 		case HD63484_COMMAND_CPY:    return COMMAND_CPY;
 		case HD63484_COMMAND_SCPY:   return COMMAND_SCPY;
+		case HD63484_COMMAND_PTN:    return COMMAND_PTN;
+		case HD63484_COMMAND_AGCPY:  return COMMAND_AGCPY;
+		case HD63484_COMMAND_RGCPY:  return COMMAND_RGCPY;
 	}
 
-	switch(data & ~0x00ff)
+	switch (data & 0xfc00) // using top 6 bits for decoding
 	{
+		case HD63484_COMMAND_ORG:    return COMMAND_ORG;
+		case HD63484_COMMAND_WPR:    return COMMAND_WPR;
+		case HD63484_COMMAND_RPR:    return COMMAND_RPR;
+		case HD63484_COMMAND_WPTN:   return COMMAND_WPTN;
+		case HD63484_COMMAND_RPTN:   return COMMAND_RPTN;
+		case HD63484_COMMAND_DRD:    return COMMAND_DRD;
+		case HD63484_COMMAND_DWT:    return COMMAND_DWT;
+		case HD63484_COMMAND_DMOD:   return COMMAND_DMOD;
+		case HD63484_COMMAND_RD:     return COMMAND_RD;
+		case HD63484_COMMAND_WT:     return COMMAND_WT;
+		case HD63484_COMMAND_MOD:    return COMMAND_MOD;
+		case HD63484_COMMAND_CLR:    return COMMAND_CLR;
+		case HD63484_COMMAND_SCLR:   return COMMAND_SCLR;
+		case HD63484_COMMAND_AMOVE:  return COMMAND_AMOVE;
+		case HD63484_COMMAND_RMOVE:  return COMMAND_RMOVE;
 		case HD63484_COMMAND_ALINE:  return COMMAND_ALINE;
 		case HD63484_COMMAND_RLINE:  return COMMAND_RLINE;
 		case HD63484_COMMAND_ARCT:   return COMMAND_ARCT;
@@ -596,27 +582,16 @@ int hd63484_device::translate_command(uint16_t data)
 		case HD63484_COMMAND_RPLL:   return COMMAND_RPLL;
 		case HD63484_COMMAND_APLG:   return COMMAND_APLG;
 		case HD63484_COMMAND_RPLG:   return COMMAND_RPLG;
-		case HD63484_COMMAND_AFRCT:  return COMMAND_AFRCT;
-		case HD63484_COMMAND_RFRCT:  return COMMAND_RFRCT;
-		case HD63484_COMMAND_DOT:    return COMMAND_DOT;
-	}
-
-	switch(data & ~0x01ff)
-	{
 		case HD63484_COMMAND_CRCL:   return COMMAND_CRCL;
 		case HD63484_COMMAND_ELPS:   return COMMAND_ELPS;
 		case HD63484_COMMAND_AARC:   return COMMAND_AARC;
 		case HD63484_COMMAND_RARC:   return COMMAND_RARC;
 		case HD63484_COMMAND_AEARC:  return COMMAND_AEARC;
 		case HD63484_COMMAND_REARC:  return COMMAND_REARC;
+		case HD63484_COMMAND_AFRCT:  return COMMAND_AFRCT;
+		case HD63484_COMMAND_RFRCT:  return COMMAND_RFRCT;
 		case HD63484_COMMAND_PAINT:  return COMMAND_PAINT;
-	}
-
-	switch(data & ~0x0fff)
-	{
-		case HD63484_COMMAND_PTN:    return COMMAND_PTN;
-		case HD63484_COMMAND_AGCPY:  return COMMAND_AGCPY;
-		case HD63484_COMMAND_RGCPY:  return COMMAND_RGCPY;
+		case HD63484_COMMAND_DOT:    return COMMAND_DOT;
 	}
 
 	return COMMAND_INVALID;
