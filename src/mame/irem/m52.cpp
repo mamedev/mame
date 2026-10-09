@@ -57,6 +57,8 @@
 #include "screen.h"
 #include "tilemap.h"
 
+#include <bit>
+
 
 namespace {
 
@@ -395,11 +397,7 @@ void m52_state::colorram_w(offs_t offset, uint8_t data)
    follows: result = popcount(value & 0x7f) ^ (value >> 7) */
 uint8_t m52_state::protection_r()
 {
-	int popcount = 0;
-
-	for (int temp = m_bgxpos[0] & 0x7f; temp != 0; temp >>= 1)
-		popcount += temp & 1;
-	return popcount ^ (m_bgxpos[0] >> 7);
+	return std::popcount(m_bgxpos[0] & 0x7f) ^ (m_bgxpos[0] >> 7);
 }
 
 
@@ -537,8 +535,7 @@ void m52_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 		// adjust for flipping
 		if (flip_screen())
 		{
-			int temp = clip.top();
-			clip.sety(255 - clip.bottom(), 255 - temp);
+			clip.sety(255 - clip.bottom(), 255 - clip.top());
 			flipx = !flipx;
 			flipy = !flipy;
 			sx = 238 - sx;

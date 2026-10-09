@@ -735,8 +735,8 @@ void x1_020_dx_101_device::draw_sprites_line(bitmap_ind16 &bitmap, const rectang
 					const int lastcolumn = firstcolumn + width * 0x10 - 1;
 
 					// if the sprite isn't within the x-coordinates of the screen, bail
-					if (firstcolumn > cliprect.right()) continue;
-					if (lastcolumn < cliprect.left())   continue;
+					if (!cliprect.overlapsx(firstcolumn, lastcolumn))
+						continue;
 
 					// otherwise get the rest of the things we need to draw
 					int scrolly = s2[3];

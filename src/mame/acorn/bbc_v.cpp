@@ -280,7 +280,7 @@ void bbc_state::video_ula_w(offs_t offset, uint8_t data)
 MC6845_RECONFIGURE(bbc_state::crtc_reconfigure)
 {
 	// ensure all graphics modes render to same bitmap size (for split-screen modes)
-	rectangle rect(visarea.left() * m_pixel_width, visarea.left() + (visarea.width() * m_pixel_width) - 1, visarea.top(), visarea.bottom());
+	rectangle rect(visarea.left() * m_pixel_width, ((visarea.right() + 1) * m_pixel_width) - 1, visarea.top(), visarea.bottom());
 	m_screen->configure(width * m_pixel_width, height, rect, frame_period);
 }
 
