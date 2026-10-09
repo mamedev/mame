@@ -14,6 +14,7 @@
 #include "debug/points.h"
 #include "debug/textbuf.h"
 #include "debugger.h"
+#include "../../../frontend/mame/mame.h"
 
 #include "modules/lib/osdobj_common.h"
 #include "modules/osdmodule.h"
@@ -848,6 +849,7 @@ public:
 	void send_stop_packet();
 
 private:
+	void execute_lua(std::string_view code);
 	running_machine *m_machine;
 	device_t *m_maincpu;
 	device_state_interface *m_state;
@@ -1408,6 +1410,19 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_P(const char *buf)
 	return REPLY_OK;
 }
 
+void debug_gdbstub::execute_lua(std::string_view code)
+{
+	auto *const manager = dynamic_cast<mame_machine_manager *>(&m_machine->manager());
+	if (!manager)
+	{
+		m_debugger_console->printf("Lua engine unavailable\n");
+		return;
+	}
+
+	std::string const output = manager->execute_lua(code);
+	m_debugger_console->printf("%s", output);
+}
+
 //-------------------------------------------------------------------------
 // General query.
 debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
@@ -1440,7 +1455,12 @@ debug_gdbstub::cmd_reply debug_gdbstub::handle_q(const char *buf)
 		std::string command(data.begin(), data.end());
 		text_buffer &textbuf = m_debugger_console->get_console_textbuf();
 		text_buffer_clear(textbuf);
-		m_debugger_console->execute_command(command, false);
+		if (command == "lua")
+			m_debugger_console->printf("Usage: monitor lua <Lua code>\n");
+		else if (command.compare(0, 4, "lua ") == 0)
+			execute_lua(std::string_view(command).substr(4));
+		else
+			m_debugger_console->execute_command(command, false);
 		m_machine->debugger().refresh_display();
 		uint32_t nlines = text_buffer_num_lines(textbuf);
 		if ( nlines == 0 )
