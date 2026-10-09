@@ -102,6 +102,7 @@ using util::BIT;
 #include "cpu/m6502/m6510d.h"
 #include "cpu/m6502/m65ce02d.h"
 #include "cpu/m6502/m740d.h"
+#include "cpu/m6502/r6511d.h"
 #include "cpu/m6502/r65c02d.h"
 #include "cpu/m6502/r65c19d.h"
 #include "cpu/m6502/w65816d.h"
@@ -615,6 +616,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "prime64r",        be, -1, []() -> util::disasm_interface * { return new prime64r_disassembler; } },
 	{ "prime64v",        be, -1, []() -> util::disasm_interface * { return new prime64v_disassembler; } },
 	{ "psxcpu",          le,  0, []() -> util::disasm_interface * { return new psxcpu_disassembler; } },
+	{ "r6511",           le,  0, []() -> util::disasm_interface * { return new r6511_disassembler; } },
 	{ "r65c02",          le,  0, []() -> util::disasm_interface * { return new r65c02_disassembler; } },
 	{ "r65c19",          le,  0, []() -> util::disasm_interface * { return new r65c19_disassembler; } },
 	{ "r800",            le,  0, []() -> util::disasm_interface * { return new r800_disassembler; } },
