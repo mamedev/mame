@@ -1375,8 +1375,8 @@ ROM_START( namco_fca11 )
 	ROM_LOAD( "fcaf11.ic4",      0x030000, 0x010000, CRC(13d936df) SHA1(fbb2191263b2b326f1f49729767ee6fae2db21f7) ) // almost good dump, all JVS related code and data is in place
 	ROM_FILL(                    0x000000, 0x034000, 0x67 ) // dump was made from $0000 to $ffff, not $fc0000. The ROM only appears in memory from $4000-$ffff
 
-	ROM_REGION( 0x10000, "pic", 0 ) // I/O board PIC16F84 code
-	ROM_LOAD( "fcap11.ic2",      0x000000, 0x004010, CRC(1b2592ce) SHA1(a1a487361053af564f6ec67e545413e370a3b38c) )
+	ROM_REGION16_LE( 0x4280, "pic", ROMREGION_ERASEFF ) // I/O board PIC16F84 code
+	ROM_LOAD( "fcap11.ic2", 0x0000, 0x4010, CRC(1b2592ce) SHA1(a1a487361053af564f6ec67e545413e370a3b38c) )
 ROM_END
 
 class namco_fca_11_device :
@@ -1453,8 +1453,8 @@ ROM_START( namco_fca10 )
 	ROM_REGION( 0x040000, "iocpu", ROMREGION_ERASE00 ) // 256KB internal flash ROM
 	ROM_LOAD( "fcaf10.bin",      0x000000, 0x040000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "pic", 0 ) // I/O board PIC16F84 code
-	ROM_LOAD( "fcap10.ic2",      0x000000, 0x004010, NO_DUMP )
+	ROM_REGION16_LE( 0x4280, "pic", ROMREGION_ERASEFF ) // I/O board PIC16F84 code
+	ROM_LOAD( "fcap10.ic2", 0x0000, 0x4280, NO_DUMP )
 ROM_END
 
 class namco_fca_10_device :
@@ -1486,8 +1486,8 @@ ROM_START( namco_fcb )
 	ROM_LOAD( "fcb1_io-0b.ic4",  0x034000, 0x00c000, BAD_DUMP CRC(5e25b73f) SHA1(fa805a422ff8793989b0ce901cc868ec1a87c7ac) ) // most JVS handling code is in undumped area
 	ROM_FILL(                    0x000000, 0x034000, 0x67 ) // dump was made from $0000 to $ffff, not $fc0000. The ROM only appears in memory from $4000-$ffff
 
-	ROM_REGION( 0x10000, "pic", 0 ) // I/O board PIC16F84 code
-	ROM_LOAD( "fcb_pic",         0x000000, 0x004010, NO_DUMP )
+	ROM_REGION16_LE( 0x4280, "pic", ROMREGION_ERASEFF ) // I/O board PIC16F84 code
+	ROM_LOAD( "fcb_pic", 0x0000, 0x4280, NO_DUMP )
 ROM_END
 
 class namco_fcb_device :

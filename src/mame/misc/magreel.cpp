@@ -172,8 +172,8 @@ ROM_START( magreel )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "m27c800.ic18",  0x000000, 0x100000, CRC(2af3d8e7) SHA1(729cd2c1011d8018cf8d77c2d118d1815e30f475) ) // TODO: figure out the line swapping
 
-	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF )
-	ROM_LOAD( "pic16c621", 0x0000, 0x4000, NO_DUMP ) // read protected
+	ROM_REGION16_LE( 0x4010, "pic", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16c621.bin", 0x0000, 0x4010, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x800000, "reels", 0 )
 	ROM_LOAD( "m27c160.ic3",  0x000000, 0x200000, CRC(707a835a) SHA1(4edbb2279298f330514512147166b9382c79861d) )

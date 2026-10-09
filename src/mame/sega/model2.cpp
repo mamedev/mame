@@ -7214,8 +7214,8 @@ ROM_START( daytonam ) /* Daytona USA (Japan, To The MAXX) */
 	ROM_SYSTEM_BIOS(1, "16488", "drive board ROM 16488")
 	ROMX_LOAD("epr-16488.ic12",  0x000000, 0x010000, CRC(4f0b8114) SHA1(1fcebd0632da8f224a04fe6b39147a05eb358e83), ROM_BIOS(1) )
 
-	ROM_REGION( 0x10000, "pic", 0)
-	ROM_LOAD("pic.bin", 0x00000, 0x10000, NO_DUMP )
+	ROM_REGION16_LE( 0x4280, "pic", 0 )
+	ROM_LOAD( "pic.bin", 0x0000, 0x4280, NO_DUMP )
 ROM_END
 
 ROM_START( daytonagtx )

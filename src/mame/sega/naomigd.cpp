@@ -1151,10 +1151,9 @@ ROM_START( dimm )
 	ROMX_LOAD( "401_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(edb52597108462bcea8eb2a47c19e51e5fb60638), ROM_BIOS(8))
 
 	// dynamically filled with data
-	ROM_REGION(0x4010, "pic", ROMREGION_ERASE00)
-	// configuration word: 0x3ffb
+	ROM_REGION16_LE(0x4010, "pic", ROMREGION_ERASEFF)
 	ROM_FILL(0x400e, 0x01, 0xfb)
-	ROM_FILL(0x400f, 0x01, 0x3f)
+	ROM_FILL(0x400f, 0x01, 0x3f) // configuration: 0x3ffb
 
 	ROM_REGION(0x80, "i2c_0", ROMREGION_ERASE00)
 	ROM_LOAD("dimmspd.bin", 0x00, 0x80, CRC(45dac6d7) SHA1(4548675f8d31348fa6828d5b4f247af1f072b62d))
