@@ -11,7 +11,7 @@
  supply connector, moving from PC AT to PC ATX):
 
  COMPUMATIC "GANCHONEW V8" CPU
-							  CN7 COUNTERS
+                              CN7 COUNTERS
   ______________________________________
  |     ______  ______  ______  ········ |
  |     ST8251  ST8251  ST8251           |
@@ -54,7 +54,7 @@
 
  "GANCHONEW/CPU-V1 COMP" PCB has a different layout, with the connectors on
  the side instead of the front edge:
-			  __________
+              __________
   ___________|   CN1    |_____CN8__________
  |           |_________| |||||||||||||  .|
  |:                ________   _______   :| CN2
@@ -97,7 +97,7 @@
  |  [CN6]   [CN5]      [CN4] [CN3]        [CN2]         |
  |_______________________________________________________|
    DISPLAY SENSOR+V.RET. ALTAVOZ SELECTOR    JOYSTICK
-	5 pins    7 pins     2 pins   7 pins
+    5 pins    7 pins     2 pins   7 pins
 
  On that board the flash /OE is the wired-OR of /PSEN and /RD (D2 and D3 next
  to the GAL), so code and samples come from the same device, and IC16 (a quad
@@ -117,11 +117,11 @@
  unsigned PCM terminated by a zero byte; the timer 0 interrupt (6.67 kHz)
  mixes two of them and writes the result to the DAC.
 
- The ATF16V8 dumped from the V2, V7 and V8 boards does the decoding in ext_r
- and ext_w if its pins are 1 /PSEN, 2 /RD, 3 /WR, 5 P3.5, 6 A15, 7 A14, 8 A13,
- 9 A0 and 19 flash A16, an assignment that fits every access the firmware does
- (not checked on a PCB).  Pins 12 and 13 just repeat pin 11, whose signal is
- unknown.  The V1 and OM Vending PLDs aren't dumped.
+ The ATF16V8 dumped from the V2, V7 and V8 boards does the decoding in
+ ganchonew_state::ext_map if its pins are 1 /PSEN, 2 /RD, 3 /WR, 5 P3.5, 6 A15,
+ 7 A14, 8 A13, 9 A0 and 19 flash A16, an assignment that fits every access the
+ firmware does (not checked on a PCB).  Pins 12 and 13 just repeat pin 11,
+ whose signal is unknown.  The V1 and OM Vending PLDs aren't dumped.
 
  The "GANCHONEW" (V1) board has no DAC: the timer 0 interrupt pulses P3.4 for
  about 23 us at the frequency of the note, a train of narrow pulses rather
@@ -131,21 +131,21 @@
 
  Display: the four digits are not multiplexed, the 32 segment lines are driven
  by a serial LED driver on the "Plumadig" board.  The firmware supports two
- different display boards, selected by JP1 (bit 5 of the 8001h port, P1.4 on
+ different display boards, selected by JP1 (bit 5 of the 0x8001 port, P1.4 on
  the V1 board), and carries a different segment table for each:
   - bit 5 low: MM5450 style driver, segments active high.  Frames are 36
-	clocks long, the 32 data bits followed by 0,0,0,1, that trailing '1' being
-	the start bit of the next frame, so each frame latches the data sent on
-	the previous one.  It's the one emulated, fitted on every board seen, and
-	the same protocol as MAME's mm5445 family, but the chip hasn't been
-	identified.  The firmware always sends a blank frame right before the data
-	one, so the display is really blanked for about 0.5 ms on each refresh
-	(every 12 ms), unnoticeable on the real LEDs but not when sampled at the
-	frontend frame rate, hence the PWM display device.
+    clocks long, the 32 data bits followed by 0,0,0,1, that trailing '1' being
+    the start bit for the next frame, so the chip latches each frame's data on
+    its third '0'.  It's the one emulated, fitted on every board seen, but the
+    chip hasn't been identified: an MM5448, which uses the same protocol,
+    stands in for it.  The firmware always sends a blank frame right before the
+    data one, so the display is really blanked for about 0.5 ms on each refresh
+    (every 12 ms), unnoticeable on the real LEDs but not when sampled at the
+    frontend frame rate, hence the PWM display device.
   - bit 5 high: four dummy clocks with data low followed by the 32 bits shifted
-	out by the MCS51 serial port in mode 0 (plus a latch strobe on P1.2 on the
-	V1 board) to a shift register board, leftmost digit first, segments active
-	low: bit 0 g, 1 f, 2 a, 3 b, 4 e, 5 d, 6 c, 7 dp.  Not emulated.
+    out by the MCS51 serial port in mode 0 (plus a latch strobe on P1.2 on the
+    V1 board) to a shift register board, leftmost digit first, segments active
+    low: bit 0 g, 1 f, 2 a, 3 b, 4 e, 5 d, 6 c, 7 dp.  Not emulated.
 
  The 24C16 must hold the machine type code at address 1 (and a valid BCD value
  at address 2) or the firmware wipes the last 256 bytes of it and hangs on
@@ -167,7 +167,7 @@
 
  TODO:
   - Emulate the shift register display board (needs the MCS51 serial port
-	mode 0 output emulated on the port pins).
+    mode 0 output emulated on the port pins).
   - Dump a real SEEPROM and the missing PLDs.
 
 ********************************************************************************/
@@ -179,6 +179,7 @@
 #include "machine/i2cmem.h"
 #include "sound/dac.h"
 #include "sound/spkrdev.h"
+#include "video/mm5445.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
@@ -193,17 +194,15 @@ namespace
 
 class compucranes_state : public driver_device
 {
-public:
+protected:
 	compucranes_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_i2cmem(*this, "i2cmem")
-		, m_dac(*this, "dac")
-		, m_speaker(*this, "speaker")
+		, m_ledctrl(*this, "ledctrl")
 		, m_display(*this, "display")
+		, m_rombank(*this, "rombank")
 		, m_rom(*this, "program")
-		, m_inputs(*this, "IN%u", 0U)
-		, m_conf(*this, "CONF")
 		, m_outputs(*this, "out%u", 0U)
 		, m_motors(*this, "motor%u", 0U)
 		, m_claw(*this, "claw")
@@ -213,28 +212,22 @@ public:
 	{
 	}
 
-	ioport_value limits_r();
-	ioport_value limits_v1_r();
-
-	void ganchonew(machine_config &config) ATTR_COLD;
-	void ganchonew_v1(machine_config &config) ATTR_COLD;
-	void toyshop(machine_config &config) ATTR_COLD;
-
-	void init_toyshop() ATTR_COLD;
-
-protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-private:
+	void common(machine_config &config) ATTR_COLD;
+
+	virtual void outputs_w(u8 data);
+	void display_w(u8 data);
+	void set_motors(u8 data);
+	void mech_update();
+
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
-	optional_device<dac_8bit_r2r_device> m_dac;
-	optional_device<speaker_sound_device> m_speaker;
+	required_device<mm5448_device> m_ledctrl;
 	required_device<pwm_display_device> m_display;
+	required_memory_bank m_rombank;
 	required_region_ptr<u8> m_rom;
-	required_ioport_array<2> m_inputs;
-	optional_ioport m_conf;
 	output_finder<8> m_outputs;
 	output_finder<6> m_motors;
 	output_finder<> m_claw;
@@ -242,56 +235,111 @@ private:
 	output_finder<> m_crane_lr;
 	output_finder<> m_crane_z;
 
-	void common(machine_config &config) ATTR_COLD;
-
-	void program_map(address_map &map) ATTR_COLD;
-	void ext_map(address_map &map) ATTR_COLD;
-	void ext_v1_map(address_map &map) ATTR_COLD;
-
-	u8 ext_r(offs_t offset);
-	u8 ext_v1_r(offs_t offset);
-	void ext_w(offs_t offset, u8 data);
-	void ext_v1_w(offs_t offset, u8 data);
-
-	u8 p1_r();
-	u8 p1_v1_r();
-	void p1_w(u8 data);
-	void p1_v1_w(u8 data);
-	void p3_w(u8 data);
-	void p3_v1_w(u8 data);
-	void p3_toyshop_w(u8 data);
-
-	void motors_w(u8 data);
-	void outputs_w(u8 data);
-	void display_w(u8 data);
-	void set_motors(u8 data);
-	void mech_update();
-
-	u32 m_bank = 0;
-	u64 m_shifter = 0;
-	bool m_disp_clk = false;
-	u8 m_p3 = 0xff;
-	bool m_claw_on_latch = false;
-
 	// crane position from 0.0 to 1.0: front to back, left to right and claw up
 	// to down; starts clear of every limit switch, which the V1 checksum reads
 	double m_pos[3] = { 0.5, 0.5, 0.1 };
 	u8 m_motor_state = 0;
 	attotime m_mech_time;
+
+private:
+	void program_map(address_map &map) ATTR_COLD;
+
+	void display_output_w(u64 data);
+};
+
+// "GANCHONEW" V2 to V8 boards
+class ganchonew_state : public compucranes_state
+{
+public:
+	ganchonew_state(const machine_config &mconfig, device_type type, const char *tag)
+		: compucranes_state(mconfig, type, tag)
+		, m_dac(*this, "dac")
+		, m_ioview(*this, "ioview")
+	{
+	}
+
+	void ganchonew(machine_config &config) ATTR_COLD;
+
+	ioport_value limits_r();
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+
+	void ganchonew_common(machine_config &config) ATTR_COLD;
+
+	void set_bank(u8 bank);
+
+private:
+	required_device<dac_8bit_r2r_device> m_dac;
+	memory_view m_ioview;
+
+	void ext_map(address_map &map) ATTR_COLD;
+
+	u8 p1_r();
+	void p1_w(u8 data);
+	void p3_w(u8 data);
+};
+
+// OM Vending clone of the V2 board
+class toyshop_state : public ganchonew_state
+{
+public:
+	toyshop_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ganchonew_state(mconfig, type, tag)
+	{
+	}
+
+	void toyshop(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+	virtual void outputs_w(u8 data) override;
+
+private:
+	void p3_w(u8 data);
+};
+
+// "GANCHONEW/CPU-V1" board
+class ganchonew_v1_state : public compucranes_state
+{
+public:
+	ganchonew_v1_state(const machine_config &mconfig, device_type type, const char *tag)
+		: compucranes_state(mconfig, type, tag)
+		, m_speaker(*this, "speaker")
+		, m_conf(*this, "CONF")
+	{
+	}
+
+	void ganchonew_v1(machine_config &config) ATTR_COLD;
+
+	ioport_value limits_r();
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	required_device<speaker_sound_device> m_speaker;
+	required_ioport m_conf;
+
+	void ext_map(address_map &map) ATTR_COLD;
+
+	void motors_w(u8 data);
+	u8 p1_r();
+	void p1_w(u8 data);
+	void p3_w(u8 data);
 };
 
 
 void compucranes_state::machine_start()
 {
+	m_rombank->configure_entries(0, m_rom.bytes() >> 16, &m_rom[0], 0x10000);
+
 	m_mech_time = machine().time();
 
 	save_item(NAME(m_pos));
 	save_item(NAME(m_motor_state));
 	save_item(NAME(m_mech_time));
-	save_item(NAME(m_bank));
-	save_item(NAME(m_shifter));
-	save_item(NAME(m_disp_clk));
-	save_item(NAME(m_p3));
 }
 
 void compucranes_state::machine_reset()
@@ -300,26 +348,33 @@ void compucranes_state::machine_reset()
 
 	// assumed: the reset line clears both 74HC273 latches
 	outputs_w(0);
-	if (m_dac)
-		m_dac->write(0);
-	else
-		motors_w(0);
-
-	mech_update();
 }
 
-void compucranes_state::init_toyshop()
+void ganchonew_state::machine_reset()
 {
+	compucranes_state::machine_reset();
+
+	m_dac->write(0);
+}
+
+void toyshop_state::machine_start()
+{
+	ganchonew_state::machine_start();
+
 	// EA presumably tied low: run from the external flash, not the internal one
 	m_maincpu->space(AS_PROGRAM).install_rom(0x0000, 0xffff, &m_rom[0]);
+}
 
-	// the claw magnet ("BOBINA 3A") is on bit 7 of the A001h latch here
-	m_claw_on_latch = true;
+void ganchonew_v1_state::machine_reset()
+{
+	compucranes_state::machine_reset();
+
+	motors_w(0);
 }
 
 
 /********************************************************************************
-	Memory maps
+    Memory maps
 ********************************************************************************/
 
 void compucranes_state::program_map(address_map &map)
@@ -327,60 +382,43 @@ void compucranes_state::program_map(address_map &map)
 	map(0x0000, 0xffff).rom().region(m_rom, 0);
 }
 
-void compucranes_state::ext_map(address_map &map)
+void ganchonew_state::ext_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(compucranes_state::ext_r), FUNC(compucranes_state::ext_w));
+	map.unmap_value_high();
+	map(0x0000, 0xffff).view(m_ioview);
+	m_ioview[0](0x8000, 0x8000).mirror(0x1ffe).portr("IN0");
+	m_ioview[0](0x8001, 0x8001).mirror(0x1ffe).portr("IN1");
+	m_ioview[0](0xa000, 0xa000).mirror(0x1ffe).w(m_dac, FUNC(dac_byte_interface::data_w));
+	m_ioview[0](0xa001, 0xa001).mirror(0x1ffe).w(FUNC(ganchonew_state::outputs_w));
+	m_ioview[1](0x0000, 0xffff).bankr(m_rombank);
 }
 
-void compucranes_state::ext_v1_map(address_map &map)
+void ganchonew_v1_state::ext_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(compucranes_state::ext_v1_r), FUNC(compucranes_state::ext_v1_w));
+	map(0x0000, 0xffff).bankr(m_rombank);
+	map(0x8000, 0x8000).portr("IN0");
+	map(0x8001, 0x8001).portr("IN1");
+	map(0xa000, 0xa000).w(FUNC(ganchonew_v1_state::motors_w));
+	map(0xa001, 0xa001).w(FUNC(ganchonew_v1_state::outputs_w));
 }
 
-u8 compucranes_state::ext_r(offs_t offset)
+void ganchonew_state::set_bank(u8 bank)
 {
-	if (m_bank)
-		return m_rom[((m_bank << 16) | offset) & (m_rom.bytes() - 1)];
-	else if ((offset & 0xe000) == 0x8000)
-		return m_inputs[BIT(offset, 0)]->read();
-	else
-		return 0xff;
-}
-
-u8 compucranes_state::ext_v1_r(offs_t offset)
-{
-	switch (offset)
+	// MOVX reads come from the EPROM while any of its bank lines is low
+	if (bank)
 	{
-	case 0x8000: return m_inputs[0]->read();
-	case 0x8001: return m_inputs[1]->read();
+		m_rombank->set_entry(bank);
+		m_ioview.select(1);
 	}
-
-	return m_rom[((m_bank << 16) | offset) & (m_rom.bytes() - 1)];
-}
-
-void compucranes_state::ext_w(offs_t offset, u8 data)
-{
-	if (m_bank || ((offset & 0xe000) != 0xa000))
-		return;
-
-	if (BIT(offset, 0))
-		outputs_w(data);
 	else
-		m_dac->write(data);
-}
-
-void compucranes_state::ext_v1_w(offs_t offset, u8 data)
-{
-	switch (offset)
 	{
-	case 0xa000: motors_w(data); break;
-	case 0xa001: outputs_w(data); break;
+		m_ioview.select(0);
 	}
 }
 
 
 /********************************************************************************
-	Crane mechanics simulation
+    Crane mechanics simulation
 ********************************************************************************/
 
 void compucranes_state::mech_update()
@@ -413,7 +451,7 @@ void compucranes_state::set_motors(u8 data)
 		m_motors[i] = BIT(data, i);
 }
 
-ioport_value compucranes_state::limits_r()
+ioport_value ganchonew_state::limits_r()
 {
 	// the firmware knows which end of each horizontal axis it's heading to
 	if (!machine().side_effects_disabled())
@@ -425,7 +463,7 @@ ioport_value compucranes_state::limits_r()
 			((m_pos[0] <= 0.0 || m_pos[0] >= 1.0) ? 0 : 0x08);
 }
 
-ioport_value compucranes_state::limits_v1_r()
+ioport_value ganchonew_v1_state::limits_r()
 {
 	if (!machine().side_effects_disabled())
 		mech_update();
@@ -440,16 +478,8 @@ ioport_value compucranes_state::limits_v1_r()
 
 
 /********************************************************************************
-	I/O
+    I/O
 ********************************************************************************/
-
-void compucranes_state::motors_w(u8 data)
-{
-	// V1 board; bit 7 is unknown, the firmware toggles it during the game
-	set_motors(data);
-
-	m_claw = BIT(data, 6);
-}
 
 void compucranes_state::outputs_w(u8 data)
 {
@@ -457,97 +487,94 @@ void compucranes_state::outputs_w(u8 data)
 	for (int i = 0; i < 8; i++)
 		m_outputs[i] = BIT(data, i);
 
-	if (m_claw_on_latch)
-		m_claw = BIT(data, 7);
-
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+}
+
+void toyshop_state::outputs_w(u8 data)
+{
+	ganchonew_state::outputs_w(data);
+
+	m_claw = BIT(data, 7); // claw magnet ("BOBINA 3A")
+}
+
+void ganchonew_v1_state::motors_w(u8 data)
+{
+	// bit 7 is unknown, the firmware toggles it during the game
+	set_motors(data);
+
+	m_claw = BIT(data, 6);
 }
 
 void compucranes_state::display_w(u8 data)
 {
-	bool const clk = BIT(data, 1);
-
-	if (clk && !m_disp_clk)
-	{
-		m_shifter = (m_shifter << 1) | BIT(data, 0);
-
-		// start bit at the end of the 36 bit shift register
-		if (BIT(m_shifter, 35))
-		{
-			for (int digit = 0; digit < 4; digit++)
-			{
-				// bits as sent: a f g e d dp c b
-				m_display->write_row(digit, bitswap<8>(u8(m_shifter >> (27 - 8 * digit)), 2, 5, 6, 4, 3, 1, 0, 7));
-			}
-			m_shifter = 0;
-		}
-	}
-
-	m_disp_clk = clk;
+	m_ledctrl->data_w(BIT(data, 0));
+	m_ledctrl->clock_w(BIT(data, 1));
 }
 
-u8 compucranes_state::p1_r()
+void compucranes_state::display_output_w(u64 data)
+{
+	for (int digit = 0; digit < 4; digit++)
+	{
+		// bits as sent: a f g e d dp c b
+		m_display->write_row(digit, bitswap<8>(u8(data >> (8 * digit)), 5, 2, 1, 3, 4, 6, 7, 0));
+	}
+}
+
+u8 ganchonew_state::p1_r()
 {
 	return 0xfd | (m_i2cmem->read_sda() << 1);
 }
 
-u8 compucranes_state::p1_v1_r()
-{
-	return 0xe5 | (m_i2cmem->read_sda() << 1) | (m_conf->read() & 0x18);
-}
-
-void compucranes_state::p1_w(u8 data)
+void ganchonew_state::p1_w(u8 data)
 {
 	m_i2cmem->write_scl(BIT(data, 0));
 	m_i2cmem->write_sda(BIT(data, 1));
 	set_motors(data >> 2);
 }
 
-void compucranes_state::p1_v1_w(u8 data)
+void ganchonew_state::p3_w(u8 data)
+{
+	display_w(data);
+
+	set_bank(BIT(~data, 5)); // EPROM A16
+	m_claw = BIT(data, 4);   // claw magnet, PWMed to set its strength
+}
+
+void toyshop_state::p3_w(u8 data)
+{
+	display_w(data);
+
+	set_bank(bitswap<3>(u8(~data), 5, 4, 3)); // EPROM A16-A18
+}
+
+u8 ganchonew_v1_state::p1_r()
+{
+	return 0xe5 | (m_i2cmem->read_sda() << 1) | (m_conf->read() & 0x18);
+}
+
+void ganchonew_v1_state::p1_w(u8 data)
 {
 	m_i2cmem->write_scl(BIT(data, 0));
 	m_i2cmem->write_sda(BIT(data, 1));
 
-	m_bank = BIT(data, 7); // probably the EPROM A16
+	m_rombank->set_entry(BIT(data, 7)); // probably the EPROM A16
 }
 
-void compucranes_state::p3_w(u8 data)
+void ganchonew_v1_state::p3_w(u8 data)
 {
 	display_w(data);
 
-	m_bank = BIT(~data, 5); // EPROM A16
-	m_claw = BIT(data, 4);  // claw magnet, PWMed to set its strength
-
-	m_p3 = data;
-}
-
-void compucranes_state::p3_v1_w(u8 data)
-{
-	display_w(data);
-
-	if (BIT(data ^ m_p3, 4))
-		m_speaker->level_w(BIT(data, 4));
-
-	m_p3 = data;
-}
-
-void compucranes_state::p3_toyshop_w(u8 data)
-{
-	display_w(data);
-
-	m_bank = bitswap<3>(u8(~data), 5, 4, 3); // EPROM A16-A18
-
-	m_p3 = data;
+	m_speaker->level_w(BIT(data, 4));
 }
 
 
 /********************************************************************************
-	Inputs
+    Inputs
 ********************************************************************************/
 
 static INPUT_PORTS_START(ganchonew)
 	PORT_START("IN0")
-	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(compucranes_state::limits_r))
+	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(ganchonew_state::limits_r))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_COIN3)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START1) // only used when not set to start automatically
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)  PORT_NAME("Prize Sensor")  PORT_CODE(KEYCODE_P)
@@ -573,7 +600,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START(ganchonew_v1)
 	PORT_START("IN0")
-	PORT_BIT(0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(compucranes_state::limits_v1_r))
+	PORT_BIT(0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(ganchonew_v1_state::limits_r))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER)  PORT_NAME("Prize Sensor")  PORT_CODE(KEYCODE_P)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)  PORT_NAME("Hopper Sensor") PORT_CODE(KEYCODE_H)
 
@@ -587,9 +614,6 @@ static INPUT_PORTS_START(ganchonew_v1)
 	PORT_SERVICE(0x40, IP_ACTIVE_LOW)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_START1) // only used when not set to start automatically
 
-	PORT_START("COINS")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
-
 	PORT_START("CONF")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER)  PORT_NAME("Alarm Sensor")  PORT_CODE(KEYCODE_A)
 	PORT_CONFNAME(0x10, 0x00, "Display Board")
@@ -600,18 +624,17 @@ INPUT_PORTS_END
 
 
 /********************************************************************************
-	Machine configs
+    Machine configs
 ********************************************************************************/
 
 void compucranes_state::common(machine_config &config)
 {
 	m_maincpu->set_addrmap(AS_PROGRAM, &compucranes_state::program_map);
-	m_maincpu->set_addrmap(AS_DATA, &compucranes_state::ext_map);
-	m_maincpu->port_in_cb<1>().set(FUNC(compucranes_state::p1_r));
-	m_maincpu->port_out_cb<1>().set(FUNC(compucranes_state::p1_w));
-	m_maincpu->port_in_cb<3>().set_ioport("COINS");
 
 	I2C_24C16(config, m_i2cmem);
+
+	// stands in for the unidentified MM5450 style driver, outputs 1-32 used
+	MM5448(config, m_ledctrl, 0).output_cb().set(FUNC(compucranes_state::display_output_w));
 
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0xff);
@@ -621,45 +644,53 @@ void compucranes_state::common(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 }
 
-void compucranes_state::ganchonew(machine_config &config)
+void ganchonew_state::ganchonew_common(machine_config &config)
 {
-	I80C32(config, m_maincpu, 12_MHz_XTAL);
-
 	common(config);
 
-	m_maincpu->port_out_cb<3>().set(FUNC(compucranes_state::p3_w));
+	m_maincpu->set_addrmap(AS_DATA, &ganchonew_state::ext_map);
+	m_maincpu->port_in_cb<1>().set(FUNC(ganchonew_state::p1_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(ganchonew_state::p1_w));
+	m_maincpu->port_in_cb<3>().set_ioport("COINS");
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.5); // 74HC273 + resistor ladder + LM358
 }
 
-void compucranes_state::ganchonew_v1(machine_config &config)
+void ganchonew_state::ganchonew(machine_config &config)
+{
+	I80C32(config, m_maincpu, 12_MHz_XTAL);
+
+	ganchonew_common(config);
+
+	m_maincpu->port_out_cb<3>().set(FUNC(ganchonew_state::p3_w));
+}
+
+void toyshop_state::toyshop(machine_config &config)
+{
+	AT89S52(config, m_maincpu, 12_MHz_XTAL);
+
+	ganchonew_common(config);
+
+	m_maincpu->port_out_cb<3>().set(FUNC(toyshop_state::p3_w));
+}
+
+void ganchonew_v1_state::ganchonew_v1(machine_config &config)
 {
 	I80C31(config, m_maincpu, 12_MHz_XTAL);
 
 	common(config);
 
-	m_maincpu->set_addrmap(AS_DATA, &compucranes_state::ext_v1_map);
-	m_maincpu->port_in_cb<1>().set(FUNC(compucranes_state::p1_v1_r));
-	m_maincpu->port_out_cb<1>().set(FUNC(compucranes_state::p1_v1_w));
-	m_maincpu->port_out_cb<3>().set(FUNC(compucranes_state::p3_v1_w));
+	m_maincpu->set_addrmap(AS_DATA, &ganchonew_v1_state::ext_map);
+	m_maincpu->port_in_cb<1>().set(FUNC(ganchonew_v1_state::p1_r));
+	m_maincpu->port_out_cb<1>().set(FUNC(ganchonew_v1_state::p1_w));
+	m_maincpu->port_out_cb<3>().set(FUNC(ganchonew_v1_state::p3_w));
 
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void compucranes_state::toyshop(machine_config &config)
-{
-	AT89S52(config, m_maincpu, 12_MHz_XTAL);
-
-	common(config);
-
-	m_maincpu->port_out_cb<3>().set(FUNC(compucranes_state::p3_toyshop_w));
-
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.5);
-}
-
 
 /********************************************************************************
-	ROM definitions
+    ROM definitions
 ********************************************************************************/
 
 // "GANCHONEW/CPU-V1 COMP" PCB. Temic TSC80C31-12CA CPU, 32 pin windowed EPROM.
@@ -710,8 +741,7 @@ ROM_START(mastcraneb)
 	ROM_LOAD("24c16_v2.ic5", 0x00000, 0x00800, BAD_DUMP CRC(2d4ce67d) SHA1(77f2cd20f057dbfe5cd99e0eb7f14274781bd8ad)) // hand built, see the notes at the top
 ROM_END
 
-/* "GANCHONEW-V2 COMP" PCB with AT PSU connector, machine number sticker "NºMAQ. 00-356  13/06/00".
-   The flash is at IC3 (it was listed as IC5, which is the SEEPROM, when the set was added). */
+// "GANCHONEW-V2 COMP" PCB with AT PSU connector, machine number sticker "NºMAQ. 00-356  13/06/00".
 ROM_START(octopussy)
 	ROM_REGION(0x20000, "program", 0)
 	ROM_LOAD("w29c011.ic3", 0x00000, 0x20000, CRC(47da93e8) SHA1(aa821dd22c1912ec2942ca6afd989d61df4387d7))
@@ -725,7 +755,7 @@ ROM_END
 
 /* Direct clone of the GANCHONEW PCB by OM Vending, silkscreened "CPU GRUA V2  O. M. VENDING".
    The whole program, vectors included, is in the external flash, so the AT89S52 EA pin is
-   presumably tied low (see init_toyshop), but it hasn't been traced on the PCB. */
+   presumably tied low (see toyshop_state::machine_start), but it hasn't been traced on the PCB. */
 ROM_START(toyshop)
 	ROM_REGION(0x02000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("89s52.ic1",   0x00000, 0x02000, NO_DUMP)
@@ -743,10 +773,10 @@ ROM_END
 } // anonymous namespace
 
 // Years and versions are the ones the programs show on the display (or store in the SEEPROM) at power on
-//     YEAR  NAME        PARENT     MACHINE       INPUT         CLASS              INIT          ROT   COMPANY               FULLNAME                       FLAGS                                                             LAYOUT
-GAMEL( 2002, crsauruss,  0,         ganchonew_v1, ganchonew_v1, compucranes_state, empty_init,   ROT0, "Recreativos Presas", "Cranesaurus Single (v30.01)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_compucranes ) // 28/01/2002
-GAMEL( 2012, mastcrane,  0,         ganchonew,    ganchonew,    compucranes_state, empty_init,   ROT0, "Compumatic",         "Master Crane (v44.12)",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_compucranes ) // 30/04/2012
-GAMEL( 2016, mastcranea, mastcrane, ganchonew,    ganchonew,    compucranes_state, empty_init,   ROT0, "Compumatic",         "Master Crane (v46.11)",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_compucranes ) // 05/12/2016
-GAMEL( 2001, mastcraneb, mastcrane, ganchonew,    ganchonew,    compucranes_state, empty_init,   ROT0, "Compumatic",         "Master Crane (v05.05)",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_compucranes ) // 16/10/2001
-GAMEL( 2000, octopussy,  0,         ganchonew,    ganchonew,    compucranes_state, empty_init,   ROT0, "Covielsa",           "Octopussy (v21.01)",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_compucranes ) // 29/05/2000
-GAMEL( 2016, toyshop,    0,         toyshop,      ganchonew,    compucranes_state, init_toyshop, ROT0, "OM Vending",         "Toy Shop (v17.01)",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_compucranes ) // 09/12/2016
+//     YEAR  NAME        PARENT     MACHINE       INPUT         CLASS               INIT        ROT   COMPANY               FULLNAME                       FLAGS                                                             LAYOUT
+GAMEL( 2002, crsauruss,  0,         ganchonew_v1, ganchonew_v1, ganchonew_v1_state, empty_init, ROT0, "Recreativos Presas", "Cranesaurus Single (v30.01)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_compucranes ) // 28/01/2002
+GAMEL( 2012, mastcrane,  0,         ganchonew,    ganchonew,    ganchonew_state,    empty_init, ROT0, "Compumatic",         "Master Crane (v44.12)",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_compucranes ) // 30/04/2012
+GAMEL( 2016, mastcranea, mastcrane, ganchonew,    ganchonew,    ganchonew_state,    empty_init, ROT0, "Compumatic",         "Master Crane (v46.11)",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_compucranes ) // 05/12/2016
+GAMEL( 2001, mastcraneb, mastcrane, ganchonew,    ganchonew,    ganchonew_state,    empty_init, ROT0, "Compumatic",         "Master Crane (v05.05)",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_compucranes ) // 16/10/2001
+GAMEL( 2000, octopussy,  0,         ganchonew,    ganchonew,    ganchonew_state,    empty_init, ROT0, "Covielsa",           "Octopussy (v21.01)",          MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_compucranes ) // 29/05/2000
+GAMEL( 2016, toyshop,    0,         toyshop,      ganchonew,    toyshop_state,      empty_init, ROT0, "OM Vending",         "Toy Shop (v17.01)",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_compucranes ) // 09/12/2016
