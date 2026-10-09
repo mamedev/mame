@@ -52,6 +52,7 @@
 #include "cpu/m68000/mcf5206e.h"
 #include "machine/i2cmem.h"
 #include "machine/msm6242.h"
+#include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "video/pc_vga.h"
 #include "speaker.h"
@@ -242,7 +243,12 @@ void gaminator_state::gaminator_map(address_map &map)
 	map(0x08000000, 0x0bffffff).ram();
 	map(0x1e040008, 0x1e04000b).w(FUNC(gaminator_state::gamtor_unk_w));
 
-	map(0x20000000, 0x2003ffff).ram();
+	// SRAM-1: CS2 (CSAR2 0x2000, CSMR2 0x0fff0000, CSCR2 0x0d5b = 3 WS, AA, 8-bit port) holds the two battery-backed
+	// CS18LV10245 128K x 8 SRAMs (main PCB, see the header), 256KB in all. The kernel tests 0x40000 bytes from
+	// 0x20000000 ("256KB RAM test", 0x4bb26), so they are contiguous there. The game's RAM init (0x2e85e78) writes the
+	// same data at 0x20000000 and 0x20800000 and requires them to read back equal: A23 is not decoded and 0x20800000
+	// is the same SRAM. The other undecoded lines (A18-A22, A24-A27) are not proven and are left unmapped.
+	map(0x20000000, 0x2003ffff).mirror(0x00800000).ram().share("sram");
 
 	// standard VGA
 	//map(0x40000000, 0x40000fff).ram(); // regs
@@ -272,6 +278,9 @@ void gaminator_state::gaminator(machine_config &config)
 	m_maincpu->sda_w_cb().set(m_seeprom, FUNC(i2cmem_device::write_sda));
 	m_maincpu->scl_w_cb().set(m_seeprom, FUNC(i2cmem_device::write_scl));
 	m_maincpu->sda_r_cb().set(m_seeprom, FUNC(i2cmem_device::read_sda));
+
+	// SRAM-1: both SRAMs are kept by the 3.6V battery
+	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
