@@ -392,12 +392,11 @@ private:
 
 // PIC16F6xx Series
 
-class pic16f628a_device : public pic16_mid_eeprom_device
+class pic16f6xxa_device : public pic16_mid_eeprom_device
 {
-public:
-	pic16f628a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
 protected:
+	pic16f6xxa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, address_map_constructor data_map, u16 eeprom_size);
+
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -405,9 +404,9 @@ protected:
 	virtual bool irq_active() const override;
 	virtual void wdt_reset() override;
 
-private:
-	void data_map(address_map &map);
+	void base_map(address_map &map) ATTR_COLD;
 
+private:
 	// register file functions
 	u8 pir1_r();
 	void pir1_w(u8 data);
@@ -460,6 +459,24 @@ private:
 	u8 m_VRCON;
 };
 
+class pic16f628a_device : public pic16f6xxa_device
+{
+public:
+	pic16f628a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+private:
+	void data_map(address_map &map);
+};
+
+class pic16f648a_device : public pic16f6xxa_device
+{
+public:
+	pic16f648a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+private:
+	void data_map(address_map &map);
+};
+
 // PIC16F8xx Series
 
 class  pic16f83_device : public pic16_mid_eeprom_device
@@ -498,6 +515,7 @@ DECLARE_DEVICE_TYPE(PIC16C622A, pic16c622a_device)
 DECLARE_DEVICE_TYPE(PIC16CR83,  pic16cr83_device)
 DECLARE_DEVICE_TYPE(PIC16CR84,  pic16cr84_device)
 DECLARE_DEVICE_TYPE(PIC16F628A, pic16f628a_device)
+DECLARE_DEVICE_TYPE(PIC16F648A, pic16f648a_device)
 DECLARE_DEVICE_TYPE(PIC16F83,   pic16f83_device)
 DECLARE_DEVICE_TYPE(PIC16F84,   pic16f84_device)
 DECLARE_DEVICE_TYPE(PIC16F84A,  pic16f84a_device)
