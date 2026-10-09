@@ -577,8 +577,9 @@ void floppy_image_device::device_start()
 	floppy_connector *conn = dynamic_cast<floppy_connector*>(device().owner());
 	if (conn != nullptr)  // just in case that the floppy connects to something else
 	{
-		m_sound_out->set_samples(conn->get_samples_name(), m_form_factor, m_tracks);
 		m_make_sound = conn->use_sound();
+		if (m_make_sound)
+			m_sound_out->set_samples(conn->get_samples_name(), m_form_factor, m_tracks);
 	}
 
 	save_item(NAME(m_dir));
