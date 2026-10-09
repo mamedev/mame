@@ -391,12 +391,12 @@ uint32_t jb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll_ram[0][i + 0x080]);
 	}
 
-	for (int j = cliprect.min_y; j <= cliprect.max_y; j++)
+	for (int j = cliprect.top(); j <= cliprect.bottom(); j++)
 	{
 		int const rowenable = m_reel_scroll_ram[1][j];
 
 		// draw top of screen
-		rectangle const clip(cliprect.min_x, cliprect.max_x, j, j);
+		rectangle const clip(cliprect.left(), cliprect.right(), j, j);
 
 		if (rowenable < 3)
 			m_reel_tilemap[rowenable]->draw(screen, bitmap, clip, 0, 0);

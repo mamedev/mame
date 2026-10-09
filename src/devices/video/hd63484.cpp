@@ -538,7 +538,7 @@ inline void hd63484_device::recompute_parameters()
 	attotime frame_period = screen().frame_period(); // TODO: use clock() to calculate the frame_period
 	screen().configure(m_hc * ppmc, m_vc, visarea, frame_period);
 	if (LOG)
-		logerror("ACRTC: full %dx%d vis (%d, %d)-(%d, %d)\n", m_hc * ppmc, m_vc, visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+		logerror("ACRTC: full %dx%d vis (%d, %d)-(%d, %d)\n", m_hc * ppmc, m_vc, visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
 }
 
 
@@ -2094,7 +2094,7 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 			wind_offs++;
 	}
 
-	for(int x=cliprect.min_x; x<=cliprect.max_x; x+=ppw)
+	for(int x=cliprect.left(); x<=cliprect.right(); x+=ppw)
 	{
 		uint16_t data = 0;
 		int screen_n = layer_n;
@@ -2129,18 +2129,18 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 
 uint32_t hd63484_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int l0 = cliprect.min_y + (BIT(m_dcr, 13) ? m_sp[0] : 0);
+	int l0 = cliprect.top() + (BIT(m_dcr, 13) ? m_sp[0] : 0);
 	int l1 = l0 + m_sp[1];
 	int l2 = l1 + (BIT(m_dcr, 11) ? m_sp[2] : 0);
 
 	if(m_omr & 0x4000)
 	{
-		for(int y=cliprect.min_y; y<=cliprect.max_y; y++)
+		for(int y=cliprect.top(); y<=cliprect.bottom(); y++)
 		{
 			bool ins_window = BIT(m_dcr, 9) && y >= m_vws && y < m_vws+m_vww;
 
-			if (BIT(m_dcr, 13) && y >= cliprect.min_y && y < l0)
-				draw_graphics_line(bitmap, cliprect, cliprect.min_y, y, 0, BIT(m_dcr, 12), ins_window);
+			if (BIT(m_dcr, 13) && y >= cliprect.top() && y < l0)
+				draw_graphics_line(bitmap, cliprect, cliprect.top(), y, 0, BIT(m_dcr, 12), ins_window);
 			else if (y >= l0 && y < l1)
 				draw_graphics_line(bitmap, cliprect, l0, y, 1, BIT(m_dcr, 14), ins_window);
 			else if (BIT(m_dcr, 11) && y >= l1 && y < l2)

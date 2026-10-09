@@ -8,7 +8,10 @@
 
 #include "emu.h"
 #include "video32.h"
+
 #include "screen.h"
+
+#include <algorithm>
 
 
 /***************************************************************************
@@ -18,8 +21,6 @@
 ROM_START( iq151_video32 )
 	ROM_REGION(0x0400, "chargen", ROMREGION_INVERT)
 	ROM_LOAD( "iq151_video32font.rom", 0x0000, 0x0400, CRC(395567a7) SHA1(18800543daf4daed3f048193c6ae923b4b0e87db))
-
-	ROM_REGION(0x0400, "videoram", ROMREGION_ERASE)
 ROM_END
 
 
@@ -55,7 +56,7 @@ iq151_video32_device::iq151_video32_device(const machine_config &mconfig, const 
 	: device_t(mconfig, IQ151_VIDEO32, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr, "^^palette")
 	, device_iq151cart_interface(mconfig, *this)
-	, m_videoram(*this, "videoram")
+	, m_videoram(*this, "videoram", 0x0400, ENDIANNESS_LITTLE)
 	, m_chargen(*this, "chargen")
 {
 }
@@ -67,6 +68,7 @@ iq151_video32_device::iq151_video32_device(const machine_config &mconfig, const 
 
 void iq151_video32_device::device_start()
 {
+	std::fill(m_videoram.begin(), m_videoram.end(), 0);
 	set_gfx(0, std::make_unique<gfx_element>(&palette(), iq151_video32_charlayout, m_chargen, 0, 1, 0));
 }
 
@@ -77,9 +79,9 @@ void iq151_video32_device::device_start()
 void iq151_video32_device::device_reset()
 {
 	// if required adjust screen size
-	if (m_screen != nullptr && m_screen->visible_area().max_x < 32*8 - 1)
+	if (m_screen && (m_screen->visible_area().right() < 32*8 - 1))
 	{
-		printf("Setting visible area to 32\n");
+		logerror("Setting visible area to 32\n");
 		m_screen->set_visible_area(0, 32*8-1, 0, 32*8-1);
 	}
 }

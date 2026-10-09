@@ -720,7 +720,7 @@ void isa8_cga_device::vsync_changed(int state)
 MC6845_RECONFIGURE( isa8_cga_device::reconfigure )
 {
 	rectangle curvisarea = m_screen->visible_area();
-	m_screen->set_visible_area(visarea.min_x, visarea.max_x, curvisarea.min_y, curvisarea.max_y);
+	m_screen->set_visible_area(visarea.left(), visarea.right(), curvisarea.top(), curvisarea.bottom());
 }
 
 void isa8_cga_device::set_palette_luts(void)
@@ -2178,7 +2178,7 @@ MC6845_RECONFIGURE( isa8_cga_pcxport_device::reconfigure )
 	// hsync (see hsync_changed), so if the CRTC's line rate and the screen's line rate
 	// disagree the two walk away from each other and rows land in the wrong places.
 	rectangle curvisarea = m_screen->visible_area();
-	m_screen->configure(width, height, rectangle(visarea.min_x, visarea.max_x, curvisarea.min_y, curvisarea.max_y), frame_period);
+	m_screen->configure(width, height, rectangle(visarea.left(), visarea.right(), curvisarea.top(), curvisarea.bottom()), frame_period);
 }
 
 MC6845_UPDATE_ROW( isa8_cga_pcxport_device::crtc_update_row )

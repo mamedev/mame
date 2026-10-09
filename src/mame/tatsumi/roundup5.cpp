@@ -208,7 +208,7 @@ pos is 11.5 fixed point
 
 	int visible_line=0;
 
-	for ( ; y<cliprect.max_y+1; y++)
+	for ( ; y <= cliprect.bottom(); y++)
 	{
 		// TODO: tunnels road drawing has a different format?
 		// shift is always 0x88** while data[3] is a variable argument with bit 15 always on
@@ -260,7 +260,7 @@ offset is from last pixel of first road segment?
 		int x;
 
 		/* Fill in left of road segment */
-		for (x=0; (x < startPos) && (x < cliprect.max_x+1); x++)
+		for (x=0; (x < startPos) && (x <= cliprect.right()); x++)
 		{
 			int col = linedata[0]&0xf;
 			bitmap.pix(y, x) = m_palette->pen(256 + pal*16 + col);
@@ -278,7 +278,7 @@ offset is from last pixel of first road segment?
 		}
 
 		/* Fill in main part of road, then right-hand side edge */
-		for (x=startPos; x < (cliprect.max_x + 1) && ((samplePos>>11)<0x80); x++)
+		for (x = startPos; x <= cliprect.right() && ((samplePos>>11)<0x80); x++)
 		{
 			// look up colour
 			int col = linedata[(samplePos>>11)&0x7f]&0xf;
@@ -307,7 +307,7 @@ offset is from last pixel of first road segment?
 		endPos=startPos+endPos;
 
 		/* Fill pixels */
-		for (x=startPos; x < (cliprect.max_x+1) && (x < endPos); x++)
+		for (x = startPos; (x <= cliprect.right()) && (x < endPos); x++)
 		{
 			int col = linedata[0x80]&0xf;
 
@@ -334,7 +334,7 @@ offset is from last pixel of first road segment?
 			samplePos=0; // todo
 		}
 
-		for (/*x=endPos*/; x < cliprect.max_x+1; x++)
+		for (/*x=endPos*/; x <= cliprect.right(); x++)
 		{
 			// look up colour
 			int col = linedata[((samplePos>>11)&0x7f) + 0x200]&0xf;

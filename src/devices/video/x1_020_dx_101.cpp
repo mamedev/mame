@@ -474,8 +474,8 @@ inline void x1_020_dx_101_device::drawgfx_line(
 
 	uint16_t *const dest = &bitmap.pix(screenline);
 
-	const int minx = cliprect.min_x << 16;
-	const int maxx = (cliprect.max_x + 1) << 16;
+	const int minx = cliprect.left() << 16;
+	const int maxx = (cliprect.right() + 1) << 16;
 
 	if (flipy)
 		line = 7 - line;
@@ -735,8 +735,8 @@ void x1_020_dx_101_device::draw_sprites_line(bitmap_ind16 &bitmap, const rectang
 					const int lastcolumn = firstcolumn + width * 0x10 - 1;
 
 					// if the sprite isn't within the x-coordinates of the screen, bail
-					if (firstcolumn > cliprect.max_x)    continue;
-					if (lastcolumn < cliprect.min_x)    continue;
+					if (firstcolumn > cliprect.right()) continue;
+					if (lastcolumn < cliprect.left())   continue;
 
 					// otherwise get the rest of the things we need to draw
 					int scrolly = s2[3];
@@ -942,10 +942,9 @@ void x1_020_dx_101_device::draw_sprites(bitmap_ind16& bitmap, const rectangle& c
 
 	//LOGOFFSET("xinc is %04x xoom %04x xoffset is %4x\n", inc2, xzoom, xoffset);
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	rectangle tempcliprect(cliprect);
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		rectangle tempcliprect(cliprect);
-
 		tempcliprect.sety(y, y);
 
 		int yy;

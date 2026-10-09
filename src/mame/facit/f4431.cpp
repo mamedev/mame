@@ -186,7 +186,7 @@ uint32_t f4431_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 {
 	if (m_display_enabled && BIT(m_row_attr, 6))
 	{
-		for (int i = cliprect.min_y; i <= cliprect.max_y; i++)
+		for (int i = cliprect.top(); i <= cliprect.bottom(); i++)
 		{
 			int line = i % 10;
 

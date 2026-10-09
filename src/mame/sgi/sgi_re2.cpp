@@ -471,8 +471,8 @@ bool sgi_re2_device::pattern(unsigned const x, unsigned const n) const
 u32 sgi_re2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
 {
 	// TODO: variable topscan row and column
-	for (unsigned screen_y = screen.visible_area().min_y, mem_y = 1023; screen_y <= screen.visible_area().max_y; screen_y++, mem_y--)
-		for (unsigned screen_x = screen.visible_area().min_x, mem_x = 0; screen_x <= screen.visible_area().max_x; screen_x++, mem_x++)
+	for (unsigned screen_y = screen.visible_area().top(), mem_y = 1023; screen_y <= screen.visible_area().bottom(); screen_y++, mem_y--)
+		for (unsigned screen_x = screen.visible_area().left(), mem_x = 0; screen_x <= screen.visible_area().right(); screen_x++, mem_x++)
 		{
 			unsigned const channel = mem_x % 5;
 			u32 const data = m_vram[(mem_y * 0x500) + mem_x];

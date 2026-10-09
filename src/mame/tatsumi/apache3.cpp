@@ -125,7 +125,7 @@ void apache3_state::draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect)
 		uint16_t gva = 0x180; // TODO
 		uint8_t sky_val = m_apache3_rotate_ctrl[1] & 0xff;
 
-		for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
 		{
 			uint16_t rgdb = 0;//m_apache3_road_x_ram[gva & 0xff];
 			uint16_t gha = 0xf60; // test
@@ -134,7 +134,7 @@ void apache3_state::draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect)
 			if (gva & 0x100)
 			{
 				/* Sky */
-				for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
+				for (int x = cliprect.left(); x <= cliprect.right(); ++x)
 				{
 					dst.pix(y, x) = m_palette->pen(0x100 + (sky_val & 0x7f));
 
@@ -145,7 +145,7 @@ void apache3_state::draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect)
 			else
 			{
 				/* Ground */
-				for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
+				for (int x = cliprect.left(); x <= cliprect.right(); ++x)
 				{
 					uint16_t hval = (rgdb + gha) & 0xfff; // Not quite
 

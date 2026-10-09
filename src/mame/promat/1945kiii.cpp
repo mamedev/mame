@@ -209,29 +209,29 @@ void k3_state::k3_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_ele
 	int ex = sx + gfx->width();
 	int ey = sy + gfx->height();
 
-	if (sx < clip.min_x)
+	if (sx < clip.left())
 	{
 		// clip left
-		int pixels = clip.min_x - sx;
+		int pixels = clip.left() - sx;
 		sx += pixels;
 		x_index_base += xinc * pixels;
 	}
-	if (sy < clip.min_y)
+	if (sy < clip.top())
 	{
 		// clip top
-		int pixels = clip.min_y - sy;
+		int pixels = clip.top() - sy;
 		sy += pixels;
 		y_index += yinc * pixels;
 	}
-	if (ex > clip.max_x + 1)
+	if (ex > clip.right() + 1)
 	{
 		// clip right
-		ex = clip.max_x + 1;
+		ex = clip.right() + 1;
 	}
-	if (ey > clip.max_y + 1)
+	if (ey > clip.bottom() + 1)
 	{
 		// clip bottom
-		ey = clip.max_y + 1;
+		ey = clip.bottom() + 1;
 	}
 
 	// skip if inner loop doesn't draw anything

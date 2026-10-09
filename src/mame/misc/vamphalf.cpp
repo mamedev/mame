@@ -732,10 +732,9 @@ void vamphalf_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	rectangle clip = cliprect;
 
-	for (int y = (cliprect.min_y & ~15); y <= (cliprect.max_y | 15); y += 16)
+	for (int y = (cliprect.top() & ~15); y <= (cliprect.bottom() | 15); y += 16)
 	{
-		clip.min_y = y;
-		clip.max_y = y + 15;
+		clip.sety(y, y + 15);
 		int block;
 		if (m_flipscreen)
 		{
@@ -746,11 +745,7 @@ void vamphalf_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 			block = (16 - (y / 16)) * 0x800;
 		}
 
-		if (clip.min_y < cliprect.min_y)
-			clip.min_y = cliprect.min_y;
-
-		if (clip.max_y > cliprect.max_y)
-			clip.max_y = cliprect.max_y;
+		clip &= cliprect;
 
 		for (u32 cnt = 0; cnt < 0x800; cnt += 8)
 		{
@@ -813,10 +808,9 @@ void vamphalf_state::draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitma
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	rectangle clip = cliprect;
 
-	for (int y = (cliprect.min_y & ~15); y <= (cliprect.max_y | 15); y += 16)
+	for (int y = (cliprect.top() & ~15); y <= (cliprect.bottom() | 15); y += 16)
 	{
-		clip.min_y = y;
-		clip.max_y = y + 15;
+		clip.sety(y, y + 15);
 		int block;
 		if (m_flipscreen)
 		{
@@ -827,11 +821,7 @@ void vamphalf_state::draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitma
 			block = (16 - (y / 16)) * 0x800;
 		}
 
-		if (clip.min_y < cliprect.min_y)
-			clip.min_y = cliprect.min_y;
-
-		if (clip.max_y > cliprect.max_y)
-			clip.max_y = cliprect.max_y;
+		clip &= cliprect;
 
 		for (u32 cnt = 0; cnt < 0x800; cnt += 8)
 		{

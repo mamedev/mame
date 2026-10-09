@@ -1267,7 +1267,7 @@ finish:
 
 	for ( cury = vdp1_shading_data->sy; cury <= vdp1_shading_data->ey; cury++ )
 	{
-		while( (vdp1_shading_data->scanline[cury].x[0] >> 16) < cliprect.min_x )
+		while( (vdp1_shading_data->scanline[cury].x[0] >> 16) < cliprect.left() )
 		{
 			vdp1_shading_data->scanline[cury].x[0] += (1 << FRAC_SHIFT);
 			vdp1_shading_data->scanline[cury].b[0] += vdp1_shading_data->scanline[cury].db;
@@ -1559,10 +1559,10 @@ void saturn_state::vdp1_fill_slope(const rectangle &cliprect, int patterndata, i
 							int32_t v1, int32_t v2, int32_t slv1, int32_t slv2, int32_t *nv1, int32_t *nv2,
 							int32_t _y1, int32_t y2)
 {
-	if(_y1 > cliprect.max_y)
+	if(_y1 > cliprect.bottom())
 		return;
 
-	if(y2 <= cliprect.min_y) {
+	if(y2 <= cliprect.top()) {
 		int delta = y2-_y1;
 		*nx1 = x1+delta*sl1;
 		*nu1 = u1+delta*slu1;
@@ -1573,18 +1573,18 @@ void saturn_state::vdp1_fill_slope(const rectangle &cliprect, int patterndata, i
 		return;
 	}
 
-	if(y2 > cliprect.max_y)
-		y2 = cliprect.max_y+1;
+	if(y2 > cliprect.bottom())
+		y2 = cliprect.bottom()+1;
 
-	if(_y1 < cliprect.min_y) {
-		int delta = cliprect.min_y - _y1;
+	if(_y1 < cliprect.top()) {
+		int delta = cliprect.top() - _y1;
 		x1 += delta*sl1;
 		u1 += delta*slu1;
 		v1 += delta*slv1;
 		x2 += delta*sl2;
 		u2 += delta*slu2;
 		v2 += delta*slv2;
-		_y1 = cliprect.min_y;
+		_y1 = cliprect.top();
 	}
 
 	if(x1 > x2 || (x1==x2 && sl1 > sl2)) {
@@ -1621,7 +1621,7 @@ void saturn_state::vdp1_fill_slope(const rectangle &cliprect, int patterndata, i
 	}
 
 	while(_y1 < y2) {
-		if(_y1 >= cliprect.min_y) {
+		if(_y1 >= cliprect.top()) {
 			int32_t slux = 0, slvx = 0;
 			int xx1 = x1>>FRAC_SHIFT;
 			int xx2 = x2>>FRAC_SHIFT;
@@ -1632,15 +1632,15 @@ void saturn_state::vdp1_fill_slope(const rectangle &cliprect, int patterndata, i
 				slux = (u2-u1)/delta;
 				slvx = (v2-v1)/delta;
 			}
-			if(xx1 <= cliprect.max_x || xx2 >= cliprect.min_x) {
-				if(xx1 < cliprect.min_x) {
-					int delta = cliprect.min_x-xx1;
+			if(xx1 <= cliprect.right() || xx2 >= cliprect.left()) {
+				if(xx1 < cliprect.left()) {
+					int delta = cliprect.left()-xx1;
 					u += slux*delta;
 					v += slvx*delta;
-					xx1 = cliprect.min_x;
+					xx1 = cliprect.left();
 				}
-				if(xx2 > cliprect.max_x)
-					xx2 = cliprect.max_x;
+				if(xx2 > cliprect.right())
+					xx2 = cliprect.right();
 
 				while(xx1 <= xx2) {
 					(this->*drawpixel)(xx1,_y1, patterndata, (v>>FRAC_SHIFT)*xsize+(u>>FRAC_SHIFT));
@@ -1673,10 +1673,10 @@ void saturn_state::vdp1_fill_line(const rectangle &cliprect, int patterndata, in
 	int xx1 = x1>>FRAC_SHIFT;
 	int xx2 = x2>>FRAC_SHIFT;
 
-	if(y > cliprect.max_y || y < cliprect.min_y)
+	if(!cliprect.containsy(y))
 		return;
 
-	if(xx1 <= cliprect.max_x || xx2 >= cliprect.min_x) {
+	if(xx1 <= cliprect.right() || xx2 >= cliprect.left()) {
 		int32_t slux = 0, slvx = 0;
 		int32_t u = u1;
 		int32_t v = v1;
@@ -1685,14 +1685,14 @@ void saturn_state::vdp1_fill_line(const rectangle &cliprect, int patterndata, in
 			slux = (u2-u1)/delta;
 			slvx = (v2-v1)/delta;
 		}
-		if(xx1 < cliprect.min_x) {
-			int delta = cliprect.min_x-xx1;
+		if(xx1 < cliprect.left()) {
+			int delta = cliprect.left()-xx1;
 			u += slux*delta;
 			v += slvx*delta;
-			xx1 = cliprect.min_x;
+			xx1 = cliprect.left();
 		}
-		if(xx2 > cliprect.max_x)
-			xx2 = cliprect.max_x;
+		if(xx2 > cliprect.right())
+			xx2 = cliprect.right();
 
 		while(xx1 <= xx2) {
 			(this->*drawpixel)(xx1,y,patterndata,(v>>FRAC_SHIFT)*xsize+(u>>FRAC_SHIFT));
@@ -1747,13 +1747,13 @@ void saturn_state::vdp1_fill_quad(const rectangle &cliprect, int patterndata, in
 		return;
 	}
 
-	if(cury > cliprect.max_y)
+	if(cury > cliprect.bottom())
 		return;
-	if(limy <= cliprect.min_y)
+	if(limy <= cliprect.top())
 		return;
 
-	if(limy > cliprect.max_y)
-		limy = cliprect.max_y;
+	if(limy > cliprect.bottom())
+		limy = cliprect.bottom();
 
 	ps1 = pmin+4;
 	ps2 = pmin;
@@ -2165,8 +2165,8 @@ void saturn_state::vdp1_draw_normal_sprite(const rectangle &cliprect, int sprite
 
 	if (VDP1_LOG) logerror ("Drawing Normal Sprite x %04x y %04x xsize %04x ysize %04x patterndata %06x\n",x,y,xsize,ysize,patterndata);
 
-	if ( x > cliprect.max_x ) return;
-	if ( y > cliprect.max_y ) return;
+	if ( x > cliprect.right() ) return;
+	if ( y > cliprect.bottom() ) return;
 
 	shading = read_gouraud_table();
 	if ( shading )
@@ -2193,24 +2193,24 @@ void saturn_state::vdp1_draw_normal_sprite(const rectangle &cliprect, int sprite
 		duy = -xsize;
 		u += xsize*(ysize-1);
 	}
-	if ( y < cliprect.min_y ) //clip y
+	if ( y < cliprect.top() ) //clip y
 	{
 		// draculax user clips a 320x240 sprite for inverted castle map (obviously x & y flipped)
 		// we need to adjust U calculation only to make it align properly,
 		// adjusting ysize will already glitch out flipped doors in gameplay.
-		const int adjust_y = direction & 2 ? y - cliprect.min_y : cliprect.min_y - y;
+		const int adjust_y = (direction & 2) ? (y - cliprect.top()) : (cliprect.top() - y);
 		u += xsize * (adjust_y);
-		ysize -= (cliprect.min_y - y);
-		y = cliprect.min_y;
+		ysize -= (cliprect.top() - y);
+		y = cliprect.top();
 	}
-	if ( x < cliprect.min_x ) //clip x
+	if ( x < cliprect.left() ) //clip x
 	{
-		u += dux*(cliprect.min_x - x);
-		xsize -= (cliprect.min_x - x);
-		x = cliprect.min_x;
+		u += dux*(cliprect.left() - x);
+		xsize -= (cliprect.left() - x);
+		x = cliprect.left();
 	}
-	maxdrawypos = std::min(y+ysize-1,cliprect.max_y);
-	maxdrawxpos = std::min(x+xsize-1,cliprect.max_x);
+	maxdrawypos = std::min(y + ysize - 1, cliprect.bottom());
+	maxdrawxpos = std::min(x + xsize - 1, cliprect.right());
 	for (drawypos = y; drawypos <= maxdrawypos; drawypos++ )
 	{
 		//destline = m_vdp1_legacy.framebuffer_draw_lines[drawypos];

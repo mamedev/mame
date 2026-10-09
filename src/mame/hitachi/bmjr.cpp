@@ -126,9 +126,10 @@ u32 bmjr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const
 	const u16 screen_bank_offset = 0x900 + ((m_screen_mode & 0xf) << 9);
 
 	// TODO: convert to scanline based renderer
-	for(int y = cliprect.min_y; y <= cliprect.max_y; y++ )
+	for(int y = cliprect.top(); y <= cliprect.bottom(); y++ )
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x+= 8)
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x+= 8)
 		{
 			const u16 tile_offset = (x >> 3) + ((y >> 3) * 32);
 			const u16 tile = m_work_ram[0x100 + tile_offset] << 3;
@@ -140,7 +141,7 @@ u32 bmjr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const
 			for (int xi = 0; xi < 8; xi++)
 			{
 				const u8 pen = BIT(gfx_data, 7 - xi) ? fg_color : bg_color;
-				bitmap.pix(y, x + xi) = pen;
+				dst[x + xi] = pen;
 			}
 		}
 	}

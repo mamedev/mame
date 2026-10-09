@@ -50,11 +50,11 @@ void cv1k_blitter_device::FUNCNAME(BLIT_PARAMS)
 	int starty = 0;
 	const int dst_y_end = dst_y_start + dimy;
 
-	if (dst_y_start < clip.min_y)
-		starty = clip.min_y - dst_y_start;
+	if (dst_y_start < clip.top())
+		starty = clip.top() - dst_y_start;
 
-	if (dst_y_end > clip.max_y)
-		dimy -= (dst_y_end-1) - clip.max_y;
+	if (dst_y_end > clip.bottom())
+		dimy -= (dst_y_end-1) - clip.bottom();
 
 	// check things are safe to draw (note, if the source would wrap round an edge of the 0x2000*0x1000 vram we don't draw.. not sure what the hw does anyway)
 	// ddpdfk triggers this on boss explosions so it needs fixing
@@ -75,11 +75,11 @@ void cv1k_blitter_device::FUNCNAME(BLIT_PARAMS)
 	int startx = 0;
 	const int dst_x_end = dst_x_start + dimx;
 
-	if (dst_x_start < clip.min_x)
-		startx = clip.min_x - dst_x_start;
+	if (dst_x_start < clip.left())
+		startx = clip.left() - dst_x_start;
 
-	if (dst_x_end > clip.max_x)
-		dimx -= (dst_x_end-1) - clip.max_x;
+	if (dst_x_end > clip.right())
+		dimx -= (dst_x_end-1) - clip.right();
 
 #if BLENDED == 1
 #if _SMODE == 0

@@ -887,14 +887,14 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		/* call the set up function if any */
 		m_begin_update_cb(bitmap, cliprect);
 
-		if (cliprect.min_y == 0)
+		if (cliprect.top() == 0)
 		{
 			/* read the start address at the beginning of the frame */
 			m_current_disp_addr = m_disp_start_addr;
 		}
 
 		/* for each row in the visible region */
-		for (uint16_t y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (uint16_t y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			this->draw_scanline(y, bitmap, cliprect);
 		}

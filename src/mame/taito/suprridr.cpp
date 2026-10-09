@@ -317,20 +317,19 @@ uint32_t suprridr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// render left 4 columns with no scroll
 	rectangle subclip = visarea;
-	subclip.max_x = subclip.min_x + (m_flipx ? 1 * 8 : 4 * 8) - 1;
+	subclip.set_width(m_flipx ? (1 * 8) : (4 * 8));
 	subclip &= cliprect;
 	m_bg_tilemap_noscroll->draw(screen, bitmap, subclip, 0, 0);
 
 	// render right 1 column with no scroll
 	subclip = visarea;
-	subclip.min_x = subclip.max_x - (m_flipx ? 4 * 8 : 1 * 8) + 1;
+	subclip.setx(subclip.right() - (m_flipx ? (4 * 8) : (1 * 8)) + 1, subclip.right());
 	subclip &= cliprect;
 	m_bg_tilemap_noscroll->draw(screen, bitmap, subclip, 0, 0);
 
 	// render the middle columns normally
 	subclip = visarea;
-	subclip.min_x += m_flipx ? 1 * 8 : 4 * 8;
-	subclip.max_x -= m_flipx ? 4 * 8 : 1 * 8;
+	subclip.insetx(m_flipx ? (1 * 8) : (4 * 8), m_flipx ? (4 * 8) : (1 * 8));
 	subclip &= cliprect;
 	m_bg_tilemap->draw(screen, bitmap, subclip, 0, 0);
 

@@ -295,11 +295,11 @@ uint32_t stfight_video_device::screen_update_stfight(screen_device &screen, bitm
 
 void stfight_video_device::mix_txlayer(screen_device &screen, bitmap_ind16 &bitmap, bitmap_ind16 &bitmap2, const rectangle &cliprect, uint8_t* clut, int base, int mask, int condition, bool realcheck)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t *const dest = &bitmap.pix(y);
 		uint16_t const *const src = &bitmap2.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			if (src[x] == 0xffff)
 				continue;

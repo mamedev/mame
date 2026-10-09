@@ -178,9 +178,12 @@ u32 videoart_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	else
 	{
 		// width of 512 compressed down to 128
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-				bitmap.pix(y, x) = m_vram[(y << 7 | x >> 2) & 0x7fff] & 0xf;
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+		{
+			auto *const dst = &bitmap.pix(y);
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
+				dst[x] = m_vram[(y << 7 | x >> 2) & 0x7fff] & 0xf;
+		}
 	}
 
 	return 0;

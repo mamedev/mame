@@ -131,7 +131,7 @@ uint32_t gridlee_state::screen_update_gridlee(screen_device &screen, bitmap_ind1
 	pen_t const *const pens = &m_palette->pen(m_palettebank_vis * 32);
 
 	/* draw scanlines from the VRAM directly */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		/* non-flipped: draw directly from the bitmap */
 		if (!m_cocktail_flip)
@@ -173,7 +173,7 @@ uint32_t gridlee_state::screen_update_gridlee(screen_device &screen, bitmap_ind1
 				currxor = 0xff;
 			}
 
-			if (ypos >= (16 + GRIDLEE_VBEND) && ypos >= cliprect.min_y && ypos <= cliprect.max_y)
+			if (ypos >= (16 + GRIDLEE_VBEND) && cliprect.containsy(ypos))
 			{
 				int currx = xpos;
 

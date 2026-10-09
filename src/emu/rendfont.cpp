@@ -754,21 +754,22 @@ void render_font::get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height
 
 	// on entry, assume x0,y0 are the top,left coordinate of the cell and add
 	// the character bounding box to that position
-	float scale = m_scale * height;
-	bounds.min_x = float(gl.xoffs) * scale * aspect;
-	bounds.min_y = 0;
+	float const scale = m_scale * height;
+	int32_t const xoffs = int32_t(float(gl.xoffs) * scale * aspect);
 
 	// compute x1,y1 from there based on the bitmap size
-	float width = float(gl.bmwidth) * scale * aspect;
-	bounds.set_width(width < 0.5f ? 0 : std::max(int(width), 1));
-	bounds.set_height(float(m_height) * scale);
+	float const width = float(gl.bmwidth) * scale * aspect;
+
+	bounds.set(
+		xoffs, xoffs + ((width < 0.5f) ? 0 : std::max(int(width), 1)) - 1,
+		0, int32_t(float(m_height) * scale) - 1);
 
 	// if the bitmap isn't big enough, bail
 	if (dest.width() < bounds.width() || dest.height() < bounds.height())
 		return;
 
 	// if no texture, fill the target
-	if (gl.texture == nullptr)
+	if (!gl.texture)
 	{
 		dest.fill(0);
 		return;

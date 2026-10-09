@@ -832,7 +832,7 @@ void upd3301_device::recompute_parameters()
 	visarea.set(0, (m_h * m_width) - 1, 0, (m_l * m_r) - 1);
 
 	LOGCRTC("Screen: %u x %u @ %f Hz\n", horiz_pix_total, vert_pix_total, refresh.as_hz());
-	LOGCRTC("Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+	LOGCRTC("Visible Area: (%u, %u) - (%u, %u)\n", visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
 
 	screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 

@@ -142,9 +142,9 @@ u32 igs011_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 
 	u8 layerpix[8] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int const scr_addr = (y << 9) | x;
 			int pri_addr = 0xff;

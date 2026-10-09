@@ -473,7 +473,7 @@ inline void cv1k_blitter_device::gfx_draw_shadow_copy(address_space &space, offs
 	u16 dst_y_end = dst_y_start + src_dimy - 1;
 
 	// Sprites fully outside of clipping area should not be drawn.
-	if (dst_x_start > m_clip.max_x || dst_x_end < m_clip.min_x || dst_y_start > m_clip.max_y || dst_y_end < m_clip.min_y)
+	if (!m_clip.overlaps(rectangle(dst_x_start, dst_x_end, dst_y_start, dst_y_end)))
 	{
 		idle_blitter(CV1K_DRAW_OPERATION_SIZE_BYTES);
 		return;
@@ -484,10 +484,10 @@ inline void cv1k_blitter_device::gfx_draw_shadow_copy(address_space &space, offs
 	// applied here to match the hardware. This way seems most likely, and maps well to the delays seen on hardware.
 	// One example of this being utilized heavily is the transparent fog in Mushihimesama Futari Stage 1. This is drawn as
 	// 256x256 sprites, with large parts clipped away.
-	dst_x_start = std::max(dst_x_start, (u16)m_clip.min_x);
-	dst_y_start = std::max(dst_y_start, (u16)m_clip.min_y);
-	dst_x_end = std::min(dst_x_end, (u16)m_clip.max_x);
-	dst_y_end = std::min(dst_y_end, (u16)m_clip.max_y);
+	dst_x_start = std::max(dst_x_start, (u16)m_clip.left());
+	dst_y_start = std::max(dst_y_start, (u16)m_clip.top());
+	dst_x_end = std::min(dst_x_end, (u16)m_clip.right());
+	dst_y_end = std::min(dst_y_end, (u16)m_clip.bottom());
 	src_dimx = dst_x_end - dst_x_start + 1;
 	src_dimy = dst_y_end - dst_y_start + 1;
 
