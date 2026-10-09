@@ -1860,6 +1860,8 @@ if BUSES["COCO"] then
 		MAME_DIR .. "src/devices/bus/coco/dragon_sprites.h",
 		MAME_DIR .. "src/devices/bus/coco/meb_intrf.cpp",
 		MAME_DIR .. "src/devices/bus/coco/meb_intrf.h",
+		MAME_DIR .. "src/devices/bus/coco/meb_3n1.cpp",
+		MAME_DIR .. "src/devices/bus/coco/meb_3n1.h",
 		MAME_DIR .. "src/devices/bus/coco/meb_rtime.cpp",
 		MAME_DIR .. "src/devices/bus/coco/meb_rtime.h",
 	}
