@@ -411,11 +411,17 @@ void idegdrom_device::map_extra(uint64_t memory_window_start, uint64_t memory_wi
 	io_space->install_device(io_offset + 0x03b0, io_offset + 0x03cf, *static_cast<idegdrom_device*>(this), &idegdrom_device::map_control);
 }
 
+static void gdrom_option_config(device_t *device)
+{
+	auto gdrom = device->subdevice<gdrom_image_device>("image");
+	gdrom->add_region("gdrom", true); // must match the disk region name in the rom definitions
+}
+
 static void gdrom_devices(device_slot_interface &device)
 {
 	device.option_add("gdrom", ATAPI_GDROM);
+	device.set_option_machine_config("gdrom", gdrom_option_config);
 }
-
 
 void idegdrom_device::ide_irq(int state)
 {
