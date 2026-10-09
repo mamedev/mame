@@ -1,17 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:grubbyplaya
 /***************************************************************************
-  
+
     Preliminary TI-84 Plus CE driver
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "screen.h"
 #include "cpu/z80/ez80.h"
 #include "machine/nvram.h"
 #include "machine/intelfsh.h"
-
+#include "screen.h"
 
 namespace {
 
@@ -19,33 +18,33 @@ class ti84pce_state : public driver_device
 {
 public:
 	ti84pce_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag), 
-        m_maincpu(*this, "maincpu"),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_flash(*this, "flash"),
 		m_nvram(*this, "nvram")
 	{
 	}
 
 	void ti84pce(machine_config &config);
-    
+
 private:
 	required_device<ez80_device> m_maincpu;
 	required_device<intelfsh8_device> m_flash;
 	required_shared_ptr<uint8_t> m_nvram;
-    
-    void mem_map(address_map &map);
-    uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void mem_map(address_map &map) ATTR_COLD;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 void ti84pce_state::mem_map(address_map &map)
 {
-    map(0x000000, 0x3FFFFF).rw(m_flash, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
-    map(0xD00000, 0xD3FFFF).ram().share("nvram");
-    map(0xD40000, 0xD657FF).ram();
+	map(0x000000, 0x3fffff).rw(m_flash, FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
+	map(0xd00000, 0xd3ffff).ram().share(m_nvram);
+	map(0xd40000, 0xd657ff).ram();
 }
 
 static INPUT_PORTS_START (ti84pce)
-    PORT_START("ROW0")
+	PORT_START("ROW0")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_F5)
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TRACE") PORT_CODE(KEYCODE_F4)
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ZOOM") PORT_CODE(KEYCODE_F3)
@@ -54,7 +53,7 @@ static INPUT_PORTS_START (ti84pce)
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2nd") PORT_CODE(KEYCODE_LALT)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MODE") PORT_CODE(KEYCODE_ESC)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL)
-    PORT_START("ROW1")
+	PORT_START("ROW1")
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("STORE") PORT_CODE(KEYCODE_S)
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LN") PORT_CODE(KEYCODE_BACKSLASH)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LOG") PORT_CODE(KEYCODE_QUOTE)
@@ -62,41 +61,41 @@ static INPUT_PORTS_START (ti84pce)
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("x^-1") PORT_CODE(KEYCODE_COMMA)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MATH") PORT_CODE(KEYCODE_F6)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ALPHA") PORT_CODE(KEYCODE_LSHIFT)
-    PORT_START("ROW2")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_END)
+	PORT_START("ROW2")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_END) PORT_CHAR(',')
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SIN") PORT_CODE(KEYCODE_INSERT)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("APPS/MATRIX") PORT_CODE(KEYCODE_F7)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("x-VAR") PORT_CODE(KEYCODE_X)
-    PORT_START("ROW3")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(") PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_START("ROW3")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('(')
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("COS") PORT_CODE(KEYCODE_HOME)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("PRGM") PORT_CODE(KEYCODE_F8)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("STAT") PORT_CODE(KEYCODE_TILDE)
-    PORT_START("ROW4")
+	PORT_START("ROW4")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(-)") PORT_CODE(KEYCODE_M)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(")") PORT_CODE(KEYCODE_CLOSEBRACE)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(')')
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TAN") PORT_CODE(KEYCODE_PGUP)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("VARS") PORT_CODE(KEYCODE_F9)
-    PORT_START("ROW5")
-		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER)
-		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+") PORT_CODE(KEYCODE_EQUALS)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
-		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_L)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_P)
+	PORT_START("ROW5")
+		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('+')
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
+		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('*')
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/')
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('^')
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_PGDN)
-    PORT_START("ROW6")
+	PORT_START("ROW6")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
@@ -109,22 +108,21 @@ void ti84pce_state::ti84pce(machine_config &config)
 {
 	EZ80(config, m_maincpu, 48'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti84pce_state::mem_map);
-	// m_maincpu->set_addrmap(AS_IO, &ti84pce_state::io_map);
-    
+
 	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_size(320, 240);
 	screen.set_visarea(0, 320-1, 0, 240-1);
-    screen.set_screen_update(FUNC(ti84pce_state::screen_update));
+	screen.set_screen_update(FUNC(ti84pce_state::screen_update));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-    WINBOND_W29GL032CB(config, m_flash);
+	WINBOND_W29GL032CB(config, m_flash);
 }
 
 uint32_t ti84pce_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-    return 0;   
+	return 0;
 }
 
 ROM_START (ti84pce)
@@ -212,10 +210,10 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME        PARENT    COMPAT  MACHINE   INPUT     STATE          INIT        COMPANY              FULLNAME                                      FLAGS
-COMP( 2015, ti83pcev15, ti84pce,  0,      ti84pce,  ti84pce,  ti84pce_state, empty_init, "Texas Instruments", "TI-83 Premium CE (Boot Code 5.1.5.0014)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2015, ti84pce,    0,        0,      ti84pce,  ti84pce,  ti84pce_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.0.0.0089)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2016, ti84pcev15, ti84pce,  0,      ti84pce,  ti84pce,  ti84pce_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.1.5.0014)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2017, ti84pcev30, ti84pce,  0,      ti84pce,  ti84pce,  ti84pce_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.3.0.0037)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2018, ti84pcev31, ti84pce,  0,      ti84pce,  ti84pce,  ti84pce_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.3.1.0050)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2020, ti84pcev50, ti84pce,  0,      ti84pce,  ti84pce,  ti84pce_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.5.0.0006)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-COMP( 2021, ti84pcev61, ti84pce,  0,      ti84pce,  ti84pce,  ti84pce_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.6.1.0006)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+SYST( 2015, ti83pcev15, ti84pce,  0,      ti84pce,  ti84pce,  ti84pce_state, empty_init, "Texas Instruments", "TI-83 Premium CE (Boot Code 5.1.5.0014)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+SYST( 2015, ti84pce,    0,        0,      ti84pce,  ti84pce,  ti84pce_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.0.0.0089)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+SYST( 2016, ti84pcev15, ti84pce,  0,      ti84pce,  ti84pce,  ti84pce_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.1.5.0014)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+SYST( 2017, ti84pcev30, ti84pce,  0,      ti84pce,  ti84pce,  ti84pce_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.3.0.0037)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+SYST( 2018, ti84pcev31, ti84pce,  0,      ti84pce,  ti84pce,  ti84pce_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.3.1.0050)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+SYST( 2020, ti84pcev50, ti84pce,  0,      ti84pce,  ti84pce,  ti84pce_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.5.0.0006)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+SYST( 2021, ti84pcev61, ti84pce,  0,      ti84pce,  ti84pce,  ti84pce_state, empty_init, "Texas Instruments", "TI-84 Plus CE (Boot Code 5.6.1.0006)",       MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )

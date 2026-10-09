@@ -558,7 +558,6 @@ void ti68k_state::machine_start()
 		}
 	}
 
-	save_item(NAME(m_hw_version));
 	save_item(NAME(m_ram_enabled));
 	save_item(NAME(m_kb_mask));
 	save_item(NAME(m_on_key));

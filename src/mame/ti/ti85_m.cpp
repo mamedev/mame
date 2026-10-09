@@ -19,44 +19,19 @@
 #define TI85_SNAPSHOT_SIZE   32976
 #define TI86_SNAPSHOT_SIZE  131284
 
-TIMER_CALLBACK_MEMBER(ti85_state::ti85_timer_callback)
+INPUT_CHANGED_MEMBER(ti85_state::on_btn)
 {
-	if (ioport("ON")->read() & 0x01)
-	{
-		if (m_ON_interrupt_mask && !m_ON_pressed)
-		{
-			m_maincpu->set_input_line(0, HOLD_LINE);
-			m_ON_interrupt_status = 1;
-			if (!m_timer_interrupt_mask) m_timer_interrupt_mask = 2;
-		}
-		m_ON_pressed = 1;
-		return;
-	}
-	else
-		m_ON_pressed = 0;
-	if (m_timer_interrupt_mask)
+    if ((newval & 0x01) && m_ON_interrupt_mask && !m_ON_pressed)
 	{
 		m_maincpu->set_input_line(0, HOLD_LINE);
-		m_timer_interrupt_status = m_timer_interrupt_mask;
+		m_ON_interrupt_status = 1;
 	}
+    
+    m_ON_pressed = newval & 0x01;
 }
 
 TIMER_CALLBACK_MEMBER(ti85_state::ti83_timer1_callback)
 {
-	if (ioport("ON")->read() & 0x01)
-	{
-		if (m_ON_interrupt_mask && !m_ON_pressed)
-		{
-			m_maincpu->set_input_line(0, HOLD_LINE);
-			m_ON_interrupt_status = 1;
-		}
-		m_ON_pressed = 1;
-		return;
-	}
-	else
-	{
-		m_ON_pressed = 0;
-	}
 	if (m_timer_interrupt_mask & 2)
 	{
 		m_maincpu->set_input_line(0, HOLD_LINE);
@@ -132,12 +107,10 @@ void ti85_state::update_ti8x_memory() {
         case TI83PSE:
         case TI84P:
         case TI84PSE:
-            m_maincpu->set_unscaled_clock(m_cpu_speed ? 15000000 : 6000000);
             update_ti83pse_memory();
             break;
 
         case TI84PCSE:
-            m_maincpu->set_unscaled_clock(m_cpu_speed ? 15000000 : 6000000);
             update_ti84pcse_memory();
             break;
 
@@ -305,8 +278,9 @@ void ti85_state::machine_start()
 
     ti8x_init_common();
 
-	m_ti85_timer = timer_alloc(FUNC(ti85_state::ti85_timer_callback), this);
-	m_ti85_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+    const attotime dma_cycles = attotime::from_ticks(1024, m_maincpu->clock());
+    m_lcd_dma_timer = timer_alloc(FUNC(ti85_state::lcd_dma_callback), this);
+    m_lcd_dma_timer->adjust(dma_cycles, 0, dma_cycles);
 
 	space.unmap_write(0x0000, 0x3fff);
 	space.unmap_write(0x4000, 0x7fff);
@@ -316,6 +290,12 @@ void ti85_state::machine_start()
 
 MACHINE_RESET_MEMBER(ti85_state,ti85)
 {
+	m_PCR = 0x00;
+	m_ti8x_memory_page_1 = 0;
+	m_ti8x_memory_page_2 = 0;
+	m_ti8x_memory_page_3 = 0;
+	m_ti83p_port4 = 1;
+	m_booting = true;
 	m_PCR = 0xc0;
 }
 
@@ -466,7 +446,7 @@ void ti85_state::ti8x_init_common()
 	m_power_mode = 0;
 	m_keypad_mask = 0;
 	m_video_buffer_width = 0;
-	m_interrupt_speed = 0;
+	m_video_buffer_rows = 0;
 	m_port4_bit0 = 0;
     
 	save_item(NAME(m_timer_interrupt_mask));
@@ -479,14 +459,17 @@ void ti85_state::ti8x_init_common()
 	save_item(NAME(m_ti8x_memory_page_1));
 	save_item(NAME(m_ti8x_memory_page_2));
 	save_item(NAME(m_ti8x_memory_page_3));
+	save_item(NAME(m_LCD_interrupt_status));
+    save_item(NAME(m_LCD_dma_speed));
 	save_item(NAME(m_LCD_memory_base));
     save_item(NAME(m_LCD_contrast));
 	save_item(NAME(m_LCD_status));
 	save_item(NAME(m_LCD_mask));
+    save_item(NAME(m_frames));
 	save_item(NAME(m_power_mode));
 	save_item(NAME(m_keypad_mask));
 	save_item(NAME(m_video_buffer_width));
-	save_item(NAME(m_interrupt_speed));
+	save_item(NAME(m_video_buffer_rows));
 	save_item(NAME(m_port4_bit0));
     
 	machine().save().register_postload(save_prepost_delegate(FUNC(ti85_state::update_ti8x_memory), this));
@@ -552,11 +535,24 @@ void ti85_state::ti8xpse_init_common()
 	save_item(NAME(m_booting));
     save_item(NAME(m_ctimer_interrupt_status));
     save_item(NAME(m_cpu_speed));
+    save_item(NAME(m_flash_unlocked));
+    save_item(NAME(m_ti83p_port4));
 	save_item(NAME(m_ti84pcse_portE));
 	save_item(NAME(m_ti84pcse_portF));
 	save_item(NAME(m_ti83pse_port21));
 	save_item(NAME(m_ti83pse_port27));
 	save_item(NAME(m_ti83pse_port28));
+
+    for (int i = 0; i < 3; i++)
+    {
+        save_item(NAME(m_ctimer[i].loop), i);
+        save_item(NAME(m_ctimer[i].setup), i);
+        save_item(NAME(m_ctimer[i].divsor), i);
+        save_item(NAME(m_ctimer[i].interrupt), i);
+        save_item(NAME(m_ctimer[i].active), i);
+        save_item(NAME(m_ctimer[i].max), i);
+        save_item(NAME(m_ctimer[i].count), i);
+    }
 
     if (m_model == TI84P || m_model == TI84PSE || m_model == TI84PCSE) {
 	    save_item(NAME(m_ti84p_rtc_control));
@@ -607,8 +603,9 @@ MACHINE_START_MEMBER(ti85_state,ti86)
 	membank("bank4")->set_base(m_ti8x_ram.get());
 	subdevice<nvram_device>("nvram")->set_base(m_ti8x_ram.get(), sizeof(uint8_t)*128*1024);
 
-	m_ti85_timer = timer_alloc(FUNC(ti85_state::ti85_timer_callback), this);
-	m_ti85_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+    const attotime dma_cycles = attotime::from_ticks(1024, m_maincpu->clock());
+    m_lcd_dma_timer = timer_alloc(FUNC(ti85_state::lcd_dma_callback), this);
+    m_lcd_dma_timer->adjust(dma_cycles, 0, dma_cycles);
     
     save_pointer(NAME(m_ti8x_ram), 128*1024);
 }
@@ -644,20 +641,20 @@ uint8_t ti85_state::ti85_port_0002_r()
 	return 0xff;
 }
 
-uint8_t ti85_state::ti85_port_0003_r()
+uint8_t ti85_state::ti85_int_status_r()
 {
 	uint8_t data = 0;
 
-	if (m_LCD_status)
-		data |= m_LCD_mask;
 	if (m_ON_interrupt_status)
 		data |= 0x01;
-	if (m_timer_interrupt_status)
-		data |= 0x04;
+	if (m_LCD_interrupt_status)
+		data |= 0x02;
 	if (!m_ON_pressed)
 		data |= 0x08;
-	m_ON_interrupt_status = 0;
-	m_timer_interrupt_status = 0;
+    
+	if (!machine().side_effects_disabled())
+		m_ON_interrupt_status = 0;
+    
 	return data;
 }
 
@@ -840,14 +837,13 @@ void ti85_state::ti85_port_0002_w(uint8_t data)
 	m_LCD_contrast = data & 0x1f;
 }
 
-void ti85_state::ti85_port_0003_w(uint8_t data)
+void ti85_state::ti85_int_status_w(uint8_t data)
 {
-	if (m_LCD_status && !(data & 0x08))
-		m_timer_interrupt_mask = 0;
 	m_ON_interrupt_mask = data & 0x01;
-//  m_timer_interrupt_mask = data & 0x04;
 	m_LCD_mask = data & 0x02;
 	m_LCD_status = data & 0x08;
+    m_LCD_interrupt_status &= m_LCD_mask;
+    m_lcd_dma_timer->enable(m_LCD_status);
 }
 
 void ti85_state::ti85_port_0004_w(uint8_t data)
@@ -856,8 +852,9 @@ void ti85_state::ti85_port_0004_w(uint8_t data)
     if (m_model == TI83) {
         update_ti83_memory();
     } else {
+        m_LCD_dma_speed = (data >> 5) & 0x01;
         m_video_buffer_width = (data >> 3) & 0x03;
-        m_interrupt_speed = (data >> 1) & 0x03;
+        m_video_buffer_rows = (data >> 1) & 0x03;
     }
 }
 
@@ -1432,7 +1429,7 @@ void ti85_state::ti85_setup_snapshot(uint8_t *data)
 	m_ON_pressed = 0;
 
 	m_video_buffer_width = 0x02;
-	m_interrupt_speed = 0x03;
+	m_video_buffer_rows = 0x03;
 }
 
 void ti85_state::ti86_setup_snapshot(uint8_t *data)
@@ -1472,7 +1469,7 @@ void ti85_state::ti86_setup_snapshot(uint8_t *data)
 	m_ON_pressed = 0;
 
 	m_video_buffer_width = 0x02;
-	m_interrupt_speed = 0x03;
+	m_video_buffer_rows = 0x03;
 }
 
 SNAPSHOT_LOAD_MEMBER(ti85_state::snapshot_cb)
