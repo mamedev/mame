@@ -152,4 +152,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=O7_P8YwZCuQ -->
+	<software name="revicion" supported="no">
+		<description>reVICion</description>
+		<year>2024</year>
+		<publisher>Desire</publisher>
+		<info name="ram" value="35K" />
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="DSR_Revicion_VIC20_oldschool_demo_PAL.d64" size="174848" crc="077eb3e0" sha1="5fef12a567adff9362994b2aeb9838488d8ef12b"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
