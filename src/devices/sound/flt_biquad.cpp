@@ -531,7 +531,7 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_inv_lowpass_calc
 	}
 	r.gain = -r2 / r1;
 	r.fc = 1.0 / (2 * std::numbers::pi * r2 * c1);
-	r.q = (M_SQRT2 / 2.0);
+	r.q = (std::numbers::sqrt2 / 2.0);
 	r.type = biquad_type::LOWPASS1P;
 	LOGMASKED(LOG_SETUP,"filter_biquad_device::opamp_inv_lowpass_calc(%f, %f, %f) yields:\n\ttype = %d, fc = %f, Q = %f, gain = %f\n", r1, r2, c1*1000000, static_cast<int>(r.type), r.fc, r.q, r.gain);
 	return r;

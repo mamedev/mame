@@ -232,10 +232,7 @@
 #include "sound/flt_biquad.h"
 #include "speaker.h"
 
-// we need the M_SQRT2 constant
-#ifndef M_SQRT2
-#define M_SQRT2 1.41421356237309504880
-#endif
+#include <numbers>
 
 // defines
 
@@ -540,6 +537,8 @@ INPUT_PORTS_END
 ******************************************************************************/
 void tsispch_state::prose2k(machine_config &config)
 {
+	using std::numbers::sqrt2;
+
 	/* basic machine hardware */
 	/* There are two crystals on the board: a 24MHz xtal at Y2 and a 16MHz xtal at Y1 */
 	I8086(config, m_maincpu, 24_MHz_XTAL/3); /* VERIFIED clock, 24MHz (or 23.040MHz on older devices) xtal at Y2, divided by 3 in an 8284A */
@@ -586,13 +585,13 @@ void tsispch_state::prose2k(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	// 7th order elliptic filter using an RF5609A clocked at (16Mhz/3)/11 = 484.8484...Khz, yielding a cutoff of 4.848khz
-	FILTER_BIQUAD(config, m_efilter[0]).setup(filter_biquad_device::biquad_type::LOWPASS1P1Z, 4848.4848, M_SQRT2/2, 1.0);
+	FILTER_BIQUAD(config, m_efilter[0]).setup(filter_biquad_device::biquad_type::LOWPASS1P1Z, 4848.4848, sqrt2/2, 1.0);
 	m_efilter[0]->add_route(ALL_OUTPUTS, "speaker", 1.0);
-	FILTER_BIQUAD(config, m_efilter[1]).setup(filter_biquad_device::biquad_type::LOWPASS, 4848.4848, M_SQRT2/2, 1.0);
+	FILTER_BIQUAD(config, m_efilter[1]).setup(filter_biquad_device::biquad_type::LOWPASS, 4848.4848, sqrt2/2, 1.0);
 	m_efilter[1]->add_route(ALL_OUTPUTS, m_efilter[0], 1.0);
-	FILTER_BIQUAD(config, m_efilter[2]).setup(filter_biquad_device::biquad_type::LOWPASS, 4848.4848, M_SQRT2/2, 1.0);
+	FILTER_BIQUAD(config, m_efilter[2]).setup(filter_biquad_device::biquad_type::LOWPASS, 4848.4848, sqrt2/2, 1.0);
 	m_efilter[2]->add_route(ALL_OUTPUTS, m_efilter[1], 1.0);
-	FILTER_BIQUAD(config, m_efilter[3]).setup(filter_biquad_device::biquad_type::LOWPASS, 4848.4848, M_SQRT2/2, 1.0);
+	FILTER_BIQUAD(config, m_efilter[3]).setup(filter_biquad_device::biquad_type::LOWPASS, 4848.4848, sqrt2/2, 1.0);
 	m_efilter[3]->add_route(ALL_OUTPUTS, m_efilter[2], 1.0);
 
 	// prefilter, has a cutoff at 10khz, this serves as a prefilter for preventing aliasing of the input of the RF5609
