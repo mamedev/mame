@@ -423,7 +423,7 @@ void votrax_sc01_device::phone_commit()
 
 			// That does not happen in the sc01(a) rom, but let's
 			// cover our behind.
-			if(m_rom_cld == 0)
+			if(m_rom_vd == 0)
 				m_cur_closure = m_rom_closure;
 
 			return;
@@ -450,7 +450,14 @@ void votrax_sc01_device::chip_update()
 		if(m_phonetick == ((m_rom_duration << 2) | 1)) {
 			m_phonetick = 0;
 			m_ticks++;
-			if(m_ticks == m_rom_cld)
+			// The closure latches on the same delay that gates the
+			// noise amplitude (m_rom_vd here).  US 4,433,210 gives the
+			// closure and the fricative amplitude one shared delay and
+			// the vocal amplitude a delay of its own; latching on
+			// m_rom_cld, the field that gates the voice amplitude, kept
+			// a stop's closure on well into the next phone, after its
+			// noise had decayed, so P, T and K lost their release burst.
+			if(m_ticks == m_rom_vd)
 				m_cur_closure = m_rom_closure;
 		}
 	}
