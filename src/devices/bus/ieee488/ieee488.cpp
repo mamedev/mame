@@ -392,6 +392,7 @@ uint8_t ieee488_device::get_data()
 
 // slot devices
 #include "bus/cbmiec/c1526.h"
+#include "bus/cbmiec/msdsd.h"
 #include "c2031.h"
 #include "c2040.h"
 #include "c3022.h"
@@ -420,6 +421,8 @@ void cbm_ieee488_devices(device_slot_interface &device)
 	device.option_add("d9090", GPIB_D9090);
 	device.option_add("softbox", GPIB_SOFTBOX);
 	device.option_add("hardbox", GPIB_HARDBOX);
+	device.option_add("msdsd1", GPIB_MSD_SD1);
+	device.option_add("msdsd2", GPIB_MSD_SD2);
 	device.option_add("shark", GPIB_MSHARK);
 	device.option_add("c3022", GPIB_C3022);
 	device.option_add("c4022", GPIB_C4022);

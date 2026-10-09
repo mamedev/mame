@@ -610,6 +610,7 @@ int cbm_iec_device::get_signal(int signal, const attotime &time)
 #include "mps2020.h"
 #include "mps801.h"
 #include "mps803.h"
+#include "msdsd.h"
 #include "prodos.h"
 #include "prologicdos.h"
 #include "rapidos.h"

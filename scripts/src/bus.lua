@@ -1612,6 +1612,8 @@ if BUSES["CBMIEC"] then
 		MAME_DIR .. "src/devices/bus/cbmiec/minichief.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/mos5710.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/mos5710.h",
+		MAME_DIR .. "src/devices/bus/cbmiec/msdsd.cpp",
+		MAME_DIR .. "src/devices/bus/cbmiec/msdsd.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/mps1200.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/mps1200.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/mps1224.cpp",
