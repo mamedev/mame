@@ -21439,6 +21439,13 @@ xycs
 wlfx
 wlzb
 
+@source:humax/cxhumax.cpp
+hxhdci2k
+
+@source:humax/irci5400.cpp
+irci5400
+irci5400z
+
 @source:husky/hawk.cpp
 hawk
 
@@ -43923,9 +43930,6 @@ megatrix
 @source:skeleton/cubieboard4.cpp
 cubibrd4
 monkyjmp
-
-@source:skeleton/cxhumax.cpp
-hxhdci2k
 
 @source:skeleton/d400.cpp
 d461
