@@ -1581,6 +1581,24 @@ Runs until disk side change prompt
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=1mQWEF6Tt0Y -->
+	<software name="popelprm" supported="no">
+		<description>Popel Premiere</description>
+		<year>1999</year>
+		<publisher>CyberpunX</publisher>
+		<notes><![CDATA[
+Requires a second SID at $D500
+]]></notes>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="popel_premiere.d64" size="174848" crc="f69e3a85" sha1="e12a494e1426e24207e892f975aa214eedd7e155"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- https://www.youtube.com/watch?v=aK8l6_iJWKM -->
 	<software name="rebirth" supported="no">
 		<description>Rebirth</description>
@@ -1617,6 +1635,20 @@ Runs until disk side change prompt
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="scpu3.d64" size="174848" crc="bdd6952c" sha1="a958773689452491848093dd71c17b1858c2184f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=ZLkWufDcDNU -->
+	<software name="scpuplsm" supported="no">
+		<description>SuperCPU Plasma Intro</description>
+		<year>2015</year>
+		<publisher>Genesis Project</publisher>
+		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="scpuintro_gp.d64" size="174848" crc="f7d99d90" sha1="df999d840168f36555f9651794f82c01cbd73b3c"/>
 			</dataarea>
 		</part>
 	</software>

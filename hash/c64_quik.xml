@@ -350,4 +350,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="digimaxd">
+		<description>DigiMAX Demo</description>
+		<year>2022</year>
+		<publisher>Data</publisher>
+
+		<part name="quik" interface="cbm_quik">
+			<dataarea name="quik" size="18873">
+				<rom name="digimaxdemo.prg" size="18873" crc="be931573" sha1="97b6c96316d4357c5643c4508226a0634d60556e"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
