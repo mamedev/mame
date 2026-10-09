@@ -7,12 +7,9 @@ Hitachi B(asic Master?) 16000 series?
 
 TODO:
 - Barely anything is known about the HW;
-- Requires a compatible system disk to make it go further;
-- hookup proper keyboard;
-- FDC throws disk error, mon_w hookup is unconfirmed, doesn't seem to select a drive ...
-- b16: hangs for checking bit 7 in vblank fashion at $80, either the DMA is at the
-  wrong spot or the earlier variant effectively don't have it.
-- b16ex2: "error message 1101", bypassed between ports $80 and $48
+- confirm keyboard command responses and typematic;
+- Confirm exact $80 video/status signals (bit 4 on EX-II, bit 5 on the earlier ROM);
+- Confirm whether the motor-enable line is shared by both floppy drives;
 - b16ex2: confirm kanji hookup;
 
 ===================================================================================================
@@ -77,6 +74,7 @@ Error codes (TODO: RE them all)
 **************************************************************************************************/
 
 #include "emu.h"
+#include "b16_kbd.h"
 #include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"
 #include "imagedev/floppy.h"
@@ -85,6 +83,13 @@ Error codes (TODO: RE them all)
 #include "machine/pit8253.h"
 #include "machine/upd765.h"
 #include "video/mc6845.h"
+
+#include "formats/pc98_dsk.h"
+#include "formats/pc98fdi_dsk.h"
+#include "formats/dcp_dsk.h"
+#include "formats/dip_dsk.h"
+#include "formats/fdd_dsk.h"
+#include "formats/nfd_dsk.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -101,8 +106,10 @@ public:
 		, m_pit(*this, "pit")
 		, m_intm(*this, "intm")
 		, m_ints(*this, "ints")
+		, m_keyboard(*this, "keyboard")
 		, m_dma(*this, "dma")
 		, m_crtc(*this, "crtc")
+		, m_screen(*this, "screen")
 		, m_vram(*this, "vram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
@@ -113,7 +120,6 @@ public:
 
 	void b16(machine_config &config);
 	void b16ex2(machine_config &config);
-	DECLARE_INPUT_CHANGED_MEMBER(key_pressed);
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -126,15 +132,21 @@ protected:
 
 private:
 	uint8_t m_crtc_vreg[0x100]{}, m_crtc_index = 0;
+	u16 m_tvram_attr_latch = 0;
 	uint8_t m_port78 = 0;
-	uint8_t m_keyb_scancode = 0;
+	uint8_t m_port80 = 0;
+	u8 m_dma_page = 0;
+	u32 m_fdc_rate = 250'000;
+	u8 m_port80_vblank_mask = 0xb0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<pic8259_device> m_intm;
 	required_device<pic8259_device> m_ints;
+	required_device<b16_kbd_device> m_keyboard;
 	required_device<i8257_device> m_dma;
 	required_device<mc6845_device> m_crtc;
+	required_device<screen_device> m_screen;
 	required_shared_ptr<uint16_t> m_vram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -144,6 +156,8 @@ private:
 
 	std::unique_ptr<u8[]> m_ig_ram;
 
+	u16 tvram_r(offs_t offset);
+	void tvram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u8 ig_ram_r(offs_t offset);
 	void ig_ram_w(offs_t offset, uint8_t data);
 	void crtc_address_w(uint8_t data);
@@ -152,9 +166,6 @@ private:
 	void memory_write_byte(offs_t offset, uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	TIMER_CALLBACK_MEMBER( tc_tick_cb );
-	emu_timer *m_timer_tc;
 
 	static void floppy_formats(format_registration &fr);
 };
@@ -184,6 +195,7 @@ void b16_state::video_start()
 
 	save_item(NAME(m_crtc_vreg));
 	save_item(NAME(m_crtc_index));
+	save_item(NAME(m_tvram_attr_latch));
 }
 
 
@@ -203,8 +215,7 @@ uint32_t b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			for(int yi = 0; yi < mc6845_tile_height; yi++)
 			{
 				u8 gfx_data = 0;
-				// TODO: incorrect select (will print gibberish after the system bootup message)
-				// system doesn't bother to clear kanji upper addresses, may opt-out thru a global register.
+				// TODO: confirm global character/kanji display control.
 				if (BIT(hi_vram, 5))
 				{
 					// TODO: apply bitswap at device_init time, move this calculation out of this inner loop.
@@ -235,6 +246,20 @@ uint32_t b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
+u16 b16_state::tvram_r(offs_t offset)
+{
+	if (offset < 0x2000 && BIT(m_port78, 2) && !machine().side_effects_disabled())
+		m_tvram_attr_latch = m_vram[offset + 0x2000];
+	return m_vram[offset];
+}
+
+void b16_state::tvram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_vram[offset]);
+	if (offset < 0x2000 && BIT(m_port78, 2))
+		m_vram[offset + 0x2000] = m_tvram_attr_latch;
+}
+
 u8 b16_state::ig_ram_r(offs_t offset)
 {
 	// swap bit 0 for now, so we can see a setup thru debugger later on.
@@ -257,7 +282,7 @@ void b16_state::b16_map(address_map &map)
 	// TODO: amount of work RAM depends on model type
 	map(0x00000, 0x9ffff).ram();
 	map(0xa0000, 0xaffff).ram(); // bitmap?
-	map(0xb0000, 0xb7fff).ram().share("vram");
+	map(0xb0000, 0xb7fff).ram().rw(FUNC(b16_state::tvram_r), FUNC(b16_state::tvram_w)).share("vram");
 	map(0xb8000, 0xbbfff).rw(FUNC(b16_state::ig_ram_r), FUNC(b16_state::ig_ram_w)).umask16(0xffff);
 	map(0xfc000, 0xfffff).rom().region("ipl", 0);
 }
@@ -292,27 +317,21 @@ void b16_state::b16_io(address_map &map)
 	map(0x20, 0x20).w(FUNC(b16_state::crtc_address_w));
 	map(0x22, 0x22).w(FUNC(b16_state::crtc_data_w));
 //  map(0x28, 0x2b) keyboard, likely thru USART
-	map(0x28, 0x28).lr8(NAME([this]() {return m_keyb_scancode; }));
-	map(0x2a, 0x2a).lr8(NAME([]() { return 0x02; }));
+	map(0x28, 0x28).rw(m_keyboard, FUNC(b16_kbd_device::data_r), FUNC(b16_kbd_device::data_w));
+	map(0x2a, 0x2a).r(m_keyboard, FUNC(b16_kbd_device::status_r));
 	// Jumper block?
 //  map(0x40, 0x40)
 //  map(0x42, 0x42)
 //  map(0x44, 0x44)
 	// b16ex2: jumps to $e0000 if bit 7 high, noisy on bit 4
 	map(0x48, 0x48).lr8(NAME([] () { return 0; }));
-	map(0x70, 0x73).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
-	map(0x74, 0x74).lw8(
-		NAME([this] (u8 data) {
-			floppy_image_device *floppy = m_floppy[0]->get_device();
-
-			// motor on strobe?
-			if (floppy != nullptr)
-			{
-				floppy->mon_w(1);
-				floppy->mon_w(0);
-			}
-		})
+	map(0x50, 0x50).lrw8(
+		NAME([this] () { return m_dma->read(8); }),
+		NAME([this] (u8 data) { m_dma->write(8, data); })
 	);
+	map(0x60, 0x6f).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write)).umask16(0x00ff);
+	map(0x70, 0x73).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
+	map(0x74, 0x74).lw8(NAME([this] (u8 data) { m_dma_page = data & 0x0f; }));
 	map(0x78, 0x78).lrw8(
 		NAME([this] () {
 			return m_port78;
@@ -322,11 +341,12 @@ void b16_state::b16_io(address_map &map)
 			// bit 0: TC strobe?
 			// bit 2: FDC reset?
 			m_port78 = data;
-			if (BIT(data, 0))
-			{
-				m_fdc->tc_w(true);
-				m_timer_tc->adjust(attotime::zero);
-			}
+			// Bit 0 is set before spin-up and cleared by the BIOS motor timeout.
+			// Bit 2 enables character/attribute transfer.
+			// A common motor-enable line for the two drives is assumed.
+			for (auto &connector : m_floppy)
+				if (floppy_image_device *const floppy = connector->get_device())
+					floppy->mon_w(!BIT(data, 0));
 		})
 	);
 	map(0x79, 0x79).lrw8(
@@ -338,48 +358,21 @@ void b16_state::b16_io(address_map &map)
 			logerror("Port $79 write %02x\n", data);
 		})
 	);
-	map(0x80, 0x89).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write)).umask16(0x00ff);
+	// Configuration/video control latch; timing status is not writable.
+	// B16 ROM polls bit 5; B16EXII ROM polls bit 4.
+	// TODO: confirm the source/polarity of these vblank-derived status bits.
+	map(0x80, 0x80).lrw8(
+		NAME([this] () {
+			return (m_port80 & ~m_port80_vblank_mask) | (m_screen->vblank() ? m_port80_vblank_mask : 0x00);
+		}),
+		NAME([this] (u8 data) { m_port80 = data; })
+	);
 //  map(0x00a0, 0x00bf) DMA upper segments or video clut
 //  map(0x8020, 0x8023) external FDC? Can branch at FDC irq
 }
 
-INPUT_CHANGED_MEMBER(b16_state::key_pressed)
-{
-	m_ints->ir0_w(!newval);
-	m_keyb_scancode = (u8)param | (newval << 7);
-}
-
-
 static INPUT_PORTS_START( b16 )
-	// question marks denotes unknown keys, asterisks for empty chars
-	// KEY0
-	// ?1234567
-	// ? = left arrow (backspace?)
-
-	// KEY1
-	// 890-<backslash>***
-
-	PORT_START("KEY2")
-	// ?qwertyu
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(b16_state::key_pressed), 0x10 | 6)
-
-	// KEY3
-	// iop@[***
-
-	PORT_START("KEY4")
-	// asdfghjk
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(b16_state::key_pressed), 0x20)
-
-	// KEY5
-	// ?;:]****
-
-	PORT_START("KEY6")
-	// zxcvbnm,
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(b16_state::key_pressed), 0x30)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(b16_state::key_pressed), 0x31)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(b16_state::key_pressed), 0x32)
-//    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(b16_state::key_pressed), 0x33)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(b16_state::key_pressed), 0x34)
+	// Keep this shared entry for future system inputs.
 INPUT_PORTS_END
 
 
@@ -416,51 +409,59 @@ GFXDECODE_END
 uint8_t b16_state::memory_read_byte(offs_t offset)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.read_byte(offset);
+	return prog_space.read_byte((u32(m_dma_page) << 16) | offset);
 }
 
 void b16_state::memory_write_byte(offs_t offset, uint8_t data)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
-	return prog_space.write_byte(offset, data);
+	return prog_space.write_byte((u32(m_dma_page) << 16) | offset, data);
 }
 
 static void b16_floppies(device_slot_interface &device)
 {
 	device.option_add("525dd", FLOPPY_525_DD);
-	// TODO: at least PC-98 3.5" x 1.2MB format
+	device.option_add("525hd", FLOPPY_525_HD); // Y-E Data YD-380 (B16 EX onward)
+	device.option_add("35hd", FLOPPY_35_HD); // Optional 3.5" HD drive
 }
 
 void b16_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
-//  fr.add(FLOPPY_PC98_FORMAT);
-//  fr.add(FLOPPY_PC98FDI_FORMAT);
-//  fr.add(FLOPPY_FDD_FORMAT);
-//  fr.add(FLOPPY_DCP_FORMAT);
-//  fr.add(FLOPPY_DIP_FORMAT);
-//  fr.add(FLOPPY_NFD_FORMAT);
-}
-
-TIMER_CALLBACK_MEMBER( b16_state::tc_tick_cb )
-{
-//  logerror("tc off\n");
-	m_fdc->tc_w(false);
+	fr.add(FLOPPY_PC98_FORMAT);
+	fr.add(FLOPPY_PC98FDI_FORMAT);
+	fr.add(FLOPPY_FDD_FORMAT);
+	fr.add(FLOPPY_DCP_FORMAT);
+	fr.add(FLOPPY_DIP_FORMAT);
+	fr.add(FLOPPY_NFD_FORMAT);
 }
 
 void b16_state::machine_start()
 {
-	m_timer_tc = timer_alloc(FUNC(b16_state::tc_tick_cb), this);
+	save_item(NAME(m_port78));
+	save_item(NAME(m_port80));
+	save_item(NAME(m_dma_page));
 }
 
 void b16_state::machine_reset()
 {
-	floppy_image_device *floppy = m_floppy[0]->get_device();
-
-	if (floppy != nullptr)
-		floppy->set_rpm(300);
-	m_fdc->set_rate(250000);
-
+	// Keep the selected drive's native speed (300 RPM DD or 360 RPM HD).
+	// Japanese 1.23MB mode uses 360 RPM
+	m_fdc->set_rate(m_fdc_rate);
+	if (m_fdc_rate == 500'000)
+	{
+		for (auto &connector : m_floppy)
+		{
+			if (auto *floppy = connector->get_device(); floppy && floppy->get_form_factor() == floppy_image::FF_35)
+				floppy->set_rpm(360);
+		}
+	}
+	m_dma_page = 0;
+	m_port78 = 0;
+	m_port80 = 0;
+	m_tvram_attr_latch = 0;
+	m_dma->dreq0_w(0);
+	m_fdc->tc_w(false);
 }
 
 void b16_state::b16(machine_config &config)
@@ -484,6 +485,13 @@ void b16_state::b16(machine_config &config)
 	I8257(config, m_dma, XTAL(16'000'000));
 	m_dma->in_memr_cb().set(FUNC(b16_state::memory_read_byte));
 	m_dma->out_memw_cb().set(FUNC(b16_state::memory_write_byte));
+	m_dma->out_hrq_cb().set([this] (int state) {
+		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+		m_dma->hlda_w(state);
+	});
+	m_dma->in_ior_cb<0>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_dma->out_iow_cb<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
+	m_dma->out_tc_cb().set(m_fdc, FUNC(upd765a_device::tc_line_w));
 
 	PIC8259(config, m_intm);
 	m_intm->out_int_callback().set_inputline(m_maincpu, 0);
@@ -494,11 +502,14 @@ void b16_state::b16(machine_config &config)
 	m_ints->out_int_callback().set(m_intm, FUNC(pic8259_device::ir6_w));
 	m_ints->in_sp_callback().set_constant(0);
 
+	B16_KBD(config, m_keyboard);
+	m_keyboard->irq_callback().set(m_ints, FUNC(pic8259_device::ir0_w));
+
 	// clock unconfirmed, definitely want the ready line on
 	// would stop at `SEARCH_ADDRESS_MARK_HEADER` otherwise
-	UPD765A(config, m_fdc, XTAL(16'000'000) / 2, true, false);
+	UPD765A(config, m_fdc, XTAL(16'000'000) / 2, true, true);
 	m_fdc->intrq_wr_callback().set(m_intm, FUNC(pic8259_device::ir1_w));
-	m_fdc->drq_wr_callback().set([this] (int state) { logerror("drq %d\n", state);});
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq0_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", b16_floppies, "525dd", b16_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", b16_floppies, "525dd", b16_state::floppy_formats).enable_sound(true);
 
@@ -508,7 +519,7 @@ void b16_state::b16(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 
-	screen_device &screen(SCREEN(config, "screen"));
+	screen_device &screen(SCREEN(config, m_screen));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(b16_state::screen_update));
@@ -524,6 +535,10 @@ void b16_state::b16(machine_config &config)
 void b16_state::b16ex2(machine_config &config)
 {
 	b16_state::b16(config);
+	m_fdc->subdevice<floppy_connector>("0")->set_default_option("525hd");
+	m_fdc->subdevice<floppy_connector>("1")->set_default_option("525hd");
+	m_fdc_rate = 500'000;
+	m_port80_vblank_mask = 0x90;
 	I80286(config.replace(), m_maincpu, XTAL(16'000'000) / 2); // A80286-8 / S
 	m_maincpu->set_addrmap(AS_PROGRAM, &b16_state::b16ex2_map);
 	m_maincpu->set_addrmap(AS_IO, &b16_state::b16_io);
