@@ -50,6 +50,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/mcf5206e.h"
+#include "machine/i2cmem.h"
 #include "machine/msm6242.h"
 #include "machine/ticket.h"
 #include "video/pc_vga.h"
@@ -214,6 +215,7 @@ public:
 	gaminator_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_seeprom(*this, "seeprom")
 	{ }
 
 	void init_gaminator();
@@ -224,7 +226,8 @@ private:
 
 	void gamtor_unk_w(uint32_t data);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<mcf5206e_device> m_maincpu;
+	required_device<i2cmem_device> m_seeprom;
 };
 
 void gaminator_state::gamtor_unk_w(uint32_t data)
@@ -262,6 +265,13 @@ void gaminator_state::gaminator(machine_config &config)
 {
 	MCF5206E(config, m_maincpu, 33.333_MHz_XTAL); // ColdFire MCF5406ECAB40
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaminator_state::gaminator_map);
+
+	// MBUS-1: 24C04 SEEPROM on the ColdFire M-Bus (main PCB P379-6, see the header); its contents are the
+	// "seeprom" ROM region. SDA is open drain: the CPU's M-Bus reads the line the EEPROM drives.
+	I2C_24C04(config, m_seeprom);
+	m_maincpu->sda_w_cb().set(m_seeprom, FUNC(i2cmem_device::write_sda));
+	m_maincpu->scl_w_cb().set(m_seeprom, FUNC(i2cmem_device::write_scl));
+	m_maincpu->sda_r_cb().set(m_seeprom, FUNC(i2cmem_device::read_sda));
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
