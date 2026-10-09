@@ -61,6 +61,7 @@ private:
 	inline void command_end_seq();
 	void calc_offset(int16_t x, int16_t y, uint32_t &offset, uint8_t &bit_pos);
 	int get_bpp();
+	int get_ppmc();
 	uint16_t get_dot(int16_t x, int16_t y);
 	bool set_dot(int16_t x, int16_t y, int16_t px, int16_t py);
 	bool set_dot(int16_t x, int16_t y, uint16_t color);

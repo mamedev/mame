@@ -507,13 +507,30 @@ inline void hd63484_device::dequeue_r(uint8_t *data)
 	}
 }
 
+int hd63484_device::get_ppmc()
+{
+	int gai = (m_omr >> 4) & 0x07;
+	int acm = (m_omr & 0x08) ? 2 : 1;
+	int ppw = 16 / get_bpp();
+
+	switch (gai)
+	{
+		case 0: case 1: case 2: case 3: // address incremented by 1, 2, 4 or 8 words
+			return (ppw << gai) / acm;
+		case 7:                         // address incremented by 1 every two display cycles
+			return std::max(ppw / 2 / acm, 1);
+		default:                        // 4-6: address not incremented
+			return ppw / acm;
+	}
+}
+
 //-------------------------------------------------
 //  recompute_parameters -
 //-------------------------------------------------
 
 inline void hd63484_device::recompute_parameters()
 {
-	if(!m_auto_configure_screen || m_hdw < 3 || m_hc == 0 || m_vc == 0) //bail out if screen params aren't valid
+	if (!m_auto_configure_screen)
 		return;
 
 	if (LOG)
@@ -523,22 +540,24 @@ inline void hd63484_device::recompute_parameters()
 		logerror("SP0 %d SP1 %d SP2 %d\n",m_sp[0],m_sp[1],m_sp[2]);
 	}
 
-	int gai = (m_omr>>4) & 0x07;
-	if (gai > 3)    logerror("unsupported GAI=%d\n", gai);
-	int acm = (m_omr & 0x08) ? 2 : 1;
-	int ppw = 16 / get_bpp();
-	int ppmc = ppw * (1 << gai) / acm;  // TODO: GAI > 3
-	int vbstart = m_vds + m_sp[1];
+	int ppmc = get_ppmc();
+	int htotal = m_hc * ppmc;
 	int hbend = (m_hsw + m_hds + m_external_skew) * ppmc;
+	int hbstart = hbend + m_hdw * ppmc;
+	int vbstart = m_vds + m_sp[1];
 	if (BIT(m_dcr, 13)) vbstart += m_sp[0];
 	if (BIT(m_dcr, 11)) vbstart += m_sp[2];
 
+	// bail out if screen params aren't valid
+	if (m_hc == 0 || m_vc == 0 || hbstart > htotal || vbstart <= m_vds)
+		return;
+
 	rectangle visarea = screen().visible_area();
-	visarea.set(hbend, hbend + (m_hdw * ppmc) - 1, m_vds, vbstart - 1);
+	visarea.set(hbend, hbstart - 1, m_vds, vbstart - 1);
 	attotime frame_period = screen().frame_period(); // TODO: use clock() to calculate the frame_period
-	screen().configure(m_hc * ppmc, m_vc, visarea, frame_period);
+	screen().configure(htotal, m_vc, visarea, frame_period);
 	if (LOG)
-		logerror("ACRTC: full %dx%d vis (%d, %d)-(%d, %d)\n", m_hc * ppmc, m_vc, visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
+		logerror("ACRTC: full %dx%d vis (%d, %d)-(%d, %d)\n", htotal, m_vc, visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
 }
 
 
@@ -2111,8 +2130,7 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 	uint32_t base_offs = m_sar[layer_n] + (y - vs) * m_mwr[layer_n] + m_external_skew;
 	uint32_t wind_offs = m_sar[3] + (y - m_vws) * m_mwr[3] + m_external_skew;
 	int step = (m_omr & 0x08) ? 2 : 1;
-	int gai = (m_omr>>4) & 0x07;
-	int ppmc = ppw * (1 << gai) / step;  // TODO: GAI > 3
+	int ppmc = get_ppmc();
 	int ws = m_hsw + m_hws + m_external_skew;
 
 	if (m_omr & 0x08)
