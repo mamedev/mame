@@ -21,15 +21,16 @@ public:
 		, m_control(*this, "control")
 		, m_vram(*this, "vram%u", 0U)
 		, m_blitter_base(*this, "gfx")
+		, m_gun_rxd(1)
 	{ }
 
-	void init_shtstar();
+	void init_wstrnsht();
 	void init_cheesech();
 	void init_ultennis();
 	void init_stonebal();
 	void cheesech(machine_config &config);
 	void artmagic(machine_config &config);
-	void shtstar(machine_config &config);
+	void wstrnsht(machine_config &config);
 	void stonebal(machine_config &config);
 	int prot_r();
 
@@ -43,6 +44,7 @@ private:
 	required_shared_ptr_array<uint16_t, 2> m_vram;
 	required_region_ptr<uint16_t> m_blitter_base;
 
+	uint8_t m_gun_rxd;
 	uint8_t m_tms_irq = 0U;
 	uint8_t m_hack_irq = 0U;
 	uint8_t m_prot_input[16]{};
@@ -70,6 +72,7 @@ private:
 	uint16_t blitter_r();
 	void blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void m68k_gen_int(int state);
+	uint8_t wstrnsht_gun_p3_r();
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
@@ -83,11 +86,11 @@ private:
 	inline uint16_t *address_to_vram(offs_t *address);
 
 	void main_map(address_map &map) ATTR_COLD;
-	void shtstar_guncpu_data_map(address_map &map) ATTR_COLD;
-	void shtstar_guncpu_map(address_map &map) ATTR_COLD;
-	void shtstar_map(address_map &map) ATTR_COLD;
-	void shtstar_subcpu_map(address_map &map) ATTR_COLD;
-	void shtstar_subcpu_vector_map(address_map &map) ATTR_COLD;
+	void wstrnsht_guncpu_data_map(address_map &map) ATTR_COLD;
+	void wstrnsht_guncpu_map(address_map &map) ATTR_COLD;
+	void wstrnsht_map(address_map &map) ATTR_COLD;
+	void wstrnsht_subcpu_map(address_map &map) ATTR_COLD;
+	void wstrnsht_subcpu_vector_map(address_map &map) ATTR_COLD;
 	void stonebal_map(address_map &map) ATTR_COLD;
 	void stonebal_tms_map(address_map &map) ATTR_COLD;
 	void tms_map(address_map &map) ATTR_COLD;
