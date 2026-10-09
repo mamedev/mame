@@ -554,7 +554,24 @@ inline void hd63484_device::recompute_parameters()
 
 	rectangle visarea = screen().visible_area();
 	visarea.set(hbend, hbstart - 1, m_vds, vbstart - 1);
-	attotime frame_period = screen().frame_period(); // TODO: use clock() to calculate the frame_period
+	attotime frame_period = screen().frame_period();
+	if (clock() != 0)
+	{
+		// a memory cycle is two 2CLK periods in all access modes
+		attotime const line = clocks_to_attotime(2 * m_hc);
+		switch (m_omr & 0x03)
+		{
+			case 2: // interlace sync: dummy raster adds half a line per field
+				frame_period = line * m_vc + line / 2;
+				break;
+			case 3: // interlace sync & video: VC counts both fields
+				frame_period = line * m_vc / 2;
+				break;
+			default: // non-interlace
+				frame_period = line * m_vc;
+				break;
+		}
+	}         
 	screen().configure(htotal, m_vc, visarea, frame_period);
 	if (LOG)
 		logerror("ACRTC: full %dx%d vis (%d, %d)-(%d, %d)\n", htotal, m_vc, visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
