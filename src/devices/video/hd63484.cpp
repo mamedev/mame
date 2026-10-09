@@ -1012,6 +1012,54 @@ void hd63484_device::command_clr_exec()
 	m_rwp[m_rwp_dn] &= 0xfffff;
 }
 
+bool hd63484_device::command_dma_write_exec(uint16_t data, bool modify)
+{
+	int16_t const ax = (int16_t)m_pr[0];
+	int16_t const ay = (int16_t)m_pr[1];
+	int const d0_inc = (ax < 0) ? -1 : 1;
+	int const d1_inc = (ay < 0) ? -1 : 1;
+	uint32_t const offset = (m_rwp[m_rwp_dn] - m_dma_d1 * m_mwr[m_rwp_dn] + m_dma_d0) & 0xfffff;
+
+	if (modify)
+	{
+		uint16_t const fb = readword(offset);
+		switch (m_cr & 0x03)
+		{
+			case 0: // replace
+				data = (fb & ~m_mask) | (data & m_mask);
+				break;
+			case 1: // OR
+				data = (fb & ~m_mask) | ((fb | data) & m_mask);
+				break;
+			case 2: // AND
+				data = (fb & ~m_mask) | ((fb & data) & m_mask);
+				break;
+			case 3: // XOR
+				data = (fb & ~m_mask) | ((fb ^ data) & m_mask);
+				break;
+		}
+	}
+
+	writeword(offset, data);
+
+	if (m_dma_d0 != ax)
+	{
+		m_dma_d0 += d0_inc;
+		return false;
+	}
+
+	m_dma_d0 = 0;
+	if (m_dma_d1 != ay)
+	{
+		m_dma_d1 += d1_inc;
+		return false;
+	}
+
+	m_rwp[m_rwp_dn] -= (ay + d1_inc) * m_mwr[m_rwp_dn];
+	m_rwp[m_rwp_dn] &= 0xfffff;
+	return true;
+}
+
 void hd63484_device::command_cpy_exec()
 {
 	uint8_t mm = m_cr & 0x03;
@@ -1490,18 +1538,30 @@ void hd63484_device::process_fifo()
 		case COMMAND_DWT:
 			if (m_param_ptr == 2)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': DWT %d, %d\n", tag(), m_pr[0], m_pr[1]);
-				command_end_seq();
-				fatalerror("HD63484 COMMAND_DWT!\n");
+				if (CMD_LOG)    logerror("HD63484 '%s': DWT %d, %d\n", tag(), (int16_t)m_pr[0], (int16_t)m_pr[1]);
+				m_dma_d0 = m_dma_d1 = 0;
+			}
+			else if (m_param_ptr == 3)
+			{
+				// data words follow the parameters, written by CPU
+				m_param_ptr = 2;
+				if (command_dma_write_exec(m_pr[2], false))
+					command_end_seq();
 			}
 			break;
 
 		case COMMAND_DMOD:
 			if (m_param_ptr == 2)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': DMOD (%d) %d, %d\n", tag(), m_cr & 0x03, m_pr[0], m_pr[1]);
-				command_end_seq();
-				fatalerror("HD63484 COMMAND_DMOD!\n");
+				if (CMD_LOG)    logerror("HD63484 '%s': DMOD (%d) %d, %d\n", tag(), m_cr & 0x03, (int16_t)m_pr[0], (int16_t)m_pr[1]);
+				m_dma_d0 = m_dma_d1 = 0;
+			}
+			else if (m_param_ptr == 3)
+			{
+				// as DWT, each data word is combined with the frame buffer under MASK
+				m_param_ptr = 2;
+				if (command_dma_write_exec(m_pr[2], true))
+					command_end_seq();
 			}
 			break;
 
@@ -2025,6 +2085,7 @@ void hd63484_device::device_reset()
 	m_mask = -1;
 	m_cpx = m_cpy = 0;
 	m_dn = 0;
+	m_dma_d0 = m_dma_d1 = 0;
 
 	memset(m_vreg, 0, sizeof(m_vreg));
 	memset(m_fifo, 0, sizeof(m_fifo));
@@ -2138,6 +2199,8 @@ void hd63484_device::register_save_state()
 	save_item(NAME(m_pr));
 	save_item(NAME(m_param_ptr));
 	save_item(NAME(m_rwp));
+	save_item(NAME(m_dma_d0));
+	save_item(NAME(m_dma_d1));
 	save_item(NAME(m_rwp_dn));
 	save_item(NAME(m_org_dpa));
 	save_item(NAME(m_org_dn));

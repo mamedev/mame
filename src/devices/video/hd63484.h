@@ -71,6 +71,7 @@ private:
 	void command_wpr_exec();
 	uint16_t command_rpr_exec();
 	void command_clr_exec();
+	bool command_dma_write_exec(uint16_t data, bool modify);
 	void command_cpy_exec();
 	void command_rct_exec();
 	void command_line_exec();
@@ -131,6 +132,7 @@ private:
 
 	uint16_t m_pram[0x10];
 	uint8_t m_dn;
+	int16_t m_dma_d0, m_dma_d1;
 
 	uint16_t m_ccr;
 	uint16_t m_omr;
