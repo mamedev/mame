@@ -145,7 +145,8 @@ DEFINE_DEVICE_TYPE(CAT28F020,                cat28f020_device,                "c
 
 DEFINE_DEVICE_TYPE(TC58FVT800,               tc58fvt800_device,               "tc58fvt800",               "Toshiba TC58FVT800 Flash")
 
-DEFINE_DEVICE_TYPE(WINBOND_W29C020C,         winbond_w29c020c_device,               "winbond_w29c020c",               "Winbond W29C020C Flash")
+DEFINE_DEVICE_TYPE(WINBOND_W29C020C,         winbond_w29c020c_device,         "winbond_w29c020c",         "Winbond W29C020C Flash")
+DEFINE_DEVICE_TYPE(WINBOND_W29GL032CB,       winbond_w29gl032cb_device,       "winbond_w29gl032cb",       "Winbond W29GL032CB Flash")
 
 
 //**************************************************************************
@@ -364,6 +365,12 @@ winbond_w29c020c_device::winbond_w29c020c_device(const machine_config &mconfig, 
 	m_page_size = 0x80;
 }
 
+winbond_w29gl032cb_device::winbond_w29gl032cb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, WINBOND_W29GL032CB, tag, owner, clock, 0x400000, MFG_AMD, 0x7e) { 
+    m_device_id2 = 0x1a; 
+    m_bot_boot_sector = true;
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -548,6 +555,16 @@ uint32_t intelfsh_device::read_full(uint32_t address)
 					break;
 			}
 		}
+        else if (m_maker_id == MFG_AMD && m_device_id == 0x7e)
+        {
+            switch (address & 0xff)
+            {
+                case 0x00: data = m_maker_id;  break;
+                case 0x01: data = m_device_id; break;
+                case 0x0e: data = m_device_id2; break;
+                case 0x0f: data = m_device_id3; break;
+            }
+        }
 		else
 		{
 			switch (address & 0xff)
@@ -948,7 +965,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			}
 			else if(m_bot_boot_sector && address < (64*1024))
 			{
-				if (m_maker_id == MFG_ST)
+				if ((m_maker_id == MFG_ST) || (m_maker_id == MFG_AMD && m_device_id == 0x7e))
 				{
 					memset(&m_data[base & ~0x1fff], 0xff, 8 * 1024);
 					m_erase_sector = address & ((m_bits == 16) ? ~0xfff : ~0x1fff);

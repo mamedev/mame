@@ -87,6 +87,8 @@ public:
 	void ti85(machine_config &config);
 	void ti84p(machine_config &config);
 
+    virtual DECLARE_INPUT_CHANGED_MEMBER(on_btn);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<ti8x_link_port_device> m_link_port;
@@ -101,6 +103,9 @@ private:
 	uint8_t m_LCD_memory_base = 0;
 	uint8_t m_LCD_contrast = 0;
 	uint8_t m_LCD_status = 0;
+	uint8_t m_LCD_mask = 0;
+    uint8_t m_LCD_dma_speed = 0;
+    uint8_t m_LCD_interrupt_status = 0;
 	uint8_t m_timer_interrupt_mask = 0;
 	uint8_t m_timer_interrupt_status = 0;
 	uint8_t m_ctimer_interrupt_status = 0;
@@ -112,12 +117,11 @@ private:
 	uint8_t m_ti8x_memory_page_2 = 0;
 	uint8_t m_ti8x_memory_page_3 = 0;
 	bool m_booting = false;
-	uint8_t m_LCD_mask = 0;
 	uint8_t m_power_mode = 0;
 	uint8_t m_cpu_speed = 0;
 	uint8_t m_keypad_mask = 0;
 	uint8_t m_video_buffer_width = 0;
-	uint8_t m_interrupt_speed = 0;
+	uint8_t m_video_buffer_rows = 0;
 	uint8_t m_port4_bit0 = 0;
 	uint8_t m_ti81_port_7_data = 0;
 	std::unique_ptr<uint8_t[]> m_ti8x_ram;
@@ -133,13 +137,13 @@ private:
 	uint8_t m_ti84pcse_portF = 0;
     uint32_t m_ti84p_rtc_currtime = 0;
     uint32_t m_ti84p_rtc_basetime = 0;
-	int m_ti_video_memory_size = 0;
-	int m_ti_screen_x_size = 0;
-	int m_ti_screen_y_size = 0;
-	int m_ti_number_of_frames = 0;
-	std::unique_ptr<uint8_t[]> m_frames;
+	int m_lcdmem_size = 0;
+	int m_lcdwidth = 0;
+	int m_lcdheight = 0;
+    uint8_t m_lcdrow = 0;
+	uint8_t m_frames[(160 * 64 / 8) * 7]{};
 	uint8_t * m_bios = nullptr;
-	emu_timer *m_ti85_timer = nullptr;
+    emu_timer *m_lcd_dma_timer = nullptr;
 	emu_timer *m_ti83_1st_timer = nullptr;
 	emu_timer *m_ti83_2nd_timer = nullptr;
     emu_timer *m_ti84p_rtc = nullptr;
@@ -155,7 +159,7 @@ private:
 	void ti85_port_0000_w(uint8_t data);
 	void ti8x_keypad_w(uint8_t data);
 	void ti85_port_0002_w(uint8_t data);
-	void ti85_port_0003_w(uint8_t data);
+	void ti85_int_status_w(uint8_t data);
 	void ti85_port_0004_w(uint8_t data);
 	void ti85_port_0005_w(uint8_t data);
 	void ti85_port_0006_w(uint8_t data);
@@ -187,7 +191,7 @@ private:
 	void ti84pcse_port_000E_w(uint8_t data);
 	void ti84pcse_port_000F_w(uint8_t data);
 	uint8_t ti85_port_0002_r();
-	uint8_t ti85_port_0003_r();
+	uint8_t ti85_int_status_r();
 	uint8_t ti85_port_0004_r();
 	uint8_t ti85_port_0005_r();
 	uint8_t ti86_port_0006_r();
@@ -213,7 +217,6 @@ private:
 	uint8_t ti84pcse_port_000E_r();
 	uint8_t ti84pcse_port_000F_r();
 	virtual void machine_start() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 	void ti85_palette(palette_device &palette);
 	DECLARE_MACHINE_RESET(ti85);
 	DECLARE_MACHINE_RESET(ti83p);
@@ -226,11 +229,12 @@ private:
 	DECLARE_MACHINE_START(ti84pse);
 	DECLARE_MACHINE_START(ti84pcse);
 	DECLARE_MACHINE_START(ti84p);
+    void ti8x_init_common() ATTR_COLD;
 	void ti83p_init_common();
 	void ti8xpse_init_common();
 
 	uint32_t screen_update_ti85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(ti85_timer_callback);
+    TIMER_CALLBACK_MEMBER(lcd_dma_callback);
 	TIMER_CALLBACK_MEMBER(ti83_timer1_callback);
 	TIMER_CALLBACK_MEMBER(ti83_timer2_callback);
 
@@ -272,6 +276,7 @@ private:
 
     void ti8x_update_int();
 	void ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram);
+    void update_ti8x_memory();
 	void update_ti85_memory();
     void update_ti83_memory();
 	void update_ti83p_memory();

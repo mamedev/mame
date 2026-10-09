@@ -435,6 +435,11 @@ public:
 	winbond_w29c020c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class winbond_w29gl032cb_device : public intelfsh8_device
+{
+public:
+	winbond_w29gl032cb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
 
 
 // device type definition
@@ -494,5 +499,6 @@ DECLARE_DEVICE_TYPE(ATMEL_49F4096,           atmel_49f4096_device)
 DECLARE_DEVICE_TYPE(CAT28F020,               cat28f020_device)
 DECLARE_DEVICE_TYPE(TC58FVT800,              tc58fvt800_device)
 DECLARE_DEVICE_TYPE(WINBOND_W29C020C,        winbond_w29c020c_device)
+DECLARE_DEVICE_TYPE(WINBOND_W29GL032CB,      winbond_w29gl032cb_device)
 
 #endif // MAME_MACHINE_INTELFSH_H

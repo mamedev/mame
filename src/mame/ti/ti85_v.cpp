@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Krzysztof Strzecha,Jon Sturm
+// copyright-holders:Krzysztof Strzecha,Jon Sturm,grubbyplaya
 /***************************************************************************
   TI-85 driver by Krzysztof Strzecha
 
@@ -10,22 +10,17 @@
 #include "emu.h"
 #include "ti85.h"
 
-#define TI81_VIDEO_MEMORY_SIZE   768
-#define TI81_SCREEN_X_SIZE    12
-#define TI81_SCREEN_Y_SIZE    64
-#define TI81_NUMBER_OF_FRAMES      6
+#define TI_VIDEO_COL_SIZE       160 / 8
+#define TI_VIDEO_MEMORY_SIZE    TI_VIDEO_COL_SIZE * 64
 
-#define TI85_VIDEO_MEMORY_SIZE  1024
-#define TI85_SCREEN_X_SIZE    16
-#define TI85_SCREEN_Y_SIZE    64
-#define TI85_NUMBER_OF_FRAMES      6
+#define TI81_SCREEN_X_SIZE      12
+#define TI81_SCREEN_Y_SIZE      64
 
-#define TI86_VIDEO_MEMORY_SIZE  1024
-#define TI86_SCREEN_X_SIZE    16
-#define TI86_SCREEN_Y_SIZE    64
-#define TI86_NUMBER_OF_FRAMES      6
+#define TI85_SCREEN_X_SIZE      16
+#define TI85_SCREEN_Y_SIZE      64
 
-
+#define TI86_SCREEN_X_SIZE      16
+#define TI86_SCREEN_Y_SIZE      64
 
 static constexpr rgb_t ti85_colors[32*7] =
 {
@@ -63,41 +58,40 @@ static constexpr rgb_t ti85_colors[32*7] =
 	{ 0x57, 0x74, 0x8c },   { 0x56, 0x73, 0x8b },   { 0x55, 0x72, 0x8b },   { 0x55, 0x71, 0x8b },   { 0x54, 0x70, 0x8a },   { 0x53, 0x6f, 0x8a },   { 0x53, 0x6f, 0x8a }  //0x1f
 };
 
-static const unsigned short ti85_pens[32][7] =
+TIMER_CALLBACK_MEMBER(ti85_state::lcd_dma_callback)
 {
-	{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 },
-	{ 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d },
-	{ 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14 },
-	{ 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b },
-	{ 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22 },
-	{ 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29 },
-	{ 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f, 0x30 },
-	{ 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37 },
-	{ 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e },
-	{ 0x3f, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45 },
-	{ 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c },
-	{ 0x4d, 0x4e, 0x4f, 0x50, 0x51, 0x52, 0x53 },
-	{ 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 0x5a },
-	{ 0x5b, 0x5c, 0x5d, 0x5e, 0x5f, 0x60, 0x61 },
-	{ 0x62, 0x63, 0x64, 0x65, 0x66, 0x67, 0x68 },
-	{ 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f },
-	{ 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76 },
-	{ 0x77, 0x78, 0x79, 0x7a, 0x7b, 0x7c, 0x7d },
-	{ 0x7e, 0x7f, 0x80, 0x81, 0x82, 0x83, 0x84 },
-	{ 0x85, 0x86, 0x87, 0x88, 0x89, 0x8a, 0x8b },
-	{ 0x8c, 0x8d, 0x8e, 0x8f, 0x90, 0x91, 0x92 },
-	{ 0x93, 0x94, 0x95, 0x96, 0x97, 0x98, 0x99 },
-	{ 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f, 0xa0 },
-	{ 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa6, 0xa7 },
-	{ 0xa8, 0xa9, 0xaa, 0xab, 0xac, 0xad, 0xae },
-	{ 0xaf, 0xb0, 0xb1, 0xb2, 0xb3, 0xb4, 0xb5 },
-	{ 0xb6, 0xb7, 0xb8, 0xb9, 0xba, 0xbb, 0xbc },
-	{ 0xbd, 0xbe, 0xbf, 0xc0, 0xc1, 0xc2, 0xc3 },
-	{ 0xc4, 0xc5, 0xc6, 0xc7, 0xc8, 0xc9, 0xca },
-	{ 0xcb, 0xcc, 0xcd, 0xce, 0xcf, 0xd0, 0xd1 },
-	{ 0xd2, 0xd3, 0xd4, 0xd5, 0xd6, 0xd7, 0xd8 },
-	{ 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf }
-};
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+    static uint8_t last_rowh = 0;
+    static const uint8_t dma_width[4] = {10, 12, 16, 20};
+    const uint8_t row_bytes = dma_width[m_video_buffer_width];
+    const uint8_t row_count = (m_video_buffer_rows + 1) * 16;
+
+	const int lcdmem = (((m_LCD_memory_base & 0x3F) + 0xc0) << 8) + ((m_lcdrow % row_count) * row_bytes);
+    uint8_t *row = m_frames + m_lcdrow * TI_VIDEO_COL_SIZE;
+    for (int x = 0; x < 10; x++)
+        row[x] = space.read_byte(lcdmem + x);
+
+    for (int x = 10; x < row_bytes; x++)
+        row[TI_VIDEO_COL_SIZE - row_bytes + x] = space.read_byte(lcdmem + x);
+
+    if (m_video_buffer_width != 3)
+        row[10] = (row[10] & 0x0f) | last_rowh;
+
+    last_rowh = row[0] & 0xf0;
+
+    // wait dma_speed*row_bytes M cycles
+    m_maincpu->adjust_icount((m_LCD_dma_speed ? 6 : 2) * row_bytes * -4);
+    
+    // trigger an interrupt one line after a frame is 1/4 and 3/4 of the way done
+    if ((m_lcdrow - 1 == row_count / 4) || (m_lcdrow - 1 == row_count * 3 / 4))
+    {
+        if (m_LCD_mask)
+		    m_maincpu->set_input_line(0, HOLD_LINE);
+        m_LCD_interrupt_status = 1;
+    }
+
+    m_lcdrow = (m_lcdrow + 1) % m_lcdheight;
+}
 
 void ti85_state::ti85_palette(palette_device &palette)
 {
@@ -106,76 +100,60 @@ void ti85_state::ti85_palette(palette_device &palette)
 
 	for (int i = 0; i < 32; i++)
 		for (int j = 0; j < 7; j++)
-			palette.set_pen_indirect(i*7+j, ti85_pens[i][j]);
+			palette.set_pen_indirect(i*7+j, i*7+j);
 
 	if (!strncmp(machine().system().name, "ti81", 4))
 	{
-		m_ti_video_memory_size = TI81_VIDEO_MEMORY_SIZE;
-		m_ti_screen_x_size = TI81_SCREEN_X_SIZE;
-		m_ti_screen_y_size = TI81_SCREEN_Y_SIZE;
-		m_ti_number_of_frames = TI81_NUMBER_OF_FRAMES;
+		m_lcdwidth = TI81_SCREEN_X_SIZE;
+		m_lcdheight = TI81_SCREEN_Y_SIZE;
 	}
 	else if (!strncmp(machine().system().name, "ti85", 4))
 	{
-		m_ti_video_memory_size = TI85_VIDEO_MEMORY_SIZE;
-		m_ti_screen_x_size = TI85_SCREEN_X_SIZE;
-		m_ti_screen_y_size = TI85_SCREEN_Y_SIZE;
-		m_ti_number_of_frames = TI85_NUMBER_OF_FRAMES;
+		m_lcdwidth = TI85_SCREEN_X_SIZE;
+		m_lcdheight = TI85_SCREEN_Y_SIZE;
 	}
 	else if (!strncmp(machine().system().name, "ti86", 4))
 	{
-		m_ti_video_memory_size = TI86_VIDEO_MEMORY_SIZE;
-		m_ti_screen_x_size = TI86_SCREEN_X_SIZE;
-		m_ti_screen_y_size = TI86_SCREEN_Y_SIZE;
-		m_ti_number_of_frames = TI86_NUMBER_OF_FRAMES;
+		m_lcdwidth = TI86_SCREEN_X_SIZE;
+		m_lcdheight = TI86_SCREEN_Y_SIZE;
 	}
 	else
 	{
 		// don't allocate memory for the others drivers
 		return;
 	}
-
-	m_frames = make_unique_clear<uint8_t[]>(m_ti_number_of_frames*m_ti_video_memory_size);
-}
-
-void ti85_state::video_start()
-{
 }
 
 uint32_t ti85_state::screen_update_ti85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	if (!m_LCD_status || !m_timer_interrupt_mask)
+	if (!m_LCD_status)
 	{
-		for (int y=0; y<m_ti_screen_y_size; y++)
-			for (int x=0; x<m_ti_screen_x_size; x++)
-				for (int b=0; b<8; b++)
-					bitmap.pix(y, x*8+b) = ti85_pens[m_LCD_contrast&0x1f][6];
+        bitmap.fill((m_LCD_contrast & 0x1f) * 7 + 6, cliprect);
 		return 0;
 	}
 
-	int lcdmem =  ((m_LCD_memory_base & 0x3F) + 0xc0) << 0x08;
+    if (!machine().side_effects_disabled()) {
+        memmove(m_frames + 2 * TI_VIDEO_MEMORY_SIZE, m_frames + TI_VIDEO_MEMORY_SIZE, TI_VIDEO_MEMORY_SIZE * 5);
+        memcpy(m_frames + TI_VIDEO_MEMORY_SIZE, m_frames, TI_VIDEO_MEMORY_SIZE);
+    }
 
-	memcpy (m_frames.get(), m_frames.get()+m_ti_video_memory_size, sizeof (uint8_t) * (m_ti_number_of_frames-1) * m_ti_video_memory_size);
+    const uint8_t contrast = (m_LCD_contrast & 0x1f) * 7;
+    for (int y = 0; y < m_lcdheight; y++)
+    {
+        for (int x = 0; x < m_lcdwidth; x++)
+        {
+            int src = x < 10 ? x : TI_VIDEO_COL_SIZE - m_lcdwidth + x;
+            for (int b = 0; b < 8; b++)
+            {
+                int level = 0;
+                for (int i = 1; i < 7; i++)
+                    level += BIT(m_frames[i * TI_VIDEO_MEMORY_SIZE + y * TI_VIDEO_COL_SIZE + src], 7 - b);
 
-	for (int y=0; y<m_ti_screen_y_size; y++)
-		for (int x=0; x<m_ti_screen_x_size; x++)
-			*(m_frames.get()+(m_ti_number_of_frames-1)*m_ti_video_memory_size+y*m_ti_screen_x_size+x) = space.read_byte(lcdmem+y*m_ti_screen_x_size+x);
+                bitmap.pix(y, x * 8 + b) = contrast + level;
+            }
+        }
+    }
 
-	for (int y=0; y<m_ti_screen_y_size; y++)
-		for (int x=0; x<m_ti_screen_x_size; x++)
-			for (int b=0; b<8; b++)
-			{
-				int brightnes = ((*(m_frames.get()+0*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01)
-						+ ((*(m_frames.get()+1*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01)
-						+ ((*(m_frames.get()+2*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01)
-						+ ((*(m_frames.get()+3*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01)
-						+ ((*(m_frames.get()+4*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01)
-						+ ((*(m_frames.get()+5*m_ti_video_memory_size+y*m_ti_screen_x_size+x)>>(7-b)) & 0x01);
-
-				bitmap.pix(y, x*8+b) = ti85_pens[m_LCD_contrast&0x1f][brightnes];
-			}
 	return 0;
 }
 

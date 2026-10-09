@@ -27,6 +27,11 @@ public:
 protected:
 	// construction/destruction
 	ez80_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+    
+	virtual device_memory_interface::space_config_vector memory_space_config() const override ATTR_COLD;
+
+	const address_space_config m_program_config;
+	const address_space_config m_opcodes_config;
 };
 
 // device type declaration
