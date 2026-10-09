@@ -244,7 +244,6 @@ private:
 	required_device<um3482a_device> m_melody;
 };
 
-
 class atetris_m5205_state : public atetris_mcu_state
 {
 public:
@@ -465,18 +464,9 @@ void atetris_mcu_state::atetrisb3_map(address_map &map)
 
 void atetris_um3482_state::atetb3482_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1fff).ram().w(FUNC(atetris_um3482_state::videoram_w)).share(m_videoram);
-	map(0x2000, 0x20ff).mirror(0x0300).ram().w("palette", FUNC(palette_device::write8)).share("palette");
-	map(0x2400, 0x25ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write));
-	map(0x2800, 0x280f).mirror(0x03e0).r(m_pokey[0], FUNC(pokey_device::read)).w(FUNC(atetris_um3482_state::sound_w<0>));
-	map(0x2810, 0x281f).mirror(0x03e0).r(m_pokey[1], FUNC(pokey_device::read)).w(FUNC(atetris_um3482_state::sound_w<1>));
-	map(0x3000, 0x3000).mirror(0x03ff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x3400, 0x3400).mirror(0x03ff).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write8));
-	map(0x3800, 0x3800).mirror(0x03ff).w(FUNC(atetris_um3482_state::irq_ack_w));
-	map(0x3c00, 0x3c00).mirror(0x03ff).w(FUNC(atetris_um3482_state::coincount_w));
-	map(0x4000, 0x7fff).bankr(m_slapstic_bank);
-	map(0x8000, 0xffff).rom();
+	main_map(map);
+	map(0x2800, 0x280f).mirror(0x03e0).w(FUNC(atetris_um3482_state::sound_w<0>));
+	map(0x2810, 0x281f).mirror(0x03e0).w(FUNC(atetris_um3482_state::sound_w<1>));
 }
 
 
@@ -564,9 +554,9 @@ void atetris_mcu_state::mcu_reg_w(offs_t offset, uint8_t data)
 
 
 /*  The board has no Pokeys. A pair of latches captures the register the game
-	meant to write and the value, and the sound Z80 polls them to index a
-	dispatch table in its own ROM. The write still reaches the Pokey device
-	because the game reads that address range back for the controls. */
+    meant to write and the value, and the sound Z80 polls them to index a
+    dispatch table in its own ROM. The write still reaches the stand-in Pokey
+    device, which answers the game's reads of that range (see atetb3482()). */
 template <unsigned N>
 void atetris_um3482_state::sound_w(offs_t offset, uint8_t data)
 {
@@ -585,8 +575,6 @@ void atetris_um3482_state::melody_ctrl_w(uint8_t data)
 	m_melody->lp_w(BIT(data, 4));
 	m_melody->sl_w(BIT(data, 5));
 }
-
-
 
 
 
@@ -770,8 +758,8 @@ void atetris_um3482_state::atetb3482(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &atetris_um3482_state::atetb3482_map);
 
-	// Re-added without audio routes: the board has no Pokeys, but the game
-	// still reads them for the controls
+	// FIXME: the board has no Pokeys, but the game reads ALLPOT, RANDOM and IRQST
+	// from them; these stand in, without audio routes, for whatever answers there
 	POKEY(config.replace(), m_pokey[0], MASTER_CLOCK / 8).allpot_r().set_ioport("IN0");
 	POKEY(config.replace(), m_pokey[1], MASTER_CLOCK / 8).allpot_r().set_ioport("IN1");
 
@@ -997,7 +985,7 @@ M ||_______________| |______________|      74LS00    74LS74 74LS161 |
   |                                                                 |
 N |PAL16R4 74LS74 14017 74LS08 74LS32 74LS04 PAL16R4 82S123 74LS32  |
   |_________________________________________________________________|
-	1      2      3       4       5       6       7      8      9
+    1      2      3       4       5       6       7      8      9
 
   Sound path:
 

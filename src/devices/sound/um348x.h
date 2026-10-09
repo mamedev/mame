@@ -3,7 +3,7 @@
 
 /***************************************************************************
 
-	UMC UM348x multi-instrument melody generator family
+    UMC UM348x multi-instrument melody generator family
 
 ***************************************************************************/
 
@@ -20,6 +20,8 @@
 class um348x_device : public device_t, public device_sound_interface
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
 	void ce_w(int state);
 	void lp_w(int state);
 	void sl_w(int state);
@@ -38,9 +40,8 @@ protected:
 	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream) override;
 
-	void decode_tone_rom() ATTR_COLD;
-
 private:
+	void decode_tone_rom() ATTR_COLD;
 	void stop();
 	void start_song();
 	void next_song();
@@ -54,34 +55,33 @@ private:
 
 	sound_stream *m_stream;
 	const u8 *const m_multipliers;
-	u8   m_divisors[16];    // oscillator half-period per tone code, 0 = silent
-	u16 m_data_end;         // last word that can sound; everything after is filler
+	u8 m_divisors[16]; // oscillator half-period per tone code, 0 = silent
+	u16 m_data_end; // last word that can sound; everything after is filler
 
-	u8  m_ce;
-	u8  m_lp;
-	u8  m_sl;
-	u8  m_as;
+	u8 m_ce;
+	u8 m_lp;
+	u8 m_sl;
+	u8 m_as;
 
-	u8  m_song;             // where the select counter is pointing
-	u8  m_timbre;           // control field of the song's header word
+	u8 m_song; // where the select counter is pointing
 
 	// playback state
 	bool m_playing;
-	u16  m_note_index;      // current word, 0..511
-	u16  m_note_start;      // first word of the current melody
-	u16  m_note_end;        // one past the last word of the current melody
-	u8   m_multiplier;      // tempo multiplier for the current melody
-	u32  m_word_cycles;     // oscillator cycles left in the current word
-	u8   m_divisor;         // half-period in oscillator cycles, 0 = silent
-	u8   m_div_count;       // countdown to the next output toggle
-	s8   m_out;             // current output level, -1 or +1
+	u16 m_note_index; // current word, 0..511
+	u16 m_note_start; // first word of the current melody
+	u16 m_note_end; // one past the last word of the current melody
+	u8 m_multiplier; // tempo multiplier for the current melody
+	u32 m_word_cycles; // oscillator cycles left in the current word
+	u8 m_divisor; // half-period in oscillator cycles, 0 = silent
+	u8 m_div_count; // countdown to the next output toggle
+	s8 m_out; // current output level, -1 or +1
 };
 
 
 class um3481a_device : public um348x_device
 {
 public:
-	um3481a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	um3481a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
@@ -91,7 +91,7 @@ protected:
 class um3482a_device : public um348x_device
 {
 public:
-	um3482a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	um3482a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
