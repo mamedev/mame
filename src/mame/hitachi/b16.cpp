@@ -10,7 +10,8 @@ TODO:
 - confirm keyboard command responses and typematic;
 - Confirm exact $80 video/status signals (bit 4 on EX-II, bit 5 on the earlier ROM);
 - Confirm whether the motor-enable line is shared by both floppy drives;
-- b16ex2: confirm kanji hookup;
+- implement the usual 6845 stuff (cursor, start address);
+- b16ex2: improve kanji hookup (needs more use cases);
 
 ===================================================================================================
 
@@ -93,7 +94,7 @@ Error codes (TODO: RE them all)
 
 #include "emupal.h"
 #include "screen.h"
-//#include "softlist_dev.h"
+#include "softlist_dev.h"
 
 namespace {
 
@@ -129,6 +130,8 @@ protected:
 	void b16_map(address_map &map) ATTR_COLD;
 	void b16_io(address_map &map) ATTR_COLD;
 	void b16ex2_map(address_map &map) ATTR_COLD;
+
+	void palette_init(palette_device &palette) const ATTR_COLD;
 
 private:
 	uint8_t m_crtc_vreg[0x100]{}, m_crtc_index = 0;
@@ -170,6 +173,17 @@ private:
 	static void floppy_formats(format_registration &fr);
 };
 
+// TODO: palette format is a guess
+void b16_state::palette_init(palette_device &palette) const
+{
+	int i;
+	for (i = 0; i < 8; i++)
+	{
+		palette.set_pen_color(i, pal1bit(BIT(i, 1)), pal1bit(BIT(i, 2)), pal1bit(BIT(i, 0)));
+		palette.set_pen_color(i + 8, BIT(i, 1) * 0xaa + 0x55, BIT(i, 2) * 0xaa + 0x55, BIT(i, 0) * 0xaa + 0x55);
+	}
+}
+
 #define mc6845_h_char_total     (m_crtc_vreg[0])
 #define mc6845_h_display        (m_crtc_vreg[1])
 #define mc6845_h_sync_pos       (m_crtc_vreg[2])
@@ -210,7 +224,9 @@ uint32_t b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			const u16 lo_vram = m_vram[tile_offset];
 			const u16 hi_vram = m_vram[tile_offset + 0x4000 / 2];
 			const u16 tile = lo_vram & 0x00ff;
-			const u8 color = (lo_vram & 0x0700) >> 8;
+			const u8 fg_color = (lo_vram >> 8) & 0xf;
+			// TODO: bit 15 may really be blink instead (gets activated on basic COLOR 16/31 issued)
+			const u8 bg_color = (lo_vram >> 12) & 0xf;
 
 			for(int yi = 0; yi < mc6845_tile_height; yi++)
 			{
@@ -236,7 +252,7 @@ uint32_t b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					if (!cliprect.contains(res_x, res_y))
 						continue;
 
-					int const pen = BIT(gfx_data, 7 - xi) ? color : 0;
+					int const pen = BIT(gfx_data, 7 - xi) ? fg_color : bg_color;
 					bitmap.pix(res_y, res_x) = m_palette->pen(pen);
 				}
 			}
@@ -528,8 +544,9 @@ void b16_state::b16(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_b16);
-	// TODO: palette format is a guess
-	PALETTE(config, m_palette, palette_device::BRG_3BIT).set_entries(8);
+	PALETTE(config, m_palette, FUNC(b16_state::palette_init)).set_entries(16);
+
+	SOFTWARE_LIST(config, "disk_list").set_original("b16");
 }
 
 void b16_state::b16ex2(machine_config &config)
@@ -594,4 +611,4 @@ COMP( 1983?, b16ex2,  0,      0,      b16ex2,  b16,   b16_state, empty_init, "Hi
 // B16 EX-III, 386 based? <fill me>
 
 // B16 LX, LCD variants
-// Ricoh Mr. My Tool (Mr.マイツール), sister variants with 3.5 2HD floppies
+// Ricoh Mr. My Tool (Mr.マイツール), sister variants with 3.5" 2HD floppies
