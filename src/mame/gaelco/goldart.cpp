@@ -122,6 +122,8 @@ class goldart_coincontrol_device : public device_t
 public:
 	goldart_coincontrol_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	static constexpr flags_type emulation_flags() { return flags::NOT_WORKING; }
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
