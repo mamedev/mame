@@ -64,6 +64,20 @@
 #define OPTION_UI_DIPSW_COLOR         "ui_dipsw_color"
 #define OPTION_UI_SLIDER_COLOR        "ui_slider_color"
 
+// core UI palette and semantic color role options
+#define OPTION_UI_PALETTE                  "ui_palette"
+#define OPTION_UI_ACCENT_COLOR             "ui_accent_color"
+#define OPTION_UI_STATUS_GOOD_COLOR        "ui_status_good_color"
+#define OPTION_UI_STATUS_WARNING_COLOR     "ui_status_warning_color"
+#define OPTION_UI_STATUS_ERROR_COLOR       "ui_status_error_color"
+#define OPTION_UI_FOCUS_COLOR              "ui_focus_color"
+#define OPTION_UI_FOCUS_BG_COLOR           "ui_focus_bg_color"
+#define OPTION_UI_FOCUS_OUTLINE_COLOR      "ui_focus_outline_color"
+#define OPTION_UI_FOCUS_GRADIENT_TOP       "ui_focus_gradient_top"
+#define OPTION_UI_FOCUS_GRADIENT_BOTTOM    "ui_focus_gradient_bottom"
+#define OPTION_UI_OVERLAY_COLOR            "ui_overlay_color"
+#define OPTION_UI_CONFIG_DEEMPHASIZED_COLOR "ui_config_deemphasized_color"
+
 // system/software selection menu options
 #define OPTION_HIDE_PANELS            "hide_main_panel"
 #define OPTION_USE_BACKGROUND         "use_background"
@@ -139,6 +153,22 @@ public:
 	rgb_t mousedown_bg_color() const { return rgb_value(OPTION_UI_MOUSEDOWN_BG_COLOR); }
 	rgb_t dipsw_color() const { return rgb_value(OPTION_UI_DIPSW_COLOR); }
 	rgb_t slider_color() const { return rgb_value(OPTION_UI_SLIDER_COLOR); }
+
+	// UI color palette
+	const char *palette() const { return value(OPTION_UI_PALETTE); }
+
+	// UI semantic color roles
+	rgb_t accent_color() const { return rgb_value(OPTION_UI_ACCENT_COLOR); }
+	rgb_t status_good_color() const { return rgb_value(OPTION_UI_STATUS_GOOD_COLOR); }
+	rgb_t status_warning_color() const { return rgb_value(OPTION_UI_STATUS_WARNING_COLOR); }
+	rgb_t status_error_color() const { return rgb_value(OPTION_UI_STATUS_ERROR_COLOR); }
+	rgb_t focus_color() const { return rgb_value(OPTION_UI_FOCUS_COLOR); }
+	rgb_t focus_bg_color() const { return rgb_value(OPTION_UI_FOCUS_BG_COLOR); }
+	rgb_t focus_outline_color() const { return rgb_value(OPTION_UI_FOCUS_OUTLINE_COLOR); }
+	rgb_t focus_gradient_top() const { return rgb_value(OPTION_UI_FOCUS_GRADIENT_TOP); }
+	rgb_t focus_gradient_bottom() const { return rgb_value(OPTION_UI_FOCUS_GRADIENT_BOTTOM); }
+	rgb_t overlay_color() const { return rgb_value(OPTION_UI_OVERLAY_COLOR); }
+	rgb_t config_deemphasized_color() const { return rgb_value(OPTION_UI_CONFIG_DEEMPHASIZED_COLOR); }
 
 	// system/software selection menu options
 	int hide_panels() const { return int_value(OPTION_HIDE_PANELS); }

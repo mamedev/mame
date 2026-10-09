@@ -18,7 +18,10 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <utility>
 
+
+class ui_colors;
 
 namespace ui {
 
@@ -102,23 +105,37 @@ protected:
 private:
 	enum
 	{
-		MUI_BACKGROUND_COLOR = 1,
-		MUI_BORDER_COLOR,
-		MUI_CLONE_COLOR,
-		MUI_DIPSW_COLOR,
-		MUI_GFXVIEWER_BG_COLOR,
-		MUI_MOUSEDOWN_BG_COLOR,
-		MUI_MOUSEDOWN_COLOR,
-		MUI_MOUSEOVER_BG_COLOR,
-		MUI_MOUSEOVER_COLOR,
-		MUI_SELECTED_BG_COLOR,
-		MUI_SELECTED_COLOR,
-		MUI_SLIDER_COLOR,
-		MUI_SUBITEM_COLOR,
-		MUI_TEXT_BG_COLOR,
+		MUI_PALETTE = 1,
+
 		MUI_TEXT_COLOR,
+		MUI_TEXT_BG_COLOR,
+		MUI_SELECTED_COLOR,
+		MUI_SELECTED_BG_COLOR,
+		MUI_SUBITEM_COLOR,
+		MUI_CLONE_COLOR,
+		MUI_BORDER_COLOR,
+		MUI_BACKGROUND_COLOR,
+		MUI_DIPSW_COLOR,
 		MUI_UNAVAILABLE_COLOR,
-		MUI_RESTORE
+		MUI_SLIDER_COLOR,
+		MUI_GFXVIEWER_BG_COLOR,
+		MUI_MOUSEOVER_COLOR,
+		MUI_MOUSEOVER_BG_COLOR,
+		MUI_MOUSEDOWN_COLOR,
+		MUI_MOUSEDOWN_BG_COLOR,
+		MUI_CONFIG_DEEMPHASIZED_COLOR,
+		MUI_ACCENT_COLOR,
+		MUI_STATUS_GOOD_COLOR,
+		MUI_STATUS_WARNING_COLOR,
+		MUI_STATUS_ERROR_COLOR,
+		MUI_FOCUS_COLOR,
+		MUI_FOCUS_BG_COLOR,
+		MUI_FOCUS_OUTLINE_COLOR,
+		MUI_FOCUS_GRADIENT_TOP,
+		MUI_FOCUS_GRADIENT_BOTTOM,
+		MUI_OVERLAY_COLOR,
+		MUI_RESET,
+		MUI_COLOR_COUNT
 	};
 
 	struct s_color_table
@@ -130,8 +147,13 @@ private:
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
 
-	s_color_table m_color_table[MUI_RESTORE];
-	void restore_colors();
+	void set_palette(std::size_t index);
+	void write_color_options();
+	bool palette_colors_customized() const;
+	void copy_effective(ui_colors const &colors, s_color_table *table) const;
+
+	s_color_table m_color_table[MUI_COLOR_COUNT];
+	std::size_t   m_palette;
 };
 
 //-------------------------------------------------
@@ -146,7 +168,7 @@ public:
 protected:
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
-
+	virtual void menu_dismissed() override;
 private:
 	enum
 	{
@@ -175,14 +197,16 @@ private:
 class menu_palette_sel : public menu
 {
 public:
-	menu_palette_sel(mame_ui_manager &mui, render_target &target, rgb_t &_color);
+	using palette_entry = std::pair<char const *, rgb_t>;
+
+	menu_palette_sel(mame_ui_manager &mui, render_target &target, rgb_t &_color, std::vector<palette_entry> &&palette);
 
 private:
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
 
-	static std::pair<const char *, const char *> const s_palette[];
 	rgb_t &m_original;
+	std::vector<palette_entry> m_palette;
 };
 
 } // namespace ui

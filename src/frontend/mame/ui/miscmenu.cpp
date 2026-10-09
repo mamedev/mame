@@ -977,6 +977,7 @@ bool menu_plugins_configure::handle(event const *ev)
 		{
 			p->m_start = !p->m_start;
 			ev->item->set_subtext(p->m_start ? _("On") : _("Off"));
+			ev->item->set_color_state(p->m_start ? menu_item_color_state::ON : menu_item_color_state::OFF);
 			ev->item->set_flags(p->m_start ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW);
 			return true;
 		}
