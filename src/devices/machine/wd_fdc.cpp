@@ -211,6 +211,41 @@ void wd_fdc_device_base::device_start()
 	save_item(NAME(drq));
 	if (head_control)
 		save_item(NAME(hld));
+	save_item(NAME(hlt));
+	save_item(NAME(enp));
+	save_item(NAME(data));
+	save_item(NAME(motor_timeout));
+	save_item(NAME(sector_size));
+	save_item(NAME(enmf));
+	save_item(NAME(delay_int));
+	save_item(NAME(delay_cmd));
+	save_item(NAME(force_ready));
+
+	save_item(NAME(cur_live.tm));
+	save_item(NAME(cur_live.state));
+	save_item(NAME(cur_live.next_state));
+	save_item(NAME(cur_live.shift_reg));
+	save_item(NAME(cur_live.crc));
+	save_item(NAME(cur_live.bit_counter));
+	save_item(NAME(cur_live.byte_counter));
+	save_item(NAME(cur_live.previous_type));
+	save_item(NAME(cur_live.data_separator_phase));
+	save_item(NAME(cur_live.data_bit_context));
+	save_item(NAME(cur_live.data_reg));
+	save_item(NAME(cur_live.idbuf));
+
+	save_item(NAME(checkpoint_live.tm));
+	save_item(NAME(checkpoint_live.state));
+	save_item(NAME(checkpoint_live.next_state));
+	save_item(NAME(checkpoint_live.shift_reg));
+	save_item(NAME(checkpoint_live.crc));
+	save_item(NAME(checkpoint_live.bit_counter));
+	save_item(NAME(checkpoint_live.byte_counter));
+	save_item(NAME(checkpoint_live.previous_type));
+	save_item(NAME(checkpoint_live.data_separator_phase));
+	save_item(NAME(checkpoint_live.data_bit_context));
+	save_item(NAME(checkpoint_live.data_reg));
+	save_item(NAME(checkpoint_live.idbuf));
 }
 
 void wd_fdc_device_base::device_reset()
@@ -2496,6 +2531,27 @@ wd_fdc_analog_device_base::wd_fdc_analog_device_base(const machine_config &mconf
 	clock_ratio = 1;
 }
 
+void wd_fdc_analog_device_base::device_start()
+{
+	wd_fdc_device_base::device_start();
+
+	save_item(NAME(cur_pll.ctime));
+	save_item(NAME(cur_pll.period));
+	save_item(NAME(cur_pll.min_period));
+	save_item(NAME(cur_pll.max_period));
+	save_item(NAME(cur_pll.period_adjust_base));
+	save_item(NAME(cur_pll.phase_adjust));
+	save_item(NAME(cur_pll.freq_hist));
+
+	save_item(NAME(checkpoint_pll.ctime));
+	save_item(NAME(checkpoint_pll.period));
+	save_item(NAME(checkpoint_pll.min_period));
+	save_item(NAME(checkpoint_pll.max_period));
+	save_item(NAME(checkpoint_pll.period_adjust_base));
+	save_item(NAME(checkpoint_pll.phase_adjust));
+	save_item(NAME(checkpoint_pll.freq_hist));
+}
+
 void wd_fdc_analog_device_base::pll_reset(bool fm, bool enmf, const attotime &when)
 {
 	int clocks = 2;
@@ -2549,6 +2605,35 @@ wd_fdc_digital_device_base::wd_fdc_digital_device_base(const machine_config &mco
 }
 
 constexpr int wd_fdc_digital_device_base::wd_digital_step_times[4];
+
+void wd_fdc_digital_device_base::device_start()
+{
+	wd_fdc_device_base::device_start();
+
+	save_item(NAME(cur_pll.counter));
+	save_item(NAME(cur_pll.increment));
+	save_item(NAME(cur_pll.transition_time));
+	save_item(NAME(cur_pll.history));
+	save_item(NAME(cur_pll.slot));
+	save_item(NAME(cur_pll.phase_add));
+	save_item(NAME(cur_pll.phase_sub));
+	save_item(NAME(cur_pll.freq_add));
+	save_item(NAME(cur_pll.freq_sub));
+	save_item(NAME(cur_pll.ctime));
+	save_item(NAME(cur_pll.delays));
+
+	save_item(NAME(checkpoint_pll.counter));
+	save_item(NAME(checkpoint_pll.increment));
+	save_item(NAME(checkpoint_pll.transition_time));
+	save_item(NAME(checkpoint_pll.history));
+	save_item(NAME(checkpoint_pll.slot));
+	save_item(NAME(checkpoint_pll.phase_add));
+	save_item(NAME(checkpoint_pll.phase_sub));
+	save_item(NAME(checkpoint_pll.freq_add));
+	save_item(NAME(checkpoint_pll.freq_sub));
+	save_item(NAME(checkpoint_pll.ctime));
+	save_item(NAME(checkpoint_pll.delays));
+}
 
 void wd_fdc_digital_device_base::pll_reset(bool fm, bool enmf, const attotime &when)
 {
