@@ -3655,8 +3655,9 @@ static INPUT_PORTS_START( shamisen )
 	// The shamisen controllers are wired to the JAMMA joystick and button inputs (no I/O board):
 	// the three strings and the bachi (plectrum) are switches, and button 1 is pulled low while a
 	// controller is plugged in (the self test reports "1P 2P error" when that line is inactive).
-	// Button 2 is the "decision" button the game asks for in its menus; the test menu moves its
-	// cursor with the P2 one and selects with the P1 one.
+	// The menus are navigated with the select up/down buttons and the decision button, which are
+	// read from the P2 button 2, P2 button 3 and P1 button 2 lines respectively; the game never
+	// looks at the start buttons.
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Bachi")
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Lower String")
@@ -3665,8 +3666,8 @@ static INPUT_PORTS_START( shamisen )
 	PORT_CONFNAME( 0x00000010, 0x00000000, "P1 Controller" )
 	PORT_CONFSETTING(          0x00000000, "Connected" )
 	PORT_CONFSETTING(          0x00000010, "Not Connected" )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Decision Button")
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Decision")
+	PORT_BIT( 0x000000c0, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Bachi")
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Lower String")
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Middle String")
@@ -3674,9 +3675,9 @@ static INPUT_PORTS_START( shamisen )
 	PORT_CONFNAME( 0x00001000, 0x00000000, "P2 Controller" )
 	PORT_CONFSETTING(          0x00000000, "Connected" )
 	PORT_CONFSETTING(          0x00001000, "Not Connected" )
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Decision Button")
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00ee0000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Select Up")
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Select Down")
+	PORT_BIT( 0x00ee8000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nicetsuk )
@@ -4521,7 +4522,7 @@ GAME( 2002, sugorotca, sugorotc, ns10_sugorotic, mgexio_medal, namcos10_memn_sta
 GAME( 2003, konotako,  0,        ns10_konotako,  konotako,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell",          "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, shamisen,  0,        ns10_shamisen,  shamisen,     namcos10_memn_state,  memn_driver_init, ROT0, "Kato / Konami",     "Shamisen Brothers (KT-SB2 Ver.A)", MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // PROGRAM 1.01K / Ver2.0 in test mode
+GAME( 2003, shamisen,  0,        ns10_shamisen,  shamisen,     namcos10_memn_state,  memn_driver_init, ROT0, "Kato / Konami",     "Shamisen Brothers (KT-SB2 Ver.A)", MACHINE_IMPERFECT_SOUND ) // PROGRAM 1.01K / Ver2.0 in test mode
 GAME( 2003, slotouji,  0,        ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // May 2 2003
 GAME( 2003, slotoujia, slotouji, ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
