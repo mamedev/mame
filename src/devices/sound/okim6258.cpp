@@ -29,10 +29,6 @@ static const int index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
 /* lookup table for the precomputed difference */
 static int diff_lookup[49*16];
 
-/* tables computed? */
-static int tables_computed = 0;
-
-
 
 // device type definition
 DEFINE_DEVICE_TYPE(OKIM6258, okim6258_device, "okim6258", "OKI MSM6258 ADPCM")
@@ -99,8 +95,6 @@ static void compute_tables()
 					stepval/8);
 		}
 	}
-
-	tables_computed = 1;
 }
 
 
