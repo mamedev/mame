@@ -620,6 +620,10 @@ public:
 	mc_mk4_hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	void mc_mk4_hopper(machine_config &mconfig) ATTR_COLD;
 
+	// parallel interface: motor drive in, coin exit sensor out (high while a coin passes)
+	void motor_w(int state) { m_hopper->motor_w(state); }
+	int exit_r() { return m_hopper->line_r(); }
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &mconfig) override ATTR_COLD;
@@ -1006,6 +1010,7 @@ public:
 		, m_uart(*this, "uart%c", 'a')
 		, m_out(*this, "out%u", 0U)
 		, m_door(*this, "DOOR")
+		, m_hopper(*this, "hopper")
 	{ }
 
 	void init_gaminator();
@@ -1015,6 +1020,8 @@ public:
 	// table 0x4bc9e entry A01/16/0c) and expects in 16 to follow it (scanner 0x5bab4): while the door is closed the
 	// receiver line follows the emitter (the scanner compares the line level itself with the pulse level, so a lit
 	// receiver reads high; the opposite polarity gives "E 63 5"); with the door open the beam is broken, the line stays low.
+	// in 1e: hopper coin exit sensor, low while a coin passes
+	ioport_value hopper_exit_r() { return m_hopper->exit_r() ? 0 : 1; }
 	ioport_value main_door_optic_r() { return (!BIT(m_door->read(), 0) && BIT(m_outlatch[0], 12)) ? 1 : 0; }
 
 private:
@@ -1028,6 +1035,8 @@ private:
 			if (BIT(mem_mask, 16 + b))
 				m_out[offset * 16 + b] = BIT(data, 16 + b);
 		m_outlatch[offset] = (m_outlatch[offset] & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
+		if (offset == 2)
+			m_hopper->motor_w(BIT(m_outlatch[2], 4)); // out 24: hopper 0 motor
 	}
 
 	virtual void machine_start() override ATTR_COLD { std::fill(std::begin(m_outlatch), std::end(m_outlatch), 0); save_item(NAME(m_outlatch)); }
@@ -1038,6 +1047,7 @@ private:
 	required_device_array<ns16550_device, 4> m_uart;
 	output_finder<64> m_out;
 	required_ioport m_door;
+	required_device<mc_mk4_hopper_device> m_hopper;
 	u16 m_outlatch[4];
 };
 
@@ -1120,11 +1130,18 @@ static INPUT_PORTS_START(  gaminator )
 	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(gaminator_state::main_door_optic_r)) // in 16, main door optical sensor (E 63 5)
 	// key 0F: with "E E0 ... Girar la llave del operador" on screen, turning it opens "Configuracion maquina"
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_TOGGLE PORT_NAME("Attendant key (key 0F, in 17)")
-	PORT_BIT( 0x00007f00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in 1f, polled in the E0 screen
+	PORT_BIT( 0x00000f00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	// Hopper 0 ("UNIVERSIAL MK3/MK4" driver 0x981a0, I/O table 0x99618: in 1c 1d 1e 1f, motor out 24, out 29).
+	// Status 0x985dc: 1f = 0 not connected (E 34 0), 1d = 0 low (E 34 2), 1c = 1 full. Coin exit 0x98ec4: 1e = 1 while
+	// a coin is in the sensor; a coin seen with the motor off gives "E 34 1: Hopper defectuoso".
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Hopper full (in 1c)")
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Hopper low (in 1d)")
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(gaminator_state::hopper_exit_r)) // in 1e
+	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Hopper disconnected (in 1f)")
 	PORT_START("IN2")
 	PORT_BIT( 0x000007ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in 2b, polled in the E0 screen
+	// in 2b: meter connection sense, 0 = "E E7 1: Contadores desconectados" (read at 0x2ef8afc)
+	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Meters disconnected (in 2b)")
 	PORT_BIT( 0x0000f000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_START("IN3")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
