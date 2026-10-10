@@ -51,6 +51,7 @@
 #include "emu.h"
 #include "cpu/m68000/mcf5206e.h"
 #include "machine/i2cmem.h"
+#include "machine/ins8250.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
@@ -681,6 +682,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_seeprom(*this, "seeprom")
 		, m_in(*this, "IN%u", 0U)
+		, m_uart(*this, "uart%c", 'a')
+		, m_out(*this, "out%u", 0U)
 	{ }
 
 	void init_gaminator();
@@ -691,10 +694,18 @@ private:
 
 	void gamtor_unk_w(uint32_t data);
 	uint32_t inputs_r(offs_t offset) { return m_in[offset]->read(); }
+	void outputs_w(offs_t offset, u32 data, u32 mem_mask)
+	{
+		for (int b = 0; b < 16; b++)
+			if (BIT(mem_mask, 16 + b))
+				m_out[offset * 16 + b] = BIT(data, 16 + b);
+	}
 
 	required_device<mcf5206e_device> m_maincpu;
 	required_device<i2cmem_device> m_seeprom;
 	required_ioport_array<4> m_in;
+	required_device_array<ns16550_device, 4> m_uart;
+	output_finder<64> m_out;
 };
 
 void gaminator_state::gamtor_unk_w(uint32_t data)
@@ -707,7 +718,19 @@ void gaminator_state::gaminator_map(address_map &map)
 {
 	map(0x00000000, 0x07ffffff).rom();
 	map(0x08000000, 0x0bffffff).ram();
+	// RTC-1: Epson RTC72423, 16 four-bit registers on D7-D0, one per long word. The kernel (0x2e8aaec) sets and
+	// clears bits of CD/CE/CF at 0x18070034/38/3c and reads the time digits from 0x18070000-0x30.
+	map(0x18070000, 0x1807003f).rw("rtc", FUNC(rtc72423_device::read), FUNC(rtc72423_device::write)).umask32(0x000000ff);
+	// UART-1: TL16C554 quad UART, channels A-D at 0x20 apart, registers on D7-D0 one per long word. The kernel
+	// (0x2e83156) clears IER, MCR and SCR of the four channels at 0x1a070004/10/1c + n * 0x20.
+	map(0x1a070000, 0x1a07001f).rw(m_uart[0], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff);
+	map(0x1a070020, 0x1a07003f).rw(m_uart[1], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff);
+	map(0x1a070040, 0x1a07005f).rw(m_uart[2], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff);
+	map(0x1a070060, 0x1a07007f).rw(m_uart[3], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff);
 	map(0x1c070000, 0x1c07000f).r(FUNC(gaminator_state::inputs_r)); // IO-1
+	// IO-2: the kernel's output driver (0x6ee54 set, 0x6eebc clear) keeps one 16-bit shadow word per group and
+	// writes it with move.w to 0x1c070000 + ((n >> 2) & 0x0c), i.e. on D31-D16, 1 = output n on
+	map(0x1c070000, 0x1c07000f).w(FUNC(gaminator_state::outputs_w));
 	map(0x1e040000, 0x1e040003).portr("SYS"); // IO-1
 	map(0x1e040008, 0x1e04000b).w(FUNC(gaminator_state::gamtor_unk_w));
 
@@ -820,6 +843,10 @@ void gaminator_state::gaminator(machine_config &config)
 	// unknown sound
 
 	RTC72423(config, "rtc", XTAL(32'768)); // Fake crystal value, the 72423 uses its own internal crystal
+
+	// UART-1: TL16C554 (four 16550 channels) near an 8 MHz xtal; interrupt wiring not known yet
+	for (int i = 0; i < 4; i++)
+		NS16550(config, m_uart[i], 8_MHz_XTAL);
 
 	MC_MK4_HOPPER(config, "hopper");
 }
