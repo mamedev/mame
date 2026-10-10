@@ -1005,10 +1005,17 @@ public:
 		, m_in(*this, "IN%u", 0U)
 		, m_uart(*this, "uart%c", 'a')
 		, m_out(*this, "out%u", 0U)
+		, m_door(*this, "DOOR")
 	{ }
 
 	void init_gaminator();
 	void gaminator(machine_config &config);
+
+	// in 16: receiver of the main door optical sensor. The kernel toggles out 0c periodically (pulse slot 0x0c, door
+	// table 0x4bc9e entry A01/16/0c) and expects in 16 to follow it (scanner 0x5bab4): while the door is closed the
+	// receiver line follows the emitter (the scanner compares the line level itself with the pulse level, so a lit
+	// receiver reads high; the opposite polarity gives "E 63 5"); with the door open the beam is broken, the line stays low.
+	ioport_value main_door_optic_r() { return (!BIT(m_door->read(), 0) && BIT(m_outlatch[0], 12)) ? 1 : 0; }
 
 private:
 	void gaminator_map(address_map &map) ATTR_COLD;
@@ -1020,13 +1027,18 @@ private:
 		for (int b = 0; b < 16; b++)
 			if (BIT(mem_mask, 16 + b))
 				m_out[offset * 16 + b] = BIT(data, 16 + b);
+		m_outlatch[offset] = (m_outlatch[offset] & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
 	}
+
+	virtual void machine_start() override ATTR_COLD { std::fill(std::begin(m_outlatch), std::end(m_outlatch), 0); save_item(NAME(m_outlatch)); }
 
 	required_device<mcf5206e_device> m_maincpu;
 	required_device<i2cmem_device> m_seeprom;
 	required_ioport_array<4> m_in;
 	required_device_array<ns16550_device, 4> m_uart;
 	output_finder<64> m_out;
+	required_ioport m_door;
+	u16 m_outlatch[4];
 };
 
 void gaminator_state::gamtor_unk_w(uint32_t data)
@@ -1099,12 +1111,13 @@ static INPUT_PORTS_START(  gaminator )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_START1 )   PORT_NAME("Arranque / Start (key 01, in 0f)")
 	PORT_START("IN1")
 	PORT_BIT( 0x00000007, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	// Door switches: the kernel door objects (table at 0x4bc9e: type A0x, input) treat logic state 1 as open; on the
-	// active-low 1c07 inputs that is a low line. in 13 open: "E 63 2: Puerta del cajon abierta"
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Drop door (in 13)")
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Stacker door 1 (in 14)") // open: E 63 4
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Logic door 1 (in 15)") // open: E 63 1
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in 16, main door optical sensor (E 63 5 when it changes), TODO
+	// Door switches: the kernel door objects (table at 0x4bc9e: type A0x, input; scan at 0x4d0f0) take logic state 1 as
+	// closed (no action) and 0 as open. The 1c07 inputs are inverted by the driver, so a closed door pulls the line low.
+	// in 13 open: "E 63 2: Puerta del cajon abierta"
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Drop door (in 13)")
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Stacker door 1 (in 14)") // open: E 63 4
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Logic door 1 (in 15)") // open: E 63 1
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(gaminator_state::main_door_optic_r)) // in 16, main door optical sensor (E 63 5)
 	// key 0F: with "E E0 ... Girar la llave del operador" on screen, turning it opens "Configuracion maquina"
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_TOGGLE PORT_NAME("Attendant key (key 0F, in 17)")
 	PORT_BIT( 0x00007f00, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1116,15 +1129,18 @@ static INPUT_PORTS_START(  gaminator )
 	PORT_START("IN3")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("DOOR") // main door, seen only through the optical sensor on in 16
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Main door")
+
 	PORT_START("SYS")
 	// logical input 0x40: when it reads 0 at boot (0x496ec) the kernel enters "*** Borrar el RAM ***" and asks to
 	// restart "con la tecla RAMCLEAR en posicion OFF" -> the RAMCLEAR key switch, a toggle
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE PORT_NAME("RAMCLEAR key")
 	// in 41: battery monitor, low = "E 12 3: Bateria del RAM debil"
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RAM battery low (in 41)")
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Logic door 2 (in 45)") // open: E 63 1 (XOR 0x60 in the driver)
-	// in 46: with it low the game shows "E 63 4: Puerta de la caja del apilador abierta"
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Stacker door 2 (in 46)")
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Logic door 2 (in 45)") // open: E 63 1 (XOR 0x60 in the driver)
+	// in 46 open (line high, logic 0 after the XOR): "E 63 4: Puerta de la caja del apilador abierta"
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Stacker door 2 (in 46)")
 	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 43, polled in the E0 screen
 	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 44, polled in the E0 screen
 	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 47, polled in the E0 screen
