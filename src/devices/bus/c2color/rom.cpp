@@ -8,7 +8,7 @@
 //  device type definitions
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(C2COLOR_ROM_PLAIN,    c2color_rom_plain_device,    "c2color_rom_plain",    "Monon Color ROM cartridge")
+DEFINE_DEVICE_TYPE(C2COLOR_ROM_PLAIN,    c2color_rom_plain_device,    "c2color_rom_plain",    "C2Color ROM cartridge")
 
 
 //-------------------------------------------------
