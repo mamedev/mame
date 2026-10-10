@@ -1938,6 +1938,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/ygv625.h,VIDEOS["YGV625"] = true
+--------------------------------------------------
+
+if VIDEOS["YGV625"] then
+	files {
+		MAME_DIR .. "src/devices/video/ygv625.cpp",
+		MAME_DIR .. "src/devices/video/ygv625.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/zeus2.h,VIDEOS["ZEUS2"] = true
 --------------------------------------------------
 

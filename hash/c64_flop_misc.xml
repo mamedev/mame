@@ -328,7 +328,7 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
-	<software name="samsjrny" supported="no">
+	<software name="samsjrny">
 		<description>Sam's Journey</description>
 		<year>2017</year>
 		<publisher>RGCD</publisher>
@@ -376,7 +376,7 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
-	<software name="mayhem" supported="no">
+	<software name="mayhem">
 		<description>Mayhem in Monsterland</description>
 		<year>1993</year>
 		<publisher>Apex Computer Productions</publisher>
@@ -391,6 +391,17 @@ Hi-score table is corrupt (dump really?)
 <!-- !Compilations -->
 
 <!-- !Applications -->
+
+	<software name="dolphdos3">
+		<description>Dolphin DOS 3.0 Tooldisk (Germany)</description>
+		<year>1990</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="dolphin_dos_3.0_original_tooldisk_1990.d64" size="174848" crc="dc48f29d" sha1="05a1b386ff91255c95d02ea9491340c6c6f80fe1"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="goliath">
 		<description>Goliath-Prommer (Ger)</description>
@@ -993,6 +1004,53 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
+	<!-- requires an MSD SD-1/SD-2 disk drive -->
+	<software name="msddcan" supported="no">
+		<description>MSD Dual Cannon</description>
+		<year>198?</year>
+		<publisher>Kracker Jax</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="msd_ddc.d64" size="174848" crc="fa146611" sha1="6d484099bef77f0574a8695ba099d120897767e9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- requires an MSD SD-1/SD-2 disk drive -->
+	<software name="msdprg" supported="no">
+		<description>MSD Programs</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="174848">
+				<rom name="msdprg1.d64" size="174848" crc="ba672c19" sha1="c0ab2b5e412ddedf6e73e5feb5d948f218907cbf"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="174848">
+				<rom name="msdprg2.d64" size="174848" crc="ec6c8131" sha1="a2c87b2ffb98755257ef939fb35678986571f088"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- requires an MSD SD-1/SD-2 disk drive -->
+	<software name="msdutil" supported="no">
+		<description>MSD Utilities</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="175531">
+				<rom name="msdutils.d64" size="175531" crc="8873e254" sha1="2fe8284e06679d07b2e31c3d3ea0942fd5d60c04"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !Operating Systems -->
 
 	<software name="contiki">
@@ -1223,14 +1281,14 @@ Hi-score table is corrupt (dump really?)
 
 <!-- !Demos -->
 
-	<software name="2ndreal" supported="no">
+	<!-- https://www.youtube.com/watch?v=HiWbKQ_gUKQ -->
+	<software name="2ndreal" supported="partial">
 		<description>Second Reality</description>
 		<year>1997</year>
 		<publisher>Smash Designs &amp; The Obsessed Maniacs</publisher>
 		<notes><![CDATA[
 LOAD "SECOND REALITY*",8
-https://www.youtube.com/watch?v=HiWbKQ_gUKQ
-First screen has [VIC] background stripes, ship transition clips in between, bad transition to title screen, hangs or crash there
+Runs until disk side change prompt
 ]]></notes>
 		<info name="usage" value="Set SID as soundcard in selection screen (press right ctrl 3 times then enter key)" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
@@ -1246,6 +1304,562 @@ First screen has [VIC] background stripes, ship transition clips in between, bad
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="174848">
 				<rom name="2nd2.d64" size="174848" crc="222c5b50" sha1="ea440448a32fe7a2e952e3265450b10c25233729"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=ZJThHmbOlCw -->
+	<software name="codeboys" supported="no">
+		<description>Codeboys &amp; Endians</description>
+		<year>2025</year>
+		<publisher>Booze Design</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="codeboysandendians_1.d64" size="174848" crc="e463f854" sha1="e0706d889012a8c874feefa9807aa11b18928b5d"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="codeboysandendians_2.d64" size="174848" crc="1c6a0554" sha1="5713f5850f9efb59e22df7c1c088e7f89246c774"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crazydem" supported="no">
+		<description>Crazy Demo</description>
+		<year>2024</year>
+		<publisher>Wyndex</publisher>
+		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="crazydemo-wyndex.d81" size="819200" crc="8285e39e" sha1="45fdc49f90ecce7abe7247c6744cd0c0d902dab2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=aNN_OSYS6-Y -->
+	<software name="cycle" supported="no">
+		<description>Cycle</description>
+		<year>2004</year>
+		<publisher>Booze Design</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="booze design - cycle.d64" size="174848" crc="d2f05311" sha1="5bc5ffba3cebdede1fa21e6a76d0cb9bf6b14ee1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=tfHazZp5CMU -->
+	<software name="democoder" supported="no">
+		<description>The Demo Coder</description>
+		<year>2024</year>
+		<publisher>Fairlight</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="196608">
+				<rom name="fairlight-the-demo-coder-fbc7cb83.d64" size="196608" crc="dc06066c" sha1="ae09dfb9bef0752c82ccb0eb1c99c522467b6709"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=8b_B0qAZVYQ -->
+	<software name="gorbabst" supported="no">
+		<description>Gorba Boost</description>
+		<year>2025</year>
+		<publisher>Gorbat Soft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="gs-gorba-boost.d64" size="174848" crc="3ff8ff28" sha1="1cad47c2d2b6afd0dae21ca18e9b440d0a0f5895"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=4mtVDLxgb4A -->
+	<software name="hat" supported="no">
+		<description>The Hat</description>
+		<year>2026</year>
+		<publisher>Fairlight &amp; Genesis Project</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="the-hat-7a825b1-a.d64" size="174848" crc="3f227224" sha1="2f381abe7775ed8848a03776ec705e7a5d83c488"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="the-hat-7a825b1-b.d64" size="174848" crc="5f0c6ad1" sha1="7e637df2c933b6ddfedb06ef7f20627cbc2f7791"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=3aJzSySfCZM -->
+	<software name="mojo" supported="no">
+		<description>Mojo</description>
+		<year>2023</year>
+		<publisher>Bonzai &amp; Pretzel Logic</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="196608">
+				<rom name="mojo_side1.d64" size="196608" crc="faf34098" sha1="7539d8da6b21e4f256f20ff24cee0632f9feea96"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="mojo_side2.d64" size="174848" crc="ad430dea" sha1="d4f66e32b3e670e7a50fe5a6d4cef53f69d5900d"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="196608">
+				<rom name="mojo_side3.d64" size="196608" crc="822d5acf" sha1="33a34f56109bb63cfbbcd7b967274296190afb8d"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
+			<dataarea name="flop" size="196608">
+				<rom name="mojo_side4.d64" size="196608" crc="e17ef73c" sha1="43d0925cbf5dd83f95ec20f0680c909848d5b03b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=BM8anS_5nbA -->
+	<software name="musikrs" supported="no">
+		<description>Musik Run/Stop</description>
+		<year>2014</year>
+		<publisher>Mahoney</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="mahoney - musik run-stop - side a.d64" size="174848" crc="610ea3d0" sha1="f4e293fb1d26d3a8046e128bc1d7feb8d07a9239"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="mahoney - musik run-stop - side b.d64" size="174848" crc="3b55c204" sha1="50c6af161890a31a903369633af62e4463c2af2d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=ZazU4H2OZFg -->
+	<software name="neon">
+		<description>Neon</description>
+		<year>2017</year>
+		<publisher>Triad</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="triad-neon_side1.d64" size="174848" crc="68cb5358" sha1="325fb6dfa8889384f8763be91f85a5e36fc175c3"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="triad-neon_side2.d64" size="174848" crc="0bbb37e7" sha1="77bb08dbf1da2bc78cc3079624b67d52fbab99b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=GqEI0T_WoAw -->
+	<software name="nextrnd" supported="no">
+		<description>Next Round</description>
+		<year>2026</year>
+		<publisher>Performers</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="174848">
+				<rom name="round1.d64" size="174848" crc="232bcda0" sha1="7b0b633b77129155b446b36ecbfccd7359717b0a"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="174848">
+				<rom name="round2.d64" size="174848" crc="3815e5c3" sha1="7274341c1ea51c490643b5624683fcc351f9faf9"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="174848">
+				<rom name="round3.d64" size="174848" crc="0f2d88a0" sha1="a959dfc8588f829a53c9ef16db1f991bb0946879"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Bonus disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="bonusround.d64" size="174848" crc="3f6e2205" sha1="c8c3e703f9fdb88563b583e6bbffd978043d0b93"/>
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2 (Digimax)"/>
+			<dataarea name="flop" size="174848">
+				<rom name="round2_digimax.d64" size="174848" crc="29b11be2" sha1="ba893591852cd0550c4297663347f544b1211624"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=S3fVhVJ_ZDk -->
+	<software name="nine">
+		<description>Nine</description>
+		<year>2010</year>
+		<publisher>Chorus</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="nine.d64" size="174848" crc="2898f7c7" sha1="9d837079e6cc2c6709e0f915624176bd2500465d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=FpVQlbPgkUg -->
+	<software name="ninelft">
+		<description>Nine (Lft)</description>
+		<year>2025</year>
+		<publisher>Lft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="lft-nine.d64" size="174848" crc="f7dd4df8" sha1="fff457778278b3dd15b4d2f5d05996b0e0b57460"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=Sj6ZEwjK1DU -->
+	<software name="nobounds" supported="no">
+		<description>No Bounds</description>
+		<year>2023</year>
+		<publisher>Genesis Project</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="nobounds-gp-side1.d64" size="174848" crc="2855abc2" sha1="54d93756b5868aa6120812db85f7c683705d6d9c"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="nobounds-gp-side2.d64" size="174848" crc="2db54808" sha1="31995a02ee322b91ee3fb7f5003f7a0db752a5bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=x6SfThtldFY -->
+	<software name="otech3" supported="no">
+		<description>O-Tech People III</description>
+		<year>2025</year>
+		<publisher>Fairlight</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="196608">
+				<rom name="o-tech-people-iii-19aaa94.d64" size="196608" crc="117d51f9" sha1="b0924750817fbf68f572c924afdd5cc94ddf8e74"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=1mQWEF6Tt0Y -->
+	<software name="popelprm" supported="no">
+		<description>Popel Premiere</description>
+		<year>1999</year>
+		<publisher>CyberpunX</publisher>
+		<notes><![CDATA[
+Requires a second SID at $D500
+]]></notes>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="popel_premiere.d64" size="174848" crc="f69e3a85" sha1="e12a494e1426e24207e892f975aa214eedd7e155"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=aK8l6_iJWKM -->
+	<software name="rebirth" supported="no">
+		<description>Rebirth</description>
+		<year>2021</year>
+		<publisher>Finnish Gold</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="rebirth_fig.d64" size="174848" crc="a80c6f18" sha1="975e301ba3f14af8acf452bd167ec2b0c9281acb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=vS8LAQbR-DY -->
+	<software name="scpukick" supported="no">
+		<description>SuperCPU Kicks!</description>
+		<year>1999</year>
+		<publisher>DMAgic</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="scpu1.d64" size="174848" crc="ae5378c0" sha1="6fe8efc36029167d39acd8f9af585a38ce4d624e"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="scpu2.d64" size="174848" crc="754f3d8f" sha1="0e2cd1c50117b6ef27e2325e67b9c1500fb1173f"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="scpu3.d64" size="174848" crc="bdd6952c" sha1="a958773689452491848093dd71c17b1858c2184f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=ZLkWufDcDNU -->
+	<software name="scpuplsm" supported="no">
+		<description>SuperCPU Plasma Intro</description>
+		<year>2015</year>
+		<publisher>Genesis Project</publisher>
+		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="scpuintro_gp.d64" size="174848" crc="f7d99d90" sha1="df999d840168f36555f9651794f82c01cbd73b3c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=-9nHNUlqMyQ -->
+	<software name="sledge" supported="no">
+		<description>Christmas Megademo</description>
+		<year>2020</year>
+		<publisher>Atlantis &amp; Bonzai &amp; Genesis Project &amp; Lethargy &amp; Offence</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="sledge of displace - santas - side a.d64" size="174848" crc="d578930e" sha1="c95e30e4bfa1c43d034c4f1dea3bb67156d983ec"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="sledge of displace - santas - side b.d64" size="174848" crc="d92c5256" sha1="4f858c1e9273166c88cfecbdec24f61d0cd40138"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="174848">
+				<rom name="sledge of displace - santas - side c.d64" size="174848" crc="ef049278" sha1="7b85854ac20f13f32c82c30ee9ee3d430898613e"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
+			<dataarea name="flop" size="174848">
+				<rom name="sledge of displace - santas - side d.d64" size="174848" crc="024849cd" sha1="ae97460e266519d73d4e5e1888a8f8d9f17c97c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=1QXf1RKzlQc -->
+	<software name="trip" supported="no">
+		<description>The Trip</description>
+		<year>2025</year>
+		<publisher>Fairlight</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="the-trip-bdaeeec0-a.d64" size="174848" crc="2b65257e" sha1="3ea6c292be0979b6c0df0dcc852131a7bdaf0325"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="the-trip-bdaeeec0-b.d64" size="174848" crc="b78d4a51" sha1="fb3106d5e4d449e98e81d4a7d257ec668b363303"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=GjDReXe9T3w -->
+	<software name="vicious2" supported="no">
+		<description>Vicious Sid 2</description>
+		<year>2012</year>
+		<publisher>The Noisy Bunch</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="vicious sid 1.d64" size="174848" crc="ecf2f9fa" sha1="c171980cc87734821e5d884c65ead790978b9652"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="vicious sid 2.d64" size="174848" crc="00745c5a" sha1="8669eea2f60be9a5f20fe99194b0d7658687899d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=BT2rrzg_XIc -->
+	<software name="violator" supported="no">
+		<description>The Violators</description>
+		<year>2025</year>
+		<publisher>Censor Design</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="the_violators-cd_s1.d64" size="174848" crc="c1267095" sha1="4f50511ddb37444b5f76c424fdf208fdd9be9762"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="the_violators-cd_s2.d64" size="174848" crc="7b408a7e" sha1="d572042bb644c5ab794780d5ffd6fb7f8daa5196"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=E5l9ecCeKPw -->
+	<software name="weanomaly" supported="no">
+		<description>We Are The Anomaly</description>
+		<year>2025</year>
+		<publisher>Extend &amp; Genesis Project</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="wearetheanomaly-side1.d64" size="174848" crc="9b870663" sha1="2c4f078a7a09d8bac809f50fe0b1047fdcc918ba"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="wearetheanomaly-side2.d64" size="174848" crc="99fb6c11" sha1="bd5dac3594e62a1ca535e28ad98535a3cf835d2d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=Y89aByVpBFs -->
+	<software name="witmat2" supported="no">
+		<description>What Is The Matrix 2</description>
+		<year>2024</year>
+		<publisher>Censor Design</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="196608">
+				<rom name="whatisthematrix_ii.d64" size="196608" crc="eaa8dcc5" sha1="1feee6ca1ecec7f8f9d4fea64bf22578da0dc314"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=lQDBSzChPjk -->
+	<software name="wonder14" supported="no">
+		<description>Wonderland XIV</description>
+		<year>2023</year>
+		<publisher>Censor Design</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="196608">
+				<rom name="wonderland_xiv_s1.d64" size="196608" crc="3ace45cb" sha1="e0d8b42b8166d0f0c6d90e176c83ad87038c9c2b"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="196608">
+				<rom name="wonderland_xiv_s2.d64" size="196608" crc="907b7efa" sha1="e969b0e8e2d21451e37647fe012760e9910662f5"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="196608">
+				<rom name="wonderland_xiv_s3.d64" size="196608" crc="52007196" sha1="c5167c2f5bb84e5b336c0c8a3099b697b87d17a6"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side D"/>
+			<dataarea name="flop" size="196608">
+				<rom name="wonderland_xiv_s4.d64" size="196608" crc="baa8fcc1" sha1="5f3736934881cbd131543a077bdc8f5497b30d4f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=uFVv1lKUn7Y -->
+	<software name="xfile">
+		<description>The X-File</description>
+		<year>2025</year>
+		<publisher>Chorus</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="chorus_x-file.d64" size="174848" crc="01136af8" sha1="d1cd8ff650ff75318da4e5e0bb3ab0650f709f5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=Rcbc72Jd97c -->
+	<software name="lab">
+		<description>The Lab</description>
+		<year>2026</year>
+		<publisher>Elysium</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="196608">
+				<rom name="side1.d64" size="196608" crc="cc979174" sha1="ef71ba6fbe91b8480406791a8c34287fee679dea"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="196608">
+				<rom name="side2.d64" size="196608" crc="c23bc9da" sha1="7ec38dc4d1fc6f1487d50c09221478fb600153b9"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="196608">
+				<rom name="side3.d64" size="196608" crc="e807f324" sha1="9e0fc8f9f3a7e7ad95dc8208d065552339e10734"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="196608">
+				<rom name="extras.d64" size="196608" crc="5233d4ad" sha1="623db03ed802fc4db64f8275729e11257f967d69"/>
 			</dataarea>
 		</part>
 	</software>

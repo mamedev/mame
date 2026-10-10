@@ -1072,9 +1072,9 @@ uint32_t ngcd_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	// fill with background color first
 	bitmap.fill(*m_bg_pen, cliprect);
 
-	if (m_has_sprite_bus) m_sprgen->draw_sprites(bitmap, cliprect.min_y);
+	if (m_has_sprite_bus) m_sprgen->draw_sprites(bitmap, cliprect.top());
 
-	if (m_has_text_bus) m_sprgen->draw_fixed_layer(bitmap, cliprect.min_y);
+	if (m_has_text_bus) m_sprgen->draw_fixed_layer(bitmap, cliprect.top());
 
 	return 0;
 }

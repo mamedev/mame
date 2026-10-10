@@ -111,7 +111,7 @@ public:
 	void m_rx_fifo_rp_step();
 	uint8_t m_rx_fifo_rp_data();
 
-	void write_rx(int state);
+	void write_rx(int state, bool loopback = false);
 	void cts_w(int state);
 	void dcd_w(int state);
 	void rxc_w(int state);

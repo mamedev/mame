@@ -90,6 +90,7 @@ public:
 	void set_rpm(float rpm);
 	void set_sectoring_type(uint32_t sectoring_type);
 	uint32_t get_sectoring_type();
+	void set_media_change_time(const attotime &time) { m_media_change_time = time; }
 
 	void init_fs(const fs_info *fs, const fs::meta_data &meta);
 
@@ -173,11 +174,13 @@ protected:
 	virtual const software_list_loader &get_software_list_loader() const override;
 
 	TIMER_CALLBACK_MEMBER(index_resync);
+	TIMER_CALLBACK_MEMBER(media_change_done);
 
 	virtual void track_changed();
 	virtual void setup_characteristics() = 0;
 
 	void init_floppy_load(bool write_supported);
+	void change_media(bool wpt);
 
 	std::function<void (format_registration &fr)> m_format_registration_cb;
 	const floppy_image_format_t *m_input_format;
@@ -189,6 +192,7 @@ protected:
 	std::vector<fs_info>  m_fs;
 	std::vector<const fs::manager_t *> m_fs_managers;
 	emu_timer             *m_index_timer;
+	emu_timer             *m_media_change_timer;
 
 	/* Physical characteristics, filled by setup_characteristics */
 	int m_tracks; /* addressable tracks */
@@ -198,6 +202,7 @@ protected:
 	bool m_motor_always_on;
 	bool m_dskchg_writable;
 	bool m_has_trk00_sensor;
+	attotime m_media_change_time;
 
 	int m_drive_index;
 
@@ -217,6 +222,8 @@ protected:
 	int m_rdy;  /* ready */
 	int m_dskchg;     /* disk changed */
 	bool m_ready;
+	bool m_media_changing;
+	bool m_media_change_wpt;
 
 	/* rotation per minute => gives index pulse frequency */
 	float m_rpm;
@@ -433,6 +440,7 @@ public:
 	template <typename T> void set_formats(T &&_formats) { formats = std::forward<T>(_formats); }
 
 	void set_sectoring_type(uint32_t sectoring_type) { m_sectoring_type = sectoring_type; }
+	void set_media_change_time(const attotime &time) { m_media_change_time = time; }
 
 	floppy_image_device *get_device();
 
@@ -453,6 +461,7 @@ private:
 	floppy_sound_samples *m_samples;
 
 	uint32_t m_sectoring_type;
+	attotime m_media_change_time;
 };
 
 

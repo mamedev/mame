@@ -791,42 +791,42 @@ uint32_t subsino2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			{
 				for (int x = 0; x < 0x80; x++)
 				{
-					rectangle visible;
-					visible.min_x = 8 * x;
-					visible.max_x = 8 * (x+1) - 1;
-					visible.min_y = 4 * 0x10 * y;
-					visible.max_y = 4 * 0x10 * (y+1) - 1;
+					rectangle visible(
+							8 * x,
+							8 * (x+1) - 1,
+							4 * 0x10 * y,
+							4 * 0x10 * (y+1) - 1);
 
 					int reeladdr = y * 0x80 * 4 + x;
 					uint16_t reelscroll = m_ss9601_reelram[reeladdr];
 
-					l->tmap->set_scrollx(0, (reelscroll >> 9) * 8 - visible.min_x);
+					l->tmap->set_scrollx(0, (reelscroll >> 9) * 8 - visible.left());
 
 					// wrap around at half tilemap (0x100)
-					int reelscroll_y = (reelscroll & 0x100) + ((reelscroll - visible.min_y) & 0xff);
+					int reelscroll_y = (reelscroll & 0x100) + ((reelscroll - visible.top()) & 0xff);
 					int reelwrap_y = 0x100 - (reelscroll_y & 0xff);
 
 					//visible &= cliprect;
 					rectangle tmp = visible;
 
 					// draw above the wrap around y
-					if ( reelwrap_y-1 >= visible.min_y )
+					if ( reelwrap_y-1 >= visible.top() )
 					{
-						if ( reelwrap_y-1 <= visible.max_y )
-							tmp.max_y = reelwrap_y-1;
+						if ( reelwrap_y-1 <= visible.bottom() )
+							tmp.sety(tmp.top(), reelwrap_y-1);
 						l->tmap->set_scrolly(0, reelscroll_y);
 						l->tmap->draw(screen, m_reelbitmap, tmp, TILEMAP_DRAW_OPAQUE);
-						tmp.max_y = visible.max_y;
+						tmp.sety(tmp.top(), visible.bottom());
 					}
 
 					// draw below the wrap around y
-					if ( reelwrap_y <= visible.max_y )
+					if ( reelwrap_y <= visible.bottom() )
 					{
-						if ( reelwrap_y >= visible.min_y )
-							tmp.min_y = reelwrap_y;
+						if ( reelwrap_y >= visible.top() )
+							tmp.sety(reelwrap_y, tmp.bottom());
 						l->tmap->set_scrolly(0, -((reelwrap_y &0xff) | (reelscroll_y & 0x100)));
 						l->tmap->draw(screen, m_reelbitmap, tmp, TILEMAP_DRAW_OPAQUE);
-						tmp.min_y = visible.min_y;
+						tmp.sety(visible.top(), tmp.bottom());
 					}
 				}
 			}

@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "midzeus.h"
+#include "midzeus_mk4_v17.h"
 
 #include "input.h" // for video debug keys
 #include "video/rgbutil.h"
@@ -616,6 +617,8 @@ void midzeus_state::zeus_register_update(offs_t offset)
 					vert[3].y = (int16_t)(m_zeusbase[0x0e] >> 16);
 
 					extra.solidcolor = m_zeusbase[0x00];
+					if (!strcmp(machine().system().name, "mk4"))
+						extra.solidcolor = mk4_v17::rectangle_color(extra.solidcolor, m_zeusbase[0x4c]);
 					extra.zoffset = 0x7fff;
 
 					m_poly->zeus_draw_solid_quad(m_zeus_cliprect, vert);
@@ -1103,10 +1106,21 @@ uint16_t midzeus_state::zeus_vertex_intensity(uint32_t packed_normal)
 }
 
 
+// MK4 v3.0-only empirical extension. Other Zeus games retain the general model.
+uint32_t midzeus_state::zeus_mk4_v17_intensity(uint32_t packed_normal, uint32_t texdata, bool long_format, int64_t rounded_z)
+{
+	const void *const table = waveram0_ptr_from_block_addr(m_zeus_unkbase);
+	return mk4_v17::intensity(packed_normal, m_zeus_matrix, m_zeus_light,
+		m_zeus_light_valid, m_zeus_unkbase, texdata, m_zeusbase[0x5c], uint8_t(m_zeusbase[0x4e]),
+		long_format, rounded_z, [table](unsigned index) { return WAVERAM_READ8(table, index); });
+}
+
+
 void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, uint32_t texdata, bool logit)
 {
 	poly_vertex clipvert[8];
 	poly_vertex vert[4];
+	bool const calibrated_mk4 = !strcmp(m_state.machine().system().name, "mk4");
 
 	uint32_t const ctrl_word = databuffer[long_fmt ? 1 : 9];
 
@@ -1165,7 +1179,9 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 		vert[i].p[0] = z;
 		vert[i].p[1] = u << ushift;
 		vert[i].p[2] = v << vshift;
-		vert[i].p[3] = long_fmt ? m_state.zeus_vertex_intensity(databuffer[10 + i]) : 0xffff;
+		vert[i].p[3] = calibrated_mk4
+			? m_state.zeus_mk4_v17_intensity(long_fmt ? databuffer[10 + i] : 0, texdata, bool(long_fmt), z)
+			: long_fmt ? m_state.zeus_vertex_intensity(databuffer[10 + i]) : 0xffff;
 
 #if (VERBOSE & LOG_QUAD)
 		if (logit)
@@ -1242,6 +1258,8 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 		}
 	}
 
+	extra.mk4_v17 = calibrated_mk4;
+	extra.mk4_depth = calibrated_mk4 && long_fmt && mk4_v17::shaft(m_state.m_zeus_unkbase, texdata);
 	extra.ctrl_word = ctrl_word;
 	extra.solidcolor = m_state.m_zeusbase[0x00] & 0x7fff;
 	extra.zoffset = m_state.m_zeusbase[0x7e] >> 16;
@@ -1418,88 +1436,97 @@ void midzeus_renderer::render_poly(int32_t scanline, const extent_t& extent, con
 					dstb = (dstb << 3) | (dstb >> 2);
 				}
 
-				switch (object.blend)
+				if (object.mk4_v17)
 				{
-					case BLEND_OPAQUE1:
-					{
-						outr = srcr;
-						outg = srcg;
-						outb = srcb;
-						break;
-					}
-
-					case BLEND_OPAQUE2:
-					{
-						outr = (srcr * i8) >> 8;
-						outg = (srcg * i8) >> 8;
-						outb = (srcb * i8) >> 8;
-						break;
-					}
-
-					case BLEND_OPAQUE3:
-					{
-						outr = (srcr * i8) >> 8;
-						outg = (srcg * i8) >> 8;
-						outb = (srcb * i8) >> 8;
-						break;
-					}
-
-					case BLEND_OPAQUE4:
-					{
-						outr = srcr;
-						outg = srcg;
-						outb = srcb;
-						break;
-					}
-
-					case BLEND_OPAQUE5:
-					{
-						// TODO: Fog factor?
-						outr = (srcr * srca) >> 8;
-						outg = (srcg * srca) >> 8;
-						outb = (srcb * srca) >> 8;
-						break;
-					}
-
-					case BLEND_ADD1:
-					{
-						outr = ((srcr * srca) >> 8) + dstr;
-						outg = ((srcg * srca) >> 8) + dstg;
-						outb = ((srcb * srca) >> 8) + dstb;
-						break;
-					}
-
-					case BLEND_ADD2:
-					{
-						outr = ((srcr * srca) >> 8) + ((dstr * (dsta << 1)) >> 8);
-						outg = ((srcg * srca) >> 8) + ((dstg * (dsta << 1)) >> 8);
-						outb = ((srcb * srca) >> 8) + ((dstb * (dsta << 1)) >> 8);
-						break;
-					}
-
-					case BLEND_MUL1:
-					{
-						outr = (((srcr * (srca << 1)) >> 8) * dstr) >> 8;
-						outg = (((srcg * (srca << 1)) >> 8) * dstg) >> 8;
-						outb = (((srcb * (srca << 1)) >> 8) * dstb) >> 8;
-						break;
-					}
-					default:
-					{
-						outr = srcr;
-						outg = srcg;
-						outb = srcb;
-						break;
-					}
+					outr = mk4_v17::channel(srcr, dstr, i8, object.alpha, object.blend, object.mk4_depth);
+					outg = mk4_v17::channel(srcg, dstg, i8, object.alpha, object.blend, object.mk4_depth);
+					outb = mk4_v17::channel(srcb, dstb, i8, object.alpha, object.blend, object.mk4_depth);
 				}
+				else
+				{
+					switch (object.blend)
+					{
+						case BLEND_OPAQUE1:
+						{
+							outr = srcr;
+							outg = srcg;
+							outb = srcb;
+							break;
+						}
 
-				outr = outr > 0xff ? 0xff : outr;
-				outg = outg > 0xff ? 0xff : outg;
-				outb = outb > 0xff ? 0xff : outb;
+						case BLEND_OPAQUE2:
+						{
+							outr = (srcr * i8) >> 8;
+							outg = (srcg * i8) >> 8;
+							outb = (srcb * i8) >> 8;
+							break;
+						}
 
-				outr >>= 3;
-				outg >>= 3;
-				outb >>= 3;
+						case BLEND_OPAQUE3:
+						{
+							outr = (srcr * i8) >> 8;
+							outg = (srcg * i8) >> 8;
+							outb = (srcb * i8) >> 8;
+							break;
+						}
+
+						case BLEND_OPAQUE4:
+						{
+							outr = srcr;
+							outg = srcg;
+							outb = srcb;
+							break;
+						}
+
+						case BLEND_OPAQUE5:
+						{
+							// TODO: Fog factor?
+							outr = (srcr * srca) >> 8;
+							outg = (srcg * srca) >> 8;
+							outb = (srcb * srca) >> 8;
+							break;
+						}
+
+						case BLEND_ADD1:
+						{
+							outr = ((srcr * srca) >> 8) + dstr;
+							outg = ((srcg * srca) >> 8) + dstg;
+							outb = ((srcb * srca) >> 8) + dstb;
+							break;
+						}
+
+						case BLEND_ADD2:
+						{
+							outr = ((srcr * srca) >> 8) + ((dstr * (dsta << 1)) >> 8);
+							outg = ((srcg * srca) >> 8) + ((dstg * (dsta << 1)) >> 8);
+							outb = ((srcb * srca) >> 8) + ((dstb * (dsta << 1)) >> 8);
+							break;
+						}
+
+						case BLEND_MUL1:
+						{
+							outr = (((srcr * (srca << 1)) >> 8) * dstr) >> 8;
+							outg = (((srcg * (srca << 1)) >> 8) * dstg) >> 8;
+							outb = (((srcb * (srca << 1)) >> 8) * dstb) >> 8;
+							break;
+						}
+						default:
+						{
+							outr = srcr;
+							outg = srcg;
+							outb = srcb;
+							break;
+						}
+					}
+
+					outr = outr > 0xff ? 0xff : outr;
+					outg = outg > 0xff ? 0xff : outg;
+					outb = outb > 0xff ? 0xff : outb;
+
+					outr >>= 3;
+					outg >>= 3;
+					outb >>= 3;
+				}
 
 				WAVERAM_WRITEPIX(m_state.m_zeus_renderbase, scanline, x, (outr << 10) | (outg << 5) | outb);
 

@@ -1213,8 +1213,8 @@ void z80scc_channel::tra_callback()
 		// transmit data
 		out_txd_cb(db);
 
-		if (m_wr14 & WR14_LOCAL_LOOPBACK)
-			write_rx(db);
+		if ((m_wr14 & (WR14_AUTO_ECHO | WR14_LOCAL_LOOPBACK)) == WR14_LOCAL_LOOPBACK)
+			write_rx(db, true);
 	}
 	else
 	{
@@ -3010,8 +3010,13 @@ void z80scc_channel::set_dtr(int state)
 //  write_rx - called by terminal through rs232/diserial
 //         when character is sent to board
 //-------------------------------------------------
-void z80scc_channel::write_rx(int state)
+void z80scc_channel::write_rx(int state, bool loopback)
 {
+	// Local loopback selects the transmitter output as the receiver input.
+	// Changes on the external RxD pin must not disturb that internal path.
+	if ((m_wr14 & (WR14_AUTO_ECHO | WR14_LOCAL_LOOPBACK)) == WR14_LOCAL_LOOPBACK && !loopback)
+		return;
+
 	// the receiver runs straight off the /RTxC pin, whether that's a configured crystal/oscillator or edges from rxc_w
 	const bool rtxc_driven_rxc = (m_wr11 & WR11_RCVCLK_SRC_MASK) == WR11_RCVCLK_SRC_RTXC;
 

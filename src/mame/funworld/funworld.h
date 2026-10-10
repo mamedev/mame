@@ -25,27 +25,27 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void royalcd1(machine_config &config);
-	void royalcd2(machine_config &config);
-	void fw1stpal(machine_config &config);
-	void fw2ndpal(machine_config &config);
-	void saloon(machine_config &config);
-	void clubcard(machine_config &config);
-	void cuoreuno(machine_config &config);
-	void funquiz(machine_config &config);
-	void witchryl(machine_config &config);
-	void fw_brick_1(machine_config &config);
-	void fw_brick_2(machine_config &config);
-	void gratispk(machine_config &config);
+	void royalcd1(machine_config &config) ATTR_COLD;
+	void royalcd2(machine_config &config) ATTR_COLD;
+	void fw1stpal(machine_config &config) ATTR_COLD;
+	void fw2ndpal(machine_config &config) ATTR_COLD;
+	void saloon(machine_config &config) ATTR_COLD;
+	void clubcard(machine_config &config) ATTR_COLD;
+	void cuoreuno(machine_config &config) ATTR_COLD;
+	void funquiz(machine_config &config) ATTR_COLD;
+	void witchryl(machine_config &config) ATTR_COLD;
+	void fw_brick_1(machine_config &config) ATTR_COLD;
+	void fw_brick_2(machine_config &config) ATTR_COLD;
+	void gratispk(machine_config &config) ATTR_COLD;
 
-	void init_saloon();
-	void init_mongolnw();
-	void init_soccernw();
-	void init_tabblue();
-	void init_dino4();
-	void init_ctunk();
-	void init_jolycdig();
-	void init_impera16();
+	void init_saloon() ATTR_COLD;
+	void init_mongolnw() ATTR_COLD;
+	void init_soccernw() ATTR_COLD;
+	void init_tabblue() ATTR_COLD;
+	void init_dino4() ATTR_COLD;
+	void init_ctunk() ATTR_COLD;
+	void init_jolycdig() ATTR_COLD;
+	void init_impera16() ATTR_COLD;
 
 protected:
 	void funworld_videoram_w(offs_t offset, uint8_t data);
@@ -54,10 +54,11 @@ protected:
 	void funworld_lamp_b_w(uint8_t data);
 
 	virtual void video_start() override ATTR_COLD;
-	void funworld_palette(palette_device &palette) const;
+	void funworld_palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update_funworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
+	void funworld_map(address_map &map) ATTR_COLD;
 	void magicrd2_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
@@ -74,7 +75,6 @@ private:
 	void clubcard_map(address_map &map) ATTR_COLD;
 	void cuoreuno_map(address_map &map) ATTR_COLD;
 	void funquiz_map(address_map &map) ATTR_COLD;
-	void funworld_map(address_map &map) ATTR_COLD;
 	void fw_brick_map(address_map &map) ATTR_COLD;
 	void gratispk_map(address_map &map) ATTR_COLD;
 	void saloon_map(address_map &map) ATTR_COLD;
@@ -93,10 +93,10 @@ class magicrd2_state : public funworld_state
 public:
 	using funworld_state::funworld_state;
 
-	void magicrd2(machine_config &config);
+	void magicrd2(machine_config &config) ATTR_COLD;
 
-	void init_magicd2b();
-	void init_magicd2c();
+	void init_magicd2b() ATTR_COLD;
+	void init_magicd2c() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -108,7 +108,7 @@ class lunapark_state : public funworld_state
 public:
 	using funworld_state::funworld_state;
 
-	void lunapark(machine_config &config);
+	void lunapark(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -124,11 +124,11 @@ class chinatow_state : public funworld_state
 public:
 	using funworld_state::funworld_state;
 
-	void chinatow(machine_config &config);
-	void rcdino4(machine_config &config);
+	void chinatow(machine_config &config) ATTR_COLD;
+	void rcdino4(machine_config &config) ATTR_COLD;
 
-	void init_rcdino4();
-	void init_rcdinch();
+	void init_rcdino4() ATTR_COLD;
+	void init_rcdinch() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -146,9 +146,11 @@ public:
 
 	using funworld_state::funworld_state;
 
-	void multiwin(machine_config& config);
+	void multiwin(machine_config& config) ATTR_COLD;
+	void multiwinb(machine_config &config) ATTR_COLD;
 
-	void driver_init();
+	void driver_init() ATTR_COLD;
+	void init_multiwinb() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -157,6 +159,7 @@ private:
 	uint8_t multiwin_opcode_r(offs_t offset);
 
 	void multiwin_opcodes_map(address_map &map) ATTR_COLD;
+	void multiwinb_map(address_map &map) ATTR_COLD;
 };
 
 class royalcrdf_state : public funworld_state
@@ -164,9 +167,9 @@ class royalcrdf_state : public funworld_state
 public:
 	using funworld_state::funworld_state;
 
-	void royalcrdf(machine_config& config);
+	void royalcrdf(machine_config& config) ATTR_COLD;
 
-	void driver_init();
+	void driver_init() ATTR_COLD;
 
 private:
 	uint8_t royalcrdf_opcode_r(offs_t offset);
@@ -185,11 +188,11 @@ public:
 		m_crtc_selected(false)
 	{ }
 
-	void intrgmes(machine_config &config);
+	void intrgmes(machine_config &config) ATTR_COLD;
 
-	void init_novop_a();
-	void init_novop_b();
-	void init_intgms();
+	void init_novop_a() ATTR_COLD;
+	void init_novop_b() ATTR_COLD;
+	void init_intgms() ATTR_COLD;
 
 protected:
 

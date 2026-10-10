@@ -368,6 +368,7 @@ Sega 2005
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "cpu/pic16_mid/pic16_mid.h"
 #include "machine/pci.h"
 #include "machine/i82875p.h"
 #include "machine/i6300esb.h"
@@ -390,6 +391,7 @@ public:
 	lindbergh_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	void lindbergh(machine_config &config);
+	void lindbergh_pic(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -437,6 +439,13 @@ void lindbergh_state::lindbergh(machine_config &config)
 	AC97                    (config, "pci:1f.5",      0, 0x808625a6, 0x02, 0x103382c0);
 }
 
+void lindbergh_state::lindbergh_pic(machine_config &config)
+{
+	lindbergh(config);
+
+	PIC16F648A(config, "pic", 4'000'000).set_disable(); // unknown clock, might run with the internal oscillator
+}
+
 #define LINDBERGH_BIOS \
 	ROM_REGION32_LE(0x100000, "pci:1f.0", 0) /* PC bios, location 3j7 */ \
 	ROM_SYSTEM_BIOS(0, "bios0", "6.0.0010 alternate version") \
@@ -462,8 +471,9 @@ ROM_END
 ROM_START(hotd4)
 	LINDBERGH_BIOS
 
-	ROM_REGION(0x2000, ":pic", 0)
+	ROM_REGION16_LE(0x4400, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD("317-0427-com.bin", 0, 0x2000, CRC(ef4a120c) SHA1(fcc0386fa708af9e010e40e1d259a6bd95e8b9e2))  // PIC was added from Rev A
+	// missing user ids, configuration word and eeprom image
 
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY("dvp-0003b", 0, SHA1(67f2565338f1e8df4c6cfc83447f490f75541b16))
@@ -472,7 +482,7 @@ ROM_END
 ROM_START(hotd4a)
 	LINDBERGH_BIOS
 
-	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0427 / 317-0427-COM
+	ROM_REGION16_LE(0x4400, "pic", ROMREGION_ERASEFF) // PIC security 253-5508-0427 / 317-0427-COM
 	ROM_LOAD("317-0427-com.bin", 0, 0x2000, CRC(ef4a120c) SHA1(fcc0386fa708af9e010e40e1d259a6bd95e8b9e2))
 
 	DISK_REGION("dvd")
@@ -482,7 +492,7 @@ ROM_END
 ROM_START(vf5)
 	LINDBERGH_BIOS
 
-	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0438 / 317-0438-COM
+	ROM_REGION16_LE(0x4400, "pic", ROMREGION_ERASEFF) // PIC security 253-5508-0438 / 317-0438-COM
 	ROM_LOAD("317-0438-com.bin", 0, 0x2000, CRC(9aeb15d3) SHA1(405ddc44b2b40b72cfe2a081a0d5e43ceb9a380e))
 
 	DISK_REGION("dvd")
@@ -492,7 +502,7 @@ ROM_END
 ROM_START(abclimax)
 	LINDBERGH_BIOS
 
-	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0440 / 317-0440-COM
+	ROM_REGION16_LE(0x4400, "pic", ROMREGION_ERASEFF) // PIC security 253-5508-0440 / 317-0440-COM
 	ROM_LOAD("317-0440-com.bin", 0, 0x2000, CRC(8d09e717) SHA1(6b25982f7042541874115d33ea5d0c028140a962))
 
 	DISK_REGION("dvd")
@@ -502,7 +512,7 @@ ROM_END
 ROM_START(letsgoju)
 	LINDBERGH_BIOS
 
-	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0442 / 317-0442-COM
+	ROM_REGION16_LE(0x4400, "pic", ROMREGION_ERASEFF) // PIC security 253-5508-0442 / 317-0442-COM
 	ROM_LOAD("317-0442-com.bin", 0, 0x2000, CRC(b706efbb) SHA1(97c2b65e521113c5201f0b588fcb37a39148a637))
 
 	DISK_REGION("dvd")
@@ -512,7 +522,7 @@ ROM_END
 ROM_START(outr2sdx)
 	LINDBERGH_BIOS
 
-	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0452 / 317-0452-COM (to verify, may be the one for OutRun 2 Special Tours)
+	ROM_REGION16_LE(0x4400, "pic", ROMREGION_ERASEFF) // PIC security 253-5508-0452 / 317-0452-COM (to verify, may be the one for OutRun 2 Special Tours)
 	ROM_LOAD("317-0452-com.bin", 0, 0x2000, CRC(f5b7bb3f) SHA1(6b179b255b3d29e5ce61902eeae4da07177a2943))
 
 	DISK_REGION("dvd")
@@ -522,7 +532,7 @@ ROM_END
 ROM_START(psmash3)
 	LINDBERGH_BIOS
 
-	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0434 / 317-0434-COM
+	ROM_REGION16_LE(0x4400, "pic", ROMREGION_ERASEFF) // PIC security 253-5508-0434 / 317-0434-COM
 	ROM_LOAD("317-0434-com.bin", 0, 0x2000, CRC(70e3b202) SHA1(4925a288f937d54529abe6ef467c9c23674e47f0))
 
 	DISK_REGION("dvd")
@@ -532,7 +542,7 @@ ROM_END
 ROM_START(vtennis3)
 	LINDBERGH_BIOS
 
-	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0506 / 317-0506-JPN
+	ROM_REGION16_LE(0x4400, "pic", ROMREGION_ERASEFF) // PIC security 253-5508-0506 / 317-0506-JPN
 	ROM_LOAD("317-0506-jpn.bin", 0, 0x2000, NO_DUMP)
 
 	DISK_REGION("dvd")
@@ -542,7 +552,7 @@ ROM_END
 ROM_START(2spicy)
 	LINDBERGH_BIOS
 
-	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0491 / 317-0491-COM
+	ROM_REGION16_LE(0x4400, "pic", ROMREGION_ERASEFF) // PIC security 253-5508-0491 / 317-0491-COM
 	ROM_LOAD("317-0491-com.bin", 0, 0x2000, NO_DUMP)
 
 	DISK_REGION("dvd")
@@ -559,7 +569,7 @@ ROM_END
 ROM_START(initiad4)
 	LINDBERGH_BIOS
 
-	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0486E / 317-0486-COM
+	ROM_REGION16_LE(0x4400, "pic", ROMREGION_ERASEFF) // PIC security 253-5508-0486E / 317-0486-COM
 	ROM_LOAD("317-0486-com.bin", 0, 0x2000, NO_DUMP)
 
 	DISK_REGION("dvd")
@@ -569,7 +579,7 @@ ROM_END
 ROM_START(initiad4c)
 	LINDBERGH_BIOS
 
-	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0486E / 317-0486-COM
+	ROM_REGION16_LE(0x4400, "pic", ROMREGION_ERASEFF) // PIC security 253-5508-0486E / 317-0486-COM
 	ROM_LOAD("317-0486-com.bin", 0, 0x2000, NO_DUMP)
 
 	DISK_REGION("dvd")
@@ -579,7 +589,7 @@ ROM_END
 ROM_START(segartv)
 	LINDBERGH_BIOS
 
-	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0504 / 317-0504-COM
+	ROM_REGION16_LE(0x4400, "pic", ROMREGION_ERASEFF) // PIC security 253-5508-0504 / 317-0504-COM
 	ROM_LOAD("317-0504-com.bin", 0, 0x2000, CRC(ae7eaea8) SHA1(187e417e0b5543d95245364b547925426aa9f80e))
 
 	DISK_REGION("dvd")
@@ -589,7 +599,7 @@ ROM_END
 ROM_START(hotdex)
 	LINDBERGH_BIOS
 
-	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0550 / 317-0550-JPN
+	ROM_REGION16_LE(0x4400, "pic", ROMREGION_ERASEFF) // PIC security 253-5508-0550 / 317-0550-JPN
 	ROM_LOAD("317-0550-jpn.bin", 0, 0x2000, CRC(7e247f13) SHA1(d416b0e7742b32eb31443967e84ef93fc9e56dfb))
 
 	DISK_REGION("dvd")
@@ -599,7 +609,7 @@ ROM_END
 ROM_START(primevah)
 	LINDBERGH_BIOS
 
-	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0512 / 317-0512-COM
+	ROM_REGION16_LE(0x4400, "pic", ROMREGION_ERASEFF) // PIC security 253-5508-0512 / 317-0512-COM
 	ROM_LOAD("317-0512-com.bin", 0, 0x2000, NO_DUMP)
 
 	DISK_REGION("dvd")
@@ -609,7 +619,7 @@ ROM_END
 ROM_START(rambo)
 	LINDBERGH_BIOS
 
-	ROM_REGION(0x2000, ":pic", 0) // PIC security 253-5508-0540 / 317-0540-COM
+	ROM_REGION16_LE(0x4400, "pic", ROMREGION_ERASEFF) // PIC security 253-5508-0540 / 317-0540-COM
 	ROM_LOAD("317-0540-com.bin", 0, 0x2000, CRC(fd9a7bc0) SHA1(140b05573e25a41c1237c7a96c8e099efbfd75b8))
 
 	DISK_REGION("dvd")
@@ -619,7 +629,7 @@ ROM_END
 ROM_START(hummerxt)
 	LINDBERGH_BIOS
 
-	ROM_REGION(0x2000, ":pic", 0) // PIC security id unknown
+	ROM_REGION16_LE(0x4400, "pic", ROMREGION_ERASEFF) // PIC security id unknown
 	ROM_LOAD("hummerextreme.bin", 0, 0x2000, CRC(524bc69a) SHA1(c79b6bd384196c169e40e623f4c80c8b9eb11f81))
 
 	DISK_REGION("dvd")
@@ -636,22 +646,22 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(2005, lindbios,  0,        lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Sega Lindbergh BIOS",                      MACHINE_IS_BIOS_ROOT)
-GAME(2005, hotd4,     lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "The House of the Dead 4 (Export) (Rev B)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2005, hotd4a,    hotd4,    lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "The House of the Dead 4 (Export) (Rev A)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2005, vf5,       lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Virtua Fighter 5 (Export)",                MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2006, abclimax,  lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "After Burner Climax (Export)",             MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2006, letsgoju,  lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Let's Go Jungle (Export)",                 MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2006, outr2sdx,  lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "OutRun 2 SP SDX",                          MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2006, psmash3,   lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Power Smash 3 / Virtua Tennis 3 (Export)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2006, vtennis3,  lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Virtua Tennis 3 (Japan)",                  MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2007, 2spicy,    lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "2 Spicy",                                  MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2007, ghostsev,  lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Ghost Squad Evolution",                    MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2007, initiad4,  lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Initial D4 (Rev D)",                       MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2007, initiad4c, initiad4, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Initial D4 (Rev C)",                       MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2007, segartv,   lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Sega Race-TV (Export)",                    MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2008, hotdex,    lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "The House of the Dead EX (Japan)",         MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2008, primevah,  lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Primeval Hunt",                            MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2008, rambo,     lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Rambo (Export)",                           MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(2009, hummerxt,  lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Hummer Extreme",                           MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
-GAME(200?, lbvbiosu,  lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "VBIOS updater",                            MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2005, lindbios,  0,        lindbergh,     0, lindbergh_state, empty_init, ROT0, "Sega", "Sega Lindbergh BIOS",                      MACHINE_IS_BIOS_ROOT)
+GAME(2005, hotd4,     lindbios, lindbergh_pic, 0, lindbergh_state, empty_init, ROT0, "Sega", "The House of the Dead 4 (Export) (Rev B)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2005, hotd4a,    hotd4,    lindbergh_pic, 0, lindbergh_state, empty_init, ROT0, "Sega", "The House of the Dead 4 (Export) (Rev A)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2005, vf5,       lindbios, lindbergh_pic, 0, lindbergh_state, empty_init, ROT0, "Sega", "Virtua Fighter 5 (Export)",                MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2006, abclimax,  lindbios, lindbergh_pic, 0, lindbergh_state, empty_init, ROT0, "Sega", "After Burner Climax (Export)",             MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2006, letsgoju,  lindbios, lindbergh_pic, 0, lindbergh_state, empty_init, ROT0, "Sega", "Let's Go Jungle (Export)",                 MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2006, outr2sdx,  lindbios, lindbergh_pic, 0, lindbergh_state, empty_init, ROT0, "Sega", "OutRun 2 SP SDX",                          MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2006, psmash3,   lindbios, lindbergh_pic, 0, lindbergh_state, empty_init, ROT0, "Sega", "Power Smash 3 / Virtua Tennis 3 (Export)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2006, vtennis3,  lindbios, lindbergh_pic, 0, lindbergh_state, empty_init, ROT0, "Sega", "Virtua Tennis 3 (Japan)",                  MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2007, 2spicy,    lindbios, lindbergh_pic, 0, lindbergh_state, empty_init, ROT0, "Sega", "2 Spicy",                                  MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2007, ghostsev,  lindbios, lindbergh,     0, lindbergh_state, empty_init, ROT0, "Sega", "Ghost Squad Evolution",                    MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2007, initiad4,  lindbios, lindbergh_pic, 0, lindbergh_state, empty_init, ROT0, "Sega", "Initial D4 (Rev D)",                       MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2007, initiad4c, initiad4, lindbergh_pic, 0, lindbergh_state, empty_init, ROT0, "Sega", "Initial D4 (Rev C)",                       MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2007, segartv,   lindbios, lindbergh_pic, 0, lindbergh_state, empty_init, ROT0, "Sega", "Sega Race-TV (Export)",                    MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2008, hotdex,    lindbios, lindbergh_pic, 0, lindbergh_state, empty_init, ROT0, "Sega", "The House of the Dead EX (Japan)",         MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2008, primevah,  lindbios, lindbergh_pic, 0, lindbergh_state, empty_init, ROT0, "Sega", "Primeval Hunt",                            MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2008, rambo,     lindbios, lindbergh_pic, 0, lindbergh_state, empty_init, ROT0, "Sega", "Rambo (Export)",                           MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(2009, hummerxt,  lindbios, lindbergh_pic, 0, lindbergh_state, empty_init, ROT0, "Sega", "Hummer Extreme",                           MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)
+GAME(200?, lbvbiosu,  lindbios, lindbergh,     0, lindbergh_state, empty_init, ROT0, "Sega", "VBIOS updater",                            MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)

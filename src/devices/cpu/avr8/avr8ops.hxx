@@ -1110,7 +1110,16 @@ void avr8_base_device::op_ror(uint16_t op)
 
 void avr8_base_device::op_setf(uint16_t op)
 {
-	m_r[SREG] |= 1 << ((op >> 4) & 0x07);
+	int which_flag = ((op >> 4) & 0x07);
+
+	// special case: a SEI opcode, when reenabling interrupts,
+	// will delay the next interrupt by one instruction
+	if (which_flag == SREG_I && !(m_r[SREG] & SREG_MASK_I))
+	{
+		m_sei_delay_pending = true;
+	}
+
+	m_r[SREG] |= 1 << which_flag;
 }
 
 void avr8_base_device::op_clrf(uint16_t op)

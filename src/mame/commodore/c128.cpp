@@ -48,6 +48,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "u10"),
 		m_subcpu(*this, M8502_TAG),
+		m_irq(*this, "irq"),
 		m_nmi(*this, "nmi"),
 		m_mmu(*this, "u7"),
 		m_pla(*this, MOS8721_TAG),
@@ -77,6 +78,8 @@ public:
 		m_portswap(*this, "JOYSWAP"),
 		m_charom_jumper(*this, "CHAROM_A12"),
 		m_vdc_ram_64k(true),
+		m_lp_cia(true),
+		m_lp_joy(true),
 		m_z80en(0),
 		m_loram(1),
 		m_hiram(1),
@@ -95,7 +98,6 @@ public:
 		m_iec_data(1),
 		m_iec_retry_ba(-1),
 		m_iec_srq_out(1),
-		m_cass_rd(1),
 		m_iec_srq(1),
 		m_vic_k(0x07),
 		m_caps_lock(1),
@@ -104,6 +106,7 @@ public:
 
 	required_device<z80_device> m_maincpu;
 	required_device<m8502_device> m_subcpu;
+	required_device<input_merger_device> m_irq;
 	required_device<input_merger_device> m_nmi;
 	required_device<mos8722_device> m_mmu;
 	required_device<pla_device> m_pla;
@@ -133,12 +136,13 @@ public:
 	optional_ioport m_portswap;
 	required_ioport m_charom_jumper;
 	bool m_vdc_ram_64k;
+	bool m_lp_cia;
+	bool m_lp_joy;
 	DECLARE_INPUT_CHANGED_MEMBER(vdc_ram_changed);
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	inline void check_interrupts();
 	int read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0);
 	uint8_t read_memory(offs_t offset, offs_t vma, int ba, int aec, int z80io);
 	void write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io);
@@ -175,6 +179,7 @@ public:
 	void cia1_pa_w(uint8_t data);
 	uint8_t cia1_pb_r();
 	void cia1_pb_w(uint8_t data);
+	void joy1_trigger_w(int state);
 
 	uint8_t cia2_pa_r();
 	void cia2_pa_w(uint8_t data);
@@ -208,8 +213,6 @@ public:
 	void write_user_pb6(int state) { if (state) m_user_pb |= 64; else m_user_pb &= ~64; }
 	void write_user_pb7(int state) { if (state) m_user_pb |= 128; else m_user_pb &= ~128; }
 
-	void update_cia1_flag();
-	void cass_rd_w(int state) { m_cass_rd = state; update_cia1_flag(); }
 
 	// memory state
 	int m_z80en;
@@ -242,7 +245,6 @@ public:
 	int m_exp_dma;
 	int m_vic_ba;
 	int m_busack;
-	int m_cass_rd;
 	int m_iec_srq;
 
 	// keyboard state
@@ -312,25 +314,14 @@ enum
 
 QUICKLOAD_LOAD_MEMBER(c128_state::quickload_c128)
 {
-	return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
-}
-
-
-//**************************************************************************
-//  INTERRUPTS
-//**************************************************************************
-
-//-------------------------------------------------
-//  check_interrupts -
-//-------------------------------------------------
-
-inline void c128_state::check_interrupts()
-{
-	//int irq = m_cia1_irq || m_vic_irq || m_exp_irq;
-	//int nmi = m_cia2_irq || !m_restore || m_exp_nmi;
-	//int aec = m_exp_dma && m_z80_busack;
-	//int rdy = m_vic_aec && m_z80en && m_vic_ba;
-	//int busreq = !m_z80en || !(m_z80_busack && !aec)
+	int const loram = m_loram;
+	int const hiram = m_hiram;
+	m_loram = 0;
+	m_hiram = 0;
+	auto const result = general_cbm_loadsnap(image, m_subcpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress);
+	m_loram = loram;
+	m_hiram = hiram;
+	return result;
 }
 
 
@@ -1183,14 +1174,14 @@ static INPUT_PORTS_START( c128_es )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("+  { @ }") PORT_CODE(KEYCODE_MINUS)     PORT_CHAR('+')
 
 	PORT_MODIFY( "ROW6" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"↑  π  { ¨ }") PORT_CODE(KEYCODE_DEL)                               PORT_CHAR(0x2191,'^') PORT_CHAR(U'π')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2191  π  { ¨ }") PORT_CODE(KEYCODE_DEL)                               PORT_CHAR(0x2191,'^') PORT_CHAR(U'π')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("=  { ;  ] }") PORT_CODE(KEYCODE_BACKSLASH)                         PORT_CHAR('=')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(";  ]  { :  [ }") PORT_CODE(KEYCODE_QUOTE)                             PORT_CHAR(';') PORT_CHAR(']')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"*  { ´ }") PORT_CODE(KEYCODE_CLOSEBRACE)                        PORT_CHAR('*')
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"£  { =  £ }") PORT_CODE(KEYCODE_BACKSLASH2)                        PORT_CHAR(U'£')
 
 	PORT_MODIFY( "ROW7" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"←  { ¡ }") PORT_CODE(KEYCODE_TILDE)                             PORT_CHAR(0x2190)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2190  { ¡ }") PORT_CODE(KEYCODE_TILDE)                             PORT_CHAR(0x2190)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( c128_ch )
@@ -1218,14 +1209,14 @@ static INPUT_PORTS_START( c128_ch )
 
 	PORT_MODIFY( "ROW6" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("/  ?  { - }") PORT_CODE(KEYCODE_SLASH)                             PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"↑  π  { [  # }") PORT_CODE(KEYCODE_DEL)                               PORT_CHAR(0x2191,'^') PORT_CHAR(U'π')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2191  π  { [  # }") PORT_CODE(KEYCODE_DEL)                               PORT_CHAR(0x2191,'^') PORT_CHAR(U'π')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("=  { $  @ }") PORT_CODE(KEYCODE_BACKSLASH)                         PORT_CHAR('=')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8";  ]  { ä  à }") PORT_CODE(KEYCODE_QUOTE)                             PORT_CHAR(';') PORT_CHAR(']')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"*  { ¨  ! }") PORT_CODE(KEYCODE_CLOSEBRACE)                        PORT_CHAR('*')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"£  { ]  ↑ }") PORT_CODE(KEYCODE_BACKSLASH2)                        PORT_CHAR(U'£')
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"£  { ]  \u2191 }") PORT_CODE(KEYCODE_BACKSLASH2)                        PORT_CHAR(U'£')
 
 	PORT_MODIFY( "ROW7" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"←  { <  > }") PORT_CODE(KEYCODE_TILDE)                             PORT_CHAR(0x2190)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(u8"\u2190  { <  > }") PORT_CODE(KEYCODE_TILDE)                             PORT_CHAR(0x2190)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("1  !  { + }") PORT_CODE(KEYCODE_1)                                 PORT_CHAR('1') PORT_CHAR('!')
 INPUT_PORTS_END
 
@@ -1591,7 +1582,14 @@ void c128_state::cia1_pb_w(uint8_t data)
 
 	cur1->joy_w(data & 0x1f);
 
-	m_vic->lp_w(BIT(data, 4));
+	m_lp_cia = BIT(data, 4);
+	m_vic->lp_w(m_lp_cia && m_lp_joy);
+}
+
+void c128_state::joy1_trigger_w(int state)
+{
+	m_lp_joy = state;
+	m_vic->lp_w(m_lp_cia && m_lp_joy);
 }
 
 void c128_state::cia1_cnt_w(int state)
@@ -1757,11 +1755,6 @@ void c128_state::cpu_w(uint8_t data)
 //  CBM_IEC_INTERFACE( cbm_iec_intf )
 //-------------------------------------------------
 
-void c128_state::update_cia1_flag()
-{
-	m_cia1->flag_w(m_cass_rd & m_iec_srq);
-}
-
 inline void c128_state::update_iec()
 {
 	int fsdir = m_mmu->fsdir_r();
@@ -1798,7 +1791,6 @@ void c128_state::iec_srq_w(int state)
 {
 	m_iec_srq = state;
 	update_iec();
-	update_cia1_flag();
 }
 
 void c128_state::iec_data_w(int state)
@@ -1909,7 +1901,6 @@ void c128_state::machine_start()
 	save_item(NAME(m_exp_dma));
 	save_item(NAME(m_vic_ba));
 	save_item(NAME(m_busack));
-	save_item(NAME(m_cass_rd));
 	save_item(NAME(m_iec_srq));
 	save_item(NAME(m_vic_k));
 	save_item(NAME(m_caps_lock));
@@ -1917,6 +1908,8 @@ void c128_state::machine_start()
 	save_item(NAME(m_user_pa2));
 	save_item(NAME(m_user_pb));
 	save_item(NAME(m_vdc_ram_64k));
+	save_item(NAME(m_lp_cia));
+	save_item(NAME(m_lp_joy));
 }
 
 
@@ -1951,6 +1944,7 @@ void c128_state::softlists(machine_config &config, const char *filter)
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter(filter);
 	SOFTWARE_LIST(config, "flop_list_c64_orig").set_compatible("c64_flop_orig").set_filter(filter);
 	SOFTWARE_LIST(config, "flop_list_c64_misc").set_compatible("c64_flop_misc").set_filter(filter);
+	SOFTWARE_LIST(config, "quik_list").set_original("c64_quik").set_filter(filter);
 	SOFTWARE_LIST(config, "hdd_list").set_original("c64_hdd").set_filter(filter);
 	SOFTWARE_LIST(config, "sdcard_list").set_original("cbm_sd").set_filter(filter);
 	SOFTWARE_LIST(config, "cd_list").set_original("c64_cd").set_filter(filter);
@@ -1977,9 +1971,9 @@ void c128_state::ntsc(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &c128_state::m8502_mem);
 	config.set_perfect_quantum(m_subcpu);
 
-	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
-	irq.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	irq.output_handler().append_inputline(m_subcpu, m8502_device::IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_irq);
+	m_irq->output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_irq->output_handler().append_inputline(m_subcpu, m8502_device::IRQ_LINE);
 
 	INPUT_MERGER_ANY_HIGH(config, m_nmi);
 	m_nmi->output_handler().set_inputline(m_subcpu, m8502_device::NMI_LINE);
@@ -1999,7 +1993,7 @@ void c128_state::ntsc(machine_config &config)
 
 	MOS8564(config, m_vic, XTAL(14'318'181)*2/3.5);
 	m_vic->set_cpu(m_subcpu);
-	m_vic->irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
+	m_vic->irq_callback().set(m_irq, FUNC(input_merger_device::in_w<1>));
 	m_vic->ba_callback().set(FUNC(c128_state::vic_ba_w));
 	m_vic->k_callback().set(FUNC(c128_state::vic_k_w));
 	m_vic->set_screen(SCREEN_VIC_TAG);
@@ -2007,9 +2001,7 @@ void c128_state::ntsc(machine_config &config)
 	m_vic->set_addrmap(1, &c128_state::vic_colorram_map);
 
 	screen_device &screen_vic(SCREEN(config, SCREEN_VIC_TAG));
-	screen_vic.set_refresh_hz(VIC6567_VRETRACERATE);
-	screen_vic.set_size(VIC6567_COLUMNS, VIC6567_LINES);
-	screen_vic.set_visarea(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
+	screen_vic.set_raw(mos6566_device::VIC6567_CLOCK * 8, mos6566_device::VIC6567_COLUMNS, mos6566_device::VIC6567_FIRST_COLUMN, mos6566_device::VIC6567_FIRST_COLUMN + mos6566_device::VIC6567_VISIBLECOLUMNS, mos6566_device::VIC6567_LINES, 0, mos6566_device::VIC6567_VISIBLELINES);
 	screen_vic.set_screen_update(MOS8564_TAG, FUNC(mos8564_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", MOS8563_TAG, gfx_c128);
@@ -2033,7 +2025,7 @@ void c128_state::ntsc(machine_config &config)
 
 	MOS6526(config, m_cia1, XTAL(14'318'181)*2/3.5/8);
 	m_cia1->set_tod_clock(60);
-	m_cia1->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<0>));
+	m_cia1->irq_wr_callback().set(m_irq, FUNC(input_merger_device::in_w<0>));
 	m_cia1->cnt_wr_callback().set(FUNC(c128_state::cia1_cnt_w));
 	m_cia1->sp_wr_callback().set(FUNC(c128_state::cia1_sp_w));
 	m_cia1->pa_rd_callback().set(FUNC(c128_state::cia1_pa_r));
@@ -2052,15 +2044,19 @@ void c128_state::ntsc(machine_config &config)
 	m_cia2->pb_wr_callback().set(FUNC(c128_state::cia2_pb_w));
 	m_cia2->pc_wr_callback().set(m_user, FUNC(pet_user_port_device::write_8));
 
+	INPUT_MERGER_ALL_HIGH(config, "cia1_flag").output_handler().set(m_cia1, FUNC(mos6526_device::flag_w));
+
 	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, "c1530");
-	m_cassette->read_handler().set(FUNC(c128_state::cass_rd_w));
+	m_cassette->read_handler().set("cia1_flag", FUNC(input_merger_device::in_w<0>));
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
-	m_joy1->trigger_wr_callback().set(m_vic, FUNC(mos8564_device::lp_w));
+	m_joy1->trigger_wr_callback().set(FUNC(c128_state::joy1_trigger_w));
+	m_joy1->set_screen_tag(SCREEN_VIC_TAG);
+	m_joy1->set_lightpen_time_callback(m_vic, FUNC(mos6566_device::time_until_lightpen_pos));
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 
 	C64_EXPANSION_SLOT(config, m_exp, XTAL(14'318'181)*2/3.5/8, c64_expansion_cards, nullptr);
-	m_exp->irq_callback().set("irq", FUNC(input_merger_device::in_w<2>));
+	m_exp->irq_callback().set(m_irq, FUNC(input_merger_device::in_w<2>));
 	m_exp->nmi_callback().set(m_nmi, FUNC(input_merger_device::in_w<2>));
 	m_exp->reset_callback().set(FUNC(c128_state::exp_reset_w));
 	m_exp->cd_input_callback().set(FUNC(c128_state::exp_dma_cd_r));
@@ -2085,7 +2081,9 @@ void c128_state::ntsc(machine_config &config)
 	m_user->pl_handler().set(FUNC(c128_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c128_state::write_user_pa2));
 
-	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c128_state::quickload_c128));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY));
+	quickload.set_load_callback(FUNC(c128_state::quickload_c128));
+	quickload.set_interface("cbm_quik");
 
 	// software lists
 	softlists(config, "NTSC");
@@ -2107,6 +2105,7 @@ void c128_state::c128(machine_config &config)
 	ntsc(config);
 	cbm_iec_slot_device::add(config, m_iec, "c1571");
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
+	m_iec->srq_callback().append("cia1_flag", FUNC(input_merger_device::in_w<1>));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
 }
 
@@ -2121,6 +2120,7 @@ void c128_state::c128dcr(machine_config &config)
 	m_vdc->set_addrmap(0, &c128_state::vdc_videoram_map_64k);
 	cbm_iec_slot_device::add(config, m_iec, nullptr);
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
+	m_iec->srq_callback().append("cia1_flag", FUNC(input_merger_device::in_w<1>));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
 
 	CBM_IEC_SLOT(config.replace(), "iec8", 8, c128dcr_iec_devices, "c1571cr").set_fixed(true);
@@ -2136,6 +2136,7 @@ void c128_state::c128d81(machine_config &config)
 	ntsc(config);
 	cbm_iec_slot_device::add(config, m_iec, nullptr);
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
+	m_iec->srq_callback().append("cia1_flag", FUNC(input_merger_device::in_w<1>));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
 
 	CBM_IEC_SLOT(config.replace(), "iec8", 8, c128d81_iec_devices, "c1563").set_fixed(true);
@@ -2162,9 +2163,9 @@ void c128_state::pal(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &c128_state::m8502_mem);
 	config.set_perfect_quantum(m_subcpu);
 
-	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
-	irq.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	irq.output_handler().append_inputline(m_subcpu, m8502_device::IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_irq);
+	m_irq->output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_irq->output_handler().append_inputline(m_subcpu, m8502_device::IRQ_LINE);
 
 	INPUT_MERGER_ANY_HIGH(config, m_nmi);
 	m_nmi->output_handler().set_inputline(m_subcpu, m8502_device::NMI_LINE);
@@ -2184,7 +2185,7 @@ void c128_state::pal(machine_config &config)
 
 	mos8566_device &mos8566(MOS8566(config, MOS8566_TAG, XTAL(17'734'472)*2/4.5));
 	mos8566.set_cpu(M8502_TAG);
-	mos8566.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
+	mos8566.irq_callback().set(m_irq, FUNC(input_merger_device::in_w<1>));
 	mos8566.ba_callback().set(FUNC(c128_state::vic_ba_w));
 	mos8566.k_callback().set(FUNC(c128_state::vic_k_w));
 	mos8566.set_screen(SCREEN_VIC_TAG);
@@ -2192,9 +2193,7 @@ void c128_state::pal(machine_config &config)
 	mos8566.set_addrmap(1, &c128_state::vic_colorram_map);
 
 	screen_device &screen_vic(SCREEN(config, SCREEN_VIC_TAG));
-	screen_vic.set_refresh_hz(VIC6569_VRETRACERATE);
-	screen_vic.set_size(VIC6569_COLUMNS, VIC6569_LINES);
-	screen_vic.set_visarea(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);
+	screen_vic.set_raw(mos6566_device::VIC6569_CLOCK * 8, mos6566_device::VIC6569_COLUMNS, mos6566_device::VIC6569_FIRST_COLUMN, mos6566_device::VIC6569_FIRST_COLUMN + mos6566_device::VIC6569_VISIBLECOLUMNS, mos6566_device::VIC6569_LINES, mos6566_device::VIC6569_FIRST_DISP_LINE, mos6566_device::VIC6569_LAST_DISP_LINE + 1);
 	screen_vic.set_screen_update(MOS8566_TAG, FUNC(mos8566_device::screen_update));
 
 	GFXDECODE(config, "gfxdecode", MOS8563_TAG, gfx_c128);
@@ -2218,7 +2217,7 @@ void c128_state::pal(machine_config &config)
 
 	MOS6526(config, m_cia1, XTAL(17'734'472)*2/4.5/8);
 	m_cia1->set_tod_clock(50);
-	m_cia1->irq_wr_callback().set("irq", FUNC(input_merger_device::in_w<0>));
+	m_cia1->irq_wr_callback().set(m_irq, FUNC(input_merger_device::in_w<0>));
 	m_cia1->cnt_wr_callback().set(FUNC(c128_state::cia1_cnt_w));
 	m_cia1->sp_wr_callback().set(FUNC(c128_state::cia1_sp_w));
 	m_cia1->pa_rd_callback().set(FUNC(c128_state::cia1_pa_r));
@@ -2237,15 +2236,19 @@ void c128_state::pal(machine_config &config)
 	m_cia2->pb_wr_callback().set(FUNC(c128_state::cia2_pb_w));
 	m_cia2->pc_wr_callback().set(m_user, FUNC(pet_user_port_device::write_8));
 
+	INPUT_MERGER_ALL_HIGH(config, "cia1_flag").output_handler().set(m_cia1, FUNC(mos6526_device::flag_w));
+
 	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, "c1530");
-	m_cassette->read_handler().set(FUNC(c128_state::cass_rd_w));
+	m_cassette->read_handler().set("cia1_flag", FUNC(input_merger_device::in_w<0>));
 
 	VCS_CONTROL_PORT(config, m_joy1, vcs_control_port_devices, nullptr);
-	m_joy1->trigger_wr_callback().set(m_vic, FUNC(mos8566_device::lp_w));
+	m_joy1->trigger_wr_callback().set(FUNC(c128_state::joy1_trigger_w));
+	m_joy1->set_screen_tag(SCREEN_VIC_TAG);
+	m_joy1->set_lightpen_time_callback(m_vic, FUNC(mos6566_device::time_until_lightpen_pos));
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 
 	C64_EXPANSION_SLOT(config, m_exp, XTAL(17'734'472)*2/4.5/8, c64_expansion_cards, nullptr);
-	m_exp->irq_callback().set("irq", FUNC(input_merger_device::in_w<2>));
+	m_exp->irq_callback().set(m_irq, FUNC(input_merger_device::in_w<2>));
 	m_exp->nmi_callback().set(m_nmi, FUNC(input_merger_device::in_w<2>));
 	m_exp->reset_callback().set(FUNC(c128_state::exp_reset_w));
 	m_exp->cd_input_callback().set(FUNC(c128_state::exp_dma_cd_r));
@@ -2270,7 +2273,9 @@ void c128_state::pal(machine_config &config)
 	m_user->pl_handler().set(FUNC(c128_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c128_state::write_user_pa2));
 
-	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c128_state::quickload_c128));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY));
+	quickload.set_load_callback(FUNC(c128_state::quickload_c128));
+	quickload.set_interface("cbm_quik");
 
 	// software list
 	softlists(config, "PAL");
@@ -2292,6 +2297,7 @@ void c128_state::c128pal(machine_config &config)
 	pal(config);
 	cbm_iec_slot_device::add(config, m_iec, "c1571");
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
+	m_iec->srq_callback().append("cia1_flag", FUNC(input_merger_device::in_w<1>));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
 }
 
@@ -2306,6 +2312,7 @@ void c128_state::c128dcrp(machine_config &config)
 	m_vdc->set_addrmap(0, &c128_state::vdc_videoram_map_64k);
 	cbm_iec_slot_device::add(config, m_iec, nullptr);
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
+	m_iec->srq_callback().append("cia1_flag", FUNC(input_merger_device::in_w<1>));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
 
 	CBM_IEC_SLOT(config.replace(), "iec8", 8, c128dcr_iec_devices, "c1571cr").set_fixed(true);
@@ -2620,11 +2627,7 @@ ROM_START( c128_ch )
 	ROM_LOAD( "251913-01.u32", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )
 	ROM_LOAD( "318018-04.u33", 0x4000, 0x4000, CRC(9f9c355b) SHA1(d53a7884404f7d18ebd60dd3080c8f8d71067441) )
 	ROM_LOAD( "318019-04.u34", 0x8000, 0x4000, CRC(6e2c91a7) SHA1(c4fb4a714e48a7bf6c28659de0302183a0e0d6c0) )
-	ROM_DEFAULT_BIOS("325172-02")
-	ROM_SYSTEM_BIOS( 0, "325172-01", "325172-01" )
-	ROMX_LOAD( "325172-01.u35", 0xc000, 0x4000, CRC(d311dab1) SHA1(98c34e0dec9f52d7862b56bb287d2573eb3f6364), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "325172-02", "325172-02" )
-	ROMX_LOAD( "325172-02.u35", 0xc000, 0x4000, CRC(f4a5b644) SHA1(6068c96b5067bdea1e8911f37079481bae7b1ef5), ROM_BIOS(1) )
+	ROM_LOAD( "325172-01.u35", 0xc000, 0x4000, CRC(d311dab1) SHA1(98c34e0dec9f52d7862b56bb287d2573eb3f6364) )
 
 	ROM_REGION( 0x2000, "charom", 0 )
 	ROM_LOAD( "325173-01d.u18", 0x0000, 0x2000, CRC(b7821651) SHA1(c995aeb892becc312389f745d030397e1c26c532) )

@@ -207,7 +207,7 @@ private:
 
 	u8 ppi_sys_portb_r();
 
-	void draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top, bool lower);
+	void draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top, int topline, int botline, bool lower);
 
 //  uint8_t winram_r();
 //  void winram_w(uint8_t data);

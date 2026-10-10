@@ -42,7 +42,7 @@ public:
 
 protected:
 	// construction/destruction
-	necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits);
+	necdsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t abits, uint32_t dbits, uint32_t drambits);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -66,9 +66,7 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	// inline data
-	const address_space_config m_program_config, m_data_config;
-
-	uint16_t dataRAM[2048];
+	const address_space_config m_program_config, m_data_config, m_dataram_config;
 
 private:
 	struct Flag
@@ -87,57 +85,37 @@ private:
 		}
 	};
 
-	struct Status
-	{
-		bool rqm, usf1, usf0, drs, dma, drc, soc, sic, ei, p1, p0;
-
-		operator unsigned() const
-		{
-			return (rqm << 15) | (usf1 << 14) | (usf0 << 13) | (drs << 12)
-				| (dma << 11) | (drc  << 10) | (soc  <<  9) | (sic <<  8)
-				| (ei  <<  7) | (p1   <<  1) | (p0   <<  0);
-		}
-
-		unsigned operator=(unsigned d)
-		{
-			rqm = d & 0x8000; usf1 = d & 0x4000; usf0 = d & 0x2000; drs = d & 0x1000;
-			dma = d & 0x0800; drc  = d & 0x0400; soc  = d & 0x0200; sic = d & 0x0100;
-			ei  = d & 0x0080; p1   = d & 0x0002; p0   = d & 0x0001;
-			return d;
-		}
-	};
-
-	struct Regs
-	{
-		uint16_t pc;          //program counter
-		uint16_t stack[16];   //LIFO
-		uint16_t rp;          //ROM pointer
-		uint16_t dp;          //data pointer
-		uint8_t  sp;          //stack pointer
-		int16_t  k;
-		int16_t  l;
-		int16_t  m;
-		int16_t  n;
-		int16_t  a;         //accumulator
-		int16_t  b;         //accumulator
-		Flag  flaga;
-		Flag  flagb;
-		uint16_t tr;        //temporary register
-		uint16_t trb;       //temporary register
-		Status sr;        //status register
-		uint16_t dr;        //data register
-		uint16_t si;
-		uint16_t so;
-		uint16_t idb;
-		bool siack;         // Serial in ACK
-		bool soack;         // Serial out ACK
-	} regs;
+	uint16_t m_pc;          //program counter
+	uint16_t m_stack[16];   //LIFO
+	uint16_t m_rp;          //ROM pointer
+	uint16_t m_dp;          //data pointer
+	uint8_t  m_sp;          //stack pointer
+	int16_t  m_k;
+	int16_t  m_l;
+	int16_t  m_m;
+	int16_t  m_n;
+	int16_t  m_a;         //accumulator
+	int16_t  m_b;         //accumulator
+	Flag     m_flaga;
+	Flag     m_flagb;
+	uint16_t m_tr;        //temporary register
+	uint16_t m_trb;       //temporary register
+	uint16_t m_sr;        //status register
+	uint16_t m_dr;        //data register
+	uint16_t m_si;
+	uint16_t m_so;
+	uint16_t m_idb;
+	bool     m_siack;     // Serial in ACK
+	bool     m_soack;     // Serial out ACK
 
 	void exec_op(uint32_t opcode);
 	void exec_rt(uint32_t opcode);
 	void exec_jp(uint32_t opcode);
 	void exec_ld(uint32_t opcode);
 
+protected:
+	uint16_t m_drammask;
+private:
 	int m_icount;
 	bool m_irq; // old irq line state, for detecting rising edges.
 	// m_irq_firing: if an irq has fired; 0 = not fired or has already finished firing
@@ -147,6 +125,8 @@ private:
 	memory_access<14, 2, -2, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<14, 2, -2, ENDIANNESS_BIG>::specific m_program;
 	memory_access<12, 1, -1, ENDIANNESS_BIG>::specific m_data;
+protected:
+	memory_access<11, 1, -1, ENDIANNESS_BIG>::specific m_dataram;
 
 protected:
 	devcb_read_line     m_in_int_cb;
@@ -160,6 +140,8 @@ protected:
 	//devcb_write8      m_out_so_cb;
 	//devcb_write_line  m_out_sorq_cb;
 	//devcb_write_line  m_out_drq_cb;
+
+	void dataram_map(address_map &map) ATTR_COLD;
 };
 
 class upd7725_device : public necdsp_device
@@ -175,10 +157,12 @@ public:
 	// construction/destruction
 	upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint16_t dataram_r(uint16_t addr) { return dataRAM[addr & 0x07ff]; }
+	uint16_t dataram_r(uint16_t addr) { return m_dataram.read_word(addr & m_drammask); }
 	void dataram_w(uint16_t addr, uint16_t data, uint16_t mem_mask = uint16_t(~0))
 	{
-		COMBINE_DATA(&dataRAM[addr & 0x07ff]);
+		uint16_t temp = (m_dataram.read_word(addr & m_drammask) & (~mem_mask));
+		temp |= data & mem_mask;
+		m_dataram.write_word(addr & m_drammask, temp);
 	}
 };
 
@@ -193,27 +177,44 @@ DECLARE_DEVICE_TYPE(UPD96050, upd96050_device)
 // registers
 enum
 {
-	UPD7725_PC = 1,
-	UPD7725_RP,
-	UPD7725_DP,
-	UPD7725_K,
-	UPD7725_L,
-	UPD7725_M,
-	UPD7725_N,
-	UPD7725_A,
-	UPD7725_B,
-	UPD7725_FLAGA,
-	UPD7725_FLAGB,
-	UPD7725_SR,
-	UPD7725_DR,
-	UPD7725_SP,
-	UPD7725_TR,
-	UPD7725_TRB,
-	UPD7725_SI,
-	UPD7725_SO,
-	UPD7725_IDB,
-	UPD7725_SIACK,
-	UPD7725_SOACK
+	D7725_PC = 1,
+	D7725_RP,
+	D7725_DP,
+	D7725_K,
+	D7725_L,
+	D7725_M,
+	D7725_N,
+	D7725_A,
+	D7725_B,
+	D7725_FLAGA,
+	D7725_FLAGB,
+	D7725_SR,
+	D7725_DR,
+	D7725_SP,
+	D7725_TR,
+	D7725_TRB,
+	D7725_SI,
+	D7725_SO,
+	D7725_IDB,
+	D7725_SIACK,
+	D7725_SOACK
 };
+
+// sr bitmasks
+enum
+{
+	D7725SR_P0 =  0x0001,
+	D7725SR_P1 =  0x0002,
+	D7725SR_EI =  0x0080,
+	D7725SR_SIC = 0x0100,
+	D7725SR_SOC = 0x0200,
+	D7725SR_DRC = 0x0400,
+	D7725SR_DMA = 0x0800,
+	D7725SR_DRS = 0x1000,
+	D7725SR_USF0= 0x2000,
+	D7725SR_USF1= 0x4000,
+	D7725SR_RQM = 0x8000
+};
+
 
 #endif // MAME_CPU_UPD7725_UPD7725_H

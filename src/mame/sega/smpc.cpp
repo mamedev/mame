@@ -410,7 +410,7 @@ void smpc_hle_device::command_register_w(uint8_t data)
 
 			m_ckchg_tick = 5;
 
-			m_cmd_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y, 0));
+			m_cmd_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().bottom(), 0));
 
 			break;
 		case 0x10:
@@ -528,7 +528,7 @@ TIMER_CALLBACK_MEMBER(smpc_hle_device::handle_command)
 			}
 
 			if (m_ckchg_tick >= 1)
-				m_cmd_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y, 0));
+				m_cmd_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().bottom(), 0));
 			else
 			{
 				// send an unconditional NMI to Master SH2

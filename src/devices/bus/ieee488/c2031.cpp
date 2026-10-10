@@ -483,6 +483,7 @@ void c2031_device::device_start()
 	save_item(NAME(m_atna));
 	save_item(NAME(m_via0_irq));
 	save_item(NAME(m_via1_irq));
+	save_item(NAME(m_ifc));
 }
 
 

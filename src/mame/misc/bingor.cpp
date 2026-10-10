@@ -1145,11 +1145,11 @@ ROM_START( vip2000 ) // Strings: (c) 2004 Paloma Elektronik. V24.
 	ROM_REGION( 0x08000, "slavecpu", 0 )
 	ROM_LOAD( "slave190991.bin", 0x0000, 0x8000, CRC(67feb297) SHA1(442b62e62b614bda2d277e4b827cb89677d6fbce) )
 
-	ROM_REGION( 0x00800, "pic1", 0 )
-	ROM_LOAD( "pic16f627_a.bin", 0x000, 0x800, NO_DUMP )
+	ROM_REGION16_LE( 0x4300, "pic1", 0 )
+	ROM_LOAD( "pic16f627_a.bin", 0x0000, 0x4300, NO_DUMP )
 
-	ROM_REGION( 0x00800, "pic2", 0 )
-	ROM_LOAD( "pic16f627_b.bin", 0x000, 0x800, NO_DUMP )
+	ROM_REGION16_LE( 0x4300, "pic2", 0 )
+	ROM_LOAD( "pic16f627_b.bin", 0x0000, 0x4300, NO_DUMP )
 
 	ROM_REGION( 0x20000, "eeprom", 0 )
 	ROM_LOAD( "24c04a.bin", 0x000, 0x200, CRC(4e231420) SHA1(24dcfc90ef9903692030be7de0f04fc9370021fd) )
@@ -1175,11 +1175,11 @@ ROM_START( vip2000a ) // Strings: Awrbell Euro 2003. (c) 2001 Paloma Elektronik.
 	ROM_REGION( 0x08000, "slavecpu", 0 )
 	ROM_LOAD( "slave_19.09.01.c34", 0x0000, 0x8000, CRC(67feb297) SHA1(442b62e62b614bda2d277e4b827cb89677d6fbce) )
 
-	ROM_REGION( 0x00800, "pic1", 0 )
-	ROM_LOAD( "pic16f627_a.bin", 0x000, 0x800, NO_DUMP )
+	ROM_REGION16_LE( 0x4300, "pic1", 0 )
+	ROM_LOAD( "pic16f627_a.bin", 0x0000, 0x4300, NO_DUMP )
 
-	ROM_REGION( 0x00800, "pic2", 0 )
-	ROM_LOAD( "pic16f627_b.bin", 0x000, 0x800, NO_DUMP )
+	ROM_REGION16_LE( 0x4300, "pic2", 0 )
+	ROM_LOAD( "pic16f627_b.bin", 0x0000, 0x4300, NO_DUMP )
 
 	ROM_REGION( 0x20000, "eeprom", 0 )
 	ROM_LOAD( "st24c04.bin", 0x000, 0x200, CRC(752a960c) SHA1(de13943ea2015a0a57b5cc30a4ec4737b6e41fd0) )
@@ -1205,11 +1205,11 @@ ROM_START( vip2000b ) // Strings: Awrbell Euro 2003. (c) 2001 Paloma Elektronik.
 	ROM_REGION( 0x08000, "slavecpu", 0 )
 	ROM_LOAD( "slave_19.09.01.ic34", 0x0000, 0x8000, CRC(67feb297) SHA1(442b62e62b614bda2d277e4b827cb89677d6fbce) )
 
-	ROM_REGION( 0x00800, "pic1", 0 )
-	ROM_LOAD( "pic16f627_a.bin", 0x000, 0x800, NO_DUMP )
+	ROM_REGION16_LE( 0x4300, "pic1", 0 )
+	ROM_LOAD( "pic16f627_a.bin", 0x0000, 0x4300, NO_DUMP )
 
-	ROM_REGION( 0x00800, "pic2", 0 )
-	ROM_LOAD( "pic16f627_b.bin", 0x000, 0x800, NO_DUMP )
+	ROM_REGION16_LE( 0x4300, "pic2", 0 )
+	ROM_LOAD( "pic16f627_b.bin", 0x0000, 0x4300, NO_DUMP )
 
 	ROM_REGION( 0x20000, "eeprom", 0 )
 	ROM_LOAD( "24c04a.bin", 0x000, 0x200, CRC(2da36c6a) SHA1(002a6e35fb21d3722d40b6c463bda95fa8a9160f) )

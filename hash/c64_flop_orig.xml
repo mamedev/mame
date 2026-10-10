@@ -45,14 +45,11 @@ Fails to LOAD "$",8
 		</part>
 	</software>
 
-	<software name="bionicco" supported="no">
-		<description>Bionic Commando</description>
+	<software name="bionicco">
+		<description>Bionic Commando (NTSC)</description>
 		<year>1988</year>
 		<publisher>Capcom</publisher>
-		<notes><![CDATA[
-Loads but game does not start
-]]></notes>
-		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="bionic_commando[capcom_1988].g64" size="333744" crc="b216989d" sha1="f1feb2dcb2af5af56051187ffda495c92e967302"/>
@@ -203,14 +200,10 @@ Loads but game does not start
 		</part>
 	</software>
 
-	<software name="rambo2n" cloneof="rambo2" supported="no">
+	<software name="rambo2n" cloneof="rambo2">
 		<description>Rambo: First Blood Part II (NTSC)</description>
 		<year>1985</year>
 		<publisher>Thunder Mountain</publisher>
-		<notes><![CDATA[
-LOAD "0:*",8,1
-Hangs on loading transition between trademarks and title
-]]></notes>
 		<info name="protection" value="signature" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 
@@ -242,7 +235,7 @@ Hangs on loading transition between trademarks and title
 		</part>
 	</software>
 
-	<software name="rambo3n" cloneof="rambo3" supported="no">
+	<software name="rambo3n" cloneof="rambo3">
 		<description>Rambo III (NTSC)</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
@@ -284,31 +277,6 @@ LOAD "STRIP POKER",8
 		</part>
 	</software>
 
-	<software name="terramex" supported="no">
-		<description>Terramex</description>
-		<year>1988</year>
-		<publisher>Grand Slam</publisher>
-		<notes><![CDATA[
-LOAD "*",8,1
-Crashes after changing to side B
-]]></notes>
-		<info name="protection" value="custom_dos" />
-		<sharedfeat name="compatibility" value="PAL"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="333744">
-				<rom name="terramex_s1[grandslam_1988].g64" size="333744" crc="cc38f968" sha1="985eb00dcda7cb2499120b1801ca18df5cf2827e"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="333744">
-				<rom name="terramex_s2[grandslam_1988].g64" size="333744" crc="78408a59" sha1="f23fdea7292a95b076cc0a23c81e2e214e42129a"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="toutrun" supported="partial">
 		<description>Turbo Out Run</description>
 		<year>1989</year>
@@ -333,12 +301,12 @@ Graphics issues
 		</part>
 	</software>
 
-	<software name="10thfrm" supported="no">
+	<software name="10thfrm">
 		<description>10th Frame</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="usage" value="Requires dongle in cassette port (or just press PLAY on tape)" />
 		<sharedfeat name="compatibility" value="PAL"/>
+		<sharedfeat name="requirement" value="tape:access"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="319232">
@@ -546,7 +514,7 @@ Graphics issues
 
 	<software name="jacknip">
 		<description>Jack the Nipper</description>
-		<year>198?</year>
+		<year>1986</year>
 		<publisher>Gremlin Graphics</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -572,7 +540,7 @@ Graphics issues
 
 	<software name="liverpol">
 		<description>Liverpool</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -590,7 +558,6 @@ Graphics issues
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="319232">
 				<rom name="MaskII_s0.g64" size="319232" crc="48d3e2c0" sha1="6440d807e8ebeb95d4257b5867875fbcb0906e5c"/>
 			</dataarea>
@@ -610,23 +577,10 @@ Graphics issues
 		</part>
 	</software>
 
-	<software name="nemesis">
-		<description>Nemesis the Warlock</description>
-		<year>1987</year>
-		<publisher>Martech</publisher>
-		<sharedfeat name="compatibility" value="PAL"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="311302">
-				<rom name="NemesisTheWarlock_s0.g64" size="311302" crc="99df1184" sha1="f8d78893f20a194ef6543d195e12b2ac4407f628" status="baddump"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="psi5trad">
 		<description>PSI-5 Trading Company</description>
 		<year>1985</year>
-		<publisher>U.S. Gold / Accolade</publisher>
+		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -659,7 +613,7 @@ Graphics issues
 	<software name="rackem">
 		<description>Rack 'em</description>
 		<year>1988</year>
-		<publisher>Electronic Arts / Accolade</publisher>
+		<publisher>Electronic Arts</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -689,7 +643,6 @@ Graphics issues
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="319232">
 				<rom name="StreetHassle_s0.g64" size="319232" crc="9a0967c0" sha1="4ce5d59772ee911b8d058c2fa700a87649376d52"/>
 			</dataarea>
@@ -703,7 +656,6 @@ Graphics issues
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="319232">
 				<rom name="Tarzan_s0.g64" size="319232" crc="077bafbd" sha1="72f01b8179c595ad20c656572d346a3dca36255f"/>
 			</dataarea>
@@ -713,7 +665,7 @@ Graphics issues
 	<software name="gamessum">
 		<description>The Games: Summer Edition</description>
 		<year>1988</year>
-		<publisher>U.S. Gold / Epyx</publisher>
+		<publisher>U.S. Gold</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -784,7 +736,7 @@ Graphics issues
 
 	<software name="wcboxmgr">
 		<description>World Championship Boxing Manager</description>
-		<year>19??</year>
+		<year>1990</year>
 		<publisher>Goliath Games</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -894,7 +846,7 @@ Graphics issues
 
 	<software name="lpactpak">
 		<description>Light Phaser Action Pack</description>
-		<year>198?</year>
+		<year>1990</year>
 		<publisher>Virgin Mastertronic</publisher>
 		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
 
@@ -1013,7 +965,7 @@ Graphics issues
 
 	<software name="4greatg3">
 		<description>Four Great Games Volume 3</description>
-		<year>198?</year>
+		<year>1988</year>
 		<publisher>MicroValue</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -1147,7 +1099,7 @@ Graphics issues
 
 	<software name="flexidraw4">
 		<description>Flexidraw 4.0</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Inkwell Systems</publisher>
 		<info name="usage" value="Requires Inkwell 184-C light pen (inkwell184c) in joystick port 1"/>
 		
@@ -1305,7 +1257,6 @@ Graphics issues
 		<sharedfeat name="compatibility" value="PAL,NTSC"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="303372">
 				<rom name="EasyFinanceI_s0.g64" size="303372" crc="685f65d1" sha1="7d96138456925eed8b12099883488e1f3516a749"/>
 			</dataarea>
@@ -1347,12 +1298,11 @@ Graphics issues
 
 	<software name="laserbas">
 		<description>Laser BASIC</description>
-		<year>19??</year>
+		<year>1985</year>
 		<publisher>Ocean</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="319232">
 				<rom name="LaserBASIC_s0.g64" size="319232" crc="6d2aa409" sha1="71f337e2e5d77f592bb45541fff3c44caf36506e"/>
 			</dataarea>
@@ -1361,12 +1311,11 @@ Graphics issues
 
 	<software name="minioff2">
 		<description>Mini Office II (v1.2E)</description>
-		<year>19??</year>
+		<year>1987</year>
 		<publisher>Database Software</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="319232">
 				<rom name="MiniOfficeII_s0.g64" size="319232" crc="e723caaf" sha1="4a64e3e63b5b19446ef5e464f575620b5a72e688"/>
 			</dataarea>
@@ -1401,12 +1350,11 @@ Graphics issues
 
 	<software name="teksti64">
 		<description>Teksti 64 (Finland)</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>PCI-Data</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="279582">
 				<rom name="Teksti64_s0.g64" size="279582" crc="5615c3fe" sha1="f35ee0e5be443e051f9fb8a786336feebe5daacf"/>
 			</dataarea>
@@ -1849,7 +1797,7 @@ Graphics issues
 
 	<software name="cagedart">
 		<description>Caged Artist's FB and DX Editor/Librarian</description>
-		<year>198?</year>
+		<year>1986</year>
 		<publisher>Dr T</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 

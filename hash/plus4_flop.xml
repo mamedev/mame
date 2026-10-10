@@ -61,13 +61,41 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=AVp515qhGP8 -->
 	<software name="hdnwndrs" supported="no">
 		<description>Hidden Wonders</description>
 		<year>2026</year>
 		<publisher>Desire</publisher>
+		<info name="usage" value="Requires a C1541."/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="hidden_wonders.d64" size="174848" crc="ae113f13" sha1="7c1182931d6f92a5abd207aef44efeb7f4325656"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=NpHyrDOa1-s -->
+	<software name="r2pl" supported="no">
+		<description>Return to Promised Land</description>
+		<year>2026</year>
+		<publisher>Section 31</publisher>
+		<info name="usage" value="Requires a SID card."/>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="r2pl-a.d64" size="174848" crc="be96df26" sha1="fa69286c37ba1fb16bedac90ef899d8331f9fb0c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="r2pl-b.d64" size="174848" crc="0ad51081" sha1="09d095dfc53a50f439866e409253d5686a05173d"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side C"/>
+			<dataarea name="flop" size="174848">
+				<rom name="r2pl-c.d64" size="174848" crc="f8186477" sha1="d057a58e77a177e5655f41bc4a32f42b583657db"/>
 			</dataarea>
 		</part>
 	</software>

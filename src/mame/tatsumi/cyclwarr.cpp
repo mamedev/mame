@@ -386,9 +386,7 @@ void bigfight_state::video_start()
 
 void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *src, const uint16_t* scrollx, const uint16_t* scrolly, const uint16_t layer_page_size, bool is_road, int hi_priority)
 {
-	rectangle clip;
-	clip.min_x = cliprect.min_x;
-	clip.max_x = cliprect.max_x;
+	rectangle clip(cliprect);
 	// TODO: both always enabled when this occurs
 	bool rowscroll_enable = (scrollx[0] & 0x1000) == 0;
 	bool colscroll_enable = (scrollx[0] & 0x2000) == 0;
@@ -396,22 +394,22 @@ void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const 
 	// TODO: Actually scrolly registers 0xf0 to 0xff are used (can split the tilemap furthermore?)
 	uint16_t page_select = scrolly[0xff];
 
-	for (int y=cliprect.min_y; y<=cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		clip.min_y = clip.max_y = y;
+		clip.sety(y, y);
 		int y_base = rowscroll_enable ? y : 0;
 		int x_base = colscroll_enable ? y : 0;
-		int src_y = (scrolly[y_base] & 0x7ff);
-		int src_x = (scrollx[x_base] & 0x7ff);
+		int src_y = scrolly[y_base] & 0x7ff;
+		int src_x = scrollx[x_base] & 0x7ff;
 		// apparently if this is on disables wraparound target
 		int page_disable = scrolly[y_base] & 0x800;
 		int cur_page = src_y + y;
 
 		// special handling for cycle warriors road: it reads in scrolly table bits 15-13 an
 		// additional tile color bank and per scanline.
-		if(is_road == true)
+		if (is_road)
 		{
-			if(scrolly[y_base] & 0x8000)
+			if (scrolly[y_base] & 0x8000)
 			{
 				m_road_color_bank = (scrolly[y_base] >> 13) & 3;
 				// road mode disables page wraparound
@@ -420,7 +418,7 @@ void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const 
 			else
 				m_road_color_bank = 0;
 
-			if(m_road_color_bank != m_prev_road_bank)
+			if (m_road_color_bank != m_prev_road_bank)
 			{
 				m_prev_road_bank = m_road_color_bank;
 				src->mark_all_dirty();
@@ -431,11 +429,11 @@ void cyclwarr_state::draw_bg(screen_device &screen, bitmap_rgb32 &bitmap, const 
 		// cfr. Cycle Warriors scrolling text (ranking, ending), backgrounds when uphill,
 		// Big Fight vertical scrolling in the morning Funnel stage (not the one chosen at start),
 		// also Big Fight text garbage in the stage after Mevella joins you (forgot the name)
-		if((cur_page - page_select) >= layer_page_size && page_disable == 0)
+		if ((cur_page - page_select) >= layer_page_size && page_disable == 0)
 			src_y -= layer_page_size;
 
-		src->set_scrollx(0,src_x);
-		src->set_scrolly(0,src_y);
+		src->set_scrollx(0, src_x);
+		src->set_scrolly(0, src_y);
 		src->draw(screen, bitmap, clip, TILEMAP_DRAW_CATEGORY(hi_priority), 0);
 	}
 }

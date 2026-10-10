@@ -315,30 +315,30 @@ void taitof2_state::taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_i
 			y_index = 0;
 		}
 
-		if (sx < clip.min_x)
+		if (sx < clip.left())
 		{
 			// clip left
-			int pixels = clip.min_x - sx;
+			int pixels = clip.left() - sx;
 			sx += pixels;
 			x_index_base += pixels * dx;
 		}
-		if (sy < clip.min_y)
+		if (sy < clip.top())
 		{
 			// clip top
-			int pixels = clip.min_y - sy;
+			int pixels = clip.top() - sy;
 			sy += pixels;
 			y_index += pixels * dy;
 		}
-		if (ex > clip.max_x + 1)
+		if (ex > clip.right() + 1)
 		{
 			// clip right
-			int pixels = ex - clip.max_x - 1;
+			int pixels = ex - clip.right() - 1;
 			ex -= pixels;
 		}
-		if (ey > clip.max_y + 1)
+		if (ey > clip.bottom() + 1)
 		{
 			// clip bottom
-			int pixels = ey - clip.max_y - 1;
+			int pixels = ey - clip.bottom() - 1;
 			ey -= pixels;
 		}
 

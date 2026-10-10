@@ -974,9 +974,9 @@ uint32_t kc85_4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	uint8_t const *const pixel_ram = m_display_video_ram;
 	uint8_t const *const colour_ram = pixel_ram + 0x04000;
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = 0; x< (KC85_SCREEN_WIDTH >> 3); x++)
+		for (int x = 0; x < (KC85_SCREEN_WIDTH >> 3); x++)
 		{
 			uint16_t const offset = y | (x<<8);
 
@@ -1007,9 +1007,9 @@ uint32_t kc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	uint8_t const *const pixel_ram = &m_video_ram[0];
 	uint8_t const *const colour_ram = &m_video_ram[0x2800];
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = 0; x< (KC85_SCREEN_WIDTH >> 3); x++)
+		for (int x = 0; x < (KC85_SCREEN_WIDTH >> 3); x++)
 		{
 			int pixel_offset,colour_offset;
 

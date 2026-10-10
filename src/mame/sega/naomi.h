@@ -26,6 +26,7 @@
 #include "gunsense.h"
 #include "segashiobd.h"
 #include "sound/aica.h"
+#include "315_6289.h"
 #include "dc.h"
 
 
@@ -72,7 +73,6 @@ protected:
 	optional_ioport_array<5> m_p1_kb;
 	optional_ioport_array<5> m_p2_kb;
 
-	DECLARE_MACHINE_RESET(naomi);
 	void external_reset(int state);
 
 	uint16_t naomi_g2bus_r(offs_t offset);
@@ -98,9 +98,13 @@ public:
 		m_pvr2_texture_ram(*this, "textureram2"),
 		m_pvr2_framebuffer_ram(*this, "frameram2"),
 		m_elan_ram(*this, "elan_ram"),
-		m_powervr2_slave(*this, "powervr2_slave") { }
+		m_powervr2_slave(*this, "powervr2_slave"),
+		m_elan(*this, "elan"),
+		m_clxb_sysctrl_regs{ },
+		m_broadcasting(false) { }
 
 	void naomi2_base(machine_config &config);
+	void naomi2(machine_config &config);
 	void naomi2m2(machine_config &config);
 	void naomi2gd(machine_config &config);
 	void naomi2m1(machine_config &config);
@@ -108,18 +112,42 @@ public:
 
 	void init_naomi2();
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	virtual int dc_compute_interrupt_level() override;
+
 private:
 	required_shared_ptr<uint64_t> m_pvr2_texture_ram;
 	required_shared_ptr<uint64_t> m_pvr2_framebuffer_ram;
 	required_shared_ptr<uint64_t> m_elan_ram;
 	required_device<powervr2_device> m_powervr2_slave;
+	required_device<sega_315_6289_device> m_elan;
+
+	// the second CLX2 has a system bus block of its own
+	uint32_t m_clxb_sysctrl_regs[0x200/4];
+
+	bool m_broadcasting;
+	bitmap_rgb32 m_clxb_bitmap;
 
 	void naomi2_map(address_map &map) ATTR_COLD;
 
-	void both_pvr2_ta_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	powervr2_device &clx(int chip) { return chip ? *m_powervr2_slave : *m_powervr2; }
 
-	uint32_t elan_regs_r(offs_t offset);
-	void elan_regs_w(offs_t offset, uint32_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	template <int Area> void vram_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	template <int Chip> void ta_fifo_poly_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	template <int Chip> void ta_fifo_yuv_w(uint8_t data);
+	template <int Chip> void ta_texture_directpath_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+
+	uint64_t clxb_sysctrl_r(offs_t offset, uint64_t mem_mask = ~0);
+	void clxb_sysctrl_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void both_sysctrl_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	void clxb_pvr_irq(uint8_t data);
+
+	uint32_t both_pvr2_ta_r(address_space &space, offs_t offset, uint32_t mem_mask = ~0);
+	void both_pvr2_ta_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 };
 
 #endif // MAME_SEGA_NAOMI_H

@@ -492,6 +492,7 @@ void c1541_device_base::device_add_mconfig(machine_config &config)
 	connector.option_add("525ssqd", ALPS_3255190X);
 	connector.set_default_option("525ssqd");
 	connector.set_fixed(true);
+	connector.set_media_change_time(attotime::from_msec(100));
 	connector.set_formats(c1541_device_base::floppy_formats);
 	connector.enable_sound(true);
 }

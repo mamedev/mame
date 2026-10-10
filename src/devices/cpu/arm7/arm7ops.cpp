@@ -534,7 +534,18 @@ void arm7_cpu_device::HandleMemSingle(uint32_t insn)
 				if (rd == eR15)
 				{
 					if (MODE32)
-						R15 = data - 4;
+					{
+						if ((data & 1) && m_archRev >= 5)
+						{
+							// ARMv5: a load to PC interworks
+							set_cpsr(GET_CPSR | T_MASK);
+							R15 = (data & ~1) - 4;
+						}
+						else
+						{
+							R15 = (data & ~3) - 4;
+						}
+					}
 					else
 					{
 						// Data East DE156: an unaligned target resumes at the next word boundary (World Cup Volleyball '95)
@@ -544,11 +555,6 @@ void arm7_cpu_device::HandleMemSingle(uint32_t insn)
 					}
 					// LDR, PC takes 2S + 2N + 1I (5 total cycles)
 					ARM7_ICOUNT -= 2;
-					if ((data & 1) && m_archRev >= 5)
-					{
-						set_cpsr(GET_CPSR | T_MASK);
-						R15--;
-					}
 				}
 				else
 				{
@@ -978,6 +984,9 @@ void arm7_cpu_device::HandlePSRTransfer(uint32_t insn)
 				}
 			}
 
+			if (m_archRev >= 6 && (insn & 0x00040000))
+				newval = (newval & ~0x000f0000U) | (val & 0x000f0000);
+
 			// status flags can be modified regardless of mode
 			if (insn & 0x00080000)
 			{
@@ -1176,7 +1185,7 @@ void arm7_cpu_device::HandleALU(uint32_t insn)
 		{
 			if (MODE32)
 			{
-				R15 = rd;
+				R15 = rd & ~3;  // ARM state: bits 1:0 of a result written to PC are ignored (ALU writes interwork only from ARMv7)
 			}
 			else
 			{
@@ -1445,7 +1454,7 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 			{
 				uint32_t const data = READ32(addr & ~3);
 				if (!m_pendingAbtD && MODE32)
-					R15 = data - 4;     // arm7ops_89 adds 4
+					R15 = (data & ~3) - 4;     // arm7ops_89 adds 4
 			}
 			else
 			{
@@ -1538,12 +1547,15 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 						write_r15_psr26(R15, true);
 					}
 				}
-				else
-					if ((R15 & 1) && m_archRev >= 5)
-					{
-						set_cpsr(GET_CPSR | T_MASK);
-						R15--;
-					}
+				else if ((R15 & 1) && m_archRev >= 5)
+				{
+					set_cpsr(GET_CPSR | T_MASK);
+					R15--;
+				}
+				else if (MODE32)
+				{
+					R15 &= ~3;
+				}
 				// LDM PC - takes 2 extra cycles
 				ARM7_ICOUNT -= 2;
 			}
@@ -1611,12 +1623,15 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 						write_r15_psr26(R15, true);
 					}
 				}
-				else
-					if ((R15 & 1) && m_archRev >= 5)
-					{
-						set_cpsr(GET_CPSR | T_MASK);
-						R15--;
-					}
+				else if ((R15 & 1) && m_archRev >= 5)
+				{
+					set_cpsr(GET_CPSR | T_MASK);
+					R15--;
+				}
+				else if (MODE32)
+				{
+					R15 &= ~3;
+				}
 				// LDM PC - takes 2 extra cycles
 				ARM7_ICOUNT -= 2;
 			}
@@ -1742,8 +1757,13 @@ void arm7_cpu_device::arm9ops_1(uint32_t insn)
 	/* Change processor state (CPS) */
 	if ((insn & 0x00f10020) == 0x00000000)
 	{
-		// unsupported (armv6 onwards only)
-		arm9ops_undef(insn);
+		if (m_archRev >= 6)
+		{
+			armv6_cps(insn);
+			R15 += 4;
+		}
+		else
+			arm9ops_undef(insn);
 	}
 	else if ((insn & 0x00ff00f0) == 0x00010000) /* set endianness (SETEND) */
 	{
@@ -1767,6 +1787,13 @@ void arm7_cpu_device::arm9ops_1(uint32_t insn)
 
 void arm7_cpu_device::arm9ops_57(uint32_t insn)
 {
+	if (insn == 0xf57ff01f && (m_archFlags & ARCHFLAG_K))
+	{
+		m_exclusive_valid = false;
+		R15 += 4;
+		return;
+	}
+
 	// Cache Preload (PLD) for ARMv5TE+.  We don't (yet?) emulate the cache.
 	if ((insn & 0x0070f000) == 0x0050f000)
 	{
@@ -1780,20 +1807,49 @@ void arm7_cpu_device::arm9ops_57(uint32_t insn)
 
 void arm7_cpu_device::arm9ops_89(uint32_t insn)
 {
-	/* Save Return State (SRS) */
-	if ((insn & 0x005f0f00) == 0x004d0500)
+	const bool srs = (insn & 0x005fffe0) == 0x004d0500;
+	const bool rfe = (insn & 0x0050ffff) == 0x00100a00;
+	if (m_archRev < 6 || GET_MODE == eARM7_MODE_USER || (!srs && !rfe))
 	{
-		// unsupported (armv6 onwards only)
 		arm9ops_undef(insn);
+		return;
 	}
-	else if ((insn & 0x00500f00) == 0x00100a00) /* Return From Exception (RFE) */
+	const unsigned mode = insn & 0x1f;
+	const auto valid_mode = [](unsigned mode) { return mode == 0x10 || mode == 0x11 || mode == 0x12 || mode == 0x13 || mode == 0x17 || mode == 0x1b || mode == 0x1f; };
+	if (srs && (!valid_mode(mode) || GET_MODE == eARM7_MODE_SYS))
 	{
-		// unsupported (armv6 onwards only)
 		arm9ops_undef(insn);
+		return;
+	}
+	const unsigned rn = (insn >> 16) & 15;
+	const uint32_t base = srs ? m_r[sRegisterTable[mode & 15][13]] : GetRegister(rn);
+	const bool up = BIT(insn, 23);
+	uint32_t addr = base + (up ? 0 : -8) + ((BIT(insn, 24) == up) ? 4 : 0);
+	if ((addr & 3) && (m_control & ((1U << 22) | 2)))
+	{
+		m_faultStatus[0] = 1 | (srs ? 0x800 : 0);
+		m_faultAddress = addr;
+		m_pendingAbtD = true;
+		update_irq_state();
+		R15 += 4;
+		return;
+	}
+	if (srs)
+	{
+		WRITE32(addr, GetRegister(14));
+		if (!m_pendingAbtD) WRITE32(addr + 4, GetRegister(SPSR));
+		if (BIT(insn, 21) && !m_pendingAbtD)
+			m_r[sRegisterTable[mode & 15][13]] = base + (up ? 8 : -8);
+		R15 += 4;
 	}
 	else
 	{
-		arm9ops_undef(insn);
+		const uint32_t pc = READ32(addr);
+		const uint32_t psr = m_pendingAbtD ? 0 : READ32(addr + 4);
+		if (m_pendingAbtD) { R15 += 4; return; }
+		if (BIT(insn, 21)) SetRegister(rn, base + (up ? 8 : -8));
+		set_cpsr(psr);
+		R15 = pc & ((psr & T_MASK) ? ~1U : ~3U);
 	}
 }
 
@@ -1807,6 +1863,11 @@ void arm7_cpu_device::arm9ops_ab(uint32_t insn)
 void arm7_cpu_device::arm9ops_c(uint32_t insn)
 {
 	/* Additional coprocessor double register transfer (MCRR2/MRRC2) */
+	if ((insn & 0x0fe00f00) == 0x0c400f00 && handle_coprocessor(insn))
+	{
+		R15 += 4;
+		return;
+	}
 	if ((insn & 0x00e00000) == 0x00400000)
 	{
 		// unsupported
@@ -1828,6 +1889,25 @@ void arm7_cpu_device::arm9ops_e(uint32_t insn)
 
 void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 {
+	if ((insn & 0x0ff000f0) == 0x00400090) // UMAAL
+	{
+		const unsigned lo = (insn >> 12) & 15, hi = (insn >> 16) & 15;
+		const unsigned rm = insn & 15, rs = (insn >> 8) & 15;
+		if (m_archRev < 6 || lo == 15 || hi == 15 || rm == 15 || rs == 15 || lo == hi)
+		{ arm7ops_undef_conditional(insn); return; }
+		const uint64_t result = uint64_t(GetRegister(rm)) * GetRegister(rs) + GetRegister(lo) + uint64_t(GetRegister(hi));
+		SetRegister(lo, uint32_t(result));
+		SetRegister(hi, uint32_t(result >> 32));
+		R15 += 4;
+		return;
+	}
+	// Exclusive encodings must be decoded before the older SWP decoder.
+	if ((insn & 0x0f800ff0) == 0x01800f90)
+	{
+		armv6_exclusive(insn);
+		return;
+	}
+
 //case 0:
 //case 1:
 //case 2:
@@ -2151,6 +2231,11 @@ void arm7_cpu_device::arm7ops_4567(uint32_t insn) /* Data Transfer - Single Data
 {
 	if ((insn & INSN_I) && (insn & 0x10))
 	{
+		if (m_archRev >= 6)
+		{
+			armv6_media(insn);
+			return;
+		}
 		// the ARMv6 media instructions don't exist on ARMv5 and earlier
 		LOGMASKED(LOG_OPS, "%08x: undefined instruction %08X in the single data transfer space\n", R15, insn);
 		R15 += 4;
@@ -2176,10 +2261,13 @@ void arm7_cpu_device::arm7ops_ab(uint32_t insn) /* Branch or Branch & Link */
 
 void arm7_cpu_device::arm7ops_cd(uint32_t insn) /* Co-Processor Data Transfer */
 {
+	if (handle_coprocessor(insn)) { R15 += 4; return; }
+
 	if ((insn & 0x0fe00000) == 0x0c400000)  // MCRR/MRRC - v5TE: cond 1100 010L Rn Rd cp_num opcode CRm
 	{
-		// The only coprocessor in the tree with a double-register transfer is the XScale DSP (CP0: MAR/MRA),
-		// which is not emulated yet - ignore those like the rest of its CP0 accesses; everything else traps.
+		// Device-specific transfers (ARM1176 CP15/VFP) were handled above.
+		// Ignore the unimplemented XScale DSP transfers like its other CP0 accesses;
+		// unsupported transfers on all other coprocessors trap.
 		if ((m_archFlags & ARCHFLAG_XSCALE) && ((insn >> 8) & 0xf) == 0)
 		{
 			LOGMASKED(LOG_OPS, "%08x: XScale %s (DSP Coprocessor 0 not yet emulated)\n", R15, (insn & 0x00100000) ? "MRA" : "MAR");
@@ -2202,6 +2290,8 @@ void arm7_cpu_device::arm7ops_cd(uint32_t insn) /* Co-Processor Data Transfer */
 
 void arm7_cpu_device::arm7ops_e(uint32_t insn) /* Co-Processor Data Operation or Register Transfer */
 {
+	if (handle_coprocessor(insn)) { R15 += 4; return; }
+
 	if (insn & 0x10)
 		HandleCoProcRT(insn);
 	else
@@ -2218,3 +2308,5 @@ void arm7_cpu_device::arm7ops_f(uint32_t insn) /* Software Interrupt */
 	arm7_check_irq_state();
 	//couldn't find any cycle counts for SWI
 }
+
+#include "arm7v6.hxx"

@@ -284,7 +284,7 @@ uint32_t astrocde_state::screen_update_astrocde(screen_device &screen, bitmap_in
 		sparklebase = (screen.frame_number() * (uint64_t)(width * height)) % RNG_PERIOD;
 
 	/* iterate over scanlines */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t *dest = &bitmap.pix(y);
 		int effy = mame_vpos_to_astrocade_vpos(y);
@@ -352,7 +352,7 @@ uint32_t astrocde_state::screen_update_astrocde(screen_device &screen, bitmap_in
 uint32_t astrocde_state::screen_update_profpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* iterate over scanlines */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		int effy = mame_vpos_to_astrocade_vpos(y);
 		uint16_t *dest = &bitmap.pix(y);

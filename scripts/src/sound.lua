@@ -1041,15 +1041,6 @@ if SOUNDS["SID6581"]~=null or SOUNDS["SID8580"] then
 	files {
 		MAME_DIR .. "src/devices/sound/mos6581.cpp",
 		MAME_DIR .. "src/devices/sound/mos6581.h",
-		MAME_DIR .. "src/devices/sound/sid.cpp",
-		MAME_DIR .. "src/devices/sound/sid.h",
-		MAME_DIR .. "src/devices/sound/sidenvel.cpp",
-		MAME_DIR .. "src/devices/sound/sidenvel.h",
-		MAME_DIR .. "src/devices/sound/sidvoice.cpp",
-		MAME_DIR .. "src/devices/sound/sidvoice.h",
-		MAME_DIR .. "src/devices/sound/side6581.h",
-		MAME_DIR .. "src/devices/sound/sidw6581.h",
-		MAME_DIR .. "src/devices/sound/sidw8580.h",
 	}
 end
 

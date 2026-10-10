@@ -414,6 +414,7 @@ void segajw_state::segajw(machine_config &config)
 
 	hd63484_device &hd63484(HD63484(config, "hd63484", 8000000));
 	hd63484.set_addrmap(0, &segajw_state::segajw_hd63484_map); // unknown clock
+	hd63484.set_auto_configure_screen(false);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

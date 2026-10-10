@@ -40,6 +40,8 @@ struct mz_poly_extra_data
 	bool            depth_test_enable = false;
 	bool            depth_write_enable = false;
 	uint32_t        blend = 0;
+	bool            mk4_v17 = false;
+	bool            mk4_depth = false;
 	uint8_t         (*get_texel)(const void *, int, int, int);
 };
 
@@ -137,6 +139,7 @@ private:
 	int zeus_fifo_process(const uint32_t *data, int numwords);
 	void zeus_draw_model(uint32_t texdata, bool logit);
 	uint16_t zeus_vertex_intensity(uint32_t packed_normal);
+	uint32_t zeus_mk4_v17_intensity(uint32_t packed_normal, uint32_t texdata, bool long_format, int64_t rounded_z);
 
 	void log_fifo_command(const uint32_t *data, int numwords, const char *suffix);
 	void log_waveram(uint32_t length_and_base);

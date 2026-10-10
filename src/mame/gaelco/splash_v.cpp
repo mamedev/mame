@@ -78,11 +78,11 @@ void splash_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void splash_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int sy = cliprect.min_y; sy <= cliprect.max_y; sy++)
+	for (int sy = cliprect.top(); sy <= cliprect.bottom(); sy++)
 	{
 		const int count = (sy & 0xff) << 9;
 		uint16_t *const dst = &bitmap.pix(sy);
-		for (int sx = cliprect.min_x; sx <= cliprect.max_x; sx++)
+		for (int sx = cliprect.left(); sx <= cliprect.right(); sx++)
 		{
 			int color = m_pixelram[count + ((sx + 9) & 0x1ff)] & 0xff;
 			dst[sx] = 0x300 + color;
@@ -131,11 +131,11 @@ void roldfrog_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect
 		colxor = 0x55;
 	}
 
-	for (int sy = cliprect.min_y; sy <= cliprect.max_y; sy++)
+	for (int sy = cliprect.top(); sy <= cliprect.bottom(); sy++)
 	{
 		const int count = (sy & 0xff) << 9;
 		uint16_t *const dst = &bitmap.pix(sy);
-		for (int sx = cliprect.min_x; sx <= cliprect.max_x; sx++)
+		for (int sx = cliprect.left(); sx <= cliprect.right(); sx++)
 		{
 			int color = m_pixelram[count + ((sx + 9) & 0x1ff)] & 0xff;
 
