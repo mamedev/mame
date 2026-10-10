@@ -1601,7 +1601,7 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		break;
 
 	case oC8:
-		if (op & 0x08)
+		if (BIT(op, 3))
 		{
 			buf = s_reg8[op & 0x07];
 		}
@@ -1694,7 +1694,7 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		break;
 
 	case oD8:
-		if (op & 0x08)
+		if (BIT(op, 3))
 		{
 			buf = s_reg16[op & 0x07];
 		}
@@ -1788,7 +1788,7 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		break;
 
 	case M_E8:
-		if (op & 0x08)
+		if (BIT(op, 3))
 		{
 			buf = s_reg32[op & 0x07];
 		}

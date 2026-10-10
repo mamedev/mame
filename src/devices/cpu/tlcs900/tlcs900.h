@@ -43,6 +43,23 @@ enum
 };
 
 
+/* Storage locations that are not registers.  m_reg1 and m_reg2 hold one of
+   these values, or the selector byte of a register in the encoding that
+   get_reg8/get_reg16/get_reg32 accept; values below 0x100 always select a
+   register. */
+enum e_regsel : uint16_t
+{
+	regsel_sr = 0x100,  /* status register - F is its low byte */
+	regsel_f2,          /* alternate flag register F' */
+	regsel_intnest,     /* interrupt nesting count */
+	regsel_dmam0, regsel_dmam1, regsel_dmam2, regsel_dmam3,
+	regsel_dmac0, regsel_dmac1, regsel_dmac2, regsel_dmac3,
+	regsel_dmas0, regsel_dmas1, regsel_dmas2, regsel_dmas3,
+	regsel_dmad0, regsel_dmad1, regsel_dmad2, regsel_dmad3,
+	regsel_dummy         /* illegal/unknown register references */
+};
+
+
 class tlcs900_device : public cpu_device
 {
 public:
@@ -131,9 +148,15 @@ protected:
 	PAIR    m_ea1, m_ea2;
 	PAIR    m_imm1, m_imm2;
 	int m_cycles;
-	uint8_t   *m_p1_reg8, *m_p2_reg8;
-	uint16_t  *m_p1_reg16, *m_p2_reg16;
-	uint32_t  *m_p1_reg32, *m_p2_reg32;
+
+	/* Storage locations of the two instruction operands.  Each holds either
+	   the selector byte for a register, in the encoding that get_reg8,
+	   get_reg16 and get_reg32 accept - the views that reg8, reg16 and reg32
+	   derive from it all address the same register - or one of the e_regsel
+	   values for the locations that are not registers (SR, F', the DMA
+	   control registers, INTNEST and the dummy location). */
+	uint16_t m_reg1;
+	uint16_t m_reg2;
 
 	int m_halted;
 	int m_icount;
@@ -163,27 +186,27 @@ protected:
 	static const tlcs900inst s_mnemonic_e8[256];
 	static const tlcs900inst s_mnemonic_f0[256];
 	static const tlcs900inst s_mnemonic[256];
-	const tlcs900inst *m_mnemonic_80;
-	const tlcs900inst *m_mnemonic_88;
-	const tlcs900inst *m_mnemonic_90;
-	const tlcs900inst *m_mnemonic_98;
-	const tlcs900inst *m_mnemonic_a0;
-	const tlcs900inst *m_mnemonic_b0;
-	const tlcs900inst *m_mnemonic_b8;
-	const tlcs900inst *m_mnemonic_c0;
-	const tlcs900inst *m_mnemonic_c8;
-	const tlcs900inst *m_mnemonic_d0;
-	const tlcs900inst *m_mnemonic_d8;
-	const tlcs900inst *m_mnemonic_e0;
-	const tlcs900inst *m_mnemonic_e8;
-	const tlcs900inst *m_mnemonic_f0;
-	const tlcs900inst *m_mnemonic;
+	const tlcs900inst (*m_mnemonic_80)[256];
+	const tlcs900inst (*m_mnemonic_88)[256];
+	const tlcs900inst (*m_mnemonic_90)[256];
+	const tlcs900inst (*m_mnemonic_98)[256];
+	const tlcs900inst (*m_mnemonic_a0)[256];
+	const tlcs900inst (*m_mnemonic_b0)[256];
+	const tlcs900inst (*m_mnemonic_b8)[256];
+	const tlcs900inst (*m_mnemonic_c0)[256];
+	const tlcs900inst (*m_mnemonic_c8)[256];
+	const tlcs900inst (*m_mnemonic_d0)[256];
+	const tlcs900inst (*m_mnemonic_d8)[256];
+	const tlcs900inst (*m_mnemonic_e0)[256];
+	const tlcs900inst (*m_mnemonic_e8)[256];
+	const tlcs900inst (*m_mnemonic_f0)[256];
+	const tlcs900inst (*m_mnemonic)[256];
 
 	inline uint8_t RDOP();
 	/* Bump INTNEST.  Called where a device pushes the SR/PC frame that op_RETI
 	   will later unwind.  NMI counts, because it pushes and unwinds the same way;
 	   SWI/TRAP do not, because they need not return through RETI. */
-	void tlcs900_intnest_accept() { if (m_intnest < 0xffff) m_intnest++; }
+	void tlcs900_intnest_accept() { if (m_intnest < 0xFFFF) m_intnest++; }
 
 	virtual void tlcs900_check_hdma() = 0;
 	virtual void tlcs900_check_irqs() = 0;
@@ -205,67 +228,39 @@ protected:
 	virtual int tlcs900_djnz_true_cycles() const { return 4; }
 	virtual int tlcs900_shift_cycles(uint8_t n) const { return 2 * n; }
 
-	int condition_true(uint8_t cond);
-	uint8_t *get_reg8_current(uint8_t reg);
-	uint16_t *get_reg16_current(uint8_t reg);
-	uint32_t *get_reg32_current(uint8_t reg);
-	PAIR *get_reg(uint8_t reg);
-	uint8_t *get_reg8(uint8_t reg);
-	uint16_t *get_reg16(uint8_t reg);
-	uint32_t *get_reg32(uint8_t reg);
-	void parity8(uint8_t a);
-	void parity16(uint16_t a);
-	void parity32(uint32_t a);
-	uint8_t adc8(uint8_t a, uint8_t b);
-	uint16_t adc16(uint16_t a, uint16_t b);
-	uint32_t adc32(uint32_t a, uint32_t b);
-	uint8_t add8(uint8_t a, uint8_t b);
-	uint16_t add16(uint16_t a, uint16_t b);
-	uint32_t add32(uint32_t a, uint32_t b);
-	uint8_t sbc8(uint8_t a, uint8_t b);
-	uint16_t sbc16(uint16_t a, uint16_t b);
-	uint32_t sbc32(uint32_t a, uint32_t b);
-	uint8_t sub8(uint8_t a, uint8_t b);
-	uint16_t sub16(uint16_t a, uint16_t b);
-	uint32_t sub32(uint32_t a, uint32_t b);
-	uint8_t and8(uint8_t a, uint8_t b);
-	uint16_t and16(uint16_t a, uint16_t b);
-	uint32_t and32(uint32_t a, uint32_t b);
-	uint8_t or8(uint8_t a, uint8_t b);
-	uint16_t or16(uint16_t a, uint16_t b);
-	uint32_t or32(uint32_t a, uint32_t b);
-	uint8_t xor8(uint8_t a, uint8_t b);
-	uint16_t xor16(uint16_t a, uint16_t b);
-	uint32_t xor32(uint32_t a, uint32_t b);
-	void ldcf8(uint8_t a, uint8_t b);
-	void ldcf16(uint8_t a, uint16_t b);
-	void andcf8(uint8_t a, uint8_t b);
-	void andcf16(uint8_t a, uint16_t b);
-	void orcf8(uint8_t a, uint8_t b);
-	void orcf16(uint8_t a, uint16_t b);
-	void xorcf8(uint8_t a, uint8_t b);
-	void xorcf16(uint8_t a, uint16_t b);
-	uint8_t rl8(uint8_t a, uint8_t s);
-	uint16_t rl16(uint16_t a, uint8_t s);
-	uint32_t rl32(uint32_t a, uint8_t s);
-	uint8_t rlc8(uint8_t a, uint8_t s);
-	uint16_t rlc16(uint16_t a, uint8_t s);
-	uint32_t rlc32(uint32_t a, uint8_t s);
-	uint8_t rr8(uint8_t a, uint8_t s);
-	uint16_t rr16(uint16_t a, uint8_t s);
-	uint32_t rr32(uint32_t a, uint8_t s);
-	uint8_t rrc8(uint8_t a, uint8_t s);
-	uint16_t rrc16(uint16_t a, uint8_t s);
-	uint32_t rrc32(uint32_t a, uint8_t s);
-	uint8_t sla8(uint8_t a, uint8_t s);
-	uint16_t sla16(uint16_t a, uint8_t s);
-	uint32_t sla32(uint32_t a, uint8_t s);
-	uint8_t sra8(uint8_t a, uint8_t s);
-	uint16_t sra16(uint16_t a, uint8_t s);
-	uint32_t sra32(uint32_t a, uint8_t s);
-	uint8_t srl8(uint8_t a, uint8_t s);
-	uint16_t srl16(uint16_t a, uint8_t s);
-	uint32_t srl32(uint32_t a, uint8_t s);
+	bool condition_true(uint8_t cond);
+	uint32_t &get_reg32_current(uint8_t reg);
+	PAIR &get_reg(uint8_t reg);
+	uint8_t &get_reg8(uint8_t reg);
+	uint16_t &get_reg16(uint8_t reg);
+	uint32_t &get_reg32(uint8_t reg);
+	uint8_t get_reg8_current_sel(uint8_t reg);
+	uint8_t get_reg16_current_sel(uint8_t reg);
+	uint8_t get_reg32_current_sel(uint8_t reg);
+	uint8_t &reg8(uint16_t sel);
+	uint16_t &reg16(uint16_t sel);
+	uint32_t &reg32(uint16_t sel);
+	template <typename T> void parity(T a);
+	template <typename T> T adc(T a, T b);
+	template <typename T> T add(T a, T b);
+	template <typename T> T sbc(T a, T b);
+	template <typename T> T sub(T a, T b);
+	template <typename T> T and_(T a, T b);
+	template <typename T> T or_(T a, T b);
+	template <typename T> T xor_(T a, T b);
+	template <typename T> void ldcf(uint8_t a, T b);
+	template <typename T> void andcf(uint8_t a, T b);
+	template <typename T> void orcf(uint8_t a, T b);
+	template <typename T> void xorcf(uint8_t a, T b);
+	template <typename T> T rl(T a, uint8_t s);
+	template <typename T> T rlc(T a, uint8_t s);
+	template <typename T> T rr(T a, uint8_t s);
+	template <typename T> T rrc(T a, uint8_t s);
+	template <typename T> T sla(T a, uint8_t s);
+	template <typename T> T sra(T a, uint8_t s);
+	template <typename T> T srl(T a, uint8_t s);
+	template <typename T, int Direction, bool Repeat> void ldxx();
+	template <typename T, int Direction> void cpx();
 	uint16_t div8(uint16_t a, uint8_t b);
 	uint32_t div16(uint32_t a, uint16_t b);
 	uint16_t divs8(int16_t a, int8_t b);
@@ -635,7 +630,8 @@ protected:
 	void op_XORCFWIR();
 	void op_XORCFWRR();
 	void op_ZCF();
-	void prepare_operands(const tlcs900inst *inst);
+	void prepare_operands(const tlcs900inst &inst);
+	void execute_op(const tlcs900inst (&mnemonic)[256]);
 	void op_80();
 	void op_88();
 	void op_90();

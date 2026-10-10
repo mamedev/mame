@@ -14,46 +14,48 @@ TODO:
 #include "tlcs900.h"
 #include "dasm900.h"
 
+#include <algorithm>
+
 
 tlcs900_device::tlcs900_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_am8_16(0),
-	m_mnemonic_80(s_mnemonic_80),
-	m_mnemonic_88(s_mnemonic_88),
-	m_mnemonic_90(s_mnemonic_90),
-	m_mnemonic_98(s_mnemonic_98),
-	m_mnemonic_a0(s_mnemonic_a0),
-	m_mnemonic_b0(s_mnemonic_b0),
-	m_mnemonic_b8(s_mnemonic_b8),
-	m_mnemonic_c0(s_mnemonic_c0),
-	m_mnemonic_c8(s_mnemonic_c8),
-	m_mnemonic_d0(s_mnemonic_d0),
-	m_mnemonic_d8(s_mnemonic_d8),
-	m_mnemonic_e0(s_mnemonic_e0),
-	m_mnemonic_e8(s_mnemonic_e8),
-	m_mnemonic_f0(s_mnemonic_f0),
-	m_mnemonic(s_mnemonic)
+	m_mnemonic_80(&s_mnemonic_80),
+	m_mnemonic_88(&s_mnemonic_88),
+	m_mnemonic_90(&s_mnemonic_90),
+	m_mnemonic_98(&s_mnemonic_98),
+	m_mnemonic_a0(&s_mnemonic_a0),
+	m_mnemonic_b0(&s_mnemonic_b0),
+	m_mnemonic_b8(&s_mnemonic_b8),
+	m_mnemonic_c0(&s_mnemonic_c0),
+	m_mnemonic_c8(&s_mnemonic_c8),
+	m_mnemonic_d0(&s_mnemonic_d0),
+	m_mnemonic_d8(&s_mnemonic_d8),
+	m_mnemonic_e0(&s_mnemonic_e0),
+	m_mnemonic_e8(&s_mnemonic_e8),
+	m_mnemonic_f0(&s_mnemonic_f0),
+	m_mnemonic(&s_mnemonic)
 {
 }
 
 tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	tlcs900_device(mconfig, type, tag, owner, clock)
 {
-	m_mnemonic_80 = s_mnemonic_80;
-	m_mnemonic_88 = s_mnemonic_88;
-	m_mnemonic_90 = s_mnemonic_90;
-	m_mnemonic_98 = s_mnemonic_98;
-	m_mnemonic_a0 = s_mnemonic_a0;
-	m_mnemonic_b0 = s_mnemonic_b0;
-	m_mnemonic_b8 = s_mnemonic_b8;
-	m_mnemonic_c0 = s_mnemonic_c0;
-	m_mnemonic_c8 = s_mnemonic_c8;
-	m_mnemonic_d0 = s_mnemonic_d0;
-	m_mnemonic_d8 = s_mnemonic_d8;
-	m_mnemonic_e0 = s_mnemonic_e0;
-	m_mnemonic_e8 = s_mnemonic_e8;
-	m_mnemonic_f0 = s_mnemonic_f0;
-	m_mnemonic = s_mnemonic;
+	m_mnemonic_80 = &s_mnemonic_80;
+	m_mnemonic_88 = &s_mnemonic_88;
+	m_mnemonic_90 = &s_mnemonic_90;
+	m_mnemonic_98 = &s_mnemonic_98;
+	m_mnemonic_a0 = &s_mnemonic_a0;
+	m_mnemonic_b0 = &s_mnemonic_b0;
+	m_mnemonic_b8 = &s_mnemonic_b8;
+	m_mnemonic_c0 = &s_mnemonic_c0;
+	m_mnemonic_c8 = &s_mnemonic_c8;
+	m_mnemonic_d0 = &s_mnemonic_d0;
+	m_mnemonic_d8 = &s_mnemonic_d8;
+	m_mnemonic_e0 = &s_mnemonic_e0;
+	m_mnemonic_e8 = &s_mnemonic_e8;
+	m_mnemonic_f0 = &s_mnemonic_f0;
+	m_mnemonic = &s_mnemonic;
 }
 
 device_memory_interface::space_config_vector tlcs900_device::memory_space_config() const
@@ -107,20 +109,22 @@ void tlcs900_device::device_start()
 	m_program = &space(AS_PROGRAM);
 
 	m_pc.d = 0;
-	memset(m_xwa, 0x00, sizeof(m_xwa));
-	memset(m_xbc, 0x00, sizeof(m_xbc));
-	memset(m_xde, 0x00, sizeof(m_xde));
-	memset(m_xhl, 0x00, sizeof(m_xhl));
+	std::fill(std::begin(m_xwa), std::end(m_xwa), PAIR{});
+	std::fill(std::begin(m_xbc), std::end(m_xbc), PAIR{});
+	std::fill(std::begin(m_xde), std::end(m_xde), PAIR{});
+	std::fill(std::begin(m_xhl), std::end(m_xhl), PAIR{});
 	m_xix.d = 0;
 	m_xiy.d = 0;
 	m_xiz.d = 0;
 	m_xnsp.d = 0;
 	m_xssp.d = 0;
-	memset(m_dmas, 0x00, sizeof(m_dmas));
-	memset(m_dmad, 0x00, sizeof(m_dmad));
-	memset(m_dmac, 0x00, sizeof(m_dmac));
-	memset(m_dmam, 0x00, sizeof(m_dmam));
+	std::fill(std::begin(m_dmas), std::end(m_dmas), PAIR{});
+	std::fill(std::begin(m_dmad), std::end(m_dmad), PAIR{});
+	std::fill(std::begin(m_dmac), std::end(m_dmac), PAIR{});
+	std::fill(std::begin(m_dmam), std::end(m_dmam), PAIR{});
 	m_intnest = 0;
+	m_reg1 = regsel_dummy;
+	m_reg2 = regsel_dummy;
 
 	save_item(NAME(m_xwa));
 	save_item(NAME(m_xbc));
@@ -203,7 +207,7 @@ void tlcs900_device::device_reset()
 {
 	m_pc.d = 0x00008000;
 	/* system mode, iff set to 111, min mode, register bank 0 */
-	m_sr.d = 0xf000;
+	m_sr.d = 0xF000;
 	m_regbank = 0;
 	m_xssp.d = 0x0100;
 	m_intnest = 0;   /* no interrupt is in progress out of reset */
@@ -215,12 +219,12 @@ void tlcs900_device::device_reset()
 
 void tlcs900h_device::device_reset()
 {
-	m_pc.b.l = RDMEM(0xffff00);
-	m_pc.b.h = RDMEM(0xffff01);
-	m_pc.b.h2 = RDMEM(0xffff02);
+	m_pc.b.l = RDMEM(0xFFFF00);
+	m_pc.b.h = RDMEM(0xFFFF01);
+	m_pc.b.h2 = RDMEM(0xFFFF02);
 	m_pc.b.h3 = 0;
 	/* system mode, iff set to 111, max mode, register bank 0 */
-	m_sr.d = 0xf800;
+	m_sr.d = 0xF800;
 	m_regbank = 0;
 	m_xssp.d = 0x0100;
 	m_intnest = 0;   /* no interrupt is in progress out of reset */
@@ -249,18 +253,18 @@ void tlcs900_device::state_string_export(const device_state_entry &entry, std::s
 	{
 		case STATE_GENFLAGS:
 			str = string_format("%c%d%c%d%c%c%c%c%c%c%c%c",
-					m_sr.w.l & 0x8000 ? 'S' : 'U',
+					BIT(m_sr.w.l, 15) ? 'S' : 'U',
 					(m_sr.w.l & 0x7000) >> 12,
-					m_sr.w.l & 0x0800 ? 'M' : 'N',
+					BIT(m_sr.w.l, 11) ? 'M' : 'N',
 					(m_sr.w.l & 0x0700) >> 8,
-					m_sr.w.l & 0x0080 ? 'S' : '.',
-					m_sr.w.l & 0x0040 ? 'Z' : '.',
-					m_sr.w.l & 0x0020 ? '1' : '.',
-					m_sr.w.l & 0x0010 ? 'H' : '.',
-					m_sr.w.l & 0x0008 ? '1' : '.',
-					m_sr.w.l & 0x0004 ? 'V' : '.',
-					m_sr.w.l & 0x0002 ? 'N' : '.',
-					m_sr.w.l & 0x0001 ? 'C' : '.');
+					BIT(m_sr.w.l, 7) ? 'S' : '.',
+					BIT(m_sr.w.l, 6) ? 'Z' : '.',
+					BIT(m_sr.w.l, 5) ? '1' : '.',
+					BIT(m_sr.w.l, 4) ? 'H' : '.',
+					BIT(m_sr.w.l, 3) ? '1' : '.',
+					BIT(m_sr.w.l, 2) ? 'V' : '.',
+					BIT(m_sr.w.l, 1) ? 'N' : '.',
+					BIT(m_sr.w.l, 0) ? 'C' : '.');
 			break;
 	}
 }
@@ -274,8 +278,6 @@ void tlcs900_device::execute_run()
 {
 	do
 	{
-		const tlcs900inst *inst;
-
 		m_cycles = 0;
 
 		if (m_check_irqs)
@@ -309,13 +311,7 @@ void tlcs900_device::execute_run()
 		{
 			debugger_instruction_hook(m_pc.d);
 
-			m_op = RDOP();
-			inst = &m_mnemonic[m_op];
-			prepare_operands(inst);
-
-			/* Execute the instruction */
-			(this->*inst->opfunc)();
-			m_cycles += inst->cycles;
+			execute_op(*m_mnemonic);
 		}
 
 		tlcs900_handle_ad();

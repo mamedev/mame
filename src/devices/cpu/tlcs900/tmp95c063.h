@@ -206,7 +206,7 @@ private:
 	uint16_t  m_ad_result[4];
 
 	// Interrupt Control
-	uint8_t   m_int_reg[0xf];
+	uint8_t   m_int_reg[0xF];
 	uint8_t   m_iimc;
 	uint8_t   m_dma_vector[4];
 
