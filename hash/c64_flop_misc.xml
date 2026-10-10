@@ -1742,13 +1742,10 @@ Requires a second SID at $D500
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=GjDReXe9T3w -->
-	<software name="vicious2" supported="no">
+	<software name="vicious2">
 		<description>Vicious Sid 2</description>
 		<year>2012</year>
 		<publisher>The Noisy Bunch</publisher>
-		<notes><![CDATA[
-Crashes after inserting side B
-]]></notes>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
