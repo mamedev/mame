@@ -197,7 +197,7 @@ private:
 	uint8_t   m_ad_mode;
 
 	// Interrupt Control
-	uint8_t   m_int_reg[0xb];
+	uint8_t   m_int_reg[0xB];
 	uint8_t   m_iimc;
 	uint8_t   m_dma_vector[4];
 
