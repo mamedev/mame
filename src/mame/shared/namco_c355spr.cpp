@@ -481,7 +481,8 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr)
 	 * --------xxxx---- priority
 	 * ------------xxxx palette select
 	 */
-	u16 palette = m_read_spritetable(which, 6);
+	u16 palette = m_read_spritetable(which, 6) >>4 ; //TODO: HAAACK
+	
 	const int priority = m_pri_cb(palette);
 
 	if (priority == -1)
