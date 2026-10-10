@@ -83,6 +83,7 @@ public:
 			m_ipr &= ~(1 << inputnum);
 		else
 			m_ipr |= (1 << inputnum);
+		update_internal_levels();
 	}
 	u16 get_par(){ return m_par; }
 

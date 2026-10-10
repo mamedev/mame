@@ -51,6 +51,7 @@
 #include "emu.h"
 #include "cpu/m68000/mcf5206e.h"
 #include "machine/i2cmem.h"
+#include "machine/input_merger.h"
 #include "machine/ins8250.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
@@ -845,9 +846,16 @@ void gaminator_state::gaminator(machine_config &config)
 
 	RTC72423(config, "rtc", XTAL(32'768)); // Fake crystal value, the 72423 uses its own internal crystal
 
-	// UART-1: TL16C554 (four 16550 channels) near an 8 MHz xtal; interrupt wiring not known yet
+	// UART-1: TL16C554 (four 16550 channels) near an 8 MHz xtal (the kernel's divisor 52 gives 9600 baud). The
+	// level 1 ISR registered by the kernel (0x2e80518) scans IIR of all four channels: INT A-D reach IRQ1.
+	input_merger_device &uart_irq(INPUT_MERGER_ANY_HIGH(config, "uart_irq"));
+	uart_irq.output_handler().set_inputline(m_maincpu, 1);
 	for (int i = 0; i < 4; i++)
 		NS16550(config, m_uart[i], 8_MHz_XTAL);
+	m_uart[0]->out_int_callback().set(uart_irq, FUNC(input_merger_device::in_w<0>));
+	m_uart[1]->out_int_callback().set(uart_irq, FUNC(input_merger_device::in_w<1>));
+	m_uart[2]->out_int_callback().set(uart_irq, FUNC(input_merger_device::in_w<2>));
+	m_uart[3]->out_int_callback().set(uart_irq, FUNC(input_merger_device::in_w<3>));
 
 	MC_MK4_HOPPER(config, "hopper");
 }

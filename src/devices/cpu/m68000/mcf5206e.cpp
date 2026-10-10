@@ -716,21 +716,21 @@ void mcf5206e_device::sim_set_internal_levels(u8 mask)
 	m_sim_levels = mask;
 	for (int l = 1; l <= 7; l++)
 		if (BIT(changed, l))
-			m68000_musashi_device::execute_set_input(l, BIT(m_ext_levels | m_sim_levels, l) ? ASSERT_LINE : CLEAR_LINE);
+			m68000_musashi_device::execute_set_input(l, BIT(m_sim_levels, l) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void mcf5206e_device::execute_set_input(int inputnum, int state)
 {
 	if (inputnum >= 1 && inputnum <= 7)
 	{
+		// IRQ-1: IRQ1/4/7 pins (PAR in IRQ mode) set their IPR bit while asserted; the SIM presents the ICR level to
+		// the core only while the IMR bit is clear (UM 8.2), see coldfire_sim_device::update_internal_levels
 		BITWRITE(m_ext_levels, inputnum, state != CLEAR_LINE);
-		m68000_musashi_device::execute_set_input(inputnum, BIT(m_ext_levels | m_sim_levels, inputnum) ? ASSERT_LINE : CLEAR_LINE);
+		if (inputnum == 1 || inputnum == 4 || inputnum == 7)
+			m_sim->set_ipr(inputnum, state);
 	}
 	else
 		m68000_musashi_device::execute_set_input(inputnum, state);
-	// HACK: make it accept external interrupts
-	if (inputnum == 1 || inputnum == 4 || inputnum == 7)
-		m_sim->set_ipr(inputnum, state);
 
 	if (BIT(m_sim->get_par(), 6))
 		popmessage("mcf5206e: encoded interrupt priority!");
@@ -747,7 +747,8 @@ u8 coldfire_sim_device::interrupt_callback(offs_t level)
 	if(!this->machine().side_effects_disabled())
 	{
 		//logerror("%s: interrupt_callback(%u), ipl: %x, m_ipr: %x, m_imr: %x\n", this->machine().describe_context(), level, ipl, m_ipr, m_imr);
-		m_maincpu->set_input_line(ipl, CLEAR_LINE);
+		// UM 8.2: all interrupt inputs are level sensitive, so the acknowledge does not clear an external request;
+		// the requesting device keeps its line asserted until it is serviced (internal levels: update_internal_levels)
 	}
 
 	for (int i = 0; i < 15; i++)
@@ -839,7 +840,7 @@ u8 coldfire_sim_device::interrupt_callback(offs_t level)
 void coldfire_sim_device::update_internal_levels()
 {
 	u8 mask = 0;
-	for (int i = WATCHDOG_IRQ; i <= DMA_1_IRQ; i++)
+	for (int i = EXTERNAL_IPL_1; i <= DMA_1_IRQ; i++)
 		if (BIT(m_ipr, i) && !BIT(m_imr, i))
 		{
 			const u8 level = INT_LEVEL(m_icr[i - 1]);
