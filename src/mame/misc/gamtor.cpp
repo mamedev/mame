@@ -1020,8 +1020,17 @@ public:
 	// table 0x4bc9e entry A01/16/0c) and expects in 16 to follow it (scanner 0x5bab4): while the door is closed the
 	// receiver line follows the emitter (the scanner compares the line level itself with the pulse level, so a lit
 	// receiver reads high; the opposite polarity gives "E 63 5"); with the door open the beam is broken, the line stays low.
+	// Power fail: the level 7 handler registered by the kernel (0x48bec) saves state and enters system state 9
+	// ("System shutdown", stamps the power-off time). MAME cannot run the CPU after exit, so test scripts pulse this
+	// before quitting; without it the SRAM may be left mid-update ("Error 61: RAM error" or spurious door errors).
+	INPUT_CHANGED_MEMBER(power_fail) { m_maincpu->set_input_line(7, newval ? ASSERT_LINE : CLEAR_LINE); }
+
 	// in 1e: hopper coin exit sensor, low while a coin passes
 	ioport_value hopper_exit_r() { return m_hopper->exit_r() ? 0 : 1; }
+	// in 2b: meter current sense, high while a meter coil draws current. The meter task (table 0x2e98ddc: 8 meters on
+	// out 18-1f) waits for no current before and for current after energising a coil (0x2ef8aa4, 5 tries of 4 s, else
+	// "E E7 1: Contadores desconectados").
+	ioport_value meter_sense_r() { return (!BIT(m_door->read(), 1) && (m_outlatch[1] & 0xff00)) ? 1 : 0; }
 	ioport_value main_door_optic_r() { return (!BIT(m_door->read(), 0) && BIT(m_outlatch[0], 12)) ? 1 : 0; }
 
 private:
@@ -1140,14 +1149,25 @@ static INPUT_PORTS_START(  gaminator )
 	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Hopper disconnected (in 1f)")
 	PORT_START("IN2")
 	PORT_BIT( 0x000007ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	// in 2b: meter connection sense, 0 = "E E7 1: Contadores desconectados" (read at 0x2ef8afc)
-	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Meters disconnected (in 2b)")
-	PORT_BIT( 0x0000f000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(gaminator_state::meter_sense_r)) // in 2b
+	// in 2c: NRI G-13.6000 coin selector connection sense, 0 = "E 21 4: Selector de monedas desconectado" (driver
+	// 0xa0dee, I/O table 0xa0fac: in 2e 2c 2d, out 23 38 39)
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Coin selector disconnected (in 2c)")
+	PORT_BIT( 0x0000e000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_START("IN3")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x000000ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	// in 38/39: coin diverter light barriers (top/bottom), low while lit; dark for a while gives "E 21 6/7: Sensores de
+	// desviacion arriba/abajo desconectados" (coin selector task 0xa0370)
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Diverter top light barrier blocked (in 38)")
+	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Diverter bottom light barrier blocked (in 39)")
+	PORT_BIT( 0x0000fc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DOOR") // main door, seen only through the optical sensor on in 16
+	PORT_START("DOOR") // main door (seen through the optical sensor on in 16) and the meter harness
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Main door")
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Meters disconnected")
+
+	PORT_START("PWR")
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Power failure (IRQ7)") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gaminator_state::power_fail), 0)
 
 	PORT_START("SYS")
 	// logical input 0x40: when it reads 0 at boot (0x496ec) the kernel enters "*** Borrar el RAM ***" and asks to
