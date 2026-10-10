@@ -282,10 +282,8 @@ void gamtor_vga_device::vblank_cb(screen_device &screen, bool state)
 	// CR40 bit 7: the extended start address is taken on VSYNC, then the bit clears (10-34)
 	if (state && BIT(m_cr40, 7))
 	{
-		m_ext_start = ((m_cr40 & 0x0f) << 16) | (vga.crtc.start_addr & 0xffff);
+		m_ext_start = ((m_cr40 & 0x0f) << 16) | (vga.crtc.start_addr_latch & 0xffff); // CR0C/CR0D as written
 		m_cr40 &= 0x7f;
-		if (m_ext_start)
-			logerror("extended start address %05x (unit not verified yet)\n", m_ext_start);
 	}
 }
 
@@ -315,7 +313,7 @@ uint32_t gamtor_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &b
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		u32 *dst = &bitmap.pix(y, cliprect.min_x);
-		u32 a = m_ext_start * 4 + y * pitch; // start address unit (dwords) not verified yet, see vblank_cb
+		u32 a = m_ext_start * 4 + y * pitch; // start address in dwords: the game flips to 0x12c00 = 0x4b000 = one 640x480 page
 		if (mode == 2)
 		{
 			a += cliprect.min_x;
@@ -755,11 +753,19 @@ static INPUT_PORTS_START(  gaminator )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON7 )  PORT_NAME("Key 09 (in 0e)")
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_START1 )   PORT_NAME("Key 01 (in 0f)")
 	PORT_START("IN1")
-	PORT_BIT( 0x0000007f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON9 )  PORT_NAME("Key 0F (in 17)")
-	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000007, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in 13, switch handler
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in 14, switch handler
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in 15, switch handler
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in 16, switch handler (pulse parameters)
+	// key 0F: with "E E0 ... Girar la llave del operador" on screen, turning it opens "Configuracion maquina"
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_TOGGLE PORT_NAME("Attendant key (key 0F, in 17)")
+	PORT_BIT( 0x00007f00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in 1f, polled in the E0 screen
 	PORT_START("IN2")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x000007ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in 2b, polled in the E0 screen
+	PORT_BIT( 0x0000f000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_START("IN3")
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -767,6 +773,12 @@ static INPUT_PORTS_START(  gaminator )
 	// logical input 0x40: when it reads 0 at boot (0x496ec) the kernel enters "*** Borrar el RAM ***" and asks to
 	// restart "con la tecla RAMCLEAR en posicion OFF" -> the RAMCLEAR key switch, a toggle
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE PORT_NAME("RAMCLEAR key")
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 41, switch handler
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 45, switch handler (XOR 0x60 in the driver)
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 46, switch handler (XOR 0x60 in the driver)
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 43, polled in the E0 screen
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 44, polled in the E0 screen
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 47, polled in the E0 screen
 INPUT_PORTS_END
 
 
