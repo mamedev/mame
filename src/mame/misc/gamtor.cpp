@@ -1080,29 +1080,30 @@ void gaminator_state::gaminator_map(address_map &map)
 // word at 0x1c070000 + ((n >> 2) & 0x0c), inverted (active low), and inputs 0x40-0x5f as bit (n - 0x40) of
 // 0x1e040000 XOR 0x60. Lines without a known function stay IPT_UNKNOWN at their idle (high) level.
 // The panel keys come from the kernel's key table (bookra ROM 0x6371c, 24-byte entries: key id, input line, lamp
-// output, ...). Their legends are not known yet, so they are named by key id and input line. Keys 1A-16 are the
+// output, ...). Names from the DIAGNOSTICO > PRUEBA TECLAS Y LAMPARAS test, keys 1A-16 are also the
 // five buttons under the screen labels of the configuration menu (Mas, Menos, Previo item, Proximo item, Proxima pag.).
 static INPUT_PORTS_START(  gaminator )
 	PORT_START("IN0")
 	PORT_BIT( 0x0000000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Key 0A (in 04)")
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON8 )  PORT_NAME("Key 0D (in 05)")
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Key 0C (in 06)")
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Key 10 (in 07)")
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_NAME("Softkey 1 (key 1A, in 08)")
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_NAME("Softkey 2 (key 19, in 09)")
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Softkey 3 (key 18, in 0a)")
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_NAME("Softkey 4 (key 17, in 0b)")
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON5 )  PORT_NAME("Softkey 5 (key 16, in 0c)")
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON6 )  PORT_NAME("Key 08 (in 0d)")
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON7 )  PORT_NAME("Key 09 (in 0e)")
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_START1 )   PORT_NAME("Key 01 (in 0f)")
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Pago / Payout (key 0A, in 04)")
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON6 )  PORT_NAME("Info (key 0D, in 05)")
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON7 )  PORT_NAME("Llamada servicio / Service call (key 0C, in 06)")
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON8 )  PORT_NAME("Arranque automatico / Autostart (key 10, in 07)")
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_NAME("Linea 1 / Line 1 (key 1A, in 08)")
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_NAME("Linea 2 / Line 2 (key 19, in 09)")
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Linea 3 / Line 3 (key 18, in 0a)")
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_NAME("Linea 4 / Line 4 (key 17, in 0b)")
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON5 )  PORT_NAME("Linea 5 / Line 5 (key 16, in 0c)")
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Apuesta 1 / Bet 1 (key 08, in 0d)")
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON9 )  PORT_NAME("Apuesta maxima / Max bet (key 09, in 0e)")
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_START1 )   PORT_NAME("Arranque / Start (key 01, in 0f)")
 	PORT_START("IN1")
 	PORT_BIT( 0x00000007, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	// in 13: drop (coin box) door, low = closed ("E 63 2: Puerta del cajon abierta" when it goes high)
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Drop door (in 13)")
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 14, door switch object type A03 (going high: E 63 4)
-	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 15, door switch object type A02
+	// Door switches: the kernel door objects (table at 0x4bc9e: type A0x, input) treat logic state 1 as open; on the
+	// active-low 1c07 inputs that is a low line. in 13 open: "E 63 2: Puerta del cajon abierta"
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Drop door (in 13)")
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Stacker door 1 (in 14)") // open: E 63 4
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Logic door 1 (in 15)") // open: E 63 1
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in 16, main door optical sensor (E 63 5 when it changes), TODO
 	// key 0F: with "E E0 ... Girar la llave del operador" on screen, turning it opens "Configuracion maquina"
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_TOGGLE PORT_NAME("Attendant key (key 0F, in 17)")
@@ -1121,9 +1122,9 @@ static INPUT_PORTS_START(  gaminator )
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE PORT_NAME("RAMCLEAR key")
 	// in 41: battery monitor, low = "E 12 3: Bateria del RAM debil"
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RAM battery low (in 41)")
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in 45, door switch object type A05 (XOR 0x60 in the driver)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Logic door 2 (in 45)") // open: E 63 1 (XOR 0x60 in the driver)
 	// in 46: with it low the game shows "E 63 4: Puerta de la caja del apilador abierta"
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Stacker door (in 46)")
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Stacker door 2 (in 46)")
 	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 43, polled in the E0 screen
 	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 44, polled in the E0 screen
 	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 47, polled in the E0 screen
