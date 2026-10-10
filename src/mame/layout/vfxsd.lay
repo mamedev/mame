@@ -7,7 +7,7 @@
 			<bounds x="0" y="0" width="2" height="1" />
 			<data>
 				<![CDATA[
-					<svg x="0" y="0" width="2" height="1" viewBox="0 0 2 1">
+					<svg width="2" height="1" viewBox="0 0 2 1">
 						<path d="M0 0H2L1 1Z" fill="#ffffff" stroke="none" />
 					</svg>
 				]]></data>
@@ -18,7 +18,7 @@
 			<bounds x="0" y="0" width="2" height="1" />
 			<data>
 				<![CDATA[
-					<svg x="0" y="0" width="2" height="1" viewBox="0 0 2 1">
+					<svg width="2" height="1" viewBox="0 0 2 1">
 						<path d="M0 1H2L 1 0Z" fill="#ffffff" stroke="none" />
 					</svg>
 				]]></data>
@@ -29,7 +29,7 @@
 			<bounds x="0" y="0" width="3.37085" height="5.12263" />
 			<data>
 				<![CDATA[
-					<svg x="0" y="0" width="3.37085" height="5.12263" viewBox="0 0 3.37085 5.12263">
+					<svg width="3.37085" height="5.12263" viewBox="0 0 3.37085 5.12263">
 						<path d="M 1 0.125 l 2.24585 0 -0.77001 3.62263 M 0 1.125 l 2.0333 0 -0.77001 3.62263" fill="none" stroke="#ffffff" stroke-width="0.25" />
 					</svg>
 				]]></data>
@@ -40,7 +40,7 @@
 			<bounds x="0" y="0" width="9.51281" height="5.12263" />
 			<data>
 				<![CDATA[
-					<svg x="0" y="0" width="9.51281" height="5.12263" viewBox="0 0 9.51281 5.12263">
+					<svg width="9.51281" height="5.12263" viewBox="0 0 9.51281 5.12263">
 						<path d="M 1 0.125 l 8.38781 0 -0.77001 3.62263 M 0 1.125 l 8.17526 0 -0.77001 3.62263" fill="none" stroke="#ffffff" stroke-width="0.25" />
 					</svg>
 				]]></data>
@@ -51,7 +51,7 @@
 			<bounds x="0" y="0" width="8.09102" height="5.12263" />
 			<data>
 				<![CDATA[
-					<svg x="0" y="0" width="8.09102" height="5.12263" viewBox="0 0 8.09102 5.12263">
+					<svg width="8.09102" height="5.12263" viewBox="0 0 8.09102 5.12263">
 						<path d="M 1 0.125 l 6.96602 0 -0.77001 3.62263 M 0 1.125 l 6.75347 0 -0.77001 3.62263" fill="none" stroke="#ffffff" stroke-width="0.25" />
 					</svg>
 				]]></data>
@@ -62,7 +62,7 @@
 			<bounds x="0" y="0" width="6.81056" height="5.12263" />
 			<data>
 				<![CDATA[
-					<svg x="0" y="0" width="6.81056" height="5.12263" viewBox="0 0 6.81056 5.12263">
+					<svg width="6.81056" height="5.12263" viewBox="0 0 6.81056 5.12263">
 						<path d="M 1 0.125 l 5.68556 0 -0.77001 3.62263 M 0 1.125 l 5.473 0 -0.77001 3.62263" fill="none" stroke="#ffffff" stroke-width="0.25" />
 					</svg>
 				]]></data>
@@ -72,7 +72,7 @@
 		<image state="0">
 			<data>
 				<![CDATA[
-					<svg x="0" y="0" width="53" height="24" viewBox="0 0 53 24">
+					<svg width="53" height="24" viewBox="0 0 53 24">
 						<rect x="0" y="0" width="53" height="24" rx="0" fill="#303030" stroke="none" />
 					</svg>
 				]]></data>
@@ -80,7 +80,7 @@
 		<image state="1">
 			<data>
 				<![CDATA[
-					<svg x="0" y="0" width="53" height="24" viewBox="0 0 53 24">
+					<svg width="53" height="24" viewBox="0 0 53 24">
 						<rect x="0" y="0" width="53" height="24" rx="0" fill="#101010" stroke="none" />
 						<path d="M1.5 14l1 10h48l1 -10 -1 -9h-48z" fill="#444444" stroke="none" />
 						<rect x="10.5" y="14" width="32" height="10" rx="0" fill="#bbbbbb" stroke="none" />
@@ -93,7 +93,7 @@
 			<bounds x="0" y="0" width="72" height="13" />
 			<data>
 				<![CDATA[
-					<svg x="0" y="0" width="72" height="13" viewBox="0 0 72 13">
+					<svg width="72" height="13" viewBox="0 0 72 13">
 						<rect x="0.5" y="0.5" width="71" height="12" rx="1" fill="none" stroke="#ffffff" stroke-width="1" />
 					</svg>
 				]]></data>
@@ -104,7 +104,7 @@
 			<bounds x="0" y="0" width="118" height="96" />
 			<data>
 				<![CDATA[
-					<svg x="0" y="0" width="118" height="96" viewBox="0 0 118 96">
+					<svg width="118" height="96" viewBox="0 0 118 96">
 						<path d="M 0 0 H 118 L 108 10 H 10 Z" fill="#101010" stroke="none" />
 						<path d="M 0 0 V 96 L 10 10 Z" fill="#101010" stroke="none" />
 						<path d="M 118 0 V 96 L 108 10 Z" fill="#303030" stroke="none" />
@@ -118,7 +118,7 @@
 			<bounds x="0" y="0" width="118" height="161" />
 			<data>
 				<![CDATA[
-					<svg x="0" y="0" width="118" height="161" viewBox="0 0 118 161">
+					<svg width="118" height="161" viewBox="0 0 118 161">
 						<rect x="0" y="0" width="5" height="161" rx="0" fill="#101010" stroke="none" />
 						<rect x="113" y="0" width="5" height="161" rx="0" fill="#303030" stroke="none" />
 						<path d="M 0 0 H 118 L 113 13 H 5 Z" fill="#101010" stroke="none" />
@@ -130,7 +130,7 @@
 		<image state="0">
 			<data>
 				<![CDATA[
-					<svg x="0" y="0" width="102" height="36" viewBox="0 0 102 36">
+					<svg width="102" height="36" viewBox="0 0 102 36">
 						<rect x="0" y="0" width="102" height="5" rx="0" fill="#444444" stroke="none" />
 						<rect x="0" y="5" width="102" height="31" rx="0" fill="#333333" stroke="none" />
 						<rect x="4" y="7" width="94" height="8" rx="0" fill="#222222" stroke="none" />
@@ -143,7 +143,7 @@
 		<image state="1">
 			<data>
 				<![CDATA[
-					<svg x="0" y="0" width="102" height="36" viewBox="0 0 102 36">
+					<svg width="102" height="36" viewBox="0 0 102 36">
 						<rect x="0" y="0" width="102" height="5" rx="0" fill="#444444" stroke="none" />
 						<rect x="0" y="5" width="102" height="31" rx="0" fill="#333333" stroke="none" />
 						<rect x="4" y="7" width="94" height="8" rx="0" fill="#222222" stroke="none" />
@@ -161,7 +161,7 @@
 			<bounds x="0" y="0" width="4" height="66" />
 			<data>
 				<![CDATA[
-					<svg x="0" y="0" width="4" height="66" viewBox="0 0 4 66">
+					<svg width="4" height="66" viewBox="0 0 4 66">
 						<path d="M 0.25 0.25 H 3.5 L 2 30 Z M 0.25 65.75 H 3.5 L 2 36 Z" fill="none" stroke="#ffffff" stroke-width="0.5" />
 						<circle cx="2" cy="33" r="1" fill="#ffffff" stroke="none" />
 					</svg>
@@ -173,7 +173,7 @@
 			<bounds x="0" y="0" width="4" height="66" />
 			<data>
 				<![CDATA[
-					<svg x="0" y="0" width="4" height="66" viewBox="0 0 4 66">
+					<svg width="4" height="66" viewBox="0 0 4 66">
 						<path d="M 0.25 0.25 H 3 L 2 65.75 Z" fill="none" stroke="#ffffff" stroke-width="0.5" />
 					</svg>
 				]]></data>
