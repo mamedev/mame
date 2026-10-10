@@ -18,7 +18,7 @@ struct sh7709s_cache_entry
 	uint8_t dirty; // Dirty bit for write eviction
 };
 
-class sh7709s_device : public sh3_base_device
+class sh7709s_device : public sh7709_base_device
 {
 public:
 	sh7709s_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock, endianness_t endianness = ENDIANNESS_LITTLE);
