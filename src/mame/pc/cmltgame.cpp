@@ -11,11 +11,11 @@ PC hardware:
    * SiS 962L southbridge.
    * SiS 651 northbridge.
    * Texas Instruments GD75232 Multiple RS-232 Drivers and Receivers.
-- ATI Rage Mobiity-P AGP video.
+- ATI Rage Mobility-P AGP video.
 - Intel Celeron 1.7 GHz (100x17).
 - 128 MB RAM DDR 256.
 - Barebone S.L. BAR974 industrial case.
-- MAME 32 0.58 with a custom frontend.
+- MAME32 0.58 with a custom frontend.
 - External PCB for inputs, audio and video to JAMMA:
 
        ________________________________
@@ -54,44 +54,44 @@ A |__                     ______   |    | Video (VGA HD15)
 
 namespace {
 
-class cmultigame_state : public driver_device
+class cmltgame_state : public driver_device
 {
 public:
-	cmultigame_state(const machine_config &mconfig, device_type type, const char *tag)
+	cmltgame_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 	{ }
 
 
-	void cmultigame(machine_config &config) ATTR_COLD;
+	void cmltgame(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void cmultigame_io(address_map &map) ATTR_COLD;
-	void cmultigame_map(address_map &map) ATTR_COLD;
+	void cmltgame_io(address_map &map) ATTR_COLD;
+	void cmltgame_map(address_map &map) ATTR_COLD;
 };
 
 
-void cmultigame_state::cmultigame_map(address_map &map)
+void cmltgame_state::cmltgame_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
 	map(0x000e0000, 0x000fffff).rom().region("bios", 0x20000);
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
 }
 
-void cmultigame_state::cmultigame_io(address_map &map)
+void cmltgame_state::cmltgame_io(address_map &map)
 {
 }
 
-static INPUT_PORTS_START(cmultigame)
+static INPUT_PORTS_START(cmltgame)
 INPUT_PORTS_END
 
-void cmultigame_state::cmultigame(machine_config &config)
+void cmltgame_state::cmltgame(machine_config &config)
 {
-	PENTIUM4(config, m_maincpu, 100'000'000); // Intel Celeron 1.7 GHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &cmultigame_state::cmultigame_map);
-	m_maincpu->set_addrmap(AS_IO, &cmultigame_state::cmultigame_io);
+	PENTIUM4(config, m_maincpu, 100'000'000); // Actually an Intel Celeron 1.7 GHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmltgame_state::cmltgame_map);
+	m_maincpu->set_addrmap(AS_IO, &cmltgame_state::cmltgame_io);
 
 	PCI_ROOT(config, "pci");
 	// ...
@@ -100,7 +100,7 @@ void cmultigame_state::cmultigame(machine_config &config)
 
 /* Boots Windows 98 SE and loads "X-Info3 ArcadePC" to set up the arcade-compatible video frequency
    before starting the MAME frontend. */
-ROM_START(cmultigame)
+ROM_START(cmltgame)
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_SYSTEM_BIOS( 0, "f12", "F12" )
 	ROMX_LOAD( "8simlh.f12.u14",   0x00000, 0x40000, CRC(98c68c69) SHA1(1721e709f11d651215f448ae8c0109a79e379aa6), ROM_BIOS(0) )
@@ -118,7 +118,7 @@ ROM_START(cmultigame)
 	ROMX_LOAD( "8simlh.f7.u14",    0x00000, 0x40000, CRC(13502db1) SHA1(664ba7be6fceb2e73b398988542d8fdbe6960312), ROM_BIOS(6) )
 	ROM_SYSTEM_BIOS( 7, "f1", "F1" )
 	ROMX_LOAD( "8simlh.f1.u14",    0x00000, 0x40000, CRC(77f74ddf) SHA1(f45178ce40bc3c4f620c066c05d3b387d663be23), ROM_BIOS(7) )
-	ROM_DEFAULT_BIOS("f1") // The older one, but was the one found om the actual machine
+	ROM_DEFAULT_BIOS("f1") // The older one, but was the one found on the actual machine
 
 	// ATI Rage Mobility-P BIOS
 	ROM_REGION( 0x10000, "vga", 0 )
@@ -134,4 +134,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(2002, cmultigame, 0, cmultigame, cmultigame, cmultigame_state, empty_init, ROT0, "Covielsa", "Multigame (Covielsa)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2002, cmltgame, 0, cmltgame, cmltgame, cmltgame_state, empty_init, ROT0, "Covielsa", "Multigame (Covielsa)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
