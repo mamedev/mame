@@ -166,4 +166,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=WlralRNCQR4 -->
+	<software name="omddelux" supported="no">
+		<description>Orb MegaDemo Delux</description>
+		<year>2016</year>
+		<publisher>Orb</publisher>
+		<info name="usage" value="mame vic20p -iec8 c1541 -flop omddelux"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="OMD_Delux.d64" size="174848" crc="53f6583d" sha1="afefd007f8a37b7c50678fa731b9ae6ce3d47259"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
