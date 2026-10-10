@@ -190,6 +190,21 @@ protected:
 	};
 
 	class frontend;
+
+	// instructions that change the PC; in a delay slot they raise a slot illegal instruction
+	// exception instead of executing (SH-1/SH-2, vector 6)
+	static constexpr bool is_slot_illegal(uint16_t opcode)
+	{
+		switch (opcode >> 12)
+		{
+		case 0x0: return ((opcode & 0xff) == 0x03) || ((opcode & 0xff) == 0x23) || (opcode == 0x000b) || (opcode == 0x002b); // BSRF, BRAF, RTS, RTE
+		case 0x4: return ((opcode & 0xff) == 0x0b) || ((opcode & 0xff) == 0x2b); // JSR, JMP
+		case 0x8: return BIT(opcode, 8) && BIT(opcode, 11); // BT, BF, BT/S, BF/S (0x89, 0x8b, 0x8d, 0x8f)
+		case 0xa: case 0xb: return true; // BRA, BSR
+		case 0xc: return ((opcode >> 8) & 0xf) == 0x3; // TRAPA
+		default: return false;
+		}
+	}
 	class opcode_desc;
 
 	sh_common_execution(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal);
@@ -433,6 +448,7 @@ public:
 
 	void func_printf_probe();
 	void func_unimplemented();
+	void func_slot_illegal();
 	void func_MAC_W();
 	void func_MAC_L();
 	void func_DIV1();
