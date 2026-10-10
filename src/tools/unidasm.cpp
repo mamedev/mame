@@ -45,6 +45,7 @@ using util::BIT;
 #include "cpu/ddp516/ddp516d.h"
 #include "cpu/dsp16/dsp16dis.h"
 #include "cpu/dsp32/dsp32dis.h"
+#include "cpu/dsp32/dsp3210dis.h"
 #include "cpu/dsp56000/dsp56000d.h"
 #include "cpu/dsp56156/dsp56dsm.h"
 #include "cpu/dsp563xx/dsp563xxd.h"
@@ -464,6 +465,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "ds80c320",        le,  0, []() -> util::disasm_interface * { return new ds80c320_disassembler; } },
 	{ "dsp16",           le, -1, []() -> util::disasm_interface * { return new dsp16_disassembler; } },
 	{ "dsp32c",          le,  0, []() -> util::disasm_interface * { return new dsp32c_disassembler; } },
+	{ "dsp3210",         be,  0, []() -> util::disasm_interface * { return new dsp3210_disassembler; } },
 	{ "dsp56000",        be, -2, []() -> util::disasm_interface * { return new dsp56000_disassembler; } },
 	{ "dsp56156",        le, -1, []() -> util::disasm_interface * { return new dsp56156_disassembler; } },
 	{ "dsp563xx",        le, -2, []() -> util::disasm_interface * { return new dsp563xx_disassembler; } },
