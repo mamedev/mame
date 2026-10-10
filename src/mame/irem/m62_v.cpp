@@ -393,6 +393,9 @@ VIDEO_START_MEMBER(m62_state,kungfum)
 uint32_t m62_state::screen_update_kungfum(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i;
+	// Beyond Kung-Fu uses map_pen_to_layer to handle more complex pen priority handling than Kung-Fu Master.
+	int flags1 = m_is_bkungfu ? TILEMAP_DRAW_LAYER1 : 0;
+	int flags2 = m_is_bkungfu ? TILEMAP_DRAW_LAYER0 : 1;
 	for (i = 0; i < 6; i++)
 	{
 		m_bg_tilemap->set_scrollx(i, 0);
@@ -401,9 +404,9 @@ uint32_t m62_state::screen_update_kungfum(screen_device &screen, bitmap_rgb32 &b
 	{
 		m_bg_tilemap->set_scrollx(i, m_m62_background_hscroll);
 	}
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, flags1, 0);
 	draw_sprites(bitmap, cliprect, 0x1f, 0x00, 0x00);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, flags2, 0);
 	return 0;
 }
 
