@@ -1816,6 +1816,30 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/sound/ymp706.h,SOUNDS["YMP706"] = true
+---------------------------------------------------
+
+if SOUNDS["YMP706"] then
+	files {
+		MAME_DIR .. "src/devices/sound/ymp706.cpp",
+		MAME_DIR .. "src/devices/sound/ymp706.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/sound/yss236.h,SOUNDS["YSS236"] = true
+---------------------------------------------------
+
+if SOUNDS["YSS236"] then
+	files {
+		MAME_DIR .. "src/devices/sound/yss236.cpp",
+		MAME_DIR .. "src/devices/sound/yss236.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/sound/xt446.h,SOUNDS["XT446"] = true
 ---------------------------------------------------
 

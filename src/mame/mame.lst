@@ -50026,6 +50026,9 @@ mu500
 mu1000
 mu2000
 
+@source:yamaha/ymfs1r.cpp
+fs1r
+
 @source:yamaha/ymqs300.cpp
 qs300
 eosb900
