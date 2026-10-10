@@ -759,7 +759,8 @@ void gaminator_state::gaminator_map(address_map &map)
 // word at 0x1c070000 + ((n >> 2) & 0x0c), inverted (active low), and inputs 0x40-0x5f as bit (n - 0x40) of
 // 0x1e040000 XOR 0x60. Lines without a known function stay IPT_UNKNOWN at their idle (high) level.
 // The panel keys come from the kernel's key table (bookra ROM 0x6371c, 24-byte entries: key id, input line, lamp
-// output, ...). Their legends are not known yet, so they are named by key id and input line.
+// output, ...). Their legends are not known yet, so they are named by key id and input line. Keys 1A-16 are the
+// five buttons under the screen labels of the configuration menu (Mas, Menos, Previo item, Proximo item, Proxima pag.).
 static INPUT_PORTS_START(  gaminator )
 	PORT_START("IN0")
 	PORT_BIT( 0x0000000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -767,11 +768,11 @@ static INPUT_PORTS_START(  gaminator )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON8 )  PORT_NAME("Key 0D (in 05)")
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Key 0C (in 06)")
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Key 10 (in 07)")
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_NAME("Key 1A (in 08)")
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_NAME("Key 19 (in 09)")
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Key 18 (in 0a)")
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_NAME("Key 17 (in 0b)")
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON5 )  PORT_NAME("Key 16 (in 0c)")
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_NAME("Softkey 1 (key 1A, in 08)")
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_NAME("Softkey 2 (key 19, in 09)")
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Softkey 3 (key 18, in 0a)")
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_NAME("Softkey 4 (key 17, in 0b)")
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON5 )  PORT_NAME("Softkey 5 (key 16, in 0c)")
 	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON6 )  PORT_NAME("Key 08 (in 0d)")
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON7 )  PORT_NAME("Key 09 (in 0e)")
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_START1 )   PORT_NAME("Key 01 (in 0f)")
