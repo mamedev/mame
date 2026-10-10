@@ -900,6 +900,42 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
+	<software name="mcs810">
+		<description>Commodore MCS 810 Color Printer Utility Disk</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="mcs810.d64" size="174848" crc="ae17a501" sha1="a775f51605e4f14d47ccb600172c6aaef10d3732"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="okimat20">
+		<description>Okimate 20 Utility Disk</description>
+		<year>198?</year>
+		<publisher>Okidata</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="okimate20.d64" size="174848" crc="c56524f2" sha1="01f84f2bb706eab7b839cb926a6f8a68cfac5105"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scpuutil" supported="no">
+		<description>CMD SuperCPU Utilities</description>
+		<year>1990</year>
+		<publisher>CMD</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="scpu-1.d64" size="174848" crc="caad286d" sha1="2c1258505148763f13ab2fcdaf247138a933817e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="swiftlnk">
 		<description>CMD SwiftLink</description>
 		<year>1990</year>
