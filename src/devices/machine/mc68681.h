@@ -42,12 +42,14 @@ public:
 	uint8_t read_MR1(){ return MR1; }
 	uint8_t read_MR2(){ return MR2; }
 	void write_MR1(uint8_t data){ MR1 = data; }
-	void write_MR2(uint8_t data){ MR2 = data; }
+	void write_MR2(uint8_t data){ set_MR2(data); }
 
 	void tx_16x_clock_w(bool state);
 	void rx_16x_clock_w(bool state);
 
 	int get_tx_rate() const { return tx_baud_rate; }
+
+	void rx_pin_w(int state);
 
 private:
 	/* Registers */
@@ -80,9 +82,12 @@ private:
 	/* Rx/Tx clocking */
 	uint8_t m_rx_prescaler , m_tx_prescaler;
 
+	uint8_t m_rx_pin;
+
 	duart_base_device *m_uart;
 
 	void write_MR(uint8_t data);
+	void set_MR2(uint8_t data);
 	void write_CR(uint8_t data);
 	void write_TX(uint8_t data);
 	void recalc_framing();
@@ -108,8 +113,8 @@ public:
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
 
-	void rx_a_w(int state) { m_chanA->device_serial_interface::rx_w((uint8_t)state); }
-	void rx_b_w(int state) { m_chanB->device_serial_interface::rx_w((uint8_t)state); }
+	void rx_a_w(int state) { m_chanA->rx_pin_w(state); }
+	void rx_b_w(int state) { m_chanB->rx_pin_w(state); }
 
 	auto irq_cb() { return write_irq.bind(); }
 	auto a_tx_cb() { return write_a_tx.bind(); }
@@ -271,8 +276,8 @@ public:
 	auto c_tx_cb() { return write_c_tx.bind(); }
 	auto d_tx_cb() { return write_d_tx.bind(); }
 
-	void rx_c_w(int state) { m_chanC->device_serial_interface::rx_w((uint8_t)state); }
-	void rx_d_w(int state) { m_chanD->device_serial_interface::rx_w((uint8_t)state); }
+	void rx_c_w(int state) { m_chanC->rx_pin_w(state); }
+	void rx_d_w(int state) { m_chanD->rx_pin_w(state); }
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;

@@ -27,6 +27,20 @@ private:
 	static const format formats[];
 };
 
+class _2hc_format : public upd765_format
+{
+public:
+	_2hc_format();
+
+	virtual const char *name() const noexcept override;
+	virtual const char *description() const noexcept override;
+	virtual const char *extensions() const noexcept override;
+
+private:
+	static const format formats[];
+};
+
 extern const xdf_format FLOPPY_XDF_FORMAT;
+extern const _2hc_format FLOPPY_2HC_FORMAT;
 
 #endif // MAME_FORMATS_XDF_DSK_H

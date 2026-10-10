@@ -77,15 +77,15 @@ void fuukispr_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, 
 {
 	// as we're likely framebuffered (sprites are delayed by 2-3 frames, at least on FG3, and doing rasters on sprites causes glitches) we
 	// only draw the sprites when MAME wants to draw the final screen line.  Ideally we should framebuffer them instead.
-	if (cliprect.max_y != screen.visible_area().max_y)
+	if (cliprect.bottom() != screen.visible_area().bottom())
 		return;
 
 	const bool tilebank = !m_tile_cb.isnull();
 	const bool priority = !m_colpri_cb.isnull();
 	const rectangle spriteclip = screen.visible_area();
 
-	const int max_x = spriteclip.max_x + 1;
-	const int max_y = spriteclip.max_y + 1;
+	const int max_x = spriteclip.right() + 1;
+	const int max_y = spriteclip.bottom() + 1;
 
 	int start, end, inc;
 	if (priority)             { start = size - 4; end =   -4; inc = -4; }

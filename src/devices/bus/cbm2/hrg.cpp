@@ -10,10 +10,6 @@
 
     TODO:
 
-    http://www.wfking.de/hires.htm
-
-    - version A (EF9365, 512x512 interlaced, 1 page)
-    - version B (EF9366, 512x256 non-interlaced, 2 pages)
     - 256KB version ROM
 
 */
@@ -239,13 +235,13 @@ uint32_t cbm2_hrg_device::screen_update(screen_device &screen, bitmap_rgb32 &bit
 	pen_t const *const pens = m_palette->pens();
 	offs_t const base = page_offset(4);
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint8_t const data = m_ram[base | ((y * 512 + x) >> 3)];
-
-			bitmap.pix(y, x) = pens[BIT(data, ~x & 7)];
+			dst[x] = pens[BIT(data, ~x & 7)];
 		}
 	}
 

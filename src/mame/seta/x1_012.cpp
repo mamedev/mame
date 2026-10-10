@@ -159,11 +159,11 @@ void x1_012_device::draw_tilemap_palette_effect(bitmap_ind16 &bitmap, const rect
 	const int width_mask = src_bitmap.width() - 1;
 	const int height_mask = src_bitmap.height() - 1;
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u16 *const dest = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int p;
 			if (!flipscreen)

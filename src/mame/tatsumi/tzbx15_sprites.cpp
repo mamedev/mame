@@ -111,15 +111,10 @@ void tzbx15_device::mycopyrozbitmap_core(bitmap_rgb32 &bitmap, const bitmap_rgb3
 	uint32_t startx = 0;
 	uint32_t starty = 0;
 
-	int sx = dstx;
-	int sy = dsty;
-	int ex = dstx + srcwidth;
-	int ey = dsty + srcheight;
-
-	if (sx < clip.min_x) sx = clip.min_x;
-	if (ex > clip.max_x) ex = clip.max_x;
-	if (sy < clip.min_y) sy = clip.min_y;
-	if (ey > clip.max_y) ey = clip.max_y;
+	int sx = std::max<int>(dstx, clip.left());
+	int sy = std::max<int>(dsty, clip.top());
+	const int ex = std::min<int>(dstx + srcwidth, clip.right());
+	const int ey = std::min<int>(dsty + srcheight, clip.bottom());
 
 	if (sx <= ex)
 	{
@@ -228,30 +223,30 @@ void tzbx15_device::roundupt_drawgfxzoomrotate(
 				y_index = 0;
 			}
 
-			if( sx < myclip.min_x)
+			if( sx < myclip.left())
 			{
 				// clip left
-				int pixels = myclip.min_x-sx;
+				int pixels = myclip.left()-sx;
 				sx += pixels;
 				x_index_base += pixels*dx;
 			}
-			if( sy < myclip.min_y )
+			if( sy < myclip.top() )
 			{
 				// clip top
-				int pixels = myclip.min_y-sy;
+				int pixels = myclip.top()-sy;
 				sy += pixels;
 				y_index += pixels*dy;
 			}
-			if( ex > myclip.max_x+1 )
+			if( ex > myclip.right()+1 )
 			{
 				// clip right
-				int pixels = ex-myclip.max_x-1;
+				int pixels = ex-myclip.right()-1;
 				ex -= pixels;
 			}
-			if( ey > myclip.max_y+1 )
+			if( ey > myclip.bottom()+1 )
 			{
 				// clip bottom
-				int pixels = ey-myclip.max_y-1;
+				int pixels = ey-myclip.bottom()-1;
 				ey -= pixels;
 			}
 

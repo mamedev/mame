@@ -42,7 +42,6 @@ surface-mounted SSOP70 32-bit ROM. Later H8-based PCBs have a custom QFP device 
 RAMDAC.
 
 TODO:
-- Add sound to SS9804/SS9904 games.
 - ptrain: missing scroll in race screens.
 - humlan: empty reels when bonus image should scroll in via L0 scroll. The image (crown/fruits) is at y > 0x100 in the tilemap.
 - bishjan, new2001, humlan, saklove, squeenb, queenbn: game is sometimes too fast (can bishjan read the VBLANK state? saklove and xplan can).
@@ -67,6 +66,7 @@ by the otherwise seemingly unnecessary internal ROMs.
 
 #include "emu.h"
 
+#include "ss9904.h"
 #include "subsino_crypt.h"
 #include "subsino_io.h"
 
@@ -105,6 +105,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_oki(*this, "oki")
+		, m_sound(*this, "ss9x04")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -189,7 +190,6 @@ private:
 	uint8_t dsw_r();
 	uint8_t vblank_bit2_r();
 	uint8_t vblank_bit6_r();
-	uint8_t bishjan_sound_r();
 	void bishjan_sound_w(uint8_t data);
 	uint8_t bishjan_serial_r();
 	uint8_t xiaoao_serial_r();
@@ -256,6 +256,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
+	optional_device<ss9904_device> m_sound;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -790,42 +791,42 @@ uint32_t subsino2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			{
 				for (int x = 0; x < 0x80; x++)
 				{
-					rectangle visible;
-					visible.min_x = 8 * x;
-					visible.max_x = 8 * (x+1) - 1;
-					visible.min_y = 4 * 0x10 * y;
-					visible.max_y = 4 * 0x10 * (y+1) - 1;
+					rectangle visible(
+							8 * x,
+							8 * (x+1) - 1,
+							4 * 0x10 * y,
+							4 * 0x10 * (y+1) - 1);
 
 					int reeladdr = y * 0x80 * 4 + x;
 					uint16_t reelscroll = m_ss9601_reelram[reeladdr];
 
-					l->tmap->set_scrollx(0, (reelscroll >> 9) * 8 - visible.min_x);
+					l->tmap->set_scrollx(0, (reelscroll >> 9) * 8 - visible.left());
 
 					// wrap around at half tilemap (0x100)
-					int reelscroll_y = (reelscroll & 0x100) + ((reelscroll - visible.min_y) & 0xff);
+					int reelscroll_y = (reelscroll & 0x100) + ((reelscroll - visible.top()) & 0xff);
 					int reelwrap_y = 0x100 - (reelscroll_y & 0xff);
 
 					//visible &= cliprect;
 					rectangle tmp = visible;
 
 					// draw above the wrap around y
-					if ( reelwrap_y-1 >= visible.min_y )
+					if ( reelwrap_y-1 >= visible.top() )
 					{
-						if ( reelwrap_y-1 <= visible.max_y )
-							tmp.max_y = reelwrap_y-1;
+						if ( reelwrap_y-1 <= visible.bottom() )
+							tmp.sety(tmp.top(), reelwrap_y-1);
 						l->tmap->set_scrolly(0, reelscroll_y);
 						l->tmap->draw(screen, m_reelbitmap, tmp, TILEMAP_DRAW_OPAQUE);
-						tmp.max_y = visible.max_y;
+						tmp.sety(tmp.top(), visible.bottom());
 					}
 
 					// draw below the wrap around y
-					if ( reelwrap_y <= visible.max_y )
+					if ( reelwrap_y <= visible.bottom() )
 					{
-						if ( reelwrap_y >= visible.min_y )
-							tmp.min_y = reelwrap_y;
+						if ( reelwrap_y >= visible.top() )
+							tmp.sety(reelwrap_y, tmp.bottom());
 						l->tmap->set_scrolly(0, -((reelwrap_y &0xff) | (reelscroll_y & 0x100)));
 						l->tmap->draw(screen, m_reelbitmap, tmp, TILEMAP_DRAW_OPAQUE);
-						tmp.min_y = visible.min_y;
+						tmp.sety(visible.top(), tmp.bottom());
 					}
 				}
 			}
@@ -895,11 +896,6 @@ void subsino2_state::oki_bank_bit4_w(uint8_t data)
                                 Bishou Jan
 ***************************************************************************/
 
-uint8_t subsino2_state::bishjan_sound_r()
-{
-	return 0;
-}
-
 void subsino2_state::bishjan_sound_w(uint8_t data)
 {
 	/*
@@ -918,6 +914,8 @@ void subsino2_state::bishjan_sound_w(uint8_t data)
 		break;
 	}
 	m_bishjan_sound = data;
+
+	m_sound->write(data);
 }
 
 uint8_t subsino2_state::bishjan_serial_r()
@@ -938,10 +936,9 @@ uint8_t subsino2_state::xiaoao_serial_r()
 
 uint8_t subsino2_state::bishjan_unknown_r()
 {
-	return
-//      (machine().rand() & 0xff);
-//      (((m_screen->frame_number()%60)==0)?0x18:0x00);
-		0x18;
+	// bits 5-6: sound chip handshake, the game waits for them to go low before sending the next command byte
+	// bits 3-4: unknown, must not be both low
+	return m_sound->busy_r() ? 0x78 : 0x18;
 }
 
 void subsino2_state::bishjan_input_w(uint8_t data)
@@ -1000,7 +997,7 @@ void subsino2_state::bishjan_map(address_map &map)
 	map(0x436000, 0x436fff).w(FUNC(subsino2_state::ss9601_reelram_hi_lo_w));
 	map(0x437000, 0x4371ff).w(FUNC(subsino2_state::ss9601_scrollram_0_hi_lo_w));
 
-	map(0x600000, 0x600000).rw(FUNC(subsino2_state::bishjan_sound_r), FUNC(subsino2_state::bishjan_sound_w));
+	map(0x600000, 0x600000).r(m_sound, FUNC(ss9904_device::read)).w(FUNC(subsino2_state::bishjan_sound_w));
 	map(0x600040, 0x600040).w(FUNC(subsino2_state::ss9601_scrollctrl_w));
 	map(0x600060, 0x600060).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x600061, 0x600061).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -1025,7 +1022,8 @@ void subsino2_state::ramdac_map(address_map &map)
 
 uint8_t subsino2_state::new2001_sound_ready_r()
 {
-	return 0x20;
+	// bit 6: sound chip handshake, the game waits for it to go low before sending the next command byte
+	return 0x20 | (m_sound->busy_r() ? 0x40 : 0x00);
 }
 
 void subsino2_state::new2001_output0_w(uint8_t data)
@@ -2878,7 +2876,10 @@ void subsino2_state::bishjan(machine_config &config)
 	ramdac.set_addrmap(0, &subsino2_state::ramdac_map);
 
 	// sound hardware
-	// SS9904
+	SPEAKER(config, "mono").front_center();
+
+	SS9904(config, m_sound, XTAL(44'100'000));
+	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void subsino2_state::xiaoao(machine_config &config)
@@ -2934,7 +2935,9 @@ void subsino2_state::humlan(machine_config &config)
 	m_eeprom->set_timing_scale(0.32);
 
 	// sound hardware
-	// SS9804
+	// SS9804 instead of SS9904; 48 MHz / 6144 = 7812.5 Hz verified against a recording of a Queen Bee cabinet
+	SS9804(config.replace(), m_sound, XTAL(48'000'000));
+	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void subsino2_state::queenbn(machine_config &config)
@@ -2942,6 +2945,7 @@ void subsino2_state::queenbn(machine_config &config)
 	humlan(config);
 
 	m_maincpu->set_clock(48.94_MHz_XTAL / 3);
+	m_sound->set_clock(48.94_MHz_XTAL);
 }
 
 /***************************************************************************
@@ -3246,7 +3250,7 @@ ROM_START( bishjan )
 	ROM_LOAD32_BYTE( "5-v201.u27", 0x000001, 0x100000, CRC(85067d40) SHA1(3ecf7851311a77a0dfca90775fcbf6faabe9c2ab) )
 	ROM_LOAD32_BYTE( "6-v201.u28", 0x000003, 0x100000, CRC(430bd9d7) SHA1(dadf5a7eb90cf2dc20f97dbf20a4b6c8e7734fb1) )
 
-	ROM_REGION( 0x100000, "samples", 0 ) // SS9904
+	ROM_REGION( 0x100000, "ss9x04", 0 ) // SS9904
 	ROM_LOAD( "2-v201.u9", 0x000000, 0x100000, CRC(ea42764d) SHA1(13fe1cd30e474f4b092949c440068e9ddca79976) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
@@ -3262,7 +3266,7 @@ ROM_START( xiaoao )
 	ROM_REGION( 0x400000, "tilemap", 0 )
 	ROM_LOAD( "mj-gc1.u24", 0x000000, 0x400000, CRC(ed3eaaea) SHA1(941ef99dfb2ba0e26112dcd992f7690a1dba8d9c) )
 
-	ROM_REGION( 0x100000, "samples", 0 )
+	ROM_REGION( 0x100000, "ss9x04", 0 )
 	ROM_LOAD( "mj-v1.u10", 0x000000, 0x100000, CRC(4d797394) SHA1(fa40a410f903cd81f15c3a86a60ad405b5db8168) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
@@ -3281,7 +3285,7 @@ ROM_START( queenbn ) // PCB has been hacked to make it work with Queen Bee New i
 	ROM_LOAD32_BYTE( "gfx.u27", 0x00001, 0x80000, CRC(56474613) SHA1(c26211d3c1a3e6eea4e097b4a4ea12743559a5ff) )
 	ROM_LOAD32_BYTE( "gfx.u28", 0x00003, 0x80000, CRC(860a85cd) SHA1(f54ac488b26b11e37cf990a0804d40a2df5cbb16) )
 
-	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_REGION( 0x80000, "ss9x04", 0 )
 	ROM_LOAD( "snd.u9", 0x00000, 0x80000, CRC(aa4edabb) SHA1(b117ad5bba2e410e20b5cbdb606688c6e2112450) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
@@ -3344,7 +3348,7 @@ ROM_START( new2001 )
 	ROM_LOAD32_BYTE( "new_2001_italy_5_v200.2.u27", 0x00001, 0x40000, CRC(d028696b) SHA1(ebb047e7cafaefbdeb479c3877aea4fce0c47ad2) )
 	ROM_LOAD32_BYTE( "new_2001_italy_6_v200.3.u28", 0x00003, 0x40000, CRC(085599e3) SHA1(afd4bed369a96ba12037e6b8cf3a4cab84d12b21) )
 
-	ROM_REGION( 0x80000, "samples", 0 ) // SS9904
+	ROM_REGION( 0x80000, "ss9x04", 0 ) // SS9904
 	ROM_LOAD( "new_2001_italy_2_v200.u9", 0x00000, 0x80000, CRC(9d522d04) SHA1(68f314b077a62598f3de8ef753bdedc93d6eca71) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
@@ -3363,7 +3367,7 @@ ROM_START( trea2000 ) // same PCB as new2001
 	ROM_LOAD32_BYTE( "t2000_alpha_5_v105.2.u27", 0x00001, 0x40000, CRC(f07386be) SHA1(dfe04022532a90089393dd4bd5c0082c341c5a1a) )
 	ROM_LOAD32_BYTE( "t2000_alpha_6_v105.3.u28", 0x00003, 0x40000, CRC(585c66f7) SHA1(8ef31af9bc45dd79610fcfe4681424429af442ba) )
 
-	ROM_REGION( 0x80000, "samples", 0 ) // SS9904
+	ROM_REGION( 0x80000, "ss9x04", 0 ) // SS9904
 	ROM_LOAD( "t2000_alpha_2_v105.u9", 0x00000, 0x80000, CRC(9d522d04) SHA1(68f314b077a62598f3de8ef753bdedc93d6eca71) ) // same as new2001
 
 	ROM_REGION( 0x28, "eeprom", 0 )
@@ -3391,7 +3395,7 @@ ROM_START( queenbee )
 	ROM_LOAD32_BYTE( "27c4001 u27.bin", 0x000001, 0x80000, CRC(27e8c4b9) SHA1(b010b9dcadb357cf4e79d97ce84b86f792bd8ecf) )
 	ROM_LOAD32_BYTE( "27c4001 u28.bin", 0x000003, 0x80000, CRC(7f139a04) SHA1(595a114806756e6f77a6fe20a13515b211ffdf2a) )
 
-	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_REGION( 0x80000, "ss9x04", 0 )
 	ROM_LOAD( "27c4001 u9.bin", 0x000000, 0x80000, CRC(c7cda990) SHA1(193144fe0c31fc8342bd44aa4899bf15f0bc399d) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
@@ -3410,7 +3414,7 @@ ROM_START( queenbee117a )
 	ROM_LOAD16_BYTE( "queen-bee_alpha_4_v200.u44", 0x000000, 0x100000, CRC(7d135b7b) SHA1(71da2db3913198c709591e9640ab5ab9c0b404f8) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
 	ROM_IGNORE(                                              0x100000 )
 
-	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_REGION( 0x80000, "ss9x04", 0 )
 	ROM_LOAD( "27c040.u9", 0x000000, 0x80000, CRC(c7cda990) SHA1(193144fe0c31fc8342bd44aa4899bf15f0bc399d) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
@@ -3428,7 +3432,7 @@ ROM_START( queenbee123a )
 	ROM_LOAD32_BYTE( "27c4001.u27", 0x000001, 0x80000, CRC(27e8c4b9) SHA1(b010b9dcadb357cf4e79d97ce84b86f792bd8ecf) )
 	ROM_LOAD32_BYTE( "27c4001.u28", 0x000003, 0x80000, CRC(7f139a04) SHA1(595a114806756e6f77a6fe20a13515b211ffdf2a) )
 
-	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_REGION( 0x80000, "ss9x04", 0 )
 	ROM_LOAD( "queen_bee_u9_v123a.u9", 0x000000, 0x80000, CRC(aa4edabb) SHA1(b117ad5bba2e410e20b5cbdb606688c6e2112450) ) // 27C040
 
 	ROM_REGION( 0x28, "eeprom", 0 )
@@ -3444,7 +3448,7 @@ ROM_START( queenbee107u )
 	ROM_REGION( 0x200000, "tilemap", 0 ) // this PCB has a single surface mounted ROM, which hasn't been dumped.
 	ROM_LOAD( "gfx", 0x000000, 0x200000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_REGION( 0x80000, "ss9x04", 0 )
 	ROM_LOAD( "27c4001 u9.bin", 0x000000, 0x80000, CRC(c7cda990) SHA1(193144fe0c31fc8342bd44aa4899bf15f0bc399d) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
@@ -3465,7 +3469,7 @@ ROM_START( queenbeeb )
 	// ROM_LOAD32_BYTE( "hlj__truemax_5_v402.u27", 0x000001, 0x80000, CRC(28e14be8) SHA1(778906427175ca50ad5b0a7c5978c36ed29ef994) )
 	// ROM_LOAD32_BYTE( "hlj__truemax_6_v402.u28", 0x000003, 0x80000, CRC(d1c7ae17) SHA1(3ddb8ad38eeb5ab0a944d7d26cfb890a4327ef2e) )
 
-	ROM_REGION( 0x40000, "samples", 0 )
+	ROM_REGION( 0x40000, "ss9x04", 0 )
 	ROM_LOAD( "u9", 0x000000, 0x40000, NO_DUMP )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
@@ -3482,7 +3486,7 @@ ROM_START( queenbeei )
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD( "gfx", 0x000000, 0x200000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_REGION( 0x80000, "ss9x04", 0 )
 	ROM_LOAD( "u9", 0x000000, 0x80000, NO_DUMP )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
@@ -3498,7 +3502,7 @@ ROM_START( queenbeesa )
 	ROM_REGION( 0x200000, "tilemap", 0 )
 	ROM_LOAD( "gfx", 0x000000, 0x200000, NO_DUMP )
 
-	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_REGION( 0x80000, "ss9x04", 0 )
 	ROM_LOAD( "u9", 0x000000, 0x80000, NO_DUMP )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
@@ -3530,9 +3534,9 @@ ROM_START( humlan )
 	ROM_LOAD32_BYTE( "hlj__truemax_5_v402.u27", 0x000001, 0x80000, CRC(28e14be8) SHA1(778906427175ca50ad5b0a7c5978c36ed29ef994) )
 	ROM_LOAD32_BYTE( "hlj__truemax_6_v402.u28", 0x000003, 0x80000, CRC(d1c7ae17) SHA1(3ddb8ad38eeb5ab0a944d7d26cfb890a4327ef2e) )
 
-	ROM_REGION( 0x40000, "samples", 0 ) // SS9804
-	// clearly samples, might be different from the SS9904 case
-	ROM_LOAD( "subsino__qb-v1.u9", 0x000000, 0x40000, CRC(c5dfed44) SHA1(3f5effb85de10c0804efee9bce769d916268bfc9) )
+	ROM_REGION( 0x80000, "ss9x04", 0 ) // SS9804
+	// only the upper half of the 4 Mbit ROM was dumped (it matches the second half of xreel's subsino_qb-vi.u9), so the sample table is missing
+	ROM_LOAD( "subsino__qb-v1.u9", 0x040000, 0x40000, BAD_DUMP CRC(c5dfed44) SHA1(3f5effb85de10c0804efee9bce769d916268bfc9) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
 	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(281eb16b) SHA1(db62a7004e2bc9a052d6f154cb4c6d645d00f768) BAD_DUMP ) // handcrafted to pass protection check
@@ -3559,7 +3563,7 @@ ROM_START( xreel )
 	ROM_LOAD32_BYTE( "x-reel_ecm_5_v103.u27", 0x000001, 0x80000, CRC(f203d41f) SHA1(4e666ffbb5a3a6545c89cbb4516c2e918b5a96f2) )
 	ROM_LOAD32_BYTE( "x-reel_ecm_6_v103.u28", 0x000003, 0x80000, CRC(a9c39698) SHA1(dedc366dec836ad3c43146633850a702ca46f722) )
 
-	ROM_REGION( 0x80000, "samples", 0 ) // SS9904
+	ROM_REGION( 0x80000, "ss9x04", 0 ) // SS9904
 	ROM_LOAD( "subsino_qb-vi.u9", 0x000000, 0x80000, CRC(aa4edabb) SHA1(b117ad5bba2e410e20b5cbdb606688c6e2112450) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
@@ -3588,7 +3592,7 @@ ROM_START( squeenb )
 	ROM_LOAD32_BYTE( "u27", 0x000001, 0x80000, CRC(d713131a) SHA1(74a95e1ef0d30da53a91a5232574687f816df2eb) )
 	ROM_LOAD32_BYTE( "u28", 0x000003, 0x80000, CRC(dfa39f39) SHA1(992f74c04cbf4af06a02812052ce701228d4e174) )
 
-	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_REGION( 0x80000, "ss9x04", 0 )
 	ROM_LOAD( "u9", 0x000000, 0x80000, CRC(c7cda990) SHA1(193144fe0c31fc8342bd44aa4899bf15f0bc399d) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
@@ -3604,7 +3608,7 @@ ROM_START( qbeebing )
 	ROM_LOAD16_BYTE( "rom 4 27c160 3374h", 0x000001, 0x200000, CRC(a01527a0) SHA1(41ea384dd9c15c58246856f104b7dce68be1737c) )
 	ROM_LOAD16_BYTE( "rom 3 27c160 08d7h", 0x000000, 0x200000, CRC(1fdf0fcb) SHA1(ed54172521f8d05bad37b670548106e4c4deb8af) )
 
-	ROM_REGION( 0x80000, "samples", ROMREGION_ERASE00 ) // no samples, missing?
+	ROM_REGION( 0x80000, "ss9x04", ROMREGION_ERASE00 ) // no samples, missing?
 
 	ROM_REGION( 0x28, "eeprom", 0 )
 	ROM_LOAD( "ds2430a.bin", 0x00, 0x28, CRC(0d8db9ef) SHA1(eef0c8debbb2cb20af180c5c6a8ba998104fa24e) BAD_DUMP ) // handcrafted to pass protection check
@@ -3621,7 +3625,7 @@ ROM_START( treamary )
 	ROM_LOAD32_BYTE( "27c040_u27.bin", 0x000001, 0x80000, CRC(dc3a477e) SHA1(6268872257f1b513b80a58a9e29861f3f2e2c177) )
 	ROM_LOAD32_BYTE( "27c040_u28.bin", 0x000003, 0x80000, CRC(58d88d8d) SHA1(4551121691e958d280dfd437e47c6e331b66ede6) )
 
-	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_REGION( 0x80000, "ss9x04", 0 )
 	ROM_LOAD( "27c040_u9.bin", 0x000000, 0x80000, CRC(5345ca39) SHA1(2b8f1dfeebb93a1d99c06912d89b268c642163df) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
@@ -4300,7 +4304,7 @@ ROM_START( goldenti )
 	ROM_LOAD16_BYTE( "m27c160.u43", 0x000001, 0x200000, CRC(27675d81) SHA1(8a3620c1d91f452ae040cd0ab8b384dd4065f0c2) )
 	ROM_LOAD16_BYTE( "m27c160.u44", 0x000000, 0x200000, CRC(c4e27e0b) SHA1(e1f00ed0f5e4ef0ca0605857d9c688a48a507630) )
 
-	ROM_REGION( 0x80000, "samples", 0 )
+	ROM_REGION( 0x80000, "ss9x04", 0 )
 	ROM_LOAD( "27c040.u9", 0x000000, 0x80000, CRC(191e3551) SHA1(f4e9fc56e71ec99bff91678608b6bd97afbfc31b) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
@@ -4318,8 +4322,8 @@ ROM_START( dongshiz ) // default password is all bet
 	ROM_LOAD16_BYTE( "mrboss_china_3_v209.u43", 0x000001, 0x200000, CRC(a2fea997) SHA1(e49dfde9eb7023485f1ba5b02fd079f76718203e) )
 	ROM_LOAD16_BYTE( "mrboss_china_4_v209.u44", 0x000000, 0x200000, CRC(7f4a402d) SHA1(bfce5efb9bd19ffbd392c3a4ff189cd22db7dc5c) )
 
-	ROM_REGION( 0x100000, "samples", 0 )
-	ROM_LOAD( "mrboss_china_2_v300.u9", 0x000000, 0x100000, CRC(165f31ae) SHA1(1a0e63e63ce953271e980a66ab2f31f3c830da5a) )
+	ROM_REGION( 0x100000, "ss9x04", 0 )
+	ROM_LOAD( "mrboss_china_2_v300.u9", 0x000000, 0x100000, BAD_DUMP CRC(165f31ae) SHA1(1a0e63e63ce953271e980a66ab2f31f3c830da5a) )
 
 	ROM_REGION( 0x28, "eeprom", 0 ) // bp 340,1,{ER6=00081f78;g} can be used to bypass the failing check for now
 	ROM_LOAD( "ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(b653cf03) SHA1(6b64dbe6c58a38b63ce7971964f2f8cafd19844e) ) // the '64-bit registration number' (0x20-0x27) is all 0xff
@@ -4355,35 +4359,35 @@ GAME( 1997, treacity202, treacity, saklove,  treacity, subsino2_state, empty_ini
 
 GAME( 1999, ntrecity,    0,        saklove,  treacity, subsino2_state, empty_init,    ROT0, "Subsino",                          "New Treasure City (Italy, Ver. 1.6)",   MACHINE_NOT_WORKING )
 
-GAME( 1999, bishjan,     0,        bishjan,  bishjan,  subsino2_state, empty_init,    ROT0, "Subsino",                          "Bishou Jan (Japan, Ver. 203)",          MACHINE_NO_SOUND )
-GAME( 1999, xiaoao,      bishjan,  xiaoao,   bishjan,  subsino2_state, empty_init,    ROT0, "Subsino",                          "Xiao Ao Jiang Hu (China, Ver. 1.00)",   MACHINE_NO_SOUND )
+GAME( 1999, bishjan,     0,        bishjan,  bishjan,  subsino2_state, empty_init,    ROT0, "Subsino",                          "Bishou Jan (Japan, Ver. 203)",          0 )
+GAME( 1999, xiaoao,      bishjan,  xiaoao,   bishjan,  subsino2_state, empty_init,    ROT0, "Subsino",                          "Xiao Ao Jiang Hu (China, Ver. 1.00)",   0 )
 
-GAME( 2000, new2001,     0,        new2001,  new2001,  subsino2_state, empty_init,    ROT0, "Subsino",                          "New 2001 (Italy, Ver. 200N)",           MACHINE_NO_SOUND )
+GAME( 2000, new2001,     0,        new2001,  new2001,  subsino2_state, empty_init,    ROT0, "Subsino",                          "New 2001 (Italy, Ver. 200N)",           0 )
 
-GAME( 2000, trea2000,    0,        trea2000, new2001,  subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Treasure 2000 (Ver. 107)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2000, trea2000,    0,        trea2000, new2001,  subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Treasure 2000 (Ver. 107)",              MACHINE_NOT_WORKING )
 
 GAME( 2006, xplan,       0,        xplan,    xplan,    subsino2_state, empty_init,    ROT0, "Subsino",                          "X-Plan (Ver. 101)",                     MACHINE_NOT_WORKING )
 
-GAME( 2001, queenbee,    0,        humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Queen Bee (Ver. 114)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
-GAME( 2001, queenbee117a,queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Queen Bee (Ver. 117)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
-GAME( 2001, queenbee123a,queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Queen Bee (Ver. 123A)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
-GAME( 2001, queenbee107u,queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (USA, Ver. 107)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
+GAME( 2001, queenbee,    0,        humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Queen Bee (Ver. 114)",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
+GAME( 2001, queenbee117a,queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Queen Bee (Ver. 117)",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
+GAME( 2001, queenbee123a,queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Queen Bee (Ver. 123A)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
+GAME( 2001, queenbee107u,queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (USA, Ver. 107)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 GAME( 2001, queenbeeb,   queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (Brazil, Ver. 202)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues, only program ROM available
 GAME( 2001, queenbeei,   queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (Israel, Ver. 100)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues, only program ROM available
 GAME( 2001, queenbeesa,  queenbee, humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee (SA-101-HARD)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues, only program ROM available
 
-GAME( 2001, humlan,      queenbee, humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino (Truemax license)",        "Humlan's Lyckohjul (Sweden, Ver. 402)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
+GAME( 2001, humlan,      queenbee, humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino (Truemax license)",        "Humlan's Lyckohjul (Sweden, Ver. 402)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 
-GAME( 2002, queenbn,     0,        queenbn,  humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Nuwang Feng New / Queen Bee New (China, Ver. 1.10)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
+GAME( 2002, queenbn,     0,        queenbn,  humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Nuwang Feng New / Queen Bee New (China, Ver. 1.10)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 
-GAME( 2002, xreel,       queenbee, humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino (ECM license)",            "X-Reel",                                MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
+GAME( 2002, xreel,       queenbee, humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino (ECM license)",            "X-Reel",                                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 
-GAME( 2002, squeenb,     0,        humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Super Queen Bee (Ver. 101)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
+GAME( 2002, squeenb,     0,        humlan,   humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Super Queen Bee (Ver. 101)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 
-GAME( 2003, qbeebing,    0,        humlan,   qbeebing, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee Bingo",                       MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, qbeebing,    0,        humlan,   qbeebing, subsino2_state, empty_init,    ROT0, "Subsino",                          "Queen Bee Bingo",                       MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // only program ROM available
 
-GAME( 200?, treamary,    0,        bishjan,  bishjan,  subsino2_state, empty_init,    ROT0, "Subsino",                          "Treasure Mary",                         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 200?, treamary,    0,        bishjan,  bishjan,  subsino2_state, empty_init,    ROT0, "Subsino",                          "Treasure Mary",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 200?, goldenti,    0,        humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Golden Treasure Island (Ver. Alpha 100)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
+GAME( 200?, goldenti,    0,        humlan,   queenbee, subsino2_state, empty_init,    ROT0, "Subsino (American Alpha license)", "Golden Treasure Island (Ver. Alpha 100)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING ) // severe timing issues
 
 GAME( 2005, dongshiz,    0,        new2001,  humlan,   subsino2_state, empty_init,    ROT0, "Subsino",                          "Dongshizhang (China, Ver. 212)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // incomplete DS dump, fails start up check

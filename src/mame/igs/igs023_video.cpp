@@ -296,11 +296,11 @@ void igs023_video_device::vblank(int state)
 
 inline void igs023_video_device::pgm_draw_pix(int xdrawpos, int pri, u16 *dest, u8 *destpri, const rectangle &cliprect, u16 srcdat)
 {
-	if ((xdrawpos >= cliprect.min_x) && (xdrawpos <= cliprect.max_x))
+	if (cliprect.containsx(xdrawpos))
 	{
 		if (!(destpri[xdrawpos] & 1))
 		{
-			if ((!pri) || (!(destpri[xdrawpos] & 2)))
+			if (!pri || !(destpri[xdrawpos] & 2))
 				dest[xdrawpos] = srcdat;
 		}
 
@@ -441,7 +441,7 @@ void igs023_video_device::draw_sprite_new_zoomed(int wide, int high, int xpos, i
 			else
 				ydrawpos = ypos + realysize - ycntdraw;
 
-			if ((ydrawpos >= cliprect.min_y) && (ydrawpos <= cliprect.max_y))
+			if (cliprect.containsy(ydrawpos))
 			{
 				u16 *dest = &bitmap.pix(ydrawpos);
 				u8 *destpri = &priority_bitmap.pix(ydrawpos);
@@ -464,7 +464,7 @@ void igs023_video_device::draw_sprite_new_zoomed(int wide, int high, int xpos, i
 			else
 				ydrawpos = ypos + realysize - ycntdraw;
 
-			if ((ydrawpos >= cliprect.min_y) && (ydrawpos <= cliprect.max_y))
+			if (cliprect.containsy(ydrawpos))
 			{
 				u16 *dest = &bitmap.pix(ydrawpos);
 				u8 *destpri = &priority_bitmap.pix(ydrawpos);
@@ -476,12 +476,12 @@ void igs023_video_device::draw_sprite_new_zoomed(int wide, int high, int xpos, i
 
 				if (!get_flipy(flip))
 				{
-					if (ydrawpos >= cliprect.max_y)
+					if (ydrawpos >= cliprect.bottom())
 						return;
 				}
 				else
 				{
-					if (ydrawpos < cliprect.min_y)
+					if (ydrawpos < cliprect.top())
 						return;
 				}
 			}
@@ -501,7 +501,7 @@ void igs023_video_device::draw_sprite_new_zoomed(int wide, int high, int xpos, i
 			else
 				ydrawpos = ypos + realysize - ycntdraw;
 
-			if ((ydrawpos >= cliprect.min_y) && (ydrawpos <= cliprect.max_y))
+			if (cliprect.containsy(ydrawpos))
 			{
 				u16 *dest = &bitmap.pix(ydrawpos);
 				u8 *destpri = &priority_bitmap.pix(ydrawpos);
@@ -513,12 +513,12 @@ void igs023_video_device::draw_sprite_new_zoomed(int wide, int high, int xpos, i
 
 				if (!get_flipy(flip))
 				{
-					if (ydrawpos >= cliprect.max_y)
+					if (ydrawpos >= cliprect.bottom())
 						return;
 				}
 				else
 				{
-					if (ydrawpos < cliprect.min_y)
+					if (ydrawpos < cliprect.top())
 						return;
 				}
 
@@ -589,7 +589,7 @@ void igs023_video_device::draw_sprite_new_basic(int wide, int high, int xpos, in
 		else
 			ydrawpos = ypos + realysize - ycntdraw;
 
-		if ((ydrawpos >= cliprect.min_y) && (ydrawpos <= cliprect.max_y))
+		if (cliprect.containsy(ydrawpos))
 		{
 			u16 *dest = &bitmap.pix(ydrawpos);
 			u8 *destpri = &priority_bitmap.pix(ydrawpos);
@@ -601,12 +601,12 @@ void igs023_video_device::draw_sprite_new_basic(int wide, int high, int xpos, in
 
 			if (!get_flipy(flip))
 			{
-				if (ydrawpos >= cliprect.max_y)
+				if (ydrawpos >= cliprect.bottom())
 					return;
 			}
 			else
 			{
-				if (ydrawpos < cliprect.min_y)
+				if (ydrawpos < cliprect.top())
 					return;
 			}
 		}
@@ -841,7 +841,7 @@ u32 igs023_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{
 		m_bg_tilemap->set_scrolly(0, m_bg_yscroll);
 
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			m_bg_tilemap->set_scrollx((y + m_bg_yscroll) & 0x1ff, m_bg_xscroll + m_rowscrollram[y]);
 
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 2);

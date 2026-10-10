@@ -17369,8 +17369,9 @@ ROM_START( chry10 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ver.1h2.u20",       0x0000, 0x10000, CRC(85bbde06) SHA1(f44d335feb4697b195e9fc7e5aeaabf099e21ed8) )
 
-	ROM_REGION( 0x10000, "pic", 0 )
-	ROM_LOAD( "pic16f84.bad.dump", 0x0000, 0x14f4, BAD_DUMP CRC(876ff1ed) SHA1(fcd6892e2b8371030af15e4d8c9f4a351ce0551c) )
+	// no code, just the user ids and configuration word - but the configuration seems invalid too
+	ROM_REGION16_LE( 0x4280, "pic", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16f84.bin", 0x0000, 0x4280, BAD_DUMP CRC(b68a4d55) SHA1(0446f260e48d7a0978d723c67ac4fad3a8b5eeb3) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "27c010.u1",         0x00000, 0x20000, CRC(05515cf8) SHA1(366dd44ae93bdc4cf456f97f38edac83441cbc89) )

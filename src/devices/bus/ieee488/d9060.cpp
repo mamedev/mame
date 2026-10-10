@@ -613,6 +613,8 @@ void d9060_device_base::device_start()
 	save_item(NAME(m_daco));
 	save_item(NAME(m_atna));
 	save_item(NAME(m_enable));
+	save_item(NAME(m_ifc));
+	save_item(NAME(m_data));
 
 	m_via->write_pb4(!(m_variant == TYPE_9090)); // J14 (6 HEADS)
 	m_via->write_pb5(!(m_variant == TYPE_9060)); // J13 (4 HEADS)

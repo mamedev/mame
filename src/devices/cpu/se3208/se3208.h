@@ -33,8 +33,8 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// device_execute_interface implementation
-	virtual u32 execute_min_cycles() const noexcept override { return 1; }
-	virtual u32 execute_max_cycles() const noexcept override { return 1; }
+	virtual u32 execute_min_cycles() const noexcept override { return 3; }
+	virtual u32 execute_max_cycles() const noexcept override { return 3; }
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;

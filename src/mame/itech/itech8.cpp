@@ -671,7 +671,7 @@ void itech8_state::machine_reset()
 	// set the visible area
 	if (m_visarea.width() > 1)
 	{
-		m_screen->set_visible_area(m_visarea.min_x, m_visarea.max_x, m_visarea.min_y, m_visarea.max_y);
+		m_screen->set_visible_area(m_visarea.left(), m_visarea.right(), m_visarea.top(), m_visarea.bottom());
 		m_visarea.set(0, 0, 0, 0);
 	}
 }

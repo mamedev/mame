@@ -533,10 +533,10 @@ void corcomp_fdc_device::common_config(machine_config& config)
 	m_motormf->set_clear_pin_value(1);
 	m_motormf->out_cb().set(FUNC(corcomp_fdc_device::motor_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy[0], ccfdc_floppies, "525dd", corcomp_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[1], ccfdc_floppies, "525dd", corcomp_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[2], ccfdc_floppies, nullptr, corcomp_fdc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[3], ccfdc_floppies, nullptr, corcomp_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], ccfdc_floppies, "525dd", corcomp_fdc_device::floppy_formats).enable_sound("ti99_peb_dsk1");
+	FLOPPY_CONNECTOR(config, m_floppy[1], ccfdc_floppies, "525dd", corcomp_fdc_device::floppy_formats).enable_sound("ti99_peb_dsk2");
+	FLOPPY_CONNECTOR(config, m_floppy[2], ccfdc_floppies, nullptr, corcomp_fdc_device::floppy_formats).enable_sound("ti99_peb_dsk3");
+	FLOPPY_CONNECTOR(config, m_floppy[3], ccfdc_floppies, nullptr, corcomp_fdc_device::floppy_formats).enable_sound("ti99_peb_dsk4");
 
 	// SRAM 2114 1Kx4
 	RAM(config, BUFFER).set_default_size("1k").set_default_value(0);

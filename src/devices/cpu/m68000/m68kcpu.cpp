@@ -2088,6 +2088,7 @@ void m68000_musashi_device::define_state(void)
 
 	if (m_cpu_type == CPU_TYPE_COLDFIRE)
 	{
+		state_add(M68K_VBR, "VBR", m_vbr);
 		state_add(COLDFIRE_ROMBAR0, "ROMBAR0", m_rombar[0]);
 		state_add(COLDFIRE_ROMBAR1, "ROMBAR1", m_rombar[1]);
 		state_add(COLDFIRE_RAMBAR0, "RAMBAR0", m_rambar[0]);

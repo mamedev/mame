@@ -12,6 +12,8 @@
 #include "formats/d64_dsk.h"
 #include "formats/g64_dsk.h"
 
+#include <algorithm>
+
 
 
 //**************************************************************************
@@ -138,10 +140,10 @@ uint8_t c1551_device::tcbm_data_r()
 
 	*/
 
-	return m_tcbm_data;
+	return m_tcbm_data[0] & m_tcbm_data[1];
 }
 
-void c1551_device::tcbm_data_w(uint8_t data)
+template <int N> void c1551_device::tcbm_data_w(uint8_t data)
 {
 	/*
 
@@ -158,7 +160,7 @@ void c1551_device::tcbm_data_w(uint8_t data)
 
 	*/
 
-	m_tcbm_data = data;
+	m_tcbm_data[N] = data;
 }
 
 uint8_t c1551_device::tpi0_r(offs_t offset)
@@ -185,8 +187,8 @@ uint8_t c1551_device::tpi0_pc_r()
 
 	    bit     description
 
-	    PC0
-	    PC1
+	    PC0     TCBM STATUS0
+	    PC1     TCBM STATUS1
 	    PC2
 	    PC3
 	    PC4
@@ -203,6 +205,9 @@ uint8_t c1551_device::tpi0_pc_r()
 
 	// SYNC detect line
 	data |= m_ga->sync_r() << 6;
+
+	// TCBM status
+	data |= m_status & m_host_status;
 
 	// TCBM data valid
 	data |= m_dav << 7;
@@ -261,7 +266,12 @@ uint8_t c1551_device::tpi1_pb_r()
 
 	*/
 
-	return m_status & 0x03;
+	return m_status & m_host_status;
+}
+
+void c1551_device::tpi1_pb_w(uint8_t data)
+{
+	m_host_status = data & 0x03;
 }
 
 uint8_t c1551_device::tpi1_pc_r()
@@ -348,7 +358,7 @@ void c1551_device::device_add_mconfig(machine_config &config)
 
 	TPI6525(config, m_tpi0);
 	m_tpi0->in_pa_cb().set(FUNC(c1551_device::tcbm_data_r));
-	m_tpi0->out_pa_cb().set(FUNC(c1551_device::tcbm_data_w));
+	m_tpi0->out_pa_cb().set(FUNC(c1551_device::tcbm_data_w<0>));
 	m_tpi0->in_pb_cb().set(m_ga, FUNC(c64h156_device::yb_r));
 	m_tpi0->out_pb_cb().set(m_ga, FUNC(c64h156_device::yb_w));
 	m_tpi0->in_pc_cb().set(FUNC(c1551_device::tpi0_pc_r));
@@ -356,8 +366,9 @@ void c1551_device::device_add_mconfig(machine_config &config)
 
 	TPI6525(config, m_tpi1);
 	m_tpi1->in_pa_cb().set(FUNC(c1551_device::tcbm_data_r));
-	m_tpi1->out_pa_cb().set(FUNC(c1551_device::tcbm_data_w));
+	m_tpi1->out_pa_cb().set(FUNC(c1551_device::tcbm_data_w<1>));
 	m_tpi1->in_pb_cb().set(FUNC(c1551_device::tpi1_pb_r));
+	m_tpi1->out_pb_cb().set(FUNC(c1551_device::tpi1_pb_w));
 	m_tpi1->in_pc_cb().set(FUNC(c1551_device::tpi1_pc_r));
 	m_tpi1->out_pc_cb().set(FUNC(c1551_device::tpi1_pc_w));
 
@@ -369,6 +380,7 @@ void c1551_device::device_add_mconfig(machine_config &config)
 	connector.set_default_option("525ssqd");
 	connector.set_fixed(true);
 	connector.set_formats(c1551_device::floppy_formats);
+	connector.enable_sound(true);
 
 	plus4_expansion_slot_device::add_passthrough(config, "exp");
 }
@@ -416,8 +428,8 @@ c1551_device::c1551_device(const machine_config &mconfig, const char *tag, devic
 	, m_floppy(*this, C64H156_TAG":0:525ssqd")
 	, m_jp1(*this, "JP1")
 	, m_leds(*this, "led%u", 0U)
-	, m_tcbm_data(0xff)
 	, m_status(1)
+	, m_host_status(3)
 	, m_dav(1)
 	, m_ack(1)
 	, m_dev(0)
@@ -439,9 +451,12 @@ void c1551_device::device_start()
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);
 
+	std::fill(std::begin(m_tcbm_data), std::end(m_tcbm_data), 0xff);
+
 	// register for state saving
 	save_item(NAME(m_tcbm_data));
 	save_item(NAME(m_status));
+	save_item(NAME(m_host_status));
 	save_item(NAME(m_dav));
 	save_item(NAME(m_ack));
 	save_item(NAME(m_dev));

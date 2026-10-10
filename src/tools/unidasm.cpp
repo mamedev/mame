@@ -45,6 +45,7 @@ using util::BIT;
 #include "cpu/ddp516/ddp516d.h"
 #include "cpu/dsp16/dsp16dis.h"
 #include "cpu/dsp32/dsp32dis.h"
+#include "cpu/dsp32/dsp3210dis.h"
 #include "cpu/dsp56000/dsp56000d.h"
 #include "cpu/dsp56156/dsp56dsm.h"
 #include "cpu/dsp563xx/dsp563xxd.h"
@@ -102,6 +103,7 @@ using util::BIT;
 #include "cpu/m6502/m6510d.h"
 #include "cpu/m6502/m65ce02d.h"
 #include "cpu/m6502/m740d.h"
+#include "cpu/m6502/r6511d.h"
 #include "cpu/m6502/r65c02d.h"
 #include "cpu/m6502/r65c19d.h"
 #include "cpu/m6502/w65816d.h"
@@ -153,7 +155,6 @@ using util::BIT;
 #include "cpu/pic16/pic16d.h"
 #include "cpu/pic1670/pic1670d.h"
 #include "cpu/pic16c5x/16c5xdsm.h"
-#include "cpu/pic16c62x/16c62xdsm.h"
 #include "cpu/pic17/pic17d.h"
 #include "cpu/powerpc/ppc_dasm.h"
 #include "cpu/pps4/pps4dasm.h"
@@ -185,6 +186,7 @@ using util::BIT;
 #include "cpu/st9/st9dasm.h"
 #include "cpu/superfx/sfx_dasm.h"
 #include "cpu/t11/t11dasm.h"
+#include "cpu/t6m53/t6m53_dasm.h"
 #include "cpu/tlcs870/tlcs870d.h"
 #include "cpu/tlcs90/tlcs90d.h"
 #include "cpu/tlcs900/dasm900.h"
@@ -463,6 +465,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "ds80c320",        le,  0, []() -> util::disasm_interface * { return new ds80c320_disassembler; } },
 	{ "dsp16",           le, -1, []() -> util::disasm_interface * { return new dsp16_disassembler; } },
 	{ "dsp32c",          le,  0, []() -> util::disasm_interface * { return new dsp32c_disassembler; } },
+	{ "dsp3210",         be,  0, []() -> util::disasm_interface * { return new dsp3210_disassembler; } },
 	{ "dsp56000",        be, -2, []() -> util::disasm_interface * { return new dsp56000_disassembler; } },
 	{ "dsp56156",        le, -1, []() -> util::disasm_interface * { return new dsp56156_disassembler; } },
 	{ "dsp563xx",        le, -2, []() -> util::disasm_interface * { return new dsp563xx_disassembler; } },
@@ -605,7 +608,6 @@ static const dasm_table_entry dasm_table[] =
 	{ "pic16",           le, -1, []() -> util::disasm_interface * { return new pic16_disassembler; } },
 	{ "pic16c5x",        le, -1, []() -> util::disasm_interface * { return new pic16c5x_disassembler; } },
 	{ "pic1670",         le, -1, []() -> util::disasm_interface * { return new pic1670_disassembler; } },
-	{ "pic16c62x",       le, -1, []() -> util::disasm_interface * { return new pic16c62x_disassembler; } },
 	{ "pic17",           le, -1, []() -> util::disasm_interface * { return new pic17_disassembler; } },
 	{ "power",           be,  0, []() -> util::disasm_interface * { return new power_disassembler; } },
 	{ "powerpc",         be,  0, []() -> util::disasm_interface * { return new powerpc_disassembler; } },
@@ -616,6 +618,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "prime64r",        be, -1, []() -> util::disasm_interface * { return new prime64r_disassembler; } },
 	{ "prime64v",        be, -1, []() -> util::disasm_interface * { return new prime64v_disassembler; } },
 	{ "psxcpu",          le,  0, []() -> util::disasm_interface * { return new psxcpu_disassembler; } },
+	{ "r6511",           le,  0, []() -> util::disasm_interface * { return new r6511_disassembler; } },
 	{ "r65c02",          le,  0, []() -> util::disasm_interface * { return new r65c02_disassembler; } },
 	{ "r65c19",          le,  0, []() -> util::disasm_interface * { return new r65c19_disassembler; } },
 	{ "r800",            le,  0, []() -> util::disasm_interface * { return new r800_disassembler; } },
@@ -666,6 +669,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "st9p",            be,  0, []() -> util::disasm_interface * { return new st9p_disassembler; } },
 	{ "superfx",         le,  0, []() -> util::disasm_interface * { return new superfx_disassembler(&superfx_unidasm); } },
 	{ "t11",             le,  0, []() -> util::disasm_interface * { return new t11_disassembler; } },
+    { "t6m53",           be,  0, []() -> util::disasm_interface * { return new t6m53_disassembler; } },
 	{ "tlcs870",         le,  0, []() -> util::disasm_interface * { return new tlcs870_disassembler; } },
 	{ "tlcs900",         le,  0, []() -> util::disasm_interface * { return new tlcs900_disassembler; } },
 	{ "tmp90c051",       le,  0, []() -> util::disasm_interface * { return new tmp90c051_disassembler; } },

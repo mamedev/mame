@@ -5,7 +5,6 @@
     TODO:
 
     - clean up TED
-    - T6721 speech chip
 
 */
 
@@ -150,12 +149,6 @@ protected:
 	void write_kb7(int state) { if (state) m_kb |= 128; else m_kb &= ~128; }
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload) { return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbm_quick_sethiaddress); }
-
-	bool m_iec_atn;
-	bool m_iec_clk;
-	bool m_iec_data;
-	emu_timer *m_iec_sync_timer;
-	TIMER_CALLBACK_MEMBER(iec_sync_tick);
 
 	enum
 	{
@@ -622,6 +615,9 @@ uint8_t plus4_state::cpu_r()
 
 	*/
 
+	if (!m_iec->sample_ready(*m_maincpu))
+		return 0xff;
+
 	uint8_t data = 0x2f;
 
 	// cassette read
@@ -652,6 +648,9 @@ uint8_t c16_state::cpu_r()
 	    7       IEC DATA IN
 
 	*/
+
+	if (!m_iec->sample_ready(*m_maincpu))
+		return 0xff;
 
 	uint8_t data = 0;
 
@@ -687,28 +686,19 @@ void plus4_state::cpu_w(uint8_t data)
 	//logerror("%s cpu write %02x\n", machine().describe_context(), data);
 
 	// serial data
-	m_iec_data = !BIT(data, 0);
+	m_iec->host_data_w(!BIT(data, 0));
 
 	// serial clock
-	m_iec_clk = !BIT(data, 1);
+	m_iec->host_clk_w(!BIT(data, 1));
 
 	// serial attention
-	m_iec_atn = !BIT(data, 2);
+	m_iec->host_atn_w(!BIT(data, 2));
 
 	// cassette motor
 	m_cassette->motor_w(BIT(data, 3));
 
 	// cassette write
 	m_cassette->write(!BIT(data, 1));
-
-	m_iec_sync_timer->adjust(attotime::zero);
-}
-
-TIMER_CALLBACK_MEMBER(plus4_state::iec_sync_tick)
-{
-	m_iec->host_atn_w(m_iec_atn);
-	m_iec->host_clk_w(m_iec_clk);
-	m_iec->host_data_w(m_iec_data);
 }
 
 
@@ -791,8 +781,6 @@ void plus4_datassette_devices(device_slot_interface &device)
 
 void plus4_state::machine_start()
 {
-	m_iec_sync_timer = timer_alloc(FUNC(plus4_state::iec_sync_tick), this);
-
 	// initialize memory
 	uint8_t data = 0xff;
 
@@ -1076,9 +1064,17 @@ void c16_state::c232(machine_config &config)
 void c16_state::v364(machine_config &config)
 {
 	plus4n(config);
-	T6721A(config, T6721A_TAG, XTAL(640'000)).add_route(ALL_OUTPUTS, "mono", 0.25);
+	t6721a_device &speech(T6721A(config, T6721A_TAG, 640_kHz_XTAL));
+	speech.add_route(ALL_OUTPUTS, "mono", 0.25);
+	speech.eos_handler().set(m_vslsi, FUNC(mos8706_device::eos_w));
+	speech.apd_handler().set(m_vslsi, FUNC(mos8706_device::apd_w));
+	speech.phi2_handler().set(m_vslsi, FUNC(mos8706_device::phi2_w));
+	speech.dtrd_handler().set(m_vslsi, FUNC(mos8706_device::dtrd_w));
 
 	MOS8706(config, m_vslsi, XTAL(14'318'181)/16);
+	m_vslsi->command_handler().set(speech, FUNC(t6721a_device::write));
+	m_vslsi->di_handler().set(speech, FUNC(t6721a_device::di_w));
+	m_vslsi->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
 }
 
 

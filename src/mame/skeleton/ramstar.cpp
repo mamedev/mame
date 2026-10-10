@@ -40,7 +40,7 @@ It only contains a 27C512 or 27C1024 and a X24C04.
 
 #include "emu.h"
 
-#include "cpu/g65816/g65816.h"
+#include "cpu/m6502/w65816.h"
 #include "cpu/mcs51/i80c51.h"
 #include "machine/6522via.h"
 #include "machine/i2cmem.h"
@@ -156,7 +156,7 @@ INPUT_PORTS_END
 void ramstar_state::ramstar(machine_config &config)
 {
 	// basic machine hardware
-	G65816(config, m_maincpu, 10_MHz_XTAL); // (absence of) divider not verified
+	W65816(config, m_maincpu, 10_MHz_XTAL); // (absence of) divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &ramstar_state::main_program_map);
 	m_maincpu->set_addrmap(AS_DATA, &ramstar_state::main_data_map);
 

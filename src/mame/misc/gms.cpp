@@ -105,7 +105,7 @@ super555: https://www.youtube.com/watch?v=CCUKdbQ5O-U
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/i80c51.h"
-#include "cpu/pic16x8x/pic16x8x.h"
+#include "cpu/pic16_mid/pic16_mid.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
@@ -2868,9 +2868,9 @@ ROM_START( rbspm ) // PCB NO.6899-B
 	ROM_REGION( 0x1000, "mcu", 0 ) // protected MCU
 	ROM_LOAD( "mj-dfmj_at89c51.bin", 0x0000, 0x1000, CRC(c6c48161) SHA1(c3ecf998820d758286b18896ff7860221dd0cf43) ) // decapped
 
-	ROM_REGION( 0x4280, "pic", 0 ) // pic was populated on this board
-	ROM_LOAD( "c016_pic16f84_code.bin", 0x000, 0x800, CRC(1eb5cd2b) SHA1(9e747235e39eaea337f9325fa55fbfec1c03168d) )
-	ROM_LOAD( "c016_pic16f84_data.bin", 0x800, 0x080, CRC(ee882e11) SHA1(aa5852a95a89b17270bb6f315dfa036f9f8155cf) )
+	ROM_REGION16_LE( 0x4280, "pic", ROMREGION_ERASEFF ) // pic was populated on this board
+	ROM_LOAD( "c016_pic16f84_code.bin", 0x0000, 0x0800, CRC(1eb5cd2b) SHA1(9e747235e39eaea337f9325fa55fbfec1c03168d) )
+	ROM_LOAD( "c016_pic16f84_data.bin", 0x4200, 0x0080, CRC(ee882e11) SHA1(aa5852a95a89b17270bb6f315dfa036f9f8155cf) )
 
 	ROM_REGION( 0x20000, "user1", 0 ) // ??? MCU data / code
 	ROM_LOAD( "mj-dfmj-2.2-xx.bin", 0x00000, 0x20000,  CRC(58a9eea2) SHA1(1a251e9b049bc8dafbc0728b3d876fdd5a1c8dd9) )

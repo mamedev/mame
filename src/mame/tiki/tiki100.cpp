@@ -20,10 +20,8 @@
 
     TODO:
 
-    - winchester hard disk
     - analog/digital I/O
     - light pen
-    - 8088 CPU card
 
 */
 
@@ -497,11 +495,11 @@ uint32_t tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	for (int vaddr = cliprect.min_y; vaddr <= cliprect.max_y; vaddr++)
+	for (int vaddr = cliprect.top(); vaddr <= cliprect.bottom(); vaddr++)
 	{
 		// This is at the start of a line
-		int haddr = (cliprect.min_x>>4);
-		int const haddr_end = (cliprect.max_x>>4);
+		int haddr = cliprect.left() >> 4;
+		int const haddr_end = cliprect.right() >> 4;
 		for (; haddr <= haddr_end; haddr++)
 		{
 			// This is at the start of a 16-dot cluster. Changes in m_scroll and m_video_ram come into effect here.
@@ -726,6 +724,8 @@ void tiki100_state::tiki100(machine_config &config)
 	m_exp->busrq_wr_callback().set(FUNC(tiki100_state::busrq_w));
 	m_exp->mrq_rd_callback().set(FUNC(tiki100_state::mrq_r));
 	m_exp->mrq_wr_callback().set(FUNC(tiki100_state::mrq_w));
+	m_exp->iorq_rd_callback().set(FUNC(tiki100_state::iorq_r));
+	m_exp->iorq_wr_callback().set(FUNC(tiki100_state::iorq_w));
 	TIKI100_BUS_SLOT(config, "slot1", m_exp, tiki100_cards, "8088");
 	TIKI100_BUS_SLOT(config, "slot2", m_exp, tiki100_cards, "hdc");
 	TIKI100_BUS_SLOT(config, "slot3", m_exp, tiki100_cards, nullptr);
@@ -793,7 +793,7 @@ void tiki100_state::tiki100(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// software list
-	SOFTWARE_LIST(config, "flop_list").set_original("tiki100");
+	SOFTWARE_LIST(config, "flop_list").set_original("tiki100_flop");
 }
 
 /* ROMs */

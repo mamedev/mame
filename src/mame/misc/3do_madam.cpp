@@ -72,6 +72,7 @@ void madam_device::device_start()
 	// TODO: reduce footprint
 	// - a possible Cel this big should tank the system a lot
 	// - there's just not enough work RAM in base system
+	// - this is hinted to be really FIFO based in documentation
 	m_cel.buffer.resize(PACKED_PITCH * 0x800);
 
 	save_item(NAME(m_pip));

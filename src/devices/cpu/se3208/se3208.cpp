@@ -1740,7 +1740,7 @@ void se3208_device::execute_run()
 		{
 			interrupt_execute();
 		}
-		--(m_icount);
+		m_icount -= 3;
 	} while(m_icount > 0);
 }
 

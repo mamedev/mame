@@ -18,14 +18,19 @@
 
 #include "emuopts.h"
 
+#include <bit>
 #include <cmath>
 
-#define ENABLE_OVERFLOWS            (0)
 #define ENABLE_EE_ELF_LOADER        (0)
 #define ENABLE_EE_DECI2             (0)
 #define ENABLE_O2_DPRINTF           (0)
 
 #include "o2dprintf.hxx"
+
+#define LOG_INVALID     (1U << 1)   // reserved instruction exceptions
+
+//#define VERBOSE (LOG_INVALID)
+#include "logmacro.h"
 
 /***************************************************************************
     HELPER MACROS
@@ -167,8 +172,14 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	, c_system_clock(0)
 	, m_pfnmask(flavor == MIPS3_TYPE_VR4300 ? 0x000fffff : 0x00ffffff)
 	, m_pagemask_mask(flavor == MIPS3_TYPE_VR5500 ? u64(0x7fffe000) : u64(0x01ffe000))
-	, m_config_wmask(flavor == MIPS3_TYPE_VR5500 ? 0x0fc00007 : 0x00000007)
+	// pp. 90-91: Config bits 5:0 (K0, CU, DB, IB) are writable
+	, m_config_wmask(flavor == MIPS3_TYPE_VR5500 ? 0x0fc0003f : 0x0000003f)
+	// Fig. 4-8: PFN | C | D | V | G.  The R5900 also has the scratchpad bit 31.
+	, m_entrylo_wmask(flavor == MIPS3_TYPE_R5900 ? u64(0xbfffffff) : u64(0x3fffffff))
+	// Fig. 4-15: R | VPN2 | ASID
+	, m_entryhi_wmask(u64(0xc00000ffffffe0ff))
 	, m_tlbentries(flavor == MIPS3_TYPE_VR4300 ? 32 : MIPS3_MAX_TLB_ENTRIES)
+	, m_dcache_geometry(dcache_geometry_for(flavor))
 	, m_bigendian(endianness == ENDIANNESS_BIG)
 	, m_byte_xor(data_bits == 64 ? (m_bigendian ? BYTE8_XOR_BE(0) : BYTE8_XOR_LE(0)) : (m_bigendian ? BYTE4_XOR_BE(0) : BYTE4_XOR_LE(0)))
 	, m_word_xor(data_bits == 64 ? (m_bigendian ? WORD2_XOR_BE(0) : WORD2_XOR_LE(0)) : (m_bigendian ? WORD_XOR_BE(0) : WORD_XOR_LE(0)))
@@ -316,8 +327,9 @@ void mips3_device::generate_exception(int exception, int backup)
 		offset = 0x200;
 	}
 
-	/* put the cause in the low 8 bits and clear the branch delay flag */
-	CAUSE = (CAUSE & ~0x800000ff) | (exception << 2);
+	/* Cause keeps IP only; a nested exception retains the recorded BD */
+	const uint32_t prev_cause = CAUSE;
+	CAUSE = (CAUSE & 0x0000ff00) | (exception << 2);
 
 	/* set the appropriate bits for coprocessor exceptions */
 	if(exception == EXCEPTION_BADCOP)
@@ -329,7 +341,7 @@ void mips3_device::generate_exception(int exception, int backup)
 	if (!(SR & SR_EXL))
 	{
 		/* if we were in a branch delay slot and we are backing up, adjust */
-		if (((m_nextpc != ~0) || (m_delayslot)) && backup)
+		if ((m_nextpc != ~0) || (m_delayslot && backup))
 		{
 			m_delayslot = false;
 			m_nextpc = ~0;
@@ -341,6 +353,10 @@ void mips3_device::generate_exception(int exception, int backup)
 
 		/* set the exception level */
 		SR |= SR_EXL;
+	}
+	else
+	{
+		CAUSE |= prev_cause & 0x80000000;
 	}
 
 	/* based on the BEV bit, we either go to ROM or RAM */
@@ -366,9 +382,51 @@ void mips3_device::generate_tlb_exception(int exception, offs_t address)
 }
 
 
+inline bool mips3_device::address_error_check(offs_t address, uint32_t size, bool iswrite)
+{
+	/* misaligned for the access width */
+	if (address & (size - 1))
+	{
+		generate_address_error(iswrite ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD, address);
+		return false;
+	}
+
+	/* user mode is confined to useg and supervisor mode to useg and sseg; EXL/ERL force kernel mode */
+	if ((address & 0x80000000) && (SR & SR_KSU_MASK) && !(SR & (SR_EXL | SR_ERL)))
+	{
+		if ((SR & SR_KSU_MASK) == SR_KSU_USER || (address >> 29) != 6)
+		{
+			generate_address_error(iswrite ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD, address);
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+void mips3_device::set_link(offs_t address)
+{
+	/* LLAddr holds PAddr(35:4); the reservation is checked on the virtual address */
+	m_core->lladdr = address;
+	m_core->cpr[0][COP0_LLAddr] = ((vtlb_table()[address >> 12] & ~0xfff) | (address & 0xfff)) >> 4;
+	m_core->llbit = 1;
+}
+
+
+void mips3_device::generate_address_error(int exception, offs_t address)
+{
+	/* unlike a TLB exception, Context and EntryHi are not written */
+	m_core->cpr[0][COP0_BadVAddr] = address;
+
+	generate_exception(exception, 1);
+}
+
+
 void mips3_device::invalid_instruction(uint32_t op)
 {
-	fatalerror("Invalid instruction! %08x\n", op);
+	// unassigned encodings raise a reserved instruction exception
+	LOGMASKED(LOG_INVALID, "%s: reserved instruction %08x\n", machine().describe_context(), op);
 	generate_exception(EXCEPTION_INVALIDOP, 1);
 }
 
@@ -402,8 +460,25 @@ void mips3_device::device_start()
 
 	/* allocate the implementation-specific state from the full cache */
 	m_core = m_drc_cache.alloc_near<internal_mips3_state>();
-	m_icache = (uint8_t *)m_drc_cache.alloc_near(c_dcache_size, std::align_val_t(alignof(uint64_t)));
-	m_dcache = (uint8_t *)m_drc_cache.alloc_near(c_icache_size, std::align_val_t(alignof(uint64_t)));
+	/* alloc_near() asserts on a zero size, and most drivers never configure one */
+	if (c_icache_size)
+		m_icache = (uint8_t *)m_drc_cache.alloc_near(c_icache_size, std::align_val_t(alignof(uint64_t)));
+	if (c_dcache_size)
+		m_dcache = (uint8_t *)m_drc_cache.alloc_near(c_dcache_size, std::align_val_t(alignof(uint64_t)));
+
+	/* lines CACHE allocates explicitly */
+	if (m_dcache_geometry)
+	{
+		assert(m_dcache_geometry->way_shift <= 2);
+		assert(m_dcache_geometry->line_shift >= m_dcache_geometry->way_shift);
+
+		const unsigned lines = 1U << (m_dcache_geometry->set_shift + m_dcache_geometry->way_shift);
+		m_dcache_line_data = make_unique_clear<uint8_t []>(size_t(lines) << m_dcache_geometry->line_shift);
+		m_dcache_line_tag = make_unique_clear<uint32_t []>(lines);
+		m_dcache_line_state = make_unique_clear<uint8_t []>(lines);
+		m_dcache_lru = make_unique_clear<uint8_t []>(1U << m_dcache_geometry->set_shift);
+		m_dcache_code_pages = make_unique_clear<uint8_t []>(1U << 17);
+	}
 
 	/* initialize based on the config */
 	memset(m_core, 0, sizeof(internal_mips3_state));
@@ -545,7 +620,16 @@ void mips3_device::device_start()
 		save_item(NAME(m_tlb[tlbindex].entry_hi), tlbindex);
 		save_item(NAME(m_tlb[tlbindex].entry_lo), tlbindex);
 	}
-	save_item(NAME(m_tlb_seed));
+	save_item(NAME(m_core->random_zero_time));
+	save_item(NAME(m_core->lladdr));
+	if (m_dcache_geometry)
+	{
+		const unsigned lines = 1U << (m_dcache_geometry->set_shift + m_dcache_geometry->way_shift);
+		save_pointer(NAME(m_dcache_line_data), size_t(lines) << m_dcache_geometry->line_shift);
+		save_pointer(NAME(m_dcache_line_tag), lines);
+		save_pointer(NAME(m_dcache_line_state), lines);
+		save_pointer(NAME(m_dcache_lru), 1U << m_dcache_geometry->set_shift);
+	}
 
 	// Register state with debugger
 	state_add( MIPS3_PC,           "PC", m_core->pc).formatstr("%08X");
@@ -744,9 +828,18 @@ void mips3_device::device_start()
 	set_icountptr(m_core->icount);
 }
 
+void mips3_device::device_post_load()
+{
+	// the DRC mode is derived from Status
+	const u32 status = m_core->cpr[0][COP0_Status];
+	m_core->mode = ((status & (SR_EXL | SR_ERL)) ? 0 : ((status >> 2) & 6)) | ((status >> 26) & 1);
+	m_drc_cache_dirty = true;
+}
+
 void r5900_device::device_start()
 {
 	mips3_device::device_start();
+	save_item(NAME(m_vu_transfer_ready));
 #if USE_ABI_REG_NAMES
 	state_add( MIPS3_R0H,           "zeroh", m_core->rh[0]).callimport().formatstr("%016X");   // Can't change R0
 	state_add( MIPS3_R1H,           "ath", m_core->rh[1]).formatstr("%016X");
@@ -1104,6 +1197,12 @@ void mips3_device::state_string_export(const device_state_entry &entry, std::str
 }
 
 
+void r5900_device::device_reset()
+{
+	mips3_device::device_reset();
+	m_vu_transfer_ready = 0;
+}
+
 void mips3_device::device_reset()
 {
 	/* common reset */
@@ -1145,18 +1244,13 @@ void mips3_device::device_reset()
 	// TX4925 on-board peripherals pass-through
 	if (m_flavor == MIPS3_TYPE_TX4925)
 		vtlb_load(2 * m_tlbentries + 2, (0xff200000 - 0xff1f0000) >> MIPS3_MIN_PAGE_SHIFT, 0xff1f0000, 0xff1f0000 | READ_ALLOWED | WRITE_ALLOWED | FETCH_ALLOWED | FLAG_VALID);
-	m_tlb_seed = 0;
+	m_core->random_zero_time = total_cycles();
+	m_core->lladdr = 0;
 
 	m_core->mode = (MODE_KERNEL << 1) | 0;
 	m_drc_cache_dirty = true;
 	m_interrupt_cycles = 0;
 
-	m_core->vfr[0][3] = 1.0f;
-	m_core->vfmem = &m_core->vumem[0];
-	m_core->vimem = reinterpret_cast<uint32_t*>(m_core->vfmem);
-	m_core->vr = &m_core->vcr[20];
-	m_core->i = reinterpret_cast<float*>(&m_core->vcr[21]);
-	m_core->q = reinterpret_cast<float*>(&m_core->vcr[22]);
 }
 
 
@@ -1184,7 +1278,7 @@ bool r4650_device::memory_translate(int spacenum, int intention, offs_t &address
 
 std::unique_ptr<util::disasm_interface> mips3_device::create_disassembler()
 {
-	return std::make_unique<mips3_disassembler>();
+	return std::make_unique<mips3_disassembler>(m_flavor == MIPS3_TYPE_VR5500);
 }
 
 std::unique_ptr<util::disasm_interface> r5900_device::create_disassembler()
@@ -1195,14 +1289,247 @@ std::unique_ptr<util::disasm_interface> r5900_device::create_disassembler()
 
 
 /***************************************************************************
+    PRIMARY DATA CACHE
+
+    Only lines a guest allocates with Create_Dirty_Exclusive are held, so
+    initializing the cache does not modify memory.  Nothing else is modelled.
+***************************************************************************/
+
+const mips3_device::dcache_geometry *mips3_device::dcache_geometry_for(mips3_flavor flavor)
+{
+	/* VR5500: 32 KB, two ways of 32-byte lines; Index operations take the way from VA0, TagLo bit 4 names the next way to replace */
+	static constexpr dcache_geometry vr5500 = { 5, 9, 1, 0, 0x00000010 };
+
+	switch (flavor)
+	{
+		case MIPS3_TYPE_VR5500:
+			return &vr5500;
+
+		default:
+			return nullptr;
+	}
+}
+
+
+int mips3_device::dcache_line_find(offs_t address, offs_t physical) const
+{
+	if (!m_dcache_geometry || (address >= 0xa0000000 && address < 0xc0000000))
+	{
+		return -1;
+	}
+
+	const dcache_geometry &geometry = *m_dcache_geometry;
+	const unsigned first = ((address >> geometry.line_shift) & ((1U << geometry.set_shift) - 1)) << geometry.way_shift;
+	const uint32_t tag = physical & ~((1U << geometry.line_shift) - 1);
+	int line = -1;
+	for (unsigned way = 0; way < (1U << geometry.way_shift); way++)
+	{
+		if (m_dcache_line_state[first + way] != DCACHE_INVALID && m_dcache_line_tag[first + way] == tag)
+		{
+			line = first + way;
+		}
+	}
+	if (line < 0)
+	{
+		return -1;
+	}
+
+	/* cacheability belongs to the virtual mapping, including uncached aliases */
+	if (address >= 0x80000000 && address < 0xa0000000)
+	{
+		return ((m_core->cpr[0][COP0_Config] & 7) == 2) ? -1 : line;
+	}
+	for (int tlbindex = 0; tlbindex < m_tlbentries; tlbindex++)
+	{
+		const mips3_tlb_entry &entry = m_tlb[tlbindex];
+		const uint32_t mask = uint32_t(entry.page_mask) | 0x1fff;
+		if ((address & ~mask) == (uint32_t(entry.entry_hi) & ~mask)
+			&& (entry.is_global() || entry.matches_asid(m_core->cpr[0][COP0_EntryHi] & 0xff)))
+		{
+			return (((entry.entry_lo[bool(address & ((mask + 1) >> 1))] >> 3) & 7) == 2) ? -1 : line;
+		}
+	}
+	return -1;
+}
+
+
+bool mips3_device::dcache_line_read(offs_t address, offs_t physical, unsigned size, uint64_t &data)
+{
+	const int line = dcache_line_find(address, physical);
+	if (line < 0)
+	{
+		return false;
+	}
+
+	const dcache_geometry &geometry = *m_dcache_geometry;
+	const unsigned offset = physical & ((1U << geometry.line_shift) - 1);
+	if (offset + size > (1U << geometry.line_shift))
+	{
+		return false;
+	}
+
+	const uint8_t *const bytes = &m_dcache_line_data[(size_t(line) << geometry.line_shift) + offset];
+	data = 0;
+	for (unsigned i = 0; i < size; i++)
+	{
+		data |= uint64_t(bytes[i]) << (8 * (m_bigendian ? (size - 1 - i) : i));
+	}
+	m_dcache_lru[line >> geometry.way_shift] = (line + 1) & ((1U << geometry.way_shift) - 1);
+	return true;
+}
+
+
+bool mips3_device::dcache_line_write(offs_t address, offs_t physical, unsigned size, uint64_t data, uint64_t mask)
+{
+	const int line = dcache_line_find(address, physical);
+	if (line < 0)
+	{
+		return false;
+	}
+
+	const dcache_geometry &geometry = *m_dcache_geometry;
+	const unsigned offset = physical & ((1U << geometry.line_shift) - 1);
+	if (offset + size > (1U << geometry.line_shift))
+	{
+		return false;
+	}
+
+	uint8_t *const bytes = &m_dcache_line_data[(size_t(line) << geometry.line_shift) + offset];
+	for (unsigned i = 0; i < size; i++)
+	{
+		const unsigned shift = 8 * (m_bigendian ? (size - 1 - i) : i);
+		bytes[i] = (bytes[i] & ~uint8_t(mask >> shift)) | uint8_t((data & mask) >> shift);
+	}
+	m_dcache_line_state[line] = DCACHE_DIRTY;
+	m_dcache_lru[line >> geometry.way_shift] = (line + 1) & ((1U << geometry.way_shift) - 1);
+	return true;
+}
+
+
+void mips3_device::dcache_line_writeback(unsigned line)
+{
+	if (m_dcache_line_state[line] != DCACHE_DIRTY)
+	{
+		return;
+	}
+
+	const unsigned line_shift = m_dcache_geometry->line_shift;
+	const uint32_t tag = m_dcache_line_tag[line];
+	const uint8_t *const bytes = &m_dcache_line_data[size_t(line) << line_shift];
+	for (unsigned i = 0; i < (1U << line_shift); i++)
+	{
+		m_program->write_byte(tag + i, bytes[i]);
+	}
+	m_dcache_line_state[line] = DCACHE_CLEAN;
+
+	if (m_isdrc && BIT(m_dcache_code_pages[tag >> 15], (tag >> 12) & 7))
+	{
+		/* a writeback into translated code has to leave the running block */
+		m_drc_cache_dirty = true;
+		abort_timeslice();
+	}
+}
+
+
+void mips3_device::dcache_op(unsigned operation, offs_t address, offs_t physical)
+{
+	const dcache_geometry &geometry = *m_dcache_geometry;
+	const unsigned ways = 1U << geometry.way_shift;
+	const unsigned set = (address >> geometry.line_shift) & ((1U << geometry.set_shift) - 1);
+	const unsigned indexed = (set << geometry.way_shift) + ((address >> geometry.index_way_bit) & (ways - 1));
+	const int hit = dcache_line_find(address, physical);
+
+	switch (operation)
+	{
+		case 0x01:  /* Index_Write_Back_Invalidate */
+			dcache_line_writeback(indexed);
+			m_dcache_line_state[indexed] = DCACHE_INVALID;
+			break;
+
+		case 0x09:  /* Index_Store_Tag */
+			if (!(m_core->cpr[0][COP0_TagLo] & 0xc0))
+			{
+				m_dcache_line_state[indexed] = DCACHE_INVALID;
+				if (geometry.taglo_lru)
+				{
+					m_dcache_lru[set] = ((m_core->cpr[0][COP0_TagLo] & geometry.taglo_lru) ? 1 : 0) & (ways - 1);
+				}
+			}
+			/* TODO: arbitrary valid tag stores and Index_Load_Tag */
+			break;
+
+		case 0x0d:  /* Create_Dirty_Exclusive */
+		{
+			const unsigned line = (hit >= 0) ? hit : ((set << geometry.way_shift) + m_dcache_lru[set]);
+			if (hit < 0)
+			{
+				dcache_line_writeback(line);
+			}
+			m_dcache_line_tag[line] = physical & ~((1U << geometry.line_shift) - 1);
+			m_dcache_line_state[line] = DCACHE_DIRTY;
+			m_dcache_lru[set] = (line + 1) & (ways - 1);
+			break;
+		}
+
+		case 0x11:  /* Hit_Invalidate */
+		case 0x15:  /* Hit_Write_Back_Invalidate */
+		case 0x19:  /* Hit_Write_Back */
+			if (hit >= 0)
+			{
+				if (operation != 0x11)
+				{
+					dcache_line_writeback(hit);
+				}
+				if (operation != 0x19)
+				{
+					m_dcache_line_state[hit] = DCACHE_INVALID;
+				}
+			}
+			break;
+	}
+}
+
+
+void mips3_device::handle_cache(uint32_t op)
+{
+	/* only the primary data cache is modelled */
+	if (!m_dcache_geometry || (RTREG & 3) != 1)
+	{
+		return;
+	}
+
+	const offs_t address = RSVAL32 + SIMMVAL;
+	const uint32_t tlbval = vtlb_table()[address >> 12];
+	if (!(tlbval & READ_ALLOWED))
+	{
+		generate_tlb_exception((tlbval & FLAG_FIXED) ? EXCEPTION_TLBLOAD : EXCEPTION_TLBLOAD_FILL, address);
+		return;
+	}
+	dcache_op(RTREG, address, (tlbval & ~0xfff) | (address & 0xfff));
+}
+
+
+
+/***************************************************************************
     TLB HANDLING
 ***************************************************************************/
 
 inline bool mips3_device::RBYTE(offs_t address, uint32_t *result)
 {
+	if (!address_error_check(address, 1, false))
+	{
+		*result = 0;
+		return false;
+	}
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & READ_ALLOWED)
 	{
+		u64 cached;
+		if (m_dcache_geometry && dcache_line_read(address, (tlbval & ~0xfff) | (address & 0xfff), 1, cached))
+		{
+			*result = cached;
+			return true;
+		}
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
@@ -1233,9 +1560,20 @@ inline bool mips3_device::RBYTE(offs_t address, uint32_t *result)
 
 inline bool mips3_device::RHALF(offs_t address, uint32_t *result)
 {
+	if (!address_error_check(address, 2, false))
+	{
+		*result = 0;
+		return false;
+	}
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & READ_ALLOWED)
 	{
+		u64 cached;
+		if (m_dcache_geometry && dcache_line_read(address, (tlbval & ~0xfff) | (address & 0xfff), 2, cached))
+		{
+			*result = cached;
+			return true;
+		}
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
@@ -1266,9 +1604,20 @@ inline bool mips3_device::RHALF(offs_t address, uint32_t *result)
 
 inline bool mips3_device::RWORD(offs_t address, uint32_t *result, bool insn)
 {
+	if (!address_error_check(address, 4, false))
+	{
+		*result = 0;
+		return false;
+	}
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & READ_ALLOWED)
 	{
+		u64 cached;
+		if (!insn && m_dcache_geometry && dcache_line_read(address, (tlbval & ~0xfff) | (address & 0xfff), 4, cached))
+		{
+			*result = cached;
+			return true;
+		}
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
@@ -1299,9 +1648,20 @@ inline bool mips3_device::RWORD(offs_t address, uint32_t *result, bool insn)
 
 inline bool mips3_device::RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask)
 {
+	if (!address_error_check(address, 1, false))
+	{
+		*result = 0;
+		return false;
+	}
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & READ_ALLOWED)
 	{
+		u64 cached;
+		if (m_dcache_geometry && dcache_line_read(address, (tlbval & ~0xfff) | (address & 0xfff), 4, cached))
+		{
+			*result = cached;
+			return true;
+		}
 		*result = m_program->read_dword((tlbval & ~0xfff) | (address & 0xfff), mem_mask);
 	}
 	else
@@ -1322,9 +1682,20 @@ inline bool mips3_device::RWORD_MASKED(offs_t address, uint32_t *result, uint32_
 
 inline bool mips3_device::RDOUBLE(offs_t address, uint64_t *result)
 {
+	if (!address_error_check(address, 8, false))
+	{
+		*result = 0;
+		return false;
+	}
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & READ_ALLOWED)
 	{
+		u64 cached;
+		if (m_dcache_geometry && dcache_line_read(address, (tlbval & ~0xfff) | (address & 0xfff), 8, cached))
+		{
+			*result = cached;
+			return true;
+		}
 		*result = m_program->read_qword((tlbval & ~0xfff) | (address & 0xfff));
 	}
 	else
@@ -1345,9 +1716,20 @@ inline bool mips3_device::RDOUBLE(offs_t address, uint64_t *result)
 
 inline bool mips3_device::RDOUBLE_MASKED(offs_t address, uint64_t *result, uint64_t mem_mask)
 {
+	if (!address_error_check(address, 1, false))
+	{
+		*result = 0;
+		return false;
+	}
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & READ_ALLOWED)
 	{
+		u64 cached;
+		if (m_dcache_geometry && dcache_line_read(address, (tlbval & ~0xfff) | (address & 0xfff), 8, cached))
+		{
+			*result = cached;
+			return true;
+		}
 		*result = m_program->read_qword((tlbval & ~0xfff) | (address & 0xfff), mem_mask);
 	}
 	else
@@ -1366,11 +1748,17 @@ inline bool mips3_device::RDOUBLE_MASKED(offs_t address, uint64_t *result, uint6
 	return true;
 }
 
-inline void mips3_device::WBYTE(offs_t address, uint8_t data)
+inline bool mips3_device::WBYTE(offs_t address, uint8_t data)
 {
+	if (!address_error_check(address, 1, true))
+	{
+		return false;
+	}
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & WRITE_ALLOWED)
 	{
+		if (m_dcache_geometry && dcache_line_write(address, (tlbval & ~0xfff) | (address & 0xfff), 1, data, ~u64(0)))
+			return true;
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
@@ -1379,7 +1767,7 @@ inline void mips3_device::WBYTE(offs_t address, uint8_t data)
 				continue;
 			}
 			m_fastram[ramnum].offset_base8[tlbaddress ^ m_byte_xor] = data;
-			return;
+			return true;
 		}
 		m_program->write_byte(tlbaddress, data);
 	}
@@ -1397,14 +1785,22 @@ inline void mips3_device::WBYTE(offs_t address, uint8_t data)
 		{
 			generate_tlb_exception(EXCEPTION_TLBSTORE_FILL, address);
 		}
+		return false;
 	}
+	return true;
 }
 
-inline void mips3_device::WHALF(offs_t address, uint16_t data)
+inline bool mips3_device::WHALF(offs_t address, uint16_t data)
 {
+	if (!address_error_check(address, 2, true))
+	{
+		return false;
+	}
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & WRITE_ALLOWED)
 	{
+		if (m_dcache_geometry && dcache_line_write(address, (tlbval & ~0xfff) | (address & 0xfff), 2, data, ~u64(0)))
+			return true;
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
@@ -1413,7 +1809,7 @@ inline void mips3_device::WHALF(offs_t address, uint16_t data)
 				continue;
 			}
 			m_fastram[ramnum].offset_base16[(tlbaddress ^ m_word_xor) >> 1] = data;
-			return;
+			return true;
 		}
 		m_program->write_word(tlbaddress, data);
 	}
@@ -1431,14 +1827,22 @@ inline void mips3_device::WHALF(offs_t address, uint16_t data)
 		{
 			generate_tlb_exception(EXCEPTION_TLBSTORE_FILL, address);
 		}
+		return false;
 	}
+	return true;
 }
 
-inline void mips3_device::WWORD(offs_t address, uint32_t data)
+inline bool mips3_device::WWORD(offs_t address, uint32_t data)
 {
+	if (!address_error_check(address, 4, true))
+	{
+		return false;
+	}
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & WRITE_ALLOWED)
 	{
+		if (m_dcache_geometry && dcache_line_write(address, (tlbval & ~0xfff) | (address & 0xfff), 4, data, ~u64(0)))
+			return true;
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
@@ -1447,7 +1851,7 @@ inline void mips3_device::WWORD(offs_t address, uint32_t data)
 				continue;
 			}
 			m_fastram[ramnum].offset_base32[(tlbaddress ^ m_dword_xor) >> 2] = data;
-			return;
+			return true;
 		}
 		m_program->write_dword(tlbaddress, data);
 	}
@@ -1465,14 +1869,22 @@ inline void mips3_device::WWORD(offs_t address, uint32_t data)
 		{
 			generate_tlb_exception(EXCEPTION_TLBSTORE_FILL, address);
 		}
+		return false;
 	}
+	return true;
 }
 
 inline void mips3_device::WWORD_MASKED(offs_t address, uint32_t data, uint32_t mem_mask)
 {
+	if (!address_error_check(address, 1, true))
+	{
+		return;
+	}
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & WRITE_ALLOWED)
 	{
+		if (m_dcache_geometry && dcache_line_write(address, (tlbval & ~0xfff) | (address & 0xfff), 4, data, mem_mask))
+			return;
 		m_program->write_dword((tlbval & ~0xfff) | (address & 0xfff), data, mem_mask);
 	}
 	else
@@ -1492,11 +1904,17 @@ inline void mips3_device::WWORD_MASKED(offs_t address, uint32_t data, uint32_t m
 	}
 }
 
-inline void mips3_device::WDOUBLE(offs_t address, uint64_t data)
+inline bool mips3_device::WDOUBLE(offs_t address, uint64_t data)
 {
+	if (!address_error_check(address, 8, true))
+	{
+		return false;
+	}
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & WRITE_ALLOWED)
 	{
+		if (m_dcache_geometry && dcache_line_write(address, (tlbval & ~0xfff) | (address & 0xfff), 8, data, ~u64(0)))
+			return true;
 		m_program->write_qword((tlbval & ~0xfff) | (address & 0xfff), data);
 	}
 	else
@@ -1513,14 +1931,22 @@ inline void mips3_device::WDOUBLE(offs_t address, uint64_t data)
 		{
 			generate_tlb_exception(EXCEPTION_TLBSTORE_FILL, address);
 		}
+		return false;
 	}
+	return true;
 }
 
 inline void mips3_device::WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t mem_mask)
 {
+	if (!address_error_check(address, 1, true))
+	{
+		return;
+	}
 	const uint32_t tlbval = vtlb_table()[address >> 12];
 	if (tlbval & WRITE_ALLOWED)
 	{
+		if (m_dcache_geometry && dcache_line_write(address, (tlbval & ~0xfff) | (address & 0xfff), 8, data, mem_mask))
+			return;
 		m_program->write_qword((tlbval & ~0xfff)  | (address & 0xfff), data, mem_mask);
 	}
 	else
@@ -1542,6 +1968,11 @@ inline void mips3_device::WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t
 
 inline bool r4650_device::RBYTE(offs_t address, uint32_t *result)
 {
+	if (!address_error_check(address, 1, false))
+	{
+		*result = 0;
+		return false;
+	}
 	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
 	{
 		*result = m_program->read_byte(address);
@@ -1550,7 +1981,7 @@ inline bool r4650_device::RBYTE(offs_t address, uint32_t *result)
 
 	if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
 	{
-		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		generate_address_error(EXCEPTION_ADDRLOAD, address);
 		*result = 0;
 		return false;
 	}
@@ -1560,6 +1991,11 @@ inline bool r4650_device::RBYTE(offs_t address, uint32_t *result)
 
 inline bool r4650_device::RHALF(offs_t address, uint32_t *result)
 {
+	if (!address_error_check(address, 2, false))
+	{
+		*result = 0;
+		return false;
+	}
 	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
 	{
 		*result = m_program->read_word(address);
@@ -1568,7 +2004,7 @@ inline bool r4650_device::RHALF(offs_t address, uint32_t *result)
 
 	if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
 	{
-		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		generate_address_error(EXCEPTION_ADDRLOAD, address);
 		*result = 0;
 		return false;
 	}
@@ -1578,6 +2014,11 @@ inline bool r4650_device::RHALF(offs_t address, uint32_t *result)
 
 inline bool r4650_device::RWORD(offs_t address, uint32_t *result, bool insn)
 {
+	if (!address_error_check(address, 4, false))
+	{
+		*result = 0;
+		return false;
+	}
 	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
 	{
 		*result = m_program->read_dword(address);
@@ -1590,7 +2031,7 @@ inline bool r4650_device::RWORD(offs_t address, uint32_t *result, bool insn)
 	const uint32_t bound = m_core->cpr[0][BOUND_INDICES[insn]];
 	if ((address & 0xfffff000) > bound)
 	{
-		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		generate_address_error(EXCEPTION_ADDRLOAD, address);
 		*result = 0;
 		return false;
 	}
@@ -1600,6 +2041,11 @@ inline bool r4650_device::RWORD(offs_t address, uint32_t *result, bool insn)
 
 inline bool r4650_device::RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask)
 {
+	if (!address_error_check(address, 1, false))
+	{
+		*result = 0;
+		return false;
+	}
 	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
 	{
 		*result = m_program->read_dword(address, mem_mask);
@@ -1608,7 +2054,7 @@ inline bool r4650_device::RWORD_MASKED(offs_t address, uint32_t *result, uint32_
 
 	if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
 	{
-		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		generate_address_error(EXCEPTION_ADDRLOAD, address);
 		*result = 0;
 		return false;
 	}
@@ -1618,6 +2064,11 @@ inline bool r4650_device::RWORD_MASKED(offs_t address, uint32_t *result, uint32_
 
 inline bool r4650_device::RDOUBLE(offs_t address, uint64_t *result)
 {
+	if (!address_error_check(address, 8, false))
+	{
+		*result = 0;
+		return false;
+	}
 	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
 	{
 		*result = m_program->read_qword(address);
@@ -1626,7 +2077,7 @@ inline bool r4650_device::RDOUBLE(offs_t address, uint64_t *result)
 
 	if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
 	{
-		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		generate_address_error(EXCEPTION_ADDRLOAD, address);
 		*result = 0;
 		return false;
 	}
@@ -1636,6 +2087,11 @@ inline bool r4650_device::RDOUBLE(offs_t address, uint64_t *result)
 
 inline bool r4650_device::RDOUBLE_MASKED(offs_t address, uint64_t *result, uint64_t mem_mask)
 {
+	if (!address_error_check(address, 1, false))
+	{
+		*result = 0;
+		return false;
+	}
 	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
 	{
 		*result = m_program->read_qword(address, mem_mask);
@@ -1644,7 +2100,7 @@ inline bool r4650_device::RDOUBLE_MASKED(offs_t address, uint64_t *result, uint6
 
 	if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
 	{
-		generate_tlb_exception(EXCEPTION_ADDRLOAD, address);
+		generate_address_error(EXCEPTION_ADDRLOAD, address);
 		*result = 0;
 		return false;
 	}
@@ -1652,98 +2108,174 @@ inline bool r4650_device::RDOUBLE_MASKED(offs_t address, uint64_t *result, uint6
 	return true;
 }
 
-inline void r4650_device::WBYTE(offs_t address, uint8_t data)
+inline bool r4650_device::WBYTE(offs_t address, uint8_t data)
 {
+	if (!address_error_check(address, 1, true))
+	{
+		return false;
+	}
 	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
 		m_program->write_byte(address, data);
 	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
-		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+	{
+		generate_address_error(EXCEPTION_ADDRSTORE, address);
+		return false;
+	}
 	else
-		m_program->write_byte(address + m_core->cpr[0][COP0_R4650_DBound], data);
+		m_program->write_byte(address + m_core->cpr[0][COP0_R4650_DBase], data);
+	return true;
 }
 
-inline void r4650_device::WHALF(offs_t address, uint16_t data)
+inline bool r4650_device::WHALF(offs_t address, uint16_t data)
 {
+	if (!address_error_check(address, 2, true))
+	{
+		return false;
+	}
 	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
 		m_program->write_word(address, data);
 	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
-		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+	{
+		generate_address_error(EXCEPTION_ADDRSTORE, address);
+		return false;
+	}
 	else
-		m_program->write_word(address + m_core->cpr[0][COP0_R4650_DBound], data);
+		m_program->write_word(address + m_core->cpr[0][COP0_R4650_DBase], data);
+	return true;
 }
 
-inline void r4650_device::WWORD(offs_t address, uint32_t data)
+inline bool r4650_device::WWORD(offs_t address, uint32_t data)
 {
+	if (!address_error_check(address, 4, true))
+	{
+		return false;
+	}
 	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
 		m_program->write_dword(address, data);
 	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
-		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+	{
+		generate_address_error(EXCEPTION_ADDRSTORE, address);
+		return false;
+	}
 	else
-		m_program->write_dword(address + m_core->cpr[0][COP0_R4650_DBound], data);
+		m_program->write_dword(address + m_core->cpr[0][COP0_R4650_DBase], data);
+	return true;
 }
 
 inline void r4650_device::WWORD_MASKED(offs_t address, uint32_t data, uint32_t mem_mask)
 {
+	if (!address_error_check(address, 1, true))
+	{
+		return;
+	}
 	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
 		m_program->write_dword(address, data, mem_mask);
 	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
-		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+		generate_address_error(EXCEPTION_ADDRSTORE, address);
 	else
-		m_program->write_dword(address + m_core->cpr[0][COP0_R4650_DBound], data, mem_mask);
+		m_program->write_dword(address + m_core->cpr[0][COP0_R4650_DBase], data, mem_mask);
 }
 
-inline void r4650_device::WDOUBLE(offs_t address, uint64_t data)
+inline bool r4650_device::WDOUBLE(offs_t address, uint64_t data)
 {
+	if (!address_error_check(address, 8, true))
+	{
+		return false;
+	}
 	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
 		m_program->write_qword(address, data);
 	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
-		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+	{
+		generate_address_error(EXCEPTION_ADDRSTORE, address);
+		return false;
+	}
 	else
-		m_program->write_qword(address + m_core->cpr[0][COP0_R4650_DBound], data);
+		m_program->write_qword(address + m_core->cpr[0][COP0_R4650_DBase], data);
+	return true;
 }
 
 inline void r4650_device::WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t mem_mask)
 {
+	if (!address_error_check(address, 1, true))
+	{
+		return;
+	}
 	if ((SR & SR_KSU_USER) == SR_KSU_KERNEL)
 		m_program->write_qword(address, data, mem_mask);
 	else if ((address & 0xfffff000) > m_core->cpr[0][COP0_R4650_DBound])
-		generate_tlb_exception(EXCEPTION_ADDRSTORE, address);
+		generate_address_error(EXCEPTION_ADDRSTORE, address);
 	else
-		m_program->write_qword(address + m_core->cpr[0][COP0_R4650_DBound], data, mem_mask);
+		m_program->write_qword(address + m_core->cpr[0][COP0_R4650_DBase], data, mem_mask);
 }
 
-inline void r5900_device::WBYTE(offs_t address, uint8_t data)
+inline bool r5900_device::WBYTE(offs_t address, uint8_t data)
 {
-	if (address >= 0x70000000 && address < 0x70004000) m_program->write_byte(address, data);
-	else mips3_device::WBYTE(address, data);
+	if (!address_error_check(address, 1, true))
+	{
+		return false;
+	}
+	if (address >= 0x70000000 && address < 0x70004000)
+		m_program->write_byte(address, data);
+	else
+		return mips3_device::WBYTE(address, data);
+	return true;
 }
 
-inline void r5900_device::WHALF(offs_t address, uint16_t data)
+inline bool r5900_device::WHALF(offs_t address, uint16_t data)
 {
-	if (address >= 0x70000000 && address < 0x70004000) m_program->write_word(address, data);
-	else mips3_device::WHALF(address, data);
+	if (!address_error_check(address, 2, true))
+	{
+		return false;
+	}
+	if (address >= 0x70000000 && address < 0x70004000)
+		m_program->write_word(address, data);
+	else
+		return mips3_device::WHALF(address, data);
+	return true;
 }
 
-inline void r5900_device::WWORD(offs_t address, uint32_t data)
+inline bool r5900_device::WWORD(offs_t address, uint32_t data)
 {
-	if (address >= 0x70000000 && address < 0x70004000) m_program->write_dword(address, data);
-	else mips3_device::WWORD(address, data);
+	if (!address_error_check(address, 4, true))
+	{
+		return false;
+	}
+	if (address >= 0x70000000 && address < 0x70004000)
+		m_program->write_dword(address, data);
+	else
+		return mips3_device::WWORD(address, data);
+	return true;
 }
 
 inline void r5900_device::WWORD_MASKED(offs_t address, uint32_t data, uint32_t mem_mask)
 {
+	if (!address_error_check(address, 1, true))
+	{
+		return;
+	}
 	if (address >= 0x70000000 && address < 0x70004000) m_program->write_dword(address, data, mem_mask);
 	else mips3_device::WWORD_MASKED(address, data, mem_mask);
 }
 
-inline void r5900_device::WDOUBLE(offs_t address, uint64_t data)
+inline bool r5900_device::WDOUBLE(offs_t address, uint64_t data)
 {
-	if (address >= 0x70000000 && address < 0x70004000) m_program->write_qword(address, data);
-	else mips3_device::WDOUBLE(address, data);
+	if (!address_error_check(address, 8, true))
+	{
+		return false;
+	}
+	if (address >= 0x70000000 && address < 0x70004000)
+		m_program->write_qword(address, data);
+	else
+		return mips3_device::WDOUBLE(address, data);
+	return true;
 }
 
 inline void r5900_device::WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t mem_mask)
 {
+	if (!address_error_check(address, 1, true))
+	{
+		return;
+	}
 	if (address >= 0x70000000 && address < 0x70004000) m_program->write_qword(address, data, mem_mask);
 	else mips3_device::WDOUBLE_MASKED(address, data, mem_mask);
 }
@@ -1814,6 +2346,11 @@ inline void r5900be_device::WQUAD(offs_t address, uint64_t data_hi, uint64_t dat
 
 inline bool r5900_device::RBYTE(offs_t address, uint32_t *result)
 {
+	if (!address_error_check(address, 1, false))
+	{
+		*result = 0;
+		return false;
+	}
 	if (address >= 0x70000000 && address < 0x70004000)
 	{
 		*result = m_program->read_byte(address);
@@ -1824,6 +2361,11 @@ inline bool r5900_device::RBYTE(offs_t address, uint32_t *result)
 
 inline bool r5900_device::RHALF(offs_t address, uint32_t *result)
 {
+	if (!address_error_check(address, 2, false))
+	{
+		*result = 0;
+		return false;
+	}
 	if (address >= 0x70000000 && address < 0x70004000)
 	{
 		*result = m_program->read_word(address);
@@ -1834,6 +2376,11 @@ inline bool r5900_device::RHALF(offs_t address, uint32_t *result)
 
 inline bool r5900_device::RWORD(offs_t address, uint32_t *result, bool insn)
 {
+	if (!address_error_check(address, 4, false))
+	{
+		*result = 0;
+		return false;
+	}
 	if (address >= 0x70000000 && address < 0x70004000)
 	{
 		*result = m_program->read_dword(address);
@@ -1844,6 +2391,11 @@ inline bool r5900_device::RWORD(offs_t address, uint32_t *result, bool insn)
 
 inline bool r5900_device::RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask)
 {
+	if (!address_error_check(address, 1, false))
+	{
+		*result = 0;
+		return false;
+	}
 	if (address >= 0x70000000 && address < 0x70004000)
 	{
 		*result = m_program->read_dword(address, mem_mask);
@@ -1854,6 +2406,11 @@ inline bool r5900_device::RWORD_MASKED(offs_t address, uint32_t *result, uint32_
 
 inline bool r5900_device::RDOUBLE(offs_t address, uint64_t *result)
 {
+	if (!address_error_check(address, 8, false))
+	{
+		*result = 0;
+		return false;
+	}
 	if (address >= 0x70000000 && address < 0x70004000)
 	{
 		*result = m_program->read_qword(address);
@@ -1864,6 +2421,11 @@ inline bool r5900_device::RDOUBLE(offs_t address, uint64_t *result)
 
 inline bool r5900_device::RDOUBLE_MASKED(offs_t address, uint64_t *result, uint64_t mem_mask)
 {
+	if (!address_error_check(address, 1, false))
+	{
+		*result = 0;
+		return false;
+	}
 	if (address >= 0x70000000 && address < 0x70004000)
 	{
 		*result = m_program->read_qword(address, mem_mask);
@@ -1965,13 +2527,7 @@ uint64_t mips3_device::get_cop0_reg(int idx)
 	}
 	else if (idx == COP0_Random)
 	{
-		uint32_t wired = m_core->cpr[0][COP0_Wired] & 0x3f;
-		uint32_t unwired = m_tlbentries - wired;
-
-		if (unwired == 0)
-			return m_tlbentries - 1;
-
-		return (generate_tlb_index() % unwired) + wired;
+		return get_random_index();
 	}
 	return m_core->cpr[0][idx];
 }
@@ -1997,7 +2553,8 @@ void mips3_device::set_cop0_reg(int idx, uint64_t val)
 	switch (idx)
 	{
 		case COP0_Cause:
-			CAUSE = (CAUSE & 0xfc00) | (val & ~0xfc00);
+			/* only IP(1:0) is writable */
+			CAUSE = (CAUSE & ~uint64_t(0x300)) | (val & 0x300);
 			if ((CAUSE & SR & 0x300) && (SR & SR_IE) && !(SR & (SR_EXL | SR_ERL)))
 			{
 				/* if we're in a delay slot, propogate the target PC before generating the exception */
@@ -2026,6 +2583,8 @@ void mips3_device::set_cop0_reg(int idx, uint64_t val)
 		case COP0_Count:
 			m_core->cpr[0][idx] = val;
 			m_core->count_zero_time = total_cycles() - ((uint64_t)(uint32_t)val * 2);
+			// a Count write moves the next compare as well
+			m_core->compare_armed = 1;
 			mips3com_update_cycle_counting();
 			break;
 
@@ -2043,11 +2602,40 @@ void mips3_device::set_cop0_reg(int idx, uint64_t val)
 			m_core->cpr[0][idx] = val & m_pagemask_mask;
 			break;
 
+		case COP0_Index:            /* Fig. 4-11: 6-bit field, P is read-only */
+			m_core->cpr[0][idx] = val & 0x3f;
+			break;
+
+		case COP0_Wired:            /* Fig. 4-14 (p. 88): 6-bit field */
+			m_core->cpr[0][idx] = val & 0x3f;
+			/* a Wired write restarts Random at the upper bound */
+			m_core->random_zero_time = total_cycles();
+			break;
+
+		case COP0_EntryLo0:
+		case COP0_EntryLo1:
+			m_core->cpr[0][idx] = val & m_entrylo_wmask;
+			break;
+
+		case COP0_Context:          /* Fig. 5-1 (p. 102): bits 3:0 read as zero */
+		case COP0_XContext:         /* Fig. 5-10 (p. 113) */
+			m_core->cpr[0][idx] = val & ~uint64_t(0xf);
+			break;
+
+		case COP0_WatchLo:          /* Fig. 5-9 (p. 113) */
+			m_core->cpr[0][idx] = val & ~uint64_t(0x4);
+			break;
+
+		case COP0_WatchHi:
+			m_core->cpr[0][idx] = val & 0xf;
+			break;
+
 		case COP0_Config:
 			m_core->cpr[0][idx] = (m_core->cpr[0][idx] & ~uint64_t(m_config_wmask)) | (val & m_config_wmask);
 			break;
 
 		case COP0_EntryHi:
+			val &= m_entryhi_wmask;     /* Fig. 4-15: R | VPN2 | ASID */
 			/* if the ASID changes, remap */
 			if ((m_core->cpr[0][idx] ^ val) & 0xff)
 			{
@@ -2094,9 +2682,9 @@ void mips3_device::handle_cop0(uint32_t op)
 			switch (RTREG)
 			{
 				case 0x00:  /* BCzF */  if (!m_cf[0][0]) ADDPC(SIMMVAL);               break;
-				case 0x01:  /* BCzF */  if (m_cf[0][0]) ADDPC(SIMMVAL);                break;
-				case 0x02:  /* BCzFL */ invalid_instruction(op);                            break;
-				case 0x03:  /* BCzTL */ invalid_instruction(op);                            break;
+				case 0x01:  /* BCzT */  if (m_cf[0][0]) ADDPC(SIMMVAL);                break;
+				case 0x02:  /* BCzFL */ if (!m_cf[0][0]) ADDPC(SIMMVAL); else m_core->pc += 4; break;
+				case 0x03:  /* BCzTL */ if (m_cf[0][0]) ADDPC(SIMMVAL); else m_core->pc += 4;  break;
 				default:    invalid_instruction(op);                                        break;
 			}
 			break;
@@ -2116,7 +2704,8 @@ void mips3_device::handle_cop0(uint32_t op)
 		case 0x1d:
 		case 0x1e:
 		case 0x1f:  /* COP */
-			switch (op & 0x01ffffff)
+			// the CP0 function is bits 5:0 only
+			switch (op & 0x3f)
 			{
 				case 0x01:  /* TLBR */
 					mips3com_tlbr();
@@ -2134,15 +2723,33 @@ void mips3_device::handle_cop0(uint32_t op)
 					mips3com_tlbp();
 					break;
 
-				case 0x10:  /* RFE */   invalid_instruction(op);                            break;
+				case 0x10:  /* RFE */
+					// reserved on R4000
+					invalid_instruction(op);
+					break;
+
 				case 0x18:  /* ERET */
-					m_core->pc = m_core->cpr[0][COP0_EPC];
-					SR &= ~SR_EXL;
+					// ERL selects ErrorEPC, otherwise EPC
+					if (SR & SR_ERL)
+					{
+						m_core->pc = m_core->cpr[0][COP0_ErrorPC];
+						SR &= ~SR_ERL;
+					}
+					else
+					{
+						m_core->pc = m_core->cpr[0][COP0_EPC];
+						SR &= ~SR_EXL;
+					}
 					check_irqs();
 					m_core->llbit = 0;
 					break;
+
 				case 0x20:  /* WAIT */                                                      break;
-				default:    handle_extra_cop0(op);                                          break;
+
+				default:
+					// invalid, but not a reserved instruction exception on R4000
+					handle_extra_cop0(op);
+					break;
 			}
 			break;
 		default:    invalid_instruction(op);                                                break;
@@ -2151,7 +2758,7 @@ void mips3_device::handle_cop0(uint32_t op)
 
 void mips3_device::handle_extra_cop0(uint32_t op)
 {
-	invalid_instruction(op);
+	LOGMASKED(LOG_INVALID, "%s: unimplemented COP0 function %08x\n", machine().describe_context(), op);
 }
 
 
@@ -2206,6 +2813,10 @@ inline uint64_t mips3_device::get_cop1_creg(int idx)
 
 inline void mips3_device::set_cop1_creg(int idx, uint64_t val)
 {
+	// FCR0 is read-only
+	if (idx == 0)
+		return;
+
 	m_core->ccr[1][idx] = val;
 	if (idx == 31)
 	{
@@ -3160,124 +3771,46 @@ inline uint64_t mips3_device::get_cop2_creg(int idx)
 
 inline void mips3_device::set_cop2_creg(int idx, uint64_t val)
 {
-	m_core->vfr[idx][0] = val;
+	m_core->ccr[2][idx] = val;
 }
 
 inline void r5900_device::handle_dmfc2(uint32_t op)
 {
-	// QMFC2
-	if (!RTREG)
+	if (RTREG)
 	{
-		return;
+		m_core->r[RTREG] = uint64_t(m_vu0->vf_r(RDREG, 0)) | (uint64_t(m_vu0->vf_r(RDREG, 1)) << 32);
+		m_core->rh[RTREG] = uint64_t(m_vu0->vf_r(RDREG, 2)) | (uint64_t(m_vu0->vf_r(RDREG, 3)) << 32);
 	}
-	const int rt = RTREG;
-	uint32_t rtval[4] = { 0 };
-	uint32_t *reg = reinterpret_cast<uint32_t*>(m_core->vfr[RDREG]);
-	for (int i = 0; i < 4; i++)
-	{
-		rtval[i] = reg[i];
-	}
-	m_core->r[rt]  = ((uint64_t)rtval[1] << 32) | rtval[0];
-	m_core->rh[rt] = ((uint64_t)rtval[3] << 32) | rtval[2];
 }
 
 inline void r5900_device::handle_dmtc2(uint32_t op)
 {
-	// QMTC2
-	uint32_t rt = RTREG;
-	uint32_t rtval[4] = { (uint32_t)m_core->r[rt], (uint32_t)(m_core->r[rt] >> 32), (uint32_t)m_core->rh[rt], (uint32_t)(m_core->rh[rt] >> 32) };
-	uint32_t *reg = reinterpret_cast<uint32_t*>(m_core->vfr[RDREG]);
-	for (int i = 0; i < 4; i++)
-	{
-		reg[i] = rtval[i];
-	}
+	m_vu_transfer_ready = total_cycles() + 2;
+	m_vu0->vf_w(RDREG, 0, uint32_t(m_core->r[RTREG]));
+	m_vu0->vf_w(RDREG, 1, uint32_t(m_core->r[RTREG] >> 32));
+	m_vu0->vf_w(RDREG, 2, uint32_t(m_core->rh[RTREG]));
+	m_vu0->vf_w(RDREG, 3, uint32_t(m_core->rh[RTREG] >> 32));
 }
 
 inline uint64_t r5900_device::get_cop2_reg(int idx)
 {
-	return reinterpret_cast<uint32_t*>(m_core->vfr[idx])[0];
+	return m_vu0->vf_r(idx, 0);
 }
 
 inline void r5900_device::set_cop2_reg(int idx, uint64_t val)
 {
-	reinterpret_cast<uint32_t*>(m_core->vfr[idx])[0] = (uint32_t)val;
+	m_vu0->vf_w(idx, 0, uint32_t(val));
 }
 
 inline uint64_t r5900_device::get_cop2_creg(int idx)
 {
-	logerror("%s: CFC2: Getting ccr[%d] (%08x)\n", machine().describe_context(), idx, m_core->vcr[idx]);
-	return m_core->vcr[idx];
+	return m_vu0->control_r(idx);
 }
 
 inline void r5900_device::set_cop2_creg(int idx, uint64_t val)
 {
-	if (idx < 16)
-	{
-		m_core->vcr[idx] = val & 0xffff;
-	}
-	else
-	{
-		logerror("%s: CTC2: Setting ccr[%d] (%08x)\n", machine().describe_context(), idx, (uint32_t)val);
-		switch (idx)
-		{
-			case 16: // Status flag
-				m_core->vcr[idx] = val & 0xf30;
-				break;
-
-			case 17: // MAC flag
-				m_core->vcr[idx] = val & 0xffff;
-				break;
-
-			case 26: // TPC register
-				m_core->vcr[idx] = val & 0xffff;
-				logerror("%s: CTC2: Setting TPC to %08x\n", machine().describe_context(), m_core->vcr[idx]);
-				break;
-
-			case 27: // CMSAR0 register
-				m_core->vcr[idx] = val & 0xffff;
-				logerror("%s: CTC2: Setting CMSAR0 to %08x\n", machine().describe_context(), m_core->vcr[idx]);
-				break;
-
-			case 18: // clipping flag
-				m_core->vcr[idx] = val & 0xffffff;
-				break;
-
-			case 20: // R register
-				m_core->vcr[idx] = val & 0x7fffff;
-				break;
-
-			case 21: // I register
-			case 22: // Q register
-				m_core->vcr[idx] = val;
-				break;
-
-			case 28: // FBRST register
-				m_core->vcr[idx] = val & 0xc0c;
-				logerror("%s: CTC2: Setting FBRST to %08x\n", machine().describe_context(), val);
-				break;
-
-			case 29: // VPU-STAT register
-				// Register is read-only
-				break;
-
-			case 31: // CMSAR1 register
-				m_core->vcr[idx] = val & 0xffff;
-				logerror("%s: CTC2: Setting CMSAR1 to %08x\n", machine().describe_context(), m_core->vcr[idx]);
-				// TODO: Begin execution
-				break;
-
-			case 19:
-			case 23:
-			case 24:
-			case 25:
-			case 30: // reserved
-				break;
-
-			default:
-				m_core->vcr[idx] = val;
-				break;
-		}
-	}
+	m_vu_transfer_ready = total_cycles() + 2;
+	m_vu0->control_w(idx, uint32_t(val));
 }
 
 void mips3_device::handle_cop2(uint32_t op)
@@ -3321,427 +3854,48 @@ void mips3_device::handle_extra_cop2(uint32_t op)
     VU0/1 (COP2) EXECUTION HANDLING (R5900)
 ***************************************************************************/
 
+bool r5900_device::instruction_stall(uint32_t op)
+{
+	m_vu0->synchronize_macro(total_cycles());
+	const auto &vu = m_vu0->pipeline();
+	const unsigned major = op >> 26;
+	if (!(SR & SR_COP2))
+		return false;
+	if (major == 0x12)
+	{
+		const unsigned transfer = (op >> 21) & 31, reg = (op >> 11) & 31;
+		if (transfer >= 16)
+		{
+			if (((op & 63) == 0x38 || (op & 63) == 0x39) && (vu.count || vu.q_due))
+				return true;
+			return m_vu0->running() || m_vu_transfer_ready > total_cycles() || m_vu0->macro_hazard(op);
+		}
+		if (transfer == 1 || transfer == 2) // QMFC2/CFC2 .i waits for micro end.
+		{
+			if ((op & 1) && m_vu0->running())
+				return true;
+			return transfer == 1 && vu.ready(reg, 15) > vu.cycle;
+		}
+		if (transfer == 5 || transfer == 6) // QMTC2/CTC2 .i also accepts M.
+		{
+			if ((op & 1) && m_vu0->write_interlocked())
+				return true;
+			return (transfer == 5 ? vu.ready(reg, 15) : vu.control_ready(reg)) > vu.cycle;
+		}
+	}
+	if (major == 0x36 || major == 0x3e) // LQC2/SQC2 have no micro interlock.
+		return vu.ready((op >> 16) & 31, 15) > vu.cycle;
+	return false;
+}
+
 void r5900_device::handle_extra_cop2(uint32_t op)
 {
-	// TODO: Flags, rounding...
-	const int rd   = (op >>  6) & 31;
-	const int rs   = (op >> 11) & 31;
-	const int rt   = (op >> 16) & 31;
-	const int ext = ((op >> 4) & 0x7c) | (op & 3);
-
-	switch (op & 0x3f)
-	{
-		case 0x00: case 0x01: case 0x02: case 0x03: /* VADDbc */
-			if (rd)
-			{
-				const uint32_t bc = op & 3;
-				float *fs = m_core->vfr[rs];
-				float *ft = m_core->vfr[rt];
-				float *fd = m_core->vfr[rd];
-				for (int field = 0; field < 4; field++)
-				{
-					if (BIT(op, 24-field))
-					{
-						fd[field] = fs[field] + ft[bc];
-					}
-				}
-			}
-			break;
-		case 0x04: case 0x05: case 0x06: case 0x07: /* VSUBbc */
-			if (rd)
-			{
-				const uint32_t bc = op & 3;
-				float *fs = m_core->vfr[rs];
-				float *ft = m_core->vfr[rt];
-				float *fd = m_core->vfr[rd];
-				for (int field = 0; field < 4; field++)
-				{
-					if (BIT(op, 24-field))
-					{
-						fd[field] = fs[field] - ft[bc];
-					}
-				}
-			}
-			break;
-		case 0x08: case 0x09: case 0x0a: case 0x0b: /* VMADDbc */
-			if (rd)
-			{
-				const uint32_t bc = op & 3;
-				float *fs = m_core->vfr[rs];
-				float *ft = m_core->vfr[rt];
-				float *fd = m_core->vfr[rd];
-				for (int field = 0; field < 4; field++)
-				{
-					if (BIT(op, 24-field))
-					{
-						fd[field] = m_core->vacc[field] + fs[field] * ft[bc];
-					}
-				}
-			}
-			break;
-		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-			printf("Unsupported instruction: VMSUBbc @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x10: case 0x11: case 0x12: case 0x13: /* VMAXbc */
-			if (rd)
-			{
-				const uint32_t bc = op & 3;
-				float *fs = m_core->vfr[rs];
-				float *ft = m_core->vfr[rt];
-				float *fd = m_core->vfr[rd];
-				for (int field = 0; field < 4; field++)
-				{
-					if (BIT(op, 24-field))
-					{
-						fd[field] = std::fmax(fs[field], ft[bc]);
-					}
-				}
-			}
-			break;
-		case 0x14: case 0x15: case 0x16: case 0x17: /* VMINIbc */
-			if (rd)
-			{
-				const uint32_t bc = op & 3;
-				float *fs = m_core->vfr[rs];
-				float *ft = m_core->vfr[rt];
-				float *fd = m_core->vfr[rd];
-				for (int field = 0; field < 4; field++)
-				{
-					if (BIT(op, 24-field))
-					{
-						fd[field] = std::fmin(fs[field], ft[bc]);
-					}
-				}
-			}
-			break;
-		case 0x18: case 0x19: case 0x1a: case 0x1b: /* VMULbc */
-			if (rd)
-			{
-				const uint32_t bc = op & 3;
-				float *fs = m_core->vfr[rs];
-				float *ft = m_core->vfr[rt];
-				float *fd = m_core->vfr[rd];
-				for (int field = 0; field < 4; field++)
-				{
-					if (BIT(op, 24-field))
-					{
-						fd[field] = fs[field] * ft[bc];
-					}
-				}
-			}
-			break;
-		case 0x1c: /* VMULq */
-			if (rd)
-			{
-				float *fs = m_core->vfr[rs];
-				float *ft = m_core->vfr[rt];
-				float *fd = m_core->vfr[rd];
-				for (int field = 0; field < 4; field++)
-				{
-					if (BIT(op, 24-field))
-					{
-						fd[field] = fs[field] * ft[field];
-					}
-				}
-			}
-			break;
-		case 0x1d: printf("Unsupported instruction: VMAXi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x1e: printf("Unsupported instruction: VMULi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x1f: printf("Unsupported instruction: VMINIi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x20: /* VADDq */
-			if (rd)
-			{
-				float *fs = m_core->vfr[rs];
-				float *fd = m_core->vfr[rd];
-				for (int field = 0; field < 4; field++)
-				{
-					if (BIT(op, 24-field))
-					{
-						fd[field] = fs[field] + *(m_core->q);
-					}
-				}
-			}
-			break;
-		case 0x21: printf("Unsupported instruction: VMADDq @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x22: printf("Unsupported instruction: VADDi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x23: printf("Unsupported instruction: VMADDi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x24: printf("Unsupported instruction: VSUBq @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x25: printf("Unsupported instruction: VMSUBq @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x26: printf("Unsupported instruction: VSUBi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x27: printf("Unsupported instruction: VMSUBi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x28: /* VADD */
-			if (rd)
-			{
-				float *fs = m_core->vfr[rs];
-				float *ft = m_core->vfr[rt];
-				float *fd = m_core->vfr[rd];
-				for (int field = 0; field < 4; field++)
-				{
-					if (BIT(op, 24-field))
-					{
-						fd[field] = fs[field] + ft[field];
-					}
-				}
-			}
-			break;
-		case 0x29: printf("Unsupported instruction: VMADD @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x2a: /* VMUL */
-			if (rd)
-			{
-				float *fs = m_core->vfr[rs];
-				float *ft = m_core->vfr[rt];
-				float *fd = m_core->vfr[rd];
-				for (int field = 0; field < 4; field++)
-				{
-					if (BIT(op, 24-field))
-					{
-						fd[field] = fs[field] * ft[field];
-					}
-				}
-			}
-			break;
-		case 0x2b: printf("Unsupported instruction: VMAX @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x2c: /* VSUB */
-		{
-			if (rd)
-			{
-				float *fs = m_core->vfr[rs];
-				float *ft = m_core->vfr[rt];
-				float *fd = m_core->vfr[rd];
-				for (int field = 0; field < 4; field++)
-				{
-					if (BIT(op, 24-field))
-					{
-						fd[field] = fs[field] - ft[field];
-					}
-				}
-			}
-			break;
-		}
-		case 0x2d: printf("Unsupported instruction: VMSUB @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x2e: /* VOPMSUB */
-			if (rd)
-			{
-				float *fs = m_core->vfr[rs];
-				float *ft = m_core->vfr[rt];
-				float *fd = m_core->vfr[rd];
-				fd[0] = m_core->vacc[0] - fs[1] * ft[2];
-				fd[1] = m_core->vacc[1] - fs[2] * ft[0];
-				fd[2] = m_core->vacc[2] - fs[0] * ft[1];
-			}
-			break;
-		case 0x2f: printf("Unsupported instruction: VMINI @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x30:
-			if (rd)
-			{
-				m_core->vcr[rd] = (m_core->vcr[rs] + m_core->vcr[rt]) & 0xffff;
-			}
-			break;
-		case 0x31: printf("Unsupported instruction: VISUB @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x32: printf("Unsupported instruction: VIADDI @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x34: printf("Unsupported instruction: VIAND @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x35: printf("Unsupported instruction: VIOR @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x38: printf("Unsupported instruction: VCALLMS @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x39: printf("Unsupported instruction: VCALLMSR @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-		case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-			switch (ext)
-			{
-				case 0x00: case 0x01: case 0x02: case 0x03:
-					printf("Unsupported instruction: VADDAbc @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x04: case 0x05: case 0x06: case 0x07:
-					printf("Unsupported instruction: VSUBAbc @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x08: case 0x09: case 0x0a: case 0x0b: /* VMADDAbc */
-					if (rd)
-					{
-						const uint32_t bc = op & 3;
-						float *fs = m_core->vfr[rs];
-						float *ft = m_core->vfr[rt];
-						for (int field = 0; field < 4; field++)
-						{
-							if (BIT(op, 24-field))
-							{
-								m_core->vacc[field] += fs[field] * ft[bc];
-							}
-						}
-					}
-					break;
-				case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-					printf("Unsupported instruction: VMSUBAbc @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x10: printf("Unsupported instruction: VITOF0 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x11: printf("Unsupported instruction: VITOF4 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x12: printf("Unsupported instruction: VITOF12 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x13: printf("Unsupported instruction: VITOF15 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x14: /* VFTOI0 */
-					if (rt)
-					{
-						float *fs = m_core->vfr[rs];
-						int32_t *ft = reinterpret_cast<int32_t*>(m_core->vfr[rt]);
-						for (int field = 0; field < 4; field++)
-						{
-							if (BIT(op, 24-field))
-							{
-								ft[field] = (int32_t)(fs[field]);
-							}
-						}
-					}
-					break;
-				case 0x15: /* VFTOI4 */
-					if (rt)
-					{
-						float *fs = m_core->vfr[rs];
-						int32_t *ft = reinterpret_cast<int32_t*>(m_core->vfr[rt]);
-						for (int field = 0; field < 4; field++)
-						{
-							if (BIT(op, 24-field))
-							{
-								ft[field] = (int32_t)(fs[field] * 16.0f);
-							}
-						}
-					}
-					break;
-				case 0x16: printf("Unsupported instruction: VFTOI12 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x17: printf("Unsupported instruction: VFTOI15 @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x18: case 0x19: case 0x1a: case 0x1b: /* VMULAbc */
-					{
-						const uint32_t bc = op & 3;
-						float *fs = m_core->vfr[rs];
-						float *ft = m_core->vfr[rt];
-						for (int field = 0; field < 4; field++)
-						{
-							if (BIT(op, 24-field))
-							{
-								m_core->vacc[field] = fs[field] * ft[bc];
-							}
-						}
-					}
-					break;
-				case 0x1c: printf("Unsupported instruction: VMULAq @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x1d: printf("Unsupported instruction: VABS @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x1e: printf("Unsupported instruction: VMULAi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x1f: printf("Unsupported instruction: VCLIP @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x20: printf("Unsupported instruction: VADDAq @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x21: printf("Unsupported instruction: VMADDAq @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x22: printf("Unsupported instruction: VADDAi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x23: printf("Unsupported instruction: VMADDAi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x24: printf("Unsupported instruction: VSUBAq @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x25: printf("Unsupported instruction: VMSUBAq @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x26: printf("Unsupported instruction: VSUBAi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x27: printf("Unsupported instruction: VMSUBAi @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x28: printf("Unsupported instruction: VADDA @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x29: printf("Unsupported instruction: VMADDA @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x2a: printf("Unsupported instruction: VMULA @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				// 2b?
-				case 0x2c: printf("Unsupported instruction: VSUBA @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x2d: printf("Unsupported instruction: VMSUBA @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x2e: /* VOPMULA */
-					{
-						float *fs = m_core->vfr[rs];
-						float *ft = m_core->vfr[rt];
-						m_core->vacc[0] = fs[1] * ft[2];
-						m_core->vacc[1] = fs[2] * ft[0];
-						m_core->vacc[2] = fs[0] * ft[1];
-					}
-					break;
-				case 0x2f: /* VNOP */
-					break;
-				case 0x30: /* VMOVE */
-					if (rt)
-					{
-						float *fs = m_core->vfr[rs];
-						float *ft = m_core->vfr[rt];
-						for (int field = 0; field < 4; field++)
-						{
-							if (BIT(op, 24-field))
-							{
-								ft[field] = fs[field];
-							}
-						}
-					}
-					break;
-				case 0x31: /* VMR32 */
-					if (rt)
-					{
-						float *fs = m_core->vfr[rs];
-						float *ft = m_core->vfr[rt];
-						for (int field = 0; field < 4; field++)
-						{
-							if (BIT(op, 24-field))
-							{
-								ft[field] = fs[(field + 3) & 3];
-							}
-						}
-					}
-					break;
-				// 32?
-				// 33?
-				case 0x34: printf("Unsupported instruction: VLQI @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x35: /* VSQI */
-				{
-					uint32_t *base = &m_core->vimem[(m_core->vcr[rt] << 2) & 0xfff];
-					uint32_t *fs = reinterpret_cast<uint32_t*>(m_core->vfr[rs]);
-					for (int field = 0; field < 4; field++)
-					{
-						if (BIT(op, 24-field))
-						{
-							base[field] = fs[field];
-						}
-					}
-					if (rt)
-					{
-						m_core->vcr[rt]++;
-						m_core->vcr[rt] &= 0xffff;
-					}
-					break;
-				}
-				case 0x36: printf("Unsupported instruction: VLQD @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x37: printf("Unsupported instruction: VSQD @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x38: /* VDIV */
-					{
-						const uint32_t fsf = (op >> 21) & 3;
-						const uint32_t ftf = (op >> 23) & 3;
-						const float *fs = m_core->vfr[rs];
-						const float *ft = m_core->vfr[rt];
-						const float ftval = ft[ftf];
-						if (ftval)
-							*(m_core->q) = fs[fsf] / ft[ftf];
-					}
-					break;
-				case 0x39: /* VSQRT */
-					{
-						const uint32_t ftf = (op >> 23) & 3;
-						*(m_core->q) = (float)sqrt(m_core->vfr[rt][ftf]);
-					}
-					break;
-				case 0x3a: printf("Unsupported instruction: VRSQRT @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x3b: /* VWAITQ */
-					// TODO: We assume Q is instantly available. Fix this!
-					break;
-				case 0x3c: printf("Unsupported instruction: VMTIR @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x3d: printf("Unsupported instruction: VMFIR @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x3e: printf("Unsupported instruction: VILWR @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x3f: /* VISWR */
-				{
-					const uint32_t val = m_core->vcr[rt];
-					const uint32_t base = m_core->vcr[rs] << 2;
-					for (int field = 0; field < 4; field++)
-					{
-						if (BIT(op, 24-field))
-						{
-							m_core->vimem[(base + field) & 0xfff] = val;
-						}
-					}
-					break;
-				}
-				case 0x40: printf("Unsupported instruction: VRNEXT @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x41: printf("Unsupported instruction: VRGET @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x42: printf("Unsupported instruction: VRINIT @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				case 0x43: printf("Unsupported instruction: VRXOR @%08x\n", m_core->pc - 4); fflush(stdout); fatalerror("Unsupported VU instruction\n"); break;
-				default:   invalid_instruction(op); break;
-			}
-			break;
-		default:
-			invalid_instruction(op);
-			break;
-	}
+	if ((op & 63) == 0x38) // VCALLMS: immediate is in instruction units.
+		m_vu0->start(((op >> 6) & 0x7fff) << 3);
+	else if ((op & 63) == 0x39) // VCALLMSR
+		m_vu0->start(m_vu0->control_r(27) << 3);
+	else if (!m_vu0->execute_macro(op))
+		invalid_instruction(op);
 }
 
 /***************************************************************************
@@ -3763,11 +3917,11 @@ void mips3_device::handle_regimm(uint32_t op)
 		case 0x02:  /* BLTZL */     if ((int64_t)RSVAL64 < 0) ADDPC(SIMMVAL); else m_core->pc += 4;         break;
 		case 0x03:  /* BGEZL */     if ((int64_t)RSVAL64 >= 0) ADDPC(SIMMVAL); else m_core->pc += 4;        break;
 		case 0x08:  /* TGEI */      if ((int64_t)RSVAL64 >= SIMMVAL) generate_exception(EXCEPTION_TRAP, 1); break;
-		case 0x09:  /* TGEIU */     if (RSVAL64 >= UIMMVAL) generate_exception(EXCEPTION_TRAP, 1);          break;
+		case 0x09:  /* TGEIU */     if (RSVAL64 >= uint64_t(int64_t(SIMMVAL))) generate_exception(EXCEPTION_TRAP, 1); break;
 		case 0x0a:  /* TLTI */      if ((int64_t)RSVAL64 < SIMMVAL) generate_exception(EXCEPTION_TRAP, 1);  break;
-		case 0x0b:  /* TLTIU */     if (RSVAL64 >= UIMMVAL) generate_exception(EXCEPTION_TRAP, 1);          break;
-		case 0x0c:  /* TEQI */      if (RSVAL64 == UIMMVAL) generate_exception(EXCEPTION_TRAP, 1);          break;
-		case 0x0e:  /* TNEI */      if (RSVAL64 != UIMMVAL) generate_exception(EXCEPTION_TRAP, 1);          break;
+		case 0x0b:  /* TLTIU */     if (RSVAL64 < uint64_t(int64_t(SIMMVAL))) generate_exception(EXCEPTION_TRAP, 1); break;
+		case 0x0c:  /* TEQI */      if (RSVAL64 == uint64_t(int64_t(SIMMVAL))) generate_exception(EXCEPTION_TRAP, 1); break;
+		case 0x0e:  /* TNEI */      if (RSVAL64 != uint64_t(int64_t(SIMMVAL))) generate_exception(EXCEPTION_TRAP, 1); break;
 		case 0x10:  /* BLTZAL */    m_core->r[31] = (int32_t)(m_core->pc + 4); if ((int64_t)RSVAL64 < 0) ADDPC(SIMMVAL);                     break;
 		case 0x11:  /* BGEZAL */    m_core->r[31] = (int32_t)(m_core->pc + 4); if ((int64_t)RSVAL64 >= 0) ADDPC(SIMMVAL);                    break;
 		case 0x12:  /* BLTZALL */   m_core->r[31] = (int32_t)(m_core->pc + 4); if ((int64_t)RSVAL64 < 0) ADDPC(SIMMVAL); else m_core->pc += 4; break;
@@ -3790,6 +3944,22 @@ void r5900_device::handle_mult(uint32_t op)
 	if (RDREG) RDVAL64 = LOVAL64;
 }
 
+// VR5500 MUL/MULS/MACC/MSAC family: sa bit 1 negates, bit 2 accumulates into HI:LO, bit 3 moves HI rather than LO to rd
+void mips3_device::handle_vr5500_mul(uint32_t op)
+{
+	const int sa = (op >> 6) & 0x1f;
+	uint64_t result = BIT(op, 0) ? mulu_32x32(RSVAL32, RTVAL32) : uint64_t(mul_32x32(RSVAL32, RTVAL32));
+	if (BIT(sa, 1))
+		result = -result;
+	if (BIT(sa, 2))
+		result += (uint64_t(uint32_t(HIVAL64)) << 32) | uint32_t(LOVAL64);
+	LOVAL64 = int32_t(result);
+	HIVAL64 = int32_t(result >> 32);
+	if (RDREG)
+		RDVAL64 = BIT(sa, 3) ? HIVAL64 : LOVAL64;
+	m_core->icount -= 3;
+}
+
 void mips3_device::handle_multu(uint32_t op)
 {
 	uint64_t temp64 = mulu_32x32(RSVAL32, RTVAL32);
@@ -3810,10 +3980,14 @@ void mips3_device::handle_special(uint32_t op)
 	{
 		case 0x00:  /* SLL */       if (RDREG) RDVAL64 = (int32_t)(RTVAL32 << SHIFT);                 break;
 		case 0x01:  /* MOVF - R5000*/if (RDREG && GET_FCC((op >> 18) & 7) == ((op >> 16) & 1)) RDVAL64 = RSVAL64;   break;
-		case 0x02:  /* SRL */       if (RDREG) RDVAL64 = (int32_t)(RTVAL32 >> SHIFT);                 break;
+		case 0x02:  /* SRL / VR5500 ROR */
+			if (RDREG) RDVAL64 = (int32_t)((m_flavor == MIPS3_TYPE_VR5500 && RSREG == 1) ? std::rotr(RTVAL32, SHIFT) : (RTVAL32 >> SHIFT));
+			break;
 		case 0x03:  /* SRA */       if (RDREG) RDVAL64 = (int32_t)RTVAL32 >> SHIFT;                   break;
 		case 0x04:  /* SLLV */      if (RDREG) RDVAL64 = (int32_t)(RTVAL32 << (RSVAL32 & 31));        break;
-		case 0x06:  /* SRLV */      if (RDREG) RDVAL64 = (int32_t)(RTVAL32 >> (RSVAL32 & 31));        break;
+		case 0x06:  /* SRLV / VR5500 RORV */
+			if (RDREG) RDVAL64 = (int32_t)((m_flavor == MIPS3_TYPE_VR5500 && SHIFT == 1) ? std::rotr(RTVAL32, RSVAL32 & 31) : (RTVAL32 >> (RSVAL32 & 31)));
+			break;
 		case 0x07:  /* SRAV */      if (RDREG) RDVAL64 = (int32_t)RTVAL32 >> (RSVAL32 & 31);          break;
 		case 0x08:  /* JR */        SETPC(RSVAL32);                                                 break;
 		case 0x09:  /* JALR */      SETPCL(RSVAL32,RDREG);                                          break;
@@ -3827,12 +4001,30 @@ void mips3_device::handle_special(uint32_t op)
 		case 0x12:  /* MFLO */      if (RDREG) RDVAL64 = LOVAL64;                                   break;
 		case 0x13:  /* MTLO */      LOVAL64 = RSVAL64;                                              break;
 		case 0x14:  /* DSLLV */     if (RDREG) RDVAL64 = RTVAL64 << (RSVAL32 & 63);                 break;
-		case 0x16:  /* DSRLV */     if (RDREG) RDVAL64 = RTVAL64 >> (RSVAL32 & 63);                 break;
+		case 0x16:  /* DSRLV / VR5500 DRORV (five-bit count) */
+			if (RDREG) RDVAL64 = (m_flavor == MIPS3_TYPE_VR5500 && SHIFT == 1) ? std::rotr(RTVAL64, RSVAL32 & 31) : (RTVAL64 >> (RSVAL32 & 63));
+			break;
 		case 0x17:  /* DSRAV */     if (RDREG) RDVAL64 = (int64_t)RTVAL64 >> (RSVAL32 & 63);        break;
-		case 0x18:  /* MULT */      handle_mult(op);                                                break;
-		case 0x19:  /* MULTU */     handle_multu(op);                                               break;
+		case 0x18:  /* MULT */
+			if (m_flavor == MIPS3_TYPE_VR5500 && (op & 0x7c0))
+				handle_vr5500_mul(op);
+			else
+				handle_mult(op);
+			break;
+		case 0x19:  /* MULTU */
+			if (m_flavor == MIPS3_TYPE_VR5500 && (op & 0x7c0))
+				handle_vr5500_mul(op);
+			else
+				handle_multu(op);
+			break;
 		case 0x1a:  /* DIV */
-			if (RTVAL32)
+			// INT_MIN / -1 wraps on hardware but is undefined in C++
+			if (RSVAL32 == 0x80000000 && RTVAL32 == 0xffffffff)
+			{
+				LOVAL64 = (int32_t)0x80000000;
+				HIVAL64 = 0;
+			}
+			else if (RTVAL32)
 			{
 				LOVAL64 = (int32_t)((int32_t)RSVAL32 / (int32_t)RTVAL32);
 				HIVAL64 = (int32_t)((int32_t)RSVAL32 % (int32_t)RTVAL32);
@@ -3856,7 +4048,12 @@ void mips3_device::handle_special(uint32_t op)
 			m_core->icount -= 7;
 			break;
 		case 0x1e:  /* DDIV */
-			if (RTVAL64)
+			if (RSVAL64 == 0x8000'0000'0000'0000U && RTVAL64 == 0xffff'ffff'ffff'ffffU)
+			{
+				LOVAL64 = 0x8000'0000'0000'0000U;
+				HIVAL64 = 0;
+			}
+			else if (RTVAL64)
 			{
 				LOVAL64 = (int64_t)RSVAL64 / (int64_t)RTVAL64;
 				HIVAL64 = (int64_t)RSVAL64 % (int64_t)RTVAL64;
@@ -3872,14 +4069,24 @@ void mips3_device::handle_special(uint32_t op)
 			m_core->icount -= 67;
 			break;
 		case 0x20:  /* ADD */
-			if (ENABLE_OVERFLOWS && RSVAL32 > ~RTVAL32) generate_exception(EXCEPTION_OVERFLOW, 1);
-			else if (RDREG) RDVAL64 = (int32_t)(RSVAL32 + RTVAL32);
+		{
+			// overflow: (sign(addend0) == sign(addend1)) && (sign(addend0) != sign(sum))
+			const uint32_t sum = RSVAL32 + RTVAL32;
+			if (!BIT(RSVAL32 ^ RTVAL32, 31) && BIT(RSVAL32 ^ sum, 31))
+				generate_exception(EXCEPTION_OVERFLOW, 1);
+			else if (RDREG) RDVAL64 = (int32_t)sum;
 			break;
+		}
 		case 0x21:  /* ADDU */      if (RDREG) RDVAL64 = (int32_t)(RSVAL32 + RTVAL32);              break;
 		case 0x22:  /* SUB */
-			if (ENABLE_OVERFLOWS && RSVAL32 < RTVAL32) generate_exception(EXCEPTION_OVERFLOW, 1);
-			else if (RDREG) RDVAL64 = (int32_t)(RSVAL32 - RTVAL32);
+		{
+			// overflow: (sign(minuend) != sign(subtrahend)) && (sign(minuend) != sign(difference))
+			const uint32_t difference = RSVAL32 - RTVAL32;
+			if (BIT(RSVAL32 ^ RTVAL32, 31) && BIT(RSVAL32 ^ difference, 31))
+				generate_exception(EXCEPTION_OVERFLOW, 1);
+			else if (RDREG) RDVAL64 = (int32_t)difference;
 			break;
+		}
 		case 0x23:  /* SUBU */      if (RDREG) RDVAL64 = (int32_t)(RSVAL32 - RTVAL32);              break;
 		case 0x24:  /* AND */       if (RDREG) RDVAL64 = RSVAL64 & RTVAL64;                         break;
 		case 0x25:  /* OR */        if (RDREG) RDVAL64 = RSVAL64 | RTVAL64;                         break;
@@ -3889,14 +4096,22 @@ void mips3_device::handle_special(uint32_t op)
 		case 0x2a:  /* SLT */       if (RDREG) RDVAL64 = (int64_t)RSVAL64 < (int64_t)RTVAL64;       break;
 		case 0x2b:  /* SLTU */      if (RDREG) RDVAL64 = (uint64_t)RSVAL64 < (uint64_t)RTVAL64;     break;
 		case 0x2c:  /* DADD */
-			if (ENABLE_OVERFLOWS && RSVAL64 > ~RTVAL64) generate_exception(EXCEPTION_OVERFLOW, 1);
-			else if (RDREG) RDVAL64 = RSVAL64 + RTVAL64;
+		{
+			const uint64_t sum = RSVAL64 + RTVAL64;
+			if (!BIT(RSVAL64 ^ RTVAL64, 63) && BIT(RSVAL64 ^ sum, 63))
+				generate_exception(EXCEPTION_OVERFLOW, 1);
+			else if (RDREG) RDVAL64 = sum;
 			break;
+		}
 		case 0x2d:  /* DADDU */     if (RDREG) RDVAL64 = RSVAL64 + RTVAL64;                         break;
 		case 0x2e:  /* DSUB */
-			if (ENABLE_OVERFLOWS && RSVAL64 < RTVAL64) generate_exception(EXCEPTION_OVERFLOW, 1);
-			else if (RDREG) RDVAL64 = RSVAL64 - RTVAL64;
+		{
+			const uint64_t difference = RSVAL64 - RTVAL64;
+			if (BIT(RSVAL64 ^ RTVAL64, 63) && BIT(RSVAL64 ^ difference, 63))
+				generate_exception(EXCEPTION_OVERFLOW, 1);
+			else if (RDREG) RDVAL64 = difference;
 			break;
+		}
 		case 0x2f:  /* DSUBU */     if (RDREG) RDVAL64 = RSVAL64 - RTVAL64;                         break;
 		case 0x30:  /* TGE */       if ((int64_t)RSVAL64 >= (int64_t)RTVAL64) generate_exception(EXCEPTION_TRAP, 1); break;
 		case 0x31:  /* TGEU */      if (RSVAL64 >= RTVAL64) generate_exception(EXCEPTION_TRAP, 1);  break;
@@ -3905,10 +4120,14 @@ void mips3_device::handle_special(uint32_t op)
 		case 0x34:  /* TEQ */       if (RSVAL64 == RTVAL64) generate_exception(EXCEPTION_TRAP, 1);  break;
 		case 0x36:  /* TNE */       if (RSVAL64 != RTVAL64) generate_exception(EXCEPTION_TRAP, 1);  break;
 		case 0x38:  /* DSLL */      if (RDREG) RDVAL64 = RTVAL64 << SHIFT;                          break;
-		case 0x3a:  /* DSRL */      if (RDREG) RDVAL64 = RTVAL64 >> SHIFT;                          break;
+		case 0x3a:  /* DSRL / VR5500 DROR */
+			if (RDREG) RDVAL64 = (m_flavor == MIPS3_TYPE_VR5500 && RSREG == 1) ? std::rotr(RTVAL64, SHIFT) : (RTVAL64 >> SHIFT);
+			break;
 		case 0x3b:  /* DSRA */      if (RDREG) RDVAL64 = (int64_t)RTVAL64 >> SHIFT;                 break;
 		case 0x3c:  /* DSLL32 */    if (RDREG) RDVAL64 = RTVAL64 << (SHIFT + 32);                   break;
-		case 0x3e:  /* DSRL32 */    if (RDREG) RDVAL64 = RTVAL64 >> (SHIFT + 32);                   break;
+		case 0x3e:  /* DSRL32 / VR5500 DROR32 */
+			if (RDREG) RDVAL64 = (m_flavor == MIPS3_TYPE_VR5500 && RSREG == 1) ? std::rotr(RTVAL64, SHIFT + 32) : (RTVAL64 >> (SHIFT + 32));
+			break;
 		case 0x3f:  /* DSRA32 */    if (RDREG) RDVAL64 = (int64_t)RTVAL64 >> (SHIFT + 32);          break;
 		default:    /* ??? */       handle_extra_special(op);                                       break;
 	}
@@ -3926,6 +4145,53 @@ void mips3_device::handle_extra_regimm(uint32_t op)
 
 void mips3_device::handle_idt(uint32_t op)
 {
+	if (m_flavor == MIPS3_TYPE_VR5500)
+	{
+		switch (op & 0x3f)
+		{
+			case 0x00: // MADD
+			case 0x01: // MADDU
+			case 0x04: // MSUB
+			case 0x05: // MSUBU
+			{
+				// HI and LO each hold a sign-extended word; the accumulator is their low words
+				const u64 product = BIT(op, 0) ? mulu_32x32(RSVAL32, RTVAL32) : u64(mul_32x32(RSVAL32, RTVAL32));
+				const u64 accumulator = (u64(u32(HIVAL64)) << 32) | u32(LOVAL64);
+				const u64 result = BIT(op, 2) ? accumulator - product : accumulator + product;
+				LOVAL64 = s32(result);
+				HIVAL64 = s32(result >> 32);
+				m_core->icount--; // two cycles
+				break;
+			}
+			case 0x02: // MUL
+				if (RDREG) RDVAL64 = s32(mul_32x32(RSVAL32, RTVAL32));
+				m_core->icount--;
+				break;
+			case 0x20: // CLZ
+				if (RDREG) RDVAL64 = std::countl_zero(RSVAL32);
+				break;
+			case 0x21: // CLO
+				if (RDREG) RDVAL64 = std::countl_one(RSVAL32);
+				break;
+			case 0x24: // DCLZ
+				if (RDREG) RDVAL64 = std::countl_zero(RSVAL64);
+				break;
+			case 0x25: // DCLO
+				if (RDREG) RDVAL64 = std::countl_one(RSVAL64);
+				break;
+			default:
+				invalid_instruction(op);
+				break;
+		}
+		return;
+	}
+
+	if (m_flavor != MIPS3_TYPE_R4650)
+	{
+		invalid_instruction(op);
+		return;
+	}
+
 	switch (op & 0x1f)
 	{
 		case 0: /* MAD */
@@ -3949,7 +4215,7 @@ void mips3_device::handle_idt(uint32_t op)
 			m_core->icount -= 3;
 			break;
 		case 2: /* MUL */
-			if (RDREG) RDVAL64 = (int32_t)((int32_t)RSVAL32 * (int32_t)RTVAL32);
+			if (RDREG) RDVAL64 = s32(RSVAL32 * RTVAL32);
 			m_core->icount -= 3;
 			break;
 		default:
@@ -4024,7 +4290,7 @@ void r5900_device::handle_extra_regimm(uint32_t op)
 
 void r5900_device::handle_extra_cop0(uint32_t op)
 {
-	switch (op & 0x01ffffff)
+	switch (op & 0x3f)
 	{
 		case 0x38: /* EI */
 			if ((SR & (SR_EXL | SR_ERL | SR_EDI)) || ((SR & SR_KSU_MASK) == SR_KSU_KERNEL))
@@ -4035,7 +4301,7 @@ void r5900_device::handle_extra_cop0(uint32_t op)
 				SR &= ~SR_EIE;
 			break;
 		default:
-			invalid_instruction(op);
+			LOGMASKED(LOG_INVALID, "%s: unimplemented COP0 function %08x\n", machine().describe_context(), op);
 			break;
 	}
 }
@@ -5330,25 +5596,21 @@ void mips3_device::handle_sdc2(uint32_t op)
 
 void r5900_device::handle_ldc2(uint32_t op)
 {
-	/* LQC2 */
+	m_vu_transfer_ready = total_cycles() + 2;
 	const uint32_t base = SIMMVAL + RSVAL32;
-	uint32_t *reg = reinterpret_cast<uint32_t*>(m_core->vfr[RTREG]);
-	for (uint32_t i = 0; i < 4; i++)
+	for (unsigned field = 0; field < 4; ++field)
 	{
-		uint32_t temp = 0;
-		if (RWORD(base + (i << 2), &temp)) reg[i] = temp;
+		uint32_t value;
+		if (RWORD(base + field * 4, &value))
+			m_vu0->vf_w(RTREG, field, value);
 	}
 }
 
 void r5900_device::handle_sdc2(uint32_t op)
 {
-	/* SQC2 */
 	const uint32_t base = SIMMVAL + RSVAL32;
-	uint32_t *reg = reinterpret_cast<uint32_t*>(m_core->vfr[RTREG]);
-	for (uint32_t i = 0; i < 4; i++)
-	{
-		WWORD(base + (i << 2), reg[i]);
-	}
+	for (unsigned field = 0; field < 4; ++field)
+		WWORD(base + field * 4, m_vu0->vf_r(RTREG, field));
 }
 
 void mips3_device::execute_run()
@@ -5414,6 +5676,14 @@ void mips3_device::execute_run()
 			continue;
 		}
 
+		// a coprocessor interlock retries the same instruction
+		if (instruction_stall(op))
+		{
+			if (--m_core->icount <= 0)
+				return;
+			continue;
+		}
+
 		/* adjust for next PC */
 		if (m_nextpc != ~0)
 		{
@@ -5449,9 +5719,14 @@ void mips3_device::execute_run()
 			case 0x06:  /* BLEZ */      if ((int64_t)RSVAL64 <= 0) ADDPC(SIMMVAL);                                break;
 			case 0x07:  /* BGTZ */      if ((int64_t)RSVAL64 > 0) ADDPC(SIMMVAL);                                 break;
 			case 0x08:  /* ADDI */
-				if (ENABLE_OVERFLOWS && RSVAL32 > ~SIMMVAL) generate_exception(EXCEPTION_OVERFLOW, 1);
-				else if (RTREG) RTVAL64 = (int32_t)(RSVAL32 + SIMMVAL);
+			{
+				const uint32_t addend = uint32_t(int32_t(SIMMVAL));
+				const uint32_t sum = RSVAL32 + addend;
+				if (!BIT(RSVAL32 ^ addend, 31) && BIT(RSVAL32 ^ sum, 31))
+					generate_exception(EXCEPTION_OVERFLOW, 1);
+				else if (RTREG) RTVAL64 = (int32_t)sum;
 				break;
+			}
 			case 0x09:  /* ADDIU */     if (RTREG) RTVAL64 = (int32_t)(RSVAL32 + SIMMVAL);                        break;
 			case 0x0a:  /* SLTI */      if (RTREG) RTVAL64 = (int64_t)RSVAL64 < (int64_t)SIMMVAL;                   break;
 			case 0x0b:  /* SLTIU */     if (RTREG) RTVAL64 = (uint64_t)RSVAL64 < (uint64_t)SIMMVAL;                 break;
@@ -5478,9 +5753,14 @@ void mips3_device::execute_run()
 			case 0x16:  /* BLEZL */     if ((int64_t)RSVAL64 <= 0) ADDPC(SIMMVAL); else m_core->pc += 4;          break;
 			case 0x17:  /* BGTZL */     if ((int64_t)RSVAL64 > 0) ADDPC(SIMMVAL); else m_core->pc += 4;           break;
 			case 0x18:  /* DADDI */
-				if (ENABLE_OVERFLOWS && (int64_t)RSVAL64 > ~SIMMVAL) generate_exception(EXCEPTION_OVERFLOW, 1);
-				else if (RTREG) RTVAL64 = RSVAL64 + (int64_t)SIMMVAL;
+			{
+				const uint64_t addend = uint64_t(int64_t(SIMMVAL));
+				const uint64_t sum = RSVAL64 + addend;
+				if (!BIT(RSVAL64 ^ addend, 63) && BIT(RSVAL64 ^ sum, 63))
+					generate_exception(EXCEPTION_OVERFLOW, 1);
+				else if (RTREG) RTVAL64 = sum;
 				break;
+			}
 			case 0x19:  /* DADDIU */    if (RTREG) RTVAL64 = RSVAL64 + (uint64_t)SIMMVAL;                         break;
 			case 0x1a:  /* LDL */       (this->*m_ldl)(op);                                                       break;
 			case 0x1b:  /* LDR */       (this->*m_ldr)(op);                                                       break;
@@ -5504,12 +5784,11 @@ void mips3_device::execute_run()
 			case 0x2e:  /* SWR */       (this->*m_swr)(op);                                                       break;
 			case 0x2f:  /* CACHE */     handle_cache(op);                                                         break;
 			case 0x30:  /* LL */
-				if (RWORD(SIMMVAL + RSVAL32, &temp) && RTREG)
+				if (RWORD(SIMMVAL + RSVAL32, &temp))
 				{
-					// Should actually use physical address
-					m_core->cpr[0][COP0_LLAddr] = SIMMVAL + RSVAL32;
-					RTVAL64 = int64_t(int32_t(temp));
-					m_core->llbit = 1;
+					set_link(SIMMVAL + RSVAL32);
+					if (RTREG)
+						RTVAL64 = int64_t(int32_t(temp));
 					if LL_BREAK
 						machine().debug_break();
 				}
@@ -5527,11 +5806,11 @@ void mips3_device::execute_run()
 			case 0x32:  /* LWC2 */      if (RWORD(SIMMVAL+RSVAL32, &temp)) set_cop2_reg(RTREG, temp);           break;
 			case 0x33:  /* PREF */      /* effective no-op */                                                   break;
 			case 0x34:  /* LLD */
-				if (RDOUBLE(SIMMVAL + RSVAL32, &temp64) && RTREG)
+				if (RDOUBLE(SIMMVAL + RSVAL32, &temp64))
 				{
-					m_core->cpr[0][COP0_LLAddr] = SIMMVAL + RSVAL32;
-					RTVAL64 = temp64;
-					m_core->llbit = 1;
+					set_link(SIMMVAL + RSVAL32);
+					if (RTREG)
+						RTVAL64 = temp64;
 					if LL_BREAK
 						machine().debug_break();
 				}
@@ -5549,13 +5828,16 @@ void mips3_device::execute_run()
 			case 0x36:  handle_ldc2(op); break;
 			case 0x37:  /* LD */        if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG) RTVAL64 = temp64;       break;
 			case 0x38:  /* SC */
-				if (RWORD(SIMMVAL + RSVAL32, &temp) && RTREG && m_core->llbit && m_core->cpr[0][COP0_LLAddr] == SIMMVAL + RSVAL32)
+				// no load; a successful SC releases the link
+				if (m_core->llbit && m_core->lladdr == uint32_t(SIMMVAL + RSVAL32))
 				{
-					WWORD(SIMMVAL + RSVAL32, RTVAL32);
-					RTVAL64 = (uint32_t)1;
+					const bool stored = WWORD(SIMMVAL + RSVAL32, RTVAL32);
+					m_core->llbit = 0;
+					if (stored && RTREG)
+						RTVAL64 = 1;
 				}
-				else
-					RTVAL64 = (uint32_t)0;
+				else if (RTREG)
+					RTVAL64 = 0;
 				break;
 			case 0x39:  /* SWC1 */
 				if (!(SR & SR_COP1))
@@ -5569,12 +5851,15 @@ void mips3_device::execute_run()
 			case 0x3a:  /* SWC2 */      WWORD(SIMMVAL+RSVAL32, get_cop2_reg(RTREG));                            break;
 			case 0x3b:  /* SWC3 */      invalid_instruction(op);                                                break;
 			case 0x3c:  /* SCD */
-				if (RDOUBLE(SIMMVAL+RSVAL32, &temp64) && RTREG && m_core->llbit && m_core->cpr[0][COP0_LLAddr] == SIMMVAL + RSVAL32)
+				// as SC
+				if (m_core->llbit && m_core->lladdr == uint32_t(SIMMVAL + RSVAL32))
 				{
-					WDOUBLE(SIMMVAL + RSVAL32, RTVAL64);
-					RTVAL64 = 1;
+					const bool stored = WDOUBLE(SIMMVAL + RSVAL32, RTVAL64);
+					m_core->llbit = 0;
+					if (stored && RTREG)
+						RTVAL64 = 1;
 				}
-				else
+				else if (RTREG)
 					RTVAL64 = 0;
 				break;
 			case 0x3d:  /* SDC1 */

@@ -84,7 +84,7 @@ additional control from extra RAM:
 
 
 
-static void K053936_zoom_draw(int chip,uint16_t *ctrl,uint16_t *linectrl, screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,tilemap_t *tmap,int flags,uint32_t priority, int glfgreat_hack)
+static void K053936_zoom_draw(int chip, uint16_t *ctrl, uint16_t *linectrl, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, int flags, uint32_t priority, int glfgreat_hack)
 {
 	if (!tmap)
 		return;
@@ -104,34 +104,29 @@ static void K053936_zoom_draw(int chip,uint16_t *ctrl,uint16_t *linectrl, screen
 
 		if (((ctrl[0x07] & 0x0002) && ctrl[0x09]) && (glfgreat_hack))   /* wrong, but fixes glfgreat */
 		{
-			my_clip.min_x = ctrl[0x08] + K053936_offset[chip][0]+2;
-			my_clip.max_x = ctrl[0x09] + K053936_offset[chip][0]+2 - 1;
-			if (my_clip.min_x < cliprect.min_x)
-				my_clip.min_x = cliprect.min_x;
-			if (my_clip.max_x > cliprect.max_x)
-				my_clip.max_x = cliprect.max_x;
+			my_clip.setx(
+				std::max<int32_t>(cliprect.left(), ctrl[0x08] + K053936_offset[chip][0]+2),
+				std::min<int32_t>(cliprect.right(), ctrl[0x09] + K053936_offset[chip][0]+2 - 1));
 
 			y = ctrl[0x0a] + K053936_offset[chip][1]-2;
-			if (y < cliprect.min_y)
-				y = cliprect.min_y;
+			if (y < cliprect.top())
+				y = cliprect.top();
 			maxy = ctrl[0x0b] + K053936_offset[chip][1]-2 - 1;
-			if (maxy > cliprect.max_y)
-				maxy = cliprect.max_y;
-
+			if (maxy > cliprect.bottom())
+				maxy = cliprect.bottom();
 		}
 		else
 		{
-			my_clip.min_x = cliprect.min_x;
-			my_clip.max_x = cliprect.max_x;
+			my_clip.setx(cliprect.left(), cliprect.right());
 
-			y = cliprect.min_y;
-			maxy = cliprect.max_y;
+			y = cliprect.top();
+			maxy = cliprect.bottom();
 		}
 
 		while (y <= maxy)
 		{
 			uint16_t const *const lineaddr = linectrl + 4*((y - K053936_offset[chip][1]) & 0x1ff);
-			my_clip.min_y = my_clip.max_y = y;
+			my_clip.sety(y, y);
 
 			uint32_t startx = 256 * (int16_t)(lineaddr[0] + ctrl[0x00]);
 			uint32_t starty = 256 * (int16_t)(lineaddr[1] + ctrl[0x01]);
@@ -316,39 +311,35 @@ void k053936_device::zoom_draw_common(screen_device &screen, BitmapClass &bitmap
 
 		if (((m_ctrl[0x07] & 0x0002) && m_ctrl[0x09]) && (glfgreat_hack)) /* wrong, but fixes glfgreat */
 		{
-			my_clip.min_x = m_ctrl[0x08] + xoff + 2;
-			my_clip.max_x = m_ctrl[0x09] + xoff + 2 - 1;
-			if (my_clip.min_x < cliprect.min_x)
-				my_clip.min_x = cliprect.min_x;
-			if (my_clip.max_x > cliprect.max_x)
-				my_clip.max_x = cliprect.max_x;
+			my_clip.setx(
+				std::max<int32_t>(cliprect.left(), m_ctrl[0x08] + xoff + 2),
+				std::min<int32_t>(cliprect.right(), m_ctrl[0x09] + xoff + 2 - 1));
 
 			y = m_ctrl[0x0a] + yoff - 2;
-			if (y < cliprect.min_y)
-				y = cliprect.min_y;
+			if (y < cliprect.top())
+				y = cliprect.top();
 			maxy = m_ctrl[0x0b] + yoff - 2 - 1;
-			if (maxy > cliprect.max_y)
-				maxy = cliprect.max_y;
+			if (maxy > cliprect.bottom())
+				maxy = cliprect.bottom();
 		}
 		else
 		{
-			my_clip.min_x = cliprect.min_x;
-			my_clip.max_x = cliprect.max_x;
+			my_clip.setx(cliprect.left(), cliprect.right());
 
-			y = cliprect.min_y;
-			maxy = cliprect.max_y;
+			y = cliprect.top();
+			maxy = cliprect.bottom();
 		}
 
 		while (y <= maxy)
 		{
 			uint16_t const *const lineaddr = m_linectrl.get() + 4 * ((y - yoff) & 0x1ff);
 
-			my_clip.min_y = my_clip.max_y = y;
+			my_clip.sety(y, y);
 
-			uint32_t startx = 256 * (int16_t)(lineaddr[0] + m_ctrl[0x00]);
-			uint32_t starty = 256 * (int16_t)(lineaddr[1] + m_ctrl[0x01]);
-			int incxx       =       (int16_t)(lineaddr[2]);
-			int incxy       =       (int16_t)(lineaddr[3]);
+			uint32_t startx = 256 * int16_t(lineaddr[0] + m_ctrl[0x00]);
+			uint32_t starty = 256 * int16_t(lineaddr[1] + m_ctrl[0x01]);
+			int incxx       =       int16_t(lineaddr[2]);
+			int incxy       =       int16_t(lineaddr[3]);
 
 			if (m_ctrl[0x06] & 0x8000)
 				incxx *= 256;
@@ -369,12 +360,12 @@ void k053936_device::zoom_draw_common(screen_device &screen, BitmapClass &bitmap
 	}
 	else    /* "simple" mode */
 	{
-		uint32_t startx = 256 * (int16_t)(m_ctrl[0x00]);
-		uint32_t starty = 256 * (int16_t)(m_ctrl[0x01]);
-		int incyx       =       (int16_t)(m_ctrl[0x02]);
-		int incyy       =       (int16_t)(m_ctrl[0x03]);
-		int incxx       =       (int16_t)(m_ctrl[0x04]);
-		int incxy       =       (int16_t)(m_ctrl[0x05]);
+		uint32_t startx = 256 * int16_t(m_ctrl[0x00]);
+		uint32_t starty = 256 * int16_t(m_ctrl[0x01]);
+		int incyx       =       int16_t(m_ctrl[0x02]);
+		int incyy       =       int16_t(m_ctrl[0x03]);
+		int incxx       =       int16_t(m_ctrl[0x04]);
+		int incxy       =       int16_t(m_ctrl[0x05]);
 
 		if (m_ctrl[0x06] & 0x4000)
 		{
@@ -473,19 +464,19 @@ static inline void K053936GP_copyroz32clip(running_machine &machine,
 
 	if (clip) // set source clip range to some extreme values when disabled
 	{
-		src_minx = src_cliprect.min_x;
-		src_maxx = src_cliprect.max_x;
-		src_miny = src_cliprect.min_y;
-		src_maxy = src_cliprect.max_y;
+		src_minx = src_cliprect.left();
+		src_maxx = src_cliprect.right();
+		src_miny = src_cliprect.top();
+		src_maxy = src_cliprect.bottom();
 	}
 	// this simply isn't safe to do!
 	else { src_minx = src_miny = -0x10000; src_maxx = src_maxy = 0x10000; }
 
 	// set target clip range
-	sx = dst_cliprect.min_x;
-	tx = dst_cliprect.max_x - sx + 1;
-	sy = dst_cliprect.min_y;
-	ty = dst_cliprect.max_y - sy + 1;
+	sx = dst_cliprect.left();
+	tx = dst_cliprect.right() - sx + 1;
+	sy = dst_cliprect.top();
+	ty = dst_cliprect.bottom() - sy + 1;
 
 	startx += sx * incxx + sy * incyx;
 	starty += sx * incxy + sy * incyy;
@@ -570,20 +561,19 @@ static void K053936GP_zoom_draw(running_machine &machine,
 
 	if (ctrl[0x07] & 0x0040)    /* "super" mode */
 	{
-		my_clip.min_x = cliprect.min_x;
-		my_clip.max_x = cliprect.max_x;
-		y = cliprect.min_y;
-		maxy = cliprect.max_y;
+		my_clip.setx(cliprect.left(), cliprect.right());
+		y = cliprect.top();
+		maxy = cliprect.bottom();
 
 		while (y <= maxy)
 		{
 			lineaddr = linectrl + (((y - K053936_offset[chip][1]) & 0x1ff) << 2);
-			my_clip.min_y = my_clip.max_y = y;
+			my_clip.sety(y, y);
 
-			startx = (int16_t)(lineaddr[0] + ctrl[0x00]) << 8;
-			starty = (int16_t)(lineaddr[1] + ctrl[0x01]) << 8;
-			incxx  = (int16_t)(lineaddr[2]);
-			incxy  = (int16_t)(lineaddr[3]);
+			startx = int16_t(lineaddr[0] + ctrl[0x00]) << 8;
+			starty = int16_t(lineaddr[1] + ctrl[0x01]) << 8;
+			incxx  = int16_t(lineaddr[2]);
+			incxy  = int16_t(lineaddr[3]);
 
 			if (ctrl[0x06] & 0x8000) incxx <<= 8;
 			if (ctrl[0x06] & 0x0080) incxy <<= 8;
@@ -634,30 +624,25 @@ static void K053936GP_zoom_draw(running_machine &machine,
 	uint16_t *ctrl = (uint16_t *)ctrl1;
 	uint16_t *linectrl = (uint16_t *)linectrl1;
 
-	rectangle my_clip;
-	uint32_t startx, starty;
-	int incxx, incxy, incyx, incyy, y, maxy, clip;
-
 	bitmap_ind16 &src_bitmap = tmap->pixmap();
 	rectangle &src_cliprect = K053936_cliprect[chip];
-	clip = K053936_clip_enabled[chip];
+	const int clip = K053936_clip_enabled[chip];
 
 	if (ctrl[0x07] & 0x0040)    /* "super" mode */
 	{
-		my_clip.min_x = cliprect.min_x;
-		my_clip.max_x = cliprect.max_x;
-		y = cliprect.min_y;
-		maxy = cliprect.max_y;
+		rectangle my_clip = cliprect;
+		int y = cliprect.top();
+		const int maxy = cliprect.bottom();
 
 		while (y <= maxy)
 		{
 			lineaddr = linectrl + (((y - K053936_offset[chip][1]) & 0x1ff) << 2);
-			my_clip.min_y = my_clip.max_y = y;
+			my_clip.sety(y, y);
 
-			startx = (int16_t)(lineaddr[0] + ctrl[0x00]) << 8;
-			starty = (int16_t)(lineaddr[1] + ctrl[0x01]) << 8;
-			incxx  = (int16_t)(lineaddr[2]);
-			incxy  = (int16_t)(lineaddr[3]);
+			uint32_t startx = int16_t(lineaddr[0] + ctrl[0x00]) << 8;
+			uint32_t starty = int16_t(lineaddr[1] + ctrl[0x01]) << 8;
+			int incxx = int16_t(lineaddr[2]);
+			int incxy = int16_t(lineaddr[3]);
 
 			if (ctrl[0x06] & 0x8000) incxx <<= 8;
 			if (ctrl[0x06] & 0x0080) incxy <<= 8;
@@ -674,12 +659,12 @@ static void K053936GP_zoom_draw(running_machine &machine,
 	}
 	else    /* "simple" mode */
 	{
-		startx = (int16_t)(ctrl[0x00]) << 8;
-		starty = (int16_t)(ctrl[0x01]) << 8;
-		incyx  = (int16_t)(ctrl[0x02]);
-		incyy  = (int16_t)(ctrl[0x03]);
-		incxx  = (int16_t)(ctrl[0x04]);
-		incxy  = (int16_t)(ctrl[0x05]);
+		uint32_t startx = int16_t(ctrl[0x00]) << 8;
+		uint32_t starty = int16_t(ctrl[0x01]) << 8;
+		int incyx = int16_t(ctrl[0x02]);
+		int incyy = int16_t(ctrl[0x03]);
+		int incxx = int16_t(ctrl[0x04]);
+		int incxy = int16_t(ctrl[0x05]);
 
 		if (ctrl[0x06] & 0x4000) { incyx <<= 8; incyy <<= 8; }
 		if (ctrl[0x06] & 0x0040) { incxx <<= 8; incxy <<= 8; }

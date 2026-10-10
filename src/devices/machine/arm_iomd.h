@@ -207,6 +207,7 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	template <unsigned Axis, unsigned Signal> void mouse_pos_w(int state);

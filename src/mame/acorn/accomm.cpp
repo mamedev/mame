@@ -28,7 +28,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/econet/econet.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/g65816/g65816.h"
+#include "cpu/m6502/w65816.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
@@ -87,7 +87,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
-	required_device<g65816_device> m_maincpu;
+	required_device<w65816_device> m_maincpu;
 	required_memory_region m_maincpu_region;
 	required_device<input_merger_device> m_irqs;
 	required_device<screen_device> m_screen;
@@ -424,10 +424,10 @@ INPUT_PORTS_END
 
 void accomm_state::accomm(machine_config &config)
 {
-	G65816(config, m_maincpu, 16_MHz_XTAL / 8);
+	W65816(config, m_maincpu, 16_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &accomm_state::mem_map);
 
-	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, G65816_LINE_IRQ);
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, w65816_device::IRQ_LINE);
 
 	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
@@ -491,7 +491,7 @@ void accomm_state::accomm(machine_config &config)
 
 	MC6854(config, m_adlc);
 	m_adlc->out_txd_cb().set("econet", FUNC(econet_device::host_data_w));
-	m_adlc->out_irq_cb().set_inputline(m_maincpu, G65816_LINE_NMI);
+	m_adlc->out_irq_cb().set_inputline(m_maincpu, w65816_device::NMI_LINE);
 
 	econet_device &econet(ECONET(config, "econet"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));

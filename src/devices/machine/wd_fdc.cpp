@@ -1325,6 +1325,9 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 		intrq_cond = 0;
 		// set busy, then set a timer to process the command
 		status |= S_BUSY;
+		// the status layout follows the command register at once
+		if(val & 0x80)
+			status_type_1 = false;
 		drop_drq();
 		delay_cycles(t_cmd, dden ? delay_command_commit*2 : delay_command_commit);
 	}

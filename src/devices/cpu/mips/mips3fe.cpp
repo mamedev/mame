@@ -252,9 +252,16 @@ bool mips3_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev
 		case 0x33:  // PREF
 			if (m_mips3->m_flavor < mips3_device::MIPS3_TYPE_MIPS_IV)
 				return false;
-			[[fallthrough]];
+			return true;
 		case 0x2f:  // CACHE
-			// effective no-op
+			// only the primary data cache is modelled, and only for some parts
+			if (m_mips3->m_dcache_geometry && (RTREG & 3) == 1)
+			{
+				desc.set_r_used(RSREG);
+				desc.set_reads_memory();
+				desc.set_writes_memory();
+				desc.set_can_cause_exception();
+			}
 			return true;
 	}
 
@@ -384,6 +391,16 @@ bool mips3_device::frontend::describe_special(uint32_t op, opcode_desc &desc)
 			desc.set_lo_modified();
 			desc.set_hi_modified();
 			desc.cycles = 3;
+			if (m_mips3->m_flavor == mips3_device::MIPS3_TYPE_VR5500 && (op & 0x7c0))
+			{
+				// VR5500 multiply family: moves a result word to rd, MACC/MSAC accumulate
+				desc.set_r_modified(RDREG);
+				if (BIT(op, 8))
+				{
+					desc.set_lo_used();
+					desc.set_hi_used();
+				}
+			}
 			return true;
 
 		case 0x1a:  // DIV
@@ -498,7 +515,38 @@ bool mips3_device::frontend::describe_regimm(uint32_t op, opcode_desc &desc)
 
 bool mips3_device::frontend::describe_idt(uint32_t op, opcode_desc &desc)
 {
-	// only on the R4650
+	if (m_mips3->m_flavor == mips3_device::MIPS3_TYPE_VR5500)
+	{
+		switch (op & 0x3f)
+		{
+			case 0x00: case 0x01: case 0x04: case 0x05: // MADD, MADDU, MSUB, MSUBU
+				desc.set_r_used(RSREG);
+				desc.set_r_used(RTREG);
+				desc.set_lo_used();
+				desc.set_hi_used();
+				desc.set_lo_modified();
+				desc.set_hi_modified();
+				desc.cycles = 2;
+				return true;
+
+			case 0x02: // MUL (HI/LO are unchanged)
+				desc.set_r_used(RSREG);
+				desc.set_r_used(RTREG);
+				desc.set_r_modified(RDREG);
+				desc.cycles = 2;
+				return true;
+
+			case 0x20: // CLZ
+			case 0x21: // CLO
+			case 0x24: // DCLZ
+			case 0x25: // DCLO
+				desc.set_r_used(RSREG);
+				desc.set_r_modified(RDREG);
+				return true;
+		}
+		return false;
+	}
+
 	if (m_mips3->m_flavor != mips3_device::MIPS3_TYPE_R4650)
 		return false;
 
@@ -573,16 +621,20 @@ bool mips3_device::frontend::describe_cop0(uint32_t op, opcode_desc &desc)
 			{
 				case 0x00:  // BCzF
 				case 0x01:  // BCzT
+				case 0x02:  // BCzFL
+				case 0x03:  // BCzTL
 					desc.set_is_conditional_branch();
 					desc.targetpc = desc.pc + 4 + SIMMVAL * 4;
 					desc.delayslots = 1;
+					desc.skipslots = (RTREG & 0x02) ? 1 : 0;
 					return true;
 			}
 			return false;
 
 		case 0x10:  case 0x11:  case 0x12:  case 0x13:  case 0x14:  case 0x15:  case 0x16:  case 0x17:
 		case 0x18:  case 0x19:  case 0x1a:  case 0x1b:  case 0x1c:  case 0x1d:  case 0x1e:  case 0x1f:  // COP
-			switch (op & 0x01ffffff)
+			// the CP0 function is bits 5:0 only
+			switch (op & 0x3f)
 			{
 				case 0x01:  // TLBR
 				case 0x08:  // TLBP
@@ -599,8 +651,14 @@ bool mips3_device::frontend::describe_cop0(uint32_t op, opcode_desc &desc)
 					desc.set_end_sequence();
 					desc.set_can_change_modes();
 					return true;
+
+				case 0x10:  // RFE: reserved on R4000
+					return false;
+
+				default:
+					// invalid, but not a reserved instruction exception on R4000
+					return true;
 			}
-			return false;
 	}
 
 	return false;

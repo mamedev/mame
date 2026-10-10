@@ -13,8 +13,6 @@ TODO:
 - C-Bus SCSI support, remove IDE ROM loads where doesn't belong by default;
 \- load actual IDE BIOSes from IPL romsets where applicable (pc9801bx onward, all pc9821)
 - Port over pc88va SASI version in common C-Bus option;
-- Remove kludge for POR bit in a20_ctrl_w fn;
-\- Causes "SYSTEM SHUTDOWN"s on OS installs/reboots (soft reset the machine manually);
 - DAC1BIT has a bit of clicking with start/end of samples, is it fixable or just a btanb?
 - Incomplete FDC inner semantics with the dual ports;
 \- floppy sounds never silences when drive is idle (disabled for the time being);
@@ -44,7 +42,6 @@ TODO (pc9801us / pc9801fs):
 \- wants specifically (the internal) SCSI?
 
 TODO (pc9801bx2):
-- "SYSTEM SHUTDOWN" at POST, SDIP related, soft reset to bypass;
 - Accesses $8f0-$8f2 PMC area, shared with 98NOTE machines;
 - A non-fatal "MEMORY ERROR" is always thrown no matter the RAM size afterwards, related?
 - unemulated conventional or EMS RAM bank, definitely should have one given the odd minimum RAM
@@ -368,11 +365,6 @@ void pc9801vm_state::a20_ctrl_w(offs_t offset, uint8_t data)
 {
 	if(offset == 0x00)
 	{
-		uint8_t por;
-		/* reset POR bit */
-		// TODO: is there any other way that doesn't involve direct r/w of ppi address?
-		por = m_ppi_sys->read(2) & ~0x20;
-		m_ppi_sys->write(2, por);
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 		m_gate_a20 = 0;
 	}
@@ -1720,11 +1712,14 @@ uint32_t pc9801vm_state::a20_286(bool state)
 *
 ****************************************/
 
-void pc9801_state::pc9801_palette(palette_device &palette) const
+void pc9801_state::palette_init(palette_device &palette) const
 {
+	// set fixed BRG for text GDC palette
 	for(int i = 0; i < 8; i++)
-		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		palette.set_pen_color(i, pal1bit(BIT(i, 1)), pal1bit(BIT(i, 2)), pal1bit(BIT(i, 0)));
 
+	// clear bitmap GDC palette(s) for debugging aid
+	// assume undefined content on real HW
 	for(int i = 8; i < palette.entries(); i++)
 		palette.set_pen_color(i, rgb_t::black());
 }
@@ -2124,7 +2119,7 @@ void pc9801_state::pc9801(machine_config &config)
 	UPD1990A(config, m_rtc);
 
 	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.15);
-	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16);
+	PALETTE(config, m_palette, FUNC(pc9801_state::palette_init), 16);
 
 	// TODO: should be PC80S31, using 'K variant for the better BIOS instead
 	// (and no patch downstream).
@@ -2209,7 +2204,7 @@ void pc9801vm_state::pc9801vm(machine_config &config)
 	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	// analog mode optional on earlier VM, with PC-9801-24 gfx board
-	PALETTE(config, m_palette, FUNC(pc9801vm_state::pc9801_palette), 16 + 16);
+	PALETTE(config, m_palette, FUNC(pc9801vm_state::palette_init), 16 + 16);
 }
 
 // UV is essentially a VM with 3.5" 2DD drives

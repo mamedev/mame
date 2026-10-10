@@ -942,14 +942,14 @@ void supracan_state::draw_roz_layer(bitmap_ind16 &bitmap, const rectangle &clipr
 	const int heightshifted = srcbitmap.height() << 16;
 
 	/* pre-advance based on the cliprect */
-	startx += cliprect.min_x * incxx + cliprect.min_y * incyx;
-	starty += cliprect.min_x * incxy + cliprect.min_y * incyy;
+	startx += cliprect.left() * incxx + cliprect.top() * incyx;
+	starty += cliprect.left() * incxy + cliprect.top() * incyy;
 
 	/* extract start/end points */
-	int sx = cliprect.min_x;
-	int sy = cliprect.min_y;
-	int ex = cliprect.max_x;
-	int ey = cliprect.max_y;
+	int sx = cliprect.left();
+	int sy = cliprect.top();
+	int ex = cliprect.right();
+	int ey = cliprect.bottom();
 
 	{
 		/* loop over rows */
@@ -1112,7 +1112,7 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 					// yes, it will draw a single line if you specify a cliprect as such (partial updates...)
 
-					for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+					for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 					{
 						// these will have to change to uint32_t* etc. once alpha blending is supported
 						uint16_t *screen = &bitmap.pix(y);
@@ -1143,7 +1143,7 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 						}
 
 
-						for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+						for (int x = cliprect.left(); x <= cliprect.right(); x++)
 						{
 							int actualx = x & mosaic_mask;
 							int realx = actualx + line_scroll_x;
@@ -1196,9 +1196,10 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					if (!(m_roz_mode & 0x0200) && (m_roz_mode & 0xf000)) // HACK - Not trusted: Acan Logo, Speedy Dragon Intro, Speed Dragon Bonus stage need it.  Monopoly and JTT *don't* causes graphical issues
 					{
 						// NOT accurate, causes issues when the attract mode loops and the logo is shown the 2nd time in some games - investigate
-						for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+						rectangle clip(cliprect);
+						for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 						{
-							rectangle clip(cliprect.min_x, cliprect.max_x, y, y);
+							clip.sety(y, y);
 
 							scrollx = (m_roz_scrollx);
 							scrolly = (m_roz_scrolly);
@@ -1246,7 +1247,7 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 			const u8 window_pen = m_window_control[0] & 0xff;
 
-			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+			for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			{
 				// bit 8 is unset by sangofgt, where it uses only two entries of the table on transitions.
 				const int ybase = BIT(m_window_control[0], 8) ? (y * 2) : 0;
@@ -1256,7 +1257,7 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				const int16_t clip_max_x = (m_vram[clip_base + 1] + window_scrollx);
 				uint8_t *priop = &m_prio_bitmap.pix(y);
 
-				for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				for (int x = cliprect.left(); x <= cliprect.right(); x++)
 				{
 					if (layer_priority >= (priop[x] >> 4))
 						continue;
@@ -1275,13 +1276,13 @@ uint32_t supracan_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	// combine sprites
 	if (BIT(m_video_flags, 3))
 	{
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			uint16_t *dstp = &bitmap.pix(y);
 			uint8_t *priop = &m_prio_bitmap.pix(y);
 			uint16_t *spritep = &m_sprite_final_bitmap.pix(y);
 
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				uint16_t sprite_pix = spritep[x];
 				uint8_t tile_prio = priop[x] >> 4;

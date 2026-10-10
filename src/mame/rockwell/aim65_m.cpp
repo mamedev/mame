@@ -313,12 +313,13 @@ void aim65_state::z32_pa_w( u8 data )
 // Display printer output
 uint32_t aim65_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (u8 y = 0; y<cliprect.max_y; y++)
+	for (u8 y = 0; y < cliprect.bottom(); y++)
 	{
-		u16 sy = m_printer_y*10 - cliprect.max_y + 10 + y;
+		auto *const dst = &bitmap.pix(y);
+		u16 sy = m_printer_y*10 - cliprect.bottom() + 10 + y;
 		if (sy > 0xfe80) // wrap-around correctly
 			sy += 0x280;
-		for(u8 x = 0; x < 10; x++)
+		for (u8 x = 0; x < 10; x++)
 		{
 			uint16_t data;
 			if (!BIT(sy, 0))
@@ -327,7 +328,7 @@ uint32_t aim65_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				data = m_printerRAM[sy * 10 + (9 - x)];
 
 			for (u8 b = 0; b < 10; b++)
-				bitmap.pix(y, 120 - (b * 12) - ((x > 4) ? x+1 : x)) = BIT(data, b);
+				dst[120 - (b * 12) - ((x > 4) ? x+1 : x)] = BIT(data, b);
 		}
 	}
 

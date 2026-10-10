@@ -210,11 +210,11 @@ TILE_GET_INFO_MEMBER(model3_state::tile_info_layer3_8bit) { MODEL3_TILE_INFO8(0x
 #ifdef UNUSED_FUNCTION
 void model3_state::draw_texture_sheet(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t *const d = &bitmap.pix(y);
 		int index = (y*2)*2048;
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x++) {
+		for(int x = cliprect.left(); x <= cliprect.right(); x++) {
 			uint16_t pix = m_texture_ram[0][index];
 			index+=4;
 			if(pix != 0) {
@@ -240,10 +240,10 @@ void model3_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 	// $f7000: stencil mask
 	uint32_t* rowmask_ram = (uint32_t*)&m_m3_char_ram[0x1ee00];
 
-	int x1 = cliprect.min_x;
-	int y1 = cliprect.min_y;
-	int x2 = cliprect.max_x;
-	int y2 = cliprect.max_y;
+	int x1 = cliprect.left();
+	int y1 = cliprect.top();
+	int x2 = cliprect.right();
+	int y2 = cliprect.bottom();
 
 	int ix = sx;
 	int iy = sy;
@@ -285,8 +285,8 @@ void model3_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 			iix += (0 - rx1);
 			rx1 = 0;
 		}
-		if (rx2 > cliprect.max_x)
-			rx2 = cliprect.max_x;
+		if (rx2 > cliprect.right())
+			rx2 = cliprect.right();
 
 		for (int x = rx1; x <= rx2; x++)
 		{
@@ -313,10 +313,10 @@ uint32_t model3_state::screen_update_model3(screen_device &screen, bitmap_rgb32 
 	int layer_scroll_x[4], layer_scroll_y[4];
 	uint32_t layer_data[4];
 
-	layer_data[0] = BYTE_REVERSE32((uint32_t)(m_layer_scroll[0] >> 32));
-	layer_data[1] = BYTE_REVERSE32((uint32_t)(m_layer_scroll[0] >> 0));
-	layer_data[2] = BYTE_REVERSE32((uint32_t)(m_layer_scroll[1] >> 32));
-	layer_data[3] = BYTE_REVERSE32((uint32_t)(m_layer_scroll[1] >> 0));
+	layer_data[0] = BYTE_REVERSE32(uint32_t(m_layer_scroll[0] >> 32));
+	layer_data[1] = BYTE_REVERSE32(uint32_t(m_layer_scroll[0] >> 0));
+	layer_data[2] = BYTE_REVERSE32(uint32_t(m_layer_scroll[1] >> 32));
+	layer_data[3] = BYTE_REVERSE32(uint32_t(m_layer_scroll[1] >> 0));
 	layer_scroll_x[0] = layer_data[0] & 0x1ff;
 	layer_scroll_y[0] = (layer_data[0] >> 16) & 0x1ff;
 	layer_scroll_x[1] = layer_data[1] & 0x1ff;
@@ -1990,12 +1990,12 @@ void model3_state::real3d_traverse_display_list()
 
 void model3_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int j = cliprect.min_y; j <= cliprect.max_y; ++j)
+	for (int j = cliprect.top(); j <= cliprect.bottom(); ++j)
 	{
 		uint32_t *const dst = &bitmap.pix(j);
 		uint32_t const *const src = &m_fb->pix(j);
 
-		for (int i = cliprect.min_x; i <= cliprect.max_x; ++i)
+		for (int i = cliprect.left(); i <= cliprect.right(); ++i)
 		{
 			if (src[i] & 0xff000000)
 			{
@@ -2007,22 +2007,14 @@ void model3_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 void model3_renderer::clear_fb()
 {
-	rectangle cliprect;
-	cliprect.min_x = 0;
-	cliprect.min_y = 0;
-	cliprect.max_x = 495;
-	cliprect.max_y = 383;
+	constexpr rectangle cliprect(0, 495, 0, 383);
 
 	m_fb->fill(0x00000000, cliprect);
 }
 
 void model3_renderer::clear_zb()
 {
-	rectangle cliprect;
-	cliprect.min_x = 0;
-	cliprect.min_y = 0;
-	cliprect.max_x = 495;
-	cliprect.max_y = 383;
+	constexpr rectangle cliprect(0, 495, 0, 383);
 
 	float zvalue = 10000000000.0f;
 	m_zb->fill(*(int*)&zvalue, cliprect);
@@ -2035,11 +2027,7 @@ void model3_renderer::wait_for_polys()
 
 void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tris)
 {
-	rectangle cliprect;
-	cliprect.min_x = 0;
-	cliprect.min_y = 0;
-	cliprect.max_x = 495;
-	cliprect.max_y = 383;
+	constexpr rectangle cliprect(0, 495, 0, 383);
 
 //  printf("draw opaque: %d\n", num_tris);
 
@@ -2100,11 +2088,7 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 
 void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris)
 {
-	rectangle cliprect;
-	cliprect.min_x = 0;
-	cliprect.min_y = 0;
-	cliprect.max_x = 495;
-	cliprect.max_y = 383;
+	constexpr rectangle cliprect(0, 495, 0, 383);
 
 //  printf("draw alpha: %d\n", num_tris);
 

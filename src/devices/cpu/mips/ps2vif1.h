@@ -41,6 +41,8 @@ public:
 
 	void dma_write(const uint64_t hi, const uint64_t lo);
 	void tag_write(uint32_t *data);
+	uint16_t top() const { return m_top; }
+	uint16_t itop() const { return m_itop; }
 	bool fifo_available(uint32_t count) const { return (BUFFER_SIZE - m_end) >= count; }
 
 protected:

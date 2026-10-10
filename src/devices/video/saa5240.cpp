@@ -758,7 +758,7 @@ int saa5240_device::get_rgb()
 
 uint32_t saa5240_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		int sy = y / 10;
 		int x = screen.visible_area().left();

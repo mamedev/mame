@@ -769,7 +769,7 @@ void edsp_device::execute_run()
 				// ROR
 				const u16 s = m_r[BIT(op, 5, 3)];
 				m_r[BIT(op, 8, 3)] = (s >> 1) | (BIT(m_sr, 0) << 15);
-				m_sr = (m_sr & 0xfff0) | (s16(s) >> 1 ? 0 : 0x0004) | (BIT(m_sr, 0) ? 0x000a : 0);
+				m_sr = (m_sr & 0xfff0) | ((s >> 1) || BIT(m_sr, 0) ? 0 : 0x0004) | (BIT(m_sr, 0) ? 0x000a : 0);
 				if (BIT(s, 0))
 					m_sr ^= 0x0003;
 				m_icount -= 1;

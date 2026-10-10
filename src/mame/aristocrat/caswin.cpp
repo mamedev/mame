@@ -165,7 +165,7 @@ uint32_t caswin_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	const rectangle &visarea = screen.visible_area();
 	// these limits are calculated thru tilemap viewer against the markers,
 	// which shouldn't draw
-	clip.set(56, 199, visarea.min_y, visarea.max_y);
+	clip.set(56, 199, visarea.top(), visarea.bottom());
 	clip &= cliprect;
 	m_tilemap->set_scroll_rows(32);
 

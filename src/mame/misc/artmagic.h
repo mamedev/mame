@@ -21,17 +21,24 @@ public:
 		, m_control(*this, "control")
 		, m_vram(*this, "vram%u", 0U)
 		, m_blitter_base(*this, "gfx")
+		, m_gun_rxd(1)
 	{ }
 
-	void init_shtstar();
 	void init_cheesech();
 	void init_ultennis();
 	void init_stonebal();
+	void init_westerns();
 	void cheesech(machine_config &config);
 	void artmagic(machine_config &config);
-	void shtstar(machine_config &config);
 	void stonebal(machine_config &config);
+	void westerns(machine_config &config);
+
 	int prot_r();
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -43,6 +50,7 @@ private:
 	required_shared_ptr_array<uint16_t, 2> m_vram;
 	required_region_ptr<uint16_t> m_blitter_base;
 
+	uint8_t m_gun_rxd;
 	uint8_t m_tms_irq = 0U;
 	uint8_t m_hack_irq = 0U;
 	uint8_t m_prot_input[16]{};
@@ -64,18 +72,19 @@ private:
 	uint8_t m_blitter_page = 0U;
 	attotime m_blitter_busy_until{};
 	emu_timer * m_irq_off_timer = nullptr;
+
+	TIMER_CALLBACK_MEMBER(irq_off);
 	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t ultennis_hack_r();
 	void protection_bit_w(offs_t offset, uint16_t data);
 	uint16_t blitter_r();
 	void blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void m68k_gen_int(int state);
+	uint8_t westerns_gun_p3_r();
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
+
 	void decrypt_cheesech();
 	void decrypt_ultennis();
 	void execute_blit();
@@ -83,15 +92,12 @@ private:
 	inline uint16_t *address_to_vram(offs_t *address);
 
 	void main_map(address_map &map) ATTR_COLD;
-	void shtstar_guncpu_data_map(address_map &map) ATTR_COLD;
-	void shtstar_guncpu_map(address_map &map) ATTR_COLD;
-	void shtstar_map(address_map &map) ATTR_COLD;
-	void shtstar_subcpu_map(address_map &map) ATTR_COLD;
-	void shtstar_subcpu_vector_map(address_map &map) ATTR_COLD;
+	void westerns_guncpu_data_map(address_map &map) ATTR_COLD;
+	void westerns_guncpu_map(address_map &map) ATTR_COLD;
+	void westerns_map(address_map &map) ATTR_COLD;
+	void westerns_subcpu_map(address_map &map) ATTR_COLD;
+	void westerns_subcpu_vector_map(address_map &map) ATTR_COLD;
 	void stonebal_map(address_map &map) ATTR_COLD;
 	void stonebal_tms_map(address_map &map) ATTR_COLD;
 	void tms_map(address_map &map) ATTR_COLD;
-
-protected:
-	TIMER_CALLBACK_MEMBER(irq_off);
 };

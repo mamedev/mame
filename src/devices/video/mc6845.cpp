@@ -112,6 +112,13 @@ mc6845_device::mc6845_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
+void mc6845_device::map(address_map &map)
+{
+	map(0x0, 0x0).rw(FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x1, 0x1).rw(FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
+
+
 void mc6845_device::device_post_load()
 {
 	recompute_parameters(true);
@@ -880,14 +887,14 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		/* call the set up function if any */
 		m_begin_update_cb(bitmap, cliprect);
 
-		if (cliprect.min_y == 0)
+		if (cliprect.top() == 0)
 		{
 			/* read the start address at the beginning of the frame */
 			m_current_disp_addr = m_disp_start_addr;
 		}
 
 		/* for each row in the visible region */
-		for (uint16_t y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (uint16_t y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			this->draw_scanline(y, bitmap, cliprect);
 		}

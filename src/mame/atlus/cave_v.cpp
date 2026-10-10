@@ -237,7 +237,6 @@ inline void cave_state::tilemap_draw(int chip,
 
 	if (tilemap->rowselect_en())  // row-select
 	{
-		rectangle clip;
 		int endline, vramdata0, vramdata1;
 
 		/*
@@ -248,14 +247,13 @@ inline void cave_state::tilemap_draw(int chip,
 		    tilemap_draw multiple times.
 		*/
 
-		clip.min_x = cliprect.min_x;
-		clip.max_x = cliprect.max_x;
+		rectangle clip(cliprect);
 
-		for (int startline = cliprect.min_y; startline <= cliprect.max_y;)
+		for (int startline = cliprect.top(); startline <= cliprect.bottom(); )
 		{
 			/* Find the largest slice */
 			vramdata0 = (vramdata1 = tilemap->rowselect(sy + offs_row + startline));
-			for (endline = startline + 1; endline <= cliprect.max_y; endline++)
+			for (endline = startline + 1; endline <= cliprect.bottom(); endline++)
 				if ((++vramdata1) != tilemap->rowselect(sy + offs_row + endline)) break;
 
 			tilemap->set_scrolly(0, vramdata0 - startline);
@@ -283,13 +281,13 @@ inline void cave_state::tilemap_draw(int chip,
 
 			if (flipy)
 			{
-				clip.min_y = cliprect.max_y - (endline - 1 - cliprect.min_y);
-				clip.max_y = cliprect.max_y - (startline - cliprect.min_y);
+				clip.sety(
+						cliprect.bottom() - (endline - 1 - cliprect.top()),
+						cliprect.bottom() - (startline - cliprect.top()));
 			}
 			else
 			{
-				clip.min_y = startline;
-				clip.max_y = endline - 1;
+				clip.sety(startline, endline - 1);
 			}
 
 			tilemap->draw(screen, bitmap, clip, flags, priority, 0);
@@ -300,7 +298,7 @@ inline void cave_state::tilemap_draw(int chip,
 	else if (tilemap->rowscroll_en()) // row-scroll, no row-select
 	{
 		tilemap->set_scroll_rows(512);
-		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
+		for (int line = cliprect.top(); line <= cliprect.bottom(); line++)
 			tilemap->set_scrollx((line + sy) & 511,
 							sx + tilemap->rowscroll(sy + offs_row + line));
 		tilemap->set_scrolly(0, sy);

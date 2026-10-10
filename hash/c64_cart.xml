@@ -364,28 +364,6 @@ Random corruption on any disk loaded with FASTLOAD enabled
 		</part>
 	</software>
 
-	<software name="multiscr" supported="no">
-		<description>Multiscreen (Australia)</description>
-		<year>1987</year>
-		<publisher>Multiscreen Pty</publisher>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="multiscreen" />
-			<feature name="game" value="0" />
-			<feature name="exrom" value="0" />
-			<feature name="battery" value="CR2325" />
-
-			<dataarea name="roml" size="0x34000">
-				<rom name="cart-1.bin" size="0x4000" crc="a0dc670c" sha1="bbee117340477a7416bba2e9abc2b8debd940cd4" offset="0x00000" />
-				<rom name="cart-2.bin" size="0x8000" crc="2abaad8e" sha1="897f98e954418e2e9313f219cd64b100c60c68b1" offset="0x04000" />
-				<rom name="cart-3.bin" size="0x8000" crc="ecddbbfc" sha1="70c72b77dc3981be8bcbec9ba0cc38d9aa5936fd" offset="0x0c000" />
-				<rom name="cart-4.bin" size="0x8000" crc="042678ef" sha1="ff2582c617f72bf57be7d76bcf8270665144f924" offset="0x14000" />
-			</dataarea>
-
-			<dataarea name="nvram" size="0x2000" />
-		</part>
-	</software>
-
 	<software name="4040fast">
 		<description>4040 + Fast Hack'Em</description>
 		<year>1990</year>
@@ -638,7 +616,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 		</part>
 	</software>
 
-	<software name="magicvce" supported="partial">
+	<software name="magicvce">
 		<description>Magic Voice</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
@@ -975,28 +953,6 @@ Black screen, self modifies code in the 0x100-0x14f range
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="supercpu" supported="no">
-		<description>SuperCPU</description>
-		<year>1997</year>
-		<publisher>Creative Micro Designs</publisher>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="supercpu" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="1" />
-
-			<dataarea name="roml" size="0x20000">
-				<rom name="supercpu_dos_204.bin" size="0x20000" crc="f4151454" sha1="6aa529a7b1b6de53e8979e407a77b4d5657727f5" />
-			</dataarea>
-		</part>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="cmdscpuu.d64" size="174848" crc="caad286d" sha1="2c1258505148763f13ab2fcdaf247138a933817e" />
 			</dataarea>
 		</part>
 	</software>
@@ -6810,17 +6766,21 @@ Fails [MOS6526], [SID] and [cassette] checks
 
 	<software name="ide64">
 		<description>IDE64 (v4.1, IDEDOS v0.90)</description>
-		<year>2011</year>
+		<year>2019</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ide64" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="1" />
 
 			<dataarea name="ide64:u3" size="0x20000">
-				<rom name="u3" size="0x20000" crc="a52ff8fa" sha1="65fb2dc7d6bc6e96c4d60aca7eb103e7d1e58412" />
+				<rom name="idedos20190819.rom" size="0x20000" crc="8792bf2d" sha1="1b97505b07aaea1ed4404e5f5ac7550ec02854b7" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="idedos_util.d64" size="174848" crc="94f27ea4" sha1="1119da8fd7304e3cea4d37828a4ce53a0f6bad09" />
 			</dataarea>
 		</part>
 	</software>

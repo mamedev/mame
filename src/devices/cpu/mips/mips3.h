@@ -324,6 +324,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_stop() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
@@ -351,11 +352,11 @@ protected:
 	virtual bool RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask);
 	virtual bool RDOUBLE(offs_t address, uint64_t *result);
 	virtual bool RDOUBLE_MASKED(offs_t address, uint64_t *result, uint64_t mem_mask);
-	virtual void WBYTE(offs_t address, uint8_t data);
-	virtual void WHALF(offs_t address, uint16_t data);
-	virtual void WWORD(offs_t address, uint32_t data);
+	virtual bool WBYTE(offs_t address, uint8_t data);
+	virtual bool WHALF(offs_t address, uint16_t data);
+	virtual bool WWORD(offs_t address, uint32_t data);
 	virtual void WWORD_MASKED(offs_t address, uint32_t data, uint32_t mem_mask);
-	virtual void WDOUBLE(offs_t address, uint64_t data);
+	virtual bool WDOUBLE(offs_t address, uint64_t data);
 	virtual void WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t mem_mask);
 
 	virtual void set_cop0_reg(int idx, uint64_t val);
@@ -374,20 +375,8 @@ protected:
 		uint64_t        cpr[3][32];
 		uint64_t        ccr[3][32];
 		uint32_t        llbit;
+		uint32_t        lladdr;                     /* virtual address the LL reservation covers */
 		float           acc;
-
-		/* VU0 registers (R5900 only) */
-		float           vfr[32][4]; // 0..3 = x..w
-		uint32_t        vcr[32];
-		float           vumem[0x1000];
-		float*          vfmem;
-		uint32_t*       vimem;
-		float           vacc[4];
-		float           p;
-
-		uint32_t*       vr;
-		float*          i;
-		float*          q;
 
 		uint32_t        mode;                       /* current global mode */
 
@@ -396,8 +385,12 @@ protected:
 		const char *    format;                     /* format string for print_debug */
 		uint32_t        arg0;                       /* print_debug argument 1 */
 		uint32_t        arg1;                       /* print_debug argument 2 */
+		uint32_t        cacheop;                    /* data cache callback: operation, or size and direction */
+		uint64_t        cachedata;                  /* data cache callback: data */
+		uint64_t        cachemask;                  /* data cache callback: mask */
 
 		uint64_t        count_zero_time;
+		uint64_t        random_zero_time;           /* Random counter origin; reset by a Wired write */
 		uint32_t        compare_armed;
 		uint32_t        jmpdest;                    /* destination jump target */
 	};
@@ -445,13 +438,26 @@ protected:
 	uint32_t        c_system_clock;
 	uint32_t        m_cpu_clock;
 	emu_timer *     m_compare_int_timer;
-	uint32_t        m_tlb_seed;
 
 	/* derived info based on flavor */
 	uint32_t        m_pfnmask;
 	uint64_t        m_pagemask_mask;
 	uint32_t        m_config_wmask;
+	uint64_t        m_entrylo_wmask;
+	uint64_t        m_entryhi_wmask;
 	uint8_t         m_tlbentries;
+
+	/* primary data cache geometry, for the parts that model one */
+	struct dcache_geometry
+	{
+		uint8_t     line_shift;                 /* log2 of the line size in bytes */
+		uint8_t     set_shift;                  /* log2 of the number of sets */
+		uint8_t     way_shift;                  /* log2 of the number of ways, 2 at most */
+		uint8_t     index_way_bit;              /* lowest virtual address bit naming the way in Index operations */
+		uint32_t    taglo_lru;                  /* TagLo bit naming the way to replace next, 0 if the part has none */
+	};
+	static const dcache_geometry *dcache_geometry_for(mips3_flavor flavor);
+	const dcache_geometry *const m_dcache_geometry; /* nullptr if this part does not model them */
 
 	/* memory accesses */
 	bool            m_bigendian;
@@ -463,6 +469,19 @@ protected:
 	size_t          c_icache_size;
 	size_t          c_dcache_size;
 	uint8_t         c_secondary_cache_line_size;
+
+	/* data cache lines allocated explicitly by CACHE, empty without m_dcache_geometry */
+	enum : uint8_t
+	{
+		DCACHE_INVALID = 0,
+		DCACHE_CLEAN,
+		DCACHE_DIRTY
+	};
+	std::unique_ptr<uint8_t []>  m_dcache_line_data;   /* contents, one line after another */
+	std::unique_ptr<uint32_t []> m_dcache_line_tag;    /* physical address of each line */
+	std::unique_ptr<uint8_t []>  m_dcache_line_state;  /* DCACHE_xxx for each line, the ways of a set adjacent */
+	std::unique_ptr<uint8_t []>  m_dcache_lru;         /* way to replace next in each set */
+	std::unique_ptr<uint8_t []>  m_dcache_code_pages;  /* DRC only: a bit for each physical 4K page holding translated code */
 
 	/* MMU */
 	mips3_tlb_entry m_tlb[MIPS3_MAX_TLB_ENTRIES];
@@ -528,6 +547,9 @@ protected:
 
 	void generate_exception(int exception, int backup);
 	void generate_tlb_exception(int exception, offs_t address);
+	void generate_address_error(int exception, offs_t address);
+	void set_link(offs_t address);
+	bool address_error_check(offs_t address, uint32_t size, bool iswrite);
 
 	void static_generate_memory_mode_checks(drcuml_block &block, uml::code_handle &exception_addrerr, int &label, int mode);
 	void static_generate_fastram_accessor(drcuml_block &block, int &label, int size, bool iswrite, bool ismasked);
@@ -537,6 +559,7 @@ protected:
 	virtual void check_irqs();
 	virtual void handle_mult(uint32_t op);
 	virtual void handle_multu(uint32_t op);
+	void handle_vr5500_mul(uint32_t op);
 
 public:
 	void mips3com_update_cycle_counting();
@@ -550,7 +573,7 @@ private:
 	uint32_t compute_prid_register();
 	uint32_t compute_fpu_prid_register();
 
-	uint32_t generate_tlb_index();
+	uint32_t get_random_index();
 	void tlb_map_entry(int tlbindex);
 	void tlb_write_common(int tlbindex);
 
@@ -575,6 +598,7 @@ private:
 	virtual uint64_t get_cop2_creg(int idx);
 	virtual void set_cop2_creg(int idx, uint64_t val);
 	void handle_cop2(uint32_t op);
+	virtual bool instruction_stall(uint32_t op) { return false; }
 
 	void handle_special(uint32_t op);
 	void handle_regimm(uint32_t op);
@@ -589,7 +613,16 @@ private:
 	virtual void handle_sdc2(uint32_t op);
 	virtual void handle_dmfc2(uint32_t op);
 	virtual void handle_dmtc2(uint32_t op);
-	virtual void handle_cache(uint32_t op) { /* Handle as a no-op in most implementations */ }
+	virtual void handle_cache(uint32_t op);
+
+	int dcache_line_find(offs_t address, offs_t physical) const;
+	bool dcache_line_read(offs_t address, offs_t physical, unsigned size, uint64_t &data);
+	bool dcache_line_write(offs_t address, offs_t physical, unsigned size, uint64_t data, uint64_t mask);
+	void dcache_line_writeback(unsigned line);
+	void dcache_op(unsigned operation, offs_t address, offs_t physical);
+	static void cfunc_dcache_op(void *param);
+	static void cfunc_dcache_memory(void *param);
+	void static_generate_dcache_memory(drcuml_block &block, int &label, int tlbmiss, int size, bool iswrite, bool ismasked);
 
 	void lwl_be(uint32_t op);
 	void lwr_be(uint32_t op);
@@ -643,6 +676,7 @@ private:
 	void generate_delay_slot_and_branch(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint8_t linkreg);
 
 	bool generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_dcache_op(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	bool generate_special(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	bool generate_regimm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	bool generate_idt(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
@@ -776,11 +810,11 @@ protected:
 	virtual bool RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask) override;
 	virtual bool RDOUBLE(offs_t address, uint64_t *result) override;
 	virtual bool RDOUBLE_MASKED(offs_t address, uint64_t *result, uint64_t mem_mask) override;
-	virtual void WBYTE(offs_t address, uint8_t data) override;
-	virtual void WHALF(offs_t address, uint16_t data) override;
-	virtual void WWORD(offs_t address, uint32_t data) override;
+	virtual bool WBYTE(offs_t address, uint8_t data) override;
+	virtual bool WHALF(offs_t address, uint16_t data) override;
+	virtual bool WWORD(offs_t address, uint32_t data) override;
 	virtual void WWORD_MASKED(offs_t address, uint32_t data, uint32_t mem_mask) override;
-	virtual void WDOUBLE(offs_t address, uint64_t data) override;
+	virtual bool WDOUBLE(offs_t address, uint64_t data) override;
 	virtual void WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t mem_mask) override;
 
 	virtual void set_cop0_reg(int idx, uint64_t val) override;
@@ -889,6 +923,7 @@ protected:
 	}
 
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
@@ -899,11 +934,11 @@ protected:
 	bool RWORD_MASKED(offs_t address, uint32_t *result, uint32_t mem_mask) override;
 	bool RDOUBLE(offs_t address, uint64_t *result) override;
 	bool RDOUBLE_MASKED(offs_t address, uint64_t *result, uint64_t mem_mask) override;
-	void WBYTE(offs_t address, uint8_t data) override;
-	void WHALF(offs_t address, uint16_t data) override;
-	void WWORD(offs_t address, uint32_t data) override;
+	bool WBYTE(offs_t address, uint8_t data) override;
+	bool WHALF(offs_t address, uint16_t data) override;
+	bool WWORD(offs_t address, uint32_t data) override;
 	void WWORD_MASKED(offs_t address, uint32_t data, uint32_t mem_mask) override;
-	void WDOUBLE(offs_t address, uint64_t data) override;
+	bool WDOUBLE(offs_t address, uint64_t data) override;
 	void WDOUBLE_MASKED(offs_t address, uint64_t data, uint64_t mem_mask) override;
 
 	virtual bool RQUAD(offs_t address, uint64_t *result_hi, uint64_t *result_lo) = 0;
@@ -933,8 +968,10 @@ protected:
 	void handle_dmtc2(uint32_t op) override;
 
 	void check_irqs() override;
+	bool instruction_stall(uint32_t op) override;
 
 	required_device<sonyvu0_device> m_vu0;
+	uint64_t m_vu_transfer_ready = 0;
 };
 
 class r5900le_device : public r5900_device {
@@ -1020,14 +1057,12 @@ COMPILER-SPECIFIC OPTIONS
 
 #define MIPS3DRC_STRICT_VERIFY      0x0001          /* verify all instructions */
 #define MIPS3DRC_STRICT_COP0        0x0002          /* validate all COP0 instructions */
-#define MIPS3DRC_STRICT_COP1        0x0004          /* validate all COP1 instructions */
 #define MIPS3DRC_STRICT_COP2        0x0008          /* validate all COP2 instructions */
 #define MIPS3DRC_DISABLE_INTRABLOCK 0x0010          /* disable intrablock branching */
-#define MIPS3DRC_CHECK_OVERFLOWS    0x0020          /* actually check overflows on add/sub instructions */
 #define MIPS3DRC_ACCURATE_DIVZERO   0x0040          /* load correct values into HI/LO on integer divide-by-zero */
 #define MIPS3DRC_EXTRA_INSTR_CHECK  0x0080          /* adds the last instruction value to all validation entry locations, used with STRICT_VERIFY */
 
-#define MIPS3DRC_COMPATIBLE_OPTIONS (MIPS3DRC_STRICT_VERIFY | MIPS3DRC_STRICT_COP1 | MIPS3DRC_STRICT_COP0 | MIPS3DRC_STRICT_COP2)
+#define MIPS3DRC_COMPATIBLE_OPTIONS (MIPS3DRC_STRICT_VERIFY | MIPS3DRC_STRICT_COP0 | MIPS3DRC_STRICT_COP2)
 #define MIPS3DRC_FASTEST_OPTIONS    (0)
 
 #endif // MAME_CPU_MIPS_MIPS3_H

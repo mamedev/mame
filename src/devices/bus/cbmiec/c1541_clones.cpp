@@ -26,14 +26,11 @@
 DEFINE_DEVICE_TYPE(FSD1,                       fsd1_device,                       "fsd1",     "FSD-1 Disk Drive")
 DEFINE_DEVICE_TYPE(FSD2,                       fsd2_device,                       "fsd2",     "FSD-2 Disk Drive")
 DEFINE_DEVICE_TYPE(CSD1,                       csd1_device,                       "csd1",     "CSD-1 Disk Drive")
-DEFINE_DEVICE_TYPE(INDUS_GT,                   indus_gt_device,                   "indusgt",  "Indus GT Disk Drive")
 DEFINE_DEVICE_TYPE(TECHNICA,                   technica_device,                   "technica", "Westfalia Technica Disk Drive")
 DEFINE_DEVICE_TYPE(BLUE_CHIP,                  blue_chip_device,                  "bluechip", "Amtech Blue Chip Disk Drive")
 DEFINE_DEVICE_TYPE(COMMANDER_C2,               commander_c2_device,               "cmdrc2",   "Commander C-II Disk Drive")
 DEFINE_DEVICE_TYPE(ENHANCER_2000,              enhancer_2000_device,              "enh2000",  "Enhancer 2000 Disk Drive")
 DEFINE_DEVICE_TYPE(FD148,                      fd148_device,                      "fd148",    "Rapid Access FD-148 Disk Drive")
-DEFINE_DEVICE_TYPE(MSD_SD1,                    msd_sd1_device,                    "msdsd1",   "MSD SD-1 Disk Drive")
-DEFINE_DEVICE_TYPE(MSD_SD2,                    msd_sd2_device,                    "msdsd2",   "MSD SD-2 Disk Drive")
 
 
 //-------------------------------------------------
@@ -106,30 +103,6 @@ const tiny_rom_entry *csd1_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ROM( indusgt )
-//-------------------------------------------------
-
-ROM_START( indusgt )
-	ROM_REGION( 0x4000, M6502_TAG, 0 )
-	ROM_LOAD( "u18 v1.1.u18", 0x0000, 0x2000, CRC(e401ce56) SHA1(9878053bdff7a036f57285c2c4974459df2602d8) )
-	ROM_LOAD( "u17 v1.1.u17", 0x2000, 0x2000, CRC(575ad906) SHA1(f48837b024add84f888acd83a9cf9eb7d2379172) )
-
-	ROM_REGION( 0x2000, "romdisk", 0 )
-	ROM_LOAD( "u19 v1.1.u19", 0x0000, 0x2000, CRC(8f83e7a5) SHA1(5bceaad520dac9d0527723b3b454e8ec99748e5b) )
-ROM_END
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *indus_gt_device::device_rom_region() const
-{
-	return ROM_NAME( indusgt );
-}
-
-
-//-------------------------------------------------
 //  ROM( technica )
 //-------------------------------------------------
 
@@ -179,7 +152,7 @@ const tiny_rom_entry *blue_chip_device::device_rom_region() const
 ROM_START( cmdrc2 )
 	ROM_REGION( 0x4000, M6502_TAG, 0 )
 	ROM_LOAD( "commander_c-ii_8k_rom1.bin", 0x0000, 0x2000, CRC(cb19daf3) SHA1(9fab414451af54d0bed9d4c9fd5fab1b8720c269) )
-	ROM_LOAD( "commander_c-ii_8k_rom2.bin", 0x2000, 0x2000, CRC(ed85a390) SHA1(eecf92fb8cc20a6c86e30f897d09d427509dd3d3) )
+	ROM_LOAD( "commander_c-ii_8k_rom2.bin", 0x2000, 0x2000, BAD_DUMP CRC(ed85a390) SHA1(eecf92fb8cc20a6c86e30f897d09d427509dd3d3) )
 ROM_END
 
 
@@ -233,48 +206,6 @@ const tiny_rom_entry *fd148_device::device_rom_region() const
 }
 
 
-//-------------------------------------------------
-//  ROM( msdsd1 )
-//-------------------------------------------------
-
-ROM_START( msdsd1 )
-	ROM_REGION( 0x4000, M6502_TAG, 0 )
-	ROM_LOAD( "sd-1-1.3-c000.bin", 0x0000, 0x2000, CRC(f399778d) SHA1(c0d939c354d84018038c60a231fc43fb9279d8a4) )
-	ROM_LOAD( "sd-1-1.3-e000.bin", 0x2000, 0x2000, CRC(7ac80da4) SHA1(99dd15c6d97938eba73880b18986a037e90742ab) )
-ROM_END
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *msd_sd1_device::device_rom_region() const
-{
-	return ROM_NAME( msdsd1 );
-}
-
-
-//-------------------------------------------------
-//  ROM( msdsd2 )
-//-------------------------------------------------
-
-ROM_START( msdsd2 )
-	ROM_REGION( 0x4000, M6502_TAG, 0 )
-	ROM_LOAD( "sd-2-2.3-c000.bin", 0x0000, 0x2000, CRC(2207560e) SHA1(471e9b4a4ac09ceee9acc1774534510396f98b9a) )
-	ROM_LOAD( "sd-2-2.3-e000.bin", 0x2000, 0x2000, CRC(4efd87a2) SHA1(4beec0b7ce2349add3b0a5bceee60826637df8d9) )
-ROM_END
-
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *msd_sd2_device::device_rom_region() const
-{
-	return ROM_NAME( msdsd2 );
-}
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -301,14 +232,6 @@ fsd2_device::fsd2_device(const machine_config &mconfig, const char *tag, device_
 
 csd1_device::csd1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: c1541_device_base(mconfig, CSD1, tag, owner, clock) { }
-
-
-//-------------------------------------------------
-//  indus_gt_device - constructor
-//-------------------------------------------------
-
-indus_gt_device::indus_gt_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: c1541_device_base(mconfig, INDUS_GT, tag, owner, clock) { }
 
 
 //-------------------------------------------------
@@ -349,22 +272,6 @@ enhancer_2000_device::enhancer_2000_device(const machine_config &mconfig, const 
 
 fd148_device::fd148_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: c1541_device_base(mconfig, FD148, tag, owner, clock) { }
-
-
-//-------------------------------------------------
-//  msd_sd1_device - constructor
-//-------------------------------------------------
-
-msd_sd1_device::msd_sd1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: c1541_device_base(mconfig, MSD_SD1, tag, owner, clock) { }
-
-
-//-------------------------------------------------
-//  msd_sd2_device - constructor
-//-------------------------------------------------
-
-msd_sd2_device::msd_sd2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: c1541_device_base(mconfig, MSD_SD2, tag, owner, clock) { }
 
 
 //-------------------------------------------------
