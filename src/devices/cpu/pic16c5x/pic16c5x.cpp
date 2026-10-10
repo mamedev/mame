@@ -970,7 +970,7 @@ enum
 
 void pic16c5x_device::device_start()
 {
-	bool is_nmospic = (m_picmodel == 0x1650 || m_picmodel == 0x1654 || m_picmodel == 0x1655);
+	const bool is_nmospic = (m_picmodel == 0x1650 || m_picmodel == 0x1654 || m_picmodel == 0x1655);
 
 	space(AS_PROGRAM).cache(m_program);
 	space(AS_DATA).specific(m_data);
@@ -1273,6 +1273,8 @@ void pic16c5x_device::execute_set_input(int line, int state)
 
 void pic16c5x_device::execute_run()
 {
+	const bool is_nmospic = (m_picmodel == 0x1650 || m_picmodel == 0x1654 || m_picmodel == 0x1655);
+
 	do {
 		if (PD == 0) { // Sleep Mode
 			m_count_cycles = 0;
@@ -1287,7 +1289,7 @@ void pic16c5x_device::execute_run()
 			m_opcode.w = m_program.read_word(m_PC);
 			set_pc(m_PC + 1);
 
-			if (m_picmodel == 0x1650 || m_picmodel == 0x1654 || m_picmodel == 0x1655 || (m_opcode.w & 0xff0) != 0x000) { // Do all opcodes except the 00? ones
+			if (is_nmospic || (m_opcode.w & 0xff0) != 0x000) { // Do all opcodes except the 00? ones
 				m_inst_cycles = s_opcode_main[((m_opcode.w >> 4) & 0xff)].cycles;
 				(this->*s_opcode_main[((m_opcode.w >> 4) & 0xff)].function)();
 			}
