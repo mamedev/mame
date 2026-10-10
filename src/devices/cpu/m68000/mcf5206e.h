@@ -96,6 +96,7 @@ private:
 	void update_internal_levels();   // SIM-1
 
 	TIMER_CALLBACK_MEMBER(swdt_callback);
+	void swt_restart();
 
 	void icr_info(u8 icr);
 
@@ -138,6 +139,7 @@ private:
 	u8 m_external_ipl;
 
 	emu_timer *m_timer_swdt;
+	bool m_swt_reset = false;
 
 	required_device<mcf5206e_device> m_maincpu;
 	required_device<watchdog_timer_device> m_swdt;

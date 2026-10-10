@@ -561,8 +561,11 @@ void coldfire_sim_device::device_start()
 
 void coldfire_sim_device::device_reset()
 {
-	if(!(m_rsr & 0x20)) m_rsr = 0x00;   // don't clear if watchdog triggered
-	else m_rsr = 0x70;
+	// RSR (UM 8.3.2.6): only one bit is set, HRST (0x80) for a hard/system reset, SWTR (0x20) when the software
+	// watchdog caused it
+	m_rsr = m_swt_reset ? 0x20 : 0x80;
+	m_swt_reset = false;
+	m_timer_swdt->adjust(attotime::never);
 
 	m_simr = 0xc0;
 	m_marb = 0x00;
@@ -913,14 +916,8 @@ void coldfire_sim_device::sypcr_w(u8 data)
 
 		// Bus monitoring is not supported (nor will it be?)
 
-		if(BIT(m_sypcr, 6))
-		{
-			m_swdt->watchdog_enable(BIT(data, 7));
-		}
-		else
-		{
-			// TODO: Set timer for interrupt
-		}
+		// SWE: start the software watchdog (UM 8.3.2.7)
+		swt_restart();
 	}
 	else
 	{
@@ -943,15 +940,38 @@ void coldfire_sim_device::swsr_w(u8 data)
 		m_swdt_w_count++;
 	if(m_swdt_w_count == 2)
 	{
-		m_swdt->watchdog_reset();
+		// $55 then $AA restarts the timeout (UM 8.3.2.9)
+		swt_restart();
 		m_swdt_w_count = 0;
 	}
 }
 
+void coldfire_sim_device::swt_restart()
+{
+	if(!BIT(m_sypcr, 7))
+	{
+		m_timer_swdt->adjust(attotime::never);
+		return;
+	}
+	// Table 8-6: SWP = 0: 2^9/2^11/2^13/2^15, SWP = 1: 2^18/2^20/2^22/2^24 system clocks for SWT = 0-3
+	const int sh = (BIT(m_sypcr, 5) ? 18 : 9) + 2 * ((m_sypcr >> 3) & 3);
+	m_timer_swdt->adjust(m_maincpu->clocks_to_attotime(u64(1) << sh));
+}
+
 TIMER_CALLBACK_MEMBER(coldfire_sim_device::swdt_callback)
 {
-	// Todo
-	//set_interrupt(WDINT);
+	if(BIT(m_sypcr, 6))
+	{
+		// SWRI = 1: internal reset, RSR shows SWTR (UM 8.3.2.6/8.3.2.7)
+		LOGMASKED(LOG_SWDT, "software watchdog timeout: reset\n");
+		m_swt_reset = true;
+		m_maincpu->reset();
+	}
+	else
+	{
+		// SWRI = 0: level 7 interrupt with the SWIVR vector
+		set_interrupt(WATCHDOG_IRQ, ASSERT_LINE);
+	}
 }
 
 /*
