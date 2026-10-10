@@ -195,16 +195,15 @@ void mos6526_device::set_cra(uint8_t data)
 		m_ta_pb6 = 1;
 	}
 
-	// switching to serial output mode causes sp to go high?
+	// an empty shifter drives SP low in output mode, and input mode releases it
 	if (!CRA_SPMODE && BIT(data, 6))
 	{
-		m_write_sp(1);
+		m_write_sp(0);
 	}
 
-	// lower sp again when switching back to input?
 	if (CRA_SPMODE && !BIT(data, 6))
 	{
-		m_write_sp(0);
+		m_write_sp(1);
 	}
 
 	// changing the serial direction abandons a transfer: the shifter is
