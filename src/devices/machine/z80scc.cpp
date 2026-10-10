@@ -1896,6 +1896,8 @@ void z80scc_channel::do_sccreg_wr1(uint8_t data)
 	/* TODO: Sort out SCC specific behaviours  from legacy SIO behaviours inherited from z80dart.cpp:
 	   - Channel B only bits vs
 	   - Parity Is Special Condition, bit2 */
+	if ((data & WR1_RX_INT_MODE_MASK) == WR1_RX_INT_FIRST && (m_wr1 & WR1_RX_INT_MODE_MASK) != WR1_RX_INT_FIRST)
+		m_rx_first = 1;
 	m_wr1 = data;
 	LOG("- External Interrupt Enable %d\n", (data & WR1_EXT_INT_ENABLE) ? 1 : 0);
 	LOG("- Transmit Interrupt Enable %d\n", (data & WR1_TX_INT_ENABLE) ? 1 : 0);
