@@ -673,6 +673,326 @@ const tiny_rom_entry *mc_mk4_hopper_device::device_rom_region() const
 }
 
 
+// WBA-1: JCM WBA bill validator with the ID-003 interface, from "ID-003 Communication Specification" rev. 05
+// (docs/ID-003_rev05_E.pdf, read from rendered pages). 9600 bps, 8 data bits, even parity, 1 stop bit (2).
+// Frames: FCh, LNG (SYNC through CRC), CMD/status, DATA, CRC-CCITT low/high (3, appendix 1).
+// Power up (7-1): POWER UP until RESET, then INITIALIZE while the settings arrive, then ENABLE or DISABLE.
+// Accepting (7-2): ACCEPTING, ESCROW + code, STACK-1/2 from the controller, STACKING, VEND VALID until the
+// controller's ACK, STACKED, ENABLE. ENQ for the interrupt modes (6-7 (3), 6-8).
+class jcm_wba_device : public device_t, public device_buffered_serial_interface<64>
+{
+public:
+	jcm_wba_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	auto tx_cb() { return m_tx_cb.bind(); }
+	void rx_w(int state) { device_serial_interface::rx_w(state); }
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void tra_callback() override { m_tx_cb(transmit_register_get_data_bit()); }
+
+private:
+	enum : u8
+	{
+		ST_ENABLE = 0x11, ST_ACCEPTING = 0x12, ST_ESCROW = 0x13, ST_STACKING = 0x14, ST_VEND_VALID = 0x15,
+		ST_STACKED = 0x16, ST_REJECTING = 0x17, ST_RETURNING = 0x18, ST_HOLDING = 0x19, ST_DISABLE = 0x1a,
+		ST_INITIALIZE = 0x1b, ST_POWER_UP = 0x40, ACK = 0x50, ENQ = 0x05, INVALID = 0x4b
+	};
+
+	virtual void received_byte(u8 byte) override;
+	static u16 crc(const u8 *d, int n);
+	void send(const u8 *body, int n);
+	void command();
+	void set_status(u8 st);
+	TIMER_CALLBACK_MEMBER(step);
+
+	devcb_write_line m_tx_cb;
+	required_ioport m_bills;
+	emu_timer *m_timer;
+	u8 m_rx[256];
+	int m_rxn;
+	u8 m_status, m_escrow;
+	u8 m_enable[2], m_security[2], m_comm, m_inhibit, m_direction, m_optional[2];
+	u8 m_prev_bills;
+};
+
+DEFINE_DEVICE_TYPE(JCM_WBA, jcm_wba_device, "jcm_wba", "JCM WBA bill validator (ID-003)")
+
+static INPUT_PORTS_START( jcm_wba )
+	PORT_START("BILLS") // the euro notes the configuration menu lists for channels 2-8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BILL1 ) PORT_NAME("Bill 5 EUR (channel 2)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bill 10 EUR (channel 3)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bill 20 EUR (channel 4)")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bill 50 EUR (channel 5)")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bill 100 EUR (channel 6)")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bill 200 EUR (channel 7)")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bill 500 EUR (channel 8)")
+INPUT_PORTS_END
+
+jcm_wba_device::jcm_wba_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, JCM_WBA, tag, owner, clock)
+	, device_buffered_serial_interface(mconfig, *this)
+	, m_tx_cb(*this)
+	, m_bills(*this, "BILLS")
+{
+}
+
+ioport_constructor jcm_wba_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(jcm_wba);
+}
+
+void jcm_wba_device::device_start()
+{
+	m_timer = timer_alloc(FUNC(jcm_wba_device::step), this);
+	save_item(NAME(m_rx)); save_item(NAME(m_rxn));
+	save_item(NAME(m_status)); save_item(NAME(m_escrow));
+	save_item(NAME(m_enable)); save_item(NAME(m_security)); save_item(NAME(m_comm));
+	save_item(NAME(m_inhibit)); save_item(NAME(m_direction)); save_item(NAME(m_optional));
+	save_item(NAME(m_prev_bills));
+}
+
+void jcm_wba_device::device_reset()
+{
+	set_data_frame(1, 8, PARITY_EVEN, STOP_BITS_1);
+	set_rate(9600);
+	receive_register_reset();
+	transmit_register_reset();
+	clear_fifo();
+	m_tx_cb(1);
+	m_rxn = 0;
+	m_status = ST_POWER_UP;
+	m_escrow = 0;
+	m_enable[0] = m_enable[1] = 0;      // defaults (6-7)
+	m_security[0] = m_security[1] = 0;
+	m_comm = 0;
+	m_inhibit = 1;
+	m_direction = 0;
+	m_optional[0] = m_optional[1] = 0;
+	m_prev_bills = 0;
+	m_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10));
+}
+
+u16 jcm_wba_device::crc(const u8 *d, int n)
+{
+	// P(X) = X^16 + X^12 + X^5 + 1, LSB first, initial value 0: FC 05 11 -> 5627h (appendix 1)
+	u16 c = 0;
+	for (int i = 0; i < n; i++)
+	{
+		c ^= d[i];
+		for (int b = 0; b < 8; b++)
+			c = (c & 1) ? (c >> 1) ^ 0x8408 : (c >> 1);
+	}
+	return c;
+}
+
+void jcm_wba_device::send(const u8 *body, int n)
+{
+	u8 f[256];
+	f[0] = 0xfc;
+	f[1] = n + 4;
+	memcpy(&f[2], body, n);
+	const u16 c = crc(f, n + 2);
+	f[n + 2] = c & 0xff;
+	f[n + 3] = c >> 8;
+	for (int i = 0; i < n + 4; i++)
+		transmit_byte(f[i]);
+}
+
+void jcm_wba_device::set_status(u8 st)
+{
+	if (st == m_status)
+		return;
+	m_status = st;
+	// interrupt modes: ENQ on every change (mode 1) or on the states that need the controller (mode 2)
+	const int mode = m_comm & 3;
+	if (mode == 1 || (mode == 2 && (st == ST_ESCROW || st == ST_VEND_VALID || st == ST_INITIALIZE || st >= 0x40)))
+	{
+		const u8 e = ENQ;
+		send(&e, 1);
+	}
+}
+
+void jcm_wba_device::received_byte(u8 byte)
+{
+	if (m_rxn == 0 && byte != 0xfc)
+		return;
+	m_rx[m_rxn++] = byte;
+	if (m_rxn >= 2 && (m_rx[1] < 5 || m_rxn >= m_rx[1]))
+	{
+		if (m_rx[1] >= 5 && crc(m_rx, m_rxn - 2) == (m_rx[m_rxn - 2] | (m_rx[m_rxn - 1] << 8)))
+			command();
+		else
+			logerror("frame dropped (%d bytes, CRC or length error)\n", m_rxn);
+		m_rxn = 0;
+	}
+}
+
+void jcm_wba_device::command()
+{
+	const u8 cmd = m_rx[2];
+	const u8 *d = &m_rx[3];
+	const int dn = m_rx[1] - 5;
+	u8 r[64];
+	switch (cmd)
+	{
+	case 0x11: // STATUS REQUEST (6-1)
+		r[0] = m_status;
+		if (m_status == ST_ESCROW)
+		{
+			r[1] = m_escrow;
+			send(r, 2);
+		}
+		else if (m_status == ST_REJECTING)
+		{
+			r[1] = 0x71;
+			send(r, 2);
+		}
+		else
+			send(r, 1);
+		if (m_status == ST_POWER_UP)
+			break;
+		if (m_status == ST_INITIALIZE)
+			set_status(m_inhibit & 1 ? ST_DISABLE : ST_ENABLE); // 7-1: INITIALIZE, then standby
+		else if (m_status == ST_STACKED)
+			set_status(m_inhibit & 1 ? ST_DISABLE : ST_ENABLE);
+		break;
+
+	case 0x40: // RESET: always accepted (6-3)
+		r[0] = ACK;
+		send(r, 1);
+		m_status = ST_INITIALIZE;
+		break;
+
+	case 0x41: case 0x42: // STACK-1 / STACK-2, valid in ESCROW
+		r[0] = (m_status == ST_ESCROW) ? ACK : INVALID;
+		send(r, 1);
+		if (m_status == ST_ESCROW)
+		{
+			set_status(ST_STACKING);
+			m_timer->adjust(attotime::from_msec(500), 1, attotime::from_msec(10));
+		}
+		break;
+
+	case 0x43: // RETURN, valid in ESCROW
+		r[0] = (m_status == ST_ESCROW) ? ACK : INVALID;
+		send(r, 1);
+		if (m_status == ST_ESCROW)
+		{
+			set_status(ST_RETURNING);
+			m_timer->adjust(attotime::from_msec(500), 2, attotime::from_msec(10));
+		}
+		break;
+
+	case 0x44: case 0x45: // HOLD, WAIT
+		r[0] = ACK;
+		send(r, 1);
+		break;
+
+	case 0x50: // ACK from the controller: answer to VEND VALID (6-4)
+		if (m_status == ST_VEND_VALID)
+		{
+			set_status(ST_STACKED);
+			m_timer->adjust(attotime::from_msec(300), 3, attotime::from_msec(10));
+		}
+		break;
+
+	case 0xc0: if (dn >= 2) { m_enable[0] = d[0]; m_enable[1] = d[1]; } goto echo;
+	case 0xc1: if (dn >= 2) { m_security[0] = d[0]; m_security[1] = d[1]; } goto echo;
+	case 0xc2: if (dn >= 1) m_comm = d[0]; goto echo;
+	case 0xc3:
+		if (dn >= 1)
+		{
+			m_inhibit = d[0];
+			if (m_status == ST_ENABLE || m_status == ST_DISABLE)
+				set_status(m_inhibit & 1 ? ST_DISABLE : ST_ENABLE);
+		}
+		goto echo;
+	case 0xc4: if (dn >= 1) m_direction = d[0]; goto echo;
+	case 0xc5: if (dn >= 2) { m_optional[0] = d[0]; m_optional[1] = d[1]; } goto echo;
+	echo: // setting commands are echoed back (6-5)
+		memcpy(r, &m_rx[2], dn + 1);
+		send(r, dn + 1);
+		break;
+
+	case 0x80: r[0] = cmd; r[1] = m_enable[0]; r[2] = m_enable[1]; send(r, 3); break;
+	case 0x81: r[0] = cmd; r[1] = m_security[0]; r[2] = m_security[1]; send(r, 3); break;
+	case 0x82: r[0] = cmd; r[1] = m_comm; send(r, 2); break;
+	case 0x83: r[0] = cmd; r[1] = m_inhibit; send(r, 2); break;
+	case 0x84: r[0] = cmd; r[1] = m_direction; send(r, 2); break;
+	case 0x85: r[0] = cmd; r[1] = m_optional[0]; r[2] = m_optional[1]; send(r, 3); break;
+
+	case 0x88: // VERSION REQUEST: "machine (country)-model-stacker ID003-interface+version date crc" (6-7 (6))
+	{
+		static const char ver[] = "i(EUR)-10-SS ID003-03V280-30 14JAN03 3A5E";
+		r[0] = cmd;
+		memcpy(&r[1], ver, sizeof(ver) - 1);
+		send(r, sizeof(ver));
+		logerror("version request: placeholder version string, the real WBA string is not known\n");
+		break;
+	}
+
+	case 0x89: // BOOT VERSION REQUEST: "Bxx " (6-7 (7))
+		r[0] = cmd; r[1] = 'B'; r[2] = '0'; r[3] = '1'; r[4] = ' ';
+		send(r, 5);
+		break;
+
+	case 0x8a: // CURRENCY ASSIGN REQUEST (6-7 (9)): 61h-69h, country, denomination integer and exponent
+	{
+		static const u8 eur[9][2] = { {0,0}, {5,0}, {10,0}, {20,0}, {50,0}, {1,2}, {2,2}, {5,2}, {0,0} };
+		r[0] = cmd;
+		for (int i = 0; i < 9; i++)
+		{
+			r[1 + i * 4] = 0x61 + i;
+			r[2 + i * 4] = eur[i][0] ? 0x0b : 0x00; // TODO: euro country type from Table 1-1 (not rendered yet)
+			r[3 + i * 4] = eur[i][0];
+			r[4 + i * 4] = eur[i][1];
+		}
+		send(r, 37);
+		break;
+	}
+
+	default:
+		logerror("unhandled command %02x (%d data bytes)\n", cmd, dn);
+		r[0] = INVALID;
+		send(r, 1);
+		break;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(jcm_wba_device::step)
+{
+	switch (param)
+	{
+	case 0: // standby: a note pressed while ENABLE is inserted (channel = bit + 2, escrow 61h + channel - 1)
+	{
+		const u8 b = m_bills->read();
+		const u8 edge = b & ~m_prev_bills;
+		m_prev_bills = b;
+		if (m_status == ST_ENABLE && edge)
+		{
+			int bit = 0;
+			while (!BIT(edge, bit))
+				bit++;
+			if (!BIT(m_enable[0], bit + 1))
+			{
+				m_escrow = 0x61 + bit + 1;
+				set_status(ST_ACCEPTING);
+				m_timer->adjust(attotime::from_msec(700), 4, attotime::from_msec(10));
+			}
+		}
+		break;
+	}
+	case 1: set_status(ST_VEND_VALID); m_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10)); break;
+	case 2: set_status(m_inhibit & 1 ? ST_DISABLE : ST_ENABLE); m_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10)); break;
+	case 3: set_status(ST_STACKED); m_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10)); break;
+	case 4: set_status(ST_ESCROW); m_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10)); break;
+	}
+}
+
+
 namespace {
 
 class gaminator_state : public driver_device
@@ -779,10 +1099,11 @@ static INPUT_PORTS_START(  gaminator )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_START1 )   PORT_NAME("Key 01 (in 0f)")
 	PORT_START("IN1")
 	PORT_BIT( 0x00000007, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in 13, switch handler
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in 14, switch handler
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in 15, switch handler
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in 16, switch handler (pulse parameters)
+	// in 13: drop (coin box) door, low = closed ("E 63 2: Puerta del cajon abierta" when it goes high)
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Drop door (in 13)")
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 14, door switch object type A03 (going high: E 63 4)
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 15, door switch object type A02
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in 16, main door optical sensor (E 63 5 when it changes), TODO
 	// key 0F: with "E E0 ... Girar la llave del operador" on screen, turning it opens "Configuracion maquina"
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_TOGGLE PORT_NAME("Attendant key (key 0F, in 17)")
 	PORT_BIT( 0x00007f00, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -798,9 +1119,11 @@ static INPUT_PORTS_START(  gaminator )
 	// logical input 0x40: when it reads 0 at boot (0x496ec) the kernel enters "*** Borrar el RAM ***" and asks to
 	// restart "con la tecla RAMCLEAR en posicion OFF" -> the RAMCLEAR key switch, a toggle
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE PORT_NAME("RAMCLEAR key")
-	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 41, switch handler
-	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 45, switch handler (XOR 0x60 in the driver)
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 46, switch handler (XOR 0x60 in the driver)
+	// in 41: battery monitor, low = "E 12 3: Bateria del RAM debil"
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RAM battery low (in 41)")
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN ) // in 45, door switch object type A05 (XOR 0x60 in the driver)
+	// in 46: with it low the game shows "E 63 4: Puerta de la caja del apilador abierta"
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Stacker door (in 46)")
 	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 43, polled in the E0 screen
 	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 44, polled in the E0 screen
 	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 47, polled in the E0 screen
@@ -856,6 +1179,11 @@ void gaminator_state::gaminator(machine_config &config)
 	m_uart[1]->out_int_callback().set(uart_irq, FUNC(input_merger_device::in_w<1>));
 	m_uart[2]->out_int_callback().set(uart_irq, FUNC(input_merger_device::in_w<2>));
 	m_uart[3]->out_int_callback().set(uart_irq, FUNC(input_merger_device::in_w<3>));
+
+	// WBA-1: channel A talks ID-003 (the kernel polls FC 05 11 27 56 there at 9600 8E1)
+	jcm_wba_device &wba(JCM_WBA(config, "wba"));
+	m_uart[0]->out_tx_callback().set(wba, FUNC(jcm_wba_device::rx_w));
+	wba.tx_cb().set(m_uart[0], FUNC(ns16550_device::rx_w));
 
 	MC_MK4_HOPPER(config, "hopper");
 }
