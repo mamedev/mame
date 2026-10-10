@@ -103,7 +103,7 @@
 
 static uint8_t cache_control_register = 0x00;
 static uint8_t cache_status_register = 0xff;
-static uint8_t task_alias_register = 0x00;
+[[maybe_unused]] static uint8_t task_alias_register = 0x00;
 
 static offs_t parity_error_offset = 0;
 static uint16_t parity_error_byte_mask = 0;
@@ -111,7 +111,7 @@ static int parity_error_handler_is_installed = 0;
 static int parity_error_handler_install_counter = 0;
 
 static uint16_t latch_page_on_parity_error_register = 0x0000;
-static uint16_t master_req_register = 0x0000;
+[[maybe_unused]] static uint16_t master_req_register = 0x0000;
 
 static uint32_t ram_base_address;
 static uint32_t ram_end_address;
