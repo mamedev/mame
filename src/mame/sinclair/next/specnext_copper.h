@@ -5,7 +5,7 @@
 
 #pragma once
 
-class specnext_copper_device : public device_t, public device_memory_interface, public device_disasm_interface
+class specnext_copper_device : public device_t, public device_memory_interface, public device_disasm_interface, public device_state_interface
 {
 
 public:
