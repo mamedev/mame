@@ -1282,14 +1282,10 @@ Hi-score table is corrupt (dump really?)
 <!-- !Demos -->
 
 	<!-- https://www.youtube.com/watch?v=HiWbKQ_gUKQ -->
-	<software name="2ndreal" supported="partial">
+	<software name="2ndreal">
 		<description>Second Reality</description>
 		<year>1997</year>
 		<publisher>Smash Designs &amp; The Obsessed Maniacs</publisher>
-		<notes><![CDATA[
-LOAD "SECOND REALITY*",8
-Runs until disk side change prompt
-]]></notes>
 		<info name="usage" value="Set SID as soundcard in selection screen (press right ctrl 3 times then enter key)" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
@@ -1309,7 +1305,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=ZJThHmbOlCw -->
-	<software name="codeboys" supported="no">
+	<software name="codeboys">
 		<description>Codeboys &amp; Endians</description>
 		<year>2025</year>
 		<publisher>Booze Design</publisher>
@@ -1343,7 +1339,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=aNN_OSYS6-Y -->
-	<software name="cycle" supported="no">
+	<software name="cycle">
 		<description>Cycle</description>
 		<year>2004</year>
 		<publisher>Booze Design</publisher>
@@ -1356,7 +1352,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=tfHazZp5CMU -->
-	<software name="democoder" supported="no">
+	<software name="democoder">
 		<description>The Demo Coder</description>
 		<year>2024</year>
 		<publisher>Fairlight</publisher>
@@ -1369,7 +1365,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=8b_B0qAZVYQ -->
-	<software name="gorbabst" supported="no">
+	<software name="gorbabst">
 		<description>Gorba Boost</description>
 		<year>2025</year>
 		<publisher>Gorbat Soft</publisher>
@@ -1382,7 +1378,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=4mtVDLxgb4A -->
-	<software name="hat" supported="no">
+	<software name="hat">
 		<description>The Hat</description>
 		<year>2026</year>
 		<publisher>Fairlight &amp; Genesis Project</publisher>
@@ -1403,7 +1399,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=3aJzSySfCZM -->
-	<software name="mojo" supported="no">
+	<software name="mojo">
 		<description>Mojo</description>
 		<year>2023</year>
 		<publisher>Bonzai &amp; Pretzel Logic</publisher>
@@ -1438,7 +1434,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=BM8anS_5nbA -->
-	<software name="musikrs" supported="no">
+	<software name="musikrs">
 		<description>Musik Run/Stop</description>
 		<year>2014</year>
 		<publisher>Mahoney</publisher>
@@ -1480,7 +1476,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=GqEI0T_WoAw -->
-	<software name="nextrnd" supported="no">
+	<software name="nextrnd">
 		<description>Next Round</description>
 		<year>2026</year>
 		<publisher>Performers</publisher>
@@ -1548,7 +1544,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=Sj6ZEwjK1DU -->
-	<software name="nobounds" supported="no">
+	<software name="nobounds">
 		<description>No Bounds</description>
 		<year>2023</year>
 		<publisher>Genesis Project</publisher>
@@ -1569,7 +1565,7 @@ Runs until disk side change prompt
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=x6SfThtldFY -->
-	<software name="otech3" supported="no">
+	<software name="otech3">
 		<description>O-Tech People III</description>
 		<year>2025</year>
 		<publisher>Fairlight</publisher>
@@ -1600,7 +1596,7 @@ Requires a second SID at $D500
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=aK8l6_iJWKM -->
-	<software name="rebirth" supported="no">
+	<software name="rebirth">
 		<description>Rebirth</description>
 		<year>2021</year>
 		<publisher>Finnish Gold</publisher>
@@ -1654,7 +1650,7 @@ Requires a second SID at $D500
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=-9nHNUlqMyQ -->
-	<software name="sledge" supported="no">
+	<software name="sledge">
 		<description>Christmas Megademo</description>
 		<year>2020</year>
 		<publisher>Atlantis &amp; Bonzai &amp; Genesis Project &amp; Lethargy &amp; Offence</publisher>
@@ -1689,7 +1685,7 @@ Requires a second SID at $D500
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=1QXf1RKzlQc -->
-	<software name="trip" supported="no">
+	<software name="trip">
 		<description>The Trip</description>
 		<year>2025</year>
 		<publisher>Fairlight</publisher>
@@ -1714,6 +1710,9 @@ Requires a second SID at $D500
 		<description>Vicious Sid 2</description>
 		<year>2012</year>
 		<publisher>The Noisy Bunch</publisher>
+		<notes><![CDATA[
+Crashes after inserting side B
+]]></notes>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -1731,7 +1730,7 @@ Requires a second SID at $D500
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=BT2rrzg_XIc -->
-	<software name="violator" supported="no">
+	<software name="violator">
 		<description>The Violators</description>
 		<year>2025</year>
 		<publisher>Censor Design</publisher>
@@ -1752,7 +1751,7 @@ Requires a second SID at $D500
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=E5l9ecCeKPw -->
-	<software name="weanomaly" supported="no">
+	<software name="weanomaly">
 		<description>We Are The Anomaly</description>
 		<year>2025</year>
 		<publisher>Extend &amp; Genesis Project</publisher>
@@ -1773,7 +1772,7 @@ Requires a second SID at $D500
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=Y89aByVpBFs -->
-	<software name="witmat2" supported="no">
+	<software name="witmat2">
 		<description>What Is The Matrix 2</description>
 		<year>2024</year>
 		<publisher>Censor Design</publisher>
@@ -1786,7 +1785,7 @@ Requires a second SID at $D500
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=lQDBSzChPjk -->
-	<software name="wonder14" supported="no">
+	<software name="wonder14">
 		<description>Wonderland XIV</description>
 		<year>2023</year>
 		<publisher>Censor Design</publisher>

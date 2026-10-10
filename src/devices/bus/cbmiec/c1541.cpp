@@ -337,7 +337,7 @@ uint8_t c1541_device_base::via0_pb_r()
 	u8 data;
 
 	// data in
-	data = !m_bus->data_r() && !m_ga->atn_r();
+	data = !m_bus->data_r();
 
 	// clock in
 	data |= !m_bus->clk_r() << 2;

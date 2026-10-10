@@ -1392,18 +1392,18 @@ uint8_t c64_state::cia2_pa_r()
 
 	    bit     description
 
-	    PA0
-	    PA1
+	    PA0		1
+	    PA1		1
 	    PA2     USER PORT
-	    PA3
-	    PA4
-	    PA5
+	    PA3		1
+	    PA4		1
+	    PA5		1
 	    PA6     CLK
 	    PA7     DATA
 
 	*/
 
-	uint8_t data = 0;
+	uint8_t data = 0x3b;
 
 	// user port
 	data |= m_user_pa2 << 2;
