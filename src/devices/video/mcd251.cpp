@@ -261,6 +261,7 @@ void mcd251_device::write_data(uint8_t data)
 		if (m_video_startcode_shift == 0x00000100)
 		{
 			m_pictures_in_input_fifo++;
+			m_sequence_ended = false;
 			m_dts_fifo.push_back(m_next_picture_dts);
 			m_next_picture_dts = 0;
 		}
@@ -343,6 +344,10 @@ void mcd251_device::video_decode_pending()
 		case mpeg_video::decode_result::NEED_DATA:
 			// see "request for bits"
 			m_video_needs_data = true;
+			if (m_store_decoding < 0 && taken == m_video_es.size())
+			{
+				m_pictures_in_input_fifo = m_reference_held ? 1 : 0;
+			}
 			break;
 		}
 
@@ -444,6 +449,7 @@ void mcd251_device::video_picture_decoded()
 void mcd251_device::video_sequence_end()
 {
 	release_held_reference();
+	m_sequence_ended = true;
 	m_fmv_isr |= FMV_IRQ_ESI;
 	LOGMASKED(LOG_VIDEO, "FMV sequence end\n");
 	update_intreq();
@@ -524,6 +530,7 @@ void mcd251_device::clear_video_fifo()
 	m_dts_fifo.clear();
 	m_next_picture_dts = 0;
 	m_pictures_in_input_fifo = 0;
+	m_sequence_ended = false;
 	m_latch_until_vsync = false;
 	m_latch_until_vblank = false;
 	m_single_step_latch = false;
@@ -678,9 +685,10 @@ void mcd251_device::vblank_w(int state)
 			{
 				// Underflow is reported as the last picture is taken with
 				// nothing behind it, counting the pictures whose start code
-				// has arrived but which the decoder has not handed back.
+				// has arrived but which the decoder has not handed back.  The
+				// end of a sequence is not an underflow.
 				if (m_fmv_playback_active && m_picture_fifo.size() == 1
-						&& m_pictures_in_input_fifo == 0)
+						&& m_pictures_in_input_fifo == 0 && !m_sequence_ended)
 				{
 					m_fmv_isr |= FMV_IRQ_NDAT;
 					LOGMASKED(LOG_VIDEO, "FMV underflow\n");

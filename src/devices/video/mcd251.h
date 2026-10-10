@@ -281,6 +281,7 @@ private:
 	bool     m_single_step_latch = false;
 
 	uint32_t m_pictures_in_input_fifo = 0;
+	bool     m_sequence_ended = false;
 	uint16_t m_logged_fmv_isr = 0;  // for log_fmv_isr
 
 	// picture start code scanner over the elementary stream, so PICS_IN_FIFO
