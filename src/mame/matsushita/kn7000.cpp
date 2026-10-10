@@ -65,7 +65,6 @@
 #include "bus/midi/midioutport.h"
 #include "cpu/mn10300/mn10300.h"
 #include "imagedev/floppy.h"
-#include "machine/input_merger.h"
 #include "machine/intelfsh.h"
 #include "machine/spi_sdcard.h"
 #include "machine/upd765.h"
@@ -215,6 +214,7 @@ private:
 	u16 m_kbd_fifo[64];
 	u8 m_kbd_head = 0;
 	u8 m_kbd_tail = 0;
+
 	u16 m_tg_addr[2];
 	u16 m_tg_wave_bank[2];
 	u16 m_tg_wave_addr[2];
@@ -940,14 +940,15 @@ void kn_state::custom_flash_add(machine_config &config)
 
 void kn_state::fdc_add(machine_config &config)
 {
-	// IC103: a custom part (C1DB00000607) compatible with the N82077AA
+	// IC103: a custom part (C1DB00000607) compatible with the N82077AA. INTRQ goes to
+	// IRQ2, whose handler issues the Sense Interrupt Status that ends a seek; DRQ drives
+	// the on-chip DMA controller's channel 0, which moves the sector data through the FDC
+	// data port at 0x98010000 and pulses the controller's terminal count back to the FDC.
+	// (The schematic prints INTRQ as IRQ1, but the board wires it to IRQ2 - follow the wire.)
 	N82077AA(config, m_fdc, 24'000'000);
-	// INTRQ and DRQ share IRQ1: the firmware moves each sector byte through the
-	// DACK slot at 0x98010000 from its interrupt handler
-	input_merger_device &fdc_irq(INPUT_MERGER_ANY_HIGH(config, "fdc_irq"));
-	fdc_irq.output_handler().set_inputline(m_maincpu, mn10300_device::IRQ1);
-	m_fdc->intrq_wr_callback().set(fdc_irq, FUNC(input_merger_device::in_w<0>));
-	m_fdc->drq_wr_callback().set(fdc_irq, FUNC(input_merger_device::in_w<1>));
+	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(mn10300_device::dma_req_w));
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, mn10300_device::IRQ2);
+	m_maincpu->dma_tc_cb().set([this] (int state) { m_fdc->tc_w(state); });
 	FLOPPY_CONNECTOR(config, "fdc:0", kn_floppies, "35hd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 }
 

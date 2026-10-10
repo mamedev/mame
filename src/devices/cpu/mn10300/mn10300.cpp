@@ -77,6 +77,16 @@ mn10300_device::mn10300_device(const machine_config &mconfig, device_type type, 
 	, m_tm_mode{ 0, 0 }
 	, m_tm_base{ 0, 0 }
 	, m_tm_timer{ nullptr, nullptr }
+	, m_dma_tc_cb(*this)
+	, m_dma_timer(nullptr)
+	, m_dma_ctrl(0)
+	, m_dma_src(0)
+	, m_dma_dst(0)
+	, m_dma_count(0)
+	, m_dma_remain(0)
+	, m_dma_active(false)
+	, m_dma_started(false)
+	, m_dma_drq(false)
 	, m_sio_tx_cb(*this)
 	, m_sio_rx_enable_cb(*this)
 	, m_sio_bit_rate{ 0, 0, 0 }
@@ -92,6 +102,9 @@ mn10300_device::mn10300_device(const machine_config &mconfig, device_type type, 
 void mn10300_device::mn103002a_internal_map(address_map &map)
 {
 	map(0x20000000, 0x2000001b).rw(FUNC(mn10300_device::ivar_r), FUNC(mn10300_device::ivar_w));
+
+	// DMA controller channel 0: control/start, source, destination, byte count
+	map(0x32000800, 0x3200080f).rw(FUNC(mn10300_device::dmac_r), FUNC(mn10300_device::dmac_w));
 
 	map(0x34000100, 0x340002ff).noprw();
 	map(0x34000100, 0x34000101).r(FUNC(mn10300_device::iagr_r));
@@ -144,6 +157,8 @@ void mn10300_device::device_start()
 	for (auto &timer : m_sio_tx_timer)
 		timer = timer_alloc(FUNC(mn10300_device::sio_tx_shifted), this);
 
+	m_dma_timer = timer_alloc(FUNC(mn10300_device::dma_transfer), this);
+
 	save_item(NAME(m_pc));
 	save_item(NAME(m_d));
 	save_item(NAME(m_a));
@@ -164,6 +179,14 @@ void mn10300_device::device_start()
 	save_item(NAME(m_irq_level));
 	save_item(NAME(m_tm_mode));
 	save_item(NAME(m_tm_base));
+	save_item(NAME(m_dma_ctrl));
+	save_item(NAME(m_dma_src));
+	save_item(NAME(m_dma_dst));
+	save_item(NAME(m_dma_count));
+	save_item(NAME(m_dma_remain));
+	save_item(NAME(m_dma_active));
+	save_item(NAME(m_dma_started));
+	save_item(NAME(m_dma_drq));
 	save_item(NAME(m_sio_config));
 	save_item(NAME(m_sio_control));
 	save_item(NAME(m_sio_rxbuf));
@@ -226,6 +249,12 @@ void mn10300_device::device_reset()
 		m_sio_rx_full[ch] = false;
 		m_sio_tx_timer[ch]->adjust(attotime::never);
 	}
+
+	m_dma_ctrl = 0;
+	m_dma_active = false;
+	m_dma_started = false;
+	m_dma_drq = false;
+	m_dma_timer->adjust(attotime::never);
 }
 
 void mn10300_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -483,6 +512,80 @@ void mn10300_device::tm_rearm(unsigned n, bool restart_phase)
 TIMER_CALLBACK_MEMBER(mn10300_device::tm_underflow)
 {
 	intc_assert(TM4_GROUP + param);
+}
+
+// DMA controller channel 0. The control register (0x800) starts the channel when
+// its low nibble reads 0xf; 0x804 and 0x808 are the source and destination, and
+// 0x80c is a 16-bit count that holds (length - 2). The transfer moves bytes
+// between the memory buffer and the peripheral data port it is pointed at, with
+// the peripheral end held at a fixed address and the memory end advancing. The
+// address modes are not yet decoded from the control register, so the peripheral
+// is taken to be the end that lies in the I/O region.
+u32 mn10300_device::dmac_r(offs_t offset)
+{
+	switch (offset)
+	{
+	case 0: return m_dma_ctrl;
+	case 1: return m_dma_src;
+	case 2: return m_dma_dst;
+	case 3: return m_dma_count;
+	}
+	return 0;
+}
+
+void mn10300_device::dmac_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	switch (offset)
+	{
+	case 0:
+	{
+		COMBINE_DATA(&m_dma_ctrl);
+		const bool go = (m_dma_ctrl & 0x0f) == 0x0f;
+		if (go && !m_dma_active)
+			m_dma_started = false;   // new transfer; latch the length at the first byte
+		m_dma_active = go;
+		break;
+	}
+	case 1: COMBINE_DATA(&m_dma_src); break;
+	case 2: COMBINE_DATA(&m_dma_dst); break;
+	case 3: if (ACCESSING_BITS_0_15) m_dma_count = data & 0xffff; break;
+	}
+}
+
+// An external request on the channel (the floppy controller's DRQ). The byte
+// moves run from a timer so that reading the peripheral port and pulsing terminal
+// count happen outside the requesting device's own request callback.
+void mn10300_device::dma_req_w(int state)
+{
+	m_dma_drq = state;
+	if (state && m_dma_active)
+		m_dma_timer->adjust(attotime::zero);
+}
+
+TIMER_CALLBACK_MEMBER(mn10300_device::dma_transfer)
+{
+	if (!m_dma_active)
+		return;
+	if (!m_dma_started)
+	{
+		m_dma_remain = u32(m_dma_count) + 2;
+		m_dma_started = true;
+	}
+	const bool src_is_memory = m_dma_src < 0x80000000;
+	while (m_dma_active && m_dma_drq)
+	{
+		m_program.write_byte(m_dma_dst, m_program.read_byte(m_dma_src));
+		if (src_is_memory)
+			m_dma_src++;
+		else
+			m_dma_dst++;
+		if (--m_dma_remain == 0)
+		{
+			m_dma_tc_cb(1);
+			m_dma_tc_cb(0);
+			m_dma_active = false;
+		}
+	}
 }
 
 
