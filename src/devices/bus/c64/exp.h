@@ -75,6 +75,7 @@ public:
 	void cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2);
 	int game_r(offs_t offset, int sphi2, int ba, int rw, int loram, int hiram);
 	int exrom_r(offs_t offset, int sphi2, int ba, int rw, int loram, int hiram);
+	void ba_w(int state);
 
 	// cartridge interface
 	uint8_t dma_cd_r(offs_t offset) { return m_read_dma_cd(offset); }
@@ -133,6 +134,7 @@ public:
 	virtual void c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) { }
 	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw) { return m_game; }
 	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw) { return m_exrom; }
+	virtual void c64_ba_w(int state) { }
 
 protected:
 	device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device);

@@ -1620,6 +1620,8 @@ void c64_state::vic_ba_w(int state)
 	m_vic_ba = state;
 
 	update_rdy();
+
+	m_exp->ba_w(state);
 }
 
 void c64_state::update_rdy()

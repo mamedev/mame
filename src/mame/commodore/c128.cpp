@@ -1328,6 +1328,8 @@ void c128_state::vic_ba_w(int state)
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? CLEAR_LINE : ASSERT_LINE);
 
 	update_rdy();
+
+	m_exp->ba_w(state);
 }
 
 void c128_state::update_rdy()

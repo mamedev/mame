@@ -296,6 +296,19 @@ int c64_expansion_slot_device::exrom_r(offs_t offset, int sphi2, int ba, int rw,
 }
 
 
+//-------------------------------------------------
+//  ba_w - bus available
+//-------------------------------------------------
+
+void c64_expansion_slot_device::ba_w(int state)
+{
+	if (m_card != nullptr)
+	{
+		m_card->c64_ba_w(state);
+	}
+}
+
+
 void c64_expansion_slot_device::set_passthrough()
 {
 	irq_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::irq_w));
