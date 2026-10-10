@@ -82,7 +82,7 @@ TODO (pc9821nr15/pc9821nr166/pc9821nw150):
 
 uint32_t pc9821_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 	if(m_video_ff[DISPLAY_REG] != 0)
 	{
@@ -1184,7 +1184,7 @@ void pc9821_state::pc9821(machine_config &config)
 
 	m_dmac->set_clock(xtal); // unknown clock
 
-	PALETTE(config.replace(), m_palette, FUNC(pc9821_state::pc9801_palette), 16 + 16 + 256);
+	PALETTE(config.replace(), m_palette, FUNC(pc9821_state::palette_init), 16 + 16 + 256);
 
 	// win95 expects to be A revision, otherwise it will overlay startup text prompts over desktop GFX
 	// NOTE: possibly this bump happened around PC-9801BX series

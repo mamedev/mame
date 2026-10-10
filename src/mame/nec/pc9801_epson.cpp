@@ -55,6 +55,8 @@ Notes:
 #include "bus/pc98_61simm/options.h"
 #include "bus/pc98_61simm/slot.h"
 
+#include "bus/pc98_cbus/options.h"
+
 template <unsigned which> void pc98_epson_state::shadow_ipl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// TODO: shadow register 0x6a may actually be write deprotect
@@ -353,7 +355,7 @@ void pc98_epson_state::config_base_epson(machine_config &config)
 void pc98_epson_state::pc286vs(machine_config &config)
 {
 	pc9801vx(config);
-	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 10000000));
+	i80286_cpu_device &maincpu(I80286(config.replace(), m_maincpu, 10'000'000));
 	maincpu.set_addrmap(AS_PROGRAM, &pc98_epson_state::pc286vs_map);
 	maincpu.set_addrmap(AS_IO, &pc98_epson_state::pc286vs_io);
 	maincpu.set_a20_callback(FUNC(pc98_epson_state::a20_286));
@@ -389,7 +391,7 @@ void pc98_epson_state::pc286u(machine_config &config)
 void pc98_epson_state::pc386m(machine_config &config)
 {
 	pc9801rs(config);
-	I386SX(config.replace(), m_maincpu, 16000000); // i386SX 16MHz, switchable to 10/6 MHz
+	I386SX(config.replace(), m_maincpu, 16'000'000); // i386SX 16MHz, switchable to 10/6 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc98_epson_state::pc386m_map);
 	m_maincpu->set_addrmap(AS_IO, &pc98_epson_state::pc386m_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
@@ -466,6 +468,131 @@ void pc98_epson_state::pc486mu(machine_config &config)
 	// 2 x 3.5 floppy drives
 }
 
+/*
+ * Laptop section
+ */
+
+// convert RGB palette setups to a perceived luma, inverted.
+// actual algo is unknown, looks a middleman DAC doing a post-process job.
+uint8_t pc98_epson_laptop_state::rgb_to_luma(uint8_t r, uint8_t g, uint8_t b)
+{
+	double rf = r * 0.299;
+	double gf = g * 0.587;
+	double bf = b * 0.114;
+	double gray = (rf + gf + bf);
+	u8 res = (u8)(gray) ^ 0xff;
+	return res;
+}
+
+void pc98_epson_laptop_state::palette_init(palette_device &palette) const
+{
+	for(int i = 0; i < 8; i++)
+	{
+		// FIXME: "passing const qualifier as this argument discards qualifier" nuisance
+		const uint8_t r = pal1bit(BIT(i, 1));
+		const uint8_t g = pal1bit(BIT(i, 2));
+		const uint8_t b = pal1bit(BIT(i, 0));
+		double rf = r * 0.299;
+		double gf = g * 0.587;
+		double bf = b * 0.114;
+		double gray = (rf + gf + bf);
+		u8 res = (u8)(gray) ^ 0xff;
+		palette.set_pen_color(i, res, res, res);
+	}
+
+	for(int i = 8; i < palette.entries(); i++)
+		palette.set_pen_color(i, rgb_t::black());
+}
+
+// POST still calls the PC-9801-24 analog stuff, assume feature not a bug
+void pc98_epson_laptop_state::pc286ls_a0_w(offs_t offset, uint8_t data)
+{
+	if((offset & 1) == 0 && offset & 8)
+	{
+		if (m_ex_video_ff[ANALOG_16_MODE])
+		{
+			switch(offset)
+			{
+				case 0x08: m_analog16.pal_entry = data & 0xf; break;
+				case 0x0a: m_analog16.g[m_analog16.pal_entry] = data & 0xf; break;
+				case 0x0c: m_analog16.r[m_analog16.pal_entry] = data & 0xf; break;
+				case 0x0e: m_analog16.b[m_analog16.pal_entry] = data & 0xf; break;
+			}
+
+			const uint8_t res = rgb_to_luma(
+				pal4bit(m_analog16.r[m_analog16.pal_entry]),
+				pal4bit(m_analog16.g[m_analog16.pal_entry]),
+				pal4bit(m_analog16.b[m_analog16.pal_entry])
+			);
+
+			m_palette->set_pen_color(
+				m_analog16.pal_entry + 0x10,
+				res,
+				res,
+				res
+			);
+
+			// TODO: test lemmings on real HW, will this really latch correctly?
+			m_screen->update_partial(m_screen->vpos());
+		}
+		else
+		{
+			uint8_t pal_entry = (offset >> 1) & 3;
+
+			m_pal_clut[pal_entry] = data;
+
+			pal_entry = bitswap<2>(pal_entry, 0, 1);
+			pal_entry ^= 3;
+
+			for (int nyb = 0; nyb < 2; nyb++)
+			{
+				const uint8_t bit_base = (nyb ^ 1) * 4;
+				const uint8_t res = rgb_to_luma(
+					pal1bit(BIT(data, bit_base + 1)),
+					pal1bit(BIT(data, bit_base + 2)),
+					pal1bit(BIT(data, bit_base + 0))
+				);
+				m_palette->set_pen_color(
+					pal_entry | nyb * 4 | 8,
+					res,
+					res,
+					res
+				);
+			}
+		}
+		return;
+	}
+
+	pc9801_a0_w(offset,data);
+}
+
+void pc98_epson_laptop_state::pc286ls_io(address_map &map)
+{
+	pc286vs_io(map);
+	map(0x00a0, 0x00af).rw(FUNC(pc98_epson_laptop_state::pc9801_a0_r), FUNC(pc98_epson_laptop_state::pc286ls_a0_w));
+}
+
+void pc98_epson_laptop_state::pc286ls(machine_config &config)
+{
+	pc286vs(config);
+	// 80C286 12MHz with no waitstates (switchable to 6 MHz)
+	m_maincpu->set_clock(12'000'000);
+	m_maincpu->set_addrmap(AS_IO, &pc98_epson_laptop_state::pc286ls_io);
+
+	// RAM 640KB ~ 8.6MB
+
+	// Display: backlit NTN-type LCD
+	m_screen->set_lcd();
+
+	// 3.5" 3-mode floppies x2 (TODO)
+
+	// 2x C-bus slots, bottommost body plane
+	// technically incompatible with all cards due of the limited space unless going DIY.
+	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config.replace(), "cbus:1", 0, "cbus", pc98_cbus_devices, nullptr);
+	config.device_remove("cbus:2");
+	config.device_remove("cbus:3");
+}
 
 // backported from pc98, of course both aren't 100% identical to the NEC counterpart
 #define LOAD_IDE_ROM \
@@ -640,6 +767,21 @@ ROM_START( pc486mu )
 	LOAD_IDE_ROM
 ROM_END
 
+ROM_START( pc286ls )
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD( "a02_cwls.3b",  0x10000, 0x08000, CRC(f24abf4a) SHA1(c8ad34c161036a25c82fcac95449bf8984328429) )
+	ROM_CONTINUE(             0x00000, 0x10000 )
+	ROM_CONTINUE(             0x28000, 0x08000 ) // bank 1, unconfirmed
+
+	ROM_REGION( 0x80000, "chargen", 0 )
+	ROM_LOAD( "font_286ls.rom", 0x0000, 0x46800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff))
+
+	LOAD_KANJI_ROMS
+	LOAD_IDE_ROM
+ROM_END
+
+
+
 // Epson PC98 desktop line
 
 // PC-286 (i286, first model released in Oct 1987)
@@ -667,7 +809,8 @@ COMP( 1993, pc486se,    pc486mu,  0, pc486se,   pc386m, pc98_epson_state, init_p
 // Epson PC98 L[aptop] line
 // PC-286B (80C286)
 // PC-286L* (V30 or 80C286)
-// ...
+COMP( 1987, pc286ls,    0,  0, pc286ls,   pc386m, pc98_epson_laptop_state, init_pc9801_kanji, "Epson", "PC-286LS", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS )
+
 
 // PC-386BL* (i386sx)
 // PC-386LS* (just bigger version of above?)
