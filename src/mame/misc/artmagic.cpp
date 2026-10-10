@@ -10,7 +10,7 @@
         * Cheese Chase
         * Ultimate Tennis
         * Stone Ball
-        * Shooting Star (not emulated)
+        * Western Shooting (preliminary)
 
     Known bugs:
         * measured against a real PCB, the games run slightly too fast
@@ -85,7 +85,7 @@ void artmagic_state::machine_start()
 	save_item(NAME(m_gun_rxd));
 }
 
-uint8_t artmagic_state::wstrnsht_gun_p3_r()
+uint8_t artmagic_state::westerns_gun_p3_r()
 {
 	return 0xfe | m_gun_rxd;
 }
@@ -445,7 +445,7 @@ void artmagic_state::stonebal_map(address_map &map)
 }
 
 // with SWB:8 on, the boot ROM downloads a program over DUART channel B and jumps to it at 230000
-void artmagic_state::wstrnsht_map(address_map &map)
+void artmagic_state::westerns_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x27ffff).ram();
@@ -489,13 +489,12 @@ void artmagic_state::stonebal_tms_map(address_map &map)
 
 /*************************************
  *
- *  Extra CPU memory handlers
- *   (Shooting Star)
+ *  Extra CPU memory handlers (Western Shooting)
  *
  *************************************/
 
 /* see adp.c */
-void artmagic_state::wstrnsht_subcpu_map(address_map &map)
+void artmagic_state::westerns_subcpu_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x8000c0, 0x8000c1).nopw(); // I/O board shift register control
@@ -505,17 +504,17 @@ void artmagic_state::wstrnsht_subcpu_map(address_map &map)
 	map(0xffc000, 0xffffff).ram();
 }
 
-void artmagic_state::wstrnsht_subcpu_vector_map(address_map &map)
+void artmagic_state::westerns_subcpu_vector_map(address_map &map)
 {
 	map(0xfffff9, 0xfffff9).r("subduart", FUNC(mc68681_device::get_irq_vector));
 }
 
-void artmagic_state::wstrnsht_guncpu_map(address_map &map)
+void artmagic_state::westerns_guncpu_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 }
 
-void artmagic_state::wstrnsht_guncpu_data_map(address_map &map)
+void artmagic_state::westerns_guncpu_data_map(address_map &map)
 {
 	map(0xc000, 0xcfff).ram();
 }
@@ -718,7 +717,7 @@ static INPUT_PORTS_START( stoneba2 )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( wstrnsht )
+static INPUT_PORTS_START( westerns )
 
 	PORT_START("300000")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(artmagic_state::prot_r))    // protection data
@@ -825,11 +824,11 @@ void artmagic_state::stonebal(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.45);
 }
 
-void artmagic_state::wstrnsht(machine_config &config)
+void artmagic_state::westerns(machine_config &config)
 {
 	artmagic(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &artmagic_state::wstrnsht_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &artmagic_state::westerns_map);
 
 	m_tms->output_int().set_inputline("maincpu", M68K_IRQ_4);
 
@@ -841,8 +840,8 @@ void artmagic_state::wstrnsht(machine_config &config)
 
 	/* sub cpu*/
 	m68000_device &subcpu(M68000(config, "subcpu", MASTER_CLOCK_25MHz/2));
-	subcpu.set_addrmap(AS_PROGRAM, &artmagic_state::wstrnsht_subcpu_map);
-	subcpu.set_addrmap(m68000_device::AS_CPU_SPACE, &artmagic_state::wstrnsht_subcpu_vector_map);
+	subcpu.set_addrmap(AS_PROGRAM, &artmagic_state::westerns_subcpu_map);
+	subcpu.set_addrmap(m68000_device::AS_CPU_SPACE, &artmagic_state::westerns_subcpu_vector_map);
 
 	mc68681_device &subduart(MC68681(config, "subduart", 3686400));
 	subduart.irq_cb().set_inputline("subcpu", M68K_IRQ_4);
@@ -856,10 +855,10 @@ void artmagic_state::wstrnsht(machine_config &config)
 
 	/*gun board cpu*/
 	i80c31_device &guncpu(I80C31(config, "guncpu", 12_MHz_XTAL));
-	guncpu.set_addrmap(AS_PROGRAM, &artmagic_state::wstrnsht_guncpu_map);
-	guncpu.set_addrmap(AS_DATA, &artmagic_state::wstrnsht_guncpu_data_map);
+	guncpu.set_addrmap(AS_PROGRAM, &artmagic_state::westerns_guncpu_map);
+	guncpu.set_addrmap(AS_DATA, &artmagic_state::westerns_guncpu_data_map);
 	guncpu.port_in_cb<1>().set_constant(0); // ?
-	guncpu.port_in_cb<3>().set(FUNC(artmagic_state::wstrnsht_gun_p3_r));
+	guncpu.port_in_cb<3>().set(FUNC(artmagic_state::westerns_gun_p3_r));
 	guncpu.port_out_cb<3>().set("mainduart", FUNC(mc68681_device::rx_a_w)).bit(1);
 }
 
@@ -1058,7 +1057,7 @@ OSC   : 40.000MHz, 25.000MHz
 */
 
 
-ROM_START( wstrnsht )
+ROM_START( westerns )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rom.u102", 0x00000, 0x20000, CRC(cce9877e) SHA1(3e2b3b29d5dd73bfe0c7faf84309b50adbcded3b) )
 	ROM_LOAD16_BYTE( "rom.u101", 0x00001, 0x20000, CRC(3a330d9d) SHA1(0f3cd75e9e5483e3cf51f0c4eb4f15b6c3b33b67) )
@@ -1157,7 +1156,7 @@ void artmagic_state::init_stonebal()
 	m_protection_handler = &artmagic_state::stonebal_protection;
 }
 
-void artmagic_state::init_wstrnsht()
+void artmagic_state::init_westerns()
 {
 	decrypt_ultennis();
 	m_is_stoneball = 0;
@@ -1178,4 +1177,4 @@ GAME( 1994, cheesech,   0,        cheesech, cheesech, artmagic_state, init_chees
 GAME( 1994, stonebal,   0,        stonebal, stonebal, artmagic_state, init_stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players, v1-20 13/12/1994)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, stonebal2,  stonebal, stonebal, stoneba2, artmagic_state, init_stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 7/11/1994)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, stonebal2o, stonebal, stonebal, stoneba2, artmagic_state, init_stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 21/10/1994)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, wstrnsht,    0,       wstrnsht, wstrnsht, artmagic_state, init_wstrnsht, ROT0, "Art & Magic", "Western Shooting", MACHINE_NOT_WORKING )
+GAME( 1994, westerns,   0,        westerns, westerns, artmagic_state, init_westerns, ROT0, "Art & Magic", "Western Shooting", MACHINE_NOT_WORKING )
