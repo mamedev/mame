@@ -753,12 +753,14 @@
 *********************************************************************************************/
 
 #include "emu.h"
+
 #include "funworld.h"
 
 #include "cpu/m6502/g65sc02.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -857,26 +859,23 @@ void multiwin_state::multiwinb_map(address_map &map)
 	map(0x1000, 0x1000).lr8(NAME([] () -> uint8_t { return 0xff; })); // or it doesn't boot (AI says some 1-Wire device - maybe iButton)
 }
 
-static uint8_t funquiz_question_bank = 0x80;
 
-uint8_t funworld_state::questions_r(offs_t offset)
+void funquiz_state::machine_start()
 {
-	uint8_t* quiz = memregion("questions")->base();
-	int extraoffset = ((funquiz_question_bank & 0x1f) * 0x8000);
+	funworld_state::machine_start();
 
-	// if 0x80 is set, read the 2nd half of the question rom (contains header info)
-	if (funquiz_question_bank & 0x80) extraoffset += 0x4000;
-
-	return quiz[offset + extraoffset];
+	m_questions_bank->configure_entries(0, 64, memregion("questions")->base(), 0x4000);
+	m_questions_bank->set_entry(1);
 }
 
-void funworld_state::question_bank_w(uint8_t data)
+void funquiz_state::question_bank_w(uint8_t data)
 {
 //  printf("question bank write %02x\n", data);
-	funquiz_question_bank = data;
+
+	m_questions_bank->set_entry(bitswap<6>(data, 4, 3, 2, 1, 0, 7));
 }
 
-void funworld_state::funquiz_map(address_map &map)
+void funquiz_state::funquiz_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");
 	map(0x0800, 0x0803).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -886,11 +885,11 @@ void funworld_state::funquiz_map(address_map &map)
 	map(0x0e00, 0x0e00).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0e01, 0x0e01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	map(0x1800, 0x1800).w(FUNC(funworld_state::question_bank_w));
+	map(0x1800, 0x1800).w(FUNC(funquiz_state::question_bank_w));
 
-	map(0x2000, 0x2fff).ram().w(FUNC(funworld_state::funworld_videoram_w)).share("videoram");
-	map(0x3000, 0x3fff).ram().w(FUNC(funworld_state::funworld_colorram_w)).share("colorram");
-	map(0x4000, 0x7fff).r(FUNC(funworld_state::questions_r));
+	map(0x2000, 0x2fff).ram().w(FUNC(funquiz_state::funworld_videoram_w)).share("videoram");
+	map(0x3000, 0x3fff).ram().w(FUNC(funquiz_state::funworld_colorram_w)).share("colorram");
+	map(0x4000, 0x7fff).bankr(m_questions_bank);
 
 	map(0xc000, 0xffff).rom();
 }
@@ -3275,12 +3274,12 @@ GFXDECODE_END
 
 
 // these ports are set to output anyway, but this quietens the log
-uint8_t funworld_state::funquiz_ay8910_a_r()
+uint8_t funquiz_state::ay8910_a_r()
 {
 	return 0x00;
 }
 
-uint8_t funworld_state::funquiz_ay8910_b_r()
+uint8_t funquiz_state::ay8910_b_r()
 {
 	return 0x00;
 }
@@ -3367,16 +3366,16 @@ void funworld_state::fw2ndpal(machine_config &config)
 
 
 
-void funworld_state::funquiz(machine_config &config)
+void funquiz_state::funquiz(machine_config &config)
 {
 	fw1stpal(config);  // gray background.
 //  fw2ndpal(config);  // blue background.
 
 	R65C02(config.replace(), m_maincpu, CPU_CLOCK); // 2 MHz.
-	m_maincpu->set_addrmap(AS_PROGRAM, &funworld_state::funquiz_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &funquiz_state::funquiz_map);
 
-	subdevice<ay8910_device>("ay8910")->port_a_read_callback().set(FUNC(funworld_state::funquiz_ay8910_a_r));
-	subdevice<ay8910_device>("ay8910")->port_b_read_callback().set(FUNC(funworld_state::funquiz_ay8910_b_r));
+	subdevice<ay8910_device>("ay8910")->port_a_read_callback().set(FUNC(funquiz_state::ay8910_a_r));
+	subdevice<ay8910_device>("ay8910")->port_b_read_callback().set(FUNC(funquiz_state::ay8910_b_r));
 }
 
 
@@ -9079,9 +9078,9 @@ GAME(  199?, mongolnw,   0,        royalcd1, royalcrd,  funworld_state, init_mon
 GAME(  199?, soccernw,   0,        royalcd1, royalcrd,  funworld_state, init_soccernw, ROT0, "<unknown>",         "Soccer New (Italian)",                            MACHINE_UNEMULATED_PROTECTION )
 
 // Quiz games...
-GAME(  199?, funquiz,    0,        funquiz,  funquiz,   funworld_state, empty_init,    ROT0, "Fun World",         "Fun World Quiz (German)",                         0 )
-GAME(  1990, funquiza,   0,        funquiz,  funquiza,  funworld_state, empty_init,    ROT0, "Fun World",         "Fun World Quiz (German, 12-11-1990)",             0 )
-GAME(  1990, funquizb,   0,        funquiz,  funquiza,  funworld_state, empty_init,    ROT0, "Fun World",         "Fun World Quiz (German, 27-04-1990)",             0 )
+GAME(  199?, funquiz,    0,        funquiz,  funquiz,   funquiz_state,      empty_init,    ROT0, "Fun World",         "Fun World Quiz (German)",                         0 )
+GAME(  1990, funquiza,   0,        funquiz,  funquiza,  funquiz_state,      empty_init,    ROT0, "Fun World",         "Fun World Quiz (German, 12-11-1990)",             0 )
+GAME(  1990, funquizb,   0,        funquiz,  funquiza,  funquiz_state,      empty_init,    ROT0, "Fun World",         "Fun World Quiz (German, 27-04-1990)",             0 )
 
 // Other games...
 GAMEL( 1986, novoplay,   0,        fw2ndpal,   novoplay,  funworld_state,   empty_init,   ROT0, "Admiral / Novomatic",      "Novo Play Multi Card / Club Card",      0,                       layout_novoplay )

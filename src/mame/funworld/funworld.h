@@ -5,10 +5,11 @@
 
 #pragma once
 
-#include "emupal.h"
 #include "machine/i2cmem.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+
+#include "emupal.h"
 #include "tilemap.h"
 
 class funworld_state : public driver_device
@@ -32,7 +33,6 @@ public:
 	void saloon(machine_config &config) ATTR_COLD;
 	void clubcard(machine_config &config) ATTR_COLD;
 	void cuoreuno(machine_config &config) ATTR_COLD;
-	void funquiz(machine_config &config) ATTR_COLD;
 	void witchryl(machine_config &config) ATTR_COLD;
 	void fw_brick_1(machine_config &config) ATTR_COLD;
 	void fw_brick_2(machine_config &config) ATTR_COLD;
@@ -66,15 +66,10 @@ protected:
 	tilemap_t *m_bg_tilemap = nullptr;
 
 private:
-	uint8_t questions_r(offs_t offset);
-	void question_bank_w(uint8_t data);
 	void pia1_ca2_w(int state);
-	uint8_t funquiz_ay8910_a_r();
-	uint8_t funquiz_ay8910_b_r();
 
 	void clubcard_map(address_map &map) ATTR_COLD;
 	void cuoreuno_map(address_map &map) ATTR_COLD;
-	void funquiz_map(address_map &map) ATTR_COLD;
 	void fw_brick_map(address_map &map) ATTR_COLD;
 	void gratispk_map(address_map &map) ATTR_COLD;
 	void saloon_map(address_map &map) ATTR_COLD;
@@ -85,6 +80,31 @@ private:
 	required_device<palette_device> m_palette;
 	optional_device<i2cmem_device> m_i2cmem;
 	output_finder<8> m_lamps;
+};
+
+
+class funquiz_state : public funworld_state
+{
+public:
+	funquiz_state(const machine_config &mconfig, device_type type, const char *tag) :
+		funworld_state(mconfig, type, tag),
+		m_questions_bank(*this, "questions_bank")
+	{ }
+
+	void funquiz(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	required_memory_bank m_questions_bank;
+
+	void question_bank_w(uint8_t data);
+
+	uint8_t ay8910_a_r();
+	uint8_t ay8910_b_r();
+
+	void funquiz_map(address_map &map) ATTR_COLD;
 };
 
 
