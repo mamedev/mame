@@ -126,68 +126,74 @@ void dc_state::g1_irq(uint8_t data)
 
 void dc_state::pvr_irq(uint8_t data)
 {
+	pvr_irq_status(dc_sysctrl_regs, data);
+	dc_update_interrupt_status();
+}
+
+// sets the status bit of a CLX2 interrupt in a system bus block's registers
+void dc_state::pvr_irq_status(uint32_t *regs, uint8_t data)
+{
 	switch(data) {
 	case powervr2_device::EOXFER_YUV_IRQ:
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
+		regs[SB_ISTNRM] |= IST_EOXFER_YUV;
 		break;
 
 	case powervr2_device::EOXFER_OPLST_IRQ:
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPLST;
+		regs[SB_ISTNRM] |= IST_EOXFER_OPLST;
 		break;
 
 	case powervr2_device::EOXFER_OPMV_IRQ:
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPMV;
+		regs[SB_ISTNRM] |= IST_EOXFER_OPMV;
 		break;
 
 	case powervr2_device::EOXFER_TRLST_IRQ:
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRLST;
+		regs[SB_ISTNRM] |= IST_EOXFER_TRLST;
 		break;
 
 	case powervr2_device::EOXFER_TRMV_IRQ:
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRMV;
+		regs[SB_ISTNRM] |= IST_EOXFER_TRMV;
 		break;
 
 	case powervr2_device::EOXFER_PTLST_IRQ:
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_PTLST;
+		regs[SB_ISTNRM] |= IST_EOXFER_PTLST;
 		break;
 
 	case powervr2_device::VBL_IN_IRQ:
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN;
+		regs[SB_ISTNRM] |= IST_VBL_IN;
 		break;
 
 	case powervr2_device::VBL_OUT_IRQ:
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_OUT;
+		regs[SB_ISTNRM] |= IST_VBL_OUT;
 		break;
 
 	case powervr2_device::HBL_IN_IRQ:
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_HBL_IN;
+		regs[SB_ISTNRM] |= IST_HBL_IN;
 		break;
 
 	case powervr2_device::EOR_VIDEO_IRQ:
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_VIDEO;
+		regs[SB_ISTNRM] |= IST_EOR_VIDEO;
 		break;
 
 	case powervr2_device::EOR_TSP_IRQ:
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;
+		regs[SB_ISTNRM] |= IST_EOR_TSP;
 		break;
 
 	case powervr2_device::EOR_ISP_IRQ:
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_ISP;
+		regs[SB_ISTNRM] |= IST_EOR_ISP;
 		break;
 
 	case powervr2_device::DMA_PVR_IRQ:
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_PVR;
+		regs[SB_ISTNRM] |= IST_DMA_PVR;
 		break;
 
 	case powervr2_device::ERR_ISP_LIMIT_IRQ:
-		dc_sysctrl_regs[SB_ISTERR] |= IST_ERR_ISP_LIMIT;
+		regs[SB_ISTERR] |= IST_ERR_ISP_LIMIT;
 		break;
 
 	case powervr2_device::ERR_PVRIF_ILL_ADDR_IRQ:
-		dc_sysctrl_regs[SB_ISTERR] |= IST_ERR_PVRIF_ILL_ADDR;
+		regs[SB_ISTERR] |= IST_ERR_PVRIF_ILL_ADDR;
 		break;
 	}
-	dc_update_interrupt_status();
 }
 
 void dc_state::maple_irq(uint8_t data)
@@ -259,27 +265,32 @@ int dc_state::decode_reg3216_64(uint32_t offset, uint64_t mem_mask, uint64_t *sh
 
 int dc_state::dc_compute_interrupt_level()
 {
+	return interrupt_level(dc_sysctrl_regs);
+}
+
+int dc_state::interrupt_level(const uint32_t *regs)
+{
 	uint32_t ln,lx,le;
 
-	ln=dc_sysctrl_regs[SB_ISTNRM] & dc_sysctrl_regs[SB_IML6NRM];
-	lx=dc_sysctrl_regs[SB_ISTEXT] & dc_sysctrl_regs[SB_IML6EXT];
-	le=dc_sysctrl_regs[SB_ISTERR] & dc_sysctrl_regs[SB_IML6ERR];
+	ln=regs[SB_ISTNRM] & regs[SB_IML6NRM];
+	lx=regs[SB_ISTEXT] & regs[SB_IML6EXT];
+	le=regs[SB_ISTERR] & regs[SB_IML6ERR];
 	if (ln | lx | le)
 	{
 		return 6;
 	}
 
-	ln=dc_sysctrl_regs[SB_ISTNRM] & dc_sysctrl_regs[SB_IML4NRM];
-	lx=dc_sysctrl_regs[SB_ISTEXT] & dc_sysctrl_regs[SB_IML4EXT];
-	le=dc_sysctrl_regs[SB_ISTERR] & dc_sysctrl_regs[SB_IML4ERR];
+	ln=regs[SB_ISTNRM] & regs[SB_IML4NRM];
+	lx=regs[SB_ISTEXT] & regs[SB_IML4EXT];
+	le=regs[SB_ISTERR] & regs[SB_IML4ERR];
 	if (ln | lx | le)
 	{
 		return 4;
 	}
 
-	ln=dc_sysctrl_regs[SB_ISTNRM] & dc_sysctrl_regs[SB_IML2NRM];
-	lx=dc_sysctrl_regs[SB_ISTEXT] & dc_sysctrl_regs[SB_IML2EXT];
-	le=dc_sysctrl_regs[SB_ISTERR] & dc_sysctrl_regs[SB_IML2ERR];
+	ln=regs[SB_ISTNRM] & regs[SB_IML2NRM];
+	lx=regs[SB_ISTEXT] & regs[SB_IML2EXT];
+	le=regs[SB_ISTERR] & regs[SB_IML2ERR];
 	if (ln | lx | le)
 	{
 		return 2;
@@ -288,27 +299,33 @@ int dc_state::dc_compute_interrupt_level()
 	return 0;
 }
 
+// ISTNRM bits 31 and 30 summarize the error and external interrupts
+void dc_state::update_summary_bits(uint32_t *regs)
+{
+	if (regs[SB_ISTERR])
+	{
+		regs[SB_ISTNRM] |= IST_ERROR;
+	}
+	else
+	{
+		regs[SB_ISTNRM] &= ~IST_ERROR;
+	}
+
+	if (regs[SB_ISTEXT])
+	{
+		regs[SB_ISTNRM] |= IST_G1G2EXTSTAT;
+	}
+	else
+	{
+		regs[SB_ISTNRM] &= ~IST_G1G2EXTSTAT;
+	}
+}
+
 void dc_state::dc_update_interrupt_status()
 {
 	int level;
 
-	if (dc_sysctrl_regs[SB_ISTERR])
-	{
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_ERROR;
-	}
-	else
-	{
-		dc_sysctrl_regs[SB_ISTNRM] &= ~IST_ERROR;
-	}
-
-	if (dc_sysctrl_regs[SB_ISTEXT])
-	{
-		dc_sysctrl_regs[SB_ISTNRM] |= IST_G1G2EXTSTAT;
-	}
-	else
-	{
-		dc_sysctrl_regs[SB_ISTNRM] &= ~IST_G1G2EXTSTAT;
-	}
+	update_summary_bits(dc_sysctrl_regs);
 
 	level=dc_compute_interrupt_level();
 	m_maincpu->sh4_set_irln_input(15-level);
@@ -329,6 +346,25 @@ void dc_state::dc_update_interrupt_status()
 			logerror("PVR-DMA HW trigger\n");
 			m_powervr2->pvr_dma_execute(space);
 		}
+	}
+}
+
+// writing a 1 clears a normal or error interrupt, the external ones only clear at their source
+void dc_state::interrupt_status_w(uint32_t *regs, int reg, uint32_t old, uint32_t data)
+{
+	switch (reg)
+	{
+		case SB_ISTNRM:
+			regs[SB_ISTNRM] = old & ~(data | 0xc0000000); // bits 31,30 ro
+			break;
+
+		case SB_ISTEXT:
+			regs[SB_ISTEXT] = old;
+			break;
+
+		case SB_ISTERR:
+			regs[SB_ISTERR] = old & ~data;
+			break;
 	}
 }
 
@@ -412,17 +448,9 @@ void dc_state::dc_sysctrl_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 			break;
 
 		case SB_ISTNRM:
-			dc_sysctrl_regs[SB_ISTNRM] = old & ~(dat | 0xC0000000); // bits 31,30 ro
-			dc_update_interrupt_status();
-			break;
-
 		case SB_ISTEXT:
-			dc_sysctrl_regs[SB_ISTEXT] = old;
-			dc_update_interrupt_status();
-			break;
-
 		case SB_ISTERR:
-			dc_sysctrl_regs[SB_ISTERR] = old & ~dat;
+			interrupt_status_w(dc_sysctrl_regs, reg, old, dat);
 			dc_update_interrupt_status();
 			break;
 		case SB_SDST:
