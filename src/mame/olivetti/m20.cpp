@@ -752,7 +752,9 @@ void m20_state::machine_reset()
 	else
 		m_port21 = 0xff;
 
-	if(system_bios() > 0)  // bits have different meanings?
+	// BIOS 1.0 must run POST to query the keyboard nationality.
+	// Later BIOS revisions retain MAME's historical fast-boot behaviour.
+	if(system_bios() > 1)  // bits have different meanings?
 		m_port21 &= ~8;
 
 	m_fd1797->reset();
