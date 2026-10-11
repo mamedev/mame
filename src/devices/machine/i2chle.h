@@ -23,6 +23,7 @@ public:
 
 protected:
 	void interface_post_start() override ATTR_COLD;
+	void interface_pre_reset() override ATTR_COLD;
 
 	// override this to read out data
 	virtual u8 read_data(u16 offset);
