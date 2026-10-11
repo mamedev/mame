@@ -22,14 +22,12 @@ TODO (pc9821ap2):
 \- alternative: bp 0xf8a32,1,{esi|=40;g} to simulate holding HELP key at power-on/reset;
 - Unimplemented 15MB memory hole mark for Windows NT
 \- cfr. io_wab.txt, interfaces with VGA core thru local bus via address-data ports at $fa2-3
-- several .hdi games squashes text GDC to 15 kHz, check SDIP DSW1.
 
 TODO (pc9821as):
-- unimplemented SDIP specific access;
-- "SYSTEM SHUTDOWN" while accessing above (does a 0xaa55 check at PC=f834f, akin
-  to ap2 stealth SRAM);
-\- Update: it never goes into above after default of m_dma_access_ctrl changed to 0xfe?
-- Eventually needs pc9821ce style sound PnP access.
+- keeps throwing "SET THE SOFTWARE DIP-SWITCH" at every start,
+  fails a sum8 ext SDIP check at PC=f8368 (wants 0x00 sums 0x5f);
+- Unrecognized HELP key, keyboard sends an 0xff when key held PC=f8918;
+- derive pc9821ce style sound PnP access (doesn't access the EEPROM addresses);
 
 TODO (pc9821ce):
 - Throws random TIMER errors at POST (soft reset to bypass);
@@ -786,15 +784,23 @@ void pc9821_state::pc9821_io(address_map &map)
  * 98MATE A overrides
  */
 
-// TODO: SDIP extended access for 9821Ap, As, Ae
+// TODO: SDIP extended access for 9821Ap, As, Ae. Move as device.
 // Undocumented, it never r/w the conventional ports, at least on POST.
 // I also suspect a few ports here not being direct RAM r/w but actual regs instead.
-// 0xf834f: checks against aa55, throws "ROM SUM ERROR" if bypassed
-// 0xf8363: sum8 contents of [0x02], 10 times (???)
+// 0xf834f: checks against aa55, throws "ROM SUM ERROR" if bypassed (fixed with autoinc)
+// 0xf8363: sum8 contents of [0x02]++, 10 times
 u8 pc9821_mate_a_state::ext_sdip_data_r(offs_t offset)
 {
-	logerror("%s: EXT SDIP access read %02x %02x\n", machine().describe_context(), m_ext_sdip_addr, m_ext_sdip[m_ext_sdip_addr]);
-	return m_ext_sdip[m_ext_sdip_addr];
+	logerror("%s: EXT SDIP access read [%02x] %02x\n", machine().describe_context(), m_ext_sdip_addr, m_ext_sdip[m_ext_sdip_addr]);
+	const u8 res = m_ext_sdip[m_ext_sdip_addr];
+	if (!machine().side_effects_disabled())
+	{
+		//printf("%d R\n", m_ext_sdip_addr);
+		// TODO: does it always autoinc? What's the rollover cutoff?
+		m_ext_sdip_addr ++;
+		m_ext_sdip_addr &= 0xff; //%= 44;
+	}
+	return res;
 }
 
 void pc9821_mate_a_state::ext_sdip_data_w(offs_t offset, u8 data)
@@ -802,6 +808,9 @@ void pc9821_mate_a_state::ext_sdip_data_w(offs_t offset, u8 data)
 	logerror("%s: EXT SDIP access write [%02x] -> %02x\n", machine().describe_context(), m_ext_sdip_addr, data);
 
 	m_ext_sdip[m_ext_sdip_addr] = data;
+
+	m_ext_sdip_addr ++;
+	m_ext_sdip_addr &= 0xff; //%= 44;
 }
 
 void pc9821_mate_a_state::ext_sdip_access_w(offs_t offset, u8 data)
@@ -878,6 +887,9 @@ void pc9821_mate_a_state::pc9821as_map(address_map &map)
 void pc9821_mate_a_state::pc9821as_io(address_map &map)
 {
 	pc9821_io(map);
+	// Ap, As, Ae and Af maps CPU mode bit 7 here (1) High/Low (0) Middle
+	// Low selector is in $7fdd bit 2 (mouse PIO range) at least for As
+	map(0x00f0, 0x00f0).lr8(NAME([] () { return 0x80; }));
 	map(0x0468, 0x0468).rw(FUNC(pc9821_mate_a_state::ext_sdip_data_r), FUNC(pc9821_mate_a_state::ext_sdip_data_w));
 	map(0x046a, 0x046a).w(FUNC(pc9821_mate_a_state::ext_sdip_access_w));
 	map(0x046c, 0x046c).w(FUNC(pc9821_mate_a_state::ext_sdip_address_w));
@@ -1227,6 +1239,10 @@ void pc9821_mate_a_state::pc9821as(machine_config &config)
 	PC9801_61_SIMM(config.replace(), "simm", pc9821_simm_options, "4mb");
 //  m_ram->set_default_size("4M");
 //  m_ram->set_extra_options("8M,14M,15M");
+
+	// FIXME: set clock to SCLK1 clock frequency
+	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "sound_pc9821ce", true);
 }
 
 void pc9821_mate_a_state::pc9821ap2(machine_config &config)
@@ -1618,15 +1634,20 @@ ROM_START( pc9821as )
 	ROM_REGION( 0x80000, "biosrom", ROMREGION_ERASEFF )
 //  ROM_LOAD( "itf.rom",     0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
 //  ROM_LOAD( "bios_as.rom", 0x18000, 0x18000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
-	ROM_LOAD( "mvs0100-1.bin", 0x00000, 0x80000, CRC(ca37b631) SHA1(8c481dd0608d6c27235bc88bd77e345628dc28a1) )
+	ROM_SYSTEM_BIOS(0, "nec", "MVS0100-1 (original)")
+	ROMX_LOAD( "mvs0100-1.bin", 0x00000, 0x80000, CRC(ca37b631) SHA1(8c481dd0608d6c27235bc88bd77e345628dc28a1), ROM_BIOS(0) )
+	// common QoL DIY patch: s1005 IDE + sampson English translated setup menu patches
+	// http://ookumaneko.s1005.xrea.com/d27c4000.htm
+	ROM_SYSTEM_BIOS(1, "diy",  "MVS0100-1 (DIY IDE & English Setup menu)")
+	ROMX_LOAD( "mvs0100-1-ide-t-en.bin", 0x00000, 0x80000, CRC(66520e3b) SHA1(fd073bd2749559d95d38539e4f9b034472bf10ae), ROM_BIOS(1) )
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// 0x00000-0x04fff KBCRT X47 891105
 	// 0x0c000-0x0ffff sound BIOS
 	// 0x10000-0x13fff ^ mirror
 	// 0x14000-0x16fff <unknown>
-	// 0x17000-0x17fff SCSI disk BIOS?
-	// 0x18000-0x19fff <unknown>
+	// 0x17000-0x17fff SCSI disk BIOS? does a $dc000 copy like -55 based cards
+	// 0x18000-0x19fff IDE BIOS
 	// 0x1a000-0x1ffff setup menu
 	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 ) // ITF
 	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x18000 ) // BIOS
@@ -1635,8 +1656,13 @@ ROM_START( pc9821as )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_as.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
 
+	ROM_REGION( 0x4000, "cbus:mb1:sound_pc9821ce:bios", ROMREGION_ERASE00 )
+	ROM_COPY( "biosrom", 0x0c000, 0x00000, 0x04000 )
+
 	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
-	LOAD_IDE_ROM
+
+	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
+	ROM_COPY( "biosrom", 0x18000, 0x00000, 0x02000 )
 ROM_END
 
 /*
