@@ -1304,7 +1304,7 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type4)
 	m_k056832->set_layer_offs(2, -24, 0);
 	m_k056832->set_layer_offs(3, -22, 0);
 
-	K053936_wraparound_enable(0, 0);
+	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, -36, 1);
 
 	m_gx_rushingheroes_hack = 1;
@@ -1331,7 +1331,7 @@ VIDEO_START_MEMBER(konamigx_state, konamigx_type4_vsn)
 	m_k056832->set_layer_offs(2, -48, 0);
 	m_k056832->set_layer_offs(3, -48, 0);
 
-	K053936_wraparound_enable(0, 1); // wraparound doesn't work properly with the custom drawing function anyway, see the crowd in vsnet and rushhero
+	K053936_wraparound_enable(0, 1);
 	K053936GP_set_offset(0, -30, 0);
 
 	m_gx_rushingheroes_hack = 1;
