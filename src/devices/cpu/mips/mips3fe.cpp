@@ -262,6 +262,10 @@ bool mips3_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev
 				desc.set_writes_memory();
 				desc.set_can_cause_exception();
 			}
+			else if ((RTREG & 3) == 0)
+			{
+				desc.set_r_used(RSREG);
+			}
 			return true;
 	}
 
