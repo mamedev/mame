@@ -529,14 +529,14 @@ TIMER_CALLBACK_MEMBER(xavix_video_device::raster_irq_gen)
 
 		// The comparison uses picture rows, which need not share the screen's
 		// scanline origin. Finish that row before software changes the tilemaps.
-		screen().update_partial(m_raster_irq_y[0] - picture_offset().second + render_offset().second);
+		screen().update_partial(m_raster_irq_y[0] - counter_offset().second + render_offset().second);
 	}
 	schedule_raster_irq();
 }
 
 void xavix_video_device::schedule_raster_irq()
 {
-	auto const [xoffset, yoffset] = picture_offset();
+	auto const [xoffset, yoffset] = counter_offset();
 	m_raster_irq_timer->adjust(screen().time_until_pos(m_raster_irq_y[0] - yoffset, m_raster_irq_x[0] - xoffset), 0);
 }
 

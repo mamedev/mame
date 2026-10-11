@@ -204,6 +204,8 @@ protected:
 	void update_pen(int pen, u16 data);
 	rectangle arena_effect_area() const;
 	u16 apply_color_effect(u16 data, u8 noise) const;
+	static int aligned_output_position(int clocks, int alignment_clocks, int sample_clocks);
+	virtual std::pair<int, int> counter_offset() const;
 	virtual std::pair<int, int> picture_offset() const;
 	virtual std::pair<int, int> render_offset() const;
 	virtual auto decode_pixel_layout(u8 flags) const -> pixel_layout;
@@ -293,6 +295,7 @@ protected:
 	int m_video_hres_scale;
 
 private:
+	static constexpr int EARLY_PICTURE_OUTPUT_DELAY_CLOCKS = 24;
 	// Uncontended master clocks per byte; earlier-chip timing remains unmeasured.
 	static constexpr unsigned SPRITE_DMA_BYTE_CLOCKS = 2;
 	static const gfx_layout TILE_16X16_2BPP_LAYOUT;
@@ -364,6 +367,7 @@ protected:
 	virtual void schedule_picture_irqs() override;
 	virtual void schedule_raster_irq() override;
 	virtual auto decode_pixel_layout(u8 flags) const -> pixel_layout override;
+	virtual std::pair<int, int> counter_offset() const override;
 	virtual std::pair<int, int> picture_offset() const override;
 	virtual std::pair<int, int> render_offset() const override;
 	virtual device_delegate<u8 (u32)> &tile_read_callback() override;
@@ -436,6 +440,7 @@ private:
 	TIMER_CALLBACK_MEMBER(picture_nmi);
 	TIMER_CALLBACK_MEMBER(video_field_start);
 	void bitmap_params_w(offs_t offset, u8 data);
+	bool horizontal_reload_in_blanking(counter_config const &config) const;
 	int output_clock_offset() const;
 	int output_position(int clocks) const;
 	static int output_origin(int clocks);

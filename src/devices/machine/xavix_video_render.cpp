@@ -138,24 +138,24 @@ rgb_t xavix_video_device::pen_color(u16 palette_data)
 
 rectangle xavix_video_device::arena_effect_area() const
 {
-	// Arena gates post-composition colour effects, not individual layers.
-	// Black replacement supplies the borders used by Monster Truck and Snowboard;
-	// Taito Nostalgia uses it for Slap Fight transitions and Gladiator portraits.
-	// Hardware footage shows asymmetric Monster Truck borders and partly cut
-	// Gladiator portraits. The former layer clip also hid Snowboard's right-edge
-	// sprites and kept Mappy Remix's single-column left border and Slap Fight's
-	// lives display visible; recheck these with the common effects gate. Snowboard's
-	// single-column status-bar gap remains uncertain, as do the effect controls for
-	// Slap Fight Tiger's equal 0x82 boundaries, which the former clip blanked entirely.
-	// With settled blanking, the two comparisons delimit the inverted gate.
-	// Equal endpoints have zero width here; their fractional output pulse is not modelled in RGB.
-	// TODO: Retain intra-line gate history for live writes and active-display counter reloads.
+	/* All generations gate post-composition colour effects, not individual layers.
+	   Black replacement supplies rad_mtrk/rad_snow borders, taitons2 Slap Fight
+	   transitions and taitons1 Gladiator portrait masks. Hardware footage shows
+	   asymmetric rad_mtrk borders and partly cut taitons1 Gladiator portraits.
+	   With settled blanking, the comparisons delimit the inverted gate within
+	   picture Y16-239. A missed trailing comparison retains the interval to blanking.
+	   Equal endpoints have zero width here; their fractional output pulse is not
+	   modelled in RGB.
+	   TODO: Retain intra-line gate history for live writes and active-display counter reloads. */
+
 	bool const side = bool(m_arena_ctrl & ARENA_SIDE);
 	int const first = side ? m_arena_end : m_arena_start;
 	int const second = side ? m_arena_start : m_arena_end;
-	int const end = (second >= first) ? second : 256;
-	auto const [xoffset, yoffset] = picture_offset();
-	return rectangle(first * m_video_hres_scale - xoffset, end * m_video_hres_scale - xoffset - 1,
+	auto const [xoffset, yoffset] = counter_offset();
+	// The fallback follows picture output, not the counter origin or the wider output raster.
+	int const end = (second >= first) ? (second * m_video_hres_scale - xoffset)
+			: (TILEMAP_WRAP_WIDTH * m_video_hres_scale - picture_offset().first);
+	return rectangle(first * m_video_hres_scale - xoffset, end - 1,
 			PICTURE_FIRST_ROW - yoffset, PICTURE_END_ROW - 1 - yoffset);
 }
 
@@ -511,6 +511,21 @@ auto superxavix_video_device::decode_pixel_layout(u8 flags) const -> pixel_layou
 	return xavix_video_device::decode_pixel_layout(flags);
 }
 
+int xavix_video_device::aligned_output_position(int clocks, int alignment_clocks, int sample_clocks)
+{
+	// Round towards the next alignment boundary, including negative positions.
+	int const position = clocks / alignment_clocks + int(clocks % alignment_clocks > 0);
+	return position * (alignment_clocks / sample_clocks);
+}
+
+bool superxavix_video_device::horizontal_reload_in_blanking(counter_config const &config) const
+{
+	u16 const reference = config.horizontal_reference;
+	int const position = reference & 0x07ff;
+	int const field_right = 0x0500 | m_video_timing_regs[TIMING_FIELD_RIGHT];
+	return BIT(reference, 11) && (position <= (config.horizontal_period >> 1)) && (position >= field_right);
+}
+
 int superxavix_video_device::output_clock_offset() const
 {
 	// Preserve the existing placement in the later paired-column mode until
@@ -518,59 +533,53 @@ int superxavix_video_device::output_clock_offset() const
 	if (BIT(m_graphics_mode, 0))
 		return 0;
 
-	auto const config = counter_parameters();
-	u16 const reference = config.horizontal_reference;
-	int const field_right = 0x0500 | m_video_timing_regs[TIMING_FIELD_RIGHT];
-	if (!BIT(reference, 11) || ((reference & 0x07ff) > (config.horizontal_period >> 1)) || ((reference & 0x07ff) < field_right))
+	counter_config const config = counter_parameters();
+	if (!horizontal_reload_in_blanking(config))
 		return 0;
 
 	int const field_left = get_u16le(&m_video_timing_regs[TIMING_FIELD_LEFT]);
 	// The first unblanked colour latch consumes the preceding even picture
 	// clock. Retain every two-clock sample from this common aperture origin.
-	return BIT(config.left + (config.horizontal_period >> 1) - (reference & 0x07ff) + field_left, 0);
+	return BIT(config.left + (config.horizontal_period >> 1) - (config.horizontal_reference & 0x07ff) + field_left, 0);
 }
 
 int superxavix_video_device::output_position(int clocks) const
 {
 	// The paired-column path keeps its former four-clock boundaries, doubled
 	// onto this finer output grid. Ordinary output retains half-column phase.
-	if (BIT(m_graphics_mode, 0))
-	{
-		int const position = clocks < 0 ? clocks / PAIRED_PIXEL_CLOCKS : (clocks + PAIRED_PIXEL_CLOCKS - 1) / PAIRED_PIXEL_CLOCKS;
-		return position * (PAIRED_PIXEL_CLOCKS / OUTPUT_PIXEL_CLOCKS);
-	}
-	return clocks < 0 ? clocks / OUTPUT_PIXEL_CLOCKS : (clocks + OUTPUT_PIXEL_CLOCKS - 1) / OUTPUT_PIXEL_CLOCKS;
+	int const alignment_clocks = BIT(m_graphics_mode, 0) ? PAIRED_PIXEL_CLOCKS : OUTPUT_PIXEL_CLOCKS;
+	return aligned_output_position(clocks, alignment_clocks, OUTPUT_PIXEL_CLOCKS);
 }
 
 int superxavix_video_device::output_origin(int clocks)
 {
 	// Stream-origin alignment shared by both graphics modes.
-	int const position = clocks < 0 ? clocks / OUTPUT_ORIGIN_CLOCKS : (clocks + OUTPUT_ORIGIN_CLOCKS - 1) / OUTPUT_ORIGIN_CLOCKS;
-	return position * (OUTPUT_ORIGIN_CLOCKS / OUTPUT_PIXEL_CLOCKS);
+	return aligned_output_position(clocks, OUTPUT_ORIGIN_CLOCKS, OUTPUT_PIXEL_CLOCKS);
+}
+
+std::pair<int, int> xavix_video_device::counter_offset() const
+{
+	// Counter comparisons use the fixed eight-clock raster reference.
+	counter_config const defaults = xavix_video_device::counter_parameters();
+	int const left = util::sext(defaults.left, 12);
+	int const xoffset = -aligned_output_position(PICTURE_OUTPUT_DELAY_CLOCKS - left, PICTURE_PIXEL_CLOCKS, PICTURE_PIXEL_CLOCKS);
+	return { xoffset, util::sext(defaults.top, 9) };
+}
+
+std::pair<int, int> superxavix_video_device::counter_offset() const
+{
+	// Counter comparisons and picture pixels share the local bitmap origin.
+	return picture_offset();
 }
 
 std::pair<int, int> xavix_video_device::picture_offset() const
 {
 	// Fixed picture origin on the rounded eight-clock output grid.
+	// TODO: Verify the provisional picture delay on earlier chips.
 	counter_config const defaults = xavix_video_device::counter_parameters();
 	int const left = util::sext(defaults.left, 12);
-	int const xoffset = -((PICTURE_OUTPUT_DELAY_CLOCKS - left + PICTURE_PIXEL_CLOCKS - 1) / PICTURE_PIXEL_CLOCKS);
+	int const xoffset = -aligned_output_position(EARLY_PICTURE_OUTPUT_DELAY_CLOCKS - left, PICTURE_PIXEL_CLOCKS, PICTURE_PIXEL_CLOCKS);
 	return { xoffset, util::sext(defaults.top, 9) };
-}
-
-std::pair<int, int> xavix_video_device::render_offset() const
-{
-	return { 0, 0 };
-}
-
-std::pair<int, int> superxavix_video_device::render_offset() const
-{
-	bool const pal = m_video_standard == video_standard::PAL;
-	counter_config const defaults = xavix_video_device::counter_parameters();
-	// Picture Y reloads at the end of the preceding raster row.
-	int const row = defaults.vertical_reference - util::sext(defaults.top, 9) + 1
-			- int(pal && BIT(m_video_timing.half_lines, 0));
-	return { screen().visible_area().min_x, row - m_video_timing.vertical_origin };
 }
 
 std::pair<int, int> superxavix_video_device::picture_offset() const
@@ -580,10 +589,8 @@ std::pair<int, int> superxavix_video_device::picture_offset() const
 	int const field_offset = BIT(m_video_timing.half_lines, 0) ? int(m_video_field_phase) - int(pal) : 0;
 	counter_config const defaults = xavix_video_device::counter_parameters();
 	int const default_top = util::sext(defaults.top, 9);
-	u16 const period = 0x0a80 | m_video_timing_regs[TIMING_HORIZONTAL_TOTAL];
-	u16 const reference = get_u16le(&m_video_position_regs[0]);
+	counter_config const config = counter_parameters();
 	int const field_left = get_u16le(&m_video_timing_regs[TIMING_FIELD_LEFT]);
-	int const field_right = 0x0500 | m_video_timing_regs[TIMING_FIELD_RIGHT];
 
 	// Position picture output relative to the programmed blanking edge.
 	// A late second-half reload leaves the remaining clocks before the next line
@@ -591,18 +598,34 @@ std::pair<int, int> superxavix_video_device::picture_offset() const
 	// TODO: Sample retained counters per line for active-display or unreachable
 	// references and write-to-reload latching. Verify the output delay and
 	// sampling phase in high-resolution modes.
-	if (!BIT(reference, 11) || ((reference & 0x07ff) > (period >> 1)) || ((reference & 0x07ff) < field_right))
+	if (!horizontal_reload_in_blanking(config))
 		return { 0, field_offset };
 
-	int const remaining_clocks = (period >> 1) - (reference & 0x07ff);
-	int const xclocks = util::sext(get_u16le(&m_video_position_regs[4]) + remaining_clocks + field_left + output_clock_offset() - PICTURE_OUTPUT_DELAY_CLOCKS, 12);
-	u16 const vertical_reference = get_u16le(&m_video_position_regs[2]);
+	int const remaining_clocks = (config.horizontal_period >> 1) - (config.horizontal_reference & 0x07ff);
+	int const xclocks = util::sext(config.left + remaining_clocks + field_left + output_clock_offset() - PICTURE_OUTPUT_DELAY_CLOCKS, 12);
 	int yoffset = field_offset;
-	if (vertical_reference < defaults.vertical_reference - default_top + PICTURE_FIRST_ROW)
-		yoffset += util::sext(get_u16le(&m_video_position_regs[6]) - default_top + defaults.vertical_reference - vertical_reference, 9);
+	if (config.vertical_reference < defaults.vertical_reference - default_top + PICTURE_FIRST_ROW)
+		yoffset += util::sext(config.top - default_top + defaults.vertical_reference - config.vertical_reference, 9);
 
 	// Round the source offset down so each edge starts at the next output sample.
 	return { -output_origin(-xclocks), yoffset };
+}
+
+std::pair<int, int> xavix_video_device::render_offset() const
+{
+	// Earlier chips render directly in screen raster coordinates.
+	return { 0, 0 };
+}
+
+std::pair<int, int> superxavix_video_device::render_offset() const
+{
+	// Place the local picture bitmap within the screen raster.
+	bool const pal = m_video_standard == video_standard::PAL;
+	counter_config const defaults = xavix_video_device::counter_parameters();
+	// Picture Y reloads at the end of the preceding raster row.
+	int const row = defaults.vertical_reference - util::sext(defaults.top, 9) + 1
+			- int(pal && BIT(m_video_timing.half_lines, 0));
+	return { screen().visible_area().min_x, row - m_video_timing.vertical_origin };
 }
 
 //-------------------------------------------------
