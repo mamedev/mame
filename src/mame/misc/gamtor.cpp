@@ -999,6 +999,169 @@ TIMER_CALLBACK_MEMBER(jcm_wba_device::step)
 
 namespace {
 
+// SND-1: AGI custom sound chip at 0x1e040000 (CoolFire I "Gaminator" audio path), modelled from the firmware only
+// (no chip documentation exists in the collected manuals):
+// - The kernel registers a level 4 handler (0x2e7e874, pea'd at 0x2e7e940) that reads bit 6 of the base register and,
+//   when set, feeds the chip: $4(reg) <- obj->$6c (next CPU address), (reg) <- obj->$20 >> 2 + 0xb0000000.
+// - The programming path (0x2e7ea92 block, runs when the strap at 0x8003464 != 1; the log shows the writes) writes
+//   $4(reg) <- obj->$24 (buffer start in CPU RAM) and (reg) <- (obj->$20 >> 2) + 0xb0000000.
+//   Interpretation: bit 31 set = DMA armed/active (the sound self-test at 0x2e8a880 writes the descriptor then polls
+//   bit 31 of the base register), the low bits carry the buffer size in words, and +4 is the source address register
+//   the chip's DMA reads from. A write of 0 to the base register stops the DMA (boot: "unmapped write to 1E040000 = 00000000").
+// - The buffer content is 32-bit packed stereo (the mixer at 0x2e7e254 accumulates L<<16 | R, 16-bit signed per channel,
+//   with a /4 gain: asr.l #2 on both channels), so the chip streams 16-bit stereo samples from CPU RAM.
+// - $8(reg) is written by the kernel input driver with the strap/test masks (0xfffffeff / 0x7ffffeff); function unknown,
+//   stored and returned as-is (it reads back in the self-test poll).
+// - The sample rate is a hardware constant the firmware never programs. CoolFire sound is commonly 44100 Hz; the
+//   device makes it a clock-derived configuration so it can be corrected from a measurement on the real cabinet.
+class gamtor_snd_device : public device_t, public device_sound_interface
+{
+public:
+	gamtor_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 44100);
+
+	// map helpers for the driver
+	u32 reg_r(offs_t offset, u32 mem_mask);
+	void reg_w(offs_t offset, u32 data, u32 mem_mask);
+	// status bits for the combined base-register read (bit 31 active, bit 6 refill request)
+	u32 status_r() { return (m_armed ? 0x80000000u : 0u) | (m_armed && m_size != 0 && m_total >= (m_size / 2) ? 0x40u : 0u); }
+
+	auto irq_bind() { return m_irq_cb.bind(); }
+	// late binding of the ColdFire program space (the chip's DMA source): called from the driver's machine_start
+	void set_dma_space(address_space &space) { m_dspace = &space; }
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void sound_stream_update(sound_stream &stream) override;
+
+private:
+	devcb_write_line m_irq_cb;
+
+	address_space *m_dspace = nullptr;
+
+	sound_stream *m_stream = nullptr;
+
+	bool m_armed = false;
+	u32 m_size = 0;          // descriptor low bits (words), from (data & 0x3fffffff)
+	u32 m_sar = 0;           // +4: source address in CPU RAM (byte address)
+	u32 m_mask = 0;          // +8: kernel strap/test mask, stored verbatim
+	u32 m_total = 0;        // frames consumed since arm
+	u32 m_reg8 = 0;          // last written +8 value
+};
+
+DEFINE_DEVICE_TYPE(GAMTOR_SND, gamtor_snd_device, "gamtor_snd", "AGI CoolFire sound chip")
+
+gamtor_snd_device::gamtor_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, GAMTOR_SND, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_irq_cb(*this)
+{
+}
+
+void gamtor_snd_device::device_start()
+{
+	// The chip streams from CPU RAM through its own DMA; sample rate is fixed by the board crystal.
+	// 44100 Hz assumed pending a real-hardware measurement (the firmware never programs a rate).
+	m_stream = stream_alloc(0, 2, 44100);
+
+	// resolve the ColdFire program space at config time via the driver (see set_dma_space)
+
+	save_item(NAME(m_armed));
+	save_item(NAME(m_size));
+	save_item(NAME(m_sar));
+	save_item(NAME(m_mask));
+	save_item(NAME(m_total));
+	save_item(NAME(m_reg8));
+}
+
+void gamtor_snd_device::device_reset()
+{
+	m_armed = false;
+	m_size = 0;
+	m_sar = 0;
+	m_mask = 0;
+	m_total = 0;
+	m_reg8 = 0;
+}
+
+u32 gamtor_snd_device::reg_r(offs_t offset, u32 mem_mask)
+{
+	switch (offset * 4)
+	{
+	case 0x00:
+		// bit 31: DMA armed/active (the self-test polls this); bit 6: FIFO refill request (the L4 handler reads it)
+	{
+		u32 data = m_armed ? 0x80000000 : 0;
+		// refill request once the chip has consumed at least half of the buffer since the last
+		// re-arm (the kernel ISR refills the half just played and re-arms with the same descriptor)
+		if (m_armed && m_size != 0 && m_total >= (m_size / 2))
+			data |= 0x40;
+		return data;
+	}
+	case 0x04:
+		return m_sar;
+	case 0x08:
+		return m_reg8;
+	}
+	return 0;
+}
+
+void gamtor_snd_device::reg_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	switch (offset * 4)
+	{
+	case 0x00:
+		if (data == 0)
+		{
+			// stop (boot does this)
+			m_armed = false;
+			m_total = 0;
+		}
+		else
+		{
+			// descriptor (re-arm): size in words in the low bits, bit 31 may be set by the descriptor form itself
+			m_size = data & 0x3fffffff;
+			m_armed = true;
+			m_total = 0;
+		}
+		break;
+	case 0x04:
+		m_sar = data;
+		break;
+	case 0x08:
+		m_reg8 = data;
+		break;
+	}
+}
+
+void gamtor_snd_device::sound_stream_update(sound_stream &stream)
+{
+	const int samples = stream.samples();
+	for (int i = 0; i < samples; i++)
+	{
+		stream.put_int_clamp(0, i, 0, 32768);
+		stream.put_int_clamp(1, i, 0, 32768);
+	}
+	if (!m_armed || m_size == 0)
+		return;
+
+	// the chip reads the packed stereo word at SAR + 4*consumed, looping within the descriptor size;
+	// crossing a half-buffer boundary latches the refill request (bit 6) and raises the level 4 line
+	const u32 half = m_size / 2;
+	for (int i = 0; i < samples; i++)
+	{
+		const u32 idx = m_total % m_size;
+		const u32 w = m_dspace->read_dword(m_sar + idx * 4);
+		stream.put_int_clamp(0, i, s16(w >> 16), 32768);
+		stream.put_int_clamp(1, i, s16(w), 32768);
+		m_total++;
+		if (half && m_total % half == 0)
+			m_irq_cb(1);
+	}
+}
+
+
+
 class gaminator_state : public driver_device
 {
 public:
@@ -1011,6 +1174,8 @@ public:
 		, m_out(*this, "out%u", 0U)
 		, m_door(*this, "DOOR")
 		, m_hopper(*this, "hopper")
+		, m_snd(*this, "snd")
+		, m_sys(*this, "SYS")
 	{ }
 
 	void init_gaminator();
@@ -1037,6 +1202,11 @@ private:
 	void gaminator_map(address_map &map) ATTR_COLD;
 
 	void gamtor_unk_w(uint32_t data);
+	// SND-1: base register of the AGI sound chip. Read: the SYS input port with the chip status bits OR-ed in
+	// (bit 31 DMA active, bit 6 FIFO refill request - the kernel reads inputs 0x40-0x5f from here XOR 0x60, and the
+	// L4 handler polls bit 6 directly). Write: descriptor (0 = stop, else size in words in the low bits = re-arm).
+	u32 snd_base_r();
+	void snd_base_w(u32 data);
 	uint32_t inputs_r(offs_t offset) { return m_in[offset]->read(); }
 	void outputs_w(offs_t offset, u32 data, u32 mem_mask)
 	{
@@ -1048,7 +1218,14 @@ private:
 			m_hopper->motor_w(BIT(m_outlatch[2], 4)); // out 24: hopper 0 motor
 	}
 
-	virtual void machine_start() override ATTR_COLD { std::fill(std::begin(m_outlatch), std::end(m_outlatch), 0); save_item(NAME(m_outlatch)); }
+	virtual void machine_start() override ATTR_COLD
+	{
+		std::fill(std::begin(m_outlatch), std::end(m_outlatch), 0);
+		save_item(NAME(m_outlatch));
+		// SND-1: give the sound chip the ColdFire program space pointer (late binding, config-time finders
+		// cannot reach a sibling device's space from a non-child device)
+		m_snd->set_dma_space(m_maincpu->space(0));
+	}
 
 	required_device<mcf5206e_device> m_maincpu;
 	required_device<i2cmem_device> m_seeprom;
@@ -1057,11 +1234,23 @@ private:
 	output_finder<64> m_out;
 	required_ioport m_door;
 	required_device<mc_mk4_hopper_device> m_hopper;
+	required_device<gamtor_snd_device> m_snd;
+	required_ioport m_sys;
 	u16 m_outlatch[4];
 };
 
-void gaminator_state::gamtor_unk_w(uint32_t data)
+u32 gaminator_state::snd_base_r()
 {
+	// IO-1: the SYS port bits (logical inputs 0x40-0x5f read this register XOR 0x60), combined with the
+	// chip status bits the kernel measures directly (L4 handler: bit 6; self-test 0x2e8a880: bit 31).
+	u32 data = m_sys->read();
+	data |= m_snd->status_r();
+	return data;
+}
+
+void gaminator_state::snd_base_w(u32 data)
+{
+	m_snd->reg_w(0, data, 0xffffffff);
 }
 
 
@@ -1083,8 +1272,12 @@ void gaminator_state::gaminator_map(address_map &map)
 	// IO-2: the kernel's output driver (0x6ee54 set, 0x6eebc clear) keeps one 16-bit shadow word per group and
 	// writes it with move.w to 0x1c070000 + ((n >> 2) & 0x0c), i.e. on D31-D16, 1 = output n on
 	map(0x1c070000, 0x1c07000f).w(FUNC(gaminator_state::outputs_w));
-	map(0x1e040000, 0x1e040003).portr("SYS"); // IO-1
-	map(0x1e040008, 0x1e04000b).w(FUNC(gaminator_state::gamtor_unk_w));
+	// SND-1: the AGI sound chip. +0 descriptor/sts (W: size|arm, R: bit31 active, bit6 refill), +4 SAR (CPU address
+	// the chip DMA reads), +8 strap/test mask register.
+	// The 0x40-0x5f logical inputs read the base register XOR 0x60 (kernel 0x6ef80), so the input view and the
+	// chip status share the register; the state combines them (chip status on the measured bits, SYS port on the rest).
+	map(0x1e040000, 0x1e040003).rw(FUNC(gaminator_state::snd_base_r), FUNC(gaminator_state::snd_base_w));
+	map(0x1e040004, 0x1e04000b).rw(m_snd, FUNC(gamtor_snd_device::reg_r), FUNC(gamtor_snd_device::reg_w));
 
 	// SRAM-1: CS2 (CSAR2 0x2000, CSMR2 0x0fff0000, CSCR2 0x0d5b = 3 WS, AA, 8-bit port) holds the two battery-backed
 	// CS18LV10245 128K x 8 SRAMs (main PCB, see the header), 256KB in all. The kernel tests 0x40000 bytes from
@@ -1219,7 +1412,12 @@ void gaminator_state::gaminator(machine_config &config)
 	vga2.set_vram_size(0x200000);
 
 	SPEAKER(config, "speaker", 2).front();
-	// unknown sound
+	// SND-1: AGI custom sound chip at 0x1e040000. The kernel's level 4 handler (0x2e7e874) is registered for the
+	// chip's refill request (bit 6 of the base register), so the IRQ line reaches the ColdFire on level 4.
+	gamtor_snd_device &snd(GAMTOR_SND(config, "snd"));
+	snd.irq_bind().set_inputline(m_maincpu, 4);
+	snd.add_route(0, "speaker", 1.0, 0);
+	snd.add_route(1, "speaker", 1.0, 1);
 
 	RTC72423(config, "rtc", XTAL(32'768)); // Fake crystal value, the 72423 uses its own internal crystal
 
