@@ -74,20 +74,13 @@
     Preliminary (MACHINE_NOT_WORKING).
 
     The AVR8 core causes these known issues with Arduboy software:
-    - Timer 0 carry-over behavior is not correct, which affects
-      micros() and other Arduino APIs depending on it, like delay().
-      This causes delay() to return instantly.
-    - The speaker is usually driven by Timer 3. When games try to play sounds, they
-      either play no sound at all, or they try to set up timer 3 in such a way
-      that an interrupt fires. When that happens, execution ends up in the middle of an
-      interrupt vector, then falls through to whatever jump is below it,
-      which typically reboots.
+    - Timers 3 and 4 are not implemented, so games that should play music usually won't.
+      The missing timers can cause other issues too; for example, ABsynth FM freezes immediately.
     - The Arduboy FX needs the spm opcode and all related functionality to be implemented.
       If it isn't there, then the menu will crash or hang when you try to load a game.
 
-    Games based off the Arduboy2 library can work and are somewhat playable.
-    This may be because they use the sleep opcode instead of relying on
-    specific timer values.
+    Many games are working to an extent and are even playable. However,
+    until all issues above are addressed, the driver is to be left as MNW.
 
 ****************************************************************************/
 
@@ -102,11 +95,6 @@
 #include "video/ssd1306.h"
 
 #include "speaker.h"
-
-// this hack is here for testing/development in THIS DRIVER ONLY!
-// enabling this for production could cause confusion with other
-// Arduino-based systems, which will have the incorrect delay() behavior.
-#define DELAY_HACK_ENABLE (0)
 
 namespace {
 
@@ -148,10 +136,6 @@ private:
 	void port_f_w(uint8_t data);
 
 	uint8_t intflash_r(offs_t offset);
-
-#if DELAY_HACK_ENABLE
-	void apply_delay_sleep_hack();
-#endif
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gameprg_load);
 
@@ -196,9 +180,6 @@ void arduboy_state::machine_reset()
 		// - the Arduboy FX flashcart menu/loader overwrites 0...n bytes
 		//   containing the game; all others up until 0x7800 persist.
 		memcpy(m_internal_flash, m_cart->get_rom_base(), m_cart->get_rom_size());
-#if DELAY_HACK_ENABLE
-		apply_delay_sleep_hack();
-#endif
 	}
 }
 
@@ -350,82 +331,6 @@ void arduboy_state::arduboy(machine_config &config)
 	m_cart->set_must_be_loaded(true);
 	m_cart->set_device_load(FUNC(arduboy_state::gameprg_load));
 }
-
-#if DELAY_HACK_ENABLE
-
-// There is a bug somewhere that causes the Arduino delay() function and its
-// variants to return immediately instead of properly delaying.
-// This looks for the delay() function and replaces it with a "sleep" opcode,
-// which should hack around this limitation for the time being.
-void arduboy_state::apply_delay_sleep_hack()
-{
-	const uint8_t delay_pattern[] =
-	{
-		0x8f, 0x92, // push r8
-		0x9f, 0x92, // push r9
-		0xaf, 0x92, // push r10
-		0xbf, 0x92, // push r11
-		0xcf, 0x92, // push r12
-		0xdf, 0x92, // push r13
-		0xef, 0x92, // push r14
-		0xff, 0x92, // push r15
-	};
-
-	// compiled from the C++:
-	//
-	//   for (unsigned long i = 0; i < ms; i++)
-	//   {
-	//     SMCR = _BV(SE);
-	//     sleep_cpu();
-	//     SMCR = 0;
-	//   }
-	const uint8_t delay_replacement[] =
-	{
-		0xcf, 0x92,           // push       R12
-		0xdf, 0x92,           // push       R13
-		0xef, 0x92,           // push       R14
-		0xff, 0x92,           // push       R15
-		0xc1, 0x2c,           // mov        R12,R1
-		0xd1, 0x2c,           // mov        R13,R1
-		0x76, 0x01,           // movw       R15R14,R13R12
-		0x21, 0xe0,           // ldi        R18,0x1
-		//  LAB_code_0317
-		0x23, 0xbf,           // out        DAT_mem_0053,R18
-		0x88, 0x95,           // sleep
-		0x13, 0xbe,           // out        DAT_mem_0053,R1
-		0x3f, 0xef,           // ser        R19
-		0xc3, 0x1a,           // sub        R12,R19
-		0xd3, 0x0a,           // sbc        R13,R1
-		0xe3, 0x0a,           // sbc        R14,R19
-		0xf3, 0x0a,           // sbc        R15,R19
-		0x6c, 0x15,           // cp         R22,R12
-		0x7d, 0x05,           // cpc        R23,R13
-		0x8e, 0x05,           // cpc        R24,R14
-		0x9f, 0x05,           // cpc        R25,R15
-		0x99, 0xf7,           // brbc       LAB_code_0317,Zflg
-		0xff, 0x90,           // pop        R15
-		0xef, 0x90,           // pop        R14
-		0xdf, 0x90,           // pop        R13
-		0xcf, 0x90,           // pop        R12
-		0x08, 0x95,           // ret
-	};
-
-	for (int i = 0; i < 0x6000-sizeof(delay_pattern); i++)
-	{
-		// searching for pushes to r8-r15, then a couple of instructions later,
-		// the call to micros()
-		if (!memcmp(m_internal_flash + i, delay_pattern, sizeof(delay_pattern)) &&
-			m_internal_flash[i+sizeof(delay_pattern)+4] == 0x0e)
-		{
-			logerror("applying delay() hack at %04x\n", i);
-			memcpy(m_internal_flash + i, delay_replacement, sizeof(delay_replacement));
-			return;
-		}
-	}
-
-	logerror("delay() hack NOT applied.\n");
-}
-#endif
 
 #define PARSE_HEX(xin, xout) { \
 	if ('0' <= xin && xin <= '9') \
