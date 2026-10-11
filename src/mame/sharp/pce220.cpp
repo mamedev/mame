@@ -498,22 +498,13 @@ void pce220_state::irq_ack_w(uint8_t data)
 {
 	m_irq_flag &= ~data;
 
-	// Writing a 1 to a bit of port 16h acknowledges that interrupt source,
-	// so release its request line too. Previously only the status flag was
-	// cleared and the timer line stayed asserted until port 14h was written.
-	// The ROM's IM1 handler (0038h -> BC37h -> B9B9h) only acks via
-	// OUT (16h),7Fh/FFh + EI/RETI, so any machine-code program running with
-	// interrupts enabled that doesn't touch port 14h itself got stuck
-	// re-entering the handler forever after the first timer tick (~468 ms).
-	// BASIC only survived because its idle loop happens to write port 14h.
-	// m_timer_status (port 14h bit 0) is deliberately left alone: the ROM
-	// still polls and acks that flag separately (COM1: timeouts).
-	if (BIT(data, 0))
-		m_input_merger->in_w<0>(CLEAR_LINE);    // keyboard
-	if (BIT(data, 1))
-		m_input_merger->in_w<1>(CLEAR_LINE);    // ON key
-	if (BIT(data, 2))
-		m_input_merger->in_w<2>(CLEAR_LINE);    // timer
+	// acknowledge interrupts
+	if (data & IRQ_FLAG_KEY)
+		m_input_merger->in_w<0>(CLEAR_LINE);
+	if (data & IRQ_FLAG_ON)
+		m_input_merger->in_w<1>(CLEAR_LINE);
+	if (data & IRQ_FLAG_TIMER)
+		m_input_merger->in_w<2>(CLEAR_LINE);
 }
 
 void pce220_state::irq_mask_w(uint8_t data)
