@@ -3562,16 +3562,15 @@ void hyperstone_device::generate_set(drcuml_block &block, compiler_state &compil
 	{
 		if (n == 0)
 		{
-			int no_low_bit = compiler.next_label();
 			UML_MOV(block, I1, mem(&m_core->global_regs[SP_REGISTER]));
+			UML_MOV(block, I2, DRC_SR);
 			UML_AND(block, I0, I1, 0xfffffe00);
-			UML_ROLINS(block, I0, DRC_SR, 32 - FP_SHIFT + 2, 0x000001fc);
-			UML_TEST(block, I1, 0x100);
-			UML_JMPc(block, uml::COND_Z, no_low_bit);
-			UML_TEST(block, DRC_SR, 0x80000000);
-			UML_JMPc(block, uml::COND_NZ, no_low_bit);
-			UML_OR(block, I0, I0, 1);
-			UML_LABEL(block, no_low_bit);
+			UML_ROLINS(block, I0, I2, 32 - FP_SHIFT + 2, 0x000001fc);
+			UML_SHR(block, I2, I2, 31 - 8);
+			UML_XOR(block, I2, I2, 0xffffffff);
+			UML_AND(block, I1, I1, I2);
+			UML_ROLAND(block, I1, I1, 1, 0x00000200);
+			UML_ADD(block, I0, I0, I1);
 		}
 		else if (n >= 2)
 		{

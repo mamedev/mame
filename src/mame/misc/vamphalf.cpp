@@ -40,8 +40,6 @@
  Mr Kicker: Doesn't boot without a valid default EEPROM, but no longer seems to fail
             after you get a high score (since EEPROM rewrite).
 
- Boong-Ga Boong-Ga: the test mode is usable with a standard input configuration like the "common" one
-
  The Semicom boards (at least) have a strange visible area, with the display output cutting off 4 lines
  before you'd expect.  It has been confirmed on real hardware that these lines are simply never output,
  no amount of stretching the screen renders them as visible.  The games are also programmed around this
@@ -1033,7 +1031,7 @@ static INPUT_PORTS_START( boonggab )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor 1
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor 2
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor 3
-	PORT_BIT( 0x3800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(vamphalf_state::boonggab_photo_sensors_r)) // photo sensors 1, 2 and 3
+	PORT_BIT( 0x3800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(vamphalf_state::boonggab_photo_sensors_r)) // photo sensors 1, 2 and 3
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -2869,7 +2867,7 @@ ROM_START( mrkickera )
 	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "at27c040.u7", 0x000000, 0x080000, CRC(e8141fcd) SHA1(256fd1987030e0a1df0a66a228c1fea996cda686) ) /* Mask ROM */
 
-	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* Default EEPROM (it doesn't boot without and the game code crashes) (game also refuses to boot if program attempts to rewrite it, CPU bug or protection?) */
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* Default EEPROM */
 	ROM_LOAD( "eeprom-mrkicker.bin", 0x0000, 0x0080, CRC(87afb8f7) SHA1(444203b793c1d7929fc5916f18b510198719cd38) )
 ROM_END
 
@@ -3255,11 +3253,6 @@ void vamphalf_qdsp_state::init_yorijori()
 	m_semicom_prot_data[0] = 2;
 	m_semicom_prot_data[1] = 3;
 
-	u8 *romx = (u8 *)memregion("maincpu")->base();
-	// HACK: prevent code dying after a trap 33 by patching it out
-	romx[BYTE4_XOR_BE(0x8ff0)] = 3;
-	romx[BYTE4_XOR_BE(0x8ff1)] = 0;
-
 	// Configure the QS1000 ROM banking. Care must be taken not to overlap the 256b internal RAM
 	m_qdsp_cpu->space(AS_DATA).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
 	m_qs1000_bank->configure_entries(0, 16, memregion("qs1000:cpu")->base() + 0x100, 0x8000-0x100);
@@ -3469,7 +3462,7 @@ GAME( 2001, dtfamily,   0,        mrkicker,  common,    vamphalf_state,       in
 GAME( 2001, finalgdr,   0,        finalgdr,  finalgdr,  vamphalf_nvram_state, init_finalgdr,  ROT0,   "SemiCom",                       "Final Godori (Korea, version 2.20.5915)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 2001, mrkicker,   0,        mrkicker,  common,    vamphalf_state,       init_mrkicker,  ROT0,   "SemiCom",                       "Mr. Kicker (F-E1-16-010 PCB)",  MACHINE_SUPPORTS_SAVE )
-GAME( 2001, mrkickera,  mrkicker, mrkickera, finalgdr,  vamphalf_nvram_state, init_mrkickera, ROT0,   "SemiCom",                       "Mr. Kicker (SEMICOM-003b PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // if you allow EEPROM saving, then this set corrupts the EEPROM and then won't boot
+GAME( 2001, mrkickera,  mrkicker, mrkickera, finalgdr,  vamphalf_nvram_state, init_mrkickera, ROT0,   "SemiCom",                       "Mr. Kicker (SEMICOM-003b PCB)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 2001, toyland,    0,        coolmini,  common,    vamphalf_state,       init_toyland,   ROT0,   "SemiCom",                       "Toy Land Adventure", MACHINE_SUPPORTS_SAVE )
 
@@ -3481,4 +3474,4 @@ GAME( 2001, aoh,        0,        aoh,       aoh,       vamphalf_state,       in
 
 GAME( 2001, boonggab,   0,        boonggab,  boonggab,  vamphalf_state,       init_boonggab,  ROT270, "Taff System",                   "Boong-Ga Boong-Ga (Spank'em!)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2002, yorijori,   0,        yorijori,  yorijori,  vamphalf_qdsp_state,  init_yorijori,  ROT0,   "Golden Bell Entertainment",     "Yori Jori Kuk Kuk", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ROM patch needed to boot
+GAME( 2002, yorijori,   0,        yorijori,  yorijori,  vamphalf_qdsp_state,  init_yorijori,  ROT0,   "Golden Bell Entertainment",     "Yori Jori Kuk Kuk", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
