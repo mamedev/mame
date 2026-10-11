@@ -899,7 +899,7 @@ u32 xavix_video_device::advance_video_noise_state(u32 state, u64 clocks) const
 	constexpr unsigned bits = sizeof(decltype(m_video_noise_feedback)) * 8;
 	constexpr u32 mask = make_bitmask<u32>(bits);
 	u32 const feedback = get_u24le(m_video_noise_feedback);
-	auto const clock = [feedback, mask] (u32 value)
+	auto const clock = [feedback] (u32 value)
 	{
 		return ((value >> 1) ^ (BIT(value, 0) ? feedback : 0)) & mask;
 	};
