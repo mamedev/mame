@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Technics SX-WSA1 / SX-WSA1R floppy disks.
+
+Sound, combination and song library disks for the WSA1 keyboard and WSA1R rack,
+which share the same hardware and disks.  The WSA1 writes PC-FAT HD diskettes; the
+data survives as the instrument's own files copied off real disks (no original
+diskette has been dumped), so these images are faithful FAT12 reconstructions built
+from those files (native data plus the .MID demo songs), which a dump of an original
+could supersede.  Publishers: Technics for the factory Sound Library disks, MIDISM
+(Taito Musikinstrumente GmbH) for the two third-party disks, unknown for the user sets.
+-->
+<softwarelist name="wsa1_flop" description="Technics SX-WSA1 / SX-WSA1R disks">
+
+	<software name="dance">
+		<description>Dance &amp; Contemporary 1</description>
+		<year>1996</year>
+		<publisher>Technics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="dance.img" size="1474560" crc="fe5121c8" sha1="42e4409cdfb9f327d2c0a69905e4028b9bd2eb95"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo1">
+		<description>Sound/Combination/Demo</description>
+		<year>1997</year>
+		<publisher>Technics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="demo1.img" size="1474560" crc="01f8e224" sha1="acae531c1ef750d2153a19a83dbc51ce4d36f0bc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="etec">
+		<description>E-tec</description>
+		<year>1997</year>
+		<publisher>Taito Musikinstrumente GmbH</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="etec.img" size="1474560" crc="34369d71" sha1="b647eda8aba42620db3185c4ea3934644cb75285"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="giontop">
+		<description>Get It On Top</description>
+		<year>1997</year>
+		<publisher>Taito Musikinstrumente GmbH</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="giontop.img" size="1474560" crc="c1dfbfb3" sha1="19c947ee8f3ddc2f5651b85c0226a97fcd3bb3fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcompos">
+		<description>Modern Set</description>
+		<year>199?</year>
+		<publisher>Technics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="mcompos.img" size="1474560" crc="3d2f6493" sha1="fcaa6cfddee7606ee132dcb1cd964c5c1997cfb3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qsdisk">
+		<description>QS Disk</description>
+		<year>1996</year>
+		<publisher>Technics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="qsdisk.img" size="1474560" crc="00710e1c" sha1="25647ca46a15b54e04afbf405b091b9d9f35b03d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="synth">
+		<description>Synth Textures 1</description>
+		<year>1996</year>
+		<publisher>Technics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="synth.img" size="1474560" crc="cff23af9" sha1="904d69c1c79a48e7a691180898bc76591a24ca30"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gjs1">
+		<description>GJS1 (user patches)</description>
+		<year>1997</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Geoff Stockham"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="gjs1.img" size="1474560" crc="4206e6e7" sha1="fa51c6d300801d7c322894cb57c3979b32814049"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="myset">
+		<description>User sound set</description>
+		<year>1997</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="author" value="Michael Kalverkamp"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="myset.img" size="1474560" crc="567408f9" sha1="0bf2cf2e5de6b304d91d679b592cd51dadb7224a"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
