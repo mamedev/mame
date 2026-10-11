@@ -66,7 +66,8 @@ license:CC0-1.0
 		<description>Hidden Wonders</description>
 		<year>2026</year>
 		<publisher>Desire</publisher>
-		<info name="usage" value="Requires a C1541."/>
+		<info name="usage" value="Remove the C1551 from the expansion slot (-exp &quot;&quot;)"/>
+		<sharedfeat name="iec8_default" value="c1541"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="hidden_wonders.d64" size="174848" crc="ae113f13" sha1="7c1182931d6f92a5abd207aef44efeb7f4325656"/>
@@ -79,7 +80,8 @@ license:CC0-1.0
 		<description>Return to Promised Land</description>
 		<year>2026</year>
 		<publisher>Section 31</publisher>
-		<info name="usage" value="Requires a SID card."/>
+		<sharedfeat name="exp_default" value="sid"/>
+		<sharedfeat name="iec8_default" value="c1541"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="174848">

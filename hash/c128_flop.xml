@@ -123,7 +123,7 @@ license:CC0-1.0
 		<description>Thai Boxing (alt)</description>
 		<year>1986</year>
 		<publisher>Anco</publisher>
-		<info name="usage" value="Only boots with a 1541 drive"/>
+		<sharedfeat name="iec8_default" value="c1541"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -555,11 +555,12 @@ Before loading FORMAT.128, disable automatic write verification with this comman
 		</part>
 	</software>
 
-	<software name="1581demo" supported="no">
+	<software name="1581demo">
 		<description>Commodore 1581 3.5" Disk Drive Demo/Utilities</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="354011-07" />
+		<sharedfeat name="iec8_default" value="c1581"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -584,6 +585,7 @@ Before loading FORMAT.128, disable automatic write verification with this comman
 		<description>Commodore 1700/1750 RAM Expansion Test/Demo Disk (v1.0)</description>
 		<year>1985</year>
 		<publisher>Commodore</publisher>
+		<sharedfeat name="exp_default" value="reu1750"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
@@ -744,6 +746,7 @@ Before loading FORMAT.128, disable automatic write verification with this comman
 		<year>198?</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="622-5002336" />
+		<sharedfeat name="iec8_default" value="c1581"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -805,6 +808,7 @@ Before loading FORMAT.128, disable automatic write verification with this comman
 		<description>LUnix Next Generation (v0.21, REU)</description>
 		<year>2004</year>
 		<publisher>LNG-Project</publisher>
+		<sharedfeat name="exp_default" value="reu1750"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -818,6 +822,7 @@ Before loading FORMAT.128, disable automatic write verification with this comman
 		<description>vdcmaniac (v1.0.2)</description>
 		<year>2026</year>
 		<publisher>xahmol</publisher>
+		<sharedfeat name="iec8_default" value="c1581"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -831,6 +836,7 @@ Before loading FORMAT.128, disable automatic write verification with this comman
 		<description>VDC Mode Mania (v1.2)</description>
 		<year>2023</year>
 		<publisher>Akronyme Analogiker</publisher>
+		<sharedfeat name="iec8_default" value="c1581"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -852,6 +858,7 @@ Before loading FORMAT.128, disable automatic write verification with this comman
 		<description>Pocket Writer 2</description>
 		<year>1986</year>
 		<publisher>Digital Solutions</publisher>
+		<sharedfeat name="iec8_default" value="c1581"/>
 		<sharedfeat name="compatibility" value="PAL,NTSC"/>
 
 		<part name="flop1" interface="floppy_5_25">

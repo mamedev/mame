@@ -1674,7 +1674,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 		<year>1983</year>
 		<publisher>Spinnaker Software</publisher>
 		<info name="serial" value="ABZ-C6" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -1770,7 +1770,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-001-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -2143,7 +2143,7 @@ Cannot select (s)ingle or (a)ll events, no key press recognized
 		<description>Donkey Kong</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -2184,7 +2184,7 @@ Cannot select (s)ingle or (a)ll events, no key press recognized
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64???" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -2668,7 +2668,7 @@ Some erratic chars in playfield [VIC] GFXMODE=1, fixes on soft reset
 Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fear"
 ]]></notes>
 		<info name="serial" value="C-64613" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3126,7 +3126,7 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-104-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3181,7 +3181,7 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-007-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3210,7 +3210,7 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-002-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
@@ -3228,7 +3228,7 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 Blue strips on title screen in place of tyres, mixes [VIC] GFXMODE=2 and 3
 Broken gameplay gfx, [VIC] GFXMODE=3
 ]]></notes>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3242,7 +3242,7 @@ Broken gameplay gfx, [VIC] GFXMODE=3
 		<description>Pitstop (alt)</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3257,7 +3257,7 @@ Broken gameplay gfx, [VIC] GFXMODE=3
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<info name="serial" value="RX8536" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3271,7 +3271,7 @@ Broken gameplay gfx, [VIC] GFXMODE=3
 		<description>Popeye</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3511,7 +3511,7 @@ Broken gameplay gfx, [VIC] GFXMODE=3
 		<notes><![CDATA[
 Glitchy [VIC] status bar GFXMODE switches on gameplay
 ]]></notes>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
@@ -4168,7 +4168,7 @@ Starts a 2 players game even if 1p is chosen?
 Erratic [VIC] collsion detection, warps and invincibility bonuses can kill player instead.
 ]]></notes>
 		<info name="serial" value="DC-101-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />

@@ -81,6 +81,7 @@ license:CC0-1.0
 		<description>GEOS 128 v2.0 (1581)</description>
 		<year>1999</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="iec8_default" value="c1581"/>
 		<part name="rom" interface="c128_rom">
 			<dataarea name="rom" size="0x8000">
 				<rom name="geos128am1581.bin" size="0x8000" crc="0790c2ea" sha1="3ba3902d47ac46f610dd58a1fec38fc1c0746fac"/>
@@ -92,6 +93,7 @@ license:CC0-1.0
 		<description>GEOS 128 v2.0 (1581) (Ger)</description>
 		<year>1999</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="iec8_default" value="c1581"/>
 		<part name="rom" interface="c128_rom">
 			<dataarea name="rom" size="0x8000">
 				<rom name="geos128ge1581.bin" size="0x8000" crc="1a60e07c" sha1="588bab588ad793b758cff26e68758065a42f15ea"/>

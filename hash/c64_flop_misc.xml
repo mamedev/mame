@@ -219,7 +219,8 @@ Laggy [joystick] fire button (half the times won't trigger)
 ]]></notes>
 
 		<sharedfeat name="compatibility" value="PAL"/>
-		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+		<sharedfeat name="exp_default" value="supercpu"/>
+		<sharedfeat name="iec8_default" value="c1581"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -256,7 +257,7 @@ Laggy [joystick] fire button (half the times won't trigger)
 		<publisher>Protovision</publisher>
 
 		<sharedfeat name="compatibility" value="PAL"/>
-		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+		<sharedfeat name="exp_default" value="supercpu"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3317760">
@@ -433,8 +434,8 @@ Hi-score table is corrupt (dump really?)
 		<description>SpeakEasy</description>
 		<year>1983</year>
 		<publisher>Personal Peripheral Products</publisher>
+		<sharedfeat name="exp_default" value="speakez"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		<sharedfeat name="requirement" value="c64_cart:speakez"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="speakeasy.d64" size="174848" crc="702cc20c" sha1="d9a19213809e2b51ee55fac9687b55bddaa86871"/>
@@ -693,6 +694,7 @@ Hi-score table is corrupt (dump really?)
 		<description>Commodore 1764 RAM Expansion Utility Disk</description>
 		<year>1987</year>
 		<publisher>Commodore</publisher>
+		<sharedfeat name="exp_default" value="reu1764"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="1764 RAM Expansion Utility Disk"/>
@@ -713,6 +715,7 @@ Hi-score table is corrupt (dump really?)
 		<description>Commodore 1351 Mouse Utility Disk</description>
 		<year>1986</year>
 		<publisher>Commodore</publisher>
+		<sharedfeat name="joy1_default" value="c1351"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Commodore 1351 Mouse Utility Disk"/>
@@ -733,7 +736,7 @@ Hi-score table is corrupt (dump really?)
 		<description>Professional-DOS - VTS Release Demo</description>
 		<year>1987</year>
 		<publisher>VTS Data</publisher>
-		<sharedfeat name="requirement" value="iec8:c1541pd"/>
+		<sharedfeat name="iec8_default" value="c1541pd"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
@@ -746,7 +749,7 @@ Hi-score table is corrupt (dump really?)
 		<description>ICT Hard-Disk Utilities v2</description>
 		<year>1987</year>
 		<publisher>InConTrol</publisher>
-		<sharedfeat name="requirement" value="iec8:minichief"/>
+		<sharedfeat name="iec8_default" value="minichief"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
@@ -928,6 +931,7 @@ Hi-score table is corrupt (dump really?)
 		<description>CMD SuperCPU Utilities</description>
 		<year>1990</year>
 		<publisher>CMD</publisher>
+		<sharedfeat name="exp_default" value="supercpu"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
@@ -940,6 +944,7 @@ Hi-score table is corrupt (dump really?)
 		<description>CMD SwiftLink</description>
 		<year>1990</year>
 		<publisher>CMD</publisher>
+		<sharedfeat name="exp_default" value="swiftlink"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 Side 1"/>
@@ -1172,6 +1177,7 @@ Hi-score table is corrupt (dump really?)
 		<description>LUnix Next Generation (v0.21, REU)</description>
 		<year>2004</year>
 		<publisher>LNG-Project</publisher>
+		<sharedfeat name="exp_default" value="reu1750"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1365,7 +1371,8 @@ Hi-score table is corrupt (dump really?)
 		<description>Crazy Demo</description>
 		<year>2024</year>
 		<publisher>Wyndex</publisher>
-		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+		<sharedfeat name="exp_default" value="supercpu"/>
+		<sharedfeat name="iec8_default" value="c1581"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
@@ -1621,8 +1628,8 @@ Hi-score table is corrupt (dump really?)
 		<notes><![CDATA[
 Requires a second SID at $D500
 ]]></notes>
+		<sharedfeat name="exp_default" value="supercpu"/>
 		<sharedfeat name="compatibility" value="PAL"/>
-		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
@@ -1649,8 +1656,8 @@ Requires a second SID at $D500
 		<description>SuperCPU Kicks!</description>
 		<year>1999</year>
 		<publisher>DMAgic</publisher>
+		<sharedfeat name="exp_default" value="supercpu"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
@@ -1676,7 +1683,7 @@ Requires a second SID at $D500
 		<description>SuperCPU Plasma Intro</description>
 		<year>2015</year>
 		<publisher>Genesis Project</publisher>
-		<sharedfeat name="requirement" value="c64_cart:supercpu"/>
+		<sharedfeat name="exp_default" value="supercpu"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">

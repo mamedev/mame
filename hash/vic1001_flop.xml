@@ -10,7 +10,7 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-3301" />
-		<info name="ram" value="16K" />
+		<sharedfeat name="exp_default" value="16k"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -23,6 +23,7 @@ license:CC0-1.0
 		<description>SimpliCalc (alt)</description>
 		<year>198?</year>
 		<publisher>Commodore Electronics Ltd.</publisher>
+		<sharedfeat name="exp_default" value="16k"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -37,7 +38,7 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-3304" />
-		<info name="ram" value="16K" />
+		<sharedfeat name="exp_default" value="16k"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -51,7 +52,7 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-3304" />
-		<info name="ram" value="16K" />
+		<sharedfeat name="exp_default" value="16k"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -64,6 +65,7 @@ license:CC0-1.0
 		<description>VicFile (alt 2)</description>
 		<year>1981</year>
 		<publisher>Commodore</publisher>
+		<sharedfeat name="exp_default" value="16k"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -77,6 +79,7 @@ license:CC0-1.0
 		<description>VicFile (alt 3)</description>
 		<year>1981</year>
 		<publisher>Commodore</publisher>
+		<sharedfeat name="exp_default" value="16k"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -91,7 +94,7 @@ license:CC0-1.0
 		<year>1981</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="VIC-3305" />
-		<info name="ram" value="8K" />
+		<sharedfeat name="exp_default" value="8k"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
@@ -104,6 +107,7 @@ license:CC0-1.0
 		<description>VicWriter (alt)</description>
 		<year>198?</year>
 		<publisher>Commodore Electronics Ltd.</publisher>
+		<sharedfeat name="exp_default" value="8k"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -157,7 +161,8 @@ license:CC0-1.0
 		<description>reVICion</description>
 		<year>2024</year>
 		<publisher>Desire</publisher>
-		<info name="ram" value="35K" />
+		<sharedfeat name="exp_default" value="32k"/>
+		<sharedfeat name="iec8_default" value="c1541"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
@@ -171,7 +176,7 @@ license:CC0-1.0
 		<description>Orb MegaDemo Delux</description>
 		<year>2016</year>
 		<publisher>Orb</publisher>
-		<info name="usage" value="mame vic20p -iec8 c1541 -flop omddelux"/>
+		<sharedfeat name="iec8_default" value="c1541"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
