@@ -88,9 +88,6 @@ int apollo_is_dsp3x00(void);
 // get the ram configuration byte
 uint8_t apollo_get_ram_config_byte(void);
 
-//apollo_get_node_id - get the node id
-uint32_t apollo_get_node_id(void);
-
 /*----------- machine/apollo.cpp -----------*/
 
 #define APOLLO_CONF_TAG "conf"
