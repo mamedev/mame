@@ -526,6 +526,8 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		m_k055673->m_k053247_cb(code, color, pri);
 
+		if (m_gx_obj_mixcode) color |= (k >> 8 & 3) << K055555_MIXSHIFT;
+
 		u8 shadow_draw_mode = 0; // shadow pens draw mode (4-5)
 		bool add_shadow = 0;          // add shadow object
 		u8 solid_draw_mode = 0;  // solid pens draw mode (0-3)
@@ -1169,6 +1171,7 @@ K056832_CB_MEMBER(konamigx_state::alpha_tile_callback)
 void konamigx_state::common_init()
 {
 	konamigx_mixer_init(*m_screen, 0);
+	m_gx_obj_mixcode = true;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -1515,7 +1518,8 @@ void konamigx_state::type1_draw_terrain(screen_device &screen)
 				}
 				continue;
 			}
-			for (int y = top; y < limit[x]; y++)
+			int const bottom = std::min(limit[x], ground + 1);
+			for (int y = top; y < bottom; y++)
 			{
 				m_type1_terrain->pix(y, x) = pen;
 				m_type1_terrain_priority->pix(y, x) = parameter;
@@ -1546,7 +1550,7 @@ void konamigx_state::type1_mix_terrain(bitmap_rgb32 &bitmap, const rectangle &cl
 	{
 		// Match the GX mixer's existing approximation for additive modes.
 		int const level = m_k054338->set_alpha_level((m & ~mix_mask) | mix_internal);
-		alpha[m] = (level & 0x100) ? (~level & 0xff) : (level & 0xff);
+		alpha[m] = level & 0xff;
 	}
 	pen_t const *const paldata = m_palette->pens();
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)

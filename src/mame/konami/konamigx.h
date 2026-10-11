@@ -290,6 +290,7 @@ protected:
 	// 2nd-Tier GX/MW Graphics Variables
 	std::unique_ptr<u8[]> m_gx_objzbuf;
 	std::unique_ptr<u8[]> m_gx_shdzbuf;
+	bool m_gx_obj_mixcode = false;
 	bool m_gx_topmost_on; // screen.priority() tracks the topmost screen's priority code, see gx_draw_deferred_shadows
 	s32 m_layer_colorbase[4]{};
 	s32 m_gx_tilebanks[8]{}, m_gx_oldbanks[8]{};

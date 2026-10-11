@@ -515,7 +515,13 @@ void konamigx_state::eeprom_w(offs_t offset, u32 data, u32 mem_mask)
 
 		// m_gx_syncen is to ensure each IRQ is triggered at least once after being enabled
 		if (m_gx_wrport1_1 & 0x80)
-			m_gx_syncen |= m_gx_wrport1_1 & 0x1f;
+		{
+			u8 arm = m_gx_wrport1_1 & 0x1f;
+			const int imask = (m_maincpu->state_int(M68K_SR) >> 8) & 7;
+			if (imask >= 1 && imask <= 3)
+				arm &= ~(1 << (imask - 1));
+			m_gx_syncen |= arm;
+		}
 	}
 }
 
@@ -601,7 +607,7 @@ TIMER_CALLBACK_MEMBER(konamigx_state::dmaend_callback)
 	m_gx_rdport1_3 &= ~2;
 
 	// IRQ 3 is the "object DMA end" IRQ also happens during vblank
-	if ((m_gx_wrport1_1 & 0x84) == 0x84 || (m_gx_syncen & 4))
+	if ((m_gx_wrport1_1 & 0x84) == 0x84 || ((m_gx_syncen & 4) && (m_gx_wrport1_1 & 0x80)))
 	{
 		m_gx_syncen &= ~4;
 
@@ -650,7 +656,7 @@ INTERRUPT_GEN_MEMBER(konamigx_state::konamigx_type2_vblank_irq)
 	{
 		m_gx_syncen &= ~0x20;
 
-		if ((m_gx_wrport1_1 & 0x81) == 0x81 || (m_gx_syncen & 1))
+		if ((m_gx_wrport1_1 & 0x81) == 0x81 || ((m_gx_syncen & 1) && (m_gx_wrport1_1 & 0x80)))
 		{
 			m_gx_syncen &= ~1;
 			// TODO: enabling ASSERT_LINE breaks opengolf, annoying.
@@ -671,7 +677,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type2_scanline)
 		{
 			m_gx_syncen &= ~0x40;
 
-			if ((m_gx_wrport1_1 & 0x82) == 0x82 || (m_gx_syncen & 2))
+			if ((m_gx_wrport1_1 & 0x82) == 0x82 || ((m_gx_syncen & 2) && (m_gx_wrport1_1 & 0x80)))
 			{
 				popmessage("HBlank IRQ enabled, contact MAMEdev");
 				m_gx_syncen &= ~2;
@@ -706,7 +712,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type4_scanline)
 		{
 			m_gx_syncen &= ~0x20;
 
-			if ((m_gx_wrport1_1 & 0x81) == 0x81 || (m_gx_syncen & 1))
+			if ((m_gx_wrport1_1 & 0x81) == 0x81 || ((m_gx_syncen & 1) && (m_gx_wrport1_1 & 0x80)))
 			{
 				m_gx_syncen &= ~1;
 				m_maincpu->set_input_line(1, HOLD_LINE);
@@ -723,7 +729,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type4_scanline)
 		{
 			m_gx_syncen &= ~0x40;
 
-			if ((m_gx_wrport1_1 & 0x82) == 0x82 || (m_gx_syncen & 2))
+			if ((m_gx_wrport1_1 & 0x82) == 0x82 || ((m_gx_syncen & 2) && (m_gx_wrport1_1 & 0x80)))
 			{
 				m_gx_syncen &= ~2;
 				m_maincpu->set_input_line(2, HOLD_LINE);
