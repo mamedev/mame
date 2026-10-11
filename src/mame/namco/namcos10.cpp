@@ -53,7 +53,7 @@ Puzz Ball (PZB1 Ver. C)                                                       (C
 *Puzz Cube                                                                    (C) Namco, 2005
 Seishun-Quiz Colorful High School (CHS1 Ver.A)                                (C) Namco, 2002
 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                                       (C) Namco, 2004
-Shamisen Brothers (KT-SB2 Ver.A + CDROM)                                      (C) Kato/Konami, 2003
+Shamisen Brothers (KT-SB2 Ver.A + CDROM)                                      (C) Kato, 2003
 Slot no Oujisama / Slot Prince (SLO1 Ver.A)                                   (C) Namco, 2003
 Slot no Oujisama / Slot Prince (SLO1 Ver.B)                                   (C) Namco, 2003
 Star Trigon (STT1 Ver.A)                                                      (C) Namco, 2002
@@ -2568,26 +2568,21 @@ void namcos10_memn_state::ns10_shamisen(machine_config &config)
 
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
-			0x0000b125bf5e61f1ULL, 0x000001e6f58e6f70ULL, 0x00001952ccf2adf4ULL, 0x000012508b5fc664ULL,
-			0x0000c1d200d2c7d5ULL, 0x00007017c046a564ULL, 0x000007af4ccaa184ULL, 0x0000fd243c75c158ULL,
-			0x00002e15e09eeb48ULL, 0x0000c2d43d5dab88ULL, 0x0000bc0b344d8b39ULL, 0x000033b7ce04ea59ULL,
-			0x0000a5641f152800ULL, 0x00007feabe9f9778ULL, 0x0000c1f7e64561d5ULL, 0x00005dd93026fbd1ULL,
+			0x0000dd7ca8800000ULL, 0x00000cc3e8884000ULL, 0x000056118a880000ULL, 0x0000ee587a000000ULL,
+			0x0000838832804000ULL, 0x0000480720800000ULL, 0x0000d85600800000ULL, 0x0000450620884000ULL,
+			0x000004c242080000ULL, 0x00001d3ff0804000ULL, 0x00001fe98a080000ULL, 0x0000c08d42004000ULL,
+			0x0000520580880000ULL, 0x00008602e0885000ULL, 0x0000692f32884000ULL, 0x0000988932801000ULL,
 		}, {
-			0x0000fad5dca36161ULL, 0x0000d4129a026f70ULL, 0x0000da5d0df3adf0ULL, 0x00000211fddb4664ULL,
-			0x00009e88fcddc7f1ULL, 0x0000f1493202a564ULL, 0x000040a4ffa3e184ULL, 0x0000ad9f4061c151ULL,
-			0x0000642dd736ea68ULL, 0x0000cf8ff2f5af08ULL, 0x000067c6a1358b39ULL, 0x0000343c383aea11ULL,
-			0x00006d0a1d140c00ULL, 0x000079d22b1b9538ULL, 0x00004e0187d441d5ULL, 0x000081e6e7216bd1ULL,
+			0x0000d44fa8a00090ULL, 0x00008846c0884000ULL, 0x0000c6ac98880004ULL, 0x0000e49af8008000ULL,
+			0x0000942b1b964024ULL, 0x0000080601a00000ULL, 0x0000c01720844000ULL, 0x00001e4c0d984009ULL,
+			0x0000804602080120ULL, 0x000014f408894480ULL, 0x000080370a2c0000ULL, 0x00004461e2024048ULL,
+			0x0000c22880882400ULL, 0x0000140700885240ULL, 0x0000206610c06000ULL, 0x00009e4812928000ULL,
 		},
-		0x1e35,
+		0x651b,
 		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
 		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
-			return ((previous_masks >> 7) & (gf2_reduce(previous_cipherwords & 0x0000820bb9dc2800ULL) ^ gf2_reduce(previous_plainwords & 0x000091d0bbd52800ULL) ^ 1) & 1) << 12;
-		},
-		[] (int iv) -> uint64_t
-		{
-			// the loader only ever initialises the decrypter once, with IV 0
-			return iv == 0 ? 0x0000000008256754ULL : 0;
+			return ((previous_masks >> 7) & (gf2_reduce(previous_cipherwords & 0x0000041408000000ULL) ^ gf2_reduce(previous_plainwords & 0x0000048408010000ULL) ^ 1) & 1) << 12;
 		},
 	});
 }
@@ -4522,7 +4517,7 @@ GAME( 2002, sugorotca, sugorotc, ns10_sugorotic, mgexio_medal, namcos10_memn_sta
 GAME( 2003, konotako,  0,        ns10_konotako,  konotako,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell",          "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, shamisen,  0,        ns10_shamisen,  shamisen,     namcos10_memn_state,  memn_driver_init, ROT0, "Kato / Konami",     "Shamisen Brothers (KT-SB2 Ver.A)", MACHINE_IMPERFECT_SOUND ) // PROGRAM 1.01K / Ver2.0 in test mode
+GAME( 2003, shamisen,  0,        ns10_shamisen,  shamisen,     namcos10_memn_state,  memn_driver_init, ROT0, "Kato",              "Shamisen Brothers (KT-SB2 Ver.A)", MACHINE_IMPERFECT_SOUND ) // PROGRAM 1.01K / Ver2.0 in test mode
 GAME( 2003, slotouji,  0,        ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // May 2 2003
 GAME( 2003, slotoujia, slotouji, ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
