@@ -65,12 +65,12 @@
 #include "bus/midi/midioutport.h"
 #include "cpu/mn10300/mn10300.h"
 #include "imagedev/floppy.h"
-#include "machine/input_merger.h"
 #include "machine/intelfsh.h"
 #include "machine/spi_sdcard.h"
 #include "machine/upd765.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "multibyte.h"
@@ -214,6 +214,7 @@ private:
 	u16 m_kbd_fifo[64];
 	u8 m_kbd_head = 0;
 	u8 m_kbd_tail = 0;
+
 	u16 m_tg_addr[2];
 	u16 m_tg_wave_bank[2];
 	u16 m_tg_wave_addr[2];
@@ -939,14 +940,15 @@ void kn_state::custom_flash_add(machine_config &config)
 
 void kn_state::fdc_add(machine_config &config)
 {
-	// IC103: a custom part (C1DB00000607) compatible with the N82077AA
+	// IC103: a custom part (C1DB00000607) compatible with the N82077AA. INTRQ goes to
+	// IRQ2, whose handler issues the Sense Interrupt Status that ends a seek; DRQ drives
+	// the on-chip DMA controller's channel 0, which moves the sector data through the FDC
+	// data port at 0x98010000 and pulses the controller's terminal count back to the FDC.
+	// (The schematic prints INTRQ as IRQ1, but the board wires it to IRQ2 - follow the wire.)
 	N82077AA(config, m_fdc, 24'000'000);
-	// INTRQ and DRQ share IRQ1: the firmware moves each sector byte through the
-	// DACK slot at 0x98010000 from its interrupt handler
-	input_merger_device &fdc_irq(INPUT_MERGER_ANY_HIGH(config, "fdc_irq"));
-	fdc_irq.output_handler().set_inputline(m_maincpu, mn10300_device::IRQ1);
-	m_fdc->intrq_wr_callback().set(fdc_irq, FUNC(input_merger_device::in_w<0>));
-	m_fdc->drq_wr_callback().set(fdc_irq, FUNC(input_merger_device::in_w<1>));
+	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(mn10300_device::dma_req_w));
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, mn10300_device::IRQ2);
+	m_maincpu->dma_tc_cb().set([this] (int state) { m_fdc->tc_w(state); });
 	FLOPPY_CONNECTOR(config, "fdc:0", kn_floppies, "35hd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 }
 
@@ -986,6 +988,7 @@ void kn_sd_state::kn7000(machine_config &config)
 	custom_flash_add(config);
 	fdc_add(config);
 	sd_add(config);
+	SOFTWARE_LIST(config, "flop_list").set_original("kn7000_flop");
 	config.set_default_layout(layout_kn7000);
 }
 
@@ -1073,13 +1076,48 @@ void kn_sd_state::kn2600(machine_config &config)
 ***************************************************************************/
 
 ROM_START(kn7000)
+	// The program (IC16/IC17) and table (same pair, A22 selects) flash are
+	// reconstructed from Panasonic's system-update floppies and verified against
+	// the checksums shipped on them (SMCK*.INF), except the SP7001 set (see below).
+	//
+	// Each version carries the PROGRAM and TABLE build numbers the instrument
+	// prints on its hidden SOFT VERSION screen:
+	//     sp7001  PROGRAM 942 / TABLE 83   Key Soft Service SD PLUG-iN
+	//     v16     PROGRAM 941 / TABLE 84   fully SMCK-verified
+	//     v15     PROGRAM 935 / TABLE 84   fully SMCK-verified
+	//     v14     PROGRAM 929 / TABLE 84   only update floppy 2 survives (floppy 1 NO_DUMP)
 	ROM_REGION32_LE(0x400000, "program", 0)
-	ROM_LOAD32_WORD("kn7000_program_even.ic17", 0x000000, 0x200000, CRC(529b87ce) SHA1(f198fd9a9ea31a454acfe7be0eb935beca6771b1))
-	ROM_LOAD32_WORD("kn7000_program_odd.ic16",  0x000002, 0x200000, CRC(a36e6222) SHA1(721d4469dc5f692f7a2c16c556b2e21115df19f6))
+	ROM_DEFAULT_BIOS("v16")
+
+	// Its SMCK checksum predates the final payload and does not match, so this set is
+	// declared as distributed rather than SMCK-verified.
+	ROM_SYSTEM_BIOS(0, "sp7001", "Program v1.6 PLUG-iN (build 942, SP7001 V1.0 2003-08-23) / Table (build 83)")
+	ROMX_LOAD("kn7000_program_even_sp7001_b942.ic17", 0x000000, 0x200000, CRC(4c91678f) SHA1(a436c851fe6514047b0c5496d394880a9894889c), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("kn7000_program_odd_sp7001_b942.ic16", 0x000002, 0x200000, CRC(7a7990ec) SHA1(3020ed66636674c67a456bfd8f2fb80a7196f2e1), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "v16", "Program v1.6 (build 941) / Table (build 84)")
+	ROMX_LOAD("kn7000_program_even_v1.6_b941.ic17", 0x000000, 0x200000, CRC(529b87ce) SHA1(f198fd9a9ea31a454acfe7be0eb935beca6771b1), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("kn7000_program_odd_v1.6_b941.ic16", 0x000002, 0x200000, CRC(a36e6222) SHA1(721d4469dc5f692f7a2c16c556b2e21115df19f6), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(2, "v15", "Program v1.5 (build 935) / Table (build 84)")
+	ROMX_LOAD("kn7000_program_even_v1.5_b935.ic17", 0x000000, 0x200000, CRC(b0e97495) SHA1(a3be879b855add10b9f4aa922e753593d3a48883), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
+	ROMX_LOAD("kn7000_program_odd_v1.5_b935.ic16", 0x000002, 0x200000, CRC(6f26836d) SHA1(aa9175097ae5e0d2395da1353702f24cf6c839a7), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(3, "v14", "Program v1.4 (build 929, floppy 1 undumped) / Table (build 84)")
+	ROMX_LOAD("kn7000_program_even_v1.4_b929_lower.ic17", 0x000000, 0x100000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
+	ROMX_LOAD("kn7000_program_odd_v1.4_b929_lower.ic16",  0x000002, 0x100000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
+	ROMX_LOAD("kn7000_program_even_v1.4_b929_upper.ic17", 0x200000, 0x100000, CRC(787d3781) SHA1(86c0dc56e7b7671e83bf59ff6b88feebe2f55b5c), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
+	ROMX_LOAD("kn7000_program_odd_v1.4_b929_upper.ic16",  0x200002, 0x100000, CRC(5f951af4) SHA1(1752a82e75b064fba8facf3c159ac0d8f827b944), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
 
 	ROM_REGION32_LE(0x400000, "table_data", 0)
-	ROM_LOAD32_WORD("kn7000_table_even.ic17", 0x000000, 0x200000, CRC(005a6db2) SHA1(2f4112ea9b039b17b5ada6952b7646adae8d9dd6))
-	ROM_LOAD32_WORD("kn7000_table_odd.ic16",  0x000002, 0x200000, CRC(7e1a312e) SHA1(435b597b926ebac56d4710bcae25b635a59a9ce5))
+	ROMX_LOAD("kn7000_table_even_sp7001_b83.ic17", 0x000000, 0x200000, CRC(ce5abecd) SHA1(1557acfbe5e887a661be9269050b1d14031a8afa), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("kn7000_table_odd_sp7001_b83.ic16", 0x000002, 0x200000, CRC(7c953378) SHA1(f535d3c2e4d3dd2aa9ef854636b582795b1df821), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("kn7000_table_even_b84.ic17", 0x000000, 0x200000, CRC(005a6db2) SHA1(2f4112ea9b039b17b5ada6952b7646adae8d9dd6), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("kn7000_table_odd_b84.ic16", 0x000002, 0x200000, CRC(7e1a312e) SHA1(435b597b926ebac56d4710bcae25b635a59a9ce5), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("kn7000_table_even_b84.ic17", 0x000000, 0x200000, CRC(005a6db2) SHA1(2f4112ea9b039b17b5ada6952b7646adae8d9dd6), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
+	ROMX_LOAD("kn7000_table_odd_b84.ic16", 0x000002, 0x200000, CRC(7e1a312e) SHA1(435b597b926ebac56d4710bcae25b635a59a9ce5), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
+	ROMX_LOAD("kn7000_table_even_b84.ic17", 0x000000, 0x200000, CRC(005a6db2) SHA1(2f4112ea9b039b17b5ada6952b7646adae8d9dd6), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
+	ROMX_LOAD("kn7000_table_odd_b84.ic16", 0x000002, 0x200000, CRC(7e1a312e) SHA1(435b597b926ebac56d4710bcae25b635a59a9ce5), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
 
 	ROM_REGION(0x1000000, "waveform_main_y", 0)
 	ROM_LOAD("c3cbqd000002.ic203", 0x000000, 0x1000000, NO_DUMP)
@@ -1099,35 +1137,9 @@ ROM_START(kn7000)
 	ROM_REGION(0x800000, "picture", 0)
 	ROM_LOAD("c3cbmd000098.ic19", 0x000000, 0x800000, NO_DUMP)
 
-	// The custom flash holds user data, and is populated from a floppy rather than
-	// programmed at the factory: the firmware inflates the CTMINI payload from an
-	// "Initial Data Disk" and writes it verbatim to offset 0x20000, which is the top
-	// 30 of the 64 KiB sectors.  Nothing is written below that, so the boot sectors
-	// are left erased here.
-	//
-	// The images below are therefore not chip dumps.  Each is the exact content the
-	// firmware places in the device for one published data set, so a part programmed
-	// from that floppy reads back as declared.  They are offered as a BIOS choice
-	// because a real instrument holds exactly one of them at a time.
+	// Preloaded with factory default (same as the contents of `Initial Data Disk`)
 	ROM_REGION(0x200000, "custom_data", ROMREGION_ERASEFF)
-	ROM_SYSTEM_BIOS(0, "ctmini",  "Initial Data Disk (factory default)")
-	ROMX_LOAD("01ctmini.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(2a133ea7) SHA1(67b2a0fe8154c4d15557399a86bf0d0b49813ced), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "custm1",  "Custom Data: Blue Bayou")
-	ROMX_LOAD("01custm1.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(c1c69b67) SHA1(4cd5fe37871984a4b470b1a12b835c9bc41f37f5), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "custm2",  "Custom Data: Piano Player")
-	ROMX_LOAD("02custm2.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(8170c2d3) SHA1(6c85b616a9acc3a7ecc1b49a70f138c0d9442086), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "custm3",  "Custom Data: Jazz Organ Soloist")
-	ROMX_LOAD("03custm3.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(5a7cc504) SHA1(d5722a1129134383bf643d20b4e0866c3089fc36), ROM_BIOS(3))
-	ROM_SYSTEM_BIOS(4, "custm4",  "Custom Data: Bob's Band")
-	ROMX_LOAD("04custm4.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(1f1c195e) SHA1(25822a3ad726df49882cdd0066424600fb70ea14), ROM_BIOS(4))
-	ROM_SYSTEM_BIOS(5, "custm5",  "Custom Data: Traditional Melody")
-	ROMX_LOAD("01custm5.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(ac264469) SHA1(11d32c3d293a23a511a76297647758046cd8ccc9), ROM_BIOS(5))
-	ROM_SYSTEM_BIOS(6, "custm6",  "Custom Data: Jogeh 1")
-	ROMX_LOAD("02custm6.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(174cea4c) SHA1(54f2bac0551a8d43dc1a87fe24a13c545169a326), ROM_BIOS(6))
-	ROM_SYSTEM_BIOS(7, "custm7",  "Custom Data: Vibraphone")
-	ROMX_LOAD("03custm7.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(aa14a0ed) SHA1(e1bdfbbbe78353003af5ed01866be87d799523bb), ROM_BIOS(7))
-	ROM_SYSTEM_BIOS(8, "custm8",  "Custom Data: Italian Accordion 7")
-	ROMX_LOAD("04custm8.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(18753233) SHA1(f4722d93ff3f31c6d8c25f757968d796e4eb57ca), ROM_BIOS(8))
+	ROM_LOAD("01ctmini.ic21", 0x020000, 0x1e0000, CRC(2a133ea7) SHA1(67b2a0fe8154c4d15557399a86bf0d0b49813ced))
 
 	ROM_REGION(0x80000, "sdcard_cpu", 0)
 	ROM_LOAD("c3fbkd000162.ic414", 0x000000, 0x80000, NO_DUMP)
