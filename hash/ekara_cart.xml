@@ -534,7 +534,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0001-jpm.u1" size="0x100000" crc="f8f314dc" sha1="743b33c835def29dcf129a26ab4636d1eec177be"/>
 			</dataarea>
@@ -546,7 +546,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0002-jpm.u1" size="0x100000" crc="15283b18" sha1="3248957019f8732bf32685906eb3aa1b997390f4"/>
 			</dataarea>
@@ -558,7 +558,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0003-jpm.u1" size="0x100000" crc="bb6a6edf" sha1="48b0a04865f8aa2b34022e29d37f44a9468a315c"/>
 			</dataarea>
@@ -570,7 +570,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0004-jpm.u1" size="0x100000" crc="9fb5af56" sha1="499ed9795f6e9854b362c7196bcc13cb8f06fabf"/>
 			</dataarea>
@@ -582,7 +582,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0005-jpm.u1" size="0x100000" crc="023b36b9" sha1="5066a9a7a0004fbd048a7b42645e42d6133b9dc2"/>
 			</dataarea>
@@ -595,7 +595,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌道 Vol.1" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0006-enk.u1" size="0x100000" crc="294a0639" sha1="f1f58057a80257c9083093be146ed287ca1aee39"/>
 			</dataarea>
@@ -608,7 +608,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="20世紀ギャラリー1976～78 Vol.1" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0007-g76.u1" size="0x100000" crc="c474f87c" sha1="1818ff5be084e6aca697cc8151a357b77947eb5e"/>
 			</dataarea>
@@ -621,7 +621,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="20世紀ギャラリー1979～81 Vol.1" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0008-g79.u1" size="0x100000" crc="0151f46b" sha1="942f9d5c1e54753d806fbadc508624ea41963b6d"/>
 			</dataarea>
@@ -634,7 +634,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アニソンクラブ Vol.1" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0009-anm.u1" size="0x100000" crc="1dbbd209" sha1="b8ca02ed1a36aa9caa067db95377cda107b1046b"/>
 			</dataarea>
@@ -647,7 +647,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="キッズソング Vol.1" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0010-kid.u1" size="0x100000" crc="3cc17df6" sha1="50e5916850ac20921a6a7aa98f4fff126943b7b5"/>
 			</dataarea>
@@ -659,7 +659,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0011-jpm.u1" size="0x100000" crc="5d0ca1e7" sha1="0c1bf33b3a436da2c19bd7171ab1a234a623987c"/>
 			</dataarea>
@@ -671,7 +671,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0012-jpm.u1" size="0x100000" crc="6df0e8f5" sha1="122744fc5b17348a00778b08855626b8b1c2f9e5"/>
 			</dataarea>
@@ -683,7 +683,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0013-jpm.u1" size="0x100000" crc="75d0d784" sha1="a7d2f937a5f4cc5894a90992a32cf2dbce50dadf"/>
 			</dataarea>
@@ -695,7 +695,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0014-ats.u1" size="0x100000" crc="71aba436" sha1="520a9d5ac99c3b9d1d6286946f994065ef33e1cd"/>
 			</dataarea>
@@ -707,7 +707,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0015-ats.u1" size="0x100000" crc="3ae1c656" sha1="53e1e8b8b742ef6c5c9c76c7830949ee6fcb6631"/>
 			</dataarea>
@@ -720,7 +720,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌道 Vol.2" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0016-enk.u1" size="0x100000" crc="1bac5cc7" sha1="d80e266d079ea2e8a5acb8c1ed97a94c5d31e6ec"/>
 			</dataarea>
@@ -733,7 +733,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="20世紀ギャラリー1973～75 Vol.1" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0017-g73.u1" size="0x100000" crc="7f4efd49" sha1="32403cf65f4ae372da64cef25e03ddd66cdffa25"/>
 			</dataarea>
@@ -746,7 +746,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="20世紀ギャラリー1982～84 Vol.1" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0018-g82.u1" size="0x100000" crc="04327372" sha1="a0fe161aa9b9b6715e2386c15f01f35fdfba76a3"/>
 			</dataarea>
@@ -759,7 +759,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストシーン Vol.1 ウェディング編" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0019-bsc.u1" size="0x100000" crc="c7de4c19" sha1="2cfc8c8b684f7b5ddac384840665fae97b8d9829"/>
 			</dataarea>
@@ -772,7 +772,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="キッズソング Vol.2" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0020-kid.u1" size="0x100000" crc="ed3e5c2c" sha1="c9ca415b50a7b87d8bf54beb3c9f794bd928e489"/>
 			</dataarea>
@@ -784,7 +784,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0021-jpm.u1" size="0x100000" crc="cb299d6a" sha1="662bb45b5ddcb4aab17ace1f16b7021dc09d5960"/>
 			</dataarea>
@@ -796,7 +796,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0022-jpm.u1" size="0x100000" crc="6dfb1b9c" sha1="1554df7fa710e398fbe69951bf187e0260bc71d1"/>
 			</dataarea>
@@ -808,7 +808,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0023-jpm.u1" size="0x100000" crc="7d5f623b" sha1="fe33d2c72bc7b5327362d4566c9621ac5f70b9d0"/>
 			</dataarea>
@@ -820,7 +820,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0024-jpm.u1" size="0x100000" crc="7ec21709" sha1="17c603655ac74b2b45a7c23776b6139fc6d013dc"/>
 			</dataarea>
@@ -832,7 +832,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0025-jpm.u1" size="0x100000" crc="c95830e0" sha1="263bdddaaa3016a2e71feaf5f3017c3d7d6e857e"/>
 			</dataarea>
@@ -844,7 +844,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0026-jpm.u1" size="0x100000" crc="bae82f82" sha1="cb2d61796d79bc82866c8f0f711c567887df608a"/>
 			</dataarea>
@@ -856,7 +856,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0027-jpm.u1" size="0x100000" crc="d72b685c" sha1="519da4b496e4c90d04f48043eb537c3644e8d0d2"/>
 			</dataarea>
@@ -868,7 +868,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0028-jpm.u1" size="0x100000" crc="f671ce7e" sha1="d901d6196d7864f5e512fbb6d539ec0580417385"/>
 			</dataarea>
@@ -881,7 +881,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストセレクション Vol.3 (Dreams Come True)" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0029-ats.u1" size="0x100000" crc="cb9b1ab0" sha1="70f1c40e58aac1dcd6777c90063c2ae8d0cbb895"/>
 			</dataarea>
@@ -894,7 +894,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌道 Vol.3" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0030-enk.u1" size="0x100000" crc="28556ca2" sha1="bf5b14208e339369e2d719441e673bf2c6534978"/>
 			</dataarea>
@@ -907,7 +907,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストセレクション Vol.4 (石原裕次郎 他)" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0031-ats.u1" size="0x100000" crc="0e4f6c31" sha1="3f42e80fde8c5d5cf6321b0fe1547ad2d1936e5c"/>
 			</dataarea>
@@ -920,7 +920,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アニソンクラブ Vol.2" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0032-anm.u1" size="0x100000" crc="6b46c0f8" sha1="c5d8cc10d89e5057b476d792509cabe333b0f497"/>
 			</dataarea>
@@ -932,7 +932,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0033-jpm.u1" size="0x100000" crc="f68736f0" sha1="36ec70646542a4c4bc5e69372d19b5365b2b7dbb"/>
 			</dataarea>
@@ -945,7 +945,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="キッズソング Vol.3" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0034-kid.u1" size="0x100000" crc="80fb5241" sha1="5619605ae7099e955fff69466a0a2f0b2ce3049a"/>
 			</dataarea>
@@ -958,7 +958,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストセレクション Vol.5 (松田 聖子)" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0035-ats.u1" size="0x100000" crc="54a09158" sha1="0570d09e761a3d15cdb8910540c535780c20c833"/>
 			</dataarea>
@@ -971,7 +971,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストセレクション Vol.6 (KinKi Kids)" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0036-ats.u1" size="0x100000" crc="c8a7117d" sha1="a3b4a48816119c898acbf5078c906692f2fc68c9"/>
 			</dataarea>
@@ -984,7 +984,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌道 Vol.4" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0037-enk.u1" size="0x100000" crc="3c61036c" sha1="b09096a58f361f70041b35c29a02b768ef1758d2"/>
 			</dataarea>
@@ -997,7 +997,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストシーン Vol.2 卒業・励まし編" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0038-bsc.u1" size="0x100000" crc="34817291" sha1="a6069419bf3fd143fb247ba625c41b42000cda27"/>
 			</dataarea>
@@ -1010,7 +1010,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストセレクション Vol.7 (B'z)" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0039-ats.u1" size="0x100000" crc="aa50b08a" sha1="91a97c0591e137e50b20f052b402ce52b70a16eb"/>
 			</dataarea>
@@ -1022,7 +1022,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0040-jpm.u1" size="0x100000" crc="e2cb7232" sha1="c9c1f7d316f0c239c659632296695081e50b85e5"/>
 			</dataarea>
@@ -1035,7 +1035,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストセレクション Vol.8 (浜崎 あゆみ)" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0041-ats.u1" size="0x100000" crc="a784e312" sha1="86e15ebfe7ff8c5e5f15065b735c8422ddc15f42"/>
 			</dataarea>
@@ -1047,7 +1047,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0042-jpm.u1" size="0x100000" crc="4082d883" sha1="66c517f72cef5fceffe94cc4ed1b5d7c0f16b151"/>
 			</dataarea>
@@ -1060,7 +1060,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌道 Vol.5" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0043-enk.u1" size="0x100000" crc="c730037d" sha1="c283b99fe4ae51adc3e13a6fae4eaffb891ec20d"/>
 			</dataarea>
@@ -1073,7 +1073,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストセレクション Vol.7 (Every Little Thing)" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0044-ats.u1" size="0x100000" crc="5ed25544" sha1="2cb30b442d97813af32530c6f61d7fcc7653f533"/>
 				<!-- this has 0x0b at address 0x00007 in an otherwise list of ascending values, above dump has 0x0f and looks more correct
@@ -1089,7 +1089,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストセレクション Vol.10 (Mr.Children)" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0045-ats.u1" size="0x100000" crc="d1f4ba12" sha1="385a341a9e92881ae362294bd61cb66bf05e2b08"/>
 			</dataarea>
@@ -1101,7 +1101,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0046-jpm.u1" size="0x100000" crc="becc678f" sha1="30c6700b43dd691ff633fa469e6a34472481af59"/>
 			</dataarea>
@@ -1114,7 +1114,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="デュエットソング Vol.1" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0047-due.u1" size="0x100000" crc="3438b438" sha1="f75fbfc54e4843908e3307de3d2a03658ec74db7"/>
 			</dataarea>
@@ -1127,7 +1127,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌道 Vol.6" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0048-enk.u1" size="0x100000" crc="32ad1da7" sha1="7033988a6652fffca840348c68d5d54e5e28f225"/>
 			</dataarea>
@@ -1140,7 +1140,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストセレクション Vol.11 (JUDY AND MARY)" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0049-ats.u1" size="0x100000" crc="110a1cde" sha1="339901556bcb54e3d09b5291038746687bfaed14"/>
 			</dataarea>
@@ -1153,7 +1153,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストセレクション Vol.12 (THE BEATLES)" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="ec0050-ats.u1" size="0x200000" crc="56ce5d3a" sha1="c499bae5faa00e0987b89185d0e2ec142054773a"/>
 			</dataarea>
@@ -1165,7 +1165,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0051-jpm.u1" size="0x100000" crc="812b00a6" sha1="4329469ff7e7ad5598ae676386c4ecd98a58f811"/>
 			</dataarea>
@@ -1178,7 +1178,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌道 Vol.7" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0052-enk.u1" size="0x100000" crc="120662ff" sha1="292d15f49f6bf450662f343e805fd49c484a04ad"/>
 			</dataarea>
@@ -1190,7 +1190,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0053-jpm.u1" size="0x100000" crc="6f799665" sha1="bf029d5c10efb8b76bff7dda0806bf943d0fff01"/>
 			</dataarea>
@@ -1202,7 +1202,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0054-jpm.u1" size="0x100000" crc="3dcf6eb2" sha1="f235126a900544bb44397ebe9e0fd963927d6cdb"/>
 			</dataarea>
@@ -1215,7 +1215,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストセレクション Vol.13 (ＴＵＢＥ)" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0055-ats.u1" size="0x100000" crc="af6b0f2a" sha1="719bd1bc88517e4e067e99416547afe9ca1ff93f"/>
 			</dataarea>
@@ -1227,7 +1227,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0056-jpm.u1" size="0x100000" crc="8c0b175b" sha1="697d7eb50a84001ddb66f50a50c682c63c21ed60"/>
 			</dataarea>
@@ -1240,7 +1240,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストセレクション Vol.14 (ＳＭＡＰ)" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0057-ats.u1" size="0x100000" crc="15345511" sha1="7e5197a8f7a0ec0160d7f5214428b153f35619f6"/>
 			</dataarea>
@@ -1253,7 +1253,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌道 Vol.8" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0058-enk.u1" size="0x100000" crc="99ff438f" sha1="87e1175f6a9372226112384c2b7f12f17a4e7994"/>
 			</dataarea>
@@ -1265,7 +1265,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0059-jpm.u1" size="0x100000" crc="e72ab46f" sha1="ef1fc7fba2beae7549edce697b12dd3b48dd1103"/>
 			</dataarea>
@@ -1277,7 +1277,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0060-jpm.u1" size="0x100000" crc="04a0b834" sha1="916bac4b58210a0cbd8c9d76c39c802b6d68be32"/>
 			</dataarea>
@@ -1289,7 +1289,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0061-jpm.u1" size="0x100000" crc="562d2549" sha1="7a6de3b4802e0f4249e1c1f82fd7d9f10cee96c0"/>
 			</dataarea>
@@ -1301,7 +1301,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0062-jpm.u1" size="0x100000" crc="b3ea4218" sha1="4b186085ca5767f0c5dc3e67b4a316a3023a44bb"/>
 			</dataarea>
@@ -1313,7 +1313,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0063-jpm.u1" size="0x100000" crc="b3761268" sha1="c7488771ff83793c4a189bd31f6ecd8235463779"/>
 			</dataarea>
@@ -1326,7 +1326,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌道 Vol.9" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0064-enk.u1" size="0x100000" crc="ec2fefb3" sha1="1a56f251d32ff3eb5a20c70ac040c6e0f7d9307d"/>
 			</dataarea>
@@ -1338,7 +1338,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0065-jpm.u1" size="0x100000" crc="fbf39688" sha1="fdf955de31bdb5bea078c0ae1305b67076093749"/>
 			</dataarea>
@@ -1350,7 +1350,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0066-jpm.u1" size="0x100000" crc="aa7b1374" sha1="07b61dc24273c41088c2a15e07f112fd7917d0bb"/>
 			</dataarea>
@@ -1362,7 +1362,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0067-jpm.u1" size="0x100000" crc="972cd1f3" sha1="0972800c5b64259e0a5953547c6c825ad68b0d83"/>
 			</dataarea>
@@ -1374,7 +1374,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0068-jpm.u1" size="0x100000" crc="71a49880" sha1="adbb182e1346e4a87765962f8587b1a465ff907b"/>
 			</dataarea>
@@ -1388,7 +1388,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌大全" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="ec0069-etz.u1" size="0x200000" crc="849ebd23" sha1="752c500d3ff48f04b985fef04219824d1d746034"/>
 			</dataarea>
@@ -1400,7 +1400,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0070-jpm.u1" size="0x100000" crc="8ba16056" sha1="20df400ce69d78883d082526375736f42b67634f"/>
 			</dataarea>
@@ -1412,7 +1412,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0071-jpm.u1" size="0x100000" crc="5d62c9d6" sha1="c50efa872833016612fc69a3ef8ae6068d27a9d8"/>
 			</dataarea>
@@ -1424,7 +1424,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0072-jpm.u1" size="0x100000" crc="e49a1e4b" sha1="43f2677610dc3bbd8f21430f48ce290eaf7ff8bc"/>
 			</dataarea>
@@ -1437,7 +1437,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ムード歌謡コレクション Vol.1" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0073-mkc.u1" size="0x100000" crc="e1ffa625" sha1="ee1bcd579a10085c4c094037e25345c17c063c7c"/>
 			</dataarea>
@@ -1449,7 +1449,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0074-jpm.u1" size="0x100000" crc="12aa9070" sha1="2b645d1cbc5716cd1f58a9d2f820a5b50b0d9448"/>
 			</dataarea>
@@ -1461,7 +1461,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0075-jpm.u1" size="0x100000" crc="cbb8e615" sha1="5fbbfbf4278ce7e289d859e389808b155bb16e4a"/>
 			</dataarea>
@@ -1473,7 +1473,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0076-jpm.u1" size="0x100000" crc="ccdc18d1" sha1="bf0ee7b17ed258495a2805d2608e960f64d5ec5c"/>
 			</dataarea>
@@ -1486,7 +1486,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストセレクション Vol.15 (桑田佳祐 他)" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0077-ats.u1" size="0x100000" crc="368b0daf" sha1="8274a06ca2e3dbcd5176ac1b916be4a5a0df12ef"/>
 			</dataarea>
@@ -1498,7 +1498,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0078-jpm.u1" size="0x100000" crc="a76c022f" sha1="983fb1a78f457edcac9c7eb0226bb1b629ec27a7"/>
 			</dataarea>
@@ -1512,7 +1512,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌大全 第二篇" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="ec0079-etz.u1" size="0x200000" crc="c03b5411" sha1="a88156aec4e0f024461f129c955a953647f51554"/>
 			</dataarea>
@@ -1524,7 +1524,7 @@ license:CC0-1.0
 		<year>2001</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0080-jpm.u1" size="0x100000" crc="6fc0b669" sha1="a712b5c25551b99b0c4a3650f71380087b5a54a7"/>
 			</dataarea>
@@ -1536,7 +1536,7 @@ license:CC0-1.0
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0081-jpm.u1" size="0x100000" crc="6266252d" sha1="1533f2f76725e45122b719b8482899ab71e25d38"/>
 			</dataarea>
@@ -1548,7 +1548,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0082-mbh.u1" size="0x100000" crc="3998e478" sha1="29dad31dfd79c57b2ccec0caac81b3489946b798"/>
 			</dataarea>
@@ -1560,7 +1560,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ec0083-jpm.u1" size="0x100000" crc="b8eb7a8f" sha1="e6d169860938b92947dc54718dbfd4225a930248"/>
 			</dataarea>
@@ -1573,7 +1573,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="キッズソングベスト40" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="ec0084-ksb.u1" size="0x200000" crc="dab58ce4" sha1="e427df85cc1a06a055fcb4e1aa28cc083b558e69"/>
 			</dataarea>
@@ -1587,7 +1587,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌大全 第三篇" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="ec0085-etz.u1" size="0x200000" crc="6c81fd34" sha1="a8d6a8edea4c7ea6f6d265c87f210170c6bef54f"/>
 			</dataarea>
@@ -1604,8 +1604,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="マーメイドメロディー ぴちぴちピッチ vol.1" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24c08_epitch"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c08_control1"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="ekaraa1.bin" size="0x200000" crc="5f69a977" sha1="33e7b453e1e78ac5e4a20c81c00f5c0c1260c6b0"/>
 			</dataarea>
@@ -1618,8 +1618,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="マーメイドメロディー ぴちぴちピッチ vol.2" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24c08_epitch"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c08_control1"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="ekara_a2.bin" size="0x200000" crc="b6fef794" sha1="be006eacd157f9c2d896730d66f1cd746ad7b9b4"/>
 			</dataarea>
@@ -1632,8 +1632,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="マーメイドメロディー ぴちぴちピッチ vol.3" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24c08_epitch"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c08_control1"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="ekara_a3.bin" size="0x200000" crc="19b79adf" sha1="31f82e8bf66f1b03df9d64061af628df3466c5ef"/>
 			</dataarea>
@@ -1646,8 +1646,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ぴちぴちピッチ ピュア第1章" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24c08_epitch"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c08_control1"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="ekaraa4.bin" size="0x200000" crc="03dcc45a" sha1="ae884128c09b4fc7521f0010bbe9624419a3d0b8"/>
 			</dataarea>
@@ -1660,7 +1660,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ぴちぴちピッチ カラオケパーティー" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraa5.bin" size="0x100000" crc="6cec888a" sha1="5cb4abefb4a5aaec8827bf2d6abc2dfda8099136"/>
 			</dataarea>
@@ -1673,8 +1673,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ぴちぴちピッチ ピュア第2章" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24c08_epitch"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c08_control1"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="ekaraa6.bin" size="0x200000" crc="1a554414" sha1="cf8e5dcca9ac2b757482113f98dd8a75b3bc20a4"/>
 			</dataarea>
@@ -1687,8 +1687,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ぴちぴちピッチ ピュア第3章" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24c08_epitch"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c08_control1"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="ekaraa7.bin" size="0x200000" crc="5b59900e" sha1="fdb8148211f00d0119b9ad082bf8fd348d509800"/>
 			</dataarea>
@@ -1701,7 +1701,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ぴちぴちピッチ カラオケパーティー2" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraa8.bin" size="0x100000" crc="252ce01f" sha1="2b4c06f7a636d4b8179bf25cb08f6e07b6366bb0"/>
 			</dataarea>
@@ -1717,7 +1717,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストヒットコレクション BH-01" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="bh01.bin" size="0x100000" crc="32641f80" sha1="6798e46448f92a9d4ef85390bd970d4c63fb7ba0"/>
 			</dataarea>
@@ -1730,7 +1730,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストヒットコレクション BH-02" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="bh02.bin" size="0x100000" crc="05ada4d7" sha1="abee397597f04f89b80bca69fa2daa4e2af7056b"/>
 			</dataarea>
@@ -1743,7 +1743,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストヒットコレクション BH-03" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="bh03.bin" size="0x100000" crc="d17cafd4" sha1="b74fd0f77a726547d4001d4177a5ccd2ea35536a"/>
 			</dataarea>
@@ -1756,7 +1756,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストヒットコレクション BH-04" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="bh04.bin" size="0x100000" crc="d97cd9c9" sha1="f1a9d5a1c71ed8b2f3b64f4a980ae64de4bc1f48"/>
 			</dataarea>
@@ -1769,7 +1769,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストヒットコレクション BH-05" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="bh05.bin" size="0x100000" crc="9713f0c1" sha1="1ccd666771dcaed304e69c7dee06ae11df4ab091"/>
 			</dataarea>
@@ -1782,7 +1782,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストヒットコレクション BH-06" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="bh06.bin" size="0x100000" crc="6e264ecb" sha1="6c3e4253565242c0c6dcdab7698f5b1e28544b2e"/>
 			</dataarea>
@@ -1795,7 +1795,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストヒットコレクション BH-07" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="bh07.bin" size="0x100000" crc="59818e9b" sha1="14df9777575bf1232d4cbb17111362fa3aab5e3c"/>
 			</dataarea>
@@ -1813,8 +1813,8 @@ license:CC0-1.0
 		<info name="alt_title" value="ドリームカートリッジ ベストヒット Vol.8"/> <!-- from cover art -->
 		<info name="alt_title" value="ドリームカートリッジvol.1"/> <!-- shown on-screen when run on Popira -->
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_control0"/>
 			<dataarea name="rom" size="0x100000">
 				<rom name="dc0001-bht.u1" size="0x100000" crc="bd0c4044" sha1="496f9270c0285480ad513c2628260a5ed629dfd6"/>
 			</dataarea>
@@ -1828,8 +1828,8 @@ license:CC0-1.0
 		<info name="alt_title" value="ドリームカートリッジ ベストアーティスト Vol.6"/> <!-- from cover art -->
 		<info name="alt_title" value="ドリームカートリッジvol.2"/> <!-- shown on-screen when run on Popira -->
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_control0"/>
 			<dataarea name="rom" size="0x100000">
 				<rom name="dc0002-bat.u1" size="0x100000" crc="bb4e13a7" sha1="f9d3a669de1b7ad3080eb428575905ee2170458c"/>
 			</dataarea>
@@ -1844,8 +1844,8 @@ license:CC0-1.0
 		<info name="alt_title" value="ドリームカートリッジ ベストヒット Vol.9"/> <!-- from cover art -->
 		<info name="alt_title" value="ベストヒットvol.9"/> <!-- shown on-screen when run on Popira -->
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_control0"/>
 			<dataarea name="rom" size="0x100000">
 				<rom name="dc0003-bht.u1" size="0x100000" crc="fd15d60f" sha1="c017d3fa1e10ad13cc130b92bd149a347d5c996c"/>
 			</dataarea>
@@ -1858,8 +1858,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ドリームカートリッジ TVPOPジュニア Vol.8 (ハッピー♥ラッキー～お願いミルモ～／ミニモニ。テレフォン！リンリンリン／他)"/> <!-- from cover art -->
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_control0"/>
 			<dataarea name="rom" size="0x100000">
 				<rom name="dc0004-tpj.u1" size="0x100000" crc="32589091" sha1="eea46b9579c0dd8f9a0a6a6fc99013a3c3a924c8"/>
 			</dataarea>
@@ -1873,8 +1873,8 @@ license:CC0-1.0
 		<info name="alt_title" value="ドリームカートリッジ TVPOPジュニア Vol.9"/> <!-- from cover art -->
 		<info name="alt_title" value="TV POPジュニアvol.9"/> <!-- shown on-screen when run on Popira -->
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_control0"/>
 			<dataarea name="rom" size="0x100000">
 				<rom name="dc0005-tpj.u1" size="0x100000" crc="515c125f" sha1="a7c7bf758b1afecb8fb55eb5766343325c1acc89"/>
 			</dataarea>
@@ -1888,8 +1888,8 @@ license:CC0-1.0
 		<info name="alt_title" value="ドリームカートリッジ ベストヒット Vol.10"/> <!-- NOT VERIFIED: from cover art -->
 		<info name="alt_title" value="ベストヒットvol.10"/> <!-- NOT VERIFIED: shown on-screen when run on Popira -->
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_control0"/>
 			<dataarea name="rom" size="0x100000">
 				<rom name="dc0006-bht.u1" size="0x100000" crc="62368c46" sha1="fdedb4b81c3b1642eb3a8993cdcf58dbc29f9a03"/>
 			</dataarea>
@@ -1903,8 +1903,8 @@ license:CC0-1.0
 		<info name="alt_title" value="キッズソング (勇気りんりん／おさかな天国／他)"/> <!-- from cartridge label - no Dream Cartridge branding, volume number not shown -->
 		<info name="alt_title" value="キッズソングvol.4"/> <!-- shown on-screen when run on Popira -->
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_control0"/>
 			<dataarea name="rom" size="0x100000">
 				<rom name="dc0007-kid.u1" size="0x100000" crc="c8908d43" sha1="a42010f805c3839b974fa8a6e2a412d68c903324"/>
 			</dataarea>
@@ -1918,8 +1918,8 @@ license:CC0-1.0
 		<info name="alt_title" value="ドリームカートリッジ ベストアーティスト Vol.7"/> <!-- NOT VERIFIED: from cover art -->
 		<info name="alt_title" value="ドリームカートリッジvol.7"/> <!-- NOT VERIFIED: shown on-screen when run on Popira -->
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_control0"/>
 			<dataarea name="rom" size="0x100000">
 				<rom name="dc0008-bat.u1" size="0x100000" crc="b97472a5" sha1="681990c795094cf83b200c947ed34624d1fc90b3"/>
 			</dataarea>
@@ -1933,8 +1933,8 @@ license:CC0-1.0
 		<info name="alt_title" value="ドリームカートリッジ TVPOPジュニア (BON VOYAGE!／君と約束した優しいあの場所まで／他)"/> <!-- from cover art -->
 		<info name="alt_title" value="TV POPジュニアvol.10"/> <!-- shown on-screen when run on Popira -->
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,TAIKO"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_control0"/>
 			<dataarea name="rom" size="0x100000">
 				<rom name="dc0009-tpj.u1" size="0x100000" crc="c99f7b5c" sha1="4eeccbafe6396ab3732308a0d4e8b117f4a8f9b7"/>
 			</dataarea>
@@ -1950,7 +1950,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌集 第一篇" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="en-1.u1" size="0x100000" crc="7f9f61f3" sha1="f6efdcc7d00c181864009662a0e8671296c174b8"/>
 			</dataarea>
@@ -1963,7 +1963,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌集 第二篇" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="en-2.u1" size="0x100000" crc="be342a04" sha1="db355d3b9372fbfc0831133482d96110aa377915"/>
 			</dataarea>
@@ -1976,7 +1976,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌集 第三篇" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="en-3.u1" size="0x100000" crc="e3686ff4" sha1="e7e9a53a778739c406b2b226300d2f525cd9676b"/>
 			</dataarea>
@@ -1989,7 +1989,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌集 第四篇" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="en-4.u1" size="0x100000" crc="4e9e00fd" sha1="4cc2b6e39a4ceb1c1753463dd6d559331d75848f"/>
 			</dataarea>
@@ -2006,7 +2006,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストアーティスト Vol.1"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0001-bat.u1" size="0x100000" crc="226224f3" sha1="d2609f342e19b0cd38678d2709866baa041658e7"/>
 			</dataarea>
@@ -2019,7 +2019,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストヒット Vol.1"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0002-bht.u1" size="0x100000" crc="eae1cb3b" sha1="d1e594858eecde5409898684654caab0555ac1b4"/>
 			</dataarea>
@@ -2032,7 +2032,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストアーティスト Vol.2 (宇多田ヒカル)"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0003-bat.u1" size="0x100000" crc="49536d5a" sha1="c112b6ac62f586fc1d1615406362fc659e587772"/>
 			</dataarea>
@@ -2045,7 +2045,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストヒット Vol.2"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0004-bht.u1" size="0x100000" crc="6d2e9711" sha1="0478578c297f14d78a6612ecd61387129bd6df42"/>
 			</dataarea>
@@ -2058,7 +2058,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="TV POPジュニアVol.1"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0005-tpj.u1" size="0x100000" crc="b1fda1a4" sha1="a135226aa400c5a78060b08d5f64eb6a06c990e7"/>
 			</dataarea>
@@ -2071,7 +2071,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストヒット Vol.3"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0006-bht.u1" size="0x100000" crc="76bbefae" sha1="a2a41f58b5750fafa92d6e3094562dd05a5d9029"/>
 			</dataarea>
@@ -2084,7 +2084,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストアーティスト Vol.3 (モーニング娘。他)"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0007-bat.u1" size="0x100000" crc="27b49bdb" sha1="2b64d978fc5df5869bc3c27d16642727e2d38999"/>
 			</dataarea>
@@ -2097,7 +2097,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ミニモニ。"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="gc0008-min.u1" size="0x200000" crc="8414c402" sha1="340c432eec8eb2108b8364b5936dd22dc34b51a9"/>
 			</dataarea>
@@ -2110,7 +2110,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ミニモニ。"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="gc0008-min(alt).u1" size="0x200000" crc="b34d1721" sha1="3621f02423f55c43d1b16855c01189719ddbcb6e"/>
 			</dataarea>
@@ -2123,7 +2123,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="TV POPジュニアVol.3"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0009-tpj.u1" size="0x100000" crc="aed34640" sha1="2a55eb5e518ca18a5fd66d4e43269954015bb238"/>
 			</dataarea>
@@ -2148,8 +2148,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストアーティスト Vol.4 (モーニング娘。他)"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02_gc0010"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_direct"/>
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0010-bat.u1" size="0x100000" crc="c08be376" sha1="28cb6baacf64e0382fd9c8bb7167d7fdd96f57ee"/>
 			</dataarea>
@@ -2162,8 +2162,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="TV POPジュニアVol.4"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02_gc0010"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_direct"/>
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0011-tpj.u1" size="0x100000" crc="4ca23131" sha1="297cea5f456c90820adc97cf0f8a40b058edb0b5"/>
 			</dataarea>
@@ -2176,8 +2176,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストヒット Vol.5"/> <!-- shown as "ベストヒットvol.5" on-screen with Popira -->
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_control0"/> <!-- with 74HC125 -->
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0012-bht.u1" size="0x100000" crc="e68d10ee" sha1="7d91e83420dc8af6f2fad6d5080e491c7ea2e001"/>
 			</dataarea>
@@ -2190,8 +2190,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストヒット Vol.6"/> <!-- shown as "ベストヒットvol.6" on-screen with Popira -->
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_control0"/> <!-- with 74HC125 -->
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0013-bht.u1" size="0x100000" crc="0bc2b917" sha1="fb43650f57e6e90abcb60c15b4a8794649571232"/>
 			</dataarea>
@@ -2204,8 +2204,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ミニモニ。 Vol.2"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_control0"/> <!-- with 74HC125 -->
 			<dataarea name="rom" size="0x200000">
 				<rom name="gc0014-min.u1" size="0x200000" crc="309e0337" sha1="ac68ad33fd15d7c2cc507efc645a04a2e6d08d49"/>
 			</dataarea>
@@ -2219,8 +2219,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストアーティスト Vol.5 (モーニング娘。他)"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_control0"/> <!-- with 74HC125 -->
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0015-bat.u1" size="0x100000" crc="a839b745" sha1="a02bd29383baf1f92b3573aaa6343cc309a6f589"/>
 			</dataarea>
@@ -2233,8 +2233,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="TV POPジュニアvol.5"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_control0"/> <!-- with 74HC125 -->
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0016-tpj.u1" size="0x100000" crc="52d81c55" sha1="c2fad86a2507589625cb507c3e1395cb662f9e34"/>
 			</dataarea>
@@ -2247,8 +2247,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="TV POPジュニアvol.6"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/> <!-- with 74HC125 -->
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_control0"/> <!-- with 74HC125 -->
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0017-tpj.u1" size="0x100000" crc="2c7d00a2" sha1="5976b9f3a95afb3b23f1d1d996de0b7aa41ee25c"/>
 			</dataarea>
@@ -2261,8 +2261,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="TV POPジュニアvol.7"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/>   <!-- with 74HC125 -->
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_control0"/>   <!-- with 74HC125 -->
 			<dataarea name="rom" size="0x100000">
 				<rom name="gc0018-tpj.u1" size="0x100000" crc="5e7fee64" sha1="14ebc6e47808f30de4724ec720c49223c2c6f22d"/>
 			</dataarea>
@@ -2279,7 +2279,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ 名探偵コナン" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="gk1.bin" size="0x200000" crc="775608cd" sha1="8b53fd4e8ced709df2716c839abfd7e41cc719d2"/>
 			</dataarea>
@@ -2292,8 +2292,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ディズニープリンセス プリンセス デビュー" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c04_control1"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="gk2.u1" size="0x200000" crc="d4413f35" sha1="ef9999422adfea77c7ca4abd4f2f21e75d66be77"/>
 			</dataarea>
@@ -2307,8 +2307,8 @@ license:CC0-1.0
 		<info name="alt_title" value="ディンカー・ベルとティンクルスターうらない" /> <!-- from box art -->
 		<info name="alt_title" value="ディンカー・ベル ティンクルスターうらない" /> <!-- from title screen -->
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c04_control1"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="gk3.u1" size="0x200000" crc="5877877b" sha1="c789b96ffcb3c303d552b236e01fd5fb587df7d3"/>
 			</dataarea>
@@ -2325,7 +2325,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="キッズソング20" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="kd-1.u1" size="0x100000" crc="f351f615" sha1="791ecb6d951669e7c41f1a08a20173fa5c51f901"/>
 			</dataarea>
@@ -2338,7 +2338,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="キッズソング20" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="kd-2.u1" size="0x100000" crc="620b9b22" sha1="c820e3fa28212cf9f530380b9b6f9c8cfdc7c476"/>
 			</dataarea>
@@ -2351,7 +2351,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="キッズソング20" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="kd3.bin" size="0x100000" crc="00231fe7" sha1="c593a734d0453989f885e6de289e2c3f3064627d"/>
 			</dataarea>
@@ -2364,7 +2364,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="キッズソング20" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="kd0004.bin" size="0x100000" crc="c9719803" sha1="5aa6ec9742d8e560a86319e40d5f731b8ef60dd3"/>
 			</dataarea>
@@ -2380,7 +2380,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストミニ mini vol.1"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0001-atm.u1" size="0x080000" crc="3ef59e82" sha1="d10f0b4a174bef736fea538028eacbeb46af5bbd"/>
 			</dataarea>
@@ -2393,7 +2393,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストミニ mini vol.2 (PIKA☆NCHI／A·RA·SHI／他)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0002-atm.u1" size="0x080000" crc="4070ad1d" sha1="d0fb82bd945034a279cb6401b1b93c16ba56575d"/>
 			</dataarea>
@@ -2406,7 +2406,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストミニ mini vol.3 (モーニング娘)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0003-atm.u1" size="0x080000" crc="d9778b40" sha1="55c875d0925c031320ccf7affe721bd07ef6175b"/>
 			</dataarea>
@@ -2419,7 +2419,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストミニ mini vol.4 (w-inds.)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0004-atm.u1" size="0x080000" crc="e9ba14c1" sha1="3cad1a6b0d1ba24dfb6c1aec84a6d87816b16d54"/>
 			</dataarea>
@@ -2432,7 +2432,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="キッズソングミニ mini vol.1 (TVソング)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0005-ksm.u1" size="0x080000" crc="a84c6d0d" sha1="dee82de4609ec93ed5152d01860e59d8693b9736"/>
 			</dataarea>
@@ -2445,7 +2445,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="キッズソングミニ mini vol.2 (TVヒーロー)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0006-ksm.u1" size="0x080000" crc="6d3c8c02" sha1="568a0e156a2189156149578277b6d615fe4e157f"/>
 			</dataarea>
@@ -2458,7 +2458,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストミニ mini vol.5 (SMAP・KinKi Kids・嵐 他)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0007-atm.u1" size="0x080000" crc="a9a19914" sha1="556adfad645ae635901b690ee57173766a5e497a"/>
 			</dataarea>
@@ -2471,7 +2471,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="キッズソングミニ mini vol.3"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0008-ksm.u1" size="0x080000" crc="5238a3d4" sha1="8da36edcc6c28de31e955edca1cf893cc5d7fce3"/>
 			</dataarea>
@@ -2484,7 +2484,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="J-POP MIXミニ mini vol.1"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0009-jpm.u1" size="0x080000" crc="794a82ae" sha1="f97cdf42bd62731363eee02dec6235b5c8a798d2"/>
 			</dataarea>
@@ -2497,7 +2497,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストミニ mini vol.6 (宇多田ヒカル)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0010-atm.u1" size="0x080000" crc="aae13f60" sha1="87ea122aebb467ebc4785482961160766db90fcd"/>
 			</dataarea>
@@ -2510,7 +2510,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストミニ mini vol.4 (ミッキーマウス・マーチ／星に願いを／他)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0011-ksm.u1" size="0x080000" crc="b6c86e18" sha1="737e61c79f93e1ca0720fa3b569f6ef2d8a6d18c"/>
 			</dataarea>
@@ -2524,7 +2524,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストミニ mini vol.7 (浜崎あゆみ)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0012-atm.u1" size="0x080000" crc="f31d3de9" sha1="41e4de960b2f348a4bed3b9b6d51229878e8c8f3"/>
 			</dataarea>
@@ -2537,7 +2537,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="キッズソングミニ mini vol.5"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0013-ksm.u1" size="0x080000" crc="db05eafa" sha1="b58efcc41ad8d5571c319e0d88fa8a3d9badbe93"/>
 			</dataarea>
@@ -2550,7 +2550,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストミニ mini vol.8 (BoA)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0014-atm.u1" size="0x080000" crc="170e02af" sha1="02b38146db7d74727f7dccf6dcc3d004979210a1"/>
 			</dataarea>
@@ -2563,7 +2563,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="TV POPミニ mini vol.1"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0015-tpm.u1" size="0x080000" crc="c0e87576" sha1="c239c22499591b85bdb2737d22417489a02ffb44"/>
 			</dataarea>
@@ -2576,7 +2576,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="アーティストミニ mini vol.9 (山口百恵)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0016-atm.u1" size="0x080000" crc="937c07dd" sha1="6c3570394e781dec96e98d95db3a3c564abe35a4"/>
 			</dataarea>
@@ -2589,7 +2589,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="キッズソングミニ mini vol.6"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="mc0017-ksm.u1" size="0x080000" crc="8ef6e48d" sha1="093f820295c35c08e29efe6f3f5e9f00a3813a27"/>
 			</dataarea>
@@ -2605,7 +2605,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストヒット Vol.4"/>
 		<sharedfeat name="compatibility" value="EKARA,FAMMAT,POPIRA"/> <!-- shows an incompatibility message with taikodp and jpopira -->
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="pc0001-bht.u1" size="0x100000" crc="4fbc13a6" sha1="142191a6522c1aa9c7772de6dc1b5706816258de"/>
 			</dataarea>
@@ -2618,7 +2618,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="TV POPジュニアvol.2"/>
 		<sharedfeat name="compatibility" value="EKARA,FAMMAT,POPIRA"/> <!-- shows an incompatibility message with taikodp and jpopira -->
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="pc0002-tpj.u1" size="0x100000" crc="2ce065ed" sha1="1c0ae8050f7093a53f74637f27063f720f19610c"/>
 			</dataarea>
@@ -2631,7 +2631,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="TV POPジュニアvol.2"/>
 		<sharedfeat name="compatibility" value="EKARA,FAMMAT,POPIRA"/> <!-- shows an incompatibility message with taikodp and jpopira -->
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="pc0002-tpj(alt).u1" size="0x100000" crc="f8c54474" sha1="4ae876d8deed068c710700499cba22b88bea3d17"/>
 			</dataarea>
@@ -2644,7 +2644,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="演歌道ベスト Vol.1"/>
 		<sharedfeat name="compatibility" value="EKARA,FAMMAT,POPIRA"/> <!-- shows an incompatibility message with taikodp and jpopira -->
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="pc0003-enb.u1" size="0x100000" crc="2fa57d12" sha1="01954a20e190c3f9e1d16c4285c9ec39f601eb80"/>
 			</dataarea>
@@ -2657,8 +2657,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="ベストヒットvol.7"/>
 		<sharedfeat name="compatibility" value="EKARA,FAMMAT,POPIRA"/> <!-- no incompatibility message with taikodp and jpopira, but still not compatible -->
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc02"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c02_control0"/>
 			<dataarea name="rom" size="0x100000">
 				<rom name="pc0004-bht.u1" size="0x100000" crc="95e35899" sha1="a9bd2694f5ee4b964e8d73afc3e88c0eb18ca1d2"/>
 			</dataarea>
@@ -2675,7 +2675,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="カラオケえほん Vol.1 ハローキティ"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="01.bin" size="0x100000" crc="0635e39f" sha1="bfe33b0de01e8618abfdd190abf752cee53a6403"/>
 			</dataarea>
@@ -2688,7 +2688,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.1"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0002-sai.u1" size="0x100000" crc="b6687799" sha1="a5350b06bf5a18e0fb84b03ac7257468c26a2019"/>
 			</dataarea>
@@ -2701,7 +2701,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ キッズチャレンジ Vol.1"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0003-sai.u1" size="0x100000" crc="935e3445" sha1="e86949467e65d515523629ca1e8f8b47cdaaacf0"/>
 			</dataarea>
@@ -2714,7 +2714,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ 演歌の達人"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0004-sai.u1" size="0x100000" crc="c2a080da" sha1="6eb803bc8587308002f7f8a15b1928c8f726c192"/>
 			</dataarea>
@@ -2727,7 +2727,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 1"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0005-sai.u1" size="0x100000" crc="f919b155" sha1="60fc9985d277422d4d64fb4f0cebf2732e2958aa"/>
 			</dataarea>
@@ -2740,7 +2740,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 2"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0006-sai.u1" size="0x100000" crc="4bd8669e" sha1="e77d16ecead2a6c660fedcbca3a1e0e719648be4"/>
 			</dataarea>
@@ -2753,7 +2753,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ 名探偵コナン Vol.1"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="sc0007-dcs.u1" size="0x200000" crc="5b8cf5ee" sha1="b31e610110fda7c7b49e7318d3191967fcf49ed8"/>
 			</dataarea>
@@ -2767,7 +2767,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.2"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0008-sai.u1" size="0x100000" crc="5d887910" sha1="5e32cccd99ba7e19974c6a9462e13cb7f8543b2a"/>
 			</dataarea>
@@ -2780,7 +2780,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 3"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0009-sai.u1" size="0x100000" crc="61413fd5" sha1="47dad178faa99301009ae74554a39b15c01e0db2"/>
 			</dataarea>
@@ -2793,7 +2793,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="氷川きよしのカラオケ道場"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="sc0010-hkw.u1" size="0x200000" crc="fd6dc588" sha1="fece06706399eb36f3e69f7693116c944fe890e7"/>
 			</dataarea>
@@ -2806,7 +2806,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ PostPet"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0011-pst.u1" size="0x100000" crc="6cc02f14" sha1="497702bd93bdf5fbdec6921e3dddf781bc23189c"/>
 			</dataarea>
@@ -2819,7 +2819,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.3"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0012-sai.u1" size="0x100000" crc="8b971664" sha1="5f748d3406dbe74ce06c68aa07bafa9e288d5b51"/>
 			</dataarea>
@@ -2832,7 +2832,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 4 (波乗りジョニー／悲しみは雪のように／他)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0013-sai.u1" size="0x100000" crc="b1971770" sha1="00e5840fbd60ed31add2bfb7d7a091db35505c59"/>
 			</dataarea>
@@ -2845,7 +2845,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.4"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0014-sai.u1" size="0x100000" crc="1c07e017" sha1="257d878578fcbf14d7c951bbe68fd25bee3c8db0"/>
 			</dataarea>
@@ -2858,7 +2858,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ 名探偵コナン Vol.2"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="sc0015-dcs.u1" size="0x200000" crc="a1b31faa" sha1="e5508940c5e674a1e12ef2cc9a5d10365ac4fa64"/>
 			</dataarea>
@@ -2871,7 +2871,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ 熱唱 Vol.5"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0016-sai.u1" size="0x100000" crc="20f06e17" sha1="0f8c4ae3c175364a84ac32ae5dea6b27cac17319"/>
 			</dataarea>
@@ -2884,7 +2884,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ キッズチャレンジ Vol.2 (てをつなごう／アンパンマンのマーチ／他)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0017-sai.u1" size="0x100000" crc="f57ec5b1" sha1="b6cb926ff0467106acd5c1d83be11ae93a0c6b14"/>
 			</dataarea>
@@ -2897,7 +2897,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ チャレンジアーティスト (モーニング娘。他)"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0018-sai.u1" size="0x100000" crc="23545417" sha1="64b84de483c6c5d1129826324b30580a189077ea"/>
 			</dataarea>
@@ -2910,7 +2910,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 6"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="sc0019-sai.u1" size="0x100000" crc="136c12e3" sha1="fabd2e83732fdbbd737fc55902a3b1612c73f929"/>
 			</dataarea>
@@ -2923,7 +2923,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ チャレンジアイドル vol.5"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="sc0020-sai.u1" size="0x100000" crc="081cb211" sha1="daf08db6d342605a8efd797a43c859b9559d6f26"/>
 			</dataarea>
@@ -2936,7 +2936,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 7 ～ミセスセレクション～"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="sc0021-sai.u1" size="0x100000" crc="fbc77e6c" sha1="eee3c8a68807dbac62c8021f9c755d08076925e2"/>
 			</dataarea>
@@ -2949,7 +2949,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ 熱唱 vol. 8"/>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="sc0022-sai.u1" size="0x100000" crc="d631d890" sha1="a0953aa347c9ec152e64bc455fc360056c5c0807"/>
 			</dataarea>
@@ -2963,8 +2963,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="スーパーカートリッジ ベストヒット"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,JPOPIRA,TAIKO"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24c08_epitch"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c08_control1"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="sp01.u1" size="0x200000" crc="af1e8755" sha1="4282635c1aac5a7e2f1edf1c21127d33e713fcbc"/>
 			</dataarea>
@@ -2977,8 +2977,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="スーパーカートリッジ ベストヒット"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,JPOPIRA,TAIKO"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c04_control1"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="sp02.u1" size="0x200000" crc="c8a84ded" sha1="02ffa04cdc7732fd3ab75505c5cc68bda130c7ee"/>
 			</dataarea>
@@ -2991,8 +2991,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="スーパーカートリッジ TVPOPジュニア"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,JPOPIRA,TAIKO"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c04_control1"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="sp03.u1" size="0x200000" crc="cd7dbbaf" sha1="cc62c10f8f83015e4c472bc41e9a1fd7ac497655"/>
 			</dataarea>
@@ -3005,8 +3005,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="スーパーカートリッジ ベストヒット"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,JPOPIRA,TAIKO"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c04_control1"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="sp04.u1" size="0x200000" crc="77818ddb" sha1="708980b1ae30864bd3395ef663de1c57ecbc113c"/>
 			</dataarea>
@@ -3019,8 +3019,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="スーパーカートリッジ TVPOPジュニア"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,JPOPIRA,TAIKO"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24c08_epitch"/> <!-- FIXME: actually 24c04 -->
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c04_control1"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="sp05.u1" size="0x200000" crc="f5ae63b2" sha1="d471ee862aa2ab790defb57873a10862531fd76b"/>
 			</dataarea>
@@ -3033,8 +3033,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="スーパーカートリッジ TVPOPジュニア"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,JPOPIRA,TAIKO"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24c08_epitch"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c08_control1"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="sp06.u1" size="0x200000" crc="b4c4b62d" sha1="5808badf75ad7974bcfc904faf4b6b6d9a0f91f9"/>
 			</dataarea>
@@ -3047,8 +3047,8 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="スーパーカートリッジ ベストヒット"/>
 		<sharedfeat name="compatibility" value="EKARA,POPIRA,JPOPIRA,TAIKO"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24c08_epitch"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c08_control1"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="sp07.u1" size="0x200000" crc="5cad2834" sha1="ba384f862897559d2a93f3aa7a7f65622070a461"/>
 			</dataarea>
@@ -3064,7 +3064,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="きらりん☆レボリューション" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekara_ac0009-kir.bin" size="0x100000" crc="351c99c3" sha1="86c2d231d0d07f5e214e19f49dc1bda3aac42eb0"/>
 			</dataarea>
@@ -3077,7 +3077,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="プレミアムカートリッジ ここにいるぜえ！ モーニング娘。" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x80000">
 				<rom name="pr-01mng.u1" size="0x80000" crc="cce85e77" sha1="1bb5863849e4728294c1a71830ec54d0190010d9"/>
 			</dataarea>
@@ -3090,7 +3090,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="美空ひばり" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="PR-06.u1" size="0x100000" crc="a08a5e06" sha1="c0abd221733002ab120e44f01c59d478547fc0d3"/>
 			</dataarea>
@@ -3106,7 +3106,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="採点カートリッジ モーニング娘。スペシャル" />
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="bx01-mor.u1" size="0x100000" crc="51a55097" sha1="44345f5ead30288cde83f023f7aabbecb2a53d63"/>
 			</dataarea>
@@ -3119,7 +3119,7 @@ license:CC0-1.0
 		<publisher>Takara</publisher>
 		<info name="alt_title" value="懐かしの名曲集 (赤蜻蛉／春が来た／他)" />
 		<sharedfeat name="compatibility" value="EKARA,POPIRA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="gs0001-mei.u1" size="0x100000" crc="eebdbe1b" sha1="639f1ecf97404720e3feeeae00e100e546dffd60"/>
 			</dataarea>
@@ -3137,7 +3137,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="ekaraweb_28m_blank.u1" size="0x200000" crc="69bb06bf" sha1="dafa4fde7b59cb547e1f3af0b29606b33cb76fd0"/>
 			</dataarea>
@@ -3176,7 +3176,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="ekaraweb_28m_26.u1" size="0x200000" crc="3c03be04" sha1="c3a68376d798f911a38634f19abe4ca870ae8b5c"/>
 			</dataarea>
@@ -3217,7 +3217,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="ekara_user_red.bin" size="0x200000" crc="2acf2b95" sha1="100106cf9da486fcc5dae328721feb2ffba74b3b"/>
 			</dataarea>
@@ -3258,7 +3258,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x200000">
 				<rom name="usercart28_28.bin" size="0x200000" crc="a45bc1aa" sha1="b962b78f4eb26a0524cc72523f1d7fbbea0aa1b0"/>
 			</dataarea>
@@ -3270,7 +3270,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb_12m_blank.u1" size="0x100000" crc="9149a3a8" sha1="01277650706c1b168c5125b0ddcceacbd207be25"/>
 			</dataarea>
@@ -3290,7 +3290,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb_12m_7.u1" size="0x100000" crc="a6a095b9" sha1="709d7edb5799b97127502408bec698663b902462"/>
 			</dataarea>
@@ -3315,7 +3315,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb_12m_12_set1.u1" size="0x100000" crc="23df7749" sha1="cfd3f9f0b9f4713d560700c4e463d0e9d94c9447"/>
 			</dataarea>
@@ -3333,7 +3333,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb_12m_5.u1" size="0x100000" crc="bc4635cd" sha1="5343b254218f85a2f9e5ae9e4646b456d82c7d27"/>
 			</dataarea>
@@ -3358,7 +3358,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb_12m_12_set2.u1" size="0x100000" crc="23507ed2" sha1="254c24c23b51cae181579ac062cf01f76edebb73"/>
 			</dataarea>
@@ -3383,7 +3383,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb_12m_12_set3.u1" size="0x100000" crc="1aa61941" sha1="002353dfd8ac61c4ea3e82d3fdd95d98a0fbf29e"/>
 			</dataarea>
@@ -3408,7 +3408,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb_12m_12_set4.u1" size="0x100000" crc="4df715fe" sha1="8aa22b8f1823c186124c4e083efc94d3b1adb5f9"/>
 			</dataarea>
@@ -3433,7 +3433,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb_12m_12_set5.u1" size="0x100000" crc="2d05d13d" sha1="252a74157e403e61107945d05e72d0c0d7b8f1c1"/>
 			</dataarea>
@@ -3458,7 +3458,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb_12m_12_set6.u1" size="0x100000" crc="cc7d21bc" sha1="14da4da1af6c9c36fac03d80a596b033347aae30"/>
 			</dataarea>
@@ -3483,7 +3483,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb_12m_12_set7.u1" size="0x100000" crc="6230d3d2" sha1="8b9ca56d64b37cf96cc97f953d2ad2525c4ee98e"/>
 			</dataarea>
@@ -3508,7 +3508,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb_12m_12_set8.u1" size="0x100000" crc="fd6f4039" sha1="d8b5e4dab616aaa2ae63ab14a919ca4b0e395614"/>
 			</dataarea>
@@ -3534,7 +3534,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb_12m_12_set9.u1" size="0x100000" crc="52535bbf" sha1="598734744c661226e4be79ec44d75ad556c05262"/>
 			</dataarea>
@@ -3559,7 +3559,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekara_user_blue.bin" size="0x100000" crc="2d36538d" sha1="455a16aea46e710a1a1f58b31341a5fc647426fe"/>
 			</dataarea>
@@ -3583,7 +3583,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekara_user_orange.bin" size="0x100000" crc="5614327d" sha1="5c415fe2529f0ee084914fe0ddb35d2ef161c939"/>
 			</dataarea>
@@ -3608,7 +3608,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="usercart12_12_1.bin" size="0x100000" crc="fe54acf0" sha1="c583b66a9b9d84fc5653a07ca70132ce6b86aaa1"/>
 			</dataarea>
@@ -3633,7 +3633,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="usercart12_12_2.bin" size="0x100000" crc="9e5e3a95" sha1="e961e0b6a0d047fc67f47c26bb187c2a0e6dbdec"/>
 			</dataarea>
@@ -3650,7 +3650,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="usercart12_4.bin" size="0x100000" crc="9ed939b1" sha1="69fd57d2b58f0606339b603ca8a9662203e3e152"/>
 			</dataarea>
@@ -3671,7 +3671,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb_8m_8_set1.u1" size="0x100000" crc="28a5a5c7" sha1="408ef97a8a42e286cb18b9df61ac575a24b1462d"/>
 			</dataarea>
@@ -3692,7 +3692,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb_8m_8_set2.u1" size="0x100000" crc="abc09a19" sha1="8b65e4b00a8757a0df3965548fd52e6b12b92756"/>
 			</dataarea>
@@ -3713,7 +3713,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb_8m_8_set3.u1" size="0x100000" crc="a97521cb" sha1="d5b826e7313697491cbcfab243439899a46f17c4"/>
 			</dataarea>
@@ -3734,7 +3734,7 @@ license:CC0-1.0
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="ekaraweb_8m_8_set4.u1" size="0x100000" crc="4e7c04d8" sha1="f81c134849cd846ede0106bf355c71408a2771a1"/>
 			</dataarea>
@@ -3744,13 +3744,14 @@ license:CC0-1.0
 	<!-- ********************************************************************************************************************************************************************** -->
 
 
+	<!-- JP-01 and JP-02 use 24LC04 EEPROMs. -->
 	<software name="jp01">
 		<description>JP-01 (Japan)</description>
 		<year>2004</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="JPOPIRA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc04"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c04_control0"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="jp1.bin" size="0x200000" crc="106544c5" sha1="1bff363ce13c0eaf344a8f36ed004c78e0ddd007" offset="0" />
 			</dataarea>
@@ -3762,8 +3763,8 @@ license:CC0-1.0
 		<year>2004</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="JPOPIRA"/>
-		<part name="cart" interface="ekara_cart">
-			<feature name="slot" value="rom_24lc04"/>
+		<part name="cart" interface="xavix_cart">
+			<feature name="slot" value="rom_24c04_control0"/>
 			<dataarea name="rom" size="0x200000">
 				<rom name="jp2.bin" size="0x200000" crc="f66d8ee8" sha1="3624c89197b1579fc60d5c40ff30bca248428a6c" offset="0" />
 			</dataarea>
@@ -3788,7 +3789,7 @@ license:CC0-1.0
 		<year>2000</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="us-m001.u1" size="0x080000" crc="8c12c0c2" sha1="8cc1b098894af25a4bfccada884125b66f5fe8b2"/>
 			</dataarea>
@@ -3812,7 +3813,7 @@ license:CC0-1.0
 		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="us-e001.u1" size="0x100000" crc="29df4aea" sha1="b95835aaf8630b61b47e5da0968cd4a1dd3bc517"/>
 			</dataarea>
@@ -3836,7 +3837,7 @@ license:CC0-1.0
 		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="us-e002.u1" size="0x100000" crc="6c66772e" sha1="e1e719df1e51caaafd9b3af187059334f7abbba3"/>
 			</dataarea>
@@ -3860,7 +3861,7 @@ license:CC0-1.0
 		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="us-e003.u1" size="0x100000" crc="d90a7e58" sha1="37b899676935fb3dda266dc5614ef53cb2c33980"/>
 			</dataarea>
@@ -3884,7 +3885,7 @@ license:CC0-1.0
 		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="us-e004.u1" size="0x100000" crc="790822e9" sha1="cc5806fdc79f777a42980d6825c92837b07fd80d"/>
 			</dataarea>
@@ -3908,7 +3909,7 @@ license:CC0-1.0
 		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="us-e005.u1" size="0x100000" crc="edf1e4ce" sha1="7e5e3116f62897ae023c84842036f24b19c926cc"/>
 			</dataarea>
@@ -3932,7 +3933,7 @@ license:CC0-1.0
 		<year>2001</year> <!-- 2000 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="us-e006.u1" size="0x100000" crc="e9aaca2f" sha1="983086f068ee38b970c01d2304e757148474aee3"/>
 			</dataarea>
@@ -3956,7 +3957,7 @@ license:CC0-1.0
 		<year>2002</year> <!-- 2002 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="us-e007.u1" size="0x100000" crc="b7f5ca53" sha1="84af6d96512de96dbab03c236b3416b2e604f753"/>
 			</dataarea>
@@ -3980,7 +3981,7 @@ license:CC0-1.0
 		<year>2002</year> <!-- 2002 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="us-e008.u1" size="0x100000" crc="5cddaf1f" sha1="345ae679974ae5ae9b506b32323ada234c01f984"/>
 			</dataarea>
@@ -4004,7 +4005,7 @@ license:CC0-1.0
 		<year>2002</year> <!-- 2002 shown on screen, 2001 on cart -->
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="us-e009.u1" size="0x100000" crc="0d9c402b" sha1="95652eb71dab74fbf05f8450f2a9b664b455deeb"/>
 			</dataarea>
@@ -4034,7 +4035,7 @@ license:CC0-1.0
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="uk-e001.u1" size="0x100000" crc="fc0ea770" sha1="47e2ef544cbb35431dd138b74d1f9b7290eba02d"/>
 			</dataarea>
@@ -4058,7 +4059,7 @@ license:CC0-1.0
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="uk-e002.u1" size="0x100000" crc="ab011ea3" sha1="dd5c9cc330956861b0d172c5a07a72eb315009a2"/>
 			</dataarea>
@@ -4082,7 +4083,7 @@ license:CC0-1.0
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="uk-e003.u1" size="0x100000" crc="ee16321c" sha1="cc6d22e164164dc678c75a65e13397fb29024b14"/>
 			</dataarea>
@@ -4106,7 +4107,7 @@ license:CC0-1.0
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="uk-e004.bin" size="0x100000" crc="d3739137" sha1="e3c404bc916cac4acccc46b8345defd9495431fa"/>
 			</dataarea>
@@ -4130,7 +4131,7 @@ license:CC0-1.0
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="uk-e005.bin" size="0x100000" crc="e8e2c9cd" sha1="d1bdcfe88bb28012e52e51dc1b39c20284d30b26"/>
 			</dataarea>
@@ -4154,7 +4155,7 @@ license:CC0-1.0
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="uk-e006.u1" size="0x100000" crc="fad51dc4" sha1="522adfab98c2634bfaa9a01e3b7aebba2f867c1f"/>
 			</dataarea>
@@ -4178,7 +4179,7 @@ license:CC0-1.0
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="uk-e007.u1" size="0x100000" crc="753ce591" sha1="e12ac98470f1dbc470f2e3d957f1b72f0a90bee1"/>
 			</dataarea>
@@ -4198,7 +4199,7 @@ license:CC0-1.0
 		<year>2002</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x080000">
 				<rom name="ger-m001.u1" size="0x080000" crc="ff2881f3" sha1="3470fc1ed81da5e2c929205fcd290da82d031c4c"/>
 			</dataarea>
@@ -4224,7 +4225,7 @@ license:CC0-1.0
 		<year>2002</year>
 		<publisher>Takara / newgent</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="spainvol1.bin" size="0x100000" crc="b90366cc" sha1="f6bab71fc8cb420728ffa721d7c12767719099e5"/>
 			</dataarea>
@@ -4248,7 +4249,7 @@ license:CC0-1.0
 		<year>2002</year>
 		<publisher>Takara / newgent</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="spainvol2.bin" size="0x100000" crc="a60f7b30" sha1="7c7736e692b9f4ce838dc064e214322aa3ae0e6a"/>
 			</dataarea>
@@ -4260,7 +4261,7 @@ license:CC0-1.0
 		<year>2002</year>
 		<publisher>Takara / Sonokong</publisher>
 		<sharedfeat name="compatibility" value="ISINGER"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="kr-ec002.u1" size="0x100000" crc="0c060c0f" sha1="82e0757a380617008b7313cf6b380e16804f7862"/>
 			</dataarea>
@@ -4272,7 +4273,7 @@ license:CC0-1.0
 		<year>2002</year>
 		<publisher>Takara / Sonokong</publisher>
 		<sharedfeat name="compatibility" value="ISINGER"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="kr-ec003.u1" size="0x100000" crc="928b97a6" sha1="5900cda733298b258b114c5452e1c02b0d90cee4"/>
 			</dataarea>
@@ -4284,7 +4285,7 @@ license:CC0-1.0
 		<year>2002</year>
 		<publisher>Takara / Sonokong</publisher>
 		<sharedfeat name="compatibility" value="ISINGER"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="kr-ec011.u1" size="0x100000" crc="effe2356" sha1="57417803b25273439fb5537a7d5aca340988eea8"/>
 			</dataarea>
@@ -4296,7 +4297,7 @@ license:CC0-1.0
 		<year>2002</year>
 		<publisher>Takara / Sonokong</publisher>
 		<sharedfeat name="compatibility" value="ISINGER"/>
-		<part name="cart" interface="ekara_cart">
+		<part name="cart" interface="xavix_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="kr-s001.u1" size="0x100000" crc="8a43e1b6" sha1="69eae20a395aee941a5da3a02e6c2dc6feee2391"/>
 			</dataarea>

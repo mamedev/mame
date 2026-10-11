@@ -1,11 +1,11 @@
 # license:BSD-3-Clause
-# copyright-holders:David Haywood
+# copyright-holders:David Haywood, MagikalUnicorn
 # xavix opcodes
 
 callf_xa3
 	read_stack(m_SP);
-	write_special_stack(m_SP, get_codebank());
-	dec_special_stack();
+	write_codebank_stack(m_SP, codebank());
+	dec_codebank_stack_pointer();
 	m_TMP2 = read_pc();
 	m_PC++;
 	m_TMP = read_pc();
@@ -39,8 +39,8 @@ retf_imp
 	m_PC = read_stack(m_SP);
 	inc_SP();
 	m_PC = set_h(m_PC, read_stack(m_SP));
-	inc_special_stack();
-	m_TMP2 = read_special_stack(m_SP);
+	inc_codebank_stack_pointer();
+	m_TMP2 = read_codebank_stack(m_SP);
 	set_codebank(m_TMP2);
 	read_pc();
 	m_PC++;
@@ -55,9 +55,9 @@ brk_xav_imp
 		read_pc();
 	m_PC++;
 	}
-	write_special_stack(m_SP, get_codebank());
+	write_codebank_stack(m_SP, codebank());
 	set_codebank(0x00); // epo_efdx, rad_ping and rad_mtrk strongly suggest that interrupts must force bank 0 as code jumps to a ROM pointer stored earlier / a fixed pointer to a rom address in bank 0
-	dec_special_stack();
+	dec_codebank_stack_pointer();
 	write_stack(m_SP, m_PC >> 8);
 	dec_SP();
 	write_stack(m_SP, m_PC);
@@ -66,17 +66,17 @@ brk_xav_imp
 	dec_SP();
 	if(m_nmi_pending) {
 		standard_irq_callback(NMI_LINE, m_PC);
-		if (m_vector_callback.isnull())
+		if (m_interrupt_vector_callback.isnull())
 		{
 			m_PC = read_arg(0xfffa);
 			m_PC = set_h(m_PC, read_arg(0xfffb));
 		}
 		else
 		{
-			if (m_vector_callback(0,1) != -1)
+			if (m_interrupt_vector_callback(0,1) != -1)
 			{
-				m_PC = m_vector_callback(0,1);
-				m_PC = set_h(m_PC, m_vector_callback(0,0));
+				m_PC = m_interrupt_vector_callback(0,1);
+				m_PC = set_h(m_PC, m_interrupt_vector_callback(0,0));
 			}
 			else
 			{
@@ -89,17 +89,17 @@ brk_xav_imp
 	} else {
 		if(m_irq_taken)
 			standard_irq_callback(IRQ_LINE, m_PC);
-		if (m_vector_callback.isnull())
+		if (m_interrupt_vector_callback.isnull())
 		{
 			m_PC = read_arg(0xfffe);
 			m_PC = set_h(m_PC, read_arg(0xffff));
 		}
 		else
 		{
-			if (m_vector_callback(1,1) != -1)
+			if (m_interrupt_vector_callback(1,1) != -1)
 			{
-				m_PC = m_vector_callback(1,1);
-				m_PC = set_h(m_PC, m_vector_callback(1,0));
+				m_PC = m_interrupt_vector_callback(1,1);
+				m_PC = set_h(m_PC, m_interrupt_vector_callback(1,0));
 			}
 			else
 			{
@@ -122,8 +122,8 @@ rti_xav_imp
 	m_PC = read_stack(m_SP);
 	inc_SP();
 	m_PC = set_h(m_PC, read_stack(m_SP));
-	inc_special_stack();
-	m_TMP2 = read_special_stack(m_SP);
+	inc_codebank_stack_pointer();
+	m_TMP2 = read_codebank_stack(m_SP);
 	set_codebank(m_TMP2);
 	prefetch();
 
@@ -357,8 +357,8 @@ sta_xav_idy
 	m_PC++;
 	m_TMP = read_zeropage(m_TMP2);
 	m_TMP = set_h(m_TMP, read_zeropage((m_TMP2+1) & 0xff));
-	read_zeropage(set_l(m_TMP, m_TMP+m_Y)); // dummy read
-	write(m_TMP+m_Y, m_A); // TODO
+	read_zeropage(set_l(m_TMP, m_TMP+m_Y)); // TODO: Verify the original-chip dummy-read address.
+	write(m_TMP+m_Y, m_A);
 	prefetch();
 
 sta_xav_idx
@@ -368,7 +368,7 @@ sta_xav_idx
 	m_TMP2 += m_X;
 	m_TMP = read_zeropage(m_TMP2 & 0xff);
 	m_TMP = set_h(m_TMP, read_zeropage((m_TMP2+1) & 0xff));
-	write(m_TMP, m_A); // TODO
+	write(m_TMP, m_A);
 	prefetch();
 
 adc_xav_zpg
@@ -1104,3 +1104,172 @@ isb_xav_idy
 	do_sbc(m_TMP2);
 	prefetch();
 
+# Standard 6502 addressing modes with binary-only arithmetic
+adc_nd_aba
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	do_adc_nd(m_TMP2);
+	prefetch();
+
+adc_nd_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	if(page_changing(m_TMP, m_X)) {
+		read(set_l(m_TMP, m_TMP+m_X));
+	}
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	do_adc_nd(m_TMP2);
+	prefetch();
+
+adc_nd_aby
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	if(page_changing(m_TMP, m_Y)) {
+		read(set_l(m_TMP, m_TMP+m_Y));
+	}
+	m_TMP += m_Y;
+	m_TMP2 = read(m_TMP);
+	do_adc_nd(m_TMP2);
+	prefetch();
+
+adc_nd_imm
+	m_TMP = read_pc();
+	m_PC++;
+	do_adc_nd(m_TMP);
+	prefetch();
+
+arr_nd_imm
+	m_TMP = read_pc();
+	m_A &= m_TMP;
+	m_PC++;
+	do_arr_nd();
+	prefetch();
+
+rra_nd_aba
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	write(m_TMP, m_TMP2);
+	m_TMP2 = do_ror(m_TMP2);
+	write(m_TMP, m_TMP2);
+	do_adc_nd(m_TMP2);
+	prefetch();
+
+rra_nd_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	read(set_l(m_TMP, m_TMP+m_X));
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	write(m_TMP, m_TMP2);
+	m_TMP2 = do_ror(m_TMP2);
+	write(m_TMP, m_TMP2);
+	do_adc_nd(m_TMP2);
+	prefetch();
+
+rra_nd_aby
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	read(set_l(m_TMP, m_TMP+m_Y));
+	m_TMP += m_Y;
+	m_TMP2 = read(m_TMP);
+	write(m_TMP, m_TMP2);
+	m_TMP2 = do_ror(m_TMP2);
+	write(m_TMP, m_TMP2);
+	do_adc_nd(m_TMP2);
+	prefetch();
+
+sbc_nd_aba
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	do_sbc_nd(m_TMP2);
+	prefetch();
+
+sbc_nd_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	if(page_changing(m_TMP, m_X)) {
+		read(set_l(m_TMP, m_TMP+m_X));
+	}
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	do_sbc_nd(m_TMP2);
+	prefetch();
+
+sbc_nd_aby
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	if(page_changing(m_TMP, m_Y)) {
+		read(set_l(m_TMP, m_TMP+m_Y));
+	}
+	m_TMP += m_Y;
+	m_TMP2 = read(m_TMP);
+	do_sbc_nd(m_TMP2);
+	prefetch();
+
+sbc_nd_imm
+	m_TMP = read_pc();
+	m_PC++;
+	do_sbc_nd(m_TMP);
+	prefetch();
+
+isb_nd_aba
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	write(m_TMP, m_TMP2);
+	m_TMP2++;
+	write(m_TMP, m_TMP2);
+	do_sbc_nd(m_TMP2);
+	prefetch();
+
+isb_nd_abx
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	read(set_l(m_TMP, m_TMP+m_X));
+	m_TMP += m_X;
+	m_TMP2 = read(m_TMP);
+	write(m_TMP, m_TMP2);
+	m_TMP2++;
+	write(m_TMP, m_TMP2);
+	do_sbc_nd(m_TMP2);
+	prefetch();
+
+isb_nd_aby
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	read(set_l(m_TMP, m_TMP+m_Y));
+	m_TMP += m_Y;
+	m_TMP2 = read(m_TMP);
+	write(m_TMP, m_TMP2);
+	m_TMP2++;
+	write(m_TMP, m_TMP2);
+	do_sbc_nd(m_TMP2);
+	prefetch();
