@@ -793,54 +793,54 @@ ROM_END
 //**************************************************************************
 
 // K.O.しようぜ！エキサイトボクシング
-CONS( 2002, epo_ebox, 0,      0, xavix2000_epo_ebox,         epo_ebox, xavix2000_epo_ebox_state,   empty_init, "Epoch / SSD Company Ltd.", "K.O. Shiyouze! Excite Boxing (Japan)", 0 ) // doesn't use XaviX2000 extra opcodes, but had that type of CPU
+CONS( 2002, epo_ebox, 0,      0, xavix2000_epo_ebox,         epo_ebox, xavix2000_epo_ebox_state,   empty_init, "Epoch / SSD Company Ltd.", "K.O. Shiyouze! Excite Boxing (Japan)", MACHINE_NOT_WORKING ) // doesn't use XaviX2000 extra opcodes, but had that type of CPU
 
 // ストライクきめるぜ！ エキサイトボウリング
-CONS( 2002, epo_bowl, 0,      0, xavix2000_epo_bowl,         epo_bowl, xavix2000_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "Strike Kimeruze! Excite Bowling (Japan)", 0 )
+CONS( 2002, epo_bowl, 0,      0, xavix2000_epo_bowl,         epo_bowl, xavix2000_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "Strike Kimeruze! Excite Bowling (Japan)", MACHINE_NOT_WORKING )
 
 // スーパーショット！ エキサイトゴルフ
 // 2002 date on PCB, 2003 in-game.
-CONS( 2003, epo_golf, 0,      0, xavix2000_epo_golf,         epo_golf, xavix2000_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "Super Shot! Excite Golf (Japan)", 0 )
+CONS( 2003, epo_golf, 0,      0, xavix2000_epo_golf,         epo_golf, xavix2000_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "Super Shot! Excite Golf (Japan)", MACHINE_NOT_WORKING )
 
 // とっとこハム太郎 ハムハム大サーカス！
-CONS( 2002, epo_hamc, 0,      0, xavix2000_epo_hamc,         epo_hamc, xavix2000_camera_state,     empty_init, "Epoch / SSD Company Ltd.", "Tottoko Hamtaro: Ham-Ham Dai Circus! (Japan)", 0 )
+CONS( 2002, epo_hamc, 0,      0, xavix2000_epo_hamc,         epo_hamc, xavix2000_camera_state,     empty_init, "Epoch / SSD Company Ltd.", "Tottoko Hamtaro: Ham-Ham Dai Circus! (Japan)", MACHINE_NOT_WORKING )
 
 // ミニモニ。パーティ！リズムでぴょん！
-CONS( 2003, epo_mini, 0,      0, xavix2000_epo_mini,         epo_mini, xavix2000_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "mini-moni. Party! Rhythm de Pyon! (Japan)", 0 )
+CONS( 2003, epo_mini, 0,      0, xavix2000_epo_mini,         epo_mini, xavix2000_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "mini-moni. Party! Rhythm de Pyon! (Japan)", MACHINE_NOT_WORKING )
 
 // カードスキャン!　エキサイトステージ サッカー日本代表チーム
-CONS( 2006, epo_es2j, 0,      0, xavix2000_epo_es2j,         epo_es2j, xavix2000_epo_es2j_state,   empty_init, "Epoch / SSD Company Ltd.", "Card Scan! Excite Stage Soccer Nippon Daihyou Team (Japan)", 0 )
+CONS( 2006, epo_es2j, 0,      0, xavix2000_epo_es2j,         epo_es2j, xavix2000_epo_es2j_state,   empty_init, "Epoch / SSD Company Ltd.", "Card Scan! Excite Stage Soccer Nippon Daihyou Team (Japan)", MACHINE_NOT_WORKING )
 
 /* Card images: https://dm.takaratomy.co.jp/card (use the complete upright front, not an artwork crop).
    Boot with an empty scanner for cover calibration, then load the card image in File Manager.
    This is a product in the Duel Masters line called Duel Station; the boot up screen calls it Duel Station, title logo is Duel Masters */
-CONS( 2003, duelmast, 0,      0, xavix2000_duelmast,         duelmast, xavix2000_duelmast_state,   empty_init, "Takara / SSD Company Ltd.", "Duel Masters: Duel Station (Japan)", 0 )
+CONS( 2003, duelmast, 0,      0, xavix2000_duelmast,         duelmast, xavix2000_duelmast_state,   empty_init, "Takara / SSD Company Ltd.", "Duel Masters: Duel Station (Japan)", MACHINE_NOT_WORKING )
 
 // スーパーダッシュボール
-CONS( 2004, epo_sdb,  0,      0, xavix2000_epo_sdb,          epo_sdb,  xavix_state,                empty_init, "Epoch / SSD Company Ltd.", "Super Dash Ball (Japan)", 0 )
+CONS( 2004, epo_sdb,  0,      0, xavix2000_epo_sdb,          epo_sdb,  xavix_state,                empty_init, "Epoch / SSD Company Ltd.", "Super Dash Ball (Japan)", MACHINE_NOT_WORKING )
 
-CONS( 2005, ttv_sw,   0,      0, xavix2000_ttv_sw,           ttv_sw,   xavix2000_i2c_camera_state, empty_init, "Hasbro / Tiger Games / SSD Company Ltd.", "Star Wars Saga Edition: Lightsaber Battle Game!", 0 )
+CONS( 2005, ttv_sw,   0,      0, xavix2000_ttv_sw,           ttv_sw,   xavix2000_i2c_camera_state, empty_init, "Hasbro / Tiger Games / SSD Company Ltd.", "Star Wars Saga Edition: Lightsaber Battle Game!", MACHINE_NOT_WORKING )
 // テレビで遊び隊 STAR WARS LIGHTSABER BATTLE ～ジェダイの戦い～
-CONS( 2005, ttv_swj,  ttv_sw, 0, xavix2000_ttv_sw,           ttv_sw,   xavix2000_i2c_camera_state, empty_init, "Tomy / SSD Company Ltd.", "TV de Asobitai Star Wars: Lightsaber Battle - Jedi no Tatakai (Japan)", 0 )
+CONS( 2005, ttv_swj,  ttv_sw, 0, xavix2000_ttv_sw,           ttv_sw,   xavix2000_i2c_camera_state, empty_init, "Tomy / SSD Company Ltd.", "TV de Asobitai Star Wars: Lightsaber Battle - Jedi no Tatakai (Japan)", MACHINE_NOT_WORKING )
 
-CONS( 2005, ttv_lotr, 0,      0, xavix2000_i2c_24c02_camera, ttv_lotr, xavix2000_i2c_camera_state, empty_init, "Hasbro / Tiger Games / SSD Company Ltd.", "The Lord of the Rings: Warrior of Middle-Earth", 0 )
+CONS( 2005, ttv_lotr, 0,      0, xavix2000_i2c_24c02_camera, ttv_lotr, xavix2000_i2c_camera_state, empty_init, "Hasbro / Tiger Games / SSD Company Ltd.", "The Lord of the Rings: Warrior of Middle-Earth", MACHINE_NOT_WORKING )
 
-CONS( 2005, ttv_mx,   0,      0, xavix2000_i2c_24c04,        ttv_mx,   xavix_i2c_state,            empty_init, "Hasbro / Tiger Games / SSD Company Ltd.", "MX Dirt Rebel", 0 )
+CONS( 2005, ttv_mx,   0,      0, xavix2000_i2c_24c04,        ttv_mx,   xavix_i2c_state,            empty_init, "Hasbro / Tiger Games / SSD Company Ltd.", "MX Dirt Rebel", MACHINE_NOT_WORKING )
 
 // テレビで遊び隊　韋駄天翔 激走 韋駄天バトル - seems to be based on the same engine at ttv_mx and has an almost identical controller, but not exactly the same game
-CONS( 2005, tom_jump, 0,      0, xavix2000_i2c_24c04,        tom_jump, xavix_i2c_state,            empty_init, "Tomy / SSD Company Ltd.", "TV de Asobitai IDATEN Jump: Gekisou IDATEN Battle (Japan)", 0 )
+CONS( 2005, tom_jump, 0,      0, xavix2000_i2c_24c04,        tom_jump, xavix_i2c_state,            empty_init, "Tomy / SSD Company Ltd.", "TV de Asobitai IDATEN Jump: Gekisou IDATEN Battle (Japan)", MACHINE_NOT_WORKING )
 
 // 剣神ドラゴンクエスト 甦りし伝説の剣
-CONS( 2003, drgqst,   0,      0, xavix2000_drgqst,           drgqst,   xavix2000_i2c_camera_state, empty_init, "Square Enix / SSD Company Ltd.", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken (Japan)", 0 )
+CONS( 2003, drgqst,   0,      0, xavix2000_drgqst,           drgqst,   xavix2000_i2c_camera_state, empty_init, "Square Enix / SSD Company Ltd.", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken (Japan)", MACHINE_NOT_WORKING )
 
 // チョロＱビュンビュンレーサー
-CONS( 2003, tak_chq,  0,      0, xavix2000_tak_chq,          tak_chq,  xavix_i2c_state,            empty_init, "Takara / SSD Company Ltd.", "Choro-Q Byun Byun Racer (Japan)", 0 )
+CONS( 2003, tak_chq,  0,      0, xavix2000_tak_chq,          tak_chq,  xavix_i2c_state,            empty_init, "Takara / SSD Company Ltd.", "Choro-Q Byun Byun Racer (Japan)", MACHINE_NOT_WORKING )
 
 // Let’s！TV プレイ　体感格闘ワンピースパンチバトル 　～海賊王にキミがなる！～
-CONS( 2004, ban_onep, 0,      0, xavix2000_ban_onep,         ban_onep, xavix2000_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Taikan Kakutou One Piece Punch Battle: Kaizoku Ou ni Kimi ga Naru! (Japan)", 0 )
+CONS( 2004, ban_onep, 0,      0, xavix2000_ban_onep,         ban_onep, xavix2000_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Taikan Kakutou One Piece Punch Battle: Kaizoku Ou ni Kimi ga Naru! (Japan)", MACHINE_NOT_WORKING )
 
 // Let’s！TV プレイ　闘印奥義　陰陽大戦記　～目指せ最強闘神士～ - 2004 date on PCB, 2005 in-game
-CONS( 2005, ban_omt,  0,      0, xavix2000_ban_omt,          ban_omt,  xavix2000_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Touin Ougi Onmyou Taisenki: Mezase Saikyou Toushinshi (Japan)", 0 )
+CONS( 2005, ban_omt,  0,      0, xavix2000_ban_omt,          ban_omt,  xavix2000_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Touin Ougi Onmyou Taisenki: Mezase Saikyou Toushinshi (Japan)", MACHINE_NOT_WORKING )
 
 // テレビで遊び隊 ディズニープリンセス　キラキラ魔法のレッスン
-CONS( 2004, tom_dpgm, 0,      0, xavix2000_tom_dpgm,         tom_dpgm, xavix2000_i2c_camera_state, empty_init, "Tomy / SSD Company Ltd.", "TV de Asobitai Disney Princess: Kirakira Mahou no Lesson (Japan)", 0 )
+CONS( 2004, tom_dpgm, 0,      0, xavix2000_tom_dpgm,         tom_dpgm, xavix2000_i2c_camera_state, empty_init, "Tomy / SSD Company Ltd.", "TV de Asobitai Disney Princess: Kirakira Mahou no Lesson (Japan)", MACHINE_NOT_WORKING )

@@ -3162,38 +3162,38 @@ ROM_END
 //  System Registrations
 //**************************************************************************
 
-CONS( 2004, xavtenni,   0,        0, superxavix_xavtenni,              xavixport_tennis,      superxavix_xavtenni_state,   empty_init, "SSD Company Ltd.", "XaviX Tennis (XaviXPORT)", 0 )
+CONS( 2004, xavtenni,   0,        0, superxavix_xavtenni,              xavixport_tennis,      superxavix_xavtenni_state,   empty_init, "SSD Company Ltd.", "XaviX Tennis (XaviXPORT)", MACHINE_NOT_WORKING )
 // ザビックス テニス
-CONS( 2005, xavtennij,  xavtenni, 0, superxavix_xavtenni,              xavixport_tennis,      superxavix_xavtenni_state,   empty_init, "SSD Company Ltd.", "XaviX Tennis (XaviXPORT, Japan)", 0 )
-CONS( 2004, xavbaseb,   0,        0, superxavix_xavbaseb,              xavixport_baseball,    superxavix_xavbaseb_state,   empty_init, "SSD Company Ltd.", "XaviX Baseball (XaviXPORT)", 0 )
+CONS( 2005, xavtennij,  xavtenni, 0, superxavix_xavtenni,              xavixport_tennis,      superxavix_xavtenni_state,   empty_init, "SSD Company Ltd.", "XaviX Tennis (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
+CONS( 2004, xavbaseb,   0,        0, superxavix_xavbaseb,              xavixport_baseball,    superxavix_xavbaseb_state,   empty_init, "SSD Company Ltd.", "XaviX Baseball (XaviXPORT)", MACHINE_NOT_WORKING )
 // ザビックス ベースボール
-CONS( 2005, xavbasebj,  xavbaseb, 0, superxavix_xavbaseb,              xavixport_baseball,    superxavix_xavbaseb_state,   empty_init, "SSD Company Ltd.", "XaviX Baseball (XaviXPORT, Japan)", 0 )
-CONS( 2005, xavgolf,    0,        0, superxavix_xavgolf,               xavixport_golf,        superxavix_xavgolf_state,    empty_init, "SSD Company Ltd.", "XaviX Golf (XaviXPORT)", 0 )
+CONS( 2005, xavbasebj,  xavbaseb, 0, superxavix_xavbaseb,              xavixport_baseball,    superxavix_xavbaseb_state,   empty_init, "SSD Company Ltd.", "XaviX Baseball (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
+CONS( 2005, xavgolf,    0,        0, superxavix_xavgolf,               xavixport_golf,        superxavix_xavgolf_state,    empty_init, "SSD Company Ltd.", "XaviX Golf (XaviXPORT)", MACHINE_NOT_WORKING )
 // ザビックス ゴルフ
-CONS( 2005, xavgolfj,   xavgolf,  0, superxavix_xavgolf,               xavixport_golf,        superxavix_xavgolf_state,    empty_init, "SSD Company Ltd.", "XaviX Golf (XaviXPORT, Japan)", 0 )
+CONS( 2005, xavgolfj,   xavgolf,  0, superxavix_xavgolf,               xavixport_golf,        superxavix_xavgolf_state,    empty_init, "SSD Company Ltd.", "XaviX Golf (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
 // Both Bowling ROMs make zero-count startup palette uploads that write to unmapped 0x6bff.
-CONS( 2004, xavbowl,    0,        0, superxavix_xavbowl,               xavix_bowl,            superxavix_i2c_camera_state, empty_init, "SSD Company Ltd.", "XaviX Bowling (XaviXPORT)", 0 ) // has IR 'Camera'
+CONS( 2004, xavbowl,    0,        0, superxavix_xavbowl,               xavix_bowl,            superxavix_i2c_camera_state, empty_init, "SSD Company Ltd.", "XaviX Bowling (XaviXPORT)", MACHINE_NOT_WORKING ) // has IR 'Camera'
 // ザビックス ボウリング
-CONS( 2005, xavbowlj,   xavbowl,  0, superxavix_xavbowl,               xavix_bowl,            superxavix_i2c_camera_state, empty_init, "SSD Company Ltd.", "XaviX Bowling (XaviXPORT, PT2-BWL-11, Japan)", 0 ) // ^^
-CONS( 2004, xavbox,     0,        0, superxavix_xavbox,                xavix_box,             superxavix_xavbox_state,     empty_init, "SSD Company Ltd.", "XaviX Boxing / Jackie Chan PowerBoxing (XaviXPORT)", 0 ) // has IR 'Camera'
+CONS( 2005, xavbowlj,   xavbowl,  0, superxavix_xavbowl,               xavix_bowl,            superxavix_i2c_camera_state, empty_init, "SSD Company Ltd.", "XaviX Bowling (XaviXPORT, PT2-BWL-11, Japan)", MACHINE_NOT_WORKING ) // ^^
+CONS( 2004, xavbox,     0,        0, superxavix_xavbox,                xavix_box,             superxavix_xavbox_state,     empty_init, "SSD Company Ltd.", "XaviX Boxing / Jackie Chan PowerBoxing (XaviXPORT)", MACHINE_NOT_WORKING ) // has IR 'Camera'
 // ザビックス パワーボクシング
-CONS( 2004, xavboxj,    xavbox,   0, superxavix_xavbox,                xavix_box,             superxavix_xavbox_state,     empty_init, "SSD Company Ltd.", "XaviX Boxing / Jackie Chan PowerBoxing (XaviXPORT, Japan)", 0 ) // has IR 'Camera'
+CONS( 2004, xavboxj,    xavbox,   0, superxavix_xavbox,                xavix_box,             superxavix_xavbox_state,     empty_init, "SSD Company Ltd.", "XaviX Boxing / Jackie Chan PowerBoxing (XaviXPORT, Japan)", MACHINE_NOT_WORKING ) // has IR 'Camera'
 // Bass Fishing PCB is just like Tennis except with an RF daughterboard.
-CONS( 2004, xavbassf,   0,        0, superxavix_xavbassf,              xavixport_bassfishing, superxavix_xavbassf_state,   empty_init, "SSD Company Ltd.", "XaviX Bass Fishing (XaviXPORT)", 0 )
+CONS( 2004, xavbassf,   0,        0, superxavix_xavbassf,              xavixport_bassfishing, superxavix_xavbassf_state,   empty_init, "SSD Company Ltd.", "XaviX Bass Fishing (XaviXPORT)", MACHINE_NOT_WORKING )
 
 // These titles use a 24C64-compatible SEEPROM.
-CONS( 2005, xavjmat,    0,        0, superxavix_xavjmat,               xavix_jmat,            superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "Jackie Chan J-Mat Fitness (XaviXPORT)", 0 )
+CONS( 2005, xavjmat,    0,        0, superxavix_xavjmat,               xavix_jmat,            superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING )
 // ザビックス エアロステップ
-CONS( 2005, xavaero,    xavjmat,  0, superxavix_xavjmat,               xavix_jmat,            superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "XaviX Aerostep J-Mat (XaviXPORT, Japan)", 0 )
-CONS( 2007, xavmusic,   0,        0, superxavix_xavmusic,              xavix_step,            superxavix_xavmusic_state,   empty_init, "SSD Company Ltd.", "XaviX Music & Circuit (XaviXPORT)", 0 )
+CONS( 2005, xavaero,    xavjmat,  0, superxavix_xavjmat,               xavix_jmat,            superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "XaviX Aerostep J-Mat (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
+CONS( 2007, xavmusic,   0,        0, superxavix_xavmusic,              xavix_step,            superxavix_xavmusic_state,   empty_init, "SSD Company Ltd.", "XaviX Music & Circuit (XaviXPORT)", MACHINE_NOT_WORKING )
 // ザビックスエアロ エアロステップ ミュージック&サーキット
-CONS( 2007, xavmusicj,  xavmusic, 0, superxavix_xavmusicj,             xavix_step,            superxavix_xavmusicj_state,  empty_init, "SSD Company Ltd.", "XaviX Aerostep MC (XaviXPORT, Japan)", 0 )
+CONS( 2007, xavmusicj,  xavmusic, 0, superxavix_xavmusicj,             xavix_step,            superxavix_xavmusicj_state,  empty_init, "SSD Company Ltd.", "XaviX Aerostep MC (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
 // ザビックスエアロ チェック&バランス
-CONS( 2006, xavcheck,   0,        0, superxavix_xavcheck,              xavix_check,           superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "XaviX Aero Check & Balance (XaviXPORT, Japan)", 0 )
+CONS( 2006, xavcheck,   0,        0, superxavix_xavcheck,              xavix_check,           superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "XaviX Aero Check & Balance (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
 // XaviX パワーキッズ ジュニア カラダでのばす才能開発
-CONS( 2007, xavpkjr,    0,        0, superxavix_xavpowrk,              xavix_step,            superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "PowerKIDS Jr. (XaviXPORT, Japan)", 0 )
+CONS( 2007, xavpkjr,    0,        0, superxavix_xavpowrk,              xavix_step,            superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "PowerKIDS Jr. (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
 // XaviX パワーキッズ カラダでのばす才能開発
-CONS( 2007, xavpowrk,   0,        0, superxavix_xavpowrk,              xavix_step,            superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "PowerKIDS (XaviXPORT, Japan)", 0 )
+CONS( 2007, xavpowrk,   0,        0, superxavix_xavpowrk,              xavix_step,            superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "PowerKIDS (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
 
 // https://arnaudmeyer.wordpress.com/domyos-interactive-system/
 // Domyos Fitness Adventure
@@ -3209,92 +3209,92 @@ CONS( 2007, xavpowrk,   0,        0, superxavix_xavpowrk,              xavix_ste
 
 // These titles use a 24C64-compatible SEEPROM and an S-35390A RTC.
 // Exercises has some leftover PC buffer stuff.  Exercises and Challenge use identical PCBs.
-CONS( 2008, domfitex,   0,        0, superxavix_domfitex,              domyos_step,           superxavix_i2c_pio1_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Exercises (Domyos Interactive System)", 0 )
-CONS( 2008, domfitch,   0,        0, superxavix_domfitex,              domyos_step,           superxavix_i2c_pio1_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Challenge (Domyos Interactive System)", 0 )
-CONS( 2007, domdance,   0,        0, superxavix_domdance,              domyos_step,           superxavix_domdance_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Dance (Domyos Interactive System)", MACHINE_IMPERFECT_SOUND )
-CONS( 2007, domstepc,   0,        0, superxavix_domfitex,              domyos_step,           superxavix_i2c_pio1_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Step Concept (Domyos Interactive System)", 0 )
+CONS( 2008, domfitex,   0,        0, superxavix_domfitex,              domyos_step,           superxavix_i2c_pio1_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Exercises (Domyos Interactive System)", MACHINE_NOT_WORKING )
+CONS( 2008, domfitch,   0,        0, superxavix_domfitex,              domyos_step,           superxavix_i2c_pio1_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Challenge (Domyos Interactive System)", MACHINE_NOT_WORKING )
+CONS( 2007, domdance,   0,        0, superxavix_domdance,              domyos_step,           superxavix_domdance_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Dance (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, domstepc,   0,        0, superxavix_domfitex,              domyos_step,           superxavix_i2c_pio1_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Step Concept (Domyos Interactive System)", MACHINE_NOT_WORKING )
 
 // some DIS games run on XaviX 2 instead, see xavix2.cpp for Domyos Fitness Adventure and Domyos Bike Concept
 
 // Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル
-CONS( 2005, mrangbat,   0,        0, superxavix_mrangbat,              mrangbat,              superxavix_i2c_state,        empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Mahou Taiketsu Magiranger: Magimat de Dance & Battle (Japan)", 0 )
+CONS( 2005, mrangbat,   0,        0, superxavix_mrangbat,              mrangbat,              superxavix_i2c_state,        empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Mahou Taiketsu Magiranger: Magimat de Dance & Battle (Japan)", MACHINE_NOT_WORKING )
 
 // エキサイトスポーツ　テニス×フィットネス
-CONS( 2004, epo_tfit,   0,        0, superxavix_epo_tfit,              epo_tfit,              superxavix_epo_tfit_state,   empty_init, "Epoch / SSD Company Ltd.", "Excite Sports Tennis x Fitness (Japan)", 0 )
+CONS( 2004, epo_tfit,   0,        0, superxavix_epo_tfit,              epo_tfit,              superxavix_epo_tfit_state,   empty_init, "Epoch / SSD Company Ltd.", "Excite Sports Tennis x Fitness (Japan)", MACHINE_NOT_WORKING )
 
 // 石川遼 エキサイトゴルフ
-CONS( 2010, epo_rgfj,   0,        0, superxavix_epo_rgfj,              epo_rgfj,              superxavix_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "Ishikawa Ryou Excite Golf (Japan)", 0 )
+CONS( 2010, epo_rgfj,   0,        0, superxavix_epo_rgfj,              epo_rgfj,              superxavix_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "Ishikawa Ryou Excite Golf (Japan)", MACHINE_NOT_WORKING )
 
 // Let's!TVプレイ ふたりはプリキュアMax Heart マットでダンス Max Heartにおどっちゃおう
-CONS( 2004, maxheart,   0,        0, superxavix_i2c_24c04_4mb,         maxheart,              superxavix_i2c_state,        empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Futari wa PreCure Max Heart: Mat de Dance Max Heart ni Odotchaou (Japan)", 0 )
+CONS( 2004, maxheart,   0,        0, superxavix_i2c_24c04_4mb,         maxheart,              superxavix_i2c_state,        empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Futari wa PreCure Max Heart: Mat de Dance Max Heart ni Odotchaou (Japan)", MACHINE_NOT_WORKING )
 
 // どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！
-CONS( 2004, epo_doka,   0,        0, superxavix_4mb,                   epo_doka,              superxavix_state,            empty_init, "Epoch / SSD Company Ltd.", "Doko Demo Doraemon Nihon Ryokou Game DX Taikan! Doko Dora Grand Prix! (Japan)", 0 )
+CONS( 2004, epo_doka,   0,        0, superxavix_4mb,                   epo_doka,              superxavix_state,            empty_init, "Epoch / SSD Company Ltd.", "Doko Demo Doraemon Nihon Ryokou Game DX Taikan! Doko Dora Grand Prix! (Japan)", MACHINE_NOT_WORKING )
 
 // Hello Kitty テレビであそぼう!まなぼう! カードでおままごと あいうえお図鑑
-CONS( 2006, epo_kabj,   0,        0, superxavix_epo_kabj,              epo_kabj,              superxavix_epo_kabj_state,   empty_init, "Epoch / SSD Company Ltd.", "Hello Kitty: TV de Asobou! Manabou! Card de Omamagoto AIUEO Zukan (Japan)", 0 )
+CONS( 2006, epo_kabj,   0,        0, superxavix_epo_kabj,              epo_kabj,              superxavix_epo_kabj_state,   empty_init, "Epoch / SSD Company Ltd.", "Hello Kitty: TV de Asobou! Manabou! Card de Omamagoto AIUEO Zukan (Japan)", MACHINE_NOT_WORKING )
 
 // Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！
-CONS( 2006, ban_bkgj,   0,        0, superxavix_ban_bkgj,              ban_bkgj,              superxavix_ban_bkgj_state,   empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Narikiri Taikan Boukenger: Hashire! Ute! Mission Start!! (Japan)", 0 )
+CONS( 2006, ban_bkgj,   0,        0, superxavix_ban_bkgj,              ban_bkgj,              superxavix_ban_bkgj_state,   empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Narikiri Taikan Boukenger: Hashire! Ute! Mission Start!! (Japan)", MACHINE_NOT_WORKING )
 
 // Let's!TV プレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック!!
-CONS( 2006, ban_utmj,   0,        0, superxavix_ban_utmj,              ban_reflective_camera, superxavix_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Taikan Cast Off: Kamen Rider Kabuto Clock Up & Rider Kick!! (Japan)", 0 )
+CONS( 2006, ban_utmj,   0,        0, superxavix_ban_utmj,              ban_reflective_camera, superxavix_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Taikan Cast Off: Kamen Rider Kabuto Clock Up & Rider Kick!! (Japan)", MACHINE_NOT_WORKING )
 
 // Let's!TVプレイ なりきりファイト ウルトラマン 撃て！必殺光線！！
-CONS( 2006, ban_ult,    0,        0, superxavix_ban_ult,               ban_ult,               superxavix_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Narikiri Fight Ultraman: Ute! Hissatsu Kousen!! (Japan)", 0 )
+CONS( 2006, ban_ult,    0,        0, superxavix_ban_ult,               ban_ult,               superxavix_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Narikiri Fight Ultraman: Ute! Hissatsu Kousen!! (Japan)", MACHINE_NOT_WORKING )
 
 // Let's!TVプレイ 体感大怪獣バトル あやつれ!ウルトラ大怪獣!
-CONS( 2007, ban_um2j,   0,        0, superxavix_ban_um2j,              ban_um2j,              superxavix_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Taikan Daikaijuu Battle: Ayatsure! Ultra Daikaijuu! (Japan)", 0 )
+CONS( 2007, ban_um2j,   0,        0, superxavix_ban_um2j,              ban_um2j,              superxavix_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Taikan Daikaijuu Battle: Ayatsure! Ultra Daikaijuu! (Japan)", MACHINE_NOT_WORKING )
 
 // Let’s!TVプレイ ゲキワザ習得 ゲキレンジャー スーパーゲキレンジャーへの道
-CONS( 2007, ban_gkrj,   0,        0, superxavix_ban_gkrj,              ban_gkrj,              superxavix_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Gekiwaza Shuutoku Gekiranger: Super Gekiranger e no Michi (Japan)", 0 )
+CONS( 2007, ban_gkrj,   0,        0, superxavix_ban_gkrj,              ban_gkrj,              superxavix_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Gekiwaza Shuutoku Gekiranger: Super Gekiranger e no Michi (Japan)", MACHINE_NOT_WORKING )
 
 // Yes!プリキュア5 いっしょに変身!メタモルフォーゼ!
-CONS( 2007, ban_pr2j,   0,        0, superxavix_ban_pr2j,              ban_pr2j,              superxavix_ban_pr2j_state,   empty_init, "Bandai / SSD Company Ltd.", "Yes! PreCure 5: Issho ni Henshin! Metamorphose! (Japan)", 0 )
+CONS( 2007, ban_pr2j,   0,        0, superxavix_ban_pr2j,              ban_pr2j,              superxavix_ban_pr2j_state,   empty_init, "Bandai / SSD Company Ltd.", "Yes! PreCure 5: Issho ni Henshin! Metamorphose! (Japan)", MACHINE_NOT_WORKING )
 
 // テレビで遊び隊 それいけトーマス ソドー島のなかまたち
-CONS( 2005, tmy_thom,   0,        0, superxavix_i2c_24c04,             tmy_thom,              superxavix_tmy_thom_state,   empty_init, "Tomy / SSD Company Ltd.", "TV de Asobitai Soreike Thomas: Sodor Tou no Nakamatachi / Thomas & Friends on the Island of Sodor (Japan)", 0 )
+CONS( 2005, tmy_thom,   0,        0, superxavix_i2c_24c04,             tmy_thom,              superxavix_tmy_thom_state,   empty_init, "Tomy / SSD Company Ltd.", "TV de Asobitai Soreike Thomas: Sodor Tou no Nakamatachi / Thomas & Friends on the Island of Sodor (Japan)", MACHINE_NOT_WORKING )
 
 // Ｌｅｔ’ｓ！ ＴＶプレイ 体感体得 結界師 方囲！定礎！結！滅！
-CONS( 2007, ban_kksj,   0,        0, superxavix_ban_reflective_camera, ban_reflective_camera, superxavix_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Taikan Taitoku Kekkaishi: Houi! Jouso! Ketsu! Metsu! (Japan)", 0 )
+CONS( 2007, ban_kksj,   0,        0, superxavix_ban_reflective_camera, ban_reflective_camera, superxavix_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Taikan Taitoku Kekkaishi: Houi! Jouso! Ketsu! Metsu! (Japan)", MACHINE_NOT_WORKING )
 
 // テレビで遊び隊 流星のロックマン 電波変換！オン・エア！
-CONS( 2007, tmy_rkmj,   0,        0, superxavix_tmy_rkmj,              tmy_rkmj,              superxavix_tmy_rkmj_state,   empty_init, "Takara Tomy / Capcom / SSD Company Ltd.", "TV de Asobitai Ryuusei no Rockman: Denpa Henkan! On Air! (Japan)", 0 )
+CONS( 2007, tmy_rkmj,   0,        0, superxavix_tmy_rkmj,              tmy_rkmj,              superxavix_tmy_rkmj_state,   empty_init, "Takara Tomy / Capcom / SSD Company Ltd.", "TV de Asobitai Ryuusei no Rockman: Denpa Henkan! On Air! (Japan)", MACHINE_NOT_WORKING )
 
 // Let's!TVプレイ 音撃バトル！仮面ライダー響鬼 決めろ！一気火勢の型
-CONS( 2005, ban_ordj,   0,        0, superxavix_ban_ordj,              ban_ordj,              superxavix_ban_ordj_state,   empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Ongeki Battle! Kamen Rider Hibiki: Kimero! Ikki Kasei no Kata (Japan)", 0 )
+CONS( 2005, ban_ordj,   0,        0, superxavix_ban_ordj,              ban_ordj,              superxavix_ban_ordj_state,   empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Ongeki Battle! Kamen Rider Hibiki: Kimero! Ikki Kasei no Kata (Japan)", MACHINE_NOT_WORKING )
 
 // Let's!TVプレイ ディズニーキャラクターズ オト！イロ！トン・トン！ミラクルパレード
-CONS( 2007, ban_dn1j,   0,        0, superxavix_i2c_24c04,             ban_dn1j,              superxavix_i2c_power_state,  empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Disney Characters: Oto! Iro! Ton-Ton! Miracle Parade (Japan)", 0 )
+CONS( 2007, ban_dn1j,   0,        0, superxavix_i2c_24c04,             ban_dn1j,              superxavix_i2c_power_state,  empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Disney Characters: Oto! Iro! Ton-Ton! Miracle Parade (Japan)", MACHINE_NOT_WORKING )
 
 // アンパンマン かぞくで!育脳マットDX
-CONS( 2011, anpanmdx,   0,        0, superxavix_anpanmdx,              anpanmdx,              superxavix_anpanmdx_state,   empty_init, "JoyPalette / Toho / SSD Company Ltd.", "Anpanman Kazoku de! Ikunou Mat DX (Japan)", 0 )
+CONS( 2011, anpanmdx,   0,        0, superxavix_anpanmdx,              anpanmdx,              superxavix_anpanmdx_state,   empty_init, "JoyPalette / Toho / SSD Company Ltd.", "Anpanman Kazoku de! Ikunou Mat DX (Japan)", MACHINE_NOT_WORKING )
 
 // アンパンマン ぴょんぴょん育脳マット
-CONS( 2009, apmj2009,   0,        0, superxavix_i2c_24c16,             apmj2009,              superxavix_i2c_power_state,  empty_init, "Toho / SSD Company Ltd.", "Anpanman Pyon-Pyon Ikunou Mat (Japan)", 0 )
+CONS( 2009, apmj2009,   0,        0, superxavix_i2c_24c16,             apmj2009,              superxavix_i2c_power_state,  empty_init, "Toho / SSD Company Ltd.", "Anpanman Pyon-Pyon Ikunou Mat (Japan)", MACHINE_NOT_WORKING )
 
 // has HT24LC16
-CONS( 2008, udance,     0,        0, superxavix_udance,                udance,                superxavix_udance_state,     empty_init, "Hasbro / Tiger Electronics / Creativity / Medialink / SSD Company Ltd.", "U-Dance", 0 )
+CONS( 2008, udance,     0,        0, superxavix_udance,                udance,                superxavix_udance_state,     empty_init, "Hasbro / Tiger Electronics / Creativity / Medialink / SSD Company Ltd.", "U-Dance", MACHINE_NOT_WORKING )
 
 // these have RAM in the usual ROM space & also have an Atmel 24LC64,
-CONS( 2004, suprtvpc,   0,        0, superxavix_suprtvpc,              suprtvpc,              superxavix_suprtvpc_state,   empty_init, "Epoch / SSD Company Ltd.", "Super TV-PC (Japan)", 0 )
-CONS( 2006, suprtvpchk, suprtvpc, 0, superxavix_suprtvpc,              suprtvpc,              superxavix_suprtvpc_state,   empty_init, "Epoch / SSD Company Ltd.", "Super TV-PC - Hello Kitty (Japan)", 0 )
-CONS( 2006, suprtvpcdo, suprtvpc, 0, superxavix_suprtvpc,              suprtvpc,              superxavix_suprtvpc_state,   empty_init, "Epoch / SSD Company Ltd.", "Super TV-PC - Doraemon (Japan)", 0 )
-CONS( 2006, suprtvpcln, suprtvpc, 0, superxavix_suprtvpc,              suprtvpc,              superxavix_suprtvpc_state,   empty_init, "Epoch / SSD Company Ltd.", "Super TV-PC - Link (Japan)", 0 )
+CONS( 2004, suprtvpc,   0,        0, superxavix_suprtvpc,              suprtvpc,              superxavix_suprtvpc_state,   empty_init, "Epoch / SSD Company Ltd.", "Super TV-PC (Japan)", MACHINE_NOT_WORKING )
+CONS( 2006, suprtvpchk, suprtvpc, 0, superxavix_suprtvpc,              suprtvpc,              superxavix_suprtvpc_state,   empty_init, "Epoch / SSD Company Ltd.", "Super TV-PC - Hello Kitty (Japan)", MACHINE_NOT_WORKING )
+CONS( 2006, suprtvpcdo, suprtvpc, 0, superxavix_suprtvpc,              suprtvpc,              superxavix_suprtvpc_state,   empty_init, "Epoch / SSD Company Ltd.", "Super TV-PC - Doraemon (Japan)", MACHINE_NOT_WORKING )
+CONS( 2006, suprtvpcln, suprtvpc, 0, superxavix_suprtvpc,              suprtvpc,              superxavix_suprtvpc_state,   empty_init, "Epoch / SSD Company Ltd.", "Super TV-PC - Link (Japan)", MACHINE_NOT_WORKING )
 
 // Hello Kitty ピアノパソコン
 // similar to Super TV-PC but with additional built in piano
-CONS( 2008, epo_ntpj,   0,        0, superxavix_epo_ntpj,              epo_ntpj,              superxavix_epo_ntpj_state,   empty_init, "Epoch / SSD Company Ltd.", "Hello Kitty Piano PC (Japan)", 0 )
+CONS( 2008, epo_ntpj,   0,        0, superxavix_epo_ntpj,              epo_ntpj,              superxavix_epo_ntpj_state,   empty_init, "Epoch / SSD Company Ltd.", "Hello Kitty Piano PC (Japan)", MACHINE_NOT_WORKING )
 
 // ドラえもん うごく！おえかき エポック社
-CONS( 2007, doradraw,   0,        0, superxavix_doradraw,              doradraw,              superxavix_doradraw_state,   empty_init, "Epoch / SSD Company Ltd.", "Doraemon Ugoku! Oekaki (Japan)", 0 )
+CONS( 2007, doradraw,   0,        0, superxavix_doradraw,              doradraw,              superxavix_doradraw_state,   empty_init, "Epoch / SSD Company Ltd.", "Doraemon Ugoku! Oekaki (Japan)", MACHINE_NOT_WORKING )
 
 // ハローキティ うごく！おえかき エポック社
-CONS( 2007, hkdraw,     doradraw, 0, superxavix_doradraw,              doradraw,              superxavix_doradraw_state,   empty_init, "Epoch / SSD Company Ltd.", "Hello Kitty Ugoku! Oekaki (Japan)", 0 )
+CONS( 2007, hkdraw,     doradraw, 0, superxavix_doradraw,              doradraw,              superxavix_doradraw_state,   empty_init, "Epoch / SSD Company Ltd.", "Hello Kitty Ugoku! Oekaki (Japan)", MACHINE_NOT_WORKING )
 
 // どんトレだ兵衛～どん兵衛くんとトレーニング
 // Camera exposure response remains unverified.
-CONS( 2007, ndpbj,      0,        0, superxavix_ndpbj,                 ndpbj,                 superxavix_ndpbj_state,      empty_init, "Nissin / SSD Company Ltd.", "Dontore da bei: Donbei-kun to Training (Japan)", 0 )
+CONS( 2007, ndpbj,      0,        0, superxavix_ndpbj,                 ndpbj,                 superxavix_ndpbj_state,      empty_init, "Nissin / SSD Company Ltd.", "Dontore da bei: Donbei-kun to Training (Japan)", MACHINE_NOT_WORKING )
 
 // どんトレだ兵衛2～おうちで、みんなでフィットネス!～
-CONS( 2008, ndpmj,      0,        0, superxavix_ndpmj,                 ndpmj,                 superxavix_ndpmj_state,      empty_init, "Nissin / SSD Company Ltd.", "Dontore da bei 2: Ouchi de, Minna de Fitness! (Japan)", 0 )
+CONS( 2008, ndpmj,      0,        0, superxavix_ndpmj,                 ndpmj,                 superxavix_ndpmj_state,      empty_init, "Nissin / SSD Company Ltd.", "Dontore da bei 2: Ouchi de, Minna de Fitness! (Japan)", MACHINE_NOT_WORKING )
