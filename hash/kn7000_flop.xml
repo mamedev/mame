@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Technics SX-KN7000 floppy disks.
+
+These carry the KN7000's "Initial Data" / custom-data: the user-data sets the
+instrument installs on a front-panel data load, which populate the custom-data
+flash (IC21) and the battery-backed user memory.  Each is available as a
+self-extracting PC archive that writes its payload onto a blank FAT12 HD diskette,
+and physical diskettes are known to exist; who prepared or distributed them is
+unclear (not necessarily official releases).  No original diskette has been
+dumped, so these images are faithful reconstructions built from the archives' own
+files, which a dump of an original could supersede.
+-->
+<softwarelist name="kn7000_flop" description="Technics SX-KN7000 disks">
+
+	<software name="idd7000">
+		<description>Initial Data (factory default)</description>
+		<year>2002</year>
+		<publisher>Technics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="idd7000.img" size="1474560" crc="9eb2cf06" sha1="d61b2b11dc2a933fd7b7b3de217486b493f95806"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="custom1">
+		<description>Custom Data 1 (Blue Bayou, Piano Player, Jazz Organ Soloist, Bob's Band)</description>
+		<year>2002</year>
+		<publisher>Technics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="custom1.img" size="1474560" crc="9e8c6445" sha1="8829b00e54a3bae1ecc5f00b93d2269b7aaa5674"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="custom2">
+		<description>Custom Data 2 (Traditional Melody, Jogeh 1, Vibraphone, Italian Accordion 7)</description>
+		<year>2002</year>
+		<publisher>Technics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="custom2.img" size="1474560" crc="be22aa34" sha1="1ddedb87970ab6ccec8cdd32b7ee68679c02fa0f"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -71,6 +71,7 @@
 #include "machine/upd765.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "multibyte.h"
@@ -986,6 +987,7 @@ void kn_sd_state::kn7000(machine_config &config)
 	custom_flash_add(config);
 	fdc_add(config);
 	sd_add(config);
+	SOFTWARE_LIST(config, "flop_list").set_original("kn7000_flop");
 	config.set_default_layout(layout_kn7000);
 }
 
@@ -1099,35 +1101,9 @@ ROM_START(kn7000)
 	ROM_REGION(0x800000, "picture", 0)
 	ROM_LOAD("c3cbmd000098.ic19", 0x000000, 0x800000, NO_DUMP)
 
-	// The custom flash holds user data, and is populated from a floppy rather than
-	// programmed at the factory: the firmware inflates the CTMINI payload from an
-	// "Initial Data Disk" and writes it verbatim to offset 0x20000, which is the top
-	// 30 of the 64 KiB sectors.  Nothing is written below that, so the boot sectors
-	// are left erased here.
-	//
-	// The images below are therefore not chip dumps.  Each is the exact content the
-	// firmware places in the device for one published data set, so a part programmed
-	// from that floppy reads back as declared.  They are offered as a BIOS choice
-	// because a real instrument holds exactly one of them at a time.
+	// Preloaded with factory default (same as the contents of `Initial Data Disk`)
 	ROM_REGION(0x200000, "custom_data", ROMREGION_ERASEFF)
-	ROM_SYSTEM_BIOS(0, "ctmini",  "Initial Data Disk (factory default)")
-	ROMX_LOAD("01ctmini.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(2a133ea7) SHA1(67b2a0fe8154c4d15557399a86bf0d0b49813ced), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "custm1",  "Custom Data: Blue Bayou")
-	ROMX_LOAD("01custm1.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(c1c69b67) SHA1(4cd5fe37871984a4b470b1a12b835c9bc41f37f5), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(2, "custm2",  "Custom Data: Piano Player")
-	ROMX_LOAD("02custm2.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(8170c2d3) SHA1(6c85b616a9acc3a7ecc1b49a70f138c0d9442086), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(3, "custm3",  "Custom Data: Jazz Organ Soloist")
-	ROMX_LOAD("03custm3.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(5a7cc504) SHA1(d5722a1129134383bf643d20b4e0866c3089fc36), ROM_BIOS(3))
-	ROM_SYSTEM_BIOS(4, "custm4",  "Custom Data: Bob's Band")
-	ROMX_LOAD("04custm4.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(1f1c195e) SHA1(25822a3ad726df49882cdd0066424600fb70ea14), ROM_BIOS(4))
-	ROM_SYSTEM_BIOS(5, "custm5",  "Custom Data: Traditional Melody")
-	ROMX_LOAD("01custm5.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(ac264469) SHA1(11d32c3d293a23a511a76297647758046cd8ccc9), ROM_BIOS(5))
-	ROM_SYSTEM_BIOS(6, "custm6",  "Custom Data: Jogeh 1")
-	ROMX_LOAD("02custm6.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(174cea4c) SHA1(54f2bac0551a8d43dc1a87fe24a13c545169a326), ROM_BIOS(6))
-	ROM_SYSTEM_BIOS(7, "custm7",  "Custom Data: Vibraphone")
-	ROMX_LOAD("03custm7.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(aa14a0ed) SHA1(e1bdfbbbe78353003af5ed01866be87d799523bb), ROM_BIOS(7))
-	ROM_SYSTEM_BIOS(8, "custm8",  "Custom Data: Italian Accordion 7")
-	ROMX_LOAD("04custm8.ic21", 0x020000, 0x1e0000, BAD_DUMP CRC(18753233) SHA1(f4722d93ff3f31c6d8c25f757968d796e4eb57ca), ROM_BIOS(8))
+	ROM_LOAD("01ctmini.ic21", 0x020000, 0x1e0000, CRC(2a133ea7) SHA1(67b2a0fe8154c4d15557399a86bf0d0b49813ced))
 
 	ROM_REGION(0x80000, "sdcard_cpu", 0)
 	ROM_LOAD("c3fbkd000162.ic414", 0x000000, 0x80000, NO_DUMP)
