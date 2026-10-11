@@ -497,7 +497,7 @@ auto xavix_video_device::decode_pixel_layout(u8 flags) const -> pixel_layout
 
 auto superxavix_video_device::decode_pixel_layout(u8 flags) const -> pixel_layout
 {
-	// Graphics mode bit 0 changes layouts 2 and 3 from flips to even/odd output columns.
+	// Graphics mode bit 0 leaves layouts 0/1 unflipped; 2/3 select even/odd output columns.
 	if (BIT(m_graphics_mode, 0) && BIT(flags, 1))
 	{
 		return {
@@ -508,7 +508,7 @@ auto superxavix_video_device::decode_pixel_layout(u8 flags) const -> pixel_layou
 		};
 	}
 
-	return xavix_video_device::decode_pixel_layout(flags);
+	return xavix_video_device::decode_pixel_layout(BIT(m_graphics_mode, 0) ? 0 : flags);
 }
 
 int xavix_video_device::aligned_output_position(int clocks, int alignment_clocks, int sample_clocks)
