@@ -36,6 +36,7 @@ nsc810_device::nsc810_device(const machine_config &mconfig, const char *tag, dev
 	m_portA_w(*this),
 	m_portB_w(*this),
 	m_portC_w(*this),
+	m_timer_clock{clock, clock},
 	m_timer_out(*this)
 {
 	std::fill(std::begin(m_timer), std::end(m_timer), nullptr);
@@ -43,7 +44,6 @@ nsc810_device::nsc810_device(const machine_config &mconfig, const char *tag, dev
 	std::fill(std::begin(m_timer_counter), std::end(m_timer_counter), 0);
 	std::fill(std::begin(m_timer_base), std::end(m_timer_base), 0);
 	std::fill(std::begin(m_timer_running), std::end(m_timer_running), false);
-	std::fill(std::begin(m_timer_clock), std::end(m_timer_clock), 0);
 }
 
 void nsc810_device::device_start()
@@ -308,10 +308,10 @@ void nsc810_device::write(offs_t offset, uint8_t data)
 			{
 				m_timer_running[1] = true;
 				// no /64 prescaler on timer 1
-				if (m_timer_mode[0] & 0x08)
-					rate = m_timer_clock[0] / 2;
+				if (m_timer_mode[1] & 0x08)
+					rate = m_timer_clock[1] / 2;
 				else
-					rate = m_timer_clock[0];
+					rate = m_timer_clock[1];
 				m_timer[1]->adjust(attotime::zero, 0, attotime::from_hz(rate));
 			}
 			LOG("NSC810: Timer 1 Start write %02x\n", data);
