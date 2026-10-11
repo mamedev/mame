@@ -1087,8 +1087,12 @@ void by35_state::nibble_nvram_w(offs_t offset, uint8_t data)
 
 INPUT_CHANGED_MEMBER( by35_state::activity_button )
 {
+	// The NMI line is held high and the switch pulls it to ground, and the 6800 takes
+	// the interrupt on the falling edge, so the press is what triggers it. newval is
+	// the port value after the active low inversion, so it reads 0 while the switch is
+	// held: asserting on a non-zero newval took the interrupt on release instead.
 	if (newval != oldval)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, (newval ? ASSERT_LINE : CLEAR_LINE));
+		m_maincpu->set_input_line(INPUT_LINE_NMI, (newval ? CLEAR_LINE : ASSERT_LINE));
 }
 
 INPUT_CHANGED_MEMBER( by35_state::self_test )
