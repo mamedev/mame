@@ -1019,12 +1019,19 @@ class gamtor_snd_device : public device_t, public device_sound_interface
 public:
 	gamtor_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 44100);
 
-	// map helpers for the driver
+	// map helpers for the driver. This device serves 0x1e040004-0x1e04000b: offset 0 (+4) is the DMA
+	// source address the L4 handler writes (obj->$6c), offset 1 (+8) is the kernel's input-strap/test
+	// register (written by the input driver 0x6ef30). The base register (+0) is handled by the driver
+	// state (it shares the SYS input view) and reaches this device through arm_w()/status_r().
 	u32 reg_r(offs_t offset, u32 mem_mask);
 	void reg_w(offs_t offset, u32 data, u32 mem_mask);
-	// status bits for the combined base-register read (bit 31 active, bit 6 refill request)
-	u32 status_r() { return (m_armed ? 0x80000000u : 0u) | (m_armed && m_size != 0 && m_total >= (m_size / 2) ? 0x40u : 0u); }
-
+	// base register (+0): descriptor write - 0 = stop, else frames-per-block in the low bits
+	void arm_w(u32 data);
+	// status bits for the combined base-register read. The kernel accesses these as BYTE reads at
+	// 0x1e040000 on the big-endian 32-bit bus: bit 7 of that byte = dword bit 31 (armed - the
+	// self-test's tst.l/bpl), bit 6 of that byte = dword bit 30 (block request - the L4 handler's
+	// btst #6). NOTES.md IRQ-1 already recorded "bit 30" from the earlier static pass.
+	u32 status_r() { return (m_armed ? 0x80000000u : 0u) | (m_block_pending ? 0x40000000u : 0u); }
 	auto irq_bind() { return m_irq_cb.bind(); }
 	// late binding of the ColdFire program space (the chip's DMA source): called from the driver's machine_start
 	void set_dma_space(address_space &space) { m_dspace = &space; }
@@ -1041,12 +1048,14 @@ private:
 
 	sound_stream *m_stream = nullptr;
 
-	bool m_armed = false;
-	u32 m_size = 0;          // descriptor low bits (words), from (data & 0x3fffffff)
-	u32 m_sar = 0;           // +4: source address in CPU RAM (byte address)
-	u32 m_mask = 0;          // +8: kernel strap/test mask, stored verbatim
-	u32 m_total = 0;        // frames consumed since arm
-	u32 m_reg8 = 0;          // last written +8 value
+	bool m_armed = false;       // descriptor armed (bit 31 view)
+	bool m_block_pending = false; // bit 6: block played out, kernel must feed the next one
+	u32 m_size = 0;             // descriptor low 24 bits (frames per arm - to be verified by the $6c trace)
+	u32 m_sar = 0;              // +4: block start address in CPU RAM (latched at arm)
+	u32 m_played = 0;           // frames consumed since the last arm
+	u32 m_mask = 0;             // +8: kernel strap/test mask, stored verbatim
+	u32 m_reg8 = 0;             // last written +8 value
+	u32 m_armtrace = 0;         // diagnostic counter for the first arm writes (log-limited)
 };
 
 DEFINE_DEVICE_TYPE(GAMTOR_SND, gamtor_snd_device, "gamtor_snd", "AGI CoolFire sound chip")
@@ -1070,67 +1079,72 @@ void gamtor_snd_device::device_start()
 	save_item(NAME(m_size));
 	save_item(NAME(m_sar));
 	save_item(NAME(m_mask));
-	save_item(NAME(m_total));
+	save_item(NAME(m_played));
+	save_item(NAME(m_block_pending));
 	save_item(NAME(m_reg8));
 }
 
 void gamtor_snd_device::device_reset()
 {
 	m_armed = false;
+	m_block_pending = false;
 	m_size = 0;
 	m_sar = 0;
 	m_mask = 0;
-	m_total = 0;
+	m_played = 0;
 	m_reg8 = 0;
 }
 
 u32 gamtor_snd_device::reg_r(offs_t offset, u32 mem_mask)
 {
-	switch (offset * 4)
+	switch (offset)
 	{
-	case 0x00:
-		// bit 31: DMA armed/active (the self-test polls this); bit 6: FIFO refill request (the L4 handler reads it)
-	{
-		u32 data = m_armed ? 0x80000000 : 0;
-		// refill request once the chip has consumed at least half of the buffer since the last
-		// re-arm (the kernel ISR refills the half just played and re-arms with the same descriptor)
-		if (m_armed && m_size != 0 && m_total >= (m_size / 2))
-			data |= 0x40;
-		return data;
-	}
-	case 0x04:
-		return m_sar;
-	case 0x08:
-		return m_reg8;
+	case 0: return m_sar;  // +4: DMA source address
+	case 1: return m_reg8; // +8: kernel input-strap/test register
 	}
 	return 0;
 }
 
 void gamtor_snd_device::reg_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	switch (offset * 4)
+	switch (offset)
 	{
-	case 0x00:
-		if (data == 0)
-		{
-			// stop (boot does this)
-			m_armed = false;
-			m_total = 0;
-		}
-		else
-		{
-			// descriptor (re-arm): size in words in the low bits, bit 31 may be set by the descriptor form itself
-			m_size = data & 0x3fffffff;
-			m_armed = true;
-			m_total = 0;
-		}
-		break;
-	case 0x04:
+	case 0: // +4: the L4 ISR writes the next block address here (obj->$6c)
+		if (m_armtrace < 500)
+			logerror("SND sar <- %08X %s\n", data, machine().describe_context().c_str());
 		m_sar = data;
 		break;
-	case 0x08:
+	case 1: // +8: the input driver's strap/test values - stored verbatim, semantics unknown
 		m_reg8 = data;
 		break;
+	}
+}
+
+void gamtor_snd_device::arm_w(u32 data)
+{
+	// trace the first arm writes only (diagnostic; the steady-state chain is measured)
+	if (m_armtrace < 500)
+	{
+		m_armtrace++;
+		logerror("SND arm_w data=%08X %s\n", data, machine().describe_context().c_str());
+	}
+	if (data == 0)
+	{
+		// stop (boot does this)
+		m_armed = false;
+		m_block_pending = false;
+		m_played = 0;
+	}
+	else
+	{
+		// descriptor (arm/re-arm): frames per block in the low bits (the firmware writes
+		// (size>>2)+0xb0000000; the measured arm write was B0000400 -> 0x400 = 1024 frames).
+		// The re-arm also acknowledges the block request: bit 6 clears and the level 4 line drops.
+		m_size = data & 0x00ffffff;
+		m_armed = true;
+		m_block_pending = false;
+		m_played = 0;
+		m_irq_cb(0);
 	}
 }
 
@@ -1142,21 +1156,26 @@ void gamtor_snd_device::sound_stream_update(sound_stream &stream)
 		stream.put_int_clamp(0, i, 0, 32768);
 		stream.put_int_clamp(1, i, 0, 32768);
 	}
-	if (!m_armed || m_size == 0)
+	if (!m_armed || m_size == 0 || m_block_pending)
 		return;
 
-	// the chip reads the packed stereo word at SAR + 4*consumed, looping within the descriptor size;
-	// crossing a half-buffer boundary latches the refill request (bit 6) and raises the level 4 line
-	const u32 half = m_size / 2;
+	// block-once playback: play m_size frames from the latched SAR, then latch bit 6 and pulse the
+	// level 4 line; playback stops until the kernel's L4 handler writes the next address and re-arms
 	for (int i = 0; i < samples; i++)
 	{
-		const u32 idx = m_total % m_size;
-		const u32 w = m_dspace->read_dword(m_sar + idx * 4);
+		const u32 w = m_dspace->read_dword(m_sar + m_played * 4);
 		stream.put_int_clamp(0, i, s16(w >> 16), 32768);
 		stream.put_int_clamp(1, i, s16(w), 32768);
-		m_total++;
-		if (half && m_total % half == 0)
+		m_played++;
+		if (m_played >= m_size)
+		{
+			// block consumed: bit 6 latches and the level 4 line is HELD until the kernel's
+			// L4 handler feeds the next block and re-arms (level-sensitive request - an
+			// instant 1->0 pulse inside one stream update is invisible to the CPU)
+			m_block_pending = true;
 			m_irq_cb(1);
+			break;
+		}
 	}
 }
 
@@ -1250,7 +1269,7 @@ u32 gaminator_state::snd_base_r()
 
 void gaminator_state::snd_base_w(u32 data)
 {
-	m_snd->reg_w(0, data, 0xffffffff);
+	m_snd->arm_w(data);
 }
 
 
@@ -1272,8 +1291,9 @@ void gaminator_state::gaminator_map(address_map &map)
 	// IO-2: the kernel's output driver (0x6ee54 set, 0x6eebc clear) keeps one 16-bit shadow word per group and
 	// writes it with move.w to 0x1c070000 + ((n >> 2) & 0x0c), i.e. on D31-D16, 1 = output n on
 	map(0x1c070000, 0x1c07000f).w(FUNC(gaminator_state::outputs_w));
-	// SND-1: the AGI sound chip. +0 descriptor/sts (W: size|arm, R: bit31 active, bit6 refill), +4 SAR (CPU address
-	// the chip DMA reads), +8 strap/test mask register.
+	// SND-1: the AGI sound chip. +0: W descriptor (0=stop, else frames/block in the low bits),
+	// R status (byte view on the BE bus: byte bit 7 = armed, byte bit 6 = block request = dword bit 30);
+	// +4 SAR (CPU RAM address the chip's DMA reads), +8 strap/test mask register.
 	// The 0x40-0x5f logical inputs read the base register XOR 0x60 (kernel 0x6ef80), so the input view and the
 	// chip status share the register; the state combines them (chip status on the measured bits, SYS port on the rest).
 	map(0x1e040000, 0x1e040003).rw(FUNC(gaminator_state::snd_base_r), FUNC(gaminator_state::snd_base_w));
