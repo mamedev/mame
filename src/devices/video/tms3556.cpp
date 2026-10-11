@@ -120,7 +120,7 @@ tms3556_device::tms3556_device(const machine_config &mconfig, const char *tag, d
 		m_vdp_acmpxy_mode(dma_write),
 		m_vdp_acmpxy(0),
 		m_vdp_acmp(0),
-		m_init_read(0),
+		m_init_read(false),
 		m_scanline(0),
 		m_blink(0),
 		m_blink_count(0),
@@ -151,6 +151,7 @@ void tms3556_device::device_start()
 	save_item(NAME(m_vdp_acmpxy_mode));
 	save_item(NAME(m_vdp_acmpxy));
 	save_item(NAME(m_vdp_acmp));
+	save_item(NAME(m_init_read));
 	save_item(NAME(m_scanline));
 	save_item(NAME(m_blink));
 	save_item(NAME(m_blink_count));
@@ -602,7 +603,7 @@ void tms3556_device::draw_line(bitmap_ind16 &bmp, int line)
 {
 	uint16_t *ln = &bmp.pix(line);
 
-	if ((line < TOP_BORDER) || (line >= (TOP_BORDER + 250)))
+	if ((line < TOP_BORDER) || (line >= (TOP_BORDER + active_height())))
 	{
 		/* draw top and bottom borders */
 		draw_line_empty(ln);
@@ -667,7 +668,7 @@ void tms3556_device::interrupt_start_vblank(void)
 void tms3556_device::interrupt()
 {
 	/* check for start of vblank */
-	if (m_scanline == 310)  /*no idea what the real value is*/
+	if (m_scanline == (lines_per_frame() - 3))  /*no idea what the real value is*/
 		interrupt_start_vblank();
 
 	/* render the current line */
@@ -677,6 +678,6 @@ void tms3556_device::interrupt()
 			draw_line(m_bitmap, m_scanline);
 	}
 
-	if (++m_scanline == 313)
+	if (++m_scanline >= lines_per_frame())
 		m_scanline = 0;
 }
