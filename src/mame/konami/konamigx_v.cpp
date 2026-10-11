@@ -100,10 +100,11 @@ K055673_CB_MEMBER(konamigx_state::type2_sprite_callback)
 {
 	int num = code;
 	int c18 = color;
+	const int effect = ((color >> 8) & 0b11) << K055555_MIXSHIFT;
 
 	code = m_k053247_vrcbk[num >> 14] | (num & 0x3fff);
 	c18 = K053247GX_combine_c18(c18);
-	color = K055555GX_decode_objcolor(c18);
+	color = K055555GX_decode_objcolor(c18) | effect;
 	priority_mask = K055555GX_decode_inpri(c18);
 }
 
@@ -151,7 +152,7 @@ K055673_CB_MEMBER(konamigx_state::le2_sprite_callback)
 	code = m_k053247_vrcbk[num >> 14] | (num & 0x3fff);
 
 	pri = color;
-	color &= 0x1f;
+	color = (color & 0x1f) | (((color >> 8) & 0b11) << K055555_MIXSHIFT);
 
 	op   = m_opri;
 	pri &= 0xf0;
@@ -525,8 +526,6 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 		// int l     = m_gx_spriteram[offs+7];
 
 		m_k055673->m_k053247_cb(code, color, pri);
-
-		if (m_gx_obj_mixcode) color |= (k >> 8 & 3) << K055555_MIXSHIFT;
 
 		u8 shadow_draw_mode = 0; // shadow pens draw mode (4-5)
 		bool add_shadow = 0;          // add shadow object
@@ -1171,7 +1170,6 @@ K056832_CB_MEMBER(konamigx_state::alpha_tile_callback)
 void konamigx_state::common_init()
 {
 	konamigx_mixer_init(*m_screen, 0);
-	m_gx_obj_mixcode = true;
 
 	for (int i = 0; i < 8; i++)
 	{
