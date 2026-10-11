@@ -53,7 +53,7 @@ Puzz Ball (PZB1 Ver. C)                                                       (C
 *Puzz Cube                                                                    (C) Namco, 2005
 Seishun-Quiz Colorful High School (CHS1 Ver.A)                                (C) Namco, 2002
 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                                       (C) Namco, 2004
-Shamisen Brothers (KT-SB2 Ver.A + CDROM)                                      (C) Kato/Konami, 2003
+Shamisen Brothers (KT-SB2 Ver.A + CDROM)                                      (C) Kato, 2003
 Slot no Oujisama / Slot Prince (SLO1 Ver.A)                                   (C) Namco, 2003
 Slot no Oujisama / Slot Prince (SLO1 Ver.B)                                   (C) Namco, 2003
 Star Trigon (STT1 Ver.A)                                                      (C) Namco, 2002
@@ -4517,7 +4517,7 @@ GAME( 2002, sugorotca, sugorotc, ns10_sugorotic, mgexio_medal, namcos10_memn_sta
 GAME( 2003, konotako,  0,        ns10_konotako,  konotako,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell",          "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, shamisen,  0,        ns10_shamisen,  shamisen,     namcos10_memn_state,  memn_driver_init, ROT0, "Kato / Konami",     "Shamisen Brothers (KT-SB2 Ver.A)", MACHINE_IMPERFECT_SOUND ) // PROGRAM 1.01K / Ver2.0 in test mode
+GAME( 2003, shamisen,  0,        ns10_shamisen,  shamisen,     namcos10_memn_state,  memn_driver_init, ROT0, "Kato",              "Shamisen Brothers (KT-SB2 Ver.A)", MACHINE_IMPERFECT_SOUND ) // PROGRAM 1.01K / Ver2.0 in test mode
 GAME( 2003, slotouji,  0,        ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // May 2 2003
 GAME( 2003, slotoujia, slotouji, ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
