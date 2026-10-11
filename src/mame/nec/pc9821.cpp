@@ -588,6 +588,7 @@ void pc9821_state::pegc_mmio_map(address_map &map)
 			m_pegc.regs[4 + offset] = data;
 		})
 	);
+//  map(0x120, 0x19f) pattern register (relates to bit 15 of $108)
 	map(0x120, 0x19f).lrw32(
 		NAME([this] (offs_t offset, u32 mem_mask) -> u32 {
 			u16 rop = m_pegc.regs[0x08] | (m_pegc.regs[0x09] << 8);
@@ -643,7 +644,6 @@ void pc9821_state::pegc_mmio_map(address_map &map)
 			}
 		})
 	);
-//  map(0x120, 0x19f) pattern register (image_xfer? relates to bit 15 of $108)
 }
 
 // make sure the latch read doesn't occur mid cycle, 8253 needs this?
@@ -651,7 +651,6 @@ void pc9821_state::pit_latch_delay(offs_t offset, uint8_t data)
 {
 	if((offset == 3) && !(data & 0x30))
 	{
-
 		m_pit_delay->adjust(attotime::from_hz(MAIN_CLOCK_X1/2));
 		m_maincpu->spin_until_time(attotime::from_hz(MAIN_CLOCK_X1/2));
 		m_maincpu->abort_timeslice();
@@ -786,6 +785,7 @@ void pc9821_state::pc9821_io(address_map &map)
 /*
  * 98MATE A overrides
  */
+
 // TODO: SDIP extended access for 9821Ap, As, Ae
 // Undocumented, it never r/w the conventional ports, at least on POST.
 // I also suspect a few ports here not being direct RAM r/w but actual regs instead.

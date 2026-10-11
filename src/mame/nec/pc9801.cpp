@@ -43,7 +43,9 @@ TODO (pc9801us / pc9801fs):
 
 TODO (pc9801bx2):
 - Accesses $8f0-$8f2 PMC area, shared with 98NOTE machines;
-- A non-fatal "MEMORY ERROR" is always thrown no matter the RAM size afterwards, related?
+- A non-fatal "MEMORY ERROR" is always thrown no matter the RAM size afterwards, missing
+  stealth SRAM hookup.
+  NOTE: stealth SRAM must be introduced between pc9821ce ~ pc9801bx2 (former doesn't have it)
 - unemulated conventional or EMS RAM bank, definitely should have one given the odd minimum RAM
   size;
 
@@ -1835,8 +1837,7 @@ MACHINE_RESET_MEMBER(pc9801bx_state,pc9801bx2)
 {
 	MACHINE_RESET_CALL_MEMBER(pc9801rs);
 
-	// TODO: if returning default 0xfe / 0xfb then it never ever surpass the "SYSTEM SHUTDOWN" even with a soft reset
-	m_dma_access_ctrl = 0x00;
+	m_dma_access_ctrl = 0xfe;
 }
 
 void pc9801_state::vrtc_irq(int state)
