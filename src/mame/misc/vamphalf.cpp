@@ -40,8 +40,6 @@
  Mr Kicker: Doesn't boot without a valid default EEPROM, but no longer seems to fail
             after you get a high score (since EEPROM rewrite).
 
- Boong-Ga Boong-Ga: the test mode is usable with a standard input configuration like the "common" one
-
  The Semicom boards (at least) have a strange visible area, with the display output cutting off 4 lines
  before you'd expect.  It has been confirmed on real hardware that these lines are simply never output,
  no amount of stretching the screen renders them as visible.  The games are also programmed around this
@@ -1043,7 +1041,7 @@ static INPUT_PORTS_START( boonggab )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor 1
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor 2
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_CUSTOM ) // sensor 3
-	PORT_BIT( 0x3800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(vamphalf_state::boonggab_photo_sensors_r)) // photo sensors 1, 2 and 3
+	PORT_BIT( 0x3800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(vamphalf_state::boonggab_photo_sensors_r)) // photo sensors 1, 2 and 3
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
