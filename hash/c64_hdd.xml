@@ -37,6 +37,7 @@ license:CC0-1.0
 		<description>IDE64</description>
 		<year>2019</year>
 		<publisher>Singular Crew</publisher>
+		<sharedfeat name="exp_default" value="ide64"/>
 
 		<!-- 64MB CompactFlash -->
 		<part name="hdd" interface="ata_cf">
@@ -51,7 +52,7 @@ license:CC0-1.0
 		<description>Rush</description>
 		<year>2008</year>
 		<publisher>Singular Crew</publisher>
-		<info name="usage" value="mame c64p -cart ide64 -hard rush -cdrom rush"/>
+		<sharedfeat name="exp_default" value="ide64"/>
 
 		<!-- 64MB CompactFlash -->
 		<part name="hdd" interface="ata_cf">
