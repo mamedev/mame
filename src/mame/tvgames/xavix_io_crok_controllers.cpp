@@ -55,7 +55,6 @@ void xavix_croket_controllers_device::device_add_mconfig(machine_config &config)
 	XAVIX_IR_REPORT(config, m_ir, DERIVED_CLOCK(1, 1));
 	m_ir->set_report_count(2);
 	m_ir->set_bit_ticks(0xe5 * 32);
-	m_ir->set_first_data_ticks(0x17d * 32);
 	m_ir->report_callback<0>().set(*this, FUNC(xavix_croket_controllers_device::controller_report_r<0>));
 	m_ir->report_callback<1>().set(*this, FUNC(xavix_croket_controllers_device::controller_report_r<1>));
 	m_ir->enable_callback().set(*this, FUNC(xavix_croket_controllers_device::ir_enable_r));

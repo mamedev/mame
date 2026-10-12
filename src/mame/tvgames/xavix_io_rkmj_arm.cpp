@@ -55,7 +55,6 @@ void xavix_rockman_arm_device::device_add_mconfig(machine_config &config)
 	m_ir->set_report_bits<0>(13);
 	// Timings centre transitions in the firmware sample windows; physical transmitter timing and repetition remain unmeasured.
 	m_ir->set_start_ticks<0>(0x162 * 64);
-	m_ir->set_first_data_ticks<0>(0x7f * 64);
 	m_ir->set_bit_ticks(0x89 * 64);
 	m_ir->report_callback<0>().set(*this, FUNC(xavix_rockman_arm_device::controller_report_r));
 	m_ir->report_enable_callback<0>().set(*this, FUNC(xavix_rockman_arm_device::controller_enabled_r));

@@ -53,9 +53,7 @@ void xavix_ebox_gloves_device::device_add_mconfig(machine_config &config)
 {
 	XAVIX_IR_REPORT(config, m_ir, DERIVED_CLOCK(1, 1));
 	m_ir->set_report_count(2);
-	// Place the first transition after the receiver's $4d sample and before its next $e5-period sample.
 	m_ir->set_bit_ticks(0xe5 * 32);
-	m_ir->set_first_data_ticks(0x98 * 32);
 	m_ir->report_callback<0>().set(*this, FUNC(xavix_ebox_gloves_device::glove_report_r<0>));
 	m_ir->report_callback<1>().set(*this, FUNC(xavix_ebox_gloves_device::glove_report_r<1>));
 	m_ir->report_enable_callback<0>().set(*this, FUNC(xavix_ebox_gloves_device::glove_enabled_r<0>));

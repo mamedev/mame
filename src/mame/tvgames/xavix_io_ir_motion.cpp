@@ -209,9 +209,8 @@ void xavix_ir_motion_device::device_config_complete()
 	bool const original = (m_controller_type == controller_type::PADDLES)
 		|| (m_controller_type == controller_type::PING_PONG_RACKETS)
 		|| (m_controller_type == controller_type::SHAKERS);
-	// Original receivers sample the first bit later; later receivers need an extended first cell.
+	// Both receivers sample within the first cell, then at uniform timer intervals.
 	m_ir.lookup()->set_bit_ticks(original ? 0x47 * 64 : 0xe5 * 32);
-	m_ir.lookup()->set_first_data_ticks(original ? 0x76 * 64 : 0x17d * 32);
 }
 
 void xavix_ir_motion_device::set_input_source(device_t &source)

@@ -38,8 +38,6 @@ public:
 	void set_bit_ticks(u32 bit_ticks) { m_bit_ticks = bit_ticks; }
 	void set_start_ticks(u32 start_ticks) { m_start_ticks.fill(start_ticks); }
 	template <unsigned N> void set_start_ticks(u32 start_ticks) { static_assert(N < 8); m_start_ticks[N] = start_ticks; }
-	void set_first_data_ticks(u32 first_data_ticks) { m_first_data_ticks.fill(first_data_ticks); }
-	template <unsigned N> void set_first_data_ticks(u32 first_data_ticks) { static_assert(N < 8); m_first_data_ticks[N] = first_data_ticks; }
 	void set_report_count(u8 report_count) { m_report_count = report_count; }
 	template <unsigned N> void set_report_bits(u8 bits) { static_assert(N < 8); m_report_bits[N] = bits; }
 	void set_mode(mode report_mode) { m_mode = report_mode; }
@@ -102,7 +100,6 @@ private:
 	u32 m_pulse_zero_ticks;
 	u32 m_first_pulse_extension;
 	std::array<u32, 8> m_start_ticks;
-	std::array<u32, 8> m_first_data_ticks;
 	u8 m_report_count;
 	u8 m_sample_tick_count;
 	mode m_mode;

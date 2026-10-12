@@ -33,7 +33,6 @@ xavix_ir_report_device::xavix_ir_report_device(const machine_config &mconfig, co
 	, m_pulse_zero_ticks(0)
 	, m_first_pulse_extension(0)
 	, m_start_ticks{}
-	, m_first_data_ticks{}
 	, m_report_count(2)
 	, m_sample_tick_count(0)
 	, m_mode(mode::MSB_FIRST)
@@ -133,8 +132,6 @@ void xavix_ir_report_device::start_report(unsigned report)
 		u32 ticks = current_bit_ticks();
 		if (m_start_cell && m_start_ticks[report])
 			ticks = m_start_ticks[report];
-		else if (!m_start_cell && m_first_data_ticks[report])
-			ticks = m_first_data_ticks[report];
 		m_bit_timer->adjust(clocks_to_attotime(ticks));
 	}
 }
@@ -191,7 +188,7 @@ TIMER_CALLBACK_MEMBER(xavix_ir_report_device::bit_tick)
 	{
 		m_start_cell = false;
 		m_data = BIT(m_shift, 0);
-		m_bit_timer->adjust(clocks_to_attotime(m_first_data_ticks[m_report_index] ? m_first_data_ticks[m_report_index] : current_bit_ticks()));
+		m_bit_timer->adjust(clocks_to_attotime(current_bit_ticks()));
 	}
 	else if (--m_bits_remaining)
 	{
