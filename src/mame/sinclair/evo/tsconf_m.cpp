@@ -592,9 +592,12 @@ u8 tsconf_state::tsconf_port_xxaf_r(offs_t port)
 
 	switch (nreg)
 	{
-	case V_CONFIG:
-		data = 0b01000011; // PWR_UP, !FDRVER, 5bit VDAC
+	case V_CONFIG: // { COPPER_RDY, PWR_UP, !FDRVER, 2'b0, VDAC_VER }
+		data = 0b01000011 | (m_copper_ready ? 0x80 : 0x00);
+		if (!machine().side_effects_disabled())
+			m_copper_ready = false; // RDY flag is cleared on read
 		break;
+
 	case PAGE2:
 	case PAGE3:
 		data = m_regs[nreg];
@@ -922,6 +925,11 @@ IRQ_CALLBACK_MEMBER(tsconf_state::irq_vector)
 		m_int_mask &= ~4;
 		vector = 0xfb;
 	}
+	else if (m_int_mask & 0x10)
+	{
+		m_int_mask &= ~0x10;
+		vector = 0xf7; // copper
+	}
 	else if (m_int_mask & 8)
 	{
 		m_int_mask &= ~8;
@@ -952,6 +960,21 @@ void tsconf_state::uart_int_w(int state)
 		if (!m_int_mask)
 			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
+}
+
+void tsconf_state::copper_int_w(int state)
+{
+	if (state && BIT(m_regs[INT_MASK], 4) && !(m_beta->vdos_r() || m_update_on_m1))
+	{
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		m_int_mask |= 0x10;
+	}
+}
+
+void tsconf_state::copper_rdy_w(int state)
+{
+	if (state)
+		m_copper_ready = true; // cleared on V_CONFIG read only (cf. zports.v copper_ready)
 }
 
 void tsconf_state::update_frame_timer()
