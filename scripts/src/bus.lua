@@ -1387,6 +1387,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/c128/vdcram.h,BUSES["C128"] = true
+---------------------------------------------------
+
+if BUSES["C128"] then
+	files {
+		MAME_DIR .. "src/devices/bus/c128/vdcram.cpp",
+		MAME_DIR .. "src/devices/bus/c128/vdcram.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/c64/exp.h,BUSES["C64"] = true
 --@src/devices/bus/c64/user.h,BUSES["C64"] = true
 ---------------------------------------------------
