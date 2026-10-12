@@ -216,6 +216,7 @@ private:
 	void ram_write16(offs_t offset, u16 data);
 	u16 ram_read16(offs_t offset);
 	u16 spi_read16();
+	void spi_write16(u16 data);
 	void dma_ready(int line);
 
 	std::map<tsconf_regs, u8> m_scanline_delayed_regs_update;
