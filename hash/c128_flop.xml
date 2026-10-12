@@ -818,10 +818,11 @@ Before loading FORMAT.128, disable automatic write verification with this comman
 		</part>
 	</software>
 
-	<software name="vdcmaniac" supported="no">
+	<software name="vdcmaniac">
 		<description>vdcmaniac (v1.0.2)</description>
 		<year>2026</year>
 		<publisher>xahmol</publisher>
+		<info name="usage" value="Requires 64KB VDC RAM"/>
 		<sharedfeat name="iec8_default" value="c1581"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
@@ -832,10 +833,12 @@ Before loading FORMAT.128, disable automatic write verification with this comman
 		</part>
 	</software>
 
-	<software name="vdcmm" supported="no">
+	<!-- https://www.youtube.com/watch?v=b0rox-_jOis -->
+	<software name="vdcmm">
 		<description>VDC Mode Mania (v1.2)</description>
 		<year>2023</year>
 		<publisher>Akronyme Analogiker</publisher>
+		<info name="usage" value="Requires 64KB VDC RAM"/>
 		<sharedfeat name="iec8_default" value="c1581"/>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
@@ -854,11 +857,26 @@ Before loading FORMAT.128, disable automatic write verification with this comman
 		</part>
 	</software>
 
+	<software name="ipaint">
+		<description>I-Paint (v1.5H)</description>
+		<year>1993</year>
+		<publisher>Living Proof Software</publisher>
+		<info name="usage" value="Requires 64KB VDC RAM"/>
+		<sharedfeat name="iec8_default" value="c1581"/>
+		<sharedfeat name="joy1_default" value="c1351"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="i-paint v1.5h complete.d81" size="819200" crc="a0e67a96" sha1="0760c489e55f0b04d872b9f2d2370a64872cec95" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pocketw2">
 		<description>Pocket Writer 2</description>
 		<year>1986</year>
 		<publisher>Digital Solutions</publisher>
-		<sharedfeat name="iec8_default" value="c1581"/>
 		<sharedfeat name="compatibility" value="PAL,NTSC"/>
 
 		<part name="flop1" interface="floppy_5_25">
