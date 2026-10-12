@@ -1463,7 +1463,7 @@ static INPUT_PORTS_START( gungunad )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Trigger") PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Trigger") PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Trigger") PORT_PLAYER(2) PORT_CONDITION("IN0", 0x40, EQUALS, 0x40)
 	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED )
 	// This debounced line gates P2 activity; its identity as the detachable gun-present contact is inferred.
 	PORT_CONFNAME( 0x40, 0x00, "P2 Gun" )
@@ -1476,6 +1476,12 @@ static INPUT_PORTS_START( gungunad )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power")
 	PORT_BIT( 0xbb, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("GUN2_0")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_CONDITION("IN0", 0x40, EQUALS, 0x40)
+
+	PORT_MODIFY("GUN2_1")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_CODE_DEC(KEYCODE_E) PORT_CONDITION("IN0", 0x40, EQUALS, 0x40)
 INPUT_PORTS_END
 
 void xavix_gungunad_state::xavix_gungunad(machine_config &config)
@@ -1497,17 +1503,23 @@ static INPUT_PORTS_START( gungunrv )
 	PORT_INCLUDE(xavix_battery_status)
 	PORT_INCLUDE(xavix_hard_power_control)
 	PORT_INCLUDE(xavix_reset_control)
-	PORT_INCLUDE(xavix_lightgun_1p)
+	PORT_INCLUDE(xavix_lightgun_2p)
 
 	PORT_MODIFY("IN0")
 	// The trigger is mirrored to a probable second pole that qualifies the vibration motor.
 	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Machine Gun Trigger / Confirm")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Foregrip / Pump")
-	PORT_BIT( 0xf4, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Support Gun Trigger") PORT_PLAYER(2) PORT_CONDITION("IN1", 0x02, EQUALS, 0x02)
+	// The disconnected trigger level is inferred from the ROM's inactivity check.
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CONDITION("IN1", 0x02, EQUALS, 0x00)
+	// Startup treats IO0.6 low as a factory-test strap when the Support Gun is absent.
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xb4, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	// The board holds this otherwise inert line high; capture code also tests the composite port value.
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	// The ROM debounces this contact before accepting shots from the optional Support Gun.
+	PORT_CONFNAME( 0x02, 0x00, "P2 Gun" )
+	PORT_CONFSETTING(    0x00, "Disconnected" )
+	PORT_CONFSETTING(    0x02, "Connected" )
 	PORT_CONFNAME( 0x04, 0x00, "Power Source" )
 	PORT_CONFSETTING(    0x00, "Batteries" )
 	PORT_CONFSETTING(    0x04, "AC Adapter" )
@@ -1523,6 +1535,12 @@ static INPUT_PORTS_START( gungunrv )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x28, "Low" )
 	PORT_CONFSETTING(    0x30, "Very Low" )
+
+	PORT_MODIFY("GUN2_0")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_CONDITION("IN1", 0x02, EQUALS, 0x02)
+
+	PORT_MODIFY("GUN2_1")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_CODE_DEC(KEYCODE_E) PORT_CONDITION("IN1", 0x02, EQUALS, 0x02)
 INPUT_PORTS_END
 
 void xavix_gungunrv_state::xavix_gungunrv(machine_config &config)
@@ -1539,7 +1557,7 @@ void xavix_gungunrv_state::machine_reset()
 
 void xavix_gungunrv_state::io0_output_w(u8 data, u8 direction)
 {
-	// IO0.4 drives the gun's vibration motor when the three-position power switch permits it.
+	// IO0.4 drives the main gun's vibration motor; the Support Gun has no separate software drive.
 	m_gun_recoil = BIT(data & direction, 4);
 }
 
@@ -1557,7 +1575,7 @@ void xavix_gungunrv_state::io1_output_w(u8 data, u8 direction)
 u8 xavix_gungunrv_state::lightgun_r(offs_t offset)
 {
 	// The steady-state capture path doubles X; hit testing indexes Y against visible picture rows.
-	return lightgun_position_r(0, offset, 0x3b, 0xe0, 0x24, 0x80);
+	return lightgun_position_r(offset >> 2, offset, 0x3b, 0xe0, 0x24, 0x80);
 }
 
 
