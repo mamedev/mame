@@ -198,7 +198,8 @@ pioneer_pr8210_device::pioneer_pr8210_device(const machine_config &mconfig, devi
 	m_slowtrg(attotime::zero),
 	m_vsync(false),
 	m_i8049_port1(0),
-	m_i8049_port2(0)
+	m_i8049_port2(0),
+	m_pif_field(0)
 {
 }
 
@@ -276,6 +277,7 @@ void pioneer_pr8210_device::device_start()
 	// alocate timers
 	m_process_vbi_timer = timer_alloc(FUNC(pioneer_pr8210_device::process_vbi_data), this);
 	m_vsync_off_timer = timer_alloc(FUNC(pioneer_pr8210_device::vsync_off), this);
+	save_item(NAME(m_pif_field));
 
 	// pass through to the parent
 	laserdisc_device::device_start();
@@ -297,6 +299,33 @@ void pioneer_pr8210_device::device_reset()
 	m_firstbittime = curtime;
 	m_lastbittime = curtime;
 	m_slowtrg = curtime;
+	m_vsync = false;
+	m_pif_field = 0;
+	m_i8049_port1 = 0;
+	m_i8049_port2 = 0;
+	m_pia = {};
+}
+
+
+uint8_t pioneer_pr8210_device::pif_status_r()
+{
+	return (BIT(m_i8049_port2, 4) ? 0x20 : 0) | (m_pif_field ? 0 : 0x40) | (m_vsync ? 0x80 : 0);
+}
+
+
+uint8_t pioneer_pr8210_device::pif_data_r(offs_t offset)
+{
+	switch (offset)
+	{
+	case 0:
+		return 0xf8 | (m_pia.frame[2] & 0x07);
+	case 1:
+		return ((m_pia.frame[3] & 0x0f) << 4) | (m_pia.frame[4] & 0x0f);
+	case 2:
+		return ((m_pia.frame[5] & 0x0f) << 4) | (m_pia.frame[6] & 0x0f);
+	default:
+		return 0;
+	}
 }
 
 
@@ -395,6 +424,8 @@ void pioneer_pr8210_device::device_add_mconfig(machine_config &config)
 
 void pioneer_pr8210_device::player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
 {
+	m_pif_field = fieldnum;
+
 	// logging
 	if ((vbi.line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
 		LOGMASKED(LOG_VBLANK_VBI, "%3d:VSYNC(%d,%05d)\n", screen().vpos(), fieldnum, VBI_CAV_PICTURE(vbi.line1718));
