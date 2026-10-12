@@ -12,7 +12,6 @@ References:
 TODO:
 - C-Bus SCSI support, remove IDE ROM loads where doesn't belong by default;
 \- load actual IDE BIOSes from IPL romsets where applicable (pc9801bx onward, all pc9821)
-- Port over pc88va SASI version in common C-Bus option;
 - DAC1BIT has a bit of clicking with start/end of samples, is it fixable or just a btanb?
 - Incomplete FDC inner semantics with the dual ports;
 \- floppy sounds never silences when drive is idle (disabled for the time being);
@@ -21,11 +20,12 @@ TODO:
 - GP-IB emulation, μPD7210;
 - Per-system dip-switches/configurations;
 - Disable EGC use where it's not mounted normally (testable thru dbuster and hypbingo)
+\- this in turn implies decoupling all the various video cards from the base driver.
 
 TODO (pc9801/pc9801f):
 - Move vanilla FDC 2HD/2DD to a separate (legacy?) bus, and split pc9801f (default: 2DD)
   from pc9801m (2HD) and vanilla pc9801 (none);
-- it currently hooks up half size kanji ROMs, causing missing text in many games;
+- dumped kanji ROMs are half size, worked around with an extra ROM for now;
 
 TODO (pc9801uv2):
 - Not enough software for the specific 3.5" 2DD format;
@@ -343,6 +343,12 @@ void pc9801vm_state::cbus_43f_bank_w(offs_t offset, uint8_t data)
 		m_vram_bank = (data & 2) >> 1;
 	else
 	{
+		if ((data & 0xf0) == 0xa0)
+		{
+			logerror("C-Bus $43f 0xa0 cache flush\n");
+			return;
+		}
+
 		logerror("Unknown C-Bus $43f bank setting %02x\n",data);
 	}
 }
@@ -1955,7 +1961,7 @@ void pc9801_state::pc9801_cbus(machine_config &config)
 	m_cbus_root->int_cb<6>().set("pic8259_slave", FUNC(pic8259_device::ir5_w));
 	m_cbus_root->int_cb<7>().set("pic8259_slave", FUNC(pic8259_device::ir2_w)); // INT41
 	m_cbus_root->drq_cb<0>().set(m_dmac, FUNC(am9517a_device::dreq0_w)).invert();
-//	m_cbus_root->drq_cb<2>().set(m_dmac, FUNC(am9517a_device::dreq2_w)).invert();
+//  m_cbus_root->drq_cb<2>().set(m_dmac, FUNC(am9517a_device::dreq2_w)).invert();
 	m_cbus_root->drq_cb<3>().set(m_dmac, FUNC(am9517a_device::dreq3_w)).invert();
 }
 

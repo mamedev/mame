@@ -1138,6 +1138,8 @@ MACHINE_START_MEMBER(pc9821_mate_a_state,pc9821ap2)
 
 	sram_init();
 	// ...
+
+	save_item(NAME(m_ext_sdip));
 }
 
 MACHINE_START_MEMBER(pc9821_canbe_state,pc9821_canbe)

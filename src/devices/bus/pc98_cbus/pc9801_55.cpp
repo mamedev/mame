@@ -26,6 +26,9 @@ TODO:
 #include "emu.h"
 #include "pc9801_55.h"
 
+#include "bus/nscsi/cdr52.h"
+#include "bus/nscsi/pc98_hd.h"
+
 DEFINE_DEVICE_TYPE(PC9801_55U, pc9801_55u_device, "pc9801_55u", "NEC PC-9801-55U SCSI interface")
 DEFINE_DEVICE_TYPE(PC9801_55L, pc9801_55l_device, "pc9801_55l", "NEC PC-9801-55L SCSI interface")
 
@@ -112,14 +115,13 @@ void pc9801_55_device::dack_w(int line, u8 data)
 static void pc98_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_PC98_HD);
-	// TODO: at least a CD-ROM option
+	device.option_add("cdr52", NSCSI_CDR52);
 }
 
 
 void pc9801_55_device::device_add_mconfig(machine_config &config)
 {
 	NSCSI_BUS(config, m_scsi_bus);
-	// TODO: currently returning default_scsi_devices, checkout if true for PC-98
 	NSCSI_CONNECTOR(config, "scsi:0", pc98_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", pc98_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", pc98_scsi_devices, nullptr);
