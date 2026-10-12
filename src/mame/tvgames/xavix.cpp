@@ -4443,7 +4443,7 @@ static INPUT_PORTS_START( epo_mj )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DIAL")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_NAME("Jog Dial") PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_NAME("Jog Dial") PORT_SENSITIVITY(10) PORT_KEYDELTA(4)
 
 	// The optional AC adapter has no identified firmware-visible source selector.
 	PORT_INCLUDE(xavix_battery_status)
