@@ -2,8 +2,8 @@
 // copyright-holders:David Haywood, MagikalUnicorn
 /***************************************************************************
 
-    XaviX and SuperXaviX video devices. Define their register maps, graphics
-    and palette storage, device lifecycle and sprite RAM DMA transfers.
+    XaviX, XaviX2000 and SuperXaviX video devices. Define their register maps,
+    graphics and palette storage, device lifecycle and sprite RAM DMA transfers.
     Rendering and picture timing are implemented in the companion rendering
     and timing files.
 
@@ -33,6 +33,7 @@
 
 
 DEFINE_DEVICE_TYPE(XAVIX_VIDEO, xavix_video_device, "xavix_video", "XaviX Video")
+DEFINE_DEVICE_TYPE(XAVIX2000_VIDEO, xavix2000_video_device, "xavix2000_video", "XaviX2000 Video")
 DEFINE_DEVICE_TYPE(SUPERXAVIX_VIDEO, superxavix_video_device, "superxavix_video", "SuperXaviX Video")
 
 xavix_video_device::xavix_video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -59,6 +60,11 @@ xavix_video_device::xavix_video_device(const machine_config &mconfig, device_typ
 	, m_video_standard(video_standard::NTSC)
 	, m_video_hres_scale(video_hres_scale)
 	, m_gfx_region(*this, finder_base::DUMMY_TAG)
+{
+}
+
+xavix2000_video_device::xavix2000_video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: xavix_video_device(mconfig, XAVIX2000_VIDEO, tag, owner, clock, 1)
 {
 }
 

@@ -117,10 +117,10 @@ void superxavix_video_device::reset_video_timing()
 
 superxavix_video_device::video_timing superxavix_video_device::calculate_video_timing() const
 {
-	return calculate_video_timing(&m_video_timing_regs[0], output_clock_offset());
+	return calculate_video_timing(&m_video_timing_regs[0], output_sample_phase_clocks());
 }
 
-superxavix_video_device::video_timing superxavix_video_device::calculate_video_timing(u8 const *registers, int output_clock_offset)
+superxavix_video_device::video_timing superxavix_video_device::calculate_video_timing(u8 const *registers, int output_sample_phase_clocks)
 {
 	video_timing timing{
 		.horizontal_total = u16((0x0a80 | registers[TIMING_HORIZONTAL_TOTAL]) + 1),
@@ -136,9 +136,9 @@ superxavix_video_device::video_timing superxavix_video_device::calculate_video_t
 	if ((field_left <= half_limit) && (field_right <= half_limit))
 	{
 		// Display blanking counts output samples independently of the picture-column layout.
-		int const active_clocks = half_clocks + field_right - field_left - output_clock_offset;
+		int const active_clocks = half_clocks + field_right - field_left - output_sample_phase_clocks;
 		timing.active_width = std::max(1, (active_clocks + OUTPUT_PIXEL_CLOCKS - 1) / OUTPUT_PIXEL_CLOCKS);
-		timing.horizontal_start = (field_left + output_clock_offset + OUTPUT_PIXEL_CLOCKS - 1) / OUTPUT_PIXEL_CLOCKS;
+		timing.horizontal_start = (field_left + output_sample_phase_clocks + OUTPUT_PIXEL_CLOCKS - 1) / OUTPUT_PIXEL_CLOCKS;
 	}
 
 	u16 const field_bottom = registers[TIMING_FIELD_BOTTOM];

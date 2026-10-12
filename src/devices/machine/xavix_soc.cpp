@@ -190,7 +190,7 @@ void xavix_soc_device::device_add_mconfig(machine_config &config)
 		break;
 	case generation::XAVIX2000:
 		XAVIX2000(config, m_maincpu, DERIVED_CLOCK(1, 2));
-		XAVIX_VIDEO(config, m_video, DERIVED_CLOCK(1, 1));
+		XAVIX2000_VIDEO(config, m_video, DERIVED_CLOCK(1, 1));
 		break;
 	case generation::SUPERXAVIX:
 		SUPERXAVIX(config, m_maincpu, DERIVED_CLOCK(1, 1));

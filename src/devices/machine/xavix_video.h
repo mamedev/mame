@@ -41,7 +41,7 @@ public:
 	virtual void vblank();
 
 protected:
-	static constexpr int PICTURE_OUTPUT_DELAY_CLOCKS = 8;
+	static constexpr int RASTER_REFERENCE_DELAY_CLOCKS = 8;
 	static constexpr int PICTURE_FIRST_ROW = 16;
 	static constexpr int PICTURE_END_ROW = 240;
 	static constexpr int SPRITE_COUNT = 0x100;
@@ -295,7 +295,7 @@ protected:
 	int m_video_hres_scale;
 
 private:
-	static constexpr int EARLY_PICTURE_OUTPUT_DELAY_CLOCKS = 24;
+	static constexpr int ORIGINAL_PICTURE_DELAY_CLOCKS = 24;
 	// Uncontended master clocks per byte; earlier-chip timing remains unmeasured.
 	static constexpr unsigned SPRITE_DMA_BYTE_CLOCKS = 2;
 	static const gfx_layout TILE_16X16_2BPP_LAYOUT;
@@ -324,6 +324,7 @@ private:
 
 	enum class graphics_source { SPRITE, TILEMAP };
 
+	std::pair<int, int> fixed_raster_offset(int delay_clocks) const;
 	void pixel_decoder_ctrl_w(u8 data);
 	void draw_output(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_tilemap(const rectangle &cliprect, int layer);
@@ -336,6 +337,15 @@ private:
 	std::unique_ptr<pen_t[]> m_color_effect_palette;
 	bool m_color_effect_palette_valid;
 	std::array<s16, PALETTE_BANK_ENTRIES / 16> m_transparent_pens;
+};
+
+class xavix2000_video_device : public xavix_video_device
+{
+public:
+	xavix2000_video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual std::pair<int, int> picture_offset() const override;
 };
 
 class superxavix_video_device : public xavix_video_device
@@ -378,7 +388,7 @@ protected:
 
 private:
 	static constexpr int OUTPUT_PIXEL_CLOCKS = 2;
-	static constexpr int OUTPUT_ORIGIN_CLOCKS = PICTURE_PIXEL_CLOCKS;
+	static constexpr int STREAM_ORIGIN_ALIGNMENT_CLOCKS = PICTURE_PIXEL_CLOCKS;
 	static constexpr int PAIRED_PIXEL_CLOCKS = PICTURE_PIXEL_CLOCKS / 2;
 	static constexpr int MAX_ACTIVE_WIDTH = TILEMAP_WRAP_WIDTH * PICTURE_PIXEL_CLOCKS / OUTPUT_PIXEL_CLOCKS;
 	static constexpr int BITMAP_OUTPUT_DELAY_PIXELS = 2;
@@ -434,16 +444,14 @@ private:
 	void bitmap_palram_sh_w(offs_t offset, u8 data);
 	void bitmap_palram_l_w(offs_t offset, u8 data);
 	void video_timing_regs_w(offs_t offset, u8 data);
-	static video_timing calculate_video_timing(u8 const *registers, int output_clock_offset);
+	static video_timing calculate_video_timing(u8 const *registers, int output_sample_phase_clocks);
 	video_timing calculate_video_timing() const;
 	void apply_video_timing();
 	TIMER_CALLBACK_MEMBER(picture_nmi);
 	TIMER_CALLBACK_MEMBER(video_field_start);
 	void bitmap_params_w(offs_t offset, u8 data);
 	bool horizontal_reload_in_blanking(counter_config const &config) const;
-	int output_clock_offset() const;
-	int output_position(int clocks) const;
-	static int output_origin(int clocks);
+	int output_sample_phase_clocks() const;
 	void video_position_regs_w(offs_t offset, u8 data);
 	void extended_segment_regs_w(offs_t offset, u8 data);
 	template <palette_bank Bank> u8 palette_index_r();
@@ -475,6 +483,7 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_VIDEO, xavix_video_device)
+DECLARE_DEVICE_TYPE(XAVIX2000_VIDEO, xavix2000_video_device)
 DECLARE_DEVICE_TYPE(SUPERXAVIX_VIDEO, superxavix_video_device)
 
 #endif // MAME_MACHINE_XAVIX_VIDEO_H
