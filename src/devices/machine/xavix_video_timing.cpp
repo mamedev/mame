@@ -537,7 +537,10 @@ TIMER_CALLBACK_MEMBER(xavix_video_device::raster_irq_gen)
 void xavix_video_device::schedule_raster_irq()
 {
 	auto const [xoffset, yoffset] = counter_offset();
-	m_raster_irq_timer->adjust(screen().time_until_pos(m_raster_irq_y[0] - yoffset, m_raster_irq_x[0] - xoffset), 0);
+	int const row = m_raster_irq_y[0] - yoffset;
+	// Off-field comparisons must not wrap to row zero and render the next field during sprite DMA.
+	m_raster_irq_timer->adjust((row >= 0 && row < screen().height())
+			? screen().time_until_pos(row, m_raster_irq_x[0] - xoffset) : attotime::never, 0);
 }
 
 void xavix_video_device::raster_irq_x_w(u8 data)
