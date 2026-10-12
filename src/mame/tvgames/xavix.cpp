@@ -60,6 +60,8 @@
 #include "xavix_io_madf_ball.h"
 #include "xavix_io_mtrk_wheel.h"
 
+#include "sound/beep.h"
+
 #include "render.h"
 #include "softlist_dev.h"
 
@@ -287,6 +289,10 @@ void xavix_state::xavixp_nv_1mb(machine_config &config)
 
 void xavix_state::machine_start()
 {
+	// Synthetic microphone tones do not need the beeper's 32x oversampling.
+	for (beep_device &beeper : device_type_enumerator<beep_device>(*this))
+		beeper.output_to_stream_output(0).first->set_sample_rate(machine().sample_rate());
+
 	m_soc->cpu().space(xavix_device::AS_LOW_BUS).specific(m_code_lowbus);
 	m_screen_output.start(machine());
 	if (m_nvram)
@@ -1682,6 +1688,11 @@ static INPUT_PORTS_START( epo_dmon )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Air Cannon Trigger") PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Air Cannon Trigger") PORT_PLAYER(2)
 
+	// Usability hack for users without host microphones.
+	PORT_START("MIC_SIMULATE")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Simulate Voice") PORT_PLAYER(1) PORT_CODE(KEYCODE_N) PORT_WRITE_LINE_DEVICE_MEMBER("microphone_tone1", FUNC(beep_device::set_state))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Simulate Voice") PORT_PLAYER(2) PORT_CODE(KEYCODE_M) PORT_WRITE_LINE_DEVICE_MEMBER("microphone_tone2", FUNC(beep_device::set_state))
+
 	PORT_MODIFY("AN7")
 	// Representative values select the ROM's three threshold bands; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
@@ -1701,6 +1712,8 @@ void xavix_epo_dmon_state::xavix_epo_dmon(machine_config &config)
 	m_soc->adc().set_audio_input(1, 1);
 	MICROPHONE(config, "microphone1", 1).front_center().add_route(0, m_soc->adc(), 1.0, 0);
 	MICROPHONE(config, "microphone2", 1).front_center().add_route(0, m_soc->adc(), 1.0, 1);
+	BEEP(config, "microphone_tone1", 1000).add_route(0, m_soc->adc(), 0.5, 0);
+	BEEP(config, "microphone_tone2", 1000).add_route(0, m_soc->adc(), 0.5, 1);
 }
 
 void xavix_epo_dmon_state::vblank_extra()
@@ -4577,6 +4590,10 @@ static INPUT_PORTS_START( tomplc )
 	// The handheld switch pulls this line low while enabling ADC0 microphone sampling.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Push-to-Talk")
 
+	// Usability hack for users without a host microphone; hold with Push-to-Talk.
+	PORT_START("MIC_SIMULATE")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Simulate Announcement") PORT_CODE(KEYCODE_N) PORT_WRITE_LINE_DEVICE_MEMBER("microphone_tone", FUNC(beep_device::set_state))
+
 	PORT_MODIFY("AN7")
 	// Representative differences select the ROM's states; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
@@ -4591,6 +4608,7 @@ void xavix_i2c_power_state::xavix_tomplc(machine_config &config)
 {
 	xavix_i2c_24c02_4mb(config);
 	configure_microphone(config);
+	BEEP(config, "microphone_tone", 1000).add_route(0, m_soc->adc(), 0.5);
 }
 
 
