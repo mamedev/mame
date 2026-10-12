@@ -8676,6 +8676,26 @@ Fails [tape] loading side 2
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="mpsoccer">
+		<description>Microprose Soccer</description>
+		<year>1988</year>
+		<publisher>Microprose</publisher>
+    
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A" />
+				<dataarea name="cass" size="506939">
+					<rom name="Microprose_Soccer_Side_1_-_6_A_Side.tap" size="506939" crc="63f3a912" sha1="ab706745a548d65b7c5bdec9ca63c12aa8b658a9" />
+				</dataarea>
+		</part>
+		
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B" />
+				<dataarea name="cass" size="535102">
+					<rom name="Microprose_Soccer_Side_2_-_11_A_Side.tap" size="535102" crc="374c35e3" sha1="8635c641611a69f85179a63de24f027009e73811" />
+				</dataarea>
+		</part>
+	</software>
 
 	<!-- Dumped by @c64tapes -->
 	<software name="midnghth">
