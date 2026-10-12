@@ -2020,14 +2020,18 @@ void z80scc_channel::do_sccreg_wr5(uint8_t data)
 	if (data != m_wr5)
 	{
 		LOG("%s(%02x): Setting up the transmitter\n", FUNCNAME, data);
+		uint8_t const changed = data ^ m_wr5;
 		m_wr5 = data;
 		LOG("- Transmitter Enable %d\n", (data & WR5_TX_ENABLE) ? 1 : 0);
 		LOG("- Transmitter Bits/Character %d\n", get_tx_word_length());
 		LOG("- Send Break %d\n", (data & WR5_SEND_BREAK) ? 1 : 0);
 		LOG("- Request to Send %d\n", (data & WR5_RTS) ? 1 : 0);
 		LOG("- Data Terminal Ready %d\n", (data & WR5_DTR) ? 1 : 0);
-		update_serial();
-		safe_transmit_register_reset();
+		if (changed & ~(WR5_RTS | WR5_DTR))
+		{
+			update_serial();
+			safe_transmit_register_reset();
+		}
 		update_rts(); // Will also update DTR accordingly
 
 		check_dma_request();
