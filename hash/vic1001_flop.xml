@@ -157,7 +157,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=O7_P8YwZCuQ -->
-	<software name="revicion" supported="no">
+	<software name="revicion">
 		<description>reVICion</description>
 		<year>2024</year>
 		<publisher>Desire</publisher>
@@ -172,7 +172,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=WlralRNCQR4 -->
-	<software name="omddelux" supported="no">
+	<software name="omddelux">
 		<description>Orb MegaDemo Delux</description>
 		<year>2016</year>
 		<publisher>Orb</publisher>
