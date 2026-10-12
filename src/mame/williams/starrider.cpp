@@ -655,6 +655,13 @@ void sr_state::machine_reset()
 	m_sound_pia2->portb_w(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
 	m_sound_pia2->ca1_w(1);
 	m_sound_pia2->ca2_w(1);
+
+	// PIF reset
+	m_pif_portb = 0xffU;
+	m_pif_irq->in_w<1>(0);
+	m_vgg_pif_portb = 0xffU;
+	m_pif_irq_enable = 0U;
+	m_pif_timer_irq = 0U;
 }
 
 void sr_state::sound_attenuators_postload()
