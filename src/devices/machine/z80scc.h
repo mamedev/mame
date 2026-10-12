@@ -106,7 +106,7 @@ public:
 	uint8_t data_read();
 	void data_write(uint8_t data);
 
-	void receive_data(uint8_t data);
+	void receive_data(uint8_t data, uint8_t status = 0);
 	void m_tx_fifo_rp_step();
 	void m_rx_fifo_rp_step();
 	uint8_t m_rx_fifo_rp_data();

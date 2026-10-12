@@ -1318,7 +1318,7 @@ void z80scc_channel::rcv_complete()
 	receive_register_extract();
 	data = get_received_char();
 	LOG("%s: Received Data %c\n", FUNCNAME, data);
-	receive_data(data);
+	receive_data(data, (is_receive_parity_error() ? RR1_PARITY_ERROR : 0) | (is_receive_framing_error() ? RR1_CRC_FRAMING_ERROR : 0));
 #if START_BIT_HUNT
 	m_rcv_mode = RCV_SEEKING;
 #endif
@@ -1468,7 +1468,7 @@ uint8_t z80scc_channel::do_sccreg_rr1()
 {
 	uint8_t rr1 = m_rr1;
 	if (m_rx_fifo_wp != m_rx_fifo_rp)
-		rr1 = (rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo_rp];
+		rr1 = (rr1 & ~RR1_CRC_FRAMING_ERROR) | m_rx_error_fifo[m_rx_fifo_rp];
 	LOGR("%s <- %02x\n", FUNCNAME, rr1);
 	return rr1;
 }
@@ -2437,7 +2437,7 @@ uint8_t z80scc_channel::data_read()
 
 		// load error status from the FIFO
 		uint8_t const status = m_rx_error_fifo[m_rx_fifo_rp];
-		m_rr1 = (m_rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_PARITY_ERROR)) | status;
+		m_rr1 = (m_rr1 & ~RR1_CRC_FRAMING_ERROR) | status;
 
 		if (rx_special_condition(status))
 			logerror("Rx Error %02x\n", status & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
@@ -2627,7 +2627,7 @@ void z80scc_channel::data_write(uint8_t data)
 //-------------------------------------------------
 //  receive_data - put received data word into fifo
 //-------------------------------------------------
-void z80scc_channel::receive_data(uint8_t data)
+void z80scc_channel::receive_data(uint8_t data, uint8_t status)
 {
 	LOGRCV("Received Data Byte '%c'/%02x put into FIFO\n", isprint(data) ? data : ' ', data);
 
@@ -2644,7 +2644,7 @@ void z80scc_channel::receive_data(uint8_t data)
 	}
 	else
 	{
-		m_rx_error_fifo[m_rx_fifo_wp] &= ~RR1_RX_OVERRUN_ERROR;
+		m_rx_error_fifo[m_rx_fifo_wp] = status;
 
 		// store received character
 		m_rx_data_fifo[m_rx_fifo_wp] = data;
@@ -3122,7 +3122,7 @@ void z80scc_channel::check_receive_interrupt()
 		case WR1_RX_INT_ALL:
 			{
 				uint8_t const status = m_rx_error_fifo[m_rx_fifo_rp]
-						| (m_rr1 & RR1_RX_OVERRUN_ERROR);
+						| (m_rr1 & (RR1_PARITY_ERROR | RR1_RX_OVERRUN_ERROR));
 				m_uart->trigger_interrupt(m_index, rx_special_condition(status) ? INT_SPECIAL : INT_RECEIVE);
 			}
 			break;
