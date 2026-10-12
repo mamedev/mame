@@ -29,6 +29,7 @@ nsc810_device::nsc810_device(const machine_config &mconfig, const char *tag, dev
 	m_portA_latch(0), m_portB_latch(0), m_portC_latch(0),
 	m_ddrA(0), m_ddrB(0), m_ddrC(0),
 	m_mode(0),
+	m_timer_clock{clock, clock},
 	m_ramselect(false),
 	m_portA_r(*this, 0),
 	m_portB_r(*this, 0),
@@ -36,7 +37,6 @@ nsc810_device::nsc810_device(const machine_config &mconfig, const char *tag, dev
 	m_portA_w(*this),
 	m_portB_w(*this),
 	m_portC_w(*this),
-	m_timer_clock{clock, clock},
 	m_timer_out(*this)
 {
 	std::fill(std::begin(m_timer), std::end(m_timer), nullptr);
