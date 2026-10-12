@@ -817,7 +817,7 @@ CONS( 2006, epo_es2j, 0,      0, xavix2000_epo_es2j,         epo_es2j, xavix2000
 CONS( 2003, duelmast, 0,      0, xavix2000_duelmast,         duelmast, xavix2000_duelmast_state,   empty_init, "Takara / SSD Company Ltd.", "Duel Masters: Duel Station (Japan)", MACHINE_NOT_WORKING )
 
 // スーパーダッシュボール
-CONS( 2004, epo_sdb,  0,      0, xavix2000_epo_sdb,          epo_sdb,  xavix_state,                empty_init, "Epoch / SSD Company Ltd.", "Super Dash Ball (Japan)", MACHINE_NOT_WORKING )
+CONS( 2004, epo_sdb,  0,      0, xavix2000_epo_sdb,          epo_sdb,  xavix_state,                empty_init, "Epoch / SSD Company Ltd.", "Super Dash Ball (Japan)", 0 )
 
 CONS( 2005, ttv_sw,   0,      0, xavix2000_ttv_sw,           ttv_sw,   xavix2000_i2c_camera_state, empty_init, "Hasbro / Tiger Games / SSD Company Ltd.", "Star Wars Saga Edition: Lightsaber Battle Game!", MACHINE_NOT_WORKING )
 // テレビで遊び隊 STAR WARS LIGHTSABER BATTLE ～ジェダイの戦い～
@@ -825,10 +825,10 @@ CONS( 2005, ttv_swj,  ttv_sw, 0, xavix2000_ttv_sw,           ttv_sw,   xavix2000
 
 CONS( 2005, ttv_lotr, 0,      0, xavix2000_i2c_24c02_camera, ttv_lotr, xavix2000_i2c_camera_state, empty_init, "Hasbro / Tiger Games / SSD Company Ltd.", "The Lord of the Rings: Warrior of Middle-Earth", MACHINE_NOT_WORKING )
 
-CONS( 2005, ttv_mx,   0,      0, xavix2000_i2c_24c04,        ttv_mx,   xavix_i2c_state,            empty_init, "Hasbro / Tiger Games / SSD Company Ltd.", "MX Dirt Rebel", MACHINE_NOT_WORKING )
+CONS( 2005, ttv_mx,   0,      0, xavix2000_i2c_24c04,        ttv_mx,   xavix_i2c_state,            empty_init, "Hasbro / Tiger Games / SSD Company Ltd.", "MX Dirt Rebel", 0 )
 
 // テレビで遊び隊　韋駄天翔 激走 韋駄天バトル - seems to be based on the same engine at ttv_mx and has an almost identical controller, but not exactly the same game
-CONS( 2005, tom_jump, 0,      0, xavix2000_i2c_24c04,        tom_jump, xavix_i2c_state,            empty_init, "Tomy / SSD Company Ltd.", "TV de Asobitai IDATEN Jump: Gekisou IDATEN Battle (Japan)", MACHINE_NOT_WORKING )
+CONS( 2005, tom_jump, 0,      0, xavix2000_i2c_24c04,        tom_jump, xavix_i2c_state,            empty_init, "Tomy / SSD Company Ltd.", "TV de Asobitai IDATEN Jump: Gekisou IDATEN Battle (Japan)", 0 )
 
 // 剣神ドラゴンクエスト 甦りし伝説の剣
 CONS( 2003, drgqst,   0,      0, xavix2000_drgqst,           drgqst,   xavix2000_i2c_camera_state, empty_init, "Square Enix / SSD Company Ltd.", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken (Japan)", MACHINE_NOT_WORKING )

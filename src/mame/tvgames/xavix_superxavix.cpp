@@ -3217,7 +3217,7 @@ CONS( 2007, domstepc,   0,        0, superxavix_domfitex,              domyos_st
 // some DIS games run on XaviX 2 instead, see xavix2.cpp for Domyos Fitness Adventure and Domyos Bike Concept
 
 // Let's!TVプレイ 魔法戦隊マジレンジャー マジマットでダンス＆バトル
-CONS( 2005, mrangbat,   0,        0, superxavix_mrangbat,              mrangbat,              superxavix_i2c_state,        empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Mahou Taiketsu Magiranger: Magimat de Dance & Battle (Japan)", MACHINE_NOT_WORKING )
+CONS( 2005, mrangbat,   0,        0, superxavix_mrangbat,              mrangbat,              superxavix_i2c_state,        empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Mahou Taiketsu Magiranger: Magimat de Dance & Battle (Japan)", 0 )
 
 // エキサイトスポーツ　テニス×フィットネス
 CONS( 2004, epo_tfit,   0,        0, superxavix_epo_tfit,              epo_tfit,              superxavix_epo_tfit_state,   empty_init, "Epoch / SSD Company Ltd.", "Excite Sports Tennis x Fitness (Japan)", MACHINE_NOT_WORKING )
@@ -3274,7 +3274,7 @@ CONS( 2011, anpanmdx,   0,        0, superxavix_anpanmdx,              anpanmdx,
 CONS( 2009, apmj2009,   0,        0, superxavix_i2c_24c16,             apmj2009,              superxavix_i2c_power_state,  empty_init, "Toho / SSD Company Ltd.", "Anpanman Pyon-Pyon Ikunou Mat (Japan)", MACHINE_NOT_WORKING )
 
 // has HT24LC16
-CONS( 2008, udance,     0,        0, superxavix_udance,                udance,                superxavix_udance_state,     empty_init, "Hasbro / Tiger Electronics / Creativity / Medialink / SSD Company Ltd.", "U-Dance", MACHINE_NOT_WORKING )
+CONS( 2008, udance,     0,        0, superxavix_udance,                udance,                superxavix_udance_state,     empty_init, "Hasbro / Tiger Electronics / Creativity / Medialink / SSD Company Ltd.", "U-Dance", 0 )
 
 // these have RAM in the usual ROM space & also have an Atmel 24LC64,
 CONS( 2004, suprtvpc,   0,        0, superxavix_suprtvpc,              suprtvpc,              superxavix_suprtvpc_state,   empty_init, "Epoch / SSD Company Ltd.", "Super TV-PC (Japan)", MACHINE_NOT_WORKING )
@@ -3297,4 +3297,4 @@ CONS( 2007, hkdraw,     doradraw, 0, superxavix_doradraw,              doradraw,
 CONS( 2007, ndpbj,      0,        0, superxavix_ndpbj,                 ndpbj,                 superxavix_ndpbj_state,      empty_init, "Nissin / SSD Company Ltd.", "Dontore da bei: Donbei-kun to Training (Japan)", MACHINE_NOT_WORKING )
 
 // どんトレだ兵衛2～おうちで、みんなでフィットネス!～
-CONS( 2008, ndpmj,      0,        0, superxavix_ndpmj,                 ndpmj,                 superxavix_ndpmj_state,      empty_init, "Nissin / SSD Company Ltd.", "Dontore da bei 2: Ouchi de, Minna de Fitness! (Japan)", MACHINE_NOT_WORKING )
+CONS( 2008, ndpmj,      0,        0, superxavix_ndpmj,                 ndpmj,                 superxavix_ndpmj_state,      empty_init, "Nissin / SSD Company Ltd.", "Dontore da bei 2: Ouchi de, Minna de Fitness! (Japan)", 0 )
