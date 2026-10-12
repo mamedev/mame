@@ -91,6 +91,10 @@ public:
 		m_ioacc(0),
 		m_cnt1(1),
 		m_sp1(1),
+		m_user_cnt1(true),
+		m_user_sp1(true),
+		m_cnt1_pin(true),
+		m_sp1_pin(true),
 		m_iec_data_out(1),
 		m_iec_atn(1),
 		m_iec_clk(1),
@@ -183,6 +187,8 @@ public:
 
 	void iec_srq_w(int state);
 	void iec_data_w(int state);
+	void user_cnt1_w(int state);
+	void user_sp1_w(int state);
 
 	uint8_t exp_dma_cd_r(offs_t offset);
 	void exp_dma_cd_w(offs_t offset, uint8_t data);
@@ -226,6 +232,10 @@ public:
 	// fast serial state
 	int m_cnt1;
 	int m_sp1;
+	bool m_user_cnt1;
+	bool m_user_sp1;
+	bool m_cnt1_pin;
+	bool m_sp1_pin;
 	int m_iec_data_out;
 
 	// deferred IEC bus output state
@@ -1491,7 +1501,6 @@ void c128_state::joy1_trigger_w(int state)
 void c128_state::cia1_cnt_w(int state)
 {
 	m_cnt1 = state;
-	m_user->write_4(state);
 
 	update_iec();
 }
@@ -1499,7 +1508,6 @@ void c128_state::cia1_cnt_w(int state)
 void c128_state::cia1_sp_w(int state)
 {
 	m_sp1 = state;
-	m_user->write_5(state);
 
 	update_iec();
 }
@@ -1655,25 +1663,23 @@ inline void c128_state::update_iec()
 {
 	int fsdir = m_mmu->fsdir_r();
 
-	// fast serial data in
-	int data_in = m_iec->data_r();
+	bool const sp1 = m_sp1 && m_user_sp1 && (fsdir || m_iec->data_r());
+	bool const cnt1 = m_cnt1 && m_user_cnt1 && (fsdir || m_iec_srq);
 
-	m_cia1->sp_w(fsdir || data_in);
+	m_cia1->sp_w(sp1);
+	m_cia1->cnt_w(cnt1);
 
 	// fast serial data out
 	int data_out = !m_iec_data_out;
 
-	if (fsdir) data_out &= m_sp1;
+	if (fsdir) data_out &= sp1;
 
 	m_iec_data = data_out;
-
-	// fast serial clock in
-	m_cia1->cnt_w(fsdir || m_iec_srq);
 
 	// fast serial clock out
 	int srq_out = 1;
 
-	if (fsdir) srq_out &= m_cnt1;
+	if (fsdir) srq_out &= cnt1;
 
 	m_iec_srq_out = srq_out;
 
@@ -1681,6 +1687,18 @@ inline void c128_state::update_iec()
 	m_iec->host_clk_w(m_iec_clk);
 	m_iec->host_data_w(m_iec_data);
 	m_iec->host_srq_w(m_iec_srq_out);
+
+	if (sp1 != m_sp1_pin)
+	{
+		m_sp1_pin = sp1;
+		m_user->write_5(sp1);
+	}
+
+	if (cnt1 != m_cnt1_pin)
+	{
+		m_cnt1_pin = cnt1;
+		m_user->write_4(cnt1);
+	}
 }
 
 void c128_state::iec_srq_w(int state)
@@ -1691,6 +1709,18 @@ void c128_state::iec_srq_w(int state)
 
 void c128_state::iec_data_w(int state)
 {
+	update_iec();
+}
+
+void c128_state::user_cnt1_w(int state)
+{
+	m_user_cnt1 = state;
+	update_iec();
+}
+
+void c128_state::user_sp1_w(int state)
+{
+	m_user_sp1 = state;
 	update_iec();
 }
 
@@ -1788,6 +1818,10 @@ void c128_state::machine_start()
 	save_item(NAME(m_clrbank));
 	save_item(NAME(m_cnt1));
 	save_item(NAME(m_sp1));
+	save_item(NAME(m_user_cnt1));
+	save_item(NAME(m_user_sp1));
+	save_item(NAME(m_cnt1_pin));
+	save_item(NAME(m_sp1_pin));
 	save_item(NAME(m_iec_data_out));
 	save_item(NAME(m_iec_atn));
 	save_item(NAME(m_iec_clk));
@@ -1960,8 +1994,8 @@ void c128_state::ntsc(machine_config &config)
 
 	PET_USER_PORT(config, m_user, c64_user_port_cards, nullptr);
 	m_user->p3_handler().set(FUNC(c128_state::exp_reset_w));
-	m_user->p4_handler().set(m_cia1, FUNC(mos6526_device::cnt_w));
-	m_user->p5_handler().set(m_cia1, FUNC(mos6526_device::sp_w));
+	m_user->p4_handler().set(FUNC(c128_state::user_cnt1_w));
+	m_user->p5_handler().set(FUNC(c128_state::user_sp1_w));
 	m_user->p6_handler().set(m_cia2, FUNC(mos6526_device::cnt_w));
 	m_user->p7_handler().set(m_cia2, FUNC(mos6526_device::sp_w));
 	m_user->p9_handler().set(m_iec, FUNC(cbm_iec_device::host_atn_w));
@@ -2002,6 +2036,7 @@ void c128_state::c128(machine_config &config)
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
 	m_iec->srq_callback().append("cia1_flag", FUNC(input_merger_device::in_w<1>));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
+	m_iec->atn_callback().set(m_user, FUNC(pet_user_port_device::write_9));
 }
 
 
@@ -2018,6 +2053,7 @@ void c128_state::c128dcr(machine_config &config)
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
 	m_iec->srq_callback().append("cia1_flag", FUNC(input_merger_device::in_w<1>));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
+	m_iec->atn_callback().set(m_user, FUNC(pet_user_port_device::write_9));
 
 	CBM_IEC_SLOT(config.replace(), "iec8", 8, c128dcr_iec_devices, "c1571cr").set_fixed(true);
 }
@@ -2034,6 +2070,7 @@ void c128_state::c128d81(machine_config &config)
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
 	m_iec->srq_callback().append("cia1_flag", FUNC(input_merger_device::in_w<1>));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
+	m_iec->atn_callback().set(m_user, FUNC(pet_user_port_device::write_9));
 
 	CBM_IEC_SLOT(config.replace(), "iec8", 8, c128d81_iec_devices, "c1563").set_fixed(true);
 }
@@ -2154,8 +2191,8 @@ void c128_state::pal(machine_config &config)
 
 	PET_USER_PORT(config, m_user, c64_user_port_cards, nullptr);
 	m_user->p3_handler().set(FUNC(c128_state::exp_reset_w));
-	m_user->p4_handler().set(m_cia1, FUNC(mos6526_device::cnt_w));
-	m_user->p5_handler().set(m_cia1, FUNC(mos6526_device::sp_w));
+	m_user->p4_handler().set(FUNC(c128_state::user_cnt1_w));
+	m_user->p5_handler().set(FUNC(c128_state::user_sp1_w));
 	m_user->p6_handler().set(m_cia2, FUNC(mos6526_device::cnt_w));
 	m_user->p7_handler().set(m_cia2, FUNC(mos6526_device::sp_w));
 	m_user->p9_handler().set(m_iec, FUNC(cbm_iec_device::host_atn_w));
@@ -2196,6 +2233,7 @@ void c128_state::c128pal(machine_config &config)
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
 	m_iec->srq_callback().append("cia1_flag", FUNC(input_merger_device::in_w<1>));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
+	m_iec->atn_callback().set(m_user, FUNC(pet_user_port_device::write_9));
 }
 
 
@@ -2212,6 +2250,7 @@ void c128_state::c128dcrp(machine_config &config)
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
 	m_iec->srq_callback().append("cia1_flag", FUNC(input_merger_device::in_w<1>));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
+	m_iec->atn_callback().set(m_user, FUNC(pet_user_port_device::write_9));
 
 	CBM_IEC_SLOT(config.replace(), "iec8", 8, c128dcr_iec_devices, "c1571cr").set_fixed(true);
 }
