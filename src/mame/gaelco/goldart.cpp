@@ -244,11 +244,11 @@ void goldart_state::vblank_w(int state)
 
 u32 goldart_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u8 const *const src = &m_vram[y * SCREEN_WIDTH];
 		u16 *const dst = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			dst[x] = src[x];
 	}
 

@@ -1284,9 +1284,9 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 	const int y_end = m_vc2->readout_y1();
 
 	/* loop over rows and copy to the destination */
-	for (int y = cliprect.min_y, sy = y_start; y <= cliprect.max_y && sy < y_end; y++, sy++)
+	for (int y = cliprect.top(), sy = y_start; y <= cliprect.bottom() && sy < y_end; y++, sy++)
 	{
-		uint32_t *dest = &bitmap.pix(y, cliprect.min_x);
+		uint32_t *dest = &bitmap.pix(y, cliprect.left());
 		const uint32_t *src_rgbci = m_rb2->rgbci(y);
 		const uint32_t *src_cidaux = m_rb2->cidaux(y);
 
@@ -1310,7 +1310,7 @@ uint32_t newport_base_device::screen_update(screen_device &device, bitmap_rgb32 
 		curr_did_entry = m_vc2->next_did_line_entry();
 
 		// loop over columns
-		for (int x = cliprect.min_x; x < cliprect.max_x; x++)
+		for (int x = cliprect.left(); x < cliprect.right(); x++)
 		{
 			if ((uint16_t)x == (curr_did_entry >> 5))
 			{
@@ -2259,10 +2259,10 @@ bool newport_base_device::pixel_clip_pass(int16_t x, int16_t y)
 	bool mask0_pass = true;
 	if (BIT(m_rex3.m_clip_mode, 0))
 	{
-		const int16_t min_x = (int16_t)(m_rex3.m_smask_x[0] >> 16);
-		const int16_t min_y = (int16_t)(m_rex3.m_smask_y[0] >> 16);
-		const int16_t max_x = (int16_t)m_rex3.m_smask_x[0];
-		const int16_t max_y = (int16_t)m_rex3.m_smask_y[0];
+		const int16_t min_x = int16_t(m_rex3.m_smask_x[0] >> 16);
+		const int16_t min_y = int16_t(m_rex3.m_smask_y[0] >> 16);
+		const int16_t max_x = int16_t(m_rex3.m_smask_x[0]);
+		const int16_t max_y = int16_t(m_rex3.m_smask_y[0]);
 
 		if (x < min_x)
 			mask0_pass = false;
@@ -2294,10 +2294,10 @@ bool newport_base_device::pixel_clip_pass(int16_t x, int16_t y)
 			if (!BIT(m_rex3.m_clip_mode, bit))
 				continue;
 
-			int16_t min_x = (int16_t)(m_rex3.m_smask_x[bit] >> 16) - 0x1000;
-			int16_t min_y = (int16_t)(m_rex3.m_smask_y[bit] >> 16) - 0x1000;
-			int16_t max_x = (int16_t)m_rex3.m_smask_x[bit] - 0x1000;
-			int16_t max_y = (int16_t)m_rex3.m_smask_y[bit] - 0x1000;
+			int16_t min_x = int16_t(m_rex3.m_smask_x[bit] >> 16) - 0x1000;
+			int16_t min_y = int16_t(m_rex3.m_smask_y[bit] >> 16) - 0x1000;
+			int16_t max_x = int16_t(m_rex3.m_smask_x[bit]) - 0x1000;
+			int16_t max_y = int16_t(m_rex3.m_smask_y[bit]) - 0x1000;
 
 			if (x < min_x)
 			{

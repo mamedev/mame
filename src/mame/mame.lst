@@ -17394,6 +17394,7 @@ c64c_se
 c64cp
 c64g
 c64gs
+c64o
 c64p
 clipper
 dx64
@@ -18616,6 +18617,8 @@ cafepara
 cafetime
 chalgirl
 daisyari
+dblbet
+dblbeta
 dondenmj
 dragonmj
 dragonmj103
@@ -18633,8 +18636,6 @@ janputer
 janputera
 jansou
 jansoua
-janyou
-janyoua
 janyoup2
 janyoup2702
 janyoup2a
@@ -18663,6 +18664,7 @@ mjvegasb
 mjvegasc
 mjyarou
 mjyarou2
+ndblbet
 openmj
 pongboo2
 royalmah
@@ -19880,6 +19882,7 @@ froggers
 froggers1
 froggers2
 froggers3
+froggers4
 froggert
 froggervd
 froggrs
@@ -21432,6 +21435,13 @@ xycs
 wlfx
 wlzb
 
+@source:humax/cxhumax.cpp
+hxhdci2k
+
+@source:humax/irci5400.cpp
+irci5400
+irci5400z
+
 @source:husky/hawk.cpp
 hawk
 
@@ -21543,6 +21553,8 @@ skimaxx
 jnero
 specfrce
 specfrceo
+
+@source:ice/vp50.cpp
 rhnation
 zoofari
 
@@ -21678,6 +21690,7 @@ fb2010
 fb2010a
 feverch
 fevercha
+feverchb
 feverchtw
 feverchw4
 fl7_3121
@@ -22013,6 +22026,7 @@ cjddzsa
 cjdh6th
 cjdh6tha
 cjsxp
+cjtlj
 cjtljp
 extradrw
 fruitpar
@@ -30279,12 +30293,12 @@ arac6k33
 
 @source:misc/artmagic.cpp
 cheesech
-shtstar
 stonebal
 stonebal2
 stonebal2o
 ultennis
 ultennisj
+westerns
 
 @source:misc/astrafr.cpp
 as_acp
@@ -30755,11 +30769,14 @@ coolpool
 @source:misc/corona.cpp
 legrandc
 luckyrlt
+luckyrlta
+monte
 rcirulet
 re800ea
 re800v1
 re800v1a
 re800v3
+rulamiky
 winner81
 winner81b
 winner81c
@@ -34693,6 +34710,7 @@ puzzball
 puzzballa
 sekaikh
 sekaikha
+shamisen
 slotouji
 slotoujia
 squizchs
@@ -35162,8 +35180,9 @@ pc9801vm
 pc9801vx
 
 @source:nec/pc9801_epson.cpp
-pc286vs
+pc286ls
 pc286u
+pc286vs
 pc386m
 pc386v
 pc486se
@@ -36955,6 +36974,7 @@ mspactwina
 newpuc2
 newpuc2b
 newpuckx
+newpuckxb
 nmouse
 nmouseb
 numcrash
@@ -40756,10 +40776,12 @@ sandaha
 @source:sealy/sealy_z80.cpp
 bbddz
 ddz2
+ddz2a
 djddz
+djddza
 jzuanshi
+lucky168
 pljh
-xy168
 
 @source:seequa/chameleon.cpp
 chameleon
@@ -42859,6 +42881,7 @@ totmejan
 bcrusher
 kncljoe
 kncljoea
+kncljoeb
 
 @source:seibu/legionna.cpp
 cupsoc
@@ -43781,10 +43804,12 @@ anpanmct
 cmcwa
 cscaoysd
 dbzbgck
+dbzbgck10
 dchopper
 gkitarou
 gyakyu
 kghmytda
+pmsgk
 satoyama
 youkai
 yujogs
@@ -43913,9 +43938,6 @@ megatrix
 @source:skeleton/cubieboard4.cpp
 cubibrd4
 monkyjmp
-
-@source:skeleton/cxhumax.cpp
-hxhdci2k
 
 @source:skeleton/d400.cpp
 d461

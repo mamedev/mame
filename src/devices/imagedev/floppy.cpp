@@ -43,7 +43,7 @@
 
 #include "logmacro.h"
 
-#define FLOPSND_TAG "floppysound"
+#define FLOPSND_TAG "flopsnd"
 
 // device type definition
 DEFINE_DEVICE_TYPE(FLOPPY_CONNECTOR, floppy_connector, "floppy_connector", "Floppy drive connector abstraction")
@@ -217,8 +217,8 @@ floppy_connector::floppy_connector(const machine_config &mconfig, const char *ta
 	device_slot_interface(mconfig, *this),
 	formats(nullptr),
 	m_use_sound(false),
-	m_samples(nullptr),
-	m_sectoring_type(floppy_image::SOFT)
+	m_sample_set(nullptr),
+	m_media_change_time(attotime::zero)
 {
 }
 
@@ -240,9 +240,10 @@ void floppy_connector::enable_sound(bool use_sound)
 // Activate floppy sounds with lists for various formats
 //------------------------------------------------------
 
-void floppy_connector::enable_sound(floppy_sound_samples *samples)
+void floppy_connector::enable_sound(const char *samplename)
 {
-	m_samples = samples;
+	if (samplename == nullptr) samplename = "default";
+	m_sample_set = samplename;
 	m_use_sound = true;
 }
 
@@ -257,6 +258,7 @@ void floppy_connector::device_config_complete()
 	{
 		dev->set_formats(formats);
 		dev->set_sectoring_type(m_sectoring_type);
+		dev->set_media_change_time(m_media_change_time);
 	}
 }
 
@@ -283,8 +285,11 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 	m_motor_always_on(false),
 	m_dskchg_writable(false),
 	m_has_trk00_sensor(true),
+	m_media_change_time(attotime::zero),
 	m_dir(0), m_stp(0), m_wtg(0), m_mon(1), m_ss(0), m_ds(-1), m_idx(0), m_wpt(0), m_rdy(0), m_dskchg(0),
 	m_ready(false),
+	m_media_changing(false),
+	m_media_change_wpt(false),
 	m_rpm(0),
 	m_angular_speed(0),
 	m_revolution_count(0),
@@ -563,6 +568,7 @@ void floppy_image_device::device_start()
 	m_wpt = 0;
 	m_dskchg = exists() ? 1 : 0;
 	m_index_timer = timer_alloc(FUNC(floppy_image_device::index_resync), this);
+	m_media_change_timer = timer_alloc(FUNC(floppy_image_device::media_change_done), this);
 	m_image_dirty = false;
 	m_ready = true;
 	m_ready_counter = 0;
@@ -571,8 +577,9 @@ void floppy_image_device::device_start()
 	floppy_connector *conn = dynamic_cast<floppy_connector*>(device().owner());
 	if (conn != nullptr)  // just in case that the floppy connects to something else
 	{
-		m_sound_out->set_samples(conn->get_samples(), m_form_factor, m_tracks);
 		m_make_sound = conn->use_sound();
+		if (m_make_sound)
+			m_sound_out->set_samples(conn->get_samples_name(), m_form_factor, m_tracks);
 	}
 
 	save_item(NAME(m_dir));
@@ -587,6 +594,8 @@ void floppy_image_device::device_start()
 	save_item(NAME(m_rdy));
 	save_item(NAME(m_dskchg));
 	save_item(NAME(m_ready));
+	save_item(NAME(m_media_changing));
+	save_item(NAME(m_media_change_wpt));
 	save_item(NAME(m_rpm));
 	save_item(NAME(m_angular_speed));
 	save_item(NAME(m_revolution_start_time));
@@ -667,13 +676,7 @@ void floppy_image_device::init_floppy_load(bool write_supported)
 
 	index_resync(0);
 
-	m_wpt = 1; // disk sleeve is covering the sensor
-	if (!m_cur_wpt_cb.isnull())
-		m_cur_wpt_cb(this, m_wpt);
-
-	m_wpt = is_readonly() || (!write_supported);
-	if (!m_cur_wpt_cb.isnull())
-		m_cur_wpt_cb(this, m_wpt);
+	change_media(is_readonly() || (!write_supported));
 
 	if (m_motor_always_on) {
 		// When disk is inserted, start motor
@@ -685,6 +688,30 @@ void floppy_image_device::init_floppy_load(bool write_supported)
 
 	if (m_dskchg_writable)
 		m_dskchg = 1;
+}
+
+void floppy_image_device::change_media(bool wpt)
+{
+	m_wpt = 1; // disk sleeve is covering the sensor
+	if (!m_cur_wpt_cb.isnull())
+		m_cur_wpt_cb(this, m_wpt);
+
+	m_media_change_wpt = wpt;
+	if (m_media_change_time.is_zero() || machine().phase() != machine_phase::RUNNING)
+		media_change_done(0);
+	else
+	{
+		m_media_changing = true;
+		m_media_change_timer->adjust(m_media_change_time);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(floppy_image_device::media_change_done)
+{
+	m_media_changing = false;
+	m_wpt = m_media_change_wpt;
+	if (!m_cur_wpt_cb.isnull())
+		m_cur_wpt_cb(this, m_wpt);
 }
 
 std::pair<std::error_condition, std::string> floppy_image_device::call_load()
@@ -746,13 +773,7 @@ void floppy_image_device::call_unload()
 		m_image.reset();
 	}
 
-	m_wpt = 1; // disk sleeve is covering the sensor
-	if (!m_cur_wpt_cb.isnull())
-		m_cur_wpt_cb(this, m_wpt);
-
-	m_wpt = 0; // sensor is uncovered
-	if (!m_cur_wpt_cb.isnull())
-		m_cur_wpt_cb(this, m_wpt);
+	change_media(false);
 
 	if (!m_cur_unload_cb.isnull())
 		m_cur_unload_cb(this);
@@ -1225,7 +1246,7 @@ void floppy_image_device::cache_weakness_setup(const std::vector<uint32_t> &buf,
 
 attotime floppy_image_device::get_next_transition(const attotime &from_when)
 {
-	if(!m_image || m_mon)
+	if(!m_image || m_mon || m_media_changing)
 		return attotime::never;
 
 	attotime from = from_when;

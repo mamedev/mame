@@ -71,7 +71,7 @@ constexpr size_t DRAM_WORDS = 0x80000 / 2;
 
 // Size of the input stream FIFO, which the "request for bits" status
 // reflects.
-constexpr size_t VIDEO_FIFO_FULL = 32 * 1024;
+constexpr size_t VIDEO_FIFO_FULL = 64 * 1024;
 
 // Picture periods in 30 MHz ticks, indexed by the MPEG-1 picture_rate code.
 constexpr uint32_t FRAME_PERIOD_30MHZ[16] =

@@ -355,6 +355,8 @@ public:
 	void rcirulet(machine_config &config) ATTR_COLD;
 	void luckyrlt(machine_config &config) ATTR_COLD;
 	void re800(machine_config &config) ATTR_COLD;
+	void luckyrlta(machine_config &config) ATTR_COLD;
+	void init_rulam() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -707,7 +709,8 @@ void corona_state::winner81_sound_cpu_io_map(address_map &map)
 
 void corona_state::winner82_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();
+//	map(0x0000, 0x3fff).rom();
+	map(0x0000, 0x7fff).rom();
 	map(0x4000, 0x4fff).ram().share("nvram");
 	map(0x8000, 0x80ff).ram();
 }
@@ -1564,6 +1567,38 @@ void corona_state::luckyrlt(machine_config &config)
 	AY8912(config, "aysnd", AY_CLK1).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void corona_state::luckyrlta(machine_config &config)
+{
+	// basic machine hardware
+	Z80(config, m_maincpu, RE_MAIN_XTAL/8);  // measured 2MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &corona_state::luckyrlt_map);
+	m_maincpu->set_addrmap(AS_IO, &corona_state::luckyrlt_cpu_io_map);
+
+	Z80(config, m_soundcpu, RE_MAIN_XTAL/8);  // measured 2MHz
+	m_soundcpu->set_addrmap(AS_PROGRAM, &corona_state::luckyrlt_sound_map);
+	m_soundcpu->set_addrmap(AS_IO, &corona_state::luckyrlt_sound_cpu_io_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	// video hardware
+	SCREEN(config, m_screen);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); //not accurate
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(corona_state::screen_update_luckyrlt));
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
+
+	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x100);
+
+	SPEAKER(config, "mono").front_center();
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+
+	AY8912(config, "aysnd", AY_CLK1).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
 
 /**************** Corona Co,LTD. Hardware ****************
 *  > ROM Loading Routines...                             *
@@ -1774,8 +1809,8 @@ ROM_END
 
 ROM_START(rcirulet)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("rc1.256", 0x4000, 0x4000, CRC(be25f548) SHA1(f59ef5d6d047299ff77f28b24517ba6d0a3afc90) )
-	ROM_CONTINUE(       0x0000, 0x4000)
+	ROM_LOAD("rc1.256", 0x0000, 0x4000, CRC(be25f548) SHA1(f59ef5d6d047299ff77f28b24517ba6d0a3afc90) )
+	ROM_CONTINUE(       0x0000, 0x4000)  // program is located in the 2nd half
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )  // IM1 instead of NMI
 	ROM_LOAD("rcson.16",    0x0000, 0x0800, CRC(9ba72a6d) SHA1(0d06ee4952255a93a7f097dd84c5937b01367836) )
@@ -1791,7 +1826,7 @@ ROM_END
 
 /******************************
 
-  Lucky Roulette
+  Lucky Roulette Plus
   6-players spanish roulette.
 
   Unknown manufacturer.
@@ -1810,6 +1845,88 @@ ROM_START(luckyrlt)
 	ROM_LOAD( "promrulxx.123",  0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
 
+/*
+  Lucky Roulette Plus
+  6-players Spanish roulette, set 2.
+
+  Derivated work/hack from luckyrlt with more code,
+  more routines, and simplified sound.
+
+*/  
+ROM_START(luckyrlta)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("am27256.bin", 0x0000, 0x8000, CRC(a780a381) SHA1(ab9fb78bd3a21bc075451ef224845d161a5c672d) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD("am2732.bin",  0x0000, 0x1000, CRC(eea304bd) SHA1(f49c5c5ff05f2f9298dd3b506ff0f297defb0d1d) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "corona_82s123.bin",  0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
+ROM_END
+
+
+/************  Miki S.R.L. sets  ************/
+
+/*
+  Rula (roulette, encrypted)
+  Miki S.R.L.
+  1991.
+
+  Argentina.
+
+  Notes:
+  blitter and inputs seems mapped as winner81.
+
+*/
+ROM_START(rulamiky)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rula.bin", 0x0000, 0x8000, CRC(a866cb05) SHA1(ffc9b05d26f312c0ba1468c33b00ac503876c836) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )  // IM1 instead of NMI. Identical halves
+	ROM_LOAD("son_2732_8ccc.bin",   0x0000, 0x1000, CRC(c944a4ae) SHA1(989ec9f39a7761aa73d08ca39b081cb2c4c75a7c) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "corona_82s123.bin",  0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
+ROM_END
+
+/*
+  Monte (cards game, encrypted)
+  40 cards game, 4 jokers.
+  Miki S.R.L.
+  1989.
+
+  Argentina.
+
+  Notes:
+  blitter and inputs seems mapped as winner82.
+
+*/
+ROM_START(monte)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("monte.bin", 0x0000, 0x8000, CRC(d72d0905) SHA1(4642224e8ee3b1e32198ce605c73aafa4f18f5db) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )  // IM1 instead of NMI. Identical halves
+	ROM_LOAD("son_2732_8ccc.bin",   0x0000, 0x1000, CRC(c944a4ae) SHA1(989ec9f39a7761aa73d08ca39b081cb2c4c75a7c) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "corona_82s123.bin",  0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
+ROM_END
+
+
+/******************************************
+*              Driver Init                *
+******************************************/
+
+void corona_state::init_rulam()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0; i < 0x10000; i++)
+		rom[i] = bitswap<8>(rom[i], 5, 2, 0, 7, 1, 6, 3, 4);
+
+}
+
+
 } // anonymous namespace
 
 
@@ -1817,16 +1934,20 @@ ROM_END
 *              Game Drivers               *
 ******************************************/
 
-//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE         INIT        ROT     COMPANY                     FULLNAME                                   FLAGS                     LAYOUT
-GAME(  1982, winner82,  0,        winner82, winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                      0 )
-GAME(  1981, winner81,  winner82, winner81, winner81, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",           MACHINE_IMPERFECT_SOUND )
-GAME(  1981, winner81b, winner82, winner82, winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",           0 )
-GAME(  1981, winner81c, winner82, winner82, winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, set 3)",               0 )
-GAME(  1981, winner81d, winner82, winner82, winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, set 4)",               0 )
-GAME(  198?, legrandc,  0,        winner82, winner82, corona_state, empty_init, ROT0,   "Isermatic France S.A.",    "Le Grandchamps",                           0 )
-GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                        layout_re800 )
-GAMEL( 1991, re800v1,   0,        re800,    re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0, set 1)",              0,                        layout_re800 )
-GAMEL( 1991, re800v1a,  re800v1,  re800,    re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0, set 2)",              0,                        layout_re800 )
-GAMEL( 1991, re800v3,   0,        re800,    re800v3,  corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     MACHINE_IMPERFECT_COLORS, layout_re800 )
-GAMEL( 199?, rcirulet,  0,        rcirulet, re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RCI (6-players, Spanish)",          0,                        layout_re800 )
-GAMEL( 1990, luckyrlt,  0,        luckyrlt, luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish)", 0,                        layout_luckyrlt )
+//     YEAR  NAME       PARENT    MACHINE    INPUT     STATE         INIT        ROT     COMPANY                     FULLNAME                                           FLAGS                     LAYOUT
+GAME(  1982, winner82,  0,        winner82,  winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                             0 )
+GAME(  1981, winner81,  winner82, winner81,  winner81, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",                  MACHINE_IMPERFECT_SOUND )
+GAME(  1981, winner81b, winner82, winner82,  winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",                  0 )
+GAME(  1981, winner81c, winner82, winner82,  winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, set 3)",                      0 )
+GAME(  1981, winner81d, winner82, winner82,  winner82, corona_state, empty_init, ROT0,   "Corona Co, LTD.",          "Winners Circle (81, set 4)",                      0 )
+GAME(  198?, legrandc,  0,        winner82,  winner82, corona_state, empty_init, ROT0,   "Isermatic France S.A.",    "Le Grandchamps",                                  0 )
+GAMEL( 1991, re800ea,   re800v1,  re800,     re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",             0,                        layout_re800 )
+GAMEL( 1991, re800v1,   0,        re800,     re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0, set 1)",                     0,                        layout_re800 )
+GAMEL( 1991, re800v1a,  re800v1,  re800,     re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0, set 2)",                     0,                        layout_re800 )
+GAMEL( 1991, re800v3,   0,        re800,     re800v3,  corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                            MACHINE_IMPERFECT_COLORS, layout_re800 )
+GAMEL( 199?, rcirulet,  0,        rcirulet,  re800,    corona_state, empty_init, ROT90,  "Entretenimientos GEMINIS", "Ruleta RCI (6-players, Spanish)",                 0,                        layout_re800 )
+GAMEL( 1990, luckyrlt,  0,        luckyrlt,  luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish, set 1)", 0,                        layout_luckyrlt )
+GAMEL( 1991, luckyrlta, luckyrlt, luckyrlta, luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish, set 2)", 0,                        layout_luckyrlt )
+
+GAME(  1991, rulamiky,  winner82, winner82,  winner82, corona_state, init_rulam, ROT90,  "Miky S.R.L.",              "Rula (roulette, encrypted)",                      MACHINE_NOT_WORKING )
+GAME(  1989, monte,     winner82, winner82,  winner82, corona_state, init_rulam, ROT90,  "Miky S.R.L.",              "Monte (cards game, encrypted)",                   MACHINE_NOT_WORKING )

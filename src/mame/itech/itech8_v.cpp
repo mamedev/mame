@@ -595,13 +595,13 @@ u32 itech8_state::screen_update_2layer(screen_device &screen, bitmap_rgb32 &bitm
 	//    top layer @ 0x00000 is only 4bpp, colors come from the first 16 palettes
 	// bottom layer @ 0x20000 is full 8bpp
 	u32 const page_offset = m_tms34061->m_display.dispstart & 0x0ffff;
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u8 const *const base0 = &m_tms34061->m_display.vram[(0x00000 + page_offset + y * 256) & VRAM_MASK];
 		u8 const *const base2 = &m_tms34061->m_display.vram[(0x20000 + page_offset + y * 256) & VRAM_MASK];
 		u32 *const dest = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			u8 const pix0 = base0[x] & 0x0f;
 			dest[x] = pens[pix0 ? pix0 : base2[x]];
@@ -631,13 +631,13 @@ u32 grmatch_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	// 4bpp pixels are packed 2 to a byte
 	// xscroll is set via a separate register
 	u32 const page_offset = (m_tms34061->m_display.dispstart & 0x0ffff) | m_xscroll;
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u8 const *const base0 = &m_tms34061->m_display.vram[0x00000 + ((page_offset + y * 256) & 0xffff)];
 		u8 const *const base2 = &m_tms34061->m_display.vram[0x20000 + ((page_offset + y * 256) & 0xffff)];
 		u32 *const dest = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.left() & ~1; x <= cliprect.right(); x += 2)
 		{
 			u8 const pix0 = base0[x / 2];
 			u8 const pix2 = base2[x / 2];
@@ -674,12 +674,12 @@ u32 itech8_state::screen_update_2page(screen_device &screen, bitmap_rgb32 &bitma
 	// there are two pages, each of which is a full 8bpp
 	// page index is selected by the top bit of the page_select register
 	u32 const page_offset = ((m_page_select & 0x80) << 10) | (m_tms34061->m_display.dispstart & 0x0ffff);
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u8 const *const base = &m_tms34061->m_display.vram[(page_offset + y * 256) & VRAM_MASK];
 		u32 *const dest = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			dest[x] = pens[base[x]];
 	}
 	return 0;
@@ -705,13 +705,13 @@ u32 itech8_state::screen_update_2page_large(screen_device &screen, bitmap_rgb32 
 	// the upper 4 bits were latched on each write into a separate bitmap
 	// page index is selected by the top bit of the page_select register
 	u32 const page_offset = ((~m_page_select & 0x80) << 10) | (m_tms34061->m_display.dispstart & 0x0ffff);
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u8 const *const base = &m_tms34061->m_display.vram[(page_offset + y * 256) & VRAM_MASK];
 		u8 const *const latch = &m_tms34061->m_display.latchram[(page_offset + y * 256) & VRAM_MASK];
 		u32 *const dest = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.left() & ~1; x <= cliprect.right(); x += 2)
 		{
 			dest[x + 0] = pens[(latch[x/2] & 0xf0) | (base[x/2] >> 4)];
 			dest[x + 1] = pens[((latch[x/2] << 4) & 0xf0) | (base[x/2] & 0x0f)];

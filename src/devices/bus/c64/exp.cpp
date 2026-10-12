@@ -296,6 +296,58 @@ int c64_expansion_slot_device::exrom_r(offs_t offset, int sphi2, int ba, int rw,
 }
 
 
+//-------------------------------------------------
+//  ba_w - bus available
+//-------------------------------------------------
+
+void c64_expansion_slot_device::ba_w(int state)
+{
+	if (m_card != nullptr)
+	{
+		m_card->c64_ba_w(state);
+	}
+}
+
+
+//-------------------------------------------------
+//  phi2_w - system clock
+//-------------------------------------------------
+
+void c64_expansion_slot_device::phi2_w(int state)
+{
+	if (m_card != nullptr)
+	{
+		m_card->c64_phi2_w(state);
+	}
+}
+
+
+//-------------------------------------------------
+//  host_irq_w - interrupt request seen by the host
+//-------------------------------------------------
+
+void c64_expansion_slot_device::host_irq_w(int state)
+{
+	if (m_card != nullptr)
+	{
+		m_card->c64_irq_w(state);
+	}
+}
+
+
+//-------------------------------------------------
+//  host_nmi_w - non-maskable interrupt seen by the host
+//-------------------------------------------------
+
+void c64_expansion_slot_device::host_nmi_w(int state)
+{
+	if (m_card != nullptr)
+	{
+		m_card->c64_nmi_w(state);
+	}
+}
+
+
 void c64_expansion_slot_device::set_passthrough()
 {
 	irq_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::irq_w));

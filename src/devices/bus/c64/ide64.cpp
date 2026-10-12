@@ -74,6 +74,9 @@ void c64_ide64_cartridge_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 
 ROM_START( c64_ide64 )
+	ROM_REGION( 0x20000, AT29C010A_TAG, 0 )
+	ROM_LOAD( "idedos20190819.u3", 0x00000, 0x20000, CRC(8792bf2d) SHA1(1b97505b07aaea1ed4404e5f5ac7550ec02854b7) )
+
 	ROM_REGION( 0x1f, DS1302_TAG, 0 )
 	ROM_LOAD( "ds1302.u4", 0x00, 0x1f, CRC(3399de09) SHA1(abfcee87b934b78c0d0b37e3655c8197fd9b4549) )
 ROM_END

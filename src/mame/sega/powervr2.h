@@ -16,6 +16,9 @@ public:
 	template <typename T> void set_framebuffer_ram(T &&tag) { dc_framebuffer_ram.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_cpu_space(T &&tag, int no) { m_cpu_space.set_tag(std::forward<T>(tag), no); }
 
+	// where the CPU sees our memory, for machines with more than one of us
+	void set_vram_base(offs_t texture, offs_t framebuffer, offs_t mirror) { m_texture_base = texture; m_framebuffer_base = framebuffer; m_vram_mirror = mirror; }
+
 	auto maple_trigger_callback() { return maple_trigger_cb.bind(); }
 	auto irq_callback() { return irq_cb.bind(); }
 
@@ -335,6 +338,9 @@ public:
 	void pvr_scanline_timer(int vpos);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	// is this position of the screen in a tile of the last scene rendered?
+	bool rendered_at(int x, int y) const;
+
 	typedef uint32_t(powervr2_device::*pix_sample_fn)(texinfo*,float,float,uint32_t,uint32_t);
 
 	inline uint32_t sample_nontextured(texinfo *ti, float u, float v, uint32_t offset_color, uint32_t base_color);
@@ -345,6 +351,9 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+	virtual void device_pre_save() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 	ioport_constructor device_input_ports() const override;
 
 private:
@@ -391,6 +400,42 @@ private:
 	emu_timer *translucent_modifier_volume_irq_timer = nullptr;
 	emu_timer *punch_through_irq_timer = nullptr;
 	emu_timer *dma_irq_timer = nullptr;
+
+	// texture RAM is tracked in 16K pages so uploads only wait for a render that samples from them
+	static constexpr unsigned TEXTURE_PAGE_SHIFT = 14;
+	static constexpr unsigned TEXTURE_PAGES = 0x1000000 >> TEXTURE_PAGE_SHIFT;
+
+	// state latched at STARTRENDER for the render thread, so it never sees later register writes
+	struct render_state
+	{
+		uint32_t fb_w_ctrl = 0;
+		uint32_t fb_r_ctrl = 0;
+		uint32_t fb_w_sof1 = 0;
+		uint32_t fb_w_linestride = 0;
+		uint32_t fb_start = 0; // span of the 32-bit area the tiles get written to, wrapping around like the writes
+		uint32_t fb_size = 0;
+		uint32_t background = 0;
+		uint32_t debug_dip_status = 0;
+		uint32_t palette[0x400] = { };
+		std::vector<uint32_t> tiles; // region array tile positions, (y << 16) | x
+		uint64_t texture_pages[TEXTURE_PAGES / 64] = { };
+	};
+
+	osd_work_queue *m_render_queue;
+	osd_work_item *m_render_request;
+	render_state m_render;
+	uint32_t m_texture_page_mask;
+
+	offs_t m_texture_base;
+	offs_t m_framebuffer_base;
+	offs_t m_vram_mirror;
+	uint64_t m_rendered_tiles[64];
+
+	static void *render_thread_callback(void *param, int threadid);
+	void wait_for_render(bool discard = false);
+	void collect_texture_pages(int buffer);
+	bool render_reads_texture(uint32_t start, uint32_t end) const;
+	bool render_writes_framebuffer(uint32_t start, uint32_t size) const;
 
 	static uint32_t (*const blend_functions[64])(uint32_t s, uint32_t d);
 
@@ -550,7 +595,7 @@ private:
 
 	void sort_vertices(const vert *v, int *i0, int *i1, int *i2);
 	void render_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void pvr_accumulationbuffer_to_framebuffer(address_space &space, int x, int y);
+	void pvr_accumulationbuffer_to_framebuffer(int x, int y);
 	void pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	static uint32_t dilate0(uint32_t value,int bits);
 	static uint32_t dilate1(uint32_t value,int bits);
@@ -559,30 +604,35 @@ private:
 	void process_ta_fifo();
 	void update_screen_format();
 
-	void fb_convert_0555krgb_to_555rgb(address_space &space, int x, int y);
-	void fb_convert_0555krgb_to_565rgb(address_space &space, int x, int y);
-	void fb_convert_0555krgb_to_888rgb24(address_space &space, int x, int y);
-	void fb_convert_0555krgb_to_888rgb32(address_space &space, int x, int y);
+	// direct writes to the 32-bit access area, offset relative to its base
+	inline void fb_write_byte(uint32_t offset, uint8_t data);
+	inline void fb_write_word(uint32_t offset, uint16_t data);
+	inline void fb_write_dword(uint32_t offset, uint32_t data);
 
-	void fb_convert_0565rgb_to_555rgb(address_space &space, int x, int y);
-	void fb_convert_0565rgb_to_565rgb(address_space &space, int x, int y);
-	void fb_convert_0565rgb_to_888rgb24(address_space &space, int x, int y);
-	void fb_convert_0565rgb_to_888rgb32(address_space &space, int x, int y);
+	void fb_convert_0555krgb_to_555rgb(int x, int y);
+	void fb_convert_0555krgb_to_565rgb(int x, int y);
+	void fb_convert_0555krgb_to_888rgb24(int x, int y);
+	void fb_convert_0555krgb_to_888rgb32(int x, int y);
 
-	void fb_convert_1555argb_to_555rgb(address_space &space, int x, int y);
-	void fb_convert_1555argb_to_565rgb(address_space &space, int x, int y);
-	void fb_convert_1555argb_to_888rgb24(address_space &space, int x, int y);
-	void fb_convert_1555argb_to_888rgb32(address_space &space, int x, int y);
+	void fb_convert_0565rgb_to_555rgb(int x, int y);
+	void fb_convert_0565rgb_to_565rgb(int x, int y);
+	void fb_convert_0565rgb_to_888rgb24(int x, int y);
+	void fb_convert_0565rgb_to_888rgb32(int x, int y);
 
-	void fb_convert_888rgb_to_555rgb(address_space &space, int x, int y);
-	void fb_convert_888rgb_to_565rgb(address_space &space, int x, int y);
-	void fb_convert_888rgb_to_888rgb24(address_space &space, int x, int y);
-	void fb_convert_888rgb_to_888rgb32(address_space &space, int x, int y);
+	void fb_convert_1555argb_to_555rgb(int x, int y);
+	void fb_convert_1555argb_to_565rgb(int x, int y);
+	void fb_convert_1555argb_to_888rgb24(int x, int y);
+	void fb_convert_1555argb_to_888rgb32(int x, int y);
 
-	void fb_convert_8888argb_to_555rgb(address_space &space, int x, int y);
-	void fb_convert_8888argb_to_565rgb(address_space &space, int x, int y);
-	void fb_convert_8888argb_to_888rgb24(address_space &space, int x, int y);
-	void fb_convert_8888argb_to_888rgb32(address_space &space, int x, int y);
+	void fb_convert_888rgb_to_555rgb(int x, int y);
+	void fb_convert_888rgb_to_565rgb(int x, int y);
+	void fb_convert_888rgb_to_888rgb24(int x, int y);
+	void fb_convert_888rgb_to_888rgb32(int x, int y);
+
+	void fb_convert_8888argb_to_555rgb(int x, int y);
+	void fb_convert_8888argb_to_565rgb(int x, int y);
+	void fb_convert_8888argb_to_888rgb24(int x, int y);
+	void fb_convert_8888argb_to_888rgb32(int x, int y);
 
 };
 

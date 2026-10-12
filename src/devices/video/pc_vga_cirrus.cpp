@@ -930,6 +930,13 @@ void cirrus_gd5428_vga_device::start_bitblt()
 {
 	uint32_t x,y;
 
+	// Bit 4: 16-bit Color / Transparency
+	// Bit 6: 8x8 Pattern Copy
+	// Bit 7: Color Expand
+	const unsigned bytes_per_pixel = BIT(m_blt_mode, 4) ? 2 : 1;
+	const unsigned pattern_pitch = BIT(m_blt_mode, 7) ? 1 : 8 * bytes_per_pixel;
+	const u32 pattern_base = m_blt_source & ~7U;
+
 	if(m_blt_mode & 0x01)
 	{
 		start_reverse_bitblt();
@@ -943,8 +950,11 @@ void cirrus_gd5428_vga_device::start_bitblt()
 
 	for(y=0;y<=m_blt_height;y++)
 	{
+		const u32 pattern_row_base = BIT(m_blt_mode, 6) ? pattern_base + (((m_blt_source + y) & 7) * pattern_pitch) : 0;
 		for(x=0;x<=m_blt_width;x++)
 		{
+			if (BIT(m_blt_mode, 6))
+				m_blt_source_current = pattern_row_base + (BIT(m_blt_mode, 7) ? 0 : x % pattern_pitch);
 			if(m_blt_mode & 0x80)  // colour expand
 			{
 				if(m_blt_mode & 0x10)  // 16-bit colour expansion / transparency width
@@ -975,32 +985,8 @@ void cirrus_gd5428_vga_device::start_bitblt()
 			}
 
 			m_blt_dest_current++;
-			if(m_blt_mode & 0x40 && (x % 8) == 7)  // 8x8 pattern - reset pattern source location
-			{
-				if(m_blt_mode & 0x80) // colour expand
-					m_blt_source_current = m_blt_source + (1*(y % 8)); // patterns are linear data
-				else if(svga.rgb15_en || svga.rgb16_en)
-				{
-					if(m_blt_mode & 0x40 && (x % 16) == 15)
-						m_blt_source_current = m_blt_source + (16*(y % 8));
-				}
-				else
-					m_blt_source_current = m_blt_source + (8*(y % 8));
-			}
 		}
-		if(m_blt_mode & 0x40)  // 8x8 pattern
-		{
-			if(m_blt_mode & 0x80) // colour expand
-				m_blt_source_current = m_blt_source + (1*(y % 8)); // patterns are linear data
-			else if(svga.rgb15_en || svga.rgb16_en)
-			{
-				if(m_blt_mode & 0x40 && (x % 16) == 15)
-					m_blt_source_current = m_blt_source + (16*(y % 8));
-			}
-			else
-				m_blt_source_current = m_blt_source + (8*(y % 8));
-		}
-		else
+		if (!BIT(m_blt_mode, 6))
 			m_blt_source_current = m_blt_source + (m_blt_source_pitch*(y+1));
 		m_blt_dest_current = m_blt_dest + (m_blt_dest_pitch*(y+1));
 	}

@@ -439,10 +439,10 @@ void m107_state::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const
 
 	if (m_control[0x08 + laynum] & 0x02)
 	{
-		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
+		for (int line = cliprect.top(); line <= cliprect.bottom(); line++)
 		{
 			const uint16_t *scrolldata = m_vram_data + (0xe800 + 0x200 * laynum) / 2;
-			clip.min_y = clip.max_y = line;
+			clip.sety(line, line);
 
 			m_pf_layer[laynum].tmap->set_scrollx(0,  m_control[1 + 2 * laynum]);
 			m_pf_layer[laynum].tmap->set_scrolly(0,  (m_control[0 + 2 * laynum] + scrolldata[line]));
@@ -522,7 +522,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(m107_state::scanline_interrupt)
 	else
 	{
 		// VBLANK interrupt
-		if (scanline == m_screen->visible_area().max_y + 1)
+		if (scanline == m_screen->visible_area().bottom() + 1)
 		{
 			m_screen->update_partial(scanline);
 			m_upd71059c->ir0_w(1);

@@ -1434,16 +1434,10 @@ void sega_9h0_0008_state::draw_layer_scanlines(
 					// Redo the x-axis visible area adjustment
 					dst_x -= 10 * tile_factor;
 
-					if (dst_x * m_scale < cliprect.min_x
-						|| dst_x * m_scale > cliprect.max_x
-						|| dst_y * m_scale < cliprect.min_y
-						|| dst_y * m_scale > cliprect.max_y) {
+					if (!cliprect.contains(dst_x * m_scale, dst_y * m_scale)) {
 						continue; // Skip beyond screen size
 					}
-					if (src_x < m_cache_layer.cliprect().min_x
-						|| src_x > m_cache_layer.cliprect().max_x
-						|| src_y < m_cache_layer.cliprect().min_y
-						|| src_y > m_cache_layer.cliprect().max_y) {
+					if (!m_cache_layer.cliprect().contains(src_x, src_y)) {
 						continue; // Skip beyond cache size
 					}
 
@@ -1490,8 +1484,8 @@ void sega_9h0_0008_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cli
 			if (color == 0
 					|| y >= bitmap_clip_h * m_scale
 					|| x >= bitmap_clip_w * m_scale
-					|| y + bitmap_scroll_y * m_scale > cliprect.max_y
-					|| x + bitmap_scroll_x * m_scale > cliprect.max_x) {
+					|| y + bitmap_scroll_y * m_scale > cliprect.bottom()
+					|| x + bitmap_scroll_x * m_scale > cliprect.right()) {
 				continue;
 			}
 
@@ -1659,8 +1653,8 @@ void sega_9h0_0008_state::screen_blend(bitmap_rgb32 &bitmap, const rectangle &cl
 	uint8_t blend_b = alpha_b_step < 0x20 ? 0xff : 0;
 	uint32_t blend_rgb = blend_b | (blend_g << 8) | (blend_r << 16);
 
-	for (size_t y = cliprect.min_y; y <= cliprect.max_y; y++) {
-		for (size_t x = cliprect.min_x; x <= cliprect.max_x; x++) {
+	for (size_t y = cliprect.top(); y <= cliprect.bottom(); y++) {
+		for (size_t x = cliprect.left(); x <= cliprect.right(); x++) {
 			uint32_t *dst = &bitmap.pix(y, x);
 			*dst = alpha_blend_rgb_levels(blend_rgb, *dst, alpha_b, alpha_r, alpha_g);
 		}

@@ -437,6 +437,8 @@ z80scc_device::z80scc_device(const machine_config &mconfig, device_type type, co
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
+	for (auto & elem : m_int_source)
+		elem = 0;
 }
 
 scc8030_device::scc8030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -809,8 +811,7 @@ int z80scc_device::update_extint(int index)
 	{
 		LOGINT(" - All interrupts serviced\n");
 
-		// Reset IP bit for external interrupts in both internal structure and rr3
-		// - External and Special interripts has the same prio, just add channel offset
+		// Reset IP bit for external interrupts in both internal structure and rr3, just add channel offset
 		m_int_state[z80scc_channel::INT_EXTERNAL_PRIO + (index == CHANNEL_A ? 0 : 3 )] = 0;
 		// Based on the fact that prio levels are aligned with the bitorder of rr3 we can do this...
 		m_chanA->m_rr3 &= ~(1 << (z80scc_channel::INT_EXTERNAL_PRIO + ((index == CHANNEL_A) ? 3 : 0)));
@@ -1213,8 +1214,8 @@ void z80scc_channel::tra_callback()
 		// transmit data
 		out_txd_cb(db);
 
-		if (m_wr14 & WR14_LOCAL_LOOPBACK)
-			write_rx(db);
+		if ((m_wr14 & (WR14_AUTO_ECHO | WR14_LOCAL_LOOPBACK)) == WR14_LOCAL_LOOPBACK)
+			write_rx(db, true);
 	}
 	else
 	{
@@ -1465,8 +1466,11 @@ uint8_t z80scc_channel::do_sccreg_rr0()
  * codes for the I-Field in the SDLC Receive Mode. */
 uint8_t z80scc_channel::do_sccreg_rr1()
 {
-	LOGR("%s <- %02x\n", FUNCNAME, m_rr1);
-	return m_rr1;
+	uint8_t rr1 = m_rr1;
+	if (m_rx_fifo_wp != m_rx_fifo_rp)
+		rr1 = (rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo_rp];
+	LOGR("%s <- %02x\n", FUNCNAME, rr1);
+	return rr1;
 }
 
 /* From Zilog SCC/ESCC USers manual, UM010902-0609:
@@ -1485,12 +1489,12 @@ uint8_t z80scc_channel::do_sccreg_rr2()
 	// If we are chan B we have to modify the vector regardless of the VIS bit
 	if (m_index == z80scc_device::CHANNEL_B)
 	{
-		int i = 0;
-
 		LOGINT(" - Channel B so we might need to update the vector modification\n");
 		// loop over all interrupt sources
-		for (auto & elem : m_uart->m_int_state)
+		for (int const i : z80scc_device::INT_PRIORITY)
 		{
+			auto &elem = m_uart->m_int_state[i];
+
 			// find the first channel with an interrupt requested
 			if (elem & Z80_DAISY_INT)
 			{
@@ -1504,7 +1508,6 @@ uint8_t z80scc_channel::do_sccreg_rr2()
 				}
 				break;
 			}
-			i++;
 		}
 	}
 	return m_rr2;
@@ -1818,8 +1821,21 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		  of these modes is selected and this command is issued before the data has been read from the
 		  Receive FIFO, the data is lost */
 		LOGCMD("WR0_ERROR_RESET - not implemented\n");
-		if (m_rx_fifo_wp != m_rx_fifo_rp)
+		m_rr1 &= ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR);
+		{
+			int const rx = INT_RECEIVE_PRIO + (m_index == z80scc_device::CHANNEL_A ? 0 : 3);
+			uint8_t const rx_ip = 1 << (INT_RECEIVE_PRIO + ((m_index == z80scc_device::CHANNEL_A) ? 3 : 0));
+			if ((m_uart->m_chanA->m_rr3 & rx_ip) && (m_uart->m_int_source[rx] == INT_SPECIAL))
+			{
+				m_uart->m_int_state[rx] &= ~Z80_DAISY_INT;
+				m_uart->m_chanA->m_rr3 &= ~rx_ip;
+			}
+		}
+		if ((m_rx_fifo_wp != m_rx_fifo_rp) && rx_holds_special_condition()
+				&& rx_special_condition(m_rx_error_fifo[m_rx_fifo_rp]))
 			m_rx_fifo_rp_step(); // Reset error state in fifo and unlock it. unlock == step to next slot in fifo.
+		check_receive_interrupt();
+		m_uart->check_interrupts();
 		break;
 	case WR0_SEND_ABORT: // Flush transmitter and Send 8-13 bits of '1's, used with SDLC
 		LOGCMD("WR0_SEND_ABORT - not implemented\n");
@@ -1880,6 +1896,8 @@ void z80scc_channel::do_sccreg_wr1(uint8_t data)
 	/* TODO: Sort out SCC specific behaviours  from legacy SIO behaviours inherited from z80dart.cpp:
 	   - Channel B only bits vs
 	   - Parity Is Special Condition, bit2 */
+	if ((data & WR1_RX_INT_MODE_MASK) == WR1_RX_INT_FIRST && (m_wr1 & WR1_RX_INT_MODE_MASK) != WR1_RX_INT_FIRST)
+		m_rx_first = 1;
 	m_wr1 = data;
 	LOG("- External Interrupt Enable %d\n", (data & WR1_EXT_INT_ENABLE) ? 1 : 0);
 	LOG("- Transmit Interrupt Enable %d\n", (data & WR1_TX_INT_ENABLE) ? 1 : 0);
@@ -2418,28 +2436,23 @@ uint8_t z80scc_channel::data_read()
 		data = m_rx_data_fifo[m_rx_fifo_rp];
 
 		// load error status from the FIFO
-		m_rr1 = (m_rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo_rp];
+		uint8_t const status = m_rx_error_fifo[m_rx_fifo_rp];
+		m_rr1 = (m_rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_PARITY_ERROR)) | status;
 
-		// trigger interrupt and lock the fifo if an error is present
-		if (m_rr1 & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | ((m_wr1 & WR1_PARITY_IS_SPEC_COND) ? RR1_PARITY_ERROR : 0)))
+		if (rx_special_condition(status))
+			logerror("Rx Error %02x\n", status & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
+
+		// trigger interrupt and lock the fifo if an error is present, in the modes that do
+		if (rx_special_condition(status) && rx_holds_special_condition())
 		{
-			logerror("Rx Error %02x\n", m_rr1 & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
-			if ((m_wr1 & WR1_RX_INT_MODE_MASK) != WR1_RX_INT_DISABLE)
-				m_uart->trigger_interrupt(m_index, INT_SPECIAL);
+			m_uart->trigger_interrupt(m_index, INT_SPECIAL);
 		}
 		else
 		{
 			// decrease RX FIFO pointer
 			m_rx_fifo_rp_step();
 
-			// if RX FIFO empty reset RX interrupt status
-			if (m_rx_fifo_wp == m_rx_fifo_rp)
-			{
-				LOGRCV("Rx FIFO empty, resetting status and interrupt state");
-				m_uart->m_int_state[INT_RECEIVE_PRIO + (m_index == z80scc_device::CHANNEL_A ? 0 : 3 )] = 0;
-				m_uart->m_chanA->m_rr3 &= ~(1 << (INT_RECEIVE_PRIO + ((m_index == z80scc_device::CHANNEL_A) ? 3 : 0)));
-				m_uart->check_interrupts();
-			}
+			check_receive_interrupt();
 		}
 
 		check_dma_request();
@@ -2466,8 +2479,25 @@ void z80scc_channel::m_rx_fifo_rp_step()
 		if (m_rx_fifo_rp == m_rx_fifo_wp)
 		{
 				// no more characters available in the FIFO
+				LOGRCV("Rx FIFO empty, resetting status and interrupt state");
 				m_rr0 &= ~ RR0_RX_CHAR_AVAILABLE;
+				m_uart->m_int_state[INT_RECEIVE_PRIO + (m_index == z80scc_device::CHANNEL_A ? 0 : 3 )] = 0;
+				m_uart->m_chanA->m_rr3 &= ~(1 << (INT_RECEIVE_PRIO + ((m_index == z80scc_device::CHANNEL_A) ? 3 : 0)));
+				m_uart->check_interrupts();
 		}
+}
+
+bool z80scc_channel::rx_special_condition(uint8_t status) const
+{
+	uint8_t const special = RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR
+			| ((m_wr1 & WR1_PARITY_IS_SPEC_COND) ? RR1_PARITY_ERROR : 0);
+	return (status & special) != 0;
+}
+
+bool z80scc_channel::rx_holds_special_condition() const
+{
+	uint8_t const mode = m_wr1 & WR1_RX_INT_MODE_MASK;
+	return mode == WR1_RX_INT_FIRST || mode == WR1_RX_INT_PARITY;
 }
 
 /* Step TX read pointer */
@@ -2604,12 +2634,13 @@ void z80scc_channel::receive_data(uint8_t data)
 	if (m_rx_fifo_wp + 1 == m_rx_fifo_rp || ( (m_rx_fifo_wp + 1 == m_rx_fifo_sz) && (m_rx_fifo_rp == 0) ))
 	{
 		// receive overrun error detected
-		m_rx_error_fifo[m_rx_fifo_wp] |= RR1_RX_OVERRUN_ERROR;
+		int const newest = (m_rx_fifo_wp ? m_rx_fifo_wp : m_rx_fifo_sz) - 1;
+		m_rx_error_fifo[newest] |= RR1_RX_OVERRUN_ERROR;
 
 		// store received character but do not step the fifo
-		m_rx_data_fifo[m_rx_fifo_wp] = data;
+		m_rx_data_fifo[newest] = data;
 
-		LOGRCV("Receive_data() Error %02x\n", m_rx_error_fifo[m_rx_fifo_wp] & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
+		LOGRCV("Receive_data() Error %02x\n", m_rx_error_fifo[newest] & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
 	}
 	else
 	{
@@ -3010,8 +3041,13 @@ void z80scc_channel::set_dtr(int state)
 //  write_rx - called by terminal through rs232/diserial
 //         when character is sent to board
 //-------------------------------------------------
-void z80scc_channel::write_rx(int state)
+void z80scc_channel::write_rx(int state, bool loopback)
 {
+	// Local loopback selects the transmitter output as the receiver input.
+	// Changes on the external RxD pin must not disturb that internal path.
+	if ((m_wr14 & (WR14_AUTO_ECHO | WR14_LOCAL_LOOPBACK)) == WR14_LOCAL_LOOPBACK && !loopback)
+		return;
+
 	// the receiver runs straight off the /RTxC pin, whether that's a configured crystal/oscillator or edges from rxc_w
 	const bool rtxc_driven_rxc = (m_wr11 & WR11_RCVCLK_SRC_MASK) == WR11_RCVCLK_SRC_RTXC;
 
@@ -3084,7 +3120,11 @@ void z80scc_channel::check_receive_interrupt()
 			break;
 
 		case WR1_RX_INT_ALL:
-			m_uart->trigger_interrupt(m_index, INT_RECEIVE);
+			{
+				uint8_t const status = m_rx_error_fifo[m_rx_fifo_rp]
+						| (m_rr1 & RR1_RX_OVERRUN_ERROR);
+				m_uart->trigger_interrupt(m_index, rx_special_condition(status) ? INT_SPECIAL : INT_RECEIVE);
+			}
 			break;
 		}
 	}

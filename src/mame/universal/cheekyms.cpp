@@ -234,9 +234,9 @@ uint32_t cheekyms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_cm_tilemap->draw(screen, *m_bitmap_buffer, cliprect, 0, 0);
 
 	// draw the tilemap to the final bitmap applying the scroll to the man character
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int in_man_area;
 

@@ -42,6 +42,8 @@ diag264_cassette_loopback_device::diag264_cassette_loopback_device(const machine
 
 void diag264_cassette_loopback_device::device_start()
 {
+	save_item(NAME(m_read));
+	save_item(NAME(m_sense));
 }
 
 

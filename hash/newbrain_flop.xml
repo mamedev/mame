@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="newbrain_flop" description="Grundy NewBrain disks">
+
+	<!-- Compiled in 2011 by Michael Fog from the files described in "NewBrain - Handbook for disk users" -->
+
+	<software name="cpm22" supported="no">
+		<description>CP/M 2.2 (DSDD 400K, single drive)</description>
+		<year>198?</year>
+		<publisher>Grundy Business Systems</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="73850">
+				<rom name="dsdd400k.imd" size="73850" crc="3452cf64" sha1="06c740bcf67bda74039ec1cfe9c9a0e9b618341a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm22d" cloneof="cpm22" supported="no">
+		<description>CP/M 2.2 (DSDD 400K, dual drive)</description>
+		<year>198?</year>
+		<publisher>Grundy Business Systems</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="73848">
+				<rom name="dsdd4002.imd" size="73848" crc="f04476d6" sha1="d08f07ff66dca64af87de71e04b204337827deb3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm22ss" cloneof="cpm22" supported="no">
+		<description>CP/M 2.2 (SSDD 200K, single drive)</description>
+		<year>198?</year>
+		<publisher>Grundy Business Systems</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="72816">
+				<rom name="ssdd200k.imd" size="72816" crc="9d2d2d91" sha1="845d00bd91f8602dbed8f238c832d70c58a2522d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm22ssd" cloneof="cpm22" supported="no">
+		<description>CP/M 2.2 (SSDD 200K, dual drive)</description>
+		<year>198?</year>
+		<publisher>Grundy Business Systems</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="72815">
+				<rom name="ssdd2002.imd" size="72815" crc="03024c20" sha1="cf6d16d7ce17b986f70db7a1126ad552797e461d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm22qd" cloneof="cpm22" supported="no">
+		<description>CP/M 2.2 (DSDD 800K, single drive)</description>
+		<year>198?</year>
+		<publisher>Grundy Business Systems</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="76403">
+				<rom name="dsdd800k.imd" size="76403" crc="8a690f56" sha1="e16fe355dfa6a5acd8264f1e04044a1485b84665"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm22qdd" cloneof="cpm22" supported="no">
+		<description>CP/M 2.2 (DSDD 800K, dual drive)</description>
+		<year>198?</year>
+		<publisher>Grundy Business Systems</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="76401">
+				<rom name="dsdd8002.imd" size="76401" crc="2711075e" sha1="95e4b7ec769f355a9144b927b513f335d342ac5d"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

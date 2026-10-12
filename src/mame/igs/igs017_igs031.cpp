@@ -278,29 +278,29 @@ void igs017_igs031_device::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cl
 	int ex = sx + dimx;
 	int ey = sy + dimy;
 
-	if (sx < cliprect.min_x)
+	if (sx < cliprect.left())
 	{
 		// clip left
-		int pixels = cliprect.min_x - sx;
+		int pixels = cliprect.left() - sx;
 		sx += pixels;
 		x_index_base += xinc * pixels;
 	}
-	if (sy < cliprect.min_y)
+	if (sy < cliprect.top())
 	{
 		// clip top
-		int pixels = cliprect.min_y - sy;
+		int pixels = cliprect.top() - sy;
 		sy += pixels;
 		y_index += yinc * pixels;
 	}
-	if (ex > cliprect.max_x + 1)
+	if (ex > cliprect.right() + 1)
 	{
 		// clip right
-		ex = cliprect.max_x + 1;
+		ex = cliprect.right() + 1;
 	}
-	if (ey > cliprect.max_y + 1)
+	if (ey > cliprect.bottom() + 1)
 	{
 		// clip bottom
-		ey = cliprect.max_y + 1;
+		ey = cliprect.bottom() + 1;
 	}
 
 	// skip if inner loop doesn't draw anything

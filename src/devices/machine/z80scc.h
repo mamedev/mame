@@ -111,7 +111,7 @@ public:
 	void m_rx_fifo_rp_step();
 	uint8_t m_rx_fifo_rp_data();
 
-	void write_rx(int state);
+	void write_rx(int state, bool loopback = false);
 	void cts_w(int state);
 	void dcd_w(int state);
 	void rxc_w(int state);
@@ -183,7 +183,7 @@ protected:
 		INT_TRANSMIT_PRIO       = 1,
 		INT_EXTERNAL_PRIO       = 0,
 		INT_RECEIVE_PRIO        = 2,
-		INT_SPECIAL_PRIO        = 0,
+		INT_SPECIAL_PRIO        = 2,
 	};
 
 	// Read registers
@@ -250,6 +250,8 @@ protected:
 	void safe_transmit_register_reset();
 	void check_dma_request();
 	void check_receive_interrupt();
+	bool rx_special_condition(uint8_t status) const;
+	bool rx_holds_special_condition() const;
 
 	emu_timer *m_baudtimer;
 	uint16_t m_brg_counter;
@@ -454,6 +456,10 @@ protected:
 	int m_out_int_state;
 	int m_int_state[6]; // interrupt state
 	int m_int_source[6]; // interrupt source
+
+	static constexpr int INT_PRIORITY[6] = {
+			z80scc_channel::INT_RECEIVE_PRIO, z80scc_channel::INT_TRANSMIT_PRIO, z80scc_channel::INT_EXTERNAL_PRIO,
+			3 + z80scc_channel::INT_RECEIVE_PRIO, 3 + z80scc_channel::INT_TRANSMIT_PRIO, 3 + z80scc_channel::INT_EXTERNAL_PRIO };
 
 	int const m_variant;
 	uint8_t m_wr0_ptrbits;

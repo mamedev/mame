@@ -1,92 +1,111 @@
-// license:GPL-2.0+
-// copyright-holders:Curt Coder,Christian Bauer
+// license:BSD-3-Clause
+// copyright-holders:Curt Coder
 /***************************************************************************
 
-    MOS 6566/6567/6569 Video Interface Chip (VIC-II) emulation
-
-    A part of the code (cycle routine and drawing routines) is a modified version of the vic ii emulation used in
-    commodore 64 emulator "frodo" by Christian Bauer
+    MOS 6566 Video Interface Chip II (VIC-II) emulation
 
 ***************************************************************************/
-
-/*
-
-    TODO:
-
-    - cleanup
-    - https://hitmen.c02.at/temp/palstuff/
-
-*/
 
 #include "emu.h"
 #include "mos6566.h"
 
-#include "cpu/m6502/m6502.h"
 #include "screen.h"
 
+#include <algorithm>
+#include <bit>
+#include <iterator>
 
 
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
+namespace {
 
-#define LOG 0
-
-
-enum
+constexpr rgb_t PALETTE_PAL[] =
 {
-	REGISTER_M0X = 0,
-	REGISTER_M0Y,
-	REGISTER_M1X,
-	REGISTER_M1Y,
-	REGISTER_M2X,
-	REGISTER_M2Y,
-	REGISTER_M3X,
-	REGISTER_M3Y,
-	REGISTER_M4X,
-	REGISTER_M4Y,
-	REGISTER_M5X,
-	REGISTER_M5Y,
-	REGISTER_M6X,
-	REGISTER_M6Y,
-	REGISTER_M7X,
-	REGISTER_M7Y,
-	REGISTER_MX_MSB,
-	REGISTER_CR1,
-	REGISTER_RASTER,
-	REGISTER_LPX,
-	REGISTER_LPY,
-	REGISTER_ME,
-	REGISTER_CR2,
-	REGISTER_MYE,
-	REGISTER_MP,
-	REGISTER_IRQ,
-	REGISTER_IE,
-	REGISTER_MDP,
-	REGISTER_MMC,
-	REGISTER_MXE,
-	REGISTER_MM,
-	REGISTER_MD,
-	REGISTER_EC,
-	REGISTER_B0C,
-	REGISTER_B1C,
-	REGISTER_B2C,
-	REGISTER_B3C,
-	REGISTER_MM0,
-	REGISTER_MM1,
-	REGISTER_M0C,
-	REGISTER_M1C,
-	REGISTER_M2C,
-	REGISTER_M3C,
-	REGISTER_M4C,
-	REGISTER_M5C,
-	REGISTER_M6C,
-	REGISTER_M7C,
-	REGISTER_KCR,
-	REGISTER_FAST
+	rgb_t(0x00, 0x00, 0x00),
+	rgb_t(0xff, 0xff, 0xff),
+	rgb_t(0x96, 0x28, 0x2e),
+	rgb_t(0x5b, 0xd6, 0xce),
+	rgb_t(0x9f, 0x2d, 0xad),
+	rgb_t(0x41, 0xb9, 0x36),
+	rgb_t(0x27, 0x24, 0xc4),
+	rgb_t(0xef, 0xf3, 0x47),
+	rgb_t(0x9f, 0x48, 0x15),
+	rgb_t(0x5e, 0x35, 0x00),
+	rgb_t(0xda, 0x5f, 0x66),
+	rgb_t(0x47, 0x47, 0x47),
+	rgb_t(0x78, 0x78, 0x78),
+	rgb_t(0x91, 0xff, 0x84),
+	rgb_t(0x68, 0x64, 0xff),
+	rgb_t(0xae, 0xae, 0xae)
 };
 
-static int UNUSED_BITS[0x40] =
+constexpr rgb_t PALETTE_NTSC[] =
+{
+	rgb_t(0x00, 0x00, 0x00),
+	rgb_t(0xff, 0xff, 0xff),
+	rgb_t(0x7c, 0x35, 0x2b),
+	rgb_t(0x5a, 0xa6, 0xb1),
+	rgb_t(0x69, 0x41, 0x85),
+	rgb_t(0x5d, 0x86, 0x43),
+	rgb_t(0x21, 0x2e, 0x78),
+	rgb_t(0xcf, 0xbe, 0x6f),
+	rgb_t(0x89, 0x4a, 0x26),
+	rgb_t(0x5b, 0x33, 0x00),
+	rgb_t(0xaf, 0x64, 0x59),
+	rgb_t(0x43, 0x43, 0x43),
+	rgb_t(0x6b, 0x6b, 0x6b),
+	rgb_t(0xa0, 0xcb, 0x84),
+	rgb_t(0x56, 0x65, 0xb3),
+	rgb_t(0x95, 0x95, 0x95)
+};
+
+constexpr rgb_t PALETTE_NTSC_OLD[] =
+{
+	rgb_t(0x00, 0x00, 0x00),
+	rgb_t(0xff, 0xff, 0xff),
+	rgb_t(0x6b, 0x24, 0x1a),
+	rgb_t(0x87, 0xd3, 0xde),
+	rgb_t(0x91, 0x69, 0xad),
+	rgb_t(0x68, 0x91, 0x4e),
+	rgb_t(0x27, 0x34, 0x7e),
+	rgb_t(0xd2, 0xc1, 0x72),
+	rgb_t(0xad, 0x6e, 0x4a),
+	rgb_t(0x5a, 0x32, 0x00),
+	rgb_t(0xb3, 0x68, 0x5d),
+	rgb_t(0x38, 0x38, 0x38),
+	rgb_t(0x7d, 0x7d, 0x7d),
+	rgb_t(0xa7, 0xd2, 0x8b),
+	rgb_t(0x6a, 0x79, 0xc7),
+	rgb_t(0xbd, 0xbd, 0xbd)
+};
+
+constexpr int FIRST_BAD_LINE = 0x30;
+constexpr int LAST_BAD_LINE = 0xf7;
+
+constexpr uint8_t IRQ_RST = 0x01;
+constexpr uint8_t IRQ_MBC = 0x02;
+constexpr uint8_t IRQ_MMC = 0x04;
+constexpr uint8_t IRQ_LP  = 0x08;
+
+constexpr int REGISTER_LPX = 0x13;
+constexpr int REGISTER_LPY = 0x14;
+constexpr int REGISTER_CR1 = 0x11;
+constexpr int REGISTER_RASTER = 0x12;
+constexpr int REGISTER_CR2 = 0x16;
+constexpr int REGISTER_MEMORY = 0x18;
+constexpr int REGISTER_MSE = 0x15;
+constexpr int REGISTER_MYE = 0x17;
+constexpr int REGISTER_MDP = 0x1b;
+constexpr int REGISTER_MMC = 0x1c;
+constexpr int REGISTER_MXE = 0x1d;
+constexpr int REGISTER_MM = 0x1e;
+constexpr int REGISTER_MD = 0x1f;
+constexpr int REGISTER_EC = 0x20;
+constexpr int REGISTER_B0C = 0x21;
+constexpr int REGISTER_MM0 = 0x25;
+constexpr int REGISTER_MM1 = 0x26;
+constexpr int REGISTER_M0C = 0x27;
+
+constexpr uint8_t UNUSED_BITS[0x40] =
 {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0x00, 0x01, 0x70, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -94,479 +113,349 @@ static int UNUSED_BITS[0x40] =
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
 };
 
-// VICE palette
-static const rgb_t PALETTE_MOS[] =
+constexpr int CYCLE_DOTS = 8;
+constexpr int PHI2_START = 4;
+
+// dot of the write cycle from which a register write is visible to the logic that consumes it
+constexpr int SEEN_LIVE = 0;
+constexpr int SEEN_SPRITE_MUX = 2;
+constexpr int SEEN_SPRITE_DECODE = 3;
+constexpr int SEEN_PHI2 = PHI2_START;
+constexpr int SEEN_HMOS_FALL = PHI2_START + 1;
+constexpr int SEEN_CYCLE_END = CYCLE_DOTS;
+
+constexpr int NMOS_FALL_LAG_BMM = 2;
+constexpr int NMOS_FALL_LAG_ECM = 2;
+constexpr int NMOS_FALL_LAG_MCM_IN_ECM = 1;
+
+constexpr int register_seen(int reg)
 {
-	rgb_t(0x00, 0x00, 0x00),
-	rgb_t(0xfd, 0xfe, 0xfc),
-	rgb_t(0xbe, 0x1a, 0x24),
-	rgb_t(0x30, 0xe6, 0xc6),
-	rgb_t(0xb4, 0x1a, 0xe2),
-	rgb_t(0x1f, 0xd2, 0x1e),
-	rgb_t(0x21, 0x1b, 0xae),
-	rgb_t(0xdf, 0xf6, 0x0a),
-	rgb_t(0xb8, 0x41, 0x04),
-	rgb_t(0x6a, 0x33, 0x04),
-	rgb_t(0xfe, 0x4a, 0x57),
-	rgb_t(0x42, 0x45, 0x40),
-	rgb_t(0x70, 0x74, 0x6f),
-	rgb_t(0x59, 0xfe, 0x59),
-	rgb_t(0x5f, 0x53, 0xfe),
-	rgb_t(0xa4, 0xa7, 0xa2)
+	if (reg <= 0x10)
+		return SEEN_PHI2;
+	if (reg == REGISTER_MDP || reg == REGISTER_MXE)
+		return SEEN_SPRITE_MUX;
+	if (reg >= REGISTER_EC && reg < 0x2f)
+		return SEEN_LIVE;
+	return SEEN_CYCLE_END;
+}
+
+constexpr int MCM_FLOP_DOT = 3;
+
+// dots by which the per-cell hires/multicolor latch sees BMM late
+constexpr int CELL_MC_BMM_DELAY = 2;
+
+// dots between the visible column a light pen is aimed at and the beam position that triggers it
+constexpr int LIGHTPEN_LATENCY_PAL = 39;
+constexpr int LIGHTPEN_LATENCY_NTSC = 53;
+
+// dots between a sprite pixel and its collision reaching $d01e/$d01f
+constexpr int COLLISION_LAG = 8;
+
+// dots after a collision register read during which new collisions are lost
+constexpr int COLLISION_CLEAR_HOLD = COLLISION_LAG + PHI2_START;
+
+// dots after the start of phi2 that a read of the collision registers can still see
+constexpr int COLLISION_READ_DELAY = 0;
+
+// dots after the start of a sprite's 16 dot slot
+constexpr int SPRITE_SLOT_FROZEN_HIRES = 2;
+constexpr int SPRITE_SLOT_HALT = 3;
+constexpr int SPRITE_SLOT_ACTIVE_CLEAR = 10;
+constexpr int SPRITE_SLOT_RELOAD = 12;
+constexpr int SPRITE_SLOT_RESUME = 15;
+constexpr int SPRITE_SLOT_DOTS = 16;
+
+constexpr int SPRITE_BA_LEAD = 3;
+constexpr int SPRITE_BA_CYCLES = 5;
+
+constexpr int CYCLE_VC_LOAD = 14;
+constexpr int CYCLE_REFRESH_FIRST = 11;
+constexpr int CYCLE_REFRESH_LAST = 15;
+constexpr int CYCLE_MATRIX_FIRST = 15;
+constexpr int CYCLE_MATRIX_LAST = 54;
+constexpr int CYCLE_BA_FIRST = 12;
+constexpr int CYCLE_BA_LAST = 54;
+constexpr int CYCLE_GRAPHICS_FIRST = 16;
+constexpr int CYCLE_GRAPHICS_LAST = 55;
+constexpr int CYCLE_SPRITE_MCBASE = 16;
+constexpr int CYCLE_SPRITE_YEXP = 56;
+constexpr int CYCLE_ROW_END = 58;
+
+constexpr int BORDER_LEFT_X_40 = 24;
+constexpr int BORDER_LEFT_X_38 = 31;
+constexpr int BORDER_RIGHT_X_40 = 344;
+constexpr int BORDER_RIGHT_X_38 = 335;
+
+constexpr int BORDER_TOP_LINE_25 = 51;
+constexpr int BORDER_TOP_LINE_24 = 55;
+constexpr int BORDER_BOTTOM_LINE_25 = 251;
+constexpr int BORDER_BOTTOM_LINE_24 = 247;
+
+enum : uint16_t
+{
+	DECODE_LINE_START = 0x0001,
+	DECODE_FRAME_START = 0x0002,
+	DECODE_REFRESH = 0x0004,
+	DECODE_BADLINE_BA = 0x0008,
+	DECODE_VC_LOAD = 0x0010,
+	DECODE_MATRIX = 0x0020,
+	DECODE_GRAPHICS = 0x0040,
+	DECODE_SPR_MCBASE = 0x0080,
+	DECODE_SPR_DMA = 0x0100,
+	DECODE_SPR_YEXP = 0x0200,
+	DECODE_ROW_END = 0x0400,
+	DECODE_SPR_DISPLAY = 0x0800
 };
 
-
-#define VERBOSE_LEVEL 0
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_LEVEL >= N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f: %-24s", machine().time().as_double(), (char*) M ); \
-			logerror A; \
-		} \
-	} while (0)
-
-#define IS_PAL                  ((m_variant == TYPE_6569) || (m_variant == TYPE_6572) || (m_variant == TYPE_6573) || (m_variant == TYPE_8565) || (m_variant == TYPE_8566) || (m_variant == TYPE_8569))
-#define IS_6566                 (m_variant == TYPE_6566)
-#define IS_VICIIE               ((m_variant == TYPE_8564) || (m_variant == TYPE_8566) || (m_variant == TYPE_8569))
-#define FAST_MODE               (IS_VICIIE && BIT(m_reg[REGISTER_FAST], 0))
-
-#define ROW25_YSTART      0x33
-#define ROW25_YSTOP       0xfb
-#define ROW24_YSTART      0x37
-#define ROW24_YSTOP       0xf7
-
-/* sprites 0 .. 7 */
-#define SPRITEON(nr)            (m_reg[0x15] & (1 << nr))
-#define SPRITE_Y_EXPAND(nr)     (m_reg[0x17] & (1 << nr))
-#define SPRITE_Y_SIZE(nr)       (SPRITE_Y_EXPAND(nr) ? 2 * 21 : 21)
-#define SPRITE_X_EXPAND(nr)     (m_reg[0x1d] & (1 << nr))
-#define SPRITE_X_SIZE(nr)       (SPRITE_X_EXPAND(nr) ? 2 * 24 : 24)
-#define SPRITE_X_POS(nr)        (m_reg[(nr) * 2] | (m_reg[0x10] & (1 << (nr)) ? 0x100 : 0))
-#define SPRITE_Y_POS(nr)        (m_reg[1 + 2 * (nr)])
-#define SPRITE_MULTICOLOR(nr)   (m_reg[0x1c] & (1 << nr))
-#define SPRITE_PRIORITY(nr)     (m_reg[0x1b] & (1 << nr))
-#define SPRITE_MULTICOLOR1      (m_reg[0x25] & 0x0f)
-#define SPRITE_MULTICOLOR2      (m_reg[0x26] & 0x0f)
-#define SPRITE_COLOR(nr)        (m_reg[0x27+nr] & 0x0f)
-#define SPRITE_ADDR(nr)         (m_videoaddr | 0x3f8 | nr)
-#define SPRITE_COLL             (m_reg[0x1e])
-#define SPRITE_BG_COLL          (m_reg[0x1f])
-
-#define GFXMODE                 ((m_reg[0x11] & 0x60) | (m_reg[0x16] & 0x10)) >> 4
-#define SCREENON                (m_reg[0x11] & 0x10)
-#define YSCROLL                 (m_reg[0x11] & 0x07)
-#define XSCROLL                 (m_reg[0x16] & 0x07)
-#define ECMON                   (m_reg[0x11] & 0x40)
-#define HIRESON                 (m_reg[0x11] & 0x20)
-#define COLUMNS40               (m_reg[0x16] & 0x08)           /* else 38 Columns */
-
-#define VIDEOADDR               ((m_reg[0x18] & 0xf0) << (10 - 4))
-#define CHARGENADDR             ((m_reg[0x18] & 0x0e) << 10)
-#define BITMAPADDR              ((data & 0x08) << 10)
-
-#define RASTERLINE              (((m_reg[0x11] & 0x80) << 1) | m_reg[0x12])
-
-#define FRAMECOLOR              (m_reg[0x20] & 0x0f)
-#define BACKGROUNDCOLOR         (m_reg[0x21] & 0x0f)
-#define MULTICOLOR1             (m_reg[0x22] & 0x0f)
-#define MULTICOLOR2             (m_reg[0x23] & 0x0f)
-#define FOREGROUNDCOLOR         (m_reg[0x24] & 0x0f)
-
-#define VIC2_LINES              (IS_PAL ? VIC6569_LINES : IS_6566 ? VIC6566_LINES : VIC6567_LINES)
-#define VIC2_CYCLESPERLINE      (IS_PAL ? VIC6569_CYCLESPERLINE : IS_6566 ? VIC6566_CYCLESPERLINE : VIC6567_CYCLESPERLINE)
-#define VIC2_FIRST_DMA_LINE     (IS_PAL ? VIC6569_FIRST_DMA_LINE : VIC6567_FIRST_DMA_LINE)
-#define VIC2_LAST_DMA_LINE      (IS_PAL ? VIC6569_LAST_DMA_LINE : VIC6567_LAST_DMA_LINE)
-#define VIC2_FIRST_DISP_LINE    (IS_PAL ? VIC6569_FIRST_DISP_LINE : VIC6567_FIRST_DISP_LINE)
-#define VIC2_LAST_DISP_LINE     (IS_PAL ? VIC6569_LAST_DISP_LINE : VIC6567_LAST_DISP_LINE)
-#define VIC2_RASTER_2_EMU(a)    (IS_PAL ? VIC6569_RASTER_2_EMU(a) : IS_6566 ? VIC6566_RASTER_2_EMU(a) : VIC6567_RASTER_2_EMU(a))
-#define VIC2_FIRSTCOLUMN        (IS_PAL ? VIC6569_FIRSTCOLUMN : VIC6567_FIRSTCOLUMN)
-#define VIC2_X_2_EMU(a)         (IS_PAL ? VIC6569_X_2_EMU(a) : VIC6567_X_2_EMU(a))
-
-#define IRQ_RST                 0x01
-#define IRQ_MBC                 0x02
-#define IRQ_MMC                 0x04
-#define IRQ_LP                  0x08
+} // anonymous namespace
 
 
+struct mos6566_device::raster_timing
+{
+	int cycles_per_line;
+	int lines;
+	int line_pixels;
+	int first_x;
+	int x_stall_phase;
+	int x_stall_length;
+	int spr_first_cycle;
+	int spr_dma_cycle;
+	int spr_disp_cycle;
+	int row_shift;
+	int blank_end;
+	int burst_length;
+};
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+struct mos6566_device::process_traits
+{
+	bool asymmetric_mode_edges;
+	bool hmos_sprite_mc_flop;
+	bool grey_dot;
+	int output_lag;
+	int mmc_seen;
+	int lightpen_x_offset;
+	bool lightpen_frame_irq_only;
+	offs_t dma_delay_idle_address;
+};
+
+const mos6566_device::raster_timing &mos6566_device::raster_timing_for(uint32_t variant)
+{
+	static constexpr raster_timing PAL{
+			.cycles_per_line = 63, .lines = 312, .line_pixels = 504, .first_x = 0x194,
+			.x_stall_phase = 2 * 63, .x_stall_length = 0,
+			.spr_first_cycle = 58, .spr_dma_cycle = 55, .spr_disp_cycle = 58,
+			.row_shift = 0, .blank_end = 0x1e0, .burst_length = 2 };
+	static constexpr raster_timing NTSC{
+			.cycles_per_line = 65, .lines = 263, .line_pixels = 512, .first_x = 0x19c,
+			.x_stall_phase = 123, .x_stall_length = 2,
+			.spr_first_cycle = 59, .spr_dma_cycle = 56, .spr_disp_cycle = 59,
+			.row_shift = 263 - VIC6567_FIRST_DISP_LINE, .blank_end = 0x1db, .burst_length = 0 };
+	static constexpr raster_timing NTSC_64{
+			.cycles_per_line = 64, .lines = 262, .line_pixels = 512, .first_x = 0x19c,
+			.x_stall_phase = 2 * 64, .x_stall_length = 0,
+			.spr_first_cycle = 59, .spr_dma_cycle = 56, .spr_disp_cycle = 58,
+			.row_shift = 262 - VIC6567_FIRST_DISP_LINE, .blank_end = 0x1db, .burst_length = 0 };
+
+	switch (variant)
+	{
+	case TYPE_6566:
+	case TYPE_6567R56A:
+		return NTSC_64;
+
+	case TYPE_6567:
+	case TYPE_8562:
+	case TYPE_8564:
+		return NTSC;
+
+	default:
+		return PAL;
+	}
+}
+
+const mos6566_device::process_traits &mos6566_device::process_traits_for(uint32_t variant)
+{
+	static constexpr process_traits NMOS{
+			.asymmetric_mode_edges = true, .hmos_sprite_mc_flop = false, .grey_dot = false,
+			.output_lag = 3, .mmc_seen = SEEN_SPRITE_DECODE, .lightpen_x_offset = 2,
+			.lightpen_frame_irq_only = false, .dma_delay_idle_address = 0x38ff };
+	static constexpr process_traits NMOS_OLD{
+			.asymmetric_mode_edges = true, .hmos_sprite_mc_flop = false, .grey_dot = false,
+			.output_lag = 3, .mmc_seen = SEEN_SPRITE_DECODE, .lightpen_x_offset = 2,
+			.lightpen_frame_irq_only = true, .dma_delay_idle_address = 0x38ff };
+	static constexpr process_traits HMOS{
+			.asymmetric_mode_edges = false, .hmos_sprite_mc_flop = true, .grey_dot = true,
+			.output_lag = 4, .mmc_seen = SEEN_SPRITE_MUX, .lightpen_x_offset = 1,
+			.lightpen_frame_irq_only = false, .dma_delay_idle_address = 0x3807 };
+
+	switch (variant)
+	{
+	case TYPE_6567R56A:
+		return NMOS_OLD;
+
+	case TYPE_8562:
+	case TYPE_8564:
+	case TYPE_8565:
+	case TYPE_8566:
+		return HMOS;
+
+	default:
+		return NMOS;
+	}
+}
+
 
 DEFINE_DEVICE_TYPE(MOS6566, mos6566_device, "mos6566", "MOS 6566 VIC-II")
 DEFINE_DEVICE_TYPE(MOS6567, mos6567_device, "mos6567", "MOS 6567 VIC-II")
+DEFINE_DEVICE_TYPE(MOS6567R56A, mos6567r56a_device, "mos6567r56a", "MOS 6567R56A VIC-II")
 DEFINE_DEVICE_TYPE(MOS8562, mos8562_device, "mos8562", "MOS 8562 VIC-II")
-DEFINE_DEVICE_TYPE(MOS8564, mos8564_device, "mos8564", "MOS 8564 VIC-II")
+DEFINE_DEVICE_TYPE(MOS8564, mos8564_device, "mos8564", "MOS 8564 VIC-IIe")
 DEFINE_DEVICE_TYPE(MOS6569, mos6569_device, "mos6569", "MOS 6569 VIC-II")
 DEFINE_DEVICE_TYPE(MOS8565, mos8565_device, "mos8565", "MOS 8565 VIC-II")
-DEFINE_DEVICE_TYPE(MOS8566, mos8566_device, "mos8566", "MOS 8566 VIC-II")
+DEFINE_DEVICE_TYPE(MOS8566, mos8566_device, "mos8566", "MOS 8566 VIC-IIe")
 
 
-// default address maps
-void mos6566_device::mos6566_videoram_map(address_map &map)
+mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
+	, device_execute_interface(mconfig, *this)
+	, m_icount(0)
+	, m_variant(variant)
+	, m_timing(raster_timing_for(variant))
+	, m_process(process_traits_for(variant))
+	, m_space_config{
+		{ "videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(FUNC(mos6566_device::default_map<0>), this) },
+		{ "colorram", ENDIANNESS_LITTLE, 8, 10, 0, address_map_constructor(FUNC(mos6566_device::default_map<1>), this) } }
+	, m_write_irq(*this)
+	, m_write_ba(*this)
+	, m_write_aec(*this)
+	, m_write_k(*this)
+	, m_read_charrom(*this, 0)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
+	, m_palette((variant == TYPE_6567R56A) ? PALETTE_NTSC_OLD : is_ntsc() ? PALETTE_NTSC : PALETTE_PAL)
+	, m_phi0(1)
+	, m_ba(1)
+	, m_aec(1)
+	, m_lp(1)
 {
-	if (!has_configured_map(0))
-		map(0x0000, 0x3fff).ram();
 }
 
-void mos6566_device::mos6566_colorram_map(address_map &map)
+template <int Space>
+void mos6566_device::default_map(address_map &map)
 {
-	if (!has_configured_map(1))
-		map(0x000, 0x3ff).ram();
+	if (!has_configured_map(Space))
+		map(0x0000, Space ? 0x03ff : 0x3fff).ram();
 }
-
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
 
 device_memory_interface::space_config_vector mos6566_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(0, &m_videoram_space_config),
-		std::make_pair(1, &m_colorram_space_config)
-	};
+	return space_config_vector{ { 0, &m_space_config[0] }, { 1, &m_space_config[1] } };
 }
 
-
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-inline void mos6566_device::set_interrupt( int mask )
+TIMER_CALLBACK_MEMBER(mos6566_device::fast_changed)
 {
-	if (((m_reg[0x19] ^ mask) & m_reg[0x1a] & 0xf))
-	{
-		if (!(m_reg[0x19] & 0x80))
-		{
-			DBG_LOG(2, "vic2", ("irq start %.2x\n", mask));
-			m_reg[0x19] |= 0x80;
-			m_write_irq(ASSERT_LINE);
-		}
-	}
-	m_reg[0x19] |= mask;
+	m_cpu->set_unscaled_clock((clock() / 8) << param, !param);
 }
 
-inline void mos6566_device::clear_interrupt( int mask )
+void mos6566_device::cpu_access(int ioacc)
 {
-	m_reg[0x19] &= ~mask;
-	if ((m_reg[0x19] & 0x80) && !(m_reg[0x19] & m_reg[0x1a] & 0xf))
-	{
-		DBG_LOG(2, "vic2", ("irq end %.2x\n", mask));
-		m_reg[0x19] &= ~0x80;
-		m_write_irq(CLEAR_LINE);
-	}
-}
-
-inline uint8_t mos6566_device::read_videoram(offs_t offset)
-{
-	//logerror("cycle %u VRAM %04x BA %u AEC %u\n", m_cycle, offset & 0x3fff, m_ba, m_aec);
-	m_last_data = space(0).read_byte(offset & 0x3fff);
-
-	return m_last_data;
-}
-
-inline uint8_t mos6566_device::read_colorram(offs_t offset)
-{
-	return space(1).read_byte(offset & 0x3ff);
-}
-
-// Idle access
-inline void mos6566_device::idle_access()
-{
-	read_videoram(0x3fff);
-}
-
-// Fetch sprite data pointer
-inline void mos6566_device::spr_ptr_access( int num )
-{
-	m_spr_ptr[num] = read_videoram(SPRITE_ADDR(num)) << 6;
-}
-
-inline void mos6566_device::spr_ba(int cycle, int first)
-{
-	if (cycle > 11 && cycle < first)
+	if (!fast_mode())
 		return;
 
-	int state = ASSERT_LINE;
+	// the processor runs at twice the cycle rate: work out in which half cycle of the VIC the access falls
+	attoseconds_t const half = cycles_to_attotime(1).as_attoseconds() / 2;
+	attotime const now = machine().time();
+	attotime const vic = local_time();
+	attoseconds_t const ahead = (now >= vic) ? (now - vic).as_attoseconds() : -(vic - now).as_attoseconds();
+	attoseconds_t const shifted = ahead + half / 2;
+	int64_t const halves = (shifted >= 0) ? (shifted / half) : -((half - 1 - shifted) / half);
 
-	for (int i = 0; i < 8; i++)
-	{
-		if (BIT(m_spr_dma_on, i) && ((cycle - first - 2 * i + 2 * VIC2_CYCLESPERLINE) % VIC2_CYCLESPERLINE) < 5)
-			state = CLEAR_LINE;
-	}
+	if (BIT(halves, 0))
+		return;
 
-	set_ba(state);
+	int const offset = int(halves >> 1) % m_timing.cycles_per_line;
+	int const cycle = (m_cycle - 1 + offset + m_timing.cycles_per_line) % m_timing.cycles_per_line + 1;
+
+	if (ioacc || (m_decode[cycle].strobes & DECODE_REFRESH))
+		m_cpu->adjust_icount(-1);
 }
 
-// Fetch sprite data, increment data counter
-inline void mos6566_device::spr_data_access( int num, int bytenum )
+int mos6566_device::sprite_cycle(int sprite) const
 {
-	if (m_spr_dma_on & (1 << num))
-	{
-		m_spr_data[num][bytenum] = read_videoram((m_mc[num] & 0x3f) | m_spr_ptr[num]);
-		m_mc[num]++;
-	}
-	else
-		if (bytenum == 1)
-			idle_access();
+	return (m_timing.spr_first_cycle - 1 + 2 * sprite) % m_timing.cycles_per_line + 1;
 }
 
-// Turn on display if Bad Line
-inline void mos6566_device::display_if_bad_line()
+void mos6566_device::build_decode()
 {
-	if (m_is_bad_line)
-		m_display_state = 1;
-}
+	int const cycles = m_timing.cycles_per_line;
 
-inline void mos6566_device::set_ba(int state)
-{
-	if (FAST_MODE)
-		state = ASSERT_LINE;
+	for (int phase = 0; phase < 2 * cycles; phase++)
+		m_phase_x[phase] = phase_x(phase);
 
-	if (m_ba != state)
+	for (int cycle = 1; cycle <= cycles; cycle++)
 	{
-		m_ba = state;
+		auto const within = [cycle] (int first, int last) { return cycle >= first && cycle <= last; };
+		cycle_decode &decode = m_decode[cycle];
 
-		if (m_ba)
+		decode.strobes = 0;
+		if (cycle == 1)
+			decode.strobes |= DECODE_LINE_START;
+		if (cycle == 2)
+			decode.strobes |= DECODE_FRAME_START;
+		if (within(CYCLE_REFRESH_FIRST, CYCLE_REFRESH_LAST))
+			decode.strobes |= DECODE_REFRESH;
+		if (within(CYCLE_BA_FIRST, CYCLE_BA_LAST))
+			decode.strobes |= DECODE_BADLINE_BA;
+		if (cycle == CYCLE_VC_LOAD)
+			decode.strobes |= DECODE_VC_LOAD;
+		if (within(CYCLE_MATRIX_FIRST, CYCLE_MATRIX_LAST))
+			decode.strobes |= DECODE_MATRIX;
+		if (within(CYCLE_GRAPHICS_FIRST, CYCLE_GRAPHICS_LAST))
+			decode.strobes |= DECODE_GRAPHICS;
+		if (cycle == CYCLE_SPRITE_MCBASE)
+			decode.strobes |= DECODE_SPR_MCBASE;
+		if (within(m_timing.spr_dma_cycle, m_timing.spr_dma_cycle + 1))
+			decode.strobes |= DECODE_SPR_DMA;
+		if (cycle == CYCLE_SPRITE_YEXP)
+			decode.strobes |= DECODE_SPR_YEXP;
+		if (cycle == CYCLE_ROW_END)
+			decode.strobes |= DECODE_ROW_END;
+		if (cycle == m_timing.spr_disp_cycle)
+			decode.strobes |= DECODE_SPR_DISPLAY;
+
+		decode.spr_pointer = -1;
+		decode.spr_data = -1;
+		decode.spr_ba = 0;
+		for (int i = 0; i < 8; i++)
 		{
-			m_aec_delay = 0xff;
+			int const pointer = sprite_cycle(i);
+
+			if (cycle == pointer)
+				decode.spr_pointer = i;
+			else if (cycle == pointer % cycles + 1)
+				decode.spr_data = i;
+
+			if (((cycle - (pointer - SPRITE_BA_LEAD) + 2 * cycles) % cycles) < SPRITE_BA_CYCLES)
+				decode.spr_ba |= 1 << i;
 		}
 	}
 }
 
-inline void mos6566_device::set_aec(int state)
+int mos6566_device::phase_x(int phase) const
 {
-	if (m_aec != state)
-	{
-		m_aec = state;
-	}
+	if (phase >= m_timing.x_stall_phase)
+		phase = std::max(m_timing.x_stall_phase - 1, phase - m_timing.x_stall_length);
+
+	return (m_timing.first_x + 4 * phase) % m_timing.line_pixels;
 }
-
-inline void mos6566_device::bad_line_ba()
-{
-	if (m_is_bad_line)
-	{
-		if (m_ba)
-		{
-			set_ba(CLEAR_LINE);
-		}
-	}
-	else
-	{
-		set_ba(ASSERT_LINE);
-	}
-}
-
-// Refresh access
-inline void mos6566_device::refresh_access()
-{
-	read_videoram(0x3f00 | m_ref_cnt--);
-}
-
-
-inline void mos6566_device::fetch_if_bad_line()
-{
-	if (m_is_bad_line)
-		m_display_state = 1;
-}
-
-
-// Turn on display and matrix access and reset RC if Bad Line
-inline void mos6566_device::rc_if_bad_line()
-{
-	if (m_is_bad_line)
-	{
-		m_display_state = 1;
-		m_rc = 0;
-	}
-}
-
-// Sample border color and increment m_graphic_x
-inline void mos6566_device::sample_border()
-{
-	if (m_draw_this_line)
-	{
-		if (m_border_on)
-			m_border_color_sample[m_cycle - 13] = FRAMECOLOR;
-		m_graphic_x += 8;
-	}
-}
-
-
-// Turn on sprite DMA if necessary
-inline void mos6566_device::check_sprite_dma()
-{
-	int i;
-	uint8_t mask = 1;
-
-	for (i = 0; i < 8; i++, mask <<= 1)
-		if (SPRITEON(i) && ((m_rasterline & 0xff) == SPRITE_Y_POS(i)))
-		{
-			m_spr_dma_on |= mask;
-			m_mc_base[i] = 0;
-			if (SPRITE_Y_EXPAND(i))
-				m_spr_exp_y &= ~mask;
-		}
-}
-
-// Video matrix access
-inline void mos6566_device::matrix_access()
-{
-	if (!m_is_bad_line) return;
-
-	uint16_t adr = (m_vc & 0x03ff) | VIDEOADDR;
-
-	// we're in the second clock phase
-	m_phi0 = 1;
-	set_aec(BIT(m_aec_delay, 2));
-
-	if (!m_ba && m_aec)
-	{
-		m_matrix_line[m_ml_index] = 0xff;
-	}
-	else
-	{
-		m_matrix_line[m_ml_index] = read_videoram(adr);
-	}
-
-	m_color_line[m_ml_index] = read_colorram(adr & 0x03ff);
-}
-
-// Graphics data access
-inline void mos6566_device::graphics_access()
-{
-	if (m_display_state == 1)
-	{
-		uint16_t adr;
-		if (HIRESON)
-			adr = ((m_vc & 0x03ff) << 3) | m_bitmapaddr | m_rc;
-		else
-			adr = (m_matrix_line[m_ml_index] << 3) | m_chargenaddr | m_rc;
-		if (ECMON)
-			adr &= 0xf9ff;
-		m_gfx_data = read_videoram(adr);
-		m_char_data = m_matrix_line[m_ml_index];
-		m_color_data = m_color_line[m_ml_index];
-		m_ml_index++;
-		m_vc++;
-	}
-	else
-	{
-		m_gfx_data = read_videoram((ECMON ? 0x39ff : 0x3fff));
-		m_char_data = 0;
-	}
-}
-
-inline void mos6566_device::draw_background()
-{
-	if (m_draw_this_line)
-	{
-		uint8_t c;
-
-		switch (GFXMODE)
-		{
-			case 0:
-			case 1:
-			case 3:
-				c = m_colors[0];
-				break;
-			case 2:
-				c = m_last_char_data & 0x0f;
-				break;
-			case 4:
-				if (m_last_char_data & 0x80)
-					if (m_last_char_data & 0x40)
-						c = m_colors[3];
-					else
-						c = m_colors[2];
-				else
-					if (m_last_char_data & 0x40)
-						c = m_colors[1];
-					else
-						c = m_colors[0];
-				break;
-			default:
-				c = 0;
-				break;
-		}
-		m_bitmap.plot_box(m_graphic_x, VIC2_RASTER_2_EMU(m_rasterline), 8, 1, m_palette[c]);
-	}
-}
-
-inline void mos6566_device::draw_mono( uint16_t p, uint8_t c0, uint8_t c1 )
-{
-	uint8_t const c[2] = { c0, c1 };
-	uint8_t data = m_gfx_data;
-
-	for (unsigned i = 0; i < 8; i++)
-	{
-		m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 7 - i) = m_palette[c[data & 1]];
-		m_fore_coll_buf[p + 7 - i] = data & 1;
-		data >>= 1;
-	}
-}
-
-inline void mos6566_device::draw_multi( uint16_t p, uint8_t c0, uint8_t c1, uint8_t c2, uint8_t c3 )
-{
-	uint8_t const c[4] = { c0, c1, c2, c3 };
-	uint8_t data = m_gfx_data;
-
-	m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 7) = m_palette[c[data & 3]];
-	m_fore_coll_buf[p + 7] = data & 2;
-	m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 6) = m_palette[c[data & 3]];
-	m_fore_coll_buf[p + 6] = data & 2; data >>= 2;
-	m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 5) = m_palette[c[data & 3]];
-	m_fore_coll_buf[p + 5] = data & 2;
-	m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 4) = m_palette[c[data & 3]];
-	m_fore_coll_buf[p + 4] = data & 2; data >>= 2;
-	m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 3) = m_palette[c[data & 3]];
-	m_fore_coll_buf[p + 3] = data & 2;
-	m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 2) = m_palette[c[data & 3]];
-	m_fore_coll_buf[p + 2] = data & 2; data >>= 2;
-	m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 1) = m_palette[c[data]];
-	m_fore_coll_buf[p + 1] = data & 2;
-	m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 0) = m_palette[c[data]];
-	m_fore_coll_buf[p + 0] = data & 2;
-}
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  mos6566_device - constructor
-//-------------------------------------------------
 
 mos6566_device::mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mos6566_device(mconfig, MOS6566, tag, owner, clock, TYPE_6566)
 {
 }
 
-mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_memory_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		device_execute_interface(mconfig, *this),
-		m_icount(0),
-		m_variant(variant),
-		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(FUNC(mos6566_device::mos6566_videoram_map), this)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, address_map_constructor(FUNC(mos6566_device::mos6566_colorram_map), this)),
-		m_write_irq(*this),
-		m_write_ba(*this),
-		m_write_aec(*this),
-		m_write_k(*this),
-		m_cpu(*this, finder_base::DUMMY_TAG),
-		m_palette(PALETTE_MOS),
-		m_phi0(1),
-		m_ba(ASSERT_LINE),
-		m_aec(ASSERT_LINE)
+mos6567_device::mos6567_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+	: mos6566_device(mconfig, type, tag, owner, clock, variant)
 {
 }
 
@@ -575,8 +464,8 @@ mos6567_device::mos6567_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-mos6567_device::mos6567_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
-	: mos6566_device(mconfig, type, tag, owner, clock, variant)
+mos6567r56a_device::mos6567r56a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mos6567_device(mconfig, MOS6567R56A, tag, owner, clock, TYPE_6567R56A)
 {
 }
 
@@ -590,13 +479,13 @@ mos8564_device::mos8564_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-mos6569_device::mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6569_device(mconfig, MOS6569, tag, owner, clock, TYPE_6569)
+mos6569_device::mos6569_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+	: mos6566_device(mconfig, type, tag, owner, clock, variant)
 {
 }
 
-mos6569_device::mos6569_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
-	: mos6566_device(mconfig, type, tag, owner, clock, variant)
+mos6569_device::mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mos6569_device(mconfig, MOS6569, tag, owner, clock, TYPE_6569)
 {
 }
 
@@ -605,2247 +494,1241 @@ mos8565_device::mos8565_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+
 mos8566_device::mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mos6569_device(mconfig, MOS8566, tag, owner, clock, TYPE_8566)
 {
 }
 
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
 void mos6566_device::device_start()
 {
-	// set our instruction counter
 	set_icountptr(m_icount);
+
+	build_decode();
+
+	if (is_viciie())
+		m_fast_timer = timer_alloc(FUNC(mos6566_device::fast_changed), this);
 
 	screen().register_screen_bitmap(m_bitmap);
 
-	for (int i = 0; i < 256; i++)
-	{
-		m_expandx[i] = 0;
-		if (i & 1)
-			m_expandx[i] |= 3;
-		if (i & 2)
-			m_expandx[i] |= 0xc;
-		if (i & 4)
-			m_expandx[i] |= 0x30;
-		if (i & 8)
-			m_expandx[i] |= 0xc0;
-		if (i & 0x10)
-			m_expandx[i] |= 0x300;
-		if (i & 0x20)
-			m_expandx[i] |= 0xc00;
-		if (i & 0x40)
-			m_expandx[i] |= 0x3000;
-		if (i & 0x80)
-			m_expandx[i] |= 0xc000;
-	}
-
-	for (int i = 0; i < 256; i++)
-	{
-		m_expandx_multi[i] = 0;
-		if (i & 1)
-			m_expandx_multi[i] |= 5;
-		if (i & 2)
-			m_expandx_multi[i] |= 0xa;
-		if (i & 4)
-			m_expandx_multi[i] |= 0x50;
-		if (i & 8)
-			m_expandx_multi[i] |= 0xa0;
-		if (i & 0x10)
-			m_expandx_multi[i] |= 0x500;
-		if (i & 0x20)
-			m_expandx_multi[i] |= 0xa00;
-		if (i & 0x40)
-			m_expandx_multi[i] |= 0x5000;
-		if (i & 0x80)
-			m_expandx_multi[i] |= 0xa000;
-	}
-
-	m_fast_timer = timer_alloc(FUNC(mos6566_device::fast_changed), this);
-
-	// state saving
 	save_item(NAME(m_reg));
-
-	save_item(NAME(m_on));
-
-	//save_item(NAME(m_bitmap));
-
-	save_item(NAME(m_chargenaddr));
-	save_item(NAME(m_videoaddr));
-	save_item(NAME(m_bitmapaddr));
-
-	save_item(NAME(m_colors));
-	save_item(NAME(m_spritemulti));
-
 	save_item(NAME(m_rasterline));
 	save_item(NAME(m_cycle));
 	save_item(NAME(m_raster_x));
-	save_item(NAME(m_graphic_x));
 	save_item(NAME(m_last_data));
-
-	save_item(NAME(m_dy_start));
-	save_item(NAME(m_dy_stop));
-
-	save_item(NAME(m_draw_this_line));
-	save_item(NAME(m_is_bad_line));
-	save_item(NAME(m_bad_lines_enabled));
+	save_item(NAME(m_bus_slot));
+	save_item(NAME(m_lp));
+	save_item(NAME(m_lp_latched_this_frame));
+	save_item(NAME(m_lp_pending));
+	save_item(NAME(m_aec_delay));
+	save_item(NAME(m_phi0));
+	save_item(NAME(m_ba));
+	save_item(NAME(m_aec));
+	save_item(NAME(m_ba_out));
+	save_item(NAME(m_aec_out));
+	save_item(NAME(m_beam_line));
+	save_item(NAME(m_irq_flags));
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_out));
+	save_item(NAME(m_raster_irq_done));
+	save_item(NAME(m_badline));
+	save_item(NAME(m_badlines_enabled));
 	save_item(NAME(m_display_state));
-	save_item(NAME(m_char_data));
-	save_item(NAME(m_gfx_data));
-	save_item(NAME(m_color_data));
-	save_item(NAME(m_last_char_data));
-	save_item(NAME(m_matrix_line));
-	save_item(NAME(m_color_line));
-	save_item(NAME(m_vblanking));
-	save_item(NAME(m_ml_index));
-	save_item(NAME(m_rc));
+	save_item(NAME(m_fetch_cr1));
 	save_item(NAME(m_vc));
-	save_item(NAME(m_vc_base));
-	save_item(NAME(m_ref_cnt));
-
-	save_item(NAME(m_spr_coll_buf));
-	save_item(NAME(m_fore_coll_buf));
-	save_item(NAME(m_spr_exp_y));
-	save_item(NAME(m_spr_dma_on));
-	save_item(NAME(m_spr_draw));
-	save_item(NAME(m_spr_disp_on));
-	save_item(NAME(m_spr_ptr));
-	save_item(NAME(m_mc_base));
-	save_item(NAME(m_mc));
-
-	for (int i = 0; i < 8; i++)
-	{
-		save_item(NAME(m_spr_data[i]), i);
-		save_item(NAME(m_spr_draw_data[i]), i);
-	}
-
-	save_item(NAME(m_border_on));
-	save_item(NAME(m_ud_border_on));
-	save_item(NAME(m_border_on_sample));
-	save_item(NAME(m_border_color_sample));
-
-	save_item(NAME(m_first_ba_cycle));
-	save_item(NAME(m_device_suspended));
+	save_item(NAME(m_vcbase));
+	save_item(NAME(m_vmli));
+	save_item(NAME(m_rc));
+	save_item(NAME(m_refresh));
+	save_item(NAME(m_matrix));
+	save_item(NAME(m_color));
+	save_item(NAME(m_spr_dma));
+	save_item(NAME(m_spr_disp));
+	save_item(NAME(m_spr_yff));
+	save_item(NAME(m_spr_mcbase));
+	save_item(NAME(m_spr_mc));
+	save_item(NAME(m_spr_pointer));
+	save_item(NAME(m_spr_byte));
+	save_item(NAME(m_spr_pending));
+	save_item(NAME(m_spr_active));
+	save_item(NAME(m_spr_halt));
+	save_item(NAME(m_spr_shift_data));
+	save_item(NAME(m_spr_xphase));
+	save_item(NAME(m_spr_mcphase));
+	save_item(NAME(m_spr_pixel));
+	save_item(NAME(m_dreg));
+	save_item(NAME(m_pixel_color));
+	save_item(NAME(m_pixel_row));
+	save_item(NAME(m_pixel_col));
+	save_item(NAME(m_pixel_index));
+	save_item(NAME(m_pixel_count));
+	save_item(NAME(m_color_write));
+	save_item(NAME(m_coll_mm));
+	save_item(NAME(m_coll_md));
+	save_item(NAME(m_coll_index));
+	save_item(NAME(m_coll_clear));
+	save_item(STRUCT_MEMBER(m_write_queue, reg));
+	save_item(STRUCT_MEMBER(m_write_queue, data));
+	save_item(STRUCT_MEMBER(m_write_queue, mask));
+	save_item(STRUCT_MEMBER(m_write_queue, when));
+	save_item(NAME(m_write_count));
+	save_item(NAME(m_write_last));
+	save_item(NAME(m_dot));
+	save_item(NAME(m_cycle_dot));
+	save_item(NAME(m_draw_row));
+	save_item(NAME(m_draw_col));
+	save_item(NAME(m_draw_pos));
+	save_item(NAME(m_latch_gfx));
+	save_item(NAME(m_latch_vbuf));
+	save_item(NAME(m_seq_shift));
+	save_item(NAME(m_seq_vbuf));
+	save_item(NAME(m_seq_count));
+	save_item(NAME(m_seq_mc));
+	save_item(NAME(m_seq_mcm));
+	save_item(NAME(m_seq_cell_mc));
+	save_item(NAME(m_seq_bmm));
+	save_item(NAME(m_seq_xscroll));
+	save_item(NAME(m_main_border));
+	save_item(NAME(m_vert_border));
+	save_item(NAME(m_vert_ff));
 }
 
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
 
 void mos6566_device::device_reset()
 {
-	if (IS_VICIIE)
-		m_cpu->set_unscaled_clock(clock() / 8, true);
+	std::fill(std::begin(m_reg), std::end(m_reg), 0);
 
-	memset(m_reg, 0, sizeof(m_reg));
-
-	for (auto & elem : m_mc)
-		elem = 63;
-
-	// from 0 to 311 (0 first, PAL) or from 0 to 261 (? first, NTSC 6567R56A) or from 0 to 262 (? first, NTSC 6567R8)
-	m_rasterline = 0; // VIC2_LINES - 1;
-
+	m_rasterline = 0;
+	m_beam_line = 0;
 	m_cycle = 14;
-	m_raster_x = 0x004;
-	m_graphic_x = 0;
+	m_raster_x = phase_x(2 * (m_cycle - 1));
 	m_last_data = 0;
-
-	m_on = 1;
-
-	m_chargenaddr = m_videoaddr = m_bitmapaddr = 0;
-
-	m_dy_start = ROW24_YSTART;
-	m_dy_stop = ROW24_YSTOP;
-
-	m_draw_this_line = 0;
-	m_is_bad_line = 0;
-	m_bad_lines_enabled = 0;
-	m_display_state = 0;
-	m_char_data = 0;
-	m_gfx_data = 0;
-	m_color_data = 0;
-	m_last_char_data = 0;
-	m_vblanking = 0;
+	m_bus_slot = -1;
 	m_lp_latched_this_frame = false;
-	m_ml_index = 0;
-	m_rc = 0;
+	m_lp_pending = false;
+
+	m_phi0 = 1;
+	m_ba = 1;
+	m_aec = 1;
+	m_aec_delay = 0xff;
+	m_ba_out = -1;
+	m_aec_out = -1;
+
+	m_irq_flags = 0;
+	m_irq_enable = 0;
+	m_irq_out = 0;
+	m_raster_irq_done = false;
+
+	m_badline = false;
+	m_badlines_enabled = false;
+	m_display_state = false;
+	m_fetch_cr1 = 0;
 	m_vc = 0;
-	m_vc_base = 0;
-	m_ref_cnt = 0;
+	m_vcbase = 0;
+	m_vmli = 0;
+	m_rc = 7;
+	m_refresh = 0xff;
+	std::fill(std::begin(m_matrix), std::end(m_matrix), 0);
+	std::fill(std::begin(m_color), std::end(m_color), 0);
 
-	m_spr_exp_y = 0;
-	m_spr_dma_on = 0;
-	m_spr_draw = 0;
-	m_spr_disp_on = 0;
+	m_spr_dma = 0;
+	m_spr_disp = 0;
+	m_spr_yff = 0xff;
+	std::fill(std::begin(m_spr_mcbase), std::end(m_spr_mcbase), 0);
+	std::fill(std::begin(m_spr_mc), std::end(m_spr_mc), 0);
+	std::fill(std::begin(m_spr_pointer), std::end(m_spr_pointer), 0);
+	for (auto &bytes : m_spr_byte)
+		std::fill(std::begin(bytes), std::end(bytes), 0);
+	m_spr_pending = 0;
+	m_spr_active = 0;
+	m_spr_halt = 0;
+	std::fill(std::begin(m_spr_shift_data), std::end(m_spr_shift_data), 0);
+	m_spr_xphase = 0;
+	m_spr_mcphase = 0;
+	std::fill(std::begin(m_spr_pixel), std::end(m_spr_pixel), 0);
+
+	std::fill(std::begin(m_dreg), std::end(m_dreg), 0);
+	std::fill(std::begin(m_pixel_color), std::end(m_pixel_color), 0);
+	std::fill(std::begin(m_pixel_row), std::end(m_pixel_row), 0);
+	std::fill(std::begin(m_pixel_col), std::end(m_pixel_col), 0);
+	m_pixel_index = 0;
+	m_pixel_count = 0;
+	m_color_write = 0xff;
+	std::fill(std::begin(m_coll_mm), std::end(m_coll_mm), 0);
+	std::fill(std::begin(m_coll_md), std::end(m_coll_md), 0);
+	m_coll_index = 0;
+	std::fill(std::begin(m_coll_clear), std::end(m_coll_clear), 0);
+	std::fill(std::begin(m_write_last), std::end(m_write_last), 0);
+	m_write_count = 0;
+	m_dot = 0;
+	m_cycle_dot = 0;
+	m_draw_row = 0;
+	m_draw_col = 0;
+	m_draw_pos = 8;
+	std::fill(std::begin(m_latch_gfx), std::end(m_latch_gfx), 0);
+	std::fill(std::begin(m_latch_vbuf), std::end(m_latch_vbuf), 0);
+	m_seq_shift = 0;
+	m_seq_vbuf = 0;
+	m_seq_count = 0;
+	m_seq_mc = 0;
+	m_seq_mcm = false;
+	m_seq_cell_mc = false;
+	m_seq_bmm = 0;
+	m_seq_xscroll = 0;
+
+	m_main_border = true;
+	m_vert_border = true;
+	m_vert_ff = true;
+
+	if (is_viciie())
+	{
+		m_reg[0x2f] = 0xff;
+		m_reg[0x30] = 0xfc;
+		m_write_k(0, 7);
+		m_fast_timer->adjust(attotime::zero, 0);
+	}
+}
 
 
-	m_border_on = 0;
-	m_ud_border_on = 0;
+void mos6566_device::set_ba(int state)
+{
+	if (fast_mode())
+		state = 1;
 
-	m_first_ba_cycle = 0;
-	m_device_suspended = 0;
+	if (m_ba != state)
+	{
+		m_ba = state;
 
-	memset(m_matrix_line, 0, sizeof(m_matrix_line));
-	memset(m_color_line, 0, sizeof(m_color_line));
+		if (m_ba)
+			m_aec_delay = 0xff;
+	}
+}
 
-	memset(m_spr_coll_buf, 0, sizeof(m_spr_coll_buf));
-	memset(m_fore_coll_buf, 0, sizeof(m_fore_coll_buf));
-	memset(m_border_on_sample, 0, sizeof(m_border_on_sample));
-	memset(m_border_color_sample, 0, sizeof(m_border_color_sample));
+void mos6566_device::update_irq()
+{
+	int const state = ((m_irq_flags & m_irq_enable) != 0) ? 1 : 0;
 
+	if (state != m_irq_out)
+	{
+		m_irq_out = state;
+		m_write_irq(state);
+	}
+}
+
+void mos6566_device::raise_irq(uint8_t mask)
+{
+	m_irq_flags |= mask;
+	update_irq();
+}
+
+void mos6566_device::check_raster_irq()
+{
+	int const compare = (BIT(m_reg[REGISTER_CR1], 7) << 8) | m_reg[REGISTER_RASTER];
+
+	if (!m_raster_irq_done && m_rasterline == compare)
+	{
+		m_raster_irq_done = true;
+		raise_irq(IRQ_RST);
+	}
+}
+
+uint8_t mos6566_device::fetch(offs_t address)
+{
+	m_last_data = space(0).read_byte(address & 0x3fff);
+	return m_last_data;
+}
+
+uint8_t mos6566_device::fetch_phi2(offs_t address)
+{
+	if (m_aec)
+		return 0xff;
+
+	return fetch(address);
+}
+
+uint8_t mos6566_device::read_color(offs_t offset)
+{
+	return space(1).read_byte(offset & 0x3ff) & 0x0f;
+}
+
+
+void mos6566_device::line_start()
+{
+	m_beam_line = (m_beam_line == m_timing.lines - 1) ? 0 : (m_beam_line + 1);
+
+	if (m_beam_line != 0)
+		m_rasterline = m_beam_line;
+}
+
+void mos6566_device::update_badline()
+{
+	if (m_rasterline == FIRST_BAD_LINE && BIT(m_reg[REGISTER_CR1], 4))
+		m_badlines_enabled = true;
+
+	m_badline = m_badlines_enabled
+			&& m_rasterline >= FIRST_BAD_LINE
+			&& m_rasterline <= LAST_BAD_LINE
+			&& (m_rasterline & 7) == (m_reg[REGISTER_CR1] & 7);
+
+	if (m_badline)
+		m_display_state = true;
+}
+
+void mos6566_device::sprite_dma_check()
+{
 	for (int i = 0; i < 8; i++)
 	{
-		m_spr_ptr[i] = 0;
-		m_mc_base[i] = 0;
-		m_mc[i] = 0;
+		uint8_t const mask = 1 << i;
 
-		for (int j = 0; j < 4; j++)
+		if ((m_reg[REGISTER_MSE] & mask) && !(m_spr_dma & mask) && m_reg[1 + 2 * i] == (m_rasterline & 0xff))
 		{
-			m_spr_draw_data[i][j] = 0;
-			m_spr_data[i][j] = 0;
+			m_spr_dma |= mask;
+			m_spr_mcbase[i] = 0;
+			m_spr_yff |= mask;
+		}
+	}
+}
+
+bool mos6566_device::sprite_phase1(const cycle_decode &decode)
+{
+	if (decode.spr_pointer >= 0)
+	{
+		int const i = decode.spr_pointer;
+		m_spr_pointer[i] = fetch(((m_reg[REGISTER_MEMORY] & 0xf0) << 6) | 0x3f8 | i);
+		return true;
+	}
+
+	if (decode.spr_data >= 0)
+	{
+		int const i = decode.spr_data;
+		if (BIT(m_spr_dma, i))
+		{
+			m_spr_byte[i][1] = fetch((m_spr_pointer[i] << 6) | (m_spr_mc[i] & 0x3f));
+			m_spr_mc[i] = (m_spr_mc[i] + 1) & 0x3f;
+		}
+		else
+		{
+			m_spr_byte[i][1] = fetch(0x3fff);
+		}
+		return true;
+	}
+
+	return false;
+}
+
+void mos6566_device::sprite_phase2(const cycle_decode &decode)
+{
+	m_bus_slot = -1;
+
+	bool const pointer_cycle = decode.spr_pointer >= 0;
+	int const i = pointer_cycle ? decode.spr_pointer : decode.spr_data;
+	if (i < 0)
+		return;
+
+	int const byte = pointer_cycle ? 0 : 2;
+
+	if (BIT(m_spr_dma, i))
+	{
+		m_spr_byte[i][byte] = fetch_phi2((m_spr_pointer[i] << 6) | (m_spr_mc[i] & 0x3f));
+		m_spr_mc[i] = (m_spr_mc[i] + 1) & 0x3f;
+	}
+	else
+	{
+		m_spr_byte[i][byte] = 0xff;
+		m_bus_slot = 3 * i + byte;
+	}
+}
+
+void mos6566_device::graphics_fetch(bool display, bool dma_delay)
+{
+	uint8_t const mode = fetch_mode();
+	bool const ecm = BIT(mode, 6);
+
+	m_latch_gfx[1] = m_latch_gfx[0];
+	m_latch_vbuf[1] = m_latch_vbuf[0];
+
+	if (display)
+	{
+		uint8_t const chr = m_matrix[m_vmli];
+		auto const address_for_mode = [this, chr] (uint8_t cr1)
+		{
+			offs_t address;
+			if (BIT(cr1, 5))
+				address = ((m_reg[REGISTER_MEMORY] & 0x08) << 10) | ((m_vc & 0x3ff) << 3) | m_rc;
+			else
+				address = ((m_reg[REGISTER_MEMORY] & 0x0e) << 10) | (chr << 3) | m_rc;
+			return BIT(cr1, 6) ? address & 0x39ff : address;
+		};
+
+		offs_t address = address_for_mode(mode);
+		if (m_process.asymmetric_mode_edges && ((m_reg[REGISTER_CR1] ^ m_fetch_cr1) & 0x20))
+		{
+			offs_t const from = address_for_mode(m_fetch_cr1);
+			offs_t const to = address_for_mode(m_reg[REGISTER_CR1]);
+			if (!m_read_charrom(from) && m_read_charrom(to))
+				address = (from & 0xff) | (to & 0x3f00);
+		}
+
+		m_latch_gfx[0] = fetch(address);
+		m_latch_vbuf[0] = (m_color[m_vmli] << 8) | chr;
+
+		m_vmli = (m_vmli + 1) & 0x3f;
+		m_vc = (m_vc + 1) & 0x3ff;
+	}
+	else
+	{
+		m_latch_gfx[0] = fetch(ecm ? 0x39ff : dma_delay ? m_process.dma_delay_idle_address : 0x3fff);
+		m_latch_vbuf[0] = 0;
+	}
+
+	if (m_vert_border)
+	{
+		m_latch_gfx[0] = 0;
+		m_latch_vbuf[0] = m_latch_vbuf[1];
+	}
+}
+
+void mos6566_device::matrix_fetch()
+{
+	offs_t const address = ((m_reg[REGISTER_MEMORY] & 0xf0) << 6) | (m_vc & 0x3ff);
+
+	m_matrix[m_vmli] = fetch_phi2(address);
+	m_color[m_vmli] = read_color(address);
+}
+
+
+void mos6566_device::queue_register(uint8_t reg, uint8_t data)
+{
+	if (reg == REGISTER_CR1)
+	{
+		queue_register(reg, data, 0x97, SEEN_CYCLE_END);
+		queue_register(reg, data, 0x08, SEEN_LIVE);
+		if (m_process.asymmetric_mode_edges)
+		{
+			queue_edges(reg, data, 0x20, SEEN_LIVE, SEEN_LIVE + NMOS_FALL_LAG_BMM);
+			queue_edges(reg, data, 0x40, SEEN_LIVE, SEEN_LIVE + NMOS_FALL_LAG_ECM);
+		}
+		else
+		{
+			queue_edges(reg, data, 0x60, SEEN_PHI2, SEEN_HMOS_FALL);
+		}
+	}
+	else if (reg == REGISTER_CR2)
+	{
+		queue_register(reg, data, 0xe0, SEEN_CYCLE_END);
+		queue_register(reg, data, 0x08, SEEN_LIVE);
+		queue_register(reg, data, 0x07, SEEN_PHI2);
+		queue_edges(reg, data, 0x10, SEEN_LIVE, SEEN_LIVE + mcm_fall_lag(m_reg[REGISTER_CR1]));
+	}
+	else if (reg == REGISTER_MMC)
+	{
+		queue_register(reg, data, 0xff, m_process.mmc_seen);
+	}
+	else
+	{
+		queue_register(reg, data, 0xff, register_seen(reg));
+	}
+}
+
+void mos6566_device::queue_edges(uint8_t reg, uint8_t data, uint8_t mask, int rise_seen, int fall_seen)
+{
+	if (rise_seen == fall_seen)
+	{
+		queue_register(reg, data, mask, rise_seen);
+	}
+	else
+	{
+		queue_register(reg, data, data & mask, rise_seen);
+		queue_register(reg, data, ~data & mask, fall_seen);
+	}
+}
+
+int mos6566_device::mcm_fall_lag(uint8_t cr1) const
+{
+	return (m_process.asymmetric_mode_edges && BIT(cr1, 6)) ? NMOS_FALL_LAG_MCM_IN_ECM : 0;
+}
+
+uint8_t mos6566_device::fetch_mode() const
+{
+	return m_process.asymmetric_mode_edges ? (m_reg[REGISTER_CR1] | (m_fetch_cr1 & 0x60)) : m_fetch_cr1;
+}
+
+void mos6566_device::queue_register(uint8_t reg, uint8_t data, uint8_t mask, int seen)
+{
+	if (!mask)
+		return;
+
+	if (m_write_count == std::size(m_write_queue))
+	{
+		apply_register(m_write_queue[0].reg, m_write_queue[0].data, m_write_queue[0].mask);
+		std::copy(std::begin(m_write_queue) + 1, std::end(m_write_queue), std::begin(m_write_queue));
+		m_write_count--;
+	}
+
+	uint64_t when = std::max<int64_t>(int64_t(m_cycle_dot) + seen, int64_t(m_dot));
+	if (mask == 0xff)
+	{
+		when = std::max(when, m_write_last[reg]);
+		m_write_last[reg] = when;
+	}
+	m_write_queue[m_write_count++] = { reg, data, mask, when };
+}
+
+void mos6566_device::apply_register(uint8_t reg, uint8_t data, uint8_t mask)
+{
+	if (reg == REGISTER_MMC)
+	{
+		uint8_t const toggled = m_dreg[reg] ^ data;
+		if (m_process.hmos_sprite_mc_flop)
+		{
+			m_spr_mcphase ^= toggled & m_spr_xphase;
+			m_spr_mcphase |= toggled & m_spr_xphase & ~data;
+		}
+		else
+		{
+			m_spr_mcphase &= ~toggled;
 		}
 	}
 
-	for (int i = 0; i < 4; i++)
+	if (reg >= REGISTER_EC && reg < 0x2f)
+		m_color_write = reg;
+
+	m_dreg[reg] = (m_dreg[reg] & ~mask) | (data & mask);
+}
+
+void mos6566_device::apply_registers(uint64_t dot)
+{
+	int kept = 0;
+
+	for (int i = 0; i < m_write_count; i++)
 	{
-		m_colors[i] = 0;
-		m_spritemulti[i] = 0;
+		if (m_write_queue[i].when <= dot)
+			apply_register(m_write_queue[i].reg, m_write_queue[i].data, m_write_queue[i].mask);
+		else
+			m_write_queue[kept++] = m_write_queue[i];
 	}
 
-	m_phi0 = 1;
-	m_ba = CLEAR_LINE;
-	m_aec = CLEAR_LINE;
-	m_aec_delay = 0xff;
-
-	set_ba(ASSERT_LINE);
-	set_aec(ASSERT_LINE);
+	m_write_count = kept;
 }
 
-
-//-------------------------------------------------
-//  fast_changed -
-//-------------------------------------------------
-
-TIMER_CALLBACK_MEMBER(mos6566_device::fast_changed)
+void mos6566_device::draw_until(uint64_t dot)
 {
-	m_cpu->set_unscaled_clock((clock() / 8) << param, !param);
+	while (m_dot < dot && m_draw_pos < 8)
+	{
+		if (m_write_count)
+			apply_registers(m_dot);
+
+		draw_dot();
+		m_draw_pos++;
+		m_dot++;
+	}
 }
 
-
-//-------------------------------------------------
-//  cpu_access -
-//-------------------------------------------------
-
-void mos6566_device::cpu_access(int ioacc)
+void mos6566_device::draw_dot()
 {
-	if (!FAST_MODE)
-		return;
+	int const x = m_phase_x[m_draw_col / 4 + (m_draw_pos >> 2)] + (m_draw_pos & 3);
+	uint8_t const cr1 = m_dreg[REGISTER_CR1];
+	uint8_t const cr2 = m_dreg[REGISTER_CR2];
 
-	attoseconds_t const half = cycles_to_attotime(1).as_attoseconds() / 2;
-	attotime const now = machine().time();
-	attotime const vic = local_time();
-	attoseconds_t const delta = ((now >= vic) ? (now - vic).as_attoseconds() : -(vic - now).as_attoseconds()) + half / 2;
-	int64_t const halves = (delta >= 0) ? (delta / half) : -((half - 1 - delta) / half);
+	border_unit(x, cr1, cr2);
 
-	if (halves & 1)
-		return;
+	int color;
+	bool const fg = graphics_sequencer(cr1, cr2, color);
 
-	int const cycles_per_line = VIC2_CYCLESPERLINE;
-	int const cycle = int(((m_cycle - 1 + (halves >> 1)) % cycles_per_line + cycles_per_line) % cycles_per_line) + 1;
+	int sprite_color[8];
+	uint8_t const sprite_mask = sprite_sequencer(x, sprite_color);
 
-	if (ioacc || (cycle >= 11 && cycle <= 15))
-		m_cpu->adjust_icount(-1);
+	collision_unit(sprite_mask, fg);
+
+	if (sprite_mask)
+	{
+		int const lowest = std::countr_zero(sprite_mask);
+		if (!(fg && BIT(m_dreg[REGISTER_MDP], lowest)))
+			color = sprite_color[lowest];
+	}
+
+	if (m_main_border || fast_mode())
+		color = REGISTER_EC;
+
+	if (x >= m_timing.blank_end && x < m_timing.blank_end + m_timing.burst_length)
+		color = 0x01;
+	else if (x > 0x17c && x < m_timing.blank_end)
+		color = 0x00;
+
+	output_stage(color);
 }
 
+void mos6566_device::border_unit(int x, uint8_t cr1, uint8_t cr2)
+{
+	bool const csel = BIT(cr2, 3);
+	bool const rsel = BIT(cr1, 3);
 
-//-------------------------------------------------
-//  execute_run -
-//-------------------------------------------------
+	if (x == (csel ? BORDER_RIGHT_X_40 : BORDER_RIGHT_X_38))
+		m_main_border = true;
+
+	if (x == (csel ? BORDER_LEFT_X_40 : BORDER_LEFT_X_38))
+	{
+		if (m_rasterline == (rsel ? BORDER_BOTTOM_LINE_25 : BORDER_BOTTOM_LINE_24))
+			m_vert_ff = true;
+
+		m_vert_border = m_vert_ff;
+		if (!m_vert_border)
+			m_main_border = false;
+	}
+}
+
+bool mos6566_device::graphics_sequencer(uint8_t cr1, uint8_t cr2, int &color)
+{
+	int const slot = m_draw_pos;
+	bool const next_mcm = BIT(cr2, 4);
+
+	if (slot == MCM_FLOP_DOT + (next_mcm ? 0 : mcm_fall_lag(cr1)))
+	{
+		if (next_mcm && !m_seq_mcm)
+			m_seq_count |= 1;
+		m_seq_mcm = next_mcm;
+	}
+
+	if ((m_decode[m_draw_col / CYCLE_DOTS + 1].strobes & DECODE_GRAPHICS) && !m_vert_border)
+		m_seq_xscroll = cr2 & 7;
+
+	if (((slot - PHI2_START) & 7) == m_seq_xscroll)
+	{
+		int const latch = (slot >= PHI2_START) ? 0 : 1;
+
+		m_seq_shift = m_latch_gfx[latch];
+		m_seq_vbuf = m_latch_vbuf[latch];
+		m_seq_count = 0;
+		m_seq_cell_mc = BIT(m_seq_bmm, CELL_MC_BMM_DELAY - 1) || BIT(m_seq_vbuf, 11);
+	}
+
+	uint16_t const v = m_seq_vbuf;
+	if (m_seq_mcm && m_seq_cell_mc)
+	{
+		if (!(m_seq_count & 1))
+			m_seq_mc = (m_seq_shift >> 6) & 3;
+	}
+	else
+	{
+		m_seq_mc = BIT(m_seq_shift, 7) << 1;
+	}
+	m_seq_count++;
+	m_seq_shift <<= 1;
+	m_seq_bmm = (m_seq_bmm << 1) | BIT(cr1, 5);
+
+	int const bit = BIT(m_seq_mc, 1);
+	int const pair = m_seq_mc;
+	int const mode = (BIT(cr1, 6) << 2) | (BIT(cr1, 5) << 1) | BIT(cr2, 4);
+	bool fg = false;
+	color = 0;
+
+	switch (mode)
+	{
+	case 0:
+		fg = bit;
+		color = bit ? (v >> 8) & 0x0f : REGISTER_B0C;
+		break;
+
+	case 1:
+		if (BIT(v, 11))
+		{
+			fg = BIT(pair, 1);
+			color = (pair == 3) ? (v >> 8) & 0x07 : REGISTER_B0C + pair;
+		}
+		else
+		{
+			fg = bit;
+			color = bit ? (v >> 8) & 0x07 : REGISTER_B0C;
+		}
+		break;
+
+	case 2:
+		fg = bit;
+		color = bit ? (v >> 4) & 0x0f : v & 0x0f;
+		break;
+
+	case 3:
+		fg = BIT(pair, 1);
+		switch (pair)
+		{
+		case 0: color = REGISTER_B0C; break;
+		case 1: color = (v >> 4) & 0x0f; break;
+		case 2: color = v & 0x0f; break;
+		case 3: color = (v >> 8) & 0x0f; break;
+		}
+		break;
+
+	case 4:
+		fg = bit;
+		color = bit ? (v >> 8) & 0x0f : REGISTER_B0C + ((v >> 6) & 3);
+		break;
+
+	case 5:
+		fg = BIT(v, 11) ? BIT(pair, 1) : bit;
+		break;
+
+	case 6:
+		fg = bit;
+		break;
+
+	case 7:
+		fg = BIT(pair, 1);
+		break;
+	}
+
+	return fg;
+}
+
+uint8_t mos6566_device::sprite_sequencer(int x, int (&color)[8])
+{
+	int const dot = m_draw_col + m_draw_pos;
+	if (m_draw_pos == 0 && (m_decode[m_draw_col / CYCLE_DOTS + 1].strobes & DECODE_SPR_DISPLAY))
+		m_spr_pending = m_spr_disp;
+
+	int slot_dot = dot + PHI2_START - CYCLE_DOTS * (m_timing.spr_first_cycle - 1);
+	if (slot_dot < 0)
+		slot_dot += CYCLE_DOTS * m_timing.cycles_per_line;
+	if (slot_dot < 8 * SPRITE_SLOT_DOTS)
+	{
+		int const i = slot_dot / SPRITE_SLOT_DOTS;
+		uint8_t const mask = 1 << i;
+
+		switch (slot_dot % SPRITE_SLOT_DOTS)
+		{
+		case SPRITE_SLOT_HALT:
+			m_spr_halt |= mask;
+			break;
+		case SPRITE_SLOT_ACTIVE_CLEAR:
+			m_spr_active &= ~mask;
+			break;
+		case SPRITE_SLOT_RELOAD:
+			m_spr_shift_data[i] = (m_spr_byte[i][0] << 16) | (m_spr_byte[i][1] << 8) | m_spr_byte[i][2];
+			break;
+		case SPRITE_SLOT_RESUME:
+			m_spr_halt &= ~mask;
+			break;
+		}
+	}
+
+	uint8_t sprite_mask = 0;
+
+	if (m_spr_pending || m_spr_active)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			uint8_t const mask = 1 << i;
+
+			if ((m_spr_pending & ~m_spr_active & ~m_spr_halt) & mask)
+			{
+				int const sx = m_dreg[2 * i] | ((m_dreg[0x10] & mask) ? 0x100 : 0);
+				if (sx == x)
+				{
+					m_spr_active |= mask;
+					m_spr_xphase &= ~mask;
+					m_spr_mcphase |= mask;
+				}
+			}
+
+			if (!(m_spr_active & mask))
+				continue;
+
+			if (!m_spr_shift_data[i] && !m_spr_pixel[i])
+			{
+				m_spr_active &= ~mask;
+				continue;
+			}
+
+			if (!(m_spr_halt & mask))
+			{
+				uint32_t const data = m_spr_shift_data[i];
+
+				if (!(m_spr_xphase & mask))
+				{
+					if (m_dreg[REGISTER_MMC] & mask)
+					{
+						if (m_spr_mcphase & mask)
+							m_spr_pixel[i] = (data >> 22) & 3;
+
+						m_spr_mcphase ^= mask;
+					}
+					else if (!m_process.hmos_sprite_mc_flop || (m_spr_mcphase & mask))
+					{
+						m_spr_pixel[i] = BIT(data, 23) << 1;
+					}
+					else
+					{
+						m_spr_mcphase |= mask;
+					}
+
+					m_spr_shift_data[i] = (data << 1) & 0xffffff;
+				}
+
+				if (m_dreg[REGISTER_MXE] & mask)
+					m_spr_xphase ^= mask;
+				else
+					m_spr_xphase &= ~mask;
+			}
+
+			// a halted sprite outputs its frozen pixel as hires, as seen on real 6569 and 8565 (test-136-2a)
+			int const sp = ((m_spr_halt & mask) || (slot_dot == SPRITE_SLOT_DOTS * i + SPRITE_SLOT_FROZEN_HIRES)) ? (m_spr_pixel[i] & 2) : m_spr_pixel[i];
+			if (sp)
+			{
+				sprite_mask |= mask;
+				color[i] = (sp == 1) ? REGISTER_MM0 : (sp == 3) ? REGISTER_MM1 : REGISTER_M0C + i;
+			}
+		}
+	}
+
+	return sprite_mask;
+}
+
+void mos6566_device::collision_unit(uint8_t sprite_mask, bool fg)
+{
+	uint8_t const mm = (sprite_mask & (sprite_mask - 1)) ? sprite_mask : 0;
+	uint8_t const md = (sprite_mask && fg) ? sprite_mask : 0;
+	uint8_t &ring_mm = m_coll_mm[m_coll_index];
+	uint8_t &ring_md = m_coll_md[m_coll_index];
+
+	if (ring_mm && m_dot >= m_coll_clear[0])
+	{
+		if (!m_reg[REGISTER_MM])
+			raise_irq(IRQ_MMC);
+
+		m_reg[REGISTER_MM] |= ring_mm;
+	}
+
+	if (ring_md && m_dot >= m_coll_clear[1])
+	{
+		if (!m_reg[REGISTER_MD])
+			raise_irq(IRQ_MBC);
+
+		m_reg[REGISTER_MD] |= ring_md;
+	}
+
+	ring_mm = mm;
+	ring_md = md;
+	m_coll_index = (m_coll_index + 1) & (COLLISION_LAG - 1);
+}
+
+void mos6566_device::output_stage(int color)
+{
+	int const lag = m_process.output_lag;
+	if (m_pixel_count == lag)
+	{
+		uint8_t const selected = m_pixel_color[m_pixel_index];
+		int const resolved = (m_process.grey_dot && selected == m_color_write) ? 0x0f
+				: (selected < 0x10) ? selected : m_dreg[selected] & 0x0f;
+		m_bitmap.pix(m_pixel_row[m_pixel_index], m_pixel_col[m_pixel_index]) = m_palette[resolved];
+	}
+	else
+	{
+		m_pixel_count++;
+	}
+
+	m_pixel_color[m_pixel_index] = color;
+	m_pixel_row[m_pixel_index] = m_draw_row;
+	m_pixel_col[m_pixel_index] = m_draw_col + m_draw_pos;
+	if (++m_pixel_index == lag)
+		m_pixel_index = 0;
+	m_color_write = 0xff;
+}
 
 void mos6566_device::execute_run()
 {
 	do
 	{
-		m_phi0 = 0;
-
-		m_aec_delay <<= 1;
-		m_aec_delay |= m_ba;
-
-		set_aec(CLEAR_LINE);
-
 		int const cycle = m_cycle;
-		int i;
-		uint8_t mask;
+		cycle_decode const &decode = m_decode[cycle];
 
-		if (m_rasterline == VIC2_FIRST_DMA_LINE)
-			m_bad_lines_enabled = SCREENON;
+		draw_until(m_cycle_dot + CYCLE_DOTS);
 
-		m_is_bad_line = ((m_rasterline >= VIC2_FIRST_DMA_LINE) && (m_rasterline <= VIC2_LAST_DMA_LINE) &&
-			((m_rasterline & 0x07) == YSCROLL) && m_bad_lines_enabled);
+		m_phi0 = 0;
+		m_aec_delay = (m_aec_delay << 1) | m_ba;
+		m_aec = 0;
 
-		switch (m_cycle)
+		if (decode.strobes & DECODE_LINE_START)
 		{
-		// Sprite 3, raster counter, raster IRQ, bad line
-		case 1:
-			if (m_rasterline == (VIC2_LINES - 1))
+			line_start();
+		}
+		else if (decode.strobes & DECODE_FRAME_START)
+		{
+			if (m_beam_line == 0)
 			{
-				m_vblanking = 1;
-			}
-			else
-			{
-				m_rasterline++;
-
-				m_draw_this_line = ((VIC2_RASTER_2_EMU(m_rasterline) >= VIC2_RASTER_2_EMU(VIC2_FIRST_DISP_LINE)) &&
-							(VIC2_RASTER_2_EMU(m_rasterline ) <= VIC2_RASTER_2_EMU(VIC2_LAST_DISP_LINE)));
-			}
-
-			m_border_on_sample[0] = m_border_on;
-			spr_ptr_access(3);
-			spr_data_access(3, 0);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 3
-		case 2:
-			if (m_vblanking)
-			{
-				// Vertical blank, reset counters
-				m_rasterline = m_vc_base = 0;
+				m_rasterline = 0;
+				m_vcbase = 0;
+				m_refresh = 0xff;
+				m_badlines_enabled = false;
 				m_lp_latched_this_frame = false;
-				m_ref_cnt = 0xff;
-				m_vblanking = 0;
 
-				m_bad_lines_enabled = 0;
-
-				// Trigger raster IRQ if IRQ in line 0
-				if (RASTERLINE == 0)
+				if (!m_lp)
 				{
-					set_interrupt(IRQ_RST);
+					m_lp_pending = false;
+					m_lp_latched_this_frame = true;
+					m_reg[REGISTER_LPX] = 0xd1;
+					m_reg[REGISTER_LPY] = 0;
+					raise_irq(IRQ_LP);
 				}
 			}
-
-			if (m_rasterline == RASTERLINE)
-			{
-				set_interrupt(IRQ_RST);
-			}
-
-			m_graphic_x = VIC2_X_2_EMU(0);
-
-			spr_data_access(3, 1);
-			spr_data_access(3, 2);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 4
-		case 3:
-			spr_ptr_access(4);
-			spr_data_access(4, 0);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 4
-		case 4:
-			spr_data_access(4, 1);
-			spr_data_access(4, 2);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 5
-		case 5:
-			spr_ptr_access(5);
-			spr_data_access(5, 0);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 5
-		case 6:
-			spr_data_access(5, 1);
-			spr_data_access(5, 2);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 6
-		case 7:
-			spr_ptr_access(6);
-			spr_data_access(6, 0);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 6
-		case 8:
-			spr_data_access(6, 1);
-			spr_data_access(6, 2);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 7
-		case 9:
-			spr_ptr_access(7);
-			spr_data_access(7, 0);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 7
-		case 10:
-			spr_data_access(7, 1);
-			spr_data_access(7, 2);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Refresh
-		case 11:
-			refresh_access();
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Refresh, fetch if bad line
-		case 12:
-			bad_line_ba();
-
-			refresh_access();
-			fetch_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Refresh, fetch if bad line, raster_x
-		case 13:
-			bad_line_ba();
-
-			draw_background();
-			sample_border();
-			refresh_access();
-			fetch_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Refresh, fetch if bad line, RC, VC
-		case 14:
-			bad_line_ba();
-
-			draw_background();
-			sample_border();
-			refresh_access();
-			rc_if_bad_line();
-
-			m_vc = m_vc_base;
-
-			m_cycle++;
-			break;
-
-		// Refresh, fetch if bad line, sprite y expansion
-		case 15:
-			bad_line_ba();
-
-			draw_background();
-			sample_border();
-			refresh_access();
-			fetch_if_bad_line();
-
-			for (i = 0; i < 8; i++)
-				if (m_spr_exp_y & (1 << i))
-					m_mc_base[i] += 2;
-
-			m_ml_index = 0;
-			matrix_access();
-
-			m_cycle++;
-			break;
-
-		// Graphics, sprite y expansion, sprite DMA
-		case 16:
-			bad_line_ba();
-
-			draw_background();
-			sample_border();
-			graphics_access();
-			fetch_if_bad_line();
-
-			mask = 1;
-			for (i = 0; i < 8; i++, mask <<= 1)
-			{
-				if (m_spr_exp_y & mask)
-					m_mc_base[i]++;
-				if ((m_mc_base[i] & 0x3f) == 0x3f)
-					m_spr_dma_on &= ~mask;
-			}
-
-			matrix_access();
-
-			m_cycle++;
-			break;
-
-		// Graphics, check border
-		case 17:
-			bad_line_ba();
-
-			if (COLUMNS40)
-			{
-				if (m_rasterline == m_dy_stop)
-					m_ud_border_on = 1;
-				else
-				{
-					if (SCREENON)
-					{
-						if (m_rasterline == m_dy_start)
-							m_border_on = m_ud_border_on = 0;
-						else
-							if (m_ud_border_on == 0)
-								m_border_on = 0;
-					}
-					else
-						if (m_ud_border_on == 0)
-							m_border_on = 0;
-				}
-			}
-
-			// Second sample of border state
-			m_border_on_sample[1] = m_border_on;
-
-			draw_background();
-			draw_graphics();
-			sample_border();
-			graphics_access();
-			fetch_if_bad_line();
-			matrix_access();
-
-			m_cycle++;
-			break;
-
-		// Check border
-		case 18:
-			bad_line_ba();
-
-			if (!COLUMNS40)
-			{
-				if (m_rasterline == m_dy_stop)
-					m_ud_border_on = 1;
-				else
-				{
-					if (SCREENON)
-					{
-						if (m_rasterline == m_dy_start)
-							m_border_on = m_ud_border_on = 0;
-						else
-							if (m_ud_border_on == 0)
-								m_border_on = 0;
-					}
-					else
-						if (m_ud_border_on == 0)
-							m_border_on = 0;
-				}
-			}
-
-			// Third sample of border state
-			m_border_on_sample[2] = m_border_on;
-
-			[[fallthrough]]; // FIXME: really?
-
-		// Graphics
-
-		case 19:
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		case 26:
-		case 27:
-		case 28:
-		case 29:
-		case 30:
-		case 31:
-		case 32:
-		case 33:
-		case 34:
-		case 35:
-		case 36:
-		case 37:
-		case 38:
-		case 39:
-		case 40:
-		case 41:
-		case 42:
-		case 43:
-		case 44:
-		case 45:
-		case 46:
-		case 47:
-		case 48:
-		case 49:
-		case 50:
-		case 51:
-		case 52:
-		case 53:
-		case 54:
-			bad_line_ba();
-
-			draw_graphics();
-			sample_border();
-			graphics_access();
-			fetch_if_bad_line();
-			matrix_access();
-			m_last_char_data = m_char_data;
-
-			m_cycle++;
-			break;
-
-		// Graphics, sprite y expansion, sprite DMA
-		case 55:
-			if (m_is_bad_line)
-				set_ba(ASSERT_LINE);
-
-			draw_graphics();
-			sample_border();
-			graphics_access();
-			display_if_bad_line();
-
-			// sprite y expansion
-			mask = 1;
-			for (i = 0; i < 8; i++, mask <<= 1)
-				if (SPRITE_Y_EXPAND (i))
-					m_spr_exp_y ^= mask;
-
-			check_sprite_dma();
-
-			m_cycle++;
-			break;
-
-		// Check border, sprite DMA
-		case 56:
-			if (!COLUMNS40)
-				m_border_on = 1;
-
-			// Fourth sample of border state
-			m_border_on_sample[3] = m_border_on;
-
-			draw_graphics();
-			sample_border();
-			idle_access();
-			display_if_bad_line();
-			check_sprite_dma();
-
-			m_cycle++;
-			break;
-
-		// Check border, sprites
-		case 57:
-			if (COLUMNS40)
-				m_border_on = 1;
-
-			// Fifth sample of border state
-			m_border_on_sample[4] = m_border_on;
-
-			// Sample spr_disp_on and spr_data for sprite drawing
-			m_spr_draw = m_spr_disp_on;
-			if (m_spr_draw)
-				memcpy(m_spr_draw_data, m_spr_data, 8 * 4);
-
-			mask = 1;
-			for (i = 0; i < 8; i++, mask <<= 1)
-				if ((m_spr_disp_on & mask) && !(m_spr_dma_on & mask))
-					m_spr_disp_on &= ~mask;
-
-			draw_background();
-			sample_border();
-			idle_access();
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// for NTSC 6567R8
-		case 58:
-			draw_background();
-			sample_border();
-			idle_access();
-			display_if_bad_line();
-
-			m_cycle++;
-
-			if (IS_6566)
-			{
-				draw_background();
-				sample_border();
-
-				m_cycle++;
-			}
-			break;
-
-		// for NTSC 6567R8
-		case 59:
-			draw_background();
-			sample_border();
-			idle_access();
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 0, sprite DMA, MC, RC
-		case 60:
-			draw_background();
-			sample_border();
-
-			mask = 1;
-			for (i = 0; i < 8; i++, mask <<= 1)
-			{
-				m_mc[i] = m_mc_base[i];
-				if ((m_spr_dma_on & mask) && ((m_rasterline & 0xff) == SPRITE_Y_POS(i)))
-					m_spr_disp_on |= mask;
-			}
-
-			spr_ptr_access(0);
-			spr_data_access(0, 0);
-
-			if (m_rc == 7)
-			{
-				m_vc_base = m_vc;
-				m_display_state = 0;
-			}
-
-			if (m_is_bad_line || m_display_state)
-			{
-				m_display_state = 1;
-				m_rc = (m_rc + 1) & 7;
-			}
-
-			m_cycle++;
-			break;
-
-		// Sprite 0
-		case 61:
-			draw_background();
-			sample_border();
-			spr_data_access(0, 1);
-			spr_data_access(0, 2);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 1, draw
-		case 62:
-			draw_background();
-			sample_border();
-
-			if (m_draw_this_line)
-			{
-				draw_sprites();
-
-				if (m_border_on_sample[0])
-					for (i = 0; i < 4; i++)
-						m_bitmap.plot_box(VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(m_rasterline), 8, 1, m_palette[m_border_color_sample[i]]);
-
-				if (m_border_on_sample[1])
-					m_bitmap.plot_box(VIC2_X_2_EMU(4 * 8), VIC2_RASTER_2_EMU(m_rasterline), 8, 1, m_palette[m_border_color_sample[4]]);
-
-				if (m_border_on_sample[2])
-					for (i = 5; i < 43; i++)
-						m_bitmap.plot_box(VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(m_rasterline), 8, 1, m_palette[m_border_color_sample[i]]);
-
-				if (m_border_on_sample[3])
-					m_bitmap.plot_box(VIC2_X_2_EMU(43 * 8), VIC2_RASTER_2_EMU(m_rasterline), 8, 1, m_palette[m_border_color_sample[43]]);
-
-				if (m_border_on_sample[4])
-				{
-					for (i = 44; i < 48; i++)
-						m_bitmap.plot_box(VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(m_rasterline), 8, 1, m_palette[m_border_color_sample[i]]);
-					for (i = 48; i < 53; i++)
-						m_bitmap.plot_box(VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(m_rasterline), 8, 1, m_palette[m_border_color_sample[47]]);
-				}
-			}
-
-			spr_ptr_access(1);
-			spr_data_access(1, 0);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 1
-		case 63:
-			spr_data_access(1, 1);
-			spr_data_access(1, 2);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 2
-		case 64:
-			spr_ptr_access(2);
-			spr_data_access(2, 0);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 2
-		case 65:
-			spr_data_access(2, 1);
-			spr_data_access(2, 2);
-			display_if_bad_line();
-
-			if (m_rasterline == m_dy_stop)
-				m_ud_border_on = 1;
-			else
-				if (SCREENON && (m_rasterline == m_dy_start))
-					m_ud_border_on = 0;
-
-			// Last cycle
-			m_cycle = 1;
 		}
 
-		if (IS_6566)
-			spr_ba((cycle > 59) ? (cycle - 1) : cycle, 56);
+		if (m_rasterline != ((BIT(m_reg[REGISTER_CR1], 7) << 8) | m_reg[REGISTER_RASTER]))
+			m_raster_irq_done = false;
+		else if (!(decode.strobes & DECODE_LINE_START))
+			check_raster_irq();
+
+		bool const display = m_display_state;
+		update_badline();
+		bool const dma_delay = !display && m_display_state;
+
+		bool const rsel = BIT(m_reg[REGISTER_CR1], 3);
+		if (m_rasterline == (rsel ? BORDER_TOP_LINE_25 : BORDER_TOP_LINE_24) && BIT(m_reg[REGISTER_CR1], 4))
+			m_vert_ff = m_vert_border = false;
+		if (m_rasterline == (rsel ? BORDER_BOTTOM_LINE_25 : BORDER_BOTTOM_LINE_24))
+			m_vert_ff = true;
+		if (decode.strobes & DECODE_LINE_START)
+			m_vert_border = m_vert_ff;
+
+		if (decode.strobes & DECODE_VC_LOAD)
+		{
+			m_vc = m_vcbase;
+			m_vmli = 0;
+
+			if (m_badline)
+				m_rc = 0;
+		}
+		else if (decode.strobes & DECODE_SPR_MCBASE)
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				uint8_t const mask = 1 << i;
+
+				m_spr_yff |= ~m_reg[REGISTER_MYE] & mask;
+
+				if (m_spr_yff & mask)
+				{
+					m_spr_mcbase[i] = m_spr_mc[i];
+
+					if (m_spr_mcbase[i] == 63)
+						m_spr_dma &= ~mask;
+				}
+			}
+		}
+		else if (decode.strobes & DECODE_SPR_DMA)
+		{
+			sprite_dma_check();
+		}
+		else if (decode.strobes & DECODE_ROW_END)
+		{
+			if (m_rc == 7)
+			{
+				m_vcbase = m_vc;
+				m_display_state = false;
+			}
+
+			if (m_badline || m_display_state)
+			{
+				m_display_state = true;
+				m_rc = (m_rc + 1) & 7;
+			}
+		}
+
+		if (decode.strobes & DECODE_SPR_DISPLAY)
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				uint8_t const mask = 1 << i;
+
+				m_spr_mc[i] = m_spr_mcbase[i];
+
+				if (m_spr_dma & mask)
+				{
+					if ((m_reg[REGISTER_MSE] & mask) && m_reg[1 + 2 * i] == (m_rasterline & 0xff))
+						m_spr_disp |= mask;
+				}
+				else
+				{
+					m_spr_disp &= ~mask;
+				}
+			}
+		}
+
+		if (decode.strobes & DECODE_GRAPHICS)
+		{
+			graphics_fetch(display, dma_delay);
+		}
 		else
-			spr_ba(cycle, 57);
+		{
+			m_latch_gfx[1] = m_latch_gfx[0];
+			m_latch_vbuf[1] = m_latch_vbuf[0];
+			m_latch_gfx[0] = 0;
 
+			if (decode.strobes & DECODE_REFRESH)
+				fetch(0x3f00 | m_refresh--);
+			else if (!sprite_phase1(decode))
+				fetch(0x3fff);
+		}
+
+		bool const ba_low = (m_badline && (decode.strobes & DECODE_BADLINE_BA)) || (m_spr_dma & decode.spr_ba);
+		set_ba(!ba_low);
+
+		m_fetch_cr1 = m_reg[REGISTER_CR1];
 		m_phi0 = 1;
-		set_aec(BIT(m_aec_delay, 2));
+		m_aec = BIT(m_aec_delay, 2);
 
-		m_write_ba(m_ba);
-		m_write_aec(m_aec);
+		if (decode.strobes & DECODE_SPR_YEXP)
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				uint8_t const mask = 1 << i;
 
-		m_raster_x += 8;
-		if (m_raster_x == 0x1fc) m_raster_x = 0x004;
+				if ((m_reg[REGISTER_MYE] & mask) && (m_spr_dma & mask))
+					m_spr_yff ^= mask;
+			}
+		}
+
+		if (m_badline && (decode.strobes & DECODE_MATRIX))
+			matrix_fetch();
+
+		sprite_phase2(decode);
+
+		if (m_ba_out != m_ba)
+		{
+			m_ba_out = m_ba;
+			m_write_ba(m_ba);
+		}
+
+		if (m_aec_out != m_aec)
+		{
+			m_aec_out = m_aec;
+			m_write_aec(m_aec);
+		}
+
+		m_cycle_dot = m_dot;
+		m_draw_row = (m_beam_line + m_timing.row_shift) % m_timing.lines;
+		m_draw_col = (cycle - 1) * CYCLE_DOTS;
+		m_draw_pos = 0;
+
+		if (m_lp_pending)
+			trigger_lightpen(cycle);
+
+		m_cycle = (cycle == m_timing.cycles_per_line) ? 1 : (cycle + 1);
+		m_raster_x = phase_x(2 * (m_cycle - 1));
 
 		m_icount--;
 	} while (m_icount > 0);
 }
 
-
-//-------------------------------------------------
-//  execute_run -
-//-------------------------------------------------
-
-void mos6569_device::execute_run()
-{
-	do
-	{
-		m_phi0 = 0;
-
-		m_aec_delay <<= 1;
-		m_aec_delay |= m_ba;
-
-		set_aec(CLEAR_LINE);
-
-		int const cycle = m_cycle;
-		int i;
-		uint8_t mask;
-
-		if ((m_rasterline == VIC2_FIRST_DMA_LINE) && !m_bad_lines_enabled)
-			m_bad_lines_enabled = SCREENON;
-
-		m_is_bad_line = ((m_rasterline >= VIC2_FIRST_DMA_LINE) && (m_rasterline <= VIC2_LAST_DMA_LINE) &&
-			((m_rasterline & 0x07) == YSCROLL) && m_bad_lines_enabled);
-
-		switch (m_cycle)
-		{
-		// Sprite 3, raster counter, raster IRQ, bad line
-		case 1:
-			if (m_rasterline == (VIC2_LINES - 1))
-			{
-				m_vblanking = 1;
-			}
-			else
-			{
-				m_rasterline++;
-
-				m_draw_this_line =  ((VIC2_RASTER_2_EMU(m_rasterline) >= VIC2_RASTER_2_EMU(VIC2_FIRST_DISP_LINE)) &&
-							(VIC2_RASTER_2_EMU(m_rasterline ) <= VIC2_RASTER_2_EMU(VIC2_LAST_DISP_LINE)));
-			}
-
-			m_border_on_sample[0] = m_border_on;
-			spr_ptr_access(3);
-			spr_data_access(3, 0);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 3
-		case 2:
-			if (m_vblanking)
-			{
-				// Vertical blank, reset counters
-				m_rasterline = m_vc_base = 0;
-				m_lp_latched_this_frame = false;
-				m_ref_cnt = 0xff;
-				m_vblanking = 0;
-
-				m_bad_lines_enabled = 0;
-
-				// Trigger raster IRQ if IRQ in line 0
-				if (RASTERLINE == 0)
-				{
-					set_interrupt(IRQ_RST);
-				}
-			}
-
-			if (m_rasterline == RASTERLINE)
-			{
-				set_interrupt(IRQ_RST);
-			}
-
-			m_graphic_x = VIC2_X_2_EMU(0);
-
-			spr_data_access(3, 1);
-			spr_data_access(3, 2);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 4
-		case 3:
-			spr_ptr_access(4);
-			spr_data_access(4, 0);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 4
-		case 4:
-			spr_data_access(4, 1);
-			spr_data_access(4, 2);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 5
-		case 5:
-			spr_ptr_access(5);
-			spr_data_access(5, 0);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 5
-		case 6:
-			spr_data_access(5, 1);
-			spr_data_access(5, 2);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 6
-		case 7:
-			spr_ptr_access(6);
-			spr_data_access(6, 0);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 6
-		case 8:
-			spr_data_access(6, 1);
-			spr_data_access(6, 2);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 7
-		case 9:
-			spr_ptr_access(7);
-			spr_data_access(7, 0);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 7
-		case 10:
-			spr_data_access(7, 1);
-			spr_data_access(7, 2);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Refresh
-		case 11:
-			refresh_access();
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Refresh, fetch if bad line
-		case 12:
-			bad_line_ba();
-
-			refresh_access();
-			fetch_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Refresh, fetch if bad line, raster_x
-		case 13:
-			bad_line_ba();
-
-			draw_background();
-			sample_border();
-			refresh_access();
-			fetch_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Refresh, fetch if bad line, RC, VC
-		case 14:
-			bad_line_ba();
-
-			draw_background();
-			sample_border();
-			refresh_access();
-			rc_if_bad_line();
-
-			m_vc = m_vc_base;
-
-			m_cycle++;
-			break;
-
-		// Refresh, fetch if bad line, sprite y expansion
-		case 15:
-			bad_line_ba();
-
-			draw_background();
-			sample_border();
-			refresh_access();
-			fetch_if_bad_line();
-
-			for (i = 0; i < 8; i++)
-				if (m_spr_exp_y & (1 << i))
-					m_mc_base[i] += 2;
-
-			m_ml_index = 0;
-
-			matrix_access();
-
-			m_cycle++;
-			break;
-
-		// Graphics, sprite y expansion, sprite DMA
-		case 16:
-			bad_line_ba();
-
-			draw_background();
-			sample_border();
-			graphics_access();
-			fetch_if_bad_line();
-
-			mask = 1;
-			for (i = 0; i < 8; i++, mask <<= 1)
-			{
-				if (m_spr_exp_y & (1 << i))
-					m_mc_base[i]++;
-				if ((m_mc_base[i] & 0x3f) == 0x3f)
-					m_spr_dma_on &= ~mask;
-			}
-
-			matrix_access();
-
-			m_cycle++;
-			break;
-
-		// Graphics, check border
-		case 17:
-			bad_line_ba();
-
-			if (COLUMNS40)
-			{
-				if (m_rasterline == m_dy_stop)
-					m_ud_border_on = 1;
-				else
-				{
-					if (SCREENON)
-					{
-						if (m_rasterline == m_dy_start)
-							m_border_on = m_ud_border_on = 0;
-						else
-							if (m_ud_border_on == 0)
-								m_border_on = 0;
-					} else
-						if (m_ud_border_on == 0)
-							m_border_on = 0;
-				}
-			}
-
-			// Second sample of border state
-			m_border_on_sample[1] = m_border_on;
-
-			draw_background();
-			draw_graphics();
-			sample_border();
-			graphics_access();
-			fetch_if_bad_line();
-			matrix_access();
-
-			m_cycle++;
-			break;
-
-		// Check border
-		case 18:
-			bad_line_ba();
-
-			if (!COLUMNS40)
-			{
-				if (m_rasterline == m_dy_stop)
-					m_ud_border_on = 1;
-				else
-				{
-					if (SCREENON)
-					{
-						if (m_rasterline == m_dy_start)
-							m_border_on = m_ud_border_on = 0;
-						else
-							if (m_ud_border_on == 0)
-								m_border_on = 0;
-					} else
-						if (m_ud_border_on == 0)
-							m_border_on = 0;
-				}
-			}
-
-			// Third sample of border state
-			m_border_on_sample[2] = m_border_on;
-
-			[[fallthrough]]; // FIXME: really?
-
-		// Graphics
-
-		case 19:
-		case 20:
-		case 21:
-		case 22:
-		case 23:
-		case 24:
-		case 25:
-		case 26:
-		case 27:
-		case 28:
-		case 29:
-		case 30:
-		case 31:
-		case 32:
-		case 33:
-		case 34:
-		case 35:
-		case 36:
-		case 37:
-		case 38:
-		case 39:
-		case 40:
-		case 41:
-		case 42:
-		case 43:
-		case 44:
-		case 45:
-		case 46:
-		case 47:
-		case 48:
-		case 49:
-		case 50:
-		case 51:
-		case 52:
-		case 53:
-		case 54:
-			bad_line_ba();
-
-			draw_graphics();
-			sample_border();
-			graphics_access();
-			fetch_if_bad_line();
-			matrix_access();
-			m_last_char_data = m_char_data;
-
-			m_cycle++;
-			break;
-
-		// Graphics, sprite y expansion, sprite DMA
-		case 55:
-			if (m_is_bad_line)
-				set_ba(ASSERT_LINE);
-
-			draw_graphics();
-			sample_border();
-			graphics_access();
-			display_if_bad_line();
-
-			// sprite y expansion
-			mask = 1;
-			for (i = 0; i < 8; i++, mask <<= 1)
-				if (SPRITE_Y_EXPAND (i))
-					m_spr_exp_y ^= mask;
-
-			check_sprite_dma();
-
-			m_cycle++;
-			break;
-
-		// Check border, sprite DMA
-		case 56:
-			if (!COLUMNS40)
-				m_border_on = 1;
-
-			// Fourth sample of border state
-			m_border_on_sample[3] = m_border_on;
-
-			draw_graphics();
-			sample_border();
-			idle_access();
-			display_if_bad_line();
-			check_sprite_dma();
-
-			m_cycle++;
-			break;
-
-		// Check border, sprites
-		case 57:
-			if (COLUMNS40)
-				m_border_on = 1;
-
-			// Fifth sample of border state
-			m_border_on_sample[4] = m_border_on;
-
-			// Sample spr_disp_on and spr_data for sprite drawing
-			m_spr_draw = m_spr_disp_on;
-			if (m_spr_draw)
-				memcpy(m_spr_draw_data, m_spr_data, 8 * 4);
-
-			mask = 1;
-			for (i = 0; i < 8; i++, mask <<= 1)
-				if ((m_spr_disp_on & mask) && !(m_spr_dma_on & mask))
-					m_spr_disp_on &= ~mask;
-
-			draw_background();
-			sample_border();
-			idle_access();
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 0, sprite DMA, MC, RC
-		case 58:
-			draw_background();
-			sample_border();
-
-			mask = 1;
-			for (i = 0; i < 8; i++, mask <<= 1)
-			{
-				m_mc[i] = m_mc_base[i];
-				if ((m_spr_dma_on & mask) && ((m_rasterline & 0xff) == SPRITE_Y_POS(i)))
-					m_spr_disp_on |= mask;
-			}
-
-			spr_ptr_access(0);
-			spr_data_access(0, 0);
-
-			if (m_rc == 7)
-			{
-				m_vc_base = m_vc;
-				m_display_state = 0;
-			}
-
-			if (m_is_bad_line || m_display_state)
-			{
-				m_display_state = 1;
-				m_rc = (m_rc + 1) & 7;
-			}
-
-			m_cycle++;
-			break;
-
-		// Sprite 0
-		case 59:
-			draw_background();
-			sample_border();
-			spr_data_access(0, 1);
-			spr_data_access(0, 2);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 1, draw
-		case 60:
-			draw_background();
-			sample_border();
-
-			if (m_draw_this_line)
-			{
-				draw_sprites();
-
-				if (m_border_on_sample[0])
-					for (i = 0; i < 4; i++)
-						m_bitmap.plot_box(VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(m_rasterline), 8, 1, m_palette[m_border_color_sample[i]]);
-
-				if (m_border_on_sample[1])
-					m_bitmap.plot_box(VIC2_X_2_EMU(4 * 8), VIC2_RASTER_2_EMU(m_rasterline), 8, 1, m_palette[m_border_color_sample[4]]);
-
-				if (m_border_on_sample[2])
-					for (i = 5; i < 43; i++)
-						m_bitmap.plot_box(VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(m_rasterline), 8, 1, m_palette[m_border_color_sample[i]]);
-
-				if (m_border_on_sample[3])
-					m_bitmap.plot_box(VIC2_X_2_EMU(43 * 8), VIC2_RASTER_2_EMU(m_rasterline), 8, 1, m_palette[m_border_color_sample[43]]);
-
-				if (m_border_on_sample[4])
-				{
-					for (i = 44; i < 48; i++)
-						m_bitmap.plot_box(VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(m_rasterline), 8, 1, m_palette[m_border_color_sample[i]]);
-					for (i = 48; i < 51; i++)
-						m_bitmap.plot_box(VIC2_X_2_EMU(i * 8), VIC2_RASTER_2_EMU(m_rasterline), 8, 1, m_palette[m_border_color_sample[47]]);
-				}
-			}
-
-			spr_ptr_access(1);
-			spr_data_access(1, 0);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 1
-		case 61:
-			spr_data_access(1, 1);
-			spr_data_access(1, 2);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 2
-		case 62:
-			spr_ptr_access(2);
-			spr_data_access(2, 0);
-			display_if_bad_line();
-
-			m_cycle++;
-			break;
-
-		// Sprite 2
-		case 63:
-			spr_data_access(2, 1);
-			spr_data_access(2, 2);
-			display_if_bad_line();
-
-			if (m_rasterline == m_dy_stop)
-				m_ud_border_on = 1;
-			else
-				if (SCREENON && (m_rasterline == m_dy_start))
-					m_ud_border_on = 0;
-
-			// Last cycle
-			m_cycle = 1;
-		}
-
-		spr_ba(cycle, 55);
-
-		m_phi0 = 1;
-		set_aec(BIT(m_aec_delay, 2));
-
-		m_write_ba(m_ba);
-		m_write_aec(m_aec);
-
-		m_raster_x += 8;
-		if (m_raster_x == 0x1fc) m_raster_x = 0x004;
-
-		m_icount--;
-	} while (m_icount > 0);
-}
-
-// Graphics display (8 pixels)
-void mos6566_device::draw_graphics()
-{
-	if (m_draw_this_line == 0)
-	{
-		uint16_t p = m_graphic_x + XSCROLL;
-		m_fore_coll_buf[p + 7] = 0;
-		m_fore_coll_buf[p + 6] = 0;
-		m_fore_coll_buf[p + 5] = 0;
-		m_fore_coll_buf[p + 4] = 0;
-		m_fore_coll_buf[p + 3] = 0;
-		m_fore_coll_buf[p + 2] = 0;
-		m_fore_coll_buf[p + 1] = 0;
-		m_fore_coll_buf[p + 0] = 0;
-	}
-	else if (m_ud_border_on)
-	{
-		uint16_t p = m_graphic_x + XSCROLL;
-		m_fore_coll_buf[p + 7] = 0;
-		m_fore_coll_buf[p + 6] = 0;
-		m_fore_coll_buf[p + 5] = 0;
-		m_fore_coll_buf[p + 4] = 0;
-		m_fore_coll_buf[p + 3] = 0;
-		m_fore_coll_buf[p + 2] = 0;
-		m_fore_coll_buf[p + 1] = 0;
-		m_fore_coll_buf[p + 0] = 0;
-		draw_background();
-	}
-	else
-	{
-		uint8_t tmp_col;
-		uint16_t p = m_graphic_x + XSCROLL;
-		switch (GFXMODE)
-		{
-			case 0:
-				draw_mono(p, m_colors[0], m_color_data & 0x0f);
-				break;
-			case 1:
-				if (m_color_data & 0x08)
-					draw_multi(p, m_colors[0], m_colors[1], m_colors[2], m_color_data & 0x07);
-				else
-					draw_mono(p, m_colors[0], m_color_data & 0x0f);
-				break;
-			case 2:
-				draw_mono(p, m_char_data & 0x0f, m_char_data >> 4);
-				break;
-			case 3:
-				draw_multi(p, m_colors[0], m_char_data >> 4, m_char_data & 0x0f, m_color_data & 0x0f);
-				break;
-			case 4:
-				if (m_char_data & 0x80)
-					if (m_char_data & 0x40)
-						tmp_col = m_colors[3];
-					else
-						tmp_col = m_colors[2];
-				else
-					if (m_char_data & 0x40)
-						tmp_col = m_colors[1];
-					else
-						tmp_col = m_colors[0];
-				draw_mono(p, tmp_col, m_color_data & 0x0f);
-				break;
-			case 5:
-			case 6:
-			case 7:
-				m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 7) = m_palette[0];
-				m_fore_coll_buf[p + 7] = 0;
-				m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 6) = m_palette[0];
-				m_fore_coll_buf[p + 6] = 0;
-				m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 5) = m_palette[0];
-				m_fore_coll_buf[p + 5] = 0;
-				m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 4) = m_palette[0];
-				m_fore_coll_buf[p + 4] = 0;
-				m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 3) = m_palette[0];
-				m_fore_coll_buf[p + 3] = 0;
-				m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 2) = m_palette[0];
-				m_fore_coll_buf[p + 2] = 0;
-				m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 1) = m_palette[0];
-				m_fore_coll_buf[p + 1] = 0;
-				m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + 0) = m_palette[0];
-				m_fore_coll_buf[p + 0] = 0;
-				break;
-		}
-	}
-}
-
-void mos6566_device::draw_sprites()
-{
-	int i;
-	uint8_t snum, sbit;
-	uint8_t spr_coll = 0, gfx_coll = 0;
-	uint32_t plane0_l, plane0_r, plane1_l, plane1_r;
-	uint32_t sdata_l, sdata_r;
-
-	for (i = 0; i < 0x400; i++)
-		m_spr_coll_buf[i] = 0;
-
-	for (snum = 0, sbit = 1; snum < 8; snum++, sbit <<= 1)
-	{
-		if ((m_spr_draw & sbit) && (SPRITE_X_POS(snum) <= (403 - (VIC2_FIRSTCOLUMN + 1))))
-		{
-			uint16_t p = SPRITE_X_POS(snum) + VIC2_X_2_EMU(0) + 8;
-			uint8_t color = SPRITE_COLOR(snum);
-			uint32_t sdata = (m_spr_draw_data[snum][0] << 24) | (m_spr_draw_data[snum][1] << 16) | (m_spr_draw_data[snum][2] << 8);
-
-			if (SPRITE_X_EXPAND(snum))
-			{
-				if (SPRITE_X_POS(snum) > (403 - 24 - (VIC2_FIRSTCOLUMN + 1)))
-					continue;
-
-				if (SPRITE_MULTICOLOR(snum))
-				{
-					sdata_l = (m_expandx_multi[(sdata >> 24) & 0xff] << 16) | m_expandx_multi[(sdata >> 16) & 0xff];
-					sdata_r = m_expandx_multi[(sdata >> 8) & 0xff] << 16;
-					plane0_l = (sdata_l & 0x55555555) | (sdata_l & 0x55555555) << 1;
-					plane1_l = (sdata_l & 0xaaaaaaaa) | (sdata_l & 0xaaaaaaaa) >> 1;
-					plane0_r = (sdata_r & 0x55555555) | (sdata_r & 0x55555555) << 1;
-					plane1_r = (sdata_r & 0xaaaaaaaa) | (sdata_r & 0xaaaaaaaa) >> 1;
-					for (i = 0; i < 32; i++, plane0_l <<= 1, plane1_l <<= 1)
-					{
-						uint8_t col;
-
-						if (plane1_l & 0x80000000)
-						{
-							if (m_fore_coll_buf[p + i])
-							{
-								gfx_coll |= sbit;
-							}
-							if (plane0_l & 0x80000000)
-								col = m_spritemulti[3];
-							else
-								col = color;
-						}
-						else
-						{
-							if (plane0_l & 0x80000000)
-							{
-								if (m_fore_coll_buf[p + i])
-								{
-									gfx_coll |= sbit;
-								}
-								col = m_spritemulti[1];
-							}
-							else
-								continue;
-						}
-
-						if (m_spr_coll_buf[p + i])
-							spr_coll |= m_spr_coll_buf[p + i] | sbit;
-						else
-						{
-							if (SPRITE_PRIORITY(snum))
-							{
-								if (m_fore_coll_buf[p + i] == 0)
-									m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = m_palette[col];
-								m_spr_coll_buf[p + i] = sbit;
-							}
-							else
-							{
-								m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = m_palette[col];
-								m_spr_coll_buf[p + i] = sbit;
-							}
-						}
-					}
-
-					for (; i < 48; i++, plane0_r <<= 1, plane1_r <<= 1)
-					{
-						uint8_t col;
-
-						if(plane1_r & 0x80000000)
-						{
-							if (m_fore_coll_buf[p + i])
-							{
-								gfx_coll |= sbit;
-							}
-
-							if (plane0_r & 0x80000000)
-								col = m_spritemulti[3];
-							else
-								col = color;
-						}
-						else
-						{
-							if (plane0_r & 0x80000000)
-							{
-								if (m_fore_coll_buf[p + i])
-								{
-									gfx_coll |= sbit;
-								}
-								col =  m_spritemulti[1];
-							}
-							else
-								continue;
-						}
-
-						if (m_spr_coll_buf[p + i])
-							spr_coll |= m_spr_coll_buf[p + i] | sbit;
-						else
-						{
-							if (SPRITE_PRIORITY(snum))
-							{
-								if (m_fore_coll_buf[p + i] == 0)
-									m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = m_palette[col];
-								m_spr_coll_buf[p + i] = sbit;
-							}
-							else
-							{
-								m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = m_palette[col];
-								m_spr_coll_buf[p + i] = sbit;
-							}
-						}
-					}
-				}
-				else
-				{
-					sdata_l = (m_expandx[(sdata >> 24) & 0xff] << 16) | m_expandx[(sdata >> 16) & 0xff];
-					sdata_r = m_expandx[(sdata >> 8) & 0xff] << 16;
-
-					for (i = 0; i < 32; i++, sdata_l <<= 1)
-						if (sdata_l & 0x80000000)
-						{
-							if (m_fore_coll_buf[p + i])
-							{
-								gfx_coll |= sbit;
-							}
-
-							if (m_spr_coll_buf[p + i])
-								spr_coll |= m_spr_coll_buf[p + i] | sbit;
-							else
-							{
-								if (SPRITE_PRIORITY(snum))
-								{
-									if (m_fore_coll_buf[p + i] == 0)
-										m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = m_palette[color];
-									m_spr_coll_buf[p + i] = sbit;
-								}
-								else
-								{
-									m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = m_palette[color];
-									m_spr_coll_buf[p + i] = sbit;
-								}
-							}
-						}
-
-					for (; i < 48; i++, sdata_r <<= 1)
-						if (sdata_r & 0x80000000)
-						{
-							if (m_fore_coll_buf[p + i])
-							{
-								gfx_coll |= sbit;
-							}
-
-							if (m_spr_coll_buf[p + i])
-								spr_coll |= m_spr_coll_buf[p + i] | sbit;
-							else
-							{
-								if (SPRITE_PRIORITY(snum))
-								{
-									if (m_fore_coll_buf[p + i] == 0)
-										m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = m_palette[color];
-									m_spr_coll_buf[p + i] = sbit;
-								}
-								else
-								{
-									m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = m_palette[color];
-									m_spr_coll_buf[p + i] = sbit;
-								}
-							}
-						}
-				}
-			}
-			else
-			{
-				if (SPRITE_MULTICOLOR(snum))
-				{
-					uint32_t plane0 = (sdata & 0x55555555) | (sdata & 0x55555555) << 1;
-					uint32_t plane1 = (sdata & 0xaaaaaaaa) | (sdata & 0xaaaaaaaa) >> 1;
-
-					for (i = 0; i < 24; i++, plane0 <<= 1, plane1 <<= 1)
-					{
-						uint8_t col;
-
-						if (plane1 & 0x80000000)
-						{
-							if (m_fore_coll_buf[p + i])
-							{
-								gfx_coll |= sbit;
-							}
-
-							if (plane0 & 0x80000000)
-								col = m_spritemulti[3];
-							else
-								col = color;
-						}
-						else
-						{
-							if (plane0 & 0x80000000)
-							{
-								if (m_fore_coll_buf[p + i])
-								{
-									gfx_coll |= sbit;
-								}
-
-								col = m_spritemulti[1];
-							}
-							else
-								continue;
-						}
-
-						if (m_spr_coll_buf[p + i])
-							spr_coll |= m_spr_coll_buf[p + i] | sbit;
-						else
-						{
-							if (SPRITE_PRIORITY(snum))
-							{
-								if (m_fore_coll_buf[p + i] == 0)
-									m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = m_palette[col];
-								m_spr_coll_buf[p + i] = sbit;
-							}
-							else
-							{
-								m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = m_palette[col];
-								m_spr_coll_buf[p + i] = sbit;
-							}
-						}
-					}
-				}
-				else
-				{
-					for (i = 0; i < 24; i++, sdata <<= 1)
-					{
-						if (sdata & 0x80000000)
-						{
-							if (m_fore_coll_buf[p + i])
-							{
-								gfx_coll |= sbit;
-							}
-							if (m_spr_coll_buf[p + i])
-							{
-								spr_coll |= m_spr_coll_buf[p + i] | sbit;
-							}
-							else
-							{
-								if (SPRITE_PRIORITY(snum))
-								{
-									if (m_fore_coll_buf[p + i] == 0)
-										m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = m_palette[color];
-									m_spr_coll_buf[p + i] = sbit;
-								}
-								else
-								{
-									m_bitmap.pix(VIC2_RASTER_2_EMU(m_rasterline), p + i) = m_palette[color];
-									m_spr_coll_buf[p + i] = sbit;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	if (SPRITE_COLL)
-		SPRITE_COLL |= spr_coll;
-	else
-	{
-		SPRITE_COLL = spr_coll;
-		if (SPRITE_COLL)
-			set_interrupt(IRQ_MMC);
-	}
-
-	if (SPRITE_BG_COLL)
-		SPRITE_BG_COLL |= gfx_coll;
-	else
-	{
-		SPRITE_BG_COLL = gfx_coll;
-		if (SPRITE_BG_COLL)
-			set_interrupt(IRQ_MBC);
-	}
-}
-
-
-//-------------------------------------------------
-//  screen_update -
-//-------------------------------------------------
 
 uint32_t mos6566_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette[m_on ? 0 : BACKGROUNDCOLOR], cliprect);
-
-	if (m_on)
-		copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
-
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
 
-//-------------------------------------------------
-//  read -
-//-------------------------------------------------
-
 uint8_t mos6566_device::read(offs_t offset)
 {
-	uint8_t val = 0;
-
 	offset &= 0x3f;
+
+	if (is_viciie() && (offset == 0x2f || offset == 0x30))
+		return m_reg[offset];
+
+	uint8_t val;
 
 	switch (offset)
 	{
-	case 0x11:
-		val = (m_reg[offset] & ~0x80) | ((m_rasterline & 0x100) >> 1);
-		val |= UNUSED_BITS[offset];
+	case REGISTER_CR1:
+		val = (m_reg[offset] & 0x7f) | (BIT(m_rasterline, 8) << 7);
 		break;
 
-	case 0x12:
+	case REGISTER_RASTER:
 		val = m_rasterline & 0xff;
-		val |= UNUSED_BITS[offset];
 		break;
 
-	case 0x16:
+	case REGISTER_CR2:
 		val = m_reg[offset] | 0xc0;
-		val |= UNUSED_BITS[offset];
 		break;
 
-	case 0x18:
+	case REGISTER_MEMORY:
 		val = m_reg[offset] | 0x01;
-		val |= UNUSED_BITS[offset];
 		break;
 
-	case 0x19:                          /* interrupt flag register */
-		/* clear_interrupt(0xf); */
-		val = m_reg[offset] | 0x70;
-		val |= UNUSED_BITS[offset];
+	case 0x19:
+		if (!machine().side_effects_disabled())
+			draw_until(m_cycle_dot + PHI2_START + COLLISION_READ_DELAY);
+		val = m_irq_flags | 0x70 | (m_irq_out ? 0x80 : 0x00);
 		break;
 
 	case 0x1a:
-		val = m_reg[offset] | 0xf0;
-		val |= UNUSED_BITS[offset];
+		val = m_irq_enable | 0xf0;
 		break;
 
-	case 0x1e:                          /* sprite to sprite collision detect */
+	case REGISTER_MM:
+	case REGISTER_MD:
+		if (!machine().side_effects_disabled())
+			draw_until(m_cycle_dot + PHI2_START + COLLISION_READ_DELAY);
 		val = m_reg[offset];
-		m_reg[offset] = 0;
-		clear_interrupt(4);
-		val |= UNUSED_BITS[offset];
-		break;
-
-	case 0x1f:                          /* sprite to background collision detect */
-		val = m_reg[offset];
-		m_reg[offset] = 0;
-		clear_interrupt(2);
-		val |= UNUSED_BITS[offset];
-		break;
-
-	case 0x20:
-	case 0x21:
-	case 0x22:
-	case 0x23:
-	case 0x24:
-		val = m_reg[offset];
-		val |= UNUSED_BITS[offset];
-		break;
-
-	case 0x00:
-	case 0x01:
-	case 0x02:
-	case 0x03:
-	case 0x04:
-	case 0x05:
-	case 0x06:
-	case 0x07:
-	case 0x08:
-	case 0x09:
-	case 0x0a:
-	case 0x0b:
-	case 0x0c:
-	case 0x0d:
-	case 0x0e:
-	case 0x0f:
-	case 0x10:
-	case 0x17:
-	case 0x1b:
-	case 0x1c:
-	case 0x1d:
-	case 0x25:
-	case 0x26:
-	case 0x27:
-	case 0x28:
-	case 0x29:
-	case 0x2a:
-	case 0x2b:
-	case 0x2c:
-	case 0x2d:
-	case 0x2e:
-		val = m_reg[offset];
-		val |= UNUSED_BITS[offset];
-		break;
-
-	case REGISTER_KCR:
-	case REGISTER_FAST:
-		if (IS_VICIIE)
+		if (!machine().side_effects_disabled())
 		{
-			val = m_reg[offset];
-			DBG_LOG(2, "vic read", ("%.2x:%.2x\n", offset, val));
+			m_reg[offset] = 0;
+			m_coll_clear[offset - REGISTER_MM] = m_dot + COLLISION_CLEAR_HOLD;
 		}
-		else
-		{
-			val |= UNUSED_BITS[offset];
-		}
-		break;
-
-	case 0x31:
-	case 0x32:
-	case 0x33:
-	case 0x34:
-	case 0x35:
-	case 0x36:
-	case 0x37:
-	case 0x38:
-	case 0x39:
-	case 0x3a:
-	case 0x3b:
-	case 0x3c:
-	case 0x3d:
-	case 0x3e:
-	case 0x3f:                          /* not used */
-		DBG_LOG(2, "vic read", ("%.2x:%.2x\n", offset, val));
-		val |= UNUSED_BITS[offset];
 		break;
 
 	default:
-		val = m_reg[offset];
-		val |= UNUSED_BITS[offset];
+		val = (offset < 0x2f) ? m_reg[offset] : 0;
+		break;
 	}
 
-	if ((offset != 0x11) && (offset != 0x12))
-		DBG_LOG(2, "vic read", ("%.2x:%.2x\n", offset, val));
+	val |= UNUSED_BITS[offset];
+	if (m_bus_slot >= 0 && !machine().side_effects_disabled())
+		m_spr_byte[m_bus_slot / 3][m_bus_slot % 3] = val;
 
 	return val;
 }
 
 
-//-------------------------------------------------
-//  write -
-//-------------------------------------------------
-
 void mos6566_device::write(offs_t offset, uint8_t data)
 {
-	DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
 	offset &= 0x3f;
 
-	switch (offset)
+	if (m_bus_slot >= 0)
+		m_spr_byte[m_bus_slot / 3][m_bus_slot % 3] = data;
+
+	if (is_viciie())
 	{
-	case 0x01:
-	case 0x03:
-	case 0x05:
-	case 0x07:
-	case 0x09:
-	case 0x0b:
-	case 0x0d:
-	case 0x0f:
-		m_reg[offset] = data;       /* sprite y positions */
-		break;
-
-	case 0x00:
-	case 0x02:
-	case 0x04:
-	case 0x06:
-	case 0x08:
-	case 0x0a:
-	case 0x0c:
-	case 0x0e:
-		m_reg[offset] = data;       /* sprite x positions */
-		break;
-
-	case 0x10:
-		m_reg[offset] = data;       /* sprite x positions */
-		break;
-
-	case 0x17:                          /* sprite y size */
-		m_spr_exp_y |= ~data;
-		if (m_reg[offset] != data)
-		{
-			m_reg[offset] = data;
-		}
-		break;
-
-	case 0x1d:                          /* sprite x size */
-		if (m_reg[offset] != data)
-		{
-			m_reg[offset] = data;
-		}
-		break;
-
-	case 0x1b:                          /* sprite background priority */
-		if (m_reg[offset] != data)
-		{
-			m_reg[offset] = data;
-		}
-		break;
-
-	case 0x1c:                          /* sprite multicolor mode select */
-		if (m_reg[offset] != data)
-		{
-			m_reg[offset] = data;
-		}
-		break;
-
-	case 0x27:
-	case 0x28:
-	case 0x29:
-	case 0x2a:
-	case 0x2b:
-	case 0x2c:
-	case 0x2d:
-	case 0x2e:
-									/* sprite colors */
-		if (m_reg[offset] != data)
-		{
-			m_reg[offset] = data;
-		}
-		break;
-
-	case 0x25:                          /* sprite multicolor */
-		if (m_reg[offset] != data)
-		{
-			m_reg[offset] = data;
-			m_spritemulti[1] = SPRITE_MULTICOLOR1;
-		}
-		break;
-
-	case 0x26:                          /* sprite multicolor */
-		if (m_reg[offset] != data)
-		{
-			m_reg[offset] = data;
-			m_spritemulti[3] = SPRITE_MULTICOLOR2;
-		}
-		break;
-
-	case 0x19:
-		clear_interrupt(data & 0x0f);
-		break;
-
-	case 0x1a:                          /* irq mask */
-		m_reg[offset] = data;
-		set_interrupt(0);   // beamrider needs this
-		clear_interrupt(0);
-		break;
-
-	case 0x11:
-		if (m_reg[offset] != data)
-		{
-			m_reg[offset] = data;
-			if (data & 8)
-			{
-				m_dy_start = ROW25_YSTART;
-				m_dy_stop = ROW25_YSTOP;
-			}
-			else
-			{
-				m_dy_start = ROW24_YSTART;
-				m_dy_stop = ROW24_YSTOP;
-			}
-		}
-		break;
-
-	case 0x12:
-		if (data != m_reg[offset])
-		{
-			m_reg[offset] = data;
-		}
-		break;
-
-	case 0x16:
-		if (m_reg[offset] != data)
-		{
-			m_reg[offset] = data;
-		}
-		break;
-
-	case 0x18:
-		if (m_reg[offset] != data)
-		{
-			m_reg[offset] = data;
-			m_videoaddr = VIDEOADDR;
-			m_chargenaddr = CHARGENADDR;
-			m_bitmapaddr = BITMAPADDR;
-		}
-		break;
-
-	case 0x21:                          /* background color */
-		if (m_reg[offset] != data)
-		{
-			m_reg[offset] = data;
-			m_colors[0] = BACKGROUNDCOLOR;
-		}
-		break;
-
-	case 0x22:                          /* background color 1 */
-		if (m_reg[offset] != data)
-		{
-			m_reg[offset] = data;
-			m_colors[1] = MULTICOLOR1;
-		}
-		break;
-
-	case 0x23:                          /* background color 2 */
-		if (m_reg[offset] != data)
-		{
-			m_reg[offset] = data;
-			m_colors[2] = MULTICOLOR2;
-		}
-		break;
-
-	case 0x24:                          /* background color 3 */
-		if (m_reg[offset] != data)
-		{
-			m_reg[offset] = data;
-			m_colors[3] = FOREGROUNDCOLOR;
-		}
-		break;
-
-	case 0x20:                          /* framecolor */
-		if (m_reg[offset] != data)
-		{
-			m_reg[offset] = data;
-		}
-		break;
-
-	case REGISTER_KCR:
-		if (IS_VICIIE)
+		if (offset == 0x2f)
 		{
 			m_reg[offset] = data | 0xf8;
-
-			m_write_k((offs_t)0, data & 0x07);
+			m_write_k(0, data & 7);
+			return;
 		}
-		break;
-
-	case REGISTER_FAST:
-		if (IS_VICIIE)
+		if (offset == 0x30)
 		{
 			if (BIT(m_reg[offset], 0) != BIT(data, 0))
 			{
 				m_cpu->abort_timeslice();
 				m_fast_timer->adjust(attotime::zero, BIT(data, 0));
 			}
-
 			m_reg[offset] = data | 0xfc;
-
-			m_on = !BIT(data, 0);
-
-			if (BIT(data, 0))
-				set_ba(ASSERT_LINE);
+			if (fast_mode())
+				set_ba(1);
+			return;
 		}
+	}
+
+	switch (offset)
+	{
+	case 0x19:
+		m_irq_flags &= ~(data & 0x0f);
+		update_irq();
 		break;
 
-	case 0x31:
-	case 0x32:
-	case 0x33:
-	case 0x34:
-	case 0x35:
-	case 0x36:
-	case 0x37:
-	case 0x38:
-	case 0x39:
-	case 0x3a:
-	case 0x3b:
-	case 0x3c:
-	case 0x3d:
-	case 0x3e:
-	case 0x3f:
+	case 0x1a:
+		m_irq_enable = data & 0x0f;
+		update_irq();
+		break;
+
+	case REGISTER_CR1:
+	case REGISTER_RASTER:
 		m_reg[offset] = data;
-		DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
+		queue_register(offset, data);
+		check_raster_irq();
+		if (m_rasterline == FIRST_BAD_LINE && BIT(m_reg[REGISTER_CR1], 4))
+			m_badlines_enabled = true;
+		break;
+
+	case REGISTER_MYE:
+		if (m_decode[m_cycle].strobes & DECODE_SPR_MCBASE)
+		{
+			for (int i = 0; i < 8; i++)
+			{
+				if (!BIT(data, i) && !BIT(m_spr_yff, i))
+					m_spr_mc[i] = (0x2a & (m_spr_mcbase[i] & m_spr_mc[i])) | (0x15 & (m_spr_mcbase[i] | m_spr_mc[i]));
+			}
+		}
+		m_reg[offset] = data;
+		queue_register(offset, data);
+		m_spr_yff |= ~data;
+		break;
+
+	case REGISTER_MM:
+	case REGISTER_MD:
+	case REGISTER_LPX:
+	case REGISTER_LPY:
 		break;
 
 	default:
-		m_reg[offset] = data;
+		if (offset < 0x2f)
+		{
+			m_reg[offset] = data;
+			queue_register(offset, data);
+		}
 		break;
 	}
 }
 
 
-//-------------------------------------------------
-//  lp_w - light pen strobe
-//-------------------------------------------------
-
 void mos6566_device::lp_w(int state)
 {
-	if (m_lp && !state && !m_lp_latched_this_frame)
-	{
-		m_reg[REGISTER_LPX] = m_raster_x >> 1;
-		m_reg[REGISTER_LPY] = m_rasterline;
-		m_lp_latched_this_frame = true;
-
-		set_interrupt(IRQ_LP);
-	}
+	if (m_lp && !state)
+		m_lp_pending = true;
 
 	m_lp = state;
 }
 
-
-//-------------------------------------------------
-//  time_until_pos - time until the chip's own
-//  raster_x/rasterline counters (the ones lp_w
-//  latches into LPX/LPY) reach the given position
-//-------------------------------------------------
-
-attotime mos6566_device::time_until_pos(int rasterline, int raster_x) const
+void mos6566_device::trigger_lightpen(int cycle)
 {
-	// m_raster_x holds 0x004, 0x00c, ..., 0x1f4 (0x1fc is skipped by the
-	// wraparound check in execute_run()), so it free-runs on a 63-value
-	// cycle regardless of variant - NOT 64, and NOT tied to cycles_per_line
-	// (65 on NTSC, 63 on PAL).
-	int constexpr raster_x_period = ((0x1f4 - 0x004) / 8) + 1;
+	m_lp_pending = false;
 
-	int const cycles_per_line = VIC2_CYCLESPERLINE;
+	if (m_lp_latched_this_frame)
+		return;
 
-	int lines_to_advance = (rasterline - m_rasterline + VIC2_LINES) % VIC2_LINES;
-	if (lines_to_advance == 0)
-		lines_to_advance = VIC2_LINES;
+	m_lp_latched_this_frame = true;
 
-	u64 cycles_to_line_start = u64(cycles_per_line - m_cycle + 1) + u64(lines_to_advance - 1) * cycles_per_line;
+	if (m_rasterline == m_timing.lines - 1 && cycle != 1)
+		return;
 
-	int const current_x_index = (m_raster_x / 8) % raster_x_period;
-	int const target_x_index = ((raster_x / 8) % raster_x_period + raster_x_period) % raster_x_period;
-	int const index_at_line_start = (current_x_index + int(cycles_to_line_start % raster_x_period)) % raster_x_period;
+	m_reg[REGISTER_LPX] = ((m_raster_x & ~7) >> 1) + m_process.lightpen_x_offset;
+	m_reg[REGISTER_LPY] = m_rasterline & 0xff;
 
-	// raster_x_period <= cycles_per_line always, so the soonest match is
-	// always within the target line itself.
-	int const delta = (target_x_index - index_at_line_start + raster_x_period) % raster_x_period;
-
-	return clocks_to_attotime(cycles_to_line_start + delta);
+	if (!m_process.lightpen_frame_irq_only)
+		raise_irq(IRQ_LP);
 }
 
 
-//-------------------------------------------------
-//  time_until_lightpen_pos - time_until_pos(),
-//  taking a crosshair position (0-255 across the
-//  visible picture, matching vcs_lightpen_device's
-//  LIGHTX/LIGHTY convention) instead of raw chip
-//  coordinates
-//-------------------------------------------------
+attotime mos6566_device::time_until_pos(int rasterline, int raster_x) const
+{
+	int target = 1;
+	for (int cycle = 1; cycle <= m_timing.cycles_per_line; cycle++)
+	{
+		if ((phase_x(2 * (cycle - 1)) >> 3) == ((raster_x % m_timing.line_pixels) >> 3))
+		{
+			target = cycle;
+			break;
+		}
+	}
+
+	int lines_to_advance = (rasterline - m_beam_line + m_timing.lines) % m_timing.lines;
+	if (lines_to_advance == 0)
+		lines_to_advance = m_timing.lines;
+
+	uint64_t const cycles = uint64_t(m_timing.cycles_per_line - m_cycle + 1) + uint64_t(lines_to_advance - 1) * m_timing.cycles_per_line + (target - 1);
+
+	return cycles_to_attotime(cycles);
+}
 
 attotime mos6566_device::time_until_lightpen_pos(int x255, int y255) const
 {
-	int const visible_lines = IS_PAL ? VIC6569_VISIBLELINES : VIC6567_VISIBLELINES;
-	int const target_rasterline = (VIC2_FIRST_DISP_LINE + (y255 * visible_lines) / 256) % VIC2_LINES;
+	int const first_line = is_ntsc() ? VIC6567_FIRST_DISP_LINE : VIC6569_FIRST_DISP_LINE;
+	int const first_column = is_ntsc() ? VIC6567_FIRST_COLUMN : VIC6569_FIRST_COLUMN;
+	int const visible_lines = is_ntsc() ? VIC6567_VISIBLELINES : VIC6569_VISIBLELINES;
+	int const visible_columns = is_ntsc() ? VIC6567_VISIBLECOLUMNS : VIC6569_VISIBLECOLUMNS;
 
-	int const columns_total = IS_PAL ? VIC6569_COLUMNS : VIC6567_COLUMNS;
-	int const visible_columns = IS_PAL ? VIC6569_VISIBLECOLUMNS : VIC6567_VISIBLECOLUMNS;
+	int const line = (first_line + (y255 * visible_lines) / 256) % m_timing.lines;
+	int const column = first_column + (x255 * visible_columns) / 256;
+	int const latency = is_ntsc() ? LIGHTPEN_LATENCY_NTSC : LIGHTPEN_LATENCY_PAL;
+	int const x = (phase_x(column >> 2) + (column & 3) + latency) % m_timing.line_pixels;
 
-	int constexpr BITMAP_X_TO_RASTER_X = 17; // hand-tuned
-	int const target_raster_x = ((x255 * visible_columns) / 256 + BITMAP_X_TO_RASTER_X + columns_total) % columns_total;
-
-	return time_until_pos(target_rasterline, target_raster_x);
+	return time_until_pos(line, x);
 }

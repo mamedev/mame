@@ -19,6 +19,7 @@
 #include "mda.h"
 #include "num9rev.h"
 #include "pgc.h"
+#include "proga.h"
 #include "svga_cirrus.h"
 #include "svga_paradise.h"
 #include "svga_s3.h"
@@ -177,6 +178,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("ibm_speech", ISA8_IBM_SPEECH);
 	device.option_add("zxbus_adapter", ISA8_ZXBUS);
 	device.option_add("ubpnic", ISA8_UBPNIC);
+	device.option_add("proga", ISA8_PROGA);
 }
 
 void pc_isa16_cards(device_slot_interface &device)

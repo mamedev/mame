@@ -1339,70 +1339,177 @@ void naomi_state::naomi_map(address_map &map)
  * Naomi 2 address map
  */
 
-// example hookup for accessing both PVRs, to be extended to everything else.
-void naomi2_state::both_pvr2_ta_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
+// Each CLX2 has a complete system bus block, interrupt controller included.
+// The game enables different interrupts on each (VBlank only comes from the first one),
+// the outputs are merged on their way to the SH-4.
+uint64_t naomi2_state::clxb_sysctrl_r(offs_t offset, uint64_t mem_mask)
 {
-	space.write_dword(0x005f8000|offset*4, data, mem_mask);
-	space.write_dword(0x025f8000|offset*4, data, mem_mask);
+	const int shift = (mem_mask & 0xffffffff) ? 0 : 32;
+	const int reg = (offset * 2) + (shift ? 1 : 0);
+
+	return uint64_t(m_clxb_sysctrl_regs[reg]) << shift;
 }
 
-// 315-6289 "ELAN" T&L chip registers
-// Stands between the two PVRs and mixes their output, applies T&L via commands at 0x09000000.
-// It's also responsible of enable/disable broadcast mode (i.e. writes to both PVRs)
-// and "macro tiler" config (?)
-// TODO: move to specific device once we have enough information about the inner workings
-uint32_t naomi2_state::elan_regs_r(offs_t offset)
+void naomi2_state::clxb_sysctrl_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
-	switch(offset)
+	const int shift = (mem_mask & 0xffffffff) ? 0 : 32;
+	const int reg = (offset * 2) + (shift ? 1 : 0);
+	const uint32_t dat = uint32_t(data >> shift);
+	const uint32_t old = m_clxb_sysctrl_regs[reg];
+
+	m_clxb_sysctrl_regs[reg] = dat;
+	switch (reg)
 	{
-		case 0x00/4: // ID chip
-			// TODO: BIOS gives a black screen with this as per now
-			// It boots to NAOMI2 logo if this is zeroed, which should be a debug mode.
-			// Is it expecting an irq from the macro tiler enabling?
-			// Also BIOS attempts to write on this reg, why?
-			return 0xe1ad0000;
-
-		case 0x04/4: // REVISION
-			return 0x12; //or 0x01?
-
-		case 0x10/4: // SH4 interface control (???)
-			/* ---- -x-- enable second PVR */
-			/* ---- --x- elan has channel 2 */
-			/* ---- ---x broadcast on cs1 (?) */
-			return 6;
-
-		case 0x14/4: // SDRAM refresh register
-			return 0x2029; //default 0x1429
-
-		case 0x1c/4: // SDRAM CFG
-			return 0xa7320961; //default 0xa7320961
-
-		case 0x30/4: // Macro tiler configuration, bit 0 is enable
-			return 0;
-
-		case 0x74/4: // IRQ STAT
-			return 0;
-
-		case 0x78/4: // IRQ MASK
-			// enables 0x3f on boot
-			return 0;
-
-		default:
-			logerror("%s: ELAN read %08x\n", machine().describe_context(),offset*4);
+		case SB_C2DST:
+			if (!(old & 1) && (dat & 1))
+			{
+				logerror("%s: CLXB ch2-DMA to %08x length %08x (unimplemented)\n", machine().describe_context(), m_clxb_sysctrl_regs[SB_C2DSTAT], m_clxb_sysctrl_regs[SB_C2DLEN]);
+			}
 			break;
+
+		case SB_SDST:
+			if (dat & 1)
+			{
+				logerror("%s: CLXB Sort-DMA (unimplemented)\n", machine().describe_context());
+				m_clxb_sysctrl_regs[SB_SDST] = 0;
+			}
+			break;
+
+		case SB_ISTNRM:
+		case SB_ISTEXT:
+		case SB_ISTERR:
+			interrupt_status_w(m_clxb_sysctrl_regs, reg, old, dat);
+			dc_update_interrupt_status();
+			break;
+
+		case SB_IML2NRM:
+		case SB_IML2EXT:
+		case SB_IML2ERR:
+		case SB_IML4NRM:
+		case SB_IML4EXT:
+		case SB_IML4ERR:
+		case SB_IML6NRM:
+		case SB_IML6EXT:
+		case SB_IML6ERR:
+			dc_update_interrupt_status();
+			break;
+	}
+}
+
+void naomi2_state::both_sysctrl_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+{
+	dc_sysctrl_w(offset, data, mem_mask);
+	clxb_sysctrl_w(offset, data, mem_mask);
+}
+
+void naomi2_state::clxb_pvr_irq(uint8_t data)
+{
+	pvr_irq_status(m_clxb_sysctrl_regs, data);
+	dc_update_interrupt_status();
+}
+
+int naomi2_state::dc_compute_interrupt_level()
+{
+	update_summary_bits(m_clxb_sysctrl_regs);
+
+	return std::max(interrupt_level(m_clxb_sysctrl_regs), naomi_state::dc_compute_interrupt_level());
+}
+
+void naomi2_state::machine_start()
+{
+	naomi_state::machine_start();
+
+	subdevice<screen_device>("screen")->register_screen_bitmap(m_clxb_bitmap);
+
+	save_item(NAME(m_clxb_sysctrl_regs));
+}
+
+void naomi2_state::machine_reset()
+{
+	naomi_state::machine_reset();
+
+	std::fill(std::begin(m_clxb_sysctrl_regs), std::end(m_clxb_sysctrl_regs), 0);
+	m_clxb_sysctrl_regs[SB_SBREV] = 0x0b;
+}
+
+// Each CLX2 renders part of the screen, and the video output switches between them.
+// The ELAN's macro tiler is what should decide on that.
+uint32_t naomi2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	m_powervr2->screen_update(screen, bitmap, cliprect);
+	m_powervr2_slave->screen_update(screen, m_clxb_bitmap, cliprect);
+
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		const uint32_t *const src = &m_clxb_bitmap.pix(y);
+		uint32_t *const dst = &bitmap.pix(y);
+
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		{
+			if (m_powervr2_slave->rendered_at(x, y) && !m_powervr2->rendered_at(x, y))
+			{
+				dst[x] = src[x];
+			}
+		}
 	}
 
 	return 0;
 }
 
-void naomi2_state::elan_regs_w(offs_t offset, uint32_t data)
+// The SH-4 can write to the memory of both CLX2s at once.
+template <int Area>
+void naomi2_state::vram_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
-	switch(offset)
+	uint64_t *const ram[4] = { dc_texture_ram.target(), dc_framebuffer_ram.target(), m_pvr2_texture_ram.target(), m_pvr2_framebuffer_ram.target() };
+
+	COMBINE_DATA(&ram[Area][offset]);
+	if (m_elan->broadcast() && !m_broadcasting)
 	{
-		default:
-			logerror("%s: ELAN write %08x %08x W\n", machine().describe_context(), offset*4, data);
-			break;
+		m_broadcasting = true;
+		space.write_qword(0x04000000 + ((Area ^ 2) << 24) + (offset << 3), data, mem_mask);
+		m_broadcasting = false;
 	}
+}
+
+template <int Chip>
+void naomi2_state::ta_fifo_poly_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+{
+	clx(Chip).ta_fifo_poly_w(offset, data, mem_mask);
+	if (m_elan->broadcast())
+	{
+		clx(Chip ^ 1).ta_fifo_poly_w(offset, data, mem_mask);
+	}
+}
+
+template <int Chip>
+void naomi2_state::ta_fifo_yuv_w(uint8_t data)
+{
+	clx(Chip).ta_fifo_yuv_w(data);
+	if (m_elan->broadcast())
+	{
+		clx(Chip ^ 1).ta_fifo_yuv_w(data);
+	}
+}
+
+template <int Chip>
+void naomi2_state::ta_texture_directpath_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+{
+	clx(Chip).ta_texture_directpath0_w(offset, data, mem_mask);
+	if (m_elan->broadcast())
+	{
+		clx(Chip ^ 1).ta_texture_directpath0_w(offset, data, mem_mask);
+	}
+}
+
+uint32_t naomi2_state::both_pvr2_ta_r(address_space &space, offs_t offset, uint32_t mem_mask)
+{
+	return space.read_dword(0x005f8000|offset*4, mem_mask);
+}
+
+void naomi2_state::both_pvr2_ta_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	space.write_dword(0x005f8000|offset*4, data, mem_mask);
+	space.write_dword(0x025f8000|offset*4, data, mem_mask);
 }
 
 void naomi2_state::naomi2_map(address_map &map)
@@ -1411,36 +1518,36 @@ void naomi2_state::naomi2_map(address_map &map)
 	map(0x005f7c00, 0x005f7cff).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).m(m_powervr2, FUNC(powervr2_device::ta_map));
 
+	map(0x005f6800, 0x005f69ff).rw(FUNC(dc_state::dc_sysctrl_r), FUNC(dc_state::dc_sysctrl_w));
+	map(0x025f6800, 0x025f69ff).rw(FUNC(naomi2_state::clxb_sysctrl_r), FUNC(naomi2_state::clxb_sysctrl_w));
 	map(0x025f7c00, 0x025f7cff).m(m_powervr2_slave, FUNC(powervr2_device::pd_dma_map));
 	map(0x025f8000, 0x025f9fff).m(m_powervr2_slave, FUNC(powervr2_device::ta_map));
-//  map(0x025f6800, 0x025f69ff).rw(FUNC(naomi2_state::dc_sysctrl_r), FUNC(naomi2_state::dc_sysctrl_w)); // second PVR DMA!
 //  map(0x025f7c00, 0x025f7cff).rw("powervr2", FUNC(powervr2_device::pvr_ctrl_r), FUNC(powervr2_device::pvr_ctrl_w));
 //  map(0x005f8000, 0x005f9fff).mirror(0x02000000).m("powervr2", FUNC(powervr2_device::ta_map));
 
 	/* Area 1 */
-	map(0x04000000, 0x04ffffff).ram().share("dc_texture_ram");      // texture memory 64 bit access
-	map(0x05000000, 0x05ffffff).ram().share("frameram");
-	map(0x06000000, 0x06ffffff).ram().share("textureram2");   // 64 bit access 2nd PVR RAM
-	map(0x07000000, 0x07ffffff).ram().share("frameram2");   // 32 bit access 2nd PVR RAM
+	map(0x04000000, 0x04ffffff).ram().w(FUNC(naomi2_state::vram_w<0>)).share(dc_texture_ram);      // texture memory 64 bit access
+	map(0x05000000, 0x05ffffff).ram().w(FUNC(naomi2_state::vram_w<1>)).share(dc_framebuffer_ram);
+	map(0x06000000, 0x06ffffff).ram().w(FUNC(naomi2_state::vram_w<2>)).share(m_pvr2_texture_ram);   // 64 bit access 2nd PVR RAM
+	map(0x07000000, 0x07ffffff).ram().w(FUNC(naomi2_state::vram_w<3>)).share(m_pvr2_framebuffer_ram);   // 32 bit access 2nd PVR RAM
 
 	/* Area 2*/
-	// TODO: writes to BOTH PVRs
-	map(0x085f6800, 0x085f69ff).w(FUNC(naomi2_state::dc_sysctrl_w));
-	map(0x085f8000, 0x085f9fff).w(FUNC(naomi2_state::both_pvr2_ta_w));
-	map(0x08800000, 0x088000ff).rw(FUNC(naomi2_state::elan_regs_r), FUNC(naomi2_state::elan_regs_w));
-//  map(0x09000000, 0x09??????) T&L command processing
+	map(0x085f6800, 0x085f69ff).rw(FUNC(dc_state::dc_sysctrl_r), FUNC(naomi2_state::both_sysctrl_w));
+	map(0x085f8000, 0x085f9fff).rw(FUNC(naomi2_state::both_pvr2_ta_r), FUNC(naomi2_state::both_pvr2_ta_w));
+	map(0x08800000, 0x088000ff).m(m_elan, FUNC(sega_315_6289_device::map));
+	map(0x09000000, 0x09ffffff).w(m_elan, FUNC(sega_315_6289_device::command_w));
 	map(0x0a000000, 0x0bffffff).ram().share("elan_ram"); // T&L chip RAM
 
 	/* Area 3 */
 	map(0x0c000000, 0x0dffffff).mirror(0xa2000000).ram().share("dc_ram");
 
 	/* Area 4 */
-	// TODO: second PVR access for these
-	map(0x10000000, 0x107fffff).w(m_powervr2, FUNC(powervr2_device::ta_fifo_poly_w));
-	map(0x10800000, 0x10ffffff).w(m_powervr2, FUNC(powervr2_device::ta_fifo_yuv_w));
-	map(0x11000000, 0x11ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath0_w)); // access to texture / framebuffer memory
-	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
-	map(0x13000000, 0x13ffffff).w(m_powervr2, FUNC(powervr2_device::ta_texture_directpath1_w)); // access to texture / framebuffer memory
+	map(0x10000000, 0x107fffff).w(FUNC(naomi2_state::ta_fifo_poly_w<0>));
+	map(0x10800000, 0x10ffffff).w(FUNC(naomi2_state::ta_fifo_yuv_w<0>));
+	map(0x11000000, 0x11ffffff).w(FUNC(naomi2_state::ta_texture_directpath_w<0>)); // access to texture / framebuffer memory
+	map(0x12000000, 0x127fffff).w(FUNC(naomi2_state::ta_fifo_poly_w<1>));
+	map(0x12800000, 0x12ffffff).w(FUNC(naomi2_state::ta_fifo_yuv_w<1>));
+	map(0x13000000, 0x13ffffff).w(FUNC(naomi2_state::ta_texture_directpath_w<1>));
 
 	/* Area 5 */
 	//map(0x14000000, 0x17ffffff).noprw(); // MPX Ext.
@@ -2389,16 +2496,11 @@ static INPUT_PORTS_START( naomi_kb )
 	PORT_BIT(0xfffff000, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER(naomi_state,naomi)
-{
-	naomi_state::machine_reset();
-}
-
 void naomi_state::external_reset(int state)
 {
 	// routine called by the dimm board to reboot the naomi mainboard
 	logerror("Received reset fromm dimm board !\n");
-	naomi_state::machine_reset();
+	machine_reset();
 	m_maincpu->reset();
 	// it will probably need to be adjusted
 	m_aica->reset();
@@ -2490,7 +2592,6 @@ void naomi_state::naomi_base(machine_config &config)
 
 	X76F100(config, "naomibd_eeprom");
 	M3COMM(config, "comm_board");
-	MCFG_MACHINE_RESET_OVERRIDE(naomi_state,naomi)
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 }
 
@@ -2602,30 +2703,47 @@ void naomi_state::naomigd_kb(machine_config &config)
 /*
  * Naomi 2
  */
-/*
-void naomi2_state::naomi2(machine_config &config)
-{
-    naomi(config);
-    m_maincpu->set_addrmap(AS_PROGRAM, &naomi2_state::naomi2_map);
-    m_maincpu->set_addrmap(AS_IO, &naomi2_state::naomi_port);
-}
-*/
-/*
- * Naomi 2 GD-Rom
- */
 
 void naomi2_state::naomi2_base(machine_config &config)
 {
+	m_powervr2->set_vram_base(0x04000000, 0x05000000, 0);
+
 	POWERVR2(config, m_powervr2_slave, 0); // FIXME: set clock so we can have a change of implementing proper timings
 	m_powervr2_slave->set_cpu(m_maincpu);
-	m_powervr2_slave->set_texture_ram(dc_texture_ram);
-	m_powervr2_slave->set_framebuffer_ram(dc_framebuffer_ram);
+	m_powervr2_slave->set_texture_ram(m_pvr2_texture_ram);
+	m_powervr2_slave->set_framebuffer_ram(m_pvr2_framebuffer_ram);
 	m_powervr2_slave->set_cpu_space(m_maincpu, AS_PROGRAM);
-	m_powervr2->maple_trigger_callback().set(FUNC(naomi2_state::maple_trigger));
-	m_powervr2_slave->irq_callback().set(FUNC(naomi2_state::pvr_irq));
+	m_powervr2_slave->set_vram_base(0x06000000, 0x07000000, 0);
 
-	// TODO: ELAN device
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(naomi2_state::screen_update));
+	m_powervr2->maple_trigger_callback().set(FUNC(dc_state::maple_trigger));
+	m_powervr2_slave->irq_callback().set(FUNC(naomi2_state::clxb_pvr_irq));
+
+	SEGA_315_6289(config, m_elan, 0);
+	m_elan->set_cpu(m_maincpu);
+	m_elan->set_cpu_space(m_maincpu, AS_PROGRAM);
+	m_elan->set_ram(m_elan_ram);
+	m_elan->set_pvr(0, m_powervr2);
+	m_elan->set_pvr(1, m_powervr2_slave);
+	m_elan->set_vram(0, 0x04000000, 0x01000000);
+	m_elan->set_vram(1, 0x06000000, 0x01000000);
 }
+
+/*
+ * Naomi 2, unprotected ROM sub-board
+ */
+
+void naomi2_state::naomi2(machine_config &config)
+{
+	naomi(config);
+	naomi2_base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &naomi2_state::naomi2_map);
+}
+
+/*
+ * Naomi 2 GD-Rom
+ */
 
 void naomi2_state::naomi2gd(machine_config &config)
 {
@@ -10920,7 +11038,7 @@ void naomi_state::init_hotd2()
 /* game  */ GAME( 1999, f355dlx,  0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "NAOMI Ferrari F355 Challenge (deluxe) BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
 /* game  */ GAME( 1999, f355bios, 0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "NAOMI Ferrari F355 Challenge (twin/deluxe) BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
 /* game  */ GAME( 1999, airlbios, 0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "NAOMI Airline Pilots (deluxe) BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* Naomi2*/ GAME( 2001, naomi2,   0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "NAOMI 2 BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* Naomi2*/ GAME( 2001, naomi2,   0, naomi2, naomi, naomi2_state, empty_init, ROT0, "Sega", "NAOMI 2 BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
 /* GDROM */ GAME( 2001, naomigd,  0, naomi, naomi, naomi_state,   init_naomi, ROT0, "Sega", "NAOMI GD-ROM BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
 
 /* 834-xxxxx (Sega Naomi cart with game specific BIOS sets) */

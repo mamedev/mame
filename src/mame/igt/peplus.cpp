@@ -438,8 +438,8 @@ void peplus_state::handle_lightpen()
 	int y_val = m_touch_y.read_safe(0x00);
 	const rectangle &vis_area = m_screen->visible_area();
 
-	int xt = x_val * vis_area.width() / 1024 + vis_area.min_x;
-	int yt = y_val * vis_area.height() / 1024 + vis_area.min_y;
+	int xt = x_val * vis_area.width() / 1024 + vis_area.left();
+	int yt = y_val * vis_area.height() / 1024 + vis_area.top();
 
 	m_assert_lp_timer->adjust(m_screen->time_until_pos(yt, xt), 0);
 }
