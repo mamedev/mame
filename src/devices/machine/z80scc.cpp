@@ -1318,6 +1318,22 @@ void z80scc_channel::rcv_complete()
 	receive_register_extract();
 	data = get_received_char();
 	LOG("%s: Received Data %c\n", FUNCNAME, data);
+	if (m_rr0 & RR0_BREAK_ABORT)
+		return;
+	if (!data && is_receive_framing_error())
+	{
+		m_rr0 |= RR0_BREAK_ABORT;
+		if ((m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_BREAK_ABORT))
+		{
+			if (m_extint_latch == 0)
+			{
+				m_extint_latch = 1;
+				m_extint_states = m_rr0;
+			}
+			m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
+		}
+		return;
+	}
 	receive_data(data, (is_receive_parity_error() ? RR1_PARITY_ERROR : 0) | (is_receive_framing_error() ? RR1_CRC_FRAMING_ERROR : 0));
 #if START_BIT_HUNT
 	m_rcv_mode = RCV_SEEKING;
@@ -2027,10 +2043,16 @@ void z80scc_channel::do_sccreg_wr5(uint8_t data)
 		LOG("- Send Break %d\n", (data & WR5_SEND_BREAK) ? 1 : 0);
 		LOG("- Request to Send %d\n", (data & WR5_RTS) ? 1 : 0);
 		LOG("- Data Terminal Ready %d\n", (data & WR5_DTR) ? 1 : 0);
-		if (changed & ~(WR5_RTS | WR5_DTR))
+		if (changed & ~(WR5_RTS | WR5_DTR | WR5_SEND_BREAK))
 		{
 			update_serial();
 			safe_transmit_register_reset();
+		}
+		if (changed & WR5_SEND_BREAK)
+		{
+			out_txd_cb((data & WR5_SEND_BREAK) ? 0 : 1);
+			if ((m_wr14 & (WR14_AUTO_ECHO | WR14_LOCAL_LOOPBACK)) == WR14_LOCAL_LOOPBACK)
+				write_rx((data & WR5_SEND_BREAK) ? 0 : 1, true);
 		}
 		update_rts(); // Will also update DTR accordingly
 
@@ -3069,6 +3091,21 @@ void z80scc_channel::write_rx(int state, bool loopback)
 		m_rx_clock = 0;
 
 	LOGRCV("%s(%d)\n", FUNCNAME, state);
+	if ((m_rr0 & RR0_BREAK_ABORT) && !m_rxd && state)
+	{
+		m_rr0 &= ~RR0_BREAK_ABORT;
+		if ((m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_BREAK_ABORT))
+		{
+			if (m_extint_latch == 0)
+			{
+				m_extint_latch = 1;
+				m_extint_states = m_rr0;
+			}
+			m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
+		}
+		receive_register_reset();
+		receive_data(0);
+	}
 	m_rxd = state;
 	if (rtxc_driven_rxc || m_rxc != 0 || m_brg_rate != 0)
 		device_serial_interface::rx_w(state);
