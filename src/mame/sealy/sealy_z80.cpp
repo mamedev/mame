@@ -72,8 +72,10 @@ protected:
 	void common_io_map(address_map &map) ATTR_COLD;
 
 	void decrypt_dizhu(const uint8_t (&selectors)[64]) ATTR_COLD;
+	void decrypt_djddza(const uint8_t (&selectors)[64]) ATTR_COLD;
 	void decrypt_pljh() ATTR_COLD;
 	void descramble_tiles(uint16_t *tiles, uint32_t count, uint16_t xor_mask, int r_field, int g_field, int b_field) ATTR_COLD;
+	void descramble_djddza_tiles() ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 
@@ -121,6 +123,7 @@ public:
 
 	void init_bbddz() ATTR_COLD;
 	void init_ddz2() ATTR_COLD;
+	void init_djddza() ATTR_COLD;
 	void init_djddz() ATTR_COLD;
 	void init_pljh() ATTR_COLD;
 
@@ -513,6 +516,40 @@ ROM_START( ddz2 )
 	ROM_LOAD( "93c46", 0x00, 0x80, BAD_DUMP CRC(25e71bc6) SHA1(af3cfd71e949cba4605316225e35c0629522ca22) ) // default with standard control panel
 ROM_END
 
+ROM_START( ddz2a )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "3.u11", 0x00000, 0x20000, CRC(f9124e02) SHA1(a7f85d1a3b3d44b51ab15094529d7a6565e7a699) )
+
+	ROM_REGION16_LE( 0x200000, "bgtiles", 0 )
+	ROM_LOAD( "1.u18", 0x000000, 0x200000, CRC(b746bb2c) SHA1(54338eb8d180d439a0c63f2987af5dc59862d1e8) )
+
+	ROM_REGION16_LE( 0x200000, "fgtiles", 0 )
+	ROM_LOAD( "2.u21", 0x000000, 0x200000, CRC(c62be0a4) SHA1(1cbfecba43b475f1a175f69fda498e662ac26720) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "4.u23", 0x00000, 0x40000, CRC(e089cf82) SHA1(567736b1418b86ea35e29fb9f8a408436c8a03c8) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46", 0x00, 0x80, BAD_DUMP CRC(25e71bc6) SHA1(af3cfd71e949cba4605316225e35c0629522ca22) ) // default with standard control panel
+ROM_END
+
+ROM_START( djddza )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "3.u11", 0x00000, 0x20000, CRC(ee667f83) SHA1(157de7bd7434435b7f0111f5278a1c887bfd2348) )
+
+	ROM_REGION16_LE( 0x200000, "bgtiles", 0 )
+	ROM_LOAD( "2.u18", 0x000000, 0x200000, CRC(410d7a2e) SHA1(1adc813667e71201792f042e6c641d878f86f047) )
+
+	ROM_REGION16_LE( 0x200000, "fgtiles", 0 )
+	ROM_LOAD( "1.u21", 0x000000, 0x200000, CRC(38c744d9) SHA1(2cf776b235d9b74b3bf58344d4a2a20b0be59e6b) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "4.u23", 0x00000, 0x80000, CRC(f94ad624) SHA1(1e651d180b1c64c568ae6d0be5b3f4fc612d4a02) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46", 0x00, 0x80, BAD_DUMP CRC(25e71bc6) SHA1(af3cfd71e949cba4605316225e35c0629522ca22) ) // default with standard control panel
+ROM_END
+
 // 顶级斗地主 (Dǐngjí Dòu Dìzhǔ). All labels prepend 顶级斗地主 to what's below
 // same data was also found in ROMs with 顶级100分 (Dǐngjí 100 Fēn) labels
 ROM_START( djddz )
@@ -618,6 +655,34 @@ uint8_t dizhu_decrypt_data(uint8_t data, uint8_t key)
 	}
 }
 
+// opcode fetches
+uint8_t djddza_decrypt_opcode(uint8_t data, uint8_t key)
+{
+	switch (key)
+	{
+		default:
+		case 0: return bitswap<8>(data ^ 0xc2, 0, 1, 5, 2, 7, 6, 3, 4);
+		case 1: return bitswap<8>(data ^ 0x45, 6, 3, 7, 0, 5, 1, 4, 2);
+		case 2: return bitswap<8>(data ^ 0xf0, 5, 0, 2, 4, 3, 7, 6, 1);
+		case 3: return bitswap<8>(data ^ 0x45, 4, 7, 0, 5, 1, 3, 6, 2);
+		case 4: return bitswap<8>(data ^ 0x80, 2, 3, 6, 5, 0, 1, 4, 7);
+	}
+}
+
+// ordinary reads
+uint8_t djddza_decrypt_data(uint8_t data, uint8_t key)
+{
+	switch (key)
+	{
+		default:
+		case 0: return bitswap<8>(data ^ 0x25, 1, 2, 3, 6, 4, 0, 5, 7);
+		case 1: return bitswap<8>(data ^ 0x3a, 6, 1, 5, 4, 7, 0, 2, 3);
+		case 2: return bitswap<8>(data ^ 0x99, 4, 3, 0, 1, 2, 7, 6, 5);
+		case 3: return bitswap<8>(data ^ 0x02, 7, 0, 6, 3, 4, 5, 1, 2);
+		case 4: return bitswap<8>(data ^ 0xb2, 0, 1, 2, 3, 7, 6, 5, 4);
+	}
+}
+
 // opcode fetches, pljh
 uint8_t pljh_decrypt_opcode(uint8_t data, uint8_t key)
 {
@@ -692,6 +757,20 @@ void sealy_z80_state::decrypt_dizhu(const uint8_t (&selectors)[64])
 	}
 }
 
+void sealy_z80_state::decrypt_djddza(const uint8_t (&selectors)[64])
+{
+	uint8_t *const rom = memregion("maincpu")->base();
+	const uint32_t length = memregion("maincpu")->bytes();
+	m_decrypted_opcodes = std::make_unique<uint8_t[]>(length);
+
+	for (uint32_t a = 0; a < length; a++)
+	{
+		const uint8_t key = selectors[bitswap<6>(a, 12, 10, 7, 6, 3, 1)];
+		m_decrypted_opcodes[a] = djddza_decrypt_opcode(rom[a], key);
+		rom[a] = djddza_decrypt_data(rom[a], key);
+	}
+}
+
 void sealy_z80_state::decrypt_pljh()
 {
 	uint8_t *const rom = memregion("maincpu")->base();
@@ -721,6 +800,17 @@ void sealy_z80_state::descramble_tiles(uint16_t *tiles, uint32_t count, uint16_t
 	}
 }
 
+// djddza swaps the data lines of each tile ROM individually, moving bits across
+// the 5-bit fields
+void sealy_z80_state::descramble_djddza_tiles()
+{
+	for (uint32_t i = 0; i < m_fgtiles.length(); i++)
+		m_fgtiles[i] = bitswap<16>(m_fgtiles[i], 15, 9, 8, 13, 11, 14, 12, 10, 1, 4, 6, 7, 2, 0, 5, 3);
+
+	for (uint32_t i = 0; i < m_bgtiles.length(); i++)
+		m_bgtiles[i] = bitswap<16>(m_bgtiles[i], 15, 12, 14, 11, 10, 8, 13, 9, 6, 4, 5, 0, 2, 3, 7, 1);
+}
+
 void sealy_z80_eeprom_state::init_bbddz()
 {
 	decrypt_dizhu(DIZHU_SELECTORS);
@@ -731,6 +821,12 @@ void sealy_z80_eeprom_state::init_bbddz()
 void sealy_z80_eeprom_state::init_ddz2()
 {
 	decrypt_dizhu(DIZHU_SELECTORS);
+}
+
+void sealy_z80_eeprom_state::init_djddza()
+{
+	decrypt_djddza(DIZHU_SELECTORS);
+	descramble_djddza_tiles();
 }
 
 void sealy_z80_eeprom_state::init_djddz()
@@ -753,9 +849,11 @@ void sealy_z80_eeprom_state::init_pljh()
 } // anonymous namespace
 
 
-GAME( 2005, bbddz,    0, sealy,    djddz,    sealy_z80_eeprom_state, init_bbddz,    ROT0, "Sealy", "Bai Bian Dou Dizhu", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, ddz2,     0, sealy,    djddz,    sealy_z80_eeprom_state, init_ddz2,     ROT0, "Sealy", "Dou Dizhu II",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2004, djddz,    0, sealy,    djddz,    sealy_z80_eeprom_state, init_djddz,    ROT0, "Sealy", "Dingji Dou Dizhu",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, pljh,     0, pljh,     pljh,     sealy_z80_eeprom_state, init_pljh,     ROT0, "Sealy", "Piaoliang Jinhua",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, jzuanshi, 0, lucky168, lucky168, sealy_z80_esam_state,   empty_init,    ROT0, "Sealy", "Jin Zuanshi",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing program ROM
-GAME( 2002, lucky168, 0, lucky168, lucky168, sealy_z80_esam_state,   init_lucky168, ROT0, "Sealy", "Lucky 168",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2005, bbddz,    0,     sealy,    djddz,    sealy_z80_eeprom_state, init_bbddz,    ROT0, "Sealy", "Bai Bian Dou Dizhu",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, ddz2,     0,     sealy,    djddz,    sealy_z80_eeprom_state, init_ddz2,     ROT0, "Sealy", "Dou Dizhu II (set 1)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, ddz2a,    ddz2,  sealy,    djddz,    sealy_z80_eeprom_state, init_ddz2,     ROT0, "Sealy", "Dou Dizhu II (set 2)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2004, djddz,    0,     sealy,    djddz,    sealy_z80_eeprom_state, init_djddz,    ROT0, "Sealy", "Dingji Dou Dizhu (set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2004, djddza,   djddz, sealy,    djddz,    sealy_z80_eeprom_state, init_djddza,   ROT0, "Sealy", "Dingji Dou Dizhu (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, pljh,     0,     pljh,     pljh,     sealy_z80_eeprom_state, init_pljh,     ROT0, "Sealy", "Piaoliang Jinhua",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, jzuanshi, 0,     lucky168, lucky168, sealy_z80_esam_state,   empty_init,    ROT0, "Sealy", "Jin Zuanshi",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing program ROM
+GAME( 2002, lucky168, 0,     lucky168, lucky168, sealy_z80_esam_state,   init_lucky168, ROT0, "Sealy", "Lucky 168",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

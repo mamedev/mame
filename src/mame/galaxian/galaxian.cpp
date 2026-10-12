@@ -14360,6 +14360,24 @@ ROM_START( froggers3 )
 	ROM_LOAD( "pr-91.6l",     0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) )
 ROM_END
 
+ROM_START( froggers4 ) // Konami M-1300-1A main PCB + Konami M-1300-0A sound PCB. Stickered "834-0100 FROGGER" + "REV-A" (on a separate sticker, hand-written)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-1413.ic5", 0x0000, 0x1000, CRC(21c58b17) SHA1(f8912edb13921b8488468a95e070eab830dd27ed) )
+	ROM_LOAD( "epr-1414.ic6", 0x1000, 0x1000, CRC(3087bb4b) SHA1(3fe1f68a2ad12b1cadba89d99afe574cf5342d81) )
+	ROM_LOAD( "epr-1415.ic7", 0x2000, 0x1000, CRC(a5352425) SHA1(9cdc8d4d3415043f41a51b78d485dc8e693569fc) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "epr-608.ic32", 0x0000, 0x0800, CRC(e8ab0256) SHA1(f090afcfacf5f13cdfa0dfda8e3feb868c6ce8bc) )
+	ROM_LOAD( "epr-609.ic33", 0x0800, 0x0800, CRC(7380a48f) SHA1(75582a94b696062cbdb66a4c5cf0bc0bb94f81ee) )
+	ROM_LOAD( "epr-610.ic34", 0x1000, 0x0800, CRC(31d7eb27) SHA1(2e1d34ae4da385fd7cac94707d25eeddf4604e1a) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "epr-1397.ic101", 0x0000, 0x0800, CRC(05f7d883) SHA1(78831fd287da18928651a8adb7e578d291493eff) )
+	ROM_LOAD( "epr-1396.ic102", 0x0800, 0x0800, CRC(658745f8) SHA1(e4e5c3e011c8a7233a36d29e10e08905873500aa) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "pr-91.6l", 0x0000, 0x0020, CRC(413703bf) SHA1(66648b2b28d3dcbda5bdb2605d1977428939dd3c) ) // not dumped for this set, but should match
+ROM_END
 
 ROM_START( froggert ) // KT-4108-1 + KT-4108-2, 834-0222 sticker
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -17246,6 +17264,7 @@ GAME( 1981, frogger,     0,        frogger,    frogger,    galaxian_state, init_
 GAME( 1981, froggers1,   frogger,  frogger,    frogger,    galaxian_state, init_frogger,    ROT90,  "Konami (Sega license)", "Frogger (Sega, set 1)",                                            MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggers2,   frogger,  frogger,    frogger,    galaxian_state, init_frogger,    ROT90,  "Konami (Sega license)", "Frogger (Sega, set 2)",                                            MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggers3,   frogger,  frogger,    frogger,    galaxian_state, init_frogger,    ROT90,  "Konami (Sega license)", "Frogger (Sega, set 3)",                                            MACHINE_SUPPORTS_SAVE )
+GAME( 1981, froggers4,   frogger,  frogf,      frogger,    galaxian_state, init_froggers,   ROT90,  "Konami",                "Frogger (Sega, set 4)",                                            MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggermc,   frogger,  froggermc,  froggermc,  galaxian_state, init_froggermc,  ROT90,  "Konami (Sega license)", "Frogger (Moon Cresta hardware)",                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1981, froggers,    frogger,  froggers,   frogger,    galaxian_state, init_froggers,   ROT90,  "bootleg",               "Frog",                                                             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, frogf,       frogger,  frogf,      frogger,    galaxian_state, init_froggers,   ROT90,  "bootleg (Falcon)",      "Frog (Falcon bootleg)",                                            MACHINE_SUPPORTS_SAVE )
