@@ -1466,7 +1466,7 @@ static INPUT_PORTS_START( gungunad )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Trigger") PORT_PLAYER(2)
 	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED )
 	// This debounced line gates P2 activity; its identity as the detachable gun-present contact is inferred.
-	PORT_CONFNAME( 0x40, 0x40, "P2 Gun" )
+	PORT_CONFNAME( 0x40, 0x00, "P2 Gun" )
 	PORT_CONFSETTING(    0x00, "Disconnected" )
 	PORT_CONFSETTING(    0x40, "Connected" )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
