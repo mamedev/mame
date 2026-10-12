@@ -26,6 +26,7 @@
 #include "xavix_soc.h"
 
 #include <algorithm>
+#include <random>
 
 #define LOG_IO  (1U << 2)
 #define VERBOSE 0
@@ -268,8 +269,9 @@ void xavix_soc_device::configure_screen()
 
 void xavix_soc_device::device_start()
 {
-	// Use deterministic cold-start contents; preserve RAM across resets.
-	std::ranges::fill(m_mainram, 0xff);
+	// Zero-filled RAM gives rad_crdn/rad_crdnp a false Continue option.
+	// A uniform 0xff fill gives tak_hamr a fixed seed for its title background.
+	std::ranges::generate(m_mainram, [rng = std::mt19937(std::random_device{}())] () mutable { return u8(rng()); });
 
 	m_vblank_cb.resolve_safe();
 	m_watchdog_timer = timer_alloc(FUNC(xavix_soc_device::watchdog_expired), this);
