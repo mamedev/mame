@@ -44,6 +44,9 @@ protected:
 	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw) override;
 	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw) override;
 	virtual void c64_ba_w(int state) override { m_exp->ba_w(state); }
+	virtual void c64_phi2_w(int state) override { m_exp->phi2_w(state); }
+	virtual void c64_irq_w(int state) override { m_exp->host_irq_w(state); }
+	virtual void c64_nmi_w(int state) override { m_exp->host_nmi_w(state); }
 
 private:
 	required_device<mc6852_device> m_ssda;

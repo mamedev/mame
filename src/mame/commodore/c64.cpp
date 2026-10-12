@@ -1901,10 +1901,13 @@ void c64_state::ntsc(machine_config &config)
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
 	config.set_perfect_quantum(m_maincpu);
 
-	INPUT_MERGER_ANY_HIGH(config, m_irq).output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_irq);
+	m_irq->output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
+	m_irq->output_handler().append(m_exp, FUNC(c64_expansion_slot_device::host_irq_w));
 
 	INPUT_MERGER_ANY_HIGH(config, m_nmi);
 	m_nmi->output_handler().set_inputline(m_maincpu, m6510_device::NMI_LINE);
+	m_nmi->output_handler().append(m_exp, FUNC(c64_expansion_slot_device::host_nmi_w));
 
 	// video hardware
 	vic_config(MOS6567(config, m_vic, XTAL(14'318'181)/14));
@@ -2087,10 +2090,13 @@ void c64_state::pal(machine_config &config)
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
 	config.set_perfect_quantum(m_maincpu);
 
-	INPUT_MERGER_ANY_HIGH(config, m_irq).output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_irq);
+	m_irq->output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
+	m_irq->output_handler().append(m_exp, FUNC(c64_expansion_slot_device::host_irq_w));
 
 	INPUT_MERGER_ANY_HIGH(config, m_nmi);
 	m_nmi->output_handler().set_inputline(m_maincpu, m6510_device::NMI_LINE);
+	m_nmi->output_handler().append(m_exp, FUNC(c64_expansion_slot_device::host_nmi_w));
 
 	// video hardware
 	vic_config(MOS6569(config, m_vic, XTAL(17'734'472)/18));

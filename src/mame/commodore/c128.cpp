@@ -1902,9 +1902,11 @@ void c128_state::ntsc(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_irq);
 	m_irq->output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_irq->output_handler().append_inputline(m_subcpu, m8502_device::IRQ_LINE);
+	m_irq->output_handler().append(m_exp, FUNC(c64_expansion_slot_device::host_irq_w));
 
 	INPUT_MERGER_ANY_HIGH(config, m_nmi);
 	m_nmi->output_handler().set_inputline(m_subcpu, m8502_device::NMI_LINE);
+	m_nmi->output_handler().append(m_exp, FUNC(c64_expansion_slot_device::host_nmi_w));
 
 	// video hardware
 	C128_VDC_RAM_SLOT(config, m_vdc_ram, c128_vdc_ram_cards, "16k");
@@ -2099,9 +2101,11 @@ void c128_state::pal(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_irq);
 	m_irq->output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_irq->output_handler().append_inputline(m_subcpu, m8502_device::IRQ_LINE);
+	m_irq->output_handler().append(m_exp, FUNC(c64_expansion_slot_device::host_irq_w));
 
 	INPUT_MERGER_ANY_HIGH(config, m_nmi);
 	m_nmi->output_handler().set_inputline(m_subcpu, m8502_device::NMI_LINE);
+	m_nmi->output_handler().append(m_exp, FUNC(c64_expansion_slot_device::host_nmi_w));
 
 	// video hardware
 	C128_VDC_RAM_SLOT(config, m_vdc_ram, c128_vdc_ram_cards, "16k");
