@@ -89,10 +89,8 @@ void tsconf_state::tsconf_io(address_map &map)
 	map(0x0057, 0x0057).mirror(0xff00).rw(FUNC(tsconf_state::tsconf_port_57_zctr_r), FUNC(tsconf_state::tsconf_port_57_zctr_w)); // spi config
 	map(0x0077, 0x0077).mirror(0xff00).rw(FUNC(tsconf_state::tsconf_port_77_zctr_r), FUNC(tsconf_state::tsconf_port_77_zctr_w)); // spi data
 
-	// RS-232
-	map(0x00ef, 0x00ef).mirror(0xff00).rw(m_uart, FUNC(tsconf_rs232_device::dr_r), FUNC(tsconf_rs232_device::dr_w)); // 0x00ef..0xbfef
-	map(0xc0ef, 0xc0ef).mirror(0x3f00).unmaprw();
-	map(0xc0ef, 0xc0ef).select(0x0f00)
+	// RS-232: ZiFi and Kondratyev 16550 registers, index is the high byte of the xxEF port
+	map(0x00ef, 0x00ef).select(0xff00)
 		.lr8(NAME([this](offs_t offset) -> u8 { return m_uart->reg_r(offset >> 8); }))
 		.lw8(NAME([this](offs_t offset, u8 data) { m_uart->reg_w(offset >> 8, data); }));
 
@@ -301,6 +299,7 @@ void tsconf_state::tsconf(machine_config &config)
 	TSCONF_RS232(config, m_uart, XTAL(11'059'200));
 	m_uart->out_txd_callback().set("rs232", FUNC(rs232_port_device::write_txd));
 	m_uart->out_rts_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_uart->out_int_callback().set(FUNC(tsconf_state::uart_int_w));
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(tsconf_rs232_device::rxd_w));
 	rs232.cts_handler().set(m_uart, FUNC(tsconf_rs232_device::cts_w));

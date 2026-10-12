@@ -911,6 +911,11 @@ IRQ_CALLBACK_MEMBER(tsconf_state::irq_vector)
 		m_int_mask &= ~4;
 		vector = 0xfb;
 	}
+	else if (m_int_mask & 8)
+	{
+		m_int_mask &= ~8;
+		vector = 0xf9;
+	}
 
 	if (!m_int_mask)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
@@ -921,6 +926,21 @@ IRQ_CALLBACK_MEMBER(tsconf_state::irq_vector)
 TIMER_CALLBACK_MEMBER(tsconf_state::irq_off)
 {
 	m_int_mask &= ~1;
+}
+
+void tsconf_state::uart_int_w(int state)
+{
+	if (state)
+	{
+		m_int_mask |= 8;
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	}
+	else
+	{
+		m_int_mask &= ~8;
+		if (!m_int_mask)
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	}
 }
 
 void tsconf_state::update_frame_timer()

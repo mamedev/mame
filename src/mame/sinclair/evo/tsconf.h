@@ -164,6 +164,7 @@ private:
 	IRQ_CALLBACK_MEMBER(irq_vector);
 	u8 m_int_mask;
 	bool m_update_on_m1;
+	void uart_int_w(int state);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_txt);
 	template <u8 Layer>
