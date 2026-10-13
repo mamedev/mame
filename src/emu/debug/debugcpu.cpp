@@ -1967,9 +1967,11 @@ void device_debug::breakpoint_update_flags()
 		}
 	}
 
-	// push the flags out globally
-	if (m_device.machine().debugger().cpu().live_cpu() != nullptr)
-		m_device.machine().debugger().cpu().live_cpu()->debug()->compute_debug_flags();
+	// push the flags out globally; a fatal error thrown while a CPU executes leaves it live,
+	// and once that CPU's device_debug is being destroyed its debug() is null
+	device_t *const livecpu = m_device.machine().debugger().cpu().live_cpu();
+	if (livecpu != nullptr && livecpu->debug() != nullptr)
+		livecpu->debug()->compute_debug_flags();
 }
 
 
