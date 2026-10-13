@@ -671,6 +671,8 @@ class xavix_hikara_i2c_device : public device_t, public i2c_hle_interface
 public:
 	xavix_hikara_i2c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 protected:
 	virtual void device_start() override ATTR_COLD { save_item(NAME(m_regs)); }
 	virtual void device_reset() override ATTR_COLD { std::ranges::fill(m_regs, 0); }
