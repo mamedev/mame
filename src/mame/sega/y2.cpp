@@ -2218,13 +2218,13 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2009, systemy2,   0,       system_board_y2, system_board_y2,  system_board_y2_state, empty_init, ROT0, "SI Electronics",           "System Board Y2", MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT )
+GAME( 2009, systemy2,   0,       system_board_y2, system_board_y2,  system_board_y2_state, empty_init, ROT0, "SI Electronics",           "System Board Y2", MACHINE_IS_BIOS_ROOT )
 
-/* The title screen shows "The King of Fighters - Road to Revenge" (Chinese / English) while the speech on the title screen announcer says "The King of Fighters 2002 Unlimited Match"
-   There is a PS2 version with the Unlimited Match title screen, but unless it's used for a different region the arcade doesn't show that title, only announces it. */
-GAME( 2009, kof2002um,  systemy2,  system_board_y2, system_board_y2,  system_board_y2_state, init_kof2002um, ROT0, "SNK Playmore / New Channel", "The King of Fighters - Fuchou Zhi Lu/Road to Revenge / The King of Fighters 2002 Unlimited Match (China)", MACHINE_NOT_WORKING ) // also Export?
-GAME( 2009, kof2002umj, kof2002um, system_board_y2, system_board_y2,  system_board_y2_state, init_kof2002umj, ROT0, "SNK Playmore",            "The King of Fighters 2002 Unlimited Match (Japan)",                                                     MACHINE_NOT_WORKING )
-GAME( 2009, higurashi,  systemy2,  system_board_y2, system_board_y2,  system_board_y2_state, init_higurashi, ROT0, "AQ Interactive",             "Higurashi no Naku Koro ni Jong (Japan)",                                                                 MACHINE_NOT_WORKING )
+// The title screen announcer says "The King of Fighters 2002 Unlimited Match" for both versions, but
+// the Chinese set only shows the Chinese title regardless of language setting in service mode
+GAME( 2009, kof2002um,  systemy2,  system_board_y2, system_board_y2,  system_board_y2_state, init_kof2002um,  ROT0, "SNK Playmore / New Channel", "The King of Fighters - Fuchou Zhi Lu (Chinese/English)", 0 )
+GAME( 2009, kof2002umj, kof2002um, system_board_y2, system_board_y2,  system_board_y2_state, init_kof2002umj, ROT0, "SNK Playmore",               "The King of Fighters 2002 - Unlimited Match (Japanese/English)", 0 )
+GAME( 2009, higurashi,  systemy2,  system_board_y2, system_board_y2,  system_board_y2_state, init_higurashi,  ROT0, "AQ Interactive",             "Higurashi no Naku Koro ni Jong (Japan)", MACHINE_IMPERFECT_CONTROLS )
 
 //エヌアイン完全世界/En-Eins Perfektewelt
 //上海 臥龍天昇/Shanghai Ga ryū tenshō
