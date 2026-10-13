@@ -29,10 +29,10 @@ xavix_golf_swing_device::xavix_golf_swing_device(const machine_config &mconfig, 
 
 INPUT_PORTS_START( xavix_golf_swing )
 	PORT_START("SWING_ACTION")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Right-Handed Swing") PORT_CODE(KEYCODE_SPACE)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Simulate Right-Handed Swing") PORT_CODE(KEYCODE_SPACE)
 		PORT_CHANGED_MEMBER("swing_sensor", FUNC(xavix_golf_swing_device::swing_action), 0)
 	// The optional left-handed set is documented, but reversing this trajectory is provisional without a sensor capture.
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Left-Handed Swing") PORT_CODE(KEYCODE_LALT)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Simulate Left-Handed Swing") PORT_CODE(KEYCODE_LALT)
 		PORT_CHANGED_MEMBER("swing_sensor", FUNC(xavix_golf_swing_device::swing_action), 1)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
