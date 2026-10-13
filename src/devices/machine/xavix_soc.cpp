@@ -367,12 +367,6 @@ INTERRUPT_GEN_MEMBER(xavix_soc_device::vblank)
 	m_vblank_cb();
 }
 
-void xavix_soc_device::screen_vblank(int state)
-{
-	if (m_generation == generation::SUPERXAVIX)
-		downcast<superxavix_video_device &>(*m_video).screen_vblank(state);
-}
-
 u32 xavix_soc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return m_video->screen_update(screen, bitmap, cliprect);

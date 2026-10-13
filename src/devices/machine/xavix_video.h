@@ -360,7 +360,6 @@ public:
 	virtual void map(address_map &map) override ATTR_COLD;
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 	virtual rectangle picture_area() const override;
-	void screen_vblank(int state);
 	// The picture NMI is timed independently of the presentation screen.
 	virtual void vblank() override;
 

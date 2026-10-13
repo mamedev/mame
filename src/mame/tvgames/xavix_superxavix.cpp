@@ -130,7 +130,6 @@ void superxavix_state::superxavix(machine_config &config)
 	m_palette->set_entries(512);
 
 	superxavix_video_device::configure_screen(*m_screen, m_soc->clock(), video_standard::NTSC);
-	m_screen->screen_vblank().append(m_soc, FUNC(xavix_soc_device::screen_vblank));
 
 	m_super_soc->plotter().memory_read_callback().set(*this, FUNC(superxavix_state::read_plotter_byte));
 	m_super_soc->plotter().memory_write_callback().set(*this, FUNC(superxavix_state::write_plotter_byte));

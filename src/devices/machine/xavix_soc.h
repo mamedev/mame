@@ -68,7 +68,6 @@ public:
 	u8 read_low_bus_bypass(u32 address);
 	void reset_w(int state);
 	void cpu_reset_w(int state) { m_maincpu->set_input_line(INPUT_LINE_RESET, state); }
-	void screen_vblank(int state);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	rectangle picture_area() const { return m_video->picture_area(); }
 

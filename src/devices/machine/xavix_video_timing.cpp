@@ -411,14 +411,10 @@ TIMER_CALLBACK_MEMBER(superxavix_video_device::video_field_start)
 	sync_video_counters();
 	m_video_field_phase = BIT(m_video_counters.horizontal, 12) ^ BIT(m_video_counters.vertical, 0);
 	m_video_field_timer->adjust(predict_picture_delays(PREDICT_FIELD).field);
-}
 
-
-void superxavix_video_device::screen_vblank(int state)
-{
-	if (state)
-		return;
-
+	// Sample presentation geometry at the native field boundary. An independent
+	// screen callback can catch a temporary blanking-line period adjustment and
+	// incorrectly apply it to every line, resizing the displayed picture.
 	video_timing const timing = calculate_video_timing();
 	if (timing != m_video_timing)
 	{
