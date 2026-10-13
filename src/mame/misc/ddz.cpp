@@ -13,8 +13,6 @@
 
 =============================================================================
 
-/*
-
     AI notes on the TJF sets (crzclass, baibians, cjmx, btlfront)
 
     Scrambling
