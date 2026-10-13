@@ -402,6 +402,7 @@ Hi-score table is corrupt (dump really?)
 		<sharedfeat name="iec8_default" value="c1581"/>
 		<sharedfeat name="user_default" value="digimax"/>
 		<sharedfeat name="exp_default" value="reu1764"/>
+		<sharedfeat name="sid_default" value="dual8580"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="modplay12e_fix.d81" size="819200" crc="f0727880" sha1="1806bd417524aa54a585b34a8045ac5954f57f21"/>
