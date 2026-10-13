@@ -437,7 +437,7 @@ uint32_t starcrus_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			0);
 
 	// Collision detection
-	if (cliprect.max_y == screen.visible_area().max_y)
+	if (cliprect.bottom() == screen.visible_area().bottom())
 	{
 		m_collision_reg = 0x00;
 

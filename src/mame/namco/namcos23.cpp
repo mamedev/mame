@@ -7931,8 +7931,8 @@ ROM_START( aking )
 	ROM_REGION( 0x40000, "iocpu2", 0 ) // I/O board MB90F574 MCU code
 	ROM_LOAD( "fcaf10.bin", 0x000000, 0x040000, NO_DUMP ) // 256KB internal flash ROM
 
-	ROM_REGION( 0x10000, "iocpu3", 0 ) // I/O board PIC16F84 code
-	ROM_LOAD( "fcap10.ic2", 0x000000, 0x004010, NO_DUMP )
+	ROM_REGION16_LE( 0x4280, "iocpu3", ROMREGION_ERASEFF ) // I/O board PIC16F84 code
+	ROM_LOAD( "fcap10.ic2", 0x0000, 0x4280, NO_DUMP )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data ROMs */
 	ROM_LOAD16_BYTE( "ag1mtah.2j",  0x0000000, 0x800000, CRC(f2d8ca9d) SHA1(8158d13d74f2aae7c0d1238619ce1ad3a17d8047) )
@@ -7980,8 +7980,8 @@ ROM_START( 500gp )
 	ROM_REGION( 0x40000, "iocpu2", 0 ) // I/O board MB90F574 MCU code
 	ROM_LOAD( "fcaf10.bin", 0x000000, 0x040000, NO_DUMP ) // 256KB internal flash ROM
 
-	ROM_REGION( 0x10000, "iocpu3", 0 ) // I/O board PIC16F84 code
-	ROM_LOAD( "fcap10.ic2", 0x000000, 0x004010, NO_DUMP )
+	ROM_REGION16_LE( 0x4280, "iocpu3", ROMREGION_ERASEFF ) // I/O board PIC16F84 code
+	ROM_LOAD( "fcap10.ic2", 0x000000, 0x004280, NO_DUMP )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data ROMs */
 	ROM_LOAD16_BYTE( "5gp1mtah.2j",  0x0000000, 0x800000, CRC(246e4b7a) SHA1(75743294b8f48bffb84f062febfbc02230d49ce9) )

@@ -29,7 +29,7 @@ void pc9801_state::video_start()
 
 uint32_t pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 	/* graphics */
 	if(m_video_ff[DISPLAY_REG] != 0)
@@ -47,14 +47,14 @@ uint32_t pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
  *
  ************************************************/
 
-
+// TODO: clean me up, lots of performance loss in here.
 UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 	uint8_t colors16_mode = (m_ex_video_ff[ANALOG_16_MODE]) ? 16 : 8;
 
-	for(int xi=0;xi<16;xi++)
+	for(int xi = 0; xi < 16; xi++)
 	{
 		int res_x = x + xi;
 		int res_y = y;
@@ -78,10 +78,10 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 
 UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 {
-	draw_text(bitmap, addr, y, wd, pitch, lr, cursor_on, cursor_addr, cursor_bot, cursor_top, false);
+	draw_text(bitmap, addr, y, wd, pitch, lr, cursor_on, cursor_addr, cursor_bot, cursor_top, topline, botline, false);
 }
 
-void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top, bool lower)
+void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top, int topline, int botline, bool lower)
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
@@ -109,7 +109,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 	// TODO: accurate blink rate
 	const bool is_blink_rate = m_screen->frame_number() & 0x10;
 
-	for(int x=0;x<pitch;x+=x_step)
+	for(int x = 0; x < pitch; x += x_step)
 	{
 		uint32_t tile_addr = addr+(x*(m_video_ff[WIDTH40_REG]+1));
 
@@ -188,7 +188,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 			uint8_t gfx_mode = (m_video_ff[ATTRSEL_REG]) ? attr & 0x10 : 0;
 			uint8_t color = (attr & 0xe0) >> 5;
 
-			for(int yi=0;yi<lr;yi++)
+			for(int yi=topline;yi<botline;yi++)
 			{
 				int res_y = y + yi;
 				if((line >= scroll_start) && (line <= scroll_end))
@@ -208,9 +208,9 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 					}
 				}
 
-				for(int xi=0;xi<8;xi++)
+				for(int xi = 0; xi < 8; xi++)
 				{
-					int res_x = ((x+kanji_lr)*8+xi) * (m_video_ff[WIDTH40_REG]+1);
+					int res_x = ((x + kanji_lr) * 8 + xi) * (m_video_ff[WIDTH40_REG] + 1);
 
 					if(!m_screen->visible_area().contains(res_x, res_y))
 						continue;
@@ -290,7 +290,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 		}
 	}
 	if(scroll && !lower && (line >= scroll_start) && (line <= scroll_end))
-		return draw_text(bitmap, addr += pitch, y, wd, pitch, lr, cursor_on, cursor_addr, cursor_bot, cursor_top, true);
+		return draw_text(bitmap, addr += pitch, y, wd, pitch, lr, cursor_on, cursor_addr, cursor_bot, cursor_top, topline, botline, true);
 }
 
 /*************************************************
@@ -319,7 +319,7 @@ void pc9801_state::pc9801_video_ff_w(uint8_t data)
 		case 4:
 			if(m_gfx_ff)
 			{
-				m_video_ff[(data & 0x0e) >> 1] = data &1;
+				m_video_ff[(data & 0x0e) >> 1] = data & 1;
 				m_gfx_ff = 0;
 			}
 			break;
@@ -347,7 +347,6 @@ void pc9801_state::pc9801_video_ff_w(uint8_t data)
 uint8_t pc9801_state::txt_scrl_r(offs_t offset)
 {
 	//logerror("Read to display register [%02x]\n",offset+0x70);
-	/* TODO: ok? */
 	if(offset <= 5)
 		return m_txt_scroll_reg[offset];
 	return 0xff;
@@ -388,11 +387,13 @@ uint8_t pc9801_state::pc9801_a0_r(offs_t offset)
 			case 0x00:
 			case 0x02:
 				return m_hgdc[1]->read((offset & 2) >> 1);
-			/* TODO: double check these two */
+
+			// TODO: double check following two if truly readable everywhere
 			case 0x04:
 				return m_vram_disp & 1;
 			case 0x06:
 				return m_vram_bank & 1;
+
 			/* bitmap palette clut read */
 			case 0x08:
 			case 0x0a:
@@ -449,16 +450,24 @@ void pc9801_state::pc9801_a0_w(offs_t offset, uint8_t data)
 			case 0x0c:
 			case 0x0e:
 			{
-				uint8_t pal_entry;
+				// digital palette mode
+				uint8_t pal_entry = (offset >> 1) & 3;
 
-				m_pal_clut[(offset & 0x6) >> 1] = data;
+				m_pal_clut[pal_entry] = data;
 
-				/* can't be more twisted I presume ... :-/ */
-				pal_entry = (((offset & 4) >> 1) | ((offset & 2) << 1)) >> 1;
+				pal_entry = bitswap<2>(pal_entry, 0, 1);
 				pal_entry ^= 3;
 
-				m_palette->set_pen_color((pal_entry)|4|8, pal1bit((data & 0x2) >> 1), pal1bit((data & 4) >> 2), pal1bit((data & 1) >> 0));
-				m_palette->set_pen_color((pal_entry)|8, pal1bit((data & 0x20) >> 5), pal1bit((data & 0x40) >> 6), pal1bit((data & 0x10) >> 4));
+				for (int nyb = 0; nyb < 2; nyb++)
+				{
+					const uint8_t bit_base = (nyb ^ 1) * 4;
+					m_palette->set_pen_color(
+						pal_entry | nyb * 4 | 8,
+						pal1bit(BIT(data, bit_base + 1)),
+						pal1bit(BIT(data, bit_base + 2)),
+						pal1bit(BIT(data, bit_base + 0))
+					);
+				}
 				return;
 			}
 			default:

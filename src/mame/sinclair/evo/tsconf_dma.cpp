@@ -28,7 +28,8 @@ enum
 	FILL_MEM  = 0b0100,
 	BLT_MEM   = 0b1001,
 	RAM_CRAM  = 0b1100,
-	RAM_SFILE = 0b1101
+	RAM_SFILE = 0b1101,
+	MEM_SPI   = 0b1010
 };
 
 tsconfdma_device::tsconfdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -36,6 +37,7 @@ tsconfdma_device::tsconfdma_device(const machine_config &mconfig, const char *ta
 	, m_in_mreq_cb(*this, 0)
 	, m_out_mreq_cb(*this)
 	, m_in_mspi_cb(*this, 0)
+	, m_out_mspi_cb(*this)
 	, m_out_cram_cb(*this)
 	, m_out_sfile_cb(*this)
 	, m_on_ready_cb(*this)
@@ -204,6 +206,11 @@ int tsconfdma_device::do_read()
 		m_tx_data = m_in_mspi_cb();
 		break;
 
+	case MEM_SPI:
+		len = 4;
+		m_tx_data = m_in_mreq_cb(m_tx_s_addr);
+		break;
+
 	case FILL_MEM:
 		if (!m_tx_block_num && !m_tx_block)
 		{
@@ -253,6 +260,11 @@ int tsconfdma_device::do_write()
 	case BLT_MEM:
 		len = 4;
 		m_out_mreq_cb(m_tx_d_addr, m_tx_data);
+		break;
+
+	case MEM_SPI:
+		len = 4;
+		m_out_mspi_cb(0, m_tx_data);
 		break;
 
 	case RAM_CRAM:

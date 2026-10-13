@@ -411,6 +411,7 @@ void c1571_device::add_base_mconfig(machine_config &config)
 	connector.option_add("525qd", FLOPPY_525_QD);
 	connector.set_default_option("525qd");
 	connector.set_fixed(true);
+	connector.set_media_change_time(attotime::from_msec(100));
 	connector.set_formats(c1571_device::floppy_formats);
 	connector.enable_sound(true);
 }

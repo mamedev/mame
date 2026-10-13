@@ -880,11 +880,7 @@ ROM_END
 
 ROM_START(sc8820)
 	ROM_REGION32_BE(0x10000, "cpurom", 0)
-	// not a dump: this machine's part has not been read out, and what stands
-	// here is a reconstruction of it, written to the addresses the program
-	// flash calls into with the SC-8850's ROM routines carried over to this
-	// machine's addresses and voice count
-	ROM_LOAD("roland-r02015367.ic1", 0x00000, 0x10000, BAD_DUMP CRC(d439b8d3) SHA1(6e6ff8f0ee7bd3bfb119c97016d849e5dc00c1ce))
+	ROM_LOAD("roland-r02015367.ic1", 0x00000, 0x10000, CRC(11b3f772) SHA1(9a3be3d8640f59188a9240d33e666c06612c4aa3))
 
 	// M37640E8FP here, the one time PROM member of the group
 	ROM_REGION(0x8000, "usbmcu", 0)

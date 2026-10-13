@@ -36,11 +36,11 @@ u32 st7735_lcdc_device::render_to_bitmap(screen_device &screen, bitmap_rgb32 &bi
 		if (m_sleep)
 			return 0;
 
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			u32 *const dst = &bitmap.pix(y);
 
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				int const count = (y * 0x200) + x;
 

@@ -1449,11 +1449,12 @@ uint32_t pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 {
 	pen_t const *const pen = m_palette->pens();
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		int const line = y - VIDEO_TEXT_Y;
+		auto *const dst = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int const column = x - VIDEO_TEXT_X;
 			int color = 0;
@@ -1467,7 +1468,7 @@ uint32_t pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 				color = (BIT(data, ~column & 7) ^ BIT(lsd, 7)) && m_blanktv;
 			}
 
-			bitmap.pix(y, x) = pen[color];
+			dst[x] = pen[color];
 		}
 	}
 

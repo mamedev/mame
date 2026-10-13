@@ -1819,16 +1819,16 @@ void sed1356_device::device_reset()
 
 uint32_t sed1356_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		const uint16_t *src = (uint16_t*)&m_vram[y * (0x500 >> 2)];
 		uint32_t *dst = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			const uint16_t pix = src[x];
-			const uint8_t src_red = (uint8_t)((pix >> 11) & 0x1f);
-			const uint8_t src_grn = (uint8_t)((pix >> 5) & 0x3f);
-			const uint8_t src_blu = (uint8_t)(pix & 0x1f);
+			const uint8_t src_red = uint8_t((pix >> 11) & 0x1f);
+			const uint8_t src_grn = uint8_t((pix >> 5) & 0x3f);
+			const uint8_t src_blu = uint8_t(pix & 0x1f);
 			const uint32_t dst_red = ((src_red << 3) | (src_red >> 2)) & 0x000000ff;
 			const uint32_t dst_grn = ((src_grn << 2) | (src_grn >> 4)) & 0x000000ff;
 			const uint32_t dst_blu = ((src_blu << 3) | (src_blu >> 2)) & 0x000000ff;

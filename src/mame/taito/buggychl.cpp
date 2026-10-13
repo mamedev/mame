@@ -276,9 +276,9 @@ void buggychl_state::draw_bg(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	if (m_bg_clip_on)
 	{
 		if (flip_screen_x())
-			clip.min_x += 8 * 8;
+			clip.insetx(8 * 8, 0);
 		else
-			clip.max_x -= 8 * 8;
+			clip.insetx(0, 8 * 8);
 
 		clip &= cliprect;
 	}
@@ -365,7 +365,7 @@ void buggychl_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			int dy = flip_screen_y() ? (255 - sy - y) : (sy + y);
 
-			if (dy >= cliprect.min_y && dy <= cliprect.max_y)
+			if (dy >= cliprect.top() && dy <= cliprect.bottom())
 			{
 				int charline = zoomy_rom[y] & 0x07;
 				int base_pos = zoomy_rom[y] & 0x38;
@@ -411,9 +411,9 @@ uint32_t buggychl_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	draw_sprites(m_dest_bitmap, cliprect);
 	draw_fg(m_dest_bitmap, cliprect);
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			const pen_t pen = m_dest_bitmap.pix(y, x);
 			uint32_t color = m_palette->pen(pen);

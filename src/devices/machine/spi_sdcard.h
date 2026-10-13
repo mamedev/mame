@@ -26,6 +26,7 @@ public:
 	void spi_mosi_w(int state) { m_in_bit = state; }
 
 	bool get_card_present() { return m_image->exists(); }
+	bool get_card_readonly() { return m_image->is_readonly(); }
 	auto card_present_callback() { return m_exists_cb.bind(); }
 
 	devcb_write_line write_miso;

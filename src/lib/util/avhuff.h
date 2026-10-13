@@ -18,6 +18,8 @@
 #include "flac.h"
 
 #include <algorithm>
+#include <cstdint>
+#include <vector>
 
 
 //**************************************************************************

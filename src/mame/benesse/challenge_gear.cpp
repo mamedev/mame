@@ -50,7 +50,7 @@ public:
 		, m_cart(*this, "cartslot")
 	{ }
 
-	void challenge_gear(machine_config &config);
+	void challenge_gear(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -95,6 +95,35 @@ void challenge_gear_state::data_map(address_map &map)
 	map(0x8000, 0x8001).rw("lcdc", FUNC(nt7502_device::read), FUNC(nt7502_device::write));
 }
 
+/*
+Keypad layout
+
+      OK        ON     メニュー     AC        CE/       OK
+                OFF                          もどる
+
+                          +         -         ×         ÷
+
+           up                  7         8         9
+
+left                right      4         5         6
+
+          down                 1         2         3
+
+             リセット          0         .         =
+
+
+PCB markings
+
+   S3    S1    S7    S4    S5    S6
+               S8    S9    S10   S11
+      S12         S13   S14   S15
+S20         S16   S17   S18   S19
+      S24         S21   S22   S23
+         S2       S25   S26   S27
+
+
+S2/Reset is a pinhole button
+*/
 static INPUT_PORTS_START( challenge_gear )
 INPUT_PORTS_END
 

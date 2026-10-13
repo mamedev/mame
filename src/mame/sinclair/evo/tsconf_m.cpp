@@ -94,7 +94,7 @@ void tsconf_state::tsconf_update_video_mode()
 	m_ts_tilemap[TM_TILES1]->set_scrolldx(get_screen_area().left(), 0);
 	m_ts_tilemap[TM_TILES1]->set_scrolldy(get_screen_area().top(), 0);
 
-	m_screen->configure(visarea.max_x + 1, visarea.max_y + 1, visarea, m_screen->frame_period());
+	m_screen->configure(visarea.right() + 1, visarea.bottom() + 1, visarea, m_screen->frame_period());
 }
 
 u8 tsconf_state::get_border_color(u16 hpos, u16 vpos)
@@ -515,6 +515,12 @@ u16 tsconf_state::spi_read16()
 	return data_hi | tsconf_port_57_zctr_r();
 }
 
+void tsconf_state::spi_write16(u16 data)
+{
+	tsconf_port_57_zctr_w(data >> 8);
+	tsconf_port_57_zctr_w(data & 0xff);
+}
+
 void tsconf_state::cram_write(u16 offset, u8 data)
 {
 	m_screen->update_now();
@@ -860,7 +866,8 @@ void tsconf_state::tsconf_port_77_zctr_w(u8 data)
 
 u8 tsconf_state::tsconf_port_77_zctr_r()
 {
-	return 0x02 | (m_sdcard->get_card_present() ? 0x00 : 0x01);
+	return (m_sdcard->get_card_readonly() ? 0x02 : 0x00)
+		| (m_sdcard->get_card_present() ? 0x00 : 0x01);
 }
 
 void tsconf_state::tsconf_port_57_zctr_w(u8 data)

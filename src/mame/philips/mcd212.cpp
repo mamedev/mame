@@ -337,7 +337,7 @@ void mcd212_device::process_ica()
 	// LCT depends on the current frame parity
 	uint32_t addr[2];
 	addr[0] = addr[1] = !BIT(m_csrr[0], CSR1R_PA_BIT) ? 0x200 : 0x202;
-	bool active[2] = { bool(BIT(m_dcr[0], DCR_ICA_BIT)), bool(BIT(m_dcr[1], DCR_ICA_BIT)) };
+	bool active[2] = { ica_enabled(0), ica_enabled(1) };
 
 	for (int i = 0; i < max_to_process && (active[0] | active[1]); i++)
 	{
@@ -523,6 +523,12 @@ inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_mosaic_factor()
 	return 1 << (((m_ddr[Path] & DDR_MT) >> DDR_MT_SHIFT) + 1);
 }
 
+inline ATTR_FORCE_INLINE uint32_t mcd212_device::dyuv_to_rgb(uint8_t y, uint8_t u, uint8_t v) const
+{
+	const int y0 = y + 0x100;
+	return m_dyuv_rgb_lut[0][y0 + m_dyuv_v_to_r[v]] | m_dyuv_rgb_lut[1][y0 + ((m_dyuv_u_to_g[u] + m_dyuv_v_to_g[v]) >> 8)] | m_dyuv_rgb_lut[2][y0 + m_dyuv_u_to_b[u]];
+}
+
 template <int Path>
 void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 {
@@ -535,7 +541,7 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 	uint32_t vsr = get_vsr<Path>();
 	uint32_t vsr2 = get_vsr<!Path>();
 
-	if (tp_ctrl == TCR_ALWAYS || !icm || !vsr)
+	if (!icm || !vsr)
 	{
 		std::fill_n(pixels, get_screen_width(), s_4bpp_color[0]);
 		std::fill_n(transparent, get_screen_width(), (tp_ctrl == TCR_ALWAYS));
@@ -567,88 +573,115 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 
 	LOGMASKED(LOG_VSR, "Scanline %d: VSR Path %d, ICM (%02x), VSR (%08x)\n", screen().vpos(), Path, icm, vsr);
 
+	if (icm == ICM_DYUV)
+	{
+		const int pairs = width / 4;
+		uint8_t byte0 = data[(vsr++ & 0x0007ffff) ^ 1];
+		uint8_t byte1 = data[(vsr++ & 0x0007ffff) ^ 1];
+		u += m_delta_uv_lut[byte0];
+		v += m_delta_uv_lut[byte1];
+
+		for (int i = 0; i < pairs; i++)
+		{
+			const uint8_t y2 = y + m_delta_y_lut[byte0];
+			y = y2 + m_delta_y_lut[byte1];
+
+			uint8_t u_next = u;
+			uint8_t v_next = v;
+			if (i + 1 < pairs)
+			{
+				byte0 = data[(vsr++ & 0x0007ffff) ^ 1];
+				byte1 = data[(vsr++ & 0x0007ffff) ^ 1];
+				u_next += m_delta_uv_lut[byte0];
+				v_next += m_delta_uv_lut[byte1];
+			}
+			const uint8_t u_half = (u + u_next) >> 1;
+			const uint8_t v_half = (v + v_next) >> 1;
+
+			const uint32_t color0 = dyuv_to_rgb(y2, u, v);
+			const uint32_t color1 = dyuv_to_rgb(y, u_half, v_half);
+			uint32_t *const out = &pixels[i * 4];
+			out[0] = color0;
+			out[1] = color0;
+			out[2] = color1;
+			out[3] = color1;
+
+			u = u_next;
+			v = v_next;
+		}
+
+		if (use_matte_flag && !tp_always)
+		{
+			for (int x = 0; x < width; x++)
+				transparent[x] = (matte_flags[x] == tp_check_parity);
+		}
+		else
+		{
+			std::fill_n(transparent, width, tp_always);
+		}
+
+		set_vsr<Path>(vsr);
+		return;
+	}
+
+	const bool fixed_tp = !use_color_key && !use_matte_flag && !(use_rgb_tp_bit && icm == ICM_RGB555 && Path == 1);
+
 	for (uint32_t x = 0; x < width; )
 	{
 		const uint8_t byte = data[(vsr++ & 0x0007ffff) ^ 1];
 		uint32_t color0 = 0;
 		uint32_t color1 = 0;
 		bool rgb_tp_bit = false;
-		if (icm == ICM_DYUV)
+		bool clut_select = BIT(m_image_coding_method, ICM_CS_BIT);
+		if (icm == ICM_RGB555 && Path == 1)
 		{
-			const uint8_t byte1 = data[(vsr++ & 0x0007ffff) ^ 1];
-			const uint8_t y2 = y + m_delta_y_lut[byte];
-			y = y2 + m_delta_y_lut[byte1];
-			u += m_delta_uv_lut[byte];
-			v += m_delta_uv_lut[byte1];
-
-			const uint32_t *limit_rgb = m_dyuv_limit_lut + y2 + 0x100;
-			const uint32_t *limit_rgb2 = m_dyuv_limit_lut + y + 0x100;
-
-			color0 = (limit_rgb[m_dyuv_v_to_r[v]] << 16) | (limit_rgb[m_dyuv_u_to_g[u] + m_dyuv_v_to_g[v]] << 8) | limit_rgb[m_dyuv_u_to_b[u]];
-
-			const uint8_t byte2 = data[(vsr & 0x0007ffff) ^ 1]; // Peek ahead, for calculating the half-step.
-			const uint8_t byte3 = data[((vsr + 1) & 0x0007ffff) ^ 1];
-			const uint8_t u8 = u + m_delta_uv_lut[byte2];
-			const uint8_t v8 = v + m_delta_uv_lut[byte3];
-			const uint8_t u6 = (u >> 1) + (u8 >> 1) + (u & u8 & 1);
-			const uint8_t v6 = (v >> 1) + (v8 >> 1) + (v & v8 & 1);
-
-			color1 = (limit_rgb2[m_dyuv_v_to_r[v6]] << 16) | (limit_rgb2[m_dyuv_u_to_g[u6] + m_dyuv_v_to_g[v6]] << 8) | limit_rgb2[m_dyuv_u_to_b[u6]];
-
-			// TODO: Does not support QHY
-			pixels[x] = color0;
-			pixels[x + 1] = color0;
-			pixels[x + 2] = color1;
-			pixels[x + 3] = color1;
-			transparent[x    ] = tp_always || (use_matte_flag && (matte_flags[x    ] == tp_check_parity));
-			transparent[x + 1] = tp_always || (use_matte_flag && (matte_flags[x + 1] == tp_check_parity));
-			transparent[x + 2] = tp_always || (use_matte_flag && (matte_flags[x + 2] == tp_check_parity));
-			transparent[x + 3] = tp_always || (use_matte_flag && (matte_flags[x + 3] == tp_check_parity));
-			x += 4;
+			const uint8_t byte1 = data2[(vsr2++ & 0x0007ffff) ^ 1];
+			const uint8_t blue = (byte & 0b11111) << 3;
+			const uint8_t green = ((byte & 0b11100000) >> 2) + ((byte1 & 0b11) << 6);
+			const uint8_t red = (byte1 & 0b01111100) << 1;
+			rgb_tp_bit = (use_rgb_tp_bit && (BIT(byte1,7) == tp_check_parity));
+			color1 = color0 = (uint32_t(red) << 16) | (uint32_t(green) << 8) | blue;
+		}
+		else if (icm == ICM_CLUT4)
+		{
+			const uint8_t mask = (decodingMode == DDR_FT_RLE) ? 0x7 : 0xf;
+			color0 = m_clut[BYTE_TO_CLUT<Path>(icm, mask & (byte >> 4), clut_select)];
+			color1 = m_clut[BYTE_TO_CLUT<Path>(icm, mask & byte, clut_select)];
 		}
 		else
 		{
-			bool clut_select = BIT(m_image_coding_method, ICM_CS_BIT);
-			if (icm == ICM_RGB555 && Path == 1)
-			{
-				const uint8_t byte1 = data2[(vsr2++ & 0x0007ffff) ^ 1];
-				const uint8_t blue = (byte & 0b11111) << 3;
-				const uint8_t green = ((byte & 0b11100000) >> 2) + ((byte1 & 0b11) << 6);
-				const uint8_t red = (byte1 & 0b01111100) << 1;
-				rgb_tp_bit = (use_rgb_tp_bit && (BIT(byte1,7) == tp_check_parity));
-				color1 = color0 = (uint32_t(red) << 16) | (uint32_t(green) << 8) | blue;
-			}
-			else if (icm == ICM_CLUT4)
-			{
-				const uint8_t mask = (decodingMode == DDR_FT_RLE) ? 0x7 : 0xf;
-				color0 = m_clut[BYTE_TO_CLUT<Path>(icm, mask & (byte >> 4), clut_select)];
-				color1 = m_clut[BYTE_TO_CLUT<Path>(icm, mask & byte, clut_select)];
-			}
-			else
-			{
-				color1 = color0 = m_clut[BYTE_TO_CLUT<Path>(icm, byte, clut_select)];
-			}
-
-			int length_m = mosaic_enable ? (mosaic_factor * 2) : 2;
-			if (decodingMode == DDR_FT_RLE)
-			{
-				const uint16_t length = (byte & 0x80) ? data[((vsr++) & 0x0007ffff) ^ 1] : 1;
-				length_m = length ? (length * 2) : width;
-			}
-
-			const bool color_match0 = ((mask_bits & color0) == tp_color_match) == tp_check_parity;
-			const bool color_match1 = ((mask_bits & color1) == tp_color_match) == tp_check_parity;
-			const int end = std::min<int>(width, x + length_m);
-			for (int rl_index = x; rl_index < end; rl_index += 2)
-			{
-				pixels[rl_index    ] = color0;
-				pixels[rl_index + 1] = color1;
-				transparent[rl_index    ] = tp_always || rgb_tp_bit || (use_color_key && color_match0) || (use_matte_flag && (matte_flags[rl_index    ] == tp_check_parity));
-				transparent[rl_index + 1] = tp_always || rgb_tp_bit || (use_color_key && color_match1) || (use_matte_flag && (matte_flags[rl_index + 1] == tp_check_parity));
-			}
-			x = end;
+			color1 = color0 = m_clut[BYTE_TO_CLUT<Path>(icm, byte, clut_select)];
 		}
+
+		int length_m = mosaic_enable ? (mosaic_factor * 2) : 2;
+		if (decodingMode == DDR_FT_RLE)
+		{
+			const uint16_t length = (byte & 0x80) ? data[((vsr++) & 0x0007ffff) ^ 1] : 1;
+			length_m = length ? (length * 2) : width;
+		}
+
+		const bool color_match0 = ((mask_bits & color0) == tp_color_match) == tp_check_parity;
+		const bool color_match1 = ((mask_bits & color1) == tp_color_match) == tp_check_parity;
+		const int end = std::min<int>(width, x + length_m);
+		for (int rl_index = x; rl_index < end; rl_index += 2)
+		{
+			pixels[rl_index    ] = color0;
+			pixels[rl_index + 1] = color1;
+			if (!fixed_tp)
+			{
+				transparent[rl_index    ] = rgb_tp_bit || (use_color_key && color_match0) || (use_matte_flag && (matte_flags[rl_index    ] == tp_check_parity));
+				transparent[rl_index + 1] = rgb_tp_bit || (use_color_key && color_match1) || (use_matte_flag && (matte_flags[rl_index + 1] == tp_check_parity));
+			}
+		}
+		x = end;
 	}
+
+	// Constant flag pulled out of the loop for speed.
+	if (fixed_tp)
+	{
+		std::fill_n(transparent, width, tp_always);
+	}
+	
 	set_vsr<Path>(vsr);
 	set_vsr<!Path>(vsr2);
 }
@@ -969,9 +1002,9 @@ TIMER_CALLBACK_MEMBER(mcd212_device::ica_tick)
 	// Process ICA
 	process_ica();
 
-	if (BIT(m_dcr[0], DCR_DCA_BIT))
+	if (dca_enabled(0))
 		m_dca[0] = get_dcp<0>();
-	if (BIT(m_dcr[1], DCR_DCA_BIT))
+	if (dca_enabled(1))
 		m_dca[1] = get_dcp<1>();
 
 	m_ica_timer->adjust(screen().time_until_pos(0, 0));
@@ -995,9 +1028,9 @@ TIMER_CALLBACK_MEMBER(mcd212_device::ica_tick)
 TIMER_CALLBACK_MEMBER(mcd212_device::dca_tick)
 {
 	// Process DCA
-	if (BIT(m_dcr[1], DCR_DCA_BIT))
+	if (dca_enabled(1))
 		process_dca<1>();
-	if (BIT(m_dcr[0], DCR_DCA_BIT))
+	if (dca_enabled(0))
 		process_dca<0>();
 
 	int scanline = screen().vpos() / 2;
@@ -1036,7 +1069,6 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			// If PAL and 'Standard' bit set, insert a 20-line border on the top/bottom
 			if ((scanline - m_ica_height < 20) || (scanline >= (m_total_height - 20)))
 			{
-				std::fill_n(out, 768, s_4bpp_display_color[0]);
 				draw_line = false;
 			}
 		}
@@ -1080,6 +1112,10 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 			}
 
 			draw_cursor(out);
+		}
+		else
+		{
+			std::fill_n(out, 768, s_4bpp_display_color[0]);
 		}
 
 		if (BIT(m_dcr[0], DCR_SM_BIT))
@@ -1146,10 +1182,9 @@ int mcd212_device::ram_dtack_cycle_count()
 
 int mcd212_device::rom_dtack_cycle_count()
 {
-	static const int s_dd_values[4] = { 2, 3, 4, 5 };
-	if (!BIT(m_csrw[0], CSR1W_DD_BIT))
-		return 7;
-	return s_dd_values[(m_csrw[0] & CSR1W_DD2) >> CSR1W_DD2_SHIFT];
+	static const uint8_t s_dd_clks[4] = { 4, 6, 8, 10 };
+	const uint8_t clks = BIT(m_csrw[0], CSR1W_DD_BIT) ? s_dd_clks[(m_csrw[0] & CSR1W_DD2) >> CSR1W_DD2_SHIFT] : 12;
+	return std::max(int(clks >> 1) - 4, 0);
 }
 
 void mcd212_device::device_reset()
@@ -1231,14 +1266,20 @@ void mcd212_device::device_start()
 	{
 		const uint8_t limit = (w < 0x100) ? 0 : (w < 0x200) ? (w - 0x100) : 0xff;
 		m_dyuv_limit_lut[w] = limit;
+
+		// the decoder outputs the 7 most significant bits of R, G and B
+		m_dyuv_rgb_lut[0][w] = uint32_t(limit & 0xfe) << 16;
+		m_dyuv_rgb_lut[1][w] = uint32_t(limit & 0xfe) << 8;
+		m_dyuv_rgb_lut[2][w] = uint32_t(limit & 0xfe);
 	}
 
+	// trunc{} in the MCD212 equations rounds down, also for negative values
 	for (int16_t sw = 0; sw < 0x100; sw++)
 	{
-		m_dyuv_u_to_b[sw] = (444 * (sw - 128)) / 256;
-		m_dyuv_u_to_g[sw] = - (86 * (sw - 128)) / 256;
-		m_dyuv_v_to_g[sw] = - (179 * (sw - 128)) / 256;
-		m_dyuv_v_to_r[sw] = (351 * (sw - 128)) / 256;
+		m_dyuv_u_to_b[sw] = (444 * (sw - 128)) >> 8;
+		m_dyuv_u_to_g[sw] = -86 * (sw - 128);
+		m_dyuv_v_to_g[sw] = -179 * (sw - 128);
+		m_dyuv_v_to_r[sw] = (351 * (sw - 128)) >> 8;
 	}
 
 	save_item(NAME(m_csrr));
