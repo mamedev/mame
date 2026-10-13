@@ -11,7 +11,7 @@ class xavix_bistro_sensor_device : public device_t
 public:
 	xavix_bistro_sensor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	int sense_r() const { return m_sense; }
+	int sense_r() const { return m_food_placed->read() && m_sense; }
 	void excite_w(int state);
 
 protected:
@@ -24,6 +24,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(response_tick);
 
+	required_ioport m_food_placed;
 	required_ioport m_ingredient;
 	emu_timer *m_response_timer;
 	u8 m_edges_remaining;

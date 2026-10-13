@@ -5,6 +5,8 @@
     Bistro Kids ingredient-sensor interface. Responds to the console's
     excitation signal with a timed sequence of sense-line transitions that
     encodes the selected ingredient for the software's input sampler.
+    Food placement is independent of selection; an empty board has no response.
+    This avoids detecting the wrong food while cycling through item choices.
 
     Response periods are representative values that select the ingredient
     identities decoded by the ROM.
@@ -20,9 +22,13 @@
 DEFINE_DEVICE_TYPE(XAVIX_BISTRO_SENSOR, xavix_bistro_sensor_device, "xavix_bistro_sensor", "XaviX Bistro Kids Ingredient Sensor")
 
 static INPUT_PORTS_START( xavix_bistro_sensor )
+	PORT_START("PLACED")
+	PORT_CONFNAME( 0x01, 0x00, "Food Placed" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
 	PORT_START("INGREDIENT")
-	PORT_CONFNAME( 0x0f, 0x00, "Ingredient" )
-	PORT_CONFSETTING(    0x00, DEF_STR(None) )
+	PORT_CONFNAME( 0x0f, 0x01, "Food Item" )
 	// Representative periods select the ROM's verified identities; original ingredient response timing is unmeasured.
 	PORT_CONFSETTING(    0x01, "Potato" )
 	PORT_CONFSETTING(    0x02, "Onion" )
@@ -41,6 +47,7 @@ xavix_bistro_sensor_device::xavix_bistro_sensor_device(
 		device_t *owner,
 		u32 clock)
 	: device_t(mconfig, XAVIX_BISTRO_SENSOR, tag, owner, clock)
+	, m_food_placed(*this, "PLACED")
 	, m_ingredient(*this, "INGREDIENT")
 	, m_sense(false)
 {
@@ -84,7 +91,7 @@ void xavix_bistro_sensor_device::excite_w(int state)
 		return;
 	}
 
-	u8 const ingredient = m_ingredient->read() & 0x0f;
+	u8 const ingredient = m_food_placed->read() ? (m_ingredient->read() & 0x0f) : 0;
 	u8 const period = ingredient < std::size(RESPONSE_HALF_PERIOD_TICKS) ? RESPONSE_HALF_PERIOD_TICKS[ingredient] : 0;
 	if (!period)
 		return;
