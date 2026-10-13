@@ -1958,7 +1958,7 @@ void sh_common_execution::execute_one(const uint16_t opcode)
 
 // DRC / UML related
 void cfunc_unimplemented(void *param) { ((sh_common_execution *)param)->func_unimplemented(); }
-void cfunc_slot_illegal(void *param) { ((sh_common_execution *)param)->func_slot_illegal(); }
+static void cfunc_slot_illegal(void *param) { static_cast<sh_common_execution *>(param)->func_slot_illegal(); }
 void cfunc_MAC_W(void *param) { ((sh_common_execution *)param)->func_MAC_W(); }
 void cfunc_MAC_L(void *param) { ((sh_common_execution *)param)->func_MAC_L(); }
 void cfunc_DIV1(void *param) { ((sh_common_execution *)param)->func_DIV1(); }
@@ -2489,12 +2489,12 @@ void sh_common_execution::generate_sequence_instruction(drcuml_block &block, com
 		// otherwise, unless this is a virtual no-op, it's a regular instruction
 		// compile the instruction
 		// on the SH-1/SH-2 a branch in a delay slot raises a slot illegal instruction exception,
-		// which stacks the address of the delayed branch instead of its own
+		// which stacks the destination of the delayed branch instead of its own address
 		const bool slot_illegal = (m_cpu_type <= CPU_TYPE_SH2) && desc->in_delay_slot() && is_slot_illegal(desc->opptr);
+		assert(!slot_illegal || (ovrpc != SH_OVRPC_NONE));
 		if (slot_illegal || !generate_opcode(block, compiler, desc, ovrpc))
 		{
 			// take the illegal instruction exception immediately
-			const uint32_t stacked_pc = slot_illegal ? (desc->pc - 2) : desc->pc;
 			UML_MOV(block, mem(&m_sh2_state->pc), desc->pc);                            // mov     [pc],desc->pc
 			UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);                  // mov     [arg0],opcode
 			UML_CALLC(block, slot_illegal ? cfunc_slot_illegal : cfunc_unimplemented, this); // callc   cfunc_unimplemented
@@ -2506,7 +2506,12 @@ void sh_common_execution::generate_sequence_instruction(drcuml_block &block, com
 
 			UML_SUB(block, R32(15), R32(15), 4);                    // sub     R15, R15, #4
 			UML_MOV(block, I0, R32(15));                            // mov     r0, R15
-			UML_MOV(block, I1, stacked_pc);                         // mov     r1, stacked_pc
+			if (!slot_illegal)
+				UML_MOV(block, I1, desc->pc);                       // mov     r1, desc->pc
+			else if (ovrpc == SH_OVRPC_DYNAMIC)
+				UML_MOV(block, I1, mem(&m_sh2_state->target));      // mov     r1, target
+			else
+				UML_MOV(block, I1, ovrpc + 2);                      // mov     r1, ovrpc + 2
 			UML_CALLH(block, *m_write32);                           // call    write32
 
 			// evec is clobbered by the interrupt check inside generate_update_cycles
