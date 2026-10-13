@@ -1552,6 +1552,7 @@ Hi-score table is corrupt (dump really?)
 		<description>Next Round</description>
 		<year>2026</year>
 		<publisher>Performers</publisher>
+		<sharedfeat name="user_default" value="digimax"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side 1"/>
@@ -1561,9 +1562,9 @@ Hi-score table is corrupt (dump really?)
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side 2"/>
+			<feature name="part_id" value="Side 2 (Digimax)"/>
 			<dataarea name="flop" size="174848">
-				<rom name="round2.d64" size="174848" crc="3815e5c3" sha1="7274341c1ea51c490643b5624683fcc351f9faf9"/>
+				<rom name="round2_digimax.d64" size="174848" crc="29b11be2" sha1="ba893591852cd0550c4297663347f544b1211624"/>
 			</dataarea>
 		</part>
 
@@ -1582,9 +1583,9 @@ Hi-score table is corrupt (dump really?)
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Side 2 (Digimax)"/>
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="flop" size="174848">
-				<rom name="round2_digimax.d64" size="174848" crc="29b11be2" sha1="ba893591852cd0550c4297663347f544b1211624"/>
+				<rom name="round2.d64" size="174848" crc="3815e5c3" sha1="7274341c1ea51c490643b5624683fcc351f9faf9"/>
 			</dataarea>
 		</part>
 	</software>
