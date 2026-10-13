@@ -98,14 +98,6 @@ double map_port_range(const required_ioport &port, double new_start, double new_
 		port->read(), port->field(1)->minval(), port->field(1)->maxval(), new_start, new_end);
 }
 
-// Converts a 0-5V double to the byte produced by the ADC.
-u8 adc_byte(double v)
-{
-	const double clamped_v = std::clamp(v, 0.0, 5.0);  // ADC input has clamping diodes.
-	const double mapped = std::round(fmaprange(clamped_v, 0.0, 5.0, 0.0, 255.0));
-	return u8(std::clamp(mapped, 0.0, 255.0));
-}
-
 
 // Hardware and functionality that is common to the Xpander and Matrix-12.
 class xpander_state_base : public driver_device
@@ -128,6 +120,7 @@ protected:
 	u8 encoder_sw_r();
 	bool memory_protect_r() const;
 
+	static u8 adc_byte(double v);
 	u8 adc_r(offs_t offset);
 	void adc_w(offs_t offset, u8 data);
 
@@ -145,7 +138,7 @@ private:
 	void encoder_moved(int encoder);
 	void display_output_w(int display, offs_t offset, u32 data);
 
-	virtual std::pair<double, double> pedal_pulldown(int pedal) const = 0;
+	virtual std::pair<double, double> pedal_pull(int pedal) const = 0;
 	virtual u8 gate_inputs() const = 0;
 	virtual u8 cv_in_r() = 0;
 
@@ -266,6 +259,14 @@ bool xpander_state_base::memory_protect_r() const
 	// One is read by the firmware, and the other disables (via logic gates) the
 	// /WR signal for a subset of RAM chips.
 	return !BIT(m_memory_protect_io->read(), 0);
+}
+
+// Converts a 0-5V double to the byte produced by the ADC.
+u8 xpander_state_base::adc_byte(double v)
+{
+	const double clamped_v = std::clamp(v, 0.0, 5.0);  // ADC input has clamping diodes.
+	const double mapped = std::round(fmaprange(clamped_v, 0.0, 5.0, 0.0, 255.0));
+	return u8(std::clamp(mapped, 0.0, 255.0));
 }
 
 u8 xpander_state_base::adc_r(offs_t offset)
@@ -398,7 +399,7 @@ u8 xpander_state_base::pedal_cv(int pedal) const
 	{
 		case PEDAL_TYPE_NC:
 		{
-			const auto [v_pulldown, r_pulldown] = pedal_pulldown(pedal);
+			const auto [v_pulldown, r_pulldown] = pedal_pull(pedal);
 			cv = v_pulldown + (VPLUS - v_pulldown) * RES_VOLTAGE_DIVIDER(R_VPLUS, r_pulldown);
 			break;
 		}
@@ -541,7 +542,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(firq_timer_elapsed);
 	void firq_timer_preset_w(u8 data);
 
-	std::pair<double, double> pedal_pulldown(int pedal) const override;
+	std::pair<double, double> pedal_pull(int pedal) const override;
 	u8 gate_inputs() const override;
 
 	u8 cv_in_r() override;
@@ -627,7 +628,7 @@ void xpander_state::firq_timer_preset_w(u8 data)
 	LOGMASKED(LOG_FIRQ_TIMER, "FIRQ Timer Preset: %02x\n", data);
 }
 
-std::pair<double, double> xpander_state::pedal_pulldown(int pedal) const
+std::pair<double, double> xpander_state::pedal_pull(int pedal) const
 {
 	assert(pedal == 0 || pedal == 1);
 	constexpr double R_PULL[2] = { RES_K(47), RES_K(47) };  // R75, R76
@@ -800,7 +801,7 @@ protected:
 	void machine_reset() override ATTR_COLD;
 
 private:
-	std::pair<double, double> pedal_pulldown(int pedal) const override;
+	std::pair<double, double> pedal_pull(int pedal) const override;
 	u8 gate_inputs() const override;
 	u8 kbd_pressure_cv() const;
 
@@ -859,7 +860,7 @@ matrix12_state::matrix12_state(const machine_config &mconfig, device_type type, 
 {
 }
 
-std::pair<double, double> matrix12_state::pedal_pulldown(int pedal) const
+std::pair<double, double> matrix12_state::pedal_pull(int pedal) const
 {
 	assert(pedal == 0 || pedal == 1);
 	const double v_pull = m_pull_pedal[pedal] ? 5.0 : 0.0;
@@ -870,7 +871,7 @@ std::pair<double, double> matrix12_state::pedal_pulldown(int pedal) const
 u8 matrix12_state::gate_inputs() const
 {
 	const u8 config = m_gate_config->read();
-	const u8 value = m_gate_io->read();
+	const u8 input = m_gate_io->read();
 
 	// When a pedal is connected, pedalXin will get disconnected from the
 	// ADC input circuit and assume the value of the firmware-configured pull.
@@ -880,12 +881,12 @@ u8 matrix12_state::gate_inputs() const
 	const u8 pedal1in = pedal_connected(0) ? (m_pull_pedal[0] ? 1 : 0) : 1;
 	const u8 pedal2in = pedal_connected(1) ? (m_pull_pedal[1] ? 1 : 0) : 1;
 
-	const u8 chain_adv = BIT(config, 0) ? BIT(value, 0) : 1;
+	const u8 chain_adv = BIT(config, 0) ? BIT(input, 0) : 1;
 
 	u8 trigger = m_pull_trigger ? 1 : 0;
 	if (BIT(config, 2))  // Trigger input connected?
 	{
-		trigger = BIT(value, 1);
+		trigger = BIT(input, 1);
 		if (!BIT(config, 1))  // Inverse polarity?
 			trigger ^= 1;
 	}
@@ -1001,14 +1002,17 @@ void matrix12_state::lset_w(u8 data)
 
 			if (i == 0)
 				m_pit->write_gate0(1);
-			else
+			else if (i == 1)
 				m_pit->write_gate1(1);
+			else
+				assert(false);
 
 			LOGMASKED(LOG_LEVER, "Lever %d: %f, %f\n", i, r_lever, t);
 		}
 		else
 		{
-			// If a timing is in progress, additional triggers are ignored.
+			// If a timing is already in progress, the 74LS221 ignores
+			// additional triggers.
 			LOGMASKED(LOG_LEVER, "Lever %d: timing still in progress\n");
 		}
 	}
