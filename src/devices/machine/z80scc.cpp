@@ -1510,6 +1510,10 @@ uint8_t z80scc_channel::do_sccreg_rr2()
 	if (m_index == z80scc_device::CHANNEL_B)
 	{
 		LOGINT(" - Channel B so we might need to update the vector modification\n");
+		// with no interrupt pending the status is 011 in V3-V1 (110 in V6-V4), the code for a channel B special
+		// receive condition
+		m_rr2 = m_uart->modify_vector(m_rr2, z80scc_device::CHANNEL_B, INT_SPECIAL);
+
 		// loop over all interrupt sources
 		for (int const i : z80scc_device::INT_PRIORITY)
 		{
