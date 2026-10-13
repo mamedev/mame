@@ -58262,10 +58262,10 @@ Side B: Once Upon a Lily Pad
 		</part>
 	</software>
 
-	<software name="castlequ_a" cloneof="castlequ">
-		<description>Castle Quest</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="castleqst">
+		<description>Castle Quest (Scorpio Gamesworld)</description>
+		<year>1984</year>
+		<publisher>Scorpio Gamesworld</publisher>
 		<part name="cass" interface="spectrum_cass">
 			<dataarea name="cass" size="45345">
 				<rom name="castle quest.tzx" size="45345" crc="0f436740" sha1="f7523f4cb3f9b694b58dc0940e5c0b72ee9c42de"/>
