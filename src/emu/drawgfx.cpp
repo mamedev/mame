@@ -582,36 +582,117 @@ void gfx_element::alpha(bitmap_rgb32 &dest, const rectangle &cliprect,
 ***************************************************************************/
 
 /*-------------------------------------------------
+    subpixel_zoom_step - 16.16 source step per
+    destination pixel for a 16.16 scale, rounded
+    up so N elements never gain a pixel; 0 if the
+    scale is too small to draw
+-------------------------------------------------*/
+
+u32 gfx_element::subpixel_zoom_step(u32 scale)
+{
+	if (scale == 0)
+		return 0;
+	u64 const step = ((u64(1) << 32) + scale - 1) / scale;
+	return (step > 0x7fffffff) ? 0 : u32(step);
+}
+
+
+/*-------------------------------------------------
+    subpixel_zoom_span - compute the visible
+    destination span and the starting 16.16
+    source position and step along one axis for
+    one element of a multi-element sprite; pos is
+    the 16.16 sprite origin and tile the element's
+    column/row; returns false if nothing is
+    visible
+-------------------------------------------------*/
+
+bool gfx_element::subpixel_zoom_span(s32 pos, s32 tile, u32 size, u32 step, int flip, s32 clipmin, s32 clipmax, s32 &deststart, s32 &destend, s32 &src, s32 &srcstep)
+{
+	auto const ceil_div = [] (s64 a, s64 b) { return (a >= 0) ? ((a + b - 1) / b) : -(-a / b); };
+
+	if (step == 0 || step > 0x7fffffff)
+		return false;
+
+	// first destination pixel at or after the origin, and the source position there
+	s64 const first = ceil_div(pos, 0x10000);
+	s64 const phase = ((first * 0x10000 - pos) * step) >> 16;
+
+	// destination pixels [first + k0, first + k1) sample this element's source range [t0, t1)
+	s64 const t0 = s64(tile) * size * 0x10000;
+	s64 const t1 = t0 + s64(size) * 0x10000;
+	s64 const k0 = ceil_div(t0 - phase, step);
+	s64 const k1 = ceil_div(t1 - phase, step);
+	if (k1 <= k0)
+		return false;
+
+	// compute the span and exit if we are entirely clipped
+	s64 start = first + k0;
+	s64 end = first + k1 - 1;
+	if (start > clipmax || end < clipmin)
+		return false;
+
+	// source position within the element at the first pixel
+	s64 srcpos = phase + k0 * step - t0;
+	s64 delta = step;
+
+	// apply flipping
+	if (flip)
+	{
+		srcpos = s64(size) * 0x10000 - 1 - srcpos;
+		delta = -delta;
+	}
+
+	// apply low clip
+	if (start < clipmin)
+	{
+		srcpos += (clipmin - start) * delta;
+		start = clipmin;
+	}
+
+	// apply high clip
+	if (end > clipmax)
+		end = clipmax;
+
+	deststart = s32(start);
+	destend = s32(end);
+	src = s32(srcpos);
+	srcstep = s32(delta);
+	return true;
+}
+
+
+/*-------------------------------------------------
     zoom_opaque - render a scaled gfx
     element with no transparency
 -------------------------------------------------*/
 
-void gfx_element::zoom_opaque(bitmap_ind16 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley)
+void gfx_element::zoom_opaque_common(bitmap_ind16 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return opaque(dest, cliprect, code, color, flipx, flipy, destx, desty);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return opaque(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos));
 
 	// render
 	color = colorbase() + granularity() * (color % colors());
 	code %= elements();
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [color](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_OPAQUE(destp, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, [color](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_OPAQUE(destp, srcp); });
 }
 
-void gfx_element::zoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley)
+void gfx_element::zoom_opaque_common(bitmap_rgb32 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return opaque(dest, cliprect, code, color, flipx, flipy, destx, desty);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return opaque(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos));
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
 	code %= elements();
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [paldata](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_OPAQUE(destp, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, [paldata](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_OPAQUE(destp, srcp); });
 }
 
 
@@ -620,17 +701,17 @@ void gfx_element::zoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect,
     element with a single transparent pen
 -------------------------------------------------*/
 
-void gfx_element::zoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, u32 trans_pen)
+void gfx_element::zoom_transpen_common(bitmap_ind16 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, u32 trans_pen)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, trans_pen);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return transpen(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), trans_pen);
 
 	// special case invalid pens to opaque
 	if (trans_pen > 0xff)
-		return zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley);
+		return zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy);
 
 	// use pen usage to optimize
 	code %= elements();
@@ -643,25 +724,25 @@ void gfx_element::zoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect,
 
 		// fully opaque; draw as such
 		if ((usage & (1 << trans_pen)) == 0)
-			return zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley);
+			return zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy);
 	}
 
 	// render
 	color = colorbase() + granularity() * (color % colors());
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [trans_pen, color](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN(destp, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, [trans_pen, color](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN(destp, srcp); });
 }
 
-void gfx_element::zoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, u32 trans_pen)
+void gfx_element::zoom_transpen_common(bitmap_rgb32 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, u32 trans_pen)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, trans_pen);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return transpen(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), trans_pen);
 
 	// special case invalid pens to opaque
 	if (trans_pen > 0xff)
-		return zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley);
+		return zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy);
 
 	// use pen usage to optimize
 	code %= elements();
@@ -674,12 +755,12 @@ void gfx_element::zoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 		// fully opaque; draw as such
 		if ((usage & (1 << trans_pen)) == 0)
-			return zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley);
+			return zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy);
 	}
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [trans_pen, paldata](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN(destp, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, [trans_pen, paldata](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN(destp, srcp); });
 }
 
 
@@ -689,13 +770,13 @@ void gfx_element::zoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
     color lookups
 -------------------------------------------------*/
 
-void gfx_element::zoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, u32 trans_pen)
+void gfx_element::zoom_transpen_raw_common(bitmap_ind16 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, u32 trans_pen)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return transpen_raw(dest, cliprect, code, color, flipx, flipy, destx, desty, trans_pen);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return transpen_raw(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), trans_pen);
 
 	// early out if completely transparent
 	code %= elements();
@@ -703,16 +784,16 @@ void gfx_element::zoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprec
 		return;
 
 	// render
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [trans_pen, color](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN(destp, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, [trans_pen, color](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN(destp, srcp); });
 }
 
-void gfx_element::zoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, u32 trans_pen)
+void gfx_element::zoom_transpen_raw_common(bitmap_rgb32 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, u32 trans_pen)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return transpen_raw(dest, cliprect, code, color, flipx, flipy, destx, desty, trans_pen);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return transpen_raw(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), trans_pen);
 
 	// early out if completely transparent
 	code %= elements();
@@ -720,7 +801,7 @@ void gfx_element::zoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprec
 		return;
 
 	// render
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [trans_pen, color](u32 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN(destp, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, [trans_pen, color](u32 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN(destp, srcp); });
 }
 
 
@@ -730,17 +811,17 @@ void gfx_element::zoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprec
     provided as a mask
 -------------------------------------------------*/
 
-void gfx_element::zoom_transmask(bitmap_ind16 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, u32 trans_mask)
+void gfx_element::zoom_transmask_common(bitmap_ind16 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, u32 trans_mask)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return transmask(dest, cliprect, code, color, flipx, flipy, destx, desty, trans_mask);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return transmask(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), trans_mask);
 
 	// special case 0 mask to opaque
 	if (trans_mask == 0)
-		return zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley);
+		return zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy);
 
 	// use pen usage to optimize
 	code %= elements();
@@ -753,25 +834,25 @@ void gfx_element::zoom_transmask(bitmap_ind16 &dest, const rectangle &cliprect,
 
 		// fully opaque; draw as such
 		if ((usage & trans_mask) == 0)
-			return zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley);
+			return zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy);
 	}
 
 	// render
 	color = colorbase() + granularity() * (color % colors());
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [trans_mask, color](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSMASK(destp, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, [trans_mask, color](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSMASK(destp, srcp); });
 }
 
-void gfx_element::zoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, u32 trans_mask)
+void gfx_element::zoom_transmask_common(bitmap_rgb32 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, u32 trans_mask)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return transmask(dest, cliprect, code, color, flipx, flipy, destx, desty, trans_mask);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return transmask(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), trans_mask);
 
 	// special case 0 mask to opaque
 	if (trans_mask == 0)
-		return zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley);
+		return zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy);
 
 	// use pen usage to optimize
 	code %= elements();
@@ -784,12 +865,12 @@ void gfx_element::zoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 		// fully opaque; draw as such
 		if ((usage & trans_mask) == 0)
-			return zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley);
+			return zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy);
 	}
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [trans_mask, paldata](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANSMASK(destp, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, [trans_mask, paldata](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANSMASK(destp, srcp); });
 }
 
 
@@ -799,38 +880,38 @@ void gfx_element::zoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect,
     are transparent, opaque, or shadowing
 -------------------------------------------------*/
 
-void gfx_element::zoom_transtable(bitmap_ind16 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, const u8 *pentable)
+void gfx_element::zoom_transtable_common(bitmap_ind16 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, const u8 *pentable)
 {
 	assert(pentable != nullptr);
 
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return transtable(dest, cliprect, code, color, flipx, flipy, destx, desty, pentable);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return transtable(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), pentable);
 
 	// render
 	color = colorbase() + granularity() * (color % colors());
 	const pen_t *shadowtable = m_palette->shadow_table();
 	code %= elements();
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [pentable, color, shadowtable](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSTABLE16(destp, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, [pentable, color, shadowtable](u16 &destp, const u8 &srcp) { PIXEL_OP_REBASE_TRANSTABLE16(destp, srcp); });
 }
 
-void gfx_element::zoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, const u8 *pentable)
+void gfx_element::zoom_transtable_common(bitmap_rgb32 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, const u8 *pentable)
 {
 	assert(pentable != nullptr);
 
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return transtable(dest, cliprect, code, color, flipx, flipy, destx, desty, pentable);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return transtable(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), pentable);
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
 	const pen_t *shadowtable = m_palette->shadow_table();
 	code %= elements();
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [pentable, paldata, shadowtable](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANSTABLE32(destp, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, [pentable, paldata, shadowtable](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANSTABLE32(destp, srcp); });
 }
 
 
@@ -840,17 +921,17 @@ void gfx_element::zoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect,
     the remaining pixels with a fixed alpha value
 -------------------------------------------------*/
 
-void gfx_element::zoom_alpha(bitmap_rgb32 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, u32 trans_pen, u8 alpha_val)
+void gfx_element::zoom_alpha_common(bitmap_rgb32 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, u32 trans_pen, u8 alpha_val)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return alpha(dest, cliprect, code, color, flipx, flipy, destx, desty, trans_pen, alpha_val);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return alpha(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), trans_pen, alpha_val);
 
 	// special case alpha_val = 0xff
 	if (alpha_val == 0xff)
-		return zoom_transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley, trans_pen);
+		return zoom_transpen_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy, trans_pen);
 
 	// early out if completely transparent
 	code %= elements();
@@ -859,7 +940,7 @@ void gfx_element::zoom_alpha(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, [trans_pen, alpha_val, paldata](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_ALPHA32(destp, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, [trans_pen, alpha_val, paldata](u32 &destp, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_ALPHA32(destp, srcp); });
 }
 
 
@@ -1154,13 +1235,13 @@ void gfx_element::prio_alpha(bitmap_rgb32 &dest, const rectangle &cliprect,
     the priority bitmap
 -------------------------------------------------*/
 
-void gfx_element::prio_zoom_opaque(bitmap_ind16 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask)
+void gfx_element::prio_zoom_opaque_common(bitmap_ind16 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return prio_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return prio_opaque(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), priority, pmask);
 
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
@@ -1168,16 +1249,16 @@ void gfx_element::prio_zoom_opaque(bitmap_ind16 &dest, const rectangle &cliprect
 	// render
 	color = colorbase() + granularity() * (color % colors());
 	code %= elements();
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_OPAQUE_PRIORITY(destp, pri, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, priority, [pmask, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
-void gfx_element::prio_zoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask)
+void gfx_element::prio_zoom_opaque_common(bitmap_rgb32 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return prio_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return prio_opaque(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), priority, pmask);
 
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
@@ -1185,7 +1266,7 @@ void gfx_element::prio_zoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
 	code %= elements();
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_OPAQUE_PRIORITY(destp, pri, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, priority, [pmask, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_OPAQUE_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -1195,18 +1276,18 @@ void gfx_element::prio_zoom_opaque(bitmap_rgb32 &dest, const rectangle &cliprect
     checking against the priority bitmap
 -------------------------------------------------*/
 
-void gfx_element::prio_zoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask,
+void gfx_element::prio_zoom_transpen_common(bitmap_ind16 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask,
 		u32 trans_pen)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return prio_transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, trans_pen);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return prio_transpen(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), priority, pmask, trans_pen);
 
 	// special case invalid pens to opaque
 	if (trans_pen > 0xff)
-		return prio_zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask);
+		return prio_zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy, priority, pmask);
 
 	// use pen usage to optimize
 	code %= elements();
@@ -1219,7 +1300,7 @@ void gfx_element::prio_zoom_transpen(bitmap_ind16 &dest, const rectangle &clipre
 
 		// fully opaque; draw as such
 		if ((usage & (1 << trans_pen)) == 0)
-			return prio_zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask);
+			return prio_zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy, priority, pmask);
 	}
 
 	// high bit of the mask is implicitly on
@@ -1227,21 +1308,21 @@ void gfx_element::prio_zoom_transpen(bitmap_ind16 &dest, const rectangle &clipre
 
 	// render
 	color = colorbase() + granularity() * (color % colors());
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN_PRIORITY(destp, pri, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, priority, [pmask, trans_pen, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
-void gfx_element::prio_zoom_transpen(bitmap_rgb32 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask,
+void gfx_element::prio_zoom_transpen_common(bitmap_rgb32 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask,
 		u32 trans_pen)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return prio_transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, trans_pen);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return prio_transpen(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), priority, pmask, trans_pen);
 
 	// special case invalid pens to opaque
 	if (trans_pen > 0xff)
-		return prio_zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask);
+		return prio_zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy, priority, pmask);
 
 	// use pen usage to optimize
 	code %= elements();
@@ -1254,7 +1335,7 @@ void gfx_element::prio_zoom_transpen(bitmap_rgb32 &dest, const rectangle &clipre
 
 		// fully opaque; draw as such
 		if ((usage & (1 << trans_pen)) == 0)
-			return prio_zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask);
+			return prio_zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy, priority, pmask);
 	}
 
 	// high bit of the mask is implicitly on
@@ -1262,7 +1343,7 @@ void gfx_element::prio_zoom_transpen(bitmap_rgb32 &dest, const rectangle &clipre
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_PRIORITY(destp, pri, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, priority, [pmask, trans_pen, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -1273,14 +1354,14 @@ void gfx_element::prio_zoom_transpen(bitmap_rgb32 &dest, const rectangle &clipre
     bitmap
 -------------------------------------------------*/
 
-void gfx_element::prio_zoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask,
+void gfx_element::prio_zoom_transpen_raw_common(bitmap_ind16 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask,
 		u32 trans_pen)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return prio_transpen_raw(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, trans_pen);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return prio_transpen_raw(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), priority, pmask, trans_pen);
 
 	// early out if completely transparent
 	code %= elements();
@@ -1291,17 +1372,17 @@ void gfx_element::prio_zoom_transpen_raw(bitmap_ind16 &dest, const rectangle &cl
 	pmask |= 1 << 31;
 
 	// render
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN_PRIORITY(destp, pri, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, priority, [pmask, trans_pen, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
-void gfx_element::prio_zoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask,
+void gfx_element::prio_zoom_transpen_raw_common(bitmap_rgb32 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask,
 		u32 trans_pen)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return prio_transpen_raw(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, trans_pen);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return prio_transpen_raw(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), priority, pmask, trans_pen);
 
 	// early out if completely transparent
 	code %= elements();
@@ -1312,7 +1393,7 @@ void gfx_element::prio_zoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cl
 	pmask |= 1 << 31;
 
 	// render
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, color](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN_PRIORITY(destp, pri, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, priority, [pmask, trans_pen, color](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSPEN_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -1323,18 +1404,18 @@ void gfx_element::prio_zoom_transpen_raw(bitmap_rgb32 &dest, const rectangle &cl
     priority bitmap
 -------------------------------------------------*/
 
-void gfx_element::prio_zoom_transmask(bitmap_ind16 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask,
+void gfx_element::prio_zoom_transmask_common(bitmap_ind16 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask,
 		u32 trans_mask)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return prio_transmask(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, trans_mask);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return prio_transmask(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), priority, pmask, trans_mask);
 
 	// special case 0 mask to opaque
 	if (trans_mask == 0)
-		return prio_zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask);
+		return prio_zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy, priority, pmask);
 
 	// use pen usage to optimize
 	code %= elements();
@@ -1347,7 +1428,7 @@ void gfx_element::prio_zoom_transmask(bitmap_ind16 &dest, const rectangle &clipr
 
 		// fully opaque; draw as such
 		if ((usage & trans_mask) == 0)
-			return prio_zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask);
+			return prio_zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy, priority, pmask);
 	}
 
 	// high bit of the mask is implicitly on
@@ -1355,21 +1436,21 @@ void gfx_element::prio_zoom_transmask(bitmap_ind16 &dest, const rectangle &clipr
 
 	// render
 	color = colorbase() + granularity() * (color % colors());
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_mask, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSMASK_PRIORITY(destp, pri, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, priority, [pmask, trans_mask, color](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSMASK_PRIORITY(destp, pri, srcp); });
 }
 
-void gfx_element::prio_zoom_transmask(bitmap_rgb32 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask,
+void gfx_element::prio_zoom_transmask_common(bitmap_rgb32 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask,
 		u32 trans_mask)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return prio_transmask(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, trans_mask);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return prio_transmask(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), priority, pmask, trans_mask);
 
 	// special case 0 mask to opaque
 	if (trans_mask == 0)
-		return prio_zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask);
+		return prio_zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy, priority, pmask);
 
 	// use pen usage to optimize
 	code %= elements();
@@ -1382,7 +1463,7 @@ void gfx_element::prio_zoom_transmask(bitmap_rgb32 &dest, const rectangle &clipr
 
 		// fully opaque; draw as such
 		if ((usage & trans_mask) == 0)
-			return prio_zoom_opaque(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask);
+			return prio_zoom_opaque_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy, priority, pmask);
 	}
 
 	// high bit of the mask is implicitly on
@@ -1390,7 +1471,7 @@ void gfx_element::prio_zoom_transmask(bitmap_rgb32 &dest, const rectangle &clipr
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_mask, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSMASK_PRIORITY(destp, pri, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, priority, [pmask, trans_mask, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSMASK_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -1401,16 +1482,16 @@ void gfx_element::prio_zoom_transmask(bitmap_rgb32 &dest, const rectangle &clipr
     checking against the priority bitmap
 -------------------------------------------------*/
 
-void gfx_element::prio_zoom_transtable(bitmap_ind16 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask,
+void gfx_element::prio_zoom_transtable_common(bitmap_ind16 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask,
 		const u8 *pentable)
 {
 	assert(pentable != nullptr);
 
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return prio_transtable(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, pentable);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return prio_transtable(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), priority, pmask, pentable);
 
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
@@ -1419,19 +1500,19 @@ void gfx_element::prio_zoom_transtable(bitmap_ind16 &dest, const rectangle &clip
 	color = colorbase() + granularity() * (color % colors());
 	const pen_t *shadowtable = m_palette->shadow_table();
 	code %= elements();
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, pentable, color, shadowtable](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSTABLE16_PRIORITY(destp, pri, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, priority, [pmask, pentable, color, shadowtable](u16 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REBASE_TRANSTABLE16_PRIORITY(destp, pri, srcp); });
 }
 
-void gfx_element::prio_zoom_transtable(bitmap_rgb32 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask,
+void gfx_element::prio_zoom_transtable_common(bitmap_rgb32 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask,
 		const u8 *pentable)
 {
 	assert(pentable != nullptr);
 
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return prio_transtable(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, pentable);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return prio_transtable(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), priority, pmask, pentable);
 
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
@@ -1440,7 +1521,7 @@ void gfx_element::prio_zoom_transtable(bitmap_rgb32 &dest, const rectangle &clip
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
 	const pen_t *shadowtable = m_palette->shadow_table();
 	code %= elements();
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, pentable, paldata, shadowtable](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSTABLE32_PRIORITY(destp, pri, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, priority, [pmask, pentable, paldata, shadowtable](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSTABLE32_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -1452,18 +1533,18 @@ void gfx_element::prio_zoom_transtable(bitmap_rgb32 &dest, const rectangle &clip
     bitmap
 -------------------------------------------------*/
 
-void gfx_element::prio_zoom_alpha(bitmap_rgb32 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask,
+void gfx_element::prio_zoom_alpha_common(bitmap_rgb32 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask,
 		u32 trans_pen, u8 alpha_val)
 {
 	// non-zoom case
-	if (scalex == 0x10000 && scaley == 0x10000)
-		return prio_alpha(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, trans_pen, alpha_val);
+	if (zoomx == 0x10000 && zoomy == 0x10000)
+		return prio_alpha(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), priority, pmask, trans_pen, alpha_val);
 
 	// special case alpha_val = 0xff
 	if (alpha_val == 0xff)
-		return prio_zoom_transpen(dest, cliprect, code, color, flipx, flipy, destx, desty, scalex, scaley, priority, pmask, trans_pen);
+		return prio_zoom_transpen_common(dest, cliprect, code, color, flipx, flipy, pos, zoomx, zoomy, priority, pmask, trans_pen);
 
 	// early out if completely transparent
 	code %= elements();
@@ -1475,7 +1556,7 @@ void gfx_element::prio_zoom_alpha(bitmap_rgb32 &dest, const rectangle &cliprect,
 
 	// render
 	const pen_t *paldata = m_palette->pens() + colorbase() + granularity() * (color % colors());
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, alpha_val, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_ALPHA32_PRIORITY(destp, pri, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, priority, [pmask, trans_pen, alpha_val, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_ALPHA32_PRIORITY(destp, pri, srcp); });
 }
 
 
@@ -1524,18 +1605,18 @@ void gfx_element::prio_transpen_additive(bitmap_rgb32 &dest, const rectangle &cl
 }
 
 
-void gfx_element::prio_zoom_transpen_additive(bitmap_rgb32 &dest, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, bitmap_ind8 &priority, u32 pmask,
+void gfx_element::prio_zoom_transpen_additive_common(bitmap_rgb32 &dest, const rectangle &cliprect,
+		u32 code, u32 color, int flipx, int flipy, const zoom_pos &pos,
+		u32 zoomx, u32 zoomy, bitmap_ind8 &priority, u32 pmask,
 		u32 trans_pen)
 {
 	const pen_t *paldata;
 
 	/* non-zoom case */
 
-	if (scalex == 0x10000 && scaley == 0x10000)
+	if (zoomx == 0x10000 && zoomy == 0x10000)
 	{
-		prio_transpen_additive(dest, cliprect, code, color, flipx, flipy, destx, desty, priority, pmask, trans_pen);
+		prio_transpen_additive(dest, cliprect, code, color, flipx, flipy, unzoomed_x(pos), unzoomed_y(pos), priority, pmask, trans_pen);
 		return;
 	}
 
@@ -1560,7 +1641,7 @@ void gfx_element::prio_zoom_transpen_additive(bitmap_rgb32 &dest, const rectangl
 	/* high bit of the mask is implicitly on */
 	pmask |= 1 << 31;
 
-	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, destx, desty, scalex, scaley, priority, [pmask, trans_pen, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32(destp, pri, srcp); });
+	drawgfxzoom_core(dest, cliprect, code, flipx, flipy, pos, zoomx, zoomy, priority, [pmask, trans_pen, paldata](u32 &destp, u8 &pri, const u8 &srcp) { PIXEL_OP_REMAP_TRANSPEN_PRIORITY_ADDIIVE32(destp, pri, srcp); });
 }
 
 //#define MAKE_ARGB_RGB(a, rgb) rgb_t(a, rgb.r(), rgb.g(), rgb.b())
