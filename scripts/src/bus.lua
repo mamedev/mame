@@ -1560,6 +1560,8 @@ if BUSES["C64"] then
 		MAME_DIR .. "src/devices/bus/c64/16kb.h",
 		MAME_DIR .. "src/devices/bus/c64/bn1541.cpp",
 		MAME_DIR .. "src/devices/bus/c64/bn1541.h",
+		MAME_DIR .. "src/devices/bus/c64/digimax.cpp",
+		MAME_DIR .. "src/devices/bus/c64/digimax.h",
 		MAME_DIR .. "src/devices/bus/c64/geocable.cpp",
 		MAME_DIR .. "src/devices/bus/c64/geocable.h",
 		MAME_DIR .. "src/devices/bus/c64/up9600.cpp",
