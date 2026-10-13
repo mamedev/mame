@@ -24,7 +24,7 @@
   nopw 0xcd
   nopw 0xd3
   sz n 0xd7
-  nopw 0xd9
+  nopw 0xda
 
 !  writ 211 nopw?
 */
@@ -79,7 +79,7 @@ const sc61860_disassembler::opcode sc61860_disassembler::table[]={
 	{ "SRW",    Imp }, { "SLW",     Imp }, { "FILM",    Imp }, { "FILD",    Imp },
 
 //    20-2F / 0-3 4-7 8-B C-F
-	{ "LDP",    Imp }, { "LDQ",     Imp }, { "LDR",     Imp }, { "CLRA", /* =RA undocumented  */   Imp },
+	{ "LDP",    Imp }, { "LPQ",     Imp }, { "LPR",     Imp }, { "CLRA", /* =RA undocumented  */   Imp },
 	{ "IXL",    Imp }, { "DXL",     Imp }, { "IYS",     Imp }, { "DYS",     Imp },
 	{ "JRNZP",  RelP}, { "JRNZM",   RelM}, { "JRNCP",   RelP}, { "JRNCM",   RelM},
 	{ "JRP",    RelP}, { "JRM",     RelM}, { nullptr,         Ill }, { "LOOP",    RelM},
@@ -94,7 +94,7 @@ const sc61860_disassembler::opcode sc61860_disassembler::table[]={
 	{ "INCI",   Imp }, { "DECI",    Imp }, { "INCA",    Imp }, { "DECA",    Imp },
 	{ "ADM",    Imp }, { "SBM",     Imp }, { "ANMA",    Imp }, { "ORMA",    Imp },
 	{ "INCK",   Imp }, { "DECK",    Imp }, { "INCV",    Imp }, { "DECV",    Imp },
-	{ "INA",    Imp }, { "NOPW",    Imp }, { "WAIT",    Imm }, { "IPXL"/* =CUP, lxn*/,            Imp },
+	{ "INA",    Imp }, { "NOPW",    Imp }, { "WAIT",    Imm }, { "IPXL"/* =CDN, lxn*/,            Imp },
 
 //    50-5F / 0-3 4-7 8-B C-F
 	{ "INCP",   Imp }, { "DECP",    Imp }, { "STD",     Imp }, { "MVDM",    Imp },
@@ -102,11 +102,11 @@ const sc61860_disassembler::opcode sc61860_disassembler::table[]={
 	{ "SWP",    Imp }, { "LDM",     Imp }, { "SL",      Imp }, { "POP",     Imp },
 	{ nullptr,        Ill }, { "OUTA",    Imp }, { nullptr,         Ill }, { "OUTF",    Imp },
 
-//    60-6F / 0-3 4-7 8-B C-F
+//    60-5F / 0-3 4-7 8-B C-F
 	{ "ANIM",   Imm }, { "ORIM",    Imm }, { "TSIM",    Imm }, { "CPIM",    Imm },
 	{ "ANIA",   Imm }, { "ORIA",    Imm }, { "TSIA",    Imm }, { "CPIA",    Imm },
 	{ nullptr,        Ill }, { "ETC",     Etc }, { nullptr,         Ill }, { "TEST",    Imm },
-	{ nullptr,        Ill }, { nullptr,         Ill }, { nullptr,         Ill }, { "IPXH"/* =CDN,lxp*/, Imp },
+	{ nullptr,        Ill }, { nullptr,         Ill }, { nullptr,         Ill }, { "IPXH"/* =CUP,lxp*/, Imp },
 
 	{ "ADIM",   Imm }, { "SBIM",    Imm }, { nullptr,         Ill }, { nullptr,         Ill },
 	{ "ADIA",   Imm }, { "SBIA",    Imm }, { nullptr,         Ill }, { nullptr,         Ill },
@@ -127,7 +127,7 @@ const sc61860_disassembler::opcode sc61860_disassembler::table[]={
 	{ nullptr }, { nullptr }, { nullptr }, { nullptr },  { nullptr }, { nullptr }, { nullptr }, { nullptr },
 
 	{ "INCJ",   Imp }, { "DECJ",    Imp }, { "INCB",    Imp }, { "DECB",    Imp },
-	{ "ADCM",   Imp }, { "SBCM",    Imp }, { nullptr,         Ill }, { "CPMA",    Imp },
+	{ "ACDM",   Imp }, { "SBCM",    Imp }, { nullptr,         Ill }, { "CPMA",    Imp },
 	{ "INCL",   Imp }, { "DECL",    Imp }, { "INCW",    Imp }, { "DECW",    Imp },
 	{ "INB",    Imp }, { nullptr,         Ill }, { "NOPT",    Imp }, { nullptr,         Ill },
 
