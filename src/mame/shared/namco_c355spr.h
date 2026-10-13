@@ -28,7 +28,6 @@ public:
 	//void set_ram_words(u32 size) { m_ramsize = size; }
 	void set_buffer(int buffer) { m_buffer = buffer; }
 	void set_external_prifill(bool external) { m_external_prifill = external; }
-	void set_alt_precision(bool alt_precision) { m_alt_precision = alt_precision; }
 	void set_colors(int colors) { m_colors = colors; }
 	void set_granularity(int granularity) { m_granularity = granularity; }
 
@@ -89,27 +88,17 @@ protected:
 	// decoding info
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
-	// general
-	void zdrawgfxzoom(
-		bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
-		u32 code, u32 color,
-		bool flipx, bool flipy,
-		int sx, int sy,
-		int scalex, int scaley,
-		u8 prival,
-		int sprite_screen_width, int sprite_screen_height);
-
 	struct c355_sprite
 	{
 		bool disable;
-		int size;
+		int cols, rows;
 		rectangle clip;
 		int offset;
 		int color;
 		bool flipx,flipy;
 		int tile[16*16];
-		int x[16*16],y[16*16];
-		int zoomx[16*16],zoomy[16*16];
+		int x, y;           // 16.16 top-left of the whole sprite
+		u32 stepx, stepy;   // 16.16 source step per pixel
 		int pri;
 	};
 
@@ -134,7 +123,6 @@ private:
 	//u32 m_ramsize;
 	int m_buffer;
 	bool m_external_prifill;
-	bool m_alt_precision;
 
 	u8 m_transpen;
 	u16 m_colbase;
