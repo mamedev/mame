@@ -244,6 +244,7 @@ private:
 	emu_timer *m_tempo_timer[TEMPO_TIMER_COUNT];
 
 	voice_state m_voice[VOICE_COUNT];
+	u8 m_voice_read_latch;
 	u8 m_tempo_rate[TEMPO_TIMER_COUNT];
 	u8 m_irq_status;
 	u8 m_work_page;

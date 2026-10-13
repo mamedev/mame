@@ -9,8 +9,7 @@
 
     TODO:
     - Model shared-bus contention and sprite RAM read/write timing.
-    - Model latched bitmap-palette reads when native renderer/DMA use is
-      established.
+    - Establish shared-bus bitmap-palette access by the renderer and DMA.
     - Establish the reset behaviour of the bitmap source-bottom
       registers.
 
@@ -87,11 +86,11 @@ void xavix_video_device::map(address_map &map)
 	map(0x4000, 0x4fff).rw(FUNC(xavix_video_device::text_array_r), FUNC(xavix_video_device::text_array_w));
 
 	// Sprite RAM (aka Fragment RAM)
-	map(0x6000, 0x67ff).ram().w(FUNC(xavix_video_device::spriteram_w)).share(m_spriteram);
+	map(0x6000, 0x67ff).ram().rw(FUNC(xavix_video_device::spriteram_r), FUNC(xavix_video_device::spriteram_cpu_w)).share(m_spriteram);
 
 	// Graphics palette RAM
-	map(0x6800, 0x68ff).ram().w(FUNC(xavix_video_device::graphics_palram_sh_w)).share(m_graphics_palram_sh);
-	map(0x6900, 0x69ff).ram().w(FUNC(xavix_video_device::graphics_palram_l_w)).share(m_graphics_palram_l);
+	map(0x6800, 0x68ff).ram().rw(FUNC(xavix_video_device::graphics_palram_r<palette_plane::SH>), FUNC(xavix_video_device::graphics_palram_w<palette_plane::SH>)).share(m_graphics_palram_sh);
+	map(0x6900, 0x69ff).ram().rw(FUNC(xavix_video_device::graphics_palram_r<palette_plane::L>), FUNC(xavix_video_device::graphics_palram_w<palette_plane::L>)).share(m_graphics_palram_l);
 
 	// Segment RAM
 	map(0x6a00, 0x6a1f).ram().share(m_segment_regs); // test mode, pass flag 0x20
@@ -140,23 +139,27 @@ void superxavix_video_device::map(address_map &map)
 {
 	xavix_video_device::map(map);
 
+	// Direct reads also select the indexed graphics palette address.
+	map(0x6800, 0x68ff).r(FUNC(superxavix_video_device::graphics_palram_r<palette_plane::SH>));
+	map(0x6900, 0x69ff).r(FUNC(superxavix_video_device::graphics_palram_r<palette_plane::L>));
+
 	// Extended segment registers (16 x 32-bit)
 	map(0x6a40, 0x6a7f).ram().w(FUNC(superxavix_video_device::extended_segment_regs_w)).share(m_extended_segment_regs);
 
 	// Bitmap palette RAM
-	map(0x6c00, 0x6cff).ram().w(FUNC(superxavix_video_device::bitmap_palram_sh_w)).share(m_bitmap_palram_sh);
-	map(0x6d00, 0x6dff).ram().w(FUNC(superxavix_video_device::bitmap_palram_l_w)).share(m_bitmap_palram_l);
+	map(0x6c00, 0x6cff).ram().rw(FUNC(superxavix_video_device::bitmap_palram_r<palette_plane::SH>), FUNC(superxavix_video_device::bitmap_palram_w<palette_plane::SH>)).share(m_bitmap_palram_sh);
+	map(0x6d00, 0x6dff).ram().rw(FUNC(superxavix_video_device::bitmap_palram_r<palette_plane::L>), FUNC(superxavix_video_device::bitmap_palram_w<palette_plane::L>)).share(m_bitmap_palram_l);
 
 	// Graphics and bitmap palette controls
 	map(0x6f78, 0x6f78).rw(FUNC(superxavix_video_device::palette_index_r<palette_bank::GRAPHICS>), FUNC(superxavix_video_device::palette_index_w<palette_bank::GRAPHICS>));
-	map(0x6f79, 0x6f79).rw(FUNC(superxavix_video_device::palette_hue_r<palette_bank::GRAPHICS>), FUNC(superxavix_video_device::palette_hue_w<palette_bank::GRAPHICS>));
-	map(0x6f7a, 0x6f7a).rw(FUNC(superxavix_video_device::palette_saturation_r<palette_bank::GRAPHICS>), FUNC(superxavix_video_device::palette_saturation_w<palette_bank::GRAPHICS>));
-	map(0x6f7b, 0x6f7b).rw(FUNC(superxavix_video_device::palette_lightness_r<palette_bank::GRAPHICS>), FUNC(superxavix_video_device::palette_lightness_w<palette_bank::GRAPHICS>));
+	map(0x6f79, 0x6f79).rw(NAME((&superxavix_video_device::palette_component_r<palette_bank::GRAPHICS, palette_component::HUE>)), NAME((&superxavix_video_device::palette_component_w<palette_bank::GRAPHICS, palette_component::HUE>)));
+	map(0x6f7a, 0x6f7a).rw(NAME((&superxavix_video_device::palette_component_r<palette_bank::GRAPHICS, palette_component::SATURATION>)), NAME((&superxavix_video_device::palette_component_w<palette_bank::GRAPHICS, palette_component::SATURATION>)));
+	map(0x6f7b, 0x6f7b).rw(NAME((&superxavix_video_device::palette_component_r<palette_bank::GRAPHICS, palette_component::LIGHTNESS>)), NAME((&superxavix_video_device::palette_component_w<palette_bank::GRAPHICS, palette_component::LIGHTNESS>)));
 
 	map(0x6f7c, 0x6f7c).rw(FUNC(superxavix_video_device::palette_index_r<palette_bank::BITMAP>), FUNC(superxavix_video_device::palette_index_w<palette_bank::BITMAP>));
-	map(0x6f7d, 0x6f7d).rw(FUNC(superxavix_video_device::palette_hue_r<palette_bank::BITMAP>), FUNC(superxavix_video_device::palette_hue_w<palette_bank::BITMAP>));
-	map(0x6f7e, 0x6f7e).rw(FUNC(superxavix_video_device::palette_saturation_r<palette_bank::BITMAP>), FUNC(superxavix_video_device::palette_saturation_w<palette_bank::BITMAP>));
-	map(0x6f7f, 0x6f7f).rw(FUNC(superxavix_video_device::palette_lightness_r<palette_bank::BITMAP>), FUNC(superxavix_video_device::palette_lightness_w<palette_bank::BITMAP>));
+	map(0x6f7d, 0x6f7d).rw(NAME((&superxavix_video_device::palette_component_r<palette_bank::BITMAP, palette_component::HUE>)), NAME((&superxavix_video_device::palette_component_w<palette_bank::BITMAP, palette_component::HUE>)));
+	map(0x6f7e, 0x6f7e).rw(NAME((&superxavix_video_device::palette_component_r<palette_bank::BITMAP, palette_component::SATURATION>)), NAME((&superxavix_video_device::palette_component_w<palette_bank::BITMAP, palette_component::SATURATION>)));
+	map(0x6f7f, 0x6f7f).rw(NAME((&superxavix_video_device::palette_component_r<palette_bank::BITMAP, palette_component::LIGHTNESS>)), NAME((&superxavix_video_device::palette_component_w<palette_bank::BITMAP, palette_component::LIGHTNESS>)));
 
 	// Video timing, position and graphics mode
 	map(0x6f80, 0x6f99).ram().w(FUNC(superxavix_video_device::video_timing_regs_w)).share(m_video_timing_regs);
@@ -198,6 +201,8 @@ void xavix_video_device::device_start()
 	m_video_counter_timer = timer_alloc(FUNC(xavix_video_device::counter_field_start), this);
 
 	save_item(NAME(m_text_array));
+	save_item(NAME(m_sprite_read_latch));
+	save_item(NAME(m_graphics_palette_read_latch));
 	save_item(NAME(m_sprite_dma_src));
 	save_item(NAME(m_sprite_dma_dst));
 	save_item(NAME(m_sprite_dma_len));
@@ -234,8 +239,9 @@ void superxavix_video_device::device_start()
 	m_video_field_timer = timer_alloc(FUNC(superxavix_video_device::video_field_start), this);
 	m_picture_nmi_timer = timer_alloc(FUNC(superxavix_video_device::picture_nmi), this);
 
-	save_item(NAME(m_graphics_palette_index));
-	save_item(NAME(m_bitmap_palette_index));
+	save_item(STRUCT_MEMBER(m_palette_ports, index));
+	save_item(STRUCT_MEMBER(m_palette_ports, color_latch));
+	save_item(NAME(m_bitmap_palette_read_latch));
 	save_item(NAME(m_video_timing.horizontal_total));
 	save_item(NAME(m_video_timing.half_lines));
 	save_item(NAME(m_video_timing.active_width));
@@ -248,6 +254,8 @@ void superxavix_video_device::device_start()
 
 void xavix_video_device::device_reset()
 {
+	m_sprite_read_latch = 0;
+	m_graphics_palette_read_latch = 0;
 	m_video_ctrl = 0;
 	m_raster_irq_x[0] = 0;
 	m_raster_irq_y[0] = 0;
@@ -295,8 +303,8 @@ void superxavix_video_device::device_reset()
 {
 	m_video_field_phase = false;
 	m_graphics_mode = 0;
-	m_graphics_palette_index = 0;
-	m_bitmap_palette_index = 0;
+	m_palette_ports = {};
+	m_bitmap_palette_read_latch = 0;
 	m_picture_nmi_timer->adjust(attotime::never);
 	m_video_field_timer->adjust(attotime::never);
 	// Preserve the source-bottom pair at 0x6fba/0x6fbb until its reset behaviour is known.
@@ -336,32 +344,63 @@ void xavix_video_device::decode_graphics(memory_region *extra_region)
 		decode_gfx(gfxinfo);
 }
 
-void xavix_video_device::graphics_palram_sh_w(offs_t offset, u8 data)
+template <xavix_video_device::palette_plane Plane>
+u8 xavix_video_device::graphics_palram_r(offs_t offset)
 {
-	// Direct writes select one transparent pen per 16-colour block. Indexed
-	// palette writes change the colour but leave this selection untouched.
-	auto &transparent_pen = m_transparent_pens[offset >> 4];
-	if ((data & 0x1f) >= TRANSPARENT_HUE_MIN)
-		transparent_pen = offset;
-	else if (transparent_pen == offset)
-		transparent_pen = -1;
+	u8 const data = (Plane == palette_plane::SH ? m_graphics_palram_sh : m_graphics_palram_l)[offset];
+	if (machine().side_effects_disabled())
+		return data;
 
-	set_palette_data(offset, data | (u16(m_graphics_palram_l[offset]) << 8));
+	// Both byte planes return the preceding CPU access's data.
+	return std::exchange(m_graphics_palette_read_latch, data);
 }
 
-void xavix_video_device::graphics_palram_l_w(offs_t offset, u8 data)
+template <xavix_video_device::palette_plane Plane>
+void xavix_video_device::graphics_palram_w(offs_t offset, u8 data)
 {
-	set_palette_data(offset, m_graphics_palram_sh[offset] | (u16(data) << 8));
+	m_graphics_palette_read_latch = data;
+	if constexpr (Plane == palette_plane::SH)
+	{
+		// Direct SH writes select one transparent pen per 16-colour block. Indexed
+		// palette writes change the colour but leave this selection untouched.
+		auto &transparent_pen = m_transparent_pens[offset >> 4];
+		if ((data & 0x1f) >= TRANSPARENT_HUE_MIN)
+			transparent_pen = offset;
+		else if (transparent_pen == offset)
+			transparent_pen = -1;
+	}
+
+	set_palette_data(offset, Plane == palette_plane::SH
+			? data | (u16(m_graphics_palram_l[offset]) << 8)
+			: m_graphics_palram_sh[offset] | (u16(data) << 8));
 }
 
-void superxavix_video_device::bitmap_palram_sh_w(offs_t offset, u8 data)
+template <xavix_video_device::palette_plane Plane>
+u8 superxavix_video_device::graphics_palram_r(offs_t offset)
 {
-	set_palette_data(offset + PALETTE_BANK_ENTRIES, data | (u16(m_bitmap_palram_l[offset]) << 8));
+	if (!machine().side_effects_disabled())
+		m_palette_ports[unsigned(palette_bank::GRAPHICS)].index = offset;
+	return xavix_video_device::graphics_palram_r<Plane>(offset);
 }
 
-void superxavix_video_device::bitmap_palram_l_w(offs_t offset, u8 data)
+template <xavix_video_device::palette_plane Plane>
+u8 superxavix_video_device::bitmap_palram_r(offs_t offset)
 {
-	set_palette_data(offset + PALETTE_BANK_ENTRIES, m_bitmap_palram_sh[offset] | (u16(data) << 8));
+	u8 const data = (Plane == palette_plane::SH ? m_bitmap_palram_sh : m_bitmap_palram_l)[offset];
+	if (machine().side_effects_disabled())
+		return data;
+
+	m_palette_ports[unsigned(palette_bank::BITMAP)].index = offset;
+	return std::exchange(m_bitmap_palette_read_latch, data);
+}
+
+template <xavix_video_device::palette_plane Plane>
+void superxavix_video_device::bitmap_palram_w(offs_t offset, u8 data)
+{
+	m_bitmap_palette_read_latch = data;
+	set_palette_data(offset + PALETTE_BANK_ENTRIES, Plane == palette_plane::SH
+			? data | (u16(m_bitmap_palram_l[offset]) << 8)
+			: m_bitmap_palram_sh[offset] | (u16(data) << 8));
 }
 
 u16 xavix_video_device::palette_data(int pen) const
@@ -389,17 +428,34 @@ void xavix_video_device::set_palette_data(int pen, u16 data)
 
 void superxavix_video_device::set_palette_data(int pen, u16 data)
 {
+	// Direct and component writes share an address and capture the merged colour.
 	if (pen < PALETTE_BANK_ENTRIES)
 	{
+		m_palette_ports[unsigned(palette_bank::GRAPHICS)] = { u8(pen), data };
 		xavix_video_device::set_palette_data(pen, data);
 	}
 	else
 	{
 		int const index = pen & (PALETTE_BANK_ENTRIES - 1);
+		m_palette_ports[unsigned(palette_bank::BITMAP)] = { u8(index), data };
 		m_bitmap_palram_sh[index] = data;
 		m_bitmap_palram_l[index] = data >> 8;
 		update_pen(pen, data);
 	}
+}
+
+u8 xavix_video_device::spriteram_r(offs_t offset)
+{
+	if (machine().side_effects_disabled())
+		return m_spriteram[offset];
+
+	return std::exchange(m_sprite_read_latch, m_spriteram[offset]);
+}
+
+void xavix_video_device::spriteram_cpu_w(offs_t offset, u8 data)
+{
+	m_sprite_read_latch = data;
+	spriteram_w(offset, data);
 }
 
 void xavix_video_device::spriteram_w(offs_t offset, u8 data)
@@ -471,55 +527,45 @@ void superxavix_video_device::extended_segment_regs_w(offs_t offset, u8 data)
 template <superxavix_video_device::palette_bank Bank>
 void superxavix_video_device::palette_index_w(u8 data)
 {
-	(Bank == palette_bank::BITMAP ? m_bitmap_palette_index : m_graphics_palette_index) = data;
+	auto &port = m_palette_ports[unsigned(Bank)];
+	port.index = data;
+	port.color_latch = palette_data(unsigned(Bank) * PALETTE_BANK_ENTRIES + data);
 }
 
 template <superxavix_video_device::palette_bank Bank>
 u8 superxavix_video_device::palette_index_r()
 {
-	return Bank == palette_bank::BITMAP ? m_bitmap_palette_index : m_graphics_palette_index;
+	return m_palette_ports[unsigned(Bank)].index;
 }
 
-template <superxavix_video_device::palette_bank Bank>
-u8 superxavix_video_device::palette_hue_r()
+template <superxavix_video_device::palette_bank Bank, superxavix_video_device::palette_component Component>
+u8 superxavix_video_device::palette_component_r()
 {
-	int const pen = palette_index_r<Bank>() + (Bank == palette_bank::BITMAP ? PALETTE_BANK_ENTRIES : 0);
-	return pen_hue(palette_data(pen)) << 2;
+	u16 const color = m_palette_ports[unsigned(Bank)].color_latch;
+	if constexpr (Component == palette_component::HUE)
+		return pen_hue(color) << 2;
+	else if constexpr (Component == palette_component::SATURATION)
+		return pen_saturation(color) << 4;
+	else
+		return pen_lightness(color) << 2;
 }
 
-template <superxavix_video_device::palette_bank Bank>
-u8 superxavix_video_device::palette_saturation_r()
+template <superxavix_video_device::palette_bank Bank, superxavix_video_device::palette_component Component>
+void superxavix_video_device::palette_component_w(u8 data)
 {
-	int const pen = palette_index_r<Bank>() + (Bank == palette_bank::BITMAP ? PALETTE_BANK_ENTRIES : 0);
-	return pen_saturation(palette_data(pen)) << 4;
-}
+	(Bank == palette_bank::BITMAP ? m_bitmap_palette_read_latch : m_graphics_palette_read_latch) = data;
 
-template <superxavix_video_device::palette_bank Bank>
-u8 superxavix_video_device::palette_lightness_r()
-{
-	int const pen = palette_index_r<Bank>() + (Bank == palette_bank::BITMAP ? PALETTE_BANK_ENTRIES : 0);
-	return pen_lightness(palette_data(pen)) << 2;
-}
+	int const pen = unsigned(Bank) * PALETTE_BANK_ENTRIES + m_palette_ports[unsigned(Bank)].index;
+	u16 color = palette_data(pen);
 
-template <superxavix_video_device::palette_bank Bank>
-void superxavix_video_device::palette_hue_w(u8 data)
-{
-	int const pen = palette_index_r<Bank>() + (Bank == palette_bank::BITMAP ? PALETTE_BANK_ENTRIES : 0);
-	set_palette_data(pen, replace_pen_hue(palette_data(pen), data >> 2));
-}
+	if constexpr (Component == palette_component::HUE)
+		color = replace_pen_hue(color, data >> 2);
+	else if constexpr (Component == palette_component::SATURATION)
+		color = replace_pen_saturation(color, data >> 4);
+	else
+		color = replace_pen_lightness(color, data >> 2);
 
-template <superxavix_video_device::palette_bank Bank>
-void superxavix_video_device::palette_saturation_w(u8 data)
-{
-	int const pen = palette_index_r<Bank>() + (Bank == palette_bank::BITMAP ? PALETTE_BANK_ENTRIES : 0);
-	set_palette_data(pen, replace_pen_saturation(palette_data(pen), data >> 4));
-}
-
-template <superxavix_video_device::palette_bank Bank>
-void superxavix_video_device::palette_lightness_w(u8 data)
-{
-	int const pen = palette_index_r<Bank>() + (Bank == palette_bank::BITMAP ? PALETTE_BANK_ENTRIES : 0);
-	set_palette_data(pen, replace_pen_lightness(palette_data(pen), data >> 2));
+	set_palette_data(pen, color);
 }
 
 void xavix_video_device::update_pen(int pen, u16 data)

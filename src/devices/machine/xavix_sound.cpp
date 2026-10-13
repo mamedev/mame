@@ -91,6 +91,7 @@ void xavix_sound_device::device_start()
 	save_item(STRUCT_MEMBER(m_voice, output_ready));
 	save_item(STRUCT_MEMBER(m_voice, active));
 	save_item(STRUCT_MEMBER(m_voice, parameters_pending));
+	save_item(NAME(m_voice_read_latch));
 	save_item(NAME(m_tempo_rate));
 	save_item(NAME(m_irq_status));
 	save_item(NAME(m_work_page));
@@ -121,6 +122,7 @@ void xavix_sound_device::device_reset()
 		voice.parameters_pending = false;
 	}
 
+	m_voice_read_latch = 0;
 	std::ranges::fill(m_tempo_rate, 0);
 	m_irq_status = 0;
 	m_work_page = 0x02; // rad_bb relies on this default without initializing the register
@@ -185,13 +187,16 @@ u16 &xavix_sound_device::voice_register(unsigned voice, unsigned index)
 
 u8 xavix_sound_device::voice_register_r(offs_t offset)
 {
-	synchronize();
+	if (!machine().side_effects_disabled())
+		synchronize();
 	const unsigned index = offset >> 5;
 	const unsigned voice = offset & (VOICE_COUNT - 1);
 	if (index >= REGISTER_COUNT)
 		return 0;
 
-	return voice_register(voice, index) >> (BIT(offset, 4) ? 8 : 0);
+	const u8 data = voice_register(voice, index) >> (BIT(offset, 4) ? 8 : 0);
+	// All voice registers share a one-access read pipeline.
+	return machine().side_effects_disabled() ? data : std::exchange(m_voice_read_latch, data);
 }
 
 void xavix_sound_device::voice_register_w(offs_t offset, u8 data)
@@ -204,6 +209,8 @@ void xavix_sound_device::voice_register_w(offs_t offset, u8 data)
 
 	u16 &value = voice_register(voice, index);
 	const unsigned shift = BIT(offset, 4) * 8;
+	// The shared read latch captures the byte before the write completes.
+	m_voice_read_latch = value >> shift;
 	value = (value & ~(0xff << shift)) | (u16(data) << shift);
 
 	if (index == TEMPO_COUNTER && voice < std::size(m_tempo_timer))

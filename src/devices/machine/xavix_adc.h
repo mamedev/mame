@@ -43,6 +43,8 @@ private:
 	void ctrl_w(u8 data);
 	u8 rate_select_r();
 	void rate_select_w(u8 data);
+	u8 tablet_ctrl_r();
+	void tablet_ctrl_w(u8 data);
 
 	u8 sample_input();
 	u64 current_ticks() const;
@@ -62,6 +64,7 @@ private:
 	u8 m_converter_state;
 	u8 m_ctrl;
 	u8 m_rate_select;
+	u8 m_tablet_ctrl;
 	u8 m_clock_phase;
 	u16 m_countdown;
 	bool m_request_pending;

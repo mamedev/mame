@@ -12,6 +12,7 @@
 
     TODO:
     - Determine the analogue gain selected by control bits 2-3.
+    - Implement tablet-mode analogue routing.
 
 ***************************************************************************/
 
@@ -45,6 +46,7 @@ void xavix_adc_device::map(address_map &map)
 	map(0x0, 0x0).r(FUNC(xavix_adc_device::data_r)).nopw();
 	map(0x1, 0x1).rw(FUNC(xavix_adc_device::ctrl_r), FUNC(xavix_adc_device::ctrl_w));
 	map(0x2, 0x2).rw(FUNC(xavix_adc_device::rate_select_r), FUNC(xavix_adc_device::rate_select_w));
+	map(0x4, 0x4).rw(FUNC(xavix_adc_device::tablet_ctrl_r), FUNC(xavix_adc_device::tablet_ctrl_w));
 }
 
 void xavix_adc_device::device_start()
@@ -59,6 +61,7 @@ void xavix_adc_device::device_start()
 	save_item(NAME(m_converter_sample));
 	save_item(NAME(m_converter_state));
 	save_item(NAME(m_rate_select));
+	save_item(NAME(m_tablet_ctrl));
 	save_item(NAME(m_clock_phase));
 	save_item(NAME(m_countdown));
 	save_item(NAME(m_request_pending));
@@ -74,6 +77,7 @@ void xavix_adc_device::device_reset()
 	m_ctrl = 0;
 	m_result = 0;
 	m_rate_select = 0;
+	m_tablet_ctrl = 0;
 	m_clock_phase = 0;
 	m_countdown = 0;
 	m_request_pending = true;
@@ -255,6 +259,17 @@ void xavix_adc_device::rate_select_w(u8 data)
 	// A rate write can precede the queued conversion's countdown load, as
 	// epo_quiz does at startup. It does not restart an existing countdown.
 	schedule_conversion();
+}
+
+u8 xavix_adc_device::tablet_ctrl_r()
+{
+	return m_tablet_ctrl;
+}
+
+void xavix_adc_device::tablet_ctrl_w(u8 data)
+{
+	// TODO: Apply tablet-mode analogue routing.
+	m_tablet_ctrl = data & 0x01;
 }
 
 u8 xavix_adc_device::sample_input()

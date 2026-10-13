@@ -81,7 +81,7 @@ void xavix_io_device::event_enable_w(u8 data)
 
 	// Some serial receivers acknowledge an event by disabling its channel.
 	m_event_pending &= data;
-	m_event_enable = data;
+	m_event_enable = data & 0x8f;
 	update_irq();
 }
 

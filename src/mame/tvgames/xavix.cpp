@@ -1733,7 +1733,7 @@ u8 xavix_epo_dmon_state::lightgun_r(offs_t offset)
 
 // Video Challenger (PL-1000)
 static INPUT_PORTS_START( pl1000 )
-	// For test mode, hold P1 Trigger, P1 Start and P2 Start on startup (currently fails the hardware tests).
+	// For test mode, hold P1 Trigger, P1 Start and P2 Start on startup.
 	PORT_INCLUDE(xavix)
 	PORT_INCLUDE(xavix_hard_power_control)
 	PORT_INCLUDE(xavix_reset_control)

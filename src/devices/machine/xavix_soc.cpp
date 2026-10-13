@@ -13,7 +13,7 @@
     TODO:
     - Apply internal bus-slot priorities and the external-bus release
       request.
-    - Determine sleep clock domains, readback, wake sources and retained
+    - Determine sleep clock domains, wake sources and retained
       state.
     - Implement the individual power-control disable effects and GPIO
       clock output.
@@ -112,9 +112,9 @@ void xavix_soc_device::xavix_lowbus_map(address_map &map)
 	map(0x7400, 0x75ff).m(m_sound, FUNC(xavix_sound_device::map));
 
 	// Internal- and external-bus arbitration
-	// Indexed stores perform discarded reads of these write-only selectors.
-	map(0x7800, 0x780f).nopr().w(FUNC(xavix_soc_device::internal_arbiter_select_w));
+	map(0x7800, 0x780f).rw(FUNC(xavix_soc_device::internal_arbiter_select_r), FUNC(xavix_soc_device::internal_arbiter_select_w));
 	map(0x7810, 0x7810).rw(FUNC(xavix_soc_device::internal_arbiter_ctrl_r), FUNC(xavix_soc_device::internal_arbiter_ctrl_w));
+	map(0x7880, 0x7887).rw(FUNC(xavix_soc_device::external_arbiter_select_r), FUNC(xavix_soc_device::external_arbiter_select_w));
 	map(0x7888, 0x7888).rw(FUNC(xavix_soc_device::external_arbiter_ctrl_r), FUNC(xavix_soc_device::external_arbiter_ctrl_w));
 
 	// External-bus control
@@ -133,10 +133,10 @@ void xavix_soc_device::xavix_lowbus_map(address_map &map)
 	map(0x7b00, 0x7b11).m(m_anport, FUNC(xavix_anport_device::map));
 
 	// Analogue-to-digital converter
-	map(0x7b80, 0x7b82).m(m_adc, FUNC(xavix_adc_device::map));
+	map(0x7b80, 0x7b84).m(m_adc, FUNC(xavix_adc_device::map));
 
 	// Sleep control
-	map(0x7b83, 0x7b83).w(FUNC(xavix_soc_device::sleep_ctrl_w));
+	map(0x7b83, 0x7b83).rw(FUNC(xavix_soc_device::sleep_ctrl_r), FUNC(xavix_soc_device::sleep_ctrl_w));
 
 	// General timer
 	map(0x7c00, 0x7c04).m(m_timer, FUNC(xavix_timer_device::map));
@@ -171,7 +171,7 @@ void superxavix_soc_device::superxavix_lowbus_map(address_map &map)
 	map(0x790d, 0x790d).rw(FUNC(superxavix_soc_device::external_region_access_ctrl_r<2>), FUNC(superxavix_soc_device::external_region_access_ctrl_w<2>));
 
 	// Output clocks
-	map(0x7a04, 0x7a05).w(FUNC(superxavix_soc_device::output_clock_w));
+	map(0x7a04, 0x7a05).rw(FUNC(superxavix_soc_device::output_clock_r), FUNC(superxavix_soc_device::output_clock_w));
 
 	// Programmable I/O
 	map(0x7a10, 0x7a42).m(m_pio, FUNC(superxavix_pio_device::map));
@@ -287,7 +287,9 @@ void xavix_soc_device::device_start()
 	save_item(NAME(m_external_map_ctrl));
 	save_item(NAME(m_internal_arbiter_select));
 	save_item(NAME(m_internal_arbiter_ctrl));
+	save_item(NAME(m_external_arbiter_select));
 	save_item(NAME(m_external_arbiter_ctrl));
+	save_item(NAME(m_sleep_ctrl));
 	save_item(NAME(m_power_ctrl));
 	save_item(NAME(m_watchdog_port_mode));
 	save_item(NAME(m_watchdog_count));
@@ -300,6 +302,7 @@ void superxavix_soc_device::device_start()
 	xavix_soc_device::device_start();
 	save_item(NAME(m_external_region_access_ctrl));
 	save_item(NAME(m_instruction_burst_ctrl));
+	save_item(NAME(m_output_clock_regs));
 }
 
 void xavix_soc_device::device_reset()
@@ -309,7 +312,9 @@ void xavix_soc_device::device_reset()
 	m_external_map_ctrl = 0;
 	std::ranges::fill(m_internal_arbiter_select, 0);
 	m_internal_arbiter_ctrl = 0;
+	std::ranges::fill(m_external_arbiter_select, 0);
 	m_external_arbiter_ctrl = 0;
+	m_sleep_ctrl = 0;
 	m_power_ctrl = 0;
 	m_watchdog_port_mode = true;
 	m_watchdog_count = 0;
@@ -324,6 +329,7 @@ void superxavix_soc_device::device_reset()
 	xavix_soc_device::device_reset();
 	std::ranges::fill(m_external_region_access_ctrl, 0);
 	m_instruction_burst_ctrl = 0;
+	m_output_clock_regs.fill(0);
 }
 
 //-------------------------------------------------
@@ -424,6 +430,11 @@ void xavix_soc_device::refresh_external_bus_ctrl()
 //  Bus Arbitration
 //-------------------------------------------------
 
+u8 xavix_soc_device::internal_arbiter_select_r(offs_t offset)
+{
+	return m_internal_arbiter_select[offset];
+}
+
 void xavix_soc_device::internal_arbiter_select_w(offs_t offset, u8 data)
 {
 	// TODO: Apply slot priorities when internal bus contention is modeled.
@@ -442,6 +453,17 @@ void xavix_soc_device::internal_arbiter_ctrl_w(u8 data)
 	m_internal_arbiter_ctrl = data & 0x01;
 }
 
+u8 xavix_soc_device::external_arbiter_select_r(offs_t offset)
+{
+	return m_external_arbiter_select[offset];
+}
+
+void xavix_soc_device::external_arbiter_select_w(offs_t offset, u8 data)
+{
+	// TODO: Apply slot priorities when external bus contention is modeled.
+	m_external_arbiter_select[offset] = data & 0x03;
+}
+
 u8 xavix_soc_device::external_arbiter_ctrl_r()
 {
 	return m_external_arbiter_ctrl;
@@ -458,13 +480,19 @@ void xavix_soc_device::external_arbiter_ctrl_w(u8 data)
 //  Power and System Status
 //-------------------------------------------------
 
+u8 xavix_soc_device::sleep_ctrl_r()
+{
+	return m_sleep_ctrl;
+}
+
 void xavix_soc_device::sleep_ctrl_w(u8 data)
 {
-	// Bit 0 enables sleep.  The selector at 0x7b82 chooses master-clock divisors
-	// 96, 768, 6144 or 49152 for codes 0-3; codes 4-7 are unspecified.
+	// Bit 0 enables sleep. The low two bits at 0x7b82 choose master-clock
+	// divisors 96, 768, 6144 or 49152.
 	// No dumped software has been observed accessing this register.
-	// TODO: Determine the affected clock domains, readback, wake sources and state retention.
+	// TODO: Implement clock switching, wake sources and state retention.
 	LOGMASKED(LOG_IO, "%s: sleep_ctrl_w %02x\n", machine().describe_context(), data);
+	m_sleep_ctrl = data & 0x01;
 }
 
 u8 xavix_soc_device::power_status_r()
@@ -549,12 +577,18 @@ TIMER_CALLBACK_MEMBER(xavix_soc_device::watchdog_expired)
 //  SuperXaviX Clock and Memory Control
 //-------------------------------------------------
 
+u8 superxavix_soc_device::output_clock_r(offs_t offset)
+{
+	return m_output_clock_regs[offset];
+}
+
 void superxavix_soc_device::output_clock_w(offs_t offset, u8 data)
 {
 	// 0x7a04 selects the divider; 0x7a05 bit 0 enables clock output on GPIO23.
 	// domstepc only clears the rate during startup.
 	// TODO: Emulate the clock output when native software enables it.
 	LOGMASKED(LOG_IO, "%s: output_clock_w %u %02x\n", machine().describe_context(), unsigned(offset), data);
+	m_output_clock_regs[offset] = data & (offset ? 0x01 : 0xff);
 }
 
 u8 superxavix_soc_device::cpu_memory_control_r(offs_t offset)

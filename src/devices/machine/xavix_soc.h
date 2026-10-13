@@ -110,11 +110,15 @@ private:
 	u8 external_map_ctrl_r();
 	void external_map_ctrl_w(u8 data);
 	void refresh_external_bus_ctrl();
+	u8 internal_arbiter_select_r(offs_t offset);
 	void internal_arbiter_select_w(offs_t offset, u8 data);
 	u8 internal_arbiter_ctrl_r();
 	void internal_arbiter_ctrl_w(u8 data);
+	u8 external_arbiter_select_r(offs_t offset);
+	void external_arbiter_select_w(offs_t offset, u8 data);
 	u8 external_arbiter_ctrl_r();
 	void external_arbiter_ctrl_w(u8 data);
+	u8 sleep_ctrl_r();
 	void sleep_ctrl_w(u8 data);
 	u8 power_status_r();
 	void power_ctrl_w(u8 data);
@@ -144,7 +148,9 @@ private:
 	u8 m_external_map_ctrl;
 	std::array<u8, 16> m_internal_arbiter_select;
 	u8 m_internal_arbiter_ctrl;
+	std::array<u8, 8> m_external_arbiter_select;
 	u8 m_external_arbiter_ctrl;
+	u8 m_sleep_ctrl;
 	u8 m_power_ctrl;
 	bool m_watchdog_port_mode;
 	u32 m_watchdog_count;
@@ -191,12 +197,14 @@ private:
 	template <unsigned Region> void external_legacy_access_ctrl_w(u8 data);
 	template <unsigned Region> u8 external_region_access_ctrl_r();
 	template <unsigned Region> void external_region_access_ctrl_w(u8 data);
+	u8 output_clock_r(offs_t offset);
 	void output_clock_w(offs_t offset, u8 data);
 
 	required_device<superxavix_pio_device> m_pio;
 	required_device<superxavix_plotter_device> m_plotter;
 	std::array<u8, 3> m_external_region_access_ctrl;
 	u8 m_instruction_burst_ctrl;
+	std::array<u8, 2> m_output_clock_regs;
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_SOC, xavix_soc_device)

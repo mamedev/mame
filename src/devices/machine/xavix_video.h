@@ -55,6 +55,8 @@ protected:
 	static constexpr unsigned COLOR_EFFECT_NOISE_BITS = 3;
 	static constexpr unsigned COLOR_EFFECT_NOISE_LEVELS = 1U << COLOR_EFFECT_NOISE_BITS;
 
+	enum class palette_plane { SH, L };
+
 	enum tilemap_register : unsigned
 	{
 		TILEMAP_PLANE_LOW = 0x00,
@@ -189,10 +191,12 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
 
-	void graphics_palram_sh_w(offs_t offset, u8 data);
-	void graphics_palram_l_w(offs_t offset, u8 data);
+	template <palette_plane Plane> u8 graphics_palram_r(offs_t offset);
+	template <palette_plane Plane> void graphics_palram_w(offs_t offset, u8 data);
 	virtual u16 palette_data(int pen) const;
 	virtual void set_palette_data(int pen, u16 data);
+	u8 spriteram_r(offs_t offset);
+	void spriteram_cpu_w(offs_t offset, u8 data);
 	void spriteram_w(offs_t offset, u8 data);
 	static u16 replace_pen_lightness(u16 palette_data, u16 lightness);
 	static u16 replace_pen_saturation(u16 palette_data, u16 saturation);
@@ -267,6 +271,8 @@ protected:
 	required_shared_ptr<u8> m_segment_regs;
 
 	u8 m_text_array[3];
+	u8 m_sprite_read_latch;
+	u8 m_graphics_palette_read_latch;
 	u8 m_sprite_dma_src[2];
 	u8 m_sprite_dma_dst;
 	u8 m_sprite_dma_len;
@@ -398,7 +404,14 @@ private:
 	static const std::array<u8, 0x1a> TIMING_NTSC_DEFAULT;
 	static const std::array<u8, 0x1a> TIMING_PAL_DEFAULT;
 
-	enum class palette_bank { GRAPHICS, BITMAP };
+	enum class palette_bank { GRAPHICS = 0, BITMAP = 1 };
+	enum class palette_component { HUE, SATURATION, LIGHTNESS };
+
+	struct palette_port_state
+	{
+		u8 index = 0;
+		u16 color_latch = 0;
+	};
 
 	enum bitmap_register : unsigned
 	{
@@ -440,8 +453,9 @@ private:
 		rectangle visible_area() const;
 	};
 
-	void bitmap_palram_sh_w(offs_t offset, u8 data);
-	void bitmap_palram_l_w(offs_t offset, u8 data);
+	template <palette_plane Plane> u8 graphics_palram_r(offs_t offset);
+	template <palette_plane Plane> u8 bitmap_palram_r(offs_t offset);
+	template <palette_plane Plane> void bitmap_palram_w(offs_t offset, u8 data);
 	void video_timing_regs_w(offs_t offset, u8 data);
 	static video_timing calculate_video_timing(u8 const *registers, int output_sample_phase_clocks);
 	video_timing calculate_video_timing() const;
@@ -455,12 +469,8 @@ private:
 	void extended_segment_regs_w(offs_t offset, u8 data);
 	template <palette_bank Bank> u8 palette_index_r();
 	template <palette_bank Bank> void palette_index_w(u8 data);
-	template <palette_bank Bank> u8 palette_hue_r();
-	template <palette_bank Bank> void palette_hue_w(u8 data);
-	template <palette_bank Bank> u8 palette_saturation_r();
-	template <palette_bank Bank> void palette_saturation_w(u8 data);
-	template <palette_bank Bank> u8 palette_lightness_r();
-	template <palette_bank Bank> void palette_lightness_w(u8 data);
+	template <palette_bank Bank, palette_component Component> u8 palette_component_r();
+	template <palette_bank Bank, palette_component Component> void palette_component_w(u8 data);
 
 	device_delegate<u8 (u32)> m_graphics_read_cb;
 	device_delegate<u8 (u32)> m_bitmap_read_cb;
@@ -471,8 +481,8 @@ private:
 	required_shared_ptr<u8> m_bitmap_palram_l;
 	required_shared_ptr<u8> m_bitmap_params;
 
-	u8 m_graphics_palette_index;
-	u8 m_bitmap_palette_index;
+	std::array<palette_port_state, 2> m_palette_ports;
+	u8 m_bitmap_palette_read_latch;
 	video_timing m_video_timing;
 	bitmap_rgb32 m_output_bitmap;
 	emu_timer *m_picture_nmi_timer;
