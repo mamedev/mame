@@ -37,14 +37,15 @@ INPUT_PORTS_START( xavix_golf_swing )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("SWING_ACTIVE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Club Detected (Raw)") PORT_CODE(KEYCODE_V)
+	// Keep a club in the sensor's field by default; hold V to remove it.
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Remove Club (Raw)") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	// Raw controls expose the bounded optical coordinates for testing trajectories beyond the generated gestures.
 	PORT_START("SWING_X")
 	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_X ) PORT_NAME("Swing Sensor X")
 		PORT_MINMAX(0x01, 0x3e) PORT_SENSITIVITY(25) PORT_KEYDELTA(2) PORT_CENTERDELTA(0)
-		PORT_CODE_DEC(KEYCODE_J) PORT_CODE_INC(KEYCODE_L)
+		PORT_CODE_DEC(KEYCODE_J) PORT_CODE_INC(KEYCODE_L) PORT_REVERSE
 
 	PORT_START("SWING_Y")
 	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_Y ) PORT_NAME("Swing Sensor Y")
