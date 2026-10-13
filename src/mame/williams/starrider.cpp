@@ -11,6 +11,7 @@
  Based on code from the FreeBASIC Star Rider Emulator, by Joseba and SynaMax.
  (Thanks dudes, always wanted to play this game without scavenging the original hardware.
  I owe you one.)
+ Sound implementation based on Luis Quinto's webJS port of Star Rider Emulator.
 
  VBI data has been reconstructed from the publicly available AVI capture that works with the
  Star Rider Emulator.
@@ -253,13 +254,9 @@
 
  TODO:
  * VGG video expander isn't emulated at hardware level yet, it is currently simulated.
- * Ugly palette colors for some of the opponent riders (Red and Yellow have flashing motorcycles, Green has a
-   weird flashing box around the sprite)
-   PIF board that communicates with the Laserdisc player falls asleep at random, and doesn't wake up after a
- * machine restart. Prompts a 502 disc fault; happens regularly when re-racing a track the player didn't
+ * PIF board that communicates with the Laserdisc player falls asleep at random, and doesn't wake up after a
+   machine restart. Prompts a 502 disc fault; happens regularly when re-racing a track the player didn't
    qualify for (3rd and 4th place)
- * Text misalignment ("BLAST OFF" text is positioned at the top left, doesn't get erased a few seconds after
-   starting the race)
  * Attract mode is desynchronized with the Laserdisc ("Rider" text from the video feed doesn't zoom in on time,
    opponent riders aren't properly aligned with the track. Does it even read the disc's Manchester band?)
  * The Laserdisc capture has reconstructed VBI data based on what the Manchester band provides; whether it's
@@ -360,6 +357,7 @@ private:
 	void vgg_blitter_w(offs_t offset, u8 data);
 	void vgg_blit();
 	void vgg_blit_pixel(u16 destination, u8 source, u8 control, u8 mask, u8 solid);
+	TIMER_CALLBACK_MEMBER(vgg_blast_off_clear); // Ugly "BLAST OFF" text hack...
 	u32 vgg_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vgg_disable_w(u8 data);
 	void vgg_color_palet_w(u8 data);
@@ -437,6 +435,9 @@ private:
 	u8 m_main_page = 0U;
 
 	std::unique_ptr<u8 []> m_vgg_drams;
+	u8 m_vgg_blast_off_original[9 * 4 * 8] = {};
+	u8 m_vgg_blast_off_drawn[9 * 4 * 8] = {};
+	bool m_vgg_blast_off_pending = false;
 	u8 m_vgg_image_page = 0U;
 	u8 m_vgg_xlate = 0U;
 	u8 m_vgg_blitter_regs[16] = {};
@@ -455,6 +456,7 @@ private:
 	u8 m_pif_firq = 0U;
 	emu_timer *m_vgg_irq_timer = nullptr;
 	emu_timer *m_vgg_blit_timer = nullptr;
+	emu_timer *m_vgg_blast_off_timer = nullptr;
 
 	u8 m_sound_ptm_o[2] = { 0U, 0U };
 	u8 m_sound_attenuation[4] = {};
@@ -595,6 +597,9 @@ void sr_state::machine_start()
 
 	save_item(NAME(m_main_page));
 	save_pointer(NAME(m_vgg_drams), 16'384 * 4 / 8 * 6);
+	save_item(NAME(m_vgg_blast_off_original));
+	save_item(NAME(m_vgg_blast_off_drawn));
+	save_item(NAME(m_vgg_blast_off_pending));
 	save_item(NAME(m_vgg_image_page));
 	save_item(NAME(m_vgg_xlate));
 	save_item(NAME(m_vgg_blitter_regs));
@@ -615,6 +620,7 @@ void sr_state::machine_start()
 	m_main_page = 0U;
 	std::fill_n(m_vgg_drams.get(), 16'384 * 4 / 8 * 6, 0U);
 	m_vgg_image_page = 0U;
+	m_vgg_blast_off_pending = false;
 	m_vgg_xlate = 0U;
 	m_vgg_expand_disable = 0U;
 	m_vgg_background_disable = 0U;
@@ -629,6 +635,7 @@ void sr_state::machine_start()
 	m_pif_firq_timer = timer_alloc(FUNC(sr_state::pif_firq_retry), this);
 	m_vgg_irq_timer = timer_alloc(FUNC(sr_state::vgg_irq_clear), this);
 	m_vgg_blit_timer = timer_alloc(FUNC(sr_state::vgg_blit_done), this);
+	m_vgg_blast_off_timer = timer_alloc(FUNC(sr_state::vgg_blast_off_clear), this);
 	m_pif_irq_timer->adjust(m_screen->scan_period() * 64, 0, m_screen->scan_period() * 128);
 	std::fill(std::begin(m_sound_ptm_o), std::end(m_sound_ptm_o), 0U);
 	std::fill(std::begin(m_sound_attenuation), std::end(m_sound_attenuation), 0U);
@@ -884,7 +891,8 @@ TIMER_CALLBACK_MEMBER(sr_state::vgg_blit_done)
 
 void sr_state::vgg_blit_pixel(u16 destination, u8 source, u8 control, u8 mask, u8 solid)
 {
-	u8 const color_mask = (m_vgg_xlate & 0x3f) << 4;
+	// The six latched translation bits and four source-pixel bits address all 1 KiB of the PROM.
+	u16 const color_mask = (m_vgg_xlate & 0x3f) << 4;
 	u8 const color_hi = m_vgg_color_prom->base()[color_mask | (source >> 4)] & 0x0f;
 	u8 const color_lo = m_vgg_color_prom->base()[color_mask | (source & 0x0f)] & 0x0f;
 	u8 const pixel = (color_hi << 4) | color_lo;
@@ -911,9 +919,44 @@ void sr_state::vgg_blit()
 	u8 const control = m_vgg_blitter_regs[8];
 	u8 const mask_value = m_vgg_blitter_regs[9];
 	u16 const source_start = (u16(m_vgg_blitter_regs[10]) << 8) | m_vgg_blitter_regs[11];
-	u16 const destination_start = (u16(m_vgg_blitter_regs[12]) << 8) | m_vgg_blitter_regs[13];
+	u16 destination_start = (u16(m_vgg_blitter_regs[12]) << 8) | m_vgg_blitter_regs[13];
 	u8 const width = m_vgg_blitter_regs[14];
 	u8 const height = m_vgg_blitter_regs[15];
+	int blast_off_glyph = -1;
+
+	// "BLAST OFF" text hack
+	// U8 draws these nine text-ROM glyphs from $0401; U74 maps that origin to the upper-left corner.
+	if (control == 0x1a && mask_value == 0x99 && width == 4 && height == 8)
+	{
+		constexpr std::array<u16, 9> blast_off_glyphs{
+			0xc93b, 0xca6b, 0xc91b, 0xcb57, 0xcb77, 0xc8fb, 0xcad3, 0xc9bb, 0xc9bb
+		};
+		for (unsigned i = 0; i < blast_off_glyphs.size(); ++i)
+		{
+			if ((source_start == blast_off_glyphs[i]) && (destination_start == (0x0401 + i * 0x400)))
+			{
+				blast_off_glyph = i;
+				destination_start += 0x3a23;
+				break;
+			}
+		}
+	}
+	// "BLAST OFF" text hack
+	if ((blast_off_glyph == 0) && !m_vgg_blast_off_pending)
+	{
+		unsigned cell = 0;
+		for (unsigned glyph = 0; glyph < 9; ++glyph)
+		{
+			for (unsigned y = 0; y < 8; ++y)
+			{
+				for (unsigned x = 0; x < 4; ++x)
+				{
+					u16 const address = vgg_drams_map(0x3e24 + (glyph * 0x400) + y + (x * 0x100));
+					m_vgg_blast_off_original[cell++] = (address < (16'384 * 4 / 8 * 6)) ? m_vgg_drams[address] : 0;
+				}
+			}
+		}
+	}
 	u16 const row_source_step = BIT(control, 0) ? 1 : width;
 	u16 const row_destination_step = BIT(control, 1) ? 1 : width;
 	u16 const source_pixel_step = BIT(control, 0) ? 0x100 : 1;
@@ -977,7 +1020,7 @@ void sr_state::vgg_blit()
 				destination += destination_pixel_step;
 			}
 
-			vgg_blit_pixel(destination_row, (pixels << 4) & 0xf0, control, rotated_mask | 0x0f, rotated_solid);
+			vgg_blit_pixel(destination, (pixels << 4) & 0xf0, control, rotated_mask | 0x0f, rotated_solid);
 		}
 
 		source_row += row_source_step;
@@ -986,6 +1029,57 @@ void sr_state::vgg_blit()
 		else
 			destination_row += row_destination_step;
 	}
+
+	// "BLAST OFF" text hack
+	if (blast_off_glyph == 8)
+	{
+		unsigned cell = 0;
+		for (unsigned glyph = 0; glyph < 9; ++glyph)
+		{
+			for (unsigned y = 0; y < 8; ++y)
+			{
+				for (unsigned x = 0; x < 4; ++x)
+				{
+					u16 const address = vgg_drams_map(0x3e24 + (glyph * 0x400) + y + (x * 0x100));
+					m_vgg_blast_off_drawn[cell++] = (address < (16'384 * 4 / 8 * 6)) ? m_vgg_drams[address] : 0;
+				}
+			}
+		}
+		m_vgg_blast_off_pending = true;
+		// Match the ROM's $96-tick lifetime for the title object.
+		m_vgg_blast_off_timer->adjust(m_screen->frame_period() * 0x96);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(sr_state::vgg_blast_off_clear)
+{
+	if (!m_vgg_blast_off_pending)
+		return;
+
+	unsigned cell = 0;
+	for (unsigned glyph = 0; glyph < 9; ++glyph)
+	{
+		for (unsigned y = 0; y < 8; ++y)
+		{
+			for (unsigned x = 0; x < 4; ++x)
+			{
+				u16 const address = vgg_drams_map(0x3e24 + (glyph * 0x400) + y + (x * 0x100));
+				if (address < (16'384 * 4 / 8 * 6))
+				{
+					u8 &current = m_vgg_drams[address];
+					u8 const original = m_vgg_blast_off_original[cell];
+					u8 const drawn = m_vgg_blast_off_drawn[cell];
+					if (((original ^ drawn) & 0xf0) && ((current ^ drawn) & 0xf0) == 0)
+						current = (current & 0x0f) | (original & 0xf0);
+					if (((original ^ drawn) & 0x0f) && ((current ^ drawn) & 0x0f) == 0)
+						current = (current & 0xf0) | (original & 0x0f);
+				}
+				++cell;
+			}
+		}
+	}
+
+	m_vgg_blast_off_pending = false;
 }
 
 u32 sr_state::vgg_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

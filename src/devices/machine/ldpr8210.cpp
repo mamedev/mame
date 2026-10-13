@@ -31,7 +31,7 @@
 #define LOG_SERIAL     (1U << 2)
 #define LOG_SIMUTREK   (1U << 3)
 #define LOG_UNKNOWNS   (1U << 4)
-#define VERBOSE (0)
+#define VERBOSE (LOG_SERIAL | LOG_SIMUTREK)
 #include "logmacro.h"
 
 
@@ -259,7 +259,7 @@ void pioneer_pr8210_device::control_w(uint8_t data)
 				m_lastcommand = m_pia.porta;
 
 			// log the command and wait for a keypress
-			LOGMASKED(LOG_SERIAL, "--- Command = %02X\n", m_pia.porta >> 3);
+			LOGMASKED(LOG_SERIAL, "%8.3f: --- Command = %02X\n", machine().time().as_double(), m_pia.porta >> 3);
 
 			// reset the first bit time so that the accumulator clears on the next write
 			m_firstbittime = curtime - SERIAL_MAX_WORD_TIME;
@@ -669,6 +669,8 @@ void pioneer_pr8210_device::i8049_port1_w(uint8_t data)
 	// set the new value
 	uint8_t prev = m_i8049_port1;
 	m_i8049_port1 = data;
+	if (prev != data)
+		LOGMASKED(LOG_SIMUTREK, "%8.3f: PORT1 = %02X\n", machine().time().as_double(), data);
 
 	// bit 7 selects the direction of slider movement for JUMP TRG and scanning
 	int direction = (data & 0x80) ? 1 : -1;
