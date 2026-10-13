@@ -41099,6 +41099,7 @@ xmvsfmb
 
 @source:sega/megaplay.cpp
 megaplay
+mp_addams
 mp_bio
 mp_col3
 mp_gaxe2

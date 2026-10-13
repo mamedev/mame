@@ -35,6 +35,7 @@ this reason.
 
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
+#include "machine/nvram.h"
 
 #include "endianness.h"
 
@@ -54,10 +55,12 @@ public:
 		md_ctrl_state(mconfig, type, tag),
 		m_ic3_ram(*this, "ic3_ram"),
 		m_vdp1(*this, "vdp1"),
-		m_bioscpu(*this, "mtbios")
+		m_bioscpu(*this, "mtbios"),
+		m_nvram(*this, "nvram")
 	{ }
 
 	void megaplay(machine_config &config);
+	void megaplay_nvram(machine_config &config);
 
 	void init_megaplay();
 
@@ -65,6 +68,7 @@ public:
 	int start2_r();
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
@@ -113,6 +117,7 @@ private:
 	required_shared_ptr<uint8_t>           m_ic3_ram;
 	optional_device<sega315_5124_device> m_vdp1;
 	required_device<cpu_device>          m_bioscpu;
+	optional_device<nvram_device>        m_nvram;
 };
 
 
@@ -396,6 +401,22 @@ static INPUT_PORTS_START ( mp_gunhe )
 	PORT_DIPSETTING( 0x00, "Expert" )
 INPUT_PORTS_END
 
+// The Addams Family ARCADE: homebrew Mega Play conversion of the Mega Drive game
+static INPUT_PORTS_START ( mp_addams )
+	PORT_INCLUDE( megaplay )
+
+	PORT_MODIFY("DSW1") // DSW C  (per game settings)
+	PORT_DIPNAME( 0x03, 0x03, "1UP Every" ) PORT_DIPLOCATION("SW3:1,2")
+	PORT_DIPSETTING( 0x03, "3 Pickups" )
+	PORT_DIPSETTING( 0x02, "2 Pickups" )
+	PORT_DIPSETTING( 0x01, "1 Pickup" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW3:3,4")
+	PORT_DIPSETTING( 0x0c, "3" )
+	PORT_DIPSETTING( 0x08, "5" )
+	PORT_DIPSETTING( 0x04, "7" )
+	PORT_DIPSETTING( 0x00, "99" )
+INPUT_PORTS_END
+
 // MEGAPLAY specific
 
 int mplay_state::start1_r()
@@ -651,6 +672,15 @@ uint32_t mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
+void mplay_state::machine_start()
+{
+	md_ctrl_state::machine_start();
+
+	// sets with a battery-backed BIOS RAM (credits, bookkeeping, per-slot game areas)
+	if (m_nvram)
+		m_nvram->set_base(&m_ic3_ram[0], m_ic3_ram.bytes());
+}
+
 void mplay_state::machine_reset()
 {
 	m_bios_mode = MP_ROM;
@@ -711,6 +741,15 @@ void mplay_state::megaplay(machine_config &config)
 	m_vdp1->n_int().set_inputline(m_bioscpu, 0);
 	m_vdp1->add_route(ALL_OUTPUTS, "speaker", 0.25);
 	m_vdp1->add_route(ALL_OUTPUTS, "speaker", 0.25);
+}
+
+// The BIOS keeps its credits, bookkeeping and each slot's 256-byte game
+// area (high scores) in battery-backed RAM at Z80 0x6800-0x77ff.
+void mplay_state::megaplay_nvram(machine_config &config)
+{
+	megaplay(config);
+
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 }
 
 
@@ -930,6 +969,20 @@ ROM_START( mp_gunhe ) // Gunstar Heroes
 	MEGAPLAY_PLDS
 ROM_END
 
+ROM_START( mp_addams ) // The Addams Family ARCADE (homebrew conversion of the Mega Drive game)
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "epr-26013.ic1", 0x000000, 0x200000, CRC(87ecace1) SHA1(d6529b4b692a9515ccf6722f26c011660154ae7a) )
+	// Game instruction ROM copied to 0x300000 - 0x310000 (odd / even bytes equal)
+
+	ROM_REGION( 0x8000, "user1", 0 ) // Game instructions
+	ROM_LOAD( "epr-15175-20.ic2", 0x000000, 0x08000, CRC(dcfde4e7) SHA1(3f5a1b4de94fad4ccd404b95a53fdb2e1c4773e6) )
+
+	ROM_REGION( 0x20000, "mtbios", 0 ) // BIOS
+	MEGAPLAY_BIOS
+
+	MEGAPLAY_PLDS
+ROM_END
+
 uint16_t mplay_state::extra_ram_r(offs_t offset)
 {
 	return m_ic36_ram[(offset << 1) ^ 1] | (m_ic36_ram[(offset << 1)] << 8);
@@ -1030,3 +1083,5 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 /* 11 */ GAME( 1993, mp_mazin, megaplay, megaplay, mp_mazin, mplay_state, init_megaplay, ROT0, "Sega", "Mazin Wars / Mazin Saga (Mega Play)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* ?? */ GAME( 1993, mp_col3,  megaplay, megaplay, mp_col3,  mplay_state, init_megaplay, ROT0, "Sega", "Columns III (Mega Play)",             MACHINE_IMPERFECT_GRAPHICS )
+
+/* -- */ GAME( 2026, mp_addams, megaplay, megaplay_nvram, mp_addams, mplay_state, init_megaplay, ROT0, "hack", "The Addams Family ARCADE (Mega Play)", MACHINE_IMPERFECT_GRAPHICS )
