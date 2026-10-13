@@ -48,6 +48,8 @@ constexpr size_t AUDIO_BUFFER_SIZE = 64 * 1024;
 // another frame.
 constexpr size_t MP2_FRAME_BYTES = 1024;
 
+constexpr size_t DECODE_AHEAD_SAMPLES = 2 * 1152;
+
 } // anonymous namespace
 
 //**************************************************************************
@@ -420,7 +422,18 @@ uint16_t gsc38gg307_device::regs_r(offs_t offset, uint16_t mem_mask)
 	switch (offset)
 	{
 	case 0x00: data = m_fma_cmd; break;
-	case 0x01: data = 0x0200 | m_fma_status; break;
+	case 0x01:
+		data = 0x0200 | m_fma_status;
+		if (!machine().side_effects_disabled())
+		{
+			m_stream->update();
+		}
+		if (audio_available() <= DECODE_AHEAD_SAMPLES && audio_es_available() < MP2_FRAME_BYTES)
+		{
+			data &= ~FMA_DEC;
+		}
+		break;
+
 	case 0x02: data = 0x0007; break;
 	case 0x03: data = 0x0900; break;
 	case 0x04: data = m_fma_stream; break;
