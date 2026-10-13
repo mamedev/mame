@@ -493,13 +493,6 @@ static INPUT_PORTS_START( xavixport_ir )
 	PORT_INCLUDE(xavixport_panel)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( xavix_step_sensor_power )
-	PORT_START("STEP_POWER")
-	PORT_CONFNAME( 0x01, 0x01, "Step Sensor Power" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-INPUT_PORTS_END
-
 //**************************************************************************
 //  Standalone Input Layouts
 //**************************************************************************
@@ -955,27 +948,34 @@ static INPUT_PORTS_START( xavix_jmat )
 	PORT_INCLUDE(superxavix)
 
 	PORT_MODIFY("IN0")
-	// This unexplained sparse fallback provides a decoded proxy for the wireless mat.
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Step Sensor Cancel") PORT_CODE(KEYCODE_4_PAD) PORT_CONDITION("STEP_POWER", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Step Sensor Back / Left") PORT_CODE(KEYCODE_1_PAD) PORT_CONDITION("STEP_POWER", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Step Sensor Forward / Right") PORT_CODE(KEYCODE_3_PAD) PORT_CONDITION("STEP_POWER", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Step Sensor Enter") PORT_CODE(KEYCODE_6_PAD) PORT_CONDITION("STEP_POWER", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_MODIFY("IN1")
-	// The shipped mat's timed wireless bitstream is represented by the decoded proxy above.
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mat", FUNC(xavix_jmat_device::data_r))
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 	PORT_INCLUDE(xavixport_panel)
-	PORT_INCLUDE(xavix_step_sensor_power)
 INPUT_PORTS_END
 
-void superxavix_i2c_pio1_state::superxavix_xavjmat(machine_config &config)
+void superxavix_xavjmat_state::configure_mat(machine_config &config, xavix_jmat_device::protocol type)
 {
 	superxavix_i2c_24c64(config);
 	configure_rtc_pio<0>(config);
 	configure_xavixport_io(config, 0x00);
+
+	XAVIX_JMAT(config, m_mat, peripheral_clock()).set_protocol(type);
+	m_mat->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
+	m_screen->screen_vblank().append(m_mat, FUNC(xavix_jmat_device::vblank_w));
+}
+
+void superxavix_xavjmat_state::superxavix_xavjmat(machine_config &config)
+{
+	configure_mat(config, xavix_jmat_device::protocol::JMAT);
+}
+
+void superxavix_xavjmat_state::superxavix_xavaero(machine_config &config)
+{
+	configure_mat(config, xavix_jmat_device::protocol::AEROSTEP);
 }
 
 
@@ -985,14 +985,7 @@ static INPUT_PORTS_START( xavix_step )
 	PORT_INCLUDE(superxavix)
 	PORT_INCLUDE(xavixport_panel)
 
-	PORT_START("STEP_SENSOR")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Step Sensor Enter") PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Step Sensor Forward / Right") PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Step Sensor Back / Left") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Step Sensor Cancel") PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_INCLUDE(xavix_step_sensor_power)
+	PORT_INCLUDE(xavix_step_sensor)
 INPUT_PORTS_END
 
 microphone_device &superxavix_i2c_pio1_state::configure_stereo_music_input(machine_config &config)
@@ -3181,9 +3174,9 @@ CONS( 2004, xavboxj,    xavbox,   0, superxavix_xavbox,                xavix_box
 CONS( 2004, xavbassf,   0,        0, superxavix_xavbassf,              xavixport_bassfishing, superxavix_xavbassf_state,   empty_init, "SSD Company Ltd.", "XaviX Bass Fishing (XaviXPORT)", MACHINE_NOT_WORKING )
 
 // These titles use a 24C64-compatible SEEPROM.
-CONS( 2005, xavjmat,    0,        0, superxavix_xavjmat,               xavix_jmat,            superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING )
+CONS( 2005, xavjmat,    0,        0, superxavix_xavjmat,               xavix_jmat,            superxavix_xavjmat_state,    empty_init, "SSD Company Ltd.", "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING )
 // ザビックス エアロステップ
-CONS( 2005, xavaero,    xavjmat,  0, superxavix_xavjmat,               xavix_jmat,            superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "XaviX Aerostep J-Mat (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
+CONS( 2005, xavaero,    xavjmat,  0, superxavix_xavaero,               xavix_jmat,            superxavix_xavjmat_state,    empty_init, "SSD Company Ltd.", "XaviX Aerostep J-Mat (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
 CONS( 2007, xavmusic,   0,        0, superxavix_xavmusic,              xavix_step,            superxavix_xavmusic_state,   empty_init, "SSD Company Ltd.", "XaviX Music & Circuit (XaviXPORT)", MACHINE_NOT_WORKING )
 // ザビックスエアロ エアロステップ ミュージック&サーキット
 CONS( 2007, xavmusicj,  xavmusic, 0, superxavix_xavmusicj,             xavix_step,            superxavix_xavmusicj_state,  empty_init, "SSD Company Ltd.", "XaviX Aerostep MC (XaviXPORT, Japan)", MACHINE_NOT_WORKING )

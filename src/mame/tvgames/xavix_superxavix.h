@@ -18,6 +18,7 @@
 #include "xavix_io_xavbassf_tackle.h"
 #include "xavix_io_xavgolf_swing.h"
 #include "xavix_io_xavixport.h"
+#include "xavix_io_xavjmat_mat.h"
 
 #include "bus/xavix/suprtvpc_cart.h"
 #include "bus/xavix/suprtvpc_exp.h"
@@ -184,7 +185,6 @@ public:
 
 	// XaviXPORT sports and fitness configurations
 	void superxavix_xavbox(machine_config &config) ATTR_COLD;
-	void superxavix_xavjmat(machine_config &config) ATTR_COLD;
 	void superxavix_xavcheck(machine_config &config) ATTR_COLD;
 	void superxavix_xavpowrk(machine_config &config) ATTR_COLD;
 	void superxavix_domfitex(machine_config &config) ATTR_COLD;
@@ -210,6 +210,23 @@ private:
 //**************************************************************************
 //  Super XaviX Product State
 //**************************************************************************
+
+class superxavix_xavjmat_state : public superxavix_i2c_pio1_state
+{
+public:
+	superxavix_xavjmat_state(const machine_config &mconfig, device_type type, const char *tag)
+		: superxavix_i2c_pio1_state(mconfig, type, tag)
+		, m_mat(*this, "mat")
+	{ }
+
+	void superxavix_xavjmat(machine_config &config) ATTR_COLD;
+	void superxavix_xavaero(machine_config &config) ATTR_COLD;
+
+private:
+	void configure_mat(machine_config &config, xavix_jmat_device::protocol type) ATTR_COLD;
+
+	required_device<xavix_jmat_device> m_mat;
+};
 
 class superxavix_xavmusic_state : public superxavix_i2c_pio1_state
 {
