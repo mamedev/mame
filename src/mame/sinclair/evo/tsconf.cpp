@@ -317,6 +317,7 @@ void tsconf_state::tsconf(machine_config &config)
 	m_dma->in_mreq_callback().set(FUNC(tsconf_state::ram_read16));
 	m_dma->out_mreq_callback().set(FUNC(tsconf_state::ram_write16));
 	m_dma->in_spireq_callback().set(FUNC(tsconf_state::spi_read16));
+	m_dma->out_spireq_callback().set(FUNC(tsconf_state::spi_write16));
 	m_dma->out_cram_callback().set(FUNC(tsconf_state::cram_write16));
 	m_dma->out_sfile_callback().set(FUNC(tsconf_state::sfile_write16));
 	m_dma->on_ready_callback().set(FUNC(tsconf_state::dma_ready));

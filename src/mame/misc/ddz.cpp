@@ -13,30 +13,129 @@
 
 =============================================================================
 
-Haze's notes:
+    AI notes on the TJF sets (crzclass, baibians, cjmx, btlfront)
 
-FWIW, it's probably same PCB as the non-working 'ddz' in MAME, but different game.
+    Scrambling
+    ----------
+    The program area is stored with the order of the 16-bit words reversed,
+    bytes within each word untouched:
 
-there's some kind of encryption/scrambling going on, at the very least
+        plain_word[k] = enc_word[N - 1 - k]
 
-Code:
+    It is a single region, not per-block. Length is 0x80000 for the three card
+    games and 0x20000 (head of rom5) for btlfront. Confirmed by the libc
+    strings coming out contiguous and in order ("(null)", "0123456789ABCDEF",
+    "bug in vfprintf: bad base", "Inf", "NaN") and by the short conditional
+    branches that straddle 64K boundaries: with a single region they all
+    resolve onto valid instructions, with 64K blocks one of them lands on data.
 
+    ddz does not belong to this family: the transform does not apply to it and
+    its scrambling is still unknown.
 
-Offset      0  1  2  3  4  5  6  7   8  9  A  B  C  D  E  F
+    In crzclass "(null)" decodes as ".null)" and "0123456789abcdef" is
+    truncated after "cd". This is not a descrambling error - the same strings
+    are clean in btlfront. That sector of the crzclass flash is damaged or
+    rewritten at runtime.
 
-0007BE60   00 00 00 99 03 AD AF 00  00 00 82 00 03 AD 64 63      ™ ­¯   ‚  ­dc
-0007BE70   62 61 39 38 37 36 35 34  33 32 31 30 00 4E 61 4E   ba9876543210 NaN
-0007BE80   00 66 6E 49 02 0E 85 06  02 0E 84 04 02 0E 83 EA    fnI  …   „   ƒê
-0007BE90   02 0E 83 D6 02 0E 83 C8  02 0E 84 58 02 0E 84 12     ƒÖ  ƒÈ  „X  „
-0007BEA0   66 65 28 00 30 00 65 73  61 62 20 64 61 62 20 3A   fe( 0 esab dab :
-0007BEB0   66 74 6E 69 72 70 66 76  20 6E 69 20 67 75 62 00   ftnirpfv ni gub
-0007BEC0   46 45 44 43 42 41 39 38  37 36 35 34 33 32 31 30   FEDCBA9876543210
-0007BED0   00 29 6C 6C 75 6E 2E 00  00 00 8F 8E 02 0E 89 DC    )llun.    Ž  ‰Ü
+    ISP stub
+    --------
+    The three card games each contain a 1 KB blob stored differently from the
+    rest: its four 0x100-byte pieces are in reverse order but internally
+    forward. It is byte-identical in all three, at different offsets:
 
+        crzclass  0x00C400
+        baibians  0x004800
+        cjmx      0x00CC00
+        SHA1      07d586fe24fbbd498e0318a700824ea71d16dce2
 
-if you reverse the letters you get 'bug in vfprintf : bad base'
+    Reassembled it has an 80-entry vector table at the start, reset = 0x140,
+    and at 0x140 the stack setup followed by the usual VRender0 init (PLL at
+    0x01804000/4, SDRAM at 0x01800400/8, video at 0x03000100). It then reads a
+    16-bit load address from a device at 0x0154xxxx, downloads 0x200 bytes to
+    it and jumps there. It is a factory bootstrap, not the game boot path.
+    On the btlfront PCB the DB25 connector is the likely counterpart.
 
-so I suspect the data is in reverse order and maybe some blocks scrambled about.
+    Load bases
+    ----------
+    Derived from absolute stores (LERI + ST with index register 0, which can
+    only target data) and from LDI constants:
+
+        crzclass  0x02100000      absolute stores cluster at 0x02100000,
+        baibians  0x02200000      0x02120000 and 0x02140000, all of which fall
+        cjmx      0x02200000      inside the image only with this base
+        btlfront  0x02720000      four independent constants agree exactly:
+                                  0272E1EC-0xE1EC, 0272EEB0-0xEEB0,
+                                  0272F208-0xF208, 0272F272-0xF272
+
+    ROM layout
+    ----------
+    crzclass / baibians / cjmx (3 x 4 MB, loaded as one 12 MB region):
+
+        0x000000-0x070000   SE3208 code (scrambled)
+        0x070000-0x080000   rodata and padding, ~82% blank (scrambled)
+        0x080000-0xC00000   graphics and audio, NOT scrambled
+
+    The asset area is stored plain: crzclass has 261 "GoldWave" strings in
+    clear but no RIFF/WAVE/fmt/data headers, so the audio is raw PCM blocks
+    with metadata rather than WAV files. No SE3208 code exists anywhere
+    outside 0x000000-0x070000.
+
+    btlfront:
+
+        rom5  MX 29L1611GPC-10, 2 MB
+              0x000000-0x020000   SE3208 code (scrambled)
+              rest                not code in any orientation
+        rom1  mxs0331   graphics, 0x000000-0x3C0000 + 0x400000-0x630000
+        rom2  mxs0304   8-bit unsigned PCM, 0x000000-0x440000 + 0x460000-0x4C0000
+                        (sample mean 126.5-126.9, i.e. centred on 128)
+        rom3  mxs0239   graphics, sparse, seven regions, 0x520000 used
+        rom4  mxs0524   graphics, full 8 MB
+
+    rom1-rom4 are dumped as 0x800400 bytes but the trailing 0x400 is all FF in
+    every one of them: real content is 8 MB, the extra 1 KB is dump padding.
+
+    Graphics and samples are addressed in the vr0soc audiovideo space: rom5
+    code references 0x03E00000, 0x03E10000, 0x03E50000, 0x03E80000, 0x03ED0000
+    and 0x03F00000; crzclass code references 0x03ADxxxx.
+
+    Why none of them boots
+    ----------------------
+    No set has a valid reset vector at 0, so nothing runs as mapped. Forcing
+    the descrambled image into work RAM at the base above and setting the PC
+    by hand runs real code for a few dozen instructions and then derails:
+    offset 0 of the image is a function epilogue, not an entry point.
+
+    Beyond that, the descrambled images contain absolute references to code
+    addresses that do not correspond to code anywhere in the dumps under any
+    base tried - 0x020E8xxx in crzclass (the vfprintf switch table),
+    0x020EAxxx in cjmx. In btlfront the equivalent table does resolve inside
+    rom5, so at least that module is self-contained there.
+
+    A statistical argument was also attempted: a linear sweep of long
+    (LERI-prefixed) CALL/JMP shows ~25% of targets falling outside the image,
+    clustered in narrow bands. That measurement should NOT be trusted: on the
+    same data, in-range targets land on a plausible function entry only 15% of
+    the time against a 12% random baseline, so the sweep is dominated by false
+    decodes in data regions. A proper recursive-descent pass from known-good
+    seeds is needed before claiming how much code is actually missing.
+
+    What is certain is only that something outside the dumped data is needed.
+    A separate BIOS ROM was suspected by analogy with crystal.cpp, where the
+    boot ROM sits at 0x00000000 and the game media is mapped elsewhere. Photos
+    of the btlfront PCB show no EPROM, however: besides the VRenderZERO+, the
+    three SDRAMs, the five mask/flash ROMs and the buffers, the only remaining
+    candidates are two unmarked QFPs of roughly 144 and 44 pins. The same
+    unmarked parts are present on the crzclass board.
+
+    The current suspicion is that the BIOS lives inside the larger of the two
+    QFPs, as an ASIC or microcontroller with embedded ROM, and would therefore
+    have to be extracted rather than simply dumped. That would fit what the
+    code does: the missing region is only ever read and called, never written,
+    and it sits at fixed absolute addresses that do not move with the game's
+    load base, which is what a resident firmware looks like. The SoC itself is
+    ruled out - the VRenderZERO+ is documented and has no on-die ROM - so the
+    only remaining candidates are the two unmarked parts, with the larger one
+    by far the more likely.
 
 trivia: TJF stands for Tai Ji Feng
 ****************************************************************************/
@@ -234,7 +333,7 @@ void ddz_state::init_ddz()
 } // anonymous namespace
 
 
-GAME( 200?, ddz,      0, ddz, ddz, ddz_state, init_ddz,   ROT0, "IGS?", "Dou Dizhu",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, ddz,      0, ddz, ddz, ddz_state, init_ddz,   ROT0, "IGS?", "Dou Dizhu (IGS?)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 200?, crzclass, 0, ddz, ddz, ddz_state, init_ddz,   ROT0, "TJF",  "Chaoji Fengdou",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 'Crazy Class'
 GAME( 200?, baibians, 0, ddz, ddz, ddz_state, init_ddz,   ROT0, "TJF",  "Baibian Shuangkou", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 200?, cjmx,     0, ddz, ddz, ddz_state, init_ddz,   ROT0, "TJF",  "Chaoji Mingxing",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

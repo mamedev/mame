@@ -19,6 +19,7 @@ public:
 	auto in_mreq_callback() { return m_in_mreq_cb.bind(); }
 	auto out_mreq_callback() { return m_out_mreq_cb.bind(); }
 	auto in_spireq_callback() { return m_in_mspi_cb.bind(); }
+	auto out_spireq_callback() { return m_out_mspi_cb.bind(); }
 	auto out_cram_callback() { return m_out_cram_cb.bind(); }
 	auto out_sfile_callback() { return m_out_sfile_cb.bind(); }
 	auto on_ready_callback() { return m_on_ready_cb.bind(); }
@@ -43,6 +44,7 @@ protected:
 	devcb_read16 m_in_mreq_cb;
 	devcb_write16 m_out_mreq_cb;
 	devcb_read16 m_in_mspi_cb;
+	devcb_write16 m_out_mspi_cb;
 	devcb_write16 m_out_cram_cb;
 	devcb_write16 m_out_sfile_cb;
 	devcb_write_line m_on_ready_cb;

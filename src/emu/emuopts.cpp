@@ -21,6 +21,7 @@
 #include "path.h"
 
 #include <algorithm>
+#include <set>
 #include <stack>
 
 
@@ -872,14 +873,28 @@ void emu_options::set_software(std::string &&new_software)
 
 	// distribute slot option defaults
 	bool defaults_applied = false;
-	for (auto &slot_opt : softlist_opts.slot_defaults)
+	std::set<std::string> defaults_done;
+	for (bool progress = true; progress; )
 	{
-		auto iter = m_slot_options.find(slot_opt.first);
-		if (iter != m_slot_options.end())
+		progress = false;
+		for (auto &slot_opt : softlist_opts.slot_defaults)
 		{
-			iter->second.set_default_card_software(std::move(slot_opt.second));
-			defaults_applied = true;
+			if (defaults_done.count(slot_opt.first))
+				continue;
+
+			auto iter = m_slot_options.find(slot_opt.first);
+			if (iter != m_slot_options.end())
+			{
+				iter->second.set_default_card_software(std::move(slot_opt.second));
+				defaults_done.insert(slot_opt.first);
+				defaults_applied = true;
+				progress = true;
+			}
 		}
+
+		// slot defaults can add slots, so defaults for slots nested inside them need another pass
+		if (progress)
+			softlist_opts.slot_defaults = evaluate_initial_softlist_options(new_software).slot_defaults;
 	}
 
 	// slot defaults can add image devices, so parts that had nowhere to mount need another pass

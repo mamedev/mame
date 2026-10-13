@@ -1,12 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-/*
-
-    TODO:
-
-    - clean up TED
-
-*/
 
 #include "emu.h"
 #include "screen.h"

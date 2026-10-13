@@ -331,6 +331,7 @@ license:CC0-1.0
 		<description>No Limit</description>
 		<year>2024</year>
 		<publisher>Aleksi Eeben</publisher>
+		<sharedfeat name="sid_default" value="8580"/>
 
 		<part name="quik" interface="cbm_quik">
 			<dataarea name="quik" size="63425">
@@ -356,6 +357,7 @@ license:CC0-1.0
 		<description>DigiMAX Demo</description>
 		<year>2022</year>
 		<publisher>Data</publisher>
+		<sharedfeat name="user_default" value="digimax"/>
 
 		<part name="quik" interface="cbm_quik">
 			<dataarea name="quik" size="18873">

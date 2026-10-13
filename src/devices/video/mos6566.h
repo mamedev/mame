@@ -124,6 +124,7 @@ public:
 	auto irq_callback() { return m_write_irq.bind(); }
 	auto ba_callback() { return m_write_ba.bind(); }
 	auto aec_callback() { return m_write_aec.bind(); }
+	auto phi2_callback() { return m_write_phi2.bind(); }
 	auto k_callback() { return m_write_k.bind(); }
 	auto charrom_callback() { return m_read_charrom.bind(); }
 
@@ -246,6 +247,7 @@ private:
 	devcb_write_line m_write_irq;
 	devcb_write_line m_write_ba;
 	devcb_write_line m_write_aec;
+	devcb_write_line m_write_phi2;
 	devcb_write8 m_write_k;
 	devcb_read8 m_read_charrom;
 

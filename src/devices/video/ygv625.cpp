@@ -147,9 +147,9 @@ std::pair<u32, u32> scan_8x4(u32 index)
 {
 	const u32 si = index >> 5;              // sub-block number 0..7
 	const u32 by = si >> 1;
-	const u32 bx = BIT(by, 0) ? 1 - BIT(si, 0) : BIT(si, 0);
+	const u32 bx = BIT(by, 0) ^ BIT(si, 0);
 	const u32 j = (index >> 2) & 7;         // column within the sub-block
-	const u32 c = BIT(by, 0) ? 7 - j : j;
+	const u32 c = BIT(by, 0) ? (7 - j) : j;
 	u32 r = index & 3;
 	if (BIT(j + si, 0))
 		r = 3 - r;
@@ -161,9 +161,9 @@ std::pair<u32, u32> scan_4x8(u32 index)
 {
 	const u32 si = index >> 5;              // sub-block number 0..7
 	const u32 bx = si >> 1;
-	const u32 by = BIT(bx, 0) ? 1 - BIT(si, 0) : BIT(si, 0);
+	const u32 by = BIT(bx, 0) ^ BIT(si, 0);
 	const u32 j = (index >> 2) & 7;         // row within the sub-block
-	const u32 r = BIT(bx, 0) ? 7 - j : j;
+	const u32 r = BIT(bx, 0) ? (7 - j) : j;
 	u32 c = index & 3;
 	if (BIT(j + si, 0))
 		c = 3 - c;
@@ -282,7 +282,7 @@ u32 ygv625_device::bit_reader::read(u32 bits)
 		u64 byte = m_pos >> 3;
 		u32 bit = 0;
 		if (byte < m_size)
-			bit = (m_base[byte] >> (7 - (m_pos & 7))) & 1;
+			bit = BIT(m_base[byte], ~m_pos & 7);
 		value = (value << 1) | bit;
 		m_pos++;
 	}

@@ -329,6 +329,7 @@ mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, 
 	, m_write_irq(*this)
 	, m_write_ba(*this)
 	, m_write_aec(*this)
+	, m_write_phi2(*this)
 	, m_write_k(*this)
 	, m_read_charrom(*this, 0)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
@@ -1502,6 +1503,8 @@ void mos6566_device::execute_run()
 			m_aec_out = m_aec;
 			m_write_aec(m_aec);
 		}
+
+		m_write_phi2(1);
 
 		m_cycle_dot = m_dot;
 		m_draw_row = (m_beam_line + m_timing.row_shift) % m_timing.lines;
