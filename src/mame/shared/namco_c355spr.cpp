@@ -331,7 +331,7 @@ void namco_c355spr_device::build_sprite_list_and_render_sprites(const rectangle 
 void namco_c355spr_device::render_sprites(const rectangle cliprect)
 {
 	m_renderbitmap.fill(0xffff, cliprect);
-	gfx_element *const gfx = this->gfx(0);
+	gfx_element *const gfxelem = gfx(0);
 	c355_sprite *sprite_ptr = m_spritelist.get();
 
 	while (sprite_ptr != m_sprite_end)
@@ -344,7 +344,7 @@ void namco_c355spr_device::render_sprites(const rectangle cliprect)
 			// the render bitmap holds the priority in the top 4 bits and the pen in
 			// the low 12; pal is a multiple of the granularity so adding the pen
 			// cannot carry into the priority
-			const u32 pal = gfx->colorbase() + gfx->granularity() * (sprite_ptr->color % gfx->colors());
+			const u32 pal = gfxelem->colorbase() + gfxelem->granularity() * (sprite_ptr->color % gfxelem->colors());
 			const u32 color = ((sprite_ptr->pri & 0xf) << 12) | (pal & 0xfff);
 
 			for (int ind = 0; ind < sprite_ptr->cols * sprite_ptr->rows; ind++)
@@ -359,7 +359,7 @@ void namco_c355spr_device::render_sprites(const rectangle cliprect)
 					// tiles are stored left to right, top to bottom before flipping
 					const int col = ind % sprite_ptr->cols;
 					const int row = ind / sprite_ptr->cols;
-					gfx->zoom_subpixel_transpen_raw(
+					gfxelem->zoom_subpixel_transpen_raw(
 						m_renderbitmap,
 						clip,
 						tile + sprite_ptr->offset,

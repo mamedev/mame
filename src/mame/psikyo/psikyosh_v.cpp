@@ -364,7 +364,7 @@ void psikyosh_state::drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, 
 	u32 const stepx = zoomx << 6;
 	u32 const stepy = zoomy << 6;
 
-	auto const draw = [&] (auto const &pixop)
+	auto const draw = [this, &dest_bmp, &myclip, gfx, code, flipx, flipy, offsx, offsy, wide, high, stepx, stepy] (auto const &pixop)
 	{
 		u32 code_offset = 0;
 		for (int ytile = 0; ytile < high; ytile++)
@@ -410,7 +410,7 @@ void psikyosh_state::drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, 
 		if (z > 0)
 			draw([pal, z] (u8 source, u32 *dest, u16 *pri) { pixop_transparent_priority(source, dest, pri, pal, z); });
 		else
-			draw([pal] (u8 source, u32 *dest, u16 *pri) { pixop_transparent(source, dest, pal); });
+			draw([pal] (u8 source, u32 *dest, u16 *) { pixop_transparent(source, dest, pal); });
 	}
 
 	// case 6: alpha-blended
@@ -419,7 +419,7 @@ void psikyosh_state::drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, 
 		if (z > 0)
 			draw([pal, z, alpha] (u8 source, u32 *dest, u16 *pri) { pixop_transparent_alpha_priority(source, dest, pri, pal, z, alpha); });
 		else
-			draw([pal, alpha] (u8 source, u32 *dest, u16 *pri) { pixop_transparent_alpha(source, dest, pal, alpha); });
+			draw([pal, alpha] (u8 source, u32 *dest, u16 *) { pixop_transparent_alpha(source, dest, pal, alpha); });
 	}
 
 	// case 7: TRANSPARENCY_ALPHARANGE
@@ -428,7 +428,7 @@ void psikyosh_state::drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, 
 		if (z > 0)
 			draw([pal, z, alphatable] (u8 source, u32 *dest, u16 *pri) { pixop_transparent_alphatable_priority(source, dest, pri, pal, z, alphatable); });
 		else
-			draw([pal, alphatable] (u8 source, u32 *dest, u16 *pri) { pixop_transparent_alphatable(source, dest, pal, alphatable); });
+			draw([pal, alphatable] (u8 source, u32 *dest, u16 *) { pixop_transparent_alphatable(source, dest, pal, alphatable); });
 	}
 }
 

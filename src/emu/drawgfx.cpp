@@ -593,7 +593,7 @@ u32 gfx_element::subpixel_zoom_step(u32 scale)
 	if (scale == 0)
 		return 0;
 	u64 const step = ((u64(1) << 32) + scale - 1) / scale;
-	return (step > 0x7fffffff) ? 0 : u32(step);
+	return (step > 0x7fff'ffff) ? 0 : u32(step);
 }
 
 
@@ -611,7 +611,7 @@ bool gfx_element::subpixel_zoom_span(s32 pos, s32 tile, u32 size, u32 step, int 
 {
 	auto const ceil_div = [] (s64 a, s64 b) { return (a >= 0) ? ((a + b - 1) / b) : -(-a / b); };
 
-	if (step == 0 || step > 0x7fffffff)
+	if (step == 0 || step > 0x7fff'ffff)
 		return false;
 
 	// first destination pixel at or after the origin, and the source position there

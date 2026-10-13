@@ -97,8 +97,8 @@ protected:
 		int color;
 		bool flipx,flipy;
 		int tile[16*16];
-		int x, y;           // 16.16 top-left of the whole sprite
-		u32 stepx, stepy;   // 16.16 source step per pixel
+		int x, y; // 16.16 top-left of the whole sprite
+		u32 stepx, stepy; // 16.16 source step per pixel
 		int pri;
 	};
 
