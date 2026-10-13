@@ -157,6 +157,8 @@ scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_
 		m_IrqMidi(0),
 		m_MidiOutW(0),
 		m_MidiOutR(0),
+		m_MidiInOverflow(false),
+		m_read_mask(0xffff),
 		m_MidiW(0),
 		m_MidiR(0),
 		m_timerA(nullptr),
@@ -254,6 +256,7 @@ void scsp_device::device_start()
 	save_item(NAME(m_MidiOutStack));
 	save_item(NAME(m_MidiOutW));
 	save_item(NAME(m_MidiOutR));
+	save_item(NAME(m_MidiInOverflow));
 	save_item(NAME(m_MidiStack));
 	save_item(NAME(m_MidiW));
 	save_item(NAME(m_MidiR));
@@ -617,6 +620,7 @@ void scsp_device::init()
 
 	m_IrqTimA = m_IrqTimBC = m_IrqMidi = m_IrqCPU = m_IrqDMA = 0;
 	m_MidiR = m_MidiW = 0;
+	m_MidiInOverflow = false;
 	m_MidiOutR = m_MidiOutW = 0;
 
 	m_DSP.space = &this->space();
@@ -961,21 +965,36 @@ void scsp_device::UpdateRegR(int reg)
 		case 4:
 		case 5:
 			{
-				u16 v = m_udata.data[0x4/2];
-				v &= 0xff00;
-				v |= m_MidiStack[m_MidiR];
-				logerror("Read %x from SCSP MIDI\n", v);
-				if (m_MidiR != m_MidiW)
-				{
-					++m_MidiR;
-					m_MidiR &= 31;
-				}
-				if (m_MidiR == m_MidiW)     // if the input FIFO is empty, clear the IRQ
-				{
-					m_irq_cb(m_IrqMidi, CLEAR_LINE);
-					m_udata.data[0x20 / 2] &= ~8;
-				}
+				// MOFUL/MOEMP/MIOVF/MIFUL/MIEMP, and MIBUF, the oldest byte in the input FIFO
+				u16 v = m_MidiStack[m_MidiR];
+				if (((m_MidiOutW + 1) & 31) == m_MidiOutR)
+					v |= 0x1000;
+				if (m_MidiOutR == m_MidiOutW)
+					v |= 0x0800;
+				if (m_MidiInOverflow)
+					v |= 0x0400;
+				if (((m_MidiW + 1) & 31) == m_MidiR)
+					v |= 0x0200;
+				if (m_MidiR == m_MidiW)
+					v |= 0x0100;
 				m_udata.data[0x4/2] = v;
+
+				// only reading MIBUF takes the byte: the status half alone doesn't
+				if ((m_read_mask & 0x00ff) && !machine().side_effects_disabled())
+				{
+					logerror("Read %x from SCSP MIDI\n", v);
+					m_MidiInOverflow = false;
+					if (m_MidiR != m_MidiW)
+					{
+						++m_MidiR;
+						m_MidiR &= 31;
+					}
+					if (m_MidiR == m_MidiW)     // if the input FIFO is empty, clear the IRQ
+					{
+						m_irq_cb(m_IrqMidi, CLEAR_LINE);
+						m_udata.data[0x20 / 2] &= ~8;
+					}
+				}
 			}
 			break;
 		case 8:
@@ -1471,17 +1490,25 @@ void scsp_device::exec_dma()
 }
 
 
-u16 scsp_device::read(offs_t offset)
+u16 scsp_device::read(offs_t offset, u16 mem_mask)
 {
 	m_stream->update();
-	return r16(offset * 2);
+	m_read_mask = mem_mask;
+	const u16 data = r16(offset * 2);
+	m_read_mask = 0xffff;
+	return data;
 }
 
 void scsp_device::write(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_stream->update();
 
-	u16 tmp = r16(offset * 2);
+	// merge with the current value without a read's side effects (taking a MIDI input byte)
+	u16 tmp;
+	{
+		auto dis = machine().disable_side_effects();
+		tmp = r16(offset * 2);
+	}
 	COMBINE_DATA(&tmp);
 	w16(offset * 2, tmp);
 }
@@ -1506,8 +1533,17 @@ void scsp_device::tra_complete()
 void scsp_device::rcv_complete()
 {
 	receive_register_extract();
-	m_MidiStack[m_MidiW++] = get_received_char();
-	m_MidiW &= 31;
+	if (((m_MidiW + 1) & 31) == m_MidiR)
+	{
+		// input FIFO full: the byte is lost
+		m_MidiInOverflow = true;
+		logerror("MIDI input overflow, %02x lost\n", get_received_char());
+	}
+	else
+	{
+		m_MidiStack[m_MidiW++] = get_received_char();
+		m_MidiW &= 31;
+	}
 
 	CheckPendingIRQ();
 }
