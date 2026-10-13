@@ -3127,6 +3127,8 @@ if BUSES["ISA"] then
 		MAME_DIR .. "src/devices/bus/isa/side116.h",
 		MAME_DIR .. "src/devices/bus/isa/ssi2001.cpp",
 		MAME_DIR .. "src/devices/bus/isa/ssi2001.h",
+		MAME_DIR .. "src/devices/bus/isa/stda.cpp",
+		MAME_DIR .. "src/devices/bus/isa/stda.h",
 		MAME_DIR .. "src/devices/bus/isa/stereo_fx.cpp",
 		MAME_DIR .. "src/devices/bus/isa/stereo_fx.h",
 		MAME_DIR .. "src/devices/bus/isa/svga_cirrus.cpp",
