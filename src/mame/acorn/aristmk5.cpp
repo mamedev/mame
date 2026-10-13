@@ -2513,11 +2513,14 @@ void aristmk5_state::aristmk5(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 
+	// VIDC is stereo but this HW forces mono
+	SPEAKER(config, "speaker").front_center();
+
 	ACORN_VIDC1A(config, m_vidc, MASTER_CLOCK/3);
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_memc, FUNC(acorn_memc_device::vidrq_w));
 	m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
-	// TODO: sound mixing is very low (just one channel used?), expose from device
+	m_vidc->add_route(ALL_OUTPUTS, "speaker", 1.00);
 
 	EEPROM_93C56_16BIT(config, m_eeprom[0]);
 	EEPROM_93C56_16BIT(config, m_eeprom[1]);

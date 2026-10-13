@@ -1382,10 +1382,13 @@ void hangplt_state::init_hangplt_common()
 	m_cgboard_bank[1]->configure_entries(0, 2, memregion("cgboard_0")->base(), 0x800000);
 }
 
-void hangplt_state::init_hangplt() //fixme: remove hacks and actually emulate the step lock. Possibly similar to Alpine Racer 1/2 and Alpine Surfer?
+// FIXME: remove hacks and actually emulate the step lock.
+// Possibly similar to Alpine Racer 1/2 and Alpine Surfer?
+void hangplt_state::init_hangplt()
 {
 	init_hangplt_common();
 
+	// HACK: step lock patch
 	uint32_t *rom = (uint32_t*)memregion("prgrom")->base();
 	rom[(0x153ac^4) / 4] = 0x4e800020;
 	rom[(0x15428^4) / 4] = 0x4e800020;
@@ -1395,6 +1398,7 @@ void hangplt_state::init_hangpltu()
 {
 	init_hangplt_common();
 
+	// HACK: step lock patch
 	uint32_t *rom = (uint32_t*)memregion("prgrom")->base();
 	rom[(0x153d0^4) / 4] = 0x4e800020;
 	rom[(0x15428^4) / 4] = 0x4e800020;

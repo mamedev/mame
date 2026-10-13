@@ -4,6 +4,8 @@
 
     Psion MC400/MC200 Series
 
+    The MC200 was also sold re-badged as Memorex MRX-G1.
+
 ******************************************************************************/
 
 #include "emu.h"

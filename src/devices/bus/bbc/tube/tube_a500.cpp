@@ -195,10 +195,15 @@ void bbc_tube_a500_device::device_add_mconfig(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.screen_vblank().set(m_ioc, FUNC(acorn_ioc_device::ir_w));
 
+	SPEAKER(config, "speaker", 2).front();
+
 	ACORN_VIDC1(config, m_vidc, 24_MHz_XTAL);
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_memc, FUNC(acorn_memc_device::vidrq_w));
 	m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
+	// TODO: verify routing
+	m_vidc->add_route(0, "speaker", 1.00, 0);
+	m_vidc->add_route(1, "speaker", 1.00, 1);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("bbc_flop_arm").set_filter("A500");
 }

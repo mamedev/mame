@@ -49,8 +49,8 @@ public:
 		, m_sprgen(*this, "spritegen")
 		, m_spriteram(*this, "spriteram")
 		, m_soundlatch(*this, "soundlatch")
+		, m_rowscroll_0(*this, "rowscroll_0")
 		, m_rowscroll_1(*this, "rowscroll_1")
-		, m_rowscroll_3(*this, "rowscroll_3")
 		, m_paletteram(*this, "paletteram")
 		, m_paletteram_ext(*this, "paletteram_ext")
 	{ }
@@ -77,8 +77,8 @@ private:
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<generic_latch_8_device> m_soundlatch;
 
+	required_shared_ptr<uint16_t> m_rowscroll_0;
 	required_shared_ptr<uint16_t> m_rowscroll_1;
-	required_shared_ptr<uint16_t> m_rowscroll_3;
 	required_shared_ptr<uint16_t> m_paletteram;
 	required_shared_ptr<uint16_t> m_paletteram_ext;
 };
@@ -135,13 +135,13 @@ uint32_t darkseal_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	m_tilegen[0]->update(m_rowscroll_1, m_rowscroll_1);
-	m_tilegen[1]->update(m_rowscroll_3, m_rowscroll_3);
+	m_tilegen[0]->update(m_rowscroll_0, m_rowscroll_1);
+	m_tilegen[1]->update(m_rowscroll_1, m_rowscroll_0);
+
+	m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
+	m_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 
 	m_tilegen[1]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
-	m_tilegen[1]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
-
-	m_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 	m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0);
 
@@ -179,8 +179,7 @@ void darkseal_state::main_map(address_map &map)
 	map(0x240000, 0x24000f).w(m_tilegen[1], FUNC(deco16ic_device::control_w));
 
 	map(0x220000, 0x220fff).ram().share(m_rowscroll_1);
-	// pf2 & 4 rowscrolls are where? (maybe don't exist?)
-	map(0x222000, 0x222fff).ram().share(m_rowscroll_3);
+	map(0x222000, 0x222fff).ram().share(m_rowscroll_0);
 
 	map(0x260000, 0x261fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<0>), FUNC(deco16ic_device::vram_w<0>));
 	map(0x262000, 0x263fff).rw(m_tilegen[0], FUNC(deco16ic_device::vram_r<1>), FUNC(deco16ic_device::vram_w<1>));
@@ -304,13 +303,13 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( gfx_darkseal )
-	GFXDECODE_ENTRY( "chars",   0, charlayout,    0, 16 )  // 8x8
-	GFXDECODE_ENTRY( "tiles1",  0, tilelayout,  768, 16 )  // 16x16
-	GFXDECODE_ENTRY( "tiles2",  0, tilelayout, 1024, 16 )  // 16x16
+	GFXDECODE_ENTRY( "chars",   0, charlayout, 0, 0x50 ) // 8x8
+	GFXDECODE_ENTRY( "tiles1",  0, tilelayout, 0, 0x50 ) // 16x16
+	GFXDECODE_ENTRY( "tiles2",  0, tilelayout, 0, 0x50 ) // 16x16
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_darkseal_spr )
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout,  256, 32 )  // 16x16
+	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100, 0x20 ) // 16x16
 GFXDECODE_END
 
 /******************************************************************************/
@@ -343,8 +342,8 @@ void darkseal_state::darkseal(machine_config &config)
 
 	DECO16IC(config, m_tilegen[0]);
 	m_tilegen[0]->set_size<0>(deco16ic_device::DECO_64x64);
-	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x64);     // both these tilemaps need to be twice the y size of usual!
-	m_tilegen[0]->set_col_bank<0>(0x00);
+	m_tilegen[0]->set_size<1>(deco16ic_device::DECO_64x64); // both these tilemaps need to be twice the y size of usual!
+	m_tilegen[0]->set_col_bank<0>(0x30);
 	m_tilegen[0]->set_col_bank<1>(0x00);
 	m_tilegen[0]->set_col_mask<0>(0x0f);
 	m_tilegen[0]->set_col_mask<1>(0x0f);
@@ -355,8 +354,8 @@ void darkseal_state::darkseal(machine_config &config)
 	DECO16IC(config, m_tilegen[1]);
 	m_tilegen[1]->set_size<0>(deco16ic_device::DECO_64x32);
 	m_tilegen[1]->set_size<1>(deco16ic_device::DECO_64x32);
-	m_tilegen[1]->set_col_bank<0>(0x00);
-	m_tilegen[1]->set_col_bank<1>(0x00);
+	m_tilegen[1]->set_col_bank<0>(0x20);
+	m_tilegen[1]->set_col_bank<1>(0x40);
 	m_tilegen[1]->set_col_mask<0>(0x0f);
 	m_tilegen[1]->set_col_mask<1>(0x0f);
 	m_tilegen[1]->set_8x8_bank(0);

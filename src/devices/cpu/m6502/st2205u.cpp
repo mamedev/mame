@@ -103,21 +103,24 @@ st2302u_device::st2302u_device(const machine_config &mconfig, const char *tag, d
 
 void st2205u_base_device::sound_stream_update(sound_stream &stream)
 {
+	constexpr int OUTPUT_SCALE = 0x200 * 0x3f * 4;
+	sound_stream::sample_t output = 0.0F;
 	for (int channel = 0; channel < 4; channel++)
-	{
-		// The four channels are mixed into one 10-bit output, so retain enough headroom for their sum.
-		const int output = !BIT(m_psgc, 0) && BIT(m_psgc, channel + 4)
-				? m_psg_output[channel] * (m_psg_vol[channel] & 0x3f)
-				: 0;
+		if (!BIT(m_psgc, 0) && BIT(m_psgc, channel + 4))
+			output += sound_stream::sample_t(double(m_psg_output[channel] * (m_psg_vol[channel] & 0x3f)) / OUTPUT_SCALE);
 
-		for (int sample = 0; sample < stream.samples(); sample++)
-			stream.put_int(channel, sample, output, 0x200 * 0x3f * 4);
+	// The four channels are mixed internally and output mode 3 selects the current DAC rather than PWM.
+	const bool current_dac = BIT(m_psgc, 1, 2) == 3;
+	for (int sample = 0; sample < stream.samples(); sample++)
+	{
+		stream.put(PSG_OUTPUT_PWM, sample, current_dac ? 0.0F : output);
+		stream.put(PSG_OUTPUT_CURRENT_DAC, sample, current_dac ? output : 0.0F);
 	}
 }
 
 void st2205u_base_device::base_init(std::unique_ptr<mi_st2xxx> &&intf)
 {
-	m_stream = stream_alloc(0, 4, 48000);
+	m_stream = stream_alloc(0, PSG_OUTPUT_COUNT, 48000);
 
 	m_timer_12bit[0] = timer_alloc(FUNC(st2205u_device::t0_interrupt), this);
 	m_timer_12bit[1] = timer_alloc(FUNC(st2205u_device::t1_interrupt), this);
@@ -189,12 +192,12 @@ void st2205u_device::device_start()
 	state_add(ST_IENA, "IENA", m_iena, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	for (int i = 0; i < 6; i++)
 	{
-		state_add(ST_PAOUT + i, string_format("P%cOUT", 'A' + i).c_str(), m_pdata[i]);
-		state_add(ST_PCA + i, string_format("PC%c", 'A' + i).c_str(), m_pctrl[i]);
+		state_add(ST_PAOUT + i, string_format("P%cOUT", 'A' + i), m_pdata[i]);
+		state_add(ST_PCA + i, string_format("PC%c", 'A' + i), m_pctrl[i]);
 		if (i == 2 || i == 4)
-			state_add(ST_PSA + i, string_format("PS%c", 'A' + i).c_str(), m_psel[i]);
+			state_add(ST_PSA + i, string_format("PS%c", 'A' + i), m_psel[i]);
 		if (i == 2 || i == 3)
-			state_add(ST_PFC + i - 2, string_format("PF%c", 'A' + i).c_str(), m_pfun[i - 2]).mask(i == 2 ? 0xfe : 0xff);
+			state_add(ST_PFC + i - 2, string_format("PF%c", 'A' + i), m_pfun[i - 2]).mask(i == 2 ? 0xfe : 0xff);
 	}
 	state_add(ST_PLOUT, "PLOUT", m_pdata[6]);
 	state_add(ST_PCL, "PCL", m_pctrl[6]);
@@ -206,15 +209,15 @@ void st2205u_device::device_start()
 	state_add(ST_BTSR, "BTREQ", m_btsr);
 	state_add(ST_BTC, "BTC", m_btc);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_T0C + i, string_format("T%dC", i).c_str(), m_tc_12bit[i]);
+		state_add(ST_T0C + i, string_format("T%dC", i), m_tc_12bit[i]);
 	state_add(ST_T4C, "T4C", m_t4c);
 	state_add(ST_TIEN, "TIEN", m_tien);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_FIFOS0 + i, string_format("FIFOS%d", i).c_str(), m_fifo_filled[i]).mask(0x1f);
+		state_add(ST_FIFOS0 + i, string_format("FIFOS%d", i), m_fifo_filled[i]).mask(0x1f);
 	state_add(ST_PSGC, "PSGC", m_psgc);
 	state_add(ST_PSGM, "PSGM", m_psgm);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_VOL0 + i, string_format("VOL%d", i).c_str(), m_psg_vol[i]).mask(0xbf);
+		state_add(ST_VOL0 + i, string_format("VOL%d", i), m_psg_vol[i]).mask(0xbf);
 	state_add(ST_VOLM0, "VOLM0", m_psg_volm[0]).mask(0x3f);
 	state_add(ST_VOLM1, "VOLM1", m_psg_volm[1]).mask(0x7f);
 	state_add(ST_MUL, "MUL", m_mul);
@@ -243,12 +246,12 @@ void st2205u_device::device_start()
 	state_add(ST_USBIEN, "USBIEN", m_usbien).mask(0xbf);
 	for (int i = 0; i < 2; i++)
 	{
-		state_add(ST_DMS0 + i, string_format("DMS%d", i).c_str(), m_dptr[i * 2]).mask(0x7fff);
-		state_add(ST_DMD0 + i, string_format("DMD%d", i).c_str(), m_dptr[i * 2 + 1]).mask(0x7fff);
-		state_add(ST_DBKS0 + i, string_format("DBKS%d", i).c_str(), m_dbkr[i * 2]).mask(0x87ff);
-		state_add(ST_DBKD0 + i, string_format("DBKD%d", i).c_str(), m_dbkr[i * 2 + 1]).mask(0x87ff);
-		state_add(ST_DCNT0 + i, string_format("DCNT%d", i).c_str(), m_dcnt[i]).mask(0x7fff);
-		state_add(ST_DMOD0 + i, string_format("DMOD%d", i).c_str(), m_dmod[i]).mask(0x3f);
+		state_add(ST_DMS0 + i, string_format("DMS%d", i), m_dptr[i * 2]).mask(0x7fff);
+		state_add(ST_DMD0 + i, string_format("DMD%d", i), m_dptr[i * 2 + 1]).mask(0x7fff);
+		state_add(ST_DBKS0 + i, string_format("DBKS%d", i), m_dbkr[i * 2]).mask(0x87ff);
+		state_add(ST_DBKD0 + i, string_format("DBKD%d", i), m_dbkr[i * 2 + 1]).mask(0x87ff);
+		state_add(ST_DCNT0 + i, string_format("DCNT%d", i), m_dcnt[i]).mask(0x7fff);
+		state_add(ST_DMOD0 + i, string_format("DMOD%d", i), m_dmod[i]).mask(0x3f);
 	}
 	state_add(ST_DCTR, "DCTR", m_dctr).mask(0x03);
 	state_add(ST_RCTR, "RCTR", m_rctr).mask(0xef);
@@ -275,12 +278,12 @@ void st2302u_device::device_start()
 	state_add(ST_IENA, "IENA", m_iena, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	for (int i = 0; i < 6; i++)
 	{
-		state_add(ST_PAOUT + i, string_format("P%cOUT", 'A' + i).c_str(), m_pdata[i]);
-		state_add(ST_PCA + i, string_format("PC%c", 'A' + i).c_str(), m_pctrl[i]);
+		state_add(ST_PAOUT + i, string_format("P%cOUT", 'A' + i), m_pdata[i]);
+		state_add(ST_PCA + i, string_format("PC%c", 'A' + i), m_pctrl[i]);
 		if (i == 2 || i == 4)
-			state_add(ST_PSA + i, string_format("PS%c", 'A' + i).c_str(), m_psel[i]);
+			state_add(ST_PSA + i, string_format("PS%c", 'A' + i), m_psel[i]);
 		if (i == 2 || i == 3)
-			state_add(ST_PFC + i - 2, string_format("PF%c", 'A' + i).c_str(), m_pfun[i - 2]).mask(i == 2 ? 0xfe : 0xff);
+			state_add(ST_PFC + i - 2, string_format("PF%c", 'A' + i), m_pfun[i - 2]).mask(i == 2 ? 0xfe : 0xff);
 	}
 	state_add(ST_PMCR, "PMCR", m_pmcr);
 	state_add(ST_MISC, "MISC", m_misc).mask(st2xxx_misc_mask());
@@ -290,15 +293,15 @@ void st2302u_device::device_start()
 	state_add(ST_BTSR, "BTREQ", m_btsr);
 	state_add(ST_BTC, "BTC", m_btc);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_T0C + i, string_format("T%dC", i).c_str(), m_tc_12bit[i]);
+		state_add(ST_T0C + i, string_format("T%dC", i), m_tc_12bit[i]);
 	state_add(ST_T4C, "T4C", m_t4c);
 	state_add(ST_TIEN, "TIEN", m_tien);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_FIFOS0 + i, string_format("FIFOS%d", i).c_str(), m_fifo_filled[i]).mask(0x1f);
+		state_add(ST_FIFOS0 + i, string_format("FIFOS%d", i), m_fifo_filled[i]).mask(0x1f);
 	state_add(ST_PSGC, "PSGC", m_psgc);
 	state_add(ST_PSGM, "PSGM", m_psgm);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_VOL0 + i, string_format("VOL%d", i).c_str(), m_psg_vol[i]).mask(0xbf);
+		state_add(ST_VOL0 + i, string_format("VOL%d", i), m_psg_vol[i]).mask(0xbf);
 	state_add(ST_VOLM0, "VOLM0", m_psg_volm[0]).mask(0x3f);
 	state_add(ST_VOLM1, "VOLM1", m_psg_volm[1]).mask(0x7f);
 	state_add(ST_MUL, "MUL", m_mul);
@@ -308,12 +311,12 @@ void st2302u_device::device_start()
 	state_add(ST_SMOD, "SMOD", m_smod).mask(0x0f);
 	for (int i = 0; i < 2; i++)
 	{
-		state_add(ST_DMS0 + i, string_format("DMS%d", i).c_str(), m_dptr[i * 2]).mask(0x7fff);
-		state_add(ST_DMD0 + i, string_format("DMD%d", i).c_str(), m_dptr[i * 2 + 1]).mask(0x7fff);
-		state_add(ST_DBKS0 + i, string_format("DBKS%d", i).c_str(), m_dbkr[i * 2]).mask(0x87ff);
-		state_add(ST_DBKD0 + i, string_format("DBKD%d", i).c_str(), m_dbkr[i * 2 + 1]).mask(0x87ff);
-		state_add(ST_DCNT0 + i, string_format("DCNT%d", i).c_str(), m_dcnt[i]).mask(0x7fff);
-		state_add(ST_DMOD0 + i, string_format("DMOD%d", i).c_str(), m_dmod[i]).mask(0x3f);
+		state_add(ST_DMS0 + i, string_format("DMS%d", i), m_dptr[i * 2]).mask(0x7fff);
+		state_add(ST_DMD0 + i, string_format("DMD%d", i), m_dptr[i * 2 + 1]).mask(0x7fff);
+		state_add(ST_DBKS0 + i, string_format("DBKS%d", i), m_dbkr[i * 2]).mask(0x87ff);
+		state_add(ST_DBKD0 + i, string_format("DBKD%d", i), m_dbkr[i * 2 + 1]).mask(0x87ff);
+		state_add(ST_DCNT0 + i, string_format("DCNT%d", i), m_dcnt[i]).mask(0x7fff);
+		state_add(ST_DMOD0 + i, string_format("DMOD%d", i), m_dmod[i]).mask(0x3f);
 	}
 	state_add(ST_DCTR, "DCTR", m_dctr).mask(0x03);
 	state_add(ST_RCTR, "RCTR", m_rctr).mask(0xef);
@@ -1316,6 +1319,8 @@ void st2205u_device::int_map(address_map &map)
 	map(0x004c, 0x004c).w(FUNC(st2205u_device::lpal_w));
 	map(0x004e, 0x004e).rw(FUNC(st2205u_device::pl_r), FUNC(st2205u_device::pl_w));
 	map(0x004f, 0x004f).rw(FUNC(st2205u_device::pcl_r), FUNC(st2205u_device::pcl_w));
+	map(0x0050, 0x0050).rw(FUNC(st2205u_device::sdatal_r), FUNC(st2205u_device::sdatal_w));
+	map(0x0051, 0x0051).rw(FUNC(st2205u_device::sdatah_r), FUNC(st2205u_device::sdatah_w));
 	map(0x0052, 0x0052).rw(FUNC(st2205u_device::sctr_r), FUNC(st2205u_device::sctr_w));
 	map(0x0053, 0x0053).rw(FUNC(st2205u_device::sckr_r), FUNC(st2205u_device::sckr_w));
 	map(0x0054, 0x0054).rw(FUNC(st2205u_device::ssr_r), FUNC(st2205u_device::ssr_w));
@@ -1344,6 +1349,8 @@ void st2302u_device::int_map(address_map &map)
 	map(0x0008, 0x000d).rw(FUNC(st2302u_device::pctrl_r), FUNC(st2302u_device::pctrl_w));
 	map(0x000e, 0x000e).rw(FUNC(st2302u_device::pfc_r), FUNC(st2302u_device::pfc_w));
 	map(0x000f, 0x000f).rw(FUNC(st2302u_device::pfd_r), FUNC(st2302u_device::pfd_w));
+	map(0x0010, 0x0010).rw(FUNC(st2302u_device::sdatal_r), FUNC(st2302u_device::sdatal_w));
+	map(0x0011, 0x0011).rw(FUNC(st2302u_device::sdatah_r), FUNC(st2302u_device::sdatah_w));
 	map(0x0012, 0x0012).rw(FUNC(st2302u_device::sctr_r), FUNC(st2302u_device::sctr_w));
 	map(0x0013, 0x0013).rw(FUNC(st2302u_device::sckr_r), FUNC(st2302u_device::sckr_w));
 	map(0x0014, 0x0014).rw(FUNC(st2302u_device::ssr_r), FUNC(st2302u_device::ssr_w));

@@ -334,7 +334,7 @@ void mc6847_friend_device::update_field_sync_timer()
 std::string mc6847_friend_device::scanline_zone_string(scanline_zone zone) const
 {
 	std::string result;
-	switch(zone)
+	switch (zone)
 	{
 	case SCANLINE_ZONE_TOP_BORDER:      result = "SCANLINE_ZONE_TOP_BORDER";    break;
 	case SCANLINE_ZONE_BODY:            result = "SCANLINE_ZONE_BODY";          break;
@@ -366,7 +366,7 @@ TIMER_CALLBACK_MEMBER(mc6847_friend_device::change_horizontal_sync)
 		// first store the scanline
 		{
 			auto profile2 = g_profiler.start(PROFILER_USER2);
-			switch((scanline_zone) m_logical_scanline_zone)
+			switch ((scanline_zone) m_logical_scanline_zone)
 			{
 			case SCANLINE_ZONE_TOP_BORDER:
 			case SCANLINE_ZONE_BOTTOM_BORDER:
@@ -843,7 +843,7 @@ void mc6847_base_device::record_body_scanline(uint8_t mode, uint16_t physical_sc
 
 	if (mode & MODE_AG)
 	{
-		switch(mode & (MODE_GM2|MODE_GM1|MODE_GM0))
+		switch (mode & (MODE_GM2|MODE_GM1|MODE_GM0))
 		{
 		case 0:
 		case MODE_GM0:
@@ -987,10 +987,10 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 {
 	int base_x = BMP_L_OR_R_BORDER;
 	int base_y = m_lines_top_border;
-	int min_x = USE_HORIZONTAL_CLIP ? cliprect.min_x : 0;
-	int max_x = USE_HORIZONTAL_CLIP ? cliprect.max_x : (base_x * 2 + BMP_ACTIVE_VIDEO - 1);
-	int min_y = cliprect.min_y;
-	int max_y = cliprect.max_y;
+	int min_x = USE_HORIZONTAL_CLIP ? cliprect.left() : 0;
+	int max_x = USE_HORIZONTAL_CLIP ? cliprect.right() : (base_x * 2 + BMP_ACTIVE_VIDEO - 1);
+	int min_y = cliprect.top();
+	int max_y = cliprect.bottom();
 	const pixel_t *palette = m_palette;
 
 	/* if the video didn't change, indicate as much */
@@ -1374,7 +1374,7 @@ mc6847_base_device::pixel_t mc6847_base_device::artifacter::mix_color(double fac
 //  artifacter::create_color_blend_table
 //-------------------------------------------------
 
-void mc6847_base_device::artifacter::create_color_blend_table( const pixel_t *palette )
+void mc6847_base_device::artifacter::create_color_blend_table(const pixel_t *palette)
 {
 	// PAL color blend map
 	m_palcolorblendmap.insert(std::pair<std::pair<pixel_t,pixel_t>,pixel_t>(std::pair<pixel_t,pixel_t>(palette[3],palette[2]),rgb_t(0x7c, 0x2e, 0x81))); /* RED-BLUE */

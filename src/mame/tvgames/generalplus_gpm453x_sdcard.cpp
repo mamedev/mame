@@ -169,10 +169,10 @@ CONS( 2021, rizstals, 0, 0, gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexib
 // surface details erased on SoC for both of these
 // SPI ROMs have GPspispi header, so a GeneralPlus chip, seems to have Thumb-2 instructions only and boot ROMs are similar to lx_jg7420 etc. (so likely a Cortex-M)
 // very generic packaging, boots from SPI, has game data on SD card (mostly NES games)
-CONS( 202?, intrtvg,  0, 0, gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init, "Shen Zhen Shi Fei Xun Hu Dong Technology",     "Interactive Game Console (Model B608, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 202?, intrtvg,  0, 0, gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init, "Shen Zhen Shi Fei Xun Hu Dong Technology", "Interactive Game Console (Model B608, YRPRSODF)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // also very generic packaging, similar SD card content to above, including NES games, but with some extra music/videos for the dance part
-CONS( 202?, ardancem, 0, 0, gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init, "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Dance Mat (Model DM02, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 202?, ardancem, 0, 0, gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init, "Shen Zhen Shi Fei Xun Hu Dong Technology", "AR Dance Mat (Model DM02, YRPRSODF)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // likewise
-CONS( 202?, arb605,   0, 0, gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init, "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Game Console (Model B605, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 202?, bodygun,  0, 0, gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init, "Shen Zhen Shi Fei Xun Hu Dong Technology", "Body Gun Game Console (Model GC05, Damcoola)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 202?, arb605,   0, 0, gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init, "Shen Zhen Shi Fei Xun Hu Dong Technology", "AR Game Console (Model B605, YRPRSODF)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 202?, bodygun,  0, 0, gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init, "Shen Zhen Shi Fei Xun Hu Dong Technology", "Body Gun Game Console (Model GC05, Damcoola)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 202?, kaximond, 0, 0, gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init, "Kaximon", "Double Dance Mat with HDMI (Kaximon)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

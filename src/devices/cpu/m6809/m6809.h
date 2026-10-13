@@ -220,6 +220,7 @@ protected:
 	void push_state(uint16_t state)                 { m_state = (m_state << 9) | state; }
 	uint16_t pop_state()                            { uint16_t result = m_state & 0x1ff; m_state >>= 9; return result; }
 	void reset_state()                              { m_state = 1; }
+	bool execution_state_pending() const noexcept   { return m_state != 0; }
 
 	// effective address reading/writing
 	uint8_t read_ea()                               { return read_memory(m_ea.w); }

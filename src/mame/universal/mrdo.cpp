@@ -87,7 +87,7 @@ void mrdo_state::protection_w(uint8_t data)
 
 uint8_t mrdo_state::protection_r()
 {
-	// HACK: workaround until accurate PAL emulation
+	// HACK: workaround until we have accurate PAL emulation
 	uint8_t *ROM = memregion("maincpu")->base();
 	return ROM[m_maincpu->state_int(Z80_HL)];
 }

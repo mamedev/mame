@@ -133,13 +133,23 @@ below could be not working.  FP ]
 
 static int16_t    wave_data = 0;
 static int      len;
+static double   sample_error;
 
 
 /* This in fact gives the number of samples for half of the pulse */
-static inline int tap_data_to_samplecount(int data, int frequency)
+static inline double tap_data_to_samplecount(int data, int frequency)
 {
 //  return (int) (0.5 * (0.5 + (((double)CBM_WAV_FREQUENCY / frequency) * (double)data)));      // MAME TZX formula
-	return (int) (0.5 * (((double)CBM_WAV_FREQUENCY / frequency) * (double)((data) + 0.5)));    // tap2wav formula
+	return 0.5 * (((double)CBM_WAV_FREQUENCY / frequency) * (double)((data) + 0.5));    // tap2wav formula
+}
+
+/* carry the rounding error so edges stay within half a sample of their real time */
+static inline int round_samplecount(double samples)
+{
+	samples += sample_error;
+	int const whole = int(samples + 0.5);
+	sample_error = samples - whole;
+	return whole;
 }
 
 /* The version with parameters could be handy if we decide to implement a
@@ -177,7 +187,7 @@ static int cbm_tap_do_work( int16_t **buffer, int length, const uint8_t *data )
 	int version, system, video_standard;
 	int tap_frequency = 0;
 
-	int byte_samples = 0;
+	double byte_samples = 0;
 	uint8_t over_pulse_bytes[3] = {0 , 0, 0 };
 	int over_pulse_length = 0;
 	/* These waveamp_* values are currently stored but not used.
@@ -188,6 +198,8 @@ static int cbm_tap_do_work( int16_t **buffer, int length, const uint8_t *data )
 	/* is the .tap file corrupted? */
 	if ((data == nullptr) || (length <= CBM_HEADER_SIZE))
 		return -1;
+
+	sample_error = 0.0;
 
 	version = data[0x0c];
 	system = data[0x0d];
@@ -304,14 +316,16 @@ static int cbm_tap_do_work( int16_t **buffer, int length, const uint8_t *data )
 
 		if (j == 0)
 		{
-			cbm_output_wave( buffer, byte_samples );
-			size += byte_samples;
+			int samples = round_samplecount(byte_samples);
+			cbm_output_wave( buffer, samples );
+			size += samples;
 //          toggle_wave_data(waveamp_low, waveamp_high);
 			toggle_wave_data();
 			if (version < 2)
 			{
-				cbm_output_wave( buffer, byte_samples );
-				size += byte_samples;
+				samples = round_samplecount(byte_samples);
+				cbm_output_wave( buffer, samples );
+				size += samples;
 //              toggle_wave_data(waveamp_low, waveamp_high);
 				toggle_wave_data();
 			}

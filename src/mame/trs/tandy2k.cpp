@@ -10,9 +10,17 @@
 
     TODO:
 
-    - floppy
-        - HDL is also connected to WP/TS input where TS is used to detect motor status
-        - 3 second motor off delay timer
+    - floppy (see Technical Reference 7.1.9.4/7.1.9.5 and main logic schematic
+      8000203A sheet 11)
+        - MTRON = HDL OR U132 (74LS123, C115 33uF/R38 270K), retriggered by the
+          falling edge of HDL, keeping the motor running for about 3 seconds
+        - MTRON is buffered onto the WP/TS input by U135 (74LS241), so ST3 TS
+          reports motor status while RW/SEEK selects seek mode, and the driver
+          skips the 250 ms spin up wait when the motor is already running
+        - both need upd765 to deassert HDL: hdl_cb(1) is asserted at command
+          start and never cleared, so there is no falling edge to work with.
+          The head unload time is already parsed into spec by C_SPECIFY but
+          unused; it should drop HDL after command_end() with data_completion
     - keyboard ROM, same as earlier tandy 1000
     - 2000HD hard disk controller DMA acknowledge at 0x0e0-0x0ff, not used by
       Tandy MS-DOS 2.11, which moves sectors through the buffer with the CPU

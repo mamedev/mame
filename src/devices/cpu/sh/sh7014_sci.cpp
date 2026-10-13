@@ -142,24 +142,15 @@ void sh7014_sci_device::scr_w(uint8_t data)
 			  (data & SCR_TEIE) ? " tei" : "",
 			  data & SCR_CKE);
 
-	if ((m_scr & SCR_TE) && !(data & SCR_TE))
+	if ((old & SCR_TE) && !(data & SCR_TE))
 		m_ssr |= SSR_TEND | SSR_TDRE;
-
-	if ((m_scr & SCR_TIE) && !(data & SCR_TIE))
-		m_intc->set_interrupt(m_txi_int, CLEAR_LINE);
-
-	if ((m_scr & SCR_TEIE) && !(data & SCR_TEIE))
-		m_intc->set_interrupt(m_tei_int, CLEAR_LINE);
-
-	if ((m_scr & SCR_RIE) && !(data & SCR_RIE)) {
-		m_intc->set_interrupt(m_rxi_int, CLEAR_LINE);
-		m_intc->set_interrupt(m_eri_int, CLEAR_LINE);
-	}
 
 	m_scr = data;
 
 	if ((data & SCR_CKE) != (old & SCR_CKE))
 		update_clock();
+
+	update_interrupts();
 }
 
 uint8_t sh7014_sci_device::ssr_r()
@@ -171,26 +162,26 @@ uint8_t sh7014_sci_device::ssr_r()
 void sh7014_sci_device::ssr_w(uint8_t data)
 {
 	const auto old = m_ssr;
-	bool do_tx_update = false;
 
-	m_ssr = (data & (m_ssr & (SSR_TDRE | SSR_RDRF | SSR_ORER | SSR_FER | SSR_PER)))
-		| (m_ssr & (SSR_TEND | SSR_MPB))
-		| (data & SSR_MPBT);
+	// TDRE, RDRF, ORER, FER and PER only ever fall, and only where the written value has a zero
+	// over them; TEND and MPB are read only, MPBT is plain.
+	const uint8_t writable = SSR_TDRE | SSR_RDRF | SSR_ORER | SSR_FER | SSR_PER;
+	m_ssr = (old & ~(writable | SSR_MPBT)) | (old & data & writable) | (data & SSR_MPBT);
 
-	if (!(m_scr & SCR_TE)) {
+	// The transmitter is loaded by a write that actually takes TDRE from one to zero
+	const bool start_tx = (old & SSR_TDRE) && !(m_ssr & SSR_TDRE);
+	if (start_tx)
+		m_ssr &= ~SSR_TEND;
+
+	if (!(m_scr & SCR_TE))
 		m_ssr |= SSR_TEND | SSR_TDRE;
-	} else if ((old & SSR_TDRE) || !(m_scr & SSR_TDRE)) {
-		do_tx_update = true;
-		m_ssr &= ~(SSR_TEND | SSR_TDRE);
-	}
-
-	if ((old & (SSR_ORER | SSR_FER | SSR_PER)) && !(data & (SSR_ORER | SSR_FER | SSR_PER)))
-		m_intc->set_interrupt(m_eri_int, CLEAR_LINE);
 
 	LOGMASKED(LOG_REGISTERS, "ssr_w %02x | %02x -> %02x\n", data, old, m_ssr);
 
-	if (do_tx_update)
+	if (start_tx)
 		update_tx_state();
+	else
+		update_interrupts();
 }
 
 uint8_t sh7014_sci_device::brr_r()
@@ -251,23 +242,31 @@ void sh7014_sci_device::tra_complete()
 	LOGMASKED(LOG_TXRX, "transmit ended\n");
 
 	m_ssr |= SSR_TEND;
-	if (m_scr & SCR_TEIE)
-		m_intc->set_interrupt(m_tei_int, ASSERT_LINE);
+
+	update_interrupts();
 }
 
 void sh7014_sci_device::update_tx_state()
 {
-	if (!(m_scr & SCR_TE) || (m_ssr & SSR_TDRE) || !is_transmit_register_empty())
-		return;
+	if ((m_scr & SCR_TE) && !(m_ssr & SSR_TDRE) && is_transmit_register_empty()) {
+		LOGMASKED(LOG_TXRX, "transmitting %02x\n", m_tdr);
 
-	LOGMASKED(LOG_TXRX, "transmitting %02x\n", m_tdr);
+		transmit_register_setup(m_tdr);
 
-	transmit_register_setup(m_tdr);
+		m_ssr = (m_ssr & ~SSR_TEND) | SSR_TDRE;
+	}
 
-	m_ssr = (m_ssr & ~SSR_TEND) | SSR_TDRE;
+	update_interrupts();
+}
 
-	if (m_scr & SCR_TIE)
-		m_intc->set_interrupt(m_txi_int, ASSERT_LINE);
+void sh7014_sci_device::update_interrupts()
+{
+	// The four requests are levels; the INTC's latch is cleared when an interrupt is taken, so all
+	// four are presented again at every change of state.
+	m_intc->set_interrupt(m_eri_int, ((m_scr & SCR_RIE) && (m_ssr & (SSR_ORER | SSR_FER | SSR_PER))) ? ASSERT_LINE : CLEAR_LINE);
+	m_intc->set_interrupt(m_rxi_int, ((m_scr & SCR_RIE) && (m_ssr & SSR_RDRF)) ? ASSERT_LINE : CLEAR_LINE);
+	m_intc->set_interrupt(m_txi_int, ((m_scr & SCR_TIE) && (m_ssr & SSR_TDRE)) ? ASSERT_LINE : CLEAR_LINE);
+	m_intc->set_interrupt(m_tei_int, ((m_scr & SCR_TEIE) && (m_ssr & SSR_TEND)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 uint8_t sh7014_sci_device::rdr_r()
@@ -277,8 +276,10 @@ uint8_t sh7014_sci_device::rdr_r()
 	LOGMASKED(LOG_TXRX, "rdr_r%s %02x\n", m_is_dma_source_rx ? " (dma)" : "", m_rdr);
 
 	// DMA reads cause RDRF to be cleared
-	if (m_is_dma_source_rx)
+	if (m_is_dma_source_rx) {
 		m_ssr &= ~SSR_RDRF;
+		update_interrupts();
+	}
 
 	return r;
 }
@@ -298,15 +299,11 @@ void sh7014_sci_device::rcv_complete()
 	if (!(m_ssr & SSR_RDRF)) {
 		m_rdr = get_received_char();
 		m_ssr |= SSR_RDRF;
-
-		if (m_scr & SCR_RIE)
-			m_intc->set_interrupt(m_rxi_int, ASSERT_LINE);
-
-		if ((m_ssr & SSR_FER) | (m_ssr & SSR_PER) || (m_ssr & SSR_ORER))
-			m_intc->set_interrupt(m_eri_int, ASSERT_LINE);
 	} else {
 		m_ssr |= SSR_ORER;
 	}
+
+	update_interrupts();
 }
 
 void sh7014_sci_device::update_data_format()
@@ -317,12 +314,13 @@ void sh7014_sci_device::update_data_format()
 		return;
 	}
 
-	// Async
+	// Async.  CHR 0 is eight data bits and STOP 0 one stop bit; the parity mode bit picks even or odd
+	// and is only consulted when PE enables parity at all, which multiprocessor mode overrides.
 	set_data_frame(
 		1,
-		(m_smr & SMR_CHR) ? 8 : 7,
-		(m_smr & SMR_MP) ? PARITY_NONE : ((m_smr & SMR_PE) ? PARITY_ODD : PARITY_EVEN), // Multiprocessor mode does not use parity
-		(m_smr & SMR_STOP) ? STOP_BITS_1 : STOP_BITS_2
+		(m_smr & SMR_CHR) ? 7 : 8,
+		((m_smr & (SMR_MP | SMR_PE)) != SMR_PE) ? PARITY_NONE : ((m_smr & SMR_OE) ? PARITY_ODD : PARITY_EVEN),
+		(m_smr & SMR_STOP) ? STOP_BITS_2 : STOP_BITS_1
 	);
 }
 
@@ -354,7 +352,8 @@ void sh7014_sci_device::update_clock()
 		case INTERNAL_ASYNC_OUT:
 		case INTERNAL_SYNC_OUT:
 		{
-			int divider = (1 << (2 * (m_smr & SMR_CKS))) * (m_brr + 1);
+			// phi / (64 x 2^(2n-1) x (N + 1)) asynchronous, phi / (8 x 2^(2n-1) x (N + 1)) synchronous
+			int divider = (1 << (2 * (m_smr & SMR_CKS))) * (m_brr + 1) * ((m_smr & SMR_CA) ? 4 : 32);
 			clock_speed = attotime::from_ticks(divider, clock());
 		}
 		break;

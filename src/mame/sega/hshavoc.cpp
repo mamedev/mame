@@ -800,4 +800,4 @@ void hshavoc_state::init_hshavoc()
 } // anonymous namespace
 
 
-GAME( 1994, hshavoc, 0, hshavoc, hshavoc, hshavoc_state, init_hshavoc, ROT0, "Data East Corporation", "High Seas Havoc", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, hshavoc, 0, hshavoc, hshavoc, hshavoc_state, init_hshavoc, ROT0, "Data East Corporation", "High Seas Havoc", MACHINE_UNEMULATED_PROTECTION )

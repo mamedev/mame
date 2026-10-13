@@ -76,12 +76,19 @@ def identify_line_type(ins):
     return "NONE"
 
 
+def samples_interrupt(ins, single_cycle):
+    return (single_cycle or "read_sync" not in ins) and "_noirq" not in ins
+
+
 RDY_GATED_DEVICES = {"m6502", "m6510"}
+CMOS_DEVICES = {"w65c02", "r65c02", "r65c19", "w65c02s", "m65ce02", "m4510", "w65816"}
 
 
 def save_opcodes(f, device, opcodes):
     rdy_gated = device in RDY_GATED_DEVICES
+    interrupt_sampled = device not in CMOS_DEVICES
     for name, instructions in opcodes:
+        single_cycle = sum(identify_line_type(ins) in ("MEMORY_READ", "MEMORY_WRITE") for ins in instructions) == 1
         emit(f, "void %s_device::%s_full()" % (device, name))
         emit(f, "{")
         substate = 1
@@ -102,17 +109,19 @@ def save_opcodes(f, device, opcodes):
                     emit(f, "\t\t\treturn;")
                     emit(f, "\t\t}")
                     emit(f, "\t}")
+                if interrupt_sampled and samples_interrupt(ins, single_cycle):
+                    emit(f, "\tsample_interrupt();")
                 emit(f, ins)
                 emit(f, "\tm_icount--;")
                 emit(f, "\tif(m_icount <= 0) {")
                 emit(f, "\t\tif(access_to_be_redone()) {")
                 emit(f, "\t\t\tm_icount++;")
-                emit(f, "\t\t\tm_inst_substate = %d;" % substate)
-                emit(f, "\t\t} else")
                 emit(f, "\t\t\tm_inst_substate = %d;" % (substate+1))
+                emit(f, "\t\t} else")
+                emit(f, "\t\t\tm_inst_substate = %d;" % (substate+2))
                 emit(f, "\t\treturn;")
                 emit(f, "\t}")
-                substate += 2
+                substate += 3
             else:
                 emit(f, ins)
         emit(f, "}")
@@ -143,19 +152,23 @@ def save_opcodes(f, device, opcodes):
                     emit(f, "\t\t\treturn;")
                     emit(f, "\t\t}")
                     emit(f, "\t}")
+                if interrupt_sampled and samples_interrupt(ins, single_cycle):
+                    emit(f, "\tsample_interrupt();")
+                emit(f, "\t[[fallthrough]];")
+                emit(f, "case %d:" % (substate+1))
                 emit(f, ins)
                 emit(f, "\tm_icount--;")
                 emit(f, "\tif(m_icount <= 0) {")
                 emit(f, "\t\tif(access_to_be_redone()) {")
                 emit(f, "\t\t\tm_icount++;")
-                emit(f, "\t\t\tm_inst_substate = %d;" % substate)
-                emit(f, "\t\t} else")
                 emit(f, "\t\t\tm_inst_substate = %d;" % (substate+1))
+                emit(f, "\t\t} else")
+                emit(f, "\t\t\tm_inst_substate = %d;" % (substate+2))
                 emit(f, "\t\treturn;")
                 emit(f, "\t}")
                 emit(f, "\t[[fallthrough]];")
-                emit(f, "case %d:;" % (substate+1))
-                substate += 2
+                emit(f, "case %d:;" % (substate+2))
+                substate += 3
             else:
                 emit(f, ins)
         emit(f, "\tbreak;")

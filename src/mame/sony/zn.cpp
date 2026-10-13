@@ -148,7 +148,7 @@ void zn_state::cat702(machine_config &config)
 	sio0.txd_handler().append(m_cat702[N], FUNC(cat702_device::write_datain));
 }
 
-void zn_state::driver_start()
+void zn_state::machine_start()
 {
 	save_item(NAME(m_coin));
 	save_item(NAME(m_cat702_dataout));
@@ -601,17 +601,17 @@ protected:
 		m_qsound->add_route(1, m_speaker, 1.0, 1);
 	}
 
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		zn_state::driver_start();
+		zn_state::machine_start();
 
 		m_rombank->configure_entries(0, 16, m_bankedroms->base() + 0x400000, 0x400000);
 		m_soundbank->configure_entries(0, 16, memregion("audiocpu")->base() + 0x8000, 0x4000);
 	}
 
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
-		zn_state::driver_reset();
+		zn_state::machine_reset();
 
 		m_rombank->set_entry(0);
 		m_soundbank->set_entry(0);
@@ -677,9 +677,9 @@ public:
 	using capcom_zn_state::capcom_zn_state;
 
 protected:
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
-		capcom_zn_state::driver_reset();
+		capcom_zn_state::machine_reset();
 
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // glpracr QSound ROM sockets are empty
 	}
@@ -872,16 +872,16 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		zn_state::driver_start();
+		zn_state::machine_start();
 
 		m_rombank->configure_entries(0, 4, m_bankedroms->base(), 0x800000);
 	}
 
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
-		zn_state::driver_reset();
+		zn_state::machine_reset();
 
 		m_rombank->set_entry(0);
 	}
@@ -944,16 +944,16 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		taito_fx_state::driver_start();
+		taito_fx_state::machine_start();
 
 		m_soundbank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
 	}
 
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
-		taito_fx_state::driver_reset();
+		taito_fx_state::machine_reset();
 
 		m_soundbank->set_entry(1);
 	}
@@ -1033,9 +1033,9 @@ protected:
 		m_zoom->add_route(1, m_speaker, 1.0, 1);
 	}
 
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		taito_fx_state::driver_start();
+		taito_fx_state::machine_start();
 
 		m_fram = std::make_unique<uint8_t[]>(0x200);
 		m_fm1208s->set_base(m_fram.get(), 0x200);
@@ -1236,9 +1236,9 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		zn_state::driver_start();
+		zn_state::machine_start();
 
 		m_vt83c461_irqctrl = 0;
 		m_vt83c461_latch = 0;
@@ -1541,16 +1541,16 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		zn_state::driver_start();
+		zn_state::machine_start();
 
 		m_rombank->configure_entries(0, 4, m_bankedroms->base(), 0x800000);
 	}
 
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
-		zn_state::driver_reset();
+		zn_state::machine_reset();
 
 		m_rombank->set_entry(0);
 	}
@@ -1637,9 +1637,9 @@ public:
 	}
 
 private:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		raizing_zn_state::driver_start();
+		raizing_zn_state::machine_start();
 
 		// HACK: these values are different compared to cat702_1
 		m_blprot->base()[0xb0c] = 0x28; // unknown
@@ -1654,9 +1654,9 @@ private:
 		m_okibank->configure_entries(0, memregion("oki")->bytes() / 0x10000, memregion("oki")->base(), 0x10000); // not verified
 	}
 
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
-		raizing_zn_state::driver_reset();
+		raizing_zn_state::machine_reset();
 
 		m_blprot_index = 0;
 		m_okibank->set_entry(0);
@@ -1808,18 +1808,18 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		zn_state::driver_start();
+		zn_state::machine_start();
 
 		m_rombank->configure_entries(0, 16, m_bankedroms->base(), 0x400000);
 
 		save_item(NAME(m_mcu_command));
 	}
 
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
-		zn_state::driver_reset();
+		zn_state::machine_reset();
 
 		m_rombank->set_entry(1);
 	}
@@ -2140,9 +2140,9 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		acclaim_zn_state::driver_start();
+		acclaim_zn_state::machine_start();
 
 		save_item(NAME(m_gun_mux));
 	}
@@ -2204,9 +2204,9 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		acclaim_zn_state::driver_start();
+		acclaim_zn_state::machine_start();
 
 		for (int bank = 0; bank < 2; bank++)
 			m_rombank[bank]->configure_entries(0, 16, m_bankedroms->base(), 0x200000);
@@ -2218,9 +2218,9 @@ protected:
 		save_item(NAME(m_curr_rombank));
 	}
 
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
-		acclaim_zn_state::driver_reset();
+		acclaim_zn_state::machine_reset();
 
 		m_bankmap->set_bank(0);
 		m_rombank[0]->set_entry(0);
@@ -2469,16 +2469,16 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		zn_state::driver_start();
+		zn_state::machine_start();
 
 		m_rombank->configure_entries(0, 4, m_bankedroms->base(), 0x800000);
 	}
 
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
-		zn_state::driver_reset();
+		zn_state::machine_reset();
 
 		m_rombank->set_entry(0);
 	}
@@ -2564,16 +2564,16 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		zn_state::driver_start();
+		zn_state::machine_start();
 
 		m_rombank->configure_entries(0, 24, m_bankedroms->base(), 0x100000);
 	}
 
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
-		zn_state::driver_reset();
+		zn_state::machine_reset();
 
 		m_rombank->set_entry(0);
 	}
@@ -2781,16 +2781,16 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		zn_state::driver_start();
+		zn_state::machine_start();
 
 		m_rombank->configure_entries(0, 9, m_bankedroms->base(), 0x800000);
 	}
 
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
-		zn_state::driver_reset();
+		zn_state::machine_reset();
 
 		m_rombank->set_entry(0);
 	}

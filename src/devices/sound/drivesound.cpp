@@ -11,6 +11,9 @@
 #include "drivesound.h"
 #include "formats/flopimg.h"
 #include "speaker.h"
+#include "emuopts.h"
+#include "fileio.h"
+#include "xmlfile.h"
 
 // Some debug output
 
@@ -23,6 +26,9 @@
 
 #define FLOPSND_TAG "floppysound"
 #define FLOPSPK "output"
+
+// Delay time for spinning sound; see spin_start_delay
+const int SPIN_SOUND_DELAY_MS = 10;
 
 DEFINE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device, FLOPSND_TAG, "Floppy sound")
 
@@ -77,7 +83,7 @@ void floppy_sound_samples::select(int form_factor)
 
 		for (floppy_sound_entry& entry : m_fulllist)
 		{
-			if (entry.form_factor == form_factor && entry.directory != nullptr)
+			if (entry.form_factor == form_factor)
 			{
 				if (index == 0)   // new list
 				{
@@ -88,7 +94,7 @@ void floppy_sound_samples::select(int form_factor)
 					found = true;
 				}
 				entry.index = index++;   // keep record of position in the sample list
-				m_samplenames.push_back(entry.filename);
+				m_samplenames.push_back(entry.filename.c_str());
 			}
 		}
 
@@ -120,14 +126,22 @@ void floppy_sound_samples::set_form_factor(int form_factor, const char* dir)
 	m_current_form_factor = form_factor;
 }
 
+void floppy_sound_samples::append_to(floppy_sound_samples& target)
+{
+	for (floppy_sound_entry& entry : m_fulllist)
+	{
+		target.m_fulllist.push_back(entry);
+	}
+}
+
 void floppy_sound_samples::add_spin_sample(const char* filename, int type)
 {
 	floppy_sound_entry entry;
 	entry.type = SPIN;
 	entry.spintype = type;
-	entry.filename = filename;
+	entry.filename = std::string(filename);
 	entry.form_factor = m_current_form_factor;
-	entry.directory = m_current_dir;
+	entry.directory = std::string(m_current_dir);
 	m_fulllist.push_back(entry);
 }
 
@@ -143,9 +157,9 @@ void floppy_sound_samples::add_step_sample(const char* filename, int mintrack, i
 	entry.mintrack = mintrack;
 	entry.maxtrack = maxtrack;
 	entry.dir = dir;
-	entry.filename = filename;
+	entry.filename = std::string(filename);
 	entry.form_factor = m_current_form_factor;
-	entry.directory = m_current_dir;
+	entry.directory = std::string(m_current_dir);
 	m_fulllist.push_back(entry);
 }
 
@@ -163,9 +177,9 @@ void floppy_sound_samples::add_seek_sample(const char* filename, int nominal_rat
 	entry.mintrack = mintrack;
 	entry.maxtrack = maxtrack;
 	entry.dir = dir;
-	entry.filename = filename;
+	entry.filename = std::string(filename);
 	entry.form_factor = m_current_form_factor;
-	entry.directory = m_current_dir;
+	entry.directory = std::string(m_current_dir);
 	m_fulllist.push_back(entry);
 }
 
@@ -275,7 +289,6 @@ int floppy_sound_samples::find_seek(double rate, int track, int dir, double& pit
 floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: samples_device(mconfig, FLOPPYSOUND, tag, owner, clock),
 		m_sound(nullptr),
-		m_samplelist(nullptr),
 		m_last_track(0),
 		m_last_subtrack(0),
 		m_spin_start_timer(nullptr),
@@ -297,36 +310,6 @@ floppy_sound_device::floppy_sound_device(const machine_config &mconfig, const ch
 		m_in_seek(false),
 		m_step_rate(0.0)
 {
-	// Set up the default sample list
-
-	// Unless labeled "constructed", all samples were recorded from real floppy drives.
-	// The 3.5" floppy drive is a Sony MPF420-1.
-	// The 5.25" floppy drive is a Chinon FZ502.
-	// "floppy" is the subdirectory in the samples path where the following samples are stored
-
-	m_default_samples.clear();
-	m_default_samples.set_form_factor(floppy_image::FF_35, "floppy");
-	m_default_samples.add_spin_sample("35_spin_start_empty", floppy_sound_samples::START_EMPTY);
-	m_default_samples.add_spin_sample("35_spin_start_loaded", floppy_sound_samples::START_LOADED);
-	m_default_samples.add_spin_sample("35_spin_empty", floppy_sound_samples::SPIN_EMPTY);
-	m_default_samples.add_spin_sample("35_spin_loaded", floppy_sound_samples::SPIN_LOADED);
-	m_default_samples.add_spin_sample("35_spin_end", floppy_sound_samples::END_LOADED);
-	m_default_samples.add_step_sample("35_step_1_1");
-	m_default_samples.add_seek_sample("35_seek_2ms", 2, 3);   // constructed
-	m_default_samples.add_seek_sample("35_seek_6ms", 6, 9);
-	m_default_samples.add_seek_sample("35_seek_12ms", 12, 15);
-	m_default_samples.add_seek_sample("35_seek_20ms", 20, 50);
-
-	m_default_samples.set_form_factor(floppy_image::FF_525, "floppy");
-	m_default_samples.add_spin_sample("525_spin_start_empty", floppy_sound_samples::START_EMPTY);
-	m_default_samples.add_spin_sample("525_spin_start_loaded", floppy_sound_samples::START_LOADED);
-	m_default_samples.add_spin_sample("525_spin_empty", floppy_sound_samples::SPIN_EMPTY);
-	m_default_samples.add_spin_sample("525_spin_loaded", floppy_sound_samples::SPIN_LOADED);
-	m_default_samples.add_spin_sample("525_spin_end", floppy_sound_samples::END_LOADED);
-	m_default_samples.add_step_sample("525_step_1_1");
-	m_default_samples.add_seek_sample("525_seek_6ms", 6, 9);
-	m_default_samples.add_seek_sample("525_seek_12ms", 12, 15);
-	m_default_samples.add_seek_sample("525_seek_20ms", 20, 50);
 }
 
 void floppy_sound_device::register_for_save_states()
@@ -353,40 +336,7 @@ void floppy_sound_device::register_for_save_states()
 
 void floppy_sound_device::device_start()
 {
-	m_samples_available = false;
-
-	// Set up floppy sound samples (for those systems which use the sound feature)
-	if (m_samplelist != nullptr)
-	{
-		// Only load if there is a matching form factor in the list
-		if (m_samplelist->get_assumed_form_factor() != 0)
-		{
-			set_samples_names(m_samplelist->get_names());
-			LOGMASKED(LOG_CONFIG, "Loading custom samples\n");
-			// Try to read the audio samples.
-			m_samples_available = load_samples();
-		}
-	}
-
-	// Cannot load custom samples, so try the predefined list
-	if (!m_samples_available)
-	{
-		// The default list should always have a matching form factor
-		if (m_default_samples.get_assumed_form_factor() != 0)
-		{
-			set_samples_names(m_default_samples.get_names());
-			LOGMASKED(LOG_CONFIG, "Loading default samples\n");
-			// Try to read the default audio samples
-			m_samples_available = load_samples();
-			m_samplelist = &m_default_samples;
-		}
-	}
-
-	// If we don't have samples, don't allocate a sound stream
-	if (m_samples_available)
-		m_sound = stream_alloc(0, 1, clock()); // per-floppy stream
-
-	m_spin_start_timer = timer_alloc(FUNC(floppy_sound_device::spin_start_timeout), this);
+	m_spin_start_timer = timer_alloc(FUNC(floppy_sound_device::spin_start_delay), this);
 
 	register_for_save_states();
 
@@ -404,6 +354,350 @@ void floppy_sound_device::device_start()
 	m_firstturn = true;
 }
 
+/*
+    For the DTD, see the introduction comments in drivesound.h
+*/
+bool floppy_sound_device::load_xml(emu_file &file, int maxtrack, const char* devname)
+{
+	// Read the file
+	util::xml::file::ptr const root(util::xml::file::read(file, nullptr));
+	if (!root)
+	{
+		LOGMASKED(LOG_CONFIG, "Error parsing XML configuration file %s\n", file.filename());
+		return false;
+	}
+
+	// Find the samples node
+	util::xml::data_node const *const samplesnode = root->get_child("drivesound");
+	if (!samplesnode)
+	{
+		LOGMASKED(LOG_CONFIG, "Could not find root element <drivesound> in samples definition file %s\n", file.filename());
+		return false;
+	}
+
+	int formfactor = 0;
+
+	floppy_sound_samples default_samples;
+	floppy_sound_samples* current_samples;
+
+	default_samples.clear();
+	m_samples.clear();
+
+	/* This is a first pass, serving to resolve the derivations
+
+	   Idea: The drive name, passed in by the connector, may refer to a sample set
+	         directly, but also to a name that refers to the actual samples,
+	         or even following a longer path of indirection. This allows us to
+	         set up a categorization (like internal vs. external drives).
+
+	   Example:
+	         <drive name="ti99_peb_dsk1" base="ti99_peb_internal" />
+	         <drive name="ti99_peb_dsk2" base="ti99_peb_internal" />
+	         <drive name="ti99_peb_internal" base="default" />
+
+	         Both keys "ti99_peb_dsk1" and "ti99_peb_dsk2" refer to the
+	         key "ti99_peb_internal", and this one refers to the default
+	         samples.
+
+	   The base attribute is required in this usage. The end of the chain
+	   is reached with an element without base attribute, which defines the
+	   sample set. If there is no such element, the default samples are used.
+
+	   The value "none" turns off the samples for this name.
+
+	     <drive name="..." base="none" />
+
+	   Distinguishing between form factors is done at the end of the chain,
+	   so this alias naming is not concerned with form factors.
+	*/
+	bool resolved = false;
+	bool found = false;
+
+	// We limit the depth to 10 to avoid endless loops by misconfiguration
+	int loopcount = 10;
+
+	while (!resolved && (loopcount > 0))
+	{
+		loopcount--;
+		found = false;
+		for (util::xml::data_node const *drvnode = samplesnode->get_child("drive"); drvnode; drvnode = drvnode->get_next_sibling("drive"))
+		{
+			char const *name = drvnode->get_attribute_string("name", "");
+			char const *base = drvnode->get_attribute_string("base", "");
+
+			if (strlen(name) == 0)
+			{
+				LOGMASKED(LOG_CONFIG, "Missing name in sample set definition\n");
+				return false;
+			}
+
+			if (strcmp(name,devname)==0)
+			{
+				found = true;
+				if (strlen(base)==0)
+				{
+					// Chain end
+					resolved = true;
+					break;
+				}
+				else
+				{
+					if (strcmp(base, "none")==0)
+					{
+						LOGMASKED(LOG_CONFIG, "Samples set to none for name '%s', disabling drive sound. \n", devname);
+						return false;
+					}
+					else
+						devname = base;
+				}
+			}
+		}
+
+		// If the chain breaks at any position, use default
+		if (!found)
+		{
+			LOGMASKED(LOG_CONFIG, "Name '%s' cannot be resolved\n", devname);
+			devname = "default";
+			resolved = true;
+			break;
+		}
+	}
+
+	if (loopcount == 0)
+	{
+		LOGMASKED(LOG_CONFIG, "Sample name '%s' cannot be resolved, loop in definition.\n", devname);
+		devname = "default";
+	}
+
+	/*  Now iterate over all drive nodes (except for the derivations).
+	    The name "default" is reserved for the default sample set, which may
+	    be offered for each form factor under this name.
+
+	    The first match by name and form factor is selected.
+	*/
+	for (util::xml::data_node const *drvnode = samplesnode->get_child("drive"); drvnode; drvnode = drvnode->get_next_sibling("drive"))
+	{
+		char const *name = drvnode->get_attribute_string("name", "");
+		char const *path = drvnode->get_attribute_string("path", "");
+		char const *form = drvnode->get_attribute_string("formfactor", "");
+		char const *desc = drvnode->get_attribute_string("description", "");
+
+		// Skip the derivations from the first pass
+		if (strlen(drvnode->get_attribute_string("base", ""))!=0)
+			continue;
+
+		// Check for valid form factor and path
+		if (strlen(form)==0)
+		{
+			LOGMASKED(LOG_CONFIG, "Missing form factor in sample set definition\n");
+			return false;
+		}
+		else
+		{
+			if (strcmp(form, "5.25")==0)
+				formfactor = floppy_image::FF_525;
+			else if (strcmp(form, "3.5")==0)
+				formfactor = floppy_image::FF_35;
+			else if (strcmp(form, "3")==0)
+				formfactor = floppy_image::FF_3;
+			else if (strcmp(form, "8")==0)
+				formfactor = floppy_image::FF_8;
+			else
+			{
+				LOGMASKED(LOG_CONFIG, "Bad form factor '%s' in sample set definition\n", form);
+				return false;
+			}
+		}
+		if (strlen(path)==0)
+		{
+			LOGMASKED(LOG_CONFIG, "Missing file path in sample set definition\n");
+			return false;
+		}
+
+		if (strlen(name)==0)
+		{
+			LOGMASKED(LOG_CONFIG, "Missing name in sample set definition\n");
+			return false;
+		}
+		else
+		{
+			if (strcmp(name, "default")==0)
+			{
+				// Store all default samples in an own list
+				current_samples = &default_samples;
+			}
+			else
+			{
+				if (strcmp(name, devname)==0)
+				{
+					LOGMASKED(LOG_CONFIG, "Using sample set '%s'\n", desc);
+					current_samples = &m_samples;
+				}
+				else
+					// Not a default, and not matching the selected name
+					continue;
+			}
+		}
+
+		current_samples->set_form_factor(formfactor, path);
+
+		bool spinloaded_sample = false;
+		bool step_sample = false;
+		bool seek_sample = false;
+
+		// Iterate over all contained elements
+		for (util::xml::data_node const *specnode = drvnode->get_first_child(); specnode; specnode = specnode->get_next_sibling())
+		{
+			char const *element = specnode->get_name();
+			char const *filename = specnode->get_attribute_string("file", "");
+
+			if (strlen(filename)==0)
+			{
+				LOGMASKED(LOG_CONFIG, "Missing 'file' attribute for <%s> element\n", element);
+				return false;
+			}
+
+			if (strcmp(element, "spin")==0)
+			{
+				// Spin sample; get phase and mode
+				char const *phase = specnode->get_attribute_string("phase", "");
+
+				bool initial = (strcmp(phase, "firststart")==0);
+				bool starting = (strcmp(phase, "start")==0);
+				bool running = (strcmp(phase, "run")==0);
+				bool stopping = (strcmp(phase, "stop")==0);
+
+				if (strlen(phase)==0 || !(initial || starting || running || stopping))
+				{
+					LOGMASKED(LOG_CONFIG, "Missing or invalid 'phase' attribute for <spin> element, must be 'firststart', 'start', 'run', or 'stop'\n");
+					return false;
+				}
+
+				char const *mode = specnode->get_attribute_string("mode", "");
+				bool loaded = (strcmp(mode, "loaded")==0);
+				bool empty = (strcmp(mode, "empty")==0);
+
+				if (strlen(mode)==0 || !(loaded || empty))
+				{
+					LOGMASKED(LOG_CONFIG, "Missing or invalid 'mode' attribute for <spin> element, must be 'loaded' or 'empty'\n");
+					return false;
+				}
+
+				int spintype = floppy_sound_samples::QUIET;
+
+				if (loaded)
+				{
+					if (initial) spintype = floppy_sound_samples::START_LOADED_INITIAL;
+					else if (starting) spintype = floppy_sound_samples::START_LOADED;
+					else if (running)
+					{
+						spintype = floppy_sound_samples::SPIN_LOADED;
+						spinloaded_sample = true;
+					}
+					else spintype = floppy_sound_samples::END_LOADED;
+				}
+				else
+				{
+					if (initial || starting) spintype = floppy_sound_samples::START_EMPTY;
+					else if (running) spintype = floppy_sound_samples::SPIN_EMPTY;
+					else spintype = floppy_sound_samples::END_EMPTY;
+				}
+
+				// Everything ready for the entry
+				current_samples->add_spin_sample(filename, spintype);
+			}
+			else
+			{
+				int mintrack = specnode->get_attribute_int("from", 0);
+				int maxtrack = specnode->get_attribute_int("to", 99);
+				char const *dir = specnode->get_attribute_string("dir", "both");
+				int direction = floppy_sound_samples::BOTH;
+
+				if (strcmp(dir, "in")==0) direction = floppy_sound_samples::IN;
+				else if (strcmp(dir, "out")==0) direction = floppy_sound_samples::OUT;
+				else
+				{
+					if (strcmp(dir, "both")!=0)
+					{
+						LOGMASKED(LOG_CONFIG, "Direction specification for <%s> must be 'in', 'out', or 'both' (default)\n", element);
+						return false;
+					}
+				}
+
+				if (mintrack > maxtrack)
+				{
+					LOGMASKED(LOG_CONFIG, "Invalid range specification for <%s>\n", element);
+					return false;
+				}
+
+				if (strcmp(element, "seek")==0)
+				{
+					int nomrate = specnode->get_attribute_int("nomrate", 0);
+					int maxrate = specnode->get_attribute_int("maxrate", 0);
+
+					if (nomrate<=0 || maxrate<=0 || nomrate > maxrate)
+					{
+						LOGMASKED(LOG_CONFIG, "Missing or invalid rate specification for <seek>\n");
+						return false;
+					}
+					seek_sample = true;
+					current_samples->add_seek_sample(filename, nomrate, maxrate, mintrack, maxtrack, direction);
+				}
+				else
+				{
+					if (strcmp(element, "step")==0)
+					{
+						step_sample = true;
+						current_samples->add_step_sample(filename, mintrack, maxtrack, direction);
+					}
+					else
+					{
+						LOGMASKED(LOG_CONFIG, "Invalid element; must be <seek>, <spin>, or <step>\n");
+						return false;
+					}
+				}
+			}
+		}
+
+		// We found the desired sample set, but are there some important
+		// samples missing? We could now fall back to defaults,
+		// but these definitions were provided on purpose, and so
+		// we should make that failure explicit.
+		if (!spinloaded_sample)
+		{
+			LOGMASKED(LOG_CONFIG, "No samples for spinning (loaded) in definition\n");
+			return false;
+		}
+		if (!step_sample)
+		{
+			LOGMASKED(LOG_CONFIG, "No samples for stepping in definition\n");
+			return false;
+		}
+		if (!seek_sample)
+		{
+			LOGMASKED(LOG_CONFIG, "No samples for seeking in definition\n");
+			return false;
+		}
+	}
+
+	// If we could not find the desired samples, copy the default samples into the list
+	if (m_samples.count() == 0)
+	{
+		if (default_samples.count()==0)
+		{
+			LOGMASKED(LOG_CONFIG, "No sound samples found, no default samples available; disabling drive sound.\n");
+			return false;
+		}
+
+		if (strcmp(devname, "default")==0)
+			LOGMASKED(LOG_CONFIG, "Using default samples\n");
+		else
+			LOGMASKED(LOG_CONFIG, "Sound samples '%s' not found, using default samples.\n", devname);
+		default_samples.append_to(m_samples);
+	}
+	return true;
+}
+
 
 void floppy_sound_device::device_add_mconfig(machine_config &config)
 {
@@ -411,42 +705,52 @@ void floppy_sound_device::device_add_mconfig(machine_config &config)
 	add_route(ALL_OUTPUTS, FLOPSPK, 0.5);
 }
 
-void floppy_sound_device::set_samples(floppy_sound_samples *samples, int form_factor, int maxtrack)
+void floppy_sound_device::set_samples(const char *name, int form_factor, int maxtrack)
 {
-	m_samplelist = samples;
-	if (m_samplelist != nullptr)
-		m_samplelist->select(form_factor);
-
-	m_default_samples.select(form_factor);
-	m_max_track = maxtrack;
-}
-
-/*
-    Approximate real-world spindle spin-up time, i.e. the delay between the
-    motor being switched on and the drive actually picking up speed. Heavier
-    5.25"/8" mechanisms take noticeably longer to get going than the lighter
-    3"/3.5" ones. If the motor is switched off again before this time has
-    elapsed, the spin-up sample is never started, so no sound is heard at all.
-*/
-attotime floppy_sound_device::spin_start_delay() const
-{
-	switch (m_samplelist->get_assumed_form_factor())
+	// Open the samples definition file
+	emu_file file(machine().options().sample_path(), OPEN_FLAG_READ);
+	std::error_condition const fileerr = file.open(std::string("floppy.xml"));
+	if (fileerr == std::errc::no_such_file_or_directory)
 	{
-	case floppy_image::FF_8:
-		return attotime::from_msec(1000);
-	case floppy_image::FF_525:
-		return attotime::from_msec(500);
-	default: // FF_35, FF_3
-		return attotime::from_msec(300);
+		LOGMASKED(LOG_CONFIG, "Samples configuration file 'floppy.xml' not found, disabling drive sound.\n");
+		return;
+	}
+	else
+	{
+		if (fileerr)
+		{
+			LOGMASKED(LOG_CONFIG, "Error opening samples config file 'floppy.xml' (%s:%d %s)\n",
+				fileerr.category().name(),
+				fileerr.value(),
+				fileerr.message());
+			return;
+		}
+	}
+
+	bool xml_ok = load_xml(file, maxtrack, name);
+	m_max_track = maxtrack;
+	m_samples_available = false;
+
+	if (xml_ok)
+	{
+		m_samples.select(form_factor);
+
+		set_samples_names(m_samples.get_names());
+		m_samples_available = load_samples();
+
+		// If we don't have samples, don't allocate a sound stream
+		if (m_samples_available)
+			m_sound = stream_alloc(0, 1, clock()); // per-floppy stream
 	}
 }
 
 /*
     Motor sound. Select appropriate sound sample, depending on whether the
     motor is started or keeps running. Motor samples are always fully
-    played once started, but actually starting one is delayed by
-    spin_start_delay() to emulate the time a real spindle takes to pick up
-    speed; switching the motor off within that delay cancels the sound.
+    played once started.
+    Since some drives are rapidly polled via the motor line, we allow for a
+    short delay before starting the motor sound. If the motor is turned off
+    during that time, no motor sound is played.
 */
 void floppy_sound_device::motor(bool running, bool withdisk)
 {
@@ -454,14 +758,15 @@ void floppy_sound_device::motor(bool running, bool withdisk)
 	{
 		m_sound->update(); // required
 
+		LOGMASKED(LOG_SND_DETAIL, "Motor = %s [%s]\n", running? "on " : "off", machine().time().to_string());
+
 		if ((m_spin_kind==floppy_sound_samples::QUIET
 			|| m_spin_kind==floppy_sound_samples::END_EMPTY
 			|| m_spin_kind==floppy_sound_samples::END_LOADED ) && running) // motor was either off or already spinning down
 		{
-			// Wait for the spindle to pick up speed before starting the
-			// spin-up sample; see spin_start_timeout.
+			// See spin_start_delay
 			m_spin_start_withdisk = withdisk;
-			m_spin_start_timer->adjust(spin_start_delay());
+			m_spin_start_timer->adjust(attotime::from_msec(SPIN_SOUND_DELAY_MS));
 		}
 		else
 		{
@@ -477,7 +782,7 @@ void floppy_sound_device::motor(bool running, bool withdisk)
 			m_spin_start_timer->reset(); // motor switched off again before the spindle sound could start: no sound at all
 
 		int old_sample = m_spin_sample;
-		m_spin_sample = (m_spin_kind==floppy_sound_samples::QUIET)? floppy_sound_samples::QUIET : m_samplelist->find_spin(m_spin_kind);
+		m_spin_sample = (m_spin_kind==floppy_sound_samples::QUIET)? floppy_sound_samples::QUIET : m_samples.find_spin(m_spin_kind);
 
 		if (m_spin_sample == floppy_sound_samples::QUIET)
 			LOGMASKED(LOG_SND, "Spin off\n");
@@ -490,9 +795,18 @@ void floppy_sound_device::motor(bool running, bool withdisk)
 }
 
 /*
-    The spindle has picked up speed: actually start the spin-up sample.
+    Some drives like the FD-2000 are polled via the MON line to check for
+    an inserted disk; the on-off time is only about 16us. We have to avoid
+    starting the spinning sound in that case. For that reason, the start is
+    delayed by a certain time (see SPIN_SOUND_DELAY_MS).
+
+    The value may be adapted to cover other cases, but it should not be so
+    high that the delay is noticeable: This delay only affects the output
+    of the spinning sound, but neither step/seek sounds nor the operation of
+    the drive. Realistic spin-up times should be a concern of the floppy drive
+    emulation.
 */
-TIMER_CALLBACK_MEMBER(floppy_sound_device::spin_start_timeout)
+TIMER_CALLBACK_MEMBER(floppy_sound_device::spin_start_delay)
 {
 	m_sound->update(); // required
 
@@ -503,7 +817,7 @@ TIMER_CALLBACK_MEMBER(floppy_sound_device::spin_start_timeout)
 	m_firstturn = false;
 
 	int old_sample = m_spin_sample;
-	m_spin_sample = m_samplelist->find_spin(m_spin_kind);
+	m_spin_sample = m_samples.find_spin(m_spin_kind);
 
 	if (m_spin_sample == floppy_sound_samples::QUIET)
 		LOGMASKED(LOG_SND, "Spin off\n");
@@ -585,7 +899,7 @@ void floppy_sound_device::step(int track, int subtrack)
 		{
 			if (recalc || !m_in_seek)
 			{
-				int newseek = m_samplelist->find_seek(m_step_rate, track, dir, m_seek_pitch);
+				int newseek = m_samples.find_seek(m_step_rate, track, dir, m_seek_pitch);
 
 				// If we get a QUIET, then there is no matching seek sample,
 				// i.e. the step interval became too long for a seek; we have an isolated step sound
@@ -612,7 +926,7 @@ void floppy_sound_device::step(int track, int subtrack)
 		// If we have a single step (outside of a seek), reset the step sample position
 		if (m_seek_sample == floppy_sound_samples::QUIET)
 		{
-			m_step_sample = m_samplelist->find_step(track, dir);
+			m_step_sample = m_samples.find_step(track, dir);
 			m_step_samplepos = 0;
 			m_in_seek = false;
 			LOGMASKED(LOG_SND_DETAIL, "Step rate = %.1f ms\n", m_step_rate);
@@ -705,7 +1019,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream)
 				}
 
 				int old_sample = m_spin_sample;
-				m_spin_sample = (m_spin_kind==floppy_sound_samples::QUIET)? floppy_sound_samples::QUIET : m_samplelist->find_spin(m_spin_kind);
+				m_spin_sample = (m_spin_kind==floppy_sound_samples::QUIET)? floppy_sound_samples::QUIET : m_samples.find_spin(m_spin_kind);
 
 				if (m_spin_sample == floppy_sound_samples::QUIET)
 					LOGMASKED(LOG_SND, "Spin off\n");

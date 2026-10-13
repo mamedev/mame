@@ -146,7 +146,7 @@ void upd78k3_device::device_start()
 	).mask(7).noshow();
 	state_add(UPD78K3_SP, "SP", m_sp);
 	for (int n = 0; n < 4; n++)
-		state_add<u16>(UPD78K3_RP0 + n, string_format("RP%d", n).c_str(),
+		state_add<u16>(UPD78K3_RP0 + n, string_format("RP%d", n),
 			[this, n]() { return m_iram[register_base() >> 1 | n]; },
 			[this, n](u16 data) { m_iram[register_base() >> 1 | n] = data; }
 		).formatstr("%9s");
@@ -161,13 +161,13 @@ void upd78k3_device::device_start()
 			[this, n]() { return m_iram[register_base() >> 1 | 0x04 | n]; },
 			[this, n](u16 data) { m_iram[register_base() >> 1 | 0x04 | n] = data; }
 		);
-		state_add<u16>(UPD78K3_RP4 + n, string_format("RP%d", 4 + n).c_str(),
+		state_add<u16>(UPD78K3_RP4 + n, string_format("RP%d", 4 + n),
 			[this, n]() { return m_iram[register_base() >> 1 | 0x04 | n]; },
 			[this, n](u16 data) { m_iram[register_base() >> 1 | 0x04 | n] = data; }
 		).noshow();
 	}
 	for (int n = 0; n < 16; n++)
-		state_add<u8>(UPD78K3_R0 + n, string_format("R%d", n).c_str(),
+		state_add<u8>(UPD78K3_R0 + n, string_format("R%d", n),
 			[this, n]() { return iram_byte_r(register_base() | n); },
 			[this, n](u8 data) { iram_byte_w(register_base() | n, data); }
 		).noshow();

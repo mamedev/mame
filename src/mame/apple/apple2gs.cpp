@@ -290,10 +290,16 @@ private:
 	bool m_adb_line = false;
 
 	// align timing to match observed hardware behavior
-	static constexpr int ALIGN_VBL = 4;
-	static constexpr int ALIGN_CNT = 2;
-	static constexpr int ALIGN_RFB = 1;
-	static constexpr int HPOS_VBL = BORDER_LEFT + ((40 - ALIGN_VBL) * 16);
+	// The w65816 core performs a bus access at the start of the access cycle and sees any timer
+	// that fires during that cycle, so timed events are placed in the middle of the cycle in
+	// which the CPU must first see them, and the beam position is sampled in the middle of
+	// the accessing cycle.  This keeps the alignment independent of the sub-cycle phase
+	// between the CPU clock and the pixel clock.
+	static constexpr int CYCLE_MID = 8; // half of a 1 MHz cycle, in pixels
+	static constexpr int ALIGN_VBL = 1; // VBL begins one cycle before the end of active video
+	static constexpr int ALIGN_CNT = 2; // video counters read two cycles ahead of the video output
+	static constexpr int ALIGN_RFB = 1; // floating bus returns the byte fetched for the next column
+	static constexpr int HPOS_VBL = BORDER_LEFT + ((40 - ALIGN_VBL) * 16) + CYCLE_MID;
 	// hardware testing shows SCB IRQs fire 8 video cycles after VBL
 	static constexpr int HPOS_VGC = HPOS_VBL + (8 * 16);
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
@@ -397,7 +403,6 @@ private:
 	void keyglu_816_write(u8 offset, u8 data);
 
 	u8 m_adb_p2_last, m_adb_p3_last;
-	int m_adb_reset_freeze = 0;
 	void keyglu_regen_irqs();
 
 	u8 adbmicro_p0_in();
@@ -481,6 +486,7 @@ private:
 	void raise_irq(int irq);
 	void lower_irq(int irq);
 	void update_speed();
+	void get_beam_pos(int &hpos, int &vpos);
 	int get_vpos();
 	void process_clock();
 	void clear_vgcint(u8 data);
@@ -792,7 +798,6 @@ void apple2gs_state::machine_start()
 	save_item(m_clock_control, "CLKCTRL");
 	save_item(NAME(m_adb_p2_last));
 	save_item(NAME(m_adb_p3_last));
-	save_item(NAME(m_adb_reset_freeze));
 	save_item(NAME(m_accel_unlocked));
 	save_item(NAME(m_accel_stage));
 	save_item(NAME(m_accel_fast));
@@ -809,7 +814,6 @@ void apple2gs_state::machine_start()
 void apple2gs_state::machine_reset()
 {
 	m_adb_p2_last = m_adb_p3_last = 0;
-	m_adb_reset_freeze = 0;
 	m_video->scr_w(0);
 	m_video->set_GS_border(0x02);
 	m_video->set_GS_textcol(0xf2);
@@ -887,6 +891,14 @@ void apple2gs_state::machine_reset()
 
 	// with all the banking reset, now reset the CPU
 	m_maincpu->reset();
+
+	// R105 (200K) and C39 (1uF) delay the ADB MCU's power-on reset by about
+	// 200 ms.  Let the ADB peripherals finish their own startup before the
+	// MCU polls them, and hold the main CPU until the MCU releases P2.5.
+	// Otherwise the mouse still holds ADB low during the initial keyboard
+	// status query, which ROM00 mistakes for Command+Option being held.
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_adbmicro->pulse_input_line(INPUT_LINE_RESET, attotime::from_msec(200));
 
 	// Setup ZipGS
 	m_accel_present = false;
@@ -1479,11 +1491,26 @@ void apple2gs_state::do_io(int offset)
 	}
 }
 
+// beam position as seen by a CPU access, sampled in the middle of the accessing cycle
+void apple2gs_state::get_beam_pos(int &hpos, int &vpos)
+{
+	hpos = m_screen->hpos() + CYCLE_MID;
+	vpos = m_screen->vpos();
+	if (hpos >= m_screen->width())
+	{
+		hpos -= m_screen->width();
+		vpos++;
+		if (vpos >= m_screen->height())
+			vpos = 0;
+	}
+}
+
 // return the correct vertical counter per IIgs Tech Note #39
 int apple2gs_state::get_vpos()
 {
-	int vpos = m_screen->vpos();
-	vpos += (m_screen->hpos() >= (BORDER_LEFT + (40 - ALIGN_CNT) * 16)); // adjust for set_raw
+	int hpos, vpos;
+	get_beam_pos(hpos, vpos);
+	vpos += (hpos >= (BORDER_LEFT + (40 - ALIGN_CNT) * 16)); // adjust for set_raw
 
 	if (vpos < BORDER_TOP)
 		vpos += m_screen->height(); // remap top border to bottom of VBL
@@ -1668,7 +1695,11 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			if (!machine().side_effects_disabled())
 				clear_vgcint(~VGCINT_SCANLINE);
 
-			ret = (m_screen->hpos() - BORDER_LEFT) / 16 + (25 + ALIGN_CNT); // adjust for set_raw
+			{
+				int hpos, vpos;
+				get_beam_pos(hpos, vpos);
+				ret = (hpos / 16) - (BORDER_LEFT / 16) + (25 + ALIGN_CNT); // adjust for set_raw
+			}
 			if (ret >= 65)
 				ret -= 65;
 			if (ret > 0)
@@ -1746,9 +1777,6 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return (m_gameio->sw3_r() ? 0 : 0x80) | uFloatingBus7;
 
 		case 0x61: // button 0 or Open Apple
-			// HACK/TODO: the 65816 loses a race to the microcontroller on reset
-			if (m_adb_reset_freeze > 0 && !machine().side_effects_disabled())
-				m_adb_reset_freeze--;
 			return (((m_gameio->has_sw0() && m_gameio->sw0_r()) || (m_adb_p3_last & 0x20)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x62: // button 1 or Option
@@ -2006,16 +2034,19 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x34:  // CLOCKCTL
-			if ((data & 0xf) != (m_video->get_GS_border() & 0xf))
-			{
-				m_screen->update_now();
-			}
 			m_clock_control = data & 0x6f;
 			m_video->set_GS_border(data & 0xf);
-			m_rtc->ce_w(BIT(data, 7) ^ 1);
-			if (data & 0x80)
+			if (BIT(data, 7))
 			{
+				m_rtc->ce_w(0);
 				process_clock();
+			}
+			// This used to falsely key off of bit 7, but in emulation mode the (w)65816
+			// writes the unmodified value back during the modify cycle of TSB/TRB, and
+			// that value usually has bit 7 clear.
+			if (!BIT(data, 5))
+			{
+				m_rtc->ce_w(1);
 			}
 			break;
 
@@ -2793,11 +2824,12 @@ void apple2gs_state::lc_01_w(offs_t offset, u8 data)
 
 u8 apple2gs_state::read_floatingbus()
 {
-	int h_clock = (m_screen->hpos() - BORDER_LEFT) / 16 + (25 + ALIGN_RFB); // adjust for set_raw
+	int hpos, v_clock;
+	get_beam_pos(hpos, v_clock);
+	int h_clock = (hpos / 16) - (BORDER_LEFT / 16) + (25 + ALIGN_RFB); // adjust for set_raw
 	if (h_clock >= 65)
 		h_clock -= 65;
 
-	int v_clock = m_screen->vpos();
 	if (v_clock < BORDER_TOP)
 		v_clock += m_screen->height(); // remap top border to bottom of VBL
 	v_clock -= BORDER_TOP;
@@ -2818,8 +2850,9 @@ u8 apple2gs_state::read_floatingbus()
 	static bool recurse = false; // no recursion, single thread
 	if (!recurse && ((h_clock < 5) || (v_clock > 199)))
 	{
-		// approximate (for non-flow control instructions) by peeking at PC
-		offs_t pc = m_maincpu->pc();
+		// approximate (for non-flow control instructions) by peeking at the live PC,
+		// which has already advanced past the operand bytes
+		offs_t pc = m_maincpu->get_live_pc();
 		// previous byte, wrapping at bank boundary
 		pc = (pc & 0xff0000) | ((pc - 1) & 0xffff);
 		// prevent recursion via slot firmware or Mega II C07x
@@ -3394,7 +3427,6 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 {
 	if (!BIT(data, 5) && BIT(m_adb_p2_last, 5))
 	{
-		m_adb_reset_freeze = 2;
 		m_a2bus->reset_bus();
 		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		if (m_accel_present)
@@ -3453,11 +3485,7 @@ void apple2gs_state::adbmicro_p3_out(u8 data)
 	// m_adb_p3_last is intentionally frozen while the main CPU samples the
 	// modifier inputs across reset, but the M50740's ADB output must remain live.
 	m_adbbus->adb_host_line_w(BIT(data, 3) ? CLEAR_LINE : ASSERT_LINE);
-
-	if (m_adb_reset_freeze == 0)
-	{
-		m_adb_p3_last = data;
-	}
+	m_adb_p3_last = data;
 }
 
 void apple2gs_state::set_adb_line(int linestate)

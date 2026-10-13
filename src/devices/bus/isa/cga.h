@@ -337,4 +337,31 @@ private:
 
 DECLARE_DEVICE_TYPE(ISA8_CGA_CHAMELEON, isa8_cga_chameleon_device)
 
+
+// ======================> isa8_cga_pcxport_device
+
+// The PC Transporter's CGA needs to share the system with another screen, which stock CGA struggles with,
+// and it also programs non-standard CRTC setups that stock CGA doesn't handle properly (but probably should).
+// In the interests of containing the blast radius, we're splitting out this subclass.
+
+class isa8_cga_pcxport_device : public isa8_cga_device
+{
+public:
+	// construction/destruction
+	isa8_cga_pcxport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// the character generator is stock CGA's, so look for it under that device's name
+	static auto parent_rom_device_type() { return &ISA8_CGA; }
+
+	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	MC6845_RECONFIGURE(reconfigure);
+};
+
+DECLARE_DEVICE_TYPE(ISA8_CGA_PCXPORT, isa8_cga_pcxport_device)
+
 #endif  // MAME_BUS_ISA_CGA_H

@@ -15,6 +15,8 @@
 												const rectangle &cliprect, uint16_t ma, uint8_t ra,                 \
 												uint16_t y, uint8_t x, int8_t cursor_x)
 #define CRTC_EGA_END_UPDATE(_name)   void _name(bitmap_ind16 &bitmap, const rectangle &cliprect)
+#define CRTC_EGA_RECONFIGURE(_name)  void _name(int width, int height, const rectangle &visarea, attotime frame_period, \
+												int hsync_on, int hsync_off, int vsync_on, int vsync_off)
 
 
 class crtc_ega_device : public device_t,
@@ -25,6 +27,8 @@ public:
 	typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect)> begin_update_delegate;
 	typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t ma, uint8_t ra, uint16_t y, uint8_t x_count, int8_t cursor_x)> row_update_delegate;
 	typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect)> end_update_delegate;
+	typedef device_delegate<void (int width, int height, const rectangle &visarea, attotime frame_period,
+			int hsync_on, int hsync_off, int vsync_on, int vsync_off)> reconfigure_delegate;
 
 
 	crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -38,6 +42,7 @@ public:
 	template <typename... T> void set_begin_update_callback(T &&... args) { m_begin_update_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_row_update_callback(T &&... args) { m_row_update_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_end_update_callback(T &&... args) { m_end_update_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_reconfigure_callback(T &&... args) { m_reconfigure_cb.set(std::forward<T>(args)...); }
 	void config_set_hpixels_per_column(int hpixels_per_column) { m_hpixels_per_column = hpixels_per_column; }
 
 	/* select one of the registers for reading or writing */
@@ -95,6 +100,7 @@ private:
 
 	/* if specified, this gets called after all row updating is complete */
 	end_update_delegate        m_end_update_cb;
+	reconfigure_delegate       m_reconfigure_cb;
 
 	/* ega/vga register file */
 	uint8_t   m_horiz_char_total; /* 0x00 */
@@ -118,7 +124,7 @@ private:
 	uint16_t  m_light_pen_addr;       /* 0x10/0x11 */
 	uint16_t  m_vert_retr_start;  /* 0x10/0x07 */
 	uint8_t   m_vert_retr_end;        /* 0x11 */
-	uint8_t   m_irq_enable;            /* 0x11 */
+	uint8_t   m_irq_disable;           /* 0x11 */
 	uint16_t  m_vert_disp_end;        /* 0x12/0x07 */
 	uint8_t   m_offset;               /* 0x13 */
 	uint8_t   m_underline_loc;        /* 0x14 */
@@ -140,6 +146,7 @@ private:
 	int     m_hsync;
 	int     m_vsync;
 	int     m_vblank;
+	int     m_vert_int;
 	int     m_de;
 
 	/* internal counters */
@@ -182,6 +189,7 @@ private:
 	void set_vsync(int state);
 	void set_vblank(int state);
 	void set_cur(int state);
+	void update_irq();
 	TIMER_CALLBACK_MEMBER(handle_line_timer);
 	TIMER_CALLBACK_MEMBER(de_off_tick);
 	TIMER_CALLBACK_MEMBER(cursor_on);

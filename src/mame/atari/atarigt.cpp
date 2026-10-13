@@ -6,12 +6,15 @@
 
     driver by Aaron Giles
 
+    Primal Rage protection reverse engineered by:
+        Andrea Bogazzi
+
     Games supported:
         * T-Mek (1994) [5 sets]
         * Primal Rage (1994) [3 sets]
 
     Known bugs:
-        * Protection not fully understood
+        * T-Mek protection interface is only partially understood (see atarixga.cpp)
         * T-Mek's serial communications hardware is missing. The twin and single cabs seemingly use different link hardware but both link the same.
 
 ****************************************************************************
@@ -59,11 +62,6 @@
 #include "cpu/m68000/m68020.h"
 #include "machine/eeprompar.h"
 #include "speaker.h"
-
-#define LOG_PROTECTION      (1U << 1)
-
-#define VERBOSE (0)
-#include "logmacro.h"
 
 
 #define HACK_TMEK_CONTROLS  (0)
@@ -122,8 +120,16 @@ void atarigt_state::machine_start()
 
 	save_item(NAME(m_scanline_int_state));
 	save_item(NAME(m_video_int_state));
+	save_item(NAME(m_ignore_writes));
 }
 
+
+
+void atarigt_state::machine_reset()
+{
+	atarigen_state::machine_reset();
+	m_ignore_writes = false;
+}
 
 
 /*************************************
@@ -311,310 +317,13 @@ void atarigt_state::sound_data_w(offs_t offset, uint32_t data, uint32_t mem_mask
 
 /*************************************
  *
- *  T-Mek protection
- *
- *************************************/
-
-
-
-void atarigt_state::tmek_update_mode(offs_t offset)
-{
-	/* pop us into the readseq */
-	for (int i = 0; i < ADDRSEQ_COUNT - 1; i++)
-		m_protaddr[i] = m_protaddr[i + 1];
-	m_protaddr[ADDRSEQ_COUNT - 1] = offset;
-}
-
-
-void atarigt_state::tmek_protection_w(address_space &space, offs_t offset, uint16_t data)
-{
-/*
-    T-Mek init:
-        ($387C0) = $0001
-        Read ($38010), add to memory
-        Write $3C0 bytes to low half of words from $38000-$3877E
-        Read ($38488)
-*/
-
-	LOGMASKED(LOG_PROTECTION, "%s:Protection W@%06X = %04X\n", machine().describe_context(), offset, data);
-
-	/* track accesses */
-	tmek_update_mode(offset);
-
-	switch (offset)
-	{
-		case 0xdb0000:
-			m_ignore_writes = (data == 0x18);
-			break;
-	}
-}
-
-void atarigt_state::tmek_protection_r(address_space &space, offs_t offset, uint16_t *data)
-{
-	if (!machine().side_effects_disabled())
-	{
-		LOGMASKED(LOG_PROTECTION, "%s:Protection R@%06X\n", machine().describe_context(), offset);
-
-		/* track accesses */
-		tmek_update_mode(offset);
-	}
-
-	/* handle specific reads */
-	switch (offset)
-	{
-		/* status register; the code spins on this waiting for the high bit to be set */
-		case 0xdb8700:
-		case 0xdb87c0:
-//          if (m_protmode != 0)
-			{
-				*data = -1;//0x8000;
-			}
-			break;
-	}
-}
-
-
-
-/*************************************
- *
- *  Primal Rage protection
- *
- *************************************/
-
-void atarigt_state::primrage_update_mode(offs_t offset)
-{
-	/* pop us into the readseq */
-	for (int i = 0; i < ADDRSEQ_COUNT - 1; i++)
-		m_protaddr[i] = m_protaddr[i + 1];
-	m_protaddr[ADDRSEQ_COUNT - 1] = offset;
-
-	/* check for particular sequences */
-	if (!m_protmode)
-	{
-		/* this is from the code at $20f90 */
-		if (m_protaddr[1] == 0xdcc7c4 && m_protaddr[2] == 0xdcc7c4 && m_protaddr[3] == 0xdc4010)
-		{
-			LOGMASKED(LOG_PROTECTION, "prot:Entering mode 1\n");
-			m_protmode = 1;
-		}
-
-		/* this is from the code at $27592 */
-		if (m_protaddr[0] == 0xdcc7ca && m_protaddr[1] == 0xdcc7ca && m_protaddr[2] == 0xdcc7c6 && m_protaddr[3] == 0xdc4022)
-		{
-			LOGMASKED(LOG_PROTECTION, "prot:Entering mode 2\n");
-			m_protmode = 2;
-		}
-
-		/* this is from the code at $3d8dc */
-		if (m_protaddr[0] == 0xdcc7c0 && m_protaddr[1] == 0xdcc7c0 && m_protaddr[2] == 0xdc80f2 && m_protaddr[3] == 0xdc7af2)
-		{
-			LOGMASKED(LOG_PROTECTION, "prot:Entering mode 3\n");
-			m_protmode = 3;
-		}
-	}
-}
-
-
-
-void atarigt_state::primrage_protection_w(address_space &space, offs_t offset, uint16_t data)
-{
-	switch (m_maincpu->pcbase())
-	{
-		/* protection code from 20f90 - 21000 */
-		case 0x20fba:
-			if (offset % 16 == 0) logerror("\n   ");
-			LOGMASKED(LOG_PROTECTION, "W@%06X(%04X) ", offset, data);
-			break;
-
-		/* protection code from 27592 - 27664 */
-		case 0x275f6:
-			LOGMASKED(LOG_PROTECTION, "W@%06X(%04X) ", offset, data);
-			break;
-
-		/* protection code from 3d8dc - 3d95a */
-		case 0x3d908:
-		case 0x3d932:
-		case 0x3d938:
-		case 0x3d93e:
-			LOGMASKED(LOG_PROTECTION, "W@%06X(%04X) ", offset, data);
-			break;
-		case 0x3d944:
-			LOGMASKED(LOG_PROTECTION, "W@%06X(%04X) - done\n", offset, data);
-			break;
-
-		/* protection code from 437fa - 43860 */
-		case 0x43830:
-		case 0x43838:
-			LOGMASKED(LOG_PROTECTION, "W@%06X(%04X) ", offset, data);
-			break;
-
-		/* catch anything else */
-		default:
-			LOGMASKED(LOG_PROTECTION, "%s:Unknown protection W@%06X = %04X\n", machine().describe_context(), offset, data);
-			break;
-	}
-
-/* mask = 0x78fff */
-
-	/* track accesses */
-	primrage_update_mode(offset);
-
-	/* check for certain read sequences */
-	if (m_protmode == 1 && offset >= 0xdc7800 && offset < 0xdc7800 + (0x800 * 2))
-		m_protdata[(offset - 0xdc7800) >> 1] = data;
-
-	if (m_protmode == 2)
-	{
-		int temp = (offset - 0xdc7800) >> 1;
-		LOGMASKED(LOG_PROTECTION, "prot:mode 2 param = %04X\n", temp);
-		m_protresult = temp * 0x6915 + 0x6915;
-	}
-
-	if (m_protmode == 3)
-	{
-		if (offset == 0xdc4700)
-		{
-			LOGMASKED(LOG_PROTECTION, "prot:Clearing mode 3\n");
-			m_protmode = 0;
-		}
-	}
-}
-
-
-
-void atarigt_state::primrage_protection_r(address_space &space, offs_t offset, uint16_t *data)
-{
-	if (!machine().side_effects_disabled())
-	{
-		/* track accesses */
-		primrage_update_mode(offset);
-	}
-
-	uint32_t const pc = m_maincpu->pcbase();
-	uint32_t p1, p2, a6;
-	switch (pc)
-	{
-		/* protection code from 20f90 - 21000 */
-		case 0x20f90:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "Known Protection @ 20F90: R@%06X ", offset);
-			break;
-		case 0x20f98:
-		case 0x20fa0:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "R@%06X ", offset);
-			break;
-		case 0x20fcc:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "R@%06X - done\n", offset);
-			break;
-
-		/* protection code from 27592 - 27664 */
-		case 0x275bc:
-			break;
-		case 0x275cc:
-			a6 = m_maincpu->state_int(M68K_A6);
-			p1 = (space.read_word(a6+8) << 16) | space.read_word(a6+10);
-			p2 = (space.read_word(a6+12) << 16) | space.read_word(a6+14);
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "Known Protection @ 275BC(%08X, %08X): R@%06X ", p1, p2, offset);
-			break;
-		case 0x275d2:
-		case 0x275d8:
-		case 0x275de:
-		case 0x2761e:
-		case 0x2762e:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "R@%06X ", offset);
-			break;
-		case 0x2763e:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "R@%06X - done\n", offset);
-			break;
-
-		/* protection code from 3d8dc - 3d95a */
-		case 0x3d8f4:
-			a6 = m_maincpu->state_int(M68K_A6);
-			p1 = (space.read_word(a6+12) << 16) | space.read_word(a6+14);
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "Known Protection @ 3D8F4(%08X): R@%06X ", p1, offset);
-			break;
-		case 0x3d8fa:
-		case 0x3d90e:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "R@%06X ", offset);
-			break;
-
-		/* protection code from 437fa - 43860 */
-		case 0x43814:
-			a6 = m_maincpu->state_int(M68K_A6);
-			p1 = space.read_dword(a6+14) & 0xffffff;
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "Known Protection @ 43814(%08X): R@%06X ", p1, offset);
-			break;
-		case 0x4381c:
-		case 0x43840:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "R@%06X ", offset);
-			break;
-		case 0x43848:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "R@%06X - done\n", offset);
-			break;
-
-		/* catch anything else */
-		default:
-			if (!machine().side_effects_disabled())
-				LOGMASKED(LOG_PROTECTION, "%s:Unknown protection R@%06X\n", machine().describe_context(), offset);
-			break;
-	}
-
-	/* handle specific reads */
-	switch (offset)
-	{
-		/* status register; the code spins on this waiting for the high bit to be set */
-		case 0xdc4700:
-//          if (m_protmode != 0)
-			{
-				*data = 0x8000;
-			}
-			break;
-
-		/* some kind of result register */
-		case 0xdcc7c2:
-			if (m_protmode == 2)
-			{
-				*data = m_protresult;
-				if (!machine().side_effects_disabled())
-				{
-					m_protmode = 0;
-					LOGMASKED(LOG_PROTECTION, "prot:Clearing mode 2\n");
-				}
-			}
-			break;
-
-		case 0xdcc7c4:
-			if (m_protmode == 1)
-			{
-				if (!machine().side_effects_disabled())
-				{
-					m_protmode = 0;
-					LOGMASKED(LOG_PROTECTION, "prot:Clearing mode 1\n");
-				}
-			}
-			break;
-	}
-}
-
-
-
-/*************************************
- *
  *  Protection/color RAM
  *
  *************************************/
 
-uint32_t atarigt_state::colorram_protection_r(address_space &space, offs_t offset, uint32_t mem_mask)
+// Both color RAM and the FPGA see each access. Only FPGA status and result
+// reads override the color-RAM value. The v2.0 T-MEK prototype has no FPGA.
+uint32_t atarigt_state::colorram_protection_r(offs_t offset, uint32_t mem_mask)
 {
 	offs_t const address = 0xd80000 + offset * 4;
 	uint32_t result32 = 0;
@@ -623,13 +332,15 @@ uint32_t atarigt_state::colorram_protection_r(address_space &space, offs_t offse
 	if (ACCESSING_BITS_16_31)
 	{
 		result = colorram_r(address);
-		(this->*m_protection_r)(space, address, &result);
+		if (m_xga)
+			m_xga->read16(address - 0xd80000, result);
 		result32 |= result << 16;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
 		result = colorram_r(address + 2);
-		(this->*m_protection_r)(space, address + 2, &result);
+		if (m_xga)
+			m_xga->read16(address + 2 - 0xd80000, result);
 		result32 |= result;
 	}
 
@@ -637,7 +348,7 @@ uint32_t atarigt_state::colorram_protection_r(address_space &space, offs_t offse
 }
 
 
-void atarigt_state::colorram_protection_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask)
+void atarigt_state::colorram_protection_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	offs_t const address = 0xd80000 + offset * 4;
 
@@ -645,13 +356,18 @@ void atarigt_state::colorram_protection_w(address_space &space, offs_t offset, u
 	{
 		if (!m_ignore_writes)
 			colorram_w(address, data >> 16, mem_mask >> 16);
-		(this->*m_protection_w)(space, address, data >> 16);
+		// T-MEK's palette write enable is separate from the FPGA mode.
+		if (!m_is_primrage && address == 0xdb0000)
+			m_ignore_writes = (uint16_t(data >> 16) == 0x18);
+		if (m_xga)
+			m_xga->write16(address - 0xd80000, data >> 16);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
 		if (!m_ignore_writes)
 			colorram_w(address + 2, data, mem_mask);
-		(this->*m_protection_w)(space, address + 2, data);
+		if (m_xga)
+			m_xga->write16(address + 2 - 0xd80000, data);
 	}
 }
 
@@ -917,6 +633,8 @@ void atarigt_state::tmek(machine_config &config)
 {
 	atarigt(config);
 
+	ATARI_TMEK_XGA(config, m_xga);
+
 	ADC0809(config, m_adc, 14.318181_MHz_XTAL/16); // should be 447 kHz according to schematics, but that fails the self-test
 	m_adc->in_callback<2>().set_ioport("AN4");
 	m_adc->in_callback<3>().set_ioport("AN1");
@@ -934,9 +652,18 @@ void atarigt_state::tmek(machine_config &config)
 	m_cage->add_route(3, "speaker", 1.0, 3); // Back Right
 }
 
+void atarigt_state::tmek20(machine_config &config)
+{
+	tmek(config);
+	// This prototype reads its graphics data directly from ROM.
+	config.device_remove("xga");
+}
+
 void atarigt_state::primrage(machine_config &config)
 {
 	atarigt_stereo(config);
+
+	ATARI_136094_0004A(config, m_xga);
 
 	m_cage->set_speedup(0x42f2);
 }
@@ -944,6 +671,8 @@ void atarigt_state::primrage(machine_config &config)
 void atarigt_state::primrage20(machine_config &config)
 {
 	atarigt_stereo(config);
+
+	ATARI_136094_0004A(config, m_xga);
 
 	m_cage->set_speedup(0x48a4);
 }
@@ -1465,48 +1194,14 @@ ROM_END
  *
  *************************************/
 
-void atarigt_state::tmek_pf_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	offs_t pc = m_maincpu->pc();
-
-	/* protected version */
-	if (pc == 0x2EB3C || pc == 0x2EB48)
-	{
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", m_maincpu->pc(), 0xd72000 + offset*4, data, mem_mask, (uint32_t)m_maincpu->state_int(M68K_A4) - 2);
-		/* skip these writes to make more stuff visible */
-		return;
-	}
-
-	/* unprotected version */
-	if (pc == 0x25834 || pc == 0x25860)
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", m_maincpu->pc(), 0xd72000 + offset*4, data, mem_mask, (uint32_t)m_maincpu->state_int(M68K_A3) - 2);
-
-	m_playfield_tilemap->write32(offset, data, mem_mask);
-}
-
 void atarigt_state::init_tmek()
 {
 	m_is_primrage = false;
-
-	/* setup protection */
-	m_protection_r = &atarigt_state::tmek_protection_r;
-	m_protection_w = &atarigt_state::tmek_protection_w;
-
-	/* temp hack */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xd72000, 0xd75fff, write32s_delegate(*this, FUNC(atarigt_state::tmek_pf_w)));
 }
-
 
 void atarigt_state::init_primrage()
 {
 	m_is_primrage = true;
-
-	/* install protection */
-	m_protection_r = &atarigt_state::primrage_protection_r;
-	m_protection_w = &atarigt_state::primrage_protection_w;
-
-	m_protdata = make_unique_clear<uint8_t[]>(0x800);
-	save_pointer(NAME(m_protdata), 0x800);
 }
 
 /*************************************
@@ -1515,11 +1210,11 @@ void atarigt_state::init_primrage()
  *
  *************************************/
 
-GAME( 1994, tmek,       0,        tmek,       tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
-GAME( 1994, tmek51p,    tmek,     tmek,       tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
-GAME( 1994, tmek45,     tmek,     tmek,       tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
-GAME( 1994, tmek44,     tmek,     tmek,       tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
-GAME( 1994, tmek20,     tmek,     tmek,       tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek,       0,        tmek,       tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek51p,    tmek,     tmek,       tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek45,     tmek,     tmek,       tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek44,     tmek,     tmek,       tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_NODEVICE_LAN )
+GAME( 1994, tmek20,     tmek,     tmek20,     tmek,      atarigt_state, init_tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", MACHINE_NODEVICE_LAN )
 GAME( 1994, primrage,   0,        primrage,   primrage,  atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3, Jan 1995)", MACHINE_UNEMULATED_PROTECTION ) // OS: Jan 4 1995 18:25:40 Main: Jan 4 1995 18:28:24
 GAME( 1994, primrageo,  primrage, primrage,   primrageo, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.3, Dec 1994)", MACHINE_UNEMULATED_PROTECTION ) // OS: Dec 6 1994 16:04:09 Main: Dec 7 1994 17:24:05
 GAME( 1994, primrage20, primrage, primrage20, primrageo, atarigt_state, init_primrage, ROT0, "Atari Games", "Primal Rage (version 2.0)", MACHINE_UNEMULATED_PROTECTION ) // OS: Aug 9 1994 17:05:40 Main: Aug 9 1994 17:05:02

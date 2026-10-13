@@ -46,7 +46,7 @@ static constexpr uint64_t DOUBLE_ZERO = 0;
 
 static constexpr uint32_t CODEPAGE_SIZE = 0x1'0000'0000ULL / 4096 / 8;
 
-static constexpr uint32_t SPR60X_HID0_ICFI			= 0x0000'0800;
+static constexpr uint32_t SPR60X_HID0_ICFI          = 0x0000'0800;
 
 /***************************************************************************
     PRIVATE GLOBAL VARIABLES
@@ -235,6 +235,7 @@ ppc_device::ppc_device(
 	, m_program_config("program", ENDIANNESS_BIG, data_bits, address_bits, 0, internal_map)
 	, c_bus_frequency(0)
 	, c_serial_clock(0)
+	, c_rtc_clock(7'812'500)
 	, m_core(nullptr)
 	, m_bus_freq_multiplier(1)
 	, m_flavor(flavor)
@@ -453,6 +454,18 @@ inline void ppc_device::set_timebase(uint64_t newtb)
 
 
 /*-------------------------------------------------
+    get_rtc - return the 601 RTC
+-------------------------------------------------*/
+
+inline uint64_t ppc_device::get_rtc()
+{
+	const uint64_t elapsed = total_cycles() - m_rtc_zero_cycles;
+	const uint64_t rate = uint64_t(c_rtc_clock) * 128;
+	return (elapsed / clock()) * rate + (elapsed % clock()) * rate / clock();
+}
+
+
+/*-------------------------------------------------
     get_decremeter - return the current
     decrementer value
 -------------------------------------------------*/
@@ -503,8 +516,9 @@ void ppc_device::set_decrementer(uint32_t newdec)
 
 /*-------------------------------------------------
     The 601's decrementer, like the 601-specific
-    RTC mechanism, counts nanoseconds, not bus
-    clocks.  This implementation allows pmac6100
+    RTC mechanism, counts 128 per RTC input clock
+    (nanoseconds at the nominal 7.8125 MHz), not
+    bus clocks.  This implementation allows pmac6100
     to Gestalt itself properly (the boot ROM counts
     decrementer ticks vs. instruction execution).
 -------------------------------------------------*/
@@ -512,12 +526,14 @@ void ppc_device::set_decrementer(uint32_t newdec)
 uint32_t ppc601_device::get_decrementer()
 {
 	const int64_t cycles_until_zero = (int64_t)m_dec_zero_cycles - (int64_t)total_cycles();
-	return (uint32_t)(cycles_until_zero * 1'000'000'000LL / clock());
+	const int64_t rate = int64_t(c_rtc_clock) * 128;
+	return (uint32_t)(cycles_until_zero * rate / clock());
 }
 
 void ppc601_device::set_decrementer(uint32_t newdec)
 {
-	m_dec_zero_cycles = total_cycles() + (uint64_t)newdec * clock() / 1'000'000'000;
+	const uint64_t rate = uint64_t(c_rtc_clock) * 128;
+	m_dec_zero_cycles = total_cycles() + (uint64_t)newdec * clock() / rate;
 	m_decrementer_int_timer->adjust(cycles_to_attotime(m_dec_zero_cycles - total_cycles()));
 }
 
@@ -527,7 +543,7 @@ TIMER_CALLBACK_MEMBER(ppc601_device::decrementer_int_callback)
 	m_core->irq_pending |= 0x02;
 
 	// advance by another full tick
-	m_dec_zero_cycles += ((uint64_t)1 << 32) * clock() / 1'000'000'000;
+	m_dec_zero_cycles += ((uint64_t)1 << 32) * clock() / (uint64_t(c_rtc_clock) * 128);
 	m_decrementer_int_timer->adjust(cycles_to_attotime(m_dec_zero_cycles - total_cycles()));
 }
 
@@ -569,6 +585,7 @@ void ppc_device::device_start()
 	m_entry = nullptr;
 	m_nocode = nullptr;
 	m_out_of_cycles = nullptr;
+	m_bus_retry = nullptr;
 	m_tlb_mismatch = nullptr;
 	m_swap_tgpr = nullptr;
 	for (auto &lsw : m_lsw)
@@ -801,6 +818,7 @@ void ppc_device::device_start()
 	{
 		save_item(NAME(m_core->mmu603_cmp));
 		save_item(NAME(m_core->mmu603_hash));
+		save_item(NAME(m_core->mmu603_key));
 		save_item(NAME(m_core->mmu603_r));
 	}
 	save_item(NAME(m_core->irq_pending));
@@ -844,13 +862,13 @@ void ppc_device::device_start()
 	state_add(PPC_DEC,   "DEC", m_debugger_temp).callimport().callexport().formatstr("%08X");
 
 	for (int regnum = 0; regnum < 16; regnum++)
-		state_add(PPC_SR0 + regnum, string_format("SR%d", regnum).c_str(), m_core->sr[regnum]).formatstr("%08X");
+		state_add(PPC_SR0 + regnum, string_format("SR%d", regnum), m_core->sr[regnum]).formatstr("%08X");
 
 	for (int regnum = 0; regnum < 32; regnum++)
-		state_add(PPC_R0 + regnum, string_format("R%d", regnum).c_str(), m_core->r[regnum]).formatstr("%08X");
+		state_add(PPC_R0 + regnum, string_format("R%d", regnum), m_core->r[regnum]).formatstr("%08X");
 
 	for (int regnum = 0; regnum < 32; regnum++)
-		state_add(PPC_F0 + regnum, string_format("F%d", regnum).c_str(), m_core->f[regnum]).formatstr("%12s");
+		state_add(PPC_F0 + regnum, string_format("F%d", regnum), m_core->f[regnum]).formatstr("%12s");
 	state_add(PPC_FPSCR, "FPSCR", m_core->fpscr).formatstr("%08X");
 
 	state_add(STATE_GENPC, "GENPC", m_core->pc).noshow();
@@ -951,6 +969,8 @@ void ppc_device::device_start()
 		static_generate_entry_point();
 		static_generate_nocode_handler();
 		static_generate_out_of_cycles();
+		if (m_drcoptions & PPCDRC_BUS_RETRY)
+			static_generate_bus_retry();
 		static_generate_tlb_mismatch();
 		// 601 has a unified cache, so code can self-modify without icbi.
 		// PPCDRC_STRICT_601_SELF_MODIFY causes the write accessors to watch for stores
@@ -1222,6 +1242,9 @@ void ppc_device::device_stop()
 
 void ppc_device::device_reset()
 {
+	// discard any pending retry request (this getter clears the flag)
+	access_to_be_redone();
+
 	/* initialize the OEA state */
 	if (m_cap & PPCCAP_OEA)
 	{
@@ -1428,10 +1451,10 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, bool debug
 	}
 #endif
 
-	/* look up the segment register */
+	// look up the segment register; a fetch from a no-execute segment is an ISI with SRR1[3] set
 	segreg = m_core->sr[address >> 28];
 	if (transtype == TR_FETCH && (segreg & 0x10000000))
-		return DSISR_PROTECTED | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
+		return DSISR_NOEXEC;
 
 	/* check for memory-forced I/O */
 	if (m_cap & PPCCAP_MFIOC)
@@ -1452,17 +1475,43 @@ uint32_t ppc_device::ppccom_translate_address_internal(int intention, bool debug
 	hashmask = ((m_core->spr[SPROEA_SDR1] & 0x1ff) << 16) | 0xffff;
 	hash = (segreg & 0x7ffff) ^ ((address >> 12) & 0xffff);
 
-	/* if we're simulating the 603 MMU, fill in the data and stop here */
+	// If we're simulating the 603 MMU, fill in the table search registers and stop here
 	if (m_cap & PPCCAP_603_MMU)
 	{
 		uint32_t entry = vtlb_table()[address >> 12];
 		m_core->mmu603_cmp = 0x80000000 | ((segreg & 0xffffff) << 7) | (0 << 6) | ((address >> 22) & 0x3f);
 		m_core->mmu603_hash[0] = hashbase | ((hash << 6) & hashmask);
 		m_core->mmu603_hash[1] = hashbase | ((~hash << 6) & hashmask);
+		m_core->mmu603_key = (segreg >> (29 + transpriv)) & 1;   // SRR1[KEY]: SR[Ks] for a supervisor access, SR[Kp] for a user access
+
+		// Entries loaded by tlbld/tlbli carry per-mode permissions derived from the PTE's PP bits and the segment key.
+		// The 603 has separate instruction and data TLBs that software reloads independently (and possibly from
+		// different page tables), so an entry only answers for the TLB that loaded it: a page held by the other
+		// TLB alone still takes the miss exception so the software table search can run.
 		if ((entry & (FLAG_FIXED | FLAG_VALID)) == (FLAG_FIXED | FLAG_VALID))
 		{
-			address = (entry & 0xfffff000) | (address & 0x00000fff);
-			return 0x001;
+			if (entry & ((transtype == TR_FETCH) ? VTLB_603_ITLB : VTLB_603_DTLB))
+			{
+				if (entry & (1 << (intention & (TR_TYPE | TR_USER))))
+				{
+					address = (entry & 0xfffff000) | (address & 0x00000fff);
+					return 0x001;
+				}
+
+				// A store to a page whose C bit is clear takes the TLB miss on store exception so the handler
+				// can check protection and set C (603e User's Manual Table 5-4).
+				// Anything else the hardware refuses on a TLB hit is a page protection violation (Table 5-3)
+				if (transtype == TR_WRITE && !(entry & VTLB_603_CHANGED))
+					return DSISR_NOT_FOUND | DSISR_STORE;
+				return DSISR_PROTECTED | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
+			}
+
+			// let the debugger see through the other TLB's translation
+			if (debug)
+			{
+				address = (entry & 0xfffff000) | (address & 0x00000fff);
+				return 0x001;
+			}
 		}
 		return DSISR_NOT_FOUND | ((transtype == TR_WRITE) ? DSISR_STORE : 0);
 	}
@@ -1532,6 +1581,18 @@ bool ppc_device::memory_translate(int spacenum, int intention, offs_t &address, 
 
 
 /*-------------------------------------------------
+    ppccom_fetch_intention - translation intent for an
+    instruction fetch at the current privilege
+    level
+-------------------------------------------------*/
+
+int ppc_device::ppccom_fetch_intention() const
+{
+	return TR_FETCH | ((m_core->msr & MSR_PR) ? TR_USER : 0);
+}
+
+
+/*-------------------------------------------------
     ppccom_tlb_fill - handle a missing TLB entry
 -------------------------------------------------*/
 
@@ -1540,8 +1601,9 @@ void ppc_device::ppccom_tlb_fill()
 	offs_t address = m_core->param0;
 	if (ppccom_translate_address_internal(m_core->param1, false, address) > 1)
 	{
-		// The page tables no longer translate this address, so kick it out of the TLB
-		vtlb_flush_address(m_core->param0);
+		// The page tables no longer translate this address, so kick it out of the TLB, except on the 603.
+		if (!(m_cap & PPCCAP_603_MMU))
+			vtlb_flush_address(m_core->param0);
 		return;
 	}
 	vtlb_fill(m_core->param0, address, m_core->param1);
@@ -1570,7 +1632,7 @@ void ppc_device::ppccom_tlb_flush()
 void ppc_device::ppc_check_translation(ppc_entry_check *chk)
 {
 	offs_t addr = chk->pc;
-	if (ppccom_translate_address_internal(TR_FETCH, false, addr) <= 1 && addr == chk->physpc)
+	if (ppccom_translate_address_internal(ppccom_fetch_intention(), false, addr) <= 1 && addr == chk->physpc)
 	{
 		// mapping unchanged; the block stays valid for the current generation
 		chk->generation = m_core->m_translation_generation;
@@ -1640,6 +1702,12 @@ void ppc_device::ppccom_execute_mtsr()
 	{
 		m_core->sr[seg] = newval;
 		vtlb_flush_dynamic();
+
+		// 603 TLB entries are tagged with the VSID, so a new VSID retires the segment's fixed entries.
+		if (m_cap & PPCCAP_603_MMU)
+		{
+			vtlb_flush_fixed(seg << 28, 0xf000'0000);
+		}
 
 		// Only a change to the VSID (or the T bit) actually remaps the segment.
 		// If that happens, bump the translation generation.
@@ -1739,12 +1807,12 @@ void ppc_device::ppccom_get_dsisr()
 void ppc_device::ppccom_dcbz_check()
 {
 	/*
-		HACK: Mac OS 9 uses DCBZ to pre-warm a cache line over the ATI Rage,
-		but it doesn't expect it to flush out to the hardware until it's written
-		non-zero data there.  Fixing this correctly needs proper data cache
-		emulation, which is under investigation.  Until then, this allows us to
-		deal with other issues and since it's gated by PPCDRC_MACOS_CACHE_HACK,
-		the blast radius is confined solely to slotted PCI PowerMacs.
+	    HACK: Mac OS 9 uses DCBZ to pre-warm a cache line over the ATI Rage,
+	    but it doesn't expect it to flush out to the hardware until it's written
+	    non-zero data there.  Fixing this correctly needs proper data cache
+	    emulation, which is under investigation.  Until then, this allows us to
+	    deal with other issues and since it's gated by PPCDRC_MACOS_CACHE_HACK,
+	    the blast radius is confined solely to slotted PCI PowerMacs.
 	*/
 	offs_t address = m_core->param0;
 	m_core->param1 = 1;
@@ -1764,12 +1832,19 @@ void ppc_device::ppccom_dcbz_check()
 void ppc_device::ppccom_execute_tlbie()
 {
 	// The 603/604/750 TLBs are indexed by the low bits of the effective page index alone
-	// (EA[14-19] on the 750), so tlbie invalidates that whole class.  Mac OS X aliases
-	// user pages through its copyin/copyout window and expects the tlbie of the user
-	// address to flush the alias as well.
-	for (uint32_t seg = 0; seg < 16; seg++)
+	// (EA[15-19] on the 603, EA[14-19] on the 750), so tlbie invalidates that whole class.
+	// Mac OS X aliases user pages through its copyin/copyout window and expects the tlbie
+	// of the user address to flush the alias as well.
+	if (m_cap & PPCCAP_603_MMU)
 	{
-		vtlb_flush_address((m_core->param0 & 0x0fffffff) | (seg << 28));
+		vtlb_flush_fixed(m_core->param0, 0x0001f000);
+	}
+	else
+	{
+		for (uint32_t seg = 0; seg < 16; seg++)
+		{
+			vtlb_flush_address((m_core->param0 & 0x0fffffff) | (seg << 28));
+		}
 	}
 
 	// A page table entry for this page may have changed; if code was compiled
@@ -1806,24 +1881,80 @@ void ppc_device::ppccom_execute_tlbia()
 
 void ppc_device::ppccom_execute_tlbl()
 {
-	uint32_t address = m_core->param0;
-	int isitlb = m_core->param1;
-	vtlb_entry flags;
-	int entrynum;
+	uint32_t const address = m_core->param0;
+	int const isitlb = m_core->param1;
 
 	if (m_flavor == PPC_MODEL_602) // TODO
 		return;
 
 	// determine entry number; we use machine().rand() for associativity
-	entrynum = ((address >> 12) & 0x1f) | (machine().rand() & 0x20) | (isitlb ? 0x40 : 0);
+	int const entrynum = ((address >> 12) & 0x1f) | (machine().rand() & 0x20) | (isitlb ? 0x40 : 0);
 
-	// Determine the access flags, for both supervisor and user modes.
-	flags = FLAG_VALID | READ_ALLOWED | FETCH_ALLOWED | USER_READ_ALLOWED | USER_FETCH_ALLOWED;
-	if (m_core->spr[SPR603_RPA] & 0x80)
-		flags |= WRITE_ALLOWED | USER_WRITE_ALLOWED;
+	// The real TLB stores the PTE's PP bits and applies the segment's Ks/Kp key at access time.
+	// The VTLB holds per-mode permissions instead, so derive them here from the RPA and the segment
+	// register of the missed address.
+	uint32_t const rpa = m_core->spr[SPR603_RPA];
+	uint32_t const segreg = m_core->sr[address >> 28];
+	uint8_t const pp = rpa & 3;
+	uint8_t const ks = (segreg >> 30) & 1;
+	uint8_t const kp = (segreg >> 29) & 1;
+
+	// tlbli only fills the instruction TLB and tlbld only the data TLB, so an entry grants just the
+	// accesses its own TLB is asked about.
+	vtlb_entry flags = FLAG_VALID;
+	if (isitlb)
+	{
+		flags |= VTLB_603_ITLB;
+		if (page_access_allowed(TR_READ, ks, pp))
+		{
+			flags |= FETCH_ALLOWED;
+		}
+		if (page_access_allowed(TR_READ, kp, pp))
+		{
+			flags |= USER_FETCH_ALLOWED;
+		}
+	}
+	else
+	{
+		flags |= VTLB_603_DTLB;
+		if (page_access_allowed(TR_READ, ks, pp))
+		{
+			flags |= READ_ALLOWED;
+		}
+		if (page_access_allowed(TR_READ, kp, pp))
+		{
+			flags |= USER_READ_ALLOWED;
+		}
+
+		// A store to a page with C = 0 must take the TLB miss on store exception so the handler can set C.
+		if (rpa & 0x80)
+		{
+			flags |= VTLB_603_CHANGED;
+			if (page_access_allowed(TR_WRITE, ks, pp))
+			{
+				flags |= WRITE_ALLOWED;
+			}
+			if (page_access_allowed(TR_WRITE, kp, pp))
+			{
+				flags |= USER_WRITE_ALLOWED;
+			}
+		}
+	}
+
+	// The VTLB has a single entry per effective page, so the instruction and data TLB entries for a page
+	// share it.  Keep the other TLB's permissions when it already maps the page to the same physical page;
+	// otherwise the new translation takes over and the other TLB simply misses again.
+	vtlb_entry const old = vtlb_table()[address >> 12];
+	if (((old & (FLAG_FIXED | FLAG_VALID)) == (FLAG_FIXED | FLAG_VALID)) && (((old ^ rpa) & 0xfffff000) == 0))
+	{
+		vtlb_entry const other = isitlb
+				? (VTLB_603_DTLB | VTLB_603_CHANGED | READ_ALLOWED | WRITE_ALLOWED | USER_READ_ALLOWED | USER_WRITE_ALLOWED)
+				: (VTLB_603_ITLB | FETCH_ALLOWED | USER_FETCH_ALLOWED);
+		flags |= old & other;
+	}
 
 	// load the entry
-	vtlb_load(entrynum, 1, address, (m_core->spr[SPR603_RPA] & 0xfffff000) | flags);
+	vtlb_load(entrynum, 1, address, (rpa & 0xfffff000) | flags);
 }
 
 
@@ -1903,15 +2034,11 @@ void ppc_device::ppccom_execute_mfspr()
 				return;
 
 			case SPR601_RTCUR_PWR:
-				m_core->param1 = (total_cycles() - m_rtc_zero_cycles) / clock();
+				m_core->param1 = get_rtc() / 1'000'000'000;
 				return;
 
 			case SPR601_RTCLR_PWR:
-				{
-					// get fractional seconds and convert to nanoseconds
-					const uint64_t remainder = (total_cycles() - m_rtc_zero_cycles) % clock();
-					m_core->param1 = (remainder * 1'000'000'000ULL) / clock();
-				}
+				m_core->param1 = get_rtc() % 1'000'000'000;
 				return;
 		}
 	}
@@ -2088,6 +2215,17 @@ void ppc_device::ppccom_execute_mtspr()
 						{
 							remapped = (((oldupper ^ newupper) & 0xfffe'1fff) | ((oldlower ^ newlower) & 0xfffe'0000)) != 0;
 						}
+					}
+
+					// A 603 BAT hit takes priority over the TLB, but the VTLB is consulted before the BATs, so
+					// fixed entries loaded by tlbld/tlbli inside the BAT's new range would keep shadowing it.
+					// Only the upper register sets the range and the valid bits.
+					const bool is_bat_upper = (m_core->param0 != SPROEA_SDR1) && !(m_core->param0 & 1);
+					if ((m_cap & PPCCAP_603_MMU) && is_bat_upper && (m_core->param1 & 0x3)
+							&& (((m_core->spr[m_core->param0] ^ m_core->param1) & 0xfffe'1fff) != 0))
+					{
+						const uint32_t newupper = m_core->param1;
+						vtlb_flush_fixed(newupper, (~newupper << 15) & 0xfffe'0000);
 					}
 
 					m_core->spr[m_core->param0] = m_core->param1;

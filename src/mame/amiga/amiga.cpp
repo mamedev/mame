@@ -2252,6 +2252,10 @@ static void pcmcia_devices(device_slot_interface &device)
 // basic elements common to all amigas
 void amiga_state::amiga_base(machine_config &config)
 {
+	// NTSC E is the faster of the two, so its period is a fine enough quantum
+	// for both - configs switch between PAL and NTSC in either direction later
+	config.set_maximum_quantum(attotime::from_hz(amiga_state::CLK_E_NTSC));
+
 	// video
 	pal_video(config);
 
@@ -2267,7 +2271,7 @@ void amiga_state::amiga_base(machine_config &config)
 	m_cia_0->pb_rd_callback().set("cent_data_in", FUNC(input_buffer_device::read));
 	m_cia_0->pb_wr_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_cia_0->pc_wr_callback().set(m_centronics, FUNC(centronics_device::write_strobe));
-	m_cia_0->sp_wr_callback().set("kbd", FUNC(amiga_keyboard_bus_device::kdat_in_w)).invert();
+	m_cia_0->sp_wr_callback().set("kbd", FUNC(amiga_keyboard_bus_device::kdat_in_w));
 
 	MOS8520(config, m_cia_1, amiga_state::CLK_E_PAL);
 	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
@@ -2313,7 +2317,7 @@ void amiga_state::amiga_base(machine_config &config)
 	rs232.cts_handler().set(FUNC(amiga_state::rs232_cts_w));
 
 	// centronics
-	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
 	m_centronics->set_data_input_buffer("cent_data_in");
 	m_centronics->ack_handler().set(FUNC(amiga_state::centronics_ack_w));
 	m_centronics->busy_handler().set(FUNC(amiga_state::centronics_busy_w));

@@ -534,8 +534,13 @@ void spi_sdcard_device::do_command()
 			m_data[1] = 0xff;
 			m_data[2] = 0xfe;
 			std::copy(std::begin(m_csd), std::end(m_csd), &m_data[3]);
-
-			send_data(3 + std::size(m_csd), SD_STATE_STBY);
+			{
+				// the CSD is a data block and carries a CRC16 like any other (CMD10
+				// below does the same); a host that keeps CRC on rejects it otherwise
+				util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], std::size(m_csd), 0);
+				put_u16be(&m_data[3 + std::size(m_csd)], crc16);
+			}
+			send_data(3 + std::size(m_csd) + 2, SD_STATE_STBY);
 			break;
 
 		case 10: // CMD10 - SEND_CID

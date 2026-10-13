@@ -12,7 +12,7 @@ Software, the chess engine is weaker than the one in SciSys Mark V. The hardware
 and technology was sold to Fidelity a couple of years later (fphantom in MAME).
 
 At boot-up, the computer will do a self-test. Although the user can start playing
-immediately, it may be a big distracting. So, just fast forward MAME for a while
+immediately, it may be a bit distracting. So, just fast forward MAME for a while
 (hold INS key on Windows) before starting a new game.
 
 After the user captures a piece, select the captured piece from the MAME sensorboard

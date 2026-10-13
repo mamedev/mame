@@ -311,23 +311,23 @@ void ky3211_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			const int dsty_prev = dsty;
 
 			const int fy = integer_part(srcy);
-			if (fy > sprite_cliprect.max_y)
+			if (fy > sprite_cliprect.bottom())
 				break;
-			if (fy >= sprite_cliprect.min_y)
+			if (fy >= sprite_cliprect.top())
 			{
 				// left to right
 				srcx = 0;
 				for (;;)
 				{
 					int fx = integer_part(srcx);
-					if (fx > sprite_cliprect.max_x)
+					if (fx > sprite_cliprect.right())
 						break;
-					if (fx >= sprite_cliprect.min_x)
+					if (fx >= sprite_cliprect.left())
 					{
 						const int px = integer_part(dstx);
 						const int py = integer_part(dsty);
 
-						if (px >= cliprect.min_x && px <= cliprect.max_x && py >= cliprect.min_y && py <= cliprect.max_y)
+						if (cliprect.contains(px, py))
 						{
 							const u16 pen = src[fy * src_rowpixels + fx];
 							if (pen & penmask)

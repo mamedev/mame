@@ -78,10 +78,7 @@ public:
 		m_palette(*this, "palette"),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_ram(*this, RAM_TAG),
-		m_floppy0(*this, MB8877_TAG":0"),
-		m_floppy1(*this, MB8877_TAG":1"),
-		m_floppy2(*this, MB8877_TAG":2"),
-		m_floppy3(*this, MB8877_TAG":3"),
+		m_floppy(*this, MB8877_TAG":%u", 0U),
 		m_clock_sio(*this, CLOCK_SIO_TAG),
 		m_timer_ack(*this, TIMER_ACK_TAG),
 		m_timer_rst(*this, TIMER_RST_TAG),
@@ -90,6 +87,8 @@ public:
 		m_sasi_data_in(*this, "scsi_data_in"),
 		m_sasi_ctrl_in(*this, "scsi_ctrl_in"),
 		m_rom(*this, Z80_TAG),
+		m_rom_view(*this, "rom_view"),
+		m_bank_view(*this, "bank_view"),
 		m_video_ram(*this, "video_ram"),
 		m_attr_ram(*this, "attr_ram", V1050_VIDEORAM_SIZE, ENDIANNESS_LITTLE),
 		m_int_mask(0),
@@ -186,10 +185,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
+	required_device_array<floppy_connector, 4> m_floppy;
 	required_device<clock_device> m_clock_sio;
 	required_device<timer_device> m_timer_ack;
 	required_device<timer_device> m_timer_rst;
@@ -198,6 +194,8 @@ private:
 	required_device<input_buffer_device> m_sasi_data_in;
 	required_device<input_buffer_device> m_sasi_ctrl_in;
 	required_memory_region m_rom;
+	memory_view m_rom_view;
+	memory_view m_bank_view;
 	required_shared_ptr<uint8_t> m_video_ram;
 	memory_share_creator<uint8_t> m_attr_ram;
 

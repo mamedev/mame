@@ -56,11 +56,6 @@
 #define PPC603_FIXED_TLB_ENTRIES    128
 
 
-// cycle parameters
-#define POWERPC_COUNT_READ_TBL      100
-#define POWERPC_COUNT_READ_DEC      100
-
-
 // internal capabilities flags
 #define PPCCAP_OEA                  0x01        // TRUE if we conform to the OEA
 #define PPCCAP_VEA                  0x02        // TRUE if we conform to the VEA
@@ -374,6 +369,12 @@ enum
 #define DSISR_NO_SEGMENT    0x00200000      /* DSI: no segment match found (64-bit only) */
 #define DSISR_INVALID_ECWX  0x00100000      /* DSI: ECIWX or ECOWX used with EAR[E] = 0 */
 #define DSISR_INSTRUCTION   0x000fffff      /* align: instruction decoding bits FIXME: mask/shift depends on addressing mode */
+#define DSISR_NOEXEC        0x10000000      /* ISI only: fetch from a no-execute segment (SRR1[3]) */
+
+// extra VTLB entry bits used by the 603 software-loaded TLBs (bits 8-11 of an entry are free)
+#define VTLB_603_CHANGED    0x00000100      /* The PTE's C bit was set when the entry was loaded */
+#define VTLB_603_ITLB       0x00000200      /* The entry was loaded into the instruction TLB by tlbli */
+#define VTLB_603_DTLB       0x00000400      /* The entry was loaded into the data TLB by tlbld */
 
 
 // PowerPC 4XX IRQ bits

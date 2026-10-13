@@ -37,6 +37,9 @@ static constexpr u32 C31M = (C15M * 2);
 
 static constexpr u32 DMA_IRQ_MASK = 0x000007ff;
 
+// The SCC cell's PCLK is 3.672 MHz per the ERS; the LocalTalk timer counts it down divided by 4
+static constexpr u32 LT_TIMER_HZ = 3'672'000 / 4;
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -73,7 +76,7 @@ DEFINE_DEVICE_TYPE(PADDINGTON, paddington_device, "paddington", "Apple Paddingto
 */
 void macio_device::base_map(address_map &map)
 {
-	map(0x00000, 0x00fff).rw(FUNC(grandcentral_device::macio_r), FUNC(grandcentral_device::macio_w));
+	map(0x00000, 0x00fff).rw(FUNC(macio_device::macio_r), FUNC(macio_device::macio_w));
 	map(0x08000, 0x0801f).m(m_dma_scsi0, FUNC(dbdma_device::map));
 	map(0x08100, 0x0811f).m(m_dma_floppy, FUNC(dbdma_device::map));
 	map(0x08400, 0x0841f).m(m_dma_sccatx, FUNC(dbdma_device::map));
@@ -82,11 +85,13 @@ void macio_device::base_map(address_map &map)
 	map(0x08700, 0x0871f).m(m_dma_sccbrx, FUNC(dbdma_device::map));
 	map(0x08800, 0x0881f).m(m_dma_audio_out, FUNC(dbdma_device::map));
 	map(0x08900, 0x0891f).m(m_dma_audio_in, FUNC(dbdma_device::map));
-	map(0x12000, 0x12fff).rw(FUNC(grandcentral_device::scc_r), FUNC(grandcentral_device::scc_w));
-	map(0x13000, 0x13fff).rw(FUNC(grandcentral_device::scc_macrisc_r), FUNC(grandcentral_device::scc_macrisc_w));
-	map(0x14000, 0x140ff).rw(FUNC(grandcentral_device::codec_r), FUNC(grandcentral_device::codec_w));
-	map(0x15000, 0x15fff).rw(FUNC(grandcentral_device::fdc_r), FUNC(grandcentral_device::fdc_w));
-	map(0x16000, 0x17fff).rw(FUNC(grandcentral_device::mac_via_r), FUNC(grandcentral_device::mac_via_w));
+	map(0x12000, 0x12fff).rw(FUNC(macio_device::scc_r), FUNC(macio_device::scc_w));
+	map(0x13000, 0x13fff).rw(FUNC(macio_device::scc_macrisc_r), FUNC(macio_device::scc_macrisc_w));
+	map(0x13080, 0x130bf).rw(FUNC(macio_device::ltpc_r), FUNC(macio_device::ltpc_w));
+	map(0x13100, 0x13103).rw(FUNC(macio_device::lt_timer_r), FUNC(macio_device::lt_timer_w));
+	map(0x14000, 0x140ff).rw(FUNC(macio_device::codec_r), FUNC(macio_device::codec_w));
+	map(0x15000, 0x15fff).rw(FUNC(macio_device::fdc_r), FUNC(macio_device::fdc_w));
+	map(0x16000, 0x17fff).rw(FUNC(macio_device::mac_via_r), FUNC(macio_device::mac_via_w));
 	map(0x1a000, 0x1afff).rw(FUNC(macio_device::iobus_r<&macio_device::read_iobus_a>), FUNC(macio_device::iobus_w<&macio_device::write_iobus_a>));
 	map(0x1b000, 0x1bfff).rw(FUNC(macio_device::iobus_r<&macio_device::read_iobus_b>), FUNC(macio_device::iobus_w<&macio_device::write_iobus_b>));
 	map(0x1c000, 0x1cfff).rw(FUNC(macio_device::iobus_r<&macio_device::read_iobus_c>), FUNC(macio_device::iobus_w<&macio_device::write_iobus_c>));
@@ -96,9 +101,13 @@ void macio_device::base_map(address_map &map)
 void grandcentral_device::map(address_map &map)
 {
 	base_map(map);
+	map(0x08200, 0x0821f).m(m_dma_enet_tx, FUNC(dbdma_device::map));
+	map(0x08300, 0x0831f).m(m_dma_enet_rx, FUNC(dbdma_device::map));
 	map(0x08a00, 0x08a1f).m(m_dma_scsi1, FUNC(dbdma_device::map));
 	map(0x10000, 0x100ff).rw(FUNC(grandcentral_device::scsi0_r), FUNC(grandcentral_device::scsi0_w));
+	map(0x11000, 0x111ff).rw(FUNC(grandcentral_device::enet_r), FUNC(grandcentral_device::enet_w));
 	map(0x18000, 0x180ff).rw(FUNC(grandcentral_device::scsi1_r), FUNC(grandcentral_device::scsi1_w));
+	map(0x19000, 0x1907f).r(FUNC(grandcentral_device::enet_prom_r));
 	map(0x1e000, 0x1efff).rw(FUNC(grandcentral_device::iobus_r<&grandcentral_device::read_iobus_e>), FUNC(grandcentral_device::iobus_w<&grandcentral_device::write_iobus_e>));
 	map(0x1f000, 0x1ffff).rw(FUNC(grandcentral_device::iobus_r<&grandcentral_device::read_iobus_f>), FUNC(grandcentral_device::iobus_w<&grandcentral_device::write_iobus_f>));
 }
@@ -143,6 +152,7 @@ void macio_device::device_add_mconfig(machine_config &config)
 	DBDMA_CHANNEL(config, m_dma_sccatx, 0);
 	m_dma_sccatx->set_width(1);
 	m_dma_sccatx->irq_callback().set(FUNC(macio_device::set_irq_line<4>));
+	m_dma_sccatx->dma_w().set(FUNC(macio_device::scc_tx_dma_w));
 
 	DBDMA_CHANNEL(config, m_dma_sccarx, 0);
 	m_dma_sccarx->set_width(1);
@@ -151,6 +161,7 @@ void macio_device::device_add_mconfig(machine_config &config)
 	DBDMA_CHANNEL(config, m_dma_sccbtx, 0);
 	m_dma_sccbtx->set_width(1);
 	m_dma_sccbtx->irq_callback().set(FUNC(macio_device::set_irq_line<6>));
+	m_dma_sccbtx->dma_w().set(FUNC(macio_device::scc_tx_dma_w));
 
 	DBDMA_CHANNEL(config, m_dma_sccbrx, 0);
 	m_dma_sccbrx->set_width(1);
@@ -206,6 +217,18 @@ void grandcentral_device::device_add_mconfig(machine_config &config)
 	m_dma_scsi1->irq_callback().set(FUNC(macio_device::set_irq_line<10>));
 	m_dma_scsi1->dma_r().set(FUNC(grandcentral_device::scsi1_dma_r));
 	m_dma_scsi1->dma_w().set(FUNC(grandcentral_device::scsi1_dma_w));
+
+	DBDMA_CHANNEL(config, m_dma_enet_tx, 0);
+	m_dma_enet_tx->set_width(2);
+	m_dma_enet_tx->irq_callback().set(FUNC(macio_device::set_irq_line<2>));
+	m_dma_enet_tx->dma_w().set(FUNC(grandcentral_device::enet_dma_w));
+	m_dma_enet_tx->eof_callback().set(FUNC(grandcentral_device::enet_dma_eof_w));
+
+	// receive is byte-wide so an odd-length frame and its four status bytes pack together
+	DBDMA_CHANNEL(config, m_dma_enet_rx, 0);
+	m_dma_enet_rx->set_width(1);
+	m_dma_enet_rx->irq_callback().set(FUNC(macio_device::set_irq_line<3>));
+	m_dma_enet_rx->dma_r().set(FUNC(grandcentral_device::enet_dma_r));
 }
 
 void ohare_device::device_add_mconfig(machine_config &config)
@@ -230,17 +253,11 @@ void ohare_device::device_add_mconfig(machine_config &config)
 	m_dma_scsi0->dma_r().set(m_mesh, FUNC(mesh_device::dma8_r));
 	m_dma_scsi0->dma_w().set(m_mesh, FUNC(mesh_device::dma8_w));
 
-	// The MESH's command done, exception, and error outputs show up in the SCSI
-	// channel's ChannelStatus so a channel program can wait for a command to
-	// finish and branch on how it went.  The lines are active low, so a bit reads
-	// 1 while its condition is clear.
-	//
 	// The O'Hare/Heathrow ERS tables give s7 = MESHCmdDone_L, s6 = MESHException_L,
 	// and s5 = MESHError_L, but that ordering is wrong: Apple's own driver source
 	// (apple-oss-distributions/AppleMESH, mesh.cpp) sets up the channel with
 	//     waitSelect   = 0x20002000;  /* Wait until command done      */
 	//     branchSelect = 0xC000C000;  /* Br if Exc or Err             */
-	// i.e. it waits on s5 for completion and branches on s6|s7 for trouble.
 	// (Apple only ever tests exception and error together, so which of s6/s7 is
 	// which is not determined; we keep the ERS's relative order for those two.)
 	m_mesh->cmd_done_handler_cb().set([this](int state) { m_dma_scsi0->status_bit_w(5, !state); });
@@ -302,7 +319,12 @@ macio_device::macio_device(const machine_config &mconfig, device_type type, cons
 	m_dma_audio_in(*this, "dma_audin"),
 	m_dma_audio_out(*this, "dma_audout"),
 	m_cur_floppy(nullptr),
-	m_hdsel(0)
+	m_hdsel(0),
+	m_system_id(0),
+	m_lt_timer_count(0),
+	m_lt_timer_start(attotime::zero),
+	m_scc_rec_count(8),
+	m_ltpc_start{ 0, 0 }
 {
 	m_toggle = 0;
 }
@@ -310,6 +332,13 @@ macio_device::macio_device(const machine_config &mconfig, device_type type, cons
 grandcentral_device::grandcentral_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	macio_device(mconfig, GRAND_CENTRAL, tag, owner, clock),
 	m_dma_scsi1(*this, "dma_scsi1"),
+	m_dma_enet_tx(*this, "dma_enet_tx"),
+	m_dma_enet_rx(*this, "dma_enet_rx"),
+	m_mace(*this, finder_base::DUMMY_TAG),
+	read_enet(*this, 0xff),
+	read_enet_prom(*this, 0xff),
+	write_enet(*this),
+	m_enet_tx_eof(false),
 	read_scsi0(*this, 0),
 	write_scsi0(*this),
 	read_scsi0_dma(*this, 0),
@@ -381,6 +410,10 @@ void macio_device::common_init()
 	recalc_irqs();
 
 	save_item(NAME(m_hdsel));
+	save_item(NAME(m_lt_timer_count));
+	save_item(NAME(m_lt_timer_start));
+	save_item(NAME(m_scc_rec_count));
+	save_item(NAME(m_ltpc_start));
 	save_item(NAME(m_InterruptEvents));
 	save_item(NAME(m_InterruptMask));
 	save_item(NAME(m_InterruptLevels));
@@ -397,6 +430,8 @@ void grandcentral_device::device_start()
 	status = 0x0200;
 
 	m_dma_scsi1->set_address_space(get_pci_busmaster_space());
+	m_dma_enet_tx->set_address_space(get_pci_busmaster_space());
+	m_dma_enet_rx->set_address_space(get_pci_busmaster_space());
 }
 
 void ohare_device::ohare_start()
@@ -415,7 +450,7 @@ void ohare_device::ohare_start()
 void ohare_device::device_start()
 {
 	common_init();
-	add_map(0x80000, M_MEM, FUNC(grandcentral_device::map));
+	add_map(0x80000, M_MEM, FUNC(ohare_device::map));
 	set_ids(0x106b0007, 0x01, 0xff0000, 0x000000);
 	ohare_start();
 }
@@ -443,6 +478,17 @@ void paddington_device::device_start()
 void macio_device::device_reset()
 {
 	m_hdsel = 0;
+	m_lt_timer_count = 0;
+	m_lt_timer_start = attotime::zero;
+	m_scc_rec_count = 8;
+	m_ltpc_start[0] = m_ltpc_start[1] = 0;
+	m_dma_sccatx->status_bit_w(5, 0);
+	m_dma_sccbtx->status_bit_w(5, 0);
+
+	// HACK: the SCC transmit channels are always ready to take data for now.
+	// This fixes the LocalTalk startup test on the Alchemy machines (and probably others in the future).
+	m_dma_sccatx->drq_w(1);
+	m_dma_sccbtx->drq_w(1);
 }
 
 u8 macio_device::via_in_a()
@@ -586,6 +632,8 @@ u32 macio_device::macio_r(offs_t offset)
 			return m_InterruptMask;
 		case 0x2c:
 			return m_InterruptLevels;
+		case 0x34:  // ID: front panel, monitor, media bay, CPU/box ID
+			return m_system_id;
 	}
 	return 0;
 }
@@ -818,6 +866,89 @@ void macio_device::scc_macrisc_w(offs_t offset, u8 data)
 	}
 }
 
+// The SCC cell has an 8-bit countdown timer that isn't in the ERS register list.
+// Need to find Curio documentation if possible to get detail; this is inferred from the behavior.
+u8 macio_device::lt_timer_r(offs_t offset)
+{
+	if (offset != 0)
+	{
+		return 0;
+	}
+
+	const u64 elapsed = (machine().time() - m_lt_timer_start).as_ticks(LT_TIMER_HZ);
+	return (elapsed < m_lt_timer_count) ? (m_lt_timer_count - elapsed) : 0;
+}
+
+void macio_device::lt_timer_w(offs_t offset, u8 data)
+{
+	if (offset == 0)
+	{
+		m_lt_timer_count = data;
+		m_lt_timer_start = machine().time();
+	}
+}
+
+void macio_device::scc_tx_dma_w(u32 data)
+{
+}
+
+// LocalTalk support registers in the SCC cell: the SCC access recovery count, and the LTPC.
+// Setting a channel's Start bit arms the LTPC to watch TxD for the 16 ones of the abort
+// sequence that ends an LLAP frame; when it sees them it drops RTS and sets the channel's
+// Detect bit (DetectA is bit 1, DetectB is bit 0), which is also s5 of the transmit DBDMA
+// channel's status.  Detect stays set until Start is cleared.
+//
+// HACK: since transmitted data goes nowhere, the abort is reported as soon as the LTPC is armed.
+u8 macio_device::ltpc_r(offs_t offset)
+{
+	if (offset & 0xf)
+	{
+		return 0;
+	}
+
+	switch (offset >> 4)
+	{
+		case 0: // Rec Count
+			return m_scc_rec_count;
+
+		case 1: // Start A
+			return m_ltpc_start[0];
+
+		case 2: // Start B
+			return m_ltpc_start[1];
+
+		case 3: // Detect AB
+			return (m_ltpc_start[0] << 1) | m_ltpc_start[1];
+	}
+
+	return 0;
+}
+
+void macio_device::ltpc_w(offs_t offset, u8 data)
+{
+	if (offset & 0xf)
+	{
+		return;
+	}
+
+	switch (offset >> 4)
+	{
+		case 0: // Rec Count
+			m_scc_rec_count = data & 0x3f;
+			break;
+
+		case 1: // Start A
+			m_ltpc_start[0] = data & 1;
+			m_dma_sccatx->status_bit_w(5, m_ltpc_start[0]);
+			break;
+
+		case 2: // Start B
+			m_ltpc_start[1] = data & 1;
+			m_dma_sccbtx->status_bit_w(5, m_ltpc_start[1]);
+			break;
+	}
+}
+
 // O'Hare and later have a MESH SCSI controller on-chip
 u8 ohare_device::mesh_r(offs_t offset)
 {
@@ -996,6 +1127,59 @@ template <devcb_read32 grandcentral_device::*R> u32 grandcentral_device::iobus_r
 template <devcb_write32 grandcentral_device::*W> void grandcentral_device::iobus_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	(this->*W)(offset, data, mem_mask);
+}
+
+u8 grandcentral_device::enet_r(offs_t offset)
+{
+	return read_enet(offset >> 4);
+}
+
+void grandcentral_device::enet_w(offs_t offset, u8 data)
+{
+	write_enet(offset >> 4, data);
+}
+
+u8 grandcentral_device::enet_prom_r(offs_t offset)
+{
+	return read_enet_prom(offset >> 4);
+}
+
+// The MACE's receive frame status follows the frame through the FIFO.  Grand Central
+// packs those four bytes into memory right behind the data, then ends the INPUT command
+// so the residual count tells the driver where they are.
+u32 grandcentral_device::enet_dma_r()
+{
+	if (!m_mace)
+	{
+		return 0;
+	}
+
+	auto result = m_mace->rx_dma_r(0x00ff);
+	if (result.valid && !result.bytes)
+	{
+		// an overflowed frame is all status
+		result = m_mace->rx_dma_r(0x00ff);
+	}
+
+	if (result.frame_done)
+	{
+		m_dma_enet_rx->eof_w(1);
+	}
+	return result.data & 0xff;
+}
+
+void grandcentral_device::enet_dma_eof_w(int state)
+{
+	m_enet_tx_eof = bool(state);
+}
+
+void grandcentral_device::enet_dma_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// the MACE drops its request before the FIFO can fill, so it never turns a transfer down
+	if (m_mace && !m_mace->tx_dma_w(data, mem_mask, m_enet_tx_eof))
+	{
+		logerror("%s: MACE refused a transmit DMA transfer\n", tag());
+	}
 }
 
 u8 grandcentral_device::scsi0_r(offs_t offset)

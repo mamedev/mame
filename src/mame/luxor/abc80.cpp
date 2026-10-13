@@ -294,16 +294,16 @@ void tkn80_state::tkn80_mem(address_map &map)
 void abc80_state::abc80_io(address_map &map)
 {
 	map.unmap_value_high();
-	map.global_mask(0x17);
-	map(0x00, 0x00).rw(m_bus, FUNC(abcbus_slot_device::inp_r), FUNC(abcbus_slot_device::out_w));
-	map(0x01, 0x01).rw(m_bus, FUNC(abcbus_slot_device::stat_r), FUNC(abcbus_slot_device::cs_w));
-	map(0x02, 0x02).w(m_bus, FUNC(abcbus_slot_device::c1_w));
-	map(0x03, 0x03).w(m_bus, FUNC(abcbus_slot_device::c2_w));
-	map(0x04, 0x04).w(m_bus, FUNC(abcbus_slot_device::c3_w));
-	map(0x05, 0x05).w(m_bus, FUNC(abcbus_slot_device::c4_w));
-	map(0x06, 0x06).w(FUNC(abc80_state::csg_w));
-	map(0x07, 0x07).r(m_bus, FUNC(abcbus_slot_device::rst_r));
-	map(0x10, 0x13).mirror(0x04).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map.global_mask(0xf7);
+	map(0x00, 0x00).select(0xe0).rw(m_bus, FUNC(abcbus_slot_device::inp_r), FUNC(abcbus_slot_device::out_w));
+	map(0x01, 0x01).mirror(0xe0).rw(m_bus, FUNC(abcbus_slot_device::stat_r), FUNC(abcbus_slot_device::cs_w));
+	map(0x02, 0x02).mirror(0xe0).w(m_bus, FUNC(abcbus_slot_device::c1_w));
+	map(0x03, 0x03).mirror(0xe0).w(m_bus, FUNC(abcbus_slot_device::c2_w));
+	map(0x04, 0x04).mirror(0xe0).w(m_bus, FUNC(abcbus_slot_device::c3_w));
+	map(0x05, 0x05).mirror(0xe0).w(m_bus, FUNC(abcbus_slot_device::c4_w));
+	map(0x06, 0x06).mirror(0xe0).w(FUNC(abc80_state::csg_w));
+	map(0x07, 0x07).mirror(0xe0).r(m_bus, FUNC(abcbus_slot_device::rst_r));
+	map(0x10, 0x13).mirror(0xe4).rw(m_pio, FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 }
 
 
@@ -314,8 +314,8 @@ void abc80_state::abc80_io(address_map &map)
 void tkn80_state::tkn80_io(address_map &map)
 {
 	abc80_io(map);
-	map(0x03, 0x03).r(FUNC(tkn80_state::in3_r));
-	map(0x04, 0x04).r(FUNC(tkn80_state::in4_r));
+	map(0x03, 0x03).mirror(0xe0).r(FUNC(tkn80_state::in3_r));
+	map(0x04, 0x04).mirror(0xe0).r(FUNC(tkn80_state::in4_r));
 }
 
 

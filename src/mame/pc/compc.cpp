@@ -61,9 +61,9 @@ public:
 	void pioiii_portc_w(u8 data);
 	u8 pio_portc_r();
 
-	void compc(machine_config &config);
-	void pc10iii(machine_config &config);
-	void compc1(machine_config &config);
+	void compc(machine_config &config) ATTR_COLD;
+	void pc10iii(machine_config &config) ATTR_COLD;
+	void compc1(machine_config &config) ATTR_COLD;
 	void compc_io(address_map &map) ATTR_COLD;
 	void compc_map(address_map &map) ATTR_COLD;
 	void compciii_io(address_map &map) ATTR_COLD;

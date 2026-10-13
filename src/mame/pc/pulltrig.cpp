@@ -68,8 +68,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-
-	void pulltrig(machine_config &config);
+	void pulltrig(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<pentium4_device> m_maincpu;

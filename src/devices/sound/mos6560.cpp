@@ -1,678 +1,46 @@
 // license:BSD-3-Clause
-// copyright-holders:Peter Trauner
+// copyright-holders:Curt Coder
 /***************************************************************************
 
-    MOS 6560 / 6561 Video Interface Chip
+    MOS 6560/6561 Video Interface Chip (VIC) emulation
 
-
-    Original code by PeT (mess@utanet.at), 1999
-
-
-    2010 FP: converted to a device and merged the video & sound components
-
-    TODO:
-      - plenty of cleanups!
-      - investigate attckufo chip features (no invert mode, no multicolor, 16 col chars)
-      - investigate why some vic20 carts crash emulation
-
-****************************************************************************
-
-    Original notes:
-
-    2 Versions
-    6560 NTSC
-    6561 PAL
-    14 bit addr bus
-    12 bit data bus
-    (16 8 bit registers)
-    alternates with MOS 6502 on the address bus
-    fetch 8 bit characternumber and 4 bit color
-    high bit of 4 bit color value determines:
-    0: 2 color mode
-    1: 4 color mode
-    than fetch characterbitmap for characternumber
-    2 color mode:
-    set bit in characterbitmap gives pixel in color of the lower 3 color bits
-    cleared bit gives pixel in backgroundcolor
-    4 color mode:
-    2 bits in the characterbitmap are viewed together
-    00: backgroundcolor
-    11: colorram
-    01: helpercolor
-    10: framecolor
-    advance to next character in videorram until line is full
-    repeat this 8 or 16 lines, before moving to next line in videoram
-    screen ratio ntsc, pal 4/3
-
-    pal version:
-    can contain greater visible areas
-    expects other sync position (so ntsc modules may be displayed at
-    the upper left corner of the tv screen)
-    pixel ratio seems to be different on pal and ntsc
-
-    commodore vic20 notes
-    6560 address line 13 is connected inverted to address line 15 of the board
-    1 K 4 bit ram at 0x9400 is additional connected as 4 higher bits
-    of the 6560 (colorram) without decoding the 6560 address line a8..a13
-
-*****************************************************************************/
+***************************************************************************/
 
 #include "emu.h"
 #include "mos6560.h"
 
-#include <numbers>
+#include <algorithm>
+#include <cmath>
 
 
-/*****************************************************************************
-    PARAMETERS
-*****************************************************************************/
+namespace {
 
-#define VERBOSE_LEVEL 0
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_LEVEL >= N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f: %-24s", machine().time().as_double(), (char*) M ); \
-			logerror A; \
-		} \
-	} while (0)
-
-
-/* 2008-05 FP: lightpen code needs to read input port from vc20.c */
-
-#define LIGHTPEN_BUTTON     ((!m_lightpen_button_cb.isnull()) ? m_lightpen_button_cb(0) : 0)
-#define LIGHTPEN_X_VALUE    ((!m_lightpen_x_cb.isnull()) ? m_lightpen_x_cb(0) : 0)
-#define LIGHTPEN_Y_VALUE    ((!m_lightpen_y_cb.isnull()) ? m_lightpen_y_cb(0) : 0)
-
-/* lightpen delivers values from internal counters
- * they do not start with the visual area or frame area */
-#define MOS6560_X_BEGIN 38
-#define MOS6560_Y_BEGIN -6             /* first 6 lines after retrace not for lightpen! */
-#define MOS6561_X_BEGIN 38
-#define MOS6561_Y_BEGIN -6
-#define MOS656X_X_BEGIN ((m_variant == TYPE_6561) ? MOS6561_X_BEGIN : MOS6560_X_BEGIN)
-#define MOS656X_Y_BEGIN ((m_variant == TYPE_6561) ? MOS6561_Y_BEGIN : MOS6560_Y_BEGIN)
-
-#define MOS656X_MAME_XPOS ((m_variant == TYPE_6561) ? MOS6561_MAME_XPOS : MOS6560_MAME_XPOS)
-#define MOS656X_MAME_YPOS ((m_variant == TYPE_6561) ? MOS6561_MAME_YPOS : MOS6560_MAME_YPOS)
-
-/* lightpen behaviour in pal or mono multicolor not tested */
-#define MOS656X_X_VALUE ((LIGHTPEN_X_VALUE + MOS656X_X_BEGIN + MOS656X_MAME_XPOS)/2)
-#define MOS656X_Y_VALUE ((LIGHTPEN_Y_VALUE + MOS656X_Y_BEGIN + MOS656X_MAME_YPOS)/2)
-
-#define MOS656X_VRETRACERATE ((m_variant == TYPE_6561) ? MOS6561_VRETRACERATE : MOS6560_VRETRACERATE)
-
-/* ntsc 1 - 8 */
-/* pal 5 - 19 */
-#define XPOS (((int)m_reg[0] & 0x7f) * 4)
-#define YPOS ((int)m_reg[1] * 2)
-
-/* ntsc values >= 31 behave like 31 */
-/* pal value >= 32 behave like 32 */
-#define CHARS_X ((int)m_reg[2] & 0x7f)
-#define CHARS_Y (((int)m_reg[3] & 0x7e) >> 1)
-
-/* colorram and backgroundcolor are changed */
-#define INVERTED (!(m_reg[0x0f] & 8))
-
-#define CHARGENADDR (((int)m_reg[5] & 0x0f) << 10)
-#define VIDEOADDR ((((int)m_reg[5] & 0xf0) << (10 - 4)) | (((int)m_reg[2] & 0x80) << (9-7)))
-#define VIDEORAMSIZE (YSIZE * XSIZE)
-#define CHARGENSIZE (256 * HEIGHTPIXEL)
-
-#define HELPERCOLOR (m_reg[0x0e] >> 4)
-#define BACKGROUNDCOLOR (m_reg[0x0f] >> 4)
-#define FRAMECOLOR (m_reg[0x0f] & 0x07)
-
-
-// VICE palette
-static const rgb_t PALETTE_MOS[] =
+constexpr rgb_t PALETTE_6561[16] =
 {
-	rgb_t(0x00, 0x00, 0x00),
-	rgb_t(0xff, 0xff, 0xff),
-	rgb_t(0xf0, 0x00, 0x00),
-	rgb_t(0x00, 0xf0, 0xf0),
-
-	rgb_t(0x60, 0x00, 0x60),
-	rgb_t(0x00, 0xa0, 0x00),
-	rgb_t(0x00, 0x00, 0xf0),
-	rgb_t(0xd0, 0xd0, 0x00),
-
-	rgb_t(0xc0, 0xa0, 0x00),
-	rgb_t(0xff, 0xa0, 0x00),
-	rgb_t(0xf0, 0x80, 0x80),
-	rgb_t(0x00, 0xff, 0xff),
-
-	rgb_t(0xff, 0x00, 0xff),
-	rgb_t(0x00, 0xff, 0x00),
-	rgb_t(0x00, 0xa0, 0xff),
-	rgb_t(0xff, 0xff, 0x00)
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0xff, 0xff, 0xff), rgb_t(0xb6, 0x1f, 0x21), rgb_t(0x4d, 0xf0, 0xff),
+	rgb_t(0xb4, 0x3f, 0xff), rgb_t(0x44, 0xe2, 0x37), rgb_t(0x1a, 0x34, 0xff), rgb_t(0xdc, 0xd7, 0x1b),
+	rgb_t(0xca, 0x54, 0x00), rgb_t(0xe9, 0xb0, 0x72), rgb_t(0xe7, 0x92, 0x93), rgb_t(0x9a, 0xf7, 0xfd),
+	rgb_t(0xe0, 0x9f, 0xff), rgb_t(0x8f, 0xe4, 0x93), rgb_t(0x82, 0x90, 0xff), rgb_t(0xe5, 0xde, 0x85)
 };
 
-
-
-/*****************************************************************************
-    IMPLEMENTATION
-*****************************************************************************/
-
-inline uint8_t mos6560_device::read_videoram(offs_t offset)
+constexpr rgb_t PALETTE_6560[16] =
 {
-	m_last_data = space(0).read_byte(offset & 0x3fff);
-
-	return m_last_data;
-}
-
-inline uint8_t mos6560_device::read_colorram(offs_t offset)
-{
-	return space(1).read_byte(offset & 0x3ff);
-}
-
-/*-------------------------------------------------
- draw_character
--------------------------------------------------*/
-
-void mos6560_device::draw_character( int ybegin, int yend, int ch, int yoff, int xoff, uint16_t *color )
-{
-	for (int y = ybegin; y <= yend; y++)
-	{
-		int code = read_videoram((m_chargenaddr + ch * m_charheight + y) & 0x3fff);
-
-		m_bitmap.pix(y + yoff, xoff + 0) = PALETTE_MOS[color[BIT(code, 7)]];
-		m_bitmap.pix(y + yoff, xoff + 1) = PALETTE_MOS[color[BIT(code, 6)]];
-		m_bitmap.pix(y + yoff, xoff + 2) = PALETTE_MOS[color[BIT(code, 5)]];
-		m_bitmap.pix(y + yoff, xoff + 3) = PALETTE_MOS[color[BIT(code, 4)]];
-		m_bitmap.pix(y + yoff, xoff + 4) = PALETTE_MOS[color[BIT(code, 3)]];
-		m_bitmap.pix(y + yoff, xoff + 5) = PALETTE_MOS[color[BIT(code, 2)]];
-		m_bitmap.pix(y + yoff, xoff + 6) = PALETTE_MOS[color[BIT(code, 1)]];
-		m_bitmap.pix(y + yoff, xoff + 7) = PALETTE_MOS[color[BIT(code, 0)]];
-	}
-}
-
-
-/*-------------------------------------------------
- draw_character_multi
--------------------------------------------------*/
-
-void mos6560_device::draw_character_multi( int ybegin, int yend, int ch, int yoff, int xoff, uint16_t *color )
-{
-	for (int y = ybegin; y <= yend; y++)
-	{
-		int code = read_videoram((m_chargenaddr + ch * m_charheight + y) & 0x3fff);
-
-		m_bitmap.pix(y + yoff, xoff + 0) = m_bitmap.pix(y + yoff, xoff + 1) =
-				PALETTE_MOS[color[code >> 6]];
-		m_bitmap.pix(y + yoff, xoff + 2) = m_bitmap.pix(y + yoff, xoff + 3) =
-				PALETTE_MOS[color[(code >> 4) & 3]];
-		m_bitmap.pix(y + yoff, xoff + 4) = m_bitmap.pix(y + yoff, xoff + 5) =
-				PALETTE_MOS[color[(code >> 2) & 3]];
-		m_bitmap.pix(y + yoff, xoff + 6) = m_bitmap.pix(y + yoff, xoff + 7) =
-				PALETTE_MOS[color[code & 3]];
-	}
-}
-
-
-/*-------------------------------------------------
- drawlines - draw a certain numer of lines
--------------------------------------------------*/
-
-void mos6560_device::drawlines( int first, int last )
-{
-	int line;
-
-	m_lastline = last;
-	if (first >= last)
-		return;
-
-	for (line = first; (line < m_ypos) && (line < last); line++)
-	{
-		for (int j = 0; j < m_total_xsize; j++)
-			m_bitmap.pix(line, j) = PALETTE_MOS[m_framecolor];
-	}
-
-	for (int vline = line - m_ypos; (line < last) && (line < m_ypos + m_ysize);)
-	{
-		int offs, yoff, xoff, ybegin, yend;
-		if (m_matrix8x16)
-		{
-			offs = (vline >> 4) * m_chars_x;
-			yoff = (vline & ~0xf) + m_ypos;
-			ybegin = vline & 0xf;
-			yend = (vline + 0xf < last - m_ypos) ? 0xf : ((last - line) & 0xf) + ybegin;
-		}
-		else
-		{
-			offs = (vline >> 3) * m_chars_x;
-			yoff = (vline & ~7) + m_ypos;
-			ybegin = vline & 7;
-			yend = (vline + 7 < last - m_ypos) ? 7 : ((last - line) & 7) + ybegin;
-		}
-
-		if (m_xpos > 0)
-		{
-			for (int i = ybegin; i <= yend; i++)
-				for (int j = 0; j < m_xpos; j++)
-					m_bitmap.pix(yoff + i, j) = PALETTE_MOS[m_framecolor];
-		}
-
-		for (xoff = m_xpos; (xoff < m_xpos + m_xsize) && (xoff < m_total_xsize); xoff += 8, offs++)
-		{
-			int ch = read_videoram((m_videoaddr + offs) & 0x3fff);
-
-			int attr = (read_colorram((m_videoaddr + offs) & 0x3fff)) & 0xf;
-
-			if (m_variant == TYPE_ATTACK_UFO)
-			{
-				/* the mos6560 variant used in attckufo only has only one draw mode */
-				m_mono[1] = attr;
-				draw_character(ybegin, yend, ch, yoff, xoff, m_mono);
-			}
-			else if (m_inverted)
-			{
-				if (attr & 8)
-				{
-					m_multiinverted[0] = attr & 7;
-					draw_character_multi(ybegin, yend, ch, yoff, xoff, m_multiinverted);
-				}
-				else
-				{
-					m_monoinverted[0] = attr;
-					draw_character(ybegin, yend, ch, yoff, xoff, m_monoinverted);
-				}
-			}
-			else
-			{
-				if (attr & 8)
-				{
-					m_multi[2] = attr & 7;
-					draw_character_multi(ybegin, yend, ch, yoff, xoff, m_multi);
-				}
-				else
-				{
-					m_mono[1] = attr;
-					draw_character(ybegin, yend, ch, yoff, xoff, m_mono);
-				}
-			}
-		}
-
-		if (xoff < m_total_xsize)
-		{
-			for (int i = ybegin; i <= yend; i++)
-				for (int j = xoff; j < m_total_xsize; j++)
-					m_bitmap.pix(yoff + i, j) = PALETTE_MOS[m_framecolor];
-		}
-
-		if (m_matrix8x16)
-		{
-			vline = (vline + 16) & ~0xf;
-			line = vline + m_ypos;
-		}
-		else
-		{
-			vline = (vline + 8) & ~7;
-			line = vline + m_ypos;
-		}
-	}
-
-	for (; line < last; line++)
-		for (int j = 0; j < m_total_xsize; j++)
-			m_bitmap.pix(line, j) = PALETTE_MOS[m_framecolor];
-}
-
-
-/*-------------------------------------------------
- mos6560_port_w - write to regs
--------------------------------------------------*/
-
-void mos6560_device::write(offs_t offset, uint8_t data)
-{
-	offset &= 0xf;
-
-	DBG_LOG(1, "mos6560_port_w", ("%.4x:%.2x\n", offset, data));
-
-	switch (offset)
-	{
-	case 0xa:
-	case 0xb:
-	case 0xc:
-	case 0xd:
-	case 0xe:
-		soundport_w(offset, data);
-		break;
-	}
-
-	if (m_reg[offset] != data)
-	{
-		switch (offset)
-		{
-		case 0:
-		case 1:
-		case 2:
-		case 3:
-		case 5:
-		case 0xe:
-		case 0xf:
-			drawlines(m_lastline, m_rasterline);
-			break;
-		}
-		m_reg[offset] = data;
-
-		switch (offset)
-		{
-		case 0:
-			if ((m_variant != TYPE_ATTACK_UFO))
-				m_xpos = XPOS;
-			break;
-		case 1:
-			if ((m_variant != TYPE_ATTACK_UFO))
-				m_ypos = YPOS;
-			break;
-		case 2:
-			/* ntsc values >= 31 behave like 31 */
-			/* pal value >= 32 behave like 32 */
-			m_chars_x = CHARS_X;
-			m_videoaddr = VIDEOADDR;
-			m_xsize = CHARS_X * 8;
-			break;
-		case 3:
-			if ((m_variant != TYPE_ATTACK_UFO))
-			{
-				m_matrix8x16 = data & 0x01;
-				m_charheight = m_matrix8x16 ? 16 : 8;
-			}
-			m_chars_y = CHARS_Y;
-			m_ysize = CHARS_Y * m_charheight;
-			break;
-		case 5:
-			m_chargenaddr = CHARGENADDR;
-			m_videoaddr = VIDEOADDR;
-			break;
-		case 0xe:
-			m_multi[3] = m_multiinverted[3] = m_helpercolor = HELPERCOLOR;
-			break;
-		case 0xf:
-			if ((m_variant != TYPE_ATTACK_UFO))
-				m_inverted = INVERTED;
-			m_multi[1] = m_multiinverted[1] = m_framecolor = FRAMECOLOR;
-			m_mono[0] = m_monoinverted[1] = m_multi[0] = m_multiinverted[2] = m_backgroundcolor = BACKGROUNDCOLOR;
-			break;
-		}
-	}
-}
-
-/*-------------------------------------------------
- mos6560_port_r - read from regs
--------------------------------------------------*/
-
-uint8_t mos6560_device::read(offs_t offset)
-{
-	offset &= 0xf;
-
-	int val;
-
-	switch (offset)
-	{
-	case 3:
-		val = ((m_rasterline & 1) << 7) | (m_reg[offset] & 0x7f);
-		break;
-	case 4:                        /*rasterline */
-		drawlines(m_lastline, m_rasterline);
-		val = (m_rasterline / 2) & 0xff;
-		break;
-	case 6:                        /*lightpen horizontal */
-	case 7:                        /*lightpen vertical */
-#if 0
-		if (LIGHTPEN_BUTTON && ((machine().time().as_double() - m_lightpenreadtime) * MOS656X_VRETRACERATE >= 1))
-		{
-			/* only 1 update each frame */
-			/* and diode must recognize light */
-			if (1)
-			{
-				m_reg[6] = MOS656X_X_VALUE;
-				m_reg[7] = MOS656X_Y_VALUE;
-			}
-			m_lightpenreadtime = machine().time().as_double();
-		}
-#endif
-		val = m_reg[offset];
-		break;
-	case 8:                        /* poti 1 */
-		val = m_read_potx(0);
-		break;
-	case 9:                        /* poti 2 */
-		val = m_read_poty(0);
-		break;
-	default:
-		val = m_reg[offset];
-		break;
-	}
-	DBG_LOG(3, "mos6560_port_r", ("%.4x:%.2x\n", offset, val));
-	return val;
-}
-
-void mos6560_device::lp_w(int state)
-{
-	// TODO
-}
-
-uint8_t mos6560_device::bus_r()
-{
-	return m_last_data;
-}
-
-/*-------------------------------------------------
- mos6560_raster_interrupt_gen
--------------------------------------------------*/
-
-TIMER_CALLBACK_MEMBER(mos6560_device::raster_interrupt_gen)
-{
-	m_rasterline++;
-	if (m_rasterline >= m_total_lines)
-	{
-		m_rasterline = 0;
-		drawlines(m_lastline, m_total_lines);
-		m_lastline = 0;
-	}
-}
-
-
-/*-------------------------------------------------
- mos6560_video_update - copy the VIC bitmap to
-     main screen bitmap
--------------------------------------------------*/
-
-uint32_t mos6560_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
-
-	return 0;
-}
-
-/*****************************************************************************
-    SOUND IMPLEMENTATION
-*****************************************************************************/
-
-/*
- * assumed model:
- * each write to a ton/noise generated starts it new
- * each generator behaves like an timer
- * when it reaches 0, the next samplevalue is given out
- */
-
-/*
- * noise channel
- * based on a document by diku0748@diku.dk (Asger Alstrup Nielsen)
- *
- * 23 bit shift register
- * initial value (0x7ffff8)
- * after shift bit 0 is set to bit 22 xor bit 17
- * dac sample bit22 bit20 bit16 bit13 bit11 bit7 bit4 bit2(lsb)
- *
- * emulation:
- * allocate buffer for 5 sec sampledata (fastest played frequency)
- * and fill this buffer in init with the required sample
- * fast turning off channel, immediate change of frequency
- */
-
-#define NOISE_BUFFER_SIZE_SEC 5
-
-#define TONE1_ON (m_reg[0x0a] & 0x80)
-#define TONE2_ON (m_reg[0x0b] & 0x80)
-#define TONE3_ON (m_reg[0x0c] & 0x80)
-#define NOISE_ON (m_reg[0x0d] & 0x80)
-#define VOLUME (m_reg[0x0e] & 0x0f)
-
-#define TONE_FREQUENCY_MIN  (clock()/256/128)
-
-#define TONE1_VALUE (8 * (128 - ((m_reg[0x0a] + 1) & 0x7f)))
-#define TONE1_FREQUENCY (clock()/32/TONE1_VALUE)
-
-#define TONE2_VALUE (4 * (128 - ((m_reg[0x0b] + 1) & 0x7f)))
-#define TONE2_FREQUENCY (clock()/32/TONE2_VALUE)
-
-#define TONE3_VALUE (2 * (128 - ((m_reg[0x0c] + 1) & 0x7f)))
-#define TONE3_FREQUENCY (clock()/32/TONE3_VALUE)
-
-#define NOISE_VALUE (32 * (128 - ((m_reg[0x0d] + 1) & 0x7f)))
-#define NOISE_FREQUENCY (clock()/NOISE_VALUE)
-
-#define NOISE_FREQUENCY_MAX (clock()/32/1)
-
-
-/*-------------------------------------------------
- mos6560_soundport_w - write to regs
--------------------------------------------------*/
-
-void mos6560_device::soundport_w( int offset, int data )
-{
-	int old = m_reg[offset];
-	m_channel->update();
-
-	switch (offset)
-	{
-	case 0x0a:
-		m_reg[offset] = data;
-		if (!(old & 0x80) && TONE1_ON)
-		{
-			m_tone1pos = 0;
-			m_tone1samples = machine().sample_rate() / TONE1_FREQUENCY;
-			if (m_tone1samples == 0)
-				m_tone1samples = 1;
-		}
-		DBG_LOG(1, "mos6560", ("tone1 %.2x %d\n", data, TONE1_FREQUENCY));
-		break;
-	case 0x0b:
-		m_reg[offset] = data;
-		if (!(old & 0x80) && TONE2_ON)
-		{
-			m_tone2pos = 0;
-			m_tone2samples = machine().sample_rate() / TONE2_FREQUENCY;
-			if (m_tone2samples == 0)
-				m_tone2samples = 1;
-		}
-		DBG_LOG(1, "mos6560", ("tone2 %.2x %d\n", data, TONE2_FREQUENCY));
-		break;
-	case 0x0c:
-		m_reg[offset] = data;
-		if (!(old & 0x80) && TONE3_ON)
-		{
-			m_tone3pos = 0;
-			m_tone3samples = machine().sample_rate() / TONE3_FREQUENCY;
-			if (m_tone3samples == 0)
-				m_tone3samples = 1;
-		}
-		DBG_LOG(1, "mos6560", ("tone3 %.2x %d\n", data, TONE3_FREQUENCY));
-		break;
-	case 0x0d:
-		m_reg[offset] = data;
-		if (NOISE_ON)
-		{
-			m_noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * machine().sample_rate()
-									* NOISE_BUFFER_SIZE_SEC / NOISE_FREQUENCY);
-			DBG_LOG (1, "mos6560", ("noise %.2x %d sample:%d\n",
-									data, NOISE_FREQUENCY, m_noisesamples));
-			if ((double) m_noisepos / m_noisesamples >= 1.0)
-			{
-				m_noisepos = 0;
-			}
-		}
-		else
-		{
-			m_noisepos = 0;
-		}
-		break;
-	case 0x0e:
-		m_reg[offset] = (old & ~0x0f) | (data & 0x0f);
-		DBG_LOG (3, "mos6560", ("volume %d\n", data & 0x0f));
-		break;
-	}
-}
-
-
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-/*-------------------------------------------------
- mos6560_sound_start - start audio emulation
-     (to be called at device start)
--------------------------------------------------*/
-
-void mos6560_device::sound_start()
-{
-	m_channel = stream_alloc(0, 1, machine().sample_rate());
-
-	/* buffer for fastest played sample for 5 second so we have enough data for min 5 second */
-	m_noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;
-	m_noise = std::make_unique<int8_t []>(m_noisesize);
-	{
-		int noiseshift = 0x7ffff8;
-
-		for (int i = 0; i < m_noisesize; i++)
-		{
-			char data = 0;
-			if (noiseshift & 0x400000)
-				data |= 0x80;
-			if (noiseshift & 0x100000)
-				data |= 0x40;
-			if (noiseshift & 0x010000)
-				data |= 0x20;
-			if (noiseshift & 0x002000)
-				data |= 0x10;
-			if (noiseshift & 0x000800)
-				data |= 0x08;
-			if (noiseshift & 0x000080)
-				data |= 0x04;
-			if (noiseshift & 0x000010)
-				data |= 0x02;
-			if (noiseshift & 0x000004)
-				data |= 0x01;
-			m_noise[i] = data;
-			if (((noiseshift & 0x400000) == 0) != ((noiseshift & 0x002000) == 0))
-				noiseshift = (noiseshift << 1) | 1;
-			else
-				noiseshift <<= 1;
-		}
-	}
-	m_tonesize = machine().sample_rate() / TONE_FREQUENCY_MIN;
-
-	if (m_tonesize > 0)
-	{
-		m_tone = std::make_unique<int16_t []>(m_tonesize);
-
-		for (int i = 0; i < m_tonesize; i++)
-		{
-			m_tone[i] = int16_t(sin (2 * std::numbers::pi * i / m_tonesize) * 127 + 0.5);
-		}
-	}
-}
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0xff, 0xff, 0xff), rgb_t(0xf9, 0x11, 0x37), rgb_t(0x35, 0xf9, 0xf6),
+	rgb_t(0xff, 0x3c, 0xc6), rgb_t(0x3c, 0xed, 0xa9), rgb_t(0x0f, 0x57, 0xf7), rgb_t(0xfe, 0xe9, 0x63),
+	rgb_t(0xfb, 0x62, 0x44), rgb_t(0xfb, 0xbf, 0xde), rgb_t(0xf3, 0xac, 0xe5), rgb_t(0xa8, 0xea, 0xdd),
+	rgb_t(0xe6, 0xb8, 0xf7), rgb_t(0xab, 0xdd, 0xa4), rgb_t(0x6a, 0xb3, 0xe7), rgb_t(0xf7, 0xda, 0xa5)
+};
+
+constexpr int OUTPUT_DELAY = 7;
+
+} // anonymous namespace
 
 
 DEFINE_DEVICE_TYPE(MOS6560,            mos6560_device,            "mos6560",            "MOS 6560 VIC")
 DEFINE_DEVICE_TYPE(MOS6561,            mos6561_device,            "mos6561",            "MOS 6561 VIC")
 DEFINE_DEVICE_TYPE(MOS656X_ATTACK_UFO, mos656x_attack_ufo_device, "mos656x_attack_ufo", "MOS 656X VIC (Attack UFO)")
 
-// default address maps
+
 void mos6560_device::mos6560_videoram_map(address_map &map)
 {
 	if (!has_configured_map(0))
@@ -685,39 +53,42 @@ void mos6560_device::mos6560_colorram_map(address_map &map)
 		map(0x000, 0x3ff).ram();
 }
 
-mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant) :
+mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cycles_per_line, int lines, int raster_offset, const rgb_t *palette, bool ntsc, bool interlace, bool attack_ufo) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_sound_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
-	m_variant(variant),
 	m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, address_map_constructor(FUNC(mos6560_device::mos6560_videoram_map), this)),
 	m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, address_map_constructor(FUNC(mos6560_device::mos6560_colorram_map), this)),
+	m_cycles_per_line(cycles_per_line),
+	m_lines(lines),
+	m_raster_offset(raster_offset),
+	m_palette(palette),
+	m_ntsc(ntsc),
+	m_interlace_capable(interlace),
+	m_attack_ufo(attack_ufo),
 	m_read_potx(*this, 0xff),
-	m_read_poty(*this, 0xff)
+	m_read_poty(*this, 0xff),
+	m_stream(nullptr),
+	m_line_timer(nullptr),
+	m_lp_state(false)
 {
 }
 
-mos6560_device::mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6560_device(mconfig, MOS6560, tag, owner, clock, TYPE_6560)
+mos6560_device::mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	mos6560_device(mconfig, MOS6560, tag, owner, clock, CYCLES, LINES, 37, PALETTE_6560, true, true, false)
 {
 }
 
-mos6561_device::mos6561_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6560_device(mconfig, MOS6561, tag, owner, clock, TYPE_6561)
+mos6561_device::mos6561_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	mos6560_device(mconfig, MOS6561, tag, owner, clock, CYCLES, LINES, 0, PALETTE_6561, false, false, false)
 {
 }
 
-mos656x_attack_ufo_device::mos656x_attack_ufo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6560_device(mconfig, MOS656X_ATTACK_UFO, tag, owner, clock, TYPE_ATTACK_UFO)
+mos656x_attack_ufo_device::mos656x_attack_ufo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	mos6560_device(mconfig, MOS656X_ATTACK_UFO, tag, owner, clock, CYCLES, LINES, 37, PALETTE_6560, true, false, true)
 {
 }
-
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
 
 device_memory_interface::space_config_vector mos6560_device::memory_space_config() const
 {
@@ -734,77 +105,137 @@ device_memory_interface::space_config_vector mos6560_device::memory_space_config
 
 void mos6560_device::device_start()
 {
-	screen().register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap[0]);
+	screen().register_screen_bitmap(m_bitmap[1]);
+	m_bitmap[0].fill(rgb_t::black());
+	m_bitmap[1].fill(rgb_t::black());
+	m_draw = 0;
 
-	switch (m_variant)
-	{
-	case TYPE_6560:
-		m_total_xsize = MOS6560_XSIZE;
-		m_total_ysize = MOS6560_YSIZE;
-		m_total_lines = MOS6560_LINES;
-		m_total_vretracerate = MOS6560_VRETRACERATE;
-		break;
+	m_period = HZ_TO_ATTOSECONDS(clock());
+	m_base_time = attotime::zero;
+	m_base_cycle = 0;
+	m_cycle_count = 0;
+	m_frame_start = 0;
+	m_frame_lines = m_lines;
 
-	case TYPE_ATTACK_UFO:
-		m_total_xsize = 23 * 8;
-		m_total_ysize = 22 * 8;
-		m_total_lines = MOS6560_LINES;
-		m_total_vretracerate = MOS6560_VRETRACERATE;
-		break;
+	std::fill(std::begin(m_reg), std::end(m_reg), 0);
 
-	case TYPE_6561:
-		m_total_xsize = MOS6561_XSIZE;
-		m_total_ysize = MOS6561_YSIZE;
-		m_total_lines = MOS6561_LINES;
-		m_total_vretracerate = MOS6561_VRETRACERATE;
-		break;
-	}
+	m_line = 0;
+	m_cyc = 0;
+	m_area = AREA_IDLE;
+	m_fetch_state = FETCH_IDLE;
+	m_start_delay = 0;
+	m_buf_offset = 0;
+	m_text_cols = 0;
+	m_pending_text_cols = 0;
+	m_text_lines = 0;
+	m_char_height = 8;
+	m_ycounter = 0;
+	m_row_counter = 0;
+	m_vmc = 0;
+	m_vmb = 0;
+	m_vmc_left = 0;
+	m_vmc_inc = false;
+	m_vmc_wrap_inc = false;
+	m_blank_this_line = true;
+	m_line_was_blank = true;
+	m_interlace = false;
+	m_field = 0;
 
-	// allocate timers
-	m_line_timer = timer_alloc(FUNC(mos6560_device::raster_interrupt_gen), this);
-	m_line_timer->adjust(screen().scan_period(), 0, screen().scan_period());
+	m_vbuf = 0;
+	m_cbuf = 0;
+	std::fill(std::begin(m_gload), std::end(m_gload), 0);
+	std::fill(std::begin(m_cload), std::end(m_cload), 0);
+	std::fill(std::begin(m_load), std::end(m_load), false);
+	m_gdata = 0;
+	m_cdata = 0;
+	m_shift_pos = 8;
+	m_vbus = 0;
+	m_vbus_high = 0;
 
-	// initialize sound
-	sound_start();
+	m_out_bg = 0;
+	m_out_border = 0;
+	m_out_aux = 0;
+	m_out_reverse = false;
+	m_pend_reg = -1;
+	m_pend_data = 0;
 
-	// state saving
-	save_item(NAME(m_lightpenreadtime));
-	save_item(NAME(m_rasterline));
-	save_item(NAME(m_lastline));
+	m_lp_triggered = false;
+	m_lp_trigger = ~uint64_t(0);
+	m_lp_x = 0;
+	m_lp_y = 0;
+	m_lp_extra = 1;
 
-	save_item(NAME(m_charheight));
-	save_item(NAME(m_matrix8x16));
-	save_item(NAME(m_inverted));
-	save_item(NAME(m_chars_x));
-	save_item(NAME(m_chars_y));
-	save_item(NAME(m_xsize));
-	save_item(NAME(m_ysize));
-	save_item(NAME(m_xpos));
-	save_item(NAME(m_ypos));
-	save_item(NAME(m_chargenaddr));
-	save_item(NAME(m_videoaddr));
+	m_snd_div = 0;
+	std::fill(std::begin(m_snd_cnt), std::end(m_snd_cnt), 0);
+	std::fill(std::begin(m_snd_sreg), std::end(m_snd_sreg), 0);
+	m_noise_lfsr = 0;
+	m_noise_lfsr0 = false;
 
-	save_item(NAME(m_backgroundcolor));
-	save_item(NAME(m_framecolor));
-	save_item(NAME(m_helpercolor));
+	for (unsigned i = 0; i < std::size(m_dac); i++)
+		m_dac[i] = 0.888 * (1.0 - std::exp(-double(i) / 140.0));
 
+	m_stream = stream_alloc(0, 1, clock() / 2);
+
+	m_line_timer = timer_alloc(FUNC(mos6560_device::line_tick), this);
+	attotime const line_period(0, m_period * m_cycles_per_line);
+	m_line_timer->adjust(line_period, 0, line_period);
+
+	save_item(NAME(m_draw));
+	save_item(NAME(m_base_time));
+	save_item(NAME(m_base_cycle));
+	save_item(NAME(m_cycle_count));
+	save_item(NAME(m_frame_start));
+	save_item(NAME(m_frame_lines));
 	save_item(NAME(m_reg));
-
-	save_item(NAME(m_mono));
-	save_item(NAME(m_monoinverted));
-	save_item(NAME(m_multi));
-	save_item(NAME(m_multiinverted));
-
-	save_item(NAME(m_last_data));
-
-	save_item(NAME(m_tone1pos));
-	save_item(NAME(m_tone2pos));
-	save_item(NAME(m_tone3pos));
-	save_item(NAME(m_tone1samples));
-	save_item(NAME(m_tone2samples));
-	save_item(NAME(m_tone3samples));
-	save_item(NAME(m_noisepos));
-	save_item(NAME(m_noisesamples));
+	save_item(NAME(m_line));
+	save_item(NAME(m_cyc));
+	save_item(NAME(m_area));
+	save_item(NAME(m_fetch_state));
+	save_item(NAME(m_start_delay));
+	save_item(NAME(m_buf_offset));
+	save_item(NAME(m_text_cols));
+	save_item(NAME(m_pending_text_cols));
+	save_item(NAME(m_text_lines));
+	save_item(NAME(m_char_height));
+	save_item(NAME(m_ycounter));
+	save_item(NAME(m_row_counter));
+	save_item(NAME(m_vmc));
+	save_item(NAME(m_vmb));
+	save_item(NAME(m_vmc_left));
+	save_item(NAME(m_vmc_inc));
+	save_item(NAME(m_vmc_wrap_inc));
+	save_item(NAME(m_blank_this_line));
+	save_item(NAME(m_line_was_blank));
+	save_item(NAME(m_interlace));
+	save_item(NAME(m_field));
+	save_item(NAME(m_vbuf));
+	save_item(NAME(m_cbuf));
+	save_item(NAME(m_gload));
+	save_item(NAME(m_cload));
+	save_item(NAME(m_load));
+	save_item(NAME(m_gdata));
+	save_item(NAME(m_cdata));
+	save_item(NAME(m_shift_pos));
+	save_item(NAME(m_vbus));
+	save_item(NAME(m_vbus_high));
+	save_item(NAME(m_out_bg));
+	save_item(NAME(m_out_border));
+	save_item(NAME(m_out_aux));
+	save_item(NAME(m_out_reverse));
+	save_item(NAME(m_pend_reg));
+	save_item(NAME(m_pend_data));
+	save_item(NAME(m_lp_state));
+	save_item(NAME(m_lp_triggered));
+	save_item(NAME(m_lp_trigger));
+	save_item(NAME(m_lp_x));
+	save_item(NAME(m_lp_y));
+	save_item(NAME(m_lp_extra));
+	save_item(NAME(m_snd_div));
+	save_item(NAME(m_snd_cnt));
+	save_item(NAME(m_snd_sreg));
+	save_item(NAME(m_noise_lfsr));
+	save_item(NAME(m_noise_lfsr0));
 }
 
 
@@ -814,127 +245,620 @@ void mos6560_device::device_start()
 
 void mos6560_device::device_reset()
 {
-	m_lightpenreadtime = 0.0;
-	m_rasterline = 0;
-	m_lastline = 0;
-
-	memset(m_reg, 0, 16);
-
-	m_charheight = 8;
-	m_matrix8x16 = 0;
-	m_inverted = 0;
-	m_chars_x = 0;
-	m_chars_y = 0;
-	m_xsize = 0;
-	m_ysize = 0;
-	m_xpos = 0;
-	m_ypos = 0;
-	m_chargenaddr = 0;
-	m_videoaddr = 0;
-
-	m_backgroundcolor = 0;
-	m_framecolor = 0;
-	m_helpercolor = 0;
-
-	m_mono[0] = 0;
-	m_mono[1] = 0;
-	m_monoinverted[0] = 0;
-	m_monoinverted[1] = 0;
-	m_multi[0] = 0;
-	m_multi[1] = 0;
-	m_multi[2] = 0;
-	m_multi[3] = 0;
-	m_multiinverted[0] = 0;
-	m_multiinverted[1] = 0;
-	m_multiinverted[2] = 0;
-	m_multiinverted[3] = 0;
-
-	m_last_data = 0;
-
-	m_tone1pos = 0;
-	m_tone2pos = 0;
-	m_tone3pos = 0;
-	m_tone1samples = 1;
-	m_tone2samples = 1;
-	m_tone3samples = 1;
-	m_noisepos = 0;
-	m_noisesamples = 1;
+	m_lp_triggered = false;
+	m_lp_trigger = ~uint64_t(0);
 }
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle a stream update
+//  cycle bookkeeping
+//-------------------------------------------------
+
+uint64_t mos6560_device::cycle_at(const attotime &time) const
+{
+	if (time >= m_base_time)
+		return m_base_cycle + uint64_t((time - m_base_time).as_attoseconds() / m_period);
+
+	attotime const delta = m_base_time - time;
+	if (delta.seconds() > 0)
+		return 0;
+
+	uint64_t const cycles = uint64_t((delta.as_attoseconds() + m_period - 1) / m_period);
+	return (cycles > m_base_cycle) ? 0 : (m_base_cycle - cycles);
+}
+
+uint64_t mos6560_device::current_cycle()
+{
+	attotime const now = machine().time();
+	if (now <= m_base_time)
+		return m_base_cycle;
+
+	return cycle_at(now);
+}
+
+void mos6560_device::update_cycles()
+{
+	if (!started())
+		return;
+
+	uint64_t const target = current_cycle();
+
+	while (m_cycle_count < target)
+	{
+		cycle();
+		m_cycle_count++;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(mos6560_device::line_tick)
+{
+	update_cycles();
+
+	uint64_t const cycles = m_cycle_count - m_base_cycle;
+	m_base_time += attotime(0, cycles * m_period);
+	m_base_cycle = m_cycle_count;
+}
+
+int mos6560_device::raster_line(uint64_t cycle, int *pos) const
+{
+	int64_t rel = int64_t(cycle) + m_raster_offset - int64_t(m_frame_start);
+	int64_t const frame = int64_t(m_frame_lines) * m_cycles_per_line;
+	int field = m_field;
+	int prev_lines = m_interlace ? (m_field ? m_lines + 2 : m_lines + 1) : m_lines;
+
+	if (rel >= frame)
+	{
+		rel -= frame;
+		field = m_interlace ? (m_field ^ 1) : 0;
+		prev_lines = m_frame_lines;
+	}
+	else if (rel < 0)
+	{
+		rel += frame;
+	}
+
+	int line = int(rel / m_cycles_per_line);
+	int cyc = int(rel % m_cycles_per_line);
+
+	if (m_ntsc && !field && (line == 0))
+	{
+		if (cyc < 33)
+			line = prev_lines;
+		else
+			cyc -= 33;
+	}
+
+	if (pos)
+		*pos = cyc;
+
+	return line;
+}
+
+int mos6560_device::last_line_cycles(int line) const
+{
+	if (m_ntsc && (line == m_frame_lines))
+		return 33;
+
+	return m_cycles_per_line;
+}
+
+
+//-------------------------------------------------
+//  raster state machine
+//-------------------------------------------------
+
+void mos6560_device::open_v()
+{
+	m_area = AREA_PENDING;
+
+	if (m_text_lines == 0)
+		close_v();
+}
+
+void mos6560_device::close_v()
+{
+	m_area = AREA_DONE;
+}
+
+void mos6560_device::open_h()
+{
+	m_fetch_state = FETCH_START;
+	m_start_delay = 4;
+	m_buf_offset = 0;
+
+	if (m_area == AREA_PENDING)
+		m_area = AREA_DISPLAY;
+
+	m_text_cols = m_pending_text_cols;
+}
+
+void mos6560_device::handle_vmc()
+{
+	int const vmc = m_vmc;
+
+	if ((m_ycounter == m_char_height) || (m_ycounter == 2 * m_char_height))
+	{
+		m_ycounter = 0;
+
+		if (!m_line_was_blank)
+			m_vmb = vmc;
+
+		m_row_counter++;
+		if (m_row_counter == m_text_lines)
+			close_v();
+	}
+
+	m_vmc = m_vmb;
+
+	if (m_vmc_wrap_inc)
+	{
+		if (!(vmc & 0x0f))
+			m_vmc += 0x10;
+		if (!(vmc & 0xff))
+			m_vmc += 0x100;
+		m_vmc &= 0xfff;
+	}
+}
+
+void mos6560_device::count_vmc()
+{
+	m_vmc_inc = m_vmc_left > 0;
+
+	if (m_vmc_inc)
+	{
+		m_vmc = (m_vmc + 1) & 0xfff;
+		m_vmc_left--;
+	}
+}
+
+void mos6560_device::end_of_line()
+{
+	m_line_was_blank = m_blank_this_line;
+	m_cyc = 0;
+
+	if (m_area == AREA_DISPLAY)
+		m_ycounter++;
+
+	m_vmc_wrap_inc = m_vmc_inc;
+	m_vmc_inc = false;
+	m_vmc_left = 0;
+	m_fetch_state = FETCH_IDLE;
+	m_blank_this_line = true;
+	m_line++;
+}
+
+void mos6560_device::end_of_frame()
+{
+	m_row_counter = 0;
+	m_line = 0;
+	m_area = AREA_IDLE;
+	m_ycounter = 0;
+	m_vmc = 0;
+	m_vmb = 0;
+	m_vmc_wrap_inc = false;
+	m_frame_start = m_cycle_count + 1;
+	m_draw ^= 1;
+
+	bool const lace = m_interlace_capable && BIT(m_reg[0], 7);
+
+	if (m_interlace)
+	{
+		m_field ^= 1;
+		if (!lace)
+		{
+			m_interlace = false;
+			m_field = 0;
+		}
+	}
+	else if (lace)
+	{
+		m_interlace = true;
+		m_field = 0;
+	}
+
+	if (m_interlace)
+		m_frame_lines = m_field ? m_lines + 1 : m_lines + 2;
+	else
+		m_frame_lines = m_lines;
+}
+
+uint8_t mos6560_device::fetch_byte(offs_t addr)
+{
+	m_vbus = space(0).read_byte(addr & 0x3fff);
+	m_vbus_high = space(1).read_byte(addr & 0x3ff) & 0x0f;
+
+	return m_vbus;
+}
+
+void mos6560_device::fetch()
+{
+	switch (m_fetch_state)
+	{
+	case FETCH_START:
+		if (--m_start_delay == 0)
+		{
+			m_text_cols = m_pending_text_cols;
+
+			if (m_text_cols > 0)
+			{
+				m_blank_this_line = false;
+				m_vmc_left = 2 * m_text_cols;
+				m_fetch_state = FETCH_MATRIX;
+			}
+			else
+			{
+				m_fetch_state = FETCH_DONE;
+			}
+		}
+		break;
+
+	case FETCH_MATRIX:
+		{
+			offs_t const addr = (((m_reg[5] & 0xf0) << 6) | ((m_reg[2] & 0x80) << 2)) + (m_vmc >> 1);
+			m_vbuf = fetch_byte(addr);
+			m_cbuf = m_vbus_high;
+			m_fetch_state = FETCH_CHARGEN;
+		}
+		break;
+
+	case FETCH_CHARGEN:
+		{
+			offs_t const addr = ((m_reg[5] & 0x0f) << 10) + (m_vbuf * m_char_height) + (m_ycounter & ((m_char_height >> 1) | 7));
+			m_gload[2] = fetch_byte(addr);
+			m_cload[2] = m_cbuf;
+			m_load[2] = true;
+
+			m_buf_offset++;
+
+			if (m_buf_offset >= m_text_cols)
+				m_fetch_state = FETCH_DONE;
+			else
+				m_fetch_state = FETCH_MATRIX;
+		}
+		break;
+
+	default:
+		break;
+	}
+}
+
+void mos6560_device::output_pixels()
+{
+	if (m_load[0])
+	{
+		m_gdata = m_gload[0];
+		m_cdata = m_cload[0];
+		m_shift_pos = 0;
+	}
+
+	m_load[0] = m_load[1];
+	m_gload[0] = m_gload[1];
+	m_cload[0] = m_cload[1];
+	m_load[1] = m_load[2];
+	m_gload[1] = m_gload[2];
+	m_cload[1] = m_cload[2];
+	m_load[2] = false;
+
+	int row = m_line;
+	int x = 4 * (m_cyc - OUTPUT_DELAY);
+	bitmap_rgb32 *bitmap = &m_bitmap[m_draw];
+
+	if (m_cyc < OUTPUT_DELAY)
+	{
+		x += 4 * m_cycles_per_line;
+
+		if (row == 0)
+		{
+			bitmap = &m_bitmap[m_draw ^ 1];
+			row = m_lines - 1;
+		}
+		else
+		{
+			row--;
+		}
+	}
+
+	bool const visible = (row < bitmap->height()) && (x >= 0) && (x + 3 < bitmap->width());
+	uint32_t *dest = visible ? &bitmap->pix(row, x) : nullptr;
+
+	for (int i = 0; i < 4; i++)
+	{
+		if (m_pend_reg >= 0)
+		{
+			if (i == 1)
+			{
+				if (m_pend_reg == 0x0e)
+				{
+					m_out_aux = m_pend_data >> 4;
+					m_pend_reg = -1;
+				}
+				else
+				{
+					m_out_bg = m_pend_data >> 4;
+					m_out_border = m_pend_data & 0x07;
+				}
+			}
+			else if (i == 3)
+			{
+				m_out_reverse = !BIT(m_pend_data, 3);
+				m_pend_reg = -1;
+			}
+		}
+
+		uint8_t color = m_out_border;
+
+		if (m_shift_pos < 8)
+		{
+			if (m_attack_ufo)
+			{
+				color = BIT(m_gdata, 7 - m_shift_pos) ? (m_cdata & 0x0f) : m_out_bg;
+			}
+			else if (BIT(m_cdata, 3))
+			{
+				switch ((m_gdata >> (6 - (m_shift_pos & 6))) & 3)
+				{
+				case 0: color = m_out_bg; break;
+				case 1: color = m_out_border; break;
+				case 2: color = m_cdata & 0x07; break;
+				case 3: color = m_out_aux; break;
+				}
+			}
+			else
+			{
+				bool const bit = BIT(m_gdata, 7 - m_shift_pos) ^ m_out_reverse;
+				color = bit ? (m_cdata & 0x07) : m_out_bg;
+			}
+
+			m_shift_pos++;
+		}
+
+		if (dest)
+			dest[i] = m_palette[color];
+	}
+}
+
+void mos6560_device::trigger_light_pen()
+{
+	m_lp_trigger = ~uint64_t(0);
+
+	if (m_lp_triggered)
+		return;
+
+	m_lp_triggered = true;
+
+	int pos;
+	int const line = raster_line(m_cycle_count + 1, &pos);
+	int const last = m_ntsc ? m_frame_lines : (m_frame_lines - 1);
+
+	if ((line == last) && (pos > 1))
+		return;
+
+	m_lp_x = 2 * ((m_cyc + 1) % m_cycles_per_line) + m_lp_extra;
+	m_lp_y = line >> 1;
+	m_lp_extra = 1;
+}
+
+void mos6560_device::cycle()
+{
+	if ((m_area == AREA_IDLE) && ((m_attack_ufo ? 14 : m_reg[1]) == (m_line >> 1)))
+		open_v();
+
+	m_cyc++;
+
+	if (m_cyc == m_cycles_per_line)
+	{
+		end_of_line();
+
+		if (m_line >= m_frame_lines)
+			end_of_frame();
+	}
+
+	if ((m_area == AREA_DISPLAY) || (m_area == AREA_PENDING))
+	{
+		if ((m_fetch_state == FETCH_IDLE) && ((m_attack_ufo ? 8 : (m_reg[0] & 0x7f)) == m_cyc))
+			open_h();
+
+		if ((m_area == AREA_DISPLAY) && (m_cyc == 0))
+			handle_vmc();
+	}
+
+	if ((m_line == 0) && (m_cyc == 2))
+		m_text_lines = (m_reg[3] & 0x7e) >> 1;
+
+	int lp_pos;
+	if (((m_line == 0) || (m_line >= (m_frame_lines - 1))) && (raster_line(m_cycle_count + 1, &lp_pos) == 0) && (lp_pos == 1))
+	{
+		m_lp_triggered = false;
+
+		if (m_lp_state)
+			m_lp_trigger = m_cycle_count + 2;
+	}
+
+	if (m_cyc == 1)
+		m_pending_text_cols = std::min(m_reg[2] & 0x7f, m_ntsc ? 31 : 32);
+
+	if (m_lp_trigger == m_cycle_count + 1)
+		trigger_light_pen();
+
+	fetch();
+	count_vmc();
+	output_pixels();
+}
+
+
+//-------------------------------------------------
+//  register access
+//-------------------------------------------------
+
+uint8_t mos6560_device::read(offs_t offset)
+{
+	update_cycles();
+
+	offset &= 0xf;
+
+	switch (offset)
+	{
+	case 3:
+		return (BIT(raster_line(m_cycle_count), 0) << 7) | (m_reg[3] & 0x7f);
+
+	case 4:
+		return raster_line(m_cycle_count) >> 1;
+
+	case 6:
+		return m_lp_x;
+
+	case 7:
+		return m_lp_y;
+
+	case 8:
+		return m_read_potx(0);
+
+	case 9:
+		return m_read_poty(0);
+
+	default:
+		return m_reg[offset];
+	}
+}
+
+void mos6560_device::write(offs_t offset, uint8_t data)
+{
+	update_cycles();
+
+	offset &= 0xf;
+
+	if (offset >= 0x0a && offset <= 0x0e)
+		m_stream->update();
+
+	m_reg[offset] = data;
+
+	switch (offset)
+	{
+	case 3:
+		if (!m_attack_ufo)
+			m_char_height = BIT(data, 0) ? 16 : 8;
+		break;
+
+	case 0xe:
+	case 0xf:
+		m_pend_reg = offset;
+		m_pend_data = data;
+		break;
+	}
+}
+
+uint8_t mos6560_device::bus_r()
+{
+	update_cycles();
+
+	return m_vbus;
+}
+
+void mos6560_device::bus_w(uint8_t data)
+{
+	update_cycles();
+
+	m_vbus = data;
+}
+
+void mos6560_device::bus_w(uint8_t data, uint8_t high)
+{
+	update_cycles();
+
+	m_vbus = data;
+	m_vbus_high = high & 0x0f;
+}
+
+void mos6560_device::lp_w(int state)
+{
+	if (!started())
+	{
+		m_lp_state = !state;
+		return;
+	}
+
+	update_cycles();
+
+	bool const active = !state;
+
+	if (active && !m_lp_state)
+	{
+		m_lp_trigger = m_cycle_count + 1;
+
+		int pos;
+		int const line = raster_line(m_cycle_count, &pos);
+		int const last = m_ntsc ? m_frame_lines : (m_frame_lines - 1);
+
+		if ((line == last) && (pos == (last_line_cycles(line) - 2)))
+			m_lp_extra = 0;
+	}
+
+	m_lp_state = active;
+}
+
+
+//-------------------------------------------------
+//  screen_update
+//-------------------------------------------------
+
+uint32_t mos6560_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(bitmap, m_bitmap[m_draw ^ 1], 0, 0, 0, 0, cliprect);
+
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  sound_stream_update
 //-------------------------------------------------
 
 void mos6560_device::sound_stream_update(sound_stream &stream)
 {
-	int i, v;
+	static constexpr uint8_t PRESCALE[4] = { 0x0f, 0x07, 0x03, 0x01 };
 
-	for (i = 0; i < stream.samples(); i++)
+	int const volume = m_reg[0x0e] & 0x0f;
+
+	for (int i = 0; i < stream.samples(); i++)
 	{
-		v = 0;
-		if (TONE1_ON /*||(m_tone1pos != 0) */ )
+		for (int ch = 0; ch < 4; ch++)
 		{
-			v += m_tone[m_tone1pos * m_tonesize / m_tone1samples];
-			m_tone1pos++;
-#if 0
-			m_tone1pos %= m_tone1samples;
-#else
-			if (m_tone1pos >= m_tone1samples)
+			if (m_snd_div & PRESCALE[ch])
+				continue;
+
+			uint8_t const reg = m_reg[0x0a + ch];
+			bool const enabled = BIT(reg, 7);
+
+			if (m_snd_cnt[ch] != 0x7f)
 			{
-				m_tone1pos = 0;
-				m_tone1samples = stream.sample_rate() / TONE1_FREQUENCY;
-				if (m_tone1samples == 0)
-					m_tone1samples = 1;
+				m_snd_cnt[ch]++;
+				continue;
 			}
-#endif
-		}
-		if (TONE2_ON /*||(m_tone2pos != 0) */ )
-		{
-			v += m_tone[m_tone2pos * m_tonesize / m_tone2samples];
-			m_tone2pos++;
-#if 0
-			m_tone2pos %= m_tone2samples;
-#else
-			if (m_tone2pos >= m_tone2samples)
+
+			m_snd_cnt[ch] = (reg + 1) & 0x7f;
+
+			if (ch == 3)
 			{
-				m_tone2pos = 0;
-				m_tone2samples = stream.sample_rate() / TONE2_FREQUENCY;
-				if (m_tone2samples == 0)
-					m_tone2samples = 1;
+				bool const edge = BIT(m_noise_lfsr, 0) && !m_noise_lfsr0;
+				if (edge)
+					m_snd_sreg[ch] = (m_snd_sreg[ch] << 1) | (!BIT(m_snd_sreg[ch], 7) && enabled);
+
+				bool const fb = BIT(m_noise_lfsr, 3) ^ BIT(m_noise_lfsr, 12) ^ BIT(m_noise_lfsr, 14) ^ BIT(m_noise_lfsr, 15);
+				m_noise_lfsr0 = BIT(m_noise_lfsr, 0);
+				m_noise_lfsr = (m_noise_lfsr << 1) | !(!fb && enabled);
 			}
-#endif
-		}
-		if (TONE3_ON /*||(m_tone3pos != 0) */ )
-		{
-			v += m_tone[m_tone3pos * m_tonesize / m_tone3samples];
-			m_tone3pos++;
-#if 0
-			m_tone3pos %= m_tone3samples;
-#else
-			if (m_tone3pos >= m_tone3samples)
+			else
 			{
-				m_tone3pos = 0;
-				m_tone3samples = stream.sample_rate() / TONE3_FREQUENCY;
-				if (m_tone3samples == 0)
-					m_tone3samples = 1;
-			}
-#endif
-		}
-		if (NOISE_ON)
-		{
-			v += m_noise[(int) ((double) m_noisepos * m_noisesize / m_noisesamples)];
-			m_noisepos++;
-			if ((double) m_noisepos / m_noisesamples >= 1.0)
-			{
-				m_noisepos = 0;
+				m_snd_sreg[ch] = (m_snd_sreg[ch] << 1) | (!BIT(m_snd_sreg[ch], 7) && enabled);
 			}
 		}
-		v *= VOLUME;
-		if (v > 8191)
-			v = 8191;
-		else if (v < -8191)
-			v = -8191;
-		stream.put_int(0, i, v, 8192);
+
+		m_snd_div += 2;
+
+		int bits = BIT(m_snd_sreg[0], 0) + BIT(m_snd_sreg[1], 0) + BIT(m_snd_sreg[2], 0);
+		if (BIT(m_reg[0x0d], 7))
+			bits += BIT(m_snd_sreg[3], 0);
+
+		stream.put(0, i, m_dac[(bits * 7 + 1) * volume]);
 	}
 }

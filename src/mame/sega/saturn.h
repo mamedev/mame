@@ -412,6 +412,8 @@ protected:
 		uint32_t  map_offset_max = 0;
 		uint32_t  tile_offset_min = 0;
 		uint32_t  tile_offset_max = 0;
+		uint32_t  pen_min = 0;
+		uint32_t  pen_max = 0;
 	} vdp2_layer_data;
 
 	struct _RBG0_cache_data
@@ -423,6 +425,8 @@ protected:
 		uint32_t  map_offset_max[2]{ 0, 0 };
 		uint32_t  tile_offset_min[2]{ 0, 0 };
 		uint32_t  tile_offset_max[2]{ 0, 0 };
+		uint32_t  pen_min[2]{ 0, 0 };
+		uint32_t  pen_max[2]{ 0, 0 };
 
 		struct vdp2_tilemap_capabilities    layer_data[2];
 

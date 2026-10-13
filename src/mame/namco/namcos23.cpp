@@ -1728,10 +1728,10 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void s23(machine_config &config);
-	void timecrs2(machine_config &config);
-	void downhill(machine_config &config);
-	void panicprk(machine_config &config);
+	void s23(machine_config &config) ATTR_COLD;
+	void timecrs2(machine_config &config) ATTR_COLD;
+	void downhill(machine_config &config) ATTR_COLD;
+	void panicprk(machine_config &config) ATTR_COLD;
 
 	render_t m_render;
 	const u8 *m_sprrom;
@@ -2016,8 +2016,8 @@ public:
 	{
 	}
 
-	void gorgon(machine_config &config);
-	void finfurl(machine_config &config);
+	void gorgon(machine_config &config) ATTR_COLD;
+	void finfurl(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -2056,7 +2056,7 @@ class motoxgo_state : public namcos23_state
 public:
 	using namcos23_state::namcos23_state;
 
-	void motoxgo(machine_config &config)
+	void motoxgo(machine_config &config) ATTR_COLD
 	{
 		s23(config);
 		m_jvs->set_default_option("namco_asca3a");
@@ -2095,16 +2095,16 @@ public:
 	{
 	}
 
-	void rapidrvr(machine_config &config)
+	void rapidrvr(machine_config &config) ATTR_COLD
 	{
 		gorgon(config);
 		m_jvs->set_default_option("namco_asca1");
 	}
 
 protected:
-	virtual void driver_start() override
+	virtual void machine_start() override ATTR_COLD
 	{
-		gorgon_state::driver_start();
+		gorgon_state::machine_start();
 
 		m_sensor_timer = timer_alloc(FUNC(rapidrvr_state::sensor_timer_callback), this);
 		m_sensor_timer->adjust(attotime::zero, 0, attotime::from_hz(200));
@@ -2165,10 +2165,10 @@ public:
 		namcos23_state(mconfig, type, tag)
 	{ }
 
-	void ss23(machine_config &config);
-	void timecrs2v4a(machine_config &config);
-	void _500gp(machine_config &config);
-	void aking(machine_config &config);
+	void ss23(machine_config &config) ATTR_COLD;
+	void timecrs2v4a(machine_config &config) ATTR_COLD;
+	void _500gp(machine_config &config) ATTR_COLD;
+	void aking(machine_config &config) ATTR_COLD;
 
 protected:
 	void mips_map(address_map &map) ATTR_COLD;
@@ -2191,9 +2191,9 @@ public:
 		m_dsw(*this, "GMENDSW")
 	{ }
 
-	void gmen(machine_config &config);
-	void gunwars(machine_config &config);
-	void raceon(machine_config &config);
+	void gmen(machine_config &config) ATTR_COLD;
+	void gunwars(machine_config &config) ATTR_COLD;
+	void raceon(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -2237,7 +2237,7 @@ public:
 	{
 	}
 
-	void finfurl2(machine_config &config)
+	void finfurl2(machine_config &config) ATTR_COLD
 	{
 		gmen(config);
 		m_jvs->set_default_option("namco_asca3a");
@@ -2266,7 +2266,7 @@ public:
 		m_acia(*this, "acia")
 	{ }
 
-	void crszone(machine_config &config);
+	void crszone(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -7931,8 +7931,8 @@ ROM_START( aking )
 	ROM_REGION( 0x40000, "iocpu2", 0 ) // I/O board MB90F574 MCU code
 	ROM_LOAD( "fcaf10.bin", 0x000000, 0x040000, NO_DUMP ) // 256KB internal flash ROM
 
-	ROM_REGION( 0x10000, "iocpu3", 0 ) // I/O board PIC16F84 code
-	ROM_LOAD( "fcap10.ic2", 0x000000, 0x004010, NO_DUMP )
+	ROM_REGION16_LE( 0x4280, "iocpu3", ROMREGION_ERASEFF ) // I/O board PIC16F84 code
+	ROM_LOAD( "fcap10.ic2", 0x0000, 0x4280, NO_DUMP )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data ROMs */
 	ROM_LOAD16_BYTE( "ag1mtah.2j",  0x0000000, 0x800000, CRC(f2d8ca9d) SHA1(8158d13d74f2aae7c0d1238619ce1ad3a17d8047) )
@@ -7980,8 +7980,8 @@ ROM_START( 500gp )
 	ROM_REGION( 0x40000, "iocpu2", 0 ) // I/O board MB90F574 MCU code
 	ROM_LOAD( "fcaf10.bin", 0x000000, 0x040000, NO_DUMP ) // 256KB internal flash ROM
 
-	ROM_REGION( 0x10000, "iocpu3", 0 ) // I/O board PIC16F84 code
-	ROM_LOAD( "fcap10.ic2", 0x000000, 0x004010, NO_DUMP )
+	ROM_REGION16_LE( 0x4280, "iocpu3", ROMREGION_ERASEFF ) // I/O board PIC16F84 code
+	ROM_LOAD( "fcap10.ic2", 0x000000, 0x004280, NO_DUMP )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data ROMs */
 	ROM_LOAD16_BYTE( "5gp1mtah.2j",  0x0000000, 0x800000, CRC(246e4b7a) SHA1(75743294b8f48bffb84f062febfbc02230d49ce9) )

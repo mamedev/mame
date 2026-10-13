@@ -23,77 +23,74 @@
 Namco System 12 - Arcade Playstation-based Hardware
 ===================================================
 
-Game & software revision                 Company/Year            CPU board   Mother board        Daughter board   Keycus
-------------------------------------------------------------------------------------------------------------------------
-Aqua Rush (AQ1/VER.A1)                   (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M5F2    KC053
-Attack Pla-Rail (AP1/VER.A)              (C) Tomy/Namco,   1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC032
-Derby Quiz My Dream Horse (MDH1/VER.A2)  (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M10X64  KC035
-Ehrgeiz (EG1/VER.A)                      (C) Square/Namco, 1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
-Ehrgeiz (EG2/VER.A)                      (C) Square/Namco, 1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
-Ehrgeiz (EG3/VER.A)                      (C) Square/Namco, 1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
-Fighting Layer (FTL3/VER.A)              (C) Arika/Namco,  1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC037
-Fighting Layer (FTL0/VER.A)              (C) Arika/Namco,  1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC037
-Ghoul Panic (OB2/VER.A)                  (C) Namco/Raizing,1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC045
-Oh! Bakyuuun (OB1/VER.A)                 (C) Namco/Raizing,1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC045
-Golgo 13 (GLG1/VER.A)                    (C) Raizing/Namco,1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F6    KC054
-Golgo 13 Kiseki no Dandou (GLS1/VER.A)   (C) Raizing/Namco,2000  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F6    KC059
-Kaiun Quiz (KW1/VER.A1)                  (C) Namco/MOSS,   1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M10X64  KC050
-Kart Duel (KTD1/VER.A)                   (C) Namco,        2000  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F0    KC057
-Libero Grande (LG2/VER.A)                (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC014
-Techno Drive (TH1/VER.B)                 (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC056
-Mr Driller (DRI3/VER.A2)                 (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F2F   KC048
-Mr Driller (DRI1/VER.A2)                 (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F2F   KC048
-Paca Paca Passion (PPP1/VER.A2)          (C) Produce/Namco,1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC038
-Paca Paca Passion Special (PSP1/VER.A)   (C) Produce/Namco,1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M5F2    KC052
-Paca Paca Passion 2 (PKS1/VER.A)         (C) Produce/Namco,1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F2    KC046
-Gunbarl (GNB4/VER.A)                     (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F0    KC042
-Point Blank 2 (GNB5/VER.A)               (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F0    KC042
-Soul Calibur (SOC11/VER.A2)              (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F2    KC020
-Soul Calibur (SOC11/VER.B)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F2    KC020
-Soul Calibur (SOC11/VER.C)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC020
-Soul Calibur (SOC13/VER.B)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC020
-Soul Calibur (SOC13/VER.C)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC020
-Soul Calibur (SOC14/VER.B)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC020
-Soul Calibur (SOC14/VER.C)               (C) Namco,        1998  COH-700     SYSTEM12 MOTHER     JO 11-04-98      none
-Super World Stadium '98 (SS81/VER.A)     (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC025
-Super World Stadium '99 (SS91/VER.A3)    (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC043
-Super World Stadium 2000 (SS01/VER.A3)   (C) Namco,        2000  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M5F4    KC055
-Super World Stadium 2001 (SS11/VER.A2)   (C) Namco,        2001  COH-716     SYSTEM12 MOTHER(C)  SYSTEM12 F2M5    KC061
-Tenkomori Shooting (TKM1/VER.A1)         (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC036
-Tenkomori Shooting (TKM2/VER.A1)         (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC036
-Tekken 3 (TET1/VER.A)                    (C) Namco,        1997  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
-Tekken 3 (TET2/VER.A)                    (C) Namco,        1997  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
-Tekken 3 (TET3/VER.A)                    (C) Namco,        1997  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
-Tekken 3 (TET3/VER.B)                    (C) Namco,        1997  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
-Tekken 3 (TET2/VER.C)                    (C) Namco,        1997  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
-Tekken 3 (TET2/VER.D)                    (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC006
-Tekken 3 (TET3/VER.D)                    (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC006
-Tekken 3 (TET1/VER.E1)                   (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC006
-Tekken 3 (TET2/VER.E1)                   (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC006
-Tekken Tag Tournament (TEG3/VER.C1)      (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F4    KC044
-Tekken Tag Tournament (TEG3/VER.B)       (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F4    KC044
-Toukon Retsuden 3 (TR1/VER.A)            (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC019
-Truck Kyosokyoku (TKK2/VER.A)            (C) Namco,        2000  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F6    KC056
+Game & software revision                 Company                  Year  CPU board   Mother board        Daughter board   Keycus
+----------------------------------------------------------------------------------------------------------------------------
+Aqua Rush (AQ1/VER.A1)                   (C) Namco                1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M5F2    KC053
+Attack Pla-Rail (AP1/VER.A)              (C) Tomy/Namco           1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC032
+Derby Quiz My Dream Horse (MDH1/VER.A2)  (C) Namco                1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M10X64  KC035
+Ehrgeiz (EG1/VER.A)                      (C) Square/Namco         1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
+Ehrgeiz (EG2/VER.A)                      (C) Square/Namco         1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
+Ehrgeiz (EG3/VER.A)                      (C) Square/Namco         1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
+Fighting Layer (FTL3/VER.A)              (C) Arika/Namco          1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC037
+Fighting Layer (FTL0/VER.A)              (C) Arika/Namco          1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC037
+Ghoul Panic (OB2/VER.A)                  (C) Namco/Raizing        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC045
+Oh! Bakyuuun (OB1/VER.A)                 (C) Namco/Raizing        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC045
+Golgo 13 (GLG1/VER.A)                    (C) Raizing/Namco        1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F6    KC054
+Golgo 13 Kiseki no Dandou (GLS1/VER.A)   (C) Raizing/Namco        2000  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F6    KC059
+Kaiun Quiz (KW1/VER.A1)                  (C) Namco/MOSS           1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M10X64  KC050
+Kart Duel (KTD1/VER.A)                   (C) Namco                2000  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F0    KC057
+Libero Grande (LG2/VER.A)                (C) Namco                1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC014
+Techno Drive (TH1/VER.B)                 (C) Namco                1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC056
+Mr Driller (DRI3/VER.A2)                 (C) Namco                1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F2F   KC048
+Mr Driller (DRI1/VER.A2)                 (C) Namco                1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F2F   KC048
+Paca Paca Passion (PPP1/VER.A2)          (C) Produce/Namco        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC038
+Paca Paca Passion Special (PSP1/VER.A)   (C) Produce/Namco        1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M5F2    KC052
+Paca Paca Passion 2 (PKS1/VER.A)         (C) Produce/Namco        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F2    KC046
+Gunbarl (GNB4/VER.A)                     (C) Namco                1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F0    KC042
+Point Blank 2 (GNB5/VER.A)               (C) Namco,               1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F0    KC042
+Quest for Fame (QF2/VER.A)               (C) Virtual Music/Namco, 1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M4F0    KC051
+Soul Calibur (SOC11/VER.A2)              (C) Namco,               1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F2    KC020
+Soul Calibur (SOC11/VER.B)               (C) Namco,               1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F2    KC020
+Soul Calibur (SOC11/VER.C)               (C) Namco,               1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC020
+Soul Calibur (SOC13/VER.B)               (C) Namco,               1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC020
+Soul Calibur (SOC13/VER.C)               (C) Namco,               1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC020
+Soul Calibur (SOC14/VER.B)               (C) Namco,               1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC020
+Soul Calibur (SOC14/VER.C)               (C) Namco,               1998  COH-700     SYSTEM12 MOTHER     JO 11-04-98      none
+Super World Stadium '98 (SS81/VER.A)     (C) Namco,               1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC025
+Super World Stadium '99 (SS91/VER.A3)    (C) Namco,               1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC043
+Super World Stadium 2000 (SS01/VER.A3)   (C) Namco,               2000  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M5F4    KC055
+Super World Stadium 2001 (SS11/VER.A2)   (C) Namco,               2001  COH-716     SYSTEM12 MOTHER(C)  SYSTEM12 F2M5    KC061
+Tenkomori Shooting (TKM1/VER.A1)         (C) Namco,               1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC036
+Tenkomori Shooting (TKM2/VER.A1)         (C) Namco,               1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC036
+Tekken 3 (TET1/VER.A)                    (C) Namco,               1997  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
+Tekken 3 (TET2/VER.A)                    (C) Namco,               1997  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
+Tekken 3 (TET3/VER.A)                    (C) Namco,               1997  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
+Tekken 3 (TET3/VER.B)                    (C) Namco,               1997  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
+Tekken 3 (TET2/VER.C)                    (C) Namco,               1997  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
+Tekken 3 (TET2/VER.D)                    (C) Namco,               1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC006
+Tekken 3 (TET3/VER.D)                    (C) Namco,               1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC006
+Tekken 3 (TET1/VER.E1)                   (C) Namco,               1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC006
+Tekken 3 (TET2/VER.E1)                   (C) Namco,               1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC006
+Tekken Tag Tournament (TEG3/VER.C1)      (C) Namco,               1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F4    KC044
+Tekken Tag Tournament (TEG3/VER.B)       (C) Namco,               1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F4    KC044
+Toukon Retsuden 3 (TR1/VER.A)            (C) Namco,               1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC019
+Truck Kyosokyoku (TKK2/VER.A)            (C) Namco,               2000  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M8F6    KC056
+Um Jammer Lammy NOW! (UL1/VER.A)         (C) Namco,               1999  COH-700     SYSTEM12 MOTHER(C)  SYSTEM12 M10X64  KC049
 
 Wanted Games
 ------------
-Aerosmith - Quest for Fame              (C) Namco,        1999 (flyer date)
-http://www.bandainamcogames.co.jp/am/vg/questforfame/
-https://flyers.arcade-museum.com/videogames/show/2167#gallery-1
-https://flyers.arcade-museum.com/videogames/show/2167#gallery-2
-
-Soul Calibur Ver.B                      (C) Namco,        1998 (flyer date)
+Soul Calibur Ver.B                      (C) Namco,                1998 (flyer date)
 https://flyers.arcade-museum.com/?page=flyer&db=videodb&id=1009&image=1
 https://flyers.arcade-museum.com/?page=flyer&db=videodb&id=4766&image=1
 Probably doesn't exist
 
-Submarines                              (C) Namco,        1999 (flyer date)
+Submarines                              (C) Namco,                1999 (flyer date)
 https://flyers.arcade-museum.com/?page=flyer&db=videodb&id=5531&image=1
 https://www.youtube.com/watch?v=k-JbUTWcFjg
 Unreleased but was demonstrated at the 1999 Amusement Machine Operator's Union (AMOU) tradeshow in Tokyo.
 Was possibly a sequel to Namco's 1978 'Submarine'.
 
-Tekno Werk                              (C) Namco,        1999
+Tekno Werk                              (C) Namco,                1999
 A music game with two 17-key Yamaha keyboards side by side for 2 players
 Video: https://www.youtube.com/watch?v=uGlt0HM67l8
 
@@ -384,6 +381,10 @@ Gunbarl       GNB4/VER.A   Same PCB but sticker says....                  KC042 
                            'SYSTEM 12 M4F0 PCB 8661962000'                         GNB1 PRG0U.IC11, GNB1 PRG0L.IC12
                            (i.e no FlashROMs)                                      (note these ROMs contains the same data as)
                                                                                    (the ones used on System 11 Point Blank 2)
+
+Quest for     QF2/VER.A    Same PCB but sticker says....                  KC051    QF1 WAVE0.IC2
+Fame	                   'SYSTEM 12 M4F0 PCB 8661962000'                         QF1 PRG0U.IC11, QF1 PRG0L.IC12
+                           (i.e no FlashROMs)
 
 Super World   SS81/VER.A   SYSTEM 12 M4F6 PCB 8661960901 (8661970901)     KC025    SS81 WAVE0, SS81 WAVE1
 Stadium '98                                                                        SS81 FL1U, SS81 FL1L, SS81 FL2U
@@ -761,6 +762,11 @@ Kaiun Quiz     KW1/VER.A1    SYSTEM 12 M10X64 PCB 8661961500 (8661971500)   KC05
                                                                                      KW1 ROM0L, KW1 ROM1L
                                                                                      KW1 ROM2L, KW1 ROM0U
                                                                                      KW1 ROM1U, KW1 ROM2U
+
+Um Jammer      UL1/VER.A     SYSTEM 12 M10X64 PCB 8661961500 (8661971500)   KC049    UL1 WAVE0, UL1 WAVE1
+Lammy NOW!                                                                           UL1 ROM0L, UL1 ROM1L
+                                                                                     UL1 ROM1U, UL1 ROM0U
+
 
 ********
 *Type 8*
@@ -1221,7 +1227,7 @@ public:
 
 protected:
 	// driver_device
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
 		m_mainbank->configure_entries(0, memregion("bankedroms")->bytes() / 0x200000, memregion("bankedroms")->base(), 0x200000);
 		m_mainbank->set_entry(0);
@@ -1241,7 +1247,7 @@ protected:
 		save_item(NAME(m_tektagdmaoffset));
 	}
 
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
 		if (m_boot_hack)
 		{
@@ -1504,9 +1510,9 @@ public:
 	using namcos12_state::namcos12_state;
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		namcos12_state::driver_start();
+		namcos12_state::machine_start();
 
 		m_alt_bank = true;
 	}
@@ -1575,6 +1581,14 @@ public:
 		m_cdxa_pcb->psx_int10_callback().set("maincpu:irq", FUNC(psxirq_device::intin10));
 	}
 
+	void questff(machine_config &config) ATTR_COLD
+	{
+		cdxa_pcb(config);
+
+		m_jvs_support = true;
+		m_jvs->set_default_option("namco_fca10");
+	}
+
 	virtual void maincpu_map(address_map &map) override ATTR_COLD
 	{
 		namcos12_altbank_state::maincpu_map(map);
@@ -1631,9 +1645,9 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		namcos12_state::driver_start();
+		namcos12_state::machine_start();
 
 		/* HACK: patch out wait for dma 5 to complete */
 		*((uint32_t *)(m_mainrom->base() + 0x331c4)) = 0;
@@ -1707,9 +1721,9 @@ public:
 	}
 
 protected:
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
-		namcos12_state::driver_reset();
+		namcos12_state::machine_reset();
 
 		m_link_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	}
@@ -1806,9 +1820,9 @@ public:
 	using namcos12_state::namcos12_state;
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		namcos12_state::driver_start();
+		namcos12_state::machine_start();
 
 		m_ttt_cnt = 0;
 		std::fill_n(m_ttt_val, 0, std::size(m_ttt_val));
@@ -1817,9 +1831,9 @@ protected:
 		save_item(NAME(m_ttt_val));
 	}
 
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
-		namcos12_state::driver_reset();
+		namcos12_state::machine_reset();
 
 		m_has_tektagt_dma = false;
 	}
@@ -1951,9 +1965,9 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		namcos12_cdxa_state::driver_start();
+		namcos12_cdxa_state::machine_start();
 
 		/*
 		HACK: Change order of code so that the status flags are set before DMA 5 is started
@@ -2369,6 +2383,34 @@ static INPUT_PORTS_START(ujlnow)
 	PORT_BIT(0x00008000, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(2) PORT_NAME("%p Triangle")
 	PORT_BIT(0x00000800, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_PLAYER(2) PORT_NAME("%p Square") // P2 BUTTON7
 	PORT_BIT(0x00007000, IP_ACTIVE_HIGH, IPT_UNUSED) // P2 BUTTON4/P2 BUTTON5/P2 BUTTON6
+
+	PORT_MODIFY("JVS_COIN2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(questff)
+	PORT_INCLUDE(namcos12)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DIP SW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DIP SW2:2")
+
+	PORT_MODIFY("JVS_SYSTEM")
+	PORT_SERVICE(0x80, IP_ACTIVE_HIGH)
+
+	PORT_MODIFY("JVS_PLAYER1")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("%p Select")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Enter / %p Select")
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_NAME("%p Right Choose") // TODO: P2 right/left mappings are what the game looks for but something stops them from reaching the game (sub CPU? namcoio impl?)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_PLAYER(2) PORT_NAME("%p Left Choose")
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_NAME("Down Select / %p Right Choose")
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_NAME("Up Select / %p Left Choose")
+	PORT_BIT(0x00000100, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Drum")
+	PORT_BIT(0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Guitar")
+	PORT_BIT(0x0e00ee80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_MODIFY("JVS_PLAYER2")
+	PORT_BIT(0x0000ffff, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_MODIFY("JVS_COIN2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -3610,6 +3652,25 @@ ROM_START( ujlnow )
 	DISK_IMAGE_READONLY( "ul1-a", 0, SHA1(676f2c530f8d422ab9895ea04a43b2e9272fb8f8) )
 ROM_END
 
+ROM_START( questff )
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
+	ROM_LOAD16_BYTE( "qf2vera.2l",        0x0000000, 0x200000, CRC(936778e1) SHA1(2afe556ef4888bbe422c2f92d7b6bd85beffc229) )
+	ROM_LOAD16_BYTE( "qf2vera.2p",        0x0000001, 0x200000, CRC(429ff82e) SHA1(958e4d61bd9bd0515f837e9c2b910f1581426214) )
+
+	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 )
+	ROM_LOAD16_BYTE( "qf1rom0l.ic12",     0x0000000, 0x800000, CRC(3319164f) SHA1(3d673af952203b362f52f83f805f8a24e4864489) )
+	ROM_LOAD16_BYTE( "qf1rom0u.ic11",     0x0000001, 0x800000, CRC(d892c93e) SHA1(0d7dbf4ff45f823bbc0b4fdbfb2693e18beced45) )
+
+	ROM_REGION( 0x0080000, "sub", 0 )
+	ROM_LOAD16_WORD_SWAP( "qf2vera.11s",  0x0000000, 0x080000, CRC(843f6ed9) SHA1(fdbd352e6fdbf48112ef67dcc7f34e41e00f017a) )
+
+	ROM_REGION( 0x1000000, "c352", 0 )
+	ROM_LOAD( "qf1wave0.ic2",             0x0000000, 0x800000, CRC(3f7b9afa) SHA1(b7ecef7447476937c99591b495f859ac6abf3e30) )
+
+	DISK_REGION( "cdxa_pcb:ata:0:cdrom" )
+	DISK_IMAGE_READONLY( "qf1-a", 0, SHA1(c65ac9bb0571e463a2f6a23cff396ca19430ca15) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -3663,6 +3724,7 @@ GAME( 1999, mrdrillr,   0,        coh700b,  mrdrillr, namcos12_state,         em
 GAME( 1999, mrdrillrja2,mrdrillr, coh700b,  mrdrillr, namcos12_state,         empty_init, ROT0, "Namco",           "Mr. Driller (Japan, DRI1/VER.A2)", 0 ) /* KC048 */
 GAME( 1999, ujlnow,     0,        cdxa_pcb, ujlnow,   namcos12_cdxa_state,    empty_init, ROT0, "Namco",           "Um Jammer Lammy NOW! (Japan, UL1/VER.A)", 0 ) /* KC049 */
 GAME( 1999, kaiunqz,    0,        coh700,   mdhorse,  namcos12_altbank_state, empty_init, ROT0, "Namco",           "Kaiun Quiz (Japan, KW1/VER.A)", 0 ) /* KC050 */
+GAME( 1999, questff,    0,        questff,  questff,  namcos12_cdxa_state,    empty_init, ROT0, "Virtual Music / Namco", "Quest for Fame (Japan, QF2/VER.A)", MACHINE_IMPERFECT_CONTROLS ) /* KC051 */
 GAME( 1999, pacappsp,   0,        coh700b,  pacapp2,  namcos12_state,         empty_init, ROT0, "Produce / Namco", "Paca Paca Passion Special (Japan, PSP1/VER.A)", 0 ) /* KC052 */
 GAME( 1999, aquarush,   0,        coh700,   lbgrande, namcos12_state,         empty_init, ROT0, "Namco",           "Aqua Rush (Japan, AQ1/VER.A1)", 0 ) /* KC053 */
 GAME( 1999, golgo13,    0,        golgo13,  golgo13,  golgo13_state,          empty_init, ROT0, "Eighting / Raizing / Namco", "Golgo 13 (Japan, GLG1/VER.A)", 0 ) /* KC054 */

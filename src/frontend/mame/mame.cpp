@@ -362,6 +362,7 @@ void mame_machine_manager::ui_initialize(running_machine& machine)
 	m_ui->initialize(machine);
 
 	// display the startup screens
+	m_lua->on_machine_before_startup_screens();
 	m_ui->display_startup_screens(m_firstrun);
 }
 

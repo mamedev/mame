@@ -78,6 +78,26 @@ sources in parallel::
     make SUBTARGET=appulator SOURCES=apple/apple2.cpp,apple/apple2e.cpp,apple/apple2gs.cpp REGENIE=1 -j6
 
 
+Compilation database
+~~~~~~~~~~~~~~~~~~~~
+
+To generate a ``compile_commands.json`` file for editors and tools such as
+clangd, add the **jcdb** target to your usual make command::
+
+    make OVERRIDE_CC=clang OVERRIDE_CXX=clang++ TOOLS=1 jcdb
+
+This runs GENie's compilation database generator without compiling MAME.
+The database is written to the MAME source root, using the selected compiler,
+architecture and debug/release configuration.  Build options such as
+**SOURCES**, **SUBTARGET**, **TOOLS**, **DEBUG**, and **PTR64** apply as usual.
+The build dependencies needed to generate project files must be installed.
+
+Run the command again after changing build options or adding or removing source
+files.  Each invocation replaces the database with the selected configuration;
+**REGENIE=1** is not required.  Generated source files and headers still need to
+be produced by a normal build before tools can analyse files that use them.
+
+
 .. _compiling-windows:
 
 Microsoft Windows

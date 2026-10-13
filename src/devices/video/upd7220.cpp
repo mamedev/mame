@@ -606,10 +606,11 @@ inline void upd7220_device::wdat(uint8_t type, uint8_t mod)
 
 inline void upd7220_device::get_text_partition(int index, uint32_t *sad, uint16_t *len, int *im, int *wd)
 {
-	*sad = ((m_ra[(index * 4) + 1] & 0x1f) << 8) | m_ra[(index * 4) + 0];
-	*len = ((m_ra[(index * 4) + 3] & 0x3f) << 4) | (m_ra[(index * 4) + 2] >> 4);
-	*im = BIT(m_ra[(index * 4) + 3], 6);
-	*wd = BIT(m_ra[(index * 4) + 3], 7);
+	const uint8_t *const ra = &m_ra_partition[index * 4];
+	*sad = ((ra[1] & 0x1f) << 8) | ra[0];
+	*len = ((ra[3] & 0x3f) << 4) | (ra[2] >> 4);
+	*im = BIT(ra[3], 6);
+	*wd = BIT(ra[3], 7);
 }
 
 
@@ -619,10 +620,11 @@ inline void upd7220_device::get_text_partition(int index, uint32_t *sad, uint16_
 
 inline void upd7220_device::get_graphics_partition(int index, uint32_t *sad, uint16_t *len, int *im, int *wd)
 {
-	*sad = ((m_ra[(index * 4) + 2] & 0x03) << 16) | (m_ra[(index * 4) + 1] << 8) | m_ra[(index * 4) + 0];
-	*len = ((m_ra[(index * 4) + 3] & 0x3f) << 4) | (m_ra[(index * 4) + 2] >> 4);
-	*im = BIT(m_ra[(index * 4) + 3], 6);
-	*wd = BIT(m_ra[(index * 4) + 3], 7);
+	const uint8_t *const ra = &m_ra_partition[index * 4];
+	*sad = ((ra[2] & 0x03) << 16) | (ra[1] << 8) | ra[0];
+	*len = ((ra[3] & 0x3f) << 4) | (ra[2] >> 4);
+	*im = BIT(ra[3], 6);
+	*wd = BIT(ra[3], 7);
 }
 
 /*
@@ -736,6 +738,7 @@ void upd7220_device::device_start()
 
 	// register for state saving
 	save_item(NAME(m_ra));
+	save_item(NAME(m_ra_partition));
 	save_item(NAME(m_sr));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_de));
@@ -820,6 +823,11 @@ TIMER_CALLBACK_MEMBER(upd7220_device::vsync_update)
 	else
 	{
 		m_sr &= ~UPD7220_SR_VSYNC_ACTIVE;
+		// latch partition areas at start of back porch
+		// - compis would otherwise tear when scrolling prompt down
+		//   (sets up during display time with no VSYNC wait first)
+		// - device definitely doesn't allow in-flight partition changes.
+		std::copy_n(m_ra, std::size(m_ra_partition), m_ra_partition);
 	}
 
 	m_write_vsync(param);
@@ -1766,6 +1774,7 @@ void upd7220_device::ext_sync_w(int state)
 	else
 	{
 		m_sr &= ~UPD7220_SR_VSYNC_ACTIVE;
+		std::copy_n(m_ra, std::size(m_ra_partition), m_ra_partition);
 	}
 }
 
@@ -1809,7 +1818,8 @@ void upd7220_device::update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect
 		for (y = sy; y < sy + len; y++)
 		{
 			uint32_t const addr = sad + (y * m_pitch);
-			m_draw_text_cb(bitmap, addr, (y * m_lr) + m_vbp, wd, m_pitch, m_lr, m_dc, m_ead, m_ctop, m_cbot);
+			// TODO: count by lines and handle char row splits
+			m_draw_text_cb(bitmap, addr, (y * m_lr) + m_vbp, wd, m_pitch, m_lr, m_dc, m_ead, m_ctop, m_cbot, 0, m_lr);
 		}
 
 		sy = y + 1;
@@ -1903,17 +1913,27 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 		{
 			if(m_lr)
 			{
-				for(y = 0; y < len; y += m_lr)
+				int tline = tsy % m_lr;
+				for(y = 0; y < len; y += m_lr - tline, tline = 0)
 				{
-					uint32_t const addr = (sad & 0x3ffff) + ((y / m_lr) * m_pitch);
-					int yval = y * zoom + (tsy + m_vbp);
-					m_draw_text_cb(bitmap, addr, yval, wd, m_pitch, m_lr, m_dc, m_ead, m_ctop, m_cbot);
+					uint32_t const addr = (sad & 0x3ffff) + (((y + (tsy % m_lr)) / m_lr) * m_pitch);
+					int yval = (tsy + y) * zoom + m_vbp;
+					int bline = m_lr;
+					bool done = false;
+					if((y + m_lr) > len)
+					{
+						bline = m_lr - ((tsy + len) % m_lr);
+						y = len;
+						done = true;
+					}
+					m_draw_text_cb(bitmap, addr, yval, wd, m_pitch, m_lr, m_dc, m_ead, m_ctop, m_cbot, tline, bline);
+					if(done) break;
 				}
 			}
 		}
 
 		if (m_lr)
-			tsy += y * zoom;
+			tsy += y;
 		bsy += y * zoom;
 	}
 }

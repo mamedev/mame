@@ -828,7 +828,7 @@ CONS( 2005, rad_rsgp,  rad_rsg, 0, radica_eu3a14p_altrambase, rad_rsg, elan_eu3a
 CONS( 2005, rad_rsgpa, rad_rsg, 0, radica_eu3a14p_altrambase, rad_rsg, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "Connectv Real Swing Golf (set 2)", MACHINE_NOT_WORKING ) // English, German, French, Spanish, Italian
 
 // also has a Connectv Real Soccer logo in the roms, apparently unused, maybe that was to be the US title (without the logo being changed to Play TV) but Play TV Soccer ended up being a different game licensed from Epoch instead.
-CONS( 2006, rad_foot, 0, 0, radica_eu3a14p, radica_foot, elan_eu3a14_state, empty_init, "Radica / Medialink", "Connectv Football", MACHINE_NOT_WORKING )
+CONS( 2006, rad_foot, 0, 0, radica_eu3a14p, radica_foot, elan_eu3a14_state, empty_init, "Radica / Medialink Technology", "Connectv Football", MACHINE_NOT_WORKING )
 
 CONS( 2005, rad_bb3,  0,       0, radica_eu3a14_altrambase_bb3,  radica_bb3, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "Play TV Baseball 3",  MACHINE_NOT_WORKING )
 CONS( 2005, rad_bb3p, rad_bb3, 0, radica_eu3a14p_altrambase_bb3, radica_bb3, elan_eu3a14_state, empty_init, "Radica / FarSight Studios", "Connectv Baseball 3", MACHINE_NOT_WORKING )

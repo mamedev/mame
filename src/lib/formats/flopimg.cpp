@@ -48,6 +48,12 @@ void floppy_image::set_variant(uint32_t _variant)
 
 	uint32_t sectors;
 	switch(variant) {
+	case SSSD10:
+	case SSQD10:
+	case DSSD10:
+	case DSQD10:
+		sectors = 10;
+		break;
 	case SSDD16:
 	case SSQD16:
 	case DSDD16:
@@ -1848,7 +1854,7 @@ void floppy_image_format_t::get_track_data_fm_pc(int track, int head, const flop
 {
 	auto bitstream = generate_bitstream_from_track(track, head, cell_size, image);
 	auto sectors = extract_sectors_from_bitstream_fm_pc(bitstream);
-	for(unsigned int sector=1; sector < sector_count; sector++) {
+	for(int sector=1; sector <= sector_count; sector++) {
 		uint8_t *sd = sectdata + (sector-1)*sector_size;
 		if(sector < sectors.size() && !sectors[sector].empty()) {
 			unsigned int asize = sectors[sector].size();
@@ -2435,17 +2441,18 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bi
 		shift_reg = ((shift_reg << 1) | bit) & 0x3ff;
 
 		if (sync && !bit) {
-			uint8_t id = sbyte_gcr5_r(bitstream, i);
+			uint32_t pos = i;
+			uint8_t id = sbyte_gcr5_r(bitstream, pos);
 
 			switch (id) {
 			case 0x08:
 				if(hblk_count < 100)
-					hblk[hblk_count++] = i-10;
+					hblk[hblk_count++] = i;
 				break;
 
 			case 0x07:
 				if(dblk_count < 100)
-					dblk[dblk_count++] = i-10;
+					dblk[dblk_count++] = i;
 				break;
 			}
 		}
@@ -2517,17 +2524,18 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bi
 		shift_reg = ((shift_reg << 1) | bit) & 0x3ff;
 
 		if (sync && !bit) {
-			uint8_t id = sbyte_gcr5_r(bitstream, i);
+			uint32_t pos = i;
+			uint8_t id = sbyte_gcr5_r(bitstream, pos);
 
 			switch (id) {
 			case 0x07:
 				if(hblk_count < 100)
-					hblk[hblk_count++] = i-10;
+					hblk[hblk_count++] = i;
 				break;
 
 			case 0x08:
 				if(dblk_count < 100)
-					dblk[dblk_count++] = i-10;
+					dblk[dblk_count++] = i;
 				break;
 			}
 		}

@@ -144,12 +144,13 @@ public:
 	{
 	}
 
-	void notetakr(machine_config &config);
+	void notetakr(machine_config &config) ATTR_COLD;
+
+	void init_notetakr() ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void driver_start() override;
 
 	void iop_io(address_map &map) ATTR_COLD;
 	void iop_mem(address_map &map) ATTR_COLD;
@@ -899,9 +900,9 @@ void notetaker_state::notetakr(machine_config &config)
 	DAC1200(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 1); // unknown DAC
 }
 
-void notetaker_state::driver_start()
+void notetaker_state::init_notetakr()
 {
-	// descramble the rom; the whole thing is a gigantic scrambled mess either to ease
+	// descramble the ROM; the whole thing is a gigantic scrambled mess either to ease
 	// interfacing with older xerox technologies which used A0 and D0 as the MSB bits
 	// or maybe because someone screwed up somewhere along the line. we may never know.
 	// see http://bitsavers.informatik.uni-stuttgart.de/pdf/xerox/notetaker/schematics/19790423_Notetaker_IO_Processor.pdf pages 12 and onward
@@ -1000,4 +1001,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT           COMPANY  FULLNAME     FLAGS
-COMP( 1978, notetakr, 0,      0,      notetakr, notetakr, notetaker_state, empty_init, "Xerox", "NoteTaker", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP( 1978, notetakr, 0,      0,      notetakr, notetakr, notetaker_state, init_notetakr, "Xerox", "NoteTaker", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

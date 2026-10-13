@@ -1066,7 +1066,7 @@ void cps3_state::draw_fg_layer(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	for (int line = cliprect.top(); line <= cliprect.bottom(); line++)
 	{
 		rectangle clip = cliprect;
-		clip.min_y = clip.max_y = line;
+		clip.sety(line, line);
 
 		int y = line / 8;
 		int offset = ((line + scrolly) / 8 * 128) & 0x1fff;

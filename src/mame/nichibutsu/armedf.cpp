@@ -1988,9 +1988,9 @@ void armedf_state::init_kozure()
 {
 	u16 *ROM = (u16 *)memregion("maincpu")->base();
 
-	/* patch "time over" bug, see notes on top. */
+	// HACK: patch "time over" bug, see notes on top.
 	ROM[0x1016c/2] = 0x4e71;
-	/* ROM check at POST. */
+	// ROM check at POST.
 	ROM[0x04fc6/2] = 0x4e71;
 	m_scroll_type = 0;
 }

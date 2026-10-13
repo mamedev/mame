@@ -1962,6 +1962,7 @@ u8 cvs_state::hero_prot_r(offs_t offset)
 {
 	u8 *rom = memregion("maincpu")->base() + 0x73f0;
 
+	// HACK: protection workarounds
 	switch (offset + 0x73f0)
 	{
 		case 0x73f0: // pc: 7d, ab9

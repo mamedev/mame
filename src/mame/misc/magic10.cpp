@@ -1996,7 +1996,7 @@ void magic102_state::init_altaten()
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 16;
 
-	// patching the boot protection...
+	// HACK: patch the boot protection
 	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0x7668] = 0x71;
@@ -2008,7 +2008,7 @@ void magic102_state::init_spccomp()
 	m_layer2_offset[0] = 8;
 	m_layer2_offset[1] = 16;
 
-	// patching the boot protection...
+	// HACK: patch the boot protection
 	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0x7684] = 0x71;

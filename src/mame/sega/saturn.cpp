@@ -719,6 +719,16 @@ void saturn_state::vdp1_set_framebuffer_config()
 
 void saturn_state::vdp1_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	// PTM = 01 starts drawing immediately, while 00/10 only change the plot trigger mode at the
+	// next frame buffer change, so a 01 write leaves the mode from the last 00/10 write in effect.
+	// - doom and exhumed set 10 then draw with 01, and hang unless the next change draws again (CEF)
+	if (offset == 0x04/2 && ACCESSING_BITS_0_7 && (data & 3) == 1)
+	{
+		if ( VDP1_LOG ) logerror( "VDP1: Access to register PTMR = %1X\n", data );
+		vdp1_process_list();
+		return;
+	}
+
 	COMBINE_DATA(&m_vdp1_regs[offset]);
 
 	switch(offset)
@@ -735,9 +745,6 @@ void saturn_state::vdp1_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			break;
 		case 0x04/2:
 			if ( VDP1_LOG ) logerror( "VDP1: Access to register PTMR = %1X\n", data );
-			if ( VDP1_PTMR == 1 )
-				vdp1_process_list();
-
 			break;
 		case 0x06/2:
 			if ( VDP1_LOG ) logerror( "VDP1: Erase data set %08X\n", data );
@@ -1260,7 +1267,7 @@ finish:
 
 	for ( cury = vdp1_shading_data->sy; cury <= vdp1_shading_data->ey; cury++ )
 	{
-		while( (vdp1_shading_data->scanline[cury].x[0] >> 16) < cliprect.min_x )
+		while( (vdp1_shading_data->scanline[cury].x[0] >> 16) < cliprect.left() )
 		{
 			vdp1_shading_data->scanline[cury].x[0] += (1 << FRAC_SHIFT);
 			vdp1_shading_data->scanline[cury].b[0] += vdp1_shading_data->scanline[cury].db;
@@ -1552,10 +1559,10 @@ void saturn_state::vdp1_fill_slope(const rectangle &cliprect, int patterndata, i
 							int32_t v1, int32_t v2, int32_t slv1, int32_t slv2, int32_t *nv1, int32_t *nv2,
 							int32_t _y1, int32_t y2)
 {
-	if(_y1 > cliprect.max_y)
+	if(_y1 > cliprect.bottom())
 		return;
 
-	if(y2 <= cliprect.min_y) {
+	if(y2 <= cliprect.top()) {
 		int delta = y2-_y1;
 		*nx1 = x1+delta*sl1;
 		*nu1 = u1+delta*slu1;
@@ -1566,18 +1573,18 @@ void saturn_state::vdp1_fill_slope(const rectangle &cliprect, int patterndata, i
 		return;
 	}
 
-	if(y2 > cliprect.max_y)
-		y2 = cliprect.max_y+1;
+	if(y2 > cliprect.bottom())
+		y2 = cliprect.bottom()+1;
 
-	if(_y1 < cliprect.min_y) {
-		int delta = cliprect.min_y - _y1;
+	if(_y1 < cliprect.top()) {
+		int delta = cliprect.top() - _y1;
 		x1 += delta*sl1;
 		u1 += delta*slu1;
 		v1 += delta*slv1;
 		x2 += delta*sl2;
 		u2 += delta*slu2;
 		v2 += delta*slv2;
-		_y1 = cliprect.min_y;
+		_y1 = cliprect.top();
 	}
 
 	if(x1 > x2 || (x1==x2 && sl1 > sl2)) {
@@ -1614,7 +1621,7 @@ void saturn_state::vdp1_fill_slope(const rectangle &cliprect, int patterndata, i
 	}
 
 	while(_y1 < y2) {
-		if(_y1 >= cliprect.min_y) {
+		if(_y1 >= cliprect.top()) {
 			int32_t slux = 0, slvx = 0;
 			int xx1 = x1>>FRAC_SHIFT;
 			int xx2 = x2>>FRAC_SHIFT;
@@ -1625,15 +1632,15 @@ void saturn_state::vdp1_fill_slope(const rectangle &cliprect, int patterndata, i
 				slux = (u2-u1)/delta;
 				slvx = (v2-v1)/delta;
 			}
-			if(xx1 <= cliprect.max_x || xx2 >= cliprect.min_x) {
-				if(xx1 < cliprect.min_x) {
-					int delta = cliprect.min_x-xx1;
+			if(xx1 <= cliprect.right() || xx2 >= cliprect.left()) {
+				if(xx1 < cliprect.left()) {
+					int delta = cliprect.left()-xx1;
 					u += slux*delta;
 					v += slvx*delta;
-					xx1 = cliprect.min_x;
+					xx1 = cliprect.left();
 				}
-				if(xx2 > cliprect.max_x)
-					xx2 = cliprect.max_x;
+				if(xx2 > cliprect.right())
+					xx2 = cliprect.right();
 
 				while(xx1 <= xx2) {
 					(this->*drawpixel)(xx1,_y1, patterndata, (v>>FRAC_SHIFT)*xsize+(u>>FRAC_SHIFT));
@@ -1666,10 +1673,10 @@ void saturn_state::vdp1_fill_line(const rectangle &cliprect, int patterndata, in
 	int xx1 = x1>>FRAC_SHIFT;
 	int xx2 = x2>>FRAC_SHIFT;
 
-	if(y > cliprect.max_y || y < cliprect.min_y)
+	if(!cliprect.containsy(y))
 		return;
 
-	if(xx1 <= cliprect.max_x || xx2 >= cliprect.min_x) {
+	if(xx1 <= cliprect.right() || xx2 >= cliprect.left()) {
 		int32_t slux = 0, slvx = 0;
 		int32_t u = u1;
 		int32_t v = v1;
@@ -1678,14 +1685,14 @@ void saturn_state::vdp1_fill_line(const rectangle &cliprect, int patterndata, in
 			slux = (u2-u1)/delta;
 			slvx = (v2-v1)/delta;
 		}
-		if(xx1 < cliprect.min_x) {
-			int delta = cliprect.min_x-xx1;
+		if(xx1 < cliprect.left()) {
+			int delta = cliprect.left()-xx1;
 			u += slux*delta;
 			v += slvx*delta;
-			xx1 = cliprect.min_x;
+			xx1 = cliprect.left();
 		}
-		if(xx2 > cliprect.max_x)
-			xx2 = cliprect.max_x;
+		if(xx2 > cliprect.right())
+			xx2 = cliprect.right();
 
 		while(xx1 <= xx2) {
 			(this->*drawpixel)(xx1,y,patterndata,(v>>FRAC_SHIFT)*xsize+(u>>FRAC_SHIFT));
@@ -1740,13 +1747,13 @@ void saturn_state::vdp1_fill_quad(const rectangle &cliprect, int patterndata, in
 		return;
 	}
 
-	if(cury > cliprect.max_y)
+	if(cury > cliprect.bottom())
 		return;
-	if(limy <= cliprect.min_y)
+	if(limy <= cliprect.top())
 		return;
 
-	if(limy > cliprect.max_y)
-		limy = cliprect.max_y;
+	if(limy > cliprect.bottom())
+		limy = cliprect.bottom();
 
 	ps1 = pmin+4;
 	ps2 = pmin;
@@ -2158,8 +2165,8 @@ void saturn_state::vdp1_draw_normal_sprite(const rectangle &cliprect, int sprite
 
 	if (VDP1_LOG) logerror ("Drawing Normal Sprite x %04x y %04x xsize %04x ysize %04x patterndata %06x\n",x,y,xsize,ysize,patterndata);
 
-	if ( x > cliprect.max_x ) return;
-	if ( y > cliprect.max_y ) return;
+	if ( x > cliprect.right() ) return;
+	if ( y > cliprect.bottom() ) return;
 
 	shading = read_gouraud_table();
 	if ( shading )
@@ -2186,24 +2193,24 @@ void saturn_state::vdp1_draw_normal_sprite(const rectangle &cliprect, int sprite
 		duy = -xsize;
 		u += xsize*(ysize-1);
 	}
-	if ( y < cliprect.min_y ) //clip y
+	if ( y < cliprect.top() ) //clip y
 	{
 		// draculax user clips a 320x240 sprite for inverted castle map (obviously x & y flipped)
 		// we need to adjust U calculation only to make it align properly,
 		// adjusting ysize will already glitch out flipped doors in gameplay.
-		const int adjust_y = direction & 2 ? y - cliprect.min_y : cliprect.min_y - y;
+		const int adjust_y = (direction & 2) ? (y - cliprect.top()) : (cliprect.top() - y);
 		u += xsize * (adjust_y);
-		ysize -= (cliprect.min_y - y);
-		y = cliprect.min_y;
+		ysize -= (cliprect.top() - y);
+		y = cliprect.top();
 	}
-	if ( x < cliprect.min_x ) //clip x
+	if ( x < cliprect.left() ) //clip x
 	{
-		u += dux*(cliprect.min_x - x);
-		xsize -= (cliprect.min_x - x);
-		x = cliprect.min_x;
+		u += dux*(cliprect.left() - x);
+		xsize -= (cliprect.left() - x);
+		x = cliprect.left();
 	}
-	maxdrawypos = std::min(y+ysize-1,cliprect.max_y);
-	maxdrawxpos = std::min(x+xsize-1,cliprect.max_x);
+	maxdrawypos = std::min(y + ysize - 1, cliprect.bottom());
+	maxdrawxpos = std::min(x + xsize - 1, cliprect.right());
 	for (drawypos = y; drawypos <= maxdrawypos; drawypos++ )
 	{
 		//destline = m_vdp1_legacy.framebuffer_draw_lines[drawypos];
@@ -2271,7 +2278,9 @@ void saturn_state::vdp1_process_list()
 
 		current_sprite.CMDCTRL = (m_vdp1_vram[position * (0x20/4)+0] & 0xffff0000) >> 16;
 
-		if (current_sprite.CMDCTRL == 0x8000)
+		// The END bit terminates the list regardless of the other bits.
+		// (SGL terminates its sorted list with 0xffff)
+		if (current_sprite.CMDCTRL & 0x8000)
 		{
 			if (VDP1_LOG) logerror ("List Terminator (0x8000) Encountered, Sprite List Process END\n");
 			goto end; // end of list
@@ -2326,9 +2335,9 @@ void saturn_state::vdp1_process_list()
 				}
 				else
 				{
-					if (VDP1_LOG) logerror ("Attempted return from no subroutine, aborting\n");
+					// A return with no subroutine is a NOP (Yabause and Mednafen agree)
+					if (VDP1_LOG) logerror ("Attempted return from no subroutine, continuing\n");
 					position++;
-					goto end; // end of list
 				}
 				break;
 			case 0x4000:
@@ -2367,9 +2376,8 @@ void saturn_state::vdp1_process_list()
 				}
 				else
 				{
-					if (VDP1_LOG) logerror ("Attempted return from no subroutine, aborting\n");
+					if (VDP1_LOG) logerror ("Attempted return from no subroutine, continuing\n");
 					position++;
-					goto end; // end of list
 				}
 				break;
 		}
@@ -6284,6 +6292,7 @@ void saturn_state::vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const rectangle
 	int drawypos, drawxpos;
 
 	int tilecodemin = 0x10000000, tilecodemax = 0;
+	int palmin = 0x10000000, palmax = 0;
 
 	if ( current_tilemap.incx == 0 || current_tilemap.incy == 0 ) return;
 
@@ -6571,6 +6580,15 @@ void saturn_state::vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const rectangle
 
 			pal += current_tilemap.colour_ram_address_offset<< 4; // bios uses this ..
 
+			if ( pal < palmin )
+			{
+				palmin = pal;
+			}
+			if ( pal > palmax )
+			{
+				palmax = pal;
+			}
+
 			/*Enable fading bit*/
 			if(current_tilemap.fade_control & 1)
 			{
@@ -6650,11 +6668,11 @@ void saturn_state::vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const rectangle
 				{
 					if ( current_tilemap.colour_depth == 4 )
 					{
-						/* normal */
-						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(0+(flipyx&1)+(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos, drawypos,current_tilemap.transparency,current_tilemap.alpha);
-						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(1-(flipyx&1)+(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos+8,drawypos,current_tilemap.transparency,current_tilemap.alpha);
-						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(2+(flipyx&1)-(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos,drawypos+8,current_tilemap.transparency,current_tilemap.alpha);
-						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(3-(flipyx&1)-(flipyx&2))*4,flipyx&1,flipyx&2,drawxpos+8,drawypos+8,current_tilemap.transparency,current_tilemap.alpha);
+						/* normal, an 8x8 RGB888 cell takes 8 character number units (32 bytes each) */
+						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(0+(flipyx&1)+(flipyx&2))*8,flipyx&1,flipyx&2,drawxpos, drawypos,current_tilemap.transparency,current_tilemap.alpha);
+						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(1-(flipyx&1)+(flipyx&2))*8,flipyx&1,flipyx&2,drawxpos+8,drawypos,current_tilemap.transparency,current_tilemap.alpha);
+						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(2+(flipyx&1)-(flipyx&2))*8,flipyx&1,flipyx&2,drawxpos,drawypos+8,current_tilemap.transparency,current_tilemap.alpha);
+						vdp2_drawgfx_rgb888(bitmap,cliprect,tilecode+(3-(flipyx&1)-(flipyx&2))*8,flipyx&1,flipyx&2,drawxpos+8,drawypos+8,current_tilemap.transparency,current_tilemap.alpha);
 					}
 					else if ( current_tilemap.colour_depth == 3 )
 					{
@@ -6748,6 +6766,32 @@ void saturn_state::vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const rectangle
 
 		vdp2_layer_data.tile_offset_min = tilecodemin * 0x20 / 4;
 		vdp2_layer_data.tile_offset_max = (tilecodemax + 1) * 0x20 / 4;
+
+		// store the colours used as well, the RBG cache has them baked in
+		switch ( current_tilemap.colour_depth )
+		{
+			case 0:
+				vdp2_layer_data.pen_min = palmin * 16;
+				vdp2_layer_data.pen_max = (palmax + 1) * 16;
+				break;
+			case 1:
+				vdp2_layer_data.pen_min = (palmin & ~0xf) * 16;
+				vdp2_layer_data.pen_max = ((palmax & ~0xf) + 0x10) * 16;
+				break;
+			case 2:
+				vdp2_layer_data.pen_min = 0;
+				vdp2_layer_data.pen_max = 0x800;
+				break;
+			default:
+				// RGB, no palette
+				vdp2_layer_data.pen_min = 0;
+				vdp2_layer_data.pen_max = 0;
+				break;
+		}
+		if ( palmin > palmax )
+		{
+			vdp2_layer_data.pen_min = vdp2_layer_data.pen_max = 0;
+		}
 	}
 
 }
@@ -8161,6 +8205,33 @@ void saturn_state::vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rectang
 			{
 				m_vdp2_legacy.roz_bitmap[iRP-1].fill(m_palette->black_pen(), roz_clip_rect );
 				vdp2_check_tilemap(m_vdp2_legacy.roz_bitmap[iRP-1], roz_clip_rect);
+				if ( current_tilemap.bitmap_enable )
+				{
+					// a bitmap is read straight out of VRAM, so the tilemap path didn't set up the ranges to watch
+					// - vkyoute2 water kept stale contents
+					static const int bits_per_dot[8] = { 4, 8, 16, 16, 32, 32, 32, 32 };
+					const uint32_t dots = ((current_tilemap.bitmap_size & 2) ? 1024 : 512) * ((current_tilemap.bitmap_size & 1) ? 512 : 256);
+					const uint32_t start = (current_tilemap.bitmap_map * 0x20000 / 4) & 0x1ffff;
+					const uint32_t end = start + dots * bits_per_dot[current_tilemap.colour_depth & 7] / 32;
+
+					// watch all of VRAM if the bitmap wraps around its end
+					vdp2_layer_data.map_offset_min = (end > 0x20000) ? 0 : start;
+					vdp2_layer_data.map_offset_max = (end > 0x20000) ? 0x20000 : end;
+					vdp2_layer_data.tile_offset_min = 0;
+					vdp2_layer_data.tile_offset_max = 0;
+
+					// same palette selection as the draw_*_bitmap functions, fading is off while caching
+					static const uint32_t colours[8] = { 16, 256, 0x800, 0, 0, 0, 0, 0 };
+					const uint32_t pal_bank = (current_tilemap.colour_depth == 2) ? 0 : (((current_tilemap.bitmap_palette_number + current_tilemap.colour_ram_address_offset) & 7) << 8);
+					vdp2_layer_data.pen_min = pal_bank;
+					vdp2_layer_data.pen_max = pal_bank + colours[current_tilemap.colour_depth & 7];
+				}
+				// the colour RAM address wraps, watch all of it if the range goes past its end
+				if ( vdp2_layer_data.pen_max > 0x800 )
+				{
+					vdp2_layer_data.pen_min = 0;
+					vdp2_layer_data.pen_max = 0x800;
+				}
 				// prepare cache data
 				RBG0_cache_data.watch_vdp2_vram_writes |= iRP;
 				RBG0_cache_data.is_cache_dirty &= ~iRP;
@@ -8169,6 +8240,8 @@ void saturn_state::vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rectang
 				RBG0_cache_data.map_offset_max[iRP-1] = vdp2_layer_data.map_offset_max;
 				RBG0_cache_data.tile_offset_min[iRP-1] = vdp2_layer_data.tile_offset_min;
 				RBG0_cache_data.tile_offset_max[iRP-1] = vdp2_layer_data.tile_offset_max;
+				RBG0_cache_data.pen_min[iRP-1] = vdp2_layer_data.pen_min;
+				RBG0_cache_data.pen_max[iRP-1] = vdp2_layer_data.pen_max;
 				LOGMASKED(LOG_VDP2, "Cache watch: map = %06X - %06X, tile = %06X - %06X\n", RBG0_cache_data.map_offset_min[iRP-1],
 					RBG0_cache_data.map_offset_max[iRP-1], RBG0_cache_data.tile_offset_min[iRP-1], RBG0_cache_data.tile_offset_max[iRP-1]);
 			}
@@ -8427,7 +8500,26 @@ void saturn_state::vdp2_cram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	cmode0 = (VDP2_CRMD & 3) == 0;
 
 	offset &= (0xfff) >> (2);
+	const uint32_t old_data = m_vdp2_cram[offset];
 	COMBINE_DATA(&m_vdp2_cram[offset]);
+
+	// the RBG0 cache holds rendered colours, so changing one it used makes it stale
+	// (colour RAM mode 0 mirrors the palette at 0x400, so check both halves)
+	if (m_vdp2_cram[offset] != old_data)
+	{
+		const uint32_t pen = ((VDP2_CRMD & 2) ? offset : (offset * 2)) & 0x3ff;
+		const uint32_t count = (VDP2_CRMD & 2) ? 1 : 2;
+		for (int i = 0; i < 2; i++)
+		{
+			for (const uint32_t p : { pen, pen | 0x400 })
+			{
+				if ((p < RBG0_cache_data.pen_max[i]) && ((p + count) > RBG0_cache_data.pen_min[i]))
+				{
+					RBG0_cache_data.is_cache_dirty |= 1 << i;
+				}
+			}
+		}
+	}
 
 	switch( VDP2_CRMD )
 	{
@@ -8473,6 +8565,8 @@ void saturn_state::refresh_palette_data()
 	int r,g,b;
 	int c_i;
 	uint8_t bank;
+
+	RBG0_cache_data.is_cache_dirty |= 3;
 
 	switch( VDP2_CRMD )
 	{

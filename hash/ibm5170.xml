@@ -25693,8 +25693,8 @@ Bombs: An amusing little desktop game.
 	</software>
 
 	<software name="pcbdesgn" supported="no">
-		<description>PCB Designer</description>
-		<year>1996</year>
+		<description>PCB Designer v1.85</description>
+		<year>1995</year>
 		<publisher>Niche Software</publisher>
 
 		<part name="flop1" interface="floppy_3_5">

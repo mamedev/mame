@@ -607,6 +607,7 @@ void pinball2k_state::machine_reset()
 {
 	uint8_t *rom = memregion("bios")->base();
 
+	// HACK: pretend shadow RAM doesn't exist in a x86 BIOS ...
 	memcpy(m_bios_ram, rom, 0x40000);
 	m_maincpu->reset();
 }

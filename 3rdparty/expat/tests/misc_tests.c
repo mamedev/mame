@@ -10,7 +10,7 @@
    Copyright (c) 2003      Greg Stein <gstein@users.sourceforge.net>
    Copyright (c) 2005-2007 Steven Solie <steven@solie.ca>
    Copyright (c) 2005-2012 Karl Waclawek <karl@waclawek.net>
-   Copyright (c) 2016-2025 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2016-2026 Sebastian Pipping <sebastian@pipping.org>
    Copyright (c) 2017-2022 Rhodri James <rhodri@wildebeest.org.uk>
    Copyright (c) 2017      Joe Orton <jorton@redhat.com>
    Copyright (c) 2017      José Gutiérrez de la Concha <jose@zeroc.com>
@@ -19,6 +19,10 @@
    Copyright (c) 2020      Tim Gates <tim.gates@iress.com>
    Copyright (c) 2021      Donghee Na <donghee.na@python.org>
    Copyright (c) 2023      Sony Corporation / Snild Dolkow <snild@sony.com>
+   Copyright (c) 2025      Berkay Eren Ürün <berkay.ueruen@siemens.com>
+   Copyright (c) 2026      Matthew Fernandez <matthew.fernandez@gmail.com>
+   Copyright (c) 2026      Kartik Kenchi <netliomax25@gmail.com>
+   Copyright (c) 2026      Evgeny Kotkov <kotkov@apache.org>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -39,16 +43,18 @@
    DAMAGES OR  OTHER LIABILITY, WHETHER  IN AN  ACTION OF CONTRACT,  TORT OR
    OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
    USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+   SPDX-License-Identifier: MIT
 */
 
 #if defined(NDEBUG)
 #  undef NDEBUG /* because test suite relies on assert(...) at the moment */
 #endif
 
+#include "expat_config.h"
+
 #include <assert.h>
 #include <string.h>
-
-#include "expat_config.h"
 
 #include "expat.h"
 #include "internal.h"
@@ -70,7 +76,7 @@ START_TEST(test_misc_alloc_create_parser) {
 
   /* Something this simple shouldn't need more than 10 allocations */
   for (i = 0; i < max_alloc_count; i++) {
-    g_allocation_count = i;
+    g_allocation_count = (int)i;
     g_parser = XML_ParserCreate_MM(NULL, &memsuite, NULL);
     if (g_parser != NULL)
       break;
@@ -90,7 +96,7 @@ START_TEST(test_misc_alloc_create_parser_with_encoding) {
 
   /* Try several levels of allocation */
   for (i = 0; i < max_alloc_count; i++) {
-    g_allocation_count = i;
+    g_allocation_count = (int)i;
     g_parser = XML_ParserCreate_MM(XCS("us-ascii"), &memsuite, NULL);
     if (g_parser != NULL)
       break;
@@ -211,7 +217,8 @@ START_TEST(test_misc_version) {
   if (! versions_equal(&read_version, &parsed_version))
     fail("Version mismatch");
 
-  if (xcstrcmp(version_text, XCS("expat_2.7.1"))) /* needs bump on releases */
+  if (xcstrcmp(version_text, XCS("expat_2.8.3"))
+      != 0) /* needs bump on releases */
     fail("XML_*_VERSION in expat.h out of sync?\n");
 }
 END_TEST
@@ -296,7 +303,7 @@ START_TEST(test_misc_stop_during_end_handler_issue_240_1) {
 
   parser = XML_ParserCreate(NULL);
   XML_SetElementHandler(parser, start_element_issue_240, end_element_issue_240);
-  mydata = (DataIssue240 *)malloc(sizeof(DataIssue240));
+  mydata = malloc(sizeof(DataIssue240));
   assert_true(mydata != NULL);
   mydata->parser = parser;
   mydata->deep = 0;
@@ -318,7 +325,7 @@ START_TEST(test_misc_stop_during_end_handler_issue_240_2) {
 
   parser = XML_ParserCreate(NULL);
   XML_SetElementHandler(parser, start_element_issue_240, end_element_issue_240);
-  mydata = (DataIssue240 *)malloc(sizeof(DataIssue240));
+  mydata = malloc(sizeof(DataIssue240));
   assert_true(mydata != NULL);
   mydata->parser = parser;
   mydata->deep = 0;
@@ -678,6 +685,224 @@ START_TEST(test_misc_expected_event_ptr_issue_980) {
 }
 END_TEST
 
+START_TEST(test_misc_sync_entity_tolerated) {
+  const char *const doc = "<!DOCTYPE t0 [\n"
+                          "   <!ENTITY a '<t1></t1>'>\n"
+                          "   <!ENTITY b '<t2>two</t2>'>\n"
+                          "   <!ENTITY c '<t3>three<t4>four</t4>three</t3>'>\n"
+                          "   <!ENTITY d '<t5>&b;</t5>'>\n"
+                          "]>\n"
+                          "<t0>&a;&b;&c;&d;</t0>\n";
+  XML_Parser parser = XML_ParserCreate(NULL);
+
+  assert_true(_XML_Parse_SINGLE_BYTES(parser, doc, (int)strlen(doc),
+                                      /*isFinal=*/XML_TRUE)
+              == XML_STATUS_OK);
+
+  XML_ParserFree(parser);
+}
+END_TEST
+
+START_TEST(test_misc_async_entity_rejected) {
+  struct test_case {
+    const char *doc;
+    enum XML_Status expectedStatusNoGE;
+    enum XML_Error expectedErrorNoGE;
+    XML_Size expectedErrorLine;
+    XML_Size expectedErrorColumn;
+  };
+  const struct test_case cases[] = {
+      // Opened by one entity, closed by another
+      {"<!DOCTYPE t0 [\n"
+       "   <!ENTITY open '<t1>'>\n"
+       "   <!ENTITY close '</t1>'>\n"
+       "]>\n"
+       "<t0>&open;&close;</t0>\n",
+       XML_STATUS_OK, XML_ERROR_NONE, 5, 4},
+      // Opened by tag, closed by entity (non-root case)
+      {"<!DOCTYPE t0 [\n"
+       "  <!ENTITY g0 ''>\n"
+       "  <!ENTITY g1 '&g0;</t1>'>\n"
+       "]>\n"
+       "<t0><t1>&g1;</t0>\n",
+       XML_STATUS_ERROR, XML_ERROR_TAG_MISMATCH, 5, 8},
+      // Opened by tag, closed by entity (root case)
+      {"<!DOCTYPE t0 [\n"
+       "  <!ENTITY g0 ''>\n"
+       "  <!ENTITY g1 '&g0;</t0>'>\n"
+       "]>\n"
+       "<t0>&g1;\n",
+       XML_STATUS_ERROR, XML_ERROR_NO_ELEMENTS, 5, 4},
+      // Opened by entity, closed by tag <-- regression from 2.7.0
+      {"<!DOCTYPE t0 [\n"
+       "  <!ENTITY g0 ''>\n"
+       "  <!ENTITY g1 '<t1>&g0;'>\n"
+       "]>\n"
+       "<t0>&g1;</t1></t0>\n",
+       XML_STATUS_ERROR, XML_ERROR_TAG_MISMATCH, 5, 4},
+      // Opened by tag, closed by entity; then the other way around
+      {"<!DOCTYPE t0 [\n"
+       "  <!ENTITY open '<t1>'>\n"
+       "  <!ENTITY close '</t1>'>\n"
+       "]>\n"
+       "<t0><t1>&close;&open;</t1></t0>\n",
+       XML_STATUS_OK, XML_ERROR_NONE, 5, 8},
+  };
+
+  for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
+    const struct test_case testCase = cases[i];
+    set_subtest("cases[%d]", (int)i);
+
+    const char *const doc = testCase.doc;
+#if XML_GE == 1
+    const enum XML_Status expectedStatus = XML_STATUS_ERROR;
+    const enum XML_Error expectedError = XML_ERROR_ASYNC_ENTITY;
+#else
+    const enum XML_Status expectedStatus = testCase.expectedStatusNoGE;
+    const enum XML_Error expectedError = testCase.expectedErrorNoGE;
+#endif
+
+    XML_Parser parser = XML_ParserCreate(NULL);
+    assert_true(_XML_Parse_SINGLE_BYTES(parser, doc, (int)strlen(doc),
+                                        /*isFinal=*/XML_TRUE)
+                == expectedStatus);
+    assert_true(XML_GetErrorCode(parser) == expectedError);
+#if XML_GE == 1
+    assert_true(XML_GetCurrentLineNumber(parser) == testCase.expectedErrorLine);
+    assert_true(XML_GetCurrentColumnNumber(parser)
+                == testCase.expectedErrorColumn);
+#endif
+    XML_ParserFree(parser);
+  }
+}
+END_TEST
+
+START_TEST(test_misc_no_infinite_loop_issue_1161) {
+  XML_Parser parser = XML_ParserCreate(NULL);
+
+  const char *text = "<!DOCTYPE d SYSTEM 'secondary.txt'>";
+
+  struct ExtOption options[] = {
+      {XCS("secondary.txt"),
+       "<!ENTITY % p SYSTEM 'tertiary.txt'><!ENTITY g '%p;'>"},
+      {XCS("tertiary.txt"), "<?xml version='1.0'?><a"},
+      {NULL, NULL},
+  };
+
+  XML_SetUserData(parser, options);
+  XML_SetParamEntityParsing(parser, XML_PARAM_ENTITY_PARSING_ALWAYS);
+  XML_SetExternalEntityRefHandler(parser, external_entity_optioner);
+
+  assert_true(_XML_Parse_SINGLE_BYTES(parser, text, (int)strlen(text), XML_TRUE)
+              == XML_STATUS_ERROR);
+
+#if defined(XML_DTD)
+  assert_true(XML_GetErrorCode(parser) == XML_ERROR_EXTERNAL_ENTITY_HANDLING);
+#else
+  assert_true(XML_GetErrorCode(parser) == XML_ERROR_NO_ELEMENTS);
+#endif
+
+  XML_ParserFree(parser);
+}
+END_TEST
+
+START_TEST(test_misc_calls_forbidden_from_handlers) {
+  const char *const doc = "<doc>Hello world!</doc>";
+
+  XML_Parser parser = XML_ParserCreate(NULL);
+  XML_UseParserAsHandlerArg(parser);
+  XML_SetCharacterDataHandler(parser, forbidden_calls_character_handler);
+
+  assert_true(XML_Parse(parser, doc, (int)strlen(doc), /*isFinal=*/XML_TRUE)
+              == XML_STATUS_OK);
+
+  XML_ParserFree(parser);
+}
+END_TEST
+
+START_TEST(test_misc_resume_parser_forbidden_from_handler) {
+  const char *const doc = "<doc>Hello world!</doc>";
+
+  XML_Parser parser = XML_ParserCreate(NULL);
+  ResumeFromHandlerData data = {parser, 0};
+  XML_SetUserData(parser, &data);
+  XML_SetCharacterDataHandler(parser, suspend_then_resume_character_handler);
+
+  // The handler suspends the parser, so the top-level parse reports suspension
+  // rather than completion.  The handler also asserts that resuming from inside
+  // itself is rejected.
+  assert_true(XML_Parse(parser, doc, (int)strlen(doc), /*isFinal=*/XML_TRUE)
+              == XML_STATUS_SUSPENDED);
+  assert_true(data.callCount == 1);
+
+  XML_ParserFree(parser);
+}
+END_TEST
+
+// General attack payload idea by Jason Kratzer of Mozilla
+START_TEST(test_misc_low_surrogate_mozilla_bug_2053153) {
+  const char doc_before[] = "<\0!\0D\0O\0C\0T\0Y\0P\0E\0 \0d\0 \0[\0\n\0"
+                            " \0 \0<\0!\0E\0N\0T\0I\0T\0Y\0 \0e\0 \0'\0";
+  const char doc_after[] = "'\0>\0\n\0]\0>\0\n\0"
+                           "<\0r\0 \0a\0=\0'\0&\0e\0;\0'\0/\0>\0\n\0";
+
+  for (size_t i = 1021; i <= 1025; i++) {
+    set_subtest("[%d]", (int)i);
+
+    XML_Parser parser = XML_ParserCreate(NULL);
+
+    assert_true(_XML_Parse_SINGLE_BYTES(parser, doc_before,
+                                        (int)sizeof(doc_before) - 1,
+                                        /*isFinal=*/XML_FALSE));
+
+    for (size_t j = 0; j < i; j++) {
+      assert_true(
+          _XML_Parse_SINGLE_BYTES(parser, "a\\0", 2, /*isFinal=*/XML_FALSE));
+    }
+
+    // Thinking Python, this is:
+    // ''.join([f'\\x{e:02x}' for e in '😀'.encode('UTF-16-LE')])
+    assert_true(_XML_Parse_SINGLE_BYTES(parser, "\x3d\xd8\x00\xde", 4,
+                                        /*isFinal=*/XML_FALSE));
+
+    assert_true(_XML_Parse_SINGLE_BYTES(
+        parser, doc_after, (int)sizeof(doc_after) - 1, /*isFinal=*/XML_TRUE));
+
+    XML_ParserFree(parser);
+  }
+}
+END_TEST
+
+START_TEST(test_misc_input_2gb) {
+  XML_Parser parser;
+  const char *const doc = "<?xml version='1.0'?><doc/>";
+  unsigned long long offset = 0;
+  char buf[4096];
+
+  if (g_chunkSize != 0) {
+    return; // this test is slow, and doesn't use _XML_Parse_SINGLE_BYTES().
+  }
+
+  memset(buf, ' ', sizeof(buf));
+
+  parser = XML_ParserCreate(NULL);
+
+  assert_true(XML_Parse(parser, doc, (int)strlen(doc), XML_FALSE)
+              == XML_STATUS_OK);
+  offset += strlen(doc);
+
+  while (offset < 2ULL * 1024 * 1024 * 1024) {
+    assert_true(XML_Parse(parser, buf, sizeof(buf), XML_FALSE)
+                == XML_STATUS_OK);
+    offset += sizeof(buf);
+  }
+
+  assert_true(XML_Parse(parser, NULL, 0, XML_TRUE) == XML_STATUS_OK);
+
+  XML_ParserFree(parser);
+}
+END_TEST
+
 void
 make_miscellaneous_test_case(Suite *s) {
   TCase *tc_misc = tcase_create("miscellaneous tests");
@@ -706,4 +931,11 @@ make_miscellaneous_test_case(Suite *s) {
   tcase_add_test(tc_misc, test_misc_stopparser_rejects_unstarted_parser);
   tcase_add_test__if_xml_ge(tc_misc, test_renter_loop_finite_content);
   tcase_add_test(tc_misc, test_misc_expected_event_ptr_issue_980);
+  tcase_add_test(tc_misc, test_misc_sync_entity_tolerated);
+  tcase_add_test(tc_misc, test_misc_async_entity_rejected);
+  tcase_add_test(tc_misc, test_misc_no_infinite_loop_issue_1161);
+  tcase_add_test(tc_misc, test_misc_calls_forbidden_from_handlers);
+  tcase_add_test(tc_misc, test_misc_resume_parser_forbidden_from_handler);
+  tcase_add_test(tc_misc, test_misc_input_2gb);
+  tcase_add_test(tc_misc, test_misc_low_surrogate_mozilla_bug_2053153);
 }

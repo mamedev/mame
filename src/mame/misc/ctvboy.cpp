@@ -245,7 +245,7 @@ void ctvboy_state::ctvboy(machine_config &config)
 	m_mc6847->set_screen(m_screen);
 
 	SCREEN(config, m_screen);
-	m_screen->set_raw(XTAL(3'579'545) * 2, 456, 0, 372, 262, 0, 243);
+	m_screen->set_raw(3.579545_MHz_XTAL * 2, 456, 0, 372, 262, 0, 243);
 	m_screen->set_screen_update(m_mc6847, FUNC(mc6847_base_device::screen_update));
 
 	// sound hardware

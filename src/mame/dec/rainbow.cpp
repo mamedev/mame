@@ -338,10 +338,8 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 #include "machine/z80sio.h"
 #include "bus/rs232/rs232.h"
-#include "imagedev/bitbngr.h"
 #include "machine/com8116.h"
 #include "bus/rs232/hlemouse.h"
-#include "bus/rs232/terminal.h"
 
 #include "machine/i8251.h"
 #include "lk201.h"
@@ -352,7 +350,6 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 #include "machine/ds1215.h"
 #include "emupal.h"
-#include "softlist.h"
 #include "screen.h"
 
 #include "rainbow.lh" // BEZEL - LAYOUT with LEDs for diag 1-7, keyboard 8-11 and floppy 20-23
@@ -1552,7 +1549,7 @@ uint8_t rainbow_modela_state::rtc_r(offs_t offset)
 		{
 			if (m_rtc->ceo_r())
 				return m_rtc->read();
-			 else
+			else
 				m_rtc->read();
 		}
 	}
@@ -3057,7 +3054,7 @@ void rainbow_base_state::GDC_EXTRA_REGISTER_w(offs_t offset, uint8_t data)
 				last_scroll_index = m_gdc_scroll_index;
 				if (data & GDC_MODE_READONLY_SCROLL_MAP) // 0x20
 				   logerror(" SCROLL MAP READ_ONLY. Index : %02x ", m_gdc_scroll_index);
-				 else
+				else
 				   logerror(" SCROLL MAP IS WRITABLE. Index : %02x ", m_gdc_scroll_index);
 			}
 
@@ -3181,7 +3178,7 @@ void rainbow_base_state::rainbow_base(machine_config &config)
 
 	m_hgdc->set_addrmap(0, &rainbow_base_state::upd7220_map);
 	m_hgdc->set_display_pixels(FUNC(rainbow_base_state::hgdc_display_pixels));
-	m_hgdc->set_screen(m_screen2); // set_screen needs to be added after 7720 device in the machine config, not after the screen.
+	m_hgdc->set_screen(m_screen2); // set_screen needs to be added after 7220 device in the machine config, not after the screen.
 
 	PALETTE(config, m_palette2).set_entries(32);
 

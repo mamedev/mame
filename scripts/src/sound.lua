@@ -79,6 +79,20 @@ end
 
 
 ---------------------------------------------------
+-- Zero-crossing comparator for line-level audio
+--@src/devices/sound/zcross.h,SOUNDS["ZCROSS"] = true
+---------------------------------------------------
+
+if SOUNDS["ZCROSS"] then
+	files {
+		MAME_DIR .. "src/devices/sound/zcross.cpp",
+		MAME_DIR .. "src/devices/sound/zcross.h",
+	}
+end
+
+
+
+---------------------------------------------------
 -- Discrete component audio
 --@src/devices/sound/discrete.h,SOUNDS["DISCRETE"] = true
 ---------------------------------------------------
@@ -1027,15 +1041,6 @@ if SOUNDS["SID6581"]~=null or SOUNDS["SID8580"] then
 	files {
 		MAME_DIR .. "src/devices/sound/mos6581.cpp",
 		MAME_DIR .. "src/devices/sound/mos6581.h",
-		MAME_DIR .. "src/devices/sound/sid.cpp",
-		MAME_DIR .. "src/devices/sound/sid.h",
-		MAME_DIR .. "src/devices/sound/sidenvel.cpp",
-		MAME_DIR .. "src/devices/sound/sidenvel.h",
-		MAME_DIR .. "src/devices/sound/sidvoice.cpp",
-		MAME_DIR .. "src/devices/sound/sidvoice.h",
-		MAME_DIR .. "src/devices/sound/side6581.h",
-		MAME_DIR .. "src/devices/sound/sidw6581.h",
-		MAME_DIR .. "src/devices/sound/sidw8580.h",
 	}
 end
 
@@ -1401,6 +1406,18 @@ end
 
 
 ---------------------------------------------------
+-- Yamaha YM3413 LDSP
+--@src/devices/sound/ym3413.h,SOUNDS["YM3413"] = true
+---------------------------------------------------
+
+if SOUNDS["YM3413"] then
+	files {
+		MAME_DIR .. "src/devices/sound/ym3413.cpp",
+		MAME_DIR .. "src/devices/sound/ym3413.h",
+	}
+end
+
+---------------------------------------------------
 -- Yamaha FM synthesizers
 --@src/devices/sound/ym2154.h,SOUNDS["YM2154"] = true
 --@src/devices/sound/ymopm.h,SOUNDS["YM2151"] = true
@@ -1740,6 +1757,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/sound/gsc38gg307.h,SOUNDS["GSC38GG307"] = true
+--------------------------------------------------
+
+if SOUNDS["GSC38GG307"] then
+	files {
+		MAME_DIR .. "src/devices/sound/gsc38gg307.cpp",
+		MAME_DIR .. "src/devices/sound/gsc38gg307.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/sound/iopspu.h,SOUNDS["IOPSPU"] = true
 ---------------------------------------------------
 
@@ -1831,6 +1860,19 @@ if SOUNDS["ROLANDLP"] then
 	files {
 		MAME_DIR .. "src/devices/sound/roland_lp.cpp",
 		MAME_DIR .. "src/devices/sound/roland_lp.h",
+	}
+end
+
+---------------------------------------------------
+-- Roland RPP-324 RDAC phrase player
+--@src/devices/sound/roland_rpp324.h,SOUNDS["ROLANDRPP324"] = true
+---------------------------------------------------
+
+if SOUNDS["ROLANDRPP324"] then
+	files {
+		MAME_DIR .. "src/devices/sound/roland_rpp324.cpp",
+		MAME_DIR .. "src/devices/sound/roland_rpp324.h",
+		MAME_DIR .. "src/devices/sound/roland_rpp324_codec.h",
 	}
 end
 

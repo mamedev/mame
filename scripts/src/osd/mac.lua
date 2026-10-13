@@ -28,6 +28,7 @@ links {
 linkoptions {
 	"-framework QuartzCore",
 	"-framework OpenGL",
+	"-framework GameController",
 }
 if os_version>=101100 then
 	linkoptions {
@@ -131,8 +132,11 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/mac/windowcontroller.h",
 		MAME_DIR .. "src/osd/mac/mamefswindow.mm",
 		MAME_DIR .. "src/osd/mac/mamefswindow.h",
-		MAME_DIR .. "src/osd/mac/oglview.mm",
-		MAME_DIR .. "src/osd/mac/oglview.h",
+		MAME_DIR .. "src/osd/mac/macglcontext.mm",
+		MAME_DIR .. "src/osd/mac/macglcontext.h",
+		MAME_DIR .. "src/osd/modules/input/input_macgame.mm",
+		MAME_DIR .. "src/osd/modules/input/input_macjoy.cpp",
+		MAME_DIR .. "src/osd/modules/render/drawmacsoft.cpp",
 		MAME_DIR .. "src/osd/modules/osdwindow.cpp",
 		MAME_DIR .. "src/osd/modules/osdwindow.h",
 	}

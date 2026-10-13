@@ -30,10 +30,10 @@ public:
 	required_device<at_mb_device> m_mb;
 	required_device<ram_device> m_ram;
 
-	void ps2m30286(machine_config &config);
-	void ps2386(machine_config &config);
-	void ps2386sx(machine_config &config);
-	void at_softlists(machine_config &config);
+	void ps2m30286(machine_config &config) ATTR_COLD;
+	void ps2386(machine_config &config) ATTR_COLD;
+	void ps2386sx(machine_config &config) ATTR_COLD;
+	void at_softlists(machine_config &config) ATTR_COLD;
 	void ps2_16_io(address_map &map) ATTR_COLD;
 	void ps2_16_map(address_map &map) ATTR_COLD;
 	void ps2_32_io(address_map &map) ATTR_COLD;

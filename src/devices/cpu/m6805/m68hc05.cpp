@@ -800,7 +800,7 @@ bool m68hc05_device::test_il()
 void m68hc05_device::burn_cycles(unsigned count)
 {
 	// calculate new timer values (fixed prescaler of four)
-	unsigned const ps_opt(4);
+	unsigned const ps_opt(2);
 	unsigned const ps_mask((1 << ps_opt) - 1);
 	unsigned const increments((count + (m_prescaler & ps_mask)) >> ps_opt);
 	u32 const new_counter(u32(m_counter) + increments);
@@ -850,12 +850,12 @@ void m68hc05_device::add_port_state(std::array<bool, PORT_COUNT> const &ddr)
 	for (unsigned i = 0; PORT_COUNT > i; ++i)
 	{
 		if (m_port_bits[i])
-			state_add(M68HC05_LATCHA + i, util::string_format("LATCH%c", 'A' + i).c_str(), m_port_latch[i]).mask(m_port_bits[i]);
+			state_add(M68HC05_LATCHA + i, util::string_format("LATCH%c", 'A' + i), m_port_latch[i]).mask(m_port_bits[i]);
 	}
 	for (unsigned i = 0; PORT_COUNT > i; ++i)
 	{
 		if (ddr[i] && m_port_bits[i])
-			state_add(M68HC05_DDRA + i, util::string_format("DDR%c", 'A' + i).c_str(), m_port_ddr[i]).mask(m_port_bits[i]);
+			state_add(M68HC05_DDRA + i, util::string_format("DDR%c", 'A' + i), m_port_ddr[i]).mask(m_port_bits[i]);
 	}
 }
 

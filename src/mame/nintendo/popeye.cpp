@@ -25,7 +25,7 @@ Notes:
 #include "speaker.h"
 #include "nl_popeye.h"
 
-void tnx1_state::driver_start()
+void tnx1_state::machine_start()
 {
 	decrypt_rom();
 
@@ -40,9 +40,9 @@ void tnx1_state::driver_start()
 	m_nmi_enabled = false;
 }
 
-void tpp2_state::driver_start()
+void tpp2_state::machine_start()
 {
-	tnx1_state::driver_start();
+	tpp1_state::machine_start();
 
 	save_item(NAME(m_watchdog_enabled));
 	save_item(NAME(m_watchdog_counter));
@@ -238,7 +238,7 @@ public:
 	}
 
 	virtual ~brazehs() override = default;
-	virtual void config(machine_config &config) override
+	virtual void config(machine_config &config) override ATTR_COLD
 	{
 		T::config(config);
 		EEPROM_93C46_8BIT(config, "eeprom");
@@ -247,9 +247,9 @@ public:
 protected:
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	virtual void driver_start() override
+	virtual void machine_start() override ATTR_COLD
 	{
-		T::driver_start();
+		T::machine_start();
 
 		uint8_t *rom = this->memregion("brazehs")->base();
 		int len = this->memregion("brazehs")->bytes();
@@ -273,7 +273,7 @@ protected:
 		m_eeprom->clk_write(data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
 	}
 
-	virtual void maincpu_program_map(address_map &map) override
+	virtual void maincpu_program_map(address_map &map) override ATTR_COLD
 	{
 		T::maincpu_program_map(map);
 		map(0x0000, 0x7fff).rom().region("brazehs", 0);

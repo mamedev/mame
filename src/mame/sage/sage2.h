@@ -50,8 +50,6 @@ public:
 
 	void sage2(machine_config &config);
 
-	void init_sage2();
-
 private:
 	void update_fdc_int();
 

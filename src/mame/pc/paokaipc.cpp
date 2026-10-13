@@ -144,7 +144,7 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	void paokaipc(machine_config &config);
+	void paokaipc(machine_config &config) ATTR_COLD;
 
 private:
 	void main_map(address_map &map) ATTR_COLD;

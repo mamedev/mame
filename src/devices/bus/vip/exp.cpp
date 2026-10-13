@@ -235,6 +235,7 @@ void vip_expansion_slot_device::run_w(int state)
 #include "vp550.h"
 #include "vp570.h"
 #include "vp575.h"
+#include "vp576.h"
 #include "vp585.h"
 #include "vp590.h"
 #include "vp595.h"
@@ -247,9 +248,9 @@ void vip_expansion_cards(device_slot_interface &device)
 	//device.option_add("eprommer", VP565);
 	device.option_add("ram", VP570);
 	device.option_add("exp", VP575);
-	//device.option_add("exp2", VP576_EXP);
 	device.option_add("keypad", VP585);
 	device.option_add("color", VP590);
 	device.option_add("simple", VP595);
+	device.option_add("vp551", VP576);
 	device.option_add("basic", VP700);
 }

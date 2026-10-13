@@ -973,11 +973,11 @@ void screen_device::pixels(u32 *buffer)
 		case BITMAP_FORMAT_IND16:
 		{
 			const rgb_t *palette = m_palette->palette()->entry_list_adjusted();
-			for (int y = visarea.min_y; y <= visarea.max_y; y++)
+			for (int y = visarea.top(); y <= visarea.bottom(); y++)
 			{
 				bitmap_ind16 &srcbitmap = per_scanline ? *(bitmap_ind16 *)m_scan_bitmaps[m_curbitmap][y] : curbitmap.as_ind16();
-				const u16 *src = &srcbitmap.pix(per_scanline ? 0 : y, visarea.min_x);
-				for (int x = visarea.min_x; x <= visarea.max_x; x++)
+				const u16 *src = &srcbitmap.pix(per_scanline ? 0 : y, visarea.left());
+				for (int x = visarea.left(); x <= visarea.right(); x++)
 				{
 					*buffer++ = palette[*src++];
 				}
@@ -987,11 +987,11 @@ void screen_device::pixels(u32 *buffer)
 
 		case BITMAP_FORMAT_RGB32:
 		{
-			for (int y = visarea.min_y; y <= visarea.max_y; y++)
+			for (int y = visarea.top(); y <= visarea.bottom(); y++)
 			{
 				bitmap_rgb32 &srcbitmap = per_scanline ? *(bitmap_rgb32 *)m_scan_bitmaps[m_curbitmap][y] : curbitmap.as_rgb32();
-				const u32 *src = &srcbitmap.pix(per_scanline ? 0 : y, visarea.min_x);
-				for (int x = visarea.min_x; x <= visarea.max_x; x++)
+				const u32 *src = &srcbitmap.pix(per_scanline ? 0 : y, visarea.left());
+				for (int x = visarea.left(); x <= visarea.right(); x++)
 				{
 					*buffer++ = *src++;
 				}
@@ -1018,6 +1018,13 @@ int screen_device::vpos() const
 	// round to the nearest pixel
 	delta += m_pixeltime / 2;
 
+	// A device that stopped one cycle short of the VBLANK start timer is still
+	// executing that cycle in the previous frame.  See the "skip if we already
+	// rendered this frame" comment in update_partial(), which addresses the same
+	// problem there.
+	if (delta < 0)
+		delta += m_frame_period;
+
 	// compute the v position relative to the start of VBLANK
 	vpos = delta / m_scantime;
 
@@ -1037,6 +1044,10 @@ int screen_device::hpos() const
 
 	// round to the nearest pixel
 	delta += m_pixeltime / 2;
+
+	// compensate if device is in the previous frame.  see vpos() for more details.
+	if (delta < 0)
+		delta += m_frame_period;
 
 	// compute the v position relative to the start of VBLANK
 	int vpos = delta / m_scantime;

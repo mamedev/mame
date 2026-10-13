@@ -44,54 +44,57 @@ Vector | Offset | Default Source                 | Link Reg         | Default Pr
  16    | 0x80   | IRQ16 (extended)               | ILINK1           | lv. 1 (low)   | L16
  17    | 0x87   | IRQ17 (extended)               | ILINK1           | lv. 1 (low)   | L15
 ....
- 16    | 0xf0   | IRQ30 (extended)               | ILINK1           | lv. 1 (low)   | L2
- 17    | 0xf8   | IRQ31 (extended)               | ILINK1           | lv. 1 (low)   | L1
+ 30    | 0xf0   | IRQ30 (extended)               | ILINK1           | lv. 1 (low)   | L2
+ 31    | 0xf8   | IRQ31 (extended)               | ILINK1           | lv. 1 (low)   | L1
 --------------------------------------------------------------------------------------------------------
 
 */
 
-// currently causes the Leapster to put an unhandled interrupt exception string in RAM
-// at 0x03000800
 void arcompact_device::check_interrupts()
 {
-	int vector = 8;
+	// Mapping of relative priorities to their vector number, with index 0 = highest priority
+	constexpr int RELATIVE_PRIORITY[0x20] = {0x00, 0x01, 0x02, 0x07, 0x06, 0x1f, 0x1e, 0x1d, 0x1c, 0x1b, 0x1a, 0x19,
+			0x18, 0x17, 0x16, 0x15, 0x14, 0x13, 0x12, 0x11, 0x10, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x05, 0x04, 0x03};
 
-	if (vector < 3)
+	uint32_t level_masked_ints;
+
+	// STATUS32 & 0x04 = level2 ints enabled, & 0x02 = level1 ints enabled
+	if (m_status32 & 0x0000'0004 && (m_pending_ints & m_AUX_IRQ_LEV) != 0)
 	{
-		fatalerror("check_interrupts called for vector < 3 (these are special exceptions)");
+		level_masked_ints = m_pending_ints & (m_AUX_IRQ_LEV);
+
+		m_regs[REG_ILINK2] = m_pc;
+		m_status32_l2 = m_status32;
+		m_status32 &= 0xffff'fff9;
+		m_AUX_IRQ_LV12 |= 0x00000002;
+	}
+	else if (m_status32 & 0x0000'0002 && (m_pending_ints & ~m_AUX_IRQ_LEV) != 0)
+	{
+		level_masked_ints = m_pending_ints & ~m_AUX_IRQ_LEV;
+
+		m_regs[REG_ILINK1] = m_pc;
+		m_status32_l1 = m_status32;
+		m_status32 &= 0xffff'fffd;
+		m_AUX_IRQ_LV12 |= 0x00000001;
+	}
+	else
+	{
+		return;
 	}
 
-	if (m_irq_pending)
-	{
-		if (m_status32 & 0x00000002) // & 0x04 = level2, & 0x02 = level1
-		{
-			int level = ((m_AUX_IRQ_LEV >> vector) & 1) + 1;
+	// Rearrange pending interrupts to be positioned based on priority, with MSB = highest priority interrupt (reset)
+	// Most bits are already arranged this way, but there are a few distinct groups that have to be moved around
+	uint32_t priority_adjusted_ints = (bitswap(level_masked_ints, 0, 1, 2) << 29) | (BIT(level_masked_ints, 6, 2) << 27) |
+			(BIT(level_masked_ints, 8, 24) << 3) | BIT(level_masked_ints, 3, 3);
+	// Get position of highest priority set interrupt bit and use lookup table to recover vector from it
+	int vector = RELATIVE_PRIORITY[std::countl_zero(priority_adjusted_ints)];
 
-			logerror("HACK/TEST IRQ\n");
+	standard_irq_callback(vector, m_pc);
 
-			standard_irq_callback(level, m_pc);
-			if (level == 1)
-			{
-				m_regs[REG_ILINK1] = m_pc;
-				m_status32_l1 = m_status32;
-				m_AUX_IRQ_LV12 |= 0x00000001;
-			}
-			else if (level == 2)
-			{
-				m_regs[REG_ILINK2] = m_pc;
-				m_status32_l2 = m_status32;
-				m_AUX_IRQ_LV12 |= 0x00000002;
-			}
-			else
-			{
-				fatalerror("illegal IRQ level\n");
-			}
-
-			set_pc(m_INTVECTORBASE + vector * 8);
-			m_irq_pending = 0;
-			debugreg_clear_ZZ();
-		}
-	}
+	set_pc(m_INTVECTORBASE + vector * 8);
+	m_allow_loop_check = false;
+	m_pending_ints &= ~(1 << vector);
+	debugreg_clear_ZZ();
 }
 
 void arcompact_device::execute_run()
@@ -120,6 +123,7 @@ void arcompact_device::execute_run()
 
 				m_delayactive = false;
 				m_delaylinks = false;
+				m_allow_loop_check = false;
 			}
 			else
 			{
@@ -129,9 +133,9 @@ void arcompact_device::execute_run()
 
 			// hardware loops
 
-			// NOTE: if LPcc condition code fails, the m_PC returned will be m_LP_END
-			// which will then cause this check to happen and potentially jump back to
-			// the start of the loop if LP_COUNT is anything other than 1, this should
+			// NOTE: if LPcc condition code fails or a jump happens, the m_PC returned
+			// can be m_LP_END which will then cause this check to happen and potentially
+			// jump to the start of the loop if LP_COUNT is anything other than 1, this should
 			// not happen.  It could be our PC handling needs to be better?  Either way
 			// guard against it!
 			if (m_allow_loop_check)

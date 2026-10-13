@@ -502,7 +502,7 @@ public:
 		// standard htotal is $e3 x 2 -> 908
 		// https://videogameperfection.com/forums/topic/advanced-timing-settings-for-amiga/
 		SCREEN_WIDTH = 908,
-		SCREEN_HEIGHT_PAL = 625,
+		SCREEN_HEIGHT_PAL = 626,
 		SCREEN_HEIGHT_NTSC = 525,
 		VBLANK_PAL = 58, // 52
 		VBLANK_NTSC = 42,

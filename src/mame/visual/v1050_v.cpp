@@ -5,16 +5,8 @@
 
 #include "screen.h"
 
-/*
-
-    TODO:
-
-    - bright in reverse video
-
-*/
-
-#define V1050_ATTR_BRIGHT   0x01
-#define V1050_ATTR_BLINKING 0x02
+#define V1050_ATTR_BD0      0x01
+#define V1050_ATTR_BD1      0x02
 #define V1050_ATTR_ATTEN    0x04
 #define V1050_ATTR_REVERSE  0x10
 #define V1050_ATTR_BLANK    0x20
@@ -61,21 +53,20 @@ MC6845_UPDATE_ROW( v1050_state::crtc_update_row )
 	{
 		uint16_t address = (((ra & 0x03) + 1) << 13) | ((ma & 0x1fff) + column);
 		uint8_t data = m_video_ram[address & V1050_VIDEORAM_MASK];
-		uint8_t attr = (m_attr & 0xfc) | (m_attr_ram[address] & 0x03);
+		uint8_t attr = (m_attr & 0xfc) | (m_attr_ram[address & V1050_VIDEORAM_MASK] & 0x03);
 
 		for (int bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
-			int color = BIT(data, 7);
+			int dot = BIT(data, 7);
 
 			/* blinking */
-			if ((attr & V1050_ATTR_BLINKING) && !(attr & V1050_ATTR_BLINK)) color = 0;
+			if ((attr & V1050_ATTR_BD1) && !(attr & V1050_ATTR_BLINK)) dot = 0;
 
 			/* reverse video */
-			color ^= BIT(attr, 4);
+			int color = dot ^ BIT(attr, 4);
 
-			/* bright */
-			if (color && (!(attr & V1050_ATTR_BOLD) ^ (attr & V1050_ATTR_BRIGHT))) color = 2;
+			if (dot && (attr & V1050_ATTR_BOLD) && (attr & V1050_ATTR_BD0)) color = 2;
 
 			/* display blank */
 			if (attr & V1050_ATTR_BLANK) color = 0;
@@ -117,8 +108,8 @@ void v1050_state::v1050_video(machine_config &config)
 	screen.set_screen_update(H46505_TAG, FUNC(hd6845s_device::screen_update));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(640, 400);
-	screen.set_visarea(0,640-1, 0, 400-1);
+	screen.set_size(640, 300);
+	screen.set_visarea(0, 640-1, 0, 300-1);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 }

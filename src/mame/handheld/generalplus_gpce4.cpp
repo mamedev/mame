@@ -487,7 +487,7 @@ ROM_END
 
 
 // The 'Micro Arcade' units are credit card sized handheld devices
-CONS( 2017, mapacman,      0,       0,      generalplus_gpce4,   mapacman,          generalplus_gpce4_mapacman_state, empty_init, "Super Impulse", "Pac-Man (Micro Arcade)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2017, mapacman,      0,       0,      generalplus_gpce4,   mapacman,          generalplus_gpce4_mapacman_state, empty_init, "Super Impulse", "Pac-Man (Micro Arcade)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | ROT90 )
 
 // The 'Tiny Arcade' units are arcade cabinets on a keyring.
 CONS( 2017, taspinv,       0,       0,      generalplus_gpce4,   generalplus_gpce4, generalplus_gpce4_mapacman_state, empty_init, "Super Impulse", "Space Invaders (Tiny Arcade)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

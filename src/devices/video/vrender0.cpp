@@ -235,6 +235,8 @@ void vr0video_device::device_reset()
 
 	m_display_dest = m_draw_dest = 0;
 	// 1100 objects per second at ~80 MHz
+	// TODO: stub, move as from_ticks counting inside related functions
+	// depends on actual time it takes to draw each individual render part, and SE3208 CPU actual cycle counts
 	m_pipeline_timer->adjust(attotime::from_hz(this->clock() / 1100), 0, attotime::from_hz(this->clock() / 1100));
 }
 
@@ -659,6 +661,14 @@ TIMER_CALLBACK_MEMBER(vr0video_device::pipeline_cb)
 void vr0video_device::execute_flipping()
 {
 	if (!m_render_start)
+		return;
+
+	// don't execute any flipping if the count is 0
+	// - trivrus cfr. MT08891
+	// - crospuzl disappearing text around service mode RTC test (option 1 then 5)
+	// - topbladv version screen timing (too fast without it)
+	// NOTE: it's not "m_flip_sync", that would make topbladv/donghaer/ddflower stuck at first frame drawn
+	if (!m_flip_count)
 		return;
 
 	u32 const B0 = 0x000000;

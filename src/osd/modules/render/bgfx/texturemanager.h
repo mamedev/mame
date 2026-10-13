@@ -55,6 +55,7 @@ private:
 		uint32_t seqid;
 		int width;
 		int height;
+		int rowpixels;
 	};
 
 	std::map<std::string, std::pair<bgfx_texture_handle_provider *, std::unique_ptr<bgfx_texture_handle_provider> > > m_textures;

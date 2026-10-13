@@ -55,7 +55,7 @@ each of the units using the tech, and the audio quality varies significantly.
 
 #include "emu.h"
 
-#include "cpu/g65816/g65816.h"
+#include "cpu/m6502/w65816.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -863,23 +863,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(trkfldch_state::scanline)
 	if (scanline == 200)
 	{
 		m_which_vector = 0x06;
-		m_maincpu->set_input_line(G65816_LINE_NMI, ASSERT_LINE);
+		m_maincpu->set_input_line(w65816_device::NMI_LINE, ASSERT_LINE);
 	}
 	else if (scanline == 201)
 	{
 		m_which_vector = 0x06;
-		m_maincpu->set_input_line(G65816_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(w65816_device::NMI_LINE, CLEAR_LINE);
 	}
 
 	if (scanline == 20)
 	{
 		m_which_vector = 0x14;
-		m_maincpu->set_input_line(G65816_LINE_NMI, ASSERT_LINE);
+		m_maincpu->set_input_line(w65816_device::NMI_LINE, ASSERT_LINE);
 	}
 	else if (scanline == 21)
 	{
 		m_which_vector = 0x14;
-		m_maincpu->set_input_line(G65816_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(w65816_device::NMI_LINE, CLEAR_LINE);
 	}
 
 	// this is clearly a timer interrupt, trkfldch needs it to count
@@ -888,12 +888,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(trkfldch_state::scanline)
 		if ((scanline & 1) == 0)
 		{
 			m_which_vector = 0x18;
-			m_maincpu->set_input_line(G65816_LINE_NMI, ASSERT_LINE);
+			m_maincpu->set_input_line(w65816_device::NMI_LINE, ASSERT_LINE);
 		}
 		else
 		{
 			m_which_vector = 0x18;
-			m_maincpu->set_input_line(G65816_LINE_NMI, CLEAR_LINE);
+			m_maincpu->set_input_line(w65816_device::NMI_LINE, CLEAR_LINE);
 		}
 	}
 }
@@ -1596,10 +1596,10 @@ void trkfldch_state::machine_reset()
 void trkfldch_state::trkfldch(machine_config &config)
 {
 	/* basic machine hardware */
-	G65816(config, m_maincpu, 20000000);
+	W65816(config, m_maincpu, 20000000);
 	//m_maincpu->set_addrmap(AS_DATA, &trkfldch_state::mem_map);
 	m_maincpu->set_addrmap(AS_PROGRAM, &trkfldch_state::trkfldch_map);
-	m_maincpu->set_addrmap(g65816_device::AS_VECTORS, &trkfldch_state::vectors_map);
+	m_maincpu->set_addrmap(w65816_device::AS_VECTORS, &trkfldch_state::vectors_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(trkfldch_state::scanline), "screen", 0, 1);
 

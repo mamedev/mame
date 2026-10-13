@@ -76,7 +76,12 @@
   - racooon (Raccoon World)
 
       Game animation & timers seem too fast? demoted to NOT WORKING as a
-      result
+      result.  The game sets BCR to 0xFA1501C4: MEM3 (ROM and I/O) accesses
+      take 11 cycles plus 1 hold cycle, where the other games in this
+      driver use 8.  The Hyperstone core does not emulate memory access
+      latency.  An FPGA implementation that adds these access times runs
+      the game at a speed that looks right, but it has not been compared
+      with a PCB.
 
 -----------------------------------------------------------------------------
  Game Issues (unknown):
@@ -1711,6 +1716,7 @@ void eolith_state::init_landbrk()
 	init_eolith();
 }
 
+// HACK: protection isn't emulated
 /*
 The protected sets (where we're having to use a substitute ROM from an unprotected versions instead of the
 AT89c52 internal ROM) all have an extra startup check (to prevent you swapping in an external ROM?)
@@ -1722,7 +1728,6 @@ Using landbrka as an example it fails compares with memories:
 $4002d338 -> $4002d348 .... $4002d33f -> $4002d34f
 related with bits 0x100 - 0x200 read at startup from input(0) ?
 */
-
 void eolith_state::patch_mcu_protection(uint32_t address)
 {
 	uint32_t *rombase = (uint32_t*)memregion("maincpu")->base();

@@ -159,6 +159,7 @@ void abc800c_state::abc800c_video(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(480, 480);
 	screen.set_visarea(0, 480-1, 0, 480-1);
+	screen.screen_vblank().set(m_dart, FUNC(z80dart_device::rib_w)).invert();
 
 	PALETTE(config, m_palette, FUNC(abc800c_state::abc800c_palette), 8);
 

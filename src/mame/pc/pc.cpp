@@ -46,39 +46,39 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	void ataripc1(machine_config &config);
-	void coppc400(machine_config &config);
-	void ncrpc4i(machine_config &config);
-	void kaypro16(machine_config &config);
-	void kaypropc(machine_config &config);
-	void m15(machine_config &config);
-	void bondwell(machine_config &config);
-	void siemens(machine_config &config);
-	void iskr3104(machine_config &config);
-	void poisk2(machine_config &config);
-	void dgone(machine_config &config);
-	void pccga(machine_config &config);
-	void mk88(machine_config &config);
-	void eppc(machine_config &config);
-	void olystar20f(machine_config &config);
-	void olytext30(machine_config &config);
-	void zenith(machine_config &config);
-	void eagle1600(machine_config &config);
-	void laser_turbo_xt(machine_config &config);
-	void comport(machine_config &config);
-	void mpc1600(machine_config &config);
-	void ittxtra(machine_config &config);
-	void cadd810(machine_config &config);
-	void juko16(machine_config &config);
-	void alphatp50(machine_config &config);
-	void mbc16lt(machine_config &config);
-	void modernxt(machine_config &config);
-	void earthst(machine_config &config);
-	void vpcii(machine_config &config);
-	void fraking(machine_config &config);
-	void ec1847(machine_config &config);
+	void ataripc1(machine_config &config) ATTR_COLD;
+	void coppc400(machine_config &config) ATTR_COLD;
+	void ncrpc4i(machine_config &config) ATTR_COLD;
+	void kaypro16(machine_config &config) ATTR_COLD;
+	void kaypropc(machine_config &config) ATTR_COLD;
+	void m15(machine_config &config) ATTR_COLD;
+	void bondwell(machine_config &config) ATTR_COLD;
+	void siemens(machine_config &config) ATTR_COLD;
+	void iskr3104(machine_config &config) ATTR_COLD;
+	void poisk2(machine_config &config) ATTR_COLD;
+	void dgone(machine_config &config) ATTR_COLD;
+	void pccga(machine_config &config) ATTR_COLD;
+	void mk88(machine_config &config) ATTR_COLD;
+	void eppc(machine_config &config) ATTR_COLD;
+	void olystar20f(machine_config &config) ATTR_COLD;
+	void olytext30(machine_config &config) ATTR_COLD;
+	void zenith(machine_config &config) ATTR_COLD;
+	void eagle1600(machine_config &config) ATTR_COLD;
+	void laser_turbo_xt(machine_config &config) ATTR_COLD;
+	void comport(machine_config &config) ATTR_COLD;
+	void mpc1600(machine_config &config) ATTR_COLD;
+	void ittxtra(machine_config &config) ATTR_COLD;
+	void cadd810(machine_config &config) ATTR_COLD;
+	void juko16(machine_config &config) ATTR_COLD;
+	void alphatp50(machine_config &config) ATTR_COLD;
+	void mbc16lt(machine_config &config) ATTR_COLD;
+	void modernxt(machine_config &config) ATTR_COLD;
+	void earthst(machine_config &config) ATTR_COLD;
+	void vpcii(machine_config &config) ATTR_COLD;
+	void fraking(machine_config &config) ATTR_COLD;
+	void ec1847(machine_config &config) ATTR_COLD;
 
-	void init_bondwell();
+	void init_bondwell() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(pc_turbo_callback);
 

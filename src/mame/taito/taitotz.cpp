@@ -2662,7 +2662,8 @@ void taitotz_state::landhigh(machine_config &config)
 void taitotz_state::init_taitotz_152()
 {
 	u32 *rom = (u32*)memregion("user1")->base();
-	rom[(0x2c87c ^ 4) / 4] = 0x38600000;    // skip sound load timeout...
+	// HACK: skip sound load timeout
+	rom[(0x2c87c ^ 4) / 4] = 0x38600000;
 //  rom[(0x2c620 ^ 4) / 4] = 0x48000014;    // ID check skip (not needed with correct serial number)
 
 	if (ENABLE_DEBUG_PRINTS)
@@ -2677,7 +2678,8 @@ void taitotz_state::init_taitotz_152()
 void taitotz_state::init_taitotz_111a()
 {
 	u32 *rom = (u32*)memregion("user1")->base();
-	rom[(0x2b748^4)/4] = 0x480000b8;    // skip sound load timeout
+	// HACK: skip sound load timeout
+	rom[(0x2b748^4)/4] = 0x480000b8;
 }
 
 static const char LANDHIGH_HDD_SERIAL[] =           // "824915746386        "

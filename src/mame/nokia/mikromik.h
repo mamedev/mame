@@ -122,6 +122,8 @@ private:
 
 	// video state
 	bool m_leen = 0;
+	bool m_crtc_drq = false;
+	bool m_crtc_dma = false;
 
 	// serial state
 	bool m_intc = 0;
@@ -165,6 +167,8 @@ private:
 	uint8_t mpsc_dack_r();
 	void mpsc_dack_w(uint8_t data);
 	void dma_eop_w(int state);
+	void crtc_drq_w(int state);
+	void crtc_dma_w(uint8_t data);
 	void dack1_w(int state) { if (!state) m_dmac->dreq1_w(0); }
 	void dack2_w(int state) { if (!state) m_dmac->dreq2_w(0); }
 	void dack3_w(int state) { m_dack3 = state; update_tc(); };

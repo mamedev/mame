@@ -106,12 +106,12 @@ public:
 	uint8_t data_read();
 	void data_write(uint8_t data);
 
-	void receive_data(uint8_t data);
+	void receive_data(uint8_t data, uint8_t status = 0);
 	void m_tx_fifo_rp_step();
 	void m_rx_fifo_rp_step();
 	uint8_t m_rx_fifo_rp_data();
 
-	void write_rx(int state);
+	void write_rx(int state, bool loopback = false);
 	void cts_w(int state);
 	void dcd_w(int state);
 	void rxc_w(int state);
@@ -183,7 +183,7 @@ protected:
 		INT_TRANSMIT_PRIO       = 1,
 		INT_EXTERNAL_PRIO       = 0,
 		INT_RECEIVE_PRIO        = 2,
-		INT_SPECIAL_PRIO        = 0,
+		INT_SPECIAL_PRIO        = 2,
 	};
 
 	// Read registers
@@ -250,6 +250,8 @@ protected:
 	void safe_transmit_register_reset();
 	void check_dma_request();
 	void check_receive_interrupt();
+	bool rx_special_condition(uint8_t status) const;
+	bool rx_holds_special_condition() const;
 
 	emu_timer *m_baudtimer;
 	uint16_t m_brg_counter;
@@ -257,13 +259,13 @@ protected:
 	unsigned int m_delayed_tx_brg_change;
 
 	// receiver state
-	uint8_t m_rx_data_fifo[8];    // receive data FIFO
-	uint8_t m_rx_error_fifo[8];   // receive error FIFO
+	uint8_t m_rx_data_fifo[8 + 1];    // receive data FIFO (ring buffer, one slot is always left unused)
+	uint8_t m_rx_error_fifo[8 + 1];   // receive error FIFO
 	uint8_t m_rx_error;       // current receive error
 	//int m_rx_fifo         // receive FIFO pointer
 	int m_rx_fifo_rp;       // receive FIFO read pointer
 	int m_rx_fifo_wp;       // receive FIFO write pointer
-	int m_rx_fifo_sz;       // receive FIFO size
+	int m_rx_fifo_sz;       // receive FIFO ring size (FIFO depth + 1)
 
 	int m_rx_clock;         // receive clock pulse count
 	int m_rx_first;         // first character received
@@ -398,7 +400,7 @@ protected:
 
 	// internal interrupt management
 	void check_interrupts();
-	void reset_interrupts();
+	void reset_interrupts(int index);
 	uint8_t modify_vector(uint8_t vect, int i, uint8_t src);
 	void trigger_interrupt(int index, int state);
 
@@ -454,6 +456,10 @@ protected:
 	int m_out_int_state;
 	int m_int_state[6]; // interrupt state
 	int m_int_source[6]; // interrupt source
+
+	static constexpr int INT_PRIORITY[6] = {
+			z80scc_channel::INT_RECEIVE_PRIO, z80scc_channel::INT_TRANSMIT_PRIO, z80scc_channel::INT_EXTERNAL_PRIO,
+			3 + z80scc_channel::INT_RECEIVE_PRIO, 3 + z80scc_channel::INT_TRANSMIT_PRIO, 3 + z80scc_channel::INT_EXTERNAL_PRIO };
 
 	int const m_variant;
 	uint8_t m_wr0_ptrbits;

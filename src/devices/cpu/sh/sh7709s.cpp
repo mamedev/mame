@@ -31,6 +31,10 @@
 *   slowdown sections that at a glance don't look like they should be slowing down or causing extra
 *   slowdown.
 *
+*   The real cost above is that CAVE in their wisdom decided that flushing the cache wasn't enough (they
+*   could have set the cache to WT mode or just used uncached aliases to write to SDRAM). After the flush
+*   they invalidate the entire cache meaning *everything* has to be refetched from SDRAM at hefty stall costs.
+*
 * - The code that reads irr0 to check for irq2 also seems to have a ready modify write timing bug where
 *   the register value is read, IRQ2 is masked out of that value, then that masked value is written back.
 *   Documentation does mention in an addendum that this behavior can lead to lost IRQ's but luckily these
@@ -81,6 +85,7 @@ void sh7709s_device::device_reset()
 	m_precharge_remaining_cycles = 0;
 	m_burst_continuation_remaining_cycles = 0;
 	m_last_op_cycle_count = 0;
+	m_cache_port_free = true;
 }
 
 void sh7709s_device::device_start()
@@ -96,14 +101,11 @@ void sh7709s_device::device_start()
 	m_precharge_remaining_cycles = 0;
 	m_burst_continuation_remaining_cycles = 0;
 	m_last_op_cycle_count = 0;
+	m_cache_port_free = true;
 
-	for (int i = 0; i < SH7709S_CACHE_BLOCKS; i++)
-		for (int j = 0; j < SH7709S_CACHE_ASSOCIATIVITY; j++)
-		{
-			save_item(NAME(m_cache[i][j].tag), j + (i * SH7709S_CACHE_BLOCKS));
-			save_item(NAME(m_cache[i][j].lru), j + (i * SH7709S_CACHE_BLOCKS));
-			save_item(NAME(m_cache[i][j].dirty), j + (i * SH7709S_CACHE_BLOCKS));
-		}
+	save_item(STRUCT_MEMBER(m_cache, tag));
+	save_item(STRUCT_MEMBER(m_cache, lru));
+	save_item(STRUCT_MEMBER(m_cache, dirty));
 
 	save_item(NAME(m_wb_address));
 	save_item(NAME(m_last_area_accessed));
@@ -112,6 +114,7 @@ void sh7709s_device::device_start()
 	save_item(NAME(m_last_sdram_bank));
 	save_item(NAME(m_precharge_remaining_cycles));
 	save_item(NAME(m_last_op_cycle_count));
+	save_item(NAME(m_cache_port_free));
 }
 
 // Top 3 region bits allow for aliasing cached/uncached pointers to the same physical address
@@ -134,7 +137,7 @@ uint32_t get_area(uint32_t address)
 
 static bool is_sdram_region(uint32_t address)
 {
-	unsigned int area = get_area(address);
+	uint32_t area = get_area(address);
 
 	// Hardcoded for cv1k, assumes 3 mapped to SDRAM
 	return area == 3;
@@ -210,7 +213,7 @@ uint32_t sh7709s_device::get_wcr1_timing(uint32_t area)
 	if (area > 6 || area == 1)
 		return 0;
 
-	unsigned int area_val = (m_wcr1 >> (area * 2)) & 0x3;
+	uint32_t area_val = (m_wcr1 >> (area * 2)) & 0x3;
 
 	if (area_val == 0)
 		return 1;
@@ -226,7 +229,7 @@ uint32_t sh7709s_device::get_wcr2_timing(uint32_t address)
 	if (area > 6 || area == 1)
 		return 0;
 
-	unsigned int area_val = 0;
+	uint32_t area_val = 0;
 
 	if (area == 0)
 	{
@@ -320,28 +323,43 @@ uint32_t sh7709s_device::cache_line_fetch_count(uint32_t address)
 	return SH7709S_CACHE_LINE_SIZE >> (bcr2_val - 1);
 }
 
-// Unconfirmed behavior but the math works out based on comparison of misses in a frame to pcb footage
-// This covers a pipeline where we go from miss detect -> victim select -> address to BSC
-#define CACHE_MISS_STALL (3)
-
 static uint64_t remaining_cycles(uint64_t elapsed, uint64_t cycles)
 {
 	return (elapsed < cycles) ? (cycles - elapsed) : 0;
 }
 
 // cpu->bus cycle conversion hardcoded to 2x as cv1k sh3 runs the bus at 50mhz
-unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
+uint32_t sh7709s_device::access_penalty(uint32_t address, bool write)
 {
+	// Instead of emulating the whole pipeline since games execute logic + spinwait
+	// we can emulate the cache port contention by just flipping the port free every other
+	// access. Each instruction fetch grabs 2 instructions at once so this leaves
+	// the cache free every other cycle for a data fetch. If we attempt to access
+	// while busy stall for the busy cycle.
 	bool is_in_cache = cache_access(address, write);
+	uint64_t elapsed_cycles = total_cycles() - m_last_op_cycle_count;
+	uint32_t cpu_penalty = 0;
+
+	if (!m_cache_port_free)
+		cpu_penalty++;
+
+	m_cache_port_free = !m_cache_port_free;
 
 	if (is_in_cache)
-		return 0;
+	{
+		// Background fill happening, drain the remaining fill words but leave the rest on the table
+		if (elapsed_cycles < 6 && m_burst_continuation_remaining_cycles >= 6)
+		{
+			uint32_t stall_fetch = m_burst_continuation_remaining_cycles - elapsed_cycles;
+			m_burst_continuation_remaining_cycles -= 6;
+			return stall_fetch + cpu_penalty;
+		}
+		return cpu_penalty;
+	}
 
 	uint32_t area = get_area(address);
-	uint64_t elapsed_cycles = total_cycles() - m_last_op_cycle_count;
-	uint32_t cpu_penalty = is_cacheable(address) ? CACHE_MISS_STALL : 0;
-	uint32_t bank_read = sdram_bank(address);
-	uint32_t bus_penalty = 1; // CPU -> BSC sync cost
+	uint32_t bus_penalty = 0;
+	cpu_penalty += is_cacheable(address) ? 1 : 0;
 
 	// SDRAM timing based on SH7709S documentation
 	// These are copied from the timing charts. These are all in bus cycles
@@ -430,9 +448,6 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 		m_wb_active_cycles = 0;
 	}
 
-	if (is_sdram_region(address))
-		m_last_sdram_bank = bank_read;
-
 	// We had a dirty writeback eviction, total up the background cost penalty we'll pay on subsequent cycles
 	if (m_wb_address != 0)
 	{
@@ -446,7 +461,7 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 			m_burst_continuation_remaining_cycles = 0;
 			// since this is a dirty cache line eviction we always add wcr1 as it's handled after the miss fetch read
 			// and we're switching from read->write
-			m_wb_active_cycles += (2 + mcr_rcd() + 4 + mcr_trwl() + get_wcr1_timing(area) + mcr_tpc()) * 2;
+			m_wb_active_cycles += (1 + mcr_rcd() + 4 + mcr_trwl() + get_wcr1_timing(area) + mcr_tpc()) * 2;
 		}
 		else
 		{
@@ -466,11 +481,20 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 
 void sh7709s_device::update_access_cycles(uint32_t address, bool write)
 {
-#if SH7709S_ICACHE_TRACKING_HEAVY == 0
+	// m_last_op_cycle count should be tracking just bus activity
+	// but the carry forward cycles between data accesses act like a decent
+	// heuristic for missing instruction fetch stalls. This does cause a
+	// bit of extra carry forward once you hit a string of cache hits but
+	// since slowdown is ending at that point anyway only minor penalty that
+	// isn't visible is applied. This can be fixed with some extra sampling of
+	// surrounding cache lines on access but that carries a bit of extra cpu
+	// cost and quite a bit of code complexity
+#if !SH7709S_ICACHE_TRACKING_HEAVY
 	// For now only handle cacheable instruction fetch sampling when we do
 	// data accesses. The majority of uncached instruction fetches is
 	// handled in the cache flush timing
-	if (is_cacheable(m_sh2_state->pc)) {
+	if (is_cacheable(m_sh2_state->pc))
+	{
 		m_sh2_state->icount -= access_penalty(m_sh2_state->pc, false);
 		m_last_op_cycle_count = total_cycles();
 	}
@@ -501,7 +525,7 @@ static void cfunc_drc_memory_access_write(void* param)
 	((sh7709s_device*)param)->drc_memory_access_write();
 }
 
-#if SH7709S_ICACHE_TRACKING_HEAVY == 1
+#if SH7709S_ICACHE_TRACKING_HEAVY
 
 void sh7709s_device::drc_update_icache()
 {
@@ -672,8 +696,8 @@ uint32_t sh7709s_device::ccr_r(offs_t offset, uint32_t mem_mask)
 void sh7709s_device::ccr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// Don't write the CF bit into ccr as that's only used for cache invalidate
-	mem_mask &= ~0b1000;
-	if (data & 0b1000)
+	mem_mask &= ~uint32_t(0x8);
+	if (data & 0x8)
 	{
 		// We're going to invalidate the whole cache but we don't really handle throwing out any dirty data
 		// this just assumes that the game is correct in flushing all the data it needs or doesn't rely on
@@ -682,7 +706,7 @@ void sh7709s_device::ccr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		// enforced and not handled by the hardware
 		memset(m_cache, 0, sizeof(m_cache));
 		LOG("SH7709S cache invalidate\n");
-#if SH7709S_ICACHE_TRACKING_HEAVY == 0
+#if !SH7709S_ICACHE_TRACKING_HEAVY
 		// We want to account for some of the uncached instruction
 		// fetches that happen here but instrumenting every instruction
 		// is too cpu intensive. Since this causes a decent amount of
@@ -695,23 +719,20 @@ void sh7709s_device::ccr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		// BFS $AC002A66
 		// ADD #$10, R1
 		m_sh2_state->icount -= (2 /*fetches*/ * 2 /*bus cycle convert*/ * 1024 /*loop iterations*/) *
-			(2 + mcr_rcd() + get_wcr2_timing(m_sh2_state->pc) + mcr_tpc());
+			(1 + mcr_rcd() + get_wcr2_timing(m_sh2_state->pc) + mcr_tpc());
 #endif
 	}
 	COMBINE_DATA(&m_ccr);
 	logerror("'%s' (%08x): CCN unmapped internal write %08x & %08x (CCR)\n", tag(), m_sh2_state->pc, data, mem_mask);
 }
 
-constexpr uint32_t CACHE_MAPPING_BASE = 0xF0000000;
-constexpr uint32_t CACHE_MAPPING_END = 0xF0FFFFFF;
-
 uint32_t sh7709s_device::cache_address_array_r(offs_t offset, uint32_t mem_mask)
 {
 	// TODO : LRU bits
 	// This is unused by cv1k but just added for some extra info
 	uint32_t cache_entry_index = offset / 4;
-	unsigned int entry_block = cache_entry_index % SH7709S_CACHE_BLOCKS;
-	unsigned int way = cache_entry_index / SH7709S_CACHE_BLOCKS;
+	uint32_t entry_block = cache_entry_index % SH7709S_CACHE_BLOCKS;
+	uint32_t way = cache_entry_index / SH7709S_CACHE_BLOCKS;
 	struct sh7709s_cache_entry* entry = &m_cache[entry_block][way];
 	int v = entry->tag != 0;
 	int u = entry->dirty;
@@ -725,11 +746,11 @@ void sh7709s_device::cache_address_array_w(offs_t offset, uint32_t data, uint32_
 	// Only handle U bit writes to flush the entry for now
 	uint32_t cache_entry_index = offset / 4;
 	// cv1k doesn't even bother to read the entry values, it just writes 0 to every entry to flush them
-	bool is_flush = (data & 0x2) == 0;
+	bool is_flush = !BIT(data, 1);
 	if (is_flush)
 	{
-		unsigned int entry_block = cache_entry_index % SH7709S_CACHE_BLOCKS;
-		unsigned int way = cache_entry_index / SH7709S_CACHE_BLOCKS;
+		uint32_t entry_block = cache_entry_index % SH7709S_CACHE_BLOCKS;
+		uint32_t way = cache_entry_index / SH7709S_CACHE_BLOCKS;
 		if (m_cache[entry_block][way].dirty)
 		{
 			uint32_t wb_address = m_cache[entry_block][way].tag * SH7709S_CACHE_LINE_SIZE;
@@ -748,7 +769,7 @@ void sh7709s_device::cache_7709s_map(address_map& map)
 {
 	// TODO : LRU bits should also be tracked/mapped for titles that change the LRU way replacement bits
 	// Not sure if other titles attempt to access the data array mapped section
-	map(CACHE_MAPPING_BASE, CACHE_MAPPING_END).rw(FUNC(sh7709s_device::cache_address_array_r), FUNC(sh7709s_device::cache_address_array_w));
+	map(0xf0000000, 0xf0ffffff).rw(FUNC(sh7709s_device::cache_address_array_r), FUNC(sh7709s_device::cache_address_array_w));
 }
 
 void sh7709s_device::sh3_register_map(address_map& map)

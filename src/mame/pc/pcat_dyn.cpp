@@ -53,7 +53,7 @@ public:
 		, m_nvram_mem(0x2000)
 	{ }
 
-	void pcat_dyn(machine_config &config);
+	void pcat_dyn(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<isa8_device> m_isabus;

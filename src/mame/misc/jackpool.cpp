@@ -303,7 +303,7 @@ void jackpool_state::init_jackpool()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
-	/* patch NVRAM routine */
+	// HACK: patch NVRAM routine
 	rom[0x9040/2] = 0x6602;
 }
 

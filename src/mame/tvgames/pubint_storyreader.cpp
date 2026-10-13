@@ -173,6 +173,6 @@ ROM_END
 
 
 // These are said to not be compatible with each other
-//    Year  Name      Parent  Compat  Machine             Input           Class                 Init        Company                           Fullname            Flags
-CONS( 200?, pi_stry,  0,      0,      pi_storyreader,     pi_storyreader, pi_storyreader_state, empty_init, "Publications International Ltd", "Story Reader",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 200?, pi_stry2, 0,      0,      pi_storyreader_v2,  pi_storyreader, pi_storyreader_state, empty_init, "Publications International Ltd", "Story Reader 2.0", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    Year  Name      Parent  Compat  Machine             Input           Class                 Init        Company                             Fullname            Flags
+CONS( 200?, pi_stry,  0,      0,      pi_storyreader,     pi_storyreader, pi_storyreader_state, empty_init, "Publications International, Ltd.", "Story Reader",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, pi_stry2, 0,      0,      pi_storyreader_v2,  pi_storyreader, pi_storyreader_state, empty_init, "Publications International, Ltd.", "Story Reader 2.0", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

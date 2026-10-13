@@ -581,7 +581,7 @@ public:
 			versreq = 10;
 		uint16_t gpflag(0);
 		if (METHOD_DEFLATE == method)
-			gpflag |= GP_FLAG_DEFLATE_MAX;
+			gpflag |= GP_FLAG_DEFLATE_MAX; // minizip maps 8-9 to MAX, 2 to FAST, and 1 to FASTEST; zlib header ranges are 1, 2-5, 6, and 7-9
 		if (!m_random)
 			gpflag |= GP_FLAG_DATA_DESC;
 		gpflag |= GP_FLAG_UTF8;

@@ -13030,6 +13030,18 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 		</part>
 	</software>
 
+	<software name="readriot">
+		<description>Read RIOT</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="PAL,NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="readriot.a2600.bin" size="4096" crc="b404ac55" sha1="866ae2d0da147e7aff25b53c0249ffe1b9b6b0c2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="redvsblu">
 		<description>Red Vs. Blue - Football (prototype)</description>
 		<year>1981</year>

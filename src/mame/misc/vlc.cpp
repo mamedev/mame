@@ -661,7 +661,7 @@ void nevada_state::init_nevada()
 //  ROM[0xFE0086/2] = 0x4278;
 //  ROM[0xFE0088/2] = 0x0414;
 
-	// Skip PAL SECURITY
+	// HACK: skip PAL SECURITY
 	ROM[0xFE0248/2] = 0x4E71; // nop
 	ROM[0xFE05D0/2] = 0x4E71; // nop
 	ROM[0xFE05D8/2] = 0x6014; // bra

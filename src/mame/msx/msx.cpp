@@ -255,6 +255,19 @@ void msx_state::machine_reset()
 
 void msx_state::machine_start()
 {
+	m_maincpu->set_input_line_vector(0, 0xff); // Z80
+	m_maincpu->z80_set_m1_cycles(4+1); // 1 WAIT CLK per M1
+
+	save_item(NAME(m_psg_b));
+	save_item(NAME(m_kanji_latch));
+	save_item(NAME(m_kanji_fsa1fx));
+	save_item(NAME(m_slot_expanded));
+	save_item(NAME(m_primary_slot));
+	save_item(NAME(m_secondary_slot));
+	save_item(NAME(m_port_c_old));
+	save_item(NAME(m_keylatch));
+	save_item(NAME(m_system_control));
+
 	m_port_c_old = 0xff;
 
 	if (m_region_kanji.found() && m_region_kanji.length() >= 0x20000)
@@ -271,22 +284,6 @@ void msx_state::machine_start()
 	{
 		get_io_space().install_write_handler(0xf5, 0xf5, write8smo_delegate(*this, [this] (u8 data) { m_system_control = data; }, "system_control"));
 	}
-}
-
-void msx_state::driver_start()
-{
-	m_maincpu->set_input_line_vector(0, 0xff); // Z80
-	m_maincpu->z80_set_m1_cycles(4+1); // 1 WAIT CLK per M1
-
-	save_item(NAME(m_psg_b));
-	save_item(NAME(m_kanji_latch));
-	save_item(NAME(m_kanji_fsa1fx));
-	save_item(NAME(m_slot_expanded));
-	save_item(NAME(m_primary_slot));
-	save_item(NAME(m_secondary_slot));
-	save_item(NAME(m_port_c_old));
-	save_item(NAME(m_keylatch));
-	save_item(NAME(m_system_control));
 }
 
 u8 msx_state::psg_port_a_r()

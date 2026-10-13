@@ -280,8 +280,8 @@ void *drc_cache::alloc(std::size_t bytes, std::align_val_t align) noexcept
 		if (padbucket < m_free.size())
 		{
 			free_link *const link = reinterpret_cast<free_link *>(end);
-			link->m_next = m_free[bucket];
-			m_free[bucket] = link;
+			link->m_next = m_free[padbucket];
+			m_free[padbucket] = link;
 		}
 	}
 
@@ -345,8 +345,8 @@ void *drc_cache::alloc_near(std::size_t bytes, std::align_val_t align) noexcept
 		if (padbucket < m_nearfree.size())
 		{
 			free_link *const link = reinterpret_cast<free_link *>(top);
-			link->m_next = m_nearfree[bucket];
-			m_nearfree[bucket] = link;
+			link->m_next = m_nearfree[padbucket];
+			m_nearfree[padbucket] = link;
 		}
 	}
 

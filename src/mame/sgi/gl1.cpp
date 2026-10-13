@@ -177,11 +177,12 @@ u32 sgi_gl1_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 {
 	u8 const *src = m_bp.get();
 
-	for (unsigned y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+	for (unsigned y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
 	{
-		for (unsigned x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x++)
+		auto *const dst = &bitmap.pix(screen.visible_area().bottom() - y);
+		for (unsigned x = screen.visible_area().left(); x <= screen.visible_area().right(); x++)
 		{
-			bitmap.pix(screen.visible_area().max_y - y, x) = m_cmap->pen_color(*src++);
+			dst[x] = m_cmap->pen_color(*src++);
 		}
 	}
 

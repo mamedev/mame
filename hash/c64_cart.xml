@@ -364,28 +364,6 @@ Random corruption on any disk loaded with FASTLOAD enabled
 		</part>
 	</software>
 
-	<software name="multiscr" supported="no">
-		<description>Multiscreen (Australia)</description>
-		<year>1987</year>
-		<publisher>Multiscreen Pty</publisher>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="multiscreen" />
-			<feature name="game" value="0" />
-			<feature name="exrom" value="0" />
-			<feature name="battery" value="CR2325" />
-
-			<dataarea name="roml" size="0x34000">
-				<rom name="cart-1.bin" size="0x4000" crc="a0dc670c" sha1="bbee117340477a7416bba2e9abc2b8debd940cd4" offset="0x00000" />
-				<rom name="cart-2.bin" size="0x8000" crc="2abaad8e" sha1="897f98e954418e2e9313f219cd64b100c60c68b1" offset="0x04000" />
-				<rom name="cart-3.bin" size="0x8000" crc="ecddbbfc" sha1="70c72b77dc3981be8bcbec9ba0cc38d9aa5936fd" offset="0x0c000" />
-				<rom name="cart-4.bin" size="0x8000" crc="042678ef" sha1="ff2582c617f72bf57be7d76bcf8270665144f924" offset="0x14000" />
-			</dataarea>
-
-			<dataarea name="nvram" size="0x2000" />
-		</part>
-	</software>
-
 	<software name="4040fast">
 		<description>4040 + Fast Hack'Em</description>
 		<year>1990</year>
@@ -638,7 +616,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 		</part>
 	</software>
 
-	<software name="magicvce" supported="partial">
+	<software name="magicvce">
 		<description>Magic Voice</description>
 		<year>1984</year>
 		<publisher>Commodore</publisher>
@@ -975,28 +953,6 @@ Black screen, self modifies code in the 0x100-0x14f range
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="supercpu" supported="no">
-		<description>SuperCPU</description>
-		<year>1997</year>
-		<publisher>Creative Micro Designs</publisher>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="supercpu" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="1" />
-
-			<dataarea name="roml" size="0x20000">
-				<rom name="supercpu_dos_204.bin" size="0x20000" crc="f4151454" sha1="6aa529a7b1b6de53e8979e407a77b4d5657727f5" />
-			</dataarea>
-		</part>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="cmdscpuu.d64" size="174848" crc="caad286d" sha1="2c1258505148763f13ab2fcdaf247138a933817e" />
 			</dataarea>
 		</part>
 	</software>
@@ -1718,7 +1674,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 		<year>1983</year>
 		<publisher>Spinnaker Software</publisher>
 		<info name="serial" value="ABZ-C6" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -1814,7 +1770,7 @@ Black screen, self modifies code in the 0x100-0x14f range
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-001-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -2187,7 +2143,7 @@ Cannot select (s)ingle or (a)ll events, no key press recognized
 		<description>Donkey Kong</description>
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -2228,7 +2184,7 @@ Cannot select (s)ingle or (a)ll events, no key press recognized
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64???" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -2712,7 +2668,7 @@ Some erratic chars in playfield [VIC] GFXMODE=1, fixes on soft reset
 Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fear"
 ]]></notes>
 		<info name="serial" value="C-64613" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3170,7 +3126,7 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-104-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3225,7 +3181,7 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-007-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3254,7 +3210,7 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 		<year>1984</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="DC-002-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
@@ -3272,7 +3228,7 @@ Fails detecting [VIC] collsion detection at the end of stage 2 "the tunnel of fe
 Blue strips on title screen in place of tyres, mixes [VIC] GFXMODE=2 and 3
 Broken gameplay gfx, [VIC] GFXMODE=3
 ]]></notes>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3286,7 +3242,7 @@ Broken gameplay gfx, [VIC] GFXMODE=3
 		<description>Pitstop (alt)</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3301,7 +3257,7 @@ Broken gameplay gfx, [VIC] GFXMODE=3
 		<year>1983</year>
 		<publisher>Atarisoft</publisher>
 		<info name="serial" value="RX8536" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3315,7 +3271,7 @@ Broken gameplay gfx, [VIC] GFXMODE=3
 		<description>Popeye</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -3555,7 +3511,7 @@ Broken gameplay gfx, [VIC] GFXMODE=3
 		<notes><![CDATA[
 Glitchy [VIC] status bar GFXMODE switches on gameplay
 ]]></notes>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
@@ -4212,7 +4168,7 @@ Starts a 2 players game even if 1p is chosen?
 Erratic [VIC] collsion detection, warps and invincibility bonuses can kill player instead.
 ]]></notes>
 		<info name="serial" value="DC-101-04" />
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
@@ -6808,23 +6764,6 @@ Fails [MOS6526], [SID] and [cassette] checks
 		</part>
 	</software>
 
-	<software name="ide64">
-		<description>IDE64 (v4.1, IDEDOS v0.90)</description>
-		<year>2011</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="ide64" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="1" />
-
-			<dataarea name="ide64:u3" size="0x20000">
-				<rom name="u3" size="0x20000" crc="a52ff8fa" sha1="65fb2dc7d6bc6e96c4d60aca7eb103e7d1e58412" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="pop">
 		<description>Prince of Persia (v1.1)</description>
 		<year>2011</year>
@@ -7159,36 +7098,6 @@ Fails [MOS6526], [SID] and [cassette] checks
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
 				<rom name="koalapainter" size="0x4000" crc="cc75a06d" sha1="4707fe57b0575415a2c258392355941c130fcc80"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tibdd001">
-		<description>Disc Drive DD-001 (v1.1)</description>
-		<year>1991</year>
-		<publisher>TIB</publisher>
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="tibdd001" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
-
-			<dataarea name="roml" size="0x2000">
-				<rom name="rom_dd001_v1.1.bin" size="0x2000" crc="d266b628" sha1="24d178560dad3d955ebbe15f4274d966e031142d"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tibdd001a" cloneof="tibdd001">
-		<description>Disc Drive DD-001 (v1.0)</description>
-		<year>1991</year>
-		<publisher>TIB</publisher>
-		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="tibdd001" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
-
-			<dataarea name="roml" size="0x2000">
-				<rom name="rom_dd001_v1.0.bin" size="0x2000" crc="58f83983" sha1="f18cfb42c8e2c9152e18b129d01408f702271363"/>
 			</dataarea>
 		</part>
 	</software>

@@ -5,9 +5,34 @@
     amuzy.cpp - Amuzy cartridge arcade/medal system
     Skeleton by R. Belmont
 
+    Amuzy HA01-00053 MAIN PCB
+
     H8/3007 CPU
-    Yamaha YGV625 sprite processor and CRTC
-    OKI M9810 sound
+    20 MHz XTAL (near H8)
+    2x D43256BGU-70LL RAM (near H8)
+    Yamaha YGV625-H sprite processor and CRTC (see devices/video/ygv625.cpp)
+    NEC DX-102 (I/O chip?)
+    12.8TQ XTAL (near DX-102)
+    Lattice iM4A5-32 CPLD (marked FVS1A)
+    NEC D4992 RTC
+    CR2032 battery
+    OKI M9810B sound
+    blue resonator (near M9810B) marked 409C 849, i.e. 4.096 MHz
+    93C46A serial EEPROM at U15 (settings and meters)
+    coin hopper
+
+    The control box is shared by all games: a cartridge holds the program
+    (U1), the OKI samples (U2) and the sprite data (U3).  The BIOS part of
+    the program provides a management menu (TEST -> TEST, then UP/DOWN and
+    SERVICE) with an I/O test, monitor colour test, RAM test, sound test,
+    meter display and settings.  Holding UP+DOWN at power on offers a backup
+    data clear.
+
+    TODO:
+    - the serial ports are driven by the games but nothing is known to be
+      connected to them
+    - the YGV625 layer/priority registers are not used by these games and
+      are not emulated
 
     Many series of games were done on this platform. As of now, games
     for the following series have been dumped:
@@ -195,12 +220,16 @@
 #include "emu.h"
 
 #include "cpu/h8/h83006.h"
-#include "machine/timer.h"
+#include "machine/eepromser.h"
+#include "machine/ticket.h"
+#include "machine/upd4992.h"
 #include "sound/okim9810.h"
+#include "video/ygv625.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include <vector>
 
 
 namespace {
@@ -208,63 +237,93 @@ namespace {
 class amuzy_state : public driver_device
 {
 public:
-	amuzy_state(const machine_config &mconfig, device_type type, const char *tag);
+	amuzy_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_eeprom(*this, "eeprom"),
+		m_oki(*this, "oki"),
+		m_hopper(*this, "hopper"),
+		m_in1(*this, "IN1"),
+		m_lamps(*this, "lamp%u", 0U)
+	{ }
 
-	void amuzy(machine_config &config);
+	void amuzy(machine_config &config) ATTR_COLD;
+
+	void init_amuzy() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	required_device<h83007_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<okim9810_device> m_oki;
+	required_device<hopper_device> m_hopper;
+	required_ioport m_in1;
+	output_finder<4> m_lamps;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	u8 m_port6 = 0;
+	u8 m_portb = 0;
+
+	u8 port6_r();
+	void port6_w(u8 data);
+	void port8_w(u8 data);
+	void porta_w(u8 data);
+	u8 portb_r();
+	void portb_w(u8 data);
 
 	void amuzy_map(address_map &map) ATTR_COLD;
-
-	u16 status_r(offs_t offset);
-	void status_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 m_status[2]{};
-
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-amuzy_state::amuzy_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_screen(*this, "screen"),
-	m_palette(*this, "palette"),
-	m_oki(*this, "oki")
-{
-	std::fill(std::begin(m_status), std::end(m_status), 0);
 
+void amuzy_state::machine_start()
+{
+	save_item(NAME(m_port6));
+	save_item(NAME(m_portb));
 }
 
-u32 amuzy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+// 93C46 serial EEPROM: port 6 bit 1 = CLK, bit 2 = DI, bit 7 = DO; port 8 bit 0 = CS
+u8 amuzy_state::port6_r()
 {
-	screen.priority().fill(0, cliprect);
-	return 0;
+	return (m_port6 & 0x7f) | (m_eeprom->do_read() ? 0x80 : 0x00);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(amuzy_state::scanline)
+void amuzy_state::port6_w(u8 data)
 {
+	m_port6 = data;
+	m_eeprom->di_write(BIT(data, 2));
+	m_eeprom->clk_write(BIT(data, 1));
 }
 
-// video or FIFO status bits
-u16 amuzy_state::status_r(offs_t offset)
+void amuzy_state::port8_w(u8 data)
 {
-	// Note: if bit 0 doesn't act like a heartbeat then a watchdog reset will eventually occur.
-	if (offset == 0)
-		return (m_status[0] & 0xfffe) | m_screen->vblank();
-
-	// PC=0xb2ee, FIFO empty?
-	m_status[1] ^= 0x20;
-	return m_status[1];
+	m_eeprom->cs_write(BIT(data, 0));
 }
 
-void amuzy_state::status_w(offs_t offset, u16 data, u16 mem_mask)
+void amuzy_state::porta_w(u8 data)
 {
-	COMBINE_DATA(&m_status[offset]);
+	for (u8 i = 0; i < 4; i++)
+		m_lamps[i] = BIT(data, i);
+	for (u8 i = 0; i < 3; i++)
+		machine().bookkeeping().coin_counter_w(i, BIT(data, 4 + i));
+}
+
+u8 amuzy_state::portb_r()
+{
+	return (m_in1->read() & 0xf8) | (m_portb & 0x07);
+}
+
+void amuzy_state::portb_w(u8 data)
+{
+	m_hopper->motor_w(BIT(data, 0));
+	// lockouts are released (bits high) while the game accepts coins and
+	// pulled low in the BIOS menus
+	machine().bookkeeping().coin_lockout_w(0, !BIT(data, 2)); // 100 yen
+	machine().bookkeeping().coin_lockout_w(1, !BIT(data, 1)); // 10 yen / medal
+	machine().bookkeeping().coin_lockout_w(2, !BIT(data, 1));
+	m_portb = data;
 }
 
 
@@ -272,94 +331,69 @@ void amuzy_state::amuzy_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
 	map(0x200000, 0x20ffff).ram();
-	//  0x220000- 0x22000d  YGV625 CG memory readback?
-	//  0x600000- 0x601fff) YGV625 display list
-	map(0x600000, 0x603fff).ram();
-	//  0x603c00- 0x603c7f (at least) YGV625 registers
-	map(0x603c4c, 0x603c4f).rw(FUNC(amuzy_state::status_r), FUNC(amuzy_state::status_w));
+	map(0x220000, 0x22000f).umask16(0x00ff).rw("rtc", FUNC(upd4992_device::read), FUNC(upd4992_device::write));
+	map(0x400001, 0x400001).rw(m_oki, FUNC(okim9810_device::read_status), FUNC(okim9810_device::write_command));
+	map(0x400003, 0x400003).w(m_oki, FUNC(okim9810_device::write_tmp_register));
+	map(0x600000, 0x603fff).rw("ygv", FUNC(ygv625_device::read), FUNC(ygv625_device::write));
 }
+
+
+static INPUT_PORTS_START( amuzy )
+	PORT_START("IN0") // H8 port 7
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // Shot 1
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Shot 2
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // Shot 3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // Shot 4
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) // 100 Yen
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) // 10 Yen
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) // Medal
+
+	PORT_START("IN1") // H8 port B
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNUSED ) // outputs
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) // battery OK when high
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_VOLUME_DOWN ) // Sound Down
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_VOLUME_UP ) // Sound Up
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW ) // TEST button, also opens the meter / payout screen
+INPUT_PORTS_END
+
 
 void amuzy_state::amuzy(machine_config &config)
 {
-	H83007(config, m_maincpu, 20_MHz_XTAL); // 20 MHz rated part, 20 MHz oscillator module is present
+	H83007(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &amuzy_state::amuzy_map);
+	m_maincpu->read_port6().set(FUNC(amuzy_state::port6_r));
+	m_maincpu->write_port6().set(FUNC(amuzy_state::port6_w));
 	m_maincpu->read_port7().set_ioport("IN0");
-	m_maincpu->read_portb().set_ioport("IN1");
+	m_maincpu->write_port8().set(FUNC(amuzy_state::port8_w));
+	m_maincpu->write_porta().set(FUNC(amuzy_state::porta_w));
+	m_maincpu->read_portb().set(FUNC(amuzy_state::portb_r));
+	m_maincpu->write_portb().set(FUNC(amuzy_state::portb_w));
+
+	EEPROM_93C46_16BIT(config, m_eeprom);
+
+	UPD4992(config, "rtc", 32.768_kHz_XTAL);
+
+	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	SCREEN(config, m_screen);
-	// screen parameters are completely made up
-	m_screen->set_refresh_hz(59.62);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(80, 400-1, 16, 240-1);
-	m_screen->set_screen_update(FUNC(amuzy_state::screen_update));
-	m_screen->set_palette(m_palette);
+	// 320x240 display; horizontal total 407 and the 320x240 active area come from the
+	// CRTC register values written by the games, the rest is a guess
+	m_screen->set_raw(6'422'000, 407, 0, 320, 263, 0, 240);
+	m_screen->set_screen_update("ygv", FUNC(ygv625_device::screen_update));
 
-	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 256);
-
-	TIMER(config, "scantimer").configure_scanline(FUNC(amuzy_state::scanline), m_screen, 0, 1);
+	ygv625_device &ygv(YGV625(config, "ygv", 0));
+	ygv.set_screen(m_screen);
+	ygv.set_cg_region("ygv");
 
 	SPEAKER(config, "speaker", 2).front();
 
-	OKIM9810(config, m_oki, XTAL(4'096'000));
-	m_oki->add_route(0, "speaker", 1.00, 0);
-	m_oki->add_route(1, "speaker", 1.00, 1);
+	OKIM9810(config, m_oki, 4.096_MHz_XTAL);
+	m_oki->add_route(0, "speaker", 0.30, 0);
+	m_oki->add_route(1, "speaker", 0.30, 1);
 }
 
-static INPUT_PORTS_START( amuzy )
-	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN1")
-	// boobood PC=1756 xor.b #h'f8, r4l (-> active high for bits 0-2, hopper related?)
-	PORT_DIPNAME( 0x01, 0x00, "IN1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
 
 ROM_START( mmhammer )
 	ROM_REGION(0x80000, "maincpu", 0 )
@@ -368,8 +402,8 @@ ROM_START( mmhammer )
 	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
 	ROM_LOAD( "s29al016d70tfi01.u2", 0x000000, 0x200000, CRC(beb65917) SHA1(835a0ceef2fdfee2730d88e04a4a131575048979) )
 
-	ROM_REGION(0x200000, "gfx", 0 )
-	ROM_LOAD( "s29al016d70tfi01.u3", 0x000000, 0x200000, CRC(cedb6c55) SHA1(c2981b2547468723da6f5416a81b937b293576fc) )
+	ROM_REGION(0x200000, "ygv", 0 )
+	ROM_LOAD16_WORD_SWAP( "s29al016d70tfi01.u3", 0x000000, 0x200000, CRC(cedb6c55) SHA1(c2981b2547468723da6f5416a81b937b293576fc) )
 ROM_END
 
 ROM_START( docchift )
@@ -379,8 +413,8 @@ ROM_START( docchift )
 	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
 	ROM_LOAD( "s29al016d70tfi01.u2", 0x000000, 0x200000, CRC(044f004b) SHA1(c9f8797fcd5f67831311e4fea2621d7337c74fa2) )
 
-	ROM_REGION(0x200000, "gfx", 0 )
-	ROM_LOAD( "s29al016d70tfi01.u3", 0x000000, 0x200000, CRC(fb668dbd) SHA1(49514b0c886578f065e47d9c7a5453e09622ba55) )
+	ROM_REGION(0x200000, "ygv", 0 )
+	ROM_LOAD16_WORD_SWAP( "s29al016d70tfi01.u3", 0x000000, 0x200000, CRC(fb668dbd) SHA1(49514b0c886578f065e47d9c7a5453e09622ba55) )
 ROM_END
 
 ROM_START( amhbattl )
@@ -390,8 +424,8 @@ ROM_START( amhbattl )
 	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
 	ROM_LOAD( "s29al016d70tfi01.u2", 0x000000, 0x200000, CRC(cb1fd823) SHA1(f425a37ca425315f294366298146c3f6547a28c0) )
 
-	ROM_REGION(0x200000, "gfx", 0 )
-	ROM_LOAD( "s29al016d70tfi01.u3", 0x000000, 0x200000, CRC(f5bfb1e8) SHA1(e36be311782e4bcbd00a8bc93473f23e5c39c67a) )
+	ROM_REGION(0x200000, "ygv", 0 )
+	ROM_LOAD16_WORD_SWAP( "s29al016d70tfi01.u3", 0x000000, 0x200000, CRC(f5bfb1e8) SHA1(e36be311782e4bcbd00a8bc93473f23e5c39c67a) )
 ROM_END
 
 ROM_START( shpchamp ) // HA9022-0
@@ -399,10 +433,10 @@ ROM_START( shpchamp ) // HA9022-0
 	ROM_LOAD16_WORD_SWAP( "s29al004.u1", 0x000000, 0x080000, CRC(194dc931) SHA1(eae05e6627d09daa4b71154f665237348bf0947c) ) // 11xxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
-	ROM_LOAD( "s29al016.u2", 0x000000, 0x200000, CRC(677cf07b) SHA1(f30892aa18da14c2077e8847a295112616b06386) )
+	ROM_LOAD( "s29al016.u2", 0x000000, 0x200000, CRC(1c3d4fe9) SHA1(5907c60ea526258937affb0285cd34ac23176c6d) ) // halves interleaved, see init_amuzy
 
-	ROM_REGION(0x200000, "gfx", 0 )
-	ROM_LOAD( "s29al016.u3", 0x000000, 0x200000, CRC(d218c777) SHA1(7cb09925419864ec784f31802b10e9649eba3e58) )
+	ROM_REGION(0x200000, "ygv", 0 )
+	ROM_LOAD16_WORD_SWAP( "s29al016.u3", 0x000000, 0x200000, CRC(24939e4b) SHA1(1ca8252dc60de4288b5f7ee794e9bf85821d1160) )
 ROM_END
 
 ROM_START( zenponta ) // HA9020-0
@@ -412,8 +446,8 @@ ROM_START( zenponta ) // HA9020-0
 	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
 	ROM_LOAD( "29f016.u2",  0x000000, 0x200000, CRC(0ae3354b) SHA1(05c22650ab8c60ad09d30ca83c0d3c628f4be622) )
 
-	ROM_REGION(0x200000, "gfx", 0 )
-	ROM_LOAD( "29lv160.u3", 0x000000, 0x200000, CRC(76ed6b4a) SHA1(5b3523353771d91c0382b8c2440cae795a8207ed) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_REGION(0x200000, "ygv", 0 )
+	ROM_LOAD16_WORD_SWAP( "29lv160.u3", 0x000000, 0x200000, BAD_DUMP CRC(76ed6b4a) SHA1(5b3523353771d91c0382b8c2440cae795a8207ed) ) // D3/D4 shorted during dumping
 ROM_END
 
 ROM_START( wwdash )
@@ -421,10 +455,10 @@ ROM_START( wwdash )
 	ROM_LOAD16_WORD_SWAP( "s29al004d70tfi01.u1", 0x000000, 0x080000, CRC(b8984518) SHA1(23f8f2988a44bf0f0a14c39363f97f8e1b12cf62) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
-	ROM_LOAD( "s29al016d70tfi01.u2", 0x000000, 0x200000, CRC(c02c4fed) SHA1(e3fd56621fc7ca4558f3044a1b13b6b58dd4c368) )
+	ROM_LOAD( "s29al016d70tfi01.u2", 0x000000, 0x200000, BAD_DUMP CRC(c02c4fed) SHA1(e3fd56621fc7ca4558f3044a1b13b6b58dd4c368) ) // image displaced by 0x12a26 bytes
 
-	ROM_REGION(0x200000, "gfx", 0 )
-	ROM_LOAD( "s29al016d70tfi01.u3", 0x000000, 0x200000, CRC(cd66dc10) SHA1(76051b248882f7b5c0adfd0ae62283a16d440523) )
+	ROM_REGION(0x200000, "ygv", 0 )
+	ROM_LOAD16_WORD_SWAP( "s29al016d70tfi01.u3", 0x000000, 0x200000, BAD_DUMP CRC(cd66dc10) SHA1(76051b248882f7b5c0adfd0ae62283a16d440523) ) // D3/D4 shorted during dumping
 ROM_END
 
 ROM_START( boobood ) // HA9019-0
@@ -434,8 +468,8 @@ ROM_START( boobood ) // HA9019-0
 	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
 	ROM_LOAD( "29f016a.u2", 0x000000, 0x200000, CRC(edf8d7e2) SHA1(aee4d70dfd0fcb0d766365722b8712bb3a63efb4) )
 
-	ROM_REGION(0x200000, "gfx", 0 )
-	ROM_LOAD( "29lv160.u3", 0x000000, 0x200000, CRC(684523f0) SHA1(ca96918abde4ec63f33d82cf30b121f2ac05f68d) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_REGION(0x200000, "ygv", 0 )
+	ROM_LOAD16_WORD_SWAP( "29lv160.u3", 0x000000, 0x200000, BAD_DUMP CRC(684523f0) SHA1(ca96918abde4ec63f33d82cf30b121f2ac05f68d) ) // D3/D4 shorted during dumping
 ROM_END
 
 ROM_START( fishbatl ) // HA9008-0
@@ -445,8 +479,8 @@ ROM_START( fishbatl ) // HA9008-0
 	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
 	ROM_LOAD( "29f016a.u2", 0x000000, 0x200000, CRC(95f664f8) SHA1(050f074f7646336b6ce7f5e9c34d50d68d0a9a00) )
 
-	ROM_REGION(0x200000, "gfx", 0 )
-	ROM_LOAD( "29lv160.u3", 0x000000, 0x200000, CRC(dc8f6b48) SHA1(75f92d38b1e716e3c1c0cdb25f444671789dd23a) )
+	ROM_REGION(0x200000, "ygv", 0 )
+	ROM_LOAD16_WORD_SWAP( "29lv160.u3", 0x000000, 0x200000, CRC(03611a9e) SHA1(f514a16fdd8d635675464cb6853a2296a5d0ab57) )
 ROM_END
 
 ROM_START( wanpakup ) // HA9020-0
@@ -456,8 +490,8 @@ ROM_START( wanpakup ) // HA9020-0
 	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
 	ROM_LOAD( "29f016a.u2", 0x000000, 0x200000, CRC(ae4b65ad) SHA1(5afb0dbaa37ba90c03ed18929062f6e2c136dca0) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
 
-	ROM_REGION(0x200000, "gfx", 0 )
-	ROM_LOAD( "29lv160.u3", 0x000000, 0x200000, CRC(91fe39d5) SHA1(e900824a9edc47edb9444812daa2e416f8365e0c) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_REGION(0x200000, "ygv", 0 )
+	ROM_LOAD16_WORD_SWAP( "29lv160.u3", 0x000000, 0x200000, CRC(1e7b78b3) SHA1(56a62181cf91fc10824c31984b3524a86b2e5c98) )
 ROM_END
 
 ROM_START( wanpunch ) // HA9008-0
@@ -467,8 +501,8 @@ ROM_START( wanpunch ) // HA9008-0
 	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
 	ROM_LOAD( "u2", 0x000000, 0x200000, CRC(52862706) SHA1(a8ea16bafccad0cddcfa238402268bd8a2d4788b) )
 
-	ROM_REGION(0x200000, "gfx", 0 )
-	ROM_LOAD( "u3", 0x000000, 0x200000, CRC(48c3eee9) SHA1(291aaf0ffd5c46ed84e616508cff7c930790660a) )
+	ROM_REGION(0x200000, "ygv", 0 )
+	ROM_LOAD16_WORD_SWAP( "u3", 0x000000, 0x200000, BAD_DUMP CRC(48c3eee9) SHA1(291aaf0ffd5c46ed84e616508cff7c930790660a) ) // D3/D4 shorted during dumping
 ROM_END
 
 ROM_START( hhunter ) // HA9008-0
@@ -478,8 +512,8 @@ ROM_START( hhunter ) // HA9008-0
 	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
 	ROM_LOAD( "u2", 0x000000, 0x200000, CRC(b95a7b36) SHA1(7604c6df90836656fd1c861748a7a9035d7818c2) )
 
-	ROM_REGION(0x200000, "gfx", 0 )
-	ROM_LOAD( "u3", 0x000000, 0x200000, CRC(766ab340) SHA1(aa0b857ec5da879c33c678aa9f0d4e0d8dca65bf) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_REGION(0x200000, "ygv", 0 )
+	ROM_LOAD16_WORD_SWAP( "u3", 0x000000, 0x200000, BAD_DUMP CRC(766ab340) SHA1(aa0b857ec5da879c33c678aa9f0d4e0d8dca65bf) ) // D3/D4 shorted during dumping
 ROM_END
 
 ROM_START( rodeokng ) // HA9019-0
@@ -489,8 +523,8 @@ ROM_START( rodeokng ) // HA9019-0
 	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
 	ROM_LOAD( "u2", 0x000000, 0x200000, CRC(d636a639) SHA1(35aba71c0a10762cd91dda4d08a711768d74679a) )
 
-	ROM_REGION(0x200000, "gfx", 0 )
-	ROM_LOAD( "u3", 0x000000, 0x200000, CRC(3072eeed) SHA1(dab01071f4dc7131f7e78972c9a9042a2e8ac6d6) )
+	ROM_REGION(0x200000, "ygv", 0 )
+	ROM_LOAD16_WORD_SWAP( "u3", 0x000000, 0x200000, BAD_DUMP CRC(3072eeed) SHA1(dab01071f4dc7131f7e78972c9a9042a2e8ac6d6) ) // D3/D4 shorted during dumping
 ROM_END
 
 ROM_START( dojokkot ) // HA9020-0
@@ -500,8 +534,8 @@ ROM_START( dojokkot ) // HA9020-0
 	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
 	ROM_LOAD( "u2", 0x000000, 0x200000, CRC(00756334) SHA1(747c5873f4b8a04b1956b447575a27ae23c57457) )
 
-	ROM_REGION(0x200000, "gfx", 0 )
-	ROM_LOAD( "u3", 0x000000, 0x200000, CRC(1123e2ce) SHA1(b702230d2494ecda9d90c42f87ab2396c316552d) )
+	ROM_REGION(0x200000, "ygv", 0 )
+	ROM_LOAD16_WORD_SWAP( "u3", 0x000000, 0x200000, BAD_DUMP CRC(1123e2ce) SHA1(b702230d2494ecda9d90c42f87ab2396c316552d) ) // D3/D4 shorted during dumping
 ROM_END
 
 ROM_START( itazurac ) // HA9022-0
@@ -510,10 +544,10 @@ ROM_START( itazurac ) // HA9022-0
 
 	// this ROM wouldn't read consistently: most times it gave 0x88 and sometimes 0x00 at offset 0. Here we go with 0x88.
 	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
-	ROM_LOAD( "u2", 0x000000, 0x200000, CRC(5103b215) SHA1(5fe42bd0d29d2cfc9e0d35162ee15e3ff55c4bcb) )
+	ROM_LOAD( "u2", 0x000000, 0x200000, BAD_DUMP CRC(5103b215) SHA1(5fe42bd0d29d2cfc9e0d35162ee15e3ff55c4bcb) ) // image displaced by 0x16a26 bytes
 
-	ROM_REGION(0x200000, "gfx", 0 )
-	ROM_LOAD( "u3", 0x000000, 0x200000, CRC(76ce7b79) SHA1(749bc519cf66c0aec615881824e417719af78d2b) )
+	ROM_REGION(0x200000, "ygv", 0 )
+	ROM_LOAD16_WORD_SWAP( "u3", 0x000000, 0x200000, BAD_DUMP CRC(76ce7b79) SHA1(749bc519cf66c0aec615881824e417719af78d2b) ) // D3/D4 shorted during dumping
 ROM_END
 
 ROM_START( katori ) // HA9020-0
@@ -523,8 +557,8 @@ ROM_START( katori ) // HA9020-0
 	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
 	ROM_LOAD( "29f016.u2", 0x000000, 0x200000, CRC(ee7f2bb6) SHA1(1638d5196499fd3669a97fc9e64adacf59bc6108) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
 
-	ROM_REGION(0x200000, "gfx", 0 )
-	ROM_LOAD( "mx29lv160.u3", 0x000000, 0x200000, CRC(f57c33f6) SHA1(3d5dd858e94156c4c7b1f6b8934b0f7667fd66ad) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_REGION(0x200000, "ygv", 0 )
+	ROM_LOAD16_WORD_SWAP( "mx29lv160.u3", 0x000000, 0x200000, BAD_DUMP CRC(f57c33f6) SHA1(3d5dd858e94156c4c7b1f6b8934b0f7667fd66ad) ) // D3/D4 shorted during dumping
 ROM_END
 
 ROM_START( cbkids )
@@ -534,26 +568,49 @@ ROM_START( cbkids )
 	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
 	ROM_LOAD( "mbm29f016a.u2", 0x000000, 0x200000, CRC(7faf5c9f) SHA1(c080de0eb6500bca995c23c0f348dc44696e6966) )
 
-	ROM_REGION( 0x200000, "gfx", 0 )
-	ROM_LOAD( "mx29lv160db.u3", 0x000000, 0x200000, CRC(6971d7cf) SHA1(81206a6f54180965570ccfc830083b582764aeb8) )
+	ROM_REGION( 0x200000, "ygv", 0 )
+	ROM_LOAD16_WORD_SWAP( "mx29lv160db.u3", 0x000000, 0x200000, CRC(6971d7cf) SHA1(81206a6f54180965570ccfc830083b582764aeb8) )
 ROM_END
+
+
+/*
+    The cartridge wires the OKI's A20 to the DQ15/A-1 byte select pin of the
+    16 Mbit sample flash and A0-A19 to the flash's A0-A19, so a word-mode dump
+    of the chip holds the two 1 MB halves of the OKI's address space
+    interleaved byte by byte: file byte 2n is OKI address n, file byte 2n+1 is
+    OKI address n + 0x100000.  The amhbattl, docchift, mmhammer and shpchamp
+    U2 dumps were made that way; put them back in the order the OKI sees.  The
+    other sets' U2 dumps are already in byte order.
+*/
+void amuzy_state::init_amuzy()
+{
+	memory_region *region = memregion("oki");
+	u8 *rom = region->base();
+	constexpr u32 half = 0x100000;
+	std::vector<u8> copy(rom, rom + 2 * half);
+	for (u32 i = 0; i < half; i++)
+	{
+		rom[i] = copy[2 * i];
+		rom[half + i] = copy[2 * i + 1];
+	}
+}
 
 }   // anonymous namespace
 
 
-GAME( 2005, boobood,   0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Boo Boo Donpatchi (Japan, ver 1.01)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, dojokkot,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Dojokko Tsukami (Japan, ver 1.02)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, fishbatl,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Fisherman Battle (Japan, ver 1.03)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, hhunter,   0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Haunted Hunter (Japan, ver 1.00)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, katori,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Katori Attack (Japan, ver 1.03)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, rodeokng,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Rodeo King (Japan, ver 1.00)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, wanpunch,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wanikko Punch (Japan, ver 1.20)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, zenponta,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Zenigata Ponta (Japan, ver 1.02)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2006, amhbattl,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Acchi Muite Hoi Battle (Japan, ver 1.04)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2006, wanpakup,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wanpaku Pirates (Japan, ver 1.00)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2007, cbkids,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Chanbara Kids (Japan)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2007, docchift,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Docchi Fighter (Japan, ver 1.02)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2007, itazurac,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Itazura Cockroach (Japan, ver 1.02)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2007, wwdash,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wan Wan Dash (Japan, ver 1.01)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2008, mmhammer,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Mogu Mogu Hammer (Japan, ver 1.01)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2008, shpchamp,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Shippe Champion (Japan, ver 1.02)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, boobood,   0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Boo Boo Donpatchi (Japan, ver 1.01)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics ROM is a bad dump
+GAME( 2005, dojokkot,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Dojokko Tsukami (Japan, ver 1.02)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics ROM is a bad dump
+GAME( 2005, fishbatl,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Fisherman Battle (Japan, ver 1.03)",       MACHINE_SUPPORTS_SAVE )
+GAME( 2005, hhunter,   0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Haunted Hunter (Japan, ver 1.00)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics ROM is a bad dump
+GAME( 2005, katori,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Katori Attack (Japan, ver 1.03)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics ROM is a bad dump
+GAME( 2005, rodeokng,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Rodeo King (Japan, ver 1.00)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics ROM is a bad dump
+GAME( 2005, wanpunch,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wanikko Punch (Japan, ver 1.20)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics ROM is a bad dump
+GAME( 2005, zenponta,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Zenigata Ponta (Japan, ver 1.02)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics ROM is a bad dump
+GAME( 2006, amhbattl,  0, amuzy, amuzy, amuzy_state, init_amuzy, ROT0, "Amuzy Corporation", "Acchi Muite Hoi Battle (Japan, ver 1.04)", MACHINE_SUPPORTS_SAVE )
+GAME( 2006, wanpakup,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wanpaku Pirates (Japan, ver 1.00)",        MACHINE_SUPPORTS_SAVE )
+GAME( 2007, cbkids,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Chanbara Kids (Japan)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U1 program ROM is a bad dump
+GAME( 2007, docchift,  0, amuzy, amuzy, amuzy_state, init_amuzy, ROT0, "Amuzy Corporation", "Docchi Fighter (Japan, ver 1.02)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2007, itazurac,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Itazura Cockroach (Japan, ver 1.02)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics and U2 sample ROMs are bad dumps
+GAME( 2007, wwdash,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wan Wan Dash (Japan, ver 1.01)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics and U2 sample ROMs are bad dumps
+GAME( 2008, mmhammer,  0, amuzy, amuzy, amuzy_state, init_amuzy, ROT0, "Amuzy Corporation", "Mogu Mogu Hammer (Japan, ver 1.01)",       MACHINE_SUPPORTS_SAVE )
+GAME( 2008, shpchamp,  0, amuzy, amuzy, amuzy_state, init_amuzy, ROT0, "Amuzy Corporation", "Shippe Champion (Japan, ver 1.02)",        MACHINE_SUPPORTS_SAVE )

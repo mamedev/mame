@@ -127,6 +127,7 @@ private:
 	// registers
 	uint8_t m_reg[0x3d];
 	uint8_t m_status;
+	bool m_odd_field;
 
 	uint8_t m_hpixels_per_column;
 

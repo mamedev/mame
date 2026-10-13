@@ -72,6 +72,24 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hirq_tick_callback)
 	hirq_tick();
 }
 
+// (re)arm the H-IRQ for the rest of the current scanline.  The hardware compares
+// HTIME/VTIME against the counters on every dot, so rewriting them mid-line can
+// raise a second IRQ on the same line (Doom's IRQ handler relies on this).
+void snes_state::hirq_schedule()
+{
+	const int pixel = m_htime * m_ppu->htmult();
+
+	if (!(SNES_CPU_REG(NMITIMEN) & 0x10) ||
+		((SNES_CPU_REG(NMITIMEN) & 0x20) && (m_ppu->current_vert() != m_vtime)) ||
+		(m_screen->vpos() != m_ppu->current_vert()) || (m_screen->hpos() >= pixel))
+	{
+		m_hirq_timer->adjust(attotime::never);
+		return;
+	}
+
+	m_hirq_timer->adjust(m_screen->time_until_pos(m_ppu->current_vert(), pixel));
+}
+
 TIMER_CALLBACK_MEMBER(snes_state::snes_reset_oam_address)
 {
 	if (!m_ppu->screen_disabled()) //Reset OAM address, byuu says it happens at H=10
@@ -112,29 +130,15 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 	/* Horizontal IRQ timer */
 	if (SNES_CPU_REG(NMITIMEN) & 0x10)
 	{
-		int setirq = 1;
-		int pixel = m_htime;
-
-		// is the HIRQ on a specific scanline?
-		if (SNES_CPU_REG(NMITIMEN) & 0x20)
+		if (m_htime == 0)
 		{
-			if (m_ppu->current_vert() != m_vtime)
-			{
-				setirq = 0;
-			}
-		}
-
-		if (setirq)
-		{
-//          printf("HIRQ @ %d, %d\n", pixel * m_ppu->htmult(), m_ppu->current_vert());
-			if (pixel == 0)
-			{
+			// is the HIRQ on a specific scanline?
+			if (!(SNES_CPU_REG(NMITIMEN) & 0x20) || (m_ppu->current_vert() == m_vtime))
 				hirq_tick();
-			}
-			else
-			{
-				m_hirq_timer->adjust(m_screen->time_until_pos(m_ppu->current_vert(), pixel * m_ppu->htmult()));
-			}
+		}
+		else
+		{
+			hirq_schedule();
 		}
 	}
 
@@ -493,6 +497,7 @@ void snes_state::snes_w_io(address_space &space, offs_t offset, uint8_t data)
 				scpu_irq_refresh();
 			}
 			SNES_CPU_REG(NMITIMEN) = data;
+			hirq_schedule();
 			return;
 		case WRIO:      /* Programmable I/O port - latches H/V counters on a 0->1 transition */
 			wrio_write(data);
@@ -500,15 +505,19 @@ void snes_state::snes_w_io(address_space &space, offs_t offset, uint8_t data)
 			return;
 		case HTIMEL:    /* H-Count timer settings (low)  */
 			m_htime = (m_htime & 0x100) | (data <<  0);
+			hirq_schedule();
 			return;
 		case HTIMEH:    /* H-Count timer settings (high) */
 			m_htime = (m_htime & 0x0ff) | ((data & 1) <<  8);
+			hirq_schedule();
 			return;
 		case VTIMEL:    /* V-Count timer settings (low)  */
 			m_vtime = (m_vtime & 0x100) | (data <<  0);
+			hirq_schedule();
 			return;
 		case VTIMEH:    /* V-Count timer settings (high) */
 			m_vtime = (m_vtime & 0x0ff) | ((data & 1) <<  8);
+			hirq_schedule();
 			return;
 		case MDMAEN:    /* DMA channel designation and trigger */
 			dma(space, data);

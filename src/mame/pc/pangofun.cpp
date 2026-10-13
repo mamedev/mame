@@ -129,7 +129,7 @@ public:
 		, m_speaker(*this, "speaker")
 	{ }
 
-	void pangofun(machine_config &config);
+	void pangofun(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<i486_device> m_maincpu;

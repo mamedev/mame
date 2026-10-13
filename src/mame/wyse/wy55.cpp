@@ -32,13 +32,14 @@ public:
 	{
 	}
 
-	void wy55(machine_config &config);
-	void wy65(machine_config &config);
-	void wy185es(machine_config &config);
+	void wy55(machine_config &config) ATTR_COLD;
+	void wy65(machine_config &config) ATTR_COLD;
+	void wy185es(machine_config &config) ATTR_COLD;
+
+	void init_wy55() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void driver_start() override;
 
 private:
 	void wy65_progbank_w(u8 data) { m_progbank->set_entry(data & 0x03); }
@@ -161,7 +162,7 @@ ROM_START(wy185es)
 	ROM_LOAD("251201-03.bin", 0x00000, 0x10000, CRC(5b8cace5) SHA1(484bba8244a99edb80d7f7a5437c2be52c980fc1)) // v2.0
 ROM_END
 
-void wy55_state::driver_start()
+void wy55_state::init_wy55()
 {
 	memory_region *rgn = memregion("program");
 	uint8_t *rom = rgn->base();
@@ -177,6 +178,6 @@ void wy55_state::driver_start()
 
 } // anonymous namespace
 
-COMP(1991, wy185es, 0, 0, wy185es, wy55, wy55_state, empty_init, "Wyse Technology", "WY-185ES (v2.0)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-COMP(1993, wy55,    0, 0, wy55,    wy55, wy55_state, empty_init, "Wyse Technology", "WY-55 (v2.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-COMP(1996, wy65,    0, 0, wy65,    wy55, wy55_state, empty_init, "Wyse Technology", "WY-65 (v2.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1991, wy185es, 0, 0, wy185es, wy55, wy55_state, init_wy55, "Wyse Technology", "WY-185ES (v2.0)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1993, wy55,    0, 0, wy55,    wy55, wy55_state, init_wy55, "Wyse Technology", "WY-55 (v2.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1996, wy65,    0, 0, wy65,    wy55, wy55_state, init_wy55, "Wyse Technology", "WY-65 (v2.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

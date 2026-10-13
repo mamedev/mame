@@ -6,17 +6,19 @@
 
 #define LOG_IRQ   (1U << 1) // enable bits (verbose)
 #define LOG_TIMER (1U << 2)
-#define LOG_XBUS  (1U << 3)
-#define LOG_XBUSV (1U << 4) // verbose XBus stuff
-#define LOG_DSPP  (1U << 5)
+#define LOG_DMA   (1U << 3) // DMA channel requests (verbose)
+#define LOG_XBUS  (1U << 4)
+#define LOG_XBUSV (1U << 5) // verbose XBus stuff
+#define LOG_DSPP  (1U << 6)
 
-#define VERBOSE (LOG_GENERAL | LOG_XBUS | LOG_DSPP)
+#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
 #define LOGIRQ(...)   LOGMASKED(LOG_IRQ,     __VA_ARGS__)
 #define LOGTIMER(...) LOGMASKED(LOG_TIMER,   __VA_ARGS__)
+#define LOGDMA(...)   LOGMASKED(LOG_DMA,     __VA_ARGS__)
 #define LOGXBUS(...)  LOGMASKED(LOG_XBUS,    __VA_ARGS__)
 #define LOGXBUSV(...) LOGMASKED(LOG_XBUSV,   __VA_ARGS__)
 #define LOGDSPP(...)  LOGMASKED(LOG_DSPP,    __VA_ARGS__)
@@ -266,7 +268,9 @@ void clio_device::map(address_map &map)
 	);
 	map(0x000c, 0x000f).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOG("vint1: %08x & %08x\n", data, mem_mask);
+			// suppress regular use cases (normal line and disable)
+			if (data != 5 && data != 0xffff'ffff)
+				LOG("vint1: %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_vint1);
 		})
 	);
@@ -288,6 +292,7 @@ void clio_device::map(address_map &map)
 			LOG("audout: %08x & %08x\n", data, mem_mask);
 			// c0020f0f is written here during boot
 			COMBINE_DATA(&m_audout);
+			// TODO: latch to DSPP
 		})
 	);
 	/*
@@ -544,7 +549,7 @@ void clio_device::map(address_map &map)
 				m_dma_enable &= ~data;
 			else
 				m_dma_enable |= data;
-			LOG("DMA request %s: %08x & %08x\n", offset ? "clear" : "set", data, mem_mask);
+			LOGDMA("DMA request %s: %08x & %08x\n", offset ? "clear" : "set", data, mem_mask);
 			m_exp_dma_enable_cb(BIT(m_dma_enable, 20) && BIT(m_expctl, 11));
 			// DSPP channels 0-12 (RAM -> DSPP) and 16-19 (DSPP -> RAM)
 			if (data & 0x000f1fff)
@@ -694,11 +699,25 @@ void clio_device::map(address_map &map)
 		})
 	);
 
-	// TODO: should really map these directly in DSPP core
-//  map(0x17d0, 0x17d3) Semaphore
-	// HACK: temporary to allow 3do_gdo101 boot
-	map(0x17d0, 0x17d3).lr32(NAME([] () { return 0x0004'0000; }));
+	// Semaphore
+	// - gex, nfs, cpubach, sailormn depends on this
+	map(0x17d0, 0x17d3).lrw32(
+		NAME([this] () {
+			return (m_dspp->semaphore_status_r() << 16) | m_dspp->semaphore_data_r();
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask)
+		{
+			m_dspp->host_semaphore_w(data);
+		})
+	);
 //  map(0x17d4, 0x17d7) Semaphore ACK
+	map(0x17d4, 0x17d7).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask)
+		{
+			if (ACCESSING_BITS_16_31)
+				m_dspp->host_semaphore_ack_w(data >> 16);
+		})
+	);
 //  map(0x17e0, 0x17e3) DSPP DMA
 	// DSPPRST0 (use current reload)
 	map(0x17e4, 0x17e7).lw32(
@@ -714,7 +733,14 @@ void clio_device::map(address_map &map)
 			m_dspp->host_tick_reset(true);
 		})
 	);
-//  map(0x17f0, 0x17f3) Read noise value (Red only?)
+	// Read noise value (Red only? Nope: definitely wants RNG from here)
+	// - conandl Patapata randomness
+	// - tokimjps would hang on Tsumo/Ron
+	// - oyajihmj background color changes and tile distribution,
+	//   must read as 16-bit value to work properly
+	map(0x17f0, 0x17f3).lr32(NAME([this] () {
+		return m_dspp->noise_r();
+	}));
 //  map(0x17f4, 0x17f7) Read DSPP PC (bits 15:0 only)
 //  map(0x17f8, 0x17fb) Read DSPP NR (bits 15:0 only)
 	/*

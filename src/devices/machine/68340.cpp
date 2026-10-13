@@ -160,18 +160,6 @@ void m68340_cpu_device::m68340_internal_base_w(offs_t offset, uint16_t data, uin
 {
 	LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %08x (%08x)\n", m_ppc, offset*2,data,mem_mask);
 
-	// unmap old modules
-	if (m_m68340_base & 1)
-	{
-		int base = m_m68340_base & 0xfffff000;
-
-		m_internal->unmap_readwrite(base + 0x000, base + 0x05f);
-		m_internal->unmap_readwrite(base + 0x600, base + 0x67f);
-		m_internal->unmap_readwrite(base + 0x700, base + 0x723);
-		m_internal->unmap_readwrite(base + 0x780, base + 0x7bf);
-
-	}
-
 	uint32_t data32 = data;
 	uint32_t mem_mask32 = mem_mask;
 	if (!BIT(offset, 0))
@@ -182,11 +170,29 @@ void m68340_cpu_device::m68340_internal_base_w(offs_t offset, uint16_t data, uin
 
 	m_m68340_base = (m_m68340_base & ~mem_mask32) | (data32 & mem_mask32);
 	LOGMASKED(LOG_BASE, "%08x m68340_internal_base_w %08x, %08x (%08x) (m_m68340_base write)\n", pc(), offset * 2, data, mem_mask);
+	remap_internal_modules();
+}
+
+void m68340_cpu_device::remap_internal_modules()
+{
+	// Keep the installed address separate from MBAR so a state load can remove
+	// the current mapping before installing the restored one.
+	// unmap old modules
+	if (m_mapped_base & 1)
+	{
+		uint32_t base = m_mapped_base & 0xfffff000;
+
+		m_internal->unmap_readwrite(base + 0x000, base + 0x05f);
+		m_internal->unmap_readwrite(base + 0x600, base + 0x67f);
+		m_internal->unmap_readwrite(base + 0x700, base + 0x723);
+		m_internal->unmap_readwrite(base + 0x780, base + 0x7bf);
+
+	}
 
 	// map new modules
 	if (m_m68340_base & 1)
 	{
-		int base = m_m68340_base & 0xfffff000;
+		uint32_t base = m_m68340_base & 0xfffff000;
 
 		m_internal->install_readwrite_handler(base + 0x000, base + 0x03f,
 				read16s_delegate(*this, FUNC(m68340_cpu_device::m68340_internal_sim_r)),
@@ -210,6 +216,7 @@ void m68340_cpu_device::m68340_internal_base_w(offs_t offset, uint16_t data, uin
 				read16s_delegate(*m_dma, FUNC(mc68340_dma_module_device::read)),
 				write16s_delegate(*m_dma, FUNC(mc68340_dma_module_device::write)));
 	}
+	m_mapped_base = m_m68340_base;
 }
 
 bool m68340_cpu_device::is_mbar_access(offs_t address) const
@@ -243,6 +250,7 @@ m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *
 	, m_timer(*this, "timer%u", 1U)
 	, m_dma(*this, "dma")
 	, m_clock_mode(0)
+	, m_modck(0)
 	, m_crystal(0)
 	, m_extal(0)
 	, m_pa_out_cb(*this)
@@ -252,6 +260,7 @@ m68340_cpu_device::m68340_cpu_device(const machine_config &mconfig, const char *
 {
 	m_m68340SIM = nullptr;
 	m_m68340_base = 0;
+	m_mapped_base = 0;
 	m_ipl = 0;
 	m_cpu_space_config.m_internal_map = address_map_constructor(FUNC(m68340_cpu_device::cpu_space_map), this);
 }
@@ -319,6 +328,19 @@ void m68340_cpu_device::device_start()
 
 	m_internal = &space(AS_PROGRAM);
 	m_internal->unmap_value_high();
+
+	save_item(NAME(m_clock_mode));
+	save_item(NAME(m_modck));
+	save_item(NAME(m_extal));
+	save_item(NAME(m_m68340_base));
+	save_item(NAME(m_ipl));
+}
+
+void m68340_cpu_device::device_post_load()
+{
+	remap_internal_modules();
+	fscpu32_device::device_post_load();
+	update_ipl();
 }
 
 

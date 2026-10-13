@@ -23,6 +23,10 @@
 #include "osdcore.h"
 #include "window.h"
 
+// implemented in windowcontroller.mm
+extern uint32_t MacDisplayIDForWindow(void *wincontroller);
+extern bool MacGetDisplayWorkArea(uint32_t displayID, int *x, int *y, int *width, int *height);
+
  //============================================================
  //  mac_monitor_info
  //============================================================
@@ -43,7 +47,18 @@ private:
 		dimensions = CGDisplayBounds((CGDirectDisplayID)oshandle());
 
 		m_pos_size = osd_rect(dimensions.origin.x, dimensions.origin.y, dimensions.size.width, dimensions.size.height);
-		m_usuable_pos_size = osd_rect(dimensions.origin.x, dimensions.origin.y, dimensions.size.width, dimensions.size.height);
+
+		// the usable area excludes the menu bar and Dock
+		int x, y, width, height;
+		if (MacGetDisplayWorkArea((uint32_t)oshandle(), &x, &y, &width, &height))
+		{
+			m_usuable_pos_size = osd_rect(x, y, width, height);
+		}
+		else
+		{
+			m_usuable_pos_size = m_pos_size;
+		}
+
 		m_is_primary = CGDisplayIsMain((CGDirectDisplayID)oshandle());
 	}
 };
@@ -56,7 +71,7 @@ class mac_monitor_module : public monitor_module_base
 {
 public:
 	mac_monitor_module()
-		: monitor_module_base(OSD_MONITOR_PROVIDER, "sdl")
+		: monitor_module_base(OSD_MONITOR_PROVIDER, "mac")
 	{
 	}
 
@@ -66,7 +81,9 @@ public:
 	std::shared_ptr<osd_monitor_info> monitor_from_rect(const osd_rect& proposed) override
 	{
 		if (!m_initialized)
+		{
 			return nullptr;
+		}
 
 		// Determines whether the first intersects less with the proposed rect than the second
 		auto intersects_less = [&proposed](std::shared_ptr<osd_monitor_info> mon1, std::shared_ptr<osd_monitor_info> mon2)
@@ -84,11 +101,25 @@ public:
 
 	std::shared_ptr<osd_monitor_info> monitor_from_window(const osd_window& window) override
 	{
-//      if (!m_initialized)
+		if (!m_initialized)
+		{
 			return nullptr;
+		}
 
-//      std::uint64_t display = SDL_GetWindowDisplayIndex(static_cast<const mac_window_info &>(window).platform_window());
-//      return monitor_from_handle(display);
+		// look up by the display the native window is currently on
+		void *const controller = static_cast<const mac_window_info &>(window).platform_window();
+		if (controller != nullptr)
+		{
+			const uint32_t display = MacDisplayIDForWindow(controller);
+			for (const auto &monitor : list())
+			{
+				if (monitor->oshandle() == display)
+				{
+					return monitor;
+				}
+			}
+		}
+		return nullptr;
 	}
 
 protected:

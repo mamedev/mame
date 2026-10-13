@@ -135,9 +135,6 @@ struct namcos22_object_data
 	rgbaint_t fadecolor;
 	int fadefactor;
 	bool pfade_enabled;
-	bool zfog_enabled;
-	int cz_sdelta;
-	const u8 *czram;
 	bool alpha_enabled;
 	int alpha;
 
