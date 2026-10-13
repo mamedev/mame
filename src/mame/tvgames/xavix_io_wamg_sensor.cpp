@@ -25,9 +25,15 @@ xavix_wamg_sensor_device::xavix_wamg_sensor_device(const machine_config &mconfig
 {
 }
 
-void xavix_wamg_sensor_device::set_input_source(device_t &source)
+static INPUT_PORTS_START( xavix_wamg_sensor )
+	PORT_START("SWING")
+	PORT_BIT( 0x07, 0x00, IPT_PEDAL ) PORT_NAME("Putter Swing Strength") PORT_MINMAX(0, 6) PORT_SENSITIVITY(3) PORT_KEYDELTA(1) PORT_CENTERDELTA(6) PORT_CODE_INC(KEYCODE_SPACE)
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+ioport_constructor xavix_wamg_sensor_device::device_input_ports() const
 {
-	m_strength.set_tag(source, m_strength.finder_tag());
+	return INPUT_PORTS_NAME(xavix_wamg_sensor);
 }
 
 void xavix_wamg_sensor_device::device_start()

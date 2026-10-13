@@ -15,13 +15,13 @@ class xavix_survi_buster_device : public device_t
 public:
 	xavix_survi_buster_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void set_input_source(device_t &source) ATTR_COLD;
 	auto event_callback() { return m_ir.lookup()->event_callback(); }
 	int data_r() { return m_ir->data_r(); }
 	void vblank_w(int state);
 
 protected:
 	// device_t implementation
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
@@ -43,7 +43,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_SURVI_BUSTER, xavix_survi_buster_device)
-
-INPUT_PORTS_EXTERN( xavix_survi_buster );
 
 #endif // MAME_TVGAMES_XAVIX_IO_BKGJ_SURVI_BUSTER_H

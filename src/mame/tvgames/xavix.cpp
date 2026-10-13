@@ -605,7 +605,6 @@ void xavix_i2c_cart_state::io1_output_w(u8 data, u8 direction)
 void xavix_state::configure_ir(machine_config &config, required_device<xavix_ir_motion_device> &controllers, xavix_ir_motion_device::controller_type type)
 {
 	XAVIX_IR_MOTION(config, controllers, peripheral_clock()).set_controller_type(type);
-	controllers->set_input_source(*this);
 	controllers->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 	m_screen->screen_vblank().append(controllers, FUNC(xavix_ir_motion_device::vblank_w));
 }
@@ -1796,8 +1795,6 @@ static INPUT_PORTS_START( epo_strk )
 	// Shared firmware tests this auto-off qualifier, but documented Japanese and US hardware is battery-only.
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_INCLUDE(xavix_ir_motion_kick_sensors)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( epo_strkp )
@@ -1807,8 +1804,6 @@ static INPUT_PORTS_START( epo_strkp )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_ir_motion_device::data_r))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_INCLUDE(xavix_ir_motion_kick_sensors)
 
 	PORT_MODIFY("IN1")
 	// The UK supply options are undocumented, so retain the auto-off qualifier without naming its source.
@@ -1847,8 +1842,6 @@ static INPUT_PORTS_START( epo_tenn )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x28, "Low" )
 	PORT_CONFSETTING(    0x40, "Very Low" )
-
-	PORT_INCLUDE(xavix_ir_motion_tennis_rackets)
 INPUT_PORTS_END
 
 void xavix_ir_state::xavix_epo_tenn(machine_config &config)
@@ -1872,8 +1865,6 @@ static INPUT_PORTS_START( epo_esdx )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x1c, "Low" )
 	PORT_CONFSETTING(    0x24, "Very Low" )
-
-	PORT_INCLUDE(xavix_esdx_controllers)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( epo_esht )
@@ -1890,8 +1881,6 @@ static INPUT_PORTS_START( epo_esht )
 	PORT_CONFSETTING(    0x1c, "Low" )
 	PORT_CONFSETTING(    0x24, "Very Low" )
 
-	PORT_INCLUDE(xavix_esdx_controllers)
-
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_esdx_controllers_device::data_r))
 	// The documented adapter and this line's verified auto-off behaviour identify the source selector.
@@ -1904,7 +1893,6 @@ INPUT_PORTS_END
 void xavix_epo_baseball_state::configure_controllers(machine_config &config)
 {
 	XAVIX_ESDX_CONTROLLERS(config, m_controllers, peripheral_clock());
-	m_controllers->set_input_source(*this);
 	m_controllers->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 	m_screen->screen_vblank().append(m_controllers, FUNC(xavix_esdx_controllers_device::vblank_w));
 }
@@ -1936,8 +1924,6 @@ static INPUT_PORTS_START( epo_stad )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_stadium_bat_device::data_r))
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED ) // This changes timeout pacing, but its physical source is unknown.
 	PORT_BIT( 0xbe, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_INCLUDE(xavix_stadium_bat)
 INPUT_PORTS_END
 
 void xavix_epo_stad_state::xavix_epo_stad(machine_config &config)
@@ -1945,7 +1931,6 @@ void xavix_epo_stad_state::xavix_epo_stad(machine_config &config)
 	xavix_2mb(config);
 
 	XAVIX_STADIUM_BAT(config, m_controllers, peripheral_clock());
-	m_controllers->set_input_source(*this);
 	m_controllers->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 	m_screen->screen_vblank().append(m_controllers, FUNC(xavix_stadium_bat_device::vblank_w));
 }
@@ -1968,7 +1953,6 @@ static INPUT_PORTS_START( tak_comt )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_INCLUDE(xavix_reset_control) // The recessed Reset button's electrical connection is unconfirmed.
-	PORT_INCLUDE(xavix_comet_baton)
 INPUT_PORTS_END
 
 void xavix_tak_comt_state::xavix_tak_comt(machine_config &config)
@@ -1980,7 +1964,6 @@ void xavix_tak_comt_state::xavix_tak_comt(machine_config &config)
 	MICROPHONE(config, "station_microphone", 1).map_on_request_only().add_route(0, m_soc->adc(), 1.0);
 
 	XAVIX_COMET_BATON(config, m_baton_controller, peripheral_clock());
-	m_baton_controller->set_input_source(*this);
 	m_baton_controller->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 	m_soc->io().output_callback<1>().append(m_baton_controller, FUNC(xavix_comet_baton_device::station_w));
 	m_screen->screen_vblank().append(m_baton_controller, FUNC(xavix_comet_baton_device::vblank_w));
@@ -2026,9 +2009,6 @@ static INPUT_PORTS_START( tak_wdg )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x12, "Low" )
 	PORT_CONFSETTING(    0x1c, "Very Low" ) // Select live after Low to cross the ROM's falling threshold.
-
-	PORT_INCLUDE(xavix_granblade)
-	PORT_INCLUDE(xavix_webknight)
 INPUT_PORTS_END
 
 void xavix_tak_wdg_state::xavix_tak_wdg(machine_config &config)
@@ -2036,12 +2016,10 @@ void xavix_tak_wdg_state::xavix_tak_wdg(machine_config &config)
 	xavix_nv_2mb(config);
 
 	XAVIX_GRANBLADE(config, m_granblade, peripheral_clock());
-	m_granblade->set_input_source(*this);
 	m_granblade->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 	m_screen->screen_vblank().append(m_granblade, FUNC(xavix_granblade_device::vblank_w));
 
 	XAVIX_WEBKNIGHT(config, m_webknight, peripheral_clock());
-	m_webknight->set_input_source(*this);
 	// These callbacks deliver receiver-edge events, not maintained signal levels.
 	m_webknight->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 	m_screen->screen_vblank().append(m_webknight, FUNC(xavix_webknight_device::vblank_w));
@@ -2073,8 +2051,6 @@ static INPUT_PORTS_START( epo_epp1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Button")
 
 	PORT_INCLUDE(xavix_reset_control)
-
-	PORT_INCLUDE(xavix_ir_motion_ping_pong_rackets)
 INPUT_PORTS_END
 
 void xavix_ir_state::xavix_epo_epp(machine_config &config)
@@ -2103,8 +2079,6 @@ static INPUT_PORTS_START( epo_epp2 )
 
 	PORT_INCLUDE(xavix_hard_power_control)
 	PORT_INCLUDE(xavix_reset_control)
-
-	PORT_INCLUDE(xavix_ir_motion_powered_ping_pong_rackets)
 INPUT_PORTS_END
 
 void xavix_ir_state::xavix_epo_epp2(machine_config &config)
@@ -2133,8 +2107,6 @@ static INPUT_PORTS_START( epo_epp3 )
 
 	PORT_INCLUDE(xavix_hard_power_control)
 	PORT_INCLUDE(xavix_reset_control)
-
-	PORT_INCLUDE(xavix_ir_motion_powered_ping_pong_rackets)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Y")
@@ -2174,8 +2146,6 @@ static INPUT_PORTS_START( rad_ping )
 	PORT_CONFSETTING(    0x80, "Low" )
 
 	PORT_INCLUDE(xavix_reset_control)
-
-	PORT_INCLUDE(xavix_ir_motion_paddles)
 INPUT_PORTS_END
 
 
@@ -2203,7 +2173,6 @@ static INPUT_PORTS_START( epo_hamd )
 
 	PORT_INCLUDE(xavix_hard_power_control)
 	PORT_INCLUDE(xavix_reset_control)
-	PORT_INCLUDE(xavix_ir_motion_shakers)
 INPUT_PORTS_END
 
 
@@ -2229,8 +2198,6 @@ static INPUT_PORTS_START( epo_crok )
 	// The optional AC adapter has no identified firmware-visible source selector.
 	PORT_INCLUDE(xavix_battery_status)
 	PORT_INCLUDE(xavix_hard_power_control)
-
-	PORT_INCLUDE(xavix_croket_controllers)
 INPUT_PORTS_END
 
 void xavix_epo_crok_state::xavix_epo_crok(machine_config &config)
@@ -2239,7 +2206,6 @@ void xavix_epo_crok_state::xavix_epo_crok(machine_config &config)
 	xavix_i2c_24c04_4mb(config);
 
 	XAVIX_CROKET_CONTROLLERS(config, m_controllers, peripheral_clock());
-	m_controllers->set_input_source(*this);
 	m_controllers->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 	m_screen->screen_vblank().append(m_controllers, FUNC(xavix_croket_controllers_device::vblank_w));
 }
@@ -2283,8 +2249,6 @@ static INPUT_PORTS_START( tak_zuba )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x16, "Low" )
 	PORT_CONFSETTING(    0x20, "Very Low" )
-
-	PORT_INCLUDE(xavix_ir_motion_swords)
 INPUT_PORTS_END
 
 void xavix_tak_zuba_state::xavix_tak_zuba(machine_config &config)
@@ -2299,31 +2263,9 @@ void xavix_tak_zuba_state::xavix_tak_zuba(machine_config &config)
 //  Systems Sharing Baseball Devices
 //-------------------------------------------------
 
-static INPUT_PORTS_START( xavix_baseball )
-	PORT_INCLUDE(xavix)
-
-	PORT_START("PITCH")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Pitch Controller Up / Fastball") PORT_8WAY PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Pitch Controller Down / Change-up") PORT_8WAY PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Pitch Controller Left / Knuckleball") PORT_8WAY PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Pitch Controller Right / Curveball") PORT_8WAY PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pitch Controller Left Button") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Pitch Controller Right Button") PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("PITCH_MOTION")
-	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("Pitch Motion Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(3) PORT_CENTERDELTA(3) PORT_CODE_INC(KEYCODE_G)
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("BAT")
-	PORT_BIT( 0x03, 0x00, IPT_PEDAL2 ) PORT_NAME("Bat Swing Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(3) PORT_CENTERDELTA(3) PORT_CODE_INC(KEYCODE_SPACE)
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
-INPUT_PORTS_END
-
-void xavix_state::configure_baseball(machine_config &config)
+xavix_baseball_ball_device &xavix_state::configure_baseball(machine_config &config)
 {
 	xavix_baseball_ball_device &ball(XAVIX_BASEBALL_BALL(config, "pitch_ball"));
-	ball.set_input_source(*this);
 	m_soc->adc().input_callback<0>().set(ball, FUNC(xavix_baseball_ball_device::vertical_buttons_r));
 	m_soc->adc().input_callback<1>().set(ball, FUNC(xavix_baseball_ball_device::horizontal_buttons_r));
 	m_soc->adc().input_callback<4>().set(ball, FUNC(xavix_baseball_ball_device::motion_r));
@@ -2332,15 +2274,15 @@ void xavix_state::configure_baseball(machine_config &config)
 
 	xavix_baseball_bat_device &bat(XAVIX_BASEBALL_BAT(config, "bat"));
 	bat.set_screen(m_screen);
-	bat.set_input_source(*this);
 	bat.event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 	m_screen->screen_vblank().append(bat, FUNC(xavix_baseball_bat_device::vblank_w));
+	return ball;
 }
 
 
 // Play TV Baseball
 static INPUT_PORTS_START( rad_bb )
-	PORT_INCLUDE(xavix_baseball)
+	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Console Enter")
@@ -2357,10 +2299,6 @@ static INPUT_PORTS_START( rad_bb )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power")
 	PORT_BIT( 0x9f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_MODIFY("PITCH")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Pitch Controller New") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Pitch Controller Enter") PORT_CODE(KEYCODE_O)
-
 	PORT_INCLUDE(xavix_battery_status)
 	PORT_INCLUDE(xavix_reset_control)
 INPUT_PORTS_END
@@ -2376,7 +2314,7 @@ void xavix_state::xavix_rad_bb(machine_config &config)
 // To access hidden test mode, reset while holding Console X and Console O (works every other reset).
 // Use Console X to cycle through modes until reaching the input test.
 static INPUT_PORTS_START( rad_bb2 )
-	PORT_INCLUDE(xavix_baseball)
+	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2395,10 +2333,6 @@ static INPUT_PORTS_START( rad_bb2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power")
 	PORT_BIT( 0x87, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_MODIFY("PITCH")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pitch Controller Back / X") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Pitch Controller Next / O") PORT_CODE(KEYCODE_O)
-
 	PORT_MODIFY("AN7")
 	// Representative differences select the ROM's warning rates; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
@@ -2412,7 +2346,7 @@ INPUT_PORTS_END
 void xavix_state::xavix_rad_bb2(machine_config &config)
 {
 	xavix_2mb(config);
-	configure_baseball(config);
+	configure_baseball(config).set_model(xavix_baseball_ball_device::model::RAD_BB2);
 }
 
 //-------------------------------------------------
@@ -3353,11 +3287,6 @@ static INPUT_PORTS_START( evio )
 	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P2 Vibrato") PORT_PLAYER(2)
 
-	PORT_START("BOW1")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_NAME("P1 Bow") PORT_SENSITIVITY(16) PORT_KEYDELTA(8) PORT_CODE(MOUSECODE_X_INDEXED(0)) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID) PORT_PLAYER(1)
-	PORT_START("BOW2")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_NAME("P2 Bow") PORT_SENSITIVITY(16) PORT_KEYDELTA(8) PORT_CODE(MOUSECODE_X_INDEXED(1)) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID) PORT_PLAYER(2)
-
 	PORT_MODIFY("AN7")
 	// Representative values select eVio's unusually narrow three-state battery classifier.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
@@ -3377,9 +3306,7 @@ void xavix_evio_state::xavix_evio(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	XAVIX_EVIO_BOW(config, m_bow[0]);
-	m_bow[0]->input_callback().set_ioport("BOW1");
-	XAVIX_EVIO_BOW(config, m_bow[1]);
-	m_bow[1]->input_callback().set_ioport("BOW2");
+	XAVIX_EVIO_BOW(config, m_bow[1]).set_player(1);
 
 	configure_power_hold(config);
 }
@@ -3421,8 +3348,6 @@ static INPUT_PORTS_START( daig )
 	PORT_BIT( 0x38, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_INCLUDE(xavix_daigunder_robots)
 INPUT_PORTS_END
 
 void xavix_tak_daig_state::xavix_tak_daig(machine_config &config)
@@ -3436,7 +3361,6 @@ void xavix_tak_daig_state::xavix_tak_daig(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	XAVIX_DAIGUNDER_ROBOTS(config, m_robots, peripheral_clock());
-	m_robots->set_input_source(*this);
 	m_robots->set_screen(m_screen);
 	m_robots->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<2>));
 	m_screen->screen_vblank().append(m_robots, FUNC(xavix_daigunder_robots_device::vblank_w));
@@ -4210,11 +4134,6 @@ static INPUT_PORTS_START( rad_fb )
 	// A short press returns to the main menu; holding the button requests shutdown.
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power / Main Menu")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("BALL")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Ball Function") PORT_PLAYER(1) PORT_CHANGED_MEMBER("ball", FUNC(xavix_madfb_ball_device::changed), 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Ball Motion") PORT_PLAYER(1) PORT_CHANGED_MEMBER("ball", FUNC(xavix_madfb_ball_device::changed), 0)
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void xavix_state::xavix_rad_madf(machine_config &config)
@@ -4222,7 +4141,6 @@ void xavix_state::xavix_rad_madf(machine_config &config)
 	xavix_4mb(config);
 
 	xavix_madfb_ball_device &ball(XAVIX_MADFB_BALL(config, "ball", peripheral_clock()));
-	ball.set_input_source(*this);
 	ball.event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 }
 
@@ -4247,10 +4165,6 @@ static INPUT_PORTS_START( has_wamg )
 
 	PORT_START("DIAL")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_NAME("Aim Dial") PORT_SENSITIVITY(3) PORT_KEYDELTA(8) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT)
-
-	PORT_START("SWING")
-	PORT_BIT( 0x07, 0x00, IPT_PEDAL ) PORT_NAME("Putter Swing Strength") PORT_MINMAX(0, 6) PORT_SENSITIVITY(3) PORT_KEYDELTA(1) PORT_CENTERDELTA(6) PORT_CODE_INC(KEYCODE_SPACE)
-	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void xavix_has_wamg_state::xavix_has_wamg(machine_config &config)
@@ -4262,7 +4176,6 @@ void xavix_has_wamg_state::xavix_has_wamg(machine_config &config)
 	m_soc->anport().set_counter_mode(2);
 
 	XAVIX_WAMG_SENSOR(config, m_sensor, peripheral_clock());
-	m_sensor->set_input_source(*this);
 	m_soc->adc().input_callback<0>().set(m_sensor, FUNC(xavix_wamg_sensor_device::adc_r));
 	m_screen->screen_vblank().append(m_sensor, FUNC(xavix_wamg_sensor_device::vblank_w));
 }
@@ -4348,10 +4261,6 @@ static INPUT_PORTS_START( tak_bey )
 	// Four counts moves one menu item; the real detent scale and polarity are not measured.
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_NAME("Select / Dial Controller") PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT)
 
-	PORT_START("RIPCORD")
-	// Patent JP3532900B2 identifies a rack-driven flywheel photointerrupter; host scaling is provisional.
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_NAME("Ripcord") PORT_SENSITIVITY(100) PORT_KEYDELTA(12) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(KEYCODE_SPACE)
-
 	PORT_INCLUDE(xavix_reset_control)
 	PORT_INCLUDE(xavix_soft_power_control)
 
@@ -4375,7 +4284,6 @@ void xavix_state::xavix_tak_beyu(machine_config &config)
 
 	xavix_beyblade_ripcord_device &ripcord(XAVIX_BEYBLADE_RIPCORD(config, "ripcord"));
 	ripcord.set_screen(m_screen);
-	ripcord.set_input_source(*this);
 	ripcord.event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 	m_screen->screen_vblank().append(ripcord, FUNC(xavix_beyblade_ripcord_device::vblank_w));
 }

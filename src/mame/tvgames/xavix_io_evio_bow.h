@@ -13,10 +13,11 @@ class xavix_evio_bow_device : public device_t
 public:
 	xavix_evio_bow_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	auto input_callback() { return m_input_cb.bind(); }
+	void set_player(unsigned player) { m_player = player; }
 	u8 quadrature_r() const;
 
 protected:
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -26,7 +27,8 @@ private:
 	TIMER_CALLBACK_MEMBER(sample_input);
 	TIMER_CALLBACK_MEMBER(step_phase);
 
-	devcb_read8 m_input_cb;
+	required_ioport m_motion;
+	unsigned m_player;
 	emu_timer *m_sample_timer;
 	emu_timer *m_phase_timer;
 

@@ -672,8 +672,6 @@ static INPUT_PORTS_START( xavixport_tennis )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_ir_motion_device::data_r))
-
-	PORT_INCLUDE(xavix_ir_motion_xavix_rackets)
 INPUT_PORTS_END
 
 void superxavix_xavtenni_state::superxavix_xavtenni(machine_config &config)
@@ -690,8 +688,6 @@ static INPUT_PORTS_START( xavixport_baseball )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_baseball_controllers_device::data_r))
-
-	PORT_INCLUDE(xavix_baseball_controllers)
 INPUT_PORTS_END
 
 void superxavix_xavbaseb_state::superxavix_xavbaseb(machine_config &config)
@@ -699,7 +695,6 @@ void superxavix_xavbaseb_state::superxavix_xavbaseb(machine_config &config)
 	superxavix_i2c_24c08(config);
 
 	XAVIX_BASEBALL_CONTROLLERS(config, m_controllers, peripheral_clock());
-	m_controllers->set_input_source(*this);
 	m_controllers->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 	m_screen->screen_vblank().append(m_controllers, FUNC(xavix_baseball_controllers_device::vblank_w));
 }
@@ -718,8 +713,6 @@ static INPUT_PORTS_START( xavixport_golf )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_INCLUDE(xavixport_panel)
-
-	PORT_INCLUDE(xavix_golf_swing)
 INPUT_PORTS_END
 
 void superxavix_xavgolf_state::superxavix_xavgolf(machine_config &config)
@@ -729,7 +722,6 @@ void superxavix_xavgolf_state::superxavix_xavgolf(machine_config &config)
 	configure_xavixport_io(config, 0x00);
 
 	XAVIX_GOLF_SWING(config, m_swing_sensor, peripheral_clock());
-	m_swing_sensor->set_input_source(*this);
 	m_swing_sensor->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 	m_screen->screen_vblank().append(m_swing_sensor, FUNC(xavix_golf_swing_device::vblank_w));
 }
@@ -744,32 +736,6 @@ static INPUT_PORTS_START( xavixport_bassfishing )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // Radio MCU handshake.
-
-	PORT_START("TACKLE_BUTTONS")
-	// The radio MCU folds analogue Enter/Cancel switches and digital Select contacts into this order.
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Fishing Tackle Enter") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Fishing Tackle Cancel") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_NAME("Fishing Tackle Select Down")  PORT_CODE(KEYCODE_S) PORT_4WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_NAME("Fishing Tackle Select Left")  PORT_CODE(KEYCODE_A) PORT_4WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Fishing Tackle Select Right") PORT_CODE(KEYCODE_D) PORT_4WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_NAME("Fishing Tackle Select Up")    PORT_CODE(KEYCODE_W) PORT_4WAY
-
-	PORT_START("ROD")
-	PORT_BIT( 0x0f, 0x08, IPT_AD_STICK_Y ) PORT_NAME("Fishing Rod Motion") PORT_MINMAX(0, 15) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_CENTERDELTA(1) PORT_CODE_DEC(KEYCODE_Q) PORT_CODE_INC(KEYCODE_E)
-
-	PORT_START("REEL")
-	// Keep the reel keys clear of the base unit's Reset binding.
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_NAME("Reel Handle") PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_T) PORT_CODE_INC(KEYCODE_Y)
-
-	PORT_START("TACKLE_POWER")
-	PORT_CONFNAME( 0x01, 0x01, "Fishing Tackle Power" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-
-	PORT_START("REACTION_BATTERIES")
-	PORT_CONFNAME( 0x01, 0x01, "Reaction Batteries" )
-	PORT_CONFSETTING(    0x00, "Not Installed" )
-	PORT_CONFSETTING(    0x01, "Installed" )
 
 	PORT_INCLUDE(xavixport_panel)
 
@@ -796,11 +762,6 @@ void superxavix_xavbassf_state::superxavix_xavbassf(machine_config &config)
 	m_fishing_cart_mcu->spi_miso_cb().set(m_fishing_cart_eeprom, FUNC(eeprom_spi_base_device::so_r));
 
 	XAVIX_BASSFISHING(config, m_fishing_tackle, 0);
-	m_fishing_tackle->controls_callback().set_ioport("TACKLE_BUTTONS");
-	m_fishing_tackle->rod_callback().set_ioport("ROD");
-	m_fishing_tackle->reel_callback().set_ioport("REEL");
-	m_fishing_tackle->power_callback().set_ioport("TACKLE_POWER");
-	m_fishing_tackle->reaction_battery_callback().set_ioport("REACTION_BATTERIES");
 
 	m_fishing_cart_mcu->radio().set_peer(m_fishing_tackle->radio());
 	m_fishing_tackle->radio().set_peer(m_fishing_cart_mcu->radio());
@@ -984,8 +945,6 @@ void superxavix_xavjmat_state::superxavix_xavaero(machine_config &config)
 static INPUT_PORTS_START( xavix_step )
 	PORT_INCLUDE(superxavix)
 	PORT_INCLUDE(xavixport_panel)
-
-	PORT_INCLUDE(xavix_step_sensor)
 INPUT_PORTS_END
 
 microphone_device &superxavix_i2c_pio1_state::configure_stereo_music_input(machine_config &config)
@@ -999,9 +958,7 @@ void superxavix_i2c_pio1_state::configure_xavix_step_sensor(machine_config &conf
 {
 	superxavix_i2c_24c64(config);
 	configure_rtc_pio<1>(config);
-	xavixport_io_device &xavixport_io(configure_xavixport_io(config, 0x10));
-	xavixport_io.sensor_callback<0>().set_ioport("STEP_SENSOR");
-	xavixport_io.power_callback().set_ioport("STEP_POWER");
+	configure_xavixport_io(config, 0x10);
 }
 
 microphone_device &superxavix_i2c_pio1_state::configure_xavix_music_input(machine_config &config)
@@ -1075,8 +1032,6 @@ void superxavix_i2c_pio1_state::superxavix_xavcheck(machine_config &config)
 	superxavix_i2c_24c64(config);
 	configure_rtc_pio<0>(config);
 	xavixport_io_device &xavixport_io(configure_xavixport_io(config, 0x10));
-	xavixport_io.sensor_callback<0>().set_ioport("STEP_SENSOR");
-	xavixport_io.power_callback().set_ioport("STEP_POWER");
 	// PIO2.7's electrical source is unknown; Check & Balance treats it as receiver present.
 	xavixport_io.set_receiver_present(true);
 }
@@ -1090,36 +1045,6 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( domyos_step )
 	PORT_INCLUDE(xavixp)
 	PORT_INCLUDE(xavixport_panel)
-
-	PORT_START("STEP_SENSOR")
-	// Mat zones are independent switches; PORT_16WAY preserves opposing simultaneous steps.
-	// Spatial P1 bindings keep the mat independent of the console panel's arrow keys.
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Far Right / Enter") PORT_CODE(KEYCODE_6_PAD) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("Lower Right / Select / Next") PORT_CODE(KEYCODE_3_PAD) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("Lower Left / Select / Previous") PORT_CODE(KEYCODE_1_PAD) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Far Left / Back / Cancel") PORT_CODE(KEYCODE_4_PAD) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// Upper-zone left/right is inferred from the mat artwork and ROM direction mapping.
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("Upper Right / Down") PORT_CODE(KEYCODE_9_PAD) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("Upper Left / Up") PORT_CODE(KEYCODE_7_PAD) PORT_PLAYER(1)
-
-	PORT_START("STEP_SENSOR2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Far Right / Enter") PORT_PLAYER(2) PORT_CONDITION("STEP_CONNECTION", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("Lower Right / Select / Next") PORT_PLAYER(2) PORT_CONDITION("STEP_CONNECTION", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("Lower Left / Select / Previous") PORT_PLAYER(2) PORT_CONDITION("STEP_CONNECTION", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Far Left / Back / Cancel") PORT_PLAYER(2) PORT_CONDITION("STEP_CONNECTION", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("Upper Right / Down") PORT_PLAYER(2) PORT_CONDITION("STEP_CONNECTION", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// Avoid sharing the P2 Up default with the console's recessed Reset button.
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("Upper Left / Up") PORT_CODE(KEYCODE_E) PORT_PLAYER(2) PORT_CONDITION("STEP_CONNECTION", 0x01, EQUALS, 0x01)
-
-	PORT_START("STEP_CONNECTION")
-	PORT_CONFNAME( 0x01, 0x00, "Step Sensor Connection" )
-	PORT_CONFSETTING(    0x00, "One Step Sensor (Direct)" )
-	PORT_CONFSETTING(    0x01, "Two Step Sensors (Hub)" )
-
 INPUT_PORTS_END
 
 void superxavix_i2c_pio1_state::superxavix_domfitex(machine_config &config)
@@ -1131,9 +1056,6 @@ void superxavix_i2c_pio1_state::superxavix_domfitex(machine_config &config)
 	superxavix_video_device::configure_screen(*m_screen, m_soc->clock(), video_standard::PAL);
 
 	xavixport_io_device &xavixport_io(configure_xavixport_io(config, 0x20));
-	xavixport_io.sensor_callback<0>().set_ioport("STEP_SENSOR");
-	xavixport_io.sensor_callback<1>().set_ioport("STEP_SENSOR2");
-	xavixport_io.hub_callback().set_ioport("STEP_CONNECTION");
 	xavixport_io.event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<1>));
 }
 
@@ -1310,8 +1232,6 @@ static INPUT_PORTS_START( tmy_rkmj )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_INCLUDE(xavix_soft_power_control)
-
-	PORT_INCLUDE(xavix_rockman_arm)
 INPUT_PORTS_END
 
 void superxavix_tmy_rkmj_state::superxavix_tmy_rkmj(machine_config &config)
@@ -1319,7 +1239,6 @@ void superxavix_tmy_rkmj_state::superxavix_tmy_rkmj(machine_config &config)
 	superxavix_i2c_24c04(config);
 
 	XAVIX_ROCKMAN_ARM(config, m_arm_controller, peripheral_clock());
-	m_arm_controller->set_input_source(*this);
 	m_arm_controller->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 	m_screen->screen_vblank().append(m_arm_controller, FUNC(xavix_rockman_arm_device::vblank_w));
 }
@@ -1358,8 +1277,6 @@ static INPUT_PORTS_START( epo_tfit )
 	PORT_INCLUDE(superxavix_battery_status)
 	PORT_INCLUDE(xavix_reset_control)
 	PORT_INCLUDE(xavix_hard_power_control)
-
-	PORT_INCLUDE(xavix_tfit_rackets)
 INPUT_PORTS_END
 
 void superxavix_epo_tfit_state::superxavix_epo_tfit(machine_config &config)
@@ -1367,7 +1284,6 @@ void superxavix_epo_tfit_state::superxavix_epo_tfit(machine_config &config)
 	superxavix_i2c_24c04_4mb(config);
 
 	XAVIX_TFIT_RACKETS(config, m_rackets, peripheral_clock());
-	m_rackets->set_input_source(*this);
 	m_rackets->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 	m_screen->screen_vblank().append(m_rackets, FUNC(xavix_tfit_rackets_device::vblank_w));
 }
@@ -1401,8 +1317,6 @@ static INPUT_PORTS_START( ban_bkgj )
 	// The optional AC adapter is documented, but no firmware-visible source selector has been identified.
 	PORT_INCLUDE(superxavix_battery_status)
 	PORT_INCLUDE(xavix_hard_power_control)
-
-	PORT_INCLUDE(xavix_survi_buster)
 INPUT_PORTS_END
 
 void superxavix_ban_bkgj_state::superxavix_ban_bkgj(machine_config &config)
@@ -1410,7 +1324,6 @@ void superxavix_ban_bkgj_state::superxavix_ban_bkgj(machine_config &config)
 	superxavix_i2c_24c04_4mb(config);
 
 	XAVIX_SURVI_BUSTER(config, m_survi_buster, peripheral_clock());
-	m_survi_buster->set_input_source(*this);
 	m_survi_buster->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 	m_screen->screen_vblank().append(m_survi_buster, FUNC(xavix_survi_buster_device::vblank_w));
 }
@@ -1477,8 +1390,6 @@ static INPUT_PORTS_START( ban_ordj )
 	// The optional AC adapter is documented, but no firmware-visible source selector has been identified.
 	PORT_INCLUDE(superxavix_battery_status)
 	PORT_INCLUDE(xavix_hard_power_control)
-
-	PORT_INCLUDE(xavix_hibiki_sticks)
 INPUT_PORTS_END
 
 void superxavix_ban_ordj_state::superxavix_ban_ordj(machine_config &config)
@@ -1486,7 +1397,6 @@ void superxavix_ban_ordj_state::superxavix_ban_ordj(machine_config &config)
 	superxavix_i2c_24c04(config);
 
 	XAVIX_HIBIKI_STICKS(config, m_sticks, peripheral_clock());
-	m_sticks->set_input_source(*this);
 	m_sticks->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 	m_screen->screen_vblank().append(m_sticks, FUNC(xavix_hibiki_sticks_device::vblank_w));
 }
@@ -1512,8 +1422,6 @@ static INPUT_PORTS_START( anpanmdx )
 	PORT_BIT( 0xf6, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_INCLUDE(xavix_hard_power_control)
-
-	PORT_INCLUDE(xavix_anpanman_sticks)
 INPUT_PORTS_END
 
 void superxavix_anpanmdx_state::superxavix_anpanmdx(machine_config &config)
@@ -1521,7 +1429,6 @@ void superxavix_anpanmdx_state::superxavix_anpanmdx(machine_config &config)
 	superxavix_i2c_24c08(config);
 
 	XAVIX_ANPANMAN_STICKS(config, m_sticks, peripheral_clock());
-	m_sticks->set_input_source(*this);
 	m_sticks->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 	m_screen->screen_vblank().append(m_sticks, FUNC(xavix_anpanman_sticks_device::vblank_w));
 }

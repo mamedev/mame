@@ -26,16 +26,16 @@ xavix_ebox_gloves_device::xavix_ebox_gloves_device(const machine_config &mconfig
 {
 }
 
-INPUT_PORTS_START( xavix_ebox_gloves )
+static INPUT_PORTS_START( xavix_ebox_gloves )
 	PORT_START("PUNCH")
 	// The receiver filters the first changed report, so each swing occupies two frames.
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Left Punch") PORT_PLAYER(1) PORT_IMPULSE(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Right Punch") PORT_PLAYER(1) PORT_IMPULSE(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Left Punch") PORT_PLAYER(1) PORT_IMPULSE(2) PORT_CODE(KEYCODE_SPACE) PORT_CODE(MOUSECODE_BUTTON2_INDEXED(0))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Right Punch") PORT_PLAYER(1) PORT_IMPULSE(2) PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("GUARD")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Left Guard") PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Right Guard") PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Left Guard") PORT_PLAYER(1) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Right Guard") PORT_PLAYER(1) PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("GLOVE_POWER")
@@ -61,11 +61,9 @@ void xavix_ebox_gloves_device::device_add_mconfig(machine_config &config)
 	m_ir->enable_callback().set(*this, FUNC(xavix_ebox_gloves_device::ir_enable_r));
 }
 
-void xavix_ebox_gloves_device::set_input_source(device_t &source)
+ioport_constructor xavix_ebox_gloves_device::device_input_ports() const
 {
-	m_punch.set_tag(source, m_punch.finder_tag());
-	m_guard.set_tag(source, m_guard.finder_tag());
-	m_glove_power.set_tag(source, m_glove_power.finder_tag());
+	return INPUT_PORTS_NAME(xavix_ebox_gloves);
 }
 
 void xavix_ebox_gloves_device::device_start()

@@ -25,24 +25,24 @@ xavix_tfit_rackets_device::xavix_tfit_rackets_device(const machine_config &mconf
 {
 }
 
-INPUT_PORTS_START( xavix_tfit_rackets )
+static INPUT_PORTS_START( xavix_tfit_rackets )
 	PORT_START("RACKET1_STRENGTH")
 	// The four decoded levels are exact; their physical acceleration thresholds are unmeasured.
-	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("P1 Pink Racket Swing Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(1) PORT_PLAYER(1)
+	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("P1 Pink Racket Swing Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(1) PORT_PLAYER(1) PORT_CODE_INC(KEYCODE_LCONTROL)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("RACKET2_STRENGTH")
-	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("P2 Blue Racket Swing Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(1) PORT_PLAYER(2)
+	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("P2 Blue Racket Swing Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(1) PORT_PLAYER(2) PORT_CODE_INC(KEYCODE_A)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("RACKET1_BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Pink Racket Circle / Serve / Confirm") PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Pink Racket Square / Slice / Cancel") PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Pink Racket Circle / Serve / Confirm") PORT_PLAYER(1) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(0)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(0))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Pink Racket Square / Slice / Cancel") PORT_PLAYER(1) PORT_CODE(KEYCODE_LALT) PORT_CODE(MOUSECODE_BUTTON3_INDEXED(0)) PORT_CODE(GUNCODE_BUTTON2_INDEXED(0))
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("RACKET2_BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Blue Racket Circle / Serve / Confirm") PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Blue Racket Square / Slice / Cancel") PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Blue Racket Circle / Serve / Confirm") PORT_PLAYER(2) PORT_CODE(KEYCODE_A) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(1)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(1))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Blue Racket Square / Slice / Cancel") PORT_PLAYER(2) PORT_CODE(KEYCODE_S) PORT_CODE(MOUSECODE_BUTTON3_INDEXED(1)) PORT_CODE(GUNCODE_BUTTON2_INDEXED(1))
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("RACKET_POWER")
@@ -67,13 +67,9 @@ void xavix_tfit_rackets_device::device_add_mconfig(machine_config &config)
 	m_ir->sequence_callback<1>().set(*this, FUNC(xavix_tfit_rackets_device::racket_report_r<1>));
 }
 
-void xavix_tfit_rackets_device::set_input_source(device_t &source)
+ioport_constructor xavix_tfit_rackets_device::device_input_ports() const
 {
-	for (auto &port : m_racket_strength)
-		port.set_tag(source, port.finder_tag());
-	for (auto &port : m_racket_buttons)
-		port.set_tag(source, port.finder_tag());
-	m_racket_power.set_tag(source, m_racket_power.finder_tag());
+	return INPUT_PORTS_NAME(xavix_tfit_rackets);
 }
 
 void xavix_tfit_rackets_device::device_start()

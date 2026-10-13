@@ -27,13 +27,13 @@ xavix_golf_swing_device::xavix_golf_swing_device(const machine_config &mconfig, 
 {
 }
 
-INPUT_PORTS_START( xavix_golf_swing )
+static INPUT_PORTS_START( xavix_golf_swing )
 	PORT_START("SWING_ACTION")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Simulate Right-Handed Swing") PORT_CODE(KEYCODE_SPACE)
-		PORT_CHANGED_MEMBER("swing_sensor", FUNC(xavix_golf_swing_device::swing_action), 0)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_golf_swing_device::swing_action), 0)
 	// The optional left-handed set is documented, but reversing this trajectory is provisional without a sensor capture.
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Simulate Left-Handed Swing") PORT_CODE(KEYCODE_LALT)
-		PORT_CHANGED_MEMBER("swing_sensor", FUNC(xavix_golf_swing_device::swing_action), 1)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_golf_swing_device::swing_action), 1)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("SWING_ACTIVE")
@@ -43,12 +43,12 @@ INPUT_PORTS_START( xavix_golf_swing )
 
 	// Raw controls expose the bounded optical coordinates for testing trajectories beyond the generated gestures.
 	PORT_START("SWING_X")
-	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_X ) PORT_NAME("Swing Sensor X")
+	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_X ) PORT_NAME("Swing Sensor X") PORT_CODE(MOUSECODE_X_INDEXED(0))
 		PORT_MINMAX(0x01, 0x3e) PORT_SENSITIVITY(25) PORT_KEYDELTA(2) PORT_CENTERDELTA(0)
 		PORT_CODE_DEC(KEYCODE_J) PORT_CODE_INC(KEYCODE_L) PORT_REVERSE
 
 	PORT_START("SWING_Y")
-	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_Y ) PORT_NAME("Swing Sensor Y")
+	PORT_BIT( 0x3f, 0x20, IPT_AD_STICK_Y ) PORT_NAME("Swing Sensor Y") PORT_CODE(MOUSECODE_Y_INDEXED(0))
 		PORT_MINMAX(0x01, 0x3e) PORT_SENSITIVITY(25) PORT_KEYDELTA(2) PORT_CENTERDELTA(0)
 		PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K)
 
@@ -80,13 +80,9 @@ void xavix_golf_swing_device::device_add_mconfig(machine_config &config)
 	m_ir->enable_callback().set(*this, FUNC(xavix_golf_swing_device::ir_enable_r));
 }
 
-void xavix_golf_swing_device::set_input_source(device_t &source)
+ioport_constructor xavix_golf_swing_device::device_input_ports() const
 {
-	m_swing_active.set_tag(source, m_swing_active.finder_tag());
-	for (auto &port : m_swing_axis)
-		port.set_tag(source, port.finder_tag());
-	m_swing_buttons.set_tag(source, m_swing_buttons.finder_tag());
-	m_swing_power.set_tag(source, m_swing_power.finder_tag());
+	return INPUT_PORTS_NAME(xavix_golf_swing);
 }
 
 void xavix_golf_swing_device::device_start()

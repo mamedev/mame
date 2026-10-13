@@ -21,9 +21,16 @@ xavix_madfb_ball_device::xavix_madfb_ball_device(const machine_config &mconfig, 
 }
 
 
-void xavix_madfb_ball_device::set_input_source(device_t &source)
+static INPUT_PORTS_START( xavix_madfb_ball )
+	PORT_START("BALL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Ball Function") PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_madfb_ball_device::changed), 0) PORT_CODE(KEYCODE_LALT) PORT_CODE(MOUSECODE_BUTTON3_INDEXED(0)) PORT_CODE(GUNCODE_BUTTON2_INDEXED(0))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Ball Motion") PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_madfb_ball_device::changed), 0) PORT_CODE(KEYCODE_SPACE) PORT_CODE(MOUSECODE_BUTTON2_INDEXED(0))
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+ioport_constructor xavix_madfb_ball_device::device_input_ports() const
 {
-	m_in.set_tag(source, m_in.finder_tag());
+	return INPUT_PORTS_NAME(xavix_madfb_ball);
 }
 
 void xavix_madfb_ball_device::device_start()

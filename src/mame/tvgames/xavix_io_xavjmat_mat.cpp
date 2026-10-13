@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "xavix_io_xavjmat_mat.h"
+#include "xavix_io_xavixport.h"
 
 DEFINE_DEVICE_TYPE(XAVIX_JMAT, xavix_jmat_device, "xavix_jmat", "XaviX J-Mat Infrared Mat")
 
@@ -27,20 +28,6 @@ xavix_jmat_device::xavix_jmat_device(const machine_config &mconfig, const char *
 	, m_protocol(protocol::JMAT)
 {
 }
-
-INPUT_PORTS_START( xavix_step_sensor )
-	PORT_START("STEP_SENSOR")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Step Sensor Enter") PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Step Sensor Forward / Right") PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Step Sensor Back / Left") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Step Sensor Cancel") PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("STEP_POWER")
-	PORT_CONFNAME( 0x01, 0x01, "Step Sensor Power" )
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-INPUT_PORTS_END
 
 ioport_constructor xavix_jmat_device::device_input_ports() const
 {

@@ -35,7 +35,7 @@ xavix_comet_baton_device::xavix_comet_baton_device(const machine_config &mconfig
 {
 }
 
-INPUT_PORTS_START( xavix_comet_baton )
+static INPUT_PORTS_START( xavix_comet_baton )
 	PORT_START("BATON")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Baton Heart Button / Select") PORT_CODE(KEYCODE_Z) PORT_IMPULSE(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Baton Shake / Confirm") PORT_CODE(KEYCODE_X) PORT_IMPULSE(1)
@@ -62,10 +62,9 @@ void xavix_comet_baton_device::device_add_mconfig(machine_config &config)
 	m_ir->enable_callback().set(*this, FUNC(xavix_comet_baton_device::baton_active_r));
 }
 
-void xavix_comet_baton_device::set_input_source(device_t &source)
+ioport_constructor xavix_comet_baton_device::device_input_ports() const
 {
-	m_baton.set_tag(source, m_baton.finder_tag());
-	m_baton_mode.set_tag(source, m_baton_mode.finder_tag());
+	return INPUT_PORTS_NAME(xavix_comet_baton);
 }
 
 void xavix_comet_baton_device::device_start()

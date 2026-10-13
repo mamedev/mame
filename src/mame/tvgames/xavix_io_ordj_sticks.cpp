@@ -24,20 +24,20 @@ xavix_hibiki_sticks_device::xavix_hibiki_sticks_device(const machine_config &mco
 {
 }
 
-INPUT_PORTS_START( xavix_hibiki_sticks )
+static INPUT_PORTS_START( xavix_hibiki_sticks )
 	PORT_START("SWING")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left (Red Strap) Stick Swing") PORT_PLAYER(1)
-		PORT_CHANGED_MEMBER("sticks", FUNC(xavix_hibiki_sticks_device::stick_swing), 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Right (Black Strap) Stick Swing") PORT_PLAYER(2)
-		PORT_CHANGED_MEMBER("sticks", FUNC(xavix_hibiki_sticks_device::stick_swing), 1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left (Red Strap) Stick Swing") PORT_PLAYER(1) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(0)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(0))
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_hibiki_sticks_device::stick_swing), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Right (Black Strap) Stick Swing") PORT_PLAYER(2) PORT_CODE(KEYCODE_A) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(1)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(1))
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_hibiki_sticks_device::stick_swing), 1)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("STICK1")
-	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("Left (Red Strap) Stick Swing Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(1) PORT_PLAYER(1)
+	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("Left (Red Strap) Stick Swing Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(1) PORT_PLAYER(1) PORT_CODE_INC(KEYCODE_LCONTROL)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("STICK2")
-	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("Right (Black Strap) Stick Swing Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(1) PORT_PLAYER(2)
+	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("Right (Black Strap) Stick Swing Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(1) PORT_PLAYER(2) PORT_CODE_INC(KEYCODE_A)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("STICK_POWER")
@@ -61,11 +61,9 @@ void xavix_hibiki_sticks_device::device_add_mconfig(machine_config &config)
 	m_ir->enable_callback().set(*this, FUNC(xavix_hibiki_sticks_device::ir_enable_r));
 }
 
-void xavix_hibiki_sticks_device::set_input_source(device_t &source)
+ioport_constructor xavix_hibiki_sticks_device::device_input_ports() const
 {
-	for (auto &port : m_swing_strength)
-		port.set_tag(source, port.finder_tag());
-	m_stick_power.set_tag(source, m_stick_power.finder_tag());
+	return INPUT_PORTS_NAME(xavix_hibiki_sticks);
 }
 
 void xavix_hibiki_sticks_device::device_start()

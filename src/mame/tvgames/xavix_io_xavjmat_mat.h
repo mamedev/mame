@@ -65,6 +65,4 @@ private:
 
 DECLARE_DEVICE_TYPE(XAVIX_JMAT, xavix_jmat_device)
 
-INPUT_PORTS_EXTERN( xavix_step_sensor );
-
 #endif // MAME_TVGAMES_XAVIX_IO_XAVJMAT_MAT_H

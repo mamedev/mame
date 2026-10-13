@@ -16,11 +16,11 @@ public:
 	xavix_baseball_bat_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
-	void set_input_source(device_t &source) ATTR_COLD;
 	auto event_callback() { return m_event_out_cb.bind(); }
 	void vblank_w(int state);
 
 protected:
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 

@@ -457,8 +457,6 @@ static INPUT_PORTS_START( epo_ebox )
 
 	PORT_INCLUDE(xavix_hard_power_control)
 	PORT_INCLUDE(xavix_reset_control)
-
-	PORT_INCLUDE(xavix_ebox_gloves)
 INPUT_PORTS_END
 
 void xavix2000_epo_ebox_state::xavix2000_epo_ebox(machine_config &config)
@@ -466,7 +464,6 @@ void xavix2000_epo_ebox_state::xavix2000_epo_ebox(machine_config &config)
 	xavix2000_nv_4mb(config);
 
 	XAVIX_EBOX_GLOVES(config, m_gloves, peripheral_clock());
-	m_gloves->set_input_source(*this);
 	m_gloves->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
 	m_screen->screen_vblank().append(m_gloves, FUNC(xavix_ebox_gloves_device::vblank_w));
 }

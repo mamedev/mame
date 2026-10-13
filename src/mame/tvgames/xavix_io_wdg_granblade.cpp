@@ -25,7 +25,7 @@ xavix_granblade_device::xavix_granblade_device(const machine_config &mconfig, co
 {
 }
 
-INPUT_PORTS_START( xavix_granblade )
+static INPUT_PORTS_START( xavix_granblade )
 	PORT_START("GRANBLADE_ACTION")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Granblade Swing / Confirm") PORT_CODE(KEYCODE_Z) PORT_IMPULSE(1) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Gran Magnum Trigger / Fire") PORT_CODE(KEYCODE_X) PORT_IMPULSE(1) PORT_PLAYER(1)
@@ -55,11 +55,9 @@ void xavix_granblade_device::device_add_mconfig(machine_config &config)
 	m_ir->report_enable_callback<0>().set(*this, FUNC(xavix_granblade_device::granblade_report_enabled_r));
 }
 
-void xavix_granblade_device::set_input_source(device_t &source)
+ioport_constructor xavix_granblade_device::device_input_ports() const
 {
-	m_granblade_action.set_tag(source, m_granblade_action.finder_tag());
-	m_granblade_mode.set_tag(source, m_granblade_mode.finder_tag());
-	m_granblade_power.set_tag(source, m_granblade_power.finder_tag());
+	return INPUT_PORTS_NAME(xavix_granblade);
 }
 
 void xavix_granblade_device::device_start()

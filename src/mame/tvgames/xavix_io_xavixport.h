@@ -14,9 +14,6 @@ public:
 	xavixport_io_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto panel_callback() { return m_panel_cb.bind(); }
-	template <unsigned Sensor> auto sensor_callback() { static_assert(Sensor < 2); return m_sensor_cb[Sensor].bind(); }
-	auto power_callback() { return m_power_cb.bind(); }
-	auto hub_callback() { return m_hub_cb.bind(); }
 	auto event_callback() { return m_event_cb.bind(); }
 	void set_report_type(u8 report_type) { m_report_type = report_type; }
 	void set_receiver_present(bool present) { m_receiver_present = present; }
@@ -25,6 +22,7 @@ public:
 	void pio_w(offs_t offset, u8 data, u8 mem_mask);
 
 protected:
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -35,9 +33,9 @@ private:
 	void hub_command_bit_w(int state);
 
 	devcb_read8 m_panel_cb;
-	devcb_read8::array<2> m_sensor_cb;
-	devcb_read8 m_power_cb;
-	devcb_read8 m_hub_cb;
+	optional_ioport_array<2> m_sensors;
+	optional_ioport m_power;
+	optional_ioport m_hub;
 	devcb_write_line m_event_cb;
 	emu_timer *m_event_timer;
 
@@ -61,5 +59,7 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(XAVIXPORT_IO, xavixport_io_device)
+
+INPUT_PORTS_EXTERN( xavix_step_sensor );
 
 #endif // MAME_TVGAMES_XAVIX_IO_XAVIXPORT_H

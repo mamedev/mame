@@ -27,17 +27,17 @@ xavix_daigunder_robots_device::xavix_daigunder_robots_device(const machine_confi
 {
 }
 
-INPUT_PORTS_START( xavix_daigunder_robots )
+static INPUT_PORTS_START( xavix_daigunder_robots )
 	PORT_START("P1_ROBOT")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Robot Attack") PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("P1 Robot Right") PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("P1 Robot Left") PORT_2WAY PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Robot Attack") PORT_PLAYER(1) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(0)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(0))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("P1 Robot Right") PORT_2WAY PORT_PLAYER(1) PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("P1 Robot Left") PORT_2WAY PORT_PLAYER(1) PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2_ROBOT")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Robot Attack") PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("P2 Robot Right") PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("P2 Robot Left") PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Robot Attack") PORT_PLAYER(2) PORT_CODE(KEYCODE_A) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(1)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(1))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("P2 Robot Right") PORT_2WAY PORT_PLAYER(2) PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("P2 Robot Left") PORT_2WAY PORT_PLAYER(2) PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1_ID")
@@ -72,9 +72,9 @@ INPUT_PORTS_START( xavix_daigunder_robots )
 
 	PORT_START("ACCESSORY")
 	// Bulion and Bonerex transmit sensed claw/sword motions through these three report bits.
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Accessory Swing / Attack") PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Accessory Left Motion") PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Accessory Right Motion") PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Accessory Swing / Attack") PORT_PLAYER(1) PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Accessory Left Motion") PORT_PLAYER(1) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Accessory Right Motion") PORT_PLAYER(1) PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -91,13 +91,9 @@ void xavix_daigunder_robots_device::device_add_mconfig(machine_config &config)
 	m_ir->report_callback<4>().set(*this, FUNC(xavix_daigunder_robots_device::identity_report_r<1>));
 }
 
-void xavix_daigunder_robots_device::set_input_source(device_t &source)
+ioport_constructor xavix_daigunder_robots_device::device_input_ports() const
 {
-	for (auto &port : m_robot_controls)
-		port.set_tag(source, port.finder_tag());
-	for (auto &port : m_robot_id)
-		port.set_tag(source, port.finder_tag());
-	m_accessory_controls.set_tag(source, m_accessory_controls.finder_tag());
+	return INPUT_PORTS_NAME(xavix_daigunder_robots);
 }
 
 void xavix_daigunder_robots_device::device_start()

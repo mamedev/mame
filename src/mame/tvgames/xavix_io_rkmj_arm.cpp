@@ -25,7 +25,7 @@ xavix_rockman_arm_device::xavix_rockman_arm_device(const machine_config &mconfig
 {
 }
 
-INPUT_PORTS_START( xavix_rockman_arm )
+static INPUT_PORTS_START( xavix_rockman_arm )
 	PORT_START("ARM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_2WAY PORT_NAME("Arm Up")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_2WAY PORT_NAME("Arm Down")
@@ -60,11 +60,9 @@ void xavix_rockman_arm_device::device_add_mconfig(machine_config &config)
 	m_ir->report_enable_callback<0>().set(*this, FUNC(xavix_rockman_arm_device::controller_enabled_r));
 }
 
-void xavix_rockman_arm_device::set_input_source(device_t &source)
+ioport_constructor xavix_rockman_arm_device::device_input_ports() const
 {
-	m_arm.set_tag(source, m_arm.finder_tag());
-	m_controller_buttons.set_tag(source, m_controller_buttons.finder_tag());
-	m_controller_power.set_tag(source, m_controller_power.finder_tag());
+	return INPUT_PORTS_NAME(xavix_rockman_arm);
 }
 
 void xavix_rockman_arm_device::device_start()

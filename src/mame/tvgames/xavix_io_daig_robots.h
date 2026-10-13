@@ -18,13 +18,13 @@ public:
 	xavix_daigunder_robots_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
-	void set_input_source(device_t &source) ATTR_COLD;
 	auto event_callback() { return m_ir.lookup()->event_callback(); }
 	int data_r() { return m_ir->data_r(); }
 	void vblank_w(int state);
 
 protected:
 	// device_t implementation
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
@@ -60,7 +60,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_DAIGUNDER_ROBOTS, xavix_daigunder_robots_device)
-
-INPUT_PORTS_EXTERN( xavix_daigunder_robots );
 
 #endif // MAME_TVGAMES_XAVIX_IO_DAIG_ROBOTS_H

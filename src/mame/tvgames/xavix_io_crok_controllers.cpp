@@ -26,7 +26,7 @@ xavix_croket_controllers_device::xavix_croket_controllers_device(const machine_c
 {
 }
 
-INPUT_PORTS_START( xavix_croket_controllers )
+static INPUT_PORTS_START( xavix_croket_controllers )
 	PORT_START("MOTION")
 	// The first changed report is filtered, so each physical action occupies two frames.
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Hammer Swing") PORT_PLAYER(1) PORT_IMPULSE(2)
@@ -60,11 +60,9 @@ void xavix_croket_controllers_device::device_add_mconfig(machine_config &config)
 	m_ir->enable_callback().set(*this, FUNC(xavix_croket_controllers_device::ir_enable_r));
 }
 
-void xavix_croket_controllers_device::set_input_source(device_t &source)
+ioport_constructor xavix_croket_controllers_device::device_input_ports() const
 {
-	m_motion.set_tag(source, m_motion.finder_tag());
-	m_guard.set_tag(source, m_guard.finder_tag());
-	m_controller_power.set_tag(source, m_controller_power.finder_tag());
+	return INPUT_PORTS_NAME(xavix_croket_controllers);
 }
 
 void xavix_croket_controllers_device::device_start()

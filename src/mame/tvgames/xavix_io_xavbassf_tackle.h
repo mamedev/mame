@@ -14,14 +14,10 @@ class xavix_bassfishing_device : public device_t
 public:
 	xavix_bassfishing_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	auto controls_callback() { return m_controls_cb.bind(); }
-	auto rod_callback() { return m_rod_cb.bind(); }
-	auto reel_callback() { return m_reel_cb.bind(); }
-	auto power_callback() { return m_power_cb.bind(); }
-	auto reaction_battery_callback() { return m_reaction_battery_cb.bind(); }
 	nrf2401_device &radio() { return subdevice<nrf24e1_device>("mcu")->radio(); }
 
 protected:
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -36,11 +32,11 @@ private:
 
 	required_device<nrf24e1_device> m_mcu;
 	required_device<eeprom_spi_25320_device> m_eeprom;
-	devcb_read8 m_controls_cb;
-	devcb_read8 m_rod_cb;
-	devcb_read8 m_reel_cb;
-	devcb_read_line m_power_cb;
-	devcb_read_line m_reaction_battery_cb;
+	required_ioport m_controls;
+	required_ioport m_rod;
+	required_ioport m_reel;
+	required_ioport m_power;
+	required_ioport m_reaction_battery;
 	output_finder<> m_motor_drive;
 	output_finder<> m_reaction;
 	emu_timer *m_input_timer;

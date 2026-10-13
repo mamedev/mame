@@ -26,9 +26,15 @@ xavix_baseball_bat_device::xavix_baseball_bat_device(const machine_config &mconf
 {
 }
 
-void xavix_baseball_bat_device::set_input_source(device_t &source)
+static INPUT_PORTS_START( xavix_baseball_bat )
+	PORT_START("BAT")
+	PORT_BIT( 0x03, 0x00, IPT_PEDAL2 ) PORT_NAME("Bat Swing Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(3) PORT_CENTERDELTA(3) PORT_CODE_INC(KEYCODE_SPACE)
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+ioport_constructor xavix_baseball_bat_device::device_input_ports() const
 {
-	m_strength.set_tag(source, m_strength.finder_tag());
+	return INPUT_PORTS_NAME(xavix_baseball_bat);
 }
 
 void xavix_baseball_bat_device::device_start()

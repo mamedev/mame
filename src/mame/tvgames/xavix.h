@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "xavix_io_bb_ball.h"
 #include "xavix_io_bistro_sensor.h"
 #include "xavix_io_card.h"
 #include "xavix_io_comt_baton.h"
@@ -271,7 +272,7 @@ protected:
 	virtual void external_bus_ctrl_changed(unsigned index, u8 data) { }
 
 private:
-	void configure_baseball(machine_config &config) ATTR_COLD;
+	xavix_baseball_ball_device &configure_baseball(machine_config &config) ATTR_COLD;
 };
 
 //**************************************************************************

@@ -24,7 +24,7 @@ xavix_webknight_device::xavix_webknight_device(const machine_config &mconfig, co
 {
 }
 
-INPUT_PORTS_START( xavix_webknight )
+static INPUT_PORTS_START( xavix_webknight )
 	PORT_START("WEBKNIGHT_IDENTITY")
 	// Names are identified by the ROM's dialogue; only reports 0-6 are accepted for weapon attachment.
 	PORT_CONFNAME( 0x1f, 0x1f, "Web Knight" )
@@ -63,10 +63,9 @@ void xavix_webknight_device::device_add_mconfig(machine_config &config)
 	m_ir->report_enable_callback<0>().set(*this, FUNC(xavix_webknight_device::report_enabled_r));
 }
 
-void xavix_webknight_device::set_input_source(device_t &source)
+ioport_constructor xavix_webknight_device::device_input_ports() const
 {
-	m_identity.set_tag(source, m_identity.finder_tag());
-	m_mark_switch.set_tag(source, m_mark_switch.finder_tag());
+	return INPUT_PORTS_NAME(xavix_webknight);
 }
 
 void xavix_webknight_device::device_start()

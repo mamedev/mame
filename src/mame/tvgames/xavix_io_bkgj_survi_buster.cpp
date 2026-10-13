@@ -24,9 +24,9 @@ xavix_survi_buster_device::xavix_survi_buster_device(const machine_config &mconf
 {
 }
 
-INPUT_PORTS_START( xavix_survi_buster )
+static INPUT_PORTS_START( xavix_survi_buster )
 	PORT_START("SURVI_BUSTER")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Survi-Buster Trigger / Shoot / Confirm")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Survi-Buster Trigger / Shoot / Confirm") PORT_CODE(KEYCODE_LALT) PORT_CODE(MOUSECODE_BUTTON3_INDEXED(0)) PORT_CODE(GUNCODE_BUTTON2_INDEXED(0))
 	// The red side circle seen in photos has no verified firmware function.
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -49,10 +49,9 @@ void xavix_survi_buster_device::device_add_mconfig(machine_config &config)
 	m_ir->sequence_callback<0>().set(*this, FUNC(xavix_survi_buster_device::survi_buster_report_r));
 }
 
-void xavix_survi_buster_device::set_input_source(device_t &source)
+ioport_constructor xavix_survi_buster_device::device_input_ports() const
 {
-	m_survi_buster.set_tag(source, m_survi_buster.finder_tag());
-	m_survi_buster_power.set_tag(source, m_survi_buster_power.finder_tag());
+	return INPUT_PORTS_NAME(xavix_survi_buster);
 }
 
 void xavix_survi_buster_device::device_start()

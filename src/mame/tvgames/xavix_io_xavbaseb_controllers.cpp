@@ -26,9 +26,9 @@ xavix_baseball_controllers_device::xavix_baseball_controllers_device(const machi
 {
 }
 
-INPUT_PORTS_START( xavix_baseball_controllers )
+static INPUT_PORTS_START( xavix_baseball_controllers )
 	PORT_START("BALL_THROW")
-	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("Ball Throw Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(1)
+	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("Ball Throw Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(1) PORT_CODE_INC(KEYCODE_LCONTROL)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("BALL_BUTTONS")
@@ -58,11 +58,9 @@ void xavix_baseball_controllers_device::device_add_mconfig(machine_config &confi
 	m_ir->report_callback<1>().set(*this, FUNC(xavix_baseball_controllers_device::bat_report_r));
 }
 
-void xavix_baseball_controllers_device::set_input_source(device_t &source)
+ioport_constructor xavix_baseball_controllers_device::device_input_ports() const
 {
-	m_ball_throw.set_tag(source, m_ball_throw.finder_tag());
-	m_ball_buttons.set_tag(source, m_ball_buttons.finder_tag());
-	m_bat.set_tag(source, m_bat.finder_tag());
+	return INPUT_PORTS_NAME(xavix_baseball_controllers);
 }
 
 void xavix_baseball_controllers_device::device_start()

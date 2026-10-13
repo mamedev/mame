@@ -23,7 +23,7 @@ xavix_stadium_bat_device::xavix_stadium_bat_device(const machine_config &mconfig
 {
 }
 
-INPUT_PORTS_START( xavix_stadium_bat )
+static INPUT_PORTS_START( xavix_stadium_bat )
 	PORT_START("SWING")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Bat Swing") PORT_CODE(KEYCODE_SPACE) PORT_IMPULSE(1)
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -40,9 +40,9 @@ void xavix_stadium_bat_device::device_add_mconfig(machine_config &config)
 	m_ir->enable_callback().set(*this, FUNC(xavix_stadium_bat_device::bat_active_r));
 }
 
-void xavix_stadium_bat_device::set_input_source(device_t &source)
+ioport_constructor xavix_stadium_bat_device::device_input_ports() const
 {
-	m_swing.set_tag(source, m_swing.finder_tag());
+	return INPUT_PORTS_NAME(xavix_stadium_bat);
 }
 
 void xavix_stadium_bat_device::device_start()

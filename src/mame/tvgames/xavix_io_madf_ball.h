@@ -17,12 +17,12 @@ public:
 	// construction/destruction
 	xavix_madfb_ball_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void set_input_source(device_t &source) ATTR_COLD;
 	auto event_callback() { return m_event_out_cb.bind(); }
 
 	DECLARE_INPUT_CHANGED_MEMBER(changed);
 
 protected:
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

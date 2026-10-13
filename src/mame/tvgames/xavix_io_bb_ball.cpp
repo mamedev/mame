@@ -21,13 +21,36 @@ xavix_baseball_ball_device::xavix_baseball_ball_device(const machine_config &mco
 	: device_t(mconfig, XAVIX_BASEBALL_BALL, tag, owner, clock)
 	, m_controls(*this, "PITCH")
 	, m_motion(*this, "PITCH_MOTION")
+	, m_model(model::RAD_BB)
 {
 }
 
-void xavix_baseball_ball_device::set_input_source(device_t &source)
+static INPUT_PORTS_START( xavix_baseball_ball )
+	PORT_START("PITCH")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Pitch Controller Up / Fastball") PORT_8WAY PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Pitch Controller Down / Change-up") PORT_8WAY PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Pitch Controller Left / Knuckleball") PORT_8WAY PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Pitch Controller Right / Curveball") PORT_8WAY PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Pitch Controller New") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Pitch Controller Enter") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("PITCH_MOTION")
+	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("Pitch Motion Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(3) PORT_CENTERDELTA(3) PORT_CODE_INC(KEYCODE_G)
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( xavix_baseball_ball2 )
+	PORT_INCLUDE(xavix_baseball_ball)
+
+	PORT_MODIFY("PITCH")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pitch Controller Back / X") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Pitch Controller Next / O") PORT_CODE(KEYCODE_O)
+INPUT_PORTS_END
+
+ioport_constructor xavix_baseball_ball_device::device_input_ports() const
 {
-	m_controls.set_tag(source, m_controls.finder_tag());
-	m_motion.set_tag(source, m_motion.finder_tag());
+	return m_model == model::RAD_BB ? INPUT_PORTS_NAME(xavix_baseball_ball) : INPUT_PORTS_NAME(xavix_baseball_ball2);
 }
 
 void xavix_baseball_ball_device::device_start()

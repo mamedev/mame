@@ -25,9 +25,15 @@ xavix_beyblade_ripcord_device::xavix_beyblade_ripcord_device(const machine_confi
 {
 }
 
-void xavix_beyblade_ripcord_device::set_input_source(device_t &source)
+static INPUT_PORTS_START( xavix_beyblade_ripcord )
+	PORT_START("RIPCORD")
+	// Patent JP3532900B2 identifies a rack-driven flywheel photointerrupter; host scaling is provisional.
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_NAME("Ripcord") PORT_SENSITIVITY(100) PORT_KEYDELTA(12) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(KEYCODE_SPACE) PORT_CODE(MOUSECODE_Y_INDEXED(0))
+INPUT_PORTS_END
+
+ioport_constructor xavix_beyblade_ripcord_device::device_input_ports() const
 {
-	m_position.set_tag(source, m_position.finder_tag());
+	return INPUT_PORTS_NAME(xavix_beyblade_ripcord);
 }
 
 void xavix_beyblade_ripcord_device::device_start()

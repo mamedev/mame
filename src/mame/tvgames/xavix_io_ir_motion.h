@@ -26,13 +26,13 @@ public:
 	xavix_ir_motion_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void set_controller_type(controller_type type) { m_controller_type = type; }
-	void set_input_source(device_t &source) ATTR_COLD;
 	auto event_callback() { return m_ir.lookup()->event_callback(); }
 	int data_r() { return m_ir->data_r(); }
 	void vblank_w(int state);
 
 protected:
 	// device_t implementation
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_config_complete() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
@@ -49,14 +49,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_IR_MOTION, xavix_ir_motion_device)
-
-INPUT_PORTS_EXTERN( xavix_ir_motion_paddles );
-INPUT_PORTS_EXTERN( xavix_ir_motion_ping_pong_rackets );
-INPUT_PORTS_EXTERN( xavix_ir_motion_powered_ping_pong_rackets );
-INPUT_PORTS_EXTERN( xavix_ir_motion_kick_sensors );
-INPUT_PORTS_EXTERN( xavix_ir_motion_tennis_rackets );
-INPUT_PORTS_EXTERN( xavix_ir_motion_shakers );
-INPUT_PORTS_EXTERN( xavix_ir_motion_swords );
-INPUT_PORTS_EXTERN( xavix_ir_motion_xavix_rackets );
 
 #endif // MAME_TVGAMES_XAVIX_IO_IR_MOTION_H

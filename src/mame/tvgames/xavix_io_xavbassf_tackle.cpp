@@ -23,14 +23,47 @@ xavix_bassfishing_device::xavix_bassfishing_device(const machine_config &mconfig
 	: device_t(mconfig, XAVIX_BASSFISHING, tag, owner, clock)
 	, m_mcu(*this, "mcu")
 	, m_eeprom(*this, "eeprom")
-	, m_controls_cb(*this, 0)
-	, m_rod_cb(*this, 8)
-	, m_reel_cb(*this, 0)
-	, m_power_cb(*this, 1)
-	, m_reaction_battery_cb(*this, 1)
+	, m_controls(*this, "TACKLE_BUTTONS")
+	, m_rod(*this, "ROD")
+	, m_reel(*this, "REEL")
+	, m_power(*this, "TACKLE_POWER")
+	, m_reaction_battery(*this, "REACTION_BATTERIES")
 	, m_motor_drive(*this, "reaction_motor_drive")
 	, m_reaction(*this, "reaction")
 {
+}
+
+static INPUT_PORTS_START( xavix_bassfishing )
+	PORT_START("TACKLE_BUTTONS")
+	// The radio MCU folds analogue Enter/Cancel switches and digital Select contacts into this order.
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Fishing Tackle Enter") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Fishing Tackle Cancel") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_NAME("Fishing Tackle Select Down")  PORT_CODE(KEYCODE_S) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_NAME("Fishing Tackle Select Left")  PORT_CODE(KEYCODE_A) PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Fishing Tackle Select Right") PORT_CODE(KEYCODE_D) PORT_4WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_NAME("Fishing Tackle Select Up")    PORT_CODE(KEYCODE_W) PORT_4WAY
+
+	PORT_START("ROD")
+	PORT_BIT( 0x0f, 0x08, IPT_AD_STICK_Y ) PORT_NAME("Fishing Rod Motion") PORT_MINMAX(0, 15) PORT_SENSITIVITY(25) PORT_KEYDELTA(1) PORT_CENTERDELTA(1) PORT_CODE_DEC(KEYCODE_Q) PORT_CODE_INC(KEYCODE_E) PORT_CODE(MOUSECODE_Y_INDEXED(0))
+
+	PORT_START("REEL")
+	// Keep the reel keys clear of the base unit's Reset binding.
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_NAME("Reel Handle") PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_T) PORT_CODE_INC(KEYCODE_Y) PORT_CODE(MOUSECODE_X_INDEXED(0))
+
+	PORT_START("TACKLE_POWER")
+	PORT_CONFNAME( 0x01, 0x01, "Fishing Tackle Power" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_START("REACTION_BATTERIES")
+	PORT_CONFNAME( 0x01, 0x01, "Reaction Batteries" )
+	PORT_CONFSETTING(    0x00, "Not Installed" )
+	PORT_CONFSETTING(    0x01, "Installed" )
+INPUT_PORTS_END
+
+ioport_constructor xavix_bassfishing_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(xavix_bassfishing);
 }
 
 void xavix_bassfishing_device::device_add_mconfig(machine_config &config)
@@ -61,11 +94,11 @@ void xavix_bassfishing_device::device_start()
 
 void xavix_bassfishing_device::device_reset()
 {
-	m_last_reel = m_reel_cb();
+	m_last_reel = m_reel->read();
 	m_reel_phase = 3;
 	m_reel_pending = 0;
 	m_motor_drive = 0;
-	m_powered = bool(m_power_cb());
+	m_powered = bool(m_power->read());
 	m_reaction = 0;
 	m_input_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 }
@@ -77,7 +110,7 @@ void xavix_bassfishing_device::device_reset_after_children()
 
 u8 xavix_bassfishing_device::tackle_port_r()
 {
-	u8 const buttons = m_controls_cb();
+	u8 const buttons = m_controls->read();
 	// Enter also reaches the digital wake-up pin while the ADC is asleep.
 	return (0xff ^ (buttons & 0xf0)) & ~(BIT(buttons, 2) << 3);
 }
@@ -88,9 +121,9 @@ u16 xavix_bassfishing_device::tackle_adc_r(offs_t channel)
 	{
 	case 0:
 		// Representative sensor range; the firmware learns its resting voltage.
-		return (0x70 + 2 * (m_rod_cb() & 0x0f)) << 4;
-	case 1: return BIT(m_controls_cb(), 2) ? 0 : 0x0fff;
-	case 2: return BIT(m_controls_cb(), 3) ? 0 : 0x0fff;
+		return (0x70 + 2 * (m_rod->read() & 0x0f)) << 4;
+	case 1: return BIT(m_controls->read(), 2) ? 0 : 0x0fff;
+	case 2: return BIT(m_controls->read(), 3) ? 0 : 0x0fff;
 	case 8: return 0x0d1c; // Nominal 3 V supply measured against the internal reference.
 	default: return 0x0fff;
 	}
@@ -106,13 +139,13 @@ void xavix_bassfishing_device::tackle_port_w(offs_t offset, u8 data, u8 mem_mask
 
 void xavix_bassfishing_device::update_reaction()
 {
-	m_reaction = m_motor_drive && m_powered && m_reaction_battery_cb();
+	m_reaction = m_motor_drive && m_powered && m_reaction_battery->read();
 }
 
 TIMER_CALLBACK_MEMBER(xavix_bassfishing_device::sample_inputs)
 {
-	bool const powered = bool(m_power_cb());
-	u8 const reel = m_reel_cb();
+	bool const powered = bool(m_power->read());
+	u8 const reel = m_reel->read();
 	if (powered != m_powered)
 	{
 		m_powered = powered;
