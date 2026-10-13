@@ -332,21 +332,20 @@ void psikyosh_state::draw_background(bitmap_rgb32 &bitmap, const rectangle &clip
 /* 32-bit ONLY */
 /* zoomx/y are pixel slopes in 6.10 fixed point, not scale. 0x400 is 1:1.
    drawgfx zoom algorithm doesn't produce identical results to hardware. */
-/* high/wide are number of tiles wide/high up to max size of zoom_bitmap in
-   either direction */
+/* high/wide are number of tiles wide/high */
 /* code is index of first tile and incremented across rows then down columns
    (adjusting for flip obviously) */
 /* sx and sy is top-left of entire sprite regardless of flip */
 /* Note that Level 5-4 of sbomberb boss is perfect! (Alpha blended zoomed) as
    well as S1945II logo */
 /* pixel is only plotted if z is >= priority_buffer[y][x] */
+/* Every tile samples one source accumulator shared by the whole sprite, so
+   tiles meet without gaps or overlap and each destination pixel is blended
+   at most once. */
 void psikyosh_state::drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx,
 		u32 const code, u16 const color, u8 const flipx, u8 const flipy, s32 const offsx, s32 const offsy,
 		s16 const alpha, u32 const zoomx, u32 const zoomy, u8 const wide, u8 const high, u16 const z)
 {
-	rectangle myclip; // Clip to screen boundaries
-	int code_offset = 0;
-
 	if (!zoomx || !zoomy)
 		return;
 
@@ -355,426 +354,81 @@ void psikyosh_state::drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangle &clip, 
 	assert(dest_bmp.bpp() == 32);
 
 	// force clip to bitmap boundary
-	myclip = clip;
+	rectangle myclip = clip;
 	myclip &= dest_bmp.cliprect();
 
-	// Temporary fallback for non-zoomed, needs z-buffer. Note that this is probably a lot slower than drawgfx.c, especially if there was separate code for flipped cases
-	if (zoomx == 0x400 && zoomy == 0x400)
+	pen_t const *const pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+	u8 *const alphatable = m_alphatable.get();
+
+	// 16.16 source step per destination pixel
+	u32 const stepx = zoomx << 6;
+	u32 const stepy = zoomy << 6;
+
+	auto const draw = [&] (auto const &pixop)
 	{
-		int xstart, ystart, xend, yend, xinc, yinc;
-
-		if (flipx)  { xstart = wide - 1; xend = -1;   xinc = -1; }
-		else        { xstart = 0;        xend = wide; xinc = +1; }
-
-		if (flipy)  { ystart = high - 1; yend = -1;   yinc = -1; }
-		else        { ystart = 0;        yend = high; yinc = +1; }
-
-		// Start drawing
-		if (gfx)
-		{
-			for (int ytile = ystart; ytile != yend; ytile += yinc)
-			{
-				for (int xtile = xstart; xtile != xend; xtile += xinc)
-				{
-					pen_t const *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-					u8 const *code_base = gfx->get_data((code + code_offset++) % gfx->elements());
-
-					int x_index_base, y_index;
-
-					if (flipx)  { x_index_base = gfx->width() - 1; }
-					else        { x_index_base = 0; }
-
-					if (flipy)  { y_index = gfx->height()-1; }
-					else        { y_index = 0; }
-
-					// start coordinates
-					int sx = offsx + xtile * gfx->width();
-					int sy = offsy + ytile * gfx->height();
-
-					// end coordinates
-					int ex = sx + gfx->width();
-					int ey = sy + gfx->height();
-
-					if (sx < myclip.left())
-					{
-						// clip left
-						int const pixels = myclip.left() - sx;
-						sx += pixels;
-						x_index_base += xinc * pixels;
-					}
-					if (sy < myclip.top())
-					{
-						// clip top
-						int const pixels = myclip.top() - sy;
-						sy += pixels;
-						y_index += yinc * pixels;
-					}
-					if (ex > myclip.right() + 1)
-					{
-						// clip right
-						int const pixels = ex - myclip.right() - 1;
-						ex -= pixels;
-					}
-					if (ey > myclip.bottom() + 1)
-					{
-						// clip bottom
-						int const pixels = ey - myclip.bottom() - 1;
-						ey -= pixels;
-					}
-
-					// skip if inner loop doesn't draw anything
-					if (ex > sx)
-					{
-						// case 1: no alpha
-						if (alpha == 0xff)
-						{
-							if (z > 0)
-							{
-								u8 const *source = code_base + (y_index) * gfx->rowbytes() + x_index_base;
-								u32 *dest = &dest_bmp.pix(sy, sx);
-								u16 *pri = &m_z_bitmap.pix(sy, sx);
-								int const src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
-								int const dst_modulo = dest_bmp.rowpixels() - (ex - sx);
-								int const pri_modulo = m_z_bitmap.rowpixels() - (ex - sx);
-
-								for (int y = sy; y < ey; y++)
-								{
-									for (int x = sx; x < ex; x++)
-									{
-										pixop_transparent_priority(*source, dest, pri, pal, z);
-										dest++;
-										pri++;
-										source += xinc;
-									}
-									dest += dst_modulo;
-									pri += pri_modulo;
-									source += src_modulo;
-								}
-							}
-							else
-							{
-								u8 const *source = code_base + y_index * gfx->rowbytes() + x_index_base;
-								u32 *dest = &dest_bmp.pix(sy, sx);
-								int const src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
-								int const dst_modulo = dest_bmp.rowpixels() - (ex - sx);
-
-								for (int y = sy; y < ey; y++)
-								{
-									for (int x = sx; x < ex; x++)
-									{
-										pixop_transparent(*source, dest, pal);
-										dest++;
-										source += xinc;
-									}
-									dest += dst_modulo;
-									source += src_modulo;
-								}
-							}
-						}
-
-						// case 6: alpha-blended
-						else if (alpha >= 0)
-						{
-							if (z > 0)
-							{
-								u8 const *source = code_base + y_index * gfx->rowbytes() + x_index_base;
-								u32 *dest = &dest_bmp.pix(sy, sx);
-								u16 *pri = &m_z_bitmap.pix(sy, sx);
-								int const src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
-								int const dst_modulo = dest_bmp.rowpixels() - (ex - sx);
-								int const pri_modulo = m_z_bitmap.rowpixels() - (ex - sx);
-
-								for (int y = sy; y < ey; y++)
-								{
-									for (int x = sx; x < ex; x++)
-									{
-										pixop_transparent_alpha_priority(*source, dest, pri, pal, z, alpha);
-										dest++;
-										pri++;
-										source += xinc;
-									}
-									dest += dst_modulo;
-									pri += pri_modulo;
-									source += src_modulo;
-								}
-							}
-							else
-							{
-								u8 const *source = code_base + y_index * gfx->rowbytes() + x_index_base;
-								u32 *dest = &dest_bmp.pix(sy, sx);
-								int const src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
-								int const dst_modulo = dest_bmp.rowpixels() - (ex - sx);
-
-								for (int y = sy; y < ey; y++)
-								{
-									for (int x = sx; x < ex; x++)
-									{
-										pixop_transparent_alpha(*source, dest, pal, alpha);
-										dest++;
-										source += xinc;
-									}
-									dest += dst_modulo;
-									source += src_modulo;
-								}
-							}
-						}
-
-						// case 7: TRANSPARENCY_ALPHARANGE
-						else
-						{
-							if (z > 0)
-							{
-								u8 const *source = code_base + y_index * gfx->rowbytes() + x_index_base;
-								u32 *dest = &dest_bmp.pix(sy, sx);
-								u16 *pri = &m_z_bitmap.pix(sy, sx);
-								int const src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
-								int const dst_modulo = dest_bmp.rowpixels() - (ex - sx);
-								int const pri_modulo = m_z_bitmap.rowpixels() - (ex - sx);
-
-								for (int y = sy; y < ey; y++)
-								{
-									for (int x = sx; x < ex; x++)
-									{
-										pixop_transparent_alphatable_priority(*source, dest, pri, pal, z, m_alphatable.get());
-										dest++;
-										pri++;
-										source += xinc;
-									}
-									dest += dst_modulo;
-									pri += pri_modulo;
-									source += src_modulo;
-								}
-							}
-							else
-							{
-								u8 const *source = code_base + y_index * gfx->rowbytes() + x_index_base;
-								u32 *dest = &dest_bmp.pix(sy, sx);
-								int const src_modulo = yinc * gfx->rowbytes() - xinc * (ex - sx);
-								int const dst_modulo = dest_bmp.rowpixels() - (ex - sx);
-
-								for (int y = sy; y < ey; y++)
-								{
-									for (int x = sx; x < ex; x++)
-									{
-										pixop_transparent_alphatable(*source, dest, pal, m_alphatable.get());
-										dest++;
-										source += xinc;
-									}
-									dest += dst_modulo;
-									source += src_modulo;
-								}
-							}
-						}
-
-					}
-				}
-			}
-		}
-	}
-	else // Zoomed
-	{
-		// Make a copy of complete sprite at top-left of zoom_bitmap
-		// Because I'm too slow to get it to work on the fly
+		u32 code_offset = 0;
 		for (int ytile = 0; ytile < high; ytile++)
 		{
 			for (int xtile = 0; xtile < wide; xtile++)
 			{
-				u8 const *code_base = gfx->get_data((code + code_offset++) % gfx->elements());
-				for (int ypixel = 0; ypixel < gfx->height(); ypixel++)
-				{
-					u8 const *source = code_base + ypixel * gfx->rowbytes();
-					u8 *dest = &m_zoom_bitmap.pix(ypixel + ytile * gfx->height());
+				u32 const tilecode = (code + code_offset++) % gfx->elements();
 
-					for (int xpixel = 0; xpixel < gfx->width(); xpixel++)
+				// position of this tile on screen
+				int const col = flipx ? (wide - 1 - xtile) : xtile;
+				int const row = flipy ? (high - 1 - ytile) : ytile;
+
+				s32 sx, ex, x_index_base, dx;
+				s32 sy, ey, y_index, dy;
+				if (!gfx_element::subpixel_zoom_span(offsx << 16, col, gfx->width(), stepx, flipx, myclip.left(), myclip.right(), sx, ex, x_index_base, dx))
+					continue;
+				if (!gfx_element::subpixel_zoom_span(offsy << 16, row, gfx->height(), stepy, flipy, myclip.top(), myclip.bottom(), sy, ey, y_index, dy))
+					continue;
+
+				u8 const *const code_base = gfx->get_data(tilecode);
+				for (int y = sy; y <= ey; y++)
+				{
+					u8 const *const source = code_base + (y_index >> 16) * gfx->rowbytes();
+					u32 *const dest = &dest_bmp.pix(y);
+					u16 *const pri = &m_z_bitmap.pix(y);
+
+					s32 x_index = x_index_base;
+					for (int x = sx; x <= ex; x++)
 					{
-						dest[xpixel + xtile * gfx->width()] = source[xpixel];
+						pixop(source[x_index >> 16], &dest[x], &pri[x]);
+						x_index += dx;
 					}
+
+					y_index += dy;
 				}
 			}
 		}
+	};
 
-		// Start drawing
-		if (gfx)
-		{
-			pen_t const *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+	// case 1: no alpha
+	if (alpha == 0xff)
+	{
+		if (z > 0)
+			draw([pal, z] (u8 source, u32 *dest, u16 *pri) { pixop_transparent_priority(source, dest, pri, pal, z); });
+		else
+			draw([pal] (u8 source, u32 *dest, u16 *pri) { pixop_transparent(source, dest, pal); });
+	}
 
-			int const sprite_screen_height = ((high * gfx->height() * (0x400 * 0x400)) / zoomy + 0x200) >> 10; /* Round up to nearest pixel */
-			int const sprite_screen_width = ((wide * gfx->width() * (0x400 * 0x400)) / zoomx + 0x200) >> 10;
+	// case 6: alpha-blended
+	else if (alpha >= 0)
+	{
+		if (z > 0)
+			draw([pal, z, alpha] (u8 source, u32 *dest, u16 *pri) { pixop_transparent_alpha_priority(source, dest, pri, pal, z, alpha); });
+		else
+			draw([pal, alpha] (u8 source, u32 *dest, u16 *pri) { pixop_transparent_alpha(source, dest, pal, alpha); });
+	}
 
-			if (sprite_screen_width && sprite_screen_height)
-			{
-				// start coordinates
-				int sx = offsx;
-				int sy = offsy;
-
-				// end coordinates
-				int ex = sx + sprite_screen_width;
-				int ey = sy + sprite_screen_height;
-
-				int x_index_base;
-				int y_index;
-
-				int dx, dy;
-
-				if (flipx)  { x_index_base = (sprite_screen_width - 1) * zoomx; dx = -zoomx; }
-				else        { x_index_base = 0; dx = zoomx; }
-
-				if (flipy)  { y_index = (sprite_screen_height - 1) * zoomy; dy = -zoomy; }
-				else        { y_index = 0; dy = zoomy; }
-
-				if (sx < myclip.left())
-				{
-					// clip left
-					int const pixels = myclip.left() - sx;
-					sx += pixels;
-					x_index_base += pixels * dx;
-				}
-				if (sy < myclip.top())
-				{
-					// clip top
-					int const pixels = myclip.top() - sy;
-					sy += pixels;
-					y_index += pixels * dy;
-				}
-				if (ex > myclip.right() + 1)
-				{
-					// clip right
-					int const pixels = ex - myclip.right() - 1;
-					ex -= pixels;
-				}
-				if (ey > myclip.bottom() + 1)
-				{
-					// clip bottom
-					int const pixels = ey - myclip.bottom() - 1;
-					ey -= pixels;
-				}
-
-				// skip if inner loop doesn't draw anything
-				if (ex > sx)
-				{
-					// case 1: no alpha
-					// Note: adjusted to >>10 and draws from zoom_bitmap not gfx
-					if (alpha == 0xff)
-					{
-						if (z > 0)
-						{
-							for (int y = sy; y < ey; y++)
-							{
-								u8 const *source = &m_zoom_bitmap.pix(y_index >> 10);
-								u32 *dest = &dest_bmp.pix(y);
-								u16 *pri = &m_z_bitmap.pix(y);
-
-								int x_index = x_index_base;
-								for (int x = sx; x < ex; x++)
-								{
-									pixop_transparent_priority(source[x_index >> 10], &dest[x], &pri[x], pal, z);
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for (int y = sy; y < ey; y++)
-							{
-								u8 const *source = &m_zoom_bitmap.pix(y_index >> 10);
-								u32 *dest = &dest_bmp.pix(y);
-
-								int x_index = x_index_base;
-								for (int x = sx; x < ex; x++)
-								{
-									pixop_transparent(source[x_index >> 10], &dest[x], pal);
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					// case 6: alpha-blended
-					else if (alpha >= 0)
-					{
-						if (z > 0)
-						{
-							for (int y = sy; y < ey; y++)
-							{
-								u8 const *source = &m_zoom_bitmap.pix(y_index >> 10);
-								u32 *dest = &dest_bmp.pix(y);
-								u16 *pri = &m_z_bitmap.pix(y);
-
-								int x_index = x_index_base;
-								for (int x = sx; x < ex; x++)
-								{
-									pixop_transparent_alpha_priority(source[x_index >> 10], &dest[x], &pri[x], pal, z, alpha);
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for (int y = sy; y < ey; y++)
-							{
-								u8 const *source = &m_zoom_bitmap.pix(y_index >> 10);
-								u32 *dest = &dest_bmp.pix(y);
-
-								int x_index = x_index_base;
-								for (int x = sx; x < ex; x++)
-								{
-									pixop_transparent_alpha(source[x_index >> 10], &dest[x], pal, alpha);
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					// case 7: TRANSPARENCY_ALPHARANGE
-					else
-					{
-						if (z > 0)
-						{
-							for (int y = sy; y < ey; y++)
-							{
-								u8 const *source = &m_zoom_bitmap.pix(y_index >> 10);
-								u32 *dest = &dest_bmp.pix(y);
-								u16 *pri = &m_z_bitmap.pix(y);
-
-								int x_index = x_index_base;
-								for (int x = sx; x < ex; x++)
-								{
-									pixop_transparent_alphatable_priority(source[x_index >> 10], &dest[x], &pri[x], pal, z, m_alphatable.get());
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-						else
-						{
-							for (int y = sy; y < ey; y++)
-							{
-								u8 const *source = &m_zoom_bitmap.pix(y_index >> 10);
-								u32 *dest = &dest_bmp.pix(y);
-
-								int x_index = x_index_base;
-								for (int x = sx; x < ex; x++)
-								{
-									pixop_transparent_alphatable(source[x_index >> 10], &dest[x], pal, m_alphatable.get());
-									x_index += dx;
-								}
-
-								y_index += dy;
-							}
-						}
-					}
-				}
-			}
-		}
+	// case 7: TRANSPARENCY_ALPHARANGE
+	else
+	{
+		if (z > 0)
+			draw([pal, z, alphatable] (u8 source, u32 *dest, u16 *pri) { pixop_transparent_alphatable_priority(source, dest, pri, pal, z, alphatable); });
+		else
+			draw([pal, alphatable] (u8 source, u32 *dest, u16 *pri) { pixop_transparent_alphatable(source, dest, pal, alphatable); });
 	}
 }
 
@@ -1006,7 +660,6 @@ void psikyosh_state::video_start()
 	}
 
 	m_z_bitmap.allocate(1024, 1024); /* z-buffer */
-	m_zoom_bitmap.allocate(16*16, 16*16); /* temp buffer for assembling sprites */
 	m_bg_zoom = std::make_unique<u16[]>(256);
 	m_alphatable = std::make_unique<u8[]>(256);
 
@@ -1032,7 +685,6 @@ void psikyosh_state::video_start()
 	}
 
 	save_item(NAME(m_z_bitmap));
-	save_item(NAME(m_zoom_bitmap));
 	save_pointer(NAME(m_bg_zoom), 256);
 }
 
