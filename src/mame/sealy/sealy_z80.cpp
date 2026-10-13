@@ -20,8 +20,7 @@ TODO:
   action keys, scanned as a 5-row matrix selected through port a0).  The games
   use it instead of the direct controls when test mode switch 1 (EEPROM byte
   0x38 on bbddz/djddz, 0x36 on ddz2) is OFF
-- dump the missing jzuanshi program
-- dump the lucky168 secure chip if possible
+- dump the lucky168 and ddz1 secure chips if possible
 - verify display timing, sound clock and remaining I/O against hardware
 */
 
@@ -32,6 +31,7 @@ TODO:
 
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
+#include "machine/nvram.h"
 #include "sound/okim6295.h"
 
 #include "emupal.h"
@@ -39,6 +39,7 @@ TODO:
 #include "speaker.h"
 
 #include <memory>
+#include <vector>
 
 
 namespace {
@@ -67,6 +68,7 @@ protected:
 
 	void dizhu_program_map(address_map &map) ATTR_COLD;
 	void dizhu_opcodes_map(address_map &map) ATTR_COLD;
+	void dizhu_protection_map(address_map &map) ATTR_COLD;
 	void alt_program_map(address_map &map) ATTR_COLD;
 	void alt_opcodes_map(address_map &map) ATTR_COLD;
 	void common_io_map(address_map &map) ATTR_COLD;
@@ -74,6 +76,7 @@ protected:
 	void decrypt_dizhu(const uint8_t (&selectors)[64]) ATTR_COLD;
 	void decrypt_djddza(const uint8_t (&selectors)[64]) ATTR_COLD;
 	void decrypt_pljh() ATTR_COLD;
+	void decrypt_jzuanshi() ATTR_COLD;
 	void descramble_tiles(uint16_t *tiles, uint32_t count, uint16_t xor_mask, int r_field, int g_field, int b_field) ATTR_COLD;
 	void descramble_djddza_tiles() ATTR_COLD;
 
@@ -134,7 +137,7 @@ private:
 };
 
 
-// lucky168: the 93C46 lines drive a secure chip speaking T=0 instead
+// lucky168, ddz1: the 93C46 lines drive a secure chip speaking T=0 instead
 class sealy_z80_esam_state : public sealy_z80_state
 {
 public:
@@ -143,13 +146,16 @@ public:
 		m_esam(*this, "esam")
 	{ }
 
+	void ddz1(machine_config &config) ATTR_COLD;
 	void lucky168(machine_config &config) ATTR_COLD;
 
+	void init_ddz1() ATTR_COLD;
 	void init_lucky168() ATTR_COLD;
 
 private:
 	required_device<sealy_z80_esam_device> m_esam;
 
+	void ddz1_program_map(address_map &map) ATTR_COLD;
 	void program_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
@@ -158,13 +164,30 @@ private:
 };
 
 
+// jzuanshi: battery-backed RAM, inputs on different ports, no serial device used
+class sealy_z80_jzuanshi_state : public sealy_z80_state
+{
+public:
+	sealy_z80_jzuanshi_state(const machine_config &mconfig, device_type type, const char *tag) :
+		sealy_z80_state(mconfig, type, tag)
+	{ }
+
+	void jzuanshi(machine_config &config) ATTR_COLD;
+
+	void init_jzuanshi() ATTR_COLD;
+
+private:
+	void program_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+};
+
+
 void sealy_z80_state::machine_start()
 {
 	uint8_t *const rom = memregion("maincpu")->base();
 	m_rombank->configure_entries(0, 8, rom, 0x4000);
-	uint8_t *const opcodes = m_decrypted_opcodes ? m_decrypted_opcodes.get() : rom; // jzuanshi has no program
-	m_opfixed->set_base(opcodes);
-	m_opbank->configure_entries(0, 8, opcodes, 0x4000);
+	m_opfixed->set_base(m_decrypted_opcodes.get());
+	m_opbank->configure_entries(0, 8, m_decrypted_opcodes.get(), 0x4000);
 	m_oki_banked = memregion("oki")->bytes() > 0x40000;
 
 	save_item(NAME(m_nmi_enable));
@@ -291,9 +314,18 @@ void sealy_z80_state::common_io_map(address_map &map)
 }
 
 
+void sealy_z80_state::dizhu_protection_map(address_map &map)
+{
+	// ddz1, ddz2, djddza and fkddzz80 read this once a counter kept in the
+	// EEPROM/ESAM reaches 0x28, and lock up unless it returns 0x22 (most likely
+	// a CPLD register; value taken from the check, ddz2a has it removed)
+	map(0x5ff0, 0x5ff0).lr8(NAME([] () -> uint8_t { return 0x22; }));
+}
+
 void sealy_z80_eeprom_state::program_map(address_map &map)
 {
 	dizhu_program_map(map);
+	dizhu_protection_map(map);
 	map(0x6ff0, 0x6ff0).portr("EEPROMIN");
 }
 
@@ -312,6 +344,13 @@ void sealy_z80_eeprom_state::io_map(address_map &map)
 }
 
 
+void sealy_z80_esam_state::ddz1_program_map(address_map &map)
+{
+	dizhu_program_map(map);
+	dizhu_protection_map(map);
+	map(0x6ff0, 0x6ff0).portr("ESAMIN");
+}
+
 void sealy_z80_esam_state::program_map(address_map &map)
 {
 	alt_program_map(map);
@@ -324,6 +363,23 @@ void sealy_z80_esam_state::io_map(address_map &map)
 	map(0x50, 0x50).portw("ESAMCLK");
 	map(0x60, 0x60).portw("ESAMRST");
 	map(0xe0, 0xe0).w(FUNC(sealy_z80_esam_state::esam_io_w));
+}
+
+
+void sealy_z80_jzuanshi_state::program_map(address_map &map)
+{
+	alt_program_map(map);
+	map(0xaff0, 0xaff0).portr("SYSTEM");
+	map(0xc000, 0xdfff).ram().share("nvram");
+}
+
+void sealy_z80_jzuanshi_state::io_map(address_map &map)
+{
+	common_io_map(map);
+	map(0x30, 0x30).unmapr();
+	map(0x40, 0x40).unmapr();
+	map(0x90, 0x90).portr("IN1");
+	map(0xf0, 0xf0).portr("IN0");
 }
 
 
@@ -342,12 +398,22 @@ static INPUT_PORTS_START( sealy_eeprom )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sealy_esam )
+	PORT_START("ESAMIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("esam", FUNC(sealy_z80_esam_device::io_r))
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("ESAMCLK")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("esam", FUNC(sealy_z80_esam_device::clk_w))
+
+	PORT_START("ESAMRST")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("esam", FUNC(sealy_z80_esam_device::rst_w))
+INPUT_PORTS_END
+
 // Direct controls, used when test mode switch 1 is ON (as in the default EEPROMs).
 // Functions observed running bbddz, djddz and ddz2; the bonus game confirm only
 // on bbddz.  The original button legends are unknown.
-static INPUT_PORTS_START( djddz )
-	PORT_INCLUDE(sealy_eeprom)
-
+static INPUT_PORTS_START( dizhu_controls )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Select Card / Confirm")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -369,16 +435,46 @@ static INPUT_PORTS_START( djddz )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( djddz )
+	PORT_INCLUDE(sealy_eeprom)
+	PORT_INCLUDE(dizhu_controls)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ddz1 )
+	PORT_INCLUDE(sealy_esam)
+	PORT_INCLUDE(dizhu_controls)
+INPUT_PORTS_END
+
+// Functions observed running the program; the original button legends are unknown.
+static INPUT_PORTS_START( jzuanshi )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet / Settings Confirm") // accepts the settings password
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small / Menu Decrement")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big / Menu Increment")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start / Deal / Draw")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Double Up / Menu Select")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3)
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) // ESAM I/O on the build in the upper half of the ROM
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( lucky168 )
-	PORT_START("ESAMIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("esam", FUNC(sealy_z80_esam_device::io_r))
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("ESAMCLK")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("esam", FUNC(sealy_z80_esam_device::clk_w))
-
-	PORT_START("ESAMRST")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("esam", FUNC(sealy_z80_esam_device::rst_w))
+	PORT_INCLUDE(sealy_esam)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )
@@ -479,6 +575,28 @@ void sealy_z80_esam_state::lucky168(machine_config &config)
 	SEALY_Z80_ESAM(config, m_esam, 12_MHz_XTAL / 2);
 }
 
+void sealy_z80_esam_state::ddz1(machine_config &config)
+{
+	sealy_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sealy_z80_esam_state::ddz1_program_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &sealy_z80_esam_state::dizhu_opcodes_map);
+	m_maincpu->set_addrmap(AS_IO, &sealy_z80_esam_state::io_map);
+
+	// the host samples a bit every 372 CPU cycles, half the lucky168 period
+	SEALY_Z80_ESAM(config, m_esam, 12_MHz_XTAL);
+}
+
+
+void sealy_z80_jzuanshi_state::jzuanshi(machine_config &config)
+{
+	sealy_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sealy_z80_jzuanshi_state::program_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &sealy_z80_jzuanshi_state::alt_opcodes_map);
+	m_maincpu->set_addrmap(AS_IO, &sealy_z80_jzuanshi_state::io_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
+
 
 // 百变斗地主 (Bǎi Biàn Dòu Dìzhǔ). All labels have 百变斗地主
 ROM_START( bbddz )
@@ -496,6 +614,25 @@ ROM_START( bbddz )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46", 0x00, 0x80, BAD_DUMP CRC(6ca3a909) SHA1(2f55f4040bcab30387d7cc7fecbdcf4d5762a3ed) ) // default with standard control panel
+ROM_END
+
+// 斗地主 (Dòu Dìzhǔ). All labels prepend 斗地主 to what's below
+ROM_START( ddz1 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "3.u11", 0x00000, 0x20000, CRC(2dd308ea) SHA1(6904c12b2db1fbca6f27d1553099e459fd8824d8) )
+
+	ROM_REGION16_LE( 0x200000, "bgtiles", 0 )
+	ROM_LOAD( "2.u18", 0x000000, 0x200000, CRC(e233504e) SHA1(22e2d64ac2bd0c1b59a173542e799686d9c71bd1) )
+
+	ROM_REGION16_LE( 0x200000, "fgtiles", 0 )
+	ROM_LOAD( "1.u21", 0x000000, 0x200000, CRC(198f242e) SHA1(f6da33d5dd6469eec7b3de780b8999670ea9c287) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "4.u23", 0x00000, 0x40000, CRC(e089cf82) SHA1(567736b1418b86ea35e29fb9f8a408436c8a03c8) )
+
+	// key and PIN taken from the program, file contents set for the standard control panel
+	ROM_REGION( 0x120, "esam", 0 )
+	ROM_LOAD( "esam.bin", 0x000, 0x120, BAD_DUMP CRC(7fe9cced) SHA1(4a36eee9638b32897be4e540094cc7d15ae89b0e) ) // reconstructed, not dumped
 ROM_END
 
 // 斗地主Ⅱ (Dòu Dìzhǔ II). All labels prepend 斗地主Ⅱ to what's below
@@ -550,6 +687,25 @@ ROM_START( djddza )
 	ROM_LOAD( "93c46", 0x00, 0x80, BAD_DUMP CRC(25e71bc6) SHA1(af3cfd71e949cba4605316225e35c0629522ca22) ) // default with standard control panel
 ROM_END
 
+// 疯狂斗地主 (Fēngkuáng Dòu Dìzhǔ), Dou Dizhu II program with its own graphics
+// All labels prepend 斗Ⅱ（疯斗画面） to what's below
+ROM_START( fkddzz80 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "3.u11", 0x00000, 0x20000, CRC(83dd7e28) SHA1(335a85e9cba60c65b431d5932f1d070fb8d03e4c) )
+
+	ROM_REGION16_LE( 0x200000, "bgtiles", 0 )
+	ROM_LOAD( "2.u18", 0x000000, 0x200000, CRC(483c557a) SHA1(9329b6f43d0d5a65f73e29db56b94e503ceb6f59) )
+
+	ROM_REGION16_LE( 0x200000, "fgtiles", 0 )
+	ROM_LOAD( "1.u21", 0x000000, 0x200000, CRC(65887535) SHA1(3efa7125d86e3da9136770c66af4099160f26beb) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "4.u23", 0x00000, 0x80000, CRC(f94ad624) SHA1(1e651d180b1c64c568ae6d0be5b3f4fc612d4a02) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46", 0x00, 0x80, BAD_DUMP CRC(25e71bc6) SHA1(af3cfd71e949cba4605316225e35c0629522ca22) ) // default with standard control panel
+ROM_END
+
 // 顶级斗地主 (Dǐngjí Dòu Dìzhǔ). All labels prepend 顶级斗地主 to what's below
 // same data was also found in ROMs with 顶级100分 (Dǐngjí 100 Fēn) labels
 ROM_START( djddz )
@@ -587,7 +743,9 @@ ROM_END
 // 金钻石 (Jīn Zuànshí)
 ROM_START( jzuanshi )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "3.u11", 0x00000, 0x20000, NO_DUMP ) // was stripped from the PCB
+	// lower half: build without the ESAM routines, address lines scrambled
+	// upper half: build using the ESAM, not scrambled
+	ROM_LOAD( "3.u11", 0x00000, 0x20000, CRC(d9e70d7d) SHA1(94fcd87cd66a91d28cd9d23f3a8fb88eedb28ed5) )
 
 	ROM_REGION16_LE( 0x200000, "bgtiles", 0 )
 	ROM_LOAD( "2.u18", 0x000000, 0x200000, CRC(0fe25de1) SHA1(ddd92d00c1402824c370d8bf29eed2f81b5a916d) )
@@ -624,7 +782,9 @@ an XOR followed by a bit permutation.  The transform pair is selected by a few
 address lines: A12, A10, A7, A6, A3 and A1 pick one of five pairs on the Dou Dizhu
 boards and lucky168 (same five pairs, different selector table on lucky168), A9, A7, A6,
 A5 and A3 pick one of four different pairs on pljh.  A0-A2 never take part, so
-the same transform applies to aligned groups of bytes.
+the same transform applies to aligned groups of bytes.  ddz1 uses yet another
+selector table, jzuanshi the Dou Dizhu pairs with the opcode and data roles
+exchanged.
 */
 
 // opcode fetches, Dou Dizhu boards and lucky168
@@ -734,6 +894,19 @@ constexpr uint8_t LUCKY168_SELECTORS[64] =
 	0, 2, 3, 0, 4, 1, 3, 2,
 };
 
+// as LUCKY168_SELECTORS, but pairs 1 and 2 exchanged at entries 45-47, 51, 55, 57, 61 and 63
+constexpr uint8_t DDZ1_SELECTORS[64] =
+{
+	0, 4, 0, 3, 2, 4, 3, 4,
+	3, 1, 4, 2, 3, 1, 4, 3,
+	0, 3, 1, 0, 2, 4, 2, 1,
+	4, 1, 3, 0, 2, 1, 0, 2,
+	3, 1, 0, 2, 0, 3, 1, 4,
+	1, 2, 0, 4, 3, 2, 1, 2,
+	4, 0, 4, 1, 3, 0, 4, 2,
+	0, 1, 3, 0, 4, 2, 3, 1,
+};
+
 // transform pair used for each value of bitswap<5>(address, 9, 7, 6, 5, 3)
 constexpr uint8_t PLJH_SELECTORS[32] =
 {
@@ -782,6 +955,33 @@ void sealy_z80_state::decrypt_pljh()
 		const uint8_t key = PLJH_SELECTORS[bitswap<5>(a, 9, 7, 6, 5, 3)];
 		m_decrypted_opcodes[a] = pljh_decrypt_opcode(rom[a], key);
 		rom[a] = pljh_decrypt_data(rom[a], key);
+	}
+}
+
+void sealy_z80_state::decrypt_jzuanshi()
+{
+	uint8_t *const rom = memregion("maincpu")->base();
+	const uint32_t length = memregion("maincpu")->bytes();
+
+	// A4, A8, A9 and A11 of the lower half are scrambled as a function of themselves;
+	// XOR to apply to the offset, indexed by bitswap<4>(offset, 11, 9, 8, 4)
+	static constexpr uint16_t ADDRESS_XOR[16] =
+	{
+		0x810, 0x100, 0x200, 0x200, 0x800, 0x200, 0xa00, 0x110,
+		0x210, 0xa00, 0x900, 0x210, 0xb00, 0x100, 0x300, 0x200,
+	};
+
+	std::vector<uint8_t> buffer(rom, rom + 0x10000);
+	for (uint32_t a = 0; a < 0x10000; a++)
+		rom[a ^ ADDRESS_XOR[bitswap<4>(a, 11, 9, 8, 4)]] = buffer[a];
+
+	m_decrypted_opcodes = std::make_unique<uint8_t[]>(length);
+
+	for (uint32_t a = 0; a < length; a++)
+	{
+		const uint8_t key = DIZHU_SELECTORS[bitswap<6>(a, 12, 10, 7, 6, 3, 1)];
+		m_decrypted_opcodes[a] = dizhu_decrypt_data(rom[a], key);
+		rom[a] = dizhu_decrypt_opcode(rom[a], key);
 	}
 }
 
@@ -836,9 +1036,19 @@ void sealy_z80_eeprom_state::init_djddz()
 	descramble_tiles(&m_bgtiles[0], m_bgtiles.length(), 0x0430, 1, 2, 0);
 }
 
+void sealy_z80_esam_state::init_ddz1()
+{
+	decrypt_dizhu(DDZ1_SELECTORS);
+}
+
 void sealy_z80_esam_state::init_lucky168()
 {
 	decrypt_dizhu(LUCKY168_SELECTORS);
+}
+
+void sealy_z80_jzuanshi_state::init_jzuanshi()
+{
+	decrypt_jzuanshi();
 }
 
 void sealy_z80_eeprom_state::init_pljh()
@@ -849,11 +1059,13 @@ void sealy_z80_eeprom_state::init_pljh()
 } // anonymous namespace
 
 
-GAME( 2005, bbddz,    0,     sealy,    djddz,    sealy_z80_eeprom_state, init_bbddz,    ROT0, "Sealy", "Bai Bian Dou Dizhu",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, ddz2,     0,     sealy,    djddz,    sealy_z80_eeprom_state, init_ddz2,     ROT0, "Sealy", "Dou Dizhu II (set 1)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, ddz2a,    ddz2,  sealy,    djddz,    sealy_z80_eeprom_state, init_ddz2,     ROT0, "Sealy", "Dou Dizhu II (set 2)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2004, djddz,    0,     sealy,    djddz,    sealy_z80_eeprom_state, init_djddz,    ROT0, "Sealy", "Dingji Dou Dizhu (set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2004, djddza,   djddz, sealy,    djddz,    sealy_z80_eeprom_state, init_djddza,   ROT0, "Sealy", "Dingji Dou Dizhu (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, pljh,     0,     pljh,     pljh,     sealy_z80_eeprom_state, init_pljh,     ROT0, "Sealy", "Piaoliang Jinhua",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, jzuanshi, 0,     lucky168, lucky168, sealy_z80_esam_state,   empty_init,    ROT0, "Sealy", "Jin Zuanshi",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing program ROM
-GAME( 2002, lucky168, 0,     lucky168, lucky168, sealy_z80_esam_state,   init_lucky168, ROT0, "Sealy", "Lucky 168",                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2005, bbddz,    0,     sealy,    djddz,    sealy_z80_eeprom_state,   init_bbddz,    ROT0, "Sealy", "Bai Bian Dou Dizhu",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, ddz1,     0,     ddz1,     ddz1,     sealy_z80_esam_state,     init_ddz1,     ROT0, "Sealy", "Dou Dizhu (Sealy)",                        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, ddz2,     0,     sealy,    djddz,    sealy_z80_eeprom_state,   init_ddz2,     ROT0, "Sealy", "Dou Dizhu II (set 1)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, ddz2a,    ddz2,  sealy,    djddz,    sealy_z80_eeprom_state,   init_ddz2,     ROT0, "Sealy", "Dou Dizhu II (set 2)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2004, djddz,    0,     sealy,    djddz,    sealy_z80_eeprom_state,   init_djddz,    ROT0, "Sealy", "Dingji Dou Dizhu (set 1)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2004, djddza,   djddz, sealy,    djddz,    sealy_z80_eeprom_state,   init_djddza,   ROT0, "Sealy", "Dingji Dou Dizhu (set 2)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2004, fkddzz80, 0,     sealy,    djddz,    sealy_z80_eeprom_state,   init_djddza,   ROT0, "Sealy", "Fengkuang Dou Dizhu (Z80-based hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, pljh,     0,     pljh,     pljh,     sealy_z80_eeprom_state,   init_pljh,     ROT0, "Sealy", "Piaoliang Jinhua",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, jzuanshi, 0,     jzuanshi, jzuanshi, sealy_z80_jzuanshi_state, init_jzuanshi, ROT0, "Sealy", "Jin Zuanshi",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, lucky168, 0,     lucky168, lucky168, sealy_z80_esam_state,     init_lucky168, ROT0, "Sealy", "Lucky 168",                                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
