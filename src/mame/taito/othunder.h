@@ -76,8 +76,9 @@ private:
 	{
 		u32 code = 0, color = 0;
 		bool flipx = false, flipy = false;
-		int x = 0, y = 0;
-		int zoomx = 0, zoomy = 0;
+		int x = 0, y = 0;           // 16.16 origin of the whole sprite
+		int tilex = 0, tiley = 0;   // position of this chunk within it
+		u32 stepx = 0, stepy = 0;   // 16.16 source step
 		u32 primask = 0;
 	};
 
