@@ -2078,3 +2078,19 @@ if SOUNDS["GT913"] then
 		MAME_DIR .. "src/devices/sound/gt913.h",
 	}
 end
+
+--@src/devices/sound/mb87126.h,SOUNDS["MB87126"] = true
+if SOUNDS["MB87126"] then
+	files {
+		MAME_DIR .. "src/devices/sound/mb87126.cpp",
+		MAME_DIR .. "src/devices/sound/mb87126.h",
+	}
+end
+
+--@src/devices/sound/mb654119.h,SOUNDS["MB654119"] = true
+if SOUNDS["MB654119"] then
+	files {
+		MAME_DIR .. "src/devices/sound/mb654119.cpp",
+		MAME_DIR .. "src/devices/sound/mb654119.h",
+	}
+end

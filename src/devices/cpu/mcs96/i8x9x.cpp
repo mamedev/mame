@@ -29,9 +29,11 @@ i8x9x_device::i8x9x_device(const machine_config &mconfig, device_type type, cons
 	{
 		hso.command = 0;
 		hso.time = 0;
+		hso.fire_at = 0;
 	}
 	hso_cam_hold.command = 0;
 	hso_cam_hold.time = 0;
+	hso_cam_hold.fire_at = 0;
 }
 
 std::unique_ptr<util::disasm_interface> i8x9x_device::create_disassembler()
@@ -68,8 +70,10 @@ void i8x9x_device::device_start()
 
 	save_item(STRUCT_MEMBER(hso_info, command));
 	save_item(STRUCT_MEMBER(hso_info, time));
+	save_item(STRUCT_MEMBER(hso_info, fire_at));
 	save_item(NAME(hso_cam_hold.command));
 	save_item(NAME(hso_cam_hold.time));
+	save_item(NAME(hso_cam_hold.fire_at));
 
 	save_item(NAME(base_timer2));
 	save_item(NAME(ad_done));
@@ -525,7 +529,7 @@ void i8x9x_device::internal_update(u64 current_time)
 			logerror("hso cam %02x %04x in slot %d from hold\n", hso_cam_hold.command, hso_cam_hold.time, i);
 		}
 		if(BIT(hso_active, i)) {
-			u64 new_time = timer_time_until(hso_info[i].command & 0x40 ? 2 : 1, current_time, hso_info[i].time);
+			u64 new_time = hso_info[i].fire_at;
 			if(!event_time || new_time < event_time)
 				event_time = new_time;
 		}
