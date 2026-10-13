@@ -1050,7 +1050,7 @@ Parasol Stars
 		</part>
 	</software>
 
-	<software name="ptennis" supported="partial">
+	<software name="ptennis">
 		<description>Power Tennis (TourVisión PCE bootleg)</description>
 		<year>1993</year>
 		<publisher>bootleg (TourVisión) / Hudson</publisher>
