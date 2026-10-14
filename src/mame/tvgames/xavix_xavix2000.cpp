@@ -439,6 +439,8 @@ void xavix2000_i2c_camera_state::xavix2000_tom_dpgm(machine_config &config)
 	xavix2000_i2c_24c08_4mb(config);
 	configure_camera(config, xavix_analog_image_sensor_device::target_shape::DISK);
 	m_camera->set_target_size_small(true);
+	// Provisional pixel timing keeps paired capture and game updates within one field.
+	m_camera->set_half_pixel_clocks(40);
 }
 
 
