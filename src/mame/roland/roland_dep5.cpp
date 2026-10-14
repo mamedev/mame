@@ -34,104 +34,204 @@
 #include "machine/nvram.h"
 #include "sound/mb654119.h"
 #include "sound/mb87126.h"
+
 #include "speaker.h"
+
+#include <algorithm>
+#include <cmath>
 
 #include "roland_dep5.lh"
 #include "roland_re3.lh"
 
 namespace {
-class dep5_state : public driver_device, public device_serial_interface, public device_sound_interface
+
+static constexpr float DEP5_DB[6] = { -3, -6, -9, -15, -19, -29 };
+static constexpr float RE3_DB[6] = { -3, -9, -12, -15, -18, -21 };
+
+class dep5_base_state : public driver_device, public device_serial_interface, public device_sound_interface
 {
-public:
-	dep5_state(const machine_config &config, device_type type, const char *tag)
+protected:
+	dep5_base_state(const machine_config &config, device_type type, const char *tag)
 		: driver_device(config, type, tag)
 		, device_serial_interface(config, *this)
 		, device_sound_interface(config, *this)
 		, m_cpu(*this, "maincpu")
 		, m_reverb(*this, "reverb")
-		, m_chorus(*this, "chorus")
 		, m_midiout(*this, "midiout")
 		, m_keys(*this, "KEY%u", 0U)
 		, m_knobs(*this, "KNOB%u", 0U)
-		, m_grid(*this, "grid%u", 0U)
-		, m_char(*this, "char%u", 0U)
-		, m_mark(*this, "mark%u", 0U)
+		, m_input(*this, "INPUT")
+		, m_balance(*this, "BALANCE")
+		, m_pedals(*this, "PEDALS")
 		, m_level(*this, "level%u", 0U)
 	{
 	}
-	void dep5(machine_config &config);
-	void re3(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void rcv_complete() override;
 	virtual void tra_callback() override { m_midiout->write_txd(transmit_register_get_data_bit()); }
 	virtual void sound_stream_update(sound_stream &stream) override;
+	virtual void display_update() = 0;
+	virtual void display_tick() { }
+	virtual const float *meter_thresholds() const = 0;
+	virtual float input_gain2() const { return m_input->read() / 100.0f; }
+	virtual bool output_muted() const { return false; }
 
-private:
-	void common(machine_config &config);
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
-	void re3_map(address_map &map);
+	void common(machine_config &config) ATTR_COLD;
+	void common_map(address_map &map) ATTR_COLD;
 	template <int N> u16 knob_r() { return (m_knobs[N]->read() * 1023 + 50) / 100; }
-	u8 scan_keys();
-	u8 port0_r();
-	u8 port1_r();
-	u8 port2_r();
-	void port1_w(u8 data);
+	u8 port2_r() { return (m_reverb->busy_r() << 6) | m_pedals->read(); }
 	void port2_w(u8 data) { m_reverb->control_w(BIT(data, 5), BIT(data, 7)); }
-	void select_w(u8 data);
+	void select_w(u8 data) { m_select = data; }
 	void latch_w(u8 data);
-	void chorus_w(offs_t offset, u8 data);
-	void reverb_bus_w(offs_t signals, u32 data);
 	void timer_w(offs_t offset, u8 data);
-	void display_update();
-	void vfd_w(u8 data);
-	TIMER_CALLBACK_MEMBER(panel_tick);
-	void midi_w(int state) { rx_w(state); }
 	void midi_tx(u8 data) { transmit_register_setup(data); }
+	TIMER_CALLBACK_MEMBER(panel_tick);
+
 	required_device<n8097bh_device> m_cpu;
 	required_device<mb87126_device> m_reverb;
-	optional_device<mb654119_device> m_chorus;
 	required_device<midi_port_device> m_midiout;
 	required_ioport_array<8> m_keys;
 	required_ioport_array<8> m_knobs;
-	output_finder<7> m_grid;
-	output_finder<10> m_char, m_mark;
+	required_ioport m_input, m_balance, m_pedals;
 	output_finder<6> m_level;
 	sound_stream *m_feed = nullptr, *m_mix = nullptr;
 	emu_timer *m_panel_timer = nullptr;
-	bool m_re3 = false;
-	bool m_blink_phase = false;
-	u8 m_ticks = 0;
 	float m_peak = 0, m_meter = 0;
-	s16 m_chorus_left = 0, m_chorus_right = 0;
 	std::array<u8, 4> m_timer{};
 	u8 m_select = 0, m_port1 = 0xff, m_latch = 0;
+};
+
+class dep5_state : public dep5_base_state
+{
+public:
+	dep5_state(const machine_config &config, device_type type, const char *tag)
+		: dep5_base_state(config, type, tag)
+		, m_chorus(*this, "chorus")
+		, m_mono(*this, "MONO")
+		, m_grid(*this, "grid%u", 0U)
+	{
+	}
+
+	void dep5(machine_config &config) ATTR_COLD;
+	INPUT_CHANGED_MEMBER(key_changed);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void display_update() override;
+	virtual const float *meter_thresholds() const override { return DEP5_DB; }
+	virtual bool output_muted() const override { return !BIT(m_port1, 0); }
+
+private:
+	void mem_map(address_map &map) ATTR_COLD;
+	u8 scan_keys();
+	u8 port0_r() { return (scan_keys() & 1) << 7; }
+	u8 port1_r() { return m_mono->read(); }
+	u8 port2_r() { return dep5_base_state::port2_r() | (BIT(scan_keys(), 1) << 2); }
+	void port1_w(u8 data);
+	void select_w(u8 data);
+	void update_extint();
+	void chorus_rate_w(u8 data) { m_reverb->update(); m_chorus->write_rate(data); }
+	void chorus_depth_w(u8 data) { m_reverb->update(); m_chorus->write_depth(data); }
+	void chorus_delay_w(u8 data) { m_reverb->update(); m_chorus->write_delay(data); }
+	void reverb_bus_w(offs_t signals, u32 data);
+
+	required_device<mb654119_device> m_chorus;
+	required_ioport m_mono;
+	output_finder<7> m_grid;
+	s16 m_chorus_left = 0, m_chorus_right = 0;
+};
+
+class re3_state : public dep5_base_state
+{
+public:
+	re3_state(const machine_config &config, device_type type, const char *tag)
+		: dep5_base_state(config, type, tag)
+		, m_input2(*this, "INPUT2")
+		, m_char(*this, "char%u", 0U)
+		, m_mark(*this, "mark%u", 0U)
+	{
+	}
+
+	void re3(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void display_update() override;
+	virtual void display_tick() override;
+	virtual const float *meter_thresholds() const override { return RE3_DB; }
+	virtual float input_gain2() const override { return m_input2->read() / 100.0f; }
+
+private:
+	void mem_map(address_map &map) ATTR_COLD;
+	u8 port1_r();
+	void port1_w(u8 data);
+	void vfd_w(u8 data);
+
+	required_ioport m_input2;
+	output_finder<10> m_char, m_mark;
+	bool m_blink_phase = false;
+	u8 m_ticks = 0;
 	u8 m_vfd_shift = 0, m_vfd_bits = 0, m_vfd_first = 0;
 	bool m_vfd_pending = false;
 	std::array<u8, 10> m_text{};
 	std::array<bool, 10> m_marks{}, m_blinks{};
 };
 
-void dep5_state::machine_start()
+void dep5_base_state::machine_start()
 {
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rcv_rate(31250);
+	set_tra_rate(31250);
+
 	// Separate streams avoid a feedback dependency: input feed -> DSP -> output mix.
 	m_feed = stream_alloc(2, 1, 256000);
 	m_mix = stream_alloc(4, 2, 256000);
-	m_panel_timer = timer_alloc(FUNC(dep5_state::panel_tick), this);
+	m_panel_timer = timer_alloc(FUNC(dep5_base_state::panel_tick), this);
 	m_panel_timer->adjust(attotime::from_hz(32), 0, attotime::from_hz(32));
-	save_item(NAME(m_blink_phase));
-	save_item(NAME(m_ticks));
 	save_item(NAME(m_peak));
 	save_item(NAME(m_meter));
-	save_item(NAME(m_chorus_left));
-	save_item(NAME(m_chorus_right));
 	save_item(NAME(m_timer));
 	save_item(NAME(m_select));
 	save_item(NAME(m_port1));
 	save_item(NAME(m_latch));
+}
+
+void dep5_base_state::machine_reset()
+{
+	m_timer = {};
+	m_select = m_latch = 0;
+	m_port1 = 0xff;
+	m_peak = m_meter = 0;
+	receive_register_reset();
+	transmit_register_reset();
+}
+
+void dep5_state::machine_start()
+{
+	dep5_base_state::machine_start();
+	save_item(NAME(m_chorus_left));
+	save_item(NAME(m_chorus_right));
+}
+
+void dep5_state::machine_reset()
+{
+	dep5_base_state::machine_reset();
+	m_chorus_left = m_chorus_right = 0;
+	for (int i = 0; i < 7; ++i)
+		m_grid[i] = 0;
+	update_extint();
+	display_update();
+}
+
+void re3_state::machine_start()
+{
+	dep5_base_state::machine_start();
+	save_item(NAME(m_blink_phase));
+	save_item(NAME(m_ticks));
 	save_item(NAME(m_vfd_shift));
 	save_item(NAME(m_vfd_bits));
 	save_item(NAME(m_vfd_first));
@@ -141,12 +241,9 @@ void dep5_state::machine_start()
 	save_item(NAME(m_blinks));
 }
 
-void dep5_state::machine_reset()
+void re3_state::machine_reset()
 {
-	m_chorus_left = m_chorus_right = 0;
-	m_timer = {};
-	m_select = m_latch = 0;
-	m_port1 = 0xff;
+	dep5_base_state::machine_reset();
 	m_vfd_shift = m_vfd_bits = m_vfd_first = 0;
 	m_vfd_pending = false;
 	m_text.fill(' ');
@@ -154,23 +251,15 @@ void dep5_state::machine_reset()
 	m_blinks.fill(false);
 	m_blink_phase = false;
 	m_ticks = 0;
-	m_peak = m_meter = 0;
-	for (int i = 0; i < 7; ++i)
-		m_grid[i] = 0;
 	display_update();
-	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rcv_rate(31250);
-	set_tra_rate(31250);
-	receive_register_reset();
-	transmit_register_reset();
 }
 
-void dep5_state::sound_stream_update(sound_stream &stream)
+void dep5_base_state::sound_stream_update(sound_stream &stream)
 {
-	const float input = ioport("INPUT")->read() / 100.0f;
+	const float input = m_input->read() / 100.0f;
 	// The RE-3 mixes MIC 1 and MIC 2 through separate level controls.
-	const float input2 = m_re3 ? ioport("INPUT2")->read() / 100.0f : input;
-	const float balance = ioport("BALANCE")->read() / 100.0f;
+	const float input2 = input_gain2();
+	const float balance = m_balance->read() / 100.0f;
 	if (&stream == m_feed)
 	{
 		for (int i = 0; i < stream.samples(); ++i)
@@ -182,14 +271,16 @@ void dep5_state::sound_stream_update(sound_stream &stream)
 	}
 	else
 	{
-		const bool muted = !m_re3 && !BIT(m_port1, 0);
+		const bool muted = output_muted();
 		for (int i = 0; i < stream.samples(); ++i)
+		{
 			for (int ch = 0; ch < 2; ++ch)
 				stream.put(ch, i, muted ? 0 : stream.get(ch, i) * (1 - balance) + stream.get(ch + 2, i) * balance);
+		}
 	}
 }
 
-void dep5_state::rcv_complete()
+void dep5_base_state::rcv_complete()
 {
 	receive_register_extract();
 	m_cpu->serial_w(get_received_char());
@@ -198,80 +289,69 @@ void dep5_state::rcv_complete()
 u8 dep5_state::scan_keys()
 {
 	u8 keys = 0;
-	if (!m_re3)
-		for (int bit = 0; bit < 7; ++bit)
-			if (BIT(m_select, bit))
-				keys |= m_keys[6 - bit]->read();
+	for (int bit = 0; bit < 7; ++bit)
+	{
+		if (BIT(m_select, bit))
+			keys |= m_keys[6 - bit]->read();
+	}
 	return keys;
 }
 
-u8 dep5_state::port0_r()
+u8 re3_state::port1_r()
 {
-	return m_re3 ? 0 : (scan_keys() & 1) << 7;
-}
-
-u8 dep5_state::port1_r()
-{
-	if (!m_re3)
-		return ioport("MONO")->read();
 	u8 keys = 0;
 	for (int bit = 0; bit < 8; ++bit)
+	{
 		if (BIT(m_select, bit))
 			keys |= m_keys[bit]->read();
+	}
 	return keys ? 0x7f : 0xff;
-}
-
-u8 dep5_state::port2_r()
-{
-	const u8 keys = scan_keys();
-	// KEY IN 2 is also EXTINT; jack normals ground the pedal inputs.
-	if (!machine().side_effects_disabled())
-		m_cpu->set_input_line(i8x9x_device::EXTINT_LINE, BIT(keys, 1));
-	return (m_reverb->busy_r() << 6) | (BIT(keys, 1) << 2) | ioport("PEDALS")->read();
 }
 
 void dep5_state::display_update()
 {
-	if (m_re3)
+	const u16 segments = (m_latch & 0x7f) | (((m_port1 ^ 0x30) & 0x3c) << 5);
+	for (int i = 0; i < 7; ++i)
 	{
-		for (int i = 0; i < 10; ++i)
-		{
-			const bool hidden = m_blinks[i] && m_blink_phase;
-			m_char[i] = hidden ? ' ' : m_text[i];
-			m_mark[i] = m_marks[i] && !hidden;
-		}
-	}
-	else
-	{
-		const u16 segments = (m_latch & 0x7f) | (((m_port1 ^ 0x30) & 0x3c) << 5);
-		for (int i = 0; i < 7; ++i)
-			if (BIT(m_select, i))
-				m_grid[i] = segments;
+		if (BIT(m_select, i))
+			m_grid[i] = segments;
 	}
 }
 
-TIMER_CALLBACK_MEMBER(dep5_state::panel_tick)
+void re3_state::display_update()
 {
-	// VFD flashing at 2 Hz, and the input level LEDs.
+	for (int i = 0; i < 10; ++i)
+	{
+		const bool hidden = m_blinks[i] && m_blink_phase;
+		m_char[i] = hidden ? ' ' : m_text[i];
+		m_mark[i] = m_marks[i] && !hidden;
+	}
+}
+
+void re3_state::display_tick()
+{
 	m_ticks = (m_ticks + 1) & 15;
 	if (!(m_ticks & 7))
 	{
 		m_blink_phase = m_ticks == 8;
 		display_update();
 	}
+}
+
+TIMER_CALLBACK_MEMBER(dep5_base_state::panel_tick)
+{
+	display_tick();
 	m_feed->update();
 	m_meter = std::max(m_peak, m_meter * 0.8f);
 	m_peak = 0;
 	// The top LED lights 3 dB below converter full scale; the others follow
 	// the dB legends printed beside them.
-	static constexpr float dep5_db[6] = { -3, -6, -9, -15, -19, -29 };
-	static constexpr float re3_db[6] = { -3, -9, -12, -15, -18, -21 };
 	const float db = 20.0f * std::log10(std::max(m_meter, 1e-6f));
 	for (int i = 0; i < 6; ++i)
-		m_level[i] = db >= (m_re3 ? re3_db : dep5_db)[i];
+		m_level[i] = db >= meter_thresholds()[i];
 }
 
-void dep5_state::vfd_w(u8 data)
+void re3_state::vfd_w(u8 data)
 {
 	// RE-3 serial module: MSB-first bytes, reset P1.4, rising clock P1.3.
 	if (BIT(data, 4) && !BIT(m_port1, 4))
@@ -330,26 +410,39 @@ void dep5_state::vfd_w(u8 data)
 
 void dep5_state::port1_w(u8 data)
 {
-	if (m_mix)
-		m_mix->update();
-	if (m_re3)
-		vfd_w(data);
+	m_mix->update();
 	m_port1 = data;
 	display_update();
-	m_reverb->serial_w(BIT(data, m_re3 ? 0 : 6), BIT(data, m_re3 ? 1 : 7));
+	m_reverb->serial_w(BIT(data, 6), BIT(data, 7));
+}
+
+void re3_state::port1_w(u8 data)
+{
+	vfd_w(data);
+	m_port1 = data;
+	display_update();
+	m_reverb->serial_w(BIT(data, 0), BIT(data, 1));
+}
+
+void dep5_state::update_extint()
+{
+	// KEY IN 2 is also EXTINT, independent of CPU port reads.
+	m_cpu->set_input_line(i8x9x_device::EXTINT_LINE, BIT(scan_keys(), 1));
+}
+
+INPUT_CHANGED_MEMBER(dep5_state::key_changed)
+{
+	update_extint();
 }
 
 void dep5_state::select_w(u8 data)
 {
-	m_select = data;
-	// KEY IN 2 follows the row select immediately. The 8097 returns P2.2
-	// from its EXTINT latch, so it must be current before the next read.
-	if (!m_re3)
-		m_cpu->set_input_line(i8x9x_device::EXTINT_LINE, BIT(scan_keys(), 1));
+	dep5_base_state::select_w(data);
+	update_extint();
 	display_update();
 }
 
-void dep5_state::latch_w(u8 data)
+void dep5_base_state::latch_w(u8 data)
 {
 	m_latch = data;
 	display_update();
@@ -382,78 +475,54 @@ void dep5_state::reverb_bus_w(offs_t signals, u32 data)
 	}
 }
 
-void dep5_state::timer_w(offs_t offset, u8 data)
+void dep5_base_state::timer_w(offs_t offset, u8 data)
 {
 	m_timer[offset & 3] = data;
 	const u32 clocks = 640 + (BIT(m_timer[3], 0) ? 0x10000 - (u16(m_timer[1]) << 8 | m_timer[0]) : 0);
 	m_reverb->frame_clocks_w(clocks);
 }
 
-void dep5_state::chorus_w(offs_t offset, u8 data)
+void dep5_base_state::common_map(address_map &map)
 {
-	m_reverb->update();
-	switch (offset)
-	{
-	case 0:
-		m_chorus->write_rate(data);
-		break;
-	case 2:
-		m_chorus->write_depth(data);
-		break;
-	case 4:
-		m_chorus->write_delay(data);
-		break;
-	}
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0xffe0, 0xffe7).w(FUNC(dep5_base_state::timer_w)).umask16(0x00ff);
+	map(0xffe8, 0xffe8).lr8(NAME([this]() -> u8 { return m_latch; })).w(FUNC(dep5_base_state::latch_w));
 }
 
 void dep5_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	common_map(map);
 	map(0xc000, 0xdfff).ram().share("nvram");
-	io_map(map);
-}
-
-void dep5_state::io_map(address_map &map)
-{
-	map(0xffe0, 0xffe0).w(FUNC(dep5_state::timer_w));
-	map(0xffe2, 0xffe2).lw8(NAME([this](u8 data) { timer_w(1, data); }));
-	map(0xffe4, 0xffe4).lw8(NAME([this](u8 data) { timer_w(2, data); }));
-	map(0xffe6, 0xffe6).lw8(NAME([this](u8 data) { timer_w(3, data); }));
-	map(0xffe8, 0xffe8).lr8(NAME([this]() { return m_latch; })).w(FUNC(dep5_state::latch_w));
 	map(0xffea, 0xffea).w(FUNC(dep5_state::select_w));
-	map(0xfff0, 0xfff5).w(FUNC(dep5_state::chorus_w));
+	map(0xfff0, 0xfff0).w(FUNC(dep5_state::chorus_rate_w));
+	map(0xfff2, 0xfff2).w(FUNC(dep5_state::chorus_depth_w));
+	map(0xfff4, 0xfff4).w(FUNC(dep5_state::chorus_delay_w));
 }
 
-void dep5_state::re3_map(address_map &map)
+void re3_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().region("maincpu", 0);
-	io_map(map);
+	common_map(map);
 	map(0xc000, 0xcfff).ram().share("nvram");
-	map(0xfff0, 0xfff5).unmapw();
+	map(0xffea, 0xffea).w(FUNC(re3_state::select_w));
 }
 
-void dep5_state::common(machine_config &config)
+void dep5_base_state::common(machine_config &config)
 {
 	N8097BH(config, m_cpu, 12_MHz_XTAL);
-	m_cpu->set_addrmap(AS_PROGRAM, &dep5_state::mem_map);
-	m_cpu->in_p0_cb().set(FUNC(dep5_state::port0_r));
-	m_cpu->in_p1_cb().set(FUNC(dep5_state::port1_r));
-	m_cpu->in_p2_cb().set(FUNC(dep5_state::port2_r));
-	m_cpu->out_p1_cb().set(FUNC(dep5_state::port1_w));
-	m_cpu->out_p2_cb().set(FUNC(dep5_state::port2_w));
-	m_cpu->ach0_cb().set(FUNC(dep5_state::knob_r<0>));
-	m_cpu->ach1_cb().set(FUNC(dep5_state::knob_r<1>));
-	m_cpu->ach2_cb().set(FUNC(dep5_state::knob_r<2>));
-	m_cpu->ach3_cb().set(FUNC(dep5_state::knob_r<3>));
-	m_cpu->ach4_cb().set(FUNC(dep5_state::knob_r<4>));
-	m_cpu->ach5_cb().set(FUNC(dep5_state::knob_r<5>));
-	m_cpu->ach6_cb().set(FUNC(dep5_state::knob_r<6>));
-	m_cpu->ach7_cb().set(FUNC(dep5_state::knob_r<7>));
-	m_cpu->serial_tx_cb().set(FUNC(dep5_state::midi_tx));
+	m_cpu->out_p2_cb().set(FUNC(dep5_base_state::port2_w));
+	m_cpu->ach0_cb().set(FUNC(dep5_base_state::knob_r<0>));
+	m_cpu->ach1_cb().set(FUNC(dep5_base_state::knob_r<1>));
+	m_cpu->ach2_cb().set(FUNC(dep5_base_state::knob_r<2>));
+	m_cpu->ach3_cb().set(FUNC(dep5_base_state::knob_r<3>));
+	m_cpu->ach4_cb().set(FUNC(dep5_base_state::knob_r<4>));
+	m_cpu->ach5_cb().set(FUNC(dep5_base_state::knob_r<5>));
+	m_cpu->ach6_cb().set(FUNC(dep5_base_state::knob_r<6>));
+	m_cpu->ach7_cb().set(FUNC(dep5_base_state::knob_r<7>));
+	m_cpu->serial_tx_cb().set(FUNC(dep5_base_state::midi_tx));
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	auto &in(MIDI_PORT(config, "midiin"));
 	midiin_slot(in);
-	in.rxd_handler().set(FUNC(dep5_state::midi_w));
+	in.rxd_handler().set(FUNC(dep5_base_state::rx_w));
 	MIDI_PORT(config, m_midiout);
 	midiout_slot(*m_midiout);
 	MB87126(config, m_reverb, 40.96_MHz_XTAL);
@@ -474,45 +543,51 @@ void dep5_state::common(machine_config &config)
 void dep5_state::dep5(machine_config &config)
 {
 	common(config);
+	m_cpu->set_addrmap(AS_PROGRAM, &dep5_state::mem_map);
+	m_cpu->in_p0_cb().set(FUNC(dep5_state::port0_r));
+	m_cpu->in_p1_cb().set(FUNC(dep5_state::port1_r));
+	m_cpu->in_p2_cb().set(FUNC(dep5_state::port2_r));
+	m_cpu->out_p1_cb().set(FUNC(dep5_state::port1_w));
 	MB654119(config, m_chorus, 40.96_MHz_XTAL / 16);
-	m_chorus->set_external_clock(true);
 	m_reverb->bus_callback().set(FUNC(dep5_state::reverb_bus_w));
 	config.set_default_layout(layout_roland_dep5);
 }
 
-void dep5_state::re3(machine_config &config)
+void re3_state::re3(machine_config &config)
 {
-	m_re3 = true;
 	common(config);
-	m_cpu->set_addrmap(AS_PROGRAM, &dep5_state::re3_map);
+	m_cpu->set_addrmap(AS_PROGRAM, &re3_state::mem_map);
+	m_cpu->in_p0_cb().set_constant(0);
+	m_cpu->in_p1_cb().set(FUNC(re3_state::port1_r));
+	m_cpu->in_p2_cb().set(FUNC(re3_state::port2_r));
+	m_cpu->out_p1_cb().set(FUNC(re3_state::port1_w));
 	config.set_default_layout(layout_roland_re3);
 }
 
-// clang-format off
-static INPUT_PORTS_START(dep5)
+INPUT_PORTS_START(dep5)
 	PORT_START("KEY0")
 	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_START("KEY1")
 	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_START("KEY2")
 	PORT_BIT(1, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Memory +") PORT_CODE(KEYCODE_Q)
-	PORT_BIT(2, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Memory -") PORT_CODE(KEYCODE_W)
+	PORT_BIT(2, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Memory -") PORT_CODE(KEYCODE_W) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dep5_state::key_changed), 0)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_START("KEY3")
 	PORT_BIT(1, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Reverb +") PORT_CODE(KEYCODE_E)
-	PORT_BIT(2, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Reverb -") PORT_CODE(KEYCODE_R)
+	PORT_BIT(2, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Reverb -") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dep5_state::key_changed), 0)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_START("KEY4")
 	PORT_BIT(1, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Write") PORT_CODE(KEYCODE_T)
-	PORT_BIT(2, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Chorus / EQ") PORT_CODE(KEYCODE_Y)
+	PORT_BIT(2, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Chorus / EQ") PORT_CODE(KEYCODE_Y) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dep5_state::key_changed), 0)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_START("KEY5")
 	PORT_BIT(1, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Output Level") PORT_CODE(KEYCODE_U)
-	PORT_BIT(2, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Parametric EQ") PORT_CODE(KEYCODE_I)
+	PORT_BIT(2, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Parametric EQ") PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dep5_state::key_changed), 0)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_START("KEY6")
 	PORT_BIT(1, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("MIDI") PORT_CODE(KEYCODE_O)
-	PORT_BIT(2, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Value") PORT_CODE(KEYCODE_P)
+	PORT_BIT(2, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Value") PORT_CODE(KEYCODE_P) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dep5_state::key_changed), 0)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_START("KEY7")
 	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -544,7 +619,7 @@ static INPUT_PORTS_START(dep5)
 	PORT_BIT(8, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Preset Shift Pedal") PORT_CODE(KEYCODE_Z)
 	PORT_BIT(16, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Effect Off Pedal") PORT_CODE(KEYCODE_X)
 INPUT_PORTS_END
-static INPUT_PORTS_START(re3)
+INPUT_PORTS_START(re3)
 	PORT_INCLUDE(dep5)
 	PORT_MODIFY("KEY0")
 	PORT_BIT(1, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Mode") PORT_CODE(KEYCODE_Q)
@@ -590,7 +665,9 @@ INPUT_PORTS_END
 
 ROM_START(dep5)
 	ROM_REGION16_LE(0x8000, "maincpu", 0)
-	ROM_LOAD("dep5_combined_1.6.bin", 0, 0x8000, CRC(58cf8a92) SHA1(024c9598ef35255d0468e94c5eb0f84652295acc))
+	// Program A (IC33): D0-D7; program B (IC30): D8-D15.
+	ROM_LOAD16_BYTE("dep-5_1.6_a.ic33", 0, 0x4000, CRC(cda5a72a) SHA1(62e6a81adc8b53911190ae083723896dad97f31a))
+	ROM_LOAD16_BYTE("dep-5_1.6_b.ic30", 1, 0x4000, CRC(18fae1b1) SHA1(520899eea0285e2ea7bb465c378d64a27e38fe31))
 	ROM_REGION(160 * 5, "reverb:program", 0)
 	// Furrtek die-shot extraction. Difficult cells were corrected manually
 	// by probing chip behavior; retained as BAD_DUMP pending a verified read.
@@ -604,11 +681,10 @@ ROM_START(re3)
 	// The MB87126A-008 program is assumed to match the MB87126-002, unverified.
 	// Furrtek die-shot extraction. Difficult cells were corrected manually
 	// by probing chip behavior; retained as BAD_DUMP pending a verified read.
-	ROM_LOAD("mb87126-002.bin", 0, 160 * 5, BAD_DUMP CRC(7f5232a4) SHA1(bcfc8fb6bd541255ebbfc2d62d2930f6c442afb1))
+	ROM_LOAD("mb87126a-008.bin", 0, 160 * 5, BAD_DUMP CRC(7f5232a4) SHA1(bcfc8fb6bd541255ebbfc2d62d2930f6c442afb1))
 ROM_END
-// clang-format on
 
 } // anonymous namespace
 
-SYST(1986, dep5, 0, 0, dep5, dep5, dep5_state, empty_init, "Roland", "DEP-5 Digital Effects Processor", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
-SYST(1988, re3, 0, 0, re3, re3, dep5_state, empty_init, "Roland", "RE-3 Digital Space Echo", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+SYST(1986, dep5, 0, 0, dep5, dep5, dep5_state, empty_init, "Roland", "DEP-5 Digital Effects Processor", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+SYST(1988, re3, 0, 0, re3, re3, re3_state, empty_init, "Roland", "RE-3 Digital Space Echo", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)

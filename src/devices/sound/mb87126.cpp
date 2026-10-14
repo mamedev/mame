@@ -1,24 +1,24 @@
-// license:BSD-3-Clause
+// license:GPL-3.0
 // copyright-holders:Giulio Zausa
 /***************************************************************************
 
     Roland/Fujitsu MB87126 Reverb/EQ DSP (DEP-5, D-50, RE-3, ...)
-	Originally developed by The Usual Suspects for the Gearmulator project, this
-	version instead actually executes the original mask ROM program step by step.
+    Originally developed by The Usual Suspects for the Gearmulator project, the
+    MAME version actually executes the original mask ROM program step by step.
 
     Serial SCK/SXD: 40 bits, LSB first, complemented selector and 16-bit DC,
     complemented signed 12-bit DD mantissa, active-low 2-bit range and two
-    protocol bits.
+    protocol bits (not modeled). INCK behavior is also not yet modeled.
 
     Each nominal frame takes 160 * 8 oscillator periods. An external board
     timer can stretch the interval in half-oscillator periods. The stream
     holds the ideal converter outputs between frames. Analog filters, DAC
     settling and sub-frame host arbitration are not modeled.
 
-    The chip has an internal 160 x 35-bit words mask rom with the DSP program.
-	The D-50 uses only 128 words to run at 32.768 MHz.
-	It's maybe possible to dump the rom using the chip test mode through the RD
-	pins 5 bits at a time, but it's still not fully known how.
+    The chip has an internal 160 x 35-bit mask ROM with the DSP program.
+    The D-50 uses only 128 words to run at 32.768 MHz.
+    It's maybe possible to dump the ROM using the chip test mode through the RD
+    pins 5 bits at a time, but it's still not fully known how.
 
     Bit       Meaning
     34..30    RD4..RD0 board strobes
@@ -54,27 +54,29 @@
 
     Reverse engineered from silicon using Furrtek's die photographs of
     Roland R15229841 (MB87126-002) and by probing the DRAM and DAC bus
-	with a logic analyzer. The rom is still BAD_DUMP: some vias were
-	difficult to read in the photograph, so 13 uncertain bits were
-	corrected manually by probing the chip's DRAM/DAC behavior.
+    with a logic analyzer. The ROM is still BAD_DUMP: some vias were
+    difficult to read in the photograph, so 13 uncertain bits were
+    corrected manually by probing the chip's DRAM/DAC behavior.
 
 ***************************************************************************/
 #include "emu.h"
 #include "mb87126.h"
 
-namespace {
-constexpr unsigned bit(uint64_t word, unsigned index)
-{
-	return (word >> index) & 1;
-}
+#include <algorithm>
 
+namespace {
 constexpr unsigned inverted_address(uint64_t word, unsigned high, unsigned low)
 {
-	return 3 ^ ((bit(word, high) << 1) | bit(word, low));
+	return 3 ^ ((BIT(word, high) << 1) | BIT(word, low));
 }
 } // namespace
 
-uint64_t mb87126_core::program_word(const uint8_t *program, unsigned pc)
+mb87126_device::mb87126_core::mb87126_core()
+{
+	reset();
+}
+
+uint64_t mb87126_device::mb87126_core::program_word(const uint8_t *program, unsigned pc)
 {
 	uint64_t word = 0;
 	for (unsigned byte = 0; byte < 5; ++byte)
@@ -82,7 +84,7 @@ uint64_t mb87126_core::program_word(const uint8_t *program, unsigned pc)
 	return word & 0x7ffffffffULL;
 }
 
-void mb87126_core::reset()
+void mb87126_device::mb87126_core::reset()
 {
 	m_dc.fill(0);
 	m_dd.fill(0);
@@ -99,7 +101,7 @@ void mb87126_core::reset()
 	m_output_select = false;
 }
 
-void mb87126_core::write_parameter(uint8_t selector, uint16_t delay, uint16_t coefficient)
+void mb87126_device::mb87126_core::write_parameter(uint8_t selector, uint16_t delay, uint16_t coefficient)
 {
 	if (selector < STEPS)
 	{
@@ -108,18 +110,18 @@ void mb87126_core::write_parameter(uint8_t selector, uint16_t delay, uint16_t co
 	}
 }
 
-void mb87126_core::bus_w(uint32_t data, uint32_t mem_mask)
+void mb87126_device::mb87126_core::bus_w(uint32_t data, uint32_t mem_mask)
 {
 	const uint32_t value = ((uint32_t(m_bus) & ~mem_mask) | (data & mem_mask)) & 0xffffff;
 	m_bus = int32_t(value ^ 0x800000) - 0x800000;
 }
 
-int64_t mb87126_core::wrap28(int64_t value)
+int64_t mb87126_device::mb87126_core::wrap28(int64_t value)
 {
 	return ((value + (int64_t(1) << 27)) & 0xfffffff) - (int64_t(1) << 27);
 }
 
-int32_t mb87126_core::clip24(int64_t value)
+int32_t mb87126_device::mb87126_core::clip24(int64_t value)
 {
 	if (value > 0x7fffff)
 		return 0x7fffff;
@@ -128,7 +130,7 @@ int32_t mb87126_core::clip24(int64_t value)
 	return int32_t(value);
 }
 
-int64_t mb87126_core::term(int32_t operand, uint16_t coefficient)
+int64_t mb87126_device::mb87126_core::term(int32_t operand, uint16_t coefficient)
 {
 	const int32_t mantissa = (coefficient & 0x800) ? (coefficient & 0xfff) - 4096 : coefficient & 0xfff;
 	const unsigned range = 3 - ((coefficient >> 12) & 3);
@@ -139,7 +141,7 @@ int64_t mb87126_core::term(int32_t operand, uint16_t coefficient)
 	return product < 0 ? (product + 1) / (int64_t(1) << 21) : product / (int64_t(1) << 21);
 }
 
-void mb87126_core::run_frame(const uint8_t *program, int16_t adc, const bus_handler &bus_cycle)
+void mb87126_device::mb87126_core::run_frame(const uint8_t *program, int16_t adc, const bus_handler &bus_cycle)
 {
 	m_output_select = false;
 	const uint16_t target = uint16_t(adc) ^ 0x8000;
@@ -150,34 +152,34 @@ void mb87126_core::run_frame(const uint8_t *program, int16_t adc, const bus_hand
 		const unsigned slot = (pc + STEPS - 1) % STEPS;
 		const int32_t old_capture = m_capture;
 
-		if (bit(word, 13))
+		if (BIT(word, 13))
 		{
 			m_sum = clip24(m_sum);
 			m_capture = int32_t(m_sum);
 		}
 
 		const unsigned address = (m_base + m_dc[slot]) & (DRAM_WORDS - 1);
-		if (bit(word, 1))
+		if (BIT(word, 1))
 		{
-			if (bit(word, 2))
+			if (BIT(word, 2))
 				m_bus = m_dram[address];
 			else
 				m_bus = m_dram[address] = old_capture;
 		}
 		else
 		{
-			const bool driving = !bit(word, 3);
+			const bool driving = !BIT(word, 3);
 			if (driving)
 				m_bus = old_capture;
 		}
 		// Board strobes are visible even during delay-RAM cycles. An external
 		// receiver can drive bus pins synchronously before this word's latch.
 		if (bus_cycle)
-			bus_cycle(uint8_t(word >> 30) | (!bit(word, 3) ? BUS_DRIVE : 0) | (bit(word, 1) ? BUS_CAS : 0), uint32_t(m_bus) & 0xffffff);
+			bus_cycle(uint8_t(word >> 30) | (!BIT(word, 3) ? BUS_DRIVE : 0) | (BIT(word, 1) ? BUS_CAS : 0), uint32_t(m_bus) & 0xffffff);
 
-		if (bit(word, 25))
+		if (BIT(word, 25))
 			m_latch[(word >> 23) & 3] = m_bus;
-		if (bit(word, 6))
+		if (BIT(word, 6))
 			m_register[(word >> 4) & 3] = m_older_sum;
 
 		int64_t sum = term(m_operand, m_dd[slot]);
@@ -215,16 +217,16 @@ void mb87126_core::run_frame(const uint8_t *program, int16_t adc, const bus_hand
 		}
 		m_fetch = m_latch[inverted_address(word, 22, 20)];
 
-		if (bit(word, 10))
-			m_output[bit(word, 9) ? 0 : 1] = old_capture >> 8;
-		if (bit(word, 26))
+		if (BIT(word, 10))
+			m_output[BIT(word, 9) ? 0 : 1] = old_capture >> 8;
+		if (BIT(word, 26))
 			m_output_select = true;
 
 		// Ideal integer comparator, without analog settling/filter models. ROM
 		// strobes still sequence all sixteen decisions and the final result.
-		if (!bit(word, 28))
+		if (!BIT(word, 28))
 		{
-			if (!bit(word, 27))
+			if (!BIT(word, 27))
 			{
 				m_trial = 0x7fff;
 				m_trial_bit = 15;
@@ -243,7 +245,7 @@ void mb87126_core::run_frame(const uint8_t *program, int16_t adc, const bus_hand
 	m_base = (m_base + 1) & (DRAM_WORDS - 1);
 }
 
-bool mb87126_device::write_serial_pins(const bool clock, const bool data)
+bool mb87126_device::write_serial_pins(bool clock, bool data)
 {
 	bool committed = false;
 	if (clock && !m_serial_clock)
@@ -253,7 +255,6 @@ bool mb87126_device::write_serial_pins(const bool clock, const bool data)
 		if (++m_serial_bits == 40)
 		{
 			m_serial_bits = 0;
-			m_protocol_control = m_serial[4] >> 6;
 			// ROM 4c71/4c9a complement selector and DC; 4cc0 complements
 			// only the 12-bit DD mantissa, preserving its two range bits.
 			m_core.write_parameter(uint8_t(~m_serial[0]), uint16_t(~(m_serial[1] | (uint16_t(m_serial[2]) << 8))),
@@ -269,8 +270,18 @@ DEFINE_DEVICE_TYPE(MB87126, mb87126_device, "mb87126", "Roland MB87126-002 rever
 mb87126_device::mb87126_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MB87126, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, m_stream(nullptr)
 	, m_program(*this, "program")
 	, m_bus_cb(*this)
+	, m_serial{}
+	, m_serial_bits(0)
+	, m_serial_clock(true)
+	, m_ercl(true)
+	, m_busy_until(attotime::zero)
+	, m_sync_error(false)
+	, m_frame_clocks(640)
+	, m_next_frame_clocks(640)
+	, m_frame_accumulator(640)
 {
 }
 
@@ -281,9 +292,7 @@ void mb87126_device::device_start()
 	m_stream = stream_alloc(1, 2, clock() / 160);
 	save_item(NAME(m_serial));
 	save_item(NAME(m_serial_bits));
-	save_item(NAME(m_protocol_control));
 	save_item(NAME(m_serial_clock));
-	save_item(NAME(m_inck));
 	save_item(NAME(m_ercl));
 	save_item(NAME(m_busy_until));
 	save_item(NAME(m_sync_error));
@@ -313,8 +322,8 @@ void mb87126_device::device_start()
 void mb87126_device::device_reset()
 {
 	m_serial = {};
-	m_serial_bits = m_protocol_control = 0;
-	m_serial_clock = m_inck = m_ercl = true;
+	m_serial_bits = 0;
+	m_serial_clock = m_ercl = true;
 	m_busy_until = attotime::zero;
 	m_sync_error = false;
 	m_core.reset();
@@ -331,13 +340,12 @@ void mb87126_device::serial_w(bool clock, bool data)
 		// interpretation as a framing error is inferred from that sequence.
 		if (m_serial == std::array<u8, 5>{1, 0, 0, 0, 0})
 			m_sync_error = true;
-		// Duration is provisional; unlike the old polling shim, reading BUSY
-		// cannot change chip state. Firmware sees one finite pulse per transfer.
+		// Duration is provisional. Firmware sees one finite pulse per transfer.
 		m_busy_until = machine().time() + attotime::from_usec(2);
 	}
 }
 
-void mb87126_device::control_w(bool inck, bool ercl)
+void mb87126_device::control_w(bool /*inck*/, bool ercl)
 {
 	m_stream->update();
 	if (ercl && !m_ercl)
@@ -346,7 +354,6 @@ void mb87126_device::control_w(bool inck, bool ercl)
 		m_sync_error = false;
 		m_busy_until = attotime::zero;
 	}
-	m_inck = inck;
 	m_ercl = ercl;
 }
 
@@ -363,13 +370,16 @@ void mb87126_device::frame_clocks_w(u32 clocks)
 
 void mb87126_device::sound_stream_update(sound_stream &stream)
 {
+	mb87126_core::bus_handler bus_cycle;
+	if (!m_bus_cb.isunset())
+		bus_cycle = [this](u8 signals, u32 data) { m_bus_cb(signals, data); };
 	for (int i = 0; i < stream.samples(); ++i)
 	{
 		if (m_frame_accumulator >= m_frame_clocks)
 		{
 			m_frame_accumulator -= m_frame_clocks;
 			const s16 adc = std::clamp<int>(stream.get(0, i) * 32768, -32768, 32767);
-			m_core.run_frame(m_program, adc, [this](u8 signals, u32 data) { m_bus_cb(signals, data); });
+			m_core.run_frame(m_program, adc, bus_cycle);
 			m_frame_clocks = m_next_frame_clocks;
 		}
 		m_frame_accumulator += 80;

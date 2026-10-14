@@ -319,19 +319,19 @@ macro post_indexed $cycles1 $cycles2
 
 08    shr   immed_or_reg_2w
 	TMP = reg_r16(OP2);
-	TMP = shift(TMP, 16, OP1, 0);
+	TMP = shift(TMP, 16, OP1, shift_type::LOGICAL_RIGHT);
 	reg_w16(OP2, TMP);
 	next(OP1 ? 7+OP1 : 8);
 
 09    shl   immed_or_reg_2w
 	TMP = reg_r16(OP2);
-	TMP = shift(TMP, 16, OP1, 1);
+	TMP = shift(TMP, 16, OP1, shift_type::LEFT);
 	reg_w16(OP2, TMP);
 	next(OP1 ? 7+OP1 : 8);
 
 0a    shra  immed_or_reg_2w
 	TMP = reg_r16(OP2);
-	TMP = shift(TMP, 16, OP1, 2);
+	TMP = shift(TMP, 16, OP1, shift_type::ARITHMETIC_RIGHT);
 	reg_w16(OP2, TMP);
 	next(OP1 ? 7+OP1 : 8);
 
@@ -339,7 +339,7 @@ macro post_indexed $cycles1 $cycles2
 	OP2 &= 0xfc;
 	TMP = reg_r16(OP2);
 	TMP |= uint32_t(reg_r16(OP2+2)) << 16;
-	TMP = shift(TMP, 32, OP1, 0);
+	TMP = shift(TMP, 32, OP1, shift_type::LOGICAL_RIGHT);
 	reg_w16(OP2, TMP);
 	reg_w16(OP2+2, TMP >> 16);
 	next(OP1 ? 7+OP1 : 8);
@@ -348,7 +348,7 @@ macro post_indexed $cycles1 $cycles2
 	OP2 &= 0xfc;
 	TMP = reg_r16(OP2);
 	TMP |= uint32_t(reg_r16(OP2+2)) << 16;
-	TMP = shift(TMP, 32, OP1, 1);
+	TMP = shift(TMP, 32, OP1, shift_type::LEFT);
 	reg_w16(OP2, TMP);
 	reg_w16(OP2+2, TMP >> 16);
 	next(OP1 ? 7+OP1 : 8);
@@ -357,7 +357,7 @@ macro post_indexed $cycles1 $cycles2
 	OP2 &= 0xfc;
 	TMP = reg_r16(OP2);
 	TMP |= uint32_t(reg_r16(OP2+2)) << 16;
-	TMP = shift(TMP, 32, OP1, 2);
+	TMP = shift(TMP, 32, OP1, shift_type::ARITHMETIC_RIGHT);
 	reg_w16(OP2, TMP);
 	reg_w16(OP2+2, TMP >> 16);
 	next(OP1 ? 7+OP1 : 8);
@@ -413,19 +413,19 @@ macro post_indexed $cycles1 $cycles2
 
 18    shrb  immed_or_reg_2b
 	TMP = reg_r8(OP2);
-	TMP = shift(TMP, 8, OP1, 0);
+	TMP = shift(TMP, 8, OP1, shift_type::LOGICAL_RIGHT);
 	reg_w8(OP2, TMP);
 	next(OP1 ? 7+OP1 : 8);
 
 19    shlb  immed_or_reg_2b
 	TMP = reg_r8(OP2);
-	TMP = shift(TMP, 8, OP1, 1);
+	TMP = shift(TMP, 8, OP1, shift_type::LEFT);
 	reg_w8(OP2, TMP);
 	next(OP1 ? 7+OP1 : 8);
 
 1a    shrab immed_or_reg_2b
 	TMP = reg_r8(OP2);
-	TMP = shift(TMP, 8, OP1, 2);
+	TMP = shift(TMP, 8, OP1, shift_type::ARITHMETIC_RIGHT);
 	reg_w8(OP2, TMP);
 	next(OP1 ? 7+OP1 : 8);
 
@@ -524,7 +524,7 @@ macro post_indexed $cycles1 $cycles2
 	TMP = any_r16(OP1);
 	TMP = do_sub(reg_r16(OP2), TMP);
 	reg_w16(OP3, TMP);
-	post_indirect 2 8 9 // +5 when external
+	post_indirect 2 7 8 // +5 when external
 
 4b    sub   indexed_3w
 	TMP = any_r16(OP1);
