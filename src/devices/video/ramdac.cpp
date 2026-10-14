@@ -101,6 +101,11 @@ void ramdac_device::device_validity_check(validity_checker &valid) const
 void ramdac_device::device_start()
 {
 	m_palram = make_unique_clear<uint8_t[]>(1 << 10);
+
+	save_pointer(NAME(m_palram), 1 << 10);
+	save_item(NAME(m_pal_index));
+	save_item(NAME(m_int_index));
+	save_item(NAME(m_pal_mask));
 }
 
 
