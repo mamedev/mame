@@ -143,6 +143,8 @@ public:
 	void write_memory(offs_t offset, uint8_t data, int aec, int ba);
 
 	uint8_t read(offs_t offset);
+	uint8_t exp_dma_cd_r(offs_t offset);
+	void exp_dma_cd_w(offs_t offset, uint8_t data);
 	void write(offs_t offset, uint8_t data);
 	void cpu_mem_w(offs_t offset, uint8_t data);
 
@@ -720,6 +722,26 @@ uint8_t c64_state::read(offs_t offset)
 	offs_t va = 0x3fff;
 
 	return read_memory(offset, va, aec, ba);
+}
+
+
+//-------------------------------------------------
+//  exp_dma_cd_r - expansion port bus master read
+//-------------------------------------------------
+
+uint8_t c64_state::exp_dma_cd_r(offs_t offset)
+{
+	return read_memory(offset, 0x3fff, 1, 1);
+}
+
+
+//-------------------------------------------------
+//  exp_dma_cd_w - expansion port bus master write
+//-------------------------------------------------
+
+void c64_state::exp_dma_cd_w(offs_t offset, uint8_t data)
+{
+	write_memory(offset, data, 1, m_vic->ba_r());
 }
 
 
@@ -1631,9 +1653,7 @@ void c64_state::update_rdy()
 void c64_state::exp_reset_w(int state)
 {
 	if (!state)
-	{
-		machine_reset();
-	}
+		machine().schedule_soft_reset();
 }
 
 
@@ -1850,6 +1870,7 @@ void c64_state::vic_config(mos6566_device &vic)
 	vic.set_cpu(m_maincpu);
 	vic.irq_callback().set(m_irq, FUNC(input_merger_device::in_w<1>));
 	vic.ba_callback().set(FUNC(c64_state::vic_ba_w));
+	vic.phi2_callback().set(m_exp, FUNC(c64_expansion_slot_device::phi2_w));
 	vic.charrom_callback().set(FUNC(c64_state::vic_charrom_r));
 	vic.set_screen(SCREEN_TAG);
 	vic.set_addrmap(0, &c64_state::vic_videoram_map);
@@ -1949,8 +1970,8 @@ void c64_state::ntsc(machine_config &config)
 	m_exp->irq_callback().set(m_irq, FUNC(input_merger_device::in_w<2>));
 	m_exp->nmi_callback().set(m_nmi, FUNC(input_merger_device::in_w<2>));
 	m_exp->reset_callback().set(FUNC(c64_state::exp_reset_w));
-	m_exp->cd_input_callback().set(FUNC(c64_state::read));
-	m_exp->cd_output_callback().set(FUNC(c64_state::write));
+	m_exp->cd_input_callback().set(FUNC(c64_state::exp_dma_cd_r));
+	m_exp->cd_output_callback().set(FUNC(c64_state::exp_dma_cd_w));
 	m_exp->dma_callback().set(FUNC(c64_state::exp_dma_w));
 
 	PET_USER_PORT(config, m_user, c64_user_port_cards, nullptr);
@@ -2136,8 +2157,8 @@ void c64_state::pal(machine_config &config)
 	m_exp->irq_callback().set(m_irq, FUNC(input_merger_device::in_w<2>));
 	m_exp->nmi_callback().set(m_nmi, FUNC(input_merger_device::in_w<2>));
 	m_exp->reset_callback().set(FUNC(c64_state::exp_reset_w));
-	m_exp->cd_input_callback().set(FUNC(c64_state::read));
-	m_exp->cd_output_callback().set(FUNC(c64_state::write));
+	m_exp->cd_input_callback().set(FUNC(c64_state::exp_dma_cd_r));
+	m_exp->cd_output_callback().set(FUNC(c64_state::exp_dma_cd_w));
 	m_exp->dma_callback().set(FUNC(c64_state::exp_dma_w));
 
 	PET_USER_PORT(config, m_user, c64_user_port_cards, nullptr);

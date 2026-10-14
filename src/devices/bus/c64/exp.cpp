@@ -457,6 +457,7 @@ void c64_expansion_cards(device_slot_interface &device)
 	device.option_add("sfxse", C64_SFX_SOUND_EXPANDER);
 	device.option_add("speakez", C64_SPEAKEASY);
 	device.option_add("supercpu", C64_SUPERCPU);
+	device.option_add("supercpu128", C128_SUPERCPU);
 	device.option_add("swiftlink", C64_SWIFTLINK);
 	device.option_add("tibdd001", C64_TIB_DD_001);
 	device.option_add("turbo232", C64_TURBO232);

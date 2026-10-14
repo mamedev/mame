@@ -210,15 +210,10 @@ Laggy [joystick] fire button (half the times won't trigger)
 		</part>
 	</software>
 
-	<software name="metaldst" supported="no">
+	<software name="metaldst">
 		<description>Metal Dust</description>
 		<year>2012</year>
 		<publisher>Protovision</publisher>
-		<notes><![CDATA[
-[1581] or [.d81] ?FILE NOT FOUND ERROR
-[SuperCPU] resets to PC=0, in brk-land
-]]></notes>
-
 		<sharedfeat name="compatibility" value="PAL"/>
 		<sharedfeat name="exp_default" value="supercpu"/>
 		<sharedfeat name="iec8_default" value="c1581"/>
@@ -252,7 +247,7 @@ Laggy [joystick] fire button (half the times won't trigger)
 		</part>
 	</software>
 
-	<software name="metaldstf" cloneof="metaldst" supported="no">
+	<software name="metaldstf" cloneof="metaldst">
 		<description>Metal Dust (FD-4000)</description>
 		<year>2005</year>
 		<publisher>Protovision</publisher>
@@ -406,6 +401,22 @@ Hi-score table is corrupt (dump really?)
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="modplay12e_fix.d81" size="819200" crc="f0727880" sha1="1806bd417524aa54a585b34a8045ac5954f57f21"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="modplay12" cloneof="modplay">
+		<description>MODPlay 64 (v1.2, SuperCPU)</description>
+		<year>2000</year>
+		<publisher>Digital Audio Concepts</publisher>
+		<sharedfeat name="iec8_default" value="c1581"/>
+		<sharedfeat name="exp_default" value="supercpu"/>
+		<sharedfeat name="exp:supercpu:exp_default" value="reu1764"/>
+		<sharedfeat name="user_default" value="digimax"/>
+		<sharedfeat name="sid_default" value="dual8580"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="modplay64v1.2.d81" size="819200" crc="6da02adc" sha1="b18372d957a03f3e22a49ca8c15c5dca0640ae53"/>
 			</dataarea>
 		</part>
 	</software>
@@ -957,7 +968,7 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
-	<software name="scpuutil" supported="no">
+	<software name="scpuutil">
 		<description>CMD SuperCPU Utilities</description>
 		<year>1990</year>
 		<publisher>CMD</publisher>
@@ -1397,7 +1408,7 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
-	<software name="crazydem" supported="no">
+	<software name="crazydem">
 		<description>Crazy Demo</description>
 		<year>2024</year>
 		<publisher>Wyndex</publisher>
@@ -1652,14 +1663,12 @@ Hi-score table is corrupt (dump really?)
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=1mQWEF6Tt0Y -->
-	<software name="popelprm" supported="no">
+	<software name="popelprm">
 		<description>Popel Premiere</description>
 		<year>1999</year>
 		<publisher>CyberpunX</publisher>
-		<notes><![CDATA[
-Requires a second SID at $D500
-]]></notes>
 		<sharedfeat name="exp_default" value="supercpu"/>
+		<sharedfeat name="sid_default" value="dual8580"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1683,7 +1692,7 @@ Requires a second SID at $D500
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=vS8LAQbR-DY -->
-	<software name="scpukick" supported="no">
+	<software name="scpukick">
 		<description>SuperCPU Kicks!</description>
 		<year>1999</year>
 		<publisher>DMAgic</publisher>
@@ -1709,8 +1718,23 @@ Requires a second SID at $D500
 		</part>
 	</software>
 
+	<software name="scpukickf" cloneof="scpukick">
+		<description>SuperCPU Kicks! (FD-2000)</description>
+		<year>1999</year>
+		<publisher>DMAgic</publisher>
+		<sharedfeat name="exp_default" value="supercpu"/>
+		<sharedfeat name="iec8_default" value="fd2000"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1658880">
+				<rom name="scpukick.d2m" size="1658880" crc="93abb04a" sha1="0e479cf6cddb0bfee00b7e01c14481d1e78a4dae"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- https://www.youtube.com/watch?v=ZLkWufDcDNU -->
-	<software name="scpuplsm" supported="no">
+	<software name="scpuplsm">
 		<description>SuperCPU Plasma Intro</description>
 		<year>2015</year>
 		<publisher>Genesis Project</publisher>
