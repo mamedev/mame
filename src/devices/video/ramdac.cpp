@@ -9,7 +9,7 @@
     TODO:
     - masking register, almost likely it controls rollback on incrementing
       r/w palette access;
-    - needs information about different models and what exactly they does
+    - needs information about different models and what exactly they do
 
 ***************************************************************************/
 
@@ -157,9 +157,9 @@ void ramdac_device::index_r_w(uint8_t data)
 
 uint8_t ramdac_device::pal_r()
 {
-	uint8_t res;
-	res = readbyte(m_pal_index[m_split_read_reg] | (m_int_index[m_split_read_reg] << 8));
-	reg_increment(m_split_read_reg);
+	const uint8_t res = readbyte(m_pal_index[m_split_read_reg] | (m_int_index[m_split_read_reg] << 8));
+	if (!machine().side_effects_disabled())
+		reg_increment(m_split_read_reg);
 	return res;
 }
 
@@ -191,22 +191,18 @@ uint8_t ramdac_device::ramdac_pal_r(offs_t offset)
 
 void ramdac_device::ramdac_rgb666_w(offs_t offset, uint8_t data)
 {
-	uint16_t pal_offs;
-
 	m_palram[offset] = data & 0x3f;
-	pal_offs = (offset & 0xff);
+	const uint16_t pal_offs = offset & 0xff;
 
-	pen_t pen = m_color_base + (offset & 0xff);
+	const pen_t pen = m_color_base + (offset & 0xff);
 	m_palette->set_pen_color(pen, pal6bit(m_palram[pal_offs|0x000]), pal6bit(m_palram[pal_offs|0x100]), pal6bit(m_palram[pal_offs|0x200]));
 }
 
 void ramdac_device::ramdac_rgb888_w(offs_t offset, uint8_t data)
 {
-	uint16_t pal_offs;
-
 	m_palram[offset] = data;
-	pal_offs = (offset & 0xff);
+	const uint16_t pal_offs = (offset & 0xff);
 
-	pen_t pen = m_color_base + (offset & 0xff);
+	const pen_t pen = m_color_base + (offset & 0xff);
 	m_palette->set_pen_color(pen, m_palram[pal_offs|0x000], m_palram[pal_offs|0x100], m_palram[pal_offs|0x200]);
 }
