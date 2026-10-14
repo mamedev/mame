@@ -144,10 +144,21 @@ static const gfx_layout tsconf_charlayout =
 	8 * 8
 };
 
+static const gfx_layout tsconf_tiles_8x8x8_raw =
+{
+	8, 8,
+	64 * 64,
+	8,
+	{STEP8(0, 1)},
+	{STEP8(0, 8)},
+	{STEP8(0, 8 * 8)},
+	8 * 8 * 8
+};
+
 static GFXDECODE_START(gfx_tsconf)
 	GFXDECODE_ENTRY("maincpu", 0, tsconf_charlayout, 0xf7, 1)         // TM_TS_CHAR : TXT
-	GFXDECODE_RAM("tiles0_raw", 0, gfx_8x8x8_raw, 0, 16)              // TM_TILES0  : T0 16cpp
-	GFXDECODE_RAM("tiles1_raw", 0, gfx_8x8x8_raw, 0, 16)              // TM_TILES1  : T1 16cpp
+	GFXDECODE_ENTRYX("tiles0_raw", 0, tsconf_tiles_8x8x8_raw, 0, 16, GFXENTRY_RAM | GFXENTRY_XSCALE(2) | GFXENTRY_YSCALE(1))  // TM_TILES0  : T0 16cpp
+	GFXDECODE_ENTRYX("tiles1_raw", 0, tsconf_tiles_8x8x8_raw, 0, 16, GFXENTRY_RAM | GFXENTRY_XSCALE(2) | GFXENTRY_YSCALE(1))  // TM_TILES1  : T1 16cpp
 	GFXDECODE_RAM("sprites_raw", 0, gfx_8x8x8_raw, 0, 16)             // TM_SPRITES : Sprites 16cpp
 	GFXDECODE_ENTRY("maincpu", 0x1fd00, spectrum_charlayout, 0xf7, 1) // TM_ZX_CHAR
 GFXDECODE_END
@@ -158,11 +169,11 @@ void tsconf_state::video_start()
 
 	m_ts_tilemap[TM_TS_CHAR] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_txt)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 
-	m_ts_tilemap[TM_TILES0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_ts_tilemap[TM_TILES0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<0>)), TILEMAP_SCAN_ROWS, 16, 8, 64, 64);
 	m_ts_tilemap[TM_TILES0]->set_transparent_pen(0);
 	m_gfxdecode->gfx(TM_TILES0)->set_granularity(16);
 
-	m_ts_tilemap[TM_TILES1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_ts_tilemap[TM_TILES1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<1>)), TILEMAP_SCAN_ROWS, 16, 8, 64, 64);
 	m_ts_tilemap[TM_TILES1]->set_transparent_pen(0);
 	m_gfxdecode->gfx(TM_TILES1)->set_granularity(16);
 
@@ -250,8 +261,8 @@ void tsconf_state::device_post_load()
 	spectrum_128_state::device_post_load();
 	m_sprites_cache.clear();
 	copy_tiles_to_raw(m_ram->pointer() + ((m_regs[SG_PAGE] & 0xf8) << 14), m_sprites_raw.target());
-	copy_tiles_to_raw(m_ram->pointer() + ((m_regs[T0_G_PAGE] & 0xf8) << 14), m_sprites_raw.target());
-	copy_tiles_to_raw(m_ram->pointer() + ((m_regs[T1_G_PAGE] & 0xf8) << 14), m_sprites_raw.target());
+	copy_tiles_to_raw(m_ram->pointer() + ((m_regs[T0_G_PAGE] & 0xf8) << 14), m_tiles_raw[0].target());
+	copy_tiles_to_raw(m_ram->pointer() + ((m_regs[T1_G_PAGE] & 0xf8) << 14), m_tiles_raw[1].target());
 }
 
 INPUT_PORTS_START( tsconf )
@@ -275,6 +286,17 @@ INPUT_PORTS_START( tsconf )
 
 	PORT_START("mouse_input4")
 	PORT_BIT(0x0f, 0, IPT_DIAL_V) PORT_REVERSE PORT_NAME("Mouse Scroll V") PORT_SENSITIVITY(1) PORT_CODE(MOUSECODE_Z)
+
+	PORT_START("LYRS")
+	PORT_CONFNAME(0x01, 0x00, "Disable Sprites")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x01, DEF_STR(On))
+	PORT_CONFNAME(0x02, 0x00, "Disable Tiles")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x02, DEF_STR(On))
+	PORT_CONFNAME(0x04, 0x00, "Disable Graphics")
+	PORT_CONFSETTING(   0x00, DEF_STR(Off))
+	PORT_CONFSETTING(   0x04, DEF_STR(On))
 
 INPUT_PORTS_END
 
@@ -337,7 +359,7 @@ void tsconf_state::tsconf(machine_config &config)
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speakers", 0.75);
 
 	PALETTE(config, "palette", palette_device::BLACK, 256);
-	m_screen->set_raw(14_MHz_XTAL / 2, 448, with_hblank(0), 448, 320, with_vblank(0), 320);
+	m_screen->set_raw(14_MHz_XTAL, 448 << 1, with_hblank(0) << 1, 448 << 1, 320, with_vblank(0), 320);
 	m_screen->set_screen_update(FUNC(tsconf_state::screen_update));
 	m_screen->set_no_palette();
 
