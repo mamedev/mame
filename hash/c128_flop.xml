@@ -353,6 +353,37 @@ Before loading FORMAT.128, disable automatic write verification with this comman
 		</part>
 	</software>
 
+	<software name="geos20a" cloneof="geos20">
+		<description>GEOS 128 v2.0 (Click Here Software)</description>
+		<year>199?</year>
+		<publisher>Click Here Software</publisher>
+		<info name="protection" value="none" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System"/>
+			<dataarea name="flop" size="174848">
+				<rom name="geos128.d64" size="174848" crc="0ef8b5a7" sha1="a232c8d912c8cae5d9096120669c3782b451c408"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Applications"/>
+			<dataarea name="flop" size="174848">
+				<rom name="apps128.d64" size="174848" crc="0e77c5b6" sha1="72fda59f1a9258e6ee68da2ed1c4a3ccffc95792"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Write Utilities"/>
+			<dataarea name="flop" size="174848">
+				<rom name="wruti128.d64" size="174848" crc="5dbf92c8" sha1="30527b3ca256b92ee837945b1a4f730988da3a57"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="GEOSpell"/>
+			<dataarea name="flop" size="174848">
+				<rom name="spell128.d64" size="174848" crc="2f3be014" sha1="c9a7027f2f48126d85cc930f9cf28dd3b2ffa1c9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jane">
 		<description>Jane</description>
 		<year>1985</year>
