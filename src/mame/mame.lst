@@ -37726,6 +37726,7 @@ paranoia
 
 @source:pce/tourvis.cpp
 tourvis
+tourvisv1
 
 @source:pce/uapce.cpp
 aliencr

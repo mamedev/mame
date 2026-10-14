@@ -17,7 +17,7 @@ Unless noted, all games match the corresponding PCE HuCard dump.
 All TourVisión carts are dumped as 1MB, the 384KB ROM is constructed concatenating the first 256KB of the first 512KB half with the first 128KB of the second 512KB half.
 For 512, 256 or 128KB ROMs, just a simple split is needed.
 
-    Games with unknown ID
+    Games with unknown ID (the V4 BIOS doesn't know how to start them)
 
 Armed-F
 Dragon Spirit
@@ -156,7 +156,7 @@ Parasol Stars
 		</part>
 	</software>
 
-	<software name="armedf">
+	<software name="armedf" supported="no">
 		<description>Armed-F (TourVisión PCE bootleg)</description>
 		<year>1990</year>
 		<publisher>bootleg (TourVisión) / Pack-In-Video</publisher>
@@ -345,7 +345,7 @@ Parasol Stars
 		<publisher>bootleg (TourVisión) / Naxat</publisher>
 		<info name="alt_title" value="コリューン"/>
 		<part name="cart" interface="tourvision_cart">
-			<feature name="id" value="43"/>
+			<feature name="id" value="0x2b"/>
 			<dataarea name="rom" size="524288">
 				<rom name="coryoon - child of dragon (japan).pce" size="524288" crc="b4d29e3b" sha1="709595f04defcc55181f7502a0065e4c22d5fb19" />
 			</dataarea>
@@ -495,7 +495,7 @@ Parasol Stars
 		</part>
 	</software>
 
-	<software name="dspirit">
+	<software name="dspirit" supported="no">
 		<description>Dragon Spirit (TourVisión PCE bootleg)</description>
 		<year>1988</year>
 		<publisher>bootleg (TourVisión) / Namcot</publisher>
@@ -1024,7 +1024,7 @@ Parasol Stars
 		</part>
 	</software>
 
-	<software name="pleag4">
+	<software name="pleag4" supported="no">
 		<description>Power League IV (TourVisión PCE bootleg)</description>
 		<year>1991</year>
 		<publisher>bootleg (TourVisión) / Hudson</publisher>
@@ -1124,7 +1124,7 @@ Parasol Stars
 		<publisher>bootleg (TourVisión) / Irem</publisher>
 		<info name="alt_title" value="レーシング魂"/>
 		<part name="cart" interface="tourvision_cart">
-			<feature name="id" value="0x5B"/> <!-- ID = 91d. It was not actually read from the cart, but reversed-engineered -->
+			<feature name="id" value="0x5b"/> <!-- ID = 91d. It was not actually read from the cart, but reversed-engineered -->
 			<dataarea name="rom" size="524288">
 				<rom name="racing damashii (japan).pce" size="524288" offset="000000" sha1="8e558b47599a36d78d319e0dcd2e5136564df074" crc="3e79734c"/>
 			</dataarea>
@@ -1522,7 +1522,7 @@ Parasol Stars
 		</part>
 	</software>
 
-	<software name="violents">
+	<software name="violents" supported="no">
 		<description>Violent Soldier (TourVisión PCE bootleg)</description>
 		<year>1990</year>
 		<publisher>bootleg (TourVisión) / IGS</publisher>
@@ -1600,7 +1600,7 @@ Parasol Stars
 		</part>
 	</software>
 
-	<software name="xevious">
+	<software name="xevious" supported="no">
 		<description>Xevious - Fardraut Densetsu (TourVisión PCE bootleg)</description>
 		<year>1990</year>
 		<publisher>bootleg (TourVisión) / Namcot</publisher>
