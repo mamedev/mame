@@ -190,7 +190,7 @@ void mb654119_device::advance_lfo(const u32 rising_offset)
 	if (m_par)
 		m_acc += m_depth;
 
-		++m_ramp;
+	++m_ramp;
 	if ((m_ramp & 127) == 0)
 		++m_ticks;
 
