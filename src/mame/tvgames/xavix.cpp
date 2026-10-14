@@ -5474,7 +5474,7 @@ CONS( 2006,  tomthr,    0,        0, xavix_tomthr,        tomthr,    xavix_power
 CONS( 2001,  gungunad,  0,        0, xavix_gungunad,      gungunad,  xavix_gungunad_state,         empty_init,  "Takara / SSD Company Ltd.", "Gun Gun Adventure (Japan)", 0 )
 
 // ガンガンレボリューション
-CONS( 2004,  gungunrv,  0,        0, xavix_gungunrv,      gungunrv,  xavix_gungunrv_state,         empty_init,  "Takara / SSD Company Ltd.", "Gun Gun Revolution (Japan)", MACHINE_NOT_WORKING )
+CONS( 2004,  gungunrv,  0,        0, xavix_gungunrv,      gungunrv,  xavix_gungunrv_state,         empty_init,  "Takara / SSD Company Ltd.", "Gun Gun Revolution (Japan)", 0 )
 
 // ビストロキッズ ぼくもわたしもコックさん！
 CONS( 2001,  bistro,    0,        0, xavix_bistro,        bistro,    xavix_bistro_state,           empty_init,  "Sega Toys / SSD Company Ltd.", "Bistro Kids: Boku mo Watashi mo Kok-san! (Japan)", 0 )
