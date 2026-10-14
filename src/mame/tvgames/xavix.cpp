@@ -1527,11 +1527,14 @@ static INPUT_PORTS_START( gungunrv )
 	PORT_INCLUDE(xavix_lightgun_2p)
 
 	PORT_MODIFY("IN0")
-	// The trigger is mirrored to a probable second pole that qualifies the vibration motor.
-	PORT_BIT( 0x09, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Machine Gun Trigger / Confirm")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Trigger / Confirm")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Support Gun Trigger") PORT_PLAYER(2) PORT_CONDITION("IN1", 0x02, EQUALS, 0x02)
 	// The disconnected trigger level is inferred from the ROM's inactivity check.
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CONDITION("IN1", 0x02, EQUALS, 0x00)
+	// The gun's three-position power switch combines hard Off with vibration disabled/enabled.
+	PORT_CONFNAME( 0x08, 0x08, "Vibration" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 	// Startup treats IO0.6 low as a factory-test strap when the Support Gun is absent.
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xb4, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1544,10 +1547,8 @@ static INPUT_PORTS_START( gungunrv )
 	PORT_CONFNAME( 0x04, 0x00, "Power Source" )
 	PORT_CONFSETTING(    0x00, "Batteries" )
 	PORT_CONFSETTING(    0x04, "AC Adapter" )
-	// The physical three-position switch combines hard Off with these two powered settings.
-	PORT_CONFNAME( 0x40, 0x00, "Vibration" )
-	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
-	PORT_CONFSETTING(    0x40, DEF_STR( Off ) )
+	// IO1.6 selects grenade shots; the Support Gun has a separate single-shot path.
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Weapon Select (Machine Gun / Grenade)") PORT_PLAYER(1) PORT_TOGGLE PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT( 0xb1, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")

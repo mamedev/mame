@@ -1804,8 +1804,8 @@ static INPUT_PORTS_START( tmy_thom )
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Talk")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Whistle")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Camera / Viewpoint")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Camera / Viewpoint")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Whistle")
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
@@ -2158,11 +2158,11 @@ static INPUT_PORTS_START( doradraw )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Cancel (B)")
 
 	PORT_MODIFY("PIO1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Action (A)")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Action (A)") PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("PIO2")
@@ -2172,10 +2172,10 @@ static INPUT_PORTS_START( doradraw )
 	PORT_CONFSETTING(    0x80, "AC Adapter" )
 
 	PORT_MODIFY("MOUSE1X")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(80) PORT_KEYDELTA(40) PORT_PLAYER(1)
 
 	PORT_MODIFY("MOUSE1Y")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(80) PORT_KEYDELTA(40) PORT_PLAYER(1)
 
 	PORT_INCLUDE(superxavix_battery_status)
 	PORT_INCLUDE(xavix_hard_power_control)
@@ -3225,7 +3225,7 @@ CONS( 2008, epo_ntpj,   0,        0, superxavix_epo_ntpj,              epo_ntpj,
 CONS( 2007, doradraw,   0,        0, superxavix_doradraw,              doradraw,              superxavix_doradraw_state,   empty_init, "Epoch / SSD Company Ltd.", "Doraemon Ugoku! Oekaki (Japan)", MACHINE_NOT_WORKING )
 
 // ハローキティ うごく！おえかき エポック社
-CONS( 2007, hkdraw,     doradraw, 0, superxavix_doradraw,              doradraw,              superxavix_doradraw_state,   empty_init, "Epoch / SSD Company Ltd.", "Hello Kitty Ugoku! Oekaki (Japan)", MACHINE_NOT_WORKING )
+CONS( 2007, hkdraw,     0,        0, superxavix_doradraw,              doradraw,              superxavix_doradraw_state,   empty_init, "Epoch / SSD Company Ltd.", "Hello Kitty Ugoku! Oekaki (Japan)", MACHINE_NOT_WORKING )
 
 // どんトレだ兵衛～どん兵衛くんとトレーニング
 // Camera exposure response remains unverified.
