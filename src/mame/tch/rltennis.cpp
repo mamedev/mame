@@ -1,9 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomasz Slanina
+// copyright-holders:Tomasz Slanina, Marcos Hernández
 /**************************************************************************************************
 Reality Tennis - (c) 1993 TCH
 
- driver by Tomasz Slanina
+Original driver by Tomasz Slanina.
+The blitter's scale register identified on the running game and implemented as the ratio of its
+two counters by Marcos Hernández, in collaboration, within MS-DOS Club's TCH preservation project
+(github.com/MS-DOS-Club/tch-blitter).
 
     based on informations provided by Antonio 'Peluko' Carrillo
 
@@ -53,11 +56,13 @@ and select 2k sample to play. There's probably no way to stop the sample
 player - when there's nothing to play - first, empty 2k of ROMs are selected.
 
  TODO:
-- proper timing and interrupts (remove extra hacky blitter int generation @ vblank)
-- fix various gfx glitches here and there, mostly related to wrong size of data
-  (what's the correct size? based on src or dest rectangle ? is there some kind of zoom?
-  or just rect clipping?)
-- what the 70000a blitter reg is for ?
+- IRQ1 is a level held while the blitter is idle (the main loop starts a list by unmasking
+  it); blits take no time here, so an interrupt request (HOLD_LINE) on every blit strobe and one
+  at vblank stand in until their duration is modelled
+- which source pixel a scaled blit drops in each period (the phase) is a model choice, see
+  blitter_w; so are a destination longer than its source holding the source's last step, and a
+  walk wrapping in y as it does in x; the right and bottom edges of the visible area are not
+  established
 - awfully similar to littlerb;
 
 
@@ -73,6 +78,11 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 #include "speaker.h"
 
 #include <algorithm>
+
+#define LOG_SCALE (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 namespace {
 
@@ -106,7 +116,7 @@ enum
 	BLT_Y_START,
 	BLT_Y_END,
 	BLT_FLAGS,
-	BLT_UNK,
+	BLT_SCALE,
 	BLT_START,
 	BLT_UNK2
 };
@@ -147,7 +157,7 @@ private:
 	required_region_ptr_array<uint8_t, 2> m_samples;
 	required_region_ptr<uint8_t> m_gfx;
 
-	uint16_t m_blitter[RLT_NUM_BLITTER_REGS];
+	uint16_t m_blitter[RLT_NUM_BLITTER_REGS] = { }; // compared with its previous value to find the flip and strobe edges
 	int32_t m_data760000;
 	int32_t m_data740000;
 	int32_t m_dac_counter;
@@ -161,6 +171,7 @@ private:
 	void snd1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void snd2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void decode_scale(uint16_t scale, int &dst_steps, int &src_steps) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -175,35 +186,35 @@ private:
 Blitter registers description (reg/bit names selected arbitrary ) :
 
 700000 - BLT_X_START
-     JOANA  JOAQUIN
+     JUANA  JOAQUIN
   fedcba98 76543210
   -------- xxxxxxxx dst x start
   xxxxxxxx -------- src x start
 
 
 700002 - BLT_X_END
-     JOANA  JOAQUIN
+     JUANA  JOAQUIN
   fedcba98 76543210
   -------- xxxxxxxx dst x end
   xxxxxxxx -------- src x end
 
 
 700004 - BLT_Y_START
-     JOANA  JOAQUIN
+     JUANA  JOAQUIN
   fedcba98 76543210    x start
   -------- xxxxxxxx
   xxxxxxxx --------
 
 
 700006 - BLT_Y_END
-     JOANA  JOAQUIN
+     JUANA  JOAQUIN
   fedcba98 76543210    x start
   -------- xxxxxxxx
   xxxxxxxx --------
 
 
 700008 - BLT_FLAGS
-     JOANA  JOAQUIN
+     JUANA  JOAQUIN
   fedcba98 76543210
   -------- -------x BLTFLAG_DST_X_DIR    x dst direction (step inc or dec)
   -------- ------x- BLTFLAG_DST_Y_DIR    y dst direction
@@ -219,10 +230,13 @@ Blitter registers description (reg/bit names selected arbitrary ) :
   xxxx---- --------                      src ROM num
 
 
-70000a - BLT_UNK
-     JOANA  JOAQUIN
+70000a - BLT_SCALE
   fedcba98 76543210
-  ???????? ???????? unknown (used during gameplay ... zoom factors ?)
+  aaaa---- bbbb---- scale = (a+1)/(b+1), destination pixels per source pixel, on both axes
+  ----aaaa ----bbbb the high nibbles repeated, in all but 8080 and 0004 (both 1/1)
+
+  The game writes 0000 before loading each value. Most blits run at 0000; play uses
+  2233 (3/4) and 1122 (2/3). Only reductions are seen; a > b (enlarging) is unobserved.
 
 
 70000c - BLT_START
@@ -233,11 +247,26 @@ Blitter registers description (reg/bit names selected arbitrary ) :
   x------- -------- BLTSTRT_LAYER       FG or BG layer of framebuffer
 
 70000e - BLT_UNK2
-     JOANA  JOAQUIN
+     JUANA  JOAQUIN
   fedcba98 76543210
   ???????? ???????? unknown (set to 0 @ boot)
 
 ****************************************************************************************/
+
+// The two counters of 70000a as destination and source steps, a+1 and b+1 from the high
+// nibbles; 0x0000 is 1/1, and a value whose nibbles differ is decoded the same way.
+void rltennis_state::decode_scale(uint16_t scale, int &dst_steps, int &src_steps) const
+{
+	const auto counter = [scale] (int shift) { return BIT(scale, shift, 4) + 1; };
+
+	dst_steps = counter(12);
+	src_steps = counter(4);
+
+	if (counter(8) != dst_steps || counter(0) != src_steps)
+		LOGMASKED(LOG_SCALE, "scale register %04x does not repeat its nibbles; using the high ones\n", scale);
+	if (dst_steps > src_steps)
+		LOGMASKED(LOG_SCALE, "scale register %04x enlarges, which the game was never seen to ask for\n", scale);
+}
 
 void rltennis_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -281,23 +310,21 @@ void rltennis_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		int x_src_step=(m_blitter[BLT_FLAGS] & BLTFLAG_SRC_X_DIR)?1:-1;
 		int y_src_step=(m_blitter[BLT_FLAGS] & BLTFLAG_SRC_Y_DIR)?1:-1;
 
-		int blit_w=src_x1-src_x0;
-		int blit_h=src_y1-src_y0;
+		// a walk ends where the low 8 bits of its counter reach the end coordinate; the source
+		// address itself runs on past the end of its quarter
+		const auto span = [] (int start, int end, int step) { return ((step > 0) ? (end - start) : (start - end)) & 0xff; };
 
-		int blit_w1=dst_x1-dst_x0;
-		int blit_h1=dst_y1-dst_y0;
+		int blit_w=span(src_x0, src_x1, x_src_step);
+		int blit_h=span(src_y0, src_y1, y_src_step);
 
-		if(blit_w1<0) blit_w1=(-blit_w1)^0xff; /* is it correct ? game does that when flips images */
-		if(blit_h1<0) blit_h1=-blit_h1;
+		int blit_w1=span(dst_x0, dst_x1, x_dst_step);
+		int blit_h1=span(dst_y0, dst_y1, y_dst_step);
 
-		if(blit_w<0) blit_w=-blit_w;
-		if(blit_h<0) blit_h=-blit_h;
-
-		{
-			/* wrong, causes gfx glitches (wrong size , but gives (so far) the best results */
-			if(blit_w1<blit_w) blit_w1=blit_w;
-			if(blit_h1<blit_h) blit_h1=blit_h;
-		}
+		// a scaled blit reads source step d*(b+1)/(a+1) at destination step d; which steps
+		// repeat or skip a pixel (the phase) is a model choice
+		const uint16_t scale = m_blitter[BLT_SCALE];
+		int scale_dst, scale_src;
+		decode_scale(scale, scale_dst, scale_src);
 
 		int layer=(m_blitter[BLT_START] & BLTSTRT_LAYER )?BITMAP_BG:BITMAP_FG_1;
 
@@ -316,12 +343,24 @@ void rltennis_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			force_blit=true;
 		}
 
+		// held inside the source span, whatever encodes the ratio: a destination can be longer than
+		// the ratio gives (one step on a scaled blit, a few columns on set 2's 1/1 ball animation,
+		// where the ROM's next columns are not part of the picture)
+		const auto src_idx = [scale_src, scale_dst] (int d, int limit) { return std::min(d * scale_src / scale_dst, limit); };
+
+		// the source row of each destination row is the same in every column
+		int src_row[256];
+		for( int idx_y=0 ; idx_y<=blit_h1; idx_y++ )
+			src_row[idx_y]=src_y0+(y_src_step*src_idx(idx_y, blit_h));
+
 		for( int x=dst_x0, idx_x=0 ; idx_x<=blit_w1; x+=x_dst_step, idx_x++ )
 		{
+			const int col_xx=src_x0+(x_src_step*src_idx(idx_x, blit_w));
+
 			for( int y=dst_y0, idx_y=0 ; idx_y<=blit_h1;y+=y_dst_step, idx_y++)
 			{
-				int xx=src_x0+(x_src_step*idx_x);
-				int yy=src_y0+(y_src_step*idx_y);
+				int xx=col_xx;
+				int yy=src_row[idx_y];
 
 				if(force_blit)
 				{
@@ -334,9 +373,9 @@ void rltennis_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				int pix = m_gfx[address & (m_gfx.length() - 1)];
 				int screen_x=(x&0xff)+((m_blitter[BLT_FLAGS] & BLTFLAG_DST_LR )?256:0);
 
-				if((pix || force_blit)&& screen_x >0 && y >0 && screen_x < 512 && y < 256 )
+				if(pix || force_blit)
 				{
-					m_tmp_bitmap[layer]->pix(y  , screen_x ) = pix;
+					m_tmp_bitmap[layer]->pix(y & 0xff, screen_x ) = pix;
 				}
 			}
 		}
@@ -354,6 +393,9 @@ void rltennis_state::video_start()
 	m_tmp_bitmap[BITMAP_FG_DISPLAY] = std::make_unique<bitmap_ind16>(512, 256);
 
 	save_item(NAME(m_blitter));
+	// The planes persist between frames and are painted blit by blit, so they are state.
+	for (int i = BITMAP_BG; i <= BITMAP_FG_DISPLAY; i++)
+		save_item(NAME(*m_tmp_bitmap[i]), i);
 }
 
 uint32_t rltennis_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -443,7 +485,7 @@ INTERRUPT_GEN_MEMBER(rltennis_state::interrupt)
 {
 	++m_unk_counter; // Frame counter? verify
 	device.execute().set_input_line(4, HOLD_LINE);
-	device.execute().set_input_line(1, HOLD_LINE); // Hack, to avoid dead loop
+	device.execute().set_input_line(1, HOLD_LINE); // hack: stands in for the blitter's idle level, see the TODO
 }
 
 void rltennis_state::machine_start()
@@ -476,8 +518,11 @@ void rltennis_state::rltennis(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(RLT_REFRESH_RATE);
-	screen.set_size(320, 240);
-	screen.set_visarea(0, 319, 0, 239);
+	// the game anchors its full-screen pictures at (1,1) and lets a sprite crossing x=255 spill
+	// one duplicate pixel onto column 0, so the picture starts at (1,1); the total is the planes'
+	// size and the refresh 60 Hz, both nominal, since this board's field timing is not known
+	screen.set_size(512, 256);
+	screen.set_visarea(1, 320, 1, 240);
 	screen.set_screen_update(FUNC(rltennis_state::screen_update));
 	screen.set_palette("palette");
 
