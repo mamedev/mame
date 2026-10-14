@@ -13,17 +13,14 @@ license:CC0-1.0
     - Turbo Master CPU (R65C02P4 @ 4.09 MHz)
     - Turbo Process Accelerator (65C816P-4  @ 50kHz-4MHz)
     - Flash 8 (65816 @ 8 MHz, 4/8 MB RAM)
-    - CMD SuperCPU 64 (65C816S, 64 KB RAM)
     - Data 20 Z-80 Video Pak (Z80, 80 column video)
 
     Serial I/O:
     - HART (8251)
 
     RAM expansions:
-    - CMD RAMLink
     - CMD RAMDrive
     - CMD REU 1750XL
-    - Commodore REU 1700/1750/1764
     - Rex RAM-Floppy 256K
     - Rex Goliath 1MB
     - RAM-Cart
@@ -868,91 +865,6 @@ Black screen, self modifies code in the 0x100-0x14f range
 
 			<dataarea name="roml" size="0x2000">
 				<rom name="bi80.bin" size="0x1000" crc="6bd582c7" sha1="0d9eecbaaad06aa95e8907379dea62d89bf8254a"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ramlink" supported="no">
-		<description>RAMLink</description>
-		<year>1990</year>
-		<publisher>Creative Micro Designs</publisher>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ramlink" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
-
-			<dataarea name="rom" size="0x10000">
-				<rom name="ramlink1.bin" size="0x8000" crc="da953716" sha1="adde7308c7155fc1942c98b674189e89f4965f91" offset="0x0000" />
-				<rom name="ramlink2.bin" size="0x8000" crc="ab8b6dda" sha1="e35e776387bd8b9ab16bacff70c2a3f3ef9b65bd" offset="0x8000" />
-			</dataarea>
-		</part>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ramlink140" cloneof="ramlink" supported="no">
-		<description>RAMLink v1.40</description>
-		<year>1990</year>
-		<publisher>Creative Micro Designs</publisher>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ramlink" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
-
-			<dataarea name="rom" size="0x10000">
-				<rom name="cmd_ramlink_dos_v140.bin" size="0x10000" crc="31d1c877" sha1="fe536cb7a14c8ecbac55ef2799267855f1447d9f" />
-			</dataarea>
-		</part>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ramlink201" cloneof="ramlink" supported="no">
-		<description>RAMLink v2.01</description>
-		<year>1990</year>
-		<publisher>Creative Micro Designs</publisher>
-
-		<part name="cart" interface="c64_cart">
-			<feature name="slot_unsupported" value="ramlink" />
-			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
-
-			<dataarea name="rom" size="0x10000">
-				<rom name="cmd_ramlink_dosv201.bin" size="0x10000" crc="9810f48d" sha1="aafb1c66ea6f7d131675f6c948461ca1dc56c1e7"/>
-			</dataarea>
-		</part>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" />
 			</dataarea>
 		</part>
 	</software>

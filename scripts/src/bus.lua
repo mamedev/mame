@@ -1500,6 +1500,8 @@ if BUSES["C64"] then
 		MAME_DIR .. "src/devices/bus/c64/prophet64.h",
 		MAME_DIR .. "src/devices/bus/c64/ps64.cpp",
 		MAME_DIR .. "src/devices/bus/c64/ps64.h",
+		MAME_DIR .. "src/devices/bus/c64/ramlink.cpp",
+		MAME_DIR .. "src/devices/bus/c64/ramlink.h",
 		MAME_DIR .. "src/devices/bus/c64/reu.cpp",
 		MAME_DIR .. "src/devices/bus/c64/reu.h",
 		MAME_DIR .. "src/devices/bus/c64/rex.cpp",
@@ -1577,10 +1579,12 @@ if BUSES["C64"] then
 	}
 
 	dependency {
+		{ MAME_DIR .. "src/devices/bus/c64/ramlink.cpp", GEN_DIR .. "emu/layout/ramlink.lh" },
 		{ MAME_DIR .. "src/devices/bus/c64/supercpu.cpp", GEN_DIR .. "emu/layout/supercpu.lh" },
 	}
 
 	custombuildtask {
+		layoutbuildtask("emu/layout", "ramlink"),
 		layoutbuildtask("emu/layout", "supercpu"),
 	}
 end

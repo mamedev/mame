@@ -57,6 +57,7 @@ void c64_reu_cartridge_device::device_add_mconfig(machine_config &config)
 c64_reu_cartridge_device::c64_reu_cartridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, int jp1, size_t ram_size) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
+	device_nvram_interface(mconfig, *this, false),
 	m_dmac(*this, MOS8726R1_TAG),
 	m_eprom(*this, "rom"),
 	m_ram(*this, "ram", ram_size, ENDIANNESS_LITTLE),
@@ -86,6 +87,40 @@ void c64_reu_cartridge_device::device_start()
 	m_dmac->bs_w(m_jp1);
 
 	save_item(NAME(m_dd));
+}
+
+
+//-------------------------------------------------
+//  nvram_default - RAM is only retained when
+//  something else powers the cartridge
+//-------------------------------------------------
+
+void c64_reu_cartridge_device::nvram_default()
+{
+}
+
+
+//-------------------------------------------------
+//  nvram_read - called to read NVRAM from the
+//  .nv file
+//-------------------------------------------------
+
+bool c64_reu_cartridge_device::nvram_read(util::read_stream &file)
+{
+	auto const [err, actual] = read(file, m_ram.target(), m_ram_size);
+	return !err && (actual == m_ram_size);
+}
+
+
+//-------------------------------------------------
+//  nvram_write - called to write NVRAM to the
+//  .nv file
+//-------------------------------------------------
+
+bool c64_reu_cartridge_device::nvram_write(util::write_stream &file)
+{
+	auto const [err, actual] = write(file, m_ram.target(), m_ram_size);
+	return !err;
 }
 
 
