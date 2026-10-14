@@ -167,6 +167,11 @@ static inline void apply_focus(model2_state::geo_state *geo, poly_vertex *p0)
 	p0->y *= geo->focus.y;
 }
 
+static inline float *select_geo_matrix(model2_state::geo_state *geo, const poly_vertex &p, bool palette_mode)
+{
+	return (palette_mode && (f2u(p.x) & 1)) ? geo->matrix2 : geo->matrix;
+}
+
 /* 1.8.23 float to 4.12 float converter, courtesy of Aaron Giles */
 inline u16 model2_state::float_to_zval(float floatval, s32 z_adjust)
 {
@@ -990,6 +995,7 @@ void model2_state::geo_init(memory_region *polygon_rom)
 
 	save_item(NAME(m_geo->mode));
 	save_item(NAME(m_geo->matrix));
+	save_item(NAME(m_geo->matrix2));
 	save_item(NAME(m_geo->lod));
 	save_item(NAME(m_geo->coef_table));
 	save_item(NAME(m_geo->polygon_ram0));
@@ -1003,7 +1009,7 @@ void model2_state::geo_init(memory_region *polygon_rom)
  *******************************************/
 
 /* Parse Polygons: Normals Present, No Specular case */
-void model2_state::geo_parse_np_ns(geo_state *geo, u32 *input, u32 count)
+void model2_state::geo_parse_np_ns(geo_state *geo, u32 *input, u32 count, bool palette_mode)
 {
 	raster_state *raster = geo->raster;
 	poly_vertex point, normal;
@@ -1150,7 +1156,7 @@ void model2_state::geo_parse_np_ns(geo_state *geo, u32 *input, u32 count)
 }
 
 /* Parse Polygons: Normals Present, Specular case */
-void model2_state::geo_parse_np_s(geo_state *geo, u32 *input, u32 count)
+void model2_state::geo_parse_np_s(geo_state *geo, u32 *input, u32 count, bool palette_mode)
 {
 	raster_state *raster = geo->raster;
 	poly_vertex point, normal;
@@ -1306,7 +1312,7 @@ void model2_state::geo_parse_np_s(geo_state *geo, u32 *input, u32 count)
 }
 
 /* Parse Polygons: No Normals, No Specular case */
-void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count)
+void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count, bool palette_mode)
 {
 	raster_state *raster = geo->raster;
 	poly_vertex point, normal, p0, p1, p2, p3;
@@ -1318,7 +1324,7 @@ void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count)
 	point.pz = u2f(*input++);
 
 	/* transform with the current matrix */
-	transform_point(&point, geo->matrix);
+	transform_point(&point, select_geo_matrix(geo, point, palette_mode));
 
 	/* save for normal calculation */
 	p0.x = point.x; p0.y = point.y; p0.pz = point.pz;
@@ -1337,7 +1343,7 @@ void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count)
 	point.pz = u2f(*input++);
 
 	/* transform with the current matrix */
-	transform_point(&point, geo->matrix);
+	transform_point(&point, select_geo_matrix(geo, point, palette_mode));
 
 	/* save for normal calculation */
 	p1.x = point.x; p1.y = point.y; p1.pz = point.pz;
@@ -1366,16 +1372,13 @@ void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count)
 			int32_t             luma;
 			texture_parameter * texparam;
 
-			/* Skip normal */
-			input += 3;
-
 			/* read in the next point */
 			point.x = u2f(*input++);
 			point.y = u2f(*input++);
 			point.pz = u2f(*input++);
 
 			/* transform with the current matrix */
-			transform_point(&point, geo->matrix);
+			transform_point(&point, select_geo_matrix(geo, point, palette_mode));
 
 			/* save for normal calculation */
 			p2.x = point.x; p2.y = point.y; p2.pz = point.pz;
@@ -1436,7 +1439,7 @@ void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count)
 				point.pz = u2f(*input++);
 
 				/* transform with the current matrix */
-				transform_point(&point, geo->matrix);
+				transform_point(&point, select_geo_matrix(geo, point, palette_mode));
 
 				/* save for normal calculation */
 				p3.x = point.x; p3.y = point.y; p3.pz = point.pz;
@@ -1452,7 +1455,8 @@ void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count)
 			else
 			{
 				/* skip the next 3 points */
-				input += 3;
+				if (!palette_mode)
+					input += 3;
 
 				/* for triangles, the rope of P1(n) is achieved by P0(n-1) (linktype 3) */
 				p3.x = p2.x; p3.y = p2.y; p3.pz = p2.pz;
@@ -1496,7 +1500,7 @@ void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count)
 }
 
 /* Parse Polygons: No Normals, Specular case */
-void model2_state::geo_parse_nn_s(geo_state *geo, u32 *input, u32 count)
+void model2_state::geo_parse_nn_s(geo_state *geo, u32 *input, u32 count, bool palette_mode)
 {
 	raster_state *raster = geo->raster;
 	poly_vertex point, normal, p0, p1, p2, p3;
@@ -1508,7 +1512,7 @@ void model2_state::geo_parse_nn_s(geo_state *geo, u32 *input, u32 count)
 	point.pz = u2f(*input++);
 
 	/* transform with the current matrix */
-	transform_point(&point, geo->matrix);
+	transform_point(&point, select_geo_matrix(geo, point, palette_mode));
 
 	/* save for normal calculation */
 	p0.x = point.x; p0.y = point.y; p0.pz = point.pz;
@@ -1527,7 +1531,7 @@ void model2_state::geo_parse_nn_s(geo_state *geo, u32 *input, u32 count)
 	point.pz = u2f(*input++);
 
 	/* transform with the current matrix */
-	transform_point(&point, geo->matrix);
+	transform_point(&point, select_geo_matrix(geo, point, palette_mode));
 
 	/* save for normal calculation */
 	p1.x = point.x; p1.y = point.y; p1.pz = point.pz;
@@ -1556,16 +1560,13 @@ void model2_state::geo_parse_nn_s(geo_state *geo, u32 *input, u32 count)
 			int32_t             luma;
 			texture_parameter * texparam;
 
-			/* Skip normal */
-			input += 3;
-
 			/* read in the next point */
 			point.x = u2f(*input++);
 			point.y = u2f(*input++);
 			point.pz = u2f(*input++);
 
 			/* transform with the current matrix */
-			transform_point(&point, geo->matrix);
+			transform_point(&point, select_geo_matrix(geo, point, palette_mode));
 
 			/* save for normal calculation */
 			p2.x = point.x; p2.y = point.y; p2.pz = point.pz;
@@ -1635,7 +1636,7 @@ void model2_state::geo_parse_nn_s(geo_state *geo, u32 *input, u32 count)
 				point.pz = u2f(*input++);
 
 				/* transform with the current matrix */
-				transform_point(&point, geo->matrix);
+				transform_point(&point, select_geo_matrix(geo, point, palette_mode));
 
 				/* save for normal calculation */
 				p3.x = point.x; p3.y = point.y; p3.pz = point.pz;
@@ -1651,7 +1652,8 @@ void model2_state::geo_parse_nn_s(geo_state *geo, u32 *input, u32 count)
 			else
 			{
 				/* skip the next 3 points */
-				input += 3;
+				if (!palette_mode)
+					input += 3;
 
 				/* for triangles, the rope of P1(n) is achieved by P0(n-1) (linktype 3) */
 				p3.x = p2.x; p3.y = p2.y; p3.pz = p2.pz;
@@ -1749,19 +1751,21 @@ u32 *model2_state::geo_object_data(geo_state *geo, u32 opcode, u32 *input)
 	if (obc == 0)
 		obc = 0xfffff;
 
+	bool palette_mode = (m_geotype == GEO_TOP_SKATER) && (((opcode >> 23) & 0x1f) == 0x11);
+
 	switch (geo->mode & 3)
 	{
 		/* Normals present, No Specular */
-		case 0: geo_parse_np_ns(geo, obp, obc); break;
+		case 0: geo_parse_np_ns(geo, obp, obc, palette_mode); break;
 
 		/* Normals present, Specular */
-		case 1: geo_parse_np_s(geo, obp, obc); break;
+		case 1: geo_parse_np_s(geo, obp, obc, palette_mode); break;
 
 		/* No Normals present, No Specular */
-		case 2: geo_parse_nn_ns(geo, obp, obc); break;
+		case 2: geo_parse_nn_ns(geo, obp, obc, palette_mode); break;
 
 		/* No Normals present, Specular */
-		case 3: geo_parse_nn_s(geo, obp, obc); break;
+		case 3: geo_parse_nn_s(geo, obp, obc, palette_mode); break;
 	}
 
 	/* move by 4 parameters */
@@ -2013,6 +2017,66 @@ u32 *model2_state::geo_matrix_write(geo_state *geo, u32 opcode, u32 *input)
 	/* read in the transformation matrix */
 	for (i = 0; i < 12; i++)
 		geo->matrix[i] = u2f(*input++);
+
+	return input;
+}
+
+/* Command 1B (Top Skater): Secondary Transformation Matrix Write */
+u32 *model2_state::geo_matrix2_write(geo_state *geo, u32 opcode, u32 *input)
+{
+	(void)opcode;
+
+	/* read in the secondary transformation matrix */
+	for (int i = 0; i < 12; i++)
+		geo->matrix2[i] = u2f(*input++);
+
+	return input;
+}
+
+/* Command 1C (Top Skater): Secondary Matrix Copy Translation */
+u32 *model2_state::geo_matrix2_copy_translation(geo_state *geo, u32 opcode, u32 *input)
+{
+	(void)opcode;
+
+	/* copy translation vector from matrix 0 to matrix 1 (reads 0 FIFO words) */
+	for (int i = 0; i < 3; i++)
+		geo->matrix2[i + 9] = geo->matrix[i + 9];
+
+	return input;
+}
+
+/* Command 1A (Last Bronx): Lighting mode / parameter */
+u32 *model2_state::geo_lb_light(geo_state *geo, u32 opcode, u32 *input)
+{
+	(void)opcode;
+	(void)geo;
+
+	/* reads 1 dword (mode / flag) */
+	input++;
+
+	return input;
+}
+
+/* Command 1B (Last Bronx): Mesh transform parameter */
+u32 *model2_state::geo_lb_matrix(geo_state *geo, u32 opcode, u32 *input)
+{
+	(void)opcode;
+	(void)geo;
+
+	/* reads 4 dwords (R15, R0, R1, R13: model index/pointer, angles/vector, count) */
+	input += 4;
+
+	return input;
+}
+
+/* Command 1C (Last Bronx): Mesh flush parameter */
+u32 *model2_state::geo_lb_flush(geo_state *geo, u32 opcode, u32 *input)
+{
+	(void)opcode;
+	(void)geo;
+
+	/* reads 1 dword */
+	input++;
 
 	return input;
 }
@@ -2285,6 +2349,14 @@ u32 *model2_state::geo_code_jump(geo_state *geo, u32 opcode, u32 *input)
 
 u32 *model2_state::geo_process_command(geo_state *geo, u32 opcode, u32 *input, bool *end_code)
 {
+	u32 func = (opcode >> 23) & 0x1f;
+	if (func >= 0x0e && func != 0x0f)
+	{
+		static std::set<std::pair<std::string, u32>> seen;
+		if (seen.insert({machine().system().name, func}).second)
+			osd_printf_info("GEO COMMAND SEEN: %s func=%02X opcode=%08X\n", machine().system().name, func, opcode);
+	}
+
 	switch ((opcode >> 23) & 0x1f)
 	{
 		case 0x00: input = geo_nop(geo, opcode, input);                   break;
@@ -2313,9 +2385,28 @@ u32 *model2_state::geo_process_command(geo_state *geo, u32 opcode, u32 *input, b
 		case 0x17: input = geo_mode(geo, opcode, input);                  break;
 		case 0x18: input = geo_zsort_mode(geo, opcode, input);            break;
 		case 0x19: input = geo_focal_distance(geo, opcode, input);        break;
-		case 0x1a: input = geo_light_source(geo, opcode, input);          break;
-		case 0x1b: input = geo_matrix_write(geo, opcode, input);          break;
-		case 0x1c: input = geo_translate_write(geo, opcode, input);       break;
+		case 0x1a:
+			if (m_geotype == GEO_LAST_BRONX)
+				input = geo_lb_light(geo, opcode, input);
+			else
+				input = geo_light_source(geo, opcode, input);
+			break;
+		case 0x1b:
+			if (m_geotype == GEO_TOP_SKATER)
+				input = geo_matrix2_write(geo, opcode, input);
+			else if (m_geotype == GEO_LAST_BRONX)
+				input = geo_lb_matrix(geo, opcode, input);
+			else
+				input = geo_matrix_write(geo, opcode, input);
+			break;
+		case 0x1c:
+			if (m_geotype == GEO_TOP_SKATER)
+				input = geo_matrix2_copy_translation(geo, opcode, input);
+			else if (m_geotype == GEO_LAST_BRONX)
+				input = geo_lb_flush(geo, opcode, input);
+			else
+				input = geo_translate_write(geo, opcode, input);
+			break;
 		case 0x1d: input = geo_code_upload(geo, opcode, input);           break;
 		case 0x1e: input = geo_code_jump(geo, opcode, input);             break;
 		case 0x1f: input = geo_end(geo, opcode, input); *end_code = true; break;
@@ -2355,6 +2446,8 @@ void model2_state::geo_parse()
 
 		/* process it */
 		input = geo_process_command(m_geo.get(), opcode, input, &end_code);
+		if (!input || end_code)
+			break;
 	}
 }
 
@@ -2406,6 +2499,9 @@ void model2_state::video_start()
 
 u32 model2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	if (!bitmap.valid())
+		return 0;
+
 	// if the scroll color table was written to, we need to refresh the palette
 	if (m_palette_dirty)
 	{

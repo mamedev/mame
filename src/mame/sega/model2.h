@@ -269,6 +269,7 @@ protected:
 private:
 	u32 m_geoctl = 0;
 	u32 m_geocnt = 0;
+	std::vector<u32> m_geo_program_dump;
 	u32 m_videocontrol = 0;
 	u32 m_framenum = 0;
 
@@ -278,6 +279,18 @@ private:
 	bool m_render_done = false;
 	int16_t m_crtc_xoffset = 0, m_crtc_yoffset = 0;
 	bool m_palette_dirty = false;
+
+	enum geo_type : u32
+	{
+		GEO_STANDARD = 0,
+		GEO_TOP_SKATER,
+		GEO_LAST_BRONX
+	};
+	u32 m_geotype = GEO_STANDARD;
+
+	u32 *geo_lb_light( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_lb_matrix( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_lb_flush( geo_state *geo, u32 opcode, u32 *input );
 
 	u32 *geo_process_command( geo_state *geo, u32 opcode, u32 *input, bool *end_code );
 	// geo commands
@@ -293,6 +306,8 @@ private:
 	u32 *geo_focal_distance( geo_state *geo, u32 opcode, u32 *input );
 	u32 *geo_light_source( geo_state *geo, u32 opcode, u32 *input );
 	u32 *geo_matrix_write( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_matrix2_write( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_matrix2_copy_translation( geo_state *geo, u32 opcode, u32 *input );
 	u32 *geo_translate_write( geo_state *geo, u32 opcode, u32 *input );
 	u32 *geo_data_mem_push( geo_state *geo, u32 opcode, u32 *input );
 	u32 *geo_test( geo_state *geo, u32 opcode, u32 *input );
@@ -303,10 +318,10 @@ private:
 	u32 *geo_code_upload( geo_state *geo, u32 opcode, u32 *input );
 	u32 *geo_code_jump( geo_state *geo, u32 opcode, u32 *input );
 	// geo code drawing paths
-	void geo_parse_np_ns( geo_state *geo, u32 *input, u32 count );
-	void geo_parse_np_s( geo_state *geo, u32 *input, u32 count );
-	void geo_parse_nn_ns( geo_state *geo, u32 *input, u32 count );
-	void geo_parse_nn_s( geo_state *geo, u32 *input, u32 count );
+	void geo_parse_np_ns( geo_state *geo, u32 *input, u32 count, bool palette_mode = false );
+	void geo_parse_np_s( geo_state *geo, u32 *input, u32 count, bool palette_mode = false );
+	void geo_parse_nn_ns( geo_state *geo, u32 *input, u32 count, bool palette_mode = false );
+	void geo_parse_nn_s( geo_state *geo, u32 *input, u32 count, bool palette_mode = false );
 
 	// raster functions
 	// main data input port
@@ -821,6 +836,7 @@ struct model2_state::geo_state
 	geo_state() : focus(0, 0), light(0, 0)
 	{
 		std::fill(std::begin(matrix), std::end(matrix), 0);
+		std::fill(std::begin(matrix2), std::end(matrix2), 0);
 		std::fill(std::begin(focus.p), std::end(focus.p), 0);
 		std::fill(std::begin(light.p), std::end(light.p), 0);
 		std::fill(std::begin(coef_table), std::end(coef_table), 0);
@@ -833,6 +849,7 @@ struct model2_state::geo_state
 	u32 *               polygon_rom = nullptr;      // Polygon ROM pointer
 	u32                 polygon_rom_mask = 0;       // Polygon ROM mask
 	float               matrix[12];                 // Current Transformation Matrix
+	float               matrix2[12];                // Secondary Transformation Matrix (Matrix Palette)
 	poly_vertex         focus;                      // Focus (x,y)
 	poly_vertex         light;                      // Light Vector
 	float               lod = 0;                    // LOD
