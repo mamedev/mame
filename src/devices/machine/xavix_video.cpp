@@ -358,6 +358,8 @@ u8 xavix_video_device::graphics_palram_r(offs_t offset)
 template <xavix_video_device::palette_plane Plane>
 void xavix_video_device::graphics_palram_w(offs_t offset, u8 data)
 {
+	screen().update_partial(screen().vpos());
+
 	m_graphics_palette_read_latch = data;
 	if constexpr (Plane == palette_plane::SH)
 	{
@@ -397,6 +399,8 @@ u8 superxavix_video_device::bitmap_palram_r(offs_t offset)
 template <xavix_video_device::palette_plane Plane>
 void superxavix_video_device::bitmap_palram_w(offs_t offset, u8 data)
 {
+	screen().update_partial(screen().vpos());
+
 	m_bitmap_palette_read_latch = data;
 	set_palette_data(offset + PALETTE_BANK_ENTRIES, Plane == palette_plane::SH
 			? data | (u16(m_bitmap_palram_l[offset]) << 8)
@@ -553,6 +557,8 @@ u8 superxavix_video_device::palette_component_r()
 template <superxavix_video_device::palette_bank Bank, superxavix_video_device::palette_component Component>
 void superxavix_video_device::palette_component_w(u8 data)
 {
+	screen().update_partial(screen().vpos());
+
 	(Bank == palette_bank::BITMAP ? m_bitmap_palette_read_latch : m_graphics_palette_read_latch) = data;
 
 	int const pen = unsigned(Bank) * PALETTE_BANK_ENTRIES + m_palette_ports[unsigned(Bank)].index;
@@ -572,8 +578,6 @@ void xavix_video_device::update_pen(int pen, u16 data)
 {
 	palette().set_pen_color(pen, pen_color(data));
 	m_color_effect_palette_valid = false;
-
-	screen().update_partial(screen().vpos());
 }
 
 void xavix_video_device::sprite_dma_ctrl_w(u8 data)
