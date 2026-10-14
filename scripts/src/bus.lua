@@ -6627,6 +6627,7 @@ end
 ---------------------------------------------------
 --
 --@src/devices/bus/xavix/cart.h,BUSES["XAVIX"] = true
+--@src/devices/bus/xavix/domyos_step.h,BUSES["XAVIX"] = true
 --@src/devices/bus/xavix/tvpc_mouse.h,BUSES["XAVIX"] = true
 --@src/devices/bus/xavix/suprtvpc_cart.h,BUSES["XAVIX"] = true
 --@src/devices/bus/xavix/suprtvpc_exp.h,BUSES["XAVIX"] = true
@@ -6638,6 +6639,8 @@ if BUSES["XAVIX"] then
 		MAME_DIR .. "src/devices/bus/xavix/cart.h",
 		MAME_DIR .. "src/devices/bus/xavix/cart_rom.cpp",
 		MAME_DIR .. "src/devices/bus/xavix/cart_rom.h",
+		MAME_DIR .. "src/devices/bus/xavix/domyos_step.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/domyos_step.h",
 		MAME_DIR .. "src/devices/bus/xavix/tvpc_mouse.cpp",
 		MAME_DIR .. "src/devices/bus/xavix/tvpc_mouse.h",
 		MAME_DIR .. "src/devices/bus/xavix/suprtvpc_cart.cpp",

@@ -17,6 +17,14 @@
     - The sensor dies are labeled CU5501 for Lord of the Rings and CU5501A
       for Star Wars and Dragon Quest, apparently from ETOMS.
 
+    Test-mode entry:
+    - ban_omt, ban_onep: Hold Select Up and Select Down from startup, then
+      soft reset and release.
+    - ttv_mx: Hold Motion Up, Brake and Accelerator from startup, then soft
+      reset and release.
+    - tom_jump: Hold Motion Up, Dash and Brake from startup, then soft reset
+      and release.
+
     BTANB:
     - tak_chq: Two red road-tile pixels remain visible at the right border at
       race start, also seen in hardware footage: https://www.youtube.com/watch?v=vTAt31e7X7Q

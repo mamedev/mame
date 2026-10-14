@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:MagikalUnicorn
 
-#ifndef MAME_TVGAMES_XAVIX_IO_XAVJMAT_MAT_H
-#define MAME_TVGAMES_XAVIX_IO_XAVJMAT_MAT_H
+#ifndef MAME_TVGAMES_XAVIX_IO_IR_STEP_MAT_H
+#define MAME_TVGAMES_XAVIX_IO_IR_STEP_MAT_H
 
 #pragma once
 
@@ -10,7 +10,7 @@
 
 #include <array>
 
-class xavix_jmat_device : public device_t
+class xavix_ir_step_mat_device : public device_t
 {
 public:
 	enum class protocol
@@ -19,7 +19,7 @@ public:
 		AEROSTEP
 	};
 
-	xavix_jmat_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	xavix_ir_step_mat_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void set_protocol(protocol type) { m_protocol = type; }
 	auto event_callback() { return m_ir.lookup()->event_callback(); }
@@ -63,6 +63,6 @@ private:
 	protocol m_protocol;
 };
 
-DECLARE_DEVICE_TYPE(XAVIX_JMAT, xavix_jmat_device)
+DECLARE_DEVICE_TYPE(XAVIX_IR_STEP_MAT, xavix_ir_step_mat_device)
 
-#endif // MAME_TVGAMES_XAVIX_IO_XAVJMAT_MAT_H
+#endif // MAME_TVGAMES_XAVIX_IO_IR_STEP_MAT_H

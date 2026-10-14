@@ -9,6 +9,7 @@
 #include "xavix_io_anpanmdx_sticks.h"
 #include "xavix_io_bkgj_survi_buster.h"
 #include "xavix_io_image_sensor.h"
+#include "xavix_io_ir_step_mat.h"
 #include "xavix_io_ntpj_piano.h"
 #include "xavix_io_ordj_sticks.h"
 #include "xavix_io_rkmj_arm.h"
@@ -18,7 +19,6 @@
 #include "xavix_io_xavbassf_tackle.h"
 #include "xavix_io_xavgolf_swing.h"
 #include "xavix_io_xavixport.h"
-#include "xavix_io_xavjmat_mat.h"
 
 #include "bus/xavix/suprtvpc_cart.h"
 #include "bus/xavix/suprtvpc_exp.h"
@@ -51,7 +51,7 @@ public:
 
 protected:
 	void configure_mapped_memory() ATTR_COLD;
-	xavixport_io_device &configure_xavixport_io(machine_config &config, u8 report_type) ATTR_COLD;
+	xavixport_io_device &configure_xavixport_io(machine_config &config) ATTR_COLD;
 
 	virtual u8 read_graphics_byte(u32 address);
 	u8 read_bitmap_byte(u32 address);
@@ -197,6 +197,7 @@ protected:
 	void configure_xavix_step_sensor(machine_config &config) ATTR_COLD;
 
 private:
+	xavixport_io_device &configure_xavix_step_mat(machine_config &config) ATTR_COLD;
 	void configure_pio() ATTR_COLD;
 
 	template <unsigned Port> u8 pio_input_r(offs_t offset, u8 mem_mask);
@@ -223,9 +224,9 @@ public:
 	void superxavix_xavaero(machine_config &config) ATTR_COLD;
 
 private:
-	void configure_mat(machine_config &config, xavix_jmat_device::protocol type) ATTR_COLD;
+	void configure_mat(machine_config &config, xavix_ir_step_mat_device::protocol type) ATTR_COLD;
 
-	required_device<xavix_jmat_device> m_mat;
+	required_device<xavix_ir_step_mat_device> m_mat;
 };
 
 class superxavix_xavmusic_state : public superxavix_i2c_pio1_state

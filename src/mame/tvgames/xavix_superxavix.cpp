@@ -43,6 +43,24 @@
       CIS and connect to the main PCB with an 18-20 wire ribbon cable.
     - Bowling and Boxing look identical; both sensor dies are labeled CU5501A.
 
+    Test-mode entry:
+    - xavtenni, xavtennij, xavbaseb, xavbasebj, xavgolf, xavgolfj, xavbowl,
+      xavbowlj, xavbassf, xavbox, xavboxj, epo_tfit: Hold Console Up and
+      Console Down from startup, then soft reset and release.
+    - anpanmdx: Hold Blue Rock / Shokupanman, Left Footprint / Baikinman and
+      Green Paper / Cream Panda from startup and soft reset about 5.7 seconds
+      later, then release.
+    - apmj2009: Hold Baikinman / Left Footprint, Melonpanna / Pink Triangle and
+      Shokupanman / Red Square from startup and soft reset about 7.7 seconds
+      later, then release.
+    - ban_ordj: Hold Triangle Up and Triangle Down from startup, then soft
+      reset and release.
+    - epo_doka: Hold Back and Pad 1 / Secret Gadget from startup, then soft
+      reset and release.
+    - ban_bkgj: Hold Rock / Confirm and Paper / Previous from startup and soft
+      reset about 6.5 seconds later, then release. Leave Scissors / Next
+      unpressed.
+
     TODO:
     - Shared IR controllers (e.g. xavtenni/xavtennij, xavbaseb/xavbasebj,
       epo_tfit and anpanmdx): Measure transmitter timing, repetition and
@@ -84,6 +102,9 @@
 #include "emu.h"
 #include "xavix_superxavix.h"
 
+#include "xavix_io_step_mat.h"
+
+#include "bus/xavix/domyos_step.h"
 #include "cpu/m6502/xavix2000.h"
 
 #include "softlist_dev.h"
@@ -466,17 +487,18 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( xavixport_panel )
 	PORT_START("PANEL")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Console Right")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_NAME("Console Left")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_NAME("Console Down")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_NAME("Console Up")
+	// Independent panel buttons permit opposing directions, including the Up+Down test-mode chord.
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("Console Right")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_16WAY PORT_NAME("Console Left")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_16WAY PORT_NAME("Console Down")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_16WAY PORT_NAME("Console Up")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Console Cancel") PORT_CODE(KEYCODE_C)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Console Enter") PORT_CODE(KEYCODE_ENTER)
 
 	PORT_INCLUDE(xavix_hard_power_control)
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Reset") PORT_CODE(input_seq::end_code)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(superxavix_state::xavixport_reset_button), 0)
 INPUT_PORTS_END
 
@@ -503,12 +525,12 @@ static INPUT_PORTS_START( maxheart )
 
 	PORT_MODIFY("IN0")
 	// The 16-way inputs allow independent Left/Right floor switches to be pressed together.
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Confirm")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Confirm")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_16WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_16WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_16WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_16WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Confirm") PORT_CODE(KEYCODE_W) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(0)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(0))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Confirm") PORT_CODE(KEYCODE_E) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(1)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(1))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_16WAY PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_16WAY PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_16WAY PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_16WAY PORT_CODE(KEYCODE_A)
 
 	PORT_MODIFY("PIO0")
 	// The game reads the same mat switches through PIO0 for inactivity tracking.
@@ -588,15 +610,14 @@ INPUT_PORTS_END
 //  Systems Sharing XaviXPORT Controls
 //-------------------------------------------------
 
-xavixport_io_device &superxavix_state::configure_xavixport_io(machine_config &config, u8 report_type)
+xavixport_io_device &superxavix_state::configure_xavixport_io(machine_config &config)
 {
 	m_pio_connected_inputs[2] |= 0xa4;
 	xavixport_io_device &xavixport_io(XAVIXPORT_IO(config, "xavixport_io", 0));
-	xavixport_io.set_report_type(report_type);
 	xavixport_io.panel_callback().set_ioport("PANEL");
-
-	m_super_soc->pio().input_callback<2>().set(xavixport_io, FUNC(xavixport_io_device::pio_r));
+	m_super_soc->pio().input_callback<2>().set(xavixport_io, FUNC(xavixport_io_device::pio_r)).mask(0xa0);
 	m_super_soc->pio().output_callback<2>().set(xavixport_io, FUNC(xavixport_io_device::pio_w));
+
 	return xavixport_io;
 }
 
@@ -719,7 +740,7 @@ void superxavix_xavgolf_state::superxavix_xavgolf(machine_config &config)
 {
 	superxavix_i2c_24c08(config);
 
-	configure_xavixport_io(config, 0x00);
+	configure_xavixport_io(config);
 
 	XAVIX_GOLF_SWING(config, m_swing_sensor, peripheral_clock());
 	m_swing_sensor->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
@@ -740,7 +761,7 @@ static INPUT_PORTS_START( xavixport_bassfishing )
 	PORT_INCLUDE(xavixport_panel)
 
 	PORT_MODIFY("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Reset") PORT_CODE(input_seq::end_code)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(superxavix_xavbassf_state::fishing_reset_button), 0)
 INPUT_PORTS_END
 
@@ -748,7 +769,7 @@ void superxavix_xavbassf_state::superxavix_xavbassf(machine_config &config)
 {
 	superxavix_i2c_24c08(config);
 
-	configure_xavixport_io(config, 0x00);
+	configure_xavixport_io(config);
 
 	// TODO: Identify the fitted EEPROM; the dump and SPI protocol are 25320-compatible.
 	EEPROM_25320(config, m_fishing_cart_eeprom);
@@ -851,7 +872,7 @@ void superxavix_i2c_camera_state::superxavix_xavbowl(machine_config &config)
 {
 	// The 24C08 is documented for xavbowlj and assumed to match xavbowl.
 	superxavix_i2c_24c08(config);
-	configure_xavixport_io(config, 0x00);
+	configure_xavixport_io(config);
 	XAVIX_ANALOG_IMAGE_SENSOR(config, m_camera, peripheral_clock());
 	// The ROM derives the throw from successive images of the passive ball reflector.
 	m_soc->adc().input_callback<0>().set(m_camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
@@ -873,7 +894,7 @@ void superxavix_i2c_pio1_state::superxavix_xavbox(machine_config &config)
 	superxavix_i2c_24c08(config);
 
 	configure_pio();
-	configure_xavixport_io(config, 0x00);
+	configure_xavixport_io(config);
 }
 
 void superxavix_xavbox_state::superxavix_xavbox(machine_config &config)
@@ -912,31 +933,31 @@ static INPUT_PORTS_START( xavix_jmat )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mat", FUNC(xavix_jmat_device::data_r))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mat", FUNC(xavix_ir_step_mat_device::data_r))
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_INCLUDE(xavixport_panel)
 INPUT_PORTS_END
 
-void superxavix_xavjmat_state::configure_mat(machine_config &config, xavix_jmat_device::protocol type)
+void superxavix_xavjmat_state::configure_mat(machine_config &config, xavix_ir_step_mat_device::protocol type)
 {
 	superxavix_i2c_24c64(config);
 	configure_rtc_pio<0>(config);
-	configure_xavixport_io(config, 0x00);
+	configure_xavixport_io(config);
 
-	XAVIX_JMAT(config, m_mat, peripheral_clock()).set_protocol(type);
+	XAVIX_IR_STEP_MAT(config, m_mat, peripheral_clock()).set_protocol(type);
 	m_mat->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
-	m_screen->screen_vblank().append(m_mat, FUNC(xavix_jmat_device::vblank_w));
+	m_screen->screen_vblank().append(m_mat, FUNC(xavix_ir_step_mat_device::vblank_w));
 }
 
 void superxavix_xavjmat_state::superxavix_xavjmat(machine_config &config)
 {
-	configure_mat(config, xavix_jmat_device::protocol::JMAT);
+	configure_mat(config, xavix_ir_step_mat_device::protocol::JMAT);
 }
 
 void superxavix_xavjmat_state::superxavix_xavaero(machine_config &config)
 {
-	configure_mat(config, xavix_jmat_device::protocol::AEROSTEP);
+	configure_mat(config, xavix_ir_step_mat_device::protocol::AEROSTEP);
 }
 
 
@@ -954,11 +975,19 @@ microphone_device &superxavix_i2c_pio1_state::configure_stereo_music_input(machi
 	return music_input;
 }
 
+xavixport_io_device &superxavix_i2c_pio1_state::configure_xavix_step_mat(machine_config &config)
+{
+	xavixport_io_device &xavixport_io(configure_xavixport_io(config));
+	xavix_step_mat_device &mat(XAVIX_STEP_MAT(config, "mat"));
+	xavixport_io.accessory_callback().set(mat, FUNC(xavix_step_mat_device::report_r));
+	return xavixport_io;
+}
+
 void superxavix_i2c_pio1_state::configure_xavix_step_sensor(machine_config &config)
 {
 	superxavix_i2c_24c64(config);
 	configure_rtc_pio<1>(config);
-	configure_xavixport_io(config, 0x10);
+	configure_xavix_step_mat(config);
 }
 
 microphone_device &superxavix_i2c_pio1_state::configure_xavix_music_input(machine_config &config)
@@ -1031,7 +1060,7 @@ void superxavix_i2c_pio1_state::superxavix_xavcheck(machine_config &config)
 {
 	superxavix_i2c_24c64(config);
 	configure_rtc_pio<0>(config);
-	xavixport_io_device &xavixport_io(configure_xavixport_io(config, 0x10));
+	xavixport_io_device &xavixport_io(configure_xavix_step_mat(config));
 	// PIO2.7's electrical source is unknown; Check & Balance treats it as receiver present.
 	xavixport_io.set_receiver_present(true);
 }
@@ -1055,8 +1084,12 @@ void superxavix_i2c_pio1_state::superxavix_domfitex(machine_config &config)
 	m_soc->set_clock(PAL_MASTER_CLOCK);
 	superxavix_video_device::configure_screen(*m_screen, m_soc->clock(), video_standard::PAL);
 
-	xavixport_io_device &xavixport_io(configure_xavixport_io(config, 0x20));
-	xavixport_io.event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<1>));
+	xavixport_io_device &xavixport_io(configure_xavixport_io(config));
+	domyos_step_port_device &step_port(DOMYOS_STEP_PORT(config, "step"));
+	xavixport_io.accessory_callback().set(step_port, FUNC(domyos_step_port_device::report_r));
+	m_super_soc->pio().input_callback<2>().append(step_port, FUNC(domyos_step_port_device::pio_r)).mask(0x04);
+	m_super_soc->pio().output_callback<2>().append(step_port, FUNC(domyos_step_port_device::pio_w));
+	step_port.event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<1>));
 }
 
 // Stand-in for domdance's undumped dsPIC33FJ12GP202, based on the I/O protocol
@@ -1899,10 +1932,10 @@ static INPUT_PORTS_START( ndpmj )
 
 	PORT_MODIFY("PIO0")
 	// Mat contacts are independent; PORT_16WAY preserves simultaneous presses of the two Select pads.
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Far Left / Back") PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("Centre Left / Select / Previous") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("Centre Right / Select / Next") PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Far Right / Confirm") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Far Left / Back") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("Centre Left / Select / Previous") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("Centre Right / Select / Next") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Far Right / Confirm") PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("PIO1")

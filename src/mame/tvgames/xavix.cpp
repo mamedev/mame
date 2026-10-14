@@ -18,6 +18,26 @@
     copyright. It is the only XaviX-based game so far to not show these
     details anywhere in the game.
 
+    Test-mode entry:
+    - rad_bb2: Reset while holding Console X and Console O (works every other
+      reset), then release. Use Console X to cycle through modes until reaching
+      the input test.
+    - rad_mtrk, rad_mtrkp: Hold Horn and Nitro on startup, then release.
+    - rad_rh: Hold Joystick Right and Menu on startup, then release.
+    - ltv_tam: Hold both Push Button / Confirm buttons from startup and soft
+      reset during the Bandai logo (about five seconds after startup), then
+      release. A cold start alone does not enter the test.
+    - ban_krrj: Hold Right Arrow and X from startup and soft reset about
+      3.1 seconds later, then release.
+    - tak_wdg: Hold Left and Right on startup, then release.
+    - tomplc: Hold Push-to-Talk and Headlights / Left from startup, then soft
+      reset and release.
+    - epo_tp2s: Hold Blue Mat Right and Red Mat Confirm / Orange from startup,
+      then soft reset and release.
+    - epo_tp2p: Hold Right Side Right and Left Side Confirm from startup and
+      soft reset about 2.7 seconds later, then release.
+    - pl1000: Hold P1 Trigger, P1 Start and P2 Start on startup, then release.
+
     Undumped Software (preliminary; some titles may still be missing):
     Compiled from various sources; thanks to Sean Riddle.
 
@@ -43,8 +63,6 @@
       epo_dmon, pl1000 and tak_daig): Verify physical calibration and event timing.
     - Shared IR controllers (e.g. epo_epp/epo_epp2/epo_epp3, tak_comt and
       tak_wdg): Measure physical report cadence.
-    - rad_crdn/rad_crdnp: Verify cold-start saved-game detection; zero-filled
-      RAM enables Continue.
     - jarajal: Measure the hopper pulse interval and establish payout-control
       wiring.
     - epo_guru: Measure the physical pedal-resistance motor force response.
@@ -714,7 +732,7 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( xavix_reset_control )
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Reset") PORT_CODE(input_seq::end_code)
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_state::reset_button), 0)
 INPUT_PORTS_END
 
@@ -733,7 +751,6 @@ static INPUT_PORTS_START( xavix_lightgun_2p )
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2)
 
 	PORT_START("GUN2_1")
-	// Keep upward keyboard aiming separate from the console's Reset key.
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_CODE_DEC(KEYCODE_E)
 INPUT_PORTS_END
 
@@ -969,7 +986,6 @@ static INPUT_PORTS_START( tak_geig )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Main Gun / Confirm")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Bomb")
-	// The usual P2 Up key R is already the console's Reset button.
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -994,10 +1010,10 @@ static INPUT_PORTS_START( epo_mms )
 	PORT_INCLUDE(xavix_i2c)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Pink / Select")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Green / Confirm")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Purple / Select")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Orange / Confirm")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Pink / Select") PORT_CODE(KEYCODE_A) PORT_CODE(MOUSECODE_BUTTON3_INDEXED(0)) PORT_CODE(GUNCODE_BUTTON2_INDEXED(0))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Green / Confirm") PORT_CODE(KEYCODE_S) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(0)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(0))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Purple / Select") PORT_CODE(KEYCODE_D) PORT_CODE(MOUSECODE_BUTTON3_INDEXED(1)) PORT_CODE(GUNCODE_BUTTON2_INDEXED(1))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Orange / Confirm") PORT_CODE(KEYCODE_F) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(1)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(1))
 	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_UNUSED )
 	// This unknown boot strap reaches display/factory paths and overlaps some internal effects of the auto-off-disable chord.
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1277,10 +1293,10 @@ static INPUT_PORTS_START( rad_bdp )
 
 	PORT_MODIFY("IN0")
 	// Independent flower contacts permit the two-pad combinations used for Double moves.
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Purple / Up")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Red / Down")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Blue / Back")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pink / Enter")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Purple / Up") PORT_CODE(KEYCODE_A) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(0)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(0))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Red / Down") PORT_CODE(KEYCODE_S) PORT_CODE(MOUSECODE_BUTTON3_INDEXED(0)) PORT_CODE(GUNCODE_BUTTON2_INDEXED(0))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Blue / Back") PORT_CODE(KEYCODE_D) PORT_CODE(MOUSECODE_BUTTON2_INDEXED(0))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pink / Enter") PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
@@ -1732,7 +1748,6 @@ u8 xavix_epo_dmon_state::lightgun_r(offs_t offset)
 
 // Video Challenger (PL-1000)
 static INPUT_PORTS_START( pl1000 )
-	// For test mode, hold P1 Trigger, P1 Start and P2 Start on startup.
 	PORT_INCLUDE(xavix)
 	PORT_INCLUDE(xavix_hard_power_control)
 	PORT_INCLUDE(xavix_reset_control)
@@ -2311,8 +2326,6 @@ void xavix_state::xavix_rad_bb(machine_config &config)
 
 
 // Play TV Baseball 2
-// To access hidden test mode, reset while holding Console X and Console O (works every other reset).
-// Use Console X to cycle through modes until reaching the input test.
 static INPUT_PORTS_START( rad_bb2 )
 	PORT_INCLUDE(xavix)
 
@@ -3154,10 +3167,10 @@ static INPUT_PORTS_START( jpopira )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Cancel") PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Select Left") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Select Right") PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Confirm") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Cancel") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Select Left") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Select Right") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Confirm") PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
@@ -4062,7 +4075,6 @@ void xavix_multiplt_state::io1_output_w(u8 data, u8 direction)
 
 // Play TV Monster Truck
 static INPUT_PORTS_START( rad_mtrk )
-	// To access service mode in Monster Truck hold Horn and Nitro on startup
 	// Play TV Monster Truck runs off an entirely different codebase to everything else, presumably coded by the developer from scratch rather than using code supplied by SSD Company LTD
 
 	PORT_INCLUDE(xavix)

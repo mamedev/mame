@@ -14,52 +14,31 @@ public:
 	xavixport_io_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto panel_callback() { return m_panel_cb.bind(); }
-	auto event_callback() { return m_event_cb.bind(); }
-	void set_report_type(u8 report_type) { m_report_type = report_type; }
+	// Decoded accessory bytes 1 and 2, in the low and high byte respectively.
+	auto accessory_callback() { return m_accessory_cb.bind(); }
 	void set_receiver_present(bool present) { m_receiver_present = present; }
 
 	u8 pio_r(offs_t offset, u8 mem_mask);
 	void pio_w(offs_t offset, u8 data, u8 mem_mask);
 
 protected:
-	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	TIMER_CALLBACK_MEMBER(event_timer);
 	void latch_report();
-	void latch_hub_report();
-	void hub_command_bit_w(int state);
 
 	devcb_read8 m_panel_cb;
-	optional_ioport_array<2> m_sensors;
-	optional_ioport m_power;
-	optional_ioport m_hub;
-	devcb_write_line m_event_cb;
-	emu_timer *m_event_timer;
+	devcb_read16 m_accessory_cb;
 
 	std::array<u8, 5> m_report;
-	std::array<u8, 5> m_hub_report;
-	std::array<u8, 3> m_hub_command;
-	u8 m_report_type;
 	bool m_receiver_present;
 	u8 m_bit;
-	u8 m_hub_bit;
-	u8 m_hub_command_bits;
-	u8 m_hub_report_bytes;
 	bool m_selected;
 	bool m_clock;
-	bool m_request;
-	bool m_request_output;
-	bool m_hub_clock;
-	bool m_host_transmit;
-	bool m_hub_active;
-	bool m_hub_transfer;
 };
 
 DECLARE_DEVICE_TYPE(XAVIXPORT_IO, xavixport_io_device)
-
-INPUT_PORTS_EXTERN( xavix_step_sensor );
 
 #endif // MAME_TVGAMES_XAVIX_IO_XAVIXPORT_H
