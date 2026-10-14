@@ -1387,6 +1387,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/c128/vdcram.h,BUSES["C128"] = true
+---------------------------------------------------
+
+if BUSES["C128"] then
+	files {
+		MAME_DIR .. "src/devices/bus/c128/mmu.cpp",
+		MAME_DIR .. "src/devices/bus/c128/mmu.h",
+		MAME_DIR .. "src/devices/bus/c128/supercpu128_mmu.cpp",
+		MAME_DIR .. "src/devices/bus/c128/supercpu128_mmu.h",
+		MAME_DIR .. "src/devices/bus/c128/vdcram.cpp",
+		MAME_DIR .. "src/devices/bus/c128/vdcram.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/c64/exp.h,BUSES["C64"] = true
 --@src/devices/bus/c64/user.h,BUSES["C64"] = true
 ---------------------------------------------------
@@ -1421,6 +1438,8 @@ if BUSES["C64"] then
 		MAME_DIR .. "src/devices/bus/c64/dinamic.h",
 		MAME_DIR .. "src/devices/bus/c64/dqbb.cpp",
 		MAME_DIR .. "src/devices/bus/c64/dqbb.h",
+		MAME_DIR .. "src/devices/bus/c64/dualsid.cpp",
+		MAME_DIR .. "src/devices/bus/c64/dualsid.h",
 		MAME_DIR .. "src/devices/bus/c64/easy_calc_result.cpp",
 		MAME_DIR .. "src/devices/bus/c64/easy_calc_result.h",
 		MAME_DIR .. "src/devices/bus/c64/easyflash.cpp",
@@ -1481,6 +1500,8 @@ if BUSES["C64"] then
 		MAME_DIR .. "src/devices/bus/c64/prophet64.h",
 		MAME_DIR .. "src/devices/bus/c64/ps64.cpp",
 		MAME_DIR .. "src/devices/bus/c64/ps64.h",
+		MAME_DIR .. "src/devices/bus/c64/ramlink.cpp",
+		MAME_DIR .. "src/devices/bus/c64/ramlink.h",
 		MAME_DIR .. "src/devices/bus/c64/reu.cpp",
 		MAME_DIR .. "src/devices/bus/c64/reu.h",
 		MAME_DIR .. "src/devices/bus/c64/rex.cpp",
@@ -1491,6 +1512,8 @@ if BUSES["C64"] then
 		MAME_DIR .. "src/devices/bus/c64/ross.h",
 		MAME_DIR .. "src/devices/bus/c64/sfx_sound_expander.cpp",
 		MAME_DIR .. "src/devices/bus/c64/sfx_sound_expander.h",
+		MAME_DIR .. "src/devices/bus/c64/sid.cpp",
+		MAME_DIR .. "src/devices/bus/c64/sid.h",
 		MAME_DIR .. "src/devices/bus/c64/silverrock.cpp",
 		MAME_DIR .. "src/devices/bus/c64/silverrock.h",
 		MAME_DIR .. "src/devices/bus/c64/simons_basic.cpp",
@@ -1547,10 +1570,22 @@ if BUSES["C64"] then
 		MAME_DIR .. "src/devices/bus/c64/16kb.h",
 		MAME_DIR .. "src/devices/bus/c64/bn1541.cpp",
 		MAME_DIR .. "src/devices/bus/c64/bn1541.h",
+		MAME_DIR .. "src/devices/bus/c64/digimax.cpp",
+		MAME_DIR .. "src/devices/bus/c64/digimax.h",
 		MAME_DIR .. "src/devices/bus/c64/geocable.cpp",
 		MAME_DIR .. "src/devices/bus/c64/geocable.h",
 		MAME_DIR .. "src/devices/bus/c64/up9600.cpp",
 		MAME_DIR .. "src/devices/bus/c64/up9600.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/c64/ramlink.cpp", GEN_DIR .. "emu/layout/ramlink.lh" },
+		{ MAME_DIR .. "src/devices/bus/c64/supercpu.cpp", GEN_DIR .. "emu/layout/supercpu.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "ramlink"),
+		layoutbuildtask("emu/layout", "supercpu"),
 	}
 end
 
@@ -1617,6 +1652,8 @@ if BUSES["CBMIEC"] then
 		MAME_DIR .. "src/devices/bus/cbmiec/c64_nl10.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/cmdhd.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/cmdhd.h",
+		MAME_DIR .. "src/devices/bus/cbmiec/cmdpar.cpp",
+		MAME_DIR .. "src/devices/bus/cbmiec/cmdpar.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/diag264_lb_iec.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/diag264_lb_iec.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/dolphindos.cpp",
@@ -3114,6 +3151,8 @@ if BUSES["ISA"] then
 		MAME_DIR .. "src/devices/bus/isa/side116.h",
 		MAME_DIR .. "src/devices/bus/isa/ssi2001.cpp",
 		MAME_DIR .. "src/devices/bus/isa/ssi2001.h",
+		MAME_DIR .. "src/devices/bus/isa/stda.cpp",
+		MAME_DIR .. "src/devices/bus/isa/stda.h",
 		MAME_DIR .. "src/devices/bus/isa/stereo_fx.cpp",
 		MAME_DIR .. "src/devices/bus/isa/stereo_fx.h",
 		MAME_DIR .. "src/devices/bus/isa/svga_cirrus.cpp",

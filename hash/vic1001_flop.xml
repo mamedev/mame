@@ -157,7 +157,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=O7_P8YwZCuQ -->
-	<software name="revicion" supported="no">
+	<software name="revicion">
 		<description>reVICion</description>
 		<year>2024</year>
 		<publisher>Desire</publisher>
@@ -172,7 +172,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=WlralRNCQR4 -->
-	<software name="omddelux" supported="no">
+	<software name="omddelux">
 		<description>Orb MegaDemo Delux</description>
 		<year>2016</year>
 		<publisher>Orb</publisher>
@@ -181,6 +181,19 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="OMD_Delux.d64" size="174848" crc="53f6583d" sha1="afefd007f8a37b7c50678fa731b9ae6ce3d47259"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impo3">
+		<description>Impossiblator 3</description>
+		<year>2007</year>
+		<publisher>PWP</publisher>
+		<sharedfeat name="iec8_default" value="c1541"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="impo3.d64" size="174848" crc="11a5519d" sha1="a07ee122091507ee8f59658d73d1b28ee272d693"/>
 			</dataarea>
 		</part>
 	</software>

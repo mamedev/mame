@@ -11,139 +11,135 @@
 
 #include "screen.h"
 
+#include <algorithm>
+#include <utility>
 
 
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
+namespace {
 
-#define VERBOSE_LEVEL 0
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_LEVEL >= N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f: %-24s", machine().time().as_double(), (char*) M ); \
-			logerror A; \
-		} \
-	} while(0)
-
-
-#define VREFRESHINLINES 28
-
-#define TIMER1HELPER (m_reg[0] | (m_reg[1] << 8))
-#define TIMER2HELPER (m_reg[2] | (m_reg[3] << 8))
-#define TIMER3HELPER (m_reg[4] | (m_reg[5] << 8))
-#define TIMER1 (TIMER1HELPER ? TIMER1HELPER : 0x10000)
-#define TIMER2 (TIMER2HELPER ? TIMER2HELPER : 0x10000)
-#define TIMER3 (TIMER3HELPER ? TIMER3HELPER : 0x10000)
-
-#define RASTER_OFFSET           44
-#define RASTERLINE_2_C16(a)    ((a + m_lines - RASTER_OFFSET) % m_lines)
-#define C16_2_RASTERLINE(a)    ((a + RASTER_OFFSET) % m_lines)
-#define TED7360_YPOS            m_top
-#define XPOS 32
-#define YPOS (48 - m_top)
-
-#define SCREENON               (m_reg[6] & 0x10)
-#define TEST                   (m_reg[6] & 0x80)
-#define VERTICALPOS            (m_reg[6] & 0x07)
-#define HORICONTALPOS          (m_reg[7] & 0x07)
-#define ECMON                  (m_reg[6] & 0x40)
-#define HIRESON                (m_reg[6] & 0x20)
-#define MULTICOLORON           (m_reg[7] & 0x10)
-#define REVERSEON              (!(m_reg[7] & 0x80))
-
-/* hardware inverts character when bit 7 set (character taken &0x7f) */
-/* instead of fetching character with higher number! */
-#define LINES25     (m_reg[6] & 0x08)     /* else 24 Lines */
-#define LINES       (LINES25 ? 25 : 24)
-#define YSIZE       (LINES * 8)
-#define COLUMNS40   (m_reg[7] & 0x08)     /* else 38 Columns */
-#define COLUMNS     (COLUMNS40 ? 40 : 38)
-#define XSIZE       (COLUMNS * 8)
-
-#define INROM       (m_reg[0x12] & 0x04)
-#define CHARGENADDR (REVERSEON && !HIRESON && !MULTICOLORON ? ((m_reg[0x13] & 0xfc) << 8) : ((m_reg[0x13] & 0xf8) << 8))
-#define BITMAPADDR  ((m_reg[0x12] & 0x38) << 10)
-#define VIDEOADDR   ((m_reg[0x14] & 0xf8) << 8)
-
-#define RASTERLINE  (((m_reg[0xa] & 0x01) << 8) | m_reg[0xb])
-#define CURSOR1POS  (m_reg[0xd] | ((m_reg[0xc] & 0x03) << 8))
-#define CURSOR2POS  (m_reg[0x1b] | ((m_reg[0x1a] & 0x03) << 8))
-#define CURSORRATE  ((m_reg[0x1f] & 0x7c) >> 2)
-
-#define BACKGROUNDCOLOR (m_reg[0x15] & 0x7f)
-#define FOREGROUNDCOLOR (m_reg[0x16] & 0x7f)
-#define MULTICOLOR1     (m_reg[0x17] & 0x7f)
-#define MULTICOLOR2     (m_reg[0x18] & 0x7f)
-#define FRAMECOLOR      (m_reg[0x19] & 0x7f)
-
-static constexpr int LINE_PHASE_START[5] = { 0, 4, 90, 101, 114 };
-static constexpr int LINE_PHASE_CYCLES_FETCH[4] = { 4, 43, 5, 13 };
-static constexpr int LINE_PHASE_CYCLES_BORDER[4] = { 4, 86, 6, 13 };
-
-
-static const rgb_t PALETTE_MOS[] =
+enum : uint32_t
 {
-/* black, white, red, cyan */
-/* purple, green, blue, yellow */
-/* orange, light orange, pink, light cyan, */
-/* light violett, light green, light blue, light yellow */
-/* these 16 colors are 8 times here in different luminance (dark..light) */
-/* taken from digitized tv screenshot */
-	rgb_t(0x06, 0x01, 0x03), rgb_t(0x2b, 0x2b, 0x2b), rgb_t(0x67, 0x0e, 0x0f), rgb_t(0x00, 0x3f, 0x42),
-	rgb_t(0x57, 0x00, 0x6d), rgb_t(0x00, 0x4e, 0x00), rgb_t(0x19, 0x1c, 0x94), rgb_t(0x38, 0x38, 0x00),
-	rgb_t(0x56, 0x20, 0x00), rgb_t(0x4b, 0x28, 0x00), rgb_t(0x16, 0x48, 0x00), rgb_t(0x69, 0x07, 0x2f),
-	rgb_t(0x00, 0x46, 0x26), rgb_t(0x06, 0x2a, 0x80), rgb_t(0x2a, 0x14, 0x9b), rgb_t(0x0b, 0x49, 0x00),
+	EV_REFRESH_ON       = 1U << 0,
+	EV_REFRESH_OFF      = 1U << 1,
+	EV_INC_LINE         = 1U << 2,
+	EV_LINE_REGS        = 1U << 3,
+	EV_STOP_INC_DMA     = 1U << 4,
+	EV_LATCH_DMA        = 1U << 5,
+	EV_LATCH_CHARPOS    = 1U << 6,
+	EV_INIT_DISPLAY     = 1U << 7,
+	EV_INC_LINE_2       = 1U << 8,
+	EV_INC_VSUB         = 1U << 9,
+	EV_VSUB_REG         = 1U << 10,
+	EV_COLOR            = 1U << 11,
+	EV_RELOAD_CHARPOS   = 1U << 16,
+	EV_SINGLE_ON        = 1U << 17,
+	EV_DMA_1            = 1U << 18,
+	EV_DMA_2            = 1U << 19,
+	EV_DMA_3            = 1U << 20,
+	EV_DMA_4            = 1U << 21,
+	EV_DMA_5            = 1U << 22,
+	EV_DMA_ABORT        = 1U << 23,
+	EV_T2_START         = 1U << 24,
+	EV_VSCROLL          = 1U << 25,
+	EV_HSCROLL          = 1U << 26,
+	EV_SELECT_RENDER    = 1U << 27,
+	EV_FORCE_SINGLE     = 1U << 28,
+	EV_CHARPOS_REGS     = 1U << 29,
+	EV_RESET_VSUB       = 1U << 30,
+	EV_FLASH            = 1U << 31,
 
-	rgb_t(0x00, 0x03, 0x02), rgb_t(0x3d, 0x3d, 0x3d), rgb_t(0x75, 0x1e, 0x20), rgb_t(0x00, 0x50, 0x4f),
-	rgb_t(0x6a, 0x10, 0x78), rgb_t(0x04, 0x5c, 0x00), rgb_t(0x2a, 0x2a, 0xa3), rgb_t(0x4c, 0x47, 0x00),
-	rgb_t(0x69, 0x2f, 0x00), rgb_t(0x59, 0x38, 0x00), rgb_t(0x26, 0x56, 0x00), rgb_t(0x75, 0x15, 0x41),
-	rgb_t(0x00, 0x58, 0x3d), rgb_t(0x15, 0x3d, 0x8f), rgb_t(0x39, 0x22, 0xae), rgb_t(0x19, 0x59, 0x00),
-
-	rgb_t(0x00, 0x03, 0x04), rgb_t(0x42, 0x42, 0x42), rgb_t(0x7b, 0x28, 0x20), rgb_t(0x02, 0x56, 0x59),
-	rgb_t(0x6f, 0x1a, 0x82), rgb_t(0x0a, 0x65, 0x09), rgb_t(0x30, 0x34, 0xa7), rgb_t(0x50, 0x51, 0x00),
-	rgb_t(0x6e, 0x36, 0x00), rgb_t(0x65, 0x40, 0x00), rgb_t(0x2c, 0x5c, 0x00), rgb_t(0x7d, 0x1e, 0x45),
-	rgb_t(0x01, 0x61, 0x45), rgb_t(0x1c, 0x45, 0x99), rgb_t(0x42, 0x2d, 0xad), rgb_t(0x1d, 0x62, 0x00),
-
-	rgb_t(0x05, 0x00, 0x02), rgb_t(0x56, 0x55, 0x5a), rgb_t(0x90, 0x3c, 0x3b), rgb_t(0x17, 0x6d, 0x72),
-	rgb_t(0x87, 0x2d, 0x99), rgb_t(0x1f, 0x7b, 0x15), rgb_t(0x46, 0x49, 0xc1), rgb_t(0x66, 0x63, 0x00),
-	rgb_t(0x84, 0x4c, 0x0d), rgb_t(0x73, 0x55, 0x00), rgb_t(0x40, 0x72, 0x00), rgb_t(0x91, 0x33, 0x5e),
-	rgb_t(0x19, 0x74, 0x5c), rgb_t(0x32, 0x59, 0xae), rgb_t(0x59, 0x3f, 0xc3), rgb_t(0x32, 0x76, 0x00),
-
-	rgb_t(0x02, 0x01, 0x06), rgb_t(0x84, 0x7e, 0x85), rgb_t(0xbb, 0x67, 0x68), rgb_t(0x45, 0x96, 0x96),
-	rgb_t(0xaf, 0x58, 0xc3), rgb_t(0x4a, 0xa7, 0x3e), rgb_t(0x73, 0x73, 0xec), rgb_t(0x92, 0x8d, 0x11),
-	rgb_t(0xaf, 0x78, 0x32), rgb_t(0xa1, 0x80, 0x20), rgb_t(0x6c, 0x9e, 0x12), rgb_t(0xba, 0x5f, 0x89),
-	rgb_t(0x46, 0x9f, 0x83), rgb_t(0x61, 0x85, 0xdd), rgb_t(0x84, 0x6c, 0xef), rgb_t(0x5d, 0xa3, 0x29),
-
-	rgb_t(0x02, 0x00, 0x0a), rgb_t(0xb2, 0xac, 0xb3), rgb_t(0xe9, 0x92, 0x92), rgb_t(0x6c, 0xc3, 0xc1),
-	rgb_t(0xd9, 0x86, 0xf0), rgb_t(0x79, 0xd1, 0x76), rgb_t(0x9d, 0xa1, 0xff), rgb_t(0xbd, 0xbe, 0x40),
-	rgb_t(0xdc, 0xa2, 0x61), rgb_t(0xd1, 0xa9, 0x4c), rgb_t(0x93, 0xc8, 0x3d), rgb_t(0xe9, 0x8a, 0xb1),
-	rgb_t(0x6f, 0xcd, 0xab), rgb_t(0x8a, 0xb4, 0xff), rgb_t(0xb2, 0x9a, 0xff), rgb_t(0x88, 0xcb, 0x59),
-
-	rgb_t(0x02, 0x00, 0x0a), rgb_t(0xc7, 0xca, 0xc9), rgb_t(0xff, 0xac, 0xac), rgb_t(0x85, 0xd8, 0xe0),
-	rgb_t(0xf3, 0x9c, 0xff), rgb_t(0x92, 0xea, 0x8a), rgb_t(0xb7, 0xba, 0xff), rgb_t(0xd6, 0xd3, 0x5b),
-	rgb_t(0xf3, 0xbe, 0x79), rgb_t(0xe6, 0xc5, 0x65), rgb_t(0xb0, 0xe0, 0x57), rgb_t(0xff, 0xa4, 0xcf),
-	rgb_t(0x89, 0xe5, 0xc8), rgb_t(0xa4, 0xca, 0xff), rgb_t(0xca, 0xb3, 0xff), rgb_t(0xa2, 0xe5, 0x7a),
-
-	rgb_t(0x01, 0x01, 0x01), rgb_t(0xff, 0xff, 0xff), rgb_t(0xff, 0xf6, 0xf2), rgb_t(0xd1, 0xff, 0xff),
-	rgb_t(0xff, 0xe9, 0xff), rgb_t(0xdb, 0xff, 0xd3), rgb_t(0xfd, 0xff, 0xff), rgb_t(0xff, 0xff, 0xa3),
-	rgb_t(0xff, 0xff, 0xc1), rgb_t(0xff, 0xff, 0xb2), rgb_t(0xfc, 0xff, 0xa2), rgb_t(0xff, 0xee, 0xff),
-	rgb_t(0xd1, 0xff, 0xff), rgb_t(0xeb, 0xff, 0xff), rgb_t(0xff, 0xf8, 0xff), rgb_t(0xed, 0xff, 0xbc)
+	EV_DMA_MASK         = EV_DMA_1 | EV_DMA_2 | EV_DMA_3 | EV_DMA_4 | EV_DMA_5 | EV_DMA_ABORT
 };
 
+enum : uint8_t
+{
+	MODE_MCM = 0x01,
+	MODE_BMM = 0x02,
+	MODE_ECM = 0x04,
+	MODE_RVS_OFF = 0x08
+};
 
-#define TONE1_VALUE     (m_reg[0x0e] | ((m_reg[0x12] & 3) << 8))
-#define TONE2_VALUE     (m_reg[0x0f] | ((m_reg[0x10] & 3) << 8))
-#define VOLUME          (m_reg[0x11] & 0x0f)
-#define VOICE1_ON       (m_reg[0x11] & 0x10)
-#define VOICE2_ON       (m_reg[0x11] & 0x20)
-#define NOISE_ON        ((m_reg[0x11] & 0x60) == 0x40)
-#define DIGITAL_ON      (m_reg[0x11] & 0x80)
+constexpr uint8_t REGISTER_INIT[0x20] =
+{
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1b, 0x08, 0xff, 0x04, 0xa0, 0x00, 0xff, 0xff, 0x00, 0x00,
+	0x7c, 0x00, 0xc4, 0x01, 0x07, 0x80, 0x80, 0x80, 0x80, 0x80, 0xff, 0xe8, 0xfe, 0xe0, 0xc8, 0x80
+};
+
+// palettes measured from VICE's default internal palettes
+constexpr rgb_t PALETTE_PAL[128] =
+{
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0x20, 0x20, 0x20), rgb_t(0x5e, 0x07, 0x00), rgb_t(0x00, 0x39, 0x40),
+	rgb_t(0x56, 0x00, 0x6c), rgb_t(0x00, 0x4a, 0x00), rgb_t(0x15, 0x0a, 0xae), rgb_t(0x2b, 0x36, 0x00),
+	rgb_t(0x54, 0x16, 0x00), rgb_t(0x42, 0x26, 0x00), rgb_t(0x12, 0x43, 0x00), rgb_t(0x5f, 0x00, 0x38),
+	rgb_t(0x00, 0x45, 0x08), rgb_t(0x00, 0x1a, 0x9a), rgb_t(0x2e, 0x00, 0xac), rgb_t(0x00, 0x4a, 0x00),
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0x30, 0x30, 0x30), rgb_t(0x6e, 0x17, 0x10), rgb_t(0x00, 0x49, 0x50),
+	rgb_t(0x66, 0x06, 0x7c), rgb_t(0x00, 0x5a, 0x00), rgb_t(0x25, 0x1a, 0xbe), rgb_t(0x3b, 0x46, 0x00),
+	rgb_t(0x64, 0x26, 0x00), rgb_t(0x52, 0x36, 0x00), rgb_t(0x22, 0x53, 0x00), rgb_t(0x6f, 0x0b, 0x48),
+	rgb_t(0x00, 0x55, 0x18), rgb_t(0x0e, 0x2a, 0xaa), rgb_t(0x3e, 0x0d, 0xbc), rgb_t(0x0b, 0x5a, 0x00),
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0x40, 0x40, 0x40), rgb_t(0x7e, 0x27, 0x20), rgb_t(0x02, 0x59, 0x60),
+	rgb_t(0x76, 0x16, 0x8c), rgb_t(0x0a, 0x6a, 0x00), rgb_t(0x35, 0x2a, 0xce), rgb_t(0x4b, 0x56, 0x00),
+	rgb_t(0x74, 0x36, 0x00), rgb_t(0x62, 0x46, 0x00), rgb_t(0x32, 0x63, 0x00), rgb_t(0x7f, 0x1b, 0x58),
+	rgb_t(0x01, 0x65, 0x28), rgb_t(0x1e, 0x3a, 0xba), rgb_t(0x4e, 0x1d, 0xcc), rgb_t(0x1b, 0x6a, 0x00),
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0x50, 0x50, 0x50), rgb_t(0x8e, 0x37, 0x30), rgb_t(0x12, 0x69, 0x70),
+	rgb_t(0x86, 0x26, 0x9c), rgb_t(0x1a, 0x7a, 0x04), rgb_t(0x45, 0x3a, 0xde), rgb_t(0x5b, 0x66, 0x00),
+	rgb_t(0x84, 0x46, 0x00), rgb_t(0x72, 0x56, 0x00), rgb_t(0x42, 0x73, 0x00), rgb_t(0x8f, 0x2b, 0x68),
+	rgb_t(0x11, 0x75, 0x38), rgb_t(0x2e, 0x4a, 0xca), rgb_t(0x5e, 0x2d, 0xdc), rgb_t(0x2b, 0x7a, 0x00),
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0x78, 0x78, 0x78), rgb_t(0xb6, 0x5f, 0x58), rgb_t(0x3a, 0x91, 0x98),
+	rgb_t(0xae, 0x4e, 0xc4), rgb_t(0x42, 0xa2, 0x2c), rgb_t(0x6d, 0x62, 0xff), rgb_t(0x83, 0x8e, 0x00),
+	rgb_t(0xac, 0x6e, 0x25), rgb_t(0x9a, 0x7e, 0x00), rgb_t(0x6a, 0x9b, 0x00), rgb_t(0xb7, 0x53, 0x90),
+	rgb_t(0x39, 0x9d, 0x60), rgb_t(0x56, 0x72, 0xf2), rgb_t(0x86, 0x55, 0xff), rgb_t(0x53, 0xa2, 0x03),
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0x90, 0x90, 0x90), rgb_t(0xce, 0x77, 0x70), rgb_t(0x52, 0xa9, 0xb0),
+	rgb_t(0xc6, 0x66, 0xdc), rgb_t(0x5a, 0xba, 0x44), rgb_t(0x85, 0x7a, 0xff), rgb_t(0x9b, 0xa6, 0x02),
+	rgb_t(0xc4, 0x86, 0x3d), rgb_t(0xb2, 0x96, 0x16), rgb_t(0x82, 0xb3, 0x04), rgb_t(0xcf, 0x6b, 0xa8),
+	rgb_t(0x51, 0xb5, 0x78), rgb_t(0x6e, 0x8a, 0xff), rgb_t(0x9e, 0x6d, 0xff), rgb_t(0x6b, 0xba, 0x1b),
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0xc0, 0xc0, 0xc0), rgb_t(0xfe, 0xa7, 0xa0), rgb_t(0x82, 0xd9, 0xe0),
+	rgb_t(0xf6, 0x96, 0xff), rgb_t(0x8a, 0xea, 0x74), rgb_t(0xb5, 0xaa, 0xff), rgb_t(0xcb, 0xd6, 0x32),
+	rgb_t(0xf4, 0xb6, 0x6d), rgb_t(0xe2, 0xc6, 0x46), rgb_t(0xb2, 0xe3, 0x34), rgb_t(0xff, 0x9b, 0xd8),
+	rgb_t(0x81, 0xe5, 0xa8), rgb_t(0x9e, 0xba, 0xff), rgb_t(0xce, 0x9d, 0xff), rgb_t(0x9b, 0xea, 0x4b),
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0xff, 0xff, 0xff), rgb_t(0xff, 0xe7, 0xe0), rgb_t(0xc2, 0xff, 0xff),
+	rgb_t(0xff, 0xd6, 0xff), rgb_t(0xca, 0xff, 0xb4), rgb_t(0xf5, 0xea, 0xff), rgb_t(0xff, 0xff, 0x72),
+	rgb_t(0xff, 0xf6, 0xad), rgb_t(0xff, 0xff, 0x86), rgb_t(0xf2, 0xff, 0x74), rgb_t(0xff, 0xdb, 0xff),
+	rgb_t(0xc1, 0xff, 0xe8), rgb_t(0xde, 0xfa, 0xff), rgb_t(0xff, 0xdd, 0xff), rgb_t(0xdb, 0xff, 0x8b)
+};
+
+constexpr rgb_t PALETTE_NTSC[128] =
+{
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0x20, 0x20, 0x20), rgb_t(0x62, 0x0b, 0x0e), rgb_t(0x00, 0x35, 0x32),
+	rgb_t(0x5d, 0x09, 0x23), rgb_t(0x00, 0x37, 0x1d), rgb_t(0x12, 0x15, 0x6f), rgb_t(0x2e, 0x2b, 0x00),
+	rgb_t(0x61, 0x12, 0x00), rgb_t(0x4e, 0x1e, 0x00), rgb_t(0x00, 0x37, 0x00), rgb_t(0x61, 0x0b, 0x12),
+	rgb_t(0x00, 0x37, 0x20), rgb_t(0x00, 0x26, 0x64), rgb_t(0x49, 0x09, 0x48), rgb_t(0x00, 0x38, 0x02),
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0x30, 0x30, 0x30), rgb_t(0x72, 0x1b, 0x1e), rgb_t(0x00, 0x45, 0x42),
+	rgb_t(0x6d, 0x19, 0x33), rgb_t(0x00, 0x47, 0x2d), rgb_t(0x22, 0x25, 0x7f), rgb_t(0x3e, 0x3b, 0x00),
+	rgb_t(0x71, 0x22, 0x02), rgb_t(0x5e, 0x2e, 0x00), rgb_t(0x09, 0x47, 0x05), rgb_t(0x71, 0x1b, 0x22),
+	rgb_t(0x00, 0x47, 0x30), rgb_t(0x00, 0x36, 0x74), rgb_t(0x59, 0x19, 0x58), rgb_t(0x00, 0x48, 0x12),
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0x40, 0x40, 0x40), rgb_t(0x82, 0x2b, 0x2e), rgb_t(0x00, 0x55, 0x52),
+	rgb_t(0x7d, 0x29, 0x43), rgb_t(0x03, 0x57, 0x3d), rgb_t(0x32, 0x35, 0x8f), rgb_t(0x4e, 0x4b, 0x00),
+	rgb_t(0x81, 0x32, 0x12), rgb_t(0x6e, 0x3e, 0x00), rgb_t(0x19, 0x57, 0x15), rgb_t(0x81, 0x2b, 0x32),
+	rgb_t(0x02, 0x57, 0x40), rgb_t(0x0a, 0x46, 0x84), rgb_t(0x69, 0x29, 0x68), rgb_t(0x10, 0x58, 0x22),
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0x50, 0x50, 0x50), rgb_t(0x92, 0x3b, 0x3e), rgb_t(0x0e, 0x65, 0x62),
+	rgb_t(0x8d, 0x39, 0x53), rgb_t(0x13, 0x67, 0x4d), rgb_t(0x42, 0x45, 0x9f), rgb_t(0x5e, 0x5b, 0x01),
+	rgb_t(0x91, 0x42, 0x22), rgb_t(0x7e, 0x4e, 0x06), rgb_t(0x29, 0x67, 0x25), rgb_t(0x91, 0x3b, 0x42),
+	rgb_t(0x12, 0x67, 0x50), rgb_t(0x1a, 0x56, 0x94), rgb_t(0x79, 0x39, 0x78), rgb_t(0x20, 0x68, 0x32),
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0x78, 0x78, 0x78), rgb_t(0xba, 0x63, 0x66), rgb_t(0x36, 0x8d, 0x8a),
+	rgb_t(0xb5, 0x61, 0x7b), rgb_t(0x3b, 0x8f, 0x75), rgb_t(0x6a, 0x6d, 0xc7), rgb_t(0x86, 0x83, 0x29),
+	rgb_t(0xb9, 0x6a, 0x4a), rgb_t(0xa6, 0x76, 0x2e), rgb_t(0x51, 0x8f, 0x4d), rgb_t(0xb9, 0x63, 0x6a),
+	rgb_t(0x3a, 0x8f, 0x78), rgb_t(0x42, 0x7e, 0xbc), rgb_t(0xa1, 0x61, 0xa0), rgb_t(0x48, 0x90, 0x5a),
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0x90, 0x90, 0x90), rgb_t(0xd2, 0x7b, 0x7e), rgb_t(0x4e, 0xa5, 0xa2),
+	rgb_t(0xcd, 0x79, 0x93), rgb_t(0x53, 0xa7, 0x8d), rgb_t(0x82, 0x85, 0xdf), rgb_t(0x9e, 0x9b, 0x41),
+	rgb_t(0xd1, 0x82, 0x62), rgb_t(0xbe, 0x8e, 0x46), rgb_t(0x69, 0xa7, 0x65), rgb_t(0xd1, 0x7b, 0x82),
+	rgb_t(0x52, 0xa7, 0x90), rgb_t(0x5a, 0x96, 0xd4), rgb_t(0xb9, 0x79, 0xb8), rgb_t(0x60, 0xa8, 0x72),
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0xc0, 0xc0, 0xc0), rgb_t(0xff, 0xab, 0xae), rgb_t(0x7e, 0xd5, 0xd2),
+	rgb_t(0xfd, 0xa9, 0xc3), rgb_t(0x83, 0xd7, 0xbd), rgb_t(0xb2, 0xb5, 0xff), rgb_t(0xce, 0xcb, 0x71),
+	rgb_t(0xff, 0xb2, 0x92), rgb_t(0xee, 0xbe, 0x76), rgb_t(0x99, 0xd7, 0x95), rgb_t(0xff, 0xab, 0xb2),
+	rgb_t(0x82, 0xd7, 0xc0), rgb_t(0x8a, 0xc6, 0xff), rgb_t(0xe9, 0xa9, 0xe8), rgb_t(0x90, 0xd8, 0xa2),
+	rgb_t(0x00, 0x00, 0x00), rgb_t(0xff, 0xff, 0xff), rgb_t(0xff, 0xeb, 0xee), rgb_t(0xbe, 0xff, 0xff),
+	rgb_t(0xff, 0xe9, 0xff), rgb_t(0xc3, 0xff, 0xfd), rgb_t(0xf2, 0xf5, 0xff), rgb_t(0xff, 0xff, 0xb1),
+	rgb_t(0xff, 0xf2, 0xd2), rgb_t(0xff, 0xfe, 0xb6), rgb_t(0xd9, 0xff, 0xd5), rgb_t(0xff, 0xeb, 0xf2),
+	rgb_t(0xc2, 0xff, 0xff), rgb_t(0xca, 0xff, 0xff), rgb_t(0xff, 0xe9, 0xff), rgb_t(0xd0, 0xff, 0xe2)
+};
 
 // output level for volume (bits 0-3), voice 1 (bit 4) and voice 2 (bit 5)
-static const int16_t TED_SOUND_LEVEL[64] =
+constexpr int16_t TED_SOUND_LEVEL[64] =
 {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -155,36 +151,18 @@ static const int16_t TED_SOUND_LEVEL[64] =
 	0x4e08, 0x4e08, 0x4e08, 0x4e08, 0x4e08, 0x4e08, 0x4e08, 0x4e08
 };
 
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-constexpr unsigned mos7360_device::NTSC_VRETRACERATE;
-constexpr unsigned mos7360_device::PAL_VRETRACERATE;
-constexpr unsigned mos7360_device::HRETRACERATE;
-constexpr unsigned mos7360_device::HSIZE;
-constexpr unsigned mos7360_device::VSIZE;
-constexpr unsigned mos7360_device::NTSC_LINES;
-constexpr unsigned mos7360_device::PAL_LINES;
+} // anonymous namespace
 
 
-// device type definition
 DEFINE_DEVICE_TYPE(MOS7360, mos7360_device, "mos7360", "MOS 7360 TED")
 
 
-// default address maps
 void mos7360_device::mos7360_videoram_map(address_map &map)
 {
 	if (!has_configured_map(0))
 		map(0x00000, 0x0ffff).mirror(0x10000).ram();
 }
 
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
 
 device_memory_interface::space_config_vector mos7360_device::memory_space_config() const
 {
@@ -194,67 +172,6 @@ device_memory_interface::space_config_vector mos7360_device::memory_space_config
 }
 
 
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-inline void mos7360_device::set_interrupt(int mask)
-{
-	/* kernel itself polls for timer 2 shot (interrupt disabled!) when cassette loading */
-	m_reg[9] |= mask;
-	if ((m_reg[0xa] & m_reg[9] & 0x5e))
-	{
-		if (!(m_reg[9] & 0x80))
-		{
-			//DBG_LOG(1, "ted7360", ("irq start %.2x\n", mask));
-			m_reg[9] |= 0x80;
-			m_write_irq(ASSERT_LINE);
-		}
-	}
-	m_reg[9] |= mask;
-}
-
-inline void mos7360_device::clear_interrupt(int mask)
-{
-	m_reg[9] &= ~mask;
-	if ((m_reg[9] & 0x80) && !(m_reg[9] & m_reg[0xa] & 0x5e))
-	{
-		DBG_LOG(1, "ted7360", ("irq end %.2x\n", mask));
-		m_reg[9] &= ~0x80;
-		m_write_irq(CLEAR_LINE);
-	}
-}
-
-inline int mos7360_device::rastercolumn()
-{
-	return (int) ((machine().time().as_double() - m_rastertime) * clock() * 8 + 0.5);
-}
-
-inline uint8_t mos7360_device::read_ram(offs_t offset)
-{
-	m_last_data = space(0).read_byte(offset);
-
-	return m_last_data;
-}
-
-inline uint8_t mos7360_device::read_rom(offs_t offset)
-{
-	m_last_data = space(0).read_byte(0x10000 | offset);
-
-	return m_last_data;
-}
-
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  mos7360_device - constructor
-//-------------------------------------------------
-
 mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MOS7360, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
@@ -262,111 +179,214 @@ mos7360_device::mos7360_device(const machine_config &mconfig, const char *tag, d
 	device_video_interface(mconfig, *this),
 	m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 17, 0, address_map_constructor(FUNC(mos7360_device::mos7360_videoram_map), this)),
 	m_write_irq(*this),
+	m_write_ba(*this),
 	m_read_k(*this, 0xff),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_bus_tap_installed(false),
 	m_stream(nullptr),
-	m_cpu(*this, finder_base::DUMMY_TAG)
+	m_palette(PALETTE_PAL),
+	m_catching_up(false)
 {
 }
 
 
 //-------------------------------------------------
-//  device_start - device-specific startup
+//  configure_screen - raw parameters in beam
+//  coordinates (x from the end of horizontal
+//  blanking, y from the start of vertical sync)
 //-------------------------------------------------
+
+void mos7360_device::configure_screen(screen_device &screen, bool ntsc) const
+{
+	if (ntsc)
+		screen.set_raw(clock() / 2, HTOTAL, 0, HVISIBLE, NTSC_LINES, NTSC_VBEND, NTSC_VBSTART);
+	else
+		screen.set_raw(clock() * 2 / 5, HTOTAL, 0, HVISIBLE, PAL_LINES, PAL_VBEND, PAL_VBSTART);
+}
+
 
 void mos7360_device::device_start()
 {
-	// allocate timers
-	m_timer[TIMER_ID_1] = timer_alloc(FUNC(mos7360_device::timer_expired), this);
-	m_timer[TIMER_ID_2] = timer_alloc(FUNC(mos7360_device::timer_expired), this);
-	m_timer[TIMER_ID_3] = timer_alloc(FUNC(mos7360_device::timer_expired), this);
-	m_line_timer = timer_alloc(FUNC(mos7360_device::raster_interrupt_gen), this);
-	m_phase_timer = timer_alloc(FUNC(mos7360_device::line_phase_gen), this);
-	m_frame_timer = timer_alloc(FUNC(mos7360_device::frame_interrupt_gen), this);
-	m_frame_timer->adjust(screen().frame_period(), 0, screen().frame_period());
+	m_bitmap.allocate(HTOTAL, PAL_LINES);
 
-	// allocate screen bitmap
-	screen().register_screen_bitmap(m_bitmap);
+	m_stream = stream_alloc(0, 1, clock() / 80);
+	m_ba_timer = timer_alloc(FUNC(mos7360_device::ba_tick), this);
 
-	// create sound stream
-	m_stream = stream_alloc(0, 1, clock() / 4);
-
-	// register for state saving
+	save_item(NAME(m_slot));
+	save_item(NAME(m_cpu_prev_slot));
+	save_item(NAME(m_ba));
+	save_item(NAME(m_ba_armed));
+	save_item(NAME(m_ba_slot));
+	save_item(NAME(m_ba_rise_slot));
+	save_item(NAME(m_cpu_base));
+	save_item(NAME(m_pre_done));
 	save_item(NAME(m_reg));
-	save_item(NAME(m_last_data));
+	save_item(NAME(m_bus));
 	save_item(NAME(m_rom));
-	save_item(NAME(m_frame_count));
-	save_item(NAME(m_lines));
-	save_item(NAME(m_timer_active));
-	save_item(NAME(m_cursor1));
-	save_item(NAME(m_chargenaddr));
-	save_item(NAME(m_bitmapaddr));
-	save_item(NAME(m_videoaddr));
-	save_item(NAME(m_x_begin));
-	save_item(NAME(m_x_end));
-	save_item(NAME(m_y_begin));
-	save_item(NAME(m_y_end));
-	save_item(NAME(m_c16_bitmap));
-	save_item(NAME(m_bitmapmulti));
-	save_item(NAME(m_mono));
-	save_item(NAME(m_monoinversed));
-	save_item(NAME(m_multi));
-	save_item(NAME(m_ecmcolor));
-	save_item(NAME(m_colors));
-	save_item(NAME(m_rasterline));
-	save_item(NAME(m_lastline));
-	save_item(NAME(m_rastertime));
-	save_item(NAME(m_line_phase));
-	save_item(NAME(m_badlines));
-	save_item(NAME(m_top));
+	save_item(NAME(m_ntsc));
+	save_item(NAME(m_col));
+	save_item(NAME(m_line));
+	save_item(NAME(m_saved_line));
+	save_item(NAME(m_line_d1));
+	save_item(NAME(m_char_line));
+	save_item(NAME(m_prev_char_line));
+	save_item(NAME(m_char_pos));
+	save_item(NAME(m_saved_char_pos));
+	save_item(NAME(m_char_pos_reload));
+	save_item(NAME(m_char_col));
+	save_item(NAME(m_dma_pos));
+	save_item(NAME(m_dma_pos_reload));
+	save_item(NAME(m_dma_base));
+	save_item(NAME(m_bitmap_base));
+	save_item(NAME(m_charset_base));
+	save_item(NAME(m_cursor_pos));
+	save_item(NAME(m_irq_line));
+	save_item(NAME(m_refresh));
+	save_item(NAME(m_frozen));
+	save_item(NAME(m_frozen_half));
+	save_item(NAME(m_flash));
+	save_item(NAME(m_render_window));
+	save_item(NAME(m_inc_char_line));
+	save_item(NAME(m_bitmap_disable));
+	save_item(NAME(m_display_window));
+	save_item(NAME(m_display_active));
+	save_item(NAME(m_hblank));
+	save_item(NAME(m_vblank));
+	save_item(NAME(m_prev_raster_irq));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_dma_enabled));
+	save_item(NAME(m_single));
+	save_item(NAME(m_ext_single));
+	save_item(NAME(m_dma_flags));
+	save_item(NAME(m_dma_active));
+	save_item(NAME(m_inc_dma_pos));
+	save_item(NAME(m_inc_char_pos));
+	save_item(NAME(m_cpu_running));
+	save_item(NAME(m_cpu_halted));
+	save_item(NAME(m_events_even));
+	save_item(NAME(m_events_odd));
+	save_item(NAME(m_t1_run));
+	save_item(NAME(m_t2_run));
+	save_item(NAME(m_t3_run));
+	save_item(NAME(m_t1));
+	save_item(NAME(m_t1_reload));
+	save_item(NAME(m_t2));
+	save_item(NAME(m_t3));
+	save_item(NAME(m_attr_buf));
+	save_item(NAME(m_attr_tmp));
+	save_item(NAME(m_char_buf));
+	save_item(NAME(m_shift_enable));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_render_mode));
+	save_item(NAME(m_char_mask));
+	save_item(STRUCT_MEMBER(m_shift, attr));
+	save_item(STRUCT_MEMBER(m_shift, ch));
+	save_item(STRUCT_MEMBER(m_shift, bitmap));
+	save_item(STRUCT_MEMBER(m_shift, flags));
+	save_item(STRUCT_MEMBER(m_current, attr));
+	save_item(STRUCT_MEMBER(m_current, ch));
+	save_item(STRUCT_MEMBER(m_current, bitmap));
+	save_item(STRUCT_MEMBER(m_current, flags));
+	save_item(STRUCT_MEMBER(m_next, attr));
+	save_item(STRUCT_MEMBER(m_next, ch));
+	save_item(STRUCT_MEMBER(m_next, bitmap));
+	save_item(STRUCT_MEMBER(m_next, flags));
+	save_item(NAME(m_color_latch));
+	save_item(NAME(m_hscroll));
+	save_item(NAME(m_vscroll));
+	save_item(NAME(m_beam_x));
+	save_item(NAME(m_beam_y));
+	save_item(NAME(m_vsync_pending));
 	save_item(NAME(m_osc_accu));
 	save_item(NAME(m_osc_reload));
 	save_item(NAME(m_osc_sign));
 	save_item(NAME(m_osc_out));
 	save_item(NAME(m_noise_sr));
-	save_item(NAME(m_bus_fetch));
 }
 
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
 void mos7360_device::device_reset()
 {
-	memset(m_reg, 0, sizeof(m_reg));
-	m_last_data = 0;
-	m_bus_fetch = false;
+	if (!m_bus_tap_installed)
+	{
+		m_bus_tap = m_cpu->space(AS_PROGRAM).install_readwrite_tap(0x0000, 0xffff, "ted_bus",
+				[this] (offs_t offset, uint8_t &data, uint8_t mem_mask)
+				{
+					if (m_cpu->executing())
+						cpu_access(data, false);
+				},
+				[this] (offs_t offset, uint8_t &data, uint8_t mem_mask)
+				{
+					if (m_cpu->executing())
+						cpu_access(data, true);
+				});
+		m_bus_tap_installed = true;
+	}
 
-	m_rom = 1;  // FIXME: at start should be RAM or ROM? old c16 code set it to ROM at init: is it correct?
+	std::copy(std::begin(REGISTER_INIT), std::end(REGISTER_INIT), std::begin(m_reg));
+	m_bus = 0xff;
+	m_rom = true;
 
-	m_lines = PAL_LINES;
-	m_top = 4;
-	m_chargenaddr = 0;
-	m_bitmapaddr = 0;
-	m_videoaddr = 0;
-	std::fill(std::begin(m_timer_active), std::end(m_timer_active), false);
-	m_cursor1 = 0;
+	m_col = 100;
+	m_line = 224;
+	m_saved_line = 224;
+	m_line_d1 = 223;
+	m_char_line = 0;
+	m_prev_char_line = 0;
+	m_char_pos = 0;
+	m_saved_char_pos = 0;
+	m_char_pos_reload = 0;
+	m_char_col = 0;
+	m_dma_pos = 0x3ff;
+	m_dma_pos_reload = 0x3ff;
+	m_dma_base = 0;
+	m_bitmap_base = 0;
+	m_charset_base = 0;
+	m_cursor_pos = 0x3ff;
+	m_irq_line = 0;
+	m_refresh = 0;
 
-	m_rasterline = 0;
-	m_lastline = 0;
+	m_frozen = false;
+	m_frozen_half = false;
+	m_flash = 0;
+	m_render_window = false;
+	m_inc_char_line = false;
+	m_bitmap_disable = 0x03;
+	m_display_window = false;
+	m_display_active = false;
+	m_hblank = true;
+	m_vblank = true;
+	m_prev_raster_irq = false;
+	m_dma_enabled = false;
+	m_single = 0;
+	m_ext_single = true;
+	m_dma_flags = 0;
+	m_dma_active = false;
+	m_inc_dma_pos = false;
+	m_inc_char_pos = false;
+	m_cpu_running = true;
+	m_cpu_halted = false;
+	m_events_even = 0;
+	m_events_odd = 0;
+	m_events_now = 0;
 
-	m_rastertime = 0.0;
-	m_line_phase = 0;
+	m_t1_run = m_t2_run = m_t3_run = true;
+	m_t1 = m_t1_reload = m_t2 = m_t3 = 0;
 
-	m_frame_count = 0;
-
-	m_x_begin = 0;
-	m_x_end = 0;
-	m_y_begin = 0;
-	m_y_end = 0;
-
-	memset(m_c16_bitmap, 0, sizeof(m_c16_bitmap));
-	memset(m_bitmapmulti, 0, sizeof(m_bitmapmulti));
-	memset(m_mono, 0, sizeof(m_mono));
-	memset(m_monoinversed, 0, sizeof(m_monoinversed));
-	memset(m_multi, 0, sizeof(m_multi));
-	memset(m_ecmcolor, 0, sizeof(m_ecmcolor));
-	memset(m_colors, 0, sizeof(m_colors));
+	std::fill(std::begin(m_attr_buf), std::end(m_attr_buf), 0);
+	std::fill(std::begin(m_attr_tmp), std::end(m_attr_tmp), 0);
+	std::fill(std::begin(m_char_buf), std::end(m_char_buf), 0);
+	m_shift_enable = false;
+	m_mode = 0;
+	m_render_mode = 0;
+	m_char_mask = 0x7f;
+	m_shift = m_current = m_next = character{ 0, 0, 0, 0 };
+	std::fill(std::begin(m_color_latch), std::end(m_color_latch), 0x80);
+	m_hscroll = 0;
+	m_vscroll = 3;
+	m_beam_x = 0;
+	m_beam_y = 0;
+	m_vsync_pending = false;
 
 	std::fill(std::begin(m_osc_accu), std::end(m_osc_accu), 0);
 	std::fill(std::begin(m_osc_reload), std::end(m_osc_reload), 1);
@@ -374,49 +394,1462 @@ void mos7360_device::device_reset()
 	std::fill(std::begin(m_osc_out), std::end(m_osc_out), 0);
 	m_noise_sr = 0xff;
 
-	m_badlines = false;
+	m_ba_armed = false;
+	m_ba_timer->adjust(attotime::never);
 
-	set_clocks();
+	m_ntsc = false;
+	update_timing();
+
+	m_irq = false;
+	m_write_irq(0);
+
+	m_slot = 0;
+	m_pre_done = false;
+	m_cpu_waiting = false;
+	m_cpu_access = false;
+	m_cpu_data = 0xff;
+	m_cpu_base = m_cpu->total_cycles();
+	m_cpu_prev_slot = 0;
+
+	m_ba = true;
+	m_ba_slot = 0;
+	m_ba_rise_slot = 0;
+	m_write_ba(1);
 }
 
 
-//-------------------------------------------------
-//  device_post_load - device-specific post load
-//-------------------------------------------------
+void mos7360_device::device_pre_save()
+{
+	sync();
+}
+
 
 void mos7360_device::device_post_load()
 {
-	update_cpu_clock();
+	update_timing();
+}
+
+
+//**************************************************************************
+//  SCHEDULING
+//**************************************************************************
+
+uint64_t mos7360_device::cpu_slot() const
+{
+	return m_cpu->total_cycles() - m_cpu_base;
 }
 
 
 //-------------------------------------------------
-//  timer_expired -
+//  slot_delay - time from now until the CPU is
+//  half a cycle past the start of 'slot'
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(mos7360_device::timer_expired)
+attotime mos7360_device::slot_delay(uint64_t slot) const
 {
-	static const uint8_t s_irq_values[3] = { 0x08, 0x10, 0x40 };
+	uint64_t const now = cpu_slot();
+	uint64_t const cycles = (slot > now) ? (slot - now) : 0;
 
-	if (param == TIMER_ID_1)
+	attotime const when = m_cpu->local_time() + m_cpu->cycles_to_attotime(cycles) + m_cpu->cycles_to_attotime(1) / 2;
+	attotime const base = machine().time();
+	if (when > base)
+		return when - base;
+
+	// the CPU can lag machine time; let it run up to the slot rather than spin here
+	return (slot > now) ? (m_cpu->cycles_to_attotime(1) / 2) : attotime::zero;
+}
+
+
+void mos7360_device::sync()
+{
+	catch_up(cpu_slot());
+}
+
+
+//-------------------------------------------------
+//  catch_up - finish every half-cycle before
+//  'slot' and run the part of 'slot' that comes
+//  before the CPU's bus access
+//-------------------------------------------------
+
+void mos7360_device::catch_up(uint64_t slot)
+{
+	if (m_catching_up)
+		return;
+
+	m_catching_up = true;
+
+	while (m_slot < slot)
 	{
-		// proven by digital sound of several intros like eoroidpro
-		m_timer[param]->adjust(attotime::from_ticks(TIMER1, clock()), param);
+		if (!m_pre_done)
+		{
+			half_cycle_pre();
+			m_pre_done = true;
+		}
+
+		if (!m_cpu_access && !(m_col & 1) && !m_frozen_half && !m_cpu_running && !m_cpu_halted)
+			break;
+
+		half_cycle_post();
+		m_slot++;
+		m_pre_done = false;
+	}
+
+	if (!m_pre_done)
+	{
+		half_cycle_pre();
+		m_pre_done = true;
+	}
+
+	update_ba();
+
+	m_catching_up = false;
+}
+
+
+uint64_t mos7360_device::next_even_slot() const
+{
+	return m_slot + ((m_col & 1) ? 1 : 2);
+}
+
+
+//-------------------------------------------------
+//  update_ba - drive BA (wired to the CPU's RDY)
+//  and schedule its next edge; a release is
+//  predicted from column 76 so that the halted
+//  read cycles are only run once the CPU access
+//  that owns them supplies its address
+//-------------------------------------------------
+
+void mos7360_device::update_ba()
+{
+	if (m_ba)
+	{
+		if (!m_cpu_running)
+		{
+			if (m_slot >= m_ba_rise_slot)
+			{
+				m_ba = false;
+				m_write_ba(0);
+			}
+		}
+		else if (!m_frozen && (m_events_even & EV_DMA_2))
+		{
+			arm_ba(next_even_slot());
+		}
+	}
+
+	if (!m_ba)
+	{
+		if (m_cpu_running)
+		{
+			arm_ba(m_slot);
+		}
+		else if (m_frozen || (m_events_even & EV_DMA_ABORT))
+		{
+			arm_ba(next_even_slot());
+		}
+		else
+		{
+			unsigned const delta = (76 + 114 - m_col) % 114;
+			arm_ba(m_slot + (delta ? delta : 114));
+		}
+	}
+}
+
+
+void mos7360_device::arm_ba(uint64_t slot)
+{
+	if (m_ba_armed && (slot == m_ba_slot))
+		return;
+
+	m_ba_armed = true;
+	m_ba_slot = slot;
+	m_ba_timer->adjust(slot_delay(slot));
+}
+
+
+TIMER_CALLBACK_MEMBER(mos7360_device::ba_tick)
+{
+	m_ba_armed = false;
+
+	if (m_ba)
+	{
+		catch_up(cpu_slot());
 	}
 	else
 	{
-		m_timer[param]->adjust(attotime::from_ticks(0x10000, clock()), param);
+		m_ba = true;
+		m_ba_rise_slot = m_ba_slot;
+		m_write_ba(1);
 	}
+}
 
-	m_timer_active[param] = true;
-	set_interrupt(s_irq_values[param]);
+
+bool mos7360_device::cpu_slot_free(bool write) const
+{
+	if (m_col & 1)
+		return !m_single;
+
+	return m_cpu_running || (write && !m_cpu_halted);
 }
 
 
 //-------------------------------------------------
-//  sound_stream_update - handle update requests for
-//  our sound stream
+//  cpu_cycle - run up to the CPU's bus cycle and
+//  hold the CPU while its half-cycle isn't free
 //-------------------------------------------------
+
+void mos7360_device::cpu_cycle(uint8_t data, bool write)
+{
+	uint64_t const slot = cpu_slot();
+	if (m_catching_up || (slot == m_cpu_prev_slot))
+		return;
+
+	m_cpu_access = true;
+	m_cpu_data = data;
+
+	if (slot > m_cpu_prev_slot + 1)
+	{
+		catch_up(m_cpu_prev_slot + 1);
+		m_cpu_waiting = !write;
+	}
+
+	catch_up(slot);
+
+	int stall = 0;
+	while (!cpu_slot_free(write))
+	{
+		m_cpu_waiting = !write;
+		catch_up(m_slot + 1);
+		stall++;
+	}
+
+	m_cpu_waiting = false;
+	m_cpu_access = false;
+	m_cpu_prev_slot = m_slot;
+
+	if (stall)
+		m_cpu->adjust_icount(-stall);
+}
+
+
+//-------------------------------------------------
+//  cpu_access - the CPU's bus cycle has finished;
+//  in single clock mode the following odd
+//  half-cycle is withheld from the CPU, so it is
+//  charged now and the next access lands after it
+//-------------------------------------------------
+
+void mos7360_device::cpu_access(uint8_t data, bool write)
+{
+	if (machine().side_effects_disabled())
+		return;
+
+	cpu_cycle(data, write);
+	m_bus = data;
+
+	if (!(m_col & 1) && m_single && (cpu_slot() == m_slot))
+	{
+		m_cpu->adjust_icount(-1);
+		m_cpu_prev_slot = m_slot + 1;
+	}
+}
+
+
+//**************************************************************************
+//  HALF-CYCLE STATE MACHINE
+//**************************************************************************
+
+void mos7360_device::half_cycle_pre()
+{
+	m_frozen_half = m_frozen;
+	m_beam_x = ((m_col + 114 - 106) % 114) * 4;
+
+	if (!(m_col & 1))
+	{
+		m_char_pos = 0x3ff;
+
+		if (m_inc_char_pos)
+		{
+			m_saved_char_pos = (m_saved_char_pos + 1) & 0x3ff;
+			m_char_pos = m_saved_char_pos;
+		}
+
+		if (!m_frozen)
+		{
+			m_events_now = m_events_even;
+			m_events_even = 0;
+			even_events();
+			if (m_events_now)
+				process_events(std::exchange(m_events_now, 0));
+		}
+		else
+		{
+			m_events_even &= ~EV_DMA_MASK;
+			m_dma_active = false;
+			m_cpu_halted = false;
+			m_cpu_running = true;
+			if (m_events_even)
+				process_events(std::exchange(m_events_even, 0));
+		}
+	}
+	else
+	{
+		if (m_events_odd)
+			process_events(std::exchange(m_events_odd, 0));
+
+		if (!m_frozen)
+			odd_events();
+	}
+}
+
+
+void mos7360_device::half_cycle_post()
+{
+	if (!(m_col & 1))
+	{
+		if (!m_frozen_half)
+		{
+			if (!m_cpu_running)
+			{
+				if (m_cpu_halted)
+					m_bus = fetch_dma(m_dma_base | m_dma_pos);
+				else if (m_cpu_waiting)
+					m_bus = m_cpu_data;
+
+				if (m_char_col < 40)
+				{
+					if (m_dma_flags & 0x01)
+						m_attr_tmp[m_char_col] = m_bus;
+					if (m_dma_flags & 0x02)
+						m_char_buf[m_char_col] = m_bus;
+				}
+			}
+
+			if (m_inc_dma_pos)
+				m_dma_pos = (m_dma_pos + 1) & 0x3ff;
+
+			render(m_hscroll, false);
+
+			if (m_t1_run)
+			{
+				if (!m_t1)
+				{
+					m_reg[0x09] |= 0x08;
+					update_irq();
+					m_t1 = m_t1_reload;
+				}
+
+				m_t1 = (m_t1 - 1) & 0xffff;
+			}
+
+			if (!m_t2 && m_t2_run)
+			{
+				m_reg[0x09] |= 0x10;
+				update_irq();
+			}
+
+			if (!m_t3 && m_t3_run)
+			{
+				m_reg[0x09] |= 0x40;
+				update_irq();
+			}
+		}
+		else
+		{
+			if (m_inc_dma_pos)
+				m_dma_pos = (m_dma_pos + 1) & 0x3ff;
+
+			render(m_hscroll, true);
+		}
+
+		m_reg[0x1e] = m_col;
+		m_col |= 1;
+	}
+	else
+	{
+		if (!m_frozen_half)
+		{
+			if (m_single)
+			{
+				if (!m_bitmap_disable)
+				{
+					offs_t addr = m_char_line;
+
+					if (!(m_reg[0x06] & 0x80))
+					{
+						if (!(m_reg[0x06] & 0x20))
+							addr |= m_charset_base | ((m_char_buf[m_char_col] & m_char_mask) << 3);
+						else
+							addr |= m_bitmap_base | (m_char_pos << 3);
+					}
+					else
+					{
+						if (!(m_reg[0x06] & 0x20))
+							addr |= (m_attr_tmp[m_char_col] << 3) | 0xf800;
+						else
+							addr |= m_bitmap_base | ((m_char_pos & (m_attr_tmp[m_char_col] | 0xff00)) << 3);
+					}
+
+					m_bus = fetch_bitmap(addr & 0xffff);
+				}
+				else
+				{
+					fetch_idle();
+				}
+			}
+
+			render(m_hscroll - 4, false);
+
+			m_current.bitmap = 0;
+			if (m_shift_enable)
+				m_current = m_next;
+
+			if (m_char_col != 40)
+			{
+				m_next.attr = m_attr_buf[m_char_col];
+				m_attr_buf[m_char_col] = m_attr_tmp[m_char_col];
+				m_next.ch = m_char_buf[m_char_col];
+				if (++m_char_col >= 64)
+					m_char_col = m_render_window ? 0 : 40;
+			}
+			else
+			{
+				m_next.attr = 0;
+				m_next.ch = 0;
+			}
+
+			m_next.bitmap = m_bus;
+			m_next.flags = ((m_char_pos == m_cursor_pos) ? 0xff : 0x0f) ^ m_mode;
+
+			m_t2 = (m_t2 - (m_t2_run ? 1 : 0)) & 0xffff;
+			m_t3 = (m_t3 - (m_t3_run ? 1 : 0)) & 0xffff;
+		}
+		else
+		{
+			if (m_single)
+				fetch_idle();
+
+			render(m_hscroll - 4, true);
+		}
+
+		m_reg[0x1e] = m_col;
+
+		uint8_t const prev_col = m_col & 0x7e;
+
+		if (!m_frozen)
+		{
+			if (m_col == 113)
+				m_col = 0;
+			else
+				m_col++;
+		}
+
+		m_col &= 0x7e;
+
+		if ((m_col == 106) && (prev_col != 106))
+		{
+			if (m_vsync_pending)
+			{
+				m_vsync_pending = false;
+				m_beam_y = 0;
+			}
+			else
+			{
+				m_beam_y = (m_beam_y + 1) % PAL_LINES;
+			}
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  even_events - events at the start of an even
+//  half-cycle, before the CPU
+//-------------------------------------------------
+
+void mos7360_device::even_events()
+{
+	bool const col40 = BIT(m_reg[0x07], 3);
+
+	switch (m_col)
+	{
+	case 0:
+		if (m_display_window && col40)
+			m_display_active = true;
+		break;
+
+	case 2:
+		if (m_display_window && !col40)
+			m_display_active = true;
+		break;
+
+	case 72:
+		if (m_inc_dma_pos)
+			m_events_even |= EV_STOP_INC_DMA;
+		if (m_render_window)
+		{
+			if (m_char_line == 6)
+				m_events_even |= EV_LATCH_DMA;
+			if ((m_prev_char_line == 6) && !(m_bitmap_disable & 0x02))
+				m_events_even |= EV_LATCH_CHARPOS;
+		}
+		break;
+
+	case 74:
+		m_events_even |= EV_REFRESH_ON;
+		m_ext_single = false;
+		m_dma_flags &= 0x03;
+		m_inc_char_pos = false;
+		break;
+
+	case 76:
+		m_bitmap_disable |= 0x01;
+		m_events_now &= ~EV_DMA_MASK;
+		m_events_even &= ~EV_DMA_MASK;
+		m_dma_active = false;
+		m_cpu_halted = false;
+		m_cpu_running = true;
+		break;
+
+	case 78:
+		if (!col40)
+			m_display_active = false;
+		m_shift_enable = false;
+		break;
+
+	case 80:
+		if (col40)
+			m_display_active = false;
+		break;
+
+	case 84:
+		m_events_even |= EV_REFRESH_OFF;
+		break;
+
+	case 88:
+		m_hblank = true;
+		break;
+
+	case 96:
+		m_events_even |= EV_INC_LINE;
+		break;
+
+	case 98:
+		if (m_line_d1 == (m_ntsc ? 261 : 311))
+		{
+			m_line = 0x1ff;
+			m_char_pos = 0;
+			m_saved_char_pos = 0;
+			m_char_pos_reload = 0;
+			m_events_odd |= EV_CHARPOS_REGS;
+			m_refresh = 0;
+		}
+		if (m_inc_char_line)
+			m_events_even |= EV_INC_VSUB;
+		break;
+
+	case 100:
+		m_ext_single = true;
+		if (m_render_window)
+			m_events_even |= EV_SINGLE_ON;
+		break;
+
+	case 102:
+		m_dma_flags |= 0x80;
+		if (m_char_col == 40)
+			m_char_col = 0x3c;
+		if (m_dma_enabled && ((m_line_d1 & 7) == m_vscroll))
+		{
+			m_events_even &= ~EV_DMA_MASK;
+			m_dma_active = true;
+			m_events_now = (m_events_now & ~EV_DMA_MASK) | EV_DMA_1;
+			m_dma_flags |= 0x01;
+			m_dma_base &= 0xf800;
+		}
+		else if (m_dma_flags & 0x02)
+		{
+			m_events_even &= ~EV_DMA_MASK;
+			m_dma_active = true;
+			m_events_now = (m_events_now & ~EV_DMA_MASK) | EV_DMA_1;
+			m_dma_base |= 0x400;
+		}
+		break;
+
+	case 106:
+		m_hblank = false;
+		break;
+
+	case 108:
+		if (m_render_window)
+		{
+			if (m_inc_dma_pos)
+				m_dma_pos_reload &= m_dma_pos;
+			m_dma_pos = m_dma_pos_reload;
+			m_inc_dma_pos = true;
+		}
+		m_events_even |= EV_RELOAD_CHARPOS;
+		break;
+
+	case 110:
+		m_bitmap_disable &= 0x02;
+		if (!m_bitmap_disable)
+			m_inc_char_pos = true;
+		break;
+
+	case 112:
+		if (m_render_window || m_display_window || m_display_active)
+			m_shift_enable = true;
+		break;
+	}
+}
+
+
+void mos7360_device::odd_events()
+{
+	if ((m_col == 87) && (m_line == 205))
+		m_events_odd |= EV_FLASH;
+}
+
+
+void mos7360_device::process_events(uint32_t ev)
+{
+	if (ev & EV_REFRESH_ON)
+		m_single = (m_single & 0x02) | 0x80;
+
+	if (ev & EV_REFRESH_OFF)
+		m_single &= 0x03;
+
+	if (ev & EV_INC_LINE)
+	{
+		m_dma_flags &= 0x80;
+		if (((m_line_d1 & 7) == m_vscroll) && m_dma_enabled)
+			m_dma_flags |= 0x02;
+		else if (m_dma_active)
+			m_events_even |= EV_DMA_ABORT;
+
+		m_saved_line = (m_line + 1) & 0x1ff;
+		m_render_window = m_render_window || m_dma_enabled;
+
+		bool const rows25 = BIT(m_reg[0x06], 3);
+
+		if ((m_saved_line >= 226) && (m_saved_line <= 269))
+		{
+			vertical_events();
+		}
+		else if (m_saved_line <= 8)
+		{
+			if (BIT(m_reg[0x06], 4))
+			{
+				if (m_saved_line == 0)
+					m_events_even |= EV_INIT_DISPLAY;
+				if (m_saved_line == (rows25 ? 4 : 8))
+					m_display_window = true;
+			}
+		}
+		else if ((m_saved_line >= 200) && (m_saved_line <= 204))
+		{
+			if (m_saved_line == (rows25 ? 204 : 200))
+				m_display_window = false;
+			if (m_saved_line == 204)
+			{
+				m_render_window = false;
+				m_inc_char_line = m_inc_char_line && m_dma_enabled;
+			}
+		}
+
+		m_line = m_saved_line;
+		m_prev_char_line = m_char_line;
+		m_events_odd |= EV_LINE_REGS;
+		m_events_even |= EV_INC_LINE_2;
+
+		if (m_line == (m_ntsc ? 229 : 254))
+			m_vsync_pending = true;
+	}
+
+	if (ev & EV_LINE_REGS)
+	{
+		check_dma_reset();
+		m_reg[0x1d] = m_line & 0xff;
+		m_reg[0x1c] = (m_line >> 8) & 0x01;
+		check_raster_irq();
+	}
+
+	if (ev & EV_STOP_INC_DMA)
+	{
+		m_inc_dma_pos = false;
+		if (m_line == 205)
+			m_dma_pos_reload = 0x3ff;
+	}
+
+	if (ev & EV_LATCH_DMA)
+		m_dma_pos_reload = m_dma_pos;
+
+	if (ev & EV_LATCH_CHARPOS)
+	{
+		m_char_pos_reload = (m_char_pos + 1) & 0x3ff;
+		m_events_odd |= EV_CHARPOS_REGS;
+	}
+
+	if (ev & EV_INIT_DISPLAY)
+	{
+		m_dma_enabled = true;
+		if (!m_render_window)
+		{
+			m_render_window = true;
+			m_events_odd |= EV_RESET_VSUB;
+			if (m_ext_single)
+				m_events_even |= EV_SINGLE_ON;
+		}
+	}
+
+	if (ev & EV_INC_LINE_2)
+	{
+		m_line_d1 = m_saved_line;
+		if (m_saved_line == 203)
+			m_dma_enabled = false;
+
+		if (m_saved_line == 204)
+		{
+			m_bitmap_disable |= 0x02;
+			m_single &= 0x82;
+		}
+		else if (m_render_window)
+		{
+			if ((((m_line_d1 ^ m_reg[0x06]) & 7) == 0) && m_dma_enabled)
+				m_inc_char_line = true;
+			if (m_dma_flags & 0x02)
+				m_bitmap_disable &= 0x01;
+		}
+
+		if (m_col != 100)
+			ev |= EV_VSCROLL;
+	}
+
+	if (ev & EV_INC_VSUB)
+	{
+		m_char_line = (m_char_line + 1) & 7;
+		m_events_odd |= EV_VSUB_REG;
+	}
+
+	if (ev & EV_VSUB_REG)
+		m_reg[0x1f] = (m_reg[0x1f] & 0xf8) | m_char_line;
+
+	for (int i = 0; i < 5; i++)
+		if (ev & (EV_COLOR << i))
+			m_color_latch[i] = m_reg[0x15 + i];
+
+	if (ev & EV_RELOAD_CHARPOS)
+	{
+		m_saved_char_pos = m_char_pos_reload;
+		m_char_pos = m_saved_char_pos;
+	}
+
+	if (ev & EV_SINGLE_ON)
+		m_single |= 0x01;
+
+	if (ev & EV_DMA_1)
+	{
+		if (m_render_window)
+			m_single |= 0x01;
+		m_events_even |= EV_DMA_2;
+	}
+
+	if (ev & EV_DMA_2)
+	{
+		m_cpu_running = false;
+		m_single |= 0x01;
+		m_events_even |= EV_DMA_3;
+	}
+
+	if (ev & EV_DMA_3)
+		m_events_even |= EV_DMA_4;
+
+	if (ev & EV_DMA_4)
+		m_events_even |= EV_DMA_5;
+
+	if (ev & EV_DMA_5)
+		m_cpu_halted = true;
+
+	if (ev & EV_DMA_ABORT)
+	{
+		m_events_even &= ~EV_DMA_MASK;
+		m_dma_active = false;
+		m_cpu_halted = false;
+		m_cpu_running = true;
+	}
+
+	if (ev & EV_T2_START)
+		m_t2_run = true;
+
+	if (ev & EV_VSCROLL)
+	{
+		m_vscroll = m_reg[0x06] & 7;
+
+		if (m_render_window)
+		{
+			if ((m_line_d1 & 7) == m_vscroll)
+			{
+				if (m_dma_enabled)
+				{
+					m_inc_char_line = true;
+					if (m_col == 98)
+						m_events_even |= EV_INC_VSUB;
+					if (m_dma_flags & 0x80)
+					{
+						if (!m_dma_active)
+						{
+							m_dma_active = true;
+							m_single |= 0x01;
+							m_events_even |= EV_DMA_2;
+						}
+						m_dma_flags |= 0x01;
+						m_dma_base &= 0xf800;
+					}
+				}
+			}
+			else
+			{
+				m_dma_flags &= 0x82;
+				if (!(m_dma_flags & 0x03))
+				{
+					if (m_dma_active)
+						m_events_even |= EV_DMA_ABORT;
+				}
+				else
+				{
+					m_dma_base |= 0x400;
+				}
+			}
+		}
+	}
+
+	if (ev & EV_HSCROLL)
+		m_hscroll = m_reg[0x07] & 7;
+
+	if (ev & EV_SELECT_RENDER)
+		m_render_mode = m_mode;
+
+	if (ev & EV_FORCE_SINGLE)
+		m_single = (m_single & 0x81) | (m_reg[0x13] & 0x02);
+
+	if (ev & EV_CHARPOS_REGS)
+	{
+		m_reg[0x1a] = m_char_pos_reload >> 8;
+		m_reg[0x1b] = m_char_pos_reload & 0xff;
+	}
+
+	if (ev & EV_RESET_VSUB)
+	{
+		m_char_line = 7;
+		m_prev_char_line = 7;
+		m_events_even |= EV_VSUB_REG;
+	}
+
+	if (ev & EV_FLASH)
+	{
+		m_reg[0x1f] = (m_reg[0x1f] & 0x7f) + 0x08;
+		if (m_reg[0x1f] & 0x80)
+			m_flash ^= 0xff;
+	}
+}
+
+
+void mos7360_device::vertical_events()
+{
+	int const vblank_start = m_ntsc ? 226 : 251;
+	int const vblank_end = m_ntsc ? 244 : 269;
+
+	if (m_saved_line == vblank_start)
+		m_vblank = true;
+	else if (m_saved_line == vblank_end)
+		m_vblank = false;
+}
+
+
+void mos7360_device::check_raster_irq()
+{
+	if (m_line == m_irq_line)
+	{
+		if (!m_prev_raster_irq)
+		{
+			m_prev_raster_irq = true;
+			m_reg[0x09] |= 0x02;
+			update_irq();
+		}
+	}
+	else
+	{
+		m_prev_raster_irq = false;
+	}
+}
+
+
+void mos7360_device::check_dma_reset()
+{
+	if ((m_line == 205) && !m_inc_dma_pos)
+		m_dma_pos_reload = 0x3ff;
+}
+
+
+void mos7360_device::update_irq()
+{
+	bool const irq = m_reg[0x09] & m_reg[0x0a];
+
+	if (irq != m_irq)
+	{
+		m_irq = irq;
+		m_write_irq(irq ? 1 : 0);
+	}
+}
+
+
+void mos7360_device::update_mode()
+{
+	switch (m_mode & 0x0e)
+	{
+	case 0x00:
+		m_charset_base = (m_reg[0x13] & 0xfc) << 8;
+		m_char_mask = 0x7f;
+		break;
+
+	case 0x04:
+	case 0x0c:
+		m_charset_base = (m_reg[0x13] & 0xf8) << 8;
+		m_char_mask = 0x3f;
+		break;
+
+	case 0x08:
+		m_charset_base = (m_reg[0x13] & 0xf8) << 8;
+		m_char_mask = 0xff;
+		break;
+
+	default:
+		m_charset_base = 0;
+		m_char_mask = 0;
+		break;
+	}
+}
+
+
+void mos7360_device::set_ntsc(bool ntsc)
+{
+	if (ntsc == m_ntsc)
+		return;
+
+	m_ntsc = ntsc;
+	update_timing();
+}
+
+
+void mos7360_device::update_timing()
+{
+	m_palette = m_ntsc ? PALETTE_NTSC : PALETTE_PAL;
+
+	uint32_t const half_cycle = m_ntsc ? (clock() / 8) : (clock() / 10);
+	m_cpu->set_unscaled_clock(half_cycle);
+	m_stream->set_sample_rate(half_cycle / 8);
+
+	if (m_ntsc)
+		screen().configure(HTOTAL, NTSC_LINES, rectangle(0, HVISIBLE - 1, NTSC_VBEND, NTSC_VBSTART - 1), attotime::from_ticks(uint64_t(HTOTAL) * NTSC_LINES, half_cycle * 4));
+	else
+		screen().configure(HTOTAL, PAL_LINES, rectangle(0, HVISIBLE - 1, PAL_VBEND, PAL_VBSTART - 1), attotime::from_ticks(uint64_t(HTOTAL) * PAL_LINES, half_cycle * 4));
+}
+
+
+//**************************************************************************
+//  MEMORY FETCHES
+//**************************************************************************
+
+uint8_t mos7360_device::fetch_dma(offs_t addr)
+{
+	if (m_rom && (addr >= 0x8000))
+		return space(0).read_byte(0x10000 | addr);
+
+	return space(0).read_byte(addr);
+}
+
+
+uint8_t mos7360_device::fetch_bitmap(offs_t addr)
+{
+	if (!BIT(m_reg[0x12], 2))
+	{
+		if ((addr & 0xffe0) == 0xff00)
+			return reg_r(addr & 0x1f);
+
+		return space(0).read_byte(addr);
+	}
+
+	if (addr < 0x8000 || ((addr >= 0xfd00) && (addr < 0xff00)))
+		return m_bus;
+
+	if ((addr & 0xffe0) == 0xff00)
+		return reg_r(addr & 0x1f);
+
+	return space(0).read_byte(0x10000 | addr);
+}
+
+
+void mos7360_device::fetch_idle()
+{
+	offs_t addr = 0xffff;
+
+	if (m_single & 0x80)
+	{
+		addr = 0xff00 | m_refresh;
+		m_refresh++;
+	}
+
+	if ((addr & 0xffe0) == 0xff00)
+		m_bus = reg_r(addr & 0x1f);
+	else
+		m_bus = fetch_dma(addr);
+}
+
+
+//**************************************************************************
+//  VIDEO OUTPUT
+//**************************************************************************
+
+void mos7360_device::render(int load, bool force_blank)
+{
+	uint32_t *const dest = &m_bitmap.pix(m_beam_y, m_beam_x);
+
+	bool const blank = force_blank || m_hblank || m_vblank;
+	uint8_t const mode = m_render_mode & (MODE_MCM | MODE_BMM | MODE_ECM);
+	bool const active = !blank && m_display_active && (mode < 0x05);
+
+	for (int p = 0; p < 4; p++)
+	{
+		if (p == load)
+		{
+			m_shift = m_current;
+
+			if (active && (mode == 0x00) && (m_shift.attr & 0x80))
+				m_shift.bitmap &= BIT(m_shift.flags, 7) ? 0xff : m_flash;
+		}
+
+		uint8_t const a = m_shift.attr;
+		uint8_t const c = m_shift.ch;
+		uint8_t const b = m_shift.bitmap;
+		uint8_t color = 0;
+		bool multicolor;
+
+		if (active)
+		{
+			multicolor = (mode == (MODE_MCM | MODE_BMM)) || ((mode == MODE_MCM) && (a & 0x08));
+
+			switch (mode)
+			{
+			case 0x00:
+			{
+				int bit = BIT(b, 7);
+				if (BIT(c, 7) && BIT(m_shift.flags, 3))
+					bit ^= 1;
+				if (BIT(m_shift.flags, 7))
+					bit ^= BIT(m_flash, 7);
+				color = bit ? a : (p ? m_reg[0x15] : m_color_latch[0]);
+				break;
+			}
+
+			case MODE_MCM:
+				if (multicolor)
+				{
+					int const pair = b >> 6;
+					color = (pair == 3) ? (a & 0x77) : (p ? m_reg[0x15 + pair] : m_color_latch[pair]);
+				}
+				else
+				{
+					color = BIT(b, 7) ? a : (p ? m_reg[0x15] : m_color_latch[0]);
+				}
+				break;
+
+			case MODE_BMM:
+				color = BIT(b, 7) ? (((a & 0x07) << 4) | (c >> 4)) : ((a & 0x70) | (c & 0x0f));
+				break;
+
+			case MODE_MCM | MODE_BMM:
+				switch (b >> 6)
+				{
+				case 0: color = p ? m_reg[0x15] : m_color_latch[0]; break;
+				case 1: color = ((a & 0x07) << 4) | (c >> 4); break;
+				case 2: color = (a & 0x70) | (c & 0x0f); break;
+				default: color = p ? m_reg[0x16] : m_color_latch[1]; break;
+				}
+				break;
+
+			default:
+			{
+				int const bg = c >> 6;
+				color = BIT(b, 7) ? a : (p ? m_reg[0x15 + bg] : m_color_latch[bg]);
+				break;
+			}
+			}
+		}
+		else
+		{
+			multicolor = (m_mode & MODE_MCM) && !(((m_mode & (MODE_MCM | MODE_BMM)) == MODE_MCM) && !(a & 0x08));
+
+			if (!blank && !m_display_active)
+				color = p ? m_reg[0x19] : m_color_latch[4];
+		}
+
+		dest[p] = m_palette[color & 0x7f];
+
+		if (!multicolor)
+			m_shift.bitmap <<= 1;
+		else if ((p - load) & 1)
+			m_shift.bitmap <<= 2;
+	}
+}
+
+
+uint32_t mos7360_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+
+	return 0;
+}
+
+
+//**************************************************************************
+//  REGISTER INTERFACE
+//**************************************************************************
+
+uint8_t mos7360_device::reg_r(offs_t offset)
+{
+	switch (offset)
+	{
+	case 0x00: return m_t1 & 0xff;
+	case 0x01: return m_t1 >> 8;
+	case 0x02: return m_t2 & 0xff;
+	case 0x03: return m_t2 >> 8;
+	case 0x04: return m_t3 & 0xff;
+	case 0x05: return m_t3 >> 8;
+
+	case 0x09:
+	{
+		uint8_t data = (m_reg[0x09] & 0x7f) | 0x25;
+		if (data & m_reg[0x0a] & 0x5e)
+			data |= 0x80;
+		return data;
+	}
+
+	case 0x0a: return m_reg[0x0a] | 0xa0;
+	case 0x0c: return m_reg[0x0c] | 0xfc;
+	case 0x10: return (m_reg[0x10] | 0x7c) & 0x7f;
+	case 0x12: return m_reg[0x12] | 0xc0;
+	case 0x13: return (m_reg[0x13] & 0xfe) | (m_rom ? 1 : 0);
+	case 0x14: return m_reg[0x14] | 0x07;
+	case 0x1a: return (m_reg[0x1a] & (m_char_pos_reload >> 8)) | 0xfc;
+	case 0x1b: return m_reg[0x1b] & (m_char_pos_reload & 0xff);
+	case 0x1c: return m_reg[0x1c] | 0xfe;
+	case 0x1e: return m_reg[0x1e] << 1;
+	case 0x1f: return (m_reg[0x1f] | 0x80) & (m_char_line | 0xf8);
+	default: return m_reg[offset];
+	}
+}
+
+
+uint8_t mos7360_device::read(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+	{
+		if (m_cpu->executing())
+			cpu_cycle(reg_r(offset & 0x1f), false);
+		else
+			sync();
+	}
+
+	return reg_r(offset & 0x1f);
+}
+
+
+void mos7360_device::write(offs_t offset, uint8_t data)
+{
+	if (!m_cpu->executing())
+		sync();
+
+	bool const even = !(m_col & 1);
+
+	switch (offset)
+	{
+	case 0x00:
+		m_t1_run = false;
+		m_t1 = (m_t1 & 0xff00) | data;
+		m_t1_reload = (m_t1_reload & 0xff00) | data;
+		break;
+
+	case 0x01:
+		m_t1_run = true;
+		m_t1 = (m_t1 & 0x00ff) | (data << 8);
+		m_t1_reload = (m_t1_reload & 0x00ff) | (data << 8);
+		break;
+
+	case 0x02:
+		m_t2_run = false;
+		m_events_even &= ~EV_T2_START;
+		m_t2 = (m_t2 & 0xff00) | data;
+		break;
+
+	case 0x03:
+		if (!m_t2_run)
+		{
+			if (even)
+				m_t2_run = true;
+			else
+				m_events_even |= EV_T2_START;
+		}
+		m_t2 = (m_t2 & 0x00ff) | (data << 8);
+		break;
+
+	case 0x04:
+		m_t3_run = false;
+		m_t3 = (m_t3 & 0xff00) | data;
+		break;
+
+	case 0x05:
+		m_t3_run = true;
+		m_t3 = (m_t3 & 0x00ff) | (data << 8);
+		break;
+
+	case 0x06:
+	{
+		uint8_t const changed = data ^ m_reg[0x06];
+		m_reg[0x06] = data;
+		m_mode = (m_mode & (MODE_MCM | MODE_RVS_OFF)) | ((data >> 4) & (MODE_BMM | MODE_ECM));
+
+		if (changed & 0x07)
+			m_events_even |= EV_VSCROLL;
+
+		if (changed & 0x18)
+		{
+			switch (m_saved_line)
+			{
+			case 0:
+				if (data & 0x10)
+					m_events_even |= EV_INIT_DISPLAY | EV_VSCROLL;
+				break;
+			case 4:
+				if ((data & 0x18) == 0x18)
+					m_display_window = true;
+				break;
+			case 8:
+				if ((data & 0x18) == 0x10)
+					m_display_window = true;
+				break;
+			case 200:
+				if (!(data & 0x08))
+					m_display_window = false;
+				break;
+			case 204:
+				if (data & 0x08)
+					m_display_window = false;
+				break;
+			}
+		}
+
+		if (changed & 0x60)
+		{
+			update_mode();
+			if (even)
+				m_events_odd |= EV_SELECT_RENDER;
+			else
+				m_events_even |= EV_SELECT_RENDER;
+		}
+		break;
+	}
+
+	case 0x07:
+	{
+		uint8_t const changed = data ^ m_reg[0x07];
+		m_reg[0x07] = data;
+		m_frozen = BIT(data, 5);
+		m_mode = (m_mode & (MODE_BMM | MODE_ECM)) | ((data >> 4) & (MODE_MCM | MODE_RVS_OFF));
+
+		if (changed & 0x07)
+		{
+			if (even)
+				m_events_even |= EV_HSCROLL;
+			else
+				m_events_odd |= EV_HSCROLL;
+		}
+
+		if ((changed & 0x20) && m_frozen && even)
+		{
+			m_events_even |= EV_REFRESH_ON;
+			m_hblank = true;
+		}
+
+		if (changed & 0x40)
+		{
+			set_ntsc(BIT(data, 6));
+			if ((m_saved_line >= 226) && (m_saved_line <= 269))
+				vertical_events();
+		}
+
+		if (changed & 0x90)
+		{
+			update_mode();
+			if (even)
+				m_events_odd |= EV_SELECT_RENDER;
+			else
+				m_events_even |= EV_SELECT_RENDER;
+		}
+		break;
+	}
+
+	case 0x08:
+		m_reg[0x08] = m_read_k(data);
+		break;
+
+	case 0x09:
+		m_reg[0x09] = (m_reg[0x09] & ~data) | 0x04;
+		update_irq();
+		break;
+
+	case 0x0a:
+		m_reg[0x0a] = data;
+		update_irq();
+		m_irq_line = (m_irq_line & 0xff) | ((data & 0x01) << 8);
+		check_raster_irq();
+		break;
+
+	case 0x0b:
+		m_reg[0x0b] = data;
+		m_irq_line = (m_irq_line & 0x100) | data;
+		check_raster_irq();
+		break;
+
+	case 0x0c:
+		m_reg[0x0c] = data;
+		m_cursor_pos = (m_cursor_pos & 0xff) | ((data & 0x03) << 8);
+		break;
+
+	case 0x0d:
+		m_reg[0x0d] = data;
+		m_cursor_pos = (m_cursor_pos & 0x300) | data;
+		break;
+
+	case 0x0e:
+	case 0x0f:
+	case 0x10:
+	case 0x11:
+		soundport_w(offset, data);
+		break;
+
+	case 0x12:
+		soundport_w(offset, data);
+		m_reg[0x12] = data;
+		m_bitmap_base = (data & 0x38) << 10;
+		break;
+
+	case 0x13:
+		if ((data ^ m_reg[0x13]) & 0x02)
+			m_events_even |= EV_FORCE_SINGLE;
+		m_reg[0x13] = data;
+		update_mode();
+		break;
+
+	case 0x14:
+		m_reg[0x14] = data;
+		m_dma_base = (m_dma_base & 0x400) | ((data & 0xf8) << 8);
+		break;
+
+	case 0x15:
+	case 0x16:
+	case 0x17:
+	case 0x18:
+	case 0x19:
+	{
+		int const n = offset - 0x15;
+		m_reg[offset] = data | 0x80;
+		m_color_latch[n] = 0xff;
+		if (even)
+			m_events_odd |= EV_COLOR << n;
+		else
+			m_events_even |= EV_COLOR << n;
+		break;
+	}
+
+	case 0x1a:
+		m_reg[0x1a] = data;
+		m_char_pos_reload = ((data & 0x03) << 8) | m_reg[0x1b];
+		break;
+
+	case 0x1b:
+		m_reg[0x1b] = data;
+		m_char_pos_reload = ((m_reg[0x1a] & 0x03) << 8) | data;
+		break;
+
+	case 0x1c:
+		m_reg[0x1c] = data;
+		m_line = m_reg[0x1d] | ((data & 0x01) << 8);
+		check_dma_reset();
+		check_raster_irq();
+		break;
+
+	case 0x1d:
+		m_reg[0x1d] = data;
+		m_line = data | ((m_reg[0x1c] & 0x01) << 8);
+		check_dma_reset();
+		check_raster_irq();
+		break;
+
+	case 0x1e:
+		m_col = (m_col & 0x01) | ((~data & 0xfc) >> 1);
+		m_reg[0x1e] = m_col;
+		break;
+
+	case 0x1f:
+		if (((m_reg[0x1f] ^ data) & 0x78) && ((m_reg[0x1f] & 0x78) == 0x78))
+			m_flash ^= 0xff;
+		m_reg[0x1f] = data;
+		m_char_line = data & 0x07;
+		break;
+
+	case 0x3e:
+		m_rom = true;
+		break;
+
+	case 0x3f:
+		m_rom = 0;
+		break;
+	}
+}
+
+
+//-------------------------------------------------
+//  bus_r - floating data bus read
+//-------------------------------------------------
+
+uint8_t mos7360_device::bus_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		if (m_cpu->executing())
+			cpu_cycle(m_bus, false);
+		else
+			sync();
+	}
+
+	return m_bus;
+}
+
+
+//**************************************************************************
+//  SOUND
+//**************************************************************************
+
+#define TONE1_VALUE     (m_reg[0x0e] | ((m_reg[0x12] & 3) << 8))
+#define TONE2_VALUE     (m_reg[0x0f] | ((m_reg[0x10] & 3) << 8))
+#define VOLUME          (m_reg[0x11] & 0x0f)
+#define VOICE1_ON       (m_reg[0x11] & 0x10)
+#define VOICE2_ON       (m_reg[0x11] & 0x20)
+#define NOISE_ON        ((m_reg[0x11] & 0x60) == 0x40)
+#define DIGITAL_ON      (m_reg[0x11] & 0x80)
+
 
 void mos7360_device::sound_stream_update(sound_stream &stream)
 {
@@ -447,261 +1880,6 @@ void mos7360_device::sound_stream_update(sound_stream &stream)
 }
 
 
-void mos7360_device::draw_character(int ybegin, int yend, int ch, int yoff, int xoff, uint16_t *color)
-{
-	for (int y = ybegin; y <= yend; y++)
-	{
-		int code;
-		if (INROM)
-			code = read_rom(m_chargenaddr + ch * 8 + y);
-		else
-			code = read_ram(m_chargenaddr + ch * 8 + y);
-
-		m_bitmap.pix(y + yoff, 0 + xoff) = PALETTE_MOS[color[BIT(code, 7)]];
-		m_bitmap.pix(y + yoff, 1 + xoff) = PALETTE_MOS[color[BIT(code, 6)]];
-		m_bitmap.pix(y + yoff, 2 + xoff) = PALETTE_MOS[color[BIT(code, 5)]];
-		m_bitmap.pix(y + yoff, 3 + xoff) = PALETTE_MOS[color[BIT(code, 4)]];
-		m_bitmap.pix(y + yoff, 4 + xoff) = PALETTE_MOS[color[BIT(code, 3)]];
-		m_bitmap.pix(y + yoff, 5 + xoff) = PALETTE_MOS[color[BIT(code, 2)]];
-		m_bitmap.pix(y + yoff, 6 + xoff) = PALETTE_MOS[color[BIT(code, 1)]];
-		m_bitmap.pix(y + yoff, 7 + xoff) = PALETTE_MOS[color[BIT(code, 0)]];
-	}
-}
-
-void mos7360_device::draw_character_multi(int ybegin, int yend, int ch, int yoff, int xoff)
-{
-	for (int y = ybegin; y <= yend; y++)
-	{
-		int code;
-		if (INROM)
-			code = read_rom(m_chargenaddr + ch * 8 + y);
-		else
-			code = read_ram(m_chargenaddr + ch * 8 + y);
-
-		m_bitmap.pix(y + yoff, 0 + xoff) = m_bitmap.pix(y + yoff, 1 + xoff) =
-				PALETTE_MOS[m_multi[code >> 6]];
-		m_bitmap.pix(y + yoff, 2 + xoff) = m_bitmap.pix(y + yoff, 3 + xoff) =
-				PALETTE_MOS[m_multi[(code >> 4) & 3]];
-		m_bitmap.pix(y + yoff, 4 + xoff) = m_bitmap.pix(y + yoff, 5 + xoff) =
-				PALETTE_MOS[m_multi[(code >> 2) & 3]];
-		m_bitmap.pix(y + yoff, 6 + xoff) = m_bitmap.pix(y + yoff, 7 + xoff) =
-				PALETTE_MOS[m_multi[code & 3]];
-	}
-}
-
-void mos7360_device::draw_bitmap(int ybegin, int yend, int ch, int yoff, int xoff)
-{
-	for (int y = ybegin; y <= yend; y++)
-	{
-		int code = read_ram(m_bitmapaddr + ch * 8 + y);
-
-		m_bitmap.pix(y + yoff, 0 + xoff) = PALETTE_MOS[m_c16_bitmap[BIT(code, 7)]];
-		m_bitmap.pix(y + yoff, 1 + xoff) = PALETTE_MOS[m_c16_bitmap[BIT(code, 6)]];
-		m_bitmap.pix(y + yoff, 2 + xoff) = PALETTE_MOS[m_c16_bitmap[BIT(code, 5)]];
-		m_bitmap.pix(y + yoff, 3 + xoff) = PALETTE_MOS[m_c16_bitmap[BIT(code, 4)]];
-		m_bitmap.pix(y + yoff, 4 + xoff) = PALETTE_MOS[m_c16_bitmap[BIT(code, 3)]];
-		m_bitmap.pix(y + yoff, 5 + xoff) = PALETTE_MOS[m_c16_bitmap[BIT(code, 2)]];
-		m_bitmap.pix(y + yoff, 6 + xoff) = PALETTE_MOS[m_c16_bitmap[BIT(code, 1)]];
-		m_bitmap.pix(y + yoff, 7 + xoff) = PALETTE_MOS[m_c16_bitmap[BIT(code, 0)]];
-	}
-}
-
-void mos7360_device::draw_bitmap_multi(int ybegin, int yend, int ch, int yoff, int xoff)
-{
-	for (int y = ybegin; y <= yend; y++)
-	{
-		int code = read_ram(m_bitmapaddr + ch * 8 + y);
-
-		m_bitmap.pix(y + yoff, 0 + xoff) = m_bitmap.pix(y + yoff, 1 + xoff) =
-				PALETTE_MOS[m_bitmapmulti[code >> 6]];
-		m_bitmap.pix(y + yoff, 2 + xoff) = m_bitmap.pix(y + yoff, 3 + xoff) =
-				PALETTE_MOS[m_bitmapmulti[(code >> 4) & 3]];
-		m_bitmap.pix(y + yoff, 4 + xoff) = m_bitmap.pix(y + yoff, 5 + xoff) =
-				PALETTE_MOS[m_bitmapmulti[(code >> 2) & 3]];
-		m_bitmap.pix(y + yoff, 6 + xoff) = m_bitmap.pix(y + yoff, 7 + xoff) =
-				PALETTE_MOS[m_bitmapmulti[code & 3]];
-	}
-}
-
-void mos7360_device::draw_cursor(int ybegin, int yend, int yoff, int xoff, int color)
-{
-	for (int y = ybegin; y <= yend; y++)
-	{
-		for (int x = 0; x < 8; x++)
-		{
-			m_bitmap.pix(y + yoff, x + xoff) = PALETTE_MOS[color];
-		}
-	}
-}
-
-void mos7360_device::drawlines(int first, int last)
-{
-	m_lastline = last;
-
-	/* top part of display not rastered */
-	first -= TED7360_YPOS;
-	last -= TED7360_YPOS;
-	if ((first >= last) || (last <= 0))
-		return;
-	if (first < 0)
-		first = 0;
-
-	if (!SCREENON)
-	{
-		for (int line = first; (line < last) && (line < m_bitmap.height()); line++)
-		{
-			for (int x = 0; x < m_bitmap.width(); x++)
-			{
-				m_bitmap.pix(line, x) = PALETTE_MOS[FRAMECOLOR];
-			}
-		}
-		return;
-	}
-
-	int xbegin, xend;
-	if (COLUMNS40)
-	{
-		xbegin = XPOS;
-		xend = xbegin + 320;
-	}
-	else
-	{
-		xbegin = XPOS + 7;
-		xend = xbegin + 304;
-	}
-
-	int end;
-	if (last < m_y_begin)
-		end = last;
-	else
-		end = m_y_begin + YPOS;
-
-	int line;
-	for (line = first; line < end; line++)
-	{
-		for (int x = 0; x < m_bitmap.width(); x++)
-		{
-			m_bitmap.pix(line, x) = PALETTE_MOS[FRAMECOLOR];
-		}
-	}
-
-	int vline;
-	if (LINES25)
-		vline = line - m_y_begin - YPOS;
-	else
-		vline = line - m_y_begin - YPOS + 8 - VERTICALPOS;
-
-	if (last < m_y_end + YPOS)
-		end = last;
-	else
-		end = m_y_end + YPOS;
-
-	for (int ybegin, yend; line < end; vline = (vline + 8) & ~7, line = line + 1 + yend - ybegin)
-	{
-		int offs = (vline >> 3) * 40;
-		ybegin = vline & 7;
-		int yoff = line - ybegin;
-		yend = (yoff + 7 < end) ? 7 : (end - yoff - 1);
-		/* rendering 39 characters */
-		/* left and right borders are overwritten later */
-
-		for (int xoff = m_x_begin + XPOS; xoff < m_x_end + XPOS; xoff += 8, offs++)
-		{
-			if (HIRESON)
-			{
-				int ch = read_ram((m_videoaddr | 0x400) + offs);
-				int attr = read_ram(m_videoaddr + offs);
-				int c1 = ((ch >> 4) & 0xf) | (attr << 4);
-				int c2 = (ch & 0xf) | (attr & 0x70);
-				m_bitmapmulti[1] = m_c16_bitmap[1] = c1 & 0x7f;
-				m_bitmapmulti[2] = m_c16_bitmap[0] = c2 & 0x7f;
-				if (MULTICOLORON)
-				{
-					draw_bitmap_multi(ybegin, yend, offs, yoff, xoff);
-				}
-				else
-				{
-					draw_bitmap(ybegin, yend, offs, yoff, xoff);
-				}
-			}
-			else
-			{
-				int ch = read_ram((m_videoaddr | 0x400) + offs);
-				int attr = read_ram(m_videoaddr + offs);
-				// levente harsfalvi's docu says cursor off in ecm and multicolor
-				if (ECMON)
-				{
-					// hardware reverse off
-					int ecm = ch >> 6;
-					m_ecmcolor[0] = m_colors[ecm];
-					m_ecmcolor[1] = attr & 0x7f;
-					draw_character(ybegin, yend, ch & ~0xc0, yoff, xoff, m_ecmcolor);
-				}
-				else if (MULTICOLORON)
-				{
-					// hardware reverse off
-					if (attr & 8)
-					{
-						m_multi[3] = attr & 0x77;
-						draw_character_multi(ybegin, yend, ch, yoff, xoff);
-					}
-					else
-					{
-						m_mono[1] = attr & 0x7f;
-						draw_character(ybegin, yend, ch, yoff, xoff, m_mono);
-					}
-				}
-				else if (m_cursor1 && (offs == CURSOR1POS))
-				{
-					draw_cursor(ybegin, yend, yoff, xoff, attr & 0x7f);
-				}
-				else if (REVERSEON && (ch & 0x80))
-				{
-					m_monoinversed[0] = attr & 0x7f;
-					if (m_cursor1 && (attr & 0x80))
-						draw_cursor(ybegin, yend, yoff, xoff, m_monoinversed[0]);
-					else
-						draw_character(ybegin, yend, ch & ~0x80, yoff, xoff, m_monoinversed);
-				}
-				else
-				{
-					m_mono[1] = attr & 0x7f;
-					if (m_cursor1 && (attr & 0x80))
-						draw_cursor(ybegin, yend, yoff, xoff, m_mono[0]);
-					else
-						draw_character(ybegin, yend, ch, yoff, xoff, m_mono);
-				}
-			}
-		}
-
-		for (int i = ybegin; i <= yend; i++)
-		{
-			for (int x = 0; x < xbegin; x++)
-			{
-				m_bitmap.pix(yoff + i, x) = PALETTE_MOS[FRAMECOLOR];
-			}
-
-			for (int x = xend; x < m_bitmap.width(); x++)
-			{
-				m_bitmap.pix(yoff + i, x) = PALETTE_MOS[FRAMECOLOR];
-			}
-		}
-	}
-
-	if (last < m_bitmap.height())
-		end = last;
-	else
-		end = m_bitmap.height();
-
-	for (; line < end; line++)
-	{
-		for (int x = 0; x < m_bitmap.width(); x++)
-		{
-			m_bitmap.pix(line, x) = PALETTE_MOS[FRAMECOLOR];
-		}
-	}
-}
-
 void mos7360_device::soundport_w(int offset, int data)
 {
 	m_stream->update();
@@ -711,9 +1889,9 @@ void mos7360_device::soundport_w(int offset, int data)
 	case 0x0e:
 	case 0x12:
 		if (offset == 0x12)
-			m_reg[offset & 0x1f] = (m_reg[offset & 0x1f] & ~3) | (data & 3);
+			m_reg[offset] = (m_reg[offset] & ~3) | (data & 3);
 		else
-			m_reg[offset & 0x1f] = data;
+			m_reg[offset] = data;
 
 		if (TONE1_VALUE == 0x3fe)
 			m_osc_sign[0] = 1;
@@ -723,7 +1901,7 @@ void mos7360_device::soundport_w(int offset, int data)
 
 	case 0x0f:
 	case 0x10:
-		m_reg[offset & 0x1f] = data;
+		m_reg[offset] = data;
 
 		if (TONE2_VALUE == 0x3fe)
 			m_osc_sign[1] = 1;
@@ -732,7 +1910,7 @@ void mos7360_device::soundport_w(int offset, int data)
 		break;
 
 	case 0x11:
-		m_reg[offset & 0x1f] = data;
+		m_reg[offset] = data;
 
 		if (DIGITAL_ON)
 		{
@@ -748,10 +1926,6 @@ void mos7360_device::soundport_w(int offset, int data)
 }
 
 
-//-------------------------------------------------
-//  update_sound_outputs - latch the voice outputs
-//-------------------------------------------------
-
 void mos7360_device::update_sound_outputs()
 {
 	m_osc_out[0] = VOLUME | ((m_osc_sign[0] && VOICE1_ON) ? 0x10 : 0);
@@ -760,489 +1934,4 @@ void mos7360_device::update_sound_outputs()
 		m_osc_out[1] = VOLUME | (BIT(m_noise_sr, 0) ? 0x20 : 0);
 	else
 		m_osc_out[1] = VOLUME | ((m_osc_sign[1] && VOICE2_ON) ? 0x20 : 0);
-}
-
-
-//-------------------------------------------------
-//  bus_r - floating data bus read
-//-------------------------------------------------
-
-uint8_t mos7360_device::bus_r()
-{
-	if (m_bus_fetch || !SCREENON)
-		return m_last_data;
-
-	int const line = m_rasterline - TED7360_YPOS;
-	int const x = rastercolumn() - 8 - m_x_begin;
-
-	if ((line < m_y_begin + YPOS) || (line >= m_y_end + YPOS) || (x < 0) || (x >= 320))
-		return m_last_data;
-
-	int const vline = LINES25 ? (line - m_y_begin - YPOS) : (line - m_y_begin - YPOS + 8 - VERTICALPOS);
-	int const offs = (vline >> 3) * 40 + (x >> 3);
-	uint8_t data;
-
-	m_bus_fetch = true;
-
-	if (HIRESON)
-	{
-		data = space(0).read_byte(m_bitmapaddr + offs * 8 + (vline & 7));
-	}
-	else
-	{
-		int ch = space(0).read_byte((m_videoaddr | 0x400) + offs);
-
-		if (ECMON)
-			ch &= ~0xc0;
-		else if (REVERSEON && !MULTICOLORON)
-			ch &= ~0x80;
-
-		offs_t const addr = m_chargenaddr + ch * 8 + (vline & 7);
-		data = space(0).read_byte(INROM ? (0x10000 | addr) : addr);
-	}
-
-	m_bus_fetch = false;
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  read - register read
-//-------------------------------------------------
-
-uint8_t mos7360_device::read(offs_t offset)
-{
-	uint8_t val = m_last_data;
-
-	switch (offset)
-	{
-	case 0x00:
-		val = m_timer_active[0] ? (m_timer[0]->remaining().as_ticks(clock()) & 0xff) : m_reg[offset & 0x1f];
-		break;
-	case 0x01:
-		val = m_timer_active[0] ? (m_timer[0]->remaining().as_ticks(clock()) >> 8) : m_reg[offset & 0x1f];
-		break;
-	case 0x02:
-		val = m_timer_active[1] ? (m_timer[1]->remaining().as_ticks(clock()) & 0xff) : m_reg[offset & 0x1f];
-		break;
-	case 0x03:
-		val = m_timer_active[1] ? (m_timer[1]->remaining().as_ticks(clock()) >> 8) : m_reg[offset & 0x1f];
-		break;
-	case 0x04:
-		val = m_timer_active[2] ? (m_timer[2]->remaining().as_ticks(clock()) & 0xff) : m_reg[offset & 0x1f];
-		break;
-	case 0x05:
-		val = m_timer_active[2] ? (m_timer[2]->remaining().as_ticks(clock()) >> 8) : m_reg[offset & 0x1f];
-		break;
-	case 0x13:
-		val = m_reg[offset & 0x1f] & ~1;
-		if (m_rom)
-			val |= 1;
-		break;
-	case 0x1c:                         /*rasterline */
-		drawlines(m_lastline, m_rasterline);
-		val = ((RASTERLINE_2_C16(m_rasterline) & 0x100) >> 8) | 0xfe;   /* expected by matrix */
-		break;
-	case 0x1d:                         /*rasterline */
-		drawlines(m_lastline, m_rasterline);
-		val = RASTERLINE_2_C16(m_rasterline) & 0xff;
-		break;
-	case 0x1e:                         /*rastercolumn */
-		val = (((rastercolumn() + 456 - 64) % 456) / 2) & 0xfe;
-		break;
-	case 0x1f:
-		val = ((m_rasterline & 7) << 4) | (m_reg[offset & 0x1f] & 0x0f);
-		DBG_LOG(1, "port_w", ("read from cursorblink %.2x\n", val));
-		break;
-	case 0x06:
-	case 0x07:
-	case 0x08:
-	case 0x09:
-	case 0x0a:
-	case 0x0b:
-	case 0x0c:
-	case 0x0d:
-	case 0x0e:
-	case 0x0f:
-	case 0x10:
-	case 0x11:
-	case 0x12:
-	case 0x14:
-	case 0x15:
-	case 0x16:
-	case 0x17:
-	case 0x18:
-	case 0x19:
-	case 0x1a:
-	case 0x1b:
-		val = m_reg[offset & 0x1f];
-		break;
-	}
-
-	return val;
-}
-
-
-//-------------------------------------------------
-//  write - register write
-//-------------------------------------------------
-
-void mos7360_device::write(offs_t offset, uint8_t data)
-{
-	int old;
-	int const line = (rastercolumn() >= 416) ? (m_rasterline + 1) : m_rasterline;
-
-	switch (offset)
-	{
-	case 0x0e:
-	case 0x0f:
-	case 0x10:
-	case 0x11:
-	case 0x12:
-		soundport_w(offset & 0x1f, data);
-		break;
-	}
-
-	switch (offset)
-	{
-	case 0x00:                        /* stop timer 1 */
-		m_reg[offset & 0x1f] = data;
-
-		if (m_timer_active[0])
-		{
-			m_timer[0]->reset();
-			m_timer_active[0] = false;
-		}
-		break;
-	case 0x01:                        /* start timer 1 */
-		m_reg[offset & 0x1f] = data;
-		m_timer[0]->adjust(attotime::from_ticks(TIMER1, clock()), TIMER_ID_1);
-		m_timer_active[0] = true;
-		break;
-	case 0x02:                        /* stop timer 2 */
-		m_reg[offset & 0x1f] = data;
-		if (m_timer_active[1])
-		{
-			m_timer[1]->reset();
-			m_timer_active[1] = false;
-		}
-		break;
-	case 0x03:                        /* start timer 2 */
-		m_reg[offset & 0x1f] = data;
-		m_timer[1]->adjust(attotime::from_ticks(TIMER2, clock()), TIMER_ID_2);
-		m_timer_active[1] = true;
-		break;
-	case 0x04:                        /* stop timer 3 */
-		m_reg[offset & 0x1f] = data;
-		if (m_timer_active[2])
-		{
-			m_timer[2]->reset();
-			m_timer_active[2] = false;
-		}
-		break;
-	case 0x05:                        /* start timer 3 */
-		m_reg[offset & 0x1f] = data;
-		m_timer[2]->adjust(attotime::from_ticks(TIMER3, clock()), TIMER_ID_3);
-		m_timer_active[2] = true;
-		break;
-	case 0x06:
-		if (m_reg[offset & 0x1f] != data)
-		{
-			drawlines(m_lastline, line);
-			m_reg[offset & 0x1f] = data;
-			if (LINES25)
-			{
-				m_y_begin = 0;
-				m_y_end = m_y_begin + 200;
-			}
-			else
-			{
-				m_y_begin = 4;
-				m_y_end = m_y_begin + 192;
-			}
-			m_chargenaddr = CHARGENADDR;
-
-			if (SCREENON && (RASTERLINE_2_C16(m_rasterline) == 0))
-				m_badlines = true;
-
-			set_clocks();
-		}
-		break;
-	case 0x07:
-		if (m_reg[offset & 0x1f] != data)
-		{
-			drawlines(m_lastline, line);
-			m_reg[offset & 0x1f] = data;
-			if (COLUMNS40)
-			{
-				m_x_begin = 0;
-				m_x_end = m_x_begin + 320;
-			}
-			else
-			{
-				m_x_begin = HORICONTALPOS;
-				m_x_end = m_x_begin + 320;
-			}
-			DBG_LOG(3, "port_w", ("%s %s\n", data & 0x40 ? "ntsc" : "pal", data & 0x20 ? "hori freeze" : ""));
-			m_chargenaddr = CHARGENADDR;
-			set_clocks();
-		}
-		break;
-	case 0x08:
-		m_reg[offset & 0x1f] = m_read_k(data);
-		break;
-	case 0x09:
-		if (data & 0x08)
-			clear_interrupt(8);
-		if (data & 0x10)
-			clear_interrupt(0x10);
-		if (data & 0x40)
-			clear_interrupt(0x40);
-		if (data & 0x02)
-			clear_interrupt(2);
-		break;
-	case 0x0a:
-		old = data;
-		m_reg[offset & 0x1f] = data | 0xa0;
-#if 0
-		m_reg[9] = (m_reg[9] & 0xa1) | (m_reg[9] & data & 0x5e);
-		if (m_reg[9] & 0x80)
-			clear_interrupt(0);
-#endif
-		if ((data ^ old) & 1)
-		{
-			/* DBG_LOG(1,"set rasterline hi",("soll:%d\n",RASTERLINE)); */
-		}
-		break;
-	case 0x0b:
-		if (data != m_reg[offset & 0x1f])
-		{
-			drawlines(m_lastline, line);
-			m_reg[offset & 0x1f] = data;
-			/*  DBG_LOG(1,"set rasterline lo",("soll:%d\n",RASTERLINE)); */
-		}
-		break;
-	case 0x0c:
-	case 0x0d:
-		if (m_reg[offset & 0x1f] != data)
-		{
-			drawlines(m_lastline, line);
-			m_reg[offset & 0x1f] = data;
-		}
-		break;
-	case 0x12:
-		if (m_reg[offset & 0x1f] != data)
-		{
-			drawlines(m_lastline, line);
-			m_reg[offset & 0x1f] = data;
-			m_bitmapaddr = BITMAPADDR;
-			m_chargenaddr = CHARGENADDR;
-			DBG_LOG(3, "port_w", ("bitmap %.4x %s\n",  BITMAPADDR, INROM ? "rom" : "ram"));
-		}
-		break;
-	case 0x13:
-		if (m_reg[offset & 0x1f] != data)
-		{
-			drawlines(m_lastline, line);
-			m_reg[offset & 0x1f] = data;
-			m_chargenaddr = CHARGENADDR;
-			update_cpu_clock();
-			DBG_LOG(3, "port_w", ("chargen %.4x %s %d\n", CHARGENADDR, data & 2 ? "" : "doubleclock", data & 1));
-		}
-		break;
-	case 0x14:
-		if (m_reg[offset & 0x1f] != data)
-		{
-			drawlines(m_lastline, line);
-			m_reg[offset & 0x1f] = data;
-			m_videoaddr = VIDEOADDR;
-			DBG_LOG(3, "port_w", ("videoram %.4x\n", VIDEOADDR));
-		}
-		break;
-	case 0x15:                         /* backgroundcolor */
-		if (m_reg[offset & 0x1f] != data)
-		{
-			drawlines(m_lastline, line);
-			m_reg[offset & 0x1f] = data;
-			m_monoinversed[1] = m_mono[0] = m_bitmapmulti[0] = m_multi[0] = m_colors[0] = BACKGROUNDCOLOR;
-		}
-		break;
-	case 0x16:                         /* foregroundcolor */
-		if (m_reg[offset & 0x1f] != data)
-		{
-			drawlines(m_lastline, line);
-			m_reg[offset & 0x1f] = data;
-			m_bitmapmulti[3] = m_multi[1] = m_colors[1] = FOREGROUNDCOLOR;
-		}
-		break;
-	case 0x17:                         /* multicolor 1 */
-		if (m_reg[offset & 0x1f] != data)
-		{
-			drawlines(m_lastline, line);
-			m_reg[offset & 0x1f] = data;
-			m_multi[2] = m_colors[2] = MULTICOLOR1;
-		}
-		break;
-	case 0x18:                         /* multicolor 2 */
-		if (m_reg[offset & 0x1f] != data)
-		{
-			drawlines(m_lastline, line);
-			m_reg[offset & 0x1f] = data;
-			m_colors[3] = MULTICOLOR2;
-		}
-		break;
-	case 0x19:                         /* framecolor */
-		if (m_reg[offset & 0x1f] != data)
-		{
-			drawlines(m_lastline, line);
-			m_reg[offset & 0x1f] = data;
-			m_colors[4] = FRAMECOLOR;
-		}
-		break;
-	case 0x1c:
-		m_reg[offset & 0x1f] = data;          /*? */
-		DBG_LOG(1, "port_w", ("write to rasterline high %.2x\n",
-										data));
-		break;
-	case 0x1f:
-		m_reg[offset & 0x1f] = data;
-		DBG_LOG(1, "port_w", ("write to cursorblink %.2x\n", data));
-		break;
-	case 0x3e:
-		m_rom = 1;
-		break;
-	case 0x3f:
-		m_rom = 0;
-		break;
-	case 0x1a:
-	case 0x1b:
-	case 0x1d:
-	case 0x1e:
-		m_reg[offset & 0x1f] = data;
-		break;
-	}
-}
-
-
-//-------------------------------------------------
-//  update_screen - update screen
-//-------------------------------------------------
-
-uint32_t mos7360_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
-
-	return 0;
-}
-
-TIMER_CALLBACK_MEMBER(mos7360_device::frame_interrupt_gen)
-{
-	if ((m_reg[0x1f] & 0xf) >= 0x0f)
-	{
-		/*  if (m_frame_count >= CURSORRATE) */
-		m_cursor1 ^= 1;
-		m_reg[0x1f] &= ~0xf;
-		m_frame_count = 0;
-	}
-	else
-		m_reg[0x1f]++;
-}
-
-TIMER_CALLBACK_MEMBER(mos7360_device::raster_interrupt_gen)
-{
-	m_rasterline++;
-	m_rastertime = machine().time().as_double();
-	if (m_rasterline >= m_lines)
-	{
-		m_rasterline = 0;
-		drawlines(m_lastline, m_lines);
-		m_lastline = 0;
-	}
-
-	if (m_rasterline == C16_2_RASTERLINE(RASTERLINE))
-	{
-		drawlines(m_lastline, m_rasterline);
-		set_interrupt(2);
-	}
-
-	if (RASTERLINE_2_C16(m_rasterline) == 0)
-		m_badlines = SCREENON;
-
-	m_line_phase = 0;
-	m_phase_timer->adjust(attotime::from_ticks(LINE_PHASE_START[1], clock() * 2));
-	update_cpu_clock();
-}
-
-TIMER_CALLBACK_MEMBER(mos7360_device::line_phase_gen)
-{
-	m_line_phase++;
-
-	if (m_line_phase < 3)
-		m_phase_timer->adjust(attotime::from_ticks(LINE_PHASE_START[m_line_phase + 1] - LINE_PHASE_START[m_line_phase], clock() * 2));
-
-	update_cpu_clock();
-}
-
-
-void mos7360_device::set_clocks()
-{
-	bool ntsc = BIT(m_reg[0x07], 6);
-	uint32_t const old_clock = clock();
-	set_clock_scale(1.0 / ((5 - ntsc) * 4));
-	m_lines = ntsc ? NTSC_LINES : PAL_LINES;
-
-	if (clock() != old_clock)
-		m_stream->set_sample_rate(clock() / 4);
-	m_top = ntsc ? 16 : 4;
-
-	if ((clock() != old_clock) || !m_line_timer->enabled())
-	{
-		attotime const period = attotime::from_ticks(57, clock());
-		m_line_timer->adjust(period, 0, period);
-	}
-
-	update_cpu_clock();
-}
-
-
-//-------------------------------------------------
-//  update_cpu_clock - set the CPU clock to give
-//  the number of cycles TED leaves the CPU on
-//  the current raster line
-//-------------------------------------------------
-
-void mos7360_device::update_cpu_clock()
-{
-	int const raster = RASTERLINE_2_C16(m_rasterline);
-	int const ysmooth = VERTICALPOS;
-
-	bool const badline = m_badlines &&
-			(((raster < 0xcb) && ((raster & 7) == ysmooth)) ||
-			((raster > 0) && (raster <= 0xcb) && ((raster & 7) == ((ysmooth + 1) & 7))));
-
-	int const units = LINE_PHASE_START[m_line_phase + 1] - LINE_PHASE_START[m_line_phase];
-	int half_cycles;
-
-	if (badline && (m_line_phase == 1))
-		half_cycles = 0;
-	else if (BIT(m_reg[0x13], 1))
-		half_cycles = units;
-	else if (SCREENON && (raster <= 0xcb))
-		half_cycles = 2 * LINE_PHASE_CYCLES_FETCH[m_line_phase];
-	else
-		half_cycles = 2 * LINE_PHASE_CYCLES_BORDER[m_line_phase];
-
-	if (!half_cycles)
-	{
-		m_cpu->suspend(SUSPEND_REASON_HALT, true);
-		return;
-	}
-
-	m_cpu->resume(SUSPEND_REASON_HALT);
-
-	uint32_t const cpu_clock = uint64_t(clock()) * half_cycles / units;
-
-	if (m_cpu->unscaled_clock() != cpu_clock)
-		m_cpu->set_clock(cpu_clock);
 }

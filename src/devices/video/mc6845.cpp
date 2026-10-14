@@ -84,6 +84,9 @@ DEFINE_DEVICE_TYPE(HD6345,   hd6345_device,   "hd6345",   "Hitachi HD6345 CRTC-I
 mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this, false)
+	, m_line_counter_mask(0x7f)
+	, m_interlace_fields(false)
+	, m_latch_row_end(false)
 	, m_line_timer(nullptr)
 	, m_show_border_area(true)
 	, m_noninterlace_adjust(0)
@@ -383,8 +386,7 @@ void mc6845_device::recompute_parameters(bool postload)
 				horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, refresh.as_hz());
 			LOGRAW("screen.set_raw(%lu, %d, 0, %d, %d, 0, %d);\n", this->clock() * m_hpixels_per_column, horiz_pix_total, max_visible_x + 1, vert_pix_total, max_visible_y + 1);
 
-			if (has_screen())
-				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+			configure_screen(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 			if (!m_reconfigure_cb.isnull())
 				m_reconfigure_cb(horiz_pix_total, vert_pix_total, visarea, refresh,
@@ -452,6 +454,20 @@ void mc6845_device::set_hsync(int state)
 		m_hsync = state;
 		m_out_hsync_cb(m_hsync);
 	}
+}
+
+
+void mc6845_device::configure_screen(int width, int height, const rectangle &visarea, const attotime &refresh)
+{
+	if (has_screen())
+		screen().configure(width, height, visarea, refresh);
+}
+
+
+void mc6845_device::frame_start()
+{
+	if (has_screen())
+		screen().reset_origin();
 }
 
 
@@ -569,6 +585,16 @@ bool hd6845s_device::check_cursor_visible(uint16_t ra, uint16_t line_addr)
 }
 
 
+bool mc6845_device::is_row_end() const
+{
+	// For rudimentary 'interlace and video' support without m_interlace_fields, m_raster_counter increments by 1 rather than the correct 2.
+	if (m_interlace_fields && MODE_INTERLACE_AND_VIDEO)
+		return (m_raster_counter >= m_max_ras_addr) || ((m_raster_counter + 1) == m_max_ras_addr);
+	else
+		return m_raster_counter == m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1;
+}
+
+
 TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 {
 	bool new_vsync = m_vsync;
@@ -592,10 +618,9 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 		}
 	}
 
-	// For rudimentary 'interlace and video' support, m_raster_counter increments by 1 rather than the correct 2.
-	// The correct test would be:
-	// if (m_raster_counter == (MODE_INTERLACE_AND_VIDEO ? m_max_ras_addr + 1 : m_max_ras_addr))
-	if (m_raster_counter == m_max_ras_addr + (MODE_INTERLACE_AND_VIDEO ? m_interlace_adjust : m_noninterlace_adjust) - 1)
+	bool const field_raster = m_interlace_fields && MODE_INTERLACE_AND_VIDEO;
+
+	if (m_latch_row_end ? m_row_end : is_row_end())
 	{
 		/* Check if we have reached the end of the vertical area */
 		if (m_line_counter == m_vert_char_total)
@@ -604,8 +629,8 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 			m_adjust_active = 1;
 		}
 
-		m_raster_counter = 0;
-		m_line_counter = (m_line_counter + 1) & 0x7f;
+		m_raster_counter = field_raster ? (~(m_raster_counter ^ m_max_ras_addr) & 1) : 0;
+		m_line_counter = (m_line_counter + 1) & m_line_counter_mask;
 		m_line_address = (m_line_address + m_horiz_disp) & 0x3fff;
 
 		if (match_line())
@@ -613,9 +638,7 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 	}
 	else
 	{
-		// For rudimentary 'interlace and video' support, m_raster_counter increments by 1 rather than the correct 2.
-		// m_raster_counter = (m_raster_counter + (MODE_INTERLACE_AND_VIDEO ? 2 : 1)) & 0x1f;
-		m_raster_counter = (m_raster_counter + 1) & 0x1f;
+		m_raster_counter = (m_raster_counter + (field_raster ? 2 : 1)) & 0x1f;
 	}
 
 	if (m_adjust_active)
@@ -624,7 +647,8 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 		if (m_adjust_counter == m_vert_total_adj)
 		{
 			m_adjust_active = 0;
-			m_raster_counter = 0;
+			m_field = field_raster ? (m_field ^ 1) : 0;
+			m_raster_counter = m_field;
 			m_line_counter = 0;
 			m_line_address = m_disp_start_addr;
 			m_line_enable_ff = true;
@@ -638,8 +662,7 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 			/* also update the cursor state now */
 			update_cursor_state();
 
-			if (has_screen())
-				screen().reset_origin();
+			frame_start();
 		}
 		else
 		{
@@ -661,6 +684,8 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 			m_cursor_on_timer->adjust(cclks_to_attotime(m_cursor_x));
 		}
 	}
+
+	m_row_end = is_row_end();
 
 	/* Schedule HSYNC on signal */
 	m_hsync_on_timer->adjust(cclks_to_attotime(m_horiz_sync_pos));
@@ -955,6 +980,8 @@ void mc6845_device::device_start()
 	m_line_enable_ff = false;
 	m_vsync_ff = 0;
 	m_raster_counter = 0;
+	m_field = 0;
+	m_row_end = false;
 	m_adjust_active = 0;
 	m_horiz_sync_pos = 1;
 	m_vert_sync_pos = 1;
@@ -1015,6 +1042,8 @@ void mc6845_device::device_start()
 	save_item(NAME(m_hsync_width_counter));
 	save_item(NAME(m_line_counter));
 	save_item(NAME(m_raster_counter));
+	save_item(NAME(m_field));
+	save_item(NAME(m_row_end));
 	save_item(NAME(m_adjust_counter));
 	save_item(NAME(m_vsync_width_counter));
 	save_item(NAME(m_line_enable_ff));

@@ -229,10 +229,7 @@ void mips3_device::code_flush_cache()
 
 	/* empty the transient cache contents */
 	m_drcuml->reset();
-	if (m_dcache_geometry)
-	{
-		std::fill_n(m_dcache_code_pages.get(), 1U << 17, 0);
-	}
+	std::fill_n(m_dcache_code_pages.get(), 1U << 17, 0);
 
 	try
 	{
@@ -422,6 +419,12 @@ void mips3_device::cfunc_dcache_op(void *param)
 {
 	mips3_device &cpu = *static_cast<mips3_device *>(param);
 	cpu.dcache_op(cpu.m_core->cacheop, cpu.m_core->arg0, cpu.m_core->arg1);
+}
+
+void mips3_device::cfunc_icache_op(void *param)
+{
+	mips3_device &cpu = *static_cast<mips3_device *>(param);
+	cpu.icache_op(cpu.m_core->arg0);
 }
 
 void mips3_device::cfunc_dcache_memory(void *param)
@@ -1442,11 +1445,8 @@ void mips3_device::generate_checksum_block(drcuml_block &block, compiler_state &
 
 void mips3_device::generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
-	/* pages holding translated code, for data cache writebacks */
-	if (m_dcache_geometry)
-	{
-		m_dcache_code_pages[desc->physpc >> 15] |= uint8_t(1U << ((desc->physpc >> 12) & 7));
-	}
+	/* pages holding translated code, for cache operations that reach it */
+	m_dcache_code_pages[desc->physpc >> 15] |= uint8_t(1U << ((desc->physpc >> 12) & 7));
 
 	/* add an entry for the log */
 	if (m_drcuml->logging() && !desc->virtual_noop())
@@ -2155,6 +2155,10 @@ bool mips3_device::generate_opcode(drcuml_block &block, compiler_state &compiler
 			{
 				generate_dcache_op(block, compiler, desc);
 			}
+			else if ((RTREG & 3) == 0)
+			{
+				generate_icache_op(block, compiler, desc);
+			}
 			return true;
 
 		case 0x33:  /* PREF - MIPS IV */
@@ -2218,6 +2222,27 @@ void mips3_device::generate_dcache_op(drcuml_block &block, compiler_state &compi
 	UML_LABEL(block, done);                                                         // done:
 
 	/* a writeback into translated code asks for the block to be left */
+	if (!desc->in_delay_slot())
+	{
+		generate_update_cycles(block, compiler, desc->pc + 4, true);
+	}
+}
+
+
+/*-------------------------------------------------
+    generate_icache_op - compile a CACHE operation
+    on the primary instruction cache
+-------------------------------------------------*/
+
+void mips3_device::generate_icache_op(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
+{
+	const uint32_t op = desc->opptr;
+
+	UML_ADD(block, I0, R32(RSREG), SIMMVAL);                                        // add     i0,<rsreg>,SIMMVAL
+	UML_MOV(block, mem(&m_core->arg0), I0);                                         // mov     [arg0],i0
+	UML_CALLC(block, cfunc_icache_op, this);                                        // callc   cfunc_icache_op,mips3
+
+	/* invalidating translated code asks for the block to be left */
 	if (!desc->in_delay_slot())
 	{
 		generate_update_cycles(block, compiler, desc->pc + 4, true);

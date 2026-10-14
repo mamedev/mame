@@ -30,12 +30,19 @@ DEFINE_DEVICE_TYPE(INDUS_GT, indus_gt_device, "indusgt", "Indus GT Disk Drive")
 //-------------------------------------------------
 
 ROM_START( indusgt )
+	ROM_DEFAULT_BIOS("v11")
+	ROM_SYSTEM_BIOS( 0, "v11", "Indus GT v1.1" )
+	ROM_SYSTEM_BIOS( 1, "jiffydos", "JiffyDOS v6.01" )
+
 	ROM_REGION( 0x4000, "ucd5", 0 )
-	ROM_LOAD( "u18 v1.1.u18", 0x0000, 0x2000, CRC(e401ce56) SHA1(9878053bdff7a036f57285c2c4974459df2602d8) )
-	ROM_LOAD( "u17 v1.1.u17", 0x2000, 0x2000, CRC(575ad906) SHA1(f48837b024add84f888acd83a9cf9eb7d2379172) )
+	ROMX_LOAD( "u18 v1.1.u18", 0x0000, 0x2000, CRC(e401ce56) SHA1(9878053bdff7a036f57285c2c4974459df2602d8), ROM_BIOS(0) )
+	ROMX_LOAD( "u17 v1.1.u17", 0x2000, 0x2000, CRC(575ad906) SHA1(f48837b024add84f888acd83a9cf9eb7d2379172), ROM_BIOS(0) )
+	ROMX_LOAD( "jiffydos indusgt.u18", 0x0000, 0x2000, CRC(24cc9d6b) SHA1(e03df9641e47df22ba7caadffd1f4230fe318e66), ROM_BIOS(1) )
+	ROMX_LOAD( "jiffydos indusgt.u17", 0x2000, 0x2000, CRC(ccef53a9) SHA1(9482aadbd452935e8825cf844989e58a55ad6034), ROM_BIOS(1) )
 
 	ROM_REGION( 0x2000, "romdisk", 0 )
-	ROM_LOAD( "u19 v1.1.u19", 0x0000, 0x2000, CRC(8f83e7a5) SHA1(5bceaad520dac9d0527723b3b454e8ec99748e5b) )
+	ROMX_LOAD( "u19 v1.1.u19", 0x0000, 0x2000, CRC(8f83e7a5) SHA1(5bceaad520dac9d0527723b3b454e8ec99748e5b), ROM_BIOS(0) )
+	ROMX_LOAD( "jiffydos indusgt.u19", 0x0000, 0x2000, CRC(fd4ad32a) SHA1(5e567bf8f2ac32bee30bac1dd6eb03a588d95959), ROM_BIOS(1) )
 ROM_END
 
 

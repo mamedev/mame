@@ -309,6 +309,45 @@ void c64_expansion_slot_device::ba_w(int state)
 }
 
 
+//-------------------------------------------------
+//  phi2_w - system clock
+//-------------------------------------------------
+
+void c64_expansion_slot_device::phi2_w(int state)
+{
+	if (m_card != nullptr)
+	{
+		m_card->c64_phi2_w(state);
+	}
+}
+
+
+//-------------------------------------------------
+//  host_irq_w - interrupt request seen by the host
+//-------------------------------------------------
+
+void c64_expansion_slot_device::host_irq_w(int state)
+{
+	if (m_card != nullptr)
+	{
+		m_card->c64_irq_w(state);
+	}
+}
+
+
+//-------------------------------------------------
+//  host_nmi_w - non-maskable interrupt seen by the host
+//-------------------------------------------------
+
+void c64_expansion_slot_device::host_nmi_w(int state)
+{
+	if (m_card != nullptr)
+	{
+		m_card->c64_nmi_w(state);
+	}
+}
+
+
 void c64_expansion_slot_device::set_passthrough()
 {
 	irq_callback().set(DEVICE_SELF_OWNER, FUNC(c64_expansion_slot_device::irq_w));
@@ -369,6 +408,7 @@ void c64_expansion_slot_device::set_passthrough()
 #include "partner.h"
 #include "prophet64.h"
 #include "ps64.h"
+#include "ramlink.h"
 #include "reu.h"
 #include "rex.h"
 #include "rex_ep256.h"
@@ -400,6 +440,8 @@ void c64_expansion_slot_device::set_passthrough()
 void c64_expansion_cards(device_slot_interface &device)
 {
 	device.option_add("16k", C64_16KB);
+	device.option_add("buscard", C64_BUSCARD);
+	device.option_add("buscard2", C64_BUSCARD2);
 	device.option_add("cpm", C64_CPM);
 	device.option_add("dqbb", C64_DQBB);
 	device.option_add("easyflash", C64_EASYFLASH);
@@ -410,32 +452,32 @@ void c64_expansion_cards(device_slot_interface &device)
 	device.option_add("midipp", C64_MIDI_PASSPORT);
 	device.option_add("midisci", C64_MIDI_SCI);
 	device.option_add("midisiel", C64_MIDI_SIEL);
+	device.option_add("multiscreen", C64_MULTISCREEN);
 	device.option_add("music64", C64_MUSIC64);
 	device.option_add("neoram", C64_NEORAM);
+	device.option_add("ramlink", C64_RAMLINK);
 	device.option_add("reu1700", C64_REU1700);
 	device.option_add("reu1750", C64_REU1750);
 	device.option_add("reu1764", C64_REU1764);
 	device.option_add("sfxse", C64_SFX_SOUND_EXPANDER);
 	device.option_add("speakez", C64_SPEAKEASY);
 	device.option_add("supercpu", C64_SUPERCPU);
+	device.option_add("supercpu128", C128_SUPERCPU);
 	device.option_add("swiftlink", C64_SWIFTLINK);
 	device.option_add("tibdd001", C64_TIB_DD_001);
 	device.option_add("turbo232", C64_TURBO232);
-	device.option_add("buscard", C64_BUSCARD);
-	device.option_add("buscard2", C64_BUSCARD2);
-	device.option_add("multiscreen", C64_MULTISCREEN);
 
 	// the following need ROMs from the software list
 	device.option_add_internal("standard", C64_STD);
 	device.option_add_internal("ar4x", C64_ACTION_REPLAY);
-	device.option_add_internal("comal80", C64_COMAL80);
 	device.option_add_internal("c128_comal80", C128_COMAL80);
+	device.option_add_internal("comal80", C64_COMAL80);
 	device.option_add_internal("cs64", C64_CURRAH_SPEECH);
 	device.option_add_internal("dela_ep256", C64_DELA_EP256);
-	device.option_add_internal("ep64", C64_DELA_EP64);
-	device.option_add_internal("ep7x8", C64_DELA_EP7X8);
 	device.option_add_internal("dinamic", C64_DINAMIC);
 	device.option_add_internal("easycalcres", C64_EASY_CALC_RESULT);
+	device.option_add_internal("ep64", C64_DELA_EP64);
+	device.option_add_internal("ep7x8", C64_DELA_EP7X8);
 	device.option_add_internal("epyxfastload", C64_EPYX_FAST_LOAD);
 	device.option_add_internal("exos", C64_EXOS);
 	device.option_add_internal("fcc", C64_FCC);
@@ -471,7 +513,7 @@ void c64_expansion_cards(device_slot_interface &device)
 	device.option_add_internal("vizawrite", C64_VW64);
 	device.option_add_internal("warp_speed", C64_WARP_SPEED);
 	device.option_add_internal("westermann", C64_WESTERMANN);
-	device.option_add_internal("zaxxon", C64_ZAXXON);
 	device.option_add_internal("xl80", C64_XL80);
 	device.option_add_internal("z80videopak", C64_Z80VIDEOPAK);
+	device.option_add_internal("zaxxon", C64_ZAXXON);
 }

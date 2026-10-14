@@ -1318,7 +1318,23 @@ void z80scc_channel::rcv_complete()
 	receive_register_extract();
 	data = get_received_char();
 	LOG("%s: Received Data %c\n", FUNCNAME, data);
-	receive_data(data);
+	if (m_rr0 & RR0_BREAK_ABORT)
+		return;
+	if (!data && is_receive_framing_error())
+	{
+		m_rr0 |= RR0_BREAK_ABORT;
+		if ((m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_BREAK_ABORT))
+		{
+			if (m_extint_latch == 0)
+			{
+				m_extint_latch = 1;
+				m_extint_states = m_rr0;
+			}
+			m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
+		}
+		return;
+	}
+	receive_data(data, (is_receive_parity_error() ? RR1_PARITY_ERROR : 0) | (is_receive_framing_error() ? RR1_CRC_FRAMING_ERROR : 0));
 #if START_BIT_HUNT
 	m_rcv_mode = RCV_SEEKING;
 #endif
@@ -1468,7 +1484,7 @@ uint8_t z80scc_channel::do_sccreg_rr1()
 {
 	uint8_t rr1 = m_rr1;
 	if (m_rx_fifo_wp != m_rx_fifo_rp)
-		rr1 = (rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo_rp];
+		rr1 = (rr1 & ~RR1_CRC_FRAMING_ERROR) | m_rx_error_fifo[m_rx_fifo_rp];
 	LOGR("%s <- %02x\n", FUNCNAME, rr1);
 	return rr1;
 }
@@ -1896,6 +1912,8 @@ void z80scc_channel::do_sccreg_wr1(uint8_t data)
 	/* TODO: Sort out SCC specific behaviours  from legacy SIO behaviours inherited from z80dart.cpp:
 	   - Channel B only bits vs
 	   - Parity Is Special Condition, bit2 */
+	if ((data & WR1_RX_INT_MODE_MASK) == WR1_RX_INT_FIRST && (m_wr1 & WR1_RX_INT_MODE_MASK) != WR1_RX_INT_FIRST)
+		m_rx_first = 1;
 	m_wr1 = data;
 	LOG("- External Interrupt Enable %d\n", (data & WR1_EXT_INT_ENABLE) ? 1 : 0);
 	LOG("- Transmit Interrupt Enable %d\n", (data & WR1_TX_INT_ENABLE) ? 1 : 0);
@@ -2018,14 +2036,24 @@ void z80scc_channel::do_sccreg_wr5(uint8_t data)
 	if (data != m_wr5)
 	{
 		LOG("%s(%02x): Setting up the transmitter\n", FUNCNAME, data);
+		uint8_t const changed = data ^ m_wr5;
 		m_wr5 = data;
 		LOG("- Transmitter Enable %d\n", (data & WR5_TX_ENABLE) ? 1 : 0);
 		LOG("- Transmitter Bits/Character %d\n", get_tx_word_length());
 		LOG("- Send Break %d\n", (data & WR5_SEND_BREAK) ? 1 : 0);
 		LOG("- Request to Send %d\n", (data & WR5_RTS) ? 1 : 0);
 		LOG("- Data Terminal Ready %d\n", (data & WR5_DTR) ? 1 : 0);
-		update_serial();
-		safe_transmit_register_reset();
+		if (changed & ~(WR5_RTS | WR5_DTR | WR5_SEND_BREAK))
+		{
+			update_serial();
+			safe_transmit_register_reset();
+		}
+		if (changed & WR5_SEND_BREAK)
+		{
+			out_txd_cb((data & WR5_SEND_BREAK) ? 0 : 1);
+			if ((m_wr14 & (WR14_AUTO_ECHO | WR14_LOCAL_LOOPBACK)) == WR14_LOCAL_LOOPBACK)
+				write_rx((data & WR5_SEND_BREAK) ? 0 : 1, true);
+		}
 		update_rts(); // Will also update DTR accordingly
 
 		check_dma_request();
@@ -2435,7 +2463,7 @@ uint8_t z80scc_channel::data_read()
 
 		// load error status from the FIFO
 		uint8_t const status = m_rx_error_fifo[m_rx_fifo_rp];
-		m_rr1 = (m_rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_PARITY_ERROR)) | status;
+		m_rr1 = (m_rr1 & ~RR1_CRC_FRAMING_ERROR) | status;
 
 		if (rx_special_condition(status))
 			logerror("Rx Error %02x\n", status & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
@@ -2625,7 +2653,7 @@ void z80scc_channel::data_write(uint8_t data)
 //-------------------------------------------------
 //  receive_data - put received data word into fifo
 //-------------------------------------------------
-void z80scc_channel::receive_data(uint8_t data)
+void z80scc_channel::receive_data(uint8_t data, uint8_t status)
 {
 	LOGRCV("Received Data Byte '%c'/%02x put into FIFO\n", isprint(data) ? data : ' ', data);
 
@@ -2642,7 +2670,7 @@ void z80scc_channel::receive_data(uint8_t data)
 	}
 	else
 	{
-		m_rx_error_fifo[m_rx_fifo_wp] &= ~RR1_RX_OVERRUN_ERROR;
+		m_rx_error_fifo[m_rx_fifo_wp] = status;
 
 		// store received character
 		m_rx_data_fifo[m_rx_fifo_wp] = data;
@@ -3063,6 +3091,21 @@ void z80scc_channel::write_rx(int state, bool loopback)
 		m_rx_clock = 0;
 
 	LOGRCV("%s(%d)\n", FUNCNAME, state);
+	if ((m_rr0 & RR0_BREAK_ABORT) && !m_rxd && state)
+	{
+		m_rr0 &= ~RR0_BREAK_ABORT;
+		if ((m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_BREAK_ABORT))
+		{
+			if (m_extint_latch == 0)
+			{
+				m_extint_latch = 1;
+				m_extint_states = m_rr0;
+			}
+			m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
+		}
+		receive_register_reset();
+		receive_data(0);
+	}
 	m_rxd = state;
 	if (rtxc_driven_rxc || m_rxc != 0 || m_brg_rate != 0)
 		device_serial_interface::rx_w(state);
@@ -3120,7 +3163,7 @@ void z80scc_channel::check_receive_interrupt()
 		case WR1_RX_INT_ALL:
 			{
 				uint8_t const status = m_rx_error_fifo[m_rx_fifo_rp]
-						| (m_rr1 & RR1_RX_OVERRUN_ERROR);
+						| (m_rr1 & (RR1_PARITY_ERROR | RR1_RX_OVERRUN_ERROR));
 				m_uart->trigger_interrupt(m_index, rx_special_condition(status) ? INT_SPECIAL : INT_RECEIVE);
 			}
 			break;

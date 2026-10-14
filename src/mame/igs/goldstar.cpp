@@ -257,6 +257,7 @@
 
 #include "cpu/m6805/m68705.h"
 #include "cpu/mcs51/i80c51.h"
+#include "cpu/z80/mc8123.h"
 #include "cpu/z80/z80.h"
 #include "machine/ds2401.h"
 #include "machine/i8255.h"
@@ -654,6 +655,7 @@ public:
 	void bingownga(machine_config &config) ATTR_COLD;
 	void cbaai(machine_config &config) ATTR_COLD;
 	void feverch(machine_config &config) ATTR_COLD;
+	void feverchb(machine_config &config) ATTR_COLD;
 	void fevchw4(machine_config &config) ATTR_COLD;
 	void flam7_tw(machine_config &config) ATTR_COLD;
 	void flam7_w4(machine_config &config) ATTR_COLD;
@@ -678,6 +680,7 @@ public:
 
 	void init_cb2() ATTR_COLD;
 	void init_cbaai() ATTR_COLD;
+	void init_feverchb()ATTR_COLD;
 	void init_fl7_3121() ATTR_COLD;
 	void init_flam7_tw() ATTR_COLD;
 	void init_flaming7() ATTR_COLD;
@@ -17096,6 +17099,15 @@ void wingco_state::feverch(machine_config &config)
 	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(50));
 }
 
+void wingco_state::feverchb(machine_config &config)
+{
+	feverch(config);
+
+	MC8123(config.replace(), m_maincpu, XTAL(12'000'000) / 2); // clock not verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::feverch_map);
+	m_maincpu->set_addrmap(AS_IO, &wingco_state::feverch_portmap);
+	m_maincpu->set_addrmap(AS_OPCODES, &wingco_state::common_decrypted_opcodes_map);
+}
 
 void wingco_state::lucky8tet(machine_config &config)
 {
@@ -28395,6 +28407,33 @@ ROM_START( fevercha )
 	ROM_LOAD( "82s123.10d", 0x0100, 0x0020, CRC(71670863) SHA1(bd0d18c55774db7720413632d130cf3790fca1ad) )
 ROM_END
 
+ROM_START( feverchb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "eagle_38.11b", 0x00000, 0x8000, CRC(c10e75db) SHA1(94e40c97683c1635a0f33d219d9b1a04d249fafc) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 )
+	ROM_LOAD( "key", 0x0000, 0x2000, CRC(489cdfd6) SHA1(805f6c5a1f9c0038a800f5cae1cafc348654fd50) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "eagle_15.7h",  0x00000, 0x08000, CRC(ef8bbc3f) SHA1(6787e9320f8d13d4b35e73befaffc251b6b5db65) )
+	ROM_LOAD( "eagle_16.8h",  0x08000, 0x08000, CRC(7195d1cc) SHA1(cd7d55251cb1ce64dd4f9e9181acd7885317130c) )
+	ROM_LOAD( "eagle_17.10h", 0x10000, 0x08000, CRC(343182c7) SHA1(227f0db85a7191cfb90a12402c8107537e8ca6db) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "eagle_1.1h", 0x0000, 0x2000, CRC(c2f72d5f) SHA1(3e4f37a60931a417929255e782d8f7f219d8ebd0) )
+	ROM_LOAD( "eagle_2.2h", 0x2000, 0x2000, CRC(b4a0f2ad) SHA1(f68d5134156b646c5eeadbab6bdc21507018eafa) )
+	ROM_LOAD( "eagle_3.4h", 0x4000, 0x2000, CRC(69d28b71) SHA1(f3290fa7404338e633c1762bdbd2ca737add9421) )
+	ROM_LOAD( "eagle_4.5h", 0x6000, 0x2000, CRC(bc3a09c4) SHA1(952dcd4aace87fd7249fc2391c8b4832fa17b083) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD_NIB_LOW(  "82s129.12f", 0x0000, 0x0100, CRC(5b826df5) SHA1(c6e8ffec328f1bb8acdcad70d7045f96cc150166) )
+	ROM_LOAD_NIB_HIGH( "82s129.11f", 0x0000, 0x0100, CRC(0a15ccc6) SHA1(7915e2cbfe4264cab42a780364ca56038412a249) )
+	ROM_LOAD(          "82s123.13f", 0x0080, 0x0020, CRC(82b2660a) SHA1(af4a8f4560ec22a7adda1f590651d6a84f894314) )
+
+	ROM_REGION( 0x0100, "unkproms", 0 )
+	ROM_LOAD( "82s129.4e",  0x0000, 0x0100, CRC(7edb311b) SHA1(8e7f933313dc7a1f2a5e8803c26953ced3f798d0) )  // same as megaline
+ROM_END
+
 ROM_START( feverchtw )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "main_tw.c11", 0x00000, 0x8000, CRC(a38376d8) SHA1(34b1966becae4adbde5554db95707683157d4fa4) )
@@ -31995,7 +32034,7 @@ void cmaster_state::init_cm()
 	uint8_t *rom = memregion("maincpu")->base();
 
 	// HACK: force PPI mode 0 for all, and A, B & C as input
-    // the mixed modes 2-0 are not working properly.
+	// the mixed modes 2-0 are not working properly.
 
 	rom[0x0021] = 0x9b;
 	rom[0x0025] = 0x9b;
@@ -32006,7 +32045,7 @@ void cmaster_state::init_cmv4()
 	uint8_t *rom = memregion("maincpu")->base();
 
 	// HACK: force PPI mode 0 for all, and A, B & C as input
-    // the mixed modes 2-0 are not working properly.
+	// the mixed modes 2-0 are not working properly.
 	rom[0x0209] = 0x9b;
 	rom[0x020d] = 0x9b;
 }
@@ -32044,7 +32083,7 @@ void cmaster_state::init_cmv823()
 	}
 
 	// HACK: force PPI mode 0 for all, and A, B & C as input
-    // the mixed modes 2-0 are not working properly.
+	// the mixed modes 2-0 are not working properly.
 	rom[0x001f] = 0x9b;
 	rom[0x0023] = 0x9b;
 }
@@ -32082,7 +32121,7 @@ void cmaster_state::init_cmpap()
 	}
 
 	// HACK: force PPI mode 0 for all, and A, B & C as input
-    // the mixed modes 2-0 are not working properly.
+	// the mixed modes 2-0 are not working properly.
 	rom[0x007a] = 0x9b;
 	rom[0x007e] = 0x9b;
 }
@@ -32309,7 +32348,7 @@ void cmaster_state::init_cmast91()
 	uint8_t *rom = memregion("maincpu")->base();
 
 	// HACK: force PPI mode 0 for all, and A, B & C as input
-    // the mixed modes 2-0 are not working properly.
+	// the mixed modes 2-0 are not working properly.
 	rom[0x0070] = 0x9b;
 	rom[0x0a92] = 0x9b;
 }
@@ -32319,7 +32358,7 @@ void cmaster_state::init_cll()
 	uint8_t *rom = memregion("maincpu")->base();
 
 	// HACK: force PPI mode 0 for all, and A, B & C as input
-    // the mixed modes 2-0 are not working properly.
+	// the mixed modes 2-0 are not working properly.
 	rom[0x0070] = 0x9b;
 	rom[0x0a9c] = 0x9b;
 }
@@ -33490,6 +33529,11 @@ void cmaster_state::init_chthree()
 	}
 }
 
+void wingco_state::init_feverchb()
+{
+	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), &m_decrypted_opcodes[0], 0x8000);
+}
+
 /*
   Flaming 7's
   Cyberdyne Systems.
@@ -34315,6 +34359,7 @@ GAME(  199?, special7b,  special7, flam7_tw, flaming7, wingco_state,   init_spec
 // --- Wing W-6 hardware ---
 GAMEL( 1986, feverch,    0,        feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 1)",                         0,          layout_lucky8 )
 GAMEL( 1986, fevercha,   feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 2)",                         0,          layout_lucky8 )
+GAMEL( 1986, feverchb,   feverch,  feverchb, feverch,  wingco_state,   init_feverchb,  ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, MC-8123)",                       0,          layout_lucky8 )
 GAMEL( 1986, feverchtw,  feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Yamate",            "Fever Chance (W-6, Taiwan)",                               0,          layout_lucky8 )
 GAMEL( 1986, feverchw4,  feverch,  fevchw4,  lucky8b,  wingco_state,   empty_init,     ROT0, "bootleg",           "Fever Chance (W-6, cross-system for W-4)",                 0,          layout_lucky8p1 )
 

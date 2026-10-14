@@ -19887,6 +19887,7 @@ froggers
 froggers1
 froggers2
 froggers3
+froggers4
 froggert
 froggervd
 froggrs
@@ -21694,6 +21695,7 @@ fb2010
 fb2010a
 feverch
 fevercha
+feverchb
 feverchtw
 feverchw4
 fl7_3121
@@ -30772,11 +30774,14 @@ coolpool
 @source:misc/corona.cpp
 legrandc
 luckyrlt
+luckyrlta
+monte
 rcirulet
 re800ea
 re800v1
 re800v1a
 re800v3
+rulamiky
 winner81
 winner81b
 winner81c
@@ -40776,11 +40781,15 @@ sandaha
 
 @source:sealy/sealy_z80.cpp
 bbddz
+ddz1
 ddz2
+ddz2a
 djddz
+djddza
+fkddzz80
 jzuanshi
+lucky168
 pljh
-xy168
 
 @source:seequa/chameleon.cpp
 chameleon
@@ -44123,6 +44132,9 @@ hazl1552
 
 @source:skeleton/hazl1420.cpp
 hazl1420
+
+@source:skeleton/highway_m68k.cpp
+tzfx
 
 @source:skeleton/hkcastle.cpp
 hkcastle

@@ -1004,6 +1004,8 @@ void kn6000_state::kn6000(machine_config &config)
 	configure_tonegen();
 	custom_flash_add(config);
 	fdc_add(config);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("kn6000_flop");
 }
 
 void kn_state::kn24_common(machine_config &config)

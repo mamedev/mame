@@ -254,8 +254,8 @@ Fails to LOAD "$",8
 		<publisher>Melbourne House</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="333744">
-				<rom name="street_hassle[melbourne_house_1987](pal).g64" size="333744" crc="92c15c93" sha1="a1bc536294ae1d36ffde644798dc25cd1d514c93"/>
+			<dataarea name="flop" size="319232">
+				<rom name="StreetHassle_s0.g64" size="319232" crc="9a0967c0" sha1="4ce5d59772ee911b8d058c2fa700a87649376d52"/>
 			</dataarea>
 		</part>
 	</software>
@@ -264,9 +264,7 @@ Fails to LOAD "$",8
 		<description>Strip Poker</description>
 		<year>1984</year>
 		<publisher>Artworx</publisher>
-		<notes><![CDATA[
-LOAD "STRIP POKER",8
-]]></notes>
+		<info name="usage" value="LOAD&quot;STRIP POKER&quot;,8" />
 		<sharedfeat name="compatibility" value="PAL"/>
 		<sharedfeat name="write_protected" value="true" />
 
@@ -277,13 +275,10 @@ LOAD "STRIP POKER",8
 		</part>
 	</software>
 
-	<software name="toutrun" supported="partial">
+	<software name="toutrun">
 		<description>Turbo Out Run</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
-		<notes><![CDATA[
-Graphics issues
-]]></notes>
 		<info name="protection" value="sload" />
 		<sharedfeat name="compatibility" value="PAL"/>
 
@@ -632,19 +627,6 @@ Graphics issues
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="382672">
 				<rom name="Sanatar_s0.g64" size="382672" crc="150a9667" sha1="d845fe984f370817c6bebbd0547450ba35759388"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sthassl2" cloneof="sthassle">
-		<description>Street Hassle (alt)</description>
-		<year>1987</year>
-		<publisher>Melbourne House</publisher>
-		<sharedfeat name="compatibility" value="PAL"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="319232">
-				<rom name="StreetHassle_s0.g64" size="319232" crc="9a0967c0" sha1="4ce5d59772ee911b8d058c2fa700a87649376d52"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1838,7 +1820,7 @@ Graphics issues
 		<description>1541/1571 Drive Alignment</description>
 		<year>1987</year>
 		<publisher>Free Spirit Software</publisher>
-		<info name="usage" value='LOAD "*",8' />
+		<info name="usage" value="LOAD&quot;*&quot;,8" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="279582">

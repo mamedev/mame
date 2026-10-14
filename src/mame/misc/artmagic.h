@@ -24,14 +24,15 @@ public:
 		, m_gun_rxd(1)
 	{ }
 
-	void init_cheesech();
-	void init_ultennis();
-	void init_stonebal();
-	void init_westerns();
-	void cheesech(machine_config &config);
-	void artmagic(machine_config &config);
-	void stonebal(machine_config &config);
-	void westerns(machine_config &config);
+	void init_cheesech() ATTR_COLD;
+	void init_ultennis() ATTR_COLD;
+	void init_stonebal() ATTR_COLD;
+	void init_westerns() ATTR_COLD;
+
+	void cheesech(machine_config &config) ATTR_COLD;
+	void artmagic(machine_config &config) ATTR_COLD;
+	void stonebal(machine_config &config) ATTR_COLD;
+	void westerns(machine_config &config) ATTR_COLD;
 
 	int prot_r();
 
@@ -41,6 +42,8 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	using prot_func = void (artmagic_state::*)();
+
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<tms34010_device> m_tms;
@@ -60,11 +63,8 @@ private:
 	uint8_t m_prot_output_bit = 0U;
 	uint8_t m_prot_bit_index = 0U;
 	uint16_t m_prot_save = 0U;
-	typedef void (artmagic_state::*prot_func)();
-	prot_func m_protection_handler{};
-	void ultennis_protection();
-	void cheesech_protection();
-	void stonebal_protection();
+
+	prot_func m_protection_handler = nullptr;
 
 	int m_xor[16]{};
 	int m_is_stoneball = 0;
@@ -72,6 +72,10 @@ private:
 	uint8_t m_blitter_page = 0U;
 	attotime m_blitter_busy_until{};
 	emu_timer * m_irq_off_timer = nullptr;
+
+	void ultennis_protection();
+	void cheesech_protection();
+	void stonebal_protection();
 
 	TIMER_CALLBACK_MEMBER(irq_off);
 	void control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -85,11 +89,11 @@ private:
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
 
-	void decrypt_cheesech();
-	void decrypt_ultennis();
+	void decrypt_cheesech() ATTR_COLD;
+	void decrypt_ultennis() ATTR_COLD;
 	void execute_blit();
 	void update_irq_state();
-	inline uint16_t *address_to_vram(offs_t *address);
+	uint16_t *address_to_vram(offs_t &address);
 
 	void main_map(address_map &map) ATTR_COLD;
 	void westerns_guncpu_data_map(address_map &map) ATTR_COLD;
