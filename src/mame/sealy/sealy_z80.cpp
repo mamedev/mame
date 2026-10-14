@@ -19,7 +19,7 @@ TODO:
 - Dou Dizhu games: emulate the dedicated control panel (twenty card keys plus
   action keys, scanned as a 5-row matrix selected through port a0).  The games
   use it instead of the direct controls when test mode switch 1 (EEPROM byte
-  0x38 on bbddz/djddz, 0x36 on ddz2) is OFF
+  0x38 on bbddz/djddz/wakenz80, 0x36 on ddz2) is OFF
 - dump the lucky168 and ddz1 secure chips if possible
 - verify display timing, sound clock and remaining I/O against hardware
 */
@@ -77,6 +77,7 @@ protected:
 	void decrypt_djddza(const uint8_t (&selectors)[64]) ATTR_COLD;
 	void decrypt_pljh() ATTR_COLD;
 	void decrypt_jzuanshi() ATTR_COLD;
+	void decrypt_wakenz80() ATTR_COLD;
 	void descramble_tiles(uint16_t *tiles, uint32_t count, uint16_t xor_mask, int r_field, int g_field, int b_field) ATTR_COLD;
 	void descramble_djddza_tiles() ATTR_COLD;
 
@@ -129,6 +130,7 @@ public:
 	void init_djddza() ATTR_COLD;
 	void init_djddz() ATTR_COLD;
 	void init_pljh() ATTR_COLD;
+	void init_wakenz80() ATTR_COLD;
 
 private:
 	void program_map(address_map &map) ATTR_COLD;
@@ -740,6 +742,24 @@ ROM_START( pljh )
 	ROM_LOAD( "4.u23", 0x00000, 0x40000, CRC(8cbb5623) SHA1(90169df14264c1e53040bc43106fd8b86b4f1d59) ) // 27c020
 ROM_END
 
+// 挖坑 (Wākēng). All labels prepend 挖坑 and have TIAN SHENG underneath
+ROM_START( wakenz80 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "3.u11", 0x00000, 0x20000, CRC(e1db855a) SHA1(bf212bc8b292d513a35e9a3c5f62ec83ab9222c3) )
+
+	ROM_REGION16_LE( 0x200000, "bgtiles", 0 )
+	ROM_LOAD( "2.u18", 0x000000, 0x200000, CRC(bf747281) SHA1(2e1c9be6cfd39a519a56e7024aae11c9b006ab4a) )
+
+	ROM_REGION16_LE( 0x200000, "fgtiles", 0 )
+	ROM_LOAD( "1.u21", 0x000000, 0x200000, CRC(6116348f) SHA1(b0d77fb14e17c97513068637ffaece169f0fa8fe) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "4.u23", 0x00000, 0x80000, CRC(cd742893) SHA1(153e6d166a6c661ba393e7ebdc294c490b4618d8) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46", 0x00, 0x80, BAD_DUMP CRC(6ca3a909) SHA1(2f55f4040bcab30387d7cc7fecbdcf4d5762a3ed) ) // default with standard control panel
+ROM_END
+
 // 金钻石 (Jīn Zuànshí)
 ROM_START( jzuanshi )
 	ROM_REGION( 0x20000, "maincpu", 0 )
@@ -784,7 +804,8 @@ boards and lucky168 (same five pairs, different selector table on lucky168), A9,
 A5 and A3 pick one of four different pairs on pljh.  A0-A2 never take part, so
 the same transform applies to aligned groups of bytes.  ddz1 uses yet another
 selector table, jzuanshi the Dou Dizhu pairs with the opcode and data roles
-exchanged.
+exchanged, wakenz80 the Dou Dizhu pairs with different opcode XOR values for
+pairs 0 and 1.
 */
 
 // opcode fetches, Dou Dizhu boards and lucky168
@@ -798,6 +819,17 @@ uint8_t dizhu_decrypt_opcode(uint8_t data, uint8_t key)
 		case 2: return bitswap<8>(data ^ 0x30, 5, 0, 2, 4, 3, 6, 7, 1);
 		case 3: return bitswap<8>(data ^ 0x64, 4, 7, 5, 0, 1, 3, 6, 2);
 		case 4: return bitswap<8>(data ^ 0x81, 2, 3, 6, 5, 0, 1, 4, 7);
+	}
+}
+
+// opcode fetches, wakenz80
+uint8_t wakenz80_decrypt_opcode(uint8_t data, uint8_t key)
+{
+	switch (key)
+	{
+		case 0: return bitswap<8>(data ^ 0x10, 0, 5, 1, 2, 7, 6, 3, 4);
+		case 1: return bitswap<8>(data ^ 0x02, 2, 3, 7, 0, 5, 1, 4, 6);
+		default: return dizhu_decrypt_opcode(data, key);
 	}
 }
 
@@ -958,6 +990,20 @@ void sealy_z80_state::decrypt_pljh()
 	}
 }
 
+void sealy_z80_state::decrypt_wakenz80()
+{
+	uint8_t *const rom = memregion("maincpu")->base();
+	const uint32_t length = memregion("maincpu")->bytes();
+	m_decrypted_opcodes = std::make_unique<uint8_t[]>(length);
+
+	for (uint32_t a = 0; a < length; a++)
+	{
+		const uint8_t key = DIZHU_SELECTORS[bitswap<6>(a, 12, 10, 7, 6, 3, 1)];
+		m_decrypted_opcodes[a] = wakenz80_decrypt_opcode(rom[a], key);
+		rom[a] = dizhu_decrypt_data(rom[a], key);
+	}
+}
+
 void sealy_z80_state::decrypt_jzuanshi()
 {
 	uint8_t *const rom = memregion("maincpu")->base();
@@ -1056,6 +1102,13 @@ void sealy_z80_eeprom_state::init_pljh()
 	decrypt_pljh();
 }
 
+void sealy_z80_eeprom_state::init_wakenz80()
+{
+	decrypt_wakenz80();
+	descramble_tiles(&m_fgtiles[0], m_fgtiles.length(), 0x0000, 1, 0, 2);
+	descramble_tiles(&m_bgtiles[0], m_bgtiles.length(), 0x0000, 1, 0, 2);
+}
+
 } // anonymous namespace
 
 
@@ -1067,5 +1120,6 @@ GAME( 2004, djddz,    0,     sealy,    djddz,    sealy_z80_eeprom_state,   init_
 GAME( 2004, djddza,   djddz, sealy,    djddz,    sealy_z80_eeprom_state,   init_djddza,   ROT0, "Sealy", "Dingji Dou Dizhu (set 2)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2004, fkddzz80, 0,     sealy,    djddz,    sealy_z80_eeprom_state,   init_djddza,   ROT0, "Sealy", "Fengkuang Dou Dizhu (Z80-based hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2000, pljh,     0,     pljh,     pljh,     sealy_z80_eeprom_state,   init_pljh,     ROT0, "Sealy", "Piaoliang Jinhua",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 200?, wakenz80, 0,     sealy,    djddz,    sealy_z80_eeprom_state,   init_wakenz80, ROT0, "Sealy", "Wakeng (Z80-based hardware)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2003, jzuanshi, 0,     jzuanshi, jzuanshi, sealy_z80_jzuanshi_state, init_jzuanshi, ROT0, "Sealy", "Jin Zuanshi",                              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, lucky168, 0,     lucky168, lucky168, sealy_z80_esam_state,     init_lucky168, ROT0, "Sealy", "Lucky 168",                                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
