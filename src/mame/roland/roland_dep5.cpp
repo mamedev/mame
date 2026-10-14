@@ -6,9 +6,9 @@
  Both use a 12 MHz CPU, battery SRAM, an MB673106 I/O gate array and
  an MB87126 reverb DSP (40.96 MHz, 160 steps per nominal 32 kHz frame).
  DEP-5 uses the MB87126-002 and adds an MB654119 chorus; RE-3 uses the
- MB87126A-008 and has a serial ten-character VFD.
+ MB87126A-007 and has a serial ten-character VFD.
 
- The MB87126A-008 fixes a timing bug in the serial host interface. Its
+ The MB87126A-007 fixes a timing bug in the serial host interface. Its
  internal program may also differ from the MB87126-002; using the same
  program for both revisions is currently an unverified assumption.
 
@@ -678,10 +678,10 @@ ROM_START(re3)
 	ROM_LOAD16_BYTE("re-3_1.0.0_a.bin", 0, 0x4000, CRC(31b8e98d) SHA1(034408030f1426c8d4db6070d4e1fe090bd39aef))
 	ROM_LOAD16_BYTE("re-3_1.0.0_b.bin", 1, 0x4000, CRC(543a1055) SHA1(0613e1a63dffde804762289dc2ed32f2bffdc22a))
 	ROM_REGION(160 * 5, "reverb:program", 0)
-	// The MB87126A-008 program is assumed to match the MB87126-002, unverified.
+	// The MB87126A-007 program is assumed to match the MB87126-002, unverified.
 	// Furrtek die-shot extraction. Difficult cells were corrected manually
 	// by probing chip behavior; retained as BAD_DUMP pending a verified read.
-	ROM_LOAD("mb87126a-008.bin", 0, 160 * 5, BAD_DUMP CRC(7f5232a4) SHA1(bcfc8fb6bd541255ebbfc2d62d2930f6c442afb1))
+	ROM_LOAD("mb87126a-007.bin", 0, 160 * 5, BAD_DUMP CRC(7f5232a4) SHA1(bcfc8fb6bd541255ebbfc2d62d2930f6c442afb1))
 ROM_END
 
 } // anonymous namespace
