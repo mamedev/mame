@@ -1241,11 +1241,15 @@ void z80scc_channel::tra_complete()
 		if ( (m_rr0 & RR0_TX_BUFFER_EMPTY) == 0 || // Takes care of the NMOS/CMOS 1 slot TX FIFO
 			 m_tx_fifo_rp != m_tx_fifo_wp) // or there are more characters to send in a longer FIFO.
 		{
-			LOGTX("%s: done sending, loading data from fifo:%02x '%c'\n", FUNCNAME,
-				   m_tx_data_fifo[m_tx_fifo_rp], isascii(m_tx_data_fifo[m_tx_fifo_rp]) ? m_tx_data_fifo[m_tx_fifo_rp] : ' ');
-			transmit_register_setup(m_tx_data_fifo[m_tx_fifo_rp]); // Reload the shift register
-			m_tx_fifo_rp_step();
-			m_rr0 |= RR0_TX_BUFFER_EMPTY; // Now here is room in the tx fifo again
+			// in Auto Enables mode, /CTS going inactive holds back the next character
+			if (transmit_allowed())
+			{
+				LOGTX("%s: done sending, loading data from fifo:%02x '%c'\n", FUNCNAME,
+					   m_tx_data_fifo[m_tx_fifo_rp], isascii(m_tx_data_fifo[m_tx_fifo_rp]) ? m_tx_data_fifo[m_tx_fifo_rp] : ' ');
+				transmit_register_setup(m_tx_data_fifo[m_tx_fifo_rp]); // Reload the shift register
+				m_tx_fifo_rp_step();
+				m_rr0 |= RR0_TX_BUFFER_EMPTY; // Now here is room in the tx fifo again
+			}
 		}
 		else
 		{
@@ -1296,14 +1300,14 @@ void z80scc_channel::tra_complete()
 //-------------------------------------------------
 void z80scc_channel::rcv_callback()
 {
-	if (m_wr3 & WR3_RX_ENABLE)
+	if (receive_allowed())
 	{
 		LOG("%s: receive data bit %d m_wr3:%02x\n", FUNCNAME, m_rxd, m_wr3);
 		receive_register_update_bit(m_rxd);
 	}
 	else
 	{
-		logerror("%s: Received data dit but receiver is disabled\n", FUNCNAME);
+		LOG("%s: Received data bit but receiver is disabled\n", FUNCNAME);
 	}
 }
 
@@ -1506,6 +1510,10 @@ uint8_t z80scc_channel::do_sccreg_rr2()
 	if (m_index == z80scc_device::CHANNEL_B)
 	{
 		LOGINT(" - Channel B so we might need to update the vector modification\n");
+		// with no interrupt pending the status is 011 in V3-V1 (110 in V6-V4), the code for a channel B special
+		// receive condition
+		m_rr2 = m_uart->modify_vector(m_rr2, z80scc_device::CHANNEL_B, INT_SPECIAL);
+
 		// loop over all interrupt sources
 		for (int const i : z80scc_device::INT_PRIORITY)
 		{
@@ -2005,6 +2013,7 @@ void z80scc_channel::do_sccreg_wr3(uint8_t data)
 	}
 	update_serial();
 	receive_register_reset();
+	resume_transmit();
 }
 
 void z80scc_channel::do_sccreg_wr4(uint8_t data)
@@ -2055,6 +2064,7 @@ void z80scc_channel::do_sccreg_wr5(uint8_t data)
 				write_rx((data & WR5_SEND_BREAK) ? 0 : 1, true);
 		}
 		update_rts(); // Will also update DTR accordingly
+		resume_transmit();
 
 		check_dma_request();
 	}
@@ -2332,6 +2342,9 @@ void z80scc_channel::do_sccreg_wr14(uint8_t data)
 	// TODO: Add info on the other bits of this register
 	m_wr14 = data;
 	update_serial();
+	if (!receive_allowed())
+		receive_register_reset();
+	resume_transmit();
 	if (brg_change) update_baudtimer();
 }
 
@@ -2558,6 +2571,7 @@ void z80scc_channel::data_write(uint8_t data)
 	{
 		LOGTX("- TX FIFO has room\n");
 		m_tx_data_fifo[m_tx_fifo_wp++] = data;
+		m_rr1 &= ~RR1_ALL_SENT; // All is not sent while there is data waiting to be transmitted
 		if (m_tx_fifo_wp >= m_tx_fifo_sz)
 		{
 			m_tx_fifo_wp = 0;
@@ -2606,7 +2620,7 @@ void z80scc_channel::data_write(uint8_t data)
 	m_tx_int_disarm = 0;
 
 	/* Transmitter enabled?  */
-	if (m_wr5 & WR5_TX_ENABLE)
+	if (transmit_allowed())
 	{
 		LOGTX("- TX is enabled\n");
 		if (is_transmit_register_empty()) // Is the shift register loaded?
@@ -2689,6 +2703,31 @@ void z80scc_channel::receive_data(uint8_t data, uint8_t status)
 }
 
 
+/* WR3 Auto Enables qualifies the software enables with the active-low modem pins: "/CTS becomes the transmitter
+   enable and /DCD becomes the receiver enable when this bit is set to 1. However, the Receiver Enable and Transmit
+   Enable bits must be set before the /DCD and /CTS pins can be used in this manner." The state of /DCD is ignored
+   in Local Loopback mode, and the state of /CTS is ignored in both Auto Echo and Local Loopback modes. */
+bool z80scc_channel::receive_allowed() const
+{
+	return (m_wr3 & WR3_RX_ENABLE) &&
+			(!(m_wr3 & WR3_AUTO_ENABLES) || (m_rr0 & RR0_DCD) || (m_wr14 & WR14_LOCAL_LOOPBACK));
+}
+
+bool z80scc_channel::transmit_allowed() const
+{
+	return (m_wr5 & WR5_TX_ENABLE) &&
+			(!(m_wr3 & WR3_AUTO_ENABLES) || (m_rr0 & RR0_CTS) || (m_wr14 & (WR14_LOCAL_LOOPBACK | WR14_AUTO_ECHO)));
+}
+
+// start sending queued data once the transmitter is enabled and idle
+void z80scc_channel::resume_transmit()
+{
+	if (transmit_allowed() && !(m_wr5 & WR5_SEND_BREAK) && is_transmit_register_empty() &&
+			(!(m_rr0 & RR0_TX_BUFFER_EMPTY) || m_tx_fifo_rp != m_tx_fifo_wp))
+		tra_complete();
+}
+
+
 //-------------------------------------------------
 //  cts_w - clear to send handler
 //-------------------------------------------------
@@ -2698,18 +2737,11 @@ void z80scc_channel::cts_w(int state)
 
 	if ((m_rr0 & RR0_CTS) != (state ? 0 : RR0_CTS)) //  SCC change detection logic
 	{
-		// enable transmitter if in auto enables mode
-		if (!state)
-		{
-			LOGCTS(" - CTS active\n");
-			if (m_wr3 & WR3_AUTO_ENABLES)
-			{
-				LOGCTS(" - TX auto enabled\n");
-				m_wr5 |= WR5_TX_ENABLE;
-			}
-		}
-
 		if (state) m_rr0 &= ~RR0_CTS; else  m_rr0 |= RR0_CTS; // Raw pin/status value
+
+		// in Auto Enables mode this gates the transmitter: a character already being shifted
+		// out is completed before the next one is held back
+		resume_transmit();
 
 		if (m_extint_latch == 0 && (m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_CTS))
 		{
@@ -2735,21 +2767,15 @@ void z80scc_channel::dcd_w(int state)
 
 	if ((m_rr0 & RR0_DCD) != (state ? 0 : RR0_DCD)) //  SCC change detection logic
 	{
-		// enable transmitter if in auto enables mode
-		if (!state)
-		{
-			LOGDCD(" - DCD active\n");
-			if (m_wr3 & WR3_AUTO_ENABLES)
-			{
-				LOGDCD(" - RX auto enabled\n");
-				m_wr3 |= WR3_RX_ENABLE;
-#if START_BIT_HUNT
-				m_rcv_mode = RCV_SEEKING;
-#endif
-			}
-		}
-
 		if (state) m_rr0 &= ~RR0_DCD; else  m_rr0 |= RR0_DCD; // Raw pin/status value
+
+		// in Auto Enables mode this gates the receiver: "when /DCD goes inactive, the receiver stops
+		// immediately and the character being assembled is lost" (the FIFO contents are kept)
+		if (!receive_allowed())
+			receive_register_reset();
+#if START_BIT_HUNT
+		m_rcv_mode = receive_allowed() ? RCV_SEEKING : RCV_IDLE;
+#endif
 
 		if (m_extint_latch == 0 && (m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_DCD))
 		{
@@ -2809,7 +2835,7 @@ void z80scc_channel::sync_w(int state)
 void z80scc_channel::rxc_w(int state)
 {
 	/* Support for external clock as source for BRG has not been added */
-	if (m_wr3 & WR3_RX_ENABLE)
+	if (receive_allowed())
 	{
 		int source = (m_index == z80scc_device::CHANNEL_A) ? m_uart->m_rxca : m_uart->m_rxcb;
 		bool edge_driven_rxc = ((m_wr11 & WR11_RCVCLK_SRC_MASK) == WR11_RCVCLK_SRC_RTXC) && !source && !m_rxc;
@@ -2971,7 +2997,7 @@ void z80scc_channel::update_serial()
 	set_data_frame(1, data_bit_count, parity, stop_bits);
 
 #if START_BIT_HUNT
-	m_rcv_mode = m_wr3 & WR3_RX_ENABLE ? RCV_SEEKING : RCV_IDLE;
+	m_rcv_mode = receive_allowed() ? RCV_SEEKING : RCV_IDLE;
 #endif
 
 	int clocks = get_clock_mode();
@@ -3107,7 +3133,9 @@ void z80scc_channel::write_rx(int state, bool loopback)
 		receive_data(0);
 	}
 	m_rxd = state;
-	if (rtxc_driven_rxc || m_rxc != 0 || m_brg_rate != 0)
+	// a disabled receiver doesn't hunt for start bits, but it keeps following the idle (mark) level
+	// so that the first start bit after it's enabled again is recognised
+	if ((receive_allowed() || state) && (rtxc_driven_rxc || m_rxc != 0 || m_brg_rate != 0))
 		device_serial_interface::rx_w(state);
 }
 

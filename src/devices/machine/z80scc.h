@@ -239,6 +239,9 @@ protected:
 	void scc_register_write(uint8_t reg, uint8_t data);
 	uint8_t scc_register_read(uint8_t reg);
 	void update_serial();
+	bool receive_allowed() const;
+	bool transmit_allowed() const;
+	void resume_transmit();
 	void set_dtr(int state);
 	void set_rts(int state);
 
