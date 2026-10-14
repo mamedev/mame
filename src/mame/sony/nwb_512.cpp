@@ -20,7 +20,7 @@
  *     Note: The service manual for the 1500 series describes in detail how the raster operations generally work.
  *     However, while the newer framebuffers use a similar raster engine (using the WSC-SBLT that is an upgraded
  *     version of the CXD1029) and operate in a similar way, the surrounding details are different.
- *     I might not have captured/reverse engineered all of those differences accurately yet.
+ *     I might not have captured all of those differences accurately yet.
  *  - http://bitsavers.org/pdf/sony/news/Sony_NEWS_Technical_Manual_3ed_199103.pdf
  *
  * TODO:
@@ -39,7 +39,7 @@
 #define LOG_ROP 1 << 2
 #define LOG_CTRL 1 << 3
 
-#define VERBOSE (LOG_CTRL|LOG_ROP_CONFIG|LOG_GENERAL)
+#define VERBOSE (LOG_CTRL | LOG_ROP_CONFIG | LOG_GENERAL)
 #include "logmacro.h"
 
 #include <format>
@@ -93,10 +93,10 @@ namespace
 	}
 }
 
-nwb_512_device::nwb_512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, NWB_512, tag, owner, clock),
-	m_nwp_512d(*this, "nwp_512d"),
-	m_vram(*this, "vram")
+nwb_512_device::nwb_512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, NWB_512, tag, owner, clock),
+	  m_nwp_512d(*this, "nwp_512d"),
+	  m_vram(*this, "vram")
 {
 }
 
@@ -134,9 +134,9 @@ void nwb_512_device::map(address_map &map)
 {
 	map(0x00000, 0x0ffff).w(FUNC(nwb_512_device::destination_w)); // A13 = load shift, A14 = start execution, not sure about A15
 	map(0x1a000, 0x1bfff).w(FUNC(nwb_512_device::pixel_w));
-	map(0x20000, 0x27fff).w(FUNC(nwb_512_device::source_w));      // A13 = load shift, A14 = start execution
-	map(0x40000, 0x55fff).w(FUNC(nwb_512_device::limit_w));       // A16 = source-space select (FB vs host), A14 = start execution
-	map(0x60000, 0x60fff).w(FUNC(nwb_512_device::rop_config_w));  // rop configuration TODO: is the end addr correct here?
+	map(0x20000, 0x27fff).w(FUNC(nwb_512_device::source_w));	 // A13 = load shift, A14 = start execution
+	map(0x40000, 0x55fff).w(FUNC(nwb_512_device::limit_w));		 // A16 = source-space select (FB vs host), A14 = start execution
+	map(0x60000, 0x60fff).w(FUNC(nwb_512_device::rop_config_w)); // rop configuration TODO: is the end addr correct here?
 	map(0x70000, 0x70fff).rw(FUNC(nwb_512_device::fifo_r), FUNC(nwb_512_device::fifo_w));
 	map(0x80000, 0x80001).rw(FUNC(nwb_512_device::status_r), FUNC(nwb_512_device::ctrl_w));
 	map(0xa0000, 0xa0000).w(FUNC(nwb_512_device::planemask_w));
@@ -203,7 +203,7 @@ void nwb_512_device::check_operation_start(offs_t offset)
 	m_state.current_destination_x = m_state.destination_x;
 
 	const uint16_t width = m_state.x_direction ? m_state.limit_x - m_state.destination_x  // fwd: [dest, limit)
-												: m_state.destination_x - m_state.limit_x; // rev: [limit, dest)
+											   : m_state.destination_x - m_state.limit_x; // rev: [limit, dest)
 	const uint16_t src_phase = m_state.x_direction ? m_state.source_x & 15 : 15 - (m_state.source_x & 15);
 	const uint16_t dest_phase = m_state.x_direction ? m_state.destination_x & 15 : 15 - (m_state.destination_x & 15);
 
@@ -550,6 +550,7 @@ void nwb_512_device::end_row()
 	m_state.current_destination_x = m_state.destination_x;
 	m_state.current_source_x = m_state.source_x;
 	m_state.destination_y += m_state.y_direction ? 1 : -1;
+	m_state.source_y += m_state.y_direction ? 1 : -1;
 	m_state.carry = 0;
 
 	if (!m_state.limit_y)
@@ -602,23 +603,44 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 {
 	LOG("(%s) fifo_r(0x%x, 0x%x)\n", machine().describe_context(), offset, mem_mask);
 	check_mem_mask(mem_mask);
-	if (m_state.fb_write || !m_state.fb_read) {
+	if (m_state.fb_write || !m_state.fb_read)
+	{
 		fatalerror("Wrong mode for read");
+	}
+	if (!m_state.busy)
+	{
+		fatalerror("No words left in op!\n");
 	}
 
 	uint16_t word = 0;
 
+	if (m_state.prime_pending)
+	{
+		// If the source row has more data than the dest row, prime the shifter
+		// After this, the source and destination counts will be aligned.
+		logerror("Applying primed extra read!\n");
+		word = coordinate_to_data(m_state.current_source_x, m_state.source_y);
+		shift(word);
+		m_state.prime_pending = false;
+		m_state.current_source_x += m_state.x_direction ? 16 : -16;
+	}
+
 	// word = shift(sxa, sya)
 	word = coordinate_to_data(m_state.current_source_x, m_state.source_y);
+	LOG("  fifo_r: word before shift = 0x%x\n", word);
 	word = shift(word);
+	LOG("  fifo_r: word after shift = 0x%x\n", word);
 
 	// Advance ROCC state
 	m_state.current_source_x += m_state.x_direction ? 16 : -16;
 	m_state.current_destination_x += m_state.x_direction ? 16 : -16;
+	--m_state.dest_words_left;
+	LOG("  fifo_r: advanced source to %d, destination to %d, and there are %d words left\n", m_state.current_source_x, m_state.current_destination_x, m_state.dest_words_left);
 
 	// if (dxa > lxa) end row (reload X, Y++, carry = 0, re-prime if needed)
 	if (m_state.dest_words_left == 0)
 	{
+		LOG("  fifo_r: calling end row\n", word);
 		end_row();
 	}
 
@@ -631,12 +653,29 @@ void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	check_mem_mask(mem_mask);
 	if (m_state.fb_read && !m_state.fb_write)
 	{
+		LOG("Start fbread op\n");
 		// A write to this port when armed for reading starts the process
 		m_state.busy = true; // TODO: exact value
-		if (m_state.prime_pending) {
-			m_state.prime_pending = false;
-			// TODO: prime carry (do first read and shift)
+
+		// The DSC-008 section of the NWS-15xx service manual implies that the direction bit is not
+		// supported/used for reads. For now, assume the same for the NWB-512.
+		if (!m_state.x_direction)
+		{
+			fatalerror("Reverse reads are not supported!");
 		}
+
+		m_state.current_destination_x = m_state.destination_x;
+		m_state.current_source_x = m_state.source_x;
+
+		const uint16_t src_phase = m_state.x_direction ? m_state.source_x & 15 : 15 - (m_state.source_x & 15);
+		const uint16_t dest_phase = m_state.x_direction ? m_state.destination_x & 15 : 15 - (m_state.destination_x & 15);
+
+		// The row end logic is determined from the destination (which must be aligned with the source)
+		m_state.prime = src_phase > dest_phase;
+		m_state.prime_pending = m_state.prime;
+		m_state.dest_words_per_row = (m_state.limit_x >> 4) - (m_state.source_x >> 4) + (m_state.prime ? 0 : 1);
+		m_state.dest_words_left = m_state.dest_words_per_row;
+		LOG("Destination words per row: %d\n", m_state.dest_words_per_row);
 
 		return;
 	}
@@ -687,7 +726,7 @@ uint8_t nwb_512_device::status_r()
 	return 0x20 | (m_state.busy ? 0x3 : 0x0);
 }
 
-void nwb_512_device::ctrl_w(uint8_t data) // confirmed 8-bit write
+void nwb_512_device::ctrl_w(uint8_t data)
 {
 	// NWS-1580 uses a newer version of the framebuffer that uses a similar ROP engine, these definitions
 	// can be found in the NWS-1580 service manual.
@@ -700,11 +739,11 @@ void nwb_512_device::ctrl_w(uint8_t data) // confirmed 8-bit write
 	LOGMASKED(LOG_CTRL, "\tunknown %s\n", data & 0x20 ? "set" : "cleared");
 	LOGMASKED(LOG_CTRL, "\tdimmer setting = 0x%x\n", (data & 0xC0) >> 6);
 
-	m_state.ctrl = data;
 	if (!enabled)
 	{
 		reset_state();
 	}
+	m_state.ctrl = data;
 }
 
 void nwb_512_device::planemask_w(uint8_t data)

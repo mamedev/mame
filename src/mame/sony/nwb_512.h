@@ -11,16 +11,17 @@
 #include "machine/ram.h"
 #include "screen.h"
 
-class nwb_512_device : public device_t {
+class nwb_512_device : public device_t
+{
 public:
-	nwb_512_device(const machine_config &mconfig, const char *tag, device_t *owner) :
-	 nwb_512_device(mconfig, tag, owner, 0)
+	nwb_512_device(const machine_config &mconfig, const char *tag, device_t *owner) : nwb_512_device(mconfig, tag, owner, 0)
 	{
 	}
 
 	nwb_512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <typename T> void set_vram(T &&tag) { m_vram.set_tag(std::forward<T>(tag)); }
+	template <typename T>
+	void set_vram(T &&tag) { m_vram.set_tag(std::forward<T>(tag)); }
 
 	void map(address_map &map);
 
@@ -47,13 +48,13 @@ private:
 		// Registers
 		uint8_t ctrl = 0;
 
-		uint16_t destination_x = 0; // DRXA
+		uint16_t destination_x = 0;			// DRXA
 		uint16_t current_destination_x = 0; // DXA
-		uint16_t destination_y = 0; // DYA
+		uint16_t destination_y = 0;			// DYA
 
-		uint16_t source_x = 0; // SRXA
+		uint16_t source_x = 0;		   // SRXA
 		uint16_t current_source_x = 0; // SXA
-		uint16_t source_y = 0; // SYA
+		uint16_t source_y = 0;		   // SYA
 
 		uint16_t limit_x = 0; // LXA
 		uint16_t limit_y = 0; // YC
@@ -64,15 +65,14 @@ private:
 
 		// Configuration flags
 		bool suppress_advance = false; // false = auto-increment after rop
-		bool x_direction = false; // true = top -> bottom
-		bool y_direction = false; // true = left -> right
-		bool row_fill = false; // true = write data fifo word across whole line
-		bool fb_read = false; // Tri-state with write - read = fb -> host, write = host -> fb, both = fb -> fb copy
+		bool x_direction = false;	   // true = top -> bottom
+		bool y_direction = false;	   // true = left -> right
+		bool row_fill = false;		   // true = write data fifo word across whole line
+		bool fb_read = false;		   // Tri-state with write - read = fb -> host, write = host -> fb, both = fb -> fb copy
 		bool fb_write = false;
 		bool pixel_mode = false;
 
 		// Internal state
-		uint16_t current_x = 0; // offset from dst/src, DXA
 		uint16_t shift = 0;
 		uint16_t carry = 0; // leftover bits after shifting
 		uint16_t source_words_per_row = 0;
@@ -114,7 +114,6 @@ private:
 		}
 	}
 };
-
 
 DECLARE_DEVICE_TYPE(NWB_512, nwb_512_device)
 
