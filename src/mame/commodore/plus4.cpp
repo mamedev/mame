@@ -70,7 +70,9 @@ public:
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
 		m_portswap(*this, "JOYSWAP"),
-		m_addr(0)
+		m_addr(0),
+		m_kb(0),
+		m_cst_rd(1)
 	{ }
 
 	void plus4(machine_config &config);
@@ -127,6 +129,7 @@ protected:
 	void vslsi_w(offs_t offset, uint8_t data);
 	void addr_w(offs_t offset, uint8_t data);
 	void ted_rom_w(offs_t offset, uint8_t data);
+	void cst_rd_w(int state) { m_cst_rd = state; }
 
 	uint8_t cpu_r();
 
@@ -159,6 +162,8 @@ protected:
 
 	// keyboard state
 	uint8_t m_kb;
+
+	uint8_t m_cst_rd;
 
 	template <offs_t RamSize> void plus4_mem(address_map &map) ATTR_COLD;
 	template <offs_t RamSize> void ted_videoram_map(address_map &map) ATTR_COLD;
@@ -614,7 +619,7 @@ uint8_t plus4_state::cpu_r()
 	uint8_t data = 0x2f;
 
 	// cassette read
-	data |= m_cassette->read() << 4;
+	data |= m_cst_rd << 4;
 
 	// serial clock
 	data |= m_iec->clk_r() << 6;
@@ -648,7 +653,7 @@ uint8_t c16_state::cpu_r()
 	uint8_t data = 0;
 
 	// cassette read
-	data |= m_cassette->read() << 4;
+	data |= m_cst_rd << 4;
 
 	// serial clock
 	data |= m_iec->clk_r() << 6;
@@ -791,6 +796,7 @@ void plus4_state::machine_start()
 	// state saving
 	save_item(NAME(m_addr));
 	save_item(NAME(m_kb));
+	save_item(NAME(m_cst_rd));
 
 	if (m_acia)
 	{
@@ -909,7 +915,7 @@ void plus4_state::plus4(machine_config &config)
 	m_spi_kb->p_handler<7>().set(FUNC(plus4_state::write_kb7));
 
 	PET_DATASSETTE_PORT(config, m_cassette, plus4_datassette_devices, "c1531");
-	m_cassette->read_handler().set_nop();
+	m_cassette->read_handler().set(FUNC(plus4_state::cst_rd_w));
 
 	cbm_iec_slot_device::add(config, m_iec, nullptr);
 	m_iec->atn_callback().set(m_user, FUNC(pet_user_port_device::write_9));
