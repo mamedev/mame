@@ -810,7 +810,7 @@ CONS( 2002, epo_bowl, 0,      0, xavix2000_epo_bowl,         epo_bowl, xavix2000
 CONS( 2003, epo_golf, 0,      0, xavix2000_epo_golf,         epo_golf, xavix2000_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "Super Shot! Excite Golf (Japan)", MACHINE_NOT_WORKING )
 
 // とっとこハム太郎 ハムハム大サーカス！
-CONS( 2002, epo_hamc, 0,      0, xavix2000_epo_hamc,         epo_hamc, xavix2000_camera_state,     empty_init, "Epoch / SSD Company Ltd.", "Tottoko Hamtaro: Ham-Ham Dai Circus! (Japan)", MACHINE_NOT_WORKING )
+CONS( 2002, epo_hamc, 0,      0, xavix2000_epo_hamc,         epo_hamc, xavix2000_camera_state,     empty_init, "Epoch / SSD Company Ltd.", "Tottoko Hamtaro: Ham-Ham Dai Circus! (Japan)", 0 )
 
 // ミニモニ。パーティ！リズムでぴょん！
 CONS( 2003, epo_mini, 0,      0, xavix2000_epo_mini,         epo_mini, xavix2000_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "mini-moni. Party! Rhythm de Pyon! (Japan)", MACHINE_NOT_WORKING )
@@ -838,10 +838,10 @@ CONS( 2005, ttv_mx,   0,      0, xavix2000_i2c_24c04,        ttv_mx,   xavix_i2c
 CONS( 2005, tom_jump, 0,      0, xavix2000_i2c_24c04,        tom_jump, xavix_i2c_state,            empty_init, "Tomy / SSD Company Ltd.", "TV de Asobitai IDATEN Jump: Gekisou IDATEN Battle (Japan)", 0 )
 
 // 剣神ドラゴンクエスト 甦りし伝説の剣
-CONS( 2003, drgqst,   0,      0, xavix2000_drgqst,           drgqst,   xavix2000_i2c_camera_state, empty_init, "Square Enix / SSD Company Ltd.", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken (Japan)", MACHINE_NOT_WORKING )
+CONS( 2003, drgqst,   0,      0, xavix2000_drgqst,           drgqst,   xavix2000_i2c_camera_state, empty_init, "Square Enix / SSD Company Ltd.", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken (Japan)", 0 )
 
 // チョロＱビュンビュンレーサー
-CONS( 2003, tak_chq,  0,      0, xavix2000_tak_chq,          tak_chq,  xavix_i2c_state,            empty_init, "Takara / SSD Company Ltd.", "Choro-Q Byun Byun Racer (Japan)", MACHINE_NOT_WORKING )
+CONS( 2003, tak_chq,  0,      0, xavix2000_tak_chq,          tak_chq,  xavix_i2c_state,            empty_init, "Takara / SSD Company Ltd.", "Choro-Q Byun Byun Racer (Japan)", 0 )
 
 // Let’s！TV プレイ　体感格闘ワンピースパンチバトル 　～海賊王にキミがなる！～
 CONS( 2004, ban_onep, 0,      0, xavix2000_ban_onep,         ban_onep, xavix2000_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Taikan Kakutou One Piece Punch Battle: Kaizoku Ou ni Kimi ga Naru! (Japan)", MACHINE_NOT_WORKING )

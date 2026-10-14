@@ -5372,7 +5372,7 @@ CONS( 2002,  epo_esdx,  0,        0, xavix_epo_esdx,      epo_esdx,  xavix_epo_b
 CONS( 2003,  epo_esht,  0,        0, xavix_epo_esht,      epo_esht,  xavix_epo_baseball_state,     empty_init,  "Epoch / SSD Company Ltd.", "Hanshin Tigers Excite Stadium DX (Japan)", MACHINE_NOT_WORKING )
 
 // エースきめるぜ！エキサイトテニス
-CONS( 2002,  epo_tenn,  0,        0, xavix_epo_tenn,      epo_tenn,  xavix_ir_power_state,         empty_init,  "Epoch / SSD Company Ltd.", "Ace Kimeruze! Excite Tennis (Japan)", MACHINE_NOT_WORKING )
+CONS( 2002,  epo_tenn,  0,        0, xavix_epo_tenn,      epo_tenn,  xavix_ir_power_state,         empty_init,  "Epoch / SSD Company Ltd.", "Ace Kimeruze! Excite Tennis (Japan)", 0 )
 
 // ハムちゃんず大集合 ダンスするのだ！走るのだ！
 CONS( 2001,  epo_hamd,  0,        0, xavix_ir,            epo_hamd,  xavix_ir_state,               empty_init,  "Epoch / SSD Company Ltd.", "Ham-chans Dai Shuugou: Dance Surunoda! Hashirunoda! (Japan)", MACHINE_NOT_WORKING )
@@ -5471,13 +5471,13 @@ CONS( 2004,  tomplc,    0,        0, xavix_tomplc,        tomplc,    xavix_i2c_p
 CONS( 2006,  tomthr,    0,        0, xavix_tomthr,        tomthr,    xavix_power_state,            empty_init,  "Takara Tomy / SSD Company Ltd.", "TV de Asobitai Hyper Rescue: Boku wa Kyuujotai! (Japan)", 0 )
 
 // ガンガンアドベンチャー
-CONS( 2001,  gungunad,  0,        0, xavix_gungunad,      gungunad,  xavix_gungunad_state,         empty_init,  "Takara / SSD Company Ltd.", "Gun Gun Adventure (Japan)", MACHINE_NOT_WORKING )
+CONS( 2001,  gungunad,  0,        0, xavix_gungunad,      gungunad,  xavix_gungunad_state,         empty_init,  "Takara / SSD Company Ltd.", "Gun Gun Adventure (Japan)", 0 )
 
 // ガンガンレボリューション
 CONS( 2004,  gungunrv,  0,        0, xavix_gungunrv,      gungunrv,  xavix_gungunrv_state,         empty_init,  "Takara / SSD Company Ltd.", "Gun Gun Revolution (Japan)", MACHINE_NOT_WORKING )
 
 // ビストロキッズ ぼくもわたしもコックさん！
-CONS( 2001,  bistro,    0,        0, xavix_bistro,        bistro,    xavix_bistro_state,           empty_init,  "Sega Toys / SSD Company Ltd.", "Bistro Kids: Boku mo Watashi mo Kok-san! (Japan)", MACHINE_NOT_WORKING )
+CONS( 2001,  bistro,    0,        0, xavix_bistro,        bistro,    xavix_bistro_state,           empty_init,  "Sega Toys / SSD Company Ltd.", "Bistro Kids: Boku mo Watashi mo Kok-san! (Japan)", 0 )
 
 // e-Kara Series
 CONS( 2000,  ekara,     0,        0, xavix_ekara,         ekara,     xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd. / Hasbro", "e-kara (US?, NTSC, set 1)", MACHINE_NOT_WORKING ) // shows "Please insert a cartridge before turn it on" without cart

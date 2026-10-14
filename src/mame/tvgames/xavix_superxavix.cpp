@@ -3103,7 +3103,7 @@ CONS( 2005, xavtennij,  xavtenni, 0, superxavix_xavtenni,              xavixport
 CONS( 2004, xavbaseb,   0,        0, superxavix_xavbaseb,              xavixport_baseball,    superxavix_xavbaseb_state,   empty_init, "SSD Company Ltd.", "XaviX Baseball (XaviXPORT)", MACHINE_NOT_WORKING )
 // ザビックス ベースボール
 CONS( 2005, xavbasebj,  xavbaseb, 0, superxavix_xavbaseb,              xavixport_baseball,    superxavix_xavbaseb_state,   empty_init, "SSD Company Ltd.", "XaviX Baseball (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
-CONS( 2005, xavgolf,    0,        0, superxavix_xavgolf,               xavixport_golf,        superxavix_xavgolf_state,    empty_init, "SSD Company Ltd.", "XaviX Golf (XaviXPORT)", MACHINE_NOT_WORKING )
+CONS( 2005, xavgolf,    0,        0, superxavix_xavgolf,               xavixport_golf,        superxavix_xavgolf_state,    empty_init, "SSD Company Ltd.", "XaviX Golf (XaviXPORT)", 0 )
 // ザビックス ゴルフ
 CONS( 2005, xavgolfj,   xavgolf,  0, superxavix_xavgolf,               xavixport_golf,        superxavix_xavgolf_state,    empty_init, "SSD Company Ltd.", "XaviX Golf (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
 // Both Bowling ROMs make zero-count startup palette uploads that write to unmapped 0x6bff.
@@ -3222,10 +3222,10 @@ CONS( 2006, suprtvpcln, suprtvpc, 0, superxavix_suprtvpc,              suprtvpc,
 CONS( 2008, epo_ntpj,   0,        0, superxavix_epo_ntpj,              epo_ntpj,              superxavix_epo_ntpj_state,   empty_init, "Epoch / SSD Company Ltd.", "Hello Kitty Piano PC (Japan)", MACHINE_NOT_WORKING )
 
 // ドラえもん うごく！おえかき エポック社
-CONS( 2007, doradraw,   0,        0, superxavix_doradraw,              doradraw,              superxavix_doradraw_state,   empty_init, "Epoch / SSD Company Ltd.", "Doraemon Ugoku! Oekaki (Japan)", MACHINE_NOT_WORKING )
+CONS( 2007, doradraw,   0,        0, superxavix_doradraw,              doradraw,              superxavix_doradraw_state,   empty_init, "Epoch / SSD Company Ltd.", "Doraemon Ugoku! Oekaki (Japan)", 0 )
 
 // ハローキティ うごく！おえかき エポック社
-CONS( 2007, hkdraw,     0,        0, superxavix_doradraw,              doradraw,              superxavix_doradraw_state,   empty_init, "Epoch / SSD Company Ltd.", "Hello Kitty Ugoku! Oekaki (Japan)", MACHINE_NOT_WORKING )
+CONS( 2007, hkdraw,     0,        0, superxavix_doradraw,              doradraw,              superxavix_doradraw_state,   empty_init, "Epoch / SSD Company Ltd.", "Hello Kitty Ugoku! Oekaki (Japan)", 0 )
 
 // どんトレだ兵衛～どん兵衛くんとトレーニング
 // Camera exposure response remains unverified.
