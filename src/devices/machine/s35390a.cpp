@@ -511,4 +511,7 @@ void s35390a_device::write_time(bool full)
 	}
 
 	set_time(true, year, month, day, day_of_week + 1, hour, minute, second);
+	// The first seconds carry occurs one second after writing the time.
+	attotime const period = m_clock_timer->period();
+	m_clock_timer->adjust(period, 0, period);
 }

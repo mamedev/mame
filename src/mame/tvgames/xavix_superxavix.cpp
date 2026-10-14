@@ -222,6 +222,9 @@ u8 superxavix_state::read_bitmap_byte(u32 address)
 
 u8 superxavix_state::read_plotter_byte(u32 address)
 {
+	if (m_extra && BIT(address, 24))
+		return m_extra[address & 0x7fffff];
+
 	return m_soc->cpu().space(xavix_device::AS_EXTERNAL_BUS).read_byte(address & 0x7fffff);
 }
 
