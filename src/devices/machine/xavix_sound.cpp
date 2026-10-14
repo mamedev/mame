@@ -219,7 +219,8 @@ void xavix_sound_device::voice_register_w(offs_t offset, u8 data)
 
 u8 xavix_sound_device::voice_command_r(offs_t offset)
 {
-	synchronize();
+	if (!machine().side_effects_disabled())
+		synchronize();
 	const unsigned first = BIT(offset, 0) ? 8 : 0;
 	u8 result = 0;
 	for (unsigned bit = 0; bit < 8; bit++)
@@ -259,7 +260,8 @@ void xavix_sound_device::voice_command_w(offs_t offset, u8 data)
 
 u8 xavix_sound_device::voice_status_r(offs_t offset)
 {
-	synchronize();
+	if (!machine().side_effects_disabled())
+		synchronize();
 	const unsigned first = BIT(offset, 0) ? 8 : 0;
 	u8 result = 0;
 	for (unsigned bit = 0; bit < 8; bit++)
@@ -302,7 +304,8 @@ void xavix_sound_device::tempo_rate_w(offs_t offset, u8 data)
 u8 xavix_sound_device::irq_status_r()
 {
 	// UK e-kara carts check the upper nibble for sound-timer IRQ source.
-	synchronize();
+	if (!machine().side_effects_disabled())
+		synchronize();
 	return m_irq_status;
 }
 
@@ -345,7 +348,8 @@ void xavix_sound_device::rate_divider_w(u8 data)
 
 u8 xavix_sound_device::master_volume_r()
 {
-	synchronize();
+	if (!machine().side_effects_disabled())
+		synchronize();
 	return m_output_stage.master_volume;
 }
 
@@ -357,7 +361,8 @@ void xavix_sound_device::master_volume_w(u8 data)
 
 u8 xavix_sound_device::mixer_control_r()
 {
-	synchronize();
+	if (!machine().side_effects_disabled())
+		synchronize();
 	return m_output_stage.mixer_control;
 }
 
@@ -369,7 +374,8 @@ void xavix_sound_device::mixer_control_w(u8 data)
 
 u8 xavix_sound_device::dac_control_r()
 {
-	synchronize();
+	if (!machine().side_effects_disabled())
+		synchronize();
 	return m_output_stage.dac_control;
 }
 
