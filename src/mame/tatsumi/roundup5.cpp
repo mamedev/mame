@@ -210,15 +210,11 @@ pos is 11.5 fixed point
 
 	for ( ; y <= cliprect.bottom(); y++)
 	{
-		// TODO: tunnels road drawing has a different format?
-		// shift is always 0x88** while data[3] is a variable argument with bit 15 always on
-		int shift=data[0];
-		int shift2=data[2];
+		uint16_t const shift=data[0];
+		uint16_t const shift2=data[2];
 		int pal = 4; //(data[3]>>8)&0xf;
 		int step = swapendian_int16(data[1]);
-		int samplePos=0;
 		uint16_t const *const linedata=m_road_pixel_ram;// + (0x100 * pal);
-		int startPos=0, endPos=0;
 
 		int palette_byte;//=m_road_color_ram[visible_line/8];
 
@@ -233,15 +229,13 @@ pos is 11.5 fixed point
 		    Word 0: Line shift for 1st set - 13.3 signed fixed point value.
 		    Word 1: Line scale - 5.11 fixed point value.  So 0x800 is 1:1, 0x400 is 1:2, etc
 		    Word 2: Line shift for 2nd set - 13.3 signed fixed point value.
-		    Word 3: ?
+		    Word 3: ? (bit 15 is set on every line in tunnels)
 
-		    The scale is shared between both pixel sets.  The 2nd set is only used when the road
-		    forks into two between stages.  The 2nd line shift is an offset from the last pixel
-		    of the 1st set.  The 2nd line shift uses a different palette bank.
+		    The scale is shared between both pixel sets.  The 2nd set is used when the road
+		    forks into two between stages, and for the road in tunnels.  The 2nd line shift is
+		    added to the 1st.  The 2nd set uses a different palette bank.
 
 2nd road uses upper palette - confirmed by water stage.
-offset is from last pixel of first road segment?
-//last pixel of first road is really colour from 2nd road line?
 
 		*/
 
@@ -250,102 +244,42 @@ offset is from last pixel of first road segment?
 
 		visible_line++;
 
-		if (shift&0x8000)
-			shift=-(0x10000 - shift);
-		shift=-shift;
+		/*
+		    Both pixel sets are placed independently: the 1st at -shift, the 2nd at
+		    -(shift + shift2), both 13.3 values wrapping at 16 bits. On a plain road the sum is
+		    far off screen; in tunnels the game pushes the 1st set off screen (shift 0x87b9) and
+		    draws the road with the 2nd set and its palette, so the sum lands on screen.
+		*/
+		int const start1 = step ? ((-int16_t(shift) * 256) + 0x80) / step : 0x10000;
+		int const start2 = step ? ((-int16_t(uint16_t(shift + shift2)) * 256) + 0x80) / step : 0x10000;
 
-		if (step)
-			startPos=((shift<<8) + 0x80 )/ step;
-
-		int x;
-
-		/* Fill in left of road segment */
-		for (x=0; (x < startPos) && (x <= cliprect.right()); x++)
+		uint32_t *const dest = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			int col = linedata[0]&0xf;
-			bitmap.pix(y, x) = m_palette->pen(256 + pal*16 + col);
-		}
-
-		/* If startpos is negative, clip it and adjust the sampling position accordingly */
-		if (startPos<0)
-		{
-			samplePos=step*(0-startPos);
-			startPos=0;
-		}
-		else
-		{
-			samplePos=0;
-		}
-
-		/* Fill in main part of road, then right-hand side edge */
-		for (x = startPos; x <= cliprect.right() && ((samplePos>>11)<0x80); x++)
-		{
-			// look up colour
-			int col = linedata[(samplePos>>11)&0x7f]&0xf;
-
-			/* Clamp if we have reached the end of the pixel data */
-			//if ((samplePos>>11) > 0x7f)
-			//  col=linedata[0x7f]&0xf;
-
-			bitmap.pix(y, x) = m_palette->pen(256 + pal*16 + col);
-
-			samplePos+=step;
-		}
-
-		/* Now work out how many pixels until start of 2nd segment */
-		startPos=x;
-
-		if (shift2&0x8000)
-			shift2=-(0x10000 - shift2);
-		shift2=-shift2;
-
-		if (step)
-			endPos=((shift2<<8) + 0x80) / step;
-		else
-			endPos=0;
-		endPos-=128;
-		endPos=startPos+endPos;
-
-		/* Fill pixels */
-		for (x = startPos; (x <= cliprect.right()) && (x < endPos); x++)
-		{
-			int col = linedata[0x80]&0xf;
-
-			/* Clamp if we have reached the end of the pixel data */
-			//if ((samplePos>>11) > 0x7f)
-			//  col=linedata[0x7f]&0xf;
-
-			bitmap.pix(y, x) = m_palette->pen(256 + pal*16 + col + 32);
-		}
-
-		if (endPos<0)
-		{
-			// end of left intersection (taking right turn)
-			samplePos=step*(0-startPos);
-		}
-		else if (endPos<x)
-		{
-			// start of right intersection
-			samplePos=step*(x-endPos);
-		}
-		else
-		{
-			// end of right intersection (taking right turn)
-			samplePos=0; // todo
-		}
-
-		for (/*x=endPos*/; x <= cliprect.right(); x++)
-		{
-			// look up colour
-			int col = linedata[((samplePos>>11)&0x7f) + 0x200]&0xf;
-
-			/* Clamp if we have reached the end of the pixel data */
-			if ((samplePos>>11) > 0x7f)
-				col=linedata[0x7f + 0x200]&0xf;
-
-			bitmap.pix(y, x) = m_palette->pen(256 + pal*16 + col + 32);
-
-			samplePos+=step;
+			int col;
+			int bank = 0;
+			int64_t const pos1 = int64_t(x - start1) * step;
+			int64_t const pos2 = int64_t(x - start2) * step;
+			if (pos1 >= 0 && (pos1 >> 11) < 0x80)
+				col = linedata[pos1 >> 11] & 0xf;
+			else if (pos2 >= 0 && (pos2 >> 11) < 0x80)
+			{
+				col = linedata[(pos2 >> 11) + 0x200] & 0xf;
+				bank = 32;
+			}
+			else if (x < start1 && x < start2)
+				col = linedata[0] & 0xf;                     // left of both sets
+			else if (x >= start1 && x >= start2)
+			{
+				col = linedata[0x7f + 0x200] & 0xf;          // right of both sets
+				bank = 32;
+			}
+			else
+			{
+				col = linedata[0x80] & 0xf;                  // between the sets
+				bank = 32;
+			}
+			dest[x] = m_palette->pen(256 + pal*16 + col + bank);
 		}
 		data+=4;
 	}
