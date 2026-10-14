@@ -81,7 +81,7 @@ void xavix_mtrk_wheel_device::update_event_rate()
 	if (m_rate)
 	{
 		attotime const old_period = attotime::from_hz(m_rate);
-		remaining *= m_event_timer->remaining().as_double() / old_period.as_double();
+		remaining = attotime::from_double(period.as_double() * m_event_timer->remaining().as_double() / old_period.as_double());
 	}
 	m_event_timer->adjust(remaining, 0, period);
 	m_rate = rate;
