@@ -40,15 +40,21 @@ private:
 	// CXD1029: raster operation engine
 	// ROCC - Raster Operation Cycle Controller, state machine for framebuffer
 	// Where the NWS-1500 service manual uses specific names for signals, they are noted below.
-	// Technically, they may not have used this terminology on this framebuffer.
+	// Technically, they may not have used this terminology on this framebuffer, but it seems
+	// to work the same way, at least.
 	struct state
 	{
 		// Registers
 		uint8_t ctrl = 0;
+
 		uint16_t destination_x = 0; // DRXA
+		uint16_t current_destination_x = 0; // DXA
 		uint16_t destination_y = 0; // DYA
+
 		uint16_t source_x = 0; // SRXA
+		uint16_t current_source_x = 0; // SXA
 		uint16_t source_y = 0; // SYA
+
 		uint16_t limit_x = 0; // LXA
 		uint16_t limit_y = 0; // YC
 		uint8_t rop_function = 0;

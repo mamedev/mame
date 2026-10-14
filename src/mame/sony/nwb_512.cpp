@@ -120,6 +120,7 @@ void nwb_512_device::device_add_mconfig(machine_config &config)
 	m_nwp_512d->set_raw(HORIZONTAL * VERTICAL * 60,
 						HORIZONTAL, 0, HORIZONTAL,
 						VERTICAL, 0, VERTICAL);
+	m_nwp_512d->set_physical_aspect(51, 64); // portrait mode CRT, square-ish pixels/~4:5 ratio assumed
 
 	// VRAM consists of two types of memory chips:
 	// 4x NEC uPD41264C-12 64K x 4 dual-port DRAM chips (visible screen and small off-screen area)
@@ -199,7 +200,7 @@ void nwb_512_device::check_operation_start(offs_t offset)
 		--m_state.limit_x;
 	}
 
-	m_state.current_x = m_state.destination_x;
+	m_state.current_destination_x = m_state.destination_x;
 
 	const uint16_t width = m_state.x_direction ? m_state.limit_x - m_state.destination_x  // fwd: [dest, limit)
 												: m_state.destination_x - m_state.limit_x; // rev: [limit, dest)
@@ -235,6 +236,7 @@ void nwb_512_device::check_operation_start(offs_t offset)
 	m_state.mask2 = 0xffff >> ((x_hi & 0xf) + 1);
 
 	// TODO: This executes copies immediately, faster than real hardware.
+	// It also doesn't use the proper registers
 	if (m_state.fb_read && m_state.fb_write)
 	{
 		uint16_t source_x = m_state.source_x;
@@ -507,14 +509,14 @@ uint16_t nwb_512_device::shift(uint16_t data)
 
 void nwb_512_device::rop(uint16_t source)
 {
-	const offs_t byte_offset = coordinate_to_byte_offset_aligned(m_state.current_x, m_state.destination_y);
-	const uint16_t destination = coordinate_to_data(m_state.current_x, m_state.destination_y);
+	const offs_t byte_offset = coordinate_to_byte_offset_aligned(m_state.current_destination_x, m_state.destination_y);
+	const uint16_t destination = coordinate_to_data(m_state.current_destination_x, m_state.destination_y);
 
 	// Execute raster operation with the appropriate source and destination data
 	uint16_t result = execute_rop(m_state.rop_function, source, destination);
 
 	LOG("rop_cycle:\n");
-	LOG("\tx,y(0x%x, 0x%x) => offs 0x%x\n", m_state.current_x, m_state.destination_y, byte_offset);
+	LOG("\tx,y(0x%x, 0x%x) => offs 0x%x\n", m_state.current_destination_x, m_state.destination_y, byte_offset);
 	LOG("\tshift = 0x%x, source = 0x%x, carry = 0x%x, destination = 0x%x\n", m_state.shift, source, m_state.carry, destination);
 	LOG("\trop result = 0x%x\n", result);
 	const bool first_word = m_state.dest_words_left == m_state.dest_words_per_row;
@@ -533,26 +535,27 @@ void nwb_512_device::rop(uint16_t source)
 	}
 
 	// Write result back to VRAM
-	// LOG("\tdestination (0x%x, 0x%x) => 0x%x = 0x%x 0x%x\n", m_state.current_x, m_state.destination_y, byte_offset, result >> 8 & 0xff, result & 0xff);
+	// LOG("\tdestination (0x%x, 0x%x) => 0x%x = 0x%x 0x%x\n", m_state.current_destination_x, m_state.destination_y, byte_offset, result >> 8 & 0xff, result & 0xff);
 	m_vram->write(byte_offset, result >> 8 & 0xff);
 	m_vram->write(byte_offset + 1, result & 0xff);
 
 	// Advance ROCC state
-	m_state.current_x += m_state.x_direction ? 16 : -16;
+	m_state.current_destination_x += m_state.x_direction ? 16 : -16;
 	--m_state.dest_words_left;
 }
 
 void nwb_512_device::end_row()
 {
 	// LOG("\tdone with row, advancing y\n");
-	m_state.current_x = m_state.destination_x;
+	m_state.current_destination_x = m_state.destination_x;
+	m_state.current_source_x = m_state.source_x;
 	m_state.destination_y += m_state.y_direction ? 1 : -1;
 	m_state.carry = 0;
 
 	if (!m_state.limit_y)
 	{
 		LOG("\tROP done!\n");
-		m_state.busy = false;
+		m_state.busy = false; // TODO: use granular states from DSC-008 description?
 		m_state.source_x = 0;
 		m_state.destination_x = 0;
 	}
@@ -606,10 +609,18 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 	uint16_t word = 0;
 
 	// word = shift(sxa, sya)
-	// sxa += 16
-	// dxa += 16
+	word = coordinate_to_data(m_state.current_source_x, m_state.source_y);
+	word = shift(word);
+
+	// Advance ROCC state
+	m_state.current_source_x += m_state.x_direction ? 16 : -16;
+	m_state.current_destination_x += m_state.x_direction ? 16 : -16;
+
 	// if (dxa > lxa) end row (reload X, Y++, carry = 0, re-prime if needed)
-	// if no more rows, busy = 0 (or will get interrupted)
+	if (m_state.dest_words_left == 0)
+	{
+		end_row();
+	}
 
 	return word;
 }
@@ -624,7 +635,7 @@ void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_state.busy = true; // TODO: exact value
 		if (m_state.prime_pending) {
 			m_state.prime_pending = false;
-			// prime carry (do first read and shift)
+			// TODO: prime carry (do first read and shift)
 		}
 
 		return;
