@@ -1,4 +1,4 @@
-// license:GPL-3.0
+// license:GPL-2.0
 // copyright-holders:Giulio Zausa
 /***************************************************************************
 
