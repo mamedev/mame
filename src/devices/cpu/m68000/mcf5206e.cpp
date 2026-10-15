@@ -1048,14 +1048,17 @@ void coldfire_timer_device::tmr_w(u16 data)
 	if(m_tmr & T_RST)
 	{
 		// TODO: add tin pin support
+		// TIMER-1: "the reference register is matched after (TRR+1) time intervals" (UM 14.4.1.2, rendered p. 14-5):
+		// TCN counts 0..TRR, the event comes on the step after TCN == TRR. Restart mode then counts from 0 again
+		// (TRR+1 intervals per period); free run continues through $FFFF, so the next match is $10000 intervals later.
 		int div, start, interval;
-		start = (m_trr - m_tcn);
+		start = (m_trr - m_tcn) + 1;
 		div = ((m_tmr & 0xff00) >> 8) + 1;                      // 1 -> 256 division scale
 		if ((m_tmr & T_CL1) && !(m_tmr & T_CL0)) div = div * 16;    // input clock / 16
-		if (!(m_tmr & T_FRR)) interval = (0xffff * div);            // don't reset tcn to 0
-		else interval = start;                                      // else tcn is reset to 0
+		if (!(m_tmr & T_FRR)) interval = 0x10000;                   // don't reset tcn to 0
+		else interval = m_trr + 1;                                  // else tcn is reset to 0
 		m_timer_start_time = machine().time();
-		m_timer->adjust(clocks_to_attotime(start * div), 0, clocks_to_attotime(interval * div));
+		m_timer->adjust(clocks_to_attotime(u64(start) * div), 0, clocks_to_attotime(u64(interval) * div));
 	}
 
 	LOGMASKED(LOG_TIMER, "%s: (Timer Mode Register) TMR_w: %04x\n", this->machine().describe_context(), data);
@@ -1085,7 +1088,9 @@ void coldfire_timer_device::ter_w(u8 data)
 {
 	m_ter &= ~data; // Programmer must write bit to clear it. IE write 0x80 to clear bit 7.
 	LOGMASKED(LOG_TIMER, "%s: (Timer Event) TER_w: %02x\n", this->machine().describe_context(), data);
-	write_irq(CLEAR_LINE);
+	// TIMER-1: "the REF and CAP bits must be cleared before the timer will negate the IRQ" (UM 14.4.1.5, p. 14-6)
+	if (!(m_ter & (T_EREF | T_ECAP)))
+		write_irq(CLEAR_LINE);
 }
 
 #define UNINIT 0
