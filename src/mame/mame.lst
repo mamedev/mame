@@ -30532,6 +30532,13 @@ avtnfl
 avtsym14
 avtsym25
 
+@source:misc/azkoyent.cpp
+azkoyent12
+azkoyent6
+azkoyent61
+azkoyent61a
+azkoyent8
+
 @source:misc/babysuprem.cpp
 bsuprem
 
@@ -30894,6 +30901,10 @@ kxddz
 
 @source:misc/deecoseal.cpp
 deecoseal
+
+@source:misc/design.cpp
+design6
+designe
 
 @source:misc/dfruit.cpp
 dfruit
@@ -43968,15 +43979,6 @@ dash4
 
 @source:skeleton/datacast.cpp
 datacast
-
-@source:skeleton/design.cpp
-azkoyent12
-azkoyent6
-azkoyent61
-azkoyent61a
-azkoyent8
-design6
-designe
 
 @source:skeleton/dharma_z180.cpp
 lbingo
