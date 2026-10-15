@@ -910,6 +910,7 @@ void corona_state::monte_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x5fff).ram().share("nvram");
 	map(0x8000, 0xbfff).rom().region("maincpu", 0x4000);
+//	map(0xc000, 0xc7ff).ram();  // place some cards upside-down and counts the machine turning on
 }
 
 
@@ -2033,6 +2034,7 @@ ROM_END
 /*
   Monte.
   40 cards game with 4 jokers.
+  4-players
   Miki S.R.L.
   1989.
 
@@ -2091,5 +2093,5 @@ GAMEL( 199?, rcirulet,  0,        rcirulet,  re800,    corona_state, empty_init,
 GAMEL( 1990, luckyrlt,  0,        luckyrlt,  luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish, set 1)", 0,                        layout_luckyrlt )
 GAMEL( 1991, luckyrlta, luckyrlt, luckyrlta, luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish, set 2)", 0,                        layout_luckyrlt )
 
-GAME(  1989, monte,     0,        monte,     monte,    corona_state, init_rulam, ROT0,   "Miky S.R.L.",              "Monte (4-players Spanish cards game, encrypted)", MACHINE_NOT_WORKING )
+GAME(  1989, monte,     0,        monte,     monte,    corona_state, init_rulam, ROT0,   "Miky S.R.L.",              "Monte (4-players Spanish cards game, encrypted)", 0 )
 GAME(  1991, rulamiky,  0,        winner82,  winner82, corona_state, init_rulam, ROT90,  "Miky S.R.L.",              "Rula (roulette, encrypted)",                      MACHINE_NOT_WORKING )
