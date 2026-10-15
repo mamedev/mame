@@ -263,13 +263,20 @@ protected:
 	void debug_poly_dump_command(const std::vector<std::string_view> &params);
 	void debug_help_command(const std::vector<std::string_view> &params);
 
+	enum geo_type : u32
+	{
+		GEO_STANDARD = 0,
+		GEO_TOP_SKATER,
+		GEO_LAST_BRONX
+	};
+	u32 m_geotype = GEO_STANDARD;
+
 	virtual void copro_halt() = 0;
 	virtual void copro_boot() = 0;
 
 private:
 	u32 m_geoctl = 0;
 	u32 m_geocnt = 0;
-	std::vector<u32> m_geo_program_dump;
 	u32 m_videocontrol = 0;
 	u32 m_framenum = 0;
 
@@ -279,14 +286,6 @@ private:
 	bool m_render_done = false;
 	int16_t m_crtc_xoffset = 0, m_crtc_yoffset = 0;
 	bool m_palette_dirty = false;
-
-	enum geo_type : u32
-	{
-		GEO_STANDARD = 0,
-		GEO_TOP_SKATER,
-		GEO_LAST_BRONX
-	};
-	u32 m_geotype = GEO_STANDARD;
 
 	u32 *geo_lb_light( geo_state *geo, u32 opcode, u32 *input );
 	u32 *geo_lb_matrix( geo_state *geo, u32 opcode, u32 *input );
@@ -564,6 +563,7 @@ public:
 	void gunblade(machine_config &config) ATTR_COLD;
 	void dynabb(machine_config &config) ATTR_COLD;
 	void zerogun(machine_config &config) ATTR_COLD;
+	void lastbrnx(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
