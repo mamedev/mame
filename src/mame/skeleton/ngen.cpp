@@ -102,6 +102,7 @@ public:
 		m_hdc_timer(*this,"hdc_timer"),
 		m_disk_rom(*this,"disk"),
 		m_fd0(*this,"fdc:0"),
+		m_hdd(*this,"hard0"),
 		m_hd_buffer(*this,"hd_buffer_ram", 1024*8, ENDIANNESS_LITTLE)
 	{
 	}
@@ -109,8 +110,13 @@ public:
 	void ngen(machine_config &config);
 
 protected:
-	uint8_t hd_buffer_r(offs_t offset);
-	void hd_buffer_w(offs_t offset, uint8_t data);
+	void hdc_bcs_w(offs_t offset, uint8_t data);
+	void hdc_bcr_w(int state);
+	void hdc_bdrq_w(int state);
+	void hdc_wg_w(int state);
+	int hdc_drdy_r();
+	bool hdc_sector_address(uint32_t &lba);
+	void hdc_dma_finish();
 
 	void pit_out0_w(int state);
 	void kbd_rxrdy_w(int state);
@@ -134,7 +140,7 @@ protected:
 	void dma_0_dack_w(uint8_t data) { popmessage("IOW0: data %02x",data); }
 	void dma_1_dack_w(uint8_t data) { }
 	void dma_2_dack_w(uint8_t data) { }
-	void dma_3_dack_w(uint8_t data) { popmessage("IOW3: data %02x",data); }
+	void dma_3_dack_w(uint8_t data);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -196,6 +202,7 @@ private:
 	memory_array m_vram;
 	memory_array m_fontram;
 	optional_device<floppy_connector> m_fd0;
+	required_device<harddisk_image_device> m_hdd;
 	memory_share_creator<uint8_t> m_hd_buffer;
 
 	void set_dma_channel(int channel, int state);
@@ -213,6 +220,12 @@ private:
 	uint16_t m_disk_rom_ptr;
 	uint8_t m_hdc_control;
 	uint8_t m_disk_page;
+	uint8_t m_hdc_command = 0;
+	uint16_t m_hd_buffer_offset = 0;
+	bool m_hdc_bdrq = false;
+	bool m_hdc_dma_eop = false;
+	bool m_hdc_bcs = false;
+	bool m_hdc_wg = false;
 	uint16_t m_last_hdc_status = 0x100;
 	uint32_t m_hdc_status_reads = 0;
 	uint16_t m_last_kbd_status = 0x100;
@@ -625,6 +638,8 @@ void ngen_state::hfd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		case 0x17:
 			if(ACCESSING_BITS_0_7)
 			{
+				if (offset == 0x17)
+					m_hdc_command = data & 0xff;
 				m_hdc->write(offset-0x10,data & 0xff);
 				if (offset == 0x17)
 				{
@@ -738,6 +753,7 @@ void ngen_state::fdc_control_w(uint8_t data)
 // bit 7 - HDC reset
 void ngen_state::hdc_control_w(uint8_t data)
 {
+	logerror("HDC control write %02x\n", data);
 	m_hdc_control = data;
 	if(m_hdc_control & 0x04)
 	{
@@ -748,21 +764,103 @@ void ngen_state::hdc_control_w(uint8_t data)
 	}
 }
 
+void ngen_state::hdc_bdrq_w(int state)
+{
+	logerror("WD1010 BDRQ %d\n", state);
+	m_hdc_bdrq = state;
+	if (state)
+		m_hdc_dma_eop = false;
+	if (!(m_hdc_control & 0x04))
+		m_dmac->dreq3_w(state && BIT(m_disk_page, 7));
+}
+
+void ngen_state::hdc_dma_finish()
+{
+	// The DMA controller signals EOP just before its final I/O callback.
+	if (m_hdc_dma_eop && m_hd_buffer_offset >= 512)
+	{
+		m_hdc_dma_eop = false;
+		logerror("HDC DMA complete: %u buffer bytes\n", m_hd_buffer_offset);
+		m_hdc->buffer_ready(true);
+	}
+}
+
+int ngen_state::hdc_drdy_r()
+{
+	return BIT(m_hdc_control, 0) && m_hdd->exists();
+}
+
+bool ngen_state::hdc_sector_address(uint32_t &lba)
+{
+	if (!hdc_drdy_r())
+		return false;
+
+	const auto &info = m_hdd->get_info();
+	const uint8_t sdh = m_hdc->read(6);
+	const uint16_t cylinder = m_hdc->read(4) | ((m_hdc->read(5) & 0x07) << 8);
+	const uint8_t head = sdh & 0x07;
+	const uint8_t sector = m_hdc->read(3);
+	static constexpr uint16_t sector_sizes[4] = { 256, 512, 1024, 128 };
+
+	if (((sdh >> 3) & 0x03) || (cylinder >= info.cylinders) || (head >= info.heads) ||
+		(sector >= info.sectors) || (sector_sizes[(sdh >> 5) & 0x03] != info.sectorbytes))
+	{
+		logerror("HDC invalid CHS %u/%u/%u size %u for image %u/%u/%u size %u\n",
+			cylinder, head, sector, sector_sizes[(sdh >> 5) & 0x03],
+			info.cylinders, info.heads, info.sectors, info.sectorbytes);
+		return false;
+	}
+
+	// BTOS starts the sector register at zero for the first sector.
+	lba = (cylinder * info.heads + head) * info.sectors + sector;
+	return true;
+}
+
+void ngen_state::hdc_bcs_w(offs_t offset, uint8_t data)
+{
+	if (m_hdc_bcs && !data && ((m_hdc_command & 0xf0) == 0x20))
+	{
+		uint32_t lba;
+		if (hdc_sector_address(lba))
+			logerror("HDC CHD read LBA %u: %s\n", lba, m_hdd->read(lba, m_hd_buffer.target()) ? "ok" : "failed");
+		else
+			logerror("HDC CHD read skipped: drive or geometry unavailable\n");
+	}
+	m_hdc_bcs = data;
+}
+
+void ngen_state::hdc_bcr_w(int state)
+{
+	if (state)
+	{
+		m_hd_buffer_offset = 0;
+		m_hdc->buffer_ready(false);
+	}
+}
+
+void ngen_state::hdc_wg_w(int state)
+{
+	logerror("WD1010 write gate %d\n", state);
+	if (m_hdc_wg && !state && ((m_hdc_command & 0xf0) == 0x30))
+	{
+		uint32_t lba;
+		if (hdc_sector_address(lba) && BIT(m_hdc_control, 6))
+			logerror("HDC CHD write LBA %u: %s\n", lba, m_hdd->write(lba, m_hd_buffer.target()) ? "ok" : "failed");
+		else
+			logerror("HDC CHD write skipped: drive, geometry or write enable unavailable\n");
+		m_hdc->buffer_ready(false);
+	}
+	m_hdc_wg = state;
+}
+
 // page of system RAM to access
-// bit 7 = disables read/write signals to the WD1010
+// bit 7 gates hard disk DMA requests (BTOS sets it after issuing a command)
 void ngen_state::disk_addr_ext(uint8_t data)
 {
-	m_disk_page = data & 0x7f;
-}
-
-uint8_t ngen_state::hd_buffer_r(offs_t offset)
-{
-	return m_hd_buffer[offset];
-}
-
-void ngen_state::hd_buffer_w(offs_t offset, uint8_t data)
-{
-	m_hd_buffer[offset] = data;
+	logerror("HDC address extension write %02x\n", data);
+	m_disk_page = data;
+	if (!(m_hdc_control & 0x04))
+		m_dmac->dreq3_w(m_hdc_bdrq && BIT(data, 7));
 }
 
 void ngen_state::dma_hrq_changed(int state)
@@ -771,6 +869,7 @@ void ngen_state::dma_hrq_changed(int state)
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	else
 		m_i386cpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_dmac->hack_w(state);
 }
 
 void ngen_state::dma_eop_changed(int state)
@@ -788,6 +887,12 @@ void ngen_state::dma_eop_changed(int state)
 		{
 			if(m_hdc_control & 0x04) // ROM transfer
 				m_hdc_control &= ~0x04;  // switch it off when done
+			else if (m_hdc_bdrq)
+			{
+				m_dmac->dreq3_w(0);
+				m_hdc_dma_eop = true;
+				hdc_dma_finish();
+			}
 		}
 	}
 }
@@ -819,8 +924,23 @@ uint8_t ngen_state::dma_3_dack_r()
 			//m_dmac->dreq3_w(0);
 		}
 	}
+	else if (m_hd_buffer_offset + 1 < m_hd_buffer.length())
+	{
+		ret = m_hd_buffer[m_hd_buffer_offset] | (m_hd_buffer[m_hd_buffer_offset + 1] << 8);
+		m_hd_buffer_offset += 2;
+	}
 	m_dma_high_byte = ret & 0xff00;
 	return ret;
+}
+
+void ngen_state::dma_3_dack_w(uint8_t data)
+{
+	if (m_hd_buffer_offset + 1 < m_hd_buffer.length())
+	{
+		m_hd_buffer[m_hd_buffer_offset++] = data;
+		m_hd_buffer[m_hd_buffer_offset++] = m_dma_high_byte >> 8;
+		hdc_dma_finish();
+	}
 }
 
 uint8_t ngen_state::dma_read_word(offs_t offset)
@@ -859,7 +979,9 @@ void ngen_state::dma_write_word(offs_t offset, uint8_t data)
 		return;
 	offs_t page_offset = ((offs_t) m_dma_offset[m_dma_channel]) << 16;
 
-	prog_space.write_word((page_offset & 0xfe0000) | (offset << 1), data);
+	prog_space.write_word((page_offset & 0xfe0000) | (offset << 1), m_dma_high_byte | data);
+	if ((m_dma_channel == 3) && ((m_hdc_command & 0xf0) == 0x20))
+		hdc_dma_finish();
 	popmessage("DMA byte address %06x write %04x\n", (page_offset & 0xfe0000) | (offset << 1), m_dma_high_byte | data);
 }
 
@@ -994,6 +1116,14 @@ void ngen_state::machine_reset()
 	m_cpu_timer_irq_timer->adjust(attotime::never);
 	m_kbd_rxrdy = false;
 	m_kbd_txrdy = false;
+	m_hdc_control = 0;
+	m_disk_page = 0;
+	m_hdc_command = 0;
+	m_hd_buffer_offset = 0;
+	m_hdc_bdrq = false;
+	m_hdc_dma_eop = false;
+	m_hdc_bcs = false;
+	m_hdc_wg = false;
 	m_viduart->write_dsr(0);
 	m_viduart->write_cts(0);
 	m_fd0->get_device()->set_rpm(300);
@@ -1173,12 +1303,14 @@ void ngen_state::ngen(machine_config &config)
 	m_fdc_timer->set_clk<2>(20_MHz_XTAL / 20);
 //  m_fdc_timer->out_handler<2>().set(m_pic, FUNC(pic8259_device::ir5_w));
 
-	// TODO: WD1010 HDC (not implemented), use WD2010 for now
+	// TODO: replace the WD2010 stand-in with the module's WD1010 HDC
 	WD2010(config, m_hdc, 20_MHz_XTAL / 4);
 	m_hdc->out_intrq_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
-	m_hdc->in_bcs_callback().set(FUNC(ngen_state::hd_buffer_r));
-	m_hdc->out_bcs_callback().set(FUNC(ngen_state::hd_buffer_w));
-	m_hdc->in_drdy_callback().set_constant(1);
+	m_hdc->out_bdrq_callback().set(FUNC(ngen_state::hdc_bdrq_w));
+	m_hdc->out_wg_callback().set(FUNC(ngen_state::hdc_wg_w));
+	m_hdc->out_bcs_callback().set(FUNC(ngen_state::hdc_bcs_w));
+	m_hdc->out_bcr_callback().set(FUNC(ngen_state::hdc_bcr_w));
+	m_hdc->in_drdy_callback().set(FUNC(ngen_state::hdc_drdy_r));
 	m_hdc->in_index_callback().set_constant(1);
 	m_hdc->in_wf_callback().set_constant(0);
 	m_hdc->in_tk000_callback().set_constant(1);
@@ -1287,12 +1419,14 @@ void ngen386_state::ngen386(machine_config &config)
 	m_fdc_timer->set_clk<2>(20_MHz_XTAL / 20);
 //  m_fdc_timer->out_handler<2>().set(m_pic, FUNC(pic8259_device::ir5_w));
 
-	// TODO: WD1010 HDC (not implemented), use WD2010 for now
+	// TODO: replace the WD2010 stand-in with the module's WD1010 HDC
 	WD2010(config, m_hdc, 20_MHz_XTAL / 4);
 	m_hdc->out_intrq_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
-	m_hdc->in_bcs_callback().set(FUNC(ngen386_state::hd_buffer_r));
-	m_hdc->out_bcs_callback().set(FUNC(ngen386_state::hd_buffer_w));
-	m_hdc->in_drdy_callback().set_constant(1);
+	m_hdc->out_bdrq_callback().set(FUNC(ngen386_state::hdc_bdrq_w));
+	m_hdc->out_bcs_callback().set(FUNC(ngen386_state::hdc_bcs_w));
+	m_hdc->out_bcr_callback().set(FUNC(ngen386_state::hdc_bcr_w));
+	m_hdc->out_wg_callback().set(FUNC(ngen386_state::hdc_wg_w));
+	m_hdc->in_drdy_callback().set(FUNC(ngen386_state::hdc_drdy_r));
 	m_hdc->in_index_callback().set_constant(1);
 	m_hdc->in_wf_callback().set_constant(0);
 	m_hdc->in_tk000_callback().set_constant(1);
