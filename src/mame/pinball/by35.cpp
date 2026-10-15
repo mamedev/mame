@@ -147,11 +147,11 @@ ToDo:
 #include "by35_53.lh"
 #include "by35_53_nuova.lh"
 #include "by35_lostwrlp.lh"
+#include "by35_playboy.lh"
 #include "by35_slbmania.lh"
 #include "by35_smman.lh"
 #include "by35_sst.lh"
 #include "by35_startrep.lh"
-#include "by35_playboy.lh"
 
 
 namespace {

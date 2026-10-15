@@ -19,36 +19,36 @@ Any state="9" items are not displayed and are only used for object alignment
 <!-- Switches -->
 
 	<element name="Switch_Bumper_Blue_50">
-		<disk state="0">  <color red="1.00" green="1.00" blue="1.00" /><bounds x="00" y="00" width="101" height="101" /></disk>
-		<disk state="1">  <color red="0.50" green="0.50" blue="0.50" /><bounds x="00" y="00" width="101" height="101" /></disk>
-		<disk>            <color red="0.00" green="0.50" blue="1.00" /><bounds x="05" y="05" width="089" height="089" /></disk>
-		<disk>            <color red="1.00" green="1.00" blue="1.00" /><bounds x="19" y="19" width="061" height="061" /></disk>
-		<text string="50"><color red="0.00" green="0.50" blue="1.00" /><bounds x="25" y="22" width="051" height="051" /></text>
+		<disk state="0">  <color red="1.00" green="1.00" blue="1.00" /><bounds x="0" y="0" width="101" height="101" /></disk>
+		<disk state="1">  <color red="0.50" green="0.50" blue="0.50" /><bounds x="0" y="0" width="101" height="101" /></disk>
+		<disk>            <color red="0.00" green="0.50" blue="1.00" /><bounds x="5" y="5" width="89" height="89" /></disk>
+		<disk>            <color red="1.00" green="1.00" blue="1.00" /><bounds x="19" y="19" width="61" height="61" /></disk>
+		<text string="50"><color red="0.00" green="0.50" blue="1.00" /><bounds x="25" y="22" width="51" height="51" /></text>
 	</element>
 
 
 	<element name="Switch_Target_Yellow_Forward" defstate="0">
-		<rect          ><color red="1.00" green="1.00" blue="1.00" /><bounds x="06" y="00" width="10" height="01" /></rect>
-		<rect          ><color red="1.00" green="1.00" blue="1.00" /><bounds x="06" y="00" width="01" height="05" /></rect>
-		<rect          ><color red="1.00" green="1.00" blue="1.00" /><bounds x="16" y="00" width="01" height="05" /></rect>
-		<disk state="0"><color red="1.00" green="1.00" blue="0.00" /><bounds x="00" y="05" width="24" height="06" /></disk>
-		<disk state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="00" y="02" width="24" height="06" /></disk>
+		<rect><color red="1.00" green="1.00" blue="1.00" /><bounds x="6" y="0" width="10" height="1" /></rect>
+		<rect><color red="1.00" green="1.00" blue="1.00" /><bounds x="6" y="0" width="1" height="5" /></rect>
+		<rect><color red="1.00" green="1.00" blue="1.00" /><bounds x="16" y="0" width="1" height="5" /></rect>
+		<disk state="0"><color red="1.00" green="1.00" blue="0.00" /><bounds x="0" y="5" width="24" height="6" /></disk>
+		<disk state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="0" y="2" width="24" height="6" /></disk>
 	</element>
 
 	<element name="Switch_Target_Yellow_Left" defstate="0">
-		<rect          ><color red="1.00" green="1.00" blue="1.00" /><bounds x="00" y="06" width="01" height="10" /></rect>
-		<rect          ><color red="1.00" green="1.00" blue="1.00" /><bounds x="00" y="06" width="05" height="01" /></rect>
-		<rect          ><color red="1.00" green="1.00" blue="1.00" /><bounds x="00" y="16" width="05" height="01" /></rect>
-		<disk state="0"><color red="1.00" green="1.00" blue="0.00" /><bounds x="05" y="00" width="06" height="24" /></disk>
-		<disk state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="02" y="00" width="06" height="24" /></disk>
+		<rect><color red="1.00" green="1.00" blue="1.00" /><bounds x="0" y="6" width="1" height="10" /></rect>
+		<rect><color red="1.00" green="1.00" blue="1.00" /><bounds x="0" y="6" width="5" height="1" /></rect>
+		<rect><color red="1.00" green="1.00" blue="1.00" /><bounds x="0" y="16" width="5" height="1" /></rect>
+		<disk state="0"><color red="1.00" green="1.00" blue="0.00" /><bounds x="5" y="0" width="6" height="24" /></disk>
+		<disk state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="2" y="0" width="6" height="24" /></disk>
 	</element>
 
 	<element name="Switch_Target_Yellow_Right" defstate="0">
-		<rect          ><color red="1.00" green="1.00" blue="1.00" /><bounds x="10" y="06" width="02" height="10" /></rect>
-		<rect          ><color red="1.00" green="1.00" blue="1.00" /><bounds x="06" y="06" width="05" height="01" /></rect>
-		<rect          ><color red="1.00" green="1.00" blue="1.00" /><bounds x="06" y="16" width="05" height="01" /></rect>
-		<disk state="0"><color red="1.00" green="1.00" blue="0.00" /><bounds x="00" y="00" width="06" height="24" /></disk>
-		<disk state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="03" y="00" width="06" height="24" /></disk>
+		<rect><color red="1.00" green="1.00" blue="1.00" /><bounds x="10" y="6" width="2" height="10" /></rect>
+		<rect><color red="1.00" green="1.00" blue="1.00" /><bounds x="6" y="6" width="5" height="1" /></rect>
+		<rect><color red="1.00" green="1.00" blue="1.00" /><bounds x="6" y="16" width="5" height="1" /></rect>
+		<disk state="0"><color red="1.00" green="1.00" blue="0.00" /><bounds x="0" y="0" width="6" height="24" /></disk>
+		<disk state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="3" y="0" width="6" height="24" /></disk>
 	</element>
 
 
@@ -66,149 +66,139 @@ Any state="9" items are not displayed and are only used for object alignment
 
 
 	<element name="Spinner">
-		<rect state="00"><color red="0.80" green="0.80" blue="0.80" /><bounds x="05" y="00" width="16" height="11" /></rect>
-		<rect state="00"><color red="0.80" green="0.80" blue="0.80" /><bounds x="05" y="11" width="16" height="11" /></rect>
-		<rect state="01"><color red="0.70" green="0.70" blue="0.70" /><bounds x="05" y="02" width="16" height="09" /></rect>
-		<rect state="01"><color red="0.85" green="0.85" blue="0.85" /><bounds x="05" y="11" width="16" height="09" /></rect>
-		<rect state="02"><color red="0.60" green="0.60" blue="0.60" /><bounds x="05" y="04" width="16" height="07" /></rect>
-		<rect state="02"><color red="0.90" green="0.90" blue="0.90" /><bounds x="05" y="11" width="16" height="07" /></rect>
-		<rect state="03"><color red="0.50" green="0.50" blue="0.50" /><bounds x="05" y="06" width="16" height="05" /></rect>
-		<rect state="03"><color red="0.95" green="0.95" blue="0.95" /><bounds x="05" y="11" width="16" height="05" /></rect>
-		<rect state="04"><color red="0.00" green="0.70" blue="1.00" /><bounds x="05" y="08" width="16" height="06" /></rect>
-		<rect state="05"><color red="0.00" green="0.65" blue="0.95" /><bounds x="05" y="06" width="16" height="05" /></rect>
-		<rect state="05"><color red="0.00" green="0.20" blue="0.50" /><bounds x="05" y="11" width="16" height="05" /></rect>
-		<rect state="06"><color red="0.00" green="0.60" blue="0.90" /><bounds x="05" y="04" width="16" height="07" /></rect>
-		<rect state="06"><color red="0.00" green="0.30" blue="0.60" /><bounds x="05" y="11" width="16" height="07" /></rect>
-		<rect state="07"><color red="0.00" green="0.55" blue="0.85" /><bounds x="05" y="02" width="16" height="09" /></rect>
-		<rect state="07"><color red="0.00" green="0.40" blue="0.70" /><bounds x="05" y="11" width="16" height="09" /></rect>
-		<rect state="08"><color red="0.00" green="0.50" blue="0.80" /><bounds x="05" y="00" width="16" height="11" /></rect>
-		<rect state="08"><color red="0.00" green="0.50" blue="0.80" /><bounds x="05" y="11" width="16" height="11" /></rect>
-		<rect state="09"><color red="0.00" green="0.40" blue="0.70" /><bounds x="05" y="02" width="16" height="09" /></rect>
-		<rect state="09"><color red="0.00" green="0.55" blue="0.85" /><bounds x="05" y="11" width="16" height="09" /></rect>
-		<rect state="10"><color red="0.00" green="0.30" blue="0.60" /><bounds x="05" y="04" width="16" height="07" /></rect>
-		<rect state="10"><color red="0.00" green="0.60" blue="0.90" /><bounds x="05" y="11" width="16" height="07" /></rect>
-		<rect state="11"><color red="0.00" green="0.20" blue="0.50" /><bounds x="05" y="06" width="16" height="05" /></rect>
-		<rect state="11"><color red="0.00" green="0.65" blue="0.95" /><bounds x="05" y="11" width="16" height="05" /></rect>
-		<rect state="12"><color red="1.00" green="1.00" blue="1.00" /><bounds x="05" y="08" width="16" height="06" /></rect>
-		<rect state="13"><color red="0.95" green="0.95" blue="0.95" /><bounds x="05" y="06" width="16" height="05" /></rect>
-		<rect state="13"><color red="0.50" green="0.50" blue="0.50" /><bounds x="05" y="11" width="16" height="05" /></rect>
-		<rect state="14"><color red="0.90" green="0.90" blue="0.90" /><bounds x="05" y="04" width="16" height="07" /></rect>
-		<rect state="14"><color red="0.60" green="0.60" blue="0.60" /><bounds x="05" y="11" width="16" height="07" /></rect>
-		<rect state="15"><color red="0.85" green="0.85" blue="0.85" /><bounds x="05" y="02" width="16" height="09" /></rect>
-		<rect state="15"><color red="0.70" green="0.70" blue="0.70" /><bounds x="05" y="11" width="16" height="09" /></rect>
-		<rect>           <color red="0.60" green="0.30" blue="0.15" /><bounds x="00" y="10" width="26" height="02" /></rect>
+		<rect state="0"><color red="0.80" green="0.80" blue="0.80" /><bounds x="5" y="0" width="16" height="11" /></rect>
+		<rect state="0"><color red="0.80" green="0.80" blue="0.80" /><bounds x="5" y="11" width="16" height="11" /></rect>
+		<rect state="1"><color red="0.70" green="0.70" blue="0.70" /><bounds x="5" y="2" width="16" height="9" /></rect>
+		<rect state="1"><color red="0.85" green="0.85" blue="0.85" /><bounds x="5" y="11" width="16" height="9" /></rect>
+		<rect state="2"><color red="0.60" green="0.60" blue="0.60" /><bounds x="5" y="4" width="16" height="7" /></rect>
+		<rect state="2"><color red="0.90" green="0.90" blue="0.90" /><bounds x="5" y="11" width="16" height="7" /></rect>
+		<rect state="3"><color red="0.50" green="0.50" blue="0.50" /><bounds x="5" y="6" width="16" height="5" /></rect>
+		<rect state="3"><color red="0.95" green="0.95" blue="0.95" /><bounds x="5" y="11" width="16" height="5" /></rect>
+		<rect state="4"><color red="0.00" green="0.70" blue="1.00" /><bounds x="5" y="8" width="16" height="6" /></rect>
+		<rect state="5"><color red="0.00" green="0.65" blue="0.95" /><bounds x="5" y="6" width="16" height="5" /></rect>
+		<rect state="5"><color red="0.00" green="0.20" blue="0.50" /><bounds x="5" y="11" width="16" height="5" /></rect>
+		<rect state="6"><color red="0.00" green="0.60" blue="0.90" /><bounds x="5" y="4" width="16" height="7" /></rect>
+		<rect state="6"><color red="0.00" green="0.30" blue="0.60" /><bounds x="5" y="11" width="16" height="7" /></rect>
+		<rect state="7"><color red="0.00" green="0.55" blue="0.85" /><bounds x="5" y="2" width="16" height="9" /></rect>
+		<rect state="7"><color red="0.00" green="0.40" blue="0.70" /><bounds x="5" y="11" width="16" height="9" /></rect>
+		<rect state="8"><color red="0.00" green="0.50" blue="0.80" /><bounds x="5" y="0" width="16" height="11" /></rect>
+		<rect state="8"><color red="0.00" green="0.50" blue="0.80" /><bounds x="5" y="11" width="16" height="11" /></rect>
+		<rect state="9"><color red="0.00" green="0.40" blue="0.70" /><bounds x="5" y="2" width="16" height="9" /></rect>
+		<rect state="9"><color red="0.00" green="0.55" blue="0.85" /><bounds x="5" y="11" width="16" height="9" /></rect>
+		<rect state="10"><color red="0.00" green="0.30" blue="0.60" /><bounds x="5" y="4" width="16" height="7" /></rect>
+		<rect state="10"><color red="0.00" green="0.60" blue="0.90" /><bounds x="5" y="11" width="16" height="7" /></rect>
+		<rect state="11"><color red="0.00" green="0.20" blue="0.50" /><bounds x="5" y="6" width="16" height="5" /></rect>
+		<rect state="11"><color red="0.00" green="0.65" blue="0.95" /><bounds x="5" y="11" width="16" height="5" /></rect>
+		<rect state="12"><color red="1.00" green="1.00" blue="1.00" /><bounds x="5" y="8" width="16" height="6" /></rect>
+		<rect state="13"><color red="0.95" green="0.95" blue="0.95" /><bounds x="5" y="6" width="16" height="5" /></rect>
+		<rect state="13"><color red="0.50" green="0.50" blue="0.50" /><bounds x="5" y="11" width="16" height="5" /></rect>
+		<rect state="14"><color red="0.90" green="0.90" blue="0.90" /><bounds x="5" y="4" width="16" height="7" /></rect>
+		<rect state="14"><color red="0.60" green="0.60" blue="0.60" /><bounds x="5" y="11" width="16" height="7" /></rect>
+		<rect state="15"><color red="0.85" green="0.85" blue="0.85" /><bounds x="5" y="2" width="16" height="9" /></rect>
+		<rect state="15"><color red="0.70" green="0.70" blue="0.70" /><bounds x="5" y="11" width="16" height="9" /></rect>
+		<rect>           <color red="0.60" green="0.30" blue="0.15" /><bounds x="0" y="10" width="26" height="2" /></rect>
 	</element>
 
 
 	<element name="Switch_Leaf_Horizontal">
-		<rect state="0"><color red="0.80" green="0.80" blue="0.80" /><bounds x="00" y="00" width="06" height="01" /></rect>
-		<rect state="0"><color red="0.80" green="0.80" blue="0.80" /><bounds x="00" y="08" width="06" height="1.5" /></rect>
-		<rect state="0"><color red="1.00" green="1.00" blue="0.00" /><bounds x="01" y="01" width="04" height="02" /></rect>
-		<rect state="0"><color red="1.00" green="1.00" blue="0.00" /><bounds x="01" y="06" width="04" height="02" /></rect>
+		<rect state="0"><color red="0.80" green="0.80" blue="0.80" /><bounds x="0" y="0" width="6" height="1" /></rect>
+		<rect state="0"><color red="0.80" green="0.80" blue="0.80" /><bounds x="0" y="8" width="6" height="1.5" /></rect>
+		<rect state="0"><color red="1.00" green="1.00" blue="0.00" /><bounds x="1" y="1" width="4" height="2" /></rect>
+		<rect state="0"><color red="1.00" green="1.00" blue="0.00" /><bounds x="1" y="6" width="4" height="2" /></rect>
 
-		<rect state="1"><color red="0.80" green="0.80" blue="0.80" /><bounds x="00" y="1.5" width="06" height="01" /></rect>
-		<rect state="1"><color red="0.80" green="0.80" blue="0.80" /><bounds x="00" y="6.5" width="06" height="01" /></rect>
-		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="01" y="2.0" width="04" height="02" /></rect>
-		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="01" y="4.5" width="04" height="02" /></rect>
+		<rect state="1"><color red="0.80" green="0.80" blue="0.80" /><bounds x="0" y="1.5" width="6" height="1" /></rect>
+		<rect state="1"><color red="0.80" green="0.80" blue="0.80" /><bounds x="0" y="6.5" width="6" height="1" /></rect>
+		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="1" y="2.0" width="4" height="2" /></rect>
+		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="1" y="4.5" width="4" height="2" /></rect>
 	</element>
 
 	<element name="Switch_Leaf_Vertical">
-		<rect state="0"><color red="0.80" green="0.80" blue="0.80" /><bounds x="0" y="00" width="01"   height="06" /></rect>
-		<rect state="0"><color red="0.80" green="0.80" blue="0.80" /><bounds x="8" y="00" width="01.5" height="06" /></rect>
-		<rect state="0"><color red="1.00" green="1.00" blue="0.00" /><bounds x="1" y="01" width="02"   height="04" /></rect>
-		<rect state="0"><color red="1.00" green="1.00" blue="0.00" /><bounds x="6" y="01" width="02"   height="04" /></rect>
+		<rect state="0"><color red="0.80" green="0.80" blue="0.80" /><bounds x="0" y="0" width="1" height="6" /></rect>
+		<rect state="0"><color red="0.80" green="0.80" blue="0.80" /><bounds x="8" y="0" width="1.5" height="6" /></rect>
+		<rect state="0"><color red="1.00" green="1.00" blue="0.00" /><bounds x="1" y="1" width="2" height="4" /></rect>
+		<rect state="0"><color red="1.00" green="1.00" blue="0.00" /><bounds x="6" y="1" width="2" height="4" /></rect>
 
-		<rect state="1"><color red="0.80" green="0.80" blue="0.80" /><bounds x="1.5" y="00" width="01" height="06" /></rect>
-		<rect state="1"><color red="0.80" green="0.80" blue="0.80" /><bounds x="6.5" y="00" width="01" height="06" /></rect>
-		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="2"   y="01" width="02" height="04" /></rect>
-		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="4.5" y="01" width="02" height="04" /></rect>
+		<rect state="1"><color red="0.80" green="0.80" blue="0.80" /><bounds x="1.5" y="0" width="1" height="6" /></rect>
+		<rect state="1"><color red="0.80" green="0.80" blue="0.80" /><bounds x="6.5" y="0" width="1" height="6" /></rect>
+		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="2" y="1" width="2" height="4" /></rect>
+		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="4.5" y="1" width="2" height="4" /></rect>
 	</element>
 
 
 	<element name="Switch_RollOn_WireForm_Down">
-		<text string="/\" state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="0" y="00" width="07"  height="10" /></text>
-		<rect             state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="1" y="17" width="04"  height="0.1" /></rect>
-		<rect             state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="1" y="09" width="0.1" height="09" /></rect>
-		<rect             state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="5" y="09" width="0.1" height="09" /></rect>
-		<rect             state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="3" y="07" width="0.1" height="08" /></rect>
-		<text string="/\" state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="0" y="00" width="07"  height="10" /></text>
-		<rect             state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="1" y="17" width="04"  height="0.1" /></rect>
-		<rect             state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="1" y="09" width="0.1" height="09" /></rect>
-		<rect             state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="5" y="09" width="0.1" height="09" /></rect>
+		<image>
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7 18"><g fill="none" stroke="#ffffff" stroke-width="0.5" stroke-linejoin="round"><polyline points="0,10 3.5,0 7,10"/><line x1="1" y1="17" x2="5" y2="17"/><line x1="1" y1="9" x2="1" y2="18"/><line x1="5" y1="9" x2="5" y2="18"/></g></svg>]]></data>
+			<bounds x="0" y="0" width="7" height="18" />
+		</image>
+		<image state="0">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7 18"><line x1="3" y1="7" x2="3" y2="15" fill="none" stroke="#ffffff" stroke-width="0.5"/></svg>]]></data>
+			<bounds x="0" y="0" width="7" height="18" />
+		</image>
 	</element>
 
 	<element name="Switch_RollOn_WireForm_Left">
-		<text string=">" state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="8" y="0" width="11"  height="11"  /></text>
-		<rect            state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="1" y="4" width="0.1" height="04"  /></rect>
-		<rect            state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="1" y="4" width="09"  height="0.1" /></rect>
-		<rect            state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="1" y="8" width="09"  height="0.1" /></rect>
-		<rect            state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="3" y="6" width="08"  height="0.1" /></rect>
-		<text string=">" state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="8" y="0" width="11"  height="11"  /></text>
-		<rect            state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="1" y="4" width="0.1" height="04"  /></rect>
-		<rect            state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="1" y="4" width="09"  height="0.1" /></rect>
-		<rect            state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="1" y="8" width="09"  height="0.1" /></rect>
+		<image>
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 11"><g fill="none" stroke="#ffffff" stroke-width="0.5" stroke-linejoin="round"><polyline points="8,1 18,5.5 8,10"/><line x1="1" y1="4" x2="1" y2="8"/><line x1="1" y1="4" x2="10" y2="4"/><line x1="1" y1="8" x2="10" y2="8"/></g></svg>]]></data>
+			<bounds x="0" y="0" width="19" height="11" />
+		</image>
+		<image state="0">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19 11"><line x1="3" y1="6" x2="11" y2="6" fill="none" stroke="#ffffff" stroke-width="0.5"/></svg>]]></data>
+			<bounds x="0" y="0" width="19" height="11" />
+		</image>
 	</element>
 
 	<element name="Switch_RollOver_WireForm_Vertical">
-		<text string="/\" state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="0" y="00" width="07"  height="10" /></text>
-		<text string="\/" state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="0" y="17" width="07"  height="10" /></text>
-		<rect             state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="1" y="09" width="0.1" height="09" /></rect>
-		<rect             state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="5" y="09" width="0.1" height="09" /></rect>
-		<rect             state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="3" y="07" width="0.1" height="13" /></rect>
-		<text string="/\" state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="0" y="00" width="07"  height="10" /></text>
-		<text string="\/" state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="0" y="17" width="07"  height="10" /></text>
-		<rect             state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="1" y="09" width="0.1" height="09" /></rect>
-		<rect             state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="5" y="09" width="0.1" height="09" /></rect>
+		<image>
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7 27"><g fill="none" stroke="#ffffff" stroke-width="0.5" stroke-linejoin="round"><polyline points="0,10 3.5,0 7,10"/><polyline points="0,17 3.5,27 7,17"/><line x1="1" y1="9" x2="1" y2="18"/><line x1="5" y1="9" x2="5" y2="18"/></g></svg>]]></data>
+			<bounds x="0" y="0" width="7" height="27" />
+		</image>
+		<image state="0">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7 27"><line x1="3" y1="7" x2="3" y2="20" fill="none" stroke="#ffffff" stroke-width="0.5"/></svg>]]></data>
+			<bounds x="0" y="0" width="7" height="27" />
+		</image>
 	</element>
 
 
 	<element name="Switch_Push-Button" defstate="0">
-		<rect state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="12" y="00" width="01" height="04" /></rect>
-		<rect state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="17" y="00" width="01" height="04" /></rect>
-		<rect state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="12" y="00" width="05" height="01" /></rect>
-		<rect state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="07" y="04" width="16" height="01" /></rect>
-		<rect state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="00" y="12" width="09" height="01" /></rect>
-		<rect state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="21" y="12" width="09" height="01" /></rect>
-		<disk state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="07" y="10" width="06" height="06" /></disk>
-		<disk state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="18" y="10" width="06" height="06" /></disk>
-		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="12" y="04.5" width="01" height="04" /></rect>
-		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="17" y="04.5" width="01" height="04" /></rect>
-		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="12" y="04.5" width="05" height="01" /></rect>
-		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="07" y="08.5" width="16" height="01" /></rect>
-		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="00" y="12" width="09" height="01" /></rect>
-		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="21" y="12" width="09" height="01" /></rect>
-		<disk state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="07" y="10" width="06" height="06" /></disk>
-		<disk state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="18" y="10" width="06" height="06" /></disk>
+		<rect state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="12" y="0" width="1" height="4" /></rect>
+		<rect state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="17" y="0" width="1" height="4" /></rect>
+		<rect state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="12" y="0" width="5" height="1" /></rect>
+		<rect state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="7" y="4" width="16" height="1" /></rect>
+		<rect state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="0" y="12" width="9" height="1" /></rect>
+		<rect state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="21" y="12" width="9" height="1" /></rect>
+		<disk state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="7" y="10" width="6" height="6" /></disk>
+		<disk state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="18" y="10" width="6" height="6" /></disk>
+		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="12" y="4.5" width="1" height="4" /></rect>
+		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="17" y="4.5" width="1" height="4" /></rect>
+		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="12" y="4.5" width="5" height="1" /></rect>
+		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="7" y="8.5" width="16" height="1" /></rect>
+		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="0" y="12" width="9" height="1" /></rect>
+		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="21" y="12" width="9" height="1" /></rect>
+		<disk state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="7" y="10" width="6" height="6" /></disk>
+		<disk state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="18" y="10" width="6" height="6" /></disk>
 	</element>
 
 
 	<element name="Switch_SlamTilt">
-		<rect state="0"><color red="0.80" green="0.80" blue="0.80" /><bounds x="00" y="00" width="25" height="01" /></rect>
-		<rect state="0"><color red="0.80" green="0.80" blue="0.80" /><bounds x="00" y="08" width="13" height="01.5" /></rect>
-		<rect state="0"><color red="1.00" green="1.00" blue="0.00" /><bounds x="08" y="01" width="04" height="02" /></rect>
-		<rect state="0"><color red="1.00" green="1.00" blue="0.00" /><bounds x="08" y="06" width="04" height="02" /></rect>
-
-		<rect state="0"><color red="0.70" green="0.70" blue="0.70" /><bounds x="19" y="01" width="06" height="04" /></rect>
-		<rect state="1"><color red="0.70" green="0.70" blue="0.70" /><bounds x="19" y="04" width="06" height="04" /></rect>
-
-		<rect state="1"><color red="0.80" green="0.80" blue="0.80" /><bounds x="00" y="00" width="08" height="01" /></rect>
-		<rect state="1"><color red="0.80" green="0.80" blue="0.80" /><bounds x="08" y="01" width="08" height="01" /></rect>
-		<rect state="1"><color red="0.80" green="0.80" blue="0.80" /><bounds x="16" y="02" width="09" height="01" /></rect>
-
-		<rect state="1"><color red="0.80" green="0.80" blue="0.80" /><bounds x="00" y="08"  width="13" height="01.5" /></rect>
-		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="08" y="03"  width="04" height="02" /></rect>
-		<rect state="1"><color red="1.00" green="1.00" blue="0.00" /><bounds x="08" y="06"  width="04" height="02" /></rect>
+		<image state="0">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 10"><rect x="0" y="0" width="25" height="1" fill="#cccccc"/><rect x="0" y="8" width="13" height="1.5" fill="#cccccc"/><rect x="8" y="1" width="4" height="2" fill="#ffff00"/><rect x="8" y="6" width="4" height="2" fill="#ffff00"/><rect x="19" y="1" width="6" height="4" fill="#b3b3b3"/></svg>]]></data>
+			<bounds x="0" y="0" width="25" height="10" />
+		</image>
+		<image state="1">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 10"><polyline points="0,0.5 8,1.5 16,2.5 25,2.5" fill="none" stroke="#cccccc" stroke-width="1"/><rect x="0" y="8" width="13" height="1.5" fill="#cccccc"/><rect x="8" y="3" width="4" height="2" fill="#ffff00"/><rect x="8" y="6" width="4" height="2" fill="#ffff00"/><rect x="19" y="4" width="6" height="4" fill="#b3b3b3"/></svg>]]></data>
+			<bounds x="0" y="0" width="25" height="10" />
+		</image>
 	</element>
 
 
 	<element name="Switch_Tilt">
-		<rect          ><color red="0.80" green="0.80" blue="0.00" /><bounds x="00" y="00" width="34" height="34" /></rect>
-		<disk          ><color red="0.00" green="0.00" blue="0.00" /><bounds x="02" y="02" width="30" height="30" /></disk>
-		<disk state="0"><color red="0.50" green="0.50" blue="0.50" /><bounds x="08" y="08" width="18" height="18" /></disk>
-		<disk state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="15" y="15" width="04" height="04" /></disk>
+		<rect><color red="0.80" green="0.80" blue="0.00" /><bounds x="0" y="0" width="34" height="34" /></rect>
+		<disk><color red="0.00" green="0.00" blue="0.00" /><bounds x="2" y="2" width="30" height="30" /></disk>
+		<disk state="0"><color red="0.50" green="0.50" blue="0.50" /><bounds x="8" y="8" width="18" height="18" /></disk>
+		<disk state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="15" y="15" width="4" height="4" /></disk>
 
-		<disk state="1"><color red="0.50" green="0.50" blue="0.50" /><bounds x="14" y="08" width="18" height="18" /></disk>
-		<disk state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="22" y="15" width="04" height="04" /></disk>
+		<disk state="1"><color red="0.50" green="0.50" blue="0.50" /><bounds x="14" y="8" width="18" height="18" /></disk>
+		<disk state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="22" y="15" width="4" height="4" /></disk>
 	</element>
 
 
@@ -235,14 +225,7 @@ Any state="9" items are not displayed and are only used for object alignment
 	<element name="Key_L">     <text string="L"><color red="1.00" green="0.66" blue="0.66" /></text></element>
 	<element name="Key_SColon"><text string=";"><color red="1.00" green="0.66" blue="0.66" /></text></element>
 	<element name="Key_Quote"> <text string="'"><color red="1.00" green="0.66" blue="0.66" /></text></element>
-	<element name="Key_Enter">
-		<text string="&#60;"><color red="1.00" green="0.66" blue="0.66" /><bounds x="00" y="00" width="07"  height="10" /></text>
-		<text string="-">    <color red="1.00" green="0.66" blue="0.66" /><bounds x="00" y="00" width="07"  height="10" /></text>
-		<text string="-">    <color red="1.00" green="0.66" blue="0.66" /><bounds x="02" y="00" width="07"  height="10" /></text>
-		<text string="-">    <color red="1.00" green="0.66" blue="0.66" /><bounds x="04" y="00" width="07"  height="10" /></text>
-		<text string="-">    <color red="1.00" green="0.66" blue="0.66" /><bounds x="06" y="00" width="07"  height="10" /></text>
-		<disk           >    <color red="1.00" green="0.66" blue="0.66" /><bounds x="10" y="02" width="0.5" height="03" /></disk>
-	</element>
+	<element name="Key_Enter"><text string="↵"><color red="1.00" green="0.66" blue="0.66" /></text></element>
 
 	<element name="Key_Q">     <text string="Q"><color red="1.00" green="0.66" blue="0.66" /></text></element>
 	<element name="Key_W">     <text string="W"><color red="1.00" green="0.66" blue="0.66" /></text></element>
@@ -266,13 +249,7 @@ Any state="9" items are not displayed and are only used for object alignment
 	<element name="Key_0">     <text string="0"><color red="1.00" green="0.66" blue="0.66" /></text></element>
 	<element name="Key_Minus"> <text string="-"><color red="1.00" green="0.66" blue="0.66" /></text></element>
 	<element name="Key_Equals"><text string="="><color red="1.00" green="0.66" blue="0.66" /></text></element>
-	<element name="Key_BSpace">
-		<text string="&#60;"><color red="1.00" green="0.66" blue="0.66" /><bounds x="0" y="00" width="07" height="10" /></text>
-		<text string="-">    <color red="1.00" green="0.66" blue="0.66" /><bounds x="0" y="00" width="07" height="10" /></text>
-		<text string="-">    <color red="1.00" green="0.66" blue="0.66" /><bounds x="2" y="00" width="07" height="10" /></text>
-		<text string="-">    <color red="1.00" green="0.66" blue="0.66" /><bounds x="4" y="00" width="07" height="10" /></text>
-		<text string="-">    <color red="1.00" green="0.66" blue="0.66" /><bounds x="6" y="00" width="07" height="10" /></text>
-	</element>
+	<element name="Key_BSpace"><text string="←"><color red="1.00" green="0.66" blue="0.66" /></text></element>
 
 
 
@@ -444,21 +421,15 @@ Any state="9" items are not displayed and are only used for object alignment
 
 
 	<element name="Lamp_Amber_Arrow_EB">
-		<rect state="0">   <color red="0.25" green="0.13" blue="0.00" /><bounds x="10" y="00" width="02" height="03" /></rect>
-		<rect state="1">   <color red="1.00" green="0.50" blue="0.00" /><bounds x="10" y="00" width="02" height="03" /></rect>
-		<rect state="0">   <color red="0.25" green="0.13" blue="0.00" /><bounds x="08" y="03" width="06" height="03" /></rect>
-		<rect state="1">   <color red="1.00" green="0.50" blue="0.00" /><bounds x="08" y="03" width="06" height="03" /></rect>
-		<rect state="0">   <color red="0.25" green="0.13" blue="0.00" /><bounds x="06" y="06" width="10" height="03" /></rect>
-		<rect state="1">   <color red="1.00" green="0.50" blue="0.00" /><bounds x="06" y="06" width="10" height="03" /></rect>
-		<rect state="0">   <color red="0.25" green="0.13" blue="0.00" /><bounds x="04" y="09" width="14" height="03" /></rect>
-		<rect state="1">   <color red="1.00" green="0.50" blue="0.00" /><bounds x="04" y="09" width="14" height="03" /></rect>
-		<rect state="0">   <color red="0.25" green="0.13" blue="0.00" /><bounds x="02" y="12" width="18" height="03" /></rect>
-		<rect state="1">   <color red="1.00" green="0.50" blue="0.00" /><bounds x="02" y="12" width="18" height="03" /></rect>
-		<rect state="0">   <color red="0.25" green="0.13" blue="0.00" /><bounds x="00" y="15" width="22" height="03" /></rect>
-		<rect state="1">   <color red="1.00" green="0.50" blue="0.00" /><bounds x="00" y="15" width="22" height="03" /></rect>
-		<rect state="0">   <color red="0.25" green="0.13" blue="0.00" /><bounds x="09" y="06" width="04" height="30" /></rect>
-		<rect state="1">   <color red="1.00" green="0.50" blue="0.00" /><bounds x="09" y="06" width="04" height="30" /></rect>
-		<text string="E.B"><color red="0.00" green="0.00" blue="0.00" /><bounds x="06" y="06" width="14" height="14" /></text>
+		<image state="0">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 36"><polygon points="13.45,35.50 13.45,11.00 19.75,11.00 11.00,0.50 2.25,11.00 8.55,11.00 8.55,35.50" fill="#402100" /></svg>]]></data>
+			<bounds x="0" y="0" width="22" height="36" />
+		</image>
+		<image state="1">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 36"><polygon points="13.45,35.50 13.45,11.00 19.75,11.00 11.00,0.50 2.25,11.00 8.55,11.00 8.55,35.50" fill="#ff8000" /></svg>]]></data>
+			<bounds x="0" y="0" width="22" height="36" />
+		</image>
+		<text string="E.B"><color red="0.00" green="0.00" blue="0.00" /><bounds x="6" y="6" width="14" height="14" /></text>
 	</element>
 
 
@@ -490,10 +461,10 @@ Any state="9" items are not displayed and are only used for object alignment
 
 
 	<element name="High_Score_To_Date" defstate="0">
-		<text string="HIGH GAME" state="0"><color red="0.25" green="0.19" blue="0.00" /><bounds x="00" y="00" width="100" height="10" /></text>
-		<text string="TO DATE"   state="0"><color red="0.25" green="0.19" blue="0.00" /><bounds x="15" y="09" width="070" height="10" /></text>
-		<text string="HIGH GAME" state="1"><color red="1.00" green="0.75" blue="0.00" /><bounds x="00" y="00" width="100" height="10" /></text>
-		<text string="TO DATE"   state="1"><color red="1.00" green="0.75" blue="0.00" /><bounds x="15" y="09" width="070" height="10" /></text>
+		<text string="HIGH GAME" state="0"><color red="0.25" green="0.19" blue="0.00" /><bounds x="0" y="0" width="100" height="10" /></text>
+		<text string="TO DATE" state="0"><color red="0.25" green="0.19" blue="0.00" /><bounds x="15" y="9" width="70" height="10" /></text>
+		<text string="HIGH GAME" state="1"><color red="1.00" green="0.75" blue="0.00" /><bounds x="0" y="0" width="100" height="10" /></text>
+		<text string="TO DATE" state="1"><color red="1.00" green="0.75" blue="0.00" /><bounds x="15" y="9" width="70" height="10" /></text>
 	</element>
 	<element name="Ball_In_Play" defstate="0">
 		<text string="BALL IN PLAY" state="0"><color red="0.25" green="0.19" blue="0.00" /><bounds x="0.1" y="0.1" width="1" height="0.8" /></text>
@@ -512,10 +483,10 @@ Any state="9" items are not displayed and are only used for object alignment
 		<text string="TILT" state="1"><color red="1.00" green="0.75" blue="0.00" /><bounds x="3" y="1" width="40" height="10" /></text>
 	</element>
 	<element name="Shoot_Again" defstate="0">
-		<text string="SAME PLAYER"  state="0"><color red="0.25" green="0.19" blue="0.00" /><bounds x="04" y="00" width="088" height="10" /></text>
-		<text string="SHOOTS AGAIN" state="0"><color red="0.25" green="0.19" blue="0.00" /><bounds x="00" y="09" width="100" height="10" /></text>
-		<text string="SAME PLAYER"  state="1"><color red="1.00" green="0.75" blue="0.00" /><bounds x="04" y="00" width="088" height="10" /></text>
-		<text string="SHOOTS AGAIN" state="1"><color red="1.00" green="0.75" blue="0.00" /><bounds x="00" y="09" width="100" height="10" /></text>
+		<text string="SAME PLAYER" state="0"><color red="0.25" green="0.19" blue="0.00" /><bounds x="4" y="0" width="88" height="10" /></text>
+		<text string="SHOOTS AGAIN" state="0"><color red="0.25" green="0.19" blue="0.00" /><bounds x="0" y="9" width="100" height="10" /></text>
+		<text string="SAME PLAYER" state="1"><color red="1.00" green="0.75" blue="0.00" /><bounds x="4" y="0" width="88" height="10" /></text>
+		<text string="SHOOTS AGAIN" state="1"><color red="1.00" green="0.75" blue="0.00" /><bounds x="0" y="9" width="100" height="10" /></text>
 	</element>
 
 
@@ -530,13 +501,13 @@ Any state="9" items are not displayed and are only used for object alignment
 
 
 	<element name="Lamp_Incandescent" defstate="1">
-		<disk state="0"><color red="0.25" green="0.25" blue="0.25" /><bounds x="10" y="10" width="080" height="080" /></disk>
-		<disk state="0"><color red="0.00" green="0.00" blue="0.0"  /><bounds x="15" y="15" width="070" height="070" /></disk>
-		<text string="&#937;" state="0"><color red="0.25" green="0.25" blue="0.25" /><bounds x="08" y="15" width="084" height="080" /></text>
-		<disk state="1"><color red="1.00" green="1.00" blue="0.0" /><bounds x="00" y="00" width="100" height="100" /></disk>
-		<disk state="1"><color red="0.75" green="0.75" blue="0.0" /><bounds x="10" y="10" width="080" height="080" /></disk>
-		<disk state="1"><color red="1.00" green="1.00" blue="0.0" /><bounds x="15" y="15" width="070" height="070" /></disk>
-		<text string="&#937;" state="1"><color red="1.00" green="0.50" blue="0.00" /><bounds x="08" y="15" width="084" height="080" /></text>
+		<disk state="0"><color red="0.25" green="0.25" blue="0.25" /><bounds x="10" y="10" width="80" height="80" /></disk>
+		<disk state="0"><color red="0.00" green="0.00" blue="0.0" /><bounds x="15" y="15" width="70" height="70" /></disk>
+		<text string="Ω" state="0"><color red="0.25" green="0.25" blue="0.25" /><bounds x="8" y="15" width="84" height="80" /></text>
+		<disk state="1"><color red="1.00" green="1.00" blue="0.0" /><bounds x="0" y="0" width="100" height="100" /></disk>
+		<disk state="1"><color red="0.75" green="0.75" blue="0.0" /><bounds x="10" y="10" width="80" height="80" /></disk>
+		<disk state="1"><color red="1.00" green="1.00" blue="0.0" /><bounds x="15" y="15" width="70" height="70" /></disk>
+		<text string="Ω" state="1"><color red="1.00" green="0.50" blue="0.00" /><bounds x="8" y="15" width="84" height="80" /></text>
 	</element>
 
 
@@ -544,73 +515,85 @@ Any state="9" items are not displayed and are only used for object alignment
 <!-- Solenoids -->
 
 	<element name="Solenoid_Kicker_Up">
-		<rect state="9"><color red="0.0" green="0.0" blue="0.0" /><bounds x="00" y="00" width="25" height="80" /></rect>
-		<rect state="0"><color red="0.3" green="0.3" blue="0.3" /><bounds x="04" y="35" width="14" height="35" /></rect>
-		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /><bounds x="04" y="35" width="14" height="35" /></rect>
+		<rect state="9"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0" y="0" width="25" height="80" /></rect>
+		<rect state="0"><color red="0.3" green="0.3" blue="0.3" /><bounds x="4" y="35" width="14" height="35" /></rect>
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /><bounds x="4" y="35" width="14" height="35" /></rect>
 	</element>
 	<element name="Solenoid_Kicker" defstate="9">
-		<rect state="9"><color red="0.0" green="0.0" blue="0.0" /><bounds x="00" y="00" width="25" height="80" /></rect>
-		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="04" y="05" width="14" height="35" /></rect>
+		<rect state="9"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0" y="0" width="25" height="80" /></rect>
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="4" y="5" width="14" height="35" /></rect>
 	</element>
 	<element name="Solenoid_Kicker_Lift" defstate="9">
-		<rect state="9"><color red="0.0" green="0.0" blue="0.0" /><bounds x="00" y="00" width="25" height="80" /></rect>
-		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="00" y="30" width="24" height="45" /></rect>
+		<rect state="9"><color red="0.0" green="0.0" blue="0.0" /><bounds x="0" y="0" width="25" height="80" /></rect>
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="0" y="30" width="24" height="45" /></rect>
 	</element>
 
 
 	<element name="Solenoid_PullDown" defstate="0">
-		<rect state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="3" y="0" width="03" height="09" /></rect>
+		<rect state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="3" y="0" width="3" height="9" /></rect>
 		<rect state="0"><color red="0.0" green="1.0" blue="1.0" /><bounds x="0" y="8" width="10" height="11" /></rect>
 		<rect state="1"><color red="1.0" green="1.0" blue="0.0" /><bounds x="0" y="8" width="10" height="11" /></rect>
 	</element>
 
 	<element name="Coil_PullDown" defstate="0">
-		<rect state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="8" y="0" width="02" height="01" /></rect>
-		<rect state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="6" y="1" width="02" height="01" /></rect>
-		<rect state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="4" y="2" width="02" height="01" /></rect>
-		<rect state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="2" y="3" width="02" height="01" /></rect>
-		<rect state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="4" width="02" height="01" /></rect>
-		<rect          ><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="5" width="02" height="02" /></rect>
-		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="4" width="10" height="01" /></rect>
-
-		<rect state="0"><color red="0.0" green="1.0" blue="1.0" /><bounds x="0" y="8" width="10" height="11" /></rect>
-		<rect state="1"><color red="1.0" green="1.0" blue="0.0" /><bounds x="0" y="8" width="10" height="11" /></rect>
+		<image state="0">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 19"><line x1="10" y1="0.5" x2="0" y2="4.5" stroke="#ffffff" stroke-width="1"/><rect x="0" y="5" width="2" height="2" fill="#ffffff"/><rect x="0" y="8" width="10" height="11" fill="#00ffff"/></svg>]]></data>
+			<bounds x="0" y="0" width="10" height="19" />
+		</image>
+		<image state="1">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 19"><rect x="0" y="4" width="10" height="1" fill="#ffffff"/><rect x="0" y="5" width="2" height="2" fill="#ffffff"/><rect x="0" y="8" width="10" height="11" fill="#ffff00"/></svg>]]></data>
+			<bounds x="0" y="0" width="10" height="19" />
+		</image>
 	</element>
 
 
 	<element name="Solenoid_Knocker" defstate="0">
-		<rect state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="00" y="03" width="09" height="03" /></rect>
-		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="18" y="03" width="05" height="03" /></rect>
-		<rect state="0"><color red="0.0" green="1.0" blue="1.0" /><bounds x="08" y="00" width="11" height="10" /></rect>
-		<rect state="1"><color red="1.0" green="1.0" blue="0.0" /><bounds x="08" y="00" width="11" height="10" /></rect>
+		<rect state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="3" width="9" height="3" /></rect>
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="18" y="3" width="5" height="3" /></rect>
+		<rect state="0"><color red="0.0" green="1.0" blue="1.0" /><bounds x="8" y="0" width="11" height="10" /></rect>
+		<rect state="1"><color red="1.0" green="1.0" blue="0.0" /><bounds x="8" y="0" width="11" height="10" /></rect>
 	</element>
 
 	<element name="Solenoid_Outhole" defstate="0">
-		<text string="\" state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="17" y="00" width="05" height="16" /></text>
-		<text string="\" state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="02" y="00" width="05" height="16" /></text>
-		<text string="\" state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="18" y="00" width="05" height="16" /></text>
-		<text string="\" state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="03" y="00" width="05" height="16" /></text>
-		<text string="\" state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="19" y="00" width="05" height="16" /></text>
-		<text string="\" state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="04" y="00" width="05" height="16" /></text>
-		<text string="\" state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="20" y="00" width="05" height="16" /></text>
-		<text string="\" state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="05" y="00" width="05" height="16" /></text>
-		<rect            state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="02" y="02" width="18" height="10" /></rect>
-		<rect                     ><color red="1.0" green="1.0" blue="1.0" /><bounds x="00" y="14" width="25" height="02" /></rect>
-		<text string="Outhole"    ><color red="1.0" green="1.0" blue="1.0" /><bounds x="30" y="12" width="28" height="9.5" /></text>
+		<image state="0">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 16"><rect x="0" y="14" width="25" height="2" fill="#ffffff"/><line x1="3" y1="0" x2="9" y2="16" stroke="#ffffff" stroke-width="6"/></svg>]]></data>
+			<bounds x="0" y="0" width="25" height="16" />
+		</image>
+		<image state="1">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 16"><rect x="0" y="14" width="25" height="2" fill="#ffffff"/><line x1="18" y1="0" x2="24" y2="16" stroke="#ff0000" stroke-width="6"/></svg>]]></data>
+			<bounds x="0" y="0" width="25" height="16" />
+		</image>
+		<text string="\" state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="17" y="0" width="5" height="16" /></text>
+		<text string="\" state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="2" y="0" width="5" height="16" /></text>
+		<text string="\" state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="18" y="0" width="5" height="16" /></text>
+		<text string="\" state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="3" y="0" width="5" height="16" /></text>
+		<text string="\" state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="19" y="0" width="5" height="16" /></text>
+		<text string="\" state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="4" y="0" width="5" height="16" /></text>
+		<text string="\" state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="20" y="0" width="5" height="16" /></text>
+		<text string="\" state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="5" y="0" width="5" height="16" /></text>
+		<text string="Outhole"><color red="1.0" green="1.0" blue="1.0" /><bounds x="30" y="12" width="28" height="9.5" /></text>
 	</element>
 
 
 	<element name="Solenoid_SlingShot_Left" defstate="0">
-		<text string="\" state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="05" y="00" width="65"   height="80" /></text>
-		<text string="\" state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="00" y="00" width="65"   height="80" /></text>
-		<rect                     ><color red="1.0" green="1.0" blue="1.0" /><bounds x="20" y="16" width="04"   height="60" /></rect>
-		<rect                     ><color red="1.0" green="1.0" blue="1.0" /><bounds x="20" y="76" width="24.5" height="04" /></rect>
+		<image state="0">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 80"><rect x="20" y="16" width="4" height="60" fill="#ffffff"/><rect x="20" y="76" width="24.5" height="4" fill="#ffffff"/><line x1="22" y1="16" x2="44.5" y2="78" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/></svg>]]></data>
+			<bounds x="0" y="0" width="70" height="80" />
+		</image>
+		<image state="1">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 80"><rect x="20" y="16" width="4" height="60" fill="#ffffff"/><rect x="20" y="76" width="24.5" height="4" fill="#ffffff"/><line x1="24.5" y1="16" x2="47" y2="78" stroke="#ff0000" stroke-width="4.5" stroke-linecap="round"/></svg>]]></data>
+			<bounds x="0" y="0" width="70" height="80" />
+		</image>
 	</element>
 	<element name="Solenoid_SlingShot_Right" defstate="0">
-		<text string="/" state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="-5"   y="00" width="65" height="80" /></text>
-		<text string="/" state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="00"   y="00" width="65" height="80" /></text>
-		<rect                     ><color red="1.0" green="1.0" blue="1.0" /><bounds x="40"   y="16" width="04" height="60" /></rect>
-		<rect                     ><color red="1.0" green="1.0" blue="1.0" /><bounds x="19.5" y="76" width="24" height="04" /></rect>
+		<image state="0">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 80"><rect x="45" y="16" width="4" height="60" fill="#ffffff"/><rect x="24.5" y="76" width="24" height="4" fill="#ffffff"/><line x1="47" y1="16" x2="24.5" y2="78" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/></svg>]]></data>
+			<bounds x="0" y="0" width="70" height="80" />
+		</image>
+		<image state="1">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 80"><rect x="45" y="16" width="4" height="60" fill="#ffffff"/><rect x="24.5" y="76" width="24" height="4" fill="#ffffff"/><line x1="44.5" y1="16" x2="22" y2="78" stroke="#ff0000" stroke-width="4.5" stroke-linecap="round"/></svg>]]></data>
+			<bounds x="0" y="0" width="70" height="80" />
+		</image>
 	</element>
 
 
@@ -622,34 +605,43 @@ Any state="9" items are not displayed and are only used for object alignment
 	</element>
 	<element name="Switch_PopBumper_Blue_Star" defstate="0">
 		<text string="*" state="9"><color red="0.3" green="0.5" blue="1.0" /><bounds x="-61" y="-38.5" width="206" height="206" /></text>
-		<disk            state="0"><color red="0.3" green="0.5" blue="1.0" /><bounds x="14" y="14" width="52" height="52" /></disk>
-		<disk            state="1"><color red="0.5" green="0.5" blue="0.5" /><bounds x="14" y="14" width="52" height="52" /></disk>
+		<disk state="0"><color red="0.3" green="0.5" blue="1.0" /><bounds x="14" y="14" width="52" height="52" /></disk>
+		<disk state="1"><color red="0.5" green="0.5" blue="0.5" /><bounds x="14" y="14" width="52" height="52" /></disk>
 	</element>
 	<element name="Lamp_PopBumper_Silver_SnowMan_On">
 		<text string="*" state="9"><color red="0.5" green="0.5" blue="0.5" /><bounds x="-61" y="-38.5" width="206" height="206" /></text>
 		<disk>                     <color red="1.0" green="1.0" blue="1.0" /><bounds x="18" y="18" width="44" height="44" /></disk>
-		<text string="&#9731;">    <color red="0.5" green="0.5" blue="0.5" /><bounds x="20" y="18" width="40" height="40" /></text>
+		<text string="☃">    <color red="0.5" green="0.5" blue="0.5" /><bounds x="20" y="18" width="40" height="40" /></text>
 	</element>
 
 
 	<element name="Solenoid_Saucer" defstate="0">
-		<disk>          <color red="1.0" green="0.8" blue="0.5" /><bounds x="00" y="00" width="70" height="70" /></disk> <!-- 71 -->
+		<disk>          <color red="1.0" green="0.8" blue="0.5" /><bounds x="0" y="0" width="70" height="70" /></disk> <!-- 71 -->
 		<disk>          <color red="0.7" green="0.7" blue="0.7" /><bounds x="10" y="10" width="49" height="49" /></disk> <!-- 51 -->
-		<rect state="0"><color red="0.3" green="0.3" blue="0.3" /><bounds x="31" y="07" width="07" height="25" /></rect>
-		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="31" y="07" width="07" height="25" /></rect>
+		<rect state="0"><color red="0.3" green="0.3" blue="0.3" /><bounds x="31" y="7" width="7" height="25" /></rect>
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /><bounds x="31" y="7" width="7" height="25" /></rect>
 		<disk>          <color red="0.0" green="0.0" blue="0.0" /><bounds x="27" y="40" width="15" height="15" /></disk>
 	</element>
 	<element name="Switch_Saucer" defstate="0">
-		<disk state="9"><color red="1.0" green="0.8" blue="0.5" /><bounds x="00" y="00" width="70" height="70" /></disk>
-		<disk state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="30" y="43" width="09" height="09" /></disk>
-		<disk state="1"><color red="0.0" green="0.0" blue="0.0" /><bounds x="30" y="43" width="09" height="09" /></disk>
+		<disk state="9"><color red="1.0" green="0.8" blue="0.5" /><bounds x="0" y="0" width="70" height="70" /></disk>
+		<disk state="0"><color red="1.0" green="1.0" blue="1.0" /><bounds x="30" y="43" width="9" height="9" /></disk>
+		<disk state="1"><color red="0.0" green="0.0" blue="0.0" /><bounds x="30" y="43" width="9" height="9" /></disk>
 	</element>
 
 
 	<element name="Solenoid_Gate_Left">
-		<disk                           ><color red="1.00" green="1.00" blue="1.00" /><bounds x="00"  y="21.5" width="04" height="04" /></disk>
-		<rect                  state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="03"  y="00"   width="01" height="22.5" /></rect>
-		<text string="&#8726;" state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="-26" y="-10"  width="45" height="45" /></text>
+		<image>
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 26"><circle cx="2" cy="23.5" r="2" fill="#ffffff"/></svg>]]></data>
+			<bounds x="0" y="0" width="20" height="26" />
+		</image>
+		<image state="0">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 26"><line x1="3.5" y1="0" x2="3.5" y2="22" stroke="#ffffff" stroke-width="1"/></svg>]]></data>
+			<bounds x="0" y="0" width="20" height="26" />
+		</image>
+		<image state="1">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 26"><line x1="2" y1="23.5" x2="19" y2="7" stroke="#ffffff" stroke-width="1"/></svg>]]></data>
+			<bounds x="0" y="0" width="20" height="26" />
+		</image>
 	</element>
 
 
@@ -659,21 +651,31 @@ Any state="9" items are not displayed and are only used for object alignment
 		<rect><color red="0.15" green="0.15" blue="0.15" /><bounds left="0" top="0" right="1" bottom="1" /></rect>
 	</element>
 
+	<!-- Reusable multi-digit display. Params: count, n0 (highest digit number), x0 (left edge), y (top) -->
+	<group name="Digit_Display">
+		<repeat count="~count~">
+			<param name="n" start="~n0~" increment="-1" />
+			<param name="x" start="~x0~" increment="14" />
+			<element ref="Digit" name="digit~n~"><bounds x="~x~" y="~y~" width="10" height="15" /></element>
+		</repeat>
+	</group>
+
+
 	<view name="Silverball Mania Playfield">
 
 		<collection name="Playfield">
 
-			<element ref="Draw_Grey"><bounds x="000" y="000" width="640" height="001" /></element>
-			<element ref="Draw_Grey"><bounds x="000" y="000" width="001" height="480" /></element>
-			<element ref="Draw_Grey"><bounds x="000" y="480" width="640" height="001" /></element>
-			<element ref="Lamp_Incandescent" name="GI_Lamps"><bounds x="010" y="010" width="20" height="20" /></element>
-			<element ref="Lamp_Incandescent" name="GI_Lamps"><bounds x="290" y="010" width="20" height="20" /></element>
-			<element ref="Solenoid_Knocker" name="solenoid5"><bounds x="297" y="457" width="23" height="09" /></element>
+			<element ref="Draw_Grey"><bounds x="0" y="0" width="640" height="1" /></element>
+			<element ref="Draw_Grey"><bounds x="0" y="0" width="1" height="480" /></element>
+			<element ref="Draw_Grey"><bounds x="0" y="480" width="640" height="1" /></element>
+			<element ref="Lamp_Incandescent" name="GI_Lamps"><bounds x="10" y="10" width="20" height="20" /></element>
+			<element ref="Lamp_Incandescent" name="GI_Lamps"><bounds x="290" y="10" width="20" height="20" /></element>
+			<element ref="Solenoid_Knocker" name="solenoid5"><bounds x="297" y="457" width="23" height="9" /></element>
 			<element ref="Text_Knocker"><bounds x="290" y="467" width="30" height="10" /></element>
-			<element ref="Credit_Indicator" name="lamp55"><bounds x="023" y="456" width="70" height="21" /></element>
+			<element ref="Credit_Indicator" name="lamp55"><bounds x="23" y="456" width="70" height="21" /></element>
 			<element ref="Lamp_Amber_ShootAgain" name="lamp40"><bounds x="269" y="411" width="12" height="12" /></element>
-			<element ref="Lamp_White_S" name="lamp0"><bounds x="060" y="290" width="10" height="10" /></element>
-			<element ref="Lamp_White_I" name="lamp15"><bounds x="081" y="290" width="10" height="10" /></element>
+			<element ref="Lamp_White_S" name="lamp0"><bounds x="60" y="290" width="10" height="10" /></element>
+			<element ref="Lamp_White_I" name="lamp15"><bounds x="81" y="290" width="10" height="10" /></element>
 			<element ref="Lamp_White_L" name="lamp30"><bounds x="102" y="290" width="10" height="10" /></element>
 			<element ref="Lamp_White_V" name="lamp45"><bounds x="123" y="290" width="10" height="10" /></element>
 			<element ref="Lamp_White_E" name="lamp1"><bounds x="144" y="290" width="10" height="10" /></element>
@@ -700,151 +702,127 @@ Any state="9" items are not displayed and are only used for object alignment
 			<element ref="Solenoid_Outhole" name="solenoid6"><bounds x="150" y="455" width="58" height="22" /></element>
 			<element ref="Switch_RollOn_WireForm_Left" inputtag="X0" inputmask="0x80"><bounds x="163" y="453" width="20" height="16" /></element>
 			<element ref="Key_BSpace"><bounds x="185" y="455" width="15" height="14" /></element>
-			<element ref="Solenoid_PopBumper_Blue_Star" name="solenoid8"><bounds x="044" y="107" width="80" height="80" /></element>
-			<element ref="Switch_PopBumper_Blue_Star" inputtag="X4" inputmask="0x80"><bounds x="044" y="107" width="80" height="80" /></element>
-			<element ref="Lamp_PopBumper_Silver_SnowMan_On"><bounds x="044" y="107" width="80" height="80" /></element>
-			<element ref="Key_Q"><bounds x="080" y="157" width="09" height="09" /></element>
+			<element ref="Solenoid_PopBumper_Blue_Star" name="solenoid8"><bounds x="44" y="107" width="80" height="80" /></element>
+			<element ref="Switch_PopBumper_Blue_Star" inputtag="X4" inputmask="0x80"><bounds x="44" y="107" width="80" height="80" /></element>
+			<element ref="Lamp_PopBumper_Silver_SnowMan_On"><bounds x="44" y="107" width="80" height="80" /></element>
+			<element ref="Key_Q"><bounds x="80" y="157" width="9" height="9" /></element>
 			<element ref="Solenoid_PopBumper_Blue_Star" name="solenoid7"><bounds x="200" y="107" width="80" height="80" /></element>
 			<element ref="Switch_PopBumper_Blue_Star" inputtag="X4" inputmask="0x40"><bounds x="200" y="107" width="80" height="80" /></element>
 			<element ref="Lamp_PopBumper_Silver_SnowMan_On"><bounds x="200" y="107" width="80" height="80" /></element>
-			<element ref="Key_W"><bounds x="236" y="157" width="09" height="09" /></element>
+			<element ref="Key_W"><bounds x="236" y="157" width="9" height="9" /></element>
 			<element ref="Solenoid_PopBumper_Blue_Star" name="solenoid9"><bounds x="121" y="127" width="80" height="80" /></element>
 			<element ref="Switch_PopBumper_Blue_Star" inputtag="X4" inputmask="0x20"><bounds x="121" y="127" width="80" height="80" /></element>
 			<element ref="Lamp_PopBumper_Silver_SnowMan_On"><bounds x="121" y="127" width="80" height="80" /></element>
-			<element ref="Key_E"><bounds x="156" y="127" width="09" height="09" /></element>
-			<element ref="Solenoid_SlingShot_Left" name="solenoid10"><bounds x="035" y="320" width="69" height="80" /></element>
-			<element ref="Switch_Leaf_Vertical" inputtag="X4" inputmask="0x10"><bounds x="060" y="384" width="08" height="09" /></element>
-			<element ref="Key_R"><bounds x="060" y="375" width="09" height="09" /></element>
+			<element ref="Key_E"><bounds x="156" y="127" width="9" height="9" /></element>
+			<element ref="Solenoid_SlingShot_Left" name="solenoid10"><bounds x="35" y="320" width="69" height="80" /></element>
+			<element ref="Switch_Leaf_Vertical" inputtag="X4" inputmask="0x10"><bounds x="60" y="384" width="8" height="9" /></element>
+			<element ref="Key_R"><bounds x="60" y="375" width="9" height="9" /></element>
 			<element ref="Solenoid_SlingShot_Right" name="solenoid11"><bounds x="218" y="320" width="69" height="80" /></element>
-			<element ref="Switch_Leaf_Vertical" inputtag="X4" inputmask="0x08"><bounds x="254" y="384" width="08" height="09" /></element>
-			<element ref="Key_Y"><bounds x="254" y="375" width="09" height="09" /></element>
-			<element ref="Switch_Bumper_Blue_50" inputtag="X4" inputmask="0x02"><bounds x="052" y="049" width="26" height="26" /></element>
-			<element ref="Key_I"><bounds x="061" y="037" width="09" height="09" /></element>
-			<element ref="Switch_Bumper_Blue_50" inputtag="X4" inputmask="0x02"><bounds x="116" y="049" width="26" height="26" /></element>
-			<element ref="Key_I"><bounds x="125" y="037" width="09" height="09" /></element>
-			<element ref="Switch_Bumper_Blue_50" inputtag="X4" inputmask="0x02"><bounds x="180" y="049" width="26" height="26" /></element>
-			<element ref="Key_I"><bounds x="189" y="037" width="09" height="09" /></element>
-			<element ref="Switch_Bumper_Blue_50" inputtag="X4" inputmask="0x02"><bounds x="244" y="049" width="26" height="26" /></element>
-			<element ref="Key_I"><bounds x="253" y="037" width="09" height="09" /></element>
-			<element ref="Lamp_White" name="lamp48"><bounds x="091" y="044" width="12" height="12" /></element>
-			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X0" inputmask="0x10"><bounds x="093" y="066" width="09" height="27" /></element>
-			<element ref="Key_Dot"><bounds x="091" y="092" width="14" height="14" /></element>
-			<element ref="Lamp_White" name="lamp8"><bounds x="155" y="044" width="12" height="12" /></element>
-			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X0" inputmask="0x08"><bounds x="157" y="066" width="09" height="27" /></element>
-			<element ref="Key_FSlash"><bounds x="157" y="095" width="10" height="10" /></element>
-			<element ref="Lamp_White" name="lamp48"><bounds x="219" y="044" width="12" height="12" /></element>
-			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X0" inputmask="0x04"><bounds x="221" y="066" width="09" height="27" /></element>
-			<element ref="Key_OBrkt"><bounds x="221" y="095" width="10" height="10" /></element>
-			<element ref="Lamp_White_S" name="lamp4"><bounds x="034" y="107" width="10" height="10" /></element>
-			<element ref="Switch_Target_Yellow_Forward" inputtag="X2" inputmask="0x80"><bounds x="058" y="090" width="12" height="08" /></element>
-			<element ref="Key_Z"><bounds x="060" y="079" width="09" height="09" /></element>
+			<element ref="Switch_Leaf_Vertical" inputtag="X4" inputmask="0x08"><bounds x="254" y="384" width="8" height="9" /></element>
+			<element ref="Key_Y"><bounds x="254" y="375" width="9" height="9" /></element>
+			<element ref="Switch_Bumper_Blue_50" inputtag="X4" inputmask="0x02"><bounds x="52" y="49" width="26" height="26" /></element>
+			<element ref="Key_I"><bounds x="61" y="37" width="9" height="9" /></element>
+			<element ref="Switch_Bumper_Blue_50" inputtag="X4" inputmask="0x02"><bounds x="116" y="49" width="26" height="26" /></element>
+			<element ref="Key_I"><bounds x="125" y="37" width="9" height="9" /></element>
+			<element ref="Switch_Bumper_Blue_50" inputtag="X4" inputmask="0x02"><bounds x="180" y="49" width="26" height="26" /></element>
+			<element ref="Key_I"><bounds x="189" y="37" width="9" height="9" /></element>
+			<element ref="Switch_Bumper_Blue_50" inputtag="X4" inputmask="0x02"><bounds x="244" y="49" width="26" height="26" /></element>
+			<element ref="Key_I"><bounds x="253" y="37" width="9" height="9" /></element>
+			<element ref="Lamp_White" name="lamp48"><bounds x="91" y="44" width="12" height="12" /></element>
+			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X0" inputmask="0x10"><bounds x="93" y="66" width="9" height="27" /></element>
+			<element ref="Key_Dot"><bounds x="91" y="92" width="14" height="14" /></element>
+			<element ref="Lamp_White" name="lamp8"><bounds x="155" y="44" width="12" height="12" /></element>
+			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X0" inputmask="0x08"><bounds x="157" y="66" width="9" height="27" /></element>
+			<element ref="Key_FSlash"><bounds x="157" y="95" width="10" height="10" /></element>
+			<element ref="Lamp_White" name="lamp48"><bounds x="219" y="44" width="12" height="12" /></element>
+			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X0" inputmask="0x04"><bounds x="221" y="66" width="9" height="27" /></element>
+			<element ref="Key_OBrkt"><bounds x="221" y="95" width="10" height="10" /></element>
+			<element ref="Lamp_White_S" name="lamp4"><bounds x="34" y="107" width="10" height="10" /></element>
+			<element ref="Switch_Target_Yellow_Forward" inputtag="X2" inputmask="0x80"><bounds x="58" y="90" width="12" height="8" /></element>
+			<element ref="Key_Z"><bounds x="60" y="79" width="9" height="9" /></element>
 			<element ref="Lamp_White_I" name="lamp19"><bounds x="123" y="112" width="10" height="10" /></element>
-			<element ref="Switch_Target_Yellow_Forward" inputtag="X2" inputmask="0x40"><bounds x="123" y="090" width="12" height="08" /></element>
-			<element ref="Key_X"><bounds x="125" y="079" width="09" height="09" /></element>
+			<element ref="Switch_Target_Yellow_Forward" inputtag="X2" inputmask="0x40"><bounds x="123" y="90" width="12" height="8" /></element>
+			<element ref="Key_X"><bounds x="125" y="79" width="9" height="9" /></element>
 			<element ref="Lamp_White_L" name="lamp34"><bounds x="189" y="112" width="10" height="10" /></element>
-			<element ref="Switch_Target_Yellow_Forward" inputtag="X2" inputmask="0x20"><bounds x="188" y="090" width="12" height="08" /></element>
-			<element ref="Key_C"><bounds x="190" y="079" width="09" height="09" /></element>
+			<element ref="Switch_Target_Yellow_Forward" inputtag="X2" inputmask="0x20"><bounds x="188" y="90" width="12" height="8" /></element>
+			<element ref="Key_C"><bounds x="190" y="79" width="9" height="9" /></element>
 			<element ref="Lamp_White_V" name="lamp49"><bounds x="277" y="107" width="10" height="10" /></element>
-			<element ref="Switch_Target_Yellow_Forward" inputtag="X2" inputmask="0x10"><bounds x="252" y="090" width="12" height="08" /></element>
-			<element ref="Key_V"><bounds x="253" y="079" width="09" height="09" /></element>
-			<element ref="Lamp_White_E" name="lamp5"><bounds x="042" y="223" width="10" height="10" /></element>
-			<element ref="Switch_Target_Yellow_Left" inputtag="X2" inputmask="0x08"><bounds x="022" y="210" width="08" height="12" /></element>
-			<element ref="Key_B"><bounds x="012" y="211" width="09" height="09" /></element>
-			<element ref="Lamp_White_R" name="lamp20"><bounds x="037" y="248" width="10" height="10" /></element>
-			<element ref="Switch_Target_Yellow_Left" inputtag="X2" inputmask="0x04"><bounds x="017" y="235" width="08" height="12" /></element>
-			<element ref="Key_N"><bounds x="007" y="236" width="09" height="09" /></element>
-			<element ref="Lamp_White_B" name="lamp35"><bounds x="032" y="273" width="10" height="10" /></element>
-			<element ref="Switch_Target_Yellow_Left" inputtag="X2" inputmask="0x02"><bounds x="012" y="260" width="08" height="12" /></element>
-			<element ref="Key_M"><bounds x="002" y="261" width="09" height="09" /></element>
+			<element ref="Switch_Target_Yellow_Forward" inputtag="X2" inputmask="0x10"><bounds x="252" y="90" width="12" height="8" /></element>
+			<element ref="Key_V"><bounds x="253" y="79" width="9" height="9" /></element>
+			<element ref="Lamp_White_E" name="lamp5"><bounds x="42" y="223" width="10" height="10" /></element>
+			<element ref="Switch_Target_Yellow_Left" inputtag="X2" inputmask="0x08"><bounds x="22" y="210" width="8" height="12" /></element>
+			<element ref="Key_B"><bounds x="12" y="211" width="9" height="9" /></element>
+			<element ref="Lamp_White_R" name="lamp20"><bounds x="37" y="248" width="10" height="10" /></element>
+			<element ref="Switch_Target_Yellow_Left" inputtag="X2" inputmask="0x04"><bounds x="17" y="235" width="8" height="12" /></element>
+			<element ref="Key_N"><bounds x="7" y="236" width="9" height="9" /></element>
+			<element ref="Lamp_White_B" name="lamp35"><bounds x="32" y="273" width="10" height="10" /></element>
+			<element ref="Switch_Target_Yellow_Left" inputtag="X2" inputmask="0x02"><bounds x="12" y="260" width="8" height="12" /></element>
+			<element ref="Key_M"><bounds x="2" y="261" width="9" height="9" /></element>
 			<element ref="Lamp_White_A" name="lamp50"><bounds x="269" y="223" width="10" height="10" /></element>
-			<element ref="Switch_Target_Yellow_Right" inputtag="X2" inputmask="0x01"><bounds x="290" y="210" width="08" height="12" /></element>
+			<element ref="Switch_Target_Yellow_Right" inputtag="X2" inputmask="0x01"><bounds x="290" y="210" width="8" height="12" /></element>
 			<element ref="Key_Comma"><bounds x="298" y="208" width="14" height="14" /></element>
 			<element ref="Lamp_White_L" name="lamp6"><bounds x="274" y="248" width="10" height="10" /></element>
-			<element ref="Switch_Target_Yellow_Right" inputtag="X3" inputmask="0x80"><bounds x="295" y="235" width="08" height="12" /></element>
-			<element ref="Key_A"><bounds x="305" y="236" width="09" height="09" /></element>
+			<element ref="Switch_Target_Yellow_Right" inputtag="X3" inputmask="0x80"><bounds x="295" y="235" width="8" height="12" /></element>
+			<element ref="Key_A"><bounds x="305" y="236" width="9" height="9" /></element>
 			<element ref="Lamp_White_L" name="lamp21"><bounds x="279" y="273" width="10" height="10" /></element>
-			<element ref="Switch_Target_Yellow_Right" inputtag="X3" inputmask="0x40"><bounds x="300" y="260" width="08" height="12" /></element>
-			<element ref="Key_S"><bounds x="310" y="261" width="09" height="09" /></element>
-			<element ref="Lamp_Yellow_M" name="lamp36"><bounds x="009" y="328" width="10" height="10" /></element>
-			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X3" inputmask="0x20"><bounds x="010" y="351" width="09" height="27" /></element>
-			<element ref="Key_D"><bounds x="010" y="380" width="09" height="09" /></element>
+			<element ref="Switch_Target_Yellow_Right" inputtag="X3" inputmask="0x40"><bounds x="300" y="260" width="8" height="12" /></element>
+			<element ref="Key_S"><bounds x="310" y="261" width="9" height="9" /></element>
+			<element ref="Lamp_Yellow_M" name="lamp36"><bounds x="9" y="328" width="10" height="10" /></element>
+			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X3" inputmask="0x20"><bounds x="10" y="351" width="9" height="27" /></element>
+			<element ref="Key_D"><bounds x="10" y="380" width="9" height="9" /></element>
 			<element ref="Lamp_Yellow_A" name="lamp37"><bounds x="300" y="328" width="10" height="10" /></element>
-			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X3" inputmask="0x02"><bounds x="301" y="351" width="09" height="27" /></element>
-			<element ref="Key_J"><bounds x="301" y="380" width="09" height="09" /></element>
+			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X3" inputmask="0x02"><bounds x="301" y="351" width="9" height="27" /></element>
+			<element ref="Key_J"><bounds x="301" y="380" width="9" height="9" /></element>
 			<element ref="Lamp_Yellow_N" name="lamp7"><bounds x="156" y="223" width="10" height="10" /></element>
 			<element ref="Lamp_Amber_Arrow_EB" name="lamp41"><bounds x="155" y="237" width="11" height="22" /></element>
-			<element ref="Switch_Target_Yellow_Forward" inputtag="X3" inputmask="0x08"><bounds x="155" y="202" width="12" height="08" /></element>
-			<element ref="Key_G"><bounds x="157" y="190" width="09" height="09" /></element>
-			<element ref="Lamp_Yellow_A" name="lamp51"><bounds x="032" y="328" width="10" height="10" /></element>
-			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X3" inputmask="0x10"><bounds x="033" y="353" width="09" height="27" /></element>
-			<element ref="Key_F"><bounds x="033" y="382" width="09" height="09" /></element>
+			<element ref="Switch_Target_Yellow_Forward" inputtag="X3" inputmask="0x08"><bounds x="155" y="202" width="12" height="8" /></element>
+			<element ref="Key_G"><bounds x="157" y="190" width="9" height="9" /></element>
+			<element ref="Lamp_Yellow_A" name="lamp51"><bounds x="32" y="328" width="10" height="10" /></element>
+			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X3" inputmask="0x10"><bounds x="33" y="353" width="9" height="27" /></element>
+			<element ref="Key_F"><bounds x="33" y="382" width="9" height="9" /></element>
 			<element ref="Lamp_Yellow_I" name="lamp22"><bounds x="278" y="328" width="10" height="10" /></element>
-			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X3" inputmask="0x04"><bounds x="279" y="353" width="09" height="27" /></element>
-			<element ref="Key_H"><bounds x="279" y="382" width="09" height="09" /></element>
+			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X3" inputmask="0x04"><bounds x="279" y="353" width="9" height="27" /></element>
+			<element ref="Key_H"><bounds x="279" y="382" width="9" height="9" /></element>
 			<element ref="Lamp_RollOver_Star_Button_On"><bounds x="123" y="183" width="15" height="15" /></element>
 			<element ref="Switch_RollOver_Star_Button" inputtag="X0" inputmask="0x02"><bounds x="113" y="177" width="35" height="35" /></element>
 			<element ref="Key_CBrkt"><bounds x="126" y="200" width="10" height="10" /></element>
 			<element ref="Lamp_RollOver_Star_Button_On"><bounds x="185" y="183" width="15" height="15" /></element>
 			<element ref="Switch_RollOver_Star_Button" inputtag="X0" inputmask="0x02"><bounds x="175" y="177" width="35" height="35" /></element>
 			<element ref="Key_CBrkt"><bounds x="188" y="200" width="10" height="10" /></element>
-			<element ref="Switch_Leaf_Vertical" inputtag="X4" inputmask="0x02"><bounds x="007" y="135" width="08" height="09" /></element>
-			<element ref="Key_I"><bounds x="007" y="124" width="09" height="09" /></element>
-			<element ref="Switch_Leaf_Horizontal" inputtag="X4" inputmask="0x02"><bounds x="106" y="172" width="09" height="08" /></element>
-			<element ref="Key_I"><bounds x="107" y="161" width="09" height="09" /></element>
-			<element ref="Switch_Leaf_Vertical" inputtag="X4" inputmask="0x02"><bounds x="298" y="170" width="08" height="09" /></element>
-			<element ref="Key_I"><bounds x="298" y="159" width="09" height="09" /></element>
-			<element ref="Switch_Leaf_Horizontal" inputtag="X4" inputmask="0x02"><bounds x="206" y="172" width="09" height="08" /></element>
-			<element ref="Key_I"><bounds x="207" y="161" width="09" height="09" /></element>
-			<element ref="Lamp_White_1k" name="lamp56"><bounds x="066" y="211" width="12" height="12" /></element>
-			<element ref="Spinner" name="spinner1"><bounds x="049" y="188" width="26" height="16" /></element>
-			<element ref="Switch_Leaf_Horizontal" inputtag="X4" inputmask="0x01"><bounds x="079" y="199" width="09" height="08" /></element>
-			<element ref="Key_O"><bounds x="079" y="186" width="09" height="09" /></element>
+			<element ref="Switch_Leaf_Vertical" inputtag="X4" inputmask="0x02"><bounds x="7" y="135" width="8" height="9" /></element>
+			<element ref="Key_I"><bounds x="7" y="124" width="9" height="9" /></element>
+			<element ref="Switch_Leaf_Horizontal" inputtag="X4" inputmask="0x02"><bounds x="106" y="172" width="9" height="8" /></element>
+			<element ref="Key_I"><bounds x="107" y="161" width="9" height="9" /></element>
+			<element ref="Switch_Leaf_Vertical" inputtag="X4" inputmask="0x02"><bounds x="298" y="170" width="8" height="9" /></element>
+			<element ref="Key_I"><bounds x="298" y="159" width="9" height="9" /></element>
+			<element ref="Switch_Leaf_Horizontal" inputtag="X4" inputmask="0x02"><bounds x="206" y="172" width="9" height="8" /></element>
+			<element ref="Key_I"><bounds x="207" y="161" width="9" height="9" /></element>
+			<element ref="Lamp_White_1k" name="lamp56"><bounds x="66" y="211" width="12" height="12" /></element>
+			<element ref="Spinner" name="spinner1"><bounds x="49" y="188" width="26" height="16" /></element>
+			<element ref="Switch_Leaf_Horizontal" inputtag="X4" inputmask="0x01"><bounds x="79" y="199" width="9" height="8" /></element>
+			<element ref="Key_O"><bounds x="79" y="186" width="9" height="9" /></element>
 			<element ref="Lamp_White_1k" name="lamp52"><bounds x="243" y="211" width="12" height="12" /></element>
 			<element ref="Spinner" name="spinner0"><bounds x="247" y="188" width="26" height="16" /></element>
-			<element ref="Switch_Leaf_Horizontal" inputtag="X3" inputmask="0x01"><bounds x="234" y="199" width="09" height="08" /></element>
-			<element ref="Key_K"><bounds x="234" y="186" width="09" height="09" /></element>
-			<element ref="Solenoid_Kicker_Up" inputtag="X5" inputmask="0x01"><bounds x="158" y="430" width="05" height="16" /></element>
-			<element ref="Solenoid_Kicker_Lift" name="solenoid12"><bounds x="158" y="430" width="05" height="16" /></element>
-			<element ref="Solenoid_Kicker" name="solenoid13"><bounds x="158" y="430" width="05" height="16" /></element>
-			<element ref="Switch_RollOn_WireForm_Down" inputtag="X0" inputmask="0x01"><bounds x="156" y="410" width="09" height="18" /></element>
+			<element ref="Switch_Leaf_Horizontal" inputtag="X3" inputmask="0x01"><bounds x="234" y="199" width="9" height="8" /></element>
+			<element ref="Key_K"><bounds x="234" y="186" width="9" height="9" /></element>
+			<element ref="Solenoid_Kicker_Up" inputtag="X5" inputmask="0x01"><bounds x="158" y="430" width="5" height="16" /></element>
+			<element ref="Solenoid_Kicker_Lift" name="solenoid12"><bounds x="158" y="430" width="5" height="16" /></element>
+			<element ref="Solenoid_Kicker" name="solenoid13"><bounds x="158" y="430" width="5" height="16" /></element>
+			<element ref="Switch_RollOn_WireForm_Down" inputtag="X0" inputmask="0x01"><bounds x="156" y="410" width="9" height="18" /></element>
 			<element ref="Key_BSlash"><bounds x="165" y="417" width="10" height="10" /></element>
 
 		</collection>
 
 		<collection name="Backglass">
 
-			<element ref="Draw_Grey"><bounds x="640" y="000" width="001" height="480" /></element>
-			<element ref="Draw_Grey"><bounds x="320" y="000" width="001" height="480" /></element>
-			<element ref="Title1"><bounds x="391" y="010" width="180" height="35" /></element>
+			<element ref="Draw_Grey"><bounds x="640" y="0" width="1" height="480" /></element>
+			<element ref="Draw_Grey"><bounds x="320" y="0" width="1" height="480" /></element>
+			<element ref="Title1"><bounds x="391" y="10" width="180" height="35" /></element>
 			<element ref="Title2"><bounds x="411" y="205" width="140" height="35" /></element>
-			<element ref="Digit" name="digit17"><bounds x="350" y="55" width="10" height="15" /></element>
-			<element ref="Digit" name="digit16"><bounds x="364" y="55" width="10" height="15" /></element>
-			<element ref="Digit" name="digit15"><bounds x="378" y="55" width="10" height="15" /></element>
-			<element ref="Digit" name="digit14"><bounds x="392" y="55" width="10" height="15" /></element>
-			<element ref="Digit" name="digit13"><bounds x="406" y="55" width="10" height="15" /></element>
-			<element ref="Digit" name="digit12"><bounds x="420" y="55" width="10" height="15" /></element>
-			<element ref="Digit" name="digit11"><bounds x="434" y="55" width="10" height="15" /></element>
-			<element ref="Digit" name="digit27"><bounds x="511" y="55" width="10" height="15" /></element>
-			<element ref="Digit" name="digit26"><bounds x="525" y="55" width="10" height="15" /></element>
-			<element ref="Digit" name="digit25"><bounds x="539" y="55" width="10" height="15" /></element>
-			<element ref="Digit" name="digit24"><bounds x="553" y="55" width="10" height="15" /></element>
-			<element ref="Digit" name="digit23"><bounds x="567" y="55" width="10" height="15" /></element>
-			<element ref="Digit" name="digit22"><bounds x="581" y="55" width="10" height="15" /></element>
-			<element ref="Digit" name="digit21"><bounds x="595" y="55" width="10" height="15" /></element>
-			<element ref="Digit" name="digit37"><bounds x="350" y="250" width="10" height="15" /></element>
-			<element ref="Digit" name="digit36"><bounds x="364" y="250" width="10" height="15" /></element>
-			<element ref="Digit" name="digit35"><bounds x="378" y="250" width="10" height="15" /></element>
-			<element ref="Digit" name="digit34"><bounds x="392" y="250" width="10" height="15" /></element>
-			<element ref="Digit" name="digit33"><bounds x="406" y="250" width="10" height="15" /></element>
-			<element ref="Digit" name="digit32"><bounds x="420" y="250" width="10" height="15" /></element>
-			<element ref="Digit" name="digit31"><bounds x="434" y="250" width="10" height="15" /></element>
-			<element ref="Digit" name="digit47"><bounds x="511" y="250" width="10" height="15" /></element>
-			<element ref="Digit" name="digit46"><bounds x="525" y="250" width="10" height="15" /></element>
-			<element ref="Digit" name="digit45"><bounds x="539" y="250" width="10" height="15" /></element>
-			<element ref="Digit" name="digit44"><bounds x="553" y="250" width="10" height="15" /></element>
-			<element ref="Digit" name="digit43"><bounds x="567" y="250" width="10" height="15" /></element>
-			<element ref="Digit" name="digit42"><bounds x="581" y="250" width="10" height="15" /></element>
-			<element ref="Digit" name="digit41"><bounds x="595" y="250" width="10" height="15" /></element>
+			<param name="count" value="7" /><param name="n0" value="17" /><param name="x0" value="350" /><param name="y" value="55" /><group ref="Digit_Display" />
+			<param name="count" value="7" /><param name="n0" value="27" /><param name="x0" value="511" /><param name="y" value="55" /><group ref="Digit_Display" />
+			<param name="count" value="7" /><param name="n0" value="37" /><param name="x0" value="350" /><param name="y" value="250" /><group ref="Digit_Display" />
+			<param name="count" value="7" /><param name="n0" value="47" /><param name="x0" value="511" /><param name="y" value="250" /><group ref="Digit_Display" />
 			<element ref="Text_Credit"><bounds x="542" y="142" width="48" height="8" /></element>
 			<element ref="Ball_In_Play" name="lamp12"><bounds x="586" y="105" width="50" height="11" /></element>
 			<element ref="Match" name="lamp25"><bounds x="596" y="152" width="25" height="11" /></element>
@@ -871,7 +849,7 @@ Any state="9" items are not displayed and are only used for object alignment
 
 		<collection name="I/O Test">
 
-			<element ref="Draw_Grey"><bounds x="320" y="320" width="320" height="001" /></element>
+			<element ref="Draw_Grey"><bounds x="320" y="320" width="320" height="1" /></element>
 			<element ref="Text_MPU_LED"><bounds x="609" y="342" width="30" height="10" /></element>
 			<element ref="LED_Green" name="led0"><bounds x="618" y="328" width="10" height="10" /></element>
 			<element ref="Text_Activity"><bounds x="480" y="342" width="50" height="10" /></element>
@@ -882,95 +860,46 @@ Any state="9" items are not displayed and are only used for object alignment
 			<element ref="Key_Minus"><bounds x="566" y="326" width="16" height="16" /></element>
 			<element ref="Text_Lamps"><bounds x="410" y="360" width="60" height="11" /></element>
 			<element ref="Text_15"><bounds x="552" y="373" width="30" height="11" /></element>
-			<element ref="Lamp_White" name="lamp0"><bounds x="330" y="375" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp1"><bounds x="345" y="375" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp2"><bounds x="360" y="375" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp3"><bounds x="375" y="375" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp4"><bounds x="390" y="375" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp5"><bounds x="405" y="375" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp6"><bounds x="420" y="375" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp7"><bounds x="435" y="375" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp8"><bounds x="450" y="375" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp9"><bounds x="465" y="375" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp10"><bounds x="480" y="375" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp11"><bounds x="495" y="375" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp12"><bounds x="510" y="375" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp13"><bounds x="525" y="375" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp14"><bounds x="540" y="375" width="8" height="8" /></element>
+			<repeat count="15">
+				<param name="n" start="0" increment="1" />
+				<param name="x" start="330" increment="15" />
+				<element ref="Lamp_White" name="lamp~n~"><bounds x="~x~" y="375" width="8" height="8" /></element>
+			</repeat>
 			<element ref="Text_30"><bounds x="552" y="388" width="30" height="11" /></element>
-			<element ref="Lamp_White" name="lamp15"><bounds x="330" y="390" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp16"><bounds x="345" y="390" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp17"><bounds x="360" y="390" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp18"><bounds x="375" y="390" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp19"><bounds x="390" y="390" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp20"><bounds x="405" y="390" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp21"><bounds x="420" y="390" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp22"><bounds x="435" y="390" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp23"><bounds x="450" y="390" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp24"><bounds x="465" y="390" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp25"><bounds x="480" y="390" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp26"><bounds x="495" y="390" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp27"><bounds x="510" y="390" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp28"><bounds x="525" y="390" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp29"><bounds x="540" y="390" width="8" height="8" /></element>
+			<repeat count="15">
+				<param name="n" start="15" increment="1" />
+				<param name="x" start="330" increment="15" />
+				<element ref="Lamp_White" name="lamp~n~"><bounds x="~x~" y="390" width="8" height="8" /></element>
+			</repeat>
 			<element ref="Text_45"><bounds x="552" y="403" width="30" height="11" /></element>
-			<element ref="Lamp_White" name="lamp30"><bounds x="330" y="405" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp31"><bounds x="345" y="405" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp32"><bounds x="360" y="405" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp33"><bounds x="375" y="405" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp34"><bounds x="390" y="405" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp35"><bounds x="405" y="405" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp36"><bounds x="420" y="405" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp37"><bounds x="435" y="405" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp38"><bounds x="450" y="405" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp39"><bounds x="465" y="405" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp40"><bounds x="480" y="405" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp41"><bounds x="495" y="405" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp42"><bounds x="510" y="405" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp43"><bounds x="525" y="405" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp44"><bounds x="540" y="405" width="8" height="8" /></element>
+			<repeat count="15">
+				<param name="n" start="30" increment="1" />
+				<param name="x" start="330" increment="15" />
+				<element ref="Lamp_White" name="lamp~n~"><bounds x="~x~" y="405" width="8" height="8" /></element>
+			</repeat>
 			<element ref="Text_60"><bounds x="552" y="418" width="30" height="11" /></element>
-			<element ref="Lamp_White" name="lamp45"><bounds x="330" y="420" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp46"><bounds x="345" y="420" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp47"><bounds x="360" y="420" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp48"><bounds x="375" y="420" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp49"><bounds x="390" y="420" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp50"><bounds x="405" y="420" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp51"><bounds x="420" y="420" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp52"><bounds x="435" y="420" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp53"><bounds x="450" y="420" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp54"><bounds x="465" y="420" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp55"><bounds x="480" y="420" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp56"><bounds x="495" y="420" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp57"><bounds x="510" y="420" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp58"><bounds x="525" y="420" width="8" height="8" /></element>
-			<element ref="Lamp_White" name="lamp59"><bounds x="540" y="420" width="8" height="8" /></element>
+			<repeat count="15">
+				<param name="n" start="45" increment="1" />
+				<param name="x" start="330" increment="15" />
+				<element ref="Lamp_White" name="lamp~n~"><bounds x="~x~" y="420" width="8" height="8" /></element>
+			</repeat>
 			<element ref="Text_Solenoids"><bounds x="382" y="437" width="100" height="11" /></element>
-			<element ref="Solenoid_PullDown" name="solenoid0"><bounds x="330" y="452" width="9" height="19" /></element>
-			<element ref="Solenoid_PullDown" name="solenoid1"><bounds x="345" y="452" width="9" height="19" /></element>
-			<element ref="Solenoid_PullDown" name="solenoid2"><bounds x="360" y="452" width="9" height="19" /></element>
-			<element ref="Solenoid_PullDown" name="solenoid3"><bounds x="375" y="452" width="9" height="19" /></element>
-			<element ref="Solenoid_PullDown" name="solenoid4"><bounds x="390" y="452" width="9" height="19" /></element>
-			<element ref="Solenoid_PullDown" name="solenoid5"><bounds x="405" y="452" width="9" height="19" /></element>
-			<element ref="Solenoid_PullDown" name="solenoid6"><bounds x="420" y="452" width="9" height="19" /></element>
-			<element ref="Solenoid_PullDown" name="solenoid7"><bounds x="435" y="452" width="9" height="19" /></element>
-			<element ref="Solenoid_PullDown" name="solenoid8"><bounds x="450" y="452" width="9" height="19" /></element>
-			<element ref="Solenoid_PullDown" name="solenoid9"><bounds x="465" y="452" width="9" height="19" /></element>
-			<element ref="Solenoid_PullDown" name="solenoid10"><bounds x="480" y="452" width="9" height="19" /></element>
-			<element ref="Solenoid_PullDown" name="solenoid11"><bounds x="495" y="452" width="9" height="19" /></element>
-			<element ref="Solenoid_PullDown" name="solenoid12"><bounds x="510" y="452" width="9" height="19" /></element>
-			<element ref="Solenoid_PullDown" name="solenoid13"><bounds x="525" y="452" width="9" height="19" /></element>
-			<element ref="Solenoid_PullDown" name="solenoid14"><bounds x="540" y="452" width="9" height="19" /></element>
+			<repeat count="15">
+				<param name="n" start="0" increment="1" />
+				<param name="x" start="330" increment="15" />
+				<element ref="Solenoid_PullDown" name="solenoid~n~"><bounds x="~x~" y="452" width="9" height="19" /></element>
+			</repeat>
 			<element ref="Text_Coils"><bounds x="572" y="437" width="50" height="11" /></element>
-			<element ref="Coil_PullDown" name="solenoid16"><bounds x="570" y="459" width="09" height="12" /></element>
-			<element ref="Coil_PullDown" name="solenoid17"><bounds x="585" y="459" width="09" height="12" /></element>
-			<element ref="Coil_PullDown" name="solenoid18"><bounds x="600" y="459" width="09" height="12" /></element>
-			<element ref="Coil_PullDown" name="solenoid19"><bounds x="615" y="459" width="09" height="12" /></element>
+			<repeat count="4">
+				<param name="n" start="16" increment="1" />
+				<param name="x" start="570" increment="15" />
+				<element ref="Coil_PullDown" name="solenoid~n~"><bounds x="~x~" y="459" width="9" height="12" /></element>
+			</repeat>
 			<element ref="Text_Service"><bounds x="425" y="342" width="50" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="TEST" inputmask="0x01"><bounds x="435" y="331" width="20" height="10" /></element>
 			<element ref="Key_9"><bounds x="456" y="330" width="10" height="10" /></element>
 			<element ref="Text_Slam"><bounds x="370" y="342" width="50" height="10" /></element>
-			<element ref="Switch_SlamTilt" inputtag="X1" inputmask="0x80"><bounds x="374" y="331" width="25" height="08" /></element>
+			<element ref="Switch_SlamTilt" inputtag="X1" inputmask="0x80"><bounds x="374" y="331" width="25" height="8" /></element>
 			<element ref="Key_Equals"><bounds x="401" y="330" width="10" height="10" /></element>
 			<element ref="Text_Tilt"><bounds x="320" y="342" width="50" height="10" /></element>
 			<element ref="Switch_Tilt" inputtag="X0" inputmask="0x40"><bounds x="330" y="324" width="17" height="17" /></element>

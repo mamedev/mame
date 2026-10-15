@@ -46,10 +46,10 @@ ToDo:
 #include "by17_eightbll.lh"
 #include "by17_evelknie.lh"
 #include "by17_freedom.lh"
-#include "by17_nightrdr.lh"
-#include "by17_stk_sprs.lh"
-#include "by17_pwerplay.lh"
 #include "by17_matahari.lh"
+#include "by17_nightrdr.lh"
+#include "by17_pwerplay.lh"
+#include "by17_stk_sprs.lh"
 
 
 namespace {
