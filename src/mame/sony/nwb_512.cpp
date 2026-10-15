@@ -726,7 +726,7 @@ void nwb_512_device::set_pixel(uint16_t x, uint16_t y, bool on)
 
 uint16_t nwb_512_device::status_r()
 {
-	return 0x20 | (m_state.busy ? 0x3 : 0x0);
+	return 0x20 | (m_state.busy ? 0x1 : 0x0); // TODO: some ops wait for 0x11 -> 0x10/0x01 transition instead of 0x11->0x00
 }
 
 void nwb_512_device::ctrl_w(uint16_t data)
