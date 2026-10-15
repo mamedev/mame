@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
-copyright-holders:Quench
+copyright-holders:Quench, Fabio Priuli
 
 Pinball Machine, Bally ~ Template -35 MPU board with Switch Strobe #5
 
@@ -1204,15 +1204,15 @@ Any state="9" items are not displayed and are only used for object alignment
 			<element ref="I6"><bounds x="11" y="280" width="20" height="11" /></element>
 			<element ref="I7"><bounds x="11" y="310" width="20" height="11" /></element>
 			<element ref="Switch_Push-Button" inputtag="X0" inputmask="0x01"><bounds x="35" y="100" width="20" height="10" /></element>
-			<element ref="Key_BSlash"><bounds x="41" y="111" width="10" height="10" /></element>
+			<element ref="Key_Dot"><bounds x="41" y="111" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X0" inputmask="0x02"><bounds x="35" y="130" width="20" height="10" /></element>
-			<element ref="Key_CBrkt"><bounds x="41" y="141" width="10" height="10" /></element>
+			<element ref="Key_FSlash"><bounds x="41" y="141" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X0" inputmask="0x04"><bounds x="35" y="160" width="20" height="10" /></element>
 			<element ref="Key_OBrkt"><bounds x="40" y="171" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X0" inputmask="0x08"><bounds x="35" y="190" width="20" height="10" /></element>
-			<element ref="Key_FSlash"><bounds x="41" y="201" width="10" height="10" /></element>
+			<element ref="Key_CBrkt"><bounds x="41" y="201" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X0" inputmask="0x10"><bounds x="35" y="220" width="20" height="10" /></element>
-			<element ref="Key_Dot"><bounds x="39" y="227" width="14" height="14" /></element>
+			<element ref="Key_BSlash"><bounds x="39" y="227" width="14" height="14" /></element>
 			<element ref="Switch_Push-Button" inputtag="X0" inputmask="0x20"><bounds x="35" y="250" width="20" height="10" /></element>
 			<element ref="Key_1"><bounds x="41" y="261" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X0" inputmask="0x40"><bounds x="35" y="280" width="20" height="10" /></element>
@@ -1232,57 +1232,57 @@ Any state="9" items are not displayed and are only used for object alignment
 			<element ref="Switch_Push-Button" inputtag="X1" inputmask="0x20"><bounds x="70" y="250" width="20" height="10" /></element>
 			<element ref="Key_SColon"><bounds x="75" y="259" width="11" height="11" /></element>
 			<element ref="Switch_Push-Button" inputtag="X1" inputmask="0x40"><bounds x="70" y="280" width="20" height="10" /></element>
-			<element ref="Key_T"><bounds x="75" y="291" width="10" height="10" /></element>
+			<element ref="Key_L"><bounds x="75" y="291" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X1" inputmask="0x80"><bounds x="70" y="310" width="20" height="10" /></element>
 			<element ref="Key_Equals"><bounds x="76" y="321" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X2" inputmask="0x01"><bounds x="105" y="100" width="20" height="10" /></element>
-			<element ref="Key_Comma"><bounds x="109" y="107" width="14" height="14" /></element>
+			<element ref="Key_K"><bounds x="109" y="107" width="14" height="14" /></element>
 			<element ref="Switch_Push-Button" inputtag="X2" inputmask="0x02"><bounds x="105" y="130" width="20" height="10" /></element>
-			<element ref="Key_M"><bounds x="110" y="141" width="10" height="10" /></element>
+			<element ref="Key_J"><bounds x="110" y="141" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X2" inputmask="0x04"><bounds x="105" y="160" width="20" height="10" /></element>
-			<element ref="Key_N"><bounds x="111" y="171" width="10" height="10" /></element>
+			<element ref="Key_H"><bounds x="111" y="171" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X2" inputmask="0x08"><bounds x="105" y="190" width="20" height="10" /></element>
-			<element ref="Key_B"><bounds x="110" y="201" width="10" height="10" /></element>
+			<element ref="Key_G"><bounds x="110" y="201" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X2" inputmask="0x10"><bounds x="105" y="220" width="20" height="10" /></element>
-			<element ref="Key_V"><bounds x="110" y="231" width="10" height="10" /></element>
+			<element ref="Key_F"><bounds x="110" y="231" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X2" inputmask="0x20"><bounds x="105" y="250" width="20" height="10" /></element>
-			<element ref="Key_C"><bounds x="110" y="261" width="10" height="10" /></element>
+			<element ref="Key_D"><bounds x="110" y="261" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X2" inputmask="0x40"><bounds x="105" y="280" width="20" height="10" /></element>
-			<element ref="Key_X"><bounds x="110" y="291" width="10" height="10" /></element>
+			<element ref="Key_S"><bounds x="110" y="291" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X2" inputmask="0x80"><bounds x="105" y="310" width="20" height="10" /></element>
-			<element ref="Key_Z"><bounds x="111" y="321" width="10" height="10" /></element>
+			<element ref="Key_A"><bounds x="111" y="321" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X3" inputmask="0x01"><bounds x="140" y="100" width="20" height="10" /></element>
-			<element ref="Key_K"><bounds x="146" y="111" width="10" height="10" /></element>
+			<element ref="Key_O"><bounds x="146" y="111" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X3" inputmask="0x02"><bounds x="140" y="130" width="20" height="10" /></element>
-			<element ref="Key_J"><bounds x="146" y="141" width="10" height="10" /></element>
+			<element ref="Key_I"><bounds x="146" y="141" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X3" inputmask="0x04"><bounds x="140" y="160" width="20" height="10" /></element>
-			<element ref="Key_H"><bounds x="146" y="171" width="10" height="10" /></element>
+			<element ref="Key_U"><bounds x="146" y="171" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X3" inputmask="0x08"><bounds x="140" y="190" width="20" height="10" /></element>
-			<element ref="Key_G"><bounds x="146" y="201" width="10" height="10" /></element>
+			<element ref="Key_Y"><bounds x="146" y="201" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X3" inputmask="0x10"><bounds x="140" y="220" width="20" height="10" /></element>
-			<element ref="Key_F"><bounds x="145" y="231" width="10" height="10" /></element>
+			<element ref="Key_R"><bounds x="145" y="231" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X3" inputmask="0x20"><bounds x="140" y="250" width="20" height="10" /></element>
-			<element ref="Key_D"><bounds x="146" y="261" width="10" height="10" /></element>
+			<element ref="Key_E"><bounds x="146" y="261" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X3" inputmask="0x40"><bounds x="140" y="280" width="20" height="10" /></element>
-			<element ref="Key_S"><bounds x="146" y="291" width="10" height="10" /></element>
+			<element ref="Key_W"><bounds x="146" y="291" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X3" inputmask="0x80"><bounds x="140" y="310" width="20" height="10" /></element>
-			<element ref="Key_A"><bounds x="145" y="321" width="10" height="10" /></element>
+			<element ref="Key_Q"><bounds x="145" y="321" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X4" inputmask="0x01"><bounds x="175" y="100" width="20" height="10" /></element>
-			<element ref="Key_O"><bounds x="181" y="111" width="10" height="10" /></element>
+			<element ref="Key_Comma"><bounds x="181" y="111" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X4" inputmask="0x02"><bounds x="175" y="130" width="20" height="10" /></element>
-			<element ref="Key_I"><bounds x="181" y="141" width="10" height="10" /></element>
+			<element ref="Key_M"><bounds x="181" y="141" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X4" inputmask="0x04"><bounds x="175" y="160" width="20" height="10" /></element>
-			<element ref="Key_U"><bounds x="180" y="171" width="10" height="10" /></element>
+			<element ref="Key_N"><bounds x="180" y="171" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X4" inputmask="0x08"><bounds x="175" y="190" width="20" height="10" /></element>
-			<element ref="Key_Y"><bounds x="180" y="201" width="10" height="10" /></element>
+			<element ref="Key_B"><bounds x="180" y="201" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X4" inputmask="0x10"><bounds x="175" y="220" width="20" height="10" /></element>
-			<element ref="Key_R"><bounds x="180" y="231" width="10" height="10" /></element>
+			<element ref="Key_V"><bounds x="180" y="231" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X4" inputmask="0x20"><bounds x="175" y="250" width="20" height="10" /></element>
-			<element ref="Key_E"><bounds x="181" y="261" width="10" height="10" /></element>
+			<element ref="Key_C"><bounds x="181" y="261" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X4" inputmask="0x40"><bounds x="175" y="280" width="20" height="10" /></element>
-			<element ref="Key_W"><bounds x="181" y="291" width="10" height="10" /></element>
+			<element ref="Key_X"><bounds x="181" y="291" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X4" inputmask="0x80"><bounds x="175" y="310" width="20" height="10" /></element>
-			<element ref="Key_Q"><bounds x="181" y="321" width="10" height="10" /></element>
+			<element ref="Key_Z"><bounds x="181" y="321" width="10" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X5" inputmask="0x01"><bounds x="210" y="100" width="20" height="10" /></element>
 			<element ref="Key_np1"><bounds x="211" y="111" width="20" height="10" /></element>
 			<element ref="Switch_Push-Button" inputtag="X5" inputmask="0x02"><bounds x="210" y="130" width="20" height="10" /></element>
@@ -1355,7 +1355,7 @@ Any state="9" items are not displayed and are only used for object alignment
 			<element ref="Key_Equals"><bounds x="401" y="290" width="10" height="10" /></element>
 			<element ref="Text_Tilt"><bounds x="320" y="302" width="50" height="10" /></element>
 			<element ref="Switch_Tilt" inputtag="X1" inputmask="0x40"><bounds x="330" y="284" width="17" height="17" /></element>
-			<element ref="Key_T"><bounds x="351" y="290" width="10" height="10" /></element>
+			<element ref="Key_L"><bounds x="351" y="290" width="10" height="10" /></element>
 
 		</collection>
 

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
-copyright-holders:Quench
+copyright-holders:Quench, Fabio Priuli
 
 Pinball Machine, Bally ~ Lost World
 
@@ -755,74 +755,74 @@ Any state="9" items are not displayed and are only used for object alignment
 			<element ref="Solenoid_PopBumper_Green_Star" name="solenoid8"><bounds x="78" y="80" width="80" height="80" /></element>
 			<element ref="Switch_PopBumper_Green_Star" inputtag="X4" inputmask="0x80"><bounds x="78" y="80" width="80" height="80" /></element>
 			<element ref="Lamp_PopBumper_Silver_100_On"><bounds x="78" y="80" width="80" height="80" /></element>
-			<element ref="Key_Q"><bounds x="114" y="130" width="9" height="9" /></element>
+			<element ref="Key_Z"><bounds x="114" y="130" width="9" height="9" /></element>
 			<element ref="Solenoid_PopBumper_Green_Star" name="solenoid9"><bounds x="144" y="105" width="80" height="80" /></element>
 			<element ref="Switch_PopBumper_Green_Star" inputtag="X4" inputmask="0x40"><bounds x="144" y="105" width="80" height="80" /></element>
 			<element ref="Lamp_PopBumper_Silver_100_On"><bounds x="144" y="105" width="80" height="80" /></element>
-			<element ref="Key_W"><bounds x="180" y="155" width="9" height="9" /></element>
+			<element ref="Key_X"><bounds x="180" y="155" width="9" height="9" /></element>
 			<element ref="Solenoid_PopBumper_Green_Star" name="solenoid10"><bounds x="95" y="149" width="80" height="80" /></element>
 			<element ref="Switch_PopBumper_Green_Star" inputtag="X4" inputmask="0x20"><bounds x="95" y="149" width="80" height="80" /></element>
 			<element ref="Lamp_PopBumper_Silver_1000_On"><bounds x="95" y="149" width="80" height="80" /></element>
-			<element ref="Key_E"><bounds x="130" y="153" width="9" height="9" /></element>
+			<element ref="Key_C"><bounds x="130" y="153" width="9" height="9" /></element>
 			<element ref="Solenoid_SlingShot_Left" name="solenoid11"><bounds x="35" y="320" width="69" height="80" /></element>
 			<element ref="Switch_Leaf_Vertical" inputtag="X4" inputmask="0x10"><bounds x="60" y="384" width="8" height="9" /></element>
-			<element ref="Key_R"><bounds x="60" y="375" width="9" height="9" /></element>
+			<element ref="Key_V"><bounds x="60" y="375" width="9" height="9" /></element>
 			<element ref="Solenoid_SlingShot_Right" name="solenoid13"><bounds x="218" y="320" width="69" height="80" /></element>
 			<element ref="Switch_Leaf_Vertical" inputtag="X4" inputmask="0x08"><bounds x="254" y="384" width="8" height="9" /></element>
-			<element ref="Key_Y"><bounds x="254" y="375" width="9" height="9" /></element>
+			<element ref="Key_B"><bounds x="254" y="375" width="9" height="9" /></element>
 			<element ref="Solenoid_Saucer" name="solenoid7"><bounds x="27" y="217" width="23" height="23" /></element>
 			<element ref="Switch_Saucer" inputtag="X2" inputmask="0x40"><bounds x="27" y="217" width="23" height="23" /></element>
-			<element ref="Key_X"><bounds x="34" y="204" width="9" height="9" /></element>
+			<element ref="Key_S"><bounds x="34" y="204" width="9" height="9" /></element>
 			<element ref="Solenoid_Saucer" name="solenoid12"><bounds x="267" y="217" width="23" height="23" /></element>
 			<element ref="Switch_Saucer" inputtag="X2" inputmask="0x80"><bounds x="267" y="217" width="23" height="23" /></element>
-			<element ref="Key_Z"><bounds x="274" y="204" width="9" height="9" /></element>
+			<element ref="Key_A"><bounds x="274" y="204" width="9" height="9" /></element>
 			<element ref="Lamp_Yellow_Arrow_05_A" name="lamp54"><bounds x="157" y="24" width="11.67" height="20" /></element>
 			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X3" inputmask="0x80"><bounds x="165" y="51" width="9" height="27" /></element>
-			<element ref="Key_A"><bounds x="165" y="81" width="9" height="9" /></element>
+			<element ref="Key_Q"><bounds x="165" y="81" width="9" height="9" /></element>
 			<element ref="Lamp_Yellow_Arrow_05_B" name="lamp39"><bounds x="196" y="18" width="11.67" height="20" /></element>
 			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X3" inputmask="0x40"><bounds x="204" y="45" width="9" height="27" /></element>
-			<element ref="Key_S"><bounds x="204" y="75" width="9" height="9" /></element>
+			<element ref="Key_W"><bounds x="204" y="75" width="9" height="9" /></element>
 			<element ref="Lamp_Yellow_Arrow_10_C" name="lamp53"><bounds x="46" y="269" width="20" height="11.67" /></element>
 			<element ref="Switch_Target_Red_Left" inputtag="X3" inputmask="0x20"><bounds x="29" y="259" width="8" height="12" /></element>
-			<element ref="Key_D"><bounds x="19" y="260" width="9" height="9" /></element>
+			<element ref="Key_E"><bounds x="19" y="260" width="9" height="9" /></element>
 			<element ref="Lamp_Yellow_Arrow_02_D" name="lamp38"><bounds x="258" y="269" width="20" height="11.67" /></element>
 			<element ref="Switch_Target_Red_Right" inputtag="X3" inputmask="0x10"><bounds x="285" y="259" width="8" height="12" /></element>
-			<element ref="Key_F"><bounds x="295" y="260" width="9" height="9" /></element>
+			<element ref="Key_R"><bounds x="295" y="260" width="9" height="9" /></element>
 			<element ref="Lamp_Yellow_Arrow_10_E" name="lamp23"><bounds x="46" y="295" width="20" height="11.67" /></element>
 			<element ref="Switch_Target_Red_Left" inputtag="X3" inputmask="0x08"><bounds x="29" y="285" width="8" height="12" /></element>
-			<element ref="Key_G"><bounds x="19" y="286" width="9" height="9" /></element>
+			<element ref="Key_Y"><bounds x="19" y="286" width="9" height="9" /></element>
 			<element ref="Lamp_Yellow_Arrow_02_F" name="lamp8"><bounds x="258" y="295" width="20" height="11.67" /></element>
 			<element ref="Switch_Target_Red_Right" inputtag="X3" inputmask="0x04"><bounds x="285" y="285" width="8" height="12" /></element>
-			<element ref="Key_H"><bounds x="295" y="286" width="9" height="9" /></element>
+			<element ref="Key_U"><bounds x="295" y="286" width="9" height="9" /></element>
 			<element ref="Lamp_Red" name="lamp56"><bounds x="9" y="328" width="10" height="10" /></element>
 			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X0" inputmask="0x08"><bounds x="10" y="351" width="9" height="27" /></element>
-			<element ref="Key_FSlash"><bounds x="10" y="380" width="10" height="10" /></element>
+			<element ref="Key_CBrkt"><bounds x="10" y="380" width="10" height="10" /></element>
 			<element ref="Lamp_Red" name="lamp41"><bounds x="300" y="328" width="10" height="10" /></element>
 			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X0" inputmask="0x04"><bounds x="301" y="351" width="9" height="27" /></element>
 			<element ref="Key_OBrkt"><bounds x="301" y="380" width="10" height="10" /></element>
 			<element ref="Lamp_White_AS" name="lamp26"><bounds x="32" y="328" width="10" height="10" /></element>
 			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X3" inputmask="0x02"><bounds x="33" y="353" width="9" height="27" /></element>
-			<element ref="Key_J"><bounds x="33" y="382" width="9" height="9" /></element>
+			<element ref="Key_I"><bounds x="33" y="382" width="9" height="9" /></element>
 			<element ref="Lamp_White_AS" name="lamp11"><bounds x="278" y="328" width="10" height="10" /></element>
 			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X3" inputmask="0x01"><bounds x="279" y="353" width="9" height="27" /></element>
-			<element ref="Key_K"><bounds x="279" y="382" width="9" height="9" /></element>
+			<element ref="Key_O"><bounds x="279" y="382" width="9" height="9" /></element>
 			<element ref="Lamp_RollOver_Star_Button_On"><bounds x="103" y="53" width="15" height="15" /></element>
 			<element ref="Switch_RollOver_Star_Button" inputtag="X0" inputmask="0x10"><bounds x="93" y="47" width="35" height="35" /></element>
-			<element ref="Key_Dot"><bounds x="104" y="38" width="14" height="14" /></element>
+			<element ref="Key_BSlash"><bounds x="104" y="38" width="14" height="14" /></element>
 			<element ref="Switch_Target_Red_Right" inputtag="X0" inputmask="0x10"><bounds x="245" y="94" width="8" height="12" /></element>
-			<element ref="Key_Dot"><bounds x="252" y="93" width="14" height="14" /></element>
+			<element ref="Key_BSlash"><bounds x="252" y="93" width="14" height="14" /></element>
 			<element ref="Switch_Leaf_Vertical" inputtag="X0" inputmask="0x02"><bounds x="25" y="160" width="8" height="9" /></element>
-			<element ref="Key_CBrkt"><bounds x="15" y="159" width="10" height="10" /></element>
+			<element ref="Key_FSlash"><bounds x="15" y="159" width="10" height="10" /></element>
 			<element ref="Switch_Leaf_Vertical" inputtag="X0" inputmask="0x02"><bounds x="38" y="187" width="8" height="9" /></element>
-			<element ref="Key_CBrkt"><bounds x="28" y="186" width="10" height="10" /></element>
+			<element ref="Key_FSlash"><bounds x="28" y="186" width="10" height="10" /></element>
 			<element ref="Switch_Leaf_Vertical" inputtag="X0" inputmask="0x01"><bounds x="244" y="131" width="8" height="9" /></element>
-			<element ref="Key_BSlash"><bounds x="243" y="118" width="10" height="10" /></element>
+			<element ref="Key_Dot"><bounds x="243" y="118" width="10" height="10" /></element>
 			<element ref="Switch_Leaf_Vertical" inputtag="X0" inputmask="0x01"><bounds x="228" y="169" width="8" height="9" /></element>
-			<element ref="Key_BSlash"><bounds x="227" y="156" width="10" height="10" /></element>
+			<element ref="Key_Dot"><bounds x="227" y="156" width="10" height="10" /></element>
 			<element ref="Lamp_White_5k" name="lamp49"><bounds x="225" y="222" width="9" height="9" /></element>
 			<element ref="Lamp_Amber_ExtraBall" name="lamp34"><bounds x="232" y="204" width="12" height="12" /></element>
 			<element ref="Switch_Target_Red_Forward" inputtag="X2" inputmask="0x20"><bounds x="290" y="91" width="12" height="8" /></element>
-			<element ref="Key_C"><bounds x="292" y="79" width="9" height="9" /></element>
+			<element ref="Key_D"><bounds x="292" y="79" width="9" height="9" /></element>
 			<element ref="Ball_Up" inputtag="X2" inputmask="0x20"><bounds x="290" y="97" width="12" height="12" /></element>
 			<element ref="Ball_Down" inputtag="X2" inputmask="0x20"><bounds x="241" y="184" width="12" height="12" /></element>
 			<element ref="Wire_Pin"><bounds x="239" y="193" width="3" height="3" /></element>
@@ -836,7 +836,7 @@ Any state="9" items are not displayed and are only used for object alignment
 			</repeat>
 			<element ref="Spinner" name="spinner0"><bounds x="34" y="121" width="26" height="16" /></element>
 			<element ref="Switch_Leaf_Horizontal" inputtag="X2" inputmask="0x01"><bounds x="21" y="132" width="9" height="8" /></element>
-			<element ref="Key_Comma"><bounds x="19" y="115" width="14" height="14" /></element>
+			<element ref="Key_K"><bounds x="19" y="115" width="14" height="14" /></element>
 
 		</collection>
 

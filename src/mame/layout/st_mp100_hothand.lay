@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
-copyright-holders:Quench
+copyright-holders:Quench, Fabio Priuli
 
 Pinball Machine, Stern ~ Hot hand
 
@@ -692,127 +692,127 @@ Any state="9" items are not displayed and are only used for object alignment
 			<element ref="Text_FlipperRotate" name="solenoid19"><bounds x="4" y="4" width="96" height="10" /></element>
 			<element ref="Solenoid_Outhole" name="solenoid14"><bounds x="150" y="455" width="58" height="22" /></element>
 			<element ref="Switch_RollOn_WireForm_Left" inputtag="X4" inputmask="0x01"><bounds x="163" y="453" width="20" height="16" /></element>
-			<element ref="Key_BSpace"><bounds x="185" y="455" width="15" height="14" /></element>
+			<element ref="Key_X"><bounds x="185" y="455" width="15" height="14" /></element>
 			<element ref="Lamp_Amber_ExtraBall" name="lamp52"><bounds x="20" y="212" width="12" height="12" /></element>
 			<element ref="Solenoid_Kickback" name="solenoid10"><bounds x="8" y="260" width="10" height="15" /></element>
 			<element ref="Switch_RollOn_WireForm_Down" inputtag="X4" inputmask="0x02"><bounds x="9" y="240" width="9" height="18" /></element>
-			<element ref="Key_I"><bounds x="17" y="240" width="9" height="9" /></element>
+			<element ref="Key_Dot"><bounds x="17" y="240" width="9" height="9" /></element>
 			<element ref="Switch_Leaf_Vertical" inputtag="X2" inputmask="0x04"><bounds x="41" y="245" width="8" height="9" /></element>
-			<element ref="Key_N"><bounds x="41" y="257" width="9" height="9" /></element>
+			<element ref="Key_M"><bounds x="41" y="257" width="9" height="9" /></element>
 			<element ref="Solenoid_PopBumper_Yellow_Star" name="solenoid11"><bounds x="84" y="170" width="80" height="80" /></element>
 			<element ref="Switch_PopBumper_Yellow_Star" inputtag="X1" inputmask="0x80"><bounds x="84" y="170" width="80" height="80" /></element>
 			<element ref="Lamp_PopBumper_GI_Heart"><bounds x="84" y="170" width="80" height="80" /></element>
-			<element ref="Key_O"><bounds x="120" y="220" width="9" height="9" /></element>
+			<element ref="Key_J"><bounds x="120" y="220" width="9" height="9" /></element>
 			<element ref="Solenoid_PopBumper_Yellow_Star" name="solenoid9"><bounds x="207" y="110" width="80" height="80" /></element>
 			<element ref="Switch_PopBumper_Yellow_Star" inputtag="X1" inputmask="0x08"><bounds x="207" y="110" width="80" height="80" /></element>
 			<element ref="Lamp_PopBumper_GI_Heart"><bounds x="207" y="110" width="80" height="80" /></element>
-			<element ref="Key_L"><bounds x="243" y="160" width="9" height="9" /></element>
+			<element ref="Key_F"><bounds x="243" y="160" width="9" height="9" /></element>
 			<element ref="Solenoid_PopBumper_Yellow_Star" name="solenoid7"><bounds x="152" y="153" width="80" height="80" /></element>
 			<element ref="Switch_PopBumper_Yellow_Star" inputtag="X1" inputmask="0x10"><bounds x="152" y="153" width="80" height="80" /></element>
 			<element ref="Lamp_PopBumper_GI_Heart"><bounds x="152" y="153" width="80" height="80" /></element>
-			<element ref="Key_BSlash"><bounds x="187" y="203" width="10" height="10" /></element>
+			<element ref="Key_G"><bounds x="187" y="203" width="10" height="10" /></element>
 			<element ref="Solenoid_SlingShot_Left" name="solenoid13"><bounds x="35" y="335" width="69" height="80" /></element>
 			<element ref="Switch_Leaf_Vertical" inputtag="X1" inputmask="0x20"><bounds x="60" y="399" width="8" height="9" /></element>
-			<element ref="Key_CBrkt"><bounds x="59" y="387" width="10" height="10" /></element>
+			<element ref="Key_H"><bounds x="59" y="387" width="10" height="10" /></element>
 			<element ref="Solenoid_SlingShot_Right" name="solenoid12"><bounds x="218" y="335" width="69" height="80" /></element>
 			<element ref="Switch_Leaf_Vertical" inputtag="X1" inputmask="0x40"><bounds x="254" y="399" width="8" height="9" /></element>
-			<element ref="Key_OBrkt"><bounds x="253" y="387" width="10" height="10" /></element>
+			<element ref="Key_I"><bounds x="253" y="387" width="10" height="10" /></element>
 			<element ref="Text_K"><bounds x="263" y="186" width="12" height="12" /></element>
 			<element ref="Lamp_Yellow_4X" name="lamp40"><bounds x="241" y="188" width="9" height="9" /></element>
 			<element ref="Solenoid_DropTarget_Vertical" name="solenoid8"><bounds x="277" y="185" width="7" height="15" /></element>
 			<element ref="Switch_DropTarget_Vertical" inputtag="X3" inputmask="0x08"><bounds x="277" y="185" width="7" height="15" /></element>
-			<element ref="Key_G"><bounds x="285" y="187" width="9" height="9" /></element>
+			<element ref="Key_V"><bounds x="285" y="187" width="9" height="9" /></element>
 			<element ref="Text_J"><bounds x="265" y="201" width="12" height="12" /></element>
 			<element ref="Lamp_Yellow_4X" name="lamp53"><bounds x="244" y="203" width="9" height="9" /></element>
 			<element ref="Solenoid_DropTarget_Vertical" name="solenoid8"><bounds x="280" y="200" width="7" height="15" /></element>
 			<element ref="Switch_DropTarget_Vertical" inputtag="X3" inputmask="0x10"><bounds x="280" y="200" width="7" height="15" /></element>
-			<element ref="Key_F"><bounds x="288" y="202" width="9" height="9" /></element>
+			<element ref="Key_W"><bounds x="288" y="202" width="9" height="9" /></element>
 			<element ref="Text_A"><bounds x="268" y="216" width="12" height="12" /></element>
 			<element ref="Lamp_Yellow_4X" name="lamp38"><bounds x="247" y="218" width="9" height="9" /></element>
 			<element ref="Lamp_White_10X" name="lamp39"><bounds x="220" y="217" width="12" height="12" /></element>
 			<element ref="Solenoid_DropTarget_Vertical" name="solenoid8"><bounds x="283" y="215" width="7" height="15" /></element>
 			<element ref="Switch_DropTarget_Vertical" inputtag="X3" inputmask="0x20"><bounds x="283" y="215" width="7" height="15" /></element>
-			<element ref="Key_D"><bounds x="291" y="217" width="9" height="9" /></element>
+			<element ref="Key_Y"><bounds x="291" y="217" width="9" height="9" /></element>
 			<element ref="Text_10"><bounds x="264" y="231" width="24" height="12" /></element>
 			<element ref="Lamp_Yellow_4X" name="lamp23"><bounds x="250" y="233" width="9" height="9" /></element>
 			<element ref="Solenoid_DropTarget_Vertical" name="solenoid8"><bounds x="286" y="230" width="7" height="15" /></element>
 			<element ref="Switch_DropTarget_Vertical" inputtag="X3" inputmask="0x40"><bounds x="286" y="230" width="7" height="15" /></element>
-			<element ref="Key_S"><bounds x="294" y="232" width="9" height="9" /></element>
+			<element ref="Key_Z"><bounds x="294" y="232" width="9" height="9" /></element>
 			<element ref="Text_Q"><bounds x="273" y="246" width="12" height="12" /></element>
 			<element ref="Lamp_Yellow_4X" name="lamp8"><bounds x="253" y="248" width="9" height="9" /></element>
 			<element ref="Solenoid_DropTarget_Vertical" name="solenoid8"><bounds x="289" y="245" width="7" height="15" /></element>
 			<element ref="Switch_DropTarget_Vertical" inputtag="X3" inputmask="0x80"><bounds x="289" y="245" width="7" height="15" /></element>
-			<element ref="Key_A"><bounds x="297" y="247" width="9" height="9" /></element>
+			<element ref="Key_Comma"><bounds x="297" y="247" width="9" height="9" /></element>
 			<element ref="Switch_Leaf_Vertical" inputtag="X2" inputmask="0x04"><bounds x="305" y="208" width="8" height="9" /></element>
-			<element ref="Key_N"><bounds x="305" y="196" width="9" height="9" /></element>
+			<element ref="Key_M"><bounds x="305" y="196" width="9" height="9" /></element>
 			<element ref="Lamp_Red" name="lamp56"><bounds x="9" y="348" width="12" height="12" /></element>
 			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X2" inputmask="0x02"><bounds x="10" y="371" width="9" height="27" /></element>
-			<element ref="Key_M"><bounds x="10" y="401" width="9" height="9" /></element>
+			<element ref="Key_L"><bounds x="10" y="401" width="9" height="9" /></element>
 			<element ref="Lamp_Red" name="lamp26"><bounds x="300" y="348" width="12" height="12" /></element>
 			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X2" inputmask="0x01"><bounds x="301" y="371" width="9" height="27" /></element>
-			<element ref="Key_Comma"><bounds x="301" y="398" width="14" height="14" /></element>
+			<element ref="Key_K"><bounds x="301" y="398" width="14" height="14" /></element>
 			<element ref="Lamp_White_10X" name="lamp9"><bounds x="32" y="348" width="12" height="12" /></element>
 			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X1" inputmask="0x02"><bounds x="33" y="371" width="9" height="27" /></element>
-			<element ref="Key_Quote"><bounds x="31" y="399" width="14" height="14" /></element>
+			<element ref="Key_D"><bounds x="31" y="399" width="14" height="14" /></element>
 			<element ref="Lamp_White_10X" name="lamp24"><bounds x="278" y="348" width="12" height="12" /></element>
 			<element ref="Switch_RollOver_WireForm_Vertical" inputtag="X1" inputmask="0x01"><bounds x="279" y="371" width="9" height="27" /></element>
-			<element ref="Key_Enter"><bounds x="279" y="401" width="12" height="12" /></element>
+			<element ref="Key_C"><bounds x="279" y="401" width="12" height="12" /></element>
 			<element ref="Lamp_White_10X" name="lamp24"><bounds x="64" y="148" width="12" height="12" /></element>
 			<element ref="Switch_Target_White_Forward" inputtag="X1" inputmask="0x01"><bounds x="64" y="130" width="12" height="8" /></element>
-			<element ref="Key_Enter"><bounds x="65" y="117" width="12" height="12" /></element>
+			<element ref="Key_C"><bounds x="65" y="117" width="12" height="12" /></element>
 			<element ref="Lamp_RollOver_Star_Button_On"><bounds x="152" y="8" width="15" height="15" /></element>
 			<element ref="Switch_RollOver_Star_Button" inputtag="X0" inputmask="0x10"><bounds x="142" y="2" width="35" height="35" /></element>
-			<element ref="Key_Dot"><bounds x="165" y="6" width="14" height="14" /></element>
+			<element ref="Key_B"><bounds x="165" y="6" width="14" height="14" /></element>
 			<element ref="Text_K"><bounds x="256" y="65" width="12" height="12" /></element>
 			<element ref="Lamp_Yellow_4X" name="lamp40"><bounds x="235" y="65" width="12" height="12" /></element>
 			<element ref="Switch_Target_White_Right" inputtag="X2" inputmask="0x08"><bounds x="271" y="65" width="8" height="12" /></element>
-			<element ref="Key_B"><bounds x="281" y="66" width="9" height="9" /></element>
+			<element ref="Key_N"><bounds x="281" y="66" width="9" height="9" /></element>
 			<element ref="Text_Q"><bounds x="266" y="90" width="12" height="12" /></element>
 			<element ref="Lamp_Yellow_4X" name="lamp8"><bounds x="245" y="90" width="12" height="12" /></element>
 			<element ref="Switch_Target_White_Right" inputtag="X2" inputmask="0x80"><bounds x="281" y="90" width="8" height="12" /></element>
-			<element ref="Key_Z"><bounds x="291" y="91" width="9" height="9" /></element>
+			<element ref="Key_R"><bounds x="291" y="91" width="9" height="9" /></element>
 			<element ref="Text_J"><bounds x="271" y="285" width="12" height="12" /></element>
 			<element ref="Lamp_Yellow_4X" name="lamp53"><bounds x="250" y="285" width="12" height="12" /></element>
 			<element ref="Switch_Target_White_Right" inputtag="X2" inputmask="0x10"><bounds x="286" y="285" width="8" height="12" /></element>
-			<element ref="Key_V"><bounds x="296" y="286" width="9" height="9" /></element>
+			<element ref="Key_O"><bounds x="296" y="286" width="9" height="9" /></element>
 			<element ref="Text_10"><bounds x="265" y="310" width="24" height="12" /></element>
 			<element ref="Lamp_Yellow_4X" name="lamp23"><bounds x="250" y="310" width="12" height="12" /></element>
 			<element ref="Switch_Target_White_Right" inputtag="X2" inputmask="0x40"><bounds x="286" y="310" width="8" height="12" /></element>
-			<element ref="Key_X"><bounds x="296" y="311" width="9" height="9" /></element>
+			<element ref="Key_Q"><bounds x="296" y="311" width="9" height="9" /></element>
 			<element ref="Lamp_White_2k" name="lamp39"><bounds x="20" y="133" width="12" height="12" /></element>
 			<element ref="Spinner" name="spinner0"><bounds x="10" y="100" width="26" height="16" /></element>
 			<element ref="Switch_Leaf_Horizontal" inputtag="X1" inputmask="0x04"><bounds x="40" y="115" width="9" height="8" /></element>
-			<element ref="Key_SColon"><bounds x="40" y="102" width="10" height="10" /></element>
+			<element ref="Key_E"><bounds x="40" y="102" width="10" height="10" /></element>
 			<element ref="Text_K"><bounds x="154" y="29" width="12" height="12" /></element>
 			<element ref="Switch_Pocket" inputtag="X4" inputmask="0x08"><bounds x="151" y="42" width="18" height="18" /></element>
-			<element ref="Key_Y"><bounds x="155" y="60" width="9" height="9" /></element>
+			<element ref="Key_SColon"><bounds x="155" y="60" width="9" height="9" /></element>
 			<element ref="Text_K"><bounds x="154" y="139" width="12" height="12" /></element>
 			<element ref="Switch_Pocket" inputtag="X4" inputmask="0x08"><bounds x="151" y="122" width="18" height="18" /></element>
-			<element ref="Key_Y"><bounds x="155" y="111" width="9" height="9" /></element>
+			<element ref="Key_SColon"><bounds x="155" y="111" width="9" height="9" /></element>
 			<element ref="Text_10"><bounds x="114" y="42" width="24" height="12" /></element>
 			<element ref="Switch_Pocket" inputtag="X4" inputmask="0x40"><bounds x="130" y="51" width="18" height="18" /></element>
-			<element ref="Key_W"><bounds x="144" y="67" width="9" height="9" /></element>
+			<element ref="Key_OBrkt"><bounds x="144" y="67" width="9" height="9" /></element>
 			<element ref="Text_10"><bounds x="182" y="42" width="24" height="12" /></element>
 			<element ref="Switch_Pocket" inputtag="X4" inputmask="0x40"><bounds x="172" y="51" width="18" height="18" /></element>
-			<element ref="Key_W"><bounds x="167" y="67" width="9" height="9" /></element>
+			<element ref="Key_OBrkt"><bounds x="167" y="67" width="9" height="9" /></element>
 			<element ref="Text_10"><bounds x="182" y="127" width="24" height="12" /></element>
 			<element ref="Switch_Pocket" inputtag="X4" inputmask="0x40"><bounds x="172" y="113" width="18" height="18" /></element>
-			<element ref="Key_W"><bounds x="167" y="105" width="9" height="9" /></element>
+			<element ref="Key_OBrkt"><bounds x="167" y="105" width="9" height="9" /></element>
 			<element ref="Text_10"><bounds x="114" y="127" width="24" height="12" /></element>
 			<element ref="Switch_Pocket" inputtag="X4" inputmask="0x40"><bounds x="130" y="113" width="18" height="18" /></element>
-			<element ref="Key_W"><bounds x="143" y="105" width="9" height="9" /></element>
+			<element ref="Key_OBrkt"><bounds x="143" y="105" width="9" height="9" /></element>
 			<element ref="Text_J"><bounds x="203" y="69" width="12" height="12" /></element>
 			<element ref="Switch_Pocket" inputtag="X4" inputmask="0x10"><bounds x="187" y="70" width="18" height="18" /></element>
-			<element ref="Key_R"><bounds x="178" y="79" width="9" height="9" /></element>
+			<element ref="Key_Quote"><bounds x="178" y="79" width="9" height="9" /></element>
 			<element ref="Text_J"><bounds x="105" y="99" width="12" height="12" /></element>
 			<element ref="Switch_Pocket" inputtag="X4" inputmask="0x10"><bounds x="115" y="94" width="18" height="18" /></element>
-			<element ref="Key_R"><bounds x="132" y="94" width="9" height="9" /></element>
+			<element ref="Key_Quote"><bounds x="132" y="94" width="9" height="9" /></element>
 			<element ref="Text_Q"><bounds x="204" y="100" width="12" height="12" /></element>
 			<element ref="Switch_Pocket" inputtag="X4" inputmask="0x80"><bounds x="187" y="94" width="18" height="18" /></element>
-			<element ref="Key_Q"><bounds x="178" y="94" width="9" height="9" /></element>
+			<element ref="Key_CBrkt"><bounds x="178" y="94" width="9" height="9" /></element>
 			<element ref="Text_Q"><bounds x="104" y="68" width="12" height="12" /></element>
 			<element ref="Switch_Pocket" inputtag="X4" inputmask="0x80"><bounds x="115" y="70" width="18" height="18" /></element>
-			<element ref="Key_Q"><bounds x="132" y="79" width="9" height="9" /></element>
+			<element ref="Key_CBrkt"><bounds x="132" y="79" width="9" height="9" /></element>
 
 		</collection>
 
@@ -897,10 +897,10 @@ Any state="9" items are not displayed and are only used for object alignment
 			<element ref="Key_9"><bounds x="516" y="330" width="10" height="10" /></element>
 			<element ref="Text_Slam"><bounds x="430" y="342" width="50" height="10" /></element>
 			<element ref="Switch_SlamTilt" inputtag="X0" inputmask="0x80"><bounds x="434" y="331" width="25" height="8" /></element>
-			<element ref="Key_Equals"><bounds x="461" y="330" width="10" height="10" /></element>
+			<element ref="Key_0"><bounds x="461" y="330" width="10" height="10" /></element>
 			<element ref="Text_Tilt"><bounds x="380" y="342" width="50" height="10" /></element>
 			<element ref="Switch_Tilt" inputtag="X0" inputmask="0x40"><bounds x="390" y="324" width="17" height="17" /></element>
-			<element ref="Key_T"><bounds x="411" y="330" width="10" height="10" /></element>
+			<element ref="Key_9"><bounds x="411" y="330" width="10" height="10" /></element>
 
 		</collection>
 
