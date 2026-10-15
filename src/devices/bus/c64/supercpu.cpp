@@ -700,7 +700,7 @@ void c64_supercpu_device::set_2mhz(bool state)
 }
 
 
-ATTR_FORCE_INLINE uint8_t c64_supercpu_device::config(offs_t offset)
+inline ATTR_FORCE_INLINE uint8_t c64_supercpu_device::config(offs_t offset)
 {
 	uint8_t const cfg = (m_pport & 7) | (m_hwenable << 5) | (m_dosext << 6) | (m_bootmap << 7);
 
