@@ -424,7 +424,10 @@ bool c1551_device::tcbm_sample_ready()
 	if ((other->local_time() + (cycle / 2)) <= reader->local_time())
 	{
 		if ((other->local_time() + cycle) > reader->local_time())
+		{
 			reader->yield();
+			machine().scheduler().perfect_quantum(cycle);
+		}
 		reader->retry_access();
 		return false;
 	}
