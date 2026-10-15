@@ -11,7 +11,6 @@
 #include "k054338.h"
 #include "k055555.h"
 
-#include "cpu/k056734/k056734.h"
 #include "cpu/tms57002/tms57002.h"
 #include "machine/adc083x.h"
 #include "machine/k053252.h"
@@ -33,7 +32,6 @@ public:
 		, m_maincpu(*this,"maincpu")
 		, m_soundcpu(*this, "soundcpu")
 		, m_dasp(*this, "dasp")
-		, m_esc(*this, "esc")
 		, m_k053252(*this, "k053252")
 		, m_k055673(*this, "k055673")
 		, m_k055555(*this, "k055555")
@@ -96,7 +94,6 @@ public:
 	void konamigx_tilebank_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void konamigx_t1_psacmap_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void konamigx_t4_psacmap_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void esc_irq_w(int state);
 	void vblank_irq_ack_w(int state);
 	void hblank_irq_ack_w(int state);
 	ioport_value gx_rdport1_3_r();
@@ -132,6 +129,7 @@ public:
 	K056832_CB_MEMBER(salmndr2_tile_callback);
 	K056832_CB_MEMBER(alpha_tile_callback);
 	K055673_CB_MEMBER(type2_sprite_callback);
+	K055673_CB_MEMBER(dragoonj_sprite_callback);
 
 	struct GX_OBJ
 	{
@@ -188,22 +186,11 @@ public:
 	void winspike(machine_config &config) ATTR_COLD;
 	void le2(machine_config &config) ATTR_COLD;
 	void konamigx(machine_config &config) ATTR_COLD;
-	void add_esc(machine_config &config, u16 key, u8 cfg, u32 fetch_xor, const std::array<u8, 16> &fetch_lanes) ATTR_COLD;
-	void daiskiss(machine_config &config) ATTR_COLD;
-	void dragoonj(machine_config &config) ATTR_COLD;
-	void salmndr2(machine_config &config) ATTR_COLD;
-	void tbyahhoo(machine_config &config) ATTR_COLD;
-	void gokuparo(machine_config &config) ATTR_COLD;
-	void puzldama(machine_config &config) ATTR_COLD;
-	void sexyparo(machine_config &config) ATTR_COLD;
-	void tkmmpzdm(machine_config &config) ATTR_COLD;
-	void tokkae(machine_config &config) ATTR_COLD;
 	void sexyparoebl(machine_config &config) ATTR_COLD;
 	void gx_base_memmap(address_map &map) ATTR_COLD;
 	void racinfrc_map(address_map &map) ATTR_COLD;
 	void gx_type1_map(address_map &map) ATTR_COLD;
 	void gx_type2_map(address_map &map) ATTR_COLD;
-	void gx_type2_esc_map(address_map &map) ATTR_COLD;
 	void gx_type3_map(address_map &map) ATTR_COLD;
 	void gx_type4_map(address_map &map) ATTR_COLD;
 	void gxsndmap(address_map &map) ATTR_COLD;
@@ -214,7 +201,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<tms57002_device> m_dasp;
-	optional_device<k056734_device> m_esc;
 	optional_device<k053252_device> m_k053252;
 	required_device<k055673_device> m_k055673;
 	required_device<k055555_device> m_k055555;
@@ -319,7 +305,6 @@ protected:
 	u8 m_type3_spriteram_bank = 0;
 	//int m_konamigx_type3_psac2_actual_last_bank = 0;
 	s32 m_use_68020_post_clock_hack = 0;
-	bool m_obj_mix_code = true; // sprite attribute bits 9:8 are a K055555 mix code
 	output_finder<> m_lamp;
 };
 

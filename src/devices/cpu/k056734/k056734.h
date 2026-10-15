@@ -58,10 +58,10 @@ protected:
 private:
 	enum : u8
 	{
-		F_Z = 0x01,
-		F_N = 0x02,
-		F_C = 0x04,
-		F_V = 0x08
+		F_Z = 0x01, // zero
+		F_N = 0x02, // negative
+		F_C = 0x04, // carry
+		F_V = 0x08  // signed overflow
 	};
 
 	// special registers, numbered as operands (s0 = 32)

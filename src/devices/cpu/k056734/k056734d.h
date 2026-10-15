@@ -31,7 +31,20 @@ public:
 		u32 m_table[4][256];
 	};
 
-	// fields of a descrambled instruction word
+	// Fields of a descrambled instruction word, built from 2-bit lanes (lane k is
+	// bits 2k+1:2k), most significant lane first:
+	//   class   0                   0 branch/jump/li, 1 absolute host access, 2 register/stack, 3 ALU/memory
+	//   size    7                   0 word, 1 byte, 2 halfword
+	//   opcode  10, 8, 3            the operation within the class
+	//   rA      5, 15, 9            0-31 are r0-r31, 32-63 are s0-s31
+	//   rB      2, 1, 4
+	//   off10   6, 14, 13, 12, 11   signed offset; rC is bits 8:3
+	//   imm16   rB, off10
+	//   imm24   7, rA, imm16
+	// Branches are class 0 with lanes 5, 7, 9, 15 = 2, 2, 2, 0, the condition in lanes
+	// 10, 8, 3 and imm16 a displacement in words from the next instruction.  li and the
+	// absolute host accesses take imm24 and a destination from lane 8 bit 0, lane 3 and
+	// lane 10 (reg_d).
 	static constexpr unsigned lane(u32 op, unsigned k) { return BIT(op, k * 2, 2); }
 	static constexpr unsigned reg_a(u32 op) { return (lane(op, 5) << 4) | (lane(op, 15) << 2) | lane(op, 9); }
 	static constexpr unsigned reg_b(u32 op) { return (lane(op, 2) << 4) | (lane(op, 1) << 2) | lane(op, 4); }

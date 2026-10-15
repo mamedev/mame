@@ -4,7 +4,7 @@
 /***************************************************************************
 
     Konami 056734 (ESC) security coprocessor
-    Reference: konami_056734_manual.md in https://github.com/rb6502/mame-ai-tips
+    Reference: generated-gems/konami_056734_manual.md in https://github.com/rb6502/mame-ai-tips
 
     A 32-bit core with 32 general and 32 special registers, word-addressed
     local SRAM, and bus-master access to the host's 24-bit big-endian bus.
@@ -18,6 +18,61 @@
     instructions through a descrambler: a permutation of the 2-bit lanes
     of the word plus an XOR constant.  Data reads are not descrambled.
 
+    The firmware's ciphers, for reference (this file runs the firmware and
+    implements none of them):
+
+    Image header, big-endian.  The kernel is at s11 + 0x96c; a program resides
+    wherever the host's LOAD packet points.
+      +0x00  magic 0xfef724fb
+      +0x04  code words A ^ 0x3c96        +0x06  data words B ^ 0xb9e5
+      +0x08  workspace words C ^ 0x67a5   +0x0a  LOAD entry D ^ 0x3616
+      +0x0c  RUN entry E ^ 0x7d8d         +0x0e  third entry F ^ 0x57bb
+      +0x10  flags G ^ 0x796c, used only for programs (the kernel's reads
+             0x1000 and the boot code ignores it): bit 12 plain text, bits
+             11:0 must equal ((A + B) ^ D ^ E ^ F) & 0xfff, bits 15:13 select
+             the rounds
+      +0x12  16-bit sum of the halfwords of the decrypted code and data
+      +0x14  salt
+      +0x18  code (stored scrambled for the fetch unit, padded to an even
+             word count), then data
+
+    Kernel (decrypted by the boot code): a stream cipher over the code,
+    restarted for the data.
+      key = (s11[27:24] * 0x01010101) ^ 0x36ae2592 ^ (s10[15:0] * 0x00010001)
+      a = key ^ 0x6e8ef8fc, b = key
+      each word: plain = word ^ a; a += b; b ^= rotl(a, 16)
+
+    Programs (decrypted by the kernel): a FEAL-8 variant on 64-bit blocks of
+    two big-endian words (L, R), restarted for the data.
+      k0 = s11[27:24] << 28 | (G & 0xfff) << 16 | s10[15:0]
+      k1 = k0 ^ salt
+      k2 = ((G >> 13) << 3 | ((E ^ s10) & 3)) & 0xff
+    S0(x, y) = rotl8((x + y) & 0xff, 2), S1(x, y) = rotl8((x + y + 1) & 0xff, 2).
+    Key schedule (FEAL's): A = k0, B = k1, D = 0; eight times
+      B' = fk(A, B ^ D); D = A; A = B; B = B'
+    and each B' gives two 16-bit subkeys, high half first: K0 to K15.
+    fk(a, b), bytes a0-a3 and b0-b3 most significant first:
+      f1 = S1(a0^a1, a2^a3^b0), f2 = S0(a2^a3, f1^b1),
+      f0 = S0(a0, f1^b2), f3 = S1(a3, f2^b3); result f0 f1 f2 f3
+    Block: n = (k2 >> 2) & 6, or 8 when that is 0 (8 in every shipped image).
+      R ^= K1:K0; L ^= K3:K2; R ^= L
+      n times: (L, R) = (R, L ^ f(R, K[4 + round]))
+      L ^= R; L ^= K[n+5]:K[n+4]; R ^= K[n+7]:K[n+6]; output (R, L)
+    Round function f(a, k) by k2 & 3, with k's high and low bytes b0 and b1:
+      0: x = a0^a1^b0, y = a2^a3^b1; f1 = S1(x, y), f2 = S0(y, f1), f0 = S0(a0, f1), f3 = S1(a3, f2)
+      1: x = a0^a2^b0, y = a1^a3^b1; f2 = S1(x, y), f1 = S0(y, f2), f0 = S0(a0, f2), f3 = S1(a3, f1)
+      2: x = a2^a3^b0, y = a0^a1^b1; f3 = S1(x, y), f0 = S0(y, f3), f2 = S0(a2, f3), f1 = S1(a1, f0)
+      3: x = a0^a1^b1, y = a2^a3^b0; f0 = S1(x, y), f3 = S0(y, f0), f1 = S0(a1, f0), f2 = S1(a2, f3)
+    After each block, with output words o1, o2, two 16-bit subkey updates run,
+    m1 = ((k2 & 3) ^ k0) & 3 and then m2 = ((k1 & 3) | 2) ^ m1:
+      0: K[o1 & 15] ^= K[(o2 >> 16) & 15]
+      1: K[(o1 >> 16) & 15] += 1
+      2: K[(o2 >> 16) & 15] += K[o1 & 15]
+      3: K[(o2 >> 16) & 15] -= 1
+
+    The boot code is the same on every chip: its runs of no-ops hold the XOR
+    constant, and comparing it between chips gives the lane map.
+
     TODO:
     - opcode 11022 (boot word 278, kernel word 321) is unknown
 
@@ -29,7 +84,6 @@
 
 #include <algorithm>
 #include <bit>
-#include <iterator>
 
 DEFINE_DEVICE_TYPE(K056734, k056734_device, "k056734", "Konami 056734 ESC")
 
@@ -132,11 +186,10 @@ void k056734_device::device_start()
 
 void k056734_device::device_reset()
 {
-	std::fill(std::begin(m_reg), std::end(m_reg), 0);
 	m_reg[S_KEY] = m_key;
 	m_reg[S_BOOT] = (u32(m_config) << 24) | BOOT_OBJECT;
+	m_reg[S_HOST] &= ~u32(2);
 	m_pc = 0;
-	m_flags = 0;
 	m_boot = true;
 	m_irq_cb(0);
 }
@@ -189,6 +242,7 @@ u32 k056734_device::get_reg(unsigned r)
 		// bit 1 drives the host interrupt; the firmware pulses it with ori, so it can't read back
 		return m_reg[S_HOST] & ~u32(2);
 	case S_MAILBOX:
+		// idle skip
 		if (!m_reg[S_MAILBOX])
 			m_icount = 0;
 		return m_reg[S_MAILBOX];
