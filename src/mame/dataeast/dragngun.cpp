@@ -241,9 +241,12 @@ protected:
 	TIMER_CALLBACK_MEMBER(i750_sync_w);
 	u32 i750_rom_r(offs_t offset);
 	u32 dvi_control_r() { return m_dvi_control; }
-	void dvi_control_w(u32 data, u32 mem_mask = ~0);
+	void dvi_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void dvi_vblank(int state);
 	u32 lockload_gun_mirror_r(offs_t offset);
+
+	void unk150000_w(offs_t offset, u32 data, u32 mem_mask = ~0) { logerror("%s: unk150000_w %08x %08x\n", machine().describe_context(), data, mem_mask); }
+	void mixctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0) { COMBINE_DATA(&m_mixctrl); }
 
 	u8 read_dvi_byte(offs_t offset);
 
@@ -323,6 +326,7 @@ protected:
 	u32 m_lightgun_port = 0;
 	u32 m_oki2_bank = 0; // lockload
 	u32 m_dvi_control = 0;
+	u32 m_mixctrl;
 };
 
 
@@ -507,7 +511,7 @@ u32 dragngun_state::i750_rom_r(offs_t offset)
 	return value;
 }
 
-void dragngun_state::dvi_control_w(u32 data, u32 mem_mask)
+void dragngun_state::dvi_control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_dvi_control);
 	if (ACCESSING_BITS_0_7)
@@ -649,7 +653,10 @@ u32 dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x400), cliprect); // Palette index not confirmed
 	if (m_i750_display)
-		m_i750_display->draw(bitmap, cliprect, screen.visible_area());
+	{
+		if (BIT(m_mixctrl, 1))
+			m_i750_display->draw(bitmap, cliprect, screen.visible_area());
+	}
 
 	m_tilegen[0]->update(m_rowscroll[0].get(), m_rowscroll[1].get());
 	m_tilegen[1]->update(m_rowscroll[2].get(), m_rowscroll[3].get());
@@ -808,8 +815,8 @@ void dragngun_state::dragngun_map(address_map &map)
 //  map(0x01204c0, 0x01204c3).w(FUNC(dragngun_state::sound_w));
 
 	map(0x0138000, 0x0138003).noprw(); // Palette dma complete in bit 0x8? ack?  return 0 else tight loop
-//  map(0x0150000, 0x0150003).nopw(); // Unknown; Masking related?
-//  map(0x0160000, 0x0160003).w(FUNC(dragngun_state::pri_w)); // priority
+	map(0x0150000, 0x0150003).w(FUNC(dragngun_state::unk150000_w)); // cabinet related?
+	map(0x0160000, 0x0160003).w(FUNC(dragngun_state::mixctrl_w)); // priority / layer enable?
 	map(0x0170000, 0x01703ff).rw(FUNC(dragngun_state::i750_r), FUNC(dragngun_state::i750_w));
 	map(0x0178000, 0x0178003).rw(FUNC(dragngun_state::dvi_control_r), FUNC(dragngun_state::dvi_control_w));
 	map(0x0400000, 0x0400000).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -1100,6 +1107,7 @@ void dragngun_state::machine_start()
 	save_item(NAME(m_dvi_control));
 	save_item(NAME(m_lightgun_port));
 	save_item(NAME(m_oki2_bank));
+	save_item(NAME(m_mixctrl));
 
 	// Perform a validation test of the video ROM decryption if valid video ROMs exist
 	if (m_dvi_rom.found() && m_dvi_decrypt.found() && (m_dvi_rom.bytes() >= 0xc00000) && (m_dvi_rom[0] == 0x56445649))
@@ -1750,8 +1758,6 @@ ROM_END
 //  INITIALIZER
 //**************************************************************************
 
-//extern void process_dvi_data(device_t *device,u8* dvi_data, int offset, int regionsize);
-
 void dragngun_state::expand_sprite_data()
 {
 	u8 *rom = memregion("c355spr")->base();
@@ -1778,26 +1784,6 @@ void dragngun_state::dragngun_init_common()
 	std::copy(&SRC_RAM[0x10000], &SRC_RAM[0x20000], &DST_RAM[0x110000]);
 
 	expand_sprite_data();
-
-#if 0
-	{
-		u8 *ROM = memregion("dvi")->base();
-
-		auto fp = fopen("video.dvi", "w+b");
-		if (fp)
-		{
-			fwrite(ROM, 0xc00000, 1, fp);
-			fclose(fp);
-		}
-	}
-#endif
-
-	// there are DVI headers at 0x000000, 0x580000, 0x800000, 0xB10000, 0xB80000
-//  process_dvi_data(this,memregion("dvi")->base(),0x000000, 0x1000000);
-//  process_dvi_data(this,memregion("dvi")->base(),0x580000, 0x1000000);
-//  process_dvi_data(this,memregion("dvi")->base(),0x800000, 0x1000000);
-//  process_dvi_data(this,memregion("dvi")->base(),0xB10000, 0x1000000);
-//  process_dvi_data(this,memregion("dvi")->base(),0xB80000, 0x1000000);
 }
 
 void dragngun_state::init_dragngun()
