@@ -1614,6 +1614,9 @@ void corona_state::monte(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &corona_state::monte_map);
 	m_maincpu->set_addrmap(AS_IO, &corona_state::winner82_cpu_io_map);
+
+	// video hardware
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 32*8-1);
 }
 
 
