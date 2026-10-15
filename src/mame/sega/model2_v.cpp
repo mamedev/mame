@@ -1372,6 +1372,10 @@ void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count, bool p
 			int32_t             luma;
 			texture_parameter * texparam;
 
+			/* Skip normal */
+			if (!palette_mode)
+				input += 3;
+
 			/* read in the next point */
 			point.x = u2f(*input++);
 			point.y = u2f(*input++);
@@ -1559,6 +1563,10 @@ void model2_state::geo_parse_nn_s(geo_state *geo, u32 *input, u32 count, bool pa
 			float               coef, face;
 			int32_t             luma;
 			texture_parameter * texparam;
+
+			/* Skip normal */
+			if (!palette_mode)
+				input += 3;
 
 			/* read in the next point */
 			point.x = u2f(*input++);
@@ -2351,14 +2359,6 @@ u32 *model2_state::geo_code_jump(geo_state *geo, u32 opcode, u32 *input)
 
 u32 *model2_state::geo_process_command(geo_state *geo, u32 opcode, u32 *input, bool *end_code)
 {
-	u32 func = (opcode >> 23) & 0x1f;
-	if (func >= 0x0e && func != 0x0f)
-	{
-		static std::set<std::pair<std::string, u32>> seen;
-		if (seen.insert({machine().system().name, func}).second)
-			osd_printf_info("GEO COMMAND SEEN: %s func=%02X opcode=%08X\n", machine().system().name, func, opcode);
-	}
-
 	switch ((opcode >> 23) & 0x1f)
 	{
 		case 0x00: input = geo_nop(geo, opcode, input);                   break;
