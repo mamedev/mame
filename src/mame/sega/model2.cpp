@@ -770,39 +770,10 @@ void model2_state::geo_ctl1_w(u32 data)
 		{
 			logerror("Start geo upload\n");
 			m_geocnt = 0;
-			m_geo_program_dump.clear();
 		}
 		else
 		{
 			logerror("Boot geo, %d dwords\n", m_geocnt);
-			if (!m_geo_program_dump.empty())
-			{
-				std::string filename = util::string_format("microcode_%s_geo.bin", machine().system().name);
-				FILE *f = fopen(filename.c_str(), "wb");
-				if (f)
-				{
-					fwrite(m_geo_program_dump.data(), sizeof(u32), m_geo_program_dump.size(), f);
-					fclose(f);
-				}
-			}
-			if (m_geo_program_dump.size() > 14)
-			{
-				// Top Skater Geometrizer microcode jumps to 0x2EB at instruction 6 (dwords 12-13)
-				if ((m_geo_program_dump[12] & 0x00ffffff) == 0x00bf02eb)
-				{
-					m_geotype = GEO_TOP_SKATER;
-					logerror("Model 2 Geometrizer detected: Top Skater (Dual Matrix Palette)\n");
-				}
-				else if (m_geo_program_dump.size() > 486 && (m_geo_program_dump[486] & 0xffff) == 0x0c6c)
-				{
-					m_geotype = GEO_LAST_BRONX;
-					logerror("Model 2 Geometrizer detected: Last Bronx (Dynamic Mesh / 4-float Matrix)\n");
-				}
-				else
-				{
-					m_geotype = GEO_STANDARD;
-				}
-			}
 		}
 	}
 
@@ -826,7 +797,6 @@ void model2_state::geo_prg_w(u32 data)
 {
 	if (m_geoctl & 0x80000000)
 	{
-		m_geo_program_dump.push_back(data);
 		m_geocnt++;
 	}
 	else
@@ -3017,6 +2987,12 @@ void model2b_state::zerogun(machine_config &config)
 	model2b_5881(config);
 }
 
+void model2b_state::lastbrnx(machine_config &config)
+{
+	model2b(config);
+	m_geotype = GEO_LAST_BRONX;
+}
+
 /* 2C-CRX */
 void model2c_state::model2c(machine_config &config)
 {
@@ -3139,6 +3115,7 @@ void model2c_state::segawski(machine_config &config)
 void model2c_state::topskatr(machine_config &config)
 {
 	model2c(config);
+	m_geotype = GEO_TOP_SKATER;
 
 	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
 	io.an_port_callback<0>().set_ioport("CURVING");
@@ -7715,9 +7692,9 @@ GAME( 1995, vonj,       von,      model2b,      von,       model2b_state, empty_
 GAME( 1995, vonr,       von,      model2b,      von,       model2b_state, empty_init,    ROT0, "Sega",   "Cyber Troopers Virtual-On - Relay (Japan)", MACHINE_NOT_WORKING )
 GAME( 1996, schamp,     0,        model2b,      schamp,    model2b_state, empty_init,    ROT0, "Sega",   "Sonic Championship (USA)", MACHINE_NOT_WORKING )
 GAME( 1996, sfight,     schamp,   model2b,      schamp,    model2b_state, empty_init,    ROT0, "Sega",   "Sonic the Fighters (Japan)", MACHINE_NOT_WORKING )
-GAME( 1996, lastbrnx,   0,        model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (Export, Revision A)", MACHINE_NOT_WORKING )
-GAME( 1996, lastbrnxu,  lastbrnx, model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (USA, Revision A)", MACHINE_NOT_WORKING )
-GAME( 1996, lastbrnxj,  lastbrnx, model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx: Tokyo Bangaichi (Japan, Revision A)", MACHINE_NOT_WORKING )
+GAME( 1996, lastbrnx,   0,        lastbrnx,     vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (Export, Revision A)", MACHINE_NOT_WORKING )
+GAME( 1996, lastbrnxu,  lastbrnx, lastbrnx,     vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (USA, Revision A)", MACHINE_NOT_WORKING )
+GAME( 1996, lastbrnxj,  lastbrnx, lastbrnx,     vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx: Tokyo Bangaichi (Japan, Revision A)", MACHINE_NOT_WORKING )
 GAME( 1996, doa,        0,        model2b_0229, doa,       model2b_state, empty_init,    ROT0, "Tecmo",  "Dead or Alive (Model 2B, Revision C)", 0 ) // Jan 10 1997
 GAME( 1996, doab,       doa,      model2b_0229, doa,       model2b_state, empty_init,    ROT0, "Tecmo",  "Dead or Alive (Model 2B, Revision B)", 0 ) // Dec 4 1996
 GAME( 1996, sgt24h,     0,        indy500,      sgt24h,    model2b_state, init_sgt24h,   ROT0, "Jaleco", "Super GT 24h", MACHINE_NOT_WORKING )
