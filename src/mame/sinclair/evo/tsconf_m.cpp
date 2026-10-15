@@ -229,20 +229,21 @@ void tsconf_state::tsconf_draw_txt(bitmap_rgb32 &bitmap, const rectangle &clipre
 	{
 		u16 hpos = cliprect.left();
 		u16 x = hpos - get_screen_area().left();
+		u16 x_offset = (OFFS_512(G_X_OFFS_L) + x) & 0x3ff;
 		u16 y = vpos - get_screen_area().top();
 		u16 y_offset = (OFFS_512(G_Y_OFFS_L) + y) & 0x1ff;
 
-		// TODO? u16 x_offset = OFFS_512(G_X_OFFS_L);
-		u8 *text_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + (y_offset / 8 * 256 + x / 8);
+		u8 *row_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + (y_offset / 8 * 256);
+		u8 *text_location = row_location + (x_offset / 8);
 		u32 *pix = &(bitmap.pix(vpos, hpos));
 		while (hpos <= cliprect.right())
 		{
 			u8 font_color = text_location[128] & 0x0f;
 			u8 bg_color = (text_location[128] & 0xf0) >> 4;
 			u8 char_x = font_location[(text_location[0] * 8) + (y_offset % 8)];
-			for (u8 b = 0x80 >> (x & 0x07); b != 0 && hpos <= cliprect.right(); b >>= 1, x++, hpos++)
+			for (u8 b = 0x80 >> (x_offset & 0x07); b != 0 && hpos <= cliprect.right(); b >>= 1, x_offset++, hpos++)
 				*pix++ = m_palette->pen_color(pal_offset | ((char_x & b) ? font_color : bg_color));
-			text_location++;
+			text_location = row_location + (((text_location - row_location) + 1) & 0x7f);
 		}
 	}
 }
