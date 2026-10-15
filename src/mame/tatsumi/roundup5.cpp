@@ -68,8 +68,8 @@ private:
 	void roundup5_v30_map(address_map &map) ATTR_COLD;
 	void roundup5_z80_map(address_map &map) ATTR_COLD;
 
-	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t type);
+	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, const bitmap_ind8 &shadow);
+	void draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, const bitmap_ind8 &shadow, uint8_t type);
 
 	required_device<cpu_device> m_subcpu;
 
@@ -135,7 +135,10 @@ void roundup5_state::video_start()
 	save_pointer(NAME(m_bg_gfxram), 0x20000);
 }
 
-void roundup5_state::draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+// Offset between the normal and shadow halves of the palette
+static constexpr int SHADOW_PALETTE_OFFSET = 0x200;
+
+void roundup5_state::draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, const bitmap_ind8 &shadow)
 {
 /*
 0xf980 0x0008 0x8c80 0x4a00 - road right to below, width unknown (32 pixels guess)
@@ -279,7 +282,7 @@ pos is 11.5 fixed point
 				col = linedata[0x80] & 0xf;                  // between the sets
 				bank = 32;
 			}
-			dest[x] = m_palette->pen(256 + pal*16 + col + bank);
+			dest[x] = m_palette->pen(256 + pal*16 + col + bank + (shadow.pix(y, x) ? SHADOW_PALETTE_OFFSET : 0));
 		}
 		data+=4;
 	}
@@ -288,7 +291,7 @@ pos is 11.5 fixed point
 // background layer landscape for Round Up 5
 // two bitmap layers, back layer is 512 x 128, the other one is 512 x 64
 // it's safe to assume that three monitor version will have a different arrangement here ...
-void roundup5_state::draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t type)
+void roundup5_state::draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, const bitmap_ind8 &shadow, uint8_t type)
 {
 	// TODO: guess, assume back layer having less scroll increment than front for parallax scrolling.
 	// also notice that m_vregs[8/2] >> 8 is identical to [0x0c/2], always?
@@ -319,7 +322,7 @@ void roundup5_state::draw_landscape(bitmap_rgb32 &bitmap, const rectangle &clipr
 			color &= 0xf;
 
 			if(cliprect.contains(x, y+y_scroll) && color)
-				bitmap.pix(y+y_scroll, x) = m_palette->pen(color+color_base);
+				bitmap.pix(y+y_scroll, x) = m_palette->pen(color + color_base + (shadow.pix(y+y_scroll, x) ? SHADOW_PALETTE_OFFSET : 0));
 		}
 	}
 }
@@ -336,13 +339,26 @@ uint32_t roundup5_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	m_tx_layer->set_scrollx(0,24);
 	m_tx_layer->set_scrolly(0,(tx_start_addr >> 4) | m_hd6445_reg[0x1d]);
 
-	bitmap.fill(m_palette->pen(384), cliprect); // todo
 	screen.priority().fill(0, cliprect);
 	m_sprites->draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
-	draw_landscape(bitmap,cliprect,0);
-	draw_landscape(bitmap,cliprect,1);
-	draw_road(bitmap,cliprect);
-	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), 0);
+
+	// Pixels under a shadow sprite take their colour from the shadow half of the palette, not a
+	// dimmed copy of the normal one. The game fills that half with the scenery colours while it is
+	// in a tunnel (and blacks out the normal half), so the tunnel mouth, a shadow sprite, reveals
+	// the scenery beyond it as it grows.
+	bitmap_ind8 const &shadow = screen.priority();
+	pen_t const fill_pen = m_palette->pen(384); // todo
+	pen_t const shadow_pen = m_palette->pen(384 + SHADOW_PALETTE_OFFSET);
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		uint32_t *const dest = &bitmap.pix(y);
+		uint8_t const *const src = &shadow.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+			dest[x] = src[x] ? shadow_pen : fill_pen;
+	}
+	draw_landscape(bitmap,cliprect,shadow,0);
+	draw_landscape(bitmap,cliprect,shadow,1);
+	draw_road(bitmap,cliprect,shadow);
 	if(m_control_word & 0x80) // enabled on map screen after a play
 	{
 		m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
