@@ -342,10 +342,9 @@ uint32_t roundup5_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	screen.priority().fill(0, cliprect);
 	m_sprites->draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
 
-	// Pixels under a shadow sprite take their colour from the shadow half of the palette, not a
-	// dimmed copy of the normal one. The game fills that half with the scenery colours while it is
-	// in a tunnel (and blacks out the normal half), so the tunnel mouth, a shadow sprite, reveals
-	// the scenery beyond it as it grows.
+	// Pixels under a shadow sprite take their colour from the shadow half of the palette. While in
+	// a tunnel the game fills that half with the scenery colours (and blacks out the normal half),
+	// so the tunnel mouth, a shadow sprite, reveals the scenery beyond it as it grows.
 	bitmap_ind8 const &shadow = screen.priority();
 	pen_t const fill_pen = m_palette->pen(384); // todo
 	pen_t const shadow_pen = m_palette->pen(384 + SHADOW_PALETTE_OFFSET);

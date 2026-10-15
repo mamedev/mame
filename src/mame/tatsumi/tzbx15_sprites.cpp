@@ -265,15 +265,15 @@ void tzbx15_device::draw_sprite(BitmapClass &bitmap, const rectangle &cliprect,
 				(int64_t(py - y) << 16) + 0x8000);
 		int64_t sprite_x = start_x;
 		int64_t sprite_y = start_y;
-		typename BitmapClass::pixel_t *const dest = &bitmap.pix(py);
+		auto *const dest = &bitmap.pix(py);
 		int last_dist_y = -1, line = 0, h = 0;
 		bool line_ok = false;
 
 		for (int px = bounds.left(); px <= bounds.right(); px++, sprite_x += step_x, sprite_y += step_y)
 		{
 			// Distance from the origin in the scaled sprite, which grows away from it whichever way it is flipped
-			int const dist_x = flip_x ? int(-(sprite_x >> 40)) - 1 : int(sprite_x >> 40);
-			int const dist_y = flip_y ? int(-(sprite_y >> 40)) - 1 : int(sprite_y >> 40);
+			int const dist_x = flip_x ? int(-(sprite_x >> 40) - 1) : int(sprite_x >> 40);
+			int const dist_y = flip_y ? int(-(sprite_y >> 40) - 1) : int(sprite_y >> 40);
 			if (dist_x < 0 || dist_y < 0)
 				continue;
 
