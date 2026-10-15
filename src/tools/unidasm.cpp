@@ -77,6 +77,7 @@ using util::BIT;
 #include "cpu/hphybrid/hphybrid_dasm.h"
 #include "cpu/ht1130/ht1130d.h"
 #include "cpu/i386/i386dasm.h"
+#include "cpu/i750/i750d.h"
 #include "cpu/i8008/8008dasm.h"
 #include "cpu/i8085/8085dasm.h"
 #include "cpu/i8089/i8089_dasm.h"
@@ -509,6 +510,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "ht1130",          le,  0, []() -> util::disasm_interface * { return new ht1130_disassembler; } },
 	{ "i4004",           le,  0, []() -> util::disasm_interface * { return new i4004_disassembler; } },
 	{ "i4040",           le,  0, []() -> util::disasm_interface * { return new i4040_disassembler; } },
+	{ "i750",            le, -3, []() -> util::disasm_interface * { return new i750_disassembler; } },
 	{ "i8008",           le,  0, []() -> util::disasm_interface * { return new i8008_disassembler; } },
 	{ "i802x",           le,  0, []() -> util::disasm_interface * { return new mcs48_disassembler(false, true); } },
 	{ "i8051",           le,  0, []() -> util::disasm_interface * { return new i8051_disassembler; } },

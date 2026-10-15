@@ -1405,6 +1405,23 @@ if CPUS["I386"] then
 end
 
 --------------------------------------------------
+-- Intel 82750PB
+--@src/devices/cpu/i750/i750.h,CPUS["I750"] = true
+--------------------------------------------------
+
+if CPUS["I750"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/i750/i750.cpp",
+		MAME_DIR .. "src/devices/cpu/i750/i750.h",
+	}
+end
+
+if opt_tool(CPUS, "I750") then
+	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/i750/i750d.cpp")
+	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/i750/i750d.h")
+end
+
+--------------------------------------------------
 -- Intel i860
 --@src/devices/cpu/i860/i860.h,CPUS["I860"] = true
 --------------------------------------------------
