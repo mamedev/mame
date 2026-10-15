@@ -1885,11 +1885,13 @@ ROM_END
 /************  Miki S.R.L. sets  ************/
 
 /*
-  Rula (roulette, encrypted)
+  Rula (roulette)
   Miki S.R.L.
   1991.
 
   Argentina.
+
+  Program is encrypted.
 
   Notes:
   blitter and inputs seems mapped as winner81.
@@ -1900,19 +1902,21 @@ ROM_START(rulamiky)
 	ROM_LOAD("rula.bin", 0x0000, 0x8000, CRC(a866cb05) SHA1(ffc9b05d26f312c0ba1468c33b00ac503876c836) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )  // IM1 instead of NMI. Identical halves
-	ROM_LOAD("son_2732_8ccc.bin",   0x0000, 0x1000, CRC(c944a4ae) SHA1(989ec9f39a7761aa73d08ca39b081cb2c4c75a7c) )
+	ROM_LOAD("son_2732.bin",   0x0000, 0x1000, CRC(c944a4ae) SHA1(989ec9f39a7761aa73d08ca39b081cb2c4c75a7c) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "corona_82s123.bin",  0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
 
 /*
-  Monte (cards game, encrypted)
-  40 cards game, 4 jokers.
+  Monte.
+  40 cards game with 4 jokers.
   Miki S.R.L.
   1989.
 
   Argentina.
+
+  Program is encrypted.
 
   Notes:
   blitter and inputs seems mapped as winner82.
@@ -1923,7 +1927,7 @@ ROM_START(monte)
 	ROM_LOAD("monte.bin", 0x0000, 0x8000, CRC(d72d0905) SHA1(4642224e8ee3b1e32198ce605c73aafa4f18f5db) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )  // IM1 instead of NMI. Identical halves
-	ROM_LOAD("son_2732_8ccc.bin",   0x0000, 0x1000, CRC(c944a4ae) SHA1(989ec9f39a7761aa73d08ca39b081cb2c4c75a7c) )
+	ROM_LOAD("son_2732.bin",   0x0000, 0x1000, CRC(c944a4ae) SHA1(989ec9f39a7761aa73d08ca39b081cb2c4c75a7c) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "corona_82s123.bin",  0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
@@ -1965,5 +1969,5 @@ GAMEL( 199?, rcirulet,  0,        rcirulet,  re800,    corona_state, empty_init,
 GAMEL( 1990, luckyrlt,  0,        luckyrlt,  luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish, set 1)", 0,                        layout_luckyrlt )
 GAMEL( 1991, luckyrlta, luckyrlt, luckyrlta, luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish, set 2)", 0,                        layout_luckyrlt )
 
-GAME(  1989, monte,     winner82, monte,     winner82, corona_state, init_rulam, ROT0,   "Miky S.R.L.",              "Monte (cards game, encrypted)",                   MACHINE_NOT_WORKING )
-GAME(  1991, rulamiky,  winner82, winner82,  winner82, corona_state, init_rulam, ROT90,  "Miky S.R.L.",              "Rula (roulette, encrypted)",                      MACHINE_NOT_WORKING )
+GAME(  1989, monte,     0,        monte,     winner82, corona_state, init_rulam, ROT0,   "Miky S.R.L.",              "Monte (6-players Spanish cards game, encrypted)", MACHINE_NOT_WORKING )
+GAME(  1991, rulamiky,  0,        winner82,  winner82, corona_state, init_rulam, ROT90,  "Miky S.R.L.",              "Rula (roulette, encrypted)",                      MACHINE_NOT_WORKING )
