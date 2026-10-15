@@ -30,6 +30,7 @@
  *   - Dimmer support
  *   - Refactoring for multiplanar framebuffer support (NWB-225A color framebuffer, etc.). The implementation uses the same raster operation controller,
  *     so the eventual drivers for those (when ROM dumps and board pictures are available) will be able to share code with the NWB-512.
+ *   - Determine dimming amounts from real hardware
  */
 
 #include "emu.h"
@@ -146,6 +147,8 @@ void nwb_512_device::map(address_map &map)
 
 u32 nwb_512_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, [[maybe_unused]] const rectangle &cliprect)
 {
+	const rgb_t white = current_dim_color();
+
 	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; ++y)
 	{
 		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 8)
@@ -155,7 +158,7 @@ u32 nwb_512_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, [
 
 			for (int i = 0; i < 8 && (x + i) <= screen.visible_area().max_x; ++i)
 			{
-				bitmap.pix(y, x + i) = byte & (1u << x_to_pixel_offset(x + i)) ? rgb_t::black() : rgb_t::white();
+				bitmap.pix(y, x + i) = byte & (1u << x_to_pixel_offset(x + i)) ? rgb_t::black() : white;
 			}
 		}
 	}
@@ -755,6 +758,22 @@ uint16_t nwb_512_device::coordinate_to_data(uint16_t x, uint16_t y)
 {
 	const uint32_t byte_offset = coordinate_to_byte_offset_aligned(x, y);
 	return (m_vram->read(byte_offset) << 8) | m_vram->read(byte_offset + 1);
+}
+
+rgb_t nwb_512_device::current_dim_color()
+{
+	// Assume darkest dim is 25% brightness (0b11) with 50% (0b10) and 75% (0b01) as the other options.
+	// The DSC-001 dim functions in iopboot/mrx write 0b11 to bits 7:6 of the status register when the
+	// sxsession screen saver is active. The NWS-15xx service manual backs this up for the DSC-007 from 0b00 (brightest) -> 0b11 (darkest),
+	// but does not elaborate on the exact degree of dimming.
+	const uint8_t dim = (m_state.ctrl & 0xC0) >> 6;
+	if (!dim)
+	{
+		return rgb_t::white();
+	}
+
+	const uint8_t gray_value = 64 * (4 - dim);
+	return rgb_t(gray_value, gray_value, gray_value);
 }
 
 ROM_START(nwb_512)

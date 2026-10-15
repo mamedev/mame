@@ -113,6 +113,7 @@ private:
 			fatalerror("nwb_512: framebuffer not enabled when interaction started");
 		}
 	}
+	rgb_t current_dim_color();
 };
 
 DECLARE_DEVICE_TYPE(NWB_512, nwb_512_device)
