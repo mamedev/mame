@@ -219,6 +219,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	void sound_bankswitch_w(u8 data);
@@ -319,13 +320,13 @@ protected:
 	optional_region_ptr<u32> m_dvi_rom;
 	optional_region_ptr<u8> m_dvi_decrypt;
 
-	std::unique_ptr<u8[]> m_dirty_palette{};
-	std::unique_ptr<u16[]> m_rowscroll[4]{};
+	std::unique_ptr<u8[]> m_dirty_palette;
+	std::unique_ptr<u16[]> m_rowscroll[4];
 
-	u32 m_sprite_ctrl = 0U;
-	u32 m_lightgun_port = 0;
-	u32 m_oki2_bank = 0; // lockload
-	u32 m_dvi_control = 0;
+	u32 m_sprite_ctrl;
+	u32 m_lightgun_port;
+	u32 m_oki2_bank; // lockload
+	u32 m_dvi_control;
 	u32 m_mixctrl;
 };
 
@@ -1129,6 +1130,14 @@ void dragngun_state::machine_start()
 	}
 }
 
+void dragngun_state::machine_reset()
+{
+	m_sprite_ctrl = 0;
+	m_lightgun_port = 0;
+	m_oki2_bank = 0;
+	m_dvi_control = 0;
+	m_mixctrl = 0;
+}
 
 void dragngun_state::namco_sprites(machine_config &config)
 {
