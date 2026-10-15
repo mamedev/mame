@@ -34,12 +34,11 @@ public:
 		SSD1306_ADDRESSING_MODE_INVALID    = 0b11
 	};
 
-	ssd1306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual uint32_t palette_entries() const noexcept override;
-	
 	// scrolling and alternate scan modes still need to be implemented
+	static constexpr flags_type emulation_flags() { return flags::SAVE_UNSUPPORTED; }
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
+	ssd1306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_external_oscillator(bool use_external_oscillator);
 	void set_intf_mode(uint8_t mode);
@@ -68,12 +67,15 @@ public:
 	void rst_w(int rst);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	virtual uint32_t palette_entries() const noexcept override;
+
 private:
-	void 	raw_write(int dc_line, uint8_t data);
+	void    raw_write(int dc_line, uint8_t data);
 	uint8_t raw_read(int dc_line);
 
 	/**
@@ -81,7 +83,7 @@ private:
 	 * Return true when n bytes are in FIFO.
 	 */
 	bool populate_fifo_until_n_bytes(uint8_t data, int num_bytes);
-	
+
 	void handle_invalid_command();
 
 	void exec_command(uint8_t data);
@@ -99,7 +101,7 @@ private:
 	bool m_using_external_oscillator;
 	uint8_t m_pending_interface_mode;
 	bool m_dc_internal_state; // last latched D/C# value
-	
+
 	// ... the following are all set or affected by commands ...
 
 	// Commands 0x01-0x1f
@@ -155,7 +157,7 @@ private:
 
 	// commands 0xc0, 0xc8
 	bool m_row_scan_direction_inverse;
-	
+
 	// command 0xd3
 	uint8_t m_display_offset;
 
@@ -197,7 +199,7 @@ private:
 	bool m_base_rowscan_invert;
 
 	// display memory: one "page" is 8 pixels tall, one line is 128 pixels long
-	std::unique_ptr<uint8_t[]> m_gddram;
+	std::unique_ptr<uint8_t []> m_gddram;
 };
 
-#endif
+#endif // MAME_VIDEO_SSD1306_H

@@ -1574,6 +1574,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/fs8806.h,MACHINES["FS8806"] = true
+---------------------------------------------------
+
+if MACHINES["FS8806"] then
+	files {
+		MAME_DIR .. "src/devices/machine/fs8806.cpp",
+		MAME_DIR .. "src/devices/machine/fs8806.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/gt913_kbd.h,MACHINES["GT913_KBD"] = true
 ---------------------------------------------------
 
@@ -5866,5 +5878,17 @@ if MACHINES["AT_SSRT"] then
 	files {
 		MAME_DIR .. "src/devices/machine/at_ssrt.cpp",
 		MAME_DIR .. "src/devices/machine/at_ssrt.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/pls105.h,MACHINES["PLS105"] = true
+---------------------------------------------------
+
+if MACHINES["PLS105"] then
+	files {
+		MAME_DIR .. "src/devices/machine/pls105.cpp",
+		MAME_DIR .. "src/devices/machine/pls105.h",
 	}
 end

@@ -256,11 +256,11 @@ void bbusters_state::video_start()
 template <typename Proc>
 void bbusters_state::mix_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &cliprect, Proc MIX)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t const *const srcbuf = &srcbitmap.pix(y);
 		uint16_t *const dstbuf = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint16_t const srcdat = srcbuf[x];
 			if ((srcdat & 0xf) != 0xf)

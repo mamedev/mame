@@ -35,25 +35,34 @@ inline bool arcompact_device::check_condition(uint8_t condition)
 }
 
 
-inline void arcompact_device::do_flags_overflow(uint32_t result, uint32_t b, uint32_t c)
+inline void arcompact_device::do_flags_overflow_add(uint32_t result, uint32_t b, uint32_t c)
 {
-	if ((b & 0x80000000) == (c & 0x80000000))
+	if ((b & 0x80000000) == (c & 0x80000000) && (result & 0x80000000) != (b & 0x80000000))
 	{
-		if ((result & 0x80000000) != (b & 0x80000000))
-		{
-			status32_set_v();
-		}
-		else
-		{
-			status32_clear_v();
-		}
+		status32_set_v();
+	}
+	else
+	{
+		status32_clear_v();
+	}
+}
+
+inline void arcompact_device::do_flags_overflow_sub(uint32_t result, uint32_t b, uint32_t c)
+{
+	if ((b & 0x80000000) != (c & 0x80000000) && (result & 0x80000000) != (b & 0x80000000))
+	{
+		status32_set_v();
+	}
+	else
+	{
+		status32_clear_v();
 	}
 }
 
 inline void arcompact_device::do_flags_add(uint32_t result, uint32_t b, uint32_t c)
 {
 	do_flags_nz(result);
-	do_flags_overflow(result, b, c);
+	do_flags_overflow_add(result, b, c);
 
 	if (result < b)
 	{
@@ -68,7 +77,7 @@ inline void arcompact_device::do_flags_add(uint32_t result, uint32_t b, uint32_t
 inline void arcompact_device::do_flags_sub(uint32_t result, uint32_t b, uint32_t c)
 {
 	do_flags_nz(result);
-	do_flags_overflow(result, b, c);
+	do_flags_overflow_sub(result, b, c);
 
 	if (result > b)
 	{
@@ -184,7 +193,9 @@ inline uint32_t arcompact_device::handleop32_general(uint32_t op, ophandler32 op
 		uint8_t breg = common32_get_breg(op);
 		uint8_t creg = common32_get_creg(op);
 		int size = check_limm(breg, creg);
-		m_regs[common32_get_areg(op)] = ophandler(*this, m_regs[breg], m_regs[creg], common32_get_F(op));
+		u32 const src1 = read_reg(breg);
+		u32 const src2 = read_reg(creg);
+		write_reg(common32_get_areg(op), ophandler(*this, src1, src2, common32_get_F(op)));
 		return m_pc + size;
 	}
 
@@ -192,14 +203,14 @@ inline uint32_t arcompact_device::handleop32_general(uint32_t op, ophandler32 op
 	{
 		uint8_t breg = common32_get_breg(op);
 		int size = check_limm(breg);
-		m_regs[common32_get_areg(op)] = ophandler(*this, m_regs[breg], common32_get_u6(op), common32_get_F(op));
+		write_reg(common32_get_areg(op), ophandler(*this, read_reg(breg), common32_get_u6(op), common32_get_F(op)));
 		return m_pc + size;
 	}
 	case 0x02:
 	{
 		uint8_t breg = common32_get_breg(op);
 		int size = check_limm(breg);
-		m_regs[breg] = ophandler(*this, m_regs[breg], common32_get_s12(op), common32_get_F(op));
+		write_reg(breg, ophandler(*this, read_reg(breg), common32_get_s12(op), common32_get_F(op)));
 		return m_pc + size;
 	}
 	case 0x03:
@@ -212,7 +223,11 @@ inline uint32_t arcompact_device::handleop32_general(uint32_t op, ophandler32 op
 			uint8_t creg = common32_get_creg(op);
 			int size = check_limm(breg, creg);
 			if (check_condition(common32_get_condition(op)))
-				m_regs[breg] = ophandler(*this, m_regs[breg], m_regs[creg], common32_get_F(op));
+			{
+				u32 const src1 = read_reg(breg);
+				u32 const src2 = read_reg(creg);
+				write_reg(breg, ophandler(*this, src1, src2, common32_get_F(op)));
+			}
 			return m_pc + size;
 		}
 		case 0x01:
@@ -220,7 +235,7 @@ inline uint32_t arcompact_device::handleop32_general(uint32_t op, ophandler32 op
 			uint8_t breg = common32_get_breg(op);
 			int size = check_limm(breg);
 			if (check_condition(common32_get_condition(op)))
-				m_regs[breg] = ophandler(*this, m_regs[breg], common32_get_u6(op), common32_get_F(op));
+				write_reg(breg, ophandler(*this, read_reg(breg), common32_get_u6(op), common32_get_F(op)));
 			return m_pc + size;
 		}
 		}
@@ -349,16 +364,15 @@ inline uint32_t arcompact_device::handleop32_general_SOP_group(uint32_t op, opha
 	{
 		uint8_t breg = common32_get_breg(op);
 		uint8_t creg = common32_get_creg(op);
-		int size = check_limm(breg, creg);
+		int size = check_limm(creg);
 		m_regs[breg] = ophandler(*this, m_regs[creg], common32_get_F(op));
 		return m_pc + size;
 	}
 	case 0x01:
 	{
 		uint8_t breg = common32_get_breg(op);
-		int size = check_limm(breg);
 		m_regs[breg] = ophandler(*this, common32_get_u6(op), common32_get_F(op));
-		return m_pc + size;
+		return m_pc + 4;
 	}
 	case 0x02:
 	case 0x03:

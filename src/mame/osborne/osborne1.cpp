@@ -631,7 +631,7 @@ void osborne1sp_state::machine_reset()
 template <int Width, unsigned Scale>
 inline void osborne1_state::draw_rows(uint16_t col, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; cliprect.max_y >= y; ++y)
+	for (int y = cliprect.top(); cliprect.bottom() >= y; ++y)
 	{
 		// Vertical scroll is latched at the start of the visible area
 		if (0 == y)

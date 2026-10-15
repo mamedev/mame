@@ -325,7 +325,7 @@ void gp32_state::s3c240x_lcd_configure()
 	framerate = vclk / (((vspw + 1) + (vbpd + 1) + (lineval + 1) + (vfpd + 1)) * ((hspw + 1) + (hbpd + 1) + (hfpd + 1) + (hozval + 1)));
 	LOGMASKED(LOG_VRAM, "LCD - framerate %f\n", framerate);
 	visarea.set(0, hozval, 0, lineval);
-	LOGMASKED(LOG_VRAM, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+	LOGMASKED(LOG_VRAM, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
 	m_screen->configure(hozval + 1, lineval + 1, visarea, attotime::from_hz(framerate));
 }
 

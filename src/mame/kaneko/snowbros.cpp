@@ -3106,8 +3106,9 @@ ROM_START( yutnori )
 	ROM_LOAD16_BYTE( "sys_d0-d7",    0x000001, 0x20000, CRC(d5c853da) SHA1(578f29c3a307f82fcaa23a7fe2931c0a673e777e) )
 	ROM_LOAD16_BYTE( "sys_d8-d15",   0x000000, 0x20000, CRC(bf108119) SHA1(e64f64ddb577d6750cbc3a6c9d8d2ec4482cafe0) )
 
-	ROM_REGION( 0x4010, "mcu", 0 )    /* PIC code */
-	ROM_LOAD( "pic16c64a-04-p",    0x000000, 0x4010, BAD_DUMP CRC(46fd3671) SHA1(54cf7a38f7743cdad73a2741183b2720ee42e6c8) ) // dump seems to be 99% empty, protected, only configuration bytes dumped?
+	// no code, just the user ids and configuration word
+	ROM_REGION16_LE( 0x4010, "mcu", 0 )
+	ROM_LOAD( "pic16c64a-04-p", 0x0000, 0x4010, BAD_DUMP CRC(46fd3671) SHA1(54cf7a38f7743cdad73a2741183b2720ee42e6c8) )
 
 	ROM_REGION( 0x120000, "gfx1", ROMREGION_ERASE00 )
 	ROM_LOAD( "graphics_rom_1",    0x000000, 0x80000, CRC(d4881b49) SHA1(e169b7eca48a0bd66ad55fe21197a4bb491198bb) )

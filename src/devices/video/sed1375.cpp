@@ -139,10 +139,10 @@ u32 sed1375_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		return 0;
 	}
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u32 *dst = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			u32 pix = get_pixel(0, x, y);
 			if (BIT(m_mode[0], MODE0_TFT_BIT) || BIT(m_mode[0], MODE0_COLOR_BIT))

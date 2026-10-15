@@ -213,10 +213,10 @@ void aztarac_state::video_start()
 {
 	const rectangle &visarea = m_vector->visible_area();
 
-	int xmin = visarea.min_x;
-	int ymin = visarea.min_y;
-	int xmax = visarea.max_x;
-	int ymax = visarea.max_y;
+	int xmin = visarea.left();
+	int ymin = visarea.top();
+	int xmax = visarea.right();
+	int ymax = visarea.bottom();
 
 	m_xcenter = ((xmax + xmin) / 2) << 16;
 	m_ycenter = ((ymax + ymin) / 2) << 16;

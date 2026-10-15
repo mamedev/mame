@@ -570,8 +570,8 @@ uint32_t sega_ferie_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 	update_crosshair(screen);
 
 	// Render LCD
-	for (size_t y = cliprect.min_y; y <= cliprect.max_y; y++) {
-		for (size_t x = cliprect.min_x; x <= cliprect.max_x / 8; x++) {
+	for (size_t y = cliprect.top(); y <= cliprect.bottom(); y++) {
+		for (size_t x = cliprect.left(); x <= cliprect.right() / 8; x++) {
 			uint8_t data = get_lcd_dots(x, y);
 			for (size_t bit_i = 0; bit_i < 8; bit_i++) {
 				// TODO: Adjust based on configured contrast

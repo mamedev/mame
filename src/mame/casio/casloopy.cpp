@@ -1007,7 +1007,7 @@ u32 casloopy_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		pri_table[i] = priority(bmode, mode2, mode, pri_select, i);
 
 	// Combine the layers
-	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
 		const bool rback_en = (y == wy) && m_readback_latch;
 
@@ -1016,7 +1016,7 @@ u32 casloopy_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 		update_scanline_buffers(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
+		for (int x = cliprect.left(); x <= cliprect.right(); ++x)
 		{
 			u16 pixels[11] = {};
 

@@ -31,13 +31,18 @@
 #include "emu.h"
 #include "ssd1306.h"
 
+#include <algorithm>
+
+
+namespace {
+
 // The way to set BANK0_pulse_width isn't really described in the datasheet.
 // For now, we treat it as a constant 50.
-#define BANK0_PULSE_WIDTH 50
+constexpr int BANK0_PULSE_WIDTH = 50;
 
 // It isn't really possible to get the exact frequencies because the chip
 // is usually embedded into the display panel itself.
-static const int INTERNAL_OSCILLATOR_FREQUENCIES[] =
+constexpr int INTERNAL_OSCILLATOR_FREQUENCIES[] =
 {
 	280'000,  // 0 (known absolute lowest)
 	291'250,  // 1 (guessed)
@@ -57,7 +62,7 @@ static const int INTERNAL_OSCILLATOR_FREQUENCIES[] =
 	540'000,  // 15 (known absolute highest)
 };
 
-static const int SCROLL_FRAME_FREQUENCY_COUNT[8] =
+constexpr int SCROLL_FRAME_FREQUENCY_COUNT[8] =
 {
 	5,    // 0b000
 	64,   // 0b001
@@ -68,6 +73,9 @@ static const int SCROLL_FRAME_FREQUENCY_COUNT[8] =
 	25,   // 0b110
 	2     // 0b111
 };
+
+} // anonymous namespace
+  //
 
 DEFINE_DEVICE_TYPE(SSD1306, ssd1306_device, "ssd1306", "Solomon Systech SSD1306 OLED display driver")
 
@@ -80,8 +88,8 @@ ssd1306_device::ssd1306_device(const machine_config &mconfig, const char *tag, d
 
 void ssd1306_device::device_start()
 {
-	m_gddram = std::make_unique<uint8_t[]>(128 * 8);
-	memset(m_gddram.get(), 0, 128 * 8);
+	m_gddram = std::make_unique<uint8_t []>(128 * 8);
+	std::fill_n(m_gddram.get(), 128 * 8, 0);
 }
 
 void ssd1306_device::device_reset()
@@ -170,14 +178,17 @@ inline void ssd1306_device::handle_invalid_command()
 	logerror("%s: invalid/unimplemented command %02x\n", machine().describe_context(), m_command_fifo[0]);
 }
 
-#define DUMMY_BYTE_CHECK(fifopos, expected) \
-	if (m_command_fifo[fifopos] != expected) \
-	{ \
-		logerror("%s: dummy byte in FIFO pos %d should be %02x, was %02x\n", machine().describe_context(), fifopos, expected, m_command_fifo[fifopos]); \
-	};
-
 void ssd1306_device::exec_command_2x(uint8_t data)
 {
+	auto const dummy_byte_check =
+			[this] (unsigned fifopos, uint8_t expected)
+			{
+				if (m_command_fifo[fifopos] != expected)
+				{
+					logerror("%s: dummy byte in FIFO pos %d should be %02x, was %02x\n", machine().describe_context(), fifopos, expected, m_command_fifo[fifopos]);
+				};
+			};
+
 	switch (m_command_fifo[0])
 	{
 		case 0x20: // set addressing mode
@@ -232,12 +243,12 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 
 			m_horizontal_scroll_pending = true;
 			m_horizontal_scrolling_left_pending = BIT(m_command_fifo[0], 0);
-			DUMMY_BYTE_CHECK(1, 0);
+			dummy_byte_check(1, 0);
 			m_horizontal_scroll_page_start_address_pending = BIT(m_command_fifo[2], 0, 3);
 			m_horizontal_scroll_interval_pending = BIT(m_command_fifo[3], 0, 3);
 			m_horizontal_scroll_page_end_address_pending = BIT(m_command_fifo[4], 0, 3);
-			DUMMY_BYTE_CHECK(5, 0);
-			DUMMY_BYTE_CHECK(6, 0xff);
+			dummy_byte_check(5, 0);
+			dummy_byte_check(6, 0xff);
 			break;
 
 		case 0x29:
@@ -247,7 +258,7 @@ void ssd1306_device::exec_command_2x(uint8_t data)
 			m_horizontal_scroll_pending = true;
 			m_vertical_scroll_pending = true;
 			m_horizontal_scrolling_left_pending = BIT(m_command_fifo[0], 0);
-			DUMMY_BYTE_CHECK(1, 0);
+			dummy_byte_check(1, 0);
 			m_horizontal_scroll_page_start_address_pending = BIT(m_command_fifo[2], 0, 3);
 			m_horizontal_scroll_interval_pending = BIT(m_command_fifo[3], 0, 3);
 			m_horizontal_scroll_page_end_address_pending = BIT(m_command_fifo[4], 0, 3);
@@ -483,7 +494,7 @@ void ssd1306_device::exec_command(uint8_t data)
 			{
 				if (!populate_fifo_until_n_bytes(data, 1)) return;
 
-				m_row_scan_direction_inverse = (m_command_fifo[0] & 8);	
+				m_row_scan_direction_inverse = (m_command_fifo[0] & 8);
 				return;
 			}
 			handle_invalid_command();
@@ -534,7 +545,7 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
 	//
 	// "Vertical addressing" mode = write pixels top to bottom,
 	// left to right
-	// 
+	//
 	// The Adafruit SSD1306 driver and most Arduboy games seem to use
 	// horizontal mode exclusively; drawing to a framebuffer on the
 	// ATMega chip, then copying it over to the display in one shot.
@@ -747,7 +758,7 @@ uint32_t ssd1306_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	screen.palette().set_pen_color(0, rgb_t::black());
 	screen.palette().set_pen_color(1, m_contrast, m_contrast, m_contrast);
-	
+
 	bitmap.fill(screen.palette().pen(0), cliprect);
 	if (!m_display_enabled)
 	{

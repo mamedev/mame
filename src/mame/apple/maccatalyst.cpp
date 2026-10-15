@@ -80,7 +80,7 @@ private:
 
 	void slot_irq_handler(int line, int state);
 
-	required_device<ppc_device> m_maincpu;
+	required_device<ppc601_device> m_maincpu;
 	required_device<pci_root_device> m_pci_root;
 	required_device<bandit_host_device> m_bandit;
 	required_device<grandcentral_device> m_grandcentral;
@@ -233,6 +233,7 @@ INPUT_PORTS_END
 void catalyst_state::pm7200(machine_config &config)
 {
 	PPC601(config, m_maincpu, 75_MHz_XTAL);
+	m_maincpu->set_rtc_clock(31.3344_MHz_XTAL / 4);
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS | PPCDRC_MACOS_CACHE_HACK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &catalyst_state::pm7200_map);
 

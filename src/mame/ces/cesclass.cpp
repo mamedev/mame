@@ -135,9 +135,10 @@ void cesclassic_state::dma_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 
 		rectangle cliprect = m_screen[N]->visible_area();
 
-		for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			for(int x = cliprect.min_x; x <= cliprect.max_x; x+= 16)
+			auto *const dst = &m_lcd_bitmap[N].pix(y);
+			for(int x = cliprect.left(); x <= cliprect.right(); x+= 16)
 			{
 				const u32 base_offset = ((x + base_screen) >> 4) + y * 16;
 				const u16 cell_high = vram[base_offset];
@@ -146,7 +147,7 @@ void cesclassic_state::dma_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 				{
 					const u8 color = BIT(cell_low, 15 - xi) | (BIT(cell_high, 15 - xi) << 1);
 
-					m_lcd_bitmap[N].pix(y, x + xi) = m_palette->pen(color);
+					dst[x + xi] = m_palette->pen(color);
 				}
 			}
 		}

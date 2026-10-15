@@ -223,7 +223,7 @@ bool x68k_state::draw_gfx_scanline( bitmap_ind16 &bitmap, rectangle cliprect, ui
 	if(m_crtc->gfx_double_scan())
 		divisor = 2;
 
-	for(int scanline=cliprect.min_y;scanline<=cliprect.max_y;scanline++)  // per scanline
+	for(int scanline = cliprect.top(); scanline<=cliprect.bottom(); scanline++)  // per scanline
 	{
 		if(m_crtc->is_1024x1024())  // 1024x1024 "real" screen size - use 1024x1024 16-colour gfx layer
 		{
@@ -402,8 +402,7 @@ bool x68k_state::draw_gfx(bitmap_rgb32 &bitmap,rectangle cliprect)
 	rectangle gfxrect = cliprect;
 	if(m_crtc->gfx_double_scan())
 	{
-		gfxrect.max_y >>= 1;
-		gfxrect.min_y >>= 1;
+		gfxrect.sety(gfxrect.top() >> 1, gfxrect.bottom() >> 1);
 	}
 
 	if(m_crtc->gfx_layer_buffer())  // if graphic layers are set to buffer, then they aren't visible
@@ -513,7 +512,6 @@ void x68k_state::draw_sprites(bitmap_ind16 &bitmap, screen_device &screen, recta
 #ifdef MAME_DEBUG
 		if(machine().input().code_pressed(KEYCODE_I)) continue;
 #endif
-		rectangle rect;
 		int code = m_spritereg[ptr+2] & 0x00ff;
 		int colour = (m_spritereg[ptr+2] & 0x0f00) >> 8;
 		int xflip = m_spritereg[ptr+2] & 0x4000;
@@ -521,10 +519,9 @@ void x68k_state::draw_sprites(bitmap_ind16 &bitmap, screen_device &screen, recta
 		int sx = (m_spritereg[ptr+0] & 0x3ff) - 16;
 		int sy = (m_spritereg[ptr+1] & 0x3ff) - 16;
 
-		rect.min_x=m_video.bg_hstart;
-		rect.min_y=m_video.bg_vstart;
-		rect.max_x=rect.min_x + m_crtc->visible_width()-1;
-		rect.max_y=rect.min_y + m_crtc->visible_height()-1;
+		rectangle rect;
+		rect.set_origin(m_video.bg_hstart, m_video.bg_vstart);
+		rect.set_size(m_crtc->visible_width(), m_crtc->visible_height());
 		int pmask = (pri == 1) ? 0xfffe : (pri == 2) ? 0xfffc : 0xfff0;
 
 		m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,code,colour,xflip,yflip,m_video.bg_hstart+sx,(m_video.bg_vstart / divisor)+sy,screen.priority(),pmask,0x00);
@@ -654,7 +651,6 @@ void x68k_state::video_start()
 
 uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	rectangle rect(0,0,0,0);
 	int priority;
 	int x;
 	int pixel = 0, scanline = 0;
@@ -663,15 +659,11 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	if(m_sysport.contrast == 0)  // if monitor contrast is 0, then don't bother displaying anything
 		return 0;
 
-	rect.min_x=m_crtc->hbegin();
-	rect.min_y=m_crtc->vbegin();
-	rect.max_x=m_crtc->hend();
-	rect.max_y=m_crtc->vend();
-
-	if(rect.min_y < cliprect.min_y)
-		rect.min_y = cliprect.min_y;
-	if(rect.max_y > cliprect.max_y)
-		rect.max_y = cliprect.max_y;
+	rectangle rect(
+			m_crtc->hbegin(),
+			m_crtc->hend(),
+			std::max<int32_t>(m_crtc->vbegin(), cliprect.top()),
+			std::min<int32_t>(m_crtc->vend(), cliprect.bottom()));
 
 	// update tiles
 	for(x=0;x<256;x++)
@@ -694,8 +686,7 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		rectangle pcgrect = rect;
 		if(!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan())
 		{
-			pcgrect.max_y >>= 1;
-			pcgrect.min_y >>= 1;
+			pcgrect.sety(pcgrect.top() >> 1, pcgrect.bottom() >> 1);
 		}
 		if(m_spritereg[0x404] & 0x0008)
 		{
@@ -713,9 +704,9 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		int divisor = 1;
 		if(!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan())
 			divisor = 2;
-		for(scanline=rect.min_y;scanline<=rect.max_y;scanline++)
+		for(scanline = rect.top(); scanline <= rect.bottom(); scanline++)
 		{
-			for(pixel=m_crtc->hbegin();pixel<=m_crtc->hend();pixel++)
+			for(pixel = m_crtc->hbegin(); pixel <= m_crtc->hend(); pixel++)
 			{
 				uint8_t colour = m_pcgbitmap.pix(scanline / divisor, pixel) & 0xff;
 				bitmap.pix(scanline, pixel) = m_pcgpalette->pen(colour);
@@ -736,8 +727,7 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		rectangle pcgrect = rect;
 		if((!(m_video.bg_hvres & 0x0c) && m_crtc->gfx_double_scan()) || ((m_video.bg_hvres & 0x1c) == 0x10 && m_crtc->vfactor() == 1) || (m_video.bg_hvres == 1 && m_crtc->vfactor() == 2))
 		{
-			pcgrect.max_y >>= 1;
-			pcgrect.min_y >>= 1;
+			pcgrect.sety(pcgrect.top() >> 1, pcgrect.bottom() >> 1);
 			divisor = 2;
 		}
 		m_pcgbitmap.fill(0, pcgrect);
@@ -773,9 +763,9 @@ uint32_t x68k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	}
 
 	bool blend = (((m_video.reg[2] & 0x1900) == 0x1900) && (m_video.gfx_pri != 2));
-	for(scanline=rect.min_y;scanline<=rect.max_y;scanline++)
+	for(scanline = rect.top(); scanline <= rect.bottom(); scanline++)
 	{
-		for(pixel=m_crtc->hbegin();pixel<=m_crtc->hend();pixel++)
+		for(pixel = m_crtc->hbegin(); pixel <= m_crtc->hend(); pixel++)
 		{
 			if((m_video.reg[2] & 0x1800) == 0x1000) // special priority
 			{

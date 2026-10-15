@@ -35,16 +35,20 @@ public:
 	inline uint8_t read_videoram(offs_t offset);
 	inline void write_videoram(offs_t offset, uint8_t data);
 
-	MC6845_UPDATE_ROW( vdc_update_row );
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
+	static constexpr uint8_t RETRACE_LINES = 10;
+	static constexpr uint8_t RETRACE_DOTS = 40;
+	static constexpr uint8_t FRONT_PORCH_DOTS = 80;
+	static constexpr int LINE_COUNT = 256 * 32 + 32;
+
 	mos8563_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -82,16 +86,50 @@ protected:
 
 	int m_revision;
 	uint8_t m_draw_ra;
+	uint8_t m_draw_row_ra;
+	uint16_t m_draw_row;
+	uint16_t m_draw_addr;
 	uint16_t m_attr_row_addr;
 	uint16_t m_bitmap_addr;
+
+	bool m_frame_started;
+	int32_t m_line_index;
+	int32_t m_frame_lines;
+	int32_t m_field_lines;
+	int32_t m_screen_line;
+	uint8_t m_retrace_lines;
+	uint16_t m_latched_disp_addr;
+	uint16_t m_latched_attr_addr;
+	uint16_t m_frame_disp_addr;
+	uint16_t m_frame_attr_addr;
+	bool m_start_addr_latched;
+	bool m_vsync_seen;
+	bitmap_rgb32 m_field_bitmap;
+
+	uint16_t m_line_addr[LINE_COUNT];
+	uint16_t m_line_bitmap_addr[LINE_COUNT];
+	uint16_t m_line_attr_addr[LINE_COUNT];
+	uint8_t m_line_ra[LINE_COUNT];
+	bool m_line_shown[LINE_COUNT];
+	uint8_t m_line_field[LINE_COUNT];
 
 	offs_t vram_address(offs_t offset) const;
 	void update_char_width();
 	static int displayed_width(uint8_t r22);
 	static bool semigraphics_gap(uint8_t r22);
 
+	bool interlace_video() const { return (m_mode_control & 0x03) == 3; }
+	void update_screen_geometry();
+	void reload_draw_counters();
+	void advance_draw_line();
+	void start_draw_line();
+	void draw_line(int line, int row, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_row(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t ma, uint16_t attr_row_addr, uint8_t ra, int y, int8_t cursor_x, int hbp);
+
 	virtual void update_cursor_state() override;
-	virtual uint8_t draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual void set_vsync(int state) override;
+	virtual void configure_screen(int width, int height, const rectangle &visarea, const attotime &refresh) override;
+	virtual void frame_start() override;
 
 	emu_timer *m_block_copy_timer;
 

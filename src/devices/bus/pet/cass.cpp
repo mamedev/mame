@@ -88,6 +88,7 @@ void pet_datassette_port_device::read_w(int state) { m_read_handler(state); }
 
 
 // slot devices
+#include "access.h"
 #include "c2n.h"
 #include "cdaudio.h"
 #include "diag264_lb_tape.h"
@@ -98,6 +99,7 @@ void pet_datassette_port_device::read_w(int state) { m_read_handler(state); }
 
 void cbm_datassette_devices(device_slot_interface &device)
 {
+	device.option_add("access", ACCESS_DONGLE);
 	device.option_add("c2n", C2N);
 	device.option_add("c1530", C1530);
 	device.option_add("cdaudio", PET_CD_ADAPTER);

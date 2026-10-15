@@ -391,12 +391,12 @@ uint32_t jb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll_ram[0][i + 0x080]);
 	}
 
-	for (int j = cliprect.min_y; j <= cliprect.max_y; j++)
+	for (int j = cliprect.top(); j <= cliprect.bottom(); j++)
 	{
 		int const rowenable = m_reel_scroll_ram[1][j];
 
 		// draw top of screen
-		rectangle const clip(cliprect.min_x, cliprect.max_x, j, j);
+		rectangle const clip(cliprect.left(), cliprect.right(), j, j);
 
 		if (rowenable < 3)
 			m_reel_tilemap[rowenable]->draw(screen, bitmap, clip, 0, 0);
@@ -2285,8 +2285,8 @@ ROM_START( 3super8 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "prgrom.bin", 0x00000, 0x20000, CRC(37c85dfe) SHA1(56bd2fb859b17dda1e675a385b6bcd6867ecceb0)  )
 
-	ROM_REGION( 0x1000, "pic", 0 )
-	ROM_LOAD( "pic16c65a-20-p", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION16_LE( 0x4010, "pic", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16c65a-20-p", 0x0000, 0x4010, NO_DUMP )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )
 	ROM_LOAD( "1.bin", 0x00000, 0x40000, BAD_DUMP CRC(d9d3e21e) SHA1(2f3f07ca427d9f56f0ff143d15d95cbf15255e33) ) // sldh

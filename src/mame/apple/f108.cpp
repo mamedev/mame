@@ -55,12 +55,12 @@ void f108_device::device_add_mconfig(machine_config &config)
 	NSCSI_BUS(config, m_scsibus);
 	// ... bus devices to be populated by drivers ...
 
-	NCR53C96(config, m_ncr1, 40_MHz_XTAL);
+	NCR53C96(config, m_ncr1, DERIVED_CLOCK(1, 2));
 	m_scsibus->set_external_device(7, m_ncr1);
 	m_ncr1->set_busmd(ncr53c96_device::BUSMD_1);
 
 
-	SCC85C30(config, m_scc, 31.3344_MHz_XTAL/4);
+	SCC85C30(config, m_scc, 8_MHz_XTAL);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(FUNC(f108_device::scc_irq_w));
 	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
@@ -69,12 +69,12 @@ void f108_device::device_add_mconfig(machine_config &config)
 	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
 	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
-	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
+	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w)).invert();
 
 	rs232_port_device &rs232b(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
-	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
+	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w)).invert();
 }
 
 //-------------------------------------------------

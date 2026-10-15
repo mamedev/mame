@@ -28,6 +28,7 @@ DEFINE_DEVICE_TYPE(SAMSUNG_K9F1G08U0B,  samsung_k9f1g08u0b_device,  "samsung_k9f
 DEFINE_DEVICE_TYPE(SAMSUNG_K9F1G08U0M,  samsung_k9f1g08u0m_device,  "samsung_k9f1g08u0m",  "Samsung K9F1G08U0M")
 DEFINE_DEVICE_TYPE(SAMSUNG_K9LAG08U0M,  samsung_k9lag08u0m_device,  "samsung_k9lag08u0m",  "Samsung K9LAG08U0M")
 DEFINE_DEVICE_TYPE(SAMSUNG_K9F2G08U0M,  samsung_k9f2g08u0m_device,  "samsung_k9f2g08u0m",  "Samsung K9F2G08U0M")
+DEFINE_DEVICE_TYPE(TOSHIBA_TC58V64BFT,  toshiba_tc58v64bft_device,  "toshiba_tc58v64bft",  "Toshiba TC58V64BFT")
 DEFINE_DEVICE_TYPE(TOSHIBA_TC58256AFT,  toshiba_tc58256aft_device,  "toshiba_tc58256aft",  "Toshiba TC58256AFT")
 DEFINE_DEVICE_TYPE(GENERALPLUS_GPR27P512A,  generalplus_gpr27p512a,  "generalplus_gpr27p512a",  "GeneralPlus GPR27P512A")
 DEFINE_DEVICE_TYPE(SANDISK_NAND_128MB_512_DEVICE,  sandisk_nand_128mb_512_device,  "sandisk_nand_128mb_512",  "Sandisk 128Mbyte NAND (512+16 block size)") // found on JAKKS Pacific units, part number was erased
@@ -53,6 +54,7 @@ nand_device::nand_device(const machine_config &mconfig, device_type type, const 
 	m_col_address_cycles(0),
 	m_row_address_cycles(0),
 	m_sequential_row_read(0),
+	m_sequential_row_read_wrap(true),
 	m_read_time(attotime::never),
 	m_busy_until(attotime::never),
 	m_write_rnb(*this)
@@ -210,6 +212,24 @@ hynix_hy27uf084g2m_device::hynix_hy27uf084g2m_device(const machine_config &mconf
 	m_sequential_row_read = 1; // uncertain
 }
 
+toshiba_tc58v64bft_device::toshiba_tc58v64bft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: nand_device(mconfig, TOSHIBA_TC58V64BFT, tag, owner, clock)
+{
+	m_id_len = 2;
+	m_id[0] = 0x98;
+	m_id[1] = 0xe6;
+	m_page_data_size = 512;
+	m_page_total_size = 512 + 16;
+	m_log2_pages_per_block = compute_log2(16);
+	m_num_pages = 16 * 1024;
+	m_col_address_cycles = 1;
+	m_row_address_cycles = 2;
+	m_sequential_row_read = 1;
+	m_sequential_row_read_wrap = false;
+	// Datasheet maximum cell-array-to-register transfer time.
+	m_read_time = attotime::from_usec(25);
+}
+
 toshiba_tc58256aft_device::toshiba_tc58256aft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nand_device(mconfig, TOSHIBA_TC58256AFT, tag, owner, clock)
 {
@@ -281,6 +301,7 @@ void nand_device::device_start()
 	save_item(NAME(m_pointer_mode));
 	save_item(NAME(m_page_addr));
 	save_item(NAME(m_byte_addr));
+	save_item(NAME(m_busy_until));
 	save_item(NAME(m_status));
 	save_item(NAME(m_accumulated_status));
 	save_item(NAME(m_mode_3065));
@@ -292,6 +313,7 @@ void nand_device::device_reset()
 	m_pointer_mode = SM_PM_A;
 	m_page_addr = 0;
 	m_byte_addr = 0;
+	m_busy_until = attotime::never;
 	m_accumulated_status = 0;
 	m_mode_3065 = false;
 	m_status = 0xc0;
@@ -601,6 +623,11 @@ void nand_device::address_w(uint8_t data)
 			}
 		}
 		m_addr_load_ptr++;
+		// Small-page reads start after the final address, without a confirm command.
+		if ((m_mode == SM_M_READ) && (m_col_address_cycles == 1)
+			&& (m_addr_load_ptr == m_col_address_cycles + m_row_address_cycles)
+			&& (m_read_time != attotime::never))
+			m_busy_until = machine().time() + m_read_time;
 		break;
 	case SM_M_ERASE:
 		if (m_addr_load_ptr < m_row_address_cycles)
@@ -641,7 +668,8 @@ uint8_t nand_device::data_r()
 	{
 	case SM_M_INIT:
 	case SM_M_30:
-		logerror("nandflash: unexpected data port read\n");
+		if (!machine().side_effects_disabled())
+			logerror("nandflash: unexpected data port read\n");
 		break;
 	case SM_M_READ:
 	case SM_M_RANDOM_DATA_OUTPUT:
@@ -674,31 +702,48 @@ uint8_t nand_device::data_r()
 				reply = 0xff;
 			}
 		}
-		m_byte_addr++;
-
-		// "Sequential Row Read is available only on K9F5608U0D_Y,P,V,F or K9F5608D0D_Y,P"
-		if ((m_byte_addr == m_page_total_size) && (m_sequential_row_read != 0))
+		if (!machine().side_effects_disabled())
 		{
-			m_byte_addr = (m_pointer_mode != SM_PM_C) ? 0 : m_page_data_size;
-			m_page_addr++;
-			if (m_page_addr == m_num_pages)
-				m_page_addr = 0;
+			m_byte_addr++;
+
+			// Advance to the next page on chips supporting sequential row reads.
+			if ((m_byte_addr == m_page_total_size) && (m_sequential_row_read != 0))
+			{
+				if ((m_page_addr == m_num_pages - 1) && !m_sequential_row_read_wrap)
+				{
+					// Some chips repeat the final byte until another command is issued.
+					m_byte_addr--;
+				}
+				else
+				{
+					m_byte_addr = (m_pointer_mode != SM_PM_C) ? 0 : m_page_data_size;
+					m_page_addr++;
+					if (m_page_addr == m_num_pages)
+						m_page_addr = 0;
+					if (m_read_time != attotime::never)
+						m_busy_until = machine().time() + m_read_time;
+				}
+			}
 		}
 		break;
 	case SM_M_PROGRAM:
 	case SM_M_RANDOM_DATA_INPUT:
 	case SM_M_ERASE:
-		logerror("nandflash: unexpected data port read\n");
+		if (!machine().side_effects_disabled())
+			logerror("nandflash: unexpected data port read\n");
 		break;
 	case SM_M_READSTATUS:
 		reply = m_status & 0xc1;
+		if (is_busy())
+			reply &= ~0x40;
 		break;
 	case SM_M_READID:
 		if (m_byte_addr < m_id_len)
 			reply = m_id[m_byte_addr];
 		else
 			reply = 0;
-		m_byte_addr++;
+		if (!machine().side_effects_disabled())
+			m_byte_addr++;
 		break;
 	}
 

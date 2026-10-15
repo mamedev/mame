@@ -2271,7 +2271,7 @@ void amiga_state::amiga_base(machine_config &config)
 	m_cia_0->pb_rd_callback().set("cent_data_in", FUNC(input_buffer_device::read));
 	m_cia_0->pb_wr_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	m_cia_0->pc_wr_callback().set(m_centronics, FUNC(centronics_device::write_strobe));
-	m_cia_0->sp_wr_callback().set("kbd", FUNC(amiga_keyboard_bus_device::kdat_in_w)).invert();
+	m_cia_0->sp_wr_callback().set("kbd", FUNC(amiga_keyboard_bus_device::kdat_in_w));
 
 	MOS8520(config, m_cia_1, amiga_state::CLK_E_PAL);
 	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));

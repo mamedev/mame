@@ -2169,7 +2169,7 @@ void hyperstone_device::hyperstone_set()
 	{
 		if (n == 0)
 		{
-			(DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code] = (SP & 0xfffffe00) | (GET_FP << 2) | (((SP & 0x100) && (SIGN_BIT(SR) == 0)) ? 1 : 0);
+			(DstGlobal ? m_core->global_regs : m_core->local_regs)[dst_code] = ((SP & 0xfffffe00) | (GET_FP << 2)) + (((SP & 0x100) && (SIGN_BIT(SR) == 0)) ? 0x200 : 0);
 		}
 		else if (n >= 2)
 		{

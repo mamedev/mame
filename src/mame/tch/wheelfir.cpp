@@ -450,7 +450,7 @@ uint32_t wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_in
 {
 	bitmap.fill(0, cliprect);
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		int scrolly = y;
 		scrolly += m_current_yscroll;//
@@ -458,7 +458,7 @@ uint32_t wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_in
 		uint16_t const *const source = &m_tmp_bitmap[LAYER_BG]->pix(scrolly);
 		uint16_t *const dest = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int sourcex = x;
 			sourcex += (m_blitter_data[0xa] & 0x00ff) | (m_blitter_data[0x8] & 0x0040) << 2;

@@ -101,6 +101,61 @@ bool g64_format::is_empty_track(const std::vector<bool> &trackbuf)
 }
 
 
+//-------------------------------------------------
+//  sync_aligned - a revolution rarely holds a
+//  whole number of cells or bytes, so the stored
+//  track slips and gets padded at its seam: rotate
+//  the track to start in the gap just ahead of a
+//  sync mark, where neither corrupts anything
+//-------------------------------------------------
+
+std::vector<uint32_t> g64_format::sync_aligned(const std::vector<uint32_t> &buf)
+{
+	int const count = buf.size();
+	int run = -1;
+
+	for (int i = 1; i < (count * 2); i++)
+	{
+		uint32_t const prev = buf[(i - 1) % count];
+		uint32_t const cur = buf[i % count];
+
+		if (((prev & floppy_image::MG_MASK) == floppy_image::MG_F) && ((cur & floppy_image::MG_MASK) == floppy_image::MG_F))
+		{
+			uint32_t const delta = ((cur & floppy_image::TIME_MASK) + 200000000 - (prev & floppy_image::TIME_MASK)) % 200000000;
+			if ((delta >= 2800) && (delta <= 4500))
+			{
+				if (run >= 0)
+					run++;
+			}
+			else
+			{
+				run = 0;
+			}
+		}
+		else
+		{
+			run = 0;
+		}
+
+		if (run == 20)
+		{
+			int const start = (i - 22 + count) % count;
+			uint32_t const base = buf[start] & floppy_image::TIME_MASK;
+
+			std::vector<uint32_t> result(count);
+			for (int j = 0; j < count; j++)
+			{
+				uint32_t const entry = buf[(start + j) % count];
+				result[j] = (entry & floppy_image::MG_MASK) | (((entry & floppy_image::TIME_MASK) + 200000000 - base) % 200000000);
+			}
+			return result;
+		}
+	}
+
+	return buf;
+}
+
+
 int g64_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	char h[8];
@@ -246,19 +301,22 @@ int g64_format::encode_track(int track, int head, const floppy_image &image, std
 	if (image.get_buffer(track, head).size() <= 1)
 		return 0;
 
+	floppy_image aligned(1, 1, floppy_image::FF_525);
+	aligned.get_buffer(0, 0) = sync_aligned(image.get_buffer(track, head));
+
 	// half tracks the loader filled in for absent image data are not
 	// content, so leave their offset table entries zeroed as found
 	std::vector<bool> trackbuf;
-	generate_bitstream(track, head, speed_zone(track), trackbuf, image);
+	generate_bitstream(0, 0, speed_zone(track), trackbuf, aligned);
 
 	if (is_empty_track(trackbuf))
 		return 0;
 
 	// figure out the cell size and speed zone from the track data
-	if ((zone = generate_bitstream(track, head, 3, trackbuf, image)) == -1)
-		if ((zone = generate_bitstream(track, head, 2, trackbuf, image)) == -1)
-			if ((zone = generate_bitstream(track, head, 1, trackbuf, image)) == -1)
-				if ((zone = generate_bitstream(track, head, 0, trackbuf, image)) == -1)
+	if ((zone = generate_bitstream(0, 0, 3, trackbuf, aligned)) == -1)
+		if ((zone = generate_bitstream(0, 0, 2, trackbuf, aligned)) == -1)
+			if ((zone = generate_bitstream(0, 0, 1, trackbuf, aligned)) == -1)
+				if ((zone = generate_bitstream(0, 0, 0, trackbuf, aligned)) == -1)
 					return -1;
 
 	packed.assign((trackbuf.size() + 7) >> 3, 0);
@@ -318,7 +376,7 @@ bool g64_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 		for (int track = 0; track < TRACK_COUNT; track++) {
 			uint32_t const tpos = POS_TRACK_OFFSET + ((head * TRACK_COUNT + track) * 4);
 			uint32_t const spos = tpos + (tracks * 4);
-			uint32_t const dpos = POS_TRACK_OFFSET + (tracks * 4 * 2) + (tracks_written * max_track_size);
+			uint32_t const dpos = POS_TRACK_OFFSET + (tracks * 4 * 2) + (tracks_written * (max_track_size + 2));
 
 			if (!write(tpos, zerofill, 4))
 				return false;
@@ -351,9 +409,9 @@ bool g64_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 				return false;
 			if (!write(spos, speed_offset, 4))
 				return false;
-			if (!write(dpos, prefill.data(), max_track_size))
-				return false;
 			if (!write(dpos, track_length, 2))
+				return false;
+			if (!write(dpos + 2, prefill.data(), max_track_size))
 				return false;
 			if (!write(dpos + 2, packed.data(), packed.size()))
 				return false;

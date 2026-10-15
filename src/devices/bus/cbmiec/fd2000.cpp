@@ -113,7 +113,7 @@ ioport_constructor fd2000_device::device_input_ports() const
 void fd2000_device::fd2000_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
-	map(0x4000, 0x400f).mirror(0xbf0).m(m_via, FUNC(via6522_device::map));
+	map(0x4000, 0x400f).mirror(0xbf0).r(FUNC(fd2000_device::via_r)).w(m_via, FUNC(via6522_device::write));
 	map(0x4e00, 0x4e07).mirror(0x1f8).m(m_fdc, FUNC(dp8473_device::map));
 	map(0x5000, 0x7fff).ram();
 	map(0x8000, 0xffff).r(FUNC(fd2000_device::rtc_r));
@@ -127,12 +127,20 @@ void fd2000_device::fd2000_mem(address_map &map)
 void fd4000_device::fd4000_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
-	map(0x4000, 0x400f).mirror(0xbf0).m(m_via, FUNC(via6522_device::map));
+	map(0x4000, 0x400f).mirror(0xbf0).r(FUNC(fd2000_device::via_r)).w(m_via, FUNC(via6522_device::write));
 	map(0x4e00, 0x4e07).mirror(0x1f8).m(m_fdc, FUNC(pc8477a_device::map));
 	map(0x5000, 0x7fff).ram();
 	map(0x8000, 0xffff).r(FUNC(fd4000_device::rtc_r));
 }
 
+
+uint8_t fd2000_device::via_r(offs_t offset)
+{
+	if (((offset == 1) || (offset == 15)) && !m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
+	return m_via->read(offset);
+}
 
 uint8_t fd2000_device::via_pa_r()
 {
@@ -182,7 +190,7 @@ void fd2000_device::via_pa_w(uint8_t data)
 	m_atn_ack = BIT(data, 4);
 	m_fst_dir = BIT(data, 5);
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 uint8_t fd2000_device::via_pb_r()
@@ -241,17 +249,17 @@ void fd2000_device::via_cb1_w(int state)
 {
 	m_fst_clk = state;
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 void fd2000_device::via_cb2_w(int state)
 {
 	m_fst_data = state;
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
-TIMER_CALLBACK_MEMBER(fd2000_device::iec_sync_tick)
+void fd2000_device::update_iec()
 {
 	m_via->write_cb1(m_fst_dir || m_bus->srq_r());
 	m_via->write_cb2(m_fst_dir || m_bus->data_r());
@@ -396,8 +404,6 @@ fd4000_device::fd4000_device(const machine_config &mconfig, const char *tag, dev
 
 void fd2000_device::device_start()
 {
-	m_iec_sync_timer = timer_alloc(FUNC(fd2000_device::iec_sync_tick), this);
-
 	// state saving
 	save_item(NAME(m_fst_dir));
 	save_item(NAME(m_fst_clk));
@@ -415,7 +421,7 @@ void fd2000_device::device_start()
 
 void fd2000_device::cbm_iec_srq(int state)
 {
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 
@@ -427,7 +433,7 @@ void fd2000_device::cbm_iec_atn(int state)
 {
 	m_via->write_ca2(state);
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 
@@ -437,7 +443,7 @@ void fd2000_device::cbm_iec_atn(int state)
 
 void fd2000_device::cbm_iec_data(int state)
 {
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 

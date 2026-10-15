@@ -95,7 +95,27 @@ void sbking_state::video_start()
 
 void sbking_state::palette_init_cb(palette_device &palette) const
 {
-	// TODO
+	const uint8_t *color_prom = memregion("proms")->base();
+	for (int i = 0; i < 0x20; ++i)
+	{
+		int bit0, bit1, bit2;
+
+		bit0 = 0;
+		bit1 = (color_prom[0] >> 0) & 0x01;
+		bit2 = (color_prom[0] >> 1) & 0x01;
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 2) & 0x01;
+		bit1 = (color_prom[0] >> 3) & 0x01;
+		bit2 = (color_prom[0] >> 4) & 0x01;
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[0] >> 5) & 0x01;
+		bit1 = (color_prom[0] >> 6) & 0x01;
+		bit2 = (color_prom[0] >> 7) & 0x01;
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+		color_prom++;
+	}
 }
 
 TILE_GET_INFO_MEMBER(sbking_state::get_bg_tile_info)
@@ -123,6 +143,9 @@ void sbking_state::attrram_w(offs_t offset, uint8_t data)
 uint32_t sbking_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(rgb_t::black(), cliprect);
+
+	// TODO: VRAM at $32e0 is oddly zeroed, may be per-column scroll really
+	m_bg_tilemap->set_scrolldy(+52, 0);
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -217,6 +240,7 @@ void sbking_state::sbking(machine_config &config)
 	audiocpu.set_addrmap(AS_IO, &sbking_state::audio_io_map);
 	audiocpu.set_periodic_int(FUNC(sbking_state::irq0_line_hold), attotime::from_hz(60*4)); // guess. TODO: identify where this comes from
 
+	// TODO: port C writes looks a selector for A/B inputs
 	i8255_device &ppi0(I8255(config, "ppi0")); // 0x9a, port A and B in, port C 0-3 out, 4-7 in
 	ppi0.in_pa_callback().set([this] () { logerror("%s PPI0 port A read\n", machine().describe_context()); return 0xff; });
 	ppi0.in_pb_callback().set([this] () { logerror("%s PPI0 port B read\n", machine().describe_context()); return 0xff; });
@@ -238,7 +262,8 @@ void sbking_state::sbking(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_sbking);
 
-	mc6845_device &crtc(MC6845(config, "crtc", 6_MHz_XTAL)); // TODO: exact chip model is unknown
+	// TODO: exact chip model is unknown
+	mc6845_device &crtc(MC6845(config, "crtc", 6_MHz_XTAL / 8));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
@@ -247,7 +272,9 @@ void sbking_state::sbking(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &ay(AY8910(config, "ay", 3.579545_MHz_XTAL / 2)); // TODO: exact chip model is unknown, divider not verified
+	// TODO: exact chip model is unknown, divider not verified
+	ay8910_device &ay(AY8910(config, "ay", 3.579545_MHz_XTAL / 2));
+	// TODO: port A used as soundlatch in NMI routine
 	ay.port_a_read_callback().set([this] () { logerror("%s AY port A read\n", machine().describe_context()); return 0x00; });
 	ay.port_b_read_callback().set([this] () { logerror("%s AY port B read\n", machine().describe_context()); return 0x00; });
 	ay.add_route(ALL_OUTPUTS, "mono", 1.0);

@@ -511,10 +511,10 @@ void valkyrie_device::ramdac_w(offs_t offset, u32 data)
 
 void valkyrie_device::recalc_mode()
 {
-	// mode parameters taken from the Quadra 630 Developer Note
+	// mode parameters taken from the Quadra 630 and Power Macintosh 5200/6200 Developer Notes
 	// m_video_timing numbers:
 	//  2 =  512x384, 60 Hz ("Rubik")
-	//  6 =  640x480, 72 Hz (Mac 13")
+	//  6 =  640x480, 67 Hz (Mac 13")
 	//  9 =  832x624, 75 Hz (Mac 16")
 	// 11 =  640x480, 60 Hz (VGA)
 	// 12 =  800x600, 60 Hz (SVGA)
@@ -545,11 +545,11 @@ void valkyrie_device::recalc_mode()
 			m_stride = 80;
 			break;
 
-		case 9: // 16" RGB 832x624?
+		case 9: // 16" RGB 832x624
 			m_hres = 832;
 			m_vres = 624;
-			m_htotal = 1072;
-			m_vtotal = 690;
+			m_htotal = 1152;
+			m_vtotal = 667;
 			m_stride = 104;
 			break;
 
@@ -559,6 +559,22 @@ void valkyrie_device::recalc_mode()
 			m_htotal = 800;
 			m_vtotal = 525;
 			m_stride = 80;
+			break;
+
+		case 12: // SVGA 800x600, 60 Hz
+			m_hres = 800;
+			m_vres = 600;
+			m_htotal = 1056;
+			m_vtotal = 628;
+			m_stride = 104;
+			break;
+
+		case 13: // SVGA 800x600, 72 Hz
+			m_hres = 800;
+			m_vres = 600;
+			m_htotal = 1040;
+			m_vtotal = 666;
+			m_stride = 104;
 			break;
 	}
 
@@ -622,16 +638,15 @@ void valkyrie_device::write_data(u16 offset, u8 data)
 			break;
 	}
 
-	const double clock = (3986400.0f * (double)(1 << m_P) * (double)m_N) / (double)m_M;
-	m_pixel_clock = (u32)clock;
+	// Apple's driver and Linux both write P last
+	if (offset != 3)
+		return;
 
-	// TODO: Apple documents these machines as supporting the 512x384 monitor, but selecting it
-	// programs garbage to the clock generator.  Allow that configuration to work until we determine
-	// if the Apple developer note is lying.
-	if ((m_M == 0) && (m_N == 0) && (m_P = 98))
-	{
-		m_pixel_clock = 15670000;
-	}
+	// 512x384 writes M = 0, N = 0, P = 0x62 and runs at half the crystal clock
+	if ((m_M == 0) || (m_N == 0))
+		m_pixel_clock = clock() / 2;
+	else
+		m_pixel_clock = (u32)((double)clock() / 8.0 * (double)(1 << m_P) * (double)m_N / (double)m_M);
 
 	LOGMASKED(LOG_CLOCKGEN, "Valkyrie: M = %d %02x, N = %d %02x P = %d, pixel clock %d\n", m_M, m_M, m_N, m_N, m_P, m_pixel_clock);
 	recalc_mode();

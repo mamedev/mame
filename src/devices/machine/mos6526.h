@@ -152,6 +152,7 @@ protected:
 	bool m_icr_read_prev;
 	bool m_ir_clr_pending;
 	uint8_t m_icr_delay;
+	uint8_t m_icr_new;
 	uint8_t m_icr_sticky;
 	uint8_t m_icr_sticky_next;
 

@@ -310,25 +310,24 @@ MC6845_END_UPDATE( nyny_state::crtc_end_update )
 	/* draw the star field into the bitmap */
 	uint16_t delay_counter = m_star_delay_counter;
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	const auto pen0 = m_palette->pen_color(0);
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			/* check if the star status */
-			const bool enabled = m_star_enable && (bitmap.pix(y, x) == m_palette->pen_color(0));
-			const int flip = m_flipscreen ? 1 : 0;
+			const bool enabled = m_star_enable && (dst[x] == pen0);
 
-			if (enabled && ((m_star_shift_reg & 0x80ff) == 0x00ff) && (((y & 0x01) ^ flip) ^ (((x & 0x08) >> 3) ^ flip)))
+			if (enabled && ((m_star_shift_reg & 0x80ff) == 0x00ff) && (BIT(y, 0) ^ BIT(x, 3)))
 			{
-				uint8_t color = ((m_star_shift_reg & 0x0100) >>  8) | /* R */
-						((m_star_shift_reg & 0x0400) >>  9) | /* G */
-						((m_star_shift_reg & 0x1000) >> 10);  /* B */
+				const uint8_t color = bitswap<3>(m_star_shift_reg, 12 /* B */, 10 /* G */, 8 /* R */);
 
-				bitmap.pix(y, x) = m_palette->pen_color(color);
+				dst[x] = m_palette->pen_color(color);
 			}
 
 			if (delay_counter == 0)
-				m_star_shift_reg = (m_star_shift_reg << 1) | (((~m_star_shift_reg >> 15) & 0x01) ^ ((m_star_shift_reg >> 2) & 0x01));
+				m_star_shift_reg = (m_star_shift_reg << 1) | (BIT(~m_star_shift_reg, 15) ^ BIT(m_star_shift_reg, 2));
 			else
 				delay_counter--;
 		}

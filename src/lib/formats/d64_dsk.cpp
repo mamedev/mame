@@ -16,6 +16,7 @@
 
 #include "osdcore.h" // osd_printf_*
 
+#include <algorithm>
 #include <cstring>
 
 
@@ -209,6 +210,15 @@ void d64_format::build_sector_description(const format &f, uint8_t *sectdata, ui
 	}
 }
 
+void d64_format::rotate_track(floppy_image &image, int track, int head, uint32_t skew)
+{
+	std::vector<uint32_t> &buf = image.get_buffer(track, head);
+	for(auto &elem : buf)
+		elem = (elem & floppy_image::MG_MASK) | (((elem & floppy_image::TIME_MASK) + skew) % 200000000);
+	std::rotate(buf.begin(), std::min_element(buf.begin(), buf.end(), [](uint32_t a, uint32_t b) { return (a & floppy_image::TIME_MASK) < (b & floppy_image::TIME_MASK); }), buf.end());
+	image.set_write_splice_position(track, head, (image.get_write_splice_position(track, head) + skew) % 200000000);
+}
+
 void d64_format::fix_end_gap(floppy_image_format_t::desc_e* desc, int remaining_size) const
 {
 	desc[21].p2 = remaining_size / 8;
@@ -242,6 +252,7 @@ bool d64_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	int track_offset = 0, error_offset = f.sector_count*f.sector_base_size;
 
 	uint8_t id1 = 0, id2 = 0;
+	uint64_t skew = 0;
 	get_disk_id(f, io, id1, id2);
 
 	for (int head = 0; head < f.head_count; head++) {
@@ -267,6 +278,9 @@ bool d64_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 			build_sector_description(f, &img[0], track_offset, error_offset, sectors, sector_count);
 			generate_track(desc, physical_track, head, sectors, sector_count, total_size, image);
+
+			skew = (skew + uint64_t(200000000) * (current_size - gap2 * 8) / total_size + uint64_t(200000000) * 100 / 270) % 200000000;
+			rotate_track(image, physical_track, head, skew);
 
 			track_offset += track_size;
 			error_offset += sector_count;
