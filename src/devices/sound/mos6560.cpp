@@ -70,7 +70,6 @@ mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, 
 	m_read_potx(*this, 0xff),
 	m_read_poty(*this, 0xff),
 	m_stream(nullptr),
-	m_line_timer(nullptr),
 	m_lp_state(false)
 {
 }
@@ -105,15 +104,17 @@ device_memory_interface::space_config_vector mos6560_device::memory_space_config
 
 void mos6560_device::device_start()
 {
+	space(0).specific(m_videoram);
+	space(1).specific(m_colorram);
+
 	screen().register_screen_bitmap(m_bitmap[0]);
 	screen().register_screen_bitmap(m_bitmap[1]);
 	m_bitmap[0].fill(rgb_t::black());
 	m_bitmap[1].fill(rgb_t::black());
 	m_draw = 0;
 
-	m_period = HZ_TO_ATTOSECONDS(clock());
-	m_base_time = attotime::zero;
-	m_base_cycle = 0;
+	m_cycle_time = attotime(0, HZ_TO_ATTOSECONDS(clock()));
+	m_next_cycle = m_cycle_time;
 	m_cycle_count = 0;
 	m_frame_start = 0;
 	m_frame_lines = m_lines;
@@ -177,13 +178,10 @@ void mos6560_device::device_start()
 
 	m_stream = stream_alloc(0, 1, clock() / 2);
 
-	m_line_timer = timer_alloc(FUNC(mos6560_device::line_tick), this);
-	attotime const line_period(0, m_period * m_cycles_per_line);
-	m_line_timer->adjust(line_period, 0, line_period);
+	screen().register_vblank_callback(vblank_state_delegate(&mos6560_device::screen_vblank, this));
 
 	save_item(NAME(m_draw));
-	save_item(NAME(m_base_time));
-	save_item(NAME(m_base_cycle));
+	save_item(NAME(m_next_cycle));
 	save_item(NAME(m_cycle_count));
 	save_item(NAME(m_frame_start));
 	save_item(NAME(m_frame_lines));
@@ -254,49 +252,25 @@ void mos6560_device::device_reset()
 //  cycle bookkeeping
 //-------------------------------------------------
 
-uint64_t mos6560_device::cycle_at(const attotime &time) const
-{
-	if (time >= m_base_time)
-		return m_base_cycle + uint64_t((time - m_base_time).as_attoseconds() / m_period);
-
-	attotime const delta = m_base_time - time;
-	if (delta.seconds() > 0)
-		return 0;
-
-	uint64_t const cycles = uint64_t((delta.as_attoseconds() + m_period - 1) / m_period);
-	return (cycles > m_base_cycle) ? 0 : (m_base_cycle - cycles);
-}
-
-uint64_t mos6560_device::current_cycle()
-{
-	attotime const now = machine().time();
-	if (now <= m_base_time)
-		return m_base_cycle;
-
-	return cycle_at(now);
-}
-
 void mos6560_device::update_cycles()
 {
 	if (!started())
 		return;
 
-	uint64_t const target = current_cycle();
+	attotime const now = machine().time();
 
-	while (m_cycle_count < target)
+	while (now >= m_next_cycle)
 	{
 		cycle();
 		m_cycle_count++;
+		m_next_cycle += m_cycle_time;
 	}
 }
 
-TIMER_CALLBACK_MEMBER(mos6560_device::line_tick)
+void mos6560_device::screen_vblank(screen_device &screen, bool vblank_state)
 {
-	update_cycles();
-
-	uint64_t const cycles = m_cycle_count - m_base_cycle;
-	m_base_time += attotime(0, cycles * m_period);
-	m_base_cycle = m_cycle_count;
+	if (!vblank_state)
+		update_cycles();
 }
 
 int mos6560_device::raster_line(uint64_t cycle, int *pos) const
@@ -464,8 +438,8 @@ void mos6560_device::end_of_frame()
 
 uint8_t mos6560_device::fetch_byte(offs_t addr)
 {
-	m_vbus = space(0).read_byte(addr & 0x3fff);
-	m_vbus_high = space(1).read_byte(addr & 0x3ff) & 0x0f;
+	m_vbus = m_videoram.read_byte(addr & 0x3fff);
+	m_vbus_high = m_colorram.read_byte(addr & 0x3ff) & 0x0f;
 
 	return m_vbus;
 }
@@ -558,62 +532,91 @@ void mos6560_device::output_pixels()
 		}
 	}
 
-	bool const visible = (row < bitmap->height()) && (x >= 0) && (x + 3 < bitmap->width());
-	uint32_t *dest = visible ? &bitmap->pix(row, x) : nullptr;
+	uint8_t bg = m_out_bg;
+	uint8_t border = m_out_border;
+	uint8_t aux = m_out_aux;
+	bool reverse = m_out_reverse;
+	int pos = m_shift_pos;
+	uint8_t const gdata = m_gdata;
+	uint8_t const cdata = m_cdata;
+	uint8_t const mode = m_attack_ufo ? 2 : BIT(cdata, 3);
 
-	for (int i = 0; i < 4; i++)
+	auto const pixel = [&pos, &bg, &border, &aux, &reverse, mode, gdata, cdata] () -> uint8_t
 	{
+		if (pos >= 8)
+			return border;
+
+		int const p = pos++;
+
+		switch (mode)
+		{
+		case 0:
+			return (BIT(gdata, 7 - p) ^ reverse) ? (cdata & 0x07) : bg;
+
+		case 1:
+			switch ((gdata >> (6 - (p & 6))) & 3)
+			{
+			case 0: return bg;
+			case 1: return border;
+			case 2: return cdata & 0x07;
+			default: return aux;
+			}
+
+		default:
+			return BIT(gdata, 7 - p) ? (cdata & 0x0f) : bg;
+		}
+	};
+
+	uint8_t color[4];
+
+	if (m_pend_reg < 0)
+	{
+		color[0] = pixel();
+		color[1] = pixel();
+		color[2] = pixel();
+		color[3] = pixel();
+	}
+	else
+	{
+		color[0] = pixel();
+
+		if (m_pend_reg == 0x0e)
+		{
+			aux = m_pend_data >> 4;
+			m_pend_reg = -1;
+		}
+		else
+		{
+			bg = m_pend_data >> 4;
+			border = m_pend_data & 0x07;
+		}
+
+		color[1] = pixel();
+		color[2] = pixel();
+
 		if (m_pend_reg >= 0)
 		{
-			if (i == 1)
-			{
-				if (m_pend_reg == 0x0e)
-				{
-					m_out_aux = m_pend_data >> 4;
-					m_pend_reg = -1;
-				}
-				else
-				{
-					m_out_bg = m_pend_data >> 4;
-					m_out_border = m_pend_data & 0x07;
-				}
-			}
-			else if (i == 3)
-			{
-				m_out_reverse = !BIT(m_pend_data, 3);
-				m_pend_reg = -1;
-			}
+			reverse = !BIT(m_pend_data, 3);
+			m_pend_reg = -1;
 		}
 
-		uint8_t color = m_out_border;
+		color[3] = pixel();
 
-		if (m_shift_pos < 8)
-		{
-			if (m_attack_ufo)
-			{
-				color = BIT(m_gdata, 7 - m_shift_pos) ? (m_cdata & 0x0f) : m_out_bg;
-			}
-			else if (BIT(m_cdata, 3))
-			{
-				switch ((m_gdata >> (6 - (m_shift_pos & 6))) & 3)
-				{
-				case 0: color = m_out_bg; break;
-				case 1: color = m_out_border; break;
-				case 2: color = m_cdata & 0x07; break;
-				case 3: color = m_out_aux; break;
-				}
-			}
-			else
-			{
-				bool const bit = BIT(m_gdata, 7 - m_shift_pos) ^ m_out_reverse;
-				color = bit ? (m_cdata & 0x07) : m_out_bg;
-			}
+		m_out_bg = bg;
+		m_out_border = border;
+		m_out_aux = aux;
+		m_out_reverse = reverse;
+	}
 
-			m_shift_pos++;
-		}
+	m_shift_pos = pos;
 
-		if (dest)
-			dest[i] = m_palette[color];
+	if ((row < bitmap->height()) && (x >= 0) && (x + 3 < bitmap->width()))
+	{
+		uint32_t *const dest = &bitmap->pix(row, x);
+		dest[0] = m_palette[color[0]];
+		dest[1] = m_palette[color[1]];
+		dest[2] = m_palette[color[2]];
+		dest[3] = m_palette[color[3]];
 	}
 }
 
@@ -662,7 +665,9 @@ void mos6560_device::cycle()
 			handle_vmc();
 	}
 
-	if ((m_line == 0) && (m_cyc == 2))
+	if (m_cyc == 1)
+		m_pending_text_cols = std::min(m_reg[2] & 0x7f, m_ntsc ? 31 : 32);
+	else if ((m_cyc == 2) && (m_line == 0))
 		m_text_lines = (m_reg[3] & 0x7e) >> 1;
 
 	int lp_pos;
@@ -674,13 +679,11 @@ void mos6560_device::cycle()
 			m_lp_trigger = m_cycle_count + 2;
 	}
 
-	if (m_cyc == 1)
-		m_pending_text_cols = std::min(m_reg[2] & 0x7f, m_ntsc ? 31 : 32);
-
 	if (m_lp_trigger == m_cycle_count + 1)
 		trigger_light_pen();
 
-	fetch();
+	if ((m_fetch_state != FETCH_IDLE) && (m_fetch_state != FETCH_DONE))
+		fetch();
 	count_vmc();
 	output_pixels();
 }
