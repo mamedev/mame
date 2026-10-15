@@ -377,6 +377,7 @@ private:
 	void wc_meters_w(uint8_t data);
 	void blitter_execute(int x, int y, int color, int width, int flag);
 	void corona_palette(palette_device &palette) const;
+	void monte_palette(palette_device &palette) const;
 	uint32_t screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void luckyrlt_cpu_io_map(address_map &map) ATTR_COLD;
@@ -438,6 +439,32 @@ void corona_state::corona_palette(palette_device &palette) const
 		bit0 = BIT(color_prom[i], 4);
 		bit1 = BIT(color_prom[i], 5);
 		int const r = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+void corona_state::monte_palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+
+	for (int i = 0; i < 0x20; ++i)
+	{
+		int bit0, bit1;
+		int const bit7 = BIT(color_prom[i], 7);
+		int const bit6 = BIT(color_prom[i], 6);
+
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		int const r = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
+
+		bit0 = BIT(color_prom[i], 2);
+		bit1 = BIT(color_prom[i], 3);
+		int const g = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
+
+		bit0 = BIT(color_prom[i], 4);
+		bit1 = BIT(color_prom[i], 5);
+		int const b = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -1617,6 +1644,8 @@ void corona_state::monte(machine_config &config)
 
 	// video hardware
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 32*8-1);
+
+	PALETTE(config.replace(), "palette", FUNC(corona_state::monte_palette), 0x100);
 }
 
 
