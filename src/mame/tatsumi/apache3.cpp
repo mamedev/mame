@@ -115,18 +115,18 @@ void apache3_state::apache3_road_x_w(offs_t offset, uint8_t data)
     the ground, by a game-set sky scale for the sky, and with an extra shear term for the horizontal
     accumulator). The ground accumulator is the distance below the horizon, which picks a row of
     the ground pattern RAM (512 pixels x 256 rows, 2 bits per pixel, pre-scaled for perspective and
-    mirrored about the centre); above the horizon the sky accumulator picks a colour of the sky
-    gradient.
+    mirrored about the centre). Above the horizon the same accumulator goes negative and its low 7
+    bits appear to address the sky gradient (palette entries 0x100-0x17f): one entry per line, the
+    lightest at the horizon. The gradient keeps the same height whatever the pitch, while the words
+    the game writes for the sky accumulator follow it, so they do not appear to select the gradient.
 */
 void apache3_state::draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect)
 {
 	// 24-bit accumulator: a 16-bit word in bits 8-23 plus the low byte of another word in bits 0-7
 	auto const acc24 = [] (uint16_t hi, uint16_t lo) { return util::sext((uint32_t(hi) << 8) | (lo & 0xff), 24); };
 	int32_t const h0 = util::sext((uint32_t(m_apache3_rotate_ctrl[0] & 0xff) << 16) | m_apache3_rotate_ctrl[4], 24);
-	int32_t const s0 = acc24(m_apache3_rotate_ctrl[1], m_apache3_rotate_ctrl[5]);
 	int32_t const g0 = acc24(m_apache3_rotate_ctrl[9], m_apache3_rotate_ctrl[10]);
 	int32_t const h_dx = int16_t(m_apache3_rotate_ctrl[2]), h_dy = int16_t(m_apache3_rotate_ctrl[6]);
-	int32_t const s_dx = int16_t(m_apache3_rotate_ctrl[3]), s_dy = int16_t(m_apache3_rotate_ctrl[7]);
 	int32_t const g_dx = int16_t(m_apache3_rotate_ctrl[8]), g_dy = int16_t(m_apache3_rotate_ctrl[11]);
 
 	pen_t const *const pens = m_palette->pens();
@@ -135,16 +135,14 @@ void apache3_state::draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect)
 	{
 		uint32_t *const dest = &dst.pix(y);
 		int32_t h = h0 + y * h_dy + cliprect.left() * h_dx;
-		int32_t sky = s0 + y * s_dy + cliprect.left() * s_dx;
 		int32_t g = g0 + y * g_dy + cliprect.left() * g_dx;
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int const row = g >> 8;
 			if (row < 0)
 			{
-				// sky: the gradient index grows with height above the horizon
-				int const level = std::min(-(sky >> 8), 0x7f);
-				dest[x] = pens[0x100 + std::max(level, 0)];
+				// sky: one gradient entry per line above the horizon, stopping at the darkest
+				dest[x] = pens[0x100 + std::max(row + 0x80, 0)];
 			}
 			else
 			{
@@ -163,7 +161,6 @@ void apache3_state::draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect)
 				dest[x] = pens[0x200 + (side ? 0x10 : 0) + (pix << 2) + ln];
 			}
 			h += h_dx;
-			sky += s_dx;
 			g += g_dx;
 		}
 	}
