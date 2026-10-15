@@ -724,12 +724,12 @@ void nwb_512_device::set_pixel(uint16_t x, uint16_t y, bool on)
 	m_vram->write(byte_offset, pixel);
 }
 
-uint8_t nwb_512_device::status_r()
+uint16_t nwb_512_device::status_r()
 {
 	return 0x20 | (m_state.busy ? 0x3 : 0x0);
 }
 
-void nwb_512_device::ctrl_w(uint8_t data)
+void nwb_512_device::ctrl_w(uint16_t data)
 {
 	// NWS-1580 uses a newer version of the framebuffer that uses a similar ROP engine, these definitions
 	// can be found in the NWS-1580 service manual.

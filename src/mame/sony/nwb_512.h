@@ -46,7 +46,7 @@ private:
 	struct state
 	{
 		// Registers
-		uint8_t ctrl = 0;
+		uint16_t ctrl = 0;
 
 		uint16_t destination_x = 0;			// DRXA
 		uint16_t current_destination_x = 0; // DXA
@@ -102,8 +102,8 @@ private:
 	void rop_cycle(uint16_t data);
 	void rop(uint16_t source);
 	void end_row();
-	uint8_t status_r();
-	void ctrl_w(uint8_t data);
+	uint16_t status_r();
+	void ctrl_w(uint16_t data);
 	void planemask_w(uint8_t data);
 	uint16_t coordinate_to_data(uint16_t x, uint16_t y);
 	void check_enabled() const
