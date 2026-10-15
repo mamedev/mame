@@ -21,16 +21,32 @@ ngen_keyboard_device::ngen_keyboard_device(const machine_config& mconfig, const 
 
 void ngen_keyboard_device::write(uint8_t data)
 {
-	// To be figured out
-	// Code 0x92 is sent on startup, perhaps resets the keyboard MCU
+	// 0x92 enables keyboard scanning after a soft reset.
+	// 0x8c requests the ROM checksum result; 0x9e enables echo mode.
 	// Codes 0xAx and 0xBx appear to control the keyboard LEDs, lower nibbles controlling the state of the LEDs
 	// When setting an error code via the LEDs, 0xB0 then 0xAE is sent (presumably for error code 0xE0),
 	// so that means that 0xAx controls the Overtype, Lock, F1 and F2 LEDs, and 0xBx controls the F3, F8, F9 and F10 LEDs.
 	logerror("KB: received character %02x\n",data);
+	if (data == 0x92U)
+		m_echo = false;
+	else if (m_echo)
+	{
+		send_key(data);
+		return;
+	}
+
 	switch(data)
 	{
-	case 0x92U:  // reset(?)
+	case 0x92U:  // soft reset
 		m_last_reset = 0x01U;
+		// The keyboard's first scan after a soft reset reports no keys down.
+		send_key(0xc0U);
+		break;
+	case 0x8cU:  // ROM checksum test
+		send_key(0xf0U);
+		break;
+	case 0x9eU:  // echo test
+		m_echo = true;
 		break;
 	}
 }
@@ -39,8 +55,8 @@ static INPUT_PORTS_START( ngen_keyboard )
 	PORT_INCLUDE(generic_keyboard)
 
 	PORT_START("RS232_TXBAUD")
-	PORT_CONFNAME(0xff, RS232_BAUD_19200, "TX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(serial_keyboard_device::update_serial))
-	PORT_CONFSETTING( RS232_BAUD_19200, "19200") // TODO: Based on the RAM refresh timer (~78kHz) to be 19530Hz
+	PORT_CONFNAME(0xff, RS232_BAUD_1200, "TX Baud") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(serial_keyboard_device::update_serial))
+	PORT_CONFSETTING( RS232_BAUD_1200, "1200")
 
 	PORT_START("RS232_DATABITS")
 	PORT_CONFNAME(0xff, RS232_DATABITS_8, "Data Bits") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(serial_keyboard_device::update_serial))
@@ -67,8 +83,9 @@ void ngen_keyboard_device::device_start()
 
 	save_item(NAME(m_keys_down));
 	save_item(NAME(m_last_reset));
+	save_item(NAME(m_echo));
 
-	set_rcv_rate(19200);
+	set_rcv_rate(1200);
 }
 
 void ngen_keyboard_device::device_reset()
@@ -77,6 +94,7 @@ void ngen_keyboard_device::device_reset()
 
 	m_keys_down = uint8_t(~0U);
 	m_last_reset = 0U;
+	m_echo = false;
 }
 
 void ngen_keyboard_device::rcv_complete()

@@ -27,6 +27,7 @@ private:
 
 	uint8_t m_keys_down;
 	uint8_t m_last_reset;
+	bool m_echo = false;
 };
 
 DECLARE_DEVICE_TYPE(NGEN_KEYBOARD, ngen_keyboard_device)

@@ -113,6 +113,8 @@ protected:
 	void hd_buffer_w(offs_t offset, uint8_t data);
 
 	void pit_out0_w(int state);
+	void kbd_rxrdy_w(int state);
+	void kbd_txrdy_w(int state);
 	void pit_out1_w(int state);
 	void pit_out2_w(int state);
 
@@ -137,6 +139,7 @@ protected:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void timer_clk_out(int state);
+	void cpu_timer_clk_out(int state);
 
 	void fdc_irq_w(int state);
 
@@ -165,6 +168,7 @@ private:
 	uint16_t xbus_r();
 
 	void cpu_timer_w(int state);
+	TIMER_CALLBACK_MEMBER(cpu_timer_irq_clear);
 
 	void hfd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t hfd_r(offs_t offset, uint16_t mem_mask = ~0);
@@ -209,6 +213,15 @@ private:
 	uint16_t m_disk_rom_ptr;
 	uint8_t m_hdc_control;
 	uint8_t m_disk_page;
+	uint16_t m_last_hdc_status = 0x100;
+	uint32_t m_hdc_status_reads = 0;
+	uint16_t m_last_kbd_status = 0x100;
+	uint32_t m_kbd_status_reads = 0;
+	uint16_t m_last_kbd_control = 0x100;
+	uint32_t m_kbd_control_writes = 0;
+	emu_timer *m_cpu_timer_irq_timer = nullptr;
+	bool m_kbd_rxrdy = false;
+	bool m_kbd_txrdy = false;
 };
 
 class ngen386_state : public ngen_state
@@ -226,6 +239,18 @@ void ngen_state::pit_out0_w(int state)
 {
 	m_pic->ir3_w(state);  // Timer interrupt
 	popmessage("PIT Timer 0 state %i\n",state);
+}
+
+void ngen_state::kbd_rxrdy_w(int state)
+{
+	m_kbd_rxrdy = bool(state);
+	m_pic->ir6_w(m_kbd_rxrdy || m_kbd_txrdy);
+}
+
+void ngen_state::kbd_txrdy_w(int state)
+{
+	m_kbd_txrdy = bool(state);
+	m_pic->ir6_w(m_kbd_rxrdy || m_kbd_txrdy);
 }
 
 void ngen_state::pit_out1_w(int state)
@@ -246,19 +271,28 @@ void ngen_state::cpu_timer_w(int state)
 {
 	if(state != 0)
 		popmessage("80186 Timer 0 state %i\n",state);
-	m_pic->ir5_w(state);
+	if (!state)
+	{
+		// Timer output is active low; release the PIC edge after it can be sampled.
+		m_pic->ir5_w(1);
+		m_cpu_timer_irq_timer->adjust(attotime::from_usec(10));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(ngen_state::cpu_timer_irq_clear)
+{
+	m_pic->ir5_w(0);
 }
 
 void ngen_state::timer_clk_out(int state)
 {
 	m_viduart->write_rxc(state);  // Keyboard UART Rx/Tx clocks
 	m_viduart->write_txc(state);
-	// 80186 timer pins also?  EXT bit is enabled for BTOS PIT test.
-	if(m_maincpu)
-	{
-		m_maincpu->tmrin0_w(state);
-		//m_maincpu->tmrin1_w(state);
-	}
+}
+
+void ngen_state::cpu_timer_clk_out(int state)
+{
+	m_maincpu->tmrin0_w(state);
 }
 
 void ngen_state::cpu_peripheral_cb(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -340,7 +374,10 @@ void ngen_state::peripheral_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x112:
 	case 0x113:
 		if(ACCESSING_BITS_0_7)
+		{
+			logerror("PIT register %u write %02x\n", unsigned(offset - 0x110), data & 0xff);
 			m_pit->write(offset-0x110,data & 0xff);
+		}
 		break;
 	case 0x141:
 		// bit 1 enables speaker?
@@ -357,7 +394,18 @@ void ngen_state::peripheral_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x146:
 	case 0x147:
 		if(ACCESSING_BITS_0_7)
+		{
+			if (offset & 1)
+			{
+				++m_kbd_control_writes;
+				if (((data & 0xff) != m_last_kbd_control) || !(m_kbd_control_writes & (m_kbd_control_writes - 1)))
+					logerror("Keyboard UART control write %02x (write %u)\n", data & 0xff, m_kbd_control_writes);
+				m_last_kbd_control = data & 0xff;
+			}
+			else
+				logerror("Keyboard UART data write %02x\n", data & 0xff);
 			m_viduart->write(offset & 1, data & 0xff);
+		}
 		break;
 	case 0x1a0:  // serial?
 		logerror("Serial(?) 0x1a0 write offset %04x data %04x mask %04x\n",offset,data,mem_mask);
@@ -428,7 +476,18 @@ uint16_t ngen_state::peripheral_r(offs_t offset, uint16_t mem_mask)
 	case 0x147:  // keyboard UART
 		// status expects bit 0 to be set (UART transmit ready)
 		if(ACCESSING_BITS_0_7)
+		{
 			ret = m_viduart->read(offset & 1);
+			if (offset & 1)
+			{
+				++m_kbd_status_reads;
+				if ((ret != m_last_kbd_status) || !(m_kbd_status_reads & (m_kbd_status_reads - 1)))
+					logerror("Keyboard UART status %02x (read %u)\n", ret, m_kbd_status_reads);
+				m_last_kbd_status = ret;
+			}
+			else
+				logerror("Keyboard UART data read %02x\n", ret);
+		}
 		break;
 	case 0x1a0:  // I/O control register?
 		ret = m_control;  // end of DMA transfer? (maybe a per-channel EOP?) Bit 6 is set during a transfer?
@@ -565,7 +624,14 @@ void ngen_state::hfd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		case 0x16:
 		case 0x17:
 			if(ACCESSING_BITS_0_7)
+			{
 				m_hdc->write(offset-0x10,data & 0xff);
+				if (offset == 0x17)
+				{
+					m_last_hdc_status = 0x100;
+					m_hdc_status_reads = 0;
+				}
+			}
 			logerror("WD1010 register %i write %02x mask %04x\n",offset-0x10,data & 0xff,mem_mask);
 			break;
 		case 0x18:
@@ -614,8 +680,18 @@ uint16_t ngen_state::hfd_r(offs_t offset, uint16_t mem_mask)
 		case 0x16:
 		case 0x17:
 			if(ACCESSING_BITS_0_7)
+			{
 				ret = m_hdc->read(offset-0x10);
-			logerror("WD1010 register %i read, mask %04x\n",offset-0x10,mem_mask);
+				if (offset == 0x17)
+				{
+					++m_hdc_status_reads;
+					if ((ret != m_last_hdc_status) || !(m_hdc_status_reads & (m_hdc_status_reads - 1)))
+						logerror("WD1010 status %02x (read %u since command)\n", ret, m_hdc_status_reads);
+					m_last_hdc_status = ret;
+				}
+				else
+					logerror("WD1010 register %i read %02x\n",offset-0x10,ret);
+			}
 			break;
 		case 0x18:
 		case 0x19:
@@ -895,6 +971,7 @@ uint16_t ngen_state::periph141_r(offs_t offset, uint16_t mem_mask)
 
 void ngen_state::machine_start()
 {
+	m_cpu_timer_irq_timer = timer_alloc(FUNC(ngen_state::cpu_timer_irq_clear), this);
 	memory_share* vidshare = memshare("vram");
 	memory_share* fontshare = memshare("fontram");
 	if(vidshare == nullptr || fontshare == nullptr)
@@ -908,6 +985,15 @@ void ngen_state::machine_reset()
 	m_port00 = 0;
 	m_control = 0;
 	m_xbus_current = 0;
+	m_last_hdc_status = 0x100;
+	m_hdc_status_reads = 0;
+	m_last_kbd_status = 0x100;
+	m_kbd_status_reads = 0;
+	m_last_kbd_control = 0x100;
+	m_kbd_control_writes = 0;
+	m_cpu_timer_irq_timer->adjust(attotime::never);
+	m_kbd_rxrdy = false;
+	m_kbd_txrdy = false;
 	m_viduart->write_dsr(0);
 	m_viduart->write_cts(0);
 	m_fd0->get_device()->set_rpm(300);
@@ -1064,12 +1150,14 @@ void ngen_state::ngen(machine_config &config)
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
 	I8251(config, m_viduart);  // main clock unknown, Rx/Tx clocks are 19.53kHz
-//  m_viduart->txempty_handler().set(m_pic, FUNC(pic8259_device::ir4_w));
+	m_viduart->rxrdy_handler().set(FUNC(ngen_state::kbd_rxrdy_w));
+	m_viduart->txrdy_handler().set(FUNC(ngen_state::kbd_txrdy_w));
 	m_viduart->txd_handler().set("keyboard", FUNC(rs232_port_device::write_txd));
 	rs232_port_device &kbd(RS232_PORT(config, "keyboard", keyboard, "ngen"));
 	kbd.rxd_handler().set(m_viduart, FUNC(i8251_device::write_rxd));
 
-	CLOCK(config, "refresh_clock", 19200*16).signal_handler().set(FUNC(ngen_state::timer_clk_out)); // should be 19530Hz
+	CLOCK(config, "refresh_clock", 78120/4).signal_handler().set(FUNC(ngen_state::timer_clk_out)); // 8251 x16 clock, approximately 1200 baud
+	CLOCK(config, "cpu_timer_clock", 78120).signal_handler().set(FUNC(ngen_state::cpu_timer_clk_out));
 
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
 	WD2797(config, m_fdc, 20_MHz_XTAL / 20);
@@ -1092,7 +1180,7 @@ void ngen_state::ngen(machine_config &config)
 	m_hdc->out_bcs_callback().set(FUNC(ngen_state::hd_buffer_w));
 	m_hdc->in_drdy_callback().set_constant(1);
 	m_hdc->in_index_callback().set_constant(1);
-	m_hdc->in_wf_callback().set_constant(1);
+	m_hdc->in_wf_callback().set_constant(0);
 	m_hdc->in_tk000_callback().set_constant(1);
 	m_hdc->in_sc_callback().set_constant(1);
 
@@ -1177,12 +1265,13 @@ void ngen386_state::ngen386(machine_config &config)
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
 	I8251(config, m_viduart);  // main clock unknown, Rx/Tx clocks are 19.53kHz
-//  m_viduart->txempty_handler().set("pic", FUNC(pic8259_device::ir4_w));
+	m_viduart->rxrdy_handler().set(FUNC(ngen386_state::kbd_rxrdy_w));
+	m_viduart->txrdy_handler().set(FUNC(ngen386_state::kbd_txrdy_w));
 	m_viduart->txd_handler().set("keyboard", FUNC(rs232_port_device::write_txd));
 	rs232_port_device &kbd(RS232_PORT(config, "keyboard", keyboard, "ngen"));
 	kbd.rxd_handler().set(m_viduart, FUNC(i8251_device::write_rxd));
 
-	CLOCK(config, "refresh_clock", 19200*16).signal_handler().set(FUNC(ngen386_state::timer_clk_out)); // should be 19530Hz
+	CLOCK(config, "refresh_clock", 78120/4).signal_handler().set(FUNC(ngen386_state::timer_clk_out)); // 8251 x16 clock, approximately 1200 baud
 
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
 	WD2797(config, m_fdc, 20_MHz_XTAL / 20);
@@ -1205,7 +1294,7 @@ void ngen386_state::ngen386(machine_config &config)
 	m_hdc->out_bcs_callback().set(FUNC(ngen386_state::hd_buffer_w));
 	m_hdc->in_drdy_callback().set_constant(1);
 	m_hdc->in_index_callback().set_constant(1);
-	m_hdc->in_wf_callback().set_constant(1);
+	m_hdc->in_wf_callback().set_constant(0);
 	m_hdc->in_tk000_callback().set_constant(1);
 	m_hdc->in_sc_callback().set_constant(1);
 
