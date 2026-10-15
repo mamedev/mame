@@ -850,7 +850,8 @@ void plus4_state::plus4(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &plus4_state::plus4_mem<0x10000>);
 	m_maincpu->read_callback().set(FUNC(plus4_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(plus4_state::cpu_w));
-	config.set_perfect_quantum(m_maincpu);
+	// limits how far the 1551 drive can run past a sync point
+	config.set_maximum_quantum(attotime::from_usec(16));
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m7501_device::IRQ_LINE);
 
@@ -924,6 +925,7 @@ void plus4_state::plus4(machine_config &config)
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 
 	PLUS4_EXPANSION_SLOT(config, m_exp, XTAL(14'318'181)/16, plus4_expansion_cards, "c1551");
+	m_exp->set_cpu(m_maincpu);
 	m_exp->irq_wr_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_exp->aec_wr_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 

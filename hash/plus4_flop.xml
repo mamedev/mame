@@ -80,8 +80,7 @@ license:CC0-1.0
 		<description>Return to Promised Land</description>
 		<year>2026</year>
 		<publisher>Section 31</publisher>
-		<sharedfeat name="exp_default" value="sid"/>
-		<sharedfeat name="iec8_default" value="c1541"/>
+		<sharedfeat name="exp:c1551:exp_default" value="sid"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side 1"/>
 			<dataarea name="flop" size="174848">
