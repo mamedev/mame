@@ -356,6 +356,7 @@ public:
 	void luckyrlt(machine_config &config) ATTR_COLD;
 	void re800(machine_config &config) ATTR_COLD;
 	void luckyrlta(machine_config &config) ATTR_COLD;
+	void monte(machine_config &config) ATTR_COLD;
 	void init_rulam() ATTR_COLD;
 
 protected:
@@ -394,6 +395,7 @@ private:
 	void winner82_map(address_map &map) ATTR_COLD;
 	void winner82_sound_cpu_io_map(address_map &map) ATTR_COLD;
 	void winner82_sound_map(address_map &map) ATTR_COLD;
+	void monte_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_blitter_x_reg = 0;
 	uint8_t m_blitter_y_reg = 0;
@@ -709,8 +711,7 @@ void corona_state::winner81_sound_cpu_io_map(address_map &map)
 
 void corona_state::winner82_map(address_map &map)
 {
-//	map(0x0000, 0x3fff).rom();
-	map(0x0000, 0x7fff).rom();
+	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x4fff).ram().share("nvram");
 	map(0x8000, 0x80ff).ram();
 }
@@ -875,6 +876,13 @@ void corona_state::luckyrlt_sound_cpu_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).r(FUNC(corona_state::sound_latch_r));
 	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::address_data_w));
+}
+
+void corona_state::monte_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x5fff).ram().share("nvram");
+	map(0x8000, 0xbfff).rom().region("maincpu", 0x4000);
 }
 
 
@@ -1599,6 +1607,15 @@ void corona_state::luckyrlta(machine_config &config)
 	AY8912(config, "aysnd", AY_CLK1).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void corona_state::monte(machine_config &config)
+{
+	winner82(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &corona_state::monte_map);
+	m_maincpu->set_addrmap(AS_IO, &corona_state::winner82_cpu_io_map);
+}
+
 
 /**************** Corona Co,LTD. Hardware ****************
 *  > ROM Loading Routines...                             *
@@ -1923,7 +1940,6 @@ void corona_state::init_rulam()
 
 	for (int i = 0; i < 0x10000; i++)
 		rom[i] = bitswap<8>(rom[i], 5, 2, 0, 7, 1, 6, 3, 4);
-
 }
 
 
@@ -1949,5 +1965,5 @@ GAMEL( 199?, rcirulet,  0,        rcirulet,  re800,    corona_state, empty_init,
 GAMEL( 1990, luckyrlt,  0,        luckyrlt,  luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish, set 1)", 0,                        layout_luckyrlt )
 GAMEL( 1991, luckyrlta, luckyrlt, luckyrlta, luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish, set 2)", 0,                        layout_luckyrlt )
 
+GAME(  1989, monte,     winner82, monte,     winner82, corona_state, init_rulam, ROT0,   "Miky S.R.L.",              "Monte (cards game, encrypted)",                   MACHINE_NOT_WORKING )
 GAME(  1991, rulamiky,  winner82, winner82,  winner82, corona_state, init_rulam, ROT90,  "Miky S.R.L.",              "Rula (roulette, encrypted)",                      MACHINE_NOT_WORKING )
-GAME(  1989, monte,     winner82, winner82,  winner82, corona_state, init_rulam, ROT90,  "Miky S.R.L.",              "Monte (cards game, encrypted)",                   MACHINE_NOT_WORKING )
