@@ -1,12 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-/*
-
-    TODO:
-
-    - clean up TED
-
-*/
 
 #include "emu.h"
 #include "screen.h"
@@ -77,7 +70,9 @@ public:
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
 		m_portswap(*this, "JOYSWAP"),
-		m_addr(0)
+		m_addr(0),
+		m_kb(0),
+		m_cst_rd(1)
 	{ }
 
 	void plus4(machine_config &config);
@@ -134,6 +129,7 @@ protected:
 	void vslsi_w(offs_t offset, uint8_t data);
 	void addr_w(offs_t offset, uint8_t data);
 	void ted_rom_w(offs_t offset, uint8_t data);
+	void cst_rd_w(int state) { m_cst_rd = state; }
 
 	uint8_t cpu_r();
 
@@ -166,6 +162,8 @@ protected:
 
 	// keyboard state
 	uint8_t m_kb;
+
+	uint8_t m_cst_rd;
 
 	template <offs_t RamSize> void plus4_mem(address_map &map) ATTR_COLD;
 	template <offs_t RamSize> void ted_videoram_map(address_map &map) ATTR_COLD;
@@ -621,7 +619,7 @@ uint8_t plus4_state::cpu_r()
 	uint8_t data = 0x2f;
 
 	// cassette read
-	data |= m_cassette->read() << 4;
+	data |= m_cst_rd << 4;
 
 	// serial clock
 	data |= m_iec->clk_r() << 6;
@@ -655,7 +653,7 @@ uint8_t c16_state::cpu_r()
 	uint8_t data = 0;
 
 	// cassette read
-	data |= m_cassette->read() << 4;
+	data |= m_cst_rd << 4;
 
 	// serial clock
 	data |= m_iec->clk_r() << 6;
@@ -798,6 +796,7 @@ void plus4_state::machine_start()
 	// state saving
 	save_item(NAME(m_addr));
 	save_item(NAME(m_kb));
+	save_item(NAME(m_cst_rd));
 
 	if (m_acia)
 	{
@@ -857,10 +856,6 @@ void plus4_state::plus4(machine_config &config)
 
 	// video and sound hardware
 	screen_device &screen(SCREEN(config, SCREEN_TAG));
-	screen.set_refresh_hz(mos7360_device::PAL_VRETRACERATE);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(384, 288);
-	screen.set_visarea(0, 384 - 1, 0, 288 - 1);
 	screen.set_screen_update(MOS7360_TAG, FUNC(mos7360_device::screen_update));
 
 	SPEAKER(config, "mono").front_center();
@@ -870,6 +865,7 @@ void plus4_state::plus4(machine_config &config)
 	m_ted->set_addrmap(0, &plus4_state::ted_videoram_map<0x10000>);
 	m_ted->set_screen(SCREEN_TAG);
 	m_ted->write_irq_callback().set("mainirq", FUNC(input_merger_device::in_w<0>));
+	m_ted->write_ba_callback().set_inputline(m_maincpu, m7501_device::RDY_LINE);
 	m_ted->read_k_callback().set(FUNC(plus4_state::ted_k_r));
 	m_ted->add_route(ALL_OUTPUTS, "mono", 0.25);
 
@@ -919,7 +915,7 @@ void plus4_state::plus4(machine_config &config)
 	m_spi_kb->p_handler<7>().set(FUNC(plus4_state::write_kb7));
 
 	PET_DATASSETTE_PORT(config, m_cassette, plus4_datassette_devices, "c1531");
-	m_cassette->read_handler().set_nop();
+	m_cassette->read_handler().set(FUNC(plus4_state::cst_rd_w));
 
 	cbm_iec_slot_device::add(config, m_iec, nullptr);
 	m_iec->atn_callback().set(m_user, FUNC(pet_user_port_device::write_9));
@@ -944,8 +940,9 @@ void plus4_state::plus4(machine_config &config)
 void plus4_state::plus4p(machine_config &config)
 {
 	plus4(config);
-	m_maincpu->set_clock(XTAL(17'734'470)/20);
-	m_ted->set_clock(XTAL(17'734'470));
+	m_maincpu->set_clock(17.73447_MHz_XTAL / 10);
+	m_ted->set_clock(17.73447_MHz_XTAL);
+	m_ted->configure_screen(*subdevice<screen_device>(SCREEN_TAG), false);
 	m_exp->set_clock(XTAL(17'734'470)/20);
 
 	// software list
@@ -968,13 +965,9 @@ void plus4_state::plus4p(machine_config &config)
 void plus4_state::plus4n(machine_config &config)
 {
 	plus4(config);
-	m_maincpu->set_clock(XTAL(14'318'181)/16);
-	m_ted->set_clock(XTAL(14'318'181));
-
-	screen_device &screen(*subdevice<screen_device>(SCREEN_TAG));
-	screen.set_refresh_hz(mos7360_device::NTSC_VRETRACERATE);
-	screen.set_size(384, 240);
-	screen.set_visarea(0, 384 - 1, 0, 240 - 1);
+	m_maincpu->set_clock(14.318181_MHz_XTAL / 8);
+	m_ted->set_clock(14.318181_MHz_XTAL);
+	m_ted->configure_screen(*subdevice<screen_device>(SCREEN_TAG), true);
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list").set_original("plus4_cart");

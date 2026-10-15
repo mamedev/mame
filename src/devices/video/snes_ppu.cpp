@@ -1412,12 +1412,9 @@ void snes_ppu_device::set_latch_hv(int16_t x, int16_t y)
 
 void snes_ppu_device::dynamic_res_change()
 {
-	rectangle visarea = screen().visible_area();
-	attotime refresh;
-
-	visarea.min_x = visarea.min_y = 0;
-	visarea.max_y = m_beam.last_visible_line * m_interlace - 1;
-	visarea.max_x = (SNES_SCR_WIDTH * 2) - 1;
+	rectangle visarea(
+			0, (SNES_SCR_WIDTH * 2) - 1,
+			0, m_beam.last_visible_line * m_interlace - 1);
 
 	// fixme: should compensate for SNES_DBG_VIDEO
 	if (m_mode == 5 || m_mode == 6 || m_pseudo_hires)
@@ -1428,12 +1425,12 @@ void snes_ppu_device::dynamic_res_change()
 	/* FIXME: does the timing changes when the gfx mode is equal to 5 or 6? */
 	if ((m_stat78 & 0x10) == SNES_NTSC)
 	{
-		refresh = attotime::from_ticks(SNES_HTOTAL * SNES_VTOTAL_NTSC, DOTCLK_NTSC);
+		attotime refresh = attotime::from_ticks(SNES_HTOTAL * SNES_VTOTAL_NTSC, DOTCLK_NTSC);
 		screen().configure(SNES_HTOTAL * m_htmult, SNES_VTOTAL_NTSC * m_interlace, visarea, refresh);
 	}
 	else
 	{
-		refresh = attotime::from_ticks(SNES_HTOTAL * SNES_VTOTAL_PAL, DOTCLK_PAL);
+		attotime refresh = attotime::from_ticks(SNES_HTOTAL * SNES_VTOTAL_PAL, DOTCLK_PAL);
 		screen().configure(SNES_HTOTAL * m_htmult, SNES_VTOTAL_PAL * m_interlace, visarea, refresh);
 	}
 }

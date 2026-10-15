@@ -60,7 +60,7 @@ TODO (pc9821ra20/pc9821ra266/pc9821ra333):
 - "MICON ERROR" at POST (processor microcode detection fails, basically down to a more
   involved bankswitch with Pentium based machines);
 
-TODO: (pc9821nr15/pc9821nr166/pc9821nw150)
+TODO (pc9821nr15/pc9821nr166/pc9821nw150):
 - Keeps looping on SET THE SOFTWARE DIP (wants extended UPD4993A mode?)
 - Tests conventional RAM then keeps polling $03c4 (should be base VGA regs read);
 - Skipping that will eventually error out with a "MEMORY ERROR" (never reads extended memory);
@@ -82,7 +82,7 @@ TODO: (pc9821nr15/pc9821nr166/pc9821nw150)
 
 uint32_t pc9821_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 	if(m_video_ff[DISPLAY_REG] != 0)
 	{
@@ -1184,7 +1184,7 @@ void pc9821_state::pc9821(machine_config &config)
 
 	m_dmac->set_clock(xtal); // unknown clock
 
-	PALETTE(config.replace(), m_palette, FUNC(pc9821_state::pc9801_palette), 16 + 16 + 256);
+	PALETTE(config.replace(), m_palette, FUNC(pc9821_state::palette_init), 16 + 16 + 256);
 
 	// win95 expects to be A revision, otherwise it will overlay startup text prompts over desktop GFX
 	// NOTE: possibly this bump happened around PC-9801BX series
@@ -1321,7 +1321,7 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	// file bay with built-in CD-Rom (4x)
 	// HDD with pre-installed software (850MB, 1.2GB)
 
-	// "general purpose slot" x 3, 1 fitted (all PCI?)
+	// "general purpose slot" x 3, 1 fitted (all C-Bus apparently, so no PCI slot)
 	// PC-9821CB-B04, on dedicated bus (Fax/Modem 14'400 bps) and IrDA board (115'200 bps)
 	// Optional PC-9821C3-B02 MIDI board, on dedicated bus
 
@@ -1405,6 +1405,7 @@ void pc9821_mate_x_state::pc9821xv13(machine_config &config)
 
 	// Xv13/W identical to Xa16/W specs with MGA-2064W as PCI GFX card
 	// PCI rev 2.0 (VLSI Supercore596 Wildcat) or 2.1 (Intel 430HX)
+	// assume same as 3rd gen PCI specs
 	PCI_ROOT(config, "pci");
 	// ...
 }

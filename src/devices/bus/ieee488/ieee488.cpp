@@ -135,6 +135,8 @@ ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, d
 
 void ieee488_device::device_start()
 {
+	save_item(NAME(m_line));
+	save_item(NAME(m_dio));
 }
 
 
@@ -160,6 +162,8 @@ void ieee488_device::add_device(ieee488_slot_device *slot, device_t *target)
 	entry->m_interface->m_slot = slot;
 
 	m_device_list.append(*entry);
+	save_item(NAME(entry->m_line), m_device_list.count());
+	save_item(NAME(entry->m_dio), m_device_list.count());
 }
 
 
@@ -388,6 +392,7 @@ uint8_t ieee488_device::get_data()
 
 // slot devices
 #include "bus/cbmiec/c1526.h"
+#include "bus/cbmiec/msdsd.h"
 #include "c2031.h"
 #include "c2040.h"
 #include "c3022.h"
@@ -416,6 +421,8 @@ void cbm_ieee488_devices(device_slot_interface &device)
 	device.option_add("d9090", GPIB_D9090);
 	device.option_add("softbox", GPIB_SOFTBOX);
 	device.option_add("hardbox", GPIB_HARDBOX);
+	device.option_add("msdsd1", GPIB_MSD_SD1);
+	device.option_add("msdsd2", GPIB_MSD_SD2);
 	device.option_add("shark", GPIB_MSHARK);
 	device.option_add("c3022", GPIB_C3022);
 	device.option_add("c4022", GPIB_C4022);

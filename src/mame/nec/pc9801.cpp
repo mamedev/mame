@@ -1712,11 +1712,14 @@ uint32_t pc9801vm_state::a20_286(bool state)
 *
 ****************************************/
 
-void pc9801_state::pc9801_palette(palette_device &palette) const
+void pc9801_state::palette_init(palette_device &palette) const
 {
+	// set fixed BRG for text GDC palette
 	for(int i = 0; i < 8; i++)
-		palette.set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+		palette.set_pen_color(i, pal1bit(BIT(i, 1)), pal1bit(BIT(i, 2)), pal1bit(BIT(i, 0)));
 
+	// clear bitmap GDC palette(s) for debugging aid
+	// assume undefined content on real HW
 	for(int i = 8; i < palette.entries(); i++)
 		palette.set_pen_color(i, rgb_t::black());
 }
@@ -2116,7 +2119,7 @@ void pc9801_state::pc9801(machine_config &config)
 	UPD1990A(config, m_rtc);
 
 	BEEP(config, m_beeper, 2400).add_route(ALL_OUTPUTS, "mono", 0.15);
-	PALETTE(config, m_palette, FUNC(pc9801_state::pc9801_palette), 16);
+	PALETTE(config, m_palette, FUNC(pc9801_state::palette_init), 16);
 
 	// TODO: should be PC80S31, using 'K variant for the better BIOS instead
 	// (and no patch downstream).
@@ -2201,7 +2204,7 @@ void pc9801vm_state::pc9801vm(machine_config &config)
 	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	// analog mode optional on earlier VM, with PC-9801-24 gfx board
-	PALETTE(config, m_palette, FUNC(pc9801vm_state::pc9801_palette), 16 + 16);
+	PALETTE(config, m_palette, FUNC(pc9801vm_state::palette_init), 16 + 16);
 }
 
 // UV is essentially a VM with 3.5" 2DD drives

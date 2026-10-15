@@ -711,10 +711,10 @@ u32 i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	// draw background color
 	bitmap.fill(bitswap<3>(m_vdc.s.color,3,4,5), cliprect);
 
-	for (int scanline = cliprect.min_y; scanline <= cliprect.max_y; scanline++)
+	for (int scanline = cliprect.top(); scanline <= cliprect.bottom(); scanline++)
 	{
 		// clear collision maps
-		if (cliprect.min_x == screen.visible_area().min_x)
+		if (cliprect.left() == screen.visible_area().left())
 		{
 			memset(m_collision_map, 0, sizeof(m_collision_map));
 			memset(m_priority_map, 0, sizeof(m_priority_map));
@@ -732,9 +732,9 @@ u32 i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 		}
 
 		// go over the collision map again for edge cases on this scanline
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			if (x > screen.visible_area().min_x)
+			if (x > screen.visible_area().left())
 			{
 				u16 colx0 = m_collision_map[x - 1];
 				u16 colx1 = m_collision_map[x];

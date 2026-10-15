@@ -1851,6 +1851,19 @@ if SOUNDS["ROLANDLP"] then
 end
 
 ---------------------------------------------------
+-- Roland RPP-324 RDAC phrase player
+--@src/devices/sound/roland_rpp324.h,SOUNDS["ROLANDRPP324"] = true
+---------------------------------------------------
+
+if SOUNDS["ROLANDRPP324"] then
+	files {
+		MAME_DIR .. "src/devices/sound/roland_rpp324.cpp",
+		MAME_DIR .. "src/devices/sound/roland_rpp324.h",
+		MAME_DIR .. "src/devices/sound/roland_rpp324_codec.h",
+	}
+end
+
+---------------------------------------------------
 --
 --@src/devices/sound/vgm_visualizer.h,SOUNDS["VGMVIZ"] = true
 ---------------------------------------------------

@@ -534,7 +534,18 @@ void arm7_cpu_device::HandleMemSingle(uint32_t insn)
 				if (rd == eR15)
 				{
 					if (MODE32)
-						R15 = data - 4;
+					{
+						if ((data & 1) && m_archRev >= 5)
+						{
+							// ARMv5: a load to PC interworks
+							set_cpsr(GET_CPSR | T_MASK);
+							R15 = (data & ~1) - 4;
+						}
+						else
+						{
+							R15 = (data & ~3) - 4;
+						}
+					}
 					else
 					{
 						// Data East DE156: an unaligned target resumes at the next word boundary (World Cup Volleyball '95)
@@ -544,11 +555,6 @@ void arm7_cpu_device::HandleMemSingle(uint32_t insn)
 					}
 					// LDR, PC takes 2S + 2N + 1I (5 total cycles)
 					ARM7_ICOUNT -= 2;
-					if ((data & 1) && m_archRev >= 5)
-					{
-						set_cpsr(GET_CPSR | T_MASK);
-						R15--;
-					}
 				}
 				else
 				{
@@ -1179,7 +1185,7 @@ void arm7_cpu_device::HandleALU(uint32_t insn)
 		{
 			if (MODE32)
 			{
-				R15 = rd;
+				R15 = rd & ~3;  // ARM state: bits 1:0 of a result written to PC are ignored (ALU writes interwork only from ARMv7)
 			}
 			else
 			{
@@ -1448,7 +1454,7 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 			{
 				uint32_t const data = READ32(addr & ~3);
 				if (!m_pendingAbtD && MODE32)
-					R15 = data - 4;     // arm7ops_89 adds 4
+					R15 = (data & ~3) - 4;     // arm7ops_89 adds 4
 			}
 			else
 			{
@@ -1541,12 +1547,15 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 						write_r15_psr26(R15, true);
 					}
 				}
-				else
-					if ((R15 & 1) && m_archRev >= 5)
-					{
-						set_cpsr(GET_CPSR | T_MASK);
-						R15--;
-					}
+				else if ((R15 & 1) && m_archRev >= 5)
+				{
+					set_cpsr(GET_CPSR | T_MASK);
+					R15--;
+				}
+				else if (MODE32)
+				{
+					R15 &= ~3;
+				}
 				// LDM PC - takes 2 extra cycles
 				ARM7_ICOUNT -= 2;
 			}
@@ -1614,12 +1623,15 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 						write_r15_psr26(R15, true);
 					}
 				}
-				else
-					if ((R15 & 1) && m_archRev >= 5)
-					{
-						set_cpsr(GET_CPSR | T_MASK);
-						R15--;
-					}
+				else if ((R15 & 1) && m_archRev >= 5)
+				{
+					set_cpsr(GET_CPSR | T_MASK);
+					R15--;
+				}
+				else if (MODE32)
+				{
+					R15 &= ~3;
+				}
 				// LDM PC - takes 2 extra cycles
 				ARM7_ICOUNT -= 2;
 			}

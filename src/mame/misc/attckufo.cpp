@@ -133,17 +133,14 @@ void attckufo_state::attckufo(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_refresh_hz(MOS6560_VRETRACERATE);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE);
-	screen.set_visarea(0, 23*8 - 1, 0, 22*8 - 1);
+	screen.set_raw(mos6560_device::CLOCK * 4, mos6560_device::HTOTAL, 32, 32 + 23 * 8, mos6560_device::LINES, 28, 28 + 22 * 8);
 	screen.set_screen_update("mos6560", FUNC(mos6560_device::screen_update));
 
 	mos6560_device &mos6560(MOS656X_ATTACK_UFO(config, "mos6560", XTAL(14'318'181) / 14));
 	mos6560.set_screen("screen");
 	mos6560.set_addrmap(0, &attckufo_state::vic_videoram_map);
 	mos6560.set_addrmap(1, &attckufo_state::vic_colorram_map);
-	mos6560.add_route(ALL_OUTPUTS, "mono", 0.25);
+	mos6560.add_route(ALL_OUTPUTS, "mono", 0.08);
 }
 
 

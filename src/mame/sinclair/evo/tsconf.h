@@ -35,6 +35,7 @@ public:
 		, m_sprites_raw(*this, "sprites_raw", 64U * 64 * 8 * 8, ENDIANNESS_LITTLE)
 		, m_keyboard(*this, "pc_keyboard")
 		, m_io_mouse(*this, "mouse_input%u", 1U)
+		, m_io_layers(*this, "LYRS")
 		, m_beta(*this, "beta")
 		, m_dma(*this, "dma")
 		, m_sdcard(*this, "sdcard")
@@ -216,6 +217,7 @@ private:
 	void ram_write16(offs_t offset, u16 data);
 	u16 ram_read16(offs_t offset);
 	u16 spi_read16();
+	void spi_write16(u16 data);
 	void dma_ready(int line);
 
 	std::map<tsconf_regs, u8> m_scanline_delayed_regs_update;
@@ -229,6 +231,7 @@ private:
 
 	required_device<at_keyboard_device> m_keyboard;
 	required_ioport_array<4> m_io_mouse;
+	optional_ioport m_io_layers;
 
 	required_device<tsconf_beta_device> m_beta;
 	required_device<tsconfdma_device> m_dma;

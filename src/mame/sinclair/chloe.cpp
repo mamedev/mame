@@ -59,7 +59,7 @@ public:
 		, m_kbdc(*this, "pc_kbdc")
 	{}
 
-	void chloe(machine_config &config);
+	void chloe(machine_config &config) ATTR_COLD;
 
 	INPUT_CHANGED_MEMBER(on_divmmc_nmi);
 

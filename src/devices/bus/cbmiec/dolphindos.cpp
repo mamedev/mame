@@ -140,7 +140,8 @@ void c1541_dolphin_dos_v2_device::via0_ca2_w(int state)
 
 c1571_dolphin_dos_v3_device::c1571_dolphin_dos_v3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: c1571_device(mconfig, C1571_DOLPHIN_DOS_V3, tag, owner, clock),
-	  device_c64_floppy_parallel_interface(mconfig, *this) {  }
+	  device_c64_floppy_parallel_interface(mconfig, *this),
+	  m_pia(*this, "pia") {  }
 
 
 //-------------------------------------------------
@@ -164,15 +165,18 @@ const tiny_rom_entry *c1571_dolphin_dos_v3_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  device_add_mconfig - add device configuration
+//  ADDRESS_MAP( c1571dd3_mem )
 //-------------------------------------------------
 
-uint8_t c1571_dolphin_dos_v3_device::cia_pb_r()
+void c1571_dolphin_dos_v3_device::c1571dd3_mem(address_map &map)
 {
-	return m_parallel_data;
+	c1571_mem(map);
+	map(0x5000, 0x5003).mirror(0x0ffc).rw(m_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x6000, 0x7fff).ram();
 }
 
-void c1571_dolphin_dos_v3_device::cia_pb_w(uint8_t data)
+
+void c1571_dolphin_dos_v3_device::pia_pa_w(uint8_t data)
 {
 	if (m_other != nullptr)
 	{
@@ -180,7 +184,7 @@ void c1571_dolphin_dos_v3_device::cia_pb_w(uint8_t data)
 	}
 }
 
-void c1571_dolphin_dos_v3_device::cia_pc_w(int state)
+void c1571_dolphin_dos_v3_device::pia_ca2_w(int state)
 {
 	if (m_other != nullptr)
 	{
@@ -188,14 +192,23 @@ void c1571_dolphin_dos_v3_device::cia_pc_w(int state)
 	}
 }
 
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
 void c1571_dolphin_dos_v3_device::device_add_mconfig(machine_config &config)
 {
 	c1571_device::device_add_mconfig(config);
 
-	m_cia->pb_rd_callback().set(FUNC(c1571_dolphin_dos_v3_device::cia_pb_r));
-	m_cia->pb_wr_callback().set(FUNC(c1571_dolphin_dos_v3_device::cia_pb_w));
-	m_cia->pc_wr_callback().set(FUNC(c1571_dolphin_dos_v3_device::cia_pc_w));
+	m_maincpu->set_addrmap(AS_PROGRAM, &c1571_dolphin_dos_v3_device::c1571dd3_mem);
+
+	PIA6821(config, m_pia);
+	m_pia->readpa_handler().set([this] () -> uint8_t { return m_parallel_data; });
+	m_pia->writepa_handler().set(FUNC(c1571_dolphin_dos_v3_device::pia_pa_w));
+	m_pia->ca2_handler().set(FUNC(c1571_dolphin_dos_v3_device::pia_ca2_w));
 }
+
 
 //-------------------------------------------------
 //  parallel_data_w -
@@ -213,5 +226,5 @@ void c1571_dolphin_dos_v3_device::parallel_data_w(uint8_t data)
 
 void c1571_dolphin_dos_v3_device::parallel_strobe_w(int state)
 {
-	m_cia->flag_w(state);
+	m_pia->ca1_w(state);
 }

@@ -5880,3 +5880,15 @@ if MACHINES["AT_SSRT"] then
 		MAME_DIR .. "src/devices/machine/at_ssrt.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/pls105.h,MACHINES["PLS105"] = true
+---------------------------------------------------
+
+if MACHINES["PLS105"] then
+	files {
+		MAME_DIR .. "src/devices/machine/pls105.cpp",
+		MAME_DIR .. "src/devices/machine/pls105.h",
+	}
+end

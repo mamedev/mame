@@ -558,9 +558,9 @@ void galaxian_state::sprites_clip(screen_device &screen, rectangle &cliprect)
 	// See sprites_draw for an explanation of the +1.
 	rectangle clip = screen.visible_area();
 	if (m_flipscreen_x)
-		clip.max_x = (256 - (16 + 1)) * m_x_scale - 1;
+		clip.setx(clip.left(), (256 - (16 + 1)) * m_x_scale - 1);
 	else
-		clip.min_x = ((16 + 1) * m_x_scale);
+		clip.setx((16 + 1) * m_x_scale, clip.right());
 
 	cliprect &= clip;
 }
@@ -629,7 +629,7 @@ void galaxian_state::sprites_draw(screen_device &screen, bitmap_rgb32 &bitmap, c
 void galaxian_state::bullets_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *base)
 {
 	// iterate over scanlines
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint8_t shell = 0xff, missile = 0xff;
 		uint8_t effy;
@@ -826,12 +826,12 @@ void galaxian_state::stars_update_origin()
 	/* only update on a different frame */
 	if (curframe != m_star_rng_origin_frame)
 	{
-		/* The RNG period is 2^17-1; each frame, the shift register is clocked */
-		/* 512*256 = 2^17 times. This means that we clock one extra time each */
-		/* frame. However, if we are NOT flipped, there is a pair of D flip-flops */
-		/* at 6B which delay the count so that we count 512*256-2 = 2^17-2 times. */
-		/* In this case, we only one time less than the period each frame. Both */
-		/* of these off-by-one countings produce the horizontal star scrolling. */
+		// The RNG period is 2^17-1; each frame, the shift register is clocked
+		// 512*256 = 2^17 times. This means that we clock one extra time each
+		// frame. However, if we are NOT flipped, there is a pair of D flip-flops
+		// at 6B which delay the count so that we count 512*256-2 = 2^17-2 times.
+		// In this case, we only one time less than the period each frame. Both
+		// of these off-by-one countings produce the horizontal star scrolling.
 		int per_frame_delta = m_flipscreen_x ? 1 : -1;
 		int total_delta = per_frame_delta * (curframe - m_star_rng_origin_frame);
 
@@ -938,7 +938,7 @@ void galaxian_state::galaxian_draw_stars(bitmap_rgb32 &bitmap, const rectangle &
 	if (m_stars_enabled)
 	{
 		/* iterate over scanlines */
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			uint32_t star_offs = m_star_rng_origin + y * 512;
 			stars_draw_row(bitmap, maxx, y, star_offs, 0xff);
@@ -959,28 +959,25 @@ void galaxian_state::galaxian_draw_background(bitmap_rgb32 &bitmap, const rectan
 void galaxian_state::background_draw_colorsplit(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t color, int split, int split_flipped)
 {
 	/* horizontal bgcolor split */
+	rectangle draw = cliprect;
 	if (m_flipscreen_x)
 	{
-		rectangle draw = cliprect;
-		draw.max_x = std::min(draw.max_x, split_flipped * m_x_scale - 1);
-		if (draw.min_x <= draw.max_x)
+		draw.setx(cliprect.left(), std::min(cliprect.right(), split_flipped * m_x_scale - 1));
+		if (draw.left() <= draw.right())
 			bitmap.fill(rgb_t::black(), draw);
 
-		draw = cliprect;
-		draw.min_x = std::max(draw.min_x, split_flipped * m_x_scale);
-		if (draw.min_x <= draw.max_x)
+		draw.setx(std::max(cliprect.left(), split_flipped * m_x_scale), cliprect.right());
+		if (draw.left() <= draw.right())
 			bitmap.fill(color, draw);
 	}
 	else
 	{
-		rectangle draw = cliprect;
-		draw.max_x = std::min(draw.max_x, split * m_x_scale - 1);
-		if (draw.min_x <= draw.max_x)
+		draw.setx(cliprect.left(), std::min(cliprect.right(), split * m_x_scale - 1));
+		if (draw.left() <= draw.right())
 			bitmap.fill(color, draw);
 
-		draw = cliprect;
-		draw.min_x = std::max(draw.min_x, split * m_x_scale);
-		if (draw.min_x <= draw.max_x)
+		draw.setx(std::max(cliprect.left(), split * m_x_scale), cliprect.right());
+		if (draw.left() <= draw.right())
 			bitmap.fill(rgb_t::black(), draw);
 	}
 }
@@ -997,7 +994,7 @@ void galaxian_state::scramble_draw_stars(bitmap_rgb32 &bitmap, const rectangle &
 		int blink_state = m_stars_blink_state & 3;
 
 		/* iterate over scanlines */
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			/* blink state 2 suppressed stars when 2V == 0 */
 			if (blink_state != 2 || (y & 2) != 0)
@@ -1043,7 +1040,7 @@ void galaxian_state::jumpbug_draw_background(bitmap_rgb32 &bitmap, const rectang
 	if (m_stars_enabled)
 	{
 		/* iterate over scanlines */
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			uint32_t star_offs = m_star_rng_origin + y * 512;
 			stars_draw_row(bitmap, 232, y, star_offs, 0xff); // verified on a real PCB
@@ -1087,16 +1084,14 @@ int galaxian_state::flip_and_clip(rectangle &draw, int xstart, int xend, const r
 	draw = cliprect;
 	if (!m_flipscreen_x)
 	{
-		draw.min_x = xstart * m_x_scale;
-		draw.max_x = xend * m_x_scale + (m_x_scale - 1);
+		draw.setx(xstart * m_x_scale, xend * m_x_scale + (m_x_scale - 1));
 	}
 	else
 	{
-		draw.min_x = (xend ^ 255) * m_x_scale;
-		draw.max_x = (xstart ^ 255) * m_x_scale + (m_x_scale - 1);
+		draw.setx((xend ^ 255) * m_x_scale, (xstart ^ 255) * m_x_scale + (m_x_scale - 1));
 	}
 	draw &= cliprect;
-	return (draw.min_x <= draw.max_x);
+	return (draw.left() <= draw.right());
 }
 
 void galaxian_state::amidar_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1139,20 +1134,22 @@ void galaxian_state::amidar_draw_background(bitmap_rgb32 &bitmap, const rectangl
 
 inline void galaxian_state::galaxian_draw_pixel(bitmap_rgb32 &bitmap, const rectangle &cliprect, int y, int x, rgb_t color)
 {
-	if (y >= cliprect.min_y && y <= cliprect.max_y)
+	if (y >= cliprect.top() && y <= cliprect.bottom())
 	{
+		auto *const dst = &bitmap.pix(y);
+
 		x *= m_x_scale;
 		x += m_h0_start;
-		if (x >= cliprect.min_x && x <= cliprect.max_x)
-			bitmap.pix(y, x) = color;
+		if (cliprect.containsx(x))
+			dst[x] = color;
 
 		x++;
-		if (x >= cliprect.min_x && x <= cliprect.max_x)
-			bitmap.pix(y, x) = color;
+		if (cliprect.containsx(x))
+			dst[x] = color;
 
 		x++;
-		if (x >= cliprect.min_x && x <= cliprect.max_x)
-			bitmap.pix(y, x) = color;
+		if (cliprect.containsx(x))
+			dst[x] = color;
 	}
 }
 
@@ -1442,18 +1439,12 @@ void namenayo_state::namenayo_draw_background(bitmap_rgb32 &bitmap, const rectan
 {
 	bitmap.fill(rgb_t::black(), cliprect);
 
-	rectangle draw;
+	rectangle draw = cliprect;
 
 	if (m_flipscreen_x)
-	{
-		draw = cliprect;
-		draw.min_x = std::max(draw.min_x, 72 * m_x_scale);
-	}
+		draw.setx(std::max(draw.left(), 72 * m_x_scale), draw.right());
 	else
-	{
-		draw = cliprect;
-		draw.max_x = std::min(draw.max_x, 184 * m_x_scale - 1);
-	}
+		draw.setx(draw.left(), std::min(draw.right(), 184 * m_x_scale - 1));
 
 	// draw an opaque copy of the tilemap in part of the screen to ensure some of the graphics are correct
 	// this can't extend past the playfield or you get unwanted fill near the status bar

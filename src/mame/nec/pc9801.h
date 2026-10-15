@@ -207,7 +207,7 @@ private:
 
 	u8 ppi_sys_portb_r();
 
-	void draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top, bool lower);
+	void draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top, int topline, int botline, bool lower);
 
 //  uint8_t winram_r();
 //  void winram_w(uint8_t data);
@@ -261,7 +261,7 @@ protected:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 
 	virtual void video_start() override ATTR_COLD;
-	void pc9801_palette(palette_device &palette) const;
+	virtual void palette_init(palette_device &palette) const ATTR_COLD;
 
 	uint8_t *m_char_rom = nullptr;
 	uint8_t *m_kanji_rom = nullptr;
@@ -305,10 +305,13 @@ private:
 	std::unique_ptr<uint16_t[]> m_tvram;
 	uint8_t m_gfx_ff = 0;
 	uint8_t m_txt_scroll_reg[8]{};
+
+protected:
 	uint8_t m_pal_clut[4]{};
 
 //  Mouse
 protected:
+
 	struct{
 		uint8_t control = 0;
 		uint8_t lx = 0, ly = 0;

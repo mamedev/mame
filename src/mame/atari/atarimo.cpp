@@ -182,9 +182,9 @@ void atari_motion_objects_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 			link = (m_slipram[band & m_sliprammask] >> m_linkmask.shift()) & m_linkmask.mask();
 
 			// compute minimum Y and wrap around if necessary
-			bandclip.min_y = ((band << m_slipshift) - m_yscroll + m_slipoffset) & m_bitmapymask;
-			if (bandclip.min_y >= bitmap.height())
-				bandclip.min_y -= m_bitmapheight;
+			bandclip.sety(((band << m_slipshift) - m_yscroll + m_slipoffset) & m_bitmapymask, bandclip.bottom());
+			if (bandclip.top() >= bitmap.height())
+				bandclip.insety(-m_bitmapheight, 0);
 
 			// maximum Y is based on the minimum
 			bandclip.set_height(1 << m_slipshift);

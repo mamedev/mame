@@ -602,7 +602,7 @@ void pacland_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const r
 	m_tilemap[0]->draw(screen, m_fg_bitmap, cliprect, priority, 0);
 
 	// now copy the fg_bitmap to the destination wherever the sprite pixel allows
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint8_t const *const pri = &screen.priority().pix(y);
 		uint16_t *const src = &m_fg_bitmap.pix(y);
@@ -610,7 +610,7 @@ void pacland_state::draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 		/* only copy if the priority bitmap is 0 (no high priority sprite) and the
 		   source pixel is not the invalid pen; also clear to 0xffff when finished */
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint16_t pix = src[x];
 			if (pix != 0xffff)
@@ -650,11 +650,11 @@ uint32_t pacland_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	// draw sprite pixels in a temporary bitmap with colortable values >= 0xf0
 	m_sprite_bitmap.fill(0, cliprect);
 	draw_sprites(screen, m_sprite_bitmap, cliprect, flip, 2);
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t *const spr = &m_sprite_bitmap.pix(y);
 		uint16_t const *const bmp = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			/* clear to 0 if "m_sprite_bitmap" and "bitmap" are different,
 			   because not redraw pixels that are not visible in "bitmap"

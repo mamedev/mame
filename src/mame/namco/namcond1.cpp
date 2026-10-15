@@ -223,15 +223,16 @@ namespace {
 class namcond1_state : public driver_device
 {
 public:
-	namcond1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	namcond1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_ygv608(*this, "ygv608"),
-		m_shared_ram(*this, "shared_ram") { }
+		m_shared_ram(*this, "shared_ram")
+	{ }
 
-	void abcheck(machine_config &config);
-	void namcond1(machine_config &config);
+	void abcheck(machine_config &config) ATTR_COLD;
+	void namcond1(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -258,8 +259,9 @@ private:
 	uint32_t gfxbank_cb(uint32_t addr);
 
 	INTERRUPT_GEN_MEMBER(mcu_interrupt);
-	void abcheck_main_map(address_map &map) ATTR_COLD;
+
 	void main_map(address_map &map) ATTR_COLD;
+	void abcheck_main_map(address_map &map) ATTR_COLD;
 	void h8rwmap(address_map &map) ATTR_COLD;
 };
 
@@ -360,8 +362,8 @@ void namcond1_state::main_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x400000, 0x40ffff).ram().share(m_shared_ram);
-	map(0x800000, 0x80000f).m(m_ygv608, FUNC(ygv608_device::port_map)).umask16(0xff00);
-	map(0xa00000, 0xa00fff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask16(0xff00);
+	map(0x800000, 0x80000f).umask16(0xff00).m(m_ygv608, FUNC(ygv608_device::port_map));
+	map(0xa00000, 0xa00fff).umask16(0xff00).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write));
 	map(0xc3ff00, 0xc3ffff).rw(FUNC(namcond1_state::cuskey_r), FUNC(namcond1_state::cuskey_w));
 }
 

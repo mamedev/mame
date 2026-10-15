@@ -477,8 +477,8 @@ void mips3_device::device_start()
 		m_dcache_line_tag = make_unique_clear<uint32_t []>(lines);
 		m_dcache_line_state = make_unique_clear<uint8_t []>(lines);
 		m_dcache_lru = make_unique_clear<uint8_t []>(1U << m_dcache_geometry->set_shift);
-		m_dcache_code_pages = make_unique_clear<uint8_t []>(1U << 17);
 	}
+	m_dcache_code_pages = make_unique_clear<uint8_t []>(1U << 17);
 
 	/* initialize based on the config */
 	memset(m_core, 0, sizeof(internal_mips3_state));
@@ -1426,6 +1426,25 @@ void mips3_device::dcache_line_writeback(unsigned line)
 	{
 		/* a writeback into translated code has to leave the running block */
 		m_drc_cache_dirty = true;
+		abort_timeslice();
+	}
+}
+
+
+void mips3_device::icache_op(offs_t address)
+{
+	// the instruction cache is not modelled, but invalidating a line that holds translated code means the code changed
+	const uint32_t tlbval = vtlb_table()[address >> 12];
+	if (!(tlbval & READ_ALLOWED))
+	{
+		return;
+	}
+
+	const offs_t page = tlbval >> 12;
+	if (BIT(m_dcache_code_pages[page >> 3], page & 7))
+	{
+		// drop the translations reaching the line and leave the running block
+		m_drcuml->hash_invalidate_range(address & ~31, address | 31);
 		abort_timeslice();
 	}
 }

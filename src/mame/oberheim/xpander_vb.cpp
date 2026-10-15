@@ -39,6 +39,8 @@ active-high (active == true).
 #include "xpander_vb.h"
 #include "machine/rescap.h"
 
+#include <utility>
+
 #define LOG_CPU_COMMS   (1U << 1)
 #define LOG_VOICE_TIMER (1U << 2)
 #define LOG_DAC         (1U << 3)
@@ -255,8 +257,8 @@ void xpandervb_device::reset_w(int state)
 	if (reset_voice == voice_resetting)
 		return;
 
-	const auto func = timer_expired_delegate(FUNC(xpandervb_device::deferred_reset_w), this);
-	machine().scheduler().synchronize(func, reset_voice ? 1 : 0);
+	auto func = timer_expired_delegate(FUNC(xpandervb_device::deferred_reset_w), this);
+	machine().scheduler().synchronize(std::move(func), reset_voice ? 1 : 0);
 }
 
 TIMER_CALLBACK_MEMBER(xpandervb_device::deferred_reset_w)

@@ -753,7 +753,7 @@ u8 via6522_device::read(offs_t offset)
 	{
 	case VIA_PB:
 		/* update the input */
-		if ((PB_LATCH_ENABLE(m_acr) != 0) && ((m_ifr & INT_CB1) != 0))
+		if (PB_LATCH_ENABLE(m_acr) != 0)
 		{
 			val = m_latch_b;
 		}
@@ -771,7 +771,7 @@ u8 via6522_device::read(offs_t offset)
 
 	case VIA_PA:
 		/* update the input */
-		if ((PA_LATCH_ENABLE(m_acr) != 0) && ((m_ifr & INT_CA1) != 0))
+		if (PA_LATCH_ENABLE(m_acr) != 0)
 		{
 			val = m_latch_a;
 		}
@@ -799,7 +799,7 @@ u8 via6522_device::read(offs_t offset)
 
 	case VIA_PANH:
 		/* update the input */
-		if ((PA_LATCH_ENABLE(m_acr) != 0) && ((m_ifr & INT_CA1) != 0))
+		if (PA_LATCH_ENABLE(m_acr) != 0)
 		{
 			val = m_latch_a;
 		}
@@ -1115,6 +1115,10 @@ void via6522_device::write(offs_t offset, u8 data)
 		{
 			uint16_t counter2 = get_counter2_value();
 			bool t2_was_pb6 = bool(T2_COUNT_PB6(m_acr));
+			if (!PA_LATCH_ENABLE(m_acr) && PA_LATCH_ENABLE(data))
+				m_latch_a = input_pa();
+			if (!PB_LATCH_ENABLE(m_acr) && PB_LATCH_ENABLE(data))
+				m_latch_b = input_pb();
 			m_acr = data;
 			LOGSHIFT("Write ACR: %02x ", m_acr);
 

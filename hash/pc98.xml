@@ -42666,10 +42666,13 @@ Has strips of (logic) tile garbage during stage 2, [FDC] copy protection failing
 		</part>
 	</software>
 
-	<software name="sangoku">
+	<software name="sangoku" supported="partial">
 		<description>Sangokushi</description>
 		<year>1986</year>
 		<publisher>光栄 (Koei)</publisher>
+		<notes><![CDATA[
+Stuck note with [PC9801-26]
+]]></notes>
 		<info name="alt_title" value="三国志" />
 		<info name="release" value="198604xx" />
 		<part name="flop1" interface="floppy_5_25">

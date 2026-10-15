@@ -49,6 +49,8 @@
 
 #include "formats/ap_dsk35.h"
 
+#include "endianness.h"
+
 
 namespace {
 
@@ -104,14 +106,14 @@ public:
 	{
 	}
 
-	void macii(machine_config &config);
-	void maciihmu(machine_config &config);
-	void maciihd(machine_config &config);
-	void maciix(machine_config &config);
-	void maciicx(machine_config &config);
-	void macse30(machine_config &config);
+	void macii(machine_config &config) ATTR_COLD;
+	void maciihmu(machine_config &config) ATTR_COLD;
+	void maciihd(machine_config &config) ATTR_COLD;
+	void maciix(machine_config &config) ATTR_COLD;
+	void maciicx(machine_config &config) ATTR_COLD;
+	void macse30(machine_config &config) ATTR_COLD;
 
-	void macii_init();
+	void macii_init() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -215,18 +217,18 @@ private:
 u32 macii_state::screen_update_macse30(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	u32 const video_base = (m_screen_buffer ? 0x8000 : 0) + (MAC_H_VIS / 8);
-	u16 const *const video_ram = (const u16 *)&m_vram[video_base / 4];
+	auto const video_ram = util::big_endian_cast<const u16>(&m_vram[video_base / 4]);
 
-	for (int y = 0; y < MAC_V_VIS; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u32 *const line = &bitmap.pix(y);
 
 		for (int x = 0; x < MAC_H_VIS; x += 16)
 		{
-			u16 const word = video_ram[((y * MAC_H_VIS) / 16) + ((x / 16) ^ 1)];
+			u16 const word = video_ram[((y * MAC_H_VIS) / 16) + (x / 16)];
 			for (int b = 0; b < 16; b++)
 			{
-				line[x + b] = ((word >> (15 - b)) & 0x0001) ? 0 : 0xffffff;
+				line[x + b] = BIT(word, 15 - b) ? 0 : 0xffffff;
 			}
 		}
 	}
@@ -801,7 +803,7 @@ void macii_state::macii_init()
 
 void macii_state::nubus_slot_interrupt(u8 slot, u32 state)
 {
-	static const u8 masks[8] = {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
+	constexpr u8 masks[8] = {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
 	u8 mask = 0x3f;
 
 	slot -= 9;

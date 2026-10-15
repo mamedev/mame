@@ -750,6 +750,18 @@ if VIDEOS["I8275"] then
 end
 
 --------------------------------------------------
+-- Intel 82750DB
+--@src/devices/video/i82750db.h,VIDEOS["I82750DB"] = true
+--------------------------------------------------
+
+if VIDEOS["I82750DB"] then
+	files {
+		MAME_DIR .. "src/devices/video/i82750db.cpp",
+		MAME_DIR .. "src/devices/video/i82750db.h",
+	}
+end
+
+--------------------------------------------------
 --
 --@src/devices/video/ili9335.h,VIDEOS["ILI9335"] = true
 --------------------------------------------------
@@ -1933,6 +1945,18 @@ if VIDEOS["X1_020_DX_101"] then
 	files {
 		MAME_DIR .. "src/devices/video/x1_020_dx_101.cpp",
 		MAME_DIR .. "src/devices/video/x1_020_dx_101.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/ygv625.h,VIDEOS["YGV625"] = true
+--------------------------------------------------
+
+if VIDEOS["YGV625"] then
+	files {
+		MAME_DIR .. "src/devices/video/ygv625.cpp",
+		MAME_DIR .. "src/devices/video/ygv625.h",
 	}
 end
 
