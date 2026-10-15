@@ -6,8 +6,8 @@
 
     TODO:
 
-    - sky gradient mapping and ground start line timing are inferred from the game's code, not
-      verified against hardware
+    - verify the sky gradient mapping and the ground start line timing against hardware (both are
+      inferred from the game's code)
 
 ***************************************************************************/
 
@@ -376,11 +376,11 @@ static INPUT_PORTS_START( apache3 )
 	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0040, 0x0040, "Use Throttle" ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0040, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x0040, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x0080, 0x0000, "Disable Coins" ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0080, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x0080, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x0700, 0x0000, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x0200, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x0100, DEF_STR( 2C_1C ) )

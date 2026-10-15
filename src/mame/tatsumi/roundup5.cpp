@@ -346,7 +346,7 @@ uint32_t roundup5_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	// a tunnel the game fills that half with the scenery colours (and blacks out the normal half),
 	// so the tunnel mouth, a shadow sprite, reveals the scenery beyond it as it grows.
 	bitmap_ind8 const &shadow = screen.priority();
-	pen_t const fill_pen = m_palette->pen(384); // todo
+	pen_t const fill_pen = m_palette->pen(384); // TODO
 	pen_t const shadow_pen = m_palette->pen(384 + SHADOW_PALETTE_OFFSET);
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
