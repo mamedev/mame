@@ -1030,7 +1030,7 @@ public:
 	// status bits for the combined base-register read. The kernel accesses these as BYTE reads at
 	// 0x1e040000 on the big-endian 32-bit bus: bit 7 of that byte = dword bit 31 (armed - the
 	// self-test's tst.l/bpl), bit 6 of that byte = dword bit 30 (block request - the L4 handler's
-	// btst #6). NOTES.md IRQ-1 already recorded "bit 30" from the earlier static pass.
+	// btst #6).
 	u32 status_r() { return (m_armed ? 0x80000000u : 0u) | (m_block_pending ? 0x40000000u : 0u); }
 	auto irq_bind() { return m_irq_cb.bind(); }
 	// late binding of the ColdFire program space (the chip's DMA source): called from the driver's machine_start
@@ -1231,8 +1231,7 @@ void gamtor_snd_device::arm_w(u32 data)
 		// The re-arm also acknowledges the block request: bit 30 clears and the level 4 line drops.
 		// SND-3: double-buffered - while a block still plays out of the FIFO the descriptor and the
 		// +4 address are latched as the NEXT block and chained without a gap; from stop/underrun the
-		// block starts at once. (SND-2 restarted at the arm and output silence from the block end to
-		// the next stream update: ~8-12 ms holes every 23 ms = the choppy audio-test sines.)
+		// block starts at once.
 		const u32 size = data & 0x00ffffff;
 		if (m_block_pending)
 		{
