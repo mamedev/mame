@@ -1431,6 +1431,96 @@ static INPUT_PORTS_START( luckyrlt )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( monte )
+	PORT_START("IN0")  // players 1 & 2 controls
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)     PORT_NAME("Player 1 (Bastos) - Bet x10")      // P1: bet x10
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)     PORT_NAME("Player 1 (Bastos) - Credits Out")  // P1: credits out
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)     PORT_NAME("Player 1 (Bastos) - Bet x1")       // P1: bet x1
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)     PORT_NAME("Player 2 (Copas) - Bet x10")       // P2: bet x10
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)     PORT_NAME("Player 2 (Copas) - Credits Out")   // P2: credits out
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)     PORT_NAME("Player 2 (Copas) - Bet x1")        // P2: bet x1
+
+	PORT_START("IN1")  //credits
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("Player 2 (Copas) - Coin 2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("Player 1 (Bastos) - Coin 2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("Player 4 (Espadas) - Coin 2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("Player 3 (Oros) - Coin 2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("Player 2 (Copas) - Coin 1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("Player 1 (Bastos) - Coin 1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Player 4 (Espadas) - Coin 1")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("Player 3 (Oros) - Coin 1")
+
+	PORT_START("IN2")  // players 3 & 4 controls
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)     PORT_NAME("Player 3 (Oros) - Bet x10")         // P3: bet x10
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)     PORT_NAME("Player 3 (Oros) - Credits Out")     // P3: credits out
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)     PORT_NAME("Player 3 (Oros) - Bet x1")          // P3: bet x1
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)     PORT_NAME("Player 4 (Espadas) - Bet x10")      // P4: bet x10
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)     PORT_NAME("Player 4 (Espadas) - Credits Out")  // P4: credits out
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)     PORT_NAME("Player 4 (Espadas) - Bet x1")       // P4: bet x1
+
+	PORT_START("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, "x10" )
+	PORT_DIPSETTING(    0x01, "x5" )
+	PORT_DIPSETTING(    0x02, "x2" )
+	PORT_DIPSETTING(    0x03, "x1" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Borrado (Erase)" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Service Mode" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 /*******************************************
 *             Machine Drivers              *
 *******************************************/
@@ -1605,11 +1695,11 @@ void corona_state::luckyrlt(machine_config &config)
 void corona_state::luckyrlta(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, RE_MAIN_XTAL/8);  // measured 2MHz
+	Z80(config, m_maincpu, RE_MAIN_XTAL/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &corona_state::luckyrlt_map);
 	m_maincpu->set_addrmap(AS_IO, &corona_state::luckyrlt_cpu_io_map);
 
-	Z80(config, m_soundcpu, RE_MAIN_XTAL/8);  // measured 2MHz
+	Z80(config, m_soundcpu, RE_MAIN_XTAL/8);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &corona_state::luckyrlt_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &corona_state::luckyrlt_sound_cpu_io_map);
 
@@ -2001,5 +2091,5 @@ GAMEL( 199?, rcirulet,  0,        rcirulet,  re800,    corona_state, empty_init,
 GAMEL( 1990, luckyrlt,  0,        luckyrlt,  luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish, set 1)", 0,                        layout_luckyrlt )
 GAMEL( 1991, luckyrlta, luckyrlt, luckyrlta, luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish, set 2)", 0,                        layout_luckyrlt )
 
-GAME(  1989, monte,     0,        monte,     winner82, corona_state, init_rulam, ROT0,   "Miky S.R.L.",              "Monte (6-players Spanish cards game, encrypted)", MACHINE_NOT_WORKING )
+GAME(  1989, monte,     0,        monte,     monte,    corona_state, init_rulam, ROT0,   "Miky S.R.L.",              "Monte (4-players Spanish cards game, encrypted)", MACHINE_NOT_WORKING )
 GAME(  1991, rulamiky,  0,        winner82,  winner82, corona_state, init_rulam, ROT90,  "Miky S.R.L.",              "Rula (roulette, encrypted)",                      MACHINE_NOT_WORKING )
