@@ -1042,20 +1042,45 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
+	// SND-3: output FIFO depth in frames. The chip's DMA fetches a block ahead of the DAC; the request (bit 30)
+	// rises when the last frame of the current block has been FETCHED, while the FIFO still plays it out, so the
+	// kernel's re-arm chains the next block without a gap. The real depth is undocumented; the rendered audio is
+	// identical for any depth longer than the request->re-arm latency. MEASURED (120 s headless run, SND-3 latency
+	// log): usually < 1 ms, worst 1979 us (kernel sections with the level 4 masked) - 64 frames (1.45 ms) gave 21
+	// underruns. 256 frames = 5.8 ms covers the worst case ~3x.
+	static constexpr u32 FIFO_FRAMES = 256;
+
+	TIMER_CALLBACK_MEMBER(req_timer);
+	void schedule_req();
+	void start_block(u32 addr, u32 size);
+
 	devcb_write_line m_irq_cb;
 
 	address_space *m_dspace = nullptr;
 
 	sound_stream *m_stream = nullptr;
+	emu_timer *m_req_timer = nullptr;
 
-	bool m_armed = false;       // descriptor armed (bit 31 view)
-	bool m_block_pending = false; // bit 6: block played out, kernel must feed the next one
-	u32 m_size = 0;             // descriptor low 24 bits (frames per arm - to be verified by the $6c trace)
-	u32 m_sar = 0;              // +4: block start address in CPU RAM (latched at arm)
-	u32 m_played = 0;           // frames consumed since the last arm
+	bool m_armed = false;       // descriptor armed (bit 31 view) - set by the first arm, cleared by the stop write
+	bool m_block_pending = false; // bit 30: current block fully fetched, the kernel must feed the next one
+	bool m_active = false;      // the DAC is playing a block (false = stopped or underrun)
+	bool m_next_valid = false;  // a re-arm latched the next block while the current one plays out
+	u32 m_size = 0;             // current block length in frames (descriptor low 24 bits)
+	u32 m_cur = 0;              // current block start address (latched from +4 at arm)
+	u32 m_next_size = 0;        // queued block
+	u32 m_next_addr = 0;
+	u32 m_sar = 0;              // +4 register as written
+	u32 m_played = 0;           // frames of the current block played out
+	u32 m_fifo[FIFO_FRAMES];    // the fetched-ahead tail of the current block (copied when the fetch completes)
+	u32 m_fifo_base = 0;        // frame index of m_fifo[0] within the current block
+	bool m_fifo_valid = false;
 	u32 m_mask = 0;             // +8: kernel strap/test mask, stored verbatim
 	u32 m_reg8 = 0;             // last written +8 value
 	u32 m_armtrace = 0;         // diagnostic counter for the first arm writes (log-limited)
+	u32 m_underruns = 0;        // diagnostic: blocks that ended with no re-arm latched
+	attotime m_req_time;        // diagnostic: when the request rose
+	double m_lat_max = 0;
+	u32 m_latlog = 0;
 };
 
 DEFINE_DEVICE_TYPE(GAMTOR_SND, gamtor_snd_device, "gamtor_snd", "AGI CoolFire sound chip")
@@ -1072,14 +1097,23 @@ void gamtor_snd_device::device_start()
 	// The chip streams from CPU RAM through its own DMA; sample rate is fixed by the board crystal.
 	// 44100 Hz assumed pending a real-hardware measurement (the firmware never programs a rate).
 	m_stream = stream_alloc(0, 2, 44100);
+	m_req_timer = timer_alloc(FUNC(gamtor_snd_device::req_timer), this);
 
 	// resolve the ColdFire program space at config time via the driver (see set_dma_space)
 
 	save_item(NAME(m_armed));
+	save_item(NAME(m_active));
+	save_item(NAME(m_next_valid));
 	save_item(NAME(m_size));
+	save_item(NAME(m_cur));
+	save_item(NAME(m_next_size));
+	save_item(NAME(m_next_addr));
 	save_item(NAME(m_sar));
 	save_item(NAME(m_mask));
 	save_item(NAME(m_played));
+	save_item(NAME(m_fifo));
+	save_item(NAME(m_fifo_base));
+	save_item(NAME(m_fifo_valid));
 	save_item(NAME(m_block_pending));
 	save_item(NAME(m_reg8));
 }
@@ -1088,11 +1122,59 @@ void gamtor_snd_device::device_reset()
 {
 	m_armed = false;
 	m_block_pending = false;
+	m_active = false;
+	m_next_valid = false;
+	m_fifo_valid = false;
 	m_size = 0;
+	m_cur = 0;
+	m_next_size = 0;
+	m_next_addr = 0;
 	m_sar = 0;
 	m_mask = 0;
 	m_played = 0;
+	m_fifo_base = 0;
 	m_reg8 = 0;
+	m_req_timer->adjust(attotime::never);
+}
+
+// the next moment the request line rises, in frames from the current stream position
+void gamtor_snd_device::schedule_req()
+{
+	u32 frames = 0;
+	if (!m_active)
+		frames = 0;
+	else if (!m_block_pending && !m_fifo_valid)
+	{
+		const u32 fetch_end = (m_size > FIFO_FRAMES) ? (m_size - FIFO_FRAMES) : 0;
+		frames = (fetch_end > m_played) ? (fetch_end - m_played) : 1;
+	}
+	else if (m_next_valid)
+	{
+		const u32 fetch_end = (m_next_size > FIFO_FRAMES) ? (m_next_size - FIFO_FRAMES) : 0;
+		frames = (m_size - m_played) + fetch_end;
+		if (frames == 0)
+			frames = 1;
+	}
+	if (frames)
+		m_req_timer->adjust(attotime::from_hz(44100) * frames);
+	else
+		m_req_timer->adjust(attotime::never);
+}
+
+TIMER_CALLBACK_MEMBER(gamtor_snd_device::req_timer)
+{
+	// render up to now: the fetch-complete point is crossed inside the update and raises the request
+	m_stream->update();
+	schedule_req();
+}
+
+void gamtor_snd_device::start_block(u32 addr, u32 size)
+{
+	m_cur = addr;
+	m_size = size;
+	m_played = 0;
+	m_fifo_valid = false;
+	m_active = true;
 }
 
 u32 gamtor_snd_device::reg_r(offs_t offset, u32 mem_mask)
@@ -1112,6 +1194,7 @@ void gamtor_snd_device::reg_w(offs_t offset, u32 data, u32 mem_mask)
 	case 0: // +4: the L4 ISR writes the next block address here (obj->$6c)
 		if (m_armtrace < 500)
 			logerror("SND sar <- %08X %s\n", data, machine().describe_context().c_str());
+		m_stream->update();
 		m_sar = data;
 		break;
 	case 1: // +8: the input driver's strap/test values - stored verbatim, semantics unknown
@@ -1128,24 +1211,54 @@ void gamtor_snd_device::arm_w(u32 data)
 		m_armtrace++;
 		logerror("SND arm_w data=%08X %s\n", data, machine().describe_context().c_str());
 	}
+	// bring the output up to the write's time first, so the change lands on the right sample
+	m_stream->update();
 	if (data == 0)
 	{
 		// stop (boot does this)
 		m_armed = false;
+		m_active = false;
+		m_next_valid = false;
+		m_fifo_valid = false;
 		m_block_pending = false;
 		m_played = 0;
+		m_irq_cb(0);
 	}
 	else
 	{
 		// descriptor (arm/re-arm): frames per block in the low bits (the firmware writes
 		// (size>>2)+0xb0000000; the measured arm write was B0000400 -> 0x400 = 1024 frames).
-		// The re-arm also acknowledges the block request: bit 6 clears and the level 4 line drops.
-		m_size = data & 0x00ffffff;
+		// The re-arm also acknowledges the block request: bit 30 clears and the level 4 line drops.
+		// SND-3: double-buffered - while a block still plays out of the FIFO the descriptor and the
+		// +4 address are latched as the NEXT block and chained without a gap; from stop/underrun the
+		// block starts at once. (SND-2 restarted at the arm and output silence from the block end to
+		// the next stream update: ~8-12 ms holes every 23 ms = the choppy audio-test sines.)
+		const u32 size = data & 0x00ffffff;
+		if (m_block_pending)
+		{
+			// diagnostic: request -> re-arm latency (the FIFO must cover it)
+			const double lat = (machine().time() - m_req_time).as_double() * 1e6;
+			if (lat > m_lat_max)
+				m_lat_max = lat;
+			if (lat > 1000.0 && m_latlog++ < 50)
+				logerror("SND re-arm latency %.0f us at %s (active=%d)\n", lat, machine().time().as_string(), m_active);
+		}
 		m_armed = true;
 		m_block_pending = false;
-		m_played = 0;
 		m_irq_cb(0);
+		if (size != 0)
+		{
+			if (m_active)
+			{
+				m_next_addr = m_sar;
+				m_next_size = size;
+				m_next_valid = true;
+			}
+			else
+				start_block(m_sar, size);
+		}
 	}
+	schedule_req();
 }
 
 void gamtor_snd_device::sound_stream_update(sound_stream &stream)
@@ -1153,29 +1266,54 @@ void gamtor_snd_device::sound_stream_update(sound_stream &stream)
 	const int samples = stream.samples();
 	for (int i = 0; i < samples; i++)
 	{
-		stream.put_int_clamp(0, i, 0, 32768);
-		stream.put_int_clamp(1, i, 0, 32768);
-	}
-	if (!m_armed || m_size == 0 || m_block_pending)
-		return;
+		u32 w = 0;
+		if (m_active)
+		{
+			if (m_fifo_valid)
+				w = m_fifo[m_played - m_fifo_base];
+			else
+				w = m_dspace->read_dword(m_cur + m_played * 4);
+			m_played++;
 
-	// block-once playback: play m_size frames from the latched SAR, then latch bit 6 and pulse the
-	// level 4 line; playback stops until the kernel's L4 handler writes the next address and re-arms
-	for (int i = 0; i < samples; i++)
-	{
-		const u32 w = m_dspace->read_dword(m_sar + m_played * 4);
+			// fetch complete: the DMA has read the whole block, the tail sits in the FIFO;
+			// bit 30 latches and the level 4 line is HELD until the kernel re-arms
+			const u32 fetch_end = (m_size > FIFO_FRAMES) ? (m_size - FIFO_FRAMES) : 0;
+			if (!m_fifo_valid && !m_block_pending && m_played >= fetch_end && m_played < m_size)
+			{
+				m_fifo_base = m_played;
+				for (u32 f = m_played; f < m_size; f++)
+					m_fifo[f - m_fifo_base] = m_dspace->read_dword(m_cur + f * 4);
+				m_fifo_valid = true;
+				m_block_pending = true;
+				m_req_time = machine().time();
+				m_irq_cb(1);
+			}
+
+			if (m_played >= m_size)
+			{
+				if (m_next_valid)
+				{
+					m_next_valid = false;
+					start_block(m_next_addr, m_next_size);
+				}
+				else
+				{
+					// underrun: nothing latched - the DAC goes silent until the next arm
+					m_active = false;
+					m_fifo_valid = false;
+					if (!m_block_pending)
+					{
+						m_block_pending = true;
+						m_req_time = machine().time();
+						m_irq_cb(1);
+					}
+					if (m_underruns++ < 50)
+						logerror("SND underrun #%u at %s (max re-arm latency so far %.0f us)\n", m_underruns, machine().time().as_string(), m_lat_max);
+				}
+			}
+		}
 		stream.put_int_clamp(0, i, s16(w >> 16), 32768);
 		stream.put_int_clamp(1, i, s16(w), 32768);
-		m_played++;
-		if (m_played >= m_size)
-		{
-			// block consumed: bit 6 latches and the level 4 line is HELD until the kernel's
-			// L4 handler feeds the next block and re-arms (level-sensitive request - an
-			// instant 1->0 pulse inside one stream update is invisible to the CPU)
-			m_block_pending = true;
-			m_irq_cb(1);
-			break;
-		}
 	}
 }
 
