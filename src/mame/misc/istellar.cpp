@@ -19,7 +19,8 @@ Todo:
     How does one best make one DIP switch bit from address 0x02 tie to two bits from address 0x03?
     Get real ROM labels!  The current labels are unfortunately a bit odd.
     Make it work - this one should be close right now :/.
-    istellar2 fails the self-test for all the main CPU ROMs because the prototype's checksum table (0x160) holds placeholder 0xFFFF sums.
+    Game fails CPU ROM test because the checksum table has placeeholder 0xFFFF checksums.
+	Doesn't stop it from being playable though.
 */
 
 #include "emu.h"
