@@ -4176,6 +4176,23 @@ if opt_tool(CPUS, "ROMP") then
 end
 
 --------------------------------------------------
+-- Konami 056734 (ESC)
+--@src/devices/cpu/k056734/k056734.h,CPUS["K056734"] = true
+--------------------------------------------------
+
+if CPUS["K056734"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/k056734/k056734.cpp",
+		MAME_DIR .. "src/devices/cpu/k056734/k056734.h",
+	}
+end
+
+if opt_tool(CPUS, "K056734") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/k056734/k056734d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/k056734/k056734d.h")
+end
+
+--------------------------------------------------
 -- KS0164
 --@src/devices/cpu/ks0164/ks0164.h,CPUS["KS0164"] = true
 --------------------------------------------------

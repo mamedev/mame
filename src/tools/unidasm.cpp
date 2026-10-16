@@ -88,6 +88,7 @@ using util::BIT;
 #include "cpu/interdata16/dasm16.h"
 #include "cpu/jaguar/jagdasm.h"
 #include "cpu/jalfpu/jalfpu_dasm.h"
+#include "cpu/k056734/k056734d.h"
 #include "cpu/ks0164/ks0164d.h"
 #include "cpu/lc57/lc57d.h"
 #include "cpu/lc58/lc58d.h"
@@ -531,6 +532,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "jaguardsp",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::variant::DSP); } },
 	{ "jaguargpu",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::variant::GPU); } },
 	{ "jalfpu",          le, -2, []() -> util::disasm_interface * { return new jaleco_fpu_disassembler; } },
+	{ "k056734",         be, -2, []() -> util::disasm_interface * { return new k056734_disassembler; } },
 	{ "konami",          be,  0, []() -> util::disasm_interface * { return new konami_disassembler; } },
 	{ "ks0164",          be,  0, []() -> util::disasm_interface * { return new ks0164_disassembler; } },
 	{ "kl1839vm1",       be,  0, []() -> util::disasm_interface * { return new kl1839vm1_disassembler; } },
