@@ -399,8 +399,8 @@ u8 xpander_state_base::pedal_cv(int pedal) const
 	{
 		case PEDAL_TYPE_NC:
 		{
-			const auto [v_pulldown, r_pulldown] = pedal_pull(pedal);
-			cv = v_pulldown + (VPLUS - v_pulldown) * RES_VOLTAGE_DIVIDER(R_VPLUS, r_pulldown);
+			const auto [v_pull, r_pull] = pedal_pull(pedal);
+			cv = v_pull + (VPLUS - v_pull) * RES_VOLTAGE_DIVIDER(R_VPLUS, r_pull);
 			break;
 		}
 		case PEDAL_TYPE_CONT_ACTIVE_NEG:
@@ -883,7 +883,7 @@ u8 matrix12_state::gate_inputs() const
 
 	const u8 chain_adv = BIT(config, 0) ? BIT(input, 0) : 1;
 
-	u8 trigger = m_pull_trigger ? 1 : 0;
+	u8 trigger = m_pull_trigger ? 1 : 0;  // Value when trigger input is disconnected.
 	if (BIT(config, 2))  // Trigger input connected?
 	{
 		trigger = BIT(input, 1);
@@ -899,7 +899,8 @@ u8 matrix12_state::kbd_pressure_cv() const
 	// Schematic: Matrix-12 processor board, sheet 2 of 4.
 
 	// Keyboard pressure (aka aftertouch) is measured by a force-sensitive
-	// resistor (FSR).
+	// resistor (FSR). Pressure is measured for the entire keyboard, not for
+	// each individual key.
 
 	constexpr double T1_MAX = RES_K(1);  // scale trimmer
 	constexpr double T2_MAX = RES_K(100);  // offset trimmer
