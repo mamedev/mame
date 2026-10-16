@@ -1290,6 +1290,18 @@ if SOUNDS["T6721A"] then
 end
 
 
+---------------------------------------------------
+-- Toshiba TC8802AF PARCOR speech synthesizer
+--@src/devices/sound/tc8802.h,SOUNDS["TC8802"] = true
+---------------------------------------------------
+
+if SOUNDS["TC8802"] then
+	files {
+		MAME_DIR .. "src/devices/sound/tc8802.cpp",
+		MAME_DIR .. "src/devices/sound/tc8802.h",
+	}
+end
+
 
 ---------------------------------------------------
 -- Toshiba TC8830F sample player/recorder
