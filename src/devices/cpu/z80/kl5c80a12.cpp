@@ -50,6 +50,19 @@ kl5c80a12_device::kl5c80a12_device(const machine_config &mconfig, const char *ta
 	, m_portb_data{0, 0, 0}
 	, m_portb_direction(0)
 	, m_portb_3state{0, 0, 0}
+	, m_usart_tx_cb(*this)
+	, m_usart_mode(0)
+	, m_usart_command(0)
+	, m_usart_rx_data(0)
+	, m_usart_scr{0, 0}
+	, m_usart_mode_wait(true)
+	, m_usart_rx_ready(false)
+	, m_usart_tx_timer(nullptr)
+	, m_usart_txc_clock(500'000)
+	, m_usart_tx_data(0)
+	, m_usart_tx_pending(0)
+	, m_usart_tx_busy(false)
+	, m_usart_tx_pending_valid(false)
 {
 }
 
@@ -83,6 +96,9 @@ void kl5c80a12_device::internal_io(address_map &map)
 	map(0x35, 0x35).mirror(0xff00).rw(m_kp69, FUNC(kp69_device::isrh_r), FUNC(kp69_device::lerh_pgrh_w));
 	map(0x36, 0x36).mirror(0xff00).rw(m_kp69, FUNC(kp69_device::imrl_r), FUNC(kp69_device::imrl_w));
 	map(0x37, 0x37).mirror(0xff00).rw(m_kp69, FUNC(kp69_device::imrh_r), FUNC(kp69_device::ivr_imrh_w));
+	map(0x38, 0x38).mirror(0xff00).rw(FUNC(kl5c80a12_device::usart_data_r), FUNC(kl5c80a12_device::usart_data_w));
+	map(0x39, 0x39).mirror(0xff00).rw(FUNC(kl5c80a12_device::usart_status_r), FUNC(kl5c80a12_device::usart_control_w));
+	map(0x3a, 0x3b).mirror(0xff00).rw(FUNC(kl5c80a12_device::usart_scr_r), FUNC(kl5c80a12_device::usart_scr_w));
 }
 
 
@@ -101,6 +117,18 @@ void kl5c80a12_device::device_start()
 	save_item(NAME(m_porta_direction));
 	save_item(NAME(m_portb_data));
 	save_item(NAME(m_portb_direction));
+	save_item(NAME(m_usart_mode));
+	save_item(NAME(m_usart_command));
+	save_item(NAME(m_usart_rx_data));
+	save_item(NAME(m_usart_scr));
+	save_item(NAME(m_usart_mode_wait));
+	save_item(NAME(m_usart_rx_ready));
+	save_item(NAME(m_usart_tx_data));
+	save_item(NAME(m_usart_tx_pending));
+	save_item(NAME(m_usart_tx_busy));
+	save_item(NAME(m_usart_tx_pending_valid));
+
+	m_usart_tx_timer = timer_alloc(FUNC(kl5c80a12_device::usart_tx_complete), this);
 }
 
 
@@ -123,6 +151,17 @@ void kl5c80a12_device::device_reset()
 		m_porta_out_callback[i](0, m_porta_3state[i], 0x00);
 	for (int i = 0; i < 3; i++)
 		m_portb_out_callback[i](0, m_portb_3state[i], 0x00);
+
+	// Reset USART
+	m_usart_mode = 0;
+	m_usart_command = 0;
+	m_usart_rx_ready = false;
+	m_usart_mode_wait = true;
+	m_usart_tx_busy = false;
+	m_usart_tx_pending_valid = false;
+	if (m_usart_tx_timer)
+		m_usart_tx_timer->adjust(attotime::never);
+	usart_update_interrupts();
 }
 
 
@@ -171,6 +210,172 @@ void kl5c80a12_device::device_config_complete()
 		if (m_portb_in_callback[i].isunset())
 			m_portb_in_callback[i].bind().set_constant(m_portb_3state[i]);
 	}
+}
+
+
+//**************************************************************************
+//  KP51 USART
+//**************************************************************************
+
+//-------------------------------------------------
+//  usart_data_r - read received data
+//-------------------------------------------------
+
+u8 kl5c80a12_device::usart_data_r()
+{
+	m_usart_rx_ready = false;
+	usart_update_interrupts();
+	return m_usart_rx_data;
+}
+
+
+//-------------------------------------------------
+//  usart_data_w - transmit data
+//-------------------------------------------------
+
+void kl5c80a12_device::usart_data_w(u8 data)
+{
+	if (!m_usart_tx_busy)
+	{
+		// start transmitting
+		m_usart_tx_busy = true;
+		m_usart_tx_data = data;
+		m_usart_tx_timer->adjust(usart_byte_time());
+	}
+	else
+	{
+		// double buffered transmitter: hold one byte until the current one completes
+		m_usart_tx_pending = data;
+		m_usart_tx_pending_valid = true;
+	}
+	usart_update_interrupts();
+}
+
+
+//-------------------------------------------------
+//  usart_tx_complete - byte finished transmitting
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(kl5c80a12_device::usart_tx_complete)
+{
+	m_usart_tx_cb(m_usart_tx_data);
+
+	if (m_usart_tx_pending_valid)
+	{
+		m_usart_tx_data = m_usart_tx_pending;
+		m_usart_tx_pending_valid = false;
+		m_usart_tx_timer->adjust(usart_byte_time());
+	}
+	else
+	{
+		m_usart_tx_busy = false;
+	}
+	usart_update_interrupts();
+}
+
+
+//-------------------------------------------------
+//  usart_byte_time - time to transmit one character
+//  (1 start + 8 data + 1 stop bit) at the configured
+//  baud rate
+//-------------------------------------------------
+
+attotime kl5c80a12_device::usart_byte_time() const
+{
+	// mode register D1/D0 select the TXC divider: x1, x16 or x64
+	u32 divider;
+	switch (m_usart_mode & 0x03)
+	{
+	case 0x01: divider = 1; break;
+	case 0x02: divider = 16; break;
+	case 0x03: divider = 64; break;
+	default:   divider = 16; break; // D1:D0 = 00 is sync mode, unsupported
+	}
+	return attotime::from_ticks(10 * divider, m_usart_txc_clock);
+}
+
+
+//-------------------------------------------------
+//  usart_status_r - read status register
+//-------------------------------------------------
+
+u8 kl5c80a12_device::usart_status_r()
+{
+	u8 data = 0x80;                      // DSR
+	if (!m_usart_tx_pending_valid)
+		data |= 0x01;                    // TXRDY: holding buffer empty
+	if (m_usart_rx_ready)
+		data |= 0x02;                    // RXRDY
+	if (!m_usart_tx_busy)
+		data |= 0x04;                    // TXEMPTY: shifter idle
+	return data;
+}
+
+
+//-------------------------------------------------
+//  usart_control_w - write mode/command register
+//-------------------------------------------------
+
+void kl5c80a12_device::usart_control_w(u8 data)
+{
+	if (m_usart_mode_wait)
+	{
+		m_usart_mode = data;
+		m_usart_mode_wait = false;
+	}
+	else
+	{
+		m_usart_command = data;
+		// software reset command returns to mode register wait state
+		if (BIT(data, 6))
+		{
+			m_usart_mode_wait = true;
+			m_usart_mode = 0;
+			m_usart_command = 0;
+			m_usart_rx_ready = false;
+		}
+	}
+	usart_update_interrupts();
+}
+
+
+//-------------------------------------------------
+//  usart_scr_r/usart_scr_w - system control registers
+//-------------------------------------------------
+
+u8 kl5c80a12_device::usart_scr_r(offs_t offset)
+{
+	return m_usart_scr[offset & 1];
+}
+
+void kl5c80a12_device::usart_scr_w(offs_t offset, u8 data)
+{
+	m_usart_scr[offset & 1] = data;
+}
+
+
+//-------------------------------------------------
+//  usart_rx - receive a byte from an external source
+//-------------------------------------------------
+
+void kl5c80a12_device::usart_rx(u8 data)
+{
+	m_usart_rx_data = data;
+	m_usart_rx_ready = true;
+	usart_update_interrupts();
+}
+
+
+//-------------------------------------------------
+//  usart_update_interrupts - update KP69 interrupt
+//  inputs
+//-------------------------------------------------
+
+void kl5c80a12_device::usart_update_interrupts()
+{
+	m_kp69->ir_w<8>(m_usart_tx_pending_valid ? 0 : 1); // TXRDYPIN
+	m_kp69->ir_w<9>(m_usart_rx_ready ? 1 : 0); // RXRDY
+	m_kp69->ir_w<10>(m_usart_tx_busy ? 0 : 1); // TXEMPTY
 }
 
 

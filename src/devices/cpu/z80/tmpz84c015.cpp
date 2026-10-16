@@ -54,6 +54,9 @@ tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, device_type 
 	m_out_wrdyb_cb(*this),
 	m_out_syncb_cb(*this),
 
+	m_out_txda_byte_cb(*this),
+	m_out_txdb_byte_cb(*this),
+
 	m_out_rxdrqa_cb(*this),
 	m_out_txdrqa_cb(*this),
 	m_out_rxdrqb_cb(*this),
@@ -245,6 +248,9 @@ void tmpz84c015_device::device_add_mconfig(machine_config &config)
 	m_sio->out_txdrqa_callback().set(FUNC(tmpz84c015_device::out_txdrqa_cb_trampoline_w));
 	m_sio->out_rxdrqb_callback().set(FUNC(tmpz84c015_device::out_rxdrqb_cb_trampoline_w));
 	m_sio->out_txdrqb_callback().set(FUNC(tmpz84c015_device::out_txdrqb_cb_trampoline_w));
+
+	m_sio->out_txda_byte_callback().set(FUNC(tmpz84c015_device::out_txda_byte_cb_trampoline_w));
+	m_sio->out_txdb_byte_callback().set(FUNC(tmpz84c015_device::out_txdb_byte_cb_trampoline_w));
 
 	Z80CTC(config, m_ctc, DERIVED_CLOCK(1,1));
 	m_ctc->intr_callback().set_inputline(DEVICE_SELF, INPUT_LINE_IRQ0);

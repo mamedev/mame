@@ -49,6 +49,13 @@ public:
 	void set_p3_3state(u8 value) { m_portb_3state[1] = value; }
 	void set_p4_3state(u8 value) { m_portb_3state[2] = value; }
 
+	// USART (KP51) interface
+	auto usart_tx_callback() { return m_usart_tx_cb.bind(); }
+	void usart_rx(u8 data);
+
+	// external transmitter clock input (TXC pin); baud rate = TXC / mode divider
+	void set_txc_clock(u32 clock) { m_usart_txc_clock = clock; }
+
 protected:
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -68,6 +75,15 @@ private:
 	void portb_w(offs_t offset, u8 data);
 	u8 portb_control_r();
 	void portb_control_w(u8 data);
+
+	// USART handlers
+	u8 usart_data_r();
+	void usart_data_w(u8 data);
+	u8 usart_status_r();
+	void usart_control_w(u8 data);
+	u8 usart_scr_r(offs_t offset);
+	void usart_scr_w(offs_t offset, u8 data);
+	void usart_update_interrupts();
 
 	// internal helpers
 	void portb_update_output(unsigned n);
@@ -94,6 +110,26 @@ private:
 	u8 m_portb_data[3];
 	u8 m_portb_direction;
 	u8 m_portb_3state[3];
+
+	// USART state
+	devcb_write8 m_usart_tx_cb;
+	u8 m_usart_mode;
+	u8 m_usart_command;
+	u8 m_usart_rx_data;
+	u8 m_usart_scr[2];
+	bool m_usart_mode_wait;
+	bool m_usart_rx_ready;
+
+	// USART transmit state (paced by the TXC pin clock)
+	emu_timer *m_usart_tx_timer;
+	u32 m_usart_txc_clock;
+	u8 m_usart_tx_data;
+	u8 m_usart_tx_pending;
+	bool m_usart_tx_busy;
+	bool m_usart_tx_pending_valid;
+
+	TIMER_CALLBACK_MEMBER(usart_tx_complete);
+	attotime usart_byte_time() const;
 };
 
 

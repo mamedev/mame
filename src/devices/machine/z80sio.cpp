@@ -479,7 +479,8 @@ z80sio_device::z80sio_device(const machine_config &mconfig, device_type type, co
 	m_out_sync_cb(*this),
 	m_out_int_cb(*this),
 	m_out_rxdrq_cb(*this),
-	m_out_txdrq_cb(*this)
+	m_out_txdrq_cb(*this),
+	m_out_txd_byte_cb(*this)
 {
 	for (auto & elem : m_int_state)
 		elem = 0;
@@ -970,7 +971,7 @@ uint8_t z80sio_device::read_vector()
 	// modify vector for highest-priority pending interrupt
 	int const *const prio = interrupt_priorities();
 	vec &= 0xf1U;
-	for (int i = 0; std::size(m_int_state) > i; ++i)
+	for (int i = 0; i < std::size(m_int_state); ++i)
 	{
 		if (m_int_state[prio[i]] & Z80_DAISY_INT)
 		{
@@ -2173,6 +2174,9 @@ void z80sio_channel::data_write(uint8_t data)
 	m_tx_int_disarm = false;
 	m_tx_data = data;
 	set_tx_empty(get_tx_empty() , false);
+
+	// simplified serial link: report the queued byte to the host
+	m_uart->m_out_txd_byte_cb[m_index](data);
 	if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC)
 	{
 		LOGTX("Z80SIO: WR4_STOP_BITS_SYNC detected\n");
