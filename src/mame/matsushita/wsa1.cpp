@@ -62,6 +62,7 @@
 #include "diserial.h"
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "wsa1r.lh"
@@ -668,6 +669,8 @@ void wsa1_state::wsa1r(machine_config &config)
 	// to the gap lengths.  Untested against real media -- no disk is dumped.
 	FLOPPY_CONNECTOR(config, "fdc:0", wsa1_floppies, "35hd",
 		floppy_image_device::default_pc_floppy_formats).enable_sound(true);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("wsa1_flop");
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
