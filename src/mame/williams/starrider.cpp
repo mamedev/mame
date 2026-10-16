@@ -7,6 +7,17 @@
  allows part of the LaserDisc backdrop to be enlarged and panned
  horizontally.  Overlay graphics are also supported.
 
+ Further improvement by OM3GAZX.
+ Based on code from the FreeBASIC Star Rider Emulator, by Joseba and SynaMax.
+ (Thanks dudes, always wanted to play this game without scavenging the original hardware.
+ I owe you one.)
+ Sound implementation based on Luis Quinto's webJS port of Star Rider Emulator.
+
+ VBI data has been reconstructed from the publicly available AVI capture that works with the
+ Star Rider Emulator.
+ Further reverse engineering done through ROM dissasembly and analysis of the standalone emulator's
+ behavior, which is closest to the original hardware, minus sound.
+
  Major components:
  -----------------
  * Modified Pioneer PR8210 LaserDisc player
@@ -242,11 +253,15 @@
 
 
  TODO:
- * Everything
- * Map the banked CPU ROM
- * Video DMA etc.
- * Need a dump of the clock state machine PROM at VGG U114 (82S123 32*8)
- * Need dumps of colour mapping PROMs at VGG U10 and U11 (82S137 1204*4)
+ * VGG video expander isn't emulated at hardware level yet, it is currently simulated.
+ * PIF board that communicates with the Laserdisc player falls asleep at random, and doesn't wake up after a
+   machine restart. Prompts a 502 disc fault; happens regularly when re-racing a track the player didn't
+   qualify for (3rd and 4th place)
+ * Attract mode is desynchronized with the Laserdisc ("Rider" text from the video feed doesn't zoom in on time,
+   opponent riders aren't properly aligned with the track. Does it even read the disc's Manchester band?)
+ * The Laserdisc capture has reconstructed VBI data based on what the Manchester band provides; whether it's
+   fully accurate or not remains to be seen, but so far the game behaves as it should. It's a miracle that it
+   can be read by MAME, and even more of a miracle that it works for the game.
 
  */
 
@@ -259,8 +274,11 @@
 #include "machine/bankdev.h"
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
+#include "machine/ldpr8210.h"
 
 #include "emupal.h"
+#include "sound/dac.h"
+#include "speaker.h"
 
 #include <algorithm>
 #include <iterator>
@@ -275,6 +293,7 @@ public:
 	sr_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
 		, m_main_cpu(*this, "cpu.u46")
+		, m_screen(*this, "screen")
 		, m_main_pia1(*this, "cpu.u10")
 		, m_main_pia2(*this, "cpu.u20")
 		, m_main_banks(*this, "cpu.page")
@@ -284,13 +303,20 @@ public:
 		, m_vgg_pia(*this, "vgg.u7")
 		, m_vgg_palette(*this, "vgg.color")
 		, m_vgg_horz(*this, "horz")
+		, m_vgg_gfx(*this, "gfx")
+		, m_vgg_text(*this, "text")
+		, m_vgg_color_prom(*this, "color")
 		, m_pif_cpu(*this, "pif.u4")
 		, m_pif_pia(*this, "pif.u1")
+		, m_main_irq(*this, "main.irq")
+		, m_pif_irq(*this, "pif.irq")
+		, m_laserdisc(*this, "ld_pr8210a")
 		, m_sound_cpu(*this, "sound.u5")
 		, m_sound_ptm(*this, "sound.u14")
 		, m_sound_pia1(*this, "sound.u34")
 		, m_sound_pia2(*this, "sound.u15")
 		, m_sound_fifos(*this, { "sound.u23", "sound.u22" })
+		, m_sound_dacs(*this, "sound.dac%u", 0U)
 	{
 	}
 
@@ -300,6 +326,8 @@ public:
 
 protected:
 	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+	void sound_attenuators_postload();
 
 private:
 	u8 cpu_page_r(address_space &space);
@@ -308,6 +336,12 @@ private:
 	void cpu_led_w(u8 data);
 	u8 cpu_wd_r(address_space &space);
 	void cpu_wd_w(u8 data);
+	u8 main_pia1_pa_r();
+	u8 video_counter_r();
+	u8 field_r();
+	void vgg_vblank(int state);
+	u8 control1_r();
+	u8 control2_r();
 	u8 cpu_nvram_r(address_space &space, offs_t offset);
 	void cpu_nvram_w(offs_t offset, u8 data);
 	void cpu_pia2_ca2_w(int state);
@@ -315,16 +349,32 @@ private:
 	static constexpr u16 vgg_drams_map(u16 v, u16 h, u16 p);
 	u16 vgg_drams_map(u16 a) const;
 
+	u8 vgg_drams_r(offs_t offset);
+	u8 vgg_image_r(offs_t offset);
 	void vgg_drams_w(offs_t offset, u8 data);
 	void vgg_impg_w(u8 data);
 	void vgg_xlate_w(u8 data);
+	void vgg_blitter_w(offs_t offset, u8 data);
+	void vgg_blit();
+	void vgg_blit_pixel(u16 destination, u8 source, u8 control, u8 mask, u8 solid);
+	TIMER_CALLBACK_MEMBER(vgg_blast_off_clear); // Ugly "BLAST OFF" text hack...
+	u32 vgg_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vgg_disable_w(u8 data);
 	void vgg_color_palet_w(u8 data);
 
 	u8 pif_irq_enable_r(address_space &space);
 	void pif_irq_enable_w(u8 data);
-	u8 pif_irq_ack_r(address_space &space) { m_pif_cpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); return space.unmap(); }
-	void pif_irq_ack_w(u8 data) { m_pif_cpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
+	u8 pif_irq_ack_r(address_space &space);
+	void pif_irq_ack_w(u8 data);
+	void pif_irq_update();
+	TIMER_CALLBACK_MEMBER(pif_timer_irq);
+	void pif_firq_w(int state);
+	TIMER_CALLBACK_MEMBER(pif_firq_retry);
+	TIMER_CALLBACK_MEMBER(vgg_irq_clear);
+	TIMER_CALLBACK_MEMBER(vgg_blit_done);
+	u8 pif_porta_r();
+	void vgg_portb_w(offs_t offset, u8 data, u8 ddr);
+	void pif_portb_w(offs_t offset, u8 data, u8 ddr);
 
 	template <unsigned N> u8 sound_fifo_pl_r(address_space &space);
 	template <unsigned N> void sound_fifo_pl_w(u8 data);
@@ -338,8 +388,11 @@ private:
 	void sound_ef2_w(u8 data);
 	u8 sound_er2_r(address_space &space);
 	void sound_er2_w(u8 data);
+	void sound_attenuator_w(unsigned index, u8 data);
 
 	void sound_pia2_pa(u8 data);
+	void sound_fifo0_q(u8 data);
+	void sound_fifo1_q(u8 data);
 	void sound_fifo0_ir(int state);
 	void sound_fifo1_ir(int state);
 	template <unsigned N> void sound_fifo_or(int state);
@@ -351,6 +404,7 @@ private:
 	void sound_memory(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_main_cpu;
+	required_device<screen_device> m_screen;
 	required_device<pia6821_device> m_main_pia1;
 	required_device<pia6821_device> m_main_pia2;
 	required_device<address_map_bank_device> m_main_banks;
@@ -361,28 +415,51 @@ private:
 	required_device<pia6821_device> m_vgg_pia;
 	required_device<palette_device> m_vgg_palette;
 	required_region_ptr<u8> m_vgg_horz;
+	required_memory_region m_vgg_gfx;
+	required_memory_region m_vgg_text;
+	required_memory_region m_vgg_color_prom;
 
 	required_device<cpu_device> m_pif_cpu;
 	required_device<pia6821_device> m_pif_pia;
+	required_device<input_merger_device> m_main_irq;
+	required_device<input_merger_device> m_pif_irq;
+	required_device<pioneer_pr8210_device> m_laserdisc;
 
 	required_device<cpu_device> m_sound_cpu;
 	required_device<ptm6840_device> m_sound_ptm;
 	required_device<pia6821_device> m_sound_pia1;
 	required_device<pia6821_device> m_sound_pia2;
 	required_device_array<fifo2812_device, 2> m_sound_fifos;
+	required_device_array<dac_8bit_r2r_device, 4> m_sound_dacs;
 
 	u8 m_main_page = 0U;
 
 	std::unique_ptr<u8 []> m_vgg_drams;
+	u8 m_vgg_blast_off_original[9 * 4 * 8] = {};
+	u8 m_vgg_blast_off_drawn[9 * 4 * 8] = {};
+	bool m_vgg_blast_off_pending = false;
 	u8 m_vgg_image_page = 0U;
 	u8 m_vgg_xlate = 0U;
+	u8 m_vgg_blitter_regs[16] = {};
 	u8 m_vgg_expand_disable = 0U;
 	u8 m_vgg_background_disable = 0U;
 	u8 m_vgg_color_palet = 0U;
+	u8 m_vgg_pif_portb = 0xffU;
+
+	u16 m_vgg_vblank_count = 0U;
 
 	u8 m_pif_irq_enable = 0U;
+	u8 m_pif_timer_irq = 0U;
+	u8 m_pif_portb = 0xffU;
+	emu_timer *m_pif_irq_timer = nullptr;
+	emu_timer *m_pif_firq_timer = nullptr;
+	u8 m_pif_firq = 0U;
+	emu_timer *m_vgg_irq_timer = nullptr;
+	emu_timer *m_vgg_blit_timer = nullptr;
+	emu_timer *m_vgg_blast_off_timer = nullptr;
 
 	u8 m_sound_ptm_o[2] = { 0U, 0U };
+	u8 m_sound_attenuation[4] = {};
 	u8 m_sound_pia2_pa_out = 0xffU;
 	u8 m_sound_pia2_pb_in = 0xffU;
 };
@@ -395,19 +472,19 @@ void sr_state::starrider(machine_config &config)
 	m_main_cpu->set_addrmap(AS_PROGRAM, &sr_state::main_memory);
 
 	PIA6821(config, m_main_pia1, 24_MHz_XTAL / 2 / 12); // 6820/21
-	m_main_pia1->readpa_handler().set_ioport("IN2");
+	m_main_pia1->readpa_handler().set(FUNC(sr_state::main_pia1_pa_r));
 	// CA1 is the /END SCREEN signal
 	// CA2 is the 4MS signal
-	m_main_pia1->writepb_handler().set(m_sound_pia1, FUNC(pia6821_device::portb_w));
+	m_main_pia1->writepb_handler().set(m_sound_pia1, FUNC(pia6821_device::porta_w)); // sound command latch
 	m_main_pia1->cb2_handler().set(m_sound_pia1, FUNC(pia6821_device::ca1_w));
 	m_main_pia1->irqa_handler().set("main.irq", FUNC(input_merger_device::in_w<0>));
 	m_main_pia1->irqb_handler().set("main.irq", FUNC(input_merger_device::in_w<1>));
 
 	PIA6821(config, m_main_pia2, 24_MHz_XTAL / 2 / 12); // 6820/21
-	m_main_pia2->readpa_handler().set_ioport("IN0");
+	m_main_pia2->readpa_handler().set(FUNC(sr_state::control1_r));
 	m_main_pia2->ca1_w(0); // grounded
 	m_main_pia2->ca2_handler().set(FUNC(sr_state::cpu_pia2_ca2_w));
-	m_main_pia2->readpb_handler().set_ioport("IN1");
+	m_main_pia2->readpb_handler().set(FUNC(sr_state::control2_r));
 	m_main_pia2->cb1_w(0); // grounded
 	// CB2 is unused
 	// IRQA and IRQB are unused
@@ -426,7 +503,9 @@ void sr_state::starrider(machine_config &config)
 	PIA6821(config, m_vgg_pia, 24_MHz_XTAL / 2 / 12); // 6821
 	// PA0-8 and CA2 are outputs to the expander board
 	// CA1 is the /HALT signal
-	// PB0-7 and CB1-2 are the interface to the PIF board (bidirectional)
+	// PB0-7 and CB1-2 are the interface to the PIF board
+	m_vgg_pia->writepb_handler().set(FUNC(sr_state::vgg_portb_w));
+	m_vgg_pia->cb2_handler().set(m_pif_pia, FUNC(pia6821_device::ca1_w));
 	m_vgg_pia->irqa_handler().set_inputline(m_main_cpu, M6809_FIRQ_LINE);
 	m_vgg_pia->irqb_handler().set("main.irq", FUNC(input_merger_device::in_w<2>));
 
@@ -437,8 +516,18 @@ void sr_state::starrider(machine_config &config)
 	m_pif_cpu->set_addrmap(AS_PROGRAM, &sr_state::pif_memory);
 
 	PIA6821(config, m_pif_pia, 4_MHz_XTAL / 4); // 6821
-	m_pif_pia->irqa_handler().set_inputline(m_pif_cpu, M6809_FIRQ_LINE);
-	m_pif_pia->irqb_handler().set_inputline(m_pif_cpu, INPUT_LINE_NMI);
+	m_pif_pia->readpa_handler().set(FUNC(sr_state::pif_porta_r));
+	m_pif_pia->readpb_handler().set(m_laserdisc, FUNC(pioneer_pr8210_device::pif_status_r));
+	m_pif_pia->writepb_handler().set(FUNC(sr_state::pif_portb_w));
+	m_pif_pia->ca2_handler().set(m_vgg_pia, FUNC(pia6821_device::cb1_w));
+	m_pif_pia->irqa_handler().set(FUNC(sr_state::pif_firq_w));
+	m_pif_pia->irqb_handler().set("pif.irq", FUNC(input_merger_device::in_w<0>));
+
+	PIONEER_PR8210(config, m_laserdisc);
+	m_laserdisc->add_ntsc_screen(config, "screen");
+	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(sr_state::vgg_vblank));
+	m_laserdisc->set_overlay(640, 512, FUNC(sr_state::vgg_screen_update));
+	m_laserdisc->video_enable(false); // the expander composites the video into the overlay
 
 	// Sound
 	MC6809E(config, m_sound_cpu, 8_MHz_XTAL / 4); // 68B09E
@@ -464,22 +553,35 @@ void sr_state::starrider(machine_config &config)
 	// PA3 is the IR output from the unpopulated third FIFO (active low)
 	// PA7 is the RDY output from the unpopulated 5220 (active low)
 	// CB1-2 are unused
-	m_sound_pia1->irqb_handler().set("sound.irq", FUNC(input_merger_device::in_w<2>));
-	m_sound_pia1->irqb_handler().set("sound.irq", FUNC(input_merger_device::in_w<3>));
+	m_sound_pia2->irqa_handler().set("sound.irq", FUNC(input_merger_device::in_w<2>));
+	m_sound_pia2->irqb_handler().set("sound.irq", FUNC(input_merger_device::in_w<3>));
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+	DAC_8BIT_R2R(config, m_sound_dacs[0]).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	DAC_8BIT_R2R(config, m_sound_dacs[1]).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	DAC_8BIT_R2R(config, m_sound_dacs[2]).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	DAC_8BIT_R2R(config, m_sound_dacs[3]).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+
+	m_laserdisc->add_route(0, "lspeaker", 1.0);
+	m_laserdisc->add_route(1, "rspeaker", 1.0);
 
 	FIFO2812(config, m_sound_fifos[0]);
+	m_sound_fifos[0]->q_cb().set(FUNC(sr_state::sound_fifo0_q));
 	m_sound_fifos[0]->ir_cb().set(FUNC(sr_state::sound_fifo0_ir));
 	//m_sound_fifos[0]->ir_cb().append(...) IR is input to a clock-stretching circuit
 	m_sound_fifos[0]->or_cb().set(FUNC(sr_state::sound_fifo_or<0>));
 	m_sound_fifos[0]->flag_cb().set(FUNC(sr_state::sound_fifo_flag<0>));
 
 	FIFO2812(config, m_sound_fifos[1]);
+	m_sound_fifos[1]->q_cb().set(FUNC(sr_state::sound_fifo1_q));
 	m_sound_fifos[1]->ir_cb().set(FUNC(sr_state::sound_fifo1_ir));
 	//m_sound_fifos[1]->ir_cb().append(...) IR is input to a clock-stretching circuit
 	m_sound_fifos[1]->or_cb().set(FUNC(sr_state::sound_fifo_or<1>));
 	m_sound_fifos[1]->flag_cb().set(FUNC(sr_state::sound_fifo_flag<1>));
 
 	INPUT_MERGER_ANY_HIGH(config, "sound.irq").output_handler().set_inputline(m_sound_cpu, M6809_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_pif_irq).output_handler().set_inputline(m_pif_cpu, M6809_IRQ_LINE);
 }
 
 
@@ -489,40 +591,90 @@ INPUT_CHANGED_MEMBER(sr_state::sound_sw1_changed)
 	m_sound_cpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
 void sr_state::machine_start()
 {
 	m_vgg_drams = std::make_unique<u8 []>(16'384 * 4 / 8 * 6);
 
 	save_item(NAME(m_main_page));
 	save_pointer(NAME(m_vgg_drams), 16'384 * 4 / 8 * 6);
+	save_item(NAME(m_vgg_blast_off_original));
+	save_item(NAME(m_vgg_blast_off_drawn));
+	save_item(NAME(m_vgg_blast_off_pending));
 	save_item(NAME(m_vgg_image_page));
 	save_item(NAME(m_vgg_xlate));
+	save_item(NAME(m_vgg_blitter_regs));
 	save_item(NAME(m_vgg_expand_disable));
 	save_item(NAME(m_vgg_background_disable));
 	save_item(NAME(m_vgg_color_palet));
+	save_item(NAME(m_vgg_pif_portb));
 	save_item(NAME(m_pif_irq_enable));
+	save_item(NAME(m_vgg_vblank_count));
+	save_item(NAME(m_pif_timer_irq));
+	save_item(NAME(m_pif_firq));
+	save_item(NAME(m_pif_portb));
 	save_item(NAME(m_sound_ptm_o));
+	save_item(NAME(m_sound_attenuation));
 	save_item(NAME(m_sound_pia2_pa_out));
 	save_item(NAME(m_sound_pia2_pb_in));
 
 	m_main_page = 0U;
 	std::fill_n(m_vgg_drams.get(), 16'384 * 4 / 8 * 6, 0U);
 	m_vgg_image_page = 0U;
+	m_vgg_blast_off_pending = false;
 	m_vgg_xlate = 0U;
 	m_vgg_expand_disable = 0U;
 	m_vgg_background_disable = 0U;
 	m_vgg_color_palet = 0U;
+	m_vgg_pif_portb = 0xffU;
 	m_pif_irq_enable = 0U;
+	m_pif_timer_irq = 0U;
+	m_vgg_vblank_count = 0U;
+	m_pif_portb = 0xffU;
+	m_pif_irq->in_w<1>(0);
+	m_pif_irq_timer = timer_alloc(FUNC(sr_state::pif_timer_irq), this);
+	m_pif_firq_timer = timer_alloc(FUNC(sr_state::pif_firq_retry), this);
+	m_vgg_irq_timer = timer_alloc(FUNC(sr_state::vgg_irq_clear), this);
+	m_vgg_blit_timer = timer_alloc(FUNC(sr_state::vgg_blit_done), this);
+	m_vgg_blast_off_timer = timer_alloc(FUNC(sr_state::vgg_blast_off_clear), this);
+	m_pif_irq_timer->adjust(m_screen->scan_period() * 64, 0, m_screen->scan_period() * 128);
 	std::fill(std::begin(m_sound_ptm_o), std::end(m_sound_ptm_o), 0U);
+	std::fill(std::begin(m_sound_attenuation), std::end(m_sound_attenuation), 0U);
 	m_sound_pia2_pa_out = 0xffU;
-	m_sound_pia2_pb_in = 0xffU;
+	m_sound_pia2_pb_in = 0x44U; // empty FIFOs: half-full and output-ready low, third FIFO's flag pulled up
+	for (auto &dac : m_sound_dacs)
+		dac->set_output_gain(ALL_OUTPUTS, 0.0F);
+	sound_fifo0_q(0x80U);
+	sound_fifo1_q(0x80U);
+	machine().save().register_postload(save_prepost_delegate(FUNC(sr_state::sound_attenuators_postload), this));
 
 	for (unsigned i = 0U; 3U > i; ++i)
 	{
 		m_sound_ptm->set_gate(i, 0);
 		m_sound_ptm->set_clock(i, 0);
 	}
+}
+
+void sr_state::machine_reset()
+{
+	// present the empty-FIFO state to the sound PIA; the FIFOs only report changes
+	m_sound_pia2_pa_out = 0xffU;
+	m_sound_pia2_pb_in = 0x44U;
+	m_sound_pia2->portb_w(m_sound_pia2_pb_in | (m_sound_pia2_pa_out & 0x77U));
+	m_sound_pia2->ca1_w(1);
+	m_sound_pia2->ca2_w(1);
+
+	// PIF reset
+	m_pif_portb = 0xffU;
+	m_pif_irq->in_w<1>(0);
+	m_vgg_pif_portb = 0xffU;
+	m_pif_irq_enable = 0U;
+	m_pif_timer_irq = 0U;
+}
+
+void sr_state::sound_attenuators_postload()
+{
+	for (unsigned i = 0; i < std::size(m_sound_attenuation); ++i)
+		m_sound_dacs[i]->set_output_gain(ALL_OUTPUTS, 0.5F * m_sound_attenuation[i] / 63.0F);
 }
 
 
@@ -572,6 +724,60 @@ void sr_state::cpu_wd_w(u8 data)
 	}
 }
 
+u8 sr_state::main_pia1_pa_r()
+{
+	return ioport("IN2")->read();
+}
+
+u8 sr_state::video_counter_r()
+{
+	// The VGG counts one line for every two NTSC scanlines.
+	return (m_screen->vpos() >> 1) & 0xff;
+}
+
+u8 sr_state::field_r()
+{
+	// Inverted FIELD signal on D7. The interrupt handler toggles its expected field on
+	// every interrupt, so the signal alternates once per vertical blank.
+	// The interrupt handler samples the field once per interrupt, so use that as the acknowledge.
+	if (!machine().side_effects_disabled())
+	{
+		m_main_irq->in_w<3>(0);
+		m_vgg_irq_timer->adjust(attotime::never);
+	}
+	return BIT(m_vgg_vblank_count, 0) ? 0x00 : 0x80;
+}
+
+void sr_state::vgg_vblank(int state)
+{
+	// Held until the handler samples the field signal, or for a bounded time if it never does.
+	if (state)
+	{
+		m_vgg_vblank_count++;
+		m_main_irq->in_w<3>(1);
+		m_vgg_irq_timer->adjust(m_screen->frame_period() * 4);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(sr_state::vgg_irq_clear)
+{
+	m_main_irq->in_w<3>(0);
+}
+
+u8 sr_state::control1_r()
+{
+	u8 const steering = ioport("STEER")->read() & 0x3f;
+	u8 const gray = steering ^ (steering >> 1);
+	return gray | (ioport("IN0")->read() & 0xc0);
+}
+
+u8 sr_state::control2_r()
+{
+	u8 const accelerator = ioport("ACCEL")->read() & 0x0f;
+	u8 const gray = accelerator ^ (accelerator >> 1);
+	return gray | (ioport("IN1")->read() & 0xf0);
+}
+
 u8 sr_state::cpu_nvram_r(address_space &space, offs_t offset)
 {
 	// U9 (5514) is 4 bits wide
@@ -618,13 +824,35 @@ u16 sr_state::vgg_drams_map(u16 a) const
 	return vgg_drams_map(a & 0x00ff, pa & 0x003f, (pa >> 6) & 0x0003);
 }
 
+u8 sr_state::vgg_drams_r(offs_t offset)
+{
+	u16 const address(vgg_drams_map(offset));
+	constexpr u32 dram_size = 16'384 * 4 / 8 * 6;
+	return (address < dram_size) ? m_vgg_drams[address] : 0xff;
+}
+
+
+u8 sr_state::vgg_image_r(offs_t offset)
+{
+	// Page 1 reads the image ROM selected by the image page latch (used by the ROM test).
+	if ((m_vgg_image_page & 0x1f) == 0x1e)
+		return m_vgg_text->base()[offset & 0x3fff];
+
+	if (offset >= 0x8000)
+		return 0xff;
+
+	u32 const bank = (u32(m_vgg_image_page & 0x0f) * 2) + BIT(offset, 14);
+	return m_vgg_gfx->base()[(bank * 0x4000) + (offset & 0x3fff)];
+}
+
 
 void sr_state::vgg_drams_w(offs_t offset, u8 data)
 {
 	if (((m_main_page & 0x03) == 0x03) || (((m_main_page & 0x03) == 0x01) && ((m_vgg_image_page & 0x1f) == 0x1e)))
 		offset ^= 0x8000;
 	u16 const addr(vgg_drams_map(offset));
-	if ((offset & 0xc000) != 0xc000)
+	constexpr u32 dram_size = 16'384 * 4 / 8 * 6;
+	if (((offset & 0xc000) != 0xc000) && (addr < dram_size))
 		m_vgg_drams[addr] = data;
 }
 
@@ -638,6 +866,320 @@ void sr_state::vgg_xlate_w(u8 data)
 {
 	// 6 bits latched by U12 (74LS173)
 	m_vgg_xlate = data & 0x3f;
+}
+
+void sr_state::vgg_blitter_w(offs_t offset, u8 data)
+{
+	offset &= 0x0f;
+	m_vgg_blitter_regs[offset] = data;
+
+	// The standalone starts the second register bank with a write to $CBB8.
+	if (offset == 8)
+	{
+		vgg_blit();
+
+		// Completion raises FIRQ through the VGG PIA, which the game uses to chain queued blits.
+		m_vgg_blit_timer->adjust(attotime::from_usec(1) + attotime::from_nsec(300) * (u32(m_vgg_blitter_regs[14]) * m_vgg_blitter_regs[15]));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(sr_state::vgg_blit_done)
+{
+	m_vgg_pia->ca1_w(1);
+	m_vgg_pia->ca1_w(0);
+}
+
+void sr_state::vgg_blit_pixel(u16 destination, u8 source, u8 control, u8 mask, u8 solid)
+{
+	// The six latched translation bits and four source-pixel bits address all 1 KiB of the PROM.
+	u16 const color_mask = (m_vgg_xlate & 0x3f) << 4;
+	u8 const color_hi = m_vgg_color_prom->base()[color_mask | (source >> 4)] & 0x0f;
+	u8 const color_lo = m_vgg_color_prom->base()[color_mask | (source & 0x0f)] & 0x0f;
+	u8 const pixel = (color_hi << 4) | color_lo;
+
+	if (BIT(control, 3))
+	{
+		if (!(pixel & 0xf0))
+			mask |= 0xf0;
+		if (!(pixel & 0x0f))
+			mask |= 0x0f;
+	}
+
+	u16 const address = vgg_drams_map(destination);
+	constexpr u32 dram_size = 16'384 * 4 / 8 * 6;
+	if (address >= dram_size)
+		return;
+
+	u8 &target = m_vgg_drams[address];
+	target = (target & mask) | ((BIT(control, 4) ? solid : pixel) & ~mask);
+}
+
+void sr_state::vgg_blit()
+{
+	u8 const control = m_vgg_blitter_regs[8];
+	u8 const mask_value = m_vgg_blitter_regs[9];
+	u16 const source_start = (u16(m_vgg_blitter_regs[10]) << 8) | m_vgg_blitter_regs[11];
+	u16 destination_start = (u16(m_vgg_blitter_regs[12]) << 8) | m_vgg_blitter_regs[13];
+	u8 const width = m_vgg_blitter_regs[14];
+	u8 const height = m_vgg_blitter_regs[15];
+	int blast_off_glyph = -1;
+
+	// "BLAST OFF" text hack
+	// U8 draws these nine text-ROM glyphs from $0401; U74 maps that origin to the upper-left corner.
+	if (control == 0x1a && mask_value == 0x99 && width == 4 && height == 8)
+	{
+		constexpr std::array<u16, 9> blast_off_glyphs{
+			0xc93b, 0xca6b, 0xc91b, 0xcb57, 0xcb77, 0xc8fb, 0xcad3, 0xc9bb, 0xc9bb
+		};
+		for (unsigned i = 0; i < blast_off_glyphs.size(); ++i)
+		{
+			if ((source_start == blast_off_glyphs[i]) && (destination_start == (0x0401 + i * 0x400)))
+			{
+				blast_off_glyph = i;
+				destination_start += 0x3a23;
+				break;
+			}
+		}
+	}
+	// "BLAST OFF" text hack
+	if ((blast_off_glyph == 0) && !m_vgg_blast_off_pending)
+	{
+		unsigned cell = 0;
+		for (unsigned glyph = 0; glyph < 9; ++glyph)
+		{
+			for (unsigned y = 0; y < 8; ++y)
+			{
+				for (unsigned x = 0; x < 4; ++x)
+				{
+					u16 const address = vgg_drams_map(0x3e24 + (glyph * 0x400) + y + (x * 0x100));
+					m_vgg_blast_off_original[cell++] = (address < (16'384 * 4 / 8 * 6)) ? m_vgg_drams[address] : 0;
+				}
+			}
+		}
+	}
+	u16 const row_source_step = BIT(control, 0) ? 1 : width;
+	u16 const row_destination_step = BIT(control, 1) ? 1 : width;
+	u16 const source_pixel_step = BIT(control, 0) ? 0x100 : 1;
+	u16 const destination_pixel_step = BIT(control, 1) ? 0x100 : 1;
+	u8 mask = (BIT(control, 7) ? 0xf0 : 0) | (BIT(control, 6) ? 0x0f : 0);
+	u16 source_row = source_start;
+	u16 destination_row = destination_start;
+	auto source_read = [&] (u16 address)
+	{
+		// image page latch bit 5 (CBC0 = $FF) selects screen memory as the blitter source
+		if (BIT(m_vgg_image_page, 5))
+		{
+			u16 const mapped = vgg_drams_map(address);
+			constexpr u32 dram_size = 16'384 * 4 / 8 * 6;
+			return (mapped < dram_size) ? m_vgg_drams[mapped] : u8(0);
+		}
+
+		if (address >= 0xc000)
+			return m_vgg_text->base()[address & 0x3fff];
+
+		if (address >= 0x8000)
+			return u8(0);
+
+		// Image pages are wired as even/odd ROM pairs in the graphics region.
+		u32 const bank = (u32(m_vgg_image_page & 0x0f) * 2) + BIT(address, 14);
+		u32 const offset = (bank * 0x4000) + (address & 0x3fff);
+		return m_vgg_gfx->base()[offset];
+	};
+
+	if (!width || !height)
+		return;
+
+	for (u32 y = 0; y < height; ++y)
+	{
+		u16 source = source_row;
+		u16 destination = destination_row;
+
+		if (!BIT(control, 5))
+		{
+			for (u32 x = 0; x < width; ++x)
+			{
+				vgg_blit_pixel(destination, source_read(source), control, mask, mask_value);
+				source += source_pixel_step;
+				destination += destination_pixel_step;
+			}
+		}
+		else
+		{
+			u8 const rotated_mask = (mask >> 4) | (mask << 4);
+			u8 const rotated_solid = (mask_value >> 4) | (mask_value << 4);
+			u16 pixels = source_read(source);
+			vgg_blit_pixel(destination, (pixels >> 4) & 0x0f, control, rotated_mask | 0xf0, rotated_solid);
+			source += source_pixel_step;
+			destination += destination_pixel_step;
+
+			for (u32 x = 1; x < width; ++x)
+			{
+				pixels = (pixels << 8) | source_read(source);
+				vgg_blit_pixel(destination, (pixels >> 4) & 0xff, control, rotated_mask, rotated_solid);
+				source += source_pixel_step;
+				destination += destination_pixel_step;
+			}
+
+			vgg_blit_pixel(destination, (pixels << 4) & 0xf0, control, rotated_mask | 0x0f, rotated_solid);
+		}
+
+		source_row += row_source_step;
+		if (BIT(control, 1))
+			destination_row = (destination_row & 0xff00) | ((destination_row + row_destination_step) & 0x00ff);
+		else
+			destination_row += row_destination_step;
+	}
+
+	// "BLAST OFF" text hack
+	if (blast_off_glyph == 8)
+	{
+		unsigned cell = 0;
+		for (unsigned glyph = 0; glyph < 9; ++glyph)
+		{
+			for (unsigned y = 0; y < 8; ++y)
+			{
+				for (unsigned x = 0; x < 4; ++x)
+				{
+					u16 const address = vgg_drams_map(0x3e24 + (glyph * 0x400) + y + (x * 0x100));
+					m_vgg_blast_off_drawn[cell++] = (address < (16'384 * 4 / 8 * 6)) ? m_vgg_drams[address] : 0;
+				}
+			}
+		}
+		m_vgg_blast_off_pending = true;
+		// Match the ROM's $96-tick lifetime for the title object.
+		m_vgg_blast_off_timer->adjust(m_screen->frame_period() * 0x96);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(sr_state::vgg_blast_off_clear)
+{
+	if (!m_vgg_blast_off_pending)
+		return;
+
+	unsigned cell = 0;
+	for (unsigned glyph = 0; glyph < 9; ++glyph)
+	{
+		for (unsigned y = 0; y < 8; ++y)
+		{
+			for (unsigned x = 0; x < 4; ++x)
+			{
+				u16 const address = vgg_drams_map(0x3e24 + (glyph * 0x400) + y + (x * 0x100));
+				if (address < (16'384 * 4 / 8 * 6))
+				{
+					u8 &current = m_vgg_drams[address];
+					u8 const original = m_vgg_blast_off_original[cell];
+					u8 const drawn = m_vgg_blast_off_drawn[cell];
+					if (((original ^ drawn) & 0xf0) && ((current ^ drawn) & 0xf0) == 0)
+						current = (current & 0x0f) | (original & 0xf0);
+					if (((original ^ drawn) & 0x0f) && ((current ^ drawn) & 0x0f) == 0)
+						current = (current & 0xf0) | (original & 0x0f);
+				}
+				++cell;
+			}
+		}
+	}
+
+	m_vgg_blast_off_pending = false;
+}
+
+u32 sr_state::vgg_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	// the raw laserdisc picture must never show through (it carries the Manchester code)
+	bitmap.fill(rgb_t(255, 0, 0, 0), cliprect);
+
+	// the video expander is not emulated at the hardware level: the horizontal position comes from the
+	// value the game keeps at $D004 (9 bits, centre $140, left $1C4, right $0BB)
+	bitmap_yuy16 const &video = m_laserdisc->get_raw_video();
+	bool const have_video = !m_vgg_background_disable && video.valid();
+	bool const expand = !m_vgg_expand_disable;
+	address_space &prog = m_main_cpu->space(AS_PROGRAM);
+	int const pan = ((prog.read_byte(0xd004) << 8) | prog.read_byte(0xd005)) & 0x1ff;
+	// the standalone's -1073 was tuned to its bezel; this centres the picture on the game screen at pan $140
+	int const expanded_offset = -1052 + pan * 2;
+
+	rgb_t video_line[640];
+	int video_row = -1;
+
+	for (int y = std::max(cliprect.min_y, 0); y <= std::min(cliprect.max_y, 511); ++y)
+	{
+		if (have_video)
+		{
+			// the lower 152 lines of the picture (rear view) are never expanded
+			int const row = y - 25;
+			bool const rear = row >= 337;
+			// The standalone renderer shifts the rear view down one line at the boundary.
+			video_row = (row == 336) ? -1 : (rear ? (row - 1) : row);
+			// The Manchester code occupies the last 32 lines of the picture (from line 456).
+			if (video_row >= 0 && video_row < 456 && video_row < int(video.height()))
+			{
+				uint16_t const *const src = &video.pix(video_row, 0);
+				for (int x = 0; x < 640; ++x)
+				{
+					int sx;
+					if (!expand)
+						sx = x + (rear ? 50 + 5 : 50) + 14;
+					else if (rear)
+						sx = x + 45 + 5 + 14; // the standalone's -180 is in bytes (4 per pixel)
+					else if (x >= expanded_offset)
+						sx = ((x - expanded_offset) >> 1) + 14;
+					else
+						sx = -1;
+
+					if (sx < 0 || sx >= int(video.width()))
+					{
+						video_line[x] = rgb_t(255, 0, 0, 0);
+						continue;
+					}
+					int const base = sx & ~1;
+					int const luma = 298 * ((src[sx] >> 8) - 16) + 128;
+					int const cb = (src[base] & 0xff) - 128;
+					int const cr = (src[base + 1] & 0xff) - 128;
+					video_line[x] = rgb_t(
+							255,
+							std::clamp((luma + 409 * cr) >> 8, 0, 255),
+							std::clamp((luma - 100 * cb - 208 * cr) >> 8, 0, 255),
+							std::clamp((luma + 516 * cb) >> 8, 0, 255));
+				}
+			}
+			else
+			{
+				video_row = -1;
+			}
+		}
+
+		for (int x = std::max(cliprect.min_x, 0); x <= std::min(cliprect.max_x, 639); ++x)
+		{
+			// The bottom rows (text staging, game rows 240+) and the right guard column are off-screen on the monitor:
+			// hide the game graphics there but keep the laserdisc picture.
+			if ((y >= 480) || (x >= 630))
+			{
+				if (video_row >= 0)
+					bitmap.pix(y, x) = video_line[x];
+				continue;
+			}
+
+			u32 const pixel_x = x / 2;
+			u32 const byte_address = (pixel_x / 2) * 256 + (y / 2);
+			u16 const address = vgg_drams_map(byte_address);
+			constexpr u32 dram_size = 16'384 * 4 / 8 * 6;
+			if (address >= dram_size)
+			{
+				if (video_row >= 0)
+					bitmap.pix(y, x) = video_line[x];
+				continue;
+			}
+
+			u8 const packed = m_vgg_drams[address];
+			u8 const pixel = (pixel_x & 1) ? (packed & 0x0f) : (packed >> 4);
+			rgb_t const color = m_vgg_palette->pen_color(((m_vgg_color_palet & 0x3f) << 4) | pixel);
+			if (!pixel && !m_vgg_background_disable)
+				bitmap.pix(y, x) = (video_row >= 0) ? video_line[x] : rgb_t(255, 0, 0, 0);
+			else
+				bitmap.pix(y, x) = color;
+		}
+	}
+
+	return 0;
 }
 
 void sr_state::vgg_disable_w(u8 data)
@@ -665,6 +1207,69 @@ u8 sr_state::pif_irq_enable_r(address_space &space)
 void sr_state::pif_irq_enable_w(u8 data)
 {
 	m_pif_irq_enable = BIT(data, 0);
+	pif_irq_update();
+}
+
+u8 sr_state::pif_irq_ack_r(address_space &space)
+{
+	u8 const data(space.unmap());
+	if (!machine().side_effects_disabled())
+		pif_irq_ack_w(data);
+	return data;
+}
+
+void sr_state::pif_irq_ack_w(u8)
+{
+	m_pif_timer_irq = 0U;
+	pif_irq_update();
+}
+
+void sr_state::pif_irq_update()
+{
+	m_pif_irq->in_w<1>(m_pif_irq_enable && m_pif_timer_irq);
+}
+
+u8 sr_state::pif_porta_r()
+{
+	return m_vgg_pif_portb;
+}
+
+void sr_state::vgg_portb_w(offs_t, u8 data, u8 ddr)
+{
+	m_vgg_pif_portb = data | ~ddr;
+}
+
+void sr_state::pif_firq_w(int state)
+{
+	// Evaluate in a timer so the PIF CPU has caught up and its PC is meaningful
+	m_pif_firq = state ? 1U : 0U;
+	m_pif_firq_timer->adjust(attotime::zero);
+}
+
+TIMER_CALLBACK_MEMBER(sr_state::pif_firq_retry)
+{
+	// The PIF firmware's command FIFO reader ($F281-$F2A4) is not protected against the
+	// FIRQ enqueue; defer the interrupt while the reader is inside its critical section
+	if (m_pif_firq && (m_pif_cpu->pc() >= 0xf281) && (m_pif_cpu->pc() < 0xf2a4))
+		m_pif_firq_timer->adjust(attotime::from_usec(4));
+	else
+		m_pif_cpu->set_input_line(M6809_FIRQ_LINE, m_pif_firq ? ASSERT_LINE : CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(sr_state::pif_timer_irq)
+{
+	m_pif_timer_irq = 1U;
+	pif_irq_update();
+}
+
+void sr_state::pif_portb_w(offs_t, u8 data, u8 ddr)
+{
+	u8 const pins = data | ~ddr;
+	if ((m_pif_portb & 0x01) && !(pins & 0x01) && !(pins & 0x04))
+		m_laserdisc->jump_trigger(BIT(pins, 1));
+
+	m_pif_portb = pins;
+	m_laserdisc->control_w((!(pins & 0x08) && (pins & 0x10)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -706,7 +1311,7 @@ u8 sr_state::sound_ef1_r(address_space &space)
 
 void sr_state::sound_ef1_w(u8 data)
 {
-	data &= 0x3f; // DAC 1 -> front mix level (6 bits latched by U19)
+	sound_attenuator_w(0, data); // DAC 1 -> upper-left speaker
 }
 
 u8 sr_state::sound_er1_r(address_space &space)
@@ -719,7 +1324,7 @@ u8 sr_state::sound_er1_r(address_space &space)
 
 void sr_state::sound_er1_w(u8 data)
 {
-	data &= 0x3f; // DAC 1 -> rear mix level (6 bits latched by U2)
+	sound_attenuator_w(1, data); // DAC 1 -> upper-right speaker
 }
 
 u8 sr_state::sound_ef2_r(address_space &space)
@@ -732,7 +1337,7 @@ u8 sr_state::sound_ef2_r(address_space &space)
 
 void sr_state::sound_ef2_w(u8 data)
 {
-	data &= 0x3f; // DAC 2 -> front mix level (6 bits latched by U17)
+	sound_attenuator_w(2, data); // DAC 2 -> lower-left speaker
 }
 
 u8 sr_state::sound_er2_r(address_space &space)
@@ -745,7 +1350,25 @@ u8 sr_state::sound_er2_r(address_space &space)
 
 void sr_state::sound_er2_w(u8 data)
 {
-	data &= 0x3f; // DAC 2 -> rear mix level (6 bits latched by U36)
+	sound_attenuator_w(3, data); // DAC 2 -> lower-right speaker
+}
+
+void sr_state::sound_attenuator_w(unsigned index, u8 data)
+{
+	m_sound_attenuation[index] = data & 0x3f;
+	m_sound_dacs[index]->set_output_gain(ALL_OUTPUTS, 0.5F * m_sound_attenuation[index] / 63.0F);
+}
+
+void sr_state::sound_fifo0_q(u8 data)
+{
+	m_sound_dacs[0]->write(data);
+	m_sound_dacs[1]->write(data);
+}
+
+void sr_state::sound_fifo1_q(u8 data)
+{
+	m_sound_dacs[2]->write(data);
+	m_sound_dacs[3]->write(data);
 }
 
 
@@ -819,9 +1442,10 @@ void sr_state::main_memory(address_map &map)
 	map(0xc984, 0xc987).mirror(0x0070).rw(m_main_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 
 	map(0xcb80, 0xcb83).mirror(0x000c).rw(m_vgg_pia, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	//map(0xcb90, 0xcb90).mirror(0x000f).r(FUNC(sr_state::...)); inverted FIELD signal on D7
-	//map(0xcba0, 0xcba0).mirror(0x000f).r(FUNC(sr_state::...)); vertical counters (video address A13..A6)
-	//map(0xcbb0, 0xcbbf) DMA
+	map(0xcb00, 0xcb56).r(m_laserdisc, FUNC(pioneer_pr8210_device::pif_data_r));
+	map(0xcb90, 0xcb90).mirror(0x000f).r(FUNC(sr_state::field_r));
+	map(0xcba0, 0xcba0).mirror(0x000f).r(FUNC(sr_state::video_counter_r));
+	map(0xcbb0, 0xcbbf).w(FUNC(sr_state::vgg_blitter_w));
 	map(0xcbc0, 0xcbc0).mirror(0x000e).w(FUNC(sr_state::vgg_impg_w));
 	map(0xcbc1, 0xcbc1).mirror(0x000e).w(FUNC(sr_state::vgg_xlate_w));
 	map(0xcbd0, 0xcbd0).mirror(0x000f).w(FUNC(sr_state::vgg_disable_w));
@@ -840,10 +1464,16 @@ void sr_state::main_banks(address_map &map)
 	map(0x0'4000, 0x0'7fff).mirror(0x8'0000).rom().region("banked", 0x0'8000); // /R3 -> U26
 	map(0x0'8000, 0x0'9fff).mirror(0x8'0000).rom().region("banked", 0x1'0000); // /R5 -> U45
 
+	// page 0x1/0x9 read
+	map(0x1'0000, 0x1'7fff).mirror(0x8'0000).r(FUNC(sr_state::vgg_image_r));
+
 	// page 0x4/0xc read
 	map(0x4'0000, 0x4'3fff).mirror(0x8'0000).rom().region("banked", 0x0'4000); // /R2 -> U15
 	map(0x4'4000, 0x4'7fff).mirror(0x8'0000).rom().region("banked", 0x0'c000); // /R4 -> U37
 	// nothing in 0x4'8000-0x4'9fff
+
+	// Page 2 selects VGG DRAM for CPU readback during the video RAM test.
+	map(0x2'0000, 0x2'9fff).r(FUNC(sr_state::vgg_drams_r));
 
 	// page 0x0-0x7 write
 	map(0x0'0000, 0x0'9fff).mirror(0x7'0000).w(FUNC(sr_state::vgg_drams_w));
@@ -888,19 +1518,23 @@ void sr_state::sound_memory(address_map &map)
 
 INPUT_PORTS_START(starrider)
 	PORT_START("IN0")
-	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN) // TODO: steering Gray code
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_START2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1) PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_START2) PORT_CODE(KEYCODE_2)
 
 	PORT_START("IN1")
-	PORT_BIT(0x0f, IP_ACTIVE_LOW,  IPT_UNKNOWN) // TODO: accelerator
-	PORT_BIT(0x30, IP_ACTIVE_LOW,  IPT_UNKNOWN) // TODO: brake
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON1)                  PORT_NAME("Turbo")
-	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_BUTTON2)      PORT_TOGGLE PORT_NAME("Hi/Lo")
+	PORT_BIT(0x30, IP_ACTIVE_LOW, IPT_BUTTON3)                   PORT_NAME("Brake") PORT_CODE(KEYCODE_SPACE)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1)                   PORT_NAME("Turbo") PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON2)      PORT_TOGGLE PORT_NAME("Hi/Lo") PORT_CODE(KEYCODE_X)
+
+	PORT_START("STEER")
+	PORT_BIT(0x3f, 0x20, IPT_AD_STICK_X) PORT_MINMAX(0, 63) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_CENTERDELTA(0) PORT_NAME("Steering") PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT)
+
+	PORT_START("ACCEL")
+	PORT_BIT(0x0f, 0x00, IPT_PEDAL) PORT_MINMAX(0, 15) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_NAME("Accelerator") PORT_CODE_DEC(KEYCODE_DOWN) PORT_CODE_INC(KEYCODE_UP)
 
 	PORT_START("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE1)     PORT_TOGGLE PORT_NAME("Auto Up / Manual Down")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE)                  PORT_NAME("Advance")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SERVICE)                  PORT_NAME("Advance") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_MEMORY_RESET)             PORT_NAME("High Score Reset")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_COIN1)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN2)
@@ -1008,7 +1642,7 @@ ROM_START(starridr)
 	ROM_LOAD("u74.6349", 0x000, 0x200, CRC(362ec0f9) SHA1(0304a36d038436e9f5e817dfc2c40b6421953cad))
 
 	DISK_REGION( "ld_pr8210a" )
-	DISK_IMAGE_READONLY( "starrider", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "starrider", 0, SHA1(b9441a585161f2d867ec44d21d65c7f458d7c61c))
 ROM_END
 
 ROM_START(starridrp3)
@@ -1100,7 +1734,7 @@ ROM_START(starridrp3)
 	ROM_LOAD("u74.6349", 0x000, 0x200, CRC(362ec0f9) SHA1(0304a36d038436e9f5e817dfc2c40b6421953cad))
 
 	DISK_REGION( "ld_pr8210a" )
-	DISK_IMAGE_READONLY( "starrider", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "starrider", 0, SHA1(b9441a585161f2d867ec44d21d65c7f458d7c61c))
 ROM_END
 
 } // anonymous namespace
@@ -1109,5 +1743,5 @@ ROM_END
 /***********************************************************************
     Machine definitions
 ***********************************************************************/
-GAME( 1984, starridr,   0,        starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (REV 1)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1984, starridrp3, starridr, starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (PROTO 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1984, starridr,   0,        starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (REV 1)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )
+GAME( 1984, starridrp3, starridr, starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (PROTO 3)", MACHINE_NOT_WORKING )

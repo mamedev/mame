@@ -42,6 +42,9 @@ public:
 
 	// input and output
 	void control_w(uint8_t data);
+	void jump_trigger(bool forward) { advance_slider(forward ? 1 : -1); }
+	uint8_t pif_status_r();
+	uint8_t pif_data_r(offs_t offset);
 
 protected:
 	pioneer_pr8210_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -127,6 +130,7 @@ protected:
 	bool                m_vsync;                // live VSYNC state
 	uint8_t             m_i8049_port1;          // 8049 port 1 state
 	uint8_t             m_i8049_port2;          // 8049 port 2 state
+	uint8_t             m_pif_field;            // field signal presented to the Star Rider PIF
 
 private:
 	void pr8210_portmap(address_map &map) ATTR_COLD;
