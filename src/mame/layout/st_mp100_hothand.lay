@@ -78,8 +78,26 @@ Any state="9" items are not displayed and are only used for object alignment
 
 
 	<element name="Switch_RollOver_Star_Button">
-		<text string="*" state="0"><color red="1.00" green="1.00" blue="1.00" /><bounds x="-10" y="-6" width="35" height="35" /></text>
-		<text string="*" state="1"><color red="0.00" green="0.00" blue="0.00" /><bounds x="-10" y="-6" width="35" height="35" /></text>
+		<image state="0">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 35">
+			<g fill="#ffffff" transform="translate(17.15,13.335) scale(0.131,0.137)">
+				<polygon points="6.20,-50.00 -6.20,-50.00 -6.20,50.00 6.20,50.00"/>
+				<polygon points="46.40,-19.63 40.20,-30.37 -46.40,19.63 -40.20,30.37"/>
+				<polygon points="-40.20,-30.37 -46.40,-19.63 40.20,30.37 46.40,19.63"/>
+			</g>
+		</svg>]]></data>
+			<bounds x="-10" y="-6" width="35" height="35" />
+		</image>
+		<image state="1">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 35">
+			<g fill="#000000" transform="translate(17.15,13.335) scale(0.131,0.137)">
+				<polygon points="6.20,-50.00 -6.20,-50.00 -6.20,50.00 6.20,50.00"/>
+				<polygon points="46.40,-19.63 40.20,-30.37 -46.40,19.63 -40.20,30.37"/>
+				<polygon points="-40.20,-30.37 -46.40,-19.63 40.20,30.37 46.40,19.63"/>
+			</g>
+		</svg>]]></data>
+			<bounds x="-10" y="-6" width="35" height="35" />
+		</image>
 	</element>
 	<element name="Lamp_RollOver_Star_Button_On">
 		<disk><color red="1.00" green="0.50" blue="0.00" /><bounds x="0" y="0" width="15" height="15" /></disk>
@@ -432,27 +450,73 @@ Any state="9" items are not displayed and are only used for object alignment
 	<element name="Lamp_White_Joker">
 		<disk state="0">       <color red="0.25" green="0.25" blue="0.25" /><bounds x="0.0" y="0.0" width="1.1" height="1.0" /></disk>
 		<disk state="1">       <color red="1.00" green="1.00" blue="1.00" /><bounds x="0.0" y="0.0" width="1.1" height="1.0" /></disk>
-		<text string="♛"><color red="0.00" green="0.00" blue="0.00" /><bounds x="0.1" y="0.0" width="1.0" height="0.9" /></text>
+		<image>
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 0.9">
+			<g fill="#000000" transform="translate(0.45,0.5) scale(0.007,0.006)">
+				<g fill="#000000">
+				<path d="M-46,30 L-40,-22 L-30,10 L-20,-30 L-10,8 L0,-36 L10,8 L20,-30 L30,10 L40,-22 L46,30 Z"/>
+				<circle cx="-40" cy="-26" r="6.5"/>
+				<circle cx="-20" cy="-34" r="6.5"/>
+				<circle cx="0" cy="-40" r="6.5"/>
+				<circle cx="20" cy="-34" r="6.5"/>
+				<circle cx="40" cy="-26" r="6.5"/>
+				<rect x="-46" y="30" width="92" height="14" rx="3"/>
+				</g>
+			</g>
+		</svg>]]></data>
+			<bounds x="0.1" y="0.0" width="1.0" height="0.9" />
+		</image>
 	</element>
 	<element name="Lamp_White_Hearts">
 		<disk state="0">       <color red="0.25" green="0.25" blue="0.25" /></disk>
 		<disk state="1">       <color red="1.00" green="1.00" blue="1.00" /></disk>
-		<text string="♥"><color red="1.00" green="0.00" blue="0.00" /><bounds x="0.0" y="0.0" width="1.1" height="1.1" /></text>
+		<image>
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1.1 1.1">
+			<g fill="#ff0000" transform="translate(0.522,0.682) scale(0.005,0.005)">
+				<path d="M0,46 C-30,20 -50,2 -50,-14 A20,20 0 0 1 0,-22 A20,20 0 0 1 50,-14 C50,2 30,20 0,46 Z"/>
+			</g>
+		</svg>]]></data>
+			<bounds x="0.0" y="0.0" width="1.1" height="1.1" />
+		</image>
 	</element>
 	<element name="Lamp_White_Diamonds">
 		<disk state="0">       <color red="0.25" green="0.25" blue="0.25" /></disk>
 		<disk state="1">       <color red="1.00" green="1.00" blue="1.00" /></disk>
-		<text string="♦"><color red="1.00" green="0.00" blue="0.00" /><bounds x="0.0" y="0.0" width="1.1" height="1.1" /></text>
+		<image>
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1.1 1.1">
+			<g fill="#ff0000" transform="translate(0.517,0.616) scale(0.005,0.005)">
+				<polygon points="0.00,-50.00 34.00,0.00 0.00,50.00 -34.00,0.00"/>
+			</g>
+		</svg>]]></data>
+			<bounds x="0.0" y="0.0" width="1.1" height="1.1" />
+		</image>
 	</element>
 	<element name="Lamp_White_Clubs">
 		<disk state="0">       <color red="0.25" green="0.25" blue="0.25" /></disk>
 		<disk state="1">       <color red="1.00" green="1.00" blue="1.00" /></disk>
-		<text string="♣"><color red="0.00" green="0.00" blue="0.00" /><bounds x="0.0" y="0.0" width="1.1" height="1.1" /></text>
+		<image>
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1.1 1.1">
+			<g fill="#000000" transform="translate(0.531,0.594) scale(0.006,0.006)">
+				<circle cx="0" cy="-22" r="20"/>
+				<circle cx="-23" cy="12" r="20"/>
+				<circle cx="23" cy="12" r="20"/>
+				<path d="M-5,8 C-9,30 -16,40 -22,48 L22,48 C16,40 9,30 5,8 Z"/>
+			</g>
+		</svg>]]></data>
+			<bounds x="0.0" y="0.0" width="1.1" height="1.1" />
+		</image>
 	</element>
 	<element name="Lamp_White_Spades">
 		<disk state="0">       <color red="0.25" green="0.25" blue="0.25" /></disk>
 		<disk state="1">       <color red="1.00" green="1.00" blue="1.00" /></disk>
-		<text string="♠"><color red="0.00" green="0.00" blue="0.00" /><bounds x="0.0" y="0.0" width="1.1" height="1.1" /></text>
+		<image>
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1.1 1.1">
+			<g fill="#000000" transform="translate(0.522,0.594) scale(0.006,0.006)">
+				<path d="M0,-50 C22,-24 50,-10 50,10 A18,18 0 0 1 6,18 C9,32 14,42 20,48 L-20,48 C-14,42 -9,32 -6,18 A18,18 0 0 1 -50,10 C-50,-10 -22,-24 0,-50 Z"/>
+			</g>
+		</svg>]]></data>
+			<bounds x="0.0" y="0.0" width="1.1" height="1.1" />
+		</image>
 	</element>
 
 
@@ -519,11 +583,37 @@ Any state="9" items are not displayed and are only used for object alignment
 	<element name="Lamp_Incandescent" defstate="1">
 		<disk state="0"><color red="0.25" green="0.25" blue="0.25" /><bounds x="10" y="10" width="80" height="80" /></disk>
 		<disk state="0"><color red="0.00" green="0.00" blue="0.0" /><bounds x="15" y="15" width="70" height="70" /></disk>
-		<text string="Ω" state="0"><color red="0.25" green="0.25" blue="0.25" /><bounds x="8" y="15" width="84" height="80" /></text>
+		<image state="0">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 84 80">
+			<g fill="#404040" transform="translate(42,35.04) scale(0.454,0.48)">
+				<g fill="none" stroke="#404040" stroke-width="13">
+				<path d="M-18,36 A30,36 0 1 1 18,36"/>
+				</g>
+				<g fill="#404040">
+				<rect x="-42" y="30" width="22" height="13"/>
+				<rect x="20" y="30" width="22" height="13"/>
+				</g>
+			</g>
+		</svg>]]></data>
+			<bounds x="8" y="15" width="84" height="80" />
+		</image>
 		<disk state="1"><color red="1.00" green="1.00" blue="0.0" /><bounds x="0" y="0" width="100" height="100" /></disk>
 		<disk state="1"><color red="0.75" green="0.75" blue="0.0" /><bounds x="10" y="10" width="80" height="80" /></disk>
 		<disk state="1"><color red="1.00" green="1.00" blue="0.0" /><bounds x="15" y="15" width="70" height="70" /></disk>
-		<text string="Ω" state="1"><color red="1.00" green="0.50" blue="0.00" /><bounds x="8" y="15" width="84" height="80" /></text>
+		<image state="1">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 84 80">
+			<g fill="#ff8000" transform="translate(42,35.04) scale(0.454,0.48)">
+				<g fill="none" stroke="#ff8000" stroke-width="13">
+				<path d="M-18,36 A30,36 0 1 1 18,36"/>
+				</g>
+				<g fill="#ff8000">
+				<rect x="-42" y="30" width="22" height="13"/>
+				<rect x="20" y="30" width="22" height="13"/>
+				</g>
+			</g>
+		</svg>]]></data>
+			<bounds x="8" y="15" width="84" height="80" />
+		</image>
 	</element>
 
 
@@ -601,18 +691,52 @@ Any state="9" items are not displayed and are only used for object alignment
 	<element name="Solenoid_PopBumper_Yellow_Star" defstate="0">
 		<disk state="0"> <color red="1.0" green="1.0" blue="1.0" /><bounds x="0" y="0" width="80" height="80" /></disk>
 		<disk state="1"> <color red="1.0" green="0.0" blue="0.0" /><bounds x="0" y="0" width="80" height="80" /></disk>
-		<text string="*"><color red="1.0" green="0.9" blue="0.0" /><bounds x="-61" y="-38.5" width="206" height="206" /></text>
+		<image>
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 206 206">
+			<g fill="#ffe600" transform="translate(100.94,78.486) scale(0.772,0.803)">
+				<polygon points="6.20,-50.00 -6.20,-50.00 -6.20,50.00 6.20,50.00"/>
+				<polygon points="46.40,-19.63 40.20,-30.37 -46.40,19.63 -40.20,30.37"/>
+				<polygon points="-40.20,-30.37 -46.40,-19.63 40.20,30.37 46.40,19.63"/>
+			</g>
+		</svg>]]></data>
+			<bounds x="-61" y="-38.5" width="206" height="206" />
+		</image>
 		<disk>           <color red="1.0" green="1.0" blue="1.0" /><bounds x="18" y="18" width="44" height="44" /></disk>
 	</element>
 	<element name="Switch_PopBumper_Yellow_Star" defstate="0">
-		<text string="*" state="9"><color red="1.0" green="0.9" blue="0.0" /><bounds x="-61" y="-38.5" width="206" height="206" /></text>
+		<image state="9">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 206 206">
+			<g fill="#ffe600" transform="translate(100.94,78.486) scale(0.772,0.803)">
+				<polygon points="6.20,-50.00 -6.20,-50.00 -6.20,50.00 6.20,50.00"/>
+				<polygon points="46.40,-19.63 40.20,-30.37 -46.40,19.63 -40.20,30.37"/>
+				<polygon points="-40.20,-30.37 -46.40,-19.63 40.20,30.37 46.40,19.63"/>
+			</g>
+		</svg>]]></data>
+			<bounds x="-61" y="-38.5" width="206" height="206" />
+		</image>
 		<disk state="0"><color red="1.0" green="0.9" blue="0.0" /><bounds x="14" y="14" width="52" height="52" /></disk>
 		<disk state="1"><color red="0.5" green="0.5" blue="0.5" /><bounds x="14" y="14" width="52" height="52" /></disk>
 	</element>
 	<element name="Lamp_PopBumper_GI_Heart">
-		<text string="*" state="9"><color red="0.0" green="0.0" blue="0.0" /><bounds x="-61" y="-38.5" width="206" height="206" /></text>
+		<image state="9">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 206 206">
+			<g fill="#000000" transform="translate(100.94,78.486) scale(0.772,0.803)">
+				<polygon points="6.20,-50.00 -6.20,-50.00 -6.20,50.00 6.20,50.00"/>
+				<polygon points="46.40,-19.63 40.20,-30.37 -46.40,19.63 -40.20,30.37"/>
+				<polygon points="-40.20,-30.37 -46.40,-19.63 40.20,30.37 46.40,19.63"/>
+			</g>
+		</svg>]]></data>
+			<bounds x="-61" y="-38.5" width="206" height="206" />
+		</image>
 		<disk><color red="1.0" green="1.0" blue="1.0" /><bounds x="18" y="18" width="44" height="44" /></disk>
-		<text string="♥"><color red="1.0" green="0.0" blue="0.0" /><bounds x="11.5" y="10" width="59" height="59" /></text>
+		<image>
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 59 59">
+			<g fill="#ff0000" transform="translate(28.025,36.58) scale(0.271,0.271)">
+				<path d="M0,46 C-30,20 -50,2 -50,-14 A20,20 0 0 1 0,-22 A20,20 0 0 1 50,-14 C50,2 30,20 0,46 Z"/>
+			</g>
+		</svg>]]></data>
+			<bounds x="11.5" y="10" width="59" height="59" />
+		</image>
 	</element>
 
 
@@ -625,8 +749,26 @@ Any state="9" items are not displayed and are only used for object alignment
 
 
 	<element name="Flipper_Rotating" defstate="0">
-		<text string="*" state="0"><color red="0.15" green="0.15" blue="0.15" /><bounds x="0" y="0" width="10" height="10" /></text>
-		<text string="*" state="1"><color red="1.00" green="1.00" blue="1.00" /><bounds x="0" y="0" width="10" height="10" /></text>
+		<image state="0">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+			<g fill="#262626" transform="translate(4.9,3.81) scale(0.037,0.039)">
+				<polygon points="6.20,-50.00 -6.20,-50.00 -6.20,50.00 6.20,50.00"/>
+				<polygon points="46.40,-19.63 40.20,-30.37 -46.40,19.63 -40.20,30.37"/>
+				<polygon points="-40.20,-30.37 -46.40,-19.63 40.20,30.37 46.40,19.63"/>
+			</g>
+		</svg>]]></data>
+			<bounds x="0" y="0" width="10" height="10" />
+		</image>
+		<image state="1">
+			<data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+			<g fill="#ffffff" transform="translate(4.9,3.81) scale(0.037,0.039)">
+				<polygon points="6.20,-50.00 -6.20,-50.00 -6.20,50.00 6.20,50.00"/>
+				<polygon points="46.40,-19.63 40.20,-30.37 -46.40,19.63 -40.20,30.37"/>
+				<polygon points="-40.20,-30.37 -46.40,-19.63 40.20,30.37 46.40,19.63"/>
+			</g>
+		</svg>]]></data>
+			<bounds x="0" y="0" width="10" height="10" />
+		</image>
 	</element>
 
 
