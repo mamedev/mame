@@ -188,6 +188,7 @@ protected:
 		u8 data_in;
 		u8 txbit;
 		u8 txd;
+		u8 rxd;            // RXD output in mode 0
 		u8 rxbit;
 		u8 rxb8;
 
@@ -288,6 +289,9 @@ protected:
 	void set_idl(bool state) { set_bit<PCON_IDL>(m_pcon, state); }
 
 	void transmit(int state);
+	u8 p3_pins() const;
+	void set_serial_pins(u8 rxd, u8 txd);
+	void transmit_receive_mode0();
 
 	// Memory spaces
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_program;
