@@ -575,6 +575,28 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/amiga/clockport/clockport.h,BUSES["AMIGA_CLOCKPORT"] = true
+---------------------------------------------------
+
+if BUSES["AMIGA_CLOCKPORT"] then
+	files {
+		MAME_DIR .. "src/devices/bus/amiga/clockport/clockport.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/clockport/clockport.h",
+		MAME_DIR .. "src/devices/bus/amiga/clockport/cards.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/clockport/cards.h",
+		MAME_DIR .. "src/devices/bus/amiga/clockport/eth64ii.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/clockport/eth64ii.h",
+		MAME_DIR .. "src/devices/bus/amiga/clockport/mp3at64.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/clockport/mp3at64.h",
+		MAME_DIR .. "src/devices/bus/amiga/clockport/rrnet.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/clockport/rrnet.h",
+		MAME_DIR .. "src/devices/bus/amiga/clockport/silversurfer.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/clockport/silversurfer.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/amiga/cpuslot/cpuslot.h,BUSES["AMIGA_CPUSLOT"] = true
 ---------------------------------------------------
 
@@ -1589,6 +1611,28 @@ if BUSES["C64"] then
 	}
 end
 
+
+---------------------------------------------------
+--
+--@src/devices/bus/c64/shortbus/shortbus.h,BUSES["IDE64_SHORTBUS"] = true
+---------------------------------------------------
+
+if BUSES["IDE64_SHORTBUS"] then
+	files {
+		MAME_DIR .. "src/devices/bus/c64/shortbus/shortbus.cpp",
+		MAME_DIR .. "src/devices/bus/c64/shortbus/shortbus.h",
+		MAME_DIR .. "src/devices/bus/c64/shortbus/cards.cpp",
+		MAME_DIR .. "src/devices/bus/c64/shortbus/cards.h",
+		MAME_DIR .. "src/devices/bus/c64/shortbus/digimax.cpp",
+		MAME_DIR .. "src/devices/bus/c64/shortbus/digimax.h",
+		MAME_DIR .. "src/devices/bus/c64/shortbus/duart.cpp",
+		MAME_DIR .. "src/devices/bus/c64/shortbus/duart.h",
+		MAME_DIR .. "src/devices/bus/c64/shortbus/eth64.cpp",
+		MAME_DIR .. "src/devices/bus/c64/shortbus/eth64.h",
+		MAME_DIR .. "src/devices/bus/c64/shortbus/etfe.cpp",
+		MAME_DIR .. "src/devices/bus/c64/shortbus/etfe.h",
+	}
+end
 
 ---------------------------------------------------
 --
