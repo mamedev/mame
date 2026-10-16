@@ -60,6 +60,11 @@
 #include "speaker.h"
 
 
+// TODO: Chips & Technologies 65550 with swapped address lines?
+// Needs to be moved to own family file
+// 65550 is used by Apple PowerBook 2400c
+// 65535 is used by IBM PC-110
+
 // VGA-1: Chips & Technologies 65550 (HiQV) on the Novomatic P378-1 VGA board, from the 65550 data sheet rev 1.5
 // (docs/65550.pdf, read from rendered pages):
 // - Bus: the ColdFire (big endian) data bus is wired straight to the little-endian chip, so a CPU byte at lane l
@@ -997,7 +1002,6 @@ TIMER_CALLBACK_MEMBER(jcm_wba_device::step)
 }
 
 
-namespace {
 
 // SND-1: AGI custom sound chip at 0x1e040000 (CoolFire I "Gaminator" audio path), modelled from the firmware only
 // (no chip documentation exists in the collected manuals):
@@ -1084,6 +1088,8 @@ private:
 };
 
 DEFINE_DEVICE_TYPE(GAMTOR_SND, gamtor_snd_device, "gamtor_snd", "AGI CoolFire sound chip")
+
+namespace {
 
 gamtor_snd_device::gamtor_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GAMTOR_SND, tag, owner, clock)
