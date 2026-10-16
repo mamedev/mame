@@ -105,24 +105,26 @@ void atarigt_state::video_start()
 
 void atarigt_state::colorram_w(offs_t address, uint16_t data, uint16_t mem_mask)
 {
-	/* update the raw data */
+	// update the raw data
 	address = (address & 0x7ffff) >> 1;
 	uint16_t const olddata = m_colorram[address];
 	COMBINE_DATA(&m_colorram[address]);
 
-	/* update the TRAM checksum */
 	if (address >= 0x10000 && address < 0x14000)
+	{
+		// update the TRAM checksum
 		m_tram_checksum += m_colorram[address] - olddata;
-
-	/* update expanded MRAM */
+	}
 	else if (address >= 0x20000 && address < 0x28000)
 	{
+		// update expanded MRAM
 		m_palette->set_pen_red_level(address & 0x7fff, (m_colorram[address] >> 8));
 		m_palette->set_pen_green_level(address & 0x7fff, (m_colorram[address] & 0xff));
 	}
 	else if (address >= 0x30000 && address < 0x38000)
+	{
 		m_palette->set_pen_blue_level(address & 0x7fff, (m_colorram[address] & 0xff));
-
+	}
 }
 
 

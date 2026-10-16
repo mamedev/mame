@@ -2295,7 +2295,7 @@ void ddenlovr_state::quiz365_map(address_map &map)
 {
 	map(0x000000, 0x17ffff).rom();                                                 // ROM
 
-	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
+	map(0x200000, 0x2003ff).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 
 	map(0x200c02, 0x200c03).r(FUNC(ddenlovr_state::quiz365_protection_r));                          // Protection
 	map(0x200e0a, 0x200e0d).w(FUNC(ddenlovr_state::quiz365_protection_w));                          // Protection
@@ -2305,23 +2305,23 @@ void ddenlovr_state::quiz365_map(address_map &map)
 	map(0x300203, 0x300203).w(FUNC(ddenlovr_state::quiz365_coincounter_w));                         // Coin Counters + more stuff written on startup
 	map(0x300204, 0x300207).r(FUNC(ddenlovr_state::quiz365_input2_r));                              //
 
-	map(0x300240, 0x300247).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
-	map(0x300248, 0x30024f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
-	map(0x300250, 0x300257).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w)).umask16(0x00ff);
-	map(0x300258, 0x30025f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w)).umask16(0x00ff);
+	map(0x300240, 0x300247).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x300248, 0x30024f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x300250, 0x300257).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x300258, 0x30025f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
 	map(0x300269, 0x300269).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0x30026b, 0x30026b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0x30026d, 0x30026d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0x300271, 0x300271).r(FUNC(ddenlovr_state::unk_r));                                         // ? must be 78 on startup (not necessary in ddlover)
-	map(0x300280, 0x300283).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
+	map(0x300280, 0x300283).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0x300287, 0x300287).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                             // Video Chip
 
 	map(0x3002c1, 0x3002c1).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
-	map(0x300300, 0x300303).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x300340, 0x30035f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0x300380, 0x300383).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0x300300, 0x300303).umask16(0x00ff).w("ym2413", FUNC(ym2413_device::write));
+	map(0x300340, 0x30035f).umask16(0x00ff).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x300380, 0x300383).umask16(0x00ff).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x300385, 0x300385).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x3003c0, 0x3003cf).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x3003c0, 0x3003cf).umask16(0x00ff).w(m_mainlatch, FUNC(ls259_device::write_d0));
 
 	map(0xff0000, 0xffffff).ram();                                                 // RAM
 }
@@ -2352,22 +2352,22 @@ void ddenlovr_state::ddenlovj_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom(); // ROM
 
-	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
+	map(0x200000, 0x2003ff).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 //  map(0x201000, 0x2017ff).nopq();                                      // ? B0 on startup, then 00
 
-	map(0x300040, 0x300047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
-	map(0x300048, 0x30004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
-	map(0x300050, 0x300057).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w)).umask16(0x00ff);
-	map(0x300058, 0x30005f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w)).umask16(0x00ff);
+	map(0x300040, 0x300047).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x300048, 0x30004f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x300050, 0x300057).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x300058, 0x30005f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
 	map(0x300069, 0x300069).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0x30006b, 0x30006b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0x30006d, 0x30006d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0x300071, 0x300071).r(FUNC(ddenlovr_state::unk_r));                                         // ? must be 78 on startup (not necessary in ddlover)
-	map(0x300080, 0x300083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
+	map(0x300080, 0x300083).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0x300087, 0x300087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                             // Video Chip
-	map(0x3000c0, 0x3000c3).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x300100, 0x30011f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0x300140, 0x300143).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0x3000c0, 0x3000c3).umask16(0x00ff).w("ym2413", FUNC(ym2413_device::write));
+	map(0x300100, 0x30011f).umask16(0x00ff).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x300140, 0x300143).umask16(0x00ff).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x300180, 0x300181).portr("P1");
 	map(0x300182, 0x300183).portr("P2");
 	map(0x300184, 0x300185).portr("SYSTEM");
@@ -2375,7 +2375,7 @@ void ddenlovr_state::ddenlovj_map(address_map &map)
 	map(0x300189, 0x300189).w(FUNC(ddenlovr_state::ddenlovj_coincounter_w));
 	map(0x30018b, 0x30018b).w(FUNC(ddenlovr_state::ddenlovr_select_w));                             // DSW select
 	map(0x30018d, 0x30018d).w(FUNC(ddenlovr_state::ddenlovr_oki_bank_w));
-	map(0x3001c0, 0x3001cf).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x3001c0, 0x3001cf).umask16(0x00ff).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x300241, 0x300241).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
 	map(0xff0000, 0xffffff).ram();                                                 // RAM
 }
@@ -2411,28 +2411,28 @@ void ddenlovr_state::ddenlovrk_map(address_map &map)
 	map(0x100000, 0x100001).ram().r(FUNC(ddenlovr_state::ddenlovrk_protection1_r)).share("protection1");
 	map(0x200000, 0x200001).rw(FUNC(ddenlovr_state::ddenlovrk_protection2_r), FUNC(ddenlovr_state::ddenlovrk_protection2_w)).share("protection2");
 
-	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
+	map(0xd00000, 0xd003ff).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 //  map(0xd01000, 0xd017ff).ram();                                                    // ? B0 on startup, then 00
 
-	map(0xe00040, 0xe00047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
-	map(0xe00048, 0xe0004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
-	map(0xe00050, 0xe00057).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w)).umask16(0x00ff);
-	map(0xe00058, 0xe0005f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w)).umask16(0x00ff);
+	map(0xe00040, 0xe00047).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0xe00048, 0xe0004f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0xe00050, 0xe00057).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0xe00058, 0xe0005f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
 	map(0xe00069, 0xe00069).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0xe0006b, 0xe0006b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0xe0006d, 0xe0006d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0xe00070, 0xe00071).nopr();
-	map(0xe00080, 0xe00083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
+	map(0xe00080, 0xe00083).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0xe00087, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                             // Video Chip
 
 	map(0xe00100, 0xe00101).portr("P1");
 	map(0xe00102, 0xe00103).portr("P2");
 	map(0xe00104, 0xe00105).portr("SYSTEM");
 	map(0xe00200, 0xe00201).portr("DSW");
-	map(0xe00300, 0xe0030f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);
-	map(0xe00400, 0xe00403).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0xe00500, 0xe0051f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0xe00600, 0xe00603).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0xe00300, 0xe0030f).umask16(0x00ff).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0xe00400, 0xe00403).umask16(0x00ff).w("ym2413", FUNC(ym2413_device::write));
+	map(0xe00500, 0xe0051f).umask16(0x00ff).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xe00600, 0xe00603).umask16(0x00ff).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xe00605, 0xe00605).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xe00701, 0xe00701).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));   // Sound
 	map(0xff0000, 0xffffff).ram();                                                     // RAM
@@ -2447,28 +2447,28 @@ void ddenlovr_state::ddenlovr_map(address_map &map)
 
 	map(0x300001, 0x300001).w(FUNC(ddenlovr_state::ddenlovr_oki_bank_w));
 
-	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
+	map(0xd00000, 0xd003ff).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 //  map(0xd01000, 0xd017ff).ram();                                                   // ? B0 on startup, then 00
 
-	map(0xe00040, 0xe00047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
-	map(0xe00048, 0xe0004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
-	map(0xe00050, 0xe00057).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w)).umask16(0x00ff);
-	map(0xe00058, 0xe0005f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w)).umask16(0x00ff);
+	map(0xe00040, 0xe00047).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0xe00048, 0xe0004f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0xe00050, 0xe00057).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0xe00058, 0xe0005f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
 	map(0xe00069, 0xe00069).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0xe0006b, 0xe0006b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0xe0006d, 0xe0006d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0xe00071, 0xe00071).r(FUNC(ddenlovr_state::unk_r));                                             // ? must be 78 on startup (not necessary in ddlover)
-	map(0xe00080, 0xe00083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
+	map(0xe00080, 0xe00083).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0xe00087, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
 
 	map(0xe00100, 0xe00101).portr("P1");
 	map(0xe00102, 0xe00103).portr("P2");
 	map(0xe00104, 0xe00105).portr("SYSTEM");
 	map(0xe00200, 0xe00201).portr("DSW");
-	map(0xe00300, 0xe0030f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);
-	map(0xe00400, 0xe00403).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0xe00500, 0xe0051f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0xe00600, 0xe00603).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0xe00300, 0xe0030f).umask16(0x00ff).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0xe00400, 0xe00403).umask16(0x00ff).w("ym2413", FUNC(ym2413_device::write));
+	map(0xe00500, 0xe0051f).umask16(0x00ff).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xe00600, 0xe00603).umask16(0x00ff).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xe00605, 0xe00605).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xe00701, 0xe00701).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
 	map(0xff0000, 0xffffff).ram();                                                     // RAM
@@ -2520,24 +2520,24 @@ void ddenlovr_state::nettoqc_map(address_map &map)
 {
 	map(0x000000, 0x17ffff).rom();                                                     // ROM
 
-	map(0x200000, 0x2003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
+	map(0x200000, 0x2003ff).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 	map(0x200c02, 0x200c03).r(FUNC(ddenlovr_state::nettoqc_protection1_r));                             // Protection 1
 	map(0x200e0a, 0x200e0d).writeonly().share("protection1");                       // ""
 	map(0x201000, 0x2017ff).nopw();                                               // ?
 
-	map(0x300040, 0x300047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
-	map(0x300048, 0x30004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
-	map(0x300050, 0x300057).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w)).umask16(0x00ff);
-	map(0x300058, 0x30005f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w)).umask16(0x00ff);
+	map(0x300040, 0x300047).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x300048, 0x30004f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x300050, 0x300057).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x300058, 0x30005f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
 	map(0x300069, 0x300069).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0x30006b, 0x30006b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0x30006d, 0x30006d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0x300071, 0x300071).r(FUNC(ddenlovr_state::unk_r));                                             // ? must be 78 on startup (not necessary in ddlover)
-	map(0x300080, 0x300083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
+	map(0x300080, 0x300083).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0x300087, 0x300087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
-	map(0x3000c0, 0x3000c3).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x300100, 0x30011f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0x300140, 0x300143).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0x3000c0, 0x3000c3).umask16(0x00ff).w("ym2413", FUNC(ym2413_device::write));
+	map(0x300100, 0x30011f).umask16(0x00ff).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0x300140, 0x300143).umask16(0x00ff).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x300180, 0x300181).portr("P1");
 	map(0x300182, 0x300183).portr("P2");
 	map(0x300184, 0x300185).portr("SYSTEM");
@@ -2545,7 +2545,7 @@ void ddenlovr_state::nettoqc_map(address_map &map)
 	map(0x300189, 0x300189).w(FUNC(ddenlovr_state::nettoqc_coincounter_w));
 	map(0x30018b, 0x30018b).w(FUNC(ddenlovr_state::ddenlovr_select_w));
 	map(0x30018d, 0x30018d).w(FUNC(ddenlovr_state::nettoqc_oki_bank_w));
-	map(0x3001c0, 0x3001cf).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);
+	map(0x3001c0, 0x3001cf).umask16(0x00ff).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0x300241, 0x300241).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
 	map(0xff0000, 0xffffff).ram();                                                     // RAM
 }
@@ -2573,32 +2573,32 @@ void ddenlovr_state::ultrchmp_map(address_map &map)
 	map(0x224680, 0x224681).ram().r(FUNC(ddenlovr_state::ultrchmp_protection2_r)).share("protection2");    // Protection 2
 	map(0x313570, 0x313571).w(FUNC(ddenlovr_state::ultrchmp_protection2_w));                               // "" + OKI bank
 
-	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
+	map(0xd00000, 0xd003ff).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 
 	map(0xd00c02, 0xd00c03).r(FUNC(ddenlovr_state::nettoqc_protection1_r));                             // Protection 1
 	map(0xd00e0a, 0xd00e0d).writeonly().share("protection1");                       // ""
 
 	map(0xd01000, 0xd017ff).nopw();                                               // ?
 
-	map(0xe00040, 0xe00047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
-	map(0xe00048, 0xe0004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
-	map(0xe00050, 0xe00057).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w)).umask16(0x00ff);
-	map(0xe00058, 0xe0005f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w)).umask16(0x00ff);
+	map(0xe00040, 0xe00047).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0xe00048, 0xe0004f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0xe00050, 0xe00057).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0xe00058, 0xe0005f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
 	map(0xe00069, 0xe00069).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0xe0006b, 0xe0006b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0xe0006d, 0xe0006d).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0xe00070, 0xe00071).nopr();
-	map(0xe00080, 0xe00083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
+	map(0xe00080, 0xe00083).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0xe00087, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                                 // Video Chip
 
 	map(0xe00100, 0xe00101).portr("P1");
 	map(0xe00102, 0xe00103).portr("P2");
 	map(0xe00104, 0xe00105).portr("SYSTEM");
 	map(0xe00200, 0xe00201).portr("DSW");
-	map(0xe00300, 0xe0030f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff);
-	map(0xe00400, 0xe00403).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0xe00500, 0xe0051f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0xe00600, 0xe00603).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0xe00300, 0xe0030f).umask16(0x00ff).w(m_mainlatch, FUNC(ls259_device::write_d0));
+	map(0xe00400, 0xe00403).umask16(0x00ff).w("ym2413", FUNC(ym2413_device::write));
+	map(0xe00500, 0xe0051f).umask16(0x00ff).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xe00600, 0xe00603).umask16(0x00ff).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xe00605, 0xe00605).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xe00701, 0xe00701).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
 	map(0xff0000, 0xffffff).ram().share("nvram");                                       // RAM (Battey-backed)
@@ -4119,19 +4119,19 @@ void ddenlovr_state::akamaru_map(address_map &map)
 	map(0x213570, 0x213571).w(FUNC(ddenlovr_state::akamaru_protection1_w));                // OKI bank
 	map(0x624680, 0x624681).r(FUNC(ddenlovr_state::akamaru_protection1_r));
 
-	map(0xd00000, 0xd003ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w)).umask16(0x00ff);
+	map(0xd00000, 0xd003ff).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_w));
 	map(0xd00e00, 0xd00e09).nopw();
 	map(0xd01000, 0xd017ff).nopw();                                          // 0
 
-	map(0xe00040, 0xe00047).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w)).umask16(0x00ff);
-	map(0xe00048, 0xe0004f).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w)).umask16(0x00ff);
-	map(0xe00050, 0xe00057).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w)).umask16(0x00ff);
-	map(0xe00058, 0xe0005f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w)).umask16(0x00ff);
+	map(0xe00040, 0xe00047).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0xe00048, 0xe0004f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0xe00050, 0xe00057).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0xe00058, 0xe0005f).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
 	map(0xe00069, 0xe00069).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0xe0006b, 0xe0006b).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0xe0006d, 0xe0006d).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
 	map(0xe00071, 0xe00071).r(FUNC(ddenlovr_state::unk_r));                                   // ? must be 78 on startup (not necessary in ddlover)
-	map(0xe00080, 0xe00083).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).umask16(0x00ff);
+	map(0xe00080, 0xe00083).umask16(0x00ff).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0xe00087, 0xe00087).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));                       // Video Chip
 
 	map(0xe00100, 0xe00101).portr("P1");
@@ -4146,10 +4146,10 @@ void ddenlovr_state::akamaru_map(address_map &map)
 
 	map(0xe00204, 0xe00205).r(FUNC(ddenlovr_state::akamaru_blitter_r));                       // Blitter Busy & IRQ
 
-	map(0xe00300, 0xe0030f).w(m_mainlatch, FUNC(ls259_device::write_d0)).umask16(0x00ff).nopr();
-	map(0xe00400, 0xe00403).w("ym2413", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0xe00500, 0xe0051f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
-	map(0xe00600, 0xe00603).w("aysnd", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
+	map(0xe00300, 0xe0030f).umask16(0x00ff).w(m_mainlatch, FUNC(ls259_device::write_d0)).nopr();
+	map(0xe00400, 0xe00403).umask16(0x00ff).w("ym2413", FUNC(ym2413_device::write));
+	map(0xe00500, 0xe0051f).umask16(0x00ff).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xe00600, 0xe00603).umask16(0x00ff).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xe00605, 0xe00605).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0xe00701, 0xe00701).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // Sound
 	map(0xff0000, 0xffffff).ram();                                                     // RAM
@@ -4207,15 +4207,15 @@ void ddenlovr_state::mjflove_portmap(address_map &map)
 	map(0x0035, 0x0035).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0x0036, 0x0036).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0x0038, 0x0038).nopr();         // ? ack or watchdog
-	map(0x0040, 0x0041).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).mirror(0xff00);
+	map(0x0040, 0x0041).mirror(0xff00).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0x0043, 0x0043).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x0080, 0x0080).r(FUNC(ddenlovr_state::keyb_r<0>));
 	map(0x0081, 0x0081).r(FUNC(ddenlovr_state::keyb_r<1>));
 	map(0x0082, 0x0082).portr("SYSTEM");
 	map(0x00da, 0x00da).r(FUNC(ddenlovr_state::mjflove_protection_r));
-	map(0x00f2, 0x00f2).w(FUNC(ddenlovr_state::mjmyster_rambank_w)).mirror(0xff00);
-	map(0x00f8, 0x00f8).w(FUNC(ddenlovr_state::mjflove_rombank_w)).mirror(0xff00);
-	map(0x00fa, 0x00fa).w(FUNC(ddenlovr_state::mjflove_okibank_w)).mirror(0xff00);
+	map(0x00f2, 0x00f2).mirror(0xff00).w(FUNC(ddenlovr_state::mjmyster_rambank_w));
+	map(0x00f8, 0x00f8).mirror(0xff00).w(FUNC(ddenlovr_state::mjflove_rombank_w));
+	map(0x00fa, 0x00fa).mirror(0xff00).w(FUNC(ddenlovr_state::mjflove_okibank_w));
 	map(0x0100, 0x0100).portr("DSW1");
 	map(0x0181, 0x0181).nopw();                        // ? int. enable
 	map(0x0184, 0x0184).w(FUNC(ddenlovr_state::mjflove_coincounter_w));

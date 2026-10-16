@@ -3999,22 +3999,20 @@ void analog_field::read(ioport_value &result)
 	if (!m_field.enabled())
 		return;
 
-	// if set programmatically, only use the override value
-	if (m_use_adjoverride)
+	s32 value;
+	if (!m_use_adjoverride)
 	{
-		result = m_adjoverride;
-		return;
+		// interpolate if appropriate and if time has passed since the last update
+		value = !m_interpolate ? m_accum : manager().frame_interpolate(m_previous, m_accum);
+
+		// apply standard analog settings
+		value = apply_settings(value);
 	}
-
-	// start with the raw value
-	s32 value = m_accum;
-
-	// interpolate if appropriate and if time has passed since the last update
-	if (m_interpolate)
-		value = manager().frame_interpolate(m_previous, m_accum);
-
-	// apply standard analog settings
-	value = apply_settings(value);
+	else
+	{
+		// if set programmatically, use the override value
+		value = m_adjoverride;
+	}
 
 	// remap the value if needed
 	if (m_field.remap_table() != nullptr)

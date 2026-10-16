@@ -153,7 +153,7 @@ public:
 	{
 	}
 
-	void osborne1(machine_config &config);
+	void osborne1(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_key);
 
@@ -162,7 +162,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-	void osborne1_base(machine_config &config);
+	void osborne1_base(machine_config &config) ATTR_COLD;
 
 	void osborne1_mem(address_map &map) ATTR_COLD;
 	void osborne1_op(address_map &map) ATTR_COLD;
@@ -192,12 +192,10 @@ protected:
 private:
 	u8 ieee_pia_pb_r();
 	void ieee_pia_pb_w(u8 data);
-	void ieee_pia_irq_a_func(int state);
 
 	void video_pia_port_a_w(u8 data);
 	void video_pia_port_b_w(u8 data);
 	void video_pia_out_cb2_dummy(int state);
-	void video_pia_irq_a_func(int state);
 
 	void serial_acia_irq_func(int state);
 
@@ -208,8 +206,9 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
+	IRQ_CALLBACK_MEMBER(irq_cb);
 	bool set_rom_mode(u8 value);
-	void update_irq();
+	void update_irq(int state);
 	void update_acia_rxc_txc();
 
 	required_device<gfxdecode_device>       m_gfxdecode;
@@ -264,7 +263,7 @@ public:
 	{
 	}
 
-	void osborne1sp(machine_config &config);
+	void osborne1sp(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -294,7 +293,7 @@ public:
 	{
 	}
 
-	void osborne1nv(machine_config &config);
+	void osborne1nv(machine_config &config) ATTR_COLD;
 
 private:
 	void osborne1nv_io(address_map &map) ATTR_COLD;
@@ -478,11 +477,6 @@ void osborne1_state::ieee_pia_pb_w(u8 data)
 	m_ieee->host_nrfd_w(BIT(data, 7));
 }
 
-void osborne1_state::ieee_pia_irq_a_func(int state)
-{
-	update_irq();
-}
-
 
 void osborne1_state::video_pia_port_a_w(u8 data)
 {
@@ -515,16 +509,11 @@ void osborne1_state::video_pia_out_cb2_dummy(int state)
 {
 }
 
-void osborne1_state::video_pia_irq_a_func(int state)
-{
-	update_irq();
-}
-
 
 void osborne1_state::serial_acia_irq_func(int state)
 {
 	m_acia_irq_state = state;
-	update_irq();
+	update_irq(state);
 }
 
 
@@ -721,6 +710,18 @@ TILE_GET_INFO_MEMBER(osborne1_state::get_tile_info)
 }
 
 
+IRQ_CALLBACK_MEMBER(osborne1_state::irq_cb)
+{
+	if (m_pia0->irq_a_state())
+		return 0xf0;
+	else if (m_pia1->irq_a_state())
+		return 0xf8;
+	else if (m_acia_irq_state)
+		return 0xfc;
+	else
+		return 0xfe;
+}
+
 bool osborne1_state::set_rom_mode(u8 value)
 {
 	if (value != m_rom_mode)
@@ -738,16 +739,12 @@ bool osborne1_state::set_rom_mode(u8 value)
 	}
 }
 
-void osborne1_state::update_irq()
+void osborne1_state::update_irq(int state)
 {
-	if (m_pia0->irq_a_state())
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xf0); // Z80
-	else if (m_pia1->irq_a_state())
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xf8); // Z80
-	else if (m_acia_irq_state)
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xfc); // Z80
+	if (m_pia0->irq_a_state() || m_pia1->irq_a_state() || m_acia_irq_state)
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	else
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, CLEAR_LINE, 0xfe); // Z80
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 void osborne1_state::update_acia_rxc_txc()
@@ -974,6 +971,7 @@ void osborne1_state::osborne1_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &osborne1_state::osborne1_mem);
 	m_maincpu->set_addrmap(AS_OPCODES, &osborne1_state::osborne1_op);
 	m_maincpu->set_addrmap(AS_IO, &osborne1_state::osborne1_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(osborne1_state::irq_cb));
 	m_maincpu->irqack_cb().set(FUNC(osborne1_state::irqack_w));
 
 	SCREEN(config, m_screen).set_color(rgb_t::green());
@@ -992,7 +990,7 @@ void osborne1_state::osborne1_base(machine_config &config)
 	m_pia0->writepb_handler().set(FUNC(osborne1_state::ieee_pia_pb_w));
 	m_pia0->ca2_handler().set(m_ieee, FUNC(ieee488_device::host_ifc_w));
 	m_pia0->cb2_handler().set(m_ieee, FUNC(ieee488_device::host_ren_w));
-	m_pia0->irqa_handler().set(FUNC(osborne1_state::ieee_pia_irq_a_func));
+	m_pia0->irqa_handler().set(FUNC(osborne1_state::update_irq));
 
 	IEEE488(config, m_ieee);
 	m_ieee->srq_callback().set(m_pia0, FUNC(pia6821_device::ca2_w));
@@ -1001,7 +999,7 @@ void osborne1_state::osborne1_base(machine_config &config)
 	m_pia1->writepa_handler().set(FUNC(osborne1_state::video_pia_port_a_w));
 	m_pia1->writepb_handler().set(FUNC(osborne1_state::video_pia_port_b_w));
 	m_pia1->cb2_handler().set(FUNC(osborne1_state::video_pia_out_cb2_dummy));
-	m_pia1->irqa_handler().set(FUNC(osborne1_state::video_pia_irq_a_func));
+	m_pia1->irqa_handler().set(FUNC(osborne1_state::update_irq));
 
 	ACIA6850(config, m_acia);
 	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
