@@ -43,13 +43,45 @@ public:
 	bitmap_ind16 &screen_bitmap() { return m_screenbitmap; }
 
 protected:
+	// C146: object pixel serialiser and line buffer steering
+	class c146
+	{
+	public:
+		void load(u32 ch, bool flip);
+		void shift();
+
+		u8 out() const;
+		u8 tra() const { return BIT(m_sr_tra, 3); }
+		u8 lda(int v1) const { return v1 ? out() : 0xff; }
+		u8 ldb(int v1) const { return v1 ? 0xff : out(); }
+
+		// there is no reset on the die, start out idle
+		u32 m_sr_col = 0xffffffff;
+		u8 m_sr_tra = 0x0f;
+	};
+
+	// one entry of the object table, as latched for a frame
+	struct sprite_entry
+	{
+		gfx_element *gfx;
+		u32 code;
+		u16 pri;
+		u16 pal;
+		int sx, sy;
+		int sizex, sizey;
+		u16 lutbank;
+		u8 srcx, srcy;
+		u8 size;
+		bool flipx;
+	};
+
 	namcos2_sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u16 xmask);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	// general
-	virtual void draw_sprites(const rectangle &cliprect, int control);
+	virtual void get_sprites(int control);
 
 	virtual void get_tilenum_and_size(const u16 word0, const u16 word1, u32 &sprn, bool &is_32);
 
@@ -58,7 +90,8 @@ protected:
 
 	template <class BitmapClass> void draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int control);
 
-	void draw_single_sprite(bitmap_ind16 &bitmap, const rectangle &clip, gfx_element *gfx, u32 code, u32 color, bool flipx, bool flipy, int sx, int sy, int sizex, int sizey, u32 prival);
+	void add_sprite(gfx_element *gfx, u32 code, u32 color, bool flipx, bool flipy, int sx, int sy, int sizex, int sizey, u32 prival, u8 srcx, u8 srcy, u8 size);
+	void draw_line(int y, const rectangle &cliprect);
 
 	required_shared_ptr<u16> m_spriteram;
 	required_region_ptr<u8> m_scalelut_region;
@@ -70,6 +103,11 @@ protected:
 	bitmap_ind16 m_screenbitmap;
 
 	u16 m_xmask;
+
+	c146 m_c146;
+	sprite_entry m_sprite[128];
+	int m_sprite_count = 0;
+	u16 m_linebuf[2][0x800]; // line buffers A and B
 };
 
 class namcos2_sprite_finallap_device : public namcos2_sprite_device
@@ -108,7 +146,7 @@ public:
 	}
 
 protected:
-	virtual void draw_sprites(const rectangle &cliprect, int control) override;
+	virtual void get_sprites(int control) override;
 };
 
 
