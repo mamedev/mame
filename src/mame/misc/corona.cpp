@@ -11,16 +11,17 @@
 
   Games running in this hardware:
 
-  * Winners Circle (81, 28*28 PCB),           1981, Corona Co, LTD.
-  * Winners Circle (81, 18*22 PCB),           1981, Corona Co, LTD.
-  * Winners Circle (82),                      1982, Corona Co, LTD.
-  * Le Grandchamps,                           198?, Isermatic France S.A.
-  * Ruleta RE-800 (earlier),                  1991, Entretenimientos GEMINIS & GENATRON.
-  * Ruleta RE-800 (v1.0),                     1991, Entretenimientos GEMINIS & GENATRON.
-  * Ruleta RE-800 (v3.0),                     1992, Entretenimientos GEMINIS & GENATRON.
-  * Ruleta RCI (6-players, Spanish),          199?, Entretenimientos GEMINIS & GENATRON.
-  * Lucky Roulette Plus (6-players, Spanish), 1990, unknown manufacturer.
-
+  * Winners Circle (81, 28*28 PCB),                             1981, Corona Co, LTD.
+  * Winners Circle (81, 18*22 PCB),                             1981, Corona Co, LTD.
+  * Winners Circle (82),                                        1982, Corona Co, LTD.
+  * Le Grandchamps,                                             198?, Isermatic France S.A.
+  * Ruleta RE-800 (earlier),                                    1991, Entretenimientos GEMINIS & GENATRON.
+  * Ruleta RE-800 (v1.0),                                       1991, Entretenimientos GEMINIS & GENATRON.
+  * Ruleta RE-800 (v3.0),                                       1992, Entretenimientos GEMINIS & GENATRON.
+  * Ruleta RCI (6-players, Spanish),                            199?, Entretenimientos GEMINIS & GENATRON.
+  * Lucky Roulette Plus (6-players, Spanish, set 1),            1990, unknown manufacturer.
+  * Lucky Roulette Plus (6-players, Spanish, set 2),            1990, unknown manufacturer.
+  * Monte (4-players Spanish cards game. Prototype, encrypted), 1989, Miky SRL.
 
   Special thanks to Rob Ragon for his invaluable cooperation.
 
@@ -909,9 +910,25 @@ void corona_state::luckyrlt_sound_cpu_io_map(address_map &map)
 void corona_state::monte_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x5fff).ram().share("nvram");
+	map(0x4000, 0x5fff).mirror(0xa000).ram().share("nvram");
 	map(0x8000, 0xbfff).rom().region("maincpu", 0x4000);
-//	map(0xc000, 0xc7ff).ram();  // place some cards upside-down and counts the machine turning on
+
+/*	Offset C000-C7FF contains some accessed offsets.
+    These place some cards upside-down randomly and fix the machine turning on counter.
+
+    The offset $C760 is also $4760, related to the machine turning on counter.
+    Once mirrored as the main NVRAM, we got a lot of improvements.
+
+    So we finally have...
+
+    - 4000-5FFF (the real NVRAM)
+    - 6000-7FFF (mirror)
+    - C000-DFFF (mirror) <-- active, accessed.
+    - E000-FFFF (mirror)
+
+    Now, the cards could appear facing in any direction, just as happens in a real deal,
+    and all bookkeeping parameters are working properly, including the machine turning on counter.
+*/
 }
 
 
@@ -2044,13 +2061,13 @@ ROM_START(luckyrlta)
 ROM_END
 
 
-/************  Miki S.R.L. sets  ************/
+/************  Miki SRL sets  ************/
 
 /*
   Monte.
   40 cards game with 4 jokers.
   4-players
-  Miki S.R.L.
+  Miki SRL.
   1989.
 
   Argentina.
@@ -2059,6 +2076,7 @@ ROM_END
 
   Notes:
   blitter and inputs seems mapped as winner82.
+  The game is a prototype. Never was released to the market.
 
 */
 ROM_START(monte)
@@ -2074,7 +2092,7 @@ ROM_END
 
 /*
   Rula (roulette)
-  Miki S.R.L.
+  Miki SRL.
   1991.
 
   Argentina.
@@ -2132,5 +2150,6 @@ GAMEL( 199?, rcirulet,  0,        rcirulet,  re800,    corona_state, empty_init,
 GAMEL( 1990, luckyrlt,  0,        luckyrlt,  luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish, set 1)", 0,                        layout_luckyrlt )
 GAMEL( 1991, luckyrlta, luckyrlt, luckyrlta, luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish, set 2)", 0,                        layout_luckyrlt )
 
-GAME(  1989, monte,     0,        monte,     monte,    corona_state, init_monte, ROT0,   "Miky S.R.L.",              "Monte (4-players Spanish cards game, encrypted)", 0 )
-GAME(  1991, rula,      0,        rula,      rula,     corona_state, init_monte, ROT90,  "Miky S.R.L.",              "Rula (6-players roulette, encrypted)",            MACHINE_NOT_WORKING )
+// Miky SRL games
+GAME(  1989, monte,     0,        monte,     monte,    corona_state, init_monte, ROT0,   "Miky SRL",                 "Monte (4-players Spanish cards game. Prototype, encrypted)", 0 )
+GAME(  1991, rula,      0,        rula,      rula,     corona_state, init_monte, ROT90,  "Miky SRL",                 "Rula (6-players roulette, encrypted)",            MACHINE_NOT_WORKING )
