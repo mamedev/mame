@@ -293,7 +293,7 @@ void ngen_state::kbd_rxrdy_w(int state)
 {
 	// Track the keyboard UART receive-ready transitions to distinguish serial reception from guest reads.
 	if (bool(state) != m_kbd_rxrdy)
-		logerror("Keyboard UART RXRDY %d\n", state);
+		LOGMASKED(LOG_KEYBOARD, "Keyboard UART RXRDY %d\n", state);
 	m_kbd_rxrdy = bool(state);
 	m_pic->ir6_w(m_kbd_rxrdy || m_kbd_txrdy);
 }
@@ -538,8 +538,6 @@ uint16_t ngen_state::peripheral_r(offs_t offset, uint16_t mem_mask)
 			}
 			else
 			{
-				// Log bytes read by the guest so received keyboard data can be followed through the UART.
-				logerror("Keyboard UART data read %02x\n", ret & 0xff);
 				LOGMASKED(LOG_KEYBOARD, "Keyboard UART data read %02x\n", ret);
 			}
 		}

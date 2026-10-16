@@ -10,7 +10,12 @@
 */
 
 #include "emu.h"
+
 #include "ngen_kb.h"
+
+#define LOG_KEYBOARD (1U << 1)
+#define VERBOSE (0)
+#include "logmacro.h"
 
 ngen_keyboard_device::ngen_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
 	: serial_keyboard_device(mconfig, NGEN_KEYBOARD, tag, owner, 0)
@@ -94,7 +99,7 @@ void ngen_keyboard_device::write(uint8_t data)
 	// Codes 0xAx and 0xBx appear to control the keyboard LEDs, lower nibbles controlling the state of the LEDs
 	// When setting an error code via the LEDs, 0xB0 then 0xAE is sent (presumably for error code 0xE0),
 	// so that means that 0xAx controls the Overtype, Lock, F1 and F2 LEDs, and 0xBx controls the F3, F8, F9 and F10 LEDs.
-	logerror("KB: received character %02x\n",data);
+	LOGMASKED(LOG_KEYBOARD, "KB: received character %02x\n", data);
 	if (data == 0x92U)
 		m_echo = false;
 	else if (m_echo)
@@ -225,11 +230,11 @@ void ngen_keyboard_device::rcv_complete()
 void ngen_keyboard_device::key_make(uint8_t row, uint8_t column)
 {
 	// Log host key presses separately from write(), which logs commands sent by the computer to the keyboard.
-	logerror("KB: host key down row %u column %u\n", row, column);
+	LOGMASKED(LOG_KEYBOARD, "KB: host key down row %u column %u\n", row, column);
 	uint8_t const code = ngen_key_code(row, column);
 	if (code == 0xffU)
 	{
-		logerror("KB: no NGEN key code for row %u column %u\n", row, column);
+		LOGMASKED(LOG_KEYBOARD, "KB: no NGEN key code for row %u column %u\n", row, column);
 		return;
 	}
 
@@ -238,7 +243,7 @@ void ngen_keyboard_device::key_make(uint8_t row, uint8_t column)
 	// released since the previous key event, explicitly clear the guest's held
 	// key state before reporting this new key.
 	uint16_t const modifiers = m_modifiers->read();
-	bool const shifted = bool(modifiers & 0x02U) != bool(modifiers & 0x04U);
+	bool const shifted = bool(BIT(modifiers, 1)) != bool(BIT(modifiers, 2));
 	if (shifted && !m_last_shifted && m_scan_requested && m_id_sequence_complete)
 		send_key(0xc8U); // Report Shift before the first key pressed with it.
 	if (m_last_shifted && !shifted && m_scan_requested && m_id_sequence_complete)
@@ -262,13 +267,13 @@ void ngen_keyboard_device::key_repeat(uint8_t row, uint8_t column)
 
 void ngen_keyboard_device::key_break(uint8_t row, uint8_t column)
 {
-	logerror("KB: host key up row %u column %u\n", row, column);
+	LOGMASKED(LOG_KEYBOARD, "KB: host key up row %u column %u\n", row, column);
 	uint8_t const code = ngen_key_code(row, column);
 	if (code == 0xffU)
 		return;
 
 	uint16_t const modifiers = m_modifiers->read();
-	bool const shifted = bool(modifiers & 0x02U) != bool(modifiers & 0x04U);
+	bool const shifted = bool(BIT(modifiers, 1)) != bool(BIT(modifiers, 2));
 	if (shifted && !m_last_shifted && m_scan_requested && m_id_sequence_complete)
 		send_key(0xc8U);
 	if (m_last_shifted && !shifted && m_scan_requested && m_id_sequence_complete)
@@ -290,7 +295,7 @@ void ngen_keyboard_device::send_key_scan()
 	// Shift is a separate K1 key-post.  Include it in the same scan as any
 	// shifted character rather than sending an ASCII uppercase character.
 	uint16_t const modifiers = m_modifiers->read();
-	bool const shifted = bool(modifiers & 0x02U) != bool(modifiers & 0x04U);
+	bool const shifted = bool(BIT(modifiers, 1)) != bool(BIT(modifiers, 2));
 
 	for (unsigned row = 0; row < 4U; ++row)
 	{
@@ -327,7 +332,7 @@ void ngen_keyboard_device::send_key_scan()
 void ngen_keyboard_device::send_key(uint8_t code)
 {
 	// This is the byte the emulated keyboard transmits to the computer after translating a host key press.
-	logerror("KB: transmit key code %02x\n", code);
+	LOGMASKED(LOG_KEYBOARD, "KB: transmit key code %02x\n", code);
 	serial_keyboard_device::send_key(code);
 }
 
