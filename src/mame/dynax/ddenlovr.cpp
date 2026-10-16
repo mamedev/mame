@@ -3315,21 +3315,21 @@ void hanakanz_state::mjchuuka_portmap(address_map &map)
 {     // 16 bit I/O
 	map(0x20, 0x20).select(0xff00).w(FUNC(hanakanz_state::mjchuuka_blitter_w));
 	map(0x21, 0x21).select(0xff00).w(FUNC(hanakanz_state::mjchuuka_palette_w));
-	map(0x23, 0x23).r(FUNC(hanakanz_state::mjchuuka_gfxrom_0_r));
-	map(0x40, 0x40).w(FUNC(hanakanz_state::mjchuuka_coincounter_w));
-	map(0x41, 0x41).w(FUNC(hanakanz_state::keyboard_select_w));
-	map(0x42, 0x42).portr("SYSTEM");
-	map(0x43, 0x44).r(FUNC(hanakanz_state::mjchuuka_keyb_r));
-	map(0x45, 0x45).r(FUNC(hanakanz_state::mjchuuka_gfxrom_1_r));
-	map(0x60, 0x60).portr("DSW1");
-	map(0x61, 0x61).portr("DSW2");
-	map(0x62, 0x62).portr("DSW3");
-	map(0x63, 0x63).portr("DSW4");
-	map(0x64, 0x64).portr("DSW5");     // DSW 1-4 high bits
-	map(0x80, 0x80).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xa0, 0xa1).w("ym2413", FUNC(ym2413_device::write));
-	map(0xc0, 0xcf).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0xe0, 0xe1).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x23, 0x23).mirror(0xff00).r(FUNC(hanakanz_state::mjchuuka_gfxrom_0_r));
+	map(0x40, 0x40).mirror(0xff00).w(FUNC(hanakanz_state::mjchuuka_coincounter_w));
+	map(0x41, 0x41).mirror(0xff00).w(FUNC(hanakanz_state::keyboard_select_w));
+	map(0x42, 0x42).mirror(0xff00).portr("SYSTEM");
+	map(0x43, 0x44).mirror(0xff00).r(FUNC(hanakanz_state::mjchuuka_keyb_r));
+	map(0x45, 0x45).mirror(0xff00).r(FUNC(hanakanz_state::mjchuuka_gfxrom_1_r));
+	map(0x60, 0x60).mirror(0xff00).portr("DSW1");
+	map(0x61, 0x61).mirror(0xff00).portr("DSW2");
+	map(0x62, 0x62).mirror(0xff00).portr("DSW3");
+	map(0x63, 0x63).mirror(0xff00).portr("DSW4");
+	map(0x64, 0x64).mirror(0xff00).portr("DSW5");     // DSW 1-4 high bits
+	map(0x80, 0x80).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa0, 0xa1).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
+	map(0xc0, 0xcf).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xe0, 0xe1).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_data_w));
 }
 
 
@@ -4207,15 +4207,15 @@ void ddenlovr_state::mjflove_portmap(address_map &map)
 	map(0x0035, 0x0035).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0x0036, 0x0036).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0x0038, 0x0038).nopr();         // ? ack or watchdog
-	map(0x0040, 0x0041).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x0040, 0x0041).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).mirror(0xff00);
 	map(0x0043, 0x0043).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x0080, 0x0080).r(FUNC(ddenlovr_state::keyb_r<0>));
 	map(0x0081, 0x0081).r(FUNC(ddenlovr_state::keyb_r<1>));
 	map(0x0082, 0x0082).portr("SYSTEM");
 	map(0x00da, 0x00da).r(FUNC(ddenlovr_state::mjflove_protection_r));
-	map(0x00f2, 0x00f2).w(FUNC(ddenlovr_state::mjmyster_rambank_w));
-	map(0x00f8, 0x00f8).w(FUNC(ddenlovr_state::mjflove_rombank_w));
-	map(0x00fa, 0x00fa).w(FUNC(ddenlovr_state::mjflove_okibank_w));
+	map(0x00f2, 0x00f2).w(FUNC(ddenlovr_state::mjmyster_rambank_w)).mirror(0xff00);
+	map(0x00f8, 0x00f8).w(FUNC(ddenlovr_state::mjflove_rombank_w)).mirror(0xff00);
+	map(0x00fa, 0x00fa).w(FUNC(ddenlovr_state::mjflove_okibank_w)).mirror(0xff00);
 	map(0x0100, 0x0100).portr("DSW1");
 	map(0x0181, 0x0181).nopw();                        // ? int. enable
 	map(0x0184, 0x0184).w(FUNC(ddenlovr_state::mjflove_coincounter_w));
