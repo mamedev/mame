@@ -385,6 +385,7 @@ public:
 	void hgokbang(machine_config &config) ATTR_COLD;
 	void quiz365(machine_config &config) ATTR_COLD;
 	void mjschuka(machine_config &config) ATTR_COLD;
+	void daichukab(machine_config &config) ATTR_COLD;
 	void mjmyorntr(machine_config &config) ATTR_COLD;
 	void ddenlovj(machine_config &config) ATTR_COLD;
 
@@ -558,6 +559,7 @@ private:
 	void akamaru_map(address_map &map) ATTR_COLD;
 	void daichuka_portmap(address_map &map) ATTR_COLD;
 	void daichukaa_portmap(address_map &map) ATTR_COLD;
+	void daichukab_portmap(address_map &map) ATTR_COLD;
 	void ddenlovj_map(address_map &map) ATTR_COLD;
 	void ddenlovr_map(address_map &map) ATTR_COLD;
 	void ddenlovrk_map(address_map &map) ATTR_COLD;
@@ -3313,21 +3315,21 @@ void hanakanz_state::mjchuuka_portmap(address_map &map)
 {     // 16 bit I/O
 	map(0x20, 0x20).select(0xff00).w(FUNC(hanakanz_state::mjchuuka_blitter_w));
 	map(0x21, 0x21).select(0xff00).w(FUNC(hanakanz_state::mjchuuka_palette_w));
-	map(0x23, 0x23).mirror(0xff00).r(FUNC(hanakanz_state::mjchuuka_gfxrom_0_r));
-	map(0x40, 0x40).mirror(0xff00).w(FUNC(hanakanz_state::mjchuuka_coincounter_w));
-	map(0x41, 0x41).mirror(0xff00).w(FUNC(hanakanz_state::keyboard_select_w));
-	map(0x42, 0x42).mirror(0xff00).portr("SYSTEM");
-	map(0x43, 0x44).mirror(0xff00).r(FUNC(hanakanz_state::mjchuuka_keyb_r));
-	map(0x45, 0x45).mirror(0xff00).r(FUNC(hanakanz_state::mjchuuka_gfxrom_1_r));
-	map(0x60, 0x60).mirror(0xff00).portr("DSW1");
-	map(0x61, 0x61).mirror(0xff00).portr("DSW2");
-	map(0x62, 0x62).mirror(0xff00).portr("DSW3");
-	map(0x63, 0x63).mirror(0xff00).portr("DSW4");
-	map(0x64, 0x64).mirror(0xff00).portr("DSW5");     // DSW 1-4 high bits
-	map(0x80, 0x80).mirror(0xff00).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xa0, 0xa1).mirror(0xff00).w("ym2413", FUNC(ym2413_device::write));
-	map(0xc0, 0xcf).mirror(0xff00).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0xe0, 0xe1).mirror(0xff00).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x23, 0x23).r(FUNC(hanakanz_state::mjchuuka_gfxrom_0_r));
+	map(0x40, 0x40).w(FUNC(hanakanz_state::mjchuuka_coincounter_w));
+	map(0x41, 0x41).w(FUNC(hanakanz_state::keyboard_select_w));
+	map(0x42, 0x42).portr("SYSTEM");
+	map(0x43, 0x44).r(FUNC(hanakanz_state::mjchuuka_keyb_r));
+	map(0x45, 0x45).r(FUNC(hanakanz_state::mjchuuka_gfxrom_1_r));
+	map(0x60, 0x60).portr("DSW1");
+	map(0x61, 0x61).portr("DSW2");
+	map(0x62, 0x62).portr("DSW3");
+	map(0x63, 0x63).portr("DSW4");
+	map(0x64, 0x64).portr("DSW5");     // DSW 1-4 high bits
+	map(0x80, 0x80).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa0, 0xa1).w("ym2413", FUNC(ym2413_device::write));
+	map(0xc0, 0xcf).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xe0, 0xe1).w("aysnd", FUNC(ay8910_device::address_data_w));
 }
 
 
@@ -3385,6 +3387,42 @@ void ddenlovr_state::mjschuka_portmap(address_map &map)
 	map(0x78, 0x79).w("ym2413", FUNC(ym2413_device::write));
 }
 
+void ddenlovr_state::daichukab_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+
+	map(0x00, 0x0f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+
+	map(0x20, 0x23).w(FUNC(ddenlovr_state::ddenlovr_palette_base_w));
+	map(0x24, 0x27).w(FUNC(ddenlovr_state::ddenlovr_palette_mask_w));
+	map(0x28, 0x2b).w(FUNC(ddenlovr_state::ddenlovr_transparency_pen_w));
+	map(0x2c, 0x2f).w(FUNC(ddenlovr_state::ddenlovr_transparency_mask_w));
+	map(0x34, 0x34).w(FUNC(ddenlovr_state::ddenlovr_bgcolor_w));
+	map(0x35, 0x35).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
+	map(0x36, 0x36).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
+	map(0x38, 0x38).nopr();         // ? ack or watchdog
+	map(0x40, 0x41).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
+	map(0x43, 0x43).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
+	map(0x50, 0x50).w(FUNC(ddenlovr_state::mjflove_okibank_w));
+
+	map(0x54, 0x54).rw(FUNC(ddenlovr_state::mjschuka_protection_r), FUNC(ddenlovr_state::protection_w));
+	// 58 writes ? (0/1)
+	map(0x5c, 0x5c).r(FUNC(ddenlovr_state::hanakanz_rand_r));
+
+	map(0x60, 0x60).portr("DSW1");
+	map(0x61, 0x61).portr("DSW2");
+	map(0x62, 0x62).portr("DSW3");
+	map(0x63, 0x63).portr("DSW4");
+	map(0x64, 0x64).portr("DSW5");     // DSW 1-4 high bits
+	map(0x68, 0x68).w(FUNC(ddenlovr_state::sryudens_coincounter_w));
+	map(0x69, 0x69).w(FUNC(ddenlovr_state::keyboard_select_w));
+	map(0x6a, 0x6a).portr("SYSTEM");
+	map(0x6b, 0x6c).r(FUNC(ddenlovr_state::sryudens_keyb_r));
+
+	map(0x70, 0x71).w("ym2413", FUNC(ym2413_device::write));
+	map(0x74, 0x75).w("aysnd", FUNC(ay8910_device::address_data_w));
+	map(0x78, 0x78).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
 
 void ddenlovr_state::mjmyorntr_portmap(address_map &map)
 {
@@ -4169,14 +4207,14 @@ void ddenlovr_state::mjflove_portmap(address_map &map)
 	map(0x0035, 0x0035).w(FUNC(ddenlovr_state::ddenlovr_priority_w));
 	map(0x0036, 0x0036).w(FUNC(ddenlovr_state::ddenlovr_layer_enable_w));
 	map(0x0038, 0x0038).nopr();         // ? ack or watchdog
-	map(0x0040, 0x0041).w(FUNC(ddenlovr_state::ddenlovr_blitter_w)).mirror(0xff00);
+	map(0x0040, 0x0041).w(FUNC(ddenlovr_state::ddenlovr_blitter_w));
 	map(0x0043, 0x0043).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x0080, 0x0080).r(FUNC(ddenlovr_state::keyb_r<0>));
 	map(0x0081, 0x0081).r(FUNC(ddenlovr_state::keyb_r<1>));
 	map(0x0082, 0x0082).portr("SYSTEM");
-	map(0x00da, 0x00da).r(FUNC(ddenlovr_state::mjflove_protection_r)).mirror(0xff00);
-	map(0x00f2, 0x00f2).w(FUNC(ddenlovr_state::mjmyster_rambank_w)).mirror(0xff00);
-	map(0x00f8, 0x00f8).w(FUNC(ddenlovr_state::mjflove_rombank_w)).mirror(0xff00);
+	map(0x00da, 0x00da).r(FUNC(ddenlovr_state::mjflove_protection_r));
+	map(0x00f2, 0x00f2).w(FUNC(ddenlovr_state::mjmyster_rambank_w));
+	map(0x00f8, 0x00f8).w(FUNC(ddenlovr_state::mjflove_rombank_w));
 	map(0x00fa, 0x00fa).w(FUNC(ddenlovr_state::mjflove_okibank_w));
 	map(0x0100, 0x0100).portr("DSW1");
 	map(0x0181, 0x0181).nopw();                        // ? int. enable
@@ -10209,6 +10247,13 @@ void ddenlovr_state::mjschuka(machine_config &config)
 	RTC62421(config, "rtc", 32.768_kHz_XTAL).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::pa7_w)).invert(); // internal oscillator
 }
 
+void ddenlovr_state::daichukab(machine_config &config)
+{
+	mjschuka(config);
+
+	subdevice<tmpz84c015_device>("maincpu")->set_addrmap(AS_IO, &ddenlovr_state::daichukab_portmap);
+}
+
 void ddenlovr_state::mjmyorntr(machine_config &config)
 {
 	mjschuka(config);
@@ -12143,6 +12188,19 @@ ROM_START( mjschuka )
 	ROM_RELOAD(          0x1c0000, 0x20000 )
 ROM_END
 
+ROM_START( daichukab ) // D11005018L1 PCB
+	ROM_REGION( 0x90000+0x8000+16*0x1000, "maincpu", 0 )
+	ROM_LOAD( "1102_1.5b", 0x00000, 0x40000, CRC(a4db66af) SHA1(f11c796c19551579301dbefdb7e6a094ac3f3119) )
+	ROM_RELOAD(            0x10000, 0x40000 )
+
+	ROM_REGION( 0x600000, "blitter", 0 )
+	ROM_LOAD( "1103.a11", 0x00000, 0x80000, CRC(6d33dc52) SHA1(2215ae3cb4a7bbec03574ecdebc55173c2764e2f) )
+	ROM_LOAD( "1103.a12", 0x80000, 0x80000, CRC(f594797c) SHA1(611b6482d7a691525425d8ce0b77f64d63e78c62) )
+	ROM_LOAD( "1103.a12", 0x80000, 0x80000, CRC(f594797c) SHA1(611b6482d7a691525425d8ce0b77f64d63e78c62) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "1101.2b", 0x00000, 0x80000, CRC(7630a71c) SHA1(c6de6c1c631dc8c5479455db01a3d949941642dd) )
+ROM_END
 
 /***************************************************************************
 
@@ -13707,6 +13765,7 @@ GAME( 1995, hgokbang,    hgokou,   hgokbang,  hgokou,     ddenlovr_state, empty_
 
 GAME( 1995, mjdchuka,    0,        mjchuuka,  mjchuuka,   hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Maque Da Zhonghua Quan (Taiwan, D111)",                          MACHINE_NO_COCKTAIL  )
 
+GAME( 1995, daichukab,   daichuka, daichukab, mjschuka,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Dai Chuuka Ken (Japan, D110)",                           MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL ) // needs inputs / DIPs check
 GAME( 1995, mjschuka,    0,        mjschuka,  mjschuka,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Super Dai Chuuka Ken (Japan, D115)",                     MACHINE_NO_COCKTAIL  )
 
 GAME( 1995, nettoqc,     0,        nettoqc,   nettoqc,    ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Nettoh Quiz Champion (Japan)",                                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_COLORS )
