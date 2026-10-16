@@ -86,11 +86,15 @@ protected:
 	required_device<kaneko_pandora_device> m_pandora;
 
 	u16 m_yutnori_prot_val = 0;
+	u8 m_yutnori_music = 0;
 
 	void snowbros_flipscreen_w(u8 data);
 	u16 toto_read(offs_t offset, u16 mem_mask = ~0);
 	void yutnori_prot_w(u16 data);
 	u16 yutnori_prot_r();
+	void yutnori_sound_w(u8 data);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(yutnori_scanline);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
