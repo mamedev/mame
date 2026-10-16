@@ -281,6 +281,42 @@ void c64_supercpu_device::device_start()
 	std::fill(std::begin(m_line_clk), std::end(m_line_clk), 0);
 	std::fill(std::begin(m_line_event), std::end(m_line_event), 0);
 
+	for (unsigned cfg = 0; cfg < 256; cfg++)
+	{
+		for (unsigned block = 0; block < 16; block++)
+			m_decode[cfg][block] = decode_region(block << 12, cfg);
+		m_decode[cfg][16] = decode_region(0xd800, cfg);
+
+		for (unsigned index = 0; index < 17; index++)
+		{
+			switch (m_decode[cfg][index])
+			{
+			case SRAM_BANK0: m_read_base[cfg][index] = 0; break;
+			case SRAM_BANK1: case KERNAL_SHADOW: case COLOUR_RAM: m_read_base[cfg][index] = 0x10000; break;
+			case KERNAL_SHADOW_HW: m_read_base[cfg][index] = 0x8000; break;
+			default: m_read_base[cfg][index] = -1; break;
+			}
+
+			switch (m_decode[cfg][index])
+			{
+			case IO: case COLOUR_RAM: case COLOUR_RAM_INTERNAL: case ULTIMAX: m_write_fast[cfg][index] = false; break;
+			default: m_write_fast[cfg][index] = (cfg & 0xe0) != 0xe0; break;
+			}
+		}
+
+		m_mirror_range[cfg] = MIRRORS[BIT(cfg, 0) | (BIT(cfg, 2) << 1) | (BIT(cfg, 6) << 2) | (BIT(cfg, 7) << 3)];
+	}
+
+	m_has_exp_card = m_exp->get_card_device() != nullptr;
+	m_period = clocks_to_attotime(1);
+	m_half_cycle = m_period / 2;
+	m_phase_quot = m_period.attoseconds() / ACCU_CYCLE;
+	m_phase_rem = m_period.attoseconds() % ACCU_CYCLE;
+	m_time_base = 0;
+	m_time_seconds = 0;
+	m_cpu_clock = 0;
+	m_cpu_period = 0;
+
 	save_item(NAME(m_sw_1mhz));
 	save_item(NAME(m_soft_1mhz));
 	save_item(NAME(m_sys_1mhz));
@@ -601,7 +637,7 @@ void c64_supercpu_device::c64_phi2_w(int state)
 	m_exp->phi2_w(state);
 
 	if (state)
-		m_phi2_time = machine().time() + clocks_to_attotime(1);
+		m_phi2_time = machine().time() + m_period;
 }
 
 
@@ -664,18 +700,26 @@ void c64_supercpu_device::set_2mhz(bool state)
 }
 
 
-uint8_t c64_supercpu_device::config(offs_t offset)
+inline ATTR_FORCE_INLINE uint8_t c64_supercpu_device::config(offs_t offset)
+{
+	uint8_t const cfg = (m_pport & 7) | (m_hwenable << 5) | (m_dosext << 6) | (m_bootmap << 7);
+
+	return m_has_exp_card ? (cfg | exp_config(offset)) : cfg;
+}
+
+
+uint8_t c64_supercpu_device::exp_config(offs_t offset)
 {
 	int const loram = BIT(m_pport, 0);
 	int const hiram = BIT(m_pport, 1);
 	int const exrom = !m_exp->exrom_r(offset, 1, 1, 1, loram, hiram);
 	int const game = !m_exp->game_r(offset, 1, 1, 1, loram, hiram);
 
-	return (m_pport & 7) | (exrom << 3) | (game << 4) | (m_hwenable << 5) | (m_dosext << 6) | (m_bootmap << 7);
+	return (exrom << 3) | (game << 4);
 }
 
 
-c64_supercpu_device::memory_region c64_supercpu_device::decode(offs_t offset, uint8_t cfg)
+c64_supercpu_device::memory_region c64_supercpu_device::decode_region(offs_t offset, uint8_t cfg)
 {
 	int const p = cfg & 7;
 	bool const loram = BIT(cfg, 0);
@@ -761,8 +805,7 @@ unsigned c64_supercpu_device::mirror_mode() const
 
 bool c64_supercpu_device::mirrored(offs_t offset)
 {
-	int const mirror = mirror_mode();
-	uint16_t const range = MIRRORS[mirror];
+	uint16_t const range = m_mirror_range[m_optim];
 	int const page = offset >> 8;
 
 	return range && (page >= (range >> 8)) && (page <= (range & 0xff));
@@ -1122,11 +1165,21 @@ void c64_supercpu_device::hardware_w(offs_t offset, uint8_t data)
 // clk_time - machine time of a C64 cycle and
 //  20 MHz phase
 
+attotime c64_supercpu_device::host_time(uint64_t clk)
+{
+	if ((clk < m_time_base) || ((clk - m_time_base) >= clock()))
+	{
+		m_time_seconds = clk / clock();
+		m_time_base = uint64_t(m_time_seconds) * clock();
+	}
+
+	return attotime(m_time_seconds, (clk - m_time_base) * m_period.attoseconds());
+}
+
+
 attotime c64_supercpu_device::clk_time(uint64_t clk, uint32_t accu)
 {
-	attotime const period = clocks_to_attotime(1);
-
-	return clocks_to_attotime(clk - 1) + attotime(0, attoseconds_t(double(period.attoseconds()) * accu / ACCU_CYCLE));
+	return host_time(clk - 1) + attotime(0, m_phase_quot * accu + m_phase_rem * accu / ACCU_CYCLE);
 }
 
 
@@ -1322,12 +1375,18 @@ bool c64_supercpu_device::begin_access()
 
 bool c64_supercpu_device::catch_up()
 {
-	attotime const target = clk_time(m_clk + 1, m_accu) - m_maincpu->cycles_to_attotime(2);
+	if (m_maincpu->clock() != m_cpu_clock)
+	{
+		m_cpu_clock = m_maincpu->clock();
+		m_cpu_period = m_maincpu->cycles_to_attotime(1).as_attoseconds();
+	}
+
+	attotime const target = clk_time(m_clk + 1, m_accu) - attotime(0, 2 * m_cpu_period);
 	attotime const now = m_maincpu->local_time();
 
 	if (target > now)
 	{
-		int const cycles = (target - now).as_attoseconds() / m_maincpu->cycles_to_attotime(1).as_attoseconds();
+		int const cycles = (target - now).as_attoseconds() / m_cpu_period;
 
 		if (cycles > 0)
 		{
@@ -1353,7 +1412,7 @@ bool c64_supercpu_device::catch_up()
 
 bool c64_supercpu_device::sync()
 {
-	attotime const target = clocks_to_attotime(m_clk) - clocks_to_attotime(1) / 2;
+	attotime const target = host_time(m_clk) - m_half_cycle;
 
 	if (m_phi2_time < target)
 	{
@@ -2034,6 +2093,19 @@ uint8_t c64_supercpu_device::cpu_r(offs_t offset)
 	if (machine().side_effects_disabled())
 		return peek(offset);
 
+	if (m_fast && !m_in_access && !m_dirty && !m_line_count && !m_native_c128_mode && !(offset & 0xff0000) && (m_maincpu->get_vda() || m_maincpu->get_vpa()))
+	{
+		int32_t const base = m_read_base[config(offset)][decode_index(offset)];
+
+		if (base >= 0)
+		{
+			if (m_inc_pending)
+				clock_inc();
+			m_inc_pending = true;
+			return m_sram[base + offset];
+		}
+	}
+
 	if (!begin_access())
 		return 0;
 
@@ -2056,6 +2128,16 @@ void c64_supercpu_device::cpu_w(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled())
 		return;
+
+	if (m_fast && !m_in_access && !m_dirty && !m_line_count && !m_native_c128_mode && !(offset & 0xff0000) &&
+			(offset != 0x0001) && (offset != MMU_LOAD_CONFIG) && m_write_fast[config(offset)][decode_index(offset)] && !mirrored(offset))
+	{
+		if (m_inc_pending)
+			clock_inc();
+		m_inc_pending = true;
+		m_sram[offset] = data;
+		return;
+	}
 
 	if (!begin_access())
 		return;

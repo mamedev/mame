@@ -5,7 +5,9 @@
 #include "tzbx15_sprites.h"
 #include "screen.h"
 
-#include <numbers>
+#include <algorithm>
+#include <limits>
+#include <utility>
 
 // TZB215 on Apache 3
 // TZB315 on Round Up 5, Big Fight, Cycle Warriors
@@ -77,7 +79,6 @@ void tzbx15_device::device_start()
 	m_rom_clut_offset = memregion("sprites_l")->bytes() - m_rom_clut_size;
 
 	m_shadow_pen_array = make_unique_clear<uint8_t[]>(m_rom_clut_size * 2);
-	m_temp_bitmap.allocate(512, 512);
 
 	decode_gfx(gfxinfo);
 	gfx(0)->set_colors(m_rom_clut_size / 8);
@@ -94,239 +95,6 @@ void tzbx15_device::device_add_mconfig(machine_config &config)
 	PALETTE(config, m_palette_clut).set_format(palette_device::xRGB_555, m_rom_clut_size * 2);
 }
 
-void tzbx15_device::mycopyrozbitmap_core(bitmap_ind8 &bitmap, const bitmap_rgb32 &srcbitmap,
-		int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
-		const rectangle &clip, int transparent_color)
-{ }
-
-void tzbx15_device::mycopyrozbitmap_core(bitmap_rgb32 &bitmap, const bitmap_rgb32 &srcbitmap,
-	int dstx, int dsty, int srcwidth, int srcheight, int incxx, int incxy, int incyx, int incyy,
-	const rectangle &clip, int transparent_color)
-{
-	//  const int xmask = srcbitmap.width()-1;
-	//  const int ymask = srcbitmap.height()-1;
-	const int widthshifted = srcwidth << 16;
-	const int heightshifted = srcheight << 16;
-
-	uint32_t startx = 0;
-	uint32_t starty = 0;
-
-	int sx = std::max<int>(dstx, clip.left());
-	int sy = std::max<int>(dsty, clip.top());
-	const int ex = std::min<int>(dstx + srcwidth, clip.right());
-	const int ey = std::min<int>(dsty + srcheight, clip.bottom());
-
-	if (sx <= ex)
-	{
-		while (sy <= ey)
-		{
-			int x = sx;
-			uint32_t cx = startx;
-			uint32_t cy = starty;
-			uint32_t *dest = &bitmap.pix(sy, sx);
-
-			while (x <= ex)
-			{
-				if (cx < widthshifted && cy < heightshifted)
-				{
-					int c = srcbitmap.pix(cy >> 16, cx >> 16);
-
-					if (c != transparent_color)
-						*dest = c;
-				}
-
-				cx += incxx;
-				cy += incxy;
-				x++;
-				dest++;
-			}
-			startx += incyx;
-			starty += incyy;
-			sy++;
-		}
-	}
-}
-
-template<class BitmapClass>
-void tzbx15_device::roundupt_drawgfxzoomrotate(
-		BitmapClass &dest_bmp, const rectangle &clip,
-		gfx_element *gfx, uint32_t code, uint32_t color,
-		int flipx, int flipy, uint32_t ssx, uint32_t ssy,
-		int scalex, int scaley, int rotate,
-		int write_priority_only)
-{
-	if (!scalex || !scaley) return;
-
-	/*
-	scalex and scaley are 16.16 fixed point numbers
-	1<<15 : shrink to 50%
-	1<<16 : uniform scale
-	1<<17 : double to 200%
-	*/
-
-	// force clip to bitmap boundary
-	rectangle myclip = clip;
-	myclip &= dest_bmp.cliprect();
-
-	if (gfx)
-	{
-		const pen_t *pal = &m_palette_clut->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-		const uint8_t *shadow_pens = m_shadow_pen_array.get() + (gfx->granularity() * (color % gfx->colors()));
-		const uint8_t *code_base = gfx->get_data(code % gfx->elements());
-
-		int block_size = 8 * scalex;
-		int sprite_screen_height = ((ssy&0xffff)+block_size)>>16;
-		int sprite_screen_width = ((ssx&0xffff)+block_size)>>16;
-
-		if (sprite_screen_width && sprite_screen_height)
-		{
-			// compute sprite increment per screen pixel
-			int dx = (gfx->width()<<16)/sprite_screen_width;
-			int dy = (gfx->height()<<16)/sprite_screen_height;
-
-			int sx;//=ssx>>16;
-			int sy;//=ssy>>16;
-
-//          int ex = sx+sprite_screen_width;
-//          int ey = sy+sprite_screen_height;
-
-			int incxx=0x10000;//(int)((float)dx * cos(theta));
-//          int incxy=0x0;//(int)((float)dy * -sin(theta));
-			int incyx=0x0;//(int)((float)dx * sin(theta));
-//          int incyy=0x10000;//(int)((float)dy * cos(theta));
-
-			if (ssx&0x80000000) sx=0-(0x10000 - (ssx>>16)); else sx=ssx>>16;
-			if (ssy&0x80000000) sy=0-(0x10000 - (ssy>>16)); else sy=ssy>>16;
-			int ex = sx+sprite_screen_width;
-			int ey = sy+sprite_screen_height;
-			int x_index_base;
-			if( flipx )
-			{
-				x_index_base = (sprite_screen_width-1)*dx;
-				dx = -dx;
-				incxx=-incxx;
-				incyx=-incyx;
-			}
-			else
-			{
-				x_index_base = 0;
-			}
-
-			int y_index;
-			if( flipy )
-			{
-				y_index = (sprite_screen_height-1)*dy;
-				dy = -dy;
-			}
-			else
-			{
-				y_index = 0;
-			}
-
-			if( sx < myclip.left())
-			{
-				// clip left
-				int pixels = myclip.left()-sx;
-				sx += pixels;
-				x_index_base += pixels*dx;
-			}
-			if( sy < myclip.top() )
-			{
-				// clip top
-				int pixels = myclip.top()-sy;
-				sy += pixels;
-				y_index += pixels*dy;
-			}
-			if( ex > myclip.right()+1 )
-			{
-				// clip right
-				int pixels = ex-myclip.right()-1;
-				ex -= pixels;
-			}
-			if( ey > myclip.bottom()+1 )
-			{
-				// clip bottom
-				int pixels = ey-myclip.bottom()-1;
-				ey -= pixels;
-			}
-
-			// skip if inner loop doesn't draw anything
-			if( ex > sx )
-			{
-#if 0
-				int startx=0;
-				int starty=0;
-
-				//int incxx=0x10000;
-				//int incxy=0;
-				//int incyx=0;
-				//int incyy=0x10000;
-				double theta=rotate * ((2.0 * std::numbers::pi)/512.0);
-				double c=cos(theta);
-				double s=sin(theta);
-
-				//if (ey-sy > 0) dy=dy / (ey-sy);
-				{
-					float angleAsRadians=(float)rotate * (7.28f / 512.0f);
-					//float ccx = cosf(angleAsRadians);
-					//float ccy = sinf(angleAsRadians);
-					float a=0;
-
-				}
-
-				for( int y=sy; y<ey; y++ )
-				{
-					uint32_t *const dest = &dest_bmp.pix(y);
-					int cx = startx;
-					int cy = starty;
-
-					int x_index = x_index_base;
-					for( int x=sx; x<ex; x++ )
-					{
-						const uint8_t *source = code_base + (cy>>16) * gfx->rowbytes();
-						int c = source[(cx >> 16)];
-						if( c != transparent_color )
-						{
-							if (write_priority_only)
-								dest[x]=shadow_pens[c];
-							else
-								dest[x]=pal[c];
-						}
-						cx += incxx;
-						cy += incxy;
-					}
-					startx += incyx;
-					starty += incyy;
-				}
-#endif
-#if 1 // old
-				for( int y=sy; y<ey; y++ )
-				{
-					uint8_t const *const source = code_base + (y_index>>16) * gfx->rowbytes();
-					typename BitmapClass::pixel_t *const dest = &dest_bmp.pix(y);
-
-					int x_index = x_index_base;
-					for( int x=sx; x<ex; x++ )
-					{
-						int c = source[x_index>>16];
-						if( c )
-						{
-							// Only draw shadow pens if writing priority buffer
-							if (write_priority_only)
-								dest[x]=shadow_pens[c];
-							else if (!shadow_pens[c])
-								dest[x]=pal[c];
-						}
-						x_index += dx;
-					}
-
-					y_index += dy;
-				}
-#endif
-			}
-		}
-	}
-}
 
 /*
     Sprite RAM itself uses an index into two ROM tables to actually draw the object.
@@ -352,7 +120,8 @@ void tzbx15_device::roundupt_drawgfxzoomrotate(
     Byte 0: Y destination offset (in scanlines, unaffected by scale).
     Byte 1: Always 0?
     Byte 2: Number of source scanlines to render from (so unaffected by destination scale).
-    Byte 3: Usually 0, sometimes 0x80??
+    Byte 3: Bit 0 is bit 8 of the scanline count (tall buildings in Apache 3 need more than 255 lines).
+            Bit 7 repeats each line's tiles on towards the screen edge
 
     Other banks:
     Byte 0: Width of line in tiles (-1)
@@ -372,7 +141,7 @@ void tzbx15_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &clip
 		int color =     m_spriteram[offs+1] >> 3 & 0x1ff;
 		int flip_x =    m_spriteram[offs+1] & 0x8000;
 		int flip_y =    m_spriteram[offs+1] & 0x4000;
-		int rotate =    0;//m_spriteram[offs+5]&0x1ff; // Todo:  Turned off for now
+		int rotate =    m_spriteram[offs+5] & 0x1ff;
 
 		int index = m_spriteram[offs];
 
@@ -386,127 +155,159 @@ void tzbx15_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &clip
 		if (index >= 0x4000)
 			continue;
 
-		uint8_t const *src1 = m_sprites_l_rom + (index * 4);
-		uint8_t const *src2 = m_sprites_h_rom + (index * 4);
+		draw_sprite(bitmap, cliprect, index, color, int16_t(x), int16_t(y),
+				scale, rotate, flip_x, flip_y, write_priority_only);
+	}
+}
 
-		int lines = src1[2];
-		int y_offset = src1[0]&0xf8;
+/*
+    The rotation value is a signed 9-bit slope t (0x100 = 1.0). The chip maps the drawn (flipped
+    and scaled) sprite through [1 -t; t 1] about its origin, which lands on screen position
+    (x, y). That turns the sprite by atan(t) and enlarges it by sqrt(1 + t^2); flipping X
+    negates the turn. Games compensate for the enlargement by reducing the scale.
 
-		lines -= y_offset;
+    Sprites are drawn a scanline at a time: each screen pixel is traced back through the
+    rotation to a pixel of the scaled sprite, then through the scaling to a pixel of the sprite
+    ROM tiles. The rotation step advances by a fixed amount per pixel, so it is stepped in
+    fixed point.
+*/
+template<class BitmapClass>
+void tzbx15_device::draw_sprite(BitmapClass &bitmap, const rectangle &cliprect,
+		int index, int color, int x, int y, int scale, int rotate, bool flip_x, bool flip_y,
+		int write_priority_only)
+{
+	uint8_t const *const src1 = m_sprites_l_rom + (index * 4);
+	uint8_t const *const src2 = m_sprites_h_rom + (index * 4);
+	bool const repeat = BIT(src1[3], 7);
 
-		int render_x = x << 16;
-		int render_y = y << 16;
-		scale = scale << 9; /* 0x80 becomes 0x10000 */
+	int const top = src1[0] & 0xf8;
+	int const lines = src1[2] | ((src1[3] & 0x01) << 8);
+	int const rows = (lines - top + 7) / 8;
+	if (!scale || rows <= 0)
+		return;
+	int const bottom = top + rows * 8;
 
-		if (flip_y)
-			render_y -= y_offset * scale;
-		else
-			render_y += y_offset * scale;
+	// One run of tiles per row of 8 lines, taken from alternate banks
+	int run_left[64], run_right[64], run_base[64];
+	int width = 0;
+	for (int h = 0; h < rows; h++)
+	{
+		uint8_t const *const entry = (h & 1) ? (src1 + 4 + (h / 2) * 4) : (src2 + (h / 2) * 4);
+		run_left[h] = entry[1] * 8;
+		run_right[h] = run_left[h] + (entry[0] + 1) * 8;
+		run_base[h] = (entry[2] | (entry[3] << 8)) * 2;
+		width = std::max(width, run_right[h]);
+	}
 
-		if (rotate)
+	// Slope t in 8 fractional bits, and 1 / (1 + t^2) in 24 fractional bits
+	int const slope = util::sext(rotate, 9) * (flip_x ? -1 : 1);
+	int64_t const shrink = (int64_t(1) << 40) / (65536 + slope * slope);
+
+	// Screen position relative to the origin (16 fractional bits) -> position in the scaled
+	// sprite (40 fractional bits), before flipping
+	auto const unrotate = [slope, shrink] (int64_t px, int64_t py)
+	{
+		return std::make_pair((px + ((slope * py) >> 8)) * shrink, (py - ((slope * px) >> 8)) * shrink);
+	};
+
+	// Size of the scaled sprite. Scale 0x80 is 1:1
+	int const scaled_top = (top * scale) >> 7;
+	int const scaled_bottom = (bottom * scale + 127) >> 7;
+	int const scaled_left = 0;
+	int scaled_right = (width * scale + 127) >> 7;
+	if (repeat)
+	{
+		// Repeated lines run on to the edge of the screen, so find how far that is in the sprite
+		for (int cx : { cliprect.left(), cliprect.right() + 1 })
+			for (int cy : { cliprect.top(), cliprect.bottom() + 1 })
+			{
+				int64_t const zx = unrotate(int64_t(cx - x) << 16, int64_t(cy - y) << 16).first;
+				scaled_right = std::max(scaled_right, int(-((flip_x ? zx : -zx) >> 40)) + 1);
+			}
+	}
+
+	// Screen bounds: rotate the corners of the scaled sprite (8 fractional bits)
+	int64_t minx = std::numeric_limits<int64_t>::max(), maxx = std::numeric_limits<int64_t>::min();
+	int64_t miny = std::numeric_limits<int64_t>::max(), maxy = std::numeric_limits<int64_t>::min();
+	for (int corner = 0; corner < 4; corner++)
+	{
+		int const cx = (corner & 1) ? scaled_right : scaled_left;
+		int const cy = (corner & 2) ? scaled_bottom : scaled_top;
+		int const lx = flip_x ? -cx : cx;
+		int const ly = flip_y ? -cy : cy;
+		int64_t const rx = (int64_t(lx) << 8) - int64_t(slope) * ly;
+		int64_t const ry = int64_t(slope) * lx + (int64_t(ly) << 8);
+		minx = std::min(minx, rx); maxx = std::max(maxx, rx);
+		miny = std::min(miny, ry); maxy = std::max(maxy, ry);
+	}
+	rectangle bounds(x + int(minx >> 8) - 1, x + int(-((-maxx) >> 8)) + 1,
+			y + int(miny >> 8) - 1, y + int(-((-maxy) >> 8)) + 1);
+	bounds &= cliprect;
+	bounds &= bitmap.cliprect();
+	if (bounds.empty())
+		return;
+
+	unsigned const palette = 16 * (color % gfx(0)->colors());
+	pen_t const *const pens = &m_palette_clut->pen(palette);
+	uint8_t const *const shadows = m_shadow_pen_array.get() + palette;
+
+	// Moving one pixel along a scanline moves the same amount through the scaled sprite each time
+	int64_t const step_x = int64_t(shrink) << 16;
+	int64_t const step_y = -(int64_t(slope) << 8) * shrink;
+
+	gfx_element *const tile_gfx[2] = { gfx(0), gfx(1) };
+
+	for (int py = bounds.top(); py <= bounds.bottom(); py++)
+	{
+		// Pixel centres
+		auto const [start_x, start_y] = unrotate(
+				(int64_t(bounds.left() - x) << 16) + 0x8000,
+				(int64_t(py - y) << 16) + 0x8000);
+		int64_t sprite_x = start_x;
+		int64_t sprite_y = start_y;
+		auto *const dest = &bitmap.pix(py);
+		int last_dist_y = -1, line = 0, h = 0;
+		bool line_ok = false;
+
+		for (int px = bounds.left(); px <= bounds.right(); px++, sprite_x += step_x, sprite_y += step_y)
 		{
-			render_y = 0;
-			m_temp_bitmap.fill(0);
-		}
+			// Distance from the origin in the scaled sprite, which grows away from it whichever way it is flipped
+			int const dist_x = flip_x ? int(-(sprite_x >> 40) - 1) : int(sprite_x >> 40);
+			int const dist_y = flip_y ? int(-(sprite_y >> 40) - 1) : int(sprite_y >> 40);
+			if (dist_x < 0 || dist_y < 0)
+				continue;
 
-		int extent_x = 0, extent_y = 0;
-
-		src1 += 4;
-		int h = 0;
-
-		while (lines > 0)
-		{
-			int base, x_offs, x_width, x_pos, draw_this_line = 1;
-			int this_extent = 0;
-
-			/* Odd and even lines come from different banks */
-			if (h & 1)
+			// Back through the scaling to the tile pixel
+			if (dist_y != last_dist_y)
 			{
-				x_width = src1[0] + 1;
-				x_offs = src1[1] * scale * 8;
-				base = src1[2] | (src1[3] << 8);
+				last_dist_y = dist_y;
+				line = (dist_y << 7) / scale;
+				line_ok = line >= top && line < bottom;
+				h = (line - top) >> 3;
 			}
-			else
+			if (!line_ok)
+				continue;
+			int col = (dist_x << 7) / scale;
+			if (col < run_left[h])
+				continue;
+			if (col >= run_right[h])
 			{
-				x_width = src2[0] + 1;
-				x_offs = src2[1] * scale * 8;
-				base = src2[2] | (src2[3] << 8);
+				if (!repeat)
+					continue;
+				col = run_left[h] + (col - run_left[h]) % (run_right[h] - run_left[h]);
 			}
 
-			if (draw_this_line)
+			int const tile = run_base[h] + ((col - run_left[h]) >> 3);
+			gfx_element *const tiles = tile_gfx[tile & 1];
+			uint8_t const pixel = tiles->get_data((tile >> 1) % tiles->elements())[(line & 7) * tiles->rowbytes() + (col & 7)];
+			if (pixel)
 			{
-				base *= 2;
-
-				if (!rotate)
-				{
-					if (flip_x)
-						x_pos = render_x - x_offs - scale * 8;
-					else
-						x_pos = render_x + x_offs;
-				}
-				else
-					x_pos = x_offs;
-
-				for (int w = 0; w < x_width; w++)
-				{
-					if (rotate)
-						roundupt_drawgfxzoomrotate(
-								m_temp_bitmap,cliprect,gfx(0 + (base & 1)),
-								base >> 1,
-								color,flip_x,flip_y,x_pos,render_y,
-								scale,scale,0,write_priority_only);
-					else
-						roundupt_drawgfxzoomrotate(
-								bitmap,cliprect,gfx(0 + (base & 1)),
-								base >> 1,
-								color,flip_x,flip_y,x_pos,render_y,
-								scale,scale,0,write_priority_only);
-					base++;
-
-					if (flip_x)
-						x_pos -= scale * 8;
-					else
-						x_pos += scale * 8;
-
-					this_extent += scale * 8;
-				}
-				if (h & 1)
-					src1 += 4;
-				else
-					src2 += 4;
-
-				if (this_extent > extent_x)
-					extent_x = this_extent;
-				this_extent = 0;
-
-				if (flip_y)
-					render_y -= 8 * scale;
-				else
-					render_y += 8 * scale;
-				extent_y += 8 * scale;
-
-				h++;
-				lines -= 8;
+				// Only draw shadow pens if writing priority buffer
+				if (write_priority_only)
+					dest[px] = shadows[pixel];
+				else if (!shadows[pixel])
+					dest[px] = pens[pixel];
 			}
-			else
-			{
-				h = 32; // hack
-			}
-		}
-
-		if (rotate)
-		{
-			double theta = rotate * ((2.0 * std::numbers::pi) / 512.0);
-
-			int incxx = (int)(65536.0 * cos(theta));
-			int incxy = (int)(65536.0 * -sin(theta));
-			int incyx = (int)(65536.0 * sin(theta));
-			int incyy = (int)(65536.0 * cos(theta));
-
-			extent_x = extent_x >> 16;
-			extent_y = extent_y >> 16;
-			if (extent_x > 2 && extent_y > 2)
-				mycopyrozbitmap_core(bitmap, m_temp_bitmap, x/* + (extent_x/2)*/, y /*+ (extent_y/2)*/, extent_x, extent_y, incxx, incxy, incyx, incyy, cliprect, 0);
 		}
 	}
 }

@@ -30781,7 +30781,7 @@ re800ea
 re800v1
 re800v1a
 re800v3
-rulamiky
+rula
 winner81
 winner81b
 winner81c
@@ -40442,6 +40442,10 @@ d550
 
 @source:roland/roland_d70.cpp
 d70
+
+@source:roland/roland_dep5.cpp
+dep5
+re3
 
 @source:roland/roland_jd800.cpp
 jd800

@@ -142,8 +142,7 @@ public:
 		double  m_ftrc_dmax;
 		float   m_ftrc_smin;         // FTRC single-precision range check
 		float   m_ftrc_smax;
-		float   m_fzero;             // FTRV accumulator initialiser
-		float   m_fone;              // FSRRA reciprocal numerator
+		float   m_fsca_unit;         // what one unit of the FSCA table is worth
 		uint8_t m_fpmode[4];         // FPSCR.RM -> UML rounding mode
 
 		int     m_frt_input;

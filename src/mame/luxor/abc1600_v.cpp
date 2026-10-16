@@ -11,6 +11,8 @@
 #include "abc1600_v.h"
 #include "render.h"
 
+#include <algorithm>
+
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -168,28 +170,35 @@ MC6845_UPDATE_ROW(abc1600_mover_device::crtc_update_row)
 	if ((vbp + y) > cliprect.max_y)
 		return;
 
-	int x = 0;
 	const pen_t *pen = m_palette->pens();
+	const int width = std::min(((x_count + 1) / 2) * 64, cliprect.max_x - hbp + 1);
 
-	for (int column = 0; column < x_count; column += 2)
+	if (width <= 0)
+		return;
+
+	uint32_t *dest = &bitmap.pix(vbp + y, hbp);
+
+	if (!de || BLANK)
+	{
+		std::fill_n(dest, width, pen[0]);
+		return;
+	}
+
+	const uint16_t pol = PIX_POL ? 0xffff : 0;
+	int x = 0;
+
+	for (int column = 0; x < width; column += 2)
 	{
 		uint16_t dma = get_crtca(ma, ra, column);
 
 		// data is read out of video RAM in nibble mode by strobing CAS 4 times
-		for (int cas = 0; cas < 4; cas++)
+		for (int cas = 0; cas < 4 && x < width; cas++)
 		{
-			uint16_t data = read_videoram(dma + cas);
+			uint16_t data = read_videoram(dma + cas) ^ pol;
+			const int bits = std::min(16, width - x);
 
-			for (int bit = 0; bit < 16; bit++)
-			{
-				int color = ((BIT(data, 15) ^ PIX_POL) && !BLANK) && de;
-
-				if ((hbp + x) <= cliprect.max_x)
-					bitmap.pix(vbp + y, hbp + x) = pen[color];
-
-				x++;
-				data <<= 1;
-			}
+			for (int bit = 0; bit < bits; bit++, data <<= 1)
+				dest[x++] = pen[BIT(data, 15)];
 		}
 	}
 }

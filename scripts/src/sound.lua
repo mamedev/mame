@@ -670,6 +670,32 @@ if SOUNDS["MB87077"] then
 end
 
 
+---------------------------------------------------
+-- Fujitsu MB87126 reverb DSP
+--@src/devices/sound/mb87126.h,SOUNDS["MB87126"] = true
+---------------------------------------------------
+
+if SOUNDS["MB87126"] then
+	files {
+		MAME_DIR .. "src/devices/sound/mb87126.cpp",
+		MAME_DIR .. "src/devices/sound/mb87126.h",
+	}
+end
+
+
+
+---------------------------------------------------
+-- Fujitsu MB654119 chorus gate array
+--@src/devices/sound/mb654119.h,SOUNDS["MB654119"] = true
+---------------------------------------------------
+
+if SOUNDS["MB654119"] then
+	files {
+		MAME_DIR .. "src/devices/sound/mb654119.cpp",
+		MAME_DIR .. "src/devices/sound/mb654119.h",
+	}
+end
+
 
 ---------------------------------------------------
 -- Micronas DAC 3550A Stereo Audio DAC

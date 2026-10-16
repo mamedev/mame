@@ -192,6 +192,17 @@ private:
 		uint8_t spr_ba;
 	};
 
+	struct dot_controls
+	{
+		uint16_t strobes;
+		uint8_t cr1;
+		uint8_t cr2;
+		uint8_t mode;
+		uint8_t mcm_flop_dot;
+		bool sprites;
+		bool collisions;
+	};
+
 	TIMER_CALLBACK_MEMBER(fast_changed);
 
 	template <int Space> void default_map(address_map &map) ATTR_COLD;
@@ -205,6 +216,7 @@ private:
 
 	void build_decode() ATTR_COLD;
 	int sprite_cycle(int sprite) const;
+	int sprite_slot_dot(int dot) const;
 	int phase_x(int phase) const;
 	void set_ba(int state);
 	void update_irq();
@@ -230,12 +242,13 @@ private:
 	void apply_register(uint8_t reg, uint8_t data, uint8_t mask);
 	void apply_registers(uint64_t dot);
 	void draw_until(uint64_t dot);
-	void draw_dot();
-	void border_unit(int x, uint8_t cr1, uint8_t cr2);
-	bool graphics_sequencer(uint8_t cr1, uint8_t cr2, int &color);
-	uint8_t sprite_sequencer(int x, int (&color)[8]);
-	void collision_unit(uint8_t sprite_mask, bool fg);
-	void output_stage(int color);
+	void latch_dot_controls(dot_controls &controls) const;
+	ATTR_FORCE_INLINE void draw_dot(const dot_controls &controls);
+	ATTR_FORCE_INLINE void border_unit(int x, uint8_t cr1, uint8_t cr2);
+	ATTR_FORCE_INLINE bool graphics_sequencer(const dot_controls &controls, int &color);
+	ATTR_FORCE_INLINE uint8_t sprite_sequencer(int x, int (&color)[8]);
+	ATTR_FORCE_INLINE void collision_unit(uint8_t sprite_mask, bool fg);
+	ATTR_FORCE_INLINE void output_stage(int color);
 
 	int m_icount;
 	const int m_variant;
@@ -252,6 +265,8 @@ private:
 	devcb_read8 m_read_charrom;
 
 	required_device<cpu_device> m_cpu;
+	memory_access<14, 0, 0, ENDIANNESS_LITTLE>::specific m_videoram;
+	memory_access<10, 0, 0, ENDIANNESS_LITTLE>::specific m_colorram;
 
 	const rgb_t *m_palette;
 

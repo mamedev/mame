@@ -432,6 +432,18 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
+	<software name="digitlzr">
+		<description>Digitizer Datasette</description>
+		<year>19??</year>
+		<publisher>Fantasy Cracking Service</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="digitalizator.d64" size="174848" crc="02a9e65d" sha1="15620b792f7ebc30a8e0a2babb843bc1913e47a5"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="goliath">
 		<description>Goliath-Prommer (Ger)</description>
 		<year>19??</year>

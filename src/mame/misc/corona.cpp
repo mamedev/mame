@@ -357,7 +357,8 @@ public:
 	void re800(machine_config &config) ATTR_COLD;
 	void luckyrlta(machine_config &config) ATTR_COLD;
 	void monte(machine_config &config) ATTR_COLD;
-	void init_rulam() ATTR_COLD;
+	void rula(machine_config &config) ATTR_COLD;
+	void init_monte() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -1521,6 +1522,29 @@ static INPUT_PORTS_START( monte )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( rula )
+	PORT_START("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSW2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 
 /*******************************************
 *             Machine Drivers              *
@@ -1735,6 +1759,21 @@ void corona_state::monte(machine_config &config)
 
 	// video hardware
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 32*8-1);
+
+	PALETTE(config.replace(), "palette", FUNC(corona_state::monte_palette), 0x100);
+}
+
+void corona_state::rula(machine_config &config)
+{
+	winner82(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &corona_state::monte_map);
+	m_maincpu->set_addrmap(AS_IO, &corona_state::winner81_cpu_io_map);
+
+	// video hardware
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(corona_state::screen_update_luckyrlt));
 
 	PALETTE(config.replace(), "palette", FUNC(corona_state::monte_palette), 0x100);
 }
@@ -2008,30 +2047,6 @@ ROM_END
 /************  Miki S.R.L. sets  ************/
 
 /*
-  Rula (roulette)
-  Miki S.R.L.
-  1991.
-
-  Argentina.
-
-  Program is encrypted.
-
-  Notes:
-  blitter and inputs seems mapped as winner81.
-
-*/
-ROM_START(rulamiky)
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("rula.bin", 0x0000, 0x8000, CRC(a866cb05) SHA1(ffc9b05d26f312c0ba1468c33b00ac503876c836) )
-
-	ROM_REGION( 0x10000, "soundcpu", 0 )  // IM1 instead of NMI. Identical halves
-	ROM_LOAD("son_2732.bin",   0x0000, 0x1000, CRC(c944a4ae) SHA1(989ec9f39a7761aa73d08ca39b081cb2c4c75a7c) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "corona_82s123.bin",  0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
-ROM_END
-
-/*
   Monte.
   40 cards game with 4 jokers.
   4-players
@@ -2057,12 +2072,36 @@ ROM_START(monte)
 	ROM_LOAD( "corona_82s123.bin",  0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
 
+/*
+  Rula (roulette)
+  Miki S.R.L.
+  1991.
+
+  Argentina.
+
+  Program is encrypted.
+
+  Notes:
+  blitter and inputs seems mapped as winner81.
+
+*/
+ROM_START(rula)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rula.bin", 0x0000, 0x8000, CRC(a866cb05) SHA1(ffc9b05d26f312c0ba1468c33b00ac503876c836) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )  // IM1 instead of NMI. Identical halves
+	ROM_LOAD("son_2732.bin",   0x0000, 0x1000, CRC(c944a4ae) SHA1(989ec9f39a7761aa73d08ca39b081cb2c4c75a7c) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "corona_82s123.bin",  0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
+ROM_END
+
 
 /******************************************
 *              Driver Init                *
 ******************************************/
 
-void corona_state::init_rulam()
+void corona_state::init_monte()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -2093,5 +2132,5 @@ GAMEL( 199?, rcirulet,  0,        rcirulet,  re800,    corona_state, empty_init,
 GAMEL( 1990, luckyrlt,  0,        luckyrlt,  luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish, set 1)", 0,                        layout_luckyrlt )
 GAMEL( 1991, luckyrlta, luckyrlt, luckyrlta, luckyrlt, corona_state, empty_init, ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish, set 2)", 0,                        layout_luckyrlt )
 
-GAME(  1989, monte,     0,        monte,     monte,    corona_state, init_rulam, ROT0,   "Miky S.R.L.",              "Monte (4-players Spanish cards game, encrypted)", 0 )
-GAME(  1991, rulamiky,  0,        winner82,  winner82, corona_state, init_rulam, ROT90,  "Miky S.R.L.",              "Rula (roulette, encrypted)",                      MACHINE_NOT_WORKING )
+GAME(  1989, monte,     0,        monte,     monte,    corona_state, init_monte, ROT0,   "Miky S.R.L.",              "Monte (4-players Spanish cards game, encrypted)", 0 )
+GAME(  1991, rula,      0,        rula,      rula,     corona_state, init_monte, ROT90,  "Miky S.R.L.",              "Rula (6-players roulette, encrypted)",            MACHINE_NOT_WORKING )

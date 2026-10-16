@@ -551,7 +551,6 @@ public:
 		: amiga_state(mconfig, type, tag)
 		, m_gayle(*this, "gayle")
 		, m_pcmcia(*this, "pcmcia")
-		, m_gayle_int2(0)
 	{ }
 
 	void gayle_int2_w(int state);
@@ -586,7 +585,6 @@ public:
 		: amiga_state(mconfig, type, tag)
 		, m_gayle(*this, "gayle")
 		, m_pcmcia(*this, "pcmcia")
-		, m_gayle_int2(0)
 	{ }
 
 	void gayle_int2_w(int state);

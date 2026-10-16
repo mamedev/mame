@@ -28,20 +28,24 @@ class attckufo_state : public driver_device
 public:
 	attckufo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_vic(*this, "mos6560"),
+		m_ram(*this, "ram")
 	{}
 
 	void attckufo(machine_config &config);
 
-private:
-	uint8_t vic_videoram_r(offs_t offset);
-	uint8_t vic_colorram_r(offs_t offset);
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
+private:
 	void cpu_map(address_map &map) ATTR_COLD;
 	void vic_colorram_map(address_map &map) ATTR_COLD;
 	void vic_videoram_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<mos6560_device> m_vic;
+	required_shared_ptr<uint8_t> m_ram;
 };
 
 
@@ -52,21 +56,23 @@ private:
 void attckufo_state::cpu_map(address_map &map)
 {
 	map.global_mask(0x3fff);
-	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x100f).rw("mos6560", FUNC(mos6560_device::read), FUNC(mos6560_device::write));
+	map(0x0000, 0x0fff).ram().share(m_ram);
+	map(0x1000, 0x100f).rw(m_vic, FUNC(mos6560_device::read), FUNC(mos6560_device::write));
 	map(0x1400, 0x1403).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1c00, 0x1fff).ram();
+	map(0x1c00, 0x1fff).ram().share("ram_hi");
 	map(0x2000, 0x3fff).rom().region("maincpu", 0);
 }
 
 void attckufo_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x3fff).r(FUNC(attckufo_state::vic_videoram_r));
+	map(0x0000, 0x0fff).ram().share(m_ram);
+	map(0x1c00, 0x1fff).ram().share("ram_hi");
+	map(0x2000, 0x3fff).rom().region("maincpu", 0);
 }
 
 void attckufo_state::vic_colorram_map(address_map &map)
 {
-	map(0x000, 0x3ff).r(FUNC(attckufo_state::vic_colorram_r));
+	map(0x000, 0x3ff).lr8(NAME([this] (offs_t offset) -> uint8_t { return m_ram[0x400 + offset]; }));
 }
 
 
@@ -103,17 +109,19 @@ INPUT_PORTS_END
 
 
 //**************************************************************************
-//  VIDEO EMULATION
+//  MACHINE INITIALIZATION
 //**************************************************************************
 
-uint8_t attckufo_state::vic_videoram_r(offs_t offset)
+void attckufo_state::machine_start()
 {
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
-}
-
-uint8_t attckufo_state::vic_colorram_r(offs_t offset)
-{
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset + 0x400);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	auto const vbus_w = [this] (offs_t offset, uint8_t &data, uint8_t mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+			m_vic->bus_w(data);
+	};
+	program.install_write_tap(0x0000, 0x0fff, "vbus_ram", vbus_w);
+	program.install_write_tap(0x1c00, 0x1fff, "vbus_ram_hi", vbus_w);
 }
 
 
@@ -123,7 +131,7 @@ uint8_t attckufo_state::vic_colorram_r(offs_t offset)
 
 void attckufo_state::attckufo(machine_config &config)
 {
-	M6502(config, m_maincpu, XTAL(14'318'181) / 14);
+	M6502(config, m_maincpu, mos6560_device::CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &attckufo_state::cpu_map);
 
 	pia6821_device &pia(PIA6821(config, "pia"));
@@ -136,11 +144,11 @@ void attckufo_state::attckufo(machine_config &config)
 	screen.set_raw(mos6560_device::CLOCK * 4, mos6560_device::HTOTAL, 32, 32 + 23 * 8, mos6560_device::LINES, 28, 28 + 22 * 8);
 	screen.set_screen_update("mos6560", FUNC(mos6560_device::screen_update));
 
-	mos6560_device &mos6560(MOS656X_ATTACK_UFO(config, "mos6560", XTAL(14'318'181) / 14));
-	mos6560.set_screen("screen");
-	mos6560.set_addrmap(0, &attckufo_state::vic_videoram_map);
-	mos6560.set_addrmap(1, &attckufo_state::vic_colorram_map);
-	mos6560.add_route(ALL_OUTPUTS, "mono", 0.08);
+	MOS656X_ATTACK_UFO(config, m_vic, mos6560_device::CLOCK);
+	m_vic->set_screen("screen");
+	m_vic->set_addrmap(0, &attckufo_state::vic_videoram_map);
+	m_vic->set_addrmap(1, &attckufo_state::vic_colorram_map);
+	m_vic->add_route(ALL_OUTPUTS, "mono", 0.08);
 }
 
 
