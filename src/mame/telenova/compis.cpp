@@ -18,6 +18,8 @@
         - Intel 82720 GDC Graphic display processor (NEC uPD 7220)
         - Intel 8272 FDC Floppy disk controller (Intel iSBX-218A)
         - Western Digital WD1002-05 Winchester controller
+        - J5 Styr- och mätkontakt (DIN-6); also hosts Esselte programvarunyckel
+          software keys (unemulated; see PPI section)
 
     Memory map:
 
@@ -42,6 +44,7 @@
         - 8087
         - programmable keyboard
     - hard disk
+    - programvarunyckel / hardware key on J5 (see PPI section)
 
 */
 
@@ -602,6 +605,40 @@ void compis_state::tmr5_w(int state)
 //-------------------------------------------------
 //  I8255A interface
 //-------------------------------------------------
+
+/*
+    J5 - Styr- och mätkontakt / programvarunyckel
+
+    J5 is a 6-pin DIN (IEC 60130-9 / DIN 45322 6/240°) control and measurement
+    port. Many titles also require a "programvarunyckel" (software key)
+    plugged into J5: an epoxy dongle with a product ID stamped on the shell
+    (roughly 50 variants). That key might be shared between titles; softlist 
+	notes such as "hardware key 7" refer to it.
+
+    Host wiring (pin numbers on the plug; socket face view is mirrored L/R):
+
+        DIN  8255   key role
+        1    PC0    CLOCK
+        2    PC1    PARALLEL/SERIAL CONTROL (PL)
+        3    GND    VSS
+        4    PB0    unused?
+        5    PB1    serial data in (Q8)
+        6    +5V    VDD (+ hardwired-high PI straps)
+
+    Internals (probed key number 7): two SCL4021BE (CD4021) 8-bit PISO
+    shift registers.
+
+        PC0 ──► CLOCK ──────┬──► chip1 CP
+                            └──► chip2 CP
+        PC1 ──► PL ─────────┬──► chip1 PL
+                            └──► chip2 PL
+        chip2 Q8 ──► chip1 SERIAL IN
+        chip1 Q8 ──► DIN5 (PB1)
+        chip2 SERIAL IN floating
+
+    Protocol: PL high loads the hardwired PI straps; PL low + rising CLOCK
+    shifts; host samples PB1. After parallel load, PI-8 exits on Q8 first.
+*/
 
 void compis_state::write_centronics_busy(int state)
 {
