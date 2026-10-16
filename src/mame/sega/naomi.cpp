@@ -1991,6 +1991,41 @@ static INPUT_PORTS_START( sstrkfgt )
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+// TODO: "safety sensor" nowhere to be found (on drive BD even?)
+static INPUT_PORTS_START( wrungp )
+	PORT_INCLUDE( naomi_mie )
+
+	PORT_START("TILT")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("View Change")
+	// on-board service key?
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SERVICE3 )
+	PORT_BIT( 0x4fff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	// TODO: akin to waverunr in sega/model2.cpp
+	PORT_START("A0")
+	PORT_BIT(0xff00, 0x8000, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_NAME("Handle Bar") PORT_PLAYER(1)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A1")
+	PORT_BIT(0xff00, 0x0000, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_NAME("Throttle Lever") PORT_REVERSE
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A2")
+	PORT_BIT(0xff00, 0x8000, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_NAME("Roll") PORT_PLAYER(2)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A3")
+	PORT_BIT(0xff00, 0x8000, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_NAME("Pitch") PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( crackndj )
 	PORT_INCLUDE( naomi_mie )
@@ -11162,8 +11197,8 @@ void naomi_state::init_hotd2()
 /* 0054    */ GAME( 2000, shorsem,   shorse,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse (main screens)", GAME_FLAGS )
 /* 0055    */ GAME( 2000, shorsel,   shorse,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse (live and backup)", GAME_FLAGS )
 /* 0056    */ GAME( 2000, shorse,    naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT270,"Sega", "Star Horse (satellite)", GAME_FLAGS )
-/* 0064    */ GAME( 2001, wrungpo,   wrungp,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "CRI / Sega", "Wave Runner GP (USA, Rev A)", GAME_FLAGS )
-/* 0064    */ GAME( 2001, wrungp,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "CRI / Sega", "Wave Runner GP", GAME_FLAGS )
+/* 0064    */ GAME( 2001, wrungpo,   wrungp,   naomim2, wrungp,   naomi_state, init_naomi,   ROT0, "CRI / Sega", "Wave Runner GP (USA, Rev A)", GAME_FLAGS )
+/* 0064    */ GAME( 2001, wrungp,    naomi,    naomim2, wrungp,   naomi_state, init_naomi,   ROT0, "CRI / Sega", "Wave Runner GP", GAME_FLAGS )
 /* 0068    */ GAME( 2001, crakndj2,  naomi,    naomim2, crackndj,naomi_state, init_naomi,   ROT0, "Sega", "Crackin' DJ Part 2 (Japan)", GAME_FLAGS )
 /* 0073    */ GAME( 2001, inunoos,   naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Wow Entertainment / Sega", "Inu no Osanpo / Dog Walking (Japan, Export, Rev A)", GAME_FLAGS )
 // 0075 Star Horse 2001 (main screens)
