@@ -5,7 +5,7 @@ Funai / Gakken Inter Stellar Laser Fantasy laserdisc hardware
 Driver by Andrew Gardner with help from Daphne Source
 
 Notes:
-    Holding down the TEST switch while hitting reset will bring up the Self Test.
+    Holding down the TEST switch while hitting reset will bring up the Self Test. (Not on Zangus, apparently)
     Hit TEST switch again for color and monitor calibration.
     This is somewhat strange hardware : More z80's than necessary
                                         3 bpp sprites
