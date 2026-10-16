@@ -8,8 +8,6 @@
 
 **************************************************************************/
 
-// tech manual: http://manx.classiccmp.org/mirror/vt100.net/docs/la120-tm/la120tm1.pdf
-
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
@@ -189,7 +187,7 @@ void decwriter_state::la120_NVR_w(offs_t offset, uint8_t data)
 	m_nvm->data_w(BIT(offset, 9) ? !BIT(data, 7) : 1);
 }
 
-/* todo: fully reverse engineer DC305 ASIC */
+// todo: fully reverse engineer DC305 ASIC
 /* read registers: all 4 registers read the same set of 8 bits, but what register is being read may be selectable by writing
    Tech manual implies this register is an 8-bit position counter of where the carriage head currently is located.
    0 = 1 = 2 = 3
@@ -280,7 +278,7 @@ void decwriter_state::la120_io(address_map &map)
 	map.global_mask(0xff);
 }
 
-/* Input ports */
+// Input ports
 static INPUT_PORTS_START( la120 )
 	PORT_START("COL0")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Num .") PORT_CODE(KEYCODE_DEL_PAD)
@@ -427,7 +425,7 @@ void decwriter_state::la120(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &decwriter_state::la120_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(decwriter_state::inta_cb));
 
-	/* video hardware */
+	// video hardware
 	//TODO: no actual screen! has 8 leds above the keyboard (similar to vt100/vk100) and has 4 7segment leds for showing an error code.
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(decwriter_state::screen_update));
@@ -452,11 +450,11 @@ void decwriter_state::la120(machine_config &config)
 
 	//config.set_default_layout(layout_la120);
 
-	/* audio hardware */
+	// audio hardware
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_speaker, 786).add_route(ALL_OUTPUTS, "mono", 0.50); // TODO: LA120 speaker is controlled by asic; VT100 has: 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
 
-	/* i8251 */
+	// i8251
 	i8251_device &usart(I8251(config, "usart", XTAL(18'000'000) / 9));
 	usart.txd_handler().set("eia", FUNC(rs232_port_device::write_txd));
 	usart.dtr_handler().set("eia", FUNC(rs232_port_device::write_dtr));
@@ -480,11 +478,21 @@ void decwriter_state::la120(machine_config &config)
 
 ROM_START( la120 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	// later romset, with 23-003e2.e6, 23-004e2.e8, 23-005e2.e12, 23-006e2.e17 replaced by one rom, 23-038e4.e6 which may be a concatenation of the old roms, unclear.
+	// later romset, with 23-003e2.e6, 23-004e2.e8, 23-005e2.e12, 23-006e2.e17 replaced by one ROM (a concatenation of the old ROMs).
 	ROM_LOAD( "23-038e4-00.e6", 0x0000, 0x2000, CRC(cad4eb09) SHA1(d5db117da363d36817476f906251ea4ee1cb14b8))
 	ROM_LOAD( "23-007e2-00.e4", 0x2000, 0x0800, CRC(41eaebf1) SHA1(c7d05417b24b853280d1636776d399a0aea34720)) // used by both earlier and later romset
 	// there is an optional 3 roms, european and APL (and BOTH) rom which goes from 2000-2fff in e4, all undumped.
 	// there is another romset used on the Bell Teleprinter 1000 (Model LAS12) which I believe is 23-004e4.e6 and 23-086e2.e4
+ROM_END
+
+ROM_START( la120a )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	// older romset, with smaller ROMs (but same content)
+	ROM_LOAD( "23-003e2.e6",    0x0000, 0x0800, CRC(6602f654) SHA1(8c3d430fd77930cfa87a8dcb0cbb65f1e7e0a872))
+	ROM_LOAD( "23-004e2.e8",    0x0800, 0x0800, CRC(d107da68) SHA1(b0f882dd75e7adb7f57e1a81d91b5ac8e8f99a4b))
+	ROM_LOAD( "23-005e2.e12",   0x1000, 0x0800, CRC(22eb6442) SHA1(4177c3f2eedd1dcb4f301bdd100f3f548095b31a))
+	ROM_LOAD( "23-006e2.e17",   0x1800, 0x0800, CRC(8f272acc) SHA1(1f5ca349c7656b7fccb282973405812c6d6e1991))
+	ROM_LOAD( "23-007e2-00.e4", 0x2000, 0x0800, CRC(41eaebf1) SHA1(c7d05417b24b853280d1636776d399a0aea34720)) // used by both earlier and later romset
 ROM_END
 
 } // anonymous namespace
@@ -493,5 +501,6 @@ ROM_END
 //**************************************************************************
 //  DRIVERS
 //**************************************************************************
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS            INIT        COMPANY                          FULLNAME                 FLAGS */
-COMP( 1978, la120, 0,      0,      la120,   la120, decwriter_state, empty_init, "Digital Equipment Corporation", "DECwriter III (LA120)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS            INIT        COMPANY                          FULLNAME                        FLAGS
+COMP( 1978, la120,  0,     0,      la120,   la120, decwriter_state, empty_init, "Digital Equipment Corporation", "DECwriter III (LA120)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1978, la120a, la120, 0,      la120,   la120, decwriter_state, empty_init, "Digital Equipment Corporation", "DECwriter III (LA120, older)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
