@@ -4204,6 +4204,7 @@ ATK test: C:79 H:U 1 Sector Bad
 		<year>1991</year>
 		<publisher>Magic Soft</publisher>
 		<notes><![CDATA[
+Not extensively tested
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -4220,6 +4221,10 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1987</year>
 		<publisher>King Size</publisher>
+		<notes><![CDATA[
+Not extensively tested
+Virus just infects other write enabled floppies, has zero impact in standard QA scenario
+]]></notes>
 		<info name="warning" value="Mastered with virus" />
 		<!-- baddump: SCA bootblock -->
 		<part name="flop1" interface="floppy_3_5">
@@ -5590,13 +5595,16 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="beam" supported="no">
+	<software name="beam" supported="yes">
 		<!-- SPS (CAPS) release 1304 -->
 		<description>Beam (Europe)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
 		<publisher>Magic Bytes</publisher>
+		<notes><![CDATA[
+Virus just infects other write enabled floppies, has zero impact in standard QA scenario
+]]></notes>
 		<info name="warning" value="Mastered with virus" />
 		<!-- baddump: NorthStar 2 Bootblock -->
 		<part name="flop1" interface="floppy_3_5">
@@ -10279,6 +10287,10 @@ ATK test: C:0 H:U Bad
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Virus just infects other write enabled floppies, has zero impact in standard QA scenario
+[FDC] Randomly crashes at initial boot
+]]></notes>
 		<info name="warning" value="Mastered with virus" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -17423,8 +17435,14 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>Grandslam</publisher>
+		<notes><![CDATA[
+Not extensively tested
+[keyboard] key repeat kicking in too fast
+Virus just infects other write enabled floppies, has zero impact in standard QA scenario
+]]></notes>
 		<info name="warning" value="Mastered with virus" />
 		<info name="alt_title" value="Espionage - The Computer Game (Box)" />
+		<info name="usage" value="Sports manual copy protection"/>
 		<!-- baddump: NorthStar 2 Bootblock -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
@@ -29534,6 +29552,11 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
 		<publisher>Rainbow Arts</publisher>
+		<notes><![CDATA[
+Not extensively tested
+Virus has some impact, given game requires an user disk which needs to be write enabled
+https://www.vht-dk.dk/amiga/desc/txt/bb-1.htm
+]]></notes>
 		<info name="warning" value="Mastered with virus" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -36129,13 +36152,18 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="ooze" supported="no">
+	<software name="ooze" cloneof="oozecn" supported="no">
 		<!-- SPS (CAPS) release 1255 -->
 		<description>Ooze (Germany, v2.0D)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>Ariolasoft</publisher>
+		<notes><![CDATA[
+Not extensively tested (language barrier)
+Virus would trigger only if it finds another virus in memory, has zero impact in standard QA scenario
+https://www.vht-dk.dk/amiga/desc/txt/system53-inst.htm
+]]></notes>
 		<info name="alt_title" value="Ooze - Als die Geister mürbe wurden (Box)" />
 		<info name="warning" value="Mastered with virus" />
 		<!-- baddump: PvL Virus Protector v5.0 Bootblock -->
@@ -39013,6 +39041,10 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>MicroProse</publisher>
+		<notes><![CDATA[
+Throws a Guru Meditation at startup
+Virus just infects other write enabled floppies, has zero impact in standard QA scenario
+]]></notes>
 		<info name="warning" value="Mastered with virus" />
 		<!-- baddump: Byte Warrior (DASA) Bootblock -->
 		<part name="flop1" interface="floppy_3_5">
@@ -44129,6 +44161,13 @@ ATK test: C:0 H:U Bad
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1993</year>
 		<publisher>Accrosoft</publisher>
+		<notes><![CDATA[
+Randomly black screen during intro.
+Has a laughter track when Disquette 1 is inserted (part of the virus?)
+Virus hits a connected HDD at System level, unmount any for testing this one out.
+https://www.vht-dk.dk/amiga/desc/txt/diskval1234.htm (sample, plenty of variants)
+]]></notes>
+		<info name="usage" value="Sports manual copy protection, insert Disquette 1 to skip intro"/>
 		<info name="warning" value="Mastered with virus" />
 		<!-- baddump: SADDAM disk-validator -->
 		<part name="flop1" interface="floppy_3_5">
@@ -44140,7 +44179,7 @@ ATK test: C:0 H:U Bad
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disquette 1" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2669)shortgrey,the_disquette1.ipf" size="1049180" crc="76169a84" sha1="e27b2fd80b74c3a7950037d3b828ab2ef8199eab"/>
+				<rom name="(sps2669)shortgrey,the_disquette1.ipf" size="1049180" crc="76169a84" sha1="e27b2fd80b74c3a7950037d3b828ab2ef8199eab" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
@@ -44152,7 +44191,7 @@ ATK test: C:0 H:U Bad
 		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disquette 3" />
 			<dataarea name="flop" size="1049180">
-				<rom name="(sps2669)shortgrey,the_disquette3.ipf" size="1049180" crc="8554cdcc" sha1="d8cf8560e3e5ffbad7f18f6d6754ead0b9171e7b" status="baddump"/>
+				<rom name="(sps2669)shortgrey,the_disquette3.ipf" size="1049180" crc="8554cdcc" sha1="d8cf8560e3e5ffbad7f18f6d6754ead0b9171e7b" />
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
@@ -47718,13 +47757,16 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="starraya" cloneof="starray" supported="no">
+	<software name="starraya" cloneof="starray" supported="yes">
 		<!-- SPS (CAPS) release 1612 -->
 		<description>StarRay (Europe, Hyperaction)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>Logotron</publisher>
+		<notes><![CDATA[
+Virus just infects other write enabled floppies, has zero impact in standard QA scenario
+]]></notes>
 		<info name="warning" value="Mastered with virus" />
 		<!-- baddump: SCA Bootblock -->
 		<part name="flop1" interface="floppy_3_5">
