@@ -220,14 +220,14 @@ template void menu_select_launch::draw_left_panel<machine_filter>(u32 flags, mac
 template void menu_select_launch::draw_left_panel<software_filter>(u32 flags, software_filter::type current, std::map<software_filter::type, software_filter::ptr> const &filters);
 
 
-menu_select_launch::system_flags::system_flags(machine_static_info const &info)
+menu_select_launch::system_flags::system_flags(ui_colors const &colors, machine_static_info const &info)
 	: m_machine_flags(info.machine_flags())
 	, m_emulation_flags(info.emulation_flags())
 	, m_unemulated_features(info.unemulated_features())
 	, m_imperfect_features(info.imperfect_features())
 	, m_has_keyboard(info.has_keyboard())
 	, m_has_analog(info.has_analog())
-	, m_status_color(info.status_color())
+	, m_status_color(info.status_color(colors))
 {
 }
 
@@ -708,7 +708,7 @@ menu_select_launch::system_flags const &menu_select_launch::get_system_flags(gam
 	// aggregate flags
 	emu_options clean_options;
 	machine_config const mconfig(driver, clean_options);
-	return m_flags.emplace(&driver, machine_static_info(ui().options(), mconfig)).first->second;
+	return m_flags.emplace(&driver, system_flags(ui().colors(), machine_static_info(mconfig))).first->second;
 }
 
 
@@ -819,6 +819,7 @@ void menu_select_launch::custom_render(uint32_t flags, void *selectedref, float 
 
 	bool isstar = false;
 	rgb_t color = ui().colors().background_color();
+	rgb_t text_color = ui().colors().text_color();
 	if (swinfo && !swinfo->startempty)
 	{
 		isstar = mame_machine_manager::instance()->favorite().is_favorite_system_software(*swinfo);
@@ -839,17 +840,17 @@ void menu_select_launch::custom_render(uint32_t flags, void *selectedref, float 
 		if (swinfo->supported == software_support::UNSUPPORTED)
 		{
 			tempbuf[3] = _("Supported: No");
-			color = UI_RED_COLOR;
+			text_color = ui().colors().colored_text_color();
 		}
 		else if (swinfo->supported == software_support::PARTIALLY_SUPPORTED)
 		{
 			tempbuf[3] = _("Supported: Partial");
-			color = UI_YELLOW_COLOR;
+			text_color = ui().colors().colored_text_color();
 		}
 		else
 		{
 			tempbuf[3] = _("Supported: Yes");
-			color = UI_GREEN_COLOR;
+			text_color = ui().colors().colored_text_color();
 		}
 	}
 	else if (system || (swinfo && swinfo->driver))
@@ -895,8 +896,9 @@ void menu_select_launch::custom_render(uint32_t flags, void *selectedref, float 
 			tempbuf[3].append(_("Sound: Imperfect"));
 		else
 			tempbuf[3].append(_("Sound: OK"));
-
 		color = flags.status_color();
+		text_color = ui().colors().colored_text_color();
+
 	}
 	else
 	{
@@ -928,7 +930,7 @@ void menu_select_launch::custom_render(uint32_t flags, void *selectedref, float 
 			std::begin(tempbuf), std::end(tempbuf),
 			origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, true,
-			ui().colors().text_color(), color);
+			text_color, color);
 
 	// is favorite? draw the star
 	if (isstar)
@@ -1215,12 +1217,12 @@ void menu_select_launch::draw_left_panel(u32 flags, typename Filter::type curren
 		else if ((m_filter_highlight == filter) && (get_focus() == focused_menu::LEFT))
 		{
 			// draw primary highlight if keyboard focus is here
-			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
-			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
+			fgcolor = ui().colors().focus_color();
+			bgcolor = ui().colors().focus_bg_color();
 			ui().draw_textured_box(
 					container(),
 					m_left_items_hbounds.first, line_top, m_left_items_hbounds.second, line_top + m_info_line_height,
-					bgcolor, rgb_t(255, 43, 43, 43),
+					bgcolor, ui().colors().focus_outline_color(),
 					hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 		}
 		else if (pointerline || (!m_ui_error && !(flags & PROCESS_NOINPUT) && hovered && pointer_idle()))
@@ -1440,7 +1442,7 @@ void menu_select_launch::draw_toolbar(u32 flags, float x1, float y1, float x2, f
 	unsigned const toolbar_count(m_is_swlist ? std::size(SW_TOOLBAR_BITMAPS) : std::size(SYS_TOOLBAR_BITMAPS));
 
 	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xef, 0x12, 0x47, 0x7b));
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().selection_toolbar_color());
 
 	// cache metrics and bitmaps if necessary
 	if (m_toolbar_button_vbounds.first >= m_toolbar_button_vbounds.second)
@@ -1474,7 +1476,7 @@ void menu_select_launch::draw_toolbar(u32 flags, float x1, float y1, float x2, f
 		// add backtrack button
 		bool const hovered(pointer_in_rect(m_toolbar_backtrack_left, m_toolbar_button_vbounds.first, m_toolbar_backtrack_left + m_toolbar_button_width, m_toolbar_button_vbounds.second));
 		bool const tracked((pointer_action::TOOLBAR_TRACK == m_pointer_action) && (0 > m_clicked_line));
-		rgb_t const color((hovered && tracked) ? rgb_t::white() : rgb_t(0xffcccccc));
+		rgb_t const color((hovered && tracked) ? ui().colors().selected_color() : ui().colors().text_color());
 		if (tracked || (hovered && !(flags & PROCESS_NOINPUT) && pointer_idle()))
 		{
 			ui().draw_text_box(
@@ -1499,7 +1501,9 @@ void menu_select_launch::draw_toolbar(u32 flags, float x1, float y1, float x2, f
 		bool const enabled(!need_selection || get_selection_ptr());
 		bool const hovered(pointer_in_rect(button_left, m_toolbar_button_vbounds.first, button_right, m_toolbar_button_vbounds.second));
 		bool const tracked((pointer_action::TOOLBAR_TRACK == m_pointer_action) && (z == m_clicked_line));
-		rgb_t color((hovered && tracked && enabled) ? rgb_t::white() : rgb_t(0xffcccccc));
+		rgb_t color(enabled ? ui().colors().text_color() : ui().colors().clone_color());
+		if (hovered && tracked && enabled)
+			color = ui().colors().selected_color();
 		if (tracked || (hovered && !(flags & PROCESS_NOINPUT) && pointer_idle()))
 		{
 			ui().draw_text_box(
@@ -3269,13 +3273,12 @@ void menu_select_launch::draw(u32 flags)
 		if (!rclickline && is_selected(itemnum) && (get_focus() == focused_menu::MAIN))
 		{
 			// if we're selected, draw with a different background
-			fgcolor = rgb_t(0xff, 0xff, 0x00);
-			bgcolor = rgb_t(0xff, 0xff, 0xff);
-			fgcolor_clone = rgb_t(0xcc, 0xcc, 0x00);
+			fgcolor = fgcolor_clone = ui().colors().focus_color();
+			bgcolor = ui().colors().focus_bg_color();
 			ui().draw_textured_box(
 					container(),
 					m_primary_items_hbounds.first, linetop, m_primary_items_hbounds.second, linebottom,
-					bgcolor, rgb_t(43, 43, 43),
+					bgcolor, ui().colors().focus_outline_color(),
 					hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 		}
 		else if ((pointerline || rclickline) && hovered)
@@ -3299,7 +3302,7 @@ void menu_select_launch::draw(u32 flags)
 			ui().draw_textured_box(
 					container(),
 					m_primary_items_hbounds.first, linetop, m_primary_items_hbounds.second, linebottom,
-					bgcolor, rgb_t(43, 43, 43),
+					bgcolor, ui().colors().focus_outline_color(),
 					hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 		}
 
@@ -3382,12 +3385,12 @@ void menu_select_launch::draw(u32 flags)
 		if (is_selected(itemnum) && (get_focus() == focused_menu::MAIN))
 		{
 			// if we're selected, draw with a different background
-			fgcolor = rgb_t(0xff, 0xff, 0x00);
-			bgcolor = rgb_t(0xff, 0xff, 0xff);
+			fgcolor = ui().colors().focus_color();
+			bgcolor = ui().colors().focus_bg_color();
 			ui().draw_textured_box(
 					container(),
 					m_primary_items_hbounds.first, linetop, m_primary_items_hbounds.second, linebottom,
-					bgcolor, rgb_t(43, 43, 43),
+					bgcolor, ui().colors().focus_outline_color(),
 					hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 		}
 		else if (is_selectable(pitem))
@@ -3442,8 +3445,8 @@ void menu_select_launch::draw(u32 flags)
 	// show error text if necessary
 	if (m_ui_error)
 	{
-		container().add_rect(0.0F, 0.0F, 1.0F, 1.0F, rgb_t(114, 0, 0, 0), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-		ui().draw_text_box(target(), m_error_text, text_layout::text_justify::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+		container().add_rect(0.0F, 0.0F, 1.0F, 1.0F, ui().colors().overlay_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		ui().draw_text_box(target(), m_error_text, text_layout::text_justify::CENTER, 0.5f, 0.5f, ui().colors().status_error_color());
 	}
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
@@ -3522,12 +3525,12 @@ void menu_select_launch::draw_right_box_tabs(u32 flags)
 		if ((focused_menu::RIGHTTOP == m_focus) && (cells == m_right_panel))
 		{
 			// draw primary highlight if keyboard focus is here
-			fgcolor = rgb_t(0xff, 0xff, 0x00);
-			bgcolor = rgb_t(0xff, 0xff, 0xff);
+			fgcolor = ui().colors().focus_color();
+			bgcolor = ui().colors().focus_bg_color();
 			ui().draw_textured_box(
 					container(),
 					tableft + UI_LINE_WIDTH, m_primary_vbounds.first + UI_LINE_WIDTH, tableft + tabwidth - UI_LINE_WIDTH, m_right_tabs_bottom,
-					bgcolor, rgb_t(43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
+					bgcolor, ui().colors().focus_outline_color(), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 		}
 		else if (cells != m_right_panel)
 		{
@@ -3606,12 +3609,12 @@ void menu_select_launch::draw_right_box_heading(u32 flags, bool larrow, bool rar
 	else if (focused_menu::RIGHTBOTTOM == m_focus)
 	{
 		// keyboard focus
-		fgcolor = rgb_t(0xff, 0xff, 0x00);
-		bgcolor = rgb_t(0xff, 0xff, 0xff);
+		fgcolor = ui().colors().focus_color();
+		bgcolor = ui().colors().focus_bg_color();
 		ui().draw_textured_box(
 				container(),
 				m_right_content_hbounds.first, m_right_heading_top, m_right_content_hbounds.second, m_right_heading_top + line_height(),
-				bgcolor, rgb_t(43, 43, 43),
+				bgcolor, ui().colors().focus_outline_color(),
 				hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 	}
 
