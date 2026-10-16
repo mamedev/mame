@@ -313,6 +313,10 @@ class coldfire_timer_device : public device_t
 		void tcn_w(u16 data);
 
 		TIMER_CALLBACK_MEMBER(timer_callback);
+		u32 clocks_per_count() const;
+		u16 count_now() const;
+		void latch();
+		void schedule();
 
 		u16 m_tmr;
 		u16 m_trr;

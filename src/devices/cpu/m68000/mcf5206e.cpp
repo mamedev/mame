@@ -1018,69 +1018,107 @@ void coldfire_timer_device::device_reset()
 	write_irq(CLEAR_LINE);
 }
 
+// Counter model (MCF5206e UM 14.4.1.1-14.4.1.4): TCN counts once every PS + 1 clocks of the selected source (system
+// clock or system clock / 16); source 00 stops it, and it is not clocked while RST is 0. m_tcn is the count at
+// m_timer_start_time. The reference is matched on the step after TCN == TRR: restart mode goes back to 0 there, free
+// run continues and wraps at $FFFF.
+u32 coldfire_timer_device::clocks_per_count() const
+{
+	if (!(m_tmr & T_RST))
+		return 0;
+	const u32 ps = ((m_tmr >> 8) & 0xff) + 1;
+	switch ((m_tmr >> 1) & 3)
+	{
+	case 1: return ps;          // system clock
+	case 2: return ps * 16;     // system clock / 16
+	default: return 0;          // 00 stops the counter; 11 = TIN pin (falling edge), not connected here
+	}
+}
+
+u16 coldfire_timer_device::count_now() const
+{
+	const u32 cpc = clocks_per_count();
+	if (!cpc)
+		return m_tcn;
+	const u64 n = attotime_to_clocks(machine().time() - m_timer_start_time) / cpc;
+	const u64 to_match = u16(m_trr - m_tcn) + 1;
+	if (!(m_tmr & T_FRR) || n < to_match)
+		return u16(m_tcn + n);
+	return u16((n - to_match) % (u32(m_trr) + 1));
+}
+
+void coldfire_timer_device::latch()
+{
+	m_tcn = count_now();
+	m_timer_start_time = machine().time();
+}
+
+void coldfire_timer_device::schedule()
+{
+	const u32 cpc = clocks_per_count();
+	if (!cpc)
+		m_timer->adjust(attotime::never);
+	else
+		m_timer->adjust(clocks_to_attotime(u64(u16(m_trr - m_tcn) + 1) * cpc));
+}
+
 TIMER_CALLBACK_MEMBER(coldfire_timer_device::timer_callback)
 {
-	if(m_tmr & T_FRR)
-	{
-		// FRR resets counter to 0
-		m_tcn = 0;
-	}
-	m_ter |= T_EREF;
+	m_tcn = (m_tmr & T_FRR) ? 0 : u16(m_trr + 1);
+	m_timer_start_time = machine().time();
+	m_ter |= T_EREF;    // set whatever ORI is (14.4.1.5)
 
 	// TODO: capture edge irq modes
-	if(BIT(m_tmr, 4))
+	if (m_tmr & T_ORI)
 		write_irq(ASSERT_LINE);
+	schedule();
 }
 
 void coldfire_timer_device::tmr_w(u16 data)
 {
-	u16 cmd = data;
-
-	if((m_tmr & T_RST) && !(cmd & T_RST))
+	if ((m_tmr & T_RST) && !(data & T_RST))
 	{
-		// T_RST high to low resets the entire timer
+		// a 1 -> 0 transition of RST resets the timer registers (14.4.1.1)
 		device_reset();
 		return;
 	}
 
-	m_tmr = cmd;
+	latch();
+	m_tmr = data;
+	schedule();
 
-	if(m_tmr & T_RST)
+	// "If ORI is set when the REF event is asserted in the TER, an immediate interrupt occurs. If ORI is cleared
+	// while an interrupt is asserted, the interrupt negates." (14.4.1.1)
+	if (m_tmr & T_ORI)
 	{
-		// TODO: add tin pin support
-		// "the reference register is matched after (TRR+1) time intervals" (MCF5206e UM 14.4.1.2):
-		// TCN counts 0..TRR, the event comes on the step after TCN == TRR. Restart mode then counts from 0 again
-		// (TRR+1 intervals per period); free run continues through $FFFF, so the next match is $10000 intervals later.
-		int div, start, interval;
-		start = (m_trr - m_tcn) + 1;
-		div = ((m_tmr & 0xff00) >> 8) + 1;                      // 1 -> 256 division scale
-		if ((m_tmr & T_CL1) && !(m_tmr & T_CL0)) div = div * 16;    // input clock / 16
-		if (!(m_tmr & T_FRR)) interval = 0x10000;                   // don't reset tcn to 0
-		else interval = m_trr + 1;                                  // else tcn is reset to 0
-		m_timer_start_time = machine().time();
-		m_timer->adjust(clocks_to_attotime(u64(start) * div), 0, clocks_to_attotime(u64(interval) * div));
+		if (m_ter & T_EREF)
+			write_irq(ASSERT_LINE);
 	}
+	else
+		write_irq(CLEAR_LINE);
 
 	LOGMASKED(LOG_TIMER, "%s: (Timer Mode Register) TMR_w: %04x\n", this->machine().describe_context(), data);
-	//LOGMASKED(LOG_TIMER, " (Prescale) PS : %02x  (Capture Edge/Interrupt) CE : %01x (Output Mode) OM : %01x  (Output Reference Interrupt En) ORI : %01x   Free Run (FRR) : %01x  Input Clock Source (ICLK) : %01x  (Reset Timer) RST : %01x  \n", (m_TMR1 & 0xff00)>>8, (m_TMR1 & 0x00c0)>>6,  (m_TMR1 & 0x0020)>>5, (m_TMR1 & 0x0010)>>4, (m_TMR1 & 0x0008)>>3, (m_TMR1 & 0x0006)>>1, (m_TMR1 & 0x0001)>>0);
 }
 
 void coldfire_timer_device::trr_w(u16 data)
 {
+	latch();
 	m_trr = data;
+	schedule();
 	LOGMASKED(LOG_TIMER, "%s: (Timer Reference Register) TRR_w: %04x\n", this->machine().describe_context(), data);
 }
 
 u16 coldfire_timer_device::tcn_r()
 {
-	m_tcn = (attotime_to_clocks(machine().time() - m_timer_start_time) & 0xffff);
-	return m_tcn;
+	return count_now();
 }
 
 void coldfire_timer_device::tcn_w(u16 data)
 {
-	// Writing any value resets the counter
+	// "A write of any value to TCN causes it to reset to all zeros." (14.4.1.4)
 	m_tcn = 0;
+	m_timer_start_time = machine().time();
+	schedule();
 	LOGMASKED(LOG_TIMER, "%s: (Timer Counter Reset) TCN_w: %04x\n", this->machine().describe_context(), data);
 }
 
