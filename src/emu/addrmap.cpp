@@ -40,6 +40,7 @@ address_map_entry::address_map_entry(device_t &device, address_map &map, offs_t 
 	, m_cswidth(0)
 	, m_flags(0)
 	, m_share(nullptr)
+	, m_share_offset(0)
 	, m_region(nullptr)
 	, m_rgnoffs(0)
 	, m_before_time(device)
