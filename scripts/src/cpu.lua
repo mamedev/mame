@@ -1280,6 +1280,18 @@ if opt_tool(CPUS, "MCS51") then
 end
 
 --------------------------------------------------
+-- Nordic nRF24E1 (8051 with integrated radio)
+--@src/devices/cpu/mcs51/nrf24e1.h,CPUS["NRF24E1"] = true
+--------------------------------------------------
+
+if CPUS["NRF24E1"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/mcs51/nrf24e1.cpp",
+		MAME_DIR .. "src/devices/cpu/mcs51/nrf24e1.h",
+	}
+end
+
+--------------------------------------------------
 -- Appotech AXC-51 (extended Intel 8051)
 --@src/devices/cpu/axc51/axc51.h,CPUS["AXC51"] = true
 --------------------------------------------------
@@ -2019,10 +2031,12 @@ if CPUS["XAVIX2000"] then
 
 	custombuildtask {
 		{ MAME_DIR .. "src/devices/cpu/m6502/oxavix2000.lst",   GEN_DIR .. "emu/cpu/m6502/xavix2000.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dxavix2000.lst"   }, {"@echo Generating xavix2000 instruction source file...", PYTHON .. " $(1) s xavix2000 $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6502/osuperxavix.lst",  GEN_DIR .. "emu/cpu/m6502/superxavix.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dxavix2000.lst"   }, {"@echo Generating superxavix instruction source file...", PYTHON .. " $(1) s superxavix $(<) $(2) $(@)" }},
 	}
 
 	dependency {
 		{ MAME_DIR .. "src/devices/cpu/m6502/xavix2000.cpp",    GEN_DIR .. "emu/cpu/m6502/xavix2000.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/m6502/xavix2000.cpp",    GEN_DIR .. "emu/cpu/m6502/superxavix.hxx" },
 	}
 end
 

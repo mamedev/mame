@@ -1,10 +1,7 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
-/***************************************************************************
+// copyright-holders:David Haywood, MagikalUnicorn
 
-    xavix.h
 
-***************************************************************************/
 #ifndef MAME_CPU_M6502_XAVIX_H
 #define MAME_CPU_M6502_XAVIX_H
 
@@ -14,6 +11,11 @@
 
 class xavix_device : public m6502_device {
 public:
+	enum {
+		AS_LOW_BUS = 5,
+		AS_EXTERNAL_BUS = 6
+	};
+
 	xavix_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
@@ -28,6 +30,13 @@ public:
 	O(retf_imp);
 	O(brk_xav_imp);
 	O(rti_xav_imp);
+
+	// Standard 6502 opcodes whose arithmetic differs on XaviX
+	O(adc_nd_aba); O(adc_nd_abx); O(adc_nd_aby); O(adc_nd_imm);
+	O(arr_nd_imm);
+	O(isb_nd_aba); O(isb_nd_abx); O(isb_nd_aby);
+	O(rra_nd_aba); O(rra_nd_abx); O(rra_nd_aby);
+	O(sbc_nd_aba); O(sbc_nd_abx); O(sbc_nd_aby); O(sbc_nd_imm);
 
 	O(ora_xav_idx);
 	O(ora_xav_idy);
@@ -137,16 +146,22 @@ public:
 
 #undef O
 
-	typedef device_delegate<int16_t (int which, int half)> xavix_interrupt_vector_delegate;
+	using xavix_interrupt_vector_delegate = device_delegate<int16_t (int source, int low_byte)>;
 
-	template <typename... T> void set_vector_callback(T &&... args) { m_vector_callback.set(std::forward<T>(args)...); }
+	template <typename... T> void set_interrupt_vector_callback(T &&... args) { m_interrupt_vector_callback.set(std::forward<T>(args)...); }
+	void set_data_address_mask(u32 mask) { m_data_address_mask = mask; }
 
-	uint8_t read_full_data(uint8_t databank, uint16_t addr);
-	uint8_t read_full_data(uint32_t addr);
-	void write_full_data(uint8_t databank, uint16_t adr, uint8_t val);
-	void write_full_data(uint32_t addr, uint8_t val);
+	uint8_t read_banked_data(uint8_t databank, uint16_t addr);
+	uint8_t read_banked_data(uint32_t addr);
+	void write_banked_data(uint8_t databank, uint16_t adr, uint8_t val);
+	void write_banked_data(uint32_t addr, uint8_t val);
 
 protected:
+	enum {
+		XAVIX_DATABANK = M6502_IR+1,
+		XAVIX_CODEBANK,
+	};
+
 	class mi_xavix : public memory_interface {
 	public:
 		xavix_device *m_base;
@@ -162,47 +177,47 @@ protected:
 
 	uint8_t m_databank;
 	uint8_t m_codebank;
-	uint32_t m_XPC;
+	u32 m_data_address_mask;
+	bool m_full_bank_register_decode;
 
-	xavix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	xavix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool full_bank_register_decode, bool use_separate_codebank_stack);
 
-	uint32_t adr_with_codebank(uint16_t adr) { return adr | (get_codebank() << 16); }
+	uint32_t code_address(uint16_t adr) { return adr | (codebank() << 16); }
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual offs_t pc_to_external(u16 pc) override;
-	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
-	address_space_config m_special_data_config;
 	address_space_config m_lowbus_config;
 	address_space_config m_extbus_config;
 	memory_access<15, 0, 0, ENDIANNESS_LITTLE>::specific m_lowbus;
 	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::specific m_extbus;
 
 protected:
-	xavix_interrupt_vector_delegate m_vector_callback;
+	xavix_interrupt_vector_delegate m_interrupt_vector_callback;
+
+	// XaviX retains the decimal flag, but arithmetic is always binary.
+	void do_adc(uint8_t val) { do_adc_nd(val); }
+	void do_sbc(uint8_t val) { do_sbc_nd(val); }
 
 	void set_codebank(uint8_t bank);
-	uint8_t get_codebank();
+	uint8_t codebank();
 	void set_databank(uint8_t bank);
-	uint8_t get_databank();
+	uint8_t databank();
 
-	void write_special_stack(uint32_t addr, uint8_t data);
-	void dec_special_stack();
-	void inc_special_stack();
-	uint8_t read_special_stack(uint32_t addr);
+	void write_codebank_stack(uint32_t addr, uint8_t data);
+	void dec_codebank_stack_pointer();
+	void inc_codebank_stack_pointer();
+	uint8_t read_codebank_stack(uint32_t addr);
 
-	/* we store the additional 'codebank' used for far calls in a different, private stack
-	   this seems to be neccessary for 'rad_hnt2' not to crash when bringing up the calibration / score table screens
-	   and also for ekara 'a1' cart not to crash shortly after going ingame
-	   it's possible however the stack format is just incorrect, so the exact reason for this being needed does
-	   need further research */
-	uint8_t m_special_stack[0x100];
-	uint8_t m_special_stackpos;
+	// Original XaviX software can change S independently before returning from a far call or interrupt.
+	// The emulated bank stack preserves that nesting; its physical implementation is unconfirmed.
+	uint8_t m_codebank_stack[0x100];
+	uint8_t m_codebank_stack_pointer;
 
 	uint8_t read_stack(uint32_t addr);
 	void write_stack(uint32_t addr, uint8_t val);
@@ -210,23 +225,15 @@ protected:
 	uint8_t read_zeropage(uint32_t addr);
 	void write_zeropage(uint32_t addr, uint8_t val);
 
-	// Some original XaviX games seemed to suggest that the extra byte of the far calls went to a different
-	// stack, but dblmouse on suprtvpc does direct stack manipulation which challenges this assumption.
-	// It could be a SuperXaviX vs XaviX differences however, so currently leaving this as a toggle for testing.
+	// Some original XaviX games require the extra byte of far-call and interrupt frames to be hidden, but
+	// dblmouse on suprtvpc directly reads it from the ordinary stack.  This may be a generation difference,
+	// so retain the conventional frame for the later CPUs.
 	//
 	// pausing in rad_hnt2 (press shift when on the map) is broken without this logic as the stack becomes too
 	// big with the extra bytes
 	//
-	// we currently use the private stack for regular XaviX but not for the later CPUs, however the root cause
-	// of needing it for regular XaviX could be somewhere else
-	bool m_use_private_stack_for_extra_callf_byte = true;
+	bool m_use_separate_codebank_stack;
 };
-
-enum {
-	XAVIX_DATABANK = M6502_IR+1,
-	XAVIX_CODEBANK,
-};
-
 
 DECLARE_DEVICE_TYPE(XAVIX, xavix_device)
 
