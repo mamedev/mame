@@ -1021,6 +1021,7 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 
 		/* body */
 		const int width = m_data[y].m_sample_count;
+		uint8_t artifact_modes[256] = {};
 		pixel_t *RESTRICT pixels = bitmap_addr(bitmap, base_y + y, base_x);
 		for (int x = 0; x < width; )
 		{
@@ -1030,7 +1031,7 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 				;
 
 			/* emit the samples */
-			pixels += emit_samples(
+			const uint32_t pixel_count = emit_samples(
 					m_data[y].m_mode[x],
 					&m_data[y].m_data[x],
 					x2 - x,
@@ -1039,6 +1040,10 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 					m_charrom_cb,
 					x,
 					y);
+
+			const unsigned pixel_offset = std::min<unsigned>(pixels - bitmap_addr(bitmap, base_y + y, base_x), 256);
+			std::fill_n(artifact_modes + pixel_offset, std::min<unsigned>(pixel_count, 256 - pixel_offset), m_data[y].m_mode[x]);
+			pixels += pixel_count;
 
 			/* update x */
 			x = x2;
@@ -1057,7 +1062,7 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 		}
 		else
 		{
-			m_artifacter.process_artifacts<1>(bitmap_addr(bitmap, y + base_y, base_x), m_data[y].m_mode[0], palette);
+			m_artifacter.process_artifacts<1>(bitmap_addr(bitmap, y + base_y, base_x), m_data[y].m_mode[0], palette, artifact_modes);
 		}
 	}
 
