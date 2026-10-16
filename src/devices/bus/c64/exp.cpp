@@ -444,6 +444,10 @@ void c64_expansion_cards(device_slot_interface &device)
 	device.option_add("buscard2", C64_BUSCARD2);
 	device.option_add("cpm", C64_CPM);
 	device.option_add("dqbb", C64_DQBB);
+	device.option_add("dqbb32", C64_DQBB32);
+	device.option_add("dqbb64", C64_DQBB64);
+	device.option_add("dqbb128", C64_DQBB128);
+	device.option_add("dqbb256", C64_DQBB256);
 	device.option_add("easyflash", C64_EASYFLASH);
 	device.option_add("georam", C64_GEORAM);
 	device.option_add("ide64", C64_IDE64);
