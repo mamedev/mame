@@ -174,6 +174,34 @@ void osd_sleep(osd_ticks_t duration) noexcept
 // sleep_for appears to oversleep on Windows with gcc 8
 	Sleep(duration / (osd_ticks_per_second() / 1000));
 #else
+
+#if 0
+	using units = std::chrono::duration<double, std::ratio<1, 1'000>>;
+  static constexpr int SLEEP_WINDOW { 1000 };
+	static constexpr int REPORT_EVERY { SLEEP_WINDOW };
+	static osd_ticks_t sleeps[SLEEP_WINDOW] { 0 };
+	static osd_ticks_t total_sleep_ticks { 0 };
+	static uint32_t n_sleeps { 0 };
+	static int sleep_index { 0 };
+	static int sleep_window { 0 };
+
+	n_sleeps++;
+	total_sleep_ticks -= sleeps[sleep_index];
+	sleeps[sleep_index++] = duration;
+	total_sleep_ticks += duration;
+	sleep_index %= SLEEP_WINDOW;
+
+	if (sleep_window < SLEEP_WINDOW)
+		sleep_window++;
+
+	if (!(n_sleeps % REPORT_EVERY)) {
+		auto accumulated_duration = std::chrono::high_resolution_clock::duration(total_sleep_ticks);
+		auto accumulated_units = std::chrono::duration_cast<units>(accumulated_duration);
+		auto average_units = accumulated_units / sleep_window;	
+		osd_printf_error("Sleeping %lu times, %d moving average %f ms\n", n_sleeps, sleep_window, average_units.count());
+	}
+#endif
+
 	std::this_thread::sleep_for(std::chrono::high_resolution_clock::duration(duration));
 #endif
 }
