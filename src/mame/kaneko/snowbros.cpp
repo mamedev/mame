@@ -512,14 +512,14 @@ void semicom_state::finalttr_map(address_map &map)
 // After each byte, a number of NOPs are executed to give the device time to catch up.
 // After the 4th byte, the code reads the device to get its response.
 // The response is the code with its nibbles swapped, inverted. This gives the values the fixed checks
-// expect (0x33 -> 0xcc at C3A4, 0x60 -> 0xf9 at 485E, 0xb8 -> 0x74 at D806), and makes the check at
-// DEA6, which sends two codes from the table at 2E29A, return its input state unchanged for states 0-5.
-u16 snowbros_pandora_state::yutnori_prot_r()
+// expect (0x33 -> 0xcc at c3a4, 0x60 -> 0xf9 at 485e, 0xb8 -> 0x74 at d806), and makes the check at
+// dea6, which sends two codes from the table at 2e29a, return its input state unchanged for states 0-5.
+u16 yutnori_state::yutnori_prot_r()
 {
-	return ~bitswap<8>(m_yutnori_prot_val, 3, 2, 1, 0, 7, 6, 5, 4) & 0xff;
+	return bitswap<8>(~m_yutnori_prot_val, 3, 2, 1, 0, 7, 6, 5, 4);
 }
 
-void snowbros_pandora_state::yutnori_prot_w(u16 data)
+void yutnori_state::yutnori_prot_w(u16 data)
 {
 	m_yutnori_prot_val = data;
 }
@@ -566,7 +566,7 @@ void snowbros_pandora_state::yutnori_prot_w(u16 data)
 // 0x20  32      축하합니다              "Congratulations"
 // 0x21  33      어머 아깝네요            "Oh, so close!"
 // 0x22  34      ?                     ... "one more"
-void snowbros_pandora_state::yutnori_sound_w(u8 data)
+void yutnori_state::yutnori_sound_w(u8 data)
 {
 	if (data >= 0x01 && data <= 0x22)
 	{
@@ -584,22 +584,26 @@ void snowbros_pandora_state::yutnori_sound_w(u8 data)
 	}
 	else if (data == 0x80)
 	{
-		m_yutnori_music = 0;
+		m_yutnori_music_on = false;
 		m_oki[0]->write(0x08); // stop channel 0
 	}
 	else if (data == 0x81 || data == 0x82)
 	{
-		m_yutnori_music = data;
+		m_yutnori_music_on = true;
 		m_oki[0]->write(0x08);
 		m_oki[0]->set_rom_bank(data - 0x81); // restarted in yutnori_scanline
 	}
+	else if (data)
+	{
+		logerror("%s: unknown sound command %02x\n", machine().describe_context(), data);
+	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(snowbros_pandora_state::yutnori_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(yutnori_state::yutnori_scanline)
 {
 	scanline(timer, param);
 
-	if (param == 0 && m_yutnori_music && BIT(~m_oki[0]->read(), 0))
+	if (param == 0 && m_yutnori_music_on && BIT(~m_oki[0]->read(), 0))
 	{
 		// loop music
 		m_oki[0]->write(0x80 | 0x01);
@@ -607,13 +611,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(snowbros_pandora_state::yutnori_scanline)
 	}
 }
 
-void snowbros_pandora_state::yutnori_map(address_map &map)
+void yutnori_state::yutnori_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 
 	// 0x100000  clr.w on startup
 
-	map(0x200000, 0x200001).rw(FUNC(snowbros_pandora_state::yutnori_prot_r),FUNC(snowbros_pandora_state::yutnori_prot_w)); // protection
+	map(0x200000, 0x200001).rw(FUNC(yutnori_state::yutnori_prot_r), FUNC(yutnori_state::yutnori_prot_w)); // protection
 
 	map(0x300000, 0x300001).portr("DSW1");
 	map(0x300002, 0x300003).portr("DSW2");
@@ -624,7 +628,7 @@ void snowbros_pandora_state::yutnori_map(address_map &map)
 	map(0x30000e, 0x30000f).nopr(); //.r(FUNC(snowbros_pandora_state::yutnori_unk_r)); // ??
 
 	map(0x400000, 0x400001).nopr();
-	map(0x400001, 0x400001).w(FUNC(snowbros_pandora_state::yutnori_sound_w));
+	map(0x400001, 0x400001).w(FUNC(yutnori_state::yutnori_sound_w));
 
 	map(0x500000, 0x5001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
@@ -632,9 +636,9 @@ void snowbros_pandora_state::yutnori_map(address_map &map)
 
 	map(0x700000, 0x70ffff).ram();
 
-	map(0x800000, 0x800001).nopr().w(FUNC(snowbros_pandora_state::irq_ack_w<4>));  /* IRQ 4 acknowledge */
-	map(0x900000, 0x900001).nopr().w(FUNC(snowbros_pandora_state::irq_ack_w<3>));  /* IRQ 3 acknowledge */
-	map(0xa00000, 0xa00001).nopr().w(FUNC(snowbros_pandora_state::irq_ack_w<2>));  /* IRQ 2 acknowledge */
+	map(0x800000, 0x800001).nopr().w(FUNC(yutnori_state::irq_ack_w<4>));  /* IRQ 4 acknowledge */
+	map(0x900000, 0x900001).nopr().w(FUNC(yutnori_state::irq_ack_w<3>));  /* IRQ 3 acknowledge */
+	map(0xa00000, 0xa00001).nopr().w(FUNC(yutnori_state::irq_ack_w<2>));  /* IRQ 2 acknowledge */
 }
 
 static INPUT_PORTS_START( snowbros )
@@ -1987,6 +1991,23 @@ void snowbros3_state::machine_start()
 	save_item(NAME(m_sb3_music));
 }
 
+void yutnori_state::machine_start()
+{
+	snowbros_pandora_state::machine_start();
+
+	m_pandora->set_bg_pen(0xf0);
+
+	save_item(NAME(m_yutnori_prot_val));
+	save_item(NAME(m_yutnori_music_on));
+}
+
+void yutnori_state::machine_reset()
+{
+	snowbros_pandora_state::machine_reset();
+
+	m_yutnori_music_on = false;
+}
+
 MACHINE_RESET_MEMBER(semicom_state,semiprot)
 {
 	u16 const *const PROTDATA = (u16*)memregion("protdata")->base();
@@ -2263,14 +2284,12 @@ void snowbros3_state::snowbro3(machine_config &config) /* PCB has 16MHz & 12MHz 
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void snowbros_pandora_state::yutnori(machine_config &config)
+void yutnori_state::yutnori(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(16'000'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &snowbros_pandora_state::yutnori_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(snowbros_pandora_state::yutnori_scanline), "screen", 0, 1);
-
-//  WATCHDOG_TIMER(config, "watchdog"); // maybe
+	m_maincpu->set_addrmap(AS_PROGRAM, &yutnori_state::yutnori_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(yutnori_state::yutnori_scanline), "screen", 0, 1);
 
 	/* video hardware */
 	SCREEN(config, m_screen);
@@ -2278,8 +2297,8 @@ void snowbros_pandora_state::yutnori(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 262);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(snowbros_pandora_state::screen_update));
-	m_screen->screen_vblank().set(FUNC(snowbros_pandora_state::screen_vblank));
+	m_screen->set_screen_update(FUNC(yutnori_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(yutnori_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 256);
@@ -2289,7 +2308,7 @@ void snowbros_pandora_state::yutnori(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	// clock frequency & pin 7 not verified; at 16 MHz / 16 the speech played too slow
+	// clock frequency & pin 7 not verified; 2 MHz gives the speech the expected pitch
 	OKIM6295(config, m_oki[0], XTAL(16'000'000)/8, okim6295_device::PIN7_HIGH);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 
@@ -3406,15 +3425,6 @@ void semicom_state::init_hyperpac()
 }
 
 
-void snowbros_pandora_state::init_yutnori()
-{
-	m_yutnori_prot_val = 0;
-	m_pandora->set_bg_pen(0xf0);
-	save_item(NAME(m_yutnori_prot_val));
-	save_item(NAME(m_yutnori_music));
-}
-
-
 GAME( 1990, snowbros,   0,        snowbros,    snowbros,  snowbros_pandora_state, empty_init,     ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 1)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1990, snowbrosa,  snowbros, snowbros,    snowbros,  snowbros_pandora_state, empty_init,     ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 2)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1990, snowbrosb,  snowbros, snowbros,    snowbros,  snowbros_pandora_state, empty_init,     ROT0, "Toaplan",                        "Snow Bros. - Nick & Tom (set 3)",                              MACHINE_SUPPORTS_SAVE )
@@ -3467,4 +3477,4 @@ GAME( 2002, snowbro3,   0,        snowbro3,    snowbroj,  snowbros3_state,      
 GAME( 2003, ballboy,    snowbro3, snowbro3,    snowbroj,  snowbros3_state,        init_snowbro3,  ROT0, "bootleg",                        "Ball Boy (2 players)",                                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2004, ballboy3p,  snowbro3, snowbro3,    ballboy3p, snowbros3_state,        init_ballboy3p, ROT0, "bootleg",                        "Ball Boy (3 players)",                                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 // the PIC (undumped) handles protection and presumably sound; both are HLE
-GAME( 1999, yutnori,    0,        yutnori,     yutnori,   snowbros_pandora_state, init_yutnori,   ROT0, "Nunal",                          "Puzzle Yutnori (Korea)",                                       MACHINE_IMPERFECT_SOUND ) // Nunal is apparently Korean slang for Eyeball, hence the logo.  Some places report 'JCC Soft' as the manufacturer
+GAME( 1999, yutnori,    0,        yutnori,     yutnori,   yutnori_state,          empty_init,     ROT0, "Nunal",                          "Puzzle Yutnori (Korea)",                                       MACHINE_IMPERFECT_SOUND ) // Nunal is apparently Korean slang for Eyeball, hence the logo.  Some places report 'JCC Soft' as the manufacturer
