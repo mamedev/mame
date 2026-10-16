@@ -10,7 +10,19 @@
     level 1 - SIO
     level 3 - timer (from PIT, presumably channel 0? Patent says "channel 3")
     level 4 - "interrupt detector" - keyboard, printer, RTC
-    level 7 - floppy/hard disk
+    level 7 - floppy/hard disk (original patent-based assignment)
+
+    CP-001/B26 disk module connections:
+    - WD1010 INTRQ (XINTR2) -> external PIC IR3
+    - WD2797 INTRQ and byte-count/CRC timeout (XINTR5) -> 80186 INT3
+    X-Bus priority numbers are not the external PIC input numbers.
+
+    Disk module reference: Convergent Floppy/Hard Disk Manual,
+    A-09-00328-01-A (January 1984), Figs. 2-5 and 3-9.
+    PAL 13E supplies an active-low byte-clock pulse to the 8253.  With CLK
+    idle high, loading a new mode 0 count requires two data accesses: the
+    first supplies the rising edge, and the second loads the counter on
+    its falling edge.  This accounts for the documented N-2 byte count.
 
     DMA channels:
     channel 0 - communications (RS-232)
@@ -62,6 +74,9 @@
 */
 
 #include "emu.h"
+
+#include "ngen_kb.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/i386/i386.h"
 #include "cpu/i86/i186.h"
@@ -70,15 +85,24 @@
 #include "machine/am9517a.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
-#include "ngen_kb.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/wd2010.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80sio.h"
 #include "video/mc6845.h"
+
 #include "memarray.h"
 #include "screen.h"
+
+#define LOG_DISK     (1U << 1)
+#define LOG_KEYBOARD (1U << 2)
+#define LOG_TIMER    (1U << 3)
+
+// Enable individual channels here when investigating disk completion,
+// keyboard initialization or the CPU timer interrupt bridge.
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 namespace {
@@ -148,6 +172,10 @@ protected:
 	void cpu_timer_clk_out(int state);
 
 	void fdc_irq_w(int state);
+	void fdc_byte_clock();
+	void fdc_timer0_w(int state);
+	void fdc_timer1_w(int state);
+	void update_fdc_irq();
 
 	void ngen386_io(address_map &map) ATTR_COLD;
 	void ngen386_mem(address_map &map) ATTR_COLD;
@@ -233,6 +261,9 @@ private:
 	uint16_t m_last_kbd_control = 0x100;
 	uint32_t m_kbd_control_writes = 0;
 	emu_timer *m_cpu_timer_irq_timer = nullptr;
+	bool m_fdc_irq = false;
+	bool m_fdc_timer0 = false;
+	bool m_fdc_timer1 = false;
 	bool m_kbd_rxrdy = false;
 	bool m_kbd_txrdy = false;
 };
@@ -388,7 +419,7 @@ void ngen_state::peripheral_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x113:
 		if(ACCESSING_BITS_0_7)
 		{
-			logerror("PIT register %u write %02x\n", unsigned(offset - 0x110), data & 0xff);
+			LOGMASKED(LOG_TIMER, "PIT register %u write %02x\n", unsigned(offset - 0x110), data & 0xff);
 			m_pit->write(offset-0x110,data & 0xff);
 		}
 		break;
@@ -412,11 +443,11 @@ void ngen_state::peripheral_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			{
 				++m_kbd_control_writes;
 				if (((data & 0xff) != m_last_kbd_control) || !(m_kbd_control_writes & (m_kbd_control_writes - 1)))
-					logerror("Keyboard UART control write %02x (write %u)\n", data & 0xff, m_kbd_control_writes);
+					LOGMASKED(LOG_KEYBOARD, "Keyboard UART control write %02x (write %u)\n", data & 0xff, m_kbd_control_writes);
 				m_last_kbd_control = data & 0xff;
 			}
 			else
-				logerror("Keyboard UART data write %02x\n", data & 0xff);
+				LOGMASKED(LOG_KEYBOARD, "Keyboard UART data write %02x\n", data & 0xff);
 			m_viduart->write(offset & 1, data & 0xff);
 		}
 		break;
@@ -495,11 +526,11 @@ uint16_t ngen_state::peripheral_r(offs_t offset, uint16_t mem_mask)
 			{
 				++m_kbd_status_reads;
 				if ((ret != m_last_kbd_status) || !(m_kbd_status_reads & (m_kbd_status_reads - 1)))
-					logerror("Keyboard UART status %02x (read %u)\n", ret, m_kbd_status_reads);
+					LOGMASKED(LOG_KEYBOARD, "Keyboard UART status %02x (read %u)\n", ret, m_kbd_status_reads);
 				m_last_kbd_status = ret;
 			}
 			else
-				logerror("Keyboard UART data read %02x\n", ret);
+				LOGMASKED(LOG_KEYBOARD, "Keyboard UART data read %02x\n", ret);
 		}
 		break;
 	case 0x1a0:  // I/O control register?
@@ -605,8 +636,7 @@ void ngen_state::hfd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			if(ACCESSING_BITS_0_7)
 			{
 				m_fdc->write(offset,data & 0xff);
-				m_fdc_timer->write_clk0(1);
-				m_fdc_timer->write_clk0(0);  // Data register access clocks the FDC's PIT channel 0
+				fdc_byte_clock();
 			}
 			break;
 		case 0x04:
@@ -647,7 +677,7 @@ void ngen_state::hfd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 					m_hdc_status_reads = 0;
 				}
 			}
-			logerror("WD1010 register %i write %02x mask %04x\n",offset-0x10,data & 0xff,mem_mask);
+			LOGMASKED(LOG_DISK, "WD1010 register %i write %02x mask %04x\n",offset-0x10,data & 0xff,mem_mask);
 			break;
 		case 0x18:
 		case 0x19:
@@ -675,8 +705,8 @@ uint16_t ngen_state::hfd_r(offs_t offset, uint16_t mem_mask)
 			if(ACCESSING_BITS_0_7)
 			{
 				ret = m_fdc->read(offset);
-				m_fdc_timer->write_clk0(1);
-				m_fdc_timer->write_clk0(0);  // Data register access clocks the FDC's PIT channel 0
+				if (!machine().side_effects_disabled())
+					fdc_byte_clock();
 			}
 			break;
 		case 0x08:
@@ -701,11 +731,11 @@ uint16_t ngen_state::hfd_r(offs_t offset, uint16_t mem_mask)
 				{
 					++m_hdc_status_reads;
 					if ((ret != m_last_hdc_status) || !(m_hdc_status_reads & (m_hdc_status_reads - 1)))
-						logerror("WD1010 status %02x (read %u since command)\n", ret, m_hdc_status_reads);
+						LOGMASKED(LOG_DISK, "WD1010 status %02x (read %u since command)\n", ret, m_hdc_status_reads);
 					m_last_hdc_status = ret;
 				}
 				else
-					logerror("WD1010 register %i read %02x\n",offset-0x10,ret);
+					LOGMASKED(LOG_DISK, "WD1010 register %i read %02x\n",offset-0x10,ret);
 			}
 			break;
 		case 0x18:
@@ -720,9 +750,47 @@ uint16_t ngen_state::hfd_r(offs_t offset, uint16_t mem_mask)
 	return ret;
 }
 
+void ngen_state::fdc_byte_clock()
+{
+	// Floppy/Hard Disk Manual A-09-00328-01-A, Fig. 2-5: PAL 13E's /DM
+	// output pulses low for a WD2797 data-register access and idles high.
+	// Preserve this polarity: a mode 0 count written while CLK is high needs
+	// the following rising edge before it can load on the next falling edge.
+	m_fdc_timer->write_clk0(0);
+	m_fdc_timer->write_clk0(1);
+}
+
 void ngen_state::fdc_irq_w(int state)
 {
-	m_pic->ir7_w(state);
+	LOGMASKED(LOG_DISK, "FDC INTRQ %d\n", state);
+	m_fdc_irq = bool(state);
+	update_fdc_irq();
+}
+
+void ngen_state::fdc_timer0_w(int state)
+{
+	LOGMASKED(LOG_DISK, "FDC byte counter OUT0 %d\n", state);
+	m_fdc_timer0 = bool(state);
+	m_fdc_timer->write_gate1(state);
+	update_fdc_irq();
+}
+
+void ngen_state::fdc_timer1_w(int state)
+{
+	LOGMASKED(LOG_DISK, "FDC CRC delay OUT1 %d\n", state);
+	m_fdc_timer1 = bool(state);
+	update_fdc_irq();
+}
+
+void ngen_state::update_fdc_irq()
+{
+	// Floppy/Hard Disk Manual A-09-00328-01-A, pp. 3-74/3-75:
+	// OUT0 gates the CRC delay counter; OUT0 AND OUT1 joins INTRQ on XINTR5.
+	const int state = m_fdc_irq || (m_fdc_timer0 && m_fdc_timer1);
+	if (m_maincpu)
+		m_maincpu->int3_w(state);
+	else
+		m_pic->ir7_w(state);
 }
 
 void ngen_state::fdc_drq_w(int state)
@@ -753,7 +821,7 @@ void ngen_state::fdc_control_w(uint8_t data)
 // bit 7 - HDC reset
 void ngen_state::hdc_control_w(uint8_t data)
 {
-	logerror("HDC control write %02x\n", data);
+	LOGMASKED(LOG_DISK, "HDC control write %02x\n", data);
 	m_hdc_control = data;
 	if(m_hdc_control & 0x04)
 	{
@@ -766,7 +834,7 @@ void ngen_state::hdc_control_w(uint8_t data)
 
 void ngen_state::hdc_bdrq_w(int state)
 {
-	logerror("WD1010 BDRQ %d\n", state);
+	LOGMASKED(LOG_DISK, "WD1010 BDRQ %d\n", state);
 	m_hdc_bdrq = state;
 	if (state)
 		m_hdc_dma_eop = false;
@@ -780,7 +848,7 @@ void ngen_state::hdc_dma_finish()
 	if (m_hdc_dma_eop && m_hd_buffer_offset >= 512)
 	{
 		m_hdc_dma_eop = false;
-		logerror("HDC DMA complete: %u buffer bytes\n", m_hd_buffer_offset);
+		LOGMASKED(LOG_DISK, "HDC DMA complete: %u buffer bytes\n", m_hd_buffer_offset);
 		m_hdc->buffer_ready(true);
 	}
 }
@@ -800,13 +868,13 @@ bool ngen_state::hdc_sector_address(uint32_t &lba)
 	const uint16_t cylinder = m_hdc->read(4) | ((m_hdc->read(5) & 0x07) << 8);
 	const uint8_t head = sdh & 0x07;
 	const uint8_t sector = m_hdc->read(3);
-	static constexpr uint16_t sector_sizes[4] = { 256, 512, 1024, 128 };
+	static constexpr uint16_t SECTOR_SIZES[4] = { 256, 512, 1024, 128 };
 
 	if (((sdh >> 3) & 0x03) || (cylinder >= info.cylinders) || (head >= info.heads) ||
-		(sector >= info.sectors) || (sector_sizes[(sdh >> 5) & 0x03] != info.sectorbytes))
+		(sector >= info.sectors) || (SECTOR_SIZES[BIT(sdh, 5, 2)] != info.sectorbytes))
 	{
-		logerror("HDC invalid CHS %u/%u/%u size %u for image %u/%u/%u size %u\n",
-			cylinder, head, sector, sector_sizes[(sdh >> 5) & 0x03],
+		LOGMASKED(LOG_DISK, "HDC invalid CHS %u/%u/%u size %u for image %u/%u/%u size %u\n",
+			cylinder, head, sector, SECTOR_SIZES[BIT(sdh, 5, 2)],
 			info.cylinders, info.heads, info.sectors, info.sectorbytes);
 		return false;
 	}
@@ -822,9 +890,13 @@ void ngen_state::hdc_bcs_w(offs_t offset, uint8_t data)
 	{
 		uint32_t lba;
 		if (hdc_sector_address(lba))
-			logerror("HDC CHD read LBA %u: %s\n", lba, m_hdd->read(lba, m_hd_buffer.target()) ? "ok" : "failed");
+		{
+			// Perform the transfer even when the diagnostic channel is disabled.
+			const bool success = m_hdd->read(lba, m_hd_buffer.target());
+			LOGMASKED(LOG_DISK, "HDC CHD read LBA %u: %s\n", lba, success ? "ok" : "failed");
+		}
 		else
-			logerror("HDC CHD read skipped: drive or geometry unavailable\n");
+			LOGMASKED(LOG_DISK, "HDC CHD read skipped: drive or geometry unavailable\n");
 	}
 	m_hdc_bcs = data;
 }
@@ -840,14 +912,17 @@ void ngen_state::hdc_bcr_w(int state)
 
 void ngen_state::hdc_wg_w(int state)
 {
-	logerror("WD1010 write gate %d\n", state);
+	LOGMASKED(LOG_DISK, "WD1010 write gate %d\n", state);
 	if (m_hdc_wg && !state && ((m_hdc_command & 0xf0) == 0x30))
 	{
 		uint32_t lba;
 		if (hdc_sector_address(lba) && BIT(m_hdc_control, 6))
-			logerror("HDC CHD write LBA %u: %s\n", lba, m_hdd->write(lba, m_hd_buffer.target()) ? "ok" : "failed");
+		{
+			const bool success = m_hdd->write(lba, m_hd_buffer.target());
+			LOGMASKED(LOG_DISK, "HDC CHD write LBA %u: %s\n", lba, success ? "ok" : "failed");
+		}
 		else
-			logerror("HDC CHD write skipped: drive, geometry or write enable unavailable\n");
+			LOGMASKED(LOG_DISK, "HDC CHD write skipped: drive, geometry or write enable unavailable\n");
 		m_hdc->buffer_ready(false);
 	}
 	m_hdc_wg = state;
@@ -857,7 +932,7 @@ void ngen_state::hdc_wg_w(int state)
 // bit 7 gates hard disk DMA requests (BTOS sets it after issuing a command)
 void ngen_state::disk_addr_ext(uint8_t data)
 {
-	logerror("HDC address extension write %02x\n", data);
+	LOGMASKED(LOG_DISK, "HDC address extension write %02x\n", data);
 	m_disk_page = data;
 	if (!(m_hdc_control & 0x04))
 		m_dmac->dreq3_w(m_hdc_bdrq && BIT(data, 7));
@@ -1093,6 +1168,9 @@ uint16_t ngen_state::periph141_r(offs_t offset, uint16_t mem_mask)
 
 void ngen_state::machine_start()
 {
+	save_item(NAME(m_fdc_irq));
+	save_item(NAME(m_fdc_timer0));
+	save_item(NAME(m_fdc_timer1));
 	m_cpu_timer_irq_timer = timer_alloc(FUNC(ngen_state::cpu_timer_irq_clear), this);
 	memory_share* vidshare = memshare("vram");
 	memory_share* fontshare = memshare("fontram");
@@ -1114,6 +1192,13 @@ void ngen_state::machine_reset()
 	m_last_kbd_control = 0x100;
 	m_kbd_control_writes = 0;
 	m_cpu_timer_irq_timer->adjust(attotime::never);
+	m_fdc_irq = false;
+	m_fdc_timer0 = false;
+	m_fdc_timer1 = false;
+	m_fdc_timer->write_clk0(1);
+	if (m_maincpu)
+		m_fdc_timer->write_gate1(0);
+	update_fdc_irq();
 	m_kbd_rxrdy = false;
 	m_kbd_txrdy = false;
 	m_hdc_control = 0;
@@ -1297,15 +1382,16 @@ void ngen_state::ngen(machine_config &config)
 
 	PIT8253(config, m_fdc_timer);
 	m_fdc_timer->set_clk<0>(0);
-	m_fdc_timer->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir5_w));  // clocked on FDC data register access
+	m_fdc_timer->out_handler<0>().set(FUNC(ngen_state::fdc_timer0_w));
 	m_fdc_timer->set_clk<1>(20_MHz_XTAL / 20);
-//  m_fdc_timer->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir5_w));  // 1MHz
+	m_fdc_timer->out_handler<1>().set(FUNC(ngen_state::fdc_timer1_w));
 	m_fdc_timer->set_clk<2>(20_MHz_XTAL / 20);
 //  m_fdc_timer->out_handler<2>().set(m_pic, FUNC(pic8259_device::ir5_w));
 
 	// TODO: replace the WD2010 stand-in with the module's WD1010 HDC
 	WD2010(config, m_hdc, 20_MHz_XTAL / 4);
-	m_hdc->out_intrq_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
+	// XINTR2 reaches PIC IR3 on the CP-001; BTOS unmasks bit 3 for HDC I/O.
+	m_hdc->out_intrq_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
 	m_hdc->out_bdrq_callback().set(FUNC(ngen_state::hdc_bdrq_w));
 	m_hdc->out_wg_callback().set(FUNC(ngen_state::hdc_wg_w));
 	m_hdc->out_bcs_callback().set(FUNC(ngen_state::hdc_bcs_w));
