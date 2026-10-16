@@ -156,12 +156,12 @@ Much of the software is French language conversions of existing Interact Family 
 	</software>
 
 	<software name="combat" supported="yes">
-		<description>Combat!</description>
+		<description>Combat</description>
 		<year>19??</year>
 		<publisher>Victor Lambda</publisher>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="16408">
-				<rom name="Combat! (19xx)(Victor Lambda).k7" size="16408" crc="e3d66518" sha1="60981a0eb3efb464bbc000980f22004557f316b6"/>
+				<rom name="Combat (19xx)(Victor Lambda).k7" size="16408" crc="e3d66518" sha1="60981a0eb3efb464bbc000980f22004557f316b6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -398,13 +398,13 @@ Much of the software is French language conversions of existing Interact Family 
 	</software>
 
 	<software name="tartares" supported="no">
-		<description>Le Désert Des Tartares</description>
+		<description>Le Desert Des Tartares</description>
 		<year>19??</year>
 		<publisher>Victor Lambda</publisher>
 		<info name="usage" value="Load Basic Parallel Printer, type CLOAD then ENTER" />
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="7311">
-				<rom name="Le Désert Des Tartares (19xx)(Victor Lambda).k7" size="7311" crc="3571750b" sha1="bf63a0dbba49d290430df6a95ba72a9194ae33db"/>
+				<rom name="Le Desert Des Tartares (19xx)(Victor Lambda).k7" size="7311" crc="3571750b" sha1="bf63a0dbba49d290430df6a95ba72a9194ae33db"/>
 			</dataarea>
 		</part>
 	</software>

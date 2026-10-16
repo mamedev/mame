@@ -131,13 +131,13 @@ There are 3 different methods for loading software:
 	</software>
 
 	<software name="heptaxi" supported="yes">
-		<description>Hep, Taxi!</description>
+		<description>Hep, Taxi</description>
 		<year>19??</year>
 		<publisher>Atlantic Soft</publisher>
 		<info name="usage" value="Select CASETTE and start tape" />
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="5378">
-				<rom name="Hep, Taxi! (19xx)(Atlantic Soft).k7" size="5378" crc="599403ec" sha1="a8653b8e46a2b7a277b0d787df8753d308c5d89a"/>
+				<rom name="Hep, Taxi (19xx)(Atlantic Soft).k7" size="5378" crc="599403ec" sha1="a8653b8e46a2b7a277b0d787df8753d308c5d89a"/>
 			</dataarea>
 		</part>
 	</software>
