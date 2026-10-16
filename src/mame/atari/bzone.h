@@ -35,7 +35,6 @@ public:
 	int clock_r();
 	void bzone(machine_config &config);
 	void bradley(machine_config &config);
-	void dsrtwars(machine_config &config);
 
 protected:
 	void bzone_coin_counter_w(offs_t offset, uint8_t data);
@@ -47,9 +46,9 @@ protected:
 
 	void bzone_base(machine_config &config);
 	void bzone_audio(machine_config &config);
+	void bzone_discrete_audio(machine_config &config) ATTR_COLD;
 	void bzone_map(address_map &map) ATTR_COLD;
 	void bradley_map(address_map &map) ATTR_COLD;
-	void dsrtwars_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
