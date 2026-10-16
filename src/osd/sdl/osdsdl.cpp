@@ -480,6 +480,14 @@ void sdl_osd_interface::process_events()
 		// handle UI events
 		switch (event.type)
 		{
+#if defined(__APPLE__) && defined(__MACH__)
+		case SDL_QUIT:
+			// macOS: Cmd-Q / app Quit arrives as SDL_QUIT, not a window close
+			// event, so this is the only way to exit in fullscreen
+			machine().schedule_exit();
+			break;
+#endif
+
 		case SDL_WINDOWEVENT:
 			process_window_event(event);
 			break;
