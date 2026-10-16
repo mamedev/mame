@@ -739,7 +739,7 @@ void atari_136094_0004a_device::write16(offs_t offset, uint16_t data)
 		if (data != 0x8016)
 		{
 			if ((data != 0x2694) && (data != 0x6ee0) && (data != 0x34f7) && (data != 0x32b9) && (data != 0x4d5a))
-				fatalerror("Unknown Character Protection Value %04x\n", data);
+				logerror("Unknown Character Protection Value %04x\n", data);
 
 			m_taps = bitswap<16>(data, 15, 10, 9, 14, 13, 8, 11, 12, 0, 3, 1, 5, 2, 4, 7, 6) ^ 0xd4c6;
 		}
