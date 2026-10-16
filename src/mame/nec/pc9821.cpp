@@ -24,9 +24,9 @@ TODO (pc9821ap2):
 \- cfr. io_wab.txt, interfaces with VGA core thru local bus via address-data ports at $fa2-3
 
 TODO (pc9821as):
-- keeps throwing "SET THE SOFTWARE DIP-SWITCH" at every start,
-  fails a sum8 ext SDIP check at PC=f8368 (wants 0x00 sums 0x5f);
-- Unrecognized HELP key, keyboard sends an 0xff when key held PC=f8918;
+- keeps throwing "SET THE SOFTWARE DIP-SWITCH" at every start, discarding external SDIP contents;
+- HELP key doesn't get recognized at boot, keyboard sends an 0xff when key held PC=f8918
+  (need to mash the key until it finally kicks in, has an incredibly narrow acceptance window);
 - derive pc9821ce style sound PnP access (doesn't access the EEPROM addresses);
 
 TODO (pc9821ce):
@@ -784,45 +784,6 @@ void pc9821_state::pc9821_io(address_map &map)
  * 98MATE A overrides
  */
 
-// TODO: SDIP extended access for 9821Ap, As, Ae. Move as device.
-// Undocumented, it never r/w the conventional ports, at least on POST.
-// I also suspect a few ports here not being direct RAM r/w but actual regs instead.
-// 0xf834f: checks against aa55, throws "ROM SUM ERROR" if bypassed (fixed with autoinc)
-// 0xf8363: sum8 contents of [0x02]++, 10 times
-u8 pc9821_mate_a_state::ext_sdip_data_r(offs_t offset)
-{
-	logerror("%s: EXT SDIP access read [%02x] %02x\n", machine().describe_context(), m_ext_sdip_addr, m_ext_sdip[m_ext_sdip_addr]);
-	const u8 res = m_ext_sdip[m_ext_sdip_addr];
-	if (!machine().side_effects_disabled())
-	{
-		//printf("%d R\n", m_ext_sdip_addr);
-		// TODO: does it always autoinc? What's the rollover cutoff?
-		m_ext_sdip_addr ++;
-		m_ext_sdip_addr &= 0xff; //%= 44;
-	}
-	return res;
-}
-
-void pc9821_mate_a_state::ext_sdip_data_w(offs_t offset, u8 data)
-{
-	logerror("%s: EXT SDIP access write [%02x] -> %02x\n", machine().describe_context(), m_ext_sdip_addr, data);
-
-	m_ext_sdip[m_ext_sdip_addr] = data;
-
-	m_ext_sdip_addr ++;
-	m_ext_sdip_addr &= 0xff; //%= 44;
-}
-
-void pc9821_mate_a_state::ext_sdip_access_w(offs_t offset, u8 data)
-{
-	// access enable?
-}
-
-void pc9821_mate_a_state::ext_sdip_address_w(offs_t offset, uint8_t data)
-{
-	m_ext_sdip_addr = data;
-}
-
 void pc9821_mate_a_state::itf_43d_bank_w(offs_t offset, uint8_t data)
 {
 	// assume overlay disabled on writes to $43d
@@ -890,9 +851,18 @@ void pc9821_mate_a_state::pc9821as_io(address_map &map)
 	// Ap, As, Ae and Af maps CPU mode bit 7 here (1) High/Low (0) Middle
 	// Low selector is in $7fdd bit 2 (mouse PIO range) at least for As
 	map(0x00f0, 0x00f0).lr8(NAME([] () { return 0x80; }));
-	map(0x0468, 0x0468).rw(FUNC(pc9821_mate_a_state::ext_sdip_data_r), FUNC(pc9821_mate_a_state::ext_sdip_data_w));
-	map(0x046a, 0x046a).w(FUNC(pc9821_mate_a_state::ext_sdip_access_w));
-	map(0x046c, 0x046c).w(FUNC(pc9821_mate_a_state::ext_sdip_address_w));
+	map(0x00f6, 0x00f6).lw8(NAME([this] (offs_t offset, u8 data) {
+		a20_ctrl_w(3, data);
+	}));
+
+	map(0x0468, 0x0468).rw("ext_sdip", FUNC(pc98_ext_sdip_device::data_r), FUNC(pc98_ext_sdip_device::data_w));
+	map(0x046a, 0x046a).w("ext_sdip", FUNC(pc98_ext_sdip_device::access_w));
+	map(0x046c, 0x046c).w("ext_sdip", FUNC(pc98_ext_sdip_device::address_w));
+
+	// disconnect regular SDIP access
+	// should really go through C-Bus but don't expect anything mapping there.
+	map(0x841c, 0x841f).select(0x300).unmaprw();
+	map(0x881c, 0x881f).select(0x700).unmaprw();
 	// TODO: specific MATE A local bus (overlays just like C-Bus?)
 }
 
@@ -1078,6 +1048,20 @@ static INPUT_PORTS_START( pc9821 )
 	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pc9821as )
+	PORT_INCLUDE( pc9821 )
+
+	PORT_MODIFY("DSW1")
+//	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )
+	PORT_BIT( 0x73, IP_ACTIVE_LOW, IPT_CUSTOM )
+
+	PORT_MODIFY("DSW2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )
+
+	PORT_MODIFY("DSW3")
+	PORT_BIT( 0x23, IP_ACTIVE_LOW, IPT_CUSTOM ) //PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw3_r))
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( pc9821ap2 )
 	PORT_INCLUDE( pc9821 )
 
@@ -1138,8 +1122,6 @@ MACHINE_START_MEMBER(pc9821_mate_a_state,pc9821ap2)
 
 	sram_init();
 	// ...
-
-	save_item(NAME(m_ext_sdip));
 }
 
 MACHINE_START_MEMBER(pc9821_canbe_state,pc9821_canbe)
@@ -1245,6 +1227,10 @@ void pc9821_mate_a_state::pc9821as(machine_config &config)
 	// FIXME: set clock to SCLK1 clock frequency
 	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "sound_pc9821ce", true);
+
+	config.device_remove("sdip");
+	PC98_EXT_SDIP(config, "ext_sdip");
+
 }
 
 void pc9821_mate_a_state::pc9821ap2(machine_config &config)
@@ -2087,8 +2073,8 @@ ROM_END
 COMP( 1992, pc9821,      0,          0, pc9821,        pc9821,    pc9821_state,        init_pc9801_kanji,   "NEC",   "PC-9821 (98MULTi)",             MACHINE_NOT_WORKING )
 
 // 98MATE [A] (i486, desktop, has 98 MATE local bus "ML", with optional RL-like high-reso)
-COMP( 1993, pc9821as,    0,          0, pc9821as,      pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821As (98MATE A)",          MACHINE_NOT_WORKING )
-COMP( 1993, pc9821ap2,   pc9821as,   0, pc9821ap2,     pc9821ap2, pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821Ap2/U8W (98MATE A)",     0 )
+COMP( 1993, pc9821as,    0,          0, pc9821as,      pc9821as,  pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821As (98MATE A)",          MACHINE_NOT_WORKING )
+COMP( 1993, pc9821ap2,   0,          0, pc9821ap2,     pc9821ap2, pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821Ap2/U8W (98MATE A)",     0 )
 
 // SC-9821A (rebranded MATE A machines with minor differences such as SW power control)
 // ...
