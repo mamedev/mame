@@ -341,9 +341,6 @@ void tmc600_state::printer_w(uint8_t data)
 	m_centronics->write_data5(BIT(data, 5));
 	m_centronics->write_data6(BIT(data, 6));
 	m_centronics->write_data7(BIT(data, 7));
-
-	m_centronics->write_strobe(0);
-	m_centronics->write_strobe(1);
 }
 
 int tmc600_state::ef2_r()
@@ -577,10 +574,11 @@ void tmc600_state::tmc600(machine_config &config)
 	cdp1852_device &prtout(CDP1852(config, CDP1852_TMC700_TAG)); // clock is CDP1802 TPB
 	prtout.mode_cb().set_constant(1);
 	prtout.do_cb().set(FUNC(tmc600_state::printer_w));
+	prtout.sr_cb().set(m_centronics, FUNC(centronics_device::write_strobe)).invert();
 
 	// printer connector
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
-	m_centronics->busy_handler().set(CDP1802_TAG, FUNC(cosmac_device::ef4_w)).exor(1);
+	m_centronics->busy_handler().set(CDP1802_TAG, FUNC(cosmac_device::ef4_w));
 
 	// cassette
 	CASSETTE(config, m_cassette);
@@ -608,6 +606,22 @@ void tmc600_state::tmc600(machine_config &config)
 //  ROM DEFINITIONS
 //**************************************************************************
 
+ROM_START( tmc600 )
+	ROM_REGION( 0x6000, CDP1802_TAG, 0 )
+	ROM_LOAD( "sb30",       0x0000, 0x1000, CRC(95d1292a) SHA1(1fa52d59d3005f8ac74a32c2164fdb22947c2748) )
+	ROM_LOAD( "sb31",       0x1000, 0x1000, CRC(2c8f3d17) SHA1(f14e8adbcddeaeaa29b1e7f3dfa741f4e230f599) )
+	ROM_LOAD( "sb32",       0x2000, 0x1000, CRC(dd58a128) SHA1(be9bdb0fc5e0cc3dcc7f2fb7ccab69bf5b043803) )
+	ROM_LOAD( "sb33",       0x3000, 0x1000, CRC(b7d241fa) SHA1(6f3eadf86c4e3aaf93d123e302a18dc4d9db964b) )
+	ROM_SYSTEM_BIOS( 0, "sb040282", "SB040282" )
+	ROMX_LOAD( "151182",    0x4000, 0x1000, CRC(c1a8d9d8) SHA1(4552e1f06d0e338ba7b0f1c3a20b8a51c27dafde), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "sbdos", "SBDOS" )
+	ROMX_LOAD( "151182_",   0x4000, 0x1000, NO_DUMP, ROM_BIOS(1) )
+	ROMX_LOAD( "151182_v",  0x5000, 0x1000, NO_DUMP, ROM_BIOS(1) )
+
+	ROM_REGION( 0x1000, "chargen", 0 )
+	ROM_LOAD( "chargen",    0x0000, 0x1000, CRC(93f92cbf) SHA1(371156fb38fa5319c6fde537ccf14eed94e7adfb) )
+ROM_END
+
 #if 0
 ROM_START( tmc600s1 )
 	ROM_REGION( 0x6000, CDP1802_TAG, 0 )
@@ -626,22 +640,6 @@ ROM_START( tmc600s1 )
 ROM_END
 #endif
 
-ROM_START( tmc600s2 )
-	ROM_REGION( 0x6000, CDP1802_TAG, 0 )
-	ROM_LOAD( "sb30",       0x0000, 0x1000, CRC(95d1292a) SHA1(1fa52d59d3005f8ac74a32c2164fdb22947c2748) )
-	ROM_LOAD( "sb31",       0x1000, 0x1000, CRC(2c8f3d17) SHA1(f14e8adbcddeaeaa29b1e7f3dfa741f4e230f599) )
-	ROM_LOAD( "sb32",       0x2000, 0x1000, CRC(dd58a128) SHA1(be9bdb0fc5e0cc3dcc7f2fb7ccab69bf5b043803) )
-	ROM_LOAD( "sb33",       0x3000, 0x1000, CRC(b7d241fa) SHA1(6f3eadf86c4e3aaf93d123e302a18dc4d9db964b) )
-	ROM_SYSTEM_BIOS( 0, "sb040282", "SB040282" )
-	ROMX_LOAD( "151182",    0x4000, 0x1000, CRC(c1a8d9d8) SHA1(4552e1f06d0e338ba7b0f1c3a20b8a51c27dafde), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "sbdos", "SBDOS" )
-	ROMX_LOAD( "151182_",   0x4000, 0x1000, NO_DUMP, ROM_BIOS(1) )
-	ROMX_LOAD( "151182_v",  0x5000, 0x1000, NO_DUMP, ROM_BIOS(1) )
-
-	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "chargen",    0x0000, 0x1000, CRC(93f92cbf) SHA1(371156fb38fa5319c6fde537ccf14eed94e7adfb) )
-ROM_END
-
 } // anonymous namespace
 
 //**************************************************************************
@@ -649,5 +647,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY        FULLNAME                     FLAGS
-//COMP( 1982, tmc600s1, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja I)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1982, tmc600s2, 0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, tmc600,   0,      0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja II)", MACHINE_SUPPORTS_SAVE )
+//COMP( 1982, tmc600s1, tmc600, 0,      tmc600,  tmc600, tmc600_state, empty_init, "Telercas Oy", "Telmac TMC-600 (Sarja I)",  MACHINE_SUPPORTS_SAVE )

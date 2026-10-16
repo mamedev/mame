@@ -47317,7 +47317,7 @@ tmc1800
 tmc2000
 
 @source:telercas/tmc600.cpp
-tmc600s2
+tmc600
 
 @source:telercas/tmc2000e.cpp
 tmc2000e
