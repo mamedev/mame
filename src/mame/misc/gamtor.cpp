@@ -432,6 +432,9 @@ void gamtor_vga_device::space_w(offs_t offset, u32 data, u32 mem_mask)
 			logerror("BitBLT BR%02X write while busy: line %d of %d, %d bytes queued, BR00 %08x BR03 %08x BR04 %08x BR06 %08x BR08 %08x\n",
 					r, m_blt_line, (m_br[8] >> 16) & 0x1fff, int(m_hostq.size()), m_br[0], m_br[3], m_br[4], m_br[6], m_br[8]);
 		m_br[r] = (m_br[r] & ~cmask) | (chip & cmask);
+		// reserved bits read as 0 (BR04 12-7, BR05 12-10, BR06 12-11, BR07 12-12); BR04 bit 31 is the read-only status
+		static const u32 br_mask[11] = { ~0U, ~0U, ~0U, ~0U, 0x007ff7ff, 0x007ffff8, 0x007fffff, 0x007fffff, ~0U, ~0U, ~0U };
+		m_br[r] &= br_mask[r];
 		if (r == 8 && (m_br[8] >> 16) & 0x1fff)
 			blt_start(); // a non-zero height starts the operation (E-2)
 	}
@@ -590,8 +593,9 @@ void gamtor_vga_device::blt_line(int i)
 		for (int k = 0; k < bpp; k++)
 			r |= u32(rop3(rop, p >> (8 * k), s >> (8 * k), d >> (8 * k))) << (8 * k);
 
-		// per-pixel write masking (BR04 17, 13, 16-14)
-		if (BIT(ctl, 17) && mono_pat && !solid && !pbit)
+		// per-pixel write masking (BR04 17, 13, 16-14). A solid pattern counts as all pattern bits 0 (12-7 bit 19),
+		// so with pattern write masking nothing is written
+		if (BIT(ctl, 17) && mono_pat && !pbit)
 			continue;
 		if (BIT(ctl, 13) && mono_src && !sbit)
 			continue;
