@@ -53,11 +53,15 @@ void t6m53_device::device_start() {
     state_add(T6M53_DPH, "DPH", m_regs[0x11e >> 1]).formatstr("%02X");
 
     save_item(NAME(m_regs));
-    save_item(NAME(m_pc));
     save_item(NAME(m_stack));
+
+    save_item(NAME(m_pc));
+    save_item(NAME(m_previous_pc));
+    save_item(NAME(m_write_repeat));
+    
+    save_item(NAME(m_isel));
     save_item(NAME(m_lastlow));
     save_item(NAME(m_lasthigh));
-    save_item(NAME(m_isel));
 
     save_item(NAME(m_ftimer));
     save_item(NAME(m_vtimer));
