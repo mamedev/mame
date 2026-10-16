@@ -19,10 +19,11 @@
 
     Disk module reference: Convergent Floppy/Hard Disk Manual,
     A-09-00328-01-A (January 1984), Figs. 2-5 and 3-9.
-    PAL 13E supplies an active-low byte-clock pulse to the 8253.  With CLK
-    idle high, loading a new mode 0 count requires two data accesses: the
-    first supplies the rising edge, and the second loads the counter on
-    its falling edge.  This accounts for the documented N-2 byte count.
+    PAL 13E supplies an active-low byte-clock pulse to the 8253.  The NGEN
+    driver phases the channel 0 input low when BTOS loads a mode 0 count, so
+    the first subsequent byte access supplies its rising edge and the next
+    falling edge loads the count.  This accounts for the documented N-2 byte
+    count without changing shared PIT behavior.
 
     DMA channels:
     channel 0 - communications (RS-232)
@@ -264,6 +265,9 @@ private:
 	bool m_fdc_irq = false;
 	bool m_fdc_timer0 = false;
 	bool m_fdc_timer1 = false;
+	uint8_t m_fdc_timer0_mode = 0xff;
+	uint8_t m_fdc_timer0_access = 0;
+	bool m_fdc_timer0_write_high = false;
 	bool m_kbd_rxrdy = false;
 	bool m_kbd_txrdy = false;
 };
@@ -663,7 +667,37 @@ void ngen_state::hfd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		case 0x0a:
 		case 0x0b:
 			if(ACCESSING_BITS_0_7)
+			{
+				if (offset == 0x0b)
+				{
+					// Keep the external-clock mode 0 load-edge handling local to the
+					// NGEN disk module. Its /DM clock idles high, but the standard
+					// PIT model expects a rising edge before the load's falling edge.
+					if ((data >> 6) == 0)
+					{
+						uint8_t const access = (data >> 4) & 0x03;
+						if (access)
+						{
+							m_fdc_timer0_access = access;
+							m_fdc_timer0_mode = (data >> 1) & ((data & 0x04) ? 0x03 : 0x07);
+							m_fdc_timer0_write_high = false;
+						}
+					}
+				}
+				else if (offset == 0x08 && (m_fdc_timer0_mode == 0))
+				{
+					bool count_complete = (m_fdc_timer0_access != 3);
+					if (m_fdc_timer0_access == 3)
+					{
+						count_complete = m_fdc_timer0_write_high;
+						m_fdc_timer0_write_high = !m_fdc_timer0_write_high;
+					}
+
+					if (count_complete)
+						m_fdc_timer->write_clk0(0);
+				}
 				m_fdc_timer->write(offset-0x08,data & 0xff);
+			}
 			break;
 		case 0x10:
 		case 0x11:
@@ -1183,6 +1217,9 @@ void ngen_state::machine_start()
 	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_fdc_timer0));
 	save_item(NAME(m_fdc_timer1));
+	save_item(NAME(m_fdc_timer0_mode));
+	save_item(NAME(m_fdc_timer0_access));
+	save_item(NAME(m_fdc_timer0_write_high));
 	m_cpu_timer_irq_timer = timer_alloc(FUNC(ngen_state::cpu_timer_irq_clear), this);
 	memory_share* vidshare = memshare("vram");
 	memory_share* fontshare = memshare("fontram");
@@ -1207,6 +1244,9 @@ void ngen_state::machine_reset()
 	m_fdc_irq = false;
 	m_fdc_timer0 = false;
 	m_fdc_timer1 = false;
+	m_fdc_timer0_mode = 0xff;
+	m_fdc_timer0_access = 0;
+	m_fdc_timer0_write_high = false;
 	m_fdc_timer->write_clk0(1);
 	if (m_maincpu)
 		m_fdc_timer->write_gate1(0);
