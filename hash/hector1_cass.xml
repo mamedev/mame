@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="hector1_cass" description="Micronique Hector 1 / Victor Lambda cassettes">
+<!--
+Software for the Micronique Hector 1 / Victor Lambda computers.
+Also fully compatible with Interact Family Computer and supported by Hector 2HR and Hector HRX computers, via a dedicated Hector 1 menu option.
+
+Much of the software is French language conversions of existing Interact Family Computer software, with some being original French software.
+-->
+
+	<software name="addition" supported="no">
+		<description>Addition</description>
+		<year>19??</year>
+		<publisher>Victor Lambda</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="16372">
+				<rom name="Addition (19xx)(Victor Lambda).k7" size="16372" crc="649bfc9e" sha1="1ed81b6e003fd7a0762dd1cf69ac9d7bf68ff80c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alunisge" supported="no">
+		<description>Alunissage</description>
+		<year>19??</year>
+		<publisher>Victor Lambda</publisher>
+		<info name="usage" value="Load Basic Parallel Printer, type CLOAD then ENTER" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="13899">
+				<rom name="Alunissage (19xx)(Victor Lambda).k7" size="13899" crc="e74d4b07" sha1="3f55fdb82ce89c6cd16c99c2f670453d0d6c35a3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="annonces" supported="yes">
+		<description>Centrale d'annonces</description>
+		<year>19??</year>
+		<publisher>Victor Lambda</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="7632">
+				<rom name="Centrale d'annonces (19xx)(Victor Lambda).k7" size="7632" crc="e5935ac8" sha1="7d78342cfc28370f0ae6c59b05fc107bd0461460"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteroid" supported="yes">
+		<description>Asteroides</description>
+		<year>1982</year>
+		<publisher>Micro Video Corp</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="18901">
+				<rom name="Asteroides (1982)(Micro Video Corp).k7" size="18901" crc="39237a3f" sha1="28c885a778ae08ef3053dad73930453d9ff13f2c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baroude" supported="yes">
+		<description>Le Baroudeur</description>
+		<year>19??</year>
+		<publisher>Algorithme</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="12319">
+				<rom name="Le Baroudeur (19xx)(Algorithme).k7" size="12319" crc="8f7b6137" sha1="dcf85a40d1c14309eb1a972ab3d97a75422c6f23"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basespat" supported="yes">
+		<description>Base Spatiale</description>
+		<year>1981</year>
+		<publisher>Micro Video Corp</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="15219">
+				<rom name="Base Spatiale (1981)(Micro Video Corp).k7" size="15219" crc="dc6d2779" sha1="7659dedd30d59f08a5b3bfb929f2c3fc3ee82dc6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicpp" supported="yes">
+		<description>Basic Parallel Printer</description>
+		<year>1980</year>
+		<publisher>Micro Video Corp</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="11659">
+				<rom name="Basic Parallel Printer (1980)(Micro Video Corp).k7" size="11659" crc="a49b4890" sha1="3457ba2bd1d60531d96ed6d49febc55c127c464a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicppa" supported="yes" cloneof="basicpp">
+		<description>Basic Parallel Printer (alt)</description>
+		<year>1980</year>
+		<publisher>Micro Video Corp</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="11659">
+				<rom name="Basic Parallel Printer (1980)(Micro Video Corp)(alt).k7" size="11659" crc="78d5dc03" sha1="e12f42c658173550cb86d5b8478699e489cdb42d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="briques" supported="yes">
+		<description>Le Mur de Briques</description>
+		<year>19??</year>
+		<publisher>Victor Lambda</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="7767">
+				<rom name="Le Mur de Briques (19xx)(Victor Lambda).k7" size="7767" crc="6a5bfa4c" sha1="2e678b34df9fb61b1b37c55785d73c59adcce6f6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caverne" supported="yes">
+		<description>La Caverne des Lutins</description>
+		<year>19??</year>
+		<publisher>Hector</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="16408">
+				<rom name="La Caverne des Lutins (19xx)(Hector).k7" size="16408" crc="4a563240" sha1="179c3ea0175df186d5bc90ce5cc6bbbaf81114e6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chatbyth" supported="yes">
+		<description>Chatbyrinthe</description>
+		<year>19??</year>
+		<publisher>Victor Lambda</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="16368">
+				<rom name="Chatbyrinthe (19xx)(Victor Lambda).k7" size="16368" crc="24e498d2" sha1="ad02735e180bd1bfc4eaf2d38aea798837d6728f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chess" supported="yes">
+		<description>Micro-Chess</description>
+		<year>19??</year>
+		<publisher>Victor Lambda</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="8178">
+				<rom name="Micro-Chess (19xx)(Victor Lambda).k7" size="8178" crc="d6b97af0" sha1="fd26b4d536114f598ff1ae9774b38c78cef45d9e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colorimg" supported="yes">
+		<description>Colorimage</description>
+		<year>19??</year>
+		<publisher>Hector</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="9010">
+				<rom name="Colorimage (19xx)(Hector).k7" size="9010" crc="98d17a66" sha1="bd648d901cc5e06740bf8ad5f2088da669afdc8b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="combat" supported="yes">
+		<description>Combat!</description>
+		<year>19??</year>
+		<publisher>Victor Lambda</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="16408">
+				<rom name="Combat! (19xx)(Victor Lambda).k7" size="16408" crc="e3d66518" sha1="60981a0eb3efb464bbc000980f22004557f316b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cowboys" supported="yes">
+		<description>Cow-Boys</description>
+		<year>19??</year>
+		<publisher>Victor Lambda</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="8315">
+				<rom name="Cow-Boys (19xx)(Victor Lambda).k7" size="8315" crc="141d8fc8" sha1="50c32f81801eafa7ee1cb093e54d8436480cc322"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crazy8" supported="yes">
+		<description>Crazy 8</description>
+		<year>19??</year>
+		<publisher>Victor Lambda</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="8416">
+				<rom name="Crazy 8 (19xx)(Victor Lambda).k7" size="8416" crc="019fe0f8" sha1="2537eeb44b916cedc8b98d9917301fbfd9f8bf00"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="creditai" supported="yes">
+		<description>Credits Avec Imprimante</description>
+		<year>19??</year>
+		<publisher>Hector</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="32626">
+				<rom name="Credits Avec Imprimante (19xx)(Hector).k7" size="32626" crc="89edc932" sha1="82c9957206fdeb9337aba4eaba3eec9f00a3cf19"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="creditsi" supported="no">
+		<description>Credit Sans Imprimante</description>
+		<year>19??</year>
+		<publisher>Hector</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="32648">
+				<rom name="Credit Sans Imprimante (19xx)(Hector).k7" size="32648" crc="8f0389e0" sha1="a342a802044cc3953def3e57dfe3a3833e37b124"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dogfight" supported="no">
+		<description>Dog-Fight</description>
+		<year>19??</year>
+		<publisher>Victor Lambda</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="16661">
+				<rom name="Dog-Fight (19xx)(Victor Lambda).k7" size="16661" crc="084f9cda" sha1="debf86503bca6b2b064a66280ea2ab1859dd5fff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="edubasic" supported="yes">
+		<description>EDU-Basic</description>
+		<year>19??</year>
+		<publisher>Lambda Systemes</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="7664">
+				<rom name="EDU-Basic (19xx)(Lambda Systemes).k7" size="7664" crc="7331160d" sha1="5519fd24948621ed91ec55958ccc59201df76917"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="encercle" supported="yes">
+		<description>Encerclement</description>
+		<year>19??</year>
+		<publisher>Victor Lambda</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="8369">
+				<rom name="Encerclement (19xx)(Victor Lambda).k7" size="8369" crc="9da679b6" sha1="8b0fe0f9131911899dd24a58253266e8efdb4251"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="envhisrs" supported="yes">
+		<description>Les Envahisseurs</description>
+		<year>1981</year>
+		<publisher>Micro Video Corp</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="5703">
+				<rom name="Les Envahisseurs (1981)(Micro Video Corp).k7" size="5703" crc="508bb8e3" sha1="4167f2d7bee399d02a1d6a241cf3b42637043ec7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flipper" supported="yes">
+		<description>Flipper</description>
+		<year>19??</year>
+		<publisher>Algorithme</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="8104">
+				<rom name="Flipper (19xx)(Algorithme).k7" size="8104" crc="24a3213f" sha1="0a8546750ff3f739b85256e64dd149581c6f29f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="formule1" supported="yes">
+		<description>Formule 1</description>
+		<year>19??</year>
+		<publisher>P.A.M.P.U.k</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="16403">
+				<rom name="Formule 1 (19xx)(P.A.M.P.U.k).k7" size="16403" crc="c9409ddd" sha1="82fe3a91f3ad49432f6db3c347be762cb8417f1b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxius" supported="yes">
+		<description>Galaxius</description>
+		<year>1982</year>
+		<publisher>Micro Video Corp</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="8189">
+				<rom name="Galaxius (1982)(Micro Video Corp).k7" size="8189" crc="d49f3f3e" sha1="5f3c4fcad0781179120fcdf8d3740488af2dbbea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="glouton" supported="yes">
+		<description>Le Glouton</description>
+		<year>1981</year>
+		<publisher>Micro Video Corp</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="25566">
+				<rom name="Le Glouton (1981)(Micro Video Corp).k7" size="25566" crc="41d88d3e" sha1="2dd144071977a21485ab217a7128caa1aaf4b3fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goofgolf" supported="yes">
+		<description>Goofy Golf</description>
+		<year>19??</year>
+		<publisher>Victor Lambda</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="15844">
+				<rom name="Goofy Golf (19xx)(Victor Lambda).k7" size="15844" crc="d3da2d01" sha1="36a37616bfcb2f3079308dc2c69010023f42df7d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grenouil" supported="yes">
+		<description>Grenouille</description>
+		<year>1982</year>
+		<publisher>Hector</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="9792">
+				<rom name="Grenouille (1982)(Hector).k7" size="9792" crc="38e23440" sha1="93f1b3f245fb34157777dddac354cf9262f062df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeupendu" supported="no">
+		<description>Le Jeu de Pendu</description>
+		<year>19??</year>
+		<publisher>Victor Lambda</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="16410">
+				<rom name="Le Jeu de Pendu (19xx)(Victor Lambda).k7" size="16410" crc="d2e51733" sha1="c4e24359d15d13d7cbfb96513c8d24e03ccd559e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeuvie" supported="yes">
+		<description>Jeu de la Vie</description>
+		<year>1980</year>
+		<publisher>Micro Video Corp</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="3895">
+				<rom name="Jeu de la Vie (1980)(Micro Video Corp).k7" size="3895" crc="04474129" sha1="0775dcfdcbc50736c5f36cfc1de84b355b31c684"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeuviea" supported="yes" cloneof="jeuvie">
+		<description>Jeu de la Vie (Alt)</description>
+		<year>1980</year>
+		<publisher>Micro Video Corp</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="3895">
+				<rom name="Jeu de la Vie (Alt) (1980)(Micro Video Corp).k7" size="3895" crc="74e20dfa" sha1="1a0b84385fb50643ae7638ff72d8cf09fdee345b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="othello" supported="yes">
+		<description>Othello</description>
+		<year>19??</year>
+		<publisher>Hector</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="8556">
+				<rom name="Othello (19xx)(Hector).k7" size="8556" crc="aa972b7e" sha1="5cc12a25c6e0f9eb5f1a0adb369bde0595a81939"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="piranhas" supported="yes">
+		<description>Piranhas</description>
+		<year>19??</year>
+		<publisher>Algorithme</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="7621">
+				<rom name="Piranhas (19xx)(Algorithme).k7" size="7621" crc="65f92c7a" sha1="bad571493690a8ccb67d92674c22de3df0c79ab1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="regates" supported="yes">
+		<description>Regates</description>
+		<year>19??</year>
+		<publisher>Victor Lambda</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="8178">
+				<rom name="Regates (19xx)(Victor Lambda).k7" size="8178" crc="f2cf2630" sha1="e90f8ad07e7af07c9e5c9f38ce82417bec7f35c3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sousmarn" supported="yes">
+		<description>Sous-Marin</description>
+		<year>1981</year>
+		<publisher>Micro Video Corp</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="9213">
+				<rom name="Sous-Marin (1981)(Micro Video Corp).k7" size="9213" crc="3f5efeec" sha1="6e675035ac2f7fd1df75182bba2a3182c97f854a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tartares" supported="no">
+		<description>Le Désert Des Tartares</description>
+		<year>19??</year>
+		<publisher>Victor Lambda</publisher>
+		<info name="usage" value="Load Basic Parallel Printer, type CLOAD then ENTER" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="7311">
+				<rom name="Le Désert Des Tartares (19xx)(Victor Lambda).k7" size="7311" crc="3571750b" sha1="bf63a0dbba49d290430df6a95ba72a9194ae33db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="volleybl" supported="yes">
+		<description>Volleyball</description>
+		<year>19??</year>
+		<publisher>Victor Lambda</publisher>
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="8178">
+				<rom name="Volleyball (19xx)(Victor Lambda).k7" size="8178" crc="24c0e861" sha1="b81b3b210ff6e5117ffc6ac7b64da2bfa4b41ee5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yathzee" supported="yes">
+		<description>Micro-Yathzee</description>
+		<year>19??</year>
+		<publisher>Victor Lambda</publisher>
+		<info name="usage" value="Load Basic Parallel Printer, type CLOAD then ENTER" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="6107">
+				<rom name="Micro-Yathzee (19xx)(Victor Lambda).k7" size="6107" crc="af89f07a" sha1="93d098f2d0e6c5d673d70afe27395a9535b3d98b"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
