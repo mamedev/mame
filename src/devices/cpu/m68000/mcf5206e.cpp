@@ -1048,7 +1048,7 @@ void coldfire_timer_device::tmr_w(u16 data)
 	if(m_tmr & T_RST)
 	{
 		// TODO: add tin pin support
-		// TIMER-1: "the reference register is matched after (TRR+1) time intervals" (UM 14.4.1.2, rendered p. 14-5):
+		// "the reference register is matched after (TRR+1) time intervals" (MCF5206e UM 14.4.1.2):
 		// TCN counts 0..TRR, the event comes on the step after TCN == TRR. Restart mode then counts from 0 again
 		// (TRR+1 intervals per period); free run continues through $FFFF, so the next match is $10000 intervals later.
 		int div, start, interval;
@@ -1088,7 +1088,7 @@ void coldfire_timer_device::ter_w(u8 data)
 {
 	m_ter &= ~data; // Programmer must write bit to clear it. IE write 0x80 to clear bit 7.
 	LOGMASKED(LOG_TIMER, "%s: (Timer Event) TER_w: %02x\n", this->machine().describe_context(), data);
-	// TIMER-1: "the REF and CAP bits must be cleared before the timer will negate the IRQ" (UM 14.4.1.5, p. 14-6)
+	// "the REF and CAP bits must be cleared before the timer will negate the IRQ" (MCF5206e UM 14.4.1.5)
 	if (!(m_ter & (T_EREF | T_ECAP)))
 		write_irq(CLEAR_LINE);
 }

@@ -65,8 +65,7 @@
 // 65550 is used by Apple PowerBook 2400c
 // 65535 is used by IBM PC-110
 
-// VGA-1: Chips & Technologies 65550 (HiQV) on the Novomatic P378-1 VGA board, from the 65550 data sheet rev 1.5
-// (docs/65550.pdf, read from rendered pages):
+// Chips & Technologies 65550 (HiQV) on the Novomatic P378-1 VGA board, from the 65550 data sheet rev 1.5:
 // - Bus: the ColdFire (big endian) data bus is wired straight to the little-endian chip, so a CPU byte at lane l
 //   reaches chip byte l ^ 3. That is why the I/O ports appear with A0/A1 inverted; for memory space accesses the
 //   software uses the XR0A endian swap (0x20 = byte 0<>3, 1<>2) to undo it.
@@ -682,8 +681,8 @@ const tiny_rom_entry *mc_mk4_hopper_device::device_rom_region() const
 }
 
 
-// WBA-1: JCM WBA bill validator with the ID-003 interface, from "ID-003 Communication Specification" rev. 05
-// (docs/ID-003_rev05_E.pdf, read from rendered pages). 9600 bps, 8 data bits, even parity, 1 stop bit (2).
+// JCM WBA bill validator with the ID-003 interface, from "ID-003 Communication Specification" rev. 05.
+// 9600 bps, 8 data bits, even parity, 1 stop bit (2).
 // Frames: FCh, LNG (SYNC through CRC), CMD/status, DATA, CRC-CCITT low/high (3, appendix 1).
 // Power up (7-1): POWER UP until RESET, then INITIALIZE while the settings arrive, then ENABLE or DISABLE.
 // Accepting (7-2): ACCEPTING, ESCROW + code, STACK-1/2 from the controller, STACKING, VEND VALID until the
@@ -955,7 +954,7 @@ void jcm_wba_device::command()
 		for (int i = 0; i < 9; i++)
 		{
 			r[1 + i * 4] = 0x61 + i;
-			r[2 + i * 4] = eur[i][0] ? 0x0b : 0x00; // TODO: euro country type from Table 1-1 (not rendered yet)
+			r[2 + i * 4] = eur[i][0] ? 0x0b : 0x00; // TODO: euro country type from Table 1-1 (unknown)
 			r[3 + i * 4] = eur[i][0];
 			r[4 + i * 4] = eur[i][1];
 		}
@@ -1003,7 +1002,7 @@ TIMER_CALLBACK_MEMBER(jcm_wba_device::step)
 
 
 
-// SND-1: AGI custom sound chip at 0x1e040000 (CoolFire I "Gaminator" audio path), modelled from the firmware only
+// AGI custom sound chip at 0x1e040000 (CoolFire I "Gaminator" audio path), modelled from the firmware only
 // (no chip documentation exists in the collected manuals):
 // - The kernel registers a level 4 handler (0x2e7e874, pea'd at 0x2e7e940) that reads bit 6 of the base register and,
 //   when set, feeds the chip: $4(reg) <- obj->$6c (next CPU address), (reg) <- obj->$20 >> 2 + 0xb0000000.
@@ -1017,7 +1016,7 @@ TIMER_CALLBACK_MEMBER(jcm_wba_device::step)
 // - $8(reg) is written by the kernel input driver with the strap/test masks (0xfffffeff / 0x7ffffeff); function unknown,
 //   stored and returned as-is (it reads back in the self-test poll).
 // - The sample rate is a hardware constant the firmware never programs. CoolFire sound is commonly 44100 Hz; the
-//   device makes it a clock-derived configuration so it can be corrected from a measurement on the real cabinet.
+//   rate here is an assumption until it is checked on real hardware.
 class gamtor_snd_device : public device_t, public device_sound_interface
 {
 public:
@@ -1046,12 +1045,10 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
-	// SND-3: output FIFO depth in frames. The chip's DMA fetches a block ahead of the DAC; the request (bit 30)
+	// Output FIFO depth in frames. The chip's DMA fetches a block ahead of the DAC; the request (bit 30)
 	// rises when the last frame of the current block has been FETCHED, while the FIFO still plays it out, so the
-	// kernel's re-arm chains the next block without a gap. The real depth is undocumented; the rendered audio is
-	// identical for any depth longer than the request->re-arm latency. MEASURED (120 s headless run, SND-3 latency
-	// log): usually < 1 ms, worst 1979 us (kernel sections with the level 4 masked) - 64 frames (1.45 ms) gave 21
-	// underruns. 256 frames = 5.8 ms covers the worst case ~3x.
+	// kernel's re-arm chains the next block without a gap. The real depth is undocumented; any depth longer than
+	// the request->re-arm latency (up to ~2 ms while the kernel masks level 4) gives the same output.
 	static constexpr u32 FIFO_FRAMES = 256;
 
 	TIMER_CALLBACK_MEMBER(req_timer);
@@ -1080,16 +1077,9 @@ private:
 	bool m_fifo_valid = false;
 	u32 m_mask = 0;             // +8: kernel strap/test mask, stored verbatim
 	u32 m_reg8 = 0;             // last written +8 value
-	u32 m_armtrace = 0;         // diagnostic counter for the first arm writes (log-limited)
-	u32 m_underruns = 0;        // diagnostic: blocks that ended with no re-arm latched
-	attotime m_req_time;        // diagnostic: when the request rose
-	double m_lat_max = 0;
-	u32 m_latlog = 0;
 };
 
 DEFINE_DEVICE_TYPE(GAMTOR_SND, gamtor_snd_device, "gamtor_snd", "AGI CoolFire sound chip")
-
-namespace {
 
 gamtor_snd_device::gamtor_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GAMTOR_SND, tag, owner, clock)
@@ -1198,8 +1188,6 @@ void gamtor_snd_device::reg_w(offs_t offset, u32 data, u32 mem_mask)
 	switch (offset)
 	{
 	case 0: // +4: the L4 ISR writes the next block address here (obj->$6c)
-		if (m_armtrace < 500)
-			logerror("SND sar <- %08X %s\n", data, machine().describe_context().c_str());
 		m_stream->update();
 		m_sar = data;
 		break;
@@ -1211,12 +1199,6 @@ void gamtor_snd_device::reg_w(offs_t offset, u32 data, u32 mem_mask)
 
 void gamtor_snd_device::arm_w(u32 data)
 {
-	// trace the first arm writes only (diagnostic; the steady-state chain is measured)
-	if (m_armtrace < 500)
-	{
-		m_armtrace++;
-		logerror("SND arm_w data=%08X %s\n", data, machine().describe_context().c_str());
-	}
 	// bring the output up to the write's time first, so the change lands on the right sample
 	m_stream->update();
 	if (data == 0)
@@ -1233,21 +1215,12 @@ void gamtor_snd_device::arm_w(u32 data)
 	else
 	{
 		// descriptor (arm/re-arm): frames per block in the low bits (the firmware writes
-		// (size>>2)+0xb0000000; the measured arm write was B0000400 -> 0x400 = 1024 frames).
+		// (size>>2)+0xb0000000, e.g. B0000400 = 1024 frames).
 		// The re-arm also acknowledges the block request: bit 30 clears and the level 4 line drops.
-		// SND-3: double-buffered - while a block still plays out of the FIFO the descriptor and the
+		// Double-buffered: while a block still plays out of the FIFO the descriptor and the
 		// +4 address are latched as the NEXT block and chained without a gap; from stop/underrun the
 		// block starts at once.
 		const u32 size = data & 0x00ffffff;
-		if (m_block_pending)
-		{
-			// diagnostic: request -> re-arm latency (the FIFO must cover it)
-			const double lat = (machine().time() - m_req_time).as_double() * 1e6;
-			if (lat > m_lat_max)
-				m_lat_max = lat;
-			if (lat > 1000.0 && m_latlog++ < 50)
-				logerror("SND re-arm latency %.0f us at %s (active=%d)\n", lat, machine().time().as_string(), m_active);
-		}
 		m_armed = true;
 		m_block_pending = false;
 		m_irq_cb(0);
@@ -1290,7 +1263,6 @@ void gamtor_snd_device::sound_stream_update(sound_stream &stream)
 					m_fifo[f - m_fifo_base] = m_dspace->read_dword(m_cur + f * 4);
 				m_fifo_valid = true;
 				m_block_pending = true;
-				m_req_time = machine().time();
 				m_irq_cb(1);
 			}
 
@@ -1309,11 +1281,9 @@ void gamtor_snd_device::sound_stream_update(sound_stream &stream)
 					if (!m_block_pending)
 					{
 						m_block_pending = true;
-						m_req_time = machine().time();
 						m_irq_cb(1);
 					}
-					if (m_underruns++ < 50)
-						logerror("SND underrun #%u at %s (max re-arm latency so far %.0f us)\n", m_underruns, machine().time().as_string(), m_lat_max);
+					logerror("underrun at %s\n", machine().time().as_string());
 				}
 			}
 		}
@@ -1323,6 +1293,8 @@ void gamtor_snd_device::sound_stream_update(sound_stream &stream)
 }
 
 
+
+namespace {
 
 class gaminator_state : public driver_device
 {
@@ -1364,7 +1336,7 @@ private:
 	void gaminator_map(address_map &map) ATTR_COLD;
 
 	void gamtor_unk_w(uint32_t data);
-	// SND-1: base register of the AGI sound chip. Read: the SYS input port with the chip status bits OR-ed in
+	// base register of the AGI sound chip. Read: the SYS input port with the chip status bits OR-ed in
 	// (bit 31 DMA active, bit 6 FIFO refill request - the kernel reads inputs 0x40-0x5f from here XOR 0x60, and the
 	// L4 handler polls bit 6 directly). Write: descriptor (0 = stop, else size in words in the low bits = re-arm).
 	u32 snd_base_r();
@@ -1384,7 +1356,7 @@ private:
 	{
 		std::fill(std::begin(m_outlatch), std::end(m_outlatch), 0);
 		save_item(NAME(m_outlatch));
-		// SND-1: give the sound chip the ColdFire program space pointer (late binding, config-time finders
+		// give the sound chip the ColdFire program space pointer (late binding, config-time finders
 		// cannot reach a sibling device's space from a non-child device)
 		m_snd->set_dma_space(m_maincpu->space(0));
 	}
@@ -1403,8 +1375,8 @@ private:
 
 u32 gaminator_state::snd_base_r()
 {
-	// IO-1: the SYS port bits (logical inputs 0x40-0x5f read this register XOR 0x60), combined with the
-	// chip status bits the kernel measures directly (L4 handler: bit 6; self-test 0x2e8a880: bit 31).
+	// the SYS port bits (logical inputs 0x40-0x5f read this register XOR 0x60), combined with the
+	// chip status bits the kernel tests directly (L4 handler: bit 6; self-test 0x2e8a880: bit 31).
 	u32 data = m_sys->read();
 	data |= m_snd->status_r();
 	return data;
@@ -1421,28 +1393,28 @@ void gaminator_state::gaminator_map(address_map &map)
 {
 	map(0x00000000, 0x07ffffff).rom();
 	map(0x08000000, 0x0bffffff).ram();
-	// RTC-1: Epson RTC72423, 16 four-bit registers on D7-D0, one per long word. The kernel (0x2e8aaec) sets and
+	// Epson RTC72423, 16 four-bit registers on D7-D0, one per long word. The kernel (0x2e8aaec) sets and
 	// clears bits of CD/CE/CF at 0x18070034/38/3c and reads the time digits from 0x18070000-0x30.
 	map(0x18070000, 0x1807003f).rw("rtc", FUNC(rtc72423_device::read), FUNC(rtc72423_device::write)).umask32(0x000000ff);
-	// UART-1: TL16C554 quad UART, channels A-D at 0x20 apart, registers on D7-D0 one per long word. The kernel
+	// TL16C554 quad UART, channels A-D at 0x20 apart, registers on D7-D0 one per long word. The kernel
 	// (0x2e83156) clears IER, MCR and SCR of the four channels at 0x1a070004/10/1c + n * 0x20.
 	map(0x1a070000, 0x1a07001f).rw(m_uart[0], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff);
 	map(0x1a070020, 0x1a07003f).rw(m_uart[1], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff);
 	map(0x1a070040, 0x1a07005f).rw(m_uart[2], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff);
 	map(0x1a070060, 0x1a07007f).rw(m_uart[3], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff);
-	map(0x1c070000, 0x1c07000f).r(FUNC(gaminator_state::inputs_r)); // IO-1
-	// IO-2: the kernel's output driver (0x6ee54 set, 0x6eebc clear) keeps one 16-bit shadow word per group and
+	map(0x1c070000, 0x1c07000f).r(FUNC(gaminator_state::inputs_r));
+	// the kernel's output driver (0x6ee54 set, 0x6eebc clear) keeps one 16-bit shadow word per group and
 	// writes it with move.w to 0x1c070000 + ((n >> 2) & 0x0c), i.e. on D31-D16, 1 = output n on
 	map(0x1c070000, 0x1c07000f).w(FUNC(gaminator_state::outputs_w));
-	// SND-1: the AGI sound chip. +0: W descriptor (0=stop, else frames/block in the low bits),
+	// the AGI sound chip. +0: W descriptor (0=stop, else frames/block in the low bits),
 	// R status (byte view on the BE bus: byte bit 7 = armed, byte bit 6 = block request = dword bit 30);
 	// +4 SAR (CPU RAM address the chip's DMA reads), +8 strap/test mask register.
 	// The 0x40-0x5f logical inputs read the base register XOR 0x60 (kernel 0x6ef80), so the input view and the
-	// chip status share the register; the state combines them (chip status on the measured bits, SYS port on the rest).
+	// chip status share the register; the state combines them (chip status on the tested bits, SYS port on the rest).
 	map(0x1e040000, 0x1e040003).rw(FUNC(gaminator_state::snd_base_r), FUNC(gaminator_state::snd_base_w));
 	map(0x1e040004, 0x1e04000b).rw(m_snd, FUNC(gamtor_snd_device::reg_r), FUNC(gamtor_snd_device::reg_w));
 
-	// SRAM-1: CS2 (CSAR2 0x2000, CSMR2 0x0fff0000, CSCR2 0x0d5b = 3 WS, AA, 8-bit port) holds the two battery-backed
+	// CS2 (CSAR2 0x2000, CSMR2 0x0fff0000, CSCR2 0x0d5b = 3 WS, AA, 8-bit port) holds the two battery-backed
 	// CS18LV10245 128K x 8 SRAMs (main PCB, see the header), 256KB in all. The kernel tests 0x40000 bytes from
 	// 0x20000000 ("256KB RAM test", 0x4bb26), so they are contiguous there. The game's RAM init (0x2e85e78) writes the
 	// same data at 0x20000000 and 0x20800000 and requires them to read back equal: A23 is not decoded and 0x20800000
@@ -1453,17 +1425,17 @@ void gaminator_state::gaminator_map(address_map &map)
 	//map(0x40000000, 0x40000fff).ram(); // regs
 	map(0x400003b0, 0x400003df).m("vga", FUNC(gamtor_vga_device::io_map));
 
-	// VGA-1: the 65550 memory space (frame buffer, BitBLT registers, BitBLT data port), see gamtor_vga_device
+	// the 65550 memory space (frame buffer, BitBLT registers, BitBLT data port), see gamtor_vga_device
 	map(0x44000000, 0x447fffff).rw("vga", FUNC(gamtor_vga_device::space_r), FUNC(gamtor_vga_device::space_w));
 
-	// VGA-2: second VGA board
+	// second VGA board
 	map(0x480003b0, 0x480003df).m("vga2", FUNC(gamtor_vga_device::io_map));
 	map(0x4c000000, 0x4c7fffff).rw("vga2", FUNC(gamtor_vga_device::space_r), FUNC(gamtor_vga_device::space_w));
 
 	map(0xe0000000, 0xe00001ff).ram(); // NVRAM?
 }
 
-// IO-1: the kernel's input driver (0x6ef30/0x6ee06) reads logical inputs 0x00-0x3f as bit (n & 15) of the 32-bit
+// the kernel's input driver (0x6ef30/0x6ee06) reads logical inputs 0x00-0x3f as bit (n & 15) of the 32-bit
 // word at 0x1c070000 + ((n >> 2) & 0x0c), inverted (active low), and inputs 0x40-0x5f as bit (n - 0x40) of
 // 0x1e040000 XOR 0x60. Lines without a known function stay IPT_UNKNOWN at their idle (high) level.
 // The panel keys come from the kernel's key table (bookra ROM 0x6371c, 24-byte entries: key id, input line, lamp
@@ -1545,14 +1517,14 @@ void gaminator_state::gaminator(machine_config &config)
 	MCF5206E(config, m_maincpu, 33.333_MHz_XTAL); // ColdFire MCF5406ECAB40
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaminator_state::gaminator_map);
 
-	// MBUS-1: 24C04 SEEPROM on the ColdFire M-Bus (main PCB P379-6, see the header); its contents are the
+	// 24C04 SEEPROM on the ColdFire M-Bus (main PCB P379-6, see the header); its contents are the
 	// "seeprom" ROM region. SDA is open drain: the CPU's M-Bus reads the line the EEPROM drives.
 	I2C_24C04(config, m_seeprom);
 	m_maincpu->sda_w_cb().set(m_seeprom, FUNC(i2cmem_device::write_sda));
 	m_maincpu->scl_w_cb().set(m_seeprom, FUNC(i2cmem_device::write_scl));
 	m_maincpu->sda_r_cb().set(m_seeprom, FUNC(i2cmem_device::read_sda));
 
-	// SRAM-1: both SRAMs are kept by the 3.6V battery
+	// both SRAMs are kept by the 3.6V battery
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 
 	screen_device &screen(SCREEN(config, "screen"));
@@ -1563,7 +1535,7 @@ void gaminator_state::gaminator(machine_config &config)
 	vga.set_screen("screen");
 	vga.set_vram_size(0x200000); // 4 x IS41C16256 (256K x 16) = 2MB
 
-	// VGA-2: second P378-1 VGA board (top monitor). The video module (0x2e96b0e) puts board 0 I/O at 0x40000000 and
+	// second P378-1 VGA board (top monitor). The video module (0x2e96b0e) puts board 0 I/O at 0x40000000 and
 	// board 1 at 0x48000000, memory space at I/O + 0x4000000, and stops with "Soporte fisico no existe" (VI/3/1127)
 	// when the board 1 DAC mask does not read back (0x2e95a48).
 	screen_device &screen2(SCREEN(config, "screen2"));
@@ -1575,7 +1547,7 @@ void gaminator_state::gaminator(machine_config &config)
 	vga2.set_vram_size(0x200000);
 
 	SPEAKER(config, "speaker", 2).front();
-	// SND-1: AGI custom sound chip at 0x1e040000. The kernel's level 4 handler (0x2e7e874) is registered for the
+	// AGI custom sound chip at 0x1e040000. The kernel's level 4 handler (0x2e7e874) is registered for the
 	// chip's refill request (bit 6 of the base register), so the IRQ line reaches the ColdFire on level 4.
 	gamtor_snd_device &snd(GAMTOR_SND(config, "snd"));
 	snd.irq_bind().set_inputline(m_maincpu, 4);
@@ -1584,7 +1556,7 @@ void gaminator_state::gaminator(machine_config &config)
 
 	RTC72423(config, "rtc", XTAL(32'768)); // Fake crystal value, the 72423 uses its own internal crystal
 
-	// UART-1: TL16C554 (four 16550 channels) near an 8 MHz xtal (the kernel's divisor 52 gives 9600 baud). The
+	// TL16C554 (four 16550 channels) near an 8 MHz xtal (the kernel's divisor 52 gives 9600 baud). The
 	// level 1 ISR registered by the kernel (0x2e80518) scans IIR of all four channels: INT A-D reach IRQ1.
 	input_merger_device &uart_irq(INPUT_MERGER_ANY_HIGH(config, "uart_irq"));
 	uart_irq.output_handler().set_inputline(m_maincpu, 1);
@@ -1595,7 +1567,7 @@ void gaminator_state::gaminator(machine_config &config)
 	m_uart[2]->out_int_callback().set(uart_irq, FUNC(input_merger_device::in_w<2>));
 	m_uart[3]->out_int_callback().set(uart_irq, FUNC(input_merger_device::in_w<3>));
 
-	// WBA-1: channel A talks ID-003 (the kernel polls FC 05 11 27 56 there at 9600 8E1)
+	// channel A talks ID-003 (the kernel polls FC 05 11 27 56 there at 9600 8E1)
 	jcm_wba_device &wba(JCM_WBA(config, "wba"));
 	m_uart[0]->out_tx_callback().set(wba, FUNC(jcm_wba_device::rx_w));
 	wba.tx_cb().set(m_uart[0], FUNC(ns16550_device::rx_w));
