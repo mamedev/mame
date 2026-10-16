@@ -287,6 +287,9 @@ void ngen_state::pit_out0_w(int state)
 
 void ngen_state::kbd_rxrdy_w(int state)
 {
+	// Track the keyboard UART receive-ready transitions to distinguish serial reception from guest reads.
+	if (bool(state) != m_kbd_rxrdy)
+		logerror("Keyboard UART RXRDY %d\n", state);
 	m_kbd_rxrdy = bool(state);
 	m_pic->ir6_w(m_kbd_rxrdy || m_kbd_txrdy);
 }
@@ -530,7 +533,11 @@ uint16_t ngen_state::peripheral_r(offs_t offset, uint16_t mem_mask)
 				m_last_kbd_status = ret;
 			}
 			else
+			{
+				// Log bytes read by the guest so received keyboard data can be followed through the UART.
+				logerror("Keyboard UART data read %02x\n", ret & 0xff);
 				LOGMASKED(LOG_KEYBOARD, "Keyboard UART data read %02x\n", ret);
+			}
 		}
 		break;
 	case 0x1a0:  // I/O control register?
@@ -1065,12 +1072,17 @@ MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
 {
 	uint16_t addr = ma;
 
-	for(int x=0;x<bitmap.width();x+=9)
+	for (int x = 0; x < bitmap.width(); x += 9)
 	{
 		uint8_t ch = m_vram.read16(addr++) & 0xff;
-		for(int z=0;z<9;z++)
+		uint16_t const glyph = m_fontram.read16(ch * 16 + ra);
+		bool const cursor = (x / 9) == cursor_x;
+		for (int z = 0; z < 9; z++)
 		{
-			if(BIT(m_fontram.read16(ch*16+ra),8-z))
+			// The MC6845 supplies -1 when its cursor is blanked and the
+			// character column when it is visible.  Invert the glyph cell to
+			// give the operator feedback about the active text field.
+			if(BIT(glyph,8-z) != cursor)
 				bitmap.pix(y,x+z) = rgb_t(0,0xff,0);
 			else
 				bitmap.pix(y,x+z) = rgb_t(0,0,0);
