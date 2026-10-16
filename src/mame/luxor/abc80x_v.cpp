@@ -50,12 +50,14 @@ void abc800_state::hrc_w(uint8_t data)
 void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
+	const uint8_t *fgctl_prom = &m_fgctl_prom->base()[(m_fgctl & 0x7f) << 2];
 
 	uint16_t addr = 0;
 
 	for (int y = m_hrs; y < std::min(cliprect.max_y + 1, m_hrs + 480); y += 2)
 	{
-		int x = 0;
+		uint32_t *row0 = &bitmap.pix(y);
+		uint32_t *row1 = &bitmap.pix(y + 1);
 
 		for (int sx = 0; sx < 64; sx++)
 		{
@@ -63,27 +65,24 @@ void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 			for (int dot = 0; dot < 4; dot++)
 			{
-				uint16_t fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
-				uint8_t fgctl = m_fgctl_prom->base()[fgctl_addr];
+				uint8_t fgctl = fgctl_prom[(data >> 6) & 0x03];
 				int color = fgctl & 0x07;
 
 				if (color)
 				{
-					bool black = bitmap.pix(y, x) == rgb_t::black();
+					bool black = *row0 == rgb_t::black();
 					bool opaque = !BIT(fgctl, 3);
 
 					if (black || opaque)
 					{
-						bitmap.pix(y, x) = pen[color];
-						bitmap.pix(y, x + 1) = pen[color];
-
-						bitmap.pix(y + 1, x) = pen[color];
-						bitmap.pix(y + 1, x + 1) = pen[color];
+						row0[0] = row0[1] = pen[color];
+						row1[0] = row1[1] = pen[color];
 					}
 				}
 
 				data <<= 2;
-				x += 2;
+				row0 += 2;
+				row1 += 2;
 			}
 		}
 	}
@@ -187,10 +186,15 @@ void abc800m_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	uint16_t addr = 0;
 
 	const pen_t *pen = m_palette->pens();
+	const uint8_t *fgctl_prom = &m_fgctl_prom->base()[(m_fgctl & 0x7f) << 2];
+	pen_t dot_pen[4];
+
+	for (int i = 0; i < 4; i++)
+		dot_pen[i] = pen[(fgctl_prom[i] & 0x07) ? 1 : 0];
 
 	for (int y = m_hrs; y < std::min(cliprect.max_y + 1, m_hrs + 240); y++)
 	{
-		int x = HORIZONTAL_PORCH_HACK;
+		uint32_t *dest = &bitmap.pix(y, HORIZONTAL_PORCH_HACK);
 
 		for (int sx = 0; sx < 64; sx++)
 		{
@@ -198,11 +202,8 @@ void abc800m_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 			for (int dot = 0; dot < 4; dot++)
 			{
-				uint16_t fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
-				int color = (m_fgctl_prom->base()[fgctl_addr] & 0x07) ? 1 : 0;
-
-				bitmap.pix(y, x++) = pen[color];
-				bitmap.pix(y, x++) = pen[color];
+				*dest++ = dot_pen[data >> 6];
+				*dest++ = dot_pen[data >> 6];
 
 				data <<= 2;
 			}
@@ -734,7 +735,12 @@ MC6845_UPDATE_ROW( abc806_state::abc806_update_row )
 	int e6 = m_40;
 	int th = 0;
 
+	const uint8_t *rad_prom = m_rad_prom->base();
+	const uint8_t *char_rom = m_char_rom->base();
+
 	y += m_sync + vbp;
+
+	uint32_t *const row = &bitmap.pix(y);
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -799,23 +805,25 @@ MC6845_UPDATE_ROW( abc806_state::abc806_update_row )
 		else
 		{
 			uint16_t rad_addr = (e6 << 8) | (e5 << 7) | (flash << 6) | (underline << 4) | (m_flshclk << 5) | (ra & 0x0f);
-			rad_data = m_rad_prom->base()[rad_addr] & 0x0f;
+			rad_data = rad_prom[rad_addr] & 0x0f;
 		}
 
 		uint16_t chargen_addr = (th << 12) | (data << 4) | rad_data;
-		uint8_t chargen_data = m_char_rom->base()[chargen_addr & 0xfff] << 2;
-		int x = hbp + (column + 4) * ABC800_CHAR_WIDTH;
+		uint8_t chargen_data = char_rom[chargen_addr & 0xfff] << 2;
+		uint32_t *dest = &row[hbp + (column + 4) * ABC800_CHAR_WIDTH];
+		pen_t const fg = pen[de ? fg_color : 0];
+		pen_t const bg = pen[de ? bg_color : 0];
+		bool const wide = e5 || e6;
 
 		for (int bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
 		{
-			int color = BIT(chargen_data, 7) ? fg_color : bg_color;
-			if (!de) color = 0;
+			pen_t const color = BIT(chargen_data, 7) ? fg : bg;
 
-			bitmap.pix(y, x++) = pen[color];
+			*dest++ = color;
 
-			if (e5 || e6)
+			if (wide)
 			{
-				bitmap.pix(y, x++) = pen[color];
+				*dest++ = color;
 			}
 
 			chargen_data <<= 1;
@@ -898,24 +906,27 @@ void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	const pen_t *pen = m_palette->pens();
 
+	const uint8_t *ram = m_ram->pointer();
+	offs_t const mask = videoram_mask();
 	uint32_t addr = (m_hrs & 0x0f) << 15;
 
 	for (int y = m_sync + VERTICAL_PORCH_HACK; y < std::min(cliprect.max_y + 1, m_sync + VERTICAL_PORCH_HACK + 240); y++)
 	{
+		uint32_t *dest = &bitmap.pix(y, HORIZONTAL_PORCH_HACK + (ABC800_CHAR_WIDTH * 4) - 16);
+
 		for (int sx = 0; sx < 128; sx++)
 		{
-			uint8_t data = videoram_read(addr++);
+			uint8_t data = ram[(0x8000 + addr++) & mask];
 			uint16_t dot = (m_hrc[data >> 4] << 8) | m_hrc[data & 0x0f];
 
 			for (int pixel = 0; pixel < 4; pixel++)
 			{
-				int x = HORIZONTAL_PORCH_HACK + (ABC800_CHAR_WIDTH * 4) - 16 + (sx * 4) + pixel;
-
-				if (BIT(dot, 15) || (bitmap.pix(y, x) == rgb_t::black()))
+				if (BIT(dot, 15) || (*dest == rgb_t::black()))
 				{
-					bitmap.pix(y, x) = pen[(dot >> 12) & 0x07];
+					*dest = pen[(dot >> 12) & 0x07];
 				}
 
+				dest++;
 				dot <<= 4;
 			}
 		}
