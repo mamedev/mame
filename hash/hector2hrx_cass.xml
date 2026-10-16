@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Software for the Micronique Hector HRX computer, also compatible with the Hector MX.
+Not backwards compatible with Hector 1 or Hector 2HR computers.
+
+There are 3 different methods for loading software:
+
+1. Software which can be loaded by selecting the CASSETTE option in the menu and starting the tape.
+
+2. Software which requires FORTH to be loaded first. 
+   Select the FORTH option in the menu, then reset the machine.
+   The software can be loaded by selecting the CASSETTE option in the menu and starting the tape.
+   This does not currently seem to work on the HRX, but does work on the MX.
+
+3. Software which requires BASIC 3X to be loaded first. 
+   For the HRX, BASIC 3X needs to be loaded first from tape using the first option above.
+   For the MX it can be selected from the menu. 
+   Once basic loads, type LOAD, then ENTER and start the tape. 
+   If required, select RUN then ENTER once loading completes.
+-->
+
+<softwarelist name="hector2hrx_cass" description="Micronique Hector HRX cassettes">
+
+	<software name="arcade1" supported="yes">
+		<description>Jeux d'Arcade No 1</description>
+		<year>19??</year>
+		<publisher>Serge Claire</publisher>
+		<info name="usage" value="Select BASIC, type LOAD, press ENTER and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="21796">
+				<rom name="Jeux d'Arcade No 1 (19xx)(Serge Claire).k7" size="21796" crc="1416305a" sha1="c10ad4e075004bef84878a70272fea20c18cfc8c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcade2" supported="yes">
+		<description>Jeux d'Arcade No 2</description>
+		<year>19??</year>
+		<publisher>Serge Claire</publisher>
+		<info name="usage" value="Select BASIC, type LOAD, press ENTER and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="18480">
+				<rom name="Jeux d'Arcade No 2 (19xx)(Serge Claire).k7" size="18480" crc="7a7a9157" sha1="672da5ecb75679f11b79915d2f2877b0248b8dca"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="assemblx" supported="yes">
+		<description>Assemblex Z80 v2</description>
+		<year>19??</year>
+		<publisher>Pascal Pellier</publisher>
+		<info name="usage" value="Select CASETTE and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="12053">
+				<rom name="Assemblex Z80 v2 (19xx)(Pascal Pellier).k7" size="12053" crc="649a72c6" sha1="001e464d50206d5fd9f98d10ac1e676697cf1bef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="balparis" supported="yes">
+		<description>Balade dans Paris</description>
+		<year>19??</year>
+		<publisher>Algorithme</publisher>
+		<info name="usage" value="Select BASIC, type LOAD, press ENTER and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="21657">
+				<rom name="Balade dans Paris (19xx)(Algorithme).k7" size="21657" crc="b4fbb4f6" sha1="cac3b94a2cbe1db596260ada2b87fbe9211de7e0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic3x" supported="yes">
+		<description>Basic 3X v3.5</description>
+		<year>1984</year>
+		<publisher>Micronique</publisher>
+		<info name="usage" value="Select CASETTE and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="16410">
+				<rom name="Basic 3X v3.5 (1984)(Micronique).k7" size="16410" crc="39f7e6c0" sha1="70d80e224b3f2f52d5f06b73aed3634c661e28c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fichier" supported="yes">
+		<description>Fichier</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Select BASIC, type LOAD, press ENTER and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="9654">
+				<rom name="Fichier (19xx)(Unknown).k7" size="9654" crc="46a24292" sha1="9224037c78bcc12f2d390672d62d7c03d3e0e427"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="fraavion" supported="yes">
+		<description>Le Tour de France en Avion</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Select BASIC, type LOAD, press ENTER and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="23628">
+				<rom name="Le Tour de France en Avion (19xx)(Unknown).k7" size="23628" crc="0570c816" sha1="f9836c4181fc287490f90dccc4ebc4c57c2717e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fraction" supported="yes">
+		<description>Fractions</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Select BASIC, type LOAD, press ENTER and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="18656">
+				<rom name="Fractions (19xx)(Unknown).k7" size="18656" crc="6849952f" sha1="996b28fb807303d61059eb6ffdf710122e2dfb73"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geofrance" supported="yes">
+		<description>Geo-France</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Select BASIC, type LOAD, press ENTER and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="18786">
+				<rom name="Geo-France (19xx)(Unknown).k7" size="18786" crc="d552022d" sha1="a646a4ed37bee28f206131f84a8374d9869890f0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heptaxi" supported="yes">
+		<description>Hep, Taxi!</description>
+		<year>19??</year>
+		<publisher>Atlantic Soft</publisher>
+		<info name="usage" value="Select CASETTE and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="5378">
+				<rom name="Hep, Taxi! (19xx)(Atlantic Soft).k7" size="5378" crc="599403ec" sha1="a8653b8e46a2b7a277b0d787df8753d308c5d89a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hyams" supported="yes">
+		<description>Hyams</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Select BASIC, type LOAD, press ENTER and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="21681">
+				<rom name="Hyams (19xx)(Unknown).k7" size="21681" crc="d741da68" sha1="31113bb0d8baf8107d299854ee566467bf462c04"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minor" supported="yes">
+		<description>Minor</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Select BASIC, type LOAD, press ENTER and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="14158">
+				<rom name="Minor (19xx)(Unknown).k7" size="14158" crc="36b33b4a" sha1="fc8bfec315f74361d020ef30e8a9a1ac8edd26ce"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="murbrque" supported="yes">
+		<description>Mur de Briques</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Select FORTH, reset the machine, then select CASETTE and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="15482">
+				<rom name="Mur de Briques (19xx)(Unknown).k7" size="15482" crc="e5c8e22e" sha1="5d8bbb4420a5705aaa2ea9eaa86038028eca9b4d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="parsec" supported="yes">
+		<description>Parsec</description>
+		<year>19??</year>
+		<publisher>Algorithme</publisher>
+		<info name="usage" value="Select FORTH, reset the machine, then select CASETTE and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="23599">
+				<rom name="Parsec (19xx)(Algorithme).k7" size="23599" crc="e1221e92" sha1="506e1e5fa8f626ec0eb8b1f8a465dc9077ea5a09"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pengo" supported="yes">
+		<description>Pengo</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Select CASETTE and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="35274">
+				<rom name="Pengo (19xx)(Unknown).k7" size="35274" crc="70dea70e" sha1="ec36c7a08192957ca3a64951bdcc01526d79de61"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pesee" supported="yes">
+		<description>Pesee</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Select BASIC, type LOAD, press ENTER and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="8763">
+				<rom name="Pesee (19xx)(Unknown).k7" size="8763" crc="dde09d7a" sha1="edb938aab41bb3ce2dcd21455efe148e0d87fd9c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbert" supported="yes">
+		<description>R-Bert</description>
+		<year>1984</year>
+		<publisher>Atlantic Soft</publisher>
+		<info name="usage" value="Select CASETTE and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="20935">
+				<rom name="R-Bert (1984)(Atlantic Soft).k7" size="20935" crc="03955b30" sha1="514082c500f9223f965e5b6da8cada4472ea7ea3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcopera" supported="yes">
+		<description>Space Opera</description>
+		<year>1985</year>
+		<publisher>Ulysses</publisher>
+		<info name="usage" value="Select CASETTE and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="33812">
+				<rom name="Space Opera (1985)(Ulysses).k7" size="33812" crc="2b9bcec7" sha1="f511b37861b35149645d24bf5d6b4b06f810bc17"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="triangle" supported="yes">
+		<description>Les Mots en Triangle</description>
+		<year>19??</year>
+		<publisher>G Labat</publisher>
+		<info name="usage" value="Select BASIC, type LOAD, press ENTER and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="20519">
+				<rom name="Les Mots en Triangle (19xx)(G Labat).k7" size="20519" crc="5eba52fa" sha1="b246846e240efc1bf036f947c84b0acd3632ce74"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbo" supported="yes">
+		<description>Turbo</description>
+		<year>19??</year>
+		<publisher>Algorithme</publisher>
+		<info name="usage" value="Select FORTH, reset the machine, then select CASETTE and start tape" />
+		<part name="cass" interface="interact_cass">
+			<dataarea name="cass" size="10162">
+				<rom name="Turbo (19xx)(Algorithme).k7" size="10162" crc="064f6e19" sha1="04c63e0fc5f7455fa134f1458b667d6cb6df44d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
