@@ -83,8 +83,11 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	static constexpr uint32_t DOT_CLOCK = 14'318'181;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_card;
 	required_device<mc6845_device> m_crtc;
@@ -97,6 +100,7 @@ private:
 	output_finder<> m_lock_led;
 
 	uint8_t m_row = 0;
+	bool m_80col = false;
 
 	void i7000_palette(palette_device &palette) const ATTR_COLD;
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -106,6 +110,8 @@ private:
 	void scanlines_w(uint8_t data);
 	int shift_r();
 	int ctrl_r();
+
+	void col80_w(uint8_t data);
 
 	void i7000_io(address_map &map) ATTR_COLD;
 	void i7000_mem(address_map &map) ATTR_COLD;
@@ -264,6 +270,13 @@ void i7000_state::machine_start()
 	}
 
 	save_item(NAME(m_row));
+	save_item(NAME(m_80col));
+}
+
+void i7000_state::machine_reset()
+{
+	m_80col = false;
+	m_crtc->set_unscaled_clock(DOT_CLOCK / 16);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(i7000_state::card_load)
@@ -275,6 +288,13 @@ DEVICE_IMAGE_LOAD_MEMBER(i7000_state::card_load)
 	m_card->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_card->common_load_rom(m_card->get_rom_base(), size, "rom");
 	return std::make_pair(std::error_condition(), std::string());
+}
+
+// a toggle flip-flop, cleared at reset: 40 or 80 columns
+void i7000_state::col80_w(uint8_t data)
+{
+	m_80col = !m_80col;
+	m_crtc->set_unscaled_clock(DOT_CLOCK / (m_80col ? 8 : 16));
 }
 
 void i7000_state::i7000_palette(palette_device &palette) const
@@ -310,6 +330,7 @@ void i7000_state::i7000_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
+	map(0x00, 0x00).mirror(0x03).w(FUNC(i7000_state::col80_w));
 	map(0x08, 0x08).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x09, 0x09).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x18, 0x1b).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
@@ -333,7 +354,7 @@ void i7000_state::i7000(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(i7000_state::i7000_palette), 2);
 
-	MC6845(config, m_crtc, 14'318'181 / 8);  /* TODO: verify the dot clock and the 40/80-column divider on the PCB. */
+	MC6845(config, m_crtc, DOT_CLOCK / 16);
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
