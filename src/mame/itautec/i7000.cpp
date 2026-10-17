@@ -35,13 +35,14 @@
      - Up to 4 external floppy drives: 8" (FD/DD, 1.1MB) or 5" 1/4
      - Up to 1 external 10 MB hard-drive
 
-    At the boot menu, press Z to run the cartridge.
+    At the boot menu, press E to boot SIM/M from the first 5.25" drive,
+    or Z to run the cartridge.
 
     TODO:
     - the port 0x0c/0x10 paging is only partly understood
     - PIT counter 0 drives RSTB, which needs the NSC800 interrupt control
       register (port 0xbb)
-    - printer, cassette, joystick ADC, Telex board
+    - hard disk interface, printer, cassette, joystick ADC, Telex board
     - verify the clocks
 
 ****************************************************************************/
@@ -51,10 +52,12 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/z80/nsc800.h"
+#include "imagedev/floppy.h"
 #include "machine/i8255.h"
 #include "machine/i8279.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
 
@@ -62,6 +65,9 @@
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "formats/imd_dsk.h"
+#include "formats/td0_dsk.h"
 
 #include <algorithm>
 
@@ -78,6 +84,8 @@ public:
 		, m_card(*this, "cardslot")
 		, m_crtc(*this, "crtc")
 		, m_palette(*this, "palette")
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:%u", 0U)
 		, m_page_view(*this, "page_view")
 		, m_drive_view(*this, "drive_view")
 		, m_ram(*this, "ram")
@@ -94,6 +102,7 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 private:
 	static constexpr uint32_t DOT_CLOCK = 14'318'181;
@@ -103,6 +112,8 @@ private:
 	required_device<generic_slot_device> m_card;
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
+	required_device<wd2793_device> m_fdc;
+	required_device_array<floppy_connector, 4> m_floppy;
 	memory_view m_page_view;
 	memory_view m_drive_view;
 	required_shared_ptr<uint8_t> m_ram;
@@ -117,6 +128,7 @@ private:
 	uint8_t m_page_0c = 0;
 	uint8_t m_page_10 = 0;
 	bool m_80col = false;
+	uint8_t m_fdc_ctrl = 0;
 
 	void i7000_palette(palette_device &palette) const ATTR_COLD;
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -132,6 +144,10 @@ private:
 	void page_0c_w(uint8_t data);
 	void page_10_w(uint8_t data);
 	void update_paging();
+
+	static void floppy_formats(format_registration &fr);
+	void fdc_ctrl_w(uint8_t data);
+	uint8_t fdc_status_r();
 
 	void i7000_io(address_map &map) ATTR_COLD;
 	void i7000_mem(address_map &map) ATTR_COLD;
@@ -304,6 +320,7 @@ void i7000_state::machine_start()
 	save_item(NAME(m_page_0c));
 	save_item(NAME(m_page_10));
 	save_item(NAME(m_80col));
+	save_item(NAME(m_fdc_ctrl));
 }
 
 void i7000_state::machine_reset()
@@ -314,6 +331,13 @@ void i7000_state::machine_reset()
 
 	m_80col = false;
 	m_crtc->set_unscaled_clock(DOT_CLOCK / 16);
+
+	fdc_ctrl_w(0);
+}
+
+void i7000_state::device_post_load()
+{
+	fdc_ctrl_w(m_fdc_ctrl);
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(i7000_state::card_load)
@@ -366,6 +390,44 @@ void i7000_state::update_paging()
 		m_drive_view.select(1);
 	else
 		m_drive_view.disable();
+}
+
+/* Drive board ("Placa Drive"), ports 0xe0-0xe7:
+     0xe0-0xe3  WD2793
+     0xe4       drive select latch
+     0xe5       hard disk data
+     0xe6       status
+     0xe7       hard disk select */
+
+void i7000_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_IMD_FORMAT);
+	fr.add(FLOPPY_TD0_FORMAT);
+}
+
+void i7000_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
+
+void i7000_state::fdc_ctrl_w(uint8_t data)
+{
+	// TODO: the other bits
+	m_fdc_ctrl = data;
+	floppy_image_device *const floppy = m_floppy[data & 3]->get_device();
+	m_fdc->set_floppy(floppy);
+	if (floppy)
+		floppy->mon_w(0);
+
+	// the drive ROM checks Not Ready; an empty drive must still report it
+	m_fdc->set_force_ready(floppy && floppy->exists());
+}
+
+uint8_t i7000_state::fdc_status_r()
+{
+	// bit 7: no DRQ, bit 6: INTRQ, bits 0-2: hard disk handshake
+	return (m_fdc->drq_r() ? 0x00 : 0x80) | (m_fdc->intrq_r() ? 0x40 : 0x00);
 }
 
 IRQ_CALLBACK_MEMBER(i7000_state::inta_cb)
@@ -421,6 +483,9 @@ void i7000_state::i7000_io(address_map &map)
 	map(0x18, 0x1b).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x1c, 0x1f).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x20, 0x21).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0xe0, 0xe3).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
+	map(0xe4, 0xe4).w(FUNC(i7000_state::fdc_ctrl_w));
+	map(0xe6, 0xe6).r(FUNC(i7000_state::fdc_status_r));
 }
 
 void i7000_state::i7000(machine_config &config)
@@ -467,6 +532,13 @@ void i7000_state::i7000(machine_config &config)
 	kbdc.in_ctrl_callback().set(FUNC(i7000_state::ctrl_r));
 	// the software clears the display RAM to 0x00 to light LOCK
 	kbdc.out_disp_callback().set([this] (uint8_t data) { m_lock_led = BIT(~data, 0); });
+
+	WD2793(config, m_fdc, 1'000'000);
+	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", i7000_floppies, "525dd", i7000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", i7000_floppies, "525dd", i7000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", i7000_floppies, "525dd", i7000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", i7000_floppies, "525dd", i7000_state::floppy_formats);
 
 	/* Cartridge slot */
 	GENERIC_CARTSLOT(config, "cardslot", generic_romram_plain_slot, "i7000_card", "rom").set_device_load(FUNC(i7000_state::card_load));
