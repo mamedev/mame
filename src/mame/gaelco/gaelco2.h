@@ -63,6 +63,7 @@ protected:
 
 	template <unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask);
+	void draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, unsigned layer);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void mcu_hostmem_map(address_map &map) ATTR_COLD;
@@ -116,7 +117,6 @@ protected:
 
 private:
 	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info_dual);
-	int get_rowscrollmode_yscroll(bool first_screen);
 
 	u32 dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index);
 

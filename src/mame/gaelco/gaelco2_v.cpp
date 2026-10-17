@@ -22,7 +22,8 @@
             Linescroll entries are like this:
                 Word | Bit(s)            | Description
                 -----+-FEDCBA98-76543210-+--------------------------
-                 i   | xxxxxx-- -------- | not used?
+                 i   | xxxx---- -------- | line i extra vertical step (6)
+                 i   | ----xx-- -------- | not used?
                  i   | ------xx xxxxxxxx | line i x scroll register
 
         0x002800-0x002807   Scroll registers
@@ -43,7 +44,8 @@
                 Word | Bit(s)            | Description
                 -----+-FEDCBA98-76543210-+--------------------------
                   0  | x------- -------- | tilemap #1 linescroll enable
-                  0  | -xxx---- -------- | not used?
+                  0  | -x------ -------- | tilemap #1 vertical step direction (=0 down, =1 up) (6)
+                  0  | --xx---- -------- | not used?
                   0  | ----xxx- -------- | tilemap #1 video RAM bank? (4, 5)
                   0  | -------x -------- | not used?
                   0  | -------- x------- | tilemap #1 over sprites (GAE1 PRI)
@@ -51,9 +53,11 @@
                   0  | -------- --xx---- | visible area size? (=0,480x240;=1,384x240;=2,320x240)
                   0  | -------- ----xxxx | not used?
                   1  | x------- -------- | tilemap #2 linescroll enable
-                  1  | -xxx---- -------- | not used?
+                  1  | -x------ -------- | tilemap #2 vertical step direction (=0 down, =1 up) (6)
+                  1  | --xx---- -------- | not used?
                   1  | ----xxx- -------- | tilemap #2 video RAM bank? (4, 5)
-                  1  | -------x xxx----- | not used?
+                  1  | -------x xx------ | not used?
+                  1  | -------- --x----- | flip? (GAE1 FLIP, not emulated)
                   1  | -------- ---x---- | sprite bank select
                   1  | -------- ----xxxx | not used?
         0x018008-0x018009   Clear video int?
@@ -64,6 +68,10 @@ Notes:
     (3) See devices/sound/gaelco.cpp for the sound register layout
     (4) tilemaps use the memory [0x2000*bank .. 0x2000*bank + 0x1fff]
     (5) See tile format in the tilemap section
+    (6) The GAE1 reloads the tilemap line to draw from the y scroll register
+        during vblank, and steps it once per scanline. In linescroll mode the
+        extra step from the entry of the current tilemap line is added, which
+        Touch & Go uses to squash part of its background vertically.
 
 Multi monitor notes:
     Some games have two RGB outputs to allow two or four simultaneous
@@ -75,6 +83,13 @@ Multi monitor notes:
     The sprite RAM has one bit that selects the sprite's target monitor. The
     sound is splitted too, right channel for cabinet 1 and the left channel
     for the other cabinet.
+
+    According to the GAE1 schematics, a high level on its CTR pin makes the
+    chip drive the tilemap #2 pixels out through the pins that normally read
+    the sprite pixels back from the external frame buffer. The chip's own
+    pixel output then never sees a sprite, and both games keep PRI set so it
+    shows tilemap #1 over tilemap #2. The sprites have to be merged outside
+    the chip, so PRI doesn't apply to the dual monitor screens.
 
 ***************************************************************************/
 
@@ -269,11 +284,6 @@ void gaelco2_state::video_start()
 	m_pant[0]->set_transparent_pen(0);
 	m_pant[1]->set_transparent_pen(0);
 
-	m_pant[0]->set_scroll_rows(512);
-	m_pant[0]->set_scroll_cols(1);
-	m_pant[1]->set_scroll_rows(512);
-	m_pant[1]->set_scroll_cols(1);
-
 	m_dual_monitor = false;
 }
 
@@ -288,11 +298,6 @@ void gaelco2_dual_state::video_start()
 	// set tilemap properties
 	m_pant[0]->set_transparent_pen(0);
 	m_pant[1]->set_transparent_pen(0);
-
-	m_pant[0]->set_scroll_rows(512);
-	m_pant[0]->set_scroll_cols(1);
-	m_pant[1]->set_scroll_rows(512);
-	m_pant[1]->set_scroll_cols(1);
 
 	m_dual_monitor = true;
 }
@@ -437,207 +442,60 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 ***************************************************************************/
 
+void gaelco2_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, unsigned layer)
+{
+	// dual monitor intro scenes align better with 0x13, but its test screen is definitely 0x14
+	const int xoff = layer ? 0x10 : 0x14;
+
+	const u16 *const linescroll = &m_videoram[(0x2000 / 2) + (layer * 0x200)];
+	const bool linescroll_en = BIT(m_vregs[layer], 15);
+	const bool step_up = BIT(m_vregs[layer], 14);
+	const u16 scrollx = m_videoram[(0x2802 / 2) + (layer * 2)];
+
+	// tilemap line for the first scanline, stepped once from the y scroll register
+	int line = m_videoram[(0x2800 / 2) + (layer * 2)] + (step_up ? -1 : 1);
+
+	for (int y = 0; y <= cliprect.max_y; y++)
+	{
+		line &= 0x1ff;
+		const u16 entry = linescroll_en ? linescroll[line] : scrollx;
+		if (y >= cliprect.min_y)
+		{
+			rectangle clip = cliprect;
+			clip.sety(y, y);
+			m_pant[layer]->set_scrollx(0, (entry + xoff) & 0x3ff);
+			m_pant[layer]->set_scrolly(0, (line - y) & 0x1ff);
+			m_pant[layer]->draw(screen, bitmap, clip, 0, 0);
+		}
+
+		const int step = 1 + (linescroll_en ? BIT(entry, 12, 4) : 0);
+		line += step_up ? -step : step;
+	}
+}
+
 u32 gaelco2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const int xoff0 = 0x14;
-	const int xoff1 = xoff0 - 4;
-	const int yoff0 = 0x01;
-	const int yoff1 = 0x01;
-
-	// read scroll values
-	const int scroll0x = m_videoram[0x2802 / 2] + xoff0;
-	const int scroll1x = m_videoram[0x2806 / 2] + xoff1;
-	const int scroll0y = m_videoram[0x2800 / 2] + yoff0;
-	const int scroll1y = m_videoram[0x2804 / 2] + yoff1;
-
-	// set y scroll registers
-	m_pant[0]->set_scrolly(0, scroll0y & 0x1ff);
-	m_pant[1]->set_scrolly(0, scroll1y & 0x1ff);
-
-	// set x linescroll registers
-	for (int i = 0; i < 512; i++)
-	{
-		m_pant[0]->set_scrollx(i & 0x1ff, (BIT(m_vregs[0], 15) ? (m_videoram[(0x2000 / 2) + i] + xoff0) : scroll0x) & 0x3ff);
-		m_pant[1]->set_scrollx(i & 0x1ff, (BIT(m_vregs[1], 15) ? (m_videoram[(0x2400 / 2) + i] + xoff1) : scroll1x) & 0x3ff);
-	}
-
-	// draw screen
 	bitmap.fill(0, cliprect);
 
-	m_pant[1]->draw(screen, bitmap, cliprect, 0, 0);
+	draw_tilemap(screen, bitmap, cliprect, 1);
 	if (BIT(m_vregs[0], 7))
 	{
 		draw_sprites(screen, bitmap, cliprect, 0);
-		m_pant[0]->draw(screen, bitmap, cliprect, 0, 0);
+		draw_tilemap(screen, bitmap, cliprect, 0);
 	}
 	else
 	{
-		m_pant[0]->draw(screen, bitmap, cliprect, 0, 0);
+		draw_tilemap(screen, bitmap, cliprect, 0);
 		draw_sprites(screen, bitmap, cliprect, 0);
 	}
 	return 0;
 }
 
-/*
-    The Y-scroll value in rowscroll mode has a very unusual implementation
-    the scroll value seems come from a 0x1000 bit being set in one of the
-    512 rowscroll table entries.
-
-    Only the bit representing the largest value is used?
-
-    The ordering of the bits does not appear to be immediatley obvious.
-
-    This is used in Touch & Go for the 'Super Spike' but we only scroll
-    32 possible values, the entries used for the other scroll values
-    are unknown unless a pattern can be derived, or figured out from
-    the game code.
-
-    _______________________________________ entry number
-                        1111 1111 1111 1111
-    0123 4567 89ab cdef 0123 4567 89ab cdef
-    _______________________________________ offset into linescroll ram
-    0000 0000 0000 1111 1111 1111 1111 1111
-    6677 7888 8999 0001 1112 2233 3444 4555
-    5814 7036 9258 1470 3692 5814 7036 9258
-    _______________________________________
-                                             scr = expected scroll value if bit 0x1000 at offset is set
-
-                                             scr (entry from above)
-    --x- ---- ---- ---- ---- ---- ---- ----  32  (02)
-    ---- ---- ---- --x- ---- ---- ---- ----  31  (0e)
-    ---- ---- --x- ---- ---- ---- ---- ----  30  (0a)
-    ---- ---- ---- ---- ---- ---- ---x ----  29  (1b)
-    ---- ---- ---- ---- ---- -x-- ---- ----  28  (15)
-    ---- ---- ---- ---- ---x ---- ---- ----  27  (13)
-    ---- x--- ---- ---- ---- ---- ---- ----  26  (04)
-    ---- ---- ---- ---- ---- ---- -x-- ----  25  (19)
-    ---- ---- ---- x--- ---- ---- ---- ----  24  (0c)
-    ---- ---- ---- ---- ---- ---- ---- ---x  23  (1f)
-    ---- ---- x--- ---- ---- ---- ---- ----  22  (08)
-    ---- ---- ---- ---- ---- ---- ---- -x--  21  (1d)
-    ---- ---- ---- ---- -x-- ---- ---- ----  20  (11)
-    ---- --x- ---- ---- ---- ---- ---- ----  19  (06)
-    ---- ---- ---- ---- ---- ---x ---- ----  18  (17)
-    ---- ---- ---- ---- x--- ---- ---- ----  17  (10)
-    -x-- ---- ---- ---- ---- ---- ---- ----  16  (01)
-    ---- ---- ---- -x-- ---- ---- ---- ----  15  (0d)
-    ---- ---- ---- ---- ---- --x- ---- ----  14  (16)
-    ---- ---- -x-- ---- ---- ---- ---- ----  13  (09)
-    ---- ---- ---- ---- ---- ---- --x- ----  12  (1a)
-    ---- -x-- ---- ---- ---- ---- ---- ----  11  (05)
-    ---- ---- ---- ---- ---- ---- ---- --x-  10  (1e)
-    x--- ---- ---- ---- ---- ---- ---- ----  9   (00)
-    ---- ---- ---- ---- --x- ---- ---- ----  8   (12)
-    ---- ---- ---x ---- ---- ---- ---- ----  7   (0b)
-    ---- ---- ---- ---- ---- x--- ---- ----  6   (14)
-    ---x ---- ---- ---- ---- ---- ---- ----  5   (03)
-    ---- ---- ---- ---- ---- ---- ---- x---  4   (1c)
-    ---- ---- ---- ---- ---- ---- x--- ----  3   (18)
-    ---- ---x ---- ---- ---- ---- ---- ----  2   (07)
-    ---- ---- ---- ---x ---- ---- ---- ----  1   (0f)
-
-    ================================================== sorted list for reference
-
-    x--- ---- ---- ---- ---- ---- ---- ----  9
-    -x-- ---- ---- ---- ---- ---- ---- ----  16
-    --x- ---- ---- ---- ---- ---- ---- ----  32
-    ---x ---- ---- ---- ---- ---- ---- ----  5
-
-    ---- x--- ---- ---- ---- ---- ---- ----  26
-    ---- -x-- ---- ---- ---- ---- ---- ----  11
-    ---- --x- ---- ---- ---- ---- ---- ----  19
-    ---- ---x ---- ---- ---- ---- ---- ----  2
-
-    ---- ---- x--- ---- ---- ---- ---- ----  22
-    ---- ---- -x-- ---- ---- ---- ---- ----  13
-    ---- ---- --x- ---- ---- ---- ---- ----  30
-    ---- ---- ---x ---- ---- ---- ---- ----  7
-
-    ---- ---- ---- x--- ---- ---- ---- ----  24
-    ---- ---- ---- -x-- ---- ---- ---- ----  15
-    ---- ---- ---- --x- ---- ---- ---- ----  31
-    ---- ---- ---- ---x ---- ---- ---- ----  1
-
-    ---- ---- ---- ---- x--- ---- ---- ----  17
-    ---- ---- ---- ---- -x-- ---- ---- ----  20
-    ---- ---- ---- ---- --x- ---- ---- ----  8
-    ---- ---- ---- ---- ---x ---- ---- ----  27
-
-    ---- ---- ---- ---- ---- x--- ---- ----  6
-    ---- ---- ---- ---- ---- -x-- ---- ----  28
-    ---- ---- ---- ---- ---- --x- ---- ----  14
-    ---- ---- ---- ---- ---- ---x ---- ----  18
-
-    ---- ---- ---- ---- ---- ---- x--- ----  3
-    ---- ---- ---- ---- ---- ---- -x-- ----  25
-    ---- ---- ---- ---- ---- ---- --x- ----  12
-    ---- ---- ---- ---- ---- ---- ---x ----  29
-
-    ---- ---- ---- ---- ---- ---- ---- x---  4
-    ---- ---- ---- ---- ---- ---- ---- -x--  21
-    ---- ---- ---- ---- ---- ---- ---- --x-  10
-    ---- ---- ---- ---- ---- ---- ---- ---x  23
-
-*/
-
-int gaelco2_dual_state::get_rowscrollmode_yscroll(bool first_screen)
-{
-	const u16 base = first_screen ? 0x2000 / 2 : 0x2400 / 2;
-
-	constexpr u8 checkoffsets[32] = {
-		0x02, 0x0e, 0x0a, 0x1b, 0x15, 0x13, 0x04, 0x19,
-		0x0c, 0x1f, 0x08, 0x1d, 0x11, 0x06, 0x17, 0x10,
-		0x01, 0x0d, 0x16, 0x09, 0x1a, 0x05, 0x1e, 0x00,
-		0x12, 0x0b, 0x14, 0x03, 0x1c, 0x18, 0x07, 0x0f };
-
-	int usescroll = 0;
-	for (int i = 31; i >= 0; i--)
-	{
-		const int checkoffset = (0x80 / 2) + ((checkoffsets[i] * 3) + 1);
-
-		if (BIT(m_videoram[base + checkoffset], 12))
-		{
-			usescroll = 31 - i;
-		}
-	}
-
-	return usescroll;
-}
-
 u32 gaelco2_dual_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index)
 {
-	const int xoff0 = 0x14; // intro scenes align better with 0x13, but test screen is definitely 0x14
-	const int xoff1 = xoff0 - 4;
-	const int yoff0 = 0x01;
-	const int yoff1 = 0x01;
-
-	// read scroll values
-	const int scroll0x = m_videoram[0x2802 / 2] + xoff0;
-	const int scroll1x = m_videoram[0x2806 / 2] + xoff1;
-	int scroll0y = m_videoram[0x2800 / 2] + yoff0;
-	int scroll1y = m_videoram[0x2804 / 2] + yoff1;
-
-	if (BIT(m_vregs[0], 15))
-		scroll0y += get_rowscrollmode_yscroll(true);
-
-	if (BIT(m_vregs[1], 15))
-		scroll1y += get_rowscrollmode_yscroll(false);
-
-	// set y scroll registers
-	m_pant[0]->set_scrolly(0, scroll0y & 0x1ff);
-	m_pant[1]->set_scrolly(0, scroll1y & 0x1ff);
-
-	// set x linescroll registers
-	for (int i = 0; i < 512; i++)
-	{
-		m_pant[0]->set_scrollx(i & 0x1ff, (BIT(m_vregs[0], 15) ? (m_videoram[(0x2000 / 2) + i] + xoff0) : scroll0x) & 0x3ff);
-		m_pant[1]->set_scrollx(i & 0x1ff, (BIT(m_vregs[1], 15) ? (m_videoram[(0x2400 / 2) + i] + xoff1) : scroll1x) & 0x3ff);
-	}
-
-	// draw screen
 	bitmap.fill(0, cliprect);
 
-	m_pant[index]->draw(screen, bitmap, cliprect, 0, 0);
+	draw_tilemap(screen, bitmap, cliprect, index);
 	draw_sprites(screen, bitmap, cliprect, 0x8000 * index);
 
 	return 0;
