@@ -739,6 +739,14 @@ void asc_device::write(offs_t offset, u8 data)
 	}
 
 	asc_base_device::write(offset, data);
+
+	// Writing pending flags back raises the interrupt again. On the Mac II
+	// without a 68851, SwapMMUMode does this after switching the HMMU mode
+	// through VIA2 port B, which clears the CB1 flag of a pending interrupt.
+	if ((offset == 0x800 + R_FIFOSTAT) && data)
+	{
+		set_irq_line(ASSERT_LINE);
+	}
 }
 
 // asc_v8_device implementation
