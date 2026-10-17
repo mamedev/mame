@@ -250,7 +250,8 @@ void pcfx_state::pcfx_mem(address_map &map)
 	).umask32(0x00ff00ff);
 	map(0xe8000000, 0xe9ffffff).noprw();   /* Extended BackUp RAM */
 //  map(0xf8000000, 0xf8000007).noprw();   /* PIO, needed by pcfxga for reading backup "RAM" from DOS/V host */
-	map(0xfff00000, 0xffffffff).rom().region("ipl", 0);  /* ROM */
+	// the BIOS ROM is mirrored every 1 MB over the whole area
+	map(0xf0000000, 0xf00fffff).mirror(0x0ff00000).rom().region("ipl", 0);  /* ROM */
 }
 
 void pcfx_state::pcfx_io(address_map &map)
