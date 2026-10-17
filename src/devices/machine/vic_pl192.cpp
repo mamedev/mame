@@ -50,6 +50,7 @@ void vic_pl190_device::device_start()
 	save_item(NAME(intr_en));
 	save_item(NAME(soft_intr));
 	save_item(NAME(vectaddr));
+	save_item(NAME(vectctl));
 	save_item(NAME(defaddress));
 	save_item(NAME(vicaddress));
 	save_item(NAME(priority_mask));
@@ -192,17 +193,17 @@ void vic_pl190_device::set_irq_line(int irq, int state)
 
 u32 vic_pl190_device::irq_status_r()
 {
-	return raw_intr & ~intr_select;
+	return (raw_intr | soft_intr) & intr_en & ~intr_select;
 }
 
 u32 vic_pl190_device::fiq_status_r()
 {
-	return raw_intr & intr_select;
+	return (raw_intr | soft_intr) & intr_en & intr_select;
 }
 
 u32 vic_pl190_device::raw_intr_r()
 {
-	return raw_intr;
+	return raw_intr | soft_intr;
 }
 
 u32 vic_pl190_device::int_select_r()
