@@ -4,8 +4,8 @@
 
 SNK NeoGeo Pocket driver
 
-After setting the initial console settings power cycle the unit at least once,
-otherwise the settings will not be saved properly.
+After setting the initial console settings power cycle the unit at least
+once (in emulation), otherwise the settings will not be saved properly.
 
 
 The NeoGeo Pocket (Color) contains one big chip which contains the following
@@ -44,7 +44,7 @@ These manufacturer IDs are supported: 0x98, 0xec, 0xb0
 These device IDs are supported: 0xab, 0x2c, 0x2f
 
 There is support for 3 different sizes of flash roms: 4Mbit, 8Mbit 16Mbit. The
-32Mbit games appear to be 2 16Mbit flash chips in 2 different memory regions (?).
+32Mbit games appear to be 2 16Mbit flash chips in 2 different memory regions.
 
 The flash chips have a couple of different sized blocks. When writing to a
 cartridge the neogeo pocket bios will erase the proper block and write the data
@@ -103,13 +103,14 @@ the Neogeo Pocket.
 
 #include "emu.h"
 #include "k1ge.h"
+#include "ngp_cart.h"
 
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/tlcs900/tmp95c061.h"
 #include "cpu/z80/z80.h"
-#include "sound/t6w28.h"
 #include "sound/dac.h"
+#include "sound/t6w28.h"
 
 #include "dirtc.h"
 #include "screen.h"
@@ -119,26 +120,91 @@ the Neogeo Pocket.
 
 namespace {
 
-enum flash_state
+constexpr uint32_t MAINRAM_SIZE = 0x3000;
+constexpr uint32_t IO_REG_SIZE = 0x40;
+
+// This encapsulates the RAM and I/O registers that are kept active when
+// the system is "powered down". They are saved to an nvram file to survive
+// across sessions.
+// A simple driver nvram would have been saved to a file named <driver_name>.
+// However, software cartridge flash contents would be written to the
+// folder <driver_name>. This clashes, we work around that by using this
+// ngp_sysram_device.
+class ngp_sysram_device : public device_t, public device_nvram_interface
 {
-	F_READ,                     /* xxxx F0 or 5555 AA 2AAA 55 5555 F0 */
-	F_PROG1,
-	F_PROG2,
-	F_COMMAND,
-	F_ID_READ,                  /* 5555 AA 2AAA 55 5555 90 */
-	F_AUTO_PROGRAM,             /* 5555 AA 2AAA 55 5555 A0 address data */
-	F_AUTO_CHIP_ERASE,          /* 5555 AA 2AAA 55 5555 80 5555 AA 2AAA 55 5555 10 */
-	F_AUTO_BLOCK_ERASE,         /* 5555 AA 2AAA 55 5555 80 5555 AA 2AAA 55 block_address 30 */
-	F_BLOCK_PROTECT             /* 5555 AA 2AAA 55 5555 9A 5555 AA 2AAA 55 5555 9A */
+public:
+	ngp_sysram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+
+	// device_nvram_interface implementation
+	virtual void nvram_default() override ATTR_COLD;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+
+private:
+	memory_share_creator<uint8_t> m_mainram;
+	memory_share_creator<uint8_t> m_io_reg;
 };
 
 
-class ngp_state : public driver_device, public device_nvram_interface, device_rtc_interface
+DEFINE_DEVICE_TYPE_PRIVATE(NGP_SYSRAM, device_t, ngp_sysram_device, "ngp_sysram", "SNK Neo Geo Pocket System RAM")
+
+
+ngp_sysram_device::ngp_sysram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NGP_SYSRAM, tag, owner, clock)
+	, device_nvram_interface(mconfig, *this)
+	, m_mainram(*this, "mainram", MAINRAM_SIZE, ENDIANNESS_LITTLE)
+	, m_io_reg(*this, "ioreg", IO_REG_SIZE, ENDIANNESS_LITTLE)
+{
+}
+
+
+void ngp_sysram_device::device_start()
+{
+}
+
+
+void ngp_sysram_device::nvram_default()
+{
+}
+
+
+bool ngp_sysram_device::nvram_read(util::read_stream &file)
+{
+	uint8_t data[MAINRAM_SIZE + IO_REG_SIZE];
+
+	auto const [err, actual] = read(file, data, sizeof(data));
+	if (!err && (actual == sizeof(data)))
+	{
+		std::copy_n(data, MAINRAM_SIZE, &m_mainram[0]);
+		std::copy_n(data + MAINRAM_SIZE, IO_REG_SIZE, &m_io_reg[0]);
+
+		return true;
+	}
+	return false;
+}
+
+
+bool ngp_sysram_device::nvram_write(util::write_stream &file)
+{
+	uint8_t data[MAINRAM_SIZE + IO_REG_SIZE];
+
+	std::copy_n(&m_mainram[0], MAINRAM_SIZE, data);
+	std::copy_n(&m_io_reg[0], IO_REG_SIZE, data + MAINRAM_SIZE);
+
+	auto const [err, actual] = write(file, data, sizeof(data));
+	return !err;
+}
+
+
+class ngp_state : public driver_device, public device_rtc_interface
 {
 public:
 	ngp_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		device_nvram_interface(mconfig, *this),
 		device_rtc_interface(mconfig, *this),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
@@ -146,11 +212,12 @@ public:
 		m_t6w28(*this, "t6w28"),
 		m_ldac(*this, "ldac"),
 		m_rdac(*this, "rdac"),
+		m_speaker(*this, "speaker"),
 		m_cart(*this, "cartslot"),
-		m_mainram(*this, "mainram"),
 		m_k1ge(*this, "k1ge"),
 		m_io_controls(*this, "Controls"),
-		m_io_power(*this, "Power")
+		m_io_power(*this, "Power"),
+		m_io_reg(*this, "sysram:ioreg")
 	{ }
 
 	void ngp_common(machine_config &config);
@@ -164,45 +231,25 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override ATTR_COLD;
 
-	virtual void nvram_default() override;
-	virtual bool nvram_read(util::read_stream &file) override;
-	virtual bool nvram_write(util::write_stream &file) override;
-
 private:
 	required_device<tmp95c061_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<cpu_device> m_z80;
+	required_device<z80_device> m_z80;
 	required_device<t6w28_device> m_t6w28;
 	required_device<dac_byte_interface> m_ldac;
 	required_device<dac_byte_interface> m_rdac;
-	required_device<generic_slot_device> m_cart;
-	required_shared_ptr<uint8_t> m_mainram;
+	required_device<speaker_device> m_speaker;
+	required_device<ngp_cart_slot_device> m_cart;
 	required_device<k1ge_device> m_k1ge;
 	required_ioport m_io_controls;
 	required_ioport m_io_power;
 
-	uint8_t m_io_reg[0x40] = { };
+	required_shared_ptr<uint8_t> m_io_reg;
 	uint8_t m_old_to3 = 0;
 	emu_timer* m_seconds_timer = nullptr;
 
-	struct {
-		bool      present = false;
-		uint8_t   manufacturer_id = 0;
-		uint8_t   device_id = 0;
-		uint8_t   *data = nullptr;
-		uint8_t   org_data[16] = { };
-		int32_t   state = F_READ;
-		uint8_t   command[2] = { };
-	} m_flash_chip[2];
-
-	bool m_nvram_loaded = false;
-
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);
-
-	template <int Which> void flash_w(offs_t offset, uint8_t data);
-	void flash0_w(offs_t offset, uint8_t data);
-	void flash1_w(offs_t offset, uint8_t data);
 
 	uint8_t z80_comm_r();
 	void z80_comm_w(uint8_t data);
@@ -214,9 +261,6 @@ private:
 	void hblank_pin_w(int state);
 	void tlcs900_porta(offs_t offset, uint8_t data);
 	TIMER_CALLBACK_MEMBER(seconds_callback);
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_ngp_cart);
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(unload_ngp_cart);
 
 	void main_mem(address_map &map) ATTR_COLD;
 	void z80_io(address_map &map) ATTR_COLD;
@@ -232,8 +276,6 @@ TIMER_CALLBACK_MEMBER(ngp_state::seconds_callback)
 
 uint8_t ngp_state::io_r(offs_t offset)
 {
-	uint8_t data = m_io_reg[offset];
-
 	switch (offset)
 	{
 	case 0x11:  // year
@@ -251,12 +293,10 @@ uint8_t ngp_state::io_r(offs_t offset)
 	case 0x30:  // Read controls
 		return m_io_controls->read();
 	case 0x31:
-		data = m_io_power->read() & 0x01;
-		// Sub-battery OK
-		data |= 0x02;
-		break;
+		return (m_io_power->read() & 0x01)
+			| 0x02;  // Sub-battery OK
 	}
-	return data;
+	return m_io_reg[offset];
 }
 
 
@@ -284,7 +324,7 @@ void ngp_state::io_w(offs_t offset, uint8_t data)
 		break;
 	case 0x20:  // t6w28 "right"
 	case 0x21:  // t6w28 "left"
-		if (m_io_reg[0x38] == 0x55 && m_io_reg[0x39] == 0xAA)
+		if (m_io_reg[0x38] == 0x55 && m_io_reg[0x39] == 0xaa)
 			m_t6w28->write(0, data);
 		break;
 
@@ -304,7 +344,7 @@ void ngp_state::io_w(offs_t offset, uint8_t data)
 		case 0x55:  // Enabled sound
 			m_t6w28->set_enable(true);
 			break;
-		case 0xAA:  // Disable sound
+		case 0xaa:  // Disable sound
 			m_t6w28->set_enable(false);
 			break;
 		}
@@ -318,7 +358,7 @@ void ngp_state::io_w(offs_t offset, uint8_t data)
 			m_z80->reset();
 			m_z80->set_input_line(0, CLEAR_LINE);
 			break;
-		case 0xAA:  // Disable Z80
+		case 0xaa:  // Disable Z80
 			m_z80->suspend(SUSPEND_REASON_HALT, 1);
 			break;
 		}
@@ -332,238 +372,13 @@ void ngp_state::io_w(offs_t offset, uint8_t data)
 }
 
 
-template <int Which> void ngp_state::flash_w(offs_t offset, uint8_t data)
-{
-	if (!m_flash_chip[Which].present)
-		return;
-
-	switch (m_flash_chip[Which].state)
-	{
-	case F_READ:
-		if (offset == 0x5555 && data == 0xaa)
-			m_flash_chip[Which].state = F_PROG1;
-		m_flash_chip[Which].command[0] = 0;
-		break;
-	case F_PROG1:
-		if (offset == 0x2aaa && data == 0x55)
-			m_flash_chip[Which].state = F_PROG2;
-		else
-			m_flash_chip[Which].state = F_READ;
-		break;
-	case F_PROG2:
-		if (data == 0x30)
-		{
-			if (m_flash_chip[Which].command[0] == 0x80)
-			{
-				int size = 0x10000;
-				uint8_t *block = m_flash_chip[Which].data;
-
-				m_flash_chip[Which].state = F_AUTO_BLOCK_ERASE;
-				switch (m_flash_chip[Which].device_id)
-				{
-				case 0xab:
-					if (offset < 0x70000)
-						block = m_flash_chip[Which].data + (offset & 0x70000);
-					else
-					{
-						if (offset & 0x8000)
-						{
-							if (offset & 0x4000)
-							{
-								block = m_flash_chip[Which].data + (offset & 0x7c000);
-								size = 0x4000;
-							}
-							else
-							{
-								block = m_flash_chip[Which].data + (offset & 0x7e000);
-								size = 0x2000;
-							}
-						}
-						else
-						{
-							block = m_flash_chip[Which].data + (offset & 0x78000);
-							size = 0x8000;
-						}
-					}
-					break;
-				case 0x2c:
-					if (offset < 0xf0000)
-						block = m_flash_chip[Which].data + (offset & 0xf0000);
-					else
-					{
-						if (offset & 0x8000)
-						{
-							if (offset & 0x4000)
-							{
-								block = m_flash_chip[Which].data + (offset & 0xfc000);
-								size = 0x4000;
-							}
-							else
-							{
-								block = m_flash_chip[Which].data + (offset & 0xfe000);
-								size = 0x2000;
-							}
-						}
-						else
-						{
-							block = m_flash_chip[Which].data + (offset & 0xf8000);
-							size = 0x8000;
-						}
-					}
-					break;
-				case 0x2f:
-					if (offset < 0x1f0000)
-						block = m_flash_chip[Which].data + (offset & 0x1f0000);
-					else
-					{
-						if (offset & 0x8000)
-						{
-							if (offset & 0x4000)
-							{
-								block = m_flash_chip[Which].data + (offset & 0x1fc000);
-								size = 0x4000;
-							}
-							else
-							{
-								block = m_flash_chip[Which].data + (offset & 0x1fe000);
-								size = 0x2000;
-							}
-						}
-						else
-						{
-							block = m_flash_chip[Which].data + (offset & 0x1f8000);
-							size = 0x8000;
-						}
-					}
-					break;
-				}
-				memset(block, 0xFF, size);
-			}
-			else
-				m_flash_chip[Which].state = F_READ;
-		}
-		else if (offset == 0x5555)
-		{
-			switch (data)
-			{
-			case 0x80:
-				m_flash_chip[Which].command[0] = 0x80;
-				m_flash_chip[Which].state = F_COMMAND;
-				break;
-			case 0x90:
-				m_flash_chip[Which].data[0x1fc000] = m_flash_chip[Which].manufacturer_id;
-				m_flash_chip[Which].data[0xfc000] = m_flash_chip[Which].manufacturer_id;
-				m_flash_chip[Which].data[0x7c000] = m_flash_chip[Which].manufacturer_id;
-				m_flash_chip[Which].data[0] = m_flash_chip[Which].manufacturer_id;
-				m_flash_chip[Which].data[0x1fc001] = m_flash_chip[Which].device_id;
-				m_flash_chip[Which].data[0xfc001] = m_flash_chip[Which].device_id;
-				m_flash_chip[Which].data[0x7c001] = m_flash_chip[Which].device_id;
-				m_flash_chip[Which].data[1] = m_flash_chip[Which].device_id;
-				m_flash_chip[Which].data[0x1fc002] = 0x02;
-				m_flash_chip[Which].data[0xfc002] = 0x02;
-				m_flash_chip[Which].data[0x7c002] = 0x02;
-				m_flash_chip[Which].data[2] = 0x02;
-				m_flash_chip[Which].data[0x1fc003] = 0x80;
-				m_flash_chip[Which].data[0xfc003] = 0x80;
-				m_flash_chip[Which].data[0x7c003] = 0x80;
-				m_flash_chip[Which].data[3] = 0x80;
-				m_flash_chip[Which].state = F_ID_READ;
-				break;
-			case 0x9a:
-				if (m_flash_chip[Which].command[0] == 0x9a)
-					m_flash_chip[Which].state = F_BLOCK_PROTECT;
-				else
-				{
-					m_flash_chip[Which].command[0] = 0x9a;
-					m_flash_chip[Which].state = F_COMMAND;
-				}
-				break;
-			case 0xa0:
-				m_flash_chip[Which].state = F_AUTO_PROGRAM;
-				break;
-			case 0xf0:
-			default:
-				m_flash_chip[Which].state = F_READ;
-				break;
-			}
-		}
-		else
-			m_flash_chip[Which].state = F_READ;
-		break;
-	case F_COMMAND:
-		if (offset == 0x5555 && data == 0xaa)
-			m_flash_chip[Which].state = F_PROG1;
-		else
-			m_flash_chip[Which].state = F_READ;
-		break;
-	case F_ID_READ:
-		if (offset == 0x5555 && data == 0xaa)
-			m_flash_chip[Which].state = F_PROG1;
-		else
-			m_flash_chip[Which].state = F_READ;
-		m_flash_chip[Which].command[0] = 0;
-		break;
-	case F_AUTO_PROGRAM:
-		/* Only 1 -> 0 changes can be programmed */
-		m_flash_chip[Which].data[offset] = m_flash_chip[Which].data[offset] & data;
-		m_flash_chip[Which].state = F_READ;
-		break;
-	case F_AUTO_CHIP_ERASE:
-		m_flash_chip[Which].state = F_READ;
-		break;
-	case F_AUTO_BLOCK_ERASE:
-		m_flash_chip[Which].state = F_READ;
-		break;
-	case F_BLOCK_PROTECT:
-		m_flash_chip[Which].state = F_READ;
-		break;
-	}
-
-	if (m_flash_chip[Which].state == F_READ)
-	{
-		/* Exit command/back to normal operation*/
-		m_flash_chip[Which].data[0] = m_flash_chip[Which].org_data[0];
-		m_flash_chip[Which].data[1] = m_flash_chip[Which].org_data[1];
-		m_flash_chip[Which].data[2] = m_flash_chip[Which].org_data[2];
-		m_flash_chip[Which].data[3] = m_flash_chip[Which].org_data[3];
-		m_flash_chip[Which].data[0x7c000] = m_flash_chip[Which].org_data[4];
-		m_flash_chip[Which].data[0x7c001] = m_flash_chip[Which].org_data[5];
-		m_flash_chip[Which].data[0x7c002] = m_flash_chip[Which].org_data[6];
-		m_flash_chip[Which].data[0x7c003] = m_flash_chip[Which].org_data[7];
-		m_flash_chip[Which].data[0xfc000] = m_flash_chip[Which].org_data[8];
-		m_flash_chip[Which].data[0xfc001] = m_flash_chip[Which].org_data[9];
-		m_flash_chip[Which].data[0xfc002] = m_flash_chip[Which].org_data[10];
-		m_flash_chip[Which].data[0xfc003] = m_flash_chip[Which].org_data[11];
-		m_flash_chip[Which].data[0x1fc000] = m_flash_chip[Which].org_data[12];
-		m_flash_chip[Which].data[0x1fc001] = m_flash_chip[Which].org_data[13];
-		m_flash_chip[Which].data[0x1fc002] = m_flash_chip[Which].org_data[14];
-		m_flash_chip[Which].data[0x1fc003] = m_flash_chip[Which].org_data[15];
-		m_flash_chip[Which].command[0] = 0;
-	}
-}
-
-
-void ngp_state::flash0_w(offs_t offset, uint8_t data)
-{
-	flash_w<0>(offset, data);
-}
-
-
-void ngp_state::flash1_w(offs_t offset, uint8_t data)
-{
-	flash_w<1>(offset, data);
-}
-
-
 void ngp_state::main_mem(address_map &map)
 {
-	map(0x000080, 0x0000bf).rw(FUNC(ngp_state::io_r), FUNC(ngp_state::io_w));                        /* ngp/c specific i/o */
-	map(0x004000, 0x006fff).ram().share(m_mainram);                              /* work ram */
-	map(0x007000, 0x007fff).ram().share("soundram");                             /* shared with sound cpu */
-	map(0x008000, 0x00bfff).rw(m_k1ge, FUNC(k1ge_device::read), FUNC(k1ge_device::write));       /* video chip */
-	map(0x200000, 0x3fffff).w(FUNC(ngp_state::flash0_w));   /* cart area #1 */
-	map(0x800000, 0x9fffff).w(FUNC(ngp_state::flash1_w));   /* cart area #2 */
-	map(0xff0000, 0xffffff).rom().region("maincpu", 0);                          /* system rom */
+	map(0x00'0080, 0x00'00bf).rw(FUNC(ngp_state::io_r), FUNC(ngp_state::io_w)).share("sysram:ioreg");
+	map(0x00'4000, 0x00'6fff).ram().share("sysram:mainram");
+	map(0x00'7000, 0x00'7fff).ram().share("soundram");
+	map(0x00'8000, 0x00'bfff).rw(m_k1ge, FUNC(k1ge_device::read), FUNC(k1ge_device::write));
+	map(0xff'0000, 0xff'ffff).rom().region("maincpu", 0);
 }
 
 
@@ -598,7 +413,7 @@ void ngp_state::z80_clear_irq(uint8_t data)
 {
 	m_z80->set_input_line(0, CLEAR_LINE);
 
-	/* I am not exactly sure what causes the maincpu INT5 signal to be cleared. This will do for now. */
+	// Unknown what causes the maincpu INT5 signal to be cleared. This will do for now.
 	m_maincpu->set_input_line(TLCS900_INT5, CLEAR_LINE);
 }
 
@@ -657,74 +472,10 @@ void ngp_state::tlcs900_porta(offs_t offset, uint8_t data)
 
 void ngp_state::machine_start()
 {
-	if (m_cart->exists())
-	{
-		std::string region_tag;
-		uint8_t *cart = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str())->base();
-
-		m_maincpu->space(AS_PROGRAM).install_rom(0x200000, 0x3fffff, cart);
-		m_maincpu->space(AS_PROGRAM).install_rom(0x800000, 0x9fffff, cart + 0x200000);
-
-		m_flash_chip[0].data = cart;
-		m_flash_chip[0].org_data[0] = m_flash_chip[0].data[0];
-		m_flash_chip[0].org_data[1] = m_flash_chip[0].data[1];
-		m_flash_chip[0].org_data[2] = m_flash_chip[0].data[2];
-		m_flash_chip[0].org_data[3] = m_flash_chip[0].data[3];
-		m_flash_chip[0].org_data[4] = m_flash_chip[0].data[0x7c000];
-		m_flash_chip[0].org_data[5] = m_flash_chip[0].data[0x7c001];
-		m_flash_chip[0].org_data[6] = m_flash_chip[0].data[0x7c002];
-		m_flash_chip[0].org_data[7] = m_flash_chip[0].data[0x7c003];
-		m_flash_chip[0].org_data[8] = m_flash_chip[0].data[0xfc000];
-		m_flash_chip[0].org_data[9] = m_flash_chip[0].data[0xfc001];
-		m_flash_chip[0].org_data[10] = m_flash_chip[0].data[0xfc002];
-		m_flash_chip[0].org_data[11] = m_flash_chip[0].data[0xfc003];
-		m_flash_chip[0].org_data[12] = m_flash_chip[0].data[0x1fc000];
-		m_flash_chip[0].org_data[13] = m_flash_chip[0].data[0x1fc001];
-		m_flash_chip[0].org_data[14] = m_flash_chip[0].data[0x1fc002];
-		m_flash_chip[0].org_data[15] = m_flash_chip[0].data[0x1fc003];
-
-		m_flash_chip[1].data = cart + 0x200000;
-		m_flash_chip[1].org_data[0] = m_flash_chip[1].data[0];
-		m_flash_chip[1].org_data[1] = m_flash_chip[1].data[1];
-		m_flash_chip[1].org_data[2] = m_flash_chip[1].data[2];
-		m_flash_chip[1].org_data[3] = m_flash_chip[1].data[3];
-		m_flash_chip[1].org_data[4] = m_flash_chip[1].data[0x7c000];
-		m_flash_chip[1].org_data[5] = m_flash_chip[1].data[0x7c001];
-		m_flash_chip[1].org_data[6] = m_flash_chip[1].data[0x7c002];
-		m_flash_chip[1].org_data[7] = m_flash_chip[1].data[0x7c003];
-		m_flash_chip[1].org_data[8] = m_flash_chip[1].data[0xfc000];
-		m_flash_chip[1].org_data[9] = m_flash_chip[1].data[0xfc001];
-		m_flash_chip[1].org_data[10] = m_flash_chip[1].data[0xfc002];
-		m_flash_chip[1].org_data[11] = m_flash_chip[1].data[0xfc003];
-		m_flash_chip[1].org_data[12] = m_flash_chip[1].data[0x1fc000];
-		m_flash_chip[1].org_data[13] = m_flash_chip[1].data[0x1fc001];
-		m_flash_chip[1].org_data[14] = m_flash_chip[1].data[0x1fc002];
-		m_flash_chip[1].org_data[15] = m_flash_chip[1].data[0x1fc003];
-	}
-	else
-	{
-		m_maincpu->space(AS_PROGRAM).unmap_read(0x200000, 0x3fffff);
-		m_maincpu->space(AS_PROGRAM).unmap_read(0x800000, 0x9fffff);
-	}
-
 	m_seconds_timer = timer_alloc(FUNC(ngp_state::seconds_callback), this);
 	m_seconds_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
-	save_item(NAME(m_io_reg));
 	save_item(NAME(m_old_to3));
-	// TODO: check if these are handled correctly...
-	save_item(NAME(m_flash_chip[0].present));
-	save_item(NAME(m_flash_chip[0].manufacturer_id));
-	save_item(NAME(m_flash_chip[0].device_id));
-	save_item(NAME(m_flash_chip[0].org_data));
-	save_item(NAME(m_flash_chip[0].state));
-	save_item(NAME(m_flash_chip[0].command));
-	save_item(NAME(m_flash_chip[1].present));
-	save_item(NAME(m_flash_chip[1].manufacturer_id));
-	save_item(NAME(m_flash_chip[1].device_id));
-	save_item(NAME(m_flash_chip[1].org_data));
-	save_item(NAME(m_flash_chip[1].state));
-	save_item(NAME(m_flash_chip[1].command));
 }
 
 
@@ -735,106 +486,8 @@ void ngp_state::machine_reset()
 	m_z80->suspend(SUSPEND_REASON_HALT, 1);
 	m_z80->set_input_line(0, CLEAR_LINE);
 
-	if (m_nvram_loaded)
-	{
-		m_maincpu->set_state_int(TLCS900_PC, 0xFF1800);
-	}
-}
-
-
-DEVICE_IMAGE_LOAD_MEMBER(ngp_state::load_ngp_cart)
-{
-	uint32_t size = m_cart->common_get_size("rom");
-
-	if (size != 0x8000 && size != 0x8'0000 && size != 0x10'0000 && size != 0x20'0000 && size != 0x40'0000)
-		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be 32K, 512K, 1M, 2M or 4M)");
-
-	// alloc 0x400000 ROM to simplify mapping in the address map
-	m_cart->rom_alloc(0x400000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	//printf("%2x%2x - %x - %x\n", (unsigned int) memregion("cart")->u8(0x20), (unsigned int) memregion("cart")->u8(0x21),
-	//        (unsigned int) memregion("cart")->u8(0x22), (unsigned int) memregion("cart")->u8(0x23));
-	m_flash_chip[0].manufacturer_id = 0x98;
-	m_flash_chip[0].present = true;
-	m_flash_chip[0].state = F_READ;
-
-	switch (size)
-	{
-	case 0x8000:
-	case 0x80000:
-		m_flash_chip[0].device_id = 0xab;
-		break;
-	case 0x100000:
-		m_flash_chip[0].device_id = 0x2c;
-		break;
-	case 0x200000:
-	case 0x400000:
-		m_flash_chip[0].device_id = 0x2f;
-		break;
-	}
-
-	if (size == 0x400000)
-	{
-		m_flash_chip[1].manufacturer_id = 0x98;
-		m_flash_chip[1].device_id = 0x2f;
-		m_flash_chip[1].present = true;
-		m_flash_chip[1].state = F_READ;
-	}
-
-	return std::make_pair(std::error_condition(), std::string());
-}
-
-
-DEVICE_IMAGE_UNLOAD_MEMBER(ngp_state::unload_ngp_cart)
-{
-	m_flash_chip[0].present = false;
-	m_flash_chip[0].state = F_READ;
-
-	m_flash_chip[1].present = false;
-	m_flash_chip[1].state = F_READ;
-}
-
-
-void ngp_state::nvram_default()
-{
-}
-
-
-bool ngp_state::nvram_read(util::read_stream &file)
-{
-	u8 data[0x3000 + 0x20];
-
-	auto const [err, actual] = read(file, data, 0x3000 + 0x20);
-	if (!err && (actual == 0x3000 + 0x20))
-	{
-		for (int i = 0; i < 0x3000; i++)
-			m_mainram[i] = data[i];
-		for (int i = 0; i < 0x20; i++)
-			m_io_reg[i] = data[0x3000 + i];
-
-		system_time curtime;
-		machine().current_datetime(curtime);
-		set_current_time(curtime);
-
-		m_nvram_loaded = true;
-		return true;
-	}
-	return false;
-}
-
-
-bool ngp_state::nvram_write(util::write_stream &file)
-{
-	u8 data[0x3000 + 0x20];
-
-	for (int i = 0; i < 0x3000; i++)
-		data[i] = m_mainram[i];
-	for (int i = 0; i < 0x20; i++)
-		data[0x3000 + i] = m_io_reg[i];
-
-	auto const [err, actual] = write(file, data, 0x3000 + 0x20);
-	return !err;
+	// Enforce the cpu to start executing as if the power button had just been pushed.
+	m_maincpu->set_state_int(TLCS900_PC, 0xff'1800);
 }
 
 
@@ -851,28 +504,33 @@ void ngp_state::rtc_clock_updated(int year, int month, int day, int day_of_week,
 
 void ngp_state::ngp_common(machine_config &config)
 {
+	NGP_SYSRAM(config, "sysram", 0U);
+
 	TMP95C061(config, m_maincpu, 6.144_MHz_XTAL);
 	m_maincpu->set_am8_16(1);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ngp_state::main_mem);
 	m_maincpu->porta_write().set(FUNC(ngp_state::tlcs900_porta));
 	m_maincpu->an_read<0>().set_constant(0x3ff); // main battery power
 
-	z80_device &soundcpu(Z80(config, "soundcpu", 6.144_MHz_XTAL/2));
-	soundcpu.set_addrmap(AS_PROGRAM, &ngp_state::z80_mem);
-	soundcpu.set_addrmap(AS_IO, &ngp_state::z80_io);
+	Z80(config, m_z80, 6.144_MHz_XTAL/2);
+	m_z80->set_addrmap(AS_PROGRAM, &ngp_state::z80_mem);
+	m_z80->set_addrmap(AS_IO, &ngp_state::z80_io);
 
 	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_raw(6.144_MHz_XTAL, 515, 0, 160 /*480*/, 199, 0, 152);
 
-	/* sound hardware */
-	SPEAKER(config, "speaker", 2).front();
+	// sound hardware
+	SPEAKER(config, m_speaker, 2).front();
 
 	T6W28(config, m_t6w28, 6.144_MHz_XTAL/2);
-	m_t6w28->add_route(0, "speaker", 0.50, 0);
-	m_t6w28->add_route(1, "speaker", 0.50, 1);
+	m_t6w28->add_route(0, m_speaker, 0.50, 0);
+	m_t6w28->add_route(1, m_speaker, 0.50, 1);
 
-	DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 0); // unknown DAC
-	DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1); // unknown DAC
+	DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, m_speaker, 0.25, 0); // unknown DAC
+	DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, m_speaker, 0.25, 1); // unknown DAC
+
+	NGP_CART_SLOT(config, m_cart, generic_plain_slot, "ngp_cart", "bin,ngp,npc,ngc");
+	m_cart->set_address_space(m_maincpu, AS_PROGRAM);
 }
 
 
@@ -886,10 +544,6 @@ void ngp_state::ngp(machine_config &config)
 
 	m_screen->set_screen_update(m_k1ge, FUNC(k1ge_device::screen_update));
 	m_screen->set_palette(m_k1ge);
-
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ngp_cart", "bin,ngp,npc,ngc"));
-	cartslot.set_device_load(FUNC(ngp_state::load_ngp_cart));
-	cartslot.set_device_unload(FUNC(ngp_state::unload_ngp_cart));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ngp");
 	SOFTWARE_LIST(config, "ngpc_list").set_compatible("ngpc");
@@ -905,10 +559,6 @@ void ngp_state::ngpc(machine_config &config)
 
 	m_screen->set_screen_update(m_k1ge, FUNC(k1ge_device::screen_update));
 	m_screen->set_palette(m_k1ge);
-
-	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "ngp_cart", "bin,ngp,npc,ngc"));
-	cartslot.set_device_load(FUNC(ngp_state::load_ngp_cart));
-	cartslot.set_device_unload(FUNC(ngp_state::unload_ngp_cart));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ngpc");
 	SOFTWARE_LIST(config, "ngp_list").set_compatible("ngp");
