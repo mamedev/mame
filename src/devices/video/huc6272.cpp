@@ -8,11 +8,10 @@ TODO:
 - Use NSCSI instead of legacy one;
 \- SEL acknowledges with 0x84, bit 7 controller type is unknown at this time
   (bit 2 should select the CD drive);
+- SCSI sub-channel register ($08) is a stub;
 - Convert base mapping to address_map;
 - Convert I/O to space address, and make it honor mem_mask;
 - subclass "SCSICD" into SCSI-2 "CD-ROM DRIVE:FX"
-  \- Fails detection of PC-FX discs, detects as normal audio CDs;
-  \- During POST it tries an unhandled 0x44 "Read Header";
   \- Derivative design of PCE drive, which in turn is a derivative of PC-8801-30 (cd drive)
      and PC-8801-31 (interface);
 - Implement video routines drawing and interface:
@@ -93,6 +92,7 @@ void huc6272_device::device_add_mconfig(machine_config &config)
 	scsibus.rst_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit7));
 	scsibus.bsy_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit6));
 	scsibus.req_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit5));
+	scsibus.req_handler().append(FUNC(huc6272_device::scsi_req_w));
 	scsibus.msg_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit4));
 	scsibus.cd_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit3));
 	scsibus.io_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit2));
@@ -125,6 +125,24 @@ void huc6272_device::device_start()
 	save_item(NAME(m_kram_inc_w));
 	save_item(NAME(m_kram_page_w));
 	save_item(NAME(m_page_setting));
+
+	save_item(STRUCT_MEMBER(m_scsi, data));
+	save_item(STRUCT_MEMBER(m_scsi, ctrl));
+	save_item(STRUCT_MEMBER(m_scsi, mode));
+	save_item(STRUCT_MEMBER(m_scsi, phase));
+	save_item(STRUCT_MEMBER(m_scsi, data_cache));
+	save_item(STRUCT_MEMBER(m_scsi, ack));
+	save_item(STRUCT_MEMBER(m_scsi, drq));
+	save_item(STRUCT_MEMBER(m_scsi, dma_receive));
+	save_item(STRUCT_MEMBER(m_scsi, dma_send));
+	save_item(STRUCT_MEMBER(m_scsi, irq));
+	save_item(STRUCT_MEMBER(m_scsi, subchannel_ctrl));
+	save_item(STRUCT_MEMBER(m_dma, addr));
+	save_item(STRUCT_MEMBER(m_dma, size));
+	save_item(STRUCT_MEMBER(m_dma, ctrl));
+	save_item(STRUCT_MEMBER(m_dma, latch));
+	save_item(STRUCT_MEMBER(m_dma, flipflop));
+	save_item(STRUCT_MEMBER(m_dma, irq));
 
 	save_item(STRUCT_MEMBER(m_bg, bat_address));
 	save_item(STRUCT_MEMBER(m_bg, cg_address));
@@ -177,6 +195,16 @@ void huc6272_device::device_reset()
 	m_bg0sub.cg_address = 0;
 	m_bg0sub.height = 1;
 	m_bg0sub.width = 1;
+
+	m_scsi = scsi_t();
+	m_dma = dma_t();
+	m_in_scsi_update = false;
+	m_scsi_data_out->write(0);
+	m_scsibus->write_atn(0);
+	m_scsibus->write_sel(0);
+	m_scsibus->write_ack(0);
+	m_scsibus->write_rst(0);
+	interrupt_update();
 }
 
 device_memory_interface::space_config_vector huc6272_device::memory_space_config() const
@@ -218,16 +246,17 @@ void huc6272_device::amap(address_map &map)
 void huc6272_device::io_map(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(huc6272_device::scsi_data_r), FUNC(huc6272_device::scsi_data_w));
-	map(0x01, 0x01).rw(FUNC(huc6272_device::scsi_cmd_status_r), FUNC(huc6272_device::scsi_initiate_cmd_w));
-//  map(0x02, 0x02) SCSI DMA mode
-	map(0x03, 0x03).w(FUNC(huc6272_device::scsi_target_cmd_w));
+	map(0x01, 0x01).rw(FUNC(huc6272_device::scsi_ctrl_r), FUNC(huc6272_device::scsi_ctrl_w));
+	map(0x02, 0x02).rw(FUNC(huc6272_device::scsi_mode_r), FUNC(huc6272_device::scsi_mode_w));
+	map(0x03, 0x03).rw(FUNC(huc6272_device::scsi_phase_r), FUNC(huc6272_device::scsi_phase_w));
+	map(0x04, 0x04).r(FUNC(huc6272_device::scsi_bus_status_r));
 	map(0x05, 0x05).rw(FUNC(huc6272_device::scsi_bus_r), FUNC(huc6272_device::scsi_bus_w));
-//  map(0x06, 0x06) SCSI input data
-//  map(0x07, 0x07) SCSI DMA trigger
-//  map(0x08, 0x08) SCSI subcode
-//  map(0x09, 0x09) SCSI DMA start address
-//  map(0x0a, 0x0a) SCSI DMA size
-//  map(0x0b, 0x0b) SCSI DMA control
+	map(0x06, 0x06).r(FUNC(huc6272_device::scsi_input_data_r));
+	map(0x07, 0x07).rw(FUNC(huc6272_device::scsi_irq_ack_r), FUNC(huc6272_device::scsi_dma_start_w));
+	map(0x08, 0x08).rw(FUNC(huc6272_device::scsi_subchannel_r), FUNC(huc6272_device::scsi_subchannel_w));
+	map(0x09, 0x09).rw(FUNC(huc6272_device::dma_address_r), FUNC(huc6272_device::dma_address_w));
+	map(0x0a, 0x0a).rw(FUNC(huc6272_device::dma_size_r), FUNC(huc6272_device::dma_size_w));
+	map(0x0b, 0x0b).rw(FUNC(huc6272_device::dma_control_r), FUNC(huc6272_device::dma_control_w));
 	map(0x0c, 0x0c).rw(FUNC(huc6272_device::kram_read_address_r), FUNC(huc6272_device::kram_read_address_w));
 	map(0x0d, 0x0d).rw(FUNC(huc6272_device::kram_write_address_r), FUNC(huc6272_device::kram_write_address_w));
 	map(0x0e, 0x0e).rw(FUNC(huc6272_device::kram_read_data_r), FUNC(huc6272_device::kram_write_data_w));
@@ -298,7 +327,12 @@ u16 huc6272_device::status_r(offs_t offset)
 {
 	u16 res = m_register & 0x7f;
 	res |= (m_adpcm.interrupt << 10);
-	// TODO: other IRQs
+	// TODO: sub-channel and raster IRQs
+	// only one of DMA/SCSI is reported at a time (Anime Freak FX Vol. 4 gets confused otherwise)
+	if (m_dma.irq && BIT(m_dma.ctrl, 1))
+		res |= 0x2000;
+	else if (m_scsi.irq)
+		res |= 0x4000;
 	return res;
 }
 
@@ -315,7 +349,7 @@ u16 huc6272_device::status_r(offs_t offset)
  */
 u16 huc6272_device::status2_r(offs_t offset)
 {
-	u16 res = (m_scsi_ctrl_in->read() & 0xff);
+	u16 res = scsi_bus_signals();
 	// TODO: sub-code data
 	return res;
 }
@@ -339,54 +373,401 @@ void huc6272_device::data_w(offs_t offset, u32 data, u32 mem_mask)
  * I/O handlers
  */
 
+/*
+ * SCSI controller
+ *
+ * KING is the SCSI initiator; the PC-FX CD drive is the only target.
+ */
+
+// RST, BSY, REQ, MSG, C/D, I/O and SEL, same layout as the low byte of status 2
+u8 huc6272_device::scsi_bus_signals()
+{
+	return m_scsi_ctrl_in->read() & 0xfe;
+}
+
+bool huc6272_device::scsi_phase_match()
+{
+	const u8 bus = scsi_bus_signals();
+	return BIT(bus, 2) == BIT(m_scsi.phase, 0) && BIT(bus, 3) == BIT(m_scsi.phase, 1) && BIT(bus, 4) == BIT(m_scsi.phase, 2);
+}
+
+void huc6272_device::scsi_set_ack(bool state)
+{
+	m_scsi.ack = state;
+	m_scsibus->write_ack(state ? 1 : 0);
+}
+
+// the data bus is only driven when "assert data bus" is set, or by a DMA send
+void huc6272_device::scsi_update_data_bus()
+{
+	if (m_scsi.dma_send)
+		m_scsi_data_out->write(m_scsi.data_cache);
+	else
+		m_scsi_data_out->write(BIT(m_scsi.ctrl, 0) ? m_scsi.data : 0);
+}
+
+void huc6272_device::scsi_req_w(int state)
+{
+	// phase mismatch interrupt, raised on REQ assertion while in DMA mode
+	if (state && BIT(m_scsi.mode, 1) && !scsi_phase_match())
+	{
+		m_scsi.irq = true;
+		interrupt_update();
+	}
+
+	scsi_dma_update();
+}
+
+void huc6272_device::dma_write_byte(u8 data)
+{
+	if (!m_dma.flipflop)
+		m_dma.latch = data;
+	else
+	{
+		const u32 page = BIT(m_page_setting, 0);
+		space(AS_DATA).write_word((m_dma.addr & 0x3ffff) | (page << 18), m_dma.latch | (data << 8));
+		m_dma.addr = ((m_dma.addr + 1) & 0x1ffff) | (m_dma.addr & 0x20000);
+		m_dma.size = (m_dma.size - 2) & 0x3ffff;
+		if (!m_dma.size)
+		{
+			m_dma.irq = true;
+			m_dma.ctrl &= ~1;
+			interrupt_update();
+			return;
+		}
+	}
+	m_dma.flipflop ^= 1;
+}
+
+// advance a DMA/pseudo-DMA handshake according to the current bus state
+void huc6272_device::scsi_dma_update()
+{
+	if (m_in_scsi_update)
+		return;
+	m_in_scsi_update = true;
+
+	const u8 bus = scsi_bus_signals();
+	const bool req = BIT(bus, 5);
+	const bool cd = BIT(bus, 3);
+	const bool io = BIT(bus, 2);
+
+	if (m_scsi.dma_receive)
+	{
+		if (!cd && io)
+		{
+			if (req && !m_scsi.ack)
+			{
+				if (!m_scsi.drq)
+				{
+					m_scsi.drq = true;
+					m_scsi.data_cache = m_scsi_data_in->read();
+					if (BIT(m_dma.ctrl, 0))
+					{
+						m_scsi.drq = false;
+						dma_write_byte(m_scsi.data_cache);
+						scsi_set_ack(true);
+					}
+				}
+			}
+			else if (m_scsi.ack && !req)
+				scsi_set_ack(false);
+		}
+	}
+	else if (m_scsi.dma_send)
+	{
+		if (!io)
+		{
+			if (req && !m_scsi.ack)
+			{
+				if (!m_scsi.drq)
+				{
+					scsi_update_data_bus();
+					scsi_set_ack(true);
+					m_scsi.drq = true;
+				}
+			}
+			else if (m_scsi.ack && !req)
+				scsi_set_ack(false);
+		}
+	}
+
+	m_in_scsi_update = false;
+}
+
 u32 huc6272_device::scsi_data_r(offs_t offset)
 {
-	return m_scsi_data_in->read() & 0xff;
+	return m_scsi_data_in->read();
 }
 
 void huc6272_device::scsi_data_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_scsi_data_out->write(data & 0xff);
+	if (BIT(m_scsi.ctrl, 7) || !ACCESSING_BITS_0_7)
+		return;
+
+	m_scsi.data = data & 0xff;
+	scsi_update_data_bus();
 }
 
-u32 huc6272_device::scsi_cmd_status_r(offs_t offset)
+/*
+ * x--- ---- RST
+ * ---x ---- ACK
+ * ---- -x-- SEL
+ * ---- --x- ATN
+ * ---- ---x assert data bus
+ */
+u32 huc6272_device::scsi_ctrl_r(offs_t offset)
 {
-	return m_scsi_cmd_in->read() & 0xff;
+	return m_scsi.ctrl;
 }
 
-void huc6272_device::scsi_initiate_cmd_w(offs_t offset, u32 data, u32 mem_mask)
+void huc6272_device::scsi_ctrl_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	//m_scsibus->write_bsy(BIT(data, 0)); // bus?
-	m_scsibus->write_atn(BIT(data, 1));
-	m_scsibus->write_sel(BIT(data, 2));
-	m_scsibus->write_ack(BIT(data, 4));
+	if (!ACCESSING_BITS_0_7)
+		return;
+
+	if (BIT(data, 7))
+	{
+		// RST also resets the internal SCSI registers
+		if (!BIT(m_scsi.ctrl, 7))
+		{
+			m_scsi.data = 0;
+			scsi_set_mode(0);
+			m_scsi.phase = 0;
+			m_scsi.data_cache = 0;
+		}
+		m_scsi.ctrl = 0x80;
+	}
+	else
+	{
+		m_scsi.ctrl = data & 0x97;
+		m_scsibus->write_atn(BIT(data, 1));
+		m_scsibus->write_sel(BIT(data, 2));
+		scsi_set_ack(BIT(data, 4));
+	}
+	scsi_update_data_bus();
 	m_scsibus->write_rst(BIT(data, 7));
+	scsi_dma_update();
 }
 
-void huc6272_device::scsi_target_cmd_w(offs_t offset, u32 data, u32 mem_mask)
+/*
+ * ---- --x- DMA mode
+ * ---- ---x sequential DMA
+ */
+u32 huc6272_device::scsi_mode_r(offs_t offset)
 {
-	m_scsibus->write_io(BIT(data, 0));
-	m_scsibus->write_cd(BIT(data, 1));
-	m_scsibus->write_msg(BIT(data, 2)); // Misc?
+	return m_scsi.mode;
 }
 
-u32 huc6272_device::scsi_bus_r(offs_t offset)
+void huc6272_device::scsi_mode_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	u32 res = m_scsi_ctrl_in->read() & 0xff;
-	res |= m_scsi_data_in->read() << 16;
+	if (BIT(m_scsi.ctrl, 7) || !ACCESSING_BITS_0_7)
+		return;
+
+	scsi_set_mode(data & 0xff);
+}
+
+void huc6272_device::scsi_set_mode(u8 data)
+{
+	if (!BIT(data, 1) && BIT(m_scsi.mode, 1))
+	{
+		// leaving DMA mode aborts any transfer in progress
+		m_scsi.irq = false;
+		scsi_set_ack(false);
+		m_scsi.drq = false;
+		m_scsi.dma_receive = false;
+		m_scsi.dma_send = false;
+		scsi_update_data_bus();
+		interrupt_update();
+	}
+
+	m_scsi.mode = data;
+}
+
+/*
+ * ---- -x-- MSG
+ * ---- --x- C/D
+ * ---- ---x I/O
+ * expected bus phase, compared against the bus for the phase match flag and interrupt
+ */
+u32 huc6272_device::scsi_phase_r(offs_t offset)
+{
+	return m_scsi.phase;
+}
+
+void huc6272_device::scsi_phase_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (BIT(m_scsi.ctrl, 7) || !ACCESSING_BITS_0_7)
+		return;
+
+	m_scsi.phase = data & 7;
+}
+
+u32 huc6272_device::scsi_bus_status_r(offs_t offset)
+{
+	return scsi_bus_signals();
+}
+
+/*
+ * ---- ---- xxxx xxxx ---- ---- ---- ---- (R) DMA data, acknowledges a pseudo-DMA receive
+ *                                         (W) DMA send data
+ * ---- ---- ---- ---- ---- ---- -x-- ---- (R) DRQ
+ * ---- ---- ---- ---- ---- ---- ---x ---- (R) SCSI interrupt
+ * ---- ---- ---- ---- ---- ---- ---- x--- (R) phase match
+ * ---- ---- ---- ---- ---- ---- ---- --x- (R) ATN
+ * ---- ---- ---- ---- ---- ---- ---- ---x (R) ACK
+ * any write to the low half starts a DMA send (target receive)
+ */
+u32 huc6272_device::scsi_bus_r(offs_t offset, u32 mem_mask)
+{
+	if (BIT(m_scsi.ctrl, 7))
+		return 0;
+
+	u32 res = 0;
+	if (ACCESSING_BITS_0_15)
+	{
+		const u8 cmd = m_scsi_cmd_in->read();
+		res |= BIT(cmd, 4) ? 0x01 : 0;
+		res |= BIT(cmd, 1) ? 0x02 : 0;
+		if ((m_scsi.dma_receive || m_scsi.dma_send) && m_scsi.drq)
+			res |= 0x40;
+		if (!m_dma.irq && m_scsi.irq)
+			res |= 0x10;
+		if (scsi_phase_match())
+			res |= 0x08;
+	}
+
+	if (ACCESSING_BITS_16_23)
+	{
+		res |= m_scsi.data_cache << 16;
+		if (m_scsi.dma_receive && !machine().side_effects_disabled())
+		{
+			m_scsi.drq = false;
+			scsi_set_ack(true);
+			scsi_dma_update();
+		}
+	}
+
 	return res;
 }
 
 void huc6272_device::scsi_bus_w(offs_t offset, u32 data, u32 mem_mask)
 {
+	if (BIT(m_scsi.ctrl, 7))
+		return;
+
 	if (ACCESSING_BITS_0_15)
 	{
-		// TODO: bits 7-0: SCSI DMA trigger?
-		LOG("%s: SCSI DMA trigger %04x & %08x\n", machine().describe_context(), data, mem_mask);
+		m_scsi.dma_receive = false;
+		m_scsi.dma_send = true;
+		m_scsi.drq = true;
 	}
 
 	if (ACCESSING_BITS_16_23)
-		m_scsi_data_out->write((data >> 16) & 0xff);
+	{
+		if (m_scsi.dma_send && m_scsi.drq)
+		{
+			m_scsi.data_cache = (data >> 16) & 0xff;
+			m_scsi.drq = false;
+		}
+	}
+
+	scsi_dma_update();
+}
+
+u32 huc6272_device::scsi_input_data_r(offs_t offset)
+{
+	return m_scsi.data_cache;
+}
+
+u32 huc6272_device::scsi_irq_ack_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_scsi.irq = false;
+		interrupt_update();
+	}
+	return 0xff;
+}
+
+// starts a DMA receive (initiator receive), only in DMA mode
+void huc6272_device::scsi_dma_start_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (BIT(m_scsi.ctrl, 7))
+		return;
+
+	if (BIT(m_scsi.mode, 1))
+	{
+		m_scsi.dma_receive = true;
+		m_scsi.dma_send = false;
+		scsi_dma_update();
+	}
+}
+
+// TODO: CD sub-channel data, needs a hookup to the drive's Q/P-W stream
+u32 huc6272_device::scsi_subchannel_r(offs_t offset)
+{
+	return 0;
+}
+
+void huc6272_device::scsi_subchannel_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+		m_scsi.subchannel_ctrl = data & 3;
+}
+
+u32 huc6272_device::dma_address_r(offs_t offset)
+{
+	return m_dma.addr;
+}
+
+void huc6272_device::dma_address_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_dma.addr);
+	m_dma.addr &= 0x3ffff;
+}
+
+u32 huc6272_device::dma_size_r(offs_t offset)
+{
+	return m_dma.size;
+}
+
+void huc6272_device::dma_size_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_dma.size);
+	m_dma.size &= 0x3fffe;
+	m_dma.flipflop = 0;
+}
+
+/*
+ * ---- --x- DMA end interrupt enable
+ * ---- ---x DMA enable (SCSI to KRAM)
+ * reads return the DMA end interrupt flag, and acknowledge it
+ */
+u32 huc6272_device::dma_control_r(offs_t offset, u32 mem_mask)
+{
+	u32 res = 0;
+	if (ACCESSING_BITS_0_15)
+	{
+		res = m_dma.irq ? 1 : 0;
+		if (!machine().side_effects_disabled())
+		{
+			m_dma.irq = false;
+			interrupt_update();
+		}
+	}
+	return res;
+}
+
+void huc6272_device::dma_control_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (!ACCESSING_BITS_0_15)
+		return;
+
+	m_dma.ctrl = data & 3;
+	m_dma.irq = false;
+	m_dma.flipflop = 0;
+	interrupt_update();
+	scsi_dma_update();
 }
 
 u32 huc6272_device::kram_read_address_r(offs_t offset)
@@ -726,5 +1107,6 @@ void huc6272_device::cdda_update(offs_t offset, u8 data)
 
 void huc6272_device::interrupt_update()
 {
-	m_irq_changed_cb(m_adpcm.interrupt ? ASSERT_LINE : CLEAR_LINE);
+	const bool state = m_adpcm.interrupt || m_scsi.irq || (m_dma.irq && BIT(m_dma.ctrl, 1));
+	m_irq_changed_cb(state ? ASSERT_LINE : CLEAR_LINE);
 }

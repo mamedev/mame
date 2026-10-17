@@ -75,6 +75,31 @@ private:
 		u8 ctrl = 0;
 	}m_micro_prg;
 
+	struct scsi_t {
+		u8 data = 0;
+		u8 ctrl = 0;
+		u8 mode = 0;
+		u8 phase = 0;
+		u8 data_cache = 0;
+		bool ack = false;
+		bool drq = false;
+		bool dma_receive = false;
+		bool dma_send = false;
+		bool irq = false;
+		u8 subchannel_ctrl = 0;
+	} m_scsi;
+
+	struct dma_t {
+		u32 addr = 0;
+		u32 size = 0;
+		u8 ctrl = 0;
+		u8 latch = 0;
+		u8 flipflop = 0;
+		bool irq = false;
+	} m_dma;
+
+	bool m_in_scsi_update = false;
+
 	struct{
 		u8 rate = 0;
 		u32 status = 0;
@@ -122,17 +147,39 @@ private:
 	u32 data_r(offs_t offset, u32 mem_mask = ~0);
 	void data_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
+	// SCSI controller
+	u8 scsi_bus_signals();
+	bool scsi_phase_match();
+	void scsi_set_ack(bool state);
+	void scsi_set_mode(u8 data);
+	void scsi_update_data_bus();
+	void scsi_req_w(int state);
+	void scsi_dma_update();
+	void dma_write_byte(u8 data);
+
 	// internal I/O handlers
 	u32 scsi_data_r(offs_t offset);
 	void scsi_data_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-
-	u32 scsi_cmd_status_r(offs_t offset);
-	void scsi_initiate_cmd_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-
-	void scsi_target_cmd_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-
-	u32 scsi_bus_r(offs_t offset);
+	u32 scsi_ctrl_r(offs_t offset);
+	void scsi_ctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 scsi_mode_r(offs_t offset);
+	void scsi_mode_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 scsi_phase_r(offs_t offset);
+	void scsi_phase_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 scsi_bus_status_r(offs_t offset);
+	u32 scsi_bus_r(offs_t offset, u32 mem_mask = ~0);
 	void scsi_bus_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 scsi_input_data_r(offs_t offset);
+	u32 scsi_irq_ack_r(offs_t offset);
+	void scsi_dma_start_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 scsi_subchannel_r(offs_t offset);
+	void scsi_subchannel_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 dma_address_r(offs_t offset);
+	void dma_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 dma_size_r(offs_t offset);
+	void dma_size_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 dma_control_r(offs_t offset, u32 mem_mask = ~0);
+	void dma_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	u32 kram_read_address_r(offs_t offset);
 	void kram_read_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
