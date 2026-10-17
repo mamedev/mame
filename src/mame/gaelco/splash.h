@@ -102,7 +102,6 @@ public:
 	void roldfrog(machine_config &config) ATTR_COLD;
 
 	void init_roldfrog() ATTR_COLD;
-	void init_rebus() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -110,11 +109,12 @@ protected:
 
 	virtual void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
+	void roldfrog_map(address_map &map) ATTR_COLD;
+
 private:
 	INTERRUPT_GEN_MEMBER(roldfrog_interrupt);
 	void roldfrog_update_irq();
 
-	void roldfrog_map(address_map &map) ATTR_COLD;
 	void roldfrog_sound_io_map(address_map &map) ATTR_COLD;
 	void roldfrog_sound_map(address_map &map) ATTR_COLD;
 
@@ -130,6 +130,39 @@ private:
 	void roldfrog_vblank_ack_w(uint8_t data);
 	uint8_t roldfrog_unk_r();
 	void ym_irq(int state);
+};
+
+class rebus_state : public roldfrog_state
+{
+public:
+	rebus_state(const machine_config &mconfig, device_type type, const char *tag) :
+		roldfrog_state(mconfig, type, tag),
+		m_decrypted_opcodes(*this, "decrypted_opcodes", 0x400000, ENDIANNESS_BIG)
+	{ }
+
+	void rebus(machine_config &config) ATTR_COLD;
+
+	void init_rebus() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	virtual void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+private:
+	memory_share_creator<uint16_t> m_decrypted_opcodes;
+
+	uint8_t m_adpcm_nibble = 0;
+
+	void adpcm_control_w(uint8_t data);
+	void adpcm_int(int state);
+
+	uint32_t screen_update_rebus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map) ATTR_COLD;
+	void user_opcodes_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 class funystrp_state : public splash_state
