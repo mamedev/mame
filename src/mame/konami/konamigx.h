@@ -303,6 +303,7 @@ protected:
 
 	u8 m_type3_psac2_bank = 0;
 	u8 m_type3_spriteram_bank = 0;
+	bool m_type2_spritebank_enable = false;
 	//int m_konamigx_type3_psac2_actual_last_bank = 0;
 	s32 m_use_68020_post_clock_hack = 0;
 	output_finder<> m_lamp;
