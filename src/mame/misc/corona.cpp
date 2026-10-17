@@ -1575,7 +1575,7 @@ void corona_state::winner81(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x100);
+	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x20);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1608,7 +1608,7 @@ void corona_state::winner82(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x100);
+	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x20);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1642,7 +1642,7 @@ void corona_state::re800(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x100);
+	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x20);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1675,7 +1675,7 @@ void corona_state::rcirulet(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x100);
+	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x20);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1709,7 +1709,7 @@ void corona_state::luckyrlt(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x100);
+	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x20);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1741,7 +1741,7 @@ void corona_state::luckyrlta(machine_config &config)
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x100);
+	PALETTE(config, "palette", FUNC(corona_state::corona_palette), 0x20);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1755,13 +1755,18 @@ void corona_state::monte(machine_config &config)
 	winner82(config);
 
 	// basic machine hardware
+	Z80(config.replace(), m_maincpu, 1'400'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &corona_state::monte_map);
 	m_maincpu->set_addrmap(AS_IO, &corona_state::winner82_cpu_io_map);
+
+	Z80(config.replace(), m_soundcpu, 1'400'000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &corona_state::winner82_sound_map);  // IM1 instead of NMI
+	m_soundcpu->set_addrmap(AS_IO, &corona_state::winner82_sound_cpu_io_map);
 
 	// video hardware
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 32*8-1);
 
-	PALETTE(config.replace(), "palette", FUNC(corona_state::monte_palette), 0x100);
+	PALETTE(config.replace(), "palette", FUNC(corona_state::monte_palette), 0x20);
 }
 
 void corona_state::rula(machine_config &config)
@@ -1776,7 +1781,7 @@ void corona_state::rula(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 1*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(corona_state::screen_update_luckyrlt));
 
-	PALETTE(config.replace(), "palette", FUNC(corona_state::monte_palette), 0x100);
+	PALETTE(config.replace(), "palette", FUNC(corona_state::monte_palette), 0x20);
 }
 
 
