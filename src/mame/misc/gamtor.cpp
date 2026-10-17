@@ -60,6 +60,9 @@
 #include "video/pc_vga.h"
 #include "speaker.h"
 
+#include <algorithm>
+#include <vector>
+
 
 // TODO: Chips & Technologies 65550 with swapped address lines?
 // Needs to be moved to own family file
@@ -86,7 +89,7 @@ public:
 	virtual void mem_linear_w(offs_t offset,uint8_t data) override;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-	u32 space_r(offs_t offset, u32 mem_mask);
+	u32 space_r(offs_t offset);
 	void space_w(offs_t offset, u32 data, u32 mem_mask);
 
 protected:
@@ -102,7 +105,7 @@ protected:
 
 private:
 	bool extended() const { return BIT(m_xr[0x09], 0); }
-	int swap_xor() const { static const int s[4] = { 0, 1, 3, 0 }; return s[(m_xr[0x0a] >> 4) & 3]; }
+	int swap_xor() const { static constexpr int s[4] = { 0, 1, 3, 0 }; return s[(m_xr[0x0a] >> 4) & 3]; }
 	u32 vclk() const;
 	void vblank_cb(screen_device &screen, bool state);
 	void xr_w(u8 data);
@@ -319,18 +322,18 @@ uint32_t gamtor_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &b
 	}
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		u32 *dst = &bitmap.pix(y, cliprect.min_x);
+		u32 *dst = &bitmap.pix(y, cliprect.left());
 		u32 a = m_ext_start * 4 + y * pitch; // start address in dwords: the game flips to 0x12c00 = 0x4b000 = one 640x480 page
 		if (mode == 2)
 		{
-			a += cliprect.min_x;
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			a += cliprect.left();
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 				*dst++ = pens[mem[a++ & vmask]];
 		}
 		else
 		{
-			a += cliprect.min_x * 2;
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++, a += 2)
+			a += cliprect.left() * 2;
+			for (int x = cliprect.left(); x <= cliprect.right(); x++, a += 2)
 			{
 				const u16 p = mem[a & vmask] | (mem[(a + 1) & vmask] << 8);
 				*dst++ = (mode == 4) ? rgb_t(pal5bit(p >> 10), pal5bit(p >> 5), pal5bit(p)) : rgb_t(pal5bit(p >> 11), pal6bit(p >> 5), pal5bit(p));
@@ -357,7 +360,7 @@ void gamtor_vga_device::mem_linear_w(offs_t offset, uint8_t data)
 		vga.memory[(offset & 1) | (offset >> 1)] = data;
 }
 
-u32 gamtor_vga_device::space_r(offs_t offset, u32 mem_mask)
+u32 gamtor_vga_device::space_r(offs_t offset)
 {
 	const u32 a = offset << 2;
 	const int sx = swap_xor();
@@ -433,7 +436,7 @@ void gamtor_vga_device::space_w(offs_t offset, u32 data, u32 mem_mask)
 					r, m_blt_line, (m_br[8] >> 16) & 0x1fff, int(m_hostq.size()), m_br[0], m_br[3], m_br[4], m_br[6], m_br[8]);
 		m_br[r] = (m_br[r] & ~cmask) | (chip & cmask);
 		// reserved bits read as 0 (BR04 12-7, BR05 12-10, BR06 12-11, BR07 12-12); BR04 bit 31 is the read-only status
-		static const u32 br_mask[11] = { ~0U, ~0U, ~0U, ~0U, 0x007ff7ff, 0x007ffff8, 0x007fffff, 0x007fffff, ~0U, ~0U, ~0U };
+		static constexpr u32 br_mask[11] = { ~0U, ~0U, ~0U, ~0U, 0x007ff7ff, 0x007ffff8, 0x007fffff, 0x007fffff, ~0U, ~0U, ~0U };
 		m_br[r] &= br_mask[r];
 		if (r == 8 && (m_br[8] >> 16) & 0x1fff)
 			blt_start(); // a non-zero height starts the operation (E-2)
@@ -496,7 +499,6 @@ void gamtor_vga_device::blt_host_run()
 {
 	const u32 ctl = m_br[4];
 	const int h = (m_br[8] >> 16) & 0x1fff;
-	const int bpp = blt_bpp();
 	const u32 wbytes = m_br[8] & 0x1fff;
 	while (m_blt_busy && m_blt_line < h)
 	{
@@ -516,9 +518,9 @@ void gamtor_vga_device::blt_host_run()
 		else
 		{
 			// monochrome host data: BR03 alignment, initial discard, left/right clipping (BR03, E.3.3)
-			static const int align_bits[8] = { 1, 1, 8, 16, 32, 64, 1, 1 };
+			static constexpr int align_bits[8] = { 1, 1, 8, 16, 32, 64, 1, 1 };
 			const int al = align_bits[(m_br[3] >> 24) & 7];
-			const u32 wpix = wbytes / bpp;
+			const u32 wpix = wbytes / blt_bpp();
 			u32 start = m_blt_line ? (m_host_end + al - 1) / al * al : m_host_bit;
 			const u32 end = start + (m_br[3] & 0x3f) + wpix + ((m_br[3] >> 8) & 0x3f);
 			if (m_hostq.size() * 8 < end)
@@ -528,7 +530,6 @@ void gamtor_vga_device::blt_host_run()
 			blt_line(m_blt_line++);
 			m_host_end = end;
 		}
-		(void)bpp;
 	}
 	if (m_blt_line >= h)
 	{
@@ -704,14 +705,14 @@ const tiny_rom_entry *mc_mk4_hopper_device::device_rom_region() const
 class gamtor_snd_device : public device_t, public device_sound_interface
 {
 public:
-	gamtor_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 44100);
+	gamtor_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// map helpers for the driver. This device serves 0x1e040004-0x1e04000b: offset 0 (+4) is the DMA
 	// source address the L4 handler writes (obj->$6c), offset 1 (+8) is the kernel's input-strap/test
 	// register (written by the input driver 0x6ef30). The base register (+0) is handled by the driver
 	// state (it shares the SYS input view) and reaches this device through arm_w()/status_r().
-	u32 reg_r(offs_t offset, u32 mem_mask);
-	void reg_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 reg_r(offs_t offset);
+	void reg_w(offs_t offset, u32 data);
 	// base register (+0): descriptor write - 0 = stop, else frames-per-block in the low bits
 	void arm_w(u32 data);
 	// status bits for the combined base-register read. The kernel accesses these as BYTE reads at
@@ -719,9 +720,9 @@ public:
 	// self-test's tst.l/bpl), bit 6 of that byte = dword bit 30 (block request - the L4 handler's
 	// btst #6).
 	u32 status_r() { return (m_armed ? 0x80000000u : 0u) | (m_block_pending ? 0x40000000u : 0u); }
-	auto irq_bind() { return m_irq_cb.bind(); }
-	// late binding of the ColdFire program space (the chip's DMA source): called from the driver's machine_start
-	void set_dma_space(address_space &space) { m_dspace = &space; }
+	auto irq_cb() { return m_irq_cb.bind(); }
+	// the ColdFire program space the chip's DMA reads, set from the machine config
+	template <typename T> void set_dma_space(T &&tag, int spacenum) { m_dspace.set_tag(std::forward<T>(tag), spacenum); }
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -741,26 +742,25 @@ private:
 
 	devcb_write_line m_irq_cb;
 
-	address_space *m_dspace = nullptr;
+	required_address_space m_dspace;
 
-	sound_stream *m_stream = nullptr;
-	emu_timer *m_req_timer = nullptr;
+	sound_stream *m_stream;
+	emu_timer *m_req_timer;
 
-	bool m_armed = false;       // descriptor armed (bit 31 view) - set by the first arm, cleared by the stop write
-	bool m_block_pending = false; // bit 30: current block fully fetched, the kernel must feed the next one
-	bool m_active = false;      // the DAC is playing a block (false = stopped or underrun)
-	bool m_next_valid = false;  // a re-arm latched the next block while the current one plays out
-	u32 m_size = 0;             // current block length in frames (descriptor low 24 bits)
-	u32 m_cur = 0;              // current block start address (latched from +4 at arm)
-	u32 m_next_size = 0;        // queued block
-	u32 m_next_addr = 0;
-	u32 m_sar = 0;              // +4 register as written
-	u32 m_played = 0;           // frames of the current block played out
+	bool m_armed;       // descriptor armed (bit 31 view) - set by the first arm, cleared by the stop write
+	bool m_block_pending; // bit 30: current block fully fetched, the kernel must feed the next one
+	bool m_active;      // the DAC is playing a block (false = stopped or underrun)
+	bool m_next_valid;  // a re-arm latched the next block while the current one plays out
+	u32 m_size;             // current block length in frames (descriptor low 24 bits)
+	u32 m_cur;              // current block start address (latched from +4 at arm)
+	u32 m_next_size;        // queued block
+	u32 m_next_addr;
+	u32 m_sar;              // +4 register as written
+	u32 m_played;           // frames of the current block played out
 	u32 m_fifo[FIFO_FRAMES];    // the fetched-ahead tail of the current block (copied when the fetch completes)
-	u32 m_fifo_base = 0;        // frame index of m_fifo[0] within the current block
-	bool m_fifo_valid = false;
-	u32 m_mask = 0;             // +8: kernel strap/test mask, stored verbatim
-	u32 m_reg8 = 0;             // last written +8 value
+	u32 m_fifo_base;        // frame index of m_fifo[0] within the current block
+	bool m_fifo_valid;
+	u32 m_reg8;             // last written +8 value
 };
 
 DEFINE_DEVICE_TYPE(GAMTOR_SND, gamtor_snd_device, "gamtor_snd", "AGI CoolFire sound chip")
@@ -769,6 +769,7 @@ gamtor_snd_device::gamtor_snd_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, GAMTOR_SND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_irq_cb(*this)
+	, m_dspace(*this, finder_base::DUMMY_TAG, -1)
 {
 }
 
@@ -776,10 +777,8 @@ void gamtor_snd_device::device_start()
 {
 	// The chip streams from CPU RAM through its own DMA; sample rate is fixed by the board crystal.
 	// 44100 Hz assumed pending a real-hardware measurement (the firmware never programs a rate).
-	m_stream = stream_alloc(0, 2, 44100);
+	m_stream = stream_alloc(0, 2, clock());
 	m_req_timer = timer_alloc(FUNC(gamtor_snd_device::req_timer), this);
-
-	// resolve the ColdFire program space at config time via the driver (see set_dma_space)
 
 	save_item(NAME(m_armed));
 	save_item(NAME(m_active));
@@ -789,7 +788,6 @@ void gamtor_snd_device::device_start()
 	save_item(NAME(m_next_size));
 	save_item(NAME(m_next_addr));
 	save_item(NAME(m_sar));
-	save_item(NAME(m_mask));
 	save_item(NAME(m_played));
 	save_item(NAME(m_fifo));
 	save_item(NAME(m_fifo_base));
@@ -810,7 +808,6 @@ void gamtor_snd_device::device_reset()
 	m_next_size = 0;
 	m_next_addr = 0;
 	m_sar = 0;
-	m_mask = 0;
 	m_played = 0;
 	m_fifo_base = 0;
 	m_reg8 = 0;
@@ -836,7 +833,7 @@ void gamtor_snd_device::schedule_req()
 			frames = 1;
 	}
 	if (frames)
-		m_req_timer->adjust(attotime::from_hz(44100) * frames);
+		m_req_timer->adjust(attotime::from_hz(clock()) * frames);
 	else
 		m_req_timer->adjust(attotime::never);
 }
@@ -857,7 +854,7 @@ void gamtor_snd_device::start_block(u32 addr, u32 size)
 	m_active = true;
 }
 
-u32 gamtor_snd_device::reg_r(offs_t offset, u32 mem_mask)
+u32 gamtor_snd_device::reg_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -867,7 +864,7 @@ u32 gamtor_snd_device::reg_r(offs_t offset, u32 mem_mask)
 	return 0;
 }
 
-void gamtor_snd_device::reg_w(offs_t offset, u32 data, u32 mem_mask)
+void gamtor_snd_device::reg_w(offs_t offset, u32 data)
 {
 	switch (offset)
 	{
@@ -1004,8 +1001,8 @@ public:
 	// receiver line follows the emitter (the scanner compares the line level itself with the pulse level, so a lit
 	// receiver reads high; the opposite polarity gives "E 63 5"); with the door open the beam is broken, the line stays low.
 	// Power fail: the level 7 handler registered by the kernel (0x48bec) saves state and enters system state 9
-	// ("System shutdown", stamps the power-off time). MAME cannot run the CPU after exit, so test scripts pulse this
-	// before quitting; without it the SRAM may be left mid-update ("Error 61: RAM error" or spurious door errors).
+	// ("System shutdown", stamps the power-off time); without it the SRAM may be left mid-update ("Error 61: RAM
+	// error" or spurious door errors).
 	INPUT_CHANGED_MEMBER(power_fail) { m_maincpu->set_input_line(7, newval ? ASSERT_LINE : CLEAR_LINE); }
 
 	// in 1e: hopper coin exit sensor, low while a coin passes
@@ -1019,12 +1016,10 @@ public:
 private:
 	void gaminator_map(address_map &map) ATTR_COLD;
 
-	void gamtor_unk_w(uint32_t data);
 	// base register of the AGI sound chip. Read: the SYS input port with the chip status bits OR-ed in
 	// (bit 31 DMA active, bit 6 FIFO refill request - the kernel reads inputs 0x40-0x5f from here XOR 0x60, and the
 	// L4 handler polls bit 6 directly). Write: descriptor (0 = stop, else size in words in the low bits = re-arm).
 	u32 snd_base_r();
-	void snd_base_w(u32 data);
 	uint32_t inputs_r(offs_t offset) { return m_in[offset]->read(); }
 	void outputs_w(offs_t offset, u32 data, u32 mem_mask)
 	{
@@ -1040,9 +1035,6 @@ private:
 	{
 		std::fill(std::begin(m_outlatch), std::end(m_outlatch), 0);
 		save_item(NAME(m_outlatch));
-		// give the sound chip the ColdFire program space pointer (late binding, config-time finders
-		// cannot reach a sibling device's space from a non-child device)
-		m_snd->set_dma_space(m_maincpu->space(0));
 	}
 
 	required_device<mcf5206e_device> m_maincpu;
@@ -1064,11 +1056,6 @@ u32 gaminator_state::snd_base_r()
 	u32 data = m_sys->read();
 	data |= m_snd->status_r();
 	return data;
-}
-
-void gaminator_state::snd_base_w(u32 data)
-{
-	m_snd->arm_w(data);
 }
 
 
@@ -1095,7 +1082,7 @@ void gaminator_state::gaminator_map(address_map &map)
 	// +4 SAR (CPU RAM address the chip's DMA reads), +8 strap/test mask register.
 	// The 0x40-0x5f logical inputs read the base register XOR 0x60 (kernel 0x6ef80), so the input view and the
 	// chip status share the register; the state combines them (chip status on the tested bits, SYS port on the rest).
-	map(0x1e040000, 0x1e040003).rw(FUNC(gaminator_state::snd_base_r), FUNC(gaminator_state::snd_base_w));
+	map(0x1e040000, 0x1e040003).r(FUNC(gaminator_state::snd_base_r)).w(m_snd, FUNC(gamtor_snd_device::arm_w));
 	map(0x1e040004, 0x1e04000b).rw(m_snd, FUNC(gamtor_snd_device::reg_r), FUNC(gamtor_snd_device::reg_w));
 
 	// CS2 (CSAR2 0x2000, CSMR2 0x0fff0000, CSCR2 0x0d5b = 3 WS, AA, 8-bit port) holds the two battery-backed
@@ -1233,10 +1220,11 @@ void gaminator_state::gaminator(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 	// AGI custom sound chip at 0x1e040000. The kernel's level 4 handler (0x2e7e874) is registered for the
 	// chip's refill request (bit 6 of the base register), so the IRQ line reaches the ColdFire on level 4.
-	gamtor_snd_device &snd(GAMTOR_SND(config, "snd"));
-	snd.irq_bind().set_inputline(m_maincpu, 4);
-	snd.add_route(0, "speaker", 1.0, 0);
-	snd.add_route(1, "speaker", 1.0, 1);
+	GAMTOR_SND(config, m_snd, 44100);         // the rate the firmware mixer assumes; not measured on hardware
+	m_snd->irq_cb().set_inputline(m_maincpu, 4);
+	m_snd->set_dma_space(m_maincpu, AS_PROGRAM);
+	m_snd->add_route(0, "speaker", 1.0, 0);
+	m_snd->add_route(1, "speaker", 1.0, 1);
 
 	RTC72423(config, "rtc", XTAL(32'768)); // Fake crystal value, the 72423 uses its own internal crystal
 
@@ -1256,7 +1244,7 @@ void gaminator_state::gaminator(machine_config &config)
 	m_uart[0]->out_tx_callback().set(wba, FUNC(jcm_wba_device::rx_w));
 	wba.tx_cb().set(m_uart[0], FUNC(ns16550_device::rx_w));
 
-	MC_MK4_HOPPER(config, "hopper");
+	MC_MK4_HOPPER(config, m_hopper);
 }
 
 // Base ROMs for genuine Novomatic CoolFire PCB. Bootleg sets may use a different Russian bootleg hardware.
@@ -2693,7 +2681,7 @@ void gaminator_state::init_gaminator()
 } // anonymous namespace
 
 
-#define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_NO_SOUND
+#define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND
 
 GAME( 2002?, g4u2,        0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Games 4 U 2 (94 5.6-0)", GAME_FLAGS )
 

@@ -7,7 +7,8 @@
 
 #include "diserial.h"
 
-// JCM WBA bill validator with the ID-003 interface, from "ID-003 Communication Specification" rev. 05.
+// JCM WBA bill validator with the ID-003 interface, as configured for euro notes (5-500 EUR on channels 2-8;
+// the version string it reports is a placeholder), from "ID-003 Communication Specification" rev. 05.
 // 9600 bps, 8 data bits, even parity, 1 stop bit (2).
 // Frames: FCh, LNG (SYNC through CRC), CMD/status, DATA, CRC-CCITT low/high (3, appendix 1).
 // Power up (7-1): POWER UP until RESET, then INITIALIZE while the settings arrive, then ENABLE or DISABLE.
@@ -46,7 +47,7 @@ private:
 	required_ioport m_bills;
 	emu_timer *m_timer;
 	u8 m_rx[256];
-	int m_rxn;
+	u16 m_rxn;
 	u8 m_status, m_escrow;
 	u8 m_enable[2], m_security[2], m_comm, m_inhibit, m_direction, m_optional[2];
 	u8 m_prev_bills;

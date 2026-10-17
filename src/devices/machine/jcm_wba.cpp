@@ -4,8 +4,10 @@
 #include "emu.h"
 #include "jcm_wba.h"
 
+#include <algorithm>
 
-DEFINE_DEVICE_TYPE(JCM_WBA, jcm_wba_device, "jcm_wba", "JCM WBA bill validator (ID-003)")
+
+DEFINE_DEVICE_TYPE(JCM_WBA, jcm_wba_device, "jcm_wba", "JCM WBA bill validator (ID-003, euro configuration)")
 
 static INPUT_PORTS_START( jcm_wba )
 	PORT_START("BILLS") // the euro notes the configuration menu lists for channels 2-8
@@ -80,7 +82,7 @@ void jcm_wba_device::send(const u8 *body, int n)
 	u8 f[256];
 	f[0] = 0xfc;
 	f[1] = n + 4;
-	memcpy(&f[2], body, n);
+	std::copy_n(body, n, &f[2]);
 	const u16 c = crc(f, n + 2);
 	f[n + 2] = c & 0xff;
 	f[n + 3] = c >> 8;
@@ -122,7 +124,7 @@ void jcm_wba_device::command()
 	const u8 cmd = m_rx[2];
 	const u8 *d = &m_rx[3];
 	const int dn = m_rx[1] - 5;
-	u8 r[64];
+	u8 r[256];
 	switch (cmd)
 	{
 	case 0x11: // STATUS REQUEST (6-1)
@@ -142,9 +144,9 @@ void jcm_wba_device::command()
 		if (m_status == ST_POWER_UP)
 			break;
 		if (m_status == ST_INITIALIZE)
-			set_status(m_inhibit & 1 ? ST_DISABLE : ST_ENABLE); // 7-1: INITIALIZE, then standby
+			set_status((m_inhibit & 1) ? ST_DISABLE : ST_ENABLE); // 7-1: INITIALIZE, then standby
 		else if (m_status == ST_STACKED)
-			set_status(m_inhibit & 1 ? ST_DISABLE : ST_ENABLE);
+			set_status((m_inhibit & 1) ? ST_DISABLE : ST_ENABLE);
 		break;
 
 	case 0x40: // RESET: always accepted (6-3)
@@ -186,21 +188,48 @@ void jcm_wba_device::command()
 		}
 		break;
 
-	case 0xc0: if (dn >= 2) { m_enable[0] = d[0]; m_enable[1] = d[1]; } goto echo;
-	case 0xc1: if (dn >= 2) { m_security[0] = d[0]; m_security[1] = d[1]; } goto echo;
-	case 0xc2: if (dn >= 1) m_comm = d[0]; goto echo;
-	case 0xc3:
-		if (dn >= 1)
+	case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: // setting commands, echoed back (6-5)
+		switch (cmd)
 		{
-			m_inhibit = d[0];
-			if (m_status == ST_ENABLE || m_status == ST_DISABLE)
-				set_status(m_inhibit & 1 ? ST_DISABLE : ST_ENABLE);
+		case 0xc0:
+			if (dn >= 2)
+			{
+				m_enable[0] = d[0];
+				m_enable[1] = d[1];
+			}
+			break;
+		case 0xc1:
+			if (dn >= 2)
+			{
+				m_security[0] = d[0];
+				m_security[1] = d[1];
+			}
+			break;
+		case 0xc2:
+			if (dn >= 1)
+				m_comm = d[0];
+			break;
+		case 0xc3:
+			if (dn >= 1)
+			{
+				m_inhibit = d[0];
+				if (m_status == ST_ENABLE || m_status == ST_DISABLE)
+					set_status((m_inhibit & 1) ? ST_DISABLE : ST_ENABLE);
+			}
+			break;
+		case 0xc4:
+			if (dn >= 1)
+				m_direction = d[0];
+			break;
+		case 0xc5:
+			if (dn >= 2)
+			{
+				m_optional[0] = d[0];
+				m_optional[1] = d[1];
+			}
+			break;
 		}
-		goto echo;
-	case 0xc4: if (dn >= 1) m_direction = d[0]; goto echo;
-	case 0xc5: if (dn >= 2) { m_optional[0] = d[0]; m_optional[1] = d[1]; } goto echo;
-	echo: // setting commands are echoed back (6-5)
-		memcpy(r, &m_rx[2], dn + 1);
+		std::copy_n(&m_rx[2], dn + 1, r);
 		send(r, dn + 1);
 		break;
 
@@ -213,9 +242,9 @@ void jcm_wba_device::command()
 
 	case 0x88: // VERSION REQUEST: "machine (country)-model-stacker ID003-interface+version date crc" (6-7 (6))
 	{
-		static const char ver[] = "i(EUR)-10-SS ID003-03V280-30 14JAN03 3A5E";
+		static constexpr char ver[] = "i(EUR)-10-SS ID003-03V280-30 14JAN03 3A5E";
 		r[0] = cmd;
-		memcpy(&r[1], ver, sizeof(ver) - 1);
+		std::copy_n(ver, sizeof(ver) - 1, &r[1]);
 		send(r, sizeof(ver));
 		logerror("version request: placeholder version string, the real WBA string is not known\n");
 		break;
@@ -228,7 +257,7 @@ void jcm_wba_device::command()
 
 	case 0x8a: // CURRENCY ASSIGN REQUEST (6-7 (9)): 61h-69h, country, denomination integer and exponent
 	{
-		static const u8 eur[9][2] = { {0,0}, {5,0}, {10,0}, {20,0}, {50,0}, {1,2}, {2,2}, {5,2}, {0,0} };
+		static constexpr u8 eur[9][2] = { {0,0}, {5,0}, {10,0}, {20,0}, {50,0}, {1,2}, {2,2}, {5,2}, {0,0} };
 		r[0] = cmd;
 		for (int i = 0; i < 9; i++)
 		{
@@ -273,7 +302,7 @@ TIMER_CALLBACK_MEMBER(jcm_wba_device::step)
 		break;
 	}
 	case 1: set_status(ST_VEND_VALID); m_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10)); break;
-	case 2: set_status(m_inhibit & 1 ? ST_DISABLE : ST_ENABLE); m_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10)); break;
+	case 2: set_status((m_inhibit & 1) ? ST_DISABLE : ST_ENABLE); m_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10)); break;
 	case 3: set_status(ST_STACKED); m_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10)); break;
 	case 4: set_status(ST_ESCROW); m_timer->adjust(attotime::from_msec(10), 0, attotime::from_msec(10)); break;
 	}
