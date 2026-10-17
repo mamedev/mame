@@ -35,7 +35,10 @@
      - Up to 4 external floppy drives: 8" (FD/DD, 1.1MB) or 5" 1/4
      - Up to 1 external 10 MB hard-drive
 
+    At the boot menu, press Z to run the cartridge.
+
     TODO:
+    - the port 0x0c/0x10 paging is only partly understood
     - PIT counter 0 drives RSTB, which needs the NSC800 interrupt control
       register (port 0xbb)
     - printer, cassette, joystick ADC, Telex board
@@ -59,6 +62,8 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 
 namespace {
 
@@ -71,7 +76,10 @@ public:
 		, m_card(*this, "cardslot")
 		, m_crtc(*this, "crtc")
 		, m_palette(*this, "palette")
-		, m_videoram(*this, "videoram")
+		, m_page_view(*this, "page_view")
+		, m_drive_view(*this, "drive_view")
+		, m_ram(*this, "ram")
+		, m_vram(*this, "vram", 0x1000, ENDIANNESS_LITTLE)
 		, m_chargen(*this, "chargen")
 		, m_kbd(*this, "X%u", 0U)
 		, m_fn(*this, "FN")
@@ -92,7 +100,10 @@ private:
 	required_device<generic_slot_device> m_card;
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_videoram;
+	memory_view m_page_view;
+	memory_view m_drive_view;
+	required_shared_ptr<uint8_t> m_ram;
+	memory_share_creator<uint8_t> m_vram;
 	required_region_ptr<uint8_t> m_chargen;
 	required_ioport_array<8> m_kbd;
 	required_ioport m_fn;
@@ -100,6 +111,8 @@ private:
 	output_finder<> m_lock_led;
 
 	uint8_t m_row = 0;
+	uint8_t m_page_0c = 0;
+	uint8_t m_page_10 = 0;
 	bool m_80col = false;
 
 	void i7000_palette(palette_device &palette) const ATTR_COLD;
@@ -112,6 +125,9 @@ private:
 	int ctrl_r();
 
 	void col80_w(uint8_t data);
+	void page_0c_w(uint8_t data);
+	void page_10_w(uint8_t data);
+	void update_paging();
 
 	void i7000_io(address_map &map) ATTR_COLD;
 	void i7000_mem(address_map &map) ATTR_COLD;
@@ -261,20 +277,37 @@ INPUT_PORTS_END
 
 void i7000_state::machine_start()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	if (m_card->exists())
+	// one page view entry per combination of the port 0x0c bits (see page_0c_w)
+	uint32_t const cart_size = m_card->exists() ? m_card->get_rom_size() : 0;
+	for (int i = 0; i < 16; i++)
 	{
-		// 0x4000 - 0xbfff   32KB ROM
-		program.install_read_handler(0x4000, 0xbfff, read8sm_delegate(*m_card, FUNC(generic_slot_device::read_rom)));
+		memory_view::memory_view_entry &entry = m_page_view[i];
+		if (BIT(i, 0))
+			entry.install_ram(0x6000, 0x6fff, &m_vram[0]);
+		if (BIT(i, 1))
+			entry.install_ram(0x0000, 0x0fff, &m_ram[0]);
+		else
+			entry.install_ram(0x2000, 0x2fff, &m_vram[0]);
+		if (BIT(i, 2) && cart_size)
+			entry.install_rom(0x4000, 0x4000 + std::min<uint32_t>(cart_size, 0x4000) - 1, m_card->get_rom_base());
+		if (BIT(i, 3) && cart_size)
+			entry.install_rom(0x0000, cart_size - 1, m_card->get_rom_base());
 	}
 
+	m_drive_view[2].install_ram(0xa000, 0xafff, &m_vram[0]);
+
 	save_item(NAME(m_row));
+	save_item(NAME(m_page_0c));
+	save_item(NAME(m_page_10));
 	save_item(NAME(m_80col));
 }
 
 void i7000_state::machine_reset()
 {
+	m_page_0c = 0;
+	m_page_10 = 0;
+	update_paging();
+
 	m_80col = false;
 	m_crtc->set_unscaled_clock(DOT_CLOCK / 16);
 }
@@ -297,6 +330,40 @@ void i7000_state::col80_w(uint8_t data)
 	m_crtc->set_unscaled_clock(DOT_CLOCK / (m_80col ? 8 : 16));
 }
 
+/* Port 0x0c: bit 1 maps the cartridge at 0x0000, bit 5 maps it at 0x4000
+   (the boot ROM looks for its "SIM/M-" header at 0x4040), bit 3 maps RAM
+   at 0x0000-0x0fff instead of the video RAM at 0x2000, and bit 7 clear
+   maps the video RAM at 0x6000. */
+void i7000_state::page_0c_w(uint8_t data)
+{
+	m_page_0c = data;
+	update_paging();
+}
+
+/* Port 0x10 selects what appears at 0x8000-0xafff: the video RAM at
+   0xa000 (0xb0), the drive board ROM at 0x8000 (0xb1, also used by the
+   boot ROM's peripheral scan of 0xb1-0xb7), or that ROM plus the board's
+   RAM at 0xa000 (0xb4, used by the cartridges to call the ROM's API). */
+void i7000_state::page_10_w(uint8_t data)
+{
+	m_page_10 = data;
+	update_paging();
+}
+
+void i7000_state::update_paging()
+{
+	m_page_view.select(bitswap<4>(m_page_0c ^ 0x80, 1, 5, 3, 7));
+
+	if (m_page_10 == 0xb0)
+		m_drive_view.select(2);
+	else if (m_page_10 == 0xb1)
+		m_drive_view.select(0);
+	else if (m_page_10 == 0xb4)
+		m_drive_view.select(1);
+	else
+		m_drive_view.disable();
+}
+
 void i7000_state::i7000_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x33, 0x44, 0x5d));
@@ -308,7 +375,7 @@ MC6845_UPDATE_ROW(i7000_state::crtc_update_row)
 	uint32_t *p = &bitmap.pix(y);
 	for (int col = 0; col < x_count; col++)
 	{
-		uint8_t const ch = m_videoram[(ma + col) & 0x07ff];
+		uint8_t const ch = m_vram[(ma + col) & 0x07ff];
 		uint8_t bits = (ra > 7) ? 0 : m_chargen[((ch << 3) | (ra & 0x07)) & 0x07ff];
 		if (col == cursor_x)
 			bits ^= 0xff;
@@ -317,13 +384,15 @@ MC6845_UPDATE_ROW(i7000_state::crtc_update_row)
 	}
 }
 
-/*FIXME: we still need to figure out the proper memory map
-         for the maincpu and where the cartridge slot maps to. */
 void i7000_state::i7000_mem(address_map &map)
 {
+	map(0x0000, 0xffff).ram().share(m_ram);
 	map(0x0000, 0x0fff).rom().region("boot", 0);
-	map(0x2000, 0x2fff).ram().share("videoram");
-	map(0x4000, 0xffff).ram().share("mainram");
+	map(0x0000, 0x7fff).view(m_page_view);
+	map(0x8000, 0xafff).view(m_drive_view);
+	m_drive_view[0](0x8000, 0x8fff).rom().region("drive", 0);
+	m_drive_view[1](0x8000, 0x8fff).rom().region("drive", 0);
+	m_drive_view[1](0xa000, 0xa7ff).mirror(0x0800).ram();
 }
 
 void i7000_state::i7000_io(address_map &map)
@@ -333,6 +402,8 @@ void i7000_state::i7000_io(address_map &map)
 	map(0x00, 0x00).mirror(0x03).w(FUNC(i7000_state::col80_w));
 	map(0x08, 0x08).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x09, 0x09).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0c, 0x0c).w(FUNC(i7000_state::page_0c_w));
+	map(0x10, 0x10).w(FUNC(i7000_state::page_10_w));
 	map(0x18, 0x1b).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x1c, 0x1f).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x20, 0x21).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
