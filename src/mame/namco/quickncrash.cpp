@@ -323,7 +323,11 @@ void qncrash_state::qncrash(machine_config &config)
 	m_maincpu->txd_callback().set(dotcpu, FUNC(tmpz84c015_device::rxb_w));
 	dotcpu.out_txdb_callback().set(m_maincpu, FUNC(kl5c80a12_device::rxd_w));
 
-	clock_device &sioclk(CLOCK(config, "sioclk", 500'000)); // placeholder until real clock source is found
+	// the dot CPU's SIO B clock must match the main CPU's USART clock: the KP51
+	// is fed by KP63 timer B channel 1 (PWM, /4 prescale, count 0x070F -> 4*16
+	// clocks at 10MHz = 6.4us) giving 156.25kHz, and the SIO divides by 16 (WR4
+	// x16), so both ends run at 9765.6 baud
+	clock_device &sioclk(CLOCK(config, "sioclk", 156'250)); // real clock source not identified
 	sioclk.signal_handler().set(dotcpu, FUNC(tmpz84c015_device::txcb_w));
 	sioclk.signal_handler().append(dotcpu, FUNC(tmpz84c015_device::rxcb_w));
 
