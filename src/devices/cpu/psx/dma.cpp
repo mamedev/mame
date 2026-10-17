@@ -270,7 +270,10 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 					// pSX's CD DMA size calc formula
 					int oursize = (dma->n_blockcontrol >> 16);
 					oursize = (oursize > 1) ? oursize : 1;
-					oursize *= (dma->n_blockcontrol & 0xffff);
+					if ((dma->n_blockcontrol & 0xffff) != 0)
+						oursize *= (dma->n_blockcontrol & 0xffff);
+					else
+						oursize = 0x10000; // a word count of 0 transfers 0x10000 words
 
 					dma->fn_read(m_ram, n_address, oursize);
 					dma_finished(index);
