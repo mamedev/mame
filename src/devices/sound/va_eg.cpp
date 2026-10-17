@@ -168,6 +168,8 @@ void va_rc_eg_device::snapshot()
 }
 
 
+// *****************************************************************************
+
 va_ota_eg_device::va_ota_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, ota_type ota, float c)
 	: device_t(mconfig, VA_OTA_EG, tag, owner, 0)
 	, device_sound_interface(mconfig, *this)
@@ -350,7 +352,7 @@ void va_ota_eg_device::sound_stream_update(sound_stream &stream)
 		stream.put(0, i, m_v);
 	}
 
-	if (fabsf(m_v - last_v) < 1E-15 || fabsf(conv_v - m_v) < 1E-6)
+	if (fabsf(m_v - last_v) < 1E-15F || fabsf(conv_v - m_v) < 1E-6F)
 		m_converged = true;
 
 	LOGMASKED(LOG_CONVERGENCE, "%s: converged %d, target: %e %e, deltas %e %e, step: %e %e, current: %e %d\n",
@@ -358,5 +360,63 @@ void va_ota_eg_device::sound_stream_update(sound_stream &stream)
 }
 
 
+// *****************************************************************************
+
+va_smoothing_sh_device::va_smoothing_sh_device(const machine_config &mconfig, const char *tag, device_t *owner, float r, float c_large, float c_small)
+	: device_t(mconfig, VA_SMOOTHING_SH, tag, owner, 0)
+	, device_sound_interface(mconfig, *this)
+	, m_r(r)
+	, m_c_large(c_large)
+	, m_c_small(c_small)
+	, m_c_series((m_c_large * m_c_small) / (m_c_large + m_c_small))
+	, m_stream(nullptr)
+	, m_rc(*this, "rc")
+	, m_sampling(false)
+{
+}
+
+va_smoothing_sh_device::va_smoothing_sh_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: va_smoothing_sh_device(mconfig, tag, owner, RES_M(1), CAP_U(0.01), CAP_U(0.001))
+{
+}
+
+void va_smoothing_sh_device::sample(float v_in)
+{
+	if (!m_sampling)
+	{
+		m_rc->set_c(m_c_small);
+		m_sampling = true;
+	}
+	m_rc->set_target_v(v_in);
+}
+
+void va_smoothing_sh_device::hold()
+{
+	if (!m_sampling)
+		return;
+
+	m_rc->set_target_v((m_c_large * m_rc->get_target_v() + m_c_small * m_rc->get_v()) / (m_c_large + m_c_small));
+	m_rc->set_c(m_c_series);
+	m_sampling = false;
+}
+
+void va_smoothing_sh_device::device_add_mconfig(machine_config &config)
+{
+	VA_RC_EG(config, m_rc).set_r(m_r).set_c(m_c_series).add_route(0, *this, 1.0);
+}
+
+void va_smoothing_sh_device::device_start()
+{
+	m_stream = stream_alloc(1, 1, machine().sample_rate());
+	save_item(NAME(m_sampling));
+}
+
+void va_smoothing_sh_device::sound_stream_update(sound_stream &stream)
+{
+	stream.copy(0, 0);
+}
+
+
 DEFINE_DEVICE_TYPE(VA_RC_EG, va_rc_eg_device, "va_rc_eg", "RC-based Envelope Generator")
 DEFINE_DEVICE_TYPE(VA_OTA_EG, va_ota_eg_device, "va_ota_eg", "OTA-based Envelope Generator")
+DEFINE_DEVICE_TYPE(VA_SMOOTHING_SH, va_smoothing_sh_device, "va_smoothing_sh", "Smoothing Sample & Hold")

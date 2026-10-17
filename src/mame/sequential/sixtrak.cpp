@@ -93,6 +93,7 @@ For all other functionality, see the owner's manual.
 #include "sound/mixer.h"
 #include "sound/mm5837.h"
 #include "sound/va_eg.h"
+#include "sound/va_vco.h"
 #include "speaker.h"
 
 #include "sequential_sixtrak.lh"
@@ -109,47 +110,6 @@ For all other functionality, see the owner's manual.
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
-
-namespace {
-
-// TODO: Move somewhere in sound/device.
-class sixtrak_transistor_noise_device : public device_t, public device_sound_interface
-{
-public:
-	sixtrak_transistor_noise_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
-
-protected:
-	void sound_stream_update(sound_stream &stream) override;
-	void device_start() override ATTR_COLD;
-
-private:
-	sound_stream *m_stream = nullptr;
-};
-
-}  // anonymous namespace
-
-DEFINE_DEVICE_TYPE(SIXTRAK_TRANSISTOR_NOISE, sixtrak_transistor_noise_device, "sixtrak_transistor_noise", "Six-Trak PNP-based noise generator")
-
-sixtrak_transistor_noise_device::sixtrak_transistor_noise_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SIXTRAK_TRANSISTOR_NOISE, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-{
-}
-
-void sixtrak_transistor_noise_device::sound_stream_update(sound_stream &stream)
-{
-	const int n = stream.samples();
-	for (int i = 0; i < n; ++i)
-	{
-		// Uniformly distributed random number between -1 and 1.
-		stream.put(0, i, 2 * (double(machine().rand()) / std::numeric_limits<u32>::max() - 0.5));
-	}
-}
-
-void sixtrak_transistor_noise_device::device_start()
-{
-	m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
-}
 
 namespace {
 
@@ -178,7 +138,6 @@ protected:
 private:
 	double get_dac_v(bool inverted) const;
 	double get_voltage_mux_out() const;
-	static void update_sh_rc(bool sampling, double cv, va_rc_eg_device &rc);
 	void update_cvs();
 
 	void update_wheel_rc(int which);
@@ -208,8 +167,8 @@ private:
 	required_device<ttl7474_device> m_tuning_ff;  // U146A
 	required_device<output_latch_device> m_tune_control;  // U148 (CD40174)
 	required_device_array<cem3394_device, 6> m_voices;
-	required_device_array<va_rc_eg_device, 6> m_gain_rc;
-	required_device_array<va_rc_eg_device, 6> m_freq_rc;
+	required_device_array<va_smoothing_sh_device, 6> m_gain_sh;
+	required_device_array<va_smoothing_sh_device, 6> m_freq_sh;
 	required_device<filter_volume_device> m_mute;  // U147 (CD4049)
 	required_device<filter_volume_device> m_master_vol;  // R197
 	required_device_array<va_rc_eg_device, 2> m_wheel_rc;
@@ -232,8 +191,6 @@ private:
 	u8 m_sh_voices = 0x3f;
 	u8 m_sh_param = 0;
 	u8 m_voltage_mux_input = 0;
-	std::array<bool, 6> m_sampling_gain = { false, false, false, false, false, false };
-	std::array<bool, 6> m_sampling_freq = { false, false, false, false, false, false };
 
 	static inline constexpr double VPLUS = 5.0;
 	static inline constexpr double VMINUS = -6.5;
@@ -246,8 +203,8 @@ sixtrak_state::sixtrak_state(const machine_config &mconfig, device_type type, co
 	, m_tuning_ff(*this, "tuningff")
 	, m_tune_control(*this, "tune_control")
 	, m_voices(*this, "cem3394_%u", 1U)
-	, m_gain_rc(*this, "gain_rc_%u", 1U)
-	, m_freq_rc(*this, "freq_rc_%u", 1U)
+	, m_gain_sh(*this, "gain_sh_%u", 1U)
+	, m_freq_sh(*this, "freq_sh_%u", 1U)
 	, m_mute(*this, "mute")
 	, m_master_vol(*this, "master_volume")
 	, m_wheel_rc(*this, "wheel_rc_%u", 0U)
@@ -327,51 +284,6 @@ double sixtrak_state::get_voltage_mux_out() const
 	return 0;
 }
 
-// Will only be accurate if called when `sampling` is true, or when `sampling`
-// is transitioning to false. Should not be called multiple times in a row with
-// sampling == false.
-void sixtrak_state::update_sh_rc(bool sampling, double cv, va_rc_eg_device &rc)
-{
-	// The sample & hold circuits for the filter frequency and VCA gain CVs
-	// include an RC network. This smoothens the CV updates sent from the
-	// firmware.
-
-	// When the CV is being sampled, Cl (Clarge) reaches the target voltage
-	// immediately, while Cs (Csmall) (dis)charges towards the CV via R (1 MOhm).
-	// The CEM3394 senses the voltage at Cs.
-	//
-	// CV ---+--- R ---+--- CEM3394 CV input
-	//       |         |
-	//       Cl        Cs
-	//       |         |
-	//      GND       GND
-
-	// When the CV is not being sampled, Cs and Cl will (dis)charge towards the
-	// same target voltage. The (dis)charge rate will be that of an RC circuit
-	// where C is the series combination of Cs and Cl.
-	//
-	//       +--- R ---+--- CEM3394 CV input
-	//       |         |
-	//       Cl        Cs
-	//       |         |
-	//      GND       GND
-
-	constexpr double C_SMALL = CAP_U(0.001);
-	constexpr double C_LARGE = CAP_U(0.01);
-	constexpr double C_SERIES = (C_LARGE * C_SMALL) / (C_LARGE + C_SMALL);
-
-	if (sampling)
-	{
-		rc.set_target_v(cv);
-		rc.set_c(C_SMALL);
-	}
-	else
-	{
-		rc.set_target_v((C_LARGE * rc.get_target_v() + C_SMALL * rc.get_v()) / (C_LARGE + C_SMALL));
-		rc.set_c(C_SERIES);
-	}
-}
-
 void sixtrak_state::update_cvs()
 {
 	assert(m_sh_param < 8);
@@ -382,18 +294,16 @@ void sixtrak_state::update_cvs()
 		const bool voice_active = !BIT(m_sh_voices, voice);
 
 		const bool sampling_gain = voice_active && (m_sh_param == 1);
-		if (sampling_gain || sampling_gain != m_sampling_gain[voice])
-		{
-			update_sh_rc(sampling_gain, cv, *m_gain_rc[voice]);
-		}
-		m_sampling_gain[voice] = sampling_gain;
+		if (sampling_gain)
+			m_gain_sh[voice]->sample(cv);
+		else
+			m_gain_sh[voice]->hold();
 
 		const bool sampling_freq = voice_active && (m_sh_param == 3);
-		if (sampling_freq || sampling_freq != m_sampling_freq[voice])
-		{
-			update_sh_rc(sampling_freq, cv, *m_freq_rc[voice]);
-		}
-		m_sampling_freq[voice] = sampling_freq;
+		if (sampling_freq)
+			m_freq_sh[voice]->sample(cv);
+		else
+			m_freq_sh[voice]->hold();
 
 		if (!voice_active || sampling_freq || sampling_gain)
 			continue;
@@ -736,8 +646,6 @@ void sixtrak_state::machine_start()
 	save_item(NAME(m_sh_voices));
 	save_item(NAME(m_sh_param));
 	save_item(NAME(m_voltage_mux_input));
-	save_item(NAME(m_sampling_gain));
-	save_item(NAME(m_sampling_freq));
 
 	m_maincpu->space(AS_IO).install_readwrite_before_time(
 		0x00, 0xff, ws_time_delegate(*this, FUNC(sixtrak_state::iorq_wait_state)));
@@ -857,8 +765,8 @@ void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interfac
 
 	for (int i = 0; i < 6; ++i)
 	{
-		VA_RC_EG(config, m_gain_rc[i]).set_r(RES_M(1));
-		VA_RC_EG(config, m_freq_rc[i]).set_r(RES_M(1));
+		VA_SMOOTHING_SH(config, m_gain_sh[i], RES_M(1), CAP_U(0.01), CAP_U(0.001));
+		VA_SMOOTHING_SH(config, m_freq_sh[i], RES_M(1), CAP_U(0.01), CAP_U(0.001));
 
 		const cem3394_device::components comps =
 		{
@@ -870,8 +778,8 @@ void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interfac
 
 		cem3394_device::stream_inputs voice_inputs;
 		voice_inputs.ext_input = &noise;
-		voice_inputs.final_gain_cv = m_gain_rc[i].target();
-		voice_inputs.filt_freq_cv = m_freq_rc[i].target();
+		voice_inputs.final_gain_cv = m_gain_sh[i].target();
+		voice_inputs.filt_freq_cv = m_freq_sh[i].target();
 
 		CEM3394(config, m_voices[i], comps, voice_inputs);
 		m_voices[i]->add_route(0, "voicemixer", CEM3394_IOUT_MAX);
@@ -928,7 +836,7 @@ void sixtrak_state::sixtrak_rev_a(machine_config &config)
 
 void sixtrak_state::sixtrak_rev_b(machine_config &config)
 {
-	sixtrak_common(config, SIXTRAK_TRANSISTOR_NOISE(config, "noise"));
+	sixtrak_common(config, VA_NOISE(config, "noise"));
 
 	// On the Rev B and C, the D input of the tuning flip-flop is attached to
 	// its /Q output.

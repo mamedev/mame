@@ -8,6 +8,7 @@
 
 DECLARE_DEVICE_TYPE(VA_RC_EG, va_rc_eg_device)
 DECLARE_DEVICE_TYPE(VA_OTA_EG, va_ota_eg_device)
+DECLARE_DEVICE_TYPE(VA_SMOOTHING_SH, va_smoothing_sh_device)
 
 
 // Building block for emulating envelope generators (EGs) based on a single RC
@@ -78,6 +79,7 @@ private:
 	attotime m_t_start;
 	attotime m_t_end_approx;
 };
+
 
 // An envelope generator (EG) built around an operational transconductance
 // amplifier (OTA). Its rate is controlled by Iabc.
@@ -187,6 +189,57 @@ private:
 	float m_target_v;
 	float m_iabc;
 	float m_v;
+};
+
+
+// A smoothing sample & hold circuit. Used in synthesizers to smoothen control
+// voltages (CV) updates from the firmware.
+//
+// When Vin is being sampled, Cl (Clarge) reaches the target voltage immediately,
+// while Cs (Csmall) (dis)charges towards Vin via R:
+//
+// Vin ---+--- R ---+--- Vout
+//        |         |
+//        Cl        Cs
+//        |         |
+//       GND       GND
+//
+// When Vin is not being sampled, Cs and Cl will (dis)charge towards the same
+// target voltage. The (dis)charge rate will be that of an RC circuit where C
+// is the series combination of Cs and Cl:
+//
+//       +--- R ---+--- Vout
+//       |         |
+//       Cl        Cs
+//       |         |
+//      GND       GND
+//
+// Vout gets published on the output stream of this device.
+//
+class va_smoothing_sh_device : public device_t, public device_sound_interface
+{
+public:
+	va_smoothing_sh_device(const machine_config &mconfig, const char *tag, device_t *owner, float r, float c_large, float c_small) ATTR_COLD;
+	va_smoothing_sh_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
+
+	void sample(float v_in);
+	void hold();
+
+protected:
+	void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	void device_start() override ATTR_COLD;
+
+	void sound_stream_update(sound_stream &stream) override;
+
+private:
+	const float m_r;
+	const float m_c_large;
+	const float m_c_small;
+	const float m_c_series;
+
+	sound_stream *m_stream;
+	required_device<va_rc_eg_device> m_rc;
+	bool m_sampling;
 };
 
 #endif  // MAME_SOUND_VA_EG_H
