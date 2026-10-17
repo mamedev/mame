@@ -2030,6 +2030,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/jcm_wba.h,MACHINES["JCM_WBA"] = true
+---------------------------------------------------
+
+if MACHINES["JCM_WBA"] then
+	files {
+		MAME_DIR .. "src/devices/machine/jcm_wba.cpp",
+		MAME_DIR .. "src/devices/machine/jcm_wba.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/jvsdev.h,MACHINES["JVS"] = true
 --@src/devices/machine/jvshost.h,MACHINES["JVS"] = true
 ---------------------------------------------------
