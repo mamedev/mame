@@ -1158,10 +1158,10 @@ int mcd212_device::ram_dtack_cycle_count()
 
 	const int x = screen().hpos();
 	const int y = screen().vpos() / 2;
-	const bool x_outside_active_display = (x >= 408);
+	const bool x_outside_active_display = (x > screen().visible_area().right());
 
 	// No contending for Ch.1/Ch.2 timing slots during the final 8-pixel area on all lines
-	if (x >= 472)
+	if (x >= screen().width() - 16)
 		return 2;
 
 	// No contending for Ch.1/Ch.2 timing slots during the free-run area of ICA lines
