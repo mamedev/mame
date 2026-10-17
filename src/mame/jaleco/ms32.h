@@ -8,6 +8,7 @@
 #include "cpu/jalfpu/jalfpu.h"
 #include "cpu/v60/v60.h"
 #include "machine/gen_latch.h"
+#include "machine/nvram.h"
 #include "machine/timer.h"
 #include "jaleco_ms32_sysctrl.h"
 #include "ms32_sprite.h"
@@ -66,6 +67,7 @@ public:
 	ms32_state(const machine_config &mconfig, device_type type, const char *tag) :
 		ms32_base_state(mconfig, type, tag)
 		, m_sysctrl(*this, "sysctrl")
+		, m_nvram_dev(*this, "nvram")
 		, m_screen(*this, "screen")
 		, m_sprite(*this, "sprite")
 		, m_palette(*this, "palette")
@@ -97,6 +99,7 @@ public:
 
 protected:
 	required_device<jaleco_ms32_sysctrl_device> m_sysctrl;
+	required_device<nvram_device> m_nvram_dev;
 	required_device<screen_device> m_screen;
 	required_device<ms32_sprite_device> m_sprite;
 	required_device<palette_device> m_palette;
@@ -110,6 +113,9 @@ protected:
 	memory_share_creator<u16> m_txram;
 	bitmap_ind16 m_temp_bitmap_tilemaps;
 	bitmap_ind16 m_temp_bitmap_sprites;
+	bitmap_ind16 m_layer_tx;
+	bitmap_ind16 m_layer_bg;
+	bitmap_ind16 m_layer_roz;
 
 	void flipscreen_w(int state);
 	virtual void video_start() override ATTR_COLD;
@@ -121,6 +127,14 @@ protected:
 	tilemap_t *bg_layer_tilemap() const { return (m_tilemaplayoutcontrol & 1) ? m_bg_tilemap_alt : m_bg_tilemap; }
 	virtual tilemap_t &create_tx_tilemap() ATTR_COLD;
 	TILE_GET_INFO_MEMBER(get_ms32_roz_tile_info);
+
+	u32 m_brt[4];
+	int m_brt_r;
+	int m_brt_g;
+	int m_brt_b;
+	int m_brt1_r;
+	int m_brt1_g;
+	int m_brt1_b;
 
 	void ms32_map(address_map &map) ATTR_COLD;
 	void ms32_sound_map(address_map &map) ATTR_COLD;
@@ -144,11 +158,7 @@ private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap_alt;
 	u32 m_tilemaplayoutcontrol;
-	bitmap_ind8 m_temp_bitmap_sprites_pri;
-	u32 m_brt[4];
-	int m_brt_r;
-	int m_brt_g;
-	int m_brt_b;
+	bitmap_ind16 m_temp_bitmap_sprites_pri;
 
 	u8 ms32_nvram_r8(offs_t offset);
 	void ms32_nvram_w8(offs_t offset, u8 data);
@@ -179,6 +189,7 @@ private:
 	void screen_vblank(int state);
 	void update_color(int color);
 	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top);
+	void apply_sprite_effects(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority);
 };
 
@@ -212,10 +223,7 @@ private:
 	required_shared_ptr<u32> m_road_ctrl;
 	memory_share_creator<u16> m_road_lineram;
 	std::vector<u16> m_txram_latch;
-	bitmap_ind16 m_layer_tx;
-	bitmap_ind16 m_layer_bg;
 	bitmap_ind16 m_layer_road;
-	bitmap_ind16 m_layer_roz;
 
 	tilemap_t *m_extra_tilemap;
 

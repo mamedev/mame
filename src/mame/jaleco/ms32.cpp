@@ -1637,6 +1637,8 @@ void ms32_state::ms32(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60000));
 
+	NVRAM(config, m_nvram_dev, nvram_device::DEFAULT_ALL_0);
+
 	JALECO_MS32_SYSCTRL(config, m_sysctrl, XTAL(48'000'000), m_screen);
 	m_sysctrl->flip_screen_cb().set(FUNC(ms32_state::flipscreen_w));
 	m_sysctrl->vblank_cb().set(FUNC(ms32_state::vblank_irq_w));
@@ -2611,6 +2613,7 @@ void ms32_base_state::configure_banks()
 void ms32_state::init_ms32_common()
 {
 	m_nvram_8 = std::make_unique<u8[]>(0x2000);
+	m_nvram_dev->set_base(m_nvram_8.get(), 0x2000);
 	configure_banks();
 }
 
