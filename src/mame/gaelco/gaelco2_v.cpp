@@ -46,7 +46,7 @@
                   0  | -xxx---- -------- | not used?
                   0  | ----xxx- -------- | tilemap #1 video RAM bank? (4, 5)
                   0  | -------x -------- | not used?
-                  0  | -------- x------- | unknown
+                  0  | -------- x------- | tilemap #1 over sprites (GAE1 PRI)
                   0  | -------- -x------ | not used?
                   0  | -------- --xx---- | visible area size? (=0,480x240;=1,384x240;=2,320x240)
                   0  | -------- ----xxxx | not used?
@@ -179,6 +179,11 @@ void gaelco2_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 void gaelco2_state::vregs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	u16 old = m_vregs[offset];
+	if ((offset == 0) && !m_dual_monitor && ((old ^ data) & mem_mask & 0x0080))
+	{
+		for (screen_device &screen : screen_device_enumerator(*this))
+			screen.update_partial(screen.vpos());
+	}
 	data = COMBINE_DATA(&m_vregs[offset]);
 	switch (offset)
 	{
@@ -460,8 +465,16 @@ u32 gaelco2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	bitmap.fill(0, cliprect);
 
 	m_pant[1]->draw(screen, bitmap, cliprect, 0, 0);
-	m_pant[0]->draw(screen, bitmap, cliprect, 0, 0);
-	draw_sprites(screen, bitmap, cliprect, 0);
+	if (BIT(m_vregs[0], 7))
+	{
+		draw_sprites(screen, bitmap, cliprect, 0);
+		m_pant[0]->draw(screen, bitmap, cliprect, 0, 0);
+	}
+	else
+	{
+		m_pant[0]->draw(screen, bitmap, cliprect, 0, 0);
+		draw_sprites(screen, bitmap, cliprect, 0);
+	}
 	return 0;
 }
 
