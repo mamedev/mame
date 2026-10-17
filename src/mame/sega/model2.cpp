@@ -1387,9 +1387,9 @@ void model2b_state::model2b_crx_mem(address_map &map)
 	model2_base_mem(map);
 
 	map(0x00200000, 0x0023ffff).ram().flags(i960_cpu_device::BURST);
-
-	map(0x00804000, 0x00807fff).rw(FUNC(model2b_state::geo_prg_r), FUNC(model2b_state::geo_prg_w));
-	map(0x00840000, 0x00840fff).nopw();
+    map(0x00804000, 0x00807fff).rw(FUNC(model2b_state::geo_prg_r), FUNC(model2b_state::geo_prg_w));
+	//map(0x00804000, 0x00807fff).rw(FUNC(model2b_state::geo_sharc_fifo_r), FUNC(model2b_state::geo_sharc_fifo_w));
+	//map(0x00840000, 0x00840fff).w(FUNC(model2b_state::geo_sharc_iop_w));
 
 	map(0x00880000, 0x00883fff).w(FUNC(model2b_state::copro_function_port_w));
 	map(0x00884000, 0x00887fff).rw(FUNC(model2b_state::copro_fifo_r), FUNC(model2b_state::copro_fifo_w));
