@@ -109,10 +109,13 @@ protected:
 private:
 	u16 m_yutnori_prot_val = 0;
 	bool m_yutnori_music_on = false;
+	u8 m_yutnori_voice_next = 0; // sample to play when channel m_yutnori_voice_ch finishes, 0 for none
+	u8 m_yutnori_voice_ch = 0;
 
 	void yutnori_prot_w(u16 data);
 	u16 yutnori_prot_r();
-	void yutnori_sound_w(u8 data);
+	void yutnori_sound_hle_w(u8 data);
+	void yutnori_voice_update();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(yutnori_scanline);
 

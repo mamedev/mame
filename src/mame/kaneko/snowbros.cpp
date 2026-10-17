@@ -526,59 +526,95 @@ void yutnori_state::yutnori_prot_w(u16 data)
 
 // Yutnori sound (HLE, the PIC presumably drives the OKIs).
 // The game writes one byte per frame to $400001: 0 when idle, else a command.
-// 0x01-0x22: voice ROM sample 1-34
+// 0x01-0x22: voice ROM sample from SAMPLE_REMAP
 // 0x80:      sent on sound reset and before every music change, treated as stop music
 // 0x81-0x82: music, one sample in each bank of the music ROM.
 //            the code to bank mapping and the looping are unverified.
 //
-// cmd   sample  Korean               English
-// 0x01   1      (effect)
-// 0x02   2      (effect)
-// 0x03   3      (effect)
-// 0x04   4      (effect)
-// 0x05   5      (effect)
-// 0x06   6      (effect)
-// 0x07   7      베팅하세요             "Place your bet"
-// 0x08   8      한 번 더 하시오        "Go once more"
-// 0x09   9      한 번 더 할게요        "I'll go once more"
-// 0x0a  10      이겼다!               "Won!"
-// 0x0b  11      졌다.                 "Lost."
-// 0x0c  12      골인                  "Goal in!"
-// 0x0d  13      보너스 게임 할 거예요?   "Will you play the bonus game?"
-// 0x0e  14      윷을 던지세요           "Throw the yut sticks"
-// 0x0f  15      (effect)
-// 0x10  16      어머, 잡혔네요?         "Oh no, caught!"
-// 0x11  17      (effect)
-// 0x12  18      선택을 잘못하셨네요      "Wrong choice"
-// 0x13  19      이어서 하실래요?        "Continue?"
-// 0x14  20      움직일 게 없네요         "Nothing to move"
-// 0x15  21      ?                     throw result 0
-// 0x16  22      ?                     throw result 1
-// 0x17  23      ?                     throw result 2
-// 0x18  24      ?                     throw result 3
-// 0x19  25      ?                     throw result 4
-// 0x1a  26      빽도                   "Back-do" (throw result 5)
-// 0x1b  27      (effect, 6s)
-// 0x1c  28      꽝, 꽝, 꽝이네요        "Miss, miss, it's a miss!"
-// 0x1d  29      ?
-// 0x1e  30      선택해주세요            "Please choose"
-// 0x1f  31      움직일 말을             "The piece to move..."
-// 0x20  32      축하합니다              "Congratulations"
-// 0x21  33      어머 아깝네요            "Oh, so close!"
-// 0x22  34      ?                     ... "one more"
-void yutnori_state::yutnori_sound_w(u8 data)
+// sample  English                                 Korean
+//      1  (effect)
+//      2  (effect)
+//      3  (effect)
+//      4  (effect)
+//      5  (effect)
+//      6  (effect)
+//      7  "Place your bet"                        베팅하세요
+//      8  "Go once more" (player's extra turn)    한 번 더 하세요
+//      9  "My turn continues once more"           한 번 더 할게요
+//     10  "Won!"                                  이겼다!
+//     11  "Lost."                                 졌다.
+//     12  "Goal in!"                              골인
+//     13  "Will you play the bonus game?"         보너스 게임 할 거예요?
+//     14  "Throw the yut sticks"                  윷을 던지세요
+//     15  (effect)
+//     16  "Oh no, your piece has been captured."  어머, 잡혔네요?
+//     17  (effect)
+//     18  "Wrong choice"                          선택을 잘못하셨네요
+//     19  "Continue?"                             이어서 하실래요?
+//     20  "Nothing to move"                       움직일 게 없네요
+//     21  "Do" (throw result 0)                   도
+//     22  "Gae" (throw result 1)                  개
+//     23  "Geol" (throw result 2)                 걸
+//     24  "Yut" (throw result 3)                  윷
+//     25  "Mo" (throw result 4)                   모
+//     26  "Back-do" (throw result 5)              빽도
+//     27  (effect, 6s)
+//     28  "Miss, miss, it's a miss!"              꽝, 꽝, 꽝이네요
+//     29  "The thing to use...", then sample 30   쓸 것을...
+//     30  "Please choose"                         선택해주세요
+//     31  "The piece to move...", then sample 30  움직일 말을...
+//     32  "Congratulations"                       축하합니다
+//     33  "Oh, so close!"                         어머 아깝네요
+//     34  "You got another item."                 아이템을 하나 더 모았네요.
+void yutnori_state::yutnori_sound_hle_w(u8 data)
 {
+	// Commands 0x1b-0x22: where the 68000 code sends them (play_sound() at $270c), the message on screen
+	// at the same time, and the sample played. 0x1b and 0x22 show no message; 0x22's samples are by ear.
+	// cmd   sent from      when                                       sample   on screen
+	// 0x1b  $f346          bonus game, spin starts                    27
+	// 0x1c  $f0ba          bonus game, result is 0                    28       꽝 꽝 꽝이네요 후후
+	// 0x1d  $65ac, $6640   item set complete                          32       축하해요 보너스점수예요
+	//       $f17a          bonus game, win                            32       오호~ 축하해요
+	// 0x1e  -              not sent                                   -
+	// 0x1f  $6742, $67d4   item picked up                             34       아이템을 하나 더 모았네요
+	// 0x20  $8102          choose which throw result to use           29, 30   쓸것을 선택해 주세요
+	// 0x21  -              not sent                                   -
+	// 0x22  $5212          sticks landed, before every throw result   31, 30
+	//       $f03a          bonus game, spinner stopped                31, 30
+	// The prompt to choose the piece to move ($7f32) shows 움직일 말 선택하세요 and sends no command.
+	// 0x06 is sent from $159c in the title sequence, once for each of 8 objects.
+	static constexpr u8 SAMPLE_REMAP[0x23] = {
+		 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+		16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 32, 30, 34,
+		29, 33, 31
+	};
+
 	if (data >= 0x01 && data <= 0x22)
 	{
-		const u8 status = m_oki[1]->read();
+		const u8 sample = SAMPLE_REMAP[data];
 
-		for (int ch = 0; ch < 4; ch++)
+		if (sample)
 		{
-			if (BIT(~status, ch))
+			// finish a sentence before its channel can be given to the new sample
+			yutnori_voice_update();
+
+			const u8 status = m_oki[1]->read();
+
+			for (int ch = 0; ch < 4; ch++)
 			{
-				m_oki[1]->write(0x80 | data);
-				m_oki[1]->write(0x10 << ch);
-				break;
+				if (BIT(~status, ch))
+				{
+					m_oki[1]->write(0x80 | sample);
+					m_oki[1]->write(0x10 << ch);
+
+					// samples 29 and 31 start a sentence that sample 30 finishes
+					if (sample == 29 || sample == 31)
+					{
+						m_yutnori_voice_next = 30;
+						m_yutnori_voice_ch = ch;
+					}
+					break;
+				}
 			}
 		}
 	}
@@ -609,6 +645,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(yutnori_state::yutnori_scanline)
 		m_oki[0]->write(0x80 | 0x01);
 		m_oki[0]->write(0x10);
 	}
+
+	if (param == 0)
+		yutnori_voice_update();
+}
+
+// play the second half of a sentence once the first half's channel is free
+void yutnori_state::yutnori_voice_update()
+{
+	if (m_yutnori_voice_next && BIT(~m_oki[1]->read(), m_yutnori_voice_ch))
+	{
+		m_oki[1]->write(0x80 | m_yutnori_voice_next);
+		m_oki[1]->write(0x10 << m_yutnori_voice_ch);
+		m_yutnori_voice_next = 0;
+	}
 }
 
 void yutnori_state::yutnori_map(address_map &map)
@@ -628,7 +678,7 @@ void yutnori_state::yutnori_map(address_map &map)
 	map(0x30000e, 0x30000f).nopr(); //.r(FUNC(snowbros_pandora_state::yutnori_unk_r)); // ??
 
 	map(0x400000, 0x400001).nopr();
-	map(0x400001, 0x400001).w(FUNC(yutnori_state::yutnori_sound_w));
+	map(0x400001, 0x400001).w(FUNC(yutnori_state::yutnori_sound_hle_w));
 
 	map(0x500000, 0x5001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
@@ -1999,6 +2049,8 @@ void yutnori_state::machine_start()
 
 	save_item(NAME(m_yutnori_prot_val));
 	save_item(NAME(m_yutnori_music_on));
+	save_item(NAME(m_yutnori_voice_next));
+	save_item(NAME(m_yutnori_voice_ch));
 }
 
 void yutnori_state::machine_reset()
@@ -2006,6 +2058,7 @@ void yutnori_state::machine_reset()
 	snowbros_pandora_state::machine_reset();
 
 	m_yutnori_music_on = false;
+	m_yutnori_voice_next = 0;
 }
 
 MACHINE_RESET_MEMBER(semicom_state,semiprot)
