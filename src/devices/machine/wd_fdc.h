@@ -381,6 +381,8 @@ class wd_fdc_analog_device_base : public wd_fdc_device_base {
 protected:
 	wd_fdc_analog_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void device_start() override ATTR_COLD;
+
 	virtual void pll_reset(bool fm, bool enmf, const attotime &when) override;
 	virtual void pll_start_writing(const attotime &tm, floppy_image_device *floppy) override;
 	virtual void pll_commit(floppy_image_device *floppy, const attotime &tm) override;
@@ -399,6 +401,8 @@ protected:
 	wd_fdc_digital_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	static constexpr int wd_digital_step_times[4] = { 12000, 24000, 40000, 60000 };
+
+	virtual void device_start() override ATTR_COLD;
 
 	virtual void pll_reset(bool fm, bool enmf, const attotime &when) override;
 	virtual void pll_start_writing(const attotime &tm, floppy_image_device *floppy) override;
