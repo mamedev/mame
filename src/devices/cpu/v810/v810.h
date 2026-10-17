@@ -155,6 +155,7 @@ private:
 	uint32_t opJAL(uint32_t op);
 	uint32_t opEI(uint32_t op);
 	uint32_t opDI(uint32_t op);
+	void take_exception(u32 handler, u16 code);
 	uint32_t opTRAP(uint32_t op);
 	uint32_t opRETI(uint32_t op);
 	uint32_t opHALT(uint32_t op);

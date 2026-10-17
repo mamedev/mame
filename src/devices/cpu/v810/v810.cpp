@@ -642,12 +642,43 @@ uint32_t v810_device::opDI(uint32_t op)
 	return 1;
 }
 
+// software exception, vectors 0-15 at 0xffffffa0, 16-31 at 0xffffffb0; returns to the next instruction
 uint32_t v810_device::opTRAP(uint32_t op)
 {
-	logerror("V810: TRAP @ %X\n", PC - 2);
-	machine().debug_break();
-	// TODO: assume same as irq time
-	return clkIRQ;
+	const u8 vector = op & 0x1f;
+	take_exception(0xffffffa0 | (vector & 0x10), 0xffa0 | vector);
+	return 15;
+}
+
+void v810_device::take_exception(u32 handler, u16 code)
+{
+	if (GET_NP)
+	{
+		// fatal exception
+		logerror("V810: fatal exception %04X @ %X\n", code, m_PPC);
+		return;
+	}
+	else if (GET_EP)
+	{
+		// duplexed exception
+		FEPC = PC;
+		FEPSW = PSW;
+		ECR = (ECR & 0xffff) | (code << 16);
+		SET_NP(1);
+		SET_ID(1);
+		SET_AE(0);
+		PC = 0xffffffd0;
+	}
+	else
+	{
+		EIPC = PC;
+		EIPSW = PSW;
+		ECR = (ECR & 0xffff0000) | code;
+		SET_EP(1);
+		SET_ID(1);
+		SET_AE(0);
+		PC = handler;
+	}
 }
 
 uint32_t v810_device::opRETI(uint32_t op)
