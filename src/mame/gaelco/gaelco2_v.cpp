@@ -57,7 +57,7 @@
                   1  | --xx---- -------- | not used?
                   1  | ----xxx- -------- | tilemap #2 video RAM bank? (4, 5)
                   1  | -------x xx------ | not used?
-                  1  | -------- --x----- | flip? (GAE1 FLIP, not emulated)
+                  1  | -------- --x----- | tilemaps x flip (GAE1 FLIP, not emulated)
                   1  | -------- ---x---- | sprite bank select
                   1  | -------- ----xxxx | not used?
         0x018008-0x018009   Clear video int?
@@ -86,10 +86,11 @@ Multi monitor notes:
 
     According to the GAE1 schematics, a high level on its CTR pin makes the
     chip drive the tilemap #2 pixels out through the pins that normally read
-    the sprite pixels back from the external frame buffer. The chip's own
-    pixel output then never sees a sprite, and both games keep PRI set so it
-    shows tilemap #1 over tilemap #2. The sprites have to be merged outside
-    the chip, so PRI doesn't apply to the dual monitor screens.
+    the sprite pixels back from the external frame buffer. The dual monitor
+    boards presumably tie CTR high: the chip's own pixel output then never
+    sees a sprite, and both games keep PRI set so it shows tilemap #1 over
+    tilemap #2. The sprites are merged outside the chip, so PRI doesn't apply
+    to the dual monitor screens.
 
 ***************************************************************************/
 
@@ -455,14 +456,22 @@ void gaelco2_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, co
 	// tilemap line for the first scanline, stepped once from the y scroll register
 	int line = m_videoram[(0x2800 / 2) + (layer * 2)] + (step_up ? -1 : 1);
 
+	// without linescroll every step is one line down, so the layer can be drawn in one go
+	if (!linescroll_en && !step_up)
+	{
+		m_pant[layer]->set_scrollx(0, (scrollx + xoff) & 0x3ff);
+		m_pant[layer]->set_scrolly(0, line & 0x1ff);
+		m_pant[layer]->draw(screen, bitmap, cliprect, 0, 0);
+		return;
+	}
+
 	for (int y = 0; y <= cliprect.max_y; y++)
 	{
 		line &= 0x1ff;
 		const u16 entry = linescroll_en ? linescroll[line] : scrollx;
 		if (y >= cliprect.min_y)
 		{
-			rectangle clip = cliprect;
-			clip.sety(y, y);
+			const rectangle clip(cliprect.min_x, cliprect.max_x, y, y);
 			m_pant[layer]->set_scrollx(0, (entry + xoff) & 0x3ff);
 			m_pant[layer]->set_scrolly(0, (line - y) & 0x1ff);
 			m_pant[layer]->draw(screen, bitmap, clip, 0, 0);
