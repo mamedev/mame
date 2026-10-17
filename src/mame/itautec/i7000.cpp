@@ -51,8 +51,10 @@
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/nsc800.h"
 #include "imagedev/floppy.h"
+#include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/i8279.h"
 #include "machine/pic8259.h"
@@ -84,6 +86,7 @@ public:
 		, m_card(*this, "cardslot")
 		, m_crtc(*this, "crtc")
 		, m_palette(*this, "palette")
+		, m_usart(*this, "usart")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:%u", 0U)
 		, m_page_view(*this, "page_view")
@@ -112,6 +115,7 @@ private:
 	required_device<generic_slot_device> m_card;
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
+	required_device<i8251_device> m_usart;
 	required_device<wd2793_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
 	memory_view m_page_view;
@@ -316,6 +320,8 @@ void i7000_state::machine_start()
 
 	m_drive_view[2].install_ram(0xa000, 0xafff, &m_vram[0]);
 
+	m_usart->write_cts(0); // no hardware flow control
+
 	save_item(NAME(m_row));
 	save_item(NAME(m_page_0c));
 	save_item(NAME(m_page_10));
@@ -483,10 +489,22 @@ void i7000_state::i7000_io(address_map &map)
 	map(0x18, 0x1b).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x1c, 0x1f).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x20, 0x21).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x24, 0x24).mirror(0x02).rw(m_usart, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
+	map(0x25, 0x25).mirror(0x02).rw(m_usart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xe0, 0xe3).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write));
 	map(0xe4, 0xe4).w(FUNC(i7000_state::fdc_ctrl_w));
 	map(0xe6, 0xe6).r(FUNC(i7000_state::fdc_status_r));
 }
+
+// SET VT52 starts up at 9600 baud, 7 data bits, odd parity, 2 stop bits
+DEVICE_INPUT_DEFAULTS_START( vt52_serial_defaults )
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD",   0xff, RS232_BAUD_9600)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD",   0xff, RS232_BAUD_9600)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_7)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY",   0xff, RS232_PARITY_ODD)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_2)
+DEVICE_INPUT_DEFAULTS_END
+
 
 void i7000_state::i7000(machine_config &config)
 {
@@ -519,10 +537,25 @@ void i7000_state::i7000(machine_config &config)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	pit8253_device &pit8253(PIT8253(config, "pit8253"));
+	pit8253.set_clk<0>(2'000'000);
+	pit8253.set_clk<1>(2'000'000);
+	pit8253.out_handler<1>().set(m_usart, FUNC(i8251_device::write_txc));
+	pit8253.out_handler<1>().append(m_usart, FUNC(i8251_device::write_rxc));
 	pit8253.set_clk<2>(2'000'000);
 	pit8253.out_handler<2>().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	I8255(config, "ppi").in_pb_callback().set_ioport("DSW");
+
+	I8251(config, m_usart, 2'000'000); // TMP8251AP
+	m_usart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_usart->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_usart->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_usart->rxrdy_handler().set_inputline(m_maincpu, NSC800_RSTA); // assumed
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(m_usart, FUNC(i8251_device::write_dsr));
+	rs232.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(vt52_serial_defaults));
 
 	i8279_device &kbdc(I8279(config, "i8279", 2'000'000));
 	kbdc.out_irq_callback().set_inputline(m_maincpu, NSC800_RSTC);
