@@ -53,6 +53,7 @@
 #include "cpu/z80/nsc800.h"
 #include "machine/i8255.h"
 #include "machine/i8279.h"
+#include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
@@ -73,6 +74,7 @@ public:
 	i7000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_pic(*this, "pic")
 		, m_card(*this, "cardslot")
 		, m_crtc(*this, "crtc")
 		, m_palette(*this, "palette")
@@ -97,6 +99,7 @@ private:
 	static constexpr uint32_t DOT_CLOCK = 14'318'181;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<pic8259_device> m_pic;
 	required_device<generic_slot_device> m_card;
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
@@ -117,6 +120,7 @@ private:
 
 	void i7000_palette(palette_device &palette) const ATTR_COLD;
 	MC6845_UPDATE_ROW(crtc_update_row);
+	IRQ_CALLBACK_MEMBER(inta_cb);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(card_load);
 
 	uint8_t kbd_r();
@@ -364,6 +368,15 @@ void i7000_state::update_paging()
 		m_drive_view.disable();
 }
 
+IRQ_CALLBACK_MEMBER(i7000_state::inta_cb)
+{
+	// the PIC is in 8080 mode and answers with a CALL
+	uint32_t vector = m_pic->acknowledge() << 16;
+	vector |= m_pic->acknowledge();
+	vector |= m_pic->acknowledge() << 8;
+	return vector;
+}
+
 void i7000_state::i7000_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x33, 0x44, 0x5d));
@@ -404,6 +417,7 @@ void i7000_state::i7000_io(address_map &map)
 	map(0x09, 0x09).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0c, 0x0c).w(FUNC(i7000_state::page_0c_w));
 	map(0x10, 0x10).w(FUNC(i7000_state::page_10_w));
+	map(0x14, 0x15).mirror(0x02).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x18, 0x1b).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x1c, 0x1f).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x20, 0x21).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
@@ -415,6 +429,10 @@ void i7000_state::i7000(machine_config &config)
 	NSC800(config, m_maincpu, 4'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &i7000_state::i7000_mem);
 	m_maincpu->set_addrmap(AS_IO, &i7000_state::i7000_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(i7000_state::inta_cb));
+
+	PIC8259(config, m_pic);
+	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen"));
