@@ -971,7 +971,7 @@ uint8_t z80sio_device::read_vector()
 	// modify vector for highest-priority pending interrupt
 	int const *const prio = interrupt_priorities();
 	vec &= 0xf1U;
-	for (int i = 0; i < std::size(m_int_state); ++i)
+	for (int i = 0; std::size(m_int_state) > i; ++i)
 	{
 		if (m_int_state[prio[i]] & Z80_DAISY_INT)
 		{
