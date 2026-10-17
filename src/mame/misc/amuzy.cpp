@@ -334,7 +334,7 @@ void amuzy_state::amuzy_map(address_map &map)
 	map(0x220000, 0x22000f).umask16(0x00ff).rw("rtc", FUNC(upd4992_device::read), FUNC(upd4992_device::write));
 	map(0x400001, 0x400001).rw(m_oki, FUNC(okim9810_device::read_status), FUNC(okim9810_device::write_command));
 	map(0x400003, 0x400003).w(m_oki, FUNC(okim9810_device::write_tmp_register));
-	map(0x600000, 0x603fff).rw("ygv", FUNC(ygv625_device::read), FUNC(ygv625_device::write));
+	map(0x600000, 0x603fff).m("ygv", FUNC(ygv625_device::map));
 }
 
 

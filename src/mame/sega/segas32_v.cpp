@@ -1578,7 +1578,7 @@ int segas32_state::draw_one_sprite(uint16_t const *data, int xoffs, int yoffs, c
 		if (xpos >= xtarget)
 			goto bail;
 	}
-	if (xdelta < 0 && xtarget < clipin.right())
+	if (xdelta < 0 && xtarget < clipin.left())
 	{
 		xtarget = clipin.left() - 1;
 		if (xpos <= xtarget)
