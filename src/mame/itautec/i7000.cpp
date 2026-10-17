@@ -48,6 +48,7 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "cpu/z80/nsc800.h"
+#include "machine/i8255.h"
 #include "machine/i8279.h"
 #include "machine/pit8253.h"
 #include "sound/spkrdev.h"
@@ -234,31 +235,21 @@ INPUT_PORTS_START( i7000 )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 
-	PORT_START("DSW") /* DP01 */
-	PORT_DIPNAME( 0x80, 0x80, "1")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "2")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, "3")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x10, "4")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x08, "5")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x04, 0x04, "6")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x00, "7")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x01, 0x01, "8")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_START("DSW") // DP01, read through PPI port B
+	PORT_DIPNAME( 0x80, 0x00, "Diagnostic Mode" ) PORT_DIPLOCATION("DP01:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DP01:2" )
+	PORT_DIPNAME( 0x20, 0x20, "Columns" ) PORT_DIPLOCATION("DP01:3")
+	PORT_DIPSETTING(    0x00, "40" )
+	PORT_DIPSETTING(    0x20, "80" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DP01:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DP01:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DP01:6" )
+	PORT_DIPNAME( 0x02, 0x02, "Characters per Line" ) PORT_DIPLOCATION("DP01:7") // CRTC horizontal total with 80 columns selected
+	PORT_DIPSETTING(    0x00, "52/103" )
+	PORT_DIPSETTING(    0x02, "56/112" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DP01:8" )
 INPUT_PORTS_END
 
 
@@ -322,7 +313,7 @@ void i7000_state::i7000_io(address_map &map)
 	map(0x08, 0x08).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x09, 0x09).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x18, 0x1b).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0x1d, 0x1d).portr("DSW");
+	map(0x1c, 0x1f).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x20, 0x21).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
 }
 
@@ -355,6 +346,8 @@ void i7000_state::i7000(machine_config &config)
 	pit8253_device &pit8253(PIT8253(config, "pit8253"));
 	pit8253.set_clk<2>(2'000'000);
 	pit8253.out_handler<2>().set("speaker", FUNC(speaker_sound_device::level_w));
+
+	I8255(config, "ppi").in_pb_callback().set_ioport("DSW");
 
 	i8279_device &kbdc(I8279(config, "i8279", 2'000'000));
 	kbdc.out_irq_callback().set_inputline(m_maincpu, NSC800_RSTC);
