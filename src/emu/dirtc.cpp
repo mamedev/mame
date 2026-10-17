@@ -45,6 +45,22 @@ device_rtc_interface::~device_rtc_interface()
 
 
 //-------------------------------------------------
+//  interface_post_start - register the clock
+//  registers for save states, so a restored
+//  state also restores the time the next tick
+//  advances from (the derived device saves only
+//  its own counter)
+//-------------------------------------------------
+
+void device_rtc_interface::interface_post_start()
+{
+	// "rtc_register", not NAME(m_register): some RTC devices already save a
+	// member of their own called m_register (bq4847, pcf8583)
+	device().save_item(m_register, "rtc_register");
+}
+
+
+//-------------------------------------------------
 //  set_time - called to initialize the RTC to
 //  a known date/time
 //-------------------------------------------------
