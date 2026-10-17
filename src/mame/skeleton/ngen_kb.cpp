@@ -57,6 +57,10 @@ uint8_t ngen_key_code(uint8_t row, uint8_t column)
 		return 0x09U; // K1 Tab.
 	if ((row == 1U) && (column >= 1U) && (column <= std::size(ROW1_CODES)))
 		return ROW1_CODES[column - 1U];
+	if ((row == 1U) && (column == 11U))
+		return 0x5bU; // K1 left bracket.
+	if ((row == 1U) && (column == 12U))
+		return 0x5dU; // K1 right bracket.
 	if ((row == 1U) && (column == 14U))
 		return 0x01U; // K1 Cursor Up.
 	if ((row == 1U) && (column == 15U))

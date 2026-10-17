@@ -157,6 +157,7 @@ protected:
 	void dack3_w(int state);
 	uint8_t dma_read_word(offs_t offset);
 	void dma_write_word(offs_t offset, uint8_t data);
+	offs_t dma_byte_address(offs_t offset) const;
 	// TODO: sort out what devices use which channels
 	uint8_t dma_0_dack_r() { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
 	uint8_t dma_1_dack_r() { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
@@ -250,9 +251,10 @@ private:
 	uint8_t m_hdc_control;
 	uint8_t m_disk_page;
 	uint8_t m_hdc_command = 0;
+	bool m_hdc_count_adjusted = false;
 	uint16_t m_hd_buffer_offset = 0;
 	bool m_hdc_bdrq = false;
-	bool m_hdc_dma_eop = false;
+	bool m_hdc_dma_sector_ready = false;
 	bool m_hdc_bcs = false;
 	bool m_hdc_wg = false;
 	uint16_t m_last_hdc_status = 0x100;
@@ -401,7 +403,10 @@ void ngen_state::peripheral_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x0e:
 	case 0x0f:
 		if(ACCESSING_BITS_0_7)
+		{
+			LOGMASKED(LOG_DISK, "DMA controller register %02x write %02x\n", offset, data & 0xff);
 			m_dmac->write(offset,data & 0xff);
+		}
 		break;
 	case 0x80: // DMA page offset?
 	case 0x81:
@@ -489,7 +494,7 @@ uint16_t ngen_state::peripheral_r(offs_t offset, uint16_t mem_mask)
 	case 0x0f:
 		if(ACCESSING_BITS_0_7)
 			ret = m_dmac->read(offset);
-		logerror("DMA read offset %04x mask %04x returning %04x\n",offset,mem_mask,ret);
+		LOGMASKED(LOG_DISK, "DMA read offset %04x mask %04x returning %04x\n", offset, mem_mask, ret);
 		break;
 	case 0x80: // DMA page offset?
 	case 0x81:
@@ -707,8 +712,26 @@ void ngen_state::hfd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		case 0x17:
 			if(ACCESSING_BITS_0_7)
 			{
+				if (offset == 0x12)
+					m_hdc_count_adjusted = false;
 				if (offset == 0x17)
+				{
 					m_hdc_command = data & 0xff;
+					m_hdc_count_adjusted = false;
+					// wd2010_device::complete_immediate() stops a multi-sector
+					// command when its decremented count reaches one, omitting
+					// the last sector requested by BTOS.  Compensate on this
+					// machine without changing the shared WD2010 device.
+					if ((m_hdc_command & 0xf4) == 0x24 || (m_hdc_command & 0xf4) == 0x34)
+					{
+						uint8_t const count = m_hdc->read(2);
+						if (count > 1 && count < 0xff)
+						{
+							m_hdc->write(2, count + 1);
+							m_hdc_count_adjusted = true;
+						}
+					}
+				}
 				m_hdc->write(offset-0x10,data & 0xff);
 				if (offset == 0x17)
 				{
@@ -766,6 +789,8 @@ uint16_t ngen_state::hfd_r(offs_t offset, uint16_t mem_mask)
 			if(ACCESSING_BITS_0_7)
 			{
 				ret = m_hdc->read(offset-0x10);
+				if (offset == 0x12 && m_hdc_count_adjusted)
+					--ret;
 				if (offset == 0x17)
 				{
 					++m_hdc_status_reads;
@@ -876,18 +901,25 @@ void ngen_state::hdc_bdrq_w(int state)
 	LOGMASKED(LOG_DISK, "WD1010 BDRQ %d\n", state);
 	m_hdc_bdrq = state;
 	if (state)
-		m_hdc_dma_eop = false;
+		m_hdc_dma_sector_ready = false;
 	if (!(m_hdc_control & 0x04))
 		m_dmac->dreq3_w(state && BIT(m_disk_page, 7));
 }
 
 void ngen_state::hdc_dma_finish()
 {
-	// The DMA controller signals EOP just before its final I/O callback.
-	if (m_hdc_dma_eop && m_hd_buffer_offset >= 512)
+	// The WD1010 exchanges one 512-byte sector at a time, even when BTOS
+	// chains several sectors into one DMA operation.  Release each sector's
+	// buffer as soon as its bytes have crossed the DMA interface so the
+	// controller can complete it and request the next one before DMA EOP.
+	if (!m_hdc_dma_sector_ready && (m_hd_buffer_offset >= 512))
 	{
-		m_hdc_dma_eop = false;
-		LOGMASKED(LOG_DISK, "HDC DMA complete: %u buffer bytes\n", m_hd_buffer_offset);
+		m_hdc_dma_sector_ready = true;
+		// WD2010 drops BDRQ when it notices buffer_ready(), but that happens
+		// on a later timer tick.  Stop DMA now so the pending request cannot
+		// consume the first word of the following sector in the meantime.
+		m_dmac->dreq3_w(0);
+		LOGMASKED(LOG_DISK, "HDC DMA sector ready: %u buffer bytes\n", m_hd_buffer_offset);
 		m_hdc->buffer_ready(true);
 	}
 }
@@ -945,6 +977,7 @@ void ngen_state::hdc_bcr_w(int state)
 	if (state)
 	{
 		m_hd_buffer_offset = 0;
+		m_hdc_dma_sector_ready = false;
 		m_hdc->buffer_ready(false);
 	}
 }
@@ -967,8 +1000,12 @@ void ngen_state::hdc_wg_w(int state)
 	m_hdc_wg = state;
 }
 
-// page of system RAM to access
-// bit 7 gates hard disk DMA requests (BTOS sets it after issuing a command)
+// The HFD module's X-Bus Extended Address register (port XX0Eh) drives
+// XADR11-XADR17 with bits 0-6.  Bit 7 disables the X-Bus master I/O read/write
+// signals to the WD1010 so it can access the RAM data buffer directly.  BTOS
+// sets bit 7 while requesting a hard disk DMA transfer.  The low bits extend
+// the channel 3 DMA word address; the host DMA page registers used by the
+// other channels are handled separately by dma_bank_w().
 void ngen_state::disk_addr_ext(uint8_t data)
 {
 	LOGMASKED(LOG_DISK, "HDC address extension write %02x\n", data);
@@ -1004,7 +1041,6 @@ void ngen_state::dma_eop_changed(int state)
 			else if (m_hdc_bdrq)
 			{
 				m_dmac->dreq3_w(0);
-				m_hdc_dma_eop = true;
 				hdc_dma_finish();
 			}
 		}
@@ -1057,6 +1093,18 @@ void ngen_state::dma_3_dack_w(uint8_t data)
 	}
 }
 
+offs_t ngen_state::dma_byte_address(offs_t offset) const
+{
+	// Channel 3 belongs to the HFD module.  Its extended address register
+	// supplies address bits above the 16-bit word address from the DMA chip.
+	// For example, BTOS writes 07h here and A535h to channel 3 to address
+	// physical byte F4A6Ah while constructing the volume header.
+	offs_t const page_offset = (m_dma_channel == 3)
+		? (offs_t(m_disk_page & 0x7f) << 17)
+		: ((offs_t(m_dma_offset[m_dma_channel]) << 16) & 0xfe0000);
+	return page_offset | (offset << 1);
+}
+
 uint8_t ngen_state::dma_read_word(offs_t offset)
 {
 	cpu_device* cpu;
@@ -1070,11 +1118,11 @@ uint8_t ngen_state::dma_read_word(offs_t offset)
 
 	if(m_dma_channel == -1)
 		return 0xff;
-	offs_t page_offset = ((offs_t) m_dma_offset[m_dma_channel]) << 16;
+	offs_t const address = dma_byte_address(offset);
 
-	result = prog_space.read_word((page_offset & 0xfe0000) | (offset << 1));
+	result = prog_space.read_word(address);
 	m_dma_high_byte = result & 0xFF00;
-	popmessage("DMA byte address %06x read %04x\n", (page_offset & 0xfe0000) | (offset << 1),result);
+	LOGMASKED(LOG_DISK, "DMA byte address %06x read %04x\n", address, result);
 	return result & 0xff;
 }
 
@@ -1091,12 +1139,12 @@ void ngen_state::dma_write_word(offs_t offset, uint8_t data)
 
 	if(m_dma_channel == -1)
 		return;
-	offs_t page_offset = ((offs_t) m_dma_offset[m_dma_channel]) << 16;
+	offs_t const address = dma_byte_address(offset);
 
-	prog_space.write_word((page_offset & 0xfe0000) | (offset << 1), m_dma_high_byte | data);
+	prog_space.write_word(address, m_dma_high_byte | data);
 	if ((m_dma_channel == 3) && ((m_hdc_command & 0xf0) == 0x20))
 		hdc_dma_finish();
-	popmessage("DMA byte address %06x write %04x\n", (page_offset & 0xfe0000) | (offset << 1), m_dma_high_byte | data);
+	LOGMASKED(LOG_DISK, "DMA byte address %06x write %04x\n", address, m_dma_high_byte | data);
 }
 
 
@@ -1130,7 +1178,10 @@ uint8_t ngen_state::irq_cb()
 void ngen_state::dma_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
+	{
 		m_dma_offset[offset] = data & 0xff;
+		LOGMASKED(LOG_DISK, "DMA host page register channel %u = %02x\n", offset, m_dma_offset[offset]);
+	}
 }
 
 uint16_t ngen_state::dma_bank_r(offs_t offset, uint16_t mem_mask)
@@ -1212,6 +1263,8 @@ uint16_t ngen_state::periph141_r(offs_t offset, uint16_t mem_mask)
 
 void ngen_state::machine_start()
 {
+	save_item(NAME(m_hdc_count_adjusted));
+	save_item(NAME(m_hdc_dma_sector_ready));
 	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_fdc_timer0));
 	save_item(NAME(m_fdc_timer1));
@@ -1254,9 +1307,10 @@ void ngen_state::machine_reset()
 	m_hdc_control = 0;
 	m_disk_page = 0;
 	m_hdc_command = 0;
+	m_hdc_count_adjusted = false;
 	m_hd_buffer_offset = 0;
 	m_hdc_bdrq = false;
-	m_hdc_dma_eop = false;
+	m_hdc_dma_sector_ready = false;
 	m_hdc_bcs = false;
 	m_hdc_wg = false;
 	m_viduart->write_dsr(0);
