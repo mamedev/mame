@@ -1593,7 +1593,7 @@ void pc9821_note_lavie_state::pc9821nw150(machine_config &config)
 
 TODO: should access SDIP from $00f6, most likely a partial A Mate dump instead
 
-Retire not done because we depend on this.
+Retire not yet done because we depend on this as a base for this driver.
 
 */
 

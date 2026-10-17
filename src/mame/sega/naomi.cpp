@@ -22,8 +22,8 @@ QA Notes (Update January 2022):
     - Manufacturers needs to be overhauled, also
       cfr. MT08143 about a necessity to at least log Sega divisions somehow.
     - usability defaults, i.e. 31kHz dip switch and non-canonical service mode settings in NVRAM.
-    - All Cycraft games requires the extra SMCP board tied to JVS. Inputs are untested and assumed
-      to be derived from initd.
+    - All Cycraft games requires the extra SMCP board tied to Ethernet (NetDIMM).
+      Inputs are untested and assumed to be derived from initd.
 
 ===================================================================================================
 
