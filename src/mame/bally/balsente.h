@@ -12,10 +12,15 @@
 
 #pragma once
 
+#include "efo_zsu.h"
+
+#include "machine/6821pia.h"
 #include "machine/6850acia.h"
-#include "machine/timer.h"
-#include "machine/x2212.h"
 #include "machine/74259.h"
+#include "machine/timer.h"
+#include "machine/watchdog.h"
+#include "machine/x2212.h"
+#include "video/mc6845.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -42,23 +47,22 @@ class balsente_state : public driver_device
 public:
 	balsente_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_scanline_timer(*this, "scan_timer")
-		, m_spriteram(*this, "spriteram")
-		, m_videoram(*this, "videoram")
-		, m_shrike_io(*this, "shrike_io")
-		, m_shrike_shared(*this, "shrike_shared")
 		, m_maincpu(*this, "maincpu")
-		, m_audiocpu(*this, "audiocpu")
-		, m_68k(*this, "68k")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_outlatch(*this, "outlatch")
-		, m_novram(*this, "nov%u", 0U)
-		, m_acia(*this, "acia")
+		, m_spriteram(*this, "spriteram")
+		, m_videoram(*this, "videoram")
 		, m_mainrom(*this, "maincpu")
 		, m_bankab(*this, "bankab")
 		, m_bankcd(*this, "bankcd")
 		, m_bankef(*this, "bankef")
+		, m_scanline_timer(*this, "scan_timer")
+		, m_shrike_io(*this, "shrike_io")
+		, m_shrike_shared(*this, "shrike_shared")
+		, m_68k(*this, "68k")
+		, m_outlatch(*this, "outlatch")
+		, m_novram(*this, "nov%u", 0U)
+		, m_acia(*this, "acia")
 	{ }
 
 	void shrike(machine_config &config);
@@ -68,7 +72,6 @@ public:
 	void grudge(machine_config &config);
 	void st1002(machine_config &config);
 	void spiker(machine_config &config);
-	void triviamb(machine_config &config);
 	ioport_value nstocker_bits_r();
 	void init_otwalls();
 	void init_triviaes();
@@ -100,9 +103,29 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-private:
+	void balsente_common(machine_config &config) ATTR_COLD;
+
 	void random_reset_w(uint8_t data);
 	uint8_t random_num_r();
+	void videoram_w(offs_t offset, uint8_t data);
+	void palette_select_w(uint8_t data);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+
+	required_memory_region m_mainrom;
+
+	required_memory_bank m_bankab;
+	required_memory_bank m_bankcd;
+	required_memory_bank m_bankef;
+
+	uint8_t m_expanded_videoram[256*256]{};
+	uint8_t m_palettebank_vis = 0;
+
+private:
 	void rombank_select_w(uint8_t data);
 	void rombank2_select_w(uint8_t data);
 	void out0_w(int state);
@@ -127,8 +150,6 @@ private:
 	uint8_t teamht_extra_r();
 	void teamht_multiplex_select_w(offs_t offset, uint8_t data);
 
-	void videoram_w(offs_t offset, uint8_t data);
-	void palette_select_w(uint8_t data);
 	void shrike_sprite_select_w(uint8_t data);
 
 	uint32_t screen_update_balsente(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -150,9 +171,6 @@ private:
 	void cpu1_spiker_map(address_map &map) ATTR_COLD;
 	void cpu1_shrike_map(address_map &map) ATTR_COLD;
 	void cpu1_smudge_map(address_map &map) ATTR_COLD;
-	void cpu1_triviamb_map(address_map &map) ATTR_COLD;
-	void cpu2_triviamb_io_map(address_map &map) ATTR_COLD;
-	void cpu2_triviamb_map(address_map &map) ATTR_COLD;
 	void shrike68k_map(address_map &map) ATTR_COLD;
 
 	required_device<timer_device> m_scanline_timer;
@@ -182,31 +200,59 @@ private:
 	uint8_t m_teamht_input = 0;
 
 	/* video data */
-	uint8_t m_expanded_videoram[256*256]{};
 	uint8_t *m_sprite_data = nullptr;
 	uint32_t m_sprite_mask = 0;
 	uint8_t *m_sprite_bank[2]{};
 
-	uint8_t m_palettebank_vis = 0;
-
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_videoram;
 	optional_shared_ptr<uint16_t> m_shrike_io;
 	optional_shared_ptr<uint16_t> m_shrike_shared;
-	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_68k;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
 	optional_device<ls259_device> m_outlatch;
 	optional_device_array<x2212_device, 2> m_novram;
 	optional_device<acia6850_device> m_acia;
+};
 
-	required_memory_region m_mainrom;
 
-	required_memory_bank m_bankab;
-	required_memory_bank m_bankcd;
-	required_memory_bank m_bankef;
+// Maibesa MAB-016 hardware
+class triviamb_state : public balsente_state
+{
+public:
+	triviamb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: balsente_state(mconfig, type, tag)
+		, m_watchdog(*this, "watchdog")
+		, m_pia(*this, "pia")
+		, m_crtc(*this, "crtc")
+		, m_zsu(*this, "zsu")
+		, m_sprite_gfx(*this, "gfx1")
+		, m_lamps(*this, "lamp%u", 0U)
+	{ }
+
+	void triviamb(machine_config &config) ATTR_COLD;
+
+	void init_triviaes4() ATTR_COLD;
+	void init_triviaes5() ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	void rombank_w(uint8_t data);
+	void sound_strobe_w(uint8_t data);
+	void video_control_w(uint8_t data);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *sprite);
+
+	void main_map(address_map &map) ATTR_COLD;
+
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<pia6821_device> m_pia;
+	required_device<mc6845_device> m_crtc;
+	required_device<efo_zsu_device> m_zsu;
+	required_region_ptr<uint8_t> m_sprite_gfx;
+	output_finder<6> m_lamps;
+
+	bool m_flip_screen = false;
 };
 
 #endif // MAME_BALLY_BALSENTE_H
