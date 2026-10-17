@@ -47,6 +47,7 @@ It probably needs at least a LED driving PCB, too.
 #include "machine/clock.h"
 #include "machine/eepromser.h"
 #include "machine/i8255.h"
+#include "machine/ticket.h"
 #include "sound/okim9810.h"
 
 #include "screen.h"
@@ -71,6 +72,7 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_oki(*this, "oki"),
 		m_screen(*this, "screen"),
+		m_ticket(*this, "ticket"),
 		m_dotbank(*this, "dotbank"),
 		m_dotram(*this, "dotram", 0x8000, ENDIANNESS_LITTLE),
 		m_dot_portb2(0)
@@ -78,6 +80,8 @@ public:
 
 	void qncrash(machine_config &config) ATTR_COLD;
 	void cgunman(machine_config &config) ATTR_COLD;
+
+	int ticket_sensor_r();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -90,6 +94,7 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<okim9810_device> m_oki;
 	optional_device<screen_device> m_screen;
+	optional_device<ticket_dispenser_device> m_ticket;
 	required_memory_bank m_dotbank;
 	memory_share_creator<u8> m_dotram;
 
@@ -110,6 +115,7 @@ private:
 	u8 oki_r();
 	void oki_w(u8 data);
 
+	void main_porta0_w(u8 data);
 	void main_portb0_w(u8 data);
 	void main_portb2_w(u8 data);
 };
@@ -212,13 +218,30 @@ void qncrash_state::oki_w(u8 data)
 
 
 //-------------------------------------------------
-//  main CPU port B outputs
+//  main CPU port outputs
 //-------------------------------------------------
+
+void qncrash_state::main_porta0_w(u8 data)
+{
+	// A0.6 = coin counter drive
+	LOGMASKED(LOG_PORTS, "%s: port A0 out %02X\n", machine().describe_context(), data);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 6));
+}
 
 void qncrash_state::main_portb0_w(u8 data)
 {
-	// B0.0-B0.3 = lamps, B0.4/B0.5 = ticket dispenser, B0.6/B0.7 = flat target U motor
+	// B0.0-B0.3 = lamps, B0.4 = ticket dispenser auxiliary output,
+	// B0.5 = ticket dispenser motor, B0.6/B0.7 = flat target U motor
 	LOGMASKED(LOG_PORTS, "%s: port B0 out %02X\n", machine().describe_context(), data);
+	if (m_ticket.found())
+		m_ticket->motor_w(BIT(data, 5));
+}
+
+
+int qncrash_state::ticket_sensor_r()
+{
+	// ticket sensor is only present on Quick & Crash
+	return m_ticket.found() ? m_ticket->line_r() : 0;
 }
 
 void qncrash_state::main_portb2_w(u8 data)
@@ -229,7 +252,7 @@ void qncrash_state::main_portb2_w(u8 data)
 
 
 //-------------------------------------------------
-//  dot matrix display (SED1351 debug rendering)
+//  dot matrix display (SED1351)
 //-------------------------------------------------
 
 u32 qncrash_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -266,7 +289,7 @@ static INPUT_PORTS_START( qncrash ) // no DIPs on PCB
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service switch (service credit / change setting)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) // select switch (advance menu item / operate test)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Test Switch") PORT_TOGGLE // slide switch, held = test mode
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Ticket Sensor") PORT_CODE(KEYCODE_DEL_PAD) // ticket dispenser sensor
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(qncrash_state::ticket_sensor_r)) // ticket dispenser sensor
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // coin door switch?
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED ) // configured as output (coin counter)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
@@ -309,7 +332,7 @@ void qncrash_state::qncrash(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &qncrash_state::main_program_map);
 	m_maincpu->set_addrmap(AS_IO, &qncrash_state::main_io_map);
 	m_maincpu->in_p0_callback().set_ioport("IN0");
-	m_maincpu->out_p0_callback().set([this] (u8 data) { LOGMASKED(LOG_PORTS, "%s: p0 out %02X\n", machine().describe_context(), data); });
+	m_maincpu->out_p0_callback().set(FUNC(qncrash_state::main_porta0_w));
 	m_maincpu->out_p1_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(0);
 	m_maincpu->out_p1_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(1);
 	m_maincpu->out_p1_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(2);
@@ -338,6 +361,8 @@ void qncrash_state::qncrash(machine_config &config)
 
 	EEPROM_93C66_16BIT(config, "eeprom");
 
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(50)); // guessed; each phase must exceed the ROM's 8-sample (16ms) sensor debounce and leave the sensor low when the motor stops
+
 	// video hardware
 	// TODO:
 	// - a 5 digit 7 segment display for time
@@ -362,7 +387,7 @@ void qncrash_state::cgunman(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &qncrash_state::main_program_map);
 	m_maincpu->set_addrmap(AS_IO, &qncrash_state::cgunman_main_io_map);
 	m_maincpu->in_p0_callback().set_ioport("IN0");
-	m_maincpu->out_p0_callback().set([this] (u8 data) { logerror("%s: p0 out %02X\n", machine().describe_context(), data); });
+	m_maincpu->out_p0_callback().set(FUNC(qncrash_state::main_porta0_w));
 	m_maincpu->out_p1_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(0);
 	m_maincpu->out_p1_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(1);
 	m_maincpu->out_p1_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(2);
