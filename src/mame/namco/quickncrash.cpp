@@ -44,15 +44,17 @@ It probably needs at least a LED driving PCB, too.
 
 #include "cpu/z80/kl5c80a12.h"
 #include "cpu/z80/tmpz84c015.h"
+#include "machine/clock.h"
 #include "machine/eepromser.h"
 #include "machine/i8255.h"
 #include "sound/okim9810.h"
 
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
-#define VERBOSE 0
+#define LOG_PORTS (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_PORTS)
 #include "logmacro.h"
 
 
@@ -110,13 +112,14 @@ private:
 
 	void main_portb0_w(u8 data);
 	void main_portb2_w(u8 data);
-	void main_usart_tx(u8 data);
-	void dot_sio_tx(u8 data);
 };
 
 
 void qncrash_state::machine_start()
 {
+	save_item(NAME(m_dot_portb2));
+	save_item(NAME(m_sed_regs));
+
 	// the dot CPU (and its ROM bank) only exist when it isn't disabled (cgunman)
 	if (!m_dotcpu->disabled())
 		m_dotbank->configure_entries(0, 8, memregion("dotcpu")->base(), 0x4000);
@@ -138,7 +141,7 @@ void qncrash_state::main_program_map(address_map &map)
 void qncrash_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).lw8(NAME([this] (u8 data) { LOGMASKED(VERBOSE, "%s: port40 out %02X\n", machine().describe_context(), data); }));
+	map(0x40, 0x40).lw8(NAME([this] (u8 data) { LOGMASKED(LOG_PORTS, "%s: port40 out %02X\n", machine().describe_context(), data); }));
 	map(0x50, 0x50).rw(FUNC(qncrash_state::oki_r), FUNC(qncrash_state::oki_w));
 	map(0x58, 0x5b).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	// 0x38-0x3b are the internal KP51 USART
@@ -147,7 +150,7 @@ void qncrash_state::main_io_map(address_map &map)
 void qncrash_state::cgunman_main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).lw8(NAME([this] (u8 data) { LOGMASKED(VERBOSE, "%s: port40 out %02X\n", machine().describe_context(), data); }));
+	map(0x40, 0x40).lw8(NAME([this] (u8 data) { LOGMASKED(LOG_PORTS, "%s: port40 out %02X\n", machine().describe_context(), data); }));
 	map(0x50, 0x50).rw(FUNC(qncrash_state::oki_r), FUNC(qncrash_state::oki_w));
 }
 
@@ -162,7 +165,7 @@ void qncrash_state::dot_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x40, 0x40).w(FUNC(qncrash_state::dot_bank_w));
-	map(0x60, 0x60).lw8(NAME([this] (u8 data) { LOGMASKED(VERBOSE, "%s: port60 out %02X\n", machine().describe_context(), data); }));
+	map(0x60, 0x60).lw8(NAME([this] (u8 data) { LOGMASKED(LOG_PORTS, "%s: port60 out %02X\n", machine().describe_context(), data); }));
 	map(0xc0, 0xcf).rw(FUNC(qncrash_state::sed_reg_r), FUNC(qncrash_state::sed_reg_w));
 }
 
@@ -200,7 +203,7 @@ u8 qncrash_state::oki_r()
 void qncrash_state::oki_w(u8 data)
 {
 	// port B2 bit 0 selects between the command register and the TMP register
-	LOGMASKED(VERBOSE, "%s: oki %s %02X\n", machine().describe_context(), BIT(m_dot_portb2, 0) ? "tmp" : "cmd", data);
+	LOGMASKED(LOG_PORTS, "%s: oki %s %02X\n", machine().describe_context(), BIT(m_dot_portb2, 0) ? "tmp" : "cmd", data);
 	if (BIT(m_dot_portb2, 0))
 		m_oki->write_tmp_register(data);
 	else
@@ -215,30 +218,13 @@ void qncrash_state::oki_w(u8 data)
 void qncrash_state::main_portb0_w(u8 data)
 {
 	// B0.0-B0.3 = lamps, B0.4/B0.5 = ticket dispenser, B0.6/B0.7 = flat target U motor
-	if (VERBOSE) logerror("%s: port B0 out %02X\n", machine().describe_context(), data);
+	LOGMASKED(LOG_PORTS, "%s: port B0 out %02X\n", machine().describe_context(), data);
 }
 
 void qncrash_state::main_portb2_w(u8 data)
 {
 	// B2.0 = M9810 register select, B2.1 = M9810 read strobe
 	m_dot_portb2 = data;
-}
-
-
-//-------------------------------------------------
-//  serial link
-//-------------------------------------------------
-
-void qncrash_state::main_usart_tx(u8 data)
-{
-	if (VERBOSE) logerror("%s: main usart tx %02X\n", machine().describe_context(), data);
-	m_dotcpu->sio_receive_byte_b(data);
-}
-
-void qncrash_state::dot_sio_tx(u8 data)
-{
-	if (VERBOSE) logerror("%s: dot sio tx %02X\n", machine().describe_context(), data);
-	m_maincpu->usart_rx(data);
 }
 
 
@@ -271,30 +257,6 @@ u32 qncrash_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 		}
 	}
 
-/*
-	if (VERBOSE)
-	{
-		static int frames = 0;
-		if ((++frames % 120) == 0)
-		{
-			logerror("display start %04X:\n", start);
-			for (int y = 0; y < 16; y++)
-			{
-				char line[97];
-				u32 const row = start + y * 25;
-				for (int x = 0; x < 96; x++)
-				{
-					u32 const cpu_addr = row + (x >> 2) + 0x6000;
-					u8 byte = ((cpu_addr >= 0x8000) && (cpu_addr <= 0xffff)) ? m_dotram[cpu_addr - 0x8000] : 0;
-					u8 const pix = (byte >> (6 - 2 * (x & 3))) & 3;
-					line[x] = pix ? '#' : '.';
-				}
-				line[96] = 0;
-				logerror("  %s\n", line);
-			}
-		}
-	}
-*/
 	return 0;
 }
 
@@ -343,25 +305,27 @@ INPUT_PORTS_END
 
 void qncrash_state::qncrash(machine_config &config)
 {
-	// basic machine hardware
 	KL5C80A12(config, m_maincpu, 20_MHz_XTAL);
-	m_maincpu->set_txc_clock(500'000); // USART baud = TXC/16 = 31250; TXC source not identified, slow enough for the dot CPU's 3-byte SIO FIFO
 	m_maincpu->set_addrmap(AS_PROGRAM, &qncrash_state::main_program_map);
 	m_maincpu->set_addrmap(AS_IO, &qncrash_state::main_io_map);
 	m_maincpu->in_p0_callback().set_ioport("IN0");
-	m_maincpu->out_p0_callback().set([this] (u8 data) { LOGMASKED(VERBOSE, "%s: p0 out %02X\n", machine().describe_context(), data); });
+	m_maincpu->out_p0_callback().set([this] (u8 data) { LOGMASKED(LOG_PORTS, "%s: p0 out %02X\n", machine().describe_context(), data); });
 	m_maincpu->out_p1_callback().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(0);
 	m_maincpu->out_p1_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::clk_write)).bit(1);
 	m_maincpu->out_p1_callback().append("eeprom", FUNC(eeprom_serial_93cxx_device::di_write)).bit(2);
 	m_maincpu->out_p2_callback().set(FUNC(qncrash_state::main_portb0_w));
-	m_maincpu->out_p3_callback().set([this] (u8 data) { LOGMASKED(VERBOSE, "%s: p3 out %02X\n", machine().describe_context(), data); });
+	m_maincpu->out_p3_callback().set([this] (u8 data) { LOGMASKED(LOG_PORTS, "%s: p3 out %02X\n", machine().describe_context(), data); });
 	m_maincpu->out_p4_callback().set(FUNC(qncrash_state::main_portb2_w));
-	m_maincpu->usart_tx_callback().set(FUNC(qncrash_state::main_usart_tx));
 
 	tmpz84c015_device &dotcpu(TMPZ84C015(config, "dotcpu", 24'000'000 / 2)); // unknown D24OP8I XTAL, but TMPZ84C015BF-12 is rated for max 12 MHz, so guessed
 	dotcpu.set_addrmap(AS_PROGRAM, &qncrash_state::dot_program_map);
 	dotcpu.set_addrmap(AS_IO, &qncrash_state::dot_io_map);
-	dotcpu.sio_txdb_byte_callback().set(FUNC(qncrash_state::dot_sio_tx));
+	m_maincpu->txd_callback().set(dotcpu, FUNC(tmpz84c015_device::rxb_w));
+	dotcpu.out_txdb_callback().set(m_maincpu, FUNC(kl5c80a12_device::rxd_w));
+
+	clock_device &sioclk(CLOCK(config, "sioclk", 500'000)); // placeholder until real clock source is found
+	sioclk.signal_handler().set(dotcpu, FUNC(tmpz84c015_device::txcb_w));
+	sioclk.signal_handler().append(dotcpu, FUNC(tmpz84c015_device::rxcb_w));
 
 	i8255_device &ppi(I8255(config, "ppi")); // NEC D71055C
 	ppi.in_pa_callback().set_ioport("IN1");
@@ -391,7 +355,6 @@ void qncrash_state::cgunman(machine_config &config)
 {
 	// basic machine hardware
 	KL5C80A12(config, m_maincpu, 20_MHz_XTAL);
-	m_maincpu->set_txc_clock(500'000); // USART baud = TXC/16 = 31250; TXC source not identified, slow enough for the dot CPU's 3-byte SIO FIFO
 	m_maincpu->set_addrmap(AS_PROGRAM, &qncrash_state::main_program_map);
 	m_maincpu->set_addrmap(AS_IO, &qncrash_state::cgunman_main_io_map);
 	m_maincpu->in_p0_callback().set_ioport("IN0");
@@ -402,7 +365,6 @@ void qncrash_state::cgunman(machine_config &config)
 	m_maincpu->out_p2_callback().set([this] (u8 data) { logerror("%s: p2 out %02X\n", machine().describe_context(), data); });
 	m_maincpu->out_p3_callback().set([this] (u8 data) { logerror("%s: p3 out %02X\n", machine().describe_context(), data); });
 	m_maincpu->out_p4_callback().set([this] (u8 data) { logerror("%s: p4 out %02X\n", machine().describe_context(), data); });
-	m_maincpu->usart_tx_callback().set([this] (u8 data) { logerror("%s: usart out %02X\n", machine().describe_context(), data); });
 
 	TMPZ84C015(config, "dotcpu", 24'000'000 / 2).set_disable();
 
