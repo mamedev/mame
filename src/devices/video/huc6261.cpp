@@ -12,8 +12,8 @@
     VSync changes 30 master cycles after HSync would go low.
 
     TODO:
-    - Allow fetch and mix pixels from other PC-FX video hardwares
-    - Implement 'Cellophane' effect
+    - Implement 'Cellophane' effect (layer blending, used by the BIOS menu message box)
+    - Interlace and 7MHz dot clock alignment with the KING/RAINBOW layers
 
 **********************************************************************/
 
@@ -76,10 +76,10 @@ huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-inline u32 huc6261_device::yuv2rgb(u32 yuv) const
+inline u32 huc6261_device::yuv888_to_rgb(u32 yuv) const
 {
-	const u8 y = yuv >> 8;
-	const u16 uv = ((yuv & 0xf0) << 8) | ((yuv & 0xf) << 4);
+	const u8 y = yuv >> 16;
+	const u16 uv = yuv & 0xffff;
 
 	const s32 r = std::clamp<s32>(y + m_uv_lookup[uv][0], 0, 255);
 	const s32 g = std::clamp<s32>(y + m_uv_lookup[uv][1], 0, 255);
@@ -88,18 +88,98 @@ inline u32 huc6261_device::yuv2rgb(u32 yuv) const
 	return (r << 16) | (g << 8) | b;
 }
 
-inline void huc6261_device::apply_pal_offs(u16 &pix_data) const
+// palette entries are Y8 U4 V4
+inline u32 huc6261_device::palette_yuv888(u16 index) const
 {
-	// sprite
-	if (pix_data & huc6270_device::HUC6270_SPRITE)
-	{
-		pix_data &= 0xff;
-		pix_data += ((m_palette_offset[0] & 0xff00) >> 8) << 1;
-	}
-	else // background
-		pix_data += (m_palette_offset[0] & 0xff) << 1;
+	const u16 entry = m_palette[index & 0x1ff];
+	return ((entry & 0xff00) << 8) | ((entry & 0xf0) << 8) | ((entry & 0x0f) << 4);
+}
 
-	pix_data &= 0x1ff;
+/*
+ * Layer priority, rebuilt at the start of each line.
+ * Each layer has a 3-bit priority (0 = backmost) and an enable bit in the control register,
+ * equal priorities are ordered KING BG0-3, VDC BG, VDC SPR, RAINBOW from back to front.
+ * The resulting rank is 0 for a hidden layer, otherwise 1 (backmost) to 7.
+ */
+void huc6261_device::update_layer_ranks()
+{
+	u8 value[LAYER_COUNT];
+	for (int n = 0; n < 4; n++)
+		value[LAYER_KING_BG0 + n] = BIT(m_control, 10 + n) ? m_priority[n] + 1 : 0;
+	value[LAYER_VDC_BG] = BIT(m_control, 8) ? m_priority[4] + 1 : 0;
+	value[LAYER_VDC_SPR] = BIT(m_control, 9) ? m_priority[5] + 1 : 0;
+	value[LAYER_RAINBOW] = BIT(m_control, 14) ? m_priority[6] + 1 : 0;
+
+	std::fill(std::begin(m_layer_rank), std::end(m_layer_rank), 0);
+	u8 rank = 1;
+	for (int prio = 1; prio <= 8; prio++)
+		for (int layer = 0; layer < LAYER_COUNT; layer++)
+			if (value[layer] == prio)
+				m_layer_rank[layer] = rank++;
+}
+
+/*
+ * Combines the HuC6270 pair and the KING BG line into the output colour for one dot.
+ * vdc0/vdc1 are raw HuC6270 pixels (bit 8 = sprite), king is a KING BG line entry
+ * (bits 31-28 layer 1-4, bit 27 direct colour, low bits palette index or YUV888),
+ * rainbow is a RAINBOW line entry (0 = transparent, bit 27 YUV888, else palette index).
+ */
+u32 huc6261_device::mix_pixel(u16 vdc0, u16 vdc1, u32 king, u32 rainbow) const
+{
+	// HuC6270 pair: the second chip covers the first, unless the 256 colour combination modes are on
+	u16 vdc;
+	if (BIT(m_control, 7) && (vdc1 & 0x18f) > 0x180)
+		vdc = (vdc1 & 0xf) | ((vdc0 & 0xf) << 4) | 0x100;
+	else if (BIT(m_control, 6) && ((vdc1 ^ 0x100) & 0x18f) > 0x180)
+		vdc = (vdc1 & 0xf) | ((vdc0 & 0xf) << 4);
+	else
+		vdc = (vdc1 & 0xf) ? vdc1 : vdc0;
+
+	struct { u8 rank; u32 yuv; } layer[3]{ };
+
+	if (vdc & 0xf)
+	{
+		const bool sprite = BIT(vdc, 8);
+		const u16 offset = ((m_palette_offset[0] >> (sprite ? 8 : 0)) & 0xff) << 1;
+		layer[0].rank = m_layer_rank[sprite ? LAYER_VDC_SPR : LAYER_VDC_BG];
+		layer[0].yuv = palette_yuv888((vdc & 0xff) + offset);
+	}
+
+	if (king >> 28)
+	{
+		const int n = (king >> 28) - 1;
+		layer[1].rank = m_layer_rank[LAYER_KING_BG0 + n];
+		if (BIT(king, 27))
+			layer[1].yuv = king & 0xffffff;
+		else
+		{
+			const u16 offset = ((m_palette_offset[1 + (n >> 1)] >> (BIT(n, 0) ? 8 : 0)) & 0xff) << 1;
+			layer[1].yuv = palette_yuv888((king & 0xff) + offset);
+		}
+	}
+
+	if (rainbow)
+	{
+		layer[2].rank = m_layer_rank[LAYER_RAINBOW];
+		if (BIT(rainbow, 27))
+			layer[2].yuv = rainbow & 0xffffff;
+		else
+			layer[2].yuv = palette_yuv888((rainbow & 0xff) + ((m_palette_offset[3] & 0xff) << 1));
+	}
+
+	// hindmost colour is palette entry 0, black if no layer is enabled; the frontmost visible layer wins
+	u32 out = (m_control & 0x7f00) ? palette_yuv888(0) : 0x008080;
+	u8 front = 0;
+	for (auto &l : layer)
+	{
+		if (l.rank > front)
+		{
+			out = l.yuv;
+			front = l.rank;
+		}
+	}
+
+	return yuv888_to_rgb(out);
 }
 
 TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
@@ -110,22 +190,30 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 	int v = m_last_v;
 	u32 *bitmap_line = &m_bmp.pix(v);
 
+	// KING dots are 4 master clocks wide in both dot clock modes
+	const int king_start = BIT(m_control, 3) ? KING_START_7MHZ : KING_START_5MHZ;
+
 	while (h != hpos || v != vpos)
 	{
-		if (m_pixel_clock == 0)
+		const int king_x = h - king_start;
+		const bool king_dot = king_x >= 0 && king_x < 256 * 4 && (king_x & 3) == 0;
+
+		if (m_pixel_clock == 0 || king_dot || h == king_start + 256 * 4)
 		{
 			auto profile = g_profiler.start(PROFILER_VIDEO);
-			/* Get next pixel information */
-			m_pixel_data[0] = m_huc6270[0]->next_pixel();
-			m_pixel_data[1] = m_huc6270[1]->next_pixel();
-			apply_pal_offs(m_pixel_data[0]);
-			apply_pal_offs(m_pixel_data[1]);
+			if (m_pixel_clock == 0)
+			{
+				/* Get next pixel information */
+				m_pixel_data[0] = m_huc6270[0]->next_pixel();
+				m_pixel_data[1] = m_huc6270[1]->next_pixel();
+			}
+			const bool in_window = king_x >= 0 && king_x < 256 * 4;
+			const u32 king = in_window ? m_king_line[king_x >> 2] : 0;
+			const u32 rainbow = in_window ? m_rainbow_line[king_x >> 2] : 0;
+			m_pixel_rgb = mix_pixel(m_pixel_data[0], m_pixel_data[1], king, rainbow);
 		}
 
-		bitmap_line[h] = yuv2rgb(m_palette[m_pixel_data[0]]);
-		// TODO: is mixing correct?
-		if ((m_pixel_data[1] & 0xff) != 0)
-			bitmap_line[h] = yuv2rgb(m_palette[m_pixel_data[1]]);
+		bitmap_line[h] = m_pixel_rgb;
 
 		m_pixel_clock = (m_pixel_clock + 1) % m_pixels_per_clock;
 		h = (h + 1) % WPF;
@@ -160,6 +248,7 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 			m_pixel_clock = 0;
 			v = (v + 1) % m_height;
 			bitmap_line = &m_bmp.pix(v);
+			start_line(v);
 			break;
 
 		case HUC6261_HSYNC_START + 30:      /* End/Start of VSync */
@@ -228,6 +317,47 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 	m_timer->adjust(screen().time_until_pos(v, h));
 }
 
+
+// latch per-line state and render the KING layers for display line v
+void huc6261_device::start_line(int v)
+{
+	update_layer_ranks();
+
+	// RAINBOW decodes on every line, including blanking
+	const int format = m_huc6272->rainbow_line(v, m_rainbow_line);
+
+	if (v >= 22 && v < 262)
+	{
+		m_huc6272->render_bg_line(v - 22, m_king_line);
+
+		if (format == huc6271_device::FORMAT_YUV)
+		{
+			// chroma key, Y/U/V each in [min, max] (low/high byte) becomes transparent, not in 7MHz mode
+			const u8 ymin = m_chroma_key[0] & 0xff, ymax = m_chroma_key[0] >> 8;
+			const u8 umin = m_chroma_key[1] & 0xff, umax = m_chroma_key[1] >> 8;
+			const u8 vmin = m_chroma_key[2] & 0xff, vmax = m_chroma_key[2] >> 8;
+			const bool all_zero = !(m_chroma_key[0] | m_chroma_key[1] | m_chroma_key[2]);
+			for (auto &pix : m_rainbow_line)
+			{
+				const u8 y = pix >> 16, u = pix >> 8, v = pix;
+				bool key = false;
+				if (!BIT(m_control, 3))
+				{
+					if (all_zero)
+						key = !(pix & 0xffffff);
+					else
+						key = y >= ymin && y <= ymax && u >= umin && u <= umax && v >= vmin && v <= vmax;
+				}
+				pix = key ? 0 : (pix | (1 << 27));
+			}
+		}
+	}
+	else
+	{
+		std::fill(std::begin(m_king_line), std::end(m_king_line), 0);
+		std::fill(std::begin(m_rainbow_line), std::end(m_rainbow_line), 0);
+	}
+}
 
 u32 huc6261_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -373,16 +503,11 @@ void huc6261_device::write(offs_t offset, u16 data)
 					m_priority[3] = (data >> 12) & 0x07;
 					break;
 
-				// Chroma key Y
+				// Chroma key Y, U, V: max in the high byte, min in the low byte
 				case 0x0a:
-					break;
-
-				// Chroma key U
 				case 0x0b:
-					break;
-
-				// Chroma key V
 				case 0x0c:
+					m_chroma_key[m_register - 0x0a] = data;
 					break;
 
 				//
@@ -445,6 +570,11 @@ void huc6261_device::device_start()
 	save_item(NAME(m_pixel_data));
 	save_item(NAME(m_pixel_clock));
 	save_item(NAME(m_bmp));
+	save_item(NAME(m_pixel_rgb));
+	save_item(NAME(m_king_line));
+	save_item(NAME(m_rainbow_line));
+	save_item(NAME(m_chroma_key));
+	save_item(NAME(m_layer_rank));
 }
 
 
@@ -456,6 +586,11 @@ void huc6261_device::device_reset()
 	m_pixel_clock = 0;
 
 	memset(m_palette, 0, sizeof(m_palette));
+	m_pixel_rgb = 0;
+	std::fill(std::begin(m_king_line), std::end(m_king_line), 0);
+	std::fill(std::begin(m_rainbow_line), std::end(m_rainbow_line), 0);
+	std::fill(std::begin(m_chroma_key), std::end(m_chroma_key), 0);
+	std::fill(std::begin(m_layer_rank), std::end(m_layer_rank), 0);
 
 	m_last_v = screen().vpos();
 	m_last_h = screen().hpos();

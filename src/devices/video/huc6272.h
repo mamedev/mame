@@ -33,6 +33,10 @@ public:
 	// CD-DA operations
 	void cdda_update(offs_t offset, u8 data);
 
+	// video output, for the '6261
+	void render_bg_line(int raster, u32 *dest);
+	int rainbow_line(int raster, u32 *dest);
+
 	static void cdrom_config(device_t *device);
 
 protected:
@@ -52,23 +56,19 @@ private:
 	u32 m_kram_load_reg, m_kram_write_reg;
 	u32 m_page_setting;
 
-	struct{
-		u32 bat_address = 0;
-		u32 cg_address = 0;
-		u8 mode = 0;
-		u16 height = 0;
-		u16 width = 0;
+	struct bg_t {
+		u16 bat = 0;
+		u16 cg = 0;
+		u16 size = 0;
 		u16 xscroll = 0;
 		u16 yscroll = 0;
-		u8 priority = 0;
-	}m_bg[4];
-
-	struct{
-		u32 bat_address = 0;
-		u32 cg_address = 0;
-		u16 height = 0;
-		u16 width = 0;
-	}m_bg0sub;
+	} m_bg[4];
+	u16 m_bg_mode = 0;
+	u16 m_bg_priority = 0;
+	u8 m_bg_scroll_mode = 0;
+	u16 m_bg0sub_bat = 0;
+	u16 m_bg0sub_cg = 0;
+	u16 m_bg_affine[6]{};
 
 	struct{
 		u8 index = 0;
@@ -99,6 +99,19 @@ private:
 	} m_dma;
 
 	bool m_in_scsi_update = false;
+
+	struct rainbow_t {
+		u8 control = 0;
+		u32 address = 0;
+		u16 start_line = 0;
+		u8 block_count = 0;
+		u16 raster_irq_line = 0;
+		u32 read_pos = 0;
+		u8 busy = 0;
+		u8 blocks = 0;
+		bool start_pending = false;
+		bool raster_irq = false;
+	} m_rainbow;
 
 	struct{
 		u8 rate = 0;
@@ -193,7 +206,10 @@ private:
 	u32 kram_page_setup_r(offs_t offset);
 	void kram_page_setup_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
+	u32 bg_mode_r(offs_t offset);
 	void bg_mode_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void bg_scroll_mode_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void bg_affine_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	void bg_priority_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
@@ -208,6 +224,17 @@ private:
 	void bg0sub_cg_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void bg_size_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void bg_scroll_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
+	void rainbow_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void rainbow_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void rainbow_start_line_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void rainbow_block_count_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void raster_irq_line_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u8 rainbow_fetch();
+
+	u16 kram_word(int page, u32 base, u32 offset);
+	void bg_decode_8(u8 mode, const u16 *cg, u32 pbn, u32 layer_or, u32 *dest);
+	void draw_bg_layer(int n, int raster, u32 *line);
 
 	void adpcm_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void adpcm_channel_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);

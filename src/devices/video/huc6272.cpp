@@ -14,12 +14,12 @@ TODO:
 - subclass "SCSICD" into SCSI-2 "CD-ROM DRIVE:FX"
   \- Derivative design of PCE drive, which in turn is a derivative of PC-8801-30 (cd drive)
      and PC-8801-31 (interface);
-- Implement video routines drawing and interface:
-  \- BIOS main menu draws BG0 only as backdrop of the PCE VDCs with 16M mode (5);
-  \- (check Photo CD, Audio CD & backup RAM screens);
-- Implement video mixing with other PCFX chips;
-- Implement microprogram (layer timings, sort of Sega Saturn VRAM cycle patterns);
-- Implement Rainbow transfers (NEC logo on POST);
+- BG drawing is done a line at a time, mid-line register changes are not reflected;
+- Microprogram only selects which CG/BAT words are fetched, no cycle timing;
+- Rotation mode ignores the microprogram;
+- Extended dot modes (64K/16M "extdot") are not drawn;
+- Sub-channel interrupt;
+- (check Photo CD, Audio CD & backup RAM screens);
 - Verify ADPCM transfers;
 - Verify CD-DA hookup;
 
@@ -35,6 +35,8 @@ ADPCM related patents:
 
 #include "emu.h"
 #include "huc6272.h"
+
+#include <algorithm>
 
 #define VERBOSE (LOG_GENERAL)
 
@@ -144,19 +146,28 @@ void huc6272_device::device_start()
 	save_item(STRUCT_MEMBER(m_dma, flipflop));
 	save_item(STRUCT_MEMBER(m_dma, irq));
 
-	save_item(STRUCT_MEMBER(m_bg, bat_address));
-	save_item(STRUCT_MEMBER(m_bg, cg_address));
-	save_item(STRUCT_MEMBER(m_bg, mode));
-	save_item(STRUCT_MEMBER(m_bg, height));
-	save_item(STRUCT_MEMBER(m_bg, width));
+	save_item(STRUCT_MEMBER(m_bg, bat));
+	save_item(STRUCT_MEMBER(m_bg, cg));
+	save_item(STRUCT_MEMBER(m_bg, size));
 	save_item(STRUCT_MEMBER(m_bg, xscroll));
 	save_item(STRUCT_MEMBER(m_bg, yscroll));
-	save_item(STRUCT_MEMBER(m_bg, priority));
+	save_item(NAME(m_bg_mode));
+	save_item(NAME(m_bg_priority));
+	save_item(NAME(m_bg_scroll_mode));
+	save_item(NAME(m_bg0sub_bat));
+	save_item(NAME(m_bg0sub_cg));
+	save_item(NAME(m_bg_affine));
 
-	save_item(NAME(m_bg0sub.bat_address));
-	save_item(NAME(m_bg0sub.cg_address));
-	save_item(NAME(m_bg0sub.height));
-	save_item(NAME(m_bg0sub.width));
+	save_item(STRUCT_MEMBER(m_rainbow, control));
+	save_item(STRUCT_MEMBER(m_rainbow, address));
+	save_item(STRUCT_MEMBER(m_rainbow, start_line));
+	save_item(STRUCT_MEMBER(m_rainbow, block_count));
+	save_item(STRUCT_MEMBER(m_rainbow, raster_irq_line));
+	save_item(STRUCT_MEMBER(m_rainbow, read_pos));
+	save_item(STRUCT_MEMBER(m_rainbow, busy));
+	save_item(STRUCT_MEMBER(m_rainbow, blocks));
+	save_item(STRUCT_MEMBER(m_rainbow, start_pending));
+	save_item(STRUCT_MEMBER(m_rainbow, raster_irq));
 
 	save_item(NAME(m_micro_prg.index));
 	save_item(NAME(m_micro_prg.ctrl));
@@ -181,20 +192,16 @@ void huc6272_device::device_start()
 
 void huc6272_device::device_reset()
 {
-	for (int i = 0; i < 4; i++)
-	{
-		m_bg[i].bat_address = 0;
-		m_bg[i].cg_address = 0;
-		m_bg[i].height = 1;
-		m_bg[i].width = 1;
-		m_bg[i].mode = 0;
-		m_bg[i].priority = 0;
-	}
-
-	m_bg0sub.bat_address = 0;
-	m_bg0sub.cg_address = 0;
-	m_bg0sub.height = 1;
-	m_bg0sub.width = 1;
+	for (auto &bg : m_bg)
+		bg = bg_t();
+	m_bg_mode = 0;
+	m_bg_priority = 0;
+	m_bg_scroll_mode = 0;
+	m_bg0sub_bat = 0;
+	m_bg0sub_cg = 0;
+	std::fill(std::begin(m_bg_affine), std::end(m_bg_affine), 0);
+	m_micro_prg.ctrl = 0;
+	m_rainbow = rainbow_t();
 
 	m_scsi = scsi_t();
 	m_dma = dma_t();
@@ -262,12 +269,12 @@ void huc6272_device::io_map(address_map &map)
 	map(0x0e, 0x0e).rw(FUNC(huc6272_device::kram_read_data_r), FUNC(huc6272_device::kram_write_data_w));
 	map(0x0f, 0x0f).rw(FUNC(huc6272_device::kram_page_setup_r), FUNC(huc6272_device::kram_page_setup_w));
 
-	map(0x10, 0x10).w(FUNC(huc6272_device::bg_mode_w));
+	map(0x10, 0x10).rw(FUNC(huc6272_device::bg_mode_r), FUNC(huc6272_device::bg_mode_w));
 	map(0x12, 0x12).w(FUNC(huc6272_device::bg_priority_w));
 	map(0x13, 0x13).w(FUNC(huc6272_device::microprogram_address_w));
 	map(0x14, 0x14).w(FUNC(huc6272_device::microprogram_data_w));
 	map(0x15, 0x15).rw(FUNC(huc6272_device::microprogram_control_r), FUNC(huc6272_device::microprogram_control_w));
-//  map(0x16, 0x16) wrap-around enable
+	map(0x16, 0x16).w(FUNC(huc6272_device::bg_scroll_mode_w));
 
 	map(0x20, 0x20).w(FUNC(huc6272_device::bg_bat_w<0>));
 	map(0x21, 0x21).w(FUNC(huc6272_device::bg_cg_w<0>));
@@ -277,18 +284,21 @@ void huc6272_device::io_map(address_map &map)
 	map(0x24, 0x24).w(FUNC(huc6272_device::bg_bat_w<1>));
 	map(0x25, 0x25).w(FUNC(huc6272_device::bg_cg_w<1>));
 
-	map(0x26, 0x26).w(FUNC(huc6272_device::bg_bat_w<2>));
-	map(0x27, 0x27).w(FUNC(huc6272_device::bg_cg_w<2>));
+	map(0x28, 0x28).w(FUNC(huc6272_device::bg_bat_w<2>));
+	map(0x29, 0x29).w(FUNC(huc6272_device::bg_cg_w<2>));
 
-	map(0x28, 0x28).w(FUNC(huc6272_device::bg_bat_w<3>));
-	map(0x29, 0x29).w(FUNC(huc6272_device::bg_cg_w<3>));
+	map(0x2a, 0x2a).w(FUNC(huc6272_device::bg_bat_w<3>));
+	map(0x2b, 0x2b).w(FUNC(huc6272_device::bg_cg_w<3>));
 
 	map(0x2c, 0x2f).w(FUNC(huc6272_device::bg_size_w));
 
 	map(0x30, 0x37).w(FUNC(huc6272_device::bg_scroll_w));
-//  map(0x38, 0x3b) BG affine coefficients
-//  map(0x3c, 0x3d) BG affine center X/Y
-//  map(0x40, 0x44) Rainbow regs
+	map(0x38, 0x3d).w(FUNC(huc6272_device::bg_affine_w));
+	map(0x40, 0x40).w(FUNC(huc6272_device::rainbow_control_w));
+	map(0x41, 0x41).w(FUNC(huc6272_device::rainbow_address_w));
+	map(0x42, 0x42).w(FUNC(huc6272_device::rainbow_start_line_w));
+	map(0x43, 0x43).w(FUNC(huc6272_device::rainbow_block_count_w));
+	map(0x44, 0x44).w(FUNC(huc6272_device::raster_irq_line_w));
 
 	map(0x50, 0x50).w(FUNC(huc6272_device::adpcm_control_w));
 	map(0x51, 0x52).w(FUNC(huc6272_device::adpcm_channel_control_w));
@@ -327,12 +337,21 @@ u16 huc6272_device::status_r(offs_t offset)
 {
 	u16 res = m_register & 0x7f;
 	res |= (m_adpcm.interrupt << 10);
-	// TODO: sub-channel and raster IRQs
+	// TODO: sub-channel IRQ
 	// only one of DMA/SCSI is reported at a time (Anime Freak FX Vol. 4 gets confused otherwise)
 	if (m_dma.irq && BIT(m_dma.ctrl, 1))
 		res |= 0x2000;
 	else if (m_scsi.irq)
 		res |= 0x4000;
+	if (m_rainbow.raster_irq)
+		res |= 0x0800;
+
+	// reading acknowledges the raster interrupt
+	if (m_rainbow.raster_irq && !machine().side_effects_disabled())
+	{
+		m_rainbow.raster_irq = false;
+		interrupt_update();
+	}
 	return res;
 }
 
@@ -858,19 +877,15 @@ void huc6272_device::kram_page_setup_w(offs_t offset, u32 data, u32 mem_mask)
  * 1011 - 256 color palette block mode
  * others - <invalid>
  */
+u32 huc6272_device::bg_mode_r(offs_t offset)
+{
+	return m_bg_mode;
+}
+
 void huc6272_device::bg_mode_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		for(int i = 0; i < 2; i++)
-			m_bg[i].mode = (data >> i * 4) & 0x0f;
-	}
-
-	if (ACCESSING_BITS_8_15)
-	{
-		for(int i = 2; i < 4; i++)
-			m_bg[i].mode = (data >> i * 4) & 0x0f;
-	}
+	if (ACCESSING_BITS_0_15)
+		m_bg_mode = (m_bg_mode & ~mem_mask) | (data & mem_mask);
 }
 
 /*
@@ -883,18 +898,12 @@ void huc6272_device::bg_mode_w(offs_t offset, u32 data, u32 mem_mask)
  * ---- ---- ---- -001 farthest back
  * ---- ---- ---- -100 farthest forward
  * ---- ---- ---- -1xx <prohibited>
- * NB: there's another priority reg in '6261, is above layer vs. layer priority?
+ * this orders the KING layers between themselves, the '6261 then orders KING against the other chips
  */
 void huc6272_device::bg_priority_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	// TODO: fix access
-	// TODO: rotation enable
-
 	if (ACCESSING_BITS_0_15)
-	{
-		for(int i = 0; i < 4; i++)
-			m_bg[i].priority = (data >> i * 3) & 0x07;
-	}
+		m_bg_priority = data & 0x1fff;
 }
 
 void huc6272_device::microprogram_address_w(offs_t offset, u32 data, u32 mem_mask)
@@ -903,6 +912,15 @@ void huc6272_device::microprogram_address_w(offs_t offset, u32 data, u32 mem_mas
 		m_micro_prg.index = data & 0xf;
 }
 
+/*
+ * microprogram, one entry per KRAM access slot of an 8 dot cycle, 0-7 for KRAM page A, 8-f for page B
+ * ---x ---- ---- no operation
+ * ---- xx-- ---- BG layer
+ * ---- --x- ---- rotation (affine) access
+ * ---- ---x ---- BAT access
+ * ---- ---- x--- (CG) fetch through BAT
+ * ---- ---- -xxx (CG) word offset
+ */
 void huc6272_device::microprogram_data_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
@@ -924,53 +942,441 @@ void huc6272_device::microprogram_control_w(offs_t offset, u32 data, u32 mem_mas
 		m_micro_prg.ctrl = data & 1;
 }
 
-// TODO: limit?
+// ---- ---- ---- xxxx BG3-BG0 endless scroll (wrap-around)
+void huc6272_device::bg_scroll_mode_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+		m_bg_scroll_mode = data & 0xf;
+}
+
+// addresses are in 1K word units
 template <unsigned N> void huc6272_device::bg_bat_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_bg[N].bat_address = data * 1024;
+	if (ACCESSING_BITS_0_15)
+		m_bg[N].bat = data & 0xffff;
 }
 
 template <unsigned N> void huc6272_device::bg_cg_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_bg[N].cg_address = data * 1024;
+	if (ACCESSING_BITS_0_15)
+		m_bg[N].cg = data & 0xffff;
 }
 
 void huc6272_device::bg0sub_bat_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_bg0sub.bat_address = data * 1024;
+	if (ACCESSING_BITS_0_15)
+		m_bg0sub_bat = data & 0xffff;
 }
 
 void huc6272_device::bg0sub_cg_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_bg0sub.cg_address = data * 1024;
+	if (ACCESSING_BITS_0_15)
+		m_bg0sub_cg = data & 0xffff;
 }
 
+/*
+ * xxxx ---- ---- ---- BG0 sub screen width (BG0 only)
+ * ---- xxxx ---- ---- BG0 sub screen height (BG0 only)
+ * ---- ---- xxxx ---- width, as a power of 2
+ * ---- ---- ---- xxxx height, as a power of 2
+ */
 void huc6272_device::bg_size_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_bg[offset].height = 1 << (data & 0x000f);
-		m_bg[offset].width = 1 << ((data & 0x00f0) >> 4);
-	}
-
-	if(offset == 0 && ACCESSING_BITS_8_15)
-	{
-		m_bg0sub.height = 1 << ((data & 0x0f00) >> 8);
-		m_bg0sub.width = 1 << ((data & 0xf000) >> 12);
-	}
+	if (ACCESSING_BITS_0_15)
+		m_bg[offset].size = data & (offset ? 0x00ff : 0xffff);
 }
 
+// BG0 scroll registers are 11 bits, the others 10 bits
 void huc6272_device::bg_scroll_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 	{
 		const u8 layer_n = (offset & 6) >> 1;
+		const u16 mask = layer_n ? 0x3ff : 0x7ff;
 
-		if(offset & 1)
-			m_bg[layer_n].yscroll = data & 0xffff;
+		if (offset & 1)
+			m_bg[layer_n].yscroll = data & mask;
 		else
-			m_bg[layer_n].xscroll = data & 0xffff;
+			m_bg[layer_n].xscroll = data & mask;
 	}
+}
+
+// BG0 rotation coefficients A, B, C, D (8.8 fixed point) and center X, Y
+void huc6272_device::bg_affine_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (ACCESSING_BITS_0_15)
+		m_bg_affine[offset] = data & 0xffff;
+}
+
+/*
+ * BG rendering
+ *
+ * Output pixels are tagged with their layer number in bits 31-28 (1-4 for BG0-3).
+ * Palette modes return the palette index (without the '6261 palette offset),
+ * direct color modes set bit 27 and return YUV888.
+ */
+static constexpr u32 BG_DIRECT = 1 << 27;
+
+u16 huc6272_device::kram_word(int page, u32 base, u32 offset)
+{
+	return m_kram_page[page][(base & 0x20000) | ((base + offset) & 0x1ffff)];
+}
+
+void huc6272_device::bg_decode_8(u8 mode, const u16 *cg, u32 pbn, u32 layer_or, u32 *dest)
+{
+	switch (mode)
+	{
+		case 1: // 4 colors, 2bpp
+			for (int i = 0; i < 8; i++)
+			{
+				const u8 pix = (cg[0] >> (14 - i * 2)) & 3;
+				if (pix)
+					dest[i] = layer_or | (((pbn << 2) + pix) & 0xff);
+			}
+			break;
+
+		case 2: // 16 colors, 4bpp
+			for (int i = 0; i < 8; i++)
+			{
+				const u8 pix = (cg[i >> 2] >> (12 - (i & 3) * 4)) & 0xf;
+				if (pix)
+					dest[i] = layer_or | (((pbn << 4) + pix) & 0xff);
+			}
+			break;
+
+		case 3: // 256 colors, 8bpp
+			for (int i = 0; i < 8; i++)
+			{
+				const u8 pix = (cg[i >> 1] >> (BIT(i, 0) ? 0 : 8)) & 0xff;
+				if (pix)
+					dest[i] = layer_or | pix;
+			}
+			break;
+
+		case 4: // 64K colors, Y8 U4 V4 per pixel, Y=0 is transparent
+			for (int i = 0; i < 8; i++)
+			{
+				if (cg[i] & 0xff00)
+					dest[i] = layer_or | BG_DIRECT | ((cg[i] & 0xff00) << 8) | ((cg[i] & 0x00f0) << 8) | ((cg[i] & 0x000f) << 4);
+			}
+			break;
+
+		case 5: // 16M colors, Y0 Y1 / U V per 2 pixels, Y=0 is transparent
+			for (int i = 0; i < 8; i += 2)
+			{
+				const u16 y = cg[i];
+				const u16 uv = cg[i + 1];
+				if (y & 0xff00)
+					dest[i] = layer_or | BG_DIRECT | ((y & 0xff00) << 8) | uv;
+				if (y & 0x00ff)
+					dest[i + 1] = layer_or | BG_DIRECT | ((y & 0x00ff) << 16) | uv;
+			}
+			break;
+	}
+}
+
+void huc6272_device::draw_bg_layer(int n, int raster, u32 *line)
+{
+	// out of range sizes behave as the minimum size
+	static const u8 size_shift[16] = { 3, 3, 3, 3, 4, 5, 6, 7, 8, 9, 10, 3, 3, 3, 3, 3 };
+	static const bool size_invalid[16] = { true, true, true, false, false, false, false, false, false, false, false, true, true, true, true, true };
+	// CG words fetched per 8 dots for each mode
+	static const u8 cg_words[8] = { 0, 1, 2, 4, 8, 8, 0, 0 };
+
+	const u8 bgmode = (m_bg_mode >> (n * 4)) & 0xf;
+	const u8 mode = bgmode & 7;
+	if (mode == 0 || mode >= 6)
+		return;
+
+	const u32 layer_or = u32(n + 1) << 28;
+	const int page = BIT(m_page_setting, 4);
+	const bool block_mode = BIT(bgmode, 3);
+	const bool endless = BIT(m_bg_scroll_mode, n);
+	const bool rotate = (n == 0) && BIT(m_bg_priority, 12);
+	const s32 xscroll = util::sext(m_bg[n].xscroll, n ? 10 : 11);
+	const s32 yscroll = util::sext(m_bg[n].yscroll, n ? 10 : 11);
+	const u32 yoffset = (yscroll + raster) & 0xffff;
+
+	const u32 bat_offset = m_bg[n].bat * 1024;
+	const u32 cg_offset = m_bg[n].cg * 1024;
+	const u32 bat_sub_offset = n ? bat_offset : m_bg0sub_bat * 1024;
+	const u32 cg_sub_offset = n ? cg_offset : m_bg0sub_cg * 1024;
+
+	const u16 size = m_bg[n].size;
+	const u16 sub_size = n ? (size << 8) : size;
+	const u8 width_shift = size_shift[(size >> 4) & 0xf];
+	const u8 height_shift = size_shift[size & 0xf];
+	const bool width_invalid = size_invalid[(size >> 4) & 0xf];
+	const u8 sub_width_shift = size_shift[(sub_size >> 12) & 0xf];
+	const u8 sub_height_shift = size_shift[(sub_size >> 8) & 0xf];
+	const bool sub_width_invalid = size_invalid[(sub_size >> 12) & 0xf];
+	const u32 bat_width = (1 << width_shift) >> 3;
+	const u32 bat_height = (1 << height_shift) >> 3;
+	const u32 bat_sub_width = (1 << sub_width_shift) >> 3;
+	const u32 bat_sub_height = (1 << sub_height_shift) >> 3;
+	const u32 bat_mask = 0x7ff >> 3;
+	const u32 bat_sub_width_test = endless ? (bat_mask + 1) : std::max(bat_width, bat_sub_width);
+	const u32 bat_sub_height_test = endless ? (bat_mask + 1) : std::max(bat_height, bat_sub_height);
+
+	// decode the microprogram: which CG word each of the 8 fetch slots loads, and if a BAT fetch happens at all
+	struct slots_t { u16 mask[8]{}; u8 remap[8]{}; bool through_bat[8]{}; bool bat_fetch = false; };
+	auto decode_slots = [this, n, rotate] (u32 cg_base, u32 bat_base)
+	{
+		slots_t slots;
+		int count = 0;
+		for (int i = 0; i < 8; i++)
+		{
+			const u16 op = m_microprg_ram[(BIT(cg_base, 17) ? 8 : 0) + i];
+			if (((op >> 6) & 3) == n && !BIT(op, 8) && !BIT(op, 4))
+			{
+				// a mismatched rotation bit would compute wrong addresses, treat as no fetch
+				slots.mask[count] = (BIT(op, 5) == rotate) ? 0xffff : 0;
+				slots.remap[count] = op & 7;
+				slots.through_bat[count] = BIT(op, 3);
+				count++;
+			}
+		}
+		for (int i = 0; i < 8; i++)
+		{
+			const u16 op = m_microprg_ram[(BIT(bat_base, 17) ? 8 : 0) + i];
+			if (((op >> 6) & 3) == n && !BIT(op, 8) && BIT(op, 4) && BIT(op, 5) == rotate)
+				slots.bat_fetch = true;
+		}
+		return slots;
+	};
+	const slots_t main_slots = decode_slots(cg_offset, bat_offset);
+	const slots_t sub_slots = decode_slots(cg_sub_offset, bat_sub_offset);
+
+	if (rotate)
+	{
+		if (mode > 4)
+			return;
+
+		const s32 a = s16(m_bg_affine[0]);
+		const s32 b = s16(m_bg_affine[1]);
+		const s32 c = s16(m_bg_affine[2]);
+		const s32 d = s16(m_bg_affine[3]);
+		const s32 cx = s16(m_bg_affine[4]);
+		const s32 cy = s16(m_bg_affine[5]);
+		const u32 bat_width_mask = endless ? (bat_width - 1) : 0xffff;
+		const u32 bat_height_mask = endless ? (bat_height - 1) : 0xffff;
+		const u32 bitmap_ymask = (1 << height_shift) - 1;
+		const s32 raw_x = s32(util::sext(m_bg[n].xscroll, 11)) - cx;
+		const s32 raw_y = raster + s32(util::sext(m_bg[n].yscroll, 11)) - cy;
+		s32 xaccum = raw_x * a + raw_y * b + (cx << 8);
+		s32 yaccum = raw_y * d + raw_x * c + (cy << 8);
+
+		for (int x = 0; x < 256; x++, xaccum += a, yaccum += c)
+		{
+			const u16 tx = xaccum >> 8;
+			const u16 ty = yaccum >> 8;
+			const u32 bx = (tx >> 3) & bat_width_mask;
+			const u32 by = (ty >> 3) & bat_height_mask;
+
+			if (!endless && (bx >= bat_width || by >= bat_height))
+				continue;
+
+			const u32 words = cg_words[mode];
+			u32 pbn = 0;
+			u32 cg_addr;
+			if (block_mode)
+			{
+				u16 bat = kram_word(page, bat_offset, bx + ((by << width_shift) >> 3));
+				pbn = bat >> 12;
+				bat &= 0xfff;
+				cg_addr = bat * 8 * words + (ty & 7) * words;
+			}
+			else
+				cg_addr = bx * words + (((ty & bitmap_ymask) << width_shift) >> 3) * words;
+
+			u32 pix = 0;
+			switch (mode)
+			{
+				case 1: pix = (kram_word(page, cg_offset, cg_addr) >> ((7 - (tx & 7)) * 2)) & 3; if (pix) pix = (pbn << 2) + pix; break;
+				case 2: pix = (kram_word(page, cg_offset, cg_addr + ((tx >> 2) & 1)) >> ((3 - (tx & 3)) * 4)) & 0xf; if (pix) pix = (pbn << 4) + pix; break;
+				case 3: pix = (kram_word(page, cg_offset, cg_addr + ((tx >> 1) & 3)) >> (BIT(tx, 0) ? 0 : 8)) & 0xff; break;
+				case 4:
+				{
+					const u16 w = kram_word(page, cg_offset, cg_addr + (tx & 7));
+					if (w & 0xff00)
+						line[8 + x] = layer_or | BG_DIRECT | ((w & 0xff00) << 8) | ((w & 0x00f0) << 8) | ((w & 0x000f) << 4);
+					continue;
+				}
+			}
+			if (pix)
+				line[8 + x] = layer_or | (pix & 0xff);
+		}
+		return;
+	}
+
+	const u32 words = cg_words[mode];
+	u32 bat_x = (xscroll >> 3) & bat_mask;
+	const u32 bat_y = (yoffset >> 3) & bat_mask;
+	const u32 ysmall = yoffset & 7;
+	// linear (bitmap) addressing: CG words from the start of the bitmap to this line
+	const u32 bitmap_y = ((yoffset & (width_invalid ? 0 : ((1 << height_shift) - 1))) << width_shift) * words / 8;
+	const u32 bitmap_sub_y = ((yoffset & (sub_width_invalid ? 0 : ((1 << sub_height_shift) - 1))) << sub_width_shift) * words / 8;
+	u32 *target = line + 8 - (xscroll & 7);
+
+	for (int x = 0; x < 256 + 8; x += 8)
+	{
+		const bool in_main = bat_x < bat_width && bat_y < bat_height;
+		const bool in_sub = !in_main && bat_x < bat_sub_width_test && bat_y < bat_sub_height_test;
+
+		if (in_main || in_sub)
+		{
+			const slots_t &slots = in_main ? main_slots : sub_slots;
+			const u32 b_off = in_main ? bat_offset : bat_sub_offset;
+			const u32 c_off = in_main ? cg_offset : cg_sub_offset;
+			const u32 bx = in_main ? bat_x : (bat_x & (bat_sub_width - 1));
+			const u32 by = in_main ? bat_y : (bat_y & (bat_sub_height - 1));
+			const u8 w_shift = in_main ? width_shift : sub_width_shift;
+			const bool w_invalid = in_main ? width_invalid : sub_width_invalid;
+
+			u16 bat = 0;
+			if (slots.bat_fetch)
+				bat = kram_word(page, b_off, block_mode ? (bx + (((w_invalid ? 0 : by) << w_shift) >> 3)) : 0);
+			const u32 pbn = block_mode ? (bat >> 12) : 0;
+			bat &= 0xfff;
+
+			const u32 linear = bx * words + (in_main ? bitmap_y : bitmap_sub_y);
+			const u32 through_bat = bat * 8 * words + ysmall * words;
+			u16 cg[8];
+			for (int i = 0; i < words; i++)
+				cg[i] = kram_word(page, c_off, (slots.through_bat[i] ? through_bat : linear) + slots.remap[i]) & slots.mask[i];
+
+			bg_decode_8(mode, cg, pbn, layer_or, target + x);
+		}
+		bat_x = (bat_x + 1) & bat_mask;
+	}
+}
+
+/*
+ * RAINBOW transfers
+ *
+ * $40 ---- --x- raster interrupt enable
+ *     ---- ---x transfer enable
+ * $41 KRAM word address of the stream
+ * $42 line to start a transfer on
+ * $43 number of 16 line blocks to transfer
+ * $44 raster interrupt line
+ */
+void huc6272_device::rainbow_control_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (!ACCESSING_BITS_0_15)
+		return;
+
+	m_rainbow.control = data & 3;
+	if (!BIT(data, 0))
+		m_rainbow.blocks = 0;
+	m_rainbow.raster_irq = false;
+	interrupt_update();
+}
+
+void huc6272_device::rainbow_address_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_rainbow.address);
+	m_rainbow.address &= 0x3ffff;
+}
+
+void huc6272_device::rainbow_start_line_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (ACCESSING_BITS_0_15)
+		m_rainbow.start_line = data & 0x1ff;
+}
+
+void huc6272_device::rainbow_block_count_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (ACCESSING_BITS_0_15)
+		m_rainbow.block_count = data & 0x1f;
+}
+
+void huc6272_device::raster_irq_line_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (ACCESSING_BITS_0_15)
+		m_rainbow.raster_irq_line = data & 0x1ff;
+}
+
+// RAINBOW stream byte from KRAM, low byte of each word first
+u8 huc6272_device::rainbow_fetch()
+{
+	const int page = BIT(m_page_setting, 12);
+	const u32 pos = m_rainbow.read_pos;
+	const u8 data = m_kram_page[page][(pos >> 1) & 0x3ffff] >> (BIT(pos, 0) * 8);
+	m_rainbow.read_pos = ((pos + 1) & 0x3ffff) | (pos & 0x40000);
+	return data;
+}
+
+/*
+ * Called by the '6261 at the start of each line (raster = 0-262, active display is 22-261).
+ * Raises the raster interrupt, runs the RAINBOW decode schedule (one 16 line block decoded
+ * every 16 lines, displayed after the following buffer swap) and fetches its line.
+ * Returns the line format (huc6271_device::FORMAT_*).
+ */
+int huc6272_device::rainbow_line(int raster, u32 *dest)
+{
+	if (raster == m_rainbow.raster_irq_line && BIT(m_rainbow.control, 1))
+	{
+		m_rainbow.raster_irq = true;
+		interrupt_update();
+	}
+
+	if (raster == m_rainbow.start_line && BIT(m_rainbow.control, 0))
+		m_rainbow.start_pending = true;
+
+	if (raster >= 262)
+	{
+		std::fill_n(dest, 256, 0);
+		return huc6271_device::FORMAT_NONE;
+	}
+
+	if (m_rainbow.busy)
+	{
+		m_rainbow.busy--;
+		if (!m_rainbow.busy)
+			m_huc6271->swap_buffers();
+	}
+
+	if (!m_rainbow.busy)
+	{
+		bool first = false;
+		if (!m_rainbow.blocks && m_rainbow.start_pending)
+		{
+			m_rainbow.blocks = m_rainbow.block_count;
+			if (m_rainbow.blocks)
+			{
+				m_rainbow.read_pos = m_rainbow.address << 1;
+				first = true;
+			}
+		}
+
+		if (m_rainbow.blocks)
+		{
+			m_rainbow.blocks--;
+			m_rainbow.busy = 16;
+			m_huc6271->decode_block(first, [this] () { return rainbow_fetch(); });
+		}
+	}
+
+	m_rainbow.start_pending = false;
+	return m_huc6271->fetch_line(dest);
+}
+
+// renders KING BG layers for display line "raster" (0 = first active line), 256 dots
+void huc6272_device::render_bg_line(int raster, u32 *dest)
+{
+	u32 line[256 + 16];
+	std::fill(std::begin(line), std::end(line), 0);
+
+	if (BIT(m_micro_prg.ctrl, 0))
+	{
+		for (int prio = 1; prio <= 7; prio++)
+			for (int n = 0; n < 4; n++)
+				if (((m_bg_priority >> (n * 3)) & 7) == prio)
+					draw_bg_layer(n, raster, line);
+	}
+
+	std::copy_n(&line[8], 256, dest);
 }
 
 void huc6272_device::adpcm_control_w(offs_t offset, u32 data, u32 mem_mask)
@@ -1107,6 +1513,6 @@ void huc6272_device::cdda_update(offs_t offset, u8 data)
 
 void huc6272_device::interrupt_update()
 {
-	const bool state = m_adpcm.interrupt || m_scsi.irq || (m_dma.irq && BIT(m_dma.ctrl, 1));
+	const bool state = m_adpcm.interrupt || m_scsi.irq || (m_dma.irq && BIT(m_dma.ctrl, 1)) || m_rainbow.raster_irq;
 	m_irq_changed_cb(state ? ASSERT_LINE : CLEAR_LINE);
 }

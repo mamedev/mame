@@ -69,8 +69,32 @@ private:
 	bitmap_rgb32  m_bmp;
 	s32   m_uv_lookup[65536][3];
 
-	u32 yuv2rgb(u32 yuv) const;
-	void apply_pal_offs(u16 &pix_data) const;
+	// layers as ordered by the priority logic
+	enum
+	{
+		LAYER_KING_BG0 = 0,
+		LAYER_VDC_BG = 4,
+		LAYER_VDC_SPR,
+		LAYER_RAINBOW,
+		LAYER_COUNT
+	};
+
+	// start of the 256 dot KING/RAINBOW window, in master clocks after the end of HSync
+	// TODO: 7MHz value is unverified
+	static constexpr int KING_START_5MHZ = 96;
+	static constexpr int KING_START_7MHZ = 106;
+
+	u32  m_pixel_rgb;
+	u32  m_king_line[256];
+	u32  m_rainbow_line[256];
+	u16  m_chroma_key[3];
+	u8   m_layer_rank[LAYER_COUNT];
+
+	u32 yuv888_to_rgb(u32 yuv) const;
+	u32 palette_yuv888(u16 index) const;
+	void update_layer_ranks();
+	u32 mix_pixel(u16 vdc0, u16 vdc1, u32 king, u32 rainbow) const;
+	void start_line(int v);
 };
 
 
