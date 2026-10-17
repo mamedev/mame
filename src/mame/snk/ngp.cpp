@@ -487,7 +487,7 @@ void ngp_state::machine_reset()
 	m_z80->set_input_line(0, CLEAR_LINE);
 
 	// Enforce the cpu to start executing as if the power button had just been pushed.
-	m_maincpu->set_state_int(TLCS900_PC, 0xff'1800);
+	m_maincpu->set_state_int(tlcs900_device::TLCS900_PC, 0xff'1800);
 }
 
 
