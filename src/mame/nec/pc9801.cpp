@@ -42,12 +42,14 @@ TODO (pc9801us / pc9801fs):
 \- wants specifically (the internal) SCSI?
 
 TODO (pc9801bx2):
-- Accesses $8f0-$8f2 PMC area, shared with 98NOTE machines;
+- Accesses $8f0-$8f2 PMC area, shared with 98NOTE machines and pc9821as;
 - A non-fatal "MEMORY ERROR" is always thrown no matter the RAM size afterwards, missing
   stealth SRAM hookup.
   NOTE: stealth SRAM must be introduced between pc9821ce ~ pc9801bx2 (former doesn't have it)
 - unemulated conventional or EMS RAM bank, definitely should have one given the odd minimum RAM
   size;
+- keyboard never brings setup mode;
+- Runs at 38.x Hz by default;
 
 TODO (pc9801ux):
 - "I/O Error" on any 3.5" floppy, specific to this romset (i.e. those works on pc9821).
@@ -883,6 +885,35 @@ void pc9801us_state::pc9801us_io(address_map &map)
 //  map(0x8f1f, 0x8f1f).w(m_sdip, FUNC(pc98_sdip_device::bank_w));
 }
 
+void pc9801bx_state::itf_43d_bank_w(offs_t offset, uint8_t data)
+{
+	// assume overlay disabled on writes to $43d
+	m_bios_view.disable();
+	pc9801vm_state::itf_43d_bank_w(offset, data);
+}
+
+void pc9801bx_state::cbus_43f_bank_w(offs_t offset, uint8_t data)
+{
+	if ((data & 0xf8) == 0xe0)
+	{
+		logerror("C-Bus overlay set %02x\n", data);
+		m_bios_view.select(data & 0x7);
+		return;
+	}
+
+	// Exit setup mode disarms overlay with a 0xe8 write
+	// (or writes are >> 1 and undocumented mem is wrong?)
+	if ((data & 0xf8) == 0xe8)
+	{
+		logerror("C-Bus overlay disable (%02x)\n", data);
+		m_bios_view.disable();
+		return;
+	}
+
+	pc9801vm_state::cbus_43f_bank_w(offset, data);
+}
+
+
 void pc9801bx_state::pc9801bx2_map(address_map &map)
 {
 	pc9801vm_map(map);
@@ -898,6 +929,12 @@ void pc9801bx_state::pc9801bx2_map(address_map &map)
 //  map(0x000da000, 0x000dbfff).ram(); // ide ram (declared in RS)
 //  map(0x000e0000, 0x000e7fff).rw(FUNC(pc9821_state::pc9821_grcg_gvram0_r), FUNC(pc9821_state::pc9821_grcg_gvram0_w));
 	map(0x000e8000, 0x000fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
+
+	map(0x000f8000, 0x000fffff).view(m_bios_view);
+	// TODO: remaining settings
+	m_bios_view[4](0x000f8000, 0x000fffff).rom().region("biosrom", 0x10000);
+	// setup mode
+	m_bios_view[6](0x000f8000, 0x000fffff).rom().region("biosrom", 0x18000);
 
 	map(0x00100000, 0x00efffff).rw("simm", FUNC(pc9801_61_simm_device::read_ext), FUNC(pc9801_61_simm_device::write_ext));
 	map(0x00f00000, 0x00ffffff).view(m_hole_15M_view);
@@ -2382,6 +2419,9 @@ void pc9801bx_state::pc9801bx2(machine_config &config)
 	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST, /4 ~ /7
 
 	PC98_SDIP(config, "sdip");
+
+	PC98_119_KBD(config.replace(), m_keyb, 0);
+	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
 	// RAM 1.8 MB (U2/M2) / 3.6 MB (U7) ~ 19.6 MB (from EMS?)
 	config.device_remove("simm");

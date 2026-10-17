@@ -93,7 +93,6 @@ class pc9821_mate_a_state : public pc9821_state
 public:
 	pc9821_mate_a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc9821_state(mconfig, type, tag)
-		, m_bios_view(*this, "bios_view")
 		, m_nvram(*this, "nvram")
 	{
 	}
@@ -116,9 +115,6 @@ private:
 	DECLARE_MACHINE_START(pc9821ap2);
 	DECLARE_MACHINE_RESET(pc9821ap2);
 
-	// Starting from Af
-	memory_view m_bios_view;
-
 	required_device<nvram_device> m_nvram;
 	std::unique_ptr<uint8_t[]> m_nvram_ptr;
 
@@ -132,7 +128,6 @@ class pc9821_canbe_state : public pc9821_state
 public:
 	pc9821_canbe_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc9821_state(mconfig, type, tag)
-		, m_bios_view(*this, "bios_view")
 	{
 	}
 
@@ -151,8 +146,6 @@ protected:
 	virtual void cbus_43f_bank_w(offs_t offset, uint8_t data) override;
 
 private:
-	memory_view m_bios_view;
-
 	DECLARE_MACHINE_START(pc9821_canbe);
 	DECLARE_MACHINE_RESET(pc9821_canbe);
 
