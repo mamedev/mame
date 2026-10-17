@@ -569,7 +569,8 @@ void yutnori_state::yutnori_prot_w(u16 data)
 void yutnori_state::yutnori_sound_hle_w(u8 data)
 {
 	// Commands 0x1b-0x22: where the 68000 code sends them (play_sound() at $270c), the message on screen
-	// at the same time, and the sample played. 0x1b and 0x22 show no message; 0x22's samples are by ear.
+	// at the same time, and the sample played. 0x1b and 0x22 show no message; 0x22 plays nothing until its
+	// sample is known.
 	// cmd   sent from      when                                       sample   on screen
 	// 0x1b  $f346          bonus game, spin starts                    27
 	// 0x1c  $f0ba          bonus game, result is 0                    28       꽝 꽝 꽝이네요 후후
@@ -579,14 +580,14 @@ void yutnori_state::yutnori_sound_hle_w(u8 data)
 	// 0x1f  $6742, $67d4   item picked up                             34       아이템을 하나 더 모았네요
 	// 0x20  $8102          choose which throw result to use           29, 30   쓸것을 선택해 주세요
 	// 0x21  -              not sent                                   -
-	// 0x22  $5212          sticks landed, before every throw result   31, 30
-	//       $f03a          bonus game, spinner stopped                31, 30
+	// 0x22  $5212          sticks landed, before every throw result   -
+	//       $f03a          bonus game, spinner stopped                -
 	// The prompt to choose the piece to move ($7f32) shows 움직일 말 선택하세요 and sends no command.
 	// 0x06 is sent from $159c in the title sequence, once for each of 8 objects.
 	static constexpr u8 SAMPLE_REMAP[0x23] = {
 		 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-		16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 32, 30, 34,
-		29, 33, 31
+		16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
+		32, 30, 34, 29, 33,  0 // special cases
 	};
 
 	if (data >= 0x01 && data <= 0x22)
