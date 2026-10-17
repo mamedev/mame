@@ -142,8 +142,7 @@ public:
 #ifdef DEBUG_SCREEN
 		m_debug_screen(*this, "screen_dbg"),
 #endif
-		m_screen_l(*this, "screen_l"),
-		m_screen_r(*this, "screen_r"),
+		m_screen(*this, "screen_%u",1u),
 		m_maincpu(*this, "main_cpu"),
 		m_subcpu(*this, "slv_cpu"),
 		m_rso_cpu(*this, "rso_cpu"),
@@ -162,6 +161,8 @@ public:
 	{ }
 
 	void gal3(machine_config &config);
+	void gal3z(machine_config& config);
+
 	void gal3_init();
 	void gal3zlgr_init();
 
@@ -171,9 +172,10 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
+
 	required_device_array<namco_c355spr_device, NUMSCREENS> m_c355spr;
 	required_device_array<palette_device, NUMSCREENS> m_palette;
-	uint16_t m_video_enable[NUMSCREENS];
+//	uint16_t m_video_enable[NUMSCREENS];
 	required_shared_ptr<uint16_t> m_rso_shared_ram;
 	required_device<c140_device> m_c140_16a;
 	required_device<c140_device> m_c140_16c;
@@ -188,8 +190,7 @@ private:
 #ifdef DEBUG_SCREEN
 	required_device<screen_device> m_debug_screen;
 #endif
-	required_device<screen_device> m_screen_l;
-	required_device<screen_device> m_screen_r;
+	required_device_array<screen_device,2> m_screen;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -206,40 +207,39 @@ private:
 	optional_ioport_array<8> m_adc_ports_psn1;
 	optional_ioport_array<8> m_adc_ports_psn2;
 
-	uint16_t m_psn0_adc_mux; // ADC mux settings
-	uint16_t m_psn1_adc_mux; 
-	uint16_t m_psn2_adc_mux; 
+	uint16_t m_psn_adc_mux[3]; // ADC mux settings
+
 	uint32_t m_led_mst = 0;
 	uint32_t m_led_slv = 0;
 
 	uint32_t m_serialprod = 0;
-
 	uint16_t m_rso_c139_irq = 0;
 
 	bool m_is_dragoon; // hack for original game as some differences in emulation (I need to close)
 	uint16_t m_sci_flags; // For identifying SCI interrupt sources as not via interrupt controller IC
 
-	int m_framedelay;
+	int m_dsp_kick_delay;
+	uint16_t m_venable[NUMSCREENS];
 
 	uint32_t led_mst_r();
 	void led_mst_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t led_slv_r();
 	void led_slv_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	template<int Screen> uint16_t video_enable_r();
 	
-	uint16_t video_enable_r1();
-	uint16_t video_enable_r2();
-
-	template<int Screen> void video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t rso_r(offs_t offset);
 	void rso_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	// Temp bitmaps for overlaying onto laserdisc
+	std::array<bitmap_ind16, NUMSCREENS> m_overlay_bitmap;
 
 #ifdef DEBUG_SCREEN
 	uint32_t screen_update_debug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 #endif
-	uint32_t screen_update_ld1(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
-	uint32_t screen_update_ld2(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
-	uint32_t screen_update_laserdiscs(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, uint8_t screen_index);
+
+	
+	template<int screen_index>
+	uint32_t screen_update_laserdiscs(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
+
 
 	void mst_cpu_map(address_map &map) ATTR_COLD;
 	void slv_cpu_map(address_map &map) ATTR_COLD;
@@ -253,54 +253,55 @@ private:
 	void c140a_map(address_map& map) ATTR_COLD;
 	void c140c_map(address_map& map) ATTR_COLD;
 	void c140g_map(address_map& map) ATTR_COLD;
+	void c140a_zol_map(address_map& map) ATTR_COLD;
+	void c140c_zol_map(address_map& map) ATTR_COLD;
+	void c140g_zol_map(address_map& map) ATTR_COLD;
 
 
-	void maincpu_wipeirq1(offs_t offset, uint16_t data, uint16_t mem_mask)
+	template<int line>
+	void maincpu_wipeirq(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
-		m_maincpu->set_input_line(1, CLEAR_LINE);
-	}
-	void maincpu_wipeirq3(offs_t offset, uint16_t data, uint16_t mem_mask)
-	{
-		m_maincpu->set_input_line(3, CLEAR_LINE);
+		m_maincpu->set_input_line(line, CLEAR_LINE);
 	}
 
-	uint16_t  maincpu_readirq1(offs_t offset)
+	template<int line>
+	uint16_t  maincpu_readirq(offs_t offset)
 	{
-		m_maincpu->set_input_line(1, CLEAR_LINE);
-		return 0;
-	}
-	uint16_t  maincpu_readirq3(offs_t offset)
-	{
-		m_maincpu->set_input_line(3, CLEAR_LINE);
+		m_maincpu->set_input_line(line, CLEAR_LINE);
 		return 0;
 	}
 
-	void subcpu_wipeirq1(offs_t offset, uint16_t data, uint16_t mem_mask)
+	template<int line>
+	void subcpu_wipeirq(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
-		m_subcpu->set_input_line(1, CLEAR_LINE);
+		m_subcpu->set_input_line(line, CLEAR_LINE);
 	}
-	uint16_t  subcpu_readirq1(offs_t offset)
+	
+
+	template<int line>
+	uint16_t  subcpu_readirq(offs_t offset)
 	{
-		m_subcpu->set_input_line(1, CLEAR_LINE);
+		m_subcpu->set_input_line(line, CLEAR_LINE);
 		return 0;
 	}
-	void subcpu_wipeirq3(offs_t offset, uint16_t data, uint16_t mem_mask)
+
+	template<int screen>
+	uint16_t video_enable_r()
 	{
-		m_subcpu->set_input_line(3, CLEAR_LINE);
+		m_venable[screen] ^= 0x1;
+		return m_venable[screen];
 	}
+	
 
 	void reset_all_dsps(int state)
 	{
-
 		m_namcos21_dsp_c67[0]->reset_dsps(state);
 		m_namcos21_dsp_c67[1]->reset_dsps(state);
-
 	}
 
 	void dsp_reset_w(uint8_t data)
 	{
 		reset_all_dsps(data & 1 ? CLEAR_LINE : ASSERT_LINE);
-
 	}
 
 	void rso_reset_w(uint16_t data)
@@ -335,12 +336,11 @@ private:
 			m_serialprod = 0;
 		}
 
-
 		return result;
 	}
 	void rso_uart_irq_write(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
-
+		//Nothing emulation-wise
 	}
 
 
@@ -357,42 +357,24 @@ private:
 	{
 		m_sci_flags = 0x1ff;
 	}
-
 	
 
 	// Trigger RSO when any of the C139's to PSN boards send data
-	void sci_to_rso_irq_trig_1(int state)
+
+	template<int rso>
+	void sci_to_rso_irq_trig(int state)
 	{
-		m_sci_flags = 0x1FE;
-		m_rso_intc->ex_irq_trigger();
-	}
-	void sci_to_rso_irq_trig_2(int state)
-	{
-		m_sci_flags = 0x1FD;
-		m_rso_intc->ex_irq_trigger();
-	}
-	void sci_to_rso_irq_trig_3(int state)
-	{
-		m_sci_flags = 0x1FB;
+		m_sci_flags = 0x1FF ^ (0x1 << rso);
 		m_rso_intc->ex_irq_trigger();
 	}
 
-	void psn1_sci_rx_irq(int state)
+	template<int psn>
+	void psn_sci_rx_irq(int state)
 	{
-		m_psn_cpu[0]->set_input_line(3, ASSERT_LINE);
+		m_psn_cpu[psn]->set_input_line(3, ASSERT_LINE);
 
 	}
-	void psn2_sci_rx_irq(int state)
-	{
-		m_psn_cpu[1]->set_input_line(3, ASSERT_LINE);
-
-	}
-	void psn3_sci_rx_irq(int state)
-	{
-		m_psn_cpu[2]->set_input_line(3, ASSERT_LINE);
-
-	}
-
+	
 	void sound_sci_rx_irq(int state)
 	{
 		//osd_printf_verbose("Sound SCI IRQ: %x, %x\n", state, 0);
@@ -425,130 +407,57 @@ private:
 		m_sound_cpu->set_input_line(2, CLEAR_LINE);
 	}
 
-
-	//SCI IRQ 3?
-	void psn0_sci_ack(offs_t offset, uint16_t data, uint16_t mem_mask)
+	template<int psn>
+	void psn_sci_ack(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
-		m_psn_cpu[0]->set_input_line(3, CLEAR_LINE);
+		m_psn_cpu[psn]->set_input_line(3, CLEAR_LINE);
 	}
-	void psn1_sci_ack(offs_t offset, uint16_t data, uint16_t mem_mask)
-	{
-		m_psn_cpu[1]->set_input_line(3, CLEAR_LINE);
-	}
-	void psn2_sci_ack(offs_t offset, uint16_t data, uint16_t mem_mask)
-	{
-		m_psn_cpu[2]->set_input_line(3, CLEAR_LINE);
-	}
-
-	uint16_t psn0_sci_read(offs_t offset)
-	{
-		m_psn_cpu[0]->set_input_line(3, CLEAR_LINE);
-		return (0);
-	}
-
-	uint16_t psn1_sci_read(offs_t offset)
-	{
-		m_psn_cpu[1]->set_input_line(3, CLEAR_LINE);
-		return (0);
-	}	
 	
-	uint16_t psn2_sci_read(offs_t offset)
+	template<int psn>
+	uint16_t psn_sci_read(offs_t offset)
 	{
-		m_psn_cpu[2]->set_input_line(3, CLEAR_LINE);
+		m_psn_cpu[psn]->set_input_line(3, CLEAR_LINE);
 		return (0);
 	}
 
 
-	void psn0_adc_mux_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+	template<int psn>
+	void psn_adc_mux_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
-		m_psn0_adc_mux = data & 0x7;
+		m_psn_adc_mux[psn] = data & 0x7;
 	}
 
-	void psn1_adc_mux_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-	{
-		m_psn1_adc_mux = data & 0x7;
-	}
 
-	void psn2_adc_mux_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+
+	uint16_t psn_adc_read( uint16_t port, optional_ioport_array<8>* adc_port)
 	{
-		m_psn2_adc_mux = data & 0x7;
+		
+		if (port < 4)
+		{
+			return (*adc_port)[port].read_safe(0);
+		}
+		else
+		{
+			// For port 4 and above.
+			return 0x800;
+		}
+
 	}
 
 	uint16_t psn0_adc_read(offs_t offset)
 	{
-		uint16_t port = m_psn0_adc_mux;
-		if (port < 4)
-		{
-			return m_adc_ports_psn0[port].read_safe(0);
-		}
-		else if (port == 4)
-		{
-			return 0x800; //centre
-		}
-		else if (port == 5)
-		{
-			return 0x800;//0x7ff;
-		}
-		else if (port == 6)
-		{
-			return 0x800;
-		}
-		else
-		{
-			return 0x800;//0x7ff;
-		}
-				
+		return (psn_adc_read(m_psn_adc_mux[0], &m_adc_ports_psn0));
 	}
 	uint16_t psn1_adc_read(offs_t offset)
 	{
-		uint16_t port = m_psn1_adc_mux;
-		if (port < 4)
-		{
-			return m_adc_ports_psn1[port].read_safe(0);
-		}
-		else if (port == 4)
-		{
-			return 0x800; //centre
-		}
-		else if (port == 5)
-		{
-			return 0x800;//0x7ff;
-		}
-		else if (port == 6)
-		{
-			return 0x800;
-		}
-		else
-		{
-			return 0x800;//0x7ff;
-		}
+		return (psn_adc_read(m_psn_adc_mux[1], &m_adc_ports_psn1));
 
 	}
 	uint16_t psn2_adc_read(offs_t offset)
 	{
-		uint16_t port = m_psn2_adc_mux;
-		if (port < 4)
-		{
-			return m_adc_ports_psn2[port].read_safe(0);
-		}
-		else if (port == 4)
-		{
-			return 0x800; //centre
-		}
-		else if (port == 5)
-		{
-			return 0x800;//0x7ff;
-		}
-		else if (port == 6)
-		{
-			return 0x800;
-		}
-		else
-		{
-			return 0x800;//0x7ff;
-		}
-
+		return (psn_adc_read(m_psn_adc_mux[2], &m_adc_ports_psn2));
 	}
+
 
 	
 	uint16_t psn_read_inputs_fudge(offs_t offset)
@@ -571,43 +480,20 @@ private:
 	}
 	
 
-
 	uint16_t sound_dip(offs_t offset)
 	{
-
-			return 0xffff;
-		
+			return 0xffff;		
 	}
-
 
 	u16 c140a_rom_r(offs_t offset)
 	{
-
 		uint16_t ret = 0x00;
 
-		if (m_is_dragoon)
+
 		{
-			const bool play = BIT(offset, 20);
+			ret = m_c140a_region[offset & 0x7FFFF]; // voice1 or voice2
 
-			
-
-			if (play)
-			{
-				ret = m_c140a_region[offset & 0x7FFFF]; // voice1 or voice2
-
-				ret |= (ret >> 8);
-			}
-		}
-		else
-		{
-			const bool play = BIT(offset, 19);
-
-
-			if (!play)
-			{
-				ret = m_c140a_region[((offset & 0x300000) >> 1) | (offset & 0x7ffff)];
-			}
-		
+			ret |= (ret >> 8);
 		}
 
 		return ret;
@@ -615,34 +501,15 @@ private:
 
 	u16 c140c_rom_r(offs_t offset)
 	{
-
 		uint16_t ret = 0x00;
-
-		if (m_is_dragoon)
+		
+		if (BIT(offset, 20))
 		{
-			const bool play = BIT(offset, 20);
+			ret = m_c140c_region[offset & 0x7FFFF]; // voice1 or voice2
 
-
-
-			if (play)
-			{
-				ret = m_c140c_region[offset & 0x7FFFF]; // voice1 or voice2
-
-				ret |= (ret >> 8);
-			}
+			ret |= (ret >> 8);
 		}
-		else
-		{
-			const bool play = BIT(offset, 19);
-
-
-			if (!play)
-			{
-				ret = m_c140c_region[((offset & 0x300000) >> 1) | (offset & 0x7ffff)];
-			}
-
-		}
-
+		
 		return ret;
 	}
 
@@ -650,40 +517,65 @@ private:
 	{
 		//TODO
 		uint16_t ret = 0x00;
-
-		if (m_is_dragoon)
+		
+		if (BIT(offset, 20))
 		{
-			const bool play = BIT(offset, 20);
+			ret = m_c140g_region[offset & 0x7FFFF]; // voice1 or voice2
 
-
-
-			if (play)
-			{
-				ret = m_c140g_region[offset & 0x7FFFF]; // voice1 or voice2
-
-				ret |= (ret >> 8);
-			}
+			ret |= (ret >> 8);
 		}
-		else
+		
+		return ret;
+	}
+
+
+	u16 c140a_zol_rom_r(offs_t offset)
+	{
+
+		uint16_t ret = 0x00;
+
+		if (!BIT(offset, 19))
 		{
-			const bool play = BIT(offset, 19);
-
-
-			if (!play)
-			{
-				ret = m_c140g_region[((offset & 0x300000) >> 1) | (offset & 0x7ffff)];
-			}
-
+			ret = m_c140a_region[((offset & 0x300000) >> 2) | (offset & 0x7ffff)];
 		}
 
 		return ret;
 	}
 
+	u16 c140c_zol_rom_r(offs_t offset)
+	{
+
+		uint16_t ret = 0x00;
+
+		if (!BIT(offset, 19))
+		{
+			ret = m_c140c_region[((offset & 0x300000) >> 1) | (offset & 0x7ffff)];
+		}
+
+		return ret;
+	}
+
+	u16 c140g_zol_rom_r(offs_t offset)
+	{
+		//TODO
+		uint16_t ret = 0x00;
+
+		if (!BIT(offset, 19))
+		{
+			ret = m_c140g_region[((offset & 0x300000) >> 1) | (offset & 0x7ffff)];
+		}
+		return ret;
+	}
+
+	template<int Screen>
+	void video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+	{
+		//No action on write.
+	}
+
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
 };
-
-
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(gal3_state::screen_scanline)
@@ -697,7 +589,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(gal3_state::screen_scanline)
 
 		m_rso_intc->vblank_irq_trigger();
 
-
 		m_serialprod = 1;
 		m_rso_cpu->set_input_line(4, HOLD_LINE); // UART
 
@@ -706,16 +597,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(gal3_state::screen_scanline)
 		m_psn_cpu[2]->set_input_line(4, HOLD_LINE); // ACIA (Coin inputs)
 		
 
-		if (m_framedelay == 0)
+		if (m_dsp_kick_delay == 0)
 		{
-			m_framedelay = 600;
+			m_dsp_kick_delay = 600;
 
 			m_namcos21_dsp_c67[0]->reset_kickstart();
 			m_namcos21_dsp_c67[1]->reset_kickstart();
 		}
 		else
 		{
-			m_framedelay--;
+			m_dsp_kick_delay--;
 		}
 		
 	}
@@ -728,21 +619,28 @@ void gal3_state::machine_start()
 {
 	save_item(NAME(m_led_mst));
 	save_item(NAME(m_led_slv));
-	m_framedelay = 600;
+	m_dsp_kick_delay = 600;
 }
 
 void gal3_state::video_start()
 {
-	save_item(NAME(m_video_enable));
+//	save_item(NAME(m_video_enable));
+
+	// Temporary bitmaps for overlaying 2D and 3D onto laserdisc
+	for (size_t x = 0; x < NUMSCREENS;x++)
+	{
+		m_overlay_bitmap[x].allocate(768, 528);
+		m_overlay_bitmap[x].fill(0x0000); // initial clear
+	}
 }
 
 /* One function for both sides, just index it with 0 or 1 */
-uint32_t gal3_state::screen_update_laserdiscs(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, uint8_t screen_index)
+template<int screen_index>
+uint32_t gal3_state::screen_update_laserdiscs(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-	bitmap_ind16 tmp_bitmap;
-	tmp_bitmap.allocate(768, 528);
 
-	tmp_bitmap.fill(0x0000, cliprect); // TODO : actually laserdisc layer
+	bitmap_ind16& tmp_bitmap = m_overlay_bitmap[screen_index];
+	tmp_bitmap.fill(0x0000, cliprect); 
 
 	m_c355spr[screen_index]->build_sprite_list_and_render_sprites(cliprect); // TODO : buffered?
 
@@ -787,7 +685,7 @@ uint32_t gal3_state::screen_update_laserdiscs(screen_device& screen, bitmap_rgb3
 
 	return 0;
 }
-
+/*
 uint32_t gal3_state::screen_update_ld1(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
 
@@ -803,6 +701,7 @@ uint32_t gal3_state::screen_update_ld2(screen_device& screen, bitmap_rgb32& bitm
 	screen_update_laserdiscs(screen, bitmap, cliprect, 1);	
 	return 0;
 }
+*.
 
 #ifdef DEBUG_SCREEN
 uint32_t gal3_state::screen_update_debug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -876,38 +775,7 @@ void gal3_state::led_slv_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 }
 
 
-uint16_t gal3_state::video_enable_r1()
-{
-	static uint16_t m_venabletest{ 0 };
-	m_venabletest ^= 0x1;
-	return m_venabletest;
 
-}
-
-uint16_t gal3_state::video_enable_r2()
-{
-	static uint16_t m_venabletest{ 0 };
-	m_venabletest ^= 0x1;
-	return m_venabletest;
-
-}
-
-template<int Screen>
-uint16_t gal3_state::video_enable_r()
-{
-	uint16_t data = m_video_enable[Screen];
-
-
-	return rand() & 1;
-
-	return data;
-}
-
-template<int Screen>
-void gal3_state::video_enable_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_video_enable[Screen]); // 0xff53, instead of 0x40 in namcos21
-}
 
 uint16_t gal3_state::rso_r(offs_t offset)
 {
@@ -928,8 +796,8 @@ void gal3_state::mst_cpu_map(address_map &map)
 	map(0x40000000, 0x40000001).w(FUNC(gal3_state::rso_reset_w));
 	map(0x44000000, 0x44000003).portr("DSW_CPU_mst");
 	map(0x44800000, 0x44800003).r(FUNC(gal3_state::led_mst_r)).w(FUNC(gal3_state::led_mst_w)); //LEDs
-	map(0x48000000, 0x48000003).rw(FUNC(gal3_state::maincpu_readirq1), FUNC(gal3_state::maincpu_wipeirq1));
-	map(0x4c000000, 0x4c000003).rw(FUNC(gal3_state::maincpu_readirq3), FUNC(gal3_state::maincpu_wipeirq3));
+	map(0x48000000, 0x48000003).rw(FUNC(gal3_state::maincpu_readirq<1>), FUNC(gal3_state::maincpu_wipeirq<1>));
+	map(0x4c000000, 0x4c000003).rw(FUNC(gal3_state::maincpu_readirq<3>), FUNC(gal3_state::maincpu_wipeirq<3>));
 	map(0x5fff0000, 0x5fff7fff).ram().share("share1");  //CRAM (TODO - whats pointing it here?)
 	map(0x60000000, 0x60007fff).mirror(0x10000).ram().share("share1");  //CRAM
 	map(0x80000000, 0x8007ffff).ram(); //512K Local RAM
@@ -956,7 +824,7 @@ void gal3_state::slv_cpu_map(address_map &map)
 	map(0x40000000, 0x40000003).w(FUNC(gal3_state::dsp_reset_w));
 	map(0x44000000, 0x44000003).portr("DSW_CPU_slv");
 	map(0x44800000, 0x44800003).r(FUNC(gal3_state::led_slv_r)).w(FUNC(gal3_state::led_slv_w)); //LEDs
-	map(0x48000000, 0x48000003).rw(FUNC(gal3_state::subcpu_readirq1), FUNC(gal3_state::subcpu_wipeirq1));
+	map(0x48000000, 0x48000003).rw(FUNC(gal3_state::subcpu_readirq<1>), FUNC(gal3_state::subcpu_wipeirq<1>));
     map(0x50000000, 0x50000003).ram();//?? reads 16 bits from here
 	map(0x54000000, 0x54000003).ram(); // Flashy something? TODO.
 	map(0x60000000, 0x60007fff).mirror(0x10000).ram().share("share1");
@@ -973,7 +841,7 @@ void gal3_state::slv_cpu_map(address_map &map)
 	map(0xf1720000, 0xf1720007).rw(m_c355spr[0], FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
 	map(0xf1740000, 0xf174ffff).rw(m_palette[0], FUNC(palette_device::read16), FUNC(palette_device::write16)).share("palette_1");
 	map(0xf1750000, 0xf175ffff).rw(m_palette[0], FUNC(palette_device::read16_ext), FUNC(palette_device::write16_ext)).share("palette_1_ext");
-	map(0xf1760000, 0xf1760003).rw(FUNC(gal3_state::video_enable_r1), FUNC(gal3_state::video_enable_w<0>));
+	map(0xf1760000, 0xf1760003).rw(FUNC(gal3_state::video_enable_r<0>), FUNC(gal3_state::video_enable_w<0>));
 
 
 	// Video chain 2
@@ -987,7 +855,7 @@ void gal3_state::slv_cpu_map(address_map &map)
 	map(0xf2720000, 0xf2720007).rw(m_c355spr[1], FUNC(namco_c355spr_device::position_r), FUNC(namco_c355spr_device::position_w));
 	map(0xf2740000, 0xf274ffff).rw(m_palette[1], FUNC(palette_device::read16), FUNC(palette_device::write16)).share("palette_2");
 	map(0xf2750000, 0xf275ffff).rw(m_palette[1], FUNC(palette_device::read16_ext), FUNC(palette_device::write16_ext)).share("palette_2_ext");
-	map(0xf2760000, 0xf2760003).rw(FUNC(gal3_state::video_enable_r2), FUNC(gal3_state::video_enable_w<1>));
+	map(0xf2760000, 0xf2760003).rw(FUNC(gal3_state::video_enable_r<1>), FUNC(gal3_state::video_enable_w<1>));
 
 }
 
@@ -1152,8 +1020,8 @@ void gal3_state::psn_cpu_map_0(address_map &map)
 	map(0x800004, 0x800039).ram();
 	map(0x800040, 0x800041).portr("BUTTONS_PSN0");
 
-	map(0x800014, 0x800015).w(FUNC(gal3_state::psn0_adc_mux_w));
-	map(0x80004a, 0x80004b).rw(FUNC(gal3_state::psn0_sci_read), FUNC(gal3_state::psn0_sci_ack));
+	map(0x800014, 0x800015).w(FUNC(gal3_state::psn_adc_mux_w<0>));
+	map(0x80004a, 0x80004b).rw(FUNC(gal3_state::psn_sci_read<0>), FUNC(gal3_state::psn_sci_ack<0>));
 	map(0x900060, 0x900061).r(FUNC(gal3_state::psn0_adc_read));
 	map(0x900080, 0x90008f).m(m_sci_psn[0], FUNC(namco_c139_local_device::regs_map));  // C139 18P
 	map(0xb00000, 0xb03fff).m(m_sci_psn[0], FUNC(namco_c139_local_device::data_map));
@@ -1166,8 +1034,8 @@ void gal3_state::psn_cpu_map_1(address_map& map)
 	map(0x800002, 0x800003).ram();//portr("DIP_PSN0");
 	map(0x800004, 0x800039).ram();
 	map(0x800040, 0x800041).portr("BUTTONS_PSN1");
-	map(0x800014, 0x800015).w(FUNC(gal3_state::psn1_adc_mux_w));
-	map(0x80004a, 0x80004b).rw(FUNC(gal3_state::psn1_sci_read), FUNC(gal3_state::psn1_sci_ack));
+	map(0x800014, 0x800015).w(FUNC(gal3_state::psn_adc_mux_w<1>));
+	map(0x80004a, 0x80004b).rw(FUNC(gal3_state::psn_sci_read<1>), FUNC(gal3_state::psn_sci_ack<1>));
 	map(0x900060, 0x900061).r(FUNC(gal3_state::psn1_adc_read));
 	map(0x900080, 0x90008f).m(m_sci_psn[1], FUNC(namco_c139_local_device::regs_map));
 	map(0xb00000, 0xb03fff).m(m_sci_psn[1], FUNC(namco_c139_local_device::data_map));
@@ -1180,8 +1048,8 @@ void gal3_state::psn_cpu_map_2(address_map& map)
 	map(0x800002, 0x800003).ram();//portr("DIP_PSN0");
 	map(0x800004, 0x800039).ram();
 	map(0x800040, 0x800041).portr("BUTTONS_PSN2");
-	map(0x800014, 0x800015).w(FUNC(gal3_state::psn2_adc_mux_w));
-	map(0x80004a, 0x80004b).rw(FUNC(gal3_state::psn2_sci_read), FUNC(gal3_state::psn2_sci_ack));
+	map(0x800014, 0x800015).w(FUNC(gal3_state::psn_adc_mux_w<2>));
+	map(0x80004a, 0x80004b).rw(FUNC(gal3_state::psn_sci_read<2>), FUNC(gal3_state::psn_sci_ack<2>));
 	map(0x900060, 0x900061).r(FUNC(gal3_state::psn2_adc_read));
 	map(0x900080, 0x90008f).m(m_sci_psn[2], FUNC(namco_c139_local_device::regs_map));  
 	map(0xb00000, 0xb03fff).m(m_sci_psn[2], FUNC(namco_c139_local_device::data_map));
@@ -1191,29 +1059,42 @@ void gal3_state::psn_cpu_map_2(address_map& map)
 
 void gal3_state::c140a_map(address_map& map)
 {
-
 	map.global_mask(0x7fffff); 
 	map(0x000000, 0x7fffff).r(FUNC(gal3_state::c140a_rom_r));
-
-
 }
 
 void gal3_state::c140c_map(address_map& map)
 {
 	map.global_mask(0x7fffff); 
 	map(0x000000, 0x7fffff).r(FUNC(gal3_state::c140c_rom_r));
-
 }
-
 
 
 void gal3_state::c140g_map(address_map& map)
 {
-
 	map.global_mask(0x7fffff); 
 	map(0x000000, 0x7fffff).r(FUNC(gal3_state::c140g_rom_r));
-
 }
+
+
+void gal3_state::c140a_zol_map(address_map& map)
+{
+	map.global_mask(0x7fffff);
+	map(0x000000, 0x7fffff).r(FUNC(gal3_state::c140a_zol_rom_r));
+}
+
+void gal3_state::c140c_zol_map(address_map& map)
+{
+	map.global_mask(0x7fffff);
+	map(0x000000, 0x7fffff).r(FUNC(gal3_state::c140c_zol_rom_r));
+}
+
+void gal3_state::c140g_zol_map(address_map& map)
+{
+	map.global_mask(0x7fffff);
+	map(0x000000, 0x7fffff).r(FUNC(gal3_state::c140g_zol_rom_r));
+}
+
 
 static INPUT_PORTS_START( gal3 )
 	PORT_START("DSW_CPU_mst")   //
@@ -1358,10 +1239,10 @@ static INPUT_PORTS_START( gal3 )
 
 	PORT_START("INP_PSN0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_START1) PORT_PLAYER(1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_TILT) PORT_PLAYER(1)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_SELECT) PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_TILT) PORT_PLAYER(1)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_SERVICE) PORT_PLAYER(1)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SERVICE2) PORT_PLAYER(1)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -1539,21 +1420,83 @@ void gal3_state::gal3(machine_config& config)
 	config.set_maximum_quantum(attotime::from_hz(60 * 8000)); /* 8000 CPU slices per frame */
 
 
-	SCREEN(config, m_screen_l);
-	m_screen_l->set_refresh_hz(60);
-	m_screen_l->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen_l->set_raw(1.0 * 49.152_MHz_XTAL / 4 * 2, 768, 0, 496, 264 * 2, 0, 480);
-	m_screen_l->set_video_attributes(VIDEO_SELF_RENDER);
-	m_screen_l->set_screen_update("laserdisc_1", FUNC(laserdisc_device::screen_update));
-	m_screen_l->set_default_position(1.0, 0.042000, 1.0, 0.0);
+	M68020(config, m_maincpu, 49152000 / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gal3_state::mst_cpu_map);
+	m_maincpu->set_vblank_int("screen_1", FUNC(gal3_state::irq1_line_assert));
+	TIMER(config, "scantimer").configure_scanline(FUNC(gal3_state::screen_scanline), "screen_1", 0, 1);
 
-	SCREEN(config, m_screen_r);
-	m_screen_r->set_refresh_hz(60);
-	m_screen_r->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen_r->set_raw(1.0 * 49.152_MHz_XTAL / 4 * 2, 768, 0, 496, 264 * 2, 0, 480);
-	m_screen_r->set_video_attributes(VIDEO_SELF_RENDER);
-	m_screen_r->set_screen_update("laserdisc_2", FUNC(laserdisc_device::screen_update));
+	M68020(config, m_subcpu, 49152000 / 2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &gal3_state::slv_cpu_map);
+	m_subcpu->set_vblank_int("screen_1", FUNC(gal3_state::irq1_line_assert));
+
+	M68000(config, m_rso_cpu, 49152000 / 4);
+	m_rso_cpu->set_addrmap(AS_PROGRAM, &gal3_state::rso_cpu_map);
+	//m_rso_cpu->set_vblank_int("screen_1", FUNC(gal3_state::irq5_line_hold));  /// handled via C148 IC
+
+	M68000(config, m_sound_cpu, 49152000 / 4);
+	m_sound_cpu->set_addrmap(AS_PROGRAM, &gal3_state::sound_cpu_map);
+	m_sound_cpu->set_vblank_int("screen_1", FUNC(gal3_state::irq2_line_hold));
+
+
+	//oof, a bit of a mess with that vblank to psn. Also what's going on with RSO'
+	M68000(config, m_psn_cpu[0], 16384000 / 2);
+	m_psn_cpu[0]->set_addrmap(AS_PROGRAM, &gal3_state::psn_cpu_map_0);
+	m_psn_cpu[0]->set_vblank_int("screen_1", FUNC(gal3_state::irq2_line_assert));
+	M68000(config, m_psn_cpu[1], 16384000 / 2);
+	m_psn_cpu[1]->set_addrmap(AS_PROGRAM, &gal3_state::psn_cpu_map_1);
+	m_psn_cpu[1]->set_vblank_int("screen_1", FUNC(gal3_state::irq2_line_assert));
+	M68000(config, m_psn_cpu[2], 16384000 / 2);
+	m_psn_cpu[2]->set_addrmap(AS_PROGRAM, &gal3_state::psn_cpu_map_2);
+	m_psn_cpu[2]->set_vblank_int("screen_1", FUNC(gal3_state::irq2_line_assert));
+
 	
+	NVRAM(config, "nvmem", nvram_device::DEFAULT_ALL_0);
+
+	for (size_t scn = 0; scn < 2; scn++)
+	{
+		SCREEN(config, m_screen[scn]);
+		m_screen[scn]->set_refresh_hz(60);
+		m_screen[scn]->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+		m_screen[scn]->set_raw(1.0 * 49.152_MHz_XTAL / 4 * 2, 768, 0, 496, 264 * 2, 0, 480);
+		m_screen[scn]->set_video_attributes(VIDEO_SELF_RENDER);
+
+		
+		// Palette for 2D/3D
+		PALETTE(config, m_palette[scn]).set_format(palette_device::xBRG_888, 0x10000 / 2);
+		m_palette[scn]->set_membits(16);
+
+
+		NAMCO_C355SPR(config, m_c355spr[scn], 0);
+		m_c355spr[scn]->set_screen(m_screen[scn]);
+		m_c355spr[scn]->set_palette(m_palette[scn]);
+		m_c355spr[scn]->set_color_base(0x0); // TODO : verify palette offset
+		m_c355spr[scn]->set_external_prifill(true);
+		m_c355spr[scn]->set_palette_shift(true);
+
+		NAMCOS21_3D(config, m_namcos21_3d[scn], 0);
+		m_namcos21_3d[scn]->set_depth_reverse(false);
+		m_namcos21_3d[scn]->set_num_palettes(0x8);
+		m_namcos21_3d[scn]->set_framebuffer_size(480, 480);
+		//m_namcos21_3d[scn]->set_framebuffer_size(496, 480);
+		NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67[scn], 0);
+		m_namcos21_dsp_c67[scn]->set_gametype(namcos21_dsp_c67_device::NAMCOS21_GALAXIAN3);
+
+	}
+
+	/* Dragoon */
+	m_screen[0]->set_default_position(1.042, 0.018000, 1.0, 0.0);
+	m_screen[1]->set_default_position(1.042, 0.018000, 1.0, 0.0);
+	m_c355spr[0]->set_scroll_offsets(0x12, 0x19); //10
+	m_c355spr[1]->set_scroll_offsets(0x11, 0x19); //10
+
+
+
+	m_screen[0]->set_screen_update("laserdisc_1", FUNC(laserdisc_device::screen_update));
+	m_screen[1]->set_screen_update("laserdisc_2", FUNC(laserdisc_device::screen_update));
+
+	m_namcos21_dsp_c67[0]->set_renderer_tag("namcos21_3d_1");
+	m_namcos21_dsp_c67[1]->set_renderer_tag("namcos21_3d_2");
+
 
 #ifdef DEBUG_SCREEN
 	// video chain 3 - DEBUG
@@ -1569,88 +1512,6 @@ void gal3_state::gal3(machine_config& config)
 	m_palette[2]->set_membits(16);
 #endif
 
-
-	M68020(config, m_maincpu, 49152000 / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gal3_state::mst_cpu_map);
-	m_maincpu->set_vblank_int("screen_l", FUNC(gal3_state::irq1_line_assert));
-	TIMER(config, "scantimer").configure_scanline(FUNC(gal3_state::screen_scanline), "screen_l", 0, 1);
-
-	M68020(config, m_subcpu, 49152000 / 2);
-	m_subcpu->set_addrmap(AS_PROGRAM, &gal3_state::slv_cpu_map);
-	m_subcpu->set_vblank_int("screen_l", FUNC(gal3_state::irq1_line_assert));
-
-	M68000(config, m_rso_cpu, 49152000 / 4);
-	m_rso_cpu->set_addrmap(AS_PROGRAM, &gal3_state::rso_cpu_map);
-	//m_rso_cpu->set_vblank_int("screen_l", FUNC(gal3_state::irq5_line_hold));  /// handled via C148 IC
-
-	M68000(config, m_sound_cpu, 49152000 / 4);
-	m_sound_cpu->set_addrmap(AS_PROGRAM, &gal3_state::sound_cpu_map);
-	m_sound_cpu->set_vblank_int("screen_l", FUNC(gal3_state::irq2_line_hold));
-
-
-	//oof, a bit of a mess with that vblank to psn. Also what's going on with RSO'
-	M68000(config, m_psn_cpu[0], 16384000 / 2);
-	m_psn_cpu[0]->set_addrmap(AS_PROGRAM, &gal3_state::psn_cpu_map_0);
-	m_psn_cpu[0]->set_vblank_int("screen_l", FUNC(gal3_state::irq2_line_assert));
-	M68000(config, m_psn_cpu[1], 16384000 / 2);
-	m_psn_cpu[1]->set_addrmap(AS_PROGRAM, &gal3_state::psn_cpu_map_1);
-	m_psn_cpu[1]->set_vblank_int("screen_l", FUNC(gal3_state::irq2_line_assert));
-	M68000(config, m_psn_cpu[2], 16384000 / 2);
-	m_psn_cpu[2]->set_addrmap(AS_PROGRAM, &gal3_state::psn_cpu_map_2);
-	m_psn_cpu[2]->set_vblank_int("screen_l", FUNC(gal3_state::irq2_line_assert));
-
-	
-	NVRAM(config, "nvmem", nvram_device::DEFAULT_ALL_0);
-
-	// Palette for left screen 2D/3D
-	PALETTE(config, m_palette[0]).set_format(palette_device::xBRG_888, 0x10000 / 2);
-	m_palette[0]->set_membits(16);
-
-	// Palette for right screen 2D/3D
-	PALETTE(config, m_palette[1]).set_format(palette_device::xBRG_888, 0x10000 / 2);
-	m_palette[1]->set_membits(16);
-
-	NAMCO_C355SPR(config, m_c355spr[0], 0);
-	m_c355spr[0]->set_screen(m_screen_l);
-	m_c355spr[0]->set_palette(m_palette[0]);
-	m_c355spr[0]->set_scroll_offsets(0x10, 0x19);
-	m_c355spr[0]->set_color_base(0x0); // TODO : verify palette offset
-	m_c355spr[0]->set_external_prifill(true);
-
-	NAMCOS21_3D(config, m_namcos21_3d[0], 0);
-	//m_namcos21_3d[0]->set_zz_shift_mult(11, 0x200);
-	m_namcos21_3d[0]->set_depth_reverse(false);
-	m_namcos21_3d[0]->set_num_palettes(0x8);
-//	m_namcos21_3d[0]->set_framebuffer_size(496, 480);
-	m_namcos21_3d[0]->set_framebuffer_size(480, 480);
-
-
-	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67[0], 0);
-	m_namcos21_dsp_c67[0]->set_renderer_tag("namcos21_3d_1");
-
-
-
-
-	NAMCO_C355SPR(config, m_c355spr[1], 0);
-	m_c355spr[1]->set_screen(m_screen_l);
-	m_c355spr[1]->set_palette(m_palette[1]);
-	m_c355spr[1]->set_scroll_offsets(0xa, 0x19);
-	m_c355spr[1]->set_color_base(0x0); // TODO : verify palette offset
-	m_c355spr[1]->set_external_prifill(true);
-
-
-	NAMCOS21_3D(config, m_namcos21_3d[1], 0);
-	//m_namcos21_3d[1]->set_zz_shift_mult(11, 0x200);
-	m_namcos21_3d[1]->set_depth_reverse(false);
-	m_namcos21_3d[1]->set_num_palettes(0x8);
-//	m_namcos21_3d[1]->set_framebuffer_size(496 , 480);
-	m_namcos21_3d[1]->set_framebuffer_size(480, 480);
-
-	NAMCOS21_DSP_C67(config, m_namcos21_dsp_c67[1], 0);
-	m_namcos21_dsp_c67[1]->set_renderer_tag("namcos21_3d_2");
-
-	m_namcos21_dsp_c67[0]->set_gametype(namcos21_dsp_c67_device::NAMCOS21_GALAXIAN3);
-	m_namcos21_dsp_c67[1]->set_gametype(namcos21_dsp_c67_device::NAMCOS21_GALAXIAN3);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -1690,29 +1551,30 @@ void gal3_state::gal3(machine_config& config)
 	m_uart[0]->a_tx_cb().set(m_laserdisc[0], FUNC(pioneer_ldv8000hle_device::rx_w));
 
 	PIONEER_LDV8000HLE(config, m_laserdisc[0], 0);
-	m_laserdisc[0]->set_overlay(496, 528 , FUNC(gal3_state::screen_update_ld1));
+	m_laserdisc[0]->set_overlay(496, 528 , FUNC(gal3_state::screen_update_laserdiscs<0>));
 
 	m_laserdisc[0]->add_route(0, "lspeaker", 0.4);
 	m_laserdisc[0]->add_route(1, "rspeaker", 0.4);
-	m_laserdisc[0]->set_overlay_scale(1.0f, 1.1f);
-	m_laserdisc[0]->set_overlay_position(-0.01f, 0.05f);
+	m_laserdisc[0]->set_overlay_scale(1.0f, 1.094f);
+	m_laserdisc[0]->set_overlay_position(-0.006f, 0.05f);
 
-	m_laserdisc[0]->set_screen(m_screen_l);
+	m_laserdisc[0]->set_screen(m_screen[0]);
 	m_laserdisc[0]->serial_tx().set(m_uart[0], FUNC(mc68681_device::rx_a_w));
+
 
 
 	/* Laserdisc Right */
 	m_uart[0]->b_tx_cb().set(m_laserdisc[1], FUNC(pioneer_ldv8000hle_device::rx_w));
 
 	PIONEER_LDV8000HLE(config, m_laserdisc[1], 0);
-	m_laserdisc[1]->set_overlay(496, 528, FUNC(gal3_state::screen_update_ld2));
+	m_laserdisc[1]->set_overlay(496, 528, FUNC(gal3_state::screen_update_laserdiscs<1>));
 
-	m_laserdisc[1]->set_overlay_scale(1.0f, 1.1f);
+	m_laserdisc[1]->set_overlay_scale(1.0f, 1.094f);
 	m_laserdisc[1]->set_overlay_position(0.000f, 0.05f);
 
 	m_laserdisc[1]->add_route(0, "lspeaker", 0.4);
 	m_laserdisc[1]->add_route(1, "rspeaker", 0.4);
-	m_laserdisc[1]->set_screen(m_screen_r);
+	m_laserdisc[1]->set_screen(m_screen[1]);
 	m_laserdisc[1]->serial_tx().set(m_uart[0], FUNC(mc68681_device::rx_b_w));
 
 	//C139 for remote boards from RS PCB
@@ -1730,12 +1592,12 @@ void gal3_state::gal3(machine_config& config)
 
 
 	
-	m_sci_rso[0]->irq_cb().set(FUNC(gal3_state::sci_to_rso_irq_trig_1));
-	m_sci_rso[1]->irq_cb().set(FUNC(gal3_state::sci_to_rso_irq_trig_2));
-	m_sci_rso[2]->irq_cb().set(FUNC(gal3_state::sci_to_rso_irq_trig_3));
-	m_sci_psn[0]->irq_cb().set(FUNC(gal3_state::psn1_sci_rx_irq));
-	m_sci_psn[1]->irq_cb().set(FUNC(gal3_state::psn2_sci_rx_irq));
-	m_sci_psn[2]->irq_cb().set(FUNC(gal3_state::psn3_sci_rx_irq));
+	m_sci_rso[0]->irq_cb().set(FUNC(gal3_state::sci_to_rso_irq_trig<0>));
+	m_sci_rso[1]->irq_cb().set(FUNC(gal3_state::sci_to_rso_irq_trig<1>));
+	m_sci_rso[2]->irq_cb().set(FUNC(gal3_state::sci_to_rso_irq_trig<2>));
+	m_sci_psn[0]->irq_cb().set(FUNC(gal3_state::psn_sci_rx_irq<0>));
+	m_sci_psn[1]->irq_cb().set(FUNC(gal3_state::psn_sci_rx_irq<1>));
+	m_sci_psn[2]->irq_cb().set(FUNC(gal3_state::psn_sci_rx_irq<2>));
 
 	m_sci_sound->irq_cb().set(FUNC(gal3_state::sound_sci_rx_irq));
 
@@ -1781,9 +1643,6 @@ void gal3_state::gal3(machine_config& config)
 
 	
 	NAMCO_C148(config, m_rso_intc, 0, m_rso_cpu, true);
-	//m_rso_intc->link_c148_device(m_slave_intc);
-	//m_rso_intc->out_ext1_callback().set(FUNC(namcos21_state::sound_reset_w));
-	//m_rso_intc->out_ext2_callback().set(FUNC(namcos21_state::system_reset_w));
 
 #ifdef DEBUG_SCREEN
 	NAMCO_C355SPR(config, m_c355spr[2], 0);
@@ -1797,7 +1656,37 @@ void gal3_state::gal3(machine_config& config)
 #endif
 
 
+
 }
+
+/*
+	Zolgear config
+	Slightly different positioning and higher-resolution audio
+*/
+
+void gal3_state::gal3z(machine_config& config)
+{
+	/* Dragoon */
+	gal3(config);
+
+	/* Zolgear */
+	m_screen[0]->set_default_position(1.042, 0.0100, 1.0, 0.0);
+	m_screen[1]->set_default_position(1.042, 0.008000, 1.0, 0.0);
+	m_c355spr[0]->set_scroll_offsets(0x10, 0x19); //10
+	m_c355spr[1]->set_scroll_offsets(0x0a, 0x19); //10
+	m_laserdisc[0]->set_overlay_position(0.006f, 0.05f);
+	m_laserdisc[1]->set_overlay_position(0.014f, 0.05f);
+
+
+	m_c140_16a->set_addrmap(0, &gal3_state::c140a_zol_map);
+	m_c140_16c->set_addrmap(0, &gal3_state::c140c_zol_map);
+	m_c140_16g->set_addrmap(0, &gal3_state::c140g_zol_map);
+
+
+}
+
+
+
 /*
 
 **************************************************************************************************
@@ -1909,14 +1798,13 @@ label       loc.    Device      Filename
 GLC1-SND-VOI0   13A 27c040      VOI0.BIN
 GLC1-SND-VOI2   13C 27c040      VOI2.BIN
 GLC1-SND-VOI8   10G 27c040      VOI8.BIN
-GLC1-SND-VOI9   11/12G  27c040      VOI9.BIN
+GLC1-SND-VOI9   11/12G  27c040  VOI9.BIN
 GLC1-SND-VOI10  13G 27c040      VOI10.BIN
 GLC1-SND-VOI11  14G 27c040      VOI11.BIN
 
 GLC1-SND-PRG0   1H  27c1000     PRG0.BIN
 GLC1-SND-PRG1   2H  27c1000     PRG1.BIN
-GLC1-SND-DATA1  4/5H    27c1000     DATA1.BIN
-
+GLC1-SND-DATA1  4/5H 27c1000    DATA1.BIN
 
 */
 
@@ -2137,11 +2025,10 @@ void gal3_state::gal3zlgr_init()
 
 void gal3_state::gal3_init()
 {
-	m_c355spr[1]->set_scroll_offsets(0x12, 0x18);
 	m_is_dragoon = true;
 }
 
 
 /*     YEAR  NAME     PARENT  MACHINE  INPUT  CLASS       INIT           MONITOR  COMPANY  FULLNAME                                    FLAGS */
 GAMEL( 1992, gal3,      0,     gal3,    gal3,  gal3_state, gal3_init,    ROT0,  "Namco", "Galaxian 3 - Theater 6 : Project Dragoon", MACHINE_IMPERFECT_SOUND| MACHINE_IMPERFECT_GRAPHICS, layout_dualhsxs )
-GAMEL( 1994, gal3zlgr,  0,     gal3,    gal3,  gal3_state, gal3zlgr_init, ROT0, "Namco", "Galaxian 3 - Theater 6 : Attack of the Zolgear", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS, layout_dualhsxs) 
+GAMEL( 1994, gal3zlgr,  0,     gal3z,    gal3,  gal3_state, gal3zlgr_init, ROT0, "Namco", "Galaxian 3 - Theater 6 : Attack of the Zolgear", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS, layout_dualhsxs) 
