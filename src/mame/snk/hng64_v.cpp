@@ -291,18 +291,27 @@ void hng64_state::tilemap_draw_roz_core_line(
 			u16 line = source_line_to_use;
 			xtopleft = (m_videoram[(0x40000 + (scrollbase << 4)) / 4]);
 			xmiddle = (m_videoram[(0x40004 + (scrollbase << 4)) / 4]); // middle screen point
+			ytopleft = (m_videoram[(0x40008 + (scrollbase << 4)) / 4]);
+			ymiddle = (m_videoram[(0x4000c + (scrollbase << 4)) / 4]); // middle screen point
 
 			u32 xtopleft2 = (m_videoram[(0x40000 + (line * 0x10) + (scrollbase << 4)) / 4]);
 			u32 xmiddle2 = (m_videoram[(0x40004 + (line * 0x10) + (scrollbase << 4)) / 4]); // middle screen point
+			u32 ytopleft2 = (m_videoram[(0x40008 + (line * 0x10) + (scrollbase << 4)) / 4]);
+			u32 ymiddle2 = (m_videoram[(0x4000c + (line * 0x10) + (scrollbase << 4)) / 4]); // middle screen point
 
-			if ((xtopleft2 & 0xff) == 0x00)// set to 0x00 if we should use the line data?
-				xtopleft = xtopleft2;
+			// A line value with a zero low byte is an absolute scroll position (the fatfurwa and buriki
+			// floors).  Any other low byte marks an offset to the first line's position instead, applied
+			// on top of the layer scrolling one source row per line (the xrally mist in the tunnel).
+			// TODO: verify the flag and the per-line step against hardware
+			auto const apply_line = [] (u32 base, u32 value, u32 step) -> u32
+			{
+				return ((value & 0xff) == 0x00) ? value : (base + (value & ~u32(0xff)) + step);
+			};
 
-			if ((xmiddle2 & 0xff) == 0x00) // also set to 0x00 if we should use the line data?
-				xmiddle = xmiddle2;
-
-			ytopleft = (m_videoram[(0x40008 + (line * 0x10) + (scrollbase << 4)) / 4]);
-			ymiddle = (m_videoram[(0x4000c + (line * 0x10) + (scrollbase << 4)) / 4]); // middle screen point
+			xtopleft = apply_line(xtopleft, xtopleft2, 0);
+			xmiddle = apply_line(xmiddle, xmiddle2, 0);
+			ytopleft = apply_line(ytopleft, ytopleft2, u32(line) << 16);
+			ymiddle = apply_line(ymiddle, ymiddle2, u32(line) << 16);
 		}
 
 		if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
