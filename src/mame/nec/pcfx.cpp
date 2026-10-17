@@ -50,6 +50,7 @@ protected:
 
 private:
 	void int_w(offs_t line, u8 state);
+	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	template <int Pad> u16 pad_r(offs_t offset);
 	template <int Pad> void pad_w(offs_t offset, u16 data);
@@ -57,6 +58,11 @@ private:
 	[[maybe_unused]] void extio_w(offs_t offset, u8 data);
 
 	template <int Pad> TIMER_CALLBACK_MEMBER(pad_func);
+
+	u16 timer_r(offs_t offset);
+	void timer_w(offs_t offset, u16 data);
+	TIMER_CALLBACK_MEMBER(timer_expired);
+	u32 timer_effective_period() const { return (m_timer_period ? m_timer_period : 0x10000) * 15; }
 
 	void pcfx_io(address_map &map) ATTR_COLD;
 	void pcfx_mem(address_map &map) ATTR_COLD;
@@ -70,6 +76,10 @@ private:
 
 	pcfx_pad_t m_pad;
 	emu_timer *m_pad_timers[2]{};
+
+	u16 m_timer_control = 0;
+	u16 m_timer_period = 0;
+	emu_timer *m_timer = nullptr;
 
 	u8 m_bram_control = 0;
 	std::unique_ptr<u8[]> m_nvram_ptr;
@@ -163,6 +173,64 @@ void pcfx_state::pad_w(offs_t offset, u16 data)
 	}
 }
 
+/*
+ * Timer
+ * counts down in units of 15 master clocks, reloads from the period register
+ *
+ * $f00 control
+ * ---- ---- ---- -x-- interrupt request (write 0 to acknowledge)
+ * ---- ---- ---- --x- counter enable
+ * ---- ---- ---- ---x interrupt enable
+ * $f80 period (0 = 65536)
+ * $fc0 counter (read only)
+ */
+u16 pcfx_state::timer_r(offs_t offset)
+{
+	switch (offset & 0x30)
+	{
+		case 0x00:
+			return m_timer_control;
+		case 0x20:
+			return m_timer_period;
+		case 0x30:
+		{
+			if (!BIT(m_timer_control, 1))
+				return 0;
+			const u64 clocks = m_maincpu->attotime_to_clocks(m_timer->remaining());
+			return (clocks + 14) / 15;
+		}
+	}
+	return 0;
+}
+
+void pcfx_state::timer_w(offs_t offset, u16 data)
+{
+	switch (offset & 0x30)
+	{
+		case 0x00:
+			if (!BIT(m_timer_control, 1) && BIT(data, 1))
+				m_timer->adjust(m_maincpu->clocks_to_attotime(timer_effective_period()));
+			else if (!BIT(data, 1))
+				m_timer->adjust(attotime::never);
+			m_timer_control = data & 7;
+			m_intc->irq_w<9>(BIT(m_timer_control, 2) ? ASSERT_LINE : CLEAR_LINE);
+			break;
+		case 0x20:
+			m_timer_period = data;
+			break;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(pcfx_state::timer_expired)
+{
+	m_timer->adjust(m_maincpu->clocks_to_attotime(timer_effective_period()));
+	if (BIT(m_timer_control, 0))
+	{
+		m_timer_control |= 4;
+		m_intc->irq_w<9>(ASSERT_LINE);
+	}
+}
+
 void pcfx_state::pcfx_mem(address_map &map)
 {
 	map.unmap_value_high();
@@ -205,7 +273,7 @@ void pcfx_state::pcfx_io(address_map &map)
 		})
 	);
 	map(0x00000e00, 0x00000eff).rw(m_intc, FUNC(pcfx_intc_device::read), FUNC(pcfx_intc_device::write)).umask32(0x0000ffff);
-//  map(0x00000f00, 0x00000fff).noprw(); // Timer
+	map(0x00000f00, 0x00000fff).rw(FUNC(pcfx_state::timer_r), FUNC(pcfx_state::timer_w)).umask32(0x0000ffff);
 //  map(0x00500000, 0x005000ff) Aurora mirror
 //  map(0x00600000, 0x006fffff).r(FUNC(pcfx_state::scsi_ctrl_r)); // SCSI control for EXTIO
 //  map(0x00700000, 0x007fffff).rom().region("scsi_rom", 0); // EXTIO ROM area
@@ -253,17 +321,40 @@ void pcfx_state::machine_start()
 
 	m_pad_timers[0] = timer_alloc(FUNC(pcfx_state::pad_func<0>), this);
 	m_pad_timers[1] = timer_alloc(FUNC(pcfx_state::pad_func<1>), this);
+	m_timer = timer_alloc(FUNC(pcfx_state::timer_expired), this);
 
 	m_nvram_ptr = make_unique_clear<u8[]>(0x8000);
 	subdevice<nvram_device>("nvram")->set_base(&m_nvram_ptr[0], 0x8000);
 
 	save_pointer(NAME(m_nvram_ptr), 0x8000);
 	save_item(NAME(m_bram_control));
+	save_item(NAME(m_timer_control));
+	save_item(NAME(m_timer_period));
 }
 
 void pcfx_state::machine_reset()
 {
 	m_bram_control = 0;
+	m_timer_control = 0;
+	m_timer_period = 0;
+	m_timer->adjust(attotime::never);
+	m_intc->irq_w<9>(CLEAR_LINE);
+}
+
+// default backup RAM contents: an empty, formatted "PCFXSram" volume
+void pcfx_state::nvram_init(nvram_device &nvram, void *data, size_t size)
+{
+	static const u8 header[] =
+	{
+		0x24, 0x8a, 0xdf, 0x50, 0x43, 0x46, 0x58, 0x53, 0x72, 0x61, 0x6d, 0x80, 0x00, 0x01, 0x01, 0x00,
+		0x01, 0x40, 0x00, 0x00, 0x01, 0xf9, 0x03, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00
+	};
+	static const u8 fat[] = { 0xf9, 0xff, 0xff };
+
+	u8 *const bram = reinterpret_cast<u8 *>(data);
+	std::fill_n(bram, size, 0);
+	std::copy(std::begin(header), std::end(header), &bram[0x00]);
+	std::copy(std::begin(fat), std::end(fat), &bram[0x80]);
 }
 
 void pcfx_state::int_w(offs_t line, u8 state)
@@ -281,7 +372,7 @@ void pcfx_state::pcfx(machine_config &config)
 	PCFX_INTC(config, m_intc);
 	m_intc->int_cb().set(FUNC(pcfx_state::int_w));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, "nvram").set_custom_handler(FUNC(pcfx_state::nvram_init));
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(m_huc6261, FUNC(huc6261_device::screen_update));
