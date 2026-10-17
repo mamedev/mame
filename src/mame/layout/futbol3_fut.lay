@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:
+Gaelco 'Futbol' pinball: backglass displays and indicators, laid out like the real backglass without artwork.
+-->
+<mamelayout version="2">
+
+	<element name="background">
+		<rect><color red="0.06" green="0.06" blue="0.07" /></rect>
+	</element>
+
+	<element name="panel">
+		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.12" blue="0.06" /></led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.22" green="0.04" blue="0.04" /></disk>
+		<disk state="1"><color red="1.0" green="0.18" blue="0.12" /></disk>
+	</element>
+
+	<element name="text_local"><text string="LOCAL"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_away"><text string="VISITANTE"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="text_knock"><text string="DERRIBOS"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_center"><text string="CENTRAL"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_turn"><text string="TURNO"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_credit"><text string="CREDITO"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_time"><text string="TIEMPO"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+
+	<view name="Backglass Displays">
+		<bounds x="0" y="0" width="400" height="166" />
+		<element ref="background"><bounds x="0" y="0" width="400" height="166" /></element>
+
+		<!-- home score and knockdowns -->
+		<element ref="panel"><bounds x="14" y="6" width="100" height="74" /></element>
+		<element name="score_home0" ref="digit"><bounds x="20" y="12" width="42" height="62" /></element>
+		<element name="score_home1" ref="digit"><bounds x="66" y="12" width="42" height="62" /></element>
+		<element ref="text_local"><bounds x="14" y="82" width="100" height="12" /></element>
+		<element name="led_home" ref="led"><bounds x="120" y="30" width="12" height="12" /></element>
+
+		<element ref="panel"><bounds x="28" y="100" width="72" height="50" /></element>
+		<element name="knock_home0" ref="digit"><bounds x="33" y="104" width="30" height="42" /></element>
+		<element name="knock_home1" ref="digit"><bounds x="65" y="104" width="30" height="42" /></element>
+		<element ref="text_knock"><bounds x="18" y="152" width="92" height="11" /></element>
+
+		<!-- credit and time LEDs, central display -->
+		<element ref="text_credit"><bounds x="148" y="8" width="48" height="11" /></element>
+		<element ref="text_time"><bounds x="204" y="8" width="48" height="11" /></element>
+		<element name="led_credit" ref="led"><bounds x="164" y="22" width="16" height="16" /></element>
+		<element name="led_time" ref="led"><bounds x="220" y="22" width="16" height="16" /></element>
+
+		<element ref="panel"><bounds x="152" y="44" width="96" height="62" /></element>
+		<element name="center0" ref="digit"><bounds x="158" y="48" width="40" height="54" /></element>
+		<element name="center1" ref="digit"><bounds x="202" y="48" width="40" height="54" /></element>
+		<element ref="text_center"><bounds x="152" y="108" width="96" height="11" /></element>
+
+		<!-- away score and knockdowns -->
+		<element ref="panel"><bounds x="286" y="6" width="100" height="74" /></element>
+		<element name="score_away0" ref="digit"><bounds x="292" y="12" width="42" height="62" /></element>
+		<element name="score_away1" ref="digit"><bounds x="338" y="12" width="42" height="62" /></element>
+		<element ref="text_away"><bounds x="286" y="82" width="100" height="12" /></element>
+		<element name="led_away" ref="led"><bounds x="268" y="30" width="12" height="12" /></element>
+		<element ref="text_turn"><bounds x="170" y="126" width="60" height="10" /></element>
+
+		<element ref="panel"><bounds x="300" y="100" width="72" height="50" /></element>
+		<element name="knock_away0" ref="digit"><bounds x="305" y="104" width="30" height="42" /></element>
+		<element name="knock_away1" ref="digit"><bounds x="337" y="104" width="30" height="42" /></element>
+		<element ref="text_knock"><bounds x="290" y="152" width="92" height="11" /></element>
+	</view>
+
+</mamelayout>
