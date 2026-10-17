@@ -28,49 +28,49 @@ enum tlcs900_inputs
 };
 
 
-enum
-{
-	TLCS900_PC=1, TLCS900_SR,
-	TLCS900_XWA0, TLCS900_XBC0, TLCS900_XDE0, TLCS900_XHL0,
-	TLCS900_XWA1, TLCS900_XBC1, TLCS900_XDE1, TLCS900_XHL1,
-	TLCS900_XWA2, TLCS900_XBC2, TLCS900_XDE2, TLCS900_XHL2,
-	TLCS900_XWA3, TLCS900_XBC3, TLCS900_XDE3, TLCS900_XHL3,
-	TLCS900_XIX, TLCS900_XIY, TLCS900_XIZ, TLCS900_XNSP, TLCS900_XSSP,
-	TLCS900_DMAS0, TLCS900_DMAS1, TLCS900_DMAS2, TLCS900_DMAS3,
-	TLCS900_DMAD0, TLCS900_DMAD1, TLCS900_DMAD2, TLCS900_DMAD3,
-	TLCS900_DMAC0, TLCS900_DMAC1, TLCS900_DMAC2, TLCS900_DMAC3,
-	TLCS900_DMAM0, TLCS900_DMAM1, TLCS900_DMAM2, TLCS900_DMAM3
-};
-
-
-/* Storage locations that are not registers.  m_reg1 and m_reg2 hold one of
-   these values, or the selector byte of a register in the encoding that
-   get_reg8/get_reg16/get_reg32 accept; values below 0x100 always select a
-   register. */
-enum e_regsel : uint16_t
-{
-	regsel_sr = 0x100,  /* status register - F is its low byte */
-	regsel_f2,          /* alternate flag register F' */
-	regsel_intnest,     /* interrupt nesting count */
-	regsel_dmam0, regsel_dmam1, regsel_dmam2, regsel_dmam3,
-	regsel_dmac0, regsel_dmac1, regsel_dmac2, regsel_dmac3,
-	regsel_dmas0, regsel_dmas1, regsel_dmas2, regsel_dmas3,
-	regsel_dmad0, regsel_dmad1, regsel_dmad2, regsel_dmad3,
-	regsel_dummy         /* illegal/unknown register references */
-};
-
-
 class tlcs900_device : public cpu_device
 {
 public:
+	enum
+	{
+		TLCS900_PC=1, TLCS900_SR,
+		TLCS900_XWA0, TLCS900_XBC0, TLCS900_XDE0, TLCS900_XHL0,
+		TLCS900_XWA1, TLCS900_XBC1, TLCS900_XDE1, TLCS900_XHL1,
+		TLCS900_XWA2, TLCS900_XBC2, TLCS900_XDE2, TLCS900_XHL2,
+		TLCS900_XWA3, TLCS900_XBC3, TLCS900_XDE3, TLCS900_XHL3,
+		TLCS900_XIX, TLCS900_XIY, TLCS900_XIZ, TLCS900_XNSP, TLCS900_XSSP,
+		TLCS900_DMAS0, TLCS900_DMAS1, TLCS900_DMAS2, TLCS900_DMAS3,
+		TLCS900_DMAD0, TLCS900_DMAD1, TLCS900_DMAD2, TLCS900_DMAD3,
+		TLCS900_DMAC0, TLCS900_DMAC1, TLCS900_DMAC2, TLCS900_DMAC3,
+		TLCS900_DMAM0, TLCS900_DMAM1, TLCS900_DMAM2, TLCS900_DMAM3
+	};
+
+
 	// configuration helpers
 	void set_am8_16(int am8_16) { m_am8_16 = am8_16; }
 
 protected:
+	/* Storage locations that are not registers.  m_reg1 and m_reg2 hold one of
+	   these values, or the selector byte of a register in the encoding that
+	   get_reg8/get_reg16/get_reg32 accept; values below 0x100 always select a
+	   register. */
+	enum e_regsel : uint16_t
+	{
+		regsel_sr = 0x100,  /* status register - F is its low byte */
+		regsel_f2,          /* alternate flag register F' */
+		regsel_intnest,     /* interrupt nesting count */
+		regsel_dmam0, regsel_dmam1, regsel_dmam2, regsel_dmam3,
+		regsel_dmac0, regsel_dmac1, regsel_dmac2, regsel_dmac3,
+		regsel_dmas0, regsel_dmas1, regsel_dmas2, regsel_dmas3,
+		regsel_dmad0, regsel_dmad1, regsel_dmad2, regsel_dmad3,
+		regsel_dummy         /* illegal/unknown register references */
+	};
+
+
 	// construction/destruction
 	tlcs900_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 

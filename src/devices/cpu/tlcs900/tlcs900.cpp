@@ -15,6 +15,8 @@ TODO:
 #include "dasm900.h"
 
 #include <algorithm>
+#include <bit>
+#include <type_traits>
 
 
 tlcs900_device::tlcs900_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
