@@ -57,22 +57,48 @@ TILE_GET_INFO_MEMBER(m62_bkungfu_state::get_bkungfu_bg_tile_info)
 {
 	int code = m_bkungfu_tileram[(tile_index << 1)];
 	int color = m_bkungfu_tileram[(tile_index << 1) | 1];
+	int tile = code | ((color & 0xe0) << 3);
+	int is_hud = (tile_index / 256) < 6;
+	// Game Over and other "pop-up" messages
+	int is_msg = (tile >= 0x320 && tile <= 0x35F);
 
-	tileinfo.set(0, code | ((color & 0xe0) << 3) | (m_kidniki_background_bank << 11), color & 0x1f, 0);
+	tileinfo.set(0, tile | (m_kidniki_background_bank << 11), color & 0x1f, 0);
 
+	// Full high priority tiles for hud and pop up messages
+	if(is_hud || is_msg)
+		tileinfo.group = 2;
 	// The title flame uses palette pair 0x0d and is visibly behind the player
 	// sprite in the reference footage.  Beyond Kung-Fu therefore has the M62
 	// tile-priority threshold strapped one step above Kung-Fu Master: only
 	// palette pairs 0x0e-0x0f (colors 0x1c-0x1f) cover sprites.
-	if ((tile_index / 256) < 6 || ((color & 0x1f) >> 1) > 0x0d)
-		tileinfo.category = 1;
+
+	// Partial high priority based on pen
+	// You can see this in effect where dragons descend from ceiling, body should appear underneath.
+	// Similary in the floor levels various sprites should be seen through the window bars.
+	else if (((color & 0x1f) >> 1) > 0x0d)
+		tileinfo.group = 1;
 	else
-		tileinfo.category = 0;
+		tileinfo.group = 0;
 }
 
 void m62_bkungfu_state::video_start()
 {
+	m_is_bkungfu = true;
 	m62_start(tilemap_get_info_delegate(*this, FUNC(m62_bkungfu_state::get_bkungfu_bg_tile_info)), 32, 0, 8, 8, 256, 32);
+
+	// Group 0 - Low priority tiles
+	for (int pen = 0; pen <= 7; pen++)
+		m_bg_tilemap->map_pen_to_layer(0, pen, TILEMAP_PIXEL_LAYER1);
+
+	// Group 1 - Partial high priority tiles (ceiling trim, window bars, doorways)
+	for (int pen = 0; pen <= 3; pen++)
+		m_bg_tilemap->map_pen_to_layer(1, pen, TILEMAP_PIXEL_LAYER1);
+	for (int pen = 4; pen <= 7; pen++)
+		m_bg_tilemap->map_pen_to_layer(1, pen, TILEMAP_PIXEL_LAYER0);
+
+	// Group 2 - Full high priority tiles (HUD & Popup Message Boxes)
+	for (int pen = 0; pen <= 7; pen++)
+		m_bg_tilemap->map_pen_to_layer(2, pen, TILEMAP_PIXEL_LAYER0);
 }
 
 

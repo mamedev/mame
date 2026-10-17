@@ -62,6 +62,7 @@ protected:
 
 	tilemap_t*             m_bg_tilemap = nullptr;
 	uint8_t                m_kidniki_background_bank = 0;
+	bool                   m_is_bkungfu = false;
 
 	void m62_flipscreen_w(uint8_t data);
 	void m62_hscroll_low_w(uint8_t data);
