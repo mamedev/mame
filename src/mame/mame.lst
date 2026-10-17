@@ -33429,6 +33429,9 @@ quizoa
 quizpun
 quizpun2
 
+@source:misc/ramstar.cpp
+ramstar
+
 @source:misc/rawthrillspc.cpp
 doodljmp
 fnf
@@ -44502,9 +44505,6 @@ qmsirius
 
 @source:skeleton/qtsbc.cpp
 qtsbc
-
-@source:skeleton/ramstar.cpp
-ramstar
 
 @source:skeleton/rd100.cpp
 rd100
