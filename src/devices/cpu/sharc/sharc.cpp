@@ -567,6 +567,9 @@ void adsp21062_device::device_start()
 	assert(m_blocks[0].length() == m_blocks[1].length());
 	assert(std::has_single_bit(m_blocks[0].length()));
 
+	for (auto &block : m_blocks)
+		std::fill(std::begin(block), std::end(block), 0);
+
 	space(AS_PROGRAM).specific(m_program);
 	space(AS_DATA).specific(m_data);
 
@@ -926,9 +929,6 @@ void adsp21062_device::device_start()
 
 void adsp21062_device::device_reset()
 {
-	for (auto &block : m_blocks)
-		std::fill(std::begin(block), std::end(block), 0);
-
 	switch (m_boot_mode)
 	{
 		case BOOT_MODE_EPROM:
