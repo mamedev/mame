@@ -37,7 +37,7 @@
 #define LOG_DRAM        (1U << 7)
 #define LOG_SIM         (1U << 8)
 #define LOG_DMA         (1U << 9)
-#define VERBOSE         ( LOG_DEBUG | LOG_UART | LOG_SWDT | LOG_MBUS | LOG_DRAM | LOG_SIM | LOG_DMA | LOG_TIMER )
+#define VERBOSE         0
 #include "logmacro.h"
 
 #define INT_LEVEL(N)    ((N&0x1c) >> 2)
@@ -286,12 +286,16 @@ void mcf5206e_device::device_start()
 
 	save_item(NAME(m_ppddr));
 	save_item(NAME(m_ppdat_out));
+	save_item(NAME(m_mbar));
 
+	m_sim_levels = 0;
+	save_item(NAME(m_sim_levels));
 }
 
 void mcf5206e_device::device_reset()
 {
 	m68000_musashi_device::device_reset();
+	m_sim_levels = 0;          // the core cleared its interrupt lines
 	m_timer[0]->reset();
 	m_timer[1]->reset();
 	m_uart[0]->reset();
@@ -530,18 +534,12 @@ coldfire_sim_device::coldfire_sim_device(const machine_config &mconfig, const ch
 	device_t(mconfig, COLDFIRE_SIM, tag, owner, clock)
 	, irq_vector_cb(*this, (u8)EXCEPTION_BUS_ERROR)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
-	, m_swdt(*this, "watchdog")
 {
-}
-
-void coldfire_sim_device::device_add_mconfig(machine_config &config)
-{
-	WATCHDOG_TIMER(config, m_swdt);
 }
 
 void coldfire_sim_device::device_start()
 {
-	m_swdt->watchdog_enable(0);
+	m_swt_reset = false;
 	m_timer_swdt = timer_alloc( FUNC( coldfire_sim_device::swdt_callback ), this ); // For interrupt version
 
 	save_item(NAME(m_simr));
@@ -662,7 +660,7 @@ void coldfire_sim_device::icr_w(offs_t offset, u8 data)
 		case 14: m_icr[offset] = (data & 0x9f); break;
 		default: logerror("%s: Implausible ICR offset received: %d", this->machine().describe_context(), offset);
 	}
-	update_internal_levels();   // SIM-1: a new level for a pending source
+	update_internal_levels();   // a new level for a pending source
 	//printf("%d %02x -> %02x\n", offset, data, m_icr[offset]);
 	//icr_info(m_icr[offset]);
 }
@@ -672,7 +670,7 @@ void coldfire_sim_device::imr_w(u16 data)
 {
 	m_imr = (data & 0xfffe);
 	LOGMASKED(LOG_DEBUG, "%s: (Interrupt Mask Register) IMR_w %04x\n", this->machine().describe_context(), data);
-	update_internal_levels();   // SIM-1
+	update_internal_levels();
 }
 
 void coldfire_sim_device::icr_info(u8 icr)
@@ -715,17 +713,18 @@ void mcf5206e_device::sim_set_internal_levels(u8 mask)
 	const u8 changed = mask ^ m_sim_levels;
 	m_sim_levels = mask;
 	for (int l = 1; l <= 7; l++)
+	{
 		if (BIT(changed, l))
 			m68000_musashi_device::execute_set_input(l, BIT(m_sim_levels, l) ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 void mcf5206e_device::execute_set_input(int inputnum, int state)
 {
 	if (inputnum >= 1 && inputnum <= 7)
 	{
-		// IRQ-1: IRQ1/4/7 pins (PAR in IRQ mode) set their IPR bit while asserted; the SIM presents the ICR level to
-		// the core only while the IMR bit is clear (UM 8.2), see coldfire_sim_device::update_internal_levels
-		BITWRITE(m_ext_levels, inputnum, state != CLEAR_LINE);
+		// IRQ1/4/7 pins (PAR in IRQ mode) hold their IPR bit while asserted; the SIM presents the ICR level to the core
+		// only while the IMR bit is clear (UM 8.2), see coldfire_sim_device::update_internal_levels
 		if (inputnum == 1 || inputnum == 4 || inputnum == 7)
 			m_sim->set_ipr(inputnum, state);
 	}
@@ -769,9 +768,6 @@ u8 coldfire_sim_device::interrupt_callback(offs_t level)
 		if(!this->machine().side_effects_disabled()) logerror("%s: Spurious interrupt detected: %u\n", this->machine().describe_context(), ipl);
 		return EXCEPTION_SPURIOUS_INTERRUPT;
 	}
-
-	if (highest_priority_device < WATCHDOG_IRQ)
-		BITWRITE(m_ipr, ipl, 0);   // SIM-1: external requests only - an internal one is cleared by its source
 
 	u8 vector = 0xff;
 
@@ -829,71 +825,28 @@ u8 coldfire_sim_device::interrupt_callback(offs_t level)
 	return vector;
 }
 
-/*  SIM-1 (2026-10-09), MCF5206e UM 8.2.5 / 8.3.2.4-5, RENDERED pages 215, 221-222 (printed 8-5, 8-11, 8-12):
-    "For internal peripherals the corresponding bit in the IPR is set the CLK cycle after the internal interrupt is
-    asserted and is cleared when the internal interrupt is cleared"; "When a masked interrupt occurs, the
-    corresponding bit in the IPR is still set ... but no interrupt request is passed to the core processor";
-    "The interrupt controller ... outputs the highest priority unmasked pending interrupt to the ColdFire core."
-    So the core's level is recomputed from IPR, IMR and the ICRs whenever any of them changes. The previous code
-    raised the line only at the moment of a request and only if unmasked, so a request that arrived while IMR
-    masked it was never delivered (the gamtor kernel masks through IMR constantly: its EEPROM driver stalled). */
+/*  The core's level is recomputed from IPR, IMR and the ICRs whenever any of them changes (UM 8.2.5, 8.3.2.4,
+    8.3.2.5): a masked request still sets its IPR bit, and the controller outputs the highest priority unmasked
+    pending interrupt to the core. */
 void coldfire_sim_device::update_internal_levels()
 {
 	u8 mask = 0;
 	for (int i = EXTERNAL_IPL_1; i <= DMA_1_IRQ; i++)
+	{
 		if (BIT(m_ipr, i) && !BIT(m_imr, i))
 		{
 			const u8 level = INT_LEVEL(m_icr[i - 1]);
 			if (level)
 				mask |= 1 << level;
 		}
+	}
 	m_maincpu->sim_set_internal_levels(mask);
 }
 
 void coldfire_sim_device::set_interrupt(int interrupt, int state)
 {
-	BITWRITE(m_ipr, interrupt, ((state == CLEAR_LINE) ? 0 : 1));
-	if (interrupt >= WATCHDOG_IRQ)
-	{
-		update_internal_levels();   // SIM-1: internal sources
-		return;
-	}
-
-	//LOGMASKED(LOG_DEBUG, "%s: set_interrupt(%u, %u): %x, %d, %d\n", this->machine().describe_context(), interrupt, state, m_ipr, BIT(m_imr, interrupt), m_imr & interrupt);
-
-	//printf("%d %d -> %04x %04x\n", interrupt, state, m_imr, m_ipr);
-
-	// IMR enables interrupts when bit is 0
-	if(state != CLEAR_LINE)
-	{
-		if(!BIT(m_imr, interrupt))
-		{
-			u8 icr = 0;
-			switch (interrupt)
-			{
-				case EXTERNAL_IPL_1: icr = m_icr[ICR1]; break;
-				case EXTERNAL_IPL_2: icr = m_icr[ICR2]; break;
-				case EXTERNAL_IPL_3: icr = m_icr[ICR3]; break;
-				case EXTERNAL_IPL_4: icr = m_icr[ICR4]; break;
-				case EXTERNAL_IPL_5: icr = m_icr[ICR5]; break;
-				case EXTERNAL_IPL_6: icr = m_icr[ICR6]; break;
-				case EXTERNAL_IPL_7: icr = m_icr[ICR7]; break;
-				case WATCHDOG_IRQ:  icr = m_icr[ICR_SWDT]; break;
-				case TIMER_1_IRQ:   icr = m_icr[ICR_TMR1]; break;   // Always autovector
-				case TIMER_2_IRQ:   icr = m_icr[ICR_TMR2]; break;   // Always autovector
-				case MBUS_IRQ:      icr = m_icr[ICR_MBUS]; break;   // Always autovector
-				case UART_1_IRQ:    icr = m_icr[ICR_UART1]; break;
-				case UART_2_IRQ:    icr = m_icr[ICR_UART2]; break;
-				case DMA_0_IRQ:     icr = m_icr[ICR_DMA0];  break;
-				case DMA_1_IRQ:     icr = m_icr[ICR_DMA1];  break;
-				default:
-					logerror("%s: Unknown device trying to set interrupt level: %u\n", this->machine().describe_context(), interrupt);
-					return;
-			}
-
-			m_maincpu->set_input_line(INT_LEVEL(icr), ASSERT_LINE);
-		}
-	}
+	BITWRITE(m_ipr, interrupt, (state == CLEAR_LINE) ? 0 : 1);
+	update_internal_levels();
 }
 
 /* Reset status */
@@ -1196,10 +1149,6 @@ void coldfire_mbus_device::device_start()
 	save_item(NAME(m_mfdr));
 	save_item(NAME(m_mbdr));
 
-	save_item(NAME(m_tx_in_progress));
-	save_item(NAME(m_clk_state));
-	save_item(NAME(m_tx_bit));
-	save_item(NAME(m_tx_out));
 	save_item(NAME(m_tx_in));
 	save_item(NAME(m_sda_out));
 }
@@ -1212,11 +1161,7 @@ void coldfire_mbus_device::device_reset()
 	m_mbsr = 0x81;
 	m_mbdr = 0x00;
 
-	m_tx_in_progress = false;
-	m_clk_state = 1;
-	m_tx_bit = 0;
-	m_tx_out = 0;
-	m_tx_in = 0;
+	m_tx_in = 1;
 	m_sda_out = 1;
 
 	m_timer_mbus->adjust(attotime::never);
@@ -1233,23 +1178,24 @@ void coldfire_mbus_device::mbus_map(address_map &map)
 	map(0x10, 0x10).rw(FUNC(coldfire_mbus_device::mbdr_r), FUNC(coldfire_mbus_device::mbdr_w));
 }
 
-/*  MBUS-1 (2026-10-09), MCF5206e User's Manual section 13, RENDERED PDF pages 381-394 (printed 13-1..13-14).
+/*  M-Bus, MCF5206e User's Manual section 13. Master mode only: the boards this core runs on have one bus master.
+    A byte takes nine SCL periods (eight bits and the acknowledge, figure 13-2); SCL = CPU clock / the MFDR
+    divider (table 13-2). The bits are played to the slaves at the end of that time, where MCF and MIF are set
+    "at the falling edge of the 9th clock" (13.5.4). Slave mode, the address match (MAAS/SRW) and multi-master
+    arbitration are not emulated: a START while MBB is set only reports MAL (13.5.4). */
+namespace {
 
-    Master mode only - the boards this core runs on have one bus master. A byte takes nine SCL periods
-    (eight bits and the acknowledge, figure 13-2); SCL = CPU clock / the MFDR divider (table 13-2). The
-    electrical sequence is played to the slaves at the END of that time, where MCF and MIF are set "at the
-    falling edge of the 9th clock" (13.5.4); the slaves see the same bits in the same order.
-    STATED: slave mode, the address match (MAAS/SRW) and multi-master arbitration are not modelled - a
-    START while MBB is set only reports MAL, as 13.5.4 item 3 describes. */
-static const u16 s_mbus_divider[64] = {   // table 13-2, MBC5-0 -> divider
+constexpr u16 MBUS_DIVIDER[64] = {   // table 13-2, MBC5-0 -> divider
 	  28,   30,   34,   40,   44,   48,   56,   68,   80,   88,  104,  128,  144,  160,  192,  240,
 	 288,  320,  384,  480,  576,  640,  768,  960, 1152, 1280, 1536, 1920, 2304, 2560, 3072, 3840,
 	  20,   22,   24,   26,   28,   32,   36,   40,   48,   56,   64,   72,   80,   96,  112,  128,
 	 160,  192,  224,  256,  320,  384,  448,  512,  640,  768,  896, 1024, 1280, 1536, 1792, 2048 };
 
+} // anonymous namespace
+
 void coldfire_mbus_device::bus_sda(int state) { m_sda_out = state ? 1 : 0; write_sda(m_sda_out); }
 void coldfire_mbus_device::bus_scl(int state) { write_scl(state ? 1 : 0); }
-int  coldfire_mbus_device::bus_sda_in() { return m_sda_out & (read_sda() ? 1 : 0); }
+int  coldfire_mbus_device::bus_sda_in() { return m_sda_out & (read_sda() ? 1 : 0) & (m_tx_in ? 1 : 0); }
 // START: SDA high-to-low while SCL is high (13.4.1); also the repeated START (13.4.4)
 void coldfire_mbus_device::bus_start() { bus_sda(1); bus_scl(1); bus_sda(0); bus_scl(0); }
 // STOP: SDA low-to-high while SCL is high (13.4.5)
@@ -1264,7 +1210,7 @@ void coldfire_mbus_device::update_irq()
 void coldfire_mbus_device::start_byte()
 {
 	m_mbsr &= ~MCF;                                    // "While one byte of data is being transferred, this bit is cleared"
-	const u32 div = s_mbus_divider[m_mfdr & 0x3f];
+	const u32 div = MBUS_DIVIDER[m_mfdr & 0x3f];
 	m_timer_mbus->adjust(attotime::from_ticks(9 * div, clock()));
 }
 
