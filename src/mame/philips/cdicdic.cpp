@@ -843,11 +843,6 @@ void cdicdic_device::process_disc_sector()
 		{
 			play_cdda_sector(buffer);
 		}
-
-		if (frac != 0 && cdg == nullptr)
-		{
-			return;
-		}
 	}
 
 	// Calculate subcode data
