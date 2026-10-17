@@ -120,7 +120,7 @@ protected:
 	PAIR    m_dmac[4];
 	PAIR    m_dmam[4];
 
-	/* Control register 0x3C (0x7C on the TMP94C241), INTNEST: how many interrupt
+	/* Control register 0x3c (0x7c on the TMP94C241), INTNEST: how many interrupt
 	   frames are currently stacked.  Incremented where each device accepts an
 	   interrupt and pushes SR/PC, decremented in op_RETI, so the two stay paired.
 	   Decoded on the 16-bit CR paths.  Saturates at zero, so an unmatched RETI
@@ -206,7 +206,7 @@ protected:
 	/* Bump INTNEST.  Called where a device pushes the SR/PC frame that op_RETI
 	   will later unwind.  NMI counts, because it pushes and unwinds the same way;
 	   SWI/TRAP do not, because they need not return through RETI. */
-	void tlcs900_intnest_accept() { if (m_intnest < 0xFFFF) m_intnest++; }
+	void tlcs900_intnest_accept() { if (m_intnest < 0xffff) m_intnest++; }
 
 	virtual void tlcs900_check_hdma() = 0;
 	virtual void tlcs900_check_irqs() = 0;

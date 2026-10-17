@@ -207,7 +207,7 @@ void tlcs900_device::device_reset()
 {
 	m_pc.d = 0x00008000;
 	/* system mode, iff set to 111, min mode, register bank 0 */
-	m_sr.d = 0xF000;
+	m_sr.d = 0xf000;
 	m_regbank = 0;
 	m_xssp.d = 0x0100;
 	m_intnest = 0;   /* no interrupt is in progress out of reset */
@@ -219,12 +219,12 @@ void tlcs900_device::device_reset()
 
 void tlcs900h_device::device_reset()
 {
-	m_pc.b.l = RDMEM(0xFFFF00);
-	m_pc.b.h = RDMEM(0xFFFF01);
-	m_pc.b.h2 = RDMEM(0xFFFF02);
+	m_pc.b.l = RDMEM(0xff'ff00);
+	m_pc.b.h = RDMEM(0xff'ff01);
+	m_pc.b.h2 = RDMEM(0xff'ff02);
 	m_pc.b.h3 = 0;
 	/* system mode, iff set to 111, max mode, register bank 0 */
-	m_sr.d = 0xF800;
+	m_sr.d = 0xf800;
 	m_regbank = 0;
 	m_xssp.d = 0x0100;
 	m_intnest = 0;   /* no interrupt is in progress out of reset */
