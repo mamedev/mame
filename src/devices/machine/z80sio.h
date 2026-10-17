@@ -197,7 +197,6 @@ public:
 	void do_sioreg_wr7(uint8_t data);
 
 	uint8_t control_read();
-
 	void control_write(uint8_t data);
 
 	uint8_t data_read();
@@ -507,12 +506,6 @@ public:
 
 	template <typename T> void set_cputag(T &&tag) { m_hostcpu.set_tag(std::forward<T>(tag)); }
 
-	// byte-level serial link helpers
-	auto out_txda_byte_callback() { return m_out_txd_byte_cb[0].bind(); }
-	auto out_txdb_byte_callback() { return m_out_txd_byte_cb[1].bind(); }
-	void receive_byte_a(uint8_t data) { m_chanA->queue_received(data, 0); }
-	void receive_byte_b(uint8_t data) { m_chanB->queue_received(data, 0); }
-
 	uint8_t cd_ba_r(offs_t offset);
 	void cd_ba_w(offs_t offset, uint8_t data);
 	uint8_t ba_cd_r(offs_t offset);
@@ -597,10 +590,6 @@ protected:
 	devcb_write_line m_out_int_cb;
 	devcb_write_line::array<2> m_out_rxdrq_cb;
 	devcb_write_line::array<2> m_out_txdrq_cb;
-
-	// byte-level transmit callbacks (invoked when a data byte is written to the
-	// transmit buffer; allows hosts to implement a simplified serial link)
-	devcb_write8::array<2> m_out_txd_byte_cb;
 
 	int m_int_state[8]; // interrupt state
 	int m_int_source[8]; // interrupt source

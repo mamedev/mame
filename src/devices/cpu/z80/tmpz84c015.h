@@ -49,12 +49,6 @@ public:
 	auto out_rxdrqb_callback() { return m_out_rxdrqb_cb.bind(); }
 	auto out_txdrqb_callback() { return m_out_txdrqb_cb.bind(); }
 
-	// byte-level serial link helpers (simplified alternative to bit-level SIO pins)
-	auto sio_txda_byte_callback() { return m_out_txda_byte_cb.bind(); }
-	auto sio_txdb_byte_callback() { return m_out_txdb_byte_cb.bind(); }
-	void sio_receive_byte_a(uint8_t data) { m_sio->receive_byte_a(data); }
-	void sio_receive_byte_b(uint8_t data) { m_sio->receive_byte_b(data); }
-
 	auto wdtout_cb() { return m_wdtout_cb.bind(); }
 
 	// CTC callbacks
@@ -156,9 +150,6 @@ private:
 	devcb_write_line m_out_wrdyb_cb;
 	devcb_write_line m_out_syncb_cb;
 
-	devcb_write8 m_out_txda_byte_cb;
-	devcb_write8 m_out_txdb_byte_cb;
-
 	devcb_write_line m_out_rxdrqa_cb;
 	devcb_write_line m_out_txdrqa_cb;
 	devcb_write_line m_out_rxdrqb_cb;
@@ -195,9 +186,6 @@ private:
 	void out_rtsb_cb_trampoline_w(int state) { m_out_rtsb_cb(state); }
 	void out_wrdyb_cb_trampoline_w(int state) { m_out_wrdyb_cb(state); }
 	void out_syncb_cb_trampoline_w(int state) { m_out_syncb_cb(state); }
-
-	void out_txda_byte_cb_trampoline_w(uint8_t data) { m_out_txda_byte_cb(data); }
-	void out_txdb_byte_cb_trampoline_w(uint8_t data) { m_out_txdb_byte_cb(data); }
 
 	void out_rxdrqa_cb_trampoline_w(int state) { m_out_rxdrqa_cb(state); }
 	void out_txdrqa_cb_trampoline_w(int state) { m_out_txdrqa_cb(state); }
