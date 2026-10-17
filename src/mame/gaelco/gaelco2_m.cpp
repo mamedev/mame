@@ -257,7 +257,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bang_state::bang_irq)
 
 INPUT_CHANGED_MEMBER(saltcrdi_state::heart_rate_pulse)
 {
-	// each heartbeat latches IRQ 4, held clear while output latch Q7 is low
+	// each heartbeat clocks a flip-flop (U10B) that pulls IPL2 low to request IRQ 4, held clear while output latch Q7 (/RESINT) is low
 	if (newval && m_mainlatch->q7_r())
 		m_maincpu->set_input_line(4, ASSERT_LINE);
 }
