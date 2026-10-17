@@ -31,6 +31,7 @@ private:
 	u16 m_irq_mask;
 	u16 m_irq_pending;
 	u8 m_irq_priority[8];
+	s8 m_int_level; // CPU interrupt level currently asserted, -1 for none
 
 	void check_irqs();
 	void set_irq_line(int line, int state);
