@@ -20,13 +20,23 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void rcv_complete() override;
 	virtual void key_make(uint8_t row, uint8_t column) override;
+	virtual void key_repeat(uint8_t row, uint8_t column) override;
 	virtual void key_break(uint8_t row, uint8_t column) override;
+	virtual void send_key(uint8_t code) override;
+	TIMER_CALLBACK_MEMBER(id_sequence_tick);
 
 private:
 	void write(uint8_t data);
+	void send_key_scan();
 
-	uint8_t m_keys_down;
+	uint64_t m_keys_down;
 	uint8_t m_last_reset;
+	emu_timer *m_id_timer;
+	uint8_t m_id_bytes_remaining;
+	bool m_id_sequence_complete;
+	bool m_scan_requested;
+	bool m_last_shifted;
+	bool m_echo = false;
 };
 
 DECLARE_DEVICE_TYPE(NGEN_KEYBOARD, ngen_keyboard_device)
