@@ -578,6 +578,7 @@ void i7000_state::i7000(machine_config &config)
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "card_list").set_original("i7000_card");
+	SOFTWARE_LIST(config, "flop_list").set_original("i7000_flop");
 }
 
 ROM_START( i7000 )
