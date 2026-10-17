@@ -12,7 +12,6 @@
     VSync changes 30 master cycles after HSync would go low.
 
     TODO:
-    - Implement 'Cellophane' effect (layer blending, used by the BIOS menu message box)
     - Interlace and 7MHz dot clock alignment with the KING/RAINBOW layers
 
 **********************************************************************/
@@ -89,10 +88,38 @@ inline u32 huc6261_device::yuv888_to_rgb(u32 yuv) const
 }
 
 // palette entries are Y8 U4 V4
+inline u32 huc6261_device::palette_yuv888_entry(u16 entry)
+{
+	return ((entry & 0xff00) << 8) | ((entry & 0xf0) << 8) | ((entry & 0x0f) << 4);
+}
+
 inline u32 huc6261_device::palette_yuv888(u16 index) const
 {
-	const u16 entry = m_palette[index & 0x1ff];
-	return ((entry & 0xff00) << 8) | ((entry & 0xf0) << 8) | ((entry & 0x0f) << 4);
+	return palette_yuv888_entry(m_palette[index & 0x1ff]);
+}
+
+// cellophane coefficient set (0 = none, 1-3) for a layer
+inline u8 huc6261_device::cello_set(u8 layer) const
+{
+	switch (layer)
+	{
+		case LAYER_VDC_BG:  return (m_cello_enable >> 0) & 3;
+		case LAYER_VDC_SPR: return (m_cello_enable >> 2) & 3;
+		case LAYER_RAINBOW: return (m_cello_enable >> 12) & 3;
+		default:            return (m_cello_enable >> (4 + (layer - LAYER_KING_BG0) * 2)) & 3;
+	}
+}
+
+// front * front_coeff + back * back_coeff, per component, coefficients in 1/8 (Y, U, V nibbles)
+u32 huc6261_device::cello_blend(u16 front_coeff, u32 front, u16 back_coeff, u32 back)
+{
+	auto scale_y = [] (u32 yuv, u16 coeff) { return int((yuv >> 16) & 0xff) * int((coeff >> 8) & 0xf) / 8; };
+	auto scale_uv = [] (u32 yuv, int shift, u16 coeff, int cshift) { return (int((yuv >> shift) & 0xff) - 128) * int((coeff >> cshift) & 0xf) / 8; };
+
+	const int y = std::clamp(scale_y(back, back_coeff) + scale_y(front, front_coeff), 0, 255);
+	const int u = std::clamp(scale_uv(back, 8, back_coeff, 4) + scale_uv(front, 8, front_coeff, 4) + 128, 0, 255);
+	const int v = std::clamp(scale_uv(back, 0, back_coeff, 0) + scale_uv(front, 0, front_coeff, 0) + 128, 0, 255);
+	return (y << 16) | (u << 8) | v;
 }
 
 /*
@@ -135,20 +162,22 @@ u32 huc6261_device::mix_pixel(u16 vdc0, u16 vdc1, u32 king, u32 rainbow) const
 	else
 		vdc = (vdc1 & 0xf) ? vdc1 : vdc0;
 
-	struct { u8 rank; u32 yuv; } layer[3]{ };
+	struct { u8 rank; u8 id; u32 yuv; } layer[3]{ };
 
 	if (vdc & 0xf)
 	{
 		const bool sprite = BIT(vdc, 8);
 		const u16 offset = ((m_palette_offset[0] >> (sprite ? 8 : 0)) & 0xff) << 1;
-		layer[0].rank = m_layer_rank[sprite ? LAYER_VDC_SPR : LAYER_VDC_BG];
+		layer[0].id = sprite ? LAYER_VDC_SPR : LAYER_VDC_BG;
+		layer[0].rank = m_layer_rank[layer[0].id];
 		layer[0].yuv = palette_yuv888((vdc & 0xff) + offset);
 	}
 
 	if (king >> 28)
 	{
 		const int n = (king >> 28) - 1;
-		layer[1].rank = m_layer_rank[LAYER_KING_BG0 + n];
+		layer[1].id = LAYER_KING_BG0 + n;
+		layer[1].rank = m_layer_rank[layer[1].id];
 		if (BIT(king, 27))
 			layer[1].yuv = king & 0xffffff;
 		else
@@ -160,6 +189,7 @@ u32 huc6261_device::mix_pixel(u16 vdc0, u16 vdc1, u32 king, u32 rainbow) const
 
 	if (rainbow)
 	{
+		layer[2].id = LAYER_RAINBOW;
 		layer[2].rank = m_layer_rank[LAYER_RAINBOW];
 		if (BIT(rainbow, 27))
 			layer[2].yuv = rainbow & 0xffffff;
@@ -167,17 +197,43 @@ u32 huc6261_device::mix_pixel(u16 vdc0, u16 vdc1, u32 king, u32 rainbow) const
 			layer[2].yuv = palette_yuv888((rainbow & 0xff) + ((m_palette_offset[3] & 0xff) << 1));
 	}
 
-	// hindmost colour is palette entry 0, black if no layer is enabled; the frontmost visible layer wins
-	u32 out = (m_control & 0x7f00) ? palette_yuv888(0) : 0x008080;
-	u8 front = 0;
+	// draw back to front
+	if (layer[0].rank > layer[1].rank) std::swap(layer[0], layer[1]);
+	if (layer[1].rank > layer[2].rank) std::swap(layer[1], layer[2]);
+	if (layer[0].rank > layer[1].rank) std::swap(layer[0], layer[1]);
+
+	// no cellophane with the 7MHz dot clock
+	const bool cello = !BIT(m_control, 3);
+	const u8 cello_mode = cello ? (m_cello_enable >> 14) : 0;
+
+	// hindmost colour is palette entry 0, black if no layer is enabled, or the cellophane colour/black in back/front mode
+	u32 out;
+	if (cello_mode == 1)
+		out = palette_yuv888_entry(m_cello_colour);
+	else if (cello_mode == 3)
+		out = 0x008080;
+	else
+		out = (m_control & 0x7f00) ? palette_yuv888(0) : 0x008080;
+
+	bool out_is_layer = false;
 	for (auto &l : layer)
 	{
-		if (l.rank > front)
-		{
+		if (!l.rank)
+			continue;
+
+		const u8 set = cello ? cello_set(l.id) : 0;
+		const bool sprite_ok = l.id != LAYER_VDC_SPR || BIT(m_cello_sprite_mask, (vdc >> 4) & 0xf);
+		// back cellophane also blends with the hindmost colour, otherwise only with another layer
+		if (set && sprite_ok && (cello_mode == 1 || out_is_layer))
+			out = cello_blend(m_cello_coeff[(set - 1) * 2], l.yuv, m_cello_coeff[(set - 1) * 2 + 1], out);
+		else
 			out = l.yuv;
-			front = l.rank;
-		}
+		out_is_layer = true;
 	}
+
+	// front cellophane: the cellophane colour over everything
+	if (cello_mode == 3)
+		out = cello_blend(m_cello_coeff[0], palette_yuv888_entry(m_cello_colour), m_cello_coeff[1], out);
 
 	return yuv888_to_rgb(out);
 }
@@ -510,40 +566,35 @@ void huc6261_device::write(offs_t offset, u16 data)
 					m_chroma_key[m_register - 0x0a] = data;
 					break;
 
-				//
+				// Cellophane colour, Y8 U4 V4
 				case 0x0d:
+					m_cello_colour = data;
 					break;
 
-				//
+				// Cellophane enable
+				// xx-- ---- ---- ---- 01 = back cellophane (blend over the cellophane colour), 11 = front (blend the cellophane colour over the result)
+				// --xx ---- ---- ---- RAINBOW coefficient set
+				// ---- xxxx xxxx ---- KING BG3-BG0 coefficient sets
+				// ---- ---- ---- xx-- HuC6270 SPR coefficient set
+				// ---- ---- ---- --xx HuC6270 BG coefficient set
+				// coefficient set 0 = no blending, 1-3 = coefficient pair 0-2
 				case 0x0e:
+					m_cello_enable = data;
 					break;
 
-				//
+				// HuC6270 sprite palettes subject to cellophane, one bit per palette
 				case 0x0f:
+					m_cello_sprite_mask = data;
 					break;
 
-				//
+				// Cellophane coefficient pairs (front, back), Y U V 4 bits each, in 1/8
 				case 0x10:
-					break;
-
-				//
 				case 0x11:
-					break;
-
-				//
 				case 0x12:
-					break;
-
-				//
 				case 0x13:
-					break;
-
-				//
 				case 0x14:
-					break;
-
-				//
 				case 0x15:
+					m_cello_coeff[m_register - 0x10] = data & 0xfff;
 					break;
 			}
 			break;
@@ -574,6 +625,10 @@ void huc6261_device::device_start()
 	save_item(NAME(m_king_line));
 	save_item(NAME(m_rainbow_line));
 	save_item(NAME(m_chroma_key));
+	save_item(NAME(m_cello_colour));
+	save_item(NAME(m_cello_enable));
+	save_item(NAME(m_cello_sprite_mask));
+	save_item(NAME(m_cello_coeff));
 	save_item(NAME(m_layer_rank));
 }
 
@@ -590,6 +645,10 @@ void huc6261_device::device_reset()
 	std::fill(std::begin(m_king_line), std::end(m_king_line), 0);
 	std::fill(std::begin(m_rainbow_line), std::end(m_rainbow_line), 0);
 	std::fill(std::begin(m_chroma_key), std::end(m_chroma_key), 0);
+	m_cello_colour = 0;
+	m_cello_enable = 0;
+	m_cello_sprite_mask = 0;
+	std::fill(std::begin(m_cello_coeff), std::end(m_cello_coeff), 0);
 	std::fill(std::begin(m_layer_rank), std::end(m_layer_rank), 0);
 
 	m_last_v = screen().vpos();

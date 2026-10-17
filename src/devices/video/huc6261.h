@@ -88,10 +88,17 @@ private:
 	u32  m_king_line[256];
 	u32  m_rainbow_line[256];
 	u16  m_chroma_key[3];
+	u16  m_cello_colour;
+	u16  m_cello_enable;
+	u16  m_cello_sprite_mask;
+	u16  m_cello_coeff[6];
 	u8   m_layer_rank[LAYER_COUNT];
 
 	u32 yuv888_to_rgb(u32 yuv) const;
+	static u32 palette_yuv888_entry(u16 entry);
 	u32 palette_yuv888(u16 index) const;
+	u8 cello_set(u8 layer) const;
+	static u32 cello_blend(u16 front_coeff, u32 front, u16 back_coeff, u32 back);
 	void update_layer_ranks();
 	u32 mix_pixel(u16 vdc0, u16 vdc1, u32 king, u32 rainbow) const;
 	void start_line(int v);
