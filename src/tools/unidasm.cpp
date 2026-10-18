@@ -77,6 +77,7 @@ using util::BIT;
 #include "cpu/hphybrid/hphybrid_dasm.h"
 #include "cpu/ht1130/ht1130d.h"
 #include "cpu/i386/i386dasm.h"
+#include "cpu/i750/i750d.h"
 #include "cpu/i8008/8008dasm.h"
 #include "cpu/i8085/8085dasm.h"
 #include "cpu/i8089/i8089_dasm.h"
@@ -87,6 +88,7 @@ using util::BIT;
 #include "cpu/interdata16/dasm16.h"
 #include "cpu/jaguar/jagdasm.h"
 #include "cpu/jalfpu/jalfpu_dasm.h"
+#include "cpu/k056734/k056734d.h"
 #include "cpu/ks0164/ks0164d.h"
 #include "cpu/lc57/lc57d.h"
 #include "cpu/lc58/lc58d.h"
@@ -509,6 +511,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "ht1130",          le,  0, []() -> util::disasm_interface * { return new ht1130_disassembler; } },
 	{ "i4004",           le,  0, []() -> util::disasm_interface * { return new i4004_disassembler; } },
 	{ "i4040",           le,  0, []() -> util::disasm_interface * { return new i4040_disassembler; } },
+	{ "i750",            le, -3, []() -> util::disasm_interface * { return new i750_disassembler; } },
 	{ "i8008",           le,  0, []() -> util::disasm_interface * { return new i8008_disassembler; } },
 	{ "i802x",           le,  0, []() -> util::disasm_interface * { return new mcs48_disassembler(false, true); } },
 	{ "i8051",           le,  0, []() -> util::disasm_interface * { return new i8051_disassembler; } },
@@ -529,6 +532,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "jaguardsp",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::variant::DSP); } },
 	{ "jaguargpu",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::variant::GPU); } },
 	{ "jalfpu",          le, -2, []() -> util::disasm_interface * { return new jaleco_fpu_disassembler; } },
+	{ "k056734",         be, -2, []() -> util::disasm_interface * { return new k056734_disassembler; } },
 	{ "konami",          be,  0, []() -> util::disasm_interface * { return new konami_disassembler; } },
 	{ "ks0164",          be,  0, []() -> util::disasm_interface * { return new ks0164_disassembler; } },
 	{ "kl1839vm1",       be,  0, []() -> util::disasm_interface * { return new kl1839vm1_disassembler; } },

@@ -19,6 +19,7 @@
 #include "video/pc_vga.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 
 #include "kn5000.lh"
 
@@ -182,7 +183,7 @@ void kn5000_state::subcpu_mem(address_map &map)
 
 static void kn5000_floppies(device_slot_interface &device)
 {
-	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("35hd", FLOPPY_35_HD);
 }
 
 static INPUT_PORTS_START(kn5000)
@@ -685,7 +686,9 @@ void kn5000_state::kn5000(machine_config &config)
 	// Interrupt 6: FDC.H/D
 	// Interrupt 7: FDC.I/O
 
-	FLOPPY_CONNECTOR(config, "fdc:0", kn5000_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", kn5000_floppies, "35hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("kn5000_flop");
 
 	/* Extension port */
 	KN5000_EXTENSION(config, m_extension, kn5000_extension_intf, nullptr);

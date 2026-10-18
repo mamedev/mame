@@ -296,10 +296,10 @@ void cirrus_gd5428_vga_device::gc_map(address_map &map)
 			return res;
 		}),
 		NAME([this](offs_t offset, u8 data) {
-			vga.gc.shift256 = (data & 0x40) >> 6;
-			vga.gc.shift_reg = (data & 0x20) >> 5;
-			vga.gc.host_oe = (data & 0x10) >> 4;
-			vga.gc.read_mode = (data & 8) >> 3;
+			vga.gc.shift256 = BIT(data, 6);
+			vga.gc.shift_reg = BIT(data, 5);
+			vga.gc.host_oe = BIT(data, 4);
+			vga.gc.read_mode = BIT(data, 3);
 			if(gc_mode_ext & 0x04)
 				vga.gc.write_mode = data & 7;
 			else
@@ -834,7 +834,7 @@ void cirrus_gd5428_vga_device::recompute_params()
 	{
 		int numerator = m_vclk_num[clocksel] & 0x7f;
 		int denominator = (m_vclk_denom[clocksel] & 0x3e) >> 1;
-		int mul = m_vclk_denom[clocksel] & 0x01 ? 2 : 1;
+		int mul = (m_vclk_denom[clocksel] & 0x01) ? 2 : 1;
 		clock = (xtal * numerator / denominator / mul).dvalue();
 		LOGMASKED(LOG_PLL, "CL: PLL setting %d num %d denom %d mul %d -> %f\n", clocksel, numerator, denominator, mul, clock);
 	}
@@ -934,7 +934,7 @@ void cirrus_gd5428_vga_device::start_bitblt()
 	// Bit 6: 8x8 Pattern Copy
 	// Bit 7: Color Expand
 	const unsigned bytes_per_pixel = BIT(m_blt_mode, 4) ? 2 : 1;
-	const unsigned pattern_pitch = BIT(m_blt_mode, 7) ? 1 : 8 * bytes_per_pixel;
+	const unsigned pattern_pitch = BIT(m_blt_mode, 7) ? 1 : (8 * bytes_per_pixel);
 	const u32 pattern_base = m_blt_source & ~7U;
 
 	if(m_blt_mode & 0x01)
@@ -950,17 +950,17 @@ void cirrus_gd5428_vga_device::start_bitblt()
 
 	for(y=0;y<=m_blt_height;y++)
 	{
-		const u32 pattern_row_base = BIT(m_blt_mode, 6) ? pattern_base + (((m_blt_source + y) & 7) * pattern_pitch) : 0;
+		const u32 pattern_row_base = BIT(m_blt_mode, 6) ? (pattern_base + (((m_blt_source + y) & 7) * pattern_pitch)) : 0;
 		for(x=0;x<=m_blt_width;x++)
 		{
 			if (BIT(m_blt_mode, 6))
-				m_blt_source_current = pattern_row_base + (BIT(m_blt_mode, 7) ? 0 : x % pattern_pitch);
+				m_blt_source_current = pattern_row_base + (BIT(m_blt_mode, 7) ? 0 : (x % pattern_pitch));
 			if(m_blt_mode & 0x80)  // colour expand
 			{
 				if(m_blt_mode & 0x10)  // 16-bit colour expansion / transparency width
 				{
 					// use GR0/1/10/11 background/foreground regs
-					uint16_t pixel = (vga.memory[m_blt_source_current % vga.svga_intf.vram_size] >> (7-((x/2) % 8)) & 0x01) ? ((m_gr11 << 8) | vga.gc.enable_set_reset) : ((m_gr10 << 8) | vga.gc.set_reset);
+					uint16_t pixel = BIT(vga.memory[m_blt_source_current % vga.svga_intf.vram_size], ~(x/2) & 7) ? ((m_gr11 << 8) | vga.gc.enable_set_reset) : ((m_gr10 << 8) | vga.gc.set_reset);
 
 					if(m_blt_dest_current & 1)
 						copy_pixel(pixel >> 8, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
@@ -971,7 +971,7 @@ void cirrus_gd5428_vga_device::start_bitblt()
 				}
 				else
 				{
-					uint8_t pixel = (vga.memory[m_blt_source_current % vga.svga_intf.vram_size] >> (7-(x % 8)) & 0x01) ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
+					uint8_t pixel = BIT(vga.memory[m_blt_source_current % vga.svga_intf.vram_size], ~x & 7) ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
 
 					copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
 					if((x % 8) == 7 && !(m_blt_mode & 0x40))  // don't increment if a pattern (it's only 8 bits)
@@ -1012,7 +1012,7 @@ void cirrus_gd5428_vga_device::start_reverse_bitblt()
 				if(m_blt_mode & 0x10)  // 16-bit colour expansion / transparency width
 				{
 					// use GR0/1/10/11 background/foreground regs
-					uint16_t pixel = (vga.memory[m_blt_source_current % vga.svga_intf.vram_size] >> (7-((x/2) % 8)) & 0x01) ? ((m_gr11 << 8) | vga.gc.enable_set_reset) : ((m_gr10 << 8) | vga.gc.set_reset);
+					uint16_t pixel = BIT(vga.memory[m_blt_source_current % vga.svga_intf.vram_size], ~(x/2) & 7) ? ((m_gr11 << 8) | vga.gc.enable_set_reset) : ((m_gr10 << 8) | vga.gc.set_reset);
 
 					if(m_blt_dest_current & 1)
 						copy_pixel(pixel >> 8, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
@@ -1023,11 +1023,11 @@ void cirrus_gd5428_vga_device::start_reverse_bitblt()
 				}
 				else
 				{
-				uint8_t pixel = (vga.memory[m_blt_source_current % vga.svga_intf.vram_size] >> (7-(x % 8)) & 0x01) ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
+					uint8_t pixel = BIT(vga.memory[m_blt_source_current % vga.svga_intf.vram_size], ~x & 7) ? vga.gc.enable_set_reset : vga.gc.set_reset;  // use GR0/1/10/11 background/foreground regs
 
-				copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
-				if((x % 8) == 7 && !(m_blt_mode & 0x40))  // don't decrement if a pattern (it's only 8 bits)
-					m_blt_source_current--;
+					copy_pixel(pixel, vga.memory[m_blt_dest_current % vga.svga_intf.vram_size]);
+					if((x % 8) == 7 && !(m_blt_mode & 0x40))  // don't decrement if a pattern (it's only 8 bits)
+						m_blt_source_current--;
 				}
 			}
 			else
@@ -1367,25 +1367,24 @@ uint8_t cirrus_gd5428_vga_device::mem_r(offs_t offset)
 	else
 	{
 		// TODO: Lines up in 16-colour mode, likely different for 256-colour modes (docs say video addresses are shifted right 3 places)
-		uint8_t i,data;
-//      uint8_t bits = ((gc_mode_ext & 0x08) && (vga.gc.write_mode == 1)) ? 8 : 4;
+		//uint8_t bits = ((gc_mode_ext & 0x08) && (vga.gc.write_mode == 1)) ? 8 : 4;
 
-		data = 0;
+		uint8_t data = 0;
 		//printf("%08x\n",offset);
 
 		if(gc_mode_ext & 0x02)
 		{
-			for(i=0;i<8;i++)
+			for(uint8_t i = 0; i < 8; i++)
 			{
-				if(vga.sequencer.map_mask & 1 << i)
+				if(BIT(vga.sequencer.map_mask, i))
 					data |= vga.memory[(((offset+addr))+i*0x10000) % vga.svga_intf.vram_size];
 			}
 		}
 		else
 		{
-			for(i=0;i<4;i++)
+			for(uint8_t i = 0; i < 4; i++)
 			{
-				if(vga.sequencer.map_mask & 1 << i)
+				if(BIT(vga.sequencer.map_mask, i))
 					data |= vga.memory[(((offset+addr))+i*0x10000) % vga.svga_intf.vram_size];
 			}
 		}
@@ -1506,10 +1505,9 @@ void cirrus_gd5428_vga_device::mem_w(offs_t offset, uint8_t data)
 			vga.memory[(offset+addr) % vga.svga_intf.vram_size] = data;
 		else
 		{
-			int i;
-			for(i=0;i<4;i++)
+			for(int i = 0; i < 4; i++)
 			{
-				if(vga.sequencer.map_mask & 1 << i)
+				if(BIT(vga.sequencer.map_mask, i))
 					vga.memory[((offset*4+i)+addr) % vga.svga_intf.vram_size] =
 						BIT(vga.sequencer.data[4], 2) ? vga_latch_write(i, data) : data;
 			}
@@ -1545,13 +1543,12 @@ void cirrus_gd5428_vga_device::mem_w(offs_t offset, uint8_t data)
 		}
 
 		{
-		// TODO: Lines up in 16-colour mode, likely different for 256-colour modes (docs say video addresses are shifted right 3 places)
-			uint8_t i;
-//          uint8_t bits = ((gc_mode_ext & 0x08) && (vga.gc.write_mode == 1)) ? 8 : 4;
+			// TODO: Lines up in 16-colour mode, likely different for 256-colour modes (docs say video addresses are shifted right 3 places)
+			//uint8_t bits = ((gc_mode_ext & 0x08) && (vga.gc.write_mode == 1)) ? 8 : 4;
 
-			for(i=0;i<4;i++)
+			for(uint8_t i = 0; i < 4; i++)
 			{
-				if(vga.sequencer.map_mask & 1 << i)
+				if(BIT(vga.sequencer.map_mask, i))
 				{
 					if(gc_mode_ext & 0x02)
 					{

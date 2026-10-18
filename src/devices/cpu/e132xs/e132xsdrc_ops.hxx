@@ -3565,11 +3565,11 @@ void hyperstone_device::generate_set(drcuml_block &block, compiler_state &compil
 			UML_MOV(block, I1, mem(&m_core->global_regs[SP_REGISTER]));
 			UML_MOV(block, I2, DRC_SR);
 			UML_AND(block, I0, I1, 0xfffffe00);
+			UML_ROLAND(block, I1, I1, 1, 0x00000200);
 			UML_ROLINS(block, I0, I2, 32 - FP_SHIFT + 2, 0x000001fc);
-			UML_SHR(block, I2, I2, 31 - 8);
+			UML_SHR(block, I2, I2, 31 - 9);
 			UML_XOR(block, I2, I2, 0xffffffff);
 			UML_AND(block, I1, I1, I2);
-			UML_ROLAND(block, I1, I1, 1, 0x00000200);
 			UML_ADD(block, I0, I0, I1);
 		}
 		else if (n >= 2)

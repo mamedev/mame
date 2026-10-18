@@ -35,6 +35,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 	virtual u8 joy_read();
+	u8 joystick_port_select() const { return m_joystick_port_select; }
 
 	void pce_joystick_w(u8 data);
 	u8 pce_joystick_r();

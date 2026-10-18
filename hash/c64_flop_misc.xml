@@ -51,6 +51,7 @@ Laggy [joystick] fire button (half the times won't trigger)
 		<year>1992</year>
 		<publisher>Accolade</publisher>
 		<info name="developer" value="Flair Software" />
+		<sharedfeat name="iec8_default" value="fd2000"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1658880">
 				<rom name="elvira_ii_mistress_of_the_dark_1992_flair_software.d2m" size="1658880" crc="4eada167" sha1="03fc4eae44187826cf06e54610f525621e1b7cc3"/>
@@ -209,15 +210,10 @@ Laggy [joystick] fire button (half the times won't trigger)
 		</part>
 	</software>
 
-	<software name="metaldst" supported="no">
+	<software name="metaldst">
 		<description>Metal Dust</description>
 		<year>2012</year>
 		<publisher>Protovision</publisher>
-		<notes><![CDATA[
-[1581] or [.d81] ?FILE NOT FOUND ERROR
-[SuperCPU] resets to PC=0, in brk-land
-]]></notes>
-
 		<sharedfeat name="compatibility" value="PAL"/>
 		<sharedfeat name="exp_default" value="supercpu"/>
 		<sharedfeat name="iec8_default" value="c1581"/>
@@ -251,13 +247,14 @@ Laggy [joystick] fire button (half the times won't trigger)
 		</part>
 	</software>
 
-	<software name="metaldstf" cloneof="metaldst" supported="no">
+	<software name="metaldstf" cloneof="metaldst">
 		<description>Metal Dust (FD-4000)</description>
 		<year>2005</year>
 		<publisher>Protovision</publisher>
 
 		<sharedfeat name="compatibility" value="PAL"/>
 		<sharedfeat name="exp_default" value="supercpu"/>
+		<sharedfeat name="iec8_default" value="fd4000"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3317760">
@@ -393,6 +390,37 @@ Hi-score table is corrupt (dump really?)
 
 <!-- !Applications -->
 
+	<software name="modplay">
+		<description>MODPlay 64 (v1.2e)</description>
+		<year>2007</year>
+		<publisher>Digital Audio Concepts</publisher>
+		<sharedfeat name="iec8_default" value="c1581"/>
+		<sharedfeat name="user_default" value="digimax"/>
+		<sharedfeat name="exp_default" value="reu1764"/>
+		<sharedfeat name="sid_default" value="dual8580"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="modplay12e_fix.d81" size="819200" crc="f0727880" sha1="1806bd417524aa54a585b34a8045ac5954f57f21"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="modplay12" cloneof="modplay">
+		<description>MODPlay 64 (v1.2, SuperCPU)</description>
+		<year>2000</year>
+		<publisher>Digital Audio Concepts</publisher>
+		<sharedfeat name="iec8_default" value="c1581"/>
+		<sharedfeat name="exp_default" value="supercpu"/>
+		<sharedfeat name="exp:supercpu:exp_default" value="reu1764"/>
+		<sharedfeat name="user_default" value="digimax"/>
+		<sharedfeat name="sid_default" value="dual8580"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="modplay64v1.2.d81" size="819200" crc="6da02adc" sha1="b18372d957a03f3e22a49ca8c15c5dca0640ae53"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dolphdos3">
 		<description>Dolphin DOS 3.0 Tooldisk (Germany)</description>
 		<year>1990</year>
@@ -400,6 +428,18 @@ Hi-score table is corrupt (dump really?)
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="dolphin_dos_3.0_original_tooldisk_1990.d64" size="174848" crc="dc48f29d" sha1="05a1b386ff91255c95d02ea9491340c6c6f80fe1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digitlzr">
+		<description>Digitizer Datasette</description>
+		<year>19??</year>
+		<publisher>Fantasy Cracking Service</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="digitalizator.d64" size="174848" crc="02a9e65d" sha1="15620b792f7ebc30a8e0a2babb843bc1913e47a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -940,7 +980,7 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
-	<software name="scpuutil" supported="no">
+	<software name="scpuutil">
 		<description>CMD SuperCPU Utilities</description>
 		<year>1990</year>
 		<publisher>CMD</publisher>
@@ -1030,6 +1070,26 @@ Hi-score table is corrupt (dump really?)
 			<feature name="part_id" value="GEOS Utilities"/>
 			<dataarea name="flop" size="174848">
 				<rom name="hd_geos_utils.d64" size="174848" crc="fd2ae57a" sha1="c132ab9b534aa51236c6622c0a37746b2f5a59ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ramlink">
+		<description>CMD RAMLink Utilities</description>
+		<year>1990</year>
+		<publisher>CMD</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="RL Utilities"/>
+			<dataarea name="flop" size="174848">
+				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="RL GEOS Utilities"/>
+			<dataarea name="flop" size="174848">
+				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1380,7 +1440,7 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
-	<software name="crazydem" supported="no">
+	<software name="crazydem">
 		<description>Crazy Demo</description>
 		<year>2024</year>
 		<publisher>Wyndex</publisher>
@@ -1536,6 +1596,7 @@ Hi-score table is corrupt (dump really?)
 		<description>Next Round</description>
 		<year>2026</year>
 		<publisher>Performers</publisher>
+		<sharedfeat name="user_default" value="digimax"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side 1"/>
@@ -1545,9 +1606,9 @@ Hi-score table is corrupt (dump really?)
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side 2"/>
+			<feature name="part_id" value="Side 2 (Digimax)"/>
 			<dataarea name="flop" size="174848">
-				<rom name="round2.d64" size="174848" crc="3815e5c3" sha1="7274341c1ea51c490643b5624683fcc351f9faf9"/>
+				<rom name="round2_digimax.d64" size="174848" crc="29b11be2" sha1="ba893591852cd0550c4297663347f544b1211624"/>
 			</dataarea>
 		</part>
 
@@ -1566,9 +1627,9 @@ Hi-score table is corrupt (dump really?)
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Side 2 (Digimax)"/>
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="flop" size="174848">
-				<rom name="round2_digimax.d64" size="174848" crc="29b11be2" sha1="ba893591852cd0550c4297663347f544b1211624"/>
+				<rom name="round2.d64" size="174848" crc="3815e5c3" sha1="7274341c1ea51c490643b5624683fcc351f9faf9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1634,14 +1695,12 @@ Hi-score table is corrupt (dump really?)
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=1mQWEF6Tt0Y -->
-	<software name="popelprm" supported="no">
+	<software name="popelprm">
 		<description>Popel Premiere</description>
 		<year>1999</year>
 		<publisher>CyberpunX</publisher>
-		<notes><![CDATA[
-Requires a second SID at $D500
-]]></notes>
 		<sharedfeat name="exp_default" value="supercpu"/>
+		<sharedfeat name="sid_default" value="dual8580"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1665,7 +1724,7 @@ Requires a second SID at $D500
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=vS8LAQbR-DY -->
-	<software name="scpukick" supported="no">
+	<software name="scpukick">
 		<description>SuperCPU Kicks!</description>
 		<year>1999</year>
 		<publisher>DMAgic</publisher>
@@ -1691,8 +1750,23 @@ Requires a second SID at $D500
 		</part>
 	</software>
 
+	<software name="scpukickf" cloneof="scpukick">
+		<description>SuperCPU Kicks! (FD-2000)</description>
+		<year>1999</year>
+		<publisher>DMAgic</publisher>
+		<sharedfeat name="exp_default" value="supercpu"/>
+		<sharedfeat name="iec8_default" value="fd2000"/>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1658880">
+				<rom name="scpukick.d2m" size="1658880" crc="93abb04a" sha1="0e479cf6cddb0bfee00b7e01c14481d1e78a4dae"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- https://www.youtube.com/watch?v=ZLkWufDcDNU -->
-	<software name="scpuplsm" supported="no">
+	<software name="scpuplsm">
 		<description>SuperCPU Plasma Intro</description>
 		<year>2015</year>
 		<publisher>Genesis Project</publisher>

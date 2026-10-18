@@ -32,6 +32,7 @@ void c2n_device::device_add_mconfig(machine_config &config)
 	m_cassette->set_formats(cbm_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED);
 	m_cassette->set_interface("cbm_cass");
+	m_cassette->change_handler().set(FUNC(c2n_device::cassette_changed));
 }
 
 
@@ -48,7 +49,6 @@ c2n_device::c2n_device(const machine_config &mconfig, device_type type, const ch
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_pet_datassette_port_interface(mconfig, *this)
 	, m_cassette(*this, "cassette")
-	, m_motor(false)
 	, m_read_timer(nullptr)
 {
 }
@@ -87,22 +87,23 @@ void c2n_device::device_start()
 {
 	// allocate timers
 	m_read_timer = timer_alloc(FUNC(c2n_device::read_tick), this);
-	m_read_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
-
-	save_item(NAME(m_motor));
 }
 
 
 //-------------------------------------------------
-//  read_tick - periodically read the datasette
+//  read_tick - update the datassette read line
 //-------------------------------------------------
 
 TIMER_CALLBACK_MEMBER(c2n_device::read_tick)
 {
-	if (m_motor)
-	{
-		m_slot->read_w(datassette_read());
-	}
+	cassette_changed(0);
+}
+
+
+void c2n_device::cassette_changed(int state)
+{
+	m_slot->read_w(datassette_read());
+	m_read_timer->adjust(m_cassette->time_to_next_transition());
 }
 
 
@@ -142,16 +143,5 @@ int c2n_device::datassette_sense()
 
 void c2n_device::datassette_motor(int state)
 {
-	if (!state)
-	{
-		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		m_motor = true;
-	}
-	else
-	{
-		m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		m_motor = false;
-	}
-
-	m_slot->read_w(datassette_read());
+	m_cassette->change_state(state ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }

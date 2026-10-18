@@ -110,55 +110,17 @@ K055673_CB_MEMBER(konamigx_state::type2_sprite_callback)
 
 K055673_CB_MEMBER(konamigx_state::dragoonj_sprite_callback)
 {
-	int num, op, pri, c18;
+	int num = code;
+	int c18 = color;
 
-	num = code;
 	code = m_k053247_vrcbk[num >> 14] | (num & 0x3fff);
-
-	c18  = pri = color;
-	op   = m_opri;
-	pri  = (pri & 0x200) ? 4 : pri >> 4 & 0xf;
-	op  &= m_oinprion;
-	pri &=~m_oinprion;
-	priority_mask = pri | op;
-
 	c18 = K053247GX_combine_c18(c18);
+
+	// attribute bits 9:8 are not a mix code here: applying them makes the attract logo, clock and effects translucent
+	// Bit meaning is unknown
+	// See https://youtu.be/xt5O4gAnTho?t=106
 	color = K055555GX_decode_objcolor(c18);
-}
-
-K055673_CB_MEMBER(konamigx_state::salmndr2_sprite_callback)
-{
-	int num, op, pri, c18;
-
-	num = code;
-	code = m_k053247_vrcbk[num >> 14] | (num & 0x3fff);
-
-	c18  = pri = color;
-	op   = m_opri;
-	pri  = pri >> 4 & 0x3f;
-	op  &= m_oinprion;
-	pri &=~m_oinprion;
-	priority_mask = pri | op;
-
-	c18 = K053247GX_combine_c18(c18);
-	color = K055555GX_decode_objcolor(c18);
-}
-
-K055673_CB_MEMBER(konamigx_state::le2_sprite_callback)
-{
-	int num, op, pri;
-
-	num = code;
-	code = m_k053247_vrcbk[num >> 14] | (num & 0x3fff);
-
-	pri = color;
-	color = (color & 0x1f) | (((color >> 8) & 0b11) << K055555_MIXSHIFT);
-
-	op   = m_opri;
-	pri &= 0xf0;
-	op  &= m_oinprion;
-	pri &=~m_oinprion;
-	priority_mask = pri | op;
+	priority_mask = K055555GX_decode_inpri(c18);
 }
 
 int konamigx_state::K055555GX_decode_vmixcolor(int layer, int &color) // (see p.62 7.2.6 and p.27 3.3)

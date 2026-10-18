@@ -123,7 +123,7 @@ DEFINE_DEVICE_TYPE(DSP3210, dsp3210_device, "dsp3210", "AT&T DSP3210")
 
 ROM_START(dsp3210)
 	ROM_REGION(0x400, "bootrom", ROMREGION_ERASE00)
-	ROM_LOAD("dsp3210_boot.bin", 0x000, 0x400, NO_DUMP)
+	ROM_LOAD("dsp3210_boot.bin", 0x000, 0x400, CRC(a3ca27a9) SHA1(f27b9b1d142358abc26c19d7bde2a1f974f796be))
 ROM_END
 
 dsp3210_device::dsp3210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

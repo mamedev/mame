@@ -192,14 +192,14 @@ protected:
 	static inline constexpr uint32_t ROM_MASK_BASE = 0x80000000;
 	static inline constexpr uint32_t ROM_FLASH_BASE = 0xa0000000;
 
-	void sega_9h0_0008(machine_config &config);
+	void sega_9h0_0008(machine_config &config) ATTR_COLD;
 
 	virtual void device_post_load() override;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-	virtual void install_game_rom();
+	virtual void install_game_rom() ATTR_COLD;
 	virtual void update_sensors(offs_t offset);
 
 	void beena_arm7_map(address_map &map) ATTR_COLD;
@@ -1781,7 +1781,7 @@ public:
 		, m_io_pen_y(*this, "PENY")
 	{ }
 
-	void sega_beena(machine_config &config);
+	void sega_beena(machine_config &config) ATTR_COLD;
 
 	virtual float pen_y_mapper(float linear_value);
 
@@ -1789,7 +1789,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	virtual void install_game_rom() override;
+	virtual void install_game_rom() override ATTR_COLD;
 	virtual uint32_t io_expansion_r() override;
 	virtual void update_crosshair(screen_device &screen) override;
 	virtual void update_sensors(offs_t offset) override;
@@ -2029,12 +2029,12 @@ public:
 		, m_io_buttons(*this, "BUTTONS")
 	{ }
 
-	void tvochken(machine_config &config);
+	void tvochken(machine_config &config) ATTR_COLD;
 
 	virtual uint32_t io_expansion_r() override;
 
 private:
-	virtual void install_game_rom() override;
+	virtual void install_game_rom() override ATTR_COLD;
 
 	required_device<sega_9h0_0008_card_device> m_card;
 	required_ioport m_io_buttons;
@@ -2097,12 +2097,12 @@ public:
 		, m_io_buttons(*this, "BUTTONS")
 	{ }
 
-	void carbeena(machine_config &config);
+	void carbeena(machine_config &config) ATTR_COLD;
 
 	virtual uint32_t io_expansion_r() override;
 
 private:
-	virtual void install_game_rom() override;
+	virtual void install_game_rom() override ATTR_COLD;
 
 	required_ioport m_io_buttons;
 };

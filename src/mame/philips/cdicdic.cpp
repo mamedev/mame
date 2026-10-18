@@ -372,12 +372,6 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 		return;
 	}
 
-	if (coding & 0x40)
-	{
-		LOGMASKED(LOG_SECTORS, "Emphasis is not implemented (%02x), ignoring\n", coding);
-		// TODO: Emphasis is commonly used. Do not throw a fatal error.
-	}
-
 	int channels = 2;
 	//offs_t buffer_length = 1;
 	if (!(coding & CODING_STEREO))
@@ -444,6 +438,29 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 		{
 			play_xa_group(coding, data, offset);
 			offset += 28 * num_samples;
+		}
+
+		if (coding & CODING_EMPHASIS)
+		{
+			// 50/15 us de-emphasis, y = g * (x - z * x') + p * y'
+			static const float s_deemph[2][3] =
+			{
+				{ 0.475001f,  0.135021f, 0.589135f }, // 37.8 kHz: g, z, p
+				{ 0.614375f, -0.062739f, 0.347080f }  // 18.9 kHz
+			};
+			const float *const coef = s_deemph[(coding & CODING_RATE_MASK) == CODING_18KHZ];
+			for (int ch = 0; ch < channels; ch++)
+			{
+				int16_t *const samples = &m_samples[ch][0];
+				for (uint16_t i = 0; i < 18 * 28 * num_samples; i++)
+				{
+					const float x = samples[i];
+					const float y = coef[0] * (x - coef[1] * m_deemph_x1[ch]) + coef[2] * m_deemph_y1[ch];
+					m_deemph_x1[ch] = x;
+					m_deemph_y1[ch] = y;
+					samples[i] = int16_t(std::clamp(y, -32768.0f, 32767.0f));
+				}
+			}
 		}
 
 		int16_t sampleL = 0, sampleR = 0, outL = 0, outR = 0;
@@ -1183,6 +1200,8 @@ void cdicdic_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				m_audio_sector_counter = 1;
 				m_decoding_audio_map = true;
 				std::fill_n(m_xa_last, 4, 0);
+				std::fill_n(m_deemph_x1, 2, 0.0f);
+				std::fill_n(m_deemph_y1, 2, 0.0f);
 			}
 			break;
 
@@ -1366,6 +1385,8 @@ void cdicdic_device::device_start()
 
 	save_item(NAME(m_atten));
 	save_item(NAME(m_xa_last));
+	save_item(NAME(m_deemph_x1));
+	save_item(NAME(m_deemph_y1));
 
 	m_audio_timer = timer_alloc(FUNC(cdicdic_device::audio_tick), this);
 	m_audio_timer->adjust(attotime::never);
@@ -1414,6 +1435,8 @@ void cdicdic_device::device_reset()
 
 	std::fill_n(m_atten, 4, 0xff);
 	std::fill_n(m_xa_last, 4, 0);
+	std::fill_n(m_deemph_x1, 2, 0.0f);
+	std::fill_n(m_deemph_y1, 2, 0.0f);
 }
 
 void cdicdic_device::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)

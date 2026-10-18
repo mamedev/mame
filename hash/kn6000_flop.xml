@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Technics SX-KN6000 / SX-KN6500 floppy disks.
+
+User-data and sound-library disks the instrument installs from its floppy drive: the
+"Initial Data" factory-default set (idd6000) plus style, registration, picture and
+sound libraries.  Each is available as a self-extracting PC archive that writes its
+payload onto a blank FAT12 HD diskette; who prepared or distributed the library disks
+is unclear (not necessarily official releases), and no original diskette has been
+dumped, so these images are faithful reconstructions built from the archives' own
+files, which a dump of an original could supersede.
+-->
+<softwarelist name="kn6000_flop" description="Technics SX-KN6000 / SX-KN6500 disks">
+
+	<software name="idd6000">
+		<description>Initial Data (factory default)</description>
+		<year>2000</year>
+		<publisher>Technics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="idd6000.img" size="1474560" crc="22d5ad15" sha1="23806eda1e642da3d763f1702ea5eaa7ca0e54d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6000p">
+		<description>Registration/panel memories (20 sets)</description>
+		<year>2000</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6000p.img" size="1474560" crc="ddd68b2f" sha1="d66efc55ceb08b72992d4fd61a7bf382549f2da3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6000s">
+		<description>Styles (Tanzen, Tico, Give Up, Sunshine, ...)</description>
+		<year>2000</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6000s.img" size="1474560" crc="c9e1c0c2" sha1="aec302f5989ae543257f1e6604dd107cc8196b0a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6001">
+		<description>Styles: Polka, March, Walzer</description>
+		<year>2000</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6001.img" size="1474560" crc="4ca31a64" sha1="a3f7950ee59897e76e3f7dfe7a10ab43730c84c8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6002">
+		<description>Styles: 8-Beat, 16-Beat, Synth Pop, Disco, Slow Pop</description>
+		<year>2000</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6002.img" size="1474560" crc="1a1b7c92" sha1="d0c2ffbd608d388ce2334dd646ed54632de0e35b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6003">
+		<description>Styles: Dance, Rave, Techno, Charts, Funk</description>
+		<year>2000</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6003.img" size="1474560" crc="9cadb418" sha1="ea0d73f259e9d0791aa7eea92e90ef238ea6e866"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6004">
+		<description>Styles: Big Band, Foxtrot, Country, Jazz, Ballad</description>
+		<year>2000</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6004.img" size="1474560" crc="2efe8cf6" sha1="76673a18b457e65b3deafe13d214b1713b39d5ff"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6005">
+		<description>Styles: Samba, Bossa Nova, Beach, Caribbean, Ballroom</description>
+		<year>2000</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6005.img" size="1474560" crc="f3137b2e" sha1="d98161d888224c25181092858d48a6178a8fd949"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6006">
+		<description>Styles: Schlager, Party Pop, Foxtrot, Walzer, Latin</description>
+		<year>2000</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6006.img" size="1474560" crc="d49efc3e" sha1="ba3cc02c2b76f0e8778520f79400020f31645cbd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6007">
+		<description>Styles: Rock, Rock'n'Roll, Shuffle, Boogie, Twist</description>
+		<year>2000</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6007.img" size="1474560" crc="6c0b496d" sha1="482c8d74242fc87a6b1535fdd2a06b04f45f3f35"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6008">
+		<description>Styles: Polka, Draws, Schlager, Party Pop, Swing</description>
+		<year>2000</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6008.img" size="1474560" crc="4eea8f0d" sha1="fb80b983730d482aca0afb2bf0eefb308eed2575"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6009">
+		<description>Styles: Latin Pop, Oldies, Polka, Schlager, Dance Pop/Rock</description>
+		<year>1999</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6009.img" size="1474560" crc="8ae8f027" sha1="565d7df603426a2ad4be06ee8ccbd485f366bbea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6010">
+		<description>Styles: Polka, Waltz, Swing, Latin, Rock</description>
+		<year>1999</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6010.img" size="1474560" crc="a5c5a188" sha1="7aba3f273703d850388d3547670c5fbbc9a859ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6dim">
+		<description>Styles (assorted: Piano, Saloon, Mambo, Skydive, ...)</description>
+		<year>2001</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6dim.img" size="1474560" crc="58d73084" sha1="97a423fe7a94571fda1e2fb11ad5b0383d335e1f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6fp01">
+		<description>Feature pictures (set 1, 19 images)</description>
+		<year>2000</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6fp01.img" size="1474560" crc="0e907c5d" sha1="2a3c3b2fce2b407c14904a667d878428f7650ffb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6fp02">
+		<description>Feature pictures (set 2, 20 images)</description>
+		<year>1996</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6fp02.img" size="1474560" crc="866d83f5" sha1="4a6c1646497e7981e9851588764d3931197f5ef7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6fp03">
+		<description>Feature pictures (set 3, 8 images)</description>
+		<year>2001</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6fp03.img" size="1474560" crc="8aae025a" sha1="07311645aab25a59c8b8874926dc3a622f8a7034"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6fp04">
+		<description>Feature pictures (set 4, 17 images)</description>
+		<year>2002</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6fp04.img" size="1474560" crc="67cc60d5" sha1="a478843deaa025dbdb60f5076d17dcd7443860d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6tm01">
+		<description>Sound set (01 Sounds)</description>
+		<year>2000</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6tm01.img" size="1474560" crc="b9584878" sha1="cd94bf3ac5c9ca94858716a18d6da3c304b50d19"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca6tm02">
+		<description>Sound set (Accordion/Organ)</description>
+		<year>2001</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca6tm02.img" size="1474560" crc="54b176d3" sha1="011598e7c5e911b885c6aa041276729f934ad788"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scd6000">
+		<description>Style Convert Disk (GEM, Korg, Roland, Solton, Technics styles)</description>
+		<year>1999</year>
+		<publisher>Technics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="scd6000.img" size="1474560" crc="75abe8e1" sha1="7662dc611ac1305ef33904fc9c428d3aa425c74d"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

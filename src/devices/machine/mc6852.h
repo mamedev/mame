@@ -28,8 +28,6 @@
 
 #include "diserial.h"
 
-#include <queue>
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -41,8 +39,6 @@ class mc6852_device :   public device_t,
 						public device_serial_interface
 {
 public:
-	static constexpr flags_type emulation_flags() { return flags::SAVE_UNSUPPORTED; }
-
 	// construction/destruction
 	mc6852_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
@@ -149,8 +145,10 @@ private:
 	uint8_t m_rdr;            // receive data register
 	uint8_t m_rsr;            // receive shift register
 
-	std::queue<uint8_t> m_rx_fifo;
-	std::queue<uint8_t> m_tx_fifo;
+	uint8_t m_rx_fifo[3];
+	uint8_t m_rx_fifo_count;
+	uint8_t m_tx_fifo[3];
+	uint8_t m_tx_fifo_count;
 
 	// If m_tx_pull_mode is true, get_tx_byte() must be called to retrieve
 	// the next byte to transmit, and the actual transmission must be
@@ -166,6 +164,8 @@ private:
 	int m_sm_dtr;           // sync match/data terminal ready
 	int m_tuf;              // transmitter underflow
 	int m_in_sync;
+
+	static uint8_t fifo_pop(uint8_t (&fifo)[3], uint8_t &count);
 };
 
 

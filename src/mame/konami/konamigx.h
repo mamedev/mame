@@ -68,7 +68,6 @@ public:
 		, m_lamp(*this, "lamp0")
 	{ }
 
-	void esc_w(address_space &space, u32 data);
 	void eeprom_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 le2_gun_H_r();
@@ -131,8 +130,6 @@ public:
 	K056832_CB_MEMBER(alpha_tile_callback);
 	K055673_CB_MEMBER(type2_sprite_callback);
 	K055673_CB_MEMBER(dragoonj_sprite_callback);
-	K055673_CB_MEMBER(salmndr2_sprite_callback);
-	K055673_CB_MEMBER(le2_sprite_callback);
 
 	struct GX_OBJ
 	{
@@ -157,7 +154,6 @@ public:
 	void gx_draw_basic_extended_tilemaps_1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub1, int sub1flags, int rushingheroes_hack, int offs);
 	void gx_draw_basic_extended_tilemaps_2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub2, int sub2flags, bitmap_ind16 *extra_bitmap, int offs);
 
-	void konamigx_esc_alert(u32 *srcbase, int srcoffs, int count, int mode);
 	void konamigx_precache_registers(void);
 
 	void wipezbuf(int noshadow);
@@ -167,20 +163,10 @@ public:
 
 	void konamigx_mixer_init(screen_device &screen, int objdma);
 	void konamigx_objdma(void);
-	void generate_sprites(address_space &space, u32 src, u32 spr, int count);
 
 	void fantjour_dma_install();
 
 	void konamigx_mixer_primode(int mode);
-
-	typedef void (konamigx_state::*esc_cb)(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
-
-	void tkmmpzdm_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
-	void dragoonj_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
-	void sal2_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
-	void sexyparo_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
-	void tbyahhoo_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
-	void daiskiss_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
 
 	inline int K053247GX_combine_c18(int attrib);
 	inline int K055555GX_decode_objcolor(int c18);
@@ -200,11 +186,6 @@ public:
 	void winspike(machine_config &config) ATTR_COLD;
 	void le2(machine_config &config) ATTR_COLD;
 	void konamigx(machine_config &config) ATTR_COLD;
-	void dragoonj(machine_config &config) ATTR_COLD;
-	void salmndr2(machine_config &config) ATTR_COLD;
-	void tbyahhoo(machine_config &config) ATTR_COLD;
-	void gokuparo(machine_config &config) ATTR_COLD;
-	void sexyparo(machine_config &config) ATTR_COLD;
 	void sexyparoebl(machine_config &config) ATTR_COLD;
 	void gx_base_memmap(address_map &map) ATTR_COLD;
 	void racinfrc_map(address_map &map) ATTR_COLD;
@@ -261,9 +242,6 @@ protected:
 	s32 m_last_prot_op = 0, m_last_prot_clk = 0;
 	u16 m_last_prot_param = 0;
 	u8 m_prev_pixel_clock = 0;
-
-	u8 m_esc_program[4096]{};
-	esc_cb m_esc_cb;
 
 	u16 m_prot_data[0x20]{};
 

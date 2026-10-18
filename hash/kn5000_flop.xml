@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Technics SX-KN5000 floppy disks.
+
+The KN5000's factory "Initial Data" set (idd5000) plus style, wallpaper and demo
+library disks.  Each is available as a self-extracting PC archive that writes its
+payload onto a blank FAT12 HD diskette (1.44 MB); who prepared or distributed the
+library disks is unclear (not necessarily official releases), and no original
+diskette has been dumped, so these images are faithful reconstructions built from
+the archives' own files, which a dump of an original could supersede.
+-->
+<softwarelist name="kn5000_flop" description="Technics SX-KN5000 disks">
+
+	<software name="idd5000">
+		<description>Initial Data (factory default)</description>
+		<year>1997</year>
+		<publisher>Technics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="idd5000.img" size="1474560" crc="04e7983f" sha1="f5027dcf17acfd7e72f6eb053c11595f908258c1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca5001">
+		<description>Styles: Volksmusik (Polka, March, Walzer)</description>
+		<year>1998</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca5001.img" size="1474560" crc="5e40ca6c" sha1="e3a264c354aab44e2897e9cd8042e005589f563d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca5002">
+		<description>Styles: Popmusik (8-Beat, 16-Beat, Synth Pop, Disco, Slow Pop)</description>
+		<year>1998</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca5002.img" size="1474560" crc="c71c101c" sha1="46e47201906b1d300b72285e36ac350ffb5b957a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca5003">
+		<description>Styles: Dance &amp; Techno (Dance, Rave, Techno, Charts, Funk)</description>
+		<year>1998</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca5003.img" size="1474560" crc="19e74ac6" sha1="afabdd07ee5e203972d9fc802bfe40fb852846b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca5004">
+		<description>Styles: Swingin' (Big Band, Foxtrot, Country, Jazz, Ballad)</description>
+		<year>1998</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca5004.img" size="1474560" crc="4bf7e596" sha1="577dad1b5ce6fdf48d10af23f9daef3de13daf23"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca5005">
+		<description>Styles: Latin (Samba, Bossa, Beach, Caribbean, Ballroom)</description>
+		<year>1998</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca5005.img" size="1474560" crc="e8079d58" sha1="3b8ac9df7d409c6a3025bc10f955e25e211017ed"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca5006">
+		<description>Styles: Partytime (Schlager, Party Pop, Foxtrot, Walzer, Latin)</description>
+		<year>1998</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca5006.img" size="1474560" crc="005a595d" sha1="fb0e7e55690d61041bbfd64ce4bb84f528664785"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca5007">
+		<description>Styles: Rockin' Days (Rock, Rock'n'Roll, Shuffle, Boogie, Twist)</description>
+		<year>1998</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca5007.img" size="1474560" crc="7b97614c" sha1="7b29152b80867cc578b9d2f4967705e5bb9e0591"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca5008">
+		<description>Styles: Partytime 2 (Polka, Draws, Schlager, Party Pop, Swing)</description>
+		<year>1998</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca5008.img" size="1474560" crc="d92f2906" sha1="1874b423727dba42fe2f05a6465643fbd5e61c5f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca5009">
+		<description>Styles: Stars &amp; Hits (Latin Pop, Oldies, Polka, Schlager, Dance Pop/Rock)</description>
+		<year>1998</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca5009.img" size="1474560" crc="e2788bb8" sha1="b75f988ff28843e4ab60e21c78e5862f0dab3820"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca5010">
+		<description>Styles: Happy Accordion (Polka, Waltz, Swing, Latin, Rock)</description>
+		<year>1998</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca5010.img" size="1474560" crc="e96db46b" sha1="210fca09e92d2ca9958d172237e8b2481894e578"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca5000r">
+		<description>Styles: remainders (Rock, Folklore, Dixie, Slow Waltz)</description>
+		<year>1998</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca5000r.img" size="1474560" crc="8c162b35" sha1="ba67c79757a2e5e691474d4302e63c932f98f5d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca5000w">
+		<description>Wallpapers (14 screen backgrounds)</description>
+		<year>1998</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca5000w.img" size="1474560" crc="01c07458" sha1="111f86ec3b6ab00e821d0ea9e0c1160571a693b1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mix5000">
+		<description>Demo medleys</description>
+		<year>1998</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="mix5000.img" size="1474560" crc="11a2b73f" sha1="b93e47a3c17f14a3041a7fc301a2b61875900277"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
