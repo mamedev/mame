@@ -2179,6 +2179,106 @@ static INPUT_PORTS_START( inunoos )
 	PORT_DIPSETTING(    0x00, "15 kHz" )
 INPUT_PORTS_END
 
+// TODO: deambiguate IPT_COINs (each player has one)
+static INPUT_PORTS_START( ringout )
+	PORT_INCLUDE( naomi_mie )
+
+	PORT_START("TILT.0")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("TILT.1")
+//	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	// need to unmap on-board service buttons: bit 14 at JVS end works in test mode anyway
+	// (i.e. IPT_SERVICE4 is the MAME limit)
+	PORT_MODIFY("MIE.5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// NOTE: maps back & bumper buttons in reverse order than default
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x3c00, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE2 )
+	PORT_BIT( 0x3c00, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE3 )
+	PORT_BIT( 0x3c00, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P4")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE4 )
+	PORT_BIT( 0x3c00, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A0.0")
+	PORT_BIT( 0xff00, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A1.0")
+	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL ) PORT_MINMAX(0x00,0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_PLAYER(1)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A2.0")
+	PORT_BIT( 0xff00, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(2)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A3.0")
+	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL ) PORT_MINMAX(0x00,0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_PLAYER(2)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A4.0")
+
+	PORT_START("A5.0")
+
+	PORT_START("A6.0")
+
+	PORT_START("A7.0")
+
+	PORT_START("A0.1")
+	PORT_BIT( 0xff00, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(3)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A1.1")
+	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL ) PORT_MINMAX(0x00,0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_PLAYER(3)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A2.1")
+	PORT_BIT( 0xff00, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(3)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A3.1")
+	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL ) PORT_MINMAX(0x00,0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_PLAYER(4)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("A4.1")
+
+	PORT_START("A5.1")
+
+	PORT_START("A6.1")
+
+	PORT_START("A7.1")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( initd )
 	PORT_INCLUDE( naomi_mie )
 
@@ -2836,6 +2936,22 @@ void naomi_state::naomigd_kb(machine_config &config)
 	dcctrl0.set_port_tags("P1.M", "P1.LD", "P1.KC1", "P1.KC2", "P1.KC3", "P1.KC4", "P1.KC5", "P1.KC6");
 	dc_keyboard_device &dcctrl1(DC_KEYBOARD(config, "dcctrl1", m_maple, 2));
 	dcctrl1.set_port_tags("P2.M", "P2.LD", "P2.KC1", "P2.KC2", "P2.KC3", "P2.KC4", "P2.KC5", "P2.KC6");
+}
+
+/*
+ * Ringout: 2x 837-13551
+ */
+
+void naomi_state::naomim2_ringout(machine_config &config)
+{
+	naomim2(config);
+
+	config.device_remove("837_13551");
+	sega_837_13551_device &sega837_0(SEGA_837_13551(config, "837_13551_0", "mie"));
+	sega_837_13551_device &sega837_1(SEGA_837_13551(config, "837_13551_1", "mie"));
+	// reads p3 / p4 first then p1 / p2
+	sega837_1.set_port_tags("TILT.0", "P1", "P2", "A0.0", "A1.0", "A2.0", "A3.0", "A4.0", "A5.0", "A6.0", "A7.0", "OUTPUT.0");
+	sega837_0.set_port_tags("TILT.1", "P3", "P4", "A0.1", "A1.1", "A2.1", "A3.1", "A4.1", "A5.1", "A6.1", "A7.1", "OUTPUT.1");
 }
 
 /*
@@ -6092,7 +6208,7 @@ ROM_START( otrigger )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-		ROM_REGION( 0x10000, "io_board", 0)
+	ROM_REGION( 0x10000, "io_board", 0)
 	ROM_LOAD("epr-22084.ic3", 0x0000, 0x10000, CRC(18cf58bb) SHA1(1494f8215231929e41bbe2a133658d01882fbb0f) )
 
 	ROM_REGION( 0xa000000, "rom_board", ROMREGION_ERASEFF)
@@ -11209,8 +11325,8 @@ void naomi_state::init_hotd2()
 /* 0003    */ GAME( 1999, zombrvno,  zombrvn,  naomim2, zombrvn, naomi_state, init_naomi,   ROT0, "Sega", "Zombie Revenge", GAME_FLAGS )
 /* 0003    */ GAME( 1999, zombrvn,   naomi,    naomim2, zombrvn, naomi_state, init_naomi,   ROT0, "Sega", "Zombie Revenge (Rev A)", GAME_FLAGS )
 /* 0003    */ GAME( 1999, zombrvne,  zombrvn,  naomim2, zombrvn, naomi_state, init_naomi,   ROT0, "Sega", "Zombie Revenge (Export)", GAME_FLAGS ) // not 100% sure if its really version for Export, also might have different 840-xxx ID
-/* 0004    */ GAME( 1999, ringouto,  ringout,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Ring Out 4x4", GAME_FLAGS )
-/* 0004    */ GAME( 1999, ringout,   naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Ring Out 4x4 (Rev A)", GAME_FLAGS )
+/* 0004    */ GAME( 1999, ringouto,  ringout,  naomim2_ringout, ringout,   naomi_state, init_naomi,   ROT0, "Sega", "Ring Out 4x4", GAME_FLAGS )
+/* 0004    */ GAME( 1999, ringout,   naomi,    naomim2_ringout, ringout,   naomi_state, init_naomi,   ROT0, "Sega", "Ring Out 4x4 (Rev A)", GAME_FLAGS )
 /* 0005    */ GAME( 1999, alpilotj,  naomi,    naomim2, alpilota,naomi_state, init_naomi,   ROT0, "Sega", "Airline Pilots (Japan, Rev A)", GAME_FLAGS ) // have "Japan Airlines" (JAL) logos and texts on airplanes, deluxe/multiboard setup uses specific BIOS "airlbios"
 /* 0007    */ GAME( 1999, ggram2,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Giant Gram: All Japan Pro Wrestling 2 (Japan)", GAME_FLAGS )
 /* 0008    */ GAME( 1999, tduno,     naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Touch de Uno! / Unou Nouryoku Check Machine (Japan)", GAME_FLAGS )
