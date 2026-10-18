@@ -2113,6 +2113,72 @@ static INPUT_PORTS_START( shaktamb )
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( alienfnt )
+	PORT_INCLUDE( naomi_mie )
+
+	PORT_START("TILT")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Shot Button")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Rotation Button R")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Right Shot Button")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Rotation Button L")
+	PORT_BIT( 0x7c3f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	// NOTE: analog needs to be calibrated in controller settings
+	// wheel
+	PORT_START("A0")
+	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	// right pedal
+	PORT_START("A1")
+	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	// left pedal
+	PORT_START("A2")
+	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+// 犬のおさんぽ
+// cabinet has a treadmill with incline, two handlebars and a lead / leash to simulate dog walking
+// TODO: treadmill comes from the 4 not hooked up rotary channels?
+static INPUT_PORTS_START( inunoos )
+	PORT_INCLUDE( naomi_mie )
+
+	PORT_START("TILT")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("Safety Sensor Far")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("Safety Sensor Near")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pull Lead")
+	PORT_BIT( 0x47ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	// lead
+	PORT_START("A0")
+	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("MIE.5")
+	PORT_DIPNAME( 0x01, 0x01, "Monitor" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "31 kHz" )
+	PORT_DIPSETTING(    0x00, "15 kHz" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( initd )
 	PORT_INCLUDE( naomi_mie )
 
@@ -11191,16 +11257,16 @@ void naomi_state::init_hotd2()
 /* 0044    */ GAME( 2000, csmash,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Cosmic Smash (Rev A)", GAME_FLAGS )
 /* 0045    */ GAME( 1999, tokyobus,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Fortyfive", "Tokyo Bus Guide (Japan, Rev A)", GAME_FLAGS )
 /* 0047    */ GAME( 2000, samba2k,   naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Samba de Amigo ver. 2000 (Japan)", GAME_FLAGS )
-/* 0048    */ GAME( 2001, alienfnt,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Alien Front (Rev T)", GAME_FLAGS )
-/* 0048    */ GAME( 2001, alienfnta, alienfnt, naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Alien Front (Rev A)", GAME_FLAGS )
+/* 0048    */ GAME( 2001, alienfnt,  naomi,    naomim2, alienfnt, naomi_state, init_naomi,   ROT0, "Sega", "Alien Front (Rev T)", GAME_FLAGS )
+/* 0048    */ GAME( 2001, alienfnta, alienfnt, naomim2, alienfnt, naomi_state, init_naomi,   ROT0, "Sega", "Alien Front (Rev A)", GAME_FLAGS )
 /* 0052    */ GAME( 2000, derbyo2k,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Derby Owners Club 2000 Ver.2 (Japan, Rev A)", GAME_FLAGS )
 /* 0054    */ GAME( 2000, shorsem,   shorse,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse (main screens)", GAME_FLAGS )
 /* 0055    */ GAME( 2000, shorsel,   shorse,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse (live and backup)", GAME_FLAGS )
 /* 0056    */ GAME( 2000, shorse,    naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT270,"Sega", "Star Horse (satellite)", GAME_FLAGS )
-/* 0064    */ GAME( 2001, wrungpo,   wrungp,   naomim2, wrungp,   naomi_state, init_naomi,   ROT0, "CRI / Sega", "Wave Runner GP (USA, Rev A)", GAME_FLAGS )
-/* 0064    */ GAME( 2001, wrungp,    naomi,    naomim2, wrungp,   naomi_state, init_naomi,   ROT0, "CRI / Sega", "Wave Runner GP", GAME_FLAGS )
+/* 0064    */ GAME( 2001, wrungpo,   wrungp,   naomim2, wrungp,  naomi_state, init_naomi,   ROT0, "CRI / Sega", "Wave Runner GP (USA, Rev A)", GAME_FLAGS )
+/* 0064    */ GAME( 2001, wrungp,    naomi,    naomim2, wrungp,  naomi_state, init_naomi,   ROT0, "CRI / Sega", "Wave Runner GP", GAME_FLAGS )
 /* 0068    */ GAME( 2001, crakndj2,  naomi,    naomim2, crackndj,naomi_state, init_naomi,   ROT0, "Sega", "Crackin' DJ Part 2 (Japan)", GAME_FLAGS )
-/* 0073    */ GAME( 2001, inunoos,   naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Wow Entertainment / Sega", "Inu no Osanpo / Dog Walking (Japan, Export, Rev A)", GAME_FLAGS )
+/* 0073    */ GAME( 2001, inunoos,   naomi,    naomim2, inunoos, naomi_state, init_naomi,   ROT0, "Wow Entertainment / Sega", "Inu no Osanpo / Dog Walking (Japan, Export, Rev A)", GAME_FLAGS )
 // 0075 Star Horse 2001 (main screens)
 // 0076 Star Horse 2001 (sound)
 // 0077 Star Horse 2001 (live)
