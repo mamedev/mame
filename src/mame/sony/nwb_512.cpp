@@ -27,7 +27,6 @@
  *   - Add NEWS I/O Bus slot and convert this to it instead of regular device
  *   - Cycle-accurate timing
  *   - Interrupt support for CPU-only models (iopboot, mrx, and the monitor don't use them because they have the free cycles to poll)
- *   - Dimmer support
  *   - Refactoring for multiplanar framebuffer support (NWB-225A color framebuffer, etc.). The implementation uses the same raster operation controller,
  *     so the eventual drivers for those (when ROM dumps and board pictures are available) will be able to share code with the NWB-512.
  *   - Determine dimming amounts from real hardware
@@ -36,9 +35,10 @@
 #include "emu.h"
 #include "nwb_512.h"
 
-#define LOG_ROP_CONFIG 1 << 1
-#define LOG_ROP 1 << 2
-#define LOG_CTRL 1 << 3
+#define LOG_CTRL 1 << 1
+#define LOG_OP 1 << 2
+#define LOG_ROP_CONFIG 1 << 3
+#define LOG_ROP 1 << 4
 
 #define VERBOSE (LOG_CTRL | LOG_ROP_CONFIG | LOG_GENERAL)
 #include "logmacro.h"
@@ -191,9 +191,6 @@ void nwb_512_device::check_operation_start(offs_t offset)
 		return;
 	}
 
-	LOG("Operation started\n");
-
-	m_state.busy = true;
 	// Adjust source and destination coordinates for the reverse direction if necessary,
 	// because the left edge is always inclusive (right edge exclusive).
 	if (!m_state.x_direction)
@@ -203,40 +200,7 @@ void nwb_512_device::check_operation_start(offs_t offset)
 		--m_state.limit_x;
 	}
 
-	m_state.current_destination_x = m_state.destination_x;
-
-	const uint16_t width = m_state.x_direction ? m_state.limit_x - m_state.destination_x  // fwd: [dest, limit)
-											   : m_state.destination_x - m_state.limit_x; // rev: [limit, dest)
-	const uint16_t src_phase = m_state.x_direction ? m_state.source_x & 15 : 15 - (m_state.source_x & 15);
-	const uint16_t dest_phase = m_state.x_direction ? m_state.destination_x & 15 : 15 - (m_state.destination_x & 15);
-
-	m_state.prime = src_phase > dest_phase;
-	m_state.prime_pending = m_state.prime;
-	m_state.source_words_per_row = (src_phase + width + 15) >> 4;
-	m_state.dest_words_per_row = (dest_phase + width + 15) >> 4;
-	m_state.source_words_left = m_state.source_words_per_row;
-	m_state.dest_words_left = m_state.dest_words_per_row;
-	LOG("Source words per row: %d, Destination words per row: %d, priming required = %s\n", m_state.source_words_per_row, m_state.dest_words_per_row, m_state.prime ? "yes" : "no");
-
-	if (std::abs(m_state.dest_words_per_row - m_state.source_words_per_row) > 1)
-	{
-		fatalerror("nwb512: source (0x%x) and destination (0x%x) words per row not aligned!", m_state.dest_words_per_row, m_state.source_words_per_row);
-	}
-
-	// Update masks to preserve framebuffer contents that shouldn't be modified
-	uint16_t x_lo, x_hi;
-	if (m_state.x_direction)
-	{
-		x_lo = m_state.destination_x;
-		x_hi = m_state.limit_x - 1;
-	}
-	else
-	{
-		x_lo = m_state.limit_x + 1;
-		x_hi = m_state.destination_x;
-	}
-	m_state.mask1 = ~(0xffff >> (x_lo & 0xf));
-	m_state.mask2 = 0xffff >> ((x_hi & 0xf) + 1);
+	start_operation();
 
 	// TODO: This executes copies immediately, faster than real hardware.
 	// It also doesn't use the proper registers
@@ -314,6 +278,7 @@ void nwb_512_device::limit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	const bool op_start = offset & (0x4000 >> 1);
 	const bool fb_read = op_start ? offset & (0x10000 >> 1) : true;
 	const bool fb_write = op_start;
+
 	if (fb_read != m_state.fb_read || fb_write != m_state.fb_write)
 	{
 		LOG("limit_w: override arm=%d%d -> limit=%d%d\n", m_state.fb_read, m_state.fb_write, fb_read, fb_write);
@@ -321,16 +286,8 @@ void nwb_512_device::limit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_state.fb_read = fb_read;
 	m_state.fb_write = fb_write;
 
-	// if (m_state.fb_read != fb_read)
-	// {
-	// 	m_state.fb_read = fb_read;
-	// 	LOG("limit_w override for source: offset = 0x%x fbread = %s fbwrite = %s\n", offset, m_state.fb_read ? "true" : "false", m_state.fb_write ? "true" : "false");
-	// }
-
 	m_state.limit_x = x_address(data);
 	m_state.limit_y = y_address(offset);
-	// const uint16_t last_pixel = (m_state.limit_x - 1) & 0xf;     // last pixel's position in the last word
-	// m_state.mask2 = 0xffff >> (last_pixel + 1);        // preserve everything at/after the right edge
 
 	LOG("Limit set to (0x%x, 0x%x) x word offset = 0x%x\n", m_state.limit_x, m_state.limit_y, (m_state.limit_x - 1) >> 4);
 	check_operation_start(offset);
@@ -491,17 +448,14 @@ uint16_t nwb_512_device::execute_rop(const uint8_t opcode, const uint16_t source
 uint16_t nwb_512_device::shift(uint16_t data)
 {
 	// Calculate source by shifting bits and update carryover
-	// TODO: clean this up
 	uint16_t result;
-	if (m_state.x_direction)
+	if (m_state.x_direction) // L -> R
 	{
 		result = uint16_t(data >> m_state.shift | m_state.carry);
 		m_state.carry = uint16_t(uint32_t(data) << (16 - m_state.shift) & 0xffff);
 	}
-	else
+	else // R -> L
 	{
-		// TODO: might be better to calculate shift differently based on rev flag instead, mainly if the computation of state can be centralized
-		//       But, the direction is still different, so doing the computation in the state update doesn't get rid of this if/else
 		const uint16_t shift_complement = (16 - m_state.shift) & 0xf;
 		result = uint16_t(data << shift_complement | m_state.carry);
 		m_state.carry = uint16_t(uint32_t(data) >> (16 - shift_complement) & 0xffff);
@@ -584,14 +538,16 @@ void nwb_512_device::rop_cycle(uint16_t data)
 		m_state.prime_pending = false;
 		--m_state.source_words_left;
 
-		if (m_state.source_words_left == 0 && m_state.dest_words_left > 0) {
+		if (m_state.source_words_left == 0 && m_state.dest_words_left > 0)
+		{
 			// In this case, the prime has to be written directly, because we had only one word left
 			// from the source but it had to be shifted to account for the phase.
 			rop(m_state.carry);
 		}
 
 		// Because we are writing a word, we might have to end the row
-		if (m_state.dest_words_left == 0) {
+		if (m_state.dest_words_left == 0)
+		{
 			end_row();
 		}
 
@@ -640,7 +596,6 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 		m_state.current_source_x += m_state.x_direction ? 16 : -16;
 	}
 
-	// word = shift(sxa, sya)
 	word = coordinate_to_data(m_state.current_source_x, m_state.source_y);
 	LOG("  fifo_r: word before shift = 0x%x\n", word);
 	word = shift(word);
@@ -652,7 +607,6 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 	--m_state.dest_words_left;
 	LOG("  fifo_r: advanced source to %d, destination to %d, and there are %d words left\n", m_state.current_source_x, m_state.current_destination_x, m_state.dest_words_left);
 
-	// if (dxa > lxa) end row (reload X, Y++, carry = 0, re-prime if needed)
 	if (m_state.dest_words_left == 0)
 	{
 		LOG("  fifo_r: calling end row\n");
@@ -662,6 +616,71 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 	return word;
 }
 
+void nwb_512_device::start_operation()
+{
+	LOGMASKED(LOG_OP, "start_operation()\n");
+	m_state.busy = true; // TODO: use the granular status bits
+
+	// The DSC-008 section of the NWS-15xx service manual implies that the direction bit is not
+	// supported/used for reads. For now, assume the same for the NWB-512.
+	if (m_state.is_fb_to_host() && !m_state.x_direction)
+	{
+		fatalerror("Reverse reads are not supported!");
+	}
+
+	// Latch SRXA and DRXA into SXA and DXA
+	m_state.current_destination_x = m_state.destination_x;
+	m_state.current_source_x = m_state.source_x;
+
+	// Compute the phase of the source and destination (used to determine how the shifter is loaded)
+	const uint16_t src_phase = m_state.x_direction ? m_state.source_x & 15 : 15 - (m_state.source_x & 15);
+	const uint16_t dest_phase = m_state.x_direction ? m_state.destination_x & 15 : 15 - (m_state.destination_x & 15);
+	const uint16_t width = m_state.x_direction ? m_state.limit_x - m_state.destination_x  // fwd: [dest, limit)
+											   : m_state.destination_x - m_state.limit_x; // rev: [limit, dest)
+
+	m_state.prime = src_phase > dest_phase;
+	m_state.prime_pending = m_state.prime;
+
+	// TODO: should be a way to consolidate these formulas
+	if (m_state.fb_write)
+	{
+		m_state.source_words_per_row = (src_phase + width + 15) >> 4;
+		m_state.dest_words_per_row = (dest_phase + width + 15) >> 4;
+	}
+	else
+	{
+		m_state.dest_words_per_row = (m_state.limit_x >> 4) - (m_state.source_x >> 4) + (m_state.prime ? 0 : 1);
+		m_state.source_words_per_row = m_state.dest_words_per_row; // not used for reads
+	}
+
+	if (std::abs(m_state.dest_words_per_row - m_state.source_words_per_row) > 1)
+	{
+		fatalerror("nwb512: source (0x%x) and destination (0x%x) words per row not aligned!", m_state.dest_words_per_row, m_state.source_words_per_row);
+	}
+
+	m_state.source_words_left = m_state.source_words_per_row;
+	m_state.dest_words_left = m_state.dest_words_per_row;
+	LOG("Source words per row: %d, Destination words per row: %d, priming required = %s\n", m_state.source_words_per_row, m_state.dest_words_per_row, m_state.prime ? "yes" : "no");
+
+	// If writing to the framebuffer, update masks to preserve bits that shouldn't be modified
+	if (m_state.fb_write)
+	{
+		uint16_t x_lo, x_hi;
+		if (m_state.x_direction)
+		{
+			x_lo = m_state.destination_x;
+			x_hi = m_state.limit_x - 1;
+		}
+		else
+		{
+			x_lo = m_state.limit_x + 1;
+			x_hi = m_state.destination_x;
+		}
+		m_state.mask1 = ~(0xffff >> (x_lo & 0xf));
+		m_state.mask2 = 0xffff >> ((x_hi & 0xf) + 1);
+	}
+}
+
 void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOG("(%s) fifo_w(0x%x, 0x%x, 0x%x)\n", machine().describe_context(), offset, data, mem_mask);
@@ -669,29 +688,7 @@ void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (m_state.fb_read && !m_state.fb_write)
 	{
 		LOG("Start fbread op\n");
-		// A write to this port when armed for reading starts the process
-		m_state.busy = true; // TODO: exact value
-
-		// The DSC-008 section of the NWS-15xx service manual implies that the direction bit is not
-		// supported/used for reads. For now, assume the same for the NWB-512.
-		if (!m_state.x_direction)
-		{
-			fatalerror("Reverse reads are not supported!");
-		}
-
-		m_state.current_destination_x = m_state.destination_x;
-		m_state.current_source_x = m_state.source_x;
-
-		const uint16_t src_phase = m_state.x_direction ? m_state.source_x & 15 : 15 - (m_state.source_x & 15);
-		const uint16_t dest_phase = m_state.x_direction ? m_state.destination_x & 15 : 15 - (m_state.destination_x & 15);
-
-		// The row end logic is determined from the destination (which must be aligned with the source)
-		m_state.prime = src_phase > dest_phase;
-		m_state.prime_pending = m_state.prime;
-		m_state.dest_words_per_row = (m_state.limit_x >> 4) - (m_state.source_x >> 4) + (m_state.prime ? 0 : 1);
-		m_state.dest_words_left = m_state.dest_words_per_row;
-		LOG("Destination words per row: %d\n", m_state.dest_words_per_row);
-
+		start_operation();
 		return;
 	}
 

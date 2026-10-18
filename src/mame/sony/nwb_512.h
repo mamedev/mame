@@ -82,30 +82,47 @@ private:
 		uint16_t mask1 = 0;
 		uint16_t mask2 = 0;
 		bool prime = false;
-		bool prime_pending = false; // /PRED - when src phase > dst phase, there are two source words needed to get/set first dst/src
+		bool prime_pending = false; // /PRED - when src phase > dst phase, there are two source words needed to get/set first dst/src (or one source word that needs to be shifted for alignment purposes)
+	
+		bool is_fb_to_host() {
+			return fb_read && !fb_write;
+		}
+
+		bool is_host_to_fb() {
+			return !fb_read && fb_write;
+		}
+
+		bool is_fb_to_fb() {
+			return fb_read && fb_write;
+		}
+	
 	} m_state;
 
 	// TODO: split by what is mapped and what is a helper
-	void reset_state();
 	void destination_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void source_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void limit_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void shift_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	void check_operation_start(offs_t offset);
 	uint16_t fifo_r(offs_t offset, uint16_t mem_mask);
 	void fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t status_r();
+	void ctrl_w(uint16_t data);
+	void planemask_w(uint8_t data);
+
+	void reset_state();
+	void check_operation_start(offs_t offset);
 	void set_pixel(uint16_t x, uint16_t y, bool on);
 	uint16_t execute_rop(uint8_t opcode, uint16_t source, uint16_t destination);
 	uint16_t shift(uint16_t data);
 	void rop_cycle(uint16_t data);
 	void rop(uint16_t source);
 	void end_row();
-	uint16_t status_r();
-	void ctrl_w(uint16_t data);
-	void planemask_w(uint8_t data);
+	void start_operation();
 	uint16_t coordinate_to_data(uint16_t x, uint16_t y);
+	rgb_t current_dim_color();
+
 	void check_enabled() const
 	{
 		if (!(m_state.ctrl & 0x1))
@@ -113,7 +130,6 @@ private:
 			fatalerror("nwb_512: framebuffer not enabled when interaction started");
 		}
 	}
-	rgb_t current_dim_color();
 };
 
 DECLARE_DEVICE_TYPE(NWB_512, nwb_512_device)
