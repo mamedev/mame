@@ -85,6 +85,12 @@ public:
 	// construction/destruction
 	v810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// optional bus timing: when set, the core charges opcode fetches (and models the
+	// instruction cache) and asks the callback for the wait states of every bus access
+	enum : int { BUS_FETCH, BUS_READ, BUS_WRITE, BUS_IO_READ, BUS_IO_WRITE };
+	using bus_wait_delegate = device_delegate<int (offs_t address, int access, int size)>;
+	template <typename... T> void set_bus_wait_callback(T &&... args) { m_bus_wait.set(std::forward<T>(args)...); }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -120,6 +126,20 @@ private:
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_io;
 	uint32_t m_PPC;
 	int m_icount;
+
+	enum : u8 { LAST_OTHER, LAST_LD, LAST_ST, LAST_OUT };
+
+	bus_wait_delegate m_bus_wait;
+	bool m_bus_timing;
+	u8 m_lastop;
+	u8 m_curop;
+	// instruction cache, only modelled for its timing: 128 entries of two 4-byte sub-blocks
+	uint32_t m_icache_tag[128];
+	bool m_icache_valid[128][2];
+
+	inline uint16_t fetch_op(offs_t addr, int cycles);
+	inline uint32_t mem_cycles(offs_t addr, int access, int size, int base, int pair, u8 kind);
+	void icache_clear(unsigned start, unsigned count);
 
 	inline void SETREG(uint32_t reg,uint32_t val);
 	inline uint32_t GETREG(uint32_t reg);

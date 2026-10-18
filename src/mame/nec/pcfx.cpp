@@ -50,6 +50,7 @@ protected:
 
 private:
 	void int_w(offs_t line, u8 state);
+	int bus_wait(offs_t address, int access, int size);
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 	template <int Pad> u16 pad_r(offs_t offset);
@@ -84,7 +85,9 @@ private:
 	u8 m_bram_control = 0;
 	std::unique_ptr<u8[]> m_nvram_ptr;
 
-	required_device<cpu_device> m_maincpu;
+	u32 m_dram_page = 0;
+
+	required_device<v810_device> m_maincpu;
 	required_device<huc6261_device> m_huc6261;
 	required_device<pcfx_intc_device> m_intc;
 	required_ioport_array<2> m_pads;
@@ -329,6 +332,7 @@ void pcfx_state::machine_start()
 
 	save_pointer(NAME(m_nvram_ptr), 0x8000);
 	save_item(NAME(m_bram_control));
+	save_item(NAME(m_dram_page));
 	save_item(NAME(m_timer_control));
 	save_item(NAME(m_timer_period));
 }
@@ -358,6 +362,43 @@ void pcfx_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 	std::copy(std::begin(fat), std::end(fat), &bram[0x80]);
 }
 
+// bus wait states: the DRAM charges 3 cycles when an access (opcode
+// fetches included) leaves the 2 KB page of the previous one, the BIOS ROM 2 cycles a
+// halfword, the video and sound chips 4 cycles a read and 2 a write; everything but
+// the DRAM is on a 16-bit bus, so a 32-bit access takes two bus cycles
+int pcfx_state::bus_wait(offs_t address, int access, int size)
+{
+	const bool io = access == v810_device::BUS_IO_READ || access == v810_device::BUS_IO_WRITE;
+	int wait;
+
+	if (!io && address < 0x01000000)
+	{
+		const u32 page = address & ~0x7ff;
+		wait = (page != m_dram_page) ? 3 : 0;
+		m_dram_page = page;
+		return wait;
+	}
+
+	const bool write = access == v810_device::BUS_WRITE || access == v810_device::BUS_IO_WRITE;
+	if (io || (address >= 0x80000000 && address < 0x80800000))
+	{
+		const offs_t port = address & 0x7fffff;
+		wait = (port >= 0x100 && port < 0x700) ? (write ? 2 : 4) : 0;
+	}
+	else if (address >= 0xf0000000)
+		wait = write ? 0 : 2;
+	else if (address >= 0xa0000000 && address < 0xb0000000)
+		wait = write ? 0 : 4;
+	else if (address >= 0xb0000000 && address < 0xc0000000)
+		wait = write ? 2 : 0;
+	else
+		wait = 0;
+
+	if (size == 4)
+		wait = wait * 2 + ((access == v810_device::BUS_FETCH) ? 1 : 2);
+	return wait;
+}
+
 void pcfx_state::int_w(offs_t line, u8 state)
 {
 	m_maincpu->set_input_line(line, state ? ASSERT_LINE : CLEAR_LINE);
@@ -369,6 +410,7 @@ void pcfx_state::pcfx(machine_config &config)
 	V810(config, m_maincpu, XTAL(21'477'272));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcfx_state::pcfx_mem);
 	m_maincpu->set_addrmap(AS_IO, &pcfx_state::pcfx_io);
+	m_maincpu->set_bus_wait_callback(FUNC(pcfx_state::bus_wait));
 
 	PCFX_INTC(config, m_intc);
 	m_intc->int_cb().set(FUNC(pcfx_state::int_w));
