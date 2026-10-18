@@ -9,11 +9,11 @@
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
 #include "video/huc6271.h"
-#include "speaker.h"
 
 
 class huc6272_device :  public device_t,
-						public device_memory_interface
+						public device_memory_interface,
+						public device_mixer_interface
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND | feature::GRAPHICS; }
@@ -32,7 +32,6 @@ public:
 	u8 adpcm_update_1();
 
 	// CD-DA operations
-	void cdda_update(offs_t offset, u8 data);
 
 	// video output, for the '6261
 	void render_bg_line(int raster, u32 *dest);
@@ -48,7 +47,6 @@ protected:
 
 private:
 	required_device<huc6271_device> m_huc6271;
-	required_device<speaker_device> m_cdda;
 
 	u8 m_register;
 	u32 m_kram_addr_r, m_kram_addr_w;

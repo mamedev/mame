@@ -10,12 +10,12 @@
 class huc6230_device : public device_t, public device_sound_interface
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::SOUND; } // volume smoothing, anti-click, PSG/ADPCM balance unverified
+	static constexpr feature_type imperfect_features() { return feature::SOUND; } // anti-click, analog output stage not emulated
 
 	huc6230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// sound inputs 0-1: unused (PSG), 2-3: line (CD-DA) left/right
 	template <unsigned N> auto adpcm_update_cb() { return m_adpcm_update_cb[N].bind(); }
-	auto vca_callback() { return m_vca_cb.bind(); }
 
 	// write only
 	void write(offs_t offset, uint8_t data);
@@ -49,10 +49,18 @@ private:
 	uint32_t m_pcm_lvol;
 	uint32_t m_pcm_rvol;
 
+	// line input VCA: level 0-1023, the level it ramps towards, master clocks to the next step
+	int32_t m_vca_level[2];
+	int32_t m_vca_target[2];
+	int32_t m_vca_wait[2];
+
+	static int32_t vca_step_time(int32_t level);
+	void vca_set(int ch, u8 data);
+	void vca_run(int ch, int32_t clocks);
+
 	TIMER_CALLBACK_MEMBER(adpcm_timer);
 
 	devcb_read8::array<2> m_adpcm_update_cb;
-	devcb_write8 m_vca_cb;
 };
 
 DECLARE_DEVICE_TYPE(HuC6230, huc6230_device)

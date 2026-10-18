@@ -52,8 +52,8 @@ DEFINE_DEVICE_TYPE(HUC6272, huc6272_device, "huc6272", "Hudson HuC6272 \"King\""
 huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, HUC6272, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
+	, device_mixer_interface(mconfig, *this)
 	, m_huc6271(*this, finder_base::DUMMY_TAG)
-	, m_cdda(*this, "cdda")
 	, m_register(0)
 	, m_kram_addr_r(0)
 	, m_kram_addr_w(0)
@@ -81,14 +81,13 @@ huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, d
 void huc6272_device::cdrom_config(device_t *device)
 {
 	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-	cdda->add_route(0, "^^cdda", 1.0, 0);
-	cdda->add_route(1, "^^cdda", 1.0, 1);
+	// the drive's audio passes through to the HuC6230 line input
+	cdda->add_route(0, "^^", 1.0, 0);
+	cdda->add_route(1, "^^", 1.0, 1);
 }
 
 void huc6272_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, m_cdda, 2).front();
-
 	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
 	scsibus.set_data_input_buffer("scsi_data_in");
 	scsibus.rst_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit7));
@@ -1522,11 +1521,6 @@ u8 huc6272_device::adpcm_update_0()
 u8 huc6272_device::adpcm_update_1()
 {
 	return adpcm_update(1);
-}
-
-void huc6272_device::cdda_update(offs_t offset, u8 data)
-{
-	m_cdda->set_input_gain(offset, float(data & 0x3f) / 63.0);
 }
 
 void huc6272_device::interrupt_update()

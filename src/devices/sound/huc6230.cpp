@@ -30,6 +30,13 @@ void huc6230_device::sound_stream_update(sound_stream &stream)
 		s32 samp0 = stream.get(0, i) * 32768.0;
 		s32 samp1 = stream.get(1, i) * 32768.0;
 
+		// line input: summed through 4R against 2R for an ADPCM channel and R for the PSG,
+		// so full scale matches one ADPCM channel's
+		vca_run(0, 6);
+		vca_run(1, 6);
+		samp0 += s32(stream.get(2, i) * 16384.0 * m_vca_level[0] / 1023);
+		samp1 += s32(stream.get(3, i) * 16384.0 * m_vca_level[1] / 1023);
+
 		for (int adpcm = 0; adpcm < 2; adpcm++)
 		{
 			adpcm_channel *channel = &m_adpcm_channel[adpcm];
@@ -79,12 +86,61 @@ void huc6230_device::write(offs_t offset, uint8_t data)
 	else if (offset < 0x16)
 	{
 		m_pcm_lvol = data & 0x3f;
-		m_vca_cb(0, m_pcm_lvol);
+		vca_set(0, m_pcm_lvol);
 	}
 	else if (offset < 0x17)
 	{
 		m_pcm_rvol = data & 0x3f;
-		m_vca_cb(1, m_pcm_rvol);
+		vca_set(1, m_pcm_rvol);
+	}
+}
+
+/*
+    Line (CD-DA) volume: a VCA whose level (0-1023) moves one step at a time towards
+    16n+15 when rising or 16n when falling (n = register value, 3F = 1023).
+    The step time grows as the level falls, a full 3F to 00 fade takes 7.53 ms.
+*/
+int32_t huc6230_device::vca_step_time(int32_t level)
+{
+	// 1.49us per step at 512 and up, doubling for each lower octave; the last step to/from 0 takes 2956.16us
+	if (level >= 512) return 32;
+	if (level >= 256) return 64;
+	if (level >= 128) return 128;
+	if (level >= 64) return 256;
+	if (level >= 32) return 512;
+	if (level >= 16) return 1024;
+	return 63490;
+}
+
+void huc6230_device::vca_set(int ch, u8 data)
+{
+	const int32_t level = m_vca_level[ch];
+	const int32_t up = (data == 0x3f) ? 1023 : data ? data * 16 + 15 : 0;
+	const int32_t down = (data == 0x3f) ? 1023 : data * 16;
+	const int32_t target = (up > level) ? up : (down < level) ? down : level;
+
+	if (target != level && m_vca_target[ch] == level)
+		m_vca_wait[ch] = vca_step_time((target > level) ? level + 1 : level);
+	m_vca_target[ch] = target;
+}
+
+void huc6230_device::vca_run(int ch, int32_t clocks)
+{
+	int32_t &level = m_vca_level[ch];
+	const int32_t target = m_vca_target[ch];
+	if (level == target)
+		return;
+
+	m_vca_wait[ch] -= clocks;
+	while (m_vca_wait[ch] <= 0 && level != target)
+	{
+		if (target > level)
+			level = (level < 16) ? std::min(target, 16) : level + 1;
+		else
+			level = (level < 16) ? target : level - 1;
+
+		if (level != target)
+			m_vca_wait[ch] += vca_step_time((target > level) ? level + 1 : level);
 	}
 }
 
@@ -148,7 +204,6 @@ huc6230_device::huc6230_device(const machine_config &mconfig, const char *tag, d
 	, m_pcm_lvol(0)
 	, m_pcm_rvol(0)
 	, m_adpcm_update_cb(*this, 0)
-	, m_vca_cb(*this)
 {
 }
 
@@ -168,7 +223,7 @@ void huc6230_device::device_add_mconfig(machine_config &config)
 
 void huc6230_device::device_start()
 {
-	m_stream = stream_alloc(2, 2, clock() / 6);
+	m_stream = stream_alloc(4, 2, clock() / 6);
 	m_adpcm_timer = timer_alloc(FUNC(huc6230_device::adpcm_timer), this);
 
 	// 1.5dB per step, settings 0x00-0x1b are silent
@@ -189,6 +244,12 @@ void huc6230_device::device_start()
 	save_item(NAME(m_adpcm_control));
 	save_item(NAME(m_pcm_lvol));
 	save_item(NAME(m_pcm_rvol));
+
+	for (int i = 0; i < 2; i++)
+		m_vca_level[i] = m_vca_target[i] = m_vca_wait[i] = 0;
+	save_item(NAME(m_vca_level));
+	save_item(NAME(m_vca_target));
+	save_item(NAME(m_vca_wait));
 }
 
 void huc6230_device::device_clock_changed()
