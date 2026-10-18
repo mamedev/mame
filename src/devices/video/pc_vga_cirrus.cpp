@@ -1609,6 +1609,35 @@ void cirrus_gd5430_vga_device::mem_w(offs_t offset, uint8_t data)
 	cirrus_gd5428_vga_device::mem_w(offset, data);
 }
 
+/*
+ * GD5430 BitBLT registers:
+ * GR0:     Background colour byte 0 (00h).
+ * GR1:     Foreground colour byte 0 (04h).
+ * GR10:    Background colour byte 1 (01h).
+ * GR11:    Foreground colour byte 1 (05h).
+ * GR20/21: BLT width bytes 0/1 (08h/09h).
+ * GR22/23: BLT height bytes 0/1 (0Ah/0Bh).
+ * GR24/25: BLT destination pitch bytes 0/1 (0Ch/0Dh).
+ * GR26/27: BLT source pitch bytes 0/1 (0Eh/0Fh).
+ * GR28-2A: BLT destination start bytes 0-2 (10h-12h).
+ * GR2C-2E: BLT source start bytes 0-2 (14h-16h).
+ * GR2F:    BLT destination left-side clipping (17h).
+ * GR30:    BLT mode (18h).
+ * GR31:    BLT start/status (40h), the only register readable through MMIO.
+ * GR32:    BLT raster operation (1Ah).
+ *
+ * Notes:
+ * - This is the GD5430/'40 subset from the Alpine Family TRM. Colour
+ *   bytes are grouped by background/foreground rather than GR index.
+ *
+ * TODO:
+ * - GD5430 reserves 02h/03h/06h/07h (GR12-GR15) and 1Bh-3Fh. GD5446
+ *   also defines those colour bytes, GR33 mode extensions and GR34/35
+ *   colour keys; these are not implemented by inheriting this decoder.
+ * - Give later chips their own MMIO address map and replace the GR
+ *   lambdas with named handlers shared by indexed and MMIO maps, allowing
+ *   each chip to define its register set and MMIO access permissions.
+ */
 u8 cirrus_gd5430_vga_device::mmio_register(offs_t offset)
 {
 	if ((offset >= 0x08 && offset <= 0x12) ||
