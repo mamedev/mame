@@ -6,6 +6,7 @@
 #include "cpu/tlcs90/tlcs90.h"
 
 DEFINE_DEVICE_TYPE(SEGA_837_13551, sega_837_13551_device, "jvs13551", "Sega 837-13551 I/O Board")
+DEFINE_DEVICE_TYPE(SEGA_837_13844, sega_837_13844_device, "jvs13844", "Sega 837-13844 I/O Board")
 
 void sega_837_13551_device::jvs13551_coin_1_w(int state)
 {
@@ -58,6 +59,12 @@ ioport_constructor sega_837_13551_device::device_input_ports() const
 sega_837_13551_device::sega_837_13551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : jvs_device(mconfig, SEGA_837_13551, tag, owner, clock)
 , port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
 {
+}
+
+sega_837_13551_device::sega_837_13551_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : jvs_device(mconfig, type, tag, owner, clock)
+, port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
+{
+
 }
 
 const char *sega_837_13551_device::device_id()
@@ -189,4 +196,32 @@ bool sega_837_13551_device::swoutputs(uint8_t id, uint8_t val)
 	handle_output(port[11], id, val);
 	logerror("837-13551: output %d, %d\n", id, val);
 	return true;
+}
+
+/*
+ * 837-13844 (smarinef, anpanman2)
+ */
+
+sega_837_13844_device::sega_837_13844_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : sega_837_13551_device(mconfig, SEGA_837_13844, tag, owner, clock)
+{
+}
+
+const char *sega_837_13844_device::device_id()
+{
+	return "SEGA ENTERPRISES,LTD.;837-13844-01 I/O CNTL BD2 ;Ver1.00;99/07";
+}
+
+void sega_837_13844_device::function_list(uint8_t *&buf)
+{
+	// SW input - 2 players, 12 bits
+	*buf++ = 0x01; *buf++ = 2; *buf++ = 12; *buf++ = 0;
+
+	// Coin input - 2 slots
+	*buf++ = 0x02; *buf++ = 2; *buf++ = 0; *buf++ = 0;
+
+	// Analog input - 8 channels
+	*buf++ = 0x03; *buf++ = 8; *buf++ = 16; *buf++ = 0;
+
+	// Driver out - 22 channels
+	*buf++ = 0x12; *buf++ = 22; *buf++ = 0; *buf++ = 0;
 }
