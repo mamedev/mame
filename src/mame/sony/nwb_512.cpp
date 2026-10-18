@@ -90,7 +90,19 @@ namespace
 	// Extracts the Y address from the address provided to an FB write
 	uint16_t y_address(uint16_t data) // word offset
 	{
-		return data & 0xfff; // When Y is supplied, it is in A12-A1, but is already shifted down because it is mapped in the memory map function at word width.
+		return data & 0xfff; // When Y is supplied, it is in A12-A1
+	}
+
+	// True if address written specifies that the write should also load the shift
+	bool shift_load_requested(offs_t offset) // word offset
+	{
+		return offset & (0x2000 >> 1);
+	}
+
+	// True if address written specifies operation start
+	bool execution_requested(offs_t offset) // word offset
+	{
+		return offset & (0x4000 >> 1);
 	}
 }
 
@@ -186,7 +198,7 @@ void nwb_512_device::check_operation_start(offs_t offset)
 			 m_state.destination_x, m_state.destination_y,
 			 m_state.limit_x, m_state.limit_y);
 
-	if (!(offset & (0x4000 >> 1))) // word offset
+	if (!execution_requested(offset))
 	{
 		return;
 	}
@@ -238,12 +250,9 @@ void nwb_512_device::destination_w(offs_t offset, uint16_t data, uint16_t mem_ma
 	m_state.destination_y = y_address(offset);
 	LOG("Destination set to (0x%x, 0x%x) x word offset = 0x%x\n", m_state.destination_x, m_state.destination_y, (m_state.destination_x - 1) >> 4);
 
-	if (offset & (0x2000 >> 1))
+	if (shift_load_requested(offset))
 	{
-		// Determine how much we need to shift source by to align it with destination
-		// TODO: double-check that the math works here for both xfwd and xrev
-		m_state.shift = (m_state.destination_x - m_state.source_x) & 15;
-		LOG("destination_w: Calculated shift: 0x%x - 0x%x & 15 = 0x%x\n", m_state.destination_x, m_state.source_x, m_state.shift);
+		m_state.load_shift_count();
 	}
 
 	check_operation_start(offset);
@@ -257,12 +266,9 @@ void nwb_512_device::source_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	m_state.source_x = x_address(data);
 	m_state.source_y = y_address(offset);
 
-	if (offset & (0x2000 >> 1))
+	if (shift_load_requested(offset))
 	{
-		// how much do we need to shift source by to align it with destination?
-		// TODO: double-check that the math works here for both xfwd and xrev
-		m_state.shift = (m_state.destination_x % 16 - m_state.source_x % 16) & 0xf; // direction determined by x direction
-		LOG("source_w: Calculated shift: 0x%x % 16 - 0x%x % 16 = 0x%x\n", m_state.destination_x, m_state.source_x, m_state.shift);
+		m_state.load_shift_count();
 	}
 
 	LOG("Source set to (0x%x, 0x%x)\n", m_state.source_x, m_state.source_y);
@@ -275,7 +281,7 @@ void nwb_512_device::limit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	LOG("limit_w(0x%x, 0x%x, 0x%x)\n", offset, data, mem_mask);
 
 	// TODO: this feels like a hack
-	const bool op_start = offset & (0x4000 >> 1);
+	const bool op_start = execution_requested(offset);
 	const bool fb_read = op_start ? offset & (0x10000 >> 1) : true;
 	const bool fb_write = op_start;
 
@@ -303,8 +309,8 @@ void nwb_512_device::shift_w(offs_t, uint16_t data, uint16_t mem_mask)
 
 void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	check_enabled();
 	check_mem_mask(mem_mask);
+	m_state.check_enabled();
 
 	LOGMASKED(LOG_ROP_CONFIG, "(%s) rop_config_w(0x%x, 0x%x) = ", machine().describe_context(), offset, data);
 
@@ -497,7 +503,7 @@ void nwb_512_device::rop(uint16_t source)
 	m_vram->write(byte_offset + 1, result & 0xff);
 
 	// Advance ROCC state
-	m_state.current_destination_x += m_state.x_direction ? 16 : -16;
+	m_state.advance_dxa();
 	--m_state.dest_words_left;
 }
 
@@ -506,8 +512,8 @@ void nwb_512_device::end_row()
 	// LOG("\tdone with row, advancing y\n");
 	m_state.current_destination_x = m_state.destination_x;
 	m_state.current_source_x = m_state.source_x;
-	m_state.destination_y += m_state.y_direction ? 1 : -1;
-	m_state.source_y += m_state.y_direction ? 1 : -1;
+	m_state.advance_dya();
+	m_state.advance_sya();
 	m_state.carry = 0;
 
 	if (!m_state.limit_y)
@@ -522,7 +528,7 @@ void nwb_512_device::end_row()
 		m_state.dest_words_left = m_state.dest_words_per_row;
 		m_state.source_words_left = m_state.source_words_per_row;
 		m_state.prime_pending = m_state.prime;
-		m_state.limit_y--;
+		--m_state.limit_y;
 		// LOG("\tdecremented limit to 0x%x\n", m_state.limit_y);
 	}
 }
@@ -572,12 +578,18 @@ void nwb_512_device::rop_cycle(uint16_t data)
 
 uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 {
+	if (machine().side_effects_disabled())
+	{
+		return 0; // TODO: figure out what makes sense for debugging. Can't use the normal functions due to side effects
+	}
+
 	LOG("(%s) fifo_r(0x%x, 0x%x)\n", machine().describe_context(), offset, mem_mask);
 	check_mem_mask(mem_mask);
-	if (m_state.fb_write || !m_state.fb_read)
+	if (!m_state.is_fb_to_host())
 	{
-		fatalerror("Wrong mode for read");
+		fatalerror("nwb_512: fifo_r when read op is not executing");
 	}
+
 	if (!m_state.busy)
 	{
 		fatalerror("No words left in op!\n");
@@ -593,7 +605,7 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 		word = coordinate_to_data(m_state.current_source_x, m_state.source_y);
 		shift(word);
 		m_state.prime_pending = false;
-		m_state.current_source_x += m_state.x_direction ? 16 : -16;
+		m_state.advance_sxa();
 	}
 
 	word = coordinate_to_data(m_state.current_source_x, m_state.source_y);
@@ -602,8 +614,8 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 	LOG("  fifo_r: word after shift = 0x%x\n", word);
 
 	// Advance ROCC state
-	m_state.current_source_x += m_state.x_direction ? 16 : -16;
-	m_state.current_destination_x += m_state.x_direction ? 16 : -16;
+	m_state.advance_sxa();
+	m_state.advance_dxa();
 	--m_state.dest_words_left;
 	LOG("  fifo_r: advanced source to %d, destination to %d, and there are %d words left\n", m_state.current_source_x, m_state.current_destination_x, m_state.dest_words_left);
 
@@ -685,7 +697,9 @@ void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOG("(%s) fifo_w(0x%x, 0x%x, 0x%x)\n", machine().describe_context(), offset, data, mem_mask);
 	check_mem_mask(mem_mask);
-	if (m_state.fb_read && !m_state.fb_write)
+
+	// One write kickstarts the reading process when triggered op is a read
+	if (m_state.is_fb_to_host())
 	{
 		LOG("Start fbread op\n");
 		start_operation();

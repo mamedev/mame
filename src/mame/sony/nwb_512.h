@@ -83,19 +83,56 @@ private:
 		uint16_t mask2 = 0;
 		bool prime = false;
 		bool prime_pending = false; // /PRED - when src phase > dst phase, there are two source words needed to get/set first dst/src (or one source word that needs to be shifted for alignment purposes)
-	
-		bool is_fb_to_host() {
+
+		bool is_fb_to_host() const
+		{
 			return fb_read && !fb_write;
 		}
 
-		bool is_host_to_fb() {
+		bool is_host_to_fb() const
+		{
 			return !fb_read && fb_write;
 		}
 
-		bool is_fb_to_fb() {
+		bool is_fb_to_fb() const
+		{
 			return fb_read && fb_write;
 		}
-	
+
+		void check_enabled() const
+		{
+			if (!(ctrl & 0x1))
+			{
+				fatalerror("nwb_512: framebuffer not enabled when interaction started");
+			}
+		}
+
+		void advance_sxa()
+		{
+			current_source_x += x_direction ? 16 : -16;
+		}
+
+		void advance_dxa()
+		{
+			current_destination_x += x_direction ? 16 : -16;
+		}
+
+		void advance_sya()
+		{
+			source_y += y_direction ? 1 : -1;
+		}
+
+		void advance_dya()
+		{
+			destination_y += y_direction ? 1 : -1;
+		}
+
+		void load_shift_count()
+		{
+			// Determines how much to shift source by to align it with destination
+			shift = (destination_x % 16 - source_x % 16) & 0xf;
+		}
+
 	} m_state;
 
 	// TODO: split by what is mapped and what is a helper
@@ -122,14 +159,6 @@ private:
 	void start_operation();
 	uint16_t coordinate_to_data(uint16_t x, uint16_t y);
 	rgb_t current_dim_color();
-
-	void check_enabled() const
-	{
-		if (!(m_state.ctrl & 0x1))
-		{
-			fatalerror("nwb_512: framebuffer not enabled when interaction started");
-		}
-	}
 };
 
 DECLARE_DEVICE_TYPE(NWB_512, nwb_512_device)
