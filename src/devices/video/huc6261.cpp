@@ -8,7 +8,7 @@
     1365 "master" cycles (typically at 21.47727Mhz).
 
     HSync is low for 237 and high for 1128 master cycles.
-    VSync is low for 4095 master cycles (3 lines).
+    VSync is low for 4095 master cycles (3 lines), lines 0-2.
     VSync changes 30 master cycles after HSync would go low.
 
     TODO:
@@ -308,14 +308,17 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 			break;
 
 		case HUC6261_HSYNC_START + 30:      /* End/Start of VSync */
-			if (v >= m_height - 4)
+		{
+			// VSync is low for lines 0-2, the HuC6270s time their display from it
+			if (v == 0 || v == 3)
 			{
-				const int vsync = (v >= m_height - 4 && v < m_height - 1) ? 0 : 1;
+				const int vsync = (v == 0) ? 0 : 1;
 
 				m_huc6270[0]->vsync_changed(vsync);
 				m_huc6270[1]->vsync_changed(vsync);
 			}
 			break;
+		}
 		}
 	}
 
@@ -329,7 +332,7 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 		v = m_last_v;
 		h = HUC6261_HSYNC_START;
 	}
-	else if ((m_last_v == m_height - 4 || m_last_v == m_height - 1) && m_last_h < HUC6261_HSYNC_START + 30)
+	else if ((m_last_v == 0 || m_last_v == 3) && m_last_h < HUC6261_HSYNC_START + 30)
 	{
 		/* Next event is start/end of VSync signal */
 		v = m_last_v;
