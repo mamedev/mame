@@ -27,6 +27,8 @@
 #include "emu.h"
 #include "sh7709_scif.h"
 
+#include <bit>
+
 #define LOG_REGISTERS (1U << 1)
 #define LOG_TXRX      (1U << 2)
 #define LOG_CLOCK     (1U << 3)
@@ -40,7 +42,6 @@ DEFINE_DEVICE_TYPE(SH7709_SCIF, sh7709_scif_device, "sh7709scif", "SH7709 SCIF C
 
 sh7709_scif_device::sh7709_scif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SH7709_SCIF, tag, owner, clock)
-	, device_serial_interface(mconfig, *this)
 	, m_txd_cb(*this)
 	, m_eri_cb(*this)
 	, m_rxi_cb(*this)
@@ -65,9 +66,22 @@ void sh7709_scif_device::device_start()
 	save_item(NAME(m_tx_count));
 	save_item(NAME(m_clock_speed));
 	save_item(NAME(m_rxd));
+	save_item(NAME(m_rx_busy));
+	save_item(NAME(m_rx_shift));
+	save_item(NAME(m_rx_bits));
+	save_item(NAME(m_rx_frame_bits));
+	save_item(NAME(m_txd));
+	save_item(NAME(m_tx_busy));
+	save_item(NAME(m_tx_shift));
+	save_item(NAME(m_tx_bit));
+	save_item(NAME(m_tx_frame_bits));
+	save_item(NAME(m_tx_stop_bit));
 
+	m_rx_shift_timer = timer_alloc(FUNC(sh7709_scif_device::rx_shift), this);
+	m_tx_shift_timer = timer_alloc(FUNC(sh7709_scif_device::tx_shift), this);
 	m_rx_timeout = timer_alloc(FUNC(sh7709_scif_device::rx_timeout), this);
 	m_rxd = 1;
+	m_txd = 1;
 }
 
 void sh7709_scif_device::device_reset()
@@ -79,21 +93,27 @@ void sh7709_scif_device::device_reset()
 	m_scfcr = 0x00;
 
 	std::fill(std::begin(m_rx_fifo), std::end(m_rx_fifo), 0);
-	std::fill(std::begin(m_rx_err), std::end(m_rx_err), 0);
 	std::fill(std::begin(m_tx_fifo), std::end(m_tx_fifo), 0);
 	clear_rx_fifo();
 	clear_tx_fifo();
 
 	m_clock_speed = attotime::never;
-	m_rx_timeout->adjust(attotime::never);
+	m_rx_timeout->reset();
 
-	receive_register_reset();
-	transmit_register_reset();
+	abort_rx();
+	abort_tx();
+
+	// Drive the idle level even if m_txd already holds it, so the other end
+	// starts out in sync.
 	m_txd_cb(1);
 
-	update_data_format();
 	update_clock();
 	update_interrupts();
+}
+
+void sh7709_scif_device::device_clock_changed()
+{
+	update_clock();
 }
 
 void sh7709_scif_device::map(address_map &map)
@@ -126,13 +146,9 @@ void sh7709_scif_device::scsmr_w(uint8_t data)
 			(data & SCSMR_STOP) ? '2' : '1',
 			1 << (2 * (data & SCSMR_CKS)));
 
-	const uint8_t old = m_scsmr;
+	// The frame format is picked up at the start of each frame.
 	m_scsmr = data;
-
-	if ((data & ~SCSMR_CKS) != (old & ~SCSMR_CKS))
-		update_data_format();
-	if ((data & SCSMR_CKS) != (old & SCSMR_CKS))
-		update_clock();
+	update_clock();
 }
 
 uint8_t sh7709_scif_device::scbrr_r()
@@ -170,15 +186,14 @@ void sh7709_scif_device::scscr_w(uint8_t data)
 	// RFRST (SH7709S hardware manual 16.3.2).
 	if (!(m_scscr & SCSCR_TE))
 	{
-		transmit_register_reset();
-		m_txd_cb(1);
+		abort_tx();
 
 		if (old & SCSCR_TE)
 			m_scssr |= SCSSR_TEND;
 	}
 
 	if (!(m_scscr & SCSCR_RE))
-		receive_register_reset();
+		abort_rx();
 
 	update_status();
 	update_tx_state();
@@ -271,13 +286,13 @@ void sh7709_scif_device::scfcr_w(uint8_t data)
 	if (data & SCFCR_RFRST)
 	{
 		clear_rx_fifo();
-		receive_register_reset();
+		abort_rx();
 	}
 
 	if (data & SCFCR_TFRST)
 	{
 		clear_tx_fifo();
-		transmit_register_reset();
+		abort_tx();
 	}
 
 	update_status();
@@ -348,7 +363,7 @@ void sh7709_scif_device::update_status()
 	else
 		m_scssr &= ~SCSSR_TDFE;
 
-	if (!m_tx_count && is_transmit_register_empty())
+	if (!m_tx_count && !m_tx_busy)
 		m_scssr |= SCSSR_TEND;
 
 	update_interrupts();
@@ -366,28 +381,18 @@ void sh7709_scif_device::update_interrupts()
 
 void sh7709_scif_device::update_tx_state()
 {
-	if (!(m_scscr & SCSCR_TE) || (m_scfcr & SCFCR_TFRST) || !m_tx_count || !is_transmit_register_empty())
+	// Start the next frame once the transmitter is idle.
+	if (!(m_scscr & SCSCR_TE) || (m_scfcr & SCFCR_TFRST) || !m_tx_count || m_tx_busy || m_clock_speed.is_never())
 		return;
 
 	const uint8_t data = m_tx_fifo[m_tx_head];
 	m_tx_head = (m_tx_head + 1) % FIFO_LENGTH;
 	m_tx_count--;
 
-	LOGMASKED(LOG_TXRX, "transmitting %02x\n", data);
-
-	transmit_register_setup(data);
+	start_tx_frame(data);
 
 	m_scssr &= ~SCSSR_TEND;
 	update_status();
-}
-
-void sh7709_scif_device::update_data_format()
-{
-	set_data_frame(
-			1,
-			(m_scsmr & SCSMR_CHR) ? 7 : 8,
-			(m_scsmr & SCSMR_PE) ? ((m_scsmr & SCSMR_OE) ? PARITY_ODD : PARITY_EVEN) : PARITY_NONE,
-			(m_scsmr & SCSMR_STOP) ? STOP_BITS_2 : STOP_BITS_1);
 }
 
 void sh7709_scif_device::update_clock()
@@ -402,8 +407,20 @@ void sh7709_scif_device::update_clock()
 	LOGMASKED(LOG_CLOCK, "baud rate %f (cks=%d brr=%02x pclk=%d)\n",
 			clock_speed.as_hz(), m_scsmr & SCSMR_CKS, m_scbrr, clock());
 
+	// Frames already being shifted pick up the new bit time on their next bit.
 	m_clock_speed = clock_speed;
-	set_rate(clock_speed);
+	update_tx_state();
+}
+
+unsigned sh7709_scif_device::data_bits() const
+{
+	return (m_scsmr & SCSMR_CHR) ? 7 : 8;
+}
+
+unsigned sh7709_scif_device::parity_bit(uint8_t data) const
+{
+	// Even parity makes the number of 1 bits including the parity bit even.
+	return (std::popcount(data) & 1) ^ ((m_scsmr & SCSMR_OE) ? 1 : 0);
 }
 
 
@@ -413,26 +430,50 @@ void sh7709_scif_device::update_clock()
 
 void sh7709_scif_device::rxd_w(int state)
 {
+	// The receiver synchronises on the falling edge of the start bit and
+	// latches each bit in the middle, on the eighth pulse of the 16x base clock
+	// (SH7709S hardware manual 16.3.2).
+	if (m_rxd && !state && !m_rx_busy && (m_scscr & SCSCR_RE) && !m_clock_speed.is_never())
+	{
+		m_rx_busy = true;
+		m_rx_shift = 0;
+		m_rx_bits = 0;
+
+		// Only the first stop bit is checked, a second one is just idle line.
+		m_rx_frame_bits = 1 + data_bits() + ((m_scsmr & SCSMR_PE) ? 1 : 0) + 1;
+
+		m_rx_shift_timer->adjust(m_clock_speed / 2);
+	}
+
 	m_rxd = state;
-	device_serial_interface::rx_w(state);
 }
 
-void sh7709_scif_device::rcv_complete()
+TIMER_CALLBACK_MEMBER(sh7709_scif_device::rx_shift)
 {
-	receive_register_extract();
-
-	if (!(m_scscr & SCSCR_RE))
+	m_rx_shift |= uint16_t(m_rxd ? 1 : 0) << m_rx_bits;
+	if (++m_rx_bits < m_rx_frame_bits)
+	{
+		m_rx_shift_timer->adjust(m_clock_speed);
 		return;
+	}
 
-	const uint8_t data = get_received_char();
+	m_rx_busy = false;
+
+	const unsigned bits = data_bits();
+	const uint8_t data = BIT(m_rx_shift, 1, bits);
 	uint8_t err = 0;
-	if (is_receive_framing_error())
+	if (!BIT(m_rx_shift, m_rx_frame_bits - 1))
 		err |= SCSSR_FER;
-	if (is_receive_parity_error())
+	if ((m_scsmr & SCSMR_PE) && (BIT(m_rx_shift, 1 + bits) != parity_bit(data)))
 		err |= SCSSR_PER;
 
+	receive_frame(data, err);
+}
+
+void sh7709_scif_device::receive_frame(uint8_t data, uint8_t err)
+{
 	// The DR timeout runs from the end of the last received frame.
-	m_rx_timeout->adjust(m_clock_speed.is_never() ? attotime::never : m_clock_speed * 15);
+	m_rx_timeout->adjust(m_clock_speed * 15);
 
 	// While BRK is set no further data is transferred to the receive FIFO
 	// (SH7709S hardware manual 16.2.7, 16.3.2).
@@ -484,7 +525,7 @@ TIMER_CALLBACK_MEMBER(sh7709_scif_device::rx_timeout)
 {
 	// DR: data below the receive trigger level and no new frame for 15 etu
 	// after the last stop bit.
-	if (m_rx_count && (m_rx_count < rx_trigger()) && !is_receive_register_synchronized())
+	if (m_rx_count && (m_rx_count < rx_trigger()) && !m_rx_busy)
 	{
 		LOGMASKED(LOG_TXRX, "receive timeout, %d bytes below trigger\n", m_rx_count);
 		m_scssr |= SCSSR_DR;
@@ -492,18 +533,65 @@ TIMER_CALLBACK_MEMBER(sh7709_scif_device::rx_timeout)
 	}
 }
 
-void sh7709_scif_device::tra_callback()
+void sh7709_scif_device::start_tx_frame(uint8_t data)
 {
-	m_txd_cb(transmit_register_get_data_bit());
+	LOGMASKED(LOG_TXRX, "transmitting %02x\n", data);
+
+	// Start bit, data LSB first, optional parity, then ones for the stop bits.
+	const unsigned bits = data_bits();
+	const unsigned pe = (m_scsmr & SCSMR_PE) ? 1 : 0;
+	data &= (1 << bits) - 1;
+	uint16_t frame = data;
+	if (pe)
+		frame |= parity_bit(data) << bits;
+	m_tx_shift = (frame | (0xffff << (bits + pe))) << 1;
+	m_tx_stop_bit = 1 + bits + pe;
+	m_tx_frame_bits = m_tx_stop_bit + ((m_scsmr & SCSMR_STOP) ? 2 : 1);
+
+	m_tx_busy = true;
+	m_tx_bit = 0;
+	set_txd(BIT(m_tx_shift, 0));
+	m_tx_shift_timer->adjust(m_clock_speed);
 }
 
-void sh7709_scif_device::tra_complete()
+TIMER_CALLBACK_MEMBER(sh7709_scif_device::tx_shift)
 {
-	update_tx_state();
-
-	if (!m_tx_count && is_transmit_register_empty())
+	if (++m_tx_bit < m_tx_frame_bits)
 	{
-		m_scssr |= SCSSR_TEND;
-		update_status();
+		set_txd(BIT(m_tx_shift, m_tx_bit));
+
+		// TEND is set when the stop bit goes out with SCFTDR empty (16.3.2).
+		if ((m_tx_bit == m_tx_stop_bit) && !m_tx_count)
+			m_scssr |= SCSSR_TEND;
+
+		m_tx_shift_timer->adjust(m_clock_speed);
+		return;
+	}
+
+	// Frame done, start the next one or leave the line marking.
+	m_tx_busy = false;
+	update_tx_state();
+	update_status();
+}
+
+void sh7709_scif_device::abort_rx()
+{
+	m_rx_busy = false;
+	m_rx_shift_timer->reset();
+}
+
+void sh7709_scif_device::abort_tx()
+{
+	m_tx_busy = false;
+	m_tx_shift_timer->reset();
+	set_txd(1);
+}
+
+void sh7709_scif_device::set_txd(int state)
+{
+	if (state != m_txd)
+	{
+		m_txd = state;
+		m_txd_cb(state);
 	}
 }

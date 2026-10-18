@@ -11,9 +11,7 @@
 
 #pragma once
 
-#include "diserial.h"
-
-class sh7709_scif_device : public device_t, public device_serial_interface
+class sh7709_scif_device : public device_t
 {
 public:
 	sh7709_scif_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -37,10 +35,7 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-
-	virtual void rcv_complete() override;
-	virtual void tra_callback() override;
-	virtual void tra_complete() override;
+	virtual void device_clock_changed() override;
 
 private:
 	static constexpr unsigned FIFO_LENGTH = 16;
@@ -109,11 +104,20 @@ private:
 	void update_status();
 	void update_interrupts();
 	void update_tx_state();
-	void update_data_format();
 	void update_clock();
 	void clear_rx_fifo();
 	void clear_tx_fifo();
 
+	unsigned data_bits() const;
+	unsigned parity_bit(uint8_t data) const;
+	void receive_frame(uint8_t data, uint8_t err);
+	void start_tx_frame(uint8_t data);
+	void abort_rx();
+	void abort_tx();
+	void set_txd(int state);
+
+	TIMER_CALLBACK_MEMBER(rx_shift);
+	TIMER_CALLBACK_MEMBER(tx_shift);
 	TIMER_CALLBACK_MEMBER(rx_timeout);
 
 	devcb_write_line m_txd_cb;
@@ -134,9 +138,25 @@ private:
 	uint8_t m_rx_head, m_rx_count;
 	uint8_t m_tx_head, m_tx_count;
 
-	attotime m_clock_speed;
+	attotime m_clock_speed;         // one bit time
+	emu_timer *m_rx_shift_timer;
+	emu_timer *m_tx_shift_timer;
 	emu_timer *m_rx_timeout;
+
+	// Receive shift register (SCRSR)
 	int m_rxd;
+	bool m_rx_busy;
+	uint16_t m_rx_shift;
+	uint8_t m_rx_bits;              // bits sampled so far
+	uint8_t m_rx_frame_bits;        // start, data, parity and the first stop bit
+
+	// Transmit shift register (SCTSR)
+	int m_txd;
+	bool m_tx_busy;
+	uint16_t m_tx_shift;
+	uint8_t m_tx_bit;               // bit currently on TxD
+	uint8_t m_tx_frame_bits;        // start, data, parity and stop bits
+	uint8_t m_tx_stop_bit;          // index of the first stop bit
 };
 
 DECLARE_DEVICE_TYPE(SH7709_SCIF, sh7709_scif_device)
