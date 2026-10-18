@@ -520,9 +520,9 @@ protected:
 	DECLARE_MACHINE_START(pc9801us);
 
 
-	// SDIP, PC9801DA onward
+	// SDIP, PC9801DA onward, except for Ap, As, Ae
 protected:
-	required_device<pc98_sdip_device> m_sdip;
+	optional_device<pc98_sdip_device> m_sdip;
 };
 
 /**********************************************************

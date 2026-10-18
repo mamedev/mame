@@ -489,6 +489,8 @@ void pc98_epson_laptop_state::palette_init(palette_device &palette) const
 	for(int i = 0; i < 8; i++)
 	{
 		// FIXME: "passing const qualifier as this argument discards qualifier" nuisance
+		// NOTE: actual pc286ls has dips for inversion and individual enable RGB layers
+		// TBD if they acts live or requires a soft reset first (makes above a non-problem in reality)
 		const uint8_t r = pal1bit(BIT(i, 1));
 		const uint8_t g = pal1bit(BIT(i, 2));
 		const uint8_t b = pal1bit(BIT(i, 0));

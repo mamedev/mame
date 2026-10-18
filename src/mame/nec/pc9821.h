@@ -123,14 +123,6 @@ private:
 	std::unique_ptr<uint8_t[]> m_nvram_ptr;
 
 	void sram_init();
-
-	// Ap, As, Ae only
-	u8 ext_sdip_data_r(offs_t offset);
-	void ext_sdip_data_w(offs_t offset, u8 data);
-	void ext_sdip_address_w(offs_t offset, u8 data);
-	void ext_sdip_access_w(offs_t offset, u8 data);
-
-	uint8_t m_ext_sdip[0x100]{}, m_ext_sdip_addr = 0;
 };
 
 // CanBe

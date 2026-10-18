@@ -142,8 +142,7 @@ public:
 		double  m_ftrc_dmax;
 		float   m_ftrc_smin;         // FTRC single-precision range check
 		float   m_ftrc_smax;
-		float   m_fzero;             // FTRV accumulator initialiser
-		float   m_fone;              // FSRRA reciprocal numerator
+		float   m_fsca_unit;         // what one unit of the FSCA table is worth
 		uint8_t m_fpmode[4];         // FPSCR.RM -> UML rounding mode
 
 		int     m_frt_input;
@@ -190,6 +189,23 @@ protected:
 	};
 
 	class frontend;
+
+	// instructions that change the PC; in a delay slot they raise a slot illegal instruction
+	// exception instead of executing (SH-1/SH-2, vector 6)
+	// groups 0 and 4 are matched on the low six bits like the decoder does, so every encoding
+	// it treats as a delayed branch is caught
+	static constexpr bool is_slot_illegal(uint16_t opcode)
+	{
+		switch (opcode >> 12)
+		{
+		case 0x0: return ((opcode & 0x3f) == 0x03) || ((opcode & 0x3f) == 0x0b) || ((opcode & 0x3f) == 0x23) || ((opcode & 0x3f) == 0x2b); // BSRF, RTS, BRAF, RTE
+		case 0x4: return ((opcode & 0x3f) == 0x0b) || ((opcode & 0x3f) == 0x2b); // JSR, JMP
+		case 0x8: return BIT(opcode, 8) && BIT(opcode, 11); // BT, BF, BT/S, BF/S (0x89, 0x8b, 0x8d, 0x8f)
+		case 0xa: case 0xb: return true; // BRA, BSR
+		case 0xc: return ((opcode >> 8) & 0xf) == 0x3; // TRAPA
+		default: return false;
+		}
+	}
 	class opcode_desc;
 
 	sh_common_execution(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal);
@@ -433,6 +449,7 @@ public:
 
 	void func_printf_probe();
 	void func_unimplemented();
+	void func_slot_illegal();
 	void func_MAC_W();
 	void func_MAC_L();
 	void func_DIV1();

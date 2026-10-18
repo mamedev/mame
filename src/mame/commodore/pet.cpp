@@ -169,6 +169,8 @@ ROM sockets:  UA3   2K or 4K character
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
 
+#include <algorithm>
+
 
 namespace {
 
@@ -1448,27 +1450,37 @@ TIMER_CALLBACK_MEMBER( pet_state::sync_tick )
 uint32_t pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t const *const pen = m_palette->pens();
+	int const left = cliprect.left();
+	int const right = cliprect.right();
+	int const text_left = std::max(left, VIDEO_TEXT_X);
+	int const text_right = std::min(right, VIDEO_TEXT_X + 319);
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		int const line = y - VIDEO_TEXT_Y;
 		auto *const dst = &bitmap.pix(y);
 
-		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		if (line < 0 || line >= 200 || !m_blanktv || text_left > text_right)
+		{
+			std::fill(dst + left, dst + right + 1, pen[0]);
+			continue;
+		}
+
+		std::fill(dst + left, dst + text_left, pen[0]);
+		std::fill(dst + text_right + 1, dst + right + 1, pen[0]);
+
+		uint8_t const *const lsd_row = &m_video_ram[(line >> 3) * 40];
+		uint8_t const *const char_rom = m_char_rom->base() + ((m_graphic << 10) | (line & 0x07));
+
+		for (int x = text_left; x <= text_right; )
 		{
 			int const column = x - VIDEO_TEXT_X;
-			int color = 0;
+			uint8_t const lsd = lsd_row[column >> 3];
+			uint8_t const data = char_rom[(lsd & 0x7f) << 3] ^ (BIT(lsd, 7) ? 0xff : 0x00);
+			int const end = std::min(text_right, VIDEO_TEXT_X + (column | 7));
 
-			if (line >= 0 && line < 200 && column >= 0 && column < 320)
-			{
-				uint8_t const lsd = m_video_ram[((line >> 3) * 40) + (column >> 3)];
-				offs_t const char_addr = (m_graphic << 10) | ((lsd & 0x7f) << 3) | (line & 0x07);
-				uint8_t const data = m_char_rom->base()[char_addr];
-
-				color = (BIT(data, ~column & 7) ^ BIT(lsd, 7)) && m_blanktv;
-			}
-
-			dst[x] = pen[color];
+			for (; x <= end; x++)
+				dst[x] = pen[BIT(data, ~(x - VIDEO_TEXT_X) & 7)];
 		}
 	}
 
@@ -1491,43 +1503,33 @@ MC6845_ON_UPDATE_ADDR_CHANGED( pet_state::crtc_update_addr )
 
 MC6845_UPDATE_ROW( pet80_state::pet80_update_row )
 {
-	int x = 0;
-	int char_rom_mask = m_char_rom->bytes() - 1;
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 	hbp = 80;
+
+	uint32_t *dst = &bitmap.pix(vbp + y, hbp);
+	bool const no_row = !(BIT(ra, 3) || BIT(ra, 4));
+	bool const invert = BIT(ma, 12);
+
+	if (!de || !no_row)
+	{
+		std::fill_n(dst, x_count * 16, pen[(de && !invert) ? 1 : 0]);
+		return;
+	}
+
+	uint8_t const *const char_rom = m_char_rom->base();
+	offs_t const char_rom_mask = m_char_rom->bytes() - 1;
+	offs_t const char_base = (BIT(ma, 13) << 11) | (m_graphic << 10) | (ra & 0x07);
+	uint8_t const polarity = invert ? 0x00 : 0xff;
 
 	for (int column = 0; column < x_count; column++)
 	{
-		uint8_t lsd = 0, data = 0;
-		uint8_t rra = ra & 0x07;
-		int no_row = !(BIT(ra, 3) || BIT(ra, 4));
-		int invert = BIT(ma, 12);
-		int chr_option = BIT(ma, 13);
-
-		// even character
-
-		lsd = m_video_ram[((ma + column) << 1) & 0x7ff];
-
-		offs_t char_addr = (chr_option << 11) | (m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
-		data = m_char_rom->base()[char_addr & char_rom_mask];
-
-		for (int bit = 0; bit < 8; bit++, data <<= 1)
+		for (int odd = 0; odd < 2; odd++)
 		{
-			int const video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
-			bitmap.pix(vbp + y, hbp + x++) = pen[video];
-		}
+			uint8_t const lsd = m_video_ram[(((ma + column) << 1) + odd) & 0x7ff];
+			uint8_t const data = char_rom[(char_base | ((lsd & 0x7f) << 3)) & char_rom_mask] ^ (BIT(lsd, 7) ? 0xff : 0x00) ^ polarity;
 
-		// odd character
-
-		lsd = m_video_ram[(((ma + column) << 1) + 1) & 0x7ff];
-
-		char_addr = (chr_option << 11) | (m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
-		data = m_char_rom->base()[char_addr & char_rom_mask];
-
-		for (int bit = 0; bit < 8; bit++, data <<= 1)
-		{
-			int const video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
-			bitmap.pix(vbp + y, hbp + x++) = pen[video];
+			for (int bit = 7; bit >= 0; bit--)
+				*dst++ = pen[BIT(data, bit)];
 		}
 	}
 }
@@ -1539,29 +1541,31 @@ MC6845_UPDATE_ROW( pet80_state::pet80_update_row )
 
 MC6845_UPDATE_ROW( pet_state::pet40_update_row )
 {
-	int x = 0;
-	int char_rom_mask = m_char_rom->bytes() - 1;
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
 	hbp = 41;
+
+	uint32_t *dst = &bitmap.pix(vbp + y, hbp);
+	bool const no_row = !(BIT(ra, 3) || BIT(ra, 4));
+	bool const invert = BIT(ma, 12);
+
+	if (!de || !no_row)
+	{
+		std::fill_n(dst, x_count * 8, pen[(de && !invert) ? 1 : 0]);
+		return;
+	}
+
+	uint8_t const *const char_rom = m_char_rom->base();
+	offs_t const char_rom_mask = m_char_rom->bytes() - 1;
+	offs_t const char_base = (BIT(ma, 13) << 11) | (m_graphic << 10) | (ra & 0x07);
+	uint8_t const polarity = invert ? 0x00 : 0xff;
 
 	for (int column = 0; column < x_count; column++)
 	{
-		uint8_t lsd = 0, data = 0;
-		uint8_t rra = ra & 0x07;
-		int no_row = !(BIT(ra, 3) || BIT(ra, 4));
-		int invert = BIT(ma, 12);
-		int chr_option = BIT(ma, 13);
+		uint8_t const lsd = m_video_ram[(ma + column) & 0x3ff];
+		uint8_t const data = char_rom[(char_base | ((lsd & 0x7f) << 3)) & char_rom_mask] ^ (BIT(lsd, 7) ? 0xff : 0x00) ^ polarity;
 
-		lsd = m_video_ram[(ma + column) & 0x3ff];
-
-		offs_t char_addr = (chr_option << 11) | (m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
-		data = m_char_rom->base()[char_addr & char_rom_mask];
-
-		for (int bit = 0; bit < 8; bit++, data <<= 1)
-		{
-			int const video = (!((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert) && de;
-			bitmap.pix(vbp + y, hbp + x++) = pen[video];
-		}
+		for (int bit = 7; bit >= 0; bit--)
+			*dst++ = pen[BIT(data, bit)];
 	}
 }
 
@@ -1572,13 +1576,19 @@ MC6845_UPDATE_ROW( pet_state::pet40_update_row )
 
 MC6845_UPDATE_ROW( cbm8296_state::cbm8296_update_row )
 {
-	int x = 0;
-	const pen_t *pen = m_palette->pens();
+	pen_t const *const pen = m_palette->pens();
+	uint8_t const *const ram = m_ram->pointer();
+
+	uint32_t *dst = &bitmap.pix(vbp + y, hbp);
+
+	if (!de || BIT(ra, 3))
+	{
+		std::fill_n(dst, x_count * 16, pen[0]);
+		return;
+	}
 
 	if (m_hre_present && !BIT(ma, 12))
 	{
-		bool const no_row = !BIT(ra, 3);
-
 		for (int column = 0; column < x_count; column++)
 		{
 			for (int clkvla = 0; clkvla < 2; clkvla++)
@@ -1586,55 +1596,31 @@ MC6845_UPDATE_ROW( cbm8296_state::cbm8296_update_row )
 				offs_t const scr = (((ma + column) & 0xfff) << 1) | clkvla;
 				offs_t const addr = (0x8000 + ((scr & 0x1fc0) << 3) + ((ra & 0x07) << 6) + (scr & 0x3f)) & 0xffff;
 				offs_t const drma = 0x8000 | (addr & 0x7e00) | BIT(addr, 0) << 8 | (addr & 0x1fe) >> 1;
-				u8 data = m_ram->pointer()[drma];
+				uint8_t const data = ram[drma];
 
-				for (int bit = 0; bit < 8; bit++, data <<= 1)
-				{
-					int const video = BIT(data, 7) && no_row && de;
-					bitmap.pix(vbp + y, hbp + x++) = pen[video];
-				}
+				for (int bit = 7; bit >= 0; bit--)
+					*dst++ = pen[BIT(data, bit)];
 			}
 		}
 
 		return;
 	}
 
+	uint8_t const *const char_rom = m_char_rom->base();
+	offs_t const row_base = 0x8000 | (BIT(ra, 4) << 14);
+	offs_t const char_base = (BIT(ma, 13) << 11) | (m_graphic << 10) | (ra & 0x07);
+
 	for (int column = 0; column < x_count; column++)
 	{
-		u8 const rra = ra & 0x07;
-		bool const no_row = !BIT(ra, 3);
-		bool const ra4 = BIT(ra, 4);
-		bool const chr_option = BIT(ma, 13);
-		bool clkvla = 0;
 		offs_t const vma = (ma + column) & 0x1fff;
-		offs_t drma = 0x8000 | ra4 << 14 | ((vma & 0xf00) << 1) | clkvla << 8 | (vma & 0xff);
 
-		// even character
-
-		u8 lsd = m_ram->pointer()[drma];
-
-		offs_t char_addr = (chr_option << 11) | (m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
-		u8 data = m_char_rom->base()[char_addr & 0xfff];
-
-		for (int bit = 0; bit < 8; bit++, data <<= 1)
+		for (int clkvla = 0; clkvla < 2; clkvla++)
 		{
-			int const video = (((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) && de);
-			bitmap.pix(vbp + y, hbp + x++) = pen[video];
-		}
+			uint8_t const lsd = ram[row_base | ((vma & 0xf00) << 1) | (clkvla << 8) | (vma & 0xff)];
+			uint8_t const data = char_rom[(char_base | ((lsd & 0x7f) << 3)) & 0xfff] ^ (BIT(lsd, 7) ? 0xff : 0x00);
 
-		// odd character
-
-		clkvla = 1;
-		drma = 0x8000 | ra4 << 14 | ((vma & 0xf00) << 1) | clkvla << 8 | (vma & 0xff);
-		lsd = m_ram->pointer()[drma];
-
-		char_addr = (chr_option << 11) | (m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
-		data = m_char_rom->base()[char_addr & 0xfff];
-
-		for (int bit = 0; bit < 8; bit++, data <<= 1)
-		{
-			int const video = (((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) && de);
-			bitmap.pix(vbp + y, hbp + x++) = pen[video];
+			for (int bit = 7; bit >= 0; bit--)
+				*dst++ = pen[BIT(data, bit)];
 		}
 	}
 }

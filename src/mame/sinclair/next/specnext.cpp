@@ -209,6 +209,7 @@ protected:
 	void bank_update(u8 bank, u8 count);
 	void bank_update(u8 bank);
 	void memory_change(u16 port, u8 data);
+	void xffd_bank_w(offs_t offset, u8 data);
 	u16 get_layer2_active_page(u8 bank);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -959,6 +960,44 @@ void specnext_state::memory_change(u16 port, u8 data) // port_memory_change_dly
 	}
 
 	m_port_1ffd_special_old = port_1ffd_special();
+}
+
+// #7ffd/#dffd/#1ffd write decodes for the addresses shadowed by the soundrive
+// mode 2 dac ports (#xxf1/#xxf9) while those are io-disabled (port_fd_conflict_wr = 0)
+void specnext_state::xffd_bank_w(offs_t offset, u8 data)
+{
+	if (BIT(offset, 12, 4) == 0b1101) // #dffd
+	{
+		if (port_dffd_io_en())
+		{
+			if (!port_7ffd_locked() || nr_8f_mapping_mode_profi())
+			{
+				m_port_dffd_data = data;
+				memory_change(0xdffd, data);
+			}
+		}
+		else
+		{
+			// #dffd disabled - falls through to #fffd on hardware (port_fffd_wr AND NOT port_dffd)
+			turbosound_address_w(data);
+		}
+	}
+	else if (!BIT(offset, 14, 2) && BIT(offset, 12, 2) == 0b01) // #1ffd: a15:14 = 00, a13:12 = 01
+	{
+		if (port_1ffd_io_en() && !port_7ffd_locked())
+		{
+			m_port_1ffd_data = data;
+			memory_change(0x1ffd, data);
+		}
+	}
+	else if (!BIT(offset, 15) && (BIT(offset, 14) || (m_nr_03_machine_timing & 3) != 0b11)) // #7ffd
+	{
+		if (port_7ffd_io_en() && !port_7ffd_locked())
+		{
+			port_7ffd_reg_w(data);
+			memory_change(0x7ffd, data);
+		}
+	}
 }
 
 void specnext_state::update_video_mode()
@@ -3152,17 +3191,9 @@ void specnext_state::map_io(address_map &map)
 			m_dac[3]->data_w(data);
 		}
 	}));
-	map(0x00f1, 0x00f1).mirror(0xff00).lw8(NAME([this](u8 data) {
-		if (m_nr_08_dac_en)
-			m_dac[0]->data_w(data);
-	}));
 	map(0x00f3, 0x00f3).mirror(0xff00).lw8(NAME([this](u8 data) {
 		if (m_nr_08_dac_en)
 			m_dac[1]->data_w(data);
-	}));
-	map(0x00f9, 0x00f9).mirror(0xff00).lw8(NAME([this](u8 data) {
-		if (m_nr_08_dac_en)
-			m_dac[2]->data_w(data);
 	}));
 	map(0x00fb, 0x00fb).mirror(0xff00).lw8(NAME([this](u8 data) {
 		if (m_nr_08_dac_en && port_dac_mono_AD_fb_io_en())
@@ -3195,12 +3226,17 @@ void specnext_state::map_io(address_map &map)
 			memory_change(0x7ffd, data);
 		}
 	}));
-	map(0x1001, 0x1001).mirror(0x0ffc).lw8(NAME([this](u8 data) {
-		if (port_1ffd_io_en() && !port_7ffd_locked())
+	map(0x1001, 0x1001).mirror(0x0ffc).lw8(NAME([this](offs_t offset, u8 data) {
+		if (port_1ffd_io_en())
 		{
-			m_port_1ffd_data = data;
-			memory_change(0x1ffd, data);
+			if (!port_7ffd_locked())
+			{
+				m_port_1ffd_data = data;
+				memory_change(0x1ffd, data);
+			}
 		}
+		else
+			xffd_bank_w(offset, data); // zxnext.vhd: port_1ffd = 0 -> falls to #7ffd decode
 	}));
 	map(0xe0f7, 0xe0f7).mirror(0x0f00).lw8(NAME([this](u8 data) {
 		if (port_eff7_io_en())
@@ -3222,10 +3258,31 @@ void specnext_state::map_io(address_map &map)
 	}));
 	map(0x3001, 0x3001).mirror(0x0ffc).lrw8(NAME([]() {
 		return /*m_nr_d8_io_trap_fdc_en ? ... :*/ 0xff;
-	}), NAME([this](u8 data) {
+	}), NAME([this](offs_t offset, u8 data) {
 		if (m_nr_d8_io_trap_fdc_en)
 		{
 		}
+		// the fdc trap does not mask the banking decode; #3xx1 still reaches #7ffd
+		xffd_bank_w(offset, data);
+	}));
+	// port_fd_conflict_wr - soundrive mode 2 dac ports (#xxf1/#xxf9) override the banking ports when enabled.
+	map(0x00f1, 0x00f1).select(0xff00).lw8(NAME([this](offs_t offset, u8 data) {
+		if (port_dac_sd2_ABCD_f1f3f9fb_io_en())
+		{
+			if (m_nr_08_dac_en)
+				m_dac[0]->data_w(data);
+		}
+		else
+			xffd_bank_w(offset | 0x00f1, data);
+	}));
+	map(0x00f9, 0x00f9).select(0xff00).lw8(NAME([this](offs_t offset, u8 data) {
+		if (port_dac_sd2_ABCD_f1f3f9fb_io_en())
+		{
+			if (m_nr_08_dac_en)
+				m_dac[2]->data_w(data);
+		}
+		else
+			xffd_bank_w(offset | 0x00f9, data);
 	}));
 
 

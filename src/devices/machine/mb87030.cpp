@@ -855,7 +855,13 @@ void mb87030_device::dreg_w(uint8_t data)
 
 uint8_t mb87030_device::temp_r()
 {
+	uint8_t ctrl = m_scsi_bus->ctrl_r();
 	step(false);
+	if((m_pctl & PCTL_PHASE_MASK) == S_PHASE_STATUS && (ctrl & (S_INP | S_REQ)) == (S_INP | S_REQ))
+	{
+		m_temp = m_scsi_bus->data_r();
+		logerror("status read -> temp %02x\n", m_temp);
+	}
 	LOG("%s: %02X\n", __FUNCTION__, m_temp);
 	return m_temp;
 }

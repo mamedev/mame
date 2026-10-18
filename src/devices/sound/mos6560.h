@@ -107,10 +107,8 @@ private:
 		FETCH_DONE
 	};
 
-	TIMER_CALLBACK_MEMBER(line_tick);
+	void screen_vblank(screen_device &screen, bool vblank_state);
 
-	uint64_t current_cycle();
-	uint64_t cycle_at(const attotime &time) const;
 	void update_cycles();
 	void cycle();
 	void end_of_line();
@@ -141,15 +139,16 @@ private:
 	devcb_read8 m_read_potx;
 	devcb_read8 m_read_poty;
 
+	memory_access<14, 0, 0, ENDIANNESS_LITTLE>::specific m_videoram;
+	memory_access<10, 0, 0, ENDIANNESS_LITTLE>::specific m_colorram;
+
 	sound_stream *m_stream;
-	emu_timer *m_line_timer;
 
 	bitmap_rgb32 m_bitmap[2];
 	int32_t m_draw;
 
-	attoseconds_t m_period;
-	attotime m_base_time;
-	uint64_t m_base_cycle;
+	attotime m_cycle_time;
+	attotime m_next_cycle;
 	uint64_t m_cycle_count;
 	uint64_t m_frame_start;
 	int32_t m_frame_lines;

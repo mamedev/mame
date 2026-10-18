@@ -25,10 +25,6 @@
 
 */
 
-/*
-    TODO: write protect
-*/
-
 #include "emu.h"
 #include "victor9k_fdc.h"
 
@@ -245,6 +241,7 @@ void victor_9000_fdc_device::device_start()
 	t_tach[1] = timer_alloc(FUNC(victor_9000_fdc_device::tach1_tick), this);
 
 	// state saving
+	save_item(NAME(m_p2));
 	save_item(NAME(m_da));
 	save_item(NAME(m_start));
 	save_item(NAME(m_stop));
@@ -265,6 +262,8 @@ void victor_9000_fdc_device::device_start()
 	save_item(NAME(m_side));
 	save_item(NAME(m_drw));
 	save_item(NAME(m_erase));
+	save_item(NAME(m_wd));
+	save_item(NAME(m_wrsync));
 	save_item(NAME(m_via4_irq));
 	save_item(NAME(m_via5_irq));
 	save_item(NAME(m_via6_irq));
@@ -316,6 +315,22 @@ void victor_9000_fdc_device::device_start()
 	save_item(NAME(checkpoint_live.wrsync));
 	save_item(NAME(checkpoint_live.gcr_data));
 	save_item(NAME(checkpoint_live.erase));
+
+	save_item(NAME(cur_pll.ctime));
+	save_item(NAME(cur_pll.period));
+	save_item(NAME(cur_pll.min_period));
+	save_item(NAME(cur_pll.max_period));
+	save_item(NAME(cur_pll.period_adjust_base));
+	save_item(NAME(cur_pll.phase_adjust));
+	save_item(NAME(cur_pll.freq_hist));
+
+	save_item(NAME(checkpoint_pll.ctime));
+	save_item(NAME(checkpoint_pll.period));
+	save_item(NAME(checkpoint_pll.min_period));
+	save_item(NAME(checkpoint_pll.max_period));
+	save_item(NAME(checkpoint_pll.period_adjust_base));
+	save_item(NAME(checkpoint_pll.phase_adjust));
+	save_item(NAME(checkpoint_pll.freq_hist));
 }
 
 
@@ -876,7 +891,8 @@ uint8_t victor_9000_fdc_device::via6_pa_r()
 	data |= (m_floppy[1]->get_device() ? m_floppy[1]->get_device()->trk00_r() : 0) << 3;
 
 	// write protect sense
-	data |= (m_drive ? (m_floppy[1]->get_device() ? m_floppy[1]->get_device()->wpt_r() : 0) : (m_floppy[0]->get_device() ? m_floppy[0]->get_device()->wpt_r() : 0)) << 6;
+	floppy_image_device *floppy = get_floppy();
+	data |= (floppy ? floppy->wpt_r() : 1) << 6;
 
 	// disk sync detect
 	data |= checkpoint_live.sync << 7;
@@ -1295,7 +1311,7 @@ void victor_9000_fdc_device::live_run(const attotime &limit)
 
 			// write bit
 			int write_bit = 0;
-			if (!cur_live.drw && !get_floppy()->wpt_r())
+			if (!cur_live.drw)
 			{
 				write_bit = BIT(cur_live.shift_reg_write, 9);
 				if (pll_write_next_bit(write_bit, cur_live.tm, get_floppy(), limit))

@@ -9,6 +9,7 @@
 #include "bus/cbmiec/c1541.h"
 #include "bus/cbmiec/clipper_fdd.h"
 #include "bus/c64/exp.h"
+#include "bus/c64/sid.h"
 #include "bus/vic20/user.h"
 #include "bus/pet/cass.h"
 #include "bus/vcs_ctrl/ctrl.h"
@@ -21,7 +22,6 @@
 #include "machine/mos6526.h"
 #include "machine/pla.h"
 #include "machine/ram.h"
-#include "sound/mos6581.h"
 #include "video/mos6566.h"
 
 
@@ -29,7 +29,6 @@ namespace {
 
 #define MOS6567_TAG     "u19"
 #define MOS6569_TAG     "u19"
-#define MOS6581_TAG     "u18"
 #define MOS6526_1_TAG   "u1"
 #define MOS6526_2_TAG   "u2"
 #define PLA_TAG         "u17"
@@ -85,7 +84,7 @@ public:
 		m_nmi(*this, "nmi"),
 		m_pla(*this, PLA_TAG),
 		m_vic(*this, MOS6569_TAG),
-		m_sid(*this, MOS6581_TAG),
+		m_sid(*this, "sid"),
 		m_cia1(*this, MOS6526_1_TAG),
 		m_cia2(*this, MOS6526_2_TAG),
 		m_iec(*this, CBM_IEC_TAG),
@@ -118,7 +117,7 @@ public:
 	required_device<input_merger_device> m_nmi;
 	required_device<pla_device> m_pla;
 	required_device<mos6566_device> m_vic;
-	required_device<mos6581_device> m_sid;
+	required_device<c64_sid_slot_device> m_sid;
 	required_device<mos6526_device> m_cia1;
 	required_device<mos6526_device> m_cia2;
 	optional_device<cbm_iec_device> m_iec;
@@ -144,6 +143,8 @@ public:
 	void write_memory(offs_t offset, uint8_t data, int aec, int ba);
 
 	uint8_t read(offs_t offset);
+	uint8_t exp_dma_cd_r(offs_t offset);
+	void exp_dma_cd_w(offs_t offset, uint8_t data);
 	void write(offs_t offset, uint8_t data);
 	void cpu_mem_w(offs_t offset, uint8_t data);
 
@@ -154,8 +155,8 @@ public:
 
 	uint8_t sid_potx_r();
 	uint8_t sid_poty_r();
-	virtual uint8_t sid_r(offs_t offset) { return m_sid->read(offset & 0x1f); }
-	virtual void sid_w(offs_t offset, uint8_t data) { m_sid->write(offset & 0x1f, data); }
+	virtual uint8_t sid_r(offs_t offset) { return m_sid->read(offset); }
+	virtual void sid_w(offs_t offset, uint8_t data) { m_sid->write(offset, data); }
 
 	uint8_t cia1_pa_r();
 	void cia1_pa_w(uint8_t data);
@@ -721,6 +722,26 @@ uint8_t c64_state::read(offs_t offset)
 	offs_t va = 0x3fff;
 
 	return read_memory(offset, va, aec, ba);
+}
+
+
+//-------------------------------------------------
+//  exp_dma_cd_r - expansion port bus master read
+//-------------------------------------------------
+
+uint8_t c64_state::exp_dma_cd_r(offs_t offset)
+{
+	return read_memory(offset, 0x3fff, 1, 1);
+}
+
+
+//-------------------------------------------------
+//  exp_dma_cd_w - expansion port bus master write
+//-------------------------------------------------
+
+void c64_state::exp_dma_cd_w(offs_t offset, uint8_t data)
+{
+	write_memory(offset, data, 1, m_vic->ba_r());
 }
 
 
@@ -1632,9 +1653,7 @@ void c64_state::update_rdy()
 void c64_state::exp_reset_w(int state)
 {
 	if (!state)
-	{
-		machine_reset();
-	}
+		machine().schedule_soft_reset();
 }
 
 
@@ -1851,6 +1870,7 @@ void c64_state::vic_config(mos6566_device &vic)
 	vic.set_cpu(m_maincpu);
 	vic.irq_callback().set(m_irq, FUNC(input_merger_device::in_w<1>));
 	vic.ba_callback().set(FUNC(c64_state::vic_ba_w));
+	vic.phi2_callback().set(m_exp, FUNC(c64_expansion_slot_device::phi2_w));
 	vic.charrom_callback().set(FUNC(c64_state::vic_charrom_r));
 	vic.set_screen(SCREEN_TAG);
 	vic.set_addrmap(0, &c64_state::vic_videoram_map);
@@ -1917,11 +1937,12 @@ void c64_state::ntsc(machine_config &config)
 	screen.set_screen_update(MOS6567_TAG, FUNC(mos6567_device::screen_update));
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	MOS6581(config, m_sid, XTAL(14'318'181)/14);
+	SPEAKER(config, "speaker", 2).front();
+	C64_SID_SLOT(config, m_sid, XTAL(14'318'181)/14, c64_sid_cards, "6581");
 	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
 	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
-	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
+	m_sid->add_route(0, "speaker", 1.0, 0);
+	m_sid->add_route(1, "speaker", 1.0, 1);
 
 	// devices
 	PLS100(config, m_pla);
@@ -1949,8 +1970,8 @@ void c64_state::ntsc(machine_config &config)
 	m_exp->irq_callback().set(m_irq, FUNC(input_merger_device::in_w<2>));
 	m_exp->nmi_callback().set(m_nmi, FUNC(input_merger_device::in_w<2>));
 	m_exp->reset_callback().set(FUNC(c64_state::exp_reset_w));
-	m_exp->cd_input_callback().set(FUNC(c64_state::read));
-	m_exp->cd_output_callback().set(FUNC(c64_state::write));
+	m_exp->cd_input_callback().set(FUNC(c64_state::exp_dma_cd_r));
+	m_exp->cd_output_callback().set(FUNC(c64_state::exp_dma_cd_w));
 	m_exp->dma_callback().set(FUNC(c64_state::exp_dma_w));
 
 	PET_USER_PORT(config, m_user, c64_user_port_cards, nullptr);
@@ -2067,10 +2088,7 @@ void c64c_state::ntsc_c(machine_config &config)
 	MOS8521(config.replace(), m_cia1, XTAL(14'318'181)/14);
 	MOS8521(config.replace(), m_cia2, XTAL(14'318'181)/14);
 	cia_config(config, 60);
-	MOS8580(config.replace(), m_sid, XTAL(14'318'181)/14);
-	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
-	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
-	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
+	m_sid->set_default_option("8580");
 }
 
 
@@ -2106,11 +2124,12 @@ void c64_state::pal(machine_config &config)
 	screen.set_screen_update(MOS6569_TAG, FUNC(mos6569_device::screen_update));
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	MOS6581(config, m_sid, XTAL(17'734'472)/18);
+	SPEAKER(config, "speaker", 2).front();
+	C64_SID_SLOT(config, m_sid, XTAL(17'734'472)/18, c64_sid_cards, "6581");
 	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
 	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
-	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
+	m_sid->add_route(0, "speaker", 1.0, 0);
+	m_sid->add_route(1, "speaker", 1.0, 1);
 
 	// devices
 	PLS100(config, m_pla);
@@ -2138,8 +2157,8 @@ void c64_state::pal(machine_config &config)
 	m_exp->irq_callback().set(m_irq, FUNC(input_merger_device::in_w<2>));
 	m_exp->nmi_callback().set(m_nmi, FUNC(input_merger_device::in_w<2>));
 	m_exp->reset_callback().set(FUNC(c64_state::exp_reset_w));
-	m_exp->cd_input_callback().set(FUNC(c64_state::read));
-	m_exp->cd_output_callback().set(FUNC(c64_state::write));
+	m_exp->cd_input_callback().set(FUNC(c64_state::exp_dma_cd_r));
+	m_exp->cd_output_callback().set(FUNC(c64_state::exp_dma_cd_w));
 	m_exp->dma_callback().set(FUNC(c64_state::exp_dma_w));
 
 	PET_USER_PORT(config, m_user, c64_user_port_cards, nullptr);
@@ -2215,10 +2234,7 @@ void c64c_state::pal_c(machine_config &config)
 	MOS8521(config.replace(), m_cia1, XTAL(17'734'472)/18);
 	MOS8521(config.replace(), m_cia2, XTAL(17'734'472)/18);
 	cia_config(config, 50);
-	MOS8580(config.replace(), m_sid, XTAL(17'734'472)/18);
-	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
-	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
-	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
+	m_sid->set_default_option("8580");
 }
 
 
@@ -2263,6 +2279,8 @@ void clipper_state::clipper(machine_config &config)
 	pal(config);
 
 	subdevice<mos6566_device>(MOS6569_TAG)->set_palette(PALETTE_CLIPPER);
+
+	m_sid->set_fixed(true);
 
 	m_cia1->pa_rd_callback().set(FUNC(clipper_state::cia1_pa_r));
 	m_cia1->pb_rd_callback().set(FUNC(clipper_state::cia1_pb_r));
@@ -2554,8 +2572,10 @@ ROM_START( c64c )
 	ROM_DEFAULT_BIOS("cbm")
 	ROM_SYSTEM_BIOS(0, "cbm", "Original" )
 	ROMX_LOAD( "251913-01.u4", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS(1, "pdc", "ProLogic-DOS Classic" )
-	ROMX_LOAD( "pdc.u4", 0x0000, 0x4000, CRC(6b653b9c) SHA1(0f44a9c62619424a0cd48a90e1b377b987b494e0), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "jiffydos", "JiffyDOS v6.01" )
+	ROMX_LOAD( "jiffydos c64c.u4", 0x0000, 0x4000, CRC(f48a93ba) SHA1(23152a7afcd90826a4034e826c8f5b3432da0b4a), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(2, "pdc", "ProLogic-DOS Classic" )
+	ROMX_LOAD( "pdc.u4", 0x0000, 0x4000, CRC(6b653b9c) SHA1(0f44a9c62619424a0cd48a90e1b377b987b494e0), ROM_BIOS(2) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u5", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )

@@ -5,6 +5,7 @@
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+#include "bus/c128/mmu.h"
 #include "bus/c128/vdcram.h"
 #include "bus/c64/exp.h"
 #include "bus/cbmiec/cbmiec.h"
@@ -22,7 +23,6 @@
 #include "cbm_snqk.h"
 #include "machine/input_merger.h"
 #include "machine/mos6526.h"
-#include "machine/mos8722.h"
 #include "machine/pla.h"
 #include "machine/ram.h"
 #include "sound/mos6581.h"
@@ -51,7 +51,7 @@ public:
 		m_subcpu(*this, M8502_TAG),
 		m_irq(*this, "irq"),
 		m_nmi(*this, "nmi"),
-		m_mmu(*this, "u7"),
+		m_mmu(*this, "mmu"),
 		m_pla(*this, MOS8721_TAG),
 		m_vdc(*this, MOS8563_TAG),
 		m_vic(*this, MOS8564_TAG),
@@ -104,6 +104,8 @@ public:
 		m_iec_srq(1),
 		m_vic_k(0x07),
 		m_caps_lock(1),
+		m_cpu_port(0x07),
+		m_adapter_drive(false),
 		m_charom_caps(0)
 	{ }
 
@@ -111,7 +113,7 @@ public:
 	required_device<m8502_device> m_subcpu;
 	required_device<input_merger_device> m_irq;
 	required_device<input_merger_device> m_nmi;
-	required_device<mos8722_device> m_mmu;
+	required_device<c128_mmu_slot_device> m_mmu;
 	required_device<pla_device> m_pla;
 	required_device<mos8563_device> m_vdc;
 	required_device<mos6566_device> m_vic;
@@ -144,8 +146,8 @@ public:
 	virtual void machine_reset() override ATTR_COLD;
 
 	int read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, int aec, int z80io, int ms3, int ms2, int ms1, int ms0);
-	uint8_t read_memory(offs_t offset, offs_t vma, int ba, int aec, int z80io);
-	void write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io);
+	uint8_t read_memory(offs_t offset, offs_t vma, int ba, int aec, int z80io, bool dma = false);
+	void write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io, bool dma = false);
 	inline void update_iec();
 
 	uint8_t z80_r(offs_t offset);
@@ -162,6 +164,9 @@ public:
 	void vic_ba_w(int state);
 	void update_rdy();
 	void mmu_fsdir_w(int state);
+	void adapter_port_w(uint8_t data);
+	void adapter_drive_w(int state);
+	int adapter_caps_r();
 	int mmu_game_r();
 	int mmu_exrom_r();
 	int mmu_sense40_r();
@@ -254,6 +259,8 @@ public:
 	// keyboard state
 	uint8_t m_vic_k;
 	int m_caps_lock;
+	uint8_t m_cpu_port;
+	bool m_adapter_drive;
 	int m_charom_caps;
 
 	int m_user_pa2;
@@ -359,7 +366,7 @@ int c128_state::read_pla(offs_t offset, offs_t ca, offs_t vma, int ba, int rw, i
 //  read_memory -
 //-------------------------------------------------
 
-uint8_t c128_state::read_memory(offs_t offset, offs_t vma, int ba, int aec, int z80io)
+uint8_t c128_state::read_memory(offs_t offset, offs_t vma, int ba, int aec, int z80io, bool dma)
 {
 	int rw = 1, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
 	int io1 = 1, io2 = 1;
@@ -367,7 +374,12 @@ uint8_t c128_state::read_memory(offs_t offset, offs_t vma, int ba, int aec, int 
 
 	uint8_t data = 0xff;
 
-	offs_t ta = m_mmu->ta_r(offset, aec, &ms0, &ms1, &ms2, &ms3, &cas0, &cas1);
+	// /DMA gates the MMU's AEC, so a bus master drives TA8-TA15 itself and gets the VIC bank
+	bool const gaec = m_mmu->aec_r(!dma);
+	offs_t ta = m_mmu->ta_r(offset, aec && gaec, &ms0, &ms1, &ms2, &ms3, &cas0, &cas1);
+
+	if (!gaec)
+		ta = offset & 0xff00;
 	offs_t ma = 0;
 	offs_t sa = 0;
 
@@ -479,7 +491,10 @@ uint8_t c128_state::read_memory(offs_t offset, offs_t vma, int ba, int aec, int 
 
 	data = m_exp->cd_r(ca, data, sphi2, ba, roml, romh, io1, io2);
 
-	return m_mmu->read(offset, data);
+	if (gaec)
+		data = m_mmu->read(offset, data);
+
+	return data;
 }
 
 
@@ -487,13 +502,17 @@ uint8_t c128_state::read_memory(offs_t offset, offs_t vma, int ba, int aec, int 
 //  write_memory -
 //-------------------------------------------------
 
-void c128_state::write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io)
+void c128_state::write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, int aec, int z80io, bool dma)
 {
 	int rw = 0, ms0 = 1, ms1 = 1, ms2 = 1, ms3 = 1, cas0 = 1, cas1 = 1;
 	int io1 = 1, io2 = 1;
 	int sphi2 = m_vic->phi0_r();
 
-	offs_t ta = m_mmu->ta_r(offset, aec, &ms0, &ms1, &ms2, &ms3, &cas0, &cas1);
+	bool const gaec = m_mmu->aec_r(!dma);
+	offs_t ta = m_mmu->ta_r(offset, aec && gaec, &ms0, &ms1, &ms2, &ms3, &cas0, &cas1);
+
+	if (!gaec)
+		ta = offset & 0xff00;
 	offs_t ca = ta | (offset & 0xff);
 	offs_t ma = ta | (offset & 0xff);
 	offs_t sa = offset & 0xff;
@@ -564,7 +583,8 @@ void c128_state::write_memory(offs_t offset, offs_t vma, uint8_t data, int ba, i
 
 	m_exp->cd_w(ca, data, sphi2, ba, roml, romh, io1, io2);
 
-	m_mmu->write(offset, data);
+	if (gaec)
+		m_mmu->write(offset, data);
 }
 
 
@@ -1261,6 +1281,30 @@ int c128_state::mmu_sense40_r()
 	return BIT(m_40_80->read(), 0);
 }
 
+void c128_state::adapter_port_w(uint8_t data)
+{
+	m_loram = BIT(data, 0);
+	m_hiram = BIT(data, 1);
+	m_charen = BIT(data, 2);
+}
+
+void c128_state::adapter_drive_w(int state)
+{
+	m_adapter_drive = state;
+
+	if (!state)
+	{
+		m_loram = BIT(m_cpu_port, 0);
+		m_hiram = BIT(m_cpu_port, 1);
+		m_charen = BIT(m_cpu_port, 2);
+	}
+}
+
+int c128_state::adapter_caps_r()
+{
+	return m_caps_lock;
+}
+
 
 //-------------------------------------------------
 //  mc6845
@@ -1643,9 +1687,14 @@ void c128_state::cpu_w(uint8_t data)
 	*/
 
 	// memory banking
-	m_loram = BIT(data, 0);
-	m_hiram = BIT(data, 1);
-	m_charen = BIT(data, 2);
+	m_cpu_port = data & 0x07;
+
+	if (!m_adapter_drive)
+	{
+		m_loram = BIT(data, 0);
+		m_hiram = BIT(data, 1);
+		m_charen = BIT(data, 2);
+	}
 
 	// cassette write
 	m_cassette->write(BIT(data, 3));
@@ -1731,10 +1780,10 @@ void c128_state::user_sp1_w(int state)
 
 uint8_t c128_state::exp_dma_cd_r(offs_t offset)
 {
-	int ba = m_vic->ba_r(), aec = 1, z80io = 1;
+	int ba = 1, aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	return read_memory(offset, vma, ba, aec, z80io);
+	return read_memory(offset, vma, ba, aec, z80io, true);
 }
 
 void c128_state::exp_dma_cd_w(offs_t offset, uint8_t data)
@@ -1742,12 +1791,14 @@ void c128_state::exp_dma_cd_w(offs_t offset, uint8_t data)
 	int ba = m_vic->ba_r(), aec = 1, z80io = 1;
 	offs_t vma = 0;
 
-	write_memory(offset, vma, data, ba, aec, z80io);
+	write_memory(offset, vma, data, ba, aec, z80io, true);
 }
 
 void c128_state::exp_dma_w(int state)
 {
 	m_exp_dma = state;
+
+	m_mmu->dma_w(state);
 
 	update_rdy();
 }
@@ -1755,9 +1806,7 @@ void c128_state::exp_dma_w(int state)
 void c128_state::exp_reset_w(int state)
 {
 	if (!state)
-	{
-		machine_reset();
-	}
+		machine().schedule_soft_reset();
 }
 
 
@@ -1834,6 +1883,8 @@ void c128_state::machine_start()
 	save_item(NAME(m_iec_srq));
 	save_item(NAME(m_vic_k));
 	save_item(NAME(m_caps_lock));
+	save_item(NAME(m_cpu_port));
+	save_item(NAME(m_adapter_drive));
 	save_item(NAME(m_charom_caps));
 	save_item(NAME(m_user_pa2));
 	save_item(NAME(m_user_pb));
@@ -1926,6 +1977,7 @@ void c128_state::ntsc(machine_config &config)
 	m_vic->set_cpu(m_subcpu);
 	m_vic->irq_callback().set(m_irq, FUNC(input_merger_device::in_w<1>));
 	m_vic->ba_callback().set(FUNC(c128_state::vic_ba_w));
+	m_vic->phi2_callback().set(m_exp, FUNC(c64_expansion_slot_device::phi2_w));
 	m_vic->k_callback().set(FUNC(c128_state::vic_k_w));
 	m_vic->set_screen(SCREEN_VIC_TAG);
 	m_vic->set_addrmap(0, &c128_state::vic_videoram_map);
@@ -1945,12 +1997,15 @@ void c128_state::ntsc(machine_config &config)
 	m_sid->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	// devices
-	MOS8722(config, m_mmu, XTAL(14'318'181)*2/3.5/8);
+	C128_MMU_SLOT(config, m_mmu, XTAL(14'318'181)*2/3.5/8, c128_mmu_cards, "mos8722");
 	m_mmu->z80en().set(FUNC(c128_state::mmu_z80en_w));
 	m_mmu->fsdir().set(FUNC(c128_state::mmu_fsdir_w));
 	m_mmu->game().set(FUNC(c128_state::mmu_game_r));
 	m_mmu->exrom().set(FUNC(c128_state::mmu_exrom_r));
 	m_mmu->sense40().set(FUNC(c128_state::mmu_sense40_r));
+	m_mmu->port().set(FUNC(c128_state::adapter_port_w));
+	m_mmu->drive().set(FUNC(c128_state::adapter_drive_w));
+	m_mmu->caps().set(FUNC(c128_state::adapter_caps_r));
 
 	MOS8721(config, m_pla);
 
@@ -2125,6 +2180,7 @@ void c128_state::pal(machine_config &config)
 	mos8566.set_cpu(M8502_TAG);
 	mos8566.irq_callback().set(m_irq, FUNC(input_merger_device::in_w<1>));
 	mos8566.ba_callback().set(FUNC(c128_state::vic_ba_w));
+	mos8566.phi2_callback().set(m_exp, FUNC(c64_expansion_slot_device::phi2_w));
 	mos8566.k_callback().set(FUNC(c128_state::vic_k_w));
 	mos8566.set_screen(SCREEN_VIC_TAG);
 	mos8566.set_addrmap(0, &c128_state::vic_videoram_map);
@@ -2144,12 +2200,15 @@ void c128_state::pal(machine_config &config)
 	m_sid->add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	// devices
-	MOS8722(config, m_mmu, XTAL(17'734'472)*2/4.5/8);
+	C128_MMU_SLOT(config, m_mmu, XTAL(17'734'472)*2/4.5/8, c128_mmu_cards, "mos8722");
 	m_mmu->z80en().set(FUNC(c128_state::mmu_z80en_w));
 	m_mmu->fsdir().set(FUNC(c128_state::mmu_fsdir_w));
 	m_mmu->game().set(FUNC(c128_state::mmu_game_r));
 	m_mmu->exrom().set(FUNC(c128_state::mmu_exrom_r));
 	m_mmu->sense40().set(FUNC(c128_state::mmu_sense40_r));
+	m_mmu->port().set(FUNC(c128_state::adapter_port_w));
+	m_mmu->drive().set(FUNC(c128_state::adapter_drive_w));
+	m_mmu->caps().set(FUNC(c128_state::adapter_caps_r));
 
 	MOS8721(config, m_pla);
 

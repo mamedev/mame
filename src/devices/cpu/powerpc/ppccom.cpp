@@ -1245,14 +1245,14 @@ void ppc_device::device_reset()
 	// discard any pending retry request (this getter clears the flag)
 	access_to_be_redone();
 
-	/* initialize the OEA state */
+	// initialize the OEA state
 	if (m_cap & PPCCAP_OEA)
 	{
-		/* PC to the reset vector; MSR has IP set to start */
+		// PC to the reset vector; MSR has IP set to start
 		m_core->pc = 0xfff00100;
 		m_core->msr = MSROEA_IP;
 
-		/* reset the decrementer */
+		// reset the decrementer
 		m_dec_zero_cycles = total_cycles();
 		if (m_tb_divisor || (m_flavor == PPC_MODEL_601))
 		{
@@ -1260,35 +1260,43 @@ void ppc_device::device_reset()
 		}
 	}
 
-	/* initialize the 4XX state */
+	// initialize the 4XX state
 	if (m_cap & PPCCAP_4XX)
 	{
-		/* PC to the last word; MSR to 0 */
+		// PC to the last word; MSR to 0
 		m_core->pc = 0xfffffffc;
 		m_core->msr = 0;
 
-		/* reset the SPU status */
+		// reset the SPU status
 		m_core->spr[SPR4XX_TCR] &= ~PPC4XX_TCR_WRC_MASK;
 		m_spu.regs[SPU4XX_LINE_STATUS] = 0x06;
 	}
 
-	/* initialize the 602 HID0 register */
+	// initialize the 602 HID0 register
 	if (m_flavor == PPC_MODEL_602)
 	{
 		m_core->spr[SPR602_ESASRR] = 0;
 		m_core->spr[SPR603_HID0] = 1;
 	}
+	else if (m_flavor == PPC_MODEL_603E || m_flavor == PPC_MODEL_603EV || m_flavor == PPC_MODEL_603R)
+	{
+		// initialize the 603e HID1 register; PC0-PC3 are a read-only view of the PLL_CFG pins
+		// PLL_CFG0-3 encodings indexed by twice the CPU:bus ratio (0 = no such setting)
+		static constexpr uint8_t pll_cfg[13] = {0, 0, 0x1, 0xc, 0x4, 0x6, 0x8, 0xe, 0xa, 0x7, 0xb, 0x9, 0xd};
+		uint32_t const ratio = m_system_clock ? ((uint64_t(clock()) * 4 + m_system_clock) / (uint64_t(m_system_clock) * 2)) : 0;
+		m_core->spr[SPR603_HID1] = (ratio < std::size(pll_cfg)) ? (uint32_t(pll_cfg[ratio]) << 28) : 0;
+	}
 
-	/* time base starts here */
+	// time base starts here
 	m_tb_zero_cycles = total_cycles();
 
-	/* clear interrupts */
+	// clear interrupts
 	m_core->irq_pending = 0;
 
 	// clear the "any page has code" flag
 	m_core->m_codepage_any = 0;
 
-	/* flush the TLB */
+	// flush the TLB
 	if (m_cap & PPCCAP_603_MMU)
 	{
 		for (int tlbindex = 0; tlbindex < PPC603_FIXED_TLB_ENTRIES; tlbindex++)
@@ -1297,7 +1305,7 @@ void ppc_device::device_reset()
 		}
 	}
 
-	/* Mark the cache dirty */
+	// Mark the cache dirty
 	m_core->mode = 0;
 	m_cache_dirty = true;
 }
@@ -2289,11 +2297,11 @@ void ppc_device::ppccom_execute_mtspr()
 			case SPR603_HASH2:
 			case SPR603_IMISS:
 			case SPR603_ICMP:
+			case SPR603_HID1:
 				return;
 
 			/* write-through no-ops */
 			case SPR603_RPA:
-			case SPR603_HID1:
 			case SPR603_IABR:
 			case SPR603_HID2:
 				m_core->spr[m_core->param0] = m_core->param1;

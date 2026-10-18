@@ -7,8 +7,6 @@ P's Attack (c) 2004 Uniana
 based off original crystal.cpp by ElSemi
 
 TODO:
-- Has serious popup/missing renders during gameplay
-  Old note: Requires timed based FIFO renderer, loops until both rear and front are equal;
 - Enables wavetable IRQ, has sound hiccups;
 - Refine gun positioning, and hookup out of screen behaviour properly;
 - Lamps;
