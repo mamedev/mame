@@ -170,7 +170,7 @@ void nwb_512_device::reset_state()
 {
 	// TODO: actually reset state
 	m_state.busy = false;
-	m_state = {};
+	// m_state = {};
 }
 
 void nwb_512_device::check_operation_start(offs_t offset)
@@ -216,7 +216,7 @@ void nwb_512_device::check_operation_start(offs_t offset)
 	m_state.dest_words_per_row = (dest_phase + width + 15) >> 4;
 	m_state.source_words_left = m_state.source_words_per_row;
 	m_state.dest_words_left = m_state.dest_words_per_row;
-	LOG("Source words per row: %d, Destination words per row: %d\n", m_state.source_words_per_row, m_state.dest_words_per_row);
+	LOG("Source words per row: %d, Destination words per row: %d, priming required = %s\n", m_state.source_words_per_row, m_state.dest_words_per_row, m_state.prime ? "yes" : "no");
 
 	if (std::abs(m_state.dest_words_per_row - m_state.source_words_per_row) > 1)
 	{
@@ -366,7 +366,7 @@ void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mas
 		m_state.rop_function = data & 0xf;
 	}
 
-	LOGMASKED(LOG_ROP_CONFIG, "%s%s%s%s%s%s%s\n",
+	LOGMASKED(LOG_ROP_CONFIG, "%s%s%s%s%s%s%s%s\n",
 			  m_state.fb_write ? "fbwrite " : "",
 			  m_state.fb_read ? "fbread " : "",
 			  m_state.row_fill ? "rowfill " : "",
@@ -374,7 +374,7 @@ void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mas
 			  m_state.x_direction ? "xfwd " : "xrev ",
 			  m_state.suppress_advance ? "supadv " : "",
 			  m_state.pixel_mode ? "pixel " : "word ",
-			  offset & 400 ? "func=0x" + std::format("{:x}", m_state.rop_function) : "");
+			  offset & 0x400 ? util::string_format("func=0x%x", m_state.rop_function) : "");
 
 	// TODO: this check causes issues, maybe the ROP engine can be configured on the fly?
 	//       Should also check with not resetting everything when the card is disabled,
@@ -583,6 +583,18 @@ void nwb_512_device::rop_cycle(uint16_t data)
 		shift(data);
 		m_state.prime_pending = false;
 		--m_state.source_words_left;
+
+		if (m_state.source_words_left == 0 && m_state.dest_words_left > 0) {
+			// In this case, the prime has to be written directly, because we had only one word left
+			// from the source but it had to be shifted to account for the phase.
+			rop(m_state.carry);
+		}
+
+		// Because we are writing a word, we might have to end the row
+		if (m_state.dest_words_left == 0) {
+			end_row();
+		}
+
 		return;
 	}
 
@@ -643,7 +655,7 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 	// if (dxa > lxa) end row (reload X, Y++, carry = 0, re-prime if needed)
 	if (m_state.dest_words_left == 0)
 	{
-		LOG("  fifo_r: calling end row\n", word);
+		LOG("  fifo_r: calling end row\n");
 		end_row();
 	}
 
@@ -726,7 +738,9 @@ void nwb_512_device::set_pixel(uint16_t x, uint16_t y, bool on)
 
 uint16_t nwb_512_device::status_r()
 {
-	return 0x20 | (m_state.busy ? 0x1 : 0x0); // TODO: some ops wait for 0x11 -> 0x10/0x01 transition instead of 0x11->0x00
+	// The framebuffer font is only rendered properly if bit 5 is set.
+	// This might be some kind of ID or revision flag for the Kanji ROM (or the framebuffer as a whole).
+	return 0x20 | (m_state.busy ? 0b10 : 0b0); // TODO: some ops wait for 0x11 -> 0b10/0b01 transition instead of 0b11->0b00
 }
 
 void nwb_512_device::ctrl_w(uint16_t data)

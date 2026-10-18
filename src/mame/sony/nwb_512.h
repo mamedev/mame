@@ -65,8 +65,8 @@ private:
 
 		// Configuration flags
 		bool suppress_advance = false; // false = auto-increment after rop
-		bool x_direction = false;	   // true = top -> bottom
-		bool y_direction = false;	   // true = left -> right
+		bool x_direction = false;	   // true = left -> right
+		bool y_direction = false;	   // true = top -> bottom
 		bool row_fill = false;		   // true = write data fifo word across whole line
 		bool fb_read = false;		   // Tri-state with write - read = fb -> host, write = host -> fb, both = fb -> fb copy
 		bool fb_write = false;
