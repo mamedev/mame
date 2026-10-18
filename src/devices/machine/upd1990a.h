@@ -108,6 +108,7 @@ private:
 	int m_c_unlatched;          // command waiting for STB
 
 	bool m_testmode;            // testmode active
+	bool m_counter_held;        // Time Set holds the time counter until Register Hold, Shift or Time Read
 
 	int const m_variant;
 
@@ -119,6 +120,7 @@ private:
 
 	bool is_serial_mode();
 	int get_data_out();
+	void release_counter();
 };
 
 

@@ -87,6 +87,7 @@ void upd1990a_device::device_start()
 	m_tp = 0;
 	m_c_unlatched = 0;
 	m_testmode = false;
+	m_counter_held = false;
 
 	// allocate timers
 	m_timer_clock = timer_alloc(FUNC(upd1990a_device::clock_tick), this);
@@ -108,6 +109,7 @@ void upd1990a_device::device_start()
 	save_item(NAME(m_tp));
 	save_item(NAME(m_c_unlatched));
 	save_item(NAME(m_testmode));
+	save_item(NAME(m_counter_held));
 }
 
 
@@ -123,6 +125,29 @@ void upd1990a_device::rtc_clock_updated(int year, int month, int day, int day_of
 	m_time_counter[3] = convert_to_bcd(day);
 	m_time_counter[4] = (month << 4) | (day_of_week - 1);
 	m_time_counter[5] = convert_to_bcd(year);
+}
+
+
+//-------------------------------------------------
+//  release_counter - end a Time Set hold
+//-------------------------------------------------
+
+void upd1990a_device::release_counter()
+{
+	if (!m_counter_held)
+		return;
+
+	m_counter_held = false;
+	if (m_testmode)
+		return;
+
+	// Time Set held the upper stages of the clock divider (uPD4990A: 10-15, uPD1990A: 11-15) in reset; the lower
+	// stages run on, so the next second comes 63/64 s (uPD4990A) or 31/32 s (uPD1990A) after their next step
+	// (the uPD4990A's time setting accuracy is +/-15.625ms)
+	uint32_t const steps = (m_variant == TYPE_4990A) ? 64 : 32; // steps per second of the last stage running on
+	uint64_t const period = clock() / steps; // in clock ticks
+	uint64_t const now = machine().time().as_ticks(clock());
+	m_timer_clock->adjust(attotime::from_ticks(period - (now % period) + (steps - 1) * period, clock()), 0, attotime::from_hz(clock() / 32768.0));
 }
 
 
@@ -149,6 +174,10 @@ TIMER_CALLBACK_MEMBER(upd1990a_device::data_out_tick)
 
 TIMER_CALLBACK_MEMBER(upd1990a_device::test_tick)
 {
+	// Time Set holds the time counter in the test mode too
+	if (m_counter_held)
+		return;
+
 	if (m_oe)
 	{
 		/* TODO: completely untested */
@@ -211,8 +240,9 @@ void upd1990a_device::stb_w(int state)
 		// common functions
 		if (m_c == MODE_REGISTER_HOLD || (m_c >= MODE_TP_64HZ && m_c < MODE_TEST))
 		{
-			// enable time counter
-			m_timer_clock->enable(1);
+			// enable time counter, unless Time Set holds it
+			if (!m_counter_held)
+				m_timer_clock->enable(1);
 
 			// disable testmode
 			m_testmode = false;
@@ -222,6 +252,8 @@ void upd1990a_device::stb_w(int state)
 		switch (m_c)
 		{
 		case MODE_REGISTER_HOLD:
+			release_counter();
+
 			// 1Hz data out pulse
 			m_timer_data_out->adjust(attotime::zero, 0, attotime::from_hz((clock() / 32768.0) * 2.0));
 
@@ -234,7 +266,9 @@ void upd1990a_device::stb_w(int state)
 
 		case MODE_SHIFT:
 			// enable time counter
-			if (!m_testmode)
+			if (m_counter_held)
+				release_counter();
+			else if (!m_testmode)
 				m_timer_clock->enable(1);
 
 			// data out LSB of shift register
@@ -250,8 +284,9 @@ void upd1990a_device::stb_w(int state)
 
 		case MODE_TIME_SET:
 		{
-			// disable time counter
+			// hold the time counter until Register Hold, Shift or Time Read releases it
 			m_timer_clock->enable(0);
+			m_counter_held = true;
 
 			// data out LSB of shift register
 			m_timer_data_out->enable(0);
@@ -273,9 +308,6 @@ void upd1990a_device::stb_w(int state)
 				bcd_to_integer(m_time_counter[0])
 			);
 
-			// reset stage 10-15 of clock divider
-			m_timer_clock->adjust(attotime::from_ticks(m_timer_clock->remaining().as_ticks(clock()) % (clock() / 512), clock()), 0, attotime::from_hz(clock() / 32768.0));
-
 			// disable(low) time pulse in testmode
 			if (m_testmode)
 			{
@@ -290,7 +322,9 @@ void upd1990a_device::stb_w(int state)
 		case MODE_TIME_READ:
 		{
 			// enable time counter
-			if (!m_testmode)
+			if (m_counter_held)
+				release_counter();
+			else if (!m_testmode)
 				m_timer_clock->enable(1);
 
 			// load time counter data into shift register
