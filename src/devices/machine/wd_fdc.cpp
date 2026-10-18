@@ -255,9 +255,7 @@ void wd_fdc_device_base::mr_w(int state)
 		}
 
 		mon_cb(1); // Clear the MON* line
-
-		// SSO is forced low by a master reset
-		set_sso(0);
+		set_sso(0); // set to side 0
 
 		intrq_cond = 0;
 		live_abort();
