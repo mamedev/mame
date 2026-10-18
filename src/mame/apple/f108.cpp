@@ -39,7 +39,7 @@ void f108_device::map(address_map &map)
 	map(0x5001a000, 0x5001a01f).rw(m_ata, FUNC(ata_interface_device::cs0_swap_r), FUNC(ata_interface_device::cs0_swap_w)).umask32(0xffff0000).mirror(0x00fc0000);
 	map(0x5001a000, 0x5001a003).rw(FUNC(f108_device::ata_data_r), FUNC(f108_device::ata_data_w)).mirror(0x00fc0000);
 	map(0x5001a020, 0x5001a03f).rw(m_ata, FUNC(ata_interface_device::cs1_swap_r), FUNC(ata_interface_device::cs1_swap_w)).umask32(0xffff0000).mirror(0x00fc0000);
-	// a040 is probably a configuration register based on later Apple ATA implementations, but the values written don't make sense
+	map(0x5001a040, 0x5001a04b).rw(FUNC(f108_device::ata_timing_r), FUNC(f108_device::ata_timing_w)).mirror(0x00fc0000);
 	map(0xf9000000, 0xf90fffff).ram();  // VRAM
 }
 
@@ -103,6 +103,11 @@ void f108_device::device_start()
 {
 	m_rom_ptr = &m_rom[0];
 	m_rom_size = m_rom.length() << 2;
+
+	m_ata_active = 0;
+	m_ata_recovery = 0;
+	save_item(NAME(m_ata_active));
+	save_item(NAME(m_ata_recovery));
 }
 
 //-------------------------------------------------
@@ -149,6 +154,37 @@ void f108_device::set_ram_info(u32 *ram, u32 size)
 void f108_device::ata_irq_w(int state)
 {
 	m_ata_irq(state);
+}
+
+u8 f108_device::ata_timing_r(offs_t offset)
+{
+	switch (offset & ~2)
+	{
+		case 1:
+			return 0x20;
+
+		case 5:
+			return m_ata_active;
+
+		case 9:
+			return m_ata_recovery;
+	}
+
+	return 0xff;
+}
+
+void f108_device::ata_timing_w(offs_t offset, u8 data)
+{
+	switch (offset & ~2)
+	{
+		case 5:
+			m_ata_active = data & 0x3f;
+			break;
+
+		case 9:
+			m_ata_recovery = data & 0x0f;
+			break;
+	}
 }
 
 u32 f108_device::ata_data_r(offs_t offset, u32 mem_mask)
