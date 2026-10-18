@@ -360,6 +360,7 @@ license:CC0-1.0
 		<sharedfeat name="release" value="MVS,AES" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
+			<feature name="slot" value="rom_link" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="006-p1.p1" offset="0x000000" size="0x080000" crc="d4aaf597" sha1="34d35b71adb5bd06f4f1b50ffd9c58ab9c440a84" />   <!-- MB834200 -->
 			</dataarea>
@@ -402,6 +403,7 @@ license:CC0-1.0
 		<sharedfeat name="release" value="unknown" />
 		<sharedfeat name="compatibility" value="MVS,AES" />
 		<part name="cart" interface="neo_cart">
+			<feature name="slot" value="rom_link" />
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="006-pg1.p1" offset="0x000000" size="0x080000" status="baddump" crc="52445646" sha1="647bb31f2f68453c1366cb6e2e867e37d1df7a54" />
 				<!-- Chip label p1h does not exist, renamed temporarily to pg1, marked BAD_DUMP. This needs to be verified. -->
