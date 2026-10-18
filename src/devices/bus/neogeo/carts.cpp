@@ -7,6 +7,7 @@
 #include "emu.h"
 #include "bus/neogeo/carts.h"
 #include "bus/neogeo/rom.h"
+#include "bus/neogeo/link.h"
 #include "bus/neogeo/fatfury2.h"
 #include "bus/neogeo/kof98.h"
 #include "bus/neogeo/mslugx.h"
@@ -29,6 +30,7 @@ void neogeo_cart(device_slot_interface &device)
 	device.option_add_internal("rom",  NEOGEO_ROM);                     // Standard cart with banking
 
 	device.option_add_internal("rom_vliner",  NEOGEO_VLINER_CART);      // Standard cart + RAM
+	device.option_add_internal("rom_link",    NEOGEO_LINK_CART);        // Standard cart + multi-play link MCU
 	device.option_add_internal("rom_fatfur2", NEOGEO_FATFURY2_CART);    // Custom Fatal Fury 2 protection
 	device.option_add_internal("rom_kof98",   NEOGEO_KOF98_CART);       // Custom King of Fighters 98 protection
 	device.option_add_internal("rom_mslugx",  NEOGEO_MSLUGX_CART);      // Custom Metal Slug X protection

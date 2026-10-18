@@ -74,6 +74,7 @@ enum
 	NEOGEO_KOF10TH,
 	NEOGEO_VLINER,
 	NEOGEO_JOCKEYGP,
+	NEOGEO_LINK,
 };
 
 
@@ -106,6 +107,7 @@ public:
 
 	virtual void decrypt_all(DECRYPT_ALL_PARAMS) { }
 	virtual int get_fixed_bank_type() { return 0; }
+	virtual void set_slot_selected(bool state) { }  // the MVS's slot select (SLOTCS) reaches the cart
 
 	void rom_alloc(uint32_t size) { m_rom.resize(size/sizeof(uint16_t)); }
 	uint16_t* get_rom_base()  { return m_rom.size() > 0 ? &m_rom[0] : nullptr; }
@@ -221,6 +223,7 @@ public:
 	uint16_t addon_r(offs_t offset);
 
 	void set_cart_type(const char *slot);
+	void set_selected(bool state) { if (m_cart) m_cart->set_slot_selected(state); }
 	int get_type() { return m_type; }
 
 	uint16_t* get_rom_base()  {
