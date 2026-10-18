@@ -6,7 +6,7 @@
 
     The board used in the H19 smart terminal designed and manufactured
     by Heath Company. (and the identical Z19 sold by Zenith Data Systems)
-    This board is also used the Heath's H89 / H88, and ZDS's Z-89 and Z-90.
+    This board is also used in Heath's H89 / H88, and ZDS's Z-89 and Z-90.
 
     The keyboard consists of a 9x10 matrix connected to a MM5740AAC/N
     mask-programmed keyboard controller. The output of this passes
@@ -24,7 +24,7 @@
 
   Not Currently Implemented
     - With Imaginator I-100
-      - Support for Tektronics Emulation (missing ROM image)
+      - Support for Tektronix Emulation (missing ROM image)
     - With SigmaSoft IGC
       - Interlace video support (with higher resolution)
       - Joystick support
@@ -37,7 +37,7 @@
       - ANSI character set selection (missing ROM image)
       - light pen support
     - With UltraROM
-      - Interace mode
+      - Interlace mode
 
 ****************************************************************************/
 /***************************************************************************
@@ -75,6 +75,17 @@
 #include "emu.h"
 
 #include "tlb.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/clock.h"
+#include "machine/ins8250.h"
+#include "machine/mm5740.h"
+#include "sound/beep.h"
+#include "video/mc6845.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include <algorithm>
 
@@ -123,26 +134,372 @@ static constexpr u8 KB_STATUS_KEYBOARD_STROBE_MASK = 0x80;
 
 DEFINE_DEVICE_TYPE(HEATH_TLB_CONNECTOR, heath_tlb_connector,          "heath_tlb_connector",          "Heath Terminal Logic board connector abstraction")
 
-DEFINE_DEVICE_TYPE(HEATH_TLB,           heath_tlb_device,             "heath_tlb",                    "Heath Terminal Logic Board")
-DEFINE_DEVICE_TYPE(HEATH_SUPER19,       heath_super19_tlb_device,     "heath_super19_tlb",            "Heath Terminal Logic Board w/Super19 ROM")
-DEFINE_DEVICE_TYPE(HEATH_SUPERSET,      heath_superset_tlb_device,    "heath_superset_tlb",           "Heath Terminal Logic Board w/Superset ROM")
-DEFINE_DEVICE_TYPE(HEATH_ULTRA,         heath_ultra_tlb_device,       "heath_ultra_tlb",              "Heath Terminal Logic Board w/Ultra ROM")
-DEFINE_DEVICE_TYPE(HEATH_WATZ,          heath_watz_tlb_device,        "heath_watz_tlb",               "Heath Terminal Logic Board w/Watzman ROM")
-DEFINE_DEVICE_TYPE(HEATH_GP19,          heath_gp19_tlb_device,        "heath_gp19_tlb",               "Heath Terminal Logic Board plus Northwest Digital Systems GP-19")
-DEFINE_DEVICE_TYPE(HEATH_IMAGINATOR,    heath_imaginator_tlb_device,  "heath_imaginator_tlb",         "Heath Terminal Logic Board plus Cleveland Codonics Imaginator I-100")
-
-// Devices for the terminal boards compatible with SigmaSoft IGC
-DEFINE_DEVICE_TYPE(HEATH_IGC,           heath_igc_tlb_device,         "heath_igc_tlb_device",         "Heath Terminal Logic Board plus SigmaSoft Interactive Graphics Controller")
-DEFINE_DEVICE_TYPE(HEATH_IGC_SUPER19,   heath_igc_super19_tlb_device, "heath_igc_super19_tlb_device", "Heath Terminal Logic Board w/ Super19 ROM plus SigmaSoft Interactive Graphics Controller")
-DEFINE_DEVICE_TYPE(HEATH_IGC_ULTRA,     heath_igc_ultra_tlb_device,   "heath_igc_ultra_tlb_device",   "Heath Terminal Logic Board w/ Ultra ROM plus SigmaSoft Interactive Graphics Controller")
-DEFINE_DEVICE_TYPE(HEATH_IGC_WATZ,      heath_igc_watz_tlb_device,    "heath_igc_watz_tlb_device",    "Heath Terminal Logic Board w/Watzman ROM plus SigmaSoft Interactive Graphics Controller")
-
-
 device_heath_tlb_card_interface::device_heath_tlb_card_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "heathtlbdevice"),
 	m_slot(dynamic_cast<heath_tlb_connector *>(device.owner()))
 {
 }
+
+
+namespace {
+
+/**
+ *  Standard Heath Terminal logic board
+ */
+class heath_tlb_device : public device_t,
+						 public device_heath_tlb_card_interface
+{
+public:
+	heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	// 8250 UART
+	virtual void serial_in_w(int state) override;
+	virtual void rlsd_in_w(int state) override;
+	virtual void dsr_in_w(int state) override;
+	virtual void cts_in_w(int state) override;
+	void serial_irq_w(int state);
+
+	// Keyboard
+	void reset_key_w(int state);
+	void right_shift_w(int state);
+	void repeat_key_w(int state);
+	void break_key_w(int state);
+
+protected:
+	heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+
+
+	// interrupt related
+	virtual void set_irq_line();
+
+	// reset
+	void check_for_reset();
+
+	// sound/speaker
+	void check_beep_state();
+	void key_click_w(u8 data);
+	void bell_w(u8 data);
+	TIMER_CALLBACK_MEMBER(key_click_off);
+	TIMER_CALLBACK_MEMBER(bell_off);
+
+	// keyboard
+	u8 kbd_key_r();
+	u8 kbd_flags_r();
+	u16 translate_mm5740_b(u16 b);
+	int mm5740_shift_r();
+	int mm5740_control_r();
+	void mm5740_data_ready_w(int state);
+
+	// serial port
+	void serial_out_b(int data);
+	void dtr_out(int data);
+	void rts_out(int data);
+
+	// crtc
+	void crtc_addr_w(offs_t reg, u8 val);
+	virtual u8 crtc_reg_r(offs_t reg);
+	virtual void crtc_reg_w(offs_t reg, u8 val);
+	void crtc_vsync_w(int val);
+	virtual MC6845_UPDATE_ROW(crtc_update_row);
+
+	required_device<cpu_device>     m_maincpu;
+	required_device<screen_device>  m_screen;
+	required_device<palette_device> m_palette;
+	required_device<mc6845_device>  m_crtc;
+	required_shared_ptr<u8>         m_p_videoram;
+	required_region_ptr<u8>         m_p_chargen;
+	required_ioport                 m_config;
+	required_device<ins8250_device> m_ace;
+	required_device<beep_device>    m_beep;
+	required_device<mm5740_device>  m_mm5740;
+	required_memory_region          m_kbdrom;
+	required_ioport                 m_kbspecial;
+	required_device<clock_device>   m_repeat_clock;
+
+	emu_timer                      *m_key_click_timer;
+	emu_timer                      *m_bell_timer;
+
+	u8                              m_transchar;
+	bool                            m_strobe;
+	bool                            m_key_click_active;
+	bool                            m_bell_active;
+	bool                            m_reset_pending;
+	bool                            m_right_shift;
+	bool                            m_reset_key;
+	bool                            m_keyboard_irq_raised;
+	bool                            m_serial_irq_raised;
+	bool                            m_break_key_irq_raised;
+	bool                            m_allow_vsync_nmi;
+};
+
+/**
+ *  Heath TLB with Super19 ROM
+ */
+class heath_super19_tlb_device : public heath_tlb_device
+{
+public:
+	heath_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+};
+
+/**
+ *  Heath TLB with Superset ROM
+ */
+class heath_superset_tlb_device : public heath_tlb_device
+{
+public:
+	heath_superset_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+
+	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
+
+	void dtr_internal(int data);
+	void out1_internal(int data);
+	void out2_internal(int data);
+
+	virtual u8 crtc_reg_r(offs_t reg) override;
+	virtual void crtc_reg_w(offs_t reg, u8 val) override;
+
+	u8   m_selected_char_set;
+	bool m_reverse_video_disabled;
+};
+
+/**
+ *  Heath TLB with Watzman (HUG) ROM
+ */
+class heath_watz_tlb_device : public heath_tlb_device
+{
+public:
+	heath_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+};
+
+/**
+ *  Heath TLB with Ultra ROM
+ */
+class heath_ultra_tlb_device : public heath_tlb_device
+{
+public:
+	heath_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void mem_map(address_map &map) ATTR_COLD;
+
+	required_memory_region m_maincpu_region;
+	required_shared_ptr<u8> m_page_2_ram;
+	memory_view m_mem_view;
+};
+
+/**
+ *  Heath TLB plus Northwest Digital Systems GP-19
+ */
+class heath_gp19_tlb_device : public heath_tlb_device
+{
+public:
+	heath_gp19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+
+	void latch_u5_w(u8 data);
+
+	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
+
+	bool m_char_gen_a11;
+	bool m_graphic_mode;
+	bool m_col_132;
+	bool m_reverse_video;
+};
+
+/**
+ *  Heath TLB plus Cleveland Codonics Imaginator-100
+ */
+class heath_imaginator_tlb_device : public heath_tlb_device
+{
+public:
+	heath_imaginator_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+
+	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
+	void crtc_hsync_w(int val);
+
+	IRQ_CALLBACK_MEMBER(irq_ack_cb);
+
+	void update_tap_6000h();
+	void tap_6000h();
+	void tap_8000h();
+
+	void allow_tlb_intr();
+	void allow_hsync_intr();
+
+	void display_enable_w(offs_t reg, u8 val);
+	void config_irq_w(offs_t reg, u8 val);
+	void nop_w(offs_t reg, u8 val);
+	virtual void set_irq_line() override;
+
+	required_memory_bank            m_mem_bank;
+	required_shared_ptr<u8>         m_p_graphic_ram;
+	memory_passthrough_handler      m_tap_6000h;
+
+	u8                              m_im2_val;
+
+	bool                            m_alphanumeric_mode_active;
+	bool                            m_graphics_mode_active;
+
+	bool                            m_allow_tlb_interrupts;
+	bool                            m_allow_imaginator_interrupts;
+
+	bool                            m_hsync_irq_raised;
+};
+
+/**
+ *  Heath TLB plus SigmaSoft Interactive Graphics Controller
+ */
+class heath_igc_tlb_device : public heath_tlb_device
+{
+public:
+	heath_igc_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	virtual void sigma_w(u8 offset, u8 data) override;
+	virtual u8 sigma_r(u8 offset) override;
+
+protected:
+	heath_igc_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	virtual MC6845_UPDATE_ROW(crtc_update_row) override;
+
+	virtual void sigma_ctrl_w(u8 data);
+	virtual u8 sigma_ctrl_r();
+
+	u8 sigma_video_mem_r();
+	void sigma_video_mem_w(u8 val);
+
+	void sigma_io_lo_addr_w(u8 val);
+	void sigma_io_hi_addr_w(u8 val);
+
+	void sigma_window_lo_addr_w(u8 val);
+	void sigma_window_hi_addr_w(u8 val);
+
+
+	std::unique_ptr<u8[]>   m_p_graphic_ram;
+
+	// Control Register
+	bool                    m_pixel_video_enabled;
+	bool                    m_character_video_disabled;
+	bool                    m_video_invert_enabled;
+	bool                    m_alternate_character_set_enabled;
+	bool                    m_video_fill_enabled;
+	bool                    m_read_address_increment_disabled;
+	u8                      m_memory_bank_select;
+
+	u8                      m_data_reg;
+
+	u16                     m_io_address;
+	u16                     m_window_address;
+private:
+	required_ioport m_joystick1, m_joystick2;
+
+};
+
+/**
+ *  Heath TLB with the super19 ROM plus SigmaSoft Interactive Graphics Controller
+ */
+class heath_igc_super19_tlb_device : public heath_igc_tlb_device
+{
+public:
+	heath_igc_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+};
+
+/**
+ *  Heath TLB with the ultrarom plus SigmaSoft Interactive Graphics Controller
+ */
+class heath_igc_ultra_tlb_device : public heath_igc_tlb_device
+{
+public:
+	heath_igc_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void mem_map(address_map &map) ATTR_COLD;
+
+	required_memory_region m_maincpu_region;
+	required_shared_ptr<u8> m_page_2_ram;
+	memory_view m_mem_view;
+};
+
+/**
+ *  Heath TLB with the watzman ROM plus SigmaSoft Interactive Graphics Controller
+ */
+class heath_igc_watz_tlb_device : public heath_igc_tlb_device
+{
+public:
+	heath_igc_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+};
 
 
 /**
@@ -237,6 +594,7 @@ void heath_tlb_device::device_start()
 	save_item(NAME(m_break_key_irq_raised));
 	save_item(NAME(m_allow_vsync_nmi));
 
+	m_transchar            = 0;
 	m_strobe               = false;
 	m_key_click_active     = false;
 	m_bell_active          = false;
@@ -262,10 +620,14 @@ void heath_tlb_device::device_start()
 
 void heath_tlb_device::device_reset()
 {
-	m_strobe           = false;
-	m_key_click_active = false;
-	m_bell_active      = false;
-	m_allow_vsync_nmi  = false;
+	m_strobe              = false;
+	m_keyboard_irq_raised = false;
+	m_key_click_active    = false;
+	m_bell_active         = false;
+	m_allow_vsync_nmi     = false;
+
+	// clearing the keyboard strobe also clears its interrupt
+	set_irq_line();
 
 	ioport_value const cfg(m_config->read());
 
@@ -330,10 +692,13 @@ u16 heath_tlb_device::translate_mm5740_b(u16 b)
 
 u8 heath_tlb_device::kbd_key_r()
 {
-	m_strobe              = false;
-	m_keyboard_irq_raised = false;
+	if (!machine().side_effects_disabled())
+	{
+		m_strobe              = false;
+		m_keyboard_irq_raised = false;
 
-	set_irq_line();
+		set_irq_line();
+	}
 
 	// high bit is for control key pressed, this is handled in the ROM,
 	// no processing needed.
@@ -714,9 +1079,9 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( super19 )
-  PORT_INCLUDE( tlb )
+	PORT_INCLUDE( tlb )
 
-  PORT_MODIFY("SW401")
+	PORT_MODIFY("SW401")
 	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")                                   PORT_DIPLOCATION("SW401:1,2,3,4")
 	PORT_DIPSETTING(    0x01, "110")
 	PORT_DIPSETTING(    0x02, "150")
@@ -778,7 +1143,7 @@ static INPUT_PORTS_START( superset )
 	PORT_DIPSETTING(    0x0f, "134.5")
 	PORT_DIPNAME( 0x10, 0x10, "Duplex")                                      PORT_DIPLOCATION("SW401:5")
 	PORT_DIPSETTING(    0x00, "Half")
-	PORT_DIPSETTING(    0x80, "Full")
+	PORT_DIPSETTING(    0x10, "Full")
 	PORT_DIPNAME( 0x20, 0x00, "Word Length")                                 PORT_DIPLOCATION("SW401:6")
 	PORT_DIPSETTING(    0x00, "8-bit" )
 	PORT_DIPSETTING(    0x20, "7-bit" )
@@ -838,8 +1203,8 @@ static INPUT_PORTS_START( ultra19 )
 
 	PORT_MODIFY("CONFIG")
 	PORT_CONFNAME(0x10, 0x10, "Page 2 RAM present")
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_CONFSETTING(   0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(   0x10, DEF_STR( Yes ) )
 
 INPUT_PORTS_END
 
@@ -1233,8 +1598,10 @@ void heath_superset_tlb_device::device_start()
 	heath_tlb_device::device_start();
 
 	save_item(NAME(m_selected_char_set));
+	save_item(NAME(m_reverse_video_disabled));
 
-	m_selected_char_set = 0;
+	m_selected_char_set     = 0;
+	m_reverse_video_disabled = false;
 }
 
 void heath_superset_tlb_device::mem_map(address_map &map)
@@ -1338,7 +1705,7 @@ void heath_superset_tlb_device::out1_internal(int data)
 	m_selected_char_set = (m_selected_char_set & 0x09) | ((data & 0x01) << 1);
 }
 
-// OUT2 (pin 31) to A11? on board
+// OUT2 (pin 31) to A11 on board
 void heath_superset_tlb_device::out2_internal(int data)
 {
 	m_selected_char_set = (m_selected_char_set & 0x0a) | (data & 0x01);
@@ -1456,11 +1823,13 @@ void heath_gp19_tlb_device::device_start()
 
 void heath_gp19_tlb_device::mem_map(address_map &map)
 {
+	map.unmap_value_high();
+
 	// ROMs 1, 2, 3
-	map(0x0000, 0x02fff).rom();
+	map(0x0000, 0x2fff).rom();
 
 	// Optional external board - Program ROM 4(not aware if any ever existed), external I/O
-	// map(0x3000, 0x03fff).rom();
+	// map(0x3000, 0x3fff).rom();
 
 	map(0x4000, 0x40ff).mirror(0x3f00).ram();
 	map(0x6000, 0x67ff).mirror(0x1800).ram();
@@ -1625,6 +1994,11 @@ void heath_imaginator_tlb_device::device_start()
 	save_item(NAME(m_allow_imaginator_interrupts));
 	save_item(NAME(m_hsync_irq_raised));
 
+	// set_irq_line() is called from the base device_reset(), before ours runs
+	m_allow_tlb_interrupts        = true;
+	m_allow_imaginator_interrupts = false;
+	m_hsync_irq_raised            = false;
+
 	m_mem_bank->configure_entries(0, 2, memregion("maincpu")->base(), 0x2000);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x8000, 0xbfff, "irq_update",
@@ -1637,10 +2011,7 @@ void heath_imaginator_tlb_device::device_reset()
 	heath_tlb_device::device_reset();
 
 	m_mem_bank->set_entry(1);
-	m_tap_6000h.remove();
-	m_tap_6000h = m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x6000, 0x7fff, "mem_map_update",
-			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } },
-			[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } });
+	update_tap_6000h();
 
 	m_alphanumeric_mode_active = true;
 	m_graphics_mode_active     = false;
@@ -1673,6 +2044,27 @@ void heath_imaginator_tlb_device::mem_map(address_map &map)
 
 	// Alphanumeric RAM
 	map(0xe000, 0xe7ff).mirror(0x1800).ram().share(m_p_videoram);
+}
+
+void heath_imaginator_tlb_device::device_post_load()
+{
+	heath_tlb_device::device_post_load();
+
+	// the bank is saved, but not whether the tap that switches it is installed
+	update_tap_6000h();
+}
+
+// The GCP ROM is mapped at 0x0000 after reset until the first access at 0x6000-0x7fff
+void heath_imaginator_tlb_device::update_tap_6000h()
+{
+	m_tap_6000h.remove();
+
+	if (m_mem_bank->entry() == 1)
+	{
+		m_tap_6000h = m_maincpu->space(AS_PROGRAM).install_readwrite_tap(0x6000, 0x7fff, "mem_map_update",
+				[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } },
+				[this] (offs_t offset, u8 &data, u8 mem_mask) { if (!machine().side_effects_disabled()) { tap_6000h(); } });
+	}
 }
 
 void heath_imaginator_tlb_device::tap_6000h()
@@ -1848,8 +2240,8 @@ void heath_igc_tlb_device::device_start()
 {
 	heath_tlb_device::device_start();
 
-	m_p_graphic_ram = make_unique_clear<u8[]>(0x3ffff);
-	save_pointer(NAME(m_p_graphic_ram), 0x3ffff);
+	m_p_graphic_ram = make_unique_clear<u8[]>(0x40000);
+	save_pointer(NAME(m_p_graphic_ram), 0x40000);
 
 	save_item(NAME(m_data_reg));
 	save_item(NAME(m_pixel_video_enabled));
@@ -2150,6 +2542,23 @@ ioport_constructor heath_igc_watz_tlb_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(igc_watz);
 }
+
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(HEATH_TLB,           device_heath_tlb_card_interface, heath_tlb_device,             "heath_tlb",                    "Heath Terminal Logic Board")
+DEFINE_DEVICE_TYPE_PRIVATE(HEATH_SUPER19,       device_heath_tlb_card_interface, heath_super19_tlb_device,     "heath_super19_tlb",            "Heath Terminal Logic Board w/Super19 ROM")
+DEFINE_DEVICE_TYPE_PRIVATE(HEATH_SUPERSET,      device_heath_tlb_card_interface, heath_superset_tlb_device,    "heath_superset_tlb",           "Heath Terminal Logic Board w/Superset ROM")
+DEFINE_DEVICE_TYPE_PRIVATE(HEATH_ULTRA,         device_heath_tlb_card_interface, heath_ultra_tlb_device,       "heath_ultra_tlb",              "Heath Terminal Logic Board w/Ultra ROM")
+DEFINE_DEVICE_TYPE_PRIVATE(HEATH_WATZ,          device_heath_tlb_card_interface, heath_watz_tlb_device,        "heath_watz_tlb",               "Heath Terminal Logic Board w/Watzman ROM")
+DEFINE_DEVICE_TYPE_PRIVATE(HEATH_GP19,          device_heath_tlb_card_interface, heath_gp19_tlb_device,        "heath_gp19_tlb",               "Heath Terminal Logic Board plus Northwest Digital Systems GP-19")
+DEFINE_DEVICE_TYPE_PRIVATE(HEATH_IMAGINATOR,    device_heath_tlb_card_interface, heath_imaginator_tlb_device,  "heath_imaginator_tlb",         "Heath Terminal Logic Board plus Cleveland Codonics Imaginator I-100")
+
+// Devices for the terminal boards compatible with SigmaSoft IGC
+DEFINE_DEVICE_TYPE_PRIVATE(HEATH_IGC,           device_heath_tlb_card_interface, heath_igc_tlb_device,         "heath_igc_tlb_device",         "Heath Terminal Logic Board plus SigmaSoft Interactive Graphics Controller")
+DEFINE_DEVICE_TYPE_PRIVATE(HEATH_IGC_SUPER19,   device_heath_tlb_card_interface, heath_igc_super19_tlb_device, "heath_igc_super19_tlb_device", "Heath Terminal Logic Board w/ Super19 ROM plus SigmaSoft Interactive Graphics Controller")
+DEFINE_DEVICE_TYPE_PRIVATE(HEATH_IGC_ULTRA,     device_heath_tlb_card_interface, heath_igc_ultra_tlb_device,   "heath_igc_ultra_tlb_device",   "Heath Terminal Logic Board w/ Ultra ROM plus SigmaSoft Interactive Graphics Controller")
+DEFINE_DEVICE_TYPE_PRIVATE(HEATH_IGC_WATZ,      device_heath_tlb_card_interface, heath_igc_watz_tlb_device,    "heath_igc_watz_tlb_device",    "Heath Terminal Logic Board w/Watzman ROM plus SigmaSoft Interactive Graphics Controller")
 
 
 /**
