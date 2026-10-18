@@ -35,7 +35,7 @@ TODO (pc9801rs):
 - Remove IDE hack to not make 512 to 256 sector byte translations
 \- probably need a working C-Bus IDE in place, or a SCSI option;
 
-TODO (pc9801us / pc9801fs):
+TODO (pc9801us):
 - "Invalid Command Byte 13" for bitmap upd7220 at POST (?)
 - RAM check detects more RAM than what's really installed (and saves previous detection in MEMSW);
 

@@ -273,7 +273,9 @@ void pc9801_55_device::increment_addr()
 {
 	if (machine().side_effects_disabled()) return;
 
-	if (m_ar <= 0x19)
+	// 'A documentation says command, data and auxiliary status
+	// 'B omits aux, assume same deal anyway.
+	if (m_ar <= 0x17)
 		m_ar ++;
 }
 
