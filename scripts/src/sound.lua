@@ -260,6 +260,18 @@ if SOUNDS["CEM3360"] then
 end
 
 ---------------------------------------------------
+-- CEM 3372 uP-controllable signal processor chip
+--@src/devices/sound/cem3372.h,SOUNDS["CEM3372"] = true
+---------------------------------------------------
+
+if SOUNDS["CEM3372"] then
+	files {
+		MAME_DIR .. "src/devices/sound/cem3372.cpp",
+		MAME_DIR .. "src/devices/sound/cem3372.h",
+	}
+end
+
+---------------------------------------------------
 -- CEM 3394 analog synthesizer chip
 --@src/devices/sound/cem3394.h,SOUNDS["CEM3394"] = true
 ---------------------------------------------------
