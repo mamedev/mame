@@ -88,8 +88,9 @@ namespace {
 class ngen_base_state : public driver_device
 {
 public:
-	ngen_base_state(const machine_config &mconfig, device_type type, const char *tag) :
+	ngen_base_state(const machine_config &mconfig, device_type type, const char *tag, const char *cpu_tag) :
 		driver_device(mconfig, type, tag),
+		m_maincpu(*this, cpu_tag),
 		m_crtc(*this, "crtc"),
 		m_viduart(*this, "videouart"),
 		m_iouart(*this, "iouart"),
@@ -107,11 +108,6 @@ public:
 	}
 
 protected:
-	virtual cpu_device &system_cpu() = 0;
-	// The 80186 configuration enumerates the on-board floppy/hard disk module on X-Bus.
-	virtual bool has_hfd_module() const = 0;
-	virtual void timer_input_w(int) { }
-
 	uint8_t hd_buffer_r(offs_t offset);
 	void hd_buffer_w(offs_t offset, uint8_t data);
 
@@ -139,10 +135,9 @@ protected:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void timer_clk_out(int state);
-
 	void fdc_irq_w(int state);
 
+	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8251_device> m_viduart;
 	required_device<upd7201_device> m_iouart;
@@ -154,10 +149,7 @@ protected:
 	optional_device<pit8253_device> m_fdc_timer;
 	optional_device<pit8253_device> m_hdc_timer;
 
-	// X-Bus, disk module, and addressable peripheral helpers shared by both CPUs.
-	void xbus_w(uint16_t data);
-	uint16_t xbus_r();
-
+	// Disk module and addressable peripheral helpers.
 	void hfd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t hfd_r(offs_t offset, uint16_t mem_mask = ~0);
 	[[maybe_unused]] void fdc_drq_w(int state);
@@ -203,27 +195,22 @@ class ngen_state : public ngen_base_state
 {
 public:
 	ngen_state(const machine_config &mconfig, device_type type, const char *tag) :
-		ngen_base_state(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		ngen_base_state(mconfig, type, tag, "maincpu")
 	{
 	}
 
 	void ngen(machine_config &config);
 
-protected:
-	virtual cpu_device &system_cpu() override { return *m_maincpu; }
-	virtual bool has_hfd_module() const override { return true; }
-	virtual void timer_input_w(int state) override { m_maincpu->tmrin0_w(state); }
-
 private:
+	void xbus_w(uint16_t data);
+	uint16_t xbus_r();
+
 	void cpu_peripheral_cb(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void peripheral_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t peripheral_r(offs_t offset, uint16_t mem_mask = ~0);
 	void cpu_timer_w(int state);
 	void ngen_io(address_map &map) ATTR_COLD;
 	void ngen_mem(address_map &map) ATTR_COLD;
-
-	required_device<i80186_cpu_device> m_maincpu;
 };
 
 // Later 386-based systems have their own CPU maps and external interrupt wiring.
@@ -231,18 +218,17 @@ class ngen386_state : public ngen_base_state
 {
 public:
 	ngen386_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ngen_base_state(mconfig, type, tag), m_i386cpu(*this, "i386cpu")
+		: ngen_base_state(mconfig, type, tag, "i386cpu")
 	{
 	}
 
 	void ngen386(machine_config &config);
 	void _386i(machine_config &config);
 
-protected:
-	virtual cpu_device &system_cpu() override { return *m_i386cpu; }
-	virtual bool has_hfd_module() const override { return false; }
-
 private:
+	void xbus_w(uint16_t data);
+	uint16_t xbus_r();
+
 	void ngen386_io(address_map &map) ATTR_COLD;
 	void ngen386_mem(address_map &map) ATTR_COLD;
 	void ngen386i_mem(address_map &map) ATTR_COLD;
@@ -250,7 +236,6 @@ private:
 	void b38_keyboard_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t b38_crtc_r(offs_t offset, uint16_t mem_mask = ~0);
 	void b38_crtc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	required_device<i386_device> m_i386cpu;
 };
 
 void ngen_base_state::pit_out0_w(int state)
@@ -278,13 +263,6 @@ void ngen_state::cpu_timer_w(int state)
 	if(state != 0)
 		popmessage("80186 Timer 0 state %i\n",state);
 	m_pic->ir5_w(state);
-}
-
-void ngen_base_state::timer_clk_out(int state)
-{
-	m_viduart->write_rxc(state);  // Keyboard UART Rx/Tx clocks
-	m_viduart->write_txc(state);
-	timer_input_w(state);
 }
 
 void ngen_state::cpu_peripheral_cb(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -470,25 +448,25 @@ uint16_t ngen_state::peripheral_r(offs_t offset, uint16_t mem_mask)
 // expansion module.  The base I/O address for the currently selected module is set by writing to
 // this register (bits 0-7 are ignored)
 // TODO: make expansion modules slot devices
-void ngen_base_state::xbus_w(uint16_t data)
+void ngen_state::xbus_w(uint16_t data)
 {
-	uint16_t addr = (data & 0x00ff) << 8;
-	cpu_device &cpu = system_cpu();
-	address_space& io = cpu.space(AS_IO);
-	switch(m_xbus_current)
-	{
-		case 0x00:  // Floppy/Hard disk module - only works with the 80186 NGEN
-			if(has_hfd_module())
-				io.install_readwrite_handler(addr,addr+0xff, read16s_delegate(*this, FUNC(ngen_base_state::hfd_r)), write16s_delegate(*this, FUNC(ngen_base_state::hfd_w)), 0xffffffff);
-			else
-				cpu.pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // reached end of the modules
-			break;
-		default:
-			cpu.pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // reached end of the modules
-			break;
-	}
-	if(addr != 0)
-		logerror("SYS: X-Bus module %i address set %04x\n",m_xbus_current+1,addr);
+	const uint16_t addr = (data & 0x00ff) << 8;
+	if (m_xbus_current == 0)
+		m_maincpu->space(AS_IO).install_readwrite_handler(addr, addr + 0xff, read16s_delegate(*this, FUNC(ngen_state::hfd_r)), write16s_delegate(*this, FUNC(ngen_state::hfd_w)), 0xffffffff);
+	else
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // reached end of the modules
+	if (addr != 0)
+		logerror("SYS: X-Bus module %i address set %04x\n", m_xbus_current + 1, addr);
+	m_xbus_current++;
+}
+
+// No X-Bus modules are currently enumerated by the 386 configurations.
+void ngen386_state::xbus_w(uint16_t data)
+{
+	const uint16_t addr = (data & 0x00ff) << 8;
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	if (addr != 0)
+		logerror("SYS: X-Bus module %i address set %04x\n", m_xbus_current + 1, addr);
 	m_xbus_current++;
 }
 
@@ -512,27 +490,19 @@ void ngen_base_state::xbus_w(uint16_t data)
 //  0xc8xx - ISDN
 //  0xc9xx - SuperGen Ethernet
 
-uint16_t ngen_base_state::xbus_r()
+uint16_t ngen_state::xbus_r()
 {
-	uint16_t ret = 0xffff;
+	if (m_xbus_current == 0)
+		return 0x1070;  // Floppy/Hard disk module
 
-	switch(m_xbus_current)
-	{
-		case 0x00:
-			if(has_hfd_module())
-				ret = 0x1070;  // Floppy/Hard disk module - 80186 NGEN only
-			else
-			{
-				system_cpu().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-				ret = 0x0080;
-			}
-			break;
-		default:
-			system_cpu().pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // reached the end of the modules
-			ret = 0x0080;
-			break;
-	}
-	return ret;
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // reached end of the modules
+	return 0x0080;
+}
+
+uint16_t ngen386_state::xbus_r()
+{
+	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	return 0x0080;
 }
 
 
@@ -709,7 +679,7 @@ void ngen_base_state::hd_buffer_w(offs_t offset, uint8_t data)
 
 void ngen_base_state::dma_hrq_changed(int state)
 {
-	system_cpu().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void ngen_base_state::dma_eop_changed(int state)
@@ -765,7 +735,7 @@ uint8_t ngen_base_state::dma_3_dack_r()
 uint8_t ngen_base_state::dma_read_word(offs_t offset)
 {
 	uint16_t result;
-	address_space& prog_space = system_cpu().space(AS_PROGRAM); // get the right address space
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 
 	if(m_dma_channel == -1)
 		return 0xff;
@@ -780,7 +750,7 @@ uint8_t ngen_base_state::dma_read_word(offs_t offset)
 
 void ngen_base_state::dma_write_word(offs_t offset, uint8_t data)
 {
-	address_space& prog_space = system_cpu().space(AS_PROGRAM); // get the right address space
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM); // get the right address space
 
 	if(m_dma_channel == -1)
 		return;
@@ -993,12 +963,12 @@ static void ngen_floppies(device_slot_interface &device)
 void ngen_state::ngen(machine_config &config)
 {
 	// basic machine hardware
-	I80186(config, m_maincpu, 16_MHz_XTAL);
+	i80186_cpu_device &maincpu(I80186(config, m_maincpu, 16_MHz_XTAL));
 	m_maincpu->set_addrmap(AS_PROGRAM, &ngen_state::ngen_mem);
 	m_maincpu->set_addrmap(AS_IO, &ngen_state::ngen_io);
-	m_maincpu->chip_select_callback().set(FUNC(ngen_state::cpu_peripheral_cb));
-	m_maincpu->tmrout0_handler().set(FUNC(ngen_state::cpu_timer_w));
-	m_maincpu->read_slave_ack_callback().set(FUNC(ngen_state::irq_cb));
+	maincpu.chip_select_callback().set(FUNC(ngen_state::cpu_peripheral_cb));
+	maincpu.tmrout0_handler().set(FUNC(ngen_state::cpu_timer_w));
+	maincpu.read_slave_ack_callback().set(FUNC(ngen_state::irq_cb));
 
 	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
@@ -1072,7 +1042,11 @@ void ngen_state::ngen(machine_config &config)
 	rs232_port_device &kbd(RS232_PORT(config, "keyboard", keyboard, "ngen"));
 	kbd.rxd_handler().set(m_viduart, FUNC(i8251_device::write_rxd));
 
-	CLOCK(config, "refresh_clock", 19200*16).signal_handler().set(FUNC(ngen_state::timer_clk_out)); // should be 19530Hz
+	clock_device &refresh_clock(CLOCK(config, "refresh_clock", 19200*16)); // should be 19530Hz
+	refresh_clock.signal_handler().set(m_viduart, FUNC(i8251_device::write_rxc));
+	refresh_clock.signal_handler().append(m_viduart, FUNC(i8251_device::write_txc));
+	// The CP-001 also feeds this clock to the 80186 timer input.
+	refresh_clock.signal_handler().append(m_maincpu, FUNC(i80186_cpu_device::tmrin0_w));
 
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
 	WD2797(config, m_fdc, 20_MHz_XTAL / 20);
@@ -1108,13 +1082,13 @@ void ngen_state::ngen(machine_config &config)
 
 void ngen386_state::ngen386(machine_config &config)
 {
-	I386(config, m_i386cpu, 50_MHz_XTAL / 2);
-	m_i386cpu->set_addrmap(AS_PROGRAM, &ngen386_state::ngen386_mem);
-	m_i386cpu->set_addrmap(AS_IO, &ngen386_state::ngen386_io);
-	m_i386cpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
+	I386(config, m_maincpu, 50_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ngen386_state::ngen386_mem);
+	m_maincpu->set_addrmap(AS_IO, &ngen386_state::ngen386_io);
+	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
 
 	PIC8259(config, m_pic);
-	m_pic->out_int_callback().set_inputline(m_i386cpu, 0);
+	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	PIT8254(config, m_pit);
 	m_pit->set_clk<0>(78120/4);  // 19.53kHz, /4 of the CPU timer output?
@@ -1185,12 +1159,14 @@ void ngen386_state::ngen386(machine_config &config)
 	rs232_port_device &kbd(RS232_PORT(config, "keyboard", keyboard, "ngen"));
 	kbd.rxd_handler().set(m_viduart, FUNC(i8251_device::write_rxd));
 
-	CLOCK(config, "refresh_clock", 19200*16).signal_handler().set(FUNC(ngen386_state::timer_clk_out)); // should be 19530Hz
+	clock_device &refresh_clock(CLOCK(config, "refresh_clock", 19200*16)); // should be 19530Hz
+	refresh_clock.signal_handler().set(m_viduart, FUNC(i8251_device::write_rxc));
+	refresh_clock.signal_handler().append(m_viduart, FUNC(i8251_device::write_txc));
 
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
 	WD2797(config, m_fdc, 20_MHz_XTAL / 20);
 	m_fdc->intrq_wr_callback().set(FUNC(ngen386_state::fdc_irq_w));
-	//m_fdc->drq_wr_callback().set(m_i386cpu, FUNC(i80186_cpu_device_device::drq1_w));
+	//m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device_device::drq1_w));
 	m_fdc->set_force_ready(true);
 
 	PIT8253(config, m_fdc_timer);
@@ -1222,7 +1198,7 @@ void ngen386_state::ngen386(machine_config &config)
 void ngen386_state::_386i(machine_config &config)
 {
 	ngen386(config);
-	m_i386cpu->set_addrmap(AS_PROGRAM, &ngen386_state::ngen386i_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ngen386_state::ngen386i_mem);
 }
 
 ROM_START( ngen )
