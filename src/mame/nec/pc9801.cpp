@@ -38,8 +38,10 @@ TODO (pc9801rs):
 TODO (pc9801us / pc9801fs):
 - "Invalid Command Byte 13" for bitmap upd7220 at POST (?)
 - RAM check detects more RAM than what's really installed (and saves previous detection in MEMSW);
-- pc9801fs: Crashes with Japanese error for "HDD failure" when mounted with IDE BIOS
-\- wants specifically (the internal) SCSI?
+
+TODO (pc9801fs, on top of pc9801us notes):
+- no way to get past "run-time error R6003" with format /h in msdos62
+\- attempts to read a "VOL1" string from an unformatted HDD ...
 
 TODO (pc9801bx2):
 - Accesses $8f0-$8f2 PMC area, shared with 98NOTE machines and pc9821as;
@@ -2391,6 +2393,8 @@ void pc9801us_state::pc9801fs(machine_config &config)
 	config_floppy_525hd(config);
 
 	// optional SCSI HDD
+	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "scsi1_pc98", true);
+	// TODO: SASI BIOS hookup
 
 	pit_clock_config(config, xtal / 4);
 
@@ -2758,7 +2762,9 @@ ROM_START( pc9801fs )
 	// 0x0c000-0x0ffff sound ROM BIOS
 	// 0x10000-0x13fff ^ mirror
 	// 0x14000-0x16fff <unknown>
-	// 0x17000-0x17fff SCSI disk BIOS?
+	// 0x14000-0x14fff SCSI disk BIOS bank 0
+	// 0x16000-0x16fff SCSI disk BIOS bank 1
+	// 0x17000-0x17fff SASI disk BIOS
 	// 0x18000-0x1ffff <empty>
 	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 )  //ITF ROM
 	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x08000 )  //BIOS ROM
@@ -2769,10 +2775,13 @@ ROM_START( pc9801fs )
 	ROM_LOAD( "font_ux.rom",     0x000000, 0x046800, BAD_DUMP CRC(19a76eeb) SHA1(96a006e8515157a624599c2b53a581ae0dd560fd) )
 
 	LOAD_KANJI_ROMS
+	// NOTE: Crashes with Japanese error for "HDD failure" when mounted with IDE BIOS
 //  LOAD_IDE_ROM
 
-//  ROM_REGION( 0x4000, "scsi", ROMREGION_ERASEVAL(0xcb) )
-//  ROM_COPY( "biosrom", 0x16000, 0x00000, 0x02000 )
+	// NOTE: SCSI BIOS is always selected as "external" (0xfd) in PkgId regardless of DSW2:6
+	ROM_REGION16_LE( 0x8000, "cbus:mb1:scsi1_pc98:bios", 0 )
+	ROM_COPY( "biosrom", 0x14000, 0x00000, 0x01000 )
+	ROM_COPY( "biosrom", 0x16000, 0x01000, 0x01000 )
 ROM_END
 
 /*
