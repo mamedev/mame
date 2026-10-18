@@ -256,6 +256,13 @@ pos is 11.5 fixed point
 		int const start1 = step ? ((-int16_t(shift) * 256) + 0x80) / step : 0x10000;
 		int const start2 = step ? ((-int16_t(uint16_t(shift + shift2)) * 256) + 0x80) / step : 0x10000;
 
+		// Pixels outside both sets take the edge pen of the outermost set on that side, from that set's palette bank
+		bool const set2_left = start2 < start1;
+		int const left_col = linedata[set2_left ? 0x200 : 0] & 0xf;
+		int const left_bank = set2_left ? 32 : 0;
+		int const right_col = linedata[set2_left ? 0x7f : (0x7f + 0x200)] & 0xf;
+		int const right_bank = set2_left ? 0 : 32;
+
 		uint32_t *const dest = &bitmap.pix(y);
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
@@ -271,11 +278,14 @@ pos is 11.5 fixed point
 				bank = 32;
 			}
 			else if (x < start1 && x < start2)
-				col = linedata[0] & 0xf;                     // left of both sets
+			{
+				col = left_col;                              // left of both sets
+				bank = left_bank;
+			}
 			else if (x >= start1 && x >= start2)
 			{
-				col = linedata[0x7f + 0x200] & 0xf;          // right of both sets
-				bank = 32;
+				col = right_col;                             // right of both sets
+				bank = right_bank;
 			}
 			else
 			{
