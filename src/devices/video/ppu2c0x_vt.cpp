@@ -1064,7 +1064,7 @@ void ppu_vt3xx_device::draw_background(u8 *line_priority)
 			draw_back_pen(dest, m_back_color);
 			dest++;
 
-			line_priority[i] ^= 0x02;
+			line_priority[i] &= ~0x02;
 		}
 	}
 }

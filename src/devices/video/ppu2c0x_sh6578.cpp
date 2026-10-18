@@ -260,7 +260,7 @@ void ppu_sh6578_device::draw_background(uint8_t* line_priority)
 		for (int i = 0; i < 8; i++)
 		{
 			*(dest++) = back_pen;
-			line_priority[i] ^= 0x02;
+			line_priority[i] &= ~0x02;
 		}
 	}
 }
