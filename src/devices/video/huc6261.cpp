@@ -126,8 +126,10 @@ u32 huc6261_device::cello_blend(u16 front_coeff, u32 front, u16 back_coeff, u32 
 
 /*
  * Layer priority, rebuilt at the start of each line.
- * Each layer has a 3-bit priority (0 = backmost) and an enable bit in the control register,
- * equal priorities are ordered KING BG0-3, VDC BG, VDC SPR, RAINBOW from back to front.
+ * Each layer has a 3-bit priority (0 = backmost) and an enable bit in the control register.
+ * Software is not meant to give two layers the same priority; the manual gives
+ * HuC6270 > HuC6272 > HuC6271 for the cleared registers, so equal priorities are ordered
+ * RAINBOW, KING BG0-3, VDC BG, VDC SPR from back to front.
  * The resulting rank is 0 for a hidden layer, otherwise 1 (backmost) to 7.
  */
 void huc6261_device::update_layer_ranks()
@@ -140,9 +142,10 @@ void huc6261_device::update_layer_ranks()
 	value[LAYER_RAINBOW] = BIT(m_control, 14) ? m_priority[6] + 1 : 0;
 
 	std::fill(std::begin(m_layer_rank), std::end(m_layer_rank), 0);
+	static const u8 tie_order[LAYER_COUNT] = { LAYER_RAINBOW, LAYER_KING_BG0, LAYER_KING_BG0 + 1, LAYER_KING_BG0 + 2, LAYER_KING_BG0 + 3, LAYER_VDC_BG, LAYER_VDC_SPR };
 	u8 rank = 1;
 	for (int prio = 1; prio <= 8; prio++)
-		for (int layer = 0; layer < LAYER_COUNT; layer++)
+		for (u8 layer : tie_order)
 			if (value[layer] == prio)
 				m_layer_rank[layer] = rank++;
 }
