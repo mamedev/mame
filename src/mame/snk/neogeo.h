@@ -104,6 +104,7 @@ protected:
 	void write_bankprot_kf2k3bl(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void write_bankprot_kof10th(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t read_lorom_kof10th(offs_t offset);
+	uint16_t read_link_mcu(address_space &space, offs_t offset);
 
 	void set_screen_shadow(int state);
 	void set_palette_bank(int state);

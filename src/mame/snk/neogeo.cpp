@@ -543,9 +543,8 @@
     AES driver (home version of MVS)
     Current emulation status:
     - Cartridges run.
-    - Riding Hero runs in slow-mo due to the unemulated comm link MCU in the cartridge.
-      In MAME if dip SW6 is set to ON to enable link play, it runs the same way!
-      On AES there are no dipswitches, and so it always tries to talk to the MCU.
+    - Riding Hero talks to the link MCU in its cartridge (always on AES, with no dipswitches; on MVS with SW6 ON);
+      the MCU runs its dumped program (bus/neogeo/link.cpp), but the link to another machine isn't connected.
 
 ****************************************************************************/
 
@@ -613,6 +612,7 @@ public:
 
 	// fixed software configurations
 	void neobase(machine_config &config);
+	void ridhero(machine_config &config);
 	void fatfur2(machine_config &config);
 	void kof97oro(machine_config &config);
 	void kog(machine_config &config);
@@ -1290,6 +1290,12 @@ uint16_t neogeo_base_state::read_lorom_kof10th(offs_t offset)
 	return rom[offset + 0x80/2];
 }
 
+uint16_t neogeo_base_state::read_link_mcu(address_space &space, offs_t offset)
+{
+	// the link cart drives D0-D11 (bus/neogeo/link.cpp); D12-D15 keep the open bus
+	return (unmapped_r(space) & 0xf000) | (m_slots[m_curr_slot]->protection_r(space, offset) & 0x0fff);
+}
+
 
 /*************************************
  *
@@ -1526,6 +1532,11 @@ void neogeo_base_state::set_slot_idx(int slot)
 			space.install_read_handler(0x200000, 0x201fff, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::ram_r)));
 			space.install_write_handler(0x200000, 0x201fff, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::ram_w)));
 			break;
+		case NEOGEO_LINK:
+			// the link MCU's latch and status (bus/neogeo/link.cpp)
+			space.install_read_handler(0x200000, 0x2fffff, read16m_delegate(*this, FUNC(neogeo_base_state::read_link_mcu)));
+			space.install_write_handler(0x200000, 0x2fffff, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::protection_w)));
+			break;
 		case NEOGEO_VLINER:
 			space.install_read_handler(0x200000, 0x201fff, read16sm_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::ram_r)));
 			space.install_write_handler(0x200000, 0x201fff, write16s_delegate(*m_slots[m_curr_slot], FUNC(neogeo_cart_slot_device::ram_w)));
@@ -1536,6 +1547,11 @@ void neogeo_base_state::set_slot_idx(int slot)
 			break;
 		}
 	}
+
+	// SLOTCS: only the selected slot's cart is selected (a link cart's MCU idles while its slot isn't)
+	for (unsigned i = 0; i < m_slots.size(); i++)
+		if (m_slots[i].found())
+			m_slots[i]->set_selected(int(i) == m_curr_slot);
 }
 
 
@@ -2451,6 +2467,13 @@ void mvs_led_state::neobase(machine_config &config)
 	cartslot_fixed(config, "rom");
 }
 
+// Riding Hero: its cart has the multi-play link MCU
+void mvs_led_state::ridhero(machine_config &config)
+{
+	mv1_fixed(config);
+	cartslot_fixed(config, "rom_link");
+}
+
 // used by fatfury2 & ssideki
 void mvs_led_state::fatfur2(machine_config &config)
 {
@@ -2937,8 +2960,9 @@ void mvs_led_state::sbp(machine_config &config)
     . League Bowling (AES - NEO-AEG PROG-HERO   / MVS NEO-MVS PROG-HERO)
     . Thrash Rally   (AES - NEO-AEG PROG42G-COM / NEO-MVS PROG42G-COM)
 
-    A HD6301V1P MCU on the above boards is used for establishing the 'link'. The MCU has a 4kb internal ROM which
-    is not dumped.
+    A HD6301V1P MCU on the above boards is used for establishing the 'link'. The MCU has a 4kb internal ROM.
+    Riding Hero's program was dumped from a prototype with an external ROM and runs (bus/neogeo/link.cpp);
+    League Bowling's and Thrash Rally's aren't dumped.
     To use the MULTI PLAY MODE on your MVS you have to set the following hardware dips:
     HARD DIP SETTING  4   5   6
     CABINET 1:        OFF OFF ON
@@ -3290,7 +3314,7 @@ ROM_START( ridhero ) /* MVS AND AES VERSION */
 	ROM_LOAD16_WORD_SWAP( "006-p1.p1", 0x000000, 0x080000, CRC(d4aaf597) SHA1(34d35b71adb5bd06f4f1b50ffd9c58ab9c440a84) ) /* MB834200 */
 
 	// dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
-	ROM_REGION( 0x2000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
+	ROM_REGION( 0x2000, "cslot1:mcu", 0 )    /* Hitachi HD6301V1 MCU */
 	ROM_LOAD( "hd6301v1p_k78.com", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) )
 
 	NEO_SFIX_128K( "006-s1.s1", CRC(eb5189f0) SHA1(0239c342ea62e73140a2306052f226226461a478) ) /* TC531000 */
@@ -3320,7 +3344,7 @@ ROM_START( ridheroh )
 	/* Chip label p1h does not exist, renamed temporarily to pg1, marked BAD_DUMP. This needs to be verified. */
 
 	// dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
-	ROM_REGION( 0x2000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
+	ROM_REGION( 0x2000, "cslot1:mcu", 0 )    /* Hitachi HD6301V1 MCU */
 	ROM_LOAD( "hd6301v1p_k78.com", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) )
 
 	NEO_SFIX_128K( "006-s1.s1", CRC(eb5189f0) SHA1(0239c342ea62e73140a2306052f226226461a478) ) /* TC531000 */
@@ -11908,8 +11932,8 @@ GAME( 1990, bstars,     neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1990, bstarsh,    bstars,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Baseball Stars Professional (NGH-002)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, tpgolf,     neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Top Player's Golf (NGM-003 ~ NGH-003)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mahretsu,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Mahjong Kyo Retsuden (NGM-004 ~ NGH-004)", MACHINE_SUPPORTS_SAVE ) // does not support mahjong panel in MVS mode <- it actually works fine???
-GAME( 1990, ridhero,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Riding Hero (NGM-006 ~ NGH-006)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ridheroh,   ridhero,  neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Riding Hero (set 2)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ridhero,    neogeo,   ridhero,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Riding Hero (NGM-006 ~ NGH-006)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ridheroh,   ridhero,  ridhero,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Riding Hero (set 2)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, alpham2,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Alpha Mission II / ASO II - Last Guardian (NGM-007 ~ NGH-007)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, alpham2p,   alpham2,  neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Alpha Mission II / ASO II - Last Guardian (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, cyberlip,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Cyber-Lip (NGM-010)", MACHINE_SUPPORTS_SAVE )

@@ -3993,6 +3993,8 @@ if BUSES["NEOGEO"] then
 		MAME_DIR .. "src/devices/bus/neogeo/carts.h",
 		MAME_DIR .. "src/devices/bus/neogeo/rom.cpp",
 		MAME_DIR .. "src/devices/bus/neogeo/rom.h",
+		MAME_DIR .. "src/devices/bus/neogeo/link.cpp",
+		MAME_DIR .. "src/devices/bus/neogeo/link.h",
 		MAME_DIR .. "src/devices/bus/neogeo/fatfury2.cpp",
 		MAME_DIR .. "src/devices/bus/neogeo/fatfury2.h",
 		MAME_DIR .. "src/devices/bus/neogeo/kof98.cpp",

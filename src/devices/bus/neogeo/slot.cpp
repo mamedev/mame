@@ -139,6 +139,7 @@ static const neogeo_slot slot_list[] =
 {
 	{ NEOGEO_STD, "rom" },
 	{ NEOGEO_VLINER, "rom_vliner" },
+	{ NEOGEO_LINK, "rom_link" },
 	{ NEOGEO_FATFURY2, "rom_fatfur2" },
 	{ NEOGEO_KOF98, "rom_kof98" },
 	{ NEOGEO_MSLUGX, "rom_mslugx" },
