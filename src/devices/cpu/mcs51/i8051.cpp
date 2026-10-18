@@ -317,7 +317,9 @@ u8 mcs51_cpu_device::p3_r()
 	return m_rwm ? m_p3 :
 		(m_p3 | m_forced_inputs[3]) & m_port_in_cb[3]()
 		& ~(BIT(m_last_line_state, MCS51_INT0_LINE) ? 4 : 0)
-		& ~(BIT(m_last_line_state, MCS51_INT1_LINE) ? 8 : 0);
+		& ~(BIT(m_last_line_state, MCS51_INT1_LINE) ? 8 : 0)
+		& ~(BIT(m_last_line_state, MCS51_T0_LINE) ? 0x10 : 0)
+		& ~(BIT(m_last_line_state, MCS51_T1_LINE) ? 0x20 : 0);
 }
 
 void mcs51_cpu_device::p3_w(u8 data)
