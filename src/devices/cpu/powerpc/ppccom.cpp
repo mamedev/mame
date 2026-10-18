@@ -235,6 +235,7 @@ ppc_device::ppc_device(
 	, m_program_config("program", ENDIANNESS_BIG, data_bits, address_bits, 0, internal_map)
 	, c_bus_frequency(0)
 	, c_serial_clock(0)
+	, c_rtc_clock(7'812'500)
 	, m_core(nullptr)
 	, m_bus_freq_multiplier(1)
 	, m_flavor(flavor)
@@ -453,6 +454,18 @@ inline void ppc_device::set_timebase(uint64_t newtb)
 
 
 /*-------------------------------------------------
+    get_rtc - return the 601 RTC
+-------------------------------------------------*/
+
+inline uint64_t ppc_device::get_rtc()
+{
+	const uint64_t elapsed = total_cycles() - m_rtc_zero_cycles;
+	const uint64_t rate = uint64_t(c_rtc_clock) * 128;
+	return (elapsed / clock()) * rate + (elapsed % clock()) * rate / clock();
+}
+
+
+/*-------------------------------------------------
     get_decremeter - return the current
     decrementer value
 -------------------------------------------------*/
@@ -503,8 +516,9 @@ void ppc_device::set_decrementer(uint32_t newdec)
 
 /*-------------------------------------------------
     The 601's decrementer, like the 601-specific
-    RTC mechanism, counts nanoseconds, not bus
-    clocks.  This implementation allows pmac6100
+    RTC mechanism, counts 128 per RTC input clock
+    (nanoseconds at the nominal 7.8125 MHz), not
+    bus clocks.  This implementation allows pmac6100
     to Gestalt itself properly (the boot ROM counts
     decrementer ticks vs. instruction execution).
 -------------------------------------------------*/
@@ -512,12 +526,14 @@ void ppc_device::set_decrementer(uint32_t newdec)
 uint32_t ppc601_device::get_decrementer()
 {
 	const int64_t cycles_until_zero = (int64_t)m_dec_zero_cycles - (int64_t)total_cycles();
-	return (uint32_t)(cycles_until_zero * 1'000'000'000LL / clock());
+	const int64_t rate = int64_t(c_rtc_clock) * 128;
+	return (uint32_t)(cycles_until_zero * rate / clock());
 }
 
 void ppc601_device::set_decrementer(uint32_t newdec)
 {
-	m_dec_zero_cycles = total_cycles() + (uint64_t)newdec * clock() / 1'000'000'000;
+	const uint64_t rate = uint64_t(c_rtc_clock) * 128;
+	m_dec_zero_cycles = total_cycles() + (uint64_t)newdec * clock() / rate;
 	m_decrementer_int_timer->adjust(cycles_to_attotime(m_dec_zero_cycles - total_cycles()));
 }
 
@@ -527,7 +543,7 @@ TIMER_CALLBACK_MEMBER(ppc601_device::decrementer_int_callback)
 	m_core->irq_pending |= 0x02;
 
 	// advance by another full tick
-	m_dec_zero_cycles += ((uint64_t)1 << 32) * clock() / 1'000'000'000;
+	m_dec_zero_cycles += ((uint64_t)1 << 32) * clock() / (uint64_t(c_rtc_clock) * 128);
 	m_decrementer_int_timer->adjust(cycles_to_attotime(m_dec_zero_cycles - total_cycles()));
 }
 
@@ -1229,14 +1245,14 @@ void ppc_device::device_reset()
 	// discard any pending retry request (this getter clears the flag)
 	access_to_be_redone();
 
-	/* initialize the OEA state */
+	// initialize the OEA state
 	if (m_cap & PPCCAP_OEA)
 	{
-		/* PC to the reset vector; MSR has IP set to start */
+		// PC to the reset vector; MSR has IP set to start
 		m_core->pc = 0xfff00100;
 		m_core->msr = MSROEA_IP;
 
-		/* reset the decrementer */
+		// reset the decrementer
 		m_dec_zero_cycles = total_cycles();
 		if (m_tb_divisor || (m_flavor == PPC_MODEL_601))
 		{
@@ -1244,35 +1260,43 @@ void ppc_device::device_reset()
 		}
 	}
 
-	/* initialize the 4XX state */
+	// initialize the 4XX state
 	if (m_cap & PPCCAP_4XX)
 	{
-		/* PC to the last word; MSR to 0 */
+		// PC to the last word; MSR to 0
 		m_core->pc = 0xfffffffc;
 		m_core->msr = 0;
 
-		/* reset the SPU status */
+		// reset the SPU status
 		m_core->spr[SPR4XX_TCR] &= ~PPC4XX_TCR_WRC_MASK;
 		m_spu.regs[SPU4XX_LINE_STATUS] = 0x06;
 	}
 
-	/* initialize the 602 HID0 register */
+	// initialize the 602 HID0 register
 	if (m_flavor == PPC_MODEL_602)
 	{
 		m_core->spr[SPR602_ESASRR] = 0;
 		m_core->spr[SPR603_HID0] = 1;
 	}
+	else if (m_flavor == PPC_MODEL_603E || m_flavor == PPC_MODEL_603EV || m_flavor == PPC_MODEL_603R)
+	{
+		// initialize the 603e HID1 register; PC0-PC3 are a read-only view of the PLL_CFG pins
+		// PLL_CFG0-3 encodings indexed by twice the CPU:bus ratio (0 = no such setting)
+		static constexpr uint8_t pll_cfg[13] = {0, 0, 0x1, 0xc, 0x4, 0x6, 0x8, 0xe, 0xa, 0x7, 0xb, 0x9, 0xd};
+		uint32_t const ratio = m_system_clock ? ((uint64_t(clock()) * 4 + m_system_clock) / (uint64_t(m_system_clock) * 2)) : 0;
+		m_core->spr[SPR603_HID1] = (ratio < std::size(pll_cfg)) ? (uint32_t(pll_cfg[ratio]) << 28) : 0;
+	}
 
-	/* time base starts here */
+	// time base starts here
 	m_tb_zero_cycles = total_cycles();
 
-	/* clear interrupts */
+	// clear interrupts
 	m_core->irq_pending = 0;
 
 	// clear the "any page has code" flag
 	m_core->m_codepage_any = 0;
 
-	/* flush the TLB */
+	// flush the TLB
 	if (m_cap & PPCCAP_603_MMU)
 	{
 		for (int tlbindex = 0; tlbindex < PPC603_FIXED_TLB_ENTRIES; tlbindex++)
@@ -1281,7 +1305,7 @@ void ppc_device::device_reset()
 		}
 	}
 
-	/* Mark the cache dirty */
+	// Mark the cache dirty
 	m_core->mode = 0;
 	m_cache_dirty = true;
 }
@@ -2018,15 +2042,11 @@ void ppc_device::ppccom_execute_mfspr()
 				return;
 
 			case SPR601_RTCUR_PWR:
-				m_core->param1 = (total_cycles() - m_rtc_zero_cycles) / clock();
+				m_core->param1 = get_rtc() / 1'000'000'000;
 				return;
 
 			case SPR601_RTCLR_PWR:
-				{
-					// get fractional seconds and convert to nanoseconds
-					const uint64_t remainder = (total_cycles() - m_rtc_zero_cycles) % clock();
-					m_core->param1 = (remainder * 1'000'000'000ULL) / clock();
-				}
+				m_core->param1 = get_rtc() % 1'000'000'000;
 				return;
 		}
 	}
@@ -2277,11 +2297,11 @@ void ppc_device::ppccom_execute_mtspr()
 			case SPR603_HASH2:
 			case SPR603_IMISS:
 			case SPR603_ICMP:
+			case SPR603_HID1:
 				return;
 
 			/* write-through no-ops */
 			case SPR603_RPA:
-			case SPR603_HID1:
 			case SPR603_IABR:
 			case SPR603_HID2:
 				m_core->spr[m_core->param0] = m_core->param1;

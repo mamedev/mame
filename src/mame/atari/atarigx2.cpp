@@ -447,22 +447,38 @@ void atarigx2_state::atarigx2(machine_config &config)
 	m_screen->set_screen_update(FUNC(atarigx2_state::screen_update));
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
+}
 
-	/* sound hardware */
+void atarigx2_state::add_jsa3(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	ATARI_JSA_III(config, m_jsa);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_5);
+	m_jsa->test_read_cb().set_ioport("SERVICE").bit(6);
+	m_jsa->set_oki_bankregion("jsa:oki");
+	m_jsa->set_larger_bank();
+	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void atarigx2_state::add_jsa3s(machine_config &config)
+{
 	SPEAKER(config, "speaker", 2).front();
 
 	ATARI_JSA_IIIS(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_5);
 	m_jsa->test_read_cb().set_ioport("SERVICE").bit(6);
+	m_jsa->set_oki_bankregion("jsa:oki");
 	m_jsa->add_route(0, "speaker", 0.7, 0);
 	m_jsa->add_route(1, "speaker", 0.7, 1);
 }
 
-void atarigx2_state::atarigx2_0x200(machine_config &config)
+void atarigx2_state::atarigx2_0x200_jsa3s(machine_config &config)
 {
 	atarigx2(config);
 	ATARI_136094_0072(config, m_xga);
 	ATARI_RLE_OBJECTS(config, m_rle, modesc_0x200);
+	add_jsa3s(config);
 }
 
 void atarigx2_state::atarigx2_0x400(machine_config &config)
@@ -472,7 +488,17 @@ void atarigx2_state::atarigx2_0x400(machine_config &config)
 	ATARI_RLE_OBJECTS(config, m_rle, modesc_0x400);
 }
 
+void atarigx2_state::atarigx2_0x400_jsa3(machine_config &config)
+{
+	atarigx2_0x400(config);
+	add_jsa3(config);
+}
 
+void atarigx2_state::atarigx2_0x400_jsa3s(machine_config &config)
+{
+	atarigx2_0x400(config);
+	add_jsa3s(config);
+}
 
 /*************************************
  *
@@ -512,10 +538,7 @@ ROM_START( spclords )
 	ROM_LOAD16_BYTE( "136095.51b", 0x500000, 0x80000, CRC(97541074) SHA1(f9f75bfc4af9587f4a9630ad93d9cd0efd89e4f4) )
 	ROM_LOAD16_BYTE( "136095.50b", 0x500001, 0x80000, CRC(a1c11ae8) SHA1(53fb2f376aae0aa346f9f911d6d8a73753c67d6e) )
 
-	ROM_REGION( 0x80000, "jsa:oki1", 0 )
-	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
-
-	ROM_REGION( 0x80000, "jsa:oki2", 0 )
+	ROM_REGION( 0x80000, "jsa:oki", 0 )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -557,10 +580,7 @@ ROM_START( spclordsb )
 	ROM_LOAD16_BYTE( "136095.51b", 0x500000, 0x80000, CRC(97541074) SHA1(f9f75bfc4af9587f4a9630ad93d9cd0efd89e4f4) )
 	ROM_LOAD16_BYTE( "136095.50b", 0x500001, 0x80000, CRC(a1c11ae8) SHA1(53fb2f376aae0aa346f9f911d6d8a73753c67d6e) )
 
-	ROM_REGION( 0x80000, "jsa:oki1", 0 )
-	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
-
-	ROM_REGION( 0x80000, "jsa:oki2", 0 )
+	ROM_REGION( 0x80000, "jsa:oki", 0 )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -602,10 +622,7 @@ ROM_START( spclordsg )
 	ROM_LOAD16_BYTE( "136095.51a", 0x500000, 0x80000, CRC(4635c534) SHA1(7261508052e3b17a552b43bc3d4ad7cd2d1f6af9) )
 	ROM_LOAD16_BYTE( "136095.50a", 0x500001, 0x80000, CRC(94bde47d) SHA1(dde8f0184a2d7e9f7eb961af2d9d016399ec18fc) )
 
-	ROM_REGION( 0x80000, "jsa:oki1", 0 )
-	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
-
-	ROM_REGION( 0x80000, "jsa:oki2", 0 )
+	ROM_REGION( 0x80000, "jsa:oki", 0 )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -647,10 +664,7 @@ ROM_START( spclordsa )
 	ROM_LOAD16_BYTE( "136095.51a", 0x500000, 0x80000, CRC(4635c534) SHA1(7261508052e3b17a552b43bc3d4ad7cd2d1f6af9) )
 	ROM_LOAD16_BYTE( "136095.50a", 0x500001, 0x80000, CRC(94bde47d) SHA1(dde8f0184a2d7e9f7eb961af2d9d016399ec18fc) )
 
-	ROM_REGION( 0x80000, "jsa:oki1", 0 )
-	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
-
-	ROM_REGION( 0x80000, "jsa:oki2", 0 )
+	ROM_REGION( 0x80000, "jsa:oki", 0 )
 	ROM_LOAD( "136095.81a",  0x00000, 0x80000, CRC(212560dd) SHA1(9d90bca5b478050d640b2393c9d3d59a4bd493dd) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -694,10 +708,7 @@ ROM_START( motofren )
 	ROM_LOAD16_BYTE( "136094-0053a.35t", 0x600000, 0x80000, CRC(74320763) SHA1(9cbf61c51dd96dc3e4a4227f3080766b9482a16a) )
 	ROM_LOAD16_BYTE( "136094-0052a.35r", 0x600001, 0x80000, CRC(a7f9df2e) SHA1(c3e0c67081cf8f7b24350abf5a9adbb544ab44a7) )
 
-	ROM_REGION( 0x80000, "jsa:oki1", 0 )
-	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
-
-	ROM_REGION( 0x80000, "jsa:oki2", 0 )
+	ROM_REGION( 0x80000, "jsa:oki", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -741,10 +752,7 @@ ROM_START( motofrenmd )
 	ROM_LOAD16_BYTE( "136094-0053a.35t", 0x600000, 0x80000, CRC(74320763) SHA1(9cbf61c51dd96dc3e4a4227f3080766b9482a16a) )
 	ROM_LOAD16_BYTE( "136094-0052a.35r", 0x600001, 0x80000, CRC(a7f9df2e) SHA1(c3e0c67081cf8f7b24350abf5a9adbb544ab44a7) )
 
-	ROM_REGION( 0x80000, "jsa:oki1", 0 )
-	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
-
-	ROM_REGION( 0x80000, "jsa:oki2", 0 )
+	ROM_REGION( 0x80000, "jsa:oki", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -792,10 +800,7 @@ ROM_START( motofrei )
 	ROM_LOAD16_BYTE( "136094-0053a.35t", 0x600000, 0x80000, CRC(74320763) SHA1(9cbf61c51dd96dc3e4a4227f3080766b9482a16a) )
 	ROM_LOAD16_BYTE( "136094-0052a.35r", 0x600001, 0x80000, CRC(a7f9df2e) SHA1(c3e0c67081cf8f7b24350abf5a9adbb544ab44a7) )
 
-	ROM_REGION( 0x80000, "jsa:oki1", 0 )
-	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
-
-	ROM_REGION( 0x80000, "jsa:oki2", 0 )
+	ROM_REGION( 0x80000, "jsa:oki", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -840,10 +845,7 @@ ROM_START( motofreg )
 	ROM_LOAD16_BYTE( "136094-0053a.35t", 0x600000, 0x80000, CRC(74320763) SHA1(9cbf61c51dd96dc3e4a4227f3080766b9482a16a) )
 	ROM_LOAD16_BYTE( "136094-0052a.35r", 0x600001, 0x80000, CRC(a7f9df2e) SHA1(c3e0c67081cf8f7b24350abf5a9adbb544ab44a7) )
 
-	ROM_REGION( 0x80000, "jsa:oki1", 0 )
-	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
-
-	ROM_REGION( 0x80000, "jsa:oki2", 0 )
+	ROM_REGION( 0x80000, "jsa:oki", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -888,10 +890,7 @@ ROM_START( motofmdg )
 	ROM_LOAD16_BYTE( "136094-0053a.35t", 0x600000, 0x80000, CRC(74320763) SHA1(9cbf61c51dd96dc3e4a4227f3080766b9482a16a) )
 	ROM_LOAD16_BYTE( "136094-0052a.35r", 0x600001, 0x80000, CRC(a7f9df2e) SHA1(c3e0c67081cf8f7b24350abf5a9adbb544ab44a7) )
 
-	ROM_REGION( 0x80000, "jsa:oki1", 0 )
-	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
-
-	ROM_REGION( 0x80000, "jsa:oki2", 0 )
+	ROM_REGION( 0x80000, "jsa:oki", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -935,10 +934,7 @@ ROM_START( motofrenft )
 	ROM_LOAD16_BYTE( "136094-0053a.35t", 0x600000, 0x80000, CRC(74320763) SHA1(9cbf61c51dd96dc3e4a4227f3080766b9482a16a) )
 	ROM_LOAD16_BYTE( "136094-0052a.35r", 0x600001, 0x80000, CRC(a7f9df2e) SHA1(c3e0c67081cf8f7b24350abf5a9adbb544ab44a7) )
 
-	ROM_REGION( 0x80000, "jsa:oki1", 0 )
-	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
-
-	ROM_REGION( 0x80000, "jsa:oki2", 0 )
+	ROM_REGION( 0x80000, "jsa:oki", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -982,10 +978,7 @@ ROM_START( motofrenfta )
 	ROM_LOAD16_BYTE( "136094-0053a.35t", 0x600000, 0x80000, CRC(74320763) SHA1(9cbf61c51dd96dc3e4a4227f3080766b9482a16a) )
 	ROM_LOAD16_BYTE( "136094-0052a.35r", 0x600001, 0x80000, CRC(a7f9df2e) SHA1(c3e0c67081cf8f7b24350abf5a9adbb544ab44a7) )
 
-	ROM_REGION( 0x80000, "jsa:oki1", 0 )
-	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
-
-	ROM_REGION( 0x80000, "jsa:oki2", 0 )
+	ROM_REGION( 0x80000, "jsa:oki", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -1029,10 +1022,7 @@ ROM_START( motofrenmf )
 	ROM_LOAD16_BYTE( "136094-0053a.35t", 0x600000, 0x80000, CRC(74320763) SHA1(9cbf61c51dd96dc3e4a4227f3080766b9482a16a) )
 	ROM_LOAD16_BYTE( "136094-0052a.35r", 0x600001, 0x80000, CRC(a7f9df2e) SHA1(c3e0c67081cf8f7b24350abf5a9adbb544ab44a7) )
 
-	ROM_REGION( 0x80000, "jsa:oki1", 0 )
-	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
-
-	ROM_REGION( 0x80000, "jsa:oki2", 0 )
+	ROM_REGION( 0x80000, "jsa:oki", 0 )
 	ROM_LOAD( "136094-0082a.19e",  0x00000, 0x80000, CRC(fde543c4) SHA1(7d36d7f2f30d0ac40da77a36a47488d75474caaf) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
@@ -1095,11 +1085,9 @@ ROM_START( rrreveng )
 	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
 	ROM_LOAD( "rr65snd.bin", 0x00000, 0x10000, CRC(d78429da) SHA1(a4d36d74986f08c793f15f2e67cb97a8c91c5e90) )
 
-	ROM_REGION( 0x80000, "jsa:oki1", 0 )
+	ROM_REGION( 0x100000, "jsa:oki", 0 )
 	ROM_LOAD( "rralpc0.bin",  0x00000, 0x80000, CRC(1f7b6ecf) SHA1(1787a2e89618e1338d70a54684dbc7d44c5f5559) )
-
-	ROM_REGION( 0x80000, "jsa:oki2", 0 )
-	ROM_LOAD( "rralpc1.bin",  0x00000, 0x80000, CRC(7ccd26d7) SHA1(1a74bdc66482896f5b9795d27383aa993e5fbaa4) )
+	ROM_LOAD( "rralpc1.bin",  0x80000, 0x80000, CRC(7ccd26d7) SHA1(1a74bdc66482896f5b9795d27383aa993e5fbaa4) )
 ROM_END
 
 
@@ -1133,11 +1121,9 @@ ROM_START( rrrevenga ) /* Same program roms as the set below, but shares more ro
 	ROM_LOAD16_BYTE( "mo4h.31t",   0x400000, 0x80000, CRC(af6a027e) SHA1(08038bddb6aa7e97f013f9d3e508f5501821e460) )
 	ROM_LOAD16_BYTE( "mo4l.31r",   0x400001, 0x80000, CRC(9ebc5369) SHA1(ffd8418b328d99aa44fb1aed1db1aa6ac715c644) )
 
-	ROM_REGION( 0x80000, "jsa:oki1", 0 )
+	ROM_REGION( 0x100000, "jsa:oki", 0 )
 	ROM_LOAD( "rralpc0.bin",  0x00000, 0x80000, CRC(1f7b6ecf) SHA1(1787a2e89618e1338d70a54684dbc7d44c5f5559) )
-
-	ROM_REGION( 0x80000, "jsa:oki2", 0 )
-	ROM_LOAD( "rralpc1.bin",  0x00000, 0x80000, CRC(7ccd26d7) SHA1(1a74bdc66482896f5b9795d27383aa993e5fbaa4) )
+	ROM_LOAD( "rralpc1.bin",  0x80000, 0x80000, CRC(7ccd26d7) SHA1(1a74bdc66482896f5b9795d27383aa993e5fbaa4) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
 	ROM_LOAD( "136094-0001a.22s",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* 74S472AN BPROM */
@@ -1192,11 +1178,9 @@ ROM_START( rrrevengb )
 	ROM_LOAD16_BYTE( "rrmo4h.31t", 0x400000, 0x80000, CRC(12bf3e11) SHA1(37b1a7fe0b50202030f5c1938b95a449bbd51add) )
 	ROM_LOAD16_BYTE( "rrmo4l.31r", 0x400001, 0x80000, CRC(a80175f6) SHA1(db621902fdfa99ec532713f4314c6cbb8353a773) )
 
-	ROM_REGION( 0x80000, "jsa:oki1", 0 )
+	ROM_REGION( 0x100000, "jsa:oki", 0 )
 	ROM_LOAD( "rralpc0.bin",  0x00000, 0x80000, CRC(1f7b6ecf) SHA1(1787a2e89618e1338d70a54684dbc7d44c5f5559) )
-
-	ROM_REGION( 0x80000, "jsa:oki2", 0 )
-	ROM_LOAD( "rralpc1.bin",  0x00000, 0x80000, CRC(7ccd26d7) SHA1(1a74bdc66482896f5b9795d27383aa993e5fbaa4) )
+	ROM_LOAD( "rralpc1.bin",  0x80000, 0x80000, CRC(7ccd26d7) SHA1(1a74bdc66482896f5b9795d27383aa993e5fbaa4) )
 
 	ROM_REGION( 0x0600, "proms", 0 )    /* microcode for growth renderer */
 	ROM_LOAD( "136094-0001a.22s",  0x0000, 0x0200, CRC(a70ade3f) SHA1(f4a558b17767eed2683c768d1b441e75edcff967) ) /* 74S472AN BPROM */
@@ -1274,6 +1258,14 @@ void atarigx2_state::init_rrreveng()
 	// Keep the not-working/protection flags pending full runtime validation.
 	init_spclords();
 	downcast<atari_136095_0072_device &>(*m_xga).set_polynomial_high(0xf000);
+
+	// we need to give the sound CPU time to respond, or the music dies
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe06000, 0xe06003,
+		write8smo_delegate(*this, [this] (u8 data)
+		{
+			m_jsa->main_command_w(data);
+			m_maincpu->spin_until_time(attotime::from_usec(50));
+		}, "rrreveng_sound_command"), 0xff000000);
 }
 
 
@@ -1283,17 +1275,19 @@ void atarigx2_state::init_rrreveng()
  *
  *************************************/
 
-GAME( 1992, spclords,  0,         atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev C)", MACHINE_NODEVICE_LAN )
-GAME( 1992, spclordsb, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev B)", MACHINE_NODEVICE_LAN )
-GAME( 1992, spclordsg, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A, German)", MACHINE_NODEVICE_LAN )
-GAME( 1992, spclordsa, spclords,  atarigx2_0x400, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A)", MACHINE_NODEVICE_LAN )
+GAME( 1992, spclords,  0,         atarigx2_0x400_jsa3s, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev C)", MACHINE_NODEVICE_LAN )
+GAME( 1992, spclordsb, spclords,  atarigx2_0x400_jsa3s, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev B)", MACHINE_NODEVICE_LAN )
+GAME( 1992, spclordsg, spclords,  atarigx2_0x400_jsa3s, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A, German)", MACHINE_NODEVICE_LAN )
+GAME( 1992, spclordsa, spclords,  atarigx2_0x400_jsa3s, spclords, atarigx2_state, init_spclords, ROT0, "Atari Games", "Space Lords (rev A)", MACHINE_NODEVICE_LAN )
 
-GAME( 1992, motofren,    0,        atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy", MACHINE_NODEVICE_LAN )
-GAME( 1992, motofrenmd,  motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", MACHINE_NODEVICE_LAN )
-GAME( 1992, motofrenft,  motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version, Jul 17, 1992)", MACHINE_NODEVICE_LAN )
-GAME( 1992, motofrenfta, motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version, Jul 22, 1992)", MACHINE_NODEVICE_LAN )
-GAME( 1992, motofrenmf,  motofren, atarigx2_0x200, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", MACHINE_NODEVICE_LAN )
+GAME( 1992, motofren,    0,        atarigx2_0x200_jsa3s, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy", MACHINE_NODEVICE_LAN )
+GAME( 1992, motofrenmd,  motofren, atarigx2_0x200_jsa3s, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe)", MACHINE_NODEVICE_LAN )
+GAME( 1992, motofrenft,  motofren, atarigx2_0x200_jsa3s, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version, Jul 17, 1992)", MACHINE_NODEVICE_LAN )
+GAME( 1992, motofrenfta, motofren, atarigx2_0x200_jsa3s, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Field Test Version, Jul 22, 1992)", MACHINE_NODEVICE_LAN )
+GAME( 1992, motofrenmf,  motofren, atarigx2_0x200_jsa3s, motofren, atarigx2_state, init_motofren, ROT0, "Atari Games", "Moto Frenzy (Mini Deluxe Field Test Version)", MACHINE_NODEVICE_LAN )
 
-GAME( 1993, rrreveng,   0,        atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Sep 06, 1994)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
-GAME( 1993, rrrevenga,  rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
-GAME( 1993, rrrevengb,  rrreveng, atarigx2_0x400, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+// MACHINE_IMPERFECT_SOUND as volume levels between OKI and YM don't seem well balanced
+// 1993 copyright on screen, but these builds are all from 1994
+GAME( 1994, rrreveng,   0,        atarigx2_0x400_jsa3, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Sep 06, 1994)", MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_SOUND )
+GAME( 1994, rrrevenga,  rrreveng, atarigx2_0x400_jsa3, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 1)", MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_SOUND )
+GAME( 1994, rrrevengb,  rrreveng, atarigx2_0x400_jsa3, rrreveng, atarigx2_state, init_rrreveng, ROT0, "Atari Games", "Road Riot's Revenge (prototype, Jan 27, 1994, set 2)", MACHINE_NODEVICE_LAN | MACHINE_IMPERFECT_SOUND )

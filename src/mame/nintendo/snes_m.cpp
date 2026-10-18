@@ -115,6 +115,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 
 	// not in hblank
 	SNES_CPU_REG(HVBJOY) &= ~0x40;
+	hblank_w(0);
 
 	/* Vertical IRQ timer - only if horizontal isn't also enabled! */
 	if ((SNES_CPU_REG(NMITIMEN) & 0x20) && !(SNES_CPU_REG(NMITIMEN) & 0x10))
@@ -203,6 +204,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 
 	// signal hblank
 	SNES_CPU_REG(HVBJOY) |= 0x40;
+	hblank_w(1);
 
 	/* kick off the start of scanline timer */
 	nextscan = m_ppu->current_vert() + 1;

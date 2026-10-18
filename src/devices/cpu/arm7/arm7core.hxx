@@ -123,6 +123,8 @@ void arm7_cpu_device::arm7_check_irq_state()
 			SetRegister(14, link);
 			SetRegister(SPSR, cpsr);
 			set_cpsr((GET_CPSR | I_MASK | (mask_fiq ? F_MASK : 0)) & ~T_MASK);
+			if (m_archRev >= 6)
+				set_cpsr((GET_CPSR & ~0x200U) | ((m_control >> 16) & 0x200));
 			R15 = vector | vector_base();    // CP15 c1 V bit selects the high vectors whether or not the MMU is enabled
 		}
 		else

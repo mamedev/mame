@@ -207,7 +207,7 @@ const int IE_FRAME_TIMER                = 0x01;
 const int STATUS_INTERRUPT_PENDING      = 0x80;
 //const int STATUS_VERTICAL_RETRACE       = 0x40;
 const int STATUS_LIGHT_PEN_UPDATE       = 0x20;
-//const int STATUS_ODD_EVEN               = 0x04;
+const int STATUS_ODD_EVEN               = 0x04;
 //const int STATUS_FRAME_TIMER_OCCURRED   = 0x01;
 
 
@@ -541,6 +541,7 @@ void crt9007_device::device_start()
 	// save state
 	save_item(NAME(m_reg));
 	save_item(NAME(m_status));
+	save_item(NAME(m_odd_field));
 	save_item(NAME(m_hpixels_per_column));
 	save_item(NAME(m_disp));
 	save_item(NAME(m_hs));
@@ -571,6 +572,7 @@ void crt9007_device::device_reset()
 	m_disp = false;
 	m_cblank = false;
 	m_status = 0;
+	m_odd_field = false;
 
 	// HS = 1
 	m_hs = true;
@@ -672,6 +674,10 @@ TIMER_CALLBACK_MEMBER(crt9007_device::vsync_update)
 	}
 	else
 	{
+		m_odd_field = !m_odd_field;
+		if (m_odd_field)
+			m_status |= STATUS_ODD_EVEN;
+
 		trigger_interrupt(IE_VERTICAL_RETRACE);
 
 		update_cblank_line();

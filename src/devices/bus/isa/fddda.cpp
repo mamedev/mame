@@ -204,8 +204,8 @@ static void drive_options(device_slot_interface &device)
 void isa16_fddda_device::device_add_mconfig(machine_config &config)
 {
 	// fixed disk section
-	HARDDISK(config, m_hdd[0]);
-	HARDDISK(config, m_hdd[1]);
+	HARDDISK(config, m_hdd[0], "mfm_hdd");
+	HARDDISK(config, m_hdd[1], "mfm_hdd");
 
 	// diskette drive section
 	UPD765A(config, m_fdc, 24_MHz_XTAL / 3, false, false);

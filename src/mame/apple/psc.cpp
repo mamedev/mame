@@ -33,8 +33,12 @@
 
 #include "formats/ap_dsk35.h"
 
+#include <algorithm>
+
 #define LOG_PSCREGS    (1U << 1)
 #define LOG_ENET       (1U << 2)
+#define LOG_SND        (1U << 3)
+#define LOG_DSP        (1U << 4)
 
 #define VERBOSE (0)
 #define LOG_OUTPUT_FUNC osd_printf_info
@@ -48,7 +52,7 @@ static constexpr int IRQ_ANYSLOT    = 1;
 [[maybe_unused]] static constexpr int IRQ_MUNIIRQ = 2;
 static constexpr int IRQ_SCSIIRQ    = 3;
 static constexpr int IRQ_FDCIRQ     = 5;
-[[maybe_unused]] static constexpr int IRQ_SNDFRMIRQ = 6;
+static constexpr int IRQ_SNDFRMIRQ  = 6;
 
 static constexpr u16 CMD_IE         = 0x1000;
 static constexpr u16 CMD_ENABLED    = 0x0800;
@@ -73,6 +77,26 @@ static constexpr u8 LV4_DMA         = 0x08;
 
 static constexpr u8 LV5_DSPIRQ      = 0x01;
 static constexpr u8 LV5_FRMOVRNNIRQ = 0x02;
+
+static constexpr u16 SNDCOM_FRMIE   = 0x0040;   // sndComCtl: frame interrupt enable
+static constexpr u16 SNDCOM_INEN    = 0x0080;   //            sound input enable
+static constexpr u16 SNDCOM_OUTEN   = 0x0100;   //            sound output enable
+
+static constexpr u8 OVRN_DSPRESET   = 0x01;     // DSPOVERRUN: hold the DSP in reset
+static constexpr u8 OVRN_FRMOVRN    = 0x04;     //             frame overrun, sticky
+
+static constexpr u32 SINGER_EXPAND  = 0x0080'0000;  // singerCtl: expand
+static constexpr u32 SINGER_MUTE    = 0x0040'0000;  //            mute
+static constexpr u32 SINGER_OUTPORT = 0x0000'000f;  //            output port DO1-DO4
+
+static constexpr u16 SNDSIZE_MASK   = 0x07fc;   // sndSize: BUFSIZE in bits 10:2, the rest hardwired to 0
+
+// the Singer D/A attenuators: 1.5 dB steps, as gains x 65536
+static constexpr u32 SINGER_ATTEN[16] =
+{
+	65536, 55142, 46396, 39037, 32846, 27636, 23253, 19565,
+	16462, 13851, 11654,  9806,  8250,  6942,  5841,  4915
+};
 
 static constexpr u8 LV6_60HZ        = 0x01;
 static constexpr u8 LV6_SCCA        = 0x02;
@@ -153,9 +177,21 @@ psc_device::psc_device(const machine_config &mconfig, const char *tag, device_t 
 	m_drq(0),
 	m_scsi_irq(0),
 	m_fdc_irq(0),
-	m_audio_out_ptr(0),
-	m_audio_out_offset(0),
-	m_audio_out_length(0),
+	m_snd_com(0),
+	m_singer_ctl(0),
+	m_snd_in_base(0),
+	m_snd_out_base(0),
+	m_snd_size(0),
+	m_dsp_overrun(0),
+	m_dsp_held(true),
+	m_dsp_bio(0),
+	m_frame_irq(false),
+	m_dsp_iack1(false),
+	m_in_samples(0),
+	m_out_ring{},
+	m_out_head(0),
+	m_out_tail(0),
+	m_frame_timer(nullptr),
 	m_l3if(0), m_l3ier(0),
 	m_l4if(0), m_l4ier(0),
 	m_l5if(0), m_l5ier(0),
@@ -168,7 +204,8 @@ psc_device::psc_device(const machine_config &mconfig, const char *tag, device_t 
 	m_enet_rx_offset(0),
 	m_enet_rx_status(0),
 	m_space(*this, finder_base::DUMMY_TAG, -1),
-	m_ncr(nullptr)
+	m_ncr(nullptr),
+	m_dsp(*this, finder_base::DUMMY_TAG)
 {
 	std::fill(std::begin(m_psc_regs), std::end(m_psc_regs), 0);
 	for (int dma = 0; dma < DMA_NUM_CHANNELS; dma++)
@@ -192,6 +229,7 @@ void psc_device::device_start()
 	m_6015_timer->adjust(attotime::never);
 
 	m_singer_timer = timer_alloc(FUNC(psc_device::singer_tick), this);
+	m_frame_timer = timer_alloc(FUNC(psc_device::frame_tick), this);
 	m_enet_timer = timer_alloc(FUNC(psc_device::enet_dma_tick), this);
 
 	save_item(NAME(m_via_interrupt));
@@ -222,10 +260,20 @@ void psc_device::device_start()
 	save_item(NAME(m_drq));
 	save_item(NAME(m_scsi_irq));
 	save_item(NAME(m_fdc_irq));
-	save_item(NAME(m_audio_out_ptr));
-	save_item(NAME(m_audio_out_offset));
-	save_item(NAME(m_audio_out_length));
-
+	save_item(NAME(m_snd_com));
+	save_item(NAME(m_singer_ctl));
+	save_item(NAME(m_snd_in_base));
+	save_item(NAME(m_snd_out_base));
+	save_item(NAME(m_snd_size));
+	save_item(NAME(m_dsp_overrun));
+	save_item(NAME(m_dsp_held));
+	save_item(NAME(m_dsp_bio));
+	save_item(NAME(m_frame_irq));
+	save_item(NAME(m_dsp_iack1));
+	save_item(NAME(m_in_samples));
+	save_item(NAME(m_out_ring));
+	save_item(NAME(m_out_head));
+	save_item(NAME(m_out_tail));
 }
 
 void psc_device::device_reset()
@@ -244,10 +292,35 @@ void psc_device::device_reset()
 	}
 	m_l3if = m_l3ier = m_l4if = m_l4ier = 0;
 	m_l5if = m_l5ier = m_l6if = m_l6ier = 0;
+
+	m_snd_com = 0;
+	m_singer_ctl = (m_singer_ctl & ~(SINGER_EXPAND | SINGER_OUTPORT)) | SINGER_MUTE;
+	m_snd_size = 240;                       // 10 ms frames at 24 kHz
+	m_dsp_overrun = 0;
+	m_dsp_bio = 0;
+	m_frame_irq = false;
+	m_dsp_iack1 = false;
+	m_out_head = m_out_tail = 0;
+
+	m_singer_timer->adjust(attotime::never);
+
+	m_dac_l->write(0x8000);                 // the codec idles at mid-scale
+	m_dac_r->write(0x8000);
+
+	m_dsp_held = true;
+	if (m_dsp)
+	{
+		m_dsp->set_input_line(DSP3210_IR1, CLEAR_LINE);
+		m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	}
+
 	device_post_load();
 
 	// start 60.15 Hz timer
 	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
+
+	// the sound engine free-runs from power-on
+	arm_frame_timer();
 }
 
 TIMER_CALLBACK_MEMBER(psc_device::mac_6015_tick)
@@ -286,30 +359,43 @@ void psc_device::dma_ctrl_w(offs_t offset, u16 data)
 			// disables both sets, and selects set zero with the channel paused.
 			control = (control & CTRL_CIE) | CTRL_FROZEN | CTRL_PAUSE;
 			for (auto &command : m_dma_cmdstat[channel])
+			{
 				command &= ~CMD_ENABLED;
+			}
 			if (channel == DMA_ETHERNET_RX)
+			{
 				m_enet_rx_offset = m_enet_rx_status = 0;
+			}
 		}
 		if (data & CTRL_PAUSE)
+		{
 			control |= CTRL_FROZEN;
+		}
+
 		if ((data & CTRL_FLUSH) && ethernet)
 		{
 			// Flush abandons the current chain and advances to the other set.
 			m_dma_cmdstat[channel][control & 1] &= ~CMD_ENABLED;
 			control = (control ^ 1) | CTRL_PAUSE | CTRL_FROZEN;
 			if (channel == DMA_ETHERNET_RX)
+			{
 				m_enet_rx_offset = m_enet_rx_status = 0;
+			}
 		}
 	}
 	else
 	{
 		control &= ~(data & (CTRL_CIE | CTRL_PAUSE | CTRL_BERR));
 		if (data & CTRL_PAUSE)
+		{
 			control &= ~CTRL_FROZEN;
+		}
 	}
 	recalc_dma_irqs();
 	if (ethernet)
+	{
 		enet_dma_kick();
+	}
 }
 
 u32 psc_device::dma_set_r(offs_t offset)
@@ -344,17 +430,25 @@ void psc_device::dma_set_w(offs_t offset, u32 data, u32 mem_mask)
 			const u16 bits = (data & mem_mask) >> 16;
 			const u16 writable = bits & (CMD_IE | CMD_ENABLED | CMD_DIR | CMD_IF);
 			if (BIT(bits, 15))
+			{
 				m_dma_cmdstat[channel][set] |= writable;
+			}
 			else
+			{
 				m_dma_cmdstat[channel][set] &= ~writable;
+			}
 		}
 		break;
 	}
 	recalc_dma_irqs();
 	if (channel == DMA_SCSI && m_ncr)
+	{
 		scsi_drq_w(m_drq);
+	}
 	else if (channel == DMA_ETHERNET_RX || channel == DMA_ETHERNET_TX)
+	{
 		enet_dma_kick();
+	}
 }
 
 void psc_device::enet_irq_w(int state)
@@ -389,7 +483,9 @@ void psc_device::enet_dma_kick()
 	if (m_enet_timer && !m_enet_timer->enabled() && m_mace &&
 		((m_enet_tx_drq && enet_dma_ready(DMA_ETHERNET_TX)) ||
 		 ((m_enet_rx_drq || m_enet_rx_offset || m_enet_rx_status) && enet_dma_ready(DMA_ETHERNET_RX))))
+	{
 		m_enet_timer->adjust(attotime::from_usec(1));
+	}
 }
 
 void psc_device::enet_dma_complete(int channel)
@@ -419,13 +515,19 @@ TIMER_CALLBACK_MEMBER(psc_device::enet_dma_tick)
 		const unsigned bytes = std::min<u32>(2, count);
 		u16 data = m_space->read_byte(address);
 		if (bytes == 2)
+		{
 			data |= u16(m_space->read_byte(address + 1)) << 8;
+		}
 		if (!m_mace->tx_dma_w(data, bytes == 2 ? 0xffff : 0x00ff, count == bytes))
+		{
 			break;
+		}
 		address += bytes;
 		count -= bytes;
 		if (!count)
+		{
 			enet_dma_complete(DMA_ETHERNET_TX);
+		}
 	}
 
 	for (unsigned word = 0; word < 8 && enet_dma_ready(DMA_ETHERNET_RX) &&
@@ -433,7 +535,9 @@ TIMER_CALLBACK_MEMBER(psc_device::enet_dma_tick)
 	{
 		const auto result = m_mace->rx_dma_r();
 		if (!result.valid)
+		{
 			break;
+		}
 		const unsigned set = m_dma_control[DMA_ETHERNET_RX] & 1;
 		u32 &address = m_dma_addr[DMA_ETHERNET_RX][set];
 		if (result.status)
@@ -447,7 +551,9 @@ TIMER_CALLBACK_MEMBER(psc_device::enet_dma_tick)
 			{
 				// A malformed oversized frame must never overwrite the next slot.
 				if (m_enet_rx_offset < 2048 - 16)
+				{
 					m_space->write_byte(address + 16 + m_enet_rx_offset, result.data >> (8 * byte));
+				}
 				++m_enet_rx_offset;
 			}
 		}
@@ -569,7 +675,9 @@ u16 psc_device::mac_via2_r(offs_t offset)
 	offset &= 0x0f;
 
 	if (!machine().side_effects_disabled())
+	{
 		via_sync();
+	}
 
 	switch (offset)
 	{
@@ -711,7 +819,9 @@ uint16_t psc_device::mac_via_r(offs_t offset)
 	offset &= 0x0f;
 
 	if (!machine().side_effects_disabled())
+	{
 		via_sync();
+	}
 
 	data = m_via1->read(offset);
 
@@ -726,9 +836,13 @@ void psc_device::mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	via_sync();
 
 	if (ACCESSING_BITS_0_7)
+	{
 		m_via1->write(offset, data & 0xff);
+	}
 	if (ACCESSING_BITS_8_15)
+	{
 		m_via1->write(offset, (data >> 8) & 0xff);
+	}
 }
 
 void psc_device::via_sync()
@@ -819,7 +933,9 @@ void psc_device::recalc_dma_irqs()
 			{
 				m_dma_control[dma] |= CTRL_CIRQ;
 				if (m_dma_control[dma] & CTRL_CIE)
+				{
 					m_dma_irqstat |= 0x80000000U >> dma;
+				}
 			}
 		}
 	}
@@ -924,14 +1040,26 @@ u32 psc_device::psc_regs_r(offs_t offset)
 		case 0x164:
 			return m_l6ier << 24;
 
-		case 0x20c:
-			if (m_audio_out_offset >= m_audio_out_length)
-			{
-				return 0;
-			}
+		case 0x200:
+			return u32(m_snd_com) << 16;
 
-//          printf("Ofs %08x ret %08x\n", m_audio_out_offset, (m_audio_out_offset >> 2) << 11);
-			return (m_audio_out_offset >> 2) << 11;
+		case 0x204:
+			return m_singer_ctl;
+
+		case 0x20c:
+			return snd_phase();
+
+		case 0x210:
+			return m_snd_in_base;
+
+		case 0x214:
+			return m_snd_out_base;
+
+		case 0x218:
+			return u32(m_snd_size) << 16;
+
+		case 0x21c:
+			return u32(m_dsp_overrun) << 24;
 
 		case 0x804:
 			return m_dma_irqstat;
@@ -948,7 +1076,9 @@ void psc_device::psc_regs_w(offs_t offset, u32 data, u32 mem_mask)
 	if ((offset << 2) >= 0x130 && (offset << 2) <= 0x164)
 	{
 		if (!ACCESSING_BITS_24_31)
+		{
 			return;
+		}
 		data >>= 24;
 	}
 
@@ -971,8 +1101,7 @@ void psc_device::psc_regs_w(offs_t offset, u32 data, u32 mem_mask)
 			break;
 
 		case 0x0140:
-			m_l4if &= ~1;
-			m_l4if |= data & 1;
+			m_l4if &= ~(data & LV4_SNDSTAT);
 			recalc_lv4();
 			break;
 
@@ -989,8 +1118,7 @@ void psc_device::psc_regs_w(offs_t offset, u32 data, u32 mem_mask)
 			break;
 
 		case 0x0150:
-			m_l5if &= ~1;
-			m_l5if |= data & 1;
+			m_l5if &= ~(data & LV5_DSPIRQ);
 			recalc_lv5();
 			break;
 
@@ -1006,10 +1134,8 @@ void psc_device::psc_regs_w(offs_t offset, u32 data, u32 mem_mask)
 			recalc_lv5();
 			break;
 
-		// Level 6 interrupt flag - only bit 1 is writable
 		case 0x0160:
-			m_l6if &= ~1;
-			m_l6if |= data & 1;
+			m_l6if &= ~(data & LV6_60HZ);
 			recalc_lv6();
 			break;
 
@@ -1025,75 +1151,257 @@ void psc_device::psc_regs_w(offs_t offset, u32 data, u32 mem_mask)
 			recalc_lv6();
 			break;
 
-		case 0x0200:
-		{
-			data >>= 16;
+		case 0x0200:    // sndComCtl
+			if (ACCESSING_BITS_16_31)
+			{
+				const u16 old = m_snd_com;
+				m_snd_com = data >> 16;
 
-			if (BIT(data, 8))
-			{   // start audio out DMA
-				u8 rate = (data >> 9) & 3;
-				int hz = 0;
-				switch (rate)
+				if ((old ^ m_snd_com) & (SNDCOM_FRMIE | SNDCOM_INEN | SNDCOM_OUTEN))
 				{
-					case 0:
-						hz = 24000;
-						break;
-
-					case 1:
-						hz = 22050;
-						break;
-
-					case 2:
-						hz = 48000;
-						break;
-
-					case 3:
-						hz = 44100;
-						break;
+					LOGMASKED(LOG_SND, "%s: sndComCtl %04x (frmie %d in %d out %d rate %d Hz)\n", machine().describe_context(),
+							m_snd_com, BIT(m_snd_com, 6), BIT(m_snd_com, 7), BIT(m_snd_com, 8), snd_rate());
 				}
 
-				printf("Starting audio DMA @ %d Hz\n", hz);
-				// force the first transfer to happen immediately
-				m_singer_timer->adjust(attotime::zero, 0, attotime::from_hz(hz));
-			}
-			else // stop audio out DMA
-			{
-				m_singer_timer->adjust(attotime::never);
-			}
-		}
-		break;
+				if (((m_snd_com >> 9) & 3) == 3 && ((old >> 9) & 3) != 3)
+				{
+					logerror("%s: illegal sound rate code 3 in sndComCtl %04x\n", machine().describe_context(), m_snd_com);
+				}
 
-		case 0x0214:    // address
-			m_audio_out_ptr = data;
-			m_audio_out_offset = 0;
+				if (!(m_snd_com & SNDCOM_OUTEN))
+				{
+					// output stops immediately
+					m_singer_timer->adjust(attotime::never);
+					m_out_head = m_out_tail = 0;
+					m_dac_l->write(0x8000);
+					m_dac_r->write(0x8000);
+				}
+			}
 			break;
 
-		case 0x0218: // count
-			m_audio_out_length = data >> 13;
-			//printf("length to %08x bytes\n", m_audio_out_length);
+		case 0x0204:    // singerCtl
+			COMBINE_DATA(&m_singer_ctl);
 			break;
 
-		case 0x021c: // DSPOVERRUN
-			//printf("DSPOVERRUN (%x): RESETEN %d DSPRESET %d\n", data, BIT(data, 1), BIT(data, 0));
-			if (!BIT(data, 31) && BIT(data, 24))
+		case 0x0210:    // sndInBase: quad-longword aligned
+			COMBINE_DATA(&m_snd_in_base);
+			m_snd_in_base &= ~0xfU;
+			break;
+
+		case 0x0214:    // sndOutBase: quad-longword aligned
+			COMBINE_DATA(&m_snd_out_base);
+			m_snd_out_base &= ~0xfU;
+			break;
+
+		case 0x0218:    // sndSize
+			if (ACCESSING_BITS_16_31)
 			{
-				// DSP enable
-				machine().debug_break();
+				m_snd_size = (data >> 16) & SNDSIZE_MASK;
+			}
+			break;
+
+		case 0x021c:    // DSPOVERRUN
+			if (ACCESSING_BITS_24_31)
+			{
+				dsp_overrun_w(data >> 24);
 			}
 			break;
 	}
 }
 
+//**************************************************************************
+//  SOUND ENGINE AND DSP INTERFACE
+//**************************************************************************
+
+u32 psc_device::snd_rate() const
+{
+	static constexpr u32 RATES[4] = { 24000, 32000, 48000, 48000 };
+	return RATES[(m_snd_com >> 9) & 3];
+}
+
+u32 psc_device::snd_size() const
+{
+	return std::max<u32>(m_snd_size, 4);
+}
+
+u32 psc_device::snd_phase() const
+{
+	const u64 sixty_fourths = machine().time().as_ticks(snd_rate() * 64);
+	const u32 offset = u32((sixty_fourths >> 6) % (2 * snd_size()));
+	return ((offset & 0xfff) << 6) | u32(sixty_fourths & 63);
+}
+
+void psc_device::arm_frame_timer()
+{
+	const u32 rate = snd_rate();
+	const u32 size = snd_size();
+	const attotime now = machine().time();
+	// half a sample in: a boundary computed from the timer's own time
+	// would otherwise round down into the frame just finished
+	const u64 frame = (now + attotime::from_ticks(1, rate * 2)).as_ticks(rate) / size;
+	const attotime next = attotime::from_ticks((frame + 1) * size, rate);
+	m_frame_timer->adjust(next > now ? next - now : attotime::from_usec(1));
+}
+
+// one codec sample: the next staged output sample to the DACs
 TIMER_CALLBACK_MEMBER(psc_device::singer_tick)
 {
-	const u16 l = m_maincpu->space(AS_PROGRAM).read_word(m_audio_out_ptr + m_audio_out_offset);
-	const u16 r = m_maincpu->space(AS_PROGRAM).read_word(m_audio_out_ptr + m_audio_out_offset + 2);
-	m_dac_l->write(l ^ 0x8000);
-	m_dac_r->write(r ^ 0x8000);
-	m_audio_out_offset += 4;
-
-	if (m_audio_out_offset > m_audio_out_length)
+	s16 l = 0, r = 0;
+	if (m_out_head != m_out_tail)
 	{
-		m_audio_out_offset = m_audio_out_length;
+		l = m_out_ring[m_out_head][0];
+		r = m_out_ring[m_out_head][1];
+		m_out_head = (m_out_head + 1) % OUT_RING_SIZE;
 	}
+	m_dac_l->write(u16(l) ^ 0x8000);
+	m_dac_r->write(u16(r) ^ 0x8000);
+}
+
+// a frame boundary: the half that just finished is serviced, and the
+// frame tick goes to the host and the DSP
+TIMER_CALLBACK_MEMBER(psc_device::frame_tick)
+{
+	const u32 rate = snd_rate();
+	const u32 size = snd_size();
+	const attotime now = machine().time();
+	const u64 frame = (now + attotime::from_ticks(1, rate * 2)).as_ticks(rate) / size;
+	const u32 half = u32((frame + 1) & 1);
+
+	if (m_snd_com & SNDCOM_OUTEN)
+	{
+		const u32 base = m_snd_out_base + half * size * 4;
+		const u32 gain_l = SINGER_ATTEN[(m_singer_ctl >> 8) & 15];
+		const u32 gain_r = SINGER_ATTEN[(m_singer_ctl >> 4) & 15];
+		const bool mute = (m_singer_ctl & SINGER_MUTE) || (m_dsp_overrun & OVRN_DSPRESET);
+
+		for (u32 i = 0; i < size; i++)
+		{
+			s16 l = 0, r = 0;
+			if (!mute)
+			{
+				// reads may address ROM: the chime plays PCM straight from it
+				l = s16(m_space->read_word(base + i * 4));
+				r = s16(m_space->read_word(base + i * 4 + 2));
+				l = s16((s32(l) * s32(gain_l)) >> 16);
+				r = s16((s32(r) * s32(gain_r)) >> 16);
+			}
+			const u32 next = (m_out_tail + 1) % OUT_RING_SIZE;
+			if (next == m_out_head)
+			{
+				break;                      // the DACs are behind: drop the rest
+			}
+			m_out_ring[m_out_tail][0] = l;
+			m_out_ring[m_out_tail][1] = r;
+			m_out_tail = next;
+		}
+		if (!m_singer_timer->enabled() || m_singer_timer->period() != attotime::from_hz(rate))
+		{
+			m_singer_timer->adjust(attotime::zero, 0, attotime::from_hz(rate));
+		}
+	}
+
+	if (m_snd_com & SNDCOM_INEN)
+	{
+		// no input source yet, so generate some low-level noise.
+		// returning all zeroes makes Apple's speech recognition crash.
+		const u32 base = m_snd_in_base + half * size * 4;
+		for (u32 i = 0; i < size * 2; i++)
+		{
+			u32 h = u32((m_in_samples * 2 + i) * 2654435761u);
+			h ^= h >> 13;
+			h *= 1274126177u;
+			h ^= h >> 16;
+			m_space->write_word(base + i * 2, u16(s16(h % 3) - 1));
+		}
+		m_in_samples += size;
+	}
+
+	if (m_snd_com & SNDCOM_FRMIE)
+	{
+		if (m_dsp && !m_dsp_held)
+		{
+			if (m_frame_irq)
+			{
+				// if the last frame IRQ wasn't acked, that's a frame overrun
+				LOGMASKED(LOG_DSP, "frame overrun at frame %d\n", frame);
+				m_dsp_overrun |= OVRN_FRMOVRN;
+				m_l5if |= LV5_FRMOVRNNIRQ;
+				recalc_lv5();
+			}
+			else
+			{
+				m_frame_irq = true;
+				m_dsp->set_input_line(DSP3210_IR1, ASSERT_LINE);
+			}
+		}
+		m_ifr |= 1 << IRQ_SNDFRMIRQ;
+		recalc_via2_irqs();
+	}
+
+	arm_frame_timer();
+}
+
+// DSPOVERRUN ($21C): bit 7 selects set or clear of bits 2:0
+void psc_device::dsp_overrun_w(u8 data)
+{
+	if (BIT(data, 7))
+	{
+		m_dsp_overrun |= data & 0x07;
+	}
+	else
+	{
+		m_dsp_overrun &= ~(data & 0x07);
+	}
+	LOGMASKED(LOG_DSP, "%s: DSPOVERRUN write %02x -> %02x\n", machine().describe_context(), data, m_dsp_overrun);
+
+	// FRMOVRN is a level on LVL5 bit 1, so it re-asserts until the host clears it here
+	m_l5if = (m_l5if & ~LV5_FRMOVRNNIRQ) | ((m_dsp_overrun & OVRN_FRMOVRN) ? LV5_FRMOVRNNIRQ : 0);
+	recalc_lv5();
+
+	// a write that addresses DSPRESET drives the DSP's reset
+	// FIXME: DSPRESETEN (bit 1) should gate RESTN, but it's never used by the Quadra AVs
+	if (BIT(data, 0) && m_dsp)
+	{
+		const bool hold = m_dsp_overrun & OVRN_DSPRESET;
+		if (hold != m_dsp_held)
+		{
+			LOGMASKED(LOG_DSP, "DSP %s\n", hold ? "held in reset" : "released: running from physical 0");
+			m_dsp_held = hold;
+			if (hold)
+			{
+				// a held DSP gets no frame interrupt, and its reset clears
+				// the BIO output register
+				m_dsp_bio = 0;
+				if (m_frame_irq)
+				{
+					m_frame_irq = false;
+					m_dsp->set_input_line(DSP3210_IR1, CLEAR_LINE);
+				}
+			}
+			m_dsp->set_input_line(INPUT_LINE_RESET, hold ? ASSERT_LINE : CLEAR_LINE);
+		}
+	}
+}
+
+// the DSP's IACK1: a rising edge acknowledges the frame interrupt
+void psc_device::dsp_iack1_w(int state)
+{
+	if (state && !m_dsp_iack1 && m_frame_irq)
+	{
+		m_frame_irq = false;
+		m_dsp->set_input_line(DSP3210_IR1, CLEAR_LINE);
+	}
+	m_dsp_iack1 = state;
+}
+
+// the DSP's BIO output register: a BIO0 transition is the doorbell
+void psc_device::dsp_bio_w(u8 data)
+{
+	if ((data ^ m_dsp_bio) & 1)
+	{
+		LOGMASKED(LOG_DSP, "doorbell (BIO0 -> %d)\n", data & 1);
+		m_l5if |= LV5_DSPIRQ;
+		recalc_lv5();
+	}
+	m_dsp_bio = data;
 }

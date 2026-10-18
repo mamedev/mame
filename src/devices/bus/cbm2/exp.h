@@ -42,22 +42,33 @@
 class cbm2_expansion_window
 {
 public:
-	cbm2_expansion_window(offs_t start) : m_space(nullptr), m_start(start) { }
+	cbm2_expansion_window(device_t &device, const char *name, offs_t start) : m_view(device, name), m_start(start) { }
 
-	void install_rom(offs_t start, offs_t end, void *baseptr) { m_space->install_rom(m_start + start, m_start + end, baseptr); }
-	void install_ram(offs_t start, offs_t end, void *baseptr) { m_space->install_ram(m_start + start, m_start + end, baseptr); }
+	void install_view(address_space_installer &program);
+
+	void install_rom(offs_t start, offs_t end, void *baseptr);
+	void install_ram(offs_t start, offs_t end, void *baseptr);
 
 	template <typename R> void install_read_handler(offs_t start, offs_t end, R &&rhandler)
-	{ m_space->install_read_handler(m_start + start, m_start + end, std::forward<R>(rhandler)); }
+	{
+		m_view[0].install_read_handler(m_start + start, m_start + end, std::forward<R>(rhandler));
+		m_view.select(0);
+	}
 	template <typename W> void install_write_handler(offs_t start, offs_t end, W &&whandler)
-	{ m_space->install_write_handler(m_start + start, m_start + end, std::forward<W>(whandler)); }
+	{
+		m_view[0].install_write_handler(m_start + start, m_start + end, std::forward<W>(whandler));
+		m_view.select(0);
+	}
 	template <typename R, typename W> void install_readwrite_handler(offs_t start, offs_t end, R &&rhandler, W &&whandler)
-	{ m_space->install_readwrite_handler(m_start + start, m_start + end, std::forward<R>(rhandler), std::forward<W>(whandler)); }
+	{
+		m_view[0].install_readwrite_handler(m_start + start, m_start + end, std::forward<R>(rhandler), std::forward<W>(whandler));
+		m_view.select(0);
+	}
 
 private:
 	friend class cbm2_expansion_slot_device;
 
-	address_space *m_space;
+	memory_view m_view;
 	offs_t const m_start;
 };
 
@@ -68,8 +79,7 @@ class device_cbm2_expansion_card_interface;
 
 class cbm2_expansion_slot_device : public device_t,
 									public device_single_card_slot_interface<device_cbm2_expansion_card_interface>,
-									public device_cartrom_image_interface,
-									public device_memory_interface
+									public device_cartrom_image_interface
 {
 public:
 	// construction/destruction
@@ -81,9 +91,9 @@ public:
 	}
 	cbm2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// computer interface
-	uint8_t read(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3);
-	void write(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3);
+	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }
+	uint8_t mirror_r(offs_t offset);
+	void mirror_w(offs_t offset, uint8_t data);
 
 	// cartridge interface
 	cbm2_expansion_window &bank1() { return m_bank1; }
@@ -95,9 +105,6 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
-
-	// device_memory_interface implementation
-	virtual space_config_vector memory_space_config() const override;
 
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;
@@ -111,18 +118,15 @@ protected:
 
 	uint8_t *alloc_region(const char *tag);
 
+	optional_address_space m_program;
 	device_cbm2_expansion_card_interface *m_card;
 
 private:
-	void cart_map(address_map &map) ATTR_COLD;
-
-	address_space_config const m_space_config;
+	void install_program_views(address_space_installer &program);
 
 	cbm2_expansion_window m_bank1;
 	cbm2_expansion_window m_bank2;
 	cbm2_expansion_window m_bank3;
-
-	uint8_t m_data;
 };
 
 

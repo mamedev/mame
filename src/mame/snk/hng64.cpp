@@ -675,6 +675,7 @@ LVS-DG2
 #include "cpu/mips/mips3.h"
 #include "cpu/z80/kl5c80a12.h"
 #include "cpu/z80/z80.h"
+#include "machine/com20020.h"
 #include "machine/nvram.h"
 
 #define LOG_COMRW           (1U << 1)
@@ -687,99 +688,144 @@ LVS-DG2
 #include "logmacro.h"
 
 
-// this is driven by a KL5C80A12CFP which is basically a super-charged Z80
-// MMU handling has been moved to the core; the rest is not implemented yet.
-
-// I believe this CPU is used for network only (the racing games) and not related to the I/O MCU
-
-/*
-0x6010: tests RAM at [3]8000
-
-*/
+// network CPU: two 16-bit mailboxes and the IDT7133 dual port RAM connect it to the MIPS
 
 void hng64_state::comm_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom().region("comm", 0);
 	map(0x20000, 0x3ffff).bankr(m_com_bank);
-	map(0x40000, 0x47fff).mirror(0xb8000).ram();
+	map(0x40000, 0x40fff).rw(FUNC(hng64_state::net_dpram_r), FUNC(hng64_state::net_dpram_w));
+	map(0x60000, 0x67fff).mirror(0x98000).ram();
 }
 
 void hng64_state::comm_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	/* Reserved for the KL5C80 internal hardware */
-//  map(0x00, 0x07).rw(FUNC(hng64_state::comm_mmu_r), FUNC(hng64_state::comm_mmu_w));
-//  map(0x08, 0x1f).noprw();              /* Reserved */
-//  map(0x20, 0x25).rw(hng64_state::));   /* Timer/Counter B */           /* hng64 writes here */
-//  map(0x27, 0x27).noprw();              /* Reserved */
-//  map(0x28, 0x2b).rw(hng64_state::)); /* Timer/Counter A */           /* hng64 writes here */
-//  map(0x2c, 0x2f).rw(hng64_state::)); /* Parallel port A */
-//  map(0x30, 0x33).rw(hng64_state::)); /* Parallel port B */
-//  map(0x34, 0x37).rw(hng64_state::)); /* Interrupt controller */      /* hng64 writes here */
-//  map(0x38, 0x39).rw(hng64_state::)); /* Serial port */               /* hng64 writes here */
-//  map(0x3a, 0x3b).rw(hng64_state::)); /* System control register */   /* hng64 writes here */
-//  map(0x3c, 0x3f).noprw();              /* Reserved */
-
-	/* General IO */
-//  map(0x40, 0x47).rw("ulanc", FUNC(com20020_device::read), FUNC(com20020_device::write));
-	map(0x50, 0x57).rw(FUNC(hng64_state::com_share_r), FUNC(hng64_state::com_share_w));
-	map(0x72, 0x72).w(FUNC(hng64_state::com_bank_w));
-//  map(0x73, 0x73).w(hng64_state::));            /* dunno yet */
-}
-
-
-void hng64_state::reset_net()
-{
-//  m_comm->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // reset the CPU and let 'er rip
-//  m_comm->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
+	map(0x40, 0x47).rw("arcnet", FUNC(com20020_device::read), FUNC(com20020_device::write));
+	map(0x50, 0x51).r(FUNC(hng64_state::net_data_r));
+	map(0x52, 0x53).w(FUNC(hng64_state::net_data_w));
+	map(0x54, 0x54).r(FUNC(hng64_state::net_status_r));
+	map(0x72, 0x72).w(FUNC(hng64_state::net_bank_w));
+	map(0x73, 0x73).nopw(); // unknown
+	map(0x80, 0x80).portr("NETWORK");
 }
 
 void hng64_state::hng64_network(machine_config &config)
 {
-	KL5C80A12(config, m_comm, HNG64_MASTER_CLOCK / 4);        /* KL5C80A12CFP - binary compatible with Z80. */
+	// FIXME: 40 MHz / 4 on the board; x4 makes up for the core's Z80 timings, but also speeds up the internal timers
+	KL5C80A12(config, m_comm, 40_MHz_XTAL);
 	m_comm->set_addrmap(AS_PROGRAM, &hng64_state::comm_map);
 	m_comm->set_addrmap(AS_IO, &hng64_state::comm_io_map);
+
+	COM20020(config, "arcnet"); // TODO: INT goes to an unknown KP69 IR line
 }
 
 
-u32 hng64_state::com_r(offs_t offset, u32 mem_mask)
+u16 hng64_state::com_dpram_r(offs_t offset, u16 mem_mask)
 {
 	if (!machine().side_effects_disabled())
-		LOGMASKED(LOG_COMRW, "com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_idt7133_dpram[offset]);
-	return m_idt7133_dpram[offset];
+	{
+		LOGMASKED(LOG_COMRW, "%s: com read  %08x = %04x & %04x\n", machine().describe_context(), 0xc0000000 + offset * 2, m_com_dpram[offset], mem_mask);
+	}
+	return m_com_dpram[offset];
 }
 
-void hng64_state::com_w(offs_t offset, u32 data, u32 mem_mask)
+void hng64_state::com_dpram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	LOGMASKED(LOG_COMRW, "com write (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, data);
-	COMBINE_DATA(&m_idt7133_dpram[offset]);
+	LOGMASKED(LOG_COMRW, "%s: com write %08x = %04x & %04x\n", machine().describe_context(), 0xc0000000 + offset * 2, data, mem_mask);
+	COMBINE_DATA(&m_com_dpram[offset]);
 }
 
-/* TODO: fully understand this */
-void hng64_state::com_share_mips_w(offs_t offset, u8 data)
+void hng64_state::com_data_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_com_shared[offset ^ 3] = data;
+	u16 value = m_mips_to_comm;
+	COMBINE_DATA(&value);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(hng64_state::com_data_sync), this), value);
 }
 
-u8 hng64_state::com_share_mips_r(offs_t offset)
+TIMER_CALLBACK_MEMBER(hng64_state::com_data_sync)
 {
-	return m_com_shared[offset];
+	m_mips_to_comm = param;
+	m_mips_to_comm_full = true;
 }
 
-void hng64_state::com_share_w(offs_t offset, u8 data)
+u16 hng64_state::com_data_r()
 {
-	m_com_shared[offset] = data;
+	if (!machine().side_effects_disabled())
+	{
+		m_comm_to_mips_full = false;
+	}
+	return m_comm_to_mips;
 }
 
-u8 hng64_state::com_share_r(offs_t offset)
+u8 hng64_state::com_status_r()
 {
-	if (offset == 4)
-		return m_com_shared[offset] | 1; // some busy flag?
-
-	return m_com_shared[offset];
+	// FIXME: stands in for uncached access wait states; without it the BIOS times out the network RAM test
+	if (!machine().side_effects_disabled())
+	{
+		m_maincpu->spin_until_time(attotime::from_usec(2));
+	}
+	return (m_comm_to_mips_full ? 0x02 : 0x00) | (m_mips_to_comm_full ? 0x00 : 0x01);
 }
 
-void hng64_state::com_bank_w(u8 data)
+void hng64_state::com_control_w(u8 data)
+{
+	m_com_irq_enable = BIT(data, 1);
+	if (m_com_irq_enable && m_comm_to_mips_full)
+	{
+		set_irq(0x0800);
+	}
+}
+
+void hng64_state::com_reset_w(u8 data)
+{
+	m_comm->set_input_line(INPUT_LINE_RESET, BIT(data, 1) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+// the network CPU sees the dual port RAM as little-endian bytes
+u8 hng64_state::net_dpram_r(offs_t offset)
+{
+	return m_com_dpram[offset >> 1] >> (BIT(offset, 0) * 8);
+}
+
+void hng64_state::net_dpram_w(offs_t offset, u8 data)
+{
+	const int shift = BIT(offset, 0) * 8;
+	m_com_dpram[offset >> 1] = (m_com_dpram[offset >> 1] & ~(0xff << shift)) | (data << shift);
+}
+
+u8 hng64_state::net_data_r(offs_t offset)
+{
+	if (offset && !machine().side_effects_disabled())
+	{
+		m_mips_to_comm_full = false;
+	}
+	return m_mips_to_comm >> (offset * 8);
+}
+
+void hng64_state::net_data_w(offs_t offset, u8 data)
+{
+	if (!offset)
+	{
+		m_comm_to_mips = (m_comm_to_mips & 0xff00) | data;
+	}
+	else
+	{
+		m_comm_to_mips = (m_comm_to_mips & 0x00ff) | (data << 8);
+		m_comm_to_mips_full = true;
+		if (m_com_irq_enable)
+		{
+			set_irq(0x0800);
+		}
+	}
+}
+
+u8 hng64_state::net_status_r()
+{
+	return (m_mips_to_comm_full ? 0x01 : 0x00) | (m_comm_to_mips_full ? 0x00 : 0x02);
+}
+
+void hng64_state::net_bank_w(u8 data)
 {
 	m_com_bank->set_entry(data & 0x03);
 }
@@ -1244,9 +1290,12 @@ void hng64_state::main_map(address_map &map)
 	map(0x68000000, 0x6800000f).rw(FUNC(hng64_state::main_sound_comms_r), FUNC(hng64_state::main_sound_comms_w));
 	map(0x6f000000, 0x6f000003).w(FUNC(hng64_state::soundcpu_enable_w));
 
-	// Dualport RAM (shared with Communications CPU)
-	map(0xc0000000, 0xc0000fff).rw(FUNC(hng64_state::com_r), FUNC(hng64_state::com_w)).share("com_ram");
-	map(0xc0001000, 0xc0001007).ram().share(m_comhack);//.rw(FUNC(hng64_state::com_share_mips_r), FUNC(hng64_state::com_share_mips_w));
+	// network CPU dual port RAM and mailboxes
+	map(0xc0000000, 0xc0000fff).rw(FUNC(hng64_state::com_dpram_r), FUNC(hng64_state::com_dpram_w));
+	map(0xc0001000, 0xc0001003).umask32(0xffff'0000).w(FUNC(hng64_state::com_data_w));
+	map(0xc0001000, 0xc0001003).umask32(0x0000'ffff).r(FUNC(hng64_state::com_data_r));
+	map(0xc0001004, 0xc0001007).umask32(0x00ff'0000).rw(FUNC(hng64_state::com_status_r), FUNC(hng64_state::com_control_w));
+	map(0xc0001004, 0xc0001007).umask32(0x0000'00ff).w(FUNC(hng64_state::com_reset_w));
 }
 
 
@@ -1470,6 +1519,18 @@ static INPUT_PORTS_START( hng64 ) // base port, for debugging
 	PORT_START("AN5")
 	PORT_START("AN6")
 	PORT_START("AN7")
+
+	PORT_START("NETWORK")
+	PORT_CONFNAME( 0x0f, 0x01, "Network ID" )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x03, "3" )
+	PORT_CONFSETTING(    0x04, "4" )
+	PORT_CONFSETTING(    0x05, "5" )
+	PORT_CONFSETTING(    0x06, "6" )
+	PORT_CONFSETTING(    0x07, "7" )
+	PORT_CONFSETTING(    0x08, "8" )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -1844,22 +1905,10 @@ void hng64_state::init_hng64_fght()
 	init_hng64();
 }
 
-void hng64_state::init_ss64()
-{
-	init_hng64_fght();
-	m_samsho64_3d_hack = true;
-}
-
 void hng64_state::init_hng64_drive()
 {
 	m_no_machine_error_code = 0x02;
 	init_hng64();
-}
-
-void hng64_state::init_roadedge()
-{
-	init_hng64_drive();
-	m_roadedge_3d_hack = true;
 }
 
 void hng64_state::init_hng64_shoot()
@@ -2138,7 +2187,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
 		case 224: set_irq(0x0001);  break; // lv 0 vblank irq
 //      case 32:  set_irq(0x0008);  break; // lv 2
 //      case 64:  set_irq(0x0008);  break; // lv 2
-		case 240: set_irq(0x0800);  break; // lv 11 network irq?
 
 		default:
 		{
@@ -2156,10 +2204,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
 
 void hng64_state::machine_start()
 {
-	/* 1 meg of virtual address space for the com cpu */
-	m_com_virtual_mem = std::make_unique<u8[]>(0x100000);
-	m_com_op_base = std::make_unique<u8[]>(0x10000);
-
 	m_soundram = std::make_unique<u16[]>(0x200000 / 2);
 	m_soundram2 = std::make_unique<u16[]>(0x200000 / 2);
 
@@ -2186,7 +2230,6 @@ void hng64_state::machine_start()
 	m_irq_pending = 0;
 
 	m_3dfifo_timer = timer_alloc(FUNC(hng64_state::_3dfifo_processed), this);
-	m_comhack_timer = timer_alloc(FUNC(hng64_state::comhack_callback), this);
 
 	m_com_bank->configure_entries(0, 4, memregion("comm")->base(), 0x20000);
 	m_com_bank->set_entry(0);
@@ -2194,8 +2237,6 @@ void hng64_state::machine_start()
 	init_sound();
 	init_io();
 
-	save_pointer(NAME(m_com_virtual_mem), 0x100000);
-	save_pointer(NAME(m_com_op_base), 0x10000);
 	save_pointer(NAME(m_soundram), 0x200000 / 2);
 	save_pointer(NAME(m_soundram2), 0x200000 / 2);
 
@@ -2235,23 +2276,13 @@ void hng64_state::machine_start()
 	save_item(NAME(m_raster_irq_pos));
 
 	save_item(NAME(m_texture_wrapsize_table));
-}
+	save_item(NAME(m_dl_upload));
 
-TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
-{
-	LOG("comhack_callback %04x\n\n", m_comhack[0]);
-
-	// different network IDs give different default colours for the cars in roadedge
-	u8 network_id = 0x01;
-
-	// this fixes the stuck scroller text in the xrally intro (largest pink text) but prevents the inputs from working.
-	// It's probably trying to sync the scroller with another unit? however the original machines can run as singles
-	// if you loop some of the pins on the network connector back, so maybe MAME is just confused about the mode it's
-	// running in.
-	// network_id |= 0x08;
-
-
-	m_comhack[0] = m_comhack[0] | network_id;
+	save_item(NAME(m_mips_to_comm));
+	save_item(NAME(m_comm_to_mips));
+	save_item(NAME(m_mips_to_comm_full));
+	save_item(NAME(m_comm_to_mips_full));
+	save_item(NAME(m_com_irq_enable));
 }
 
 
@@ -2260,11 +2291,11 @@ void hng64_state::machine_reset()
 	/* For simulate MCU stepping */
 	m_mcu_en = 0;
 
-	reset_net();
 	reset_sound();
 
-	// on real hardware, even with no network, it takes until the counter reaches about 37 (Xtreme Rally) to boot, this kicks in at around 7
-	m_comhack_timer->adjust(m_maincpu->cycles_to_attotime(400000000));
+	m_mips_to_comm_full = false;
+	m_comm_to_mips_full = false;
+	m_com_irq_enable = false;
 
 	// does the HW init these to anything?
 	m_fbcontrol[0] = 0x00;
@@ -3238,10 +3269,10 @@ ROM_END
 GAME( 1997, hng64,    0,     hng64_default, hng64,          hng64_state, init_hng64,       ROT0, "SNK",       "Hyper NeoGeo 64 BIOS", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT )
 
 /* Games */
-GAME( 1997, roadedge, hng64, hng64_drive,   hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK",       "Roads Edge / Round Trip RV (rev.B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )  /* 001 */
-GAME( 1997, sams64,   hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK",       "Samurai Shodown 64 / Samurai Spirits / Paewang Jeonseol 64", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* 002 */
+GAME( 1997, roadedge, hng64, hng64_drive,   hng64_drive,    hng64_state, init_hng64_drive, ROT0, "SNK",       "Roads Edge / Round Trip RV (rev.B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )  /* 001 */
+GAME( 1997, sams64,   hng64, hng64_fight,   hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK",       "Samurai Shodown 64 / Samurai Spirits / Paewang Jeonseol 64", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* 002 */
 GAME( 1998, xrally,   hng64, hng64_drive,   hng64_drive,    hng64_state, init_hng64_drive, ROT0, "SNK",       "Xtreme Rally / Off Beat Racer!", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )  /* 003 */
 GAME( 1998, bbust2,   hng64, hng64_shoot,   hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK / ADK", "Beast Busters: Second Nightmare", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  /* 004 */ // ADK credited in the ending sequence
-GAME( 1998, sams64_2, hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK",       "Samurai Shodown 64: Warriors Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* 005 */
+GAME( 1998, sams64_2, hng64, hng64_fight,   hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK",       "Samurai Shodown 64: Warriors Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* 005 */
 GAME( 1998, fatfurwa, hng64, hng64_fight,   hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK",       "Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition (rev.A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  /* 006 */
 GAME( 1999, buriki,   hng64, hng64_fight,   hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK",       "Buriki One: World Grapple Tournament '99 in Tokyo (rev.B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  /* 007 */

@@ -21,6 +21,8 @@
 
 #include "emu.h"
 
+#include "mahjong.h"
+
 #include "cpu/z80/mc8123.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
@@ -46,67 +48,86 @@ public:
 	chinsan_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_video_ram(*this, "video_ram"), m_color_ram(*this, "color_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_adpcm(*this, "adpcm"),
-		m_inputs_p1(*this, "p1_%u", 0U),
-		m_inputs_p2(*this, "p2_%u", 0U),
-		m_bank1(*this, "bank1"), m_bank0d(*this, "bank0d"), m_bank1d(*this, "bank1d"),
-		m_tilemap(nullptr),
-		m_int_enabled(false),
-		m_port_select(0xff),
-		m_adpcm_pos(0), m_adpcm_idle(1), m_adpcm_data(0), m_trigger(0)
+		m_video_ram(*this, "video_ram"),
+		m_color_ram(*this, "color_ram"),
+		m_rombank(*this, "rombank"),
+		m_inputs{ { *this, "KEY%u", 0U }, { *this, "KEY%u", 5U } }
 	{ }
 
-	void init_chinsan();
+	void mayumi(machine_config &config) ATTR_COLD;
 
-	void chinsan(machine_config &config);
-	void mayumi(machine_config &config);
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	required_device<z80_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_shared_ptr<uint8_t> m_color_ram;
+	required_memory_bank m_rombank;
+
+	required_ioport_array<5> m_inputs[2];
+
+	void chinsan_map(address_map &map) ATTR_COLD;
+	INTERRUPT_GEN_MEMBER(vblank_int);
+
+	tilemap_t *m_tilemap = nullptr;
+
+	bool m_int_enabled = false;
+	uint8_t m_port_select = 0xff;
+
+private:
+	void input_select_w(uint8_t data);
+	template <uint8_t Which> uint8_t input_r();
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TILE_GET_INFO_MEMBER(tile_info);
+
+	void ctrl_w(uint8_t data);
+
+	void mayumi_io_map(address_map &map) ATTR_COLD;
+};
+
+class chinsan_adpcm_state : public chinsan_state
+{
+public:
+	chinsan_adpcm_state(const machine_config &mconfig, device_type type, const char *tag) :
+		chinsan_state(mconfig, type, tag),
+		m_adpcm(*this, "adpcm"),
+		m_opbank(*this, "opbank"),
+		m_adpcm_rom(*this, "adpcm"),
+		m_decrypted_opcodes(*this, "decrypted_opcodes", 0x18000, ENDIANNESS_LITTLE)
+	{ }
+
+	void init_chinsan() ATTR_COLD;
+
+	void chinsan(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<z80_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_video_ram;
-	required_shared_ptr<uint8_t> m_color_ram;
-	required_device<gfxdecode_device> m_gfxdecode;
-	optional_device<msm5205_device> m_adpcm;
-	required_ioport_array<5> m_inputs_p1;
-	required_ioport_array<5> m_inputs_p2;
-	required_memory_bank m_bank1;
-	optional_memory_bank m_bank0d;
-	optional_memory_bank m_bank1d;
+	required_device<msm5205_device> m_adpcm;
 
-	std::unique_ptr<uint8_t[]> m_decrypted_opcodes;
+	required_memory_bank m_opbank;
+	required_region_ptr<uint8_t> m_adpcm_rom;
+	memory_share_creator<uint8_t> m_decrypted_opcodes;
 
-	tilemap_t *m_tilemap;
-
-	bool m_int_enabled;
-	uint8_t m_port_select;
-	uint32_t m_adpcm_pos;
-	uint8_t m_adpcm_idle;
-	uint8_t m_adpcm_data;
-	uint8_t m_trigger;
-
-	void input_select_w(uint8_t data);
-	uint8_t input_p2_r();
-	uint8_t input_p1_r();
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TILE_GET_INFO_MEMBER(tile_info);
+	uint32_t m_adpcm_pos = 0;
+	uint8_t m_adpcm_idle = 1;
+	uint8_t m_adpcm_data = 0;
+	uint8_t m_trigger = 0;
 
 	void adpcm_w(uint8_t data);
 	void adpcm_int_w(int state);
 
-	INTERRUPT_GEN_MEMBER(vblank_int);
 	void ctrl_w(uint8_t data);
 
 	void chinsan_io_map(address_map &map) ATTR_COLD;
-	void chinsan_map(address_map &map) ATTR_COLD;
 	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
-	void mayumi_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -117,31 +138,31 @@ private:
 void chinsan_state::chinsan_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_rombank);
 	map(0xc000, 0xdfff).ram().share("nvram");
-	map(0xe000, 0xefff).ram().share("video_ram");
-	map(0xf000, 0xf7ff).ram().share("color_ram");
+	map(0xe000, 0xefff).ram().share(m_video_ram);
+	map(0xf000, 0xf7ff).ram().share(m_color_ram);
 }
 
-void chinsan_state::decrypted_opcodes_map(address_map &map)
+void chinsan_adpcm_state::decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0x7fff).bankr("bank0d");
-	map(0x8000, 0xbfff).bankr("bank1d");
+	map(0x0000, 0x7fff).bankr("opfixed");
+	map(0x8000, 0xbfff).bankr(m_opbank);
 }
 
-void chinsan_state::chinsan_io_map(address_map &map)
+void chinsan_adpcm_state::chinsan_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x10, 0x11).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0x20, 0x20).w(FUNC(chinsan_state::adpcm_w));
-	map(0x30, 0x30).w(FUNC(chinsan_state::ctrl_w));
+	map(0x20, 0x20).w(FUNC(chinsan_adpcm_state::adpcm_w));
+	map(0x30, 0x30).w(FUNC(chinsan_adpcm_state::ctrl_w));
 }
 
 void chinsan_state::mayumi_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x30, 0x30).portr("extra").w(FUNC(chinsan_state::ctrl_w));
+	map(0x30, 0x30).portr("EXTRA").w(FUNC(chinsan_state::ctrl_w));
 	map(0xc0, 0xc3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xd0, 0xd1).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 }
@@ -182,111 +203,51 @@ static INPUT_PORTS_START( chinsan )
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW-2:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW-2:8")
 
-	PORT_START("p1_0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_INCLUDE(mahjong_matrix_2p_ff)
+
+	PORT_MODIFY("KEY0")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("p1_1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_MODIFY("KEY1")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("p1_2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_MODIFY("KEY2")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("p1_3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_MODIFY("KEY3")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("p1_4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) // labeled ff in test mode, i assume this means flip flop
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("KEY4")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("p2_0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_M )   PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_I )   PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_E )   PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_A )   PORT_PLAYER(2)
+	PORT_MODIFY("KEY5")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("p2_1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_N )     PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_J )     PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_F )     PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_B )     PORT_PLAYER(2)
+	PORT_MODIFY("KEY6")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("p2_2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_K )   PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_G )   PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_C )   PORT_PLAYER(2)
+	PORT_MODIFY("KEY7")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("p2_3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_L )   PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_H )   PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_D )   PORT_PLAYER(2)
+	PORT_MODIFY("KEY8")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("p2_4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2) // labeled ff in test mode, i assume this means flip flop
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Statistics")
+	PORT_MODIFY("KEY9")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mayumi )
-	PORT_INCLUDE(chinsan)
-
-	PORT_MODIFY("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW-1:8")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW-1:7")
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Service_Mode )) PORT_DIPLOCATION("SW-1:6")
@@ -303,7 +264,7 @@ static INPUT_PORTS_START( mayumi )
 	PORT_DIPSETTING(   0x00, DEF_STR( On ))
 	PORT_DIPSETTING(   0x80, DEF_STR( Off ))
 
-	PORT_MODIFY("DSW2")
+	PORT_START("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW-2:8")
 	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW-2:7")
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW-2:6")
@@ -313,21 +274,57 @@ static INPUT_PORTS_START( mayumi )
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW-2:2")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW-2:1")
 
-	PORT_MODIFY("p1_4")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_MODIFY("p2_4")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("extra")
+	PORT_START("EXTRA")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW , IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE )  PORT_TOGGLE
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_TOGGLE PORT_NAME("Statistics")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK ) PORT_TOGGLE PORT_NAME("Statistics")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MEMORY_RESET )
+
+	PORT_INCLUDE(mahjong_matrix_2p)
+
+	PORT_MODIFY("KEY0")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("KEY1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("KEY2")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("KEY3")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("KEY4")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("KEY5")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("KEY6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("KEY7")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("KEY8")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("KEY9")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -343,32 +340,18 @@ void chinsan_state::input_select_w(uint8_t data)
 	m_port_select = data;
 }
 
-uint8_t chinsan_state::input_p1_r()
+template <uint8_t Which>
+uint8_t chinsan_state::input_r()
 {
 	uint8_t data = 0xff;
 
-	if (BIT(m_port_select, 0) == 0) data &= m_inputs_p1[0]->read();
-	if (BIT(m_port_select, 1) == 0) data &= m_inputs_p1[1]->read();
-	if (BIT(m_port_select, 2) == 0) data &= m_inputs_p1[2]->read();
-	if (BIT(m_port_select, 3) == 0) data &= m_inputs_p1[3]->read();
-	if (BIT(m_port_select, 4) == 0) data &= m_inputs_p1[4]->read();
+	for (int i = 0; i < 5; i++)
+		if (!BIT(m_port_select, i))
+			data &= m_inputs[Which][i]->read();
 
-	return data;
+	// mahjong matrix columns wired in "Nichibutsu order"
+	return bitswap<8>(data, 7, 6, 0, 1, 2, 3, 4, 5);
 }
-
-uint8_t chinsan_state::input_p2_r()
-{
-	uint8_t data = 0xff;
-
-	if (BIT(m_port_select, 0) == 0) data &= m_inputs_p2[0]->read();
-	if (BIT(m_port_select, 1) == 0) data &= m_inputs_p2[1]->read();
-	if (BIT(m_port_select, 2) == 0) data &= m_inputs_p2[2]->read();
-	if (BIT(m_port_select, 3) == 0) data &= m_inputs_p2[3]->read();
-	if (BIT(m_port_select, 4) == 0) data &= m_inputs_p2[4]->read();
-
-	return data;
-}
-
 
 //**************************************************************************
 //  VIDEO EMULATION
@@ -393,11 +376,11 @@ GFXDECODE_END
 
 TILE_GET_INFO_MEMBER( chinsan_state::tile_info )
 {
-	uint16_t code = m_video_ram[tile_index] | (m_video_ram[tile_index + 0x800] << 8);
+	uint16_t const code = m_video_ram[tile_index] | (m_video_ram[tile_index + 0x800] << 8);
 
 	// 76543---  color
 	// -----210  unknown
-	uint8_t color = m_color_ram[tile_index] >> 3;
+	uint8_t const color = m_color_ram[tile_index] >> 3;
 
 	tileinfo.set(0, code, color, 0);
 }
@@ -407,14 +390,14 @@ TILE_GET_INFO_MEMBER( chinsan_state::tile_info )
 //  AUDIO
 //**************************************************************************
 
-void chinsan_state::adpcm_w(uint8_t data)
+void chinsan_adpcm_state::adpcm_w(uint8_t data)
 {
 	m_adpcm_pos = data << 8;
 	m_adpcm_idle = 0;
 	m_adpcm->reset_w(0);
 }
 
-void chinsan_state::adpcm_int_w(int state)
+void chinsan_adpcm_state::adpcm_int_w(int state)
 {
 	if (m_adpcm_pos >= 0x10000 || m_adpcm_idle)
 	{
@@ -424,15 +407,13 @@ void chinsan_state::adpcm_int_w(int state)
 	}
 	else
 	{
-		uint8_t *ROM = memregion("adpcm")->base();
-
-		m_adpcm_data = ((m_trigger ? (ROM[m_adpcm_pos] & 0x0f) : (ROM[m_adpcm_pos] & 0xf0) >> 4));
+		m_adpcm_data = ((m_trigger ? (m_adpcm_rom[m_adpcm_pos] & 0x0f) : (m_adpcm_rom[m_adpcm_pos] & 0xf0) >> 4));
 		m_adpcm->data_w(m_adpcm_data & 0xf);
 		m_trigger ^= 1;
 		if (m_trigger == 0)
 		{
 			m_adpcm_pos++;
-			if ((ROM[m_adpcm_pos] & 0xff) == 0x70)
+			if ((m_adpcm_rom[m_adpcm_pos] & 0xff) == 0x70)
 				m_adpcm_idle = 1;
 		}
 	}
@@ -443,7 +424,7 @@ void chinsan_state::adpcm_int_w(int state)
 //  MACHINE EMULATION
 //**************************************************************************
 
-INTERRUPT_GEN_MEMBER( chinsan_state::vblank_int )
+INTERRUPT_GEN_MEMBER(chinsan_state::vblank_int)
 {
 	if (m_int_enabled)
 		device.execute().set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
@@ -451,7 +432,7 @@ INTERRUPT_GEN_MEMBER( chinsan_state::vblank_int )
 
 void chinsan_state::ctrl_w(uint8_t data)
 {
-	// 76------  rom bank
+	// 76------  ROM bank
 	// --5432--  unknown
 	// ------1-  flip screen
 	// -------0  interrupt enable
@@ -459,33 +440,43 @@ void chinsan_state::ctrl_w(uint8_t data)
 	m_int_enabled = bool(BIT(data, 0));
 	flip_screen_set(BIT(data, 1));
 
-	if (m_bank1d.found())
-	{
-		int bank = (BIT(data, 7) << 1) | BIT(data, 6);
-		m_bank1->set_entry(bank);
-		m_bank1d->set_entry(bank);
-	}
-	else
-	{
-		// bank bits have switched for mayumi
-		int bank = (BIT(data, 6) << 1) | BIT(data, 7);
-		m_bank1->set_entry(bank);
-	}
+	// bank bits have switched for mayumi
+	int const bank = bitswap<2>(data, 6, 7);
+	m_rombank->set_entry(bank);
+}
+
+void chinsan_adpcm_state::ctrl_w(uint8_t data)
+{
+	// 76------  ROM bank
+	// --5432--  unknown
+	// ------1-  flip screen
+	// -------0  interrupt enable
+
+	m_int_enabled = bool(BIT(data, 0));
+	flip_screen_set(BIT(data, 1));
+
+	int const bank = bitswap<2>(data, 7, 6);
+	m_rombank->set_entry(bank);
+	m_opbank->set_entry(bank);
 }
 
 void chinsan_state::machine_start()
 {
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chinsan_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	m_bank1->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x4000);
-
-	if (m_bank0d.found())
-		m_bank0d->set_base(m_decrypted_opcodes.get());
-	if (m_bank1d.found())
-		m_bank1d->configure_entries(0, 4, m_decrypted_opcodes.get() + 0x8000, 0x4000);
+	m_rombank->configure_entries(0, 4, memregion("maincpu")->base() + 0x8000, 0x4000);
 
 	save_item(NAME(m_int_enabled));
 	save_item(NAME(m_port_select));
+}
+
+void chinsan_adpcm_state::machine_start()
+{
+	chinsan_state::machine_start();
+
+	membank("opfixed")->set_base(&m_decrypted_opcodes[0]);
+	m_opbank->configure_entries(0, 4, &m_decrypted_opcodes[0x8000], 0x4000);
+
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_idle));
 	save_item(NAME(m_adpcm_data));
@@ -496,16 +487,21 @@ void chinsan_state::machine_reset()
 {
 	m_int_enabled = false;
 	m_port_select = 0xff;
+}
+
+void chinsan_adpcm_state::machine_reset()
+{
+	chinsan_state::machine_reset();
+
 	m_adpcm_pos = 0;
 	m_adpcm_idle = 1;
 	m_adpcm_data = 0;
 	m_trigger = 0;
 }
 
-void chinsan_state::init_chinsan()
+void chinsan_adpcm_state::init_chinsan()
 {
-	m_decrypted_opcodes = std::make_unique<uint8_t[]>(0x18000);
-	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), m_decrypted_opcodes.get(), 0x18000);
+	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), &m_decrypted_opcodes[0], 0x18000);
 }
 
 
@@ -513,21 +509,19 @@ void chinsan_state::init_chinsan()
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-// C1-00114-B
-void chinsan_state::chinsan(machine_config &config)
+void chinsan_state::mayumi(machine_config &config)
 {
-	MC8123(config, m_maincpu, XTAL(10'000'000)/2); // 317-5012
+	Z80(config, m_maincpu, XTAL(10'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &chinsan_state::chinsan_map);
-	m_maincpu->set_addrmap(AS_IO, &chinsan_state::chinsan_io_map);
-	m_maincpu->set_addrmap(AS_OPCODES, &chinsan_state::decrypted_opcodes_map);
+	m_maincpu->set_addrmap(AS_IO, &chinsan_state::mayumi_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(chinsan_state::vblank_int));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(chinsan_state::input_select_w));
-	ppi.in_pb_callback().set(FUNC(chinsan_state::input_p2_r));
-	ppi.in_pc_callback().set(FUNC(chinsan_state::input_p1_r));
+	ppi.in_pb_callback().set(FUNC(chinsan_state::input_r<1>));
+	ppi.in_pc_callback().set(FUNC(chinsan_state::input_r<0>));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen"));
@@ -551,25 +545,23 @@ void chinsan_state::chinsan(machine_config &config)
 	ymsnd.add_route(1, "mono", 0.15);
 	ymsnd.add_route(2, "mono", 0.15);
 	ymsnd.add_route(3, "mono", 0.10);
-
-	MSM5205(config, m_adpcm, XTAL(384'000));
-	m_adpcm->vck_legacy_callback().set(FUNC(chinsan_state::adpcm_int_w));
-	m_adpcm->set_prescaler_selector(msm5205_device::S64_4B); // 8kHz
-	m_adpcm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void chinsan_state::mayumi(machine_config &config)
+// C1-00114-B
+void chinsan_adpcm_state::chinsan(machine_config &config)
 {
-	chinsan(config);
+	mayumi(config);
 
-	// standard Z80 instead of MC-8123
-	Z80(config.replace(), m_maincpu, XTAL(10'000'000)/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &chinsan_state::chinsan_map);
-	m_maincpu->set_addrmap(AS_IO, &chinsan_state::mayumi_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(chinsan_state::vblank_int));
+	MC8123(config.replace(), m_maincpu, 10_MHz_XTAL / 2); // 317-5012
+	m_maincpu->set_addrmap(AS_PROGRAM, &chinsan_adpcm_state::chinsan_map);
+	m_maincpu->set_addrmap(AS_IO, &chinsan_adpcm_state::chinsan_io_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &chinsan_adpcm_state::decrypted_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(chinsan_adpcm_state::vblank_int));
 
-	// no ADPCM
-	config.device_remove("adpcm");
+	MSM5205(config, m_adpcm, XTAL(384'000));
+	m_adpcm->vck_legacy_callback().set(FUNC(chinsan_adpcm_state::adpcm_int_w));
+	m_adpcm->set_prescaler_selector(msm5205_device::S64_4B); // 8kHz
+	m_adpcm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 
@@ -578,12 +570,12 @@ void chinsan_state::mayumi(machine_config &config)
 //**************************************************************************
 
 ROM_START( chinsan )
-	ROM_REGION( 0x18000, "maincpu", 0 ) /* encrypted code / data */
+	ROM_REGION( 0x18000, "maincpu", 0 ) // encrypted code / data
 	ROM_LOAD( "mm00.7d", 0x00000, 0x08000, CRC(f7a4414f) SHA1(f65223b2928f610ab97fda2f2c008806cf2420e5) )
 	ROM_CONTINUE(        0x00000, 0x08000 ) // first half is blank
 	ROM_LOAD( "mm01.8d", 0x08000, 0x10000, CRC(c69ddbf5) SHA1(9533365c1761b113174d53a2e23ce6a7baca7dfe) )
 
-	ROM_REGION( 0x2000, "maincpu:key", 0 ) /* MC8123 key */
+	ROM_REGION( 0x2000, "maincpu:key", 0 ) // MC8123 key
 	ROM_LOAD( "317-5012.key",  0x0000, 0x2000, CRC(2ecfb132) SHA1(3110ef82080dd7d908cc6bf34c6643f187f90b29) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
@@ -591,7 +583,7 @@ ROM_START( chinsan )
 	ROM_LOAD( "mm21.8k", 0x10000, 0x10000, CRC(25f6c827) SHA1(add72a3cfa2f24105e36d0464c2db6a6bedd4139) )
 	ROM_LOAD( "mm20.7k", 0x20000, 0x10000, CRC(54efb409) SHA1(333adadd7f3dc3393dbe334303bae544b3d26c00) )
 
-	ROM_REGION( 0x10000, "adpcm", 0 ) /* M5205 samples */
+	ROM_REGION( 0x10000, "adpcm", 0 ) // M5205 samples
 	ROM_LOAD( "mm40.13d", 0x00000, 0x10000, CRC(a408b8f7) SHA1(60a2644922cb60c0a1a3409761c7e50924360313) )
 
 	ROM_REGION( 0x20, "user2", 0 )
@@ -626,6 +618,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT          ROT   COMPANY           FULLNAME                                         FLAGS
-GAME( 1987, chinsan, 0,      chinsan, chinsan, chinsan_state, init_chinsan, ROT0, "Sanritsu",       "Ganbare Chinsan Ooshoubu (MC-8123A, 317-5012)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mayumi,  0,      mayumi,  mayumi,  chinsan_state, empty_init,   ROT0, "Victory L.L.C.", "Kiki-Ippatsu Mayumi-chan",                      MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS                INIT          ROT   COMPANY           FULLNAME                                         FLAGS
+GAME( 1987, chinsan, 0,      chinsan, chinsan, chinsan_adpcm_state, init_chinsan, ROT0, "Sanritsu",       "Ganbare Chinsan Ooshoubu (MC-8123A, 317-5012)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mayumi,  0,      mayumi,  mayumi,  chinsan_state,       empty_init,   ROT0, "Victory L.L.C.", "Kiki-Ippatsu Mayumi-chan",                      MACHINE_SUPPORTS_SAVE )

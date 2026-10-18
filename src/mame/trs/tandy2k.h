@@ -66,7 +66,6 @@ public:
 		m_screen(*this, SCREEN_TAG),
 		m_colpal(*this, "colpal"),
 		m_vrambank(*this, "vrambank"),
-		m_timer_vidldsh(*this, "vidldsh"),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_speaker(*this, "speaker"),
 		m_ram(*this, RAM_TAG),
@@ -145,7 +144,6 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_colpal;
 	required_device<address_map_bank_device> m_vrambank;
-	required_device<timer_device> m_timer_vidldsh;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
@@ -195,6 +193,8 @@ public:
 	void drb_attr_w(uint8_t data);
 	int character_width() const { return m_clkcnt ? 8 : 10; }
 	void set_vidldsh_timer();
+	void vid_catch_up();
+	void colpal_w(offs_t offset, uint8_t data);
 	void kbdclk_w(int state);
 	void kbddat_w(int state);
 	uint8_t clkmouse_r(offs_t offset);
@@ -208,7 +208,7 @@ public:
 	void write_centronics_select(int state);
 	void write_centronics_fault(int state);
 	CRT9021_DRAW_CHARACTER_MEMBER( vac_draw_character );
-	TIMER_DEVICE_CALLBACK_MEMBER( vidldsh_tick );
+	void vidldsh_tick();
 	static void floppy_formats(format_registration &fr);
 	static rgb_t IRGB(uint32_t raw);
 
@@ -260,6 +260,10 @@ public:
 	bool m_frame = false;
 	int m_int = 0;
 	int m_col = 0;
+	uint8_t m_hchar = 0;
+	attotime m_vid_next;
+	attotime m_vid_period;
+	attotime m_vid_time;
 	int m_row = 0;
 	int m_scanline = 0;
 

@@ -97,14 +97,14 @@ void segas18_state::set_vdp_mixing(uint8_t mixing)
 void segas18_state::draw_vdp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	bitmap_ind8 &priority_bitmap = screen.priority();
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 	//  uint16_t *src = vdp->m_render_line; // can't use this because we're not in RGB32, which we'll need to be if there are palette effects
 	//  uint16_t *src2 = vdp->m_render_line_raw;
 
 		uint16_t *dst = &bitmap.pix(y);
 		uint8_t *pri = &priority_bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			if (m_vdp->m_render_line_raw[x] & 0x100)
 			{
@@ -229,12 +229,12 @@ uint32_t segas18_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			cliprect,
 			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
 			{
-				for (int y = rect.min_y; y <= rect.max_y; y++)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
 					uint16_t *const dest = &bitmap.pix(y);
 					uint16_t const *const src = &sprites.pix(y);
 					uint8_t *const pri = &screen.priority().pix(y);
-					for (int x = rect.min_x; x <= rect.max_x; x++)
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
 						// only process written pixels
 						uint16_t const pix = src[x];

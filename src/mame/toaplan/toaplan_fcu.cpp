@@ -206,7 +206,7 @@ void toaplan_fcu_device::draw_sprites_common(screen_device &screen, BitmapClass 
 			{
 				sx_base = visarea.width() - (sx_base + 8);  /* visarea.x = 320 */
 				sy_base = visarea.height() - (sy_base + 8); /* visarea.y = 240 */
-				sy_base += ((visarea.max_y + 1) - visarea.height()) * 2;    /* Horizontal games are offset so adjust by  + 0x20 */
+				sy_base += visarea.top() * 2;    /* Horizontal games are offset so adjust by  + 0x20 */
 			}
 
 			for (int dim_y = 0; dim_y < sprite_sizey; dim_y += 8)

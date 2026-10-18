@@ -18,7 +18,6 @@
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/input_merger.h"
-#include "machine/timer.h"
 #include "video/crt9007.h"
 #include "video/crt9212.h"
 
@@ -49,7 +48,6 @@ private:
 	required_device<crt9007_device> m_vpac;
 	required_device<crt9212_device> m_drb0;
 	required_device<crt9212_device> m_drb1;
-	required_device<timer_device> m_timer_vidldsh;
 	required_device<i8251_device> m_sio;
 	required_device<mm2_keyboard_device> m_kb;
 	required_device<ls259_device> m_ctrl;
@@ -61,13 +59,13 @@ private:
 
 	uint16_t vpac_r(offs_t offset, uint16_t mem_mask);
 	void vpac_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	void cpl_w(int state) { m_cpl = state; }
-	void blc_w(int state) { m_blc = state; }
-	void mode_w(int state) { m_mode = state; set_vidldsh_timer(); }
-	void modeg_w(int state) { m_modeg = state; set_vidldsh_timer(); }
+	void cpl_w(int state) { vidldsh_update(); m_cpl = state; }
+	void blc_w(int state) { vidldsh_update(); m_blc = state; }
+	void mode_w(int state) { vidldsh_update(); m_mode = state; set_vidldsh_timer(); }
+	void modeg_w(int state) { vidldsh_update(); m_modeg = state; set_vidldsh_timer(); }
 	void c70_50_w(int state) { m_c70_50 = state; }
-	void cru_w(int state) { m_cru = state; }
-	void crb_w(int state) { m_crb = state; }
+	void cru_w(int state) { vidldsh_update(); m_cru = state; }
+	void crb_w(int state) { vidldsh_update(); m_crb = state; }
 
 	uint8_t videoram_r(offs_t offset);
 	void vpac_vlt_w(int state);
@@ -82,9 +80,13 @@ private:
 	void drb_attr_w(uint8_t data);
 	void set_vidldsh_timer();
 	int character_width() const { return m_modeg ? 16 : 10; }
-	void draw_character(int x, int y);
+	void draw_character(int x, int y, const attotime &time);
+	void vidldsh_update();
+	void vidldsh_tick(const attotime &time);
 
-	TIMER_DEVICE_CALLBACK_MEMBER( vidldsh_tick );
+	TIMER_CALLBACK_MEMBER( line_tick );
+
+	emu_timer *m_line_timer;
 
 	u8 m_vidla;
 	u8 m_vidat;
@@ -100,10 +102,15 @@ private:
 	bool m_dout;
 	bool m_vs;
 	bool m_frame;
+	bool m_hold;
 	int m_cgra;
 	int m_col;
 	int m_row;
 	int m_scanline;
+	attotime m_char_time;
+	attotime m_char_period;
+	attotime m_line_start;
+	attotime m_line_end;
 
 	static constexpr rgb_t halflit() { return rgb_t(0x7f, 0x7f, 0x7f); }
 };

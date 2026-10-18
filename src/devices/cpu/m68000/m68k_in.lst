@@ -1699,14 +1699,12 @@ ebc0 ffc0 bfexts   l ADXWLdx    234fc:15
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -1765,14 +1763,12 @@ e9c0 ffc0 bfextu   l ADXWLdx    234fc:15
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -1845,8 +1841,8 @@ edc0 ffc0 bfffo    l ADXWLdx    234fc:28
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (local_offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(local_offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -1915,14 +1911,12 @@ efc0 ffc0 bfins    l ADXWL      234fc:17
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -3099,7 +3093,7 @@ f078 f1f8 cptrapcc l .          23:4
 	m_pc += 2;
 
 
-51c8 fff8 dbf      w .          0:12 7:14 1:10 2:6 34fc:4
+51c8 fff8 dbf      w .          0:12 7:14 1:10 23:6 4fc:4
 	u32* r_dst = &DY();
 	u32 res = MASK_OUT_ABOVE_16(*r_dst - 1);
 
@@ -7276,7 +7270,30 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 24fc:5 3:4
 		m68ki_exception_privilege_violation();
 	}
 
-4e73 ffff rte      l .          234fc:20p
+4e73 ffff rte      l .          c:14p
+	if (m_s_flag)
+	{
+		u32 const frame = m68ki_read_32(REG_A()[7]);
+		if ((frame >> 28) >= 4 && (frame >> 28) <= 7)
+		{
+			u32 const new_pc = m68ki_read_32(REG_A()[7] + 4);
+			REG_A()[7] += 8 + ((frame >> 28) & 3);
+			m68ki_jump(new_pc);
+			m68ki_set_sr(frame & 0xffff);
+			m_instr_mode = INSTRUCTION_YES;
+			m_run_mode = RUN_MODE_NORMAL;
+		}
+		else
+		{
+			m68ki_exception_format_error();
+		}
+	}
+	else
+	{
+		m68ki_exception_privilege_violation();
+	}
+
+4e73 ffff rte      l .          234f:20p
 	if(m_s_flag) {
 		u32 new_sr;
 		u32 new_pc;

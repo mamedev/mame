@@ -11,6 +11,8 @@ TODO:
 - Make AGP to install properly (bridge fault?);
 - 3d rendering;
 - MPEG acceleration for DVD;
+- Win2k driver for this is "SiS 5598/SiS 6326", which implies the integrated chipset uses this
+  exact variant;
 
 **************************************************************************************************/
 

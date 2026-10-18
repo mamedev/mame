@@ -123,13 +123,14 @@ uint32_t flashvga2_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 		m_palette->set_pen_color(i, pal5bit(r), pal6bit(g), pal5bit(b));
 	}
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		const u32 base_address = y * 640;
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			const u8 pen = vram[base_address + x];
-			bitmap.pix(y, x) = m_palette->pen(pen);
+			dst[x] = m_palette->pen(pen);
 		}
 	}
 

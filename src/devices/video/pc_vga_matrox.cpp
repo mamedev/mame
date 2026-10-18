@@ -4,6 +4,7 @@
 #include "emu.h"
 #include "pc_vga_matrox.h"
 
+//#include "input.h"
 #define DEBUG_VRAM_VIEWER 0
 
 DEFINE_DEVICE_TYPE(MATROX_VGA,  matrox_vga_device,  "matrox_vga",  "Matrox MGA2064W VGA i/f")

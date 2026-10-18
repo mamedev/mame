@@ -179,8 +179,7 @@ void mrflea_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	const uint8_t *finish = source + 0x100;
 	rectangle clip = m_screen->visible_area();
 
-	clip.max_x -= 24;
-	clip.min_x += 16;
+	clip.insetx(16, 24);
 
 	while (source < finish)
 	{
@@ -189,15 +188,15 @@ void mrflea_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int const tile_number = source[2] + source[3] * 0x100;
 
 		gfx->transpen(bitmap, clip,
-			tile_number,
-			0, // color
-			0, 0, // no flip
-			xpos, ypos, 0);
+				tile_number,
+				0, // color
+				0, 0, // no flip
+				xpos, ypos, 0);
 		gfx->transpen(bitmap, clip,
-			tile_number,
-			0, // color
-			0, 0, // no flip
-			xpos, 256 + ypos, 0);
+				tile_number,
+				0, // color
+				0, 0, // no flip
+				xpos, 256 + ypos, 0);
 		source += 4;
 	}
 }

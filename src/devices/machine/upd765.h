@@ -231,7 +231,7 @@ protected:
 
 	static constexpr int rates[4] = { 500000, 300000, 250000, 1000000 };
 
-	bool ready_connected, ready_polled, select_connected, select_multiplexed, ts_connected, has_dor;
+	bool ready_connected, ready_polled, select_connected, select_multiplexed, ts_connected, has_dor, has_base_mode;
 
 	bool external_ready;
 
@@ -244,7 +244,7 @@ protected:
 	devcb_write_line intrq_cb, drq_cb, hdl_cb, mtr0_cb, idx_cb;
 	devcb_read_line ts_cb;
 	devcb_write8 us_cb;
-	bool cur_irq, irq, drq, internal_drq, tc, tc_done, locked, mfm, scan_done;
+	bool cur_irq, irq, drq, internal_drq, tc, tc_done, locked, mfm, scan_done, base_mode_pending;
 	floppy_info flopi[4];
 
 	int fifo_pos, fifo_expected, command_pos, result_pos, sectors_read;
@@ -296,6 +296,7 @@ protected:
 	};
 
 	void end_reset();
+	void base_mode_access();
 
 	void delay_cycles(floppy_info &fi, int cycles);
 	void check_irq();

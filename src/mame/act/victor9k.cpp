@@ -657,8 +657,9 @@ void victor9k_state::hd_dma_w(offs_t offset, uint8_t data)
     highlighted pixels are controlled by brightness alone.
 
     Approximate the low-intensity level with the normalized resistor weights,
-    from black at CONT=0 to the highlighted level at CONT=7.  The monitor's
-    analogue transfer function is not modelled.  Unlit pixels remain black.
+    up to the highlighted level at CONT=7.  The monitor's analogue transfer
+    function is not modelled; brightness and contrast are mapped above fixed
+    floors instead.  Unlit pixels remain black.
 
 */
 
@@ -676,11 +677,13 @@ void victor9k_state::update_palette()
 			+ ((BIT(brt, 1) ? VOH : VOL) - VBE) / 39000.0
 			+ ((BIT(brt, 2) ? VOH : VOL) - VBE) / 20000.0;
 	};
-	double const brt = brt_current(m_brt) / brt_current(7);
+	constexpr double BRT_FLOOR = 0.5;
+	double const brt = BRT_FLOOR + (1.0 - BRT_FLOOR) * brt_current(m_brt) / brt_current(7);
 
 	// approximate low-intensity level relative to highlighted pixels
+	constexpr double CONT_FLOOR = 0.6;
 	constexpr double G = 1.0 / 620.0 + 1.0 / 332.0 + 1.0 / 162.0;
-	double const cont = (BIT(m_cont, 0) / 620.0
+	double const cont = CONT_FLOOR + (1.0 - CONT_FLOOR) * (BIT(m_cont, 0) / 620.0
 		+ BIT(m_cont, 1) / 332.0
 		+ BIT(m_cont, 2) / 162.0) / G;
 
@@ -886,6 +889,7 @@ void victor9k_state::victor9k(machine_config &config)
 	RAM(config, m_ram).set_default_size("128K").set_extra_options("128K,256K,512K,640K,768K,896K");
 
 	SOFTWARE_LIST(config, "flop_list").set_original("victor9k_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("victor9k_hdd");
 }
 
 
@@ -917,4 +921,4 @@ ROM_END
 //******************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                     FULLNAME       FLAGS
-COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, empty_init, "Victor Business Products", "Victor 9000", 0 )
+COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, empty_init, "Victor Business Products", "Victor 9000", MACHINE_SUPPORTS_SAVE )

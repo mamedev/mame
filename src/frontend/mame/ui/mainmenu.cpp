@@ -15,6 +15,7 @@
 #include "ui/audioeffects.h"
 #include "ui/audiomix.h"
 #include "ui/barcode.h"
+#include "ui/cdctrl.h"
 #include "ui/cheatopt.h"
 #include "ui/confswitch.h"
 #include "ui/datmenu.h"
@@ -56,6 +57,7 @@ enum : unsigned {
 	WARN_INFO,
 	IMAGE_MENU_FILE_MANAGER,
 	TAPE_CONTROL,
+	CD_CONTROL,
 	SLOT_DEVICES,
 	NETWORK_DEVICES,
 	AUDIO_MIXER,
@@ -140,6 +142,9 @@ void menu_main::populate()
 
 	if (cassette_device_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("menu-main", "Tape Control"), 0, (void *)TAPE_CONTROL);
+
+	if (cd_player_interface_enumerator(machine().root_device()).first() != nullptr)
+		item_append(_("menu-main", "CD Player Control"), 0, (void *)CD_CONTROL);
 
 	if (pty_interface_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("menu-main", "Pseudo Terminals"), 0, (void *)PTY_INFO);
@@ -252,6 +257,10 @@ bool menu_main::handle(event const *ev)
 
 		case TAPE_CONTROL:
 			menu::stack_push<menu_tape_control>(ui(), target(), nullptr);
+			break;
+
+		case CD_CONTROL:
+			menu::stack_push<menu_cd_control>(ui(), target(), nullptr);
 			break;
 
 		case PTY_INFO:

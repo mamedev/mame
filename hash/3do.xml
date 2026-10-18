@@ -207,11 +207,16 @@ Previews (sic) section contains a single FMV of BattleSport, works
 	<software name="cowcasn" supported="partial">
 		<description>Cowboy Casino (USA)</description>
 		<year>1994</year>
+		<!-- a.k.a. Intellimedia Sports -->
 		<publisher>IntelliPlay</publisher>
 		<notes><![CDATA[
 IntelliPlay logo at startup seems to need a transparency pen (btanb)
+Coin fill ending sometimes gets corrupt and just do one coin only in left column (verify)
+Reads [Clio] at $340'25e0 (undocumented N stack read?) and random registers during gameplay
 ]]></notes>
 		<info name="barcode" value="7 69139 84119 8"/>
+		<!-- "Programming Services by" -->
+		<info name="developer" value="Pixel Technologies"/>
 		<info name="serial" value="SCC-01-3DO"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">

@@ -18,6 +18,9 @@
     - investigate and fix audio routing:
       cabinet sports 2 front speakers + 1 subwoofer *per player side*,
       splitted and amplified thru an unknown middleman device.
+    - dot matrix disable hookup;
+    - has a random DSB2 bug where triggering service mode during attract
+      will erratically playback a song instead of muting output;
 
 ****************************************************************************/
 
@@ -181,13 +184,6 @@ class flashbeats_state : public driver_device
 	static constexpr int DMD_H = 16;
 	static constexpr int LANE_COUNT = 5;
 	static constexpr int LANE_LEN = 47;        // LEDs per lane (even bytes 0..92 of each 0x60 row at 0xa0c000)
-
-	// DMD framebuffer: sub 0x75ec copies shifting slices of the 0xa02800 staging
-	// canvas (itself filled by the sprite-blit at 0x749e) into 0xa00000, one row
-	// per DMD_PITCH bytes, dispatched by 0x7642(r5=0) from the scene handler's
-	// per-tick scroll loop.
-	static constexpr offs_t DMD_BASE  = 0xa00000;
-	static constexpr offs_t DMD_PITCH = 0x80;    // bytes/row = DMD_W * 2
 
 public:
 	flashbeats_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -362,10 +358,11 @@ void flashbeats_state::update_lanes()
 void flashbeats_state::update_dmd()
 {
 	auto const disp8 = util::big_endian_cast<uint8_t const>(m_dispram.target());
+	const u16 pitch = 0x80;
 
 	for (int y = 0; y < DMD_H; y++)
 		for (int x = 0; x < DMD_W; x++)
-			m_dmd[y * DMD_W + x] = disp8[(DMD_BASE + y * DMD_PITCH + x * 2) & 0xffff] & 0x0f;
+			m_dmd[y * DMD_W + x] = disp8[(y * pitch + x * 2) & 0xffff] & 0x0f;
 }
 
 // Polls display RAM on a fixed-rate timer. Both the DMD and the lanes are pure
@@ -432,6 +429,15 @@ uint8_t flashbeats_state::spectrum_mux_r()
 	return m_spectrum_mux;
 }
 
+// 1--- ---- unknown, always high
+// -x-- ---- unknown, written as 0xf0 during POST, low otherwise
+// --x- ---- high with dot matrix off in output test
+//           (note: becomes on again by cycling with service once)
+// ---x ---- demo sound source
+// ---1 ---- internal
+// ---0 ---- external
+// ---- x--- unknown, always high except at POST
+// ---- -xxx spectrum output select
 void flashbeats_state::spectrum_mux_w(uint8_t data)
 {
 	m_spectrum_mux = data;
@@ -582,48 +588,40 @@ void flashbeats_state::scsp_irq(offs_t offset, uint8_t data)
 	m_scspcpu->set_input_line(offset, data);
 }
 
-// Input mappings
-// 3 bits seem genuinely dead (scanner never reads them) and left PORT_BIT(..., IPT_UNUSED).
 static INPUT_PORTS_START( flashbeats )
+	// SW does a shrl.b rotxl.b when moving input reads to work RAM buffer at $ff'0010+,
+	// discarding bit 7. We reflect this with IPT_UNKNOWN, but they are clearly unused by this game.
+
 	// 315-5296 port A -- @0x400000.
 	PORT_START("IN_A")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Attack 1") PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Attack 2") PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Attack 1") PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Attack 2") PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 Attack 3") PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Attack 4") PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Attack 5") PORT_PLAYER(2)
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )  // dead lines (scanner never reads)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 Attack 4") PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Attack 5") PORT_PLAYER(2)
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	// 315-5296 port B -- @0x400002.
-	// bit 2 is the cabinet's TEST/diagnostics button (opens the ">Exit" test
-	// menu from attract, and doubles as select/confirm once inside it). Bit 3
-	// is the coin-door SERVICE button (credits up, and advances the test-menu
-	// cursor exactly what a Sega service switch does; it was mislabeled COIN1
-	// at first). Bits 0-1 are the real coin chutes 1/2. Bit 6 = start. Bits 4-5
-	// are Select1 (up) and Select2 (down); bit 7 is unknown (unconfirmed, not
-	// dead -- scanner does read it).
 	PORT_START("IN_B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW ) PORT_NAME("Test")  // TEST button (menu open/select)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service")  // SERVICE button (credit + menu advance)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Select 1 (Up)") PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Select 2 (Down)") PORT_PLAYER(1)
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Select 1 (Up)") PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Select 2 (Down)") PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unconfirmed, not a dead line
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	// 315-5296 port D -- @0x400006.
-	// Bits 0-4 quiet in attract - P2's 5 lane buttons (mirrors port A's P1 layout).
-	// Bit 7 is unknown (unconfirmed, not dead). Bits 5-6 are dead lines (scanner
-	// never reads them).
 	PORT_START("IN_D")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Attack 1") PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Attack 2") PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Attack 3") PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Attack 4") PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Attack 5") PORT_PLAYER(1)
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNUSED )  // dead lines (scanner never reads)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unconfirmed, not a dead line
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	// DIP SW1 on 315-5296 port G (read @boot, PC 0x622, active-low: ON = 0).
 	// Only the low nibble (sw1-4) is consumed; setting #N reads back as
@@ -651,19 +649,7 @@ static INPUT_PORTS_START( flashbeats )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
 
-	// DIP SW2 on 315-5296 port H (read @boot, PC 0x650-0x69e, active-low). The
-	// H8 inverts, masks each field and adds 1 -> credit counts 1-4. Bit 7 is
-	// cabinet-documented "ADVERTISE SOUND" (Japanese label: 内部/外部, "internal/
-	// external"). This is a sound-source selector, not a demo-sounds mute -
-	// confirmed by a full 24-bit input sweep during attract mode that found no
-	// input bit (DIP or otherwise) silences advertise sound.
-	// Traced the boot read itself (PC 0x69C-0x6A8): bit 7 does gate a conditional
-	// write, but its target (0xfff438) sits above the H8/3007's on-chip RAM
-	// ceiling (0xfff1f per the Hitachi H8/300H family memory map) and below the
-	// internal I/O register block (0xfff20+) -- i.e. unmapped space in the
-	// current emulation, so the write is a no-op here and has no observable
-	// effect either way. Left as the literal cabinet-documented labels rather
-	// than DEF_STR( Demo_Sounds ) pending further hardware RE.
+	// DIP SW2 on 315-5296 port H (read @boot, PC 0x650-0x69e, active-low).
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Credits To Start (1P)" )  PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "1" )
@@ -681,7 +667,9 @@ static INPUT_PORTS_START( flashbeats )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
-	PORT_DIPNAME( 0x80, 0x80, "Advertise Sound" )        PORT_DIPLOCATION("SW2:8")
+	// "ADVERTISE SOUND" (Japanese label: 内部/外部, "internal/external")
+	// TODO: understand the context of this as speaker standpoint.
+	PORT_DIPNAME( 0x80, 0x80, "Demo Sound Source" )        PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, "Internal" )
 	PORT_DIPSETTING(    0x00, "External" )
 INPUT_PORTS_END

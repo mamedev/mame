@@ -414,8 +414,8 @@ void rpunch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		const bool yflip = data1 & 0x0800;
 		const u32 color = ((data1 >> 13) & 7) | ((m_videoflags & 0x0040) >> 3);
 
-		if (x > cliprect.max_x) x -= 512;
-		if (y > cliprect.max_y) y -= 512;
+		if (x > cliprect.right()) x -= 512;
+		if (y > cliprect.bottom()) y -= 512;
 
 		m_gfxdecode->gfx(2)->prio_transpen(bitmap,cliprect,
 				code, color + (m_sprite_palette / 16), xflip, yflip, x + m_sprite_xoffs, y,
@@ -434,11 +434,11 @@ void rpunch_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const u32 colourbase = 512 + ((m_videoflags & 0x000f) << 4);
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u16 const *const src = &m_pixmap->pix(y & 0xff);
 		u16 *const dst = &bitmap.pix(y);
-		for(int x = cliprect.min_x / 4; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left() / 4; x <= cliprect.right(); x++)
 		{
 			const u16 pix = src[(x + 4) & 0x1ff];
 			if ((pix & 0xf) != 0xf)

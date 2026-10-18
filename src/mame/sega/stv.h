@@ -25,7 +25,6 @@ public:
 		m_cart3(*this, "stv_slot3"),
 		m_cart4(*this, "stv_slot4"),
 		m_rax(*this, "rax"),
-		m_protbank(*this, "protbank"),
 		m_eeprom(*this, "eeprom"),
 		m_cryptdevice(*this, "315_5881"),
 		m_5838crypt(*this, "315_5838"),
@@ -49,14 +48,16 @@ public:
 	void batmanfr(machine_config &config) ATTR_COLD;
 	void shienryu(machine_config &config) ATTR_COLD;
 	void stv_5838(machine_config &config) ATTR_COLD;
+	void stv_0229(machine_config &config) ATTR_COLD;
+	void stv_0230(machine_config &config) ATTR_COLD;
+	void stv_0231(machine_config &config) ATTR_COLD;
 	void stv_5881(machine_config &config) ATTR_COLD;
 	void stvcd(machine_config &config) ATTR_COLD;
 
 	void init_astrass() ATTR_COLD;
 	void init_batmanfr() ATTR_COLD;
 	void init_finlarch() ATTR_COLD;
-	void init_decathlt() ATTR_COLD;
-	void init_decathlt_nokey() ATTR_COLD;
+	void init_5838() ATTR_COLD;
 	void init_sanjeon() ATTR_COLD;
 	void init_puyosun() ATTR_COLD;
 	void init_winterht() ATTR_COLD;
@@ -141,12 +142,12 @@ private:
 	uint32_t m_abus_protenable = 0;
 	uint32_t m_abus_protkey = 0;
 
-	uint32_t decathlt_prot_r(offs_t offset, uint32_t mem_mask = ~0);
-	void sega5838_map(address_map &map) ATTR_COLD;
-	optional_memory_bank m_protbank;
-	bool m_newprotection_element; // debug helper only, doesn't need saving
-	int m_protbankval; // debug helper only, doesn't need saving
-	void decathlt_prot_srcaddr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	u8 m_5838_bank = 0;
+	u16 m_5838_control = 2;
+	u16 sega5838_source_r(offs_t offset);
+	u32 sega5838_r(unsigned bank, u32 mem_mask);
+	void sega5838_control_w(offs_t offset, u16 data, u16 mem_mask = 0xffff);
+	void sega5838_w(offs_t offset, u32 data, u32 mem_mask = ~0U);
 
 	uint32_t m_a_bus[4]{};
 
