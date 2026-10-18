@@ -64,7 +64,7 @@ void capella_device::map(address_map &map)
 	map(0x53000008, 0x5300000f).rw(FUNC(capella_device::ctrl_r), FUNC(capella_device::ctrl_w));
 	map(0x53000010, 0x53000017).rw(FUNC(capella_device::ctrl_b_r), FUNC(capella_device::ctrl_b_w));
 	map(0x53000018, 0x5300001f).rw(FUNC(capella_device::irq_ack_r), FUNC(capella_device::irq_ack_w));
-	map(0x53000020, 0x53000027).r(FUNC(capella_device::ipl_lines_r));
+	map(0x53000020, 0x53000027).r(FUNC(capella_device::ipl_lines_r)).nopw();
 }
 
 //-------------------------------------------------
