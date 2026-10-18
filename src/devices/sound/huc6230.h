@@ -5,13 +5,12 @@
 
 #pragma once
 
-#include "sound/okiadpcm.h"
 #include "sound/c6280.h"
 
 class huc6230_device : public device_t, public device_sound_interface
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::SOUND; } // Incorrect ADPCM
+	static constexpr feature_type imperfect_features() { return feature::SOUND; } // volume smoothing, anti-click, PSG/ADPCM balance unverified
 
 	huc6230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -32,16 +31,12 @@ protected:
 
 private:
 	struct adpcm_channel {
-		oki_adpcm_state m_adpcm;
+		int32_t         m_predictor;
+		int32_t         m_step_index;
+		int32_t         m_delta;
+		uint8_t         m_delta_count;
 		uint8_t         m_lvol;
 		uint8_t         m_rvol;
-		uint8_t         m_interpolate;
-		uint8_t         m_playing;
-		int32_t         m_prev_sample;
-		int32_t         m_curr_sample;
-		int32_t         m_output;
-		uint32_t        m_pos;
-		uint8_t         m_input;
 	};
 
 	// internal state
@@ -49,7 +44,8 @@ private:
 	emu_timer *m_adpcm_timer;
 	required_device<c6280_device> m_psg;
 	adpcm_channel m_adpcm_channel[2];
-	uint32_t m_adpcm_freq;
+	uint8_t m_adpcm_control;
+	float m_volume[0x40];
 	uint32_t m_pcm_lvol;
 	uint32_t m_pcm_rvol;
 

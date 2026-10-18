@@ -175,6 +175,8 @@ void huc6272_device::device_start()
 	save_item(NAME(m_adpcm.rate));
 	save_item(NAME(m_adpcm.status));
 	save_item(NAME(m_adpcm.interrupt));
+	save_item(NAME(m_adpcm.divider));
+	save_item(NAME(m_adpcm.tick));
 	for (int adpcm = 0; adpcm < 2; adpcm++)
 	{
 		save_item(NAME(m_adpcm.playing[adpcm]), adpcm);
@@ -182,9 +184,9 @@ void huc6272_device::device_start()
 		save_item(NAME(m_adpcm.start[adpcm]), adpcm);
 		save_item(NAME(m_adpcm.end[adpcm]), adpcm);
 		save_item(NAME(m_adpcm.imm[adpcm]), adpcm);
-		save_item(NAME(m_adpcm.input[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.halfword[adpcm]), adpcm);
+		save_item(NAME(m_adpcm.have_halfword[adpcm]), adpcm);
 		save_item(NAME(m_adpcm.nibble[adpcm]), adpcm);
-		save_item(NAME(m_adpcm.pos[adpcm]), adpcm);
 		save_item(NAME(m_adpcm.addr[adpcm]), adpcm);
 	}
 }
@@ -844,8 +846,8 @@ void huc6272_device::kram_write_data_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 /*
- * ---x ---- ---- ---- ADPCM page setting
- * ---- ---x ---- ---- RAINBOW page setting
+ * ---x ---- ---- ---- RAINBOW page setting
+ * ---- ---x ---- ---- ADPCM page setting
  * ---- ---- ---x ---- BG page setting
  * ---- ---- ---- ---x SCSI page setting
  */
@@ -1379,21 +1381,26 @@ void huc6272_device::render_bg_line(int raster, u32 *dest)
 	std::copy_n(&line[8], 256, dest);
 }
 
+/*
+ * ADPCM
+ * $50 ---- xx-- sample rate, a nibble every 2^n '6230 samples
+ *     ---- --xx channel 1/0 play (starting playback reloads the address)
+ * $51/$52 channel 0/1 buffer mode
+ *     ---- -x-- intermediate address interrupt enable
+ *     ---- --x- end address interrupt enable
+ *     ---- ---x ring buffer (restart from the start address at the end)
+ * $53 (R) status, channel 0 bits 1-0, channel 1 bits 3-2: intermediate, end reached
+ */
 void huc6272_device::adpcm_control_w(offs_t offset, u32 data, u32 mem_mask)
 {
+	if (!ACCESSING_BITS_0_15)
+		return;
+
 	for (int i = 0; i < 2; i++)
 	{
-		m_adpcm.playing[i] = BIT(data, i);
-		if (!m_adpcm.playing[i])
-		{
-			m_adpcm.input[i] = 0;
-			m_adpcm.pos[i] = 0;
-			m_adpcm.nibble[i] = 32;
-		}
-		else
-		{
+		if (!m_adpcm.playing[i] && BIT(data, i))
 			m_adpcm.addr[i] = m_adpcm.start[i];
-		}
+		m_adpcm.playing[i] = BIT(data, i);
 	}
 
 	m_adpcm.rate = (data & 0xc) >> 2;
@@ -1401,13 +1408,11 @@ void huc6272_device::adpcm_control_w(offs_t offset, u32 data, u32 mem_mask)
 
 void huc6272_device::adpcm_channel_control_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	const u8 channel = 1 - (offset & 1);
-	m_adpcm.control[channel] = data & 0x7;
-	if (BIT(m_adpcm.control[channel], 1) == 0)
-		m_adpcm.status &= ~(1 << (2 * channel));
+	if (!ACCESSING_BITS_0_15)
+		return;
 
-	if (BIT(m_adpcm.control[channel], 2) == 0)
-		m_adpcm.status &= ~(1 << (2 * channel + 1));
+	m_adpcm.control[offset & 1] = data & 0x7;
+	interrupt_update();
 }
 
 u32 huc6272_device::adpcm_status_r(offs_t offset)
@@ -1423,10 +1428,10 @@ u32 huc6272_device::adpcm_status_r(offs_t offset)
 	return res;
 }
 
-// TODO: verify mask ranges
+// start address in 256 word units, end address in words, intermediate address in 64 word units
 template <unsigned N> void huc6272_device::adpcm_start_address_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_adpcm.start[N] = (data * 256) & 0x3ffff;
+	m_adpcm.start[N] = (data & 0x3ff) * 256;
 }
 
 template <unsigned N> void huc6272_device::adpcm_end_address_w(offs_t offset, u32 data, u32 mem_mask)
@@ -1436,64 +1441,77 @@ template <unsigned N> void huc6272_device::adpcm_end_address_w(offs_t offset, u3
 
 template <unsigned N> void huc6272_device::adpcm_imm_address_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_adpcm.imm[N] = (data * 64) & 0x3ffff;
+	m_adpcm.imm[N] = (data & 0xfff) * 64;
 }
 
-// TODO: verify me
-// (interrupt_update fns are untested by the BIOS main menu)
-u8 huc6272_device::adpcm_update(int chan)
+// fetch the next word of ADPCM data and handle the end/intermediate addresses
+u16 huc6272_device::adpcm_fetch(int chan)
 {
-	if (!m_adpcm.playing[chan])
-		return 0;
+	const int page = BIT(m_page_setting, 8);
+	const u16 data = m_kram_page[page][m_adpcm.addr[chan] & 0x3ffff];
+	m_adpcm.addr[chan] = (m_adpcm.addr[chan] & 0x20000) | ((m_adpcm.addr[chan] + 1) & 0x1ffff);
 
-	const unsigned rate = (1 << m_adpcm.rate);
-	m_adpcm.pos[chan]++;
-	if (m_adpcm.pos[chan] >= rate)
+	const u32 end = (m_adpcm.end[chan] & 0x20000) | ((m_adpcm.end[chan] + 1) & 0x1ffff);
+	if (m_adpcm.addr[chan] == end)
 	{
-		m_adpcm.nibble[chan] += 4;
-		if (m_adpcm.nibble[chan] >= 32)
-			m_adpcm.nibble[chan] = 0;
+		if (BIT(m_adpcm.control[chan], 0))
+			m_adpcm.addr[chan] = m_adpcm.start[chan];
+		else
+			m_adpcm.playing[chan] = 0;
 
-		if (m_adpcm.nibble[chan] == 0)
+		m_adpcm.status |= 1 << (chan * 2);
+		if (BIT(m_adpcm.control[chan], 1))
 		{
-			const u32 offset = ((m_page_setting & 0x1000) << 6) | (m_adpcm.addr[chan] << 0);
-			m_adpcm.input[chan] = (space(AS_DATA).read_word(offset) << 0) | (space(AS_DATA).read_word(offset + 1)) << 16;
-			m_adpcm.addr[chan] = (m_adpcm.addr[chan] & 0x20000) | ((m_adpcm.addr[chan] + 2) & 0x1ffff);
-			if (m_adpcm.addr[chan] == m_adpcm.imm[chan])
-			{
-				m_adpcm.status |= (1 << (chan*2+1));
-				if (BIT(m_adpcm.control[chan], 2))
-				{
-					m_adpcm.interrupt = 1;
-					interrupt_update();
-				}
-			}
-			if (m_adpcm.addr[chan] > m_adpcm.end[chan])
-			{
-				m_adpcm.status |= (1 << (chan*2));
-				if (BIT(m_adpcm.control[chan], 1))
-				{
-					m_adpcm.interrupt = 1;
-					interrupt_update();
-				}
-
-				if (BIT(m_adpcm.control[chan], 0)) // Ring Buffer
-				{
-					m_adpcm.addr[chan] = m_adpcm.start[chan];
-				}
-				else
-				{
-					m_adpcm.playing[chan] = 0;
-					return 0;
-				}
-			}
-			//m_adpcm.nibble[chan] = 0;
+			m_adpcm.interrupt = 1;
+			interrupt_update();
 		}
-
-		m_adpcm.pos[chan] = 0;
+	}
+	else if (m_adpcm.addr[chan] == m_adpcm.imm[chan])
+	{
+		m_adpcm.status |= 1 << (chan * 2 + 1);
+		if (BIT(m_adpcm.control[chan], 2))
+		{
+			m_adpcm.interrupt = 1;
+			interrupt_update();
+		}
 	}
 
-	return (m_adpcm.input[chan] >> m_adpcm.nibble[chan]) & 0xf;
+	return data;
+}
+
+u8 huc6272_device::adpcm_update(int chan)
+{
+	// both channels share the rate divider
+	if (chan == 0)
+	{
+		m_adpcm.tick = 0;
+		if (--m_adpcm.divider <= 0)
+		{
+			m_adpcm.divider += 1 << m_adpcm.rate;
+			m_adpcm.tick = 1;
+		}
+	}
+
+	const u8 rate = m_adpcm.rate << 5;
+	if (!m_adpcm.tick)
+		return rate;
+
+	// the last word fetched keeps playing even if the channel was stopped
+	if (!m_adpcm.have_halfword[chan] && !m_adpcm.playing[chan])
+		return rate;
+
+	if (!m_adpcm.nibble[chan])
+	{
+		m_adpcm.halfword[chan] = adpcm_fetch(chan);
+		m_adpcm.have_halfword[chan] = 1;
+	}
+
+	const u8 data = (m_adpcm.halfword[chan] >> m_adpcm.nibble[chan]) & 0xf;
+	m_adpcm.nibble[chan] = (m_adpcm.nibble[chan] + 4) & 0xf;
+	if (!m_adpcm.nibble[chan])
+		m_adpcm.have_halfword[chan] = 0;
+
+	return 0x80 | rate | data;
 }
 
 u8 huc6272_device::adpcm_update_0()

@@ -26,7 +26,8 @@ public:
 
 	void amap(address_map &map) ATTR_COLD;
 
-	// ADPCM operations
+	// ADPCM operations, called at the '6230 sample rate:
+	// bit 7 = new nibble in bits 3-0, bits 6-5 = rate (nibble every 2^rate samples)
 	u8 adpcm_update_0();
 	u8 adpcm_update_1();
 
@@ -122,9 +123,11 @@ private:
 		u32 start[2]{};
 		u32 end[2]{};
 		u32 imm[2]{};
-		u32 input[2]{};
-		s32 nibble[2]{};
-		u32 pos[2]{};
+		u16 halfword[2]{};
+		u8 have_halfword[2]{};
+		u8 nibble[2]{};
+		s32 divider = 0;
+		u8 tick = 0;
 		u32 addr[2]{};
 	}m_adpcm;
 
@@ -145,6 +148,7 @@ private:
 	void write_microprg_data(offs_t address, u16 data);
 
 	u8 adpcm_update(int chan);
+	u16 adpcm_fetch(int chan);
 	void interrupt_update();
 
 	void io_map(address_map &map) ATTR_COLD;
