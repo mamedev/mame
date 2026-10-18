@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:Eduardo Cruz
 
 /***********************************************************************************************************************************
 
-Skeleton driver for Secoinsa Serie 20 minicomputer.
+Preliminary emulation of the Secoinsa Serie 20 minicomputer.
 
 Secoinsa (Sociedad Española de Comunicaciones e Informática, S.A.) was a company founded in 1975 by Fujitsu, the Spanish
 National Institute for Industry (Instituto Nacional de Industria, INI), Telefónica, and other investors (mainly banks).
@@ -16,13 +16,29 @@ Key features for Secoinsa Serie 20:
     -CPU: Z80B.
     -RAM: 80 Kbytes, expandable to 272 Kbytes.
     -Peripherals: Terminal interface, RS-232 serial port for printer, two sync/async communication channels.
-    -Screen: Green phosphor with 24 lines of 80 characters, with an option for NSP terminal with 12/25 lines of 69/80/132 characters.
+    -Terminal: Secoinsa IS 9502. Green phosphor with 24 lines of 80 characters, with an option for NSP terminal with 12/25 lines of 69/80/132 characters
     -Keyboard: QWERTY, 102 keys.
     -Mass storage: One or two 8" floppy disk drives of 640 Kbytes or 1.2 Mbytes. Winchester hard drives of 10 or 20 Mbytes.
-    -Operating System: OASIS.
-    -Programming languages: BASIC (interpreter and compiler), Spanish EXEC.
+    -Operating System: S.O. Multi-Usuario (OASIS based)
+    -Programming languages: BASIC (interpreter and compiler), EXEC (command-file interpreter).
 
-The dumped Secoinsa Serie 20 was found with the following PCBs:
+The dumps come from a Serie 20 Model 20/4 with a 5.25" floppy drive and a tape drive (models unknown).
+The storage options above come from the brochure, which also lists the 20/4 with a 16-bit processor,
+in conflict with this Z80B unit.
+
+TODO:
+    - Tape drive and controller (not emulated).
+    - Identify the floppy drive (and the earlier 8" options); verify media, density, drive selection,
+      motor and ready lines, and the SS2 DMA adapter wiring. Booting from floppy is untested.
+    - Secoinsa IS 9502 terminal: the default RS-232 terminal is an HLE stand-in until the terminal's
+      ROM and documentation are found (keyboard, character generator and display details).
+    - RAM decode (A19 and the common board; 16 KiB of the fitted 272 KiB isn't mapped), clock dividers,
+      interrupt sources and priority including the RTC, ALP flow control, SS2 clocks and modem lines,
+      ASI buffering and the optional interface configurations.
+    - The WD1001 is emulated at task file level: its 8X305 microcode isn't run, and track layouts,
+      bad block marks and error/retry/rotational timing aren't modelled.
+
+The dumped Secoinsa Serie 20 Model 20/4 was found with the following PCBs:
 
 PCB SECOINSA SM16B-0200-0170
      _______________________________________________________________
@@ -550,7 +566,25 @@ WESTERN DIGITAL MFM HDD CONTROLLER WD 100,1-05
 ***********************************************************************************************************************************/
 
 #include "emu.h"
+
+#include "secoinsa20_term.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
+#include "imagedev/harddriv.h"
+#include "machine/am9517a.h"
+#include "machine/mm58167.h"
+#include "machine/pit8253.h"
+#include "machine/scn_pci.h"
+#include "machine/upd765.h"
+#include "machine/wd1000.h"
+#include "machine/z80scc.h"
+
+#include "softlist_dev.h"
+
+#include <algorithm>
+#include <iterator>
 
 namespace {
 
@@ -560,6 +594,26 @@ public:
 	secoinsa20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_scc(*this, "scc%u", 0U)
+		, m_ss2_scc(*this, "ss2_scc")
+		, m_dma(*this, "dma%u", 0U)
+		, m_alp_ports(*this, "pan%u", 1U)
+		, m_ss2_ports(*this, "pan%u", 9U)
+		, m_printer_uart(*this, "printer_uart")
+		, m_printer_port(*this, "printerport")
+		, m_pit(*this, "pit")
+		, m_rtc(*this, "rtc")
+		, m_hdc(*this, "hdc")
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:%u", 0U)
+		, m_rom(*this, "maincpu")
+		, m_common_ram(*this, "common_ram", 0x4000, ENDIANNESS_LITTLE)
+		, m_bank_ram(*this, "bank_ram", 5 * 0xc000, ENDIANNESS_LITTLE)
+		, m_ram_bank(*this, "ram_bank")
+		, m_boot_view(*this, "boot_view")
+		, m_bank_view(*this, "bank_view")
+		, m_rom_view(*this, "rom_view")
+		, m_config(*this, "CONFIG")
 	{ }
 
 	void secoinsa20(machine_config &config);
@@ -568,27 +622,534 @@ private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	required_device<cpu_device> m_maincpu;
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void bank_w(u8 data);
+	void irq_w(unsigned level, int state);
+	void irq_mask_w(u8 data);
+	IRQ_CALLBACK_MEMBER(irq_ack);
+	void alp_irq_w(unsigned channel, int state);
+	void serial_ready_w(offs_t offset, u8 data);
+	void serial_rts_w(unsigned channel, int state);
+	void update_serial_rts();
+	void timer_w(int state);
+	void ss2_scc_irq_w(int state);
+	void dma_hrq_w(unsigned dma, int state);
+	void dma_busack_w(int state);
+	void dma_grant();
+	u8 *dma_ram(u8 page, offs_t offset);
+	u8 dma_memory_r(unsigned dma, offs_t offset);
+	void dma_memory_w(unsigned dma, offs_t offset, u8 data);
+	void fdc_data_w(u8 data);
+	u8 fdc_adapter_r();
+	void fdc_adapter_w(u8 data);
+	void fdc_drq_w(int state);
+	TIMER_CALLBACK_MEMBER(fdc_transfer);
+	u8 ss2_status_r();
+	void ss2_control_w(u8 data);
+
+	required_device<z80_device> m_maincpu;
+	required_device_array<scc8530_device, 2> m_scc;
+	required_device<scc8530_device> m_ss2_scc;
+	required_device_array<am9517a_device, 2> m_dma;
+	required_device_array<rs232_port_device, 4> m_alp_ports;
+	required_device_array<rs232_port_device, 2> m_ss2_ports;
+	required_device<scn2651_device> m_printer_uart;
+	required_device<rs232_port_device> m_printer_port;
+	required_device<pit8254_device> m_pit;
+	required_device<mm58167_device> m_rtc;
+	required_device<wd1000_device> m_hdc;
+	required_device<upd765a_device> m_fdc;
+	required_device_array<floppy_connector, 2> m_floppy;
+	required_region_ptr<u8> m_rom;
+	memory_share_creator<u8> m_common_ram;
+	memory_share_creator<u8> m_bank_ram;
+	memory_bank_creator m_ram_bank;
+	memory_view m_boot_view;
+	memory_view m_bank_view;
+	memory_view m_rom_view;
+	required_ioport m_config;
+
+	emu_timer *m_fdc_timer = nullptr;
+	u16 m_fdc_address = 0;
+	u8 m_fdc_page = 0;
+	u8 m_fdc_load = 0;
+	u8 m_fdc_command = 0;
+	bool m_fdc_drq = false;
+	u8 m_irq_pending = 0;
+	u8 m_irq_mask = 0xff;
+	u8 m_alp_irq = 0;
+	u8 m_serial_ready = 0x0f;
+	u8 m_serial_rts = 0x0f;
+	bool m_timer_irq = false;
+	bool m_ss2_scc_irq = false;
+	u8 m_dma_page[4]{};
+	u8 m_dma_channel[2]{};
+	u8 m_dma_hrq = 0;
+	bool m_dma_busack = false;
 };
 
 
-// Input ports
 static INPUT_PORTS_START( secoinsa20 )
+	PORT_START("CONFIG")
+	PORT_DIPNAME(0x01, 0x00, "Diagnostic language")
+	PORT_DIPSETTING(0x00, "Spanish")
+	PORT_DIPSETTING(0x01, "English")
+	PORT_DIPNAME(0x02, 0x02, "ASI test")
+	PORT_DIPSETTING(0x02, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x04, 0x00, "Hard disk test")
+	PORT_DIPSETTING(0x04, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
+	PORT_DIPNAME(0x08, 0x08, "Power-on diagnostics")
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
+	PORT_DIPSETTING(0x08, DEF_STR(On))
+	PORT_DIPUNKNOWN(0x10, 0x00)
+	PORT_DIPUNKNOWN(0x20, 0x00)
+	PORT_DIPUNKNOWN(0x40, 0x00)
+	PORT_DIPUNKNOWN(0x80, 0x00)
 INPUT_PORTS_END
+
+static DEVICE_INPUT_DEFAULTS_START(terminal)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_19200)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_19200)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_7)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
+DEVICE_INPUT_DEFAULTS_END
+
+static DEVICE_INPUT_DEFAULTS_START(null_modem)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_19200)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_19200)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_7)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
+	DEVICE_INPUT_DEFAULTS("FLOW_CONTROL", 0x07, 0x01)
+DEVICE_INPUT_DEFAULTS_END
+
+// as set up by the DIS22 printer driver
+static DEVICE_INPUT_DEFAULTS_START(printer)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_9600)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_ODD)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
+DEVICE_INPUT_DEFAULTS_END
+
+static void secoinsa20_terminals(device_slot_interface &device)
+{
+	default_rs232_devices(device);
+	device.option_add("secoinsa", SECOINSA20_TERMINAL);
+}
+
+void secoinsa20_state::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x3fff).ram().share(m_common_ram);
+	map(0x0000, 0x0fff).view(m_boot_view);
+	m_boot_view[0](0x0000, 0x0fff).rom().region(m_rom, 0);
+	map(0x4000, 0xffff).noprw();
+	map(0x4000, 0xffff).view(m_bank_view);
+	m_bank_view[0](0x4000, 0xffff).bankrw(m_ram_bank);
+	map(0x8000, 0x8fff).view(m_rom_view);
+	m_rom_view[0](0x8000, 0x8fff).rom().region(m_rom, 0);
+}
+
+void secoinsa20_state::bank_w(u8 data)
+{
+	m_boot_view.disable();
+
+	if ((data & 0x0f) < 5)
+	{
+		m_ram_bank->set_entry(data & 0x0f);
+		m_bank_view.select(0);
+	}
+	else
+	{
+		m_bank_view.disable();
+	}
+
+	if (BIT(data, 7))
+		m_rom_view.select(0);
+	else
+		m_rom_view.disable();
+}
+
+void secoinsa20_state::irq_w(unsigned level, int state)
+{
+	m_irq_pending = (m_irq_pending & ~(1U << level)) | ((state ? 1U : 0U) << level);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_irq_pending & ~m_irq_mask) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void secoinsa20_state::irq_mask_w(u8 data)
+{
+	m_irq_mask = data;
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_irq_pending & ~m_irq_mask) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+// the CPU board's LS148 priority encoder supplies RST opcodes for IM0
+IRQ_CALLBACK_MEMBER(secoinsa20_state::irq_ack)
+{
+	for (int level = 7; level > 0; --level)
+		if (BIT(m_irq_pending & ~m_irq_mask, level))
+			return 0xc7 | (level << 3);
+	return 0xff;
+}
+
+void secoinsa20_state::alp_irq_w(unsigned channel, int state)
+{
+	m_alp_irq = (m_alp_irq & ~(1U << channel)) | ((state ? 1U : 0U) << channel);
+	irq_w(5, m_alp_irq != 0);
+}
+
+// The terminal drivers (DIS18-21) clear these receive ready latches while their
+// input buffer is nearly full. How they combine with the SCC RTS isn't traced.
+void secoinsa20_state::serial_ready_w(offs_t offset, u8 data)
+{
+	m_serial_ready = (m_serial_ready & ~(1U << offset)) | (BIT(data, 0) << offset);
+	update_serial_rts();
+}
+
+void secoinsa20_state::serial_rts_w(unsigned channel, int state)
+{
+	m_serial_rts = (m_serial_rts & ~(1U << channel)) | ((state ? 1U : 0U) << channel);
+	update_serial_rts();
+}
+
+void secoinsa20_state::update_serial_rts()
+{
+	for (unsigned i = 0; i < 4; i++)
+		m_alp_ports[i]->write_rts(BIT(m_serial_rts, i) || !BIT(m_serial_ready, i));
+}
+
+void secoinsa20_state::dma_hrq_w(unsigned dma, int state)
+{
+	m_dma_hrq = (m_dma_hrq & ~(1U << dma)) | ((state ? 1U : 0U) << dma);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, (m_dma_hrq || m_fdc_drq) ? ASSERT_LINE : CLEAR_LINE);
+	dma_grant();
+}
+
+void secoinsa20_state::dma_busack_w(int state)
+{
+	m_dma_busack = state;
+	dma_grant();
+}
+
+void secoinsa20_state::dma_grant()
+{
+	// FIXME: priority between the two 8237s and the floppy adapter isn't traced
+	m_dma[0]->hack_w(m_dma_busack && BIT(m_dma_hrq, 0));
+	m_dma[1]->hack_w(m_dma_busack && !BIT(m_dma_hrq, 0) && BIT(m_dma_hrq, 1));
+	if (m_dma_busack && !m_dma_hrq && m_fdc_drq)
+	{
+		if (!m_fdc_timer->enabled() || m_fdc_timer->expire().is_never())
+			m_fdc_timer->adjust(m_maincpu->cycles_to_attotime(4));
+	}
+	else
+	{
+		m_fdc_timer->adjust(attotime::never);
+	}
+}
+
+u8 *secoinsa20_state::dma_ram(u8 page, offs_t offset)
+{
+	if (offset < 0x4000)
+		return &m_common_ram[offset];
+	unsigned const bank = page & 0x0f;
+	return (bank < 5) ? &m_bank_ram[(bank * 0xc000) + offset - 0x4000] : nullptr;
+}
+
+u8 secoinsa20_state::dma_memory_r(unsigned dma, offs_t offset)
+{
+	u8 const *const ram = dma_ram(m_dma_page[(dma * 2) + (m_dma_channel[dma] / 2)], offset);
+	return ram ? *ram : 0xff;
+}
+
+void secoinsa20_state::dma_memory_w(unsigned dma, offs_t offset, u8 data)
+{
+	u8 *const ram = dma_ram(m_dma_page[(dma * 2) + (m_dma_channel[dma] / 2)], offset);
+	if (ram)
+		*ram = data;
+}
+
+// SS2 floppy DMA adapter: LS461 counters loaded with the bank, then the address
+void secoinsa20_state::fdc_adapter_w(u8 data)
+{
+	switch (m_fdc_load)
+	{
+	case 0: m_fdc_page = data; break;
+	case 1: m_fdc_address = (m_fdc_address & 0x00ff) | (u16(data) << 8); break;
+	case 2: m_fdc_address = (m_fdc_address & 0xff00) | data; break;
+	}
+	m_fdc_load = (m_fdc_load + 1) % 3;
+}
+
+u8 secoinsa20_state::fdc_adapter_r()
+{
+	return m_fdc->get_irq() ? 0x80 : 0x00;
+}
+
+void secoinsa20_state::fdc_data_w(u8 data)
+{
+	// FIXME: the DMA direction signal isn't traced; bit 0 of the 765 command
+	// byte is set for write, scan and format commands
+	if ((m_fdc->msr_r() & 0x90) == 0x80)
+		m_fdc_command = data;
+	m_fdc->fifo_w(data);
+}
+
+void secoinsa20_state::fdc_drq_w(int state)
+{
+	m_fdc_drq = bool(state);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, (m_dma_hrq || m_fdc_drq) ? ASSERT_LINE : CLEAR_LINE);
+	dma_grant();
+}
+
+TIMER_CALLBACK_MEMBER(secoinsa20_state::fdc_transfer)
+{
+	if (!m_dma_busack || m_dma_hrq || !m_fdc_drq)
+		return;
+
+	u8 *const ram = dma_ram(m_fdc_page, m_fdc_address);
+	if (BIT(m_fdc_command, 0))
+	{
+		m_fdc->dma_w(ram ? *ram : 0xff);
+	}
+	else
+	{
+		u8 const data = m_fdc->dma_r();
+		if (ram)
+			*ram = data;
+	}
+	++m_fdc_address;
+	dma_grant();
+}
+
+void secoinsa20_state::timer_w(int state)
+{
+	if (state)
+	{
+		m_timer_irq = true;
+		irq_w(2, 1);
+	}
+}
+
+void secoinsa20_state::ss2_scc_irq_w(int state)
+{
+	m_ss2_scc_irq = bool(state);
+	irq_w(2, m_timer_irq || m_ss2_scc_irq);
+}
+
+u8 secoinsa20_state::ss2_status_r()
+{
+	// TODO: other sources (power, temperature) and their priority
+	return m_ss2_scc_irq ? 0xe0 : m_timer_irq ? 0xc0 : 0x00;
+}
+
+void secoinsa20_state::ss2_control_w(u8 data)
+{
+	if ((data & 0xe0) == 0xa0)
+	{
+		m_timer_irq = false;
+		irq_w(2, m_ss2_scc_irq);
+	}
+}
+
+void secoinsa20_state::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x000f).mirror(0xff00).rw(m_dma[0], FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x0010, 0x001f).mirror(0xff00).rw(m_dma[1], FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x0020, 0x0023).mirror(0xff00).lw8(NAME([this](offs_t offset, u8 data) { m_dma_page[offset] = data; }));
+	map(0x0024, 0x0027).mirror(0xff00).w(FUNC(secoinsa20_state::serial_ready_w));
+	map(0x002e, 0x002f).mirror(0xff00).lw8(NAME([this](offs_t offset, u8 data) { alp_irq_w(2 + offset, 0); }));
+	map(0x002c, 0x002c).mirror(0xff00).lr8(NAME([this]() -> u8 { return m_alp_irq; }));
+	map(0x0030, 0x0033).mirror(0xff00).rw(m_scc[0], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
+	map(0x0034, 0x0037).mirror(0xff00).rw(m_scc[1], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
+	map(0x0060, 0x0060).mirror(0xff00).rw(FUNC(secoinsa20_state::ss2_status_r), FUNC(secoinsa20_state::ss2_control_w));
+	map(0x0061, 0x0061).mirror(0xff00).portr(m_config);
+	map(0x0074, 0x0077).mirror(0xff00).rw(m_pit, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	map(0x0078, 0x007b).mirror(0xff00).rw(m_printer_uart, FUNC(scn2651_device::read), FUNC(scn2651_device::write));
+	map(0x007c, 0x007f).mirror(0xff00).rw(m_ss2_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
+	map(0x0080, 0x009f).mirror(0xff00).rw(m_rtc, FUNC(mm58167_device::read), FUNC(mm58167_device::write));
+	map(0x00b8, 0x00bf).mirror(0xff00).rw(m_hdc, FUNC(wd1000_device::read), FUNC(wd1000_device::write));
+	map(0x00c0, 0x00c0).mirror(0xff00).r(m_fdc, FUNC(upd765a_device::msr_r));
+	map(0x00c1, 0x00c1).mirror(0xff00).r(m_fdc, FUNC(upd765a_device::fifo_r)).w(FUNC(secoinsa20_state::fdc_data_w));
+	map(0x00c2, 0x00c2).mirror(0xff00).rw(FUNC(secoinsa20_state::fdc_adapter_r), FUNC(secoinsa20_state::fdc_adapter_w));
+	map(0x00fd, 0x00fd).mirror(0xff00).w(FUNC(secoinsa20_state::bank_w));
+	map(0x00fe, 0x00fe).mirror(0xff00).w(FUNC(secoinsa20_state::irq_mask_w));
+}
 
 
 void secoinsa20_state::machine_reset()
 {
+	bank_w(0x80);
+	m_boot_view.select(0);
+
+	m_serial_ready = 0x0f;
+	update_serial_rts();
+
+	// timer and DMA end-of-process latches
+	m_timer_irq = false;
+	irq_w(2, m_ss2_scc_irq);
+	m_alp_irq &= 0x03;
+	irq_w(5, m_alp_irq != 0);
+	irq_mask_w(0xff);
+
+	m_fdc_address = 0;
+	m_fdc_page = 0;
+	m_fdc_load = 0;
+	m_fdc_command = 0;
+	m_fdc_timer->adjust(attotime::never);
+	// no motor control has been found, so the motors are always on
+	for (auto &connector : m_floppy)
+	{
+		if (floppy_image_device *const floppy = connector->get_device())
+			floppy->mon_w(0);
+	}
+	std::fill(std::begin(m_dma_page), std::end(m_dma_page), 0);
 }
 
 void secoinsa20_state::machine_start()
 {
+	m_ram_bank->configure_entries(0, 5, m_bank_ram.target(), 0xc000);
+	m_fdc_timer = timer_alloc(FUNC(secoinsa20_state::fdc_transfer), this);
+	m_fdc->set_rate(500000);
+
+	save_item(NAME(m_irq_pending));
+	save_item(NAME(m_irq_mask));
+	save_item(NAME(m_alp_irq));
+	save_item(NAME(m_serial_ready));
+	save_item(NAME(m_serial_rts));
+	save_item(NAME(m_timer_irq));
+	save_item(NAME(m_ss2_scc_irq));
+	save_item(NAME(m_dma_page));
+	save_item(NAME(m_dma_channel));
+	save_item(NAME(m_dma_hrq));
+	save_item(NAME(m_dma_busack));
+	save_item(NAME(m_fdc_address));
+	save_item(NAME(m_fdc_page));
+	save_item(NAME(m_fdc_load));
+	save_item(NAME(m_fdc_command));
+	save_item(NAME(m_fdc_drq));
+}
+
+static void secoinsa20_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("525qd", FLOPPY_525_QD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
 }
 
 void secoinsa20_state::secoinsa20(machine_config &config)
 {
-	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(4'000'000));
+	Z80(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &secoinsa20_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &secoinsa20_state::io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(secoinsa20_state::irq_ack));
+	m_maincpu->busack_cb().set(FUNC(secoinsa20_state::dma_busack_w));
+
+	// ALP terminal board (SM16B-0200-0170)
+	for (unsigned i = 0; i < 2; i++)
+	{
+		AM9517A(config, m_dma[i], 4_MHz_XTAL);
+		m_dma[i]->dreq_active_low();
+		m_dma[i]->out_hreq_callback().set([this, i](int state) { dma_hrq_w(i, state); });
+		m_dma[i]->out_eop_callback().set([this, i](int state) { if (state) alp_irq_w(2 + i, 1); });
+		m_dma[i]->in_memr_callback().set([this, i](offs_t offset) { return dma_memory_r(i, offset); });
+		m_dma[i]->out_memw_callback().set([this, i](offs_t offset, u8 data) { dma_memory_w(i, offset, data); });
+		m_dma[i]->out_dack_callback<0>().set([this, i](int state) { if (!state) m_dma_channel[i] = 0; });
+		m_dma[i]->out_dack_callback<1>().set([this, i](int state) { if (!state) m_dma_channel[i] = 1; });
+		m_dma[i]->out_dack_callback<2>().set([this, i](int state) { if (!state) m_dma_channel[i] = 2; });
+		m_dma[i]->out_dack_callback<3>().set([this, i](int state) { if (!state) m_dma_channel[i] = 3; });
+		m_dma[i]->out_iow_callback<0>().set(m_scc[i], FUNC(z80scc_device::da_w));
+		m_dma[i]->in_ior_callback<1>().set(m_scc[i], FUNC(z80scc_device::da_r));
+		m_dma[i]->out_iow_callback<2>().set(m_scc[i], FUNC(z80scc_device::db_w));
+		m_dma[i]->in_ior_callback<3>().set(m_scc[i], FUNC(z80scc_device::db_r));
+
+		SCC8530(config, m_scc[i], 4_MHz_XTAL);
+		// RTxC (SS2 oscillator / 2) inferred from the terminal drivers' baud rate tables
+		m_scc[i]->configure_channels((4.9152_MHz_XTAL / 2).value(), 0, (4.9152_MHz_XTAL / 2).value(), 0);
+		m_scc[i]->out_int_callback().set([this, i](int state) { alp_irq_w(i, state); });
+		m_scc[i]->out_txda_callback().set(m_alp_ports[i * 2], FUNC(rs232_port_device::write_txd));
+		m_scc[i]->out_dtra_callback().set(m_dma[i], FUNC(am9517a_device::dreq0_w));
+		m_scc[i]->out_wreqa_callback().set(m_dma[i], FUNC(am9517a_device::dreq1_w));
+		m_scc[i]->out_rtsa_callback().set([this, i](int state) { serial_rts_w(i * 2, state); });
+		m_scc[i]->out_txdb_callback().set(m_alp_ports[i * 2 + 1], FUNC(rs232_port_device::write_txd));
+		m_scc[i]->out_dtrb_callback().set(m_dma[i], FUNC(am9517a_device::dreq2_w));
+		m_scc[i]->out_wreqb_callback().set(m_dma[i], FUNC(am9517a_device::dreq3_w));
+		m_scc[i]->out_rtsb_callback().set([this, i](int state) { serial_rts_w(i * 2 + 1, state); });
+
+		RS232_PORT(config, m_alp_ports[i * 2], secoinsa20_terminals, i ? nullptr : "secoinsa");
+		m_alp_ports[i * 2]->rxd_handler().set(m_scc[i], FUNC(z80scc_device::rxa_w));
+		m_alp_ports[i * 2]->cts_handler().set(m_scc[i], FUNC(z80scc_device::ctsa_w));
+		m_alp_ports[i * 2]->dcd_handler().set(m_scc[i], FUNC(z80scc_device::dcda_w));
+		RS232_PORT(config, m_alp_ports[i * 2 + 1], secoinsa20_terminals, nullptr);
+		m_alp_ports[i * 2 + 1]->rxd_handler().set(m_scc[i], FUNC(z80scc_device::rxb_w));
+		m_alp_ports[i * 2 + 1]->cts_handler().set(m_scc[i], FUNC(z80scc_device::ctsb_w));
+		m_alp_ports[i * 2 + 1]->dcd_handler().set(m_scc[i], FUNC(z80scc_device::dcdb_w));
+	}
+
+	// SS2 board (SM16B-0200-0140)
+	SCC8530(config, m_ss2_scc, 4_MHz_XTAL);
+	m_ss2_scc->configure_channels((4.9152_MHz_XTAL / 2).value(), 0, (4.9152_MHz_XTAL / 2).value(), 0);
+	m_ss2_scc->out_int_callback().set(FUNC(secoinsa20_state::ss2_scc_irq_w));
+	m_ss2_scc->out_txda_callback().set(m_ss2_ports[0], FUNC(rs232_port_device::write_txd));
+	m_ss2_scc->out_rtsa_callback().set(m_ss2_ports[0], FUNC(rs232_port_device::write_rts));
+	m_ss2_scc->out_dtra_callback().set(m_ss2_ports[0], FUNC(rs232_port_device::write_dtr));
+	m_ss2_scc->out_txdb_callback().set(m_ss2_ports[1], FUNC(rs232_port_device::write_txd));
+	m_ss2_scc->out_rtsb_callback().set(m_ss2_ports[1], FUNC(rs232_port_device::write_rts));
+	m_ss2_scc->out_dtrb_callback().set(m_ss2_ports[1], FUNC(rs232_port_device::write_dtr));
+	RS232_PORT(config, m_ss2_ports[0], secoinsa20_terminals, nullptr);
+	m_ss2_ports[0]->rxd_handler().set(m_ss2_scc, FUNC(z80scc_device::rxa_w));
+	m_ss2_ports[0]->cts_handler().set(m_ss2_scc, FUNC(z80scc_device::ctsa_w));
+	m_ss2_ports[0]->dcd_handler().set(m_ss2_scc, FUNC(z80scc_device::dcda_w));
+	RS232_PORT(config, m_ss2_ports[1], secoinsa20_terminals, nullptr);
+	m_ss2_ports[1]->rxd_handler().set(m_ss2_scc, FUNC(z80scc_device::rxb_w));
+	m_ss2_ports[1]->cts_handler().set(m_ss2_scc, FUNC(z80scc_device::ctsb_w));
+	m_ss2_ports[1]->dcd_handler().set(m_ss2_scc, FUNC(z80scc_device::dcdb_w));
+
+	auto const terminal_defaults = [] (rs232_port_device &port)
+	{
+		port.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+		port.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(null_modem));
+		port.set_option_device_input_defaults("pty", DEVICE_INPUT_DEFAULTS_NAME(null_modem));
+	};
+	for (auto &port : m_alp_ports)
+		terminal_defaults(*port);
+	for (auto &port : m_ss2_ports)
+		terminal_defaults(*port);
+
+	// FIXME: BRCLK isn't traced; 4.9152 MHz gives 9309 baud for the 9600 setting
+	SCN2651(config, m_printer_uart, 4.9152_MHz_XTAL);
+	m_printer_uart->txd_handler().set(m_printer_port, FUNC(rs232_port_device::write_txd));
+	m_printer_uart->rts_handler().set(m_printer_port, FUNC(rs232_port_device::write_rts));
+	m_printer_uart->dtr_handler().set(m_printer_port, FUNC(rs232_port_device::write_dtr));
+	RS232_PORT(config, m_printer_port, default_rs232_devices, nullptr);
+	m_printer_port->rxd_handler().set(m_printer_uart, FUNC(scn2651_device::rxd_w));
+	m_printer_port->cts_handler().set(m_printer_uart, FUNC(scn2651_device::cts_w));
+	m_printer_port->dsr_handler().set(m_printer_uart, FUNC(scn2651_device::dsr_w));
+	m_printer_port->dcd_handler().set(m_printer_uart, FUNC(scn2651_device::dcd_w));
+	m_printer_port->set_option_device_input_defaults("printer", DEVICE_INPUT_DEFAULTS_NAME(printer));
+
+	PIT8254(config, m_pit);
+	// 1 MHz inferred from the kernel's 8 ms tick with a count of 8000
+	m_pit->set_clk<1>((16_MHz_XTAL / 16).value());
+	m_pit->out_handler<1>().set(FUNC(secoinsa20_state::timer_w));
+	MM58167(config, m_rtc, 32.768_kHz_XTAL);
+
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, true, true);
+	m_fdc->drq_wr_callback().set(FUNC(secoinsa20_state::fdc_drq_w));
+	// FLOPPY2 in the OS is unit 1
+	FLOPPY_CONNECTOR(config, "fdc:0", secoinsa20_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", secoinsa20_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
+
+	// WD1001-05 board
+	WD1000(config, m_hdc, 8_MHz_XTAL);
+	m_hdc->set_sector_base(0);
+	m_hdc->intrq_wr_callback().set([this](int state) { irq_w(4, state); });
+	HARDDISK(config, "hdc:0", "secoinsa20_hdd");
+	SOFTWARE_LIST(config, "hdd_list").set_original("secoinsa20");
 }
 
 
@@ -623,4 +1184,4 @@ ROM_END
 } // Anonymous namespace
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY     FULLNAME    FLAGS
-COMP( 1981, secoinsa20, 0,      0,      secoinsa20, secoinsa20, secoinsa20_state, empty_init, "Secoinsa", "Serie 20", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 1981, secoinsa20, 0,      0,      secoinsa20, secoinsa20, secoinsa20_state, empty_init, "Secoinsa", "Serie 20", MACHINE_NO_SOUND_HW )

@@ -43,6 +43,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void send_key(uint8_t code) { m_keyboard_cb(code); }
 
+	uint32_t update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(bell_off);
 
 	required_ioport m_io_term_conf;
@@ -60,7 +61,6 @@ private:
 	void scroll_line();
 	void write_char(uint8_t data);
 	void clear();
-	uint32_t update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t m_framecnt;
 
