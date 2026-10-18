@@ -1219,6 +1219,8 @@ void cdicdic_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				m_disc_mode = 0;
 				m_disc_spinup_counter = 0;
 				m_curr_lba = 0;
+				m_x_buffer &= 0x7fff; // Data-ready interrupt is only serviced while bit 14 is set
+				update_interrupt_state();
 			}
 			break;
 
