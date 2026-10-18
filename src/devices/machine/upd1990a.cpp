@@ -206,6 +206,8 @@ void upd1990a_device::stb_w(int state)
 
 		LOG("uPD1990A Command %x\n", m_c);
 
+		bool const was_testmode = m_testmode;
+
 		// common functions
 		if (m_c == MODE_REGISTER_HOLD || (m_c >= MODE_TP_64HZ && m_c < MODE_TEST))
 		{
@@ -223,8 +225,11 @@ void upd1990a_device::stb_w(int state)
 			// 1Hz data out pulse
 			m_timer_data_out->adjust(attotime::zero, 0, attotime::from_hz((clock() / 32768.0) * 2.0));
 
-			// 64Hz time pulse
-			m_timer_tp->adjust(attotime::zero, 0, attotime::from_hz((clock() / 512.0) * 2.0));
+			// 64Hz time pulse when this cancels the test mode; otherwise TP keeps the mode last set,
+			// as TP modes are a separate group (the TP state at power-on isn't documented, so a TP
+			// that was never set starts at 64Hz)
+			if (was_testmode || !m_timer_tp->enabled())
+				m_timer_tp->adjust(attotime::zero, 0, attotime::from_hz((clock() / 512.0) * 2.0));
 			break;
 
 		case MODE_SHIFT:
