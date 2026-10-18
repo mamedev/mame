@@ -55,7 +55,9 @@ huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, d
 	, m_pixel_clock(0)
 	, m_timer(nullptr)
 {
-	// Set up UV lookup table
+	// Set up UV lookup table: the inverse of the RGB to YUV matrix in the HuC6271 manual
+	// (Y = 0.2990R + 0.5870G + 0.1140B, U = -0.1686R - 0.3311G + 0.4997B + 128,
+	// V = 0.4998R - 0.4185G - 0.0813B + 128), which is JPEG YCbCr
 	for (int ur = 0; ur < 256; ur++)
 	{
 		for (int vr = 0; vr < 256; vr++)
@@ -63,9 +65,9 @@ huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, d
 			const s32 u = ur - 128;
 			const s32 v = vr - 128;
 
-			const s32 r =              + 1.13983 * v;
-			const s32 g = -0.35465 * u - 0.58060 * v;
-			const s32 b =  2.03211 * u;
+			const s32 r =              + 1.40200 * v;
+			const s32 g = -0.34414 * u - 0.71414 * v;
+			const s32 b =  1.77200 * u;
 
 			m_uv_lookup[(ur << 8) | vr][0] = r;
 			m_uv_lookup[(ur << 8) | vr][1] = g;
