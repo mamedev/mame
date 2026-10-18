@@ -151,6 +151,7 @@ public:
 	dendego_state(const machine_config &mconfig, device_type type, const char *tag)
 		: taitojc_state(mconfig, type, tag)
 		, m_counters(*this, "counter%u", 0U)
+		, m_pressure_tenths(*this, "dendego_pressure_tenths")
 	{
 	}
 
@@ -164,6 +165,7 @@ public:
 
 private:
 	output_finder<6> m_counters;
+	output_finder<> m_pressure_tenths;
 
 	void speedmeter_w(uint8_t data);
 	void brakemeter_w(uint8_t data);

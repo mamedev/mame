@@ -702,6 +702,9 @@ void dendego_state::brakemeter_w(uint8_t data)
 {
 	m_counters[4] = pressure_table[data] / 100;
 	m_counters[5] = (pressure_table[data] % 100) / 10;
+
+	// Preserve tenths of kg/cm2 for the analog pressure gauge.
+	m_pressure_tenths = pressure_table[data] / 10;
 }
 
 void dendego_state::dendego_map(address_map &map)
