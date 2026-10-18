@@ -1370,6 +1370,8 @@ void cdicdic_device::device_start()
 	save_item(NAME(m_interrupt_vector));
 	save_item(NAME(m_data_buffer));
 
+	save_item(NAME(m_cd_byteswap));
+
 	save_item(NAME(m_disc_command));
 	save_item(NAME(m_disc_mode));
 	save_item(NAME(m_disc_spinup_counter));
@@ -1395,6 +1397,11 @@ void cdicdic_device::device_start()
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
+
+void cdicdic_device::device_post_load()
+{
+	update_interrupt_state();
+}
 
 void cdicdic_device::device_reset()
 {

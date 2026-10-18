@@ -194,6 +194,7 @@ INPUT_PORTS_END
 
 void cdi_state::machine_start()
 {
+	save_item(NAME(m_in4_owner));
 }
 
 void cdi_state::machine_reset()
