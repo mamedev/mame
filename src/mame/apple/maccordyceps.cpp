@@ -134,13 +134,6 @@ void pmac6200_state::init_pmac6200()
 
 uint32_t pmac6200_state::id_r(offs_t offset, uint32_t mem_mask)
 {
-	// same behavior as in macpdm.cpp
-	// FIXME: Apple System Profiler only reports half the desired CPU speed
-	if (mem_mask == 0xffff'ffff)
-	{
-		return m_model_id & 0xffff;
-	}
-
 	return m_model_id;
 }
 
@@ -180,7 +173,7 @@ INPUT_PORTS_END
 
 void pmac6200_state::pmac6200(machine_config &config)
 {
-	m_model_id = 0xa55a3250;
+	m_model_id = 0xa55a2250;
 
 	PPC603(config, m_maincpu, 75_MHz_XTAL);
 	// BUS_RETRY: TurboSCSI stalls the CPU until DRQ
