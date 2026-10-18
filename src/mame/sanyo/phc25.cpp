@@ -640,7 +640,7 @@ void phc25_state::phc25(machine_config &config)
 	m_vdg->fsync_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE).invert();
 	m_vdg->input_callback().set(FUNC(phc25_state::video_ram_r));
 	m_vdg->set_get_char_rom(FUNC(phc25_state::char_rom_r));
-	m_vdg->set_get_fixed_mode(mc6847_device::MODE_GM2 | mc6847_device::MODE_GM1 | mc6847_device::MODE_INTEXT);
+	m_vdg->set_get_fixed_mode(mc6847_device::MODE_GM2 | mc6847_device::MODE_INTEXT);
 	// other lines not connected
 
 	/* sound hardware (Synthesizer PSG-01 add-on) */
@@ -680,7 +680,7 @@ void phc25_state::phc25j(machine_config &config)
 	m_vdg->fsync_wr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0, HOLD_LINE).invert();
 	m_vdg->input_callback().set(FUNC(phc25_state::video_ram_r));
 	m_vdg->set_get_char_rom(FUNC(phc25_state::char_rom_r));
-	m_vdg->set_get_fixed_mode(mc6847_device::MODE_GM2 | mc6847_device::MODE_GM1 | mc6847_device::MODE_INTEXT);
+	m_vdg->set_get_fixed_mode(mc6847_device::MODE_GM2 | mc6847_device::MODE_INTEXT);
 	// other lines not connected
 }
 
