@@ -1,10 +1,74 @@
 // license:BSD-3-Clause
-// copyright-holders:Barry Rodewald
+// copyright-holders:Barry Rodewald, Vas Crabb
 // Convergent NGEN keyboard device
 
 #include "emu.h"
 #include "ngen_kb.h"
 #include "machine/keyboard.ipp"
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+namespace {
+
+// Retain the previous generic keyboard character mapping while separating the
+// NGEN serial device from serial_keyboard_device.  These tables match the
+// generic_keyboard input ports (machine/keyboard.cpp), not the physical NGEN
+// scan codes.  The hardware protocol remains to be implemented separately.
+constexpr u8 TRANSLATION_TABLE[][2][4][16] = {
+	{
+		{   // ANSI
+			{ '`',   '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   '-',   '=',   0x08U, 0x7fU, 0x1bU },
+			{ 0x09U, 'q',   'w',   'e',   'r',   't',   'y',   'u',   'i',   'o',   'p',   '[',   ']',   '\\',  0xffU, 0xffU },
+			{ 0xffU, 'a',   's',   'd',   'f',   'g',   'h',   'j',   'k',   'l',   ';',   '\'',  0x0dU, 0xffU, 0xffU, 0x0aU },
+			{ 0xffU, '\\',  'z',   'x',   'c',   'v',   'b',   'n',   'm',   ',',   '.',   '/',   0xffU, 0xffU, 0xffU, ' '   }
+		},
+		{   // JIS
+			{ '\\',  '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   '-',   '^',   0x08U, 0x7fU, 0x1bU },
+			{ 0x09U, 'q',   'w',   'e',   'r',   't',   'y',   'u',   'i',   'o',   'p',   '@',   '[',   ']',   0xffU, 0xffU },
+			{ 0xffU, 'a',   's',   'd',   'f',   'g',   'h',   'j',   'k',   'l',   ';',   ':',   0x0dU, 0xffU, 0xffU, 0x0aU },
+			{ 0xffU, '\\',  'z',   'x',   'c',   'v',   'b',   'n',   'm',   ',',   '.',   '/',   0xffU, 0xffU, 0xffU, ' '   }
+		}
+	},
+	{
+		{   // ANSI shift
+			{ '~',   '!',   '@',   '#',   '$',   '%',   '^',   '&',   '*',   '(',   ')',   '_',   '+',   0x08U, 0x7fU, 0x1bU },
+			{ 0x09U, 'Q',   'W',   'E',   'R',   'T',   'Y',   'U',   'I',   'O',   'P',   '{',   '}',   '|',   0xffU, 0xffU },
+			{ 0xffU, 'A',   'S',   'D',   'F',   'G',   'H',   'J',   'K',   'L',   ':',   '"',   0x0dU, 0xffU, 0xffU, 0x0aU },
+			{ 0xffU, '_',   'Z',   'X',   'C',   'V',   'B',   'N',   'M',   '<',   '>',   '?',   0xffU, 0xffU, 0xffU, ' '   }
+		},
+		{   // JIS shift
+			{ '|',   '!',   '"',   '#',   '$',   '%',   '&',   '\'',  '(',   ')',   0xffU, '=',   '~',   0x08U, 0x7fU, 0x1bU },
+			{ 0x09U, 'Q',   'W',   'E',   'R',   'T',   'Y',   'U',   'I',   'O',   'P',   '`',   '{',   '}',   0xffU, 0xffU },
+			{ 0xffU, 'A',   'S',   'D',   'F',   'G',   'H',   'J',   'K',   'L',   '+',   '*',   0x0dU, 0xffU, 0xffU, 0x0aU },
+			{ 0xffU, '_',   'Z',   'X',   'C',   'V',   'B',   'N',   'M',   '<',   '>',   '?',   0xffU, 0xffU, 0xffU, ' '   }
+		}
+	},
+	{
+		{   // ANSI ctrl
+			{ 0x00U, '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   0x1fU, 0x1eU, 0x08U, 0x7fU, 0x1bU },
+			{ 0x09U, 0x11U, 0x17U, 0x05U, 0x12U, 0x14U, 0x19U, 0x15U, 0x09U, 0x0fU, 0x10U, 0x1bU, 0x1dU, 0x1cU, 0xffU, 0xffU },
+			{ 0xffU, 0x01U, 0x13U, 0x04U, 0x06U, 0x07U, 0x08U, 0x0aU, 0x0bU, 0x0cU, ';',   '\'',  0x0dU, 0xffU, 0xffU, 0x0aU },
+			{ 0xffU, 0x1cU, 0x1aU, 0x18U, 0x03U, 0x16U, 0x02U, 0x0eU, 0x0dU, ',',   '.',   0x1fU, 0xffU, 0xffU, 0xffU, 0x00U }
+		},
+		{   // JIS ctrl
+			{ 0x1cU, '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   0x1fU, 0x1eU, 0x08U, 0x7fU, 0x1bU },
+			{ 0x09U, 0x11U, 0x17U, 0x05U, 0x12U, 0x14U, 0x19U, 0x15U, 0x09U, 0x0fU, 0x10U, 0x00U, 0x1bU, 0x1dU, 0xffU, 0xffU },
+			{ 0xffU, 0x01U, 0x13U, 0x04U, 0x06U, 0x07U, 0x08U, 0x0aU, 0x0bU, 0x0cU, ';',   ':',   0x0dU, 0xffU, 0xffU, 0x0aU },
+			{ 0xffU, 0x1cU, 0x1aU, 0x18U, 0x03U, 0x16U, 0x02U, 0x0eU, 0x0dU, ',',   '.',   0x1fU, 0xffU, 0xffU, 0xffU, 0x00U }
+		}
+	}
+};
+
+
+constexpr bool CAPS_TABLE[4][16] = {
+	{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
+	{ false, true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  false, false, false, false, false },
+	{ false, true,  true,  true,  true,  true,  true,  true,  true,  true,  false, false, false, false, false, false },
+	{ false, false, true,  true,  true,  true,  true,  true,  true,  false, false, false, false, false, false, false }
+};
+
+} // anonymous namespace
 
 DEFINE_DEVICE_TYPE(NGEN_KEYBOARD, ngen_keyboard_device, "ngen_kb", "NGEN Keyboard (HLE)")
 
@@ -67,8 +131,8 @@ void ngen_keyboard_device::tra_callback()
 
 void ngen_keyboard_device::received_byte(uint8_t byte)
 {
-	// Host commands are not understood; the earlier HLE only logged them.
-	(void)byte;
+	// Host commands are not understood yet; retain optional protocol logging.
+	LOG("Received from host: %02x\n", byte);
 }
 
 
@@ -77,67 +141,15 @@ bool ngen_keyboard_device::translate(uint8_t row, uint8_t column, uint8_t &data)
 	if (row >= 4U || column >= 16U)
 		return false;
 
-	ioport_field *const field = m_key_rows[row]->field(ioport_value(1) << column);
-	if (!field)
-		return false;
-
+	unsigned const layout(BIT(m_config->read(), 0));
 	u16 const modifiers(m_modifiers->read());
-	unsigned which = 0;
-	if (modifiers & 0x01U)
-	{
-		// Control-character variants are the third character mapping on
-		// the generic keyboard fields where one is defined.
-		which = 2;
-	}
-	else
-	{
-		bool const alphabetic = (row == 1U && column >= 1U && column <= 10U)
-				|| (row == 2U && column >= 1U && column <= 9U)
-				|| (row == 3U && column >= 2U && column <= 8U);
-		bool const shifted = bool(modifiers & 0x02U) != (bool(modifiers & 0x04U) && alphabetic);
-		which = shifted ? 1U : 0U;
-	}
-
-	std::vector<char32_t> codes(field->keyboard_codes(which));
-	if (codes.empty() && (modifiers & 0x01U))
-	{
-		// Generic keyboard control mappings retain ordinary characters for
-		// keys without a dedicated control character.  These punctuation
-		// positions are the exceptions in its ANSI/JIS control tables.
-		uint8_t control = 0xffU;
-		bool const jis = BIT(m_config->read(), 0);
-		if (row == 0U && column == 0U)
-			control = jis ? 0x1cU : 0x00U;
-		else if (row == 0U && column == 11U)
-			control = 0x1fU;
-		else if (row == 0U && column == 12U)
-			control = 0x1eU;
-		else if (row == 1U && column == 11U)
-			control = jis ? 0x00U : 0x1bU;
-		else if (row == 1U && column == 12U)
-			control = 0x1bU;
-		else if (row == 1U && column == 13U)
-			control = jis ? 0x1dU : 0x1cU;
-		else if (row == 3U && column == 1U)
-			control = 0x1cU;
-		else if (row == 3U && column == 11U)
-			control = 0x1fU;
-
-		if (control != 0xffU)
-		{
-			data = control | ((modifiers & 0x08U) ? 0x80U : 0x00U);
-			return true;
-		}
-
-		codes = field->keyboard_codes(0);
-	}
-
-	if (codes.empty() || codes.front() > 0xffU)
+	bool const shift(BIT(modifiers, 1) != (BIT(modifiers, 2) && CAPS_TABLE[row][column]));
+	unsigned const map(BIT(modifiers, 0) ? 2U : shift ? 1U : 0U);
+	u8 const result(TRANSLATION_TABLE[map][layout][row][column]);
+	if (result == 0xffU)
 		return false;
 
-	data = uint8_t(codes.front());
-	if (modifiers & 0x08U)
-		data |= 0x80U;
+	data = result | (BIT(modifiers, 3) ? 0x80U : 0x00U);
 	return true;
 }
 
