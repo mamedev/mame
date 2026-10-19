@@ -334,7 +334,7 @@ TILE_GET_INFO_MEMBER(armwrest_state::fg_get_info)
 {
 	int const attr = m_fg_videoram[tile_index * 2 + 1];
 	int const code = m_fg_videoram[tile_index * 2] + 256 * (attr & 0x07);
-	int const color = ((attr & 0xf8) >> 3);
+	int const color = (attr >> 3) & 0x0f; // bit 7 only drives T-HRV (flip); the mux's fifth colour input is tied low (CL7)
 	int const flipx = attr & 0x80;
 	tileinfo.set(1, code, color, flipx ? TILE_FLIPX : 0);
 }
