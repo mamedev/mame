@@ -760,8 +760,8 @@ ROM_START( futbolt )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "test_pic16c54a.bin", 0x0000, 0x2000, CRC(ad819aaa) SHA1(f10500e9147c703e24a26b4d48305c16996b7c0a) )
 
-	ROM_LOAD( "test_futbol_27c010a.bin", 0x00000, 0x20000, CRC(57cf1ca4) SHA1(8d7f027bf7809194035c5b4671919d3b3dce2f1b) )
 	ROM_REGION( 0x20000, "oki", 0 )
+	ROM_LOAD( "test_futbol_27c010a.bin", 0x00000, 0x20000, CRC(57cf1ca4) SHA1(8d7f027bf7809194035c5b4671919d3b3dce2f1b) )
 ROM_END
 
 
@@ -819,8 +819,8 @@ ROM_START( cochegkr )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "m4_pic16c54c.bin", 0x0000, 0x2000, NO_DUMP ) // Protected
 
-	ROM_LOAD( "coche_freno_italia_-r-_69f0_pic_m4.bin", 0x00000, 0x20000, CRC(c2f26fdd) SHA1(92eed91d5e491b3563dd48933be570fc8a96d78f) ) // sum 6f90, the label says 69f0, probably a typo
 	ROM_REGION( 0x20000, "oki", 0 )
+	ROM_LOAD( "coche_freno_italia_-r-_69f0_pic_m4.bin", 0x00000, 0x20000, CRC(c2f26fdd) SHA1(92eed91d5e491b3563dd48933be570fc8a96d78f) ) // sum 6f90, the label says 69f0, probably a typo
 ROM_END
 
 ROM_START( kwairi )
