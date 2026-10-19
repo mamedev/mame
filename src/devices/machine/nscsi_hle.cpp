@@ -160,6 +160,10 @@ void nscsi_full_device::step(bool timeout)
 		if(!(ctrl & S_ACK)) {
 			m_scsi_state &= STATE_MASK;
 			m_scsi_bus->ctrl_wait(m_scsi_refid, 0, S_ACK);
+			if((ctrl & S_ATN) && m_scsi_state != TARGET_WAIT_MSG_BYTE && m_scsi_state != TARGET_WAIT_CMD_BYTE) {
+				target_go_message_out();
+				break;
+			}
 			attotime delay = scsi_data_byte_period();
 			if (delay == attotime::zero) {
 				step(false);
@@ -181,6 +185,10 @@ void nscsi_full_device::step(bool timeout)
 		if(!(ctrl & S_ACK)) {
 			m_scsi_state &= STATE_MASK;
 			m_scsi_bus->ctrl_wait(m_scsi_refid, 0, S_ACK);
+			if((ctrl & S_ATN) && m_scsi_state != TARGET_WAIT_MSG_BYTE && m_scsi_state != TARGET_WAIT_CMD_BYTE) {
+				target_go_message_out();
+				break;
+			}
 			attotime delay = scsi_data_byte_period();
 			if (delay == attotime::zero) {
 				step(false);
@@ -280,6 +288,14 @@ void nscsi_full_device::step(bool timeout)
 			scsi_message();
 			m_data_buffer_id = SBUF_MAIN;
 			m_data_buffer_pos = 0;
+			if(m_scsi_cmdbuf[0] == SM_ABORT || m_scsi_cmdbuf[0] == SM_BUS_DEVICE_RESET) {
+				scsi_abort();
+				m_buf_control_rpos = m_buf_control_wpos = 0;
+				buf_control_push()->m_action = BC_BUS_FREE;
+				m_scsi_state = TARGET_NEXT_CONTROL;
+				step(false);
+				break;
+			}
 			m_scsi_state = TARGET_WAIT_CMD_BYTE;
 			m_scsi_bus->ctrl_w(m_scsi_refid, S_PHASE_COMMAND, S_PHASE_MASK);
 		}
@@ -676,10 +692,29 @@ void nscsi_full_device::scsi_message()
 		return;
 	}
 
+	if(m_scsi_cmdbuf[0] == SM_ABORT || m_scsi_cmdbuf[0] == SM_BUS_DEVICE_RESET)
+		return;
+
 	std::string txt = "Unknown message";
 	for(int i=0; i != m_scsi_cmdsize; i++)
 		txt += util::string_format(" %02x", m_scsi_cmdbuf[i]);
 	LOGMASKED(LOG_UNSUPPORTED, "%s\n", txt);
+}
+
+void nscsi_full_device::scsi_abort()
+{
+}
+
+// The initiator asserted ATN while a byte was in flight: drop the rest of the
+// current phase sequence and offer MESSAGE OUT at the end of this byte.
+void nscsi_full_device::target_go_message_out()
+{
+	m_buf_control_rpos = m_buf_control_wpos = 0;
+	m_data_buffer_id = SBUF_MAIN;
+	m_data_buffer_pos = 0;
+	m_scsi_state = TARGET_WAIT_MSG_BYTE;
+	m_scsi_bus->ctrl_w(m_scsi_refid, S_PHASE_MSG_OUT, S_PHASE_MASK);
+	target_recv_byte();
 }
 
 int nscsi_full_device::get_lun(int def)

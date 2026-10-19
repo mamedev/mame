@@ -524,6 +524,11 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	virtual void scsi_message();
+	// ABORT or BUS DEVICE RESET message received (SCSI-2 5.6.1/5.6.2): the current
+	// command is dropped and the bus goes free. Overrides must cancel any of their
+	// own pending deferred scsi_data_in()/scsi_data_out()/scsi_status_complete()
+	// (timers etc.) themselves; the base class only clears its own control queue.
+	virtual void scsi_abort();
 	virtual void scsi_command();
 	virtual bool scsi_command_done(uint8_t command, uint8_t length);
 
@@ -718,6 +723,7 @@ private:
 
 	void step(bool timeout);
 	void target_recv_byte();
+	void target_go_message_out();
 	void target_send_byte(uint8_t val);
 	void target_send_buffer_byte();
 };
