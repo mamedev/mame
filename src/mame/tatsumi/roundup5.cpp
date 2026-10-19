@@ -273,9 +273,27 @@ pos is 11.5 fixed point
 			int bank = 0;
 			int64_t const pos1 = int64_t(x - start1) * step;
 			int64_t const pos2 = int64_t(x - start2) * step;
-			if (pos1 >= 0 && (pos1 >> 11) < 0x80)
+			bool const in1 = pos1 >= 0 && (pos1 >> 11) < 0x80;
+			bool const in2 = pos2 >= 0 && (pos2 >> 11) < 0x80;
+			if (in1 && in2)
+			{
+				// Where the sets overlap, as in a fork, the higher pen appears to win so that the asphalt
+				// of one set covers the kerb of the other and the two roads merge
+				int const col1 = linedata[pos1 >> 11] & 0xf;
+				int const col2 = linedata[(pos2 >> 11) + 0x200] & 0xf;
+				if (col2 > col1)
+				{
+					col = col2;
+					bank = 32;
+				}
+				else
+				{
+					col = col1;
+				}
+			}
+			else if (in1)
 				col = linedata[pos1 >> 11] & 0xf;
-			else if (pos2 >= 0 && (pos2 >> 11) < 0x80)
+			else if (in2)
 			{
 				col = linedata[(pos2 >> 11) + 0x200] & 0xf;
 				bank = 32;
