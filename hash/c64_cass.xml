@@ -3948,11 +3948,12 @@ Black screen after [tape] loading
 			</dataarea>
 		</part>
 	</software>
-	
+
+	<!-- origin: Ultimate Tape Archive V3.0 id=6435 -->
 	<software name="emlynhis">
 		<description>Emlyn Hughes International Soccer</description>
 		<year>1988</year>
-		<publisher>Audiogenic Software Ltd</publisher>
+		<publisher>Audiogenic Software</publisher>
     
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="638446">
