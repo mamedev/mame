@@ -19,7 +19,7 @@ TODO:
 main CPU:
 
 0000-bfff ROM
-c000-c3ff NVRAM
+c000-c3ff NVRAM (1Kx4), mirrored at c400-c7ff
 d000-d7ff RAM
 d800-dfff Video RAM (info screen)
 e000-e7ff Video RAM (opponent)
@@ -67,7 +67,7 @@ write:
 0c        to VLM5030 RESET
 0d        to VLM5030 START
 0e        to VLM5030 VCU
-0f        enable NVRAM ?
+0f        NVRAM enable (NM)
 
 sound CPU:
 the sound CPU is a 2A03, which is a modified 6502 with built-in input ports
@@ -151,6 +151,7 @@ public:
 		m_spr1_videoram(*this, "spr1_videoram"),
 		m_spr2_videoram(*this, "spr2_videoram"),
 		m_bg_bot_videoram(*this, "bg_bot_videoram"),
+		m_nvram(*this, "nvram"),
 		m_proms(*this, "proms")
 	{ }
 
@@ -173,6 +174,7 @@ protected:
 	required_shared_ptr<uint8_t> m_spr1_videoram;
 	required_shared_ptr<uint8_t> m_spr2_videoram;
 	required_shared_ptr<uint8_t> m_bg_bot_videoram;
+	required_shared_ptr<uint8_t> m_nvram;
 
 	required_region_ptr<uint8_t> m_proms;
 
@@ -182,7 +184,11 @@ protected:
 	tilemap_t *m_spr2_tilemap = nullptr;
 
 	bool m_nmi_mask = false;
+	bool m_nvram_enable = false;
 	void nmi_mask_w(int state);
+	void nvram_enable_w(int state);
+	uint8_t nvram_r(offs_t offset);
+	void nvram_w(offs_t offset, uint8_t data);
 	void bg_top_videoram_w(offs_t offset, uint8_t data);
 	void bg_bot_videoram_w(offs_t offset, uint8_t data);
 	void spr1_videoram_w(offs_t offset, uint8_t data);
@@ -633,10 +639,30 @@ void punchout_state::nmi_mask_w(int state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
+void punchout_state::nvram_enable_w(int state)
+{
+	m_nvram_enable = state;
+}
+
+// The battery backed RAM is a 1Kx4 TC5514AP-3 (8M) on DD0-DD3, mirrored at c400-c7ff. It is
+// only selected while latch output NM (port 0f) is high; the games set NM around every access.
+// Undriven data lines (DD4-DD7 when it's read, all of them while it isn't selected) are assumed
+// to read high.
+uint8_t punchout_state::nvram_r(offs_t offset)
+{
+	return m_nvram_enable ? (m_nvram[offset] | 0xf0) : 0xff;
+}
+
+void punchout_state::nvram_w(offs_t offset, uint8_t data)
+{
+	if (m_nvram_enable)
+		m_nvram[offset] = data & 0x0f;
+}
+
 void punchout_state::program_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc3ff).ram().share("nvram");
+	map(0xc000, 0xc3ff).mirror(0x0400).rw(FUNC(punchout_state::nvram_r), FUNC(punchout_state::nvram_w)).share(m_nvram);
 	map(0xd000, 0xd7ff).ram();
 	map(0xd800, 0xdfef).ram().w(FUNC(punchout_state::bg_top_videoram_w)).share(m_bg_top_videoram);
 	map(0xdff0, 0xdff7).ram().share(m_spr1_ctrlram);
@@ -652,7 +678,7 @@ void punchout_state::program_map(address_map &map)
 void armwrest_state::program_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc3ff).ram().share("nvram");
+	map(0xc000, 0xc3ff).mirror(0x0400).rw(FUNC(armwrest_state::nvram_r), FUNC(armwrest_state::nvram_w)).share(m_nvram);
 	map(0xd000, 0xd7ff).ram();
 	map(0xd800, 0xdfef).ram().w(FUNC(armwrest_state::fg_videoram_w)).share(m_fg_videoram);
 	map(0xdff0, 0xdff7).ram().share(m_spr1_ctrlram);
@@ -1093,6 +1119,7 @@ void punchout_state::vblank_irq(int state)
 void punchout_state::machine_start()
 {
 	save_item(NAME(m_nmi_mask));
+	save_item(NAME(m_nvram_enable));
 }
 
 void spunchout_state::machine_reset()
@@ -1121,7 +1148,7 @@ void punchout_state::punchout(machine_config &config)
 	mainlatch.q_out_cb<4>().set("vlm", FUNC(vlm5030_device::rst_w));
 	mainlatch.q_out_cb<5>().set("vlm", FUNC(vlm5030_device::st_w));
 	mainlatch.q_out_cb<6>().set("vlm", FUNC(vlm5030_device::vcu_w));
-	mainlatch.q_out_cb<7>().set_nop(); // enable NVRAM?
+	mainlatch.q_out_cb<7>().set(FUNC(punchout_state::nvram_enable_w)); // NM
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_punchout);
