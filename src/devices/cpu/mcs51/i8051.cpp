@@ -950,16 +950,27 @@ bool mcs51_cpu_device::manage_idle_on_interrupt(u8 ints)
 	return false;
 }
 
-void mcs51_cpu_device::check_irqs()
+u8 mcs51_cpu_device::pending_irq_flags(u8 int_mask)
 {
 	u8 ints = (BIT(m_tcon, TCON_IE0) | (BIT(m_tcon, TCON_TF0) << 1) | (BIT(m_tcon, TCON_IE1) << 2) | (BIT(m_tcon, TCON_TF1) << 3) | ((BIT(m_scon, SCON_RI) | BIT(m_scon, SCON_TI)) << 4));
+	irqs_complete_and_mask(ints, int_mask);
+	return ints;
+}
+
+void mcs51_cpu_device::check_irqs()
+{
 	u8 int_vec = 0;
 	int priority_request = -1;
 
 	// Abort if all interrupts disabled or none pending
 	u8 int_mask = BIT(m_ie, IE_A) ? m_ie : 0x00;
 
-	irqs_complete_and_mask(ints, int_mask);
+	u8 ints = pending_irq_flags(int_mask);
+
+	// Flags are sampled in one machine cycle and polled in the next, so a flag
+	// set in the last cycle of an instruction is only seen after the next one.
+	ints &= ~m_irq_delayed;
+	m_irq_delayed = 0;
 
 	if (!ints)
 		return;
@@ -1056,6 +1067,8 @@ void mcs51_cpu_device::burn_cycles(int cycles)
 {
 	while (cycles--)
 	{
+		u8 const before = cycles ? 0 : pending_irq_flags(0xff);
+
 		m_icount--;
 
 		// update timers
@@ -1065,6 +1078,10 @@ void mcs51_cpu_device::burn_cycles(int cycles)
 
 		// check and update status of serial port
 		transmit_receive(0);
+
+		// remember flags raised in the instruction's last cycle
+		if (!cycles)
+			m_irq_delayed |= pending_irq_flags(0xff) & ~before;
 	}
 }
 
@@ -1218,6 +1235,7 @@ void mcs51_cpu_device::device_start()
 	save_item(NAME(m_irq_prio));
 	save_item(NAME(m_last_op));
 	save_item(NAME(m_last_bit));
+	save_item(NAME(m_irq_delayed));
 
 	save_item(NAME(m_dptr));
 	save_item(NAME(m_acc));
@@ -1321,6 +1339,7 @@ void mcs51_cpu_device::device_reset()
 	m_cur_irq_prio = -1;
 	m_last_op = 0;
 	m_last_bit = 0;
+	m_irq_delayed = 0;
 
 	// these are all defined reset states
 	m_rwm = 0;
