@@ -14,7 +14,6 @@
     - clean-ups;
 
     TODO (per-game issues)
-    - doa, doaa: corrupted sound, eventually becomes silent;
     - lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
     - manxtt: no escape from "active motion slider" tutorial (needs analog inputs),
               bypass it by entering then exiting service mode;
