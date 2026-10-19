@@ -2342,7 +2342,7 @@ s32 u32_to_s24(u32 v)
 
 s32 u32_to_s10(u32 v)
 {
-	return v & 0x200 ? (0x3ff - (v & 0x3ff)) | 0xfffffe00 : v & 0x1ff;
+	return util::sext(v, 10);
 }
 
 float namcos23_state::f24_to_f32(u32 v)
