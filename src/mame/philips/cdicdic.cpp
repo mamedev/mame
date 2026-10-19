@@ -775,8 +775,9 @@ void cdicdic_device::process_disc_sector()
 	uint8_t buffer[2560] = { 0 };
 	m_cdrom->read_data(m_curr_lba, buffer, cdrom_file::CD_TRACK_RAW_DONTCARE);
 
-	// Detect (badly) if we're dealing with a byteswapped loose-bin image
-	if (buffer[0] == 0xff && buffer[1] == 0x00)
+	// Detect a byteswapped loose-bin image from a data sector's sync pattern
+	static const uint8_t s_byteswapped_sync[12] = { 0xff, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0xff };
+	if (m_disc_mode != DISC_CDDA && !memcmp(buffer, s_byteswapped_sync, sizeof(s_byteswapped_sync)))
 	{
 		LOGMASKED(LOG_SECTORS, "Byteswapping\n");
 		m_cd_byteswap = true;
