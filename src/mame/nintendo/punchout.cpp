@@ -28,8 +28,15 @@ e800-efff Video RAM (player)
 f000-f03f Background row scroll (low/high couples)
 f000-ffff Video RAM (background)
 
-memory mapped ports:
-write:
+Arm Wrestling instead has:
+d800-dfef Video RAM (FG)
+f000-f7ff Video RAM (background)
+f800-ffff Video RAM (info screen)
+
+d800-ffff is RAM on the CPU board. The video and BAK boards render only from their own copy,
+which a DMA updates at the start of vblank while port 0a is set, holding the Z80 off the bus.
+
+video registers (in the RAM copied by the DMA):
 dfe0-dfef ??
 
 dff0      big sprite #1 zoom low 8 bits
@@ -64,7 +71,7 @@ write:
 04        to VLM5030
 08        NMI enable + watchdog reset
 09        watchdog reset
-0a        ? latched into Z80 BUS RQ
+0a        vblank DMA enable (latched into Z80 BUSRQ at vblank)
 0b        to 2A03 #1 and #2 RESET
 0c        to VLM5030 RESET
 0d        to VLM5030 START
@@ -147,15 +154,10 @@ public:
 		m_vlm(*this, "vlm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_bg_top_videoram(*this, "bg_top_videoram"),
-		m_spr1_ctrlram(*this, "spr1_ctrlram"),
-		m_spr2_ctrlram(*this, "spr2_ctrlram"),
-		m_palettebank(*this, "palettebank"),
-		m_spr1_videoram(*this, "spr1_videoram"),
-		m_spr2_videoram(*this, "spr2_videoram"),
-		m_bg_bot_videoram(*this, "bg_bot_videoram"),
+		m_dmaram(*this, "dmaram"),
 		m_nvram(*this, "nvram"),
-		m_proms(*this, "proms")
+		m_proms(*this, "proms"),
+		m_vram(*this, "vram", 0x2800, ENDIANNESS_LITTLE)
 	{ }
 
 	void punchout(machine_config &config) ATTR_COLD;
@@ -170,16 +172,22 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<uint8_t> m_bg_top_videoram;
-	required_shared_ptr<uint8_t> m_spr1_ctrlram;
-	required_shared_ptr<uint8_t> m_spr2_ctrlram;
-	required_shared_ptr<uint8_t> m_palettebank;
-	required_shared_ptr<uint8_t> m_spr1_videoram;
-	required_shared_ptr<uint8_t> m_spr2_videoram;
-	required_shared_ptr<uint8_t> m_bg_bot_videoram;
+	required_shared_ptr<uint8_t> m_dmaram;
 	required_shared_ptr<uint8_t> m_nvram;
 
 	required_region_ptr<uint8_t> m_proms;
+
+	// the video and BAK boards' copy of d800-ffff, written by the vblank DMA
+	memory_share_creator<uint8_t> m_vram;
+	uint8_t *m_bg_top_videoram = nullptr;   // d800-dfef (Arm Wrestling's video_start moves it to f800-ffff)
+	uint8_t *m_spr1_ctrlram = nullptr;      // dff0-dff7
+	uint8_t *m_spr2_ctrlram = nullptr;      // dff8-dffc
+	uint8_t *m_palettebank = nullptr;       // dffd
+	uint8_t *m_spr1_videoram = nullptr;     // e000-e7ff
+	uint8_t *m_spr2_videoram = nullptr;     // e800-efff
+	uint8_t *m_bg_bot_videoram = nullptr;   // f000-ffff (f000-f7ff on Arm Wrestling)
+
+	emu_timer *m_dma_timer = nullptr;
 
 	tilemap_t *m_bg_top_tilemap = nullptr;
 	tilemap_t *m_bg_bot_tilemap = nullptr;
@@ -187,8 +195,10 @@ protected:
 	tilemap_t *m_spr2_tilemap = nullptr;
 
 	bool m_nmi_mask = false;
+	bool m_dma_enable = false;
 	bool m_nvram_enable = false;
 	void nmi_mask_w(int state);
+	void dma_enable_w(int state);
 	void nvram_enable_w(int state);
 	uint8_t nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, uint8_t data);
@@ -196,6 +206,7 @@ protected:
 	void bg_bot_videoram_w(offs_t offset, uint8_t data);
 	void spr1_videoram_w(offs_t offset, uint8_t data);
 	void spr2_videoram_w(offs_t offset, uint8_t data);
+	virtual void dma_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(top_get_info);
 	TILE_GET_INFO_MEMBER(bot_get_info);
 	TILE_GET_INFO_MEMBER(bs1_get_info);
@@ -203,6 +214,7 @@ protected:
 	uint32_t screen_update_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
+	TIMER_CALLBACK_MEMBER(dma_done);
 	void draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette);
 	void drawbs2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void copy_top_palette(int bank);
@@ -243,8 +255,7 @@ class armwrest_state : public punchout_state
 {
 public:
 	armwrest_state(const machine_config &mconfig, device_type type, const char *tag) :
-		punchout_state(mconfig, type, tag),
-		m_fg_videoram(*this, "fgram")
+		punchout_state(mconfig, type, tag)
 	{ }
 
 	void armwrest(machine_config &config) ATTR_COLD;
@@ -252,8 +263,10 @@ public:
 protected:
 	virtual void video_start() override ATTR_COLD;
 
+	virtual void dma_w(offs_t offset, uint8_t data) override;
+
 private:
-	required_shared_ptr<uint8_t> m_fg_videoram;
+	uint8_t *m_fg_videoram = nullptr; // d800-dfef
 
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_spr1_tilemap_flipx = nullptr;
@@ -274,8 +287,6 @@ private:
 	uint32_t screen_update_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette);
-
-	void program_map(address_map &map) ATTR_COLD;
 };
 
 /***************************************************************************
@@ -376,6 +387,9 @@ void punchout_state::video_start()
 
 void armwrest_state::video_start()
 {
+	m_fg_videoram = &m_vram[0x0000];
+	m_bg_top_videoram = &m_vram[0x2000]; // f800-ffff
+
 	m_bg_top_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(armwrest_state::top_get_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_bot_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(armwrest_state::bot_get_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
@@ -435,6 +449,33 @@ void punchout_state::spr2_videoram_w(offs_t offset, uint8_t data)
 {
 	m_spr2_videoram[offset] = data;
 	m_spr2_tilemap->mark_tile_dirty(offset / 4);
+}
+
+// offset is relative to d800
+void punchout_state::dma_w(offs_t offset, uint8_t data)
+{
+	if (offset < 0x0800)
+		bg_top_videoram_w(offset, data); // also the sprite control registers and palette bank at dff0-dfff
+	else if (offset < 0x1000)
+		spr1_videoram_w(offset - 0x0800, data);
+	else if (offset < 0x1800)
+		spr2_videoram_w(offset - 0x1000, data);
+	else
+		bg_bot_videoram_w(offset - 0x1800, data);
+}
+
+void armwrest_state::dma_w(offs_t offset, uint8_t data)
+{
+	if (offset < 0x0800)
+		fg_videoram_w(offset, data); // also the sprite control registers and palette bank at dff0-dfff
+	else if (offset < 0x1000)
+		spr1_videoram_w(offset - 0x0800, data);
+	else if (offset < 0x1800)
+		spr2_videoram_w(offset - 0x1000, data);
+	else if (offset < 0x2000)
+		bg_bot_videoram_w(offset - 0x1800, data);
+	else
+		bg_top_videoram_w(offset - 0x2000, data);
 }
 
 
@@ -709,6 +750,11 @@ void punchout_state::nmi_mask_w(int state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
+void punchout_state::dma_enable_w(int state)
+{
+	m_dma_enable = state;
+}
+
 void punchout_state::nvram_enable_w(int state)
 {
 	m_nvram_enable = state;
@@ -734,31 +780,7 @@ void punchout_state::program_map(address_map &map)
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc3ff).mirror(0x0400).rw(FUNC(punchout_state::nvram_r), FUNC(punchout_state::nvram_w)).share(m_nvram);
 	map(0xd000, 0xd7ff).ram();
-	map(0xd800, 0xdfef).ram().w(FUNC(punchout_state::bg_top_videoram_w)).share(m_bg_top_videoram);
-	map(0xdff0, 0xdff7).ram().share(m_spr1_ctrlram);
-	map(0xdff8, 0xdffc).ram().share(m_spr2_ctrlram);
-	map(0xdffd, 0xdffd).ram().share(m_palettebank);
-	map(0xdffe, 0xdfff).ram();
-	map(0xe000, 0xe7ff).ram().w(FUNC(punchout_state::spr1_videoram_w)).share(m_spr1_videoram);
-	map(0xe800, 0xefff).ram().w(FUNC(punchout_state::spr2_videoram_w)).share(m_spr2_videoram);
-	map(0xf000, 0xffff).ram().w(FUNC(punchout_state::bg_bot_videoram_w)).share(m_bg_bot_videoram);   // also contains scroll RAM
-}
-
-
-void armwrest_state::program_map(address_map &map)
-{
-	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc3ff).mirror(0x0400).rw(FUNC(armwrest_state::nvram_r), FUNC(armwrest_state::nvram_w)).share(m_nvram);
-	map(0xd000, 0xd7ff).ram();
-	map(0xd800, 0xdfef).ram().w(FUNC(armwrest_state::fg_videoram_w)).share(m_fg_videoram);
-	map(0xdff0, 0xdff7).ram().share(m_spr1_ctrlram);
-	map(0xdff8, 0xdffc).ram().share(m_spr2_ctrlram);
-	map(0xdffd, 0xdffd).ram().share(m_palettebank);
-	map(0xdffe, 0xdfff).ram();
-	map(0xe000, 0xe7ff).ram().w(FUNC(armwrest_state::spr1_videoram_w)).share(m_spr1_videoram);
-	map(0xe800, 0xefff).ram().w(FUNC(armwrest_state::spr2_videoram_w)).share(m_spr2_videoram);
-	map(0xf000, 0xf7ff).ram().w(FUNC(armwrest_state::bg_bot_videoram_w)).share(m_bg_bot_videoram);
-	map(0xf800, 0xffff).ram().w(FUNC(armwrest_state::bg_top_videoram_w)).share(m_bg_top_videoram);
+	map(0xd800, 0xffff).ram().share(m_dmaram); // copied to the video and BAK boards by the vblank DMA
 }
 
 
@@ -1218,13 +1240,48 @@ GFXDECODE_END
 
 void punchout_state::vblank_irq(int state)
 {
-	if (state && m_nmi_mask)
+	if (!state)
+		return;
+
+	if (m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+
+	// The same edge clocks the BUSRQ flip-flop (1D), whose D input is latch Q2. While the Z80 is off
+	// the bus, the DMA counters (5B/5A/7B/6B, starting at d800) copy d800-ffff to the video and BAK
+	// boards, one byte per 5.04 MHz period, and the end of the copy clears the flip-flop. The NMI is
+	// taken once the Z80 has the bus back. Without the copy the boards keep showing the old picture.
+	if (m_dma_enable)
+	{
+		for (offs_t offset = 0; offset < m_vram.length(); offset++)
+		{
+			if (m_vram[offset] != m_dmaram[offset])
+				dma_w(offset, m_dmaram[offset]);
+		}
+
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, ASSERT_LINE);
+		m_dma_timer->adjust(attotime::from_ticks(m_vram.length(), XTAL(20'160'000) / 4));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(punchout_state::dma_done)
+{
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, CLEAR_LINE);
 }
 
 void punchout_state::machine_start()
 {
+	m_bg_top_videoram = &m_vram[0x0000];
+	m_spr1_ctrlram = &m_vram[0x07f0];
+	m_spr2_ctrlram = &m_vram[0x07f8];
+	m_palettebank = &m_vram[0x07fd];
+	m_spr1_videoram = &m_vram[0x0800];
+	m_spr2_videoram = &m_vram[0x1000];
+	m_bg_bot_videoram = &m_vram[0x1800];
+
+	m_dma_timer = timer_alloc(FUNC(punchout_state::dma_done), this);
+
 	save_item(NAME(m_nmi_mask));
+	save_item(NAME(m_dma_enable));
 	save_item(NAME(m_nvram_enable));
 }
 
@@ -1249,7 +1306,7 @@ void punchout_state::punchout(machine_config &config)
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 2B
 	mainlatch.q_out_cb<0>().set(FUNC(punchout_state::nmi_mask_w));
 	mainlatch.q_out_cb<1>().set_nop(); // watchdog reset, seldom used because 08 clears the watchdog as well
-	mainlatch.q_out_cb<2>().set_nop(); // ?
+	mainlatch.q_out_cb<2>().set(FUNC(punchout_state::dma_enable_w)); // BUSRQ flip-flop D
 	mainlatch.q_out_cb<3>().set_inputline("audiocpu", INPUT_LINE_RESET);
 	mainlatch.q_out_cb<4>().set("vlm", FUNC(vlm5030_device::rst_w));
 	mainlatch.q_out_cb<5>().set("vlm", FUNC(vlm5030_device::st_w));
@@ -1306,9 +1363,6 @@ void spunchout_state::spnchout(machine_config &config)
 void armwrest_state::armwrest(machine_config &config)
 {
 	punchout(config);
-
-	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &armwrest_state::program_map);
 
 	// video hardware
 	m_gfxdecode->set_info(gfx_armwrest);
