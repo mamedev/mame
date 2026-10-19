@@ -264,21 +264,7 @@ void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &b
 			}
 
 			rgb_t c = paldata[pen & 0x7fff];
-			if ((code & 3) == 2)
-				c = rgb_t(c.r() * m_brt1_r / 0x100, c.g() * m_brt1_g / 0x100, c.b() * m_brt1_b / 0x100);
-			else if (code & 1)
-				c = rgb_t(c.r() * m_brt_r / 0x100, c.g() * m_brt_g / 0x100, c.b() * m_brt_b / 0x100);
-			if (!BIT(code, 2) && !BIT(code, 6))
-			{
-				if (layer == 0)
-				{
-					if ((code & 3) == 2)
-						c = alpha_blend_r32(c, 0x00ffffff, 128);
-				}
-				else
-					c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
-			}
-			dst[x] = c;
+			dst[x] = apply_pixel_effects(c, code, s_op, layer);
 		}
 	}
 }
@@ -378,21 +364,33 @@ void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, con
 
 void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority)
 {
-	// TODO: registers 0x40 / 0x44 and 0x50 / 0x54 are used, unknown meaning
-	// Given how this works out it is most likely that 0x*0 controls X axis while 0x*4 Y,
-	// nothing is known to diverge between settings so far (i.e. bbbxing sets 0xffff to 0x4* and 0x0000 to 0x5*).
-	//             0x4*   0x5*  ROZ should wrap?
-	// bbbxing:  0xffff 0x0000  0 (match presentation)
-	// gratia:   0x0000 0x0000  1 (sky in stage 2)
-	// p47aces:  0xffff 0x0651  0 (title screen)
-	// desertwr: 0xffff 0x0651  1 (any stage)
-	// f1superb: 0xffff 0x0000  ?
-	// suchie2:  0x0000 0x0000  0?
-	// bnstars:  0x0000 0x0000  ?
-	// hayaosi3: 0x0000 0x0000  ?
-	// akiss:    0xffff 0x0000  0 (gal riichi, cfr. attract mode)
-	// Maybe wrapping is done by limit boundaries rather than individual bits, so that bbbxing and p47aces abuses of this behaviour?
-	// Are we missing a ROZ plane size as well?
+	// ROZ wrapping controlled by roz_ctrl[0x40] (plane size) and roz_ctrl[0x50]:
+	// r40=0xffff extends the plane beyond the tilemap; r50 non-zero fills outside
+	// with a tile, effectively enabling wrapping. r40=0x0000 wraps at tilemap boundary.
+	// Wrap when: r40 == 0 (natural tilemap wrap) or r50 != 0 (fill tile active)
+	// No wrap when: r40 != 0 and r50 == 0 (extended plane, transparent outside)
+	//
+	// Verified against PCB recordings:
+	//   bbbxing:  r40=ffff r50=0000 → no wrap (zoom-in shows single stripe)
+	//   desertwr: r40=ffff r50=0651 → wraps (desert ground tiles seamlessly)
+	//   f1superb: r40=ffff r50=0000 → no wrap
+	//
+	// roz_ctrl register survey (0x40-0x5c):
+	//             0x40   0x44   0x50   0x54   0x5c(super)  wraps?
+	// bbbxing:  0xffff 0xffff 0x0000 0x0000  0x0001        no
+	// p47aces:  0xffff 0xffff 0x0651 0x0651  0x0000        yes (transparent ROZ)
+	// f1superb: 0xffff 0xffff 0x0000 0x0000  0x0001        no
+	// akiss:    0xffff 0xffff 0x0000 0x0000  0x0000        no
+	// desertwr: 0xffff 0xffff 0x0651 0x0651  0x0000        yes
+	// gratia:   0x0000 0x0000 0x0000 0x0000  0x0000        yes
+	// suchie2:  0x0000 0x0000 0x0000 0x0000  0x0000        yes
+	// gametngk: 0x0000 0x0000 0x0000 0x0000  0x0000        yes
+	// tetrisp:  0x0000 0x0000 0x0000 0x0000  0x0000        yes
+	// hayaosi3: 0x0000 0x0000 0x0000 0x0000  0x0000        yes
+	// bnstars:  0x0000 0x0000 0x0000 0x0000  0x0000        yes
+	// kirarast: 0x0000 0x0000 0x0000 0x0000  0x0000        yes
+	// wpksocv2: 0x0000 0x0000 0x0000 0x0000  0x0000        yes
+	const bool roz_wrap = ((m_roz_ctrl[0x40/4] & 0xffff) == 0) || ((m_roz_ctrl[0x50/4] & 0xffff) != 0);
 
 	if (m_roz_ctrl[0x5c/4] & 1)  /* "super" mode */
 	{
@@ -433,7 +431,7 @@ void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rec
 			m_roz_tilemap->draw_roz(screen, bitmap, my_clip,
 					(start2x+startx+offsx)<<16, (start2y+starty+offsy)<<16,
 					incxx<<8, incxy<<8, 0, 0,
-					1, // Wrap
+					roz_wrap,
 					0, priority);
 
 			y++;
@@ -464,7 +462,7 @@ void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rec
 		m_roz_tilemap->draw_roz(screen, bitmap, cliprect,
 				(startx+offsx)<<16, (starty+offsy)<<16,
 				incxx<<8, incxy<<8, incyx<<8, incyy<<8,
-				1, // Wrap
+				roz_wrap,
 				0, priority);
 	}
 }
@@ -634,26 +632,7 @@ void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const r
 			}
 
 			rgb_t c = paldata[pen & 0x7fff];
-			// priram output bits 1:0 select brightness bank (always applied):
-			//   0 = none, 1 or 3 = bank 0, 2 = bank 1
-			if ((code & 3) == 2)
-				c = rgb_t(c.r() * m_brt1_r / 0x100, c.g() * m_brt1_g / 0x100, c.b() * m_brt1_b / 0x100);
-			else if (code & 1)
-				c = rgb_t(c.r() * m_brt_r / 0x100, c.g() * m_brt_g / 0x100, c.b() * m_brt_b / 0x100);
-			// !BIT(2) = shadow/glow effect (independent of brightness)
-			// sprites: only brt==2 triggers glow (white blend), otherwise unaffected
-			// BG/ROZ/TX: shadow (darken by half)
-			if (!BIT(code, 2) && !BIT(code, 6))
-			{
-				if (layer == 0)
-				{
-					if ((code & 3) == 2)
-						c = alpha_blend_r32(c, 0x00ffffff, 128);
-				}
-				else
-					c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
-			}
-			dst[x] = c;
+			dst[x] = apply_pixel_effects(c, code, s_op, layer);
 		}
 	}
 }

@@ -121,6 +121,17 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 	virtual void draw_tile_layers(screen_device &screen, const rectangle &cliprect);
 	virtual void mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	rgb_t apply_pixel_effects(rgb_t c, u8 code, bool s_op, u8 layer) const
+	{
+		if ((code & 3) == 2)
+			c = rgb_t(c.r() * m_brt1_r / 0x100, c.g() * m_brt1_g / 0x100, c.b() * m_brt1_b / 0x100);
+		else if (code & 1)
+			c = rgb_t(c.r() * m_brt_r / 0x100, c.g() * m_brt_g / 0x100, c.b() * m_brt_b / 0x100);
+		if (!BIT(code, 2) && !BIT(code, 6) && s_op && layer != 0)
+			c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
+		return c;
+	}
 	virtual tilemap_t &create_roz_tilemap() ATTR_COLD;
 	tilemap_t *roz_tilemap() const { return m_roz_tilemap; }
 	tilemap_t *tx_tilemap() const { return m_tx_tilemap; }
