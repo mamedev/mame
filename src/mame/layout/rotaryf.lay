@@ -7,11 +7,11 @@ authors:MASH
 	<element name="overlay">
 		<rect>
 			<bounds left="0" top="0" right="256" bottom="40" />
-			<color red="0" green="1" blue="0" />
+			<color red="0.5" green="1" blue="0" />
 		</rect>
 		<rect>
 			<bounds left="0" top="40" right="256" bottom="72" />
-			<color red="0.5" green="0.5" blue="1" />
+			<color red="0.6" green="0.5" blue="0.9" />
 		</rect>
 		<rect>
 			<bounds left="0" top="72" right="256" bottom="104" />
@@ -27,11 +27,11 @@ authors:MASH
 		</rect>
 		<rect>
 			<bounds left="0" top="168" right="256" bottom="192" />
-			<color red="0.5" green="0.5" blue="1" />
+			<color red="0.6" green="0.5" blue="0.9" />
 		</rect>
 		<rect>
 			<bounds left="0" top="192" right="256" bottom="232" />
-			<color red="0" green="1" blue="0" />
+			<color red="0.5" green="1" blue="0" />
 		</rect>
 	</element>
 
