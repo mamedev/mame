@@ -154,6 +154,15 @@ void cuda_device::device_start()
 
 void cuda_device::device_reset()
 {
+	if (m_pram_loaded)
+	{
+		for (int byte = 0; byte < 256; byte++)
+		{
+			m_disk_pram[byte] = m_maincpu->read_internal_ram(0x70 + byte);
+		}
+		m_pram_loaded = false;
+	}
+
 	m_last_adb_time = m_maincpu->total_cycles();
 }
 
