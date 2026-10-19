@@ -643,8 +643,8 @@ void ms32_state::apply_sprite_effects(screen_device &screen, bitmap_rgb32 &bitma
 	screen.priority().fill(0, cliprect);
 
 	const size_t sprite_tail = m_objectram_size - 8;
-	u16 *source = m_sprram_buffer.get();
-	u16 *finish = m_sprram_buffer.get() + sprite_tail;
+	const u16 *source = m_sprram_buffer.get();
+	const u16 *finish = m_sprram_buffer.get() + sprite_tail;
 	const bool reverseorder = (m_sprite_ctrl[0x10/4] & 0x8000) == 0x0000;
 	if (reverseorder) { source = m_sprram_buffer.get() + sprite_tail; finish = m_sprram_buffer.get(); }
 	for (;reverseorder ? (source>=finish) : (source<finish); reverseorder ? (source-=8) : (source+=8))
