@@ -425,6 +425,10 @@ void kn_sd_state::kn7000_map(address_map &map)
 	tg_map<0>(map, 0x98040000);
 	tg_map<1>(map, 0x98050000);
 	fdc_map(map);
+	// IC19, the picture ROM: the Slide Show's 100 PRESET pictures. Its top
+	// address pin is grounded through JP10, and the half the CPU can reach
+	// holds one 2 MB image, so the 8 MB window shows it four times.
+	map(0x57800000, 0x579fffff).mirror(0x600000).rom().region("picture", 0);
 	sd_map(map);
 }
 
@@ -1136,8 +1140,9 @@ ROM_START(kn7000)
 	ROM_REGION(0x800000, "rhythm_data", 0)
 	ROM_LOAD("c3cbnd000046.ic18", 0x000000, 0x800000, NO_DUMP)
 
-	ROM_REGION(0x800000, "picture", 0)
-	ROM_LOAD("c3cbmd000098.ic19", 0x000000, 0x800000, NO_DUMP)
+	// The 2 MB the CPU sees; the chip's other half is out of its reach
+	ROM_REGION32_LE(0x200000, "picture", 0)
+	ROM_LOAD("c3cbmd000098.ic19", 0x000000, 0x200000, CRC(3372cb5c) SHA1(9631dedfc501b8c11bb93efa2d99750e3c84465a))
 
 	// Preloaded with factory default (same as the contents of `Initial Data Disk`)
 	ROM_REGION(0x200000, "custom_data", ROMREGION_ERASEFF)
