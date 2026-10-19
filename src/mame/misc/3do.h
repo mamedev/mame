@@ -12,7 +12,6 @@
 #include "machine/bankdev.h"
 #include "machine/cr560b.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
 
 #include "screen.h"
@@ -20,7 +19,6 @@
 #include "3do_amy.h"
 #include "3do_clio.h"
 #include "3do_madam.h"
-#include "3do_portfolio.h"
 
 class _3do_state : public driver_device
 {
@@ -29,7 +27,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dram(*this, "dram", 0x200000, ENDIANNESS_BIG),
-		m_vram(*this, "vram"),
+		m_vram(*this, "vram", 0x100000, ENDIANNESS_BIG),
+		m_bios(*this, "bios"),
 		m_nvram(*this, "nvram"),
 		m_madam(*this, "madam"),
 		m_clio(*this, "clio"),
@@ -50,6 +49,7 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_post_load() override;
 
 	void green_config(machine_config &config) ATTR_COLD;
 
@@ -78,8 +78,9 @@ private:
 	};
 
 	required_device<cpu_device> m_maincpu;
-	memory_share_creator<uint32_t> m_dram;
-	required_shared_ptr<uint32_t> m_vram;
+	memory_share_creator<uint32_t> m_dram; // two sets of 1MB
+	memory_share_creator<uint32_t> m_vram; // one bank of 1MB
+	required_region_ptr<uint32_t> m_bios;
 	required_device<nvram_device> m_nvram;
 	// HACK: protected for adapting with Arcade systems
 	// The only thing required being protected will eventually be the Player Bus only
@@ -116,6 +117,8 @@ private:
 
 	void m_slow2_init( void );
 
+	void memory_config_w(uint8_t data);
+	void overlay_w(uint32_t data);
 	void soft_reset_w(int state);
 	TIMER_CALLBACK_MEMBER(soft_reset_cb);
 };
@@ -162,9 +165,14 @@ class alg_gun_state : public _3do_state
 public:
 	alg_gun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: _3do_state(mconfig, type, tag)
+		, m_gun_r(*this, {"P1_GUNX", "P1_GUNY", "P2_GUNX", "P2_GUNY"})
 	{ }
 
 	void alg_gun(machine_config &config) ATTR_COLD;
+private:
+	required_ioport_array<4> m_gun_r;
+
+	std::pair<u32, u8> gun_counter_r(u8 which);
 };
 
 #endif // MAME_MISC_3DO_H

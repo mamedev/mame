@@ -46,9 +46,9 @@
 
 
 #define MX_OR                       0x00
-#define MX_XOR                      0x01    // unimplemented
-#define MX_AND                      0x02    // unimplemented
-#define MX_PRIORITY_OR              0x03    // unimplemented
+#define MX_XOR                      0x01
+#define MX_AND                      0x02
+#define MX_PRIORITY_OR              0x03
 
 
 #define FC_OFF                      0x00
@@ -266,6 +266,14 @@ void sed1330_device::command_w(uint8_t data)
 	case INSTRUCTION_SLEEP_IN:
 		break;
 #endif
+	case INSTRUCTION_DISP_ON:
+	case INSTRUCTION_DISP_OFF:
+		// the parameter byte is optional; a bare command just toggles the
+		// display and leaves FC/FP as last latched
+		m_d = BIT(m_ir, 0);
+		LOG("SED1330 Display: %s (no parameter byte)\n", m_d ? "on" : "off");
+		break;
+
 	case INSTRUCTION_CSRDIR_RIGHT:
 	case INSTRUCTION_CSRDIR_LEFT:
 	case INSTRUCTION_CSRDIR_UP:
@@ -637,7 +645,7 @@ void sed1330_device::draw_text_scanline(bitmap_ind16 &bitmap, const rectangle &c
 //  draw_graphics_scanline -
 //-------------------------------------------------
 
-void sed1330_device::draw_graphics_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t va)
+void sed1330_device::draw_graphics_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t va, int op)
 {
 	for (int sx = 0; sx < m_cr; sx++)
 	{
@@ -647,8 +655,21 @@ void sed1330_device::draw_graphics_scanline(bitmap_ind16 &bitmap, const rectangl
 		{
 			// the character pitch need not divide the panel width
 			const int px = (sx * m_fx) + x;
-			if (cliprect.contains(px, y))
-				bitmap.pix(y, px) = BIT(data, 7);
+			if (!cliprect.contains(px, y))
+				continue;
+
+			const uint8_t bit = BIT(data, 7);
+
+			switch (op)
+			{
+			case LAYER_REPLACE:  bitmap.pix(y, px)  = bit; break;
+			case MX_XOR:         bitmap.pix(y, px) ^= bit; break;
+			case MX_AND:         bitmap.pix(y, px) &= bit; break;
+
+			// 1bpp layers: priority-OR and OR agree on every input
+			case MX_OR:
+			case MX_PRIORITY_OR: bitmap.pix(y, px) |= bit; break;
+			}
 		}
 	}
 }
@@ -660,6 +681,31 @@ void sed1330_device::draw_graphics_scanline(bitmap_ind16 &bitmap, const rectangl
 
 void sed1330_device::update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	const uint8_t attr1 = m_fp & 0x03;
+	const uint8_t attr2 = (m_fp >> 2) & 0x03;
+	const uint8_t attr3 = (m_fp >> 4) & 0x03;
+
+	const int lines = std::min<int>(m_lf, bitmap.height());
+
+	for (int y = 0; y < lines; y++)
+	{
+		bool first = true;
+
+		if ((attr1 != FP_OFF) && (y < m_sl1))
+		{
+			draw_graphics_scanline(bitmap, cliprect, y, m_sad1 + (y * m_ap), LAYER_REPLACE);
+			first = false;
+		}
+
+		if (attr2 != FP_OFF)
+		{
+			draw_graphics_scanline(bitmap, cliprect, y, m_sad2 + (y * m_ap), first ? LAYER_REPLACE : m_mx);
+			first = false;
+		}
+
+		if (m_ov && (attr3 != FP_OFF))
+			draw_graphics_scanline(bitmap, cliprect, y, m_sad3 + (y * m_ap), first ? LAYER_REPLACE : m_mx);
+	}
 }
 
 

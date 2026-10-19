@@ -75,7 +75,7 @@ function toolchain(_buildDir, _subDir)
 		androidApiLevel = _OPTIONS["with-android"]
 	end
 
-	if _ACTION == "gmake" or _ACTION == "ninja" then
+	if _ACTION == "gmake" or _ACTION == "ninja" or _ACTION == "jcdb" then
 
 		if nil == _OPTIONS["gcc"] or nil == _OPTIONS["gcc_version"] then
 			print("GCC flavor and version must be specified!")
@@ -212,6 +212,11 @@ function toolchain(_buildDir, _subDir)
 			premake.vstudio.toolset = ("ClangCL")
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-clang")
 		end
+	end
+
+	-- put the compilation database at the source root for editor discovery
+	if _ACTION == "jcdb" then
+		location (MAME_DIR)
 	end
 
 	if (_OPTIONS["CC"] ~= nil) then
@@ -618,4 +623,3 @@ function strip()
 
 	configuration {} -- reset configuration
 end
-

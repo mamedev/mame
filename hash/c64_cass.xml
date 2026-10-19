@@ -241,7 +241,7 @@ Notes:
 		<description>Army Days</description>
 		<year>1989</year>
 		<publisher>Mindscape</publisher>
-		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
+		<sharedfeat name="joy1_default" value="magnum"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="635014">
@@ -1563,7 +1563,7 @@ Fails [tape] loading, light blue screen
 		<description>Blaze Out</description>
 		<year>1989</year>
 		<publisher>Ocean</publisher>
-		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
+		<sharedfeat name="joy1_default" value="magnum"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="2091822">
@@ -1815,6 +1815,7 @@ Fails [tape] loading, light blue screen
 		<info name="alt_title" value="Boulder Dash IV: The Game"/>
 		<info name="alt_title" value="Boulder Dash IV: Construction Kit"/>
 		<info name="usage" value="Swap joy port 2 to port 1 after loaded a screen"/>
+		<sharedfeat name="joy1_default" value="joy"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Boulder Dash IV: The Game"/>
@@ -4571,6 +4572,7 @@ Fails [tape] loading, light blue screen
 [VIC] glitch on score bar
 ]]></notes>
 		<info name="usage" value="Swap joystick in port 1 for one player game" />
+		<sharedfeat name="joy1_default" value="joy"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -4981,7 +4983,7 @@ Fails [tape] loading, light blue screen
 		<description>Gangster</description>
 		<year>1989</year>
 		<publisher>Mindscape Inc.</publisher>
-		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
+		<sharedfeat name="joy1_default" value="magnum"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="633400">
@@ -5189,6 +5191,7 @@ Fails [tape] loading, light blue screen
 		<year>1988</year>
 		<publisher>Ricochet</publisher>
 		<info name="usage" value="Swap joystick port 2 in 1 once you reach the shop screen"/>
+		<sharedfeat name="joy1_default" value="joy"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="491599">
@@ -5205,6 +5208,7 @@ Fails [tape] loading, light blue screen
 BASIC IPL dislikes being skipped with SPACE key (wants specifically CBM key)
 ]]></notes>
 		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading, swap joystick port 2 in 1 once you reach the shop screen"/>
+		<sharedfeat name="joy1_default" value="joy"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="467682">
@@ -7580,7 +7584,7 @@ Fails [tape] loading, light blue screen
 		<description>Kikstart 2</description>
 		<year>1987</year>
 		<publisher>Mastertronic</publisher>
-		<info name="usage" value="Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="718821">
@@ -13932,7 +13936,7 @@ Fails [tape] loading after side swap (update: cannot reproduce, random?)
 		<description>Time Traveller</description>
 		<year>1989</year>
 		<publisher>Mindscape Inc.</publisher>
-		<info name="usage" value="Requires Magnum Light Phaser (magnum) in joystick port 1"/>
+		<sharedfeat name="joy1_default" value="magnum"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="632776">
@@ -15548,6 +15552,7 @@ Space Trooper (000):
 Hummdinger (193): [VIC] line off on instruction screen scroll
 ]]></notes>
 		<info name="usage" value="Hummdinger: requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A: Dandy / Freddy Hardest"/>
@@ -15574,7 +15579,7 @@ Indoor Soccer (383):
 Street Soccer (000):
 Soccer Skills (453): [VIC] scrolling sometimes flickers for a brief period during gameplay
 ]]></notes>
-		<info name="usage" value="All games requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A: 11-A-Side Soccer / Indoor Soccer"/>
@@ -17111,6 +17116,7 @@ The Staff of Karnath: Fails [tape] loading, light blue screen
 Jet Set Willy:
 ]]></notes>
 		<info name="usage" value="Decathlon: Requires joystick in port 1" />
+		<sharedfeat name="joy1_default" value="joy"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Tape 1 Side 1: Beach Head"/>
@@ -17152,6 +17158,7 @@ Rambo: [VIC] status bar at bottom cuts off score display
 Kung-Fu Master: randomly crashes on life losses
 ]]></notes>
 		<info name="usage" value="Ghostbusters: Ensure c1541 Slot Device is removed prior to loading, swap joystick port 2 in 1 once you reach the shop screen"/>
+		<sharedfeat name="joy1_default" value="joy"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Tape 1 Side 1: Fighter Pilot"/>

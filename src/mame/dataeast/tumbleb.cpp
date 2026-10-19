@@ -209,16 +209,16 @@ Stephh's notes (based on the games M68000 code and some tests) :
     but the address where the computed value is stored is NEVER read back !
     I guess this might be a leftover from another game.
 
-  - The "Event Selection" Dip Switch allows you to select your events by
+  - The "Event Selection" DIP switch allows you to select your events by
     pressing BUTTON1 when the moving "cursor" is on the event you want
 
-  - The "Control Type" Dip Switch only has an effect during the events :
+  - The "Control Type" DIP switch only has an effect during the events :
     it means that whatever the settings are, you need the joystick and buttons
     to select your character, enter your initials and select your events.
 
-  - The "Debug Mode" Dip Switch (known as "Test Mode" ingame) allows you
+  - The "Debug Mode" DIP switch (known as "Test Mode" ingame) allows you
     to select your events by using the joystick then pressing BUTTON1.
-    This Dip Switch overrides "Event Selection" Dip Switch !
+    This DIP switch overrides "Event Selection" DIP switch !
 
 
 10) 'semibase'
@@ -418,6 +418,9 @@ protected:
 
 	u8 m_suprtrio_prot_latch = 0;
 
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 	void tumblepb_oki_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t tumblepb_prot_r();
 	uint16_t tumblepopb_controls_r(offs_t offset);
@@ -453,8 +456,6 @@ protected:
 	TILE_GET_INFO_MEMBER(pangpang_get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(pangpang_get_bg2_tile_info);
 	TILE_GET_INFO_MEMBER(pangpang_get_fg_tile_info);
-	DECLARE_MACHINE_START(tumbleb);
-	DECLARE_MACHINE_RESET(tumbleb);
 	DECLARE_VIDEO_START(tumblepb);
 	DECLARE_VIDEO_START(fncywld);
 	DECLARE_MACHINE_RESET(htchctch);
@@ -508,10 +509,10 @@ public:
 		m_okibank(*this, "okibank")
 	{ }
 
-	void funkyjetb(machine_config &config);
+	void funkyjetb(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void driver_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void oki_bank_w(uint8_t data);
@@ -1513,8 +1514,10 @@ void tumbleb_pic_state::pic_ctrl_w(uint8_t data)
 		m_soundlatch->acknowledge_w();
 }
 
-void tumbleb_pic_state::driver_start()
+void tumbleb_pic_state::machine_start()
 {
+	tumbleb_state::machine_start();
+
 	m_pic_data = 0xff;
 	save_item(NAME(m_pic_data));
 
@@ -2792,7 +2795,7 @@ GFXDECODE_END
 /******************************************************************************/
 
 
-MACHINE_START_MEMBER(tumbleb_state,tumbleb)
+void tumbleb_state::machine_start()
 {
 	save_item(NAME(m_music_command));
 	save_item(NAME(m_music_bank));
@@ -2802,7 +2805,7 @@ MACHINE_START_MEMBER(tumbleb_state,tumbleb)
 	save_item(NAME(m_tilebank));
 }
 
-MACHINE_RESET_MEMBER(tumbleb_state,tumbleb)
+void tumbleb_state::machine_reset()
 {
 	m_music_command = 0;
 	m_music_bank = 0;
@@ -2818,9 +2821,6 @@ void tumbleb_state::tumblepb(machine_config &config)
 	M68000(config, m_maincpu, 14000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::tumblepopb_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
-
-	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
-	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
 	SCREEN(config, m_screen);
@@ -2848,6 +2848,7 @@ void tumbleb_state::tumblepb(machine_config &config)
 void tumbleb_state::tumblepba(machine_config &config)
 {
 	tumblepb(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::tumblepopba_main_map);
 }
 
@@ -2857,9 +2858,6 @@ void tumbleb_state::tumbleb2(machine_config &config)
 	M68000(config, m_maincpu, 14000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::tumblepopb_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::tumbleb2_interrupt));
-
-	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
-	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
 	SCREEN(config, m_screen);
@@ -2914,9 +2912,6 @@ void tumbleb_state::jumpkids(machine_config &config) // OSCs: 12MHz, 8MHz & 14.3
 	Z80(config, m_audiocpu, 8_MHz_XTAL/2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tumbleb_state::jumpkids_sound_map);
 
-	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
-	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
-
 	/* video hardware */
 	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
@@ -2948,9 +2943,6 @@ void tumbleb_state::fncywld(machine_config &config) // OSCs: 12MHz, 4MHz & 28.63
 	M68000(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::fncywld_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
-
-	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
-	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
 	SCREEN(config, m_screen);
@@ -2984,9 +2976,6 @@ void tumbleb_state::magipur(machine_config &config) // OSCs: 12MHz, 4MHz, 28.636
 	M68000(config, m_maincpu, XTAL(12'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::magipur_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::irq6_line_hold));
-
-	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
-	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
 	SCREEN(config, m_screen);
@@ -3027,7 +3016,7 @@ MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
 			m_mainram[0x000 / 2 + i] = PROTDATA[i];
 	}
 
-	MACHINE_RESET_CALL_MEMBER(tumbleb);
+	machine_reset();
 }
 
 void tumbleb_state::htchctch(machine_config &config) // OSCs: 15MHz, 4.096MHz
@@ -3040,7 +3029,6 @@ void tumbleb_state::htchctch(machine_config &config) // OSCs: 15MHz, 4.096MHz
 	Z80(config, m_audiocpu, 15_MHz_XTAL/4); /* 3.75MHz verified on dquizgo */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tumbleb_state::semicom_sound_map);
 
-	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
 	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,htchctch)
 
 	/* video hardware */
@@ -3088,6 +3076,7 @@ void tumbleb_state::htchctch_mcu(machine_config &config) // OSCs: 15MHz, 4.096MH
 void tumbleb_state::cookbib(machine_config &config)
 {
 	htchctch(config);
+
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_semicom_altoffsets));
 }
 
@@ -3116,6 +3105,7 @@ void tumbleb_state::cookbib_mcu(machine_config &config) // OSCs: 15MHz, 4.096MHz
 void tumbleb_state::bcstory(machine_config &config) // OSCs: 15MHz, 4.096MHz
 {
 	htchctch(config);
+
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_bcstory));
 }
 
@@ -3128,6 +3118,7 @@ void tumbleb_state::semibase(machine_config &config) // OSCs: 15MHz, 4.096MHz
 void tumbleb_state::sdfight(machine_config &config) // OSCs: 15MHz, 4.096MHz
 {
 	htchctch(config);
+
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,sdfight)
 	m_screen->set_screen_update(FUNC(tumbleb_state::screen_update_sdfight));
 }
@@ -3135,6 +3126,7 @@ void tumbleb_state::sdfight(machine_config &config) // OSCs: 15MHz, 4.096MHz
 void tumbleb_state::metlsavr(machine_config &config)// OSCs: 14MHz, 3.579545MHz
 {
 	cookbib(config);
+
 	m_palette->set_format(palette_device::xBGR_444, 1024);
 
 	subdevice<ym2151_device>("ymsnd")->set_clock(3.579545_MHz_XTAL);
@@ -3150,9 +3142,6 @@ void tumbleb_state::suprtrio(machine_config &config) // OSCs: 14MHz, 12MHz & 8MH
 
 	Z80(config, m_audiocpu, 8_MHz_XTAL/2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tumbleb_state::suprtrio_sound_map);
-
-	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
-	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
 	SCREEN(config, m_screen);
@@ -3190,9 +3179,6 @@ void tumbleb_state::pangpang(machine_config &config) // OSCs: 14MHz, 12MHz & 8MH
 	M68000(config, m_maincpu, 14_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tumbleb_state::pangpang_main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tumbleb_state::tumbleb2_interrupt));
-
-	MCFG_MACHINE_START_OVERRIDE(tumbleb_state,tumbleb)
-	MCFG_MACHINE_RESET_OVERRIDE(tumbleb_state,tumbleb)
 
 	/* video hardware */
 	SCREEN(config, m_screen);

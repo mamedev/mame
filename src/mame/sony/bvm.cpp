@@ -96,7 +96,7 @@ ROM_END
 
 void bvm_state::init_bvm()
 {
-	// Generate a fake internal ROM that does nothing but call exception handlers using PJSR
+	// HACK: Generate a fake internal ROM that does nothing but call exception handlers using PJSR
 	u8 *rom = memregion("maincpu")->base();
 	put_u32be(&rom[0], 0x00000200);
 	put_u24be(&rom[0x200], 0x04048d); // LDC.B #H'04, DP

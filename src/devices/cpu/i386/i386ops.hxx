@@ -796,7 +796,7 @@ void i386_device::i386_mov_rm16_sreg()     // Opcode 0x8c
 			STORE_RM16(modrm, m_sreg[s].selector);
 		CYCLES(CYCLES_MOV_SREG_REG);
 	} else {
-		uint32_t ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1,2);
 		WRITE16(ea, m_sreg[s].selector);
 		CYCLES(CYCLES_MOV_SREG_MEM);
 	}
@@ -813,7 +813,7 @@ void i386_device::i386_mov_sreg_rm16()     // Opcode 0x8e
 		selector = LOAD_RM16(modrm);
 		CYCLES(CYCLES_MOV_REG_SREG);
 	} else {
-		uint32_t ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0,2);
 		selector = READ16(ea);
 		CYCLES(CYCLES_MOV_MEM_SREG);
 	}

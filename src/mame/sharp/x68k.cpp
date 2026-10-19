@@ -349,24 +349,26 @@ void x68k_state::ct_w(uint8_t data)
 
 enum ioc_irq_number : unsigned
 {
+	IOC_HDD_INT = 8,
 	IOC_FDC_INT = 7,
 	IOC_FDD_INT = 6,
 	IOC_PRT_INT = 5,
-	IOC_HDD_INT = 4,
-	IOC_HDD_IEN = 3,
 	IOC_FDC_IEN = 2,
 	IOC_FDD_IEN = 1,
 	IOC_PRT_IEN = 0,
 };
 template <unsigned N> void x68k_state::ioc_irq(int state)
 {
-	if (state)
-		m_ioc.irqstatus |= 1U << N;
+	if(N == IOC_HDD_INT)
+		m_hdd_irq = state;
 	else
-		m_ioc.irqstatus &= ~(1U << N);
-
-	bool const irq_state =
-		(BIT(m_ioc.irqstatus, IOC_HDD_INT) && BIT(m_ioc.irqstatus, IOC_HDD_IEN)) ||
+	{
+		if (state)
+			m_ioc.irqstatus |= 1U << N;
+		else
+			m_ioc.irqstatus &= ~(1U << N);
+	}
+	bool const irq_state = m_hdd_irq ||
 		(BIT(m_ioc.irqstatus, IOC_PRT_INT) && BIT(m_ioc.irqstatus, IOC_PRT_IEN)) ||
 		(BIT(m_ioc.irqstatus, IOC_FDD_INT) && BIT(m_ioc.irqstatus, IOC_FDD_IEN)) ||
 		(BIT(m_ioc.irqstatus, IOC_FDC_INT) && BIT(m_ioc.irqstatus, IOC_FDC_IEN));
@@ -381,8 +383,6 @@ template <unsigned N> void x68k_state::ioc_irq(int state)
                 - bit 7 = FDC interrupt
                 - bit 6 = FDD interrupt
                 - bit 5 = Printer Busy signal
-                - bit 4 = HDD interrupt
-                - bit 3 = HDD interrupts enabled
                 - bit 2 = FDC interrupts enabled
                 - bit 1 = FDD interrupts enabled
                 - bit 0 = Printer interrupts enabled
@@ -396,6 +396,10 @@ void x68k_state::ioc_w(offs_t offset, uint8_t data)
 	{
 	case 0x00:
 		m_ioc.irqstatus = (m_ioc.irqstatus & 0xf0) | (data & 0x0f);
+//		if(BIT(data,IOC_FDC_INT)) ioc_irq<IOC_FDC_INT>(0);
+//		if(BIT(data,IOC_FDD_INT)) ioc_irq<IOC_FDD_INT>(0);
+//		if(BIT(data,IOC_HDD_INT)) ioc_irq<IOC_HDD_INT>(0);
+//		if(BIT(data,IOC_PRT_INT)) ioc_irq<IOC_PRT_INT>(0);
 		LOGMASKED(LOG_SYS, "I/O: Status register write %02x\n",data);
 		break;
 	case 0x01:
@@ -693,7 +697,14 @@ void x68k_state::adpcm_w(offs_t offset, uint8_t data)
 uint8_t x68k_state::iack1()
 {
 	uint8_t vector = 0x18;
-	if (BIT(m_ioc.irqstatus, IOC_FDC_INT) && BIT(m_ioc.irqstatus, IOC_FDC_IEN))
+	if (m_hdd_irq)
+	{
+		// TODO: Internal SCSI IRQ vector 0x6c, External SCSI IRQ vector 0xf6 (really?)
+		vector = 0x6c;
+//		if (!machine().side_effects_disabled())
+//			ioc_irq<IOC_HDD_INT>(0);
+	}
+	else if (BIT(m_ioc.irqstatus, IOC_FDC_INT) && BIT(m_ioc.irqstatus, IOC_FDC_IEN))
 	{
 		vector = m_ioc.vector | 0;
 		if (!machine().side_effects_disabled())
@@ -710,13 +721,6 @@ uint8_t x68k_state::iack1()
 		vector = m_ioc.vector | 3;
 		if (!machine().side_effects_disabled())
 			ioc_irq<IOC_PRT_INT>(0);
-	}
-	else if (BIT(m_ioc.irqstatus, IOC_HDD_INT) && BIT(m_ioc.irqstatus, IOC_HDD_IEN))
-	{
-		// TODO: Internal SCSI IRQ vector 0x6c, External SCSI IRQ vector 0xf6 (really?)
-		vector = m_ioc.vector | 2;
-		if (!machine().side_effects_disabled())
-			ioc_irq<IOC_HDD_INT>(0);
 	}
 
 	if (!machine().side_effects_disabled())
@@ -762,6 +766,36 @@ uint8_t x68k_state::iack4()
 		return m68000_base_device::autovector(0); // spurious interrupt
 }
 
+uint16_t x68ksupr_state::scsi_data_r(offs_t offset)
+{
+	switch(offset)
+	{
+		case 0:
+		default:
+			if(!m_dreq)
+				m_hd63450->dtack_w(1);
+			return m_scsictrl->dma_r();
+		case 1:
+			return m_scsictrl->temp_r();
+	}
+}
+
+void x68ksupr_state::scsi_data_w(offs_t offset, uint16_t data)
+{
+	switch(offset)
+	{
+		case 0:
+		default:
+			if(!m_dreq)
+				m_hd63450->dtack_w(1);
+			m_scsictrl->dma_w(data);
+			break;
+		case 1:
+			m_scsictrl->temp_w(data);
+			break;
+	}
+}
+
 void x68k_state::cpu_space_map(address_map &map)
 {
 	map.global_mask(0xffffff);
@@ -799,7 +833,7 @@ void x68k_state::x68k_base_map(address_map &map)
 	map(0xe94004, 0xe94007).rw(FUNC(x68k_state::fdc_r), FUNC(x68k_state::fdc_w));
 	map(0xe98000, 0xe99fff).rw(m_scc, FUNC(scc8530_device::ab_dc_r), FUNC(scc8530_device::ab_dc_w)).umask16(0x00ff);
 	map(0xe9a000, 0xe9bfff).rw(FUNC(x68k_state::ppi_r), FUNC(x68k_state::ppi_w));
-	map(0xe9c000, 0xe9dfff).rw(FUNC(x68k_state::ioc_r), FUNC(x68k_state::ioc_w)).umask16(0x00ff);
+	map(0xe9c000, 0xe9c003).mirror(0x001ff0).rw(FUNC(x68k_state::ioc_r), FUNC(x68k_state::ioc_w)).umask16(0x00ff);
 	map(0xe9e000, 0xe9e3ff).rw(FUNC(x68k_state::exp_r), FUNC(x68k_state::exp_w));  // FPU (Optional)
 	map(0xeafa00, 0xeafa1f).rw(FUNC(x68k_state::exp_r), FUNC(x68k_state::exp_w));
 	map(0xeb0000, 0xeb7fff).rw(FUNC(x68k_state::spritereg_r), FUNC(x68k_state::spritereg_w));
@@ -832,6 +866,8 @@ void x68ksupr_state::x68kxvi_map(address_map &map)
 	map(0xe92001, 0xe92001).rw(m_okim6258, FUNC(okim6258_device::status_r), FUNC(okim6258_device::ctrl_w));
 	map(0xe92003, 0xe92003).rw(m_okim6258, FUNC(okim6258_device::status_r), FUNC(okim6258_device::data_w));
 	map(0xe96020, 0xe9603f).m(m_scsictrl, FUNC(mb89352_device::map)).umask16(0x00ff);
+	map(0xe9602d, 0xe9602d).w(FUNC(x68ksupr_state::scsi_unknown_w));
+	map(0xe96034, 0xe96035).rw(FUNC(x68ksupr_state::scsi_data_r), FUNC(x68ksupr_state::scsi_data_w));  // handle DMA glue
 	map(0xea0000, 0xea1fff).rw(FUNC(x68ksupr_state::exp_r), FUNC(x68ksupr_state::exp_w));  // external SCSI ROM and controller
 	map(0xeafa80, 0xeafa89).rw(FUNC(x68ksupr_state::areaset_r), FUNC(x68ksupr_state::enh_areaset_w));
 	map(0xfc0000, 0xfdffff).rom();  // internal SCSI ROM
@@ -848,6 +884,9 @@ void x68030_state::x68030_map(address_map &map)
 
 	map(0xe96020, 0xe9603f).m(m_scsictrl, FUNC(mb89352_device::map)).umask32(0x00ff00ff);
 	map(0xe9602d, 0xe9602d).w(FUNC(x68030_state::scsi_unknown_w));
+	map(0xe96034, 0xe96037).lrw16(
+		NAME([this](offs_t off) { return scsi_data_r(off); }),
+		NAME([this](offs_t off, uint16_t data) { return scsi_data_w(off,data); }));
 	map(0xea0000, 0xea1fff).noprw();//.rw(FUNC(x68030_state::exp_r), FUNC(x68030_state::exp_w));  // external SCSI ROM and controller
 	map(0xeafa80, 0xeafa8b).rw(FUNC(x68030_state::areaset_r), FUNC(x68030_state::enh_areaset_w));
 	map(0xfc0000, 0xfdffff).rom();  // internal SCSI ROM
@@ -916,6 +955,33 @@ void x68k_state::machine_reset()
 
 void x68k_state::machine_start()
 {
+	unsigned char* rom = memregion("maincpu")->base();
+	unsigned char* user2 = memregion("user2")->base();
+
+	subdevice<nvram_device>("nvram")->set_base(&m_nvram[0], m_nvram.size()*sizeof(m_nvram[0]));
+
+#ifdef USE_PREDEFINED_SRAM
+	{
+		unsigned char* ramptr = memregion("user3")->base();
+		memcpy(m_sram,ramptr,0x4000);
+	}
+#endif
+
+	// copy last half of BIOS to a user region, to use for initial startup
+	memcpy(user2,(rom+0xff0000),0x10000);
+
+	m_led_timer = timer_alloc(FUNC(x68ksupr_state::led_callback), this);
+	m_fdc_tc = timer_alloc(FUNC(x68ksupr_state::floppy_tc_tick), this);
+	m_adpcm_timer = timer_alloc(FUNC(x68ksupr_state::adpcm_drq_tick), this);
+	m_bus_error_timer = timer_alloc(FUNC(x68ksupr_state::bus_error), this);
+
+	m_sysport.cputype = 0xff;  // 68000, 10MHz
+	m_is_32bit = false;
+
+	save_item(NAME(m_tvram));
+	save_item(NAME(m_gvram));
+	save_item(NAME(m_spritereg));
+
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	// install RAM handlers
 	m_spriteram = (uint16_t*)(memregion("user1")->base());
@@ -948,46 +1014,18 @@ void x68k_state::machine_start()
 	m_led_state = 0;
 }
 
-void x68k_state::driver_start()
+void x68ksupr_state::machine_start()
 {
-	unsigned char* rom = memregion("maincpu")->base();
-	unsigned char* user2 = memregion("user2")->base();
+	x68k_state::machine_start();
 
-	subdevice<nvram_device>("nvram")->set_base(&m_nvram[0], m_nvram.size()*sizeof(m_nvram[0]));
-
-#ifdef USE_PREDEFINED_SRAM
-	{
-		unsigned char* ramptr = memregion("user3")->base();
-		memcpy(m_sram,ramptr,0x4000);
-	}
-#endif
-
-	// copy last half of BIOS to a user region, to use for initial startup
-	memcpy(user2,(rom+0xff0000),0x10000);
-
-	m_led_timer = timer_alloc(FUNC(x68ksupr_state::led_callback), this);
-	m_fdc_tc = timer_alloc(FUNC(x68ksupr_state::floppy_tc_tick), this);
-	m_adpcm_timer = timer_alloc(FUNC(x68ksupr_state::adpcm_drq_tick), this);
-	m_bus_error_timer = timer_alloc(FUNC(x68ksupr_state::bus_error), this);
-
-	m_sysport.cputype = 0xff;  // 68000, 10MHz
-	m_is_32bit = false;
-
-	save_item(NAME(m_tvram));
-	save_item(NAME(m_gvram));
-	save_item(NAME(m_spritereg));
-}
-
-void x68ksupr_state::driver_start()
-{
-	x68k_state::driver_start();
 	m_sysport.cputype = 0xfe; // 68000, 16MHz
 	m_is_32bit = false;
 }
 
-void x68030_state::driver_start()
+void x68030_state::machine_start()
 {
-	x68k_state::driver_start();
+	x68ksupr_state::machine_start();
+
 	m_sysport.cputype = 0xdc; // 68030, 25MHz
 	m_is_32bit = true;
 }
@@ -996,6 +1034,7 @@ void x68k_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_XDF_FORMAT);
+	fr.add(FLOPPY_2HC_FORMAT);
 	fr.add(FLOPPY_DIM_FORMAT);
 }
 
@@ -1164,7 +1203,7 @@ void x68ksupr_state::x68ksupr_base(machine_config &config)
 	MB89352(config, m_scsictrl, 40_MHz_XTAL / 8);
 	scsi.set_external_device(7, m_scsictrl);
 	m_scsictrl->out_irq_callback().set(*this, FUNC(x68ksupr_state::ioc_irq<IOC_HDD_INT>));
-	// TODO: duplicate DMA glue from CZ-6BS1
+	m_scsictrl->out_dreq_callback().set(*this, FUNC(x68ksupr_state::dreq));
 
 	VICON(config, m_crtc, 38.86363_MHz_XTAL);
 	m_crtc->set_clock_69m(69.55199_MHz_XTAL);

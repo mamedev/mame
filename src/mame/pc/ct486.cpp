@@ -47,9 +47,9 @@ public:
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
 
-	void ct486(machine_config &config);
-	void ast6000(machine_config &config);
-	void ast611(machine_config &config);
+	void ct486(machine_config &config) ATTR_COLD;
+	void ast6000(machine_config &config) ATTR_COLD;
+	void ast611(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;

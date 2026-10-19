@@ -84,9 +84,9 @@ public:
 		, m_kbdio(*this, "Y%u", 1)
 	{ }
 
-	void poisk1(machine_config &config);
+	void poisk1(machine_config &config) ATTR_COLD;
 
-	void init_poisk1();
+	void init_poisk1() ATTR_COLD;
 
 	void fdc_config(device_t *device);
 
@@ -454,7 +454,7 @@ uint32_t p1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	if (!m_video.stride || !m_video.videoram) return 0;
 
 	// bit 6 of 6Ah disables color burst -- not implemented
-	for (ra = cliprect.min_y; ra <= cliprect.max_y; ra++)
+	for (ra = cliprect.top(); ra <= cliprect.bottom(); ra++)
 	{
 		if (BIT(m_video.color_select_68, 7))
 		{

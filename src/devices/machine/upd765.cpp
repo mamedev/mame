@@ -208,6 +208,7 @@ upd765_family_device::upd765_family_device(const machine_config &mconfig, device
 	select_multiplexed(true),
 	ts_connected(true),
 	has_dor(true),
+	has_base_mode(false),
 	external_ready(false),
 	recalibrate_steps(77),
 	mode(mode_t::AT),
@@ -289,6 +290,7 @@ void upd765_family_device::device_start()
 	save_item(NAME(locked));
 	save_item(NAME(mfm));
 	save_item(NAME(scan_done));
+	save_item(NAME(base_mode_pending));
 	save_item(NAME(fifo_write));
 	save_item(NAME(fifo_pos));
 	save_item(NAME(fifo_expected));
@@ -361,6 +363,7 @@ void upd765_family_device::device_start()
 
 	cur_irq = false;
 	locked = false;
+	base_mode_pending = false;
 }
 
 void upd765_family_device::device_reset()
@@ -368,6 +371,7 @@ void upd765_family_device::device_reset()
 	if(has_dor)
 		dor = 0x00;
 	locked = false;
+	base_mode_pending = has_base_mode;
 	soft_reset();
 }
 
@@ -414,6 +418,16 @@ void upd765_family_device::end_reset()
 	main_phase = PHASE_CMD;
 	if(ready_polled)
 		poll_timer->adjust(attotime::from_usec(100), 0, attotime::from_usec(1024));
+}
+
+void upd765_family_device::base_mode_access()
+{
+	if(!base_mode_pending || machine().side_effects_disabled())
+		return;
+
+	base_mode_pending = false;
+	dor |= 0x04;
+	end_reset();
 }
 
 void upd765_family_device::tc_w(bool _tc)
@@ -549,6 +563,7 @@ void upd765_family_device::dor_w(uint8_t data)
 {
 	assert(has_dor);
 	LOGREGS("dor = %02x\n", data);
+	base_mode_pending = false;
 	uint8_t diff = dor ^ data;
 	dor = data;
 	if(BIT(diff, 2)) {
@@ -580,6 +595,8 @@ void upd765_family_device::tdr_w(uint8_t data)
 
 uint8_t upd765_family_device::msr_r()
 {
+	base_mode_access();
+
 	uint8_t msr = 0;
 	switch(main_phase) {
 	case PHASE_CMD:
@@ -589,8 +606,11 @@ uint8_t upd765_family_device::msr_r()
 		break;
 	case PHASE_EXEC:
 		msr |= MSR_CB;
-		if((spec & SPEC_ND) && xfer_in_progress)
+		if((spec & SPEC_ND) && xfer_in_progress) {
 			msr |= MSR_EXM;
+			if(!fifo_write)
+				msr |= MSR_DIO;
+		}
 		if(internal_drq) {
 			msr |= MSR_RQM;
 			if(!fifo_write)
@@ -629,6 +649,8 @@ void upd765_family_device::set_rate(int rate)
 
 uint8_t upd765_family_device::fifo_r()
 {
+	base_mode_access();
+
 	uint8_t r = 0xff;
 	if(!machine().side_effects_disabled())
 	{
@@ -677,6 +699,8 @@ uint8_t upd765_family_device::fifo_r()
 
 void upd765_family_device::fifo_w(uint8_t data)
 {
+	base_mode_access();
+
 	if(!BIT(dor, 2))
 		LOGWARN("%s: fifo_w(%02x) in reset\n", machine().describe_context(), data);
 
@@ -2206,6 +2230,8 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 
 		case SCAN_ID:
 			LOGSTATE("SCAN_ID\n");
+			st1 &= ~ST1_MA;
+			st1 |= ST1_ND;
 			if(!sector_matches()) {
 				LOGSTATE("SEARCH_ADDRESS_MARK_HEADER\n");
 				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
@@ -2217,7 +2243,7 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 				fi.sub_state = COMMAND_DONE;
 				break;
 			}
-			st1 &= ~ST1_MA;
+			st1 &= ~ST1_ND;
 			xfer_in_progress = true;
 			LOGRW("writing sector %02x %02x %02x %02x\n",
 						cur_live.idbuf[0],
@@ -3384,6 +3410,7 @@ wd37c65_device::wd37c65_device(const machine_config &mconfig, device_type type, 
 	upd765_family_device(mconfig, type, tag, owner, clock),
 	m_clock2(0)
 {
+	has_base_mode = true;
 	ready_polled = true;
 	ready_connected = false;
 	select_connected = true;

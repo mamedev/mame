@@ -445,6 +445,7 @@ private:
 	emu_timer *m_cpu_timer = nullptr;
 	uint8_t m_irq_state = 0;
 	uint8_t m_irq_pin = 0;
+	uint8_t m_irqh_pin = 0;
 	uint8_t m_ctrld = 0;
 	uint8_t m_flipscreen = 0;
 	uint64_t m_madsel_lastcycles = 0;
@@ -512,11 +513,15 @@ TIMER_CALLBACK_MEMBER(missile_state::clock_irq)
 
 void missile_state::sync_w(int state)
 {
-	// SYNC latches IRQ pin
-	if (state && m_irq_state != m_irq_pin)
+	if (state)
 	{
-		m_irq_pin = m_irq_state;
-		m_maincpu->set_input_line(0, m_irq_pin ? ASSERT_LINE : CLEAR_LINE);
+		// F7 latches /IRQ, while E7 latches the previous /IRQ as /IRQH for MADSEL.
+		m_irqh_pin = m_irq_pin;
+		if (m_irq_state != m_irq_pin)
+		{
+			m_irq_pin = m_irq_state;
+			m_maincpu->set_input_line(0, m_irq_pin ? ASSERT_LINE : CLEAR_LINE);
+		}
 	}
 }
 
@@ -567,6 +572,7 @@ void missile_state::machine_start()
 	// setup for save states
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_irq_pin));
+	save_item(NAME(m_irqh_pin));
 	save_item(NAME(m_ctrld));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_madsel_lastcycles));
@@ -576,6 +582,7 @@ void missile_state::machine_reset()
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_irq_pin = 0;
+	m_irqh_pin = 0;
 	m_irq_state = 0;
 	m_madsel_lastcycles = 0;
 }
@@ -590,9 +597,10 @@ void missile_state::machine_reset()
 
 void missile_state::load_madsel(uint8_t data)
 {
-	// MADSEL counter is loaded at SYNC when the low 5 bytes of the data bus are 0x01
-	// and the IRQ signal is clear
-	if (!m_irq_pin && ((data & 0x1f) == 0x01) && m_maincpu->get_sync() && !machine().side_effects_disabled())
+	// MADSEL counter is loaded at SYNC when the low 5 bits of the data bus are 0x01
+	// and /IRQH is inactive. E7 delays /IRQ by one opcode fetch so an instruction
+	// can still access pixels before the CPU takes a newly asserted interrupt.
+	if (!m_irqh_pin && ((data & 0x1f) == 0x01) && m_maincpu->get_sync() && !machine().side_effects_disabled())
 		m_madsel_lastcycles = m_maincpu->total_cycles();
 }
 

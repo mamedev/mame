@@ -1,21 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-/*
-
-    TODO:
-
-    - tape input/output
-    - PL-80 plotter
-    - serial printer
-    - thermal printer
-
-
-    Cassette: PSAVE works, and the result can be loaded into Emma02 emulator.
-              PLOAD works, but it may be necessary to unplug all slots to get
-              a reliable load. This is the same as real hardware.
-
-*/
-
 #include "emu.h"
 
 #include "bus/comx35/exp.h"

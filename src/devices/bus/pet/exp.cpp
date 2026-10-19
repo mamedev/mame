@@ -39,8 +39,11 @@ pet_expansion_slot_device::pet_expansion_slot_device(const machine_config &mconf
 	device_t(mconfig, PET_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_pet_expansion_card_interface>(mconfig, *this),
 	m_card(nullptr),
-	m_read_dma(*this, 0),
-	m_write_dma(*this)
+	m_program(*this, finder_base::DUMMY_TAG, -1),
+	m_window(*this, "window"),
+	m_write_halt(*this),
+	m_write_reset(*this),
+	m_write_irq(*this)
 {
 }
 
@@ -81,42 +84,8 @@ device_pet_expansion_card_interface::~device_pet_expansion_card_interface()
 void pet_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
-}
-
-
-//-------------------------------------------------
-//  norom_r - NO ROM read
-//-------------------------------------------------
-
-int pet_expansion_slot_device::norom_r(offs_t offset, int sel)
-{
-	return m_card ? m_card->pet_norom_r(offset, sel) : 1;
-}
-
-
-//-------------------------------------------------
-//  read - buffered data read
-//-------------------------------------------------
-
-uint8_t pet_expansion_slot_device::read(offs_t offset, uint8_t data, int &sel)
-{
-	if (m_card)
-		data = m_card->pet_bd_r(offset, data, sel);
-
-	return data;
-}
-
-
-//-------------------------------------------------
-//  write - buffered data write
-//-------------------------------------------------
-
-void pet_expansion_slot_device::write(offs_t offset, uint8_t data, int &sel)
-{
-	if (m_card != nullptr)
-	{
-		m_card->pet_bd_w(offset, data, sel);
-	}
+	m_program->install_view(0x8000, 0xffff, m_window);
+	m_window[0];
 }
 
 
@@ -146,7 +115,7 @@ void pet_expansion_slot_device::irq_w(int state)
 
 uint8_t pet_expansion_slot_device::dma_bd_r(offs_t offset)
 {
-	return m_read_dma(offset);
+	return m_program->read_byte(offset);
 }
 
 
@@ -156,7 +125,7 @@ uint8_t pet_expansion_slot_device::dma_bd_r(offs_t offset)
 
 void pet_expansion_slot_device::dma_bd_w(offs_t offset, uint8_t data)
 {
-	m_write_dma(offset, data);
+	m_program->write_byte(offset, data);
 }
 
 

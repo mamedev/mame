@@ -712,6 +712,11 @@ void lucky74_state::machine_start()
 	save_item(NAME(m_adpcm_data));
 	save_item(NAME(m_adpcm_reg));
 	save_item(NAME(m_adpcm_busy_line));
+
+	// cleaning all 09R81P registers
+	for (uint8_t i = 0; i < 6; i++)
+		m_adpcm_reg[i] = 0;
+	m_adpcm_busy_line = 0x01;    // free and ready
 }
 
 void lucky74_state::machine_reset()
@@ -1317,20 +1322,6 @@ GFXDECODE_END
 *    ADPCM sound system (09R81P + M5205)    *
 ********************************************/
 
-void lucky74_state::sound_start()
-{
-	// cleaning all 09R81P registers
-
-	uint8_t i;
-
-	for (i = 0; i < 6; i++)
-	{
-		m_adpcm_reg[i] = 0;
-	}
-
-	m_adpcm_busy_line = 0x01;    // free and ready
-}
-
 void lucky74_state::adpcm_int(int state)
 {
 	if (m_adpcm_reg[05] == 0x01) // register 0x05 (bit 0 activated), trigger the sample
@@ -1444,7 +1435,7 @@ void lucky74_state::lucky74(machine_config &config)
 
 
 /*************************
-*        Rom Load        *
+*        ROM Load        *
 *************************/
 
 /*

@@ -7,39 +7,39 @@
 Driver file to handle emulation of the 3DO systems
 
 TODO:
-- Incomplete XBus/CD drive semantics;
-\- Audio CD has plenty of Cel, VDLP and sport issues. Also needs support between CD drive and DSPP
-   (reads random port, asks for audio tracks *with* subcode);
-\- Photo CD (winsenna): ugly DSPP scratching;
-- Incomplete DSPP mapping (semaphores, audio input, output FIFO flush, FIFO status flags,
-  RAM to DSPP N stack DMA);
-- Fix VRAM size (should be 1 MB, but every single BIOS fails to boot with that, possible mirroring?)
+- Incomplete XBus/CD drive semantics:
+\- Audio CD hangs between CD drive and DSPP (reads random port, asks for audio tracks *with*
+   subcode);
+\- Photo CD (winsenna): ugly DSPP scratching when pressing play *headphone user alert*;
+- Incomplete DSPP mapping (audio input, output FIFO flush, RAM to DSPP N stack DMA);
 - CEL engine should really halt main CPU when running, paused only when irqs are taken;
-- Fence/MMU?  Games seem to run fine with stock ARM60 semantics.
+- Fence/MMU? Games seem to run fine with stock ARM60 semantics.
 - Video CD module under Uncle/Woody (allegedly uses a C-Cube CL-450, also seen in Amiga,
   x86 ReelMagic card and possibly more);
 
 TODO (BIOS programs):
-- 3do_fz1: DSPP is silent on planet splash screen
-- 3do_fz1j: DSPP has repeating noise on planet splash screen
-- 3do_hc21 (bios 0): some intermediate garbage on top-left of CELs on initial logo screen;
-- 3do_gdo101: errors on DSPP semaphore, hacked to make it boot;
-- 3do_try, 3do_hc21 (bios 1), 3do_fc2: throws "QueueSport error on cmd 4: xfer across 1M boundary"
-  in Logic Analyser (resulting in issues with layer clearances), never really pings Sport DMA,
-  needs smaller VRAM?
+- 3do_fz1: DSPP is silent on planet splash screen (verify, is it supposed to make any sound?)
+- 3do_gdo101: star outward explosion should draw in b&w shades not colorized (Amy cornerweight?)
+- 3do_fc2: detects as PAL system during POST (?);
 - 3do_fc1: hangs on OpenDiskFile at PC=2e6dc, path="/rom/system/tasks/shell", will "give up" if
   skipped.
 
 TODO (Arcade variants):
-- crime3do/md23do/sht3do: lightgun hookup;
-- orbatak: ugly colors in service mode, not extensively tested;
 - The actual Player bus hookup will require specific subclasses for all these (namely can't use %p
   for enumerating p2 then p1);
+- orbatak, sht3do: occasional Projector CEL gap stretches;
 
 References:
 - https://wiki.console5.com/wiki/Panasonic_3DO_FZ-1
 - https://github.com/trapexit/portfolio_os
 - 3dodev wiki;
+
+Notes:
+- crime3do/md23do: to calibrate, go in service mode -> gun aiming and hit the center of the
+  target *twice*;
+- sht3do has its own calibration scheme, just follow on-screen instructions;
+
+===================================================================================================
 
 Hardware descriptions:
 
@@ -103,10 +103,11 @@ Models:
 - Panasonic FZ-1 R.E.A.L. 3DO Interactive Multiplayer (Japan, Asia, North America, Europe)
 - Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer (Japan, North America, Europe)
 - Goldstar 3DO Interactive Multiplayer (South Korea, North America, Europe)
-- Goldstar 3DO ALIVE II (South Korea)
+- Goldstar 3DO GDO-203 ALIVE II (South Korea)
 - Samsung DMB-800 (South Korea)
 - Sanyo TRY 3DO Interactive Multiplayer (Japan)
-- Creative 3DO Blaster - PC Card (ISA)
+- Creative 3DO Blaster, (ISA16 card, PCB marked CTM6110) with a MCT MVM121A VGA passthrough,
+  and a bunch of Creative-style feature connectors
 - Panasonic N-1005 "Robo" 3DO (Japan), based on FZ-1 with 5x CD media changer and VCD adapter
   built-in
 - a Scientific Atlanta Set Top Terminal, with a Nicky device in BIGTRACE space
@@ -133,10 +134,11 @@ Part list of Goldstar 3DO Interactive Multiplayer
 **************************************************************************************************/
 
 #include "emu.h"
+
 #include "3do.h"
+#include "3do_portfolio.h"
 
 #include "cpu/arm7/arm7.h"
-#include "imagedev/cdromimg.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -151,10 +153,8 @@ Part list of Goldstar 3DO Interactive Multiplayer
 
 void _3do_state::main_mem(address_map &map)
 {
-	map(0x0000'0000, 0x001F'FFFF).ram();
-	map(0x0000'0000, 0x001F'FFFF).view(m_overlay_view);
-	m_overlay_view[0](0x0000'0000, 0x001F'FFFF).rom().region("bios", 0).lw8(NAME([this] (offs_t offset) { m_overlay_view.disable(); }));
-	map(0x0020'0000, 0x003F'FFFF).ram().share(m_vram);                                   /* VRAM */
+	// DRAM and VRAM, placed by Madam's memory configuration; [0] has the boot ROM overlaid, [1] doesn't
+	map(0x0000'0000, 0x00FF'FFFF).view(m_overlay_view);
 	map(0x0300'0000, 0x030F'FFFF).m(m_bankdev, FUNC(address_map_bank_device::amap32));   /* BIOS */
 	// slow bus
 	map(0x0310'0000, 0x0313'FFFF).ram();                                                 /* Brooktree? */
@@ -272,6 +272,35 @@ static INPUT_PORTS_START( orbatak )
 	PORT_BIT( 0x3ff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(40) PORT_KEYDELTA(25) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+// adapt our lightgun coordinate system to what the game expects.
+// Device return two values:
+// 1. a counter that translates video beams into a single 20-bit value;
+// 2. a 5-bit line_counter that indicates the number of consecutive scanlines where the hit
+//    occurred, as a "signal quality" check. It's unknown if ALG guns can do it and probably
+//    irrelevant for emulation beyond actually handling the out of screen check;
+std::pair<u32, u8> alg_gun_state::gun_counter_r(u8 which)
+{
+	const u8 p_side = which << 1;
+	// base with some (rather arbitrary) vblank offset
+	u32 counter = 4947;
+	u8 line_trigger = 1;
+
+	const u32 in_x = m_gun_r[p_side | 0]->read() / 2;
+	// 1271 would be NTSC_DEFAULT_YSCANTIME divided by 10 (12707)
+	const u32 in_y = (m_gun_r[p_side | 1]->read() * 240 / 2048) * 1271;
+
+	counter += in_x;
+	counter += in_y;
+
+	// out of screen check (top and bottom edges)
+	// unchecked by sht3do (relies on holster alone)
+	if (counter <= 5970 || counter >= 308716)
+		line_trigger = 0;
+
+	return std::make_pair(counter, line_trigger);
+}
+
+
 // both games maps player 2 first then player 1 next
 static INPUT_PORTS_START( alg_gun )
 	PORT_START("P1.0")
@@ -293,6 +322,18 @@ static INPUT_PORTS_START( alg_gun )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // highest bit for counter?
+
+	PORT_START("P1_GUNX")
+	PORT_BIT( 0x7ff, 0x400, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("P1_GUNY")
+	PORT_BIT( 0x7ff, 0x400, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("P2_GUNX")
+	PORT_BIT( 0x7ff, 0x400, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	PORT_START("P2_GUNY")
+	PORT_BIT( 0x7ff, 0x400, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -304,6 +345,13 @@ void _3do_state::machine_start()
 	m_uncle.rev = 0x03800000;
 
 	save_item(NAME(m_svf.sport));
+
+	memory_config_w(m_madam->memory_config());
+}
+
+void _3do_state::device_post_load()
+{
+	memory_config_w(m_madam->memory_config());
 }
 
 void _3do_state::machine_reset()
@@ -311,6 +359,49 @@ void _3do_state::machine_reset()
 	// start with overlay enabled, and bank pointing at BIOS
 	m_overlay_view.select(0);
 	m_bankdev->set_bank(0);
+}
+
+/*
+ * Madam decodes DRAM set 0, DRAM set 1 and VRAM back to back from address zero, each with the size it has
+ * been told about rather than the size of what is fitted.  The boot ROM tries configurations from the
+ * largest down and settles on the first one where every megabyte holds its own data, so a set that is
+ * declared larger than it is has to alias, and one that is declared but missing must not respond.
+ */
+void _3do_state::memory_config_w(uint8_t data)
+{
+	constexpr offs_t MB = 0x10'0000;
+	constexpr offs_t SPACE_SIZE = 16 * MB;
+
+	// 0, 1, 4 or 16MB per DRAM set; VRAM sits on top of DRAM and DRAM gives way if the two don't fit
+	const offs_t set_size[2] = { ((1 << (BIT(data, 5, 2) * 2)) >> 2) * MB, ((1 << (BIT(data, 3, 2) * 2)) >> 2) * MB };
+	const offs_t vram_size = std::min<offs_t>(BIT(data, 0, 3) * MB, SPACE_SIZE);
+	const offs_t dram_size = std::min<offs_t>(set_size[0] + set_size[1], SPACE_SIZE - vram_size);
+
+	for (int entry = 0; entry < 2; entry++)
+	{
+		memory_view::memory_view_entry &view = m_overlay_view[entry];
+		view.unmap_readwrite(0, SPACE_SIZE - 1);
+
+		// each set has 1MB fitted
+		for (offs_t base = 0; base < dram_size; base += MB)
+			view.install_ram(base, base + MB - 1, &m_dram[((base < set_size[0]) ? 0 : 1) * (MB / 4)]);
+
+		// only the first VRAM bank is fitted
+		if (vram_size)
+			view.install_ram(dram_size, dram_size + MB - 1, &m_vram[0]);
+
+		if (entry == 0)
+		{
+			// any write drops the overlay
+			view.install_rom(0x0000'0000, 0x001F'FFFF, &m_bios[0]);
+			view.install_write_handler(0x0000'0000, 0x001F'FFFF, write32smo_delegate(*this, FUNC(_3do_state::overlay_w)));
+		}
+	}
+}
+
+void _3do_state::overlay_w(uint32_t data)
+{
+	m_overlay_view.select(1);
 }
 
 void _3do_state::soft_reset_w(int state)
@@ -376,9 +467,12 @@ void _3do_state::green_config(machine_config &config)
 		if (offset == 0)
 			return (m_p1_r[0]->read() << 24) | (m_p1_r[1]->read() << 16) | (m_p2_r[0]->read() << 8) | (m_p2_r[1]->read() << 0);
 
-		return 0;
+		// past the last pod the bus is pulled up, which the event broker reads as PODID_END_CHAIN;
+		// zeroes would log in a bogus pod of type 0
+		return 0xffffffff;
 	});
 	m_madam->irq_dply_cb().set(m_clio, FUNC(clio_device::dply_w));
+	m_madam->memory_config_cb().set(FUNC(_3do_state::memory_config_w));
 	m_madam->set_amy_tag("amy");
 
 	CLIO(config, m_clio, XTAL(50'000'000)/4);
@@ -557,17 +651,23 @@ void alg_gun_state::alg_gun(machine_config &config)
 {
 	arcade_ntsc(config);
 	m_madam->playerbus_read_cb().set([this] (offs_t offset) -> u32 {
+		u32 p1_counter, p2_counter;
+		u8 p1_line_trigger, p2_line_trigger;
+
+		std::tie(p1_counter, p1_line_trigger) = gun_counter_r(0);
+		std::tie(p2_counter, p2_line_trigger) = gun_counter_r(1);
+
 		switch(offset)
 		{
 			case 0:
-				return (0x4d << 24) | (m_p1_r[1]->read() << 16);
+				return (0x4d << 24) | ((m_p1_r[1]->read() & 0xfe) << 16) | ((p2_counter >> 3) & 0x1ffff);
 			case 1:
-				// should be 8 bit of ID and 24 of actual inputs but both games expects an extra byte
-				// to make this other side to work (padding or actual meaning?)
-				return (0x4d << 16) | (m_p1_r[0]->read() << 8);
+				return ((p2_counter & 7) << 29) | (p2_line_trigger << 24) | (0x4d << 16) | ((m_p1_r[0]->read() & 0xfe) << 8) | ((p1_counter >> 11) & 0x1ff);
+			case 2:
+				return ((p1_counter & 0x7ff) << 21) | (p1_line_trigger << 16);
 		}
 
-		return 0;
+		return 0xffff'ffff;
 	});
 }
 
@@ -757,9 +857,9 @@ GAME( 1993, alg3do, 0,       _3do,           3do,   _3do_state, empty_init, ROT0
 GAME( 1995, orbatak, alg3do, orbatak,  orbatak,   orbatak_state, empty_init, ROT0,     "American Laser Games", "Orbatak (USA, prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING ) // v1.0
 
 // MACHINE_IMPERFECT_TIMING doesn't really matter for the gun games, they are pure FMV based.
-GAME( 1995, crime3do,alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Crime Patrol (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // v1.0
-GAME( 1994, md23do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // v1.1
-GAME( 1994, sht3do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // v1.05
+GAME( 1994, sht3do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_IMPERFECT_GRAPHICS ) // v1.05, no WDUD present in attract unlike other ALG games
+GAME( 1994, md23do,  alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (USA, 3DO hardware)", MACHINE_IMPERFECT_GRAPHICS ) // v1.1
+GAME( 1995, crime3do,alg3do, alg_gun,  alg_gun,   alg_gun_state, empty_init, ROT0,     "American Laser Games", "Crime Patrol (USA, 3DO hardware)", MACHINE_IMPERFECT_GRAPHICS ) // v1.0
 
 // Beavis and Butthead (prototype), with "proprietary" CD drive according to pitch deck
 // (likely not Jaguar CD derived because seems to work with stock 3do drive anyway)

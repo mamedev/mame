@@ -269,6 +269,7 @@ void fortyl_state::driver_init()
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
 
+	// TODO: belongs to video_start
 	m_pix_color[0] = 0x000;
 	m_pix_color[1] = 0x1e3;
 	m_pix_color[2] = 0x16c;

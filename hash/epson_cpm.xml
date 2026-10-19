@@ -168,4 +168,136 @@ Generic software list for the Epson HX-20, PX-4 and PX-8 systems
 		</part>
 	</software>
 
+	<software name="px8tools">
+		<description>px8-tools</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPX8-1.d88" size="348848" crc="40ad5d1b" sha1="df6b7fb3940aafa29899e35f2389f0d1a5f8fa55"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPX8-2.d88" size="348848" crc="719603c4" sha1="f118e2a48d3d0da1aa467f5726228790a43bee9e"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPX8-3.d88" size="348848" crc="11f9d7a2" sha1="307d73e0e643d01ac712d734e719fd6a1c023e72"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPX8-4.d88" size="348848" crc="520dcece" sha1="1166f99fd00b3b2de2af5d4da8239123e7f8131e"/>
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPX8-5.d88" size="348848" crc="85da88d2" sha1="3201aa7de698684f4949195f669c305919cead17"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pxdock">
+		<description>PXDock</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPXDock-1.d88" size="348848" crc="cc59ca2a" sha1="52490cab937585cab0d5aab5edf2c9430e4d9c0d"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPXDock-2.d88" size="348848" crc="daf9a9b2" sha1="42c461b9805c3d739590ed9760147e89038ba315"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPXDock-3.d88" size="348848" crc="dfd3d87b" sha1="c83b109822065649893e5db89ebf3c76caeb5d52"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPXDock-4.d88" size="348848" crc="5e435df9" sha1="c9999bafd971c4d66801373b5665f2effe179f3b"/>
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPXDock-5.d88" size="348848" crc="2262bd9f" sha1="0fdb0ac6947aa4086eef8a43a7a212474368901d"/>
+			</dataarea>
+		</part>
+
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPXDock-6.d88" size="348848" crc="eee4bb75" sha1="42f73bfda5528afb63ad292a6c6f006b8058ddfc"/>
+			</dataarea>
+		</part>
+
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPXDock-7.d88" size="348848" crc="ba69f1ec" sha1="6c728e2d3f24c91026116cd6a5ec1989a4c2ce7e"/>
+			</dataarea>
+		</part>
+
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPXDock-8.d88" size="348848" crc="a6ad17e6" sha1="4dac9398cbaffdb0bd4040bea5ef42d084b0cdd0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPXDock-9.d88" size="348848" crc="d8efd9bc" sha1="a8ec7ff69b8aa1b383fe14905334e8e2e58771e8"/>
+			</dataarea>
+		</part>
+
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPXDock-10.d88" size="348848" crc="17a33813" sha1="19c563d9dc605baf325d382769b1912d27129657"/>
+			</dataarea>
+		</part>
+
+		<part name="flop11" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPXDock-11.d88" size="348848" crc="520c9fd6" sha1="c65f5e12397b3d3342128e2840329242d83a08ee"/>
+			</dataarea>
+		</part>
+
+		<part name="flop12" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPXDock-12.d88" size="348848" crc="74114ef6" sha1="9de4f48651a041e2b68a3f6ffe58c107e9c7f0b8"/>
+			</dataarea>
+		</part>
+
+		<part name="flop13" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPXDock-13.d88" size="348848" crc="1672a68d" sha1="2f6eb1916a45c4634cb585a1083e85ac45048a4b"/>
+			</dataarea>
+		</part>
+
+		<part name="flop14" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPXDock-14.d88" size="348848" crc="74dbe0c0" sha1="cac21cb23c267dc6d3ea754eb8c627face763cd2"/>
+			</dataarea>
+		</part>
+
+		<part name="flop15" interface="floppy_3_5">
+			<dataarea name="flop" size="348848">
+				<rom name="cerealPXDock-15.d88" size="348848" crc="fb3cd7e3" sha1="7add157e207b7cb476b523e60c84fb5957d9cb93"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

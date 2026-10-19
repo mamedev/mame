@@ -426,7 +426,7 @@ void namcos1_state::sound_map(address_map &map)
 	map(0x8000, 0x9fff).ram(); /* Sound RAM 3 */
 	map(0xa000, 0xa000).nopr();
 	map(0xc000, 0xc001).w(FUNC(namcos1_state::sound_bankswitch_w)); /* ROM bank selector */
-	map(0xd001, 0xd001).w(m_c117, FUNC(namco_c117_device::sound_watchdog_w));
+	map(0xd001, 0xd001).w(m_watchdog_input, FUNC(input_merger_all_high_device::in_set<2>));
 	map(0xe000, 0xe000).w(FUNC(namcos1_state::audiocpu_irq_ack_w));
 	map(0xc000, 0xffff).rom().region("audiocpu", 0);
 }
@@ -1030,6 +1030,11 @@ void namcos1_state::ns1(machine_config &config)
 	m_c117->set_addrmap(AS_PROGRAM, &namcos1_state::virtual_map);
 	m_c117->set_cpu_tags("maincpu", "subcpu");
 	m_c117->subres_cb().set(FUNC(namcos1_state::subres_w));
+	m_c117->watchdog_cb().set(FUNC(namcos1_state::kick_watchdog_w));
+
+	INPUT_MERGER_ALL_HIGH(config, m_watchdog_input).output_handler().set(FUNC(namcos1_state::watchdog_cb));
+
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	// heavy sync required to prevent CPUs from fighting for video RAM access and going into deadlocks
 	config.set_maximum_quantum(attotime::from_hz(38400));

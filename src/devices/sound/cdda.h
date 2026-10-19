@@ -7,6 +7,8 @@
 
 #include "imagedev/cdromimg.h"
 
+#include "notifier.h"
+
 
 class cdda_device : public device_t, public device_sound_interface
 {
@@ -61,5 +63,48 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(CDDA, cdda_device)
+
+
+// hand-operated audio CD player whose line output is routed to the owner's sound inputs
+class device_cdda_player_interface : public device_cd_player_interface
+{
+public:
+	// device_cd_player_interface implementation
+	virtual cdrom_image_device &cd_image() override;
+
+	virtual void play() override;
+	virtual void pause() override;
+	virtual void stop() override;
+	virtual void previous_track() override;
+	virtual void next_track() override;
+	virtual void select_track(int track) override;
+
+	virtual transport state() override;
+	virtual int track() override;
+	virtual int track_count() override;
+	virtual u32 track_elapsed_frames() override;
+	virtual u32 track_length_frames() override;
+
+protected:
+	device_cdda_player_interface(const machine_config &mconfig, device_t &device);
+
+	// device_interface implementation
+	virtual void interface_pre_start() override ATTR_COLD;
+
+	void add_cd_player(machine_config &config) ATTR_COLD;
+
+private:
+	void audio_end(int state);
+
+	u32 track_start(int track) const { return m_cd_image->get_track_start(track); }
+	u32 disc_end() const { return m_cd_image->get_track_start(0xaa); }
+	int current_track();
+	void seek_track(int track);
+
+	required_device<cdrom_image_device> m_cd_image;
+	required_device<cdda_device> m_cdda;
+	util::notifier_subscription m_media_notifier;
+	s32 m_track;
+};
 
 #endif // MAME_SOUND_CDDA_H

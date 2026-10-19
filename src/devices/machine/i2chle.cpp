@@ -65,6 +65,8 @@ void i2c_hle_interface::interface_post_start()
 	device().save_item(NAME(m_state_next));
 	device().save_item(NAME(m_data_offset));
 	device().save_item(NAME(m_just_acked));
+	device().save_item(NAME(m_sda));
+	device().save_item(NAME(m_scl));
 
 	write_sda(1);
 }
@@ -84,6 +86,7 @@ void i2c_hle_interface::sda_write(int state)
 				m_last_address = 0;
 				m_just_acked = false;
 				m_data_offset = 0;
+				i2c_stop();
 			}
 			else
 			{
@@ -92,6 +95,7 @@ void i2c_hle_interface::sda_write(int state)
 				m_bit = 0;
 				m_latch = 0;
 				m_just_acked = false;
+				i2c_start();
 			}
 		}
 	}
@@ -157,12 +161,20 @@ void i2c_hle_interface::scl_write(int state)
 								{
 									if (((m_latch >> 1) == m_address) && is_present())
 									{
-										LOGMASKED(LOG_DATAOUT, "%s: write: getting subaddress\n", get_tag());
+										LOGMASKED(LOG_DATAOUT, "%s: write: getting %s\n", get_tag(), has_subaddress() ? "subaddress" : "data");
 										m_last_address = m_latch >> 1;
 										write_sda(0);
 										m_bit = 0;
 										m_latch = 0;
-										m_state_next = STATE_GET_SUBADDRESS;
+										if (has_subaddress())
+										{
+											m_state_next = STATE_GET_SUBADDRESS;
+										}
+										else
+										{
+											m_data_offset = 0;
+											m_state_next = STATE_GET_WRITE_DATA;
+										}
 										m_state = STATE_WAIT_ACK;
 									}
 									else

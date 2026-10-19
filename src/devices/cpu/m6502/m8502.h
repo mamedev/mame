@@ -21,7 +21,8 @@ public:
 
 enum {
 	M8502_IRQ_LINE = m6502_device::IRQ_LINE,
-	M8502_NMI_LINE = m6502_device::NMI_LINE
+	M8502_NMI_LINE = m6502_device::NMI_LINE,
+	M8502_RDY_LINE = m6502_device::RDY_LINE
 };
 
 DECLARE_DEVICE_TYPE(M8502, m8502_device)

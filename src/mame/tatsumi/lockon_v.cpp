@@ -683,7 +683,7 @@ void lockon_state::rotate_draw( bitmap_ind16 &bitmap, const rectangle &cliprect 
 	uint32_t axy_en  = !BIT(m_dx0ll, 8);
 	uint32_t ayy_en  = !BIT(m_dy0ll, 8);
 
-	for (uint32_t y = 0; y <= cliprect.max_y; ++y)
+	for (uint32_t y = 0; y <= cliprect.bottom(); ++y)
 	{
 		uint32_t carry;
 		uint16_t *dst = &bitmap.pix(y);
@@ -694,7 +694,7 @@ void lockon_state::rotate_draw( bitmap_ind16 &bitmap, const rectangle &cliprect 
 		uint8_t axx = axy;
 		uint8_t ayx = ayy;
 
-		for (uint32_t x = 0; x <= cliprect.max_x; ++x)
+		for (uint32_t x = 0; x <= cliprect.right(); ++x)
 		{
 			cx &= 0x1ff;
 			cy &= 0x1ff;
@@ -801,7 +801,7 @@ void lockon_state::hud_draw( bitmap_ind16 &bitmap, const rectangle &cliprect )
 		else
 			y_size = 8;
 
-		for (uint32_t y = cliprect.min_y; y <= cliprect.max_y; ++y)
+		for (uint32_t y = cliprect.top(); y <= cliprect.bottom(); ++y)
 		{
 			uint32_t xt;
 			uint32_t cy;
@@ -840,7 +840,7 @@ void lockon_state::hud_draw( bitmap_ind16 &bitmap, const rectangle &cliprect )
 				{
 					uint32_t x = x_pos + (xt << 3) + px;
 
-					if (x <= cliprect.max_x)
+					if (x <= cliprect.right())
 					{
 						uint16_t *const dst = &bitmap.pix(y, x);
 

@@ -195,8 +195,8 @@ uint32_t kamikaze_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	uint8_t yoffs = m_flip_yoffs & m_screen_flip;
 
 	// render the visible pixels
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-		for (int x = cliprect.min_x & ~7; x <= cliprect.max_x; x += 8)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+		for (int x = cliprect.left() & ~7; x <= cliprect.right(); x += 8)
 		{
 			uint8_t color = m_color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (m_screen_flip ? 0 : 4);
 			uint8_t data = m_videoram[(((y ^ m_screen_flip) + yoffs) << 5) | ((x ^ m_screen_flip) >> 3)];
@@ -212,8 +212,8 @@ uint32_t spcking2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	uint8_t yoffs = m_flip_yoffs & m_screen_flip;
 
 	/* render the visible pixels */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-		for (int x = cliprect.min_x & ~7; x <= cliprect.max_x; x += 8)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+		for (int x = cliprect.left() & ~7; x <= cliprect.right(); x += 8)
 		{
 			uint8_t color = m_color_prom[(((y & 0xf8) << 2) | (x >> 3)) ^ (m_screen_flip ? 0x3ff : m_player ? 0 : 0x3ff)] >> (m_player ? 4 : 0);
 			uint8_t data = m_videoram[(((y ^ m_screen_flip) + yoffs) << 5) | ((x ^ m_screen_flip) >> 3)];

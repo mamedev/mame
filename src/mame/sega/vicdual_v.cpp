@@ -33,7 +33,7 @@ void vicdual_state::palette_bank_w(uint8_t data)
 uint32_t vicdual_state::screen_update_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	uint8_t x = 0;
-	uint8_t y = cliprect.min_y;
+	uint8_t y = cliprect.top();
 	uint8_t video_data = 0;
 
 	while (1)
@@ -64,7 +64,7 @@ uint32_t vicdual_state::screen_update_bw(screen_device &screen, bitmap_rgb32 &bi
 		if (x == 0)
 		{
 			/* end of region to update? */
-			if (y == cliprect.max_y)
+			if (y == cliprect.bottom())
 			{
 				break;
 			}
@@ -82,7 +82,7 @@ uint32_t vicdual_state::screen_update_color(screen_device &screen, bitmap_rgb32 
 {
 	uint8_t const *const color_prom = (uint8_t *)m_proms->base();
 	uint8_t x = 0;
-	uint8_t y = cliprect.min_y;
+	uint8_t y = cliprect.top();
 	uint8_t video_data = 0;
 	pen_t back_pen = 0;
 	pen_t fore_pen = 0;
@@ -122,7 +122,7 @@ uint32_t vicdual_state::screen_update_color(screen_device &screen, bitmap_rgb32 
 		if (x == 0)
 		{
 			/* end of region to update? */
-			if (y == cliprect.max_y)
+			if (y == cliprect.bottom())
 			{
 				break;
 			}

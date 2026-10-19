@@ -431,6 +431,7 @@ void alien_state::masmario2(machine_config &config)
 
 void alien_state::init_dkbanans()
 {
+	// HACK: understand either if this is bad dump or something else
 	uint8_t *rom = memregion("maincpu")->base();
 	rom[2] = 0x02;
 	rom[3] = 0x60;

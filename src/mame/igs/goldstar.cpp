@@ -257,6 +257,7 @@
 
 #include "cpu/m6805/m68705.h"
 #include "cpu/mcs51/i80c51.h"
+#include "cpu/z80/mc8123.h"
 #include "cpu/z80/z80.h"
 #include "machine/ds2401.h"
 #include "machine/i8255.h"
@@ -654,6 +655,7 @@ public:
 	void bingownga(machine_config &config) ATTR_COLD;
 	void cbaai(machine_config &config) ATTR_COLD;
 	void feverch(machine_config &config) ATTR_COLD;
+	void feverchb(machine_config &config) ATTR_COLD;
 	void fevchw4(machine_config &config) ATTR_COLD;
 	void flam7_tw(machine_config &config) ATTR_COLD;
 	void flam7_w4(machine_config &config) ATTR_COLD;
@@ -678,6 +680,7 @@ public:
 
 	void init_cb2() ATTR_COLD;
 	void init_cbaai() ATTR_COLD;
+	void init_feverchb()ATTR_COLD;
 	void init_fl7_3121() ATTR_COLD;
 	void init_flam7_tw() ATTR_COLD;
 	void init_flaming7() ATTR_COLD;
@@ -6264,9 +6267,9 @@ static INPUT_PORTS_START( ll3 )
 	PORT_DIPNAME( 0x04, 0x00, "Free Spin" )                 PORT_DIPLOCATION("DSW2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x00, "Double Up %" )               PORT_DIPLOCATION("DSW2:4")
-	PORT_DIPSETTING(    0x00, "70" )
-	PORT_DIPSETTING(    0x08, "80" )
+	PORT_DIPNAME( 0x08, 0x00, "Double Up Game Payout Rate" ) PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPSETTING(    0x00, "70%" )
+	PORT_DIPSETTING(    0x08, "80%" )
 	PORT_DIPNAME( 0x30, 0x20, DEF_STR(Coinage) )            PORT_DIPLOCATION("DSW2:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR(1C_4C) )
 	PORT_DIPSETTING(    0x20, DEF_STR(1C_10C) )
@@ -6384,7 +6387,7 @@ static INPUT_PORTS_START( ll3c )
 	PORT_INCLUDE( ll3b )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x03, 0x00, "Payout (Main Game)" )          PORT_DIPLOCATION("DSW2:1,2")
+	PORT_DIPNAME( 0x03, 0x00, "Main Game Payout Rate" )     PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(    0x00, "35%" )
 	PORT_DIPSETTING(    0x01, "45%" )
 	PORT_DIPSETTING(    0x02, "55%" )
@@ -17096,6 +17099,15 @@ void wingco_state::feverch(machine_config &config)
 	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(50));
 }
 
+void wingco_state::feverchb(machine_config &config)
+{
+	feverch(config);
+
+	MC8123(config.replace(), m_maincpu, XTAL(12'000'000) / 2); // clock not verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::feverch_map);
+	m_maincpu->set_addrmap(AS_IO, &wingco_state::feverch_portmap);
+	m_maincpu->set_addrmap(AS_OPCODES, &wingco_state::common_decrypted_opcodes_map);
+}
 
 void wingco_state::lucky8tet(machine_config &config)
 {
@@ -17369,8 +17381,9 @@ ROM_START( chry10 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ver.1h2.u20",       0x0000, 0x10000, CRC(85bbde06) SHA1(f44d335feb4697b195e9fc7e5aeaabf099e21ed8) )
 
-	ROM_REGION( 0x10000, "pic", 0 )
-	ROM_LOAD( "pic16f84.bad.dump", 0x0000, 0x14f4, BAD_DUMP CRC(876ff1ed) SHA1(fcd6892e2b8371030af15e4d8c9f4a351ce0551c) )
+	// no code, just the user ids and configuration word - but the configuration seems invalid too
+	ROM_REGION16_LE( 0x4280, "pic", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16f84.bin", 0x0000, 0x4280, BAD_DUMP CRC(b68a4d55) SHA1(0446f260e48d7a0978d723c67ac4fad3a8b5eeb3) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "27c010.u1",         0x00000, 0x20000, CRC(05515cf8) SHA1(366dd44ae93bdc4cf456f97f38edac83441cbc89) )
@@ -28394,6 +28407,33 @@ ROM_START( fevercha )
 	ROM_LOAD( "82s123.10d", 0x0100, 0x0020, CRC(71670863) SHA1(bd0d18c55774db7720413632d130cf3790fca1ad) )
 ROM_END
 
+ROM_START( feverchb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "eagle_38.11b", 0x00000, 0x8000, CRC(c10e75db) SHA1(94e40c97683c1635a0f33d219d9b1a04d249fafc) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 )
+	ROM_LOAD( "key", 0x0000, 0x2000, CRC(489cdfd6) SHA1(805f6c5a1f9c0038a800f5cae1cafc348654fd50) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "eagle_15.7h",  0x00000, 0x08000, CRC(ef8bbc3f) SHA1(6787e9320f8d13d4b35e73befaffc251b6b5db65) )
+	ROM_LOAD( "eagle_16.8h",  0x08000, 0x08000, CRC(7195d1cc) SHA1(cd7d55251cb1ce64dd4f9e9181acd7885317130c) )
+	ROM_LOAD( "eagle_17.10h", 0x10000, 0x08000, CRC(343182c7) SHA1(227f0db85a7191cfb90a12402c8107537e8ca6db) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "eagle_1.1h", 0x0000, 0x2000, CRC(c2f72d5f) SHA1(3e4f37a60931a417929255e782d8f7f219d8ebd0) )
+	ROM_LOAD( "eagle_2.2h", 0x2000, 0x2000, CRC(b4a0f2ad) SHA1(f68d5134156b646c5eeadbab6bdc21507018eafa) )
+	ROM_LOAD( "eagle_3.4h", 0x4000, 0x2000, CRC(69d28b71) SHA1(f3290fa7404338e633c1762bdbd2ca737add9421) )
+	ROM_LOAD( "eagle_4.5h", 0x6000, 0x2000, CRC(bc3a09c4) SHA1(952dcd4aace87fd7249fc2391c8b4832fa17b083) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD_NIB_LOW(  "82s129.12f", 0x0000, 0x0100, CRC(5b826df5) SHA1(c6e8ffec328f1bb8acdcad70d7045f96cc150166) )
+	ROM_LOAD_NIB_HIGH( "82s129.11f", 0x0000, 0x0100, CRC(0a15ccc6) SHA1(7915e2cbfe4264cab42a780364ca56038412a249) )
+	ROM_LOAD(          "82s123.13f", 0x0080, 0x0020, CRC(82b2660a) SHA1(af4a8f4560ec22a7adda1f590651d6a84f894314) )
+
+	ROM_REGION( 0x0100, "unkproms", 0 )
+	ROM_LOAD( "82s129.4e",  0x0000, 0x0100, CRC(7edb311b) SHA1(8e7f933313dc7a1f2a5e8803c26953ced3f798d0) )  // same as megaline
+ROM_END
+
 ROM_START( feverchtw )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "main_tw.c11", 0x00000, 0x8000, CRC(a38376d8) SHA1(34b1966becae4adbde5554db95707683157d4fa4) )
@@ -31194,7 +31234,7 @@ void cmaster_state::init_crazybonb()
 
 	init_palnibbles();
 
-	// Hack Protection
+	// HACK: protection is not understood
 	rom[0x0123]=0x20; // change call $b00c to call $5a20  / Protection #1
 	rom[0x0124]=0x5a;
 
@@ -31234,6 +31274,7 @@ void cmaster_state::init_crazybonb()
 
 void cd3poker_state::init_3cdp()  // v1.6 & v1.0
 {
+	// HACK: why it needs to initialize PPIs like this?
 	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0x0209] = 0x9b; // ppi0 init
@@ -31966,9 +32007,10 @@ void cmaster_state::init_wcat3a()  // seems ok, but needs checking
 		rom[i] = x;
 	}
 
-	rom[0x00e3] = 0x38; // Enable PSG Sound ChA-ChB-ChC
-	rom[0x0785] = 0xdc; //
-	rom[0x0786] = 0x20; //
+	// HACK: enable PSG Sound ChA-ChB-ChC
+	rom[0x00e3] = 0x38;
+	rom[0x0785] = 0xdc;
+	rom[0x0786] = 0x20;
 }
 
 void cb3_state::init_chrygld()
@@ -31991,9 +32033,9 @@ void cmaster_state::init_cm()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-/*  forcing PPI mode 0 for all, and A, B & C as input.
-    the mixed modes 2-0 are not working properly.
-*/
+	// HACK: force PPI mode 0 for all, and A, B & C as input
+	// the mixed modes 2-0 are not working properly.
+
 	rom[0x0021] = 0x9b;
 	rom[0x0025] = 0x9b;
 }
@@ -32002,9 +32044,8 @@ void cmaster_state::init_cmv4()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-/*  forcing PPI mode 0 for all, and A, B & C as input.
-    the mixed modes 2-0 are not working properly.
-*/
+	// HACK: force PPI mode 0 for all, and A, B & C as input
+	// the mixed modes 2-0 are not working properly.
 	rom[0x0209] = 0x9b;
 	rom[0x020d] = 0x9b;
 }
@@ -32041,7 +32082,8 @@ void cmaster_state::init_cmv823()
 		}
 	}
 
-//  forcing PPI mode 0 for all, and A, B & C as input.
+	// HACK: force PPI mode 0 for all, and A, B & C as input
+	// the mixed modes 2-0 are not working properly.
 	rom[0x001f] = 0x9b;
 	rom[0x0023] = 0x9b;
 }
@@ -32078,7 +32120,8 @@ void cmaster_state::init_cmpap()
 		}
 	}
 
-//  forcing PPI mode 0 for all, and A, B & C as input.
+	// HACK: force PPI mode 0 for all, and A, B & C as input
+	// the mixed modes 2-0 are not working properly.
 	rom[0x007a] = 0x9b;
 	rom[0x007e] = 0x9b;
 }
@@ -32258,6 +32301,7 @@ void cmaster_state::init_ll3() // verified with ICE dump
 
 	decrypt_ll3();
 
+	// HACK: what is this patch for?
 	rom[0x8a] = 0;
 	rom[0x8b] = 0;
 	rom[0x8c] = 0;
@@ -32269,6 +32313,7 @@ void cmaster_state::init_ll3b() // verified with ICE dump
 
 	decrypt_ll3();
 
+	// HACK: what are these patch for?
 	rom[0x7e] = 0xcd;
 	rom[0x7f] = 0x87;
 	rom[0x80] = 0x6a;
@@ -32302,9 +32347,8 @@ void cmaster_state::init_cmast91()
 
 	uint8_t *rom = memregion("maincpu")->base();
 
-/*  forcing PPI mode 0 for all, and A, B & C as input.
-    the mixed modes 2-0 are not working properly.
-*/
+	// HACK: force PPI mode 0 for all, and A, B & C as input
+	// the mixed modes 2-0 are not working properly.
 	rom[0x0070] = 0x9b;
 	rom[0x0a92] = 0x9b;
 }
@@ -32313,9 +32357,8 @@ void cmaster_state::init_cll()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-/*  forcing PPI mode 0 for all, and A, B & C as input.
-    the mixed modes 2-0 are not working properly.
-*/
+	// HACK: force PPI mode 0 for all, and A, B & C as input
+	// the mixed modes 2-0 are not working properly.
 	rom[0x0070] = 0x9b;
 	rom[0x0a9c] = 0x9b;
 }
@@ -32324,11 +32367,13 @@ void wingco_state::init_lucky8a()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what is this patch for?
 	rom[0x0010] = 0x21;
 }
 
-void wingco_state::init_lucky8f()  // TODO: simplify
+void wingco_state::init_lucky8f()
 {
+	// TODO: simplify
 	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int i = 0; i < 0x8000; i++)
@@ -32598,7 +32643,7 @@ void wingco_state::init_lucky8r()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	// bypass protection
+	// HACK: bypass protection
 	rom[0x4340] = 0x20;
 	rom[0x4364] = 0x08;
 	rom[0x4385] = 0x02;
@@ -32612,7 +32657,7 @@ void wingco_state::init_lucky8s()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	// bypass protection
+	// HACK: bypass protection
 	rom[0x4772] = 0x08;
 	rom[0x47a8] = 0x02;
 	rom[0x47db] = 0x20;
@@ -32695,6 +32740,7 @@ void wingco_state::init_mbs2()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what is this for?
 	rom[0xd6b1] = 0x97;
 }
 
@@ -33196,14 +33242,14 @@ void cb3_state::init_cb3c()
 		rom[i] = bitswap<8>(rom[i], 1, 0, 6, 4, 7, 5, 3, 2);
 	}
 
-	// skip checksum
+	// HACK: skip checksum
 	rom[0x0004] = 0x00;
 	rom[0x0005] = 0x02;
 	rom[0x0269] = 0xbb;
 	rom[0x026a] = 0x10;
 	rom[0xff02] = 0xc9;
 
-	// skip the 240 games suicide limit
+	// HACK: skip the 240 games suicide limit
 	rom[0x1110] = 0x00;
 	rom[0x1111] = 0x00;
 }
@@ -33262,9 +33308,10 @@ void cb3_state::init_cb3g()
 		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 13, 12, 14, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
 }
 
-// todo: remove these patches!
 void unkch_state::init_unkch1()
 {
+	// HACK: remove this patch
+
 	// game stores $02 at ($D75C) and expects it to change
 	// possibly expecting stack to grow to this point in NMI handler?
 	// it does this before enabling vblank irq, so if that's the case there's a missing nmi source
@@ -33275,6 +33322,8 @@ void unkch_state::init_unkch1()
 
 void unkch_state::init_unkch3()
 {
+	// HACK: remove this patch
+
 	// game stores $04 at ($D77F) and expects it to change
 	// possibly expecting stack to grow to this point in NMI handler?
 	// it does this before enabling vblank irq, so if that's the case there's a missing nmi source
@@ -33285,6 +33334,8 @@ void unkch_state::init_unkch3()
 
 void unkch_state::init_unkch4()
 {
+	// HACK: remove this patch
+
 	// game stores $02 at ($D75C) and expects it to change
 	// possibly expecting stack to grow to this point in NMI handler?
 	// it does this before enabling vblank irq, so if that's the case there's a missing nmi source
@@ -33295,7 +33346,7 @@ void unkch_state::init_unkch4()
 
 void cmaster_state::init_tonypok()
 {
-	// the ppi doesn't seem to work properly, so just install the inputs directly
+	// HACK: the ppi doesn't seem to work properly, so just install the inputs directly
 	address_space &io = m_maincpu->space(AS_IO);
 	io.install_read_port(0x04, 0x04, "IN0" );
 	io.install_read_port(0x05, 0x05, "IN1" );
@@ -33314,6 +33365,7 @@ void goldstar_state::init_super9()
 	for (int i = 0; i < 0x8000; i++)
 		src2[i] = bitswap<8>(src2[i], 3, 7, 2, 6, 1, 5, 0, 4);
 
+	// HACK: get rid of this
 /*  Routine to arrange palette is in second half
     Here we try to adapt one for this half of program.
 
@@ -33421,7 +33473,7 @@ void cmaster_state::init_chthree()
 			std::swap(rom[i], rom[addr]);
 	}
 
-	// Temporary hacks - PPI settings and checksum correction
+	// HACK: PPI settings and checksum correction
 	rom[0x1ff] = 0xbd;
 	rom[0x209] = 0x9b;
 	rom[0x20d] = 0x9b;
@@ -33475,6 +33527,11 @@ void cmaster_state::init_chthree()
 
 		std::swap(gfx2[i], gfx2[addr]);
 	}
+}
+
+void wingco_state::init_feverchb()
+{
+	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), &m_decrypted_opcodes[0], 0x8000);
 }
 
 /*
@@ -33572,7 +33629,7 @@ void wingco_state::init_special7()
 		}
 	}
 
-	// bypassing the serial protection
+	// HACK: bypass the serial protection
 	rom[0x60ac] = 0x00;
 	rom[0x60b7] = 0x00;
 }
@@ -33683,7 +33740,7 @@ void cmaster_state::init_alienatt()
 	for (int a = 0; a < 0xc000; a++)
 		rom[a] = bitswap<8>(rom[a] ^ 0x59, 3, 1, 5, 0, 6, 7, 4, 2);
 
-	// unknown protection - read back needed values
+	// HACK: unknown protection - read back needed values
 	rom[0x9001] = 0x33;
 	rom[0x9002] = 0x54;
 }
@@ -33695,8 +33752,9 @@ void cmaster_state::init_animalhs()
 	for (int a = 0; a < 0xc000; a++)
 		m_decrypted_opcodes[a] = bitswap<8>(rom[a] ^ 0xff, 2, 3, 0, 1, 6, 7, 4, 5);
 
-	 // Fix Test Mode bad string pointer - (perhaps bad decryption)
-	 // animalhs & animalhsa
+	// HACK: get rid of these patches
+	// Fix Test Mode bad string pointer - (perhaps bad decryption)
+	// animalhs & animalhsa
 	rom[0x5d5d] = 0xeb;
 	rom[0x5d5e] = 0x82;
 
@@ -33769,23 +33827,26 @@ void wingco_state::init_l8tet()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: get rid of these copy protection patches
 	rom[0x120e] = 0x00;   // skip bet protection
-	rom[0x01c9] = 0x68;   // alt mcu protection
-	rom[0x788f] = 0x20;   // alt mcu protection
+	rom[0x01c9] = 0x68;   // alt MCU protection
+	rom[0x788f] = 0x20;   // alt MCU protection
 }
 
 void cmaster_state::init_reelmag()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	rom[0xc803] = 0xbf; // unknown protection device (not rom)
-	rom[0xc80a] = 0x7f; // unknown protection device (not rom)
+	// HACK: unknown protection device (not ROM)
+	rom[0xc803] = 0xbf;
+	rom[0xc80a] = 0x7f;
 }
 
 void cmaster_state::init_rm7b()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what is this for?
 	rom[0x0004] = 0xd3;
 	rom[0x00d3] = 0x21;
 	rom[0x00d4] = 0xe4;
@@ -33798,6 +33859,7 @@ void wingco_state::init_skch()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what are these for?
 	rom[0x3415] = 0xc9;
 	rom[0x45e4] = 0xc9;
 
@@ -33809,6 +33871,7 @@ void wingco_state::init_skcha()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what are these for?
 	rom[0x3434] = 0xc9;
 	rom[0x4608] = 0xc9;
 
@@ -33820,6 +33883,7 @@ void wingco_state::init_skchb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what are these for?
 	rom[0x3415] = 0xc9;
 	rom[0x45ee] = 0xc9;
 
@@ -33831,6 +33895,7 @@ void wingco_state::init_mgln()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what are these for?
 	rom[0x45ec] = 0xc9;
 	rom[0x4637] = 0xc9;
 }
@@ -33839,19 +33904,20 @@ void unkch_state::init_bonch()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what are these for?
 	rom[0x5a60] = 0x77;
 	rom[0x5a67] = 0x77;
 
 	rom[0x5a8c] = 0x77;
 	rom[0x5a93] = 0x77;
 
-	//release hopper pay protection
+	// HACK: release hopper pay protection
 	rom[0x5ab2] = 0x4f;
 	rom[0x5ab3] = 0xd8;
 	rom[0x5ab6] = 0x77;
 	rom[0x5aca] = 0x77;
 
-	// backup data control skip
+	// HACK: backup data control skip
 	rom[0x5e82] = 0xd8; // 1
 	rom[0x5e98] = 0xd8; // 2
 
@@ -33863,6 +33929,7 @@ void unkch_state::init_boncha()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: what are these for?
 	rom[0x5a47] = 0x77;
 	rom[0x5a4e] = 0x77;
 	rom[0x5a73] = 0x77;
@@ -33894,7 +33961,7 @@ void unkch_state::init_boncha()
 
 void goldstar_state::init_moonlghtb()
 {
-	// masking the reels
+	// HACK: mask the reels
 	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0xc780] = 0x00;   // black
@@ -33948,13 +34015,15 @@ void wingco_state::init_cbaai()
 		rom[0xf430 + i] = data2[i];
 	}
 
-	rom[0xf420] = 0xc9;  // disabling the stops bomb
+	// HACK: disabling the stops bomb
+	rom[0xf420] = 0xc9;
 }
 
 void cmaster_state::init_noved()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	rom[0x5551] = 0xaf;  // avoids link error
+	// HACK: avoids link error
+	rom[0x5551] = 0xaf;
 	rom[0x29ff] = 0x00;
 	rom[0x2b11] = 0x00;
 	rom[0xb98f] = 0x00;
@@ -33978,7 +34047,8 @@ void cmaster_state::init_noved()
 void cmast97_state::init_cm97()
 {
 	uint8_t *rom = memregion("maincpu")->base();
-	rom[0x4d9a] = 0x08;  // fix video register
+	// HACK: fix video register
+	rom[0x4d9a] = 0x08;
 }
 
 
@@ -34289,6 +34359,7 @@ GAME(  199?, special7b,  special7, flam7_tw, flaming7, wingco_state,   init_spec
 // --- Wing W-6 hardware ---
 GAMEL( 1986, feverch,    0,        feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 1)",                         0,          layout_lucky8 )
 GAMEL( 1986, fevercha,   feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 2)",                         0,          layout_lucky8 )
+GAMEL( 1986, feverchb,   feverch,  feverchb, feverch,  wingco_state,   init_feverchb,  ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, MC-8123)",                       0,          layout_lucky8 )
 GAMEL( 1986, feverchtw,  feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Yamate",            "Fever Chance (W-6, Taiwan)",                               0,          layout_lucky8 )
 GAMEL( 1986, feverchw4,  feverch,  fevchw4,  lucky8b,  wingco_state,   empty_init,     ROT0, "bootleg",           "Fever Chance (W-6, cross-system for W-4)",                 0,          layout_lucky8p1 )
 

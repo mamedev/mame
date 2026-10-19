@@ -2000,7 +2000,7 @@ void salamand_state::salamand(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3'579'545));
 //  ymsnd.irq_handler().set_inputline(m_audiocpu, 0); ... Interrupts _are_ generated, I wonder where they go
-	ymsnd.add_route(0, "speaker", 1.2, 1); // reversed according to MT #4565
+	ymsnd.add_route(0, "speaker", 1.2, 1); // reversed according to MT04565
 	ymsnd.add_route(1, "speaker", 1.2, 0);
 }
 

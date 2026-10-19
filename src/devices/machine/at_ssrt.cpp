@@ -76,6 +76,7 @@ void at_ssrt_device::device_start()
 	save_item(NAME(m_clk));
 	save_item(NAME(m_rxd));
 
+	m_rx_timeout = timer_alloc(FUNC(at_ssrt_device::rx_timeout), this);
 	m_rts = timer_alloc(FUNC(at_ssrt_device::rts), this);
 }
 
@@ -87,6 +88,7 @@ void at_ssrt_device::device_reset()
 	m_shift = 0;
 	m_parity = false;
 
+	m_rx_timeout->reset();
 	m_rts->reset();
 	m_txd_cb(1);
 	m_clk_cb(1);
@@ -115,6 +117,7 @@ void at_ssrt_device::clk_w(int state)
 				m_parity = false;
 
 				m_state++;
+				m_rx_timeout->adjust(attotime::from_usec(200));
 			}
 			break;
 		case RX_DATA1: case RX_DATA2: case RX_DATA3: case RX_DATA4:
@@ -127,6 +130,7 @@ void at_ssrt_device::clk_w(int state)
 			}
 
 			m_state++;
+			m_rx_timeout->adjust(attotime::from_usec(200));
 			break;
 		case RX_PARITY:
 			// rx parity bit
@@ -136,6 +140,7 @@ void at_ssrt_device::clk_w(int state)
 			m_rp_cb(m_rxd);
 
 			m_state++;
+			m_rx_timeout->adjust(attotime::from_usec(200));
 			break;
 		case RX_STOP:
 			// rx stop bit
@@ -162,6 +167,7 @@ void at_ssrt_device::clk_w(int state)
 				LOG("rx framing error\n");
 				m_state = RX_START;
 			}
+			m_rx_timeout->reset();
 			break;
 
 		case TX_START:
@@ -210,6 +216,18 @@ void at_ssrt_device::clk_w(int state)
 	}
 }
 
+TIMER_CALLBACK_MEMBER( at_ssrt_device::rx_timeout )
+{
+    if (rx_busy())
+    {
+        LOG("rx timeout\n");
+
+        m_state = RX_START;
+        m_shift = 0;
+        m_parity = false;
+    }
+}
+
 void at_ssrt_device::rxd_w(int state)
 {
 	// don't log transmitted data
@@ -226,6 +244,7 @@ u8 at_ssrt_device::data_r()
 		LOG("%s: data_r 0x%02x\n", machine().describe_context(), m_latch);
 
 		m_state = RX_START;
+		m_rx_timeout->reset();
 
 		// release keyboard
 		m_clk_cb(1);

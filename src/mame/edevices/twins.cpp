@@ -70,7 +70,7 @@ video is not banked in this case instead palette data is sent to the ports
 strange palette format.
 
 TODO:
-- Proper fix for twins & twinsed2 crash after round 1 (MT #07516):
+- Proper fix for twins & twinsed2 crash after round 1 (MT07516):
   after clearing 1-5 it pings i2c for a couple times, expect it to be 0 then 1 otherwise
   jumps to lalaland;
 - Improve blitter / clear logic for Spider.
@@ -715,6 +715,7 @@ ROM_END
 
 void twins_state::init_twins()
 {
+	// TODO: MT07516 workaround
 	u8 *rom = (u8 *)memregion("ipl")->base();
 
 	rom[0x3497d] = 0x90;
@@ -726,6 +727,7 @@ void twins_state::init_twins()
 
 void twins_state::init_twinsed2()
 {
+	// TODO: MT07516 workaround
 	u8 *rom = (u8 *)memregion("ipl")->base();
 
 	rom[0x349d3] = 0x90;

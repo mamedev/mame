@@ -30,9 +30,9 @@ Note:   All versions of Police Trainer "claim" to be version 1.5 both in an audi
 
 To ID the version of your SharpShooter, check the 2nd printed line on each type of ROM.
 
-Program Roms:  C121012 - Code version 1.2, Graphics v1.0 & Sound v1.2
-Graphic Roms:  G10     - Graphics rom v1.0 (in diagnostics mode it's called "Art")
-  Sound Roms:  S12     - Sound rom v1.2
+Program ROMs:  C121012 - Code version 1.2, Graphics v1.0 & Sound v1.2
+Graphic ROMs:  G10     - Graphics rom v1.0 (in diagnostics mode it's called "Art")
+  Sound ROMs:  S12     - Sound rom v1.2
 
 Noted differences in versions of SharpShooter:
  Added a "Welcome to Sharpshooter" start-up screen showing rom versions for v1.9
@@ -243,48 +243,51 @@ void policetr_state::speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask)
  *
  *************************************/
 
-void policetr_state::mem(address_map &map)
+void policetr_state::common_mem(address_map &map)
 {
 	map.global_mask(0x3fffffff);
 
 	map(0x00000000, 0x0001ffff).ram().share(m_rambase);
-	map(0x00200000, 0x0020000f).w(FUNC(policetr_state::video_w));
+
 	map(0x00400000, 0x00400003).r(FUNC(policetr_state::video_r));
 	map(0x00500000, 0x00500003).nopw();        // copies ROM here at startup, plus checksum
 	map(0x00600002, 0x00600002).r(FUNC(policetr_state::bsmt2000_data_r));
 	map(0x00700000, 0x00700003).w(FUNC(policetr_state::bsmt2000_reg_w));
-	map(0x00800000, 0x00800003).w(FUNC(policetr_state::bsmt2000_data_w));
-	map(0x00900001, 0x00900001).w(m_ramdac, FUNC(bt481_device::address_w));
-	map(0x00920001, 0x00920001).w(m_ramdac, FUNC(bt481_device::palette_w));
-	map(0x00940001, 0x00940001).w(m_ramdac, FUNC(bt481_device::mask_w));
+
 	map(0x00a00000, 0x00a00003).w(FUNC(policetr_state::control_w));
 	map(0x00a00000, 0x00a00003).portr("IN0");
 	map(0x00a20000, 0x00a20003).portr("IN1");
 	map(0x00a40000, 0x00a40003).portr("DSW");
 	map(0x00e00000, 0x00e00003).nopw();        // watchdog???
+}
+
+
+void policetr_state::policetr_mem(address_map &map)
+{
+	common_mem(map);
+
+	map(0x00200000, 0x0020000f).w(FUNC(policetr_state::video_w));
+
+	map(0x00800000, 0x00800003).w(FUNC(policetr_state::bsmt2000_data_w));
+	map(0x00900001, 0x00900001).w(m_ramdac, FUNC(bt481_device::address_w));
+	map(0x00920001, 0x00920001).w(m_ramdac, FUNC(bt481_device::palette_w));
+	map(0x00940001, 0x00940001).w(m_ramdac, FUNC(bt481_device::mask_w));
+
 	map(0x1fc00000, 0x1fc7ffff).rom().region("maincpu", 0);
 }
 
 
-void sshooter_state::mem(address_map &map)
+void policetr_state::sshooter_mem(address_map &map)
 {
-	map.global_mask(0x3fffffff);
+	common_mem(map);
 
-	map(0x00000000, 0x0001ffff).ram().share(m_rambase);
-	map(0x00200000, 0x00200003).w(FUNC(sshooter_state::bsmt2000_data_w));
+	map(0x00200000, 0x00200003).w(FUNC(policetr_state::bsmt2000_data_w));
 	map(0x00300001, 0x00300001).w(m_ramdac, FUNC(bt481_device::address_w));
 	map(0x00320001, 0x00320001).w(m_ramdac, FUNC(bt481_device::palette_w));
 	map(0x00340001, 0x00340001).w(m_ramdac, FUNC(bt481_device::mask_w));
-	map(0x00400000, 0x00400003).r(FUNC(sshooter_state::video_r));
-	map(0x00500000, 0x00500003).nopw();        // copies ROM here at startup, plus checksum
-	map(0x00600002, 0x00600002).r(FUNC(sshooter_state::bsmt2000_data_r));
-	map(0x00700000, 0x00700003).w(FUNC(sshooter_state::bsmt2000_reg_w));
-	map(0x00800000, 0x0080000f).w(FUNC(sshooter_state::video_w));
-	map(0x00a00000, 0x00a00003).w(FUNC(sshooter_state::control_w));
-	map(0x00a00000, 0x00a00003).portr("IN0");
-	map(0x00a20000, 0x00a20003).portr("IN1");
-	map(0x00a40000, 0x00a40003).portr("DSW");
-	map(0x00e00000, 0x00e00003).nopw();        // watchdog???
+
+	map(0x00800000, 0x0080000f).w(FUNC(policetr_state::video_w));
+
 	map(0x1fc00000, 0x1fcfffff).rom().region("maincpu", 0);
 }
 
@@ -426,6 +429,9 @@ void policetr_state::machine_start()
 	save_item(NAME(m_bsmt_data_offset));
 	save_item(NAME(m_last_cycles));
 	save_item(NAME(m_loop_count));
+
+	m_maincpu->space(AS_PROGRAM).install_write_handler(m_speedup_addr, m_speedup_addr+3, write32s_delegate(*this, FUNC(policetr_state::speedup_w)));
+	m_speedup_data = m_rambase + m_speedup_addr/4;
 }
 
 void policetr_state::policetr(machine_config &config)
@@ -433,7 +439,7 @@ void policetr_state::policetr(machine_config &config)
 	// basic machine hardware
 	R3041(config, m_maincpu, MASTER_CLOCK/2);
 	m_maincpu->set_endianness(ENDIANNESS_BIG);
-	m_maincpu->set_addrmap(AS_PROGRAM, &policetr_state::mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &policetr_state::policetr_mem);
 
 	EEPROM_93C66_16BIT(config, m_eeprom);
 
@@ -454,12 +460,59 @@ void policetr_state::policetr(machine_config &config)
 	BSMT2000(config, m_bsmt, MASTER_CLOCK/2);
 	m_bsmt->add_route(0, *m_speaker, 1.0, 0);
 	m_bsmt->add_route(1, *m_speaker, 1.0, 1);
+
+	m_speedup_pc = 0x1fc028ac;
+	m_speedup_addr = 0x00000fc8;
 }
 
-void sshooter_state::sshooter(machine_config &config)
+void policetr_state::policetr10(machine_config &config)
 {
 	policetr(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &sshooter_state::mem);
+
+	m_speedup_pc = 0x1fc028b4;
+	m_speedup_addr = 0x00000fc8;
+}
+
+void policetr_state::sshooter(machine_config &config)
+{
+	policetr(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &policetr_state::sshooter_mem);
+
+	m_speedup_pc = 0x1fc03440;
+	m_speedup_addr = 0x00018fd8;
+}
+
+void policetr_state::policetr13b(machine_config &config)
+{
+	sshooter(config);
+
+	m_speedup_pc = 0x1fc028bc;
+	m_speedup_addr = 0x00000fc8;
+}
+
+void policetr_state::sshooter17(machine_config &config)
+{
+	sshooter(config);
+
+	m_speedup_pc = 0x1fc03470;
+	m_speedup_addr = 0x00018fd8;
+}
+
+void policetr_state::sshooter12(machine_config &config)
+{
+	sshooter(config);
+
+	m_speedup_pc = 0x1fc033e0;
+	m_speedup_addr = 0x00018fd8;
+}
+
+void policetr_state::sshooter11(machine_config &config)
+{
+	sshooter(config);
+
+	m_speedup_pc = 0x1fc032f8;
+	m_speedup_addr = 0x00018fd8;
 }
 
 
@@ -755,34 +808,20 @@ ROM_END
 
 /*************************************
  *
- *  Driver initialization
- *
- *************************************/
-
-void policetr_state::driver_start()
-{
-	m_maincpu->space(AS_PROGRAM).install_write_handler(m_speedup_addr, m_speedup_addr+3, write32s_delegate(*this, FUNC(policetr_state::speedup_w)));
-	m_speedup_data = m_rambase + m_speedup_addr/4;
-}
-
-
-
-/*************************************
- *
  *  Game driver(s)
  *
  *************************************/
 
-GAME( 1996, policetr,    0,        policetr, policetr, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B, Rev 0.3 PCB)",        0 )
-GAME( 1996, policetr13,  policetr, policetr, policetr, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)",                      0 )
-GAME( 1996, policetr12,  policetr, policetr, polict10, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.2)",                      0 )
-GAME( 1996, policetr11,  policetr, policetr, polict10, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)",                      0 )
-GAME( 1996, policetr10,  policetr, policetr, polict10, polict10_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)",                      0 )
+GAME( 1996, policetr,    0,        policetr,    policetr, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B, Rev 0.3 PCB)",        0 )
+GAME( 1996, policetr13,  policetr, policetr,    policetr, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)",                      0 )
+GAME( 1996, policetr12,  policetr, policetr,    polict10, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.2)",                      0 )
+GAME( 1996, policetr11,  policetr, policetr,    polict10, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)",                      0 )
+GAME( 1996, policetr10,  policetr, policetr10,  polict10, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)",                      0 )
 
-GAME( 1996, policetr13a, policetr, sshooter, policetr, plctr13b_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B Newer, Rev 0.5B PCB)", 0 )
-GAME( 1996, policetr13b, policetr, sshooter, policetr, plctr13b_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B, Rev 0.5B PCB)",       0 )
+GAME( 1996, policetr13a, policetr, policetr13b, policetr, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B Newer, Rev 0.5B PCB)", 0 )
+GAME( 1996, policetr13b, policetr, policetr13b, policetr, policetr_state, empty_init, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B, Rev 0.5B PCB)",       0 )
 
-GAME( 1998, sshooter,    0,        sshooter, sshooter, sshooter_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)",                        0 )
-GAME( 1998, sshooter17,  sshooter, sshooter, sshooter, sshoot17_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)",                        0 )
-GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, sshoot12_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)",                        0 )
-GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, sshoot11_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)",                        0 )
+GAME( 1998, sshooter,    0,        sshooter,    sshooter, policetr_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)",                        0 )
+GAME( 1998, sshooter17,  sshooter, sshooter17,  sshooter, policetr_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)",                        0 )
+GAME( 1998, sshooter12,  sshooter, sshooter12,  sshoot11, policetr_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)",                        0 )
+GAME( 1998, sshooter11,  sshooter, sshooter11,  sshoot11, policetr_state, empty_init, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)",                        0 )

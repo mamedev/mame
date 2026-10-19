@@ -109,7 +109,7 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
 		save_item(NAME(m_ball_x));
 		save_item(NAME(m_ball_y));

@@ -464,6 +464,15 @@ void sh2_device::sh2_exception_internal(const char *message, int irqline, int ve
 {
 	debugger_exception_hook(vector);
 
+	// an exception cancels sleep mode and returns to the instruction following the SLEEP
+	// (the handler doesn't necessarily come back: the Saturn BIOS clock change one drops
+	// the exception frame, which left the next SLEEP falling through)
+	if (m_sh2_state->sleep_mode == 1)
+	{
+		m_sh2_state->pc += 2;
+		m_sh2_state->sleep_mode = 0;
+	}
+
 	if (m_isdrc)
 	{
 		m_sh2_state->evec = read_long(m_sh2_state->vbr + vector * 4);
@@ -494,9 +503,6 @@ void sh2_device::sh2_exception_internal(const char *message, int irqline, int ve
 		/* fetch PC */
 		m_sh2_state->pc = read_long(m_sh2_state->vbr + vector * 4) & m_am;
 	}
-
-	if (m_sh2_state->sleep_mode == 1)
-		m_sh2_state->sleep_mode = 2;
 }
 
 /////////

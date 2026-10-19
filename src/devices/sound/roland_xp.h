@@ -313,7 +313,7 @@ protected:
 	u8 m_parity;
 
 	int m_icount;
-	u16 m_pc;
+	s32 m_pc;
 	u16 m_cycle;
 
 	u8 m_position;

@@ -85,7 +85,7 @@ void nbmj8891_state::init_omotesnd()
 #if 1
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	// Protection ROM check skip
+	// HACK: Protection ROM check skip
 	ROM[0x0106] = 0x00;
 	ROM[0x0107] = 0x00;
 	ROM[0x0108] = 0x00;
@@ -153,7 +153,7 @@ void nbmj8891_state::init_mjfocusm()
 #if 1
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	// Protection ROM check skip
+	// HACK: Protection ROM check skip
 	ROM[0x014e] = 0x00;
 	ROM[0x014f] = 0x00;
 	ROM[0x0150] = 0x00;
@@ -163,6 +163,7 @@ void nbmj8891_state::init_mjfocusm()
 void nbmj8891_state::init_scandal()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
+	// TODO: why it needs 0-fill the main program, and why ROM_FILL isn't enough?
 	for (int i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
 }
 

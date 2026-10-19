@@ -118,6 +118,8 @@ private:
 		SUBMODE_VIDEO      = 0x02,
 		SUBMODE_EOR        = 0x01,
 
+		CODING_EMPHASIS    = 0x40,
+
 		CODING_BPS_MASK    = 0x30,
 		CODING_4BPS        = 0x00,
 		CODING_8BPS        = 0x10,
@@ -190,6 +192,8 @@ private:
 	// Audio Attenuation (L->L, L->R, R->R, R->L)
 	uint8_t m_atten[4];
 	int16_t m_xa_last[4];
+	float m_deemph_x1[2];
+	float m_deemph_y1[2];
 	std::unique_ptr<uint8_t[]> m_ram;
 	std::unique_ptr<int16_t[]> m_samples[2];
 
@@ -208,7 +212,7 @@ private:
 	bool is_mode2_audio_selected(const uint8_t *buffer);
 
 	void process_disc_sector();
-	void process_sector_data(const uint8_t *buffer, const uint8_t *subcode_buffer);
+	void process_sector_data(const uint8_t *buffer, const uint8_t *subcode_buffer, const uint8_t *raw_subcode);
 	void init_disc_read(uint8_t disc_mode);
 	void cancel_disc_read();
 	void handle_cdic_command();

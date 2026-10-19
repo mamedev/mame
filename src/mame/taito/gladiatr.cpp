@@ -1435,7 +1435,7 @@ void ppking_state::init_ppking()
 		}
 	}
 
-	// patch audio CPU crash + ROM checksums
+	// HACK: patch audio CPU crash + ROM checksums
 	rom = memregion("sub")->base();
 	rom[0x1b9] = 0x00;
 	rom[0x1ba] = 0x00;

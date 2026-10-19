@@ -38,6 +38,7 @@ public:
 	void atarigt(machine_config &config) ATTR_COLD;
 	void atarigt_stereo(machine_config &config) ATTR_COLD;
 	void tmek(machine_config &config) ATTR_COLD;
+	void tmek20(machine_config &config) ATTR_COLD;
 	void primrage20(machine_config &config) ATTR_COLD;
 	void primrage(machine_config &config) ATTR_COLD;
 
@@ -46,11 +47,10 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	static inline constexpr unsigned ADDRSEQ_COUNT = 4;
-
 	required_device<palette_device> m_palette;
 	memory_share_creator<uint16_t> m_colorram;
 
@@ -62,7 +62,7 @@ private:
 
 	required_shared_ptr<uint32_t> m_mo_command;
 	required_device<atari_cage_device> m_cage;
-	optional_device<atari_136094_0004a_device> m_xga;
+	optional_device<atari_gt_xga_device> m_xga;
 
 	optional_ioport m_service_io;
 	optional_ioport m_coin_io;
@@ -83,12 +83,7 @@ private:
 
 	uint32_t        m_tram_checksum = 0;
 
-	void            (atarigt_state::*m_protection_w)(address_space &space, offs_t offset, uint16_t data);
-	void            (atarigt_state::*m_protection_r)(address_space &space, offs_t offset, uint16_t *data);
-
 	bool            m_ignore_writes = false;
-	offs_t          m_protaddr[ADDRSEQ_COUNT]{};
-	uint8_t         m_protmode = 0;
 
 	INTERRUPT_GEN_MEMBER(scanline_int_gen);
 	void video_int_write_line(int state);
@@ -103,9 +98,8 @@ private:
 	void led_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t sound_data_r(offs_t offset, uint32_t mem_mask = ~0);
 	void sound_data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t colorram_protection_r(address_space &space, offs_t offset, uint32_t mem_mask = ~0);
-	void colorram_protection_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void tmek_pf_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t colorram_protection_r(offs_t offset, uint32_t mem_mask = ~0);
+	void colorram_protection_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void cage_irq_callback(uint8_t data);
 
@@ -117,11 +111,5 @@ private:
 	TILEMAP_MAPPER_MEMBER(playfield_scan);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map) ATTR_COLD;
-
-	void tmek_update_mode(offs_t offset);
-	void tmek_protection_w(address_space &space, offs_t offset, uint16_t data);
-	void tmek_protection_r(address_space &space, offs_t offset, uint16_t *data);
-	void primrage_protection_w(address_space &space, offs_t offset, uint16_t data);
-	void primrage_protection_r(address_space &space, offs_t offset, uint16_t *data);
 	void compute_fake_pots(int *pots);
 };

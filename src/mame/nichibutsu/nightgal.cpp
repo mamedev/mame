@@ -1299,7 +1299,7 @@ void nightgal_state::init_royalqn()
 {
 	uint8_t *ROM = memregion("subrom")->base();
 
-	/* patch open bus / protection */
+	// HACK: patch open bus / protection
 	ROM[0x027e] = 0x02;
 	ROM[0x027f] = 0x02;
 }

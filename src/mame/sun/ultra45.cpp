@@ -57,21 +57,25 @@ ROM_START(ultra45)
 	ROM_REGION(0x008000, "extra3", 0)
 	ROM_LOAD( "ca4b_at25256an.u79",                    0x000000, 0x008000, CRC(a35303fb) SHA1(df1b4121c8ae40b7fb9a03cc57e61f0da12e1110) )
 
-	/* Unprotected PIC16F777 near a 20 MHz xtal
-	    ID0 = 2009h
-	    ID1 = 0000h
-	    ID2 = 2009h
-	    ID3 = 0003h
-	    Oscillator = High Speed
-	    Watchdog = Disabled
-	    Power-up timer = Disabled
-	    MCLR pin = Disabled
-	    Brown-out Reset enabled and always on */
-	ROM_REGION(0x004000, "pic1", 0)
-	ROM_LOAD("972a_pic16f777.u13",                     0x000000, 0x004000, CRC(a1d4b342) SHA1(564926990cf28a1f88a8a374f16ac172f7b8c8f7) )
+	// Unprotected PIC16F777 near a 20 MHz xtal
+	ROM_REGION16_LE( 0x4012, "pic1", 0 )
+	ROM_LOAD( "972a_pic16f777.u13", 0x0000, 0x4000, CRC(a1d4b342) SHA1(564926990cf28a1f88a8a374f16ac172f7b8c8f7) )
+	ROM_FILL( 0x4000, 0x01, 0x09 )
+	ROM_FILL( 0x4001, 0x01, 0x20 ) // user_id0: 0x2009
+	ROM_FILL( 0x4002, 0x01, 0x00 )
+	ROM_FILL( 0x4003, 0x01, 0x00 ) // user_id1: 0x0000
+	ROM_FILL( 0x4004, 0x01, 0x09 )
+	ROM_FILL( 0x4005, 0x01, 0x20 ) // user_id2: 0x2009
+	ROM_FILL( 0x4006, 0x01, 0x03 )
+	ROM_FILL( 0x4007, 0x01, 0x00 ) // user_id3: 0x0003
+	// unspecified configuration bits are left unprogrammed
+	ROM_FILL( 0x400e, 0x01, 0xca )
+	ROM_FILL( 0x400f, 0x01, 0x3f ) // configuration1: 0x3fca (HS oscillator, WDT/PWRT/MCLR disabled, BOREN=1)
+	ROM_FILL( 0x4010, 0x01, 0xff )
+	ROM_FILL( 0x4011, 0x01, 0x3f ) // configuration2: 0x3fff (BORSEN=1)
 
-	ROM_REGION(0x004300, "pic2", 0)
-	ROM_LOAD("a4bb_pic12f629.u66",                     0x000000, 0x004300, CRC(258bd64e) SHA1(58f64710a3f4d184a3aaa776aa351d30144806f5) )
+	ROM_REGION16_LE(0x004300, "pic2", 0)
+	ROM_LOAD("a4bb_pic12f629.u66", 0x0000, 0x4300, CRC(258bd64e) SHA1(58f64710a3f4d184a3aaa776aa351d30144806f5) )
 
 	ROM_REGION(0x0016cc, "pld", 0)
 	ROM_LOAD("chicago_0309_4m_cks_6d7b_xc9572xl.u15",  0x000000, 0x0016cc, CRC(d5fbe610) SHA1(a41e136eeb6c115523814ca3774ff7a0a0604569) )

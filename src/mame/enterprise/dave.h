@@ -52,6 +52,7 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(update_1hz_timer);
 	TIMER_CALLBACK_MEMBER(update_50hz_timer);
+	TIMER_CALLBACK_MEMBER(update_tone_channel);
 
 	uint8_t program_r(offs_t offset);
 	void program_w(offs_t offset, uint8_t data);
@@ -89,11 +90,14 @@ private:
 
 	emu_timer *m_timer_1hz;
 	emu_timer *m_timer_50hz;
+	emu_timer *m_timer_tone[3];
+
+	void start_tone_channel(int channel);
+	void sync_tone_channel(int channel, int state);
+	void update_dac();
 
 	/* SOUND SYNTHESIS */
 	uint8_t m_regs[32];
-	int m_period[4];
-	int m_count[4];
 	int m_level[4];
 
 	/* these are used to force channels on/off */
@@ -107,6 +111,9 @@ private:
 
 	/* these are the current channel volumes in MAME form */
 	int m_mame_volumes[8];
+
+	/* the D/A output levels, which also drive the cassette output */
+	int m_dac[2];
 
 	sound_stream *m_sound_stream_var;
 };

@@ -59,10 +59,10 @@ public:
 		, m_bank(*this, "bank%u", 0U)
 	{ }
 
-	void pengadvb(machine_config &config);
+	void pengadvb(machine_config &config) ATTR_COLD;
 
-	void init_pengadvb();
-	void init_pengadvb2();
+	void init_pengadvb() ATTR_COLD;
+	void init_pengadvb2() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

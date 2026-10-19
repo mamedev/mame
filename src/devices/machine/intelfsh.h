@@ -23,6 +23,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -32,6 +33,8 @@ protected:
 	// derived helpers
 	uint32_t read_full(uint32_t offset);
 	void write_full(uint32_t offset, uint32_t data);
+	void page_load_start();
+	void complete_page_write();
 
 	TIMER_CALLBACK_MEMBER(delay_tick);
 
@@ -50,6 +53,10 @@ protected:
 	bool                     m_top_boot_sector;
 	bool                     m_bot_boot_sector;
 	uint16_t                 m_page_size;
+	uint32_t                 m_page_timeout_usec;
+
+	// whether the device has a hardware reset pin
+	bool                     m_has_reset_pin;
 
 	// internal state
 	std::unique_ptr<uint8_t[]> m_data;
@@ -65,6 +72,8 @@ protected:
 	uint8_t                  m_write_buffer[32];
 	uint32_t                 m_write_buffer_start_address;
 	uint32_t                 m_write_buffer_count;
+	uint32_t                 m_page_address;
+	std::unique_ptr<uint8_t[]> m_page_buffer;
 
 	bool                     m_fast_mode;
 };
@@ -161,6 +170,12 @@ class amd_29f080_device : public intelfsh8_device
 {
 public:
 	amd_29f080_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class amd_29f032_device : public intelfsh8_device
+{
+public:
+	amd_29f032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class amd_29f400t_device : public intelfsh8_device
@@ -399,6 +414,12 @@ public:
 	fujitsu_29lv800b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class fujitsu_29lv160b_device : public intelfsh16_device
+{
+public:
+	fujitsu_29lv160b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class amd_29f800b_16bit_device : public intelfsh16_device
 {
 public:
@@ -434,6 +455,7 @@ DECLARE_DEVICE_TYPE(ATMEL_29C020,            atmel_29c020_device)
 DECLARE_DEVICE_TYPE(AMD_29F010,              amd_29f010_device)
 DECLARE_DEVICE_TYPE(AMD_29F040,              amd_29f040_device)
 DECLARE_DEVICE_TYPE(AMD_29F080,              amd_29f080_device)
+DECLARE_DEVICE_TYPE(AMD_29F032,              amd_29f032_device)
 DECLARE_DEVICE_TYPE(AMD_29F400T,             amd_29f400t_device)
 DECLARE_DEVICE_TYPE(AMD_29F800T,             amd_29f800t_device)
 DECLARE_DEVICE_TYPE(AMD_29F800B_16BIT,       amd_29f800b_16bit_device)
@@ -445,6 +467,7 @@ DECLARE_DEVICE_TYPE(FUJITSU_29F016A,         fujitsu_29f016a_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29DL164BD,       fujitsu_29dl164bd_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29LV002TC,       fujitsu_29lv002tc_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29LV800B,        fujitsu_29lv800b_device)
+DECLARE_DEVICE_TYPE(FUJITSU_29LV160B,        fujitsu_29lv160b_device)
 DECLARE_DEVICE_TYPE(INTEL_E28F400B,          intel_e28f400b_device)
 DECLARE_DEVICE_TYPE(MACRONIX_29F008TC,       macronix_29f008tc_device)
 DECLARE_DEVICE_TYPE(MACRONIX_29F1610MC,      macronix_29f1610mc_device)

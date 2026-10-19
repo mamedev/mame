@@ -194,10 +194,11 @@ void gba_lcd_device::device_start()
 	m_vram = make_unique_clear<uint32_t[]>(0x18000 / 4);
 	m_oam = make_unique_clear<uint32_t[]>(0x400 / 4);
 
-	// the engine fetches from 64K of BG data followed by 32K of OBJ tiles
+	// the engine fetches from 64K of BG data followed by 32K of OBJ tiles;
+	// the bitmap modes also display the first 16K of the OBJ tiles
 	set_palette_ram(m_pram.get());
 	set_oam(m_oam.get());
-	for (int page = 0; page < 4; page++)
+	for (int page = 0; page < 5; page++)
 	{
 		set_vram_page(VRAM_BG, page, &m_vram[page * (0x4000 / 4)]);
 	}

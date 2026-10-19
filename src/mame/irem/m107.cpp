@@ -20,9 +20,9 @@ To Do:
   Hook up inputs and EEPROM in Kick for the Goal / World PK Soccer
 
 2008-08
-Dip locations have been added assuming that the layout is the same as the
-m92 boards (and earlier Irem boards). However, it would be nice to have them
-confirmed for m107 games as well.
+DIP switch locations have been added assuming that the layout is the same as
+the m92 boards (and earlier Irem boards). However, it would be nice to have
+them confirmed for m107 games as well.
 
 *******************************************************************************/
 
@@ -68,14 +68,14 @@ public:
 	{
 	}
 
-	void airass(machine_config &config);
-	void firebarr(machine_config &config);
-	void dsoccr94(machine_config &config);
-	void wpksoc(machine_config &config);
+	void airass(machine_config &config) ATTR_COLD;
+	void firebarr(machine_config &config) ATTR_COLD;
+	void dsoccr94(machine_config &config) ATTR_COLD;
+	void wpksoc(machine_config &config) ATTR_COLD;
 
-	void init_dsoccr94();
-	void init_firebarr();
-	void init_wpksoc();
+	void init_dsoccr94() ATTR_COLD;
+	void init_firebarr() ATTR_COLD;
+	void init_wpksoc() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -126,14 +126,15 @@ private:
 	void update_scroll_positions();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int laynum, int category, int opaque);
 	void screen_refresh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void dsoccr94_io_map(address_map &map) ATTR_COLD;
-	void dsoccr94_map(address_map &map) ATTR_COLD;
-	void firebarr_map(address_map &map) ATTR_COLD;
+
 	void main_map(address_map &map) ATTR_COLD;
+	void firebarr_map(address_map &map) ATTR_COLD;
+	void dsoccr94_map(address_map &map) ATTR_COLD;
 	void main_portmap(address_map &map) ATTR_COLD;
-	void sound_map(address_map &map) ATTR_COLD;
-	void wpksoc_io_map(address_map &map) ATTR_COLD;
+	void dsoccr94_io_map(address_map &map) ATTR_COLD;
 	void wpksoc_map(address_map &map) ATTR_COLD;
+	void wpksoc_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -439,10 +440,10 @@ void m107_state::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const
 
 	if (m_control[0x08 + laynum] & 0x02)
 	{
-		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
+		for (int line = cliprect.top(); line <= cliprect.bottom(); line++)
 		{
 			const uint16_t *scrolldata = m_vram_data + (0xe800 + 0x200 * laynum) / 2;
-			clip.min_y = clip.max_y = line;
+			clip.sety(line, line);
 
 			m_pf_layer[laynum].tmap->set_scrollx(0,  m_control[1 + 2 * laynum]);
 			m_pf_layer[laynum].tmap->set_scrolly(0,  (m_control[0 + 2 * laynum] + scrolldata[line]));
@@ -522,7 +523,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(m107_state::scanline_interrupt)
 	else
 	{
 		// VBLANK interrupt
-		if (scanline == m_screen->visible_area().max_y + 1)
+		if (scanline == m_screen->visible_area().bottom() + 1)
 		{
 			m_screen->update_partial(scanline);
 			m_upd71059c->ir0_w(1);

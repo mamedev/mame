@@ -5320,6 +5320,7 @@ license:CC0-1.0
 		<description>Populous (Europe, Brazil)</description>
 		<year>1989</year>
 		<publisher>TecMagik</publisher>
+		<info name="developer" value="Code To Go" />
 		<info name="serial" value="27014-50"/>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">

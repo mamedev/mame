@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
 /*
-    Yamaha PSR-340 PortaSound keyboard
+    Yamaha PSR-340 PortaTone keyboard
     Preliminary driver by R. Belmont
 
     CPU and Sound: SWX00B, which is an H8S/2000 series CPU and Yamaha
@@ -260,4 +260,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS(1994, psr340, 0, 0, psr340, psr340, psr340_state, empty_init, "Yamaha", "PSR-340 PortaSound", MACHINE_NOT_WORKING)
+CONS(1994, psr340, 0, 0, psr340, psr340, psr340_state, empty_init, "Yamaha", "PortaTone PSR-340", MACHINE_NOT_WORKING)

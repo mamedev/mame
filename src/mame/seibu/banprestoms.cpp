@@ -28,12 +28,16 @@ The audio section also has unpopulated spaces marked for a Z80, a YM2203 and a S
 
 
 TODO:
-- the GFX emulation was adapted from other drivers using the Seibu customs, it might need more adjustments
-- verify Oki banking (needs someone who understands Japanese to check if speech makes sense when it gets called)
-- lamps
-- controls / dips need to be completed and better arranged
-- identify and hookup RTC
-- hopper emulation not 100% correct
+- the GFX emulation was adapted from other drivers using the Seibu customs,
+  it might need more adjustments;
+- lamps;
+- controls / dips need to be completed and better arranged;
+- identify and hookup RTC;
+- hopper emulation not 100% correct;
+- tvdenwad: the way we hookup keypad 0 breaks gameplay i.e. you have to hold 0 then make a selection
+  to work around it;
+- tvdenwam: scroll X jerkiness in attract mode, warrants copying video RAM buffers like godzilla?
+
 */
 
 #include "emu.h"
@@ -64,6 +68,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_spritegen(*this, "spritegen")
+		, m_crtc(*this, "crtc")
 		, m_ticket(*this, "ticket")
 		, m_rtc(*this, "rtc")
 		, m_vram(*this, "vram%u", 0U)
@@ -72,6 +77,7 @@ public:
 	{ }
 
 	void banprestoms(machine_config &config) ATTR_COLD;
+	void tvdenwam(machine_config &config) ATTR_COLD;
 
 	void init_oki() ATTR_COLD;
 
@@ -81,11 +87,12 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<sei0211_device> m_spritegen;
+	required_device<seibu_crtc_device> m_crtc;
+private:
 	required_device<ticket_dispenser_device> m_ticket;
 	required_device<lh5045_device> m_rtc;
 
@@ -261,7 +268,7 @@ void banprestoms_state::prg_map(address_map &map)
 	map(0x083000, 0x0837ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x083800, 0x083fff).ram().share(m_spriteram);
 	map(0x0a0001, 0x0a0001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x0c0000, 0x0c004f).rw("crtc", FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
+	map(0x0c0000, 0x0c004f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x0c0080, 0x0c0081).nopw(); // CRTC related ?
 	map(0x0c00c0, 0x0c00c1).nopw(); // CRTC related ?
 	map(0x0c0100, 0x0c0101).w(FUNC(banprestoms_state::okibank_w));
@@ -346,7 +353,8 @@ static INPUT_PORTS_START( tvdenwad )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( marioun ) // inputs defined as IPT_UNKNOWN don't show any effect in switch test in test mode
+// inputs defined as IPT_UNKNOWN don't show any effect in switch test in test mode
+static INPUT_PORTS_START( marioun )
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) // upper space on the feet platform
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) // right space on the feet platform
@@ -389,7 +397,9 @@ static INPUT_PORTS_START( marioun ) // inputs defined as IPT_UNKNOWN don't show 
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3") // some of these are difficulty (i.e. see Bowser being quicker or slower in the 100m dash)
+	// TODO: some of these are difficulty
+	// (i.e. see Bowser being quicker or slower in the 100m dash)
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:4")
@@ -454,22 +464,20 @@ void banprestoms_state::banprestoms(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(banprestoms_state::irq4_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-
-	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(40)); // TODO: this is trial and error, not verified
+	// TODO: this is trial and error, not verified
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(40));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen")); // TODO: copied from other drivers using the same CRTC
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0, 320-1, 16, 240-1);
+	// TODO: copied from other drivers using the same CRTC
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(14318180 / 2, 455, 0, 320, 258, 16, 240); // ~61 Hz, 15.734 kHz
 	screen.set_screen_update(FUNC(banprestoms_state::screen_update));
 	screen.set_palette(m_palette);
 
-	seibu_crtc_device &crtc(SEIBU_CRTC(config, "crtc"));
-	crtc.layer_en_callback().set(FUNC(banprestoms_state::layer_en_w));
-	crtc.layer_scroll_callback().set(FUNC(banprestoms_state::layer_scroll_w));
-	crtc.layer_scroll_base_callback().set([this] (offs_t offset, u16 data, u16 mem_mask) {
+	SEIBU_CRTC(config, m_crtc);
+	m_crtc->layer_en_callback().set(FUNC(banprestoms_state::layer_en_w));
+	m_crtc->layer_scroll_callback().set(FUNC(banprestoms_state::layer_scroll_w));
+	m_crtc->layer_scroll_base_callback().set([this] (offs_t offset, u16 data, u16 mem_mask) {
 		const u8 layer_n = offset >> 1;
 		if (!BIT(offset, 0))
 			m_tilemap[layer_n]->set_scrolldx((0x1c0 - data) & 0x1ff, (0x1c0 - data) & 0x1ff);
@@ -493,6 +501,27 @@ void banprestoms_state::banprestoms(machine_config &config)
 	oki.add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
+void banprestoms_state::tvdenwam(machine_config &config)
+{
+	banprestoms_state::banprestoms(config);
+	// tvdenwam routes flipy at byte 3 bit 15 unlike any other SEI021x SW.
+	// notice that all games on this HW may have the same hookup, they just never use flipy afaik
+	m_spritegen->set_flipy_location(3, 15);
+
+	// TODO: tvdenwam wants a Y shift of +16 pixels
+	// This comes from the CRTC register $42, it's not static
+    m_spritegen->set_offset(0, +16);
+
+	// TODO: need to adjust by 0x1c1 rather than 0x1c0 in X direction
+	// needed for sprite & tilemap to stay aligned, cfr. coin in.
+	m_crtc->layer_scroll_base_callback().set([this] (offs_t offset, u16 data, u16 mem_mask) {
+		const u8 layer_n = offset >> 1;
+		if (!BIT(offset, 0))
+			m_tilemap[layer_n]->set_scrolldx((0x1c1 - data) & 0x1ff, (0x1c1 - data) & 0x1ff);
+		else
+			m_tilemap[layer_n]->set_scrolldy((0x1ff - data) & 0x1ff, (0x1ff - data) & 0x1ff);
+	});
+}
 
 ROM_START( tvdenwad )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -503,7 +532,7 @@ ROM_START( tvdenwad )
 	ROM_LOAD( "s82_a05.u119", 0x00000, 0x80000, CRC(980be413) SHA1(d35cb6bb2299fc34226c59c3c97f8789dd1f71ce) )
 
 	ROM_REGION( 0x80000, "gfx_tiles", 0 )
-	ROM_LOAD( "s82_a04.u18", 0x00000, 0x80000, CRC(55f31697) SHA1(58011800b2e2c6cac55a3881a9970bbd325d74ad) ) // TODO: are all of the following used? in attract it seems only fg_gfx and tx_gfx are used
+	ROM_LOAD( "s82_a04.u18", 0x00000, 0x80000, CRC(55f31697) SHA1(58011800b2e2c6cac55a3881a9970bbd325d74ad) )
 
 	ROM_REGION( 0x80000, "bg_gfx", 0 )
 	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
@@ -605,7 +634,7 @@ ROM_START( marioun )
 	ROM_LOAD( "s98_a05.u119", 0x00000, 0x80000, CRC(b8317dd8) SHA1(37f0be38607e40d7925faf9731b95577cbd56bb0) )
 
 	ROM_REGION( 0x80000, "gfx_tiles", 0 )
-	ROM_LOAD( "s98_a04.u18", 0x00000, 0x80000, CRC(b107c5a0) SHA1(d4e7ef71bfb9a10e72b6292405d0378c95ebba25) ) // TODO: are all of the following used? in attract it seems only fg_gfx and tx_gfx are used
+	ROM_LOAD( "s98_a04.u18", 0x00000, 0x80000, CRC(b107c5a0) SHA1(d4e7ef71bfb9a10e72b6292405d0378c95ebba25) )
 
 	ROM_REGION( 0x80000, "bg_gfx", 0 )
 	ROM_COPY( "gfx_tiles" , 0x00000, 0x00000, 0x80000)
@@ -664,7 +693,7 @@ void banprestoms_state::init_oki() // The Oki mask ROM is in an unusual format, 
 } // anonymous namespace
 
 
-GAME( 1991, tvdenwad, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Doraemon",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, tvdenwam, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Super Mario World",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, tvdenwat, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Thomas the Tank Engine and Friends",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, marioun,  0, banprestoms, marioun,  banprestoms_state, init_oki, ROT0, "Banpresto", "Super Mario World - Mario Undoukai",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tvdenwad, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Doraemon (Japan)",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, tvdenwam, 0, tvdenwam,    tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Super Mario World (Japan)",                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, tvdenwat, 0, banprestoms, tvdenwad, banprestoms_state, init_oki, ROT0, "Banpresto", "Terebi Denwa Thomas the Tank Engine and Friends (Japan)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, marioun,  0, banprestoms, marioun,  banprestoms_state, init_oki, ROT0, "Banpresto", "Super Mario World - Mario Undoukai (Japan)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

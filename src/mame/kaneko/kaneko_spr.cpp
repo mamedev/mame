@@ -72,7 +72,7 @@ void kaneko16_sprite_device::device_start()
 	m_sprites_regs = make_unique_clear<u16[]>(0x20/2);
 
 	// actually 256x256x12bit (VU002) / 512x512x16bit (KC002), double buffered
-	// blazeon and wingforc uses 2 chips for double sprite bitmap size (see Notes)
+	// blazeon and wingforc uses 2 chips for extend sprite bitmap size (see Notes)
 	for (int i = 0; i < 2; i++)
 	{
 		m_sprites_bitmap[i].allocate(512, 512);
@@ -461,7 +461,7 @@ void kaneko16_sprite_device::draw_sprites(const rectangle &cliprect, u16* sprite
 
     Offset:         Format:                     Value:
 
-    0000.w          f--- ---- ---- ----         Sprites Disable?? (see blazeon)
+    0000.w          f--- ---- ---- ----         Sprites DMA Disable?? (see blazeon)
                     -edc ba98 7654 3---
                     ---- ---- ---- -2--         Keep sprites on screen (only sprites type 0?)
                     ---- ---- ---- --1-         Flip X

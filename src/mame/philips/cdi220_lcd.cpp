@@ -4,6 +4,13 @@
 #include "emu.h"
 #include "cdi220_lcd.h"
 
+#define LOG_STATE    (1U << 1)
+
+#define VERBOSE      (0)
+#include "logmacro.h"
+
+DEFINE_DEVICE_TYPE(CDI220_LCD, cdi220_lcd, "cdi220_lcd", "CD-i 220 LCD")
+
 // 14 segment display font
 static const uint8_t cdi220_lcd_char[20*22] =
 {
@@ -86,7 +93,39 @@ static const char *const cdi220_lcd_digit_legend[16] =
 	"",         ""          // 7: extra indicators
 };
 
-void draw_lcd_text(bitmap_rgb32& bitmap, const rectangle& bounds, int x, int y, const char* text)
+cdi220_lcd::cdi220_lcd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, CDI220_LCD, tag, owner, clock)
+	, m_screen(*this, "screen")
+{
+}
+
+void cdi220_lcd::device_add_mconfig(machine_config &config)
+{
+	SCREEN(config, m_screen);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(WIDTH, HEIGHT);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update(FUNC(cdi220_lcd::screen_update));
+}
+
+void cdi220_lcd::device_start()
+{
+	save_item(NAME(lcd_state));
+}
+
+void cdi220_lcd::device_reset()
+{
+	std::fill(std::begin(lcd_state), std::end(lcd_state), 0);
+}
+
+void cdi220_lcd::state_w(offs_t offset, uint8_t data)
+{
+	LOGMASKED(LOG_STATE, "state[%d] = %02x\n", offset, data);
+	lcd_state[offset] = data;
+}
+
+void cdi220_lcd::draw_lcd_text(bitmap_rgb32& bitmap, const rectangle& bounds, int x, int y, const char* text)
 {
 	for (const char* p = text; *p != '\0'; p++)
 	{
@@ -128,7 +167,13 @@ void cdi220_lcd::draw_digit(bitmap_rgb32& bitmap, const rectangle& bounds, const
 		draw_lcd_text(bitmap, bounds, x0, y1, cdi220_lcd_digit_legend[idx * 2 + 1]);
 }
 
-void cdi220_lcd::draw(bitmap_rgb32 &bitmap, const rectangle & bounds, const uint8_t *lcd_state)
+uint32_t cdi220_lcd::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	draw(bitmap, cliprect);
+	return 0;
+}
+
+void cdi220_lcd::draw(bitmap_rgb32& bitmap, const rectangle& bounds)
 {
 	bitmap.fill(rgb_t::black(), bounds);
 

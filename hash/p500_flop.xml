@@ -29,4 +29,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="p500demo">
+		<description>Commodore P500 Sales/Demo disk</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1066496">
+				<rom name="p500demo.d82" size="1066496" crc="da69d8a3" sha1="8f2ad132a5247f48958070434c5956e73de758b4"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

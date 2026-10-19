@@ -206,6 +206,7 @@ public:
 	void wlcc(machine_config &config) ATTR_COLD;
 	void xymg(machine_config &config) ATTR_COLD;
 	void xymga(machine_config &config) ATTR_COLD;
+	void sdmg2641c(machine_config &config) ATTR_COLD;
 	void lhb2(machine_config &config) ATTR_COLD;
 	void lhb2cpgs(machine_config &config) ATTR_COLD;
 	void lhb3(machine_config &config) ATTR_COLD;
@@ -243,6 +244,8 @@ private:
 	u16 wlcc_igs003_r();
 	void xymg_igs003_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 xymg_igs003_r();
+	void sdmg2641c_igs003_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 sdmg2641c_igs003_r();
 	void lhb_irq_enable_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void lhb_okibank_w(u8 data);
 
@@ -269,6 +272,7 @@ private:
 	void lhb2_mem(address_map &map) ATTR_COLD;
 	void lhb3_mem(address_map &map) ATTR_COLD;
 	void nkishusp_mem(address_map &map) ATTR_COLD;
+	void sdmg2641c_mem(address_map &map) ATTR_COLD;
 	void tygn_mem(address_map &map) ATTR_COLD;
 	void wlcc_mem(address_map &map) ATTR_COLD;
 	void xymg_base_mem(address_map &map) ATTR_COLD;
@@ -1641,6 +1645,128 @@ void vbowl_state::vbowlhk_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
+void igs011_oki_state::sdmg2641c_igs003_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	switch (m_igs003_reg)
+	{
+		case 0x01:
+			COMBINE_DATA(&m_input_sel);
+
+			if (ACCESSING_BITS_0_7)
+			{
+				machine().bookkeeping().coin_counter_w(0, BIT(data, 5)); // coin in
+				machine().bookkeeping().coin_counter_w(1, BIT(data, 6)); // coin out
+				m_hopper->motor_w(BIT(data, 7));
+			}
+
+			if (m_input_sel & 0x40)
+				logerror("%s: warning, unknown bits written in input_sel = %02x\n", machine().describe_context(), m_input_sel);
+			break;
+
+		case 0x40:
+			m_igs003_prot_h2 = m_igs003_prot_h1;
+			m_igs003_prot_h1 = data;
+			break;
+
+		case 0x41:
+		case 0x42:
+		case 0x43:
+		case 0x44:
+		case 0x45:
+		case 0x46:
+		case 0x47:
+			break;
+
+		case 0x48:
+			m_igs003_prot_x = 0;
+			if ((m_igs003_prot_h2 & 0x0a) != 0x0a)   m_igs003_prot_x |= 0x08;
+			if ((m_igs003_prot_h2 & 0x90) != 0x90)   m_igs003_prot_x |= 0x04;
+			if ((m_igs003_prot_h1 & 0x06) != 0x06)   m_igs003_prot_x |= 0x02;
+			if ((m_igs003_prot_h1 & 0x90) != 0x90)   m_igs003_prot_x |= 0x01;
+			break;
+
+		case 0x50: // reset
+			m_igs003_prot_hold = 0;
+			break;
+
+		case 0x80:
+		case 0x81:
+		case 0x82:
+		case 0x83:
+		case 0x84:
+		case 0x85:
+		case 0x86:
+		case 0x87:
+			{
+				m_igs003_prot_y = m_igs003_reg & 0x07;
+				m_igs003_prot_z = data;
+
+				const u16 old = m_igs003_prot_hold;
+
+				// rotate (with some bits inverted)
+				m_igs003_prot_hold <<= 1;
+				m_igs003_prot_hold |= BIT(old, 15);
+				m_igs003_prot_hold ^= 0x2bad;
+				// xor bit 0
+				m_igs003_prot_hold ^= BIT(old, 9);
+				m_igs003_prot_hold ^= BIT(old, 6);
+				m_igs003_prot_hold ^= BIT(old, 1);
+				m_igs003_prot_hold ^= BIT(m_igs003_prot_z, m_igs003_prot_y);
+				// xor other 4 bits
+				m_igs003_prot_hold ^= BIT(m_igs003_prot_x, 0) <<  3;
+				m_igs003_prot_hold ^= BIT(m_igs003_prot_x, 1) <<  8;
+				m_igs003_prot_hold ^= BIT(m_igs003_prot_x, 2) << 10;
+				m_igs003_prot_hold ^= BIT(m_igs003_prot_x, 3) << 14;
+			}
+			break;
+
+		default:
+			logerror("%s: warning, writing to igs003_reg %02x = %02x\n", machine().describe_context(), m_igs003_reg, data);
+	}
+}
+
+u16 igs011_oki_state::sdmg2641c_igs003_r()
+{
+	switch (m_igs003_reg)
+	{
+		case 0x00:  return m_io_coin->read();
+
+		case 0x02:  return key_matrix_r();
+
+		case 0x03:
+			return bitswap<16>(m_igs003_prot_hold, 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff;
+
+		case 0x20:  return 0x49;
+		case 0x21:  return 0x47;
+		case 0x22:  return 0x53;
+
+		case 0x24:  return 0x41;
+		case 0x25:  return 0x41;
+		case 0x26:  return 0x7f;
+		case 0x27:  return 0x41;
+		case 0x28:  return 0x41;
+
+		case 0x2a:  return 0x3e;
+		case 0x2b:  return 0x41;
+		case 0x2c:  return 0x49;
+		case 0x2d:  return 0xf9;
+		case 0x2e:  return 0x0a;
+
+		case 0x30:  return 0x26;
+		case 0x31:  return 0x49;
+		case 0x32:  return 0x49;
+		case 0x33:  return 0x49;
+		case 0x34:  return 0x32;
+
+		default:
+			if (!machine().side_effects_disabled())
+				logerror("%s: warning, reading with igs003_reg = %02x\n", machine().describe_context(), m_igs003_reg);
+			break;
+	}
+
+	return 0;
+}
+
 
 /***************************************************************************
 
@@ -2312,6 +2438,15 @@ void igs011_oki_state::xymga_mem(address_map &map)
 	map(0x700000, 0x700001).portr("COIN");
 	map(0x700002, 0x700005).r(FUNC(igs011_oki_state::lhb_inputs_r));
 	map(0x700002, 0x700003).w(FUNC(igs011_oki_state::lhb_inputs_w));
+}
+
+void igs011_oki_state::sdmg2641c_mem(address_map &map)
+{
+	xymg_base_mem(map);
+
+	map(0x700000, 0x700001).w(FUNC(igs011_oki_state::igs003_w));
+	map(0x700002, 0x700003).rw(FUNC(igs011_oki_state::sdmg2641c_igs003_r), FUNC(igs011_oki_state::sdmg2641c_igs003_w));
+	map(0x838000, 0x838001).w(FUNC(igs011_oki_state::lhb_irq_enable_w));
 }
 
 void igs011_oki_state::wlcc_mem(address_map &map)
@@ -3777,6 +3912,13 @@ void igs011_oki_state::xymga(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_oki_state::xymga_mem);
 }
 
+void igs011_oki_state::sdmg2641c(machine_config &config)
+{
+	xymg(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_oki_state::sdmg2641c_mem);
+}
+
 
 void igs011_oki_state::lhb2(machine_config &config)
 {
@@ -4719,5 +4861,5 @@ GAME( 1996, wlcc,          xymg,     wlcc,            wlcc,      igs011_oki_stat
 GAME( 1996, vbowl,         0,        vbowl,           vbowl,     vbowl_state,      init_vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, vbowlj,        vbowl,    vbowl,           vbowlj,    vbowl_state,      init_vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, vbowlhk,       vbowl,    vbowlhk,         vbowlhk,   vbowl_state,      init_vbowlhk,      ROT0, "IGS / Tai Tin Amusement", "Virtua Bowling (Hong Kong, V101HJS)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, sdmg2641c,     sdmg2,    xymga,           xymg,      igs011_oki_state, init_sdmg2641c,    ROT0, "IGS",                     "Chaoji Da Manguan II (China, V641C)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // inputs / outputs / protection need verifying
+GAME( 1997, sdmg2641c,     sdmg2,    sdmg2641c,       xymg,      igs011_oki_state, init_sdmg2641c,    ROT0, "IGS",                     "Chaoji Da Manguan II (China, V641C)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // inputs / outputs / protection need verifying
 GAME( 1998, nkishusp,      lhb2,     nkishusp,        nkishusp,  igs011_oki_state, init_nkishusp,     ROT0, "IGS / Alta",              "Mahjong Nenrikishu SP (Japan, V250J)",             MACHINE_SUPPORTS_SAVE )

@@ -69,7 +69,7 @@ public:
 	void ct6vta2(machine_config &config) ATTR_COLD;
 
 protected:
-	void x86_softlists(machine_config &config);
+	void x86_softlists(machine_config &config) ATTR_COLD;
 
 private:
 	void main_io(address_map &map) ATTR_COLD;

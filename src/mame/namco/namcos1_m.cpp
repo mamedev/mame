@@ -504,7 +504,35 @@ void namcos1_state::subres_w(int state)
 	m_subcpu->set_input_line(INPUT_LINE_RESET, state);
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state);
 	m_mcu->set_input_line(INPUT_LINE_RESET, state);
+	if (state)
+		watchdog_cb(ASSERT_LINE);
 }
+
+void namcos1_state::watchdog_cb(int state)
+{
+	if (state)
+	{
+		m_watchdog->watchdog_reset();
+		m_watchdog_input->in_clear<0>();
+		m_watchdog_input->in_clear<1>();
+		m_watchdog_input->in_clear<2>();
+	}
+}
+
+void namcos1_state::kick_watchdog_w(u8 data)
+{
+	switch (data)
+	{
+		case 0: m_watchdog_input->in_set<0>(); break;
+		case 1: m_watchdog_input->in_set<1>(); break;
+	}
+	if (m_reset)
+		watchdog_cb(ASSERT_LINE);
+}
+
+// FIXME: the sound CPU watchdog is probably in CUS121, and definitely isn't in CUS117
+// however, until the watchdog is a device and it's possible to have two independent
+// watchdogs in a machine, it's easiest to handle it here
 
 /*******************************************************************************
 *                                                                              *

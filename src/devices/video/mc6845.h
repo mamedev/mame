@@ -36,7 +36,8 @@
 
 
 /* callback definitions */
-#define MC6845_RECONFIGURE(name)  void name(int width, int height, const rectangle &visarea, attotime frame_period)
+#define MC6845_RECONFIGURE(name)  void name(int width, int height, const rectangle &visarea, attotime frame_period, \
+										  int hsync_on, int hsync_off, int vsync_on, int vsync_off)
 
 #define MC6845_BEGIN_UPDATE(name)  void name(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
@@ -52,7 +53,8 @@ class mc6845_device :   public device_t,
 						public device_video_interface
 {
 public:
-	typedef device_delegate<void (int width, int height, const rectangle &visarea, attotime frame_period)> reconfigure_delegate;
+	typedef device_delegate<void (int width, int height, const rectangle &visarea, attotime frame_period,
+			int hsync_on, int hsync_off, int vsync_on, int vsync_off)> reconfigure_delegate;
 	typedef device_delegate<void (bitmap_rgb32 &bitmap, const rectangle &cliprect)> begin_update_delegate;
 	typedef device_delegate<void (bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t ma, uint8_t ra,
 									uint16_t y, uint8_t x_count, int8_t cursor_x, int de, int hbp, int vbp)> update_row_delegate;
@@ -61,6 +63,8 @@ public:
 
 	// construction/destruction
 	mc6845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void map(address_map &map);
 
 	// HACK: show the full screen_device htotal/vtotal if true (regulate with UI slider controls)
 	void set_show_border_area(bool show) { m_show_border_area = show; }
@@ -181,7 +185,12 @@ protected:
 	uint8_t   m_character_counter;        /* Not used yet */
 	uint8_t   m_hsync_width_counter;  /* Not used yet */
 	uint8_t   m_line_counter;
+	uint8_t   m_line_counter_mask;
+	bool      m_interlace_fields;
+	bool      m_latch_row_end;
+	bool      m_row_end;
 	uint8_t   m_raster_counter;
+	uint8_t   m_field;
 	uint8_t   m_adjust_counter;
 	uint8_t   m_vsync_width_counter;
 
@@ -227,9 +236,10 @@ protected:
 	void update_counters();
 	void set_de(int state);
 	void set_hsync(int state);
-	void set_vsync(int state);
+	virtual void set_vsync(int state);
 	void set_cur(int state);
 	bool match_line();
+	bool is_row_end() const;
 	virtual bool check_cursor_visible(uint16_t ra, uint16_t line_addr);
 	TIMER_CALLBACK_MEMBER(handle_line_timer);
 	TIMER_CALLBACK_MEMBER(de_off_tick);
@@ -242,6 +252,8 @@ protected:
 	TIMER_CALLBACK_MEMBER(transparent_update_tick);
 	virtual void update_cursor_state();
 	virtual uint8_t draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual void configure_screen(int width, int height, const rectangle &visarea, const attotime &refresh);
+	virtual void frame_start();
 
 	/************************
 	 interface CRTC - driver

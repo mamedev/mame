@@ -50,7 +50,7 @@ Note: Decapping shows the CALC3 MCU to be a NEC uPD78322 series MCU with 16K int
 To Do:
 
 [blazeon, wingforc]
-- Hardware has 2 sprite hardware for swapping sprite otuput buffer?
+- Hardware has 2 sprite hardware for extend sprite output buffer
 
 [bonkadv]
 - Needs to verify sprite/background offset and/or screen resolution?

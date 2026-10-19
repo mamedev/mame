@@ -175,4 +175,10 @@ floppy_image_format_t::desc_e* d81_format::get_desc_mfm(const format &f, int &cu
 	return desc;
 }
 
+int d81_format::get_image_offset(const format &f, int head, int track) const
+{
+	// the 1581 stores logical side 0 on physical side 1 (with side 0 in its ID fields)
+	return wd177x_format::get_image_offset(f, (f.sector_count == 10) ? (head ^ 1) : head, track);
+}
+
 const d81_format FLOPPY_D81_FORMAT;

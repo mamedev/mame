@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tyson Smith
 /*
- * wd33c9x.c
+ * wd33c9x.cpp
  *
  * This is an NSCSI device implementation
  * of the Western Digital/AMD 33C9x SCSI
@@ -601,7 +601,8 @@ uint8_t wd33c9x_base_device::indir_reg_r()
 			update_irq();
 		}
 
-		// No address increment on accesses to Command, Data, and Auxiliary Status Registers
+		// No address increment on accesses to Command, Data (handled above),
+		// and Auxiliary Status Registers
 		if (m_addr != COMMAND && m_addr != AUXILIARY_STATUS) {
 			m_addr = (m_addr + 1) & REGS_MASK;
 		}
@@ -1708,17 +1709,7 @@ void wd33c9x_base_device::clear_drq()
 
 void wd33c9x_base_device::delay(uint32_t cycles)
 {
-	// FIXME - This should take Own ID Frequency Scale into account.
-	delay_cycles(cycles);
-}
-
-
-//-------------------------------------------------
-//  delay_cycles
-//-------------------------------------------------
-
-void wd33c9x_base_device::delay_cycles(uint32_t cycles)
-{
+	// FIXME: This should take Own ID Frequency Scale into account.
 	m_timer->adjust(clocks_to_attotime(cycles));
 }
 

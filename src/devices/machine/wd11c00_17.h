@@ -50,10 +50,8 @@ public:
 	void io_w(int state);
 	void cd_w(int state);
 	void clct_w(int state);
-	void mode_w(int state);
 
 	int busy_r();
-	int ecc_not_0_r();
 
 protected:
 	// device-level overrides
@@ -84,9 +82,6 @@ private:
 	uint8_t m_mask;
 
 	offs_t m_ra;
-
-	int m_mode;
-	int m_ecc_not_0;
 
 	int m_irq5;
 	int m_drq3;

@@ -37,6 +37,7 @@
 #define VERBOSE (0)
 #include "logmacro.h"
 
+DEFINE_DEVICE_TYPE(ATI_MACH64VT, atimach64vt_device, "mach64vt", "ATI mach64 VT PCI")
 DEFINE_DEVICE_TYPE(ATI_RAGEII, atirageii_device, "rageii", "ATI Rage II PCI")
 DEFINE_DEVICE_TYPE(ATI_RAGEIIC, atirageiic_device, "rageiic", "ATI Rage IIC PCI")
 DEFINE_DEVICE_TYPE(ATI_RAGEIIDVD, atirageiidvd_device, "rageiidvd", "ATI Rage II+ DVD PCI")
@@ -44,6 +45,7 @@ DEFINE_DEVICE_TYPE(ATI_RAGEPRO, atiragepro_device, "ragepro", "ATI Rage Pro PCI"
 
 static constexpr u32 CRTC_H_TOTAL_DISP  = 0x000 >> 2;
 static constexpr u32 CRTC_V_TOTAL_DISP  = 0x008 >> 2;
+static constexpr u32 CRTC_V_SYNC_STRT_WID = 0x00c >> 2;
 static constexpr u32 CRTC_OFF_PITCH     = 0x014 >> 2;
 static constexpr u32 CRTC_INT_CNTL      = 0x018 >> 2;
 static constexpr u32 CRTC_GEN_CNTL      = 0x01c >> 2;
@@ -55,6 +57,7 @@ static constexpr u32 CUR_OFFSET         = 0x068 >> 2;
 static constexpr u32 CUR_HORZ_VERT_POSN = 0x06c >> 2;
 static constexpr u32 CUR_HORZ_VERT_OFF  = 0x070 >> 2;
 static constexpr u32 CRTC_DAC_BASE      = 0x0c0 >> 2;
+static constexpr u32 DAC_CNTL           = 0x0c4 >> 2;
 static constexpr u32 GEN_TEST_CNTL      = 0x0d0 >> 2;
 static constexpr u32 CONFIG_CHIP_ID     = 0x0e0 >> 2;
 static constexpr u32 DST_OFF_PITCH      = 0x100 >> 2;
@@ -186,6 +189,14 @@ atirage_device::atirage_device(const machine_config &mconfig, device_type type, 
 	m_gpio_pullups = 0;
 }
 
+atimach64vt_device::atimach64vt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: atirage_device(mconfig, ATI_MACH64VT, tag, owner, clock)
+	, read_dac_gio(*this, 0)
+	, write_dac_gio(*this)
+	, m_dac_gio_pullups(0)
+{
+}
+
 atirageii_device::atirageii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: atirage_device(mconfig, ATI_RAGEII, tag, owner, clock)
 {
@@ -297,6 +308,60 @@ void atirage_device::device_start()
 	save_item(NAME(m_dac_state));
 	save_item(NAME(m_dac_mask));
 	save_item(NAME(m_dac_colors));
+}
+
+void atimach64vt_device::device_start()
+{
+	// mach64 VT (264VT): the Rage's 2D and video core without the 3D engine
+	// TODO: verify revision; the VT predates PCI 2.1 subsystem IDs
+	set_ids(0x10025654, 0x00, 0x030000, 0x00000000);
+	atirage_device::device_start();
+	revision = 0x40;
+	m_regs0[CONFIG_CHIP_ID] = 0x5654 | (u32(revision) << 24);
+}
+
+// DAC_CNTL on the VT: 18:16 = DAC_TYPE (always 1: internal DAC, 24 bit palette, gamma correction),
+// 24/25/26 = state of the GIO1/GIO0/GIO4 pins, 27/28/29 = their direction (1 = output)
+u8 atimach64vt_device::dac_gio_dir() const
+{
+	const u32 dac_cntl = m_regs0[DAC_CNTL];
+	return BIT(dac_cntl, 28) | (BIT(dac_cntl, 27) << 1) | (BIT(dac_cntl, 29) << 4);
+}
+
+u32 atimach64vt_device::regs_0_read(offs_t offset, u32 mem_mask)
+{
+	switch (offset)
+	{
+		case GP_IO:
+			// the pins are sampled continuously, not only when the register is written
+			return (m_regs0[GP_IO] & 0xffff0000) | gpio_sample();
+
+		case DAC_CNTL:
+			{
+				const u8 dir = dac_gio_dir();
+				const u8 out = BIT(m_regs0[DAC_CNTL], 25) | (BIT(m_regs0[DAC_CNTL], 24) << 1) | (BIT(m_regs0[DAC_CNTL], 26) << 4);
+				const u8 pins = (out & dir) | (read_dac_gio() & ~dir);
+
+				u32 result = (m_regs0[DAC_CNTL] & 0xf8f8ffff) | (1 << 16);
+				result |= (BIT(pins, 1) << 24) | (BIT(pins, 0) << 25) | (BIT(pins, 4) << 26);
+				return result;
+			}
+	}
+
+	return atirage_device::regs_0_read(offset, mem_mask);
+}
+
+void atimach64vt_device::regs_0_write(offs_t offset, u32 data, u32 mem_mask)
+{
+	atirage_device::regs_0_write(offset, data, mem_mask);
+
+	if ((offset == DAC_CNTL) && ACCESSING_BITS_24_31)
+	{
+		// pins that aren't driven float to their pullups
+		const u8 dir = dac_gio_dir();
+		const u8 out = BIT(m_regs0[DAC_CNTL], 25) | (BIT(m_regs0[DAC_CNTL], 24) << 1) | (BIT(m_regs0[DAC_CNTL], 26) << 4);
+		write_dac_gio((out & dir) | (m_dac_gio_pullups & ~dir));
+	}
 }
 
 void atirageii_device::device_start()
@@ -538,6 +603,24 @@ void atirage_device::update_irq()
 		m_irq_active = active;
 		write_irq(active ? ASSERT_LINE : CLEAR_LINE);
 	}
+}
+
+// current state of the GP_IO pins: outputs read back what they drive, inputs come from the board
+u16 atirage_device::gpio_sample()
+{
+	const u16 ddr = BIT(m_regs0[GP_IO], 16, 16);
+	return (u16(m_regs0[GP_IO]) & ddr) | (read_gpio() & ~ddr);
+}
+
+// CRTC_V_SYNC_POL is 0 for a positive-going pulse.  The pin idles at the inactive level while
+// the CRTC is disabled, which is what lets firmware wiggle it by flipping the polarity.
+int atirage_device::vsync_r()
+{
+	const int polarity = BIT(m_regs0[CRTC_V_SYNC_STRT_WID], 21);
+	const bool crtc_on = BIT(m_regs0[CRTC_GEN_CNTL], 25);
+
+	// TODO: this is the whole of vertical blanking, not just the sync pulse
+	return polarity ^ ((crtc_on && m_screen->vblank()) ? 1 : 0);
 }
 
 u32 atirage_device::regs_0_read(offs_t offset, u32 mem_mask)

@@ -75,6 +75,8 @@ c64_bn1541_device::c64_bn1541_device(const machine_config &mconfig, const char *
 
 void c64_bn1541_device::device_start()
 {
+	save_item(NAME(m_parallel_output));
+
 	for (device_t &device : device_enumerator(machine().root_device()))
 	{
 		for (device_t &subdevice : device_enumerator(device))

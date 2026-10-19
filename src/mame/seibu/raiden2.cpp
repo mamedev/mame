@@ -250,7 +250,7 @@ u16 xsedae_state::rpc()
 
 void xsedae_state::combine32(u32 *val, offs_t offset, u16 data, u16 mem_mask)
 {
-	u16 *dest = (u16 *)val + BYTE_XOR_LE(offset);
+	auto const dest = util::little_endian_cast<u16>(val) + offset;
 	COMBINE_DATA(dest);
 }
 

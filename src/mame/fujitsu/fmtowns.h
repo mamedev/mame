@@ -157,7 +157,6 @@ protected:
 	void towns_mem(address_map &map) ATTR_COLD;
 	void ux_mem(address_map &map) ATTR_COLD;
 
-	virtual void driver_start() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
@@ -436,7 +435,7 @@ public:
 	void marty(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void driver_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 };
 
 #endif // MAME_FUJITSU_FMTOWNS_H

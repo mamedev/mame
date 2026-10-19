@@ -1865,8 +1865,8 @@ void nds_state::update_vram_mapping()
 
 	if (m_gba_mode)
 	{
-		// bank A holds the GBA's 96K of VRAM
-		map_vram_bank(VRAM_REGION_BG_A, 0, 4, 0);
+		// bank A holds the GBA's 96K of VRAM; the bitmap modes reach 16K into the OBJ tiles
+		map_vram_bank(VRAM_REGION_BG_A, 0, 5, 0);
 		map_vram_bank(VRAM_REGION_OBJ_A, 0, 2, 0x10000/4);
 		return;
 	}
@@ -1888,8 +1888,8 @@ void nds_state::update_vram_mapping()
 		const int ofs = (cnt[bank] >> 3) & 3;
 		const uint32_t base = bank_off[bank];
 
-		// F and G are 16K, and both their BG/OBJ offsets skip in a 4K/64K pattern
-		const int fg_page = (ofs & 1) + ((ofs & 2) * 4);
+		// F and G are 16K; OFS.0 steps their BG/OBJ base by 16K and OFS.1 by 64K
+		const int fg_page = (ofs & 1) + ((ofs & 2) * 2);
 
 		switch (bank)
 		{

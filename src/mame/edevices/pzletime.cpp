@@ -7,7 +7,7 @@ Elettronica Video-Games S.R.L, 199?
 
 dump and info provided by Yoshi
 
-To initialize the eeprom keep Service button pressed at boot.
+To initialize the EEPROM hold Service button at boot.
 
 TODO:
 - Text tilemap blinking could be a bit slower / faster

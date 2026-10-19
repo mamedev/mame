@@ -156,9 +156,9 @@ uint32_t midas_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	// fill with background color first
 	bitmap.fill(0x0, cliprect);
 
-	m_sprgen->draw_sprites(bitmap, cliprect.min_y);
+	m_sprgen->draw_sprites(bitmap, cliprect.top());
 
-	m_sprgen->draw_fixed_layer(bitmap, cliprect.min_y);
+	m_sprgen->draw_fixed_layer(bitmap, cliprect.top());
 
 	return 0;
 }
@@ -831,7 +831,7 @@ void midas_state::init_livequiz()
 {
 	uint16_t *rom = (uint16_t *) memregion("maincpu")->base();
 
-	// PROTECTION CHECKS
+	// HACK: patch protection check
 	rom[0x13345a/2] = 0x4e75;
 }
 

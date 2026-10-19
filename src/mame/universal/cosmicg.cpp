@@ -418,8 +418,7 @@ void cosmicg_state::init_cosmicg()
 	offs_t len = memregion("program")->bytes();
 	u8 *rom = memregion("program")->base();
 
-	/* convert dummy instruction to meaningful one */
-
+	// HACK: convert dummy instruction to meaningful one
 	rom[0x1e9b] ^= 0x20;
 	rom[0x1e9f] ^= 0x20;
 

@@ -757,7 +757,7 @@ CONS(2021, pokgoget, 0,        0, poke, bfspyhnt, generalplus_gpl951xx_game_stat
 // ガチッとゲットだぜ! モンスターボール
 CONS(2021, pokebala, 0,        0, poke, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Gachitto Get da ze! Monster Ball (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // ポケモンといっしょ！モンスターボール
-CONS(2021, pokeissh, 0,        0, poke, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Pokemon to Issho! Monster Ball (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, pokeissh, 0,        0, poke, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", u8"Pokémon to Issho! Monster Ball (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // めちゃナゲ! モンスターボール
 CONS(2021, pokemech, 0,        0, poke, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Mecha Nage! Monster Ball (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 

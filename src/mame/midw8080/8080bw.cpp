@@ -950,7 +950,7 @@ void spacecom_state::init_spacecom()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	// bad byte: should be push a at RST 10h
+	// HACK: bad byte, should be push a at RST 10h
 	ROM[0x10] = 0xf5;
 }
 

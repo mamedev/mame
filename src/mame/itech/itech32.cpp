@@ -11,7 +11,7 @@
     Games supported:
         * Time Killers
         * Bloodstorm
-        * Hard Yardage
+        * NFL Hard Yardage
         * Pairs
         * Pairs Redemption (Child's version of pairs)
         * Driver's Edge
@@ -104,7 +104,7 @@
             6 * V52C8126K  = 6 * 128k =  768k (video RAM)
             3 * NMS64X8AM  = 3 *  32k =   96k (palette RAM)
 
-        Hard Yardage:
+        NFL Hard Yardage:
             2 * MS62256    = 2 *  32k =   64k (main RAM)
             4 * V52C8128K  = 4 * 128k =  512k (video RAM)
             3 * MB84256    = 3 *  32k =   96k (palette RAM)
@@ -271,7 +271,7 @@ Notes:
 
 ****************************************************************************
 
-Hard Yardage
+NFL Hard Yardage
 Strata/Incredible Technologies, 1993
 
 PCB Layout
@@ -505,6 +505,13 @@ void drivedge_state::machine_start()
 #if LOG_DRIVEDGE_UNINIT_RAM
 	save_item(NAME(m_written));
 #endif
+
+	init_program_rom();
+	m_vram_height = 1024;
+	m_planes = 1;
+
+	m_dsp[0]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32mo_delegate(*this, FUNC(drivedge_state::tms1_speedup_r)));
+	m_dsp[1]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32mo_delegate(*this, FUNC(drivedge_state::tms2_speedup_r)));
 }
 
 void drivedge_state::machine_reset()
@@ -4925,17 +4932,6 @@ void itech32_state::init_bloodstm()
 }
 
 
-void drivedge_state::driver_start()
-{
-	init_program_rom();
-	m_vram_height = 1024;
-	m_planes = 1;
-
-	m_dsp[0]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32mo_delegate(*this, FUNC(drivedge_state::tms1_speedup_r)));
-	m_dsp[1]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32mo_delegate(*this, FUNC(drivedge_state::tms2_speedup_r)));
-}
-
-
 void itech32_state::init_wcbowl()
 {
 	/*
@@ -5071,8 +5067,10 @@ void itech32_state::init_gt3d()
 }
 
 
-void shoottv_state::driver_start()
+void shoottv_state::machine_start()
 {
+	itech32_state::machine_start();
+
 	init_program_rom();
 	m_vram_height = 1024;
 	m_planes = 2;
@@ -5200,9 +5198,9 @@ GAME( 1992, timekill121a, timekill, timekill, timekill, itech32_state,  init_tim
 GAME( 1992, timekill120,  timekill, timekill, timekill, itech32_state,  init_timekill, ROT0, "Strata / Incredible Technologies",                        "Time Killers (v1.20, alternate ROM board)", MACHINE_SUPPORTS_SAVE ) // P/N 1057 Rev 0 ROM board
 GAME( 1992, timekill100,  timekill, timekill, timekill, itech32_state,  init_timekill, ROT0, "Strata / Incredible Technologies",                        "Time Killers (v1.00)", MACHINE_SUPPORTS_SAVE ) // P/N 1049 Rev 1 ROM board
 
-GAME( 1993, hardyard,     0,        bloodstm, hardyard, itech32_state,  init_hardyard, ROT0, "Strata / Incredible Technologies",                        "Hard Yardage (v1.20)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, hardyard11,   hardyard, bloodstm, hardyard, itech32_state,  init_hardyard, ROT0, "Strata / Incredible Technologies",                        "Hard Yardage (v1.10)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, hardyard10,   hardyard, bloodstm, hardyard, itech32_state,  init_hardyard, ROT0, "Strata / Incredible Technologies",                        "Hard Yardage (v1.00)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hardyard,     0,        bloodstm, hardyard, itech32_state,  init_hardyard, ROT0, "Strata / Incredible Technologies",                        "NFL Hard Yardage (v1.20)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hardyard11,   hardyard, bloodstm, hardyard, itech32_state,  init_hardyard, ROT0, "Strata / Incredible Technologies",                        "NFL Hard Yardage (v1.10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, hardyard10,   hardyard, bloodstm, hardyard, itech32_state,  init_hardyard, ROT0, "Strata / Incredible Technologies",                        "NFL Hard Yardage (v1.00)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, bloodstm,     0,        bloodstm, bloodstm, itech32_state,  init_bloodstm, ROT0, "Strata / Incredible Technologies",                        "BloodStorm (v2.22)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, bloodstm221,  bloodstm, bloodstm, bloodstm, itech32_state,  init_bloodstm, ROT0, "Strata / Incredible Technologies",                        "BloodStorm (v2.21)", MACHINE_SUPPORTS_SAVE )

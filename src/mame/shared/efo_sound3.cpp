@@ -91,9 +91,9 @@ void efo_sound3_device::device_add_mconfig(machine_config &config)
 	cdp1802_device &soundcpu(CDP1802(config, "soundcpu", 2.95_MHz_XTAL)); // IC3 90435 "Microprocesador"
 	soundcpu.set_addrmap(AS_PROGRAM, &efo_sound3_device::efo90435_mem);
 	soundcpu.set_addrmap(AS_IO, &efo_sound3_device::efo90435_io);
-	soundcpu.ef3_cb().set(m_tms, FUNC(tms5220_device::status_r)).bit(6).invert();
-	soundcpu.ef4_cb().set(m_tms, FUNC(tms5220_device::status_r)).bit(7).invert();
-	soundcpu.q_cb().set(m_tms, FUNC(tms5220_device::rsq_w)).invert();
+	soundcpu.ef3_cb().set(m_tms, FUNC(tms5200_device::status_r)).bit(6).invert();
+	soundcpu.ef4_cb().set(m_tms, FUNC(tms5200_device::status_r)).bit(7).invert();
+	soundcpu.q_cb().set(m_tms, FUNC(tms5200_device::rsq_w)).invert();
 
 	CDP1852(config, m_inputlatch); // IC7 "Entradas"
 	m_inputlatch->mode_cb().set_constant(0);
@@ -102,10 +102,10 @@ void efo_sound3_device::device_add_mconfig(machine_config &config)
 
 	CDP1852(config, m_intflatch); // IC8 "Interface Sintetizador"
 	m_intflatch->mode_cb().set_constant(0);
-	m_intflatch->sr_cb().set(m_tms, FUNC(tms5220_device::wsq_w));
+	m_intflatch->sr_cb().set(m_tms, FUNC(tms5200_device::wsq_w));
 	m_intflatch->sr_cb().append(FUNC(efo_sound3_device::intf_cs_w));
 
-	TMS5220(config, m_tms, 640000); // IC9 90503 "Sintetizador"
+	TMS5200(config, m_tms, 640000); // IC9 90503 "Sintetizador"
 	m_tms->add_route(ALL_OUTPUTS, "mono", 1.0);
 	m_tms->irq_cb().set_inputline("soundcpu", COSMAC_INPUT_LINE_INT).invert();
 	m_tms->ready_cb().set_inputline("soundcpu", COSMAC_INPUT_LINE_EF1).invert();

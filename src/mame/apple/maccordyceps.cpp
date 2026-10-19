@@ -27,8 +27,7 @@
     to fully support PowerPC accelerators. But we can hack around that for now.
 
     Driver status:
-    Boots to Finder from the ATA hard disk.  TurboSCSI was not intended for PowerPC use and
-    a CD-ROM boot unsurprisingly hangs.
+    Boots to Finder from the ATA hard disk and from the internal SCSI CD-ROM.
 
     Machine IDs:
     pmac5200: 0x3258, 0x3259, 0x325C, 0x325D, 0x325E
@@ -184,15 +183,16 @@ void pmac6200_state::pmac6200(machine_config &config)
 	m_model_id = 0xa55a3250;
 
 	PPC603(config, m_maincpu, 75_MHz_XTAL);
-	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
-	m_maincpu->set_bus_frequency(XTAL(75_MHz_XTAL)); // FSB freq to Capella
+	// BUS_RETRY: TurboSCSI stalls the CPU until DRQ
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS | PPCDRC_BUS_RETRY);
+	m_maincpu->set_bus_frequency(75_MHz_XTAL / 2); // FSB freq to Capella
 	m_maincpu->set_addrmap(AS_PROGRAM, &pmac6200_state::pmac6200_map);
 	config.set_perfect_quantum(m_maincpu); // chimes of death without it
 
 	CAPELLA(config, m_capella, 75_MHz_XTAL);
 	m_capella->set_maincpu_tag("maincpu");
 
-	F108(config, m_f108, 75_MHz_XTAL / 2); // 68040 bus speed is 37.5 MHz, half of FSB frequency
+	F108(config, m_f108, 75_MHz_XTAL / 2); // 68040 bus speed is 37.5 MHz, same as the FSB
 	m_f108->set_maincpu_tag("maincpu");
 	m_f108->set_primetimeii_tag("primetimeii");
 	m_f108->set_rom_tag("bootrom");
@@ -201,19 +201,25 @@ void pmac6200_state::pmac6200(machine_config &config)
 	NSCSI_CONNECTOR(config, "f108:scsi:0", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "f108:scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "f108:scsi:2", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "f108:scsi:3", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "f108:scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
+		[](device_t *device)
+		{
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^^primetimeii:speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^^primetimeii:speaker", 1.0, 1);
+		});
 	NSCSI_CONNECTOR(config, "f108:scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "f108:scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "f108:scsi:6", mac_scsi_devices, nullptr);
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("PPC603");
 
 	PRIMETIMEII(config, m_primetimeii, 75_MHz_XTAL / 2); // guessed
 	m_primetimeii->set_maincpu_tag("maincpu");
 	m_primetimeii->set_scsi_tag("f108:ncr53c96");
 	m_primetimeii->set_capella_tag("capella");
 
-	VALKYRIE(config, m_video, C32M); // TODO: confirm on real hardware
+	VALKYRIE(config, m_video, C32M);
 	m_video->write_irq().set(m_primetimeii, FUNC(primetime_device::via2_irq_w<0x40>));
 
 	ADB_BUS(config, m_adbbus);

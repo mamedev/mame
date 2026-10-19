@@ -403,7 +403,6 @@ private:
 	void keyglu_816_write(u8 offset, u8 data);
 
 	u8 m_adb_p2_last, m_adb_p3_last;
-	int m_adb_reset_freeze = 0;
 	void keyglu_regen_irqs();
 
 	u8 adbmicro_p0_in();
@@ -799,7 +798,6 @@ void apple2gs_state::machine_start()
 	save_item(m_clock_control, "CLKCTRL");
 	save_item(NAME(m_adb_p2_last));
 	save_item(NAME(m_adb_p3_last));
-	save_item(NAME(m_adb_reset_freeze));
 	save_item(NAME(m_accel_unlocked));
 	save_item(NAME(m_accel_stage));
 	save_item(NAME(m_accel_fast));
@@ -816,7 +814,6 @@ void apple2gs_state::machine_start()
 void apple2gs_state::machine_reset()
 {
 	m_adb_p2_last = m_adb_p3_last = 0;
-	m_adb_reset_freeze = 0;
 	m_video->scr_w(0);
 	m_video->set_GS_border(0x02);
 	m_video->set_GS_textcol(0xf2);
@@ -894,6 +891,14 @@ void apple2gs_state::machine_reset()
 
 	// with all the banking reset, now reset the CPU
 	m_maincpu->reset();
+
+	// R105 (200K) and C39 (1uF) delay the ADB MCU's power-on reset by about
+	// 200 ms.  Let the ADB peripherals finish their own startup before the
+	// MCU polls them, and hold the main CPU until the MCU releases P2.5.
+	// Otherwise the mouse still holds ADB low during the initial keyboard
+	// status query, which ROM00 mistakes for Command+Option being held.
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_adbmicro->pulse_input_line(INPUT_LINE_RESET, attotime::from_msec(200));
 
 	// Setup ZipGS
 	m_accel_present = false;
@@ -1772,9 +1777,6 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return (m_gameio->sw3_r() ? 0 : 0x80) | uFloatingBus7;
 
 		case 0x61: // button 0 or Open Apple
-			// HACK/TODO: the 65816 loses a race to the microcontroller on reset
-			if (m_adb_reset_freeze > 0 && !machine().side_effects_disabled())
-				m_adb_reset_freeze--;
 			return (((m_gameio->has_sw0() && m_gameio->sw0_r()) || (m_adb_p3_last & 0x20)) ? 0x80 : 0) | uFloatingBus7;
 
 		case 0x62: // button 1 or Option
@@ -3425,7 +3427,6 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 {
 	if (!BIT(data, 5) && BIT(m_adb_p2_last, 5))
 	{
-		m_adb_reset_freeze = 2;
 		m_a2bus->reset_bus();
 		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		if (m_accel_present)
@@ -3484,11 +3485,7 @@ void apple2gs_state::adbmicro_p3_out(u8 data)
 	// m_adb_p3_last is intentionally frozen while the main CPU samples the
 	// modifier inputs across reset, but the M50740's ADB output must remain live.
 	m_adbbus->adb_host_line_w(BIT(data, 3) ? CLEAR_LINE : ASSERT_LINE);
-
-	if (m_adb_reset_freeze == 0)
-	{
-		m_adb_p3_last = data;
-	}
+	m_adb_p3_last = data;
 }
 
 void apple2gs_state::set_adb_line(int linestate)

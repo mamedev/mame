@@ -2305,7 +2305,7 @@ uint8_t robokid_state::motion_error_verbose_r()
 
 void robokid_state::motion_error_kludge(uint16_t offset)
 {
-	// patch out rare "5268 MOTION ERROR" (MT 05024)
+	// HACK: patch out rare "5268 MOTION ERROR" (MT 05024)
 	// It looks like it's due to a buggy random number generator,
 	// then it possibly happens on the real arcade cabinet too.
 	// I doubt it is protection related, but you can never be sure.

@@ -192,12 +192,12 @@ void st2205u_device::device_start()
 	state_add(ST_IENA, "IENA", m_iena, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	for (int i = 0; i < 6; i++)
 	{
-		state_add(ST_PAOUT + i, string_format("P%cOUT", 'A' + i).c_str(), m_pdata[i]);
-		state_add(ST_PCA + i, string_format("PC%c", 'A' + i).c_str(), m_pctrl[i]);
+		state_add(ST_PAOUT + i, string_format("P%cOUT", 'A' + i), m_pdata[i]);
+		state_add(ST_PCA + i, string_format("PC%c", 'A' + i), m_pctrl[i]);
 		if (i == 2 || i == 4)
-			state_add(ST_PSA + i, string_format("PS%c", 'A' + i).c_str(), m_psel[i]);
+			state_add(ST_PSA + i, string_format("PS%c", 'A' + i), m_psel[i]);
 		if (i == 2 || i == 3)
-			state_add(ST_PFC + i - 2, string_format("PF%c", 'A' + i).c_str(), m_pfun[i - 2]).mask(i == 2 ? 0xfe : 0xff);
+			state_add(ST_PFC + i - 2, string_format("PF%c", 'A' + i), m_pfun[i - 2]).mask(i == 2 ? 0xfe : 0xff);
 	}
 	state_add(ST_PLOUT, "PLOUT", m_pdata[6]);
 	state_add(ST_PCL, "PCL", m_pctrl[6]);
@@ -209,15 +209,15 @@ void st2205u_device::device_start()
 	state_add(ST_BTSR, "BTREQ", m_btsr);
 	state_add(ST_BTC, "BTC", m_btc);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_T0C + i, string_format("T%dC", i).c_str(), m_tc_12bit[i]);
+		state_add(ST_T0C + i, string_format("T%dC", i), m_tc_12bit[i]);
 	state_add(ST_T4C, "T4C", m_t4c);
 	state_add(ST_TIEN, "TIEN", m_tien);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_FIFOS0 + i, string_format("FIFOS%d", i).c_str(), m_fifo_filled[i]).mask(0x1f);
+		state_add(ST_FIFOS0 + i, string_format("FIFOS%d", i), m_fifo_filled[i]).mask(0x1f);
 	state_add(ST_PSGC, "PSGC", m_psgc);
 	state_add(ST_PSGM, "PSGM", m_psgm);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_VOL0 + i, string_format("VOL%d", i).c_str(), m_psg_vol[i]).mask(0xbf);
+		state_add(ST_VOL0 + i, string_format("VOL%d", i), m_psg_vol[i]).mask(0xbf);
 	state_add(ST_VOLM0, "VOLM0", m_psg_volm[0]).mask(0x3f);
 	state_add(ST_VOLM1, "VOLM1", m_psg_volm[1]).mask(0x7f);
 	state_add(ST_MUL, "MUL", m_mul);
@@ -246,12 +246,12 @@ void st2205u_device::device_start()
 	state_add(ST_USBIEN, "USBIEN", m_usbien).mask(0xbf);
 	for (int i = 0; i < 2; i++)
 	{
-		state_add(ST_DMS0 + i, string_format("DMS%d", i).c_str(), m_dptr[i * 2]).mask(0x7fff);
-		state_add(ST_DMD0 + i, string_format("DMD%d", i).c_str(), m_dptr[i * 2 + 1]).mask(0x7fff);
-		state_add(ST_DBKS0 + i, string_format("DBKS%d", i).c_str(), m_dbkr[i * 2]).mask(0x87ff);
-		state_add(ST_DBKD0 + i, string_format("DBKD%d", i).c_str(), m_dbkr[i * 2 + 1]).mask(0x87ff);
-		state_add(ST_DCNT0 + i, string_format("DCNT%d", i).c_str(), m_dcnt[i]).mask(0x7fff);
-		state_add(ST_DMOD0 + i, string_format("DMOD%d", i).c_str(), m_dmod[i]).mask(0x3f);
+		state_add(ST_DMS0 + i, string_format("DMS%d", i), m_dptr[i * 2]).mask(0x7fff);
+		state_add(ST_DMD0 + i, string_format("DMD%d", i), m_dptr[i * 2 + 1]).mask(0x7fff);
+		state_add(ST_DBKS0 + i, string_format("DBKS%d", i), m_dbkr[i * 2]).mask(0x87ff);
+		state_add(ST_DBKD0 + i, string_format("DBKD%d", i), m_dbkr[i * 2 + 1]).mask(0x87ff);
+		state_add(ST_DCNT0 + i, string_format("DCNT%d", i), m_dcnt[i]).mask(0x7fff);
+		state_add(ST_DMOD0 + i, string_format("DMOD%d", i), m_dmod[i]).mask(0x3f);
 	}
 	state_add(ST_DCTR, "DCTR", m_dctr).mask(0x03);
 	state_add(ST_RCTR, "RCTR", m_rctr).mask(0xef);
@@ -278,12 +278,12 @@ void st2302u_device::device_start()
 	state_add(ST_IENA, "IENA", m_iena, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	for (int i = 0; i < 6; i++)
 	{
-		state_add(ST_PAOUT + i, string_format("P%cOUT", 'A' + i).c_str(), m_pdata[i]);
-		state_add(ST_PCA + i, string_format("PC%c", 'A' + i).c_str(), m_pctrl[i]);
+		state_add(ST_PAOUT + i, string_format("P%cOUT", 'A' + i), m_pdata[i]);
+		state_add(ST_PCA + i, string_format("PC%c", 'A' + i), m_pctrl[i]);
 		if (i == 2 || i == 4)
-			state_add(ST_PSA + i, string_format("PS%c", 'A' + i).c_str(), m_psel[i]);
+			state_add(ST_PSA + i, string_format("PS%c", 'A' + i), m_psel[i]);
 		if (i == 2 || i == 3)
-			state_add(ST_PFC + i - 2, string_format("PF%c", 'A' + i).c_str(), m_pfun[i - 2]).mask(i == 2 ? 0xfe : 0xff);
+			state_add(ST_PFC + i - 2, string_format("PF%c", 'A' + i), m_pfun[i - 2]).mask(i == 2 ? 0xfe : 0xff);
 	}
 	state_add(ST_PMCR, "PMCR", m_pmcr);
 	state_add(ST_MISC, "MISC", m_misc).mask(st2xxx_misc_mask());
@@ -293,15 +293,15 @@ void st2302u_device::device_start()
 	state_add(ST_BTSR, "BTREQ", m_btsr);
 	state_add(ST_BTC, "BTC", m_btc);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_T0C + i, string_format("T%dC", i).c_str(), m_tc_12bit[i]);
+		state_add(ST_T0C + i, string_format("T%dC", i), m_tc_12bit[i]);
 	state_add(ST_T4C, "T4C", m_t4c);
 	state_add(ST_TIEN, "TIEN", m_tien);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_FIFOS0 + i, string_format("FIFOS%d", i).c_str(), m_fifo_filled[i]).mask(0x1f);
+		state_add(ST_FIFOS0 + i, string_format("FIFOS%d", i), m_fifo_filled[i]).mask(0x1f);
 	state_add(ST_PSGC, "PSGC", m_psgc);
 	state_add(ST_PSGM, "PSGM", m_psgm);
 	for (int i = 0; i < 4; i++)
-		state_add(ST_VOL0 + i, string_format("VOL%d", i).c_str(), m_psg_vol[i]).mask(0xbf);
+		state_add(ST_VOL0 + i, string_format("VOL%d", i), m_psg_vol[i]).mask(0xbf);
 	state_add(ST_VOLM0, "VOLM0", m_psg_volm[0]).mask(0x3f);
 	state_add(ST_VOLM1, "VOLM1", m_psg_volm[1]).mask(0x7f);
 	state_add(ST_MUL, "MUL", m_mul);
@@ -311,12 +311,12 @@ void st2302u_device::device_start()
 	state_add(ST_SMOD, "SMOD", m_smod).mask(0x0f);
 	for (int i = 0; i < 2; i++)
 	{
-		state_add(ST_DMS0 + i, string_format("DMS%d", i).c_str(), m_dptr[i * 2]).mask(0x7fff);
-		state_add(ST_DMD0 + i, string_format("DMD%d", i).c_str(), m_dptr[i * 2 + 1]).mask(0x7fff);
-		state_add(ST_DBKS0 + i, string_format("DBKS%d", i).c_str(), m_dbkr[i * 2]).mask(0x87ff);
-		state_add(ST_DBKD0 + i, string_format("DBKD%d", i).c_str(), m_dbkr[i * 2 + 1]).mask(0x87ff);
-		state_add(ST_DCNT0 + i, string_format("DCNT%d", i).c_str(), m_dcnt[i]).mask(0x7fff);
-		state_add(ST_DMOD0 + i, string_format("DMOD%d", i).c_str(), m_dmod[i]).mask(0x3f);
+		state_add(ST_DMS0 + i, string_format("DMS%d", i), m_dptr[i * 2]).mask(0x7fff);
+		state_add(ST_DMD0 + i, string_format("DMD%d", i), m_dptr[i * 2 + 1]).mask(0x7fff);
+		state_add(ST_DBKS0 + i, string_format("DBKS%d", i), m_dbkr[i * 2]).mask(0x87ff);
+		state_add(ST_DBKD0 + i, string_format("DBKD%d", i), m_dbkr[i * 2 + 1]).mask(0x87ff);
+		state_add(ST_DCNT0 + i, string_format("DCNT%d", i), m_dcnt[i]).mask(0x7fff);
+		state_add(ST_DMOD0 + i, string_format("DMOD%d", i), m_dmod[i]).mask(0x3f);
 	}
 	state_add(ST_DCTR, "DCTR", m_dctr).mask(0x03);
 	state_add(ST_RCTR, "RCTR", m_rctr).mask(0xef);

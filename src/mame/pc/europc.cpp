@@ -111,11 +111,11 @@ public:
 		m_jim_state(0)
 	{ }
 
-	void europc(machine_config &config);
-	void europc2(machine_config &config);
-	void euroxt(machine_config &config);
+	void europc(machine_config &config) ATTR_COLD;
+	void europc2(machine_config &config) ATTR_COLD;
+	void euroxt(machine_config &config) ATTR_COLD;
 
-	void init_europc();
+	void init_europc() ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -316,10 +316,9 @@ void europc_pc_state::init_europc()
 {
 	uint8_t *rom = &memregion("bios")->base()[0];
 
-	/*
-	  fix century rom bios bug !
-	  if year <79 month (and not CENTURY) is loaded with 0x20
-	*/
+	// HACK: fix century rom bios bug
+    // if year <79 month (and not CENTURY) is loaded with 0x20
+	// (should probably be handled by RTC init in some way ...)
 	if (rom[0xf93e]==0xb6){ // mov dh,
 		rom[0xf93e]=0xb5; // mov ch,
 		uint8_t a = 0;

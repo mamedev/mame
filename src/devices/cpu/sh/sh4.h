@@ -187,7 +187,9 @@ public:
 	void generate_pop(drcuml_block &block, uint32_t reg, const uml::parameter &dst);
 	void generate_fmov_single(drcuml_block &block, uint32_t reg, bool load);
 	void generate_fmov_pair(drcuml_block &block, uint32_t reg, bool load);
-	void func_FSSCA();
+	void func_FSRRA();
+	void func_FIPR();
+	void func_FTRV();
 	void func_LDTLB();
 
 protected:
@@ -223,6 +225,7 @@ protected:
 	address_space_config m_io_config;
 
 	int m_host_round;      // host rounding mode the interpreter has to leave in place
+	std::unique_ptr<int32_t []> m_fsca_table; // what the recompiler makes FSCA results from: sines in units of 2^-26
 	uml::parameter m_fs_regmap[16];
 	uml::parameter m_fd_regmap[16];
 
@@ -517,6 +520,7 @@ protected:
 	void FDIV(const uint16_t opcode);
 	void FMAC(const uint16_t opcode);
 	void FSQRT(const uint16_t opcode);
+	void fpu_raise(uint32_t cause);
 	void FSRRA(const uint16_t opcode);
 	void FSSCA(const uint16_t opcode);
 	void FIPR(const uint16_t opcode);

@@ -203,6 +203,7 @@ uint8_t hitpoker_state::hitpoker_pic_r()
 {
 	// logerror("%s PIC R\n", machine().describe_context());
 
+	// HACK: protection workarounds
 	if (m_maincpu->pc() == 0x3143 ||
 		m_maincpu->pc() == 0x314e ||
 		m_maincpu->pc() == 0x3164 ||
@@ -441,7 +442,8 @@ void hitpoker_state::init_hitpoker()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	ROM[0x1220] = 0x01; // patch EEPROM write?
+	// HACK: patch EEPROM write?
+	ROM[0x1220] = 0x01;
 	ROM[0x1221] = 0x01;
 	ROM[0x1222] = 0x01;
 

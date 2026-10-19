@@ -92,6 +92,7 @@ private:
 	const address_space_config      m_space_config;
 
 	emu_timer *m_cmd_timer;
+	emu_timer *m_syshalt_timer;
 	emu_timer *m_rtc_timer;
 	emu_timer *m_intback_timer;
 	emu_timer *m_sndres_timer;
@@ -142,6 +143,7 @@ private:
 	TIMER_CALLBACK_MEMBER(handle_rtc_increment);
 	TIMER_CALLBACK_MEMBER(sound_reset);
 	TIMER_CALLBACK_MEMBER(handle_command);
+	TIMER_CALLBACK_MEMBER(system_halt);
 	void read_saturn_ports();
 
 	void sr_set(uint8_t data);

@@ -236,6 +236,8 @@ public:
 	void chicgum(machine_config &config) ATTR_COLD;
 	void strker(machine_config &config) ATTR_COLD;
 
+	void init_unk_gamble_enc() ATTR_COLD;
+
 private:
 	required_shared_ptr<uint8_t> m_nvram;
 
@@ -245,18 +247,6 @@ private:
 	void strker_main_map(address_map &map) ATTR_COLD;
 
 	void unkpacg_main_portmap(address_map &map) ATTR_COLD;
-};
-
-class unk_gambl_enc_state : public unk_gambl_state
-{
-public:
-	unk_gambl_enc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: unk_gambl_state(mconfig, type, tag)
-	{
-	}
-
-private:
-	virtual void driver_start() override ATTR_COLD;
 };
 
 
@@ -1141,7 +1131,7 @@ ROM_END
 *          Driver Init             *
 ***********************************/
 
-void unk_gambl_enc_state::driver_start()
+void unk_gambl_state::init_unk_gamble_enc()
 {
 	// descramble ROM
 	uint8_t *rom = memregion("maincpu")->base();
@@ -1166,13 +1156,13 @@ GAME( 1992?, chicgum,  0,       chicgum,  tourpgum,  unk_gambl_state, empty_init
 GAME( 1992?, strker,   0,       strker,   strker,    unk_gambl_state, empty_init, ROT0, "<unknown>",     "Striker",        MACHINE_SUPPORTS_SAVE )
 GAME( 1992?, bowlgum,  0,       chicgum,  tourpgum,  unk_gambl_state, empty_init, ROT0, "<unknown>",     "Bowling Gum",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, unkpacg,   0,       unkpacg,  unkpacg,   unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)",   MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkpacgb,  unkpacg, unkpacg,  unkpacg,   unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1988, unkpacgc,  unkpacg, unkpacg,  unkpacg,   unk_gambl_state,     empty_init, ROT0, "<unknown>", "Coco Louco",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1988, unkpacgd,  unkpacg, unkpacg,  unkpacg,   unk_gambl_state,     empty_init, ROT0, "<unknown>", "unknown 'Pac Man with cars' gambling game", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkpacga,  unkpacg, unkpacga, unkpacg,   unk_gambl_enc_state, empty_init, ROT0, "IDI SRL",   "Pucman",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacg,   0,       unkpacg,  unkpacg,   unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)",   MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacgb,  unkpacg, unkpacg,  unkpacg,   unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1988, unkpacgc,  unkpacg, unkpacg,  unkpacg,   unk_gambl_state, empty_init,          ROT0, "<unknown>", "Coco Louco",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1988, unkpacgd,  unkpacg, unkpacg,  unkpacg,   unk_gambl_state, empty_init,          ROT0, "<unknown>", "unknown 'Pac Man with cars' gambling game", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacga,  unkpacg, unkpacga, unkpacg,   unk_gambl_state, init_unk_gamble_enc, ROT0, "IDI SRL",   "Pucman",                                    MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, unksig,    0,       unkpacg,  unkfr,     unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksiga,   unksig,  unkpacg,  unkfr,     unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksigb,   unksig,  unkpacg,  unkfr,     unk_gambl_state,     empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (unencrypted)",      MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksigc,   unksig,  unkpacg,  unkfr,     unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksig,    0,       unkpacg,  unkfr,     unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksiga,   unksig,  unkpacg,  unkfr,     unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksigb,   unksig,  unkpacg,  unkfr,     unk_gambl_state, empty_init,          ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (unencrypted)",      MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksigc,   unksig,  unkpacg,  unkfr,     unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 3)", MACHINE_SUPPORTS_SAVE )

@@ -108,10 +108,10 @@ public:
 			m_disk_bios_share(*this, "disk_bios")
 	{ }
 
-	void bonanza(machine_config &config);
-	void pcat_nit(machine_config &config);
+	void bonanza(machine_config &config) ATTR_COLD;
+	void pcat_nit(machine_config &config) ATTR_COLD;
 
-	void init_pcat_nit();
+	void init_pcat_nit() ATTR_COLD;
 
 private:
 	std::unique_ptr<uint8_t[]> m_banked_nvram;

@@ -253,6 +253,7 @@ const double XTAL::known_xtals[] = {
 	 14'250'000, // 14.250_MHz_XTAL        Hector HRX
 	 14'250'450, // 14.25045_MHz_XTAL      Apple II Europlus
 	 14'300'000, // 14.3_MHz_XTAL          Agat-7
+	 14'302'446, // 14.302446_MHz_XTAL     TK2000 (4x PAL-M subcarrier)
 	 14'314'000, // 14.314_MHz_XTAL        Taito TTL Board
 	 14'318'181, // 14.318181_MHz_XTAL     Extremely common, used on 100's of PCBs (4x NTSC subcarrier)
 	 14'349'600, // 14.3496_MHz_XTAL       Roland S-50 VDP
@@ -471,6 +472,7 @@ const double XTAL::known_xtals[] = {
 	 39'710'000, // 39.71_MHz_XTAL         Wyse WY-60 132-column display clock
 	 40'000'000, // 40_MHz_XTAL            -
 	 40'210'000, // 40.21_MHz_XTAL         Fairlight CMI IIx
+	 40'960'000, // 40.96_MHz_XTAL         Roland DEP-5 / RE-3 reverb DSP
 	 41'539'000, // 41.539_MHz_XTAL        IBM PS/2 132-column text mode
 	 42'000'000, // 42_MHz_XTAL            BMC A-00211 - Popo Bear
 	 42'105'200, // 42.1052_MHz_XTAL       NEC PC-88xx
@@ -508,6 +510,7 @@ const double XTAL::known_xtals[] = {
 	 53'203'424, // 53.203424_MHz_XTAL     Master System, Mega Drive PAL (12x PAL subcarrier)
 	 53'693'175, // 53.693175_MHz_XTAL     PSX-based h/w, Sony ZN1-2-based (15x NTSC subcarrier)
 	 54'000'000, // 54_MHz_XTAL            Taito JC
+	 54'285'700, // 54.2857_MHz_XTAL       Qume QVT-82
 	 55'000'000, // 55_MHz_XTAL            Eolith Vega
 	 56'000'000, // 56_MHz_XTAL            ARM7500 based Belatra slot machines
 	 57'272'727, // 57.272727_MHz_XTAL     Psikyo SH2 with /2 divider (16x NTSC subcarrier)

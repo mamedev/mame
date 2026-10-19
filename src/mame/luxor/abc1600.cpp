@@ -318,13 +318,13 @@ uint8_t abc1600_state::bus_r(offs_t offset)
 		case INP:
 			if (m_bus0)
 			{
-				data &= m_bus0i->read_inp();
-				data &= m_bus0x->read_inp();
+				data &= m_bus0i->read_inp(0);
+				data &= m_bus0x->read_inp(0);
 			}
 			else
 			{
-				data &= m_bus1->read_inp();
-				data &= m_bus2->read_inp();
+				data &= m_bus1->read_inp(0);
+				data &= m_bus2->read_inp(0);
 			}
 
 			LOG("%s INP %02x: %02x\n", machine().describe_context(), cs, data);
@@ -389,13 +389,13 @@ void abc1600_state::bus_w(offs_t offset, uint8_t data)
 
 		if (m_bus0)
 		{
-			m_bus0i->write_out(data);
-			m_bus0x->write_out(data);
+			m_bus0i->write_out(0, data);
+			m_bus0x->write_out(0, data);
 		}
 		else
 		{
-			m_bus1->write_out(data);
-			m_bus2->write_out(data);
+			m_bus1->write_out(0, data);
+			m_bus2->write_out(0, data);
 		}
 		break;
 

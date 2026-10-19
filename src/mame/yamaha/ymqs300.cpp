@@ -379,5 +379,5 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 1999, qs300,       0, 0, qs300, qs300, qs300_state,    empty_init, "Yamaha", "QS300",    MACHINE_NOT_WORKING )
-SYST( 1999, eosb900, qs300, 0, qs300, qs300, eos_b900_state, empty_init, "Yamaha", "EOS B900", MACHINE_NOT_WORKING )
+SYST( 1999, qs300,       0, 0, qs300, qs300, qs300_state,    empty_init, "Yamaha", "QS300 Music Production Synthesizer",    MACHINE_NOT_WORKING )
+SYST( 1999, eosb900, qs300, 0, qs300, qs300, eos_b900_state, empty_init, "Yamaha", "EOS B900 Music Production Synthesizer", MACHINE_NOT_WORKING )
