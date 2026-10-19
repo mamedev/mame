@@ -20,8 +20,6 @@
               bypass it by entering then exiting service mode;
     - sgt24h: has input analog issues, steering doesn't center when neutral,
       gas and brake pedals pulses instead of being fixed;
-    - vcop2: stage select has tilemap priority issue, tilemap B (city model) has priority bit set,
-             yet it should appear underneath tilemap A ("shoot to select") which does not;
     - srallyc: initial enemy car placement seems to be slightly incorrect for a few cars,
                seems to be affected by i960 clock speed, may need wait state emulation to fix
 

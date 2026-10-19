@@ -2425,15 +2425,24 @@ u32 model2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 	//logerror("--- frame ---\n");
 	bitmap.fill(m_palette->pen(0), cliprect);
 	m_sys24_bitmap.fill(0, cliprect);
+	screen.priority().fill(0, cliprect);
 
-	// draw tilemap B as opaque
-	for (int layer = 3; layer >= 2; layer--)
-		m_tiles->draw(screen, m_sys24_bitmap, cliprect, layer << 1, 0, TILEMAP_DRAW_OPAQUE);
+	// The tile layers are mixed among themselves first, tilemap A over
+	// tilemap B whatever their priority bits; the priority bit of the
+	// winning pixel then puts it behind or in front of the polygons
+	// (vcop2 stage select: tilemap B has the priority bit set, yet it
+	// stays under "SHOOT TO SELECT" on tilemap A).
+	// Back to front, each layer and priority sets bit 2*depth+priority in
+	// the priority bitmap; the highest bit set gives the winning pixel.
+	for (int layer = 3; layer >= 0; layer--)
+	{
+		int const depth = 3 - layer;
+		// tilemap B as opaque
+		m_tiles->draw(screen, m_sys24_bitmap, cliprect, layer << 1, depth * 2, (layer >= 2) ? TILEMAP_DRAW_OPAQUE : 0);
+		m_tiles->draw(screen, m_sys24_bitmap, cliprect, (layer << 1) | 1, depth * 2 + 1, 0);
+	}
 
-	for (int layer = 1; layer >= 0; layer--)
-		m_tiles->draw(screen, m_sys24_bitmap, cliprect, layer << 1, 0, 0);
-
-	copybitmap_trans(bitmap, m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
+	copy_sys24_tiles(screen, bitmap, cliprect, false);
 
 	/* tell the rasterizer we're starting a frame */
 	if (m_render_test_mode == true)
@@ -2441,12 +2450,29 @@ u32 model2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 	else
 		render_polygons(bitmap, cliprect);
 
-	m_sys24_bitmap.fill(0, cliprect);
-
-	for (int layer = 3; layer >= 0; layer--)
-		m_tiles->draw(screen, m_sys24_bitmap, cliprect, (layer<<1) | 1, 0, 0);
-
-	copybitmap_trans(bitmap, m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
+	copy_sys24_tiles(screen, bitmap, cliprect, true);
 
 	return 0;
+}
+
+// copy the tile pixels behind (front = false) or in front of the polygons
+void model2_state::copy_sys24_tiles(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool front)
+{
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		u32 const *const src = &m_sys24_bitmap.pix(y);
+		u8 const *const pri = &screen.priority().pix(y);
+		u32 *const dst = &bitmap.pix(y);
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			if (!pri[x] || !src[x])
+				continue;
+			// the highest bit set is the winning layer, its bit 0 the tile priority
+			int top = 7;
+			while (!BIT(pri[x], top))
+				top--;
+			if (bool(top & 1) == front)
+				dst[x] = src[x];
+		}
+	}
 }
