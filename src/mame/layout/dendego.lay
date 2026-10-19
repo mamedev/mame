@@ -548,9 +548,9 @@ license:CC0-1.0
 	</view>
 
 	<script><![CDATA[
-		local function needle(name, scale)
+		local function needle(name, scale, maximum)
 			file.elements[name]:set_draw_callback(function (state, bitmap)
-				local angle = math.rad(135 + 270 * state / scale)
+				local angle = math.rad(135 + 270 * math.min(state, maximum or state) / scale)
 				local dx, dy = math.cos(angle), math.sin(angle)
 				local w, h = bitmap.width, bitmap.height
 				local edge = 50 / math.min(w, h)
@@ -574,7 +574,7 @@ license:CC0-1.0
 				end
 			end)
 		end
-		needle('analog_speed_needle', 1200)
+		needle('analog_speed_needle', 1200, 1200)
 		needle('analog_pressure_needle', 1500)
 	]]></script>
 </mamelayout>
