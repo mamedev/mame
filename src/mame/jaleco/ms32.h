@@ -116,6 +116,13 @@ protected:
 	bitmap_ind16 m_layer_tx;
 	bitmap_ind16 m_layer_bg;
 	bitmap_ind16 m_layer_roz;
+	u32 m_brt[4];
+	int m_brt_r;
+	int m_brt_g;
+	int m_brt_b;
+	int m_brt1_r;
+	int m_brt1_g;
+	int m_brt1_b;
 
 	void flipscreen_w(int state);
 	virtual void video_start() override ATTR_COLD;
@@ -138,14 +145,6 @@ protected:
 	tilemap_t *bg_layer_tilemap() const { return (m_tilemaplayoutcontrol & 1) ? m_bg_tilemap_alt : m_bg_tilemap; }
 	virtual tilemap_t &create_tx_tilemap() ATTR_COLD;
 	TILE_GET_INFO_MEMBER(get_ms32_roz_tile_info);
-
-	u32 m_brt[4];
-	int m_brt_r;
-	int m_brt_g;
-	int m_brt_b;
-	int m_brt1_r;
-	int m_brt1_g;
-	int m_brt1_b;
 
 	void ms32_map(address_map &map) ATTR_COLD;
 	void ms32_sound_map(address_map &map) ATTR_COLD;
