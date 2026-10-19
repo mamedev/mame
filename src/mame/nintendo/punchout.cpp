@@ -215,6 +215,7 @@ protected:
 	uint32_t screen_update_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	TIMER_CALLBACK_MEMBER(dma_done);
+	void draw_big_sprite_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t &tilemap, uint32_t startx, int incxx, int incyy);
 	void draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette);
 	void drawbs2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void copy_top_palette(int bank);
@@ -480,6 +481,37 @@ void armwrest_state::dma_w(offs_t offset, uint8_t data)
 
 
 
+// Draws big sprite 1 from the given tilemap. The video board loads the vertical position (dff4/dff5)
+// into a 9-bit line counter (LS161s 4M/5M/3M) and clears the zoom accumulator (LS174s 3L/4L) while
+// /EC2 (from 7U) is low, until line 4. The accumulator then adds the zoom four times in each horizontal
+// blank, and its carry steps the counter, so the counter advances by zoom / 1024 per line. The counter
+// wraps modulo 512, which can bring the top of the sprite into view; counts past the end of the image
+// show nothing (V8, and V7 on Arm Wrestling, turn the sprite off through 1K).
+void punchout_state::draw_big_sprite_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t &tilemap, uint32_t startx, int incxx, int incyy)
+{
+	constexpr uint32_t period = 512 << 16;  // period of the 9-bit line counter, 16.16 fixed point
+
+	uint32_t const ypos = m_spr1_ctrlram[4] + 256 * (m_spr1_ctrlram[5] & 1);
+
+	// the first step comes in the horizontal blank before line 4, so bitmap line v shows the count after
+	// v - 3 steps (on every other frame the board adds up to half a step more, which isn't emulated)
+	int const offset = -3;
+
+	// source line at bitmap line 0, 16.16 fixed point
+	uint32_t const starty = ((ypos << 16) + uint32_t(offset * incyy)) & (period - 1);
+
+	// One more pass for each wrap between bitmap line 0 and the bottom of the clipping rectangle. Each
+	// pass starts a whole period earlier, so draw_roz skips lines until the count has wrapped. (draw_roz's
+	// own wraparound would repeat the image every 256 lines, 128 on Arm Wrestling, instead of every 512.)
+	int const wraps = (starty + uint32_t(cliprect.max_y) * incyy) / period;
+	for (int wrap = 0; wrap <= wraps; wrap++)
+		tilemap.draw_roz(screen, bitmap, cliprect,
+			startx, starty - wrap * period,
+			incxx, 0, 0, incyy,    // zoom, no rotation
+			0,  // no wraparound
+			0, 0);
+}
+
 void punchout_state::draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette)
 {
 	int const zoom = m_spr1_ctrlram[0] + 256 * (m_spr1_ctrlram[1] & 0x0f);
@@ -489,17 +521,11 @@ void punchout_state::draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap
 		int sx = 4096 - (m_spr1_ctrlram[2] + 256 * (m_spr1_ctrlram[3] & 0x0f));
 		if (sx > 4096 - 4 * 127) sx -= 4096;
 
-		int sy = -(m_spr1_ctrlram[4] + 256 * (m_spr1_ctrlram[5] & 1));
-		if (sy <= -256 + zoom / 0x40) sy += 512;
-		sy += 12;
-
 		int incxx = zoom << 6;
 		int const incyy = zoom << 6;
 
 		uint32_t startx = -sx * 0x4000;
-		uint32_t starty = -sy * 0x10000;
 		startx += 3740 * zoom;  // adjustment to match the screen shots
-		starty -= 178 * zoom;   // and make the hall of fame picture nice
 
 		if (m_spr1_ctrlram[6] & 1)   // flip x
 		{
@@ -509,11 +535,7 @@ void punchout_state::draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap
 
 		m_spr1_tilemap->set_palette_offset(0x100 * palette);
 
-		m_spr1_tilemap->draw_roz(screen, bitmap, cliprect,
-			startx, starty + 0x200 * (2) * zoom,
-			incxx, 0, 0, incyy,    // zoom, no rotation
-			0,  // no wraparound
-			0, 0);
+		draw_big_sprite_roz(screen, bitmap, cliprect, *m_spr1_tilemap, startx, incxx, incyy);
 	}
 }
 
@@ -527,17 +549,11 @@ void armwrest_state::draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap
 		int sx = 4096 - (m_spr1_ctrlram[2] + 256 * (m_spr1_ctrlram[3] & 0x0f));
 		if (sx > 2048) sx -= 4096;
 
-		int sy = -(m_spr1_ctrlram[4] + 256 * (m_spr1_ctrlram[5] & 1));
-		if (sy <= -256 + zoom/0x40) sy += 512;
-		sy += 12;
-
 		int incxx = zoom << 6;
 		int const incyy = zoom << 6;
 
 		uint32_t startx = -sx * 0x4000;
-		uint32_t starty = -sy * 0x10000;
 		startx += 3740 * zoom;  // adjustment to match the screen shots
-		starty -= 178 * zoom;   // and make the hall of fame picture nice
 
 		tilemap_t *spr1_tilemap;
 
@@ -552,11 +568,7 @@ void armwrest_state::draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap
 
 		spr1_tilemap->set_palette_offset(0x100 * palette);
 
-		spr1_tilemap->draw_roz(screen, bitmap, cliprect,
-			startx, starty + 0x200 * (2) * zoom,
-			incxx, 0, 0, incyy,    // zoom, no rotation
-			0,  // no wraparound
-			0,0);
+		draw_big_sprite_roz(screen, bitmap, cliprect, *spr1_tilemap, startx, incxx, incyy);
 	}
 }
 
