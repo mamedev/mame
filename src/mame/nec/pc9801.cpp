@@ -2761,8 +2761,8 @@ ROM_START( pc9801fs )
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// 0x0c000-0x0ffff sound ROM BIOS
 	// 0x10000-0x13fff ^ mirror
-	// 0x14000-0x16fff <unknown>
 	// 0x14000-0x14fff SCSI disk BIOS bank 0
+	// 0x15000-0x15fff <empty>
 	// 0x16000-0x16fff SCSI disk BIOS bank 1
 	// 0x17000-0x17fff SASI disk BIOS
 	// 0x18000-0x1ffff <empty>

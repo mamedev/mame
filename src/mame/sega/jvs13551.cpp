@@ -203,6 +203,8 @@ bool sega_837_13551_device::swoutputs(uint8_t id, uint8_t val)
  */
 
 sega_837_13844_device::sega_837_13844_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : sega_837_13551_device(mconfig, SEGA_837_13844, tag, owner, clock)
+	, m_digital_bits(12)
+	, m_encoder_bits(0)
 {
 }
 
@@ -213,14 +215,20 @@ const char *sega_837_13844_device::device_id()
 
 void sega_837_13844_device::function_list(uint8_t *&buf)
 {
-	// SW input - 2 players, 12 bits
-	*buf++ = 0x01; *buf++ = 2; *buf++ = 12; *buf++ = 0;
+	// SW input - 2 players, 12 bits / 8 bits (inunoos)
+	*buf++ = 0x01; *buf++ = 2; *buf++ = m_digital_bits; *buf++ = 0;
 
 	// Coin input - 2 slots
 	*buf++ = 0x02; *buf++ = 2; *buf++ = 0; *buf++ = 0;
 
 	// Analog input - 8 channels
 	*buf++ = 0x03; *buf++ = 8; *buf++ = 16; *buf++ = 0;
+
+	if (m_encoder_bits)
+	{
+		// rotary encoders - 4 channels (inunoos)
+		*buf++ = 0x04; *buf++ = m_encoder_bits; *buf++ = 0; *buf++ = 0;
+	}
 
 	// Driver out - 22 channels
 	*buf++ = 0x12; *buf++ = 22; *buf++ = 0; *buf++ = 0;

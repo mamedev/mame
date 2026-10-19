@@ -2150,7 +2150,7 @@ INPUT_PORTS_END
 
 // 犬のおさんぽ
 // cabinet has a treadmill with incline, two handlebars and a lead / leash to simulate dog walking
-// TODO: treadmill comes from the 4 not hooked up rotary channels?
+// TODO: treadmill comes from the 4 not hooked up rotary channels, plus mostly manual.
 static INPUT_PORTS_START( inunoos )
 	PORT_INCLUDE( naomi_mie )
 
@@ -3027,6 +3027,20 @@ void naomi_state::naomim2_smarinef(machine_config &config)
 	sega837.set_port_tags("TILT", "P1", "P2", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "OUTPUT");
 }
 
+/*
+ * Naomi M2 Inu no Osanpo
+ */
+
+ void naomi_state::naomim2_inunoos(machine_config &config)
+{
+	naomim2(config);
+
+	config.device_remove("837_13551");
+	sega_837_13844_device &sega837(SEGA_837_13844(config, "837_13844", "mie"));
+	sega837.set_port_tags("TILT", "P1", "P2", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "OUTPUT");
+	sega837.set_digital_bits(8);
+	sega837.set_encoder_bits(4);
+}
 
 /*
  * Naomi 2
@@ -11457,7 +11471,7 @@ void naomi_state::init_hotd2()
 /* 0064    */ GAME( 2001, wrungpo,   wrungp,   naomim2, wrungp,  naomi_state, init_naomi,   ROT0, "CRI / Sega", "Wave Runner GP (USA, Rev A)", GAME_FLAGS )
 /* 0064    */ GAME( 2001, wrungp,    naomi,    naomim2, wrungp,  naomi_state, init_naomi,   ROT0, "CRI / Sega", "Wave Runner GP", GAME_FLAGS )
 /* 0068    */ GAME( 2001, crakndj2,  naomi,    naomim2, crackndj,naomi_state, init_naomi,   ROT0, "Sega", "Crackin' DJ Part 2 (Japan)", GAME_FLAGS )
-/* 0073    */ GAME( 2001, inunoos,   naomi,    naomim2, inunoos, naomi_state, init_naomi,   ROT0, "Wow Entertainment / Sega", "Inu no Osanpo / Dog Walking (Japan, Export, Rev A)", GAME_FLAGS )
+/* 0073    */ GAME( 2001, inunoos,   naomi,    naomim2_inunoos, inunoos, naomi_state, init_naomi,   ROT0, "Wow Entertainment / Sega", "Inu no Osanpo / Dog Walking (Japan, Export, Rev A)", GAME_FLAGS )
 // 0075 Star Horse 2001 (main screens)
 // 0076 Star Horse 2001 (sound)
 // 0077 Star Horse 2001 (live)

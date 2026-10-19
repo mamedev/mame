@@ -84,9 +84,16 @@ public:
 	static auto parent_rom_device_type() { return &SEGA_837_13551; }
 //  virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
+	void set_digital_bits(uint8_t bits) { m_digital_bits = bits; }
+	void set_encoder_bits(uint8_t bits) { m_encoder_bits = bits; }
+
 protected:
 	virtual const char *device_id() override;
 	virtual void function_list(uint8_t *&buf) override;
+
+private:
+	uint8_t m_digital_bits;
+	uint8_t m_encoder_bits;
 };
 
 
