@@ -694,17 +694,14 @@ static const int pressure_table[0x100] =
 
 void dendego_state::speedmeter_w(uint8_t data)
 {
-	m_counters[2] = odometer_table[data] / 10;
-	m_counters[3] = odometer_table[data] % 10;
+	assert(odometer_table[0xff] == 1300);
+	m_counters[2] = odometer_table[data];
 }
 
 void dendego_state::brakemeter_w(uint8_t data)
 {
-	m_counters[4] = pressure_table[data] / 100;
-	m_counters[5] = (pressure_table[data] % 100) / 10;
-
-	// Preserve tenths of kg/cm2 for the analog pressure gauge.
-	m_pressure_tenths = pressure_table[data] / 10;
+	assert(pressure_table[0xff] == 1600);
+	m_counters[3] = pressure_table[data];
 }
 
 void dendego_state::dendego_map(address_map &map)

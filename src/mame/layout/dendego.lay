@@ -1,24 +1,6 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
-authors:hap
-
-16:9 analog dashboard; game screen remains 4:3 at full height.
-White SVG dials, black SVG needles and all original lamp outputs.
-Speed: counter2 in km/h, 0-120 scale (output range 0-130).
-Pressure: dendego_pressure_tenths in 0.1 kg/cm2, 0-15 scale
-(output range 0-160). Needles stop at the end of their scales.
-Voltage: decorative 0-2 kV dial, always pointing at 1.5 kV.
-
-SVG data is embedded so the internal layout needs no external artwork.
-MAME's layout orientation only supports 90-degree steps; each output
-state therefore selects a small SVG with an explicit rotation angle.
-Dial labels use layout text because NanoSVG does not render SVG text.
-The separate hub is shared by all three meters.
-
-Only the Japanese and English analog views are provided. The original
-Internal Layout views and their unused digital meter elements are removed.
-Throttle/brake position counters are retained in the analog views.
 -->
 <mamelayout version="2">
 
@@ -95,7 +77,7 @@ Throttle/brake position counters are retained in the analog views.
 	</element>
 
 	<element name="text_door_j">
-		<text string="車内信号">
+		<text string="戸閉">
 			<color red="0.9" green="0.1" blue="0.1" />
 		</text>
 	</element>
@@ -262,140 +244,11 @@ Throttle/brake position counters are retained in the analog views.
 			<color red="0" green="0" blue="0" />
 		</text>
 	</element>
-
-	<!-- analog_speed_needle: angle = 135 + 270 * min(state, 120) / 120. -->
 	<element name="analog_speed_needle" defstate="0">
-		<image state="0"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(135 50 50)" /></svg>]]></data></image>
-		<image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(137.25 50 50)" /></svg>]]></data></image>
-		<image state="2"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(139.5 50 50)" /></svg>]]></data></image>
-		<image state="3"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(141.75 50 50)" /></svg>]]></data></image>
-		<image state="4"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(144 50 50)" /></svg>]]></data></image>
-		<image state="5"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(146.25 50 50)" /></svg>]]></data></image>
-		<image state="6"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(148.5 50 50)" /></svg>]]></data></image>
-		<image state="7"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(150.75 50 50)" /></svg>]]></data></image>
-		<image state="8"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(153 50 50)" /></svg>]]></data></image>
-		<image state="9"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(155.25 50 50)" /></svg>]]></data></image>
-		<image state="10"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(157.5 50 50)" /></svg>]]></data></image>
-		<image state="11"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(159.75 50 50)" /></svg>]]></data></image>
-		<image state="12"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(162 50 50)" /></svg>]]></data></image>
-		<image state="13"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(164.25 50 50)" /></svg>]]></data></image>
-		<image state="14"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(166.5 50 50)" /></svg>]]></data></image>
-		<image state="15"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(168.75 50 50)" /></svg>]]></data></image>
-		<image state="16"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(171 50 50)" /></svg>]]></data></image>
-		<image state="17"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(173.25 50 50)" /></svg>]]></data></image>
-		<image state="18"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(175.5 50 50)" /></svg>]]></data></image>
-		<image state="19"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(177.75 50 50)" /></svg>]]></data></image>
-		<image state="20"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(180 50 50)" /></svg>]]></data></image>
-		<image state="21"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(182.25 50 50)" /></svg>]]></data></image>
-		<image state="22"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(184.5 50 50)" /></svg>]]></data></image>
-		<image state="23"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(186.75 50 50)" /></svg>]]></data></image>
-		<image state="24"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(189 50 50)" /></svg>]]></data></image>
-		<image state="25"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(191.25 50 50)" /></svg>]]></data></image>
-		<image state="26"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(193.5 50 50)" /></svg>]]></data></image>
-		<image state="27"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(195.75 50 50)" /></svg>]]></data></image>
-		<image state="28"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(198 50 50)" /></svg>]]></data></image>
-		<image state="29"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(200.25 50 50)" /></svg>]]></data></image>
-		<image state="30"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(202.5 50 50)" /></svg>]]></data></image>
-		<image state="31"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(204.75 50 50)" /></svg>]]></data></image>
-		<image state="32"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(207 50 50)" /></svg>]]></data></image>
-		<image state="33"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(209.25 50 50)" /></svg>]]></data></image>
-		<image state="34"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(211.5 50 50)" /></svg>]]></data></image>
-		<image state="35"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(213.75 50 50)" /></svg>]]></data></image>
-		<image state="36"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(216 50 50)" /></svg>]]></data></image>
-		<image state="37"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(218.25 50 50)" /></svg>]]></data></image>
-		<image state="38"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(220.5 50 50)" /></svg>]]></data></image>
-		<image state="39"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(222.75 50 50)" /></svg>]]></data></image>
-		<image state="40"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(225 50 50)" /></svg>]]></data></image>
-		<image state="41"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(227.25 50 50)" /></svg>]]></data></image>
-		<image state="42"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(229.5 50 50)" /></svg>]]></data></image>
-		<image state="43"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(231.75 50 50)" /></svg>]]></data></image>
-		<image state="44"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(234 50 50)" /></svg>]]></data></image>
-		<image state="45"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(236.25 50 50)" /></svg>]]></data></image>
-		<image state="46"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(238.5 50 50)" /></svg>]]></data></image>
-		<image state="47"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(240.75 50 50)" /></svg>]]></data></image>
-		<image state="48"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(243 50 50)" /></svg>]]></data></image>
-		<image state="49"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(245.25 50 50)" /></svg>]]></data></image>
-		<image state="50"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(247.5 50 50)" /></svg>]]></data></image>
-		<image state="51"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(249.75 50 50)" /></svg>]]></data></image>
-		<image state="52"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(252 50 50)" /></svg>]]></data></image>
-		<image state="53"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(254.25 50 50)" /></svg>]]></data></image>
-		<image state="54"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(256.5 50 50)" /></svg>]]></data></image>
-		<image state="55"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(258.75 50 50)" /></svg>]]></data></image>
-		<image state="56"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(261 50 50)" /></svg>]]></data></image>
-		<image state="57"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(263.25 50 50)" /></svg>]]></data></image>
-		<image state="58"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(265.5 50 50)" /></svg>]]></data></image>
-		<image state="59"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(267.75 50 50)" /></svg>]]></data></image>
-		<image state="60"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(270 50 50)" /></svg>]]></data></image>
-		<image state="61"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(272.25 50 50)" /></svg>]]></data></image>
-		<image state="62"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(274.5 50 50)" /></svg>]]></data></image>
-		<image state="63"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(276.75 50 50)" /></svg>]]></data></image>
-		<image state="64"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(279 50 50)" /></svg>]]></data></image>
-		<image state="65"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(281.25 50 50)" /></svg>]]></data></image>
-		<image state="66"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(283.5 50 50)" /></svg>]]></data></image>
-		<image state="67"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(285.75 50 50)" /></svg>]]></data></image>
-		<image state="68"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(288 50 50)" /></svg>]]></data></image>
-		<image state="69"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(290.25 50 50)" /></svg>]]></data></image>
-		<image state="70"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(292.5 50 50)" /></svg>]]></data></image>
-		<image state="71"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(294.75 50 50)" /></svg>]]></data></image>
-		<image state="72"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(297 50 50)" /></svg>]]></data></image>
-		<image state="73"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(299.25 50 50)" /></svg>]]></data></image>
-		<image state="74"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(301.5 50 50)" /></svg>]]></data></image>
-		<image state="75"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(303.75 50 50)" /></svg>]]></data></image>
-		<image state="76"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(306 50 50)" /></svg>]]></data></image>
-		<image state="77"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(308.25 50 50)" /></svg>]]></data></image>
-		<image state="78"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(310.5 50 50)" /></svg>]]></data></image>
-		<image state="79"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(312.75 50 50)" /></svg>]]></data></image>
-		<image state="80"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(315 50 50)" /></svg>]]></data></image>
-		<image state="81"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(317.25 50 50)" /></svg>]]></data></image>
-		<image state="82"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(319.5 50 50)" /></svg>]]></data></image>
-		<image state="83"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(321.75 50 50)" /></svg>]]></data></image>
-		<image state="84"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(324 50 50)" /></svg>]]></data></image>
-		<image state="85"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(326.25 50 50)" /></svg>]]></data></image>
-		<image state="86"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(328.5 50 50)" /></svg>]]></data></image>
-		<image state="87"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(330.75 50 50)" /></svg>]]></data></image>
-		<image state="88"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(333 50 50)" /></svg>]]></data></image>
-		<image state="89"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(335.25 50 50)" /></svg>]]></data></image>
-		<image state="90"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(337.5 50 50)" /></svg>]]></data></image>
-		<image state="91"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(339.75 50 50)" /></svg>]]></data></image>
-		<image state="92"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(342 50 50)" /></svg>]]></data></image>
-		<image state="93"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(344.25 50 50)" /></svg>]]></data></image>
-		<image state="94"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(346.5 50 50)" /></svg>]]></data></image>
-		<image state="95"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(348.75 50 50)" /></svg>]]></data></image>
-		<image state="96"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(351 50 50)" /></svg>]]></data></image>
-		<image state="97"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(353.25 50 50)" /></svg>]]></data></image>
-		<image state="98"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(355.5 50 50)" /></svg>]]></data></image>
-		<image state="99"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(357.75 50 50)" /></svg>]]></data></image>
-		<image state="100"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(360 50 50)" /></svg>]]></data></image>
-		<image state="101"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(362.25 50 50)" /></svg>]]></data></image>
-		<image state="102"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(364.5 50 50)" /></svg>]]></data></image>
-		<image state="103"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(366.75 50 50)" /></svg>]]></data></image>
-		<image state="104"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(369 50 50)" /></svg>]]></data></image>
-		<image state="105"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(371.25 50 50)" /></svg>]]></data></image>
-		<image state="106"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(373.5 50 50)" /></svg>]]></data></image>
-		<image state="107"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(375.75 50 50)" /></svg>]]></data></image>
-		<image state="108"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(378 50 50)" /></svg>]]></data></image>
-		<image state="109"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(380.25 50 50)" /></svg>]]></data></image>
-		<image state="110"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(382.5 50 50)" /></svg>]]></data></image>
-		<image state="111"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(384.75 50 50)" /></svg>]]></data></image>
-		<image state="112"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(387 50 50)" /></svg>]]></data></image>
-		<image state="113"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(389.25 50 50)" /></svg>]]></data></image>
-		<image state="114"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(391.5 50 50)" /></svg>]]></data></image>
-		<image state="115"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(393.75 50 50)" /></svg>]]></data></image>
-		<image state="116"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(396 50 50)" /></svg>]]></data></image>
-		<image state="117"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(398.25 50 50)" /></svg>]]></data></image>
-		<image state="118"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(400.5 50 50)" /></svg>]]></data></image>
-		<image state="119"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(402.75 50 50)" /></svg>]]></data></image>
-		<image state="120"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="121"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="122"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="123"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="124"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="125"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="126"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="127"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="128"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="129"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="130"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
+		<rect>
+			<color state="0" alpha="0" />
+			<color state="1300" alpha="0" />
+		</rect>
 	</element>
 
 	<element name="analog_voltage_face">
@@ -456,8 +309,6 @@ Throttle/brake position counters are retained in the analog views.
 			<color red="0" green="0" blue="0" />
 		</text>
 	</element>
-
-	<!-- Decorative voltmeter, fixed at 1.5 kV on a 0-2 kV scale. -->
 	<element name="analog_voltage_needle">
 		<image><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(337.5 50 50)" /></svg>]]></data></image>
 	</element>
@@ -554,173 +405,14 @@ Throttle/brake position counters are retained in the analog views.
 			<color red="0" green="0" blue="0" />
 		</text>
 	</element>
-
-	<!-- analog_pressure_needle: angle = 135 + 270 * min(state, 150) / 150. -->
 	<element name="analog_pressure_needle" defstate="0">
-		<image state="0"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(135 50 50)" /></svg>]]></data></image>
-		<image state="1"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(136.8 50 50)" /></svg>]]></data></image>
-		<image state="2"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(138.6 50 50)" /></svg>]]></data></image>
-		<image state="3"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(140.4 50 50)" /></svg>]]></data></image>
-		<image state="4"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(142.2 50 50)" /></svg>]]></data></image>
-		<image state="5"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(144 50 50)" /></svg>]]></data></image>
-		<image state="6"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(145.8 50 50)" /></svg>]]></data></image>
-		<image state="7"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(147.6 50 50)" /></svg>]]></data></image>
-		<image state="8"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(149.4 50 50)" /></svg>]]></data></image>
-		<image state="9"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(151.2 50 50)" /></svg>]]></data></image>
-		<image state="10"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(153 50 50)" /></svg>]]></data></image>
-		<image state="11"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(154.8 50 50)" /></svg>]]></data></image>
-		<image state="12"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(156.6 50 50)" /></svg>]]></data></image>
-		<image state="13"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(158.4 50 50)" /></svg>]]></data></image>
-		<image state="14"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(160.2 50 50)" /></svg>]]></data></image>
-		<image state="15"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(162 50 50)" /></svg>]]></data></image>
-		<image state="16"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(163.8 50 50)" /></svg>]]></data></image>
-		<image state="17"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(165.6 50 50)" /></svg>]]></data></image>
-		<image state="18"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(167.4 50 50)" /></svg>]]></data></image>
-		<image state="19"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(169.2 50 50)" /></svg>]]></data></image>
-		<image state="20"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(171 50 50)" /></svg>]]></data></image>
-		<image state="21"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(172.8 50 50)" /></svg>]]></data></image>
-		<image state="22"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(174.6 50 50)" /></svg>]]></data></image>
-		<image state="23"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(176.4 50 50)" /></svg>]]></data></image>
-		<image state="24"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(178.2 50 50)" /></svg>]]></data></image>
-		<image state="25"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(180 50 50)" /></svg>]]></data></image>
-		<image state="26"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(181.8 50 50)" /></svg>]]></data></image>
-		<image state="27"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(183.6 50 50)" /></svg>]]></data></image>
-		<image state="28"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(185.4 50 50)" /></svg>]]></data></image>
-		<image state="29"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(187.2 50 50)" /></svg>]]></data></image>
-		<image state="30"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(189 50 50)" /></svg>]]></data></image>
-		<image state="31"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(190.8 50 50)" /></svg>]]></data></image>
-		<image state="32"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(192.6 50 50)" /></svg>]]></data></image>
-		<image state="33"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(194.4 50 50)" /></svg>]]></data></image>
-		<image state="34"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(196.2 50 50)" /></svg>]]></data></image>
-		<image state="35"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(198 50 50)" /></svg>]]></data></image>
-		<image state="36"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(199.8 50 50)" /></svg>]]></data></image>
-		<image state="37"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(201.6 50 50)" /></svg>]]></data></image>
-		<image state="38"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(203.4 50 50)" /></svg>]]></data></image>
-		<image state="39"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(205.2 50 50)" /></svg>]]></data></image>
-		<image state="40"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(207 50 50)" /></svg>]]></data></image>
-		<image state="41"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(208.8 50 50)" /></svg>]]></data></image>
-		<image state="42"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(210.6 50 50)" /></svg>]]></data></image>
-		<image state="43"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(212.4 50 50)" /></svg>]]></data></image>
-		<image state="44"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(214.2 50 50)" /></svg>]]></data></image>
-		<image state="45"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(216 50 50)" /></svg>]]></data></image>
-		<image state="46"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(217.8 50 50)" /></svg>]]></data></image>
-		<image state="47"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(219.6 50 50)" /></svg>]]></data></image>
-		<image state="48"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(221.4 50 50)" /></svg>]]></data></image>
-		<image state="49"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(223.2 50 50)" /></svg>]]></data></image>
-		<image state="50"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(225 50 50)" /></svg>]]></data></image>
-		<image state="51"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(226.8 50 50)" /></svg>]]></data></image>
-		<image state="52"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(228.6 50 50)" /></svg>]]></data></image>
-		<image state="53"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(230.4 50 50)" /></svg>]]></data></image>
-		<image state="54"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(232.2 50 50)" /></svg>]]></data></image>
-		<image state="55"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(234 50 50)" /></svg>]]></data></image>
-		<image state="56"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(235.8 50 50)" /></svg>]]></data></image>
-		<image state="57"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(237.6 50 50)" /></svg>]]></data></image>
-		<image state="58"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(239.4 50 50)" /></svg>]]></data></image>
-		<image state="59"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(241.2 50 50)" /></svg>]]></data></image>
-		<image state="60"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(243 50 50)" /></svg>]]></data></image>
-		<image state="61"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(244.8 50 50)" /></svg>]]></data></image>
-		<image state="62"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(246.6 50 50)" /></svg>]]></data></image>
-		<image state="63"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(248.4 50 50)" /></svg>]]></data></image>
-		<image state="64"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(250.2 50 50)" /></svg>]]></data></image>
-		<image state="65"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(252 50 50)" /></svg>]]></data></image>
-		<image state="66"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(253.8 50 50)" /></svg>]]></data></image>
-		<image state="67"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(255.6 50 50)" /></svg>]]></data></image>
-		<image state="68"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(257.4 50 50)" /></svg>]]></data></image>
-		<image state="69"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(259.2 50 50)" /></svg>]]></data></image>
-		<image state="70"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(261 50 50)" /></svg>]]></data></image>
-		<image state="71"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(262.8 50 50)" /></svg>]]></data></image>
-		<image state="72"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(264.6 50 50)" /></svg>]]></data></image>
-		<image state="73"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(266.4 50 50)" /></svg>]]></data></image>
-		<image state="74"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(268.2 50 50)" /></svg>]]></data></image>
-		<image state="75"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(270 50 50)" /></svg>]]></data></image>
-		<image state="76"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(271.8 50 50)" /></svg>]]></data></image>
-		<image state="77"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(273.6 50 50)" /></svg>]]></data></image>
-		<image state="78"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(275.4 50 50)" /></svg>]]></data></image>
-		<image state="79"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(277.2 50 50)" /></svg>]]></data></image>
-		<image state="80"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(279 50 50)" /></svg>]]></data></image>
-		<image state="81"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(280.8 50 50)" /></svg>]]></data></image>
-		<image state="82"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(282.6 50 50)" /></svg>]]></data></image>
-		<image state="83"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(284.4 50 50)" /></svg>]]></data></image>
-		<image state="84"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(286.2 50 50)" /></svg>]]></data></image>
-		<image state="85"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(288 50 50)" /></svg>]]></data></image>
-		<image state="86"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(289.8 50 50)" /></svg>]]></data></image>
-		<image state="87"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(291.6 50 50)" /></svg>]]></data></image>
-		<image state="88"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(293.4 50 50)" /></svg>]]></data></image>
-		<image state="89"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(295.2 50 50)" /></svg>]]></data></image>
-		<image state="90"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(297 50 50)" /></svg>]]></data></image>
-		<image state="91"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(298.8 50 50)" /></svg>]]></data></image>
-		<image state="92"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(300.6 50 50)" /></svg>]]></data></image>
-		<image state="93"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(302.4 50 50)" /></svg>]]></data></image>
-		<image state="94"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(304.2 50 50)" /></svg>]]></data></image>
-		<image state="95"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(306 50 50)" /></svg>]]></data></image>
-		<image state="96"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(307.8 50 50)" /></svg>]]></data></image>
-		<image state="97"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(309.6 50 50)" /></svg>]]></data></image>
-		<image state="98"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(311.4 50 50)" /></svg>]]></data></image>
-		<image state="99"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(313.2 50 50)" /></svg>]]></data></image>
-		<image state="100"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(315 50 50)" /></svg>]]></data></image>
-		<image state="101"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(316.8 50 50)" /></svg>]]></data></image>
-		<image state="102"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(318.6 50 50)" /></svg>]]></data></image>
-		<image state="103"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(320.4 50 50)" /></svg>]]></data></image>
-		<image state="104"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(322.2 50 50)" /></svg>]]></data></image>
-		<image state="105"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(324 50 50)" /></svg>]]></data></image>
-		<image state="106"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(325.8 50 50)" /></svg>]]></data></image>
-		<image state="107"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(327.6 50 50)" /></svg>]]></data></image>
-		<image state="108"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(329.4 50 50)" /></svg>]]></data></image>
-		<image state="109"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(331.2 50 50)" /></svg>]]></data></image>
-		<image state="110"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(333 50 50)" /></svg>]]></data></image>
-		<image state="111"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(334.8 50 50)" /></svg>]]></data></image>
-		<image state="112"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(336.6 50 50)" /></svg>]]></data></image>
-		<image state="113"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(338.4 50 50)" /></svg>]]></data></image>
-		<image state="114"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(340.2 50 50)" /></svg>]]></data></image>
-		<image state="115"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(342 50 50)" /></svg>]]></data></image>
-		<image state="116"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(343.8 50 50)" /></svg>]]></data></image>
-		<image state="117"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(345.6 50 50)" /></svg>]]></data></image>
-		<image state="118"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(347.4 50 50)" /></svg>]]></data></image>
-		<image state="119"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(349.2 50 50)" /></svg>]]></data></image>
-		<image state="120"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(351 50 50)" /></svg>]]></data></image>
-		<image state="121"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(352.8 50 50)" /></svg>]]></data></image>
-		<image state="122"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(354.6 50 50)" /></svg>]]></data></image>
-		<image state="123"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(356.4 50 50)" /></svg>]]></data></image>
-		<image state="124"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(358.2 50 50)" /></svg>]]></data></image>
-		<image state="125"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(360 50 50)" /></svg>]]></data></image>
-		<image state="126"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(361.8 50 50)" /></svg>]]></data></image>
-		<image state="127"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(363.6 50 50)" /></svg>]]></data></image>
-		<image state="128"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(365.4 50 50)" /></svg>]]></data></image>
-		<image state="129"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(367.2 50 50)" /></svg>]]></data></image>
-		<image state="130"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(369 50 50)" /></svg>]]></data></image>
-		<image state="131"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(370.8 50 50)" /></svg>]]></data></image>
-		<image state="132"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(372.6 50 50)" /></svg>]]></data></image>
-		<image state="133"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(374.4 50 50)" /></svg>]]></data></image>
-		<image state="134"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(376.2 50 50)" /></svg>]]></data></image>
-		<image state="135"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(378 50 50)" /></svg>]]></data></image>
-		<image state="136"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(379.8 50 50)" /></svg>]]></data></image>
-		<image state="137"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(381.6 50 50)" /></svg>]]></data></image>
-		<image state="138"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(383.4 50 50)" /></svg>]]></data></image>
-		<image state="139"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(385.2 50 50)" /></svg>]]></data></image>
-		<image state="140"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(387 50 50)" /></svg>]]></data></image>
-		<image state="141"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(388.8 50 50)" /></svg>]]></data></image>
-		<image state="142"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(390.6 50 50)" /></svg>]]></data></image>
-		<image state="143"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(392.4 50 50)" /></svg>]]></data></image>
-		<image state="144"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(394.2 50 50)" /></svg>]]></data></image>
-		<image state="145"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(396 50 50)" /></svg>]]></data></image>
-		<image state="146"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(397.8 50 50)" /></svg>]]></data></image>
-		<image state="147"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(399.6 50 50)" /></svg>]]></data></image>
-		<image state="148"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(401.4 50 50)" /></svg>]]></data></image>
-		<image state="149"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(403.2 50 50)" /></svg>]]></data></image>
-		<image state="150"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="151"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="152"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="153"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="154"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="155"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="156"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="157"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="158"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="159"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
-		<image state="160"><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(405 50 50)" /></svg>]]></data></image>
+		<rect>
+			<color state="0" alpha="0" />
+			<color state="1600" alpha="0" />
+		</rect>
 	</element>
 
-	<group name="widescreen_dashboard">
+	<group name="dashboard">
 		<bounds x="0" y="0" width="533.3333333333334" height="300" />
 		<screen index="0">
 			<bounds x="0" y="0" width="400" height="300" />
@@ -788,7 +480,7 @@ Throttle/brake position counters are retained in the analog views.
 		<element ref="analog_pressure_face">
 			<bounds x="452.666667" y="140" width="78" height="78" />
 		</element>
-		<element ref="analog_pressure_needle" name="dendego_pressure_tenths" id="pressure_needle">
+		<element ref="analog_pressure_needle" name="counter3" id="pressure_needle">
 			<bounds x="452.666667" y="140" width="78" height="78" />
 		</element>
 		<element ref="analog_speed_hub">
@@ -805,9 +497,9 @@ Throttle/brake position counters are retained in the analog views.
 		</element>
 	</group>
 
-	<view name="Widescreen 16:9 Analog (Japanese)">
+	<view name="Lamps and Dials (Japanese)">
 		<bounds x="0" y="0" width="533.3333333333334" height="300" />
-		<group ref="widescreen_dashboard">
+		<group ref="dashboard">
 			<bounds x="0" y="0" width="533.3333333333334" height="300" />
 		</group>
 		<element ref="text_pwr_j">
@@ -830,9 +522,9 @@ Throttle/brake position counters are retained in the analog views.
 		</element>
 	</view>
 
-	<view name="Widescreen 16:9 Analog (English)">
+	<view name="Lamps and Dials (English)">
 		<bounds x="0" y="0" width="533.3333333333334" height="300" />
-		<group ref="widescreen_dashboard">
+		<group ref="dashboard">
 			<bounds x="0" y="0" width="533.3333333333334" height="300" />
 		</group>
 		<element ref="text_pwr">
@@ -854,4 +546,35 @@ Throttle/brake position counters are retained in the analog views.
 			<bounds x="467" y="285" width="38" height="9" />
 		</element>
 	</view>
+
+	<script><![CDATA[
+		local function needle(name, scale)
+			file.elements[name]:set_draw_callback(function (state, bitmap)
+				local angle = math.rad(135 + 270 * state / scale)
+				local dx, dy = math.cos(angle), math.sin(angle)
+				local w, h = bitmap.width, bitmap.height
+				local edge = 50 / math.min(w, h)
+				local radius = 0.6 + edge
+				local x0, y0 = 50 - 5 * dx, 50 - 5 * dy
+				local x1, y1 = 50 + 40 * dx, 50 + 40 * dy
+				local left = math.max(0, math.floor((math.min(x0, x1) - radius) * w / 100))
+				local right = math.min(w - 1, math.ceil((math.max(x0, x1) + radius) * w / 100))
+				local top = math.max(0, math.floor((math.min(y0, y1) - radius) * h / 100))
+				local bottom = math.min(h - 1, math.ceil((math.max(y0, y1) + radius) * h / 100))
+				for y = top, bottom do
+					for x = left, right do
+						local px, py = (x + 0.5) * 100 / w - 50, (y + 0.5) * 100 / h - 50
+						local along = px * dx + py * dy
+						local across = px * dy - py * dx
+						local cap = math.max(-5 - along, 0, along - 40)
+						local distance = math.sqrt(across * across + cap * cap)
+						local alpha = math.floor(255 * math.min(1, math.max(0, (radius - distance) / (2 * edge))))
+						if alpha > 0 then bitmap:plot(x, y, alpha << 24) end
+					end
+				end
+			end)
+		end
+		needle('analog_speed_needle', 1200)
+		needle('analog_pressure_needle', 1500)
+	]]></script>
 </mamelayout>
