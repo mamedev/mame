@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
-copyright-holders:
+copyright-holders: Tomás García-Merás Capote (ClawGrip)
 Gaelco FUTBOL-3 kiddie rides: external credits/time display board and PCB outputs
 -->
 <mamelayout version="2">
@@ -19,18 +19,8 @@ Gaelco FUTBOL-3 kiddie rides: external credits/time display board and PCB output
 	</element>
 
 	<element name="lamp" defstate="0">
-		<disk state="0"><color red="0.22" green="0.17" blue="0.03" /></disk>
-		<disk state="1"><color red="1.0" green="0.82" blue="0.15" /></disk>
-	</element>
-
-	<element name="motor" defstate="0">
-		<disk state="0"><color red="0.04" green="0.18" blue="0.05" /></disk>
-		<disk state="1"><color red="0.15" green="1.0" blue="0.25" /></disk>
-	</element>
-
-	<element name="aux" defstate="0">
-		<disk state="0"><color red="0.05" green="0.08" blue="0.2" /></disk>
-		<disk state="1"><color red="0.3" green="0.5" blue="1.0" /></disk>
+		<disk state="0"><color red="0.2" green="0.2" blue="0.2" /></disk>
+		<disk state="1"><color red="1.0" green="1.0" blue="1.0" /></disk>
 	</element>
 
 	<element name="text_credits"><text string="CREDITS"><color red="0.85" green="0.85" blue="0.85" /></text></element>
@@ -57,13 +47,13 @@ Gaelco FUTBOL-3 kiddie rides: external credits/time display board and PCB output
 		<element name="digit3" ref="digit"><bounds x="182" y="28" width="36" height="50" /></element>
 
 		<!-- 74HCT273 outputs -->
-		<element name="lamp0" ref="lamp"><bounds x="21" y="100" width="22" height="22" /></element>
+		<element name="lamp0" ref="lamp"><bounds x="21" y="100" width="22" height="22" /><color red="1.0" green="0.82" blue="0.15" /></element>
 		<element ref="text_lamp1"><bounds x="7" y="127" width="50" height="10" /></element>
-		<element name="lamp1" ref="lamp"><bounds x="79" y="100" width="22" height="22" /></element>
+		<element name="lamp1" ref="lamp"><bounds x="79" y="100" width="22" height="22" /><color red="1.0" green="0.82" blue="0.15" /></element>
 		<element ref="text_lamp2"><bounds x="65" y="127" width="50" height="10" /></element>
-		<element name="motor" ref="motor"><bounds x="137" y="100" width="22" height="22" /></element>
+		<element name="motor" ref="lamp"><bounds x="137" y="100" width="22" height="22" /><color red="0.15" green="1.0" blue="0.25" /></element>
 		<element ref="text_motor"><bounds x="123" y="127" width="50" height="10" /></element>
-		<element name="aux" ref="aux"><bounds x="195" y="100" width="22" height="22" /></element>
+		<element name="aux" ref="lamp"><bounds x="195" y="100" width="22" height="22" /><color red="0.3" green="0.5" blue="1.0" /></element>
 		<element ref="text_aux"><bounds x="179" y="127" width="54" height="10" /></element>
 	</view>
 

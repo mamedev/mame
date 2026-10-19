@@ -46,19 +46,18 @@
   1st and 2nd half identical and the same contents as the 27C020 versions.
 
   'IRN' kiddie ride program:
-	- Idle: with demo sounds enabled, phrase 1 plays about every 4 minutes while the lamps blink.
-	- A credit starts the ride: phrase 2, then phrase 8 (the song) loops on voice 1, the motor runs, the lamps
-	  alternate and the time display counts from 99 down to 0.
-	- At 75, 50 and 25 Q7 goes off for about 0.7 seconds, then Q4 toggles, and phrase 9 plays on voice 4, with the
-	  buttons ignored meanwhile. The driver takes Q7 as the motor, but the real rides don't stop there: Q4 and Q7
-	  are the MOT and POT pins of JP2, and which one is which, and what POT does, is not known.
-	- Button 1 plays phrase 3 on voice 2, button 2 plays phrase 4 on voice 3.
-	- End of ride: phrase 5, unless there are credits left; then phrase 7 plays and the next ride starts after
-	  pressing start or after about 30 seconds.
+    - Idle: with demo sounds enabled, phrase 1 plays about every 4 minutes while the lamps blink.
+    - A credit starts the ride: phrase 2, then phrase 8 (the song) loops on voice 1, the motor runs, the lamps
+      alternate and the time display counts from 99 down to 0.
+    - At 75, 50 and 25 Q7 goes off for about 0.7 seconds, then Q4 toggles, and phrase 9 plays on voice 4, with the
+      buttons ignored meanwhile. The driver takes Q7 as the motor, but the real rides don't stop there: Q4 and Q7
+      are the MOT and POT pins of JP2, and which one is which, and what POT does, is not known.
+    - Button 1 plays phrase 3 on voice 2, button 2 plays phrase 4 on voice 3.
+    - End of ride: phrase 5, unless there are credits left; then phrase 7 plays and the next ride starts after
+      pressing start or after about 30 seconds.
 
   Its sound ROMs share phrases 2, 3, 4, 5 and 7 byte for byte, and phrase 9, which 'donpepito', 'mueve' and
-  'obladi' leave empty. 'autopapa', 'donpepito', 'mueve' and 'obladi' were also found with 27C040 EPROMs holding
-  the same data twice. The hex number on the sound ROM labels is the 16-bit sum of the whole EPROM.
+  'obladi' leave empty. The hex number on the sound ROM labels is the 16-bit sum of the whole EPROM.
 
   Pinball: the ten targets are the knocked down players of the table, the game adds the newly closed ones to the
   knockdown display of the team playing. D5 looks like the sensor of the ball in front of a goal: the game waits
@@ -81,14 +80,14 @@
   keeps running for about 16 seconds, unless the stop input is activated.
   The Gaelco kiddie ride manual (12 VAC series, 1995) gives the same DIP switch settings, and this connector:
   JP1 = 15 pin [12VAC, GND, GND, speaker, speaker, coin, push 1, push 2, push aux, motor (to an external driver),
-				light 4 or gift motor (selected with a jumper), light 3, light 2, light 1, coin counter]
+                light 4 or gift motor (selected with a jumper), light 3, light 2, light 1, coin counter]
 
   TODO:
   - Verify the M6295 SS pin: with PIN7_HIGH the known songs of 'mueve', 'donpepito' and 'obladi' play at their
-	original tempo, with PIN7_LOW they would be 20% slower.
+    original tempo, with PIN7_LOW they would be 20% slower.
   - Verify the DIP switch order of the original PCB, and which latch output goes to each connector pin.
   - Dump the 'FUTBOL.N' PIC of the REF.920505 PCB, and find out what SW2 does. SW3 (MOT/LAMP) is probably the
-	jumper of the kiddie ride manual that turns light 4 into the gift motor output.
+    jumper of the kiddie ride manual that turns light 4 into the gift motor output.
   - Find out which of Q4 and Q7 drive the MOT and POT pins of the kiddie rides, and what POT does.
   - Find out what the crane outputs drive and what its D2 and D4 lines are.
   - Find out what the pinball outputs Q3 to Q7 drive, and which switch each of its D2, D5 and D7 lines is.
@@ -115,55 +114,48 @@
 namespace {
 
 // RC oscillator, the programs expect 4 MHz
-static constexpr u32 PIC_CLOCK = 4'000'000;
+constexpr u32 PIC_CLOCK = 4'000'000;
+
+// Common to all the boards: PIC, M6295, 74LS365 for the DIP switches and 74HCT273 output latch
 
 class gaelcof3_state : public driver_device
 {
 public:
-	gaelcof3_state(const machine_config &mconfig, device_type type, const char *tag) :
+	void gaelcof3(machine_config &config) ATTR_COLD;
+	void gaelcof3_c54(machine_config &config) ATTR_COLD;
+
+protected:
+	gaelcof3_state(const machine_config &mconfig, device_type type, const char *tag, u8 oki_cs = 0, u8 latch_clk = 2) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_inputs(*this, "IN0"),
 		m_dsw(*this, "DSW1"),
-		m_lamps(*this, "lamp%u", 0U),
-		m_motor(*this, "motor"),
-		m_aux(*this, "aux"),
-		m_digits(*this, "digit%u", 0U)
+		m_oki_cs(oki_cs),
+		m_latch_clk(latch_clk)
 	{ }
 
-	void gaelcof3(machine_config &config) ATTR_COLD;
-	void gaelcof3_c54(machine_config &config) ATTR_COLD;
-
-	void init_rc_wdt() ATTR_COLD;
-
-protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	// hooks for the different external boards
-	virtual void display_shift(int bit);        // Q1 falling edge (rising at the connector)
-	virtual void display_strobe();              // Q2 rising edge
-	virtual void update_outputs();
-	virtual u8 bus_inputs_r();                  // bus value when nothing else drives it
-
 	void common(machine_config &config) ATTR_COLD;
+
+	// hooks for the different boards
+	virtual void update_outputs() = 0;
+	virtual void display_shift(int bit) { }     // Q1 falling edge (rising at the connector)
+	virtual void display_strobe() { }           // Q2 rising edge
+	virtual u8 bus_inputs_r();                  // bus value when nothing else drives it
 
 	required_device<pic16c5x_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_ioport m_inputs;
 	required_ioport m_dsw;
 
-	u8 m_oki_cs = 0;        // port A bit driving the M6295 /CS
-	u8 m_latch_clk = 2;     // port A bit clocking the 74HCT273
 	u8 m_latch = 0x00;
-	u32 m_display_shift = 0;
 
 private:
-	output_finder<2> m_lamps;
-	output_finder<> m_motor;
-	output_finder<> m_aux;
-	output_finder<4> m_digits;
+	u8 const m_oki_cs;      // port A bit driving the M6295 /CS
+	u8 const m_latch_clk;   // port A bit clocking the 74HCT273
 
 	u8 m_porta = 0x0f;
 	u8 m_portb = 0xff;
@@ -175,7 +167,6 @@ private:
 
 	u8 bus_r(u8 porta);
 	void latch_w(u8 data);
-	void update_display();
 };
 
 
@@ -185,7 +176,6 @@ void gaelcof3_state::machine_start()
 	save_item(NAME(m_portb));
 	save_item(NAME(m_portb_driven));
 	save_item(NAME(m_latch));
-	save_item(NAME(m_display_shift));
 }
 
 void gaelcof3_state::machine_reset()
@@ -197,12 +187,6 @@ void gaelcof3_state::machine_reset()
 	// assume the 74HCT273 is cleared by the reset circuit
 	m_latch = 0x00;
 	update_outputs();
-}
-
-void gaelcof3_state::init_rc_wdt()
-{
-	// RC oscillator, watchdog enabled
-	m_maincpu->set_config(0x0fff);
 }
 
 
@@ -277,17 +261,43 @@ void gaelcof3_state::latch_w(u8 data)
 		display_shift(BIT(data, 0));
 }
 
-void gaelcof3_state::display_shift(int bit)
+
+// Kiddie rides: the external board drives the credits and time displays
+
+class kiddie_state : public gaelcof3_state
 {
-	m_display_shift = (m_display_shift << 1) | bit;
+public:
+	kiddie_state(const machine_config &mconfig, device_type type, const char *tag) :
+		gaelcof3_state(mconfig, type, tag),
+		m_lamps(*this, "lamp%u", 0U),
+		m_motor(*this, "motor"),
+		m_aux(*this, "aux"),
+		m_digits(*this, "digit%u", 0U)
+	{ }
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+	virtual void update_outputs() override;
+	virtual void display_shift(int bit) override;
+	virtual void display_strobe() override;
+
+private:
+	output_finder<2> m_lamps;
+	output_finder<> m_motor;
+	output_finder<> m_aux;
+	output_finder<4> m_digits;
+
+	u16 m_display_shift = 0;
+};
+
+void kiddie_state::machine_start()
+{
+	gaelcof3_state::machine_start();
+	save_item(NAME(m_display_shift));
 }
 
-void gaelcof3_state::display_strobe()
-{
-	update_display();
-}
-
-void gaelcof3_state::update_outputs()
+void kiddie_state::update_outputs()
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(m_latch, 3));
 	m_aux = BIT(m_latch, 4);
@@ -296,7 +306,12 @@ void gaelcof3_state::update_outputs()
 	m_motor = BIT(m_latch, 7);
 }
 
-void gaelcof3_state::update_display()
+void kiddie_state::display_shift(int bit)
+{
+	m_display_shift = (m_display_shift << 1) | bit;
+}
+
+void kiddie_state::display_strobe()
 {
 	// 16-bit frame, the first bit shifted in ends at bit 15 (1 = active):
 	// bit 15: credits display enable, bits 14-8: units digit segments (a, f, e, d, c, g, b)
@@ -304,7 +319,7 @@ void gaelcof3_state::update_display()
 	u8 const units = bitswap<7>(m_display_shift >> 8, 1, 5, 4, 3, 2, 0, 6);
 	u8 const tens = bitswap<7>(m_display_shift, 5, 6, 2, 3, 4, 1, 0);
 
-	LOGMASKED(LOG_DISPLAY, "display frame %04x\n", BIT(m_display_shift, 0, 16));
+	LOGMASKED(LOG_DISPLAY, "display frame %04x\n", m_display_shift);
 
 	if (BIT(m_display_shift, 15))
 	{
@@ -340,14 +355,13 @@ public:
 		m_outputs(*this, "out%u", 3U)
 	{ }
 
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+	virtual void update_outputs() override;
 	virtual void display_shift(int bit) override;
 	virtual void display_strobe() override;
-	virtual void update_outputs() override;
 	virtual u8 bus_inputs_r() override;
 
 private:
@@ -365,6 +379,7 @@ private:
 	output_finder<> m_led_away;
 	output_finder<5> m_outputs;
 
+	u32 m_display_shift = 0;
 	u16 m_input_shift = 0xffff;
 };
 
@@ -372,6 +387,7 @@ private:
 void futbol_state::machine_start()
 {
 	gaelcof3_state::machine_start();
+	save_item(NAME(m_display_shift));
 	save_item(NAME(m_input_shift));
 }
 
@@ -383,7 +399,7 @@ void futbol_state::machine_reset()
 
 void futbol_state::display_shift(int bit)
 {
-	gaelcof3_state::display_shift(bit);
+	m_display_shift = (m_display_shift << 1) | bit;
 
 	// the input shift register runs on the same clock, but ignores it while Q2 keeps it in parallel load
 	if (BIT(m_latch, 2))
@@ -474,8 +490,6 @@ public:
 	{ }
 
 protected:
-	virtual void display_shift(int bit) override { }
-	virtual void display_strobe() override { }
 	virtual void update_outputs() override;
 
 private:
@@ -496,33 +510,28 @@ class kiddie_i_state : public gaelcof3_state
 {
 public:
 	kiddie_i_state(const machine_config &mconfig, device_type type, const char *tag) :
-		gaelcof3_state(mconfig, type, tag),
-		m_lamp(*this, "lamp%u", 0U),
+		gaelcof3_state(mconfig, type, tag, 2, 0), // M6295 /CS on RA2, 74HCT273 clock on RA0
+		m_lamps(*this, "lamp%u", 0U),
 		m_gift_motor(*this, "gift_motor"),
-		m_motor_out(*this, "motor")
-	{
-		m_oki_cs = 2;
-		m_latch_clk = 0;
-	}
+		m_motor(*this, "motor")
+	{ }
 
 protected:
-	virtual void display_shift(int bit) override { }
-	virtual void display_strobe() override { }
 	virtual void update_outputs() override;
 
 private:
-	output_finder<4> m_lamp;
+	output_finder<4> m_lamps;
 	output_finder<> m_gift_motor;
-	output_finder<> m_motor_out;
+	output_finder<> m_motor;
 };
 
 void kiddie_i_state::update_outputs()
 {
 	for (int i = 0; i < 4; i++)
-		m_lamp[i] = BIT(m_latch, i);
+		m_lamps[i] = BIT(m_latch, i);
 	machine().bookkeeping().coin_counter_w(0, BIT(m_latch, 4));
 	m_gift_motor = BIT(m_latch, 5);
-	m_motor_out = BIT(m_latch, 6);
+	m_motor = BIT(m_latch, 6);
 }
 
 static INPUT_PORTS_START( futbol )
@@ -559,11 +568,11 @@ static INPUT_PORTS_START( futbol )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Game_Time ) ) PORT_DIPLOCATION("SW1:5,6") // tick divider, longest first
-	PORT_DIPSETTING(    0x30, "1 (longest)" )
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x10, "3" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Game_Time ) ) PORT_DIPLOCATION("SW1:5,6") // tick divider
 	PORT_DIPSETTING(    0x00, "4 (shortest)" )
+	PORT_DIPSETTING(    0x10, "3" )
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x30, "1 (longest)" )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED ) // not connected, pulled up
 INPUT_PORTS_END
 
@@ -620,14 +629,14 @@ static INPUT_PORTS_START( irn ) // 'IRN' kiddie ride program
 
 	PORT_START("DSW1") // order not verified, read only at power on
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Game_Time ) ) PORT_DIPLOCATION("SW1:1,2,3")
-	PORT_DIPSETTING(    0x00, "140 seconds" )
-	PORT_DIPSETTING(    0x01, "126 seconds" )
-	PORT_DIPSETTING(    0x02, "112 seconds" )
-	PORT_DIPSETTING(    0x03, "98 seconds" )
-	PORT_DIPSETTING(    0x04, "84 seconds" )
-	PORT_DIPSETTING(    0x05, "70 seconds" )
-	PORT_DIPSETTING(    0x06, "56 seconds" )
 	PORT_DIPSETTING(    0x07, "42 seconds" )
+	PORT_DIPSETTING(    0x06, "56 seconds" )
+	PORT_DIPSETTING(    0x05, "70 seconds" )
+	PORT_DIPSETTING(    0x04, "84 seconds" )
+	PORT_DIPSETTING(    0x03, "98 seconds" )
+	PORT_DIPSETTING(    0x02, "112 seconds" )
+	PORT_DIPSETTING(    0x01, "126 seconds" )
+	PORT_DIPSETTING(    0x00, "140 seconds" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -704,6 +713,7 @@ INPUT_PORTS_END
 
 void gaelcof3_state::common(machine_config &config)
 {
+	m_maincpu->set_config(0x0fff); // RC oscillator, watchdog enabled
 	m_maincpu->write_a().set(FUNC(gaelcof3_state::porta_w));
 	m_maincpu->read_b().set(FUNC(gaelcof3_state::portb_r));
 	m_maincpu->write_b().set(FUNC(gaelcof3_state::portb_w));
@@ -750,8 +760,8 @@ ROM_START( futbolt )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "test_pic16c54a.bin", 0x0000, 0x2000, CRC(ad819aaa) SHA1(f10500e9147c703e24a26b4d48305c16996b7c0a) )
 
-	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "test_futbol_27c010a.bin", 0x00000, 0x20000, CRC(57cf1ca4) SHA1(8d7f027bf7809194035c5b4671919d3b3dce2f1b) )
+	ROM_REGION( 0x20000, "oki", 0 )
 ROM_END
 
 
@@ -809,8 +819,8 @@ ROM_START( cochegkr )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "m4_pic16c54c.bin", 0x0000, 0x2000, NO_DUMP ) // Protected
 
-	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "coche_freno_italia_-r-_69f0_pic_m4.bin", 0x00000, 0x20000, CRC(c2f26fdd) SHA1(92eed91d5e491b3563dd48933be570fc8a96d78f) ) // sum 6f90, the label says 69f0, probably a typo
+	ROM_REGION( 0x20000, "oki", 0 )
 ROM_END
 
 ROM_START( kwairi )
@@ -825,7 +835,7 @@ ROM_START( motoxgkr )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "m4_pic16c54c.bin", 0x0000, 0x2000, NO_DUMP ) // Protected
 
-	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_REGION( 0x20000, "oki", 0 )
 	ROM_LOAD( "freno_moto_italia_cros_7bce_m4_27c010a.bin", 0x00000, 0x20000, CRC(c0988321) SHA1(557839d5f6ee5e3325c5ce943a75138406224eaa) )
 ROM_END
 
@@ -841,7 +851,7 @@ ROM_START( motvespa )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "m4_pic16c54c.bin", 0x0000, 0x2000, NO_DUMP ) // Protected
 
-	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_REGION( 0x20000, "oki", 0 )
 	ROM_LOAD( "moto_freno_italia_vespa_cd9b_pic_m4_27c010.bin", 0x00000, 0x20000, CRC(937de303) SHA1(ac47aada63eab433b33a07b50b07689558698968) )
 ROM_END
 
@@ -877,7 +887,7 @@ ROM_START( memo0102 )
 	ROM_LOAD( "m.i3_pic16c54c.bin", 0x0000, 0x2000, CRC(c1f74d05) SHA1(6c09d4854141ee7731f246db9eb916a1ebecfd2e) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "memo_0102_ef03_27c2001.bin", 0x00000, 0x40000, CRC(1a78b49c) SHA1(6e94b3f84fa7e4fd65cbcbf236f08fc01bf55cff) ) // sum 0xe703, the label says ef03
+	ROM_LOAD( "memo_0102_e703_27c2001.bin", 0x00000, 0x40000, CRC(1a78b49c) SHA1(6e94b3f84fa7e4fd65cbcbf236f08fc01bf55cff) )
 ROM_END
 
 ROM_START( memo0304 )
@@ -993,42 +1003,42 @@ ROM_END
 
 } // anonymous namespace
 
-GAMEL( 1998, futbol,       0, gaelcof3,     futbol, futbol_state, init_rc_wdt, ROT0, "Gaelco / Cresmatic", "Futbol (set 1)",    MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_fut )
-GAMEL( 1997, futbola, futbol, gaelcof3,     futbol, futbol_state, init_rc_wdt, ROT0, "Gaelco / Cresmatic", "Futbol (set 2)",    MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_fut )
-GAMEL( 1997, futbolt, futbol, gaelcof3_c54, futbol, futbol_state, init_rc_wdt, ROT0, "Gaelco / Cresmatic", "Futbol (test ROM)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_fut )
+GAMEL( 1998, futbol,       0, gaelcof3,     futbol, futbol_state, empty_init, ROT0, "Gaelco / Cresmatic", "Futbol (set 1)",    MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_fut )
+GAMEL( 1997, futbola, futbol, gaelcof3,     futbol, futbol_state, empty_init, ROT0, "Gaelco / Cresmatic", "Futbol (set 2)",    MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_fut )
+GAMEL( 1997, futbolt, futbol, gaelcof3_c54, futbol, futbol_state, empty_init, ROT0, "Gaelco / Cresmatic", "Futbol (test ROM)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_fut )
 
-GAMEL( 199?, autopapa,  0, gaelcof3,     irn, gaelcof3_state, init_rc_wdt, ROT0, "Gaelco / Cresmatic", u8"El auto de papá", MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
-GAMEL( 199?, donpepito, 0, gaelcof3,     irn, gaelcof3_state, init_rc_wdt, ROT0, "Gaelco / Cresmatic", "Don Pepito",        MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
-GAMEL( 199?, mueve,     0, gaelcof3,     irn, gaelcof3_state, init_rc_wdt, ROT0, "Gaelco / Cresmatic", "Mueve",             MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
-GAMEL( 199?, obladi,    0, gaelcof3,     irn, gaelcof3_state, init_rc_wdt, ROT0, "Gaelco / Cresmatic", "Ob-La-Di",          MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
-GAMEL( 199?, susanita,  0, gaelcof3,     irn, gaelcof3_state, init_rc_wdt, ROT0, "Gaelco / Cresmatic", "Susanita",          MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
+GAMEL( 199?, autopapa,  0, gaelcof3,     irn, kiddie_state, empty_init, ROT0, "Gaelco / Cresmatic", u8"El auto de papá", MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
+GAMEL( 199?, donpepito, 0, gaelcof3,     irn, kiddie_state, empty_init, ROT0, "Gaelco / Cresmatic", "Don Pepito",        MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
+GAMEL( 199?, mueve,     0, gaelcof3,     irn, kiddie_state, empty_init, ROT0, "Gaelco / Cresmatic", "Mueve",             MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
+GAMEL( 199?, obladi,    0, gaelcof3,     irn, kiddie_state, empty_init, ROT0, "Gaelco / Cresmatic", "Ob-La-Di",          MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
+GAMEL( 199?, susanita,  0, gaelcof3,     irn, kiddie_state, empty_init, ROT0, "Gaelco / Cresmatic", "Susanita",          MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
 
-GAMEL( 200?, cochegkr, 0, gaelcof3_c54, irn, gaelcof3_state, init_rc_wdt, ROT0, "Gaelco",           "Coche (sudden braking, Italy)",                      MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
-GAMEL( 2003, kwairi,   0, gaelcof3_c54, irn, gaelcof3_state, init_rc_wdt, ROT0, "Gaelco / Rumatic", "K Wai Regalo (Italy)",                               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
-GAMEL( 200?, motoxgkr, 0, gaelcof3_c54, irn, gaelcof3_state, init_rc_wdt, ROT0, "Gaelco",           "Moto Cross (Gaelco kiddie Ride, with brake, Italy)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
-GAMEL( 1999, motogkr,  0, gaelcof3_c54, irn, gaelcof3_state, init_rc_wdt, ROT0, "Gaelco",           "Moto (Gaelco kiddie Ride, Italy)",                   MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
-GAMEL( 200?, motvespa, 0, gaelcof3_c54, irn, gaelcof3_state, init_rc_wdt, ROT0, "Gaelco",           "Moto Vespa (with brake, Italy)",                     MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
+GAMEL( 200?, cochegkr, 0, gaelcof3_c54, irn, kiddie_state, empty_init, ROT0, "Gaelco",           "Coche (sudden braking, Italy)",                      MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
+GAMEL( 2003, kwairi,   0, gaelcof3_c54, irn, kiddie_state, empty_init, ROT0, "Gaelco / Rumatic", "K Wai Regalo (Italy)",                               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
+GAMEL( 200?, motoxgkr, 0, gaelcof3_c54, irn, kiddie_state, empty_init, ROT0, "Gaelco",           "Moto Cross (Gaelco kiddie ride, with brake, Italy)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
+GAMEL( 1999, motogkr,  0, gaelcof3_c54, irn, kiddie_state, empty_init, ROT0, "Gaelco",           "Moto (Gaelco kiddie ride, Italy)",                   MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
+GAMEL( 200?, motvespa, 0, gaelcof3_c54, irn, kiddie_state, empty_init, ROT0, "Gaelco",           "Moto Vespa (with brake, Italy)",                     MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid )
 
-GAMEL( 200?, aladigkr, 0, gaelcof3_c54, i3, kiddie_i_state, init_rc_wdt, ROT0, "Gaelco", "Aladino (Gaelco kiddie ride, Italy)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i ) // Not working because an unreachable sound that causes silent rides
+GAMEL( 200?, aladigkr, 0, gaelcof3_c54, i3, kiddie_i_state, empty_init, ROT0, "Gaelco", "Aladino (Gaelco kiddie ride, Italy)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i ) // Not working because of an unreachable sound that causes silent rides
 
-GAMEL( 2003, m2003_1, 0, gaelcof3_c54, m2003_1, kiddie_i_state, init_rc_wdt, ROT0, "Gaelco", u8"Març 2003 1 (Nella Vecchia Fattoria / Popoff)", MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
-GAMEL( 2003, m2003_a, 0, gaelcof3_c54, m2003_a, kiddie_i_state, init_rc_wdt, ROT0, "Gaelco", u8"Març 2003 A (Dagli Una Spinta)",                MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
+GAMEL( 2003, m2003_1, 0, gaelcof3_c54, m2003_1, kiddie_i_state, empty_init, ROT0, "Gaelco", u8"Març 2003 1 (Nella Vecchia Fattoria / Popoff)", MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
+GAMEL( 2003, m2003_a, 0, gaelcof3_c54, m2003_a, kiddie_i_state, empty_init, ROT0, "Gaelco", u8"Març 2003 A (Dagli Una Spinta)",                MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
 
-GAMEL( 200?, memo0102, 0, gaelcof3_c54, i3,  kiddie_i_state, init_rc_wdt, ROT0, "Gaelco", "Memo 0102 (44 Gatti / Torero Camomillo)",                      MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
-GAMEL( 200?, memo0304, 0, gaelcof3_c54, i3,  kiddie_i_state, init_rc_wdt, ROT0, "Gaelco", "Memo 0304 (Volevo Un Gatto Nero / Il Valzer Del Moscerino)",   MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
-GAMEL( 200?, memo0506, 0, gaelcof3_c54, i3,  kiddie_i_state, init_rc_wdt, ROT0, "Gaelco", u8"Memo 0506 (Il Caffè Della Peppina / Dagli Una Spinta)",      MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
-GAMEL( 200?, memo0708, 0, gaelcof3_c54, i3,  kiddie_i_state, init_rc_wdt, ROT0, "Gaelco", "Memo 0708 (Il Corsaro Nero / Popoff)",                         MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
+GAMEL( 200?, memo0102, 0, gaelcof3_c54, i3,  kiddie_i_state, empty_init, ROT0, "Gaelco", "Memo 0102 (44 Gatti / Torero Camomillo)",                      MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
+GAMEL( 200?, memo0304, 0, gaelcof3_c54, i3,  kiddie_i_state, empty_init, ROT0, "Gaelco", "Memo 0304 (Volevo Un Gatto Nero / Il Valzer Del Moscerino)",   MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
+GAMEL( 200?, memo0506, 0, gaelcof3_c54, i3,  kiddie_i_state, empty_init, ROT0, "Gaelco", u8"Memo 0506 (Il Caffè Della Peppina / Dagli Una Spinta)",      MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
+GAMEL( 200?, memo0708, 0, gaelcof3_c54, i3,  kiddie_i_state, empty_init, ROT0, "Gaelco", "Memo 0708 (Il Corsaro Nero / Popoff)",                         MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
 // "Memo 0910" missing (Il lungo, il corto e il pacioccone / ?)
-GAMEL( 200?, memo1011, 0, gaelcof3_c54, i3,  kiddie_i_state, init_rc_wdt, ROT0, "Gaelco", u8"Memo 1011 (Mi Scappa La Pipì, Papà / La Casetta In Canadà)", MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
-GAMEL( 200?, memo1213, 0, gaelcof3_c54, i3,  kiddie_i_state, init_rc_wdt, ROT0, "Gaelco", "Memo 1213 (Nella Vecchia Fattoria / Sandokan)",                MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
-GAMEL( 200?, memo1415, 0, gaelcof3_c54, i3,  kiddie_i_state, init_rc_wdt, ROT0, "Gaelco", "Memo 1415 (Attenti Al Lupo / Viva La Pappa Col Pomodoro)",     MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
-GAMEL( 200?, memo1617, 0, gaelcof3_c54, i3,  kiddie_i_state, init_rc_wdt, ROT0, "Gaelco", u8"Memo 1617 (Dolce Remì / Anna Dei Capelli Rossi)",            MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
+GAMEL( 200?, memo1011, 0, gaelcof3_c54, i3,  kiddie_i_state, empty_init, ROT0, "Gaelco", u8"Memo 1011 (Mi Scappa La Pipì, Papà / La Casetta In Canadà)", MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
+GAMEL( 200?, memo1213, 0, gaelcof3_c54, i3,  kiddie_i_state, empty_init, ROT0, "Gaelco", "Memo 1213 (Nella Vecchia Fattoria / Sandokan)",                MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
+GAMEL( 200?, memo1415, 0, gaelcof3_c54, i3,  kiddie_i_state, empty_init, ROT0, "Gaelco", "Memo 1415 (Attenti Al Lupo / Viva La Pappa Col Pomodoro)",     MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
+GAMEL( 200?, memo1617, 0, gaelcof3_c54, i3,  kiddie_i_state, empty_init, ROT0, "Gaelco", u8"Memo 1617 (Dolce Remì / Anna Dei Capelli Rossi)",            MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
 
-GAMEL( 200?, pokemgkr,  0,        gaelcof3_c54, pokemgkr, kiddie_i_state, init_rc_wdt, ROT0, "Gaelco", u8"Pokémon (Gaelco kiddie ride, with button)",        MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
-GAMEL( 200?, pokemgkra, pokemgkr, gaelcof3_c54, m2003_1,  kiddie_i_state, init_rc_wdt, ROT0, "Gaelco", u8"Pokémon (Gaelco kiddie ride, with attract sound)", MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
-GAMEL( 200?, pokemgkrb, pokemgkr, gaelcof3_c54, m2003_1,  kiddie_i_state, init_rc_wdt, ROT0, "Gaelco", u8"Pokémon (Gaelco kiddie ride, without button)",     MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
+GAMEL( 200?, pokemgkr,  0,        gaelcof3_c54, pokemgkr, kiddie_i_state, empty_init, ROT0, "Gaelco", u8"Pokémon (Gaelco kiddie ride, with button)",        MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
+GAMEL( 200?, pokemgkra, pokemgkr, gaelcof3_c54, m2003_1,  kiddie_i_state, empty_init, ROT0, "Gaelco", u8"Pokémon (Gaelco kiddie ride, with attract sound)", MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
+GAMEL( 200?, pokemgkrb, pokemgkr, gaelcof3_c54, m2003_1,  kiddie_i_state, empty_init, ROT0, "Gaelco", u8"Pokémon (Gaelco kiddie ride, without button)",     MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_futbol3_kid_i )
 
-GAME( 199?, gruacarr,  0,        gaelcof3_c54, gruacarr,  grua_state, init_rc_wdt, ROT0, "Gaelco", u8"Grúa Carrus (set 1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, gruacarra, gruacarr, gaelcof3_c54, gruacarra, grua_state, init_rc_wdt, ROT0, "Gaelco", u8"Grúa Carrus (set 2)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, gruacarr,  0,        gaelcof3_c54, gruacarr,  grua_state, empty_init, ROT0, "Gaelco", u8"Grúa Carrus (set 1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, gruacarra, gruacarr, gaelcof3_c54, gruacarra, grua_state, empty_init, ROT0, "Gaelco", u8"Grúa Carrus (set 2)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, futbolin, 0, gaelcof3, futbol, futbol_state, init_rc_wdt, ROT0, "Gaelco / Rumatic", u8"Futbolín Electrónico", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, futbolin, 0, gaelcof3, futbol, futbol_state, empty_init, ROT0, "Gaelco / Rumatic", u8"Futbolín Electrónico", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
