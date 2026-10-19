@@ -1016,6 +1016,9 @@ void mcs51_cpu_device::check_irqs()
 		standard_irq_callback(1, m_pc);
 	}
 
+	// the next opcode is fetched in the polling cycle and then discarded
+	m_program.read_byte(m_pc);
+
 	// Save current pc to stack, set pc to new interrupt vector
 	push_pc();
 	m_pc = int_vec;
