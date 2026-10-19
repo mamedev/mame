@@ -1248,7 +1248,10 @@ void snes_ppu_device::update_color_windowmasks( uint8_t mask, uint8_t *output )
  * the optimized averaging algorithm.
  *********************************************/
 
-void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
+// TODO: use a back buffer bitmap and compose honoring MAME screen_device timings
+// - this pretends to expose a single scanline and copy from clients
+// - dstline is an optional parameter dictated by snesb51.cpp overlay requirements, it's normally 0
+void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline, uint16_t dstline )
 {
 	bool blurring = m_options.read_safe(0) & 0x01;
 
@@ -1258,7 +1261,7 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 
 	if (m_screen_disabled) /* screen is forced blank */
 		for (int x = 0; x < SNES_SCR_WIDTH * 2; x++)
-			bitmap.pix(0, x) = rgb_t::black();
+			bitmap.pix(dstline, x) = rgb_t::black();
 	else
 	{
 		uint8_t window_above[256];
@@ -1324,29 +1327,29 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 			{
 				const uint16_t c = luma[pixel(x, above, below, window_above, window_below)];
 
-				bitmap.pix(0, x * 2 + 0) = indirect_color(c & 0x7fff);
-				bitmap.pix(0, x * 2 + 1) = indirect_color(c & 0x7fff);
+				bitmap.pix(dstline, x * 2 + 0) = indirect_color(c & 0x7fff);
+				bitmap.pix(dstline, x * 2 + 1) = indirect_color(c & 0x7fff);
 			}
 			else if (!blurring)
 			{
 				const uint16_t c0 = luma[pixel(x, below, above, window_above, window_below)];
 				const uint16_t c1 = luma[pixel(x, above, below, window_above, window_below)];
 
-				bitmap.pix(0, x * 2 + 0) = indirect_color(c0 & 0x7fff);
-				bitmap.pix(0, x * 2 + 1) = indirect_color(c1 & 0x7fff);
+				bitmap.pix(dstline, x * 2 + 0) = indirect_color(c0 & 0x7fff);
+				bitmap.pix(dstline, x * 2 + 1) = indirect_color(c1 & 0x7fff);
 			}
 			else
 			{
 				uint16_t curr = luma[pixel(x, below, above, window_above, window_below)];
 
 				uint16_t c0 = (prev + curr - ((prev ^ curr) & 0x0421)) >> 1;
-				bitmap.pix(0, x * 2 + 0) = indirect_color(c0 & 0x7fff);
+				bitmap.pix(dstline, x * 2 + 0) = indirect_color(c0 & 0x7fff);
 
 				prev = curr;
 				curr = luma[pixel(x, above, below, window_above, window_below)];
 
 				uint16_t c1 = (prev + curr - ((prev ^ curr) & 0x0421)) >> 1;
-				bitmap.pix(0, x * 2 + 1) = indirect_color(c1 & 0x7fff);
+				bitmap.pix(dstline, x * 2 + 1) = indirect_color(c1 & 0x7fff);
 
 				prev = curr;
 			}

@@ -424,21 +424,30 @@ void snesb51_state::hblank_w(int state)
 
 uint32_t snesb51_state::overlay_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+//	bitmap.fill(0, cliprect);
+
 	if (m_overlay_start)
 	{
 		m_overlay_y = (m_vram_address & 0xff) + 1;
 		m_overlay_start = false;
 	}
 
-	bitmap.fill(rgb_t::black(), cliprect);
-
-	if (!BIT(m_p1, 7))
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-		{
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-				bitmap.pix(y, x) = BIT(m_vram[((x >> 3) << 8) | m_overlay_y], 7 - (x & 7)) ? rgb_t::white() : rgb_t::black();
+		m_ppu->refresh_scanline(bitmap, y, y);
 
+		if (!BIT(m_p1, 7))
+		{
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x+=2)
+			{
+				u8 dot = BIT(m_vram[((x >> 4) << 8) | m_overlay_y], 7 - ((x >> 1) & 7));
+				if (dot)
+				{
+					// TODO: colorization looks programmable somehow
+					bitmap.pix(y, x + 0) = rgb_t::white();
+					bitmap.pix(y, x + 1) = rgb_t::white();
+				}
+			}
 			m_overlay_y++;
 		}
 	}
@@ -750,15 +759,10 @@ void snesb51_state::base(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen);
 	m_screen->set_raw(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
-	m_screen->set_video_attributes(VIDEO_VARIABLE_WIDTH);
-	m_screen->set_screen_update(FUNC(snes_state::screen_update));
+	// TODO: can't use VIDEO_VARIABLE_WIDTH with an overlay
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	m_screen->set_screen_update(FUNC(snesb51_state::overlay_update));
 	m_screen->screen_vblank().set_inputline(m_mcu, MCS51_INT0_LINE);
-
-	// temporary until the screen is actually overlayed
-	screen_device &overlay(SCREEN(config, "overlay"));
-	overlay.set_raw(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, 256, SNES_VTOTAL_NTSC, 0, 256);
-	overlay.set_video_attributes(VIDEO_UPDATE_SCANLINE);
-	overlay.set_screen_update(FUNC(snesb51_state::overlay_update));
 
 	SNES_PPU(config, m_ppu, MCLK_NTSC);
 	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); });
