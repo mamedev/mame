@@ -85,7 +85,7 @@ private:
 	required_ioport m_config;
 
 	u8 m_prom[32];
-	u8 m_ram[16 * 1024];
+	memory_share_creator<u8> m_ram;
 	u8 m_irq;
 	bool m_installed;
 	bool m_wts_warned;
@@ -97,7 +97,7 @@ kiselev_eth_device::kiselev_eth_device(machine_config const &mconfig, char const
 	, m_nic(*this, "rtl8019a")
 	, m_config(*this, "CONFIG")
 	, m_prom{}
-	, m_ram{}
+	, m_ram(*this, "ram", 16 * 1024, ENDIANNESS_LITTLE)
 	, m_irq(0)
 	, m_installed(false)
 	, m_wts_warned(false)
@@ -133,7 +133,6 @@ void kiselev_eth_device::device_start()
 	m_installed = false;
 	m_wts_warned = false;
 
-	save_item(NAME(m_ram));
 	save_item(NAME(m_irq));
 }
 
@@ -169,12 +168,10 @@ u8 kiselev_eth_device::port_r(offs_t offset)
 	}
 	else if (offset < 0x18)
 	{
-		if (machine().side_effects_disabled())
-			return 0xff;
-
 		u8 const data = u8(m_nic->remote_read());
 
-		LOGDMA("remote read data 0x%02x\n", data);
+		if (!machine().side_effects_disabled())
+			LOGDMA("remote read data 0x%02x\n", data);
 
 		return data;
 	}
@@ -226,7 +223,7 @@ u8 kiselev_eth_device::mem_r(offs_t offset)
 	if (offset < std::size(m_prom))
 		return m_prom[offset];
 
-	if ((offset >= RAM_BASE) && (offset < (RAM_BASE + std::size(m_ram))))
+	if ((offset >= RAM_BASE) && (offset < (RAM_BASE + m_ram.length())))
 		return m_ram[offset - RAM_BASE];
 
 	LOGDMA("invalid buffer read offset 0x%04x\n", offset);
@@ -236,7 +233,7 @@ u8 kiselev_eth_device::mem_r(offs_t offset)
 
 void kiselev_eth_device::mem_w(offs_t offset, u8 data)
 {
-	if ((offset >= RAM_BASE) && (offset < (RAM_BASE + std::size(m_ram))))
+	if ((offset >= RAM_BASE) && (offset < (RAM_BASE + m_ram.length())))
 	{
 		m_ram[offset - RAM_BASE] = data;
 		return;
