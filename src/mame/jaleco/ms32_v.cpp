@@ -155,7 +155,7 @@ void ms32_f1superbattle_state::draw_line_plane(screen_device &screen, bitmap_ind
 	int const offsy = ctrl[0x34/4] + (ctrl[0x3c/4] & 1) * 0x400;
 
 	rectangle clip = cliprect;
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u16 const *const line = &lineram[8 * (y & 0xff)];
 		int const start2x = util::sext((line[0] & 0xffff) | ((line[1] & 3) << 16), 18);
@@ -219,7 +219,7 @@ void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &b
 	draw_line_plane(screen, m_layer_roz, cliprect, roz_tilemap(), &m_rozram[0], &m_lineram[0], &m_roz_ctrl[0], false, roz_line_colour);
 
 	pen_t const *const paldata = m_palette->pens();
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u16 const *const spr = &m_temp_bitmap_sprites.pix(y);
 		u16 const *const tx = &m_layer_tx.pix(y);
@@ -230,7 +230,7 @@ void ms32_f1superbattle_state::mix_layers(screen_device &screen, bitmap_rgb32 &b
 		u16 const road_depth = (road_line_colour[y & 0xff] >> 4) & 7;
 		u16 const roz_depth = (roz_line_colour[y & 0xff] >> 4) & 7;
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			bool const s_op = (spr[x] & 0xff) != 0;
 			u16 const pri = s_op ? (spr[x] >> 12) : 0;
@@ -396,11 +396,11 @@ void ms32_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rec
 	{
 		rectangle my_clip;
 
-		my_clip.min_x = cliprect.min_x;
-		my_clip.max_x = cliprect.max_x;
+		my_clip.min_x = cliprect.left();
+		my_clip.max_x = cliprect.right();
 
-		int y = cliprect.min_y;
-		const int maxy = cliprect.max_y;
+		int y = cliprect.top();
+		const int maxy = cliprect.bottom();
 
 		while (y <= maxy)
 		{
@@ -582,7 +582,7 @@ void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const r
 {
 	pen_t const *const paldata = m_palette->pens();
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u16 const *const spr = &m_temp_bitmap_sprites.pix(y);
 		u16 const *const tx  = &m_layer_tx.pix(y);
@@ -590,7 +590,7 @@ void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const r
 		u16 const *const roz = &m_layer_roz.pix(y);
 		u32 *const dst = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			bool const s_op = (spr[x] & 0xff) != 0;
 			u16 const pri = s_op ? (spr[x] >> 12) : 0;
@@ -659,7 +659,7 @@ void ms32_state::apply_sprite_effects(screen_device &screen, bitmap_rgb32 &bitma
 				screen.priority(), 0, 0xffff);
 	}
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u16 const *const spr = &m_temp_bitmap_sprites.pix(y);
 		u16 const *const cov = &m_temp_bitmap_sprites_pri.pix(y);
@@ -668,7 +668,7 @@ void ms32_state::apply_sprite_effects(screen_device &screen, bitmap_rgb32 &bitma
 		u16 const *const roz_row = &m_layer_roz.pix(y);
 		u32 *const dst = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			if (cov[x] == 0) continue;
 			if (spr[x] & 0xff) continue;
