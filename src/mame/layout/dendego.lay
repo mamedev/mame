@@ -77,7 +77,7 @@ license:CC0-1.0
 	</element>
 
 	<element name="text_door_j">
-		<text string="戸閉">
+		<text string="車内信号">
 			<color red="0.9" green="0.1" blue="0.1" />
 		</text>
 	</element>
