@@ -90,12 +90,6 @@ void splash_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 }
 
-// rebus never writes the bitmap mode register; its pixels index the palette directly
-void rebus_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	splash_state::draw_bitmap(bitmap, cliprect);
-}
-
 void roldfrog_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int colxor = 0; /* splash and some bitmap modes in roldfrog */
@@ -282,7 +276,7 @@ uint32_t splash_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-// sprites are above both tilemaps: needed for the computer in attract mode and the PUSH START prompt
+// sprites are above both tilemaps
 uint32_t rebus_state::screen_update_rebus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap[0]->set_scrolly(0, m_vregs[0]);
