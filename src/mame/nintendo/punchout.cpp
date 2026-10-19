@@ -110,6 +110,7 @@ regardless of PCB revision which would change PROMs 6E, 6F, and 7F.
 DIP locations verified for:
     -punchout (manual)
     -spnchout (manual)
+    -armwrest (manual)
 
 ***************************************************************************/
 
@@ -848,8 +849,24 @@ static INPUT_PORTS_START( punchout )
 	PORT_DIPSETTING(    0x0f, DEF_STR( Free_Play ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("vlm", FUNC(vlm5030_device::bsy_r))
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "R18:!1" )       // Not documented, R18 resistor
-	PORT_DIPNAME( 0x80, 0x00, "Copyright" )             PORT_DIPLOCATION("R19:!1") // Not documented, R19 resistor
+	// R18 and R19 are fitted as 0 ohm links (CHP1-CPU parts list), so these bits read 1 on a stock board
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )       PORT_DIPLOCATION("R18:!1") // R18 resistor
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Copyright" )             PORT_DIPLOCATION("R19:!1") // R19 resistor
+	PORT_DIPSETTING(    0x00, "Nintendo" )
+	PORT_DIPSETTING(    0x80, "Nintendo of America Inc." )
+INPUT_PORTS_END
+
+// No parts list is known for the Japanese and bootleg boards, so R18 and R19 are left open. The
+// bootleg uses both bits for other things: bit 6 is stored at d7ce for a purpose that hasn't been
+// worked out, and bit 7 selects one of two coinage tables (b900 or bb00), not the copyright line.
+static INPUT_PORTS_START( punchoutj )
+	PORT_INCLUDE( punchout )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "R18:!1" )       // R18 resistor
+	PORT_DIPNAME( 0x80, 0x00, "Copyright" )             PORT_DIPLOCATION("R19:!1") // R19 resistor
 	PORT_DIPSETTING(    0x00, "Nintendo" )
 	PORT_DIPSETTING(    0x80, "Nintendo of America Inc." )
 INPUT_PORTS_END
@@ -882,6 +899,23 @@ static INPUT_PORTS_START( spnchout )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x40, 0x40, "Coin Slots" )            PORT_DIPLOCATION("R18:!1") // R18 resistor
+	PORT_DIPSETTING(    0x40, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+INPUT_PORTS_END
+
+// No parts list is known for this board, so R18 and R19 are left open. This program needs R19 open:
+// the check at 0x0030 (called at startup from 0x02a4) restarts it while DSW1 bit 7 is set.
+static INPUT_PORTS_START( spnchoutj )
+	PORT_INCLUDE( spnchout )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x40, 0x00, "Coin Slots" )            PORT_DIPLOCATION("R18:!1") // R18 resistor
+	PORT_DIPSETTING(    0x40, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0x80, 0x00, "Copyright" )             PORT_DIPLOCATION("R19:!1") // R19 resistor
+	PORT_DIPSETTING(    0x00, "Nintendo" )
+	PORT_DIPSETTING(    0x80, "Nintendo of America Inc." )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( armwrest )
@@ -901,7 +935,8 @@ static INPUT_PORTS_START( armwrest )
 
 	/* Coinage:
 
-	R18 (Coin Slots setting) determines which table is used.
+	R18 (Coin Slots setting) determines which table is used. The CHV1-CPU parts list
+	has R18 and R19 fitted as 0 ohm links, so stock boards use the 1 coin slot table.
 
 	L = number of credits per coin for left coin slot
 	R = number of credits per coin for right coin slot
@@ -1015,7 +1050,7 @@ bit 3210 5432  L  R  C
 	1000 0xxx  1  1  6
 	1000 1xxx  10 10 3
 
-	1001 0xxx  5  1  5
+	1001 0xxx  2  2  3
 	1001 1xxx  11 11 1
 
 	1010 0xxx  5  5  1
@@ -1080,10 +1115,12 @@ bit 3210 5432  L  R  C
 	PORT_DIPSETTING(    0x0e, "1110" )
 	PORT_DIPSETTING(    0x0f, "1111" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("vlm", FUNC(vlm5030_device::bsy_r))
-	PORT_DIPNAME( 0x40, 0x00, "Coin Slots" )            PORT_DIPLOCATION("R18:!1") // R18 resistor
+	PORT_DIPNAME( 0x40, 0x40, "Coin Slots" )            PORT_DIPLOCATION("R18:!1") // R18 resistor
 	PORT_DIPSETTING(    0x40, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "R19:!1" )       // R19 resistor
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )       PORT_DIPLOCATION("R19:!1") // R19 resistor, not used
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1904,12 +1941,12 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1984, punchout,   0,        punchout, punchout, punchout_state,  empty_init, ROT0, "Nintendo", "Punch-Out!! (Rev B)",           0 ) // CHP1-02 boards
-GAME( 1984, punchouta,  punchout, punchout, punchout, punchout_state,  empty_init, ROT0, "Nintendo", "Punch-Out!! (Rev A)",           0 ) // CHP1-01 boards
-GAME( 1984, punchoutah, punchout, punchout, punchout, punchout_state,  empty_init, ROT0, "Nintendo", "Punch-Out!! (Rev A, harder)",   0 ) // CHP1-01 boards
-GAME( 1984, punchoutj,  punchout, punchout, punchout, punchout_state,  empty_init, ROT0, "Nintendo", "Punch-Out!! (Japan)",           0 )
-GAME( 1984, punchita,   punchout, punchout, punchout, punchout_state,  empty_init, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
-GAME( 1984, spnchout,   0,        spnchout, spnchout, spunchout_state, empty_init, ROT0, "Nintendo", "Super Punch-Out!! (Rev B)",     0 ) // CHP1-02 boards
-GAME( 1984, spnchouta,  spnchout, spnchout, spnchout, spunchout_state, empty_init, ROT0, "Nintendo", "Super Punch-Out!! (Rev A)",     0 ) // CHP1-01 boards
-GAME( 1984, spnchoutj,  spnchout, spnchout, spnchout, spunchout_state, empty_init, ROT0, "Nintendo", "Super Punch-Out!! (Japan)",     0 )
-GAME( 1985, armwrest,   0,        armwrest, armwrest, armwrest_state,  empty_init, ROT0, "Nintendo", "Arm Wrestling",                 0 )
+GAME( 1984, punchout,   0,        punchout, punchout,  punchout_state,  empty_init, ROT0, "Nintendo", "Punch-Out!! (Rev B)",           0 ) // CHP1-02 boards
+GAME( 1984, punchouta,  punchout, punchout, punchout,  punchout_state,  empty_init, ROT0, "Nintendo", "Punch-Out!! (Rev A)",           0 ) // CHP1-01 boards
+GAME( 1984, punchoutah, punchout, punchout, punchout,  punchout_state,  empty_init, ROT0, "Nintendo", "Punch-Out!! (Rev A, harder)",   0 ) // CHP1-01 boards
+GAME( 1984, punchoutj,  punchout, punchout, punchoutj, punchout_state,  empty_init, ROT0, "Nintendo", "Punch-Out!! (Japan)",           0 )
+GAME( 1984, punchita,   punchout, punchout, punchoutj, punchout_state,  empty_init, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
+GAME( 1984, spnchout,   0,        spnchout, spnchout,  spunchout_state, empty_init, ROT0, "Nintendo", "Super Punch-Out!! (Rev B)",     0 ) // CHP1-02 boards
+GAME( 1984, spnchouta,  spnchout, spnchout, spnchout,  spunchout_state, empty_init, ROT0, "Nintendo", "Super Punch-Out!! (Rev A)",     0 ) // CHP1-01 boards
+GAME( 1984, spnchoutj,  spnchout, spnchout, spnchoutj, spunchout_state, empty_init, ROT0, "Nintendo", "Super Punch-Out!! (Japan)",     0 )
+GAME( 1985, armwrest,   0,        armwrest, armwrest,  armwrest_state,  empty_init, ROT0, "Nintendo", "Arm Wrestling",                 0 )
