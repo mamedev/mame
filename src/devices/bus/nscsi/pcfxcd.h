@@ -28,8 +28,10 @@ protected:
 	virtual void scsi_command() override;
 	virtual bool scsi_command_done(u8 command, u8 length) override;   // c0h-ffh are 10 bytes
 	virtual void scsi_abort() override;                               // stops CD-DA
-	virtual attotime scsi_data_byte_period() override;     // 2x: 307,200 bytes/s
-	virtual attotime scsi_data_command_delay() override;   // command processing time
+	virtual uint8_t scsi_get_data(int id, int pos) override;
+	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
+	virtual attotime scsi_data_byte_period() override;     // wait for the next sector, else bus byte time
+	virtual attotime scsi_data_command_delay() override;   // READ: wait for the first sector
 
 private:
 	// NEC audio commands
@@ -59,6 +61,17 @@ private:
 	// after scsi_command() has returned, by which point a data-in command has overwritten the
 	// buffer with its response
 	u8 m_command;
+
+	void start_read(u32 blocks);
+	attotime next_sector_wait();
+
+	// data reads: sectors still to be read from the disc, sectors waiting in the
+	// read-ahead buffer, when the sector being read is done, and the wait to apply
+	// before the next sector goes over the bus
+	u32 m_read_left;
+	u32 m_read_buffered;
+	attotime m_read_done;
+	attotime m_sector_wait;
 };
 
 DECLARE_DEVICE_TYPE(NSCSI_CDROM_PCFX, nscsi_cdrom_pcfx_device)

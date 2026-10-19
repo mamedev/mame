@@ -36,6 +36,18 @@
 #define LOGCMD(...)         LOGMASKED(LOG_CMD, __VA_ARGS__)
 #define LOGCDDA(...)        LOGMASKED(LOG_CDDA, __VA_ARGS__)
 
+namespace {
+
+// double speed: 150 sectors a second, read ahead into a 64 KB buffer; sectors are
+// handed over as the drive reads them, each as a burst at the bus rate
+const attotime SECTOR_TIME = attotime::from_hz(150);
+// asynchronous SCSI, 1.5 MB/s (GMAKER hardware manual)
+const attotime BUS_BYTE_TIME = attotime::from_hz(1'500'000);
+constexpr u32 READ_AHEAD_SECTORS = 32;
+constexpr u32 SECTOR_BYTES = 2048;
+
+} // anonymous namespace
+
 DEFINE_DEVICE_TYPE(NSCSI_CDROM_PCFX, nscsi_cdrom_pcfx_device, "nscsi_cdrom_pcfx", "NEC CD-ROM DRIVE:FX")
 
 nscsi_cdrom_pcfx_device::nscsi_cdrom_pcfx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -45,6 +57,10 @@ nscsi_cdrom_pcfx_device::nscsi_cdrom_pcfx_device(const machine_config &mconfig, 
 	, m_cdda_start(0)
 	, m_cdda_end(0)
 	, m_command(0)
+	, m_read_left(0)
+	, m_read_buffered(0)
+	, m_read_done(attotime::zero)
+	, m_sector_wait(attotime::zero)
 {
 }
 
@@ -63,22 +79,66 @@ void nscsi_cdrom_pcfx_device::device_start()
 	save_item(NAME(m_cdda_start));
 	save_item(NAME(m_cdda_end));
 	save_item(NAME(m_command));
+	save_item(NAME(m_read_left));
+	save_item(NAME(m_read_buffered));
+	save_item(NAME(m_read_done));
+	save_item(NAME(m_sector_wait));
 }
 
 void nscsi_cdrom_pcfx_device::device_reset()
 {
 	nscsi_cdrom_device::device_reset();
 
+	// a machine reset: nscsi_full_device::device_reset() does not call scsi_abort()
 	m_cdda_status = CDDA_STOPPED;
 	m_cdda_loop = false;
 	m_cdda_start = m_cdda_end = 0;
 	m_command = 0;
+	m_read_left = m_read_buffered = 0;
+	m_sector_wait = attotime::zero;
 }
 
-// double speed, same figure as nscsi_cdrom_2x_device
+// time until the next sector is available: zero while the read-ahead buffer
+// holds one, otherwise the remainder of the sector being read
+attotime nscsi_cdrom_pcfx_device::next_sector_wait()
+{
+	if (!m_read_left && !m_read_buffered)
+		return attotime::zero;
+
+	const attotime now = machine().time();
+	while (m_read_left && m_read_done <= now)
+	{
+		if (m_read_buffered == READ_AHEAD_SECTORS)
+		{
+			// the buffer was full, reading resumes now
+			m_read_done = now + SECTOR_TIME;
+			break;
+		}
+		m_read_buffered++;
+		m_read_left--;
+		m_read_done += SECTOR_TIME;
+	}
+
+	if (m_read_buffered)
+	{
+		m_read_buffered--;
+		return attotime::zero;
+	}
+
+	// wait for the sector being read
+	const attotime wait = m_read_done - now;
+	m_read_left--;
+	m_read_done += SECTOR_TIME;
+	return wait;
+}
+
+// sectors go over the bus as a burst at the bus rate; at the end of a sector, the
+// wait for the next one instead
 attotime nscsi_cdrom_pcfx_device::scsi_data_byte_period()
 {
-	return attotime::from_ticks(1, 307'200);
+	const attotime wait = m_sector_wait;
+	m_sector_wait = attotime::zero;
+	return wait.is_zero() ? BUS_BYTE_TIME : wait;
 }
 
 attotime nscsi_cdrom_pcfx_device::scsi_data_command_delay()
@@ -86,14 +146,31 @@ attotime nscsi_cdrom_pcfx_device::scsi_data_command_delay()
 	switch (m_command)
 	{
 		case SC_READ_6: case SC_READ_10: case SC_READ_12:
-			return attotime::from_msec(10);   // TODO: seek time by distance
+			return next_sector_wait();   // the first sector; TODO: seek time by distance
 
 		default:
 			return attotime::zero;
 	}
 }
 
-// ABORT or BUS DEVICE RESET stops audio playback
+uint8_t nscsi_cdrom_pcfx_device::scsi_get_data(int id, int pos)
+{
+	// last byte of a sector: the wait for the next one is applied after this byte, before
+	// the next sector's first REQ
+	if (id == 2 && (pos + 1) % SECTOR_BYTES == 0 && (m_read_left || m_read_buffered))
+		m_sector_wait = next_sector_wait();
+	return nscsi_cdrom_device::scsi_get_data(id, pos);
+}
+
+// any byte received from the initiator (a message after ATN, or the next CDB) cancels a
+// pending sector wait that was set on the last data byte of a sector
+void nscsi_cdrom_pcfx_device::scsi_put_data(int buf, int offset, uint8_t data)
+{
+	m_sector_wait = attotime::zero;
+	nscsi_cdrom_device::scsi_put_data(buf, offset, data);
+}
+
+// ABORT or BUS DEVICE RESET stops audio playback and the read in progress
 void nscsi_cdrom_pcfx_device::scsi_abort()
 {
 	nscsi_cdrom_device::scsi_abort();
@@ -101,6 +178,18 @@ void nscsi_cdrom_pcfx_device::scsi_abort()
 	LOGCDDA("Abort: audio stop\n");
 	cdda->stop_audio();
 	m_cdda_status = CDDA_STOPPED;
+
+	m_read_left = m_read_buffered = 0;
+	m_sector_wait = attotime::zero;
+}
+
+// start a read of the given number of sectors, the first due one sector time from now
+void nscsi_cdrom_pcfx_device::start_read(u32 blocks)
+{
+	m_read_left = blocks;
+	m_read_buffered = 0;
+	m_read_done = machine().time() + SECTOR_TIME;
+	m_sector_wait = attotime::zero;
 }
 
 void nscsi_cdrom_pcfx_device::scsi_command()
@@ -108,6 +197,10 @@ void nscsi_cdrom_pcfx_device::scsi_command()
 	// latched here: a data-in command below overwrites m_scsi_cmdbuf with its response before
 	// scsi_data_command_delay() is called, so byte 0 of the CDB would no longer be byte 0 of the CDB
 	m_command = m_scsi_cmdbuf[0];
+
+	// a new command cancels a read; READs below start their own
+	m_read_left = m_read_buffered = 0;
+	m_sector_wait = attotime::zero;
 
 	if (!image->exists() && m_scsi_cmdbuf[0] != SC_INQUIRY && m_scsi_cmdbuf[0] != SC_REQUEST_SENSE)
 	{
@@ -135,9 +228,16 @@ void nscsi_cdrom_pcfx_device::scsi_command()
 		}
 
 		case SC_READ_6:
+			cdda->stop_audio();
+			m_cdda_status = CDDA_STOPPED;
+			start_read(m_scsi_cmdbuf[4] ? m_scsi_cmdbuf[4] : 256);
+			nscsi_cdrom_device::scsi_command();
+			break;
+
 		case SC_READ_10:
 			cdda->stop_audio();
 			m_cdda_status = CDDA_STOPPED;
+			start_read(get_u16be(&m_scsi_cmdbuf[7]));
 			nscsi_cdrom_device::scsi_command();
 			break;
 
@@ -150,6 +250,7 @@ void nscsi_cdrom_pcfx_device::scsi_command()
 			// narrow the block count to 16 bits (clamped, not truncated) and relabel the CDB
 			put_u16be(&m_scsi_cmdbuf[7], std::min<u32>(blocks, 0xffff));
 			m_scsi_cmdbuf[0] = SC_READ_10;
+			start_read(get_u16be(&m_scsi_cmdbuf[7]));
 			nscsi_cdrom_device::scsi_command();
 			break;
 		}
