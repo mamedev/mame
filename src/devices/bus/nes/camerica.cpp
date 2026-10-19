@@ -148,7 +148,8 @@ void nes_bf9093_device::write_h(offs_t offset, u8 data)
 			break;
 		case 0x4000:
 		case 0x6000:
-			prg16_89ab(data);
+			// BF9093 has a 4-bit bank register (PRG A14-A17); BF9097 (Fire Hawk) has no PRG A17 pin, so only 3 bits
+			prg16_89ab(data & (m_pcb_ctrl_mirror ? 0x07 : 0x0f));
 			break;
 	}
 }
