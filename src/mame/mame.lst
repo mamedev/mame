@@ -21289,6 +21289,9 @@ sc116
 sc133
 sc203
 
+@source:homebrew/sbc6120.cpp
+sbc6120
+
 @source:homebrew/sbc6510.cpp
 sbc6510
 
@@ -36281,6 +36284,7 @@ fatfurspb
 kinstsnes
 mk3snes
 snes4sl
+snes4sl94
 snes4sln
 
 @source:nintendo/spacefb.cpp

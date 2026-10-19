@@ -13,7 +13,7 @@ References:
 - http://ookumaneko.s1005.xrea.com/pcibios.htm (Ra266 PCI Config Space at the end)
 
 TODO (pc9821):
-- non-fatal "cache error" at POST for all machines listed here;
+- non-fatal "cache error" at POST for all machines listed here (I/O $43d bit 2 reads);
 - partial dump, has undumped IDE ROM and no setup bank, kludged to work;
 - further state machine breakdowns;
 
@@ -28,6 +28,7 @@ TODO (pc9821as):
 - HELP key doesn't get recognized at boot, keyboard sends an 0xff when key held PC=f8918
   (need to mash the key until it finally kicks in, has an incredibly narrow acceptance window);
 - derive pc9821ce style sound PnP access (doesn't access the EEPROM addresses);
+- turbocpp: throws a color mess with the editor (ext SDIP setting misbehaving?)
 
 TODO (pc9821ce):
 - Throws random TIMER errors at POST (soft reset to bypass);
@@ -1593,7 +1594,7 @@ void pc9821_note_lavie_state::pc9821nw150(machine_config &config)
 
 TODO: should access SDIP from $00f6, most likely a partial A Mate dump instead
 
-Retire not done because we depend on this.
+Retire not yet done because we depend on this as a base for this driver.
 
 */
 

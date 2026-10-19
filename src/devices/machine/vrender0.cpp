@@ -687,6 +687,8 @@ void vrender0soc_device::crtc_update()
 	if (hdisp == 0 || vdisp == 0)
 		return;
 
+	m_vr0vid->set_hres(hdisp);
+
 	bool const interlace_mode = crt_is_interlaced();
 
 	if (interlace_mode)

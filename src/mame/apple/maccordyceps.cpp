@@ -107,6 +107,12 @@ private:
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 	}
 
+	void cuda_power_w(int state)
+	{
+		if (state)
+			machine().schedule_exit();
+	}
+
 	void nmi_irq(int state)
 	{
 		m_capella->nmi_w(state);
@@ -134,13 +140,6 @@ void pmac6200_state::init_pmac6200()
 
 uint32_t pmac6200_state::id_r(offs_t offset, uint32_t mem_mask)
 {
-	// same behavior as in macpdm.cpp
-	// FIXME: Apple System Profiler only reports half the desired CPU speed
-	if (mem_mask == 0xffff'ffff)
-	{
-		return m_model_id & 0xffff;
-	}
-
 	return m_model_id;
 }
 
@@ -180,7 +179,7 @@ INPUT_PORTS_END
 
 void pmac6200_state::pmac6200(machine_config &config)
 {
-	m_model_id = 0xa55a3250;
+	m_model_id = 0xa55a2250;
 
 	PPC603(config, m_maincpu, 75_MHz_XTAL);
 	// BUS_RETRY: TurboSCSI stalls the CPU until DRQ
@@ -229,6 +228,7 @@ void pmac6200_state::pmac6200(machine_config &config)
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->zero_default_pram();
 	m_cuda->set_default_bios_tag("341s0060");
+	m_cuda->poweroff_callback().set(FUNC(pmac6200_state::cuda_power_w));
 	m_cuda->reset_callback().set(FUNC(pmac6200_state::cuda_reset_w));
 	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(m_primetimeii, FUNC(primetime_device::cb1_w));
