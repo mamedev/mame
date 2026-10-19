@@ -430,6 +430,13 @@ void kn_sd_state::kn7000_map(address_map &map)
 	// holds one 2 MB image, so the 8 MB window shows it four times.
 	map(0x57800000, 0x579fffff).mirror(0x600000).rom().region("picture", 0);
 	sd_map(map);
+	// IC18, the rhythm data ROM, answers on CS0. Its address pins take A1-A21
+	// and its top one is set by JP7, so 4 MB of the 64 Mbit part is visible and
+	// repeats at 0x40400000. The firmware finds its "Technics Rhythms" resource
+	// at 0x40010000. The first 64 KB is the instrument's boot code and flash
+	// updater: the CPU starts there at reset and is sent on to 0x48400000,
+	// where the driver starts it directly.
+	map(0x40000000, 0x403fffff).mirror(0x400000).rom().region("rhythm_data", 0);
 }
 
 void kn_sd_state::kn2600_map(address_map &map)
@@ -1137,8 +1144,11 @@ ROM_START(kn7000)
 	ROM_REGION(0x1000000, "waveform_sub_x", 0)
 	ROM_LOAD("c3cbqd000003.ic208", 0x000000, 0x1000000, NO_DUMP)
 
-	ROM_REGION(0x800000, "rhythm_data", 0)
-	ROM_LOAD("c3cbnd000046.ic18", 0x000000, 0x800000, NO_DUMP)
+	// The half of the chip that JP7 selects, as the CPU reads it. The dumped
+	// instrument was not opened, so the part is assumed: early units fit the
+	// IC20 flash at this site instead, which the CPU sees as the same 4 MB.
+	ROM_REGION32_LE(0x400000, "rhythm_data", 0)
+	ROM_LOAD("c3cbnd000046.ic18", 0x000000, 0x400000, CRC(a0c23466) SHA1(2dc71f5082063cd6b21e4ed16acd67e9d326a79f))
 
 	// The 2 MB the CPU sees; the chip's other half is out of its reach
 	ROM_REGION32_LE(0x200000, "picture", 0)
