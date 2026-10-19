@@ -23,6 +23,7 @@
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/mb3773.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -37,6 +38,7 @@ public:
 	roundup5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tatsumi_state(mconfig, type, tag)
 		, m_subcpu(*this, "sub")
+		, m_watchdog(*this, "watchdog")
 		, m_vregs(*this, "vregs")
 		, m_bg_scrollx(*this, "bg_scrollx")
 		, m_bg_scrolly(*this, "bg_scrolly")
@@ -72,6 +74,7 @@ private:
 	void draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, const bitmap_ind8 &shadow, uint8_t type);
 
 	required_device<cpu_device> m_subcpu;
+	required_device<mb3773_device> m_watchdog;
 
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_bg_scrollx;
@@ -414,7 +417,8 @@ void roundup5_state::roundup5_control_w(offs_t offset, uint16_t data, uint16_t m
 //  if (offset == 1 && (tatsumi_control_w & 0xfeff) != (last_bank & 0xfeff))
 //      logerror("%s:  Changed bank to %04x (%d)\n", m_maincpu->pc(), tatsumi_control_w,offset);
 
-//todo - watchdog
+	// The control word latch drives the MB3773 watchdog clock (EHCK); the program pulses it every frame
+	m_watchdog->write_line_ck(BIT(m_control_word, 8));
 
 	/* Bank:
 
@@ -650,6 +654,8 @@ void roundup5_state::roundup5(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &roundup5_state::roundup5_z80_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
+
+	MB3773(config, m_watchdog); // resets the board when the program stops pulsing the clock
 
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.in_pa_callback().set_ioport("IN0");
