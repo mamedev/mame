@@ -13,7 +13,6 @@ driver by Nicola Salmoria
 
 TODO:
 - add useless driver config to choose between pink and white color proms
-- video raw params - pixel clock is derived from 20.16mhz xtal
 - money bag placement might not be 100% correct in Arm Wrestling
 
 
@@ -1129,21 +1128,19 @@ void punchout_state::punchout(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x200);
 	config.set_default_layout(layout_dualhovu);
 
+	// CHP1-VIDEO and CHV1-VIDEO timing (shared by both monitors): 20.16 MHz / 4 dot clock; the H counter
+	// (2E/3E) reloads with 0x00 and 0xba on alternate passes, giving 326 dots per line; the V counter (8U/8T)
+	// advances on every second EQ pulse from timing PROM 2D (two per line), and its reload adds one EQ period,
+	// giving 256.5 lines per frame (rounded up here); vblank (7U) is from V = 240 to V = 15
 	screen_device &top(SCREEN(config, "top"));
-	top.set_refresh_hz(60);
-	top.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	top.set_size(32*8, 32*8);
-	top.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	top.set_raw(XTAL(20'160'000) / 4, 326, 0, 256, 257, 16, 240);
 	top.set_screen_update(FUNC(punchout_state::screen_update_top));
 	top.set_palette(m_palette);
 	top.screen_vblank().set(FUNC(punchout_state::vblank_irq));
 	top.screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	screen_device &bottom(SCREEN(config, "bottom"));
-	bottom.set_refresh_hz(60);
-	bottom.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	bottom.set_size(32*8, 32*8);
-	bottom.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	bottom.set_raw(XTAL(20'160'000) / 4, 326, 0, 256, 257, 16, 240);
 	bottom.set_screen_update(FUNC(punchout_state::screen_update_bottom));
 	bottom.set_palette(m_palette);
 
