@@ -7,6 +7,7 @@
 
 DEFINE_DEVICE_TYPE(SEGA_837_13551, sega_837_13551_device, "jvs13551", "Sega 837-13551 I/O Board")
 DEFINE_DEVICE_TYPE(SEGA_837_13844, sega_837_13844_device, "jvs13844", "Sega 837-13844 I/O Board")
+DEFINE_DEVICE_TYPE(SEGA_837_13938, sega_837_13938_device, "jvs13938", "Sega 837-13938 I/O Board")
 
 void sega_837_13551_device::jvs13551_coin_1_w(int state)
 {
@@ -199,10 +200,11 @@ bool sega_837_13551_device::swoutputs(uint8_t id, uint8_t val)
 }
 
 /*
- * 837-13844 (smarinef, anpanman2)
+ * 837-13844 (smarinef, anpanman2, inunoos)
  */
 
 sega_837_13844_device::sega_837_13844_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : sega_837_13551_device(mconfig, SEGA_837_13844, tag, owner, clock)
+	, rotary_port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
 	, m_digital_bits(12)
 	, m_encoder_bits(0)
 {
@@ -232,4 +234,63 @@ void sega_837_13844_device::function_list(uint8_t *&buf)
 
 	// Driver out - 22 channels
 	*buf++ = 0x12; *buf++ = 22; *buf++ = 0; *buf++ = 0;
+}
+
+bool sega_837_13844_device::rotary(uint8_t *&buf, uint8_t count)
+{
+	if(count > 4)
+		return false;
+	for(int i=0; i<count; i++) {
+		uint16_t val = rotary_port[i] ? rotary_port[i]->read() : 0x8000;
+		// TODO: pass a delta
+		*buf++ = val >> 8;
+		*buf++ = val;
+	}
+	return true;
+}
+
+
+/*
+ * 837-13938 (crackndj)
+ */
+
+sega_837_13938_device::sega_837_13938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : sega_837_13551_device(mconfig, SEGA_837_13938, tag, owner, clock)
+	, rotary_port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
+{
+}
+
+const char *sega_837_13938_device::device_id()
+{
+	return "SEGA ENTERPRISES,LTD.;837-13938 ENCORDER BD  ;Ver0.01;99/08";
+}
+
+void sega_837_13938_device::function_list(uint8_t *&buf)
+{
+	// SW input - 1 players, 9 bits
+	*buf++ = 0x01; *buf++ = 1; *buf++ = 9; *buf++ = 0;
+
+	// Coin input - 0 slots
+	//*buf++ = 0x02; *buf++ = 2; *buf++ = 0; *buf++ = 0;
+
+	// Analog input - 0 channels
+	//*buf++ = 0x03; *buf++ = 8; *buf++ = 16; *buf++ = 0;
+
+	// rotary encoders - 4 channels
+	*buf++ = 0x04; *buf++ = 4; *buf++ = 0; *buf++ = 0;
+
+	// Driver out - 8 channels
+	*buf++ = 0x12; *buf++ = 8; *buf++ = 0; *buf++ = 0;
+}
+
+bool sega_837_13938_device::rotary(uint8_t *&buf, uint8_t count)
+{
+	if(count > 4)
+		return false;
+	for(int i=0; i<count; i++) {
+		uint16_t val = rotary_port[i] ? rotary_port[i]->read() : 0x8000;
+		// TODO: pass a delta
+		*buf++ = val >> 8;
+		*buf++ = val;
+	}
+	return true;
 }

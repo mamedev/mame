@@ -47,9 +47,10 @@ public:
 	void naomim2(machine_config &config) ATTR_COLD;
 	void naomim2_kb(machine_config &config) ATTR_COLD;
 	void naomim2_gun(machine_config &config) ATTR_COLD;
+	void naomim2_crackndj(machine_config &config) ATTR_COLD;
+	void naomim2_inunoos(machine_config &config) ATTR_COLD;
 	void naomim2_ringout(machine_config &config) ATTR_COLD;
 	void naomim2_smarinef(machine_config &config) ATTR_COLD;
-	void naomim2_inunoos(machine_config &config) ATTR_COLD;
 	void naomi(machine_config &config) ATTR_COLD;
 	void naomim1(machine_config &config) ATTR_COLD;
 	void naomim1_hop(machine_config &config) ATTR_COLD;

@@ -87,16 +87,67 @@ public:
 	void set_digital_bits(uint8_t bits) { m_digital_bits = bits; }
 	void set_encoder_bits(uint8_t bits) { m_encoder_bits = bits; }
 
+	template <uint8_t Which, typename T>
+	void set_rotary_tag(T &&port_tag) { rotary_port[Which].set_tag(std::forward<T>(port_tag)); }
+	template <uint8_t First = 0U, typename T, typename... U>
+	void set_rotary_tags(T &&first_tag, U &&... other_tags)
+	{
+		set_rotary_tag<First>(std::forward<T>(first_tag));
+		set_rotary_tags<First + 1>(std::forward<U>(other_tags)...);
+	}
+
 protected:
+	template <uint8_t First> void set_rotary_tags() { }
+
 	virtual const char *device_id() override;
 	virtual void function_list(uint8_t *&buf) override;
+	virtual bool rotary(uint8_t *&buf, uint8_t count) override;
 
 private:
+	optional_ioport_array<4> rotary_port;
+
 	uint8_t m_digital_bits;
 	uint8_t m_encoder_bits;
 };
 
+class sega_837_13938_device : public sega_837_13551_device
+{
+public:
+	template <typename T>
+	sega_837_13938_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&jvs_host_tag)
+		: sega_837_13938_device(mconfig, tag, owner)
+	{
+		host.set_tag(std::forward<T>(jvs_host_tag));
+	}
+
+	sega_837_13938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	// TODO: actual ROM
+	static auto parent_rom_device_type() { return &SEGA_837_13551; }
+//  virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	template <uint8_t Which, typename T>
+	void set_rotary_tag(T &&port_tag) { rotary_port[Which].set_tag(std::forward<T>(port_tag)); }
+	template <uint8_t First = 0U, typename T, typename... U>
+	void set_rotary_tags(T &&first_tag, U &&... other_tags)
+	{
+		set_rotary_tag<First>(std::forward<T>(first_tag));
+		set_rotary_tags<First + 1>(std::forward<U>(other_tags)...);
+	}
+
+protected:
+	template <uint8_t First> void set_rotary_tags() { }
+
+	virtual const char *device_id() override;
+	virtual void function_list(uint8_t *&buf) override;
+	virtual bool rotary(uint8_t *&buf, uint8_t count) override;
+
+private:
+	optional_ioport_array<4> rotary_port;
+};
+
 
 DECLARE_DEVICE_TYPE(SEGA_837_13844, sega_837_13844_device)
+DECLARE_DEVICE_TYPE(SEGA_837_13938, sega_837_13938_device)
 
 #endif // MAME_SEGA_JVS13551_H
