@@ -8,12 +8,13 @@ Arm Wrestling runs on about the same hardware, but the video board is different.
 The most significant changes are that Punchout has a larger bottom tilemap,
 with scrolling, while Arm Wrestling has an additional FG tilemap displayed on
 the bottom screen.
+Arm Wrestling also scrolls its FG and background tilemaps per tile row, with
+the values at d800-d81f (FG) and at the even addresses of f000-f03f (BG).
 
 driver by Nicola Salmoria
 
 TODO:
 - add useless driver config to choose between pink and white color proms
-- money bag placement might not be 100% correct in Arm Wrestling
 
 
 main CPU:
@@ -264,6 +265,7 @@ private:
 
 	void spr1_videoram_w(offs_t offset, uint8_t data);
 	void fg_videoram_w(offs_t offset, uint8_t data);
+	void update_scroll();
 	uint32_t screen_update_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette);
@@ -381,6 +383,10 @@ void armwrest_state::video_start()
 	m_spr1_tilemap_flipx->set_transparent_pen(0x07);
 	m_spr2_tilemap->set_transparent_pen(0x03);
 	m_fg_tilemap->set_transparent_pen(0x07);
+
+	m_bg_top_tilemap->set_scroll_rows(32);
+	m_bg_bot_tilemap->set_scroll_rows(32);
+	m_fg_tilemap->set_scroll_rows(32);
 }
 
 
@@ -597,9 +603,26 @@ uint32_t punchout_state::screen_update_bottom(screen_device &screen, bitmap_ind1
 }
 
 
+void armwrest_state::update_scroll()
+{
+	// CHV1-BAK loads the FG column counter at the start of each line from FG RAM d800 + row,
+	// and the BG column counter from the code byte at f000 + row * 2. The BG counter is shared
+	// by both monitors. A larger value moves the layer left. The game uses 0xc8 as the neutral
+	// position, which is drawn with no scroll offset.
+	for (int row = 0; row < 32; row++)
+	{
+		m_fg_tilemap->set_scrollx(row, (m_fg_videoram[row] - 0xc8) & 0xff);
+
+		int const bgscroll = (m_bg_bot_videoram[row * 2] - 0xc8) & 0xff;
+		m_bg_top_tilemap->set_scrollx(row, bgscroll);
+		m_bg_bot_tilemap->set_scrollx(row, bgscroll);
+	}
+}
+
 uint32_t armwrest_state::screen_update_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copy_top_palette(BIT(*m_palettebank, 1));
+	update_scroll();
 
 	m_bg_top_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -612,6 +635,7 @@ uint32_t armwrest_state::screen_update_top(screen_device &screen, bitmap_ind16 &
 uint32_t armwrest_state::screen_update_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copy_bot_palette(BIT(*m_palettebank, 0));
+	update_scroll();
 
 	m_bg_bot_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
