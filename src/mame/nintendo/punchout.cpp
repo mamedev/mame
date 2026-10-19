@@ -47,6 +47,7 @@ dffa      big sprite #2 y pos low 8 bits
 dffb      big sprite #2 y pos high bit
 dffc      big sprite #2 x flip (bit 0)
 dffd      palette bank (bit 0 = bottom monitor bit 1 = top monitor)
+          Arm Wrestling: bits 6-7 select the bottom monitor layer priority
 
 I/O
 read:
@@ -257,6 +258,10 @@ private:
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_spr1_tilemap_flipx = nullptr;
 
+	bitmap_ind16 m_spr1_bitmap;
+	bitmap_ind16 m_spr2_bitmap;
+	bitmap_ind16 m_fg_bitmap;
+
 	TILE_GET_INFO_MEMBER(top_get_info);
 	TILE_GET_INFO_MEMBER(bot_get_info);
 	TILE_GET_INFO_MEMBER(fg_get_info);
@@ -387,6 +392,11 @@ void armwrest_state::video_start()
 	m_bg_top_tilemap->set_scroll_rows(32);
 	m_bg_bot_tilemap->set_scroll_rows(32);
 	m_fg_tilemap->set_scroll_rows(32);
+
+	screen_device &bottom = *subdevice<screen_device>("bottom");
+	bottom.register_screen_bitmap(m_spr1_bitmap);
+	bottom.register_screen_bitmap(m_spr2_bitmap);
+	bottom.register_screen_bitmap(m_fg_bitmap);
 }
 
 
@@ -639,11 +649,46 @@ uint32_t armwrest_state::screen_update_bottom(screen_device &screen, bitmap_ind1
 
 	m_bg_bot_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	if (m_spr1_ctrlram[7] & 2)  // display in bottom monitor
-		draw_big_sprite(screen, bitmap, cliprect, 1);
-	drawbs2(screen, bitmap, cliprect);
+	// the other layers are mixed by the priority PROM (CHV1-BAK 3C), whose top two
+	// address bits are latched from dffd bits 6-7
+	m_spr1_bitmap.fill(0xffff, cliprect);
+	m_spr2_bitmap.fill(0xffff, cliprect);
+	m_fg_bitmap.fill(0xffff, cliprect);
 
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if (m_spr1_ctrlram[7] & 2)  // display in bottom monitor
+		draw_big_sprite(screen, m_spr1_bitmap, cliprect, 1);
+	drawbs2(screen, m_spr2_bitmap, cliprect);
+	m_fg_tilemap->draw(screen, m_fg_bitmap, cliprect, 0, 0);
+
+	uint8_t const *const prio = &m_proms[0xc00 | (*m_palettebank & 0xc0)];
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint16_t *const dst = &bitmap.pix(y);
+		uint16_t const *const spr1 = &m_spr1_bitmap.pix(y);
+		uint16_t const *const spr2 = &m_spr2_bitmap.pix(y);
+		uint16_t const *const fg = &m_fg_bitmap.pix(y);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			// A0 = big sprite 1 transparent, A1-A2 = big sprite 2 pixel, A3-A5 = FG pixel
+			int const addr = ((spr1[x] == 0xffff) ? 0x01 : 0x00)
+					| (((spr2[x] == 0xffff) ? 0x03 : (spr2[x] & 0x03)) << 1)
+					| (((fg[x] == 0xffff) ? 0x07 : (fg[x] & 0x07)) << 3);
+
+			// Q0-Q1 drive the LS153 selects through links CL2/CL3; Q2-Q3 go to the open links SL2/SL3
+			uint16_t pen;
+			switch (prio[addr] & 0x03)
+			{
+			case 0:  pen = fg[x];   break;
+			case 1:  pen = spr2[x]; break;
+			case 2:  pen = spr1[x]; break;
+			default: pen = 0xffff;  break; // background
+			}
+
+			if (pen != 0xffff)
+				dst[x] = pen;
+		}
+	}
 
 	return 0;
 }
@@ -1955,7 +2000,7 @@ ROM_START( armwrest )
 	ROM_LOAD( "chpv-b.4b",    0x0600, 0x0200, CRC(9d51416e) SHA1(ae933786c5fc19311144b2094305b4253dc8b75b) ) // R (bottom monitor)
 	ROM_LOAD( "chpv-b.4c",    0x0800, 0x0200, CRC(b8a25795) SHA1(8e41baa796fd8f00739a95b2e07066d68193bd76) ) // G
 	ROM_LOAD( "chpv-b.4d",    0x0a00, 0x0200, CRC(474fc3b1) SHA1(9cda1d1626285310524d048b60b1cf89e197a26d) ) // B
-	ROM_LOAD( "chv1-b.3c",    0x0c00, 0x0100, CRC(c3f92ea2) SHA1(1a82cca1b9a8d9bd4a1d121d8c131a7d0be554bc) ) // priority encoder - not used
+	ROM_LOAD( "chv1-b.3c",    0x0c00, 0x0100, CRC(c3f92ea2) SHA1(1a82cca1b9a8d9bd4a1d121d8c131a7d0be554bc) ) // bottom monitor layer priority
 	ROM_LOAD( "chpv-v.2d",    0x0d00, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) ) // timing - not used
 
 	ROM_REGION( 0x4000, "vlm", 0 )
