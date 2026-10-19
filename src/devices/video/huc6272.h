@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsicd.h"
+#include "machine/nscsi_bus.h"
+#include "machine/nscsi_cb.h"
 #include "video/huc6271.h"
 
 
@@ -36,8 +36,6 @@ public:
 	// video output, for the '6261
 	void render_bg_line(int raster, u32 *dest);
 	int rainbow_line(int raster, u32 *dest);
-
-	static void cdrom_config(device_t *device);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -86,6 +84,9 @@ private:
 		bool dma_send = false;
 		bool irq = false;
 		u8 subchannel_ctrl = 0;
+		u8 bus = 0;            // bus control lines as last seen, scsi_bus_signals() layout
+		bool req_last = false; // REQ as of the last req_callback, for edge detection
+		bool req_rose = false; // REQ rose since scsi_lines_changed last ran (sticky)
 	} m_scsi;
 
 	struct dma_t {
@@ -98,6 +99,7 @@ private:
 	} m_dma;
 
 	bool m_in_scsi_update = false;
+	emu_timer *m_scsi_line_timer = nullptr;
 
 	struct rainbow_t {
 		u8 control = 0;
@@ -134,11 +136,8 @@ private:
 	const address_space_config           m_io_space_config;
 	required_shared_ptr<u16>             m_microprg_ram;
 	required_shared_ptr_array<u16, 2>    m_kram_page;
-	required_device<scsi_port_device>    m_scsibus;
-	required_device<input_buffer_device> m_scsi_data_in;
-	required_device<output_latch_device> m_scsi_data_out;
-	required_device<input_buffer_device> m_scsi_ctrl_in;
-	required_device<input_buffer_device> m_scsi_cmd_in;
+	required_device<nscsi_bus_device>      m_scsibus;
+	required_device<nscsi_callback_device> m_scsicb;
 
 	/* Callback for when the irq line may have changed (mandatory) */
 	devcb_write_line    m_irq_changed_cb;
@@ -169,6 +168,9 @@ private:
 	void scsi_set_mode(u8 data);
 	void scsi_update_data_bus();
 	void scsi_req_w(int state);
+	void scsi_line_w(int state);
+	void scsi_req_edge_w(int state);
+	TIMER_CALLBACK_MEMBER(scsi_lines_changed);
 	void scsi_dma_update();
 	void dma_write_byte(u8 data);
 

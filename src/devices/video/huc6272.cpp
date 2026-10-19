@@ -5,13 +5,10 @@
 Hudson/NEC HuC6272 "King" device
 
 TODO:
-- Use NSCSI instead of legacy one;
-\- SEL acknowledges with 0x84, bit 7 controller type is unknown at this time
-  (bit 2 should select the CD drive);
 - SCSI sub-channel register ($08) is a stub;
 - Convert base mapping to address_map;
 - Convert I/O to space address, and make it honor mem_mask;
-- subclass "SCSICD" into SCSI-2 "CD-ROM DRIVE:FX"
+- CD-ROM DRIVE:FX is bus/nscsi/pcfxcd.cpp (KING is SCSI ID 7, the drive ID 2);
   \- Derivative design of PCE drive, which in turn is a derivative of PC-8801-30 (cd drive)
      and PC-8801-31 (interface);
 - BG drawing is done a line at a time, mid-line register changes are not reflected;
@@ -35,6 +32,9 @@ ADPCM related patents:
 
 #include "emu.h"
 #include "huc6272.h"
+
+#include "bus/nscsi/devices.h"
+#include "bus/nscsi/pcfxcd.h"
 
 #include <algorithm>
 
@@ -70,54 +70,41 @@ huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, d
 	, m_microprg_ram(*this, "microprg_ram")
 	, m_kram_page(*this, "kram_page%u", 0U)
 	, m_scsibus(*this, "scsi")
-	, m_scsi_data_in(*this, "scsi_data_in")
-	, m_scsi_data_out(*this, "scsi_data_out")
-	, m_scsi_ctrl_in(*this, "scsi_ctrl_in")
-	, m_scsi_cmd_in(*this, "scsi_cmd_in")
+	, m_scsicb(*this, "scsi:7:scsicb")
 	, m_irq_changed_cb(*this)
 {
 }
 
-void huc6272_device::cdrom_config(device_t *device)
-{
-	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-	// the drive's audio passes through to the HuC6230 line input
-	cdda->add_route(0, "^^", 1.0, 0);
-	cdda->add_route(1, "^^", 1.0, 1);
-}
-
 void huc6272_device::device_add_mconfig(machine_config &config)
 {
-	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
-	scsibus.set_data_input_buffer("scsi_data_in");
-	scsibus.rst_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit7));
-	scsibus.bsy_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit6));
-	scsibus.req_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit5));
-	scsibus.req_handler().append(FUNC(huc6272_device::scsi_req_w));
-	scsibus.msg_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit4));
-	scsibus.cd_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit3));
-	scsibus.io_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit2));
-	scsibus.sel_handler().set("scsi_ctrl_in", FUNC(input_buffer_device::write_bit1));
-
-	scsibus.rst_handler().append("scsi_cmd_in", FUNC(input_buffer_device::write_bit7));
-	scsibus.ack_handler().set("scsi_cmd_in", FUNC(input_buffer_device::write_bit4));
-	scsibus.sel_handler().append("scsi_cmd_in", FUNC(input_buffer_device::write_bit2));
-	scsibus.atn_handler().set("scsi_cmd_in", FUNC(input_buffer_device::write_bit1));
-	scsibus.bsy_handler().append("scsi_cmd_in", FUNC(input_buffer_device::write_bit0));
-
-	output_latch_device &scsiout(OUTPUT_LATCH(config, "scsi_data_out"));
-	scsibus.set_output_latch(scsiout);
-
-	INPUT_BUFFER(config, "scsi_cmd_in");
-	INPUT_BUFFER(config, "scsi_ctrl_in");
-	INPUT_BUFFER(config, "scsi_data_in");
-
-	scsibus.set_slot_device(1, "cdrom", SCSICD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-	scsibus.slot(1).set_option_machine_config("cdrom", cdrom_config);
+	NSCSI_BUS(config, m_scsibus);
+	NSCSI_CONNECTOR(config, "scsi:2").option_set("cdrom", NSCSI_CDROM_PCFX).machine_config(
+		[](device_t *device)
+		{
+			// the drive's audio passes through the KING mixer (this device's two outputs)
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^", 1.0, 1);
+		});
+	NSCSI_CONNECTOR(config, "scsi:7", default_scsi_devices, "scsicb", true)
+		.option_add_internal("scsicb", NSCSI_CB)
+		.machine_config([this](device_t *device)
+		{
+			// the callback device reports every line on any change; scsi_lines_changed() edge-detects
+			nscsi_callback_device &cb = downcast<nscsi_callback_device &>(*device);
+			cb.rst_callback().set(*this, FUNC(huc6272_device::scsi_line_w));
+			cb.bsy_callback().set(*this, FUNC(huc6272_device::scsi_line_w));
+			cb.req_callback().set(*this, FUNC(huc6272_device::scsi_req_edge_w));
+			cb.msg_callback().set(*this, FUNC(huc6272_device::scsi_line_w));
+			cb.cd_callback().set(*this, FUNC(huc6272_device::scsi_line_w));
+			cb.io_callback().set(*this, FUNC(huc6272_device::scsi_line_w));
+			cb.sel_callback().set(*this, FUNC(huc6272_device::scsi_line_w));
+		});
 }
 
 void huc6272_device::device_start()
 {
+	m_scsi_line_timer = timer_alloc(FUNC(huc6272_device::scsi_lines_changed), this);
+
 	save_item(NAME(m_register));
 	save_item(NAME(m_kram_addr_r));
 	save_item(NAME(m_kram_inc_r));
@@ -138,6 +125,9 @@ void huc6272_device::device_start()
 	save_item(STRUCT_MEMBER(m_scsi, dma_send));
 	save_item(STRUCT_MEMBER(m_scsi, irq));
 	save_item(STRUCT_MEMBER(m_scsi, subchannel_ctrl));
+	save_item(STRUCT_MEMBER(m_scsi, bus));
+	save_item(STRUCT_MEMBER(m_scsi, req_last));
+	save_item(STRUCT_MEMBER(m_scsi, req_rose));
 	save_item(STRUCT_MEMBER(m_dma, addr));
 	save_item(STRUCT_MEMBER(m_dma, size));
 	save_item(STRUCT_MEMBER(m_dma, ctrl));
@@ -207,11 +197,12 @@ void huc6272_device::device_reset()
 	m_scsi = scsi_t();
 	m_dma = dma_t();
 	m_in_scsi_update = false;
-	m_scsi_data_out->write(0);
-	m_scsibus->write_atn(0);
-	m_scsibus->write_sel(0);
-	m_scsibus->write_ack(0);
-	m_scsibus->write_rst(0);
+	m_scsicb->write(0);
+	m_scsicb->atn_w(0);
+	m_scsicb->sel_w(0);
+	m_scsicb->ack_w(0);
+	m_scsicb->rst_w(0);
+	m_scsi.bus = scsi_bus_signals();
 	interrupt_update();
 }
 
@@ -402,7 +393,49 @@ void huc6272_device::data_w(offs_t offset, u32 data, u32 mem_mask)
 // RST, BSY, REQ, MSG, C/D, I/O and SEL, same layout as the low byte of status 2
 u8 huc6272_device::scsi_bus_signals()
 {
-	return m_scsi_ctrl_in->read() & 0xfe;
+	const u32 ctrl = m_scsibus->ctrl_r();
+	return
+			((ctrl & nscsi_device_interface::S_RST) ? 0x80 : 0) |
+			((ctrl & nscsi_device_interface::S_BSY) ? 0x40 : 0) |
+			((ctrl & nscsi_device_interface::S_REQ) ? 0x20 : 0) |
+			((ctrl & nscsi_device_interface::S_MSG) ? 0x10 : 0) |
+			((ctrl & nscsi_device_interface::S_CTL) ? 0x08 : 0) |
+			((ctrl & nscsi_device_interface::S_INP) ? 0x04 : 0) |
+			((ctrl & nscsi_device_interface::S_SEL) ? 0x02 : 0);
+}
+
+// any control line callback but REQ; all of them fire on every bus change
+void huc6272_device::scsi_line_w(int state)
+{
+	// KING must not answer REQ from inside the drive's own ctrl_w(S_REQ) call: that would
+	// re-enter nscsi_full_device::step(), and the trailing step(false) in target_send_byte()/
+	// target_recv_byte() would then skip scsi_data_byte_period(), so the transfer would run
+	// unpaced. The reaction is deferred by a zero-time timer instead.
+	m_scsi_line_timer->adjust(attotime::zero);
+}
+
+// REQ callback: REQ can fall and rise again before the deferred handler runs, so the
+// rising edge is latched here.
+void huc6272_device::scsi_req_edge_w(int state)
+{
+	if (state && !m_scsi.req_last)
+		m_scsi.req_rose = true;
+	m_scsi.req_last = state;
+	m_scsi_line_timer->adjust(attotime::zero);
+}
+
+TIMER_CALLBACK_MEMBER(huc6272_device::scsi_lines_changed)
+{
+	const u8 bus = scsi_bus_signals();
+	const u8 changed = bus ^ m_scsi.bus;
+	const bool req_rose = m_scsi.req_rose;
+	m_scsi.bus = bus;
+	m_scsi.req_rose = false;
+
+	if (req_rose || BIT(changed, 5))
+		scsi_req_w(BIT(bus, 5));
+	else if (changed)
+		scsi_dma_update();
 }
 
 bool huc6272_device::scsi_phase_match()
@@ -414,16 +447,16 @@ bool huc6272_device::scsi_phase_match()
 void huc6272_device::scsi_set_ack(bool state)
 {
 	m_scsi.ack = state;
-	m_scsibus->write_ack(state ? 1 : 0);
+	m_scsicb->ack_w(state ? 1 : 0);
 }
 
 // the data bus is only driven when "assert data bus" is set, or by a DMA send
 void huc6272_device::scsi_update_data_bus()
 {
 	if (m_scsi.dma_send)
-		m_scsi_data_out->write(m_scsi.data_cache);
+		m_scsicb->write(m_scsi.data_cache);
 	else
-		m_scsi_data_out->write(BIT(m_scsi.ctrl, 0) ? m_scsi.data : 0);
+		m_scsicb->write(BIT(m_scsi.ctrl, 0) ? m_scsi.data : 0);
 }
 
 void huc6272_device::scsi_req_w(int state)
@@ -480,7 +513,7 @@ void huc6272_device::scsi_dma_update()
 				if (!m_scsi.drq)
 				{
 					m_scsi.drq = true;
-					m_scsi.data_cache = m_scsi_data_in->read();
+					m_scsi.data_cache = m_scsicb->read();
 					if (BIT(m_dma.ctrl, 0))
 					{
 						m_scsi.drq = false;
@@ -516,7 +549,7 @@ void huc6272_device::scsi_dma_update()
 
 u32 huc6272_device::scsi_data_r(offs_t offset)
 {
-	return m_scsi_data_in->read();
+	return m_scsicb->read();
 }
 
 void huc6272_device::scsi_data_w(offs_t offset, u32 data, u32 mem_mask)
@@ -560,12 +593,12 @@ void huc6272_device::scsi_ctrl_w(offs_t offset, u32 data, u32 mem_mask)
 	else
 	{
 		m_scsi.ctrl = data & 0x97;
-		m_scsibus->write_atn(BIT(data, 1));
-		m_scsibus->write_sel(BIT(data, 2));
+		m_scsicb->atn_w(BIT(data, 1));
+		m_scsicb->sel_w(BIT(data, 2));
 		scsi_set_ack(BIT(data, 4));
 	}
 	scsi_update_data_bus();
-	m_scsibus->write_rst(BIT(data, 7));
+	m_scsicb->rst_w(BIT(data, 7));
 	scsi_dma_update();
 }
 
@@ -645,9 +678,9 @@ u32 huc6272_device::scsi_bus_r(offs_t offset, u32 mem_mask)
 	u32 res = 0;
 	if (ACCESSING_BITS_0_15)
 	{
-		const u8 cmd = m_scsi_cmd_in->read();
-		res |= BIT(cmd, 4) ? 0x01 : 0;
-		res |= BIT(cmd, 1) ? 0x02 : 0;
+		// KING is the only initiator, so the bus ACK and ATN are its own outputs
+		res |= m_scsi.ack ? 0x01 : 0;
+		res |= BIT(m_scsi.ctrl, 1) ? 0x02 : 0;
 		if ((m_scsi.dma_receive || m_scsi.dma_send) && m_scsi.drq)
 			res |= 0x40;
 		if (!m_dma.irq && m_scsi.irq)
