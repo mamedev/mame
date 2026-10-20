@@ -368,7 +368,7 @@ void menu_add_change_folder::custom_render(uint32_t flags, void *selectedref, fl
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - tb_border(),
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
-			ui().colors().text_color(), UI_GREEN_COLOR);
+			ui().colors().colored_text_color(), ui().colors().accent_color());
 
 	// bottom text
 	char const *const bottomtext[] = { _("Press TAB to set") };
@@ -568,7 +568,7 @@ void menu_display_actual::custom_render(uint32_t flags, void *selectedref, float
 			std::begin(m_heading), std::end(m_heading),
 			0.5f * (1.0f - maxwidth), 0.5f * (1.0f + maxwidth), origy1 - top, origy1 - top + line_height() + (2.0f * tb_border()),
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-			ui().colors().text_color(), UI_GREEN_COLOR);
+			ui().colors().colored_text_color(), ui().colors().accent_color());
 }
 
 } // anonymous namespace

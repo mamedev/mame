@@ -825,7 +825,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 					warning_text = machine_info().warnings_string();
 					warning_text.append(_("\n\nPress any key to continue"));
 					set_handler(ui_callback_type::MODAL, handler_callback_func(handler_messagebox_anykey));
-					warning_color = machine_info().warnings_color();
+					warning_color = machine_info().warnings_color(m_ui_colors);
 				}
 			}
 			break;
@@ -2721,6 +2721,43 @@ void mame_ui_manager::load_ui_options()
 			osd_printf_error("**Error loading ui.ini**\n");
 		}
 	}
+
+
+	auto const valid_palette = [] (char const *value)
+	{
+		return value && (!strcmp(value, "dark") || !strcmp(value, "light")
+				|| !strcmp(value, "solarized-dark") || !strcmp(value, "solarized-light")
+				|| !strcmp(value, "classic"));
+	};
+	// Migrate a legacy color configuration that lacks an explicit palette.
+	core_options::entry::shared_const_ptr palette_entry(options().get_entry(OPTION_UI_PALETTE));
+	char const *const palette(palette_entry ? palette_entry->value() : nullptr);
+	bool const explicit_palette(
+			palette_entry
+			&& (OPTION_PRIORITY_DEFAULT < palette_entry->priority())
+			&& valid_palette(palette));
+	if (!explicit_palette)
+	{
+		// A legacy file without an explicit palette keeps its role colors;
+		// the palette selector itself defaults to Classic.
+		options().set_value(OPTION_UI_PALETTE, "classic", OPTION_PRIORITY_MAME_INI);
+	}
+
+	char const *const effective_palette(explicit_palette ? palette : "classic");
+	if (!strcmp(effective_palette, "classic"))
+	{
+		// Replace only those exact generated defaults; keep deliberate edits.
+		auto migrate_classic_default = [this](char const *option, char const *old_value, char const *new_value)
+		{
+			core_options::entry::shared_const_ptr const entry(options().get_entry(option));
+			if (entry && !strcmp(entry->value(), old_value))
+				options().set_value(option, new_value, OPTION_PRIORITY_MAME_INI);
+		};
+		migrate_classic_default(OPTION_UI_FOCUS_BG_COLOR, "ef808000", "ffffffff");
+		migrate_classic_default(OPTION_UI_FOCUS_OUTLINE_COLOR, "ffffffff", "ff2b2b2b");
+		migrate_classic_default(OPTION_UI_FOCUS_GRADIENT_TOP, "ef808000", "ff00a9ff");
+		migrate_classic_default(OPTION_UI_FOCUS_GRADIENT_BOTTOM, "ef000000", "ff002782");
+	}
 }
 
 //-------------------------------------------------
@@ -2872,22 +2909,248 @@ std::string mame_ui_manager::get_general_input_setting(ioport_type type, int pla
 }
 
 
+namespace
+{
+
+//-------------------------------------------------
+//  built-in palettes - canonical token sources
+//  expanded into shared semantic roles
+//-------------------------------------------------
+
+enum palette_token : uint8_t
+{
+	TOKEN_BASE03,
+	TOKEN_BASE02,
+	TOKEN_BASE01,
+	TOKEN_BASE00,
+	TOKEN_BASE0,
+	TOKEN_BASE1,
+	TOKEN_BASE2,
+	TOKEN_BASE3,
+	TOKEN_YELLOW,
+	TOKEN_ORANGE,
+	TOKEN_RED,
+	TOKEN_MAGENTA,
+	TOKEN_VIOLET,
+	TOKEN_BLUE,
+	TOKEN_CYAN,
+	TOKEN_GREEN,
+	TOKEN_COUNT
+};
+
+struct theme_palette
+{
+	std::array<rgb_t, TOKEN_COUNT> tokens;
+};
+
+theme_palette const s_classic_palette =
+{
+	{
+		rgb_t(0xef808000U), rgb_t(0xef101030U), rgb_t(0x70404000U), rgb_t(0xb0606000U),
+		rgb_t(0xff808080U), rgb_t(0xff808080U), rgb_t(0xffffffffU), rgb_t(0xffffff00U),
+		rgb_t(0xffffff00U), rgb_t(0xefcc7a28U), rgb_t(0xefb20000U), rgb_t(0xef8a2b8aU),
+		rgb_t(0xffc0c0c0U), rgb_t(0xef12477bU), rgb_t(0xff00a9ffU), rgb_t(0xef0a660aU)
+	},
+};
+theme_palette const s_dark_palette =
+{
+	{
+		rgb_t(0xef202020U), rgb_t(0xcc101010U), rgb_t(0x70404040U), rgb_t(0xb0505050U),
+		rgb_t(0xffe0e0e0U), rgb_t(0xffe0e0e0U), rgb_t(0xfff0f0f0U), rgb_t(0xfff8f8f8U),
+		rgb_t(0xeff0d060U), rgb_t(0xefedc45bU), rgb_t(0xefef6a6aU), rgb_t(0xefb05a9aU),
+		rgb_t(0xffb0b0b0U), rgb_t(0xef3f82c0U), rgb_t(0xef5aa9e6U), rgb_t(0xef64c466U)
+	},
+};
+
+theme_palette const s_light_palette =
+{
+	{
+		rgb_t(0xeff0f0f0U), rgb_t(0xccffffffU), rgb_t(0x70d8e8f8U), rgb_t(0xb0d0d0d0U),
+		rgb_t(0xff707070U), rgb_t(0xff707070U), rgb_t(0xff202020U), rgb_t(0xff102040U),
+		rgb_t(0xefb87a00U), rgb_t(0xef9a6200U), rgb_t(0xef9a2020U), rgb_t(0xef6f4a8fU),
+		rgb_t(0xff404040U), rgb_t(0xef286aa0U), rgb_t(0xef12477bU), rgb_t(0xef087f3fU)
+	},
+};
+
+theme_palette const s_solarized_dark_palette =
+{
+	{
+		rgb_t(0xff073642U), rgb_t(0xcc002b36U), rgb_t(0xff586e75U), rgb_t(0xff657b83U),
+		rgb_t(0xff839496U), rgb_t(0xff839496U), rgb_t(0xff93a1a1U), rgb_t(0xffeee8d5U),
+		rgb_t(0xffb58900U), rgb_t(0xffcb4b16U), rgb_t(0xffdc322fU), rgb_t(0xffd33682U),
+		rgb_t(0xff6c71c4U), rgb_t(0xff268bd2U), rgb_t(0xff2aa198U), rgb_t(0xff859900U)
+	},
+};
+
+theme_palette const s_solarized_light_palette =
+{
+	{
+		rgb_t(0xffeee8d5U), rgb_t(0xccfdf6e3U), rgb_t(0xff93a1a1U), rgb_t(0xff839496U),
+		rgb_t(0xff657b83U), rgb_t(0xff657b83U), rgb_t(0xff586e75U), rgb_t(0xff073642U),
+		rgb_t(0xffb58900U), rgb_t(0xffcb4b16U), rgb_t(0xffdc322fU), rgb_t(0xffd33682U),
+		rgb_t(0xff6c71c4U), rgb_t(0xff268bd2U), rgb_t(0xff2aa198U), rgb_t(0xff859900U)
+	},
+};
+ui_colors::semantic_colors expand_palette(std::array<ui_colors::palette_color, 16> const &tokens, ui_colors::palette_family family)
+{
+	auto const token = [&tokens](palette_token index) { return tokens[index].value; };
+	bool const is_legacy(family == ui_colors::palette_family::CLASSIC);
+	palette_token const selected_background(TOKEN_BASE03);
+	palette_token const hover_background(TOKEN_BASE01);
+	palette_token const pressed_background(TOKEN_BASE00);
+	palette_token const unavailable_token = is_legacy ? TOKEN_BASE0 : TOKEN_BASE00;
+	palette_token const muted_token(TOKEN_BASE1);
+	palette_token const subitem_token = is_legacy ? TOKEN_BASE2 : TOKEN_BASE1;
+	palette_token const surface_foreground(TOKEN_BASE2);
+	palette_token const colored_text = is_legacy ? TOKEN_BASE2 : TOKEN_BASE3;
+	rgb_t const surface_background(is_legacy ? rgb_t(0xef000000U) : token(TOKEN_BASE02));
+	rgb_t const overlay_color(is_legacy ? rgb_t(0x72000000U) : token(TOKEN_BASE02));
+	palette_token const selected_foreground(TOKEN_YELLOW);
+	palette_token const accent_token = is_legacy ? TOKEN_GREEN : TOKEN_CYAN;
+	palette_token const toolbar_token = is_legacy ? TOKEN_BLUE : TOKEN_CYAN;
+	rgb_t const focus_outline(is_legacy ? rgb_t(0xff2b2b2bU) : token(surface_foreground));
+	rgb_t const focus_gradient_top(is_legacy ? token(TOKEN_CYAN) : token(selected_background));
+	rgb_t const focus_gradient_bottom(is_legacy ? rgb_t(0xff002782U) : token(TOKEN_BASE02));
+	ui_colors::color_pair const surface{ token(surface_foreground), surface_background };
+	ui_colors::color_pair const selected{ token(selected_foreground), token(selected_background) };
+	ui_colors::color_pair const hover{ token(selected_foreground), token(hover_background) };
+	ui_colors::color_pair const pressed{ token(selected_foreground), token(pressed_background) };
+	return {
+			surface, selected, hover, pressed, selected,
+			token(subitem_token), token(muted_token), token(surface_foreground), token(TOKEN_BASE02),
+			token(TOKEN_CYAN), token(unavailable_token), token(surface_foreground), token(TOKEN_BASE02), token(muted_token),
+			token(colored_text), token(accent_token), token(toolbar_token), token(TOKEN_GREEN), token(TOKEN_ORANGE), token(TOKEN_RED),
+			focus_outline, focus_gradient_top, focus_gradient_bottom, overlay_color
+	};
+}
+std::array<ui_colors::palette_color, 16> make_palette_colors(theme_palette const &palette, ui_colors::palette_family family, bool light)
+{
+	static char const * const ids[TOKEN_COUNT] = {
+		"base03", "base02", "base01", "base00", "base0", "base1", "base2", "base3",
+		"yellow", "orange", "red", "magenta", "violet", "blue", "cyan", "green"
+	};
+	static char const * const classic_names[TOKEN_COUNT] = {
+		N_("Olive"), N_("Black"), N_("Dark Olive"), N_("Brown"), N_("Gray"), N_("Gray"), N_("White"), N_("Bright Yellow"),
+		N_("Yellow"), N_("Orange"), N_("Red"), N_("Magenta"), N_("Light Gray"), N_("Dark Blue"), N_("Light Blue"), N_("Green")
+	};
+	static char const * const compact_dark_names[TOKEN_COUNT] = {
+		N_("Near Black"), N_("Black"), N_("Transparent Dark Gray"), N_("Transparent Gray"), N_("Light Gray"), N_("Light Gray"), N_("Near White"), N_("Off White"),
+		N_("Light Yellow"), N_("Yellow"), N_("Light Red"), N_("Light Purple"), N_("Gray"), N_("Blue"), N_("Light Blue"), N_("Light Green"),
+	};
+	static char const * const compact_light_names[TOKEN_COUNT] = {
+		N_("Light Gray"), N_("White"), N_("Transparent Light Blue"), N_("Transparent Gray"), N_("Gray"), N_("Gray"), N_("Dark Gray"), N_("Dark Blue"),
+		N_("Gold"), N_("Brown"), N_("Dark Red"), N_("Purple"), N_("Dark Gray"), N_("Blue"), N_("Dark Blue"), N_("Dark Green")
+	};
+	static char const * const solarized_names[TOKEN_COUNT] = {
+		N_("base03"), N_("base02"), N_("base01"), N_("base00"), N_("base0"), N_("base1"), N_("base2"), N_("base3"),
+		N_("yellow"), N_("orange"), N_("red"), N_("magenta"), N_("violet"), N_("blue"), N_("cyan"), N_("green")
+	};
+	char const * const *names = family == ui_colors::palette_family::CLASSIC
+			? classic_names
+			: family == ui_colors::palette_family::SOLARIZED
+			? solarized_names
+			: (light ? compact_light_names : compact_dark_names);
+	std::array<ui_colors::palette_color, 16> result;
+	for (uint8_t i = 0; i < TOKEN_COUNT; ++i)
+		result[i] = { ids[i], names[i], palette.tokens[i] };
+	return result;
+}
+std::array<ui_colors::palette_definition, 5> const s_predefined_palettes = {{
+	{ "classic", N_("Classic"), ui_colors::palette_family::CLASSIC, make_palette_colors(s_classic_palette, ui_colors::palette_family::CLASSIC, false) },
+	{ "dark", N_("Dark"), ui_colors::palette_family::COMPACT, make_palette_colors(s_dark_palette, ui_colors::palette_family::COMPACT, false) },
+	{ "light", N_("Light"), ui_colors::palette_family::COMPACT, make_palette_colors(s_light_palette, ui_colors::palette_family::COMPACT, true) },
+	{ "solarized-dark", N_("Solarized Dark"), ui_colors::palette_family::SOLARIZED, make_palette_colors(s_solarized_dark_palette, ui_colors::palette_family::SOLARIZED, false) },
+	{ "solarized-light", N_("Solarized Light"), ui_colors::palette_family::SOLARIZED, make_palette_colors(s_solarized_light_palette, ui_colors::palette_family::SOLARIZED, true) }
+}};
+
+} // anonymous namespace
+
+
+std::array<ui_colors::palette_definition, 5> const &ui_colors::predefined_palettes()
+{
+	return s_predefined_palettes;
+}
+
+
+//-------------------------------------------------
+//  load_palette - load a predefined palette by ID
+//-------------------------------------------------
+
+bool ui_colors::load_palette(char const *palette)
+{
+	palette_definition const *definition(nullptr);
+	for (palette_definition const &candidate : predefined_palettes())
+	{
+		if (!strcmp(palette, candidate.id))
+		{
+			definition = &candidate;
+			break;
+		}
+	}
+	if (!definition)
+		return false;
+
+	m_palette_colors = definition->colors;
+
+	semantic_colors const colors(expand_palette(definition->colors, definition->family));
+	m_normal = colors.normal;
+	m_selected = colors.selected;
+	m_mouseover = colors.mouseover;
+	m_mousedown = colors.mousedown;
+	m_focus = colors.focus;
+	m_subitem_color = colors.subitem;
+	m_clone_color = colors.clone;
+	m_border_color = colors.border;
+	m_background_color = colors.background;
+	m_dipsw_color = colors.dipsw;
+	m_unavailable_color = colors.unavailable;
+	m_slider_color = colors.slider;
+	m_gfxviewer_bg_color = colors.gfxviewer_background;
+	m_config_deemphasized_color = colors.config_deemphasized;
+	m_colored_text_color = colors.colored_text;
+	m_accent_color = colors.accent;
+	m_selection_toolbar_color = colors.selection_toolbar;
+	m_status_good_color = colors.status_good;
+	m_status_warning_color = colors.status_warning;
+	m_status_error_color = colors.status_error;
+	m_focus_outline_color = colors.focus_outline;
+	m_focus_gradient_top = colors.focus_gradient_top;
+	m_focus_gradient_bottom = colors.focus_gradient_bottom;
+	m_overlay_color = colors.overlay;
+
+	return true;
+}
+
+
+//-------------------------------------------------
+//  refresh - load the effective palette from the
+//  UI options
+//-------------------------------------------------
+
 void ui_colors::refresh(const ui_options &options)
 {
+	load_palette(options.palette());
+
+	m_normal = { options.text_color(), options.text_bg_color() };
+	m_selected = { options.selected_color(), options.selected_bg_color() };
+	m_mouseover = { options.mouseover_color(), options.mouseover_bg_color() };
+	m_mousedown = { options.mousedown_color(), options.mousedown_bg_color() };
+	m_focus = { options.focus_color(), options.focus_bg_color() };
 	m_border_color = options.border_color();
 	m_background_color = options.background_color();
 	m_gfxviewer_bg_color = options.gfxviewer_bg_color();
 	m_unavailable_color = options.unavailable_color();
-	m_text_color = options.text_color();
-	m_text_bg_color = options.text_bg_color();
 	m_subitem_color = options.subitem_color();
 	m_clone_color = options.clone_color();
-	m_selected_color = options.selected_color();
-	m_selected_bg_color = options.selected_bg_color();
-	m_mouseover_color = options.mouseover_color();
-	m_mouseover_bg_color = options.mouseover_bg_color();
-	m_mousedown_color = options.mousedown_color();
-	m_mousedown_bg_color = options.mousedown_bg_color();
 	m_dipsw_color = options.dipsw_color();
 	m_slider_color = options.slider_color();
+	m_accent_color = options.accent_color();
+	m_status_good_color = options.status_good_color();
+	m_status_warning_color = options.status_warning_color();
+	m_status_error_color = options.status_error_color();
+	m_config_deemphasized_color = options.config_deemphasized_color();
+	m_focus_outline_color = options.focus_outline_color();
+	m_focus_gradient_top = options.focus_gradient_top();
+	m_focus_gradient_bottom = options.focus_gradient_bottom();
+	m_overlay_color = options.overlay_color();
 }

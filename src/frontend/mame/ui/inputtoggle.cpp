@@ -78,6 +78,7 @@ void menu_input_toggles::populate()
 			// choose the display name for the value
 			char const *setting;
 			u32 flags = 0U;
+			menu_item_color_state state(menu_item_color_state::NORMAL);
 			if (!field.get().settings().empty())
 			{
 				setting = field.get().setting_name();
@@ -89,16 +90,18 @@ void menu_input_toggles::populate()
 			else if (field.get().defvalue() == field.get().live().value)
 			{
 				setting = _("Off");
+				state = menu_item_color_state::OFF;
 				flags = FLAG_RIGHT_ARROW;
 			}
 			else
 			{
 				setting = _("On");
+				state = menu_item_color_state::ON;
 				flags = FLAG_LEFT_ARROW;
 			}
 
 			// actually create the item
-			item_append(field.get().name(), setting, flags, &field);
+			item_append(field.get().name(), setting, flags, &field, menu_item_type::UNKNOWN, state);
 		}
 	}
 
