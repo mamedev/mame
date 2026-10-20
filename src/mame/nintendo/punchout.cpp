@@ -1333,16 +1333,19 @@ void punchout_state::punchout(machine_config &config)
 	// CHP1-VIDEO and CHV1-VIDEO timing (shared by both monitors): 20.16 MHz / 4 dot clock; the H counter
 	// (2E/3E) reloads with 0x00 and 0xba on alternate passes, giving 326 dots per line; the V counter (8U/8T)
 	// advances on every second EQ pulse from timing PROM 2D (two per line), and its reload adds one EQ period,
-	// giving 256.5 lines per frame (rounded up here); vblank (7U) is from V = 240 to V = 15
+	// giving 256.5 lines per frame (rounded up here). The picture is blanked while /VB (7U) is low, from count
+	// 240 to count 15, but /VB changes mid-line and the layers use the count latched by 8V at the start of each
+	// horizontal blank, so the lines shown are 15-238 (on every other frame, line 15 only from dot 102 and
+	// line 239 only up to dot 101)
 	screen_device &top(SCREEN(config, "top"));
-	top.set_raw(XTAL(20'160'000) / 4, 326, 0, 256, 257, 16, 240);
+	top.set_raw(XTAL(20'160'000) / 4, 326, 0, 256, 257, 15, 239);
 	top.set_screen_update(FUNC(punchout_state::screen_update_top));
 	top.set_palette(m_palette);
 	top.screen_vblank().set(FUNC(punchout_state::vblank_irq));
 	top.screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	screen_device &bottom(SCREEN(config, "bottom"));
-	bottom.set_raw(XTAL(20'160'000) / 4, 326, 0, 256, 257, 16, 240);
+	bottom.set_raw(XTAL(20'160'000) / 4, 326, 0, 256, 257, 15, 239);
 	bottom.set_screen_update(FUNC(punchout_state::screen_update_bottom));
 	bottom.set_palette(m_palette);
 
