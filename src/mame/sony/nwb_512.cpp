@@ -510,17 +510,15 @@ void nwb_512_device::rop_cycle(uint16_t data)
 {
 	if (m_state.prime_pending)
 	{
-		// If the source row has more data than the dest row, all we need to do is prime the shifter so carry is correct.
-		// After this, the source and destination counts will be aligned.
-		logerror("Applying primed extra read!\n");
+		// If the source is ahead of the destination (in the scan direction), we need to prime the shifter so carry is correct.
 		shift(data);
 		m_state.prime_pending = false;
 		m_state.advance_sxa();
 
 		if (m_state.source_words_left == 0 && m_state.dest_words_left > 0)
 		{
-			// In this case, the prime has to be written directly, because we had only one word left
-			// from the source but it had to be shifted to account for the phase.
+			// In this case, the prime has to be written directly, because the row consisted of one source word and one destination word
+			// which still triggers the priming mechanism (/PRED, set when), as the applied shift is still needed to align the source data properly.
 			rop(m_state.carry);
 		}
 
@@ -571,8 +569,8 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 
 	if (m_state.prime_pending)
 	{
-		// If the source row has more data than the dest row, prime the shifter
-		// After this, the source and destination counts will be aligned.
+		// If the source row's coordinate is greater (or less when reverse), prime the shifter,
+		// because two initial reads are needed. After this, the source and destination counts will be aligned.
 		logerror("Applying primed extra read!\n");
 		word = coordinate_to_data(m_state.current_source_x, m_state.source_y);
 		shift(word);
@@ -644,7 +642,7 @@ void nwb_512_device::start_operation()
 
 	m_state.source_words_left = m_state.source_words_per_row;
 	m_state.dest_words_left = m_state.dest_words_per_row;
-	LOG("Source words per row: %d, Destination words per row: %d, priming required = %s\n", m_state.source_words_per_row, m_state.dest_words_per_row, m_state.prime ? "yes" : "no");
+	LOGMASKED(LOG_OP, "start_operation: Source words per row: %d, Destination words per row: %d, priming required = %s\n", m_state.source_words_per_row, m_state.dest_words_per_row, m_state.prime ? "yes" : "no");
 
 	// If writing to the framebuffer, update masks to preserve bits that shouldn't be modified
 	if (m_state.fb_write)
