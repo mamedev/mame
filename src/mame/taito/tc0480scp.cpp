@@ -802,8 +802,8 @@ void tc0480scp_device::bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		int x_index = sx - ((m_bgscroll_ram[layer][row_index] << 16)) - ((m_bgscroll_ram[layer][row_index + 0x800] << 8) & 0xffff);
 
-		/* flawed calc ?? */
-		x_index -= (m_x_offset - 0x1f + layer * 4) * ((row_zoom & 0xff) << 8);
+		/* rescale the x_offset origin term by the row zoom so zoomed rows keep the same origin as unzoomed ones */
+		x_index -= (m_x_offset - 15 - layer * 4) * ((row_zoom & 0xff) << 8);
 
 		/* We used to kludge 270 multiply factor, before adjusting x_index instead */
 

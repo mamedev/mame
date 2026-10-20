@@ -217,7 +217,8 @@ class sci_state : public taitoz_z80_sound_state
 {
 public:
 	sci_state(const machine_config &mconfig, device_type type, const char *tag) :
-		taitoz_z80_sound_state(mconfig, type, tag)
+		taitoz_z80_sound_state(mconfig, type, tag),
+		m_sprphase(1)
 	{
 	}
 
@@ -237,6 +238,7 @@ private:
 	void sci_spriteframe_w(u16 data);
 
 	INTERRUPT_GEN_MEMBER(sci_interrupt);
+	void racingb_scp_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void sci_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs);
 	u32 screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -250,6 +252,10 @@ private:
 	int        m_sci_spriteframe = 0;
 	s32        m_sci_int6 = 0;
 	emu_timer *m_int6_timer = nullptr;
+
+	/* displayed copy of the sprite list, latched on spriteframe edges */
+	std::unique_ptr<u16[]> m_spritebuf_display;
+	int m_sprphase;
 };
 
 
