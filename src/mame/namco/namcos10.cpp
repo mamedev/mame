@@ -1973,16 +1973,10 @@ void namcos10_memn_state::ns10_dicerom(machine_config &config)
 		[] (int iv) -> uint64_t
 		{
 			constexpr uint64_t values[16]{
-				0x00000000a7409cc4ULL, 0x000000009ce04a6cULL,
-				0x0000000078a4971cULL, 0x00000000d064ca6cULL,
-				0x000000002a205184ULL, 0x000000000f80c1b4ULL,
-				0x000000005d04072cULL, 0x0000000066a4d184ULL,
-				0x00000000ebc41cc4ULL, 0x00000000ce648cf4ULL,
-				0x00000000b940da5cULL, 0x0000000082e00cf4ULL,
-				0x00000000430441b4ULL, 0x000000001180872cULL,
-				0x000000003420171cULL, 0x00000000f5c45a5cULL,
+				0xa7409cc4, 0x9ce04a6c, 0x78a4971c, 0xd064ca6c, 0x2a205184, 0x0f80c1b4, 0x5d04072c, 0x66a4d184,
+				0xebc41cc4, 0xce648cf4, 0xb940da5c, 0x82e00cf4, 0x430441b4, 0x1180872c, 0x3420171c, 0xf5c45a5c,
 			};
-			return values[iv & 0x0f];
+			return values[iv];
 		},
 	});
 }
