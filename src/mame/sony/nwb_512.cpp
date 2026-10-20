@@ -214,30 +214,14 @@ void nwb_512_device::check_operation_start(offs_t offset)
 
 	start_operation();
 
-	// TODO: This executes copies immediately, faster than real hardware.
-	// It also doesn't use the proper registers
-	if (m_state.fb_read && m_state.fb_write)
+	// TODO: This executes copies immediately, faster than real hardware
+	if (m_state.is_fb_to_fb())
 	{
-		uint16_t source_x = m_state.source_x;
-		uint16_t source_y = m_state.source_y;
-
 		while (m_state.busy)
 		{
-			const uint16_t source_data = coordinate_to_data(source_x, source_y);
-
-			const uint16_t destination_y_snapshot = m_state.destination_y; // if the row is advanced, we need to reset the source - TODO: should this be in end_row?
-			LOGMASKED(LOG_ROP, "ROP for sx = 0x%x sy = 0x%x data = 0x%x\n", source_x, source_y, source_data);
-			rop_cycle(source_data); // When the ROP is done, this function will clear m_state.busy
-
-			if (m_state.destination_y != destination_y_snapshot)
-			{
-				source_x = m_state.source_x;
-				source_y += m_state.y_direction ? 1 : -1;
-			}
-			else
-			{
-				source_x += m_state.x_direction ? 16 : -16;
-			}
+			const uint16_t source_data = coordinate_to_data(m_state.current_source_x, m_state.source_y);
+			LOGMASKED(LOG_ROP, "fb->fb: sx = 0x%x sy = 0x%x data = 0x%x\n", m_state.source_x, m_state.source_y, source_data);
+			rop_cycle(source_data); // When the ROP is done, this will clear m_state.busy
 		}
 	}
 }
@@ -504,7 +488,7 @@ void nwb_512_device::rop(uint16_t source)
 
 	// Advance ROCC state
 	m_state.advance_dxa();
-	--m_state.dest_words_left;
+	m_state.advance_sxa();
 }
 
 void nwb_512_device::end_row()
@@ -542,7 +526,7 @@ void nwb_512_device::rop_cycle(uint16_t data)
 		logerror("Applying primed extra read!\n");
 		shift(data);
 		m_state.prime_pending = false;
-		--m_state.source_words_left;
+		m_state.advance_sxa();
 
 		if (m_state.source_words_left == 0 && m_state.dest_words_left > 0)
 		{
@@ -562,7 +546,6 @@ void nwb_512_device::rop_cycle(uint16_t data)
 
 	data = shift(data);
 	rop(data);
-	m_state.source_words_left--;
 
 	if (m_state.source_words_left == 0 && m_state.dest_words_left > 0)
 	{
@@ -616,7 +599,7 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 	// Advance ROCC state
 	m_state.advance_sxa();
 	m_state.advance_dxa();
-	--m_state.dest_words_left;
+
 	LOG("  fifo_r: advanced source to %d, destination to %d, and there are %d words left\n", m_state.current_source_x, m_state.current_destination_x, m_state.dest_words_left);
 
 	if (m_state.dest_words_left == 0)

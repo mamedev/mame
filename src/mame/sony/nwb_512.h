@@ -110,11 +110,13 @@ private:
 		void advance_sxa()
 		{
 			current_source_x += x_direction ? 16 : -16;
+			--source_words_left;
 		}
 
 		void advance_dxa()
 		{
 			current_destination_x += x_direction ? 16 : -16;
+			--dest_words_left;
 		}
 
 		void advance_sya()
@@ -135,7 +137,6 @@ private:
 
 	} m_state;
 
-	// TODO: split by what is mapped and what is a helper
 	void destination_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void source_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void limit_w(offs_t offset, uint16_t data, uint16_t mem_mask);
