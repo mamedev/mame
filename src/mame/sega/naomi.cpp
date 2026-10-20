@@ -2052,6 +2052,32 @@ static INPUT_PORTS_START( crackndj )
 	PORT_BIT( 0xff00, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(50) PORT_PLAYER(2) PORT_NAME("Turntable R")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dygolf )
+	PORT_INCLUDE( naomi_mie )
+
+	PORT_START("TILT")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
+	// Up / Down buttons labeled with "⚪ 📹" / "📹 ⚪" respectively, where circle is a golf ball.
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Up Button")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Down Button")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Left Button")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Right Button")
+	PORT_BIT( 0x43ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("R0")
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
+
+	PORT_START("R1")
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_REVERSE PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( monkeyba )
 	PORT_INCLUDE( naomi_mie )
 
@@ -2997,6 +3023,18 @@ void naomi_state::naomim1_anpanman2(machine_config &config)
 }
 
 /*
+ * Naomi M1 Shootout Pool Prize
+ */
+
+void naomi_state::naomim1_shootpl(machine_config &config)
+{
+	naomim1_hop(config);
+
+	sega_837_13938_device &sega938(SEGA_837_13938(config, "837_13938", "mie"));
+	sega938.set_rotary_tags("R0", "R1", "R2", "R3");
+}
+
+/*
  * Naomi M2 with Keyboard controllers
  */
 
@@ -3100,6 +3138,30 @@ void naomi_state::naomim2_smarinef(machine_config &config)
 	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", "mie"));
 	sega837.set_port_tags("TILT", "P1", "P2", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "OUTPUT");
 	sega837.set_analog_bits(0);
+
+	sega_837_13938_device &sega938(SEGA_837_13938(config, "837_13938", "mie"));
+	sega938.set_rotary_tags("R0", "R1", "R2", "R3");
+}
+
+/*
+ * Naomi GD Dynamite Golf
+ */
+
+void naomi_state::naomigd_dygolf(machine_config &config)
+{
+	naomigd(config);
+
+	sega_837_13938_device &sega938(SEGA_837_13938(config, "837_13938", "mie"));
+	sega938.set_rotary_tags("R0", "R1", "R2", "R3");
+}
+
+/*
+ * Naomi M2 Dynamite Golf prototype
+ */
+
+void naomi_state::naomim2_dygolfp(machine_config &config)
+{
+	naomim2(config);
 
 	sega_837_13938_device &sega938(SEGA_837_13938(config, "837_13938", "mie"));
 	sega938.set_rotary_tags("R0", "R1", "R2", "R3");
@@ -11559,7 +11621,7 @@ void naomi_state::init_hotd2()
 /* 0122    */ GAME( 2003, shorsepl,  shorsep,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress (live, Rev A)", GAME_FLAGS )
 /* 0123    */ GAME( 2003, shorsep,   naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT270,"Sega", "Star Horse Progress (satellite, Rev A)", GAME_FLAGS )
 /* 0126    */ GAME( 2003, oinori,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Oinori-daimyoujin Matsuri", GAME_FLAGS )
-/* 0128    */ GAME( 2003, shootpl,   naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan, Rev A)", GAME_FLAGS )
+/* 0128    */ GAME( 2003, shootpl,   naomi,    naomim1_shootpl, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan, Rev A)", GAME_FLAGS )
 /* 0130    */ GAME( 2002, hopper,    naomi,    naomi,   naomi,   naomi_state, init_naomi,   ROT0, "Sega", "SWP Hopper Board", GAME_FLAGS )
 /* 0132    */ GAME( 2003, mushi2k3,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2003 Second (Japan)", GAME_FLAGS )
 /* 0136    */ GAME( 2004, shootplm,  naomi,    naomim1_hop, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Shootout Pool Prize (Export) / Shootout Pool The Medal (Japan) Version B", GAME_FLAGS ) // Build: 23 Jan 2004
@@ -11599,7 +11661,7 @@ void naomi_state::init_hotd2()
 // 0xxx Star Horse 2002 (whole set)
 
 /* Cartridge prototypes of games released on GD-ROM */
-/* none */ GAME( 2001, dygolfp,   dygolf,   naomim2, naomi, naomi_state, init_naomi, ROT0, "Sega", "Virtua Golf / Dynamic Golf (prototype)", GAME_FLAGS )
+/* none */ GAME( 2001, dygolfp,   dygolf,   naomim2_dygolfp, dygolf, naomi_state, init_naomi, ROT0, "Sega", "Virtua Golf / Dynamic Golf (prototype)", GAME_FLAGS )
 /* none */ GAME( 2003, puyofevp,  puyofev,  naomim1, naomi, naomi_state, init_naomi, ROT0, "Sega", "Puyo Puyo Fever (prototype ver 0.01)", GAME_FLAGS )
 /* none */ GAME( 2001, vathletep, vathlete, naomim2, naomi, naomi_state, init_naomi, ROT0, "Sega", "Virtua Athletics / Virtua Athlete (prototype)", GAME_FLAGS )
 
@@ -11695,7 +11757,7 @@ void naomi_state::init_hotd2()
 // 0007
 /* 0008  */ GAME( 2001, monkeyba, naomigd, naomigd,  monkeyba,naomi_state, init_naomigd, ROT0, "Sega", "Monkey Ball (GDS-0008)", GAME_FLAGS )
 // 0009  Dynamic Golf / Virtua Golf (GDS-0009)
-/* 0009A */ GAME( 2001, dygolf,   naomigd, naomigd,  naomi,   naomi_state, init_naomigd, ROT0, "Sega", "Virtua Golf / Dynamic Golf (Rev A) (GDS-0009A)", GAME_FLAGS )
+/* 0009A */ GAME( 2001, dygolf,   naomigd, naomigd_dygolf,  dygolf,   naomi_state, init_naomigd, ROT0, "Sega", "Virtua Golf / Dynamic Golf (Rev A) (GDS-0009A)", GAME_FLAGS )
 /* 0010  */ GAME( 2001, wsbbgd,   naomigd, naomigd,  dybbnao, naomi_state, init_naomigd, ROT0, "Sega", "World Series Baseball / Super Major League (GDS-0010)", GAME_FLAGS )
 /* 0011  */ GAME( 2001, vtennisg, naomigd, naomigd,  naomi,   naomi_state, init_naomigd, ROT0, "Sega", "Virtua Tennis / Power Smash (GDS-0011)", GAME_FLAGS )
 /* 0012  */ GAME( 2001, vf4o,     vf4,     naomi2gd, naomi,   naomi2_state, init_naomi2,  ROT0, "Sega", "Virtua Fighter 4 (GDS-0012)", GAME_FLAGS )
