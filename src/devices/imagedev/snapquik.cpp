@@ -87,6 +87,12 @@ void snapshot_image_device::device_start()
 	m_timer = timer_alloc(FUNC(snapshot_image_device::process_snapshot_or_quickload), this);
 }
 
+void snapshot_image_device::device_post_load()
+{
+	if (exists())
+		call_load();
+}
+
 /*-------------------------------------------------
     call_load
 -------------------------------------------------*/
