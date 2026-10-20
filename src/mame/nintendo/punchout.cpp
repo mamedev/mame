@@ -132,12 +132,15 @@ DIP locations verified for:
 #include "machine/nvram.h"
 #include "machine/rp5c01.h"
 #include "machine/rp5h01.h"
+#include "sound/flt_biquad.h"
 #include "sound/vlm5030.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
+#include <numbers>
 
 #include "layout/generic.h"
 
@@ -1389,6 +1392,8 @@ void punchout_state::punchout(machine_config &config)
 	bottom.set_palette(m_palette);
 
 	// sound hardware
+	// The VLM5030 (SSOUND) goes to the upper monitor's sound board and the 2A03 (MSOUND) to the lower monitor's. Each
+	// board drives one of the cabinet's two speakers below the control panel; the manuals don't say which side is which.
 	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
@@ -1396,8 +1401,26 @@ void punchout_state::punchout(machine_config &config)
 
 	VLM5030(config, m_vlm, RP2A03_NTSC_XTAL/6);
 	m_vlm->set_addrmap(0, &punchout_state::vlm_map);
-	m_vlm->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
-	m_audiocpu->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
+
+	// Each output ends in an RC low-pass section driving a unity-gain Sallen-Key low-pass (LM324 2N). The Sallen-Key
+	// loads the RC section, so the filters are the poles of the whole network: one real pole and a complex pair.
+	// VLM5030: R55 10K, C39 0.01uF, R56 100K, R57 8.2K, C40 0.015uF, C41 330pF
+	filter_biquad_device &ssound_lpf1 = FILTER_BIQUAD(config, "ssound_lpf1");
+	filter_biquad_device &ssound_lpf2 = FILTER_BIQUAD(config, "ssound_lpf2");
+	ssound_lpf1.setup(filter_biquad_device::biquad_type::LOWPASS1P, 1603.6, std::numbers::sqrt2 / 2.0, 1.0);
+	ssound_lpf2.setup(filter_biquad_device::biquad_type::LOWPASS, 2488.7, 1.609, 1.0);
+	m_vlm->add_route(ALL_OUTPUTS, ssound_lpf1, 1.0);
+	ssound_lpf1.add_route(ALL_OUTPUTS, ssound_lpf2, 1.0);
+	ssound_lpf2.add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+
+	// 2A03: R47 3.3K, C34 0.01uF, R48 30K, R49 2.4K, C35 0.015uF, C36 330pF
+	filter_biquad_device &msound_lpf1 = FILTER_BIQUAD(config, "msound_lpf1");
+	filter_biquad_device &msound_lpf2 = FILTER_BIQUAD(config, "msound_lpf2");
+	msound_lpf1.setup(filter_biquad_device::biquad_type::LOWPASS1P, 4837.9, std::numbers::sqrt2 / 2.0, 1.0);
+	msound_lpf2.setup(filter_biquad_device::biquad_type::LOWPASS, 8417.4, 1.591, 1.0);
+	m_audiocpu->add_route(ALL_OUTPUTS, msound_lpf1, 1.0);
+	msound_lpf1.add_route(ALL_OUTPUTS, msound_lpf2, 1.0);
+	msound_lpf2.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 }
 
 
