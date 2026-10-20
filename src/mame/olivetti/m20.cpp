@@ -61,6 +61,124 @@ E I1     Vectored interrupt error
 #include "formats/m20_dsk.h"
 
 
+
+// Logical colour-upgrade slot: U57 module MI204, colour RAM and motherboard jumpers.
+// Keep the original -ram storage, monochrome mappings and APB access.
+class m20_colour_upgrade_interface : public device_interface
+{
+public:
+    virtual unsigned colours() const = 0;
+    virtual void palette_w(offs_t offset, u8 data) = 0;
+    virtual rgb_t pixel(bool green, bool blue, bool red) const = 0;
+
+protected:
+    m20_colour_upgrade_interface(const machine_config &, device_t &device)
+        : device_interface(device, "m20colour") { }
+};
+
+class m20_colour_upgrade_device : public device_t, public m20_colour_upgrade_interface
+{
+public:
+    unsigned colours() const override { return m_colours; }
+
+    void palette_w(offs_t offset, u8 data) override
+    {
+        // U88 is a motherboard 74LS670, not part of the U57 module.
+        // Preserve VTin (bit 3); its BRIGHT/monitor effect is unverified.
+        if (m_colours == 4 && offset < 4)
+            m_colour_palette[offset] = data & 0x0f;
+    }
+
+    rgb_t pixel(bool green, bool blue, bool red) const override
+    {
+        // Video planes are green (motherboard), blue and optionally red (RAM).
+        // PCOS G/B/R codes differ from the palette register's R/G/B order.
+        u8 const colour = (m_colours == 4)
+            ? bitswap<3>(m_colour_palette[(unsigned(green) << 1) | unsigned(blue)], 0, 2, 1)
+            : (unsigned(red) << 2) | (unsigned(blue) << 1) | unsigned(green);
+        return rgb_t(BIT(colour, 2) * 255, BIT(colour, 0) * 255, BIT(colour, 1) * 255);
+    }
+
+protected:
+    m20_colour_upgrade_device(const machine_config &mconfig, device_type type,
+        const char *tag, device_t *owner, u32 clock, unsigned colours)
+        : device_t(mconfig, type, tag, owner, clock),
+          m20_colour_upgrade_interface(mconfig, *this), m_colours(colours) { }
+
+    void device_start() override ATTR_COLD
+    {
+        save_item(NAME(m_colour_palette));
+    }
+
+private:
+    const unsigned m_colours;
+    u8 m_colour_palette[4] = {};
+};
+
+class m20_colour_4c_device : public m20_colour_upgrade_device
+{
+public:
+    m20_colour_4c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class m20_colour_8c_device : public m20_colour_upgrade_device
+{
+public:
+    m20_colour_8c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+DECLARE_DEVICE_TYPE(M20_COLOUR_4C, m20_colour_4c_device)
+DECLARE_DEVICE_TYPE(M20_COLOUR_8C, m20_colour_8c_device)
+
+DEFINE_DEVICE_TYPE(M20_COLOUR_4C, m20_colour_4c_device,
+    "m20colour4c", "Olivetti M20 colour upgrade (4 colours)")
+DEFINE_DEVICE_TYPE(M20_COLOUR_8C, m20_colour_8c_device,
+    "m20colour8c", "Olivetti M20 colour upgrade (8 colours)")
+
+m20_colour_4c_device::m20_colour_4c_device(const machine_config &mconfig,
+    const char *tag, device_t *owner, u32 clock)
+    : m20_colour_upgrade_device(mconfig, M20_COLOUR_4C, tag, owner, clock, 4) { }
+
+m20_colour_8c_device::m20_colour_8c_device(const machine_config &mconfig,
+    const char *tag, device_t *owner, u32 clock)
+    : m20_colour_upgrade_device(mconfig, M20_COLOUR_8C, tag, owner, clock, 8) { }
+
+class m20_colour_slot_device : public device_t,
+    public device_single_card_slot_interface<m20_colour_upgrade_interface>
+{
+public:
+    template <typename T>
+    m20_colour_slot_device(const machine_config &mconfig, const char *tag,
+        device_t *owner, u32 clock, T &&opts, const char *dflt)
+        : m20_colour_slot_device(mconfig, tag, owner, clock)
+    {
+        set_options(std::forward<T>(opts), dflt, false);
+    }
+
+    m20_colour_slot_device(const machine_config &mconfig,
+        const char *tag, device_t *owner, u32 clock);
+
+    m20_colour_upgrade_interface *card() const { return get_card_device(); }
+
+protected:
+    void device_start() override ATTR_COLD { }
+};
+
+DECLARE_DEVICE_TYPE(M20_COLOUR_SLOT, m20_colour_slot_device)
+DEFINE_DEVICE_TYPE(M20_COLOUR_SLOT, m20_colour_slot_device,
+    "m20colourslot", "Olivetti M20 colour-system upgrade (logical slot)")
+
+m20_colour_slot_device::m20_colour_slot_device(const machine_config &mconfig,
+    const char *tag, device_t *owner, u32 clock)
+    : device_t(mconfig, M20_COLOUR_SLOT, tag, owner, clock),
+      device_single_card_slot_interface<m20_colour_upgrade_interface>(mconfig, *this) { }
+
+static void m20_colour_options(device_slot_interface &device)
+{
+    device.option_add("4c", M20_COLOUR_4C);
+    device.option_add("8c", M20_COLOUR_8C);
+}
+
 namespace {
 
 class m20_state : public driver_device
@@ -80,7 +198,7 @@ public:
 		m_apb(*this, "apb"),
 		m_hdc(*this, "hdc"),
 		m_palette(*this, "palette"),
-		m_video_config(*this, "VIDEO")
+		m_colour_slot(*this, "m20colour")
 	{
 	}
 
@@ -100,7 +218,8 @@ private:
 	optional_device<wd1000_device> m_hdc;
 
 	required_device<palette_device> m_palette;
-	optional_ioport m_video_config;
+	required_device<m20_colour_slot_device> m_colour_slot;
+	m20_colour_upgrade_interface *m_colour_upgrade = nullptr;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -124,7 +243,6 @@ private:
 	uint8_t m_port21 = 0;
 	enum : uint8_t { MONOCHROME, EIGHT_COLOR, FOUR_COLOR };
 	uint8_t m_display = MONOCHROME;
-	uint8_t m_color_palette[4] = {};
 	void install_memory();
 	void install_color_memory();
 	void remap_memory();
@@ -164,10 +282,7 @@ MC6845_UPDATE_ROW( m20_state::update_row )
 			{
 				// The register file's read address has the motherboard plane on bit 1.
 				// Its RGB data bits are ordered R,G,B, unlike PCOS's G,B,R colour codes.
-				uint8_t const color = (m_display == FOUR_COLOR)
-					? bitswap<3>(m_color_palette[(BIT(green, j) << 1) | BIT(blue, j)], 0, 2, 1)
-					: (BIT(red, j) << 2) | (BIT(blue, j) << 1) | BIT(green, j);
-				*p++ = de ? rgb_t(BIT(color, 2) * 255, BIT(color, 0) * 255, BIT(color, 1) * 255) : rgb_t::black();
+				*p++ = de ? m_colour_upgrade->pixel(BIT(green, j), BIT(blue, j), BIT(red, j)) : rgb_t::black();
 			}
 		}
 		return;
@@ -187,9 +302,9 @@ MC6845_UPDATE_ROW( m20_state::update_row )
 
 void m20_state::color_palette_w(offs_t offset, uint8_t data)
 {
-	// Write-only 74LS670 register file at odd I/O addresses 0x181..0x187.
-	if (m_display == FOUR_COLOR)
-		m_color_palette[offset] = data & 7;
+	// U88 palette writes: four registers at odd ports 0x181..0x187.
+	if (m_colour_upgrade)
+		m_colour_upgrade->palette_w(offset, data);
 }
 
 /*
@@ -890,6 +1005,9 @@ void m20_state::int_w(int state)
 
 void m20_state::machine_start()
 {
+	// Installed colour hardware is fixed at machine configuration time.
+	m_colour_upgrade = m_colour_slot->card();
+	m_display = m_colour_upgrade ? ((m_colour_upgrade->colours() == 4) ? FOUR_COLOR : EIGHT_COLOR) : MONOCHROME;
 	install_memory();
 
 	// Only install WD1000 HD controller I/O if a hard disk image is mounted
@@ -905,9 +1023,8 @@ void m20_state::machine_start()
 
 	save_item(NAME(m_memsize));
 	save_item(NAME(m_port21));
-	save_item(NAME(m_display));
-	save_item(NAME(m_color_palette));
-	if (m_video_config)
+	save_item(NAME(m_display));  // Palette state is saved by the slot device.
+	if (m_display != MONOCHROME)
 	{
 		m_maincpu->space(AS_IO).install_write_handler(0x180, 0x187, write8sm_delegate(*this, FUNC(m20_state::color_palette_w)), 0x00ff);
 		machine().save().register_postload(save_prepost_delegate(FUNC(m20_state::remap_memory), this));
@@ -916,15 +1033,6 @@ void m20_state::machine_start()
 
 void m20_state::machine_reset()
 {
-	uint8_t const display = m_video_config.read_safe(MONOCHROME);
-	if (display > FOUR_COLOR)
-		throw emu_fatalerror("Invalid M20 display configuration");
-	if (display != m_display)
-	{
-		m_display = display;
-		remap_memory();
-	}
-
 	uint8_t *ROM = memregion("maincpu")->base();
 	uint8_t *RAM = (uint8_t *)(m_ram->pointer() + 0x4000);
 
@@ -947,14 +1055,6 @@ void m20_state::machine_reset()
 		m_apb->halt();
 }
 
-
-static INPUT_PORTS_START(m20)
-	PORT_START("VIDEO")
-	PORT_CONFNAME(0x03, 0x00, "Display (reset required)")
-	PORT_CONFSETTING(0x00, "Monochrome")
-	PORT_CONFSETTING(0x02, "4 colours")
-	PORT_CONFSETTING(0x01, "8 colours")
-INPUT_PORTS_END
 
 static void m20_floppies(device_slot_interface &device)
 {
@@ -984,6 +1084,9 @@ void m20_state::m20(machine_config &config)
 	m_maincpu->nviack().set(FUNC(m20_state::nviack_r));
 
 	RAM(config, RAM_TAG).set_default_size("160K").set_default_value(0).set_extra_options("128K,192K,224K,256K,384K,512K");
+
+	// 4c/8c options represent complete upgrades, not separate U57 boards.
+	M20_COLOUR_SLOT(config, "m20colour", 0, m20_colour_options, nullptr);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen"));
@@ -1092,6 +1195,6 @@ ROM_END
 
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME           FLAGS
-COMP( 1981, m20,  0,      0,      m20,     m20,   m20_state, empty_init, "Olivetti", "Olivetti L1 M20", MACHINE_SUPPORTS_SAVE )
+COMP( 1981, m20,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M20", MACHINE_SUPPORTS_SAVE )
 COMP( 1981, m40,  m20,    0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M40", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1986, m44,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M44", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
