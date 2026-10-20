@@ -410,6 +410,7 @@ void hec2hrp_state::interact_common(machine_config &config)
 	m_cassette->set_interface("interact_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("interact");
+	SOFTWARE_LIST(config, "cass_list_h1").set_original("hector1_cass");
 
 	/* printer */
 	PRINTER(config, m_printer);
@@ -489,6 +490,8 @@ void hec2hrp_state::hec2hr(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("80K").set_default_value(0x00);
 
 	SOFTWARE_LIST(config, "cass_list").set_original("interact");
+	SOFTWARE_LIST(config, "cass_list_h1").set_original("hector1_cass");
+	SOFTWARE_LIST(config, "cass_list_hr").set_original("hector2hr_cass");
 }
 
 void hec2hrp_state::hec2hrx(machine_config &config)
@@ -510,18 +513,25 @@ void hec2hrp_state::hec2hrx(machine_config &config)
 
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
+
+	SOFTWARE_LIST(config, "cass_list_hrx").set_original("hector2hrx_cass");
+
 }
 
 void hec2hrp_state::hec2mx40(machine_config &config)
 {
 	hec2hrx(config);
 	m_maincpu->set_addrmap(AS_IO, &hec2hrp_state::hec2mx40_io);
+	config.device_remove("cass_list");	
+	config.device_remove("cass_list_h1");	
 }
 
 void hec2hrp_state::hec2mx80(machine_config &config)
 {
 	hec2hrx(config);
 	m_maincpu->set_addrmap(AS_IO, &hec2hrp_state::hec2mx80_io);
+	config.device_remove("cass_list");	
+	config.device_remove("cass_list_h1");
 }
 
 void hec2hrp_state::hec2mdhrx(machine_config &config)
