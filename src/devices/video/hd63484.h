@@ -68,7 +68,7 @@ private:
 	uint16_t get_dot(int16_t x, int16_t y);
 	bool set_dot(int16_t x, int16_t y, int16_t px, int16_t py);
 	bool set_dot(int16_t x, int16_t y, uint16_t color);
-	void draw_line(int16_t sx, int16_t sy, int16_t ex, int16_t ey);
+	bool draw_line(int16_t sx, int16_t sy, int16_t ex, int16_t ey);
 	void draw_ellipse(int16_t cx, int16_t cy, double dx, double dy, double s_angol, double e_angol, bool c);
 	void paint(int16_t sx, int16_t sy);
 

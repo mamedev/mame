@@ -836,6 +836,55 @@ bool hd63484_device::set_dot(int16_t x, int16_t y, uint16_t color)
 	uint8_t opm = m_cr & 0x07;
 	uint8_t area = (m_cr >> 5) & 0x07;
 
+	if (area != 0 && area != 4)
+	{
+		bool const inside = x >= int16_t(m_xmin) && x <= int16_t(m_xmax) && y >= int16_t(m_ymin) && y <= int16_t(m_ymax);
+
+		switch (area)
+		{
+			case 1: // command terminated when attempting to exit the area
+				if (!inside)
+				{
+					m_sr |= HD63484_SR_ARD;
+					update_irq();
+					return true;
+				}
+				break;
+			case 2: // drawing suppressed outside the area
+			case 3: // as 2, with the suppression flagged
+				if (!inside)
+				{
+					if (area == 3)
+					{
+						m_sr |= HD63484_SR_ARD;
+						update_irq();
+					}
+					return false;
+				}
+				break;
+			case 5: // command terminated when attempting to enter the area
+				if (inside)
+				{
+					m_sr |= HD63484_SR_ARD;
+					update_irq();
+					return true;
+				}
+				break;
+			case 6: // drawing suppressed inside the area
+			case 7: // as 6, with the suppression flagged
+				if (inside)
+				{
+					if (area == 7)
+					{
+						m_sr |= HD63484_SR_ARD;
+						update_irq();
+					}
+					return false;
+				}
+				break;
+		}
+	}
+
 	calc_offset(x, y, offset, bit_pos);
 
 	uint16_t mask = ((1 << bpp) - 1) << bit_pos;
@@ -878,13 +927,10 @@ bool hd63484_device::set_dot(int16_t x, int16_t y, uint16_t color)
 
 	writeword(offset, res);
 
-	if (area)
-		logerror("HD63484 '%s': unsupported area detection %x (%d %d)\n", tag(), area, x, y);
-
-	return false;   // TODO: return area detection status
+	return false;
 }
 
-void hd63484_device::draw_line(int16_t sx, int16_t sy, int16_t ex, int16_t ey)
+bool hd63484_device::draw_line(int16_t sx, int16_t sy, int16_t ex, int16_t ey)
 {
 	uint16_t delta_x = abs(ex - sx) * 2;
 	uint16_t delta_y = abs(ey - sy) * 2;
@@ -897,7 +943,8 @@ void hd63484_device::draw_line(int16_t sx, int16_t sy, int16_t ex, int16_t ey)
 		int delta = delta_y - delta_x / 2;
 		while(sx != ex)
 		{
-			set_dot(sx, sy, pram_pos, 0);
+			if (set_dot(sx, sy, pram_pos, 0))
+				return true;
 
 			if(delta >= 0)
 			{
@@ -914,7 +961,8 @@ void hd63484_device::draw_line(int16_t sx, int16_t sy, int16_t ex, int16_t ey)
 		int delta = delta_x - delta_y / 2;
 		while(sy != ey)
 		{
-			set_dot(sx, sy, pram_pos, 0);
+			if (set_dot(sx, sy, pram_pos, 0))
+				return true;
 
 			if(delta >= 0)
 			{
@@ -926,6 +974,8 @@ void hd63484_device::draw_line(int16_t sx, int16_t sy, int16_t ex, int16_t ey)
 			delta += delta_x;
 		}
 	}
+
+	return false;
 }
 
 void hd63484_device::draw_ellipse(int16_t cx, int16_t cy, double dx, double dy, double s_angol, double e_angol, bool c)
@@ -938,7 +988,8 @@ void hd63484_device::draw_ellipse(int16_t cx, int16_t cy, double dx, double dy, 
 
 		double px = cos(angol) * dx;
 		double py = sin(angol) * dy;
-		set_dot(cx + round(px), cy + round(py), 0, 0);
+		if (set_dot(cx + round(px), cy + round(py), 0, 0))
+			return;
 	}
 }
 
@@ -990,7 +1041,8 @@ void hd63484_device::paint(int16_t sx, int16_t sy)
 		bool up = false, dn = false;
 		for (int32_t px = xl; px <= xr && budget; px++, budget--)
 		{
-			set_dot(px, y, px - m_cpx, y - m_cpy);
+			if (set_dot(px, y, px - m_cpx, y - m_cpy))
+				return;
 
 			// drop one seed per paintable run of the adjacent rows
 			if (paintable(px, y + 1)) { if (!up) { seeds.emplace_back(px, y + 1); up = true; } }
@@ -1319,13 +1371,16 @@ void hd63484_device::command_rct_exec()
 	*/
 
 	/* 0 -> 1 */
-	draw_line(m_cpx, m_cpy, dX, m_cpy);
+	if (draw_line(m_cpx, m_cpy, dX, m_cpy))
+		return;
 
 	/* 1 -> 2 */
-	draw_line(dX, m_cpy, dX, dY);
+	if (draw_line(dX, m_cpy, dX, dY))
+		return;
 
 	/* 2 -> 3 */
-	draw_line(dX, dY, m_cpx, dY);
+	if (draw_line(dX, dY, m_cpx, dY))
+		return;
 
 	/* 3 -> 4 */
 	draw_line(m_cpx, dY, m_cpx, m_cpy);
@@ -1370,10 +1425,13 @@ void hd63484_device::command_gcpy_exec()
 			else
 				color = get_dot(Xs + sd0, Ys + sd1);
 
+			bool stop;
 			if (BIT(dsd, 2))
-				set_dot(m_cpx + dd1, m_cpy + dd0, color);
+				stop = set_dot(m_cpx + dd1, m_cpy + dd0, color);
 			else
-				set_dot(m_cpx + dd0, m_cpy + dd1, color);
+				stop = set_dot(m_cpx + dd0, m_cpy + dd1, color);
+			if (stop)
+				return;
 		}
 	}
 
@@ -1401,7 +1459,10 @@ void hd63484_device::command_frct_exec()
 	for(int16_t d1=0; d1!=Y+d1_inc; d1+=d1_inc)
 	{
 		for(int16_t d0=0; d0!=X+d0_inc; d0+=d0_inc)
-			set_dot(m_cpx + d0, m_cpy + d1, d0, d1);
+		{
+			if (set_dot(m_cpx + d0, m_cpy + d1, d0, d1))
+				return;
+		}
 	}
 
 	m_cpy += (Y + d1_inc);
@@ -1439,7 +1500,8 @@ void hd63484_device::command_ptn_exec()
 
 		for(int16_t d0=0; d0!=szx+1; d0++)
 		{
-			set_dot(m_cpx + px, m_cpy + py, d0, d1);
+			if (set_dot(m_cpx + px, m_cpy + py, d0, d1))
+				return;
 
 			switch (sl_sd)
 			{
@@ -1504,7 +1566,8 @@ void hd63484_device::command_plg_exec()
 			ey = (int16_t)m_pr[1 + i * 2 + 1];
 		}
 
-		draw_line(sx, sy, ex, ey);
+		if (draw_line(sx, sy, ex, ey))
+			break;
 
 		sx = ex;
 		sy = ey;
