@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Tomás García-Merás Capote (ClawGrip)
+-->
+<mamelayout version="2">
+
+	<element name="strip">
+		<rect>
+			<color red="0.10" green="0.11" blue="0.13" />
+		</rect>
+	</element>
+
+	<element name="lamp" defstate="0">
+		<disk state="0">
+			<color red="0.25" green="0.22" blue="0.14" />
+		</disk>
+		<disk state="1">
+			<color red="1.00" green="0.90" blue="0.50" />
+		</disk>
+	</element>
+
+	<element name="motor_state" defstate="0">
+		<rect state="0">
+			<color red="0.22" green="0.22" blue="0.24" />
+		</rect>
+		<text state="0" string="MOTOR OFF">
+			<color red="0.60" green="0.60" blue="0.62" />
+		</text>
+		<rect state="1">
+			<color red="0.10" green="0.55" blue="0.15" />
+		</rect>
+		<text state="1" string="MOTOR ON">
+			<color red="1.00" green="1.00" blue="1.00" />
+		</text>
+	</element>
+
+	<element name="lbl_start">
+		<text string="START LAMP" align="1"><color red="0.85" green="0.85" blue="0.85" /></text>
+	</element>
+	<element name="lbl_lights1">
+		<text string="LIGHTS 1" align="1"><color red="0.85" green="0.85" blue="0.85" /></text>
+	</element>
+	<element name="lbl_lights2">
+		<text string="LIGHTS 2" align="1"><color red="0.85" green="0.85" blue="0.85" /></text>
+	</element>
+
+	<view name="Screen and Outputs">
+		<screen index="0">
+			<bounds left="0" top="0" right="320" bottom="240" />
+		</screen>
+
+		<element ref="strip">
+			<bounds left="0" top="242" right="320" bottom="258" />
+		</element>
+
+		<element name="lamp0" ref="lamp">
+			<bounds left="4" top="245" right="14" bottom="255" />
+		</element>
+		<element ref="lbl_start">
+			<bounds left="17" top="246" right="77" bottom="254" />
+		</element>
+
+		<element name="lamp1" ref="lamp">
+			<bounds left="84" top="245" right="94" bottom="255" />
+		</element>
+		<element ref="lbl_lights1">
+			<bounds left="97" top="246" right="147" bottom="254" />
+		</element>
+
+		<element name="lamp2" ref="lamp">
+			<bounds left="154" top="245" right="164" bottom="255" />
+		</element>
+		<element ref="lbl_lights2">
+			<bounds left="167" top="246" right="217" bottom="254" />
+		</element>
+
+		<element name="motor" ref="motor_state">
+			<bounds left="250" top="244" right="316" bottom="256" />
+		</element>
+	</view>
+
+</mamelayout>
