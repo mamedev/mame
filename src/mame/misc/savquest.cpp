@@ -19,8 +19,6 @@
 
     - When game boots it does extensive CPUID checks, more copy protection tied to the CPU serial it has been installed on?
 
-    - Convert HASP dongle to a pc_lpt_device friendly device;
-
     - currently asserts by selecting a s3 video bank above 1M (register 0x6a) Update: fixed?
 
     - The version is labeled "SQ05" in the filesystem but has the 1999 release year.
@@ -83,6 +81,13 @@
 #include "video/voodoo_2.h"
 #include "video/voodoo_pci.h"
 
+#include <algorithm>
+#include <string>
+#include <string_view>
+#include <utility>
+
+
+DECLARE_DEVICE_TYPE(SAVQUEST_GCI, device_rs232_port_interface)
 
 namespace {
 
@@ -101,29 +106,9 @@ protected:
 	// driver_device overrides
 //  virtual void video_start();
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<voodoo_2_pci_device> m_voodoo2;
-
-	//int m_haspind = 0;
-	//int m_haspstate = 0;
-	//enum hasp_states
-	//{
-	//  HASPSTATE_NONE,
-	//  HASPSTATE_PASSBEG,
-	//  HASPSTATE_PASSEND,
-	//  HASPSTATE_READ
-	//};
-	//int m_hasp_passind = 0;
-	//uint8_t m_hasp_tmppass[0x29]{};
-	//uint8_t m_port379 = 0;
-	//int m_hasp_passmode = 0;
-	//int m_hasp_prodind = 0;
-
-	//uint8_t parallel_port_r(offs_t offset);
-	//void parallel_port_w(offs_t offset, uint8_t data);
 
 	void savquest_io(address_map &map) ATTR_COLD;
 	void savquest_map(address_map &map) ATTR_COLD;
@@ -131,286 +116,6 @@ private:
 	static void winbond_superio_config(device_t *device);
 };
 
-
-// TODO: move into parallel port device
-#if 0
-
-uint8_t savquest_state::parallel_port_r(offs_t offset)
-{
-	if (offset == 1)
-	{
-		if ((m_haspstate == HASPSTATE_READ)
-			&& (m_hasp_passmode == 3)
-			)
-		{
-			/* passmode 3 is used to retrieve the product(s) information
-			   it comes in two parts: header and product
-			   the header has this format:
-			   offset  range      purpose
-			   00      01         header type
-			   01      01-05      count of used product slots, must be 2
-			   02      01-05      count of unused product slots
-			                      this is assumed to be 6-(count of used slots)
-			                      but it is not enforced here
-			                      however a total of 6 structures will be checked
-			   03      01-02      unknown
-			   04      01-46      country code
-			   05-0f   00         reserved
-			   the used product slots have this format:
-			   (the unused product slots must be entirely zeroes)
-			   00-01   0001-000a  product ID, one must be 6, the other 0a
-			   02      0001-0003  unknown but must be 0001
-			   04      01-05      HASP plug country ID
-			   05      01-02      unknown but must be 01
-			   06      05         unknown
-			   07-0a   any        unknown, not used
-			   0b      ff         unknown
-			   0c      ff         unknown
-			   0d-0f   00         reserved
-
-			   the read is performed by accessing an array of 16-bit big-endian values
-			   and returning one bit at a time into bit 5 of the result
-			   the 16-bit value is then XORed with 0x534d and the register index
-			*/
-
-			if (m_hasp_prodind <= (sizeof(m_hasp_prodinfo) * 8))
-			{
-				m_port379 = ((m_hasp_prodinfo[(m_hasp_prodind - 1) >> 3] >> ((8 - m_hasp_prodind) & 7)) & 1) << 5; /* return defined info */
-			}
-			else
-			{
-				m_port379 = (((0x534d ^ ((m_hasp_prodind - 1) >> 4)) >> ((16 - m_hasp_prodind) & 15)) & 1) << 5; /* then just alternate between the two key values */
-			}
-
-			++m_hasp_prodind;
-		}
-
-		return m_port379;
-	}
-
-	return 0;
-}
-
-void savquest_state::parallel_port_w(offs_t offset, uint8_t data)
-{
-	if (!offset)
-	{
-		uint8_t data8 = (uint8_t) (data & 0xff);
-
-		/* state machine to determine when password is about to be entered */
-
-		switch (m_haspind)
-		{
-			case 0:
-			{
-				if (data8 == 0xc6)
-				{
-					++m_haspind;
-					break;
-				}
-
-				m_haspind = 0;
-				break;
-			}
-
-			case 1:
-			{
-				if (data8 == 0xc7)
-				{
-					++m_haspind;
-					break;
-				}
-
-				m_haspind = 0;
-				break;
-			}
-
-			case 2:
-			{
-				if (data8 == 0xc6)
-				{
-					++m_haspind;
-					break;
-				}
-
-				m_haspind = 0;
-				m_haspstate = HASPSTATE_NONE;
-				break;
-			}
-
-			case 3:
-			{
-				m_haspind = 0;
-
-				if (data8 == 0x80)
-				{
-					m_haspstate = HASPSTATE_PASSBEG;
-					m_hasp_passind = 0;
-					return;
-				}
-
-				break;
-			}
-
-			default:
-			{
-			}
-		}
-
-		m_port379 = 0x00;
-
-		if (m_haspstate == HASPSTATE_READ)
-		{
-			/* different passwords cause different values to be returned
-			   but there are really only two passwords of interest
-			   passmode 2 is used to verify that the dongle is responding correctly
-			*/
-
-			if (m_hasp_passmode == 2)
-			{
-				/* in passmode 2, some values remain unknown: 96, 9a, c4, d4, ec, f8
-				   they all return 00, but if that's wrong then there will be failures to start
-				*/
-
-				if ((data8 == 0x94)
-					|| (data8 == 0x9e)
-					|| (data8 == 0xa4)
-					|| (data8 == 0xb2)
-					|| (data8 == 0xbe)
-					|| (data8 == 0xd0)
-					)
-				{
-					return;
-				}
-
-				if ((data8 == 0x8a)
-					|| (data8 == 0x8e)
-					|| (data8 == 0xca)
-					|| (data8 == 0xd2)
-					|| (data8 == 0xe2)
-					|| (data8 == 0xf0)
-					|| (data8 == 0xfc)
-					)
-				{
-					/* someone with access to the actual dongle could dump the true values
-					   I've never seen it so I just determined the relevant bits instead
-					   from the disassembly of the software
-					   some of the keys are verified explicitly, the others implicitly
-					   I guessed the implicit ones with a bit of trial and error
-					*/
-
-					m_port379 = 0x20;
-					return;
-				}
-			}
-
-			switch (data8)
-			{
-				/* in passmode 0, some values remain unknown: 8a, 8e (inconclusive), 94, 96, 9a, a4, b2, be, c4, d2, d4 (inconclusive), e2, ec, f8, fc
-				   this is less of a concern since the contents seem to decrypt correctly
-				*/
-
-				case 0x88:
-				case 0x94:
-				case 0x98:
-				case 0x9c:
-				case 0x9e:
-				case 0xa0:
-				case 0xa4:
-				case 0xaa:
-				case 0xae:
-				case 0xb0:
-				case 0xb2:
-				case 0xbc:
-				case 0xbe:
-				case 0xc2:
-				case 0xc6:
-				case 0xc8:
-				case 0xce:
-				case 0xd0:
-				case 0xd6:
-				case 0xd8:
-				case 0xdc:
-				case 0xe0:
-				case 0xe6:
-				case 0xea:
-				case 0xee:
-				case 0xf2:
-				case 0xf6:
-				{
-					/* again, just the relevant bits instead of the true values */
-
-					m_port379 = 0x20;
-					break;
-				}
-
-				default:
-				{
-				}
-			}
-		}
-		else if (m_haspstate == HASPSTATE_PASSEND)
-		{
-			if (data8 & 1)
-			{
-				if ((m_hasp_passmode == 1)
-					&& (data8 == 0x9d)
-					)
-				{
-					m_hasp_passmode = 2;
-				}
-
-				m_haspstate = HASPSTATE_READ;
-			}
-			else if (m_hasp_passmode == 1)
-			{
-				m_hasp_tmppass[m_hasp_passind] = data8;
-
-				if (++m_hasp_passind == sizeof(m_hasp_tmppass))
-				{
-					if ((m_hasp_tmppass[0] == 0x9c)
-						&& (m_hasp_tmppass[1] == 0x9e)
-						)
-					{
-						int i;
-
-						i = 2;
-						m_hasp_prodind = 0;
-
-						do
-						{
-							m_hasp_prodind = (m_hasp_prodind << 1) + ((m_hasp_tmppass[i] >> 6) & 1);
-						}
-						while ((i += 3) < sizeof(m_hasp_tmppass));
-
-						m_hasp_prodind = (m_hasp_prodind - 0xc08) << 4;
-
-						if (m_hasp_prodind < (0x38 << 4))
-						{
-							m_hasp_passmode = 3;
-						}
-					}
-
-					m_haspstate = HASPSTATE_READ;
-				}
-			}
-		}
-		else if ((m_haspstate == HASPSTATE_PASSBEG)
-				&& (data8 & 1)
-			)
-		{
-			m_hasp_tmppass[m_hasp_passind] = data8;
-
-			if (++m_hasp_passind == sizeof(m_hasp_cmppass))
-			{
-				m_haspstate = HASPSTATE_PASSEND;
-				m_hasp_passind = 0;
-				m_hasp_passmode = (int) !memcmp(m_hasp_tmppass, m_hasp_cmppass, sizeof(m_hasp_cmppass));
-			}
-		}
-	}
-}
-#endif
 
 void savquest_state::savquest_map(address_map &map)
 {
@@ -422,15 +127,344 @@ void savquest_state::savquest_io(address_map &map)
 	map.unmap_value_high();
 }
 
+// cabinet controls, read by the GCI board on serport0 (kept in the driver so they stay player 1)
 static INPUT_PORTS_START( savquest )
+	// bits are GCI buttons 1-7, bit 7 is the coin input (the credit counter)
+	PORT_START("PANEL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Roar")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Instant Credit")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Operator")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	// GCI buttons 11 and 12 (13-16 are the unused second stick and spares)
+	PORT_START("STICK_BUTTONS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Bite (Trigger)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Charge (Thumb)")
+
+	PORT_START("STICK_X")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
+
+	PORT_START("STICK_Y")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
-void savquest_state::machine_start()
+/*
+    Immersia GCI controls board (PIC17C43, not dumped), simulated from the protocol the game speaks.
+
+    The game talks to it on COM1 at 115200 8N1. Frames are ASCII: 'Z', a command character, hex fields,
+    then four lowercase hex digits of the 16-bit byte sum (the checksum) and CR.
+
+    Game -> board:
+      Z0      connect; reply "Z0" + version (the "REX" prefix selects the CoinSoft command set)
+      Z9      firmware version; reply "Z9" + version string
+      ZQc     is command c supported; reply "ZQcY" for the commands below, "ZQcN" otherwise
+      ZLjjtt  automatic joystick reports every jj ms, 00 = off (trackball every tt ms, not fitted); reply "ZL"
+      Z3abtt  outputs: lamps 1-4 (a), lamps 5-8 (b), tickets to dispense (tt); no reply
+      ZC      toggle checksums
+    Frames with a wrong checksum (while checksums are on) or the wrong length are dropped.
+    The buttons are scanned every 16 ms once connected; changes are reported at once.
+    Board -> game (the game acknowledges ZP and ZH with an empty frame of the same command):
+      ZP      buttons 1-7, credits, ticket status; each button and credit digit holds a press count
+              (bits 0-2, mod 8) and a held flag (bit 3 clear = held)
+      ZH      buttons 11-16 in the same format (11 = stick trigger, 12 = stick thumb button)
+      ZJ      joystick: x1 y1 x2 y2 poll counter, two hex digits each
+
+    Button numbers follow the game's event map: 2 Roar, 4 Start, 6 Instant Credit, 7 Operator,
+    11 Bite (trigger), 12 Charge (thumb).
+    TODO: version strings are guesses (the game accepts them); joystick reports are sent when the stick moves,
+    real board behaviour unknown; stick axis directions unverified.
+*/
+class savquest_gci_device : public buffered_rs232_device<64>
+{
+public:
+	savquest_gci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual void received_byte(u8 byte) override;
+
+private:
+	TIMER_CALLBACK_MEMBER(scan);
+	TIMER_CALLBACK_MEMBER(joystick);
+
+	void command(std::string_view body);
+	void send(std::string_view msg);
+	void send_panel();
+	void send_stick_buttons();
+
+	static char button_digit(u8 count, bool held) { return "0123456789ABCDEF"[(count & 7) | (held ? 0 : 8)]; }
+	static int hex_digit(char c)
+	{
+		if (c >= '0' && c <= '9') return c - '0';
+		if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+		if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+		return -1;
+	}
+
+	required_ioport m_panel;
+	required_ioport m_stick_buttons;
+	required_ioport m_stick_x;
+	required_ioport m_stick_y;
+	output_finder<8> m_lamps;
+
+	emu_timer *m_scan_timer = nullptr;
+	emu_timer *m_joystick_timer = nullptr;
+	char m_line[64]{};
+	u8 m_line_len = 0;
+	bool m_line_overflow = false;
+	bool m_checksum = true;
+	bool m_autosend = false;
+	u8 m_panel_state = 0;
+	u8 m_panel_count[8]{};
+	u8 m_stick_button_state = 0;
+	u8 m_stick_button_count[2]{};
+	int m_last_x = -1;
+	int m_last_y = -1;
+	u8 m_poll = 0;
+};
+
+savquest_gci_device::savquest_gci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	buffered_rs232_device<64>(mconfig, SAVQUEST_GCI, tag, owner, clock),
+	m_panel(*this, ":PANEL"),
+	m_stick_buttons(*this, ":STICK_BUTTONS"),
+	m_stick_x(*this, ":STICK_X"),
+	m_stick_y(*this, ":STICK_Y"),
+	m_lamps(*this, "lamp%u", 1U)
 {
 }
 
-void savquest_state::machine_reset()
+
+void savquest_gci_device::device_start()
 {
+	buffered_rs232_device<64>::device_start();
+
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rate(115'200);
+	output_rxd(1);
+	output_dcd(0);
+	output_dsr(0);
+	output_ri(0);
+	output_cts(0);
+
+	m_scan_timer = timer_alloc(FUNC(savquest_gci_device::scan), this);
+	m_joystick_timer = timer_alloc(FUNC(savquest_gci_device::joystick), this);
+
+	save_item(NAME(m_line));
+	save_item(NAME(m_line_len));
+	save_item(NAME(m_line_overflow));
+	save_item(NAME(m_checksum));
+	save_item(NAME(m_autosend));
+	save_item(NAME(m_panel_state));
+	save_item(NAME(m_panel_count));
+	save_item(NAME(m_stick_button_state));
+	save_item(NAME(m_stick_button_count));
+	save_item(NAME(m_last_x));
+	save_item(NAME(m_last_y));
+	save_item(NAME(m_poll));
+}
+
+void savquest_gci_device::device_reset()
+{
+	clear_fifo();
+	receive_register_reset();
+	transmit_register_reset();
+	m_line_len = 0;
+	m_line_overflow = false;
+	m_checksum = true;
+	m_autosend = false;
+	m_panel_state = 0;
+	std::fill(std::begin(m_panel_count), std::end(m_panel_count), 0);
+	m_stick_button_state = 0;
+	std::fill(std::begin(m_stick_button_count), std::end(m_stick_button_count), 0);
+	m_last_x = m_last_y = -1;
+	m_poll = 0;
+	m_scan_timer->adjust(attotime::never);
+	m_joystick_timer->adjust(attotime::never);
+	for (int i = 0; i < 8; i++)
+		m_lamps[i] = 0;
+}
+
+void savquest_gci_device::received_byte(u8 byte)
+{
+	if (byte == 'Z')
+	{
+		// a new frame restarts the buffer, as the game's own parser does
+		m_line_len = 0;
+		m_line_overflow = false;
+	}
+	if (byte != '\r')
+	{
+		if (m_line_len < std::size(m_line))
+			m_line[m_line_len++] = char(byte);
+		else
+			m_line_overflow = true;
+		return;
+	}
+
+	std::string_view body(m_line, m_line_len);
+	m_line_len = 0;
+	if (m_line_overflow || body.size() < 2 || body[0] != 'Z')
+	{
+		logerror("dropped malformed frame\n");
+		return;
+	}
+	if (m_checksum)
+	{
+		unsigned sum = 0;
+		bool valid = body.size() >= 6;
+		for (size_t i = 0; valid && i < body.size() - 4; i++)
+			sum += u8(body[i]);
+		for (size_t i = 0; valid && i < 4; i++)
+			valid = hex_digit(body[body.size() - 4 + i]) == int((sum >> (12 - 4 * i)) & 0x0f);
+		if (!valid)
+		{
+			logerror("dropped frame with bad checksum: %s\n", std::string(body));
+			return;
+		}
+		body.remove_suffix(4);
+	}
+	command(body);
+}
+
+void savquest_gci_device::command(std::string_view body)
+{
+	// commands this board implements, with their frame lengths (without checksum)
+	static constexpr std::pair<char, size_t> s_commands[] = { { '0', 2 }, { '9', 2 }, { 'Q', 3 }, { 'L', 6 }, { '3', 6 }, { 'C', 2 } };
+	auto const found = std::find_if(std::begin(s_commands), std::end(s_commands), [c = body[1]] (auto const &e) { return e.first == c; });
+	if (found == std::end(s_commands))
+		return; // acknowledgements of our reports (ZP, ZH), and commands this cabinet does not use
+	if (body.size() != found->second)
+	{
+		logerror("dropped frame with wrong length: %s\n", std::string(body));
+		return;
+	}
+
+	switch (body[1])
+	{
+	case '0': // connect: start scanning the controls
+		send("Z0REX1.0");
+		m_scan_timer->adjust(attotime::from_msec(16), 0, attotime::from_msec(16));
+		break;
+
+	case '9':
+		send("Z91.0");
+		break;
+
+	case 'Q':
+		{
+			bool const supported = std::any_of(std::begin(s_commands), std::end(s_commands), [c = body[2]] (auto const &e) { return e.first == c; });
+			send(std::string(body) + (supported ? "Y" : "N"));
+		}
+		break;
+
+	case 'L':
+		{
+			if (hex_digit(body[2]) < 0 || hex_digit(body[3]) < 0)
+				break;
+			int const ms = (hex_digit(body[2]) << 4) | hex_digit(body[3]);
+			send("ZL");
+			m_autosend = ms != 0;
+			m_last_x = m_last_y = -1; // report the current stick position on the first tick
+			if (m_autosend)
+				m_joystick_timer->adjust(attotime::from_msec(ms), 0, attotime::from_msec(ms));
+			else
+				m_joystick_timer->adjust(attotime::never);
+		}
+		break;
+
+	case '3':
+		if (hex_digit(body[2]) >= 0 && hex_digit(body[3]) >= 0)
+		{
+			u8 const lamps = hex_digit(body[2]) | (hex_digit(body[3]) << 4);
+			for (int i = 0; i < 8; i++)
+				m_lamps[i] = BIT(lamps, i);
+		}
+		break;
+
+	case 'C':
+		m_checksum = !m_checksum;
+		break;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(savquest_gci_device::scan)
+{
+	u8 const panel = m_panel->read();
+	if (panel != m_panel_state)
+	{
+		for (int i = 0; i < 8; i++)
+			if (BIT(panel, i) && !BIT(m_panel_state, i))
+				m_panel_count[i]++;
+		m_panel_state = panel;
+		send_panel();
+	}
+
+	u8 const stick_buttons = m_stick_buttons->read() & 0x03;
+	if (stick_buttons != m_stick_button_state)
+	{
+		for (int i = 0; i < 2; i++)
+			if (BIT(stick_buttons, i) && !BIT(m_stick_button_state, i))
+				m_stick_button_count[i]++;
+		m_stick_button_state = stick_buttons;
+		send_stick_buttons();
+	}
+}
+
+TIMER_CALLBACK_MEMBER(savquest_gci_device::joystick)
+{
+	int const x = m_stick_x->read();
+	int const y = m_stick_y->read();
+	if (x != m_last_x || y != m_last_y)
+	{
+		m_last_x = x;
+		m_last_y = y;
+		send(util::string_format("ZJ%02X%02X8080%02X", x, y, m_poll++));
+	}
+}
+
+void savquest_gci_device::send_panel()
+{
+	std::string msg = "ZP";
+	for (int i = 0; i < 8; i++)
+		msg.push_back(button_digit(m_panel_count[i], BIT(m_panel_state, i)));
+	msg.push_back('1'); // tickets OK
+	send(msg);
+}
+
+void savquest_gci_device::send_stick_buttons()
+{
+	std::string msg = "ZH";
+	for (int i = 0; i < 6; i++)
+		msg.push_back((i < 2) ? button_digit(m_stick_button_count[i], BIT(m_stick_button_state, i)) : '8');
+	send(msg);
+}
+
+void savquest_gci_device::send(std::string_view msg)
+{
+	std::string out(msg);
+	if (m_checksum)
+	{
+		unsigned sum = 0;
+		for (char c : msg)
+			sum += u8(c);
+		out += util::string_format("%04x", sum & 0xffff);
+	}
+	out.push_back('\r');
+	for (char c : out)
+		transmit_byte(u8(c));
+}
+
+
+static void savquest_com(device_slot_interface &device)
+{
+	default_rs232_devices(device);
+	device.option_add("gci", SAVQUEST_GCI);
 }
 
 static void isa_internal_devices(device_slot_interface &device)
@@ -446,12 +480,12 @@ void savquest_state::winbond_superio_config(device_t *device)
 	fdc.gp25_gatea20().set(":pci:07.0", FUNC(i82371eb_isa_device::a20gate_w));
 	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
-//  fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
-//  fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
-//  fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
-//  fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
-//  fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
-//  fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 
 	auto *lpt = device->subdevice<pc_lpt_device>("lpt");
 	auto *centronics = lpt->subdevice<centronics_device>("centronics");
@@ -463,6 +497,8 @@ void savquest_state::winbond_superio_config(device_t *device)
 void savquest_state::savquest(machine_config &config)
 {
 	pentium2_device &maincpu(PENTIUM2(config, "maincpu", 66'000'000)); // actually Pentium II @ 450 MHz
+	// Execution is underclocked; count timestamps at an assumed nominal 450 MHz (board clock unverified)
+	maincpu.set_tsc_cycle_ratio(75, 11);
 	maincpu.set_addrmap(AS_PROGRAM, &savquest_state::savquest_map);
 	maincpu.set_addrmap(AS_IO, &savquest_state::savquest_io);
 	maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
@@ -491,6 +527,21 @@ void savquest_state::savquest(machine_config &config)
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, "sblaster_16", false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+
+	// the GCI controls board talks to the PC on COM1
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", savquest_com, "gci"));
+	serport0.rxd_handler().set("board4:w83977tf", FUNC(w83977tf_device::rxd1_w));
+	serport0.dcd_handler().set("board4:w83977tf", FUNC(w83977tf_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:w83977tf", FUNC(w83977tf_device::ndsr1_w));
+	serport0.ri_handler().set("board4:w83977tf", FUNC(w83977tf_device::nri1_w));
+	serport0.cts_handler().set("board4:w83977tf", FUNC(w83977tf_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", default_rs232_devices, nullptr));
+	serport1.rxd_handler().set("board4:w83977tf", FUNC(w83977tf_device::rxd2_w));
+	serport1.dcd_handler().set("board4:w83977tf", FUNC(w83977tf_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:w83977tf", FUNC(w83977tf_device::ndsr2_w));
+	serport1.ri_handler().set("board4:w83977tf", FUNC(w83977tf_device::nri2_w));
+	serport1.cts_handler().set("board4:w83977tf", FUNC(w83977tf_device::ncts2_w));
 
 	VOODOO_2_PCI(config, m_voodoo2, 0, "maincpu", "voodoo_screen");
 	m_voodoo2->set_fbmem(4);
@@ -529,5 +580,6 @@ ROM_END
 
 } // Anonymous namespace
 
+DEFINE_DEVICE_TYPE_PRIVATE(SAVQUEST_GCI, device_rs232_port_interface, savquest_gci_device, "savquest_gci", "Immersia GCI controls board (simulated)")
 
 GAME(1999, savquest, 0, savquest, savquest, savquest_state, empty_init, ROT0, "Interactive Light", "Savage Quest", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
