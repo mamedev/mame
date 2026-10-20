@@ -763,4 +763,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAMEL(1989, roundup5,  0,        roundup5,  roundup5, roundup5_state, init_tatsumi,  ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_roundup5 )
+GAMEL(1989, roundup5,  0,        roundup5,  roundup5, roundup5_state, init_tatsumi,  ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", MACHINE_IMPERFECT_GRAPHICS, layout_roundup5 )
