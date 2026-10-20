@@ -103,7 +103,7 @@ void i386_device::pentium_wrmsr()          // Opcode 0x0f 30
 
 void i386_device::pentium_rdtsc()          // Opcode 0x0f 31
 {
-	uint64_t ts = m_tsc + (m_base_cycles - m_cycles);
+	uint64_t ts = tsc_peek(m_base_cycles - m_cycles);
 	REG32(EAX) = (uint32_t)(ts);
 	REG32(EDX) = (uint32_t)(ts >> 32);
 
