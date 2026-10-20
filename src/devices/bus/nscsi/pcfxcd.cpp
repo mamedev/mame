@@ -1,0 +1,494 @@
+// license:BSD-3-Clause
+// copyright-holders:Damian Rogers
+/***************************************************************************
+
+    NEC CD-ROM DRIVE:FX (PC-FX internal CD-ROM drive)
+
+    A SCSI-2 CD-ROM drive with the NEC vendor audio commands d8h/d9h/dah/
+    ddh/deh (10-byte CDBs from c0h up) and their LBA, BCD M:S:F and BCD
+    track address modes.
+
+    The vendor commands are shared with the PC-8801-30, PC Engine CD-ROM²
+    and CDR-35 drives, but the responses here are the DRIVE:FX ones; a
+    common NEC drive base is left for the rework of the PC-8801-30 /
+    PC Engine host path (mamedev/mame#11078).
+
+    TODO:
+    - MESSAGE OUT accepts only ABORT
+    - Scan (d2h)
+    - Seek times
+    - Real sub-channel data, Q is synthesized from the play position
+
+***************************************************************************/
+
+#include "emu.h"
+#include "pcfxcd.h"
+
+#include "multibyte.h"
+
+#define LOG_CMD            (1U << 1)
+#define LOG_CDDA           (1U << 2)
+
+#define VERBOSE (0)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+#define LOGCMD(...)         LOGMASKED(LOG_CMD, __VA_ARGS__)
+#define LOGCDDA(...)        LOGMASKED(LOG_CDDA, __VA_ARGS__)
+
+DEFINE_DEVICE_TYPE(NSCSI_CDROM_PCFX, nscsi_cdrom_pcfx_device, "nscsi_cdrom_pcfx", "NEC CD-ROM DRIVE:FX")
+
+nscsi_cdrom_pcfx_device::nscsi_cdrom_pcfx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nscsi_cdrom_device(mconfig, NSCSI_CDROM_PCFX, tag, owner, clock)
+	, m_cdda_status(CDDA_STOPPED)
+	, m_cdda_loop(false)
+	, m_cdda_start(0)
+	, m_cdda_end(0)
+	, m_command(0)
+{
+}
+
+void nscsi_cdrom_pcfx_device::device_add_mconfig(machine_config &config)
+{
+	nscsi_cdrom_device::device_add_mconfig(config);
+	cdda->audio_end_cb().set(FUNC(nscsi_cdrom_pcfx_device::nec_audio_end));
+}
+
+void nscsi_cdrom_pcfx_device::device_start()
+{
+	nscsi_cdrom_device::device_start();
+
+	save_item(NAME(m_cdda_status));
+	save_item(NAME(m_cdda_loop));
+	save_item(NAME(m_cdda_start));
+	save_item(NAME(m_cdda_end));
+	save_item(NAME(m_command));
+}
+
+void nscsi_cdrom_pcfx_device::device_reset()
+{
+	nscsi_cdrom_device::device_reset();
+
+	m_cdda_status = CDDA_STOPPED;
+	m_cdda_loop = false;
+	m_cdda_start = m_cdda_end = 0;
+	m_command = 0;
+}
+
+// double speed, same figure as nscsi_cdrom_2x_device
+attotime nscsi_cdrom_pcfx_device::scsi_data_byte_period()
+{
+	return attotime::from_ticks(1, 307'200);
+}
+
+attotime nscsi_cdrom_pcfx_device::scsi_data_command_delay()
+{
+	switch (m_command)
+	{
+		case SC_READ_6: case SC_READ_10: case SC_READ_12:
+			return attotime::from_msec(10);   // TODO: seek time by distance
+
+		default:
+			return attotime::zero;
+	}
+}
+
+// ABORT or BUS DEVICE RESET stops audio playback
+void nscsi_cdrom_pcfx_device::scsi_abort()
+{
+	nscsi_cdrom_device::scsi_abort();
+
+	LOGCDDA("Abort: audio stop\n");
+	cdda->stop_audio();
+	m_cdda_status = CDDA_STOPPED;
+}
+
+void nscsi_cdrom_pcfx_device::scsi_command()
+{
+	// latched here: a data-in command below overwrites m_scsi_cmdbuf with its response before
+	// scsi_data_command_delay() is called, so byte 0 of the CDB would no longer be byte 0 of the CDB
+	m_command = m_scsi_cmdbuf[0];
+
+	if (!image->exists() && m_scsi_cmdbuf[0] != SC_INQUIRY && m_scsi_cmdbuf[0] != SC_REQUEST_SENSE)
+	{
+		return_no_cd();   // NOT READY / MEDIUM NOT PRESENT
+		return;
+	}
+
+	switch (m_scsi_cmdbuf[0])
+	{
+		case SC_INQUIRY:
+		{
+			// games check for this drive by its INQUIRY data (Battle Heat)
+			static const u8 inquiry[36] =
+			{
+				0x05, 0x80, 0x02, 0x00, 0x1f, 0x00, 0x00, 0x00,
+				'N', 'E', 'C', ' ', ' ', ' ', ' ', ' ',
+				'C', 'D', '-', 'R', 'O', 'M', ' ', 'D', 'R', 'I', 'V', 'E', ':', 'F', 'X', ' ',
+				'1', '.', '0', ' '
+			};
+			const int size = std::min<int>(m_scsi_cmdbuf[4], sizeof(inquiry));
+			std::copy_n(inquiry, size, m_scsi_cmdbuf);
+			scsi_data_in(SBUF_MAIN, size);
+			scsi_status_complete(SS_GOOD);
+			break;
+		}
+
+		case SC_READ_6:
+		case SC_READ_10:
+			cdda->stop_audio();
+			m_cdda_status = CDDA_STOPPED;
+			nscsi_cdrom_device::scsi_command();
+			break;
+
+		case SC_READ_12:
+		{
+			cdda->stop_audio();
+			m_cdda_status = CDDA_STOPPED;
+			const u32 blocks = get_u32be(&m_scsi_cmdbuf[6]);
+			// same path as the base READ(10): the LBA is already at the same offset, just
+			// narrow the block count to 16 bits (clamped, not truncated) and relabel the CDB
+			put_u16be(&m_scsi_cmdbuf[7], std::min<u32>(blocks, 0xffff));
+			m_scsi_cmdbuf[0] = SC_READ_10;
+			nscsi_cdrom_device::scsi_command();
+			break;
+		}
+
+		case SC_READ_HEADER:  // 44h, used by the BIOS POST
+		{
+			const u32 lba = get_u32be(&m_scsi_cmdbuf[2]);
+			const bool msf = BIT(m_scsi_cmdbuf[1], 1);
+			const int size = std::min<int>(get_u16be(&m_scsi_cmdbuf[7]), 8);
+
+			if (lba >= image->get_track_start(0xaa))
+			{
+				report_condition(SK_ILLEGAL_REQUEST, SKC_LOGICAL_BLOCK_ADDRESS_OUT_OF_RANGE);
+				break;
+			}
+
+			const int track_type = image->get_track_type(image->get_track(lba));
+			if (track_type == cdrom_file::CD_TRACK_AUDIO)
+			{
+				report_condition(SK_ILLEGAL_REQUEST, SKC_ILLEGAL_MODE_FOR_THIS_TRACK);
+				break;
+			}
+
+			// header of the addressed data sector: mode, then its address (as t10mmc.cpp)
+			const bool mode1 = track_type == cdrom_file::CD_TRACK_MODE1 || track_type == cdrom_file::CD_TRACK_MODE1_RAW;
+			std::fill_n(m_scsi_cmdbuf, 8, 0);
+			m_scsi_cmdbuf[0] = mode1 ? 1 : 2;
+			put_u32be(&m_scsi_cmdbuf[4], msf ? to_msf(lba + 150) : lba);
+			scsi_data_in(SBUF_MAIN, size);
+			scsi_status_complete(SS_GOOD);
+			break;
+		}
+
+		case 0x0d:  // NEC: no operation
+		case 0xdb:  // NEC: set stop time
+			scsi_status_complete(SS_GOOD);
+			break;
+
+		case 0xd8: nec_set_audio_start_position(); break;
+		case 0xd9: nec_set_audio_end_position(); break;
+		case 0xda: nec_pause(); break;
+		case 0xdd: nec_read_subq(); break;
+		case 0xde: nec_get_dir_info(); break;
+
+		default:
+			nscsi_cdrom_device::scsi_command();
+			break;
+	}
+}
+
+u8 nscsi_cdrom_pcfx_device::to_bcd(u32 v)
+{
+	return ((v / 10) << 4) | (v % 10);
+}
+
+u8 nscsi_cdrom_pcfx_device::from_bcd(u8 v)
+{
+	return (v >> 4) * 10 + (v & 0xf);
+}
+
+// absolute M:S:F (BCD) of an LBA, including the 2 second offset
+void nscsi_cdrom_pcfx_device::put_msf(u8 *dest, s32 lba)
+{
+	lba += 150;
+	dest[0] = to_bcd(lba / (60 * 75));
+	dest[1] = to_bcd((lba / 75) % 60);
+	dest[2] = to_bcd(lba % 75);
+}
+
+// vendor specific commands (c0h-ffh) are 10 bytes long
+bool nscsi_cdrom_pcfx_device::scsi_command_done(u8 command, u8 length)
+{
+	if (command >= 0xc0)
+		return length == 10;
+	return nscsi_cdrom_device::scsi_command_done(command, length);
+}
+
+void nscsi_cdrom_pcfx_device::nec_audio_end(int state)
+{
+	if (!state || m_cdda_status != CDDA_PLAYING)
+		return;
+
+	if (m_cdda_loop)
+	{
+		LOGCDDA("Audio end: repeat %d-%d\n", m_cdda_start, m_cdda_end);
+		cdda->start_audio(m_cdda_start, m_cdda_end - m_cdda_start);
+	}
+	else
+	{
+		LOGCDDA("Audio end: stop\n");
+		m_cdda_status = CDDA_STOPPED;
+	}
+}
+
+// address in the NEC audio commands: byte 9 bits 7-6 select LBA, BCD M:S:F or BCD track
+bool nscsi_cdrom_pcfx_device::nec_address(const u8 *cdb, u32 &lba)
+{
+	const int last_track = image->get_last_track();
+
+	switch (cdb[9] & 0xc0)
+	{
+		case 0x00:
+			lba = get_u24be(&cdb[3]);
+			return true;
+
+		case 0x40:
+			lba = ((from_bcd(cdb[2]) * 60) + from_bcd(cdb[3])) * 75 + from_bcd(cdb[4]) - 150;
+			return true;
+
+		case 0x80:
+		{
+			const int track = from_bcd(cdb[2]);
+			if (!track || track > last_track + 1)
+				return false;
+			lba = image->get_track_start((track == last_track + 1) ? 0xaa : (track - 1));
+			return true;
+		}
+
+		default:
+			return false;
+	}
+}
+
+void nscsi_cdrom_pcfx_device::nec_play(u32 start, u32 end)
+{
+	m_cdda_start = start;
+	m_cdda_end = end;
+	if (end > start)
+		cdda->start_audio(start, end - start);
+	else
+		cdda->stop_audio();
+}
+
+// d8h: set audio playback start position, then play to the end of the disc (byte 1 bit 0) or pause there
+void nscsi_cdrom_pcfx_device::nec_set_audio_start_position()
+{
+	u8 cdb[10];
+	std::copy_n(m_scsi_cmdbuf, 10, cdb);
+
+	if (!image->exists())
+	{
+		return_no_cd();
+		return;
+	}
+
+	u32 lba;
+	if (!nec_address(cdb, lba) || lba > image->get_track_start(0xaa))
+	{
+		report_bad_cdb_field();
+		return;
+	}
+
+	LOGCMD("0xd8 SET AUDIO PLAYBACK START POSITION (NEC): mode %02x lba %d play %d\n", cdb[9] & 0xc0, lba, BIT(cdb[1], 0));
+
+	m_cdda_loop = false;
+	cdda->set_output_gain(ALL_OUTPUTS, 1.0);
+	nec_play(lba, image->get_track_start(0xaa));
+	if (BIT(cdb[1], 0))
+		m_cdda_status = CDDA_PLAYING;
+	else
+	{
+		cdda->pause_audio(1);
+		m_cdda_status = CDDA_PAUSED;
+	}
+
+	scsi_status_complete(SS_GOOD);
+}
+
+// d9h: set audio playback end position and play from the start position, byte 1 bits 2-0:
+// 0 = muted, 1 = left only, 2 = right only, 3 = stereo, 4 = repeat, 5 = play while busy
+// (left/right only can play in stereo on the PC-FX, depending on the drive; play while busy is not emulated)
+void nscsi_cdrom_pcfx_device::nec_set_audio_end_position()
+{
+	u8 cdb[10];
+	std::copy_n(m_scsi_cmdbuf, 10, cdb);
+
+	if (!image->exists())
+	{
+		return_no_cd();
+		return;
+	}
+
+	u32 lba;
+	if (m_cdda_status == CDDA_STOPPED || !nec_address(cdb, lba))
+	{
+		report_bad_cdb_field();
+		return;
+	}
+
+	const u32 start = (m_cdda_status != CDDA_PLAYING) ? cdda->get_audio_lba() : m_cdda_start;
+	LOGCMD("0xd9 SET AUDIO PLAYBACK END POSITION (NEC): mode %02x play mode %d, %d-%d\n", cdb[9] & 0xc0, cdb[1] & 7, start, lba);
+
+	m_cdda_loop = (cdb[1] & 7) == 4;
+	cdda->set_output_gain(ALL_OUTPUTS, ((cdb[1] & 7) == 0) ? 0.0 : 1.0);
+	cdda->pause_audio(0);
+	nec_play(start, lba);
+	m_cdda_start = start;
+	m_cdda_status = CDDA_PLAYING;
+
+	scsi_status_complete(SS_GOOD);
+}
+
+// dah: still (pause during play)
+void nscsi_cdrom_pcfx_device::nec_pause()
+{
+	if (!image->exists())
+	{
+		return_no_cd();
+		return;
+	}
+
+	if (m_cdda_status == CDDA_STOPPED)
+	{
+		report_bad_cdb_field();
+		return;
+	}
+
+	LOGCMD("0xda PAUSE (NEC)\n");
+	cdda->pause_audio(1);
+	m_cdda_status = CDDA_STILL;
+
+	scsi_status_complete(SS_GOOD);
+}
+
+// ddh: read sub-channel Q, byte 1 = allocation length
+void nscsi_cdrom_pcfx_device::nec_read_subq()
+{
+	u8 cdb[10];
+	std::copy_n(m_scsi_cmdbuf, 10, cdb);
+
+	if (!image->exists())
+	{
+		return_no_cd();
+		return;
+	}
+
+	const u32 lba = (m_cdda_status == CDDA_STOPPED) ? m_cdda_start : cdda->get_audio_lba();
+	const u32 track = image->get_track(lba);
+
+	m_scsi_cmdbuf[0] = m_cdda_status;
+	// get_adr_control() is ADR in the high nibble, as for READ TOC, Q has the control field first
+	const u8 adr_control = image->get_adr_control(track);
+	m_scsi_cmdbuf[1] = ((adr_control & 0x0f) << 4) | (adr_control >> 4);
+	m_scsi_cmdbuf[2] = to_bcd(track + 1);
+	m_scsi_cmdbuf[3] = 1;
+	put_msf(&m_scsi_cmdbuf[4], s32(lba - image->get_track_start(track)) - 150);
+	put_msf(&m_scsi_cmdbuf[7], lba);
+
+	scsi_data_in(SBUF_MAIN, std::min<int>(cdb[1], 10));
+	scsi_status_complete(SS_GOOD);
+}
+
+// deh: get directory (TOC) information, byte 1 = type
+void nscsi_cdrom_pcfx_device::nec_get_dir_info()
+{
+	u8 cdb[10];
+	std::copy_n(m_scsi_cmdbuf, 10, cdb);
+
+	if (!image->exists())
+	{
+		return_no_cd();
+		return;
+	}
+
+	LOGCMD("0xde GET DIR INFO (NEC): type %d track %02x\n", cdb[1] & 3, cdb[2]);
+
+	const int last_track = image->get_last_track();
+	int size = 0;
+	std::fill_n(m_scsi_cmdbuf, 2 + 10 * 103, 0);
+
+	switch (cdb[1] & 3)
+	{
+		case 0: // first and last track
+			m_scsi_cmdbuf[0] = to_bcd(1);
+			m_scsi_cmdbuf[1] = to_bcd(last_track);
+			size = 4;
+			break;
+
+		case 1: // lead-out
+			put_msf(&m_scsi_cmdbuf[0], image->get_track_start(0xaa));
+			size = 4;
+			break;
+
+		case 2: // track start and control
+		{
+			const int track = from_bcd(cdb[2]);
+			if (track < 1 || track > last_track)
+			{
+				report_bad_cdb_field();
+				return;
+			}
+			put_msf(&m_scsi_cmdbuf[0], image->get_track_start(track - 1));
+			m_scsi_cmdbuf[3] = image->get_adr_control(track - 1) & 0x0f;
+			size = 4;
+			break;
+		}
+
+		case 3: // lead-in Q entries: A0, A1, A2 then each track, or only the one in byte 2
+		{
+			const u8 match = cdb[2];
+			if (match != 0x00 && match != 0xa0 && match != 0xa1 && match != 0xa2 && match != 0xb0)
+			{
+				report_bad_cdb_field();
+				return;
+			}
+
+			int offset = 2;
+			s32 lead_in = -150;
+			auto entry = [this, &offset, &lead_in] (u8 point, s32 plba, u8 control)
+			{
+				u8 *const e = &m_scsi_cmdbuf[offset];
+				e[0] = control << 4;
+				e[1] = 0;
+				e[2] = point;
+				put_msf(&e[3], lead_in++);
+				e[6] = 0;
+				put_msf(&e[7], plba);
+				offset += 10;
+			};
+			auto control = [this] (int track) { return image->get_adr_control(track) & 0x0f; };
+
+			if (!match || match == 0xa0)
+				entry(0xa0, 1 * 75 * 60 - 150, control(0));
+			if (!match || match == 0xa1)
+				entry(0xa1, last_track * 75 * 60 - 150, control(last_track - 1));
+			if (!match || match == 0xa2)
+				entry(0xa2, image->get_track_start(0xaa), control(last_track - 1));
+			if (!match)
+				for (int track = 1; track <= last_track; track++)
+					entry(to_bcd(track), image->get_track_start(track - 1), control(track - 1));
+			if (match == 0xb0)
+				offset += 0x14;
+
+			put_u16be(&m_scsi_cmdbuf[0], offset - 2);
+			size = offset;
+			break;
+		}
+	}
+
+	scsi_data_in(SBUF_MAIN, size);
+	scsi_status_complete(SS_GOOD);
+}

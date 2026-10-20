@@ -4153,6 +4153,8 @@ if BUSES["NSCSI"] then
 		MAME_DIR .. "src/devices/bus/nscsi/pc8801_30.h",
 		MAME_DIR .. "src/devices/bus/nscsi/pc98_hd.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/pc98_hd.h",
+		MAME_DIR .. "src/devices/bus/nscsi/pcfxcd.cpp",
+		MAME_DIR .. "src/devices/bus/nscsi/pcfxcd.h",
 		MAME_DIR .. "src/devices/bus/nscsi/s1410.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/s1410.h",
 		MAME_DIR .. "src/devices/bus/nscsi/sa1403d.cpp",
