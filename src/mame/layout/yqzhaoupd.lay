@@ -1,0 +1,240 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<element name="ledr" defstate="1">
+		<text string=""></text>
+		<rect state="0">
+				<color red="1" green="0" blue="0" />
+				<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+		<rect state="1">
+				<color red="0.1" green="0" blue="0" />
+				<bounds x="0" y="0" width="1" height="1" />
+		</rect>	
+	</element>
+	<element name="ledr2" defstate="1">
+		<text string=""></text>
+		<disk state="0">
+				<color red="1" green="0" blue="0" />
+				<bounds x="0" y="0" width="1" height="1" />
+		</disk>
+			<disk state="1">
+				<color red="0.1" green="0" blue="0" />
+				<bounds x="0" y="0" width="1" height="1" />
+		</disk>		
+	</element>
+	
+	<element name="ledg" defstate="1">
+		<text string=""></text>
+		<rect state="0">
+				<color red="0" green="1" blue="0" />
+				<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+		
+	<rect state="1">
+				<color red="0.0" green="0.1" blue="0" />
+				<bounds x="0" y="0" width="1" height="1" />
+		</rect>			
+	</element>
+	<element name="ledg2" defstate="1">
+		<text string=""></text>
+		<disk state="0">
+				<color red="0" green="1" blue="0" />
+				<bounds x="0" y="0" width="0.9" height="1" />
+		</disk>
+	<disk state="1">
+				<color red="0.0" green="0.1" blue="0" />
+				<bounds x="0" y="0" width="1" height="1" />
+		</disk>			
+	</element>
+
+
+	<view name="Default Layout">
+		<bounds left="0" top="0" right="1701" bottom="1776" />
+
+
+		<!-- LEDs -->
+
+		<element name="led5"  ref="ledr"><bounds x="289" y="442" width="106" height="106" /></element>
+		<element name="led6"  ref="ledr"><bounds x="402" y="442" width="106" height="106" /></element>
+		<element name="led7"  ref="ledr"><bounds x="518" y="442" width="106" height="106" /></element>
+		<element name="led8"  ref="ledr"><bounds x="631" y="442" width="106" height="106" /></element>
+		<element name="led9"  ref="ledr"><bounds x="745" y="442" width="106" height="106" /></element>
+		<element name="led10"  ref="ledr"><bounds x="859" y="442" width="106" height="106" /></element>
+		<element name="led11" ref="ledr"><bounds x="973" y="441" width="106" height="106" /></element>
+
+		<element name="led4"  ref="ledr"><bounds x="289" y="549" width="106" height="106" /></element>
+		<element name="led12" ref="ledr"><bounds x="973" y="549" width="106" height="106" /></element>
+
+		<element name="led3"  ref="ledr"><bounds x="289" y="656" width="106" height="106" /></element>
+		<element name="led13" ref="ledr"><bounds x="973" y="656" width="106" height="106" /></element>
+
+		<element name="led2"  ref="ledr"><bounds x="291" y="763" width="106" height="106" /></element>
+		<element name="led14" ref="ledr"><bounds x="973" y="763" width="106" height="106" /></element>
+
+		<element name="led1"  ref="ledr"><bounds x="289" y="870" width="106" height="106" /></element>
+		<element name="led15" ref="ledr"><bounds x="973" y="870" width="106" height="106" /></element>
+
+		<element name="led0" ref="ledr"><bounds x="289" y="977" width="106" height="106" /></element>
+		<element name="led16" ref="ledr"><bounds x="973" y="977" width="106" height="106" /></element>
+
+		<element name="led23" ref="ledr"><bounds x="289" y="1085" width="106" height="106" /></element>
+		<element name="led22" ref="ledr"><bounds x="403" y="1085" width="106" height="106" /></element>
+		<element name="led21" ref="ledr"><bounds x="517" y="1085" width="106" height="106" /></element>
+		<element name="led20" ref="ledr"><bounds x="631" y="1085" width="106" height="106" /></element>
+		<element name="led19" ref="ledr"><bounds x="745" y="1085" width="106" height="106" /></element>
+		<element name="led18" ref="ledr"><bounds x="857" y="1085" width="106" height="106" /></element>
+		<element name="led17" ref="ledr"><bounds x="973" y="1085" width="106" height="106" /></element>
+
+		<element name="led31" ref="ledr2"><bounds x="622" y="833" width="106" height="106" /></element>
+
+		<element name="led40" ref="ledg2"><bounds x="455" y="995" width="69" height="69" /></element>
+		<element name="led41" ref="ledg2"><bounds x="570" y="920" width="69" height="69" /></element>
+		<element name="led42" ref="ledg2"><bounds x="735" y="925" width="69" height="69" /></element>
+		<element name="led43" ref="ledg2"><bounds x="855" y="995" width="69" height="69" /></element>
+
+		<element name="led44" ref="ledr2"><bounds x="504" y="714" width="69" height="69" /></element>
+		<element name="led45" ref="ledr2"><bounds x="571" y="670" width="69" height="69" /></element>
+		<element name="led46" ref="ledr2"><bounds x="648" y="651" width="69" height="69" /></element>
+		<element name="led47" ref="ledr2"><bounds x="724" y="670" width="69" height="69" /></element>
+		<element name="led30" ref="ledr2"><bounds x="790" y="716" width="69" height="69" /></element>
+
+
+
+		<element name="led36" ref="ledr"><bounds x="522" y="986" width="33" height="33" /></element>
+		<element name="led37" ref="ledr"><bounds x="618" y="986" width="33" height="33" /></element>
+		<element name="led38" ref="ledg"><bounds x="715" y="986" width="33" height="33" /></element>
+		<element name="led39" ref="ledg"><bounds x="810" y="986" width="33" height="33" /></element>
+
+		<element name="led32" ref="ledr"><bounds x="522" y="1041" width="33" height="33" /></element>
+		<element name="led33" ref="ledr"><bounds x="618" y="1041" width="33" height="33" /></element>
+		<element name="led34" ref="ledg"><bounds x="715" y="1041" width="33" height="33" /></element>
+		<element name="led35" ref="ledg"><bounds x="810" y="1041" width="33" height="33" /></element>
+
+		<element name="led27" ref="ledr"><bounds x="384" y="1196" width="33" height="33" /></element>
+		<element name="led28" ref="ledr"><bounds x="499" y="1196" width="33" height="33" /></element>
+		<element name="led29" ref="ledr"><bounds x="613" y="1196" width="33" height="33" /></element>
+		<element name="led24" ref="ledr"><bounds x="724" y="1196" width="33" height="33" /></element>
+		<element name="led26" ref="ledr"><bounds x="838" y="1196" width="33" height="33" /></element>
+		<element name="led25" ref="ledr"><bounds x="953" y="1196" width="33" height="33" /></element>
+
+		
+		<!-- Top 7seg display modules -->
+
+
+		<element name="digit23" ref="digit">
+			<bounds left="419" top="371" right="461" bottom="431" />
+		</element>
+		<element name="digit22" ref="digit">
+			<bounds left="468" top="371" right="510" bottom="431" />
+		</element>
+		<element name="digit21" ref="digit">
+			<bounds left="517" top="371" right="558" bottom="431" />
+		</element>
+		<element name="digit20" ref="digit">
+			<bounds left="565" top="371" right="607" bottom="431" />
+		</element>
+
+
+		<element name="digit19" ref="digit">
+			<bounds left="809" top="369" right="851" bottom="429" />
+		</element>
+		<element name="digit18" ref="digit">
+			<bounds left="858" top="369" right="900" bottom="429" />
+		</element>
+		<element name="digit17" ref="digit">
+			<bounds left="907" top="369" right="948" bottom="429" />
+		</element>
+		<element name="digit16" ref="digit">
+			<bounds left="955" top="369" right="997" bottom="429" />
+		</element>
+
+		<!-- Middle 7seg display module -->
+
+		<element name="digit31" ref="digit">
+			<bounds left="590" top="570" right="630" bottom="630" />
+		</element>
+		<element name="digit30" ref="digit">
+			<bounds left="638" top="570" right="678" bottom="630" />
+		</element>
+		<element name="digit29" ref="digit">
+			<bounds left="685" top="570" right="725" bottom="630" />
+		</element>
+		<element name="digit28" ref="digit">
+			<bounds left="738" top="570" right="778" bottom="630" />
+		</element>
+		<element name="digit27" ref="digit">
+			<bounds left="589" top="753" right="629" bottom="813" />
+		</element>
+		<element name="digit26" ref="digit">
+			<bounds left="637" top="753" right="677" bottom="813" />
+		</element>
+		<element name="digit25" ref="digit">
+			<bounds left="684" top="753" right="724" bottom="813" />
+		</element>
+		<element name="digit24" ref="digit">
+			<bounds left="737" top="753" right="777" bottom="813" />
+		</element>
+
+
+
+		<element name="digit15" ref="digit">
+			<bounds left="240" top="1350" right="280" bottom="1410" />
+		</element>
+		<element name="digit14" ref="digit">
+			<bounds left="290" top="1350" right="330" bottom="1410" />
+		</element>
+		<element name="digit13" ref="digit">
+			<bounds left="353" top="1350" right="393" bottom="1410" />
+		</element>
+		<element name="digit12" ref="digit">
+			<bounds left="403" top="1350" right="443" bottom="1410" />
+		</element>
+		<element name="digit11" ref="digit">
+			<bounds left="467" top="1350" right="507" bottom="1410" />
+		</element>
+		<element name="digit10" ref="digit">
+			<bounds left="517" top="1350" right="557" bottom="1410" />
+		</element>
+		<element name="digit9" ref="digit">
+			<bounds left="579" top="1350" right="619" bottom="1410" />
+		</element>
+		<element name="digit8" ref="digit">
+			<bounds left="629" top="1350" right="669" bottom="1410" />
+		</element>
+		<element name="digit7" ref="digit">
+			<bounds left="693" top="1350" right="733" bottom="1410" />
+		</element>
+		<element name="digit6" ref="digit">
+			<bounds left="743" top="1350" right="783" bottom="1410" />
+		</element>
+		<element name="digit5" ref="digit">
+			<bounds left="806" top="1350" right="846" bottom="1410" />
+		</element>
+		<element name="digit4" ref="digit">
+			<bounds left="856" top="1350" right="896" bottom="1410" />
+		</element>
+		<element name="digit3" ref="digit">
+			<bounds left="922" top="1350" right="962" bottom="1410" />
+		</element>
+		<element name="digit2" ref="digit">
+			<bounds left="972" top="1350" right="1012" bottom="1410" />
+		</element>
+		<element name="digit1" ref="digit">
+			<bounds left="1036" top="1350" right="1076" bottom="1410" />
+		</element>
+		<element name="digit0" ref="digit">
+			<bounds left="1086" top="1350" right="1126" bottom="1410" />
+		</element>
+  </view>
+</mamelayout>
