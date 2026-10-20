@@ -795,8 +795,9 @@ bool hd63484_device::set_dot(int16_t x, int16_t y, int16_t px, int16_t py)
 				return set_dot(x, y, cl0);
 			break;
 		case 0x03:
-			fatalerror("HD63484 color modes (Pattern RAM indirect)\n");
-			// TODO
+			// pattern RAM contents are directly used as color data, with the
+			// selected pattern row sliced per dot like a color register
+			return set_dot(x, y, (m_pram[yp & 0x0f] >> ((x & xmask) * bpp)) & mask);
 	}
 
 	return false;
