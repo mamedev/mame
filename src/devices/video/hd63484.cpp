@@ -995,11 +995,13 @@ void hd63484_device::draw_ellipse(int16_t cx, int16_t cy, double dx, double dy, 
 void hd63484_device::paint(int16_t sx, int16_t sy)
 {
 /*
-    This is not accurate since real hardware can only hold 4 'unpaintable' areas,
-    the other 'unpaintable' points are pushed into the read FIFO to be processed
-    later by the program, but currently is impossible suspend/resume the command
-    in case the read FIFO is full, so all 'unpaintable' areas are painted.
-    Also CP is not in the correct position after this command.
+    Complex figure handling is approximated: real hardware holds four
+    unpaintable-area coordinates on an internal stack and pushes further ones
+    into the read FIFO as 3-word records (CPx, CPy, pattern pointer), halting
+    while the FIFO is full so the host can drain it and re-issue PAINT per
+    spilled point. Painting everything in one pass instead keeps such programs
+    working: they see command end with an empty read FIFO, i.e. 'completely
+    painted', which mid-command suspension would be needed to improve on.
 */
 	uint8_t e = BIT(m_cr, 8);
 	uint8_t bpp = get_bpp();
@@ -1017,6 +1019,10 @@ void hd63484_device::paint(int16_t sx, int16_t sy)
 
 	std::vector<std::pair<int16_t, int16_t>> seeds;
 	seeds.emplace_back(sx, sy);
+
+	// CP ends up at the end point of the bottom-most painted line
+	int32_t pe_x = sx;
+	int32_t pe_y = sy;
 
 	// failsafe for fills whose painted dots stay paintable (conditional
 	// operation modes), which would otherwise never terminate
@@ -1043,6 +1049,12 @@ void hd63484_device::paint(int16_t sx, int16_t sy)
 			if (set_dot(px, y, px - m_cpx, y - m_cpy))
 				return;
 
+			if (y < pe_y || (y == pe_y && px > pe_x))
+			{
+				pe_x = px;
+				pe_y = y;
+			}
+
 			// drop one seed per paintable run of the adjacent rows
 			if (paintable(px, y + 1)) { if (!up) { seeds.emplace_back(px, y + 1); up = true; } }
 			else up = false;
@@ -1053,6 +1065,9 @@ void hd63484_device::paint(int16_t sx, int16_t sy)
 
 	if (!budget)
 		logerror("HD63484 '%s': PAINT dot budget exhausted, fill aborted\n", tag());
+
+	m_cpx = pe_x;
+	m_cpy = pe_y;
 }
 
 uint16_t hd63484_device::command_rpr_exec()
