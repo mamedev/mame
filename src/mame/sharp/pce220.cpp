@@ -497,6 +497,14 @@ uint8_t pce220_state::irq_status_r()
 void pce220_state::irq_ack_w(uint8_t data)
 {
 	m_irq_flag &= ~data;
+
+	// acknowledge interrupts
+	if (data & IRQ_FLAG_KEY)
+		m_input_merger->in_w<0>(CLEAR_LINE);
+	if (data & IRQ_FLAG_ON)
+		m_input_merger->in_w<1>(CLEAR_LINE);
+	if (data & IRQ_FLAG_TIMER)
+		m_input_merger->in_w<2>(CLEAR_LINE);
 }
 
 void pce220_state::irq_mask_w(uint8_t data)
