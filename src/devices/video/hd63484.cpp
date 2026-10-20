@@ -2094,7 +2094,8 @@ void hd63484_device::video_registers_w(int offset)
 			queue_w((vreg_data & 0xff00) >> 8);
 			queue_w((vreg_data & 0x00ff) >> 0);
 			if(FIFO_LOG) logerror("%s -> %04x\n",acrtc_regnames[m_ar/2],vreg_data);
-			process_fifo();
+			if (!BIT(m_ccr, 14))
+				process_fifo();
 			break;
 
 		case 0x02: // Command Entry
@@ -2109,8 +2110,16 @@ void hd63484_device::video_registers_w(int offset)
 			---- -xxx ---- ---- Graphic Bit Mode (bpp)
 			---- ---- xxxx xxxx irq mask, directly correlated to sr
 			*/
-			m_ccr = vreg_data;
-			update_irq();
+			{
+				bool const resume = BIT(m_ccr, 14) && !BIT(vreg_data, 14) && !(vreg_data & 0x8000);
+				m_ccr = vreg_data;
+				update_irq();
+
+				// leaving pause: process everything accumulated in the write FIFO
+				if (resume)
+					while (m_fifo_ptr >= 1)
+						process_fifo();
+			}
 			break;
 
 		case 0x04:
@@ -2288,7 +2297,7 @@ void hd63484_device::write8(offs_t offset, uint8_t data)
 		if(m_ar < 2) // FIFO write
 		{
 			queue_w(data);
-			if (m_ar & 1)
+			if ((m_ar & 1) && !BIT(m_ccr, 14))
 				process_fifo();
 
 			m_ar ^= 1;
