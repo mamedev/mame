@@ -153,6 +153,8 @@ private:
 	uint16_t m_vc, m_vws, m_vww, m_vds;
 	uint8_t m_vsw;
 
+	uint8_t m_hzf, m_vzf;
+
 	uint16_t m_ppy;
 	uint16_t m_pzcy;
 	uint16_t m_ppx;

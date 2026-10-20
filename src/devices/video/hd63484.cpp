@@ -2144,6 +2144,13 @@ void hd63484_device::video_registers_w(int offset)
 			m_sp[2] = vreg_data & 0x0fff;
 			recompute_parameters();
 			break;
+		case 0xea: // Zoom Factor Register
+			m_hzf = (vreg_data >> 12) & 0x0f;
+			m_vzf = (vreg_data >> 8) & 0x0f;
+			if (m_hzf)
+				logerror("HD63484 '%s': unsupported horizontal zoom factor %d (external dot shifter)\n", tag(), m_hzf + 1);
+			break;
+
 		case 0x94: // Vertical Window Register A
 			m_vws = (vreg_data & 0xfff) + 1;
 			recompute_parameters();
@@ -2317,6 +2324,7 @@ void hd63484_device::device_reset()
 	m_dma_d0 = m_dma_d1 = 0;
 	m_stream = STREAM_NONE;
 	m_irq_state = CLEAR_LINE;
+	m_hzf = m_vzf = 0;
 
 	memset(m_vreg, 0, sizeof(m_vreg));
 	memset(m_fifo, 0, sizeof(m_fifo));
@@ -2339,7 +2347,8 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 	int bpp = get_bpp();
 	int ppw = 16 / bpp;
 	uint32_t mask = (1 << bpp) - 1;
-	uint32_t base_offs = m_sar[layer_n] + (y - vs) * m_mwr[layer_n] + m_external_skew;
+	int row = (layer_n == 1) ? (y - vs) / (m_vzf + 1) : (y - vs);
+	uint32_t base_offs = m_sar[layer_n] + row * m_mwr[layer_n] + m_external_skew;
 	uint32_t wind_offs = m_sar[3] + (y - m_vws) * m_mwr[3] + m_external_skew;
 	int step = (m_omr & 0x08) ? 2 : 1;
 	int ppmc = get_ppmc();
@@ -2449,6 +2458,8 @@ void hd63484_device::register_save_state()
 	save_item(NAME(m_dn));
 	save_item(NAME(m_stream));
 	save_item(NAME(m_irq_state));
+	save_item(NAME(m_hzf));
+	save_item(NAME(m_vzf));
 	save_item(NAME(m_ccr));
 	save_item(NAME(m_omr));
 	save_item(NAME(m_edg));
