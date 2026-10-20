@@ -694,13 +694,11 @@ static const int pressure_table[0x100] =
 
 void dendego_state::speedmeter_w(uint8_t data)
 {
-	assert(odometer_table[0xff] == 1300);
 	m_counters[2] = odometer_table[data];
 }
 
 void dendego_state::brakemeter_w(uint8_t data)
 {
-	assert(pressure_table[0xff] == 1600);
 	m_counters[3] = pressure_table[data];
 }
 
