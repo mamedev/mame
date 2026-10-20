@@ -101,7 +101,7 @@ void toccata_device::update_interrupts()
 		LOGMASKED(LOG_IRQ, "generating interrupt, control = %02x, status = %02x\n", m_control, m_status);
 
 		m_status &= ~(1 << 7);
-		m_zorro->int6_w(1);
+		int6_w(1);
 	}
 }
 
@@ -171,7 +171,7 @@ uint8_t toccata_device::status_r(offs_t offset)
 
 		// reading the status clears the interrupt
 		m_status = 0x80;
-		m_zorro->int6_w(0);
+		int6_w(0);
 	}
 
 	return data;
@@ -280,13 +280,13 @@ void toccata_device::autoconfig_base_address(offs_t address)
 	LOG("-> installing toccata\n");
 
 	// stop responding to default autoconfig
-	m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
+	zorro_space().unmap_readwrite(0xe80000, 0xe8007f);
 
 	// toccata registers
-	m_zorro->space().install_device(address, address + 0x0ffff, *this, &toccata_device::mmio_map);
+	zorro_space().install_device(address, address + 0x0ffff, *this, &toccata_device::mmio_map);
 
 	// we're done
-	m_zorro->cfgout_w(0);
+	cfgout_w(0);
 }
 
 void toccata_device::cfgin_w(int state)
@@ -309,7 +309,7 @@ void toccata_device::cfgin_w(int state)
 		autoconfig_rom_vector(0x0000);
 
 		// install autoconfig handler
-		m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
+		zorro_space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
 			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}

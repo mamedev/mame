@@ -22,7 +22,7 @@
     GQ974 PWB(A2) 0000070140 Extend board
     -------------------------------------
         ADC0808CCN
-        FDC37C665GT (floppy disk controller)
+        FDC37C665GT (Super I/O floppy disk controller)
         National Semiconductor PC16552DV (dual UART)
         ADM223LJR (RS-232 driver/receiver)
 
@@ -748,7 +748,7 @@ void firebeat_state::firebeat(machine_config &config)
 	/* video hardware */
 	PALETTE(config, "palette", palette_device::RGB_555);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
 	screen.set_screen_update(m_gcu, FUNC(k057714_device::draw));
 	screen.set_palette("palette");
@@ -1818,7 +1818,7 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	/* video hardware */
 	PALETTE(config, "palette", palette_device::RGB_555);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
 	lscreen.set_screen_update(m_gcu, FUNC(k057714_device::draw));
 	lscreen.set_palette("palette");
@@ -1827,7 +1827,7 @@ void firebeat_kbm_state::firebeat_kbm(machine_config &config)
 	K057714(config, m_gcu).set_screen("lscreen");
 	m_gcu->irq_callback().set(FUNC(firebeat_kbm_state::gcu_interrupt));
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 525, 0, 480);
 	rscreen.set_screen_update(m_gcu_sub, FUNC(k057714_device::draw));
 	rscreen.set_palette("palette");

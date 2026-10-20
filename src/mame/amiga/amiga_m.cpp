@@ -344,17 +344,27 @@ void amiga_state::update_irqs()
 	}
 
 	// int 2 and 6 are level triggered
+	uint16_t level_interrupts = 0;
+
 	if (int2_pending())
-		CUSTOM_REG(REG_INTREQ) |= INTENA_PORTS;
+		level_interrupts |= INTENA_PORTS;
 
 	if (int6_pending())
-		CUSTOM_REG(REG_INTREQ) |= INTENA_EXTER;
+		level_interrupts |= INTENA_EXTER;
+
+	uint16_t const newly_asserted = level_interrupts & ~CUSTOM_REG(REG_INTREQ);
+
+	CUSTOM_REG(REG_INTREQ) |= level_interrupts;
+
+	// schedule another call to us if new interrupts arrived
+	if (newly_asserted)
+		m_irq_timer->adjust(m_maincpu->cycles_to_attotime(AMIGA_IRQ_DELAY_CYCLES));
 }
 
 TIMER_CALLBACK_MEMBER( amiga_state::irq_process_callback )
 {
-	update_irqs();
 	m_irq_timer->reset();
+	update_irqs();
 }
 
 void amiga_state::paula_int_w (offs_t channel, u8 state)
@@ -1042,7 +1052,7 @@ void amiga_state::gayle_cia_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 ioport_value amiga_state::floppy_drive_status()
 {
-	return m_fdc->ciaapra_r();
+	return m_fdc->ciaapra_r() | 0x03;
 }
 
 void amiga_state::cia_0_port_a_write(uint8_t data)
@@ -1081,11 +1091,16 @@ uint8_t amiga_state::cia_1_port_a_read()
 	data |= m_rs232_cts << 4;
 	data |= m_rs232_dcd << 5;
 
+	data |= 0xc0;
+
 	return data;
 }
 
 void amiga_state::cia_1_port_a_write(uint8_t data)
 {
+	m_cia_1->sp_w(BIT(data, 0));
+	m_cia_1->cnt_w(BIT(data, 1));
+
 	if (m_rs232)
 	{
 		m_rs232->write_rts(BIT(data, 6));
@@ -1198,8 +1213,9 @@ void amiga_state::ocs_map(address_map &map)
 			return CUSTOM_REG(REG_COLOR00 + offset);
 		}),
 		NAME([this] (offs_t offset, u16 data) {
-			CUSTOM_REG(REG_COLOR00 + offset) = data;
+			// TODO: a2000 kick31 Prefs/Overscan sets bit 15 here for COLOR01, genlock select?
 			data &= 0xfff;
+			CUSTOM_REG(REG_COLOR00 + offset) = data;
 			// Extra Half-Brite
 			CUSTOM_REG(REG_COLOR00 + offset + 32) = (data >> 1) & 0x777;
 		})
@@ -1380,7 +1396,7 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 			}
 			else
 			{
-				int scale = m_agnus_id & 0x10 ? 525 : 625;
+				int scale = m_agnus_id & 0x10 ? SCREEN_HEIGHT_NTSC : SCREEN_HEIGHT_PAL;
 
 				m_pot0dat  = (int) ((double) m_pot0x / scale) * 0xff;
 				m_pot0dat |= (int)(((double) m_pot0y / scale) * 0xff) << 8;
@@ -1395,7 +1411,7 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 			}
 			else
 			{
-				int scale = m_agnus_id & 0x10 ? 525 : 625;
+				int scale = m_agnus_id & 0x10 ? SCREEN_HEIGHT_NTSC : SCREEN_HEIGHT_PAL;
 
 				m_pot1dat  = (int) ((double) m_pot1x / scale) * 0xff;
 				m_pot1dat |= (int)(((double) m_pot1y / scale) * 0xff) << 8;

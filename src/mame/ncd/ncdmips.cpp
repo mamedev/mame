@@ -109,7 +109,7 @@ void ncd_mips_state::hmxpro(machine_config &config)
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
 	m_duart->irq_cb().set(FUNC(ncd_mips_state::duart_irq_handler));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(77.4144_MHz_XTAL, 1376, 0, 1024, 803, 0, 768);
 	m_screen->set_screen_update(FUNC(ncd_mips_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(ncd_mips_state::vblank));

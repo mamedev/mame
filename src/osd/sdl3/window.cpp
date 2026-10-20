@@ -760,8 +760,8 @@ void sdl_window_info::update()
 			// Check whether window has vector screens
 
 			{
-				const screen_device *screen = screen_device_enumerator(machine().root_device()).byindex(index());
-				if ((screen != nullptr) && (screen->screen_type() == SCREEN_TYPE_VECTOR))
+				const device_video_output_interface *screen = video_output_interface_enumerator(machine().root_device()).byindex(index());
+				if ((screen != nullptr) && (screen->is_vector()))
 					renderer().set_flags(osd_renderer::FLAG_HAS_VECTOR_SCREEN);
 				else
 					renderer().clear_flags(osd_renderer::FLAG_HAS_VECTOR_SCREEN);
@@ -944,7 +944,9 @@ int sdl_window_info::complete_create()
 	set_platform_window(sdlwindow);
 	renderer_create();
 
+#ifndef SDLMAME_ANDROID
 	SDL_StartTextInput(sdlwindow);
+#endif
 
 	if (fullscreen() && video_config.switchres)
 	{

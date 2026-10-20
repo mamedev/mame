@@ -367,15 +367,13 @@ void acorn_memc_device::do_video_dma()
 
 void acorn_memc_device::do_sound_dma()
 {
-	if (m_vidc.found())
+	for (int i = 0; i < 4; i++)
 	{
-		for (int ch = 0; ch < 8; ch++)
-			m_vidc->write_dac(ch, m_space->read_byte(dram_address(m_sndcur + ch)));
+		if (m_vidc.found())
+			m_vidc->enqueue32_fifo(m_space->read_dword(dram_address(m_sndcur)));
+		m_sndcur += 4;
 	}
-
-	m_sndcur += 8;
-
-	if (m_sndcur >= m_sndendcur)
+	if (m_sndcur > m_sndendcur)
 	{
 		m_sirq_w(ASSERT_LINE);
 
@@ -392,7 +390,7 @@ void acorn_memc_device::do_sound_dma()
 		else if (m_vidc.found())
 		{
 			for (int ch=0; ch<8; ch++)
-				m_vidc->clear_dac(ch);
+				m_vidc->write_dac(ch, 0);
 		}
 	}
 }

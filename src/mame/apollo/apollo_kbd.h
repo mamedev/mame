@@ -60,8 +60,6 @@ private:
 	TIMER_CALLBACK_MEMBER( kbd_scan_timer );
 
 	std::string cpu_context() const;
-	template <typename Format, typename... Params>
-	void logerror(Format &&fmt, Params &&... args) const;
 
 	void kgetchar(uint8_t data);
 

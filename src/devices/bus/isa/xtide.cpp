@@ -69,7 +69,7 @@ uint8_t xtide_device::read(offs_t offset)
 	}
 	else if (offset < 8)
 	{
-		result = m_ata->cs0_r(offset & 7, 0xff);
+		result = m_ata->cs0_r(offset & 7);
 	}
 	else if (offset == 8)
 	{
@@ -77,7 +77,7 @@ uint8_t xtide_device::read(offs_t offset)
 	}
 	else
 	{
-		result = m_ata->cs1_r(offset & 7, 0xff);
+		result = m_ata->cs1_r(offset & 7);
 	}
 
 //  logerror("%s xtide_device::read: offset=%d, result=%2X\n",device->machine().describe_context(),offset,result);
@@ -97,7 +97,7 @@ void xtide_device::write(offs_t offset, uint8_t data)
 	}
 	else if (offset < 8)
 	{
-		m_ata->cs0_w(offset & 7, data, 0xff);
+		m_ata->cs0_w(offset & 7, data);
 	}
 	else if (offset == 8)
 	{
@@ -105,7 +105,7 @@ void xtide_device::write(offs_t offset, uint8_t data)
 	}
 	else
 	{
-		m_ata->cs1_w(offset & 7, data, 0xff);
+		m_ata->cs1_w(offset & 7, data);
 	}
 }
 

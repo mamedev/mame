@@ -1494,7 +1494,7 @@ void px4_state::px4(machine_config &config)
 	m_z80->set_addrmap(AS_IO, &px4_state::px4_io);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(72);
 	screen.set_size(240, 64);
 	screen.set_visarea(0, 239, 0, 63);

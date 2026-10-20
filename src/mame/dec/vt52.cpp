@@ -419,7 +419,7 @@ void vt52_state::vt52(machine_config &config)
 	AY51013(config, m_uart); // TR1402 or equivalent
 	m_uart->write_so_callback().set(FUNC(vt52_state::serial_out_w));
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "bell").add_route(ALL_OUTPUTS, "mono", 1.0); // FIXME: uses a flyback diode circuit

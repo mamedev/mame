@@ -681,7 +681,7 @@ void tank8_state::tank8(machine_config &config)
 	motorlatch.q_out_cb<7>().set(m_discrete, FUNC(discrete_device::write_line<TANK8_MOTOR8_EN>));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(11.055_MHz_XTAL * 2, 703, 16, 496, 524, 0, 464); // FIXME: should be 30 Hz interlaced, with two VBLANK interrupts per frame
 	m_screen->set_screen_update(FUNC(tank8_state::screen_update));

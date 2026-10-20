@@ -30,6 +30,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual u8 *get_cart_base() override;
 	virtual memory_region *get_cart_memregion() override;
+	virtual void device_resolve_objects() override ATTR_COLD;
 
 	virtual u8 cts_read(offs_t offset) override;
 	virtual void cts_write(offs_t offset, u8 data) override;

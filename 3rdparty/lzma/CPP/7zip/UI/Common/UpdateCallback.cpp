@@ -7,18 +7,12 @@
 #ifndef _WIN32
 // #include <grp.h>
 // #include <pwd.h>
-/*
-inclusion of <sys/sysmacros.h> by <sys/types.h> is deprecated since glibc 2.25.
-Since glibc 2.3.3, macros have been aliases for three GNU-specific
-functions: gnu_dev_makedev(), gnu_dev_major(), and gnu_dev_minor()
-*/
 // for major()/minor():
+#if defined(__APPLE__) || defined(__DragonFly__) || \
+    defined(BSD) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #include <sys/types.h>
-#if defined(__FreeBSD__) || defined(BSD) || defined(__APPLE__)
 #else
-#ifndef major
 #include <sys/sysmacros.h>
-#endif
 #endif
 
 #endif // _WIN32
@@ -38,6 +32,7 @@ functions: gnu_dev_makedev(), gnu_dev_major(), and gnu_dev_minor()
 #include "../../../Windows/PropVariant.h"
 
 #include "../../Common/StreamObjects.h"
+#include "../../Archive/Common/ItemNameUtils.h"
 
 #include "UpdateCallback.h"
 
@@ -176,6 +171,7 @@ Z7_COM7F_IMF(CArchiveUpdateCallback::GetRootProp(PROPID propID, PROPVARIANT *val
     case kpidATime:  if (ParentDirItem) PropVariant_SetFrom_FiTime(prop, ParentDirItem->ATime); break;
     case kpidMTime:  if (ParentDirItem) PropVariant_SetFrom_FiTime(prop, ParentDirItem->MTime); break;
     case kpidArcFileName:  if (!ArcFileName.IsEmpty()) prop = ArcFileName; break;
+    default: break;
   }
   prop.Detach(value);
   return S_OK;
@@ -311,7 +307,7 @@ Z7_COM7F_IMF(CArchiveUpdateCallback::GetRawProp(UInt32 index, PROPID propID, con
 
 #if defined(_WIN32) && !defined(UNDER_CE)
 
-static UString GetRelativePath(const UString &to, const UString &from)
+static UString GetRelativePath(const UString &to, const UString &from, bool isWSL)
 {
   UStringVector partsTo, partsFrom;
   SplitPathToParts(to, partsTo);
@@ -329,11 +325,12 @@ static UString GetRelativePath(const UString &to, const UString &from)
 
   if (i == 0)
   {
-    #ifdef _WIN32
-    if (NName::IsDrivePath(to) ||
-        NName::IsDrivePath(from))
+#ifdef _WIN32
+    if (isWSL ||
+       (NName::IsDrivePath(to) ||
+        NName::IsDrivePath(from)))
       return to;
-    #endif
+#endif
   }
 
   UString s;
@@ -378,54 +375,87 @@ Z7_COM7F_IMF(CArchiveUpdateCallback::GetProperty(UInt32 index, PROPID propID, PR
         return S_OK;
       }
       
-      #if !defined(UNDER_CE)
-
+#if !defined(UNDER_CE)
       if (up.DirIndex >= 0)
       {
         const CDirItem &di = DirItems->Items[(unsigned)up.DirIndex];
-        
-        #ifdef _WIN32
-        // if (di.IsDir())
+        if (di.ReparseData.Size())
         {
+#ifdef _WIN32
           CReparseAttr attr;
           if (attr.Parse(di.ReparseData, di.ReparseData.Size()))
           {
-            const UString simpleName = attr.GetPath();
-            if (!attr.IsSymLink_WSL() && attr.IsRelative_Win())
-              prop = simpleName;
-            else
+            UString path = attr.GetPath();
+            if (!path.IsEmpty())
             {
-              const FString phyPath = DirItems->GetPhyPath((unsigned)up.DirIndex);
-              FString fullPath;
-              if (NDir::MyGetFullPathName(phyPath, fullPath))
+              bool isWSL = attr.IsSymLink_WSL();
+              if (isWSL)
+                NArchive::NItemName::ReplaceToWinSlashes(path, true); // useBackslashReplacement
+              // it's expected that (path) now uses windows slashes.
+              // CReparseAttr::IsRelative_Win() returns true if FLAG_RELATIVE is set
+              // CReparseAttr::IsRelative_Win() returns true for "\dir1\path"
+              // but we want to store real relative paths without "\" root prefix.
+              // so we parse path instead of IsRelative_Win() calling.
+              if (// attr.IsRelative_Win() ||
+                  (isWSL ?
+                   IS_PATH_SEPAR(path[0]) :
+                   NName::IsAbsolutePath(path)))
               {
-                prop = GetRelativePath(simpleName, fs2us(fullPath));
+                // (path) is abolute path or relative to root: "\path"
+                // we try to convert (path) to relative path for writing to archive.
+                const FString phyPath = DirItems->GetPhyPath((unsigned)up.DirIndex);
+                FString fullPath;
+                if (NDir::MyGetFullPathName(phyPath, fullPath))
+                {
+                  if (IS_PATH_SEPAR(path[0]) &&
+                      !IS_PATH_SEPAR(path[1]))
+                  {
+                    // path is relative to root of (fullPath): "\path"
+                    const unsigned prefixSize = NName::GetRootPrefixSize(fullPath);
+                    if (prefixSize)
+                    {
+                      path.DeleteFrontal(1);
+                      path.Insert(0, fs2us(fullPath.Left(prefixSize)));
+                      // we have changed "\" prefix to drive prefix "c:\" in (path).
+                      // (path) is Windows path now.
+                      isWSL = false;
+                    }
+                  }
+                }
+                path = GetRelativePath(path, fs2us(fullPath), isWSL);
               }
+#if WCHAR_PATH_SEPARATOR != L'/'
+              // 7-Zip's TAR handler in Windows replaces windows slashes to linux slashes.
+              // so we can return any slashes to TAR handler.
+              // or we can convert to linux slashes here,
+              // because input IInArchive handler uses linux slashes for kpidSymLink.
+              // path.Replace(WCHAR_PATH_SEPARATOR, L'/');
+#endif
+              if (!path.IsEmpty())
+                prop = path;
             }
-            prop.Detach(value);
-            return S_OK;
           }
-        }
-        
-        #else // _WIN32
-
-        if (di.ReparseData.Size() != 0)
-        {
+#else // ! _WIN32
           AString utf;
           utf.SetFrom_CalcLen((const char *)(const Byte *)di.ReparseData, (unsigned)di.ReparseData.Size());
-
+    #if 0 // 0 - for debug
+          // it's expected that link data uses system codepage.
+          // fs2us() ignores conversion errors. But we want correct path
+          UString us (fs2us(utf));
+    #else
           UString us;
           if (ConvertUTF8ToUnicode(utf, us))
+    #endif
           {
-            prop = us;
-            prop.Detach(value);
-            return S_OK;
+            if (!us.IsEmpty())
+              prop = us;
           }
+#endif // ! _WIN32
         }
-
-        #endif // _WIN32
+        prop.Detach(value);
+        return S_OK;
       }
-      #endif // !defined(UNDER_CE)
+#endif // !defined(UNDER_CE)
     }
     else if (propID == kpidHardLink)
     {
@@ -433,7 +463,12 @@ Z7_COM7F_IMF(CArchiveUpdateCallback::GetProperty(UInt32 index, PROPID propID, PR
       {
         const CKeyKeyValPair &pair = _map[_hardIndex_To];
         const CUpdatePair2 &up2 = (*UpdatePairs)[pair.Value];
-        prop = DirItems->GetLogPath((unsigned)up2.DirIndex);
+        const UString path = DirItems->GetLogPath((unsigned)up2.DirIndex);
+#if WCHAR_PATH_SEPARATOR != L'/'
+        // 7-Zip's TAR handler in Windows replaces windows slashes to linux slashes.
+        // path.Replace(WCHAR_PATH_SEPARATOR, L'/');
+#endif
+        prop = path;
         prop.Detach(value);
         return S_OK;
       }
@@ -443,7 +478,7 @@ Z7_COM7F_IMF(CArchiveUpdateCallback::GetProperty(UInt32 index, PROPID propID, PR
         return S_OK;
       }
     }
-  }
+  } // if (up.NewData)
   
   if (up.IsAnti
       && propID != kpidIsDir
@@ -454,6 +489,7 @@ Z7_COM7F_IMF(CArchiveUpdateCallback::GetProperty(UInt32 index, PROPID propID, PR
     {
       case kpidSize:  prop = (UInt64)0; break;
       case kpidIsAnti:  prop = true; break;
+      default: break;
     }
   }
   else if (propID == kpidPath && up.NewNameIndex >= 0)
@@ -481,8 +517,8 @@ Z7_COM7F_IMF(CArchiveUpdateCallback::GetProperty(UInt32 index, PROPID propID, PR
       case kpidCTime:  PropVariant_SetFrom_FiTime(prop, di.CTime); break;
       case kpidATime:  PropVariant_SetFrom_FiTime(prop, di.ATime); break;
       case kpidMTime:  PropVariant_SetFrom_FiTime(prop, di.MTime); break;
-      case kpidAttrib:  prop = (UInt32)di.GetWinAttrib(); break;
-      case kpidPosixAttrib: prop = (UInt32)di.GetPosixAttrib(); break;
+      case kpidAttrib:  /* if (di.Attrib_IsDefined) */ prop = (UInt32)di.GetWinAttrib(); break;
+      case kpidPosixAttrib: /* if (di.Attrib_IsDefined) */ prop = (UInt32)di.GetPosixAttrib(); break;
     
     #if defined(_WIN32)
       case kpidIsAltStream:  prop = di.IsAltStream; break;
@@ -526,6 +562,7 @@ Z7_COM7F_IMF(CArchiveUpdateCallback::GetProperty(UInt32 index, PROPID propID, PR
           prop = DirItems->OwnerGroupMap.Strings[(unsigned)di.OwnerGroupIndex];
         break;
      #endif
+      default: break;
     }
   }
   prop.Detach(value);
@@ -594,8 +631,14 @@ Z7_COM7F_IMF(CArchiveUpdateCallback::GetStream2(UInt32 index, ISequentialInStrea
         mode != NUpdateNotifyOp::kUpdate)
       return S_OK;
 
+#if 1
     CStdInFileStream *inStreamSpec = new CStdInFileStream;
     CMyComPtr<ISequentialInStream> inStreamLoc(inStreamSpec);
+#else
+    CMyComPtr<ISequentialInStream> inStreamLoc;
+    if (!CreateStdInStream(inStreamLoc))
+      return GetLastError_noZero_HRESULT();
+#endif
     *inStream = inStreamLoc.Detach();
   }
   else
@@ -950,7 +993,7 @@ Z7_COM7F_IMF(CArchiveUpdateCallback::GetVolumeStream(UInt32 index, ISequentialOu
   fileName += VolExt;
   COutFileStream *streamSpec = new COutFileStream;
   CMyComPtr<ISequentialOutStream> streamLoc(streamSpec);
-  if (!streamSpec->Create(fileName, false))
+  if (!streamSpec->Create_NEW(fileName))
     return GetLastError_noZero_HRESULT();
   *volumeStream = streamLoc.Detach();
   return S_OK;

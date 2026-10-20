@@ -44,6 +44,7 @@ private:
 	std::unique_ptr<mpeg_audio> m_decoder;
 	int16_t m_audio_buf[1152*2];
 	uint32_t m_mp_start, m_mp_end, m_mp_vol, m_mp_pan, m_lp_start, m_lp_end, m_start, m_end;
+	uint32_t m_rom_bank;
 	int32_t m_mp_pos, m_audio_pos, m_audio_avail;
 
 	emu_timer *m_timer_1kHz;

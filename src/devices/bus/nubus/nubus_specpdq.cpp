@@ -147,7 +147,7 @@ void nubus_specpdq_device::device_add_mconfig(machine_config &config)
 {
 	config.set_default_layout(layout_monitors);
 
-	screen_device &screen(SCREEN(config, SPECPDQ_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SPECPDQ_SCREEN_NAME));
 	screen.set_screen_update(FUNC(nubus_specpdq_device::screen_update));
 	screen.set_raw(100.000_MHz_XTAL, 1'456, 108, 1'260, 915, 39, 909);
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);

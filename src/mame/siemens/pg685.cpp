@@ -439,7 +439,7 @@ void pg685_state::pg675(machine_config &config)
 	// ram
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12288000, 882, 0, 720, 370, 0, 350 ); // not real values
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -487,7 +487,7 @@ void pg685_state::pg685(machine_config &config)
 	// ram
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12288000, 882, 0, 720, 370, 0, 350 ); // not real values
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -539,7 +539,7 @@ void pg685_state::pg685oua12(machine_config &config)
 	// ram
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12288000, 882, 0, 720, 370, 0, 350 ); // not real values
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

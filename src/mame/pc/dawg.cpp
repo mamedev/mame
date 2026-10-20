@@ -42,7 +42,7 @@ public:
 		, m_kbdc(*this, "kbdc")
 	{ }
 
-	void dawg(machine_config &config);
+	void dawg(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

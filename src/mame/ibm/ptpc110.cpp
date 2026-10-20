@@ -109,7 +109,7 @@ isa16_f65535_lcd_device::isa16_f65535_lcd_device(const machine_config &mconfig, 
 
 void isa16_f65535_lcd_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update("vga", FUNC(f65535_vga_device::screen_update));
 

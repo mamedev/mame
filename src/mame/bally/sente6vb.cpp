@@ -65,11 +65,6 @@
 
 #include "speaker.h"
 
-#define LOG_CEM_WRITES (1U << 1)
-
-#define VERBOSE (0)
-#include "logmacro.h"
-
 
 DEFINE_DEVICE_TYPE(SENTE6VB, sente6vb_device, "sente6vb", "Bally Sente 6VB Audio Board")
 
@@ -140,12 +135,21 @@ void sente6vb_device::device_add_mconfig(machine_config &config)
 	filter_rc_device &ac_noise(FILTER_RC(config, "ac_noise"));
 	ac_noise.set_rc(filter_rc_device::HIGHPASS, RES_K(68) + RES_K(1), 0, 0, CAP_U(2.2)); // R19, R20, C115
 
+	cem3394_device::components comps =
+	{
+		.r_vco = RES_K(301),   // R1
+		.c_vco = CAP_U(0.002), // C1
+		.c_vcf = CAP_U(0.033), // C11
+		.c_ac = CAP_U(10),     // C3
+	};
+
+	cem3394_device::stream_inputs inputs;
+	inputs.ext_input = &ac_noise;
+
 	for (auto &cem_device : m_cem_device)
 	{
-		CEM3394(config, cem_device);
-		cem_device->configure(RES_K(301), CAP_U(0.002), CAP_U(0.033), CAP_U(10)); // R1, C1, C11, C3 on voice 0 (U1)
+		CEM3394(config, cem_device, comps, inputs);
 		cem_device->add_route(ALL_OUTPUTS, "mono", 0.50);
-		ac_noise.add_route(0, *cem_device, 1.0);
 	}
 }
 
@@ -280,7 +284,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(sente6vb_device::clock_counter_0_ff)
 void sente6vb_device::update_counter_0_timer()
 {
 	double maxfreq = 0.0;
-	int i;
 
 	// if there's already a timer, remove it
 	if (m_counter_0_timer_active)
@@ -289,18 +292,18 @@ void sente6vb_device::update_counter_0_timer()
 
 	// find the counter with the maximum frequency
 	// this is used to calibrate the timers at startup
-	for (i = 0; i < 6; i++)
-		if (m_cem_device[i]->get_parameter(cem3394_device::FINAL_GAIN) < 10.0)
+	for (int i = 0; i < 6; i++)
+		if (m_cem_device[i]->final_gain() > 0.1)
 		{
 			double tempfreq;
 
 			// if the filter resonance is high, then they're calibrating the filter frequency
-			if (m_cem_device[i]->get_parameter(cem3394_device::FILTER_RESONANCE) > 0.9)
-				tempfreq = m_cem_device[i]->get_parameter(cem3394_device::FILTER_FREQUENCY);
+			if (m_cem_device[i]->filt_res() > 3)
+				tempfreq = m_cem_device[i]->filt_freq();
 
 			// otherwise, they're calibrating the VCO frequency
 			else
-				tempfreq = m_cem_device[i]->get_parameter(cem3394_device::VCO_FREQUENCY);
+				tempfreq = m_cem_device[i]->vco_freq();
 
 			if (tempfreq > maxfreq) maxfreq = tempfreq;
 		}
@@ -388,21 +391,8 @@ void sente6vb_device::counter_control_w(uint8_t data)
 
 void sente6vb_device::chip_select_w(uint8_t data)
 {
-	static constexpr uint8_t register_map[8] =
-	{
-		cem3394_device::VCO_FREQUENCY,
-		cem3394_device::FINAL_GAIN,
-		cem3394_device::FILTER_RESONANCE,
-		cem3394_device::FILTER_FREQUENCY,
-		cem3394_device::MIXER_BALANCE,
-		cem3394_device::MODULATION_AMOUNT,
-		cem3394_device::PULSE_WIDTH,
-		cem3394_device::WAVE_SELECT
-	};
-
 	double voltage = (double)m_dac_value * (8.0 / 4096.0) - 4.0;
 	int diffchip = data ^ m_chip_select, i;
-	int reg = register_map[m_dac_register];
 
 	// remember the new select value
 	m_chip_select = data;
@@ -411,27 +401,17 @@ void sente6vb_device::chip_select_w(uint8_t data)
 	for (i = 0; i < 6; i++)
 		if ((diffchip & (1 << i)) && (data & (1 << i)))
 		{
-			// remember the previous value
-			double temp = m_cem_device[i]->get_parameter(reg);
-
 			// set the voltage
-			m_cem_device[i]->set_voltage(reg, voltage);
-
-			// only log changes
-			if (temp != m_cem_device[i]->get_parameter(reg))
+			switch (m_dac_register)
 			{
-				static const char *const names[] =
-				{
-					"VCO_FREQUENCY",
-					"FINAL_GAIN",
-					"FILTER_RESONANCE",
-					"FILTER_FREQUENCY",
-					"MIXER_BALANCE",
-					"MODULATION_AMOUNT",
-					"PULSE_WIDTH",
-					"WAVE_SELECT"
-				};
-				LOGMASKED(LOG_CEM_WRITES, "s%04X:   CEM#%d:%s=%f\n", m_audiocpu->pcbase(), i, names[m_dac_register], voltage);
+				case 0: m_cem_device[i]->set_vco_freq_cv(voltage);      break;
+				case 1: m_cem_device[i]->set_final_gain_cv(voltage);    break;
+				case 2: m_cem_device[i]->set_filt_res_cv(voltage);      break;
+				case 3: m_cem_device[i]->set_filt_freq_cv(voltage);     break;
+				case 4: m_cem_device[i]->set_mixer_balance_cv(voltage); break;
+				case 5: m_cem_device[i]->set_mod_amount_cv(voltage);    break;
+				case 6: m_cem_device[i]->set_pulse_width_cv(voltage);   break;
+				case 7: m_cem_device[i]->set_wave_select_cv(voltage);   break;
 			}
 		}
 

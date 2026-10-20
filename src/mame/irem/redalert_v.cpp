@@ -533,7 +533,7 @@ uint32_t redalert_state::screen_update_panther(screen_device &screen, bitmap_rgb
 
 void redalert_state::redalert_video_common(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);

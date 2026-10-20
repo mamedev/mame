@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="licocai_cart" description="Socrates Co. / C&amp;E Inc. LICO cartridges">
+
+	<!-- data seems to end abruptly in all of these, are they complete? -->
+	
+	<!-- has 3FFFF(2M) in the header, probably a word count, so 0x80000 bytes, so probably not bad -->
+	<software name="znfsg" supported="no">
+		<description>Zhuōná Fēnshù Guài</description>
+		<year>1992</year>
+		<publisher>Socrates Co. / C&amp;E Inc.</publisher>
+		<info name="alt_title" value="捉拿分數怪"/>
+		<part name="cart" interface="licocai_cart">
+			<feature name="label_color" value="green" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="lico-cai-cart1-green.bin" size="0x80000" crc="73940e86" sha1="cfac9b4a10eb203395ea82281217aa57ec89aea9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- has 16M in the header, and data seems to end abruptly. 16M bytes would be 0x200000, 16M words would be 0x400000, likely bad -->
+	<software name="zyfhk" supported="no">
+		<description>Zhùyīn Fúhào Kǎ</description>
+		<year>1994</year>
+		<publisher>Socrates Co. / C&amp;E Inc.</publisher>
+		<info name="alt_title" value="注音符號卡"/>	
+		<part name="cart" interface="licocai_cart">
+			<feature name="label_color" value="pink/red" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="lico-cai-cart2-white.bin" size="0x100000" crc="6a81d065" sha1="14b8580d48ed3a989255611d7b1f8e77076ce59a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- no size listed in header, data ends abruptly, was dumped at double this size but with identical halves, likely bad -->
+	<software name="kshs" supported="no">
+		<description>Kuài Suàn Hǎoshǒu / Smart Kids</description>
+		<year>1994</year>
+		<publisher>Socrates Co. / C&amp;E Inc.</publisher>
+		<info name="alt_title" value="快算好手"/>	
+		<part name="cart" interface="licocai_cart">
+			<feature name="label_color" value="orange/yellow" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="lico-cai-cart3-yellow.bin" size="0x80000" crc="41b4dcc6" sha1="3f90bcaa5917d2e303eeef80d4979239964deab2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+	
+</softwarelist>

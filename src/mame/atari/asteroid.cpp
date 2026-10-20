@@ -255,7 +255,7 @@ NOTE: Previous program versions, for the second line would only show 4 digits.  
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "sound/pokey.h"
-#include "video/vector.h"
+#include "vector.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -853,12 +853,9 @@ void asteroid_state::asteroid_base(machine_config &config)
 	outlatch.bit_handler<5>().set(FUNC(asteroid_state::coin_counter_right_w)); // COIN CNTRR
 
 	// Video hardware
-	VECTOR(config, "vector");
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
-	screen.set_refresh_hz(CLOCK_3KHZ/12/4);
-	screen.set_size(400, 300);
-	screen.set_visarea(522, 1566, 394, 1182);
-	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+	vector_device &vector(VECTOR(config, "vector"));
+	vector.set_refresh_hz(CLOCK_3KHZ/12/4);
+	vector.set_visarea(522, 1566, 394, 1182);
 
 	DVG(config, m_dvg);
 	m_dvg->set_vector("vector");
@@ -920,10 +917,9 @@ void asteroid_state::llander(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &asteroid_state::llander_map);
 	m_maincpu->set_periodic_int(FUNC(asteroid_state::llander_interrupt), attotime::from_hz(MASTER_CLOCK/4096/12));
 
-	screen_device &screen(*subdevice<screen_device>("screen"));
-	screen.set_refresh_hz(CLOCK_3KHZ/12/6);
-	screen.set_visarea(522, 1566, 270, 1070);
-	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+	vector_device &vector(*subdevice<vector_device>("vector"));
+	vector.set_refresh_hz(CLOCK_3KHZ/12/6);
+	vector.set_visarea(522, 1566, 270, 1070);
 
 	output_latch_device &outlatch(*subdevice<output_latch_device>("outlatch")); // LS174 at N11
 	outlatch.bit_handler<0>().set_output("lamp4"); // LAMP5 (COMMAND MISSION)

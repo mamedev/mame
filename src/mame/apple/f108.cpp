@@ -39,7 +39,7 @@ void f108_device::map(address_map &map)
 	map(0x5001a000, 0x5001a01f).rw(m_ata, FUNC(ata_interface_device::cs0_swap_r), FUNC(ata_interface_device::cs0_swap_w)).umask32(0xffff0000).mirror(0x00fc0000);
 	map(0x5001a000, 0x5001a003).rw(FUNC(f108_device::ata_data_r), FUNC(f108_device::ata_data_w)).mirror(0x00fc0000);
 	map(0x5001a020, 0x5001a03f).rw(m_ata, FUNC(ata_interface_device::cs1_swap_r), FUNC(ata_interface_device::cs1_swap_w)).umask32(0xffff0000).mirror(0x00fc0000);
-	// a040 is probably a configuration register based on later Apple ATA implementations, but the values written don't make sense
+	map(0x5001a040, 0x5001a04b).rw(FUNC(f108_device::ata_timing_r), FUNC(f108_device::ata_timing_w)).mirror(0x00fc0000);
 	map(0xf9000000, 0xf90fffff).ram();  // VRAM
 }
 
@@ -53,26 +53,14 @@ void f108_device::device_add_mconfig(machine_config &config)
 	m_ata->irq_handler().set(FUNC(f108_device::ata_irq_w));
 
 	NSCSI_BUS(config, m_scsibus);
-	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
-		[](device_t *device)
-		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^^primetimeii:speaker", 1.0, 0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^^primetimeii:speaker", 1.0, 1);
-		});
-	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, nullptr);
-	NCR53C96(config, m_ncr1, 40_MHz_XTAL);
+	// ... bus devices to be populated by drivers ...
+
+	NCR53C96(config, m_ncr1, DERIVED_CLOCK(1, 2));
 	m_scsibus->set_external_device(7, m_ncr1);
 	m_ncr1->set_busmd(ncr53c96_device::BUSMD_1);
 
-	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
-	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68040");
 
-	SCC85C30(config, m_scc, 31.3344_MHz_XTAL/4);
+	SCC85C30(config, m_scc, 8_MHz_XTAL);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(FUNC(f108_device::scc_irq_w));
 	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
@@ -81,12 +69,12 @@ void f108_device::device_add_mconfig(machine_config &config)
 	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
 	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
-	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
+	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w)).invert();
 
 	rs232_port_device &rs232b(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
-	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
+	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w)).invert();
 }
 
 //-------------------------------------------------
@@ -115,6 +103,11 @@ void f108_device::device_start()
 {
 	m_rom_ptr = &m_rom[0];
 	m_rom_size = m_rom.length() << 2;
+
+	m_ata_active = 0;
+	m_ata_recovery = 0;
+	save_item(NAME(m_ata_active));
+	save_item(NAME(m_ata_recovery));
 }
 
 //-------------------------------------------------
@@ -127,7 +120,7 @@ void f108_device::device_reset()
 
 	// put ROM mirror at 0
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	const u32 memory_size = std::min((u32)0x3fffff, m_rom_size);
+	const u32 memory_size = std::min((u32)0x400000, m_rom_size);
 	const u32 memory_end = memory_size - 1;
 	offs_t memory_mirror = memory_end & ~(memory_size - 1);
 
@@ -163,18 +156,49 @@ void f108_device::ata_irq_w(int state)
 	m_ata_irq(state);
 }
 
+u8 f108_device::ata_timing_r(offs_t offset)
+{
+	switch (offset & ~2)
+	{
+		case 1:
+			return 0x20;
+
+		case 5:
+			return m_ata_active;
+
+		case 9:
+			return m_ata_recovery;
+	}
+
+	return 0xff;
+}
+
+void f108_device::ata_timing_w(offs_t offset, u8 data)
+{
+	switch (offset & ~2)
+	{
+		case 5:
+			m_ata_active = data & 0x3f;
+			break;
+
+		case 9:
+			m_ata_recovery = data & 0x0f;
+			break;
+	}
+}
+
 u32 f108_device::ata_data_r(offs_t offset, u32 mem_mask)
 {
 	u32 retval = 0;
 
 	if (mem_mask == 0xffffffff)
 	{
-		retval = m_ata->cs0_swap_r(0, 0xffff) << 16;
-		retval |= m_ata->cs0_swap_r(0, 0xffff);
+		retval = m_ata->cs0_swap_r(0) << 16;
+		retval |= m_ata->cs0_swap_r(0);
 	}
 	else if ((mem_mask & 0xffff0000) != 0)
 	{
-		retval = m_ata->cs0_swap_r(0, mem_mask >> 16) << 16;
+		retval = m_ata->cs0_swap_r(0) << 16;
 	}
 
 	return retval;
@@ -184,12 +208,12 @@ void f108_device::ata_data_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (mem_mask == 0xffffffff)
 	{
-		m_ata->cs0_swap_w(0, data >> 16, 0xffff);
-		m_ata->cs0_swap_w(0, data & 0xffff, 0xffff);
+		m_ata->cs0_swap_w(0, data >> 16);
+		m_ata->cs0_swap_w(0, data & 0xffff);
 	}
 	else if ((mem_mask & 0xffff0000) != 0)
 	{
-		m_ata->cs0_swap_w(0, data >> 16, mem_mask >> 16);
+		m_ata->cs0_swap_w(0, data >> 16);
 	}
 }
 

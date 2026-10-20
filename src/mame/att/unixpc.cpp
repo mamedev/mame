@@ -393,7 +393,7 @@ void unixpc_state::unixpc(machine_config &config)
 	// bit 7 (D15) = VBL ack (must go high-low-high to ack)
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(unixpc_state::screen_update));
 	screen.set_raw(40_MHz_XTAL / 2, 896, 0, 720, 367, 0, 348);
 	screen.set_palette("palette");

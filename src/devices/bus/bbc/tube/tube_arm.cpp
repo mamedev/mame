@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "tube_arm.h"
 
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/ram.h"
 #include "machine/tube.h"
 
@@ -46,7 +46,7 @@ protected:
 	virtual void host_w(offs_t offset, uint8_t data) override;
 
 private:
-	required_device<arm_cpu_device> m_maincpu;
+	required_device<arm1_cpu_device> m_maincpu;
 	required_device<tube_device> m_ula;
 	required_device<ram_device> m_ram;
 	required_memory_region m_bootstrap;
@@ -101,12 +101,12 @@ const tiny_rom_entry *bbc_tube_arm_device::device_rom_region() const
 
 void bbc_tube_arm_device::device_add_mconfig(machine_config &config)
 {
-	ARM(config, m_maincpu, 20_MHz_XTAL / 3);
+	ARM1(config, m_maincpu, 20_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_arm_device::tube_arm_mem);
 
 	TUBE(config, m_ula);
-	m_ula->pnmi_handler().set_inputline(m_maincpu, ARM_FIRQ_LINE);
-	m_ula->pirq_handler().set_inputline(m_maincpu, ARM_IRQ_LINE);
+	m_ula->pnmi_handler().set_inputline(m_maincpu, arm7_cpu_device::ARM7_FIRQ_LINE);
+	m_ula->pirq_handler().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
 	m_ula->prst_handler().set(FUNC(bbc_tube_arm_device::prst_w));
 
 	RAM(config, m_ram).set_default_size("4M").set_default_value(0);

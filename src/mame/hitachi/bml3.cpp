@@ -882,7 +882,7 @@ void bml3_state::bml3(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("bml3_cass");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// Service manual specifies "Raster return period" as 2.4 ms (p.64),
 	// although the total vertical non-displaying time seems to be 4 ms.
 	// NOTE: D80_CLOCK x 2 as per MAME interlace limitation

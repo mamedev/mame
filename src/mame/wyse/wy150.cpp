@@ -30,11 +30,12 @@ public:
 	{
 	}
 
-	void wy150(machine_config &config);
+	void wy150(machine_config &config) ATTR_COLD;
+
+	void init_wy150() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void driver_start() override;
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -80,7 +81,7 @@ void wy150_state::wy150(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 8464 or 5564 or similar (e.g. Winbond W2465-70LL) + battery
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(48_MHz_XTAL, 1530, 0, 1200, 523, 0, 416); // 31.372 kHz horizontal
 	//m_screen->set_raw(48_MHz_XTAL, 1530, 0, 1188, 402, 0, 338);
 	// TBD: WY-160 should have different parameters (has 76 Hz refresh rate rather than 78 Hz)
@@ -112,7 +113,7 @@ ROM_START(wy325) // SCN8032HCCA44, 211009-02, 3x CXK5864CM-70LL, SCN2661BC1A28, 
 	ROM_LOAD("wyse_tech_rev.a_251125-05.bin", 0x00000, 0x10000, CRC(4a327c38) SHA1(061332197d824aa4171ec998e2f286081adcf198)) // M27C512-15XF1
 ROM_END
 
-void wy150_state::driver_start()
+void wy150_state::init_wy150()
 {
 	uint8_t *rom = memregion("program")->base();
 	for (offs_t base = 0x00000; base < 0x10000; base += 0x4000)
@@ -128,7 +129,7 @@ void wy150_state::driver_start()
 } // anonymous namespace
 
 
-COMP(1991, wy150, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-150 (v1.0)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-COMP(1992, wy120, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-120 (v1.4)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-COMP(1994, wy160, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-160 (v1.7)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-COMP(1994, wy325, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-325 (v3.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1991, wy150, 0, 0, wy150, wy150, wy150_state, init_wy150, "Wyse Technology", "WY-150 (v1.0)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1992, wy120, 0, 0, wy150, wy150, wy150_state, init_wy150, "Wyse Technology", "WY-120 (v1.4)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1994, wy160, 0, 0, wy150, wy150, wy150_state, init_wy150, "Wyse Technology", "WY-160 (v1.7)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1994, wy325, 0, 0, wy150, wy150, wy150_state, init_wy150, "Wyse Technology", "WY-325 (v3.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

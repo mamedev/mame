@@ -1,0 +1,1097 @@
+// license:BSD-3-Clause
+// copyright-holders:trwgQ26xxx
+/***************************************************************************
+
+	Fujitsu MB8840x / MB8850xH series 4-bit MCU emulator.
+
+	Written by trwgQ26xxx, based on Ernesto Corvi's MB88xx MCU emulator.
+
+***************************************************************************/
+
+#include "emu.h"
+#include "mb88xxx.h"
+#include "mb88xxxdasm.h"
+
+DEFINE_DEVICE_TYPE(MB88401,  mb88401_cpu_device,  "mb88401",  "Fujitsu MB88401")
+DEFINE_DEVICE_TYPE(MB88501H, mb88501h_cpu_device, "mb88501h", "Fujitsu MB88501H")
+DEFINE_DEVICE_TYPE(MB88503H, mb88503h_cpu_device, "mb88503h", "Fujitsu MB88503H")
+DEFINE_DEVICE_TYPE(MB88505H, mb88505h_cpu_device, "mb88505h", "Fujitsu MB88505H")
+
+/***************************************************************************
+	CONSTANTS
+***************************************************************************/
+
+#define SERIAL_PRESCALE			6		// serial bit-clock divisor (same as MB88xx)
+#define TIMER_PRESCALE			32		// internal timer tick divisor (same as MB88xx)
+
+#define SERIAL_DISABLE_THRESH	1000	// give up driving serial after this many unread bits
+
+#define INT_CAUSE_SERIAL		0x01	// PIO bit 0
+#define INT_CAUSE_TIMER			0x02	// PIO bit 1
+#define INT_CAUSE_EXTERNAL		0x04	// PIO bit 2
+#define INT_CAUSE_CLOCK			0x08	// PIO bit 3
+
+/***************************************************************************
+	MACROS
+***************************************************************************/
+
+#define READOP(a)			(m_cache.read_byte(a))
+#define RDMEM(a)			(m_data.read_byte(a) & 0x0f)
+#define WRMEM(a, v)			(m_data.write_byte((a), (v) & 0x0f))
+
+#define TEST_ST()			(m_st & 1)
+#define TEST_ZF()			(m_zf & 1)
+#define TEST_CF()			(m_cf & 1)
+#define TEST_VF()			(m_vf & 1)
+#define TEST_SF()			(m_sf & 1)
+#define TEST_IF()			(m_if & 1)
+
+// ST=0 when carry-out (bit 4 set), else ST=1
+#define UPDATE_ST_C(v)		m_st = ((v) & 0x10) ? 0 : 1
+// ST=1 when non-zero, ST=0 when zero
+#define UPDATE_ST_Z(v)		m_st = ((v) == 0) ? 0 : 1
+
+#define UPDATE_CF(v)		m_cf = (((v) & 0x10) == 0) ? 0 : 1
+#define UPDATE_ZF(v)		m_zf = ((v) != 0) ? 0 : 1
+
+// Full 12-bit program counter: PA is 6 bits, PC is 6 bits
+#define GETPC()				(((int)m_PA << 6) + m_PC)
+// Effective data address: X is 4 bits (page), Y is 4 bits (offset)
+#define GETEA()				((m_X << 4) + m_Y)
+
+// Increment PC; roll over into PA when PC reaches 64
+#define INCPC() do { m_PC++; if (m_PC >= 0x40) { m_PC = 0; m_PA = (m_PA + 1) & 0x3f; } } while (0)
+
+/***************************************************************************
+	ADDRESS MAPS
+***************************************************************************/
+
+void mb88xxx_cpu_device::program_12bit(address_map &map)
+{
+	map(0x000, 0xfff).rom();	// 4 KiB (MB88401, MB88501H, MB88505H)
+}
+
+void mb88xxx_cpu_device::program_11bit(address_map &map)
+{
+	map(0x000, 0x7ff).rom();	// 2 KiB (MB88503H)
+}
+
+void mb88xxx_cpu_device::data_c0(address_map &map)
+{
+	map(0x00, 0xbf).ram();		// 192 nibbles (MB88401)
+}
+
+void mb88xxx_cpu_device::data_100(address_map &map)
+{
+	map(0x00, 0xff).ram();		// 256 nibbles (MB8850xH)
+}
+
+
+/***************************************************************************
+	CONSTRUCTORS
+***************************************************************************/
+
+mb88xxx_cpu_device::mb88xxx_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, int data_width, u8 sb_bits)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 8, program_width, 0,
+		(program_width == 11)
+			? address_map_constructor(FUNC(mb88xxx_cpu_device::program_11bit), this)
+			: address_map_constructor(FUNC(mb88xxx_cpu_device::program_12bit), this))
+	, m_data_config("data", ENDIANNESS_BIG, 8, data_width, 0,
+		(type == MB88401)
+			? address_map_constructor(FUNC(mb88xxx_cpu_device::data_c0), this)
+			: address_map_constructor(FUNC(mb88xxx_cpu_device::data_100), this))
+	, m_sb_bits(sb_bits)
+	, m_pla_data(nullptr)
+	, m_pla_bits(8)
+	, m_read_k(*this, 0)
+	, m_write_o(*this)
+	, m_write_p(*this)
+	, m_read_r(*this, 0)
+	, m_write_r(*this)
+	, m_read_si(*this, 0)
+	, m_write_so(*this)
+{
+}
+
+// MB88401: NMOS, 4K ROM, 192-nibble RAM, 4-bit serial
+mb88401_cpu_device::mb88401_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: mb88xxx_cpu_device(mconfig, MB88401, tag, owner, clock, 12, 8, 4)
+{
+}
+
+// MB88501H: CMOS, 4K ROM, 256-nibble RAM, 4-bit serial
+mb88501h_cpu_device::mb88501h_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: mb88xxx_cpu_device(mconfig, MB88501H, tag, owner, clock, 12, 8, 4)
+{
+}
+
+// MB88503H: CMOS, 2K ROM, 256-nibble RAM, 4-bit serial
+mb88503h_cpu_device::mb88503h_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+: mb88xxx_cpu_device(mconfig, MB88503H, tag, owner, clock, 11, 8, 4)
+{
+}
+
+// MB88505H: CMOS, 4K ROM, 256-nibble RAM, 8-bit serial
+mb88505h_cpu_device::mb88505h_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: mb88xxx_cpu_device(mconfig, MB88505H, tag, owner, clock, 12, 8, 8)
+{
+}
+
+/***************************************************************************
+	MEMORY SPACE CONFIG
+***************************************************************************/
+
+device_memory_interface::space_config_vector mb88xxx_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA, &m_data_config)
+	};
+}
+
+std::unique_ptr<util::disasm_interface> mb88xxx_cpu_device::create_disassembler()
+{
+	return std::make_unique<mb88xxx_disassembler>();
+}
+
+
+/***************************************************************************
+	INITIALIZATION AND RESET
+***************************************************************************/
+
+void mb88xxx_cpu_device::device_start()
+{
+	space(AS_PROGRAM).cache(m_cache);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_DATA).specific(m_data);
+
+	m_serial = timer_alloc(FUNC(mb88xxx_cpu_device::serial_timer), this);
+
+	m_if = 0;
+	m_ctr = 0;
+	m_o_output = 0;
+
+	save_item(NAME(m_PC));
+	save_item(NAME(m_PA));
+	save_item(NAME(m_SP));
+	save_item(NAME(m_SI));
+	save_item(NAME(m_A));
+	save_item(NAME(m_X));
+	save_item(NAME(m_Y));
+	save_item(NAME(m_st));
+	save_item(NAME(m_zf));
+	save_item(NAME(m_cf));
+	save_item(NAME(m_vf));
+	save_item(NAME(m_sf));
+	save_item(NAME(m_if));
+	save_item(NAME(m_pio));
+	save_item(NAME(m_TH));
+	save_item(NAME(m_TL));
+	save_item(NAME(m_TP));
+	save_item(NAME(m_ctr));
+	save_item(NAME(m_SB));
+	save_item(NAME(m_SBcount));
+	save_item(NAME(m_o_output));
+	save_item(NAME(m_pending_irq));
+	save_item(NAME(m_in_irq));
+
+	state_add(MB88XXX_PC,  "PC",  m_PC).formatstr("%02X");
+	state_add(MB88XXX_PA,  "PA",  m_PA).formatstr("%02X");
+	state_add(MB88XXX_SI,  "SI",  m_SI).formatstr("%01X");
+	state_add(MB88XXX_A,   "A",   m_A).formatstr("%01X");
+	state_add(MB88XXX_X,   "X",   m_X).formatstr("%01X");
+	state_add(MB88XXX_Y,   "Y",   m_Y).formatstr("%01X");
+	state_add(MB88XXX_PIO, "PIO", m_pio).formatstr("%02X");
+	state_add(MB88XXX_TH,  "TH",  m_TH).formatstr("%01X");
+	state_add(MB88XXX_TL,  "TL",  m_TL).formatstr("%01X");
+	state_add(MB88XXX_SB,  "SB",  m_SB).formatstr("%02X");
+
+	state_add(STATE_GENPC, "GENPC", m_debugger_pc).callimport().callexport().noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_debugger_pc).callimport().callexport().noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_debugger_flags).callimport().callexport().formatstr("%6s").noshow();
+
+	set_icountptr(m_icount);
+}
+
+void mb88xxx_cpu_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			m_st = (m_debugger_flags & 0x01) ? 1 : 0;
+			m_zf = (m_debugger_flags & 0x02) ? 1 : 0;
+			m_cf = (m_debugger_flags & 0x04) ? 1 : 0;
+			m_vf = (m_debugger_flags & 0x08) ? 1 : 0;
+			m_sf = (m_debugger_flags & 0x10) ? 1 : 0;
+			m_if = (m_debugger_flags & 0x20) ? 1 : 0;
+			break;
+
+		case STATE_GENPC:
+		case STATE_GENPCBASE:
+			m_PC = m_debugger_pc & 0x3f;
+			m_PA = (m_debugger_pc >> 6) & 0x3f;
+			break;
+	}
+}
+
+void mb88xxx_cpu_device::state_export(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			m_debugger_flags = 0;
+			if (TEST_ST()) m_debugger_flags |= 0x01;
+			if (TEST_ZF()) m_debugger_flags |= 0x02;
+			if (TEST_CF()) m_debugger_flags |= 0x04;
+			if (TEST_VF()) m_debugger_flags |= 0x08;
+			if (TEST_SF()) m_debugger_flags |= 0x10;
+			if (TEST_IF()) m_debugger_flags |= 0x20;
+			break;
+
+		case STATE_GENPC:
+		case STATE_GENPCBASE:
+			m_debugger_pc = GETPC();
+			break;
+	}
+}
+
+void mb88xxx_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			str = string_format("%c%c%c%c%c%c",
+				TEST_ST() ? 'T' : 't',
+				TEST_ZF() ? 'Z' : 'z',
+				TEST_CF() ? 'C' : 'c',
+				TEST_VF() ? 'V' : 'v',
+				TEST_SF() ? 'S' : 's',
+				TEST_IF() ? 'I' : 'i');
+			break;
+	}
+}
+void mb88xxx_cpu_device::device_reset()
+{
+	// Zero registers and flags.
+	m_PC = 0;
+	m_PA = 0;
+	m_SP[0] = m_SP[1] = m_SP[2] = m_SP[3] = 0;
+	m_SP[4] = m_SP[5] = m_SP[6] = m_SP[7] = 0;
+
+	m_SI = 0;
+	m_A = 0;
+	m_X = 0;
+	m_Y = 0;
+
+	m_st = 1;	// ST starts high (first conditional branch is not taken).
+	m_zf = 0;
+	m_cf = 0;
+	m_vf = 0;
+	m_sf = 0;
+	m_if = 0;
+
+	m_pio = 0;
+
+	m_TH = 0;
+	m_TL = 0;
+	m_TP = 0;
+
+	m_SB = 0;
+	m_SBcount = 0;
+
+	m_o_output = 0;
+
+	m_pending_irq = 0;
+	m_in_irq = false;
+	m_serial->adjust(attotime::never);
+}
+
+/***************************************************************************
+	SERIAL TIMER
+***************************************************************************/
+
+TIMER_CALLBACK_MEMBER(mb88xxx_cpu_device::serial_timer)
+{
+	m_SBcount++;
+
+	// Stop driving if the program never reads the buffer
+	if (m_SBcount >= SERIAL_DISABLE_THRESH)
+	{
+		m_serial->adjust(attotime::never);
+	}
+
+	// Shift in one bit from SI; do not overwrite an unread full buffer
+	if (!m_sf)
+	{
+		m_SB = (m_SB >> 1) | (m_read_si() ? (1 << (m_sb_bits - 1)) : 0);
+
+		if (m_SBcount >= m_sb_bits)
+		{
+			m_sf = 1;
+			m_pending_irq |= INT_CAUSE_SERIAL;
+		}
+	}
+}
+
+/***************************************************************************
+	PLA / O-PORT WRITE
+***************************************************************************/
+
+void mb88xxx_cpu_device::write_pla(u8 index)
+{
+	u8 mask = 0xff;
+
+	if (m_pla_bits == 8)
+	{
+		// 8-bit mode: CF selects which nibble of O-port gets the accumulator
+		// CF=0 -> O[3:0] <- A; CF=1 -> O[7:4] <- A
+		const u8 shift = (index & 0x10) ? 4 : 0;
+		mask = 0xf << shift;
+		m_o_output = (m_o_output & ~mask) | (index << shift & mask);
+	}
+	else
+	{
+		// 4-bit PLA mode: look up full 8-bit output from table
+		// If the driver has not supplied PLA data, just output the index.
+		if (m_pla_data)
+			m_o_output = m_pla_data[index];
+		else
+			m_o_output = index;
+	}
+
+	m_write_o(0, m_o_output, mask);
+}
+
+/***************************************************************************
+	EXTERNAL INPUTS
+***************************************************************************/
+
+void mb88xxx_cpu_device::execute_set_input(int inputnum, int state)
+{
+	state = state ? 1 : 0;
+
+	switch (inputnum)
+	{
+		case MB88XXX_IRQ_LINE:
+			// Trigger on a rising logical edge of the IRQ input.
+			// Only latch when the external interrupt source is enabled.
+			if (!m_if && state && (m_pio & INT_CAUSE_EXTERNAL))
+				m_pending_irq |= INT_CAUSE_EXTERNAL;
+
+			m_if = state;
+			break;
+
+		case MB88XXX_TC_LINE:
+			// Falling edge of TC increments the counter when TC is started (PIO b7)
+			if (m_ctr && !state && (m_pio & 0x80))
+				increment_timer();
+
+			m_ctr = state;
+			break;
+
+		default:
+			break;
+	}
+}
+
+/***************************************************************************
+	PERIPHERAL ENABLE / DISABLE
+***************************************************************************/
+
+void mb88xxx_cpu_device::pio_enable(u8 newpio)
+{
+	// Bit 6 (0x40) = SC: serial port start/stop
+	if ((m_pio ^ newpio) & 0x40)
+	{
+		if (!(newpio & 0x40))
+		{
+			m_serial->adjust(attotime::never);
+		}
+		else
+		{
+			m_serial->adjust(attotime::from_hz(clock() / SERIAL_PRESCALE), 0, attotime::from_hz(clock() / SERIAL_PRESCALE));
+		}
+	}
+
+	m_pio = newpio;
+}
+
+/***************************************************************************
+	TIMER
+***************************************************************************/
+
+void mb88xxx_cpu_device::increment_timer()
+{
+	m_TL = (m_TL + 1) & 0x0f;
+	if (m_TL == 0)
+	{
+		m_TH = (m_TH + 1) & 0x0f;
+		if (m_TH == 0)
+		{
+			m_vf = 1;
+			m_pending_irq |= INT_CAUSE_TIMER;
+		}
+	}
+}
+
+/***************************************************************************
+	CYCLE BURN + INTERRUPT DISPATCH
+***************************************************************************/
+
+void mb88xxx_cpu_device::burn_cycles(int cycles)
+{
+	m_icount -= cycles;
+
+	// Internal timer: PIO bit 7 (TC) starts the timer in internal-clock mode
+	if (m_pio & 0x80)
+	{
+		m_TP += cycles;
+		while (m_TP >= TIMER_PRESCALE)
+		{
+			m_TP -= TIMER_PRESCALE;
+			increment_timer();
+		}
+	}
+
+	// TODO: Implement clock (INT_CAUSE_CLOCK) interrupt generation.
+	// The available data sheet documents its enable bit,
+	// but not the request period or assertion condition.
+
+	// Dispatch a pending interrupt (highest priority wins)
+	if (!m_in_irq && (m_pending_irq & m_pio))
+	{
+		m_in_irq = true;
+		const u16 intpc = GETPC();
+
+		// Save return address and flags onto stack (same layout as MB88xx)
+		m_SP[m_SI] = intpc;
+		m_SP[m_SI] |= (u16)TEST_CF() << 15;
+		m_SP[m_SI] |= (u16)TEST_ZF() << 14;
+		m_SP[m_SI] |= (u16)TEST_ST() << 13;
+		m_SI = (m_SI + 1) & 7;
+
+		// External, timer, serial, and clock interrupt vectors.
+		if (m_pending_irq & m_pio & INT_CAUSE_EXTERNAL)
+		{
+			standard_irq_callback(0, intpc);
+			m_PC = 0x02;
+		}
+		else if (m_pending_irq & m_pio & INT_CAUSE_TIMER)
+		{
+			standard_irq_callback(1, intpc);
+			m_PC = 0x04;
+		}
+		else if (m_pending_irq & m_pio & INT_CAUSE_SERIAL)
+		{
+			standard_irq_callback(2, intpc);
+			m_PC = 0x06;
+		}
+		else if (m_pending_irq & m_pio & INT_CAUSE_CLOCK)
+		{
+			standard_irq_callback(3, intpc);
+			m_PC = 0x08;
+		}
+
+		m_PA = 0x00;
+		m_st = 1;
+		m_pending_irq = 0;
+
+		burn_cycles(3);
+	}
+}
+
+/***************************************************************************
+	CORE EXECUTION LOOP
+***************************************************************************/
+
+void mb88xxx_cpu_device::execute_run()
+{
+	while (m_icount > 0)
+	{
+		u8 opcode, arg, oc;
+
+		// Fetch the opcode.
+		debugger_instruction_hook(GETPC());
+		opcode = READOP(GETPC());
+
+		// Increment the PC.
+		INCPC();
+
+		// Start with one cycle; multi-byte/multi-step instructions add to this.
+		oc = 1;
+
+		switch (opcode)
+		{
+			case 0x00: // NOP ZCS:...
+				m_st = 1;
+				break;
+
+			case 0x01: // OUTO ZCS:...
+				// CF selects upper (O[7:4]) or lower ([3:0]) nibble of O-port
+				write_pla((TEST_CF() << 4) | m_A);
+				m_st = 1;
+				break;
+
+			case 0x02: // OUTP ZCS:...
+				m_write_p(m_A);
+				m_st = 1;
+				break;
+
+			case 0x03: // OUT ZCS:...
+				arg = m_Y;
+				m_write_r[arg & 3](m_A);
+				m_st = 1;
+				break;
+
+			case 0x04: // TAY ZCS:...
+				m_Y = m_A;
+				m_st = 1;
+				break;
+
+			case 0x05: // TATH ZCS:...
+				m_TH = m_A;
+				m_st = 1;
+				break;
+
+			case 0x06: // TATL ZCS:...
+				m_TL = m_A;
+				m_st = 1;
+				break;
+
+			case 0x07: // TAS ZCS:...
+				m_SB = m_A;
+				m_st = 1;
+				break;
+
+			case 0x08: // ICY ZCS:x.x
+				m_Y++;
+				UPDATE_ST_C(m_Y);
+				m_Y &= 0x0f;
+				UPDATE_ZF(m_Y);
+				break;
+
+			case 0x09: // ICM ZCS:x.x
+				arg = RDMEM(GETEA());
+				arg++;
+				UPDATE_ST_C(arg);
+				arg &= 0x0f;
+				UPDATE_ZF(arg);
+				WRMEM(GETEA(), arg);
+				break;
+
+			case 0x0a: // STIC ZCS:x.x
+				WRMEM(GETEA(), m_A);
+				m_Y++;
+				UPDATE_ST_C(m_Y);
+				m_Y &= 0x0f;
+				UPDATE_ZF(m_Y);
+				break;
+
+			case 0x0b: // X ZCS:x..
+				arg = RDMEM(GETEA());
+				WRMEM(GETEA(), m_A);
+				m_A = arg;
+				UPDATE_ZF(m_A);
+				m_st = 1;
+				break;
+
+			case 0x0c: // ROL ZCS:xxx
+				m_A <<= 1;
+				m_A |= TEST_CF();
+				UPDATE_ST_C(m_A);
+				m_cf = m_st ^ 1;
+				m_A &= 0x0f;
+				UPDATE_ZF(m_A);
+				break;
+
+			case 0x0d: // L ZCS:x..
+				m_A = RDMEM(GETEA());
+				UPDATE_ZF(m_A);
+				m_st = 1;
+				break;
+
+			case 0x0e: // ADC ZCS:xxx
+				arg = RDMEM(GETEA());
+				arg += m_A;
+				arg += TEST_CF();
+				UPDATE_ST_C(arg);
+				m_cf = m_st ^ 1;
+				m_A = arg & 0x0f;
+				UPDATE_ZF(m_A);
+				break;
+
+			case 0x0f: // AND ZCS:x.x
+				m_A &= RDMEM(GETEA());
+				UPDATE_ZF(m_A);
+				m_st = m_zf ^ 1;
+				break;
+
+			case 0x10: // DAA ZCS:.xx
+				if (TEST_CF() || m_A > 9) m_A += 6;
+				UPDATE_ST_C(m_A);
+				m_cf = m_st ^ 1;
+				m_A &= 0x0f;
+				break;
+
+			case 0x11: // DAS ZCS:.xx
+				if (TEST_CF() || m_A > 9) m_A += 10;
+				UPDATE_ST_C(m_A);
+				m_cf = m_st ^ 1;
+				m_A &= 0x0f;
+				break;
+
+			case 0x12: // INK ZCS:x..
+				m_A = m_read_k() & 0x0f;
+				UPDATE_ZF(m_A);
+				m_st = 1;
+				break;
+
+			case 0x13: // IN ZCS:x..
+				arg = m_Y;
+				m_A = m_read_r[arg & 3]() & 0x0f;
+				UPDATE_ZF(m_A);
+				m_st = 1;
+				break;
+
+			case 0x14: // TYA ZCS:x..
+				m_A = m_Y;
+				UPDATE_ZF(m_A);
+				m_st = 1;
+				break;
+
+			case 0x15: // TTHA ZCS:x..
+				m_A = m_TH;
+				UPDATE_ZF(m_A);
+				m_st = 1;
+				break;
+
+			case 0x16: // TTLA ZCS:x..
+				m_A = m_TL;
+				UPDATE_ZF(m_A);
+				m_st = 1;
+				break;
+
+			case 0x17: // TSA ZCS:x..
+				// MB88505H 8-bit serial mode: TSA transfers SBL->A and SBH->X.
+				// 4-bit variants keep legacy behavior (A from low nibble only).
+				m_A = m_SB & 0x0f;
+				if (m_sb_bits == 8)
+					m_X = (m_SB >> 4) & 0x0f;
+				UPDATE_ZF(m_A);
+				m_st = 1;
+				break;
+
+			case 0x18: // DCY ZCS:..x
+				m_Y--;
+				UPDATE_ST_C(m_Y);
+				m_Y &= 0x0f;
+				// Note: ZF is not updated by DCY.
+				break;
+
+			case 0x19: // DCM ZCS:x.x
+				arg = RDMEM(GETEA());
+				arg--;
+				UPDATE_ST_C(arg);
+				arg &= 0x0f;
+				UPDATE_ZF(arg);
+				WRMEM(GETEA(), arg);
+				break;
+
+			case 0x1a: // STDC ZCS:x.x
+				WRMEM(GETEA(), m_A);
+				m_Y--;
+				UPDATE_ST_C(m_Y);
+				m_Y &= 0x0f;
+				UPDATE_ZF(m_Y);
+				break;
+
+			case 0x1b: // XX ZCS:x..
+				arg = m_X;
+				m_X = m_A;
+				m_A = arg;
+				UPDATE_ZF(m_A);
+				m_st = 1;
+				break;
+
+			case 0x1c: // ROR ZCS:xxx
+				m_A |= TEST_CF() << 4;
+				UPDATE_ST_C(m_A << 4);
+				m_cf = m_st ^ 1;
+				m_A >>= 1;
+				m_A &= 0x0f;
+				UPDATE_ZF(m_A);
+				break;
+
+			case 0x1d: // ST ZCS:x..
+				WRMEM(GETEA(), m_A);
+				m_st = 1;
+				break;
+
+			case 0x1e: // SBC ZCS:xxx
+				arg = RDMEM(GETEA());
+				arg -= m_A;
+				arg -= TEST_CF();
+				UPDATE_ST_C(arg);
+				m_cf = m_st ^ 1;
+				m_A = arg & 0x0f;
+				UPDATE_ZF(m_A);
+				break;
+
+			case 0x1f: // OR ZCS:x.x
+				m_A |= RDMEM(GETEA());
+				UPDATE_ZF(m_A);
+				m_st = m_zf ^ 1;
+				break;
+
+			case 0x20: // SETR ZCS:...
+				arg = m_read_r[m_Y >> 2]() & 0x0f;
+				m_write_r[m_Y >> 2](arg | (1 << (m_Y & 3)));
+				m_st = 1;
+				break;
+
+			case 0x21: // SETC ZCS:.xx
+				m_cf = 1;
+				m_st = 1;
+				break;
+
+			case 0x22: // RSTR ZCS:...
+				arg = m_read_r[m_Y >> 2]() & 0x0f;
+				m_write_r[m_Y >> 2](arg & ~(1 << (m_Y & 3)));
+				m_st = 1;
+				break;
+
+			case 0x23: // RSTC ZCS:.xx
+				m_cf = 0;
+				m_st = 1;
+				break;
+
+			case 0x24: // TSTR ZCS:..x
+				arg = m_read_r[m_Y >> 2]() & 0x0f;
+				m_st = (arg & (1 << (m_Y & 3))) ? 0 : 1;
+				break;
+
+			case 0x25: // TSTI ZCS:..x
+				m_st = m_if ^ 1;
+				break;
+
+			case 0x26: // TSTV ZCS:..x
+				m_st = m_vf ^ 1;
+				m_vf = 0;
+				break;
+
+			case 0x27: // TSTS ZCS:..x
+				m_st = m_sf ^ 1;
+				if (m_sf)
+				{
+					// Re-arm serial timer if it had been silenced
+					if (m_SBcount >= SERIAL_DISABLE_THRESH)
+						m_serial->adjust(attotime::from_hz(clock() / SERIAL_PRESCALE), 0, attotime::from_hz(clock() / SERIAL_PRESCALE));
+
+					m_SBcount = 0;
+				}
+				m_sf = 0;
+				break;
+
+			case 0x28: // TSTC ZCS:..x
+				m_st = m_cf ^ 1;
+				break;
+
+			case 0x29: // TSTZ ZCS:..x
+				m_st = m_zf ^ 1;
+				break;
+
+			case 0x2a: // STS ZCS:x..
+				WRMEM(GETEA(), m_SB);
+				UPDATE_ZF(m_SB);
+				m_st = 1;
+				break;
+
+			case 0x2b: // LS ZCS:x..
+				m_SB = RDMEM(GETEA());
+				UPDATE_ZF(m_SB);
+				m_st = 1;
+				break;
+
+			case 0x2c: // RTS ZCS:...
+				m_SI = (m_SI - 1) & 7;
+				m_PC = m_SP[m_SI] & 0x3f;
+				m_PA = (m_SP[m_SI] >> 6) & 0x3f;
+				m_st = 1;
+				break;
+
+			case 0x2d: // NEG ZCS:..x
+				m_A = (~m_A) + 1;
+				m_A &= 0x0f;
+				UPDATE_ST_Z(m_A);
+				break;
+
+			case 0x2e: // C ZCS:xxx
+				arg = RDMEM(GETEA());
+				arg -= m_A;
+				UPDATE_CF(arg);
+				arg &= 0x0f;
+				UPDATE_ST_Z(arg);
+				m_zf = m_st ^ 1;
+				break;
+
+			case 0x2f: // EOR ZCS:x.x
+				m_A ^= RDMEM(GETEA());
+				UPDATE_ST_Z(m_A);
+				m_zf = m_st ^ 1;
+				break;
+
+			case 0x30: case 0x31: case 0x32: case 0x33: // SBIT bp ZCS:...
+				arg = RDMEM(GETEA());
+				WRMEM(GETEA(), arg | (1 << (opcode & 3)));
+				m_st = 1;
+				break;
+
+			case 0x34: case 0x35: case 0x36: case 0x37: // RBIT bp ZCS:...
+				arg = RDMEM(GETEA());
+				WRMEM(GETEA(), arg & ~(1 << (opcode & 3)));
+				m_st = 1;
+				break;
+
+			case 0x38: case 0x39: case 0x3a: case 0x3b: // TBIT bp ZCS:..x
+				arg = RDMEM(GETEA());
+				m_st = (arg & (1 << (opcode & 3))) ? 0 : 1;
+				break;
+
+			case 0x3c: // RTI ZCS:...
+				// Restore address and saved state flags from stack high bits.
+				m_in_irq = false;
+				m_SI = (m_SI - 1) & 7;
+				m_PC = m_SP[m_SI] & 0x3f;
+				m_PA = (m_SP[m_SI] >> 6) & 0x3f;
+				m_st = (m_SP[m_SI] >> 13) & 1;
+				m_zf = (m_SP[m_SI] >> 14) & 1;
+				m_cf = (m_SP[m_SI] >> 15) & 1;
+				break;
+
+			case 0x3d: // EXT ZCS:...
+				// EXT is a multi-byte instruction; the next byte is an extended opcode.
+			{
+				arg = READOP(GETPC());
+				INCPC();
+				oc++;
+
+				if ((arg >= 0x00) && (arg <= 0x1f)) // JPXY $page ZCS:..x
+				{
+					// PA = 5-bit page number from EXT byte
+					// PC = (X<<4|Y)&0x3f - X provides upper 2 bits, Y lower 4
+					m_PA = arg & 0x1f;
+					m_PC = ((m_X << 4) | m_Y) & 0x3f;
+					m_st = 1;
+				}
+				else if ((arg >= 0x20) && (arg <= 0x3f)) // LRXA #imm ZCS:x..
+				{
+					// ROM addr = imm[4:0] | X[3:0] | Y[3:0] (12 bits).
+					const u16 romaddr = (u16(arg & 0x1f) << 8) | ((m_X & 0x0f) << 4) | (m_Y & 0x0f);
+					const u8 romdata = READOP(romaddr & 0xfff);
+					m_X = (romdata >> 4) & 0x0f;
+					m_A = romdata & 0x0f;
+					UPDATE_ZF(m_A);
+					m_st = 1;
+					oc++;
+				}
+				else if ((arg >= 0x80) && (arg <= 0x8f)) // AI #imm ZCS:xxx
+				{
+					const u8 imm = arg & 0x0f;
+					const u8 v = m_A + imm;
+					UPDATE_ST_C(v);
+					m_cf = m_st ^ 1;
+					m_A = v & 0x0f;
+					UPDATE_ZF(m_A);
+				}
+				else if ((arg >= 0x90) && (arg <= 0x9f)) // LXID #imm ZCS:x..
+				{
+					m_X = arg & 0x0f;
+					UPDATE_ZF(m_X);
+					m_st = 1;
+				}
+				else if ((arg >= 0xa0) && (arg <= 0xa3)) // SBA bp ZCS:...
+				{
+					m_A |= (1 << (arg & 3));
+					m_A &= 0x0f;
+					m_st = 1;
+				}
+				else if ((arg >= 0xa4) && (arg <= 0xa7)) // RBA bp ZCS:...
+				{
+					m_A &= ~(1 << (arg & 3));
+					m_A &= 0x0f;
+					m_st = 1;
+				}
+				else if (arg == 0xac) // ICX ZCS:x.x
+				{
+					m_X++;
+					UPDATE_ST_C(m_X);
+					m_cf = m_st ^ 1;
+					m_X &= 0x0f;
+					UPDATE_ZF(m_X);
+				}
+				else if (arg == 0xad) // RST ZCS:...
+				{
+					device_reset();
+					m_st = 1; // device_reset() sets m_st=1 anyway, kept explicit.
+				}
+				else // Undefined EXT opcode; treat as NOP.
+				{
+					m_st = 1;
+				}
+				break;
+			}
+
+			case 0x3e: // EN #imm ZCS:...
+				arg = READOP(GETPC());
+				// If bit 5 (0x20) is set, clear the internal timer prescaler accumulator (TP).
+				if (arg & 0x20)
+				{
+					m_TP = 0;
+				}
+				pio_enable(m_pio | arg);
+				INCPC();
+				oc++;
+				m_st = 1;
+				break;
+
+			case 0x3f: // DIS #imm ZCS:...
+				pio_enable(m_pio & ~(READOP(GETPC())));
+				INCPC();
+				oc++;
+				m_st = 1;
+				break;
+
+			case 0x40: case 0x41: case 0x42: case 0x43: // SETD d ZCS:...
+				arg = m_read_r[0]() & 0x0f;
+				arg |= (1 << (opcode & 3));
+				m_write_r[0](arg);
+				m_st = 1;
+				break;
+
+			case 0x44: case 0x45: case 0x46: case 0x47: // RSTD d ZCS:...
+				arg = m_read_r[0]() & 0x0f;
+				arg &= ~(1 << (opcode & 3));
+				m_write_r[0](arg);
+				m_st = 1;
+				break;
+
+			case 0x48: case 0x49: case 0x4a: case 0x4b: // TSTD d ZCS:..x
+				// It tests R[11:8], not R[3:0] as the other SETD/RSTD.
+				arg = m_read_r[2]() & 0x0f;
+				m_st = (arg & (1 << (opcode & 3))) ? 0 : 1;
+				break;
+
+			case 0x4c: case 0x4d: case 0x4e: case 0x4f: // TBA d ZCS:..x
+				m_st = (m_A & (1 << (opcode & 3))) ? 0 : 1;
+				break;
+
+			case 0x50: case 0x51: case 0x52: case 0x53: // XD d ZCS:x..
+				arg = RDMEM(opcode & 3);
+				WRMEM((opcode & 3), m_A);
+				m_A = arg;
+				UPDATE_ZF(m_A);
+				m_st = 1;
+				break;
+
+			case 0x54: case 0x55: case 0x56: case 0x57: // XYD d ZCS:x..
+				arg = RDMEM((opcode & 3) + 4);
+				WRMEM((opcode & 3) + 4, m_Y);
+				m_Y = arg;
+				UPDATE_ZF(m_Y);
+				m_st = 1;
+				break;
+
+			case 0x58: case 0x59: case 0x5a: case 0x5b:
+			case 0x5c: case 0x5d: case 0x5e: case 0x5f: // LXI #imm ZCS:x..
+				// X[3] is explicitly cleared; only X[2:0] are loaded.
+				m_X = opcode & 7;
+				UPDATE_ZF(m_X);
+				m_st = 1;
+				break;
+
+			// 12-bit target: (opcode[3:0] << 8) | arg
+			case 0x60: case 0x61: case 0x62: case 0x63:
+			case 0x64: case 0x65: case 0x66: case 0x67:
+			case 0x68: case 0x69: case 0x6a: case 0x6b:
+			case 0x6c: case 0x6d: case 0x6e: case 0x6f: // CALL addr ZCS:..x
+				arg = READOP(GETPC());
+				INCPC();
+				oc++;
+				if (TEST_ST())
+				{
+					m_SP[m_SI] = GETPC();
+					m_SI = (m_SI + 1) & 7;
+					m_PC = arg & 0x3f;
+					m_PA = ((opcode & 0x0f) << 2) | (arg >> 6);
+				}
+				m_st = 1;
+				break;
+
+			// 12-bit target: (opcode[3:0] << 8) | arg
+			case 0x70: case 0x71: case 0x72: case 0x73:
+			case 0x74: case 0x75: case 0x76: case 0x77:
+			case 0x78: case 0x79: case 0x7a: case 0x7b:
+			case 0x7c: case 0x7d: case 0x7e: case 0x7f: // JPL addr ZCS:..x
+				arg = READOP(GETPC());
+				INCPC();
+				oc++;
+				if (TEST_ST())
+				{
+					m_PC = arg & 0x3f;
+					m_PA = ((opcode & 0x0f) << 2) | (arg >> 6);
+				}
+				m_st = 1;
+				break;
+
+			case 0x80: case 0x81: case 0x82: case 0x83:
+			case 0x84: case 0x85: case 0x86: case 0x87:
+			case 0x88: case 0x89: case 0x8a: case 0x8b:
+			case 0x8c: case 0x8d: case 0x8e: case 0x8f: // LYI #imm ZCS:x..
+				m_Y = opcode & 0x0f;
+				UPDATE_ZF(m_Y);
+				m_st = 1;
+				break;
+
+			case 0x90: case 0x91: case 0x92: case 0x93:
+			case 0x94: case 0x95: case 0x96: case 0x97:
+			case 0x98: case 0x99: case 0x9a: case 0x9b:
+			case 0x9c: case 0x9d: case 0x9e: case 0x9f: // LI #imm ZCS:x..
+				m_A = opcode & 0x0f;
+				UPDATE_ZF(m_A);
+				m_st = 1;
+				break;
+
+			case 0xa0: case 0xa1: case 0xa2: case 0xa3:
+			case 0xa4: case 0xa5: case 0xa6: case 0xa7:
+			case 0xa8: case 0xa9: case 0xaa: case 0xab:
+			case 0xac: case 0xad: case 0xae: case 0xaf: // CYI #imm ZCS:xxx
+				arg = (opcode & 0x0f) - m_Y;
+				UPDATE_CF(arg);
+				arg &= 0x0f;
+				UPDATE_ST_Z(arg);
+				m_zf = m_st ^ 1;
+				break;
+
+			case 0xb0: case 0xb1: case 0xb2: case 0xb3:
+			case 0xb4: case 0xb5: case 0xb6: case 0xb7:
+			case 0xb8: case 0xb9: case 0xba: case 0xbb:
+			case 0xbc: case 0xbd: case 0xbe: case 0xbf: // CI #imm ZCS:xxx
+				arg = (opcode & 0x0f) - m_A;
+				UPDATE_CF(arg);
+				arg &= 0x0f;
+				UPDATE_ST_Z(arg);
+				m_zf = m_st ^ 1;
+				break;
+
+			default: // JMP addr ZCS:..x
+				if (TEST_ST())
+					m_PC = opcode & 0x3f;
+				m_st = 1;
+				break;
+		}
+
+		// Update cycle count, also update interrupts, serial and timer flags
+		burn_cycles(oc);
+	}
+}

@@ -493,7 +493,7 @@ void hhtiger_state::hhtiger(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(16_MHz_XTAL, 520, 0, 320, 308, 0, 240);
 	m_screen->set_screen_update("upd7220", FUNC(upd7220_device::screen_update));

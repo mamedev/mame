@@ -62,13 +62,16 @@ void nbmj8688_state::init_mjcamera()
 
 void nbmj8688_state::init_kanatuen()
 {
+#if 1
 	/* uses the same protection data as mjcamer, but a different check */
 	uint8_t *rom = memregion("voice")->base() + 0x30000;
 
+	// HACK: bypass protection
 	rom[0x0004] = 0x09;
 	rom[0x0103] = 0x0e;
 	rom[0x0202] = 0x08;
 	rom[0x0301] = 0xdc;
+#endif
 }
 
 void nbmj8688_state::init_kyuhito()
@@ -77,6 +80,7 @@ void nbmj8688_state::init_kyuhito()
 	/* uses the same protection data as ????, but a different check */
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: bypass protection
 	rom[0x0149] = 0x00;
 	rom[0x014a] = 0x00;
 	rom[0x014b] = 0x00;
@@ -2574,7 +2578,7 @@ void nbmj8688_state::NBMJDRV_4096(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2736,7 +2740,7 @@ void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 	PALETTE(config, "palette", FUNC(nbmj8688_state::mbmj8688_16bit), 65536);
 	config.set_default_layout(layout_nbmj8688);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -2746,7 +2750,7 @@ void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 
 	PALETTE(config, "palette_lcd", FUNC(nbmj8688_state::mbmj8688_lcd), 2);
 
-	screen_device &lcd0(SCREEN(config, "lcd0", SCREEN_TYPE_LCD));
+	screen_device &lcd0(SCREEN(config, "lcd0").set_lcd());
 	lcd0.set_physical_aspect(15, 3);
 	lcd0.set_orientation(ROT180);
 	lcd0.set_refresh_hz(60);
@@ -2758,7 +2762,7 @@ void nbmj8688_state::mbmj_p16bit_LCD(machine_config &config)
 	HD61830B(config, m_lcdc0,  5000000/2); // ???
 	m_lcdc0->set_screen("lcd0");
 
-	screen_device &lcd1(SCREEN(config, "lcd1", SCREEN_TYPE_LCD));
+	screen_device &lcd1(SCREEN(config, "lcd1").set_lcd());
 	lcd1.set_physical_aspect(15, 3);
 	lcd1.set_orientation(ROT180);
 	lcd1.set_refresh_hz(60);

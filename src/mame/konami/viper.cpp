@@ -86,9 +86,6 @@
     - hookup adc0838, reads from i2c;
     - convert epic to be a device, make it input_merger/irq_callback compliant;
     - (more intermediate steps for proper PCI conversions here)
-    - jpark3: attract mode demo play acts weird, the dinosaur gets submerged
-      and camera doesn't really know what to do, CPU core bug?
-    - jpark3: crashes during second attract cycle;
     - sscopex: attract mode black screens (coin still works), sogeki/sscopefh are unaffected;
     - mocapglf, sscopefh, sscopex: implement 2nd screen output, controlled by IP90C63A;
     \- sscopex/sogeki desyncs during gameplay intro, leaves heavy trails in gameplay;
@@ -409,6 +406,8 @@ The golf club acts like a LED gun. PCB power input is 12V.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include <iostream>
 
 // configurable logging
 //#define LOG_WARN  (1U << 1)
@@ -808,13 +807,25 @@ uint8_t viper_state::i2cdr_r(offs_t offset)
 					// 0x1c: voltage, assume 5v
 					if (m_i2c.addr_latch == 0x1c)
 						return 0x80;
-					const u16 adc_value = m_analog_input[m_i2c.addr_latch & 0x3]->read();
-					// FIXME: upper nibble is currently discarded in port defs
-					// is it expecting 7 bits of data and 1 of parity?
-					// cfr. input tests returning different values for each nibble when both are equal.
-					const u8 adc_nibble = BIT(m_i2c.addr_latch, 2) ? 0 : 8;
+					if (!BIT(m_i2c.addr_latch, 3))
+					{
+						// The low nibble is the ADC0838 multiplexer word: SGL/DIF, ODD/SIGN,
+						// SELECT1, SELECT0. In differential mode, ODD/SIGN = 0 converts
+						// CH(2n) - CH(2n+1) and ODD/SIGN = 1 converts CH(2n+1) - CH(2n); a
+						// negative difference reads as 0. The games read both polarities and
+						// rebuild the position as 0x100 + first - second.
+						// ANn holds CH(2n+1) - CH(2n) as a 9-bit signed value.
+						const s32 diff = util::sext(m_analog_input[m_i2c.addr_latch & 0x3]->read(), 9);
+						res = std::clamp<s32>(BIT(m_i2c.addr_latch, 2) ? diff : -diff, 0, 0xff);
+					}
+					else
+					{
+						const u16 adc_value = m_analog_input[m_i2c.addr_latch & 0x3]->read();
+						// FIXME: single-ended mode, only the supply voltage above is known
+						const u8 adc_nibble = BIT(m_i2c.addr_latch, 2) ? 0 : 8;
 
-					res = (adc_value) >> adc_nibble;
+						res = (adc_value) >> adc_nibble;
+					}
 				}
 				else
 					LOG("I2C: unmapped read access %02x\n", m_i2c.addr_latch);
@@ -1257,15 +1268,11 @@ uint64_t viper_state::cf_card_data_r(offs_t offset, uint64_t mem_mask)
 		switch (offset & 0xf)
 		{
 			case 0x8:   // Duplicate Even RD Data
-			{
-				r |= m_ata->cs0_r(0, mem_mask >> 16) << 16;
+				r |= m_ata->cs0_r(0) << 16;
 				break;
-			}
 
 			default:
-			{
 				throw emu_fatalerror("%s:cf_card_data_r: IDE reg %02X\n", machine().describe_context().c_str(), offset & 0xf);
-			}
 		}
 	}
 	return r;
@@ -1278,15 +1285,11 @@ void viper_state::cf_card_data_w(offs_t offset, uint64_t data, uint64_t mem_mask
 		switch (offset & 0xf)
 		{
 			case 0x8:   // Duplicate Even RD Data
-			{
-				m_ata->cs0_w(0, data >> 16, mem_mask >> 16);
+				m_ata->cs0_w(0, data >> 16);
 				break;
-			}
 
 			default:
-			{
 				throw emu_fatalerror("%s:cf_card_data_w: IDE reg %02X, %04X\n", machine().describe_context().c_str(), offset & 0xf, (uint16_t)(data >> 16));
-			}
 		}
 	}
 }
@@ -1309,30 +1312,22 @@ uint64_t viper_state::cf_card_r(offs_t offset, uint64_t mem_mask)
 				case 0x5:   // Cylinder High
 				case 0x6:   // Select Card/Head
 				case 0x7:   // Status
-				{
-					r |= m_ata->cs0_r(offset & 7, mem_mask >> 16) << 16;
+					r |= m_ata->cs0_r(offset & 7) << 16;
 					break;
-				}
 
 				//case 0x8: // Duplicate Even RD Data
 				//case 0x9: // Duplicate Odd RD Data
 
 				case 0xd:   // Duplicate Error
-				{
-					r |= m_ata->cs0_r(1, mem_mask >> 16) << 16;
+					r |= m_ata->cs0_r(1) << 16;
 					break;
-				}
 				case 0xe:   // Alt Status
 				case 0xf:   // Drive Address
-				{
-					r |= m_ata->cs1_r(offset & 7, mem_mask >> 16) << 16;
+					r |= m_ata->cs1_r(offset & 7) << 16;
 					break;
-				}
 
 				default:
-				{
-					printf("%s:compact_flash_r: IDE reg %02X\n", machine().describe_context().c_str(), offset & 0xf);
-				}
+					util::stream_format(std::cerr, "%s:compact_flash_r: IDE reg %02X\n", machine().describe_context(), offset & 0xf);
 			}
 		}
 		else
@@ -1372,30 +1367,22 @@ void viper_state::cf_card_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 				case 0x5:   // Cylinder High
 				case 0x6:   // Select Card/Head
 				case 0x7:   // Command
-				{
-					m_ata->cs0_w(offset & 7, data >> 16, mem_mask >> 16);
+					m_ata->cs0_w(offset & 7, data >> 16);
 					break;
-				}
 
 				//case 0x8: // Duplicate Even WR Data
 				//case 0x9: // Duplicate Odd WR Data
 
 				case 0xd:   // Duplicate Features
-				{
-					m_ata->cs0_w(1, data >> 16, mem_mask >> 16);
+					m_ata->cs0_w(1, data >> 16);
 					break;
-				}
 				case 0xe:   // Device Ctl
 				case 0xf:   // Reserved
-				{
-					m_ata->cs1_w(offset & 7, data >> 16, mem_mask >> 16);
+					m_ata->cs1_w(offset & 7, data >> 16);
 					break;
-				}
 
 				default:
-				{
 					throw emu_fatalerror("%s:compact_flash_w: IDE reg %02X, data %04X\n", machine().describe_context().c_str(), offset & 0xf, (uint16_t)((data >> 16) & 0xffff));
-				}
 			}
 		}
 		else if (offset >= 0x100)
@@ -1403,7 +1390,6 @@ void viper_state::cf_card_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 			switch (offset)
 			{
 				case 0x100:
-				{
 					if ((data >> 16) & 0x80)
 					{
 						m_cf_card_ide = 1;
@@ -1411,11 +1397,9 @@ void viper_state::cf_card_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 						m_ata->reset();
 					}
 					break;
-				}
+
 				default:
-				{
 					throw emu_fatalerror("%s:compact_flash_w: reg %02X, data %04X\n", machine().describe_context().c_str(), offset, (uint16_t)((data >> 16) & 0xffff));
-				}
 			}
 		}
 	}
@@ -1443,10 +1427,10 @@ uint64_t viper_state::ata_r(offs_t offset, uint64_t mem_mask)
 		switch(offset & 0x80)
 		{
 		case 0x00:
-			r |= m_ata->cs0_r(reg, mem_mask >> 16) << 16;
+			r |= m_ata->cs0_r(reg) << 16;
 			break;
 		case 0x80:
-			r |= m_ata->cs1_r(reg, mem_mask >> 16) << 16;
+			r |= m_ata->cs1_r(reg) << 16;
 			break;
 		}
 	}
@@ -1463,10 +1447,10 @@ void viper_state::ata_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 		switch(offset & 0x80)
 		{
 		case 0x00:
-			m_ata->cs0_w(reg, data >> 16, mem_mask >> 16);
+			m_ata->cs0_w(reg, data >> 16);
 			break;
 		case 0x80:
-			m_ata->cs1_w(reg, data >> 16, mem_mask >> 16);
+			m_ata->cs1_w(reg, data >> 16);
 			break;
 		}
 	}
@@ -1477,33 +1461,19 @@ uint32_t viper_state::voodoo3_pci_r(int function, int reg, uint32_t mem_mask)
 	switch (reg)
 	{
 		case 0x00:      // PCI Vendor ID (0x121a = 3dfx), Device ID (0x0005 = Voodoo 3)
-		{
 			return 0x0005121a;
-		}
 		case 0x08:      // Device class code
-		{
 			return 0x03000000;
-		}
 		case 0x10:      // memBaseAddr0
-		{
 			return m_voodoo3_pci_reg[0x10/4];
-		}
 		case 0x14:      // memBaseAddr1
-		{
 			return m_voodoo3_pci_reg[0x14/4];
-		}
 		case 0x18:      // memBaseAddr1
-		{
 			return m_voodoo3_pci_reg[0x18/4];
-		}
 		case 0x40:      // fabId
-		{
 			return m_voodoo3_pci_reg[0x40/4];
-		}
 		case 0x50:      // cfgScratch
-		{
 			return m_voodoo3_pci_reg[0x50/4];
-		}
 
 		default:
 			throw emu_fatalerror("voodoo3_pci_r: %08X at %08X\n", reg, m_maincpu->pc());
@@ -1517,12 +1487,9 @@ void viper_state::voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t m
 	switch (reg)
 	{
 		case 0x04:      // Command register
-		{
 			m_voodoo3_pci_reg[0x04/4] = data;
 			break;
-		}
 		case 0x10:      // memBaseAddr0
-		{
 			if (data == 0xffffffff)
 			{
 				m_voodoo3_pci_reg[0x10/4] = 0xfe000000;
@@ -1532,9 +1499,7 @@ void viper_state::voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t m
 				m_voodoo3_pci_reg[0x10/4] = data;
 			}
 			break;
-		}
 		case 0x14:      // memBaseAddr1
-		{
 			if (data == 0xffffffff)
 			{
 				m_voodoo3_pci_reg[0x14/4] = 0xfe000008;
@@ -1544,9 +1509,7 @@ void viper_state::voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t m
 				m_voodoo3_pci_reg[0x14/4] = data;
 			}
 			break;
-		}
 		case 0x18:      // ioBaseAddr
-		{
 			if (data == 0xffffffff)
 			{
 				m_voodoo3_pci_reg[0x18/4] = 0xffffff01;
@@ -1556,21 +1519,14 @@ void viper_state::voodoo3_pci_w(int function, int reg, uint32_t data, uint32_t m
 				m_voodoo3_pci_reg[0x18/4] = data;
 			}
 			break;
-		}
 		case 0x3c:      // InterruptLine
-		{
 			break;
-		}
 		case 0x40:      // fabId
-		{
 			m_voodoo3_pci_reg[0x40/4] = data;
 			break;
-		}
 		case 0x50:      // cfgScratch
-		{
 			m_voodoo3_pci_reg[0x50/4] = data;
 			break;
-		}
 
 		default:
 			throw emu_fatalerror("voodoo3_pci_w: %08X, %08X at %08X\n", data, reg, m_maincpu->pc());
@@ -1970,16 +1926,16 @@ static INPUT_PORTS_START( viper )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("AN0")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("AN1")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("AN2")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("AN3")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 INPUT_PORTS_START( ppp2nd )
@@ -2047,13 +2003,13 @@ INPUT_PORTS_START( thrild2 )
 
 	// TODO: normal type steering wheel (non-K type)
 	PORT_MODIFY("AN0")
-	PORT_BIT( 0xfff, 0x000, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x800,0x7ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50)
+	PORT_BIT( 0x1ff, 0x000, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_MODIFY("AN1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+	PORT_BIT( 0x1ff, 0x000, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_MODIFY("AN2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+	PORT_BIT( 0x1ff, 0x000, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
 INPUT_PORTS_END
 
 INPUT_PORTS_START( gticlub2 )
@@ -2061,10 +2017,10 @@ INPUT_PORTS_START( gticlub2 )
 
 	// K-Type steering wheel
 	PORT_MODIFY("AN0")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
+	PORT_BIT( 0x1ff, 0x000, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_MODIFY("AN3")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_NAME("Handbrake Lever") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE
+	PORT_BIT( 0x1ff, 0x000, IPT_PEDAL3 ) PORT_NAME("Handbrake Lever") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_REVERSE
 INPUT_PORTS_END
 
 INPUT_PORTS_START( gticlub2ea )
@@ -2387,16 +2343,16 @@ INPUT_PORTS_START( xtrial )
 
 	// virtually identical to gticlub
 	PORT_MODIFY("AN0")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
+	PORT_BIT( 0x1ff, 0x000, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_MODIFY("AN1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+	PORT_BIT( 0x1ff, 0x000, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_MODIFY("AN2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+	PORT_BIT( 0x1ff, 0x000, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_MODIFY("AN3")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_NAME("Handbrake Lever") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE
+	PORT_BIT( 0x1ff, 0x000, IPT_PEDAL3 ) PORT_NAME("Handbrake Lever") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50) PORT_REVERSE
 INPUT_PORTS_END
 
 INPUT_PORTS_START( code1d )
@@ -2419,13 +2375,13 @@ INPUT_PORTS_START( code1d )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Action Button")
 
 	PORT_MODIFY("AN0")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
+	PORT_BIT( 0x1ff, 0x000, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_MODIFY("AN1")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+	PORT_BIT( 0x1ff, 0x000, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
 
 	PORT_MODIFY("AN2")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
+	PORT_BIT( 0x1ff, 0x000, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x101,0x0ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(50) PORT_REVERSE
 INPUT_PORTS_END
 
 /*****************************************************************************/
@@ -2593,7 +2549,7 @@ void viper_state::viper(machine_config &config)
 	m_voodoo->pciint_callback().set(FUNC(viper_state::voodoo_pciint));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// Screeen size and timing is re-calculated later in voodoo card
 	screen.set_refresh_hz(60);
 	screen.set_size(1024, 768);

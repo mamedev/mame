@@ -191,14 +191,14 @@ protected:
 INPUT_PORTS_START( 48gc )
 	PORT_START("CONFIG")
 	PORT_CONFNAME(0x0f, 0x06, u8"Attached monitor")
-	PORT_CONFSETTING(   0x00, u8"Macintosh Two-Page Monitor (1152\u00d7870)")
-	PORT_CONFSETTING(   0x01, u8"Macintosh Portrait Display (B&W 15\" 640\u00d7870)")
-	PORT_CONFSETTING(   0x02, u8"Macintosh RGB Display (12\" 512\u00d7384)")
-	PORT_CONFSETTING(   0x03, u8"Macintosh Two-Page Monitor (B&W 21\" 1152\u00d7870)")
-	PORT_CONFSETTING(   0x04, u8"NTSC Monitor (512\u00d7384, 640\u00d7480)") // requires interlace modes
-	PORT_CONFSETTING(   0x05, u8"Macintosh Portrait Display (640\u00d7870)")
-	PORT_CONFSETTING(   0x06, u8"Macintosh Hi-Res Display (12-14\" 640\u00d7480)")
-	PORT_CONFSETTING(   0x0b, u8"NTSC Encoder (512\u00d7384, 640\u00d7480)") // requires interlace modes
+	PORT_CONFSETTING(   0x00, u8"Macintosh Two-Page Monitor (1152×870)")
+	PORT_CONFSETTING(   0x01, u8"Macintosh Portrait Display (B&W 15\" 640×870)")
+	PORT_CONFSETTING(   0x02, u8"Macintosh RGB Display (12\" 512×384)")
+	PORT_CONFSETTING(   0x03, u8"Macintosh Two-Page Monitor (B&W 21\" 1152×870)")
+	PORT_CONFSETTING(   0x04, u8"NTSC Monitor (512×384, 640×480)") // requires interlace modes
+	PORT_CONFSETTING(   0x05, u8"Macintosh Portrait Display (640×870)")
+	PORT_CONFSETTING(   0x06, u8"Macintosh Hi-Res Display (12-14\" 640×480)")
+	PORT_CONFSETTING(   0x0b, u8"NTSC Encoder (512×384, 640×480)") // requires interlace modes
 	PORT_CONFNAME(0x10, 0x00, u8"VRAM size")
 	PORT_CONFSETTING(   0x00, u8"512 kB (4\u20228)")
 	PORT_CONFSETTING(   0x10, u8"1 MB (8\u202224)")
@@ -211,16 +211,16 @@ INPUT_PORTS_END
 INPUT_PORTS_START( 824gc )
 	PORT_START("CONFIG")
 	PORT_CONFNAME(0x0f, 0x06, u8"Attached monitor")
-	PORT_CONFSETTING(   0x00, u8"Mac 21\" Color Display (1152\u00d7870)")
-	PORT_CONFSETTING(   0x01, u8"Mac Portrait Display (B&W 15\" 640\u00d7870)")
-	PORT_CONFSETTING(   0x02, u8"Mac RGB Display (12\" 512\u00d7384)")
-	PORT_CONFSETTING(   0x03, u8"Mac Two-Page Display (B&W 21\" 1152\u00d7870)")
-	PORT_CONFSETTING(   0x04, u8"NTSC Monitor (512\u00d7384, 640\u00d7480)") // requires interlace modes
-	PORT_CONFSETTING(   0x06, u8"Mac Hi-Res Display (12-14\" 640\u00d7480)")
-	PORT_CONFSETTING(   0x0a, u8"PAL Encoder (640\u00d7480, 768\u00d7576)") // requires interlace modes
-	PORT_CONFSETTING(   0x0b, u8"NTSC Encoder (512\u00d7384, 640\u00d7480)") // requires interlace modes
-	PORT_CONFSETTING(   0x0d, u8"Mac 16\" Color Display (832\u00d7624)")
-	PORT_CONFSETTING(   0x1e, u8"PAL Monitor (640\u00d7480, 768\u00d7576)") // requires interlace modes
+	PORT_CONFSETTING(   0x00, u8"Mac 21\" Color Display (1152×870)")
+	PORT_CONFSETTING(   0x01, u8"Mac Portrait Display (B&W 15\" 640×870)")
+	PORT_CONFSETTING(   0x02, u8"Mac RGB Display (12\" 512×384)")
+	PORT_CONFSETTING(   0x03, u8"Mac Two-Page Display (B&W 21\" 1152×870)")
+	PORT_CONFSETTING(   0x04, u8"NTSC Monitor (512×384, 640×480)") // requires interlace modes
+	PORT_CONFSETTING(   0x06, u8"Mac Hi-Res Display (12-14\" 640×480)")
+	PORT_CONFSETTING(   0x0a, u8"PAL Encoder (640×480, 768×576)") // requires interlace modes
+	PORT_CONFSETTING(   0x0b, u8"NTSC Encoder (512×384, 640×480)") // requires interlace modes
+	PORT_CONFSETTING(   0x0d, u8"Mac 16\" Color Display (832×624)")
+	PORT_CONFSETTING(   0x1e, u8"PAL Monitor (640×480, 768×576)") // requires interlace modes
 	PORT_CONFNAME(0x10, 0x10, u8"VRAM size")
 	PORT_CONFSETTING(   0x00, u8"512 kB (4\u20228)")
 	PORT_CONFSETTING(   0x10, u8"1 MB (8\u202224)")
@@ -273,7 +273,7 @@ void jmfb_device::device_add_mconfig(machine_config &config)
 {
 	config.set_default_layout(layout_monitors);
 
-	screen_device &screen(SCREEN(config, GC48_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, GC48_SCREEN_NAME));
 	screen.set_screen_update(FUNC(jmfb_device::screen_update));
 	screen.set_raw(20_MHz_XTAL / 21 * 127 / 4, 864, 0, 640, 525, 0, 480);
 	//screen.set_raw(20_MHz_XTAL / 19 * 190 / 2, 1'456, 0, 1'152, 915, 0, 870);
@@ -806,7 +806,7 @@ void jmfb_device::update_crtc()
 		screen().configure(
 				hpixels, vlines,
 				rectangle(left, left + width - 1, top, top + height - 1),
-				attotime::from_ticks(frametotal << (convolution ? 2 : 0) >> (interlace ? 1 : 0), pixclk).attoseconds());
+				attotime::from_ticks(frametotal << (convolution ? 2 : 0) >> (interlace ? 1 : 0), pixclk));
 
 		set_vbl_timer();
 	}

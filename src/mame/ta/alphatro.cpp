@@ -808,7 +808,7 @@ void alphatro_state::alphatro(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(m_pic, FUNC(pic8259_device::inta_cb));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	if (m_is_ntsc)
 		screen.set_raw(16_MHz_XTAL, 1016, 0, 640, 271, 0, 216);
 	else if (m_is_bicom)

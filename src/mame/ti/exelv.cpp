@@ -842,7 +842,7 @@ void exelv_state::exl100(machine_config &config)
 	TMS3556(config, m_tms3556, 18_MHz_XTAL);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_screen_update("tms3556", FUNC(tms3556_device::screen_update));
 #if TMS3556_DOUBLE_WIDTH
@@ -907,7 +907,7 @@ void exelv_state::exeltel(machine_config &config)
 	TMS3556(config, m_tms3556, 18_MHz_XTAL);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_screen_update("tms3556", FUNC(tms3556_device::screen_update));
 #if TMS3556_DOUBLE_WIDTH

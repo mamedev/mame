@@ -14,7 +14,6 @@
     - clean-ups;
 
     TODO (per-game issues)
-    - doa, doaa: corrupted sound, eventually becomes silent;
     - lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
     - manxtt: no escape from "active motion slider" tutorial (needs analog inputs),
               bypass it by entering then exiting service mode;
@@ -178,6 +177,8 @@ void model2_state::machine_start()
 	save_item(NAME(m_timerrun[3]));
 	save_item(NAME(m_videocontrol));
 	save_item(NAME(m_framenum));
+	save_item(NAME(m_doa_dummy));
+	save_item(NAME(m_prot_a));
 
 	save_item(NAME(m_geo_write_start_address));
 	save_item(NAME(m_geo_read_start_address));
@@ -276,6 +277,8 @@ void model2c_state::machine_start()
 
 void model2_state::machine_reset()
 {
+	m_doa_dummy = true;
+	m_prot_a = 0;
 	m_intreq = 0;
 	m_intena = 0;
 	m_coproctl = 0;
@@ -931,23 +934,6 @@ void model2_state::irq_update()
 	m_maincpu->set_input_line(I960_IRQ3, m_intreq & 0b1100'0000'0000 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-u8 model2_state::model2_serial_r(offs_t offset)
-{
-	return m_uart->data_r();
-}
-
-
-void model2_state::model2_serial_w(offs_t offset, u8 data)
-{
-	m_uart->data_w(data);
-
-	if (m_scsp.found())
-	{
-		// TODO: make the SCSP receive the data via the USART device
-		m_scsp->midi_in(data);
-	}
-}
-
 
 #ifdef UNUSED_FUNCTION
 void model2_state::copro_w(offs_t offset, u32 data)
@@ -1378,8 +1364,7 @@ void model2a_state::model2a_crx_mem(address_map &map)
 	map(0x00200000, 0x0023ffff).ram().flags(i960_cpu_device::BURST);
 	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
 	map(0x01c00040, 0x01c00043).nopw();
-	map(0x01c80000, 0x01c80001).rw(FUNC(model2a_state::model2_serial_r), FUNC(model2a_state::model2_serial_w)).umask16(0x00ff);
-	map(0x01c80002, 0x01c80003).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0x00ff);
+	map(0x01c80000, 0x01c80003).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 }
 
 void model2a_state::model2a_5881_mem(address_map &map)
@@ -1414,8 +1399,7 @@ void model2b_state::model2b_crx_mem(address_map &map)
 	map(0x00980014, 0x00980017).r(FUNC(model2b_state::copro_status_r));
 	map(0x00980020, 0x00980023).noprw();    // bank control reg - used during SHARC program upload, all games just set this to 0
 
-	map(0x009c0000, 0x009c0003).rw(FUNC(model2b_state::model2_serial_r), FUNC(model2b_state::model2_serial_w)).umask32(0x000000ff);
-	map(0x009c0004, 0x009c0007).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask32(0x000000ff);
+	map(0x009c0000, 0x009c0007).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask32(0x000000ff);
 
 	map(0x11000000, 0x110fffff).ram().share("textureram0").flags(i960_cpu_device::BURST); // texture RAM 0 (2b/2c)
 	map(0x11100000, 0x111fffff).ram().share("textureram0").flags(i960_cpu_device::BURST); // texture RAM 0 (2b/2c)
@@ -1459,8 +1443,7 @@ void model2c_state::model2c_crx_mem(address_map &map)
 	map(0x11400000, 0x1140ffff).rw(FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w)).umask16(0x00ff).flags(i960_cpu_device::BURST);    // polygon "luma" RAM (2b/2c)
 
 	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
-	map(0x01c80000, 0x01c80001).rw(FUNC(model2c_state::model2_serial_r), FUNC(model2c_state::model2_serial_w)).umask16(0x00ff);
-	map(0x01c80002, 0x01c80003).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0x00ff);
+	map(0x01c80000, 0x01c80003).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 }
 
 void model2c_state::model2c_5881_mem(address_map &map)
@@ -2471,6 +2454,10 @@ void model2_state::sound_ready_w(int state)
 
 /* Model 2 sound board emulation */
 
+// TODO: modernize, bit 3-0 same as model3.cpp and flashbeats.cpp
+// - bit 4 looks always high in at least vstriker, which rules out being banking related
+// - none of the Model 2 games actually has more than 0x800000 of sample data (wtf),
+//   so this will actually never trigger ...
 void model2_state::model2snd_ctrl(u16 data)
 {
 	// handle sample banking
@@ -2490,10 +2477,11 @@ void model2_state::model2snd_ctrl(u16 data)
 	}
 }
 
+// We assume using the same waitstate weights as Saturn, applied to SCSP area only
 void model2_state::model2_snd(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram().share("soundram");
-	map(0x100000, 0x100fff).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
+	map(0x000000, 0x07ffff).before_delay(NAME([](offs_t) { return 1; })).ram().share("soundram");
+	map(0x100000, 0x100fff).before_delay(NAME([](offs_t) { return 1; })).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
 	map(0x400000, 0x400001).w(FUNC(model2_state::model2snd_ctrl));
 	map(0x600000, 0x67ffff).rom().region("audiocpu", 0);
 	map(0x800000, 0x9fffff).rom().region("samples", 0);
@@ -2532,7 +2520,7 @@ void model2_state::model2_screen(machine_config &config)
 	m_tiles->xhout_write_callback().set(FUNC(model2_state::horizontal_sync_w));
 	m_tiles->xvout_write_callback().set(FUNC(model2_state::vertical_sync_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	// TODO: from System 24, might not be accurate for Model 2
 	m_screen->set_raw(32_MHz_XTAL/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/);
@@ -2552,14 +2540,16 @@ void model2_state::model2_scsp(machine_config &config)
 	SCSP(config, m_scsp, 45.1584_MHz_XTAL / 2); // 45.158MHz XTAL at Video board(Model 2A-CRX)
 	m_scsp->set_addrmap(0, &model2_state::scsp_map);
 	m_scsp->irq_cb().set(FUNC(model2_state::scsp_irq));
+	m_scsp->midi_out_cb().set(m_uart, FUNC(i8251_device::write_rxd));
 	m_scsp->add_route(0, "speaker", 1.0, 0);
 	m_scsp->add_route(1, "speaker", 1.0, 1);
 
 	I8251(config, m_uart, 8000000); // uPD71051C, clock unknown
+	m_uart->txd_handler().set(m_scsp, FUNC(scsp_device::midi_in));
 	m_uart->rxrdy_handler().set(FUNC(model2_state::sound_ready_w));
 	m_uart->txrdy_handler().set(FUNC(model2_state::sound_ready_w));
 
-	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 }
@@ -2783,7 +2773,7 @@ void model2a_state::manxttdx(machine_config &config)
 	SEGAM1AUDIO(config, m_m1audio);
 	m_m1audio->rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
 
-	m_uart->txd_handler().set(m_m1audio, FUNC(segam1audio_device::write_txd));
+	m_uart->txd_handler().append(m_m1audio, FUNC(segam1audio_device::write_txd));
 }
 
 void model2a_state::srallyc(machine_config &config)
@@ -2840,7 +2830,8 @@ void model2a_state::model2a_0229(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2a_state::model2a_0229_mem);
 
 	SEGA315_5838_COMP(config, m_0229crypt);
-	m_0229crypt->set_addrmap(0, &model2a_state::sega_0229_map);
+	m_0229crypt->set_variant(sega_315_5838_comp_device::variant::SEGA_317_0229);
+	m_0229crypt->source_callback().set(FUNC(model2a_state::sega_0229_source_r));
 }
 
 void model2a_state::zeroguna(machine_config &config)
@@ -2908,7 +2899,8 @@ void model2b_state::model2b_0229(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2b_state::model2b_0229_mem);
 
 	SEGA315_5838_COMP(config, m_0229crypt);
-	m_0229crypt->set_addrmap(0, &model2b_state::sega_0229_map);
+	m_0229crypt->set_variant(sega_315_5838_comp_device::variant::SEGA_317_0229);
+	m_0229crypt->source_callback().set(FUNC(model2b_state::sega_0229_source_r));
 }
 
 void model2b_state::indy500(machine_config &config)
@@ -3050,7 +3042,7 @@ void model2c_state::stcc(machine_config &config)
 	m_dsbz80->add_route(0, "speaker", 1.0, 0);
 	m_dsbz80->add_route(1, "speaker", 1.0, 1);
 
-	m_uart->txd_handler().set(m_dsbz80, FUNC(dsbz80_device::write_txd));
+	m_uart->txd_handler().append(m_dsbz80, FUNC(dsbz80_device::write_txd));
 }
 
 void model2c_state::waverunr(machine_config &config)
@@ -3122,10 +3114,11 @@ void model2c_state::topskatr(machine_config &config)
 	io.an_port_callback<1>().set_ioport("SLIDE");
 
 	DSB2(config, m_dsb2);
+	// TODO: should be chained with SCSP EXTS not being direct
 	m_dsb2->add_route(0, "speaker", 1.0, 0);
 	m_dsb2->add_route(1, "speaker", 1.0, 1);
 
-	m_uart->txd_handler().set(m_dsb2, FUNC(dsb2_device::write_txd));
+	m_uart->txd_handler().append(m_dsb2, FUNC(dsb2_device::write_txd));
 }
 
 
@@ -5521,8 +5514,11 @@ ROM_START( rchase2 ) /* Rail Chase 2 Revision A, Model 2B. Sega game ID# 833-118
 	ROM_LOAD16_WORD_SWAP("epr-18047.31", 0x000000, 0x080000, CRC(4c31d459) SHA1(424d5e5a7787d0d4c68aa919ba7d575babfd1ce0) )
 
 	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	// 16Mbit ROMs in 32Mbit sockets: A21 is not decoded, so each ROM is mirrored
 	ROM_LOAD16_WORD_SWAP("mpr-18029.32", 0x0000000, 0x200000, CRC(f6804150) SHA1(ef40c11008c75d04159772ad30f02cdb8c5464f3) )
+	ROM_RELOAD(                          0x0200000, 0x200000 )
 	ROM_LOAD16_WORD_SWAP("mpr-18030.34", 0x0400000, 0x200000, CRC(1167615d) SHA1(bae0060aec3c15f08342f11df665c05c5703523d) )
+	ROM_RELOAD(                          0x0600000, 0x200000 )
 
 	/* Z80 code located on the I/O board type 837-11694. Z80 @ 4Mhz with 8-way DSW & SONY CXD1095Q QFP64 chip */
 	ROM_REGION( 0x8000, "iocpu", 0 )
@@ -5563,8 +5559,11 @@ ROM_START( rchase2a ) /* Rail Chase 2, Model 2B */
 	ROM_LOAD16_WORD_SWAP("epr-18047.31", 0x000000, 0x080000, CRC(4c31d459) SHA1(424d5e5a7787d0d4c68aa919ba7d575babfd1ce0) )
 
 	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	// 16Mbit ROMs in 32Mbit sockets: A21 is not decoded, so each ROM is mirrored
 	ROM_LOAD16_WORD_SWAP("mpr-18029.32", 0x0000000, 0x200000, CRC(f6804150) SHA1(ef40c11008c75d04159772ad30f02cdb8c5464f3) )
+	ROM_RELOAD(                          0x0200000, 0x200000 )
 	ROM_LOAD16_WORD_SWAP("mpr-18030.34", 0x0400000, 0x200000, CRC(1167615d) SHA1(bae0060aec3c15f08342f11df665c05c5703523d) )
+	ROM_RELOAD(                          0x0600000, 0x200000 )
 
 	/* Z80 code located on the I/O board type 837-11694. Z80 @ 4Mhz with 8-way DSW & SONY CXD1095Q QFP64 chip */
 	ROM_REGION( 0x8000, "iocpu", 0 )
@@ -7220,8 +7219,8 @@ ROM_START( daytonam ) /* Daytona USA (Japan, To The MAXX) */
 	ROM_SYSTEM_BIOS(1, "16488", "drive board ROM 16488")
 	ROMX_LOAD("epr-16488.ic12",  0x000000, 0x010000, CRC(4f0b8114) SHA1(1fcebd0632da8f224a04fe6b39147a05eb358e83), ROM_BIOS(1) )
 
-	ROM_REGION( 0x10000, "pic", 0)
-	ROM_LOAD("pic.bin", 0x00000, 0x10000, NO_DUMP )
+	ROM_REGION16_LE( 0x4280, "pic", 0 )
+	ROM_LOAD( "pic.bin", 0x0000, 0x4280, NO_DUMP )
 ROM_END
 
 ROM_START( daytonagtx )
@@ -7587,53 +7586,49 @@ void model2_state::init_powsledm()
 	ROM[0x1585d] = 0xfd; // inverted node ID
 }
 
-u32 model2_state::doa_prot_r(offs_t offset, u32 mem_mask)
+u16 model2_state::doa_prot_r()
 {
-	// doa only reads 16-bits at a time, while STV reads 32-bits
-	uint32_t ret = 0;
+	// The first halfword is discarded by DOA; its hardware value is unknown.
+	if (m_doa_dummy)
+	{
+		if (!machine().side_effects_disabled())
+			m_doa_dummy = false;
+		return 0;
+	}
+	return m_0229crypt->data_r();
+}
 
-	if (mem_mask&0xffff0000) ret |= (m_0229crypt->data_r()<<16);
-	if (mem_mask&0x0000ffff) ret |= m_0229crypt->data_r();
+void model2_state::doa_source_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	m_0229crypt->source_w(data, mem_mask);
+	m_doa_dummy = true;
+}
 
-	return ret;
+u16 model2_state::sega_0229_source_r(offs_t offset)
+{
+	// The source is a 32 KiB window of little-endian i960 RAM.
+	return util::little_endian_cast<u16 const>(&m_0229ram[0])[offset & 0x3fff];
 }
 
 u32 model2_state::doa_unk_r()
 {
-	u32 retval = 0;
-
-	// this actually looks a busy status flag
-	m_prot_a = !m_prot_a;
-	if (m_prot_a)
-		retval = 0xffff;
-	else
-		retval = 0xfff0;
-
-	return retval;
-}
-
-void model2_state::sega_0229_map(address_map &map)
-{
-	// view the protection device has into RAM, this might need endian swapping
-	map(0x000000, 0x007fff).lrw8([this](offs_t offset){ return m_maincpu->space(AS_PROGRAM).read_byte(0x1d80000+offset); }, "prot", [this](offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(0x1d80000+offset, data); }, "prot");
+	// TODO: determine the actual busy/status timing.
+	if (!machine().side_effects_disabled())
+		m_prot_a = !m_prot_a;
+	return m_prot_a ? 0xffff : 0xfff0;
 }
 
 /* common map for 0229 protection */
 void model2_state::model2_0229_mem(address_map &map)
 {
-	// the addresses here suggest this is only connected to a 0x8000 byte window, not 0x80000 like ST-V
-	map(0x01d80000, 0x01d87fff).ram();
-	map(0x01d87ff0, 0x01d87ff3).w(m_0229crypt, FUNC(sega_315_5838_comp_device::srcaddr_w));
-	map(0x01d87ff4, 0x01d87ff7).w(m_0229crypt, FUNC(sega_315_5838_comp_device::data_w_doa));
+	// The protection registers overlay the end of the source RAM window.
+	map(0x01d80000, 0x01d87fff).ram().share(m_0229ram);
+	map(0x01d87ff0, 0x01d87ff3).w(FUNC(model2_state::doa_source_w));
+	map(0x01d87ff4, 0x01d87ff7).w(m_0229crypt, FUNC(sega_315_5838_comp_device::table_w));
 	map(0x01d87ff8, 0x01d87ffb).r(FUNC(model2_state::doa_prot_r));
 
-	 // is this protection related? it's in the same ram range but other games with the device don't use the address for any kind of status doesn't access the device otherwise?
+	// A separate status location polled by DOA; not used by the ST-V games.
 	map(0x01d8400c, 0x01d8400f).r(FUNC(model2_state::doa_unk_r));
-}
-
-void model2_state::init_doa()
-{
-	m_0229crypt->set_hack_mode(sega_315_5838_comp_device::HACK_MODE_DOA);
 }
 
 // Model 2 (TGPs, Model 1 sound board)
@@ -7664,9 +7659,9 @@ GAME( 1995, srallycdx,  srallyc,  srallyc,      srallyc,   model2a_state,       
 GAME( 1995, srallycdxa, srallyc,  srallyc,      srallyc,   model2a_state,          empty_init,    ROT0, "Sega",   "Sega Rally Championship - DX", MACHINE_NOT_WORKING )
 GAME( 1995, vcop2,      0,        vcop2,        vcop2,     model2a_state,          empty_init,    ROT0, "Sega",   "Virtua Cop 2", 0 )
 GAME( 1995, skytargt,   0,        skytargt,     skytargt,  model2a_state,          empty_init,    ROT0, "Sega",   "Sky Target", MACHINE_NOT_WORKING )
-GAME( 1996, doaa,       doa,      model2a_0229, doa,       model2a_state,          init_doa,      ROT0, "Tecmo",  "Dead or Alive (Model 2A, Revision A)", 0 ) // Dec  4 1996, defaults to Japan but can be changed in test mode
-GAME( 1996, doaab,      doa,      model2a_0229, doa,       model2a_state,          init_doa,      ROT0, "Tecmo",  "Dead or Alive (Model 2A)", 0 ) // Nov  3 1996, defaults to Japan but can be changed in test mode
-GAME( 1996, doaae,      doa,      model2a_0229, doa,       model2a_state,          init_doa,      ROT0, "Tecmo",  "Dead or Alive (Export, Model 2A, Revision A)", 0 ) // Nov  3 1996, locked to Export
+GAME( 1996, doaa,       doa,      model2a_0229, doa,       model2a_state,          empty_init,    ROT0, "Tecmo",  "Dead or Alive (Model 2A, Revision A)", 0 ) // Dec  4 1996, defaults to Japan but can be changed in test mode
+GAME( 1996, doaab,      doa,      model2a_0229, doa,       model2a_state,          empty_init,    ROT0, "Tecmo",  "Dead or Alive (Model 2A)", 0 ) // Nov  3 1996, defaults to Japan but can be changed in test mode
+GAME( 1996, doaae,      doa,      model2a_0229, doa,       model2a_state,          empty_init,    ROT0, "Tecmo",  "Dead or Alive (Export, Model 2A, Revision A)", 0 ) // Nov  3 1996, locked to Export
 GAME( 1997, zeroguna,   zerogun,  zeroguna,     zerogun,   model2a_state,          init_zerogun,  ROT0, "Psikyo", "Zero Gunner (Export, Model 2A)", 0 )
 GAME( 1997, zerogunaj,  zerogun,  zeroguna,     zerogun,   model2a_state,          init_zerogun,  ROT0, "Psikyo", "Zero Gunner (Japan, Model 2A)", 0 )
 GAME( 1997, motoraid,   0,        manxtt,       motoraid,  model2a_state,          empty_init,    ROT0, "Sega",   "Motor Raid - Twin", MACHINE_IMPERFECT_SOUND )
@@ -7698,8 +7693,8 @@ GAME( 1996, sfight,     schamp,   model2b,      schamp,    model2b_state, empty_
 GAME( 1996, lastbrnx,   0,        model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (Export, Revision A)", MACHINE_NOT_WORKING )
 GAME( 1996, lastbrnxu,  lastbrnx, model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (USA, Revision A)", MACHINE_NOT_WORKING )
 GAME( 1996, lastbrnxj,  lastbrnx, model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx: Tokyo Bangaichi (Japan, Revision A)", MACHINE_NOT_WORKING )
-GAME( 1996, doa,        0,        model2b_0229, doa,       model2b_state, init_doa,      ROT0, "Tecmo",  "Dead or Alive (Model 2B, Revision C)", 0 ) // Jan 10 1997
-GAME( 1996, doab,       doa,      model2b_0229, doa,       model2b_state, init_doa,      ROT0, "Tecmo",  "Dead or Alive (Model 2B, Revision B)", 0 ) // Dec 4 1996
+GAME( 1996, doa,        0,        model2b_0229, doa,       model2b_state, empty_init,    ROT0, "Tecmo",  "Dead or Alive (Model 2B, Revision C)", 0 ) // Jan 10 1997
+GAME( 1996, doab,       doa,      model2b_0229, doa,       model2b_state, empty_init,    ROT0, "Tecmo",  "Dead or Alive (Model 2B, Revision B)", 0 ) // Dec 4 1996
 GAME( 1996, sgt24h,     0,        indy500,      sgt24h,    model2b_state, init_sgt24h,   ROT0, "Jaleco", "Super GT 24h", MACHINE_NOT_WORKING )
 GAME( 1996, powsled,    0,        powsled,      powsled,   model2b_state, empty_init,    ROT0, "Sega",   "Power Sled (Slave, Revision A)", MACHINE_NOT_WORKING )
 GAME( 1996, powsledr,   powsled,  powsled,      powsled,   model2b_state, empty_init,    ROT0, "Sega",   "Power Sled (Relay, Revision A)", MACHINE_NOT_WORKING )

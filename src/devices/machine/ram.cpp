@@ -6,20 +6,12 @@ RAM device
 
 Provides a configurable amount of RAM to drivers
 
-TODO:
-- add RAM size options to UI, eg. under Machine Configuration
-- remove limitations due to hardcoded RAM_TAG:
-  + *configurable* RAM device can only be added to root device
-    (that is the driver device)
-  + can only have one *configurable* RAM device per machine driver
-
 **************************************************************************/
 
 #include "emu.h"
 #include "ram.h"
 
 #include "corestr.h"
-#include "emuopts.h"
 
 #include <cstdio>
 #include <cctype>
@@ -50,7 +42,10 @@ u32 parse_string(const char *s)
 		{ "kib",    1024 },
 		{ "m",      1024 * 1024 },
 		{ "mb",     1024 * 1024 },
-		{ "mib",    1024 * 1024 }
+		{ "mib",    1024 * 1024 },
+		{ "g",      1024 * 1024 * 1024 },
+		{ "gb",     1024 * 1024 * 1024 },
+		{ "gib",    1024 * 1024 * 1024 }
 	};
 
 	// parse the string
@@ -71,179 +66,137 @@ u32 parse_string(const char *s)
 	return ram * multiplier;
 }
 
+};
 
-//-------------------------------------------------
-//  calculate_extra_options
-//-------------------------------------------------
-
-ram_device::extra_option_vector calculate_extra_options(const char *extra_options_string, std::string *bad_option)
+device_ram_interface::device_ram_interface(const machine_config& mconfig, device_t& device)
+	: device_interface(device, "ram")
 {
-	ram_device::extra_option_vector result;
-	std::string const options(extra_options_string);
-
-	bool done(false);
-	for (std::string::size_type start = 0, end = options.find_first_of(','); !done; start = end + 1, end = options.find_first_of(',', start))
-	{
-		// ignore spaces
-		while ((end > start) && (options.length() > start) && ((' ' == options[start]) || ('\t' == options[start])))
-			++start;
-
-		// parse the option
-		std::string ram_option_string(options.substr(start, (end == -1) ? -1 : end - start));
-		u32 const ram_option = parse_string(ram_option_string.c_str());
-		if (ram_option == 0)
-		{
-			if (bad_option)
-				*bad_option = std::move(ram_option_string);
-			return result;
-		}
-
-		// and add it to the results
-		result.emplace_back(std::move(ram_option_string), ram_option);
-		done = std::string::npos == end;
-	}
-	return result;
 }
 
+device_ram_interface::~device_ram_interface()
+{
+}
+
+DECLARE_DEVICE_TYPE(RAM_OPTION, device_ram_interface)
+
+class ram_option_device :
+	public device_t,
+	public device_ram_interface
+{
+public:
+	ram_option_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+		: device_t(mconfig, RAM_OPTION, tag, owner, clock)
+		, device_ram_interface(mconfig, *this)
+	{
+	}
+
+	virtual u32 size() const override { return parse_string(basetag()); }
+
+protected:
+	virtual void device_validity_check(validity_checker& valid) const override
+	{
+		if (!size())
+			osd_printf_error("Invalid RAM option: %s\n", basetag());
+	}
+
+	virtual void device_start() override
+	{
+	}
 };
 
 
-/*****************************************************************************
-    LIVE DEVICE
-*****************************************************************************/
-
-// device type definition
-DEFINE_DEVICE_TYPE(RAM, ram_device, "ram", "RAM")
-
-
-//-------------------------------------------------
-//  ram_device - constructor
-//-------------------------------------------------
-
 ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, RAM, tag, owner, clock)
+	, device_single_card_slot_interface<device_ram_interface>(mconfig, *this)
 	, m_size(0)
-	, m_default_size(0)
+	, m_bits(8)
 	, m_default_value(0xff)
 	, m_extra_options_string(nullptr)
 {
 }
 
+void ram_device::device_validity_check(validity_checker& valid) const
+{
+	if (m_bits != 8 && m_bits != 16 && m_bits != 32 && m_bits != 64)
+		osd_printf_error("Invalid RAM bits: %u\n", m_bits);
+}
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
+void ram_device::device_config_complete()
+{
+	device_ram_interface* device = get_card_device();
+
+	m_size = device ? device->size() : parse_string(m_default_size.c_str());
+}
 
 void ram_device::device_start()
 {
-	// the device named 'ram' can get ram options from command line
-	u32 const defsize(default_size());
-	m_size = 0;
-	if (strcmp(tag(), ":" RAM_TAG) == 0)
-	{
-		char const *const ramsize_string(machine().options().ram_size());
-		if (ramsize_string && *ramsize_string)
-		{
-			m_size = parse_string(ramsize_string);
-			if (!is_valid_size(m_size))
-			{
-				extra_option_vector::const_iterator found(std::find_if(m_extra_options.begin(), m_extra_options.end(), [defsize] (extra_option const &opt) { return opt.second == defsize; }));
-				std::ostringstream output;
-				util::stream_format(output, "Cannot recognize the RAM option %s (valid options are ", ramsize_string);
-				if (!m_extra_options_string)
-					util::stream_format(output, "%s).\n", m_default_size);
-				else if (m_extra_options.end() != found)
-					util::stream_format(output, "%s).\n", m_extra_options_string);
-				else
-					util::stream_format(output, "%s,%s).\n", m_default_size, m_extra_options_string);
+	allocate_ram();
 
-				osd_printf_error("%s", output.str());
-
-				osd_printf_warning("Setting value to default %s\n", m_default_size);
-
-				m_size = 0;
-			}
-		}
-	}
-
-	// if we didn't get a size yet, use the default
-	if (m_size == 0)
-		m_size = defsize;
-
-	// allocate space for the ram
-	m_pointer.reset(std::malloc(m_size));
-	if (!m_pointer)
-		throw emu_fatalerror("%s: error allocating memory", tag());
-	std::fill_n(reinterpret_cast<u8 *>(m_pointer.get()), m_size, m_default_value);
-
-	// register for state saving
-	save_item(NAME(m_size));
-	save_pointer(reinterpret_cast<u8 *>(m_pointer.get()), "m_pointer", m_size);
+	if (m_bits == 8)
+		save_pointer(reinterpret_cast<u8 *>(m_pointer.get()), "m_pointer", m_size);
+	else if (m_bits == 16)
+		save_pointer(reinterpret_cast<u16 *>(m_pointer.get()), "m_pointer", m_size / 2);
+	else if (m_bits == 32)
+		save_pointer(reinterpret_cast<u32 *>(m_pointer.get()), "m_pointer", m_size / 4);
+	else if (m_bits == 64)
+		save_pointer(reinterpret_cast<u64 *>(m_pointer.get()), "m_pointer", m_size / 8);
 }
 
-
-//-------------------------------------------------
-//  device_validity_check - device-specific validity
-//  checks
-//-------------------------------------------------
-
-void ram_device::device_validity_check(validity_checker &valid) const
+std::string ram_device::sanitise_option(std::string_view option)
 {
-	// verify default ram value
-	if (default_size() == 0)
-		osd_printf_error("Invalid default RAM option: %s\n", m_default_size);
+	u32 const ram_option = parse_string(option.data());
 
-	// calculate any extra options
+	if (!ram_option)
+		return std::string(option);
+	else if (ram_option % 1024)
+		return string_format("%u", ram_option);
+	else if (ram_option % (1024 * 1024))
+		return string_format("%uk", ram_option / 1024);
+	else if (ram_option % (1024 * 1024 * 1024))
+		return string_format("%um", ram_option / (1024 * 1024));
+	else
+		return string_format("%ug", ram_option / (1024 * 1024 * 1024));
+}
+
+void ram_device::update_options()
+{
+	option_reset();
+
+	if (m_default_size.length())
+	{
+		option_add(m_default_size, RAM_OPTION);
+		set_default_option(m_default_size.c_str());
+	}
+
 	if (m_extra_options_string)
 	{
-		std::string bad_option;
-		extra_option_vector const extras(calculate_extra_options(m_extra_options_string, &bad_option));
+		std::string const options(m_extra_options_string);
 
-		// report any errors
-		if (!bad_option.empty())
-			osd_printf_error("Invalid RAM option: %s\n", bad_option);
-
-		// report duplicates
-		using extra_option_ref_set = std::set<std::reference_wrapper<extra_option const>, bool (*)(extra_option const &, extra_option const &)>;
-		extra_option_ref_set sorted([] (extra_option const &a, extra_option const &b) { return a.second < b.second; });
-		for (extra_option const &opt : extras)
+		bool done(false);
+		for (std::string::size_type start = 0, end = options.find_first_of(','); !done; start = end + 1, end = options.find_first_of(',', start))
 		{
-			auto const ins(sorted.emplace(opt));
-			if (!ins.second)
-				osd_printf_error("Duplicate RAM options: %s == %s (%u)\n", ins.first->get().first, opt.first, opt.second);
+			while ((end > start) && (options.length() > start) && ((' ' == options[start]) || ('\t' == options[start])))
+				++start;
+
+			std::string ram_option_string(sanitise_option(options.substr(start, (end == -1) ? -1 : end - start)));
+
+			if (ram_option_string != m_default_size)
+				option_add(ram_option_string, RAM_OPTION);
+			done = std::string::npos == end;
 		}
 	}
 }
 
-
-//-------------------------------------------------
-//  is_valid_size
-//-------------------------------------------------
-
-bool ram_device::is_valid_size(u32 size) const
+void ram_device::allocate_ram()
 {
-	return size == default_size()
-		|| std::find_if(extra_options().begin(), extra_options().end(), [size] (extra_option const &opt) { return opt.second == size; }) != extra_options().end();
+	if (!m_pointer)
+	{
+		m_pointer.reset(std::malloc(m_size));
+		if (!m_pointer)
+			throw emu_fatalerror("%s: error allocating memory", tag());
+		std::fill_n(reinterpret_cast<u8*>(m_pointer.get()), m_size, m_default_value);
+	}
 }
 
-
-//-------------------------------------------------
-//  default_size
-//-------------------------------------------------
-
-u32 ram_device::default_size() const
-{
-	return parse_string(m_default_size);
-}
-
-
-//-------------------------------------------------
-//  extra_options
-//-------------------------------------------------
-
-const ram_device::extra_option_vector &ram_device::extra_options() const
-{
-	if (m_extra_options_string && m_extra_options.empty())
-		m_extra_options = calculate_extra_options(m_extra_options_string, nullptr);
-	return m_extra_options;
-}
+DEFINE_DEVICE_TYPE(RAM, ram_device, "ram_slot", "RAM Slot")
+DEFINE_DEVICE_TYPE_PRIVATE(RAM_OPTION, device_ram_interface, ram_option_device, "ram", "RAM")

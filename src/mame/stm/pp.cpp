@@ -473,7 +473,7 @@ void pp_state::pp(machine_config &config)
 	m_pvtc->intr_callback().set(FUNC(pp_state::int_w<5>));
 	m_pvtc->set_display_callback(FUNC(pp_state::display_char));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(13_MHz_XTAL, 630, 0, 560, 240, 0, 216);
 	screen.set_screen_update("pvtc", FUNC(scn2672_device::screen_update));
 

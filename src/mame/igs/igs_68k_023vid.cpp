@@ -240,7 +240,7 @@ void igs_68k_023vid_state::xypmd(machine_config &config)
 	//IGS025(config, "igs025");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // TODO: verify everything once emulation works
+	SCREEN(config, m_screen); // TODO: verify everything once emulation works
 	m_screen->set_raw(50_MHz_XTAL/5, 640, 0, 448, 264, 0, 224); // copied from igs/pgm.cpp, correct?
 	m_screen->set_screen_update("igs023", FUNC(igs023_video_device::screen_update));
 	m_screen->screen_vblank().set(FUNC(igs_68k_023vid_state::screen_vblank));

@@ -111,12 +111,12 @@ void st2204_device::device_start()
 	state_add(ST_IENA, "IENA", m_iena, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	for (int i = 0; i < 5; i++)
 	{
-		state_add(ST_PAOUT + i, string_format("P%cOUT", 'A' + i).c_str(), m_pdata[i]);
-		state_add(ST_PCA + i, string_format("PC%c", 'A' + i).c_str(), m_pctrl[i]);
+		state_add(ST_PAOUT + i, string_format("P%cOUT", 'A' + i), m_pdata[i]);
+		state_add(ST_PCA + i, string_format("PC%c", 'A' + i), m_pctrl[i]);
 		if (i == 2)
-			state_add(ST_PSA + i, string_format("PS%c", 'A' + i).c_str(), m_psel[i]);
+			state_add(ST_PSA + i, string_format("PS%c", 'A' + i), m_psel[i]);
 		if (i == 2 || i == 3)
-			state_add(ST_PFC + i - 2, string_format("PF%c", 'A' + i).c_str(), m_pfun[i - 2]);
+			state_add(ST_PFC + i - 2, string_format("PF%c", 'A' + i), m_pfun[i - 2]);
 	}
 	state_add(ST_PLOUT, "PLOUT", m_pdata[6]);
 	state_add(ST_PCL, "PCL", m_pctrl[6]);
@@ -692,6 +692,8 @@ void st2204_device::common_map(address_map &map)
 	map(0x004c, 0x004c).rw(FUNC(st2204_device::pl_r), FUNC(st2204_device::pl_w));
 	// PCL is listed as write-only in ST2202 specification, but DynamiDesk suggests otherwise
 	map(0x004e, 0x004e).rw(FUNC(st2204_device::pcl_r), FUNC(st2204_device::pcl_w));
+	map(0x0050, 0x0050).rw(FUNC(st2204_device::sdatal_r), FUNC(st2204_device::sdatal_w));
+	map(0x0051, 0x0051).rw(FUNC(st2204_device::sdatah_r), FUNC(st2204_device::sdatah_w));
 	map(0x0052, 0x0052).rw(FUNC(st2204_device::sctr_r), FUNC(st2204_device::sctr_w));
 	map(0x0053, 0x0053).rw(FUNC(st2204_device::sckr_r), FUNC(st2204_device::sckr_w));
 	map(0x0054, 0x0054).rw(FUNC(st2204_device::ssr_r), FUNC(st2204_device::ssr_w));

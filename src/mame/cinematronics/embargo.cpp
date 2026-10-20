@@ -276,7 +276,7 @@ void embargo_state::embargo(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &embargo_state::main_data_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 255, 0, 239);
 	screen.set_refresh_hz(60);

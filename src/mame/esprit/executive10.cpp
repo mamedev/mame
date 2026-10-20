@@ -291,7 +291,7 @@ void executive10_state::executive10(machine_config &config)
 	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(16.960_MHz_XTAL, 890, 0, 720, 320, 0, 300); // maybe
 	m_screen->set_screen_update(FUNC(executive10_state::screen_update));

@@ -193,7 +193,7 @@ void iqunlim_state::iqunlim(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("2M");
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(480, 260);
 	m_screen->set_visarea(0, 480 - 1, 0, 260 - 1);

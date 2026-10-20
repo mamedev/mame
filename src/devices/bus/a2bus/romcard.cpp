@@ -12,11 +12,25 @@
     Apple at various points called it both "ROM Card" and
     "Firmware Card".
 
+    The Applesoft firmware card was originally released with only the
+    five ROMs containing the Applesoft II language, with the F8 socket
+    vacant and disabled.  The Autostart Monitor was later added to
+    occupy the F8 socket, and this is the configuration emulated here.
+
     Some later revisions of DOS 3.3 remove support for the Applesoft
     BASIC firmware card in slot 0 of an original Apple II, though
     they will load Applesoft onto a language card if one is present
-    there.  Compatible revisions print "APPLE II PLUS OR ROMCARD"
-    when successfully booted on any non-Integer BASIC system.
+    there.  Compatible revisions of the DOS 3.3 master disk print
+    "APPLE II PLUS OR ROMCARD" when successfully booted on any
+    non-Integer BASIC system.
+
+    The four EPROMs on the FORTH card contain a version of fig-FORTH
+    updated to FORTH-79 with other modifications to allow the editor
+    and assembler to run from ROM.  Designed for a system with
+    cassette tape but no disk drives, it uses the upper half of the
+    48K RAM on the motherboard as a RAM disk.  More info on its
+    development is provided in FORTH Dimensions, Volume IV, No. 4,
+    p. 6–7.
 
 *********************************************************************/
 
@@ -80,6 +94,17 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
+class a2bus_romcardforth_device: public a2bus_romcard_device
+{
+public:
+	a2bus_romcardforth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override ATTR_COLD;
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
 class a2bus_romcarduser_device: public a2bus_romcard_device, public device_image_interface
 {
 public:
@@ -127,6 +152,24 @@ ROM_START( romcardint )
 	ROM_LOAD ( "341-0004-00.f8", 0x2800, 0x0800, CRC(020a86d0) SHA1(52a18bd578a4694420009cad7a7a5779a8c00226))
 ROM_END
 
+/*
+    FORTH ROM CARD FOR APPLE II
+
+    •FORTH-79 Standard with Editor and Assembler Extensions.
+    •24K Pseudo Disk in a 48K System.
+    •Plug into Slot 0 and FORTH will be booted up automatically.
+
+     Offete Enterprises, 1306 S. B St., San Mateo, Ca. 94402
+*/
+ROM_START( romcardforth )
+	ROM_REGION(0x3000, "romcard", 0)
+	ROM_LOAD ( "d0.bin", 0x0000, 0x0800, CRC(0d8406a3) SHA1(6f86248b7c53bc78777a46ff92c4f682e0cb73e6) ) // 2716
+	ROM_LOAD ( "d8.bin", 0x0800, 0x0800, CRC(88a8932c) SHA1(c3666864f962b7515ca838f40753283dca34bf66) ) // 2716
+	ROM_LOAD ( "e0.bin", 0x1000, 0x0800, CRC(07717b7b) SHA1(219f64e56cc554bf6185c495bee5f60e0cd6b011) ) // 2716
+	ROM_LOAD ( "e8.bin", 0x1800, 0x0800, CRC(f2e8cc76) SHA1(e6e8b43dd39e808b1366b834dfa67ad359d85632) ) // 2716
+	ROM_LOAD ( "341-0020-00.f8", 0x2800, 0x0800, CRC(079589c4) SHA1(a28852ff997b4790e53d8d0352112c4b1a395098)) // not actually present on this card
+ROM_END
+
 static INPUT_PORTS_START( romcard )
 	PORT_START("CONFIG")
 	PORT_CONFNAME(0x01, 0x00, "Enable at reset")
@@ -157,6 +200,11 @@ a2bus_romcardint_device::a2bus_romcardint_device(const machine_config &mconfig, 
 {
 }
 
+a2bus_romcardforth_device::a2bus_romcardforth_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	a2bus_romcard_device(mconfig, A2BUS_ROMCARDFORTH, tag, owner, clock)
+{
+}
+
 a2bus_romcarduser_device::a2bus_romcarduser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	a2bus_romcard_device(mconfig, A2BUS_ROMCARDUSER, tag, owner, clock),
 	device_image_interface(mconfig, *this)
@@ -171,6 +219,11 @@ const tiny_rom_entry *a2bus_romcardfp_device::device_rom_region() const
 const tiny_rom_entry *a2bus_romcardint_device::device_rom_region() const
 {
 	return ROM_NAME( romcardint );
+}
+
+const tiny_rom_entry *a2bus_romcardforth_device::device_rom_region() const
+{
+	return ROM_NAME( romcardforth );
 }
 
 ioport_constructor a2bus_romcard_device::device_input_ports() const
@@ -194,6 +247,12 @@ void a2bus_romcardfp_device::device_start()
 }
 
 void a2bus_romcardint_device::device_start()
+{
+	m_rom = device().machine().root_device().memregion(this->subtag("romcard"))->base();
+	a2bus_romcard_device::device_start();
+}
+
+void a2bus_romcardforth_device::device_start()
 {
 	m_rom = device().machine().root_device().memregion(this->subtag("romcard"))->base();
 	a2bus_romcard_device::device_start();
@@ -244,8 +303,9 @@ void a2bus_romcard_device::do_io(int offset)
 
 uint8_t a2bus_romcard_device::read_c0nx(uint8_t offset)
 {
-	do_io(offset & 0xf);
-	return 0xff;
+	if (!machine().side_effects_disabled())
+		do_io(offset & 0xf);
+	return get_open_bus();
 }
 
 
@@ -292,3 +352,4 @@ std::pair<std::error_condition, std::string> a2bus_romcarduser_device::call_load
 DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_ROMCARDUSER, device_a2bus_card_interface, a2bus_romcarduser_device, "a2romusr", "Apple II ROM Card (Custom)")
 DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_ROMCARDFP, device_a2bus_card_interface, a2bus_romcardfp_device, "a2romfp", "Apple II ROM Card (Applesoft BASIC)")
 DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_ROMCARDINT, device_a2bus_card_interface, a2bus_romcardint_device, "a2romint", "Apple II ROM Card (Integer BASIC)")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_ROMCARDFORTH, device_a2bus_card_interface, a2bus_romcardforth_device, "a2romforth", "Offete Enterprises FORTH-79 ROM Card")

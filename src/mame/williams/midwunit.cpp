@@ -642,7 +642,7 @@ void midwunit_state::wunit(machine_config &config)
 	// video hardware
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 32768);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// from TMS340 registers
 	screen.set_raw(PIXEL_CLOCK, 506, 101, 501, 289, 20, 274);
 	screen.set_screen_update(m_maincpu, FUNC(tms34010_device::tms340x0_ind16));

@@ -371,7 +371,7 @@ void ts28_state::ts28(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::amber()); // unknown color
 	m_screen->set_raw(16.537_MHz_XTAL, 864, 0, 720, 319, 0, 300);
 	m_screen->set_screen_update(m_pvtc, FUNC(scn2672_device::screen_update));

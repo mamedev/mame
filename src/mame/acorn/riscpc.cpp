@@ -1,31 +1,71 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese
 // thanks-to: Tomasz Slanina, Sarah Walker
-/***************************************************************************
+/**************************************************************************************************
 
-    Acorn RiscPC line of computers
+Acorn RiscPC line of computers
 
-    TODO:
-    - IOMD currently hardwired with ARM7500FE flavour for all machines, needs information about
-      which uses what;
-    - PS/2 keyboard doesn't work properly;
-    - Fix pendingUnd fatalerror from ARM7 core;
-    - Fix pendingAbtD fatalerror for RiscOS 4.xx;
+TODO:
+- a7000 should use the plain ARM7500 IOMD flavour (ID 0x5b98) rather than the ARM7500FE one;
+- rename a7000/p to aa7000/p for consistency with aa310 driver (helps from command line)
 
-****************************************************************************/
+TODO (rpc600):
+- no sound, no option to set 16-bit in Configure, is it using VIDC10 compatible sound only?
+
+TODO (a7000):
+- farty sound beeps on this specific model alone;
+
+TODO (a7000p -bios 0):
+- Doesn't boot, ROM is same as sarpc one (incompatible with non-StrongARM?)
+
+TODO (a7000p -bios 2):
+- Hangs at boot with nullptr ide1:0 option (strike ESC key several times until Boot menu appears,
+  then disable it in Configure machine item);
+- In turn the ESC key Cancel looks too slow to catch up (verify);
+- CD throws "CD drive not ready or disc not present" when mounted
+  (NOTE: needs filesystem changed to CDFS in Configure machine)
+- Serial mouse doesn't work even if selected;
+- No VIDC10 sound even if configured in games, needs support in IOMD sound DMA;
+
+Notes:
+- https://wiki.mamedev.org/index.php?title=Driver:RiscOS
+- CTRL + F12 brings a Task window in Risc OS 4+ when in Desktop;
+- https://www.riscosopen.org/wiki/documentation/show/CLI%20Basics%20part%201#TOC1
+- "Configure SoundSystem 8bit" in CLI to attempt using older VIDC10 sound system (after reboot);
+- "Configure MouseType 0" for making quadrature mouse to work with rpc600/rpc700/sarpc
+
+**************************************************************************************************/
 
 #include "emu.h"
+#include "riscpc_mouse.h"
+
+//#include "bus/archimedes/network/slot.h"
+#include "bus/archimedes/podule/slot.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "bus/pc_kbd/keyboards.h"
+#include "bus/rs232/hlemouse.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "cpu/arm7/arm7.h"
 #include "machine/acorn_vidc.h"
 #include "machine/arm_iomd.h"
-#include "machine/i2cmem.h"
-#include "machine/at_keybc.h"
-#include "bus/pc_kbd/pc_kbdc.h"
-#include "bus/pc_kbd/keyboards.h"
+#include "machine/fdc37c665gt.h"
+#include "machine/pcf8583.h"
+
+#include "formats/acorn_dsk.h"
+#include "formats/apd_dsk.h"
+#include "formats/hxchfe_dsk.h"
+#include "formats/jfd_dsk.h"
+#include "formats/st_dsk.h"
+
+#include "imagedev/floppy.h"
+
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
-#include "debugger.h"
 
 
 namespace {
@@ -38,10 +78,14 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_vidc(*this, "vidc")
 		, m_iomd(*this, "iomd")
+		, m_superio(*this, "superio")
+		, m_ide(*this, "ide")
+		, m_kbdc(*this, "kbdc")
 		, m_screen(*this, "screen")
 		, m_i2cmem(*this, "i2cmem")
-		, m_kbdc(*this, "kbdc")
-		, m_mouse(*this, "MOUSE")
+		, m_exp(*this, "exp")
+		, m_podule(*this, "podule%u", 0U)
+		, m_misc(*this, "MISC")
 	{ }
 
 	void rpc700(machine_config &config);
@@ -51,19 +95,25 @@ public:
 	void a7000(machine_config &config);
 	void a7000p(machine_config &config);
 
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	void base_config(machine_config &config);
+	void quad_mouse(machine_config &config);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<arm_vidc20_device> m_vidc;
-	required_device<arm7500fe_iomd_device> m_iomd;
+	required_device<arm_iomd_device> m_iomd;
+	required_device<fdc37c665gt_device> m_superio;
+	required_device<ata_interface_device> m_ide;
+	required_device<pc_kbdc_device> m_kbdc;
 	required_device<screen_device> m_screen;
-	required_device<i2cmem_device> m_i2cmem;
-	required_device<ps2_keyboard_controller_device> m_kbdc;
-	required_ioport m_mouse;
-
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
+	required_device<pcf8583_device> m_i2cmem;
+	required_device<archimedes_exp_device> m_exp;
+	optional_device_array<archimedes_podule_slot_device, 8> m_podule;
+	required_ioport m_misc;
 
 	void a7000_map(address_map &map) ATTR_COLD;
 	void riscpc_map(address_map &map) ATTR_COLD;
@@ -73,6 +123,10 @@ private:
 	int iocr_od1_r();
 	void iocr_od0_w(int state);
 	void iocr_od1_w(int state);
+
+	TIMER_CALLBACK_MEMBER(tc_zero_tick);
+
+	emu_timer *m_tc_zero_timer = nullptr;
 };
 
 int riscpc_state::iocr_od1_r()
@@ -83,64 +137,85 @@ int riscpc_state::iocr_od1_r()
 
 int riscpc_state::iocr_od0_r()
 {
-	return (m_i2cmem->read_sda() ? 1 : 0); //eeprom read
+	return m_i2cmem->sda_r();
 }
 
 void riscpc_state::iocr_od0_w(int state)
 {
-	m_i2cmem->write_sda(state == true ? 1 : 0);
+	m_i2cmem->sda_w(state);
 }
 
 void riscpc_state::iocr_od1_w(int state)
 {
 	m_i2cmem_clock = state;
-	m_i2cmem->write_scl(state == true ? 1 : 0);
+	m_i2cmem->scl_w(state);
+}
+
+TIMER_CALLBACK_MEMBER(riscpc_state::tc_zero_tick)
+{
+	m_superio->fdc_tc_w(0);
 }
 
 void riscpc_state::a7000_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).mirror(0x00800000).rom().region("user1", 0);
-//  map(0x01000000, 0x01ffffff).noprw(); //expansion ROM
-	//
+	map(0x01000000, 0x01ffffff).noprw(); //expansion ROM
 //  map(0x02000000, 0x027fffff).mirror(0x00800000).ram(); // VRAM, not installed on A7000 models
-//  I/O 03000000 - 033fffff
-//  AM_RANGE(0x03010000, 0x03011fff) //Super IO
-//  AM_RANGE(0x03012000, 0x03029fff) //FDC
-//  AM_RANGE(0x0302b000, 0x0302bfff) //Network podule
-//  AM_RANGE(0x03040000, 0x0304ffff) //podule space 0,1,2,3
-//  AM_RANGE(0x03070000, 0x0307ffff) //podule space 4,5,6,7
-	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
-	map(0x03310000, 0x03310003).portr(m_mouse);
-
+	map(0x03000000, 0x0300ffff).rw(m_exp, FUNC(archimedes_exp_device::ms0_r), FUNC(archimedes_exp_device::ms0_w)).umask32(0x0000ffff);
+	// NOTE: 0x1fff >> 2 = 0x7ff, the upper $400 used for LPTx ECP regs
+	map(0x03010000, 0x03011fff).rw(m_superio, FUNC(fdc37c665gt_device::read16), FUNC(fdc37c665gt_device::write16)).umask32(0x0000ffff);
+	map(0x03012000, 0x03029fff).rw(m_superio, FUNC(fdc37c665gt_device::fdc_dma_r), FUNC(fdc37c665gt_device::fdc_dma_w)).umask32(0x000000ff);
+	map(0x0302a000, 0x0302afff).lrw8(
+		NAME([this] (offs_t offset) {
+			u8 res = m_superio->fdc_dma_r(0);
+			if (!machine().side_effects_disabled())
+			{
+				m_superio->fdc_tc_w(1);
+				// TODO: accurate timing, same as below
+				m_tc_zero_timer->reset();
+				m_tc_zero_timer->adjust(attotime::from_usec(50));
+			}
+			return res;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_superio->fdc_dma_w(0, data);
+			m_superio->fdc_tc_w(1);
+			m_tc_zero_timer->reset();
+			m_tc_zero_timer->adjust(attotime::from_usec(50));
+		})
+	).umask32(0x000000ff);
+//..map(0x0302b000, 0x0302b3ff).rw(m_net, FUNC(acorn_network_slot_device::netrom_r), FUNC(acorn_network_slot_device::netrom_w)).umask32(0x0000ffff);
+//..map(0x0302b800, 0x0302bbff).rw(m_net, FUNC(acorn_network_slot_device::netcs_r), FUNC(acorn_network_slot_device::netcs_w)).umask32(0x0000ffff);
+	map(0x03030000, 0x0303ffff).rw(m_exp, FUNC(archimedes_exp_device::ms3_r), FUNC(archimedes_exp_device::ms3_w)).umask32(0x0000ffff);
+	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm_iomd_device::map));
+	map(0x03210000, 0x03210003).mirror(0x00180000).portr(m_misc);
+	map(0x03240000, 0x0324ffff).select(0x00180000).rw(m_exp, FUNC(archimedes_exp_device::ps4_r), FUNC(archimedes_exp_device::ps4_w)).umask32(0x0000ffff);
+	map(0x03270000, 0x0327ffff).select(0x00180000).rw(m_exp, FUNC(archimedes_exp_device::ps7_r), FUNC(archimedes_exp_device::ps7_w)).umask32(0x0000ffff);
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
-//  AM_RANGE(0x08000000, 0x08ffffff) AM_MIRROR(0x07000000) //EASI space
-
+	map(0x08000000, 0x0fffffff).rw(m_exp, FUNC(archimedes_exp_device::eas_r), FUNC(archimedes_exp_device::eas_w));
 	map(0x10000000, 0x13ffffff).ram(); //SIMM 0 bank 0
 	map(0x14000000, 0x17ffffff).ram(); //SIMM 0 bank 1
-//  map(0x18000000, 0x18ffffff).mirror(0x03000000).ram(); //SIMM 1 bank 0
-//  map(0x1c000000, 0x1cffffff).mirror(0x03000000).ram(); //SIMM 1 bank 1
+//  map(0x18000000, 0x18ffffff).ram(); //SIMM 1 bank 0
+//  map(0x1c000000, 0x1cffffff).ram(); //SIMM 1 bank 1
 }
 
 void riscpc_state::riscpc_map(address_map &map)
 {
 	a7000_map(map);
 	map(0x02000000, 0x027fffff).mirror(0x00800000).ram(); // VRAM
+//	map(0x03210400, 0x03210400).r("mouse", FUNC(riscpc_mouse_device::buttons_r)); // TODO: monitor ID bit
 }
 
 
 /* Input ports */
-static INPUT_PORTS_START( a7000 )
-//  PORT_INCLUDE( at_keyboard )
-
-	PORT_START("MOUSE")
+static INPUT_PORTS_START( riscpc )
+	PORT_START("MISC")
 	// for debugging we leave video and sound HWs as options, eventually slotify them
 	PORT_CONFNAME( 0x01, 0x00, "Monitor Type" )
 	PORT_CONFSETTING(    0x00, "VGA" )
 	PORT_CONFSETTING(    0x01, "TV Screen" )
 	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mouse Right")   PORT_CODE(MOUSECODE_BUTTON3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mouse Center")  PORT_CODE(MOUSECODE_BUTTON2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mouse Left")    PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("mouse", FUNC(riscpc_mouse_device::buttons_r))
 	// TODO: understand condition where this occurs
 	PORT_CONFNAME( 0x80, 0x00, "CMOS Reset bit" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -151,65 +226,172 @@ static INPUT_PORTS_START( a7000 )
 	PORT_BIT(0xfffffe00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( a7000 )
+	PORT_INCLUDE( riscpc )
+
+	PORT_MODIFY("MISC")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 void riscpc_state::machine_start()
 {
-	// ...
+	m_tc_zero_timer = timer_alloc(FUNC(riscpc_state::tc_zero_tick), this);
 }
 
 void riscpc_state::machine_reset()
 {
+	m_tc_zero_timer->adjust(attotime::never);
+}
 
+// assume same formats as Acorn Archimedes
+static void riscpc_floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_HFE_FORMAT);
+	//fr.add(FLOPPY_HFE3_FORMAT);
+	// Archimedes formats
+	fr.add(FLOPPY_ACORN_ADFS_NEW_FORMAT);
+	fr.add(FLOPPY_APD_FORMAT);
+	fr.add(FLOPPY_JFD_FORMAT);
+	// BBC Micro formats
+	fr.add(FLOPPY_ACORN_ADFS_OLD_FORMAT);
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+	fr.add(FLOPPY_ACORN_DSD_FORMAT);
+	// Atari ST formats
+	fr.add(FLOPPY_ST_FORMAT);
+	fr.add(FLOPPY_MSA_FORMAT);
+}
+
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse",  LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse",     WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse",  MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal",        SERIAL_TERMINAL);
+	device.option_add("null_modem",      NULL_MODEM);
+	device.option_add("sun_kbd",         SUN_KBD_ADAPTOR);
 }
 
 void riscpc_state::base_config(machine_config &config)
 {
-	I2C_24C02(config, m_i2cmem);
+	constexpr XTAL refxtal(24_MHz_XTAL);
 
-	// TODO: verify type
-	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_IBM_PC_AT_101));
-	kbd_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
-	kbd_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
+	PCF8583(config, m_i2cmem, 32.768_kHz_XTAL);
 
 	// auxiliary connector
 //  pc_kbdc_device &aux_con(PC_KBDC(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
 //  aux_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
 //  aux_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_data_w));
 
-	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);
-	m_kbdc->hot_res().set(m_iomd, FUNC(arm_iomd_device::keyboard_reset));
-	m_kbdc->kbd_clk().set(kbd_con, FUNC(pc_kbdc_device::clock_write_from_mb));
-	m_kbdc->kbd_data().set(kbd_con, FUNC(pc_kbdc_device::data_write_from_mb));
-	m_kbdc->kbd_irq().set(m_iomd, FUNC(arm_iomd_device::keyboard_irq));
 //  m_kbdc->aux_clk().set(aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
 //  m_kbdc->aux_data().set(aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
 //  m_kbdc->aux_irq().set(FUNC(riscpc_state::keyboard_interrupt));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 
-	ARM_VIDC20(config, m_vidc, 24_MHz_XTAL);
+	SPEAKER(config, "speaker", 2).front();
+
+	ARM_VIDC20(config, m_vidc, refxtal);
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_iomd, FUNC(arm_iomd_device::vblank_irq));
 	m_vidc->sound_drq().set(m_iomd, FUNC(arm_iomd_device::sound_drq));
+	m_vidc->add_route(0, "speaker", 1.00, 0);
+	m_vidc->add_route(1, "speaker", 1.00, 1);
+	m_vidc->set_ext_vclk(refxtal);
+	m_vidc->set_int_sclk(refxtal);
 
 	m_iomd->set_host_cpu_tag(m_maincpu);
 	m_iomd->set_vidc_tag(m_vidc);
-	m_iomd->set_kbdc_tag(m_kbdc);
 	m_iomd->iocr_read_od<0>().set(FUNC(riscpc_state::iocr_od0_r));
 	m_iomd->iocr_read_od<1>().set(FUNC(riscpc_state::iocr_od1_r));
 	m_iomd->iocr_write_od<0>().set(FUNC(riscpc_state::iocr_od0_w));
 	m_iomd->iocr_write_od<1>().set(FUNC(riscpc_state::iocr_od1_w));
+	m_iomd->irq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
+	m_iomd->fiq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_FIRQ_LINE);
+	m_iomd->kclk_cb().set(m_kbdc, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_iomd->kdata_cb().set(m_kbdc, FUNC(pc_kbdc_device::data_write_from_mb));
+
+	PC_KBDC(config, m_kbdc, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
+	m_kbdc->out_clock_cb().set(m_iomd, FUNC(arm_iomd_device::kclk_w));
+	m_kbdc->out_data_cb().set(m_iomd, FUNC(arm_iomd_device::kdata_w));
+
+	// https://arcwiki.org.uk/index.php/FDC37C665GT
+	// sarpc_j233 also uses a 'GT, as per the identifier check it does at startup (65h in CRD)
+	// some systems may use a '672 instead (TBD, which ones?)
+	FDC37C665GT(config, m_superio, refxtal, upd765_family_device::mode_t::AT);
+	m_superio->set_ide(m_ide);
+	m_superio->fintr().set(m_iomd, FUNC(arm_iomd_device::int4_w));
+	m_superio->fdrq().set(m_iomd, FUNC(arm_iomd_device::int9_w));
+	subdevice<upd765_family_device>("superio:fdc")->idx_wr_callback().set(m_iomd, FUNC(arm_iomd_device::int1_w));
+	m_superio->pintr1().set(m_iomd, FUNC(arm_iomd_device::int2_w));
+	m_superio->irq4().set(m_iomd, FUNC(arm_iomd_device::int6_w));
+	m_superio->txd1().set("serport0", FUNC(rs232_port_device::write_txd));
+	m_superio->ndtr1().set("serport0", FUNC(rs232_port_device::write_dtr));
+	m_superio->nrts1().set("serport0", FUNC(rs232_port_device::write_rts));
+	m_superio->txd2().set("serport1", FUNC(rs232_port_device::write_txd));
+	m_superio->ndtr2().set("serport1", FUNC(rs232_port_device::write_dtr));
+	m_superio->nrts2().set("serport1", FUNC(rs232_port_device::write_rts));
+
+	// cfr. note on top, we need to reserve first option for an HDD connector
+	// (even if user don't mount one)
+	ATA_INTERFACE(config, m_ide).options(ata_devices, "hdd", "cdrom");
+	m_ide->default_data(0x0000);
+	m_ide->irq_handler().set(m_iomd, FUNC(arm_iomd_device::int7_w));
+
+	FLOPPY_CONNECTOR(config, "superio:fdc:0", "35hd", FLOPPY_35_HD, true,  riscpc_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "superio:fdc:1", "35hd", FLOPPY_35_HD, false, riscpc_floppy_formats).enable_sound(true);
+
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
+	serport0.rxd_handler().set("superio", FUNC(fdc37c665gt_device::rxd1_w));
+	serport0.dcd_handler().set("superio", FUNC(fdc37c665gt_device::ndcd1_w));
+	serport0.dsr_handler().set("superio", FUNC(fdc37c665gt_device::ndsr1_w));
+	serport0.ri_handler().set("superio", FUNC(fdc37c665gt_device::nri1_w));
+	serport0.cts_handler().set("superio", FUNC(fdc37c665gt_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("superio", FUNC(fdc37c665gt_device::rxd2_w));
+	serport1.dcd_handler().set("superio", FUNC(fdc37c665gt_device::ndcd2_w));
+	serport1.dsr_handler().set("superio", FUNC(fdc37c665gt_device::ndsr2_w));
+	serport1.ri_handler().set("superio", FUNC(fdc37c665gt_device::nri2_w));
+	serport1.cts_handler().set("superio", FUNC(fdc37c665gt_device::ncts2_w));
+
+	ARCHIMEDES_EXPANSION_BUS(config, m_exp, refxtal / 3);
+	//m_exp->out_fiq_callback().set(m_iomd, FUNC(arm_iomd_device::int8_w));
+	//m_exp->out_irq_callback().set(m_iomd, FUNC(arm_iomd_device::int3_w));
+
+	//riscpc_network_slot_device &network(RISCPC_NETWORK_SLOT(config, "net", riscpc_network_devices, nullptr));
+	//network.netint_handler().set(m_iomd, FUNC(arm_iomd_device::int5_w));
+
+	SOFTWARE_LIST(config, "flop_list").set_compatible("archimedes");
+}
+
+void riscpc_state::quad_mouse(machine_config &config)
+{
+	// TODO: figure out which x/y directions are positive/negative
+	riscpc_mouse_device &mouse(RISCPC_MOUSE(config, "mouse"));
+	mouse.write_right().set(m_iomd, FUNC(arm_iomd20_device::mousex0_w));
+	mouse.write_left().set(m_iomd, FUNC(arm_iomd20_device::mousex1_w));
+	mouse.write_up().set(m_iomd, FUNC(arm_iomd20_device::mousey0_w));
+	mouse.write_down().set(m_iomd, FUNC(arm_iomd20_device::mousey1_w));
 }
 
 void riscpc_state::rpc600(machine_config &config)
 {
 	constexpr XTAL cpuxtal(60_MHz_XTAL/2);
 
-	ARM7(config, m_maincpu, cpuxtal); // really ARM610
+	ARM610(config, m_maincpu, cpuxtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD20(config, m_iomd, cpuxtal);
 	base_config(config);
+	quad_mouse(config);
+
+	// expansion slots - 2-card backplane
+	ARCHIMEDES_PODULE_SLOT(config, m_podule[0], m_exp, riscpc_debi_exp_devices, nullptr);
+	ARCHIMEDES_PODULE_SLOT(config, m_podule[1], m_exp, riscpc_debi_exp_devices, nullptr);
 }
 
 void riscpc_state::rpc700(machine_config &config)
@@ -218,8 +400,13 @@ void riscpc_state::rpc700(machine_config &config)
 	ARM710A(config, m_maincpu, cpuxtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD20(config, m_iomd, cpuxtal);
 	base_config(config);
+	quad_mouse(config);
+
+	// expansion slots - 2-card backplane
+	ARCHIMEDES_PODULE_SLOT(config, m_podule[0], m_exp, riscpc_debi_exp_devices, nullptr);
+	ARCHIMEDES_PODULE_SLOT(config, m_podule[1], m_exp, riscpc_debi_exp_devices, nullptr);
 }
 
 void riscpc_state::a7000(machine_config &config)
@@ -231,6 +418,12 @@ void riscpc_state::a7000(machine_config &config)
 
 	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
 	base_config(config);
+	m_vidc->set_clock(cpuxtal / 2);
+	m_vidc->set_ext_vclk((cpuxtal / 4) * 3);
+	m_vidc->set_int_sclk((cpuxtal / 4) * 3);
+
+	// expansion slots - 1-card backplane
+	ARCHIMEDES_PODULE_SLOT(config, m_podule[0], m_exp, riscpc_easi_exp_devices, nullptr);
 }
 
 void riscpc_state::a7000p(machine_config &config)
@@ -242,44 +435,68 @@ void riscpc_state::a7000p(machine_config &config)
 
 	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
 	base_config(config);
+	m_vidc->set_clock(cpuxtal / 3);
+	m_vidc->set_ext_vclk((cpuxtal / 3) * 2);
+	m_vidc->set_int_sclk(cpuxtal / 2);
+
+	// expansion slots - 1-card backplane
+	ARCHIMEDES_PODULE_SLOT(config, m_podule[0], m_exp, riscpc_easi_exp_devices, nullptr);
 }
 
 void riscpc_state::sarpc(machine_config &config)
 {
 	// TODO: ranges from 160 to 233 MHz
-	constexpr XTAL cpuxtal(200'000'000);
+	// Base xtal comes from the upgrade StrongARM kit, which may or may not be identical to the
+	// regular mobo.
+	// PLL bump is unverified and may be moved as part of the CPU core actually
+	constexpr XTAL cpuxtal(3'686'400);
 
-	SA1110(config, m_maincpu, cpuxtal); // StrongARM
+	SA110(config, m_maincpu, cpuxtal * 44);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
+	// TODO: bump me up, check VIDC clocks
+	ARM_IOMD20(config, m_iomd, cpuxtal * 44);
 	base_config(config);
+	quad_mouse(config);
+
+	// expansion slots - 2-card backplane
+	ARCHIMEDES_PODULE_SLOT(config, m_podule[0], m_exp, riscpc_debi_exp_devices, nullptr);
+	ARCHIMEDES_PODULE_SLOT(config, m_podule[1], m_exp, riscpc_debi_exp_devices, nullptr);
 }
 
 void riscpc_state::sarpc_j233(machine_config &config)
 {
-	// TODO: 233 MHz, unsupported by xtal module
-	constexpr XTAL cpuxtal(200'000'000);
+	// TODO: 233 MHz, as above
+	constexpr XTAL cpuxtal(3'686'400);
 
-	SA1110(config, m_maincpu, cpuxtal); // StrongARM
+	SA110(config, m_maincpu, cpuxtal * 64);
 	m_maincpu->set_addrmap(AS_PROGRAM, &riscpc_state::riscpc_map);
 
-	ARM7500FE_IOMD(config, m_iomd, cpuxtal);
+	ARM_IOMD20(config, m_iomd, cpuxtal * 64);
 	base_config(config);
+	quad_mouse(config);
+
+	// expansion slots - 2-card backplane
+	ARCHIMEDES_PODULE_SLOT(config, m_podule[0], m_exp, riscpc_debi_exp_devices, nullptr);
+	ARCHIMEDES_PODULE_SLOT(config, m_podule[1], m_exp, riscpc_debi_exp_devices, nullptr);
 }
+
+
+// TODO: BIOS revisions are identical for all computers (except StrongARM based?)
+// may warrant a dummy MACHINE_IS_BIOS_ROOT romset to hold them all instead.
 
 ROM_START(rpc600)
 	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.50
-	ROM_SYSTEM_BIOS( 0, "350", "RiscOS 3.50" )
-	ROMX_LOAD("0277,521-01.bin", 0x000000, 0x100000, CRC(8ba4444e) SHA1(1b31d7a6e924bef0e0056c3a00a3fed95e55b175), ROM_BIOS(0))
-	ROMX_LOAD("0277,522-01.bin", 0x100000, 0x100000, CRC(2bc95c9f) SHA1(f8c6e2a1deb4fda48aac2e9fa21b9e01955331cf), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 0, "350", "RISC OS 3.50" )
+	ROMX_LOAD("0277,521-01.bin", 0x000000, 0x100000, CRC(3bdf870e) SHA1(d419cae91ad4e040861cf749f60d6f747eabe9ff), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("0277,522-01.bin", 0x000002, 0x100000, CRC(1773be31) SHA1(0d204cbe433ab2a7a0962288f34c4f6829ad1dd5), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 ROM_END
 
 ROM_START(rpc700)
 	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.60
-	ROM_SYSTEM_BIOS( 0, "360", "RiscOS 3.60" )
+	ROM_SYSTEM_BIOS( 0, "360", "RISC OS 3.60" )
 	ROMX_LOAD("1203,101-01.bin", 0x000000, 0x200000, CRC(2eeded56) SHA1(7217f942cdac55033b9a8eec4a89faa2dd63cd68), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROMX_LOAD("1203,102-01.bin", 0x000002, 0x200000, CRC(6db87d21) SHA1(428403ed31682041f1e3d114ea02a688d24b7d94), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 ROM_END
@@ -287,7 +504,7 @@ ROM_END
 ROM_START(a7000)
 	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.60
-	ROM_SYSTEM_BIOS( 0, "360", "RiscOS 3.60" )
+	ROM_SYSTEM_BIOS( 0, "360", "RISC OS 3.60" )
 	ROMX_LOAD("1203,101-01.bin", 0x000000, 0x200000, CRC(2eeded56) SHA1(7217f942cdac55033b9a8eec4a89faa2dd63cd68), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROMX_LOAD("1203,102-01.bin", 0x000002, 0x200000, CRC(6db87d21) SHA1(428403ed31682041f1e3d114ea02a688d24b7d94), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 ROM_END
@@ -295,34 +512,34 @@ ROM_END
 ROM_START(a7000p)
 	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.71
-	ROM_SYSTEM_BIOS( 0, "371", "RiscOS 3.71" )
+	ROM_SYSTEM_BIOS( 0, "371", "RISC OS 3.71" )
 	ROMX_LOAD("1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROMX_LOAD("1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	// Version 4.02
-	ROM_SYSTEM_BIOS( 1, "402", "RiscOS 4.02" )
+	ROM_SYSTEM_BIOS( 1, "402", "RISC OS 4.02" )
 	ROMX_LOAD("riscos402_1.bin", 0x000000, 0x200000, CRC(4c32f7e2) SHA1(d290e29a4de7be9eb36cbafbb2dc99b1c4ce7f72), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
 	ROMX_LOAD("riscos402_2.bin", 0x000002, 0x200000, CRC(7292b790) SHA1(67f999c1ccf5419e0a142b7e07f809e13dfed425), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
 	// Version 4.39
-	ROM_SYSTEM_BIOS( 2, "439", "RiscOS 4.39" )
+	ROM_SYSTEM_BIOS( 2, "439", "RISC OS 4.39" )
 	ROMX_LOAD("riscos439_1.bin", 0x000000, 0x200000, CRC(dab94cb8) SHA1(a81fb7f1a8117f85e82764675445092d769aa9af), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
 	ROMX_LOAD("riscos439_2.bin", 0x000002, 0x200000, CRC(22e6a5d4) SHA1(b73b73c87824045130840a19ce16fa12e388c039), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
 ROM_END
 
 ROM_START(sarpc)
+	ROM_DEFAULT_BIOS("371")
+
 	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASEFF )
 	// Version 3.70
-	ROM_SYSTEM_BIOS( 0, "370", "RiscOS 3.70" )
-	ROMX_LOAD("1203,191-01.bin", 0x000000, 0x200000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
-	ROMX_LOAD("1203,192-01.bin", 0x000002, 0x200000, NO_DUMP, ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 0, "370", "RISC OS 3.70" )
+	ROMX_LOAD("1203,191-01.bin", 0x000000, 0x200000, CRC(ef45c518) SHA1(9abc9ddb183a7747d5c6da528538626885987998), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	ROMX_LOAD("1203,192-01.bin", 0x000002, 0x200000, CRC(90b02de8) SHA1(9a86597c54466eb3b76188274f577a5e6f56c155), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
+	// Version 3.71
+	ROM_SYSTEM_BIOS( 1, "371", "RISC OS 3.71" )
+	ROMX_LOAD("1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
+	ROMX_LOAD("1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(1))
 ROM_END
 
-ROM_START(sarpc_j233)
-	ROM_REGION32_LE( 0x800000, "user1", ROMREGION_ERASEFF )
-	// Version 3.71
-	ROM_SYSTEM_BIOS( 0, "371", "RiscOS 3.71" )
-	ROMX_LOAD("1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
-	ROMX_LOAD("1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
-ROM_END
+#define rom_sarpc_j233 rom_sarpc
 
 } // anonymous namespace
 
@@ -333,10 +550,9 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  CLASS         INIT        COMPANY  FULLNAME                  FLAGS */
-COMP( 1994, rpc600,     0,      0,      rpc600,     a7000, riscpc_state, empty_init, "Acorn", "Risc PC 600",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1994, rpc700,     rpc600, 0,      rpc700,     a7000, riscpc_state, empty_init, "Acorn", "Risc PC 700",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000, riscpc_state, empty_init, "Acorn", "Archimedes A7000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000, riscpc_state, empty_init, "Acorn", "Archimedes A7000+",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, sarpc,      rpc600, 0,      sarpc,      a7000, riscpc_state, empty_init, "Acorn", "StrongARM Risc PC",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, sarpc_j233, rpc600, 0,      sarpc_j233, a7000, riscpc_state, empty_init, "Acorn", "J233 StrongARM Risc PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1994, rpc600,     0,      0,      rpc600,     riscpc, riscpc_state, empty_init, "Acorn Computers", "Risc PC 600",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1995, rpc700,     rpc600, 0,      rpc700,     riscpc, riscpc_state, empty_init, "Acorn Computers", "Risc PC 700",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1995, a7000,      rpc600, 0,      a7000,      a7000,  riscpc_state, empty_init, "Acorn Computers", "Acorn A7000",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1996, sarpc,      0,      0,      sarpc,      riscpc, riscpc_state, empty_init, "Acorn Computers", "StrongARM Risc PC",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1997, a7000p,     rpc600, 0,      a7000p,     a7000,  riscpc_state, empty_init, "Acorn Computers", "Acorn A7000+",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1997, sarpc_j233, sarpc,  0,      sarpc_j233, riscpc, riscpc_state, empty_init, "Acorn Computers", "J233 StrongARM Risc PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

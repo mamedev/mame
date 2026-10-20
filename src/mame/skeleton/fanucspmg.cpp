@@ -993,7 +993,7 @@ void fanucspmg_state::fanucspmg(machine_config &config)
 	FLOPPY_CONNECTOR(config, FDC_TAG":0", fanuc_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, FDC_TAG":1", fanuc_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_raw(XTAL(15'000'000), 640, 0, 512, 390, 0, 384);
 	screen.set_screen_update(CRTC_TAG, FUNC(mc6845_device::screen_update));
 

@@ -720,7 +720,7 @@ void alpha68k_N_state::base_config(machine_config &config)
 void alpha68k_N_state::video_config(machine_config &config, u8 tile_transchar, u8 tile_bankshift, bool is_super_stingray)
 {
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(alpha68k_N_state::screen_update));
 	m_screen->set_palette(m_palette);

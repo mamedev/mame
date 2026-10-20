@@ -411,7 +411,7 @@ void pntnpuzl_state::pntnpuzl(machine_config &config)
 	m_svga->set_screen(m_screen);
 	m_svga->set_vram_size(0x100000);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: XTAL is not right and likely not the source,
 	// selects xtal mode 3 (36 MHz) / 2 plus another / 2 for module testing bit 7
 	m_screen->set_raw(XTAL(40'000'000) / 2, 1080, 0, 400, 265, 0, 240);
@@ -434,13 +434,12 @@ ROM_START( pntnpuzl )
 	ROM_LOAD( "trident_quadtel_tvga9000_isa16.bin", 0x0000, 0x10000, BAD_DUMP CRC(ad0e7351) SHA1(eb525460a80e1c1baa34642b93d54caf2607920d) )
 ROM_END
 
-
+// TODO: verify these patches, eventually get rid of _init if they are useless
 void pntnpuzl_state::init_pip()
 {
 //  uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 //  rom[0x2696/2] = 0x4e71;
 //  rom[0x26a0/2] = 0x4e71;
-
 }
 
 } // anonymous namespace

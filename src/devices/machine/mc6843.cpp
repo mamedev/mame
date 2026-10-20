@@ -662,7 +662,7 @@ void mc6843_device::live_start(int state, bool start_writing)
 	m_cur_live.pll.reset(m_cur_live.tm);
 	m_cur_live.pll.set_clock(attotime::from_ticks(2, clock()));
 	if(start_writing)
-		m_cur_live.pll.start_writing(machine().time());
+		m_cur_live.pll.start_writing(machine().time(), m_floppy);
 
 	m_checkpoint_live = m_cur_live;
 
@@ -930,7 +930,7 @@ void mc6843_device::live_run(attotime limit)
 		case L_DAM_WRITE_BYTE: {
 			int byte = (6+1+128+2) - (m_cur_live.bit_counter >> 4);
 			if(!byte) {
-				m_cur_live.pll.start_writing(m_cur_live.tm);
+				m_cur_live.pll.start_writing(m_cur_live.tm, m_floppy);
 				m_cur_live.shift_reg = 0xaaaa;
 
 			} else if(byte <= 5) {

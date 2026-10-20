@@ -565,7 +565,7 @@ void pasogo_state::pasogo(machine_config &config)
 
 	// It's a CGA device right so lets use isa_cga!  Well, not so much.
 	// The carts use vg230 specific registers and mostly ignore the mc6845.
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_size(320, 240);
 	screen.set_visarea(0, 320-1, 0, 240-1);

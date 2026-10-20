@@ -1195,7 +1195,7 @@ void psychic5_state::psychic5(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));      // Allow time for 2nd CPU to interleave
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(12'000'000)/2, 394, 0, 256, 282, 16, 240); // was 53.8 Hz before, assume same as Bombs Away
 	screen.set_screen_update(FUNC(psychic5_state::screen_update));
 
@@ -1237,7 +1237,7 @@ void bombsa_state::bombsa(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(12'000'000)/2, 394, 0, 256, 282, 16, 240); // Measured as: VSync 54Hz, HSync 15.25kHz
 	screen.set_screen_update(FUNC(bombsa_state::screen_update));
 

@@ -2,7 +2,7 @@
 // detail/null_static_mutex.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -24,6 +24,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 struct null_static_mutex
@@ -33,6 +34,12 @@ struct null_static_mutex
   // Initialise the mutex.
   void init()
   {
+  }
+
+  // Try to lock the mutex without blocking.
+  bool try_lock()
+  {
+    return true;
   }
 
   // Lock the mutex.
@@ -51,6 +58,7 @@ struct null_static_mutex
 #define ASIO_NULL_STATIC_MUTEX_INIT { 0 }
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

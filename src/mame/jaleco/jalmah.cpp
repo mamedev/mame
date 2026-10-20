@@ -1121,7 +1121,7 @@ void jalmah_state::jalmah(machine_config &config)
 	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x0200);
 	MEGASYS1_TILEMAP(config, m_tmap[3], m_palette, 0x0300);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12000000/2,406,0,256,263,16,240); // assume same as nmk16 & mega system 1
 	screen.set_screen_update(FUNC(jalmah_state::screen_update_jalmah));
 	screen.set_palette(m_palette);

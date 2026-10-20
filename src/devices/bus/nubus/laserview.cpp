@@ -91,7 +91,7 @@ ROM_END
 
 void nubus_laserview_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(nubus_laserview_device::screen_update));
 	m_screen->set_raw(99108000/2, 1008, 0, 832, 622, 0, 600);
 	m_screen->set_palette("palette");
@@ -214,7 +214,7 @@ void nubus_laserview_device::regs_w(offs_t offset, u8 data)
 			if (data == 0xc1)
 			{
 				const rectangle visarea(0, (m_hvis / 2) - 1, 0, (m_vvis / 2) - 1);
-				m_screen->configure(m_htotal / 2, m_vtotal / 2, visarea, attotime::from_ticks((m_htotal / 2) * (m_vtotal / 2), 160000000 / 2).as_attoseconds());
+				m_screen->configure(m_htotal / 2, m_vtotal / 2, visarea, attotime::from_ticks((m_htotal / 2) * (m_vtotal / 2), 160000000 / 2));
 			}
 			break;
 

@@ -13,78 +13,82 @@
 
 
 namespace {
-	int32_t get_disp16(uint32_t op) { return DISP16; }
-	int32_t get_disp19(uint32_t op) { return DISP19; }
-	int32_t get_disp22(uint32_t op) { return DISP22; }
 
-	const char *bicc_comment(const sparc_disassembler::config *conf, bool use_cc, offs_t pc, uint32_t op)
+constexpr int32_t get_disp16(uint32_t op) { return DISP16; }
+constexpr int32_t get_disp19(uint32_t op) { return DISP19; }
+constexpr int32_t get_disp22(uint32_t op) { return DISP22; }
+
+const char *bicc_comment(const sparc_disassembler::config *conf, bool use_cc, offs_t pc, uint32_t op)
+{
+	if (!conf || (conf->get_translated_pc() != pc)) return nullptr;
+	auto const cc((use_cc && (BRCC & 0x2)) ? conf->get_xcc() : conf->get_icc());
+	switch (COND)
 	{
-		if (!conf || (conf->get_translated_pc() != pc)) return nullptr;
-		auto const cc((use_cc && (BRCC & 0x2)) ? conf->get_xcc() : conf->get_icc());
-		switch (COND)
-		{
-		case 0x0: return "will fall through";
-		case 0x1: return (cc & 0x4) ? "will branch" : "will fall through";
-		case 0x2: return ((cc & 0x04) | ((cc ^ (cc >> 2)) & 0x2)) ? "will branch" : "will fall through";
-		case 0x3: return ((cc ^ (cc >> 2)) & 0x2) ? "will branch" : "will fall through";
-		case 0x4: return (cc & 0x5) ? "will branch" : "will fall through";
-		case 0x5: return (cc & 0x1) ? "will branch" : "will fall through";
-		case 0x6: return (cc & 0x8) ? "will branch" : "will fall through";
-		case 0x7: return (cc & 0x2) ? "will branch" : "will fall through";
-		case 0x8: return "will branch";
-		case 0x9: return (cc & 0x4) ? "will fall through" : "will branch";
-		case 0xa: return ((cc & 0x04) | ((cc ^ (cc >> 2)) & 0x2)) ? "will fall through" : "will branch";
-		case 0xb: return ((cc ^ (cc >> 2)) & 0x2) ? "will fall through" : "will branch";
-		case 0xc: return (cc & 0x5) ? "will fall through" : "will branch";
-		case 0xd: return (cc & 0x1) ? "will fall through" : "will branch";
-		case 0xe: return (cc & 0x8) ? "will fall through" : "will branch";
-		case 0xf: return (cc & 0x2) ? "will fall through" : "will branch";
-		}
-		return nullptr;
+	case 0x0: return "will fall through";
+	case 0x1: return (cc & 0x4) ? "will branch" : "will fall through";
+	case 0x2: return ((cc & 0x04) | ((cc ^ (cc >> 2)) & 0x2)) ? "will branch" : "will fall through";
+	case 0x3: return ((cc ^ (cc >> 2)) & 0x2) ? "will branch" : "will fall through";
+	case 0x4: return (cc & 0x5) ? "will branch" : "will fall through";
+	case 0x5: return (cc & 0x1) ? "will branch" : "will fall through";
+	case 0x6: return (cc & 0x8) ? "will branch" : "will fall through";
+	case 0x7: return (cc & 0x2) ? "will branch" : "will fall through";
+	case 0x8: return "will branch";
+	case 0x9: return (cc & 0x4) ? "will fall through" : "will branch";
+	case 0xa: return ((cc & 0x04) | ((cc ^ (cc >> 2)) & 0x2)) ? "will fall through" : "will branch";
+	case 0xb: return ((cc ^ (cc >> 2)) & 0x2) ? "will fall through" : "will branch";
+	case 0xc: return (cc & 0x5) ? "will fall through" : "will branch";
+	case 0xd: return (cc & 0x1) ? "will fall through" : "will branch";
+	case 0xe: return (cc & 0x8) ? "will fall through" : "will branch";
+	case 0xf: return (cc & 0x2) ? "will fall through" : "will branch";
 	}
-	const char *bfcc_comment(const sparc_disassembler::config *conf, bool use_cc, offs_t pc, uint32_t op)
-	{
-		if (!conf || (conf->get_translated_pc() != pc)) return nullptr;
-		auto const fcc(conf->get_fcc(use_cc ? BRCC : 0));
-		switch (COND)
-		{
-		case 0x0: return "will fall through";
-		case 0x1: return ((fcc == 1) || (fcc == 2) || (fcc == 3)) ? "will branch" : "will fall through";
-		case 0x2: return ((fcc == 1) || (fcc == 2)) ? "will branch" : "will fall through";
-		case 0x3: return ((fcc == 1) || (fcc == 3)) ? "will branch" : "will fall through";
-		case 0x4: return (fcc == 1) ? "will branch" : "will fall through";
-		case 0x5: return ((fcc == 2) || (fcc == 3)) ? "will branch" : "will fall through";
-		case 0x6: return (fcc == 2) ? "will branch" : "will fall through";
-		case 0x7: return (fcc == 3) ? "will branch" : "will fall through";
-		case 0x8: return "will branch";
-		case 0x9: return (fcc == 0) ? "will branch" : "will fall through";
-		case 0xa: return ((fcc == 0) || (fcc == 3)) ? "will branch" : "will fall through";
-		case 0xb: return ((fcc == 0) || (fcc == 2)) ? "will branch" : "will fall through";
-		case 0xc: return ((fcc == 0) || (fcc == 2) || (fcc == 3)) ? "will branch" : "will fall through";
-		case 0xd: return ((fcc == 0) || (fcc == 1)) ? "will branch" : "will fall through";
-		case 0xe: return ((fcc == 0) || (fcc == 1) || (fcc == 3)) ? "will branch" : "will fall through";
-		case 0xf: return ((fcc == 0) || (fcc == 1) || (fcc == 2)) ? "will branch" : "will fall through";
-		}
-		return nullptr;
-	}
-	const char *bpr_comment(const sparc_disassembler::config *conf, bool use_cc, offs_t pc, uint32_t op)
-	{
-		if (!conf || (conf->get_translated_pc() != pc)) return nullptr;
-		const int64_t reg(conf->get_reg_r(RS1));
-		switch (COND)
-		{
-		case 1: return (reg == 0) ? "will branch" : "will fall through";
-		case 2: return (reg <= 0) ? "will branch" : "will fall through";
-		case 3: return (reg < 0) ? "will branch" : "will fall through";
-		case 5: return (reg != 0) ? "will branch" : "will fall through";
-		case 6: return (reg > 0) ? "will branch" : "will fall through";
-		case 7: return (reg >= 0) ? "will branch" : "will fall through";
-		}
-		return nullptr;
-	}
+	return nullptr;
 }
 
-const char * const sparc_disassembler::REG_NAMES[32] = {
+const char *bfcc_comment(const sparc_disassembler::config *conf, bool use_cc, offs_t pc, uint32_t op)
+{
+	if (!conf || (conf->get_translated_pc() != pc)) return nullptr;
+	auto const fcc(conf->get_fcc(use_cc ? BRCC : 0));
+	switch (COND)
+	{
+	case 0x0: return "will fall through";
+	case 0x1: return ((fcc == 1) || (fcc == 2) || (fcc == 3)) ? "will branch" : "will fall through";
+	case 0x2: return ((fcc == 1) || (fcc == 2)) ? "will branch" : "will fall through";
+	case 0x3: return ((fcc == 1) || (fcc == 3)) ? "will branch" : "will fall through";
+	case 0x4: return (fcc == 1) ? "will branch" : "will fall through";
+	case 0x5: return ((fcc == 2) || (fcc == 3)) ? "will branch" : "will fall through";
+	case 0x6: return (fcc == 2) ? "will branch" : "will fall through";
+	case 0x7: return (fcc == 3) ? "will branch" : "will fall through";
+	case 0x8: return "will branch";
+	case 0x9: return (fcc == 0) ? "will branch" : "will fall through";
+	case 0xa: return ((fcc == 0) || (fcc == 3)) ? "will branch" : "will fall through";
+	case 0xb: return ((fcc == 0) || (fcc == 2)) ? "will branch" : "will fall through";
+	case 0xc: return ((fcc == 0) || (fcc == 2) || (fcc == 3)) ? "will branch" : "will fall through";
+	case 0xd: return ((fcc == 0) || (fcc == 1)) ? "will branch" : "will fall through";
+	case 0xe: return ((fcc == 0) || (fcc == 1) || (fcc == 3)) ? "will branch" : "will fall through";
+	case 0xf: return ((fcc == 0) || (fcc == 1) || (fcc == 2)) ? "will branch" : "will fall through";
+	}
+	return nullptr;
+}
+
+const char *bpr_comment(const sparc_disassembler::config *conf, bool use_cc, offs_t pc, uint32_t op)
+{
+	if (!conf || (conf->get_translated_pc() != pc)) return nullptr;
+	const int64_t reg(conf->get_reg_r(RS1));
+	switch (COND)
+	{
+	case 1: return (reg == 0) ? "will branch" : "will fall through";
+	case 2: return (reg <= 0) ? "will branch" : "will fall through";
+	case 3: return (reg < 0) ? "will branch" : "will fall through";
+	case 5: return (reg != 0) ? "will branch" : "will fall through";
+	case 6: return (reg > 0) ? "will branch" : "will fall through";
+	case 7: return (reg >= 0) ? "will branch" : "will fall through";
+	}
+	return nullptr;
+}
+
+} // anonymous namespace
+
+const char *const sparc_disassembler::REG_NAMES[32] = {
 	"%g0", "%g1", "%g2", "%g3", "%g4", "%g5", "%g6", "%g7",
 	"%o0", "%o1", "%o2", "%o3", "%o4", "%o5", "%o6", "%o7",
 	"%l0", "%l1", "%l2", "%l3", "%l4", "%l5", "%l6", "%l7",

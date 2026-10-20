@@ -439,6 +439,9 @@ public:
 	virtual int execute(uml::code_handle &entry) override;
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
 	virtual bool hash_exists(uint32_t mode, uint32_t pc) const noexcept override;
+	virtual void hash_invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept override;
+	virtual drccodeptr hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept override;
+	virtual bool hash_set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) noexcept override;
 	virtual void get_info(drcbe_info &info) const noexcept override;
 	virtual bool logging() const noexcept override { return false; }
 
@@ -1556,7 +1559,7 @@ inline void drcbe_arm64::calculate_carry_shift_right_imm(a64::Assembler &a, cons
 
 drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
 	: drcbe_interface(drcuml, cache, device)
-	, m_hash(cache, modes, addrbits, ignorebits, std::align_val_t(1 << 12), std::align_val_t(1 << 12))
+	, m_hash(cache, modes, addrbits, ignorebits, drcuml.max_sequence_length(), std::align_val_t(1 << 12), std::align_val_t(1 << 12))
 	, m_map(cache, 0xaaaaaaaa5555)
 	, m_log_asmjit(nullptr)
 	, m_carry_state(carry_state::POISON)
@@ -1823,6 +1826,21 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 bool drcbe_arm64::hash_exists(uint32_t mode, uint32_t pc) const noexcept
 {
 	return m_hash.code_exists(mode, pc);
+}
+
+void drcbe_arm64::hash_invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept
+{
+	m_hash.invalidate_range(pcstart, pcend);
+}
+
+drccodeptr drcbe_arm64::hash_get_codeptr(uint32_t mode, uint32_t pc) const noexcept
+{
+	return m_hash.code_exists(mode, pc) ? m_hash.get_codeptr(mode, pc) : nullptr;
+}
+
+bool drcbe_arm64::hash_set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) noexcept
+{
+	return m_hash.set_codeptr(mode, pc, code);
 }
 
 void drcbe_arm64::get_info(drcbe_info &info) const noexcept
@@ -3715,9 +3733,9 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 				// save some instructions by avoid mov to register by computing the ror and storing it into scratch directly
 				uint64_t result;
 				if (inst.size() == 4)
-					result = rotr_32(srcp.immediate(), rot);
+					result = std::rotr<uint32_t>(srcp.immediate(), rot);
 				else
-					result = rotr_64(srcp.immediate(), rot);
+					result = std::rotr<uint64_t>(srcp.immediate(), rot);
 
 				a.mov(scratch, result);
 				a.bfi(dst, scratch, lsb, pop);
@@ -3759,9 +3777,9 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 
 			uint64_t result;
 			if (inst.size() == 4)
-				result = rotl_32(srcp.immediate(), s) & maskp.immediate();
+				result = std::rotl<uint32_t>(srcp.immediate(), s) & maskp.immediate();
 			else
-				result = rotl_64(srcp.immediate(), s) & maskp.immediate();
+				result = std::rotl<uint64_t>(srcp.immediate(), s) & maskp.immediate();
 
 			if (result != 0)
 			{

@@ -19,11 +19,9 @@ class sonix16_device : public cpu_device
 		SONIX16_INTEN
 	};
 
-public:
-	// construction/destruction
-	sonix16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
 protected:
+	sonix16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -71,6 +69,8 @@ private:
 	void ixbkram_w(offs_t offset, u16 data);
 	u16 inten_r();
 	void inten_w(u16 data);
+	u16 wdt_r();
+	void wdt_w(u16 data);
 	u16 iosw_r();
 	void iosw_w(u16 data);
 
@@ -96,11 +96,43 @@ private:
 	u32 m_pc;
 	u16 m_sp;
 	u16 m_inten;
+	u16 m_wdt;
 	u16 m_iosw;
 	s32 m_icount;
 };
 
-// device type declaration
-DECLARE_DEVICE_TYPE(SONIX16, sonix16_device)
+class snl320_device : public sonix16_device
+{
+public:
+	// device type constructor
+	snl320_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class snc7001a_device : public sonix16_device
+{
+public:
+	// device type constructor
+	snc7001a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class snc7648s_device : public sonix16_device
+{
+public:
+	// device type constructor
+	snc7648s_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class snt110_device : public sonix16_device
+{
+public:
+	// device type constructor
+	snt110_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+// device type declarations
+DECLARE_DEVICE_TYPE(SNL320, snl320_device)
+DECLARE_DEVICE_TYPE(SNC7001A, snc7001a_device)
+DECLARE_DEVICE_TYPE(SNC7648S, snc7648s_device)
+DECLARE_DEVICE_TYPE(SNT110, snt110_device)
 
 #endif // MAME_CPU_SONIX16_SONIX16_H

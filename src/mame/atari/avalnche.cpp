@@ -232,7 +232,7 @@ void avalnche_state::avalnche_base(machine_config &config)
 	// Q1, Q4, Q5, Q6 are configured in audio/avalnche.cpp
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 16, 256);
 	screen.set_screen_update(FUNC(avalnche_state::screen_update_avalnche));
 }

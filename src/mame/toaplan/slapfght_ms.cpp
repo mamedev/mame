@@ -368,7 +368,7 @@ void slapfght_ms_state::slapfighm(machine_config &config)
 	mainlatch.q_out_cb<3>().set(FUNC(slapfght_ms_state::irq_enable_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // all wrong
+	SCREEN(config, m_screen); // all wrong
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(64*8, 32*8);

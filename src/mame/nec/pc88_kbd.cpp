@@ -9,7 +9,9 @@ I/O ports are normally read in direct/parallel-ish form, eventually exposed as s
 http://www.maroon.dti.ne.jp/youkan/pc88/iomap.html
 
 TODO:
-- pc88va_kbd: serial interface, add key modifiers;
+- pc8801fh_kbd: MC needs the identifier to be high rather than low for setup keys to work properly.
+                Settable from a port?
+- pc88va_kbd: serial interface, add key modifiers, runs on undumped MCU really;
 
 **************************************************************************************************/
 
@@ -18,6 +20,15 @@ TODO:
 #include "pc88_kbd.h"
 
 #include "utf8.h"
+
+//#include "iostream.h"
+
+// pc88va_kbd_device only
+#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(PC8001_KBD,   pc8001_kbd_device,   "pc8001_kbd",     "NEC PC-8001 Keyboard")
 DEFINE_DEVICE_TYPE(PC8801_KBD,   pc8801_kbd_device,   "pc8801_kbd",     "NEC PC-8801 Keyboard")
@@ -227,6 +238,7 @@ ioport_constructor pc8801_kbd_device::device_input_ports() const
 
 pc8801fh_kbd_device::pc8801fh_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pc8001_kbd_device(mconfig, PC8801FH_KBD, tag, owner, clock)
+	, m_read_id_cb(*this, 1)
 {
 }
 
@@ -241,6 +253,7 @@ static INPUT_PORTS_START( pc8801fh_kbd )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F8")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F9")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F10")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Backspace")
 
 	PORT_MODIFY("KEYD")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Henkan") // 変換 / conversion
@@ -251,12 +264,17 @@ static INPUT_PORTS_START( pc8801fh_kbd )
 	PORT_MODIFY("KEYE")
 	// TODO: Normal & Numpad RETURN, Left Shift, Right Shift aliases here at bits 0-3
 	// as above
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // FH identifier really
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER(DEVICE_SELF, FUNC(pc8801fh_kbd_device::read_id_r)) // FH+ identifier
 INPUT_PORTS_END
 
 ioport_constructor pc8801fh_kbd_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( pc8801fh_kbd );
+}
+
+int pc8801fh_kbd_device::read_id_r()
+{
+	return m_read_id_cb();
 }
 
 /*
@@ -273,9 +291,16 @@ pc88va_kbd_device::pc88va_kbd_device(const machine_config &mconfig, const char *
 {
 }
 
+static INPUT_PORTS_START( pc88va_kbd )
+	PORT_INCLUDE( pc8801fh_kbd )
+
+	PORT_MODIFY("KEYE")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // FH identifier, assume low for this
+INPUT_PORTS_END
+
 ioport_constructor pc88va_kbd_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( pc8801fh_kbd );
+	return INPUT_PORTS_NAME( pc88va_kbd );
 }
 
 void pc88va_kbd_device::device_start()
@@ -294,7 +319,7 @@ void pc88va_kbd_device::device_reset()
 
 uint8_t pc88va_kbd_device::translate(uint8_t row, uint8_t column)
 {
-	// this table is essentially same-ish as the one in pc98_kbd
+	// this table produces same-ish scancodes as the one in pc98_kbd
 	// TODO: some stuff currently unmapped
 	const u8 keytable[0x80] = {
 //      [0],   [1],   [2],   [3],   [4],   [5],   [6],   [7]
@@ -333,6 +358,12 @@ uint8_t pc88va_kbd_device::translate(uint8_t row, uint8_t column)
 		0xff,  0xff,  0x5a,  0xff,  0xff,  0xff,  0xff,  0xff,
 //      RET,   [RET], LSHIFT,RSHIFT,------,-----,-----,  <ID>
 		0xff,  0xff,  0xff,  0xff,  0xff,  0xff,  0xff,  0xff
+
+		// TODO: according to documentation last three ports are moved around (?)
+//      $0c: f.1,    f.2,    f.3,   f.4,   f.5,   BS,   INS,   DEL
+//      $0d: f.6,    f.7,    f.8,   f.9,   f.10,  変換,  決定,  SPACE
+//      $0e: RET FK, RET 10, LSHIFT,RSHIFT,PC,    全角,  -----,-----
+		// assume RET FK and RET 10 be equivalent of regular / numpad returns
 	};
 
 	const u8 key_select = row * 8 + column;
@@ -352,6 +383,7 @@ void pc88va_kbd_device::key_make(uint8_t row, uint8_t column)
 void pc88va_kbd_device::key_break(uint8_t row, uint8_t column)
 {
 	// TODO: eventually thrown away by the MCU after set time
+	// is it also supposed to send scancode |= 0x80 to the host like PC-98?
 	m_scan_code = 0xff;
 	m_irq_cb(0);
 }
@@ -359,5 +391,26 @@ void pc88va_kbd_device::key_break(uint8_t row, uint8_t column)
 void pc88va_kbd_device::key_repeat(uint8_t row, uint8_t column)
 {
 	// ...
+}
+
+/*
+ * 10-- -1-- FCLR FIFO clear
+ * 10-- --1- RTRY Retransmission Request
+ * 10-- ---1 RESET Sub CPU reset
+ * 11-x ---- KTARY JIS Layout (0) <prohibited> (1)
+ * 11-- x--- KCIFE Key Code Interface Operation Mode (1) Use Matrix only (0)
+ * 11-- -1-- AREP Auto Repeat Operation
+ * 11-- --1- PRIK Priority Key Pre-transmission
+ * 11-- ---1 FCTRL FIFO Control
+ *
+ */
+void pc88va_kbd_device::write_command(offs_t offset, u8 data)
+{
+	LOG("command_w: %02x\n", data);
+	// TODO: all SWs just calls here with either 0x81 or 0x4d
+	// the mildly special cases are shanghai and lodoss, which calls an extra 0x4d along the way.
+	// Also: isn't supposed to be 0xcd according to documentation?
+	if (data != 0x81 && data != 0x4d)
+		popmessage("pc88_kbd.cpp: warning write_command %02x", data);
 }
 

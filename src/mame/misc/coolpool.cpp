@@ -957,7 +957,7 @@ void amerdart_state::amerdart(machine_config &config)
 	TIMER(config, m_nvram_timer).configure_generic(FUNC(amerdart_state::nvram_write_timeout));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(40'000'000)/6, 212*2, 0, 161*2, 262, 0, 241);
 	screen.set_screen_update(m_maincpu, FUNC(tms34010_device::tms340x0_rgb32));
 
@@ -1003,7 +1003,7 @@ void _9ballsht_state::_9ballsht(machine_config &config)
 	// video hardware
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(40'000'000)/6, 424, 0, 320, 262, 0, 240);
 	screen.set_screen_update(m_maincpu, FUNC(tms34010_device::tms340x0_rgb32));
 

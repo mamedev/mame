@@ -288,12 +288,12 @@ uint32_t panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t const *const srcline = &m_temprender->pix(y);
 		uint16_t *const dstline = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint16_t const dat = srcline[x];
 
@@ -303,12 +303,12 @@ uint32_t panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	draw_sprites(bitmap,cliprect);
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t const *const srcline = &m_temprender->pix(y);
 		uint16_t *const dstline = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint16_t const dat = srcline[x];
 			if (dat & 0x10)
@@ -605,7 +605,7 @@ void panicr_state::panicr(machine_config &config)
 	m_t5182->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
 	m_t5182->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(32*8, 32*8);

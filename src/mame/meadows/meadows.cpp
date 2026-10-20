@@ -921,7 +921,7 @@ void meadows_state::meadows(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(32*8, 30*8);
 	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
@@ -949,7 +949,7 @@ void meadows_state::minferno(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &meadows_state::minferno_data_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 1*8, 24*8-1);

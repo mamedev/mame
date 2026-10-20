@@ -2,7 +2,10 @@
 // copyright-holders:R. Belmont
 #ifndef MAME_SOUND_L4003_H
 #define MAME_SOUND_L4003_H
+
 #pragma once
+
+
 class l4003_sound_device : public device_t,
 							 public device_sound_interface,
 							 public device_memory_interface
@@ -10,26 +13,24 @@ class l4003_sound_device : public device_t,
 public:
 	l4003_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// sound stream update overrides
+	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream) override;
 
-	// device_memory_interface overrides
-	virtual space_config_vector memory_space_config() const override;
+	// device_memory_interface implementation
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 
 private:
 	static const int NUM_VOICES = 16;
 
 	struct l4003_voice
 	{
-		constexpr l4003_voice() {}
-
 		uint32_t start = 0;
 		uint32_t step = 0;
 		uint32_t pos = 0;

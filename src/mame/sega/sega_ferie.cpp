@@ -570,8 +570,8 @@ uint32_t sega_ferie_state::screen_update(screen_device &screen, bitmap_ind16 &bi
 	update_crosshair(screen);
 
 	// Render LCD
-	for (size_t y = cliprect.min_y; y <= cliprect.max_y; y++) {
-		for (size_t x = cliprect.min_x; x <= cliprect.max_x / 8; x++) {
+	for (size_t y = cliprect.top(); y <= cliprect.bottom(); y++) {
+		for (size_t x = cliprect.left(); x <= cliprect.right() / 8; x++) {
 			uint8_t data = get_lcd_dots(x, y);
 			for (size_t bit_i = 0; bit_i < 8; bit_i++) {
 				// TODO: Adjust based on configured contrast
@@ -662,7 +662,7 @@ void sega_ferie_state::sega_ferie(machine_config &config)
 	// FIXME: Guessed timings
 	TIMER(config, "irq").configure_periodic(FUNC(sega_ferie_state::irq), attotime::from_hz(200));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(LCD_W, LCD_H);

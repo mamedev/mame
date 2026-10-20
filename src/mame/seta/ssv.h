@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "cpu/v60/v60.h"
 #include "cpu/upd7725/upd7725.h"
 #include "st0020.h"
 #include "machine/adc0808.h"
@@ -89,7 +90,7 @@ protected:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	void update_irq_state();
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	u8 irq_callback();
 
 	void drawgfx_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, uint32_t code, uint32_t color, bool flipx, bool flipy, int base_sx, int base_sy, int shadow, int realline, int line);
 	void drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, int gfx, uint32_t code, uint32_t color, bool flipx, bool flipy, int base_sx, int base_sy,int shadow);
@@ -122,7 +123,7 @@ protected:
 
 	void ssv_map(address_map &map, u32 rom) ATTR_COLD;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<v60_device> m_maincpu;
 	required_device<es5506_device> m_ensoniq;
 
 	required_shared_ptr<uint16_t> m_mainram;

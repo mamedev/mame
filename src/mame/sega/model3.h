@@ -134,7 +134,8 @@ public:
 		m_palette(*this, "palette"),
 		m_cryptdevice(*this, "315_5881"),
 		m_billboard(*this, "billboard"),
-		m_bank2(*this, "bank2")
+		m_bank2(*this, "bank2"),
+		m_sound_bank(*this, "sound_bank")
 	{
 		m_step15_with_mpc106 = false;
 		m_step20_with_old_real3d = false;
@@ -217,7 +218,7 @@ private:
 	required_shared_ptr<uint64_t> m_paletteram64;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
 	optional_device<dsb2_device> m_dsb2;        // 68k-based MPEG Digital Sound Board
-	optional_device<i8251_device> m_uart;
+	required_device<i8251_device> m_uart;
 	required_shared_ptr<uint16_t> m_soundram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -226,6 +227,7 @@ private:
 
 	required_device<sega_billboard_device> m_billboard;
 	memory_bank_creator m_bank2;
+	required_memory_bank m_sound_bank;
 
 	tilemap_t *m_layer4[4]{};
 	tilemap_t *m_layer8[4]{};
@@ -360,11 +362,10 @@ private:
 	uint64_t model3_rtc_r(offs_t offset, uint64_t mem_mask = ~0);
 	void model3_rtc_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t real3d_status_r(offs_t offset);
-	uint8_t model3_sound_r(offs_t offset);
 	void model3_sound_w(offs_t offset, uint8_t data);
 
 	void daytona2_rombank_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	void model3snd_ctrl(uint16_t data);
+	void sound_control_w(uint8_t data);
 	uint32_t pci_device_get_reg();
 	void pci_device_set_reg(uint32_t value);
 	void configure_fast_ram();

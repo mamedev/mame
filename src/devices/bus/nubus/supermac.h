@@ -39,8 +39,8 @@ public:
 	u16 v_end() const noexcept
 	{ return m_vend + 1; }
 
-	attoseconds_t frame_time(u32 scale, XTAL const &osc) const noexcept
-	{ return attotime::from_ticks((m_htotal + 1) * (m_vtotal + 1) * scale, osc).attoseconds(); }
+	attotime frame_time(u32 scale, XTAL const &osc) const noexcept
+	{ return attotime::from_ticks((m_htotal + 1) * (m_vtotal + 1) * scale, osc); }
 
 private:
 	u16 m_hsync, m_hstart, m_hend, m_htotal;

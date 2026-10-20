@@ -104,6 +104,11 @@ bgfx_backend
     * ``auto`` -- MAME will automatically choose the best selection for you.
 bgfx_debug
     Enables BGFX debugging features.  Most users will not need to use this.
+bgfx_vectorcrt
+    Enables the persistent BGFX vector CRT renderer for vector games.  It uses
+    HDR phosphor accumulation, Gaussian beam rendering, scan-order variation,
+    and bloom.  The default is disabled.  This option has no effect when using
+    a video backend other than BGFX or when running a raster game.
 bgfx_screen_chains
     This dictates how to handle BGFX rendering on a per-display basis.  Possible
     choices include ``hlsl``, ``unfiltered``, and ``default``.
@@ -114,6 +119,9 @@ bgfx_screen_chains
     * ``crt-geom`` -- lightweight CRT simulation
     * ``crt-geom-deluxe`` -- more detailed CRT simulation
     * ``lcd-grid`` -- LCD matrix simulation
+    * ``depixelize`` -- vectorizing upscaler for pixel art (Kopf & Lischinski,
+      "Depixelizing Pixel Art"); smooth contours, best on clean low-resolution
+      graphics
 
     We make a distinction between emulated screens (which we’ll call a *screen*)
     and output windows or monitors (which we’ll call a *window*, set by the

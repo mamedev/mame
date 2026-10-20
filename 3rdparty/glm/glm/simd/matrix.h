@@ -166,6 +166,18 @@ GLM_FUNC_QUALIFIER void glm_mat4_transpose(glm_vec4 const in[4], glm_vec4 out[4]
 	out[3] = _mm_shuffle_ps(tmp2, tmp3, 0xDD);
 }
 
+GLM_FUNC_QUALIFIER void glm_mat3_transpose(glm_vec4 const in[3], glm_vec4 out[3])
+{
+	__m128 tmp0 = _mm_shuffle_ps(in[0], in[1], 0x44);
+	__m128 tmp2 = _mm_shuffle_ps(in[0], in[1], 0xEE);
+	__m128 tmp1 = _mm_shuffle_ps(in[2], in[2], 0x44);
+	__m128 tmp3 = _mm_shuffle_ps(in[2], in[2], 0xEE);
+
+	out[0] = _mm_shuffle_ps(tmp0, tmp1, 0x88);
+	out[1] = _mm_shuffle_ps(tmp0, tmp1, 0xDD);
+	out[2] = _mm_shuffle_ps(tmp2, tmp3, 0x88);
+}
+
 GLM_FUNC_QUALIFIER glm_vec4 glm_mat4_determinant_highp(glm_vec4 const in[4])
 {
 	__m128 Fac0;
@@ -410,7 +422,7 @@ GLM_FUNC_QUALIFIER glm_vec4 glm_mat4_determinant_lowp(glm_vec4 const m[4])
 	__m128 MulC = _mm_mul_ps(Swp2C, Swp3C);
 	__m128 SubF = _mm_sub_ps(_mm_movehl_ps(MulC, MulC), MulC);
 
-	//tvec4<T, P> DetCof(
+	//vec<4, T, Q> DetCof(
 	//	+ (m[1][1] * SubFactor00 - m[1][2] * SubFactor01 + m[1][3] * SubFactor02),
 	//	- (m[1][0] * SubFactor00 - m[1][2] * SubFactor03 + m[1][3] * SubFactor04),
 	//	+ (m[1][0] * SubFactor01 - m[1][1] * SubFactor03 + m[1][3] * SubFactor05),
@@ -473,7 +485,7 @@ GLM_FUNC_QUALIFIER glm_vec4 glm_mat4_determinant(glm_vec4 const m[4])
 	__m128 MulC = _mm_mul_ps(Swp2C, Swp3C);
 	__m128 SubF = _mm_sub_ps(_mm_movehl_ps(MulC, MulC), MulC);
 
-	//tvec4<T, P> DetCof(
+	//vec<4, T, Q> DetCof(
 	//	+ (m[1][1] * SubFactor00 - m[1][2] * SubFactor01 + m[1][3] * SubFactor02),
 	//	- (m[1][0] * SubFactor00 - m[1][2] * SubFactor03 + m[1][3] * SubFactor04),
 	//	+ (m[1][0] * SubFactor01 - m[1][1] * SubFactor03 + m[1][3] * SubFactor05),
@@ -712,9 +724,9 @@ GLM_FUNC_QUALIFIER void glm_mat4_inverse(glm_vec4 const in[4], glm_vec4 out[4])
 	__m128 Row1 = _mm_shuffle_ps(Inv2, Inv3, _MM_SHUFFLE(0, 0, 0, 0));
 	__m128 Row2 = _mm_shuffle_ps(Row0, Row1, _MM_SHUFFLE(2, 0, 2, 0));
 
-	//	valType Determinant = m[0][0] * Inverse[0][0] 
-	//						+ m[0][1] * Inverse[1][0] 
-	//						+ m[0][2] * Inverse[2][0] 
+	//	valType Determinant = m[0][0] * Inverse[0][0]
+	//						+ m[0][1] * Inverse[1][0]
+	//						+ m[0][2] * Inverse[2][0]
 	//						+ m[0][3] * Inverse[3][0];
 	__m128 Det0 = glm_vec4_dot(in[0], Row2);
 	__m128 Rcp0 = _mm_div_ps(_mm_set1_ps(1.0f), Det0);
@@ -933,9 +945,9 @@ GLM_FUNC_QUALIFIER void glm_mat4_inverse_lowp(glm_vec4 const in[4], glm_vec4 out
 	__m128 Row1 = _mm_shuffle_ps(Inv2, Inv3, _MM_SHUFFLE(0, 0, 0, 0));
 	__m128 Row2 = _mm_shuffle_ps(Row0, Row1, _MM_SHUFFLE(2, 0, 2, 0));
 
-	//	valType Determinant = m[0][0] * Inverse[0][0] 
-	//						+ m[0][1] * Inverse[1][0] 
-	//						+ m[0][2] * Inverse[2][0] 
+	//	valType Determinant = m[0][0] * Inverse[0][0]
+	//						+ m[0][1] * Inverse[1][0]
+	//						+ m[0][2] * Inverse[2][0]
 	//						+ m[0][3] * Inverse[3][0];
 	__m128 Det0 = glm_vec4_dot(in[0], Row2);
 	__m128 Rcp0 = _mm_rcp_ps(Det0);
@@ -962,10 +974,10 @@ GLM_FUNC_QUALIFIER void glm_mat4_rotate(__m128 const in[4], float Angle, float c
 	__m128 Sin0 = _mm_set_ss(s);
 	__m128 SinA = _mm_shuffle_ps(Sin0, Sin0, _MM_SHUFFLE(0, 0, 0, 0));
 
-	// tvec3<T, P> temp = (valType(1) - c) * axis;
+	// vec<3, T, Q> temp = (valType(1) - c) * axis;
 	__m128 Temp0 = _mm_sub_ps(one, CosA);
 	__m128 Temp1 = _mm_mul_ps(Temp0, AxisC);
-	
+
 	//Rotate[0][0] = c + temp[0] * axis[0];
 	//Rotate[0][1] = 0 + temp[0] * axis[1] + s * axis[2];
 	//Rotate[0][2] = 0 + temp[0] * axis[2] - s * axis[1];
@@ -1008,7 +1020,7 @@ GLM_FUNC_QUALIFIER void glm_mat4_rotate(__m128 const in[4], float Angle, float c
 	Result[2] = TmpC4;
 	Result[3] = _mm_set_ps(1, 0, 0, 0);
 
-	//tmat4x4<valType> Result(uninitialize);
+	//mat<4, 4, valType> Result;
 	//Result[0] = m[0] * Rotate[0][0] + m[1] * Rotate[0][1] + m[2] * Rotate[0][2];
 	//Result[1] = m[0] * Rotate[1][0] + m[1] * Rotate[1][1] + m[2] * Rotate[1][2];
 	//Result[2] = m[0] * Rotate[2][0] + m[1] * Rotate[2][1] + m[2] * Rotate[2][2];
@@ -1017,7 +1029,7 @@ GLM_FUNC_QUALIFIER void glm_mat4_rotate(__m128 const in[4], float Angle, float c
 	sse_mul_ps(in, Result, out);
 }
 */
-GLM_FUNC_QUALIFIER void glm_mat4_outerProduct(__m128 const & c, __m128 const & r, __m128 out[4])
+GLM_FUNC_QUALIFIER void glm_mat4_outerProduct(__m128 const& c, __m128 const& r, __m128 out[4])
 {
 	out[0] = _mm_mul_ps(c, _mm_shuffle_ps(r, r, _MM_SHUFFLE(0, 0, 0, 0)));
 	out[1] = _mm_mul_ps(c, _mm_shuffle_ps(r, r, _MM_SHUFFLE(1, 1, 1, 1)));

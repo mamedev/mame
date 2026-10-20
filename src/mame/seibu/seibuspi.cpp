@@ -1202,12 +1202,9 @@ void seibuspi_state::spi_ymf271_map(address_map &map)
 
 /*****************************************************************************/
 
-void seibuspi_z80_state::ymf_irqhandler(int state)
+IRQ_CALLBACK_MEMBER(seibuspi_z80_state::audio_vector_r)
 {
-	if (state)
-		m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, 0xd7); // Z80 - IRQ is RST10
-	else
-		m_audiocpu->set_input_line(0, CLEAR_LINE);
+	return 0xd7; // Z80 IM0, RST10
 }
 
 template <int N>
@@ -1781,7 +1778,7 @@ void seibuspi_state::machine_reset()
 void seibuspi_tilemap_state::base_video(machine_config &config)
 {
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART);
 	screen.set_screen_update(FUNC(seibuspi_tilemap_state::screen_update_spi));
 
@@ -1813,6 +1810,7 @@ void seibuspi_state::spi(machine_config &config)
 
 	Z80(config, m_audiocpu, 28.636363_MHz_XTAL / 4); // Z84C0008PEC, 7.159MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &seibuspi_state::spi_soundmap);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(seibuspi_state::audio_vector_r));
 
 	config.set_maximum_quantum(attotime::from_hz(12000));
 
@@ -1833,7 +1831,7 @@ void seibuspi_state::spi(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 
 	ymf271_device &ymf(YMF271(config, "ymf", 16.9344_MHz_XTAL));
-	ymf.irq_handler().set(FUNC(seibuspi_state::ymf_irqhandler));
+	ymf.irq_handler().set_inputline(m_audiocpu, 0);
 	ymf.set_addrmap(0, &seibuspi_state::spi_ymf271_map);
 
 	ymf.add_route(0, "speaker", 1.0, 0);
@@ -1869,6 +1867,7 @@ void seibuspi_z80_state::sxx2e(machine_config &config)
 
 	Z80(config, m_audiocpu, 28.636363_MHz_XTAL / 4); // Unknown part number and clock
 	m_audiocpu->set_addrmap(AS_PROGRAM, &seibuspi_z80_state::sxx2e_soundmap);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(seibuspi_z80_state::audio_vector_r));
 
 	config.set_maximum_quantum(attotime::from_hz(12000));
 
@@ -1886,7 +1885,7 @@ void seibuspi_z80_state::sxx2e(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ymf271_device &ymf(YMF271(config, "ymf", 16.9344_MHz_XTAL));
-	ymf.irq_handler().set(FUNC(seibuspi_z80_state::ymf_irqhandler));
+	ymf.irq_handler().set_inputline(m_audiocpu, 0);
 	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -1915,7 +1914,7 @@ void seibuspi_z80_state::sxx2g(machine_config &config) // clocks differ, but oth
 
 	/* sound hardware */
 	ymf271_device &ymf(YMF271(config.replace(), "ymf", 16.384_MHz_XTAL)); // 16.384MHz(!)
-	ymf.irq_handler().set(FUNC(seibuspi_z80_state::ymf_irqhandler));
+	ymf.irq_handler().set_inputline(m_audiocpu, 0);
 	ymf.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -1976,7 +1975,7 @@ void sys386f_state::sys386f(machine_config &config)
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57.59);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -2078,7 +2077,7 @@ void seibuspi_z80_state::init_rfjet()
 u32 seibuspi_state::senkyu_speedup_r()
 {
 	if (!machine().side_effects_disabled())
-		if (m_maincpu->pc()==0x00305bb2) m_maincpu->spin_until_interrupt(); // idle
+		if (m_maincpu->pc() == 0x00305bb2) m_maincpu->spin_until_interrupt();
 
 	return m_mainram[0x0018cb4/4];
 }
@@ -2086,22 +2085,22 @@ u32 seibuspi_state::senkyu_speedup_r()
 u32 seibuspi_state::senkyua_speedup_r()
 {
 	if (!machine().side_effects_disabled())
-		if (m_maincpu->pc()== 0x30582e) m_maincpu->spin_until_interrupt(); // idle
+		if (m_maincpu->pc() == 0x0030582e) m_maincpu->spin_until_interrupt();
 
 	return m_mainram[0x0018c9c/4];
 }
 
 u32 seibuspi_state::batlball_speedup_r()
 {
-//  printf("m_maincpu->pc() %06x\n", m_maincpu->pc());
-
 	if (!machine().side_effects_disabled())
 	{
-		/* batlbalu */
-		if (m_maincpu->pc()==0x00305996) m_maincpu->spin_until_interrupt(); // idle
+		// batlbalu
+		if (m_maincpu->pc() == 0x00305996) m_maincpu->spin_until_interrupt();
 
-		/* batlball */
-		if (m_maincpu->pc()==0x003058aa) m_maincpu->spin_until_interrupt(); // idle
+		// batlball
+		if (m_maincpu->pc() == 0x003058aa) m_maincpu->spin_until_interrupt();
+
+		//osd_printf_debug("%08x\n",m_maincpu->pc());
 	}
 
 	return m_mainram[0x0018db4/4];
@@ -2111,14 +2110,14 @@ u32 seibuspi_state::viprp1_speedup_r()
 {
 	if (!machine().side_effects_disabled())
 	{
-		/* viprp1 */
-		if (m_maincpu->pc()==0x0202769) m_maincpu->spin_until_interrupt(); // idle
+		// viprp1
+		if (m_maincpu->pc() == 0x0202769) m_maincpu->spin_until_interrupt();
 
-		/* viprp1s */
-		if (m_maincpu->pc()==0x02027e9) m_maincpu->spin_until_interrupt(); // idle
+		// viprp1s
+		if (m_maincpu->pc() == 0x02027e9) m_maincpu->spin_until_interrupt();
 
-		/* viprp1ot */
-		if (m_maincpu->pc()==0x02026bd) m_maincpu->spin_until_interrupt(); // idle
+		// viprp1ot
+		if (m_maincpu->pc() == 0x02026bd) m_maincpu->spin_until_interrupt();
 
 		//osd_printf_debug("%08x\n",m_maincpu->pc());
 	}
@@ -2130,8 +2129,9 @@ u32 seibuspi_state::viprp1o_speedup_r()
 {
 	if (!machine().side_effects_disabled())
 	{
-		/* viperp1o */
-		if (m_maincpu->pc()==0x0201f99) m_maincpu->spin_until_interrupt(); // idle
+		// viperp1o
+		if (m_maincpu->pc() == 0x0201f99) m_maincpu->spin_until_interrupt();
+
 		//osd_printf_debug("%08x\n",m_maincpu->pc());
 	}
 	return m_mainram[0x001d49c/4];
@@ -2142,7 +2142,8 @@ u32 seibuspi_state::ejanhs_speedup_r()
 {
 	if (!machine().side_effects_disabled())
 	{
-		if (m_maincpu->pc()==0x03032c7) m_maincpu->spin_until_interrupt(); // idle
+		if (m_maincpu->pc() == 0x03032c7) m_maincpu->spin_until_interrupt();
+
 		//osd_printf_debug("%08x\n",m_maincpu->pc());
 	}
 	return m_mainram[0x002d224/4];
@@ -2152,26 +2153,26 @@ u32 seibuspi_z80_state::rdft_speedup_r()
 {
 	if (!machine().side_effects_disabled())
 	{
-		/* rdft */
-		if (m_maincpu->pc()==0x0203f06) m_maincpu->spin_until_interrupt(); // idle
+		// rdft
+		if (m_maincpu->pc() == 0x0203f06) m_maincpu->spin_until_interrupt();
 
-		/* rdftj? */
-		if (m_maincpu->pc()==0x0203f0a) m_maincpu->spin_until_interrupt(); // idle
+		// rdftj?
+		if (m_maincpu->pc() == 0x0203f0a) m_maincpu->spin_until_interrupt();
 
-		/* rdftau */
-		if (m_maincpu->pc()==0x0203f16) m_maincpu->spin_until_interrupt(); // idle
+		// rdftau
+		if (m_maincpu->pc() == 0x0203f16) m_maincpu->spin_until_interrupt();
 
-		/* rdftja? */
-		if (m_maincpu->pc()==0x0203f22) m_maincpu->spin_until_interrupt(); // idle
+		// rdftja?
+		if (m_maincpu->pc() == 0x0203f22) m_maincpu->spin_until_interrupt();
 
-		/* rdfta, rdftadi, rdftam, rdftit */
-		if (m_maincpu->pc()==0x0203f46) m_maincpu->spin_until_interrupt(); // idle
+		// rdfta, rdftadi, rdftam, rdftit
+		if (m_maincpu->pc() == 0x0203f46) m_maincpu->spin_until_interrupt();
 
-		/* rdftu */
-		if (m_maincpu->pc()==0x0203f3a) m_maincpu->spin_until_interrupt(); // idle
+		// rdftu
+		if (m_maincpu->pc() == 0x0203f3a) m_maincpu->spin_until_interrupt();
 
-		/* rdftauge */
-		if (m_maincpu->pc()==0x0203f6e) m_maincpu->spin_until_interrupt(); // idle
+		// rdftauge
+		if (m_maincpu->pc() == 0x0203f6e) m_maincpu->spin_until_interrupt();
 
 		//osd_printf_debug("%08x\n",m_maincpu->pc());
 	}
@@ -2183,17 +2184,17 @@ u32 seibuspi_tilemap_state::rf2_speedup_r()
 {
 	if (!machine().side_effects_disabled())
 	{
-		/* rdft22kc */
-		if (m_maincpu->pc()==0x0203926) m_maincpu->spin_until_interrupt(); // idle
+		// rdft22kc
+		if (m_maincpu->pc() == 0x0203926) m_maincpu->spin_until_interrupt();
 
-		/* rdft2, rdft2j */
-		if (m_maincpu->pc()==0x0204372) m_maincpu->spin_until_interrupt(); // idle
+		// rdft2, rdft2j
+		if (m_maincpu->pc() == 0x0204372) m_maincpu->spin_until_interrupt();
 
-		/* rdft2us */
-		if (m_maincpu->pc()==0x020420e) m_maincpu->spin_until_interrupt(); // idle
+		// rdft2us
+		if (m_maincpu->pc() == 0x020420e) m_maincpu->spin_until_interrupt();
 
-		/* rdft2a */
-		if (m_maincpu->pc()==0x0204366) m_maincpu->spin_until_interrupt(); // idle
+		// rdft2a
+		if (m_maincpu->pc() == 0x0204366) m_maincpu->spin_until_interrupt();
 
 		//osd_printf_debug("%08x\n",m_maincpu->pc());
 	}
@@ -2205,21 +2206,20 @@ u32 seibuspi_tilemap_state::rfjet_speedup_r()
 {
 	if (!machine().side_effects_disabled())
 	{
-		/* rfjet, rfjetu, rfjeta */
-		if (m_maincpu->pc()==0x0206082) m_maincpu->spin_until_interrupt(); // idle
+		// rfjet, rfjetu, rfjeta
+		if (m_maincpu->pc() == 0x0206082) m_maincpu->spin_until_interrupt();
 
-		/* rfjetus */
-		if (m_maincpu->pc()==0x0205b39)
-		{
-			u32 r;
-			m_maincpu->spin_until_interrupt(); // idle
-			// Hack to enter test mode
-			r = m_mainram[0x002894c/4] & (~0x400);
-			return r | (((ioport("SYSTEM")->read() ^ 0xff)<<8) & 0x400);
-		}
+		// rfjetj
+		if (m_maincpu->pc() == 0x0205f2e) m_maincpu->spin_until_interrupt();
 
-		/* rfjetj */
-		if (m_maincpu->pc()==0x0205f2e) m_maincpu->spin_until_interrupt(); // idle
+		// rfjet2kc
+		if (m_maincpu->pc() == 0x0205c9e) m_maincpu->spin_until_interrupt();
+
+		// rfjets
+		if (m_maincpu->pc() == 0x0205b39) m_maincpu->spin_until_interrupt();
+
+		// rfjetsa
+		if (m_maincpu->pc() == 0x0205bd9) m_maincpu->spin_until_interrupt();
 
 		//osd_printf_debug("%08x\n",m_maincpu->pc());
 	}

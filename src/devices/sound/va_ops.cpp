@@ -128,6 +128,33 @@ void va_comparator_device::sound_stream_update(sound_stream &stream)
 }
 
 
+va_lambda_device::va_lambda_device(const machine_config &mconfig, const char *tag, device_t *owner, func_t func)
+	: device_t(mconfig, VA_LAMBDA, tag, owner, 0)
+	, device_sound_interface(mconfig, *this)
+	, m_stream(nullptr)
+	, m_func(func)
+{
+}
+
+va_lambda_device::va_lambda_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: va_lambda_device(mconfig, tag, owner, [] (float x) { return x; })
+{
+}
+
+void va_lambda_device::device_start()
+{
+	m_stream = stream_alloc(1, 1, SAMPLE_RATE_INPUT_ADAPTIVE);
+}
+
+void va_lambda_device::sound_stream_update(sound_stream &stream)
+{
+	const int n = stream.samples();
+	for (int i = 0; i < n; ++i)
+		stream.put(0, i, m_func(stream.get(0, i)));
+}
+
+
 DEFINE_DEVICE_TYPE(VA_CONST, va_const_device, "va_const", "Constant value stream")
 DEFINE_DEVICE_TYPE(VA_SCALE_OFFSET, va_scale_offset_device, "va_scale_offset", "Stream scale and offset")
 DEFINE_DEVICE_TYPE(VA_COMPARATOR, va_comparator_device, "va_comparator", "Stream comparator")
+DEFINE_DEVICE_TYPE(VA_LAMBDA, va_lambda_device, "va_lambda", "Generic computation")

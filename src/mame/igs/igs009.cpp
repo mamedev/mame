@@ -251,12 +251,12 @@ uint32_t igs009_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		m_reel_tilemap[3]->set_scrolly(i, m_bg_scroll[0][i + 0x180] * 2);
 	}
 
-	for (int zz = (cliprect.min_y >> 1), startclipmin = (cliprect.min_y & ~1); zz < ((cliprect.max_y + 1) >> 1); zz++, startclipmin += 2)
+	for (int zz = (cliprect.top() >> 1), startclipmin = (cliprect.top() & ~1); zz < ((cliprect.bottom() + 1) >> 1); zz++, startclipmin += 2)
 	{
 		int const rowenable = m_bg_scroll[1][zz];
 
 		// draw top of screen
-		rectangle const clip(cliprect.min_x, cliprect.max_x, startclipmin, startclipmin + 1);
+		rectangle const clip(cliprect.left(), cliprect.right(), startclipmin, startclipmin + 1);
 
 		bitmap.fill(m_palette->pen(rowenable), clip);
 
@@ -712,7 +712,7 @@ void igs009_state::jingbell(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
@@ -879,6 +879,7 @@ ROM_END
 Jingle Bell
 Italy, V133I
 (C) IGS ("COPYRIGHT 1995" in ROM, "FEB. 23 1998" on sticker)
+IGS PCB N0-0102-5
 
 CPU:
     1x HD64180RP8 (u18)(main)
@@ -996,7 +997,7 @@ void igs009_state::init_jingbelli()
 {
 	decrypt_jingbell();
 
-	// protection patch
+	// HACK: protection patch
 	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
 	rom[0x01f19] = 0x18;
 }
@@ -1005,7 +1006,7 @@ void igs009_state::init_animalhjb()
 {
 	decrypt_jingbell();
 
-	// protection patch
+	// HACK: protection patch
 	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
 	rom[0x01f21] = 0x18;
 }
@@ -1014,7 +1015,7 @@ void igs009_state::init_jingbell()
 {
 	decrypt_jingbell();
 
-	// protection patch
+	// HACK: protection patch
 	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
 	rom[0x0e753] = 0x18;
 }

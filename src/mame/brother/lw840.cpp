@@ -348,7 +348,7 @@ void lw840_state::lw840(machine_config &config)
 	TIMER(config, "2khz").configure_periodic(FUNC(lw840_state::int2_timer_callback), attotime::from_hz(2*1000));
 
 	// video hardware
-	SCREEN(config, screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, screen);
 	screen->set_color(rgb_t::white());
 	screen->set_physical_aspect(640, 400);
 	screen->set_screen_update(FUNC(lw840_state::screen_update));

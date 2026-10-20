@@ -31,7 +31,10 @@ TODO:
 - Pinpoint number of EXPansion slots for each machine (currently hardwired to 1),
   guessing from the back panels seems that each model can install between 1 to 3 cards.
   Also note: most cards aren't bus compatible between each other;
-- FH+: move EEPROM emulation in an SDIP device;
+- pc8801mc: several setup mode unknowns:
+  \- tries to clear $6f CPU clock select bit 4, halts CPU?
+  \- only PC=0x00d0 A=1 branch is checked. A=2 and A=4 clears MEMSW, A=5 unknown;
+  \- EEPROM needs removing;
 
 Notes:
 - Later models have washed out palette with some SWs, with no red component.
@@ -116,6 +119,8 @@ Notes:
 #include "pc88_kbd.h"
 #include "pc8801.h"
 
+#include "formats/pc88_t88.h"
+
 #include "softlist_dev.h"
 
 #include "utf8.h"
@@ -147,9 +152,9 @@ void pc8801_state::palette_reset()
 	// bitmap init
 	for (i = 0; i < 8; i ++)
 	{
-		m_palram[i].b = i & 1 ? 7 : 0;
-		m_palram[i].r = i & 2 ? 7 : 0;
-		m_palram[i].g = i & 4 ? 7 : 0;
+		m_palram[i].b = (i & 1) ? 7 : 0;
+		m_palram[i].r = (i & 2) ? 7 : 0;
+		m_palram[i].g = (i & 4) ? 7 : 0;
 		m_palette->set_pen_color(i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 	}
 	m_palette->set_pen_color(BGPAL_PEN, 0, 0, 0);
@@ -171,20 +176,21 @@ UPD3301_FETCH_ATTRIBUTE( pc8801_state::attr_fetch )
 	return attr_extend_info;
 }
 
-void pc8801_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func)
+template <typename T>
+void pc8801_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, T &&dot_func)
 {
 	uint16_t y_double = get_screen_frequency();
 	if ((m_gfx_ctrl & 0x11) == 0)
 		y_double = 0;
 	int32_t y_line_size = y_double + 1;
 
-	for(int y = cliprect.min_y; y <= cliprect.max_y; y += y_line_size)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y += y_line_size)
 	{
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 		{
 			u8 x_char = (x >> 3);
 			u32 bitmap_offset = (y >> y_double) * 80 + x_char;
-			for(int xi = 0; xi < 8; xi++)
+			for (int xi = 0; xi < 8; xi++)
 			{
 				u8 pen_dot = dot_func(bitmap_offset, y, x_char, 7 - xi);
 
@@ -209,7 +215,7 @@ void pc8801_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, 
 
 uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if(m_gfx_ctrl & 8)
+	if (m_gfx_ctrl & 8)
 	{
 		// BG Pal applies to 1bpp mode only
 		// - sharrier draws blue backdrop with pen #0 during gameplay
@@ -217,37 +223,43 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		const bool bitmap_color_mode = bool(m_gfx_ctrl & 0x10);
 		bitmap.fill(m_palette->pen(bitmap_color_mode ? 0 : BGPAL_PEN), cliprect);
 
-		if(bitmap_color_mode)
-			draw_bitmap(bitmap, cliprect, m_palette, [&](u32 bitmap_offset, int y, int x, int xi){
-				u8 res = 0;
+		if (bitmap_color_mode)
+		{
+			draw_bitmap(bitmap, cliprect, m_palette,
+					[this] (u32 bitmap_offset, int y, int x, int xi)
+					{
+						u8 res = 0;
 
-				// note: layer masking doesn't occur in 3bpp mode, bugattac relies on this
-				for (int plane = 0; plane < 3; plane ++)
-					res |= ((m_gvram[bitmap_offset + plane * 0x4000] >> xi) & 1) << plane;
+						// note: layer masking doesn't occur in 3bpp mode, bugattac relies on this
+						for (int plane = 0; plane < 3; plane ++)
+							res |= ((m_gvram[bitmap_offset + plane * 0x4000] >> xi) & 1) << plane;
 
-				return res;
-			});
+						return res;
+					});
+		}
 		else
 		{
 			if (m_gfx_ctrl & 1)
 			{
 				// b&w 640x200x3
-				draw_bitmap(bitmap, cliprect, m_palette, [&](u32 bitmap_offset, int y, int x, int xi){
-					u8 res = 0;
+				draw_bitmap(bitmap, cliprect, m_palette,
+						[this] (u32 bitmap_offset, int y, int x, int xi)
+						{
+							u8 res = 0;
 
-					// in this mode all three planes can potentially form the output
-					// it's the only place where I/O $53 bits 1-3 have an actual effect
-					for (int plane = 0; plane < 3; plane ++)
-					{
-						u8 mask = (m_bitmap_layer_mask >> plane) & 1;
-						res |= ((m_gvram[bitmap_offset + plane * 0x4000] >> xi) & mask);
-					}
+							// in this mode all three planes can potentially form the output
+							// it's the only place where I/O $53 bits 1-3 have an actual effect
+							for (int plane = 0; plane < 3; plane ++)
+							{
+								u8 mask = (m_bitmap_layer_mask >> plane) & 1;
+								res |= ((m_gvram[bitmap_offset + plane * 0x4000] >> xi) & mask);
+							}
 
-					if (!res)
-						return 0;
+							if (!res)
+								return 0;
 
-					return m_crtc->is_gfx_color_mode() ? (m_attr_info[y][x] >> 13) & 7 : 7;
-				});
+							return m_crtc->is_gfx_color_mode() ? (m_attr_info[y][x] >> 13) & 7 : 7;
+						});
 			}
 			else
 			{
@@ -257,31 +269,33 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 				//    that runs in 3bpp)
 				// - byoin set a transparent text layer (ASCII=0x20 / attribute = 0x80 0x00)
 				//   but it's in gfx_mode = 0 (b&w) so it just draw white from here.
-				draw_bitmap(bitmap, cliprect, m_crtc_palette, [&](u32 bitmap_offset, int y, int x, int xi){
-					u8 res = 0;
-					// HW pick ups just the first two planes (R and B), G is unused for drawing purposes.
-					// Plane switch happens at half screen, VRAM areas 0x3e80-0x3fff is unused again.
-					// TODO: confirm that a 15 kHz monitor cannot work with this
-					// - jettermi just uses the other b&w mode;
-					// - casablan/byoin doesn't bother in changing resolution so only the upper part is drawn.
-					// Update: real HW capture shows an ugly overlap with the two layers,
-					// implying that the second plane just latches on the same signals as the first,
-					// YAGNI unless found in concrete example.
-					int plane_offset = y >= 200 ? 384 : 0;
+				draw_bitmap(bitmap, cliprect, m_crtc_palette,
+						[this] (u32 bitmap_offset, int y, int x, int xi)
+						{
+							u8 res = 0;
+							// HW pick ups just the first two planes (R and B), G is unused for drawing purposes.
+							// Plane switch happens at half screen, VRAM areas 0x3e80-0x3fff is unused again.
+							// TODO: confirm that a 15 kHz monitor cannot work with this
+							// - jettermi just uses the other b&w mode;
+							// - casablan/byoin doesn't bother in changing resolution so only the upper part is drawn.
+							// Update: real HW capture shows an ugly overlap with the two layers,
+							// implying that the second plane just latches on the same signals as the first,
+							// YAGNI unless found in concrete example.
+							const int plane_offset = (y >= 200) ? 384 : 0;
 
-					res |= ((m_gvram[bitmap_offset + plane_offset] >> xi) & 1);
-					if (!res)
-						return 0;
+							res |= ((m_gvram[bitmap_offset + plane_offset] >> xi) & 1);
+							if (!res)
+								return 0;
 
-					return m_crtc->is_gfx_color_mode() ? (m_attr_info[y][x] >> 13) & 7 : 7;
-				});
+							return m_crtc->is_gfx_color_mode() ? (m_attr_info[y][x] >> 13) & 7 : 7;
+						});
 			}
 		}
 	}
 	else
 		bitmap.fill(0, cliprect);
 
-	if(!m_text_layer_mask)
+	if (!m_text_layer_mask)
 	{
 		m_text_bitmap.fill(0, cliprect);
 		m_crtc->screen_update(screen, m_text_bitmap, cliprect);
@@ -324,7 +338,7 @@ void pc8801_state::wram_w(offs_t offset, uint8_t data)
 
 uint8_t pc8801_state::ext_wram_r(offs_t offset)
 {
-	if(offset < m_extram_size)
+	if (offset < m_extram_size)
 		return m_ext_work_ram[offset];
 
 	return 0xff;
@@ -332,7 +346,7 @@ uint8_t pc8801_state::ext_wram_r(offs_t offset)
 
 void pc8801_state::ext_wram_w(offs_t offset, uint8_t data)
 {
-	if(offset < m_extram_size)
+	if (offset < m_extram_size)
 		m_ext_work_ram[offset] = data;
 }
 
@@ -387,25 +401,25 @@ void pc8801_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).lrw8(
 		NAME([this] (offs_t offset) {
-			if(m_extram_mode & 1)
+			if (m_extram_mode & 1)
 				return ext_wram_r(offset | (m_extram_bank * 0x8000));
 
-			if(m_gfx_ctrl & 2)
+			if (m_gfx_ctrl & 2)
 				return wram_r(offset);
 
-			if(cdbios_rom_enable())
+			if (cdbios_rom_enable())
 				return cdbios_rom_r(offset & 0x7fff);
 
-			if(m_gfx_ctrl & 4)
+			if (m_gfx_ctrl & 4)
 				return nbasic_rom_r(offset);
 
-			if(offset >= 0x6000 && offset <= 0x7fff && ((m_ext_rom_bank & 1) == 0))
+			if (offset >= 0x6000 && offset <= 0x7fff && ((m_ext_rom_bank & 1) == 0))
 				return n88basic_rom_r(0x8000 + (offset & 0x1fff) + (0x2000 * (m_misc_ctrl & 3)));
 
 			return n88basic_rom_r(offset);
 		}),
 		NAME([this] (offs_t offset, uint8_t data) {
-			if(m_extram_mode & 0x10)
+			if (m_extram_mode & 0x10)
 				ext_wram_w(offset | (m_extram_bank * 0x8000), data);
 			else
 				wram_w(offset, data);
@@ -426,7 +440,7 @@ void pc8801_state::main_map(address_map &map)
 			const uint16_t window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
 
 			// castlex and imenes accesses this
-			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
+			if (((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
 				return high_wram_r(window_offset & 0xfff);
 
 			return wram_r(window_offset);
@@ -435,7 +449,7 @@ void pc8801_state::main_map(address_map &map)
 			const uint16_t window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
 
 			// castlex and imenes accesses this
-			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
+			if (((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
 				high_wram_w(window_offset & 0xfff, data);
 			else
 				wram_w(window_offset, data);
@@ -446,7 +460,7 @@ void pc8801_state::main_map(address_map &map)
 
 uint8_t pc8801_state::wram_c000_r(offs_t offset)
 {
-	if((offset & 0x3000) == 0x3000 && (m_misc_ctrl & 0x10))
+	if ((offset & 0x3000) == 0x3000 && (m_misc_ctrl & 0x10))
 		return high_wram_r(offset & 0xfff);
 
 	return wram_r(offset + 0xc000);
@@ -454,7 +468,7 @@ uint8_t pc8801_state::wram_c000_r(offs_t offset)
 
 void pc8801_state::wram_c000_w(offs_t offset, uint8_t data)
 {
-	if((offset & 0x3000) == 0x3000 && (m_misc_ctrl & 0x10))
+	if ((offset & 0x3000) == 0x3000 && (m_misc_ctrl & 0x10))
 	{
 		high_wram_w(offset & 0xfff, data);
 		return;
@@ -541,6 +555,8 @@ uint8_t pc8801_state::port40_r()
 	data |= m_centronics_busy;
 //  data |= m_centronics_ack << 1;
 	data |= ioport("CTRL")->read() & 0xca;
+	// bit 2 is CMT CDIN, the tape input comparator (inherited from pc8001)
+	data |= cmt_cdin_r() << 2;
 	data |= m_rtc->data_out_r() << 4;
 	data |= m_crtc->vrtc_r() << 5;
 	// TODO: enable line from pc80s31k (bit 3, active_low)
@@ -572,16 +588,16 @@ void pc8801_state::port40_w(uint8_t data)
 	m_rtc->stb_w(BIT(data, 1));
 	m_rtc->clk_w(BIT(data, 2));
 
-	if(((m_device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
+	if (((m_device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
 		m_beeper->set_state(1);
 
-	if(((m_device_ctrl_data & 0x20) == 0x20) && ((data & 0x20) == 0x00))
+	if (((m_device_ctrl_data & 0x20) == 0x20) && ((data & 0x20) == 0x00))
 		m_beeper->set_state(0);
 
 	m_mouse_port->pin_8_w(BIT(data, 6));
 
 	// TODO: is SING a buzzer mask? bastard leaves beeper to ON state otherwise
-	if(m_device_ctrl_data & 0x80)
+	if (m_device_ctrl_data & 0x80)
 		m_beeper->set_state(0);
 
 	m_device_ctrl_data = data;
@@ -602,29 +618,6 @@ void pc8801_state::flush_gvram_access()
 {
 	m_gvram_bank->set_bank(m_vram_sel);
 }
-
-void pc8801_state::irq_level_w(uint8_t data)
-{
-	m_pic->b_sgs_w(~data);
-}
-
-/*
- * ---- -x-- /RXMF RXRDY irq mask
- * ---- --x- /VRMF VRTC irq mask
- * ---- ---x /RTMF Real-time clock irq mask
- *
- */
-void pc8801_state::irq_mask_w(uint8_t data)
-{
-	m_irq_state.enable &= ~7;
-	// mapping reversed to the correlated irq levels
-	m_irq_state.enable |= bitswap<3>(data & 7, 0, 1, 2);
-
-	check_irq(RXRDY_IRQ_LEVEL);
-	check_irq(VRTC_IRQ_LEVEL);
-	check_irq(CLOCK_IRQ_LEVEL);
-}
-
 
 uint8_t pc8801_state::window_bank_r()
 {
@@ -697,9 +690,9 @@ void pc8801_state::bgpal_w(uint8_t data)
 
 void pc8801_state::palram_w(offs_t offset, uint8_t data)
 {
-	if(m_misc_ctrl & 0x20) //analog palette
+	if (m_misc_ctrl & 0x20) //analog palette
 	{
-		if((data & 0x40) == 0)
+		if ((data & 0x40) == 0)
 		{
 			m_palram[offset].b = data & 0x7;
 			m_palram[offset].r = (data & 0x38) >> 3;
@@ -711,9 +704,9 @@ void pc8801_state::palram_w(offs_t offset, uint8_t data)
 	}
 	else //digital palette
 	{
-		m_palram[offset].b = data & 1 ? 7 : 0;
-		m_palram[offset].r = data & 2 ? 7 : 0;
-		m_palram[offset].g = data & 4 ? 7 : 0;
+		m_palram[offset].b = (data & 1) ? 7 : 0;
+		m_palram[offset].r = (data & 2) ? 7 : 0;
+		m_palram[offset].g = (data & 4) ? 7 : 0;
 	}
 
 	// TODO: What happens to the palette contents when the analog/digital palette mode changes?
@@ -772,7 +765,7 @@ void pc8801_state::extram_bank_w(uint8_t data)
  */
 template <unsigned kanji_level> uint8_t pc8801_state::kanji_r(offs_t offset)
 {
-	if((offset & 2) == 0)
+	if ((offset & 2) == 0)
 	{
 		const u8 *kanji_rom = kanji_level ? m_kanji_lv2_rom : m_kanji_rom;
 		const u32 kanji_address = (m_knj_addr[kanji_level] * 2) + ((offset & 1) ^ 1);
@@ -784,7 +777,7 @@ template <unsigned kanji_level> uint8_t pc8801_state::kanji_r(offs_t offset)
 
 template <unsigned kanji_level> void pc8801_state::kanji_w(offs_t offset, uint8_t data)
 {
-	if((offset & 2) == 0)
+	if ((offset & 2) == 0)
 	{
 		m_knj_addr[kanji_level] = (
 			((offset & 1) == 0) ?
@@ -797,201 +790,13 @@ template <unsigned kanji_level> void pc8801_state::kanji_w(offs_t offset, uint8_
 	// https://retrocomputerpeople.web.fc2.com/machines/nec/8801/io_map88.html
 }
 
-/*
- * PC-8801mkIISR overrides (ALU)
- */
-
-uint8_t pc8801mk2sr_state::alu_r(offs_t offset)
-{
-	uint8_t b, r, g;
-
-	// ignore for debugger, wouldn't make sense anyway
-	if (machine().side_effects_disabled())
-		return 0xff;
-
-	offset &= 0x3fff;
-
-	/* store data to ALU regs */
-	for(int i = 0; i < 3; i++)
-		m_alu_reg[i] = m_gvram[i*0x4000 + offset];
-
-	b = m_alu_reg[0];
-	r = m_alu_reg[1];
-	g = m_alu_reg[2];
-	if(!(m_alu_ctrl2 & 1)) { b^=0xff; }
-	if(!(m_alu_ctrl2 & 2)) { r^=0xff; }
-	if(!(m_alu_ctrl2 & 4)) { g^=0xff; }
-
-	return b & r & g;
-}
-
-void pc8801mk2sr_state::alu_w(offs_t offset, uint8_t data)
-{
-	int i;
-
-	offset &= 0x3fff;
-
-	// ALU write mode
-	switch(m_alu_ctrl2 & 0x30)
-	{
-		// logic operation
-		case 0x00:
-		{
-			uint8_t logic_op;
-
-			for(i = 0; i < 3; i++)
-			{
-				logic_op = (m_alu_ctrl1 & (0x11 << i)) >> i;
-
-				switch(logic_op)
-				{
-					case 0x00: { m_gvram[i*0x4000 + offset] &= ~data; } break;
-					case 0x01: { m_gvram[i*0x4000 + offset] |= data; } break;
-					case 0x10: { m_gvram[i*0x4000 + offset] ^= data; } break;
-					case 0x11: break; // NOP
-				}
-			}
-		}
-		break;
-
-		// restore data from ALU regs
-		case 0x10:
-		{
-			for(i = 0; i < 3; i++)
-				m_gvram[i*0x4000 + offset] = m_alu_reg[i];
-		}
-		break;
-
-		// swap ALU reg 1 into R GVRAM
-		case 0x20:
-			m_gvram[0x0000 + offset] = m_alu_reg[1];
-			break;
-
-		// swap ALU reg 0 into B GVRAM
-		case 0x30:
-			m_gvram[0x4000 + offset] = m_alu_reg[0];
-			break;
-	}
-}
-
-void pc8801mk2sr_state::alu_ctrl1_w(uint8_t data)
-{
-	m_alu_ctrl1 = data;
-}
-
-void pc8801mk2sr_state::alu_ctrl2_w(uint8_t data)
-{
-	m_alu_ctrl2 = data;
-	flush_gvram_access();
-}
-
-void pc8801mk2sr_state::flush_gvram_access()
-{
-	if (BIT(m_misc_ctrl, 6))
-	{
-		if (BIT(m_alu_ctrl2, 7))
-		{
-			m_alu_view.select(0);
-		}
-		else
-		{
-			m_alu_view.disable();
-		}
-
-		// NOTE: ALU enabled wins over GVRAM, to the point of disabling its latch when setting changes
-		m_vram_sel = 3;
-	}
-	else
-		m_alu_view.disable();
-
-	pc8801_state::flush_gvram_access();
-}
-
-
-void pc8801mk2sr_state::main_map(address_map &map)
-{
-	pc8801_state::main_map(map);
-	map(0xc000, 0xffff).view(m_alu_view);
-	m_alu_view[0](0xc000, 0xffff).rw(FUNC(pc8801mk2sr_state::alu_r), FUNC(pc8801mk2sr_state::alu_w));
-}
-
-
-/*
- * PC8801FH overrides (CPU clock switch & setup mode)
- */
-
-void pc8801fh_state::main_map(address_map &map)
-{
-	pc8801mk2sr_state::main_map(map);
-	map(0x0000, 0x7fff).view(m_setup_mem_view);
-	m_setup_mem_view[0](0x0000, 0x7fff).rom().region("setup", 0);
-}
-
-uint8_t pc8801fh_state::cpuclock_r()
-{
-	return 0x10 | m_clock_setting;
-}
-
-uint8_t pc8801fh_state::baudrate_r()
-{
-	return 0xf0 | m_baudrate_val;
-}
-
-void pc8801fh_state::baudrate_w(uint8_t data)
-{
-	m_baudrate_val = data & 0xf;
-}
-
-/*
- * PC8801MA overrides (dictionary)
- */
-
-inline uint8_t pc8801ma_state::dictionary_rom_r(offs_t offset)
-{
-	return m_dictionary_rom[offset + ((m_dic_bank & 0x1f) * 0x4000)];
-}
-
-void pc8801ma_state::dic_bank_w(uint8_t data)
-{
-	m_dic_bank = data & 0x1f;
-}
-
-void pc8801ma_state::dic_ctrl_w(uint8_t data)
-{
-	m_dic_ctrl = (data ^ 1) & 1;
-}
-
-uint8_t pc8801ma_state::wram_c000_r(offs_t offset)
-{
-	// overlays at Work RAM level (GVRAM and ALU wins over this) and on reads only
-	if (m_dic_ctrl)
-		return dictionary_rom_r(offset);
-
-	// assume unchanged vs. vanilla PC-8801
-	return pc8801fh_state::wram_c000_r(offset);
-}
-
-/*
- * PC8801MC overrides (CD-ROM)
- */
-
-inline uint8_t pc8801mc_state::cdbios_rom_r(offs_t offset)
-{
-	return m_cdrom_bios[offset | ((m_gfx_ctrl & 4) ? 0x8000 : 0x0000)];
-}
-
-inline bool pc8801mc_state::cdbios_rom_enable()
-{
-	return m_cdrom_bank;
-}
-
 void pc8801_state::main_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0x00, 0x0f).r("kbd", FUNC(pc8001_kbd_device::read_direct));
 	map(0x10, 0x10).w(FUNC(pc8801_state::port10_w));
-	map(0x20, 0x21).mirror(0x0e).rw(m_usart, FUNC(i8251_device::read), FUNC(i8251_device::write)); // CMT / RS-232C ch. 0
+	map(0x20, 0x21).mirror(0x0e).r(m_usart, FUNC(i8251_device::read)).w(FUNC(pc8801_state::usart_w)); // CMT / RS-232C ch. 0
 	map(0x30, 0x30).portr("DSW1").w(FUNC(pc8801_state::port30_w));
 	map(0x31, 0x31).portr("DSW2").w(FUNC(pc8801_state::port31_w));
 	map(0x32, 0x32).rw(FUNC(pc8801_state::misc_ctrl_r), FUNC(pc8801_state::misc_ctrl_w));
@@ -1050,13 +855,98 @@ void pc8801_state::main_io(address_map &map)
 	map(0xfc, 0xff).m(m_pc80s31, FUNC(pc80s31_device::host_map));
 }
 
+/*
+ * PC-8801mkIISR overrides (ALU)
+ */
+
+void pc8801mk2sr_state::alu_ctrl2_w(uint8_t data)
+{
+	m_alu->ctrl2_w(data);
+	m_alu_gam = BIT(data, 7);
+	flush_gvram_access();
+}
+
+void pc8801mk2sr_state::flush_gvram_access()
+{
+	if (BIT(m_misc_ctrl, 6))
+	{
+		if (m_alu_gam)
+		{
+			m_alu_view.select(0);
+		}
+		else
+		{
+			m_alu_view.disable();
+		}
+
+		// NOTE: ALU enabled wins over GVRAM, to the point of disabling its latch when setting changes
+		m_vram_sel = 3;
+	}
+	else
+		m_alu_view.disable();
+
+	pc8801_state::flush_gvram_access();
+}
+
+
+void pc8801mk2sr_state::main_map(address_map &map)
+{
+	pc8801_state::main_map(map);
+	map(0xc000, 0xffff).view(m_alu_view);
+	m_alu_view[0](0xc000, 0xffff).rw(m_alu, FUNC(pc88_alu_device::alu_r), FUNC(pc88_alu_device::alu_w));
+}
+
 void pc8801mk2sr_state::main_io(address_map &map)
 {
 	pc8801_state::main_io(map);
-	map(0x34, 0x34).w(FUNC(pc8801mk2sr_state::alu_ctrl1_w));
+	map(0x34, 0x34).w(m_alu, FUNC(pc88_alu_device::ctrl1_w));
 	map(0x35, 0x35).w(FUNC(pc8801mk2sr_state::alu_ctrl2_w));
 
 	map(0x44, 0x45).rw(m_opn, FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+}
+
+
+/*
+ * PC8801FH overrides (CPU clock switch & setup mode)
+ */
+
+void pc8801fh_state::main_map(address_map &map)
+{
+	pc8801mk2sr_state::main_map(map);
+	map(0x0000, 0x7fff).view(m_setup_mem_view);
+	m_setup_mem_view[0](0x0000, 0x7fff).rom().region("setup", 0);
+}
+
+// x--- ---- <unknown> On MC prints "change CPU clock" if bit 7 high. MA tests it as well.
+// ---x ---- <unknown> MC writes on it
+// ---- ---x Current CPU speed setting
+uint8_t pc8801fh_state::cpuclock_r()
+{
+	return 0x10 | m_clock_setting;
+}
+
+/*
+ * ---- xxxx baud rate
+ * ---- 1000 19200 bps
+ * ---- 0111 9600 bps
+ * ---- 0110 4800 bps
+ * ---- 0101 2400 bps
+ * ---- 0100 1200 bps
+ * ---- 0011 600 bps
+ * ---- 0010 300 bps
+ * ---- 0001 150 bps
+ * ---- 0000 75 bps
+ * ---- 1xxx <invalid>
+ */
+uint8_t pc8801fh_state::baudrate_r()
+{
+	return 0xf0 | m_baudrate_val;
+}
+
+void pc8801fh_state::baudrate_w(uint8_t data)
+{
+	m_baudrate_val = data & 0xf;
+	// TODO: change clock for RS-232C
 }
 
 void pc8801fh_state::main_io(address_map &map)
@@ -1066,6 +956,7 @@ void pc8801fh_state::main_io(address_map &map)
 	// $11, $12, $13 written to at startup, unknown purpose
 	m_setup_io_view[0](0x11, 0x11).lr8(NAME([this] (offs_t offset) {
 		// bit 7: unknown, read at startup, flips $9002 to 0x80
+		// on MC bit 7 high will disable CD-ROM, concealing its option in setup menu.
 		return m_eeprom->do_read();
 	}));
 	m_setup_io_view[0](0x14, 0x14).lw8(NAME([this] (offs_t offset, u8 data) {
@@ -1074,13 +965,43 @@ void pc8801fh_state::main_io(address_map &map)
 		m_eeprom->cs_write(BIT(data, 2));
 	}));
 	m_setup_io_view[0](0x15, 0x15).lw8(NAME([this] (offs_t offset, u8 data) { m_setup_mem_view.disable(); m_setup_io_view.disable(); }));
-	map(0x34, 0x34).w(FUNC(pc8801fh_state::alu_ctrl1_w));
+	map(0x34, 0x34).w(m_alu, FUNC(pc88_alu_device::ctrl1_w));
 	map(0x35, 0x35).w(FUNC(pc8801fh_state::alu_ctrl2_w));
 
 	map(0x44, 0x47).rw(m_opna, FUNC(ym2608_device::read), FUNC(ym2608_device::write));
 
 	map(0x6e, 0x6e).r(FUNC(pc8801fh_state::cpuclock_r));
 	map(0x6f, 0x6f).rw(FUNC(pc8801fh_state::baudrate_r), FUNC(pc8801fh_state::baudrate_w));
+}
+
+
+/*
+ * PC8801MA overrides (dictionary)
+ */
+
+inline uint8_t pc8801ma_state::dictionary_rom_r(offs_t offset)
+{
+	return m_dictionary_rom[offset + ((m_dic_bank & 0x1f) * 0x4000)];
+}
+
+void pc8801ma_state::dic_bank_w(uint8_t data)
+{
+	m_dic_bank = data & 0x1f;
+}
+
+void pc8801ma_state::dic_ctrl_w(uint8_t data)
+{
+	m_dic_ctrl = (data ^ 1) & 1;
+}
+
+uint8_t pc8801ma_state::wram_c000_r(offs_t offset)
+{
+	// overlays at Work RAM level (GVRAM and ALU wins over this) and on reads only
+	if (m_dic_ctrl)
+		return dictionary_rom_r(offset);
+
+	// assume unchanged vs. vanilla PC-8801
+	return pc8801fh_state::wram_c000_r(offset);
 }
 
 void pc8801ma_state::main_io(address_map &map)
@@ -1091,11 +1012,46 @@ void pc8801ma_state::main_io(address_map &map)
 	map(0xf1, 0xf1).w(FUNC(pc8801ma_state::dic_ctrl_w));
 }
 
+/*
+ * PC8801MC overrides (CD-ROM)
+ */
+
+inline uint8_t pc8801mc_state::cdbios_rom_r(offs_t offset)
+{
+	return m_cdrom_bios[offset | ((m_gfx_ctrl & 4) ? 0x8000 : 0x0000)];
+}
+
+inline bool pc8801mc_state::cdbios_rom_enable()
+{
+	return m_cdrom_bank;
+}
+
+void pc8801mc_state::main_map(address_map &map)
+{
+	pc8801ma_state::main_map(map);
+	// range unconfirmed
+	// really looks 0x00~0x2f in size, while 0x30~0x5f is just a copy for checking if SRAM works?
+	// 0x60~0x7f unused by this point.
+	map(0xe000, 0xe07f).view(m_memsw_view);
+	m_memsw_view[0](0xe000, 0xe07f).rw("memsw", FUNC(pc8801mc_memsw_device::read), FUNC(pc8801mc_memsw_device::write));
+}
+
 void pc8801mc_state::main_io(address_map &map)
 {
 	pc8801ma_state::main_io(map);
 	map(0x90, 0x9f).m(m_cdrom_if, FUNC(pc8801_31_device::amap));
+	// TODO: verify if it also requires the setup view to be enabled
+	map(0xf2, 0xf2).lw8(NAME([this] (offs_t offset, u8 data) {
+		if (!BIT(data, 0))
+			m_memsw_view.select(0);
+		else
+			m_memsw_view.disable();
+	}));
 }
+
+/*
+ * OPNA memory map
+ */
 
 void pc8801fh_state::opna_map(address_map &map)
 {
@@ -1126,9 +1082,9 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	// TODO: these really maps to "general purpose inputs" UIP1 / UIP2
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-//	PORT_DIPNAME( 0x40, 0x40, "Memory wait" )
-//	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x40, 0x40, "Memory wait" )
+//  PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Disable CMD SING" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1155,12 +1111,12 @@ static INPUT_PORTS_START( pc8801 )
 	// vanilla PC8801 and mkII doesn't have V2
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-//	PORT_DIPNAME( 0x40, 0x40, "BASIC speed select" ) PORT_DIPLOCATION("SW3:1") // actually SW3:0!
-//	PORT_DIPSETTING(    0x40, "High Speed Mode (V1H, V2)" )
-//	PORT_DIPSETTING(    0x00, "Standard Mode (V1S)" )
-//	PORT_DIPNAME( 0x80, 0x00, "BASIC Version select" ) PORT_DIPLOCATION("SW4:2")
-//	PORT_DIPSETTING(    0x80, "V1 Mode" )
-//	PORT_DIPSETTING(    0x00, "V2 Mode" )
+//  PORT_DIPNAME( 0x40, 0x40, "BASIC speed select" ) PORT_DIPLOCATION("SW3:1") // actually SW3:0!
+//  PORT_DIPSETTING(    0x40, "High Speed Mode (V1H, V2)" )
+//  PORT_DIPSETTING(    0x00, "Standard Mode (V1S)" )
+//  PORT_DIPNAME( 0x80, 0x00, "BASIC Version select" ) PORT_DIPLOCATION("SW4:2")
+//  PORT_DIPSETTING(    0x80, "V1 Mode" )
+//  PORT_DIPSETTING(    0x00, "V2 Mode" )
 
 	PORT_START("CTRL")
 	PORT_DIPNAME( 0x02, 0x02, "Monitor Type" )
@@ -1175,6 +1131,8 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	// TODO: Coming from the old legacy driver as "EXSWITCH", where this maps?
+	// On FH+ machines this is driven by the BIOS SDIP itself (changed in port $6f)
+	// On mk2SR and earlier: fixed at 300 bps or expects a RS-232C card with physical dips?
 	PORT_START("CFG")
 	#if 0
 	PORT_DIPNAME( 0x0f, 0x08, "Serial speed" )
@@ -1188,9 +1146,9 @@ static INPUT_PORTS_START( pc8801 )
 	PORT_DIPSETTING(    0x08, "9600bps" )
 	PORT_DIPSETTING(    0x09, "19200bps" )
 	#endif
-//	PORT_DIPNAME( 0x40, 0x40, "Speed mode" )
-//	PORT_DIPSETTING(    0x00, "Slow" )
-//	PORT_DIPSETTING(    0x40, DEF_STR( High ) )
+//  PORT_DIPNAME( 0x40, 0x40, "Speed mode" )
+//  PORT_DIPSETTING(    0x00, "Slow" )
+//  PORT_DIPSETTING(    0x40, DEF_STR( High ) )
 
 	PORT_START("MEM")
 	PORT_CONFNAME( 0x0f, 0x0a, "Extension memory" )
@@ -1241,6 +1199,40 @@ static INPUT_PORTS_START( pc8801fh )
 	PORT_DIPSETTING(    0x80, "4MHz" )
 	PORT_DIPSETTING(    0x00, "8MHz" )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( pc8801ma )
+	PORT_INCLUDE( pc8801fh )
+
+	PORT_MODIFY("DSW1")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("eeprom", FUNC(pc88_sdip_device::memory_weight_r))
+	PORT_BIT( 0x3e, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("eeprom", FUNC(pc88_sdip_device::dsw1_r))
+
+	PORT_MODIFY("DSW2")
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("eeprom", FUNC(pc88_sdip_device::dsw2_r))
+
+	PORT_MODIFY("CTRL")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("eeprom", FUNC(pc88_sdip_device::auto_boot_floppy_r))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pc8801mc )
+	PORT_INCLUDE( pc8801fh )
+
+	PORT_MODIFY("DSW1")
+	PORT_BIT( 0x7e, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("memsw", FUNC(pc8801mc_memsw_device::dsw1_r))
+	// TODO: is bit 0 (N88/N Basic switch) even available on MC?
+	// TODO: CMD SING should be available from the advanced setup menu
+
+	PORT_MODIFY("DSW2")
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("memsw", FUNC(pc8801mc_memsw_device::dsw2_r))
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("memsw", FUNC(pc8801mc_memsw_device::boot_mode_r))
+
+	PORT_MODIFY("CTRL")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("memsw", FUNC(pc8801mc_memsw_device::auto_boot_floppy_r))
+
+	PORT_MODIFY("CFG")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("memsw", FUNC(pc8801mc_memsw_device::cpu_clock_r))
+INPUT_PORTS_END
+
 
 /* Graphics Layouts */
 
@@ -1304,10 +1296,6 @@ void pc8801_state::machine_start()
 	save_item(STRUCT_MEMBER(m_palram, r));
 	save_item(STRUCT_MEMBER(m_palram, g));
 	save_item(STRUCT_MEMBER(m_palram, b));
-	save_item(STRUCT_MEMBER(m_irq_state, enable));
-	save_item(STRUCT_MEMBER(m_irq_state, pending));
-	save_item(NAME(m_sound_irq_enable));
-	save_item(NAME(m_sound_irq_pending));
 }
 
 void pc8801_state::machine_reset()
@@ -1331,15 +1319,7 @@ void pc8801_state::machine_reset()
 
 	m_beeper->set_state(0);
 
-	// initialize irq section
-	{
-		m_pic->etlg_w(1);
-		m_pic->inte_w(1);
-		m_irq_state.pending = 0;
-		m_irq_state.enable = 0;
-		m_sound_irq_enable = false;
-		m_sound_irq_pending = false;
-	}
+	picu_reset();
 
 	{
 		m_extram_bank = 0;
@@ -1360,9 +1340,7 @@ void pc8801mk2sr_state::machine_start()
 {
 	pc8801_state::machine_start();
 
-	save_pointer(NAME(m_alu_reg), 3);
-	save_item(NAME(m_alu_ctrl1));
-	save_item(NAME(m_alu_ctrl2));
+	save_item(NAME(m_alu_gam));
 }
 
 void pc8801mk2sr_state::machine_reset()
@@ -1370,9 +1348,7 @@ void pc8801mk2sr_state::machine_reset()
 	pc8801_state::machine_reset();
 
 	// initialize ALU, assume disabled by default
-	for(int i = 0; i < 3; i++)
-		m_alu_reg[i] = 0x00;
-	m_alu_ctrl1 = m_alu_ctrl2 = 0;
+	m_alu_gam = 0;
 
 	m_alu_view.disable();
 }
@@ -1439,6 +1415,7 @@ void pc8801mc_state::machine_reset()
 
 	// Hold STOP during boot to bypass CDROM BIOS at POST (PC=0x10)
 	m_cdrom_bank = true;
+	m_memsw_view.disable();
 }
 
 // DE-9 mouse port on front panel (labelled "マウス") - MSX-compatible
@@ -1464,98 +1441,6 @@ void pc8801_state::txdata_callback(int state)
 	//m_cassette->output( (state) ? 1.0 : -1.0);
 }
 
-void pc8801_state::rxrdy_irq_w(int state)
-{
-	if (state)
-		assert_irq(RXRDY_IRQ_LEVEL);
-}
-
-/*
- * 0 RXRDY
- * 1 VRTC
- * 2 CLOCK
- * 3 INT3 (GSX-8800)
- * 4 INT4 (any OPN, external boards included with different irq mask at $aa)
- * 5 INT5
- * 6 FDCINT1
- * 7 FDCINT2
- *
- */
-IRQ_CALLBACK_MEMBER(pc8801_state::int_ack_cb)
-{
-	// TODO: schematics sports a μPB8212 too, with DI2-DI4 connected to 8214 A0-A2
-	// Seems just an intermediate bridge for translating raw levels to vectors
-	// with no access from outside world?
-	u8 level = m_pic->a_r();
-	m_pic->r_w(level, 1);
-
-	return (7 - level) * 2;
-}
-
-void pc8801_state::int4_irq_w(int state)
-{
-	bool irq_state = m_sound_irq_enable & state;
-
-	// remember current setting so that an enable reg variation will pick up
-	// particularly needed by Telenet games (xzr2, valis2)
-	// TODO: understand how exactly the external irq source works out (Sound Board II)
-	// has a separate irq mask for secondary OPNA but still sends INT4s,
-	// we separate the logic from the others since this exact function needs templatized array for enable and pending anyway
-	// (and won't otherwise work for xzr2 anyway).
-	m_pic->r_w(7 ^ INT4_IRQ_LEVEL, !irq_state);
-	m_sound_irq_pending = state;
-}
-
-// FIXME: convert to pure write-line-style member
-// Works with 0 -> 1 F/F transitions
-TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::clock_irq_w)
-{
-	// TODO: castlex sound notes in BGM loop are pretty erratic
-	// (uses clock irq instead of the dedicated INT4, started happening on last OPN rewrite, is it just missing some interpolation in the sound core?
-	assert_irq(CLOCK_IRQ_LEVEL);
-}
-
-void pc8801_state::check_irq(u8 level)
-{
-	u8 mask = 1 << level;
-
-	// megamit and babylon are particularly fussy if the VRTC irq isn't disabled when requested
-	// - megamit jumps to PC=0
-	// - babylon has just a ret coded in the VRTC irq, so accepting that will wreck the program flow and hang at title screen with no sound (because it expects INT4s)
-	if (!(m_irq_state.enable & mask))
-		m_pic->r_w(7 ^ level, 1);
-	else if (m_irq_state.enable & m_irq_state.pending & mask)
-		assert_irq(level);
-}
-
-void pc8801_state::assert_irq(u8 level)
-{
-	u8 mask = 1 << level;
-
-	if (mask & m_irq_state.enable)
-	{
-		m_irq_state.pending &= ~mask;
-		m_pic->r_w(7 ^ level, 0);
-	}
-	else
-		m_irq_state.pending |= mask;
-}
-
-void pc8801_state::vrtc_irq_w(int state)
-{
-//  bool irq_state = m_vrtc_irq_enable & state;
-	if (state)
-	{
-		assert_irq(VRTC_IRQ_LEVEL);
-	}
-}
-
-void pc8801_state::irq_w(int state)
-{
-	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 void pc8801_state::pc8801(machine_config &config)
 {
 	Z80(config, m_maincpu, MASTER_CLOCK); // ~4 MHz, selectable to ~8 MHz on late models
@@ -1564,15 +1449,14 @@ void pc8801_state::pc8801(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(pc8801_state::int_ack_cb));
 
 	PC80S31(config, m_pc80s31, MASTER_CLOCK);
-//  config.set_perfect_quantum(m_maincpu);
 	// TODO: get rid of this
 	config.set_perfect_quantum("pc80s31:fdc_cpu");
 
 //  config.set_maximum_quantum(attotime::from_hz(MASTER_CLOCK/1024));
 
-	I8214(config, m_pic, MASTER_CLOCK);
-	m_pic->int_wr_callback().set(FUNC(pc8801_state::irq_w));
-	m_pic->set_int_dis_hack(true);
+	I8214(config, m_picu, MASTER_CLOCK);
+	m_picu->int_wr_callback().set_inputline(m_maincpu, 0);
+	m_picu->set_int_dis_hack(true);
 
 	UPD1990A(config, m_rtc);
 
@@ -1583,9 +1467,9 @@ void pc8801_state::pc8801(machine_config &config)
 	OUTPUT_LATCH(config, m_cent_data_out);
 	m_centronics->set_output_latch(*m_cent_data_out);
 
-	// TODO: needs T88 format support
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_formats(t88_cassette_formats);
 	m_cassette->set_interface("pc8801_cass");
 
 	// TODO: clock, receiver handler, DCD?
@@ -1593,7 +1477,7 @@ void pc8801_state::pc8801(machine_config &config)
 	m_usart->txd_handler().set(FUNC(pc8801_state::txdata_callback));
 	m_usart->rxrdy_handler().set(FUNC(pc8801_state::rxrdy_irq_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 //  m_screen->set_raw(PIXEL_CLOCK_24KHz,848,0,640,448,0,400);
 	m_screen->set_raw(PIXEL_CLOCK_15KHz, 896, 0, 640, 260, 0, 200);
 	m_screen->set_screen_update(FUNC(pc8801_state::screen_update));
@@ -1609,7 +1493,7 @@ void pc8801_state::pc8801(machine_config &config)
 	m_crtc->set_attribute_fetch_callback(FUNC(pc8801_state::attr_fetch));
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq2_w));
 	m_crtc->rvv_wr_callback().set(FUNC(pc8801_state::crtc_reverse_w));
-//  Note: 3301 isn't actually connected to INT so its internal irq mask doesn't have any effect in PC88
+//  Note: 3301 isn't actually connected to INT so its internal irq mask doesn't have any effect in PC-88
 	m_crtc->vrtc_wr_callback().set(FUNC(pc8801_state::vrtc_irq_w));
 	m_crtc->set_screen(m_screen);
 
@@ -1646,20 +1530,25 @@ void pc8801_state::pc8801(machine_config &config)
 
 	PC8801_EXP_SLOT(config, m_exp, pc8801_exp_devices, nullptr);
 	m_exp->set_iospace(m_maincpu, AS_IO);
-	m_exp->int3_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT3_IRQ_LEVEL, !state); });
-	m_exp->int4_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT4_IRQ_LEVEL, !state); });
-	m_exp->int5_callback().set([this] (bool state) { m_pic->r_w(7 ^ INT5_IRQ_LEVEL, !state); });
+	m_exp->int3_callback().set([this] (bool state) { m_picu->r_w(7 ^ INT3_IRQ_LEVEL, !state); });
+	m_exp->int4_callback().set([this] (bool state) { m_picu->r_w(7 ^ INT4_IRQ_LEVEL, !state); });
+	m_exp->int5_callback().set([this] (bool state) { m_picu->r_w(7 ^ INT5_IRQ_LEVEL, !state); });
 
 	SOFTWARE_LIST(config, "tape_list").set_original("pc8801_cass");
 	SOFTWARE_LIST(config, "disk_n88_list").set_original("pc8801_flop");
 	SOFTWARE_LIST(config, "disk_n88_orig_list").set_original("pc8801_flop_orig");
 	SOFTWARE_LIST(config, "disk_n_list").set_compatible("pc8001_flop");
+	SOFTWARE_LIST(config, "cass_n_list").set_compatible("pc8001_cass");
 	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("pc8801");
 }
 
 void pc8801mk2sr_state::pc8801mk2sr(machine_config &config)
 {
 	pc8801(config);
+
+	PC88_ALU(config, m_alu, 0);
+	m_alu->gvram_read_cb().set([this] (offs_t offset) { return m_gvram[offset]; });
+	m_alu->gvram_write_cb().set([this] (offs_t offset, u8 data) { m_gvram[offset] = data; });
 
 	YM2203(config, m_opn, MASTER_CLOCK);
 	m_opn->irq_handler().set(FUNC(pc8801mk2sr_state::int4_irq_w));
@@ -1688,7 +1577,7 @@ void pc8801fh_state::pc8801fh(machine_config &config)
 {
 	pc8801mk2mr(config);
 
-	EEPROM_93C06_16BIT(config, m_eeprom); // NMC9306N
+	PC88_SDIP(config, m_eeprom); // NMC9306N
 
 	PC8801FH_KBD(config.replace(), "kbd");
 
@@ -1721,6 +1610,12 @@ void pc8801ma_state::pc8801ma(machine_config &config)
 void pc8801mc_state::pc8801mc(machine_config &config)
 {
 	pc8801ma(config);
+
+	// pull ID line low otherwise setup menu won't work
+	pc8801fh_kbd_device &kbd(PC8801FH_KBD(config.replace(), "kbd"));
+	kbd.read_id().set_constant(0);
+
+	PC8801MC_MEMSW(config, m_memsw);
 
 	PC8801_31(config, m_cdrom_if);
 	m_cdrom_if->rom_bank_cb().set([this](bool state) { m_cdrom_bank = state; });
@@ -1835,6 +1730,7 @@ ROM_END
 
 ROM_START( pc8801mh )
 	ROM_REGION( 0x8000,  "setup", ROMREGION_ERASEFF )
+	ROM_LOAD( "setup.bin", 0x00000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x8000,  "n80rom", ROMREGION_ERASEFF ) // 1.8, but different BIOS code?
 	ROM_LOAD( "mh_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
@@ -1858,6 +1754,7 @@ ROM_END
 
 ROM_START( pc8801fa )
 	ROM_REGION( 0x8000,  "setup", ROMREGION_ERASEFF )
+	ROM_LOAD( "setup.bin", 0x00000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x8000,  "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "fa_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
@@ -1912,6 +1809,7 @@ ROM_END
 
 ROM_START( pc8801ma2 )
 	ROM_REGION( 0x8000,  "setup", ROMREGION_ERASEFF )
+	ROM_LOAD( "setup.bin", 0x00000, 0x8000, NO_DUMP )
 
 	ROM_REGION( 0x8000,  "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "ma2_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
@@ -1937,7 +1835,11 @@ ROM_START( pc8801ma2 )
 ROM_END
 
 ROM_START( pc8801mc )
+	ROM_REGION( 0x80000, "raw_bios", ROMREGION_ERASEFF )
+	ROM_LOAD( "hn62324bp.ic21", 0x00000, 0x80000, CRC(49924b82) SHA1(78bdae521d1fec7d459cec0aa4e4656bae836207) )
+
 	ROM_REGION( 0x8000,  "setup", ROMREGION_ERASEFF )
+	ROM_COPY( "raw_bios", 0x18000, 0, 0x8000 )
 
 	ROM_REGION( 0x08000, "n80rom", ROMREGION_ERASEFF ) // 1.8
 	ROM_LOAD( "mc_n80.rom",   0x0000, 0x8000, CRC(8a2a1e17) SHA1(06dae1db384aa29d81c5b6ed587877e7128fcb35) )
@@ -1962,6 +1864,7 @@ ROM_START( pc8801mc )
 	ROM_COPY( "kanji", 0x1000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x80000, "dictionary", 0 )
+	// d23c4000.ic23
 	ROM_LOAD( "mc_jisyo.rom", 0x00000, 0x80000, CRC(bd6eb062) SHA1(deef0cc2a9734ba891a6d6c022aa70ffc66f783e) )
 ROM_END
 
@@ -1989,6 +1892,23 @@ template <bool IS_DUMPED> void pc8801fh_state::init_setup_mode()
 	}
 }
 
+// Uses a linear form
+// 0x00000 - 0x07fff n88rom @ 0x0000
+// 0x08000 - 0x0ffff n80rom
+// 0x10000 - 0x17fff n88rom @ 0x8000
+// 0x18000 - 0x1ffff setup
+// 0x20000 - 0x2ffff CD BIOS
+// 0x30000 - 0x3bfff <blank>
+// 0x3c000 - 0x3dfff upper bank for FDC BIOS?
+// 0x3e000 - 0x3ffff FDC BIOS (match ma_disk.rom)
+// 0x40000 - 0x7ffff kanji/CG
+// hn62324bp.ic21 [4/4]      mc_kanji2.rom           IDENTICAL
+// hn62324bp.ic21 [3/4]      kanji1.rom              7.713318% (shuffled around looks like)
+void pc8801mc_state::init_pc8801mc()
+{
+	m_has_setup_mode = true;
+}
+
 COMP( 1981, pc8801,      0,      0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS ) // MIG for border, heavy V1 timing issues, has no floppy drive by default
 // PC-8801A (120V, USA & Canada) / PC-8801B (240V, Export?) for Western markets according to a NEC brochure
 COMP( 1983, pc8801mk2,   pc8801, 0,      pc8801,      pc8801, pc8801_state, empty_init,      "NEC",   "PC-8801mkII",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // as above but no border and with built-in floppy (mostly)
@@ -1999,15 +1919,15 @@ COMP( 1985, pc8801mk2sr, 0,           0,      pc8801mk2sr, pc8801mk2sr, pc8801mk
 COMP( 1985, pc8801mk2fr, pc8801mk2sr, 0,      pc8801mk2sr, pc8801mk2sr, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIFR", MACHINE_IMPERFECT_TIMING )
 COMP( 1985, pc8801mk2mr, pc8801mk2sr, 0,      pc8801mk2mr, pc8801mk2sr, pc8801mk2sr_state, empty_init, "NEC",   "PC-8801mkIIMR", MACHINE_IMPERFECT_TIMING )
 
-// internal OPNA + newer keyboard model.
+// internal OPNA + newer keyboard model + software dips
 //COMP( 1986, pc8801fh,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, init_setup_mode<false>, "NEC",   "PC-8801FH",     MACHINE_IMPERFECT_TIMING )
 COMP( 1986, pc8801mh,    0,        0,      pc8801fh,    pc8801fh, pc8801fh_state, init_setup_mode<false>, "NEC",   "PC-8801MH",     MACHINE_IMPERFECT_TIMING )
 COMP( 1987, pc8801fa,    pc8801mh, 0,      pc8801fh,    pc8801fh, pc8801fh_state, init_setup_mode<false>, "NEC",   "PC-8801FA",     MACHINE_IMPERFECT_TIMING )
-COMP( 1987, pc8801ma,    0,        0,      pc8801ma,    pc8801fh, pc8801ma_state, init_setup_mode<true>,  "NEC",   "PC-8801MA",     MACHINE_IMPERFECT_TIMING )
+COMP( 1987, pc8801ma,    0,        0,      pc8801ma,    pc8801ma, pc8801ma_state, init_setup_mode<true>,  "NEC",   "PC-8801MA",     MACHINE_IMPERFECT_TIMING )
 //COMP( 1988, pc8801fe,    pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, init_setup_mode<false>, "NEC",   "PC-8801FE",     MACHINE_IMPERFECT_TIMING )
-COMP( 1988, pc8801ma2,   pc8801ma, 0,      pc8801ma,    pc8801fh, pc8801ma_state, init_setup_mode<false>, "NEC",   "PC-8801MA2",    MACHINE_IMPERFECT_TIMING ) // missing SDIP-style BIOS bank?
+COMP( 1988, pc8801ma2,   pc8801ma, 0,      pc8801ma,    pc8801fh, pc8801ma_state, init_setup_mode<false>, "NEC",   "PC-8801MA2",    MACHINE_IMPERFECT_TIMING )
 //COMP( 1989, pc8801fe2,   pc8801ma, 0,      pc8801fa,    pc8801fh, pc8801ma_state, init_setup_mode<false>, "NEC",   "PC-8801FE2",    MACHINE_IMPERFECT_TIMING )
-COMP( 1989, pc8801mc,    pc8801ma, 0,      pc8801mc,    pc8801fh, pc8801mc_state, init_setup_mode<false>, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // missing SDIP-style BIOS bank, extra CD issues (dioscd essentially), otherwise same as MA
+COMP( 1989, pc8801mc,    0,        0,      pc8801mc,    pc8801mc, pc8801mc_state, init_pc8801mc, "NEC",   "PC-8801MC",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING ) // extra CD issues (dioscd essentially), otherwise same as MA
 
 // PC98DO (PC88+PC98, V33 + μPD70008AC)
 // belongs to own driver

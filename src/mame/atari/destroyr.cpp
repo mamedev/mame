@@ -489,7 +489,7 @@ void destroyr_state::destroyr(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 263, 0, 240);
 	m_screen->set_screen_update(FUNC(destroyr_state::screen_update));
 	m_screen->set_palette(m_palette);

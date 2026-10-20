@@ -273,9 +273,9 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu") { }
 
-	void ibm5160(machine_config &config);
-	void ibm5150(machine_config &config);
-	void ibm5140(machine_config &config);
+	void ibm5160(machine_config &config) ATTR_COLD;
+	void ibm5150(machine_config &config) ATTR_COLD;
+	void ibm5140(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

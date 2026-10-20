@@ -26,13 +26,18 @@ public:
 		INPUT_RES
 	};
 
-	va_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
+	// Typically, only OUTPUT_LPF4 (the output of the last stage) will be
+	// connected. But outputs of earlier stages are also available, since they
+	// are used in some filter configurations.
+	enum output_stream
+	{
+		OUTPUT_LPF1 = 0,
+		OUTPUT_LPF2,
+		OUTPUT_LPF3,
+		OUTPUT_LPF4
+	};
 
-	// Disables streams. Intended for using this filter in sound_stream_update()
-	// of other devices. The device that embeds this should call process_sample()
-	// for each sample in its stream, possibly after calling set_fixed_freq_cv()
-	// and set_fixed_res_cv().
-	va_lpf4_device &configure_streamless(u32 sample_rate) ATTR_COLD;
+	va_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
 
 	va_lpf4_device &configure_input_gain(float gain) ATTR_COLD;
 
@@ -58,12 +63,14 @@ public:
 	void set_fixed_freq_cv(float freq_cv);  // frequency in Hz
 	void set_fixed_res_cv(float res_cv);  // feedback gain (typically 0-4, but can go over 4)
 
+	// The control frequency can be scaled for each stage. This can be used to
+	// configure a different capacitor for each stage, for example, while still
+	// having a single frequency control signal.
+	// Stage 0 is the first stage, and stage 3 is the output stage.
+	void set_freq_scale(int stage, float scale);
+
 	float get_freq();  // Returns the cutoff frequency, in Hz.
 	float get_res();  // Returns the feedback gain (0-4).
-
-	// Processes a sample through the filter.
-	// This only works when in "streamless" mode. See configure_streamless().
-	sound_stream::sample_t process_sample(sound_stream::sample_t s);
 
 protected:
 	va_lpf4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
@@ -75,30 +82,31 @@ protected:
 	void sound_stream_update(sound_stream &stream) override;
 
 private:
-	sound_stream::sample_t process_sample_internal(sound_stream::sample_t s);
+	void process_sample(sound_stream &stream, int sample_idx);
 
-	u32 sample_rate() const;
 	void recalc_res();
 	void recalc_filter();
 
-	sound_stream *m_stream;
-
-	// Configuration, not needed in save state.
-	u32 m_streamless_sample_rate;  // Ignored (and 0) when in streaming mode.
-	float m_input_gain;
-	float m_gain_comp;
-	float m_drive;
-
-	// Filter state.
-	float m_fc;  // Cutoff frequency in Hz.
-	float m_res;  // Feedback gain.
 	struct filter_stage
 	{
 		float alpha = 1;
 		float beta = 0;
 		float state = 0;
 	};
+
+	sound_stream *m_stream;
+
+	// Configuration, not needed in save state.
+	float m_input_gain;
+	float m_gain_comp;
+	float m_drive;
+	float m_drive_inv;
+
+	// Filter state.
+	float m_fc;  // Cutoff frequency in Hz.
+	float m_res;  // Feedback gain.
 	std::array<filter_stage, 4> m_stages;
+	std::array<float, 4> m_fc_scale;
 	float m_alpha0;
 	float m_G4;
 	float m_gain_comp_scale;

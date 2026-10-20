@@ -1178,7 +1178,7 @@ void midvunit_base_state::midvcommon(machine_config &config)
 	// video hardware
 	PALETTE(config, m_palette).set_entries(32768);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MIDVUNIT_VIDEO_CLOCK/2, 666, 0, 512, 432, 0, 400);
 	m_screen->set_screen_update(FUNC(midvunit_base_state::screen_update));
 	m_screen->set_palette(m_palette);

@@ -422,7 +422,7 @@ void mbc200_state::mbc200(machine_config &config)
 	config.set_perfect_quantum(m_maincpu); // lazy way to keep CPUs in sync
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL, 816, 0, 640, 420, 0, 400);
 	screen.set_screen_update(m_crtc, FUNC(hd6845s_device::screen_update));
 	screen.set_color(rgb_t::green());

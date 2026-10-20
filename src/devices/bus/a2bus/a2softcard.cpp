@@ -39,7 +39,7 @@ void a2bus_softcard_device::z80_mem(address_map &map)
 
 void a2bus_softcard_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_z80, 1021800*2);   // Z80 runs on double the Apple II's clock
+	Z80(config, m_z80, A2BUS_1M_CLOCK*2);   // Z80 runs on double the Apple II's clock
 	m_z80->set_addrmap(AS_PROGRAM, &a2bus_softcard_device::z80_mem);
 }
 

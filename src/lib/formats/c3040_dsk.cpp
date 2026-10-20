@@ -26,7 +26,7 @@ const char *c3040_format::description() const noexcept
 
 const char *c3040_format::extensions() const noexcept
 {
-	return "d67";
+	return "d67,d40";
 }
 
 const c3040_format::format c3040_format::file_formats[] = {

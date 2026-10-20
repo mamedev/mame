@@ -48,7 +48,7 @@ void news_lcd_device::device_start()
 void news_lcd_device::device_add_mconfig(machine_config &config)
 {
 	// LCD panel
-	SCREEN(config, m_lcd, SCREEN_TYPE_LCD);
+	SCREEN(config, m_lcd).set_lcd();
 	m_lcd->set_raw(52416000, 1120, 0, 1120, 780, 0, 780);
 	m_lcd->set_screen_update(FUNC(news_lcd_device::screen_update));
 
@@ -78,9 +78,9 @@ u32 news_lcd_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 	u32 const *pixel_pointer = m_vram;
 
-	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+	for (int y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
 	{
-		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 32)
+		for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x += 32)
 		{
 			u32 const pixel_data = *pixel_pointer++;
 

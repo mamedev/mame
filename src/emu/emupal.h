@@ -195,6 +195,9 @@ public:
 	enum brg_3b_t       { BRG_3BIT };
 	enum bgr_3b_t       { BGR_3BIT };
 
+	// 6-bit
+	enum bgr_222_t      { BGR_222, RRGGBB };
+
 	// 8-bit
 	enum rgb_332_t      { RGB_332, RRRGGGBB };
 	enum bgr_233_t      { BGR_233, BBGGGRRR };
@@ -265,6 +268,7 @@ public:
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, gbr_3b_t);
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, brg_3b_t);
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_3b_t);
+	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_222_t);
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, rgb_555_t);
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, grb_555_t);
 	palette_device(const machine_config &mconfig, const char *tag, device_t *owner, bgr_555_t);
@@ -397,6 +401,7 @@ protected:
 	void palette_init_3bit_grb(palette_device &palette);
 	void palette_init_3bit_gbr(palette_device &palette);
 	void palette_init_3bit_bgr(palette_device &palette);
+	void palette_init_bgr_222(palette_device &palette);
 	void palette_init_rgb_444_proms(palette_device &palette);
 	void palette_init_rgb_555(palette_device &palette);
 	void palette_init_grb_555(palette_device &palette);

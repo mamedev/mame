@@ -596,7 +596,7 @@ void sms_state::sms2_ntsc(machine_config &config)
 {
 	sms_ntsc_base(config);
 	/* video hardware */
-	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_main_scr);
 	screen_sms_ntsc_raw_params(*m_main_scr, XTAL(10'738'635)/2);
 	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
@@ -618,15 +618,15 @@ void sms1_state::sms1_ntsc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sms1_state::sms1_mem);  // This adds the SegaScope handlers for 3-D glasses
 
 	/* video hardware */
-	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_main_scr);
 	screen_sms_ntsc_raw_params(*m_main_scr, XTAL(10'738'635)/2);
 	m_main_scr->set_screen_update(FUNC(sms1_state::screen_update_sms));
 
-	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
+	SCREEN(config, m_left_lcd).set_lcd();    // This is needed for SegaScope Left LCD
 	screen_sms_ntsc_raw_params(*m_left_lcd, XTAL(10'738'635)/2);
 	m_left_lcd->set_screen_update(FUNC(sms1_state::screen_update_left));
 
-	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
+	SCREEN(config, m_right_lcd).set_lcd();   // This is needed for SegaScope Right LCD
 	screen_sms_ntsc_raw_params(*m_right_lcd, XTAL(10'738'635)/2);
 	m_right_lcd->set_screen_update(FUNC(sms1_state::screen_update_right));
 
@@ -688,7 +688,7 @@ void sms_state::sms2_pal(machine_config &config)
 	sms_pal_base(config);
 
 	/* video hardware */
-	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_main_scr);
 	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PAL/10);
 	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
@@ -709,15 +709,15 @@ void sms1_state::sms1_pal(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sms1_state::sms1_mem);  // This adds the SegaScope handlers for 3-D glasses
 
 	/* video hardware */
-	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_main_scr);
 	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PAL/10);
 	m_main_scr->set_screen_update(FUNC(sms1_state::screen_update_sms));
 
-	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
+	SCREEN(config, m_left_lcd).set_lcd();    // This is needed for SegaScope Left LCD
 	screen_sms_pal_raw_params(*m_left_lcd, MASTER_CLOCK_PAL/10);
 	m_left_lcd->set_screen_update(FUNC(sms1_state::screen_update_left));
 
-	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
+	SCREEN(config, m_right_lcd).set_lcd();   // This is needed for SegaScope Right LCD
 	screen_sms_pal_raw_params(*m_right_lcd, MASTER_CLOCK_PAL/10);
 	m_right_lcd->set_screen_update(FUNC(sms1_state::screen_update_right));
 
@@ -757,7 +757,7 @@ void sms_state::sms3_paln(machine_config &config)
 	sms_paln_base(config);
 
 	/* video hardware */
-	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_main_scr);
 	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PALN/2);
 	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
@@ -778,15 +778,15 @@ void sms1_state::sms1_paln(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sms1_state::sms1_mem);  // This adds the SegaScope handlers for 3-D glasses
 
 	/* video hardware */
-	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_main_scr);
 	screen_sms_pal_raw_params(*m_main_scr, MASTER_CLOCK_PALN/2);
 	m_main_scr->set_screen_update(FUNC(sms1_state::screen_update_sms));
 
-	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
+	SCREEN(config, m_left_lcd).set_lcd();    // This is needed for SegaScope Left LCD
 	screen_sms_pal_raw_params(*m_left_lcd, MASTER_CLOCK_PALN/2);
 	m_left_lcd->set_screen_update(FUNC(sms1_state::screen_update_left));
 
-	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
+	SCREEN(config, m_right_lcd).set_lcd();   // This is needed for SegaScope Right LCD
 	screen_sms_pal_raw_params(*m_right_lcd, MASTER_CLOCK_PALN/2);
 	m_right_lcd->set_screen_update(FUNC(sms1_state::screen_update_right));
 
@@ -827,7 +827,7 @@ void sms_state::sms3_br(machine_config &config)
 	sms_br_base(config);
 	/* video hardware */
 	// PAL-M height/width parameters are the same of NTSC screens.
-	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_main_scr);
 	screen_sms_ntsc_raw_params(*m_main_scr, MASTER_CLOCK_PALM/2);
 	m_main_scr->set_screen_update(FUNC(sms_state::screen_update_sms));
 
@@ -849,15 +849,15 @@ void sms1_state::sms1_br(machine_config &config)
 
 	/* video hardware */
 	// PAL-M height/width parameters are the same of NTSC screens.
-	SCREEN(config, m_main_scr, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_main_scr);
 	screen_sms_ntsc_raw_params(*m_main_scr, MASTER_CLOCK_PALM/2);
 	m_main_scr->set_screen_update(FUNC(sms1_state::screen_update_sms));
 
-	SCREEN(config, m_left_lcd, SCREEN_TYPE_LCD);    // This is needed for SegaScope Left LCD
+	SCREEN(config, m_left_lcd).set_lcd();    // This is needed for SegaScope Left LCD
 	screen_sms_ntsc_raw_params(*m_left_lcd, MASTER_CLOCK_PALM/2);
 	m_left_lcd->set_screen_update(FUNC(sms1_state::screen_update_left));
 
-	SCREEN(config, m_right_lcd, SCREEN_TYPE_LCD);   // This is needed for SegaScope Right LCD
+	SCREEN(config, m_right_lcd).set_lcd();   // This is needed for SegaScope Right LCD
 	screen_sms_ntsc_raw_params(*m_right_lcd, MASTER_CLOCK_PALM/2);
 	m_right_lcd->set_screen_update(FUNC(sms1_state::screen_update_right));
 
@@ -970,7 +970,7 @@ void gamegear_state::gamegear(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	SCREEN(config, m_main_scr, SCREEN_TYPE_LCD);
+	SCREEN(config, m_main_scr).set_lcd();
 	screen_gg_raw_params(*m_main_scr, MASTER_CLOCK_GG/6);
 	m_main_scr->set_screen_update(FUNC(gamegear_state::screen_update_gamegear));
 

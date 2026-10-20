@@ -314,6 +314,7 @@ protected:
 	int     m_nmi;    /* keep track of current nmi state. Needed for 7810 irq checking. */
 	int     m_int1;   /* keep track of current int1 state. Needed for irq checking. */
 	int     m_int2;   /* keep track to current int2 state. Needed for irq checking. */
+	uint8_t m_halt;
 
 	/* internal helper variables */
 	uint16_t  m_txs;    /* transmitter shift register */
@@ -392,7 +393,7 @@ protected:
 	void RLD();
 	void RRD();
 	void NEGA();
-	void HALT();
+	void HLT();
 	void DIV_A();
 	void DIV_B();
 	void DIV_C();

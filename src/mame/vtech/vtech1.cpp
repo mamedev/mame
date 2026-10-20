@@ -484,7 +484,9 @@ void vtech1_base_state::vtech1(machine_config &config)
 	// GM2 = GND, GM0 = GND, INTEXT = GND
 	// other lines not connected
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(XTAL(4'433'619) * 2, 456, 0, 372, 312, 0, 293);
+	screen.set_screen_update(m_crtc, FUNC(mc6847_base_device::screen_update));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

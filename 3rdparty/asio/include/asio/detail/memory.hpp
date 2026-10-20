@@ -2,7 +2,7 @@
 // detail/memory.hpp
 // ~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -30,6 +30,7 @@
        //   && defined(ASIO_HAS_BOOST_ALIGN)
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 using std::allocate_shared;
@@ -55,6 +56,34 @@ inline void* align(std::size_t alignment,
     std::size_t size, void*& ptr, std::size_t& space)
 {
   return std::align(alignment, size, ptr, space);
+}
+
+template <typename T, typename Allocator, typename... Args>
+T* allocate_object(const Allocator& a, Args&&... args)
+{
+  typename std::allocator_traits<Allocator>::template rebind_alloc<T> alloc(a);
+  T* raw = std::allocator_traits<decltype(alloc)>::allocate(alloc, 1);
+#if !defined(ASIO_NO_EXCEPTIONS)
+  try
+#endif // !defined(ASIO_NO_EXCEPTIONS)
+  {
+    return new (raw) T(static_cast<Args&&>(args)...);
+  }
+#if !defined(ASIO_NO_EXCEPTIONS)
+  catch (...)
+  {
+    std::allocator_traits<decltype(alloc)>::deallocate(alloc, raw, 1);
+    throw;
+  }
+#endif // !defined(ASIO_NO_EXCEPTIONS)
+}
+
+template <typename Allocator, typename T>
+void deallocate_object(const Allocator& a, T* ptr)
+{
+  typename std::allocator_traits<Allocator>::template rebind_alloc<T> alloc(a);
+  std::allocator_traits<decltype(alloc)>::destroy(alloc, ptr);
+  std::allocator_traits<decltype(alloc)>::deallocate(alloc, ptr, 1);
 }
 
 } // namespace detail
@@ -121,6 +150,7 @@ inline void aligned_delete(void* ptr)
 #endif // defined(ASIO_MSVC)
 }
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #endif // ASIO_DETAIL_MEMORY_HPP

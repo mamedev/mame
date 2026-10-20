@@ -629,7 +629,7 @@ void sigmab98_state::sigmab98(machine_config &config)
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);                    // ?
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
 	m_screen->set_size(0x140, 0x100);
@@ -710,7 +710,7 @@ void lufykzku_state::lufykzku(machine_config &config)
 	m_dsw_shifter[1]->qh_callback().set(FUNC(lufykzku_state::dsw_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);                    // ?
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);   // game reads vblank state
 	m_screen->set_size(0x140, 0x100);
@@ -840,7 +840,7 @@ void sigmab98_state::init_gegege()
 //  rom[0x0dec] = 0x00;
 //  rom[0x0ded] = 0x00;
 
-	// EEPROM timing checks
+	// HACK: EEPROM timing checks
 	rom[0x8138] = 0x00;
 	rom[0x8139] = 0x00;
 
@@ -870,7 +870,7 @@ void sigmab98_state::init_b3rinsya()
 {
 	u8 *rom = memregion("maincpu")->base();
 
-	// EEPROM timing checks
+	// HACK: EEPROM timing checks
 	rom[0x8138] = 0x00;
 	rom[0x8139] = 0x00;
 
@@ -908,7 +908,7 @@ void sigmab98_state::init_pepsiman()
 //  rom[0xa00e] = 0x00;
 //  rom[0xa00f] = 0x00;
 
-	// EEPROM timing checks
+	// HACK: EEPROM timing checks
 	rom[0x8138] = 0x00;
 	rom[0x8139] = 0x00;
 
@@ -940,7 +940,7 @@ void sigmab98_state::init_tbeastw2()
 {
 	u8 *rom = memregion("maincpu")->base();
 
-	// EEPROM timing checks
+	// HACK: EEPROM timing checks
 	rom[0x8138] = 0x00;
 	rom[0x8139] = 0x00;
 
@@ -980,7 +980,7 @@ void sigmab98_state::init_ucytokyu()
 //  rom[0xa43a] = 0x00;
 //  rom[0xa43b] = 0x00;
 
-	// EEPROM timing checks
+	// HACK: EEPROM timing checks
 	rom[0x8138] = 0x00;
 	rom[0x8139] = 0x00;
 
@@ -1011,7 +1011,7 @@ void sigmab98_state::init_dashhero()
 {
 	u8 *rom = memregion("maincpu")->base();
 
-	// EEPROM timing checks
+	// HACK: EEPROM timing checks
 	rom[0x8138] = 0x00;
 	rom[0x8139] = 0x00;
 

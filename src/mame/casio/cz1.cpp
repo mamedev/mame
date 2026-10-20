@@ -854,7 +854,7 @@ void cz1_state::mz1(machine_config &config)
 	mdin.rxd_handler().append("mdthru", FUNC(midi_port_device::write_txd));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(6*16 + 1, 19);
@@ -939,6 +939,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME            FLAGS
-SYST( 1986, cz1,    0,      0,      cz1,     cz1,    cz1_state,    empty_init, "Casio", "CZ-1",             MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-SYST( 1986, mz1,    cz1,    0,      mz1,     mz1,    cz1_state,    empty_init, "Casio", "MZ-1 (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME                    FLAGS
+SYST( 1986, cz1,    0,      0,      cz1,     cz1,    cz1_state,    empty_init, "Casio", "CZ-1 Digital Synthesizer", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+SYST( 1986, mz1,    cz1,    0,      mz1,     mz1,    cz1_state,    empty_init, "Casio", "MZ-1 (prototype)",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

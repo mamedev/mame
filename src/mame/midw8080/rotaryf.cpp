@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /* Rotary Fighter, 01/1979, Kasco (Kansai Seiki Seisakusho Co.)
- board KIV-101 CPU: xtal(??mhz), i8085A, 40 pin IC(i8255?), 6*ROM, 1*RAM, DIP(8 switches), ..
+ board KIV-101 CPU: xtal(??mhz), i8085A, 40 pin IC(i8255?), 6 x ROM, 1 x RAM, DIP(8 switches), ..
  board KIV-101 CRT: 2*RAM, lots of 74xx TTL
 
-driver by Barry Rodewald
- based on Initial work by David Haywood
+ driver by Barry Rodewald
+ based on initial work by David Haywood
 
- todo:
-
- sound
- verify game speed if possible (related to # of interrupts)
+ TODO:
+ - sound;
+ - verify game speed if possible (related to # of interrupts);
+ - document actual PCB layout;
 
 */
 
@@ -273,7 +273,7 @@ void rotaryf_state::rotaryf(machine_config &config)
 	ppi.tri_pc_callback().set_constant(0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(32*8, 262);     /* vert size is a guess, taken from mw8080bw */
 	screen.set_visarea(1*8, 30*8-1, 0*8, 32*8-1);
 	screen.set_refresh_hz(60);

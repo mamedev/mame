@@ -932,8 +932,6 @@ void sfbonus_state::draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap,
 //  printf("------------\n");
 	for (int zz = 0; zz < 288; zz++)
 	{
-		rectangle clip;
-
 		// other bits are used too..
 		int const line = ((zz + globalyscrollreels) & 0x1ff);
 		int const rowenable = selectbase[line] & 0x3;
@@ -945,7 +943,7 @@ void sfbonus_state::draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap,
 		//printf("%04x %04x %d\n",zz, xxxscroll, line/8);
 
 		// draw top of screen
-		clip.set(visarea.min_x, 511, startclipmin, startclipmin);
+		rectangle const clip(visarea.left(), 511, startclipmin, startclipmin);
 
 
 
@@ -1282,7 +1280,7 @@ void sfbonus_state::sfbonus(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sfbonus);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(128*8, 64*8);

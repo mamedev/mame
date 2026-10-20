@@ -2,7 +2,7 @@
 // read_until.cpp
 // ~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -822,6 +822,21 @@ void test_dynamic_string_async_read_until_char()
   ASIO_CHECK(i == 42);
   ioc.restart();
   ioc.run();
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  ec = asio::error_code();
+  length = 0;
+  called = false;
+  sb2.consume(sb2.size());
+  asio::async_read_until(s, sb2, 'Y')(
+      bindns::bind(async_read_handler, _1, &ec,
+        _2, &length, &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(!ec);
+  ASIO_CHECK(length == 25);
 }
 
 void test_streambuf_async_read_until_char()
@@ -978,6 +993,21 @@ void test_streambuf_async_read_until_char()
   ASIO_CHECK(i == 42);
   ioc.restart();
   ioc.run();
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  ec = asio::error_code();
+  length = 0;
+  called = false;
+  sb2.consume(sb2.size());
+  asio::async_read_until(s, sb2, 'Y')(
+      bindns::bind(async_read_handler, _1, &ec,
+        _2, &length, &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(!ec);
+  ASIO_CHECK(length == 25);
 #endif // !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
 }
 
@@ -1137,6 +1167,21 @@ void test_dynamic_string_async_read_until_string()
   ASIO_CHECK(i == 42);
   ioc.restart();
   ioc.run();
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  ec = asio::error_code();
+  length = 0;
+  called = false;
+  sb2.consume(sb2.size());
+  asio::async_read_until(s, sb2, "WXY")(
+      bindns::bind(async_read_handler, _1, &ec,
+        _2, &length, &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(!ec);
+  ASIO_CHECK(length == 25);
 }
 
 void test_streambuf_async_read_until_string()
@@ -1293,6 +1338,21 @@ void test_streambuf_async_read_until_string()
   ASIO_CHECK(i == 42);
   ioc.restart();
   ioc.run();
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  ec = asio::error_code();
+  length = 0;
+  called = false;
+  sb2.consume(sb2.size());
+  asio::async_read_until(s, sb2, "WXY")(
+      bindns::bind(async_read_handler, _1, &ec,
+        _2, &length, &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(!ec);
+  ASIO_CHECK(length == 25);
 #endif // !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
 }
 
@@ -1452,6 +1512,21 @@ void test_dynamic_string_async_read_until_match_condition()
   ASIO_CHECK(i == 42);
   ioc.restart();
   ioc.run();
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  ec = asio::error_code();
+  length = 0;
+  called = false;
+  sb2.consume(sb2.size());
+  asio::async_read_until(s, sb2, match_char('Y'))(
+      bindns::bind(async_read_handler, _1, &ec,
+        _2, &length, &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(!ec);
+  ASIO_CHECK(length == 25);
 }
 
 void test_streambuf_async_read_until_match_condition()
@@ -1608,6 +1683,21 @@ void test_streambuf_async_read_until_match_condition()
   ASIO_CHECK(i == 42);
   ioc.restart();
   ioc.run();
+
+  s.reset(read_data, sizeof(read_data));
+  s.next_read_length(10);
+  ec = asio::error_code();
+  length = 0;
+  called = false;
+  sb2.consume(sb2.size());
+  asio::async_read_until(s, sb2, match_char('Y'))(
+      bindns::bind(async_read_handler, _1, &ec,
+        _2, &length, &called));
+  ioc.restart();
+  ioc.run();
+  ASIO_CHECK(called);
+  ASIO_CHECK(!ec);
+  ASIO_CHECK(length == 25);
 #endif // !defined(ASIO_NO_DYNAMIC_BUFFER_V1)
 }
 

@@ -39,6 +39,13 @@
 static constexpr u32 C7M  = 7833600;
 static constexpr u32 C15M = (C7M * 2);
 
+// same pattern as in amiga/amiga.cpp, but macro'd
+#define RESTART_INSTRUCTION(x) \
+		if (auto *const musashi = dynamic_cast<m68000_musashi_device *>(&*x)) \
+			musashi->restart_this_instruction(); \
+		else \
+			x->retry_access(); \
+
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -124,6 +131,7 @@ iosb_base::iosb_base(const machine_config &mconfig, device_type type, const char
 	m_pa4(*this, 0),
 	m_pa6(*this, 0),
 	m_maincpu(*this, finder_base::DUMMY_TAG),
+	m_capella(*this, finder_base::DUMMY_TAG),
 	m_ncr(*this, finder_base::DUMMY_TAG),
 	m_via1(*this, "via1"),
 	m_via2(*this, "via2"),
@@ -172,7 +180,8 @@ primetime_device::primetime_device(const machine_config &mconfig, const char *ta
 
 primetimeii_device::primetimeii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	primetime_device(mconfig, PRIMETIMEII, tag, owner, clock),
-	m_ata_irq(0)
+	m_ata_irq(0),
+	m_ata_irq_enables(0)
 {
 	std::fill(std::begin(m_primetimeii_regs), std::end(m_primetimeii_regs), 0);
 }
@@ -183,7 +192,19 @@ primetimeii_device::primetimeii_device(const machine_config &mconfig, const char
 
 void iosb_base::device_start()
 {
-	m_maincpu->set_emmu_enable(true);
+	if (!m_capella)
+	{
+		// if Capella (or some other bridge chip) is not present,
+		// we *MUST* be talking directly to a 680x0
+		if (auto *const musashi = dynamic_cast<m68000_musashi_device *>(&*m_maincpu))
+		{
+			musashi->set_emmu_enable(true);
+		}
+		else
+		{
+			fatalerror("iosb.cpp: init without 68k CPU or PowerPC-to-68k bridge device\n");
+		}
+	}
 
 	m_6015_timer = timer_alloc(FUNC(iosb_base::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
@@ -296,15 +317,30 @@ void iosb_base::field_interrupts()
 		take_interrupt = 1;
 	}
 
+
 	if (m_last_taken_interrupt > -1)
 	{
-		m_maincpu->set_input_line(m_last_taken_interrupt, CLEAR_LINE);
+		if (m_capella)
+		{
+			m_capella->translate_ipl_state_change(-1);
+		}
+		else
+		{
+			m_maincpu->set_input_line(m_last_taken_interrupt, CLEAR_LINE);
+		}
 		m_last_taken_interrupt = -1;
 	}
 
 	if (take_interrupt > -1)
 	{
-		m_maincpu->set_input_line(take_interrupt, ASSERT_LINE);
+		if (m_capella)
+		{
+			m_capella->translate_ipl_state_change(take_interrupt);
+		}
+		else
+		{
+			m_maincpu->set_input_line(take_interrupt, ASSERT_LINE);
+		}
 		m_last_taken_interrupt = take_interrupt;
 	}
 }
@@ -315,16 +351,16 @@ void iosb_base::scc_irq_w(int state)
 	field_interrupts();
 }
 
-template <u8 mask>
+template <u8 Mask>
 void iosb_base::via2_irq_w(int state)
 {
 	if (state)
 	{
-		m_nubus_irqs &= ~mask;
+		m_nubus_irqs &= ~Mask;
 	}
 	else
 	{
-		m_nubus_irqs |= mask;
+		m_nubus_irqs |= Mask;
 	}
 
 	if ((m_nubus_irqs & 0x79) != 0x79)
@@ -511,7 +547,7 @@ u32 iosb_base::turboscsi_dma_r(offs_t offset, u32 mem_mask)
 	{
 		// The real DAFB simply holds off /DTACK here, we simulate that
 		// by rewinding and repeating the instruction until DRQ is asserted.
-		m_maincpu->restart_this_instruction();
+		RESTART_INSTRUCTION(m_maincpu);
 		m_maincpu->spin_until_time(attotime::from_usec(50));
 		return 0xffff;
 	}
@@ -530,7 +566,7 @@ u32 iosb_base::turboscsi_dma_r(offs_t offset, u32 mem_mask)
 		{
 			// The real DAFB simply holds off /DTACK here, we simulate that
 			// by rewinding and repeating the instruction until DRQ is asserted.
-			m_maincpu->restart_this_instruction();
+			RESTART_INSTRUCTION(m_maincpu);
 			m_maincpu->spin_until_time(attotime::from_usec(50));
 			return 0xffff;
 		}
@@ -556,7 +592,7 @@ void iosb_base::turboscsi_dma_w(offs_t offset, u32 data, u32 mem_mask)
 
 	if (!m_drq)
 	{
-		m_maincpu->restart_this_instruction();
+		RESTART_INSTRUCTION(m_maincpu);
 		m_maincpu->spin_until_time(attotime::from_usec(50));
 		return;
 	}
@@ -570,7 +606,7 @@ void iosb_base::turboscsi_dma_w(offs_t offset, u32 data, u32 mem_mask)
 		m_scsi_second_half = true;
 		if (!m_drq)
 		{
-			m_maincpu->restart_this_instruction();
+			RESTART_INSTRUCTION(m_maincpu);
 			m_maincpu->spin_until_time(attotime::from_usec(50));
 			return;
 		}
@@ -649,29 +685,31 @@ void primetimeii_device::device_start()
 {
 	primetime_device::device_start();
 	save_item(NAME(m_ata_irq));
+	save_item(NAME(m_ata_irq_enables));
 	save_item(NAME(m_primetimeii_regs));
 }
 
 void primetimeii_device::map(address_map &map)
 {
 	iosb_base::map(map);
-	map(0x0001a100, 0x0001a10f).r(FUNC(primetimeii_device::ata_regs_r)).mirror(0x00f00000);
+	map(0x0001a100, 0x0001a103).rw(FUNC(primetimeii_device::ata_regs_r), FUNC(primetimeii_device::ata_regs_w)).mirror(0x00f00000);
 }
 
 // This may actually be in F108, the boundaries between the two chips aren't completely clear
 u16 primetimeii_device::ata_regs_r(offs_t offset)
 {
-	switch (offset)
-	{
-		case 0: // special interrupt status: bit 6 = VBL IRQ, bit 5 = ATA IRQ
-			return ((m_nubus_irqs ^ 0xff) & 0x40) | (m_ata_irq << 5);
+	// special interrupt status: bit 6 = VBL IRQ, bit 5 = ATA IRQ
+	u8 status = ((m_nubus_irqs ^ 0xff) & 0x40) | (m_ata_irq << 5);
+	if (status)
+		status |= 0x80;
 
-		default:
-			LOGMASKED(LOG_IOSBREGS, "%s: Unhandled ata_regs_r @ %x\n", tag(), offset);
-			break;
-	}
+	return 0xff00 | status | m_ata_irq_enables;
+}
 
-	return 0;
+void primetimeii_device::ata_regs_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+		m_ata_irq_enables = data & 0x03;
 }
 
 void primetimeii_device::ata_irq_w(int state)

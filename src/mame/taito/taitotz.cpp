@@ -622,8 +622,8 @@ private:
 	u32 video_reg_r(u32 reg);
 	void video_reg_w(u32 reg, u32 data);
 
-	u16 tlcs_ide0_r(offs_t offset, u16 mem_mask = ~0);
-	u16 tlcs_ide1_r(offs_t offset, u16 mem_mask = ~0);
+	u16 tlcs_ide0_r(offs_t offset);
+	u16 tlcs_ide1_r(offs_t offset);
 	u8 tlcs_common_r(offs_t offset);
 	void tlcs_common_w(offs_t offset, u8 data);
 	u8 tlcs_rtc_r(offs_t offset);
@@ -2169,9 +2169,9 @@ void taitotz_state::tlcs_rtc_w(offs_t offset, u8 data)
 	}
 }
 
-u16 taitotz_state::tlcs_ide0_r(offs_t offset, u16 mem_mask)
+u16 taitotz_state::tlcs_ide0_r(offs_t offset)
 {
-	u16 d = m_ata->cs0_r(offset, mem_mask);
+	u16 d = m_ata->cs0_r(offset);
 	if (offset == 7)
 	{
 		// Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up.
@@ -2181,9 +2181,9 @@ u16 taitotz_state::tlcs_ide0_r(offs_t offset, u16 mem_mask)
 	return d;
 }
 
-u16 taitotz_state::tlcs_ide1_r(offs_t offset, u16 mem_mask)
+u16 taitotz_state::tlcs_ide1_r(offs_t offset)
 {
-	u16 d = m_ata->cs1_r(offset, mem_mask);
+	u16 d = m_ata->cs1_r(offset);
 	if (offset == 6)
 	{
 		// Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up.
@@ -2642,7 +2642,7 @@ void taitotz_state::taitotz(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 384);
@@ -2662,7 +2662,8 @@ void taitotz_state::landhigh(machine_config &config)
 void taitotz_state::init_taitotz_152()
 {
 	u32 *rom = (u32*)memregion("user1")->base();
-	rom[(0x2c87c ^ 4) / 4] = 0x38600000;    // skip sound load timeout...
+	// HACK: skip sound load timeout
+	rom[(0x2c87c ^ 4) / 4] = 0x38600000;
 //  rom[(0x2c620 ^ 4) / 4] = 0x48000014;    // ID check skip (not needed with correct serial number)
 
 	if (ENABLE_DEBUG_PRINTS)
@@ -2677,7 +2678,8 @@ void taitotz_state::init_taitotz_152()
 void taitotz_state::init_taitotz_111a()
 {
 	u32 *rom = (u32*)memregion("user1")->base();
-	rom[(0x2b748^4)/4] = 0x480000b8;    // skip sound load timeout
+	// HACK: skip sound load timeout
+	rom[(0x2b748^4)/4] = 0x480000b8;
 }
 
 static const char LANDHIGH_HDD_SERIAL[] =           // "824915746386        "

@@ -156,6 +156,7 @@ private:
 	TILE_GET_INFO_MEMBER(seibucrtc_sc2_tile_info);
 	TILE_GET_INFO_MEMBER(seibucrtc_sc3_tile_info);
 
+	IRQ_CALLBACK_MEMBER( vector_r );
 	void vblank_irq(int state);
 
 	uint32_t pri_cb(uint8_t pri, uint8_t ext);
@@ -505,11 +506,16 @@ static GFXDECODE_START( gfx_goodejan_spr )
 	GFXDECODE_ENTRY( "spr_gfx", 0, tilelayout, 0x200, 0x40 ) /* Sprites */
 GFXDECODE_END
 
+IRQ_CALLBACK_MEMBER(goodejan_state::vector_r)
+{
+	/* vector 0x00c is just a reti */
+	return 0x208 / 4;
+}
+
 void goodejan_state::vblank_irq(int state)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x208/4); // V30
-/* vector 0x00c is just a reti */
+		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 void goodejan_state::layer_en_w(uint16_t data)
@@ -532,13 +538,14 @@ void goodejan_state::goodejan(machine_config &config)
 	V30(config, m_maincpu, GOODEJAN_MHZ2/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &goodejan_state::goodejan_map);
 	m_maincpu->set_addrmap(AS_IO, &goodejan_state::goodejan_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(goodejan_state::vector_r));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", GOODEJAN_MHZ1/2));
 	audiocpu.set_addrmap(AS_PROGRAM, &goodejan_state::seibu_sound_map);
 	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// guess: assume ~59.61 Hz like toki, assume clock coming from the otherwise unused 12 MHz XTal
 	// (audio one don't give valid ranges for the provided HSync)
 	m_screen->set_raw(GOODEJAN_MHZ3/2, 390, 0, 256, 258, 16, 240);

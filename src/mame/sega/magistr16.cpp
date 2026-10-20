@@ -390,7 +390,7 @@ void magistr16_state::magistr16(machine_config &config)
 	m_mdz80cpu->set_addrmap(AS_PROGRAM, &magistr16_state::md_z80_map);
 	m_mdz80cpu->set_addrmap(AS_IO, &magistr16_state::md_z80_io);
 
-	SCREEN(config, m_mdscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_mdscreen);
 	m_mdscreen->set_raw(md_master_xtal / 8, 423, 0, 320, 312, 0, 240);
 	m_mdscreen->set_screen_update(m_md_vdp, FUNC(ym7101_device::screen_update));
 

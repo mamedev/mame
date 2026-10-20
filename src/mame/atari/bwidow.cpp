@@ -225,7 +225,7 @@
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "sound/pokey.h"
-#include "video/vector.h"
+#include "vector.h"
 
 #include "screen.h"
 
@@ -778,12 +778,9 @@ void bwidow_state::bwidow(machine_config &config)
 	ER2055(config, m_earom);
 
 	/* video hardware */
-	VECTOR(config, "vector");
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
-	screen.set_refresh_hz(CLOCK_3KHZ / 12 / 4);
-	screen.set_size(400, 300);
-	screen.set_visarea(0, 480, 0, 440);
-	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
+	vector_device &vector(VECTOR(config, "vector"));
+	vector.set_refresh_hz(CLOCK_3KHZ / 12 / 4);
+	vector.set_visarea(0, 480, 0, 440);
 	AVG(config, m_avg);
 	m_avg->set_vector("vector");
 	m_avg->set_memory(m_maincpu, AS_PROGRAM, 0x2000);
@@ -809,7 +806,7 @@ void bwidow_state::gravitar(machine_config &config)
 	/* basic machine hardware */
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea(0, 420, 0, 400);
+	subdevice<vector_device>("vector")->set_visarea(0, 420, 0, 400);
 
 	/* sound hardware */
 	gravitar_audio(config);
@@ -824,7 +821,7 @@ void bwidow_state::lunarbat(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bwidow_state::spacduel_map);
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea(0, 500, 0, 440);
+	subdevice<vector_device>("vector")->set_visarea(0, 500, 0, 440);
 }
 
 
@@ -836,7 +833,7 @@ void bwidow_state::spacduel(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bwidow_state::spacduel_map);
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea(0, 540, 0, 400);
+	subdevice<vector_device>("vector")->set_visarea(0, 540, 0, 400);
 }
 
 

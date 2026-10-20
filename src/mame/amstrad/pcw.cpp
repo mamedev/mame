@@ -1273,7 +1273,7 @@ void pcw_state::pcw(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(32_MHz_XTAL / 3, 720 + 20, 8, 720 + 8, 256 + 32, 8, 256 + 8); // Hand tuned to get 50Hz, it is all in the Amstrad ASIC, 32MHz in and video out
 	m_screen->set_screen_update(FUNC(pcw_state::screen_update_pcw));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
@@ -1305,7 +1305,7 @@ void pcw_state::pcw8256(machine_config &config)
 	FLOPPY_CONNECTOR(config, "upd765:0", pcw_ssfloppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
-	screen_device &printer(SCREEN(config, "printer", SCREEN_TYPE_RASTER));
+	screen_device &printer(SCREEN(config, "printer"));
 	printer.set_refresh_hz(50);
 	printer.set_size(PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT);
 	printer.set_visarea(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1);
@@ -1323,7 +1323,7 @@ void pcw_state::pcw8512(machine_config &config)
 	FLOPPY_CONNECTOR(config, "upd765:0", pcw_ssfloppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, "upd765:1", pcw_dsfloppies, "3dsqd", floppy_image_device::default_mfm_floppy_formats);
 
-	screen_device &printer(SCREEN(config, "printer", SCREEN_TYPE_RASTER));
+	screen_device &printer(SCREEN(config, "printer"));
 	printer.set_refresh_hz(50);
 	printer.set_size(PCW_PRINTER_WIDTH, PCW_PRINTER_HEIGHT);
 	printer.set_visarea(0, PCW_PRINTER_WIDTH-1, 0, PCW_PRINTER_HEIGHT-1);

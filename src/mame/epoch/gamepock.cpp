@@ -216,7 +216,7 @@ void gamepock_state::gamepock(machine_config &config)
 	m_maincpu->to_func().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_size(75, 64);
 	screen.set_visarea_full();

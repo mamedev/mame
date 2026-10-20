@@ -851,7 +851,7 @@ void lastduel_state::lastduel(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lastduel_state::sound_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 3, 512, 64, 448, 272, 8, 248);
 	screen.set_screen_update(FUNC(lastduel_state::screen_update_lastduel));
 	screen.screen_vblank().set(FUNC(lastduel_state::lastduel_interrupt));
@@ -887,7 +887,7 @@ void lastduel_state::madgear(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lastduel_state::madgear_sound_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 3, 512, 64, 448, 272, 8, 248); // measured 57.4444Hz
 	screen.set_screen_update(FUNC(lastduel_state::screen_update_madgear));
 	screen.screen_vblank().set(FUNC(lastduel_state::madgear_interrupt));

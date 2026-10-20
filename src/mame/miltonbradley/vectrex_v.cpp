@@ -111,17 +111,18 @@ void vectrex_base_state::via_w(offs_t offset, uint8_t data)
 TIMER_CALLBACK_MEMBER(vectrex_base_state::refresh)
 {
 	/* Refresh only marks the range of vectors which will be drawn
-	 * during the next screen_update. */
+	 * during the next vector_update. */
 	m_display_start = m_display_end;
 	m_display_end = m_point_index;
 }
 
 
-uint32_t vectrex_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void vectrex_base_state::vector_update(vector_device &vector)
 {
 	screen_configuration();
 
 	/* start black */
+	m_vector->clear_list();
 	m_vector->add_point(m_points[m_display_start].x,
 						m_points[m_display_start].y,
 						m_points[m_display_start].col,
@@ -134,10 +135,6 @@ uint32_t vectrex_base_state::screen_update(screen_device &screen, bitmap_rgb32 &
 							m_points[i].col,
 							m_points[i].intensity);
 	}
-
-	m_vector->screen_update(screen, bitmap, cliprect);
-	m_vector->clear_list();
-	return 0;
 }
 
 
@@ -222,7 +219,7 @@ void vectrex_base_state::update_vector()
 
 void vectrex_base_state::video_start()
 {
-	const rectangle &visarea = m_screen->visible_area();
+	const rectangle &visarea = m_vector->visible_area();
 
 	m_x_center=(visarea.width() / 2) << 16;
 	m_y_center=(visarea.height() / 2) << 16;

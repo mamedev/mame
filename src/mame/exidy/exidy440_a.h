@@ -26,7 +26,6 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_stop() override ATTR_COLD;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream) override;
@@ -85,9 +84,6 @@ private:
 	/* sound interface parameters */
 	sound_stream *m_stream;
 	sound_channel_data m_sound_channel[4];
-
-	/* debugging */
-	FILE *m_debuglog;
 
 	/* channel frequency is configurable */
 	int m_channel_frequency[4];

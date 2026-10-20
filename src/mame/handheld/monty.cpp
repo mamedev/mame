@@ -239,7 +239,7 @@ void monty_state::monty(machine_config &config)
 	m_maincpu->halt_cb().set(FUNC(monty_state::halt_changed));
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(0);
 	screen.set_size(40+8+1, 32+1);

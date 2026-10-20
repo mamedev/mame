@@ -265,6 +265,10 @@ offs_t adsp21xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			// 00000010 10000000 0000xxxx  idle (n)
 			else if (BIT(op, 4, 12) == 0x800)
 			{
+				if (BIT(op, 0, 4) == 0)
+					stream << "IDLE";
+				else
+					util::stream_format(stream, "IDLE(%d)", BIT(op, 0, 4) << 4);
 			}
 			else
 				util::stream_format(stream, "??? (%06X)", op);

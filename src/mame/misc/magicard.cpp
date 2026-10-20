@@ -189,7 +189,7 @@
 
 #include "emu.h"
 #include "cpu/pic16c5x/pic16c5x.h"
-#include "cpu/pic16x8x/pic16x8x.h"
+#include "cpu/pic16_mid/pic16_mid.h"
 #include "machine/ds1207.h"
 #include "machine/ds2401.h"
 #include "machine/i2cmem.h"
@@ -1003,7 +1003,7 @@ void magicard_base_state::magicard_base(machine_config &config)
 	m_maincpu->i2c_sda_w().set(FUNC(magicard_base_state::cpu_i2c_sda_write));
 	m_maincpu->i2c_sda_r().set(FUNC(magicard_base_state::cpu_i2c_sda_read));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw( CLOCK_A/2, 960, 0, 768, 312, 32, 312);
 	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	m_screen->set_screen_update(FUNC(magicard_base_state::screen_update_magicard));
@@ -1102,7 +1102,6 @@ void hotslots_state::magicle(machine_config &config)
 	hotslots_base(config);
 
 	pic16f84_device &pic(PIC16F84(config, "pic16f84", 4000000));
-	pic.set_config(0x3ffa); // No protect - No Watchdog - HS Clock
 	pic.read_b().set(FUNC(hotslots_state::pic_portb_r));
 	pic.write_b().set(FUNC(hotslots_state::pic_portb_w));
 
@@ -1292,7 +1291,7 @@ ROM_START( magicrdja )
 	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(ab2ed583) SHA1(a2d7148b785a8dfce8cff3b15ada293d65561c98) ) // sldh
 
 	ROM_REGION16_LE( 0x4280, "pic16f84", 0 )  // decapped and dumped
-	ROM_LOAD("magicardj_4.01_pic16f84_code.bin",   0x0000, 0x0800, CRC(c6502436) SHA1(85c4126251bd60ec1f4e28615ec7f948ef8c088f) )
+	ROM_LOAD("magicardj_4.01_pic16f84_code.bin", 0x0000, 0x0800, CRC(c6502436) SHA1(85c4126251bd60ec1f4e28615ec7f948ef8c088f) )
 	/*
 	{
 	"conf_word": 0,
@@ -1303,19 +1302,17 @@ ROM_START( magicrdja )
 	"user_id3": 16264
 	}
 	*/
-	// ID locations:
 	ROM_FILL( 0x4000, 0x01, 0x80 )
-	ROM_FILL( 0x4001, 0x01, 0x3f )
+	ROM_FILL( 0x4001, 0x01, 0x3f ) // user_id0: 0x3f80
 	ROM_FILL( 0x4002, 0x01, 0x86 )
-	ROM_FILL( 0x4003, 0x01, 0x3f )
+	ROM_FILL( 0x4003, 0x01, 0x3f ) // user_id1: 0x3f86
 	ROM_FILL( 0x4004, 0x01, 0x89 )
-	ROM_FILL( 0x4005, 0x01, 0x3f )
+	ROM_FILL( 0x4005, 0x01, 0x3f ) // user_id2: 0x3f89
 	ROM_FILL( 0x4006, 0x01, 0x88 )
-	ROM_FILL( 0x4007, 0x01, 0x3f )
-	// configuration word: all 0
-	ROM_FILL( 0x400e, 0x01, 0x00 )
-	ROM_FILL( 0x400f, 0x01, 0x00 )
-	ROM_LOAD("magicardj_4.01_pic16f84_data.bin",   0x4200, 0x0080, CRC(40961fef) SHA1(8617ef78d50842ea89d81d4db3728b3f799d7530) )
+	ROM_FILL( 0x4007, 0x01, 0x3f ) // user_id3: 0x3f88
+	ROM_FILL( 0x400e, 0x01, 0xfa )
+	ROM_FILL( 0x400f, 0x01, 0x3f ) // configuration: 0x3ffa (was supposed to be 0 but that can't be right)
+	ROM_LOAD("magicardj_4.01_pic16f84_data.bin", 0x4200, 0x0080, CRC(40961fef) SHA1(8617ef78d50842ea89d81d4db3728b3f799d7530) )
 
 	ROM_REGION( 0x200000, "other", 0 )  // unknown contents
 	ROM_LOAD("29f1610mc.ic30",  0x000000, 0x200000, NO_DUMP )
@@ -1517,8 +1514,8 @@ ROM_START( magicle )
 	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
 	ROM_LOAD16_WORD_SWAP( "27c4002.ic21", 0x00000, 0x80000, CRC(73328346) SHA1(fca5f8a93f25377e659c2b291674d706ca37400e) )
 
-	ROM_REGION16_LE( 0x4280, "pic16f84", 0 )  // decapped and dumped
-	ROM_LOAD("magicle_5.03_pic16f84_code.bin",   0x0000, 0x0800, CRC(22965864) SHA1(c421a9e9fac7c9c5dc01adda620dc8f5f16d94ba) )
+	ROM_REGION16_LE( 0x4280, "pic16f84", ROMREGION_ERASEFF )  // decapped and dumped
+	ROM_LOAD("magicle_5.03_pic16f84_code.bin", 0x0000, 0x0800, CRC(22965864) SHA1(c421a9e9fac7c9c5dc01adda620dc8f5f16d94ba) )
 	/*
 {
 	"conf_word": 0,
@@ -1529,19 +1526,17 @@ ROM_START( magicle )
 	"user_id3": 16265
 }
 	*/
-	// ID locations:
 	ROM_FILL( 0x4000, 0x01, 0x80 )
-	ROM_FILL( 0x4001, 0x01, 0x3f )
+	ROM_FILL( 0x4001, 0x01, 0x3f ) // user_id0: 0x3f80
 	ROM_FILL( 0x4002, 0x01, 0x87 )
-	ROM_FILL( 0x4003, 0x01, 0x3f )
+	ROM_FILL( 0x4003, 0x01, 0x3f ) // user_id1: 0x3f87
 	ROM_FILL( 0x4004, 0x01, 0x89 )
-	ROM_FILL( 0x4005, 0x01, 0x3f )
+	ROM_FILL( 0x4005, 0x01, 0x3f ) // user_id2: 0x3f89
 	ROM_FILL( 0x4006, 0x01, 0x89 )
-	ROM_FILL( 0x4007, 0x01, 0x3f )
-	// configuration word: all 0
-	ROM_FILL( 0x400e, 0x01, 0x00 )
-	ROM_FILL( 0x400f, 0x01, 0x00 )
-	ROM_LOAD("magicle_5.03_pic16f84_data.bin",   0x4200, 0x0080, CRC(b3cdf90f) SHA1(0afec6f78320e5fe653073769cdeb32918da061b) )
+	ROM_FILL( 0x4007, 0x01, 0x3f ) // user_id3: 0x3f89
+	ROM_FILL( 0x400e, 0x01, 0xfa )
+	ROM_FILL( 0x400f, 0x01, 0x3f ) // configuration: 0x3ffa (was supposed to be 0 but that can't be right)
+	ROM_LOAD("magicle_5.03_pic16f84_data.bin", 0x4200, 0x0080, CRC(b3cdf90f) SHA1(0afec6f78320e5fe653073769cdeb32918da061b) )
 
 	ROM_REGION( 0x200000, "other", 0 )  // unknown contents
 	ROM_LOAD("29f1610mc.ic30",  0x000000, 0x200000, NO_DUMP )
@@ -1909,6 +1904,20 @@ ROM_START( puzzleme )
 
 	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
 	ROM_LOAD("x24c02p.ic26",    0x0000, 0x0100, CRC(bc940f53) SHA1(6b870019752ba5c446a5ad5155e4a81dfbf6e523) )
+ROM_END
+
+ROM_START( libertyc ) // seems the same PCB as puzzleme
+	ROM_REGION( 0x80000, "maincpu", 0 )  // 68070 Code & GFX
+	ROM_LOAD16_WORD_SWAP( "liberty_card_export_94_v1.02.ic21", 0x00000, 0x80000, CRC(f5bb5dd0) SHA1(9c49ef4b5f42ddc689993d5129653efbfc57bce6) )
+
+	ROM_REGION( 0x1fff, "pic16c54", 0 )
+	ROM_LOAD( "pic16c54.ic29", 0x0000, 0x1fff, CRC(6dd2bd8e) SHA1(380f6b952ddd3183e9ab5404866c30be015b3773) BAD_DUMP ) // from puzzleme, seems to work, but a dump is needed
+
+	ROM_REGION( 0x0100, "sereeprom", 0 )  // Serial EPROM
+	ROM_LOAD( "x24c02p.ic26", 0x0000, 0x0100, CRC(54145712) SHA1(e2ddeb155c4422c54b621fd5acf4c2b8a4808c62) )
+
+	ROM_REGION( 0x10000, "nvram", 0 ) // pre-initialized
+	ROM_LOAD( "nvram", 0x00000, 0x10000, CRC(7b8150f8) SHA1(58a56401843f9b27ed1b6a4c2f786c20ecc0e3ab) )
 ROM_END
 
 
@@ -2447,8 +2456,7 @@ ROM_END
 
 void magicard_state::init_dallaspk()
 {
-//  Dallas Poker...
-//  NOP'ing to avoid the 68070 UART stuck...
+	// HACK: NOP'ing to avoid the 68070 UART stuck...
 	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0x00482e] = 0x18;
@@ -2482,6 +2490,7 @@ GAME(  1999, quingo,     0,        magicle,        hotslots,  hotslots_state, em
 GAME(  1999, belslots,   0,        magicle,        hotslots,  hotslots_state, empty_init,    ROT0,  "Impera",               "Bel Slots Export (5.01)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME(  2001, bigdeal0,   0,        magicle,        magicard,  hotslots_state, empty_init,    ROT0,  "Impera",               "Big Deal Belgien (5.04)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME(  199?, puzzleme,   0,        puzzleme,       puzzleme,  hotslots_state, empty_init,    ROT0,  "Impera",               "Puzzle Me!",                                 MACHINE_SUPPORTS_SAVE )
+GAME(  1994, libertyc,   0,        puzzleme,       magicrde,  hotslots_state, empty_init,    ROT0,  "NovoPlay",             "Liberty Card (v1.02)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 GAME(  1991, lucky7i,    0,        magicard,       lucky7i,   magicard_state, empty_init,    ROT0,  "Impera",               "Lucky 7 (Impera, V04/91a, set 1)",           MACHINE_SUPPORTS_SAVE )
 GAME(  1991, lucky7x,    lucky7i,  magicard,       lucky7i,   magicard_state, empty_init,    ROT0,  "Impera",               "Lucky 7 (Impera, V04/91a, set 2)",           MACHINE_SUPPORTS_SAVE )

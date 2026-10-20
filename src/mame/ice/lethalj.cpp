@@ -309,7 +309,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(lethalj_state::scanline_update)
 	{
 		for (int x = params->heblnk; x < params->hsblnk; x++)
 			dest[x] = 0x7fff;
-		if (scanline == screen.visible_area().max_y)
+		if (scanline == screen.visible_area().bottom())
 			m_blank_palette = 0;
 	}
 	else
@@ -1005,7 +1005,7 @@ void lethalj_state::gameroom(machine_config &config)
 	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(200));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(11.2896_MHz_XTAL, 701, 0, 512, 263, 0, 236);
 	m_screen->set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_ind16));
 	m_screen->set_palette("palette");

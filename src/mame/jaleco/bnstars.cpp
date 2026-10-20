@@ -600,7 +600,7 @@ void ms32_bnstars_state::bnstars(machine_config &config)
 {
 	V70(config, m_maincpu, XTAL(40'000'000)/2); // 20MHz (40MHz / 2)
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms32_bnstars_state::bnstars_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(ms32_bnstars_state::irq_callback));
+	m_maincpu->irq_cycle_callback().set(FUNC(ms32_bnstars_state::irq_callback));
 
 	Z80(config, m_audiocpu, XTAL(8'000'000)); // 8MHz present on sound PCB, Verified
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ms32_bnstars_state::bnstars_sound_map);
@@ -613,7 +613,7 @@ void ms32_bnstars_state::bnstars(machine_config &config)
 	{
 		PALETTE(config, m_palette[i]).set_entries(0x8000);
 
-		SCREEN(config, m_screen[i], SCREEN_TYPE_RASTER);
+		SCREEN(config, m_screen[i]);
 		m_screen[i]->set_raw(XTAL(48'000'000)/8, 384, 0, 320, 263, 0, 224); // default CRTC setup
 		m_screen[i]->set_palette(m_palette[i]);
 

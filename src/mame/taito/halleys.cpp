@@ -1954,7 +1954,7 @@ void halleys_state::halleys(machine_config &config)
 
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.50); /* verified on PCB */
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -2288,9 +2288,9 @@ void halleys_state::init_halley87()
 //**************************************************************************
 // Game Definitions
 
-GAME( 1984, benberob,   0,        benberob, benberob, halleys_state, init_benberob, ROT0,  "Taito",                                       "Ben Bero Beh (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
-GAME( 1986, halleysc,   0,        halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito America Corporation (Coin-It license)", "Halley's Comet (US)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1986, halleyscj,  halleysc, halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito Corporation",                           "Halley's Comet (Japan, rev 1)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1986, halleyscja, halleysc, halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito Corporation",                           "Halley's Comet (Japan)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1985, halleyscjp, halleysc, halleys,  halleys,  halleys_state, init_halleysp, ROT90, "Taito Corporation",                           "Halley's Comet (Japan, prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
-GAME( 1986, halleysc87, halleysc, halleys,  halleys,  halleys_state, init_halley87, ROT90, "Taito Corporation",                           "Halley's Comet '87",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1984, benberob,   0,        benberob, benberob, halleys_state, init_benberob, ROT0,  "Taito",                           "Ben Bero Beh (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_COCKTAIL )
+GAME( 1986, halleysc,   0,        halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito America (Coin-It license)", "Halley's Comet (US)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1986, halleyscj,  halleysc, halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito",                           "Halley's Comet (Japan, rev 1)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1986, halleyscja, halleysc, halleys,  halleys,  halleys_state, init_halleys,  ROT90, "Taito",                           "Halley's Comet (Japan)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1985, halleyscjp, halleysc, halleys,  halleys,  halleys_state, init_halleysp, ROT90, "Taito",                           "Halley's Comet (Japan, prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
+GAME( 1986, halleysc87, halleysc, halleys,  halleys,  halleys_state, init_halley87, ROT90, "Taito",                           "Halley's Comet '87",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )

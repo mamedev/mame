@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include <vector>
+
 
 
 
@@ -25,6 +27,7 @@ DECLARE_DEVICE_TYPE(CBM_IEC,      cbm_iec_device)
 DECLARE_DEVICE_TYPE(CBM_IEC_SLOT, cbm_iec_slot_device)
 
 void cbm_iec_devices(device_slot_interface &device);
+void cbm_iec_printer_devices(device_slot_interface &device);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -49,12 +52,15 @@ public:
 
 	void add_device(cbm_iec_slot_device *slot, device_t *target);
 
+	// call before a CPU samples the bus; returns false after setting up a retry of the access
+	bool sample_ready(cpu_device &cpu);
+
 	// reads for both host and peripherals
-	int srq_r() { return get_signal(SRQ); }
-	int atn_r() { return get_signal(ATN); }
-	int clk_r() { return get_signal(CLK); }
-	int data_r() { return get_signal(DATA); }
-	int reset_r() { return get_signal(RESET); }
+	int srq_r() { return get_signal(SRQ, machine().time()); }
+	int atn_r() { return get_signal(ATN, machine().time()); }
+	int clk_r() { return get_signal(CLK, machine().time()); }
+	int data_r() { return get_signal(DATA, machine().time()); }
+	int reset_r() { return get_signal(RESET, machine().time()); }
 
 	// writes for host (driver_device)
 	void host_srq_w(int state) { set_signal(this, SRQ, state); }
@@ -81,6 +87,17 @@ protected:
 		SIGNAL_COUNT
 	};
 
+	static constexpr unsigned EDGE_COUNT = 16;
+
+	struct source_lines
+	{
+		void reset();
+
+		attotime m_time[SIGNAL_COUNT][EDGE_COUNT];
+		u8 m_state[SIGNAL_COUNT][EDGE_COUNT];
+		u8 m_count[SIGNAL_COUNT];
+	};
+
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -96,7 +113,7 @@ protected:
 		device_t *                  m_device;       // associated device
 		device_cbm_iec_interface *  m_interface;    // associated device's daisy interface
 
-		int m_line[SIGNAL_COUNT];
+		source_lines m_lines;
 	};
 
 	simple_list<daisy_entry> m_device_list;
@@ -109,9 +126,14 @@ private:
 	devcb_write_line   m_write_reset;
 
 	void set_signal(device_t *device, int signal, int state);
-	int get_signal(int signal);
+	int get_signal(int signal, const attotime &time);
+	void update_lines();
+	TIMER_CALLBACK_MEMBER(update_tick);
 
-	int m_line[SIGNAL_COUNT];
+	source_lines m_lines;
+	u8 m_line[SIGNAL_COUNT];
+	emu_timer *m_update_timer;
+	std::vector<device_execute_interface *> m_execs;
 };
 
 
@@ -133,11 +155,19 @@ public:
 
 	template <typename T> static void add(machine_config &config, T &&_bus_tag, const char *_default_drive)
 	{
-		CBM_IEC_SLOT(config, "iec4", 4, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec4", 4, cbm_iec_printer_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec5", 5, cbm_iec_printer_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec6", 6, cbm_iec_printer_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec7", 7, cbm_iec_printer_devices, nullptr);
 		CBM_IEC_SLOT(config, "iec8", 8, cbm_iec_devices, _default_drive);
 		CBM_IEC_SLOT(config, "iec9", 9, cbm_iec_devices, nullptr);
 		CBM_IEC_SLOT(config, "iec10", 10, cbm_iec_devices, nullptr);
 		CBM_IEC_SLOT(config, "iec11", 11, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec12", 12, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec13", 13, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec14", 14, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec15", 15, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec30", 30, cbm_iec_devices, nullptr);
 
 		CBM_IEC(config, std::forward<T>(_bus_tag), 0);
 	}

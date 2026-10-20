@@ -3,6 +3,13 @@
 #include "emu.h"
 #include "ataflash.h"
 
+#define LOG_CIS (1U << 1)
+//#define VERBOSE (LOG_CIS)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+#define LOGCIS(...)    LOGMASKED(LOG_CIS, __VA_ARGS__)
+
 ata_flash_pccard_device::ata_flash_pccard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ata_flash_pccard_device(mconfig, ATA_FLASH_PCCARD, tag, owner, clock)
 {
@@ -31,25 +38,126 @@ void ata_flash_pccard_device::device_reset()
 
 	if (!cis)
 	{
-		m_cis[0] = 0x01; // CISTPL_DEVICE
+		m_cis[0] = CISTPL_DEVICE;
 		m_cis[1] = 0x04; // TPL_LINK
 		m_cis[2] = 0xdf; // 4:device type/1:WPS/3:device speed
 		m_cis[3] = 0x4a; // extended device speed (1:ext 4:mantissa 3:speed) (if speed==7)
 		m_cis[4] = 0x01; // device size byte (5:# of address units -1 3: size code)
 		m_cis[5] = 0xff; // end of device info field
-		m_cis[6] = 0x1a; // CISTPL_CONFIG
-		m_cis[7] = 0x05; // TPL_LINK
-		m_cis[8] = 0x01; // Size of Fields Byte (2:TPCC_RFSZ 4:TPCC_RMSZ 2:TPCC_RASZ)
-		m_cis[9] = 0x03; // TPCC_LAST (2:RFU 6:Last Index) (count of 0x1b?)
-		m_cis[10] = 0x00; // TPCC_RADR
-		m_cis[11] = 0x02; // TPCC_RADR
-		m_cis[12] = 0x0f; // TPCC_RMSK
-		m_cis[13] = 0x21; // CISTPL_FUNCID
-		m_cis[14] = 0x02; // TPL_LINK
-		m_cis[15] = 0x04; // TPLFID_FUNCTION
-		m_cis[16] = 0x01; // TPLFID_SYSINIT
-		m_cis[17] = 0xff; // CISTPL_END
-		m_cis[18] = 0xff; // TPL_LINK
+
+		m_cis[6] = CISTPL_MANFID;
+		m_cis[7] = 0x04; // TPL_LINK
+		m_cis[8] = 0x00; // Manufacture ID
+		m_cis[9] = 0x00;
+		m_cis[10] = 0x00; // Card ID
+		m_cis[11] = 0x00;
+
+		m_cis[12] = CISTPL_FUNCID;
+		m_cis[13] = 0x02; // TPL_LINK
+		m_cis[14] = 0x04; // TPLFID_FUNCTION
+		m_cis[15] = 0x01; // TPLFID_SYSINIT
+
+		m_cis[16] = CISTPL_CONFIG;
+		m_cis[17] = 0x05; // TPL_LINK
+		m_cis[18] = 0x01; // Size of Fields Byte (2:TPCC_RFSZ 4:TPCC_RMSZ 2:TPCC_RASZ)
+		m_cis[19] = 0x03; // TPCC_LAST (2:RFU 6:Last Index) (count of 0x1b?)
+		m_cis[20] = 0x00; // TPCC_RADR
+		m_cis[21] = 0x02; // TPCC_RADR
+		m_cis[22] = 0x0f; // TPCC_RMSK
+
+		m_cis[23] = CISTPL_VERS_1;
+		m_cis[24] = 0x14; // TPL_LINK
+		m_cis[25] = 0x05; // major version
+		m_cis[26] = 0x01; // minor version
+		m_cis[27] = 'M';
+		m_cis[28] = 'A';
+		m_cis[29] = 'M';
+		m_cis[30] = 'E';
+		m_cis[31] = '\0';
+		m_cis[32] = 'A';
+		m_cis[33] = 'T';
+		m_cis[34] = ' ';
+		m_cis[35] = 'F';
+		m_cis[36] = 'L';
+		m_cis[37] = 'A';
+		m_cis[38] = 'S';
+		m_cis[39] = 'H';
+		m_cis[40] = '\0';
+		m_cis[41] = '1';
+		m_cis[42] = '.';
+		m_cis[43] = '0';
+		m_cis[44] = '\0';
+
+		m_cis[45] = CISTPL_END;
+		m_cis[46] = 0xff; // TPL_LINK
+	}
+
+	if (VERBOSE & LOG_CIS)
+	{
+		size_t i = 0;
+		while (i < m_cis.size() && m_cis[i] != 0x01)
+		{
+			LOGCIS("CIS header unknown %02x\n", m_cis[i++]);
+		}
+
+		while (i < m_cis.size())
+		{
+			std::string cis;
+			if (m_cis[i] == CISTPL_NULL) { LOGCIS("CISTPL_NULL\n"); continue; }
+			else if (m_cis[i] == CISTPL_DEVICE) cis = "CISTPL_DEVICE";
+			else if (m_cis[i] == CISTPL_LONGLINK_CB) cis = "CISTPL_LONGLINK_CB";
+			else if (m_cis[i] == CISTPL_CONFIG_CB) cis = "CISTPL_CONFIG_CB";
+			else if (m_cis[i] == CISTPL_CFTABLE_ENTRY_CB) cis = "CISTPL_CFTABLE_ENTRY_CB";
+			else if (m_cis[i] == CISTPL_LONGLINK_MFC) cis = "CISTPL_LONGLINK_MFC";
+			else if (m_cis[i] == CISTPL_BAR) cis = "CISTPL_BAR";
+			else if (m_cis[i] == CISTPL_CHECKSUM) cis = "CISTPL_CHECKSUM";
+			else if (m_cis[i] == CISTPL_LONGLINK_A) cis = "CISTPL_LONGLINK_A";
+			else if (m_cis[i] == CISTPL_LONGLINK_C) cis = "CISTPL_LONGLINK_C";
+			else if (m_cis[i] == CISTPL_LINKTARGET) cis = "CISTPL_LINKTARGET";
+			else if (m_cis[i] == CISTPL_NO_LINK) cis = "CISTPL_NO_LINK";
+			else if (m_cis[i] == CISTPL_VERS_1) cis = "CISTPL_VERS_1";
+			else if (m_cis[i] == CISTPL_ALTSTR) cis = "CISTPL_ALTSTR";
+			else if (m_cis[i] == CISTPL_DEVICE_A) cis = "CISTPL_DEVICE_A";
+			else if (m_cis[i] == CISTPL_JEDEC_C) cis = "CISTPL_JEDEC_C";
+			else if (m_cis[i] == CISTPL_JEDEC_A) cis = "CISTPL_JEDEC_A";
+			else if (m_cis[i] == CISTPL_CONFIG) cis = "CISTPL_CONFIG";
+			else if (m_cis[i] == CISTPL_CFTABLE_ENTRY) cis = "CISTPL_CFTABLE_ENTRY";
+			else if (m_cis[i] == CISTPL_DEVICE_OC) cis = "CISTPL_DEVICE_OC";
+			else if (m_cis[i] == CISTPL_DEVICE_OA) cis = "CISTPL_DEVICE_OA";
+			else if (m_cis[i] == CISTPL_DEVICE_GEO) cis = "CISTPL_DEVICE_GEO";
+			else if (m_cis[i] == CISTPL_DEVICE_GEO_A) cis = "CISTPL_DEVICE_GEO_A";
+			else if (m_cis[i] == CISTPL_MANFID) cis = "CISTPL_MANFID";
+			else if (m_cis[i] == CISTPL_FUNCID) cis = "CISTPL_FUNCID";
+			else if (m_cis[i] == CISTPL_FUNCE) cis = "CISTPL_FUNCE";
+			else if (m_cis[i] == CISTPL_SWIL) cis = "CISTPL_SWIL";
+			else if (m_cis[i] == CISTPL_END) { LOGCIS("CISTPL_END\n"); break; }
+			else cis = util::string_format("UNKNOWN CISTPL %02x", m_cis[i]);
+			i++;
+
+			if (i < m_cis.size())
+			{
+				uint8_t len = m_cis[i++];
+				cis += util::string_format(" (len=%d):", len);
+
+				for (size_t j = 0; j < len; j++)
+				{
+					if (i < m_cis.size())
+						cis += util::string_format("  %02x", m_cis[i++]);
+					else
+					{
+						cis += util::string_format(" (truncated data)");
+						break;
+					}
+				}
+			}
+			else
+			{
+				cis += (" (truncated len)\n");
+				break;
+			}
+
+			LOGCIS("%s\n", cis);
+		}
 	}
 
 	m_configuration_option = 0;
@@ -59,32 +167,20 @@ void ata_flash_pccard_device::device_reset()
 
 uint16_t ata_flash_pccard_device::read_memory(offs_t offset, uint16_t mem_mask)
 {
-	if(offset <= 7)
-	{
-		m_8bit_data_transfers = !ACCESSING_BITS_8_15; // HACK
-		return command_r(offset);
-	}
-	else if(offset <= 15)
-	{
-		return control_r(offset & 7);
-	}
-	else
-	{
-		return 0xffff;
-	}
+	PAIR16 data; data.w = 0xffff;
+	if (offset < 8)
+		command_r(offset, data, mem_mask);
+	else if (offset < 16)
+		control_r(offset & 7, data, mem_mask);
+	return data.w;
 }
 
 void ata_flash_pccard_device::write_memory(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if(offset <= 7)
-	{
-		m_8bit_data_transfers = !ACCESSING_BITS_8_15; // HACK
-		command_w(offset, data);
-	}
-	else if( offset <= 15)
-	{
-		control_w(offset & 7, data);
-	}
+	if(offset < 8)
+		command_w(offset, data, mem_mask);
+	else if( offset < 16)
+		control_w(offset & 7, data, mem_mask);
 }
 
 uint16_t ata_flash_pccard_device::read_reg(offs_t offset, uint16_t mem_mask)

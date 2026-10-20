@@ -29,13 +29,13 @@ public:
 	uint16_t *identify_device_buffer() { return m_identify_buffer; }
 
 	// device_ata_interface implementation
-	virtual uint16_t read_dma() override { return dma_r(); }
-	virtual uint16_t read_cs0(offs_t offset, uint16_t mem_mask) override { return command_r(offset); }
-	virtual uint16_t read_cs1(offs_t offset, uint16_t mem_mask) override { return control_r(offset); }
+	virtual void read_dma(PAIR16 &data) override { dma_r(data); }
+	virtual void read_cs0(offs_t offset, PAIR16 &data) override { command_r(offset, data); }
+	virtual void read_cs1(offs_t offset, PAIR16 &data) override { control_r(offset, data); }
 
 	virtual void write_dma(uint16_t data) override { dma_w(data); }
-	virtual void write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask) override { command_w(offset, data); }
-	virtual void write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask) override { control_w(offset, data); }
+	virtual void write_cs0(offs_t offset, uint16_t data) override { command_w(offset, data); }
+	virtual void write_cs1(offs_t offset, uint16_t data) override { control_w(offset, data); }
 
 	virtual void write_dmack(int state) override { set_dmack_in(state); }
 	virtual void write_csel(int state) override { set_csel_in(state); }
@@ -59,7 +59,7 @@ protected:
 	uint16_t m_ultra_dma_mode;
 
 private:
-	// ata_hle_device_base implementation
+	// device_ata_hle_interface implementation
 	virtual void set_irq_out(int state) override { device_ata_interface::set_irq(state); }
 	virtual void set_dmarq_out(int state) override { device_ata_interface::set_dmarq(state); }
 	virtual void set_dasp_out(int state) override { device_ata_interface::set_dasp(state); }

@@ -236,6 +236,8 @@ public:
 	void chicgum(machine_config &config) ATTR_COLD;
 	void strker(machine_config &config) ATTR_COLD;
 
+	void init_unk_gamble_enc() ATTR_COLD;
+
 private:
 	required_shared_ptr<uint8_t> m_nvram;
 
@@ -245,18 +247,6 @@ private:
 	void strker_main_map(address_map &map) ATTR_COLD;
 
 	void unkpacg_main_portmap(address_map &map) ATTR_COLD;
-};
-
-class unk_gambl_enc_state : public unk_gambl_state
-{
-public:
-	unk_gambl_enc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: unk_gambl_state(mconfig, type, tag)
-	{
-	}
-
-private:
-	virtual void driver_start() override ATTR_COLD;
 };
 
 
@@ -695,7 +685,7 @@ void _4enraya_state::machine_reset()
 void _4enraya_state::video(machine_config &config)
 {
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
@@ -1126,11 +1116,22 @@ ROM_START( unksigb ) // this set has been found with GFX ROMs of different sizes
 	ROM_LOAD( "u170", 0x4000, 0x2000, CRC(f9c686fc) SHA1(b34412be047e04fc6aca218adf61bbe233908bd7) )
 ROM_END
 
+ROM_START( unksigc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2764_space 11 000 2.bin", 0x0000, 0x2000, CRC(3f4422af) SHA1(cc99db35ec8aa9fb91aa03a0f9f6f012a6f48faa) )
+	ROM_LOAD( "cpu_27256.bin",           0x8000, 0x8000, CRC(f0517058) SHA1(0f8c1492e31777c70ff61b7c2cba014d84eb1203) ) // only the first 0x2000 matter
+
+	ROM_REGION( 0x6000, "chars", 0 )
+	ROM_LOAD( "2764_space inv r.bin",         0x0000, 0x2000, CRC(57c98676) SHA1(7b91e091225ac388a29fa03345be669295f2f699) )
+	ROM_LOAD( "2764_space pas etiquette.bin", 0x2000, 0x2000, CRC(e330a0cb) SHA1(e1b451ac80fc94035bdcde083da256b6bad70534) )
+	ROM_LOAD( "2764_space bleu.bin",          0x4000, 0x2000, CRC(f9c686fc) SHA1(b34412be047e04fc6aca218adf61bbe233908bd7) )
+ROM_END
+
 /***********************************
 *          Driver Init             *
 ***********************************/
 
-void unk_gambl_enc_state::driver_start()
+void unk_gambl_state::init_unk_gamble_enc()
 {
 	// descramble ROM
 	uint8_t *rom = memregion("maincpu")->base();
@@ -1155,12 +1156,13 @@ GAME( 1992?, chicgum,  0,       chicgum,  tourpgum,  unk_gambl_state, empty_init
 GAME( 1992?, strker,   0,       strker,   strker,    unk_gambl_state, empty_init, ROT0, "<unknown>",     "Striker",        MACHINE_SUPPORTS_SAVE )
 GAME( 1992?, bowlgum,  0,       chicgum,  tourpgum,  unk_gambl_state, empty_init, ROT0, "<unknown>",     "Bowling Gum",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, unkpacg,   0,       unkpacg,  unkpacg,   unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)",   MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkpacgb,  unkpacg, unkpacg,  unkpacg,   unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1988, unkpacgc,  unkpacg, unkpacg,  unkpacg,   unk_gambl_state,     empty_init, ROT0, "<unknown>", "Coco Louco",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1988, unkpacgd,  unkpacg, unkpacg,  unkpacg,   unk_gambl_state,     empty_init, ROT0, "<unknown>", "unknown 'Pac Man with cars' gambling game", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkpacga,  unkpacg, unkpacga, unkpacg,   unk_gambl_enc_state, empty_init, ROT0, "IDI SRL",   "Pucman",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacg,   0,       unkpacg,  unkpacg,   unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)",   MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacgb,  unkpacg, unkpacg,  unkpacg,   unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1988, unkpacgc,  unkpacg, unkpacg,  unkpacg,   unk_gambl_state, empty_init,          ROT0, "<unknown>", "Coco Louco",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1988, unkpacgd,  unkpacg, unkpacg,  unkpacg,   unk_gambl_state, empty_init,          ROT0, "<unknown>", "unknown 'Pac Man with cars' gambling game", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacga,  unkpacg, unkpacga, unkpacg,   unk_gambl_state, init_unk_gamble_enc, ROT0, "IDI SRL",   "Pucman",                                    MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, unksig,    0,       unkpacg,  unkfr,     unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksiga,   unksig,  unkpacg,  unkfr,     unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksigb,   unksig,  unkpacg,  unkfr,     unk_gambl_state,     empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (unencrypted)",      MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksig,    0,       unkpacg,  unkfr,     unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksiga,   unksig,  unkpacg,  unkfr,     unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksigb,   unksig,  unkpacg,  unkfr,     unk_gambl_state, empty_init,          ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (unencrypted)",      MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksigc,   unksig,  unkpacg,  unkfr,     unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 3)", MACHINE_SUPPORTS_SAVE )

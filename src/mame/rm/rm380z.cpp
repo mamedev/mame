@@ -214,7 +214,7 @@ void rm380z_state::base_configure(machine_config &config)
 
 	/* video hardware */
 	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(rm380z_state::screen_update_rm380z));
 	m_screen->set_palette(m_palette);
 

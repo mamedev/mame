@@ -41,7 +41,7 @@ void tandy200_state::tandy200_lcdc(address_map &map)
 
 void kc85_state::kc85_video(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_lcd());
 	screen.set_refresh_hz(44);
 	screen.set_screen_update(FUNC(kc85_state::screen_update));
 	screen.set_size(240, 64);
@@ -59,7 +59,7 @@ void kc85_state::kc85_video(machine_config &config)
 
 void tandy200_state::tandy200_video(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_lcd());
 	screen.set_refresh_hz(80);
 	screen.set_screen_update(FUNC(tandy200_state::screen_update));
 	screen.set_size(240, 128);

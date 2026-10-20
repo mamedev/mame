@@ -461,7 +461,7 @@ void orbit_state::orbit(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK*2, 384*2, 0, 256*2, 261*2, 0, 240*2);
 	m_screen->set_screen_update(FUNC(orbit_state::screen_update));
 	m_screen->set_palette(m_palette);

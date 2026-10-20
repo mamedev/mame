@@ -284,7 +284,7 @@ void psion3_state::psion3(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &psion3_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback(m_asic1, FUNC(psion_asic1_device::inta_cb));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_size(240, 80);
 	screen.set_visarea_full();
 	screen.set_refresh_hz(66);

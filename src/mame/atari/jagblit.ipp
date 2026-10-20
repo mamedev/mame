@@ -400,6 +400,8 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 				// - atarikrt track borders
 				// - spacewar intro
 				// - missil3d (uses both clipping types)
+				// - chekflag map display
+				// - whitemen gameplay
 				if (COMMAND & 0x00000040)
 				{
 					s32 target_x = COMMAND & 0x00000800 ? asrc_x : adest_x;
@@ -539,7 +541,7 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 					WRITE_ZDATA(adestflags, srczdata);
 			}
 
-				/* update X/Y */
+			/* update X/Y */
 			asrc_x = (asrc_x + asrc_xadd) & asrc_xmask;
 			asrc_y = (asrc_y + asrc_yadd) & asrc_ymask;
 			adest_x = (adest_x + adest_xadd) & adest_xmask;

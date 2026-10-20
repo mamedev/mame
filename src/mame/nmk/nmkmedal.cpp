@@ -134,6 +134,23 @@ NMK MAC98205-1 - main CPU board, stickered 99040048
 - 9 x connectors
 
 Other PCBs unknown
+
+-------
+Sugo Rock Spirit by NMK
+
+Video of the game: https://www.youtube.com/watch?v=e4rrxtm_sy4
+
+NMK MAC98189 - main CPU board, stickered 982023
+- Toshiba TMP90C041AN
+- 16.0000 MHz XTAL
+- main CPU ROM
+- YMZ280B-F
+- 1 x YMZ ROM + 1 x empty socket
+- NMK01 custom
+- NMK903 custom
+- 20.000 MHz XTAL
+- volume knob
+- 9 x connectors
 */
 
 
@@ -474,6 +491,16 @@ ROM_START( draillov )
 	ROM_LOAD( "223_lovely.2", 0x00000, 0x80000, CRC(5319c060) SHA1(acd13e6e0f0583cf912b229998f6b3fd886bc45d) ) // label is actually ラブリー
 ROM_END
 
+// スゴ Rock Spirit
+ROM_START( srspirit )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "spirit_v987100.1", 0x00000, 0x10000, CRC(76069d1e) SHA1(8cf3c4faa825be610835bb3b54e0d78ae7ed361c) ) // actual label "スピリット V987100"
+
+	ROM_REGION( 0x100000, "ymz", ROMREGION_ERASE00 )
+	ROM_LOAD( "spirit_2.2", 0x00000, 0x80000, CRC(eab05efd) SHA1(871a73e44e5e89a6bc41f60608ea65e722dfa009) ) // actual label "スピリット 2"
+	// empty second socket
+ROM_END
+
 // POW98200 main PCB + POW98202 ROM PCB with small label "9810 ムラカミ" (9810 murakami)
 ROM_START( pldoraemon )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -517,6 +544,7 @@ GAME( 1996, sweethrt,   0,        sweethrt, trocana, hpierrot_state, empty_init,
 GAME( 1998, draillov,   0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NTC / NMK",  "Dream Rail Lovely",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // LOVELY D_RAIL LOVELY NMK LTD DR_LOLÙ MT155 \T2\V0° V98B27° UPRIGHT_PCB223_150CAP strings
 GAME( 1998, plpittashi, 0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Love Pi Chan (Power Link)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, V98622°, LOVE PI, CHAN strings (title taken from string, very probably wrong)
 GAME( 1998, sluster2,   0,        drail,    trocana, hpierrot_state, empty_init, ROT0, "NMK",        "Super Luster II",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, H10072,·V040P, V98727 strings
+GAME( 1998, srspirit,   0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Sugo Rock Spirit",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, V98710 strings
 GAME( 1999, omatsuri,   0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK / Sega", "Shimura Ken no Bakatono-sama Ooedomatsuri", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, V99422 strings. Cabinet has NMK logo, manual has Sega logo
 GAME( 1999, pldoraemon, 0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Doraemon (Power Link)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, V99204°, DORAMON (sic), STEPPING_PCB200_CAP75 strings
 GAME( 1999, pllovegene, 0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "The Love Generation (Power Link)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // LOVE GE NMK LTD MK LTD CHAN16± V98616

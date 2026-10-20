@@ -365,7 +365,7 @@ void trs80dt1_state::trs80dt1(machine_config &config)
 	m_maincpu->port_in_cb<3>().set(FUNC(trs80dt1_state::port3_r));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update("crtc", FUNC(i8276_device::screen_update));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */

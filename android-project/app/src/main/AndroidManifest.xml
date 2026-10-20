@@ -3,9 +3,8 @@
      com.gamemaker.game
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="org.mamedev.mame"
-      android:versionCode="288"
-      android:versionName="0.288"
+      android:versionCode="289"
+      android:versionName="0.289"
       android:installLocation="auto">
 
     <!-- OpenGL ES 2.0 -->
@@ -46,8 +45,6 @@
     <!-- <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" /> -->
     <!-- <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" /> -->
 
-    <!-- Allow writing to external storage -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!-- Allow access to the vibrator -->
     <uses-permission android:name="android.permission.VIBRATE" />
 

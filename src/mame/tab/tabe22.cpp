@@ -262,7 +262,7 @@ void tabe22_state::tabe22(machine_config &config)
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::amber());
 	m_screen->set_raw(21.7566_MHz_XTAL, 918, 0, 720, 395, 0, 378); // 80 column mode
 //  m_screen->set_raw(35.8344_MHz_XTAL, 1494, 0, 1188, 395, 0, 378); // 132 column mode

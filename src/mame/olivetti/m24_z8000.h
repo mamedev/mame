@@ -37,6 +37,8 @@ public:
 	void z8000_data(address_map &map) ATTR_COLD;
 	void z8000_io(address_map &map) ATTR_COLD;
 	void z8000_prog(address_map &map) ATTR_COLD;
+	uint16_t segment_r();
+	uint16_t segtack_r();
 protected:
 	void device_start() override ATTR_COLD;
 	void device_reset() override ATTR_COLD;

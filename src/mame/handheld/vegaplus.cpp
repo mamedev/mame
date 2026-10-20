@@ -62,7 +62,7 @@ void vegaplus_state::vegaplus(machine_config &config)
 	ARM9(config, m_maincpu, 454000000); // Freescale MCIMX233DJM4C
 	m_maincpu->set_addrmap(AS_PROGRAM, &vegaplus_state::arm_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);

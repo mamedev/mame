@@ -182,7 +182,7 @@ void idpart_video_device::device_add_mconfig(machine_config &config)
 	m_crtc->drq_wr_callback().append(*this, FUNC(idpart_video_device::dreq0_w));
 	m_crtc->irq_wr_callback().set_inputline(m_maincpu, I8085_RST55_LINE);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(22'680'000) / 2, 728, 0, 560, 310, 0, 270);
 	screen.set_screen_update(m_crtc, FUNC(i8275_device::screen_update));
 }

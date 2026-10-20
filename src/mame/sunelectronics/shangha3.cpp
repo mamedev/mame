@@ -23,7 +23,7 @@ blocken:
 - incomplete zoom support, and missing rotation support. Setting the game in
   Game Mode B shows a decent test case for it by starting a play.
 - attract mode tries to read at 0x80000-0xfffff area, returning 0 in there
-  freezes the demo play for some frames (MT #00985). For now I've returned $ff,
+  freezes the demo play for some frames (MT00985). For now I've returned $ff,
   but needs HW tests to check out what lies in there (maybe a ROM mirror).
 - how to play screen is bogus, it basically loses sync pretty soon.
 
@@ -792,7 +792,7 @@ void shangha3_state::shangha3(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(shangha3_state::irq4_line_assert));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 //  m_screen->set_refresh_hz(60);
 //  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 //  m_screen->set_size(24*16, 16*16);
@@ -829,7 +829,7 @@ void heberpop_state::heberpop(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &heberpop_state::sound_io_map);  // NMI triggered by YM3438
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 //  m_screen->set_refresh_hz(60);
 //  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 //  m_screen->set_size(24*16, 16*16);
@@ -869,7 +869,7 @@ void blocken_state::blocken(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &blocken_state::sound_io_map);  // NMI triggered by YM3438
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 //  m_screen->set_refresh_hz(60);
 //  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 //  m_screen->set_size(24*16, 16*16);

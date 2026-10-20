@@ -138,7 +138,7 @@ void v550_state::v550(machine_config &config)
 	v550_keyboard_device &keyboard(V550_KEYBOARD(config, "keyboard"));
 	keyboard.txd_callback().set(m_usart, FUNC(i8251_device::write_rxd));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(34.846_MHz_XTAL, 19 * 102, 0, 19 * 80, 295, 0, 272);
 	m_screen->set_screen_update(FUNC(v550_state::screen_update));
 

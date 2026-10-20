@@ -287,7 +287,7 @@ uint8_t jr200_state::mcu_keyb_r()
 		table = 2;
 	// SHIFT
 	if (modifiers & 0x06)
-		table ++;
+		table++;
 
 	/* scan keyboard */
 	for (u8 row = 0; row < 7; row++)
@@ -314,18 +314,20 @@ uint8_t jr200_state::mcu_keyb_r()
 	// This might need to be done away with if games don't like it (should any be found)
 	if (keydata && (m_old_keydata == keydata))
 	{
-		m_autorepeat++;
+		u16 autorepeat = m_autorepeat + 1;
 		if (m_autorepeat == 2) // initial keypress
-			ret = keydata;
-		else
-		if (m_autorepeat == 0x330) // pause
 		{
 			ret = keydata;
-			m_autorepeat = 0x2e0; // repeat speed (pause - this)
 		}
+		else if (m_autorepeat == 0x330) // pause
+		{
+			ret = keydata;
+			autorepeat = 0x2e0; // repeat speed (pause - this)
+		}
+		if (!machine().side_effects_disabled())
+			m_autorepeat = autorepeat;
 	}
-	else
-	if (m_old_keydata != keydata)
+	else if ((m_old_keydata != keydata) && !machine().side_effects_disabled())
 	{
 		// new key or none
 		m_old_keydata = keydata;
@@ -413,12 +415,12 @@ void jr200_state::mn1271_io_w(offs_t offset, uint8_t data)
 	{
 		case 0xc803: unknown_port_w(data); break;
 		case 0xc805: break; //LPT printer port W
-		case 0xc816: if (data!=0) {
-					m_timer_d->adjust(attotime::zero, 0, attotime::from_hz(XTAL(14'318'181)) * (m_mn1271_ram[0x17]*0x100 + m_mn1271_ram[0x18]));
-				} else {
-					m_timer_d->adjust(attotime::zero, 0,  attotime::zero);
-				}
-				break;
+		case 0xc816:
+			if (data!=0)
+				m_timer_d->adjust(attotime::zero, 0, attotime::from_hz(XTAL(14'318'181)) * (m_mn1271_ram[0x17]*0x100 + m_mn1271_ram[0x18]));
+			else
+				m_timer_d->adjust(attotime::zero, 0, attotime::zero);
+			break;
 		case 0xc819: jr200_beep_w(data); break;
 		case 0xc81a:
 		case 0xc81b: jr200_beep_freq_w(offset-0x1a,data); break;
@@ -611,7 +613,7 @@ void jr200_state::jr200(machine_config &config)
 //  MN1544(config, "mn1544", ?);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(16 + 256 + 16, 16 + 192 + 16); /* border size not accurate */

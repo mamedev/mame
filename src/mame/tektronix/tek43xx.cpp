@@ -54,7 +54,7 @@ void tek43xx_state::tek4319(machine_config &config)
 	M68020(config, m_maincpu, 20'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tek43xx_state::mem_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(60 * 1600 * 1066, 1600, 0, 1280, 1066, 0, 1024); // not confirmed except for displayed resolution
 	screen.set_screen_update(FUNC(tek43xx_state::screen_update));
 }

@@ -430,7 +430,7 @@ TIMER_CALLBACK_MEMBER(hp9885_device::bit_byte_tick)
 						} else {
 							m_word_cnt = 130;
 							set_state(FSM_WR_DATA);
-							m_pll.start_writing(m_pll.ctime);
+							m_pll.start_writing(m_pll.ctime, m_drive);
 							m_had_transition = false;
 							wr_word(m_input);
 							set_ibf(false);
@@ -624,7 +624,7 @@ void hp9885_device::floppy_index_cb(floppy_image_device *floppy , int state)
 			// See bit_byte_tick function
 			m_word_cnt = 167;
 			m_pll.set_clock(attotime::from_usec(HALF_CELL_US));
-			m_pll.start_writing(machine().time());
+			m_pll.start_writing(machine().time(), m_drive);
 			m_pll.read_reset(machine().time());
 			m_had_transition = false;
 			// Start by writing 1st sync word

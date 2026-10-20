@@ -92,7 +92,7 @@ void smd2144c_state::smd2144c(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &smd2144c_state::program_map);
 
 	// all wrong
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

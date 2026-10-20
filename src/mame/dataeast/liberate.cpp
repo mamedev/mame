@@ -643,7 +643,7 @@ void liberate_state::prosport_interrupt(int state)
  *
  *************************************/
 
-MACHINE_START_MEMBER(liberate_state,liberate)
+void liberate_state::machine_start()
 {
 	save_item(NAME(m_background_disable));
 	save_item(NAME(m_background_color));
@@ -653,7 +653,7 @@ MACHINE_START_MEMBER(liberate_state,liberate)
 	save_item(NAME(m_io_ram));
 }
 
-MACHINE_RESET_MEMBER(liberate_state,liberate)
+void liberate_state::machine_reset()
 {
 	std::fill(std::begin(m_io_ram), std::end(m_io_ram), 0);
 
@@ -676,11 +676,8 @@ void liberate_state::liberate_base(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(12000));
 
-	MCFG_MACHINE_START_OVERRIDE(liberate_state,liberate)
-	MCFG_MACHINE_RESET_OVERRIDE(liberate_state,liberate)
-
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529) /* 529ms Vblank duration?? */);
 	screen.set_size(32*8, 32*8);
@@ -707,6 +704,7 @@ void liberate_state::liberate_base(machine_config &config)
 void liberate_state::liberate(machine_config &config)
 {
 	liberate_base(config);
+
 	m_maincpu->set_addrmap(AS_OPCODES, &liberate_state::decrypted_opcodes_map);
 }
 
@@ -715,7 +713,7 @@ void liberate_state::liberatb(machine_config &config)
 	liberate_base(config);
 
 	/* basic machine hardware */
-	M6502(config.replace(), m_maincpu, 2000000);
+	M6502(config.replace(), m_maincpu, 2'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &liberate_state::liberatb_map);
 }
 
@@ -739,11 +737,11 @@ void liberate_state::prosoccr(machine_config &config)
 	liberate_base(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_clock(10000000/8); //xtal is unknown?
+	m_maincpu->set_clock(10'000'000/8); //xtal is unknown?
 	m_maincpu->set_addrmap(AS_PROGRAM, &liberate_state::prosoccr_map);
 	m_maincpu->set_addrmap(AS_IO, &liberate_state::deco16_io_map);
 
-	m_audiocpu->set_clock(10000000/8); //xtal is 12 Mhz, divider is unknown
+	m_audiocpu->set_clock(10'000'000/8); //xtal is 12 Mhz, divider is unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &liberate_state::prosoccr_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(12000));
@@ -769,11 +767,8 @@ void liberate_state::prosport(machine_config &config)
 
 //  config.set_maximum_quantum(attotime::from_hz(12000));
 
-	MCFG_MACHINE_START_OVERRIDE(liberate_state,liberate)
-	MCFG_MACHINE_RESET_OVERRIDE(liberate_state,liberate)
-
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1529) /* 529ms Vblank duration?? */);
 	screen.set_size(32*8, 32*8);

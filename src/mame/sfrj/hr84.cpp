@@ -279,7 +279,7 @@ void hr84_state::hr84(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hr84_state::hr84_mem);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(14.7456_MHz_XTAL, 472, 0, 320, 312, 0, 240);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	PALETTE(config, m_palette, palette_device::MONOCHROME);

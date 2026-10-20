@@ -5,7 +5,6 @@
 Victor 9000 / ACT Sirius 1 emulation
 
 TODO:
-- contrast
 - expansion bus:
   * Z80 card
   * RAM cards
@@ -133,7 +132,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices
@@ -208,7 +206,7 @@ private:
 	MC6845_UPDATE_ROW( crtc_update_row );
 	MC6845_BEGIN_UPDATE( crtc_begin_update );
 
-	void victor9k_palette(palette_device &palette) const;
+	void update_palette();
 
 	void update_kback();
 
@@ -276,6 +274,12 @@ INPUT_PORTS_END
 #define DC_LOWINT   0x4000
 #define DC_RVS      0x8000
 
+enum : int
+{
+	PEN_LOWINT = 0,
+	PEN_VIDEO
+};
+
 MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 {
 	int hires = BIT(ma, 13);
@@ -327,11 +331,7 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 			int color = 0;
 
 			if (pixel && de)
-			{
-				int pen = 1 + m_brt;
-				if (!lowint) pen = 9;
-				color = palette[pen];
-			}
+				color = palette[lowint ? PEN_LOWINT : PEN_VIDEO];
 
 			bitmap.pix(vbp + y, x++) = color;
 		}
@@ -543,6 +543,8 @@ void victor9k_state::via2_pb_w(uint8_t data)
 	// contrast
 	m_cont = data >> 5;
 
+	update_palette();
+
 	LOGDISPLAY("BRT %u CONT %u\n", m_brt, m_cont);
 }
 
@@ -642,32 +644,62 @@ void victor9k_state::hd_dma_w(offs_t offset, uint8_t data)
 //  MACHINE INITIALIZATION
 //******************************************************************************
 
-void victor9k_state::victor9k_palette(palette_device &palette) const
+/*
+
+	BRT0-BRT2 drive R23 82K, R25 39K and R26 20K into the emitter of Q3, whose
+    base is grounded, so the node sits one VBE above ground and the three
+    resistors simply sum currents; R24 220K adds a fixed offset from +12V.  Q3's
+    collector feeds the monitor's BRIGHTNESS input (J13 pin 5).  Its 7uA to 288uA
+    span makes this the coarse control.
+
+    CONT0-CONT2 are inverted by 13D and feed R27 620R, R28 332R and R29 162R
+    into the LOWINT clamp through Q4.  Contrast changes only low-intensity pixels;
+    highlighted pixels are controlled by brightness alone.
+
+    Approximate the low-intensity level with the normalized resistor weights,
+    up to the highlighted level at CONT=7.  The monitor's analogue transfer
+    function is not modelled; brightness and contrast are mapped above fixed
+    floors instead.  Unlit pixels remain black.
+
+*/
+
+void victor9k_state::update_palette()
 {
-	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
+	constexpr double VBE = 0.7;
+	constexpr double VOH = 3.4;
+	constexpr double VOL = 0.2;
 
-	// BRT0 82K
-	// BRT1 39K
-	// BRT2 20K
-	// 12V 220K pullup
-	palette.set_pen_color(1, rgb_t(0x00, 0x10, 0x04));
-	palette.set_pen_color(2, rgb_t(0x00, 0x20, 0x09));
-	palette.set_pen_color(3, rgb_t(0x00, 0x40, 0x11));
-	palette.set_pen_color(4, rgb_t(0x00, 0x60, 0x1a));
-	palette.set_pen_color(5, rgb_t(0x00, 0x80, 0x23));
-	palette.set_pen_color(6, rgb_t(0x00, 0xa0, 0x2c));
-	palette.set_pen_color(7, rgb_t(0x00, 0xc0, 0x34));
-	palette.set_pen_color(8, rgb_t(0x00, 0xff, 0x45));
+	// brightness DAC current, as a fraction of its maximum
+	auto const brt_current = [] (int brt)
+	{
+		return (12.0 - VBE) / 220000.0
+			+ ((BIT(brt, 0) ? VOH : VOL) - VBE) / 82000.0
+			+ ((BIT(brt, 1) ? VOH : VOL) - VBE) / 39000.0
+			+ ((BIT(brt, 2) ? VOH : VOL) - VBE) / 20000.0;
+	};
+	constexpr double BRT_FLOOR = 0.5;
+	double const brt = BRT_FLOOR + (1.0 - BRT_FLOOR) * brt_current(m_brt) / brt_current(7);
 
-	// CONT0 620R
-	// CONT1 332R
-	// CONT2 162R
-	// 12V 110R pullup
-	palette.set_pen_color(9, rgb_t(0x00, 0xff, 0x45));
+	// approximate low-intensity level relative to highlighted pixels
+	constexpr double CONT_FLOOR = 0.6;
+	constexpr double G = 1.0 / 620.0 + 1.0 / 332.0 + 1.0 / 162.0;
+	double const cont = CONT_FLOOR + (1.0 - CONT_FLOOR) * (BIT(m_cont, 0) / 620.0
+		+ BIT(m_cont, 1) / 332.0
+		+ BIT(m_cont, 2) / 162.0) / G;
+
+	auto const set_pen = [this] (int index, double level)
+	{
+		m_palette->set_pen_color(index, rgb_t(0, u8(level * 0xff + 0.5), u8(level * 0x45 + 0.5)));
+	};
+
+	set_pen(PEN_LOWINT, brt * cont);
+	set_pen(PEN_VIDEO, brt);
 }
 
 void victor9k_state::machine_start()
 {
+	update_palette();
+
 	// state saving
 	save_item(NAME(m_brt));
 	save_item(NAME(m_cont));
@@ -706,18 +738,6 @@ void victor9k_state::machine_start()
 	}
 }
 
-void victor9k_state::machine_reset()
-{
-	m_maincpu->reset();
-	m_upd7201->reset();
-	m_ssda->reset();
-	m_via1->reset();
-	m_via2->reset();
-	m_via3->reset();
-	m_crtc->reset();
-	m_fdc->reset();
-}
-
 
 
 //******************************************************************************
@@ -741,7 +761,7 @@ void victor9k_state::victor9k(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(I8259A_TAG, FUNC(pic8259_device::inta_cb));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_refresh_hz(72);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1200));
@@ -749,7 +769,7 @@ void victor9k_state::victor9k(machine_config &config)
 	m_screen->set_visarea(0, 799, 0, 399);
 	m_screen->set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
 
-	PALETTE(config, m_palette, FUNC(victor9k_state::victor9k_palette), 16);
+	PALETTE(config, m_palette, palette_device::BLACK, 2);
 	HD6845S(config, m_crtc, 15_MHz_XTAL / 10); // HD6845 == HD46505S
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(false);
@@ -869,6 +889,7 @@ void victor9k_state::victor9k(machine_config &config)
 	RAM(config, m_ram).set_default_size("128K").set_extra_options("128K,256K,512K,640K,768K,896K");
 
 	SOFTWARE_LIST(config, "flop_list").set_original("victor9k_flop");
+	SOFTWARE_LIST(config, "hdd_list").set_original("victor9k_hdd");
 }
 
 
@@ -900,4 +921,4 @@ ROM_END
 //******************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                     FULLNAME       FLAGS
-COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, empty_init, "Victor Business Products", "Victor 9000", MACHINE_IMPERFECT_COLORS )
+COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, empty_init, "Victor Business Products", "Victor 9000", MACHINE_SUPPORTS_SAVE )

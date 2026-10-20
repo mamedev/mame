@@ -588,7 +588,7 @@ void truco_state::truco(machine_config &config)
 	pia.irqb_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(256, 192);

@@ -16,7 +16,7 @@
         * MC68681 DUART / timer (3.6864 MHz clock) (serial channel A = keyboard, channel B = RS-232 port)
         * AM9513 timer (source of timer IRQ)
         * NCR5385 SCSI controller
-		* X2210 NVRAM
+        * X2210 NVRAM
 
         Video is a 640x480 1bpp window on a 1024x1024 VRAM area; smooth panning around that area
         is possible as is flat-out changing the scanout address.
@@ -133,6 +133,10 @@ private:
 	u8 store_r();
 	void store_w(u8 data);
 
+	// cache SoundRdy
+	void ready_sound(int state);
+
+
 	void kb_rdata_w(int state);
 	void kb_tdata_w(int state);
 	void kb_rclamp_w(int state);
@@ -201,7 +205,7 @@ void tek440x_state::machine_reset()
 	m_keyboard->kdo_w(1);
 	mapcntl_w(0);
 	m_vint->in_w<1>(0);
-	
+
 	m_novram->recall(ASSERT_LINE);
 	m_novram->recall(CLEAR_LINE);
 }
@@ -232,6 +236,13 @@ u32 tek440x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 
 	return 0;
+}
+
+// this is masked into VideoControl reads
+void tek440x_state::ready_sound(int state)
+{
+	LOGMASKED(LOG_IRQ, "ready_sound(%d)\n", state);
+	m_soundrdy = state ? 0x08 : 0x00;
 }
 
 
@@ -373,6 +384,9 @@ u16 tek440x_state::fpu_r(offs_t offset)
 
 void tek440x_state::sound_w(u8 data)
 {
+	if (m_boot)
+		LOG("BOOT PROM disabled\n");
+	
 	m_snsnd->write(data);
 	m_boot = false;
 }
@@ -433,7 +447,7 @@ void tek440x_state::nvram_w(offs_t offset, u8 data)
 
 	m_novram->write(offset, data >> 4);
 }
-	
+
 u8 tek440x_state::recall_r()
 {
 	if (!machine().side_effects_disabled())
@@ -584,7 +598,7 @@ void tek440x_state::tek4404(machine_config &config)
 	m_vint->output_handler().set_inputline(m_maincpu, M68K_IRQ_6);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_raw(25.2_MHz_XTAL, 800, 0, 640, 525, 0, 480); // 31.5 kHz horizontal, 60 Hz vertical
 	screen.set_screen_update(FUNC(tek440x_state::screen_update));
@@ -640,6 +654,7 @@ void tek440x_state::tek4404(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	SN76496(config, m_snsnd, 25.2_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
+	m_snsnd->ready_cb().set(FUNC(tek440x_state::ready_sound));
 }
 
 

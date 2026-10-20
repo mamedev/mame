@@ -1259,7 +1259,7 @@ void midzunit_state::zunit(machine_config &config)
 	// video hardware
 	PALETTE(config, m_palette).set_entries(8192);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	// from TMS340 registers
 	screen.set_raw(MEDRES_PIXEL_CLOCK*2, 674, 122, 634, 433, 27, 427);
@@ -1299,7 +1299,7 @@ void midyunit_base_state::yunit_core(machine_config &config)
 	// video hardware
 	PALETTE(config, m_palette).set_entries(256);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	// from TMS340 registers - visible area varies slightly between games
 	// we use the largest visarea (smashtv's) here so that aviwrite will work nicely
@@ -3505,6 +3505,14 @@ ROM_START( mkyawdim4 )
 	ROM_LOAD( "29.bin", 0x480000, 0x80000, CRC(2a6c10a0) SHA1(cc90923c44f2961b945a0fd0f85ecc2ba04af2cb) )
 	ROM_LOAD( "28.bin", 0x500000, 0x80000, CRC(23308979) SHA1(0b36788624a1cf0d3f4c895be5ba967b8dfcf85e) )
 	ROM_LOAD( "27.bin", 0x580000, 0x80000, CRC(cafc47bb) SHA1(8610af6e52f7089ff4acd850c53ab8b4119e4445) )
+
+	ROM_REGION( 0xc00, "pld", ROMREGION_ERASE00 )
+	ROM_LOAD( "16as15hb1.u143",  0x000, 0x117, CRC(90454160) SHA1(2a1804e8bed473576c4cb5a40ff62871da032adb) )
+	ROM_LOAD( "16as15hb1.u18",  0x200, 0x117, CRC(99d3af1c) SHA1(9c119e1e89039dcd7d9eb445953420538c202b86) )
+	ROM_LOAD( "gal20v8a-25lp.1", 0x400, 0x157, CRC(23366379) SHA1(06a93bb09b208439aa7d3d60a5076898e6ae84be) )
+	ROM_LOAD( "gal20v8a-25lp.2", 0x600, 0x157, CRC(23366379) SHA1(06a93bb09b208439aa7d3d60a5076898e6ae84be) ) // same as .1
+	ROM_LOAD( "gal20v8a-25lp.3", 0x800, 0x157, CRC(25f7e58d) SHA1(24e1c314ed759dc6c89ca1df5b9283fbf729c165) )
+	ROM_LOAD( "gal20v8a-25lp.4", 0xa00, 0x157, CRC(25f7e58d) SHA1(24e1c314ed759dc6c89ca1df5b9283fbf729c165) ) // same as .3
 ROM_END
 
 

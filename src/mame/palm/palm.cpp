@@ -611,7 +611,7 @@ void palm_state::palm_base(machine_config &config)
 	m_maincpu->set_lcd_info_changed(m_lcdctrl, FUNC(mc68328_lcd_device::lcd_info_changed));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(160, 220);
 	m_screen->set_visarea(0, 160 - 1, 0, 220 - 1);
@@ -666,7 +666,7 @@ void palmiiic_state::palmiiic(machine_config &config)
 	/* video hardware */
 	SED1375(config, m_sed1375);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(160, 262);
 	m_screen->set_visarea(0, 160-1, 0, 220-1);
@@ -731,7 +731,7 @@ void palmm100_state::palmm100(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("2M");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(160, 220);
 	m_screen->set_visarea(0, 160 - 1, 0, 220 - 1);

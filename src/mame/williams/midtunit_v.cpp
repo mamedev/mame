@@ -20,12 +20,14 @@
 #include "emuopts.h" // Used by PNG logging
 #include "fileio.h" // Used by PNG logging
 
+#include "ioprocsstream.h"
 #include "png.h" // Used by PNG logging
 
 #include <rapidjson/prettywriter.h> // Used by JSON logging
 #include <rapidjson/stringbuffer.h> // Used by JSON logging
 
 #include <algorithm>
+#include <locale>
 
 DEFINE_DEVICE_TYPE(MIDTUNIT_VIDEO, midtunit_video_device, "tunitvid", "Midway T-Unit Video")
 DEFINE_DEVICE_TYPE(MIDWUNIT_VIDEO, midwunit_video_device, "wunitvid", "Midway W-Unit Video")
@@ -897,9 +899,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 
 	emu_file file(m_log_path, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
-	char name_buf[256];
-	snprintf(name_buf, 255, "0x%08x.png", raw_offset);
-	auto const filerr = file.open(name_buf);
+	auto const filerr = file.open(util::string_format("0x%08x.png", raw_offset));
 	if (filerr)
 	{
 		return;
@@ -1023,8 +1023,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
 		emu_file json(m_log_path, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
-		snprintf(name_buf, 255, "0x%08x.json", raw_offset);
-		auto const jsonerr = json.open(name_buf);
+		auto const jsonerr = json.open(util::string_format("0x%08x.json", raw_offset));
 		if (jsonerr)
 		{
 			return;
@@ -1081,7 +1080,11 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 		writer.EndObject();
 		writer.EndObject();
 
-		json.puts(s.GetString());
+		{
+			util::owritestream str(json);
+			str.imbue(std::locale::classic());
+			str << s.GetString() << std::flush;
+		}
 		json.close();
 	}
 }

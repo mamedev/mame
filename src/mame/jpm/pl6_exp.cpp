@@ -32,7 +32,7 @@ pluto6_calypso32_device::pluto6_calypso32_device(const machine_config &mconfig, 
 }
 
 void pluto6_calypso32_device::device_add_mconfig(machine_config &config) {
-	screen_device &m_screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &m_screen(SCREEN(config, "screen"));
 	m_screen.set_raw(XTAL(14'318'181), 608, 0, 480, 262, 0, 234);
 	m_screen.set_screen_update("cremson", FUNC(mb86292_device::screen_update));
 

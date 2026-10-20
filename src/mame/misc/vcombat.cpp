@@ -592,6 +592,7 @@ void vcombat_state::init_vcombat()
 	m_i860_framebuffer[1][0] = std::make_unique<uint16_t[]>(0x8000);
 	m_i860_framebuffer[1][1] = std::make_unique<uint16_t[]>(0x8000);
 
+	// HACK: get rid of this
 	/* pc==4016 : jump 4038 ... There's something strange about how it waits at 402e (interrupts all masked out)
 	   I think what is happening here is that M0 snags the first time
 	   it hits this point based on a counter test just above this
@@ -720,11 +721,11 @@ void vcombat_state::vcombat(machine_config &config)
 //  m_crtc->set_screen("screen");
 	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208);
 	screen.set_screen_update(FUNC(vcombat_state::screen_update_vcombat_main));
 
-	screen_device &aux(SCREEN(config, "aux", SCREEN_TYPE_RASTER));
+	screen_device &aux(SCREEN(config, "aux"));
 	aux.set_raw(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208);
 	aux.set_screen_update(FUNC(vcombat_state::screen_update_vcombat_aux));
 
@@ -757,7 +758,7 @@ void vcombat_state::shadfgtr(machine_config &config)
 	m_crtc->set_char_width(16);
 	m_crtc->out_hsync_callback().set(FUNC(vcombat_state::sound_update));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(20'000'000) / 4, 320, 0, 256, 277, 0, 224);
 	screen.set_screen_update(FUNC(vcombat_state::screen_update_vcombat_main));
 

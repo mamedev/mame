@@ -39,7 +39,6 @@ public:
 
 	void cb1_w(int state);
 	void cb2_w(int state);
-	template <u8 mask> void slot_irq_w(int state);
 	void scc_irq_w(int state);
 	void slot2_irq_w(int state);
 

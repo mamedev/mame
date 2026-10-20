@@ -309,7 +309,7 @@ void psionhc_state::psionhc100(machine_config &config)
 	RAM(config, m_ram).set_default_size("128K");
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_size(160, 80);
 	screen.set_visarea_full();
 	screen.set_refresh_hz(66);

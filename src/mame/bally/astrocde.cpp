@@ -26,6 +26,7 @@
     Game boards:
         90002 = Seawolf II Motherboard (seawolf2)
         90700 = Seawolf II Logic Board (seawolf2, ebases)
+        90708 = Game Board (spacezap, wow, gorf, robby)
         91312 = Characterization Card (seawolf2)
         91354 = CPU Board (ebases, spacezap, wow, gorf, robby)
         91355 = Pattern Board (spacezap, wow, gorf, robby)
@@ -52,7 +53,7 @@
         91356 = RAM Board
 
     Space Zap:
-        90706 = Space Zap Game Board
+        90708 = Game Board
         91354 = CPU Board
         91355 = Pattern Board
         91356 = RAM Board
@@ -87,7 +88,7 @@
         91846 = 640K EPROM board
 
     Ten Pin Deluxe:
-        91456 = 16 Color CPU Card
+        91465 = 16 Color CPU Card
         91466 = Screen RAM Board
         91467 = Super Game Memory
         91488 = Pattern Mover
@@ -653,14 +654,14 @@ static const ioport_value controller_table[64] =
 static INPUT_PORTS_START( seawolf2 )
 	PORT_START("P1HANDLE")
 	PORT_BIT( 0x3f, 0x1f, IPT_POSITIONAL ) PORT_PLAYER(2) PORT_POSITIONS(64) PORT_REMAP_TABLE(controller_table) PORT_SENSITIVITY(20) PORT_KEYDELTA(4) PORT_CENTERDELTA(0) PORT_CROSSHAIR(X, 2.0, -0.40, 34.0 / 240.0)
-	PORT_DIPNAME( 0x40, 0x00, "Language 1" )        PORT_DIPLOCATION("S2:!1")
-	PORT_DIPSETTING(    0x00, "Language 2" )
-	PORT_DIPSETTING(    0x40, DEF_STR( French ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 
 	PORT_START("P2HANDLE")
 	PORT_BIT( 0x3f, 0x1f, IPT_POSITIONAL ) PORT_PLAYER(1) PORT_POSITIONS(64) PORT_REMAP_TABLE(controller_table) PORT_SENSITIVITY(20) PORT_KEYDELTA(4) PORT_CENTERDELTA(0) PORT_CROSSHAIR(X, 2.0, -0.45, 34.0 / 240.0)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x40, 0x00, "Language 1" )        PORT_DIPLOCATION("S2:!1")
+	PORT_DIPSETTING(    0x00, "Language 2" )
+	PORT_DIPSETTING(    0x40, DEF_STR( French ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 
 	PORT_START("P3HANDLE")
@@ -1217,7 +1218,7 @@ void astrocde_state::astrocade_base(machine_config &config)
 	/* video hardware */
 	PALETTE(config, m_palette, FUNC(astrocde_state::astrocade_palette), 512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(ASTROCADE_CLOCK, 455, 0, 352, 262, 0, 240);
 	m_screen->set_default_position(1.1, 0.0, 1.18, -0.018); // clip out borders
 	m_screen->set_screen_update(FUNC(astrocde_state::screen_update_astrocde));
@@ -1871,7 +1872,7 @@ GAMEL( 1978, seawolf2,  0,    seawolf2, seawolf2,  seawolf2_state, init_seawolf2
 // 91354 CPU board + 90700 game board + 91356 RAM board
 GAMEL( 1980, ebases,    0,    ebases,   ebases,    ebases_state,   init_ebases,   ROT0,   "Dave Nutting Associates / Midway", "Extra Bases", MACHINE_SUPPORTS_SAVE, layout_spacezap )
 
-// 91354 CPU board + 90706 game board + 91356 RAM board + 91355 pattern board
+// 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board
 GAMEL( 1980, spacezap,  0,    spacezap, spacezap,  astrocde_state, init_spacezap, ROT0,   "Midway", "Space Zap (Midway)", MACHINE_SUPPORTS_SAVE, layout_spacezap ) // there's also an older version by Game-A-Tron on different hardware
 
 // 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91397 memory board
@@ -1884,7 +1885,6 @@ GAMEL( 1981, gorfpgm1,  gorf, gorf,     gorf,      astrocde_state, init_gorf,   
 GAMEL( 1981, gorfpgm1f, gorf, gorf,     gorfpgm1f, astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway",                  "Gorf (program 1, with French language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
 GAMEL( 1981, gorfpgm1g, gorf, gorf,     gorfpgm1g, astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway",                  "Gorf (program 1, with German language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
 GAMEL( 1981, gorfirec,  gorf, gorf,     gorfirec,  astrocde_state, init_gorf,     ROT270, "Dave Nutting Associates / Midway (Irecsa license)", "Gorf (Spain, Irecsa license)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
-
 
 // 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91423 memory board
 GAME(  1981, robby,     0,    robby,    robby,     astrocde_state, init_robby,    ROT0,   "Dave Nutting Associates / Bally Midway", "The Adventures of Robby Roto!", MACHINE_SUPPORTS_SAVE )

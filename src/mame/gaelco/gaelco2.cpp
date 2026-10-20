@@ -190,7 +190,7 @@ void gaelco2_state::maniacsq(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*16, 32*16);
@@ -515,7 +515,7 @@ void gaelco2_state::saltcrdi(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*16, 32*16);
@@ -1180,7 +1180,7 @@ void gaelco2_state::play2000(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*16, 32*16);
@@ -1216,7 +1216,7 @@ void gaelco2_state::srollnd(machine_config& config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*16, 32*16);
@@ -1316,7 +1316,7 @@ void bang_state::bang(machine_config &config)
 	// Video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*16, 32*16);
@@ -1678,7 +1678,7 @@ void gaelco2_state::alighunt(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*16, 32*16);
@@ -2086,7 +2086,7 @@ void gaelco2_dual_state::touchgo(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x10000);
 	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(59.1);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	lscreen.set_size(64*16, 32*16);
@@ -2094,7 +2094,7 @@ void gaelco2_dual_state::touchgo(machine_config &config)
 	lscreen.set_screen_update(FUNC(gaelco2_dual_state::screen_update_left));
 	lscreen.set_palette(m_palette);
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(59.1);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	rscreen.set_size(64*16, 32*16);
@@ -2566,7 +2566,7 @@ void snowboar_state::snowboar(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*16, 32*16);
@@ -2607,7 +2607,7 @@ void snowboar_state::maniacsqs(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*16, 32*16);
@@ -2904,7 +2904,7 @@ void wrally2_state::wrally2(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x10000);
 	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(59.1);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	lscreen.set_size(384, 32*16);
@@ -2912,7 +2912,7 @@ void wrally2_state::wrally2(machine_config &config)
 	lscreen.set_screen_update(FUNC(wrally2_state::screen_update_left));
 	lscreen.set_palette(m_palette);
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(59.1);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	rscreen.set_size(384, 32*16);

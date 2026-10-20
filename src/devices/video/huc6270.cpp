@@ -588,7 +588,7 @@ void huc6270_device::hsync_changed(int state)
 			// cause several side effects, namely:
 			// - draculax Stage 4' "all blue" Richter;
 			// - faussete Stage 2 excessive slowdown;
-			// - xwiber Stage 2 boss never spawning (MT#07384)
+			// - xwiber Stage 2 boss never spawning (MT07384)
 			if (m_vert_to_go == 2 && m_vert_state == v_state::VDS)
 			{
 				m_raster_count = 0x40;
@@ -879,7 +879,7 @@ inline void huc6270_device::regs_w(offs_t offset, u16 data, u16 mem_mask)
 
 void huc6270_device::device_start()
 {
-	assert(!(m_vram_size & (m_vram_size - 1)));
+	assert(std::has_single_bit(m_vram_size));
 	m_vram = make_unique_clear<u16 []>(m_vram_size / sizeof(u16));
 	m_vram_mask = (m_vram_size >> 1) - 1;
 

@@ -176,17 +176,17 @@ const z8000_disassembler::opcode z8000_disassembler::table[] = {
 	{ 0x4b00, 0x4b0f,  1, 2, "cp      %rw3,%a1",                0 },
 	{ 0x4b10, 0x4bff,  1, 2, "cp      %rw3,%a1(%rw2)",          0 },
 	{ 0x4c00, 0x4c00,  1, 2, "comb    %a1",                     0 },
-	{ 0x4c01, 0x4c01,  1, 3, "cpb     %a1,%#b3",                0 },
+	{ 0x4c01, 0x4c01,  1, 3, "cpb     %a1,%#b5",                0 },
 	{ 0x4c02, 0x4c02,  1, 2, "negb    %a1",                     0 },
 	{ 0x4c04, 0x4c04,  1, 2, "testb   %a1",                     0 },
-	{ 0x4c05, 0x4c05,  1, 3, "ldb     %a1,%#b3",                0 },
+	{ 0x4c05, 0x4c05,  1, 3, "ldb     %a1,%#b5",                0 },
 	{ 0x4c06, 0x4c06,  1, 2, "tsetb   %a1",                     0 },
 	{ 0x4c08, 0x4c08,  1, 2, "clrb    %a1",                     0 },
 	{ 0x4c10, 0x4cf0, 16, 2, "comb    %a1(%rw2)",               0 },
-	{ 0x4c11, 0x4cf1, 16, 3, "cpb     %a1(%rw2),%#b3",          0 },
+	{ 0x4c11, 0x4cf1, 16, 3, "cpb     %a1(%rw2),%#b5",          0 },
 	{ 0x4c12, 0x4cf2, 16, 2, "negb    %a1(%rw2)",               0 },
 	{ 0x4c14, 0x4cf4, 16, 2, "testb   %a1(%rw2)",               0 },
-	{ 0x4c15, 0x4cf5, 16, 3, "ldb     %a1(%rw2),%#b3",          0 },
+	{ 0x4c15, 0x4cf5, 16, 3, "ldb     %a1(%rw2),%#b5",          0 },
 	{ 0x4c16, 0x4cf6, 16, 2, "tsetb   %a1(%rw2)",               0 },
 	{ 0x4c18, 0x4cf8, 16, 2, "clrb    %a1(%rw2)",               0 },
 	{ 0x4d00, 0x4d00,  1, 2, "com     %a1",                     0 },
@@ -667,14 +667,15 @@ offs_t z8000_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 						tmp = ((n[1] & 0x01) << 8) + (n[3] << 4) + (n[7] & 0x08);
 						switch (tmp)
 						{
+							// Byte forms
 							case 0x000: util::stream_format(stream, "inirb "); flags = STEP_COND; break;
 							case 0x008: util::stream_format(stream, "inib  "); break;
 							case 0x010: util::stream_format(stream, "sinirb"); flags = STEP_COND; break;
 							case 0x018: util::stream_format(stream, "sinib "); break;
 							case 0x020: util::stream_format(stream, "otirb "); flags = STEP_COND; break;
 							case 0x028: util::stream_format(stream, "outib "); break;
-							case 0x030: util::stream_format(stream, "soutib"); break;
-							case 0x038: util::stream_format(stream, "sotirb"); flags = STEP_COND; break;
+							case 0x030: util::stream_format(stream, "sotirb"); flags = STEP_COND; break;
+							case 0x038: util::stream_format(stream, "soutib"); break;
 							case 0x040: util::stream_format(stream, "inb   "); break;
 							case 0x048: util::stream_format(stream, "inb   "); break;
 							case 0x050: util::stream_format(stream, "sinb  "); break;
@@ -689,16 +690,17 @@ offs_t z8000_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 							case 0x098: util::stream_format(stream, "sindb "); break;
 							case 0x0a0: util::stream_format(stream, "otdrb "); flags = STEP_COND; break;
 							case 0x0a8: util::stream_format(stream, "outdb "); break;
-							case 0x0b0: util::stream_format(stream, "soutdb"); break;
-							case 0x0b8: util::stream_format(stream, "sotdrb"); flags = STEP_COND; break;
+							case 0x0b0: util::stream_format(stream, "sotdrb"); flags = STEP_COND; break;
+							case 0x0b8: util::stream_format(stream, "soutdb"); break;
+							// Word forms
 							case 0x100: util::stream_format(stream, "inir  "); flags = STEP_COND; break;
 							case 0x108: util::stream_format(stream, "ini   "); break;
 							case 0x110: util::stream_format(stream, "sinir "); flags = STEP_COND; break;
 							case 0x118: util::stream_format(stream, "sini  "); break;
 							case 0x120: util::stream_format(stream, "otir  "); flags = STEP_COND; break;
 							case 0x128: util::stream_format(stream, "outi  "); break;
-							case 0x130: util::stream_format(stream, "souti "); break;
-							case 0x138: util::stream_format(stream, "sotir "); flags = STEP_COND; break;
+							case 0x130: util::stream_format(stream, "sotir "); flags = STEP_COND; break;
+							case 0x138: util::stream_format(stream, "souti "); break;
 							case 0x140: util::stream_format(stream, "in    "); break;
 							case 0x148: util::stream_format(stream, "in    "); break;
 							case 0x150: util::stream_format(stream, "sin   "); break;
@@ -713,8 +715,8 @@ offs_t z8000_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 							case 0x198: util::stream_format(stream, "sind  "); break;
 							case 0x1a0: util::stream_format(stream, "otdr  "); flags = STEP_COND; break;
 							case 0x1a8: util::stream_format(stream, "outd  "); break;
-							case 0x1b0: util::stream_format(stream, "soutd "); break;
-							case 0x1b8: util::stream_format(stream, "sotdr "); flags = STEP_COND; break;
+							case 0x1b0: util::stream_format(stream, "sotdr "); flags = STEP_COND; break;
+							case 0x1b8: util::stream_format(stream, "soutd "); break;
 							default:
 								util::stream_format(stream, "unk(0x%x)", tmp);
 						}

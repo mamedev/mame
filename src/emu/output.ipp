@@ -369,10 +369,12 @@ public:
 
 	output_proxy() noexcept;
 	output_proxy(output_proxy &&that) noexcept;
+	output_proxy(item_impl const &item) noexcept : m_item(&item), m_value(item.get()), m_local_value(0) { }
 	output_proxy(device_t &device, std::string_view name);
 	output_proxy &operator=(output_proxy &&that) noexcept;
 
 	bool exists() const { return bool(m_item); }
+	std::string_view name() const { return m_item ? m_item->name() : std::string_view(); }
 	s32 get() const { return m_value; }
 	void set(s32 value) { if (m_item) m_item->set(value); else m_local_value = value; }
 
@@ -381,5 +383,92 @@ private:
 	std::reference_wrapper<s32 const>   m_value;
 	s32                                 m_local_value;
 };
+
+
+class output_manager::output_iterator
+{
+public:
+	using difference_type = std::ptrdiff_t;
+	using value_type = output_proxy;
+
+	output_iterator() : m_position(nullptr) { }
+	output_iterator(item_reference const *p) : m_position(p) { }
+
+	output_proxy operator*() const
+	{
+		return output_proxy(m_position->get());
+	}
+	output_proxy operator[](difference_type n) const
+	{
+		return *operator+(n);
+	}
+
+	bool operator==(output_iterator const &that) const
+	{
+		return m_position == that.m_position;
+	}
+	auto operator<=>(output_iterator const &that) const
+	{
+		return m_position <=> that.m_position;
+	}
+
+	output_iterator &operator++()
+	{
+		++m_position;
+		return *this;
+	}
+	output_iterator operator++(int)
+	{
+		output_iterator result(*this);
+		operator++();
+		return result;
+	}
+
+	output_iterator &operator--()
+	{
+		--m_position;
+		return *this;
+	}
+	output_iterator operator--(int)
+	{
+		output_iterator result(*this);
+		operator--();
+		return result;
+	}
+
+	output_iterator &operator+=(difference_type n)
+	{
+		m_position += n;
+		return *this;
+	}
+	output_iterator &operator-=(difference_type n)
+	{
+		m_position -= n;
+		return *this;
+	}
+
+	output_iterator operator+(difference_type n) const
+	{
+		output_iterator result(*this);
+		return result += n;
+	}
+	output_iterator operator-(difference_type n) const
+	{
+		output_iterator result(*this);
+		return result -= n;
+	}
+	difference_type operator-(output_iterator const &that) const
+	{
+		return m_position - that.m_position;
+	}
+
+private:
+	item_reference const *m_position;
+};
+
+inline output_manager::output_iterator operator+(output_manager::output_iterator::difference_type n, output_manager::output_iterator const &it)
+{
+	return it + n;
+}
 
 #endif // MAME_EMU_OUTPUT_IPP

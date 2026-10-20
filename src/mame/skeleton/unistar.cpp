@@ -214,7 +214,7 @@ void unistar_state::unistar(machine_config &config)
 	pio.in_pa_callback().set_ioport("SW2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(20_MHz_XTAL, 954, 0, 720, 351, 0, 325);
 	//screen.set_raw(20_MHz_XTAL, 990, 0, 720, 405, 0, 375);
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));

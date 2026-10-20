@@ -81,7 +81,7 @@ ROM_END
 
 void dio32_98550_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "hp98550_screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "hp98550_screen"));
 	screen.set_screen_update(FUNC(dio32_98550_device::screen_update));
 	screen.screen_vblank().set(FUNC(dio32_98550_device::vblank_w));
 	screen.set_raw(XTAL(108'108'000), 1689, 0, m_h_pix, 1066, 0, m_v_pix);

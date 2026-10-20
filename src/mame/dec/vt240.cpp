@@ -658,7 +658,7 @@ void vt240_state::vt240(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, "bank").set_map(&vt240_state::bank_map).set_options(ENDIANNESS_LITTLE, 16, 20, 0x1000);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(16'097'280), 1024, 0, 800, 629, 0, 480);
 	screen.set_screen_update("upd7220", FUNC(upd7220_device::screen_update));
 

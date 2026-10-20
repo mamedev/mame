@@ -2,7 +2,7 @@
 // composed_6.cpp
 // ~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -108,7 +108,7 @@ auto async_write_messages(tcp::socket& socket,
       // A steady timer used for introducing a delay.
       std::unique_ptr<asio::steady_timer> delay_timer_;
 
-      // To manage the cycle between the multiple underlying asychronous
+      // To manage the cycle between the multiple underlying asynchronous
       // operations, our intermediate completion handler is implemented as a
       // state machine.
       enum { starting, waiting, writing } state_;
@@ -156,9 +156,10 @@ auto async_write_messages(tcp::socket& socket,
         // We no longer have any future work coming for the I/O executor.
         io_work_.reset();
 
-        // Deallocate the encoded message before calling the user-supplied
-        // completion handler.
+        // Deallocate the encoded message and delay timer before calling the
+        // user-supplied completion handler.
         encoded_message_.reset();
+        delay_timer_.reset();
 
         // Call the user-supplied handler with the result of the operation.
         handler_(error);

@@ -19,10 +19,12 @@
 #include "h8_adc.h"
 #include "h8_port.h"
 #include "h8_intc.h"
+#include "h8_refresh.h"
+#include "h8_sci.h"
 #include "h8_timer8.h"
 #include "h8_timer16.h"
-#include "h8_sci.h"
 #include "h8_watchdog.h"
+
 
 class h83006_device : public h8h_device {
 public:
@@ -69,6 +71,7 @@ protected:
 	required_device<h8h_timer16_channel_device> m_timer16_1;
 	required_device<h8h_timer16_channel_device> m_timer16_2;
 	required_device<h8_watchdog_device> m_watchdog;
+	required_device<h8_refresh_device> m_refresh;
 
 	u8 m_syscr;
 	u32 m_ram_start;

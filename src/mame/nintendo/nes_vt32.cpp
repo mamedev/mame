@@ -484,9 +484,19 @@ ROM_START( micac250 )
 	ROM_LOAD( "250in1microarcade.u2", 0x000000, 0x1000000, CRC(3bb2a65c) SHA1(294eb2165466981a79e1d4ec535038e73fbca4de) )
 ROM_END
 
-ROM_START( tvkunio1 )
+ROM_START( tvkunio1 ) // yellow unit
 	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "mx29lv160dt.u3", 0x00000, 0x200000, CRC(4f502bff) SHA1(5c91c46c8b3b837cf98a5519d71117164c23a721) )
+ROM_END
+
+ROM_START( tvkunio2 ) // pink unit
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "mx29lv160dt.u3", 0x00000, 0x200000, CRC(e39d4b78) SHA1(8496efddfef97662ffb707651361a588a39efde1) )
+ROM_END
+
+ROM_START( tvkunio3 ) // blue unit
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "mx29lv160bt.u3", 0x00000, 0x200000, CRC(dcc4f44f) SHA1(18439fbaaf392664c506d41d5e2ec17fb5cbaa11) )
 ROM_END
 
 ROM_START( fingerd )
@@ -571,6 +581,8 @@ CONS( 201?, k10_2l,    0, 0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty
 
 // びっくり熱血新記録！はるかなる金メダル
 CONS( 2022, tvkunio1,  0, 0,  nes_vt32_2mb,  nes_vt32, nes_vt32_unk_state, empty_init, "Arc System Works", "Kunio-kun TV! Bikkuri Nekketsu Shin Kiroku! Harukanaru Kin Medal (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // yellow unit
+CONS( 2022, tvkunio2,  0, 0,  nes_vt32_2mb,  nes_vt32, nes_vt32_unk_state, empty_init, "Arc System Works", "Kunio-kun TV! Downtown Special - Kunio-kun no Jidaigeki Da yo Zenin Shuugou! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // pink unit
+CONS( 2022, tvkunio3,  0, 0,  nes_vt32_2mb,  nes_vt32, nes_vt32_unk_state, empty_init, "Arc System Works", "Kunio-kun TV! Nekketsu Koukou Dodgeball Bu (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // blue unit
 
 CONS( 202?, micac250,  0, 0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Micro Arcade 250-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 

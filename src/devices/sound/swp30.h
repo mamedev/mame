@@ -75,7 +75,7 @@ private:
 		s32 m_pos_dec;
 		s16 m_dpcm_s0, m_dpcm_s1, m_dpcm_s2, m_dpcm_s3;
 		u32 m_dpcm_pos;
-		s32 m_dpcm_delta;
+		s32 m_dpcm_delta, m_dpcm_rem;
 
 		bool m_first, m_finetune_active, m_done;
 		s16 m_last;
@@ -305,10 +305,12 @@ private:
 		void lfo_step();
 		u32 get_lfo(int lfo);
 		u32 resolve_address(u16 pc, s32 offset);
+		int map_bank(u16 pc) const;
 
 		static u16 revram_encode(u32 v);
 		static u32 revram_decode(u16 v);
 		static s16 m1_expand(s16 v);
+		static s32 pack24(s64 p);
 
 		static void call_rand(void *ms);
 		static void call_revram_encode(void *ms);
@@ -316,6 +318,8 @@ private:
 
 		void step();
 		void drc(drcuml_block &block, u16 pc);
+		void drc_pack24(drcuml_block &block, bool dither, uml::code_label label);
+		void drc_t_value(drcuml_block &block, u32 index2);
 		void reset();
 	};
 
@@ -446,6 +450,7 @@ private:
 	u16 wave_busy_r();
 	template<int Sel> u16 wave_val_r();
 	template<int Sel> void wave_val_w(u16 data);
+	u16 revram_enable_r();
 	void revram_enable_w(u16 data);
 	void revram_clear_w(u16 data);
 	u16 revram_status_r();

@@ -812,7 +812,7 @@ void tickee_gun_state::tickee(machine_config &config)
 	// video hardware
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(14.318181_MHz_XTAL/2, 444, 0, 320, 233, 0, 200);
 	m_screen->set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_rgb32));
 
@@ -856,7 +856,7 @@ void tickee_state::mouseatk(machine_config &config)
 	// video hardware
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(14.318181_MHz_XTAL/2, 444, 0, 320, 233, 0, 200);
 	m_screen->set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_rgb32));
 
@@ -892,7 +892,7 @@ void tickee_gun_state::rapidfir(machine_config &config)
 	// video hardware
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(18_MHz_XTAL/2, 556, 0, 384, 293, 0, 240);
 	m_screen->set_screen_update("maincpu", FUNC(tms34010_device::tms340x0_rgb32));
 

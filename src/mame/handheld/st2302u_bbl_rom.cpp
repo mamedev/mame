@@ -354,13 +354,11 @@ void st22xx_bbl338_state::st22xx_dphh8213(machine_config &config)
 	m_maincpu->in_pc_callback().set_ioport("PORTC");
 
 	SPEAKER(config, "mono").front_center();
-	m_maincpu->add_route(0, "mono", 1.00);
-	m_maincpu->add_route(1, "mono", 1.00);
-	m_maincpu->add_route(2, "mono", 1.00);
-	m_maincpu->add_route(3, "mono", 1.00);
+	m_maincpu->add_route(st2205u_base_device::PSG_OUTPUT_PWM, "mono", 1.00);
+	m_maincpu->add_route(st2205u_base_device::PSG_OUTPUT_CURRENT_DAC, "mono", 1.00);
 
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(160, 128);
@@ -385,7 +383,7 @@ void st22xx_bbl338_state::st22xx_bbl338(machine_config &config)
 	m_maincpu->in_pc_callback().set_ioport("PORTC");
 
 	// incorrect for bbl338
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(160, 128);
@@ -407,7 +405,8 @@ ROM_END
 
 ROM_START( class200 )
 	ROM_REGION( 0x4000, "internal", ROMREGION_ERASEFF )
-	ROM_LOAD( "internal.rom", 0x000000, 0x4000, NO_DUMP ) // unsure of exact size for this model
+	ROM_LOAD( "internal.rom", 0x0000, 0x2000, CRC(024fa502) SHA1(0aca4bbd6b98eb156187a144a274c8d3ead27d40) )
+	ROM_RELOAD( 0x2000, 0x2000 )
 
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "m29w320eb.bin", 0x000000, 0x400000, CRC(3067b5f6) SHA1(9a159b16898054a74cfb32b5c597b505132f004e) )

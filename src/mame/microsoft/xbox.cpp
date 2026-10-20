@@ -47,7 +47,7 @@ protected:
 
 	// devices
 	optional_device<bus_master_ide_controller_device> m_ide;
-	required_device<ata_mass_storage_device_base> m_devh;
+	required_device<device_ata_mass_storage_device_interface> m_devh;
 	required_device<atapi_cdrom_device> m_devc;
 };
 

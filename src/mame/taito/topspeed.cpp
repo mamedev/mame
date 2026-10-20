@@ -982,7 +982,7 @@ void topspeed_state::topspeed(machine_config &config)
 	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60.0532); // Measured on real hardware
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -1165,6 +1165,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAMEL( 1987, topspeed,  0,        topspeed, topspeed, topspeed_state, empty_init, ROT0, "Taito Corporation Japan",                     "Top Speed (World, rev 1)", MACHINE_SUPPORTS_SAVE, layout_topspeed )
-GAMEL( 1987, topspeedu, topspeed, topspeed, fullthrl, topspeed_state, empty_init, ROT0, "Taito America Corporation (Romstar license)", "Top Speed (US)",           MACHINE_SUPPORTS_SAVE, layout_topspeed )
-GAMEL( 1987, fullthrl,  topspeed, topspeed, fullthrl, topspeed_state, empty_init, ROT0, "Taito Corporation",                           "Full Throttle (Japan)",    MACHINE_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, topspeed,  0,        topspeed, topspeed, topspeed_state, empty_init, ROT0, "Taito",                           "Top Speed (World, rev 1)", MACHINE_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, topspeedu, topspeed, topspeed, fullthrl, topspeed_state, empty_init, ROT0, "Taito America (Romstar license)", "Top Speed (US)",           MACHINE_SUPPORTS_SAVE, layout_topspeed )
+GAMEL( 1987, fullthrl,  topspeed, topspeed, fullthrl, topspeed_state, empty_init, ROT0, "Taito",                           "Full Throttle (Japan)",    MACHINE_SUPPORTS_SAVE, layout_topspeed )

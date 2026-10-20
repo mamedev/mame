@@ -62,10 +62,12 @@ public:
 	{
 	}
 
+	void windermere(machine_config &config) ATTR_COLD;
 	void psion5mx(machine_config &config) ATTR_COLD;
 	void psion5mxp(machine_config &config) ATTR_COLD;
 	void revo(machine_config &config) ATTR_COLD;
 	void revoplus(machine_config &config) ATTR_COLD;
+	void conan(machine_config &config) ATTR_COLD;
 
 	void init_s5mx() ATTR_COLD;
 	void init_mc218() ATTR_COLD;
@@ -85,6 +87,7 @@ private:
 	void s5mx_map(address_map &map) ATTR_COLD;
 	void s5mxp_map(address_map &map) ATTR_COLD;
 	void revo_map(address_map &map) ATTR_COLD;
+	void conan_map(address_map &map) ATTR_COLD;
 
 	void init_eeprom(std::string type, uint8_t locale = 0xff, uint8_t lang = 0xff);
 
@@ -116,6 +119,9 @@ private:
 	uint8_t m_kbd_scan = 0;
 	uint8_t m_volume = 0;
 	bool m_amp_enable = true;
+
+	uint16_t m_main_battery   = 3100;
+	uint16_t m_backup_battery = 3100;
 };
 
 
@@ -195,6 +201,9 @@ void psion5mx_state::init_revo()
 	if (name == "mako") locale = 0xf2; // set locale to USA
 
 	init_eeprom("", locale); // machine 'REVO' is read from ROM
+
+	m_main_battery   = 4000;
+	m_backup_battery = 2000;
 }
 
 
@@ -288,8 +297,10 @@ uint16_t psion5mx_state::ads7843_r(offs_t offset)
 		data = 3834 - (uint16_t)(m_touchy->read() * 13.225);
 		break;
 	case 0xa4a4: // Main Battery
+		data = m_main_battery;
+		break;
 	case 0xe4e4: // Backup Battery
-		data = 3100;
+		data = m_backup_battery;
 		break;
 	}
 
@@ -321,15 +332,9 @@ void psion5mx_state::update_amp()
 	static const float codec_volume[4] = { 1.0f, 0.75f, 0.5f, 0.25f };
 
 	if (m_amp_enable)
-	{
-		m_buzzer->set_output_gain(ALL_OUTPUTS, 1.0);
 		m_codec->set_output_gain(ALL_OUTPUTS, codec_volume[m_volume]); // VOL
-	}
 	else
-	{
-		m_buzzer->set_output_gain(ALL_OUTPUTS, 0.0);
 		m_codec->set_output_gain(ALL_OUTPUTS, 0.0);
-	}
 }
 
 
@@ -352,6 +357,12 @@ void psion5mx_state::s5mxp_map(address_map &map)
 
 void psion5mx_state::revo_map(address_map &map)
 {
+	map(0x80000000, 0x80000fff).rw(m_windermere, FUNC(windermere_device::periphs_r), FUNC(windermere_device::periphs_w));
+}
+
+void psion5mx_state::conan_map(address_map &map)
+{
+	map(0x00000000, 0x0001ffff).rw("flash", FUNC(intelfsh8_device::read), FUNC(intelfsh8_device::write));
 	map(0x80000000, 0x80000fff).rw(m_windermere, FUNC(windermere_device::periphs_r), FUNC(windermere_device::periphs_w));
 }
 
@@ -520,6 +531,12 @@ INPUT_PORTS_START( revo_us )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(':') PORT_CHAR('"') PORT_CHAR(';')
 INPUT_PORTS_END
 
+INPUT_PORTS_START( psion618c )
+	PORT_INCLUDE(revo_us)
+
+	// TODO: Traditional Chinese keycaps
+INPUT_PORTS_END
+
 
 QUICKLOAD_LOAD_MEMBER(psion5mx_state::quickload_cb)
 {
@@ -540,7 +557,7 @@ static void pcmcia_devices(device_slot_interface &device)
 }
 
 
-void psion5mx_state::psion5mx(machine_config &config)
+void psion5mx_state::windermere(machine_config &config)
 {
 	ARM710T(config, m_maincpu, 3.6864_MHz_XTAL * 10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &psion5mx_state::s5mx_map);
@@ -564,18 +581,7 @@ void psion5mx_state::psion5mx(machine_config &config)
 	RAM(config, m_ram).set_default_size("16M");
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
-	ETNA(config, m_etna);
-	m_etna->porta_r().set(FUNC(psion5mx_state::etna_porta_r));
-	m_etna->porta_w().set(FUNC(psion5mx_state::etna_porta_w));
-
-	PCCARD_SLOT(config, m_pccard, pcmcia_devices, "cf").set_fixed(true);
-	//m_pccard->cd1().set(m_etna, FUNC(etna_device::write_pc1_cd1));
-	//m_pccard->cd2().set(m_etna, FUNC(etna_device::write_pc1_cd2));
-	//m_pccard->bvd1().set(m_etna, FUNC(etna_device::write_pc1_bvd1));
-	//m_pccard->bvd2().set(m_etna, FUNC(etna_device::write_pc1_bvd2));
-	//m_pccard->wp().set(m_etna, FUNC(etna_device::write_pc1_wp));
-
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_screen_update(m_windermere, FUNC(windermere_device::screen_update));
@@ -590,10 +596,27 @@ void psion5mx_state::psion5mx(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_buzzer).add_route(ALL_OUTPUTS, "mono", 1.0);
 
+	EEPROM_93C46_16BIT(config, m_eeprom); // 93CS46
+}
+
+
+void psion5mx_state::psion5mx(machine_config& config)
+{
+	windermere(config);
+
+	ETNA(config, m_etna);
+	m_etna->porta_r().set(FUNC(psion5mx_state::etna_porta_r));
+	m_etna->porta_w().set(FUNC(psion5mx_state::etna_porta_w));
+
+	PCCARD_SLOT(config, m_pccard, pcmcia_devices, "cf").set_fixed(true);
+	//m_pccard->cd1().set(m_etna, FUNC(etna_device::write_pc1_cd1));
+	//m_pccard->cd2().set(m_etna, FUNC(etna_device::write_pc1_cd2));
+	//m_pccard->bvd1().set(m_etna, FUNC(etna_device::write_pc1_bvd1));
+	//m_pccard->bvd2().set(m_etna, FUNC(etna_device::write_pc1_bvd2));
+	//m_pccard->wp().set(m_etna, FUNC(etna_device::write_pc1_wp));
+
 	MICROPHONE(config, m_mic, 1).front_center();
 	m_mic->add_route(0, m_codec, 1.0);
-
-	EEPROM_93C46_16BIT(config, m_eeprom); // 93CS46
 }
 
 
@@ -617,11 +640,7 @@ void psion5mx_state::psion5mxp(machine_config &config)
 
 void psion5mx_state::revo(machine_config &config)
 {
-	psion5mx(config);
-
-	config.device_remove("etna");
-	config.device_remove("pccard");
-	config.device_remove("mic");
+	windermere(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &psion5mx_state::revo_map);
 
@@ -645,6 +664,22 @@ void psion5mx_state::revoplus(machine_config &config)
 	revo(config);
 
 	m_ram->set_default_size("16M");
+}
+
+
+void psion5mx_state::conan(machine_config &config)
+{
+	revoplus(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &psion5mx_state::conan_map);
+
+	ATMEL_29C010(config, "flash"); // 29LV010
+
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "bin"));
+	quickload.set_load_callback(FUNC(psion5mx_state::quickload_cb));
+	quickload.set_interface("psion_quik");
+
+	SOFTWARE_LIST(config, "quik_ls").set_original("psion_quik").set_filter("CONAN");
 }
 
 
@@ -695,6 +730,7 @@ ROM_END
 
 ROM_START( mc218 )
 	ROM_REGION32_LE(0x1000000, "maincpu", ROMREGION_ERASE00)
+	// Known missing versions: V1.05(257)
 	ROM_SYSTEM_BIOS(0, "259", "V1.05(259)")
 	ROMX_LOAD("mc218_uk12_v259.rom", 0x0000000, 0x0c00000, CRC(92f353b5) SHA1(f6ff73bdd59457e449f1faf95fe73878b3a94d8c), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "256", "V1.05(256)")
@@ -720,7 +756,8 @@ ROM_START( mc218_fr )
 ROM_END
 
 ROM_START( revo )
-	ROM_REGION32_LE(0x800000, "maincpu", 0)
+	ROM_REGION32_LE(0x800000, "maincpu", ROMREGION_ERASE00)
+	// Known missing versions: V1.06(320), V1.06(353)
 	ROM_SYSTEM_BIOS(0, "390", "V1.06(390)")
 	ROMX_LOAD("revo_ukus8_v390.rom", 0x000000, 0x800000, CRC(846c8176) SHA1(297c18621ea6c9440e74c71cc1cb58f21fe46796), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "361", "V1.06(361)")
@@ -730,7 +767,7 @@ ROM_START( revo )
 ROM_END
 
 ROM_START( revo_de )
-	ROM_REGION32_LE(0x800000, "maincpu", 0)
+	ROM_REGION32_LE(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_SYSTEM_BIOS(0, "391", "V1.06(391)")
 	ROMX_LOAD("revo_de8_v391.rom", 0x000000, 0x800000, CRC(e627747f) SHA1(3f451b7b0e738ee581bf73e1db310605d407e218), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "369", "V1.06(369)")
@@ -742,14 +779,40 @@ ROM_START( revo_de )
 ROM_END
 
 ROM_START( revo_fr )
-	ROM_REGION32_LE(0x800000, "maincpu", 0)
+	ROM_REGION32_LE(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_SYSTEM_BIOS(0, "392", "V1.06(392)")
 	ROMX_LOAD("revo_fr8_v392.rom", 0x000000, 0x800000, CRC(dc2806ee) SHA1(587ef391f45bc1de8ad141d8d20958029355ad2c), ROM_BIOS(0))
 
 	ROM_REGION16_LE(0x80, "eeprom", ROMREGION_ERASEFF)
 ROM_END
 
+ROM_START( revo_nl )
+	ROM_REGION32_LE(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_SYSTEM_BIOS(0, "401", "V1.06(401)")
+	ROMX_LOAD("revo_nl8_v401.rom", 0x000000, 0x800000, CRC(f1371a38) SHA1(3e89ba28d60cba97730612fb9f84042dbd85317d), ROM_BIOS(0))
+
+	ROM_REGION16_LE(0x80, "eeprom", ROMREGION_ERASEFF)
+ROM_END
+
 #define rom_mako rom_revo
+
+ROM_START( psion618c )
+	ROM_REGION32_LE(0x1000000, "maincpu", ROMREGION_ERASE00)
+	ROM_SYSTEM_BIOS(0, "14", "V1.08(14)")
+	ROMX_LOAD("psion618c_v14.rom", 0x000000, 0x1000000, CRC(4691779d) SHA1(4653e7b1b126c45178e23153bc9e897587f0b8e0), ROM_BIOS(0))
+
+	ROM_REGION16_LE(0x80, "eeprom", ROMREGION_ERASEFF)
+ROM_END
+
+ROM_START( conan )
+	ROM_REGION32_LE(0x1000000, "maincpu", ROMREGION_ERASE00)
+
+	ROM_REGION(0x20000, "flash", ROMREGION_ERASE00)
+	ROM_SYSTEM_BIOS(0, "110", "Bootloader V1.10")
+	ROMX_LOAD("conan_bl_v110.bin", 0x0000, 0x20000, CRC(7cacb56e) SHA1(2b3d24ec62bcb5d9f8a1c4d0515ecef2441cb7fc), ROM_BIOS(0))
+
+	ROM_REGION16_LE(0x80, "eeprom", ROMREGION_ERASEFF)
+ROM_END
 
 } // anonymous namespace
 
@@ -762,7 +825,10 @@ COMP( 1999, psion5mxp_de,  psion5mxp, 0,      psion5mxp, psion5mx_de,  psion5mx_
 COMP( 1999, revo,          0,         0,      revo,      revo,         psion5mx_state, init_revo,    "Psion",      "Revo",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1999, revo_de,       revo,      0,      revo,      psion5mx_de,  psion5mx_state, init_revo,    "Psion",      "Revo (German)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1999, revo_fr,       revo,      0,      revo,      psion5mx_fr,  psion5mx_state, init_revo,    "Psion",      "Revo (French)",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 2000, revo_nl,       revo,      0,      revo,      revo,         psion5mx_state, init_revo,    "Psion",      "Revo (Dutch)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 2000, mako,          revo,      0,      revoplus,  revo_us,      psion5mx_state, init_revo,    "SONICblue",  "Diamond Mako",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 2000, mc218,         0,         0,      psion5mx,  psion5mx,     psion5mx_state, init_mc218,   "Ericsson",   "MC 218",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 2000, mc218_de,      mc218,     0,      psion5mx,  psion5mx_de,  psion5mx_state, init_mc218,   "Ericsson",   "MC 218 (German)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 2000, mc218_fr,      mc218,     0,      psion5mx,  psion5mx_fr,  psion5mx_state, init_mc218,   "Ericsson",   "MC 218 (French)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 2001, psion618c,     revo,      0,      revo,      psion618c,    psion5mx_state, init_revo,    "Psion",      "Psion 618C",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 2001, conan,         0,         0,      conan,     revo,         psion5mx_state, init_revo,    "Psion",      "Conan (prototype)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

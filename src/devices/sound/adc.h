@@ -22,10 +22,38 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream) override;
 };
 
+class am2504_device : public device_t, public device_sound_interface
+{
+public:
+	am2504_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	u16 read();
+
+protected:
+	sound_stream *m_stream;
+	u16 m_current_value;
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void sound_stream_update(sound_stream &stream) override;
+};
+
 class adc10_device : public device_t, public device_sound_interface
 {
 public:
 	adc10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	u16 read();
+
+protected:
+	sound_stream *m_stream;
+	u16 m_current_value;
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void sound_stream_update(sound_stream &stream) override;
+};
+
+class adc12_device : public device_t, public device_sound_interface
+{
+public:
+	adc12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	u16 read();
 
 protected:
@@ -53,7 +81,9 @@ protected:
 };
 
 DECLARE_DEVICE_TYPE(ZN449, zn449_device);
+DECLARE_DEVICE_TYPE(AM2504, am2504_device);
 DECLARE_DEVICE_TYPE(ADC10, adc10_device);
+DECLARE_DEVICE_TYPE(ADC12, adc12_device);
 DECLARE_DEVICE_TYPE(ADC16, adc16_device);
 
 #endif // MAME_SOUND_ADC_H

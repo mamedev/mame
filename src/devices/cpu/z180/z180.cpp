@@ -832,9 +832,9 @@ void z180_device::z180_internal_port_write(uint8_t port, uint8_t data)
 			/* Force reload on state change */
 			m_tcr = (m_tcr & (Z180_TCR_TIF1 | Z180_TCR_TIF0)) | (data & ~(Z180_TCR_TIF1 | Z180_TCR_TIF0));
 			if (!(old & Z180_TCR_TDE0) && (m_tcr & Z180_TCR_TDE0))
-				m_tmdr_value[0] = 0; //m_rldr[0].w;
+				m_tmdr_value[0] = m_rldr[0].w;
 			if (!(old & Z180_TCR_TDE1) && (m_tcr & Z180_TCR_TDE1))
-				m_tmdr_value[1] = 0; //m_rldr[1].w;
+				m_tmdr_value[1] = m_rldr[1].w;
 		}
 
 		break;
@@ -848,7 +848,7 @@ void z180_device::z180_internal_port_write(uint8_t port, uint8_t data)
 	case 0x15:
 		LOG("Z180 TMDR1H wr $%02x\n", data);
 		m_tmdr[1].b.h = data;
-		m_tmdr_value[1] = (m_tmdr_value[1] & 0x00ff) | m_tmdr[1].b.h;
+		m_tmdr_value[1] = (m_tmdr_value[1] & 0x00ff) | (m_tmdr[1].b.h << 8);
 		break;
 
 	case 0x16:
@@ -1247,8 +1247,10 @@ int z180_device::z180_dma0(int max_cycles)
 		m_tend0_cb(CLEAR_LINE);
 		m_dstat &= ~Z180_DSTAT_DE0;
 		/* terminal count interrupt enabled? */
-		if (m_dstat & Z180_DSTAT_DIE0 && m_IFF1)
+		if (m_dstat & Z180_DSTAT_DIE0)
+		{
 			m_int_pending[Z180_INT_DMA0] = 1;
+		}
 	}
 	return cycles;
 }
@@ -1307,8 +1309,10 @@ int z180_device::z180_dma1()
 	cycles += m_extra_cycles; // use extra_cycles for I/O wait states
 
 	/* edge sensitive DREQ1 ? */
-	if (m_dcntl & Z180_DCNTL_DIM1)
+	if (m_dcntl & Z180_DCNTL_DMS1)
+	{
 		m_iol &= ~Z180_DREQ1;
+	}
 
 	m_dma_mar1.d = mar1;
 	m_dma_bcr[1].w = bcr1;
@@ -1319,7 +1323,7 @@ int z180_device::z180_dma1()
 		m_iol &= ~Z180_TEND1;
 		m_tend1_cb(CLEAR_LINE);
 		m_dstat &= ~Z180_DSTAT_DE1;
-		if (m_dstat & Z180_DSTAT_DIE1 && m_IFF1)
+		if (m_dstat & Z180_DSTAT_DIE1)
 			m_int_pending[Z180_INT_DMA1] = 1;
 	}
 
@@ -1840,25 +1844,24 @@ int z180_device::check_interrupts()
 		m_int_pending[Z180_INT_CSIO] = m_csio->check_interrupt();
 		m_int_pending[Z180_INT_ASCI0] = m_asci[0]->check_interrupt();
 		m_int_pending[Z180_INT_ASCI1] = m_asci[1]->check_interrupt();
-	}
 
-	int cycles = 0;
-	for (int i = 0; i <= Z180_INT_MAX; i++)
-	{
-		if (m_int_pending[i])
+		for (int i = 0; i <= Z180_INT_MAX; i++)
 		{
-			cycles += take_interrupt(i);
-			m_int_pending[i] = 0;
-			switch (i)
+			if (m_int_pending[i])
 			{
-			case Z180_INT_ASCI0: m_asci[0]->clear_interrupt(); break;
-			case Z180_INT_ASCI1: m_asci[1]->clear_interrupt(); break;
+				int const cycles = take_interrupt(i);
+				m_int_pending[i] = 0;
+				switch (i)
+				{
+				case Z180_INT_ASCI0: m_asci[0]->clear_interrupt(); break;
+				case Z180_INT_ASCI1: m_asci[1]->clear_interrupt(); break;
+				}
+				return cycles;
 			}
-			break;
 		}
 	}
 
-	return cycles;
+	return 0;
 }
 
 /****************************************************************************

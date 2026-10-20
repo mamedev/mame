@@ -31,16 +31,11 @@ http://www.stefan-uhlmann.de/cbm/MVM/index.html
 
 */
 
-/*
-
-    TODO:
-
-    - T6721A speech synthesis
-
-*/
-
 #include "emu.h"
 #include "magic_voice.h"
+
+#include "sound/flt_rc.h"
+
 #include "speaker.h"
 
 
@@ -231,15 +226,17 @@ void c64_magic_voice_cartridge_device::device_add_mconfig(machine_config &config
 	m_tpi->out_cb_cb().set(FUNC(c64_magic_voice_cartridge_device::tpi_cb_w));
 
 	CD40105(config, m_fifo);
-	m_fifo->in_ready_cb().set(m_tpi, FUNC(tpi6525_device::i3_w));
+	m_fifo->in_ready_cb().set(m_tpi, FUNC(tpi6525_device::pc3_w));
 
 	SPEAKER(config, "mono").front_center();
 	T6721A(config, m_vslsi, XTAL(640'000));
-	m_vslsi->eos_handler().set(m_tpi, FUNC(tpi6525_device::i2_w));
+	m_vslsi->eos_handler().set(m_tpi, FUNC(tpi6525_device::pc2_w));
 	m_vslsi->phi2_handler().set(FUNC(c64_magic_voice_cartridge_device::phi2_w));
 	m_vslsi->dtrd_handler().set(FUNC(c64_magic_voice_cartridge_device::dtrd_w));
 	m_vslsi->apd_handler().set(FUNC(c64_magic_voice_cartridge_device::apd_w));
-	m_vslsi->add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_vslsi->add_route(ALL_OUTPUTS, "filter", 1.0);
+
+	FILTER_RC(config, "filter").set_lowpass(RES_K(10), CAP_N(6.8)).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	C64_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1), c64_expansion_cards, nullptr);
 	m_exp->set_passthrough();
@@ -280,6 +277,7 @@ void c64_magic_voice_cartridge_device::device_start()
 	save_item(NAME(m_tpi_pb));
 	save_item(NAME(m_tpi_pc6));
 	save_item(NAME(m_pd));
+	save_item(NAME(m_ca));
 }
 
 

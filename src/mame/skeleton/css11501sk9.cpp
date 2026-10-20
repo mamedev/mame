@@ -125,14 +125,33 @@ ROM_START( css11501sk9 )
 	ROM_LOAD( "css11501s-k9_73-6917-06_24c04r6.u33",                                     0x000000, 0x000200, CRC(bd7bc39f) SHA1(9d0ac37bb3ec8c95990fd37a962a17a95ce97aa0) ) // 24C04R SEEPROM between the BCM5700C2KPB, the VSC2102-08UQ, and the 71V546S133PF, on SSL sub-board
 	ROM_LOAD( "css11501s-k9_73-6917-06_24c02n.u8",                                       0x000000, 0x000100, CRC(dcbe3083) SHA1(81934196733a8878cc19ced4f1791dfaa4da494a) ) // 24C02N SEEPROM between the BCM5700C2KPB, the 71V546S133PF, and the XC2S50, on SSL sub-board
 
-	ROM_REGION(0x004400, "pic", 0)
-	// CONFIG = 3eh, ID = ff3fff3fff3fff3fh
-	ROM_LOAD( "css11501s-k9_73-8174-04_17-6486-03_2605_27af12_pic16lf877pt_user.u35",    0x000000, 0x004000, CRC(22b03fe9) SHA1(984c14fb013763aa4fb981888480d19a6058843b) ) // PIC16LF877, on main PCB
-	ROM_LOAD( "css11501s-k9_73-8174-04_17-6486-03_2605_27af12_pic16lf877pt_data.u35",    0x000000, 0x000200, CRC(14bfe63a) SHA1(ebe833da793930303ac57c873a97f8383494a939) ) // PIC16LF877, on main PCB
+	ROM_REGION16_LE( 0x4400, "pic1", ROMREGION_ERASEFF )
+	ROM_LOAD( "css11501s-k9_73-8174-04_17-6486-03_2605_27af12_pic16lf877pt_user.u35", 0x0000, 0x4000, CRC(22b03fe9) SHA1(984c14fb013763aa4fb981888480d19a6058843b) ) // PIC16LF877, on main PCB
+	ROM_FILL( 0x4000, 0x01, 0xff )
+	ROM_FILL( 0x4001, 0x01, 0x3f ) // user_id0: 0x3fff
+	ROM_FILL( 0x4002, 0x01, 0xff )
+	ROM_FILL( 0x4003, 0x01, 0x3f ) // user_id1: 0x3fff
+	ROM_FILL( 0x4004, 0x01, 0xff )
+	ROM_FILL( 0x4005, 0x01, 0x3f ) // user_id2: 0x3fff
+	ROM_FILL( 0x4006, 0x01, 0xff )
+	ROM_FILL( 0x4007, 0x01, 0x3f ) // user_id3: 0x3fff
+	ROM_FILL( 0x400e, 0x01, 0x3e )
+	ROM_FILL( 0x400f, 0x01, 0x00 ) // configuration: 0x003e (likely wrong, might be the high byte instead)
+	ROM_LOAD( "css11501s-k9_73-8174-04_17-6486-03_2605_27af12_pic16lf877pt_data.u35", 0x4200, 0x0200, CRC(14bfe63a) SHA1(ebe833da793930303ac57c873a97f8383494a939) ) // PIC16LF877, on main PCB
 
-	// CONFIG = 3eh, ID = 7f007f007f007f00h
-	ROM_LOAD( "css11501s-k9_73-8174-04_17-6494-02_1605_92817_pic16lf872_user.u7",        0x000000, 0x001000, CRC(6deebf3a) SHA1(c8f030657b7959c6d3aa5b1583786eb84ed199c1) ) // PIC16LF872, on SSL sub-board
-	ROM_LOAD( "css11501s-k9_73-8174-04_17-6494-02_1605_92817_pic16lf872_data.u7",        0x000000, 0x000080, CRC(903500ff) SHA1(d33277afda835773cfcc9bc137690cbe79943f0f) ) // PIC16LF872, on SSL sub-board
+	ROM_REGION16_LE( 0x4280, "pic2", ROMREGION_ERASEFF )
+	ROM_LOAD( "css11501s-k9_73-8174-04_17-6494-02_1605_92817_pic16lf872_user.u7", 0x0000, 0x1000, CRC(6deebf3a) SHA1(c8f030657b7959c6d3aa5b1583786eb84ed199c1) ) // PIC16LF872, on SSL sub-board
+	ROM_FILL( 0x4000, 0x01, 0x7f )
+	ROM_FILL( 0x4001, 0x01, 0x00 ) // user_id0: 0x007f
+	ROM_FILL( 0x4002, 0x01, 0x7f )
+	ROM_FILL( 0x4003, 0x01, 0x00 ) // user_id1: 0x007f
+	ROM_FILL( 0x4004, 0x01, 0x7f )
+	ROM_FILL( 0x4005, 0x01, 0x00 ) // user_id2: 0x007f
+	ROM_FILL( 0x4006, 0x01, 0x7f )
+	ROM_FILL( 0x4007, 0x01, 0x00 ) // user_id3: 0x007f
+	ROM_FILL( 0x400e, 0x01, 0x3e )
+	ROM_FILL( 0x400f, 0x01, 0x00 ) // configuration: 0x003e (likely wrong, might be the high byte instead)
+	ROM_LOAD( "css11501s-k9_73-8174-04_17-6494-02_1605_92817_pic16lf872_data.u7", 0x4200, 0x0080, CRC(903500ff) SHA1(d33277afda835773cfcc9bc137690cbe79943f0f) ) // PIC16LF872, on SSL sub-board
 ROM_END
 
 } // Anonymous namespace

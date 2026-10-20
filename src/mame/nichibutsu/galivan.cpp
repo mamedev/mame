@@ -1177,7 +1177,7 @@ void galivan_state::common(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(12'000'000) / 2, 384, 0, 32 * 8, 263, 2 * 8, 30 * 8);
 	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	m_screen->set_palette(m_palette);

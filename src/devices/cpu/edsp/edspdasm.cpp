@@ -5,7 +5,39 @@
     Elan Microelectronics eDSP disassembler
 
     Instruction encodings for this 16-bit DSP architecture are based on
-    guesswork; many remain unidentified.
+    guesswork; several instructions remain unidentified. It is also
+    possible that different model series add or delete a few instructions.
+
+    Known missing instructions:
+
+        Rd = RAM8
+        RAM8 = Rd
+        Rd = [R3 - Rt]
+        [R3 - Rt] = Rs
+        D = Rs * [Rt]
+        D = Rs * [Rt++]
+        D = Rs * [Rt--]
+        D = Rs * P[Rt]
+        D = Rs * P[Rt++]
+        D = [Rs++] * P[Rt--]
+        D = [Rs++] * P[Rt++]
+        D = D / Rs
+        MAC (all modes)
+        MAS (all modes)
+        SWAP Rs
+        CMP Rs, [Rt++]
+        CMP Rs, [Rt--]
+        CMP Rs, P[Rt]
+        CMP Rs, P[Rt++]
+        CMP [Rs++], P[Rt--]
+        CMP [Rs++], P[Rt++]
+        LOOP Rn
+        LOOP #imm6
+        TRAP #imm6
+
+    System registers are mapped in the I/O space, but the locations differ
+    between model series. For example, SPA (stack pointer address) is
+    IO[0x11] on the eSL and eSLS series, but IO[0x13] on eMG2000A.
 
 ***************************************************************************/
 
@@ -26,24 +58,42 @@ namespace {
 
 const char *const c_conditions[15] =
 {
-	"lo",
-	"hs",
-	"cond2",
-	"cond3",
+	"lo/cc",
+	"hs/cs",
+	"vc", // not used in mylife, unconfirmed
+	"vs", // not used in mylife, unconfirmed
 	"ne",
 	"eq",
-	"cond6",
-	"cond7",
-	"ts", // or perhaps tc
-	"cond9",
+	"pl", // not used in mylife, unconfirmed
+	"mi",
+	// next two are possibly reversed
+	"tc",
+	"ts", // not used in mylife
 	"ge",
 	"lt",
 	"gt",
 	"le",
-	"cond14"
+	"ls" // not used in mylife, unconfirmed
 };
 
-}
+const char *const c_bit_ops[4] =
+{
+	"bs",
+	"bc",
+	"btest",
+	"btg" // not used in mylife, unconfirmed
+};
+
+const char *const c_mul_modes[4] =
+{
+	// unknown which of these are SS, SU, US or UU
+	"Mode0",
+	"Mode1", // not used in mylife
+	"Mode2", // not used in mylife
+	"Mode3"
+};
+
+} // anonymous namespace
 
 offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const edsp_disassembler::data_buffer &opcodes, const edsp_disassembler::data_buffer &params)
 {
@@ -66,7 +116,7 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 			break;
 
 		case 3:
-			util::stream_format(stream, "r%d = r%d + 0x%02X", BIT(op, 8, 3), BIT(op, 8, 3), BIT(op, 5, 3) << 3 | BIT(op, 0, 3));
+			util::stream_format(stream, "r%d = r%d + #0x%02X", BIT(op, 8, 3), BIT(op, 8, 3), BIT(op, 5, 3) << 3 | BIT(op, 0, 3));
 			break;
 		}
 		if (BIT(op, 11))
@@ -91,7 +141,7 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 			break;
 
 		case 3:
-			util::stream_format(stream, "r%d = r%d - 0x%02X", BIT(op, 8, 3), BIT(op, 8, 3), BIT(op, 5, 3) << 3 | BIT(op, 0, 3));
+			util::stream_format(stream, "r%d = r%d - #0x%02X", BIT(op, 8, 3), BIT(op, 8, 3), BIT(op, 5, 3) << 3 | BIT(op, 0, 3));
 			break;
 		}
 		if (BIT(op, 11))
@@ -150,7 +200,7 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	{
 		// XOR with register direct, indirect or imm6
 		if (op == 0x3000 + 0x0121 * BIT(op, 0, 3))
-			util::stream_format(stream, "r%d = 0", BIT(op, 0, 3));
+			util::stream_format(stream, "clr r%d", BIT(op, 0, 3));
 		else switch (BIT(op, 3, 2))
 		{
 		case 0:
@@ -171,58 +221,58 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 		}
 		return 1 | SUPPORTED;
 	}
-	else if ((op & 0xf81f) == 0x3800)
+	else if ((op & 0xf816) == 0x3800)
 	{
-		// ADD with imm16
-		util::stream_format(stream, "r%d = r%d + #0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
+		// ADD/ADC with imm16
+		if (BIT(op, 3))
+			util::stream_format(stream, "[r%d]", BIT(op, 8, 3));
+		else
+			util::stream_format(stream, "r%d", BIT(op, 8, 3));
+		util::stream_format(stream, " = r%d + #0x%04X", BIT(op, 5, 3), opcodes.r16(pc + 1));
+		if (BIT(op, 0))
+			stream << " + C";
 		return 2 | SUPPORTED;
 	}
-	else if ((op & 0xf81f) == 0x3802)
+	else if ((op & 0xf816) == 0x3802)
 	{
-		// SUB with imm16
-		util::stream_format(stream, "r%d = r%d - #0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
+		// SUB/SUBB with imm16
+		if (BIT(op, 3))
+			util::stream_format(stream, "[r%d]", BIT(op, 8, 3));
+		else
+			util::stream_format(stream, "r%d", BIT(op, 8, 3));
+		util::stream_format(stream, " = r%d - #0x%04X", BIT(op, 5, 3), opcodes.r16(pc + 1));
+		if (BIT(op, 0))
+			stream << " - B";
 		return 2 | SUPPORTED;
 	}
-	else if ((op & 0xf81f) == 0x3804)
+	else if ((op & 0xf817) == 0x3804)
 	{
 		// AND with imm16
-		util::stream_format(stream, "r%d = r%d AND #0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
+		if (BIT(op, 3))
+			util::stream_format(stream, "[r%d]", BIT(op, 8, 3));
+		else
+			util::stream_format(stream, "r%d", BIT(op, 8, 3));
+		util::stream_format(stream, " = r%d AND #0x%04X", BIT(op, 5, 3), opcodes.r16(pc + 1));
 		return 2 | SUPPORTED;
 	}
-	else if ((op & 0xf81f) == 0x3805)
+	else if ((op & 0xf817) == 0x3805)
 	{
 		// OR with imm16
-		util::stream_format(stream, "r%d = r%d OR #0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
+		if (BIT(op, 3))
+			util::stream_format(stream, "[r%d]", BIT(op, 8, 3));
+		else
+			util::stream_format(stream, "r%d", BIT(op, 8, 3));
+		util::stream_format(stream, " = r%d OR #0x%04X", BIT(op, 5, 3), opcodes.r16(pc + 1));
 		return 2 | SUPPORTED;
 	}
-	else if ((op & 0xf81f) == 0x3806)
+	else if ((op & 0xf817) == 0x3806)
 	{
 		// XOR with imm16
-		util::stream_format(stream, "r%d = r%d XOR #0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
-		return 2 | SUPPORTED;
-	}
-	else if ((op & 0xf81f) == 0x3808)
-	{
-		// ADD with imm16 to indirect destination
-		util::stream_format(stream, "[r%d] = r%d + #0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
-		return 2 | SUPPORTED;
-	}
-	else if ((op & 0xf81f) == 0x380a)
-	{
-		// SUB with imm16 to indirect destination
-		util::stream_format(stream, "[r%d] = r%d - #0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
-		return 2 | SUPPORTED;
-	}
-	else if ((op & 0xf81f) == 0x380c)
-	{
-		// AND with imm16 to indirect destination
-		util::stream_format(stream, "[r%d] = r%d AND #0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
-		return 2 | SUPPORTED;
-	}
-	else if ((op & 0xf81f) == 0x380d)
-	{
-		// OR with imm16 to indirect destination
-		util::stream_format(stream, "[r%d] = r%d OR #0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
+		if (BIT(op, 3))
+			util::stream_format(stream, "[r%d]", BIT(op, 8, 3));
+		else
+			util::stream_format(stream, "r%d", BIT(op, 8, 3));
+		util::stream_format(stream, " = r%d XOR #0x%04X", BIT(op, 5, 3), opcodes.r16(pc + 1));
 		return 2 | SUPPORTED;
 	}
 	else if ((op & 0xf81e) == 0x3810)
@@ -241,16 +291,28 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 			stream << " - B";
 		return 2 | SUPPORTED;
 	}
+	else if ((op & 0xf81f) == 0x3814)
+	{
+		// AND with RAM16 (not used in mylife)
+		util::stream_format(stream, "r%d = r%d AND 0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
+		return 2 | SUPPORTED;
+	}
 	else if ((op & 0xf81f) == 0x3815)
 	{
-		// OR with RAM16 (maybe)
+		// OR with RAM16
 		util::stream_format(stream, "r%d = r%d OR 0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
 		return 2 | SUPPORTED;
 	}
-	else if ((op & 0xf8ff) == 0x3817)
+	else if ((op & 0xf81f) == 0x3816)
+	{
+		// XOR with RAM16 (not used in mylife)
+		util::stream_format(stream, "r%d = r%d XOR 0x%04X", BIT(op, 8, 3), BIT(op, 5, 3), opcodes.r16(pc + 1));
+		return 2 | SUPPORTED;
+	}
+	else if ((op & 0xff1f) == 0x3817)
 	{
 		// Repeat next instruction
-		util::stream_format(stream, "rpt r%d", BIT(op, 8, 3));
+		util::stream_format(stream, "rpt r%d", BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf87f) == 0x3818)
@@ -270,7 +332,8 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	}
 	else if (op == 0x381a)
 	{
-		stream << "nop"; // maybe
+		// No operation (maybe)
+		stream << "nop";
 		return 1 | SUPPORTED;
 	}
 	else if (op == 0x383a)
@@ -285,31 +348,36 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 		stream << "reti";
 		return 1 | STEP_OUT | SUPPORTED;
 	}
+	else if (op == 0x387a)
+	{
+		// used in myrelife, not documented for eSL Series (eMG2000A allows "Ext. SRAM" in program space)
+		// possibly applies postincrement to one or both registers
+		stream << "P[r0] = [r1]";
+		return 1 | SUPPORTED;
+	}
 	else if ((op & 0xf81f) == 0x381b)
 	{
-		util::stream_format(stream, "sp = sp + #%d", BIT(op, 5, 6));
+		const u8 imm6 = BIT(op, 5, 6);
+		util::stream_format(stream, "sp = sp + #%s%X", imm6 > 9 ? "0x" : "", imm6);
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf81f) == 0x381c)
 	{
-		util::stream_format(stream, "sp = sp - #%d", BIT(op, 5, 6));
+		const u8 imm6 = BIT(op, 5, 6);
+		util::stream_format(stream, "sp = sp - #%s%X", imm6 > 9 ? "0x" : "", imm6);
 		return 1 | SUPPORTED;
 	}
-//  else if (op == 0x381e) - used very rarely
+//  else if (op == 0x381e) - used very rarely in mylife (trap?)
 	else if ((op & 0xf81f) == 0x381f)
 	{
-		// possibly rotate instead of logical or arithmetic shift? combined shift with r1?
-		util::stream_format(stream, "r0 = r0 SHR #%d", BIT(op, 5, 6) + 1);
+		// Repeat next instruction (#imm6+1) times
+		util::stream_format(stream, "rpt #%d", BIT(op, 5, 6));
 		return 1 | SUPPORTED;
 	}
-	else if ((op & 0xf818) == 0x4000)
+	else if ((op & 0xff00) == 0x4000)
 	{
-		util::stream_format(stream, "r%d = r%d OP40 r%d", BIT(op, 8, 3), BIT(op, 5, 3), BIT(op, 0, 3));
-		return 1 | SUPPORTED;
-	}
-	else if ((op & 0xf818) == 0x4018)
-	{
-		util::stream_format(stream, "r%d = r%d OP4x r%d", BIT(op, 8, 3), BIT(op, 5, 3), BIT(op, 0, 3));
+		// Multiply
+		util::stream_format(stream, "D = r%d * r%d (%s)", BIT(op, 5, 3), BIT(op, 0, 3), c_mul_modes[BIT(op, 3, 2)]);
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xff18) == 0x4818)
@@ -326,13 +394,19 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	}
 	else if ((op & 0xf81f) == 0x5800)
 	{
-		util::stream_format(stream, "r%d = OP50 r%d", BIT(op, 8, 3), BIT(op, 5, 3));
+		// Logical complement
+		util::stream_format(stream, "r%d = COM r%d", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
-//  else if ((op & 0xf81f) == 0x5801) - might have a different format
+	else if ((op & 0xf81f) == 0x5801)
+	{
+		util::stream_format(stream, "r%d = r%d", BIT(op, 8, 3), BIT(op, 5, 3));
+		return 1 | SUPPORTED;
+	}
 	else if ((op & 0xf81f) == 0x5802)
 	{
-		util::stream_format(stream, "r%d = OP52 r%d", BIT(op, 8, 3), BIT(op, 5, 3));
+		// Two's complement
+		util::stream_format(stream, "r%d = NEG r%d", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf81f) == 0x5803)
@@ -347,7 +421,6 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	}
 	else if ((op & 0xf81f) == 0x5806)
 	{
-		// shift direction unclear
 		util::stream_format(stream, "r%d = SHL r%d", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
@@ -358,7 +431,7 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	}
 	else if ((op & 0xf81f) == 0x5808)
 	{
-		util::stream_format(stream, "r%d = OP58 r%d", BIT(op, 8, 3), BIT(op, 5, 3));
+		util::stream_format(stream, "r%d = SHR r%d", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf81f) == 0x5809)
@@ -368,7 +441,6 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	}
 	else if ((op & 0xf81f) == 0x580a)
 	{
-		// shift direction unclear
 		util::stream_format(stream, "r%d = ROL r%d", BIT(op, 5, 3), BIT(op, 8, 3));
 		return 1 | SUPPORTED;
 	}
@@ -379,19 +451,53 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 	}
 	else if ((op & 0xf81f) == 0x580c)
 	{
-		// shift direction unclear
 		util::stream_format(stream, "r%d = ROR r%d", BIT(op, 8, 3), BIT(op, 5, 3));
+		return 1 | SUPPORTED;
+	}
+	else if ((op & 0xf81f) == 0x580d)
+	{
+		// not used in mylife
+		util::stream_format(stream, "[r%d++] = P[r%d--]", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf81f) == 0x580e)
 	{
-		// shift direction unclear (SHR or ASR?)
-		util::stream_format(stream, "r%d = SHR r%d", BIT(op, 8, 3), BIT(op, 5, 3));
+		util::stream_format(stream, "r%d = ASR r%d", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf81f) == 0x580f)
 	{
 		util::stream_format(stream, "[r%d++] = P[r%d++]", BIT(op, 8, 3), BIT(op, 5, 3));
+		return 1 | SUPPORTED;
+	}
+	else if ((op & 0xf81f) == 0x5811)
+	{
+		// not used in mylife
+		util::stream_format(stream, "r%d = P[r%d--]", BIT(op, 8, 3), BIT(op, 5, 3));
+		return 1 | SUPPORTED;
+	}
+	else if ((op & 0xf81f) == 0x5813)
+	{
+		// not used in mylife
+		util::stream_format(stream, "[r%d] = P[r%d++]", BIT(op, 8, 3), BIT(op, 5, 3));
+		return 1 | SUPPORTED;
+	}
+	else if ((op & 0xf81f) == 0x5815)
+	{
+		// not used in mylife
+		util::stream_format(stream, "[r%d--] = P[r%d--]", BIT(op, 8, 3), BIT(op, 5, 3));
+		return 1 | SUPPORTED;
+	}
+	else if ((op & 0xf81f) == 0x5817)
+	{
+		// not used in mylife
+		util::stream_format(stream, "[r%d] = P[r%d]", BIT(op, 8, 3), BIT(op, 5, 3));
+		return 1 | SUPPORTED;
+	}
+	else if ((op & 0xf81f) == 0x5819)
+	{
+		// not used in mylife
+		util::stream_format(stream, "[r%d++] = P[r%d]", BIT(op, 8, 3), BIT(op, 5, 3));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf81f) == 0x581b)
@@ -415,33 +521,43 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 		util::stream_format(stream, "jmp r%d", BIT(op, 8, 3));
 		return 1 | SUPPORTED;
 	}
+	else if ((op & 0xf8ff) == 0x587e)
+	{
+		util::stream_format(stream, "call r%d", BIT(op, 8, 3));
+		return 1 | STEP_OVER | SUPPORTED;
+	}
 	else if ((op & 0xf8ff) == 0x589e)
 	{
-		// MOV RAM16 to register
+		// MOV RAM16 to register direct
 		util::stream_format(stream, "r%d = 0x%04X", BIT(op, 8, 3), opcodes.r16(pc + 1));
 		return 2 | SUPPORTED;
 	}
 	else if ((op & 0xf8ff) == 0x58be)
 	{
-		// MOV register to RAM16
+		// MOV register direct to RAM16
 		util::stream_format(stream, "0x%04X = r%d", opcodes.r16(pc + 1), BIT(op, 8, 3));
 		return 2 | SUPPORTED;
 	}
 	else if ((op & 0xf8ff) == 0x58de)
 	{
-		// MOV imm16 to RAM
+		// MOV imm16 to register indirect
 		util::stream_format(stream, "[r%d] = #0x%04X", BIT(op, 8, 3), opcodes.r16(pc + 1));
 		return 2 | SUPPORTED;
 	}
+	else if ((op & 0xf81f) == 0x581f)
+	{
+		util::stream_format(stream, "[r%d--] = r%d", BIT(op, 8, 3), BIT(op, 5, 3));
+		return 1 | SUPPORTED;
+	}
 	else if ((op & 0xf800) == 0x6000)
 	{
-		// MOV imm8 to register
-		util::stream_format(stream, "r%d = ", BIT(op, 8, 3));
+		// MOV imm8 to register (clear high byte)
+		util::stream_format(stream, "r%d", BIT(op, 8, 3));
 		u16 op2 = opcodes.r16(pc + 1);
 		if (((op ^ op2) & 0xff00) == 0x0800)
-			util::stream_format(stream, "LO #0x%04X", BIT(op2, 0, 8) << 8 | BIT(op, 0, 8));
+			util::stream_format(stream, ".l = LO #0x%04X", BIT(op2, 0, 8) << 8 | BIT(op, 0, 8));
 		else
-			util::stream_format(stream, "#0x%02X", BIT(op, 0, 8));
+			util::stream_format(stream, " = #0x%02X", BIT(op, 0, 8));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf800) == 0x6800)
@@ -450,7 +566,8 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 		util::stream_format(stream, "r%d.h = #0x%02X", BIT(op, 8, 3), BIT(op, 0, 8));
 		return 1 | SUPPORTED;
 	}
-	else if (op >= 0x8000 && op < 0xa000)
+//  else if ((op & 0xf000) == 0x7000) - probably MAC and MAS or move to or from RAM8, not used in mylife
+	else if ((op & 0xe000) == 0x8000)
 	{
 		// Short branch
 		const u8 cond = BIT(op, 9, 4);
@@ -459,41 +576,32 @@ offs_t edsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const eds
 		util::stream_format(stream, "jmp 0x%04X", u16(pc + 1 + util::sext(op, 9)));
 		return 1 | (cond != 15 ? 0 : STEP_COND) | SUPPORTED;
 	}
-	else if ((op & 0xff00) == 0xa000)
+	else if ((op & 0xfa00) == 0xa000)
 	{
-		// MOV R3 indirect with displacement to register
-		util::stream_format(stream, "r%d = [r3 - %d]", BIT(op, 5, 3), BIT(op, 0, 5));
+		// MOV register to or from R3 indirect with displacement (myrelife uses 6-bit extension)
+		const u8 imm6 = BIT(op, 8) << 5 | BIT(op, 0, 5);
+		if (BIT(op, 10))
+			util::stream_format(stream, "[r3 - #%s%X] = r%d", imm6 > 9 ? "0x" : "", imm6, BIT(op, 5, 3));
+		else
+			util::stream_format(stream, "r%d = [r3 - #%s%X]", BIT(op, 5, 3), imm6 > 9 ? "0x" : "", imm6);
 		return 1 | SUPPORTED;
 	}
-	else if ((op & 0xff00) == 0xa400)
+	else if ((op & 0xf980) == 0xa800)
 	{
-		// MOV register to R3 indirect with displacement
-		util::stream_format(stream, "[r3 - %d] = r%d", BIT(op, 0, 5), BIT(op, 5, 3));
+		// Bit operations on registers
+		util::stream_format(stream, "%s r%d.%d", c_bit_ops[BIT(op, 9, 2)], BIT(op, 0, 3), BIT(op, 3, 4));
 		return 1 | SUPPORTED;
 	}
-	else if ((op & 0xff80) == 0xa800)
+	else if ((op & 0xf980) == 0xa880)
 	{
-		util::stream_format(stream, "bs r%d.%d", BIT(op, 0, 3), BIT(op, 3, 4));
+		// Bit operations on RAM addresses 0x0000–0x0007 (not used in mylife, unconfirmed)
+		util::stream_format(stream, "%s 0x%04X.%d", c_bit_ops[BIT(op, 9, 2)], BIT(op, 0, 3), BIT(op, 3, 4));
 		return 1 | SUPPORTED;
 	}
-	else if ((op & 0xff00) == 0xa900)
+	else if ((op & 0xf900) == 0xa900)
 	{
-		util::stream_format(stream, "bs IO[0x%02X].%d", BIT(op, 7) << 3 | BIT(op, 0, 3), BIT(op, 3, 4));
-		return 1 | SUPPORTED;
-	}
-	else if ((op & 0xff80) == 0xaa00)
-	{
-		util::stream_format(stream, "bc r%d.%d", BIT(op, 0, 3), BIT(op, 3, 4));
-		return 1 | SUPPORTED;
-	}
-	else if ((op & 0xff00) == 0xab00)
-	{
-		util::stream_format(stream, "bc IO[0x%02X].%d", BIT(op, 7) << 3 | BIT(op, 0, 3), BIT(op, 3, 4));
-		return 1 | SUPPORTED;
-	}
-	else if ((op & 0xff80) == 0xac00)
-	{
-		util::stream_format(stream, "btest r%d.%d", BIT(op, 0, 3), BIT(op, 3, 4));
+		// Bit operations on I/O addresses 0x00–0x0F
+		util::stream_format(stream, "%s IO[0x%02X].%d", c_bit_ops[BIT(op, 9, 2)], BIT(op, 7) << 3 | BIT(op, 0, 3), BIT(op, 3, 4));
 		return 1 | SUPPORTED;
 	}
 	else if ((op & 0xf880) == 0xb000)

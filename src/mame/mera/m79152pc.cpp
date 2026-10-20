@@ -285,7 +285,7 @@ void m79152pc_state::m79152pc(machine_config &config)
 	m_mcu->p2_out_cb().append("ctc", FUNC(z80ctc_device::trg3)).bit(6);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(50 * 720 * 324, 720, 0, 640, 324, 0, 250);
 	m_screen->set_screen_update(FUNC(m79152pc_state::screen_update));
 	m_screen->set_palette("palette");

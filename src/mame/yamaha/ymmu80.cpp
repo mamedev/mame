@@ -381,4 +381,4 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 1994, mu80, 0, 0, mu80, mu80, mu80_state, empty_init, "Yamaha", "MU80", MACHINE_NOT_WORKING )
+CONS( 1994, mu80, 0, 0, mu80, mu80, mu80_state, empty_init, "Yamaha", "MU80 Tone Generator", MACHINE_NOT_WORKING )

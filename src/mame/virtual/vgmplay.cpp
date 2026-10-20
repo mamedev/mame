@@ -52,6 +52,7 @@
 
 #include "debugger.h"
 #include "softlist_dev.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include <zlib.h>

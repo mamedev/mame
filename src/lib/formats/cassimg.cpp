@@ -15,7 +15,9 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <cstring>
+#include <limits>
 
 
 /* debugging parameters */
@@ -23,6 +25,7 @@
 #define DUMP_CASSETTES          0
 
 #define SAMPLES_PER_BLOCK       0x40000
+#define PULSE_RECORD_FREQUENCY  44100
 #define CASSETTE_FLAG_DIRTY     0x10000
 
 
@@ -35,6 +38,15 @@ namespace {
 /*********************************************************************
     helper code
 *********************************************************************/
+
+double pulse_tick(double time, uint32_t frequency, int direction)
+{
+	double const tick = time * frequency;
+	// Allow for floating-point roundoff when a timer expires on an edge.
+	double const tolerance = 1e-6 + std::abs(tick) * std::numeric_limits<double>::epsilon() * 4;
+	return tick + (direction > 0 ? tolerance : -tolerance);
+}
+
 
 constexpr double map_double(double d, uint64_t low, uint64_t high, uint64_t value)
 {
@@ -400,6 +412,68 @@ uint64_t cassette_image::image_size()
     waveform accesses
 *********************************************************************/
 
+void cassette_image::set_pulses(std::vector<Pulse> &&pulses)
+{
+	m_pulses = std::move(pulses);
+	m_sample_count = m_pulses.empty() ? 0 : m_pulses.back().end;
+}
+
+
+double cassette_image::next_transition(double time, int direction) const
+{
+	double const tick = pulse_tick(time, m_sample_frequency, direction);
+	auto const it = std::upper_bound(m_pulses.begin(), m_pulses.end(), tick,
+		[](double t, Pulse const &pulse) { return t < pulse.end; });
+	if (direction > 0)
+		return it == m_pulses.end() ? -1.0 : double(it->end) / m_sample_frequency;
+	auto const prev = std::lower_bound(m_pulses.begin(), m_pulses.end(), tick,
+		[](Pulse const &pulse, double t) { return pulse.end < t; });
+	return prev == m_pulses.begin() ? 0.0 : double(std::prev(prev)->end) / m_sample_frequency;
+}
+
+
+int32_t cassette_image::pulse_sample(double time, int direction) const
+{
+	double const tick = pulse_tick(time, m_sample_frequency, direction);
+	auto const it = std::upper_bound(m_pulses.begin(), m_pulses.end(), tick,
+		[](double t, Pulse const &pulse) { return t < pulse.end; });
+	return (it != m_pulses.end() && tick >= 0) ? it->value : 0;
+}
+
+
+cassette_image::error cassette_image::pulses_to_samples()
+{
+	uint64_t const pulse_frequency = m_sample_frequency;
+	uint64_t const pulse_end = m_pulses.back().end;
+
+	m_sample_frequency = PULSE_RECORD_FREQUENCY;
+	m_sample_count = size_t((pulse_end * m_sample_frequency + pulse_frequency - 1) / pulse_frequency);
+	m_blocks.clear();
+
+	auto pulse = m_pulses.begin();
+	for (size_t sample = 0; sample < m_sample_count; sample++)
+	{
+		uint64_t const tick = sample * pulse_frequency / m_sample_frequency;
+		while (pulse != m_pulses.end() && tick >= pulse->end)
+			++pulse;
+		if (pulse == m_pulses.end())
+			break;
+
+		for (int channel = 0; channel < m_channels; channel++)
+		{
+			int32_t *ptr;
+			error const err = lookup_sample(channel, sample, ptr);
+			if (err != error::SUCCESS)
+				return err;
+			*ptr = pulse->value;
+		}
+	}
+
+	m_pulses.clear();
+	return error::SUCCESS;
+}
+
+
 // Note: In normal use, the sample_spacing is the same as the sample size (in bytes)
 //       But it can be larger to help do an interleaved write to samples
 //       (see cassette_write_samples)
@@ -424,11 +498,17 @@ cassette_image::error cassette_image::get_samples(int channel,
 			/* find the sample that we are putting */
 			double d = map_double(ranges.sample_last + 1 - ranges.sample_first, 0, sample_count, sample_index) + ranges.sample_first;
 			size_t cassette_sample_index = (size_t) d;
-			err = lookup_sample(channel, cassette_sample_index, source_ptr);
-			if (err != error::SUCCESS)
-				return err;
-
-			sum += *source_ptr;
+			if (!m_pulses.empty())
+			{
+				sum += pulse_sample(time_index + sample_period * sample_index / sample_count, 1);
+			}
+			else
+			{
+				err = lookup_sample(channel, cassette_sample_index, source_ptr);
+				if (err != error::SUCCESS)
+					return err;
+				sum += *source_ptr;
+			}
 		}
 
 		/* average out the samples */
@@ -475,6 +555,13 @@ cassette_image::error cassette_image::put_samples(int channel,
 
 	if (sample_period == 0)
 		return error::SUCCESS;
+
+	if (!m_pulses.empty())
+	{
+		err = pulses_to_samples();
+		if (err != error::SUCCESS)
+			return err;
+	}
 
 	err = compute_manipulation_ranges(channel, time_index, sample_period, ranges);
 	if (err != error::SUCCESS)

@@ -8,7 +8,7 @@
 #include "315-6154.h"
 #include "naomibd.h"
 
-#include "cpu/pic16c62x/pic16c62x.h"
+#include "cpu/pic16_mid/pic16_mid.h"
 #include "machine/eepromser.h"
 #include "machine/i2cmem.h"
 #include "machine/idectrl.h"
@@ -154,9 +154,8 @@ private:
 	address_space *space_6154;
 
 	uint32_t dimm_cur_address;
-	uint8_t picbus;
-	uint8_t picbus_pullup;
-	uint8_t picbus_io[2]; // 0 for sh4, 1 for pic
+	uint8_t picbus_dimm;
+	uint8_t picbus_pic;
 	bool picbus_used;
 	uint32_t dimm_command;
 	uint32_t dimm_offsetl;

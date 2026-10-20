@@ -592,7 +592,7 @@ void fcombat_state::fcombat(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &fcombat_state::audio_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK / 3, 448, 96, 96+320, 256, 16, 240);
 	m_screen->set_screen_update(FUNC(fcombat_state::screen_update));
 	m_screen->set_palette(m_palette);

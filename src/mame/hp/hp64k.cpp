@@ -147,22 +147,24 @@
 //
 
 #include "emu.h"
+
+#include "bus/ieee488/ieee488.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/hphybrid/hphybrid.h"
 #include "imagedev/floppy.h"
 #include "machine/74123.h"
 #include "machine/com8116.h"
 #include "machine/i8251.h"
+#include "machine/phi.h"
 #include "machine/rescap.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"
 #include "video/i8275.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "machine/phi.h"
-#include "bus/ieee488/ieee488.h"
 
 
 namespace {
@@ -181,8 +183,7 @@ public:
 	void hp64k(machine_config &config);
 
 private:
-	virtual void driver_start() override;
-	//virtual void machine_start();
+	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
@@ -388,7 +389,7 @@ hp64k_state::hp64k_state(const machine_config &mconfig, device_type type, const 
 {
 }
 
-void hp64k_state::driver_start()
+void hp64k_state::machine_start()
 {
 	// 32kW for lower RAM
 	m_low32k_ram.resize(0x8000);
@@ -1389,7 +1390,7 @@ void hp64k_state::hp64k(machine_config &config)
 	m_crtc->drq_wr_callback().set(FUNC(hp64k_state::hp64k_crtc_drq_w));
 	m_crtc->vrtc_wr_callback().set(FUNC(hp64k_state::hp64k_crtc_vrtc_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(60);

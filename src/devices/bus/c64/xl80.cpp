@@ -125,7 +125,7 @@ GFXDECODE_END
 
 void c64_xl80_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, MC6845_SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::white()));
+	screen_device &screen(SCREEN(config, MC6845_SCREEN_TAG).set_color(rgb_t::white()));
 	screen.set_screen_update(HD46505SP_TAG, FUNC(hd6845s_device::screen_update));
 	screen.set_size(80*8, 24*8);
 	screen.set_visarea(0, 80*8-1, 0, 24*8-1);

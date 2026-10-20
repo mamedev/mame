@@ -165,7 +165,7 @@ void triviaquiz_state::triviaquiz(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000); // verified
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 }
 
 /***************************************************************************

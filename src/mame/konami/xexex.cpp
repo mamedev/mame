@@ -701,7 +701,7 @@ void xexex_state::xexex(machine_config &config)
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(32_MHz_XTAL / 4, 512, 0+40, 384+40, 289, 0, 256); // from CCU
 	m_screen->set_screen_update(FUNC(xexex_state::screen_update));
 

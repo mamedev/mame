@@ -377,7 +377,7 @@ void galspnbl_state::galspnbl(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &galspnbl_state::audio_map);    // NMI is caused by the main CPU
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);

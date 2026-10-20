@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    MPEG audio support.  Only layer2 and variants for now.
+    MPEG audio support.  Only layer1, layer2 and variants for now.
 
 ***************************************************************************/
 
@@ -10,6 +10,8 @@
 #define MAME_SOUND_MPEG_AUDIO_H
 
 #pragma once
+
+class device_t;
 
 class mpeg_audio {
 public:
@@ -56,6 +58,9 @@ public:
 	// Clear audio buffer
 	void clear();
 
+	// Register persistent synthesis history with an owning device.
+	void register_save_state(device_t &device, int index = 0);
+
 private:
 	struct limit_hit {};
 
@@ -96,6 +101,12 @@ private:
 
 	int m_current_pos, m_current_limit;
 
+	int read_header_fields(int &stereo_mode, int &stereo_mode_ext);
+	void read_header_layer1();
+	void read_data_layer1();
+	double read_layer1_sample(int allocation);
+	void decode_layer1(short *output, int &output_samples);
+
 	void read_header_amm(bool layer25);
 	void read_header_mpeg2(bool layer25);
 	void read_data_mpeg2();
@@ -109,6 +120,7 @@ private:
 	void build_amplitudes();
 	void build_next_segments(int step);
 	void retrieve_subbuffer(int step);
+	void synthesize(short *output);
 	void idct32(const double *input, double *output);
 	void resynthesis(const double *input, double *output);
 	void scale_and_clamp(const double *input, short *output, int step);

@@ -111,6 +111,7 @@ so either 6mhz or 4mhz. Schematics show the jumper set to the 6mhz setting.
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "buggychl.lh"
@@ -275,9 +276,9 @@ void buggychl_state::draw_bg(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	if (m_bg_clip_on)
 	{
 		if (flip_screen_x())
-			clip.min_x += 8 * 8;
+			clip.insetx(8 * 8, 0);
 		else
-			clip.max_x -= 8 * 8;
+			clip.insetx(0, 8 * 8);
 
 		clip &= cliprect;
 	}
@@ -364,7 +365,7 @@ void buggychl_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		{
 			int dy = flip_screen_y() ? (255 - sy - y) : (sy + y);
 
-			if (dy >= cliprect.min_y && dy <= cliprect.max_y)
+			if (dy >= cliprect.top() && dy <= cliprect.bottom())
 			{
 				int charline = zoomy_rom[y] & 0x07;
 				int base_pos = zoomy_rom[y] & 0x38;
@@ -410,9 +411,9 @@ uint32_t buggychl_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	draw_sprites(m_dest_bitmap, cliprect);
 	draw_fg(m_dest_bitmap, cliprect);
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			const pen_t pen = m_dest_bitmap.pix(y, x);
 			uint32_t color = m_palette->pen(pen);
@@ -852,7 +853,7 @@ void buggychl_state::buggychl(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // typical Taito 74ls392
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(32*8, 32*8);
@@ -969,5 +970,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAMEL( 1984, buggychl,  0,        buggychl, buggychl, buggychl_state, empty_init, ROT270, "Taito Corporation",                  "Buggy Challenge",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )
-GAMEL( 1984, buggychlt, buggychl, buggychl, buggychl, buggychl_state, empty_init, ROT270, "Taito Corporation (Tecfri license)", "Buggy Challenge (Tecfri)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )
+GAMEL( 1984, buggychl,  0,        buggychl, buggychl, buggychl_state, empty_init, ROT270, "Taito",                  "Buggy Challenge",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )
+GAMEL( 1984, buggychlt, buggychl, buggychl, buggychl, buggychl_state, empty_init, ROT270, "Taito (Tecfri license)", "Buggy Challenge (Tecfri)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE, layout_buggychl )

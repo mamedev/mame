@@ -396,7 +396,7 @@ void piet1_state::piet1(machine_config &config)
 
 	UPD4991A(config, m_rtc, 32'768); // Frequency marked on PCB.
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(160, 64);
 	m_screen->set_visarea(0, 160 - 1, 0, 64 - 1);

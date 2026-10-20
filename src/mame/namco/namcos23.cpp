@@ -115,7 +115,7 @@ c8000000:
         raceon              Locks up after POST.
         aking               Inputs unresponsive.
         500gp               Occasional lockups.
-        crszone(all)        Input issues.
+        crszone(all)        Some visual glitches.
 
 ****************************************************************************
 
@@ -874,7 +874,7 @@ Notes:
             Angler King     AG1      KC028     -
             Crisis Zone     CSZ1     KC039     -
             Downhill Bikers DH1      KC016     3A, 3C, 2M and 2F not populated.
-            Final Furlong 2 FFS1     KC???     -
+            Final Furlong 2 FFS1     KC031     -
             Gunmen Wars     GM1      KC018     3A, 3C, 4A, 4C, 2A, 2F and 2M not populated.
             Motocross Go!   MG1      KC009     3A, 3C, 4A, 4C, 4F and 7F not populated.
             Panic Park      PNP1     KC015     3A, 3C, 4A, 4C, 2M and 2F not populated.
@@ -1246,6 +1246,7 @@ It can also be used with Final Furlong when wired correctly.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "video.h"
 
 #include "md8412b_s23.h"
 #include "namco_settings.h"
@@ -1466,13 +1467,11 @@ struct namcos23_render_entry
 	s16 vp_offset_y;
 	float vp_fov;
 
-	union
-	{
-		namcos23_model_data model;
-		namcos23_direct_data direct;
-		namcos23_immediate_data immediate;
-		namcos23_sprite_data sprite;
-	};
+	// Keep the payloads separate so each can be saved with its native element sizes.
+	namcos23_model_data model;
+	namcos23_direct_data direct;
+	namcos23_immediate_data immediate;
+	namcos23_sprite_data sprite;
 };
 
 struct namcos23_render_data
@@ -1727,10 +1726,10 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void s23(machine_config &config);
-	void timecrs2(machine_config &config);
-	void downhill(machine_config &config);
-	void panicprk(machine_config &config);
+	void s23(machine_config &config) ATTR_COLD;
+	void timecrs2(machine_config &config) ATTR_COLD;
+	void downhill(machine_config &config) ATTR_COLD;
+	void panicprk(machine_config &config) ATTR_COLD;
 
 	render_t m_render;
 	const u8 *m_sprrom;
@@ -2015,8 +2014,8 @@ public:
 	{
 	}
 
-	void gorgon(machine_config &config);
-	void finfurl(machine_config &config);
+	void gorgon(machine_config &config) ATTR_COLD;
+	void finfurl(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -2055,7 +2054,7 @@ class motoxgo_state : public namcos23_state
 public:
 	using namcos23_state::namcos23_state;
 
-	void motoxgo(machine_config &config)
+	void motoxgo(machine_config &config) ATTR_COLD
 	{
 		s23(config);
 		m_jvs->set_default_option("namco_asca3a");
@@ -2094,16 +2093,16 @@ public:
 	{
 	}
 
-	void rapidrvr(machine_config &config)
+	void rapidrvr(machine_config &config) ATTR_COLD
 	{
 		gorgon(config);
 		m_jvs->set_default_option("namco_asca1");
 	}
 
 protected:
-	virtual void driver_start() override
+	virtual void machine_start() override ATTR_COLD
 	{
-		gorgon_state::driver_start();
+		gorgon_state::machine_start();
 
 		m_sensor_timer = timer_alloc(FUNC(rapidrvr_state::sensor_timer_callback), this);
 		m_sensor_timer->adjust(attotime::zero, 0, attotime::from_hz(200));
@@ -2164,10 +2163,10 @@ public:
 		namcos23_state(mconfig, type, tag)
 	{ }
 
-	void ss23(machine_config &config);
-	void timecrs2v4a(machine_config &config);
-	void _500gp(machine_config &config);
-	void aking(machine_config &config);
+	void ss23(machine_config &config) ATTR_COLD;
+	void timecrs2v4a(machine_config &config) ATTR_COLD;
+	void _500gp(machine_config &config) ATTR_COLD;
+	void aking(machine_config &config) ATTR_COLD;
 
 protected:
 	void mips_map(address_map &map) ATTR_COLD;
@@ -2179,6 +2178,8 @@ private:
 class namcoss23_gmen_state : public namcoss23_state
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::CAMERA; }
+
 	namcoss23_gmen_state(const machine_config &mconfig, device_type type, const char *tag) :
 		namcoss23_state(mconfig, type, tag),
 		m_sh2(*this, "sh2"),
@@ -2188,9 +2189,9 @@ public:
 		m_dsw(*this, "GMENDSW")
 	{ }
 
-	void gmen(machine_config &config);
-	void gunwars(machine_config &config);
-	void raceon(machine_config &config);
+	void gmen(machine_config &config) ATTR_COLD;
+	void gunwars(machine_config &config) ATTR_COLD;
+	void raceon(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -2234,7 +2235,7 @@ public:
 	{
 	}
 
-	void finfurl2(machine_config &config)
+	void finfurl2(machine_config &config) ATTR_COLD
 	{
 		gmen(config);
 		m_jvs->set_default_option("namco_asca3a");
@@ -2263,7 +2264,7 @@ public:
 		m_acia(*this, "acia")
 	{ }
 
-	void crszone(machine_config &config);
+	void crszone(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -2341,7 +2342,7 @@ s32 u32_to_s24(u32 v)
 
 s32 u32_to_s10(u32 v)
 {
-	return v & 0x200 ? (0x3ff - (v & 0x3ff)) | 0xfffffe00 : v & 0x1ff;
+	return util::sext(v, 10);
 }
 
 float namcos23_state::f24_to_f32(u32 v)
@@ -2616,7 +2617,8 @@ void namcos23_state::c435_matrix_matrix_immed_mul() // 0.2
 		return;
 	}
 	bool transpose = BIT(m_c435.buffer[0], 10);
-	if ((m_c435.buffer[0] & ~0x400) != 0x000c)
+	bool identity = BIT(m_c435.buffer[0], 8);
+	if ((m_c435.buffer[0] & ~0x500) != 0x002c)
 		LOGMASKED(LOG_MATRIX_UNK, "%s: WARNING: c435_matrix_matrix_immed_mul header %04x\n", machine().describe_context(), m_c435.buffer[0]);
 	if (m_c435.buffer[3] != 0xffff)
 		LOGMASKED(LOG_MATRIX_UNK, "%s: WARNING: c435_matrix_matrix_immed_mul with +2=%04x\n", machine().describe_context(), m_c435.buffer[3]);
@@ -2633,7 +2635,15 @@ void namcos23_state::c435_matrix_matrix_immed_mul() // 0.2
 	s16 m2[9];
 
 	memcpy(m1, &m_c435.buffer[4], sizeof(s16) * 9);
-	memcpy(m2, c435_getm(m_c435.buffer[2]), sizeof(s16) * 9);
+	if (identity)
+	{
+		memset(m2, 0, sizeof(m2));
+		m2[0] = m2[4] = m2[8] = 0x4000;
+	}
+	else
+	{
+		memcpy(m2, c435_getm(m_c435.buffer[2]), sizeof(m2));
+	}
 	LOGMASKED(LOG_MATRIX_INFO, "    m1: %04x    %04x    %04x\n",   (u16)m1[0], (u16)m1[1], (u16)m1[2]);
 	LOGMASKED(LOG_MATRIX_INFO, "        %04x    %04x    %04x\n",   (u16)m1[3], (u16)m1[4], (u16)m1[5]);
 	LOGMASKED(LOG_MATRIX_INFO, "        %04x    %04x    %04x\n\n", (u16)m1[6], (u16)m1[7], (u16)m1[8]);
@@ -3931,9 +3941,10 @@ void namcos23_state::render_immediate(const namcos23_render_entry *re)
 
 	for (int i = 0; i < ne; i++)
 	{
-		pv[i].x = s32(re->immediate.x[i]) / 16384.f;
-		pv[i].y = s32(re->immediate.y[i]) / 16384.f;
-		pv[i].p[0] = (s32)re->immediate.z[i] / 16384.f;
+		// Immediate coordinates have the same signed 24-bit format as point ROM coordinates.
+		pv[i].x = u32_to_s24(re->immediate.x[i]) / 16384.f;
+		pv[i].y = u32_to_s24(re->immediate.y[i]) / 16384.f;
+		pv[i].p[0] = u32_to_s24(re->immediate.z[i]) / 16384.f;
 		pv[i].p[1] = (s32)re->immediate.u[i];
 		pv[i].p[2] = (s32)re->immediate.v[i];
 		pv[i].p[3] = (s32)re->immediate.i[i];
@@ -6430,6 +6441,7 @@ void namcos23_state::machine_start()
 	save_item(NAME(m_c404.spritedata_idx));
 	save_item(NAME(m_c404.rowscroll_frame));
 	save_item(NAME(m_c404.rowscroll));
+	save_item(NAME(m_c404.linexscroll));
 	save_item(NAME(m_c404.lastrow));
 	save_item(NAME(m_c404.xscroll));
 	save_item(NAME(m_c404.yscroll));
@@ -6482,6 +6494,78 @@ void namcos23_state::machine_start()
 	save_item(NAME(m_ptrom_limit));
 	save_item(NAME(m_clip_data));
 	save_item(NAME(m_clip_data_line));
+	save_item(NAME(m_vp_size_x));
+	save_item(NAME(m_vp_size_y));
+	save_item(NAME(m_vp_offset_x));
+	save_item(NAME(m_vp_offset_y));
+
+	save_item(NAME(m_render.cur));
+	save_item(NAME(m_render.count));
+	save_item(STRUCT_MEMBER(m_render.entries, type));
+	save_item(STRUCT_MEMBER(m_render.entries, absolute_priority));
+	save_item(STRUCT_MEMBER(m_render.entries, tx));
+	save_item(STRUCT_MEMBER(m_render.entries, ty));
+	save_item(STRUCT_MEMBER(m_render.entries, model_blend_factor));
+	save_item(STRUCT_MEMBER(m_render.entries, light_power));
+	save_item(STRUCT_MEMBER(m_render.entries, light_ambient));
+	save_item(STRUCT_MEMBER(m_render.entries, mirror_x));
+	save_item(STRUCT_MEMBER(m_render.entries, poly_fade_r));
+	save_item(STRUCT_MEMBER(m_render.entries, poly_fade_g));
+	save_item(STRUCT_MEMBER(m_render.entries, poly_fade_b));
+	save_item(STRUCT_MEMBER(m_render.entries, poly_alpha_color));
+	save_item(STRUCT_MEMBER(m_render.entries, poly_alpha_pen));
+	save_item(STRUCT_MEMBER(m_render.entries, poly_alpha));
+	save_item(STRUCT_MEMBER(m_render.entries, screen_fade_r));
+	save_item(STRUCT_MEMBER(m_render.entries, screen_fade_g));
+	save_item(STRUCT_MEMBER(m_render.entries, screen_fade_b));
+	save_item(STRUCT_MEMBER(m_render.entries, screen_fade_factor));
+	save_item(STRUCT_MEMBER(m_render.entries, fade_flags));
+	save_item(STRUCT_MEMBER(m_render.entries, vp_size_x));
+	save_item(STRUCT_MEMBER(m_render.entries, vp_size_y));
+	save_item(STRUCT_MEMBER(m_render.entries, vp_offset_x));
+	save_item(STRUCT_MEMBER(m_render.entries, vp_offset_y));
+	save_item(STRUCT_MEMBER(m_render.entries, vp_fov));
+	// Nested payload fields have the same stride as the containing render entry.
+	auto save_render_data = [this](auto &data, const char *valname)
+	{
+		using item = std::remove_all_extents_t<std::remove_reference_t<decltype(data)>>;
+		machine().save().save_memory(this, name(), tag(), 0, valname, &data, sizeof(item),
+			sizeof(data) / sizeof(item), 2 * RENDER_MAX_ENTRIES, sizeof(namcos23_render_entry));
+	};
+	save_render_data(NAME(m_render.entries[0][0].model.model));
+	save_render_data(NAME(m_render.entries[0][0].model.model2));
+	save_render_data(NAME(m_render.entries[0][0].model.m));
+	save_render_data(NAME(m_render.entries[0][0].model.v));
+	save_render_data(NAME(m_render.entries[0][0].model.scaling));
+	save_render_data(NAME(m_render.entries[0][0].model.transpose));
+	save_render_data(NAME(m_render.entries[0][0].model.light_vector));
+	save_render_data(NAME(m_render.entries[0][0].direct.d));
+	save_render_data(NAME(m_render.entries[0][0].immediate.type));
+	save_render_data(NAME(m_render.entries[0][0].immediate.h));
+	save_render_data(NAME(m_render.entries[0][0].immediate.pal));
+	save_render_data(NAME(m_render.entries[0][0].immediate.zbias));
+	save_render_data(NAME(m_render.entries[0][0].immediate.i));
+	save_render_data(NAME(m_render.entries[0][0].immediate.u));
+	save_render_data(NAME(m_render.entries[0][0].immediate.v));
+	save_render_data(NAME(m_render.entries[0][0].immediate.x));
+	save_render_data(NAME(m_render.entries[0][0].immediate.y));
+	save_render_data(NAME(m_render.entries[0][0].immediate.z));
+	save_render_data(NAME(m_render.entries[0][0].sprite.xpos));
+	save_render_data(NAME(m_render.entries[0][0].sprite.ypos));
+	save_render_data(NAME(m_render.entries[0][0].sprite.xsize));
+	save_render_data(NAME(m_render.entries[0][0].sprite.ysize));
+	save_render_data(NAME(m_render.entries[0][0].sprite.rows));
+	save_render_data(NAME(m_render.entries[0][0].sprite.cols));
+	save_render_data(NAME(m_render.entries[0][0].sprite.linktype));
+	save_render_data(NAME(m_render.entries[0][0].sprite.alpha));
+	save_render_data(NAME(m_render.entries[0][0].sprite.code));
+	save_render_data(NAME(m_render.entries[0][0].sprite.xflip));
+	save_render_data(NAME(m_render.entries[0][0].sprite.yflip));
+	save_render_data(NAME(m_render.entries[0][0].sprite.cz));
+	save_render_data(NAME(m_render.entries[0][0].sprite.prioverchar));
+	save_render_data(NAME(m_render.entries[0][0].sprite.zcoord));
+	save_render_data(NAME(m_render.entries[0][0].sprite.color));
+	save_render_data(NAME(m_render.entries[0][0].sprite.fade_enabled));
 
 	save_item(NAME(m_absolute_priority));
 	save_item(NAME(m_tx));
@@ -6610,6 +6694,7 @@ void namcoss23_gmen_state::machine_start()
 {
 	namcos23_state::machine_start();
 
+	save_item(NAME(m_sh2_unk));
 	save_item(NAME(m_vpx_sdao));
 }
 
@@ -6669,7 +6754,7 @@ void gorgon_state::gorgon(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(gorgon_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(gorgon_state::vblank));
@@ -6745,7 +6830,7 @@ void namcos23_state::s23(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(namcos23_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(namcos23_state::vblank));
@@ -6867,6 +6952,8 @@ void crszone_state::crszone(machine_config &config)
 {
 	ss23(config);
 
+	m_subcpu->read_port7().set_constant(0x80);
+
 	/* basic machine hardware */
 	m_maincpu->set_clock(BUSCLOCK * 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &crszone_state::mips_map);
@@ -6881,6 +6968,7 @@ void crszone_state::crszone(machine_config &config)
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 1'843'200));
 	acia_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
 	acia_clock.signal_handler().append("acia", FUNC(acia6850_device::write_rxc));
+	acia_clock.set_unscaled_clock(0); // unused debug UART
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
@@ -7925,8 +8013,8 @@ ROM_START( aking )
 	ROM_REGION( 0x40000, "iocpu2", 0 ) // I/O board MB90F574 MCU code
 	ROM_LOAD( "fcaf10.bin", 0x000000, 0x040000, NO_DUMP ) // 256KB internal flash ROM
 
-	ROM_REGION( 0x10000, "iocpu3", 0 ) // I/O board PIC16F84 code
-	ROM_LOAD( "fcap10.ic2", 0x000000, 0x004010, NO_DUMP )
+	ROM_REGION16_LE( 0x4280, "iocpu3", ROMREGION_ERASEFF ) // I/O board PIC16F84 code
+	ROM_LOAD( "fcap10.ic2", 0x0000, 0x4280, NO_DUMP )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data ROMs */
 	ROM_LOAD16_BYTE( "ag1mtah.2j",  0x0000000, 0x800000, CRC(f2d8ca9d) SHA1(8158d13d74f2aae7c0d1238619ce1ad3a17d8047) )
@@ -7974,8 +8062,8 @@ ROM_START( 500gp )
 	ROM_REGION( 0x40000, "iocpu2", 0 ) // I/O board MB90F574 MCU code
 	ROM_LOAD( "fcaf10.bin", 0x000000, 0x040000, NO_DUMP ) // 256KB internal flash ROM
 
-	ROM_REGION( 0x10000, "iocpu3", 0 ) // I/O board PIC16F84 code
-	ROM_LOAD( "fcap10.ic2", 0x000000, 0x004010, NO_DUMP )
+	ROM_REGION16_LE( 0x4280, "iocpu3", ROMREGION_ERASEFF ) // I/O board PIC16F84 code
+	ROM_LOAD( "fcap10.ic2", 0x000000, 0x004280, NO_DUMP )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data ROMs */
 	ROM_LOAD16_BYTE( "5gp1mtah.2j",  0x0000000, 0x800000, CRC(246e4b7a) SHA1(75743294b8f48bffb84f062febfbc02230d49ce9) )

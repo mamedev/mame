@@ -67,7 +67,7 @@ const tiny_rom_entry *vision864_pci_device::device_rom_region() const
 
 void vision864_pci_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3vision864_vga_device::screen_update));
 
@@ -167,7 +167,7 @@ const tiny_rom_entry *vision964_pci_device::device_rom_region() const
 
 void vision964_pci_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3vision964_vga_device::screen_update));
 
@@ -217,7 +217,7 @@ const tiny_rom_entry *vision968_pci_device::device_rom_region() const
 
 void vision968_pci_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3vision968_vga_device::screen_update));
 

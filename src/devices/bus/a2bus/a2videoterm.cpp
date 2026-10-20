@@ -196,7 +196,7 @@ public:
 
 void a2bus_videx80_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, VIDEOTERM_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, VIDEOTERM_SCREEN_NAME));
 	screen.set_raw(17.43_MHz_XTAL, 1116, 0, 720, 260, 0, 216);
 	//screen.set_raw(17.43_MHz_XTAL, 1107, 0, 720, 315, 0, 216);
 	screen.set_screen_update(VIDEOTERM_MC6845_NAME, FUNC(mc6845_device::screen_update));
@@ -388,7 +388,7 @@ uint8_t a2bus_videx80_device::read_c0nx(uint8_t offset)
 		return m_crtc->register_r();   // status_r?
 	}
 
-	return 0xff;
+	return get_open_bus();
 }
 
 
@@ -450,10 +450,12 @@ uint8_t a2bus_videx80_device::read_c800(uint16_t offset)
 //        printf("Read VRAM at %x = %02x\n", offset+m_rambank, m_ram[offset + m_rambank]);
 		return m_rom[offset];
 	}
-	else
+	else if (offset < 0x600)
 	{
 		return m_ram[(offset & 0x1ff) + m_rambank];
 	}
+	else
+		return get_open_bus();
 }
 
 /*-------------------------------------------------

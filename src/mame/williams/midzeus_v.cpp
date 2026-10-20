@@ -574,7 +574,7 @@ void midzeus_state::zeus_register_update(offs_t offset)
 			break;
 
 		case 0x60:
-			// invasn writes here to execute a command (?)
+			// mk4 and invasn fill the screen here: 22FCFF in reg 0x80, a solid quad at (0,0)-(399,255)
 			if (m_zeusbase[0x60] & 1)
 			{
 				if ((m_zeusbase[0x80] & 0xffffff) == 0x22FCFF)
@@ -616,7 +616,7 @@ void midzeus_state::zeus_register_update(offs_t offset)
 					extra.solidcolor = m_zeusbase[0x00];
 					extra.zoffset = 0x7fff;
 
-					m_poly->zeus_draw_debug_quad(m_zeus_cliprect, vert);
+					m_poly->zeus_draw_solid_quad(m_zeus_cliprect, vert);
 					m_poly->wait("Normal");
 				}
 				else
@@ -710,12 +710,14 @@ void midzeus_state::zeus_register_update(offs_t offset)
 				rectangle visarea(m_zeusbase[0xc6] & 0xffff, htotal - 3, 0, m_zeusbase[0xc8] & 0xffff);
 				if (htotal > 0 && vtotal > 0 && visarea.min_x < visarea.max_x && visarea.max_y < vtotal)
 				{
-					m_screen->configure(htotal, vtotal, visarea, HZ_TO_ATTOSECONDS(MIDZEUS_VIDEO_CLOCK / 8.0 / (htotal * vtotal)));
+					m_screen->configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, MIDZEUS_VIDEO_CLOCK / 8));
 					m_zeus_cliprect = visarea;
 					m_zeus_cliprect.max_x -= m_zeus_cliprect.min_x;
 					m_zeus_cliprect.min_x = 0;
 				}
 			}
+			// re-time vertical sync against the mode just programmed
+			rearm_vsync();
 			break;
 
 		case 0xcc:
@@ -1220,9 +1222,31 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 							clipvert);
 }
 
-void midzeus_renderer::zeus_draw_debug_quad(const rectangle& rect, const vertex_t *vert)
+void midzeus_renderer::zeus_draw_solid_quad(const rectangle& rect, const vertex_t *vert)
 {
-	m_state.m_poly->render_polygon<4, 0>(rect, render_delegate(&midzeus_renderer::render_poly_solid_fixedz, this), vert);
+	// The quad names its last pixel but poly.h's extents are half-open.
+	// Axis-aligned rectangles got an unambiguous last pixel, so grow it.
+	vertex_t v[4];
+	std::copy_n(vert, std::size(v), v);
+
+	bool rectangular = true;
+	for (int i = 0; i < 4; i++)
+		if (v[i].x != v[(i + 1) & 3].x && v[i].y != v[(i + 1) & 3].y)
+			rectangular = false;
+
+	if (rectangular)
+	{
+		float const maxx = std::max({ v[0].x, v[1].x, v[2].x, v[3].x });
+		float const maxy = std::max({ v[0].y, v[1].y, v[2].y, v[3].y });
+		for (vertex_t &p : v)
+		{
+			if (p.x == maxx)
+				p.x += 1.0f;
+			if (p.y == maxy)
+				p.y += 1.0f;
+		}
+	}
+	m_state.m_poly->render_polygon<4, 0>(rect, render_delegate(&midzeus_renderer::render_poly_solid_fixedz, this), v);
 }
 
 
@@ -1231,6 +1255,20 @@ void midzeus_renderer::zeus_draw_debug_quad(const rectangle& rect, const vertex_
  *  Rasterizers
  *
  *************************************/
+
+// Key on the nearest of the four filter taps, and let keyed neighbours take its texel so the
+// transparent color cannot bleed into the edge.  Ties round down.
+static bool zeus_apply_color_key(uint8_t (&texels)[4], int32_t curu, int32_t curv, uint16_t transcolor)
+{
+	bool const ur = (curu & 0xff) > 0x80, vr = (curv & 0xff) > 0x80;
+	uint8_t const nearest = texels[(vr ? 2 : 0) + (ur ? 1 : 0)];
+	if (nearest == transcolor)
+		return false;
+	for (auto &texel : texels)
+		if (texel == transcolor)
+			texel = nearest;
+	return true;
+}
 
 void midzeus_renderer::render_poly(int32_t scanline, const extent_t& extent, const mz_poly_extra_data& object, int threadid)
 {
@@ -1290,7 +1328,7 @@ void midzeus_renderer::render_poly(int32_t scanline, const extent_t& extent, con
 				texels[2] = object.get_texel(texbase, v1, u0, texwidth);
 				texels[3] = object.get_texel(texbase, v1, u1, texwidth);
 
-				if (texels[0] != transcolor)
+				if (zeus_apply_color_key(texels, curu, curv, transcolor))
 				{
 					rgb_t color[4] = {0, 0, 0, 0};
 

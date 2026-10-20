@@ -52,5 +52,5 @@ void coco_wpk2p_device::device_add_mconfig(machine_config &config)
 	m_v9958->set_screen_ntsc("screen");
 	m_v9958->set_vram_size(0x20000);
 	m_v9958->int_cb().set([this](int state) { set_line_value(line::NMI, state); });
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 }

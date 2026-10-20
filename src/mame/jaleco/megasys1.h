@@ -57,7 +57,7 @@ public:
 	void system_B_monkelf(machine_config &config) ATTR_COLD;
 	void system_Bbl(machine_config &config) ATTR_COLD;
 
-	void init_monkelf();
+	void init_monkelf() ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -96,7 +96,7 @@ protected:
 	void system_B(machine_config &config) ATTR_COLD;
 	void system_C(machine_config &config) ATTR_COLD;
 
-	void megasys1_palette(palette_device &palette);
+	void megasys1_palette(palette_device &palette) ATTR_COLD;
 
 	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mix_sprite_bitmap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -174,10 +174,10 @@ public:
 	void system_A_gs88000(machine_config &config) ATTR_COLD;
 	void system_A_unkarray(machine_config &config) ATTR_COLD;
 
-	void init_jitsupro_gfx();
-	void init_rodland_gfx();
-	void init_stdragon_gfx();
-	void init_lordofkbp();
+	void init_jitsupro_gfx() ATTR_COLD;
+	void init_rodland_gfx() ATTR_COLD;
+	void init_stdragon_gfx() ATTR_COLD;
+	void init_lordofkbp() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -224,7 +224,7 @@ public:
 
 	void system_D(machine_config &config) ATTR_COLD;
 
-	void init_peekaboo();
+	void init_peekaboo() ATTR_COLD;
 
 private:
 	required_memory_bank m_okibank;
@@ -251,7 +251,7 @@ public:
 		m_hardware_type_z = 1;
 	}
 
-	void system_Z(machine_config &config);
+	void system_Z(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
@@ -272,13 +272,11 @@ public:
 		megasys1_state(mconfig, type, tag)
 	{ }
 
-	void init_avspirit();
-	void init_chimeraba();
-	void init_hayaosi1();
-
-	void system_B_iosim(machine_config &config) ATTR_COLD;
 	void system_B_hayaosi1(machine_config &config) ATTR_COLD;
 	void system_C_iosim(machine_config &config) ATTR_COLD;
+
+	void init_chimeraba() ATTR_COLD;
+	void init_hayaosi1() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -288,7 +286,6 @@ protected:
 
 	u16 m_ip_latched = 0;
 
-	static constexpr u8 avspirit_seq[7] =    { 0x37,0x35,0x36,0x33,0x34,  0xff,0x06 };
 	static constexpr u8 hayaosi1_seq[7] =    { 0x51,0x52,0x53,0x54,0x55,  0xfc,0x06 };
 	static constexpr u8 chimeraba_seq[7]   = { 0x56,0x52,0x53,0x55,0x54,  0xfa,0x06 };
 
@@ -317,15 +314,15 @@ protected:
 private:
 	required_device<tlcs90_device> m_iomcu;
 
+	u8 m_mcu_input_data = 0;
+	u8 m_mcu_io_data = 0;
+
 	u16 ip_select_iomcu_r();
 	void ip_select_iomcu_w(u16 data);
 	u8 mcu_capture_inputs_r(offs_t offset);
 	u8 mcu_port1_r();
 	void mcu_port2_w(u8 data);
 	void mcu_port6_w(u8 data);
-
-	u8 m_mcu_input_data = 0;
-	u8 m_mcu_io_data = 0;
 
 	void megasys1B_iomcu_map(address_map &map) ATTR_COLD;
 	void megasys1C_iomcu_map(address_map &map) ATTR_COLD;

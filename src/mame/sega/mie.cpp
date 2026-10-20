@@ -98,8 +98,9 @@ void mie_device::device_start()
 	save_item(NAME(irq_pending));
 	save_item(NAME(maple_irqlevel));
 
-	// patch out MIE RAM test
-	// TODO: figure out why SH4 code doesn't wait long enough for internal firmware's RAM test completed in the case of reset
+	// HACK: patch out MIE RAM test
+	// Figure out why SH-4 code doesn't wait long enough for internal firmware's RAM test
+	// completed in the case of reset
 	uint32_t *rom = (uint32_t*)memregion("mie")->base();
 	rom[0x144/4] = 0x0001d8c3;
 }

@@ -5,6 +5,7 @@
 #include "m20_kbd.h"
 
 #include "machine/keyboard.ipp"
+#include "speaker.h"
 
 
 namespace {
@@ -158,6 +159,8 @@ m20_keyboard_device::m20_keyboard_device(const machine_config& mconfig, const ch
 	: buffered_rs232_device(mconfig, M20_KEYBOARD, tag, owner, 0)
 	, device_matrix_keyboard_interface(mconfig, *this, "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8")
 	, m_modifiers(*this, "MODIFIERS")
+	, m_beeper(*this, "beeper")
+	, m_bell_timer(nullptr)
 {
 }
 
@@ -168,9 +171,29 @@ ioport_constructor m20_keyboard_device::device_input_ports() const
 }
 
 
+void m20_keyboard_device::device_add_mconfig(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beeper, 2000); // TODO: unknown frequency
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void m20_keyboard_device::device_start()
+{
+	buffered_rs232_device::device_start();
+	m_bell_timer = timer_alloc(FUNC(m20_keyboard_device::bell_off), this);
+}
+
+TIMER_CALLBACK_MEMBER(m20_keyboard_device::bell_off)
+{
+	m_beeper->set_state(0);
+}
+
 void m20_keyboard_device::device_reset()
 {
 	buffered_rs232_device::device_reset();
+
+	m_beeper->set_state(0);
 
 	reset_key_state();
 	clear_fifo();
@@ -217,7 +240,11 @@ void m20_keyboard_device::received_byte(uint8_t byte)
 	switch (byte)
 	{
 	case 0x03U:
-		transmit_byte(0x02U);
+		transmit_byte(0x0fU);
+		break;
+	case 0x0aU: // BEEP
+		m_beeper->set_state(1);
+		m_bell_timer->reset(attotime::from_msec(50));
 		break;
 	case 0x80U:
 		transmit_byte(0x80U);

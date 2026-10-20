@@ -8,6 +8,10 @@
 #include "specnext_im2.h"
 
 
+#define VERBOSE     0
+#include "logmacro.h"
+
+
 // device type definition
 DEFINE_DEVICE_TYPE(SPECNEXT_IM2, specnext_im2_device, "specnext_im2", "Spectrum Next IM2")
 
@@ -35,17 +39,34 @@ int specnext_im2_device::z80daisy_irq_ack()
 
 void specnext_im2_device::z80daisy_irq_reti()
 {
-	m_state = 0;
-	m_irq_cb(CLEAR_LINE);
+	if (m_state & Z80_DAISY_IEO)
+	{
+		m_state &= ~Z80_DAISY_IEO;
+		m_irq_cb((m_state & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 void specnext_im2_device::irq_w(int state)
 {
-	if (state != CLEAR_LINE)
-		m_state = Z80_DAISY_INT;
+	if (state == CLEAR_LINE)
+	{
+		m_state = 0;
+		m_irq_cb(CLEAR_LINE);
+	}
+	else if (m_state & Z80_DAISY_IEO)
+	{
+		LOG("IM2: Ignoring IRQ while in IEO\n");
+	}
 	else
-		m_state &= ~Z80_DAISY_INT;
-	m_irq_cb(state);
+	{
+		// FPGA im2_device in S_ISR cannot transition to S_REQ;
+		// don't assert INT while being serviced (IEO set), or
+		// the daisy chain would ACK this device, consuming the
+		// new INT, and a subsequent RETI would clear IEO while
+		// the original ISR still runs.
+		m_state |= Z80_DAISY_INT;
+		m_irq_cb(ASSERT_LINE);
+	}
 }
 
 

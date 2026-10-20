@@ -22,6 +22,9 @@
 #include "emu.h"
 #include "agat_fdc.h"
 
+#include "imagedev/floppy.h"
+#include "machine/i8255.h"
+
 #include "formats/aim_dsk.h"
 #include "formats/ds9_dsk.h"
 
@@ -39,18 +42,17 @@
 #define LOGWRITE(...)    LOGMASKED(LOG_WRITE, __VA_ARGS__)
 
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+namespace {
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_AGAT_FDC, a2bus_agat_fdc_device, "agat_fdc", "Agat 840K floppy controller card")
-
 #define AGAT_FDC_ROM_REGION     "agat_fdc_rom"
 #define AGAT_FDC_ROM_D6_REGION  "agat_fdc_d6_rom"
+
+#define MXCSR_SYNC      0x40
+#define MXCSR_TR        0x80
 
 ROM_START( agat9 )
 	ROM_REGION(0x100, AGAT_FDC_ROM_REGION, 0)
@@ -60,6 +62,89 @@ ROM_START( agat9 )
 	ROM_REGION(0x200, AGAT_FDC_ROM_D6_REGION, 0)
 	ROM_LOAD( "d6encdec.bin", 0x0000, 0x0200, CRC(66e7e896) SHA1(b5305e82c81240a6fdc932a559b5493c59f302c6) )
 ROM_END
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class a2bus_agat_fdc_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+public:
+	// construction/destruction
+	a2bus_agat_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// construction/destruction
+	a2bus_agat_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual void reset_from_bus() override;
+
+	uint8_t d14_i_b();
+	uint8_t d15_i_a();
+	uint8_t d15_i_c();
+	void d14_o_c(uint8_t data);
+	void d15_o_b(uint8_t data);
+	void d15_o_c(uint8_t data);
+
+	static void floppy_formats(format_registration &fr);
+
+	required_region_ptr<uint8_t> m_rom;
+	required_region_ptr<uint8_t> m_rom_d6;
+	required_device<i8255_device> m_d14;
+	required_device<i8255_device> m_d15;
+
+private:
+	struct live_info {
+		uint16_t shift_reg;
+		bool data_bit_context;
+		uint8_t data_reg;
+	};
+
+	required_device<floppy_connector> floppy0;
+	required_device<floppy_connector> floppy1;
+
+	uint64_t time_to_cycles(const attotime &tm);
+	attotime cycles_to_time(uint64_t cycles);
+
+	void lss_start();
+	TIMER_CALLBACK_MEMBER(lss_sync);
+	void live_write_raw(uint16_t raw);
+	void live_write_mfm(uint8_t mfm);
+
+	TIMER_CALLBACK_MEMBER(motor_off);
+
+	floppy_image_device *floppy;
+	int active, bits;
+	uint8_t data_reg;
+	uint16_t address;
+	uint64_t cycles;
+
+	uint8_t m_mxcs;
+	int m_unit;
+
+	live_info cur_live;
+
+	uint8_t last_6502_write;
+	bool mode_write, write_desync;
+
+	int m_seektime;
+	int m_waittime;
+
+	emu_timer *m_timer_lss;
+	emu_timer *m_timer_motor;
+};
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -110,12 +195,12 @@ const tiny_rom_entry *a2bus_agat_fdc_device::device_rom_region() const
 a2bus_agat_fdc_device::a2bus_agat_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_a2bus_card_interface(mconfig, *this)
+	, m_rom(*this, AGAT_FDC_ROM_REGION)
+	, m_rom_d6(*this, AGAT_FDC_ROM_D6_REGION)
 	, m_d14(*this, "d14")
 	, m_d15(*this, "d15")
 	, floppy0(*this, "0")
 	, floppy1(*this, "1")
-	, m_rom(nullptr)
-	, m_rom_d6(nullptr)
 {
 }
 
@@ -131,9 +216,6 @@ a2bus_agat_fdc_device::a2bus_agat_fdc_device(const machine_config &mconfig, cons
 void a2bus_agat_fdc_device::device_start()
 {
 	set_unscaled_clock((XTAL(14'300'000) / 14.0) * 4.0);
-
-	m_rom = device().machine().root_device().memregion(this->subtag(AGAT_FDC_ROM_REGION).c_str())->base();
-	m_rom_d6 = device().machine().root_device().memregion(this->subtag(AGAT_FDC_ROM_D6_REGION).c_str())->base();
 
 	floppy = nullptr;
 	if (floppy0)
@@ -153,8 +235,6 @@ void a2bus_agat_fdc_device::device_start()
 	save_item(NAME(last_6502_write));
 	save_item(NAME(mode_write));
 	save_item(NAME(write_desync));
-	save_item(NAME(write_start_time));
-	save_item(NAME(write_position));
 }
 
 void a2bus_agat_fdc_device::device_reset()
@@ -164,8 +244,6 @@ void a2bus_agat_fdc_device::device_reset()
 	mode_write = false;
 	write_desync = false;
 	last_6502_write = 0x00;
-	write_start_time = attotime::never;
-	write_position = 0;
 }
 
 void a2bus_agat_fdc_device::reset_from_bus()
@@ -315,15 +393,6 @@ TIMER_CALLBACK_MEMBER(a2bus_agat_fdc_device::lss_sync)
 					m_d15->pc2_w(0);
 					if (mode_write)
 					{
-						if(write_position) {
-							LOGWRITE("writing %d transitions\n", write_position);
-							attotime now = cycles_to_time(cycles);
-							if(floppy)
-								floppy->write_flux(write_start_time, now, write_position, write_buffer);
-							write_start_time = now;
-							write_position = 0;
-						}
-
 						if (write_desync)
 						{
 							live_write_raw(0x2d55);
@@ -345,8 +414,10 @@ TIMER_CALLBACK_MEMBER(a2bus_agat_fdc_device::lss_sync)
 					cur_live.shift_reg <<= 2;
 					if (b)
 					{
-						if (b & 2) write_buffer[write_position++] = cycles_to_time(cycles);
-						if (b & 1) write_buffer[write_position++] = cycles_to_time(cycles + 8);
+						if (floppy && (b & 2))
+							floppy->write_flux_change(cycles_to_time(cycles));
+						if (floppy && (b & 1))
+							floppy->write_flux_change(cycles_to_time(cycles + 8));
 					}
 				}
 			}
@@ -503,6 +574,8 @@ uint8_t a2bus_agat_fdc_device::d14_i_b()
 void a2bus_agat_fdc_device::d14_o_c(uint8_t data)
 {
 	const bool new_write = BIT(data, 6) & BIT(data, 7);
+	const attotime now = machine().time();
+	floppy_image_device *const old_floppy = floppy;
 	m_unit = BIT(data, 3);
 
 	switch (m_unit)
@@ -513,6 +586,13 @@ void a2bus_agat_fdc_device::d14_o_c(uint8_t data)
 	case 1:
 		floppy = floppy1 ? floppy1->get_device() : nullptr;
 		break;
+	}
+
+	if (mode_write && old_floppy != floppy)
+	{
+		if (old_floppy)
+			old_floppy->write_end(now);
+		mode_write = false;
 	}
 
 	if (floppy)
@@ -532,10 +612,10 @@ void a2bus_agat_fdc_device::d14_o_c(uint8_t data)
 		LOGWRITE("n_w %d (%d)\n", new_write, mode_write);
 		address |= 0x100;
 		if(!mode_write) {
-			write_start_time = machine().time();
-			write_position = 0;
-			if(floppy)
-				floppy->set_write_splice(write_start_time);
+			if(floppy) {
+				floppy->set_write_splice(now);
+				floppy->write_start(now);
+			}
 			mode_write = true;
 		}
 	}
@@ -543,9 +623,9 @@ void a2bus_agat_fdc_device::d14_o_c(uint8_t data)
 	{
 		address &= 0xff;
 		if(mode_write) {
-			LOGWRITE("write->read: writing %d transitions\n", write_position);
-			if(floppy && write_position)
-				floppy->write_flux(write_start_time, machine().time(), write_position, write_buffer);
+			LOGWRITE("write->read\n");
+			if(floppy)
+				floppy->write_end(now);
 			mode_write = false;
 		}
 	}
@@ -613,3 +693,6 @@ void a2bus_agat_fdc_device::d15_o_c(uint8_t data)
 	}
 }
 
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_AGAT_FDC, device_a2bus_card_interface, a2bus_agat_fdc_device, "agat_fdc", "Agat 840K floppy controller card")

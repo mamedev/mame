@@ -64,14 +64,14 @@ public:
 		, m_flash(*this, "pci:02.0:xbus_flash")
 		, m_keybc(*this, "pci:02.0:xbus_keybc")
 		, m_at_con(*this, "at_con")
-//		, m_ide(*this, "pci:02.0:xbus_ide%u", 0U)
+//      , m_ide(*this, "pci:02.0:xbus_ide%u", 0U)
 	{ }
 
 	void i430nx(machine_config &config) ATTR_COLD;
 	void sy029c2(machine_config &config) ATTR_COLD;
 
 protected:
-//	void i430lx(machine_config &config) ATTR_COLD;
+//  void i430lx(machine_config &config) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ds12885_device> m_rtc;
@@ -123,7 +123,7 @@ void i430lx_state::i430nx(machine_config &config)
 	DS12885(config, m_rtc, XTAL(32'768));
 	m_rtc->set_binary(true);
 	// TODO: alarm irq
-//	m_rtc->irq().set ...
+//  m_rtc->irq().set ...
 
 	// config space not verified, but should be good given how BIOSes accesses at $cxxx
 	PCI_ROOT(config, "pci");
@@ -153,11 +153,11 @@ void i430lx_state::i430nx(machine_config &config)
 	m_at_con->out_clock_cb().set(m_keybc, FUNC(at_keyboard_controller_device::kbd_clk_w));
 	m_at_con->out_data_cb().set(m_keybc, FUNC(at_keyboard_controller_device::kbd_data_w));
 
-//	IDE_CONTROLLER_32(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
-//	m_ide[0]->irq_handler().set("pci:02.0", FUNC(i82378zb_sio_device::pc_irq14_w));
+//  IDE_CONTROLLER_32(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
+//  m_ide[0]->irq_handler().set("pci:02.0", FUNC(i82378zb_sio_device::pc_irq14_w));
 //
-//	IDE_CONTROLLER_32(config, m_ide[1]).options(ata_devices, "cdrom", nullptr, false);
-//	m_ide[1]->irq_handler().set("pci:02.0", FUNC(i82378zb_sio_device::pc_irq15_w));
+//  IDE_CONTROLLER_32(config, m_ide[1]).options(ata_devices, "cdrom", nullptr, false);
+//  m_ide[1]->irq_handler().set("pci:02.0", FUNC(i82378zb_sio_device::pc_irq15_w));
 
 	// 1x AT keyboard
 	// 4x ISA slots

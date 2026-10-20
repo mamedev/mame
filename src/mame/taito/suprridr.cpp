@@ -317,20 +317,19 @@ uint32_t suprridr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// render left 4 columns with no scroll
 	rectangle subclip = visarea;
-	subclip.max_x = subclip.min_x + (m_flipx ? 1 * 8 : 4 * 8) - 1;
+	subclip.set_width(m_flipx ? (1 * 8) : (4 * 8));
 	subclip &= cliprect;
 	m_bg_tilemap_noscroll->draw(screen, bitmap, subclip, 0, 0);
 
 	// render right 1 column with no scroll
 	subclip = visarea;
-	subclip.min_x = subclip.max_x - (m_flipx ? 4 * 8 : 1 * 8) + 1;
+	subclip.setx(subclip.right() - (m_flipx ? (4 * 8) : (1 * 8)) + 1, subclip.right());
 	subclip &= cliprect;
 	m_bg_tilemap_noscroll->draw(screen, bitmap, subclip, 0, 0);
 
 	// render the middle columns normally
 	subclip = visarea;
-	subclip.min_x += m_flipx ? 1 * 8 : 4 * 8;
-	subclip.max_x -= m_flipx ? 4 * 8 : 1 * 8;
+	subclip.insetx(m_flipx ? (1 * 8) : (4 * 8), m_flipx ? (4 * 8) : (1 * 8));
 	subclip &= cliprect;
 	m_bg_tilemap->draw(screen, bitmap, subclip, 0, 0);
 
@@ -601,7 +600,7 @@ void suprridr_state::suprridr(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
@@ -677,4 +676,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, suprridr, 0, suprridr, suprridr, suprridr_state, empty_init, ROT90, "Taito Corporation (Venture Line license)", "Super Rider", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, suprridr, 0, suprridr, suprridr, suprridr_state, empty_init, ROT90, "Taito (Venture Line license)", "Super Rider", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

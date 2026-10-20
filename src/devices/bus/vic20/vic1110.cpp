@@ -71,6 +71,7 @@ vic1110_device::vic1110_device(const machine_config &mconfig, const char *tag, d
 	, device_vic20_expansion_card_interface(mconfig, *this)
 	, m_ram(*this, "ram", 0x2000, ENDIANNESS_LITTLE)
 	, m_sw(*this, "SW")
+	, m_window(nullptr)
 {
 }
 
@@ -85,32 +86,26 @@ void vic1110_device::device_start()
 
 
 //-------------------------------------------------
-//  vic20_cd_r - cartridge data read
+//  device_reset - device-specific reset
 //-------------------------------------------------
 
-uint8_t vic1110_device::vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void vic1110_device::device_reset()
 {
-	uint8_t sw = m_sw->read();
+	vic20_expansion_window *window = nullptr;
 
-	if ((!blk1 && (sw == BLK1)) || (!blk2 && (sw == BLK2)) || (!blk3 && (sw == BLK3)) || (!blk5 && (sw == BLK5)))
+	switch (m_sw->read())
 	{
-		data = m_ram[offset & 0x1fff];
+	case BLK1: window = &m_slot->blk1(); break;
+	case BLK2: window = &m_slot->blk2(); break;
+	case BLK3: window = &m_slot->blk3(); break;
+	case BLK5: window = &m_slot->blk5(); break;
 	}
 
-	return data;
-}
+	if (m_window && (m_window != window))
+		m_window->unmap();
 
+	m_window = window;
 
-//-------------------------------------------------
-//  vic20_cd_w - cartridge data write
-//-------------------------------------------------
-
-void vic1110_device::vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
-{
-	uint8_t sw = m_sw->read();
-
-	if ((!blk1 && (sw == BLK1)) || (!blk2 && (sw == BLK2)) || (!blk3 && (sw == BLK3)) || (!blk5 && (sw == BLK5)))
-	{
-		m_ram[offset & 0x1fff] = data;
-	}
+	if (m_window)
+		m_window->install_ram(0x0000, 0x1fff, m_ram.target());
 }

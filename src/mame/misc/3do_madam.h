@@ -11,6 +11,11 @@
 class madam_device : public device_t
 {
 public:
+	static constexpr u32 ABT_ROMF = 0x0001;
+	static constexpr u32 ABT_ROMW = 0x0002;
+	static constexpr u32 ABT_CLIOT = 0x0004;
+	static constexpr u32 ABT_HARDU = 0x0008;
+
 	// construction/destruction
 	madam_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -29,6 +34,12 @@ public:
 	// for I/O
 	auto playerbus_read_cb()    { return m_playerbus_read_cb.bind(); }
 	auto irq_dply_cb()          { return m_irq_dply_cb.bind(); }
+	// DSPP DMA stack registers (channels 0-12 and 16-19), offset = channel * 4 + register
+	auto dspp_dma_read_cb()     { return m_dspp_dma_read_cb.bind(); }
+	auto dspp_dma_write_cb()    { return m_dspp_dma_write_cb.bind(); }
+	// DRAM/VRAM size fields of MSYSBits, which place system memory in the address space
+	auto memory_config_cb()     { return m_memory_config_cb.bind(); }
+	u8 memory_config() const    { return m_msysbits & 0x7f; }
 
 	// init setter
 	void set_is_pal(bool is_pal) { m_is_pal = is_pal; }
@@ -39,6 +50,8 @@ public:
 	void vdlp_continue_w(int state);
 
 	void exp_dma_req_w(int state);
+
+	void abort_w(u32 bits) { m_abortbits |= bits; }
 
 protected:
 	// device-level overrides
@@ -56,6 +69,9 @@ private:
 	devcb_write_line m_irq_dexp_cb;
 	devcb_read32     m_playerbus_read_cb;
 	devcb_write_line m_irq_dply_cb;
+	devcb_read32     m_dspp_dma_read_cb;
+	devcb_write32    m_dspp_dma_write_cb;
+	devcb_write8     m_memory_config_cb;
 
 	uint32_t  m_revision = 0;       /* 03300000 */
 	uint32_t  m_msysbits = 0;       /* 03300004 */
@@ -86,7 +102,7 @@ private:
 	uint32_t  m_fence[4]{};         /* 03300200-0330023c (W); 03300200-0330027c (R) */
 	uint32_t  m_mmu[64]{};          /* 03300300-033003fc */
 	uint32_t  m_dma[32][4]{};       /* 03300400-033005fc */
-	uint32_t  m_mult[40]{};         /* 03300600-0330069c */
+	s32       m_mult[40]{};         /* 03300600-0330069c */
 	uint32_t  m_mult_control = 0;   /* 033007f0-033007f4 */
 	uint32_t  m_mult_status = 0;    /* 033007f8 */
 
@@ -153,22 +169,47 @@ private:
 	};
 
 	struct {
+		u16 v_output_force_high, v_output_mask;
+		//u16 h_output_force_high, h_output_mask;
+		u8 v_output_bit;
+		//u8 h_output_bit;
+		bool ascall;
+	} m_cel_master_sw;
+
+	static constexpr u32 PACKED_PITCH = 0x400;
+
+	static constexpr u32 CEL_TRANSPARENT = 1 << 31;
+	static constexpr u32 CEL_AMV_SHIFT   = 16;
+
+	struct {
 		cel_state_t state;
 		u32 address;
 		u32 current_ccb;
-		bool skip, last, ccbpre, packed, bgnd;
+		bool skip, last, ccbpre, packed, bgnd, useav, pxor;
+		bool plutpos;
+		u8 pluta;
 		u32 next_ptr;
 		u32 source_ptr;
 		u32 plut_ptr;
-		s32 xpos, ypos;
-		s32 hdx, hdy, vdx, vdy;
-		u32 hddx, hddy;
+		double xpos, ypos;
+		double hdx, hdy, vdx, vdy;
+		double hddx, hddy;
 		u32 pixc, pre0, pre1;
-		std::vector<u16> buffer;
+		u8 pixc_1s[2];
+		u8 pixc_ms[2];
+		u8 pixc_mf[2];
+		u8 pixc_df[2];
+		u8 pixc_2s[2];
+		u8 pixc_av[2];
+		u8 pixc_2d[2];
+		u32 pover_force_high, pover_mask;
+		// NOTE: u16 + 9 bit for marking pixel as transparent + AMV bits.
+		// This is done by the Pixel Decoder (PDC) internally.
+		std::vector<u32> buffer;
 	} m_cel;
 
 	struct {
-		u16 fb_pitch[2]; // regctl0 helper
+		u16 fb_pitch[2]; // regctl0 helper (0: read pitch 1: write pitch)
 		u16 xclip, yclip; // regctl1 helper
 	} m_regis;
 
@@ -177,20 +218,29 @@ private:
 	u32 regctl0_r();
 	void regctl0_w(offs_t offset, u32 data, u32 mem_mask);
 
+	void mult_start_process_w(offs_t offset, u32 data, u32 mem_mask);
+
 	void cel_start_w(offs_t offset, u32 data, u32 mem_mask);
 	void cel_stop_w(offs_t offset, u32 data, u32 mem_mask);
 	void cel_continue_w(offs_t offset, u32 data, u32 mem_mask);
+	void ccobctl0_w(offs_t offset, u32 data, u32 mem_mask);
+
 	u32 cel_decompress();
 
-	typedef u16 (madam_device::*get_pixel_func)(int x, int y, u16 woffset);
+	typedef u32 (madam_device::*get_pixel_func)(int x, int y, u16 woffset);
 	static const get_pixel_func get_pixel_table[32 + 1];
-	u16 get_pixel_invalid(int x, int y, u16 woffset);
-	u16 get_pixel_4bpp_coded_lrform0(int x, int y, u16 woffset);
-	u16 get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset);
-	u16 get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset);
-	u16 get_pixel_16bpp_uncoded_lrform0(int x, int y, u16 woffset);
-	u16 get_pixel_16bpp_uncoded_lrform1(int x, int y, u16 woffset);
-	u16 get_pixel_packed(int x, int y, u16 woffset);
+
+	u32 get_pixel_invalid(int x, int y, u16 woffset);
+	u32 get_pixel_0bpp_coded_lrform0(int x, int y, u16 woffset);
+	u32 get_pixel_1bpp_coded_lrform0(int x, int y, u16 woffset);
+	u32 get_pixel_2bpp_coded_lrform0(int x, int y, u16 woffset);
+	u32 get_pixel_4bpp_coded_lrform0(int x, int y, u16 woffset);
+	u32 get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset);
+	u32 get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset);
+	u32 get_pixel_8bpp_uncoded_lrform0(int x, int y, u16 woffset);
+	u32 get_pixel_16bpp_uncoded_lrform0(int x, int y, u16 woffset);
+	u32 get_pixel_16bpp_uncoded_lrform1(int x, int y, u16 woffset);
+	u32 get_pixel_packed(int x, int y, u16 woffset);
 
 	typedef u16 (madam_device::*get_woffset_func)(u32 ptr);
 	static const get_woffset_func get_woffset_table[2];
@@ -199,14 +249,62 @@ private:
 
 	std::tuple<u8, u32> fetch_byte(u32 ptr, u8 frac);
 
-	typedef std::tuple<u16, u32> (madam_device::*fetch_rle_func)(u32 ptr, u8 frac);
+	typedef std::tuple<u32, u32> (madam_device::*fetch_rle_func)(u32 ptr, u8 frac);
 	static const fetch_rle_func fetch_rle_table[16];
 
-	std::tuple<u16, u32> get_unemulated(u32 ptr, u8 frac);
-	std::tuple<u16, u32> get_coded_4bpp(u32 ptr, u8 frac);
-	std::tuple<u16, u32> get_coded_6bpp(u32 ptr, u8 frac);
-	std::tuple<u16, u32> get_coded_16bpp(u32 ptr, u8 frac);
-	std::tuple<u16, u32> get_uncoded_16bpp(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_unemulated(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_coded_1bpp(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_coded_2bpp(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_coded_4bpp(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_coded_6bpp(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_coded_8bpp(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_uncoded_8bpp(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_coded_16bpp(u32 ptr, u8 frac);
+	std::tuple<u32, u32> get_uncoded_16bpp(u32 ptr, u8 frac);
+
+	bool check_y_clip_normal(int ypos);
+	bool check_x_clip_normal(int xpos);
+	u16 get_fb_pixel(int xpos, int ypos);
+	void set_fb_pixel(int xpos, int ypos, u16 pix_data);
+
+	std::tuple<u8, u8, u8> convert_cel_primary_source(u32 cel_data, bool p_mode);
+	std::tuple<u8, u8, u8> convert_secondary_source(u16 pix_data, bool p_mode);
+	std::tuple<u8, u8, u8> convert_fb_primary_source(u16 fb_data, u32 cel_data, bool p_mode);
+
+	typedef std::tuple<u8, u8, u8, u8> (madam_device::*pixc_ms_func)(u32 cel_data, bool p_mode);
+	static const pixc_ms_func pixc_ms_table[4];
+
+	std::tuple<u8, u8, u8, u8> pixc_ms_0(u32 cel_data, bool p_mode);
+	std::tuple<u8, u8, u8, u8> pixc_ms_1(u32 cel_data, bool p_mode);
+	std::tuple<u8, u8, u8, u8> pixc_ms_2(u32 cel_data, bool p_mode);
+	std::tuple<u8, u8, u8, u8> pixc_ms_3(u32 cel_data, bool p_mode);
+
+	typedef u16 (madam_device::*pixc_mix_func)(int xpos, int ypos, u32 cel_data, bool p_mode, u8 op_mode);
+	static const pixc_mix_func pixc_mix_table[8];
+
+	// <src>_<dst>
+	u16 pixc_cel_0(int xpos, int ypos, u32 cel_data, bool p_mode, u8 op_mode);
+	u16 pixc_cel_ccb(int xpos, int ypos, u32 cel_data, bool p_mode, u8 op_mode);
+	u16 pixc_cel_fb(int xpos, int ypos, u32 cel_data, bool p_mode, u8 op_mode);
+	u16 pixc_cel_cel(int xpos, int ypos, u32 cel_data, bool p_mode, u8 op_mode);
+	u16 pixc_fb_0(int xpos, int ypos, u32 cel_data, bool p_mode, u8 op_mode);
+	u16 pixc_fb_ccb(int xpos, int ypos, u32 cel_data, bool p_mode, u8 op_mode);
+	u16 pixc_fb_fb(int xpos, int ypos, u32 cel_data, bool p_mode, u8 op_mode);
+	u16 pixc_fb_cel(int xpos, int ypos, u32 cel_data, bool p_mode, u8 op_mode);
+
+	typedef u16 (madam_device::*pixc_math_func)(u8 av_mode, bool avg, u8 r1s, u8 g1s, u8 b1s, u8 r2s, u8 g2s, u8 b2s);
+	static const pixc_math_func pixc_math_table[4];
+
+	u16 pixc_math_normal(u8 av_mode, bool avg, u8 r1s, u8 g1s, u8 b1s, u8 r2s, u8 g2s, u8 b2s);
+	u16 pixc_math_useav(u8 av_mode, bool avg, u8 r1s, u8 g1s, u8 b1s, u8 r2s, u8 g2s, u8 b2s);
+	u16 pixc_math_pxor(u8 av_mode, bool avg, u8 r1s, u8 g1s, u8 b1s, u8 r2s, u8 g2s, u8 b2s);
+//	u16 pixc_math_useav_pxor(u8 av_mode, u8 r1s, u8 g1s, u8 b1s, u8 r2s, u8 g2s, u8 b2s);
+
+	typedef u16 (madam_device::*vh_interpolate_func)(int xpos, int ypos, u16 cel_data, u16 pix_data);
+	static const vh_interpolate_func vh_interpolate_table[2];
+
+	u16 vh_interpolate_subposition(int xpos, int ypos, u16 cel_data, u16 pix_data);
+	u16 vh_interpolate_plut(int xpos, int ypos, u16 cel_data, u16 pix_data);
 
 	emu_timer *m_cel_timer;
 	TIMER_CALLBACK_MEMBER(cel_tick_cb);

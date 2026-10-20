@@ -432,7 +432,7 @@ void duet16_state::duet16(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", m_chrpal, gfx_duet16);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea_full();

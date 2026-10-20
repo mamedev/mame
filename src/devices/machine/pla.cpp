@@ -53,7 +53,6 @@ pls100_device::pls100_device(const machine_config &mconfig, const char *tag, dev
 mos8721_device::mos8721_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pla_device(mconfig, MOS8721, tag, owner, clock)
 {
-	// TODO: actual number of terms is unknown
 	set_num_inputs(27);
 	set_num_outputs(18);
 	set_num_terms(379);

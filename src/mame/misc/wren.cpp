@@ -589,7 +589,7 @@ void wren_state::wren(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&wren_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 20, 0x10000);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12_MHz_XTAL, 768, 0, 512, 312, 0, 256);
 	screen.set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 

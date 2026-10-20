@@ -1155,7 +1155,7 @@ void hp48_state::hp48_common(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(64);
 	m_screen->set_vblank_time(0);
 	m_screen->set_size(131, 64);

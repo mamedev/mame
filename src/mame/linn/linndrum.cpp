@@ -816,7 +816,7 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	for (int i = 0; i < NUM_TOM_VOICES; ++i)
 	{
 		FILTER_VOLUME(config, m_tom_out[i]);  // One of U87'S (CD4051) outputs.
-		tom_vcf.add_route(0, m_tom_out[i], 1.0);
+		tom_vcf.add_route(cem3320_lpf4_device::OUTPUT_LPF4, m_tom_out[i], 1.0);
 	}
 
 	// *** Mixer and output section.
@@ -849,8 +849,13 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	{
 		// The filter and gain will be configured in update_volume_and_pan().
 		FILTER_RC(config, m_voice_hpf[i]);
-		// An op-amp inverter is attached to the output of the bass VCF.
-		voice_outputs[i]->add_route(0, m_voice_hpf[i], (i == MIX_BASS) ? -1.0 : 1.0);
+
+		if (i == MIX_BASS)
+			// An op-amp inverter is attached to the output of the bass VCF.
+			voice_outputs[i]->add_route(cem3320_lpf4_device::OUTPUT_LPF4, m_voice_hpf[i], -1.0);
+		else
+			voice_outputs[i]->add_route(0, m_voice_hpf[i], 1.0);
+
 		m_voice_hpf[i]->add_route(0, m_left_mixer, 1.0);
 		m_voice_hpf[i]->add_route(0, m_right_mixer, 1.0);
 	}

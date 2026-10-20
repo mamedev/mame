@@ -919,7 +919,7 @@ void z100_state::z100(machine_config &config)
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(14.112_MHz_XTAL, 912, 0, 640, 258, 0, 216);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

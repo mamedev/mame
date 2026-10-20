@@ -175,7 +175,7 @@ void sm1800_state::sm1800(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(sm1800_state::irq_callback));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */

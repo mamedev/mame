@@ -37,6 +37,8 @@ public:
 
 	static constexpr uint32_t METADATA_WORDS   = 1 + MAX_TRACKS * 6;
 
+	static constexpr uint32_t GDI_HIGH_DENSITY_AREA = 45000;
+
 	enum
 	{
 		CD_TRACK_MODE1 = 0,         /* mode 1 2048 bytes/sector */
@@ -161,6 +163,7 @@ public:
 	static std::error_condition parse_iso(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
 	static std::error_condition parse_gdi(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
 	static std::error_condition parse_cue(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
+	static std::error_condition adjust_high_density_area(toc& outtoc, track_input_info& outinfo);
 	static bool is_gdicue(std::string_view tocfname);
 	static std::error_condition parse_toc(std::string_view tocfname, toc &outtoc, track_input_info &outinfo);
 	int get_last_session() const { return cdtoc.numsessions ? cdtoc.numsessions : 1; }

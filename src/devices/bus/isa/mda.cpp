@@ -164,7 +164,7 @@ tiny_rom_entry const *isa8_mda_device::device_rom_region() const
 
 void isa8_mda_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MDA_CLOCK, 882, 0, 720, 370, 0, 350);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
@@ -527,7 +527,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(ISA8_EC1840_0002, device_isa8_card_interface, isa8_ec
 
 void isa8_ec1840_0002_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MDA_CLOCK, 792, 0, 640, 370, 0, 350);
 	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 

@@ -713,7 +713,7 @@ void sun2_state::sun2vme(machine_config &config)
 	// MMU Type 3 device space
 	ADDRESS_MAP_BANK(config, "type3").set_map(&sun2_state::vmetype3space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
-	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	screen_device &bwtwo(SCREEN(config, "bwtwo"));
 	bwtwo.set_screen_update(FUNC(sun2_state::bw2_update));
 	bwtwo.set_raw(100_MHz_XTAL, 1600, 0, 1152, 937, 0, 900);
 
@@ -768,7 +768,7 @@ void sun2_state::sun2mbus(machine_config &config)
 	// MMU Type 3 device space
 	ADDRESS_MAP_BANK(config, "type3").set_map(&sun2_state::mbustype3space_map).set_options(ENDIANNESS_BIG, 16, 32, 0x1000000);
 
-	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	screen_device &bwtwo(SCREEN(config, "bwtwo"));
 	bwtwo.set_screen_update(FUNC(sun2_state::bw2_update));
 	bwtwo.set_raw(100_MHz_XTAL, 1600, 0, 1152, 937, 0, 900);
 	//bwtwo.set_raw(100_MHz_XTAL, 1600, 0, 1024, 1061, 0, 1024);

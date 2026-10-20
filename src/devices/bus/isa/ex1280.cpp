@@ -74,7 +74,7 @@ void isa16_ex1280_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_shiftreg_out_callback(FUNC(isa16_ex1280_device::from_shiftreg));      /* read from shiftreg function */
 	m_cpu->set_screen(m_screen);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // Not accurate
 	m_screen->set_size(640, 480);

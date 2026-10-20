@@ -11,7 +11,6 @@
 
 #pragma once
 
-
 #define F8_INPUT_LINE_INT_REQ   1
 
 class f8_cpu_device : public cpu_device
@@ -22,6 +21,9 @@ public:
 
 	// used by F3850 systems that override the normal zero reset address
 	auto romc08_callback() { return m_romc08_callback.bind(); }
+
+	// interrupt acknowledge callback
+	auto int_cycle_callback() { return m_int_cycle.bind(); }
 
 protected:
 	enum
@@ -59,6 +61,7 @@ private:
 	address_space_config m_io_config;
 
 	devcb_read8 m_romc08_callback;
+	devcb_read16 m_int_cycle;
 
 	u16  m_pc0;    /* program counter 0 */
 	u16  m_pc1;    /* program counter 1 */

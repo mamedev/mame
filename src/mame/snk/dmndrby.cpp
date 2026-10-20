@@ -258,8 +258,9 @@ uint32_t dmndrby_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	const bool fix_enable = BIT(m_scroll_ram[4], 0);
 	// Track layer has a narrower window drawing, there's no text tilemap attribute that would
 	// suggest otherwise.
-	rectangle overlay_rect;
-	overlay_rect.set(cliprect.min_x, cliprect.max_x, std::max(40, cliprect.min_y), std::min(215, cliprect.max_y));
+	rectangle overlay_rect(
+			cliprect.left(), cliprect.right(),
+			std::max(40, cliprect.top()), std::min(215, cliprect.bottom()));
 
 	m_racetrack_tilemap->set_scrollx(0, m_scroll_ram[0] + m_scroll_ram[1] * 0x100);
 	m_racetrack_tilemap->set_scrolly(0, m_scroll_ram[2] + m_scroll_ram[3] * 0x100);
@@ -785,7 +786,7 @@ void dmndrby_state::dderby(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(256, 256);

@@ -121,7 +121,6 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	void irq_handler(int state);
 	void irq6_ack_w(uint16_t data);
 	void irq5_ack_w(uint16_t data);
 	void frontcolor_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -215,13 +214,14 @@ u32 blockout_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	copybitmap(bitmap, m_tmpbitmap, 0, 0, 0, 0, cliprect);
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			const u16 d = m_frontvideoram[((y & 0xff) << 6) + ((x & 0x1ff) >> 3)];
-			if (d & (1 << (7 - (x & 7))))
-				bitmap.pix(y, x) = color;
+			if (BIT(d, ~x & 7))
+				dst[x] = color;
 		}
 	}
 
@@ -395,19 +395,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Sound interface
- *
- *************************************/
-
-// handler called by the 2151 emulator when the internal timers cause an IRQ
-void blockout_state::irq_handler(int state)
-{
-	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff); // Z80
-}
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -447,7 +434,7 @@ void blockout_state::blockout(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &blockout_state::audio_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// assume same as ddragon3 with adjusted visible display area
 	m_screen->set_raw(XTAL(28'000'000) / 4, 448, 0, 320, 272, 10, 250);
 	m_screen->set_screen_update(FUNC(blockout_state::screen_update));
@@ -462,7 +449,7 @@ void blockout_state::blockout(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", AUDIO_CLOCK));
-	ymsnd.irq_handler().set(FUNC(blockout_state::irq_handler));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0); // IM 1
 	ymsnd.add_route(0, "speaker", 0.60, 0);
 	ymsnd.add_route(1, "speaker", 0.60, 1);
 
@@ -578,6 +565,7 @@ ROM_END
 
 void blockout_state::init_agress()
 {
+	// HACK: understand why following is a thing
 	/*
 	 * agress checks at F3A that this is mirrored, blockout glitches if you mirror to it
 	 * But actually mirroring this VRAM makes display to be offset

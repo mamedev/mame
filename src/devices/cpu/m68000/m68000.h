@@ -222,16 +222,8 @@ protected:
 	inline void do_exec_partial();
 
 	// movem step
-	inline int countr_zero(u16 v) {
-		// We will be c++20 someday
-		for(int i=0; i != 16; i++)
-			if(v & (1<<i))
-				return i;
-		return 16;
-	}
-
 	inline void step_movem() {
-		int r = countr_zero(m_movemr);
+		int r = std::countr_zero(m_movemr);
 		if(r > 15)
 			r = 0;
 		m_movems = map_sp(r);
@@ -239,7 +231,7 @@ protected:
 	}
 
 	void step_movem_predec() {
-		int r = countr_zero(m_movemr);
+		int r = std::countr_zero(m_movemr);
 		if(r > 15)
 			r = 0;
 		m_movems = map_sp(r ^ 0xf);

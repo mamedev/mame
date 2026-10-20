@@ -241,7 +241,7 @@ void wpc_flip2_state::wpc_flip2(machine_config &config)
 	m_wpcsnd->reply_callback().set(FUNC(wpc_flip2_state::snd_reply_w));
 	m_wpcsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_native_aspect();
 	screen.set_size(128, 32);
 	screen.set_visarea(0, 128-1, 0, 32-1);

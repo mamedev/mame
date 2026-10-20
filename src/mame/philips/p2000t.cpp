@@ -666,7 +666,7 @@ void p2000t_state::p2000t(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(p2000t_state::p2000_interrupt));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(80 * 12, 24 * 20);
@@ -702,7 +702,7 @@ void p2000m_state::p2000m(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &p2000m_state::p2000m_mem);
 	m_maincpu->set_addrmap(AS_IO, &p2000m_state::p2000m_io);
 
-	SCREEN(config.replace(), m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config.replace(), m_screen);
 	m_screen->set_raw(6'000'000 * 2, 768, 6 * 8, 86 * 8, 26 * 12, 1 * 12, 25 * 12);
 	m_screen->set_screen_update(FUNC(p2000m_state::screen_update_p2000m));
 	m_screen->set_palette(m_palette);

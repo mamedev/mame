@@ -483,7 +483,7 @@ void subs_state::subs(machine_config &config)
 
 	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(57);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); //not accurate
 	lscreen.set_size(32*8, 32*8);
@@ -491,7 +491,7 @@ void subs_state::subs(machine_config &config)
 	lscreen.set_screen_update(FUNC(subs_state::screen_update<0>));
 	lscreen.set_palette(m_palette);
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(57);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); //not accurate
 	rscreen.set_size(32*8, 32*8);

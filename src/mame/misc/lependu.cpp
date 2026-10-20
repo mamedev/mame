@@ -682,7 +682,7 @@ void lependu_state::lependu(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(lependu_state::mux_w)); // mux + bankswitch
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, (39 + 1) * 8, 0, 32 * 8, ((31 + 1) * 8) + 4, 0, 29 * 8); // from MC6845 parameters
 	m_screen->set_screen_update(FUNC(lependu_state::screen_update_lependu));
 
@@ -788,11 +788,10 @@ void lependu_state::init_lependu()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
-/*  break the loop at $cc53 that prevents to start a game
-
-    $cc53 lda $01c4
-    $cc56 bne $cc53
-*/
+	// HACK: get rid of these patches
+	//  break the loop at $cc53 that prevents to start a game
+	//  $cc53 lda $01c4
+	//  $cc56 bne $cc53
 	ROM[0xcc56] = 0xea;
 	ROM[0xcc57] = 0xea;
 

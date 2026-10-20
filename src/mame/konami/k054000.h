@@ -25,14 +25,13 @@ private:
 	void acy_w(offs_t offset, u8 data);
 	void bcx_w(offs_t offset, u8 data);
 	void bcy_w(offs_t offset, u8 data);
-	int convert_raw_to_result_delta(u8 *buf);
-	int convert_raw_to_result(u8 *buf);
-	u8 axis_check(u32 m_Ac, u32 m_Bc, u32 m_Aa, u32 m_Ba);
+	s32 convert_raw_to_result_delta(u8 *buf);
+	u8 axis_check(u32 ac, u32 bc, u32 aa, u32 ba);
 	u8 status_r();
 
-	u8 m_raw_Acx[4]{}, m_raw_Acy[4]{}, m_raw_Bcx[4]{}, m_raw_Bcy[4]{};
-	int m_Acx = 0, m_Acy = 0, m_Bcx = 0, m_Bcy = 0;
-	int m_Aax = 0, m_Aay = 0, m_Bax = 0, m_Bay = 0;
+	u8 m_raw_acx[4]{}, m_raw_acy[4]{}, m_raw_bcx[4]{}, m_raw_bcy[4]{};
+	s32 m_acx = 0, m_acy = 0, m_bcx = 0, m_bcy = 0;
+	s32 m_aax = 0, m_aay = 0, m_bax = 0, m_bay = 0;
 
 	std::string print_hitbox_state(bool result);
 };

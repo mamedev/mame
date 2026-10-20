@@ -64,13 +64,8 @@ The CD-Rom is MKE-style, akin to CDTV CR-511B and Creative Soundblaster a.k.a. S
 */
 
 #include "emu.h"
+
 #include "3do.h"
-
-#include "cpu/arm7/arm7.h"
-
-#include "debugger.h"
-#include "screen.h"
-
 
 
 
@@ -144,15 +139,15 @@ void _3do_state::slow2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 }
 
 
-
+// TODO: convert as separate device, reinstate logging
 // NOTE: TC528267 emulation
 uint32_t _3do_state::svf_r(offs_t offset)
 {
 	uint32_t addr = ( offset & ( 0x07fc / 4 ) ) << 9;
 	uint32_t *p = m_vram + addr;
 
-	if (!machine().side_effects_disabled())
-		logerror( "%08X: SVF read offset = %08X\n", m_maincpu->pc(), offset * 4 );
+	//if (!machine().side_effects_disabled())
+	//	logerror( "%08X: SVF read offset = %08X\n", m_maincpu->pc(), offset * 4 );
 
 	switch( offset & ( 0xE000 / 4 ) )
 	{
@@ -181,7 +176,7 @@ void _3do_state::svf_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	uint32_t addr = ( offset & ( 0x07fc / 4 ) ) << 9;
 	uint32_t *p = m_vram + addr;
 
-	logerror( "%08X: SVF write offset = %08X, data = %08X, mask = %08X\n", m_maincpu->pc(), offset*4, data, mem_mask );
+	//logerror( "%08X: SVF write offset = %08X, data = %08X, mask = %08X\n", m_maincpu->pc(), offset*4, data, mem_mask );
 
 	switch( offset & ( 0xe000 / 4 ) )
 	{
@@ -203,7 +198,7 @@ void _3do_state::svf_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			uint32_t keep_bits = data ^ 0xffffffff;
 			uint32_t new_bits = m_svf.color & data;
 
-			logerror("VRAM flash write %08x color %08x\n", addr, new_bits);
+			//logerror("VRAM flash write %08x color %08x\n", addr, new_bits);
 
 			for ( int i = 0; i < 512; i++ )
 			{

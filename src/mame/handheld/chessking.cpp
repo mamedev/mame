@@ -118,12 +118,12 @@ void chessking_state::machine_start()
 uint32_t chessking_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// quickly draw from memory (should be handled by LCDC?)
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		int offset = y * 256 / 8;
 
 		uint32_t *dst = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			// 2 256x256 images (160x160 area used) one at c000, one at e000 to form 2bpp graphics
 			uint8_t data = m_videoram[0x4000 + offset + x/8];
@@ -324,7 +324,7 @@ void chessking_state::chesskng(machine_config &config)
 	NVRAM(config, "mainram", nvram_device::DEFAULT_ALL_0);
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(160, 160);
 	m_screen->set_visarea_full();

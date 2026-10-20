@@ -31,7 +31,8 @@
 // Verbosity level
 // 0 = no messages
 // 1 = everything
-static constexpr int V = 0;
+#define VERBOSE 0
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(H8_TIMER16,            h8_timer16_device,            "h8_timer16",            "H8 16-bit timer")
 DEFINE_DEVICE_TYPE(H8_TIMER16_CHANNEL,    h8_timer16_channel_device,    "h8_timer16_channel",    "H8 16-bit timer channel")
@@ -63,7 +64,7 @@ void h8_timer16_channel_device::tcr_w(u8 data)
 {
 	update_counter();
 	m_tcr = data;
-	if(V>=1) logerror("tcr_w %02x\n", data);
+	LOG("tcr_w %02x\n", data);
 	tcr_update();
 	recalc_event();
 }
@@ -75,7 +76,7 @@ u8 h8_timer16_channel_device::tmdr_r()
 
 void h8_timer16_channel_device::tmdr_w(u8 data)
 {
-	if(V>=1) logerror("tmdr_w %02x\n", data);
+	LOG("tmdr_w %02x\n", data);
 }
 
 u8 h8_timer16_channel_device::tior_r()
@@ -85,7 +86,7 @@ u8 h8_timer16_channel_device::tior_r()
 
 void h8_timer16_channel_device::tior_w(offs_t offset, u8 data)
 {
-	if(V>=1) logerror("tior_w %d, %02x\n", offset, data);
+	LOG("tior_w %d, %02x\n", offset, data);
 }
 
 void h8_timer16_channel_device::set_ier(u8 value)
@@ -110,17 +111,17 @@ u8 h8_timer16_channel_device::tier_r()
 void h8_timer16_channel_device::tier_w(u8 data)
 {
 	update_counter();
-	if(V>=1) logerror("tier_w %02x\n", data);
+	LOG("tier_w %02x\n", data);
 	m_tier = data;
 	tier_update();
-	if(V>=1) logerror("irq %c%c%c%c%c%c trigger=%d\n",
-						m_ier & IRQ_A ? 'a' : '.',
-						m_ier & IRQ_B ? 'b' : '.',
-						m_ier & IRQ_C ? 'c' : '.',
-						m_ier & IRQ_D ? 'd' : '.',
-						m_ier & IRQ_V ? 'v' : '.',
-						m_ier & IRQ_U ? 'u' : '.',
-						m_ier & IRQ_TRIG ? 1 : 0);
+	LOG("irq %c%c%c%c%c%c trigger=%d\n",
+		m_ier & IRQ_A ? 'a' : '.',
+		m_ier & IRQ_B ? 'b' : '.',
+		m_ier & IRQ_C ? 'c' : '.',
+		m_ier & IRQ_D ? 'd' : '.',
+		m_ier & IRQ_V ? 'v' : '.',
+		m_ier & IRQ_U ? 'u' : '.',
+		m_ier & IRQ_TRIG ? 1 : 0);
 	recalc_event();
 }
 
@@ -134,7 +135,7 @@ u8 h8_timer16_channel_device::tsr_r()
 void h8_timer16_channel_device::tsr_w(u8 data)
 {
 	update_counter();
-	if(V>=1) logerror("tsr_w %02x\n", data);
+	LOG("tsr_w %02x\n", data);
 	isr_update(data);
 	recalc_event();
 }
@@ -150,7 +151,7 @@ void h8_timer16_channel_device::tcnt_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	update_counter();
 	COMBINE_DATA(&m_tcnt);
-	if(V>=1) logerror("tcnt_w %04x\n", m_tcnt);
+	LOG("tcnt_w %04x\n", m_tcnt);
 	recalc_event();
 }
 
@@ -163,7 +164,7 @@ void h8_timer16_channel_device::tgr_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	update_counter();
 	COMBINE_DATA(m_tgr + offset);
-	if(V>=1) logerror("tgr%c_w %04x\n", 'a'+offset, m_tgr[offset]);
+	LOG("tgr%c_w %04x\n", 'a'+offset, m_tgr[offset]);
 	recalc_event();
 }
 
@@ -175,7 +176,7 @@ u16 h8_timer16_channel_device::tbr_r(offs_t offset)
 void h8_timer16_channel_device::tbr_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(m_tgr + offset + m_tgr_count);
-	if(V>=1) logerror("tbr%c_w %04x\n", 'a'+offset, m_tgr[offset + m_tgr_count]);
+	LOG("tbr%c_w %04x\n", 'a'+offset, m_tgr[offset + m_tgr_count]);
 }
 
 void h8_timer16_channel_device::device_start()
@@ -285,7 +286,7 @@ void h8_timer16_channel_device::update_counter(u64 cur_time)
 					match = delta >= m_counter_cycle || (prev < cmp && tt >= cmp) || (m_tcnt <= prev && m_tcnt >= cmp);
 
 				if(match && BIT(m_ier, i) && m_interrupt[i] != -1)
-					logerror("update_counter unexpected TGR %d IRQ\n, i");
+					logerror("update_counter unexpected TGR %d IRQ\n", i);
 			}
 
 			if(match) {
@@ -394,7 +395,7 @@ u8 h8_timer16_device::tstr_r()
 
 void h8_timer16_device::tstr_w(u8 data)
 {
-	if(V>=1) logerror("tstr_w %02x\n", data);
+	LOG("tstr_w %02x\n", data);
 	m_tstr = data;
 	for(int i = 0; i < m_timer_count; i++)
 		m_timer_channel[i]->set_enable((m_tstr >> i) & 1);
@@ -407,7 +408,7 @@ u8 h8_timer16_device::tsyr_r()
 
 void h8_timer16_device::tsyr_w(u8 data)
 {
-	if(V>=1) logerror("tsyr_w %02x\n", data);
+	LOG("tsyr_w %02x\n", data);
 }
 
 u8 h8_timer16_device::tmdr_r()
@@ -417,7 +418,7 @@ u8 h8_timer16_device::tmdr_r()
 
 void h8_timer16_device::tmdr_w(u8 data)
 {
-	if(V>=1) logerror("tmdr_w %02x\n", data);
+	LOG("tmdr_w %02x\n", data);
 }
 
 u8 h8_timer16_device::tfcr_r()
@@ -427,7 +428,7 @@ u8 h8_timer16_device::tfcr_r()
 
 void h8_timer16_device::tfcr_w(u8 data)
 {
-	if(V>=1) logerror("tfcr_w %02x\n", data);
+	LOG("tfcr_w %02x\n", data);
 }
 
 u8 h8_timer16_device::toer_r()
@@ -437,7 +438,7 @@ u8 h8_timer16_device::toer_r()
 
 void h8_timer16_device::toer_w(u8 data)
 {
-	if(V>=1) logerror("toer_w %02x\n", data);
+	LOG("toer_w %02x\n", data);
 }
 
 u8 h8_timer16_device::tocr_r()
@@ -447,7 +448,7 @@ u8 h8_timer16_device::tocr_r()
 
 void h8_timer16_device::tocr_w(u8 data)
 {
-	if(V>=1) logerror("tocr_w %02x\n", data);
+	LOG("tocr_w %02x\n", data);
 }
 
 u8 h8_timer16_device::tisr_r(offs_t offset)
@@ -458,14 +459,14 @@ u8 h8_timer16_device::tisr_r(offs_t offset)
 	for(int i = m_timer_count; i < 4; i++)
 		r |= 0x11 <<i;
 
-	if(V>=1) logerror("tisr%c_r %02x\n", 'a'+offset, r);
+	LOG("tisr%c_r %02x\n", 'a'+offset, r);
 
 	return r;
 }
 
 void h8_timer16_device::tisr_w(offs_t offset, u8 data)
 {
-	if(V>=1) logerror("tisr%c_w %02x\n", 'a'+offset, data);
+	LOG("tisr%c_w %02x\n", 'a'+offset, data);
 	for(int i = 0; i < m_timer_count; i++)
 		m_timer_channel[i]->tisr_w(offset, data >> i);
 }
@@ -482,7 +483,7 @@ void h8_timer16_device::tisrc_w(u8 data)
 
 void h8_timer16_device::tolr_w(u8 data)
 {
-	if(V>=1) logerror("tocr_w %02x\n", data);
+	LOG("tocr_w %02x\n", data);
 }
 
 
@@ -685,16 +686,16 @@ void h8h_timer16_channel_device::tcr_update()
 	switch(m_tcr & 0x60) {
 	case 0x00:
 		m_tgr_clearing = TGR_CLEAR_NONE;
-		if(V>=1) logerror("No automatic tcnt clearing\n");
+		LOG("No automatic tcnt clearing\n");
 		break;
 	case 0x20: case 0x40: {
 		m_tgr_clearing = m_tcr & 0x20 ? 0 : 1;
-		if(V>=1) logerror("Auto-clear on tgr%c (%04x)\n", 'a'+m_tgr_clearing, m_tgr[m_tgr_clearing]);
+		LOG("Auto-clear on tgr%c (%04x)\n", 'a'+m_tgr_clearing, m_tgr[m_tgr_clearing]);
 		break;
 	}
 	case 0x60:
 		m_tgr_clearing = TGR_CLEAR_EXT;
-		if(V>=1) logerror("External sync clear\n");
+		LOG("External sync clear\n");
 		break;
 	}
 
@@ -702,23 +703,23 @@ void h8h_timer16_channel_device::tcr_update()
 	if(count_type < 4) {
 		m_clock_type = DIV_1;
 		m_clock_divider = count_type;
-		if(V>=1) logerror("clock divider %d (%d)\n", m_clock_divider, 1 << m_clock_divider);
+		LOG("clock divider %d (%d)\n", m_clock_divider, 1 << m_clock_divider);
 		if(count_type <= DIV_2)
 			m_phase = 0;
 		else {
 			switch(m_tcr & 0x18) {
 			case 0x00:
 				m_phase = 0;
-				if(V>=1) logerror("Phase 0\n");
+				LOG("Phase 0\n");
 				break;
 			case 0x08:
 				m_phase = 1 << (m_clock_divider-1);
-				if(V>=1) logerror("Phase 180\n");
+				LOG("Phase 180\n");
 				break;
 			case 0x10: case 0x18:
 				m_phase = 0;
 				m_clock_divider--;
-				if(V>=1) logerror("Phase 0+180\n");
+				LOG("Phase 0+180\n");
 				break;
 			}
 		}
@@ -726,7 +727,7 @@ void h8h_timer16_channel_device::tcr_update()
 		m_clock_type = INPUT_A + (count_type-4);
 		m_clock_divider = 0;
 		m_phase = 0;
-		if(V>=1) logerror("counting input %c\n", 'a'+count_type-INPUT_A);
+		LOG("counting input %c\n", 'a'+count_type-INPUT_A);
 	}
 }
 
@@ -770,18 +771,18 @@ void h8s_timer16_channel_device::tcr_update()
 	switch(m_tcr & 0x60) {
 	case 0x00:
 		m_tgr_clearing = TGR_CLEAR_NONE;
-		if(V>=1) logerror("No automatic tcnt clearing\n");
+		LOG("No automatic tcnt clearing\n");
 		break;
 	case 0x20: case 0x40: {
 		m_tgr_clearing = m_tcr & 0x20 ? 0 : 1;
 		if(m_tgr_count > 2 && (m_tcr & 0x80))
 			m_tgr_clearing += 2;
-		if(V>=1) logerror("Auto-clear on tgr%c\n", 'a'+m_tgr_clearing);
+		LOG("Auto-clear on tgr%c\n", 'a'+m_tgr_clearing);
 		break;
 	}
 	case 0x60:
 		m_tgr_clearing = TGR_CLEAR_EXT;
-		if(V>=1) logerror("External sync clear\n");
+		LOG("External sync clear\n");
 		break;
 	}
 
@@ -789,23 +790,23 @@ void h8s_timer16_channel_device::tcr_update()
 	if(count_type >= DIV_1 && m_clock_type <= DIV_4) {
 		m_clock_type = DIV_1;
 		m_clock_divider = count_type - DIV_1;
-		if(V>=1) logerror("clock divider %d (%d)\n", m_clock_divider, 1 << m_clock_divider);
+		LOG("clock divider %d (%d)\n", m_clock_divider, 1 << m_clock_divider);
 		if(!m_clock_divider)
 			m_phase = 0;
 		else {
 			switch(m_tcr & 0x18) {
 			case 0x00:
 				m_phase = 0;
-				if(V>=1) logerror("Phase 0\n");
+				LOG("Phase 0\n");
 				break;
 			case 0x08:
 				m_phase = 1 << (m_clock_divider-1);
-				if(V>=1) logerror("Phase 180\n");
+				LOG("Phase 180\n");
 				break;
 			case 0x10: case 0x18:
 				m_phase = 0;
 				m_clock_divider--;
-				if(V>=1) logerror("Phase 0+180\n");
+				LOG("Phase 0+180\n");
 				break;
 			}
 		}
@@ -814,12 +815,12 @@ void h8s_timer16_channel_device::tcr_update()
 		m_clock_type = CHAIN;
 		m_clock_divider = 0;
 		m_phase = 0;
-		if(V>=1) logerror("chained timer\n");
+		LOG("chained timer\n");
 
 	} else if(count_type >= INPUT_A && count_type <= INPUT_D) {
 		m_clock_type = count_type;
 		m_clock_divider = 0;
 		m_phase = 0;
-		if(V>=1) logerror("counting input %c\n", 'a'+count_type-INPUT_A);
+		LOG("counting input %c\n", 'a'+count_type-INPUT_A);
 	}
 }

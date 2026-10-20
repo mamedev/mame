@@ -37,6 +37,8 @@ public:
 	void set_channel_num(s32 ch) { m_channel_num = ch; }
 	void set_parent(vrender0soc_device *parent) { m_parent = parent; }
 
+	void set_external_clock(u32 clock) { m_uclk = clock; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -53,6 +55,7 @@ private:
 	util::fifo<u8, 16> m_urxb_fifo; // receive FIFO
 
 	s32 m_channel_num = 0;
+	u32 m_uclk = 0;
 	vrender0soc_device *m_parent = nullptr;
 
 	u32 control_r();
@@ -87,7 +90,12 @@ public:
 	void set_external_vclk(const XTAL vclk) { m_ext_vclk = vclk.value(); }
 	auto int_callback() { return m_int_cb.bind(); }
 	template <int Port> auto tx_callback() { return m_write_tx[Port].bind(); }
+	void set_uart_external_clock(u32 uclk) { m_uart_uclk = uclk; }
+	void set_uart_external_clock(const XTAL uclk) { m_uart_uclk = uclk.value(); }
 	template <int Port> void rx_w(int state) { m_uart[Port]->rx_w((u8)state); }
+
+	// psattack
+	template <unsigned N> auto light_pen_cb() { return m_light_pen_cb[N].bind(); }
 
 	// handlers
 	bool crt_is_blanked() { return BIT(m_crtcregs[0], 9); }
@@ -117,15 +125,49 @@ private:
 	required_device<vr0sound_device> m_vr0snd;
 	required_device_array<vr0uart_device, 2> m_uart;
 	required_shared_ptr<u32> m_crtcregs;
+	devcb_read16::array<4> m_light_pen_cb;
 	required_address_space m_host_space;
 	memory_share_creator<u16> m_textureram;
 	memory_share_creator<u16> m_frameram;
 
 	u32 m_ext_vclk = 0;
+	u32 m_uart_uclk = 0;
 
 	u32 m_inten = 0;
 	u8 m_int_high = 0;
 	u32 m_intst = 0;
+
+	// bare numbers indicate <reserved> IRQSs
+	enum {
+		IRQ_TIMER0 = 0,
+		IRQ_TIMER1,
+		IRQ_WAVE_SYNTH,
+		IRQ_SIO,
+		IRQ_4,
+		IRQ_EXTINT0,
+		IRQ_EXTINT1,
+		IRQ_DMA0,
+		IRQ_DMA1,
+		IRQ_TIMER2,
+		IRQ_TIMER3,
+		IRQ_EXTINT2,
+		IRQ_EXTINT3,
+		IRQ_UART0_ERROR,
+		IRQ_UART0_RX,
+		IRQ_UART0_TX,
+		IRQ_UART1_ERROR,
+		IRQ_UART1_RX,
+		IRQ_UART1_TX,
+		IRQ_19,
+		IRQ_20,
+		IRQ_21,
+		IRQ_22,
+		// NOTE: <reserved> with blue text, like Wave Synthesizer interrupt
+		IRQ_23,
+		IRQ_VBLANK,
+		IRQ_25,
+		IRQ_PWM
+	};
 
 	struct vr0_timer
 	{
@@ -140,9 +182,13 @@ private:
 		u32 src = 0;
 		u32 dst = 0;
 		u32 size = 0;
-		u32 ctrl = 0;
+		u16 ctrl = 0;
+
+		emu_timer *timer = nullptr;
 	};
 	vr0_dma m_dma[2];
+
+	template <unsigned Which> TIMER_CALLBACK_MEMBER(dma_step_cb);
 
 	devcb_write_line m_int_cb;
 	devcb_write_line::array<2> m_write_tx;
@@ -183,6 +229,7 @@ private:
 	void crtc_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void crtc_update();
 	inline bool crt_is_interlaced();
+	u8 m_lightc;
 
 	// Misc
 	u32 sysid_r();

@@ -124,6 +124,11 @@ private:
 	struct hso_cam_entry {
 		u8 command;
 		u16 time;
+		// Absolute cycle at which this entry is due. The real comparator runs
+		// every timer tick, so it cannot miss; emulation only evaluates at
+		// scheduled points, which an instruction can overrun. Caching the
+		// deadline lets internal_update fire on "reached or passed".
+		u64 fire_at;
 	};
 
 	devcb_read16::array<8> m_ach_cb;

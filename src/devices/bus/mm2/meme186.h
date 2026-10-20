@@ -22,9 +22,12 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
 	memory_share_creator<uint16_t> m_ram;
+	required_ioport m_p3;
 };
 
 #endif // MAME_BUS_MM2_MEME186_H

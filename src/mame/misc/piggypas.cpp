@@ -209,7 +209,7 @@ void piggypas_state::piggypas(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // DS1220AD
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(m_hd44780, FUNC(hd44780_device::screen_update));
 	screen.set_size(16*6, 8);

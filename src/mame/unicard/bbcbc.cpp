@@ -132,7 +132,7 @@ void bbcbc_state::bbcbc(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set_inputline("maincpu", 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// Software on ROM cartridges
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "bbcbc_cart");

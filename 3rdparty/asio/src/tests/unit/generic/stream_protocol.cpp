@@ -2,7 +2,7 @@
 // generic/stream_protocol.cpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -100,7 +100,7 @@ void test()
     socket1 = std::move(socket2);
     socket1 = asio::ip::tcp::socket(ioc);
 
-    // basic_io_object functions.
+    // I/O object functions.
 
     sp::socket::executor_type ex = socket1.get_executor();
     (void)ex;

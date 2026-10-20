@@ -538,7 +538,7 @@ void offtwall_state::offtwall(machine_config &config)
 	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 62, 64).set_info_callback(FUNC(offtwall_state::get_playfield_tile_info));
 	ATARI_MOTION_OBJECTS(config, "vad:mob", "screen", offtwall_state::s_mob_config).set_gfxdecode("gfxdecode");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived
 	   the board uses a VAD chip to generate video signals */

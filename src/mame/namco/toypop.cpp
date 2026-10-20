@@ -213,12 +213,12 @@ void namcos16_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clip
 	u32 const src_base = 0x200/2;
 	u16 const src_pitch = 288 / 2;
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
-		u16 const *src = &m_bgvram[y * src_pitch + cliprect.min_x + src_base];
-		u16 *dst = &bitmap.pix(flip ? (cliprect.max_y - y) : y, flip ? cliprect.max_x : cliprect.min_x);
+		u16 const *src = &m_bgvram[y * src_pitch + cliprect.left() + src_base];
+		u16 *dst = &bitmap.pix(flip ? (cliprect.bottom() - y) : y, flip ? cliprect.right() : cliprect.left());
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.left(); x <= cliprect.right(); x += 2)
 		{
 			u32 const srcpix = *src++;
 			int const idx1 = ((srcpix >> 8) & 0xf) + pal_base;
@@ -729,7 +729,7 @@ void namcos16_state::liblrabl(machine_config &config)
 	m_namco56xx_2->in_callback<2>().set_ioport("P2_LEFT");
 	m_namco56xx_2->in_callback<3>().set_ioport("SERVICE");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK, 384, 0, 288, 264, 0, 224); // derived from Galaxian HW, 60.606060
 	screen.set_screen_update(FUNC(namcos16_state::screen_update));
 	screen.set_palette(m_palette);

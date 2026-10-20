@@ -26,6 +26,7 @@ DIP locations verified for:
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 
@@ -194,8 +195,8 @@ uint32_t kamikaze_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	uint8_t yoffs = m_flip_yoffs & m_screen_flip;
 
 	// render the visible pixels
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-		for (int x = cliprect.min_x & ~7; x <= cliprect.max_x; x += 8)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+		for (int x = cliprect.left() & ~7; x <= cliprect.right(); x += 8)
 		{
 			uint8_t color = m_color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (m_screen_flip ? 0 : 4);
 			uint8_t data = m_videoram[(((y ^ m_screen_flip) + yoffs) << 5) | ((x ^ m_screen_flip) >> 3)];
@@ -211,8 +212,8 @@ uint32_t spcking2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	uint8_t yoffs = m_flip_yoffs & m_screen_flip;
 
 	/* render the visible pixels */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-		for (int x = cliprect.min_x & ~7; x <= cliprect.max_x; x += 8)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+		for (int x = cliprect.left() & ~7; x <= cliprect.right(); x += 8)
 		{
 			uint8_t color = m_color_prom[(((y & 0xf8) << 2) | (x >> 3)) ^ (m_screen_flip ? 0x3ff : m_player ? 0 : 0x3ff)] >> (m_player ? 4 : 0);
 			uint8_t data = m_videoram[(((y ^ m_screen_flip) + yoffs) << 5) | ((x ^ m_screen_flip) >> 3)];
@@ -695,7 +696,7 @@ void kamikaze_state::kamikaze(machine_config &config)
 	m_ppi8255[1]->out_pb_callback().set(FUNC(kamikaze_state::sound2_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(4'915'200), 320, 0, 256, 256, 32, 256);
 	m_screen->set_screen_update(FUNC(kamikaze_state::screen_update));
 
@@ -733,7 +734,7 @@ void spaceint_state::spaceint(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(spaceint_state::irq0_line_hold));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	m_screen->set_refresh_hz(60);

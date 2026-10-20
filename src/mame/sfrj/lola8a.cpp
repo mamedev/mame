@@ -618,7 +618,7 @@ void lola8_base_state::lola_base(machine_config &config)
 	m_ay8910->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(m_hd6845, FUNC(hd6845s_device::screen_update));
 
 	HD6845S(config, m_hd6845, 0); // HD6845 == HD46505S derived machine configuration will set clock frequency

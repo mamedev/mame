@@ -472,7 +472,7 @@ void microvision_state::microvision(machine_config &config)
 	m_lcd_pwm->set_interpolation(0.25);
 	config.set_default_layout(layout_microvision);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(0);
 	screen.set_screen_update(FUNC(microvision_state::screen_update));

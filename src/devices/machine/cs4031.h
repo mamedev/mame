@@ -22,12 +22,11 @@ class cs4031_device : public device_t
 {
 public:
 	// construction/destruction
-	template <typename T, typename U, typename V, typename W, typename X>
-	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cputag, U &&isatag, V &&biostag, W &&keybctag, X &&ramtag)
+	template <typename T, typename V, typename W, typename X>
+	cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cputag, V &&biostag, W &&keybctag, X &&ramtag)
 		: cs4031_device(mconfig, tag, owner, clock)
 	{
 		set_cputag(std::forward<T>(cputag));
-		set_isatag(std::forward<U>(isatag));
 		set_biostag(std::forward<V>(biostag));
 		set_keybctag(std::forward<W>(keybctag));
 		set_ramtag(std::forward<X>(ramtag));
@@ -95,7 +94,6 @@ public:
 
 	// inline configuration
 	template <typename T> void set_cputag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_isatag(T &&tag) { m_isa.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_biostag(T &&tag) { m_bios.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_keybctag(T &&tag) { m_keybc.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_ramtag(T &&tag) { m_ram_dev.set_tag(std::forward<T>(tag)); }
@@ -139,7 +137,6 @@ private:
 	// internal state
 	required_device<device_memory_interface> m_cpu;
 	required_device<at_kbc_device_base> m_keybc;
-	required_region_ptr<u8> m_isa;
 	required_region_ptr<u8> m_bios;
 
 	address_space *m_space;

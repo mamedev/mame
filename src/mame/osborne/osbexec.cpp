@@ -537,7 +537,7 @@ void osbexec_state::osbexec(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &osbexec_state::osbexec_io);
 	m_maincpu->set_daisy_config(osbexec_daisy_config);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_screen_update(FUNC(osbexec_state::screen_update));
 	m_screen->set_raw(MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240);    // May not be correct

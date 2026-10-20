@@ -25,7 +25,7 @@ TODO:
 #include "cpu/hmcs40/hmcs40.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 
 // internal artwork
 #include "dbridgec.lh"
@@ -227,10 +227,9 @@ void dbridgec_state::dbridgec(machine_config &config)
 	m_display->set_bri_levels(0.1);
 	config.set_default_layout(layout_dbridgec);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/1.5, 1068/1.5);
-	screen.set_visarea_full();
 }
 
 

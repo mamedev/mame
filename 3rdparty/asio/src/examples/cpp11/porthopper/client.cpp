@@ -2,7 +2,7 @@
 // client.cpp
 // ~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
 
       // Try to receive a frame from the server on the new data socket. If we
       // successfully receive a frame on this new data socket we can consider
-      // the renegotation complete. In that case we will close the old data
+      // the renegotiation complete. In that case we will close the old data
       // socket, which will cause any outstanding receive operation on it to be
       // cancelled.
       frame f1;
@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
       bool done = false;
       while (!done)
       {
-        // Even though we're performing a renegotation, we want to continue
+        // Even though we're performing a renegotiation, we want to continue
         // receiving data as smoothly as possible. Therefore we will continue to
         // try to receive a frame from the server on the old data socket. If we
         // receive a frame on this socket we will interrupt the io_context,
@@ -146,7 +146,7 @@ int main(int argc, char* argv[])
         io_context.run();
 
         // If the io_context.run() was interrupted then we have received a frame
-        // on the old data socket. We need to keep waiting for the renegotation
+        // on the old data socket. We need to keep waiting for the renegotiation
         // operations to complete.
         if (!done)
         {
@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
       }
 
       // Since the loop has finished, we have either successfully completed
-      // the renegotation, or an error has occurred. First we'll check for
+      // the renegotiation, or an error has occurred. First we'll check for
       // errors.
       if (control_result)
         throw std::system_error(control_result);

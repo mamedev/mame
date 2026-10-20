@@ -414,12 +414,12 @@ uint32_t segas16a_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			cliprect,
 			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
 			{
-				for (int y = rect.min_y; y <= rect.max_y; y++)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
 					uint16_t *const dest = &bitmap.pix(y);
 					uint16_t const *const src = &sprites.pix(y);
 					uint8_t const *const pri = &screen.priority().pix(y);
-					for (int x = rect.min_x; x <= rect.max_x; x++)
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
 						// only process written pixels
 						uint16_t const pix = src[x];
@@ -2291,7 +2291,7 @@ void segas16a_state::system16a(machine_config &config)
 	m_i8255->tri_pc_callback().set_constant(0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(342, 262);   // to be verified
 	m_screen->set_visarea(0*8, 40*8-1, 0*8, 28*8-1);

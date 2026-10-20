@@ -811,7 +811,7 @@ void cosmic_state::cosmic(machine_config &config)
 	Z80(config, m_maincpu, 10.816_MHz_XTAL/6); // 1.8026 MHz
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(10.816_MHz_XTAL/2, 44*8, 0*8, 32*8, 32*8+6, 4*8, 28*8);
 	m_screen->set_palette(m_palette);
 }

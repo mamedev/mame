@@ -283,6 +283,7 @@ void hd63450_device::dma_transfer_start(int channel)
 		m_reg[channel].mar = m_dma_space->read_word(m_reg[channel].bar) << 16;
 		m_reg[channel].mar |= m_dma_space->read_word(m_reg[channel].bar+2);
 		m_reg[channel].mtc = m_dma_space->read_word(m_reg[channel].bar+4);
+		m_reg[channel].bar += 6;
 		if (m_reg[channel].btc > 0)
 			m_reg[channel].btc--;
 	}
@@ -302,7 +303,10 @@ void hd63450_device::dma_transfer_start(int channel)
 	{
 		if((m_reg[channel].ocr & 3) == 1 && m_cpu) // TODO: proper cycle stealing
 			m_cpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		m_timer[channel]->adjust(attotime::zero, channel, m_burst_clock[channel]);
+		if (((m_reg[channel].ocr & 3) == 2) && !m_drq_state[channel])
+			m_timer[channel]->adjust(attotime::never);
+		else
+			m_timer[channel]->adjust(attotime::zero, channel, m_burst_clock[channel]);
 	}
 	else if (!(m_reg[channel].ocr & 2))
 		m_timer[channel]->adjust(attotime::from_usec(500), channel, m_our_clock[channel]);
@@ -471,10 +475,10 @@ void hd63450_device::single_transfer(int x)
 		if ((m_reg[x].ocr & 0x0c) == 0x08 && m_reg[x].btc > 0)
 		{
 			m_reg[x].btc--;
-			m_reg[x].bar+=6;
 			m_reg[x].mar = m_dma_space->read_word(m_reg[x].bar) << 16;
 			m_reg[x].mar |= m_dma_space->read_word(m_reg[x].bar+2);
 			m_reg[x].mtc = m_dma_space->read_word(m_reg[x].bar+4);
+			m_reg[x].bar += 6;
 			return;
 		}
 		else if ((m_reg[x].ocr & 0x0c) == 0x0c && m_reg[x].bar)

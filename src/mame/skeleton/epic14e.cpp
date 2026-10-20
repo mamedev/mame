@@ -274,7 +274,7 @@ void epic14e_state::epic14e(machine_config &config)
 
 	I8748(config, "keybmcu", 4608000).set_disable();
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw(17.01_MHz_XTAL, 900, 0, 720, 315, 0, 300);
 	screen.set_screen_update("pvtc", FUNC(scn2672_device::screen_update));

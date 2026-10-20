@@ -58,7 +58,7 @@ private:
 	// both address and data records.  Self-contained so the shared
 	// flopimg.cpp extractors do not need to change.
 	void extract_track_rich(const std::vector<bool> &bitstream, bool is_mfm,
-	                        std::vector<extracted_sector> &out) const;
+							std::vector<extracted_sector> &out) const;
 
 	// Per-track encoding/cell-size detection.  Tries the four common
 	// combinations (MFM @ 1000/2000ns, FM @ 2000/4000ns) and picks
@@ -66,7 +66,7 @@ private:
 	// if no encoding produced any sectors (track is unformatted or
 	// unrecognised).
 	bool detect_track(const floppy_image &image, int cyl, int head,
-	                  track_info &out) const;
+					  track_info &out) const;
 };
 
 extern const imd_format FLOPPY_IMD_FORMAT;

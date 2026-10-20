@@ -766,7 +766,7 @@ void can09_state::can09(machine_config &config)
 
 
 	/* screen - totally faked value for now */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_raw(4_MHz_XTAL / 2, 512, 0, 512, 576, 0, 576);
 	screen.set_screen_update(FUNC(can09_state::screen_update));

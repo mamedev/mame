@@ -564,7 +564,7 @@ void ajax_state::ajax(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+8, 320, 264, 16, 240);
 	screen.set_screen_update(FUNC(ajax_state::screen_update));
 	screen.set_palette(m_palette);

@@ -67,9 +67,6 @@ protected:
 
 	void omti_disk_config(uint16_t disk_type);
 
-private:
-	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
-
 public:
 	uint16_t m_type;
 	uint16_t m_cylinders;
@@ -699,16 +696,6 @@ void omti8621_device::set_esdi_defect_list(uint8_t lun, uint8_t head)
 	disk->m_esdi_defect_list[2] = 90; // year
 	disk->m_esdi_defect_list[3] = head;
 	memset(disk->m_esdi_defect_list+6, 0xff, 5); // end of defect list
-}
-
-/*-------------------------------------------------
- logerror - log an error message (w/o device tags)
- -------------------------------------------------*/
-
-template <typename Format, typename... Params>
-void omti8621_device::logerror(Format &&fmt, Params &&... args) const
-{
-	machine().logerror(std::forward<Format>(fmt), std::forward<Params>(args)...);
 }
 
 /***************************************************************************
@@ -1421,16 +1408,6 @@ void omti_disk_image_device::omti_disk_config(uint16_t disk_type)
 	m_type = disk_type;
 	m_sectorbytes = OMTI_DISK_SECTOR_SIZE;
 	m_sector_count = m_cylinders * m_heads * m_sectors;
-}
-
-/*-------------------------------------------------
- logerror - log an error message (w/o device tags)
- -------------------------------------------------*/
-
-template <typename Format, typename... Params>
-void omti_disk_image_device::logerror(Format &&fmt, Params &&... args) const
-{
-	machine().logerror(std::forward<Format>(fmt), std::forward<Params>(args)...);
 }
 
 /*-------------------------------------------------

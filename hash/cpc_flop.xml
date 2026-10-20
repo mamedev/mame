@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -253,9 +253,8 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- goes back to BASIC, probably protection (Alkatraz Protetction System) related -->
 	<!-- Identifying 10th Frame (UK) (1986) [Original].zip... --> <!-- CPC Power -->
-	<software name="10frame" supported="no">
+	<software name="10frame">
 		<description>10th Frame (UK)</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
@@ -345,9 +344,8 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- goes back to BASIC, probably protection (Alkatraz Protetction System) related -->
 	<!-- Identifying 1943 (UK) (1988) [Original].zip... --> <!-- CPC Power -->
-	<software name="1943" supported="no">
+	<software name="1943">
 		<description>1943 (UK)</description>
 		<year>1988</year>
 		<publisher>Go! ~ Capcom</publisher>
@@ -474,9 +472,8 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- Possibly BAD DUMP?? (see CPC Power) Anyway, it resets to BASIC when trying to load -->
 	<!-- Identifying 2112 AD (UK,F,G,S) (128K) (1986) (CPM) [Original].zip... --> <!-- CPC Power -->
-	<software name="2112ad" supported="no">
+	<software name="2112ad">
 		<description>2112 AD (Euro?)</description>
 		<year>1986</year>
 		<publisher>Design Design</publisher>
@@ -861,9 +858,8 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- goes back to BASIC, probably protection (Alkatraz Protetction System) related -->
 	<!-- Identifying 4x4 Off-Road Racing (UK) (1988) [Original].zip... --> <!-- CPC Power -->
-	<software name="4x4offrd" supported="no">
+	<software name="4x4offrd">
 		<description>4x4 Off-Road Racing (UK)</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
@@ -926,9 +922,8 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- goes back to BASIC, probably protection (Alkatraz Protetction System) related -->
 	<!-- Identifying 720 (UK) (1988) [Original].zip... --> <!-- CPC Power -->
-	<software name="720" supported="no">
+	<software name="720">
 		<description>720° (UK)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
@@ -1561,9 +1556,8 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- goes back to BASIC, protection related -->
 	<!-- Identifying Ace Of Aces (UK) (1985) [Original] (Weak Sectors).zip... --> <!-- CPC Power -->
-	<software name="aceoface" supported="no">
+	<software name="aceoface">
 		<description>Ace of Aces (UK)</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
@@ -1628,9 +1622,8 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- goes back to BASIC, protection related -->
 	<!-- Identifying Acro Jet The Advanced Flight Simulator (UK) (1986) [Original].zip... --> <!-- CPC Power -->
-	<software name="acrojet" supported="no">
+	<software name="acrojet">
 		<description>AcroJet - The Advanced Flight Simulator (UK)</description>
 		<year>1986</year>
 		<publisher>Microprose</publisher>
@@ -1668,9 +1661,8 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- goes back to BASIC, probably protection related -->
 	<!-- Identifying Action Force (UK) (1988) (CPM) [Original].zip... --> <!-- CPC Power -->
-	<software name="actforce" supported="no">
+	<software name="actforce">
 		<description>Action Force (UK)</description>
 		<year>1988</year>
 		<publisher>Virgin Games</publisher>
@@ -2044,7 +2036,6 @@ is shared by a lot of sets... is it a generic boot disk?
 		</part>
 	</software>
 
-<!-- goes back to BASIC, protection related -->
 	<!-- Identifying Adidas Championship Football (UK) (1990) (Spain retail version) [Original].zip... --> <!-- CPC Power -->
 	<software name="adidasfb">
 		<description>Adidas Championship Football (Spa)</description> <!-- Game in English, was the same disk sold in UK too? -->
@@ -40423,7 +40414,7 @@ stick to CPC-Power disks, when available)
 	</software>
 
 	<!-- Identifying Goody (S) (1987) (CPM) [Original].zip... --> <!-- CPC Power -->
-	<software name="goodys19" supported="no">
+	<software name="goodys19">
 		<description>Goody (Spa) (CPM) [Original]</description>
 		<year>1987</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -52044,6 +52035,19 @@ stick to CPC-Power disks, when available)
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="logistic (uk) (1993).dsk" size="194816" crc="d340906b" sha1="be0133846ab14344e1c5202061ac41b290a54d11"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=22wSm4y27Wk -->
+	<software name="logonrun" supported="no">
+		<description>Logon's Run: 3D Meets the Aging Bits</description>
+		<year>2017</year>
+		<publisher>Logon System</publisher>
+		<info name="usage" value="Requires 128K RAM. RUN&quot;LOGON'S" />
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="logon's run - 3d meets the aging bits.dsk" size="194816" crc="780abbd9" sha1="c9e54c2eeb8be7f6cf967d4e23009b8ab03a6c4b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -70130,6 +70134,26 @@ stick to CPC-Power disks, when available)
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="screwball (uk) (1985).dsk" size="194816" crc="e953f63f" sha1="ab8139880c312dfb593d0625a30768e9aa305dea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=LRiWzqBwAzo -->
+	<software name="scrollf" supported="no">
+		<description>Scroll Factory</description>
+		<year>2018</year>
+		<publisher>Impact &amp; Praline &amp; GPA</publisher>
+		<info name="usage" value="Requires 128K RAM. RUN&quot;SCROLLF for the complete version, RUN&quot;SCROLLFL for the light version" />
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Complete version"/>
+			<dataarea name="flop" size="194816">
+				<rom name="scroll factory complete (tom&amp;jerry+barjack+ast).dsk" size="194816" crc="daafd242" sha1="a0c2ff9cb74289a21dfdf03d60a8f13069acbec6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Light version"/>
+			<dataarea name="flop" size="194816">
+				<rom name="scroll factory light (tom&amp;jerry+barjack+ast).dsk" size="194816" crc="65b11f7c" sha1="b03b16fa845c758e86ea0b0bb735374ff7630300"/>
 			</dataarea>
 		</part>
 	</software>
@@ -89794,9 +89818,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (UK) (1991) [Original] (Weak Sectors).zip... --> <!-- CPC Power -->
+	<!-- Identifying WWF WrestleMania (UK) (1991) [Original] (Weak Sectors).zip... --> <!-- CPC Power -->
 	<software name="wwfwrest" supported="no">
-		<description>WWF Wrestlemania (UK) [Original] (Weak Sectors)</description>
+		<description>WWF WrestleMania (UK) [Original] (Weak Sectors)</description>
 		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -89806,9 +89830,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (UK) (1991).zip... --> <!-- CPC Power -->
+	<!-- Identifying WWF WrestleMania (UK) (1991).zip... --> <!-- CPC Power -->
 	<software name="wwfwrest01" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania (UK)</description>
+		<description>WWF WrestleMania (UK)</description>
 		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -110956,9 +110980,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (E).dsk... --> <!-- CPC Base -->
+	<!-- Identifying WWF WrestleMania (E).dsk... --> <!-- CPC Base -->
 	<software name="wwfwrest02" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania (Euro)</description>
+		<description>WWF WrestleMania (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -155202,9 +155226,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (1991)(Ocean Software).dsk... --> <!-- Mostly GoodCPC -->
+	<!-- Identifying WWF WrestleMania (1991)(Ocean Software).dsk... --> <!-- Mostly GoodCPC -->
 	<software name="wwfwrest03" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania (Ocean Software)</description>
+		<description>WWF WrestleMania (Ocean Software)</description>
 		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -155214,9 +155238,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (1991)(Ocean Software)[a].dsk... --> <!-- Mostly GoodCPC -->
+	<!-- Identifying WWF WrestleMania (1991)(Ocean Software)[a].dsk... --> <!-- Mostly GoodCPC -->
 	<software name="wwfwrest04" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania (Ocean Software)[a]</description>
+		<description>WWF WrestleMania (Ocean Software)[a]</description>
 		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -190706,9 +190730,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (UK) (1991) [h1].dsk... --> <!-- GoodCPC -->
+	<!-- Identifying WWF WrestleMania (UK) (1991) [h1].dsk... --> <!-- GoodCPC -->
 	<software name="wwfwrest05" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania (UK) [h1]</description>
+		<description>WWF WrestleMania (UK) [h1]</description>
 		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -218457,9 +218481,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania #1 (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
+	<!-- Identifying WWF WrestleMania #1 (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
 	<software name="wwfwrest06" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania #1</description>
+		<description>WWF WrestleMania #1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -218469,9 +218493,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania #2 [a] (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
+	<!-- Identifying WWF WrestleMania #2 [a] (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
 	<software name="wwfwrest07" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania #2 [a]</description>
+		<description>WWF WrestleMania #2 [a]</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -218481,9 +218505,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania #2 (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
+	<!-- Identifying WWF WrestleMania #2 (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
 	<software name="wwfwrest08" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania #2</description>
+		<description>WWF WrestleMania #2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -218493,9 +218517,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (ERBE Software) (1991) (Small Cardboard Box) (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
+	<!-- Identifying WWF WrestleMania (ERBE Software) (1991) (Small Cardboard Box) (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
 	<software name="wwfwrest09" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania (ERBE Software) (Small Cardboard Box)</description>
+		<description>WWF WrestleMania (ERBE Software) (Small Cardboard Box)</description>
 		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -218505,9 +218529,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (Ocean) (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
+	<!-- Identifying WWF WrestleMania (Ocean) (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
 	<software name="wwfwrest0a" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania (Ocean)</description>
+		<description>WWF WrestleMania (Ocean)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -218517,9 +218541,9 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
-	<!-- Identifying WWF Wrestlemania (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
+	<!-- Identifying WWF WrestleMania (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
 	<software name="wwfwrest0b" cloneof="wwfwrest" supported="no">
-		<description>WWF Wrestlemania</description>
+		<description>WWF WrestleMania</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -253494,7 +253518,7 @@ stick to CPC-Power disks, when available)
 	</software>
 
 	<!-- Identifying 3D 4 en Raya &amp; Space Trucker &amp; Base Lunar Alfa &amp; Cargamento Espacial &amp; Frutties &amp; Santas Grotty &amp; Egg Blitz &amp; Smaley vs Grumpis &amp; Space Base (nongoodcpc).dsk... --> <!-- NonGoodCPC -->
-	<software name="3d4enray" supported="no">
+	<software name="3d4enray">
 		<description>3D 4 en Raya &amp; Space Trucker &amp; Base Lunar Alfa &amp; Cargamento Espacial &amp; Frutties &amp; Santas Grotty &amp; Egg Blitz &amp; Smaley vs Grumpis &amp; Space Base</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

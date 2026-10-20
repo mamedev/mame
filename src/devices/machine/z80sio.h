@@ -205,8 +205,8 @@ public:
 	void write_rx(int state) { m_rxd = state; }
 	void cts_w(int state);
 	void dcd_w(int state);
-	void rxc_w(int state);
-	void txc_w(int state);
+	virtual void rxc_w(int state);
+	virtual void txc_w(int state);
 	void sync_w(int state);
 
 	// Register state
@@ -329,6 +329,7 @@ protected:
 	int m_tx_count;     // clocks until next bit transition
 	bool m_tx_phase;    // phase of bit clock
 	bool m_tx_parity;   // accumulated parity
+	bool m_tx_int_disarm; // no more characters to send, transmit interrupts/DMA requests inhibited
 	bool m_tx_in_pkt;   // In active part of packet (sync mode)
 	bool m_tx_forced_sync;  // Force sync/flag
 	uint32_t m_tx_sr;   // transmit shift register
@@ -341,9 +342,14 @@ protected:
 	int m_txd;
 	int m_dtr;          // data terminal ready
 	int m_rts;          // request to send
+	int m_rxdrq;        // receive DMA request
+	int m_txdrq;        // transmit DMA request
 
 	// external/status monitoring
+	uint8_t m_rr0_latch; // external/status bits of RR0 frozen at the last latched condition
 	bool m_ext_latched; // changed data lines
+	bool m_ext_changed; // external/status changed again while RR0 was latched
+	attotime m_ext_latch_time; // when RR0 was latched
 	bool m_brk_latched; // break status latched
 	int m_cts;          // clear to send line state
 	int m_dcd;          // data carrier detect line state
@@ -360,6 +366,8 @@ protected:
 	void out_rts_cb(int state);
 	void out_dtr_cb(int state);
 	void update_wait_ready();
+	void update_dma_request();
+	bool is_sdlc() const;
 	bool receive_allowed() const;
 	virtual bool transmit_allowed() const;
 
@@ -434,6 +442,8 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	virtual bool transmit_allowed() const override;
+	virtual void rxc_w(int state) override;
+	virtual void txc_w(int state) override;
 
 private:
 	uint8_t cmdreg_r();
@@ -459,6 +469,7 @@ private:
 	TIMER_CALLBACK_MEMBER(brg_timeout);
 
 	bool m_tx_auto_enable;
+	bool m_loop_mode;
 	uint8_t m_brg_tc;
 	uint8_t m_brg_control;
 	bool m_brg_state;
@@ -547,8 +558,15 @@ protected:
 	void trigger_interrupt(int index, int type);
 	void clear_interrupt(int index, int type);
 	void return_from_interrupt();
+	virtual void update_interrupt_pending(int index);
 	virtual uint8_t read_vector();
 	virtual int const *interrupt_priorities() const;
+
+	// the Z80 SIO has no DMA request outputs
+	virtual bool is_dma_channel(int index) const { return false; }
+
+	// the Z80 SIO has a /SYNC pin on both channels
+	virtual bool has_sync_input(int index) const { return true; }
 
 	int get_channel_index(z80sio_channel const *ch) const { return (ch == m_chanA) ? 0 : 1; }
 
@@ -602,6 +620,8 @@ protected:
 
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_z80daisy_interface implementation
 	virtual int z80daisy_irq_ack() override;
@@ -609,6 +629,13 @@ protected:
 
 	virtual uint8_t read_vector() override;
 	virtual int const *interrupt_priorities() const override;
+	virtual bool is_dma_channel(int index) const override;
+	virtual bool has_sync_input(int index) const override;
+
+private:
+	// interrupt acknowledge state for the 8085 modes
+	uint8_t m_ack_cycle;
+	uint8_t m_ack_vector;
 };
 
 class upd7201_device : public i8274_device
@@ -617,7 +644,7 @@ public:
 	upd7201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
-class mk68564_device : public i8274_device
+class mk68564_device : public z80sio_device
 {
 public:
 	mk68564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -631,6 +658,14 @@ public:
 protected:
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	// device_z80daisy_interface implementation
+	virtual int z80daisy_irq_state() override;
+	virtual int z80daisy_irq_ack() override;
+	virtual void z80daisy_irq_reti() override;
+
+	virtual void update_interrupt_pending(int index) override;
+	virtual uint8_t read_vector() override;
 
 private:
 	void vectrg_w(uint8_t data);

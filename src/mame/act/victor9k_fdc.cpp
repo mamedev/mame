@@ -25,10 +25,6 @@
 
 */
 
-/*
-    TODO: write protect
-*/
-
 #include "emu.h"
 #include "victor9k_fdc.h"
 
@@ -245,6 +241,7 @@ void victor_9000_fdc_device::device_start()
 	t_tach[1] = timer_alloc(FUNC(victor_9000_fdc_device::tach1_tick), this);
 
 	// state saving
+	save_item(NAME(m_p2));
 	save_item(NAME(m_da));
 	save_item(NAME(m_start));
 	save_item(NAME(m_stop));
@@ -265,9 +262,75 @@ void victor_9000_fdc_device::device_start()
 	save_item(NAME(m_side));
 	save_item(NAME(m_drw));
 	save_item(NAME(m_erase));
+	save_item(NAME(m_wd));
+	save_item(NAME(m_wrsync));
 	save_item(NAME(m_via4_irq));
 	save_item(NAME(m_via5_irq));
 	save_item(NAME(m_via6_irq));
+
+	save_item(NAME(cur_live.tm));
+	save_item(NAME(cur_live.state));
+	save_item(NAME(cur_live.next_state));
+	save_item(NAME(cur_live.drive));
+	save_item(NAME(cur_live.side));
+	save_item(NAME(cur_live.drw));
+	save_item(NAME(cur_live.i));
+	save_item(NAME(cur_live.e));
+	save_item(NAME(cur_live.shift_reg));
+	save_item(NAME(cur_live.bit_counter));
+	save_item(NAME(cur_live.sync_bit_counter));
+	save_item(NAME(cur_live.sync_byte_counter));
+	save_item(NAME(cur_live.brdy));
+	save_item(NAME(cur_live.lbrdy_changed));
+	save_item(NAME(cur_live.sync));
+	save_item(NAME(cur_live.syn));
+	save_item(NAME(cur_live.syn_changed));
+	save_item(NAME(cur_live.gcr_err));
+	save_item(NAME(cur_live.shift_reg_write));
+	save_item(NAME(cur_live.wd));
+	save_item(NAME(cur_live.wrsync));
+	save_item(NAME(cur_live.gcr_data));
+	save_item(NAME(cur_live.erase));
+
+	save_item(NAME(checkpoint_live.tm));
+	save_item(NAME(checkpoint_live.state));
+	save_item(NAME(checkpoint_live.next_state));
+	save_item(NAME(checkpoint_live.drive));
+	save_item(NAME(checkpoint_live.side));
+	save_item(NAME(checkpoint_live.drw));
+	save_item(NAME(checkpoint_live.i));
+	save_item(NAME(checkpoint_live.e));
+	save_item(NAME(checkpoint_live.shift_reg));
+	save_item(NAME(checkpoint_live.bit_counter));
+	save_item(NAME(checkpoint_live.sync_bit_counter));
+	save_item(NAME(checkpoint_live.sync_byte_counter));
+	save_item(NAME(checkpoint_live.brdy));
+	save_item(NAME(checkpoint_live.lbrdy_changed));
+	save_item(NAME(checkpoint_live.sync));
+	save_item(NAME(checkpoint_live.syn));
+	save_item(NAME(checkpoint_live.syn_changed));
+	save_item(NAME(checkpoint_live.gcr_err));
+	save_item(NAME(checkpoint_live.shift_reg_write));
+	save_item(NAME(checkpoint_live.wd));
+	save_item(NAME(checkpoint_live.wrsync));
+	save_item(NAME(checkpoint_live.gcr_data));
+	save_item(NAME(checkpoint_live.erase));
+
+	save_item(NAME(cur_pll.ctime));
+	save_item(NAME(cur_pll.period));
+	save_item(NAME(cur_pll.min_period));
+	save_item(NAME(cur_pll.max_period));
+	save_item(NAME(cur_pll.period_adjust_base));
+	save_item(NAME(cur_pll.phase_adjust));
+	save_item(NAME(cur_pll.freq_hist));
+
+	save_item(NAME(checkpoint_pll.ctime));
+	save_item(NAME(checkpoint_pll.period));
+	save_item(NAME(checkpoint_pll.min_period));
+	save_item(NAME(checkpoint_pll.max_period));
+	save_item(NAME(checkpoint_pll.period_adjust_base));
+	save_item(NAME(checkpoint_pll.phase_adjust));
+	save_item(NAME(checkpoint_pll.freq_hist));
 }
 
 
@@ -828,7 +891,8 @@ uint8_t victor_9000_fdc_device::via6_pa_r()
 	data |= (m_floppy[1]->get_device() ? m_floppy[1]->get_device()->trk00_r() : 0) << 3;
 
 	// write protect sense
-	data |= (m_drive ? (m_floppy[1]->get_device() ? m_floppy[1]->get_device()->wpt_r() : 0) : (m_floppy[0]->get_device() ? m_floppy[0]->get_device()->wpt_r() : 0)) << 6;
+	floppy_image_device *floppy = get_floppy();
+	data |= (floppy ? floppy->wpt_r() : 1) << 6;
 
 	// disk sync detect
 	data |= checkpoint_live.sync << 7;
@@ -1029,7 +1093,7 @@ void victor_9000_fdc_device::drw_w(int state)
 		}
 		else
 		{
-			pll_start_writing(cur_live.tm);
+			pll_start_writing(cur_live.tm, get_floppy());
 		}
 		checkpoint();
 		live_run();
@@ -1110,10 +1174,10 @@ void victor_9000_fdc_device::pll_reset(const attotime &when)
 	cur_pll.set_clock(attotime::from_nsec(2130));
 }
 
-void victor_9000_fdc_device::pll_start_writing(const attotime &tm)
+void victor_9000_fdc_device::pll_start_writing(const attotime &tm, floppy_image_device *floppy)
 {
 	pll_reset(cur_live.tm);
-	cur_pll.start_writing(tm);
+	cur_pll.start_writing(tm, floppy);
 }
 
 void victor_9000_fdc_device::pll_commit(floppy_image_device *floppy, const attotime &tm)
@@ -1247,7 +1311,7 @@ void victor_9000_fdc_device::live_run(const attotime &limit)
 
 			// write bit
 			int write_bit = 0;
-			if (!cur_live.drw) // TODO WPS
+			if (!cur_live.drw)
 			{
 				write_bit = BIT(cur_live.shift_reg_write, 9);
 				if (pll_write_next_bit(write_bit, cur_live.tm, get_floppy(), limit))

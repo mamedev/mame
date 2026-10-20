@@ -515,7 +515,7 @@ void hektor_state::hektor(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_screen_update("ef9364", FUNC(ef9364_device::screen_update));
 	m_screen->set_size(64 * 8, 16 * (8 + 4));
@@ -575,7 +575,7 @@ void hektor3_state::hektor3(machine_config &config)
 
 	I8255(config, m_i8255); // I/O Port
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 240);
 	m_screen->set_screen_update("hd6845", FUNC(hd6845s_device::screen_update));
 

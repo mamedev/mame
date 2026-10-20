@@ -563,7 +563,7 @@ void cubeqst_state::cubeqst(machine_config &config)
 	m_laserdisc->set_overlay_scale(1.0f, 1.030f);
 	m_laserdisc->set_screen(m_screen);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_SELF_RENDER);
 	m_screen->set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
 	m_screen->set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));

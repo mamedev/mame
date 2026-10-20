@@ -33,13 +33,13 @@
 
 #include "emu.h"
 #include "cpu/i86/i286.h"
+#include "machine/am9517a.h"
 #include "machine/bankdev.h"
 #include "machine/eepromser.h"
 #include "machine/input_merger.h"
 #include "machine/mm58274c.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/upd71071.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80daisy.h"
 #include "machine/z80sio.h"
@@ -482,11 +482,13 @@ void apxen_state::apxen(machine_config &config)
 	m_io->set_endianness(ENDIANNESS_LITTLE);
 
 	UPD71071(config, m_dmac, 8000000);
-	m_dmac->set_cpu_tag("maincpu");
-	m_dmac->set_clock(8000000);
 	m_dmac->out_eop_callback().set(m_pic[1], FUNC(pic8259_device::ir2_w));
-	m_dmac->dma_read_callback<1>().set(m_fdc, FUNC(wd2797_device::data_r));
-	m_dmac->dma_write_callback<1>().set(m_fdc, FUNC(wd2797_device::data_w));
+	m_dmac->in_memr_callback().set([this](offs_t offset) { return m_maincpu->space(AS_PROGRAM).read_byte(offset); });
+	m_dmac->out_memw_callback().set([this](offs_t offset, u8 data) { return m_maincpu->space(AS_PROGRAM).write_byte(offset, data); });
+	m_dmac->in_ior_callback<1>().set(m_fdc, FUNC(wd2797_device::data_r));
+	m_dmac->out_iow_callback<1>().set(m_fdc, FUNC(wd2797_device::data_w));
+	m_dmac->out_hreq_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_dmac->out_hreq_callback().append(m_dmac, FUNC(upd71071_device::hack_w));
 
 	EEPROM_93C06_16BIT(config, m_eeprom); // NMC9306
 	m_eeprom->do_callback().set(m_sio, FUNC(z80sio_device::ctsb_w));
@@ -532,7 +534,7 @@ void apxen_state::apxen(machine_config &config)
 	// floppy
 	WD2797(config, m_fdc, 2000000);
 	m_fdc->intrq_wr_callback().set(m_pic[1], FUNC(pic8259_device::ir1_w));
-	m_fdc->drq_wr_callback().set([this](int state) { m_dmac->dmarq(state, 1); });
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(upd71071_device::dreq1_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", apricot_floppies, "d32w", apxen_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", apricot_floppies, "d32w", apxen_state::floppy_formats);
 

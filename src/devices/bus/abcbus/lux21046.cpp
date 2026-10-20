@@ -123,8 +123,8 @@ ROM_START( luxor_55_21046 )
 	ROM_SYSTEM_BIOS( 4, "v207", "DiAB v2.07 (1987-06-24)" )
 	ROMX_LOAD( "diab 207.6cd", 0x2000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2), ROM_BIOS(4) )
 
-	ROM_REGION( 0x104, "plds", 0 )
-	ROM_LOAD( "pal16r4.2a", 0x000, 0x104, NO_DUMP)
+	//ROM_REGION( 0x104, "plds", 0 )
+	//ROM_LOAD( "pal16r4.2a", 0x000, 0x104, NO_DUMP)
 ROM_END
 
 
@@ -865,7 +865,7 @@ uint8_t luxor_55_21046_device::abcbus_stat()
 //  abcbus_inp -
 //-------------------------------------------------
 
-uint8_t luxor_55_21046_device::abcbus_inp()
+uint8_t luxor_55_21046_device::abcbus_inp(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -883,7 +883,7 @@ uint8_t luxor_55_21046_device::abcbus_inp()
 //  abcbus_out -
 //-------------------------------------------------
 
-void luxor_55_21046_device::abcbus_out(uint8_t data)
+void luxor_55_21046_device::abcbus_out(offs_t offset, uint8_t data)
 {
 	if (m_cs)
 	{
@@ -926,7 +926,7 @@ void luxor_55_21046_device::abcbus_c3(uint8_t data)
 
 void luxor_55_21046_device::abcbus_c4(uint8_t data)
 {
-	// TODO connected to PAL16R4 pin 2
+	// connected to PAL16R4 pin 2
 }
 
 

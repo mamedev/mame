@@ -532,7 +532,9 @@ public:
 		m_main_ram(*this, "main_ram"),
 		m_sub_ram(*this, "sub_ram"),
 		m_gfx_ram0(*this, "gfx_main_ram_0"),
-		m_gfx_ram1(*this, "gfx_main_ram_1")
+		m_gfx_ram1(*this, "gfx_main_ram_1"),
+		m_mailbox_timeout(nullptr),
+		m_mailbox_posted(false)
 	{
 	}
 
@@ -558,6 +560,7 @@ public:
 	uint64_t main_fifo_r(offs_t offset, uint64_t mem_mask = ~0);
 	void main_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void main_cpu_dc_store(offs_t offset, uint32_t data);
+	TIMER_CALLBACK_MEMBER(mailbox_release);
 
 	uint32_t sub_comram_r(offs_t offset);
 	void sub_comram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -615,6 +618,13 @@ public:
 
 	uint8_t m_main_int_active = 0;
 
+	// The BIOS handshakes between the main and GFX CPUs through one word near the top of GFX RAM bank 1
+	static constexpr offs_t MAILBOX_MAIN_ADDR = 0xc7ff7ffc;     // as the main CPU sees it
+	static constexpr offs_t MAILBOX_GFX_ADDR = 0x07ff7ffc;      // as the GFX CPU sees it
+	static constexpr int MAILBOX_TRIGGER = 7120;
+
+	emu_timer *m_mailbox_timeout;
+	bool m_mailbox_posted;                                      // main CPU is held until the GFX CPU reads the mailbox
 
 	std::unique_ptr<uint32_t[]> m_comram[2];
 	int m_comram_page = 0;
@@ -1126,8 +1136,12 @@ void cobra_state::m2sfifo_event_callback(cobra_fifo::EventType event)
 		{
 			m_subcpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
-			// give sub cpu a bit more time to stabilize on the current fifo status
-			m_maincpu->spin_until_time(attotime::from_usec(1));
+			// Give sub cpu time to see what was written, unless the main CPU is being
+			// held for the mailbox.
+			if (!m_mailbox_posted)
+			{
+				m_maincpu->spin_until_time(attotime::from_usec(1));
+			}
 
 			if (m_m2s_int_enable & 0x80)
 			{
@@ -1452,6 +1466,18 @@ void cobra_state::main_fifo_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 			// racjamdx
 			else if (strcmp(machine().system().name, "racjamdx") == 0)
 			{
+				uint32_t *main_ram = (uint32_t*)(uint64_t*)m_main_ram;
+				uint32_t *sub_ram = (uint32_t*)m_sub_ram;
+				uint32_t *gfx_ram = (uint32_t*)(uint64_t*)m_gfx_ram0;
+
+				main_ram[(0x001a48^4) / 4] = 0x60000000;    // don't wait for the sub board's ready message
+
+				sub_ram[0x2394 / 4] = 0x4800001c;           // skip sound_init() status check (RF5C400 sample RAM checksum + DSP upload)
+				sub_ram[0x23f4 / 4] = 0x4800001c;           // skip "Lanc Fpga2 Initialize error"
+				sub_ram[0x246c / 4] = 0x60000000;           // skip external interrupt setup
+				sub_ram[0x2510 / 4] = 0x48000014;           // skip config-dependent setup
+
+				gfx_ram[(0x386354^4) / 4] = 0x38600000;     // skip check_one_scene() in drawcheck()
 			}
 		}
 
@@ -1494,11 +1520,24 @@ void cobra_state::main_comram_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 
 void cobra_state::main_cpu_dc_store(offs_t offset, uint32_t data)
 {
-	if ((offset & 0xf0000000) == 0xc0000000)
+	// The main CPU caches GFX RAM write-back, so the BIOS flushes each value it posts in the mailbox
+	// with dcbst.  It then assumes the GFX CPU sees that value before the next one replaces it, which
+	// can be well under 100 usec later, while the GFX CPU only polls between redraws of its progress
+	// display.  Hold the main CPU until the GFX CPU has read the mailbox, with a timeout in case it
+	// isn't polling.
+	if ((offset & ~0x1f) == (MAILBOX_MAIN_ADDR & ~0x1f))
 	{
-		// force sync when writing to GFX board main ram
-		m_maincpu->spin_until_time(attotime::from_usec(80));
+		m_mailbox_posted = true;
+		m_mailbox_timeout->adjust(attotime::from_msec(1));
+		m_maincpu->spin_until_trigger(MAILBOX_TRIGGER);
 	}
+}
+
+TIMER_CALLBACK_MEMBER(cobra_state::mailbox_release)
+{
+	m_mailbox_posted = false;
+	m_mailbox_timeout->adjust(attotime::never);
+	machine().scheduler().trigger(MAILBOX_TRIGGER);
 }
 
 void cobra_state::cobra_main_map(address_map &map)
@@ -2924,12 +2963,32 @@ void cobra_state::machine_start()
 	m_subcpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, false, m_sub_ram);
 
 	m_gfxcpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, false, m_gfx_ram0);
-	m_gfxcpu->ppcdrc_add_fastram(0x07c00000, 0x07ffffff, false, m_gfx_ram1);
+
+	// the GFX CPU's reads of the mailbox release the main CPU, so keep its page off the fast path
+	const offs_t mailbox_page = MAILBOX_GFX_ADDR & ~0xfff;
+	m_gfxcpu->ppcdrc_add_fastram(0x07c00000, mailbox_page - 1, false, m_gfx_ram1);
+	m_gfxcpu->ppcdrc_add_fastram(mailbox_page + 0x1000, 0x07ffffff, false, &m_gfx_ram1[(mailbox_page + 0x1000 - 0x07c00000) / 8]);
+
+	// the mailbox is the low half of its doubleword on this big-endian bus
+	m_gfxcpu->space(AS_PROGRAM).install_read_tap(MAILBOX_GFX_ADDR & ~7, MAILBOX_GFX_ADDR | 7, "mailbox_r",
+			[this] (offs_t offset, uint64_t &data, uint64_t mem_mask)
+			{
+				if (m_mailbox_posted && ACCESSING_BITS_0_31)
+				{
+					mailbox_release(0);
+				}
+			});
+
+	m_mailbox_timeout = timer_alloc(FUNC(cobra_state::mailbox_release), this);
 }
 
 void cobra_state::machine_reset()
 {
 	m_sub_interrupt = 0xff;
+
+	// a reset abandons any mailbox handshake in progress
+	m_mailbox_posted = false;
+	m_mailbox_timeout->adjust(attotime::never);
 
 	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
 	uint16_t *identify_device = hdd->identify_device_buffer();
@@ -2974,7 +3033,7 @@ void cobra_state::cobra(machine_config &config)
 
 	/* video hardware */
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(1024, 1024);
 	m_screen->set_visarea(40, 511+40, 31, 399+31);
@@ -3071,7 +3130,7 @@ void cobra_state::init_bujutsu()
 {
 	init_cobra();
 
-	// rom hacks for sub board...
+	// HACK: ROM hacks for sub board...
 	{
 		uint32_t *rom = (uint32_t*)memregion("user2")->base();
 
@@ -3079,7 +3138,7 @@ void cobra_state::init_bujutsu()
 	}
 
 
-	// rom hacks for gfx board...
+	// HACK: ROM hacks for gfx board...
 	{
 		int i;
 		uint32_t sum = 0;
@@ -3103,7 +3162,7 @@ void cobra_state::init_bujutsu()
 
 
 
-	// fill in M48T58 data for now...
+	// HACK: fill in M48T58 data for now...
 	{
 		uint8_t *rom = (uint8_t*)memregion("m48t58")->base();
 		rom[0x00] = 0x47;       // G
@@ -3153,7 +3212,7 @@ void cobra_state::init_racjamdx()
 {
 	init_cobra();
 
-	// rom hacks for sub board...
+	// HACK: ROM hacks for sub board...
 	{
 		uint32_t *rom = (uint32_t*)memregion("user2")->base();
 
@@ -3176,7 +3235,7 @@ void cobra_state::init_racjamdx()
 	}
 
 
-	// rom hacks for gfx board...
+	// HACK: ROM hacks for gfx board...
 	{
 		uint32_t sum = 0;
 
@@ -3200,7 +3259,7 @@ void cobra_state::init_racjamdx()
 	}
 
 
-	// fill in M48T58 data for now...
+	// HACK: fill in M48T58 data for now...
 	{
 		uint8_t *rom = (uint8_t*)memregion("m48t58")->base();
 		rom[0x00] = 0x47;       // G

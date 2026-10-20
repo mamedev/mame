@@ -162,7 +162,7 @@ uint32_t zerozone_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 void zerozone_state::sound_w(uint8_t data)
 {
 	m_soundlatch->write(data);
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 
@@ -294,7 +294,7 @@ void zerozone_state::zerozone(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

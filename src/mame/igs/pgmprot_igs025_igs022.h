@@ -15,24 +15,26 @@ public:
 	{
 	}
 
-	void init_killbld();
-	void init_drgw3();
+	void init_killbld() ATTR_COLD;
+	void init_drgw3() ATTR_COLD;
 
-	void pgm_022_025(machine_config &config);
-	void pgm_022_025_dw3(machine_config &config);
-	void pgm_022_025_killbld(machine_config &config);
+	void pgm_022_025(machine_config &config) ATTR_COLD;
+	void pgm_022_025_dw3(machine_config &config) ATTR_COLD;
+	void pgm_022_025_killbld(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<igs025_device> m_igs025;
 	required_device<igs022_device> m_igs022;
 
-	void pgm_dw3_decrypt();
-	void pgm_killbld_decrypt();
-
 	DECLARE_MACHINE_RESET(killbld);
 	DECLARE_MACHINE_RESET(dw3);
 
-	void igs025_to_igs022_callback(void);
+	void igs025_to_igs022_callback();
+	u8 killbld_source_data_r(u32 region, u8 addr);
+	u8 drgw3_source_data_r(u32 region, u8 addr);
+
+	void pgm_dw3_decrypt() ATTR_COLD;
+	void pgm_killbld_decrypt() ATTR_COLD;
 
 	void killbld_mem(address_map &map) ATTR_COLD;
 };

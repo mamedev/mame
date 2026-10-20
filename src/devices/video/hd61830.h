@@ -28,6 +28,9 @@ public:
 
 	auto rd_rd_callback() { return m_read_rd.bind(); }
 
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+
 	uint8_t status_r();
 	void control_w(uint8_t data);
 

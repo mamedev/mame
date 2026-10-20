@@ -55,15 +55,17 @@ function data.startplugin()
 					return nil
 				end
 				valid_lst = {}
+				local str_match = string.match
+				local table_ins = table.insert
 				for num, scr in ipairs(data_scr) do
-					local setname, softname = set:match('^([^,]+),?(.*)$')
+					local setname, softname = str_match(set, '^([^,]+),?(.*)$')
 					if softname == '' then
 						softname = nil
 					end
 					local name = scr.check(setname, softname)
 					if name then
-						table.insert(ret, name)
-						table.insert(valid_lst, scr)
+						table_ins(ret, name)
+						table_ins(valid_lst, scr)
 					end
 				end
 				cur_list = ret

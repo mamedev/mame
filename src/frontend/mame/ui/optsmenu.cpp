@@ -27,6 +27,10 @@
 #include "fileio.h"
 #include "rendfont.h"
 
+#include "util/ioprocsstream.h"
+
+#include <locale>
+
 
 namespace ui {
 
@@ -248,7 +252,13 @@ bool menu_game_options::handle_item_event(event const &menu_event)
 							emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 							if (!file.open(util::string_format("custom_%s_filter.ini", emulator_info::get_configname())))
 							{
-								filter.save_ini(file, 0);
+								{
+									util::owritestream str(file);
+									str.imbue(std::locale::classic());
+
+									filter.save_ini(str, 0);
+									str << std::flush;
+								}
 								file.close();
 							}
 						}

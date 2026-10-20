@@ -47,7 +47,6 @@ void kayproii_state::kayproii_pio_system_w(u8 data)
 	m_bankr->set_entry(BIT(data, 7));
 	m_bankw->set_entry(BIT(data, 7));
 	m_bank3->set_entry(BIT(data, 7));
-	m_is_motor_off = BIT(data, 6);
 
 	m_floppy = nullptr;
 	if (BIT(data, 0))
@@ -110,7 +109,6 @@ void kaypro84_state::kaypro484_system_port_w(u8 data)
 	m_bankr->set_entry(BIT(data, 7));
 	m_bankw->set_entry(BIT(data, 7));
 	m_bank3->set_entry(BIT(data, 7));
-	m_is_motor_off = !BIT(data, 4);
 
 	m_floppy = nullptr;
 	if (!BIT(data, 0))
@@ -170,46 +168,31 @@ void kaypro84_state::kaypro484_system_port_w(u8 data)
 
     Floppy Disk
 
-    If DRQ or IRQ is set, and cpu is halted, the NMI goes low.
-    Since the HALT occurs last (and has no callback mechanism), we need to set
-    a short delay, to give time for the processor to execute the HALT before NMI
-    becomes active.
+    If DRQ or INTRQ is set, and the CPU is halted, the NMI goes low.
 
 *************************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(kaypro_state::floppy_timer)
+void kaypro_state::update_nmi()
 {
-	bool halt;
-	halt = (bool)m_maincpu->state_int(Z80_HALT);
-	if (m_is_motor_off)
-	{
-		m_floppy_timer->adjust(attotime::from_hz(10));
-		return;
-	}
-
-	if ((halt) && (m_fdc_rq & 3) && (m_fdc_rq < 0x80))
-	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		m_fdc_rq |= 0x80;
-	}
-	else
-	if ((m_fdc_rq == 0x80) || ((!halt) && BIT(m_fdc_rq, 7)))
-	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		m_fdc_rq &= 0x7f;
-	}
-	m_floppy_timer->adjust(attotime::from_hz(1e5));
+	m_maincpu->set_input_line(INPUT_LINE_NMI, (m_cpu_halted && m_fdc_rq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
+void kaypro_state::cpu_halt_w(int state)
+{
+	m_cpu_halted = bool(state);
+	update_nmi();
+}
 
 void kaypro_state::fdc_intrq_w(int state)
 {
-	m_fdc_rq = (m_fdc_rq & 0x82) | state;
+	m_fdc_rq = (m_fdc_rq & 2) | state;
+	update_nmi();
 }
 
 void kaypro_state::fdc_drq_w(int state)
 {
-	m_fdc_rq = (m_fdc_rq & 0x81) | (state << 1);
+	m_fdc_rq = (m_fdc_rq & 1) | (state << 1);
+	update_nmi();
 }
 
 
@@ -241,7 +224,7 @@ void kaypro_state::machine_start()
 
 	save_item(NAME(m_framecnt));
 	save_item(NAME(m_centronics_busy));
-	save_item(NAME(m_is_motor_off));
+	save_item(NAME(m_cpu_halted));
 	save_item(NAME(m_fdc_rq));
 	save_item(NAME(m_system_port));
 
@@ -267,6 +250,17 @@ void kaypro84_state::machine_start()
 		save_item(NAME(m_rtc_address));
 }
 
+void kaypro10_state::machine_start()
+{
+	kaypro84_state::machine_start();
+
+	m_hdc_buf = std::make_unique<u8[]>(512);
+	save_pointer(NAME(m_hdc_buf), 512);
+	save_item(NAME(m_hdc_ptr));
+	m_hdc->drdy_w(m_hdd->exists() ? 1 : 0);  // WD1002 drive-ready
+	m_hdc->sc_w(1);                          // seek complete (heads at a known track)
+}
+
 void kaypro_state::machine_reset()
 {
 	m_bankr->set_entry(1); // point at rom
@@ -275,7 +269,6 @@ void kaypro_state::machine_reset()
 	m_system_port = 0x80;
 	m_fdc_rq = 0;
 	m_maincpu->reset();
-	m_floppy_timer->adjust(attotime::from_hz(1));   /* kick-start the nmi timer */
 }
 
 

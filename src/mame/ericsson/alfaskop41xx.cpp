@@ -31,6 +31,7 @@ Dansk Datahistorisk Forening - http://datamuseum.dk/
 #include "machine/mc6854.h"
 #include "machine/output_latch.h"
 #include "machine/pla.h"
+#include "machine/ram.h"
 #include "video/mc6845.h"
 
 #include "screen.h"
@@ -78,6 +79,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_vram(*this, "vram")
 		, m_pla(*this, PLA1_TAG)
+		, m_ram(*this, RAM_TAG)
 		, m_chargen(*this, "chargen")
 		, m_tia_adlc(*this, "tia_adlc")
 		, m_tia_dma(*this, "tia_dma")
@@ -100,6 +102,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<pls100_device> m_pla;
+	required_device<ram_device> m_ram;
 
 	/* Video controller */
 	required_region_ptr<uint8_t> m_chargen;
@@ -178,9 +181,8 @@ private:
 void alfaskop4110_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x7fff).ram();
+	// Main memory is installed in machine_start, see -ram.
 	map(0x7800, 0x7fff).ram().share(m_vram); // TODO: Video RAM base address is configurable via NVRAM - this is the default
-	map(0x8000, 0xefff).ram();
 
 	// NVRAM
 	map(0xf600, 0xf6ff).lrw8(NAME([this](offs_t offset) -> uint8_t { LOGNVRAM("nvram_r %04x: %02x\n", offset, 0); return (uint8_t) 0; }),
@@ -310,6 +312,8 @@ void alfaskop4110_state::alfaskop4110(machine_config &config)
 	M6800(config, m_maincpu, XTAL(19'170'000) / 18); // Verified from service manual
 	m_maincpu->set_addrmap(AS_PROGRAM, &alfaskop4110_state::mem_map);
 
+	RAM(config, m_ram).set_default_size("64K").set_extra_options("60K");
+
 	/* Interrupt controller and address modifier PLA */
 	/*
 	 * 82S100 data sheet
@@ -371,7 +375,7 @@ void alfaskop4110_state::alfaskop4110(machine_config &config)
 	//m_crtc->out_vsync_callback().set([this](bool state) { LOGIRQ("CRTC VSYNC: %d\n", state); });
 	//m_crtc->out_vsync_callback().set("irq1", FUNC(input_merger_device::in_w<1>));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(19'170'000, 80 * 8, 0, 80 * 8, 400, 0, 400);
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
@@ -480,6 +484,15 @@ void alfaskop4110_state::machine_start()
 {
 	save_item(NAME(m_irq));
 	save_item(NAME(m_imsk));
+
+	// Two sizes of memory board: the software accepts a top of either F000
+	// or F680 and stops the IPL with "MRW ERROR" for anything else.  Above
+	// F67F are the NVRAM, the I/O boards and the ROM.
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	u32 const top = (m_ram->size() < 0xf680) ? m_ram->size() : 0xf680;
+	space.install_ram(0x0000, 0x77ff, m_ram->pointer());
+	if (top > 0x8000)
+		space.install_ram(0x8000, top - 1, m_ram->pointer() + 0x8000);
 
 	m_poll_start_timer = timer_alloc(FUNC(alfaskop4110_state::poll_start), this);
 	m_poll_start_timer->adjust(attotime::from_msec(5000));

@@ -289,9 +289,13 @@ endif
 
 if HAVE_BOOST_COROUTINE
 spawn_echo_server_SOURCES = spawn/echo_server.cpp
-spawn_echo_server_LDADD = $(LDADD) -lboost_coroutine -lboost_context -lboost_thread -lboost_chrono -lboost_system
+spawn_echo_server_LDADD = $(LDADD) -lboost_coroutine -lboost_context -lboost_thread -lboost_chrono
 spawn_parallel_grep_SOURCES = spawn/parallel_grep.cpp
-spawn_parallel_grep_LDADD = $(LDADD) -lboost_coroutine -lboost_context -lboost_thread -lboost_chrono -lboost_system
+spawn_parallel_grep_LDADD = $(LDADD) -lboost_coroutine -lboost_context -lboost_thread -lboost_chrono
+if HAVE_BOOST_SYSTEM
+spawn_echo_server_LDADD += -lboost_system
+spawn_parallel_grep_LDADD += -lboost_system
+endif
 endif
 
 EXTRA_DIST = \

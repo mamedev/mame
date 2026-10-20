@@ -159,6 +159,21 @@ public:
 
 	void nes_vt_waixing_alt_4mb(machine_config &config) ATTR_COLD;
 	void nes_vt_waixing_alt_pal_8mb(machine_config &config) ATTR_COLD;
+	void nes_vt_waixing_alt_pal_1mb(machine_config &config) ATTR_COLD;
+};
+
+class nes_vt_waixing_alt_lg600fr_state : public nes_vt_waixing_alt_state
+{
+public:
+	nes_vt_waixing_alt_lg600fr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		nes_vt_waixing_alt_state(mconfig, type, tag)
+	{ }
+
+	virtual uint8_t in1_r() override
+	{
+		// different I/O on this
+		return machine().rand() & 0x04;
+	}
 };
 
 class nes_vt_waixing_alt_sporzpp_state : public nes_vt_waixing_alt_state
@@ -665,6 +680,15 @@ void nes_vt_waixing_alt_state::nes_vt_waixing_alt_pal_8mb(machine_config &config
 	NES_VT02_VT03_SOC_WAIXING_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_alt_state::vt_external_space_map_8mbyte);
+	m_soc->set_8000_scramble(0x3, 0x2, 0x1, 0x0, 0x5, 0x4);
+	//m_soc->set_8006_scramble(0x7, 0x8); // this is the default config in the SoC device;
+}
+
+void nes_vt_waixing_alt_state::nes_vt_waixing_alt_pal_1mb(machine_config &config)
+{
+	NES_VT02_VT03_SOC_WAIXING_PAL(config, m_soc, PAL_APU_CLOCK);
+	configure_soc(m_soc);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_alt_state::vt_external_space_map_1mbyte);
 	m_soc->set_8000_scramble(0x3, 0x2, 0x1, 0x0, 0x5, 0x4);
 	//m_soc->set_8006_scramble(0x7, 0x8); // this is the default config in the SoC device;
 }
@@ -1393,6 +1417,11 @@ ROM_START( vt25in1 )
 	ROM_LOAD( "25in1.bin", 0x00000, 0x100000, CRC(1038b5ec) SHA1(e7d1ccafe0edcfa44c11412d2aa771f4ba96b5b8) )
 ROM_END
 
+ROM_START( lg600fr )
+	ROM_REGION( 0x100000, "mainrom", ROMREGION_ERASEFF )
+	ROM_LOAD( "lg600fr.u2a", 0x00000, 0x100000, CRC(73a7eebd) SHA1(e3d2c19f84e5dbed42df2a8cbbffc8f9e113243d) )
+ROM_END
+
 ROM_START( zudugo )
 	ROM_REGION( 0x400000, "mainrom", ROMREGION_ERASEFF )
 	ROM_LOAD( "zudugo.bin", 0x00000, 0x400000, CRC(0fa9d9ad) SHA1(7533eaf51785d8fcced900ea0498281b0cf49dbf) )
@@ -1607,6 +1636,10 @@ CONS( 2004, majkon,    0, 0,  nes_vt_1mb_majkon, nes_vt, nes_vt_state, empty_ini
 CONS( 200?, majgnc,    0, 0,  nes_vt_1mb, majgnc, nes_vt_state,  empty_init, "Majesco / JungleTac", "Golden Nugget Casino", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2004, vt25in1,   0, 0,  nes_vt_1mb, nes_vt, nes_vt_state,  empty_init, "<unknown>", "unknown VT02 based 25-in-1 handheld", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// hybrid console, LCD part is separate, TV part is supported here
+// uses waixing_alt scramble in an unusual way, reading code from the PPU bank and putting it in RAM
+CONS( 2006, lg600fr,   0, 0,  nes_vt_waixing_alt_pal_1mb, nes_vt, nes_vt_waixing_alt_lg600fr_state,  empty_init, "Lexibook", "Sudoku (Lexibook, LG600FR, TV part)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
 CONS( 2004, vsmaxx17,  0,  0,  nes_vt_vh2009_2mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx 17-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // from a Green unit, '17 Classic & Racing Game'

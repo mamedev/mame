@@ -180,15 +180,9 @@ public:
 
 	// writing
 	u32 write(const void *buffer, u32 length);
-	int puts(std::string_view s);
-	int vprintf(util::format_argument_pack<char> const &args);
-	template <typename Format, typename... Params> int printf(Format &&fmt, Params &&...args)
-	{
-		return vprintf(util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
-	}
 
 	// buffers
-	void flush();
+	std::error_condition flush();
 
 private:
 	emu_file(u32 openflags, empty_t);

@@ -470,7 +470,7 @@ void exidy440_state::exidy440_video(machine_config &config)
 {
 	PALETTE(config, m_palette).set_entries(512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(exidy440_state::screen_update_exidy440));

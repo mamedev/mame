@@ -22,22 +22,20 @@
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
 #include "machine/bankdev.h"
-#include "machine/eepromser.h"
-#include "machine/i8214.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/timer.h"
 #include "machine/upd1990a.h"
 #include "sound/beep.h"
 #include "sound/ymopn.h"
+
+#include "pc88_alu.h"
+#include "pc88_sdip.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
-
-#define I8214_TAG       "i8214"
 
 class pc8801_state : public pc8001_base_state
 {
@@ -47,7 +45,6 @@ public:
 //      , m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_pc80s31(*this, "pc80s31")
-		, m_pic(*this, I8214_TAG)
 		, m_usart(*this, "usart")
 //      , m_cassette(*this, "cassette")
 		, m_beeper(*this, "beeper")
@@ -65,7 +62,7 @@ public:
 	{
 	}
 
-	void pc8801(machine_config &config);
+	void pc8801(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -87,7 +84,6 @@ protected:
 //  required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<pc80s31_device> m_pc80s31;
-	optional_device<i8214_device> m_pic;
 //  required_device<upd1990a_device> m_rtc;
 	required_device<i8251_device> m_usart;
 //  required_device<cassette_image_device> m_cassette;
@@ -103,8 +99,6 @@ protected:
 	required_device<pc8801_exp_slot_device> m_exp;
 	memory_view m_window_view;
 	required_device<address_map_bank_device> m_gvram_bank;
-
-	void int4_irq_w(int state);
 
 	std::unique_ptr<uint8_t[]> m_gvram;
 	uint8_t m_gfx_ctrl = 0;
@@ -158,8 +152,6 @@ private:
 	void port40_w(uint8_t data);
 	uint8_t vram_select_r();
 	void vram_select_w(offs_t offset, uint8_t data);
-	void irq_level_w(uint8_t data);
-	void irq_mask_w(uint8_t data);
 	uint8_t window_bank_r();
 	void window_bank_w(uint8_t data);
 	void window_bank_inc_w(uint8_t data);
@@ -179,39 +171,12 @@ private:
 	void txdata_callback(int state);
 
 	// video section
-	void draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func);
+	template <typename T>
+	void draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, T &&dot_func);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void palette_reset();
 	bitmap_rgb32 m_text_bitmap;
-
-	// irq section
-	void rxrdy_irq_w(int state);
-	void vrtc_irq_w(int state);
-	TIMER_DEVICE_CALLBACK_MEMBER(clock_irq_w);
-	IRQ_CALLBACK_MEMBER(int_ack_cb);
-	void irq_w(int state);
-
-	struct {
-		u8 enable = 0, pending = 0;
-	} m_irq_state;
-
-	bool m_sound_irq_enable = false;
-	bool m_sound_irq_pending = false;
-
-	enum {
-		RXRDY_IRQ_LEVEL = 0,
-		VRTC_IRQ_LEVEL,
-		CLOCK_IRQ_LEVEL,
-		INT3_IRQ_LEVEL,
-		INT4_IRQ_LEVEL,
-		INT5_IRQ_LEVEL,
-		FDCINT1_IRQ_LEVEL,
-		FDCINT2_IRQ_LEVEL
-	};
-
-	void assert_irq(u8 level);
-	void check_irq(u8 level);
 };
 
 class pc8801mk2sr_state : public pc8801_state
@@ -219,12 +184,13 @@ class pc8801mk2sr_state : public pc8801_state
 public:
 	pc8801mk2sr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc8801_state(mconfig, type, tag)
+		, m_alu(*this, "alu")
 		, m_opn(*this, "opn")
 		, m_alu_view(*this, "alu_view")
 	{ }
 
-	void pc8801mk2sr(machine_config &config);
-	void pc8801mk2mr(machine_config &config);
+	void pc8801mk2sr(machine_config &config) ATTR_COLD;
+	void pc8801mk2mr(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -237,19 +203,14 @@ protected:
 	uint8_t opn_portb_r();
 	void opn_portb_w(uint8_t data);
 
-	void alu_ctrl1_w(uint8_t data);
 	void alu_ctrl2_w(uint8_t data);
 
+	required_device<pc88_alu_device> m_alu;
 private:
 	optional_device<ym2203_device> m_opn;
 	memory_view m_alu_view;
 
-	uint8_t m_alu_reg[3]{};
-	uint8_t m_alu_ctrl1 = 0;
-	uint8_t m_alu_ctrl2 = 0;
-
-	uint8_t alu_r(offs_t offset);
-	void alu_w(offs_t offset, uint8_t data);
+	u8 m_alu_gam;
 
 	virtual void flush_gvram_access() override;
 };
@@ -266,7 +227,7 @@ public:
 		, m_setup_io_view(*this, "setup_io_view")
 	{ }
 
-	void pc8801fh(machine_config &config);
+	void pc8801fh(machine_config &config) ATTR_COLD;
 
 	template <bool IS_DUMPED> void init_setup_mode();
 
@@ -276,8 +237,10 @@ protected:
 
 	virtual void main_map(address_map &map) override ATTR_COLD;
 	virtual void main_io(address_map &map) override ATTR_COLD;
+
+	bool m_has_setup_mode;
 private:
-	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<pc88_sdip_device> m_eeprom;
 	required_device<ym2608_device> m_opna;
 	memory_view m_setup_mem_view;
 	memory_view m_setup_io_view;
@@ -289,8 +252,6 @@ private:
 
 	uint8_t m_clock_setting = 0;
 	uint8_t m_baudrate_val = 0;
-
-	bool m_has_setup_mode;
 };
 
 // MA has a newer floppy BIOS, an extra dictionary ROM and optional bay for CD-ROM i/f
@@ -302,7 +263,7 @@ public:
 		, m_dictionary_rom(*this, "dictionary")
 	{ }
 
-	void pc8801ma(machine_config &config);
+	void pc8801ma(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -329,14 +290,18 @@ public:
 		: pc8801ma_state(mconfig, type, tag)
 		, m_cdrom_if(*this, "cdrom_if")
 		, m_cdrom_bios(*this, "cdrom_bios")
+		, m_memsw(*this, "memsw")
+		, m_memsw_view(*this, "memsw_view")
 	{ }
 
-	void pc8801mc(machine_config &config);
+	void pc8801mc(machine_config &config) ATTR_COLD;
+	void init_pc8801mc() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+	virtual void main_map(address_map &map) override ATTR_COLD;
 	virtual void main_io(address_map &map) override ATTR_COLD;
 
 private:
@@ -345,6 +310,8 @@ private:
 
 	required_device<pc8801_31_device> m_cdrom_if;
 	required_region_ptr<u8> m_cdrom_bios;
+	required_device<pc8801mc_memsw_device> m_memsw;
+	memory_view m_memsw_view;
 
 	bool m_cdrom_bank = true;
 };

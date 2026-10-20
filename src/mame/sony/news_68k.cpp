@@ -832,7 +832,7 @@ void news_68k_desktop_state::nws1580(machine_config &config)
 	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(m_irq5, FUNC(input_merger_device::in_w<0>));
 	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(m_irq5, FUNC(input_merger_device::in_w<1>));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(64.0_MHz_XTAL, 1024, 0, 1024, 768, 0, 768);
 	m_screen->set_screen_update(FUNC(news_68k_desktop_state::screen_update));
 

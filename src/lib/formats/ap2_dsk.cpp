@@ -896,19 +896,21 @@ std::vector<uint32_t> a2_nib_format::generate_levels_from_nibbles(const std::vec
 			};
 	const auto append_byte = [&levels] (uint8_t byte) { raw_w(levels, 8, byte); };
 
-
+	// Note that FF is a valid data nibble in both 5-of-3 and 6-of-2 encodings,
+	// which means that even long strings of FF may be valid sector data rather
+	// than sync bytes. D5 begins all address and data block headers and is not
+	// supposed to occur anywhere else, so only FF ... FF D5 is counted as a
+	// sync pattern.
 	const auto leading_FF_count = count_leading_FFs(nibbles.begin(), nibbles.end());
 
 	if (leading_FF_count >= nibbles.size()) { // all are 0xff !?!?
-		assert(leading_FF_count >= min_sync_bytes);
 		append_syncs(leading_FF_count);
 		return levels;
 	}
 
 	const auto trailing_padding_size = count_trailing_padding(nibbles);
 	const auto trailing_FF_count = count_leading_FFs(nibbles.rbegin() + trailing_padding_size, nibbles.rend());
-	const auto wrapped_FF_count = leading_FF_count + trailing_FF_count;
-	const bool wrapped_FF_are_syncs = wrapped_FF_count >= min_sync_bytes;
+	const bool wrapped_FF_are_syncs = nibbles[leading_FF_count] == 0xd5;
 
 	if (wrapped_FF_are_syncs) {
 		append_syncs(leading_FF_count);
@@ -919,13 +921,13 @@ std::vector<uint32_t> a2_nib_format::generate_levels_from_nibbles(const std::vec
 	{
 		size_t FF_count = 0;
 		const auto flush_FFs =
-				[&append_syncs, &append_FFs, &FF_count]
+				[&append_syncs, &append_FFs, &FF_count] (bool found_sync)
 				{
 					if (FF_count == 0) {
 						return;
 					}
 
-					if (FF_count >= a2_nib_format::min_sync_bytes) {
+					if (found_sync) {
 						append_syncs(FF_count);
 					} else {
 						append_FFs(FF_count);
@@ -945,10 +947,10 @@ std::vector<uint32_t> a2_nib_format::generate_levels_from_nibbles(const std::vec
 				continue;
 			}
 
-			flush_FFs();
+			flush_FFs(nibble == 0xd5);
 			append_byte(nibble);
 		}
-		flush_FFs();
+		flush_FFs(wrapped_FF_are_syncs);
 	}
 
 	if (wrapped_FF_are_syncs) {

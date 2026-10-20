@@ -151,9 +151,10 @@ drcbe_interface::~drcbe_interface()
 //  drcuml_state - constructor
 //-------------------------------------------------
 
-drcuml_state::drcuml_state(device_t &device, drc_cache &cache, u32 flags, int modes, int addrbits, int ignorebits)
+drcuml_state::drcuml_state(device_t &device, drc_cache &cache, u32 flags, int modes, int addrbits, int ignorebits, u32 max_sequence_length)
 	: m_device(device)
 	, m_cache(cache)
+	, m_max_sequence_length(max_sequence_length)
 	, m_beintf(device.machine().options().drc_use_c()
 			? drc::make_drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits)
 			: drc::make_drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits))

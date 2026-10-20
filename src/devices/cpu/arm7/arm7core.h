@@ -71,6 +71,7 @@ enum
 #define COPRO_DOMAIN_MANAGER                3
 
 #define COPRO_FAULT_NONE                    0
+#define COPRO_FAULT_DEBUG                   2
 #define COPRO_FAULT_TRANSLATE_SECTION       5
 #define COPRO_FAULT_TRANSLATE_PAGE          7
 #define COPRO_FAULT_DOMAIN_SECTION          9
@@ -114,6 +115,9 @@ enum
 #define COPRO_CTRL_ADDRFAULT_EN             0x00000002
 #define COPRO_CTRL_DCACHE_EN                0x00000004
 #define COPRO_CTRL_WRITEBUF_EN              0x00000008
+#define COPRO_CTRL_PROG32                   0x00000010  // ARMv3: 32-bit program space (exceptions enter the 32-bit modes)
+#define COPRO_CTRL_DATA32                   0x00000020  // ARMv3: 32-bit data space (no address exceptions)
+#define COPRO_CTRL_LATE_ABORT               0x00000040  // ARMv3: late abort timing
 #define COPRO_CTRL_ENDIAN                   0x00000080
 #define COPRO_CTRL_SYSTEM                   0x00000100
 #define COPRO_CTRL_ROM                      0x00000200
@@ -131,7 +135,7 @@ enum
 #define COPRO_CTRL_BIG_ENDIAN               1
 #define COPRO_CTRL_INTVEC_0                 0
 #define COPRO_CTRL_INTVEC_F                 1
-#define COPRO_CTRL_MASK                     0x0000338f
+#define COPRO_CTRL_MASK                     0x000033ff
 
 #define COPRO_DOMAIN_ACCESS_CONTROL         m_domainAccessControl
 
@@ -235,7 +239,7 @@ static const int sRegisterTable[ARM7_NUM_MODES][18] =
 		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
 		eR8, eR9, eR10, eR11, eR12,
 		eR13, eR14,
-		eR15, eCPSR  // No SPSR in this mode
+		eR15, eCPSR, eCPSR  // No SPSR in this mode
 	},
 	{ /* FIQ */
 		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
@@ -274,7 +278,7 @@ static const int sRegisterTable[ARM7_NUM_MODES][18] =
 		eR0, eR1, eR2, eR3, eR4, eR5, eR6, eR7,
 		eR8, eR9, eR10, eR11, eR12,
 		eR13, eR14,
-		eR15, eCPSR  // No SPSR in this mode
+		eR15, eCPSR, eCPSR  // No SPSR in this mode
 	}
 };
 
@@ -510,10 +514,17 @@ enum arm7_cpu_device::arm_arch_flag : uint32_t
 	ARCHFLAG_MODE26   = 1U << 6,    // supports 26-bit backwards compatibility mode
 	ARCHFLAG_K        = 1U << 7,    // enhanced MMU extensions present (only for v6)
 	ARCHFLAG_T2       = 1U << 8,    // Thumb-2 present
+	ARCHFLAG_ONLY26   = 1U << 9,    // only the 26-bit modes exist (ARM1/ARM2/ARM3): 26-bit program space, no PROG32/DATA32
+	ARCHFLAG_V2A      = 1U << 10,   // ARMv2a: SWP present (ARM250, ARM3)
 };
 
 enum arm7_cpu_device::arm_copro_id : uint32_t
 {
+	ARM9_COPRO_ID_STEP_SA110_J = 1,
+	ARM9_COPRO_ID_STEP_SA110_K = 2,
+	ARM9_COPRO_ID_STEP_SA110_S = 3,
+	ARM9_COPRO_ID_STEP_SA110_T = 4,
+
 	ARM9_COPRO_ID_STEP_SA1100_A = 0,
 	ARM9_COPRO_ID_STEP_SA1100_B = 1,
 	ARM9_COPRO_ID_STEP_SA1100_C = 2,
@@ -535,6 +546,7 @@ enum arm7_cpu_device::arm_copro_id : uint32_t
 	ARM9_COPRO_ID_STEP_ARM1176JZF_S_R0P7 = 7,
 
 	ARM9_COPRO_ID_PART_ARM1176JZF_S = 0xb76 << 4,
+	ARM9_COPRO_ID_PART_SA110 = 0xa10 << 4,
 	ARM9_COPRO_ID_PART_SA1100 = 0xa11 << 4,
 	ARM9_COPRO_ID_PART_SA1110 = 0xb11 << 4,
 	ARM9_COPRO_ID_PART_ARM946 = 0x946 << 4,

@@ -588,7 +588,7 @@ void imds2ioc_device::device_add_mconfig(machine_config &config)
 	m_ioccrtc->irq_wr_callback().set_inputline(m_ioccpu, I8085_INTR_LINE);
 	m_ioccrtc->set_screen("screen");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update("ioccrtc", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(50);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_imds2);

@@ -894,7 +894,7 @@ void tek6100_state::tek6130(machine_config &config)
 
 		// 13-inch 640x480 60Hz 4-bit color
 		// 15-inch 640x480 60Hz monochrome
-		screen_device &dpu_screen(SCREEN(config, "dpu_screen", SCREEN_TYPE_RASTER));
+		screen_device &dpu_screen(SCREEN(config, "dpu_screen"));
 		dpu_screen.set_raw(25200000, 800, 0, 640, 525, 0, 480);
 		dpu_screen.set_screen_update(FUNC(tek6100_state::screen_update));
 	}

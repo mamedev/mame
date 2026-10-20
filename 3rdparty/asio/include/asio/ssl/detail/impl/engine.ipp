@@ -2,7 +2,7 @@
 // ssl/detail/impl/engine.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -26,10 +26,12 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace ssl {
 namespace detail {
 
-engine::engine(SSL_CTX* context)
+engine::engine(SSL_CTX* context,
+    std::size_t output_buffer_size, std::size_t input_buffer_size)
   : ssl_(::SSL_new(context))
 {
   if (!ssl_)
@@ -40,36 +42,34 @@ engine::engine(SSL_CTX* context)
     asio::detail::throw_error(ec, "engine");
   }
 
-#if (OPENSSL_VERSION_NUMBER < 0x10000000L)
-  accept_mutex().init();
-#endif // (OPENSSL_VERSION_NUMBER < 0x10000000L)
-
-  ::SSL_set_mode(ssl_, SSL_MODE_ENABLE_PARTIAL_WRITE);
-  ::SSL_set_mode(ssl_, SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
-#if defined(SSL_MODE_RELEASE_BUFFERS)
-  ::SSL_set_mode(ssl_, SSL_MODE_RELEASE_BUFFERS);
-#endif // defined(SSL_MODE_RELEASE_BUFFERS)
-
-  ::BIO* int_bio = 0;
-  ::BIO_new_bio_pair(&int_bio, 0, &ext_bio_, 0);
-  ::SSL_set_bio(ssl_, int_bio, int_bio);
+  init(output_buffer_size, input_buffer_size);
 }
 
-engine::engine(SSL* ssl_impl)
+engine::engine(SSL* ssl_impl,
+    std::size_t output_buffer_size, std::size_t input_buffer_size)
   : ssl_(ssl_impl)
+{
+  init(output_buffer_size, input_buffer_size);
+}
+
+void engine::init(std::size_t output_buffer_size, std::size_t input_buffer_size)
 {
 #if (OPENSSL_VERSION_NUMBER < 0x10000000L)
   accept_mutex().init();
 #endif // (OPENSSL_VERSION_NUMBER < 0x10000000L)
 
-  ::SSL_set_mode(ssl_, SSL_MODE_ENABLE_PARTIAL_WRITE);
+  // If the user has configured a larger output buffer size, allow the write to
+  // encode as many TLS records as will fit before returning.
+  if (output_buffer_size == 0)
+    ::SSL_set_mode(ssl_, SSL_MODE_ENABLE_PARTIAL_WRITE);
   ::SSL_set_mode(ssl_, SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
 #if defined(SSL_MODE_RELEASE_BUFFERS)
   ::SSL_set_mode(ssl_, SSL_MODE_RELEASE_BUFFERS);
 #endif // defined(SSL_MODE_RELEASE_BUFFERS)
 
   ::BIO* int_bio = 0;
-  ::BIO_new_bio_pair(&int_bio, 0, &ext_bio_, 0);
+  ::BIO_new_bio_pair(&int_bio, output_buffer_size,
+      &ext_bio_, input_buffer_size);
   ::SSL_set_bio(ssl_, int_bio, int_bio);
 }
 
@@ -100,6 +100,18 @@ engine& engine::operator=(engine&& other) noexcept
 {
   if (this != &other)
   {
+    if (ssl_ && SSL_get_app_data(ssl_))
+    {
+      delete static_cast<verify_callback_base*>(SSL_get_app_data(ssl_));
+      SSL_set_app_data(ssl_, 0);
+    }
+
+    if (ext_bio_)
+      ::BIO_free(ext_bio_);
+
+    if (ssl_)
+      ::SSL_free(ssl_);
+
     ssl_ = other.ssl_;
     ext_bio_ = other.ext_bio_;
     other.ssl_ = 0;
@@ -370,6 +382,7 @@ int engine::do_write(void* data, std::size_t length)
 
 } // namespace detail
 } // namespace ssl
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

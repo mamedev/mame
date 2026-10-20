@@ -410,19 +410,16 @@ ROM_END
 
 // Waixing = "Fuzhou Waixing Computer Science & Technology Co.,LTD"
 
-CONS( 2009, zone40,   0, 0, zone40,     wirels60, zone40_state,      init_zone40,     "Ultimate Products Ltd. / Waixing",                      "Zone 40",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2009, itvg49,   0, 0, zone40p,    wirels60, zone40_state,      init_reactmd,    "TaiKee / Waixing",                                      "Interactive TV Games 49-in-1 (PAL)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, zonemini, 0, 0, zone40,     wirels60, zone40_state,      init_reactmd,    "Ultimate Products Ltd. / Waixing",                      "Zone Mini",                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2009, react,    0, 0, zone40,     wirels60, zone40_state,      init_reactmd,    "Ultimate Products Ltd. / Waixing",                      "Reactor 32-in-1 (NTSC)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, zonekdft, 0, 0, zonekdft,   zonekdft, zone40_state,      init_reactmd,    "Ultimate Products Ltd. / Waixing",                      "Zone Kids Fit (18-in-1)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-
+CONS( 2009, zone40,    0, 0, zone40,     wirels60, zone40_state,     init_zone40,    "Ultimate Products Ltd. / Waixing",           "Zone 40",                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, itvg49,    0, 0, zone40p,    wirels60, zone40_state,     init_reactmd,   "TaiKee / Waixing",                           "Interactive TV Games 49-in-1 (PAL)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, zonemini,  0, 0, zone40,     wirels60, zone40_state,     init_reactmd,   "Ultimate Products Ltd. / Waixing",           "Zone Mini",                          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, react,     0, 0, zone40,     wirels60, zone40_state,     init_reactmd,   "Ultimate Products Ltd. / Waixing",           "Reactor 32-in-1 (NTSC)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, zonekdft,  0, 0, zonekdft,   zonekdft, zone40_state,     init_reactmd,   "Ultimate Products Ltd. / Waixing",           "Zone Kids Fit (18-in-1)",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // These have a newer selection of games by JungleTac instead of the Waixing ones
 
-CONS( 2010, zone60,   0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Ultimate Products (HK) Ltd / Jungle's Soft",  "Zone 60",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, zone100,  0, 0, wireless60, wirels60, wireless60_state,  init_zone100,    "Ultimate Products (HK) Ltd / Jungle's Soft",  "Zone 100",                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit was black, menus still show white controllers, unlike wireless 60
-CONS( 2010, wirels60, 0, 0, wireless60, wirels60, wireless60_state,  empty_init,      "Kids Station Toys Inc / Jungle Soft",         "Wireless 60",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2011, lx_jg7415,0, 0, wireless60, wirels60, wireless60_state,  init_lx_jg7415,  "Lexibook / JungleTac",                        "Lexibook JG7415 120-in-1",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2012, lx_jg7410,0, 0, wireless60, wirels60, wireless60_state,  init_zone100,    "Lexibook / JungleTac",                        "Lexibook JG7410 100-in-1",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // (c)2012 and JG7410_01 on box, JG7410 in other places
-
-
+CONS( 2010, zone60,    0, 0, wireless60, wirels60, wireless60_state, empty_init,     "Ultimate Products (HK) Ltd / Jungle's Soft", "Zone 60",                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, zone100,   0, 0, wireless60, wirels60, wireless60_state, init_zone100,   "Ultimate Products (HK) Ltd / Jungle's Soft", "Zone 100",                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // unit was black, menus still show white controllers, unlike wireless 60
+CONS( 2010, wirels60,  0, 0, wireless60, wirels60, wireless60_state, empty_init,     "Kids Station Toys Inc / Jungle Soft",        "Wireless 60",                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2011, lx_jg7415, 0, 0, wireless60, wirels60, wireless60_state, init_lx_jg7415, "Lexibook / JungleTac",                       "Lexibook JG7415 120-in-1",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2012, lx_jg7410, 0, 0, wireless60, wirels60, wireless60_state, init_zone100,   "Lexibook / JungleTac",                       "Lexibook JG7410 100-in-1",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // (c)2012 and JG7410_01 on box, JG7410 in other places

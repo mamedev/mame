@@ -171,7 +171,7 @@ void gamecube_state::gc(machine_config &config)
 	m_cpu->set_bus_frequency(200'000'000); // 200 MHz 64-bit bus width to main memory
 	m_cpu->set_addrmap(AS_PROGRAM, &gamecube_state::ppc_mem);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 639, 0, 479);
@@ -277,5 +277,5 @@ ROM_END
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT        COMPANY     FULLNAME             FLAGS
 CONS( 2001, gcjp,  0,      0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (Japan)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2001, gcus,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (USA)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2002, gceu,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (EUR)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, gceu,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (Europe)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2002, gcbr,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (Brazil)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -239,16 +239,18 @@ uint32_t jackie_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		m_reel_tilemap[2]->set_scrolly(i, m_bg_scroll[0][i + 0x080]);
 	}
 
-	int startclipmin = 0;
 	const rectangle &visarea = screen.visible_area();
+	rectangle clip(visarea);
 
+	// FIXME: this loop looks like it has off-by-one errors
+	// each iteration draws *two* lines, the first of which overwrites the second line drawn by the previous iteration
+	int startclipmin = 0;
 	for (int j = 0; j < 0x100 - 1; j++)
 	{
-		rectangle clip;
 		int const rowenable = m_bg_scroll[1][j];
 
 		// draw top of screen
-		clip.set(visarea.min_x, visarea.max_x, startclipmin, startclipmin + 1);
+		clip.sety(startclipmin, startclipmin + 1);
 
 		if (rowenable == 0)
 		{
@@ -971,7 +973,7 @@ void jackie_state::jackie(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
@@ -1003,7 +1005,7 @@ void jackie_state::spec8way(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);

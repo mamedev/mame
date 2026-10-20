@@ -1168,7 +1168,7 @@ void konamim2_state::konamim2(machine_config &config)
 	m_ata->slot(0).set_default_option("cr589");
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update("bda:vdu", FUNC(m2_vdu_device::screen_update));
 
 	// Sound hardware

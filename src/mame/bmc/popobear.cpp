@@ -102,6 +102,7 @@ Component Side   A   B   Solder Side
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
@@ -303,7 +304,7 @@ void popobear_state::video_start()
  */
 void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u8 *vram = reinterpret_cast<u8 *>(m_spriteram.target());
+	auto const vram = util::big_endian_cast<u8 const>(m_spriteram.target());
 
 	for (int drawpri = 0xf; drawpri >= 0x0; drawpri--)
 	{
@@ -377,7 +378,7 @@ void popobear_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 				for (int xi = 0; xi < width; xi++)
 				{
-					u8 const pix = vram[BYTE_XOR_BE(spr_num)] & palmask; // sometimes upper bits are set, but are either unused or have some non-colour purpose
+					u8 const pix = vram[spr_num] & palmask; // sometimes upper bits are set, but are either unused or have some non-colour purpose
 					int const x_draw = x + (x_dir ? (width - 1 - xi) : xi);
 
 					if (cliprect.contains(x_draw, y_draw))
@@ -432,7 +433,7 @@ void popobear_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, c
 	if (get_tilemap_enable(which) & 0x02) // or & 0x10 (no, based on popobear ending)
 	{
 		int const base = m_vregs[basereg] << 9, hi = m_vregs[hireg] << 9;
-		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
+		for (int line = cliprect.top(); line <= cliprect.bottom(); line++)
 		{
 			u16 const v = m_vram[base / 2 + line];
 			u16 u;
@@ -469,7 +470,7 @@ u32 popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	// vreg[0x01] is always
 	// 0xfefb
-	
+
 	// regs
 	// 0  see above
 	// 1
@@ -487,17 +488,20 @@ u32 popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	// d  enable 2/3
 	// e
 	// f
-	
+
 	// pixram
 	if (!get_tilemap_enable(0) && !get_tilemap_enable(1) && !get_tilemap_enable(2) && !get_tilemap_enable(3) && BIT(m_vregs[0x0e], 5))
 	{
-		u8 const *const fb = reinterpret_cast<u8 const *>(m_vram.target()) + ((m_vregs[0x0e] & 0x0f) << 16);
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		auto const fb = util::big_endian_cast<u8 const>(m_vram.target()) + ((m_vregs[0x0e] & 0x0f) << 16);
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+		{
+			auto *const dst = &bitmap.pix(y);
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
-				u8 const byte = fb[BYTE_XOR_BE(y * 0x100 + (x >> 1))];
-				bitmap.pix(y, x) = m_palette->pen((x & 1) ? (byte & 0x0f) : (byte >> 4));
+				u8 const byte = fb[(y * 0x100) + (x >> 1)];
+				dst[x] = m_palette->pen((x & 1) ? (byte & 0x0f) : (byte >> 4));
 			}
+		}
 		return 0;
 	}
 
@@ -660,6 +664,7 @@ void popobear_state::qiwang_main_map(address_map &map)
 {
 	popobear_main_map(map);
 
+	map(0x210000, 0x21ffff).ram().share("nvram");
 	map(0x620000, 0x620000).r(FUNC(popobear_state::_620000_r<0x01>)); // stuck displaying P XXXXX otherwise
 }
 
@@ -667,6 +672,7 @@ void popobear_state::magkengo_main_map(address_map &map)
 {
 	base_map(map);
 
+	map(0x210000, 0x21ffff).ram().share("nvram");
 	map(0x500001, 0x500001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x520000, 0x520001).portr("IN0");
 	map(0x530000, 0x530000).lr8(NAME([this] () -> u8 { return m_in1->read(); }));
@@ -1048,7 +1054,7 @@ void popobear_state::popobear(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &popobear_state::popobear_main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(popobear_state::scanline_cb), "screen", 0, 1);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(59.64);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_screen_update(FUNC(popobear_state::screen_update));
@@ -1073,6 +1079,8 @@ void popobear_state::qiwang(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &popobear_state::qiwang_main_map);
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	m_alt_video = true;
 }
 
@@ -1081,6 +1089,8 @@ void popobear_state::magkengo(machine_config &config)
 	popobear(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &popobear_state::magkengo_main_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	m_alt_video = true;
 }

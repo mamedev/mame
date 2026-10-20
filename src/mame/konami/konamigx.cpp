@@ -4,7 +4,6 @@
  *
  * konamigx.cpp - Konami System GX
  * Driver by R. Belmont, Acho A. Tang, and Phil Stroffolino.
- * ESC protection emulation by Olivier Galibert.
  *
  * Basic hardware consists of:
  * - MC68EC020 main CPU at 24 MHz
@@ -99,6 +98,7 @@
 #include "emu.h"
 #include "konamigx.h"
 
+#include "cpu/k056734/k056734.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68020.h"
 #include "cpu/tms57002/tms57002.h"
@@ -112,6 +112,8 @@
 
 #include "layout/generic.h"
 
+#include "racinfrc.lh"
+
 
 // TODO: check on PCB
 #define MASTER_CLOCK XTAL(24'000'000)
@@ -119,61 +121,26 @@
 
 /**********************************************************************************/
 /*
-   Konami ESC (E Security Chip) protection chip found on:
-    - Salamander 2
-    - Sexy Parodius
-    - Twinbee Yahhoo
+   Konami 056734 "ESC" security chip (see cpu/k056734/k056734.cpp), on the
+   ROM board of:
+    - Crazy Cross / Taisen Puzzle-dama
+    - Fantastic Journey / Gokujou Parodius
+    - Twin Bee Yahhoo! / Magical Twin Bee
+    - Tokimeki Memorial Taisen Puzzle-dama
     - Dragoon Might
+    - Sexy Parodius
     - Daisu-Kiss
+    - Taisen Tokkae-dama
+    - Salamander 2
 
-   The ESC is a custom microcontroller with external SRAM connected
-   to it.  It's microprogram is uploaded by the host game.  The ESC
-   has complete DMA access to the entire 68020 address space, like
-   most Konami protection devices.
-
-   Most games use the same or a compatible microprogram.  This
-   program gathers the sprite information scattered around work RAM
-   and builds a sprite list in sprite RAM which is properly sorted
-   in priority order.  The Japanese version of Gokujou Parodius
-   contains a 68020 version of this program at 0x2a285c.  The code
-   below is almost a direct translation into C of that routine.
-
-   Salamander 2 uses a different work RAM format and a different
-   ESC program, and Dragoon Might uses a third format and program.
-   These games haven't been reverse-engineered yet and so have
-   no sprites.
+   It boots from code in the game ROM, then runs the encrypted program the
+   game uploads through the mailbox at 0xcc0000, and signals completion on
+   IRQ 4.  The programs build the sprite list, copy blocks into sprite RAM,
+   or compute table pointers.
 
    Winning Spike and the Type 4 games use a new protection chip
    made from a Xilinx FPGA.  See type4_prot_w for details.
-
 */
-
-/* constant names mostly taken from sexy parodius, which includes
-   a debug protection routine with asserts intact!  Cracking the ESC
-   would have been much more difficult without it.
- */
-
-#define ESC_INIT_CONSTANT   0x0108db04
-#define ESC_OBJECT_MAGIC_ID 0xfef724fb
-#define ESTATE_END  2
-#define ESTATE_ERROR    3
-
-//    opcode 1
-// dragoonj
-//  ESC Opcode 1 : 000000xx 000000xx 00000xx0 00000000
-// tbyahhoo  sprites at c00000
-//  ESC Opcode 1 : 0000ffff 0000ffff 0000ffff 0000000e
-// sexyparo  sprites at c00604
-//  ESC Opcode 1 : 00000000 00000000 00d20000 00000000
-//  ESC Opcode 1 : 00000000 00000000 00d21000 00000000
-// salmndr2
-//  ESC Opcode 1 : 00c1f7f8 0022002c 00c00060 00010014
-// tokkae
-//  ESC Opcode 1 : 00c00000 0000000x 00000023 0000ffff
-// puzldama
-//  ESC Opcode 1 : 002xxxxx 00236102 xxxxxx01 xxxxxxxx
-
-// Say hello to gokuparo at 0x2a285c
 
 /*!
 @todo
@@ -183,283 +150,48 @@
    00000006
    000e0002
    002e0080
- - Sexy Parodius: sets up p1 as 2 at start of stage 1, 4 during stage 3A (attract mode), p4 is autoincremented at each gameplay frame. Related to missing effects?
  - Tokimeki Memorial: wrong horizontal flip for mode select arrows;
  */
 
-static struct sprite_entry
+namespace {
+
+class konamigx_esc_state : public konamigx_state
 {
-	int pri;
-	u32 adr;
-} sprites[0x100];
+public:
+	konamigx_esc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: konamigx_state(mconfig, type, tag)
+		, m_esc(*this, "esc")
+	{ }
 
-void konamigx_state::generate_sprites(address_space &space, u32 src, u32 spr, int count)
+	void daiskiss(machine_config &config) ATTR_COLD;
+	void gokuparo(machine_config &config) ATTR_COLD;
+	void puzldama(machine_config &config) ATTR_COLD;
+	void sexyparo(machine_config &config) ATTR_COLD;
+	void tbyahhoo(machine_config &config) ATTR_COLD;
+	void dragoonj(machine_config &config) ATTR_COLD;
+	void tkmmpzdm(machine_config &config) ATTR_COLD;
+	void tokkae(machine_config &config) ATTR_COLD;
+	void salmndr2(machine_config &config) ATTR_COLD;
+
+private:
+	required_device<k056734_device> m_esc;
+
+	void esc_irq_w(int state);
+
+	void add_esc(machine_config &config, u16 key, u8 cfg, u32 fetch_xor, const std::array<u8, 16> &fetch_lanes) ATTR_COLD;
+	void gx_type2_esc_map(address_map &map) ATTR_COLD;
+};
+
+void konamigx_esc_state::esc_irq_w(int state)
 {
-	int scount = 0;
-	int ecount = 0;
-
-	for (int i = 0; i < count; i++)
+	if (state && (m_gx_wrport1_1 & 0x10))
 	{
-		u32 adr = src + 0x100*i;
-		int pri;
-		if (!space.read_word(adr+2))
-			continue;
-		pri = space.read_word(adr+28);
-
-		if (pri < 256)
-		{
-			sprites[ecount].pri = pri;
-			sprites[ecount].adr = adr;
-			ecount++;
-		}
-	}
-	//qsort(sprites, ecount, sizeof(struct sprite_entry), pri_comp);
-
-	for (int i = 0; i < ecount; i++)
-	{
-		u32 adr = sprites[i].adr;
-		if (adr)
-		{
-			u32 set =(space.read_word(adr) << 16)|space.read_word(adr+2);
-			u16 glob_x = space.read_word(adr+4);
-			u16 glob_y = space.read_word(adr+8);
-			u16 flip_x = space.read_word(adr+12) ? 0x1000 : 0x0000;
-			u16 flip_y = space.read_word(adr+14) ? 0x2000 : 0x0000;
-			u16 glob_f = flip_x | (flip_y ^ 0x2000);
-			u16 zoom_x = space.read_word(adr+20);
-			u16 zoom_y = space.read_word(adr+22);
-			u16 color_val    = 0x0000;
-			u16 color_mask   = 0xffff;
-			u16 color_set    = 0x0000;
-			u16 color_rotate = 0x0000;
-			u16 v;
-
-			v = space.read_word(adr+24);
-			if (v & 0x8000)
-			{
-				color_mask = 0xf3ff;
-				color_val |= (v & 3) << 10;
-			}
-
-			v = space.read_word(adr+26);
-			if (v & 0x8000)
-			{
-				color_mask &= 0xfcff;
-				color_val  |= (v & 3) << 8;
-			}
-
-			v = space.read_word(adr+18);
-			if (v & 0x8000)
-			{
-				color_mask &= 0xff1f;
-				color_val  |= v & 0xe0;
-			}
-
-			v = space.read_word(adr+16);
-			if (v & 0x8000)
-				color_set = v & 0x1f;
-			if (v & 0x4000)
-				color_rotate = v & 0x1f;
-
-			if (!zoom_x)
-				zoom_x = 0x40;
-			if (!zoom_y)
-				zoom_y = 0x40;
-
-			if (set >= 0x200000 && set < 0xd00000)
-			{
-				u16 count2 = space.read_word(set);
-
-				set += 2;
-				while(count2)
-				{
-					u16 idx  = space.read_word(set);
-					u16 flip = space.read_word(set+2);
-					u16 col  = space.read_word(set+4);
-					short y = space.read_word(set+6);
-					short x = space.read_word(set+8);
-
-					if (idx == 0xffff)
-					{
-						set = (flip<<16) | col;
-						if (set >= 0x200000 && set < 0xd00000)
-							continue;
-						else
-							break;
-					}
-
-					if (zoom_y != 0x40)
-						y = y*0x40/zoom_y;
-					if (zoom_x != 0x40)
-						x = x*0x40/zoom_x;
-
-					if (flip_x)
-						x = glob_x - x;
-					else
-						x = glob_x + x;
-					if (x < -256 || x > 512+32)
-						goto next;
-
-					if (flip_y)
-						y = glob_y - y;
-					else
-						y = glob_y + y;
-					if (y < -256 || y > 512)
-						goto next;
-
-					col = (col & color_mask) | color_val;
-					if (color_set)
-						col = (col & 0xffe0) | color_set;
-					if (color_rotate)
-						col = (col & 0xffe0) | ((col + color_rotate) & 0x1f);
-
-					space.write_word(spr   , (flip ^ glob_f) | sprites[i].pri);
-					space.write_word(spr+ 2, idx);
-					space.write_word(spr+ 4, y);
-					space.write_word(spr+ 6, x);
-					space.write_word(spr+ 8, zoom_y);
-					space.write_word(spr+10, zoom_x);
-					space.write_word(spr+12, col);
-					spr += 16;
-					scount++;
-					if (scount == 256)
-						return;
-				next:
-					count2--;
-					set += 10;
-				}
-			}
-		}
-	}
-	while(scount < 256)
-	{
-		space.write_word(spr, scount);
-		scount++;
-		spr += 16;
+		m_gx_rdport1_3 &= ~8;
+		m_maincpu->set_input_line(4, HOLD_LINE);
 	}
 }
 
-void konamigx_state::tkmmpzdm_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4)
-{
-	konamigx_esc_alert(m_workram, 0x0142, 0x100, 0);
-}
-
-void konamigx_state::dragoonj_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4)
-{
-	konamigx_esc_alert(m_workram, 0x5c00, 0x100, 0);
-}
-
-void konamigx_state::sal2_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4)
-{
-	konamigx_esc_alert(m_workram, 0x1c8c, 0x172, 1);
-}
-
-void konamigx_state::sexyparo_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4)
-{
-	// The d20000 should probably be p3
-	// TODO: debugging bootcamp, remove once finished
-#if 0
-	if (p1 != 0)
-	{
-		logerror("sexyparo_esc P1 param: %02x\n", p1);
-	}
-#endif
-	generate_sprites(space, 0xc00604, 0xd20000, 0xfc);
-}
-
-void konamigx_state::tbyahhoo_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4)
-{
-	generate_sprites(space, 0xc00000, 0xd20000, 0x100);
-}
-
-void konamigx_state::daiskiss_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4)
-{
-	generate_sprites(space, 0xc00000, 0xd20000, 0x100);
-}
-
-void konamigx_state::esc_w(address_space &space, u32 data)
-{
-	u32 opcode;
-	u32 params;
-
-	/* ignore nullptr writes to the ESC (these appear to be "keepalives" on the real hardware) */
-	if (!data)
-	{
-		return;
-	}
-
-	/* ignore out-of-range addresses */
-	if ((data < 0xc00000) || (data > 0xc1ffff))
-	{
-		return;
-	}
-
-	/* the master opcode can be at an unaligned address, so get it "safely" */
-	opcode = (space.read_word(data+2)) | (space.read_word(data) << 16);
-
-	/* if there's an OBJECT_MAGIC_ID, that means
-	   there is a valid ESC command packet. */
-	if (opcode == ESC_OBJECT_MAGIC_ID)
-	{
-		int i;
-		/* get the subop now */
-		opcode = space.read_byte(data+8);
-		params = (space.read_word(data+12) << 16) | space.read_word(data+14);
-
-		switch (opcode)
-		{
-		case 5: // Reset
-			break;
-		case 2: // Load program
-			for (i = 0; i < 4096; i++)
-				m_esc_program[i] = space.read_byte(params+i);
-/*
-            {
-                FILE *f;
-
-                f = fopen("esc.bin", "wb");
-                fwrite(esc_program, 4096, 1, f);
-                fclose(f);
-
-                logerror("Dumping ESC program\n");
-            }
-*/
-			break;
-		case 1: // Run program
-			if (m_esc_cb)
-			{
-				u32 p1 = (space.read_word(params+0)<<16) | space.read_word(params+2);
-				u32 p2 = (space.read_word(params+4)<<16) | space.read_word(params+6);
-				u32 p3 = (space.read_word(params+8)<<16) | space.read_word(params+10);
-				u32 p4 = (space.read_word(params+12)<<16) | space.read_word(params+14);
-				(this->*m_esc_cb)(space, p1, p2, p3, p4);
-			}
-			break;
-		default:
-//          logerror("Unknown ESC opcode %d\n", opcode);
-			break;
-		}
-		space.write_byte(data+9, ESTATE_END);
-
-		if (m_gx_wrport1_1 & 0x10)
-		{
-			m_gx_rdport1_3 &= ~8;
-			m_maincpu->set_input_line(4, HOLD_LINE);
-		}
-	}
-	else
-	{
-		/* INIT_CONSTANT means just for the ESC to initialize itself,
-		   there is not normal command parsing here. */
-		if (opcode == ESC_INIT_CONSTANT)
-		{
-//          logerror("Got ESC_INIT_CONSTANT, 'booting' ESC\n");
-			return;
-		}
-
-		/* unknown constant (never been seen in any game..) */
-	}
-}
+} // anonymous namespace
 
 /**********************************************************************************/
 /* EEPROM handlers */
@@ -511,9 +243,17 @@ void konamigx_state::eeprom_w(offs_t offset, u32 data, u32 mem_mask)
 		m_gx_wrport1_1 = (data>>16)&0xff;
 //      logerror("write %x to IRQ register (PC=%x)\n", m_gx_wrport1_1, m_maincpu->pc());
 
-		// m_gx_syncen is to ensure each IRQ is triggered at least once after being enabled
+		// m_gx_syncen is to ensure each IRQ is triggered at least once after being enabled,
+		// but not when enabled by its own handler before the K053252 acknowledge
 		if (m_gx_wrport1_1 & 0x80)
-			m_gx_syncen |= m_gx_wrport1_1 & 0x1f;
+		{
+			u8 arm = m_gx_wrport1_1 & 0x1f;
+			if (!(m_gx_syncen & 0x20))
+				arm &= ~1;
+			if (!(m_gx_syncen & 0x40))
+				arm &= ~2;
+			m_gx_syncen |= arm;
+		}
 	}
 }
 
@@ -599,7 +339,7 @@ TIMER_CALLBACK_MEMBER(konamigx_state::dmaend_callback)
 	m_gx_rdport1_3 &= ~2;
 
 	// IRQ 3 is the "object DMA end" IRQ also happens during vblank
-	if ((m_gx_wrport1_1 & 0x84) == 0x84 || (m_gx_syncen & 4))
+	if ((m_gx_wrport1_1 & 0x84) == 0x84 || ((m_gx_syncen & 4) && (m_gx_wrport1_1 & 0x80)))
 	{
 		m_gx_syncen &= ~4;
 
@@ -648,7 +388,7 @@ INTERRUPT_GEN_MEMBER(konamigx_state::konamigx_type2_vblank_irq)
 	{
 		m_gx_syncen &= ~0x20;
 
-		if ((m_gx_wrport1_1 & 0x81) == 0x81 || (m_gx_syncen & 1))
+		if ((m_gx_wrport1_1 & 0x81) == 0x81 || ((m_gx_syncen & 1) && (m_gx_wrport1_1 & 0x80)))
 		{
 			m_gx_syncen &= ~1;
 			// TODO: enabling ASSERT_LINE breaks opengolf, annoying.
@@ -669,7 +409,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type2_scanline)
 		{
 			m_gx_syncen &= ~0x40;
 
-			if ((m_gx_wrport1_1 & 0x82) == 0x82 || (m_gx_syncen & 2))
+			if ((m_gx_wrport1_1 & 0x82) == 0x82 || ((m_gx_syncen & 2) && (m_gx_wrport1_1 & 0x80)))
 			{
 				popmessage("HBlank IRQ enabled, contact MAMEdev");
 				m_gx_syncen &= ~2;
@@ -704,7 +444,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type4_scanline)
 		{
 			m_gx_syncen &= ~0x20;
 
-			if ((m_gx_wrport1_1 & 0x81) == 0x81 || (m_gx_syncen & 1))
+			if ((m_gx_wrport1_1 & 0x81) == 0x81 || ((m_gx_syncen & 1) && (m_gx_wrport1_1 & 0x80)))
 			{
 				m_gx_syncen &= ~1;
 				m_maincpu->set_input_line(1, HOLD_LINE);
@@ -721,7 +461,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type4_scanline)
 		{
 			m_gx_syncen &= ~0x40;
 
-			if ((m_gx_wrport1_1 & 0x82) == 0x82 || (m_gx_syncen & 2))
+			if ((m_gx_wrport1_1 & 0x82) == 0x82 || ((m_gx_syncen & 2) && (m_gx_wrport1_1 & 0x80)))
 			{
 				m_gx_syncen &= ~2;
 				m_maincpu->set_input_line(2, HOLD_LINE);
@@ -774,20 +514,49 @@ u32 konamigx_state::le2_gun_V_r()
 /**********************************************************************************/
 /* system or game dependent handlers */
 
-u32 konamigx_state::type1_roz_r1(offs_t offset)
+u8 konamigx_state::type1_roz_r1(offs_t offset)
 {
-	u32 *ROM = (u32 *)memregion("gfx3")->base();
-
-	return ROM[offset];
+	// HBK0-2 supply ROM address bits 18-20; HBK3-4 select a byte
+	// lane (two height bitplanes). The fourth height ROM is unpopulated.
+	u32 const lane = (m_type1_bank >> 3) & 3;
+	if (lane == 3)
+	{
+		return 0xff;
+	}
+	memory_region &rom = *memregion("gfx4");
+	u32 const address = ((m_type1_bank & 7) * 0x40000 + offset) % (rom.bytes() / 3);
+	return rom.base()[address * 3 + lane];
 }
 
-u32 konamigx_state::type1_roz_r2(offs_t offset)
+u8 konamigx_state::type1_roz_r2(offs_t offset)
 {
-	u32 *ROM = (u32 *)memregion("gfx3")->base();
+	// CBK is the equivalent five-bit bank for the color ROMs. Golf
+	// populates all four lanes; Racin' Force has only three.
+	u32 const bank = (m_type1_bank >> 6) & 0x1f;
+	u32 const lane = bank >> 3;
+	u32 const lanes = m_gfxdecode->gfx(0)->granularity() == 256 ? 4 : 3;
+	if (lane >= lanes)
+	{
+		return 0xff;
+	}
+	memory_region &rom = *memregion("gfx3");
+	u32 const address = ((bank & 7) * 0x40000 + offset) % (rom.bytes() / lanes);
+	return rom.base()[address * lanes + lane];
+}
 
-	ROM += (0x600000/2);
+void konamigx_state::type1_bank_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_type1_bank);
+}
 
-	return ROM[offset];
+u8 konamigx_state::type1_lookup_r(offs_t offset)
+{
+	return m_type1_lookup[((m_type1_bank >> 12) << 7) | offset];
+}
+
+void konamigx_state::type1_lookup_w(offs_t offset, u8 data)
+{
+	m_type1_lookup[((m_type1_bank >> 12) << 7) | offset] = data;
 }
 
 u32 konamigx_state::type3_sync_r()
@@ -1042,7 +811,7 @@ void konamigx_state::gx_base_memmap(address_map &map)
 	map(0x000000, 0x01ffff).rom(); // BIOS ROM
 	map(0x200000, 0x3fffff).rom(); // main program ROM
 	map(0x400000, 0x7fffff).rom(); // data ROM
-	map(0xc00000, 0xc1ffff).ram().share("workram");
+	map(0xc00000, 0xc1ffff).ram().share(m_workram);
 	map(0xd00000, 0xd01fff).r(m_k056832, FUNC(k056832_device::k_5bpp_rom_long_r));
 	map(0xd20000, 0xd23fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0xd40000, 0xd4003f).w(m_k056832, FUNC(k056832_device::word_w));
@@ -1067,19 +836,19 @@ void konamigx_state::gx_base_memmap(address_map &map)
 void konamigx_state::gx_type1_map(address_map &map)
 {
 	gx_base_memmap(map);
-	map(0xd90000, 0xd97fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0xd90000, 0xd97fff).ram().rw(FUNC(konamigx_state::konamigx_palette_r), FUNC(konamigx_state::konamigx_palette_w)).share("palette");
 	map(0xdda000, 0xddafff).portw("ADC-WRPORT");
 	map(0xddc000, 0xddcfff).portr("ADC-RDPORT");
 	map(0xdde000, 0xdde003).w(FUNC(konamigx_state::type1_cablamps_w));
-	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
-	map(0xe20000, 0xe2000f).nopw();
-	map(0xe40000, 0xe40003).nopw();
-	map(0xe80000, 0xe81fff).ram().share("k053936_0_line");  // chips 21L+19L / S
+	map(0xe00000, 0xe0001f).rw(m_type1_roz, FUNC(k053936_device::ctrl_r), FUNC(k053936_device::ctrl_w));
+	map(0xe20000, 0xe2000f).writeonly().share(m_type1_psac4_ctrl); // 056540 registers (partially understood)
+	map(0xe40000, 0xe40003).w(FUNC(konamigx_state::type1_bank_w)); // ROM and palette lookup banks
+	map(0xe80000, 0xe81fff).rw(m_type1_roz, FUNC(k053936_device::linectrl_r), FUNC(k053936_device::linectrl_w)); // chips 21L+19L / S
 	map(0xec0000, 0xedffff).ram().w(FUNC(konamigx_state::konamigx_t1_psacmap_w)).share("psacram");  // chips 20J+23J+18J / S
 	map(0xf00000, 0xf3ffff).r(FUNC(konamigx_state::type1_roz_r1));  // ROM readback
 	map(0xf40000, 0xf7ffff).r(FUNC(konamigx_state::type1_roz_r2));  // ROM readback
-	map(0xf80000, 0xf80fff).ram(); // chip 21Q / S
-	map(0xfc0000, 0xfc00ff).ram(); // chip 22N / S
+	map(0xf80000, 0xf80fff).ram().share(m_type1_psac4_lram); // chip 21Q / S, 056540 line parameters
+	map(0xfc0000, 0xfc00ff).rw(FUNC(konamigx_state::type1_lookup_r), FUNC(konamigx_state::type1_lookup_w)).umask32(0xff00ff00); // chip 22N / S
 }
 
 void konamigx_state::racinfrc_map(address_map &map)
@@ -1092,8 +861,7 @@ void konamigx_state::racinfrc_map(address_map &map)
 void konamigx_state::gx_type2_map(address_map &map)
 {
 	gx_base_memmap(map);
-	map(0xcc0000, 0xcc0003).w(FUNC(konamigx_state::esc_w));
-	map(0xd90000, 0xd97fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0xd90000, 0xd97fff).ram().rw(FUNC(konamigx_state::konamigx_palette_r), FUNC(konamigx_state::konamigx_palette_w)).share("palette");
 }
 
 void konamigx_state::gx_type3_map(address_map &map)
@@ -1101,10 +869,10 @@ void konamigx_state::gx_type3_map(address_map &map)
 	gx_base_memmap(map);
 	map(0xd90000, 0xd97fff).ram();
 	//map(0xcc0000, 0xcc0007).w(FUNC(konamigx_state::type4_prot_w));
-	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
+	map(0xe00000, 0xe0001f).ram().share(m_k053936_0_ctrl);
 	//map(0xe20000, 0xe20003).nopw();
 	map(0xe40000, 0xe40003).w(FUNC(konamigx_state::type3_bank_w)).umask32(0xffffffff);
-	map(0xe60000, 0xe60fff).ram().share("k053936_0_line");
+	map(0xe60000, 0xe60fff).ram().share(m_k053936_0_linectrl);
 	map(0xe80000, 0xe83fff).ram().share("paletteram");  // main monitor palette
 	map(0xea0000, 0xea3fff).ram().share("subpaletteram");
 	map(0xec0000, 0xec0003).r(FUNC(konamigx_state::type3_sync_r));
@@ -1116,10 +884,10 @@ void konamigx_state::gx_type4_map(address_map &map)
 	gx_base_memmap(map);
 	map(0xcc0000, 0xcc0007).w(FUNC(konamigx_state::type4_prot_w));
 	map(0xd90000, 0xd97fff).ram();
-	map(0xe00000, 0xe0001f).ram().share("k053936_0_ctrl");
+	map(0xe00000, 0xe0001f).ram().share(m_k053936_0_ctrl);
 	map(0xe20000, 0xe20003).nopw();
 	map(0xe40000, 0xe40003).w(FUNC(konamigx_state::type3_bank_w)).umask32(0xffffffff);
-	map(0xe60000, 0xe60fff).ram().share("k053936_0_line");  // 29C & 29G (PSAC2 line control)
+	map(0xe60000, 0xe60fff).ram().share(m_k053936_0_linectrl);  // 29C & 29G (PSAC2 line control)
 	map(0xe80000, 0xe87fff).ram().share("paletteram"); // 11G/13G/15G (main screen palette RAM)
 	map(0xea0000, 0xea7fff).ram().share("subpaletteram"); // 5G/7G/9G (sub screen palette RAM)
 	map(0xec0000, 0xec0003).r(FUNC(konamigx_state::type3_sync_r));      // type 4 polls this too
@@ -1132,7 +900,7 @@ void konamigx_state::sexyparoebl_map(address_map &map) // TODO: verify everythin
 	map(0x000000, 0x01ffff).rom(); // BIOS ROM
 	map(0x200000, 0x3fffff).rom(); // main program ROM
 	map(0x400000, 0x7fffff).rom(); // data ROM
-	map(0xc00000, 0xc1ffff).ram().share("workram");
+	map(0xc00000, 0xc1ffff).ram().share(m_workram);
 	map(0xd00000, 0xd01fff).r(m_k056832, FUNC(k056832_device::k_5bpp_rom_long_r));
 	map(0xd20000, 0xd23fff).rw(m_k055673, FUNC(k055673_device::k053247_word_r), FUNC(k055673_device::k053247_word_w));
 	map(0xd40000, 0xd4003f).w(m_k056832, FUNC(k056832_device::word_w));
@@ -1150,7 +918,7 @@ void konamigx_state::sexyparoebl_map(address_map &map) // TODO: verify everythin
 	map(0xd5c000, 0xd5c003).portr("INPUTS");
 	map(0xd5e000, 0xd5e003).portr("SERVICE");
 	map(0xd80000, 0xd8001f).w(m_k054338, FUNC(k054338_device::word_w));
-	map(0xd90000, 0xd97fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0xd90000, 0xd97fff).ram().rw(FUNC(konamigx_state::konamigx_palette_r), FUNC(konamigx_state::konamigx_palette_w)).share("palette");
 	map(0xda0000, 0xda1fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 	map(0xda2000, 0xda3fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
 }
@@ -1317,8 +1085,8 @@ static INPUT_PORTS_START( racinfrc )
 	// Old note: needs Player 2 Button 1 ("IN3" & 0x10) set to get past the calibration screen
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Calibration skip?")
 	PORT_BIT( 0x03e00000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Gear Shift") PORT_TOGGLE
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Brake")
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Gear Shift") PORT_TOGGLE
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Brake")
 	PORT_BIT( 0xf0000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ADC-WRPORT")
@@ -1330,10 +1098,10 @@ static INPUT_PORTS_START( racinfrc )
 	PORT_BIT( 0x1000000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc0834", FUNC(adc083x_device::do_read))
 
 	PORT_START("AN0")   /* mask default type                     sens delta min max */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x38,0xc8) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_REVERSE
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x38,0xc8) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_REVERSE
 
 	PORT_START("AN1")
-	PORT_BIT( 0xff, 0xf0, IPT_PEDAL ) PORT_MINMAX(0x90,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_CODE_INC(KEYCODE_LCONTROL) PORT_REVERSE
+	PORT_BIT( 0xff, 0xf0, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x90,0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(35) PORT_REVERSE
 
 	PORT_MODIFY("SYSTEM_DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x01000000, 0x01000000, "SW1:1")
@@ -1347,14 +1115,14 @@ static INPUT_PORTS_START( racinfrc )
 	PORT_DIPSETTING(          0x08000000, DEF_STR( Unused ) ) // ???
 	PORT_DIPSETTING(          0x00000000, "Upright (Stereo)" )
 	PORT_DIPNAME( 0xe0000000, 0xe0000000, "Car Number & Color" ) PORT_DIPLOCATION("SW1:6,7,8")
-	PORT_DIPSETTING(          0xe0000000, "No. 1 (Red)" )
-	PORT_DIPSETTING(          0xc0000000, "No. 2 (Blue)" )
-	PORT_DIPSETTING(          0xa0000000, "No. 3 (Yellow)" )
-	PORT_DIPSETTING(          0x80000000, "No. 4 (Green)" )
-	PORT_DIPSETTING(          0x60000000, "No. 5 (Red)" )
-	PORT_DIPSETTING(          0x40000000, "No. 6 (Blue)" )
-	PORT_DIPSETTING(          0x20000000, "No. 7 (Yellow)" )
-	PORT_DIPSETTING(          0x00000000, "No. 8 (Green)" )
+	PORT_DIPSETTING(          0xe0000000, "No. 1 (Red/White)" )
+	PORT_DIPSETTING(          0xc0000000, "No. 2 (Blue/White)" )
+	PORT_DIPSETTING(          0xa0000000, "No. 3 (White/Yellow)" )
+	PORT_DIPSETTING(          0x80000000, "No. 4 (Green/White)" )
+	PORT_DIPSETTING(          0x60000000, "No. 5 (White/Red)" )
+	PORT_DIPSETTING(          0x40000000, "No. 6 (White/Blue)" )
+	PORT_DIPSETTING(          0x20000000, "No. 7 (Yellow/White)" )
+	PORT_DIPSETTING(          0x00000000, "No. 8 (White/Green)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( opengolf )
@@ -1628,43 +1396,16 @@ static const gfx_layout bglayout_8bpp =
 	16*128
 };
 
-// for scanrows on tilemap
-#if 0
-static const gfx_layout t1_charlayout6 =
-{
-	16, 16,
-	RGN_FRAC(1,1),
-	6,
-	{ 20, 16, 12, 8, 4, 0 },
-	{ 3, 2, 1, 0, 27, 26, 25, 24, 51, 50, 49, 48, 75, 74, 73, 72 },
-	{ 0, 12*8, 12*8*2, 12*8*3, 12*8*4, 12*8*5, 12*8*6, 12*8*7,
-		12*8*8, 12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
-	16*16*6
-};
-
-static const gfx_layout t1_charlayout8 =
-{
-	16, 16,
-	RGN_FRAC(1,1),
-	8,
-	{ 28, 24, 20, 16, 12, 8, 4, 0 },
-	{ 3, 2, 1, 0, 35, 34, 33, 32, 67, 66, 65, 64, 99, 98, 97, 96 },
-	{ 0, 16*8, 16*8*2, 16*8*3, 16*8*4, 16*8*5, 16*8*6, 16*8*7,
-		16*8*8, 16*8*9, 16*8*10, 16*8*11, 16*8*12, 16*8*13, 16*8*14, 16*8*15 },
-	16*16*8
-};
-#endif
-
-// for scancols on tilemap
+// Type-1 VRAM addresses use X[10:4] for columns and Y[10:4] for rows.
+// Each ROM byte supplies two bitplanes for four adjacent horizontal pixels.
 static const gfx_layout t1_charlayout6 =
 {
 	16, 16,
 	RGN_FRAC(1,1),
 	6,
 	{ 16, 20, 8, 12, 0, 4 },
-	{ 0, 12*8, 12*8*2, 12*8*3, 12*8*4, 12*8*5, 12*8*6, 12*8*7,
-		12*8*8, 12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
 	{ 3, 2, 1, 0, 27, 26, 25, 24, 51, 50, 49, 48, 75, 74, 73, 72 },
+	{ STEP16(0, 16*6) },
 	16*16*6
 };
 
@@ -1674,9 +1415,8 @@ static const gfx_layout t1_charlayout8 =
 	RGN_FRAC(1,1),
 	8,
 	{ 24, 28, 16, 20, 8, 12, 0, 4 },
-	{ 0, 16*8, 16*8*2, 16*8*3, 16*8*4, 16*8*5, 16*8*6, 16*8*7,
-		16*8*8, 16*8*9, 16*8*10, 16*8*11, 16*8*12, 16*8*13, 16*8*14, 16*8*15 },
 	{ 3, 2, 1, 0, 35, 34, 33, 32, 67, 66, 65, 64, 99, 98, 97, 96 },
+	{ STEP16(0, 16*8) },
 	16*16*8
 };
 
@@ -1684,12 +1424,12 @@ static const gfx_layout t1_charlayout8 =
 // TODO: pinpoint color size
 static GFXDECODE_START( gfx_opengolf )
 	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout8, 0x0000, 32 )
-	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 128 )
+	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 256 ) // also carries the VRAM height byte
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_racinfrc )
 	GFXDECODE_ENTRY( "gfx3", 0, t1_charlayout6, 0x0000, 128 )
-	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 128 )
+	GFXDECODE_ENTRY( "gfx4", 0, t1_charlayout6, 0x0000, 256 )
 GFXDECODE_END
 
 /* type 3 & 4 games use a simple 8bpp decode for the 53936 */
@@ -1740,7 +1480,7 @@ void konamigx_state::konamigx(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
 	/* These parameters are actual value written to the CCU.
@@ -1769,7 +1509,7 @@ void konamigx_state::konamigx(machine_config &config)
 
 	K055673(config, m_k055673);
 	m_k055673->set_sprite_callback(FUNC(konamigx_state::type2_sprite_callback));
-	m_k055673->set_config(K055673_LAYOUT_GX, -26, -23);
+	m_k055673->set_config(K055673_LAYOUT_GX, -46, -23);
 	m_k055673->set_screen(m_screen);
 	m_k055673->set_palette(m_palette);
 
@@ -1809,29 +1549,63 @@ void konamigx_state::konamigx_bios(machine_config &config)
 	m_k056832->set_config(K056832_BPP_4, 0, 0);
 }
 
-void konamigx_state::gokuparo(machine_config &config)
+namespace {
+
+void konamigx_esc_state::gx_type2_esc_map(address_map &map)
 {
-	konamigx(config);
-	m_k055673->set_config(K055673_LAYOUT_GX, -46, -23);
+	gx_type2_map(map);
+	map(0xcc0000, 0xcc0003).w(m_esc, FUNC(k056734_device::mailbox_w));
 }
 
-void konamigx_state::sexyparo(machine_config &config)
+// the chip's secret and instruction fetch scramble differ per title
+void konamigx_esc_state::add_esc(machine_config &config, u16 key, u8 cfg, u32 fetch_xor, const std::array<u8, 16> &fetch_lanes)
+{
+	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_esc_state::gx_type2_esc_map);
+
+	K056734(config, m_esc, MASTER_CLOCK); // TODO: clock not verified
+	m_esc->set_key(key, cfg);
+	m_esc->set_fetch_scramble(fetch_xor, fetch_lanes);
+	m_esc->set_host_space(m_maincpu, AS_PROGRAM);
+	m_esc->irq_cb().set(FUNC(konamigx_esc_state::esc_irq_w));
+}
+
+void konamigx_esc_state::daiskiss(machine_config &config)
+{
+	konamigx(config);
+	add_esc(config, 0x89ee, 0xd, 0x39556cc0, { 9, 12, 1, 0, 6, 10, 3, 15, 7, 14, 2, 13, 4, 5, 8, 11 });
+}
+
+void konamigx_esc_state::gokuparo(machine_config &config)
+{
+	konamigx(config);
+	add_esc(config, 0x8d8c, 0x3, 0x2c3ea1c4, { 15, 11, 13, 14, 9, 3, 0, 7, 6, 1, 8, 5, 12, 10, 4, 2 });
+}
+
+void konamigx_esc_state::puzldama(machine_config &config)
+{
+	konamigx(config);
+	add_esc(config, 0x5d32, 0x3, 0x91c2c6fb, { 11, 8, 12, 9, 4, 2, 5, 6, 10, 3, 7, 13, 14, 0, 1, 15 });
+}
+
+void konamigx_esc_state::sexyparo(machine_config &config)
 {
 	konamigx(config);
 
 	m_k056832->set_tile_callback(FUNC(konamigx_state::alpha_tile_callback));
 
-	m_k055673->set_config(K055673_LAYOUT_GX, -42, -23);
+	add_esc(config, 0x896a, 0xe, 0x1886ae1d, { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
 }
 
-void konamigx_state::tbyahhoo(machine_config &config)
+void konamigx_esc_state::tbyahhoo(machine_config &config)
 {
 	konamigx(config);
 
 	m_k056832->set_config(K056832_BPP_5, 0, 0);
+
+	add_esc(config, 0x0424, 0xa, 0xde78b8ae, { 15, 4, 12, 2, 3, 13, 11, 1, 5, 8, 10, 0, 6, 14, 7, 9 });
 }
 
-void konamigx_state::dragoonj(machine_config &config)
+void konamigx_esc_state::dragoonj(machine_config &config)
 {
 	konamigx(config);
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, dragoonj)
@@ -1842,7 +1616,35 @@ void konamigx_state::dragoonj(machine_config &config)
 
 	m_k055673->set_sprite_callback(FUNC(konamigx_state::dragoonj_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_RNG, -53, -23);
+
+	add_esc(config, 0x5963, 0xb, 0x049db8e5, { 4, 7, 9, 3, 14, 8, 6, 13, 5, 0, 15, 1, 11, 12, 2, 10 });
 }
+
+void konamigx_esc_state::tkmmpzdm(machine_config &config)
+{
+	konamigx_6bpp(config);
+	add_esc(config, 0x4924, 0xc, 0x88600ef4, { 9, 14, 5, 1, 13, 2, 0, 6, 11, 15, 3, 7, 8, 10, 12, 4 });
+}
+
+void konamigx_esc_state::tokkae(machine_config &config)
+{
+	konamigx_6bpp(config);
+	add_esc(config, 0x9e8e, 0xb, 0x6bfbb5b9, { 12, 2, 6, 9, 13, 0, 5, 10, 8, 11, 3, 4, 14, 15, 7, 1 });
+}
+
+void konamigx_esc_state::salmndr2(machine_config &config)
+{
+	konamigx(config);
+	m_k056832->set_config(K056832_BPP_6, 1, 0);
+
+	m_k056832->set_tile_callback(FUNC(konamigx_state::salmndr2_tile_callback));
+
+	m_k055673->set_config(K055673_LAYOUT_GX6, -48, -23);
+
+	add_esc(config, 0x1ec6, 0xa, 0xb3f135b3, { 7, 8, 2, 4, 10, 14, 15, 6, 9, 1, 0, 12, 3, 5, 13, 11 });
+}
+
+} // anonymous namespace
 
 void konamigx_state::le2(machine_config &config)
 {
@@ -1853,7 +1655,6 @@ void konamigx_state::le2(machine_config &config)
 
 	m_k056832->set_config(K056832_BPP_8, 1, 0);
 
-	m_k055673->set_sprite_callback(FUNC(konamigx_state::le2_sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_LE2, -46, -23);
 }
 
@@ -1863,24 +1664,15 @@ void konamigx_state::konamigx_6bpp(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_6bpp)
 
 	m_k056832->set_config(K056832_BPP_6, 0, 0);
-
-	m_k055673->set_config(K055673_LAYOUT_GX, -46, -23);
-}
-
-void konamigx_state::salmndr2(machine_config &config)
-{
-	konamigx(config);
-	m_k056832->set_config(K056832_BPP_6, 1, 0);
-
-	m_k056832->set_tile_callback(FUNC(konamigx_state::salmndr2_tile_callback));
-
-	m_k055673->set_sprite_callback(FUNC(konamigx_state::salmndr2_sprite_callback));
-	m_k055673->set_config(K055673_LAYOUT_GX6, -48, -23);
 }
 
 void konamigx_state::opengolf(machine_config &config)
 {
 	konamigx(config);
+	K053936(config, m_type1_roz).set_wrap(1);
+	m_screen->screen_vblank().set(FUNC(konamigx_state::type1_vblank_w));
+
+	m_k053252->set_offsets(24 - 8 + 16, 16);
 
 	m_screen->set_raw(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
 	m_screen->set_visarea(40, 40+384-1, 16, 16+224-1);
@@ -1889,7 +1681,7 @@ void konamigx_state::opengolf(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, opengolf)
 
-	m_k055673->set_config(K055673_LAYOUT_GX6, -53, -23);
+	m_k055673->set_config(K055673_LAYOUT_GX6, -69, -23);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::gx_type1_map);
 
@@ -1900,8 +1692,8 @@ void konamigx_state::opengolf(machine_config &config)
 void konamigx_state::racinfrc(machine_config &config)
 {
 	konamigx(config);
-	//m_screen->set_raw(6000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
-	//m_screen->set_visarea(32, 32+384-1, 16, 16+224-1);
+	K053936(config, m_type1_roz).set_wrap(1);
+	m_screen->screen_vblank().set(FUNC(konamigx_state::type1_vblank_w));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_racinfrc);
 
@@ -1911,7 +1703,7 @@ void konamigx_state::racinfrc(machine_config &config)
 
 	m_k056832->set_config(K056832_BPP_6, 0, 0);
 
-	m_k055673->set_config(K055673_LAYOUT_GX, -53, -23);
+	m_k055673->set_config(K055673_LAYOUT_GX, -53, -34);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::racinfrc_map);
 
@@ -1948,7 +1740,7 @@ void konamigx_state::gxtype3(machine_config &config)
 	m_screen->set_visarea(0, 576-1, 16, 32*8-1-16);
 	m_screen->set_screen_update(FUNC(konamigx_state::screen_update_konamigx_left));
 
-	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen_device &screen2(SCREEN(config, "screen2"));
 	screen2.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE);
 	screen2.set_raw(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223);
 	screen2.set_size(1024, 1024);
@@ -1970,7 +1762,7 @@ void konamigx_state::gxtype4(machine_config &config)
 	//m_screen->set_visarea(0, 384-1, 16, 32*8-1-16);
 	m_screen->set_screen_update(FUNC(konamigx_state::screen_update_konamigx_left));
 
-	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen_device &screen2(SCREEN(config, "screen2"));
 	screen2.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE);
 	screen2.set_raw(6000000, 288+16+32+48, 0, 287, 224+16+8+16, 0, 223);
 	screen2.set_size(1024, 1024);
@@ -2047,7 +1839,7 @@ void konamigx_state::sexyparoebl(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223);
 
@@ -3974,6 +3766,9 @@ MACHINE_START_MEMBER(konamigx_state,konamigx)
 
 MACHINE_RESET_MEMBER(konamigx_state,konamigx)
 {
+	m_type1_bank = 0;
+	m_type1_yorigin[0] = m_type1_yorigin[1] = 0;
+	m_type1_yorigin_valid = 0;
 	m_gx_wrport1_0 = m_gx_wrport1_1 = 0;
 	m_gx_wrport2 = 0;
 
@@ -4051,26 +3846,26 @@ static const GXGameInfoT gameDefs[] =
 	{ "le2",        13, 1, BPP4 },
 	{ "le2u",       13, 1, BPP4 },
 	{ "le2j",       13, 1, BPP4 },
-	{ "fantjour",    7, 9, BPP5 },
-	{ "fantjoura",   7, 9, BPP5 },
+	{ "fantjour",    7, 4, BPP5 },
+	{ "fantjoura",   7, 4, BPP5 },
 	{ "gokuparo",    7, 0, BPP5 },
 	{ "crzcross",    7, 0, BPP5 },
 	{ "puzldama",    7, 0, BPP5 },
-	{ "tbyahhoo",    7, 8, BPP5 },
-	{ "mtwinbee",    7, 8, BPP5 },
+	{ "tbyahhoo",    7, 0, BPP5 },
+	{ "mtwinbee",    7, 0, BPP5 },
 	{ "tkmmpzdm",    7, 2, BPP6 },
-	{ "dragoona",    7, 3, BPP4 },
-	{ "dragoonj",    7, 3, BPP4 },
-	{ "sexyparo",    7, 4, BPP5 },
-	{ "sexyparoa",   7, 4, BPP5 },
+	{ "dragoona",    7, 0, BPP4 },
+	{ "dragoonj",    7, 0, BPP4 },
+	{ "sexyparo",    7, 0, BPP5 },
+	{ "sexyparoa",   7, 0, BPP5 },
 	{ "sexyparoebl", 7, 0, BPP5 },
-	{ "daiskiss",    7, 5, BPP5 },
+	{ "daiskiss",    7, 0, BPP5 },
 	{ "tokkae",      7, 0, BPP5 },
-	{ "salmndr2",    7, 6, BPP66 },
-	{ "salmndr2a",   7, 6, BPP66 },
-	{ "winspike",    8, 7, BPP4 },
-	{ "winspikea",   8, 7, BPP4 },
-	{ "winspikej",   8, 7, BPP4 },
+	{ "salmndr2",    7, 0, BPP66 },
+	{ "salmndr2a",   7, 0, BPP66 },
+	{ "winspike",    8, 3, BPP4 },
+	{ "winspikea",   8, 3, BPP4 },
+	{ "winspikej",   8, 3, BPP4 },
 	{ "soccerss",    7, 0, BPP4 },
 	{ "soccerssu",   7, 0, BPP4 },
 	{ "soccerssa",   7, 0, BPP4 },
@@ -4098,7 +3893,6 @@ void konamigx_state::init_konamigx()
 	m_last_prot_op = -1;
 	m_last_prot_clk = 0;
 
-	m_esc_cb = nullptr;
 	m_resume_trigger = 0;
 
 	m_dmadelay_timer = timer_alloc(FUNC(konamigx_state::dmaend_callback), this);
@@ -4123,6 +3917,7 @@ void konamigx_state::init_konamigx()
 				{
 					u32 *rom = (u32*)memregion("maincpu")->base();
 
+					// HACK: remove this ROM patch
 					// The display is initialized after POST but the copyright screen disabled
 					// planes B,C,D and didn't bother restoring them. I've spent a good
 					// amount of time chasing this bug but the cause remains inconclusive.
@@ -4130,36 +3925,14 @@ void konamigx_state::init_konamigx()
 					// during the copyright message.
 					rom[0x810f1] &= ~1;      // fix checksum
 					rom[0x872ea] |= 0xe0000; // enable plane B,C,D
-
-					m_esc_cb = &konamigx_state::tkmmpzdm_esc;
 					break;
 				}
 
-				case 3: // dragoon might
-					m_esc_cb = &konamigx_state::dragoonj_esc;
-					break;
-
-				case 4: // sexyparo
-					m_esc_cb = &konamigx_state::sexyparo_esc;
-					break;
-
-				case 5: // daiskiss
-					m_esc_cb = &konamigx_state::daiskiss_esc;
-					break;
-
-				case 6: // salamander 2
-					m_esc_cb = &konamigx_state::sal2_esc;
-					break;
-
-				case 7: // install type 4 Xilinx protection for non-type 3/4 games
+				case 3: // install type 4 Xilinx protection for non-type 3/4 games
 					m_maincpu->space(AS_PROGRAM).install_write_handler(0xcc0000, 0xcc0007, write32m_delegate(*this, FUNC(konamigx_state::type4_prot_w)));
 					break;
 
-				case 8: // tbyahhoo
-					m_esc_cb = &konamigx_state::tbyahhoo_esc;
-					break;
-
-				case 9: // fantjour
+				case 4: // fantjour
 					fantjour_dma_install();
 					break;
 			}
@@ -4191,13 +3964,12 @@ void konamigx_state::init_posthack()
 GAME( 1994, konamigx,  0,        konamigx_bios, common,   konamigx_state, init_konamigx, ROT0, "Konami", "System GX", MACHINE_IS_BIOS_ROOT )
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-   Type 1: standard with an add-on 53936 on the ROM board, analog inputs,
+   Type 1: standard with an add-on 53936 on the ROM board, analog inputs, roz layer
    and optional 056230 networking for Racin' Force only.
-   needs the ROZ layer to be playable
    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-GAME( 1994, racinfrc,  konamigx, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
-GAME( 1994, racinfrcu, racinfrc, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAMEL( 1994, racinfrc,  konamigx, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_racinfrc )
+GAMEL( 1994, racinfrcu, racinfrc, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_racinfrc )
 
 GAME( 1994, opengolf,  konamigx, opengolf,      opengolf, konamigx_state, init_posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAE)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
 GAME( 1994, opengolf2, opengolf, opengolf,      opengolf, konamigx_state, init_posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
@@ -4212,31 +3984,31 @@ GAME( 1994, le2,         konamigx, le2,           le2,      konamigx_state, init
 GAME( 1994, le2u,        le2,      le2,           le2u,     konamigx_state, init_konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: Gun Fighters (ver UAA)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, le2j,        le2,      le2,           le2j,     konamigx_state, init_konamigx, ORIENTATION_FLIP_Y, "Konami", "Lethal Enforcers II: The Western (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, fantjour,    konamigx, gokuparo,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Fantastic Journey (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, fantjoura,   fantjour, gokuparo,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Fantastic Journey (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, gokuparo,    fantjour, gokuparo,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Gokujou Parodius: Kako no Eikou o Motomete (ver JAD)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, fantjour,    konamigx, gokuparo,      gokuparo, konamigx_esc_state, init_konamigx, ROT0, "Konami", "Fantastic Journey (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, fantjoura,   fantjour, gokuparo,      gokuparo, konamigx_esc_state, init_konamigx, ROT0, "Konami", "Fantastic Journey (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, gokuparo,    fantjour, gokuparo,      gokuparo, konamigx_esc_state, init_konamigx, ROT0, "Konami", "Gokujou Parodius: Kako no Eikou o Motomete (ver JAD)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1994, crzcross,    konamigx, gokuparo,      puzldama, konamigx_state, init_posthack, ROT0, "Konami", "Crazy Cross (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, puzldama,    crzcross, gokuparo,      puzldama, konamigx_state, init_posthack, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, crzcross,    konamigx, puzldama,      puzldama, konamigx_esc_state, init_posthack, ROT0, "Konami", "Crazy Cross (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, puzldama,    crzcross, puzldama,      puzldama, konamigx_esc_state, init_posthack, ROT0, "Konami", "Taisen Puzzle-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1995, tbyahhoo,    konamigx, tbyahhoo,      gokuparo, konamigx_state, init_posthack, ROT0, "Konami", "Twin Bee Yahhoo! (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, mtwinbee,    tbyahhoo, tbyahhoo,      gokuparo, konamigx_state, init_posthack, ROT0, "Konami", "Magical Twin Bee (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, tbyahhoo,    konamigx, tbyahhoo,      gokuparo, konamigx_esc_state, init_posthack, ROT0, "Konami", "Twin Bee Yahhoo! (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, mtwinbee,    tbyahhoo, tbyahhoo,      gokuparo, konamigx_esc_state, init_posthack, ROT0, "Konami", "Magical Twin Bee (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1995, tkmmpzdm,    konamigx, konamigx_6bpp, tokkae,   konamigx_state, init_konamigx, ROT0, "Konami", "Tokimeki Memorial Taisen Puzzle-dama (ver JAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, tkmmpzdm,    konamigx, tkmmpzdm,      tokkae,   konamigx_esc_state, init_konamigx, ROT0, "Konami", "Tokimeki Memorial Taisen Puzzle-dama (ver JAB)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1995, dragoona,    konamigx, dragoonj,      dragoonj, konamigx_state, init_posthack, ROT0, "Konami", "Dragoon Might (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, dragoonj,    dragoona, dragoonj,      dragoonj, konamigx_state, init_posthack, ROT0, "Konami", "Dragoon Might (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, dragoona,    konamigx, dragoonj,      dragoonj, konamigx_esc_state, init_posthack, ROT0, "Konami", "Dragoon Might (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, dragoonj,    dragoona, dragoonj,      dragoonj, konamigx_esc_state, init_posthack, ROT0, "Konami", "Dragoon Might (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1996, sexyparo,    konamigx, sexyparo,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Sexy Parodius (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, sexyparoa,   sexyparo, sexyparo,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Sexy Parodius (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996, sexyparoebl, sexyparo, sexyparoebl,   gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Sexy Parodius (ver EAA, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1996, sexyparo,    konamigx, sexyparo,      gokuparo, konamigx_esc_state, init_konamigx, ROT0, "Konami", "Sexy Parodius (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, sexyparoa,   sexyparo, sexyparo,      gokuparo, konamigx_esc_state, init_konamigx, ROT0, "Konami", "Sexy Parodius (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, sexyparoebl, sexyparo, sexyparoebl,   gokuparo, konamigx_state, init_konamigx, ROT0, "bootleg", "Sexy Parodius (ver EAA, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 1996, daiskiss,    konamigx, konamigx,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Daisu-Kiss (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, daiskiss,    konamigx, daiskiss,      gokuparo, konamigx_esc_state, init_konamigx, ROT0, "Konami", "Daisu-Kiss (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1996, tokkae,      konamigx, konamigx_6bpp, tokkae,   konamigx_state, init_konamigx, ROT0, "Konami", "Taisen Tokkae-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, tokkae,      konamigx, tokkae,        tokkae,   konamigx_esc_state, init_konamigx, ROT0, "Konami", "Taisen Tokkae-dama (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1996, salmndr2,    konamigx, salmndr2,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Salamander 2 (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, salmndr2a,   salmndr2, salmndr2,      gokuparo, konamigx_state, init_konamigx, ROT0, "Konami", "Salamander 2 (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, salmndr2,    konamigx, salmndr2,      gokuparo, konamigx_esc_state, init_konamigx, ROT0, "Konami", "Salamander 2 (ver JAA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, salmndr2a,   salmndr2, salmndr2,      gokuparo, konamigx_esc_state, init_konamigx, ROT0, "Konami", "Salamander 2 (ver AAB)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1997, winspike,    konamigx, winspike,      common,   konamigx_state, init_konamigx, ROT0, "Konami", "Winning Spike (ver EAA)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, winspikea,   winspike, winspike,      common,   konamigx_state, init_konamigx, ROT0, "Konami", "Winning Spike (ver AAA)", MACHINE_IMPERFECT_GRAPHICS )

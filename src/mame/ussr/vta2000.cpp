@@ -214,7 +214,7 @@ void vta2000_state::vta2000(machine_config &config)
 	dmac.out_iow_cb<2>().set(FUNC(vta2000_state::crtc_dack_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_raw(DOT_CLOCK, 800, 0, 640, 312, 0, 300);
 	screen.set_screen_update(m_crtc[0], FUNC(i8275_device::screen_update));
 	//screen.set_palette("palette");

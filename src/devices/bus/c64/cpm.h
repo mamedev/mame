@@ -46,7 +46,7 @@ protected:
 private:
 	inline void update_signals();
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 
 	int m_enabled;
 	int m_ba;

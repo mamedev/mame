@@ -654,7 +654,7 @@ void lwriter_state::lwriter(machine_config &config)
 	M68000(config, m_maincpu, CPU_CLK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwriter_state::maincpu_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(30);
 	m_screen->set_size(FB_WIDTH, FB_HEIGHT);
 	m_screen->set_visarea_full();

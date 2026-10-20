@@ -29,6 +29,7 @@ ToDO:
 
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "rowamet.lh"

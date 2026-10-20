@@ -50,7 +50,7 @@ electronically measuring them affected the frequency.
 #include "machine/timer.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 
 // internal artwork
 #include "saitek_chesstrv.lh"
@@ -278,10 +278,9 @@ void chesstrv_state::chesstrvi(machine_config &config)
 	config.set_default_layout(layout_saitek_chesstrvi);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/2, 567/2);
-	screen.set_visarea_full();
 }
 
 

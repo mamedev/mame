@@ -1427,7 +1427,7 @@ void hornet_state::hornet(machine_config &config)
 	K033906(config, m_k033906[0], m_voodoo[0]);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// default 24KHz parameter in both 037122 and voodoo, input clock correct? (58~Hz Vsync, 50MHz/3 or 64MHz/4?)
 	screen.set_raw(64_MHz_XTAL / 4, 644, 41, 41 + 512, 428, 27, 27 + 384);
 	screen.set_screen_update(FUNC(hornet_state::screen_update<0>));
@@ -1535,12 +1535,12 @@ void hornet_state::sscope(machine_config &config)
 	// video hardware
 	config.device_remove("screen");
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	// default 24KHz parameter in both 037122 and voodoo, input clock correct? (58~Hz Vsync, 50MHz/3 or 64MHz/4?)
 	lscreen.set_raw(64_MHz_XTAL / 4, 644, 41, 41 + 512, 428, 27, 27 + 384);
 	lscreen.set_screen_update(FUNC(hornet_state::screen_update<0>));
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER)); // for scope
+	screen_device &rscreen(SCREEN(config, "rscreen")); // for scope
 	// scope screen is 15khz, verified default parameter in both 037122 and voodoo, input clock correct? (60~Hz Vsync, 50MHz/3 or 64MHz/4?)
 	rscreen.set_raw(64_MHz_XTAL / 4, 1017, 106, 106 + 768, 262, 17, 17 + 236);
 	rscreen.set_screen_update(FUNC(hornet_state::screen_update<1>));

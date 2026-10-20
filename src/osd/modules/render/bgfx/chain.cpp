@@ -89,8 +89,8 @@ void bgfx_chain::repopulate_targets()
 
 void bgfx_chain::process(chain_manager::screen_prim &prim, int view, int screen, texture_manager& textures, osd_window& window)
 {
-	screen_device_enumerator screen_iterator(window.machine().root_device());
-	screen_device* screen_device = screen_iterator.byindex(screen);
+	video_output_interface_enumerator screen_iterator(window.machine().root_device());
+	device_video_output_interface* screen_dev = screen_iterator.byindex(screen);
 
 	uint16_t screen_count(window.target()->current_view().visible_screen_count());
 	uint16_t screen_width = prim.m_quad_width;
@@ -107,9 +107,9 @@ void bgfx_chain::process(chain_manager::screen_prim &prim, int view, int screen,
 	float screen_scale_y = 1.0f;
 	float screen_offset_x = 0.0f;
 	float screen_offset_y = 0.0f;
-	if (screen_device != nullptr)
+	if (screen_dev != nullptr)
 	{
-		render_container &screen_container = screen_device->container();
+		render_container &screen_container = screen_dev->container();
 		screen_scale_x = 1.0f / screen_container.xscale();
 		screen_scale_y = 1.0f / screen_container.yscale();
 		screen_offset_x = -screen_container.xoffset();

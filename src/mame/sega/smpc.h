@@ -92,6 +92,7 @@ private:
 	const address_space_config      m_space_config;
 
 	emu_timer *m_cmd_timer;
+	emu_timer *m_syshalt_timer;
 	emu_timer *m_rtc_timer;
 	emu_timer *m_intback_timer;
 	emu_timer *m_sndres_timer;
@@ -110,6 +111,10 @@ private:
 	uint8_t m_rtc_data[7];
 	uint8_t m_smem[5];
 	uint8_t m_comreg;
+	uint8_t m_ckchg_tick;
+	uint8_t m_prev_sshoff;
+	uint8_t m_prev_sndoff;
+	uint8_t m_prev_cdoff;
 	// in usec
 	// timing table, from manual in usec
 	const uint32_t m_cmd_table_timing[0x20] =
@@ -138,6 +143,7 @@ private:
 	TIMER_CALLBACK_MEMBER(handle_rtc_increment);
 	TIMER_CALLBACK_MEMBER(sound_reset);
 	TIMER_CALLBACK_MEMBER(handle_command);
+	TIMER_CALLBACK_MEMBER(system_halt);
 	void read_saturn_ports();
 
 	void sr_set(uint8_t data);

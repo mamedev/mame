@@ -168,7 +168,7 @@ void pv9234_state::pv9234(machine_config &config)
 	ARM7(config, m_maincpu, 4915000); // TODO: unknown type, VLSI branded?
 	m_maincpu->set_addrmap(AS_PROGRAM, &pv9234_state::main_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(640, 480);

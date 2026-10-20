@@ -519,7 +519,7 @@ void monzagp_state::monzagp(machine_config &config)
 	m_maincpu->p2_out_cb().set(FUNC(monzagp_state::port2_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(10'920'000, 700, 0, 560, 312, 11, 240); // 11-line offset makes attract mode look symmetric
 	screen.set_screen_update(FUNC(monzagp_state::screen_update));
 	screen.set_palette(m_palette);

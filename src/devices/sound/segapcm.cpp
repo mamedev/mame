@@ -165,7 +165,7 @@ void segapcm_base_device::rom_bank_pre_change()
 template <unsigned MaxVoices>
 void segapcm_device<MaxVoices>::sound_stream_update(sound_stream &stream)
 {
-	/* loop over streams */
+	// loop over streams
 	for (int i = 0; i < stream.samples(); i++)
 	{
 		int32_t lout = 0, rout = 0;
@@ -187,7 +187,7 @@ void segapcm_base_device::voice_t::tick()
 	if (BIT(~ctrl, 0))
 	{
 		// handle looping if we've hit the end
-		if ((addr >> 16) == end)
+		if ((addr >> 16) == ((end + 1) & 0xff))
 		{
 			if (BIT(ctrl, 1))
 			{

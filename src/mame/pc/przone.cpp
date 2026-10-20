@@ -189,7 +189,7 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
-	void przone(machine_config &config);
+	void przone(machine_config &config) ATTR_COLD;
 
 private:
 	void main_io(address_map &map) ATTR_COLD;

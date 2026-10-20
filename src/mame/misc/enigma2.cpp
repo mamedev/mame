@@ -734,7 +734,7 @@ void enigma2_state::enigma2(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(m_audiocpu->clock() / 4));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(enigma2_state::screen_update_enigma2));
 	m_screen->screen_vblank().set([this] (int state) { if (state) m_blink_count++; });
@@ -764,7 +764,7 @@ void enigma2_state::enigma2a(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(m_audiocpu->clock() / 4));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(enigma2_state::screen_update_enigma2a));
 

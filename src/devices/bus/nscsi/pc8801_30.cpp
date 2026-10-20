@@ -21,7 +21,7 @@
 
 #define LIVE_SUBQ_VIEW    0
 
-DEFINE_DEVICE_TYPE(NSCSI_CDROM_PC8801_30, nscsi_cdrom_pc8801_30_device, "scsi_pc8801_30", "SCSI NEC PC8801-30 CD-ROM")
+DEFINE_DEVICE_TYPE(NSCSI_CDROM_PC8801_30, nscsi_cdrom_pc8801_30_device, "scsi_pc8801_30", "SCSI NEC PC-8801-30 CD-ROM")
 
 nscsi_cdrom_pc8801_30_device::nscsi_cdrom_pc8801_30_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nscsi_cdrom_device(mconfig, NSCSI_CDROM_PC8801_30, tag, owner, clock)
@@ -447,7 +447,7 @@ void nscsi_cdrom_pc8801_30_device::nec_get_dir_info()
 				track = std::max(bcd_2_dec(m_scsi_cmdbuf[2]), 1U);
 				frame = toc.tracks[track-1].logframeofs;
 
-				track_type = toc.tracks[track-1].trktype == cdrom_file::CD_TRACK_AUDIO ? 0x00 : 0x04;
+				track_type = (toc.tracks[track-1].trktype == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x04;
 				LOGCMD("Get track info track = %d, frame = %d %s\n", track, frame, track_type ? "data" : "audio");
 			}
 
@@ -613,4 +613,3 @@ TIMER_CALLBACK_MEMBER(nscsi_cdrom_pc8801_30_device::cdda_fader_cb)
 
 	cdda->set_output_gain(ALL_OUTPUTS, m_cdda_volume / 100.0);
 }
-

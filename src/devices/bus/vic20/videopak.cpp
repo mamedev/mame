@@ -3,7 +3,14 @@
 /**********************************************************************
 
     Data 20 Corporation Video Pak cartridge emulation
-    aka Data 20 Display Manager aka Protecto 40/80
+    
+	(aka Data 20 Display Manager)
+	(aka Protecto 40/80)
+
+    SYS 40969 for 40 column mode
+    SYS 40972 for 80 column mode
+    SYS 40975 for VIC mode
+    SYS 40978 to restart 40/80 column mode
 
 **********************************************************************/
 
@@ -38,6 +45,9 @@ DEFINE_DEVICE_TYPE(VIC20_VIDEO_PAK, vic20_video_pak_device, "vic20_videopak", "D
 //-------------------------------------------------
 
 ROM_START( videopak )
+	ROM_REGION( 0x800, "rom", 0 )
+	ROM_LOAD( "data20.bin", 0x000, 0x800, CRC(b7b1899f) SHA1(aac8388d16d789126a917958282e9bc6da1038c6) )
+
 	ROM_REGION( 0x800, MC6845_TAG, 0 )
 	// ROM has been borrowed from the C64 XL80 cartridge
 	ROM_LOAD( "chargen", 0x000, 0x800, BAD_DUMP CRC(9edf5e58) SHA1(4b244e6d94a7653a2e52c351589f0b469119fb04) )
@@ -59,8 +69,6 @@ const tiny_rom_entry *vic20_video_pak_device::device_rom_region() const
 
 MC6845_UPDATE_ROW( vic20_video_pak_device::crtc_update_row )
 {
-	const pen_t *pen = m_palette->pens();
-
 	for (int column = 0; column < x_count; column++)
 	{
 		uint8_t code = m_videoram[((ma + column) & 0x7ff)];
@@ -75,9 +83,7 @@ MC6845_UPDATE_ROW( vic20_video_pak_device::crtc_update_row )
 		for (int bit = 0; bit < 8; bit++)
 		{
 			int x = (column * 8) + bit;
-			int color = BIT(data, 7) && de;
-
-			bitmap.pix(vbp + y, hbp + x) = pen[color];
+			bitmap.pix(vbp + y, hbp + x) = (BIT(data, 7) && de) ? rgb_t::white() : rgb_t::black();
 
 			data <<= 1;
 		}
@@ -85,28 +91,14 @@ MC6845_UPDATE_ROW( vic20_video_pak_device::crtc_update_row )
 }
 
 //-------------------------------------------------
-//  GFXDECODE( vic20_video_pak )
-//-------------------------------------------------
-
-static GFXDECODE_START( gfx_vic20_video_pak )
-	GFXDECODE_ENTRY(MC6845_TAG, 0x0000, gfx_8x8x1, 0, 1)
-GFXDECODE_END
-
-
-//-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 void vic20_video_pak_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, MC6845_SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::white()));
+	screen_device &screen(SCREEN(config, MC6845_SCREEN_TAG).set_color(rgb_t::white()));
 	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
-	screen.set_size(80*8, 24*8);
-	screen.set_visarea(0, 80*8-1, 0, 24*8-1);
-	screen.set_refresh_hz(50);
-
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_vic20_video_pak);
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	screen.set_raw(XTAL(14'318'181), 912, 0, 640, 263, 0, 192);
 
 	MC6845(config, m_crtc, XTAL(14'318'181) / 8); // HD46505RP or similar
 	m_crtc->set_screen(MC6845_SCREEN_TAG);
@@ -129,8 +121,8 @@ vic20_video_pak_device::vic20_video_pak_device(const machine_config &mconfig, co
 	device_t(mconfig, VIC20_VIDEO_PAK, tag, owner, clock),
 	device_vic20_expansion_card_interface(mconfig, *this),
 	m_crtc(*this, MC6845_TAG),
-	m_palette(*this, "palette"),
 	m_char_rom(*this, MC6845_TAG),
+	m_rom(*this, "rom"),
 	m_videoram(*this, "videoram", VIDEORAM_SIZE, ENDIANNESS_LITTLE),
 	m_ram(*this, "ram", RAM_SIZE, ENDIANNESS_LITTLE)
 {
@@ -143,6 +135,22 @@ vic20_video_pak_device::vic20_video_pak_device(const machine_config &mconfig, co
 
 void vic20_video_pak_device::device_start()
 {
+	m_slot->blk5().install_rom(0x0000, 0x07ff, m_rom->base());
+	m_slot->blk5().install_ram(0x1800, 0x1fff, m_videoram.target());
+
+	m_slot->io2().install_write_handler(0x3f8, 0x3f8, write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
+	m_slot->io2().install_readwrite_handler(0x3f9, 0x3f9, read8smo_delegate(*m_crtc, FUNC(mc6845_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
+	m_slot->io2().install_write_handler(0x3fc, 0x3fc, write8smo_delegate(*this, FUNC(vic20_video_pak_device::control_w)));
+
+	// state saving
+	save_item(NAME(m_case));
+	save_item(NAME(m_bank_size));
+	save_item(NAME(m_bank_lsb));
+	save_item(NAME(m_bank_msb));
+	save_item(NAME(m_ram_enable));
+	save_item(NAME(m_columns));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(vic20_video_pak_device::update_map), this));
 }
 
 
@@ -152,172 +160,68 @@ void vic20_video_pak_device::device_start()
 
 void vic20_video_pak_device::device_reset()
 {
+	control_w(0);
 }
 
 
 //-------------------------------------------------
-//  vic20_cd_r - cartridge data read
+//  control_w -
 //-------------------------------------------------
 
-uint8_t vic20_video_pak_device::vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void vic20_video_pak_device::control_w(uint8_t data)
 {
-	if (!m_ram_enable)
-	{
-		if (m_bank_size)
-		{
-			if (!blk1)
-			{
-				offs_t addr = m_bank_msb << 15 | m_bank_lsb << 14 | offset;
-				data = m_ram[addr];
-			}
+	/*
 
-			if (!blk2)
-			{
-				offs_t addr = m_bank_msb << 15 | m_bank_lsb << 14 | 0x2000 | offset;
-				data = m_ram[addr];
-			}
-		}
-		else
-		{
-			if (!blk1)
-			{
-				offs_t addr = m_bank_msb << 15 | offset;
-				data = m_ram[addr];
-			}
+	    bit     description
 
-			if (!blk2)
-			{
-				offs_t addr = m_bank_msb << 15 | 0x2000 | offset;
-				data = m_ram[addr];
-			}
+	    0       0 = upper case, 1 = lower case
+	    1       bank size: 0 = 2x24KB, 1 = 4x16KB
+	    2       16KB mode address LSB
+	    3       memory address MSB
+	    4       0 = enable RAM, 1 = disable RAM
+	    5       0 = 40 columns, 1 = 80 columns (Data 20 Video Manager)
 
-			if (!blk3)
-			{
-				offs_t addr = m_bank_msb << 15 | 0x4000 | offset;
-				data = m_ram[addr];
-			}
-		}
-	}
+	*/
 
-	if (!blk5)
-	{
-		switch ((offset >> 11) & 0x03)
-		{
-		case 0:
-			if (m_blk5)
-				data = m_blk5[offset & 0x7ff];
-			break;
+	m_case = BIT(data, 0);
+	m_bank_size = BIT(data, 1);
+	m_bank_lsb = BIT(data, 2);
+	m_bank_msb = BIT(data, 3);
+	m_ram_enable = BIT(data, 4);
+	m_columns = BIT(data, 5);
 
-		case 3:
-			data = m_videoram[offset & 0x7ff];
-			break;
-		}
-	}
+	m_crtc->set_unscaled_clock(XTAL(14'318'181) / (m_columns ? 8 : 16));
 
-	if (!io2)
-	{
-		if (offset == 0x1bf9)
-		{
-			data = m_crtc->register_r();
-		}
-	}
-
-	return data;
+	update_map();
 }
 
 
 //-------------------------------------------------
-//  vic20_cd_w - cartridge data write
+//  update_map -
 //-------------------------------------------------
 
-void vic20_video_pak_device::vic20_cd_w(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void vic20_video_pak_device::update_map()
 {
-	if (!m_ram_enable)
+	if (m_ram_enable)
 	{
-		if (m_bank_size)
-		{
-			if (!blk1)
-			{
-				offs_t addr = m_bank_msb << 15 | m_bank_lsb << 14 | offset;
-
-				m_ram[addr] = data;
-			}
-
-			if (!blk2)
-			{
-				offs_t addr = m_bank_msb << 15 | m_bank_lsb << 14 | 0x2000 | offset;
-
-				m_ram[addr] = data;
-			}
-		}
-		else
-		{
-			if (!blk1)
-			{
-				offs_t addr = m_bank_msb << 15 | offset;
-
-				m_ram[addr] = data;
-			}
-
-			if (!blk2)
-			{
-				offs_t addr = m_bank_msb << 15 | 0x2000 | offset;
-
-				m_ram[addr] = data;
-			}
-
-			if (!blk3)
-			{
-				offs_t addr = m_bank_msb << 15 | 0x4000 | offset;
-
-				m_ram[addr] = data;
-			}
-		}
+		m_slot->blk1().unmap();
+		m_slot->blk2().unmap();
+		m_slot->blk3().unmap();
 	}
-
-	if (!blk5)
+	else if (m_bank_size)
 	{
-		switch ((offset >> 11) & 0x03)
-		{
-		case 3:
-			m_videoram[offset & 0x7ff] = data;
-			break;
-		}
+		offs_t const base = m_bank_msb << 15 | m_bank_lsb << 14;
+
+		m_slot->blk1().install_ram(0x0000, 0x1fff, &m_ram[base]);
+		m_slot->blk2().install_ram(0x0000, 0x1fff, &m_ram[base | 0x2000]);
+		m_slot->blk3().unmap();
 	}
-
-	if (!io2)
+	else
 	{
-		switch (offset)
-		{
-		case 0x1bf8:
-			m_crtc->address_w(data);
-			break;
+		offs_t const base = m_bank_msb << 15;
 
-		case 0x1bf9:
-			m_crtc->register_w(data);
-			break;
-
-		case 0x1bfc:
-			/*
-
-			    bit     description
-
-			    0       0 = upper case, 1 = lower case
-			    1       bank size: 0 = 2x24KB, 1 = 4x16KB
-			    2       16KB mode address LSB
-			    3       memory address MSB
-			    4       0 = enable RAM, 1 = disable RAM
-			    5       0 = 40 columns, 1 = 80 columns (Data 20 Video Manager)
-
-			*/
-
-			m_case = BIT(data, 0);
-			m_bank_size = BIT(data, 1);
-			m_bank_lsb = BIT(data, 2);
-			m_bank_msb = BIT(data, 3);
-			m_ram_enable = BIT(data, 4);
-			m_columns = BIT(data, 5);
-			break;
-		}
+		m_slot->blk1().install_ram(0x0000, 0x1fff, &m_ram[base]);
+		m_slot->blk2().install_ram(0x0000, 0x1fff, &m_ram[base | 0x2000]);
+		m_slot->blk3().install_ram(0x0000, 0x1fff, &m_ram[base | 0x4000]);
 	}
 }
