@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <numbers>
 
 
 //**************************************************************************
@@ -204,7 +205,7 @@ void huc6271_device::device_start()
 
 	for (int x = 0; x < 8; x++)
 		for (int u = 0; u < 8; u++)
-			m_idct_cos[x][u] = (u ? 1.0 : M_SQRT1_2) * std::cos((2 * x + 1) * u * M_PI / 16);
+			m_idct_cos[x][u] = (u ? 1.0 : 1.0 / std::numbers::sqrt2) * std::cos((2 * x + 1) * u * std::numbers::pi / 16);
 
 	save_item(NAME(m_control));
 	save_item(NAME(m_hscroll));
