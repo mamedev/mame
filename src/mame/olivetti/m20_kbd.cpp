@@ -17,6 +17,15 @@ namespace {
     based.  The modifier handling seems very odd as it has aliasing and
     overflow all over the place.
 
+    The kbd slot selects physical keyboard layouts, not PCOS releases.
+    Olivetti's PCOS User Guide (Oct 1983), Appendix B, illustrates
+    Germany (Original) and Germany (West) in figs B-3 and B-4.
+    The German PCOS user guide (1984), sec. 2.168 and 3.2, calls these
+    the old and new (DIN 2137) German layouts. The OLIWORD reference
+    card (print 3282/02/4.84) explicitly compares DIN 2127/2137 keys.
+    Both German keycap layouts report country 1; their MCU jumpers
+    remain the same. PCOS controls scan-code translation independently:
+    on PCOS 2.0, SL 1 selects DIN 2137 and SL 15 the original layout.
     Layout is selected with jumpers 26-29 on the keyboard MCU (Olivetti
     M20 Service Manual, April 1983, pp. 2-36/2-37, fig. 2-17).  Closed
     jumpers encode zero bits: all closed is Italy, opening 26 is Germany,
@@ -25,12 +34,11 @@ namespace {
     at 0978-09ae and BIOS 2.0f at 093e-096c check the low nibble, then
     shift the response right by four to obtain the country.
 
-    Italian, German and US ASCII key legends are implemented.  US ASCII
-    matches PCOS 1.3 and PCOS 2.0h kb.all country 4.  The original German
-    legends match PCOS 1.3 kb.all country 1 and PCOS 2.0h kb.all country 15;
-    the revised legends match PCOS 2.0h country 1.  This is a keycap choice,
-    not another jumper setting: both German versions report country 1.
-    PCOS still performs all national scan-code translation.
+    Italian, German and US ASCII key legends are implemented. PCOS 1.3
+    and PCOS 2.0h kb.all supplied mapping evidence, not keyboard model
+    names. PCOS translates scan codes to characters for the selected
+    language/layout; MAME's option only models the keycap legends and
+    nationality jumpers. No manufacturing date is established.
 
     TODO: add input layouts for the other national keyboards.
 
@@ -77,9 +85,9 @@ static INPUT_PORTS_START( m20_keyboard )
 	PORT_DIPSETTING(0x00, "Italian")
 	PORT_DIPSETTING(0x01, "German")
 	PORT_DIPSETTING(0x04, "US ASCII")
-	PORT_CONFNAME(0x10, 0x00, "German Key Legends") PORT_CONDITION("LAYOUT", 0x0f, EQUALS, 0x01)
-	PORT_CONFSETTING(0x00, "Original (PCOS 1.x)")
-	PORT_CONFSETTING(0x10, "Revised (PCOS 2.x)")
+	PORT_CONFNAME(0x10, 0x00, "German Keycap Layout") PORT_CONDITION("LAYOUT", 0x0f, EQUALS, 0x01)
+	PORT_CONFSETTING(0x00, "Original (DIN 2127)")
+	PORT_CONFSETTING(0x10, "DIN 2137")
 
 	PORT_START("LINE0")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("RESET")    PORT_CODE(KEYCODE_ESC)
@@ -243,13 +251,33 @@ INPUT_PORTS_END
 } // anonymous namespace
 
 
-m20_keyboard_device::m20_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
-	: buffered_rs232_device(mconfig, M20_KEYBOARD, tag, owner, 0)
+m20_keyboard_device::m20_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m20_keyboard_device(mconfig, M20_KEYBOARD, tag, owner, clock)
+{
+}
+
+m20_keyboard_device::m20_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t /*clock*/)
+	: buffered_rs232_device(mconfig, type, tag, owner, 0)
 	, device_matrix_keyboard_interface(mconfig, *this, "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8")
 	, m_modifiers(*this, "MODIFIERS")
 	, m_layout(*this, "LAYOUT")
 	, m_beeper(*this, "beeper")
 	, m_bell_timer(nullptr)
+{
+}
+
+m20_keyboard_de_device::m20_keyboard_de_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m20_keyboard_device(mconfig, M20_KEYBOARD_DE, tag, owner, clock)
+{
+}
+
+m20_keyboard_de_original_device::m20_keyboard_de_original_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m20_keyboard_device(mconfig, M20_KEYBOARD_DE_ORIGINAL, tag, owner, clock)
+{
+}
+
+m20_keyboard_us_device::m20_keyboard_us_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m20_keyboard_device(mconfig, M20_KEYBOARD_US, tag, owner, clock)
 {
 }
 
@@ -344,4 +372,11 @@ void m20_keyboard_device::received_byte(uint8_t byte)
 }
 
 
-DEFINE_DEVICE_TYPE(M20_KEYBOARD, m20_keyboard_device, "m20_kbd", "Olivetti M20 Keyboard")
+DEFINE_DEVICE_TYPE(M20_KEYBOARD, m20_keyboard_device,
+	"m20_kbd", "Olivetti M20 Italian keyboard (QZERTY)")
+DEFINE_DEVICE_TYPE(M20_KEYBOARD_DE, m20_keyboard_de_device,
+	"m20_kbd_de", "Olivetti M20 German keyboard (QWERTZ, DIN 2137)")
+DEFINE_DEVICE_TYPE(M20_KEYBOARD_DE_ORIGINAL, m20_keyboard_de_original_device,
+	"m20_kbd_de_orig", "Olivetti M20 German keyboard (QWERTZ, original DIN 2127)")
+DEFINE_DEVICE_TYPE(M20_KEYBOARD_US, m20_keyboard_us_device,
+	"m20_kbd_us", "Olivetti M20 US ASCII keyboard (QWERTY)")
