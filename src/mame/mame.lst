@@ -33472,6 +33472,9 @@ savquest
 @source:misc/scm_500.cpp
 scm_500
 
+@source:misc/semcrossw.cpp
+semcrossw
+
 @source:misc/shangkid.cpp
 chinhero
 chinhero2
@@ -44554,9 +44557,6 @@ sagitta180
 
 @source:skeleton/seattlecmp.cpp
 scp300f
-
-@source:skeleton/semcrossw.cpp
-semcrossw
 
 @source:skeleton/seoul88.cpp
 seoul88
