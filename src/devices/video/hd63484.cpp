@@ -24,6 +24,13 @@
 #define CMD_LOG 0
 
 
+
+enum
+{
+	STREAM_NONE = 0,
+	STREAM_RPTN
+};
+
 //-------------------------------------------------
 //  hd63484_device - constructor
 //-------------------------------------------------
@@ -47,6 +54,7 @@ hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, d
 	m_org_dpd(0),
 	m_cl0(0),
 	m_cl1(0), m_ccmp(0), m_mask(0), m_cpx(0),
+	m_stream(STREAM_NONE),
 	m_dcr(0),
 	m_space_config("videoram", ENDIANNESS_BIG, 16, 20, -1)
 {
@@ -508,6 +516,35 @@ inline void hd63484_device::dequeue_r(uint8_t *data)
 
 		if (m_fifo_r_ptr == -1)
 			m_sr &= ~HD63484_SR_RFR;
+
+		if (m_stream != STREAM_NONE)
+			stream_fill();
+	}
+}
+
+// resume a data transfer command that is still streaming words into the
+// read FIFO, as far as the available FIFO space allows
+void hd63484_device::stream_fill()
+{
+	while (m_stream != STREAM_NONE && m_fifo_r_ptr < 14)
+	{
+		uint16_t data = 0;
+
+		switch (m_stream)
+		{
+			case STREAM_RPTN:
+				data = m_pram[(m_dma_d0 + (m_cr & 0x0f)) & 0x0f];
+				m_dma_d0++;
+				if (m_dma_d0 >= m_dn)
+					m_stream = STREAM_NONE;
+				break;
+		}
+
+		queue_r((data >> 8) & 0xff);
+		queue_r((data >> 0) & 0xff);
+
+		if (m_stream == STREAM_NONE)
+			command_end_seq();
 	}
 }
 
@@ -1584,8 +1621,16 @@ void hd63484_device::process_fifo()
 			if(m_param_ptr == 1)
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': RPTN (%d) %d\n", tag(), m_cr & 0x0f, m_pr[0]);
-				command_end_seq();
-				fatalerror("HD63484 COMMAND_RPTN!\n");
+				m_dn = m_pr[0]; // number of words to read
+				m_dma_d0 = 0;
+
+				if (m_dn)
+				{
+					m_stream = STREAM_RPTN;
+					stream_fill();
+				}
+				else
+					command_end_seq();
 			}
 			break;
 
@@ -1874,6 +1919,7 @@ void hd63484_device::process_fifo()
 
 void hd63484_device::exec_abort_sequence()
 {
+	m_stream = STREAM_NONE;
 	fifo_w_clear();
 	fifo_r_clear();
 	m_sr = HD63484_SR_WFR | HD63484_SR_WFE | HD63484_SR_CED; // hard-set to 0x23
@@ -2149,6 +2195,7 @@ void hd63484_device::device_reset()
 	m_cpx = m_cpy = 0;
 	m_dn = 0;
 	m_dma_d0 = m_dma_d1 = 0;
+	m_stream = STREAM_NONE;
 
 	memset(m_vreg, 0, sizeof(m_vreg));
 	memset(m_fifo, 0, sizeof(m_fifo));
@@ -2279,6 +2326,7 @@ void hd63484_device::register_save_state()
 	save_item(NAME(m_sda));
 	save_item(NAME(m_pram));
 	save_item(NAME(m_dn));
+	save_item(NAME(m_stream));
 	save_item(NAME(m_ccr));
 	save_item(NAME(m_omr));
 	save_item(NAME(m_edg));

@@ -57,6 +57,7 @@ private:
 	inline void fifo_r_clear();
 	inline void queue_r(uint8_t data);
 	inline void dequeue_r(uint8_t *data);
+	void stream_fill();
 	inline void recompute_parameters();
 	inline void command_end_seq();
 	void calc_offset(int16_t x, int16_t y, uint32_t &offset, uint8_t &bit_pos);
@@ -134,6 +135,7 @@ private:
 	uint16_t m_pram[0x10];
 	uint8_t m_dn;
 	int16_t m_dma_d0, m_dma_d1;
+	uint8_t m_stream;
 
 	uint16_t m_ccr;
 	uint16_t m_omr;
