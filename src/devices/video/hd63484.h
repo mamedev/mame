@@ -64,7 +64,8 @@ private:
 	inline void dequeue_r(uint8_t *data);
 	void stream_fill();
 	inline void recompute_parameters();
-	inline void command_end_seq();
+	inline void command_end_seq(uint32_t cycles);
+	TIMER_CALLBACK_MEMBER(cmd_exec_tick);
 	void calc_offset(int16_t x, int16_t y, uint32_t &offset, uint8_t &bit_pos);
 	int get_bpp();
 	int get_ppmc();
@@ -73,7 +74,7 @@ private:
 	bool set_dot(int16_t x, int16_t y, uint16_t color);
 	bool draw_line(int16_t sx, int16_t sy, int16_t ex, int16_t ey);
 	void draw_ellipse(int16_t cx, int16_t cy, double dx, double dy, double s_angol, double e_angol, bool c);
-	void paint(int16_t sx, int16_t sy);
+	uint32_t paint(int16_t sx, int16_t sy);
 
 	void command_wpr_exec();
 	uint16_t command_rpr_exec();
@@ -161,6 +162,10 @@ private:
 	uint8_t m_lpstb_state;
 	uint32_t m_lpar;
 	uint8_t m_lpar_chr;
+
+	emu_timer *m_cmd_timer;
+	bool m_busy;
+	uint32_t m_dot_count;
 
 	uint16_t m_ppy;
 	uint16_t m_pzcy;
