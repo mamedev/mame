@@ -15,6 +15,8 @@
 #include "screen.h"
 
 #include <numbers>
+#include <utility>
+#include <vector>
 
 
 #define LOG 0
@@ -850,7 +852,7 @@ void hd63484_device::draw_ellipse(int16_t cx, int16_t cy, double dx, double dy, 
 void hd63484_device::paint(int16_t sx, int16_t sy)
 {
 /*
-    This is not accurate since real hardware can only paint 4 'unpaintable' areas,
+    This is not accurate since real hardware can only hold 4 'unpaintable' areas,
     the other 'unpaintable' points are pushed into the read FIFO to be processed
     later by the program, but currently is impossible suspend/resume the command
     in case the read FIFO is full, so all 'unpaintable' areas are painted.
@@ -861,46 +863,52 @@ void hd63484_device::paint(int16_t sx, int16_t sy)
 	uint16_t mask = (1 << bpp) - 1;
 	uint16_t xmask = (16 / bpp) - 1;
 
-	for (int ydir=0; ydir<2; ydir++)
-		for(uint16_t y=0;y<0x7fff; y++)
+	const auto paintable = [this, e, bpp, mask, xmask] (int32_t px, int32_t py)
+	{
+		uint16_t dot = get_dot(px, py);
+		uint16_t edg = (m_edg >> (px & xmask) * bpp) & mask;
+		uint16_t cl0 = (m_cl0 >> (px & xmask) * bpp) & mask;
+		uint16_t cl1 = (m_cl1 >> (px & xmask) * bpp) & mask;
+		return !((e && dot != edg) || (!e && dot == edg) || dot == cl0 || dot == cl1);
+	};
+
+	std::vector<std::pair<int16_t, int16_t>> seeds;
+	seeds.emplace_back(sx, sy);
+
+	// failsafe for fills whose painted dots stay paintable (conditional
+	// operation modes), which would otherwise never terminate
+	uint32_t budget = 1U << 20;
+
+	while (!seeds.empty() && budget)
+	{
+		auto [x, y] = seeds.back();
+		seeds.pop_back();
+
+		if (!paintable(x, y))
+			continue;
+
+		int32_t xl = x;
+		while (x - xl < 0x8000 && paintable(xl - 1, y))
+			xl--;
+		int32_t xr = x;
+		while (xr - x < 0x8000 && paintable(xr + 1, y))
+			xr++;
+
+		bool up = false, dn = false;
+		for (int32_t px = xl; px <= xr && budget; px++, budget--)
 		{
-			bool limit = true;
-			bool unpaintable_up = false;
-			bool unpaintable_dn = false;
+			set_dot(px, y, px - m_cpx, y - m_cpy);
 
-			for (int xdir=0; xdir<2; xdir++)
-				for(uint16_t x=0; x<0x7fff; x++)
-				{
-					int16_t px = sx + (xdir ? -x : x);
-					int16_t py = sy + (ydir ? -y : y);
-
-					uint16_t dot = get_dot(px, py);
-					uint16_t edg = (m_edg >> (px & xmask) * bpp) & mask;
-					uint16_t cl0 = (m_cl0 >> (px & xmask) * bpp) & mask;
-					uint16_t cl1 = (m_cl1 >> (px & xmask) * bpp) & mask;
-
-					if ((e && dot != edg) || (!e && dot == edg) || dot == cl0 || dot == cl1)
-						break;
-
-					if ((!ydir && !xdir && x && y) || (xdir && y) || (ydir && x) || (ydir && xdir))
-						set_dot(px, py, px - m_cpx, py - m_cpy);
-
-					dot = get_dot(px, py + 1);
-					if (unpaintable_up && !((e && dot == edg) && (!e && dot != edg) && dot != cl0 && dot != cl1))
-						paint(px, py + 1);
-					else if (!unpaintable_up && ((e && dot != edg) || (!e && dot == edg) || dot == cl0 || dot == cl1))
-						unpaintable_up = true;
-
-					dot = get_dot(px, py - 1);
-					if (unpaintable_dn && !((e && dot == edg) && (!e && dot != edg) && dot != cl0 && dot != cl1))
-						paint(px, py - 1);
-					else if (!unpaintable_dn && ((e && dot != edg) || (!e && dot == edg) || dot == cl0 || dot == cl1))
-						unpaintable_dn = true;
-
-					limit = false;
-				}
-			if (limit)     break;
+			// drop one seed per paintable run of the adjacent rows
+			if (paintable(px, y + 1)) { if (!up) { seeds.emplace_back(px, y + 1); up = true; } }
+			else up = false;
+			if (paintable(px, y - 1)) { if (!dn) { seeds.emplace_back(px, y - 1); dn = true; } }
+			else dn = false;
 		}
+	}
+
+	if (!budget)
+		logerror("HD63484 '%s': PAINT dot budget exhausted, fill aborted\n", tag());
 }
 
 uint16_t hd63484_device::command_rpr_exec()
