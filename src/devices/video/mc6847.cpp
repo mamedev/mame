@@ -660,7 +660,33 @@ mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_typ
 	set_palette(s_palette);
 }
 
+void mc6847_base_device::change_mode(uint8_t mode, int state)
+{
+	// sanity check, to ensure that we're not changing fixed modes
+	// i.e. client shouldn't use set_fixed_mode bits on live setups
+	assert((mode & m_fixed_mode_mask) == 0);
 
+	// calculate new mode
+	uint8_t new_mode;
+	if (state)
+		new_mode = m_mode | mode;
+	else
+		new_mode = m_mode & ~mode;
+
+	// has the mode changed?
+	if (new_mode != m_mode)
+	{
+		// it has!  check dirty flag
+		video_flush();
+		if (!m_dirty)
+		{
+			m_dirty = true;
+		}
+
+		// and set the new mode
+		m_mode = new_mode;
+	}
+}
 
 //-------------------------------------------------
 //  setup_fixed_mode - sets up fixed mode mask
