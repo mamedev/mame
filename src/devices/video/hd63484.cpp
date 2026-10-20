@@ -1701,6 +1701,8 @@ void hd63484_device::process_fifo()
 			if (m_param_ptr == 0)
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': RPR (%d)\n", tag(), m_cr & 0x1f);
+				m_sr &= ~HD63484_SR_ARD;
+				update_irq();
 				uint16_t data = command_rpr_exec();
 				queue_r((data >> 8) & 0xff);
 				queue_r((data >> 0) & 0xff);
