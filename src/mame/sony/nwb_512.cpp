@@ -733,21 +733,16 @@ uint16_t nwb_512_device::status_r()
 
 void nwb_512_device::ctrl_w(uint16_t data)
 {
+	LOGMASKED(LOG_CTRL, "%s ctrl_w 0x%x\n", machine().describe_context(), data);
+
 	// NWS-1580 uses a newer version of the framebuffer that uses a similar ROP engine, these definitions
 	// can be found in the NWS-1580 service manual.
 	const bool enabled = data & 0x1;
-	LOGMASKED(LOG_CTRL, "Write FB control = 0x%x (%s)\n", data, machine().describe_context());
-	LOGMASKED(LOG_CTRL, "\t%s framebuffer\n", enabled ? "enable" : "reset");
-	LOGMASKED(LOG_CTRL, "\t%s kanji ROM\n", data & 0x2 ? "enable" : "disable"); // TODO: not for first-gen fb?
-	LOGMASKED(LOG_CTRL, "\t%s v-sync interrupt\n", data & 0x8 ? "enable" : "disable");
-	LOGMASKED(LOG_CTRL, "\t%s command completion interrupt\n", data & 0x10 ? "enable" : "disable");
-	LOGMASKED(LOG_CTRL, "\tunknown %s\n", data & 0x20 ? "set" : "cleared");
-	LOGMASKED(LOG_CTRL, "\tdimmer setting = 0x%x\n", (data & 0xC0) >> 6);
-
 	if (!enabled)
 	{
 		reset_state();
 	}
+
 	m_state.ctrl = data;
 }
 
