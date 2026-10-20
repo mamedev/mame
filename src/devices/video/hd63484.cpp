@@ -947,6 +947,21 @@ uint16_t hd63484_device::command_rpr_exec()
 			return (m_rwp_dn << 14) | ((m_rwp[m_rwp_dn] >> 12) & 0xff);
 		case 0x0d: // Read Write Pointer L
 			return (m_rwp[m_rwp_dn] & 0x0fff) << 4;
+		case 0x10: // Drawing Pointer H
+		case 0x11: // Drawing Pointer L
+		{
+			uint32_t offset = 0;
+			uint8_t bit_pos = 0;
+			calc_offset(m_cpx, m_cpy, offset, bit_pos);
+			if ((m_cr & 0x1f) == 0x10)
+				return (m_org_dn << 14) | ((offset >> 12) & 0xff);
+			else
+				return ((offset & 0x0fff) << 4) | ((bit_pos / get_bpp()) & 0x0f);
+		}
+		case 0x12: // Current Pointer X
+			return m_cpx;
+		case 0x13: // Current Pointer Y
+			return m_cpy;
 		default:
 			if(LOG) logerror("Read %sx\n", wpr_regnames[m_cr & 0x1f]);
 			return 0;
