@@ -2172,8 +2172,6 @@ void hd63484_device::video_registers_w(int offset)
 		case 0xea: // Zoom Factor Register
 			m_hzf = (vreg_data >> 12) & 0x0f;
 			m_vzf = (vreg_data >> 8) & 0x0f;
-			if (m_hzf)
-				logerror("HD63484 '%s': unsupported horizontal zoom factor %d (external dot shifter)\n", tag(), m_hzf + 1);
 			break;
 
 		case 0x94: // Vertical Window Register A
@@ -2372,7 +2370,11 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 	int bpp = get_bpp();
 	int ppw = 16 / bpp;
 	uint32_t mask = (1 << bpp) - 1;
+	// zooming applies to the base screen only: the same raster is scanned
+	// (VZF+1) times and the same display address is output (HZF+1) times
 	int row = (layer_n == 1) ? (y - vs) / (m_vzf + 1) : (y - vs);
+	int const hzoom = (layer_n == 1) ? m_hzf + 1 : 1;
+	int hcnt = 0;
 	uint32_t base_offs = m_sar[layer_n] + row * m_mwr[layer_n] + m_external_skew;
 	uint32_t wind_offs = m_sar[3] + (y - m_vws) * m_mwr[3] + m_external_skew;
 	int step = (m_omr & 0x08) ? 2 : 1;
@@ -2419,7 +2421,11 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 			data >>= bpp;
 		}
 
-		base_offs++;
+		if (++hcnt >= hzoom)
+		{
+			hcnt = 0;
+			base_offs++;
+		}
 	}
 }
 
