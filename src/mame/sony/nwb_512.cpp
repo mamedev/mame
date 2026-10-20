@@ -358,80 +358,66 @@ void nwb_512_device::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t nwb_512_device::execute_rop(const uint8_t opcode, const uint16_t source, const uint16_t destination)
 {
+	static constexpr std::array ops = {
+		"~S", "~(S | D)", "~S & D", "0", "~(S & D)", "~D", "S ^ D", "S & ~D", "~S | D", "~(S ^ D)", "D", "S & D", "1", "S | ~D", "S | D", "S"};
+
 	uint16_t result;
-	[[maybe_unused]] std::string op;
 
 	switch (opcode)
 	{
 	case 0x0:
-		op = "~S";
 		result = ~source;
 		break;
 	case 0x1:
-		op = "~(S | D)";
 		result = ~(source | destination);
 		break;
 	case 0x2:
-		op = "~S & D";
 		result = ~source & destination;
 		break;
 	case 0x3:
-		op = "0";
 		result = 0;
 		break;
 	case 0x4:
-		op = "~(S & D)";
 		result = ~(source & destination);
 		break;
 	case 0x5:
-		op = "~D";
 		result = ~destination;
 		break;
 	case 0x6:
-		op = "S ^ D";
 		result = source ^ destination;
 		break;
 	case 0x7:
-		op = "S & ~D";
 		result = source & ~destination;
 		break;
 	case 0x8:
-		op = "~S | D";
 		result = ~source | destination;
 		break;
 	case 0x9:
-		op = "~(S ^ D)";
 		result = ~(source ^ destination);
 		break;
 	case 0xa:
-		op = "D";
 		result = destination;
 		break;
 	case 0xb:
-		op = "S & D";
 		result = source & destination;
 		break;
 	case 0xc:
-		op = "1";
 		result = 0xffff;
 		break;
 	case 0xd:
-		op = "S | ~D";
 		result = source | ~destination;
 		break;
 	case 0xe:
-		op = "S | D";
 		result = source | destination;
 		break;
 	case 0xf:
-		op = "S";
 		result = source;
 		break;
 	default:
 		fatalerror("nwb_512: invalid ROP function code 0x%x", opcode);
 	}
 
-	LOGMASKED(LOG_ROP, "execute_rop(0x%x/%s, 0x%x, 0x%x) = 0x%x\n", opcode, op, source, destination, result);
+	LOGMASKED(LOG_ROP, "execute_rop(0x%x/%s, 0x%x, 0x%x) = 0x%x\n", opcode, ops[opcode], source, destination, result);
 	return result;
 }
 
