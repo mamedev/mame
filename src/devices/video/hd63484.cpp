@@ -521,9 +521,11 @@ int hd63484_device::get_ppmc()
 	{
 		case 0: case 1: case 2: case 3: // address incremented by 1, 2, 4 or 8 words
 			return (ppw << gai) / acm;
-		case 7:                         // address incremented by 1 every two display cycles
+		case 4:                         // address incremented by 16 words
+			return (ppw << 4) / acm;
+		case 6: case 7:                 // address incremented by 1 every two display cycles
 			return std::max(ppw / 2 / acm, 1);
-		default:                        // 4-6: address not incremented
+		default:                        // 5: address not incremented
 			return ppw / acm;
 	}
 }
