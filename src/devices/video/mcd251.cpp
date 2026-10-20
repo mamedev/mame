@@ -610,15 +610,9 @@ TIMER_CALLBACK_MEMBER(mcd251_device::frame_period_tick)
 		if (!synchronous || desync > -30)
 			m_desync_satisfied = true;
 
-		// When the demuxer's SCR has run far ahead of the timestamp we are
-		// about to display there is no point correcting the frame period, so
-		// the correction is dropped.
 		const bool valid_dts = m_dts_fifo.front() != 0;
-		const bool way_out = valid_dts
-				&& mpeg_timestamp_diff(m_demux.scr, m_dts_fifo.front()) > 15000;
-
 		m_display_dts_desync =
-				(m_syscr_written && synchronous && valid_dts && !way_out) ? desync : 0;
+				(m_syscr_written && synchronous && valid_dts) ? desync : 0;
 
 		// Correct the frame period rather than skipping a picture: the queue
 		// empties faster than the disc fills it, and the NDAT that follows
