@@ -1763,7 +1763,7 @@ void hd63484_device::process_fifo()
 			if(m_param_ptr == 3)
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': ELPS (%d, %d, %d, %d) %d, %d, %d\n", tag(), BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0], m_pr[1], m_pr[2]);
-				double dx = (double)m_pr[3];
+				double dx = (double)m_pr[2];
 				double dy = sqrt(pow(dx, 2) / ((double)m_pr[0] / m_pr[1]));
 				draw_ellipse(m_cpx, m_cpy, dx, dy, 0.0, 2.0 * std::numbers::pi, BIT(m_cr, 8));
 				command_end_seq();
