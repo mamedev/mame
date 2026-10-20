@@ -442,8 +442,8 @@ inline void hd63484_device::queue_w(uint8_t data)
 
 		m_fifo[m_fifo_ptr] = data;
 
-		// ready only while there is room for a full word
-		if (m_fifo_ptr >= 14)
+		// ready until the FIFO is completely full (8 words/16 bytes)
+		if (m_fifo_ptr == 15)
 			m_sr &= ~HD63484_SR_WFR;
 
 		m_sr &= ~HD63484_SR_WFE;
@@ -472,8 +472,7 @@ inline void hd63484_device::dequeue_w(uint8_t *data)
 
 		m_fifo_ptr--;
 
-		if (m_fifo_ptr < 14)
-			m_sr |= HD63484_SR_WFR;
+		m_sr |= HD63484_SR_WFR;
 
 		if (m_fifo_ptr == -1)
 			m_sr |= HD63484_SR_WFE;
