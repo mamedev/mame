@@ -778,11 +778,11 @@ bool hd63484_device::set_dot(int16_t x, int16_t y, uint16_t color)
 				res = (data & ~mask) | color_shifted;
 			break;
 		case 6:
-			if (get_dot(x, y) < ((m_cl0 & mask) >> bit_pos))
+			if (get_dot(x, y) < (color_shifted >> bit_pos))
 				res = (data & ~mask) | color_shifted;
 			break;
 		case 7:
-			if (get_dot(x, y) > ((m_cl1 & mask) >> bit_pos))
+			if (get_dot(x, y) > (color_shifted >> bit_pos))
 				res = (data & ~mask) | color_shifted;
 			break;
 	}
