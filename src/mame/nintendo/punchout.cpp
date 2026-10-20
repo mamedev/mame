@@ -152,6 +152,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_vlm(*this, "vlm"),
+		m_mainlatch(*this, "mainlatch"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_dmaram(*this, "dmaram"),
@@ -164,11 +165,13 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<rp2a03_device> m_audiocpu;
 	required_device<vlm5030_device> m_vlm;
+	required_device<ls259_device> m_mainlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -197,6 +200,7 @@ protected:
 	bool m_nmi_mask = false;
 	bool m_dma_enable = false;
 	bool m_nvram_enable = false;
+	uint8_t m_watchdog_count = 0;
 	void nmi_mask_w(int state);
 	void dma_enable_w(int state);
 	void nvram_enable_w(int state);
@@ -1259,6 +1263,21 @@ void punchout_state::vblank_irq(int state)
 	if (!state)
 		return;
 
+	// Watchdog: LS161A 2A counts the same vblank edges while latch Q0 (NMI enable) and Q1 are both clear;
+	// otherwise its load input (the NOR of the two, 3A) loads its grounded data inputs. QD resets the Z80
+	// and clears the latch through 3A, so the count carries on through 8-15 and the reset lasts 8 vblanks.
+	bool const was_reset = BIT(m_watchdog_count, 3);
+	if (m_mainlatch->q0_r() || m_mainlatch->q1_r())
+		m_watchdog_count = 0;
+	else
+		m_watchdog_count = (m_watchdog_count + 1) & 0x0f;
+	bool const reset = BIT(m_watchdog_count, 3);
+	if (reset != was_reset)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_RESET, reset ? ASSERT_LINE : CLEAR_LINE);
+		m_mainlatch->clear_w(reset ? 0 : 1);
+	}
+
 	if (m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
@@ -1299,10 +1318,21 @@ void punchout_state::machine_start()
 	save_item(NAME(m_nmi_mask));
 	save_item(NAME(m_dma_enable));
 	save_item(NAME(m_nvram_enable));
+	save_item(NAME(m_watchdog_count));
+}
+
+void punchout_state::machine_reset()
+{
+	// the power-on reset clears the watchdog counter (2A /CL)
+	m_watchdog_count = 0;
+	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_mainlatch->clear_w(1);
 }
 
 void spunchout_state::machine_reset()
 {
+	punchout_state::machine_reset();
+
 	m_rp5h01->enable_w(0); // _CE -> GND
 }
 
@@ -1321,7 +1351,7 @@ void punchout_state::punchout(machine_config &config)
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 2B
 	mainlatch.q_out_cb<0>().set(FUNC(punchout_state::nmi_mask_w));
-	mainlatch.q_out_cb<1>().set_nop(); // watchdog reset, seldom used because 08 clears the watchdog as well
+	mainlatch.q_out_cb<1>().set_nop(); // watchdog: while this or Q0 is set, the counter (2A) stays cleared
 	mainlatch.q_out_cb<2>().set(FUNC(punchout_state::dma_enable_w)); // BUSRQ flip-flop D
 	mainlatch.q_out_cb<3>().set_inputline("audiocpu", INPUT_LINE_RESET);
 	mainlatch.q_out_cb<4>().set("vlm", FUNC(vlm5030_device::rst_w));
