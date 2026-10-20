@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Known undumped software releases:
+
+- [FJ-WPS30]  Arabian Kid (あらびあんKID)
+- [?]         Blind Touch Club (ブラインドタッチ倶楽部)
+- [WPS-20]    Blind Touch Club II (ブラインドタッチ倶楽部Ⅱ)
+- [FW-SD2002] Chátty (シャティ)
+- [WPS-22]    Disney Characters Illustration Land (ディズニーキャラクターイラストランド)
+- [WPS-21]    Disney Characters Puzzle Land (ディズニーキャラクターパズルランド)
+- [FJ-WPS27]  Disney Characters Town Factory ~5-tsu no Item o Atsumero!~ (ディズニーキャラクター タウンファクトリー ～5つのアイテムを集めろ！～)
+- [WPS-26]    Disney Classic Characters Illustration Land ~101 Dalmatians~ (ディズニー・クラシックキャラクターイラストランド ～101匹わんちゃん～)
+- [WPS-1]     Ide Yousuke Meijin no Jissen Mahjong (井出洋介名人の実戦麻雀)
+- [WPS-9]     Knight Moves (ナイトムーブス)
+- [WPS-8]     Kohakuiro no Yuigon (琥珀色の遺言)
+- [FJ-WPS28]  Mahjong Gokuu Tenjiku (麻雀悟空天竺) (Missing Monochrome Version)
+- [FW-SD2001] Manhattan Requiem (マンハッタン・レクイエム)
+- [FJ-WPS33]  New Year's Card Illustrations 100-sen (年賀状イラスト100選)
+- [FJ-WPS32]  Pachinko Dojo (パチンコ道場)
+- [WPS-16]    Professional Mahjong Gokuu (プロフェッショナル麻雀悟空)
+- [WPS-4F]    Rakuraku Business Bunreishuu (らくらくビジネス文例集)
+- [WPS-7]     Refill Plan (リフィル・プラン)
+- [?]         Sanrio Carnival (サンリオカーニバル)
+- [WPS-6]     Satsui no Seppun (殺意の接吻)
+- [FW-SD2102] Shanghai (上海)
+- [WPS-15]    Sokoban (倉庫番)
+- [FJ-WPS29]  Trump World (トランプワールド)
+-->
+
+<softwarelist name="fwu1_flop" description="Panasonic FW-U1 Personal Word Processor floppy disk images">
+
+	<software name="casablan" supported="no">
+		<description>Casablanca ni Ai o</description>
+		<year>1989</year>
+		<publisher>Thinking Rabbit</publisher>
+		<notes><![CDATA[
+512 bytes/sector, 9 sectors/track, 80 tracks/side.
+
+Track 38 Side 1 Sector 5 has an invalid byte sequence encoded at its DAM sequence marker offset.
+Manually fixing this sequence still results in flaky reads due to jitter in 4us MFM pulse interval (no pulses in 6uS and 8uS).
+]]></notes>
+        <info name="alt_title" value="カサブランカに愛を"/>
+		<info name="serial" value="FW-SD2003"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="fw-sd2003.mfm" size="737280" crc="68a64496" sha1="7482e296487f865231d6a70c13fe01603d31c6c2" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mahgoten" supported="no">
+		<description>Mahjong Gokuu Tenjiku</description>
+		<year>1995</year>
+		<publisher>Chatnoir</publisher>
+		<notes><![CDATA[
+Color Version: 512 bytes/sector, 18 sectors/track, 80 tracks/side.
+Track 0 Side 1 Sector 12 is missing its IDAM sequence marker, but has valid data.
+]]></notes>
+		<info name="alt_title" value="麻雀悟空天竺"/>
+		<info name="serial" value="FJ-WPS28"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Monochrome Version (モノクロ液晶対応版)"/>
+			<dataarea name="flop" size="1">
+				<rom name="fj-wps28.mono.mfm" size="0" status="nodump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Color Version (カラー液晶対応版)"/>
+			<dataarea name="flop" size="1474560">
+				<rom name="fj-wps28.color.mfm" size="1474560" crc="66effb0c" sha1="e2deb1f05958459674d95b0e47dc288401f872db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickplut" supported="no">
+        <description>Mickey no Pluto o Sagase!</description>
+		<year>199?</year>
+		<publisher>Micro Cabin</publisher>
+		<notes><![CDATA[
+512 bytes/sector, 9 sectors/track, 80 tracks/side, except on
+Track 3 Side 0 and Track 79 Side 1, which are
+1024 bytes/sector, 5 sectors/track.
+]]></notes>
+        <info name="alt_title" value="ミッキーのプルートを探せ！"/>
+		<info name="serial" value="WPS-23"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="738304">
+                <rom name="wps-23.mfm" size="738304" crc="efcf7bfe" sha1="ca328979f0df0b41f19711631c7c4a89d2f4ba55"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puyopuyo" supported="no">
+		<description>Puyo Puyo</description>
+		<year>1995</year>
+		<publisher>Compile / Micro Cabin</publisher>
+		<notes><![CDATA[
+512 bytes/sector, 18 sectors/track, 80 tracks/side.
+Track 2 Side 1 null-filled: no flux in MFM pulse intervals.
+]]></notes>
+		<info name="alt_title" value="ぷよぷよ"/>
+		<info name="serial" value="FJ-WPS31"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="fj-wps31.mfm" size="1474560" crc="ea01da13" sha1="784e30982e6abc047107d1bb843a096f0c6e4369"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shang2" supported="no">
+		<description>Shanghai II</description>
+		<year>1991</year>
+		<publisher>ASCII Corporation / Activision</publisher>
+		<notes><![CDATA[
+512 bytes/sector, 9 sectors/track, 80 tracks/side.
+Track 1 Side 0 null-filled: Only has flux in 4uS MFM pulse interval.
+
+Licensed from Mediagenic.
+Original game design by Brodie Lockard.
+]]></notes>
+        <info name="alt_title" value="上海Ⅱ"/>
+		<info name="serial" value="WPS-18"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+                <rom name="wps-18.mfm" size="737280" crc="92176ed6" sha1="624430eda27c465ae1d230103c9ca3e85760a923"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris" supported="no">
+		<description>Tetris</description>
+		<year>1988</year>
+		<publisher>Bullet-Proof Software Inc.</publisher>
+		<notes><![CDATA[
+512 bytes/sector, 9 sectors/track, 80 tracks/side.
+
+Track 1 Side 1 contains empty sectors 2 to 5 (image bytes 0x3800..0x4000)
+with invalid data CRCs: expected 0xDA6E, but stored checksum is 0x5445
+(ASCII encoded "TE"). These sectors cover two non-standard overlapping
+FAT filesystem entries:
+
+- File b"\x94" in cluster 9 with size 0x1400 bytes (image bytes 0x3800..0x4c00);
+- File b"\x94\x94" in cluster 10 with size 0x17e8 bytes (image bytes 0x3c00..0x53e8);
+
+Image bytes 0x4000..0x6c00 duplicate file "OOO.PRG" at offset 0x800
+(image offset 0x7400). This file is in cluster 22 with size 0x3080 bytes
+(image bytes 0x6c00..0x9c80).
+
+TM and (C) 1987, Academy Soft-Elorg.
+Licensed to Andromeda Software Ltd.
+Sublicensed to Mirrorsoft Ltd., Sphere Inc. and Bullet-Proof Software Inc.
+Original concept by Alexey Pazhitnov.
+Original design and program by Vadim Gerasimov.
+]]></notes>
+		<info name="alt_title" value="テトリス"/>
+		<info name="serial" value="WPS-2"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="wps-2.mfm" size="737280" crc="b79fbf23" sha1="1febc654e6d95077e1b9bd2806456bd6c94286f0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

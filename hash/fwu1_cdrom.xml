@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Known undumped software releases:
+
+- [DFJN5097ZAM] FW-U1C83 Complete System (FW-U1C83 まるごとシステム)
+- [DFJN5039ZAZ] FW-U1CD300 System CD (FW-U1CD300 まるごとCD)
+- [DFJN5067ZAM] FW-U1CD330 System CD (FW-U1CD330 まるごとCD)
+- [DFJN5084ZCK] FW-U1CD350 System CD (FW-U1CD350 まるごとCD)
+- [DFJN5118ZAM] FW-U1CSD500 System CD (FW-U1CSD500 まるごとCD)
+- [FJ-WPCD2]    Nengajou 300-sen '98 (年賀状300選'98)
+-->
+
+<softwarelist name="fwu1_cdrom" description="Panasonic FW-U1 Personal Word Processor CD-ROM images">
+
+	<software name="fwu1c70" supported="no">
+		<description>FW-U1C70 Complete System</description>
+		<year>1996</year>
+		<publisher>Panasonic</publisher>
+		<notes>Includes subchannel data (2448 bytes per sector).</notes>
+		<info name="alt_title" value="FW-U1C70 まるごとシステム"/>
+		<info name="language" value="Japanese"/>
+		<info name="notice" value="© 松下電器産業株式会社"/>
+		<info name="ring_code" value="PAN-DFJN5051ZAM, IFPI LA01"/>
+		<info name="serial" value="DFJN5051ZAM"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="DFJN5051ZAM" sha1="6b9883aa1ff7b484a0a786dd9f41b37cbce019f4"/>
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>
