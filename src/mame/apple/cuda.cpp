@@ -132,6 +132,10 @@ void cuda_device::device_start()
 	save_item(NAME(m_tip));
 	save_item(NAME(m_via_data));
 	save_item(NAME(m_adb_in));
+	save_item(NAME(m_adb_power));
+	save_item(NAME(m_last_adb));
+	save_item(NAME(m_last_adb_time));
+	save_item(NAME(m_iic_sda));
 	save_item(NAME(m_reset_line));
 	save_item(NAME(m_nmi_line));
 	save_item(NAME(m_adb_dtime));

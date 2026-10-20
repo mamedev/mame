@@ -824,6 +824,7 @@ void ppc_device::device_start()
 	save_item(NAME(m_core->irq_pending));
 	save_item(NAME(m_tb_zero_cycles));
 	save_item(NAME(m_dec_zero_cycles));
+	save_item(NAME(m_rtc_zero_cycles));
 
 	save_item(NAME(m_core->reserve));
 	save_item(NAME(m_core->reserve_address));

@@ -49,6 +49,7 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	virtual void reset_all_mappings() override;
 
@@ -61,6 +62,7 @@ protected:
 
 private:
 	void install_config_access_map();
+	void install_ram();
 	void access_map_le(address_map &map) ATTR_COLD;
 	void access_map_be(address_map &map) ATTR_COLD;
 	u32 be_config_address_r();
