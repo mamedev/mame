@@ -581,12 +581,16 @@ void armwrest_state::draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap
 
 void punchout_state::drawbs2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// The X counter (LS161 8C/7C/6D) is loaded while HWD3 is low (horizontal blank counts 186-191) and the
+	// shift registers (LS299 8R/8S) and colour latch (LS377 7J) load at the end of dot 6 of each character,
+	// so x shows column xpos + 57 + x. The Y counter (LS161 8E/7E/6F) is loaded while /EC2 is low and steps
+	// once per line in the horizontal blank, as for big sprite 1, so line v shows row ypos + v - 3.
 	int sx = 512 - (m_spr2_ctrlram[0] + 256 * (m_spr2_ctrlram[1] & 1));
 	if (sx > 512 - 127) sx -= 512;
-	sx -= 55;   // adjustment to match the screen shots
+	sx -= 57;
 
 	int sy = -m_spr2_ctrlram[2] + 256 * (m_spr2_ctrlram[3] & 1);
-	sy += 3;    // adjustment to match the screen shots
+	sy += 3;
 
 	sx = -sx << 16;
 	sy = -sy << 16;
