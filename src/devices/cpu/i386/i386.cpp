@@ -1413,39 +1413,18 @@ void i386_device::sib_byte(uint8_t mod, uint32_t* out_ea, uint8_t* out_segment)
 	i = (sib >> 3) & 0x7;
 	base = sib & 0x7;
 
-	switch( base )
+	if (base == EBP && mod == 0)
 	{
-		case 0: ea = REG32(EAX); segment = DS; break;
-		case 1: ea = REG32(ECX); segment = DS; break;
-		case 2: ea = REG32(EDX); segment = DS; break;
-		case 3: ea = REG32(EBX); segment = DS; break;
-		case 4: ea = REG32(ESP); segment = SS; break;
-		case 5:
-			if( mod == 0 ) {
-				ea = FETCH32();
-				segment = DS;
-			} else if( mod == 1 ) {
-				ea = REG32(EBP);
-				segment = SS;
-			} else if( mod == 2 ) {
-				ea = REG32(EBP);
-				segment = SS;
-			}
-			break;
-		case 6: ea = REG32(ESI); segment = DS; break;
-		case 7: ea = REG32(EDI); segment = DS; break;
+		ea = FETCH32();
+		segment = DS;
 	}
-	switch( i )
+	else
 	{
-		case 0: ea += REG32(EAX) * (1 << scale); break;
-		case 1: ea += REG32(ECX) * (1 << scale); break;
-		case 2: ea += REG32(EDX) * (1 << scale); break;
-		case 3: ea += REG32(EBX) * (1 << scale); break;
-		case 4: break;
-		case 5: ea += REG32(EBP) * (1 << scale); break;
-		case 6: ea += REG32(ESI) * (1 << scale); break;
-		case 7: ea += REG32(EDI) * (1 << scale); break;
+		ea = REG32(base);
+		segment = (base == ESP || base == EBP) ? SS : DS;
 	}
+	if (i != ESP)
+		ea += REG32(i) << scale;
 	*out_ea = ea;
 	*out_segment = segment;
 }
@@ -1465,23 +1444,17 @@ void i386_device::modrm_to_EA(uint8_t mod_rm, uint32_t* out_ea, uint8_t* out_seg
 
 
 	if( m_address_size ) {
-		switch( rm )
+		if (rm == ESP)
+			sib_byte(mod, &ea, &segment);
+		else if (rm == EBP && mod == 0)
 		{
-			default:
-			case 0: ea = REG32(EAX); segment = DS; break;
-			case 1: ea = REG32(ECX); segment = DS; break;
-			case 2: ea = REG32(EDX); segment = DS; break;
-			case 3: ea = REG32(EBX); segment = DS; break;
-			case 4: sib_byte(mod, &ea, &segment ); break;
-			case 5:
-				if( mod == 0 ) {
-					ea = FETCH32(); segment = DS;
-				} else {
-					ea = REG32(EBP); segment = SS;
-				}
-				break;
-			case 6: ea = REG32(ESI); segment = DS; break;
-			case 7: ea = REG32(EDI); segment = DS; break;
+			ea = FETCH32();
+			segment = DS;
+		}
+		else
+		{
+			ea = REG32(rm);
+			segment = (rm == EBP) ? SS : DS;
 		}
 		if( mod == 1 ) {
 			disp8 = FETCH();
