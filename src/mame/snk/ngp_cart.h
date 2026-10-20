@@ -79,7 +79,7 @@ public:
 //  CARTRIDGE SLOT
 //**************************************************************************
 
-class ngp_cart_slot_device : public generic_cartslot_device
+class ngp_cart_slot_device : public generic_slot_device
 {
 public:
 	template <typename T>
@@ -99,6 +99,8 @@ public:
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;
 	virtual void call_unload() override;
+	virtual char const *image_type_name() const noexcept override { return "cartridge"; }
+	virtual char const *image_brief_type_name() const noexcept override { return "cart"; }
 
 protected:
 	// device_t implementation

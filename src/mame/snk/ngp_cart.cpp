@@ -100,7 +100,7 @@ bool ngp_flash_device::nvram_can_write() const
 DEFINE_DEVICE_TYPE(NGP_CART_SLOT, ngp_cart_slot_device, "ngp_cart_slot", "SNK Neo Geo Pocket Cartridge Slot")
 
 ngp_cart_slot_device::ngp_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: generic_cartslot_device(mconfig, tag, owner, clock)
+	: generic_slot_device(mconfig, NGP_CART_SLOT, tag, owner, clock)
 	, m_flash4m(*this, "flash4m")
 	, m_flash8m(*this, "flash8m")
 	, m_flash16m(*this, "flash16m")
@@ -206,7 +206,7 @@ void ngp_cart_slot_device::call_unload()
 	m_address_space->unmap_readwrite(0x80'0000, 0x9f'ffff);
 
 	deselect_flash();
-	generic_cartslot_device::call_unload();
+	generic_slot_device::call_unload();
 }
 
 
