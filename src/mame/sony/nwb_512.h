@@ -20,9 +20,6 @@ public:
 
 	nwb_512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <typename T>
-	void set_vram(T &&tag) { m_vram.set_tag(std::forward<T>(tag)); }
-
 	void map(address_map &map);
 
 protected:
@@ -32,8 +29,6 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 private:
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
-
 	required_device<screen_device> m_nwp_512d;
 	required_device<ram_device> m_vram;
 
@@ -136,6 +131,8 @@ private:
 		}
 
 	} m_state;
+
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
 	void destination_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void source_w(offs_t offset, uint16_t data, uint16_t mem_mask);

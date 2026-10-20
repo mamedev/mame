@@ -180,9 +180,9 @@ u32 nwb_512_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, [
 
 void nwb_512_device::reset_state()
 {
-	// TODO: actually reset state
-	m_state.busy = false;
-	// m_state = {};
+	// The DSC-008 service manual does not elaborate on what is or isn't cleared on disable
+	// (and system behavior doesn't seem to care).
+	m_state = {};
 }
 
 void nwb_512_device::check_operation_start(offs_t offset)
@@ -220,7 +220,7 @@ void nwb_512_device::check_operation_start(offs_t offset)
 		while (m_state.busy)
 		{
 			const uint16_t source_data = coordinate_to_data(m_state.current_source_x, m_state.source_y);
-			LOGMASKED(LOG_ROP, "fb->fb: sx = 0x%x sy = 0x%x data = 0x%x\n", m_state.source_x, m_state.source_y, source_data);
+			LOGMASKED(LOG_ROP, "fb->fb: sx = 0x%x sy = 0x%x data = 0x%x\n", m_state.current_source_x, m_state.source_y, source_data);
 			rop_cycle(source_data); // When the ROP is done, this will clear m_state.busy
 		}
 	}
@@ -503,9 +503,12 @@ void nwb_512_device::end_row()
 	if (!m_state.limit_y)
 	{
 		LOG("\tROP done!\n");
-		m_state.busy = false; // TODO: use granular states from DSC-008 description?
-		m_state.source_x = 0;
-		m_state.destination_x = 0;
+		m_state.busy = false;
+
+		// The DSC-008 instruction manual mentions that SRXA/DRXA[3:0] are cleared independently (see: /CLRDEST and /SFH).
+		// This may not be accurate. Hardware confirmation is needed.
+		m_state.source_x &= ~0xf;
+		m_state.destination_x &= ~0xf;
 	}
 	else
 	{
@@ -732,9 +735,14 @@ void nwb_512_device::set_pixel(uint16_t x, uint16_t y, bool on)
 
 uint16_t nwb_512_device::status_r()
 {
+	// TODO: some ops wait for 0b11 -> 0b10/0b01 transition instead of 0b11->0b00,
+	// so the driver always returns 0b10 to ensure all known cases are covered.
+	// The specifics of the internal state should be used to determine this value instead.
+	constexpr uint8_t BUSY = 0b10;
+
 	// The framebuffer font is only rendered properly if bit 5 is set.
 	// This might be some kind of ID or revision flag for the Kanji ROM (or the framebuffer as a whole).
-	return 0x20 | (m_state.busy ? 0b10 : 0b0); // TODO: some ops wait for 0x11 -> 0b10/0b01 transition instead of 0b11->0b00
+	return 0x20 | (m_state.busy ? BUSY : 0);
 }
 
 void nwb_512_device::ctrl_w(uint16_t data)
