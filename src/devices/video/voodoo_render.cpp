@@ -261,14 +261,14 @@ void rasterizer_params::compute(voodoo_regs &regs, voodoo_regs *tmu0regs, voodoo
 	m_texmode1 = reg_texture_mode::NONE;
 	if (!regs.fbi_init3().disable_tmus())
 	{
-		if (tmu0regs != nullptr && tmu0regs->texture_lod().lod_min() < 32)
+		if (tmu0regs != nullptr && tmu0regs->texture_lod().lod_min() <= 32)
 		{
 			m_texmode0 = tmu0regs->texture_mode().normalize();
 			m_generic |= GENERIC_TEX0;
 			if (tmu0regs->trexinit_send_tmu_config())
 				m_texmode0 |= reg_texture_mode::TMU_CONFIG_MASK;
 		}
-		if (tmu1regs != nullptr && tmu1regs->texture_lod().lod_min() < 32)
+		if (tmu1regs != nullptr && tmu1regs->texture_lod().lod_min() <= 32)
 		{
 			m_texmode1 = tmu1regs->texture_mode().normalize();
 			m_generic |= GENERIC_TEX1;
@@ -812,7 +812,7 @@ void rasterizer_texture::recompute(voodoo_regs const &regs, u8 *ram, u32 mask, r
 	// extract LOD parameters
 	auto const texlod = regs.texture_lod();
 	m_lodmin = texlod.lod_min() << 6;
-	m_lodmax = texlod.lod_max() << 6;
+	m_lodmax = std::min<u32>(texlod.lod_max(), 32) << 6;
 	m_lodbias = s8(texlod.lod_bias() << 2) << 4;
 
 	// determine which LODs are present
@@ -939,11 +939,14 @@ inline rgbaint_t ATTR_FORCE_INLINE rasterizer_texture::fetch_texel(reg_texture_m
 	lod += m_lodbias;
 	if (texmode.enable_lod_dither())
 		lod += dither.raw_4x4(x) << 4;
-	lod = std::clamp<s32>(lod, m_lodmin, m_lodmax);
+	// Apply the upper clamp last so reversed register limits also stay bounded.
+	lod = std::min<s32>(std::max<s32>(lod, m_lodmin), m_lodmax);
 
 	// now the LOD is in range; if we don't own this LOD, take the next one
 	s32 ilod = lod >> 8;
 	ilod += (~m_lodmask >> ilod) & 1;
+	// There is no level 9: retain the last available level for split textures.
+	ilod = std::min<s32>(ilod, (m_lodmask & 0x100) ? 8 : 7);
 
 	// fetch the texture base
 	u32 texbase = m_lodoffset[ilod];
