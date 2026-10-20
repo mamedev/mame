@@ -144,7 +144,6 @@ private:
 	void fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t status_r();
 	void ctrl_w(uint16_t data);
-	void planemask_w(uint8_t data);
 
 	void reset_state();
 	void check_operation_start(offs_t offset);

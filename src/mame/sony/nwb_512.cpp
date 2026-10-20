@@ -36,11 +36,10 @@
 #include "nwb_512.h"
 
 #define LOG_CTRL 1 << 1
-#define LOG_OP 1 << 2
-#define LOG_ROP_CONFIG 1 << 3
-#define LOG_ROP 1 << 4
+#define LOG_ROP 1 << 2
+#define LOG_DATA 1 << 3
 
-#define VERBOSE (LOG_CTRL | LOG_ROP_CONFIG | LOG_GENERAL)
+#define VERBOSE (LOG_ROP | LOG_CTRL)
 #include "logmacro.h"
 
 #include <format>
@@ -52,6 +51,10 @@ namespace
 	// Total memory region is 2048 x 2048 pixels (512KiB)
 	constexpr uint16_t X_MAX = 2048;
 	constexpr uint16_t Y_MAX = 2048;
+
+	// Hardware raster operations for logging
+	static constexpr std::array raster_ops = {
+		"~S", "~(S | D)", "~S & D", "0", "~(S & D)", "~D", "S ^ D", "S & ~D", "~S | D", "~(S ^ D)", "D", "S & D", "1", "S | ~D", "S | D", "S"};
 
 	// Takes in an x,y coordinate and returns the byte offset into the framebuffer memory region
 	uint32_t coordinate_to_byte_offset(const uint16_t x, const uint16_t y)
@@ -145,14 +148,13 @@ void nwb_512_device::device_add_mconfig(machine_config &config)
 
 void nwb_512_device::map(address_map &map)
 {
-	map(0x00000, 0x0ffff).w(FUNC(nwb_512_device::destination_w)); // A13 = load shift, A14 = start execution, not sure about A15
+	map(0x00000, 0x0ffff).w(FUNC(nwb_512_device::destination_w));
 	map(0x1a000, 0x1bfff).w(FUNC(nwb_512_device::pixel_w));
-	map(0x20000, 0x27fff).w(FUNC(nwb_512_device::source_w));	 // A13 = load shift, A14 = start execution
-	map(0x40000, 0x55fff).w(FUNC(nwb_512_device::limit_w));		 // A16 = source-space select (FB vs host), A14 = start execution
-	map(0x60000, 0x60fff).w(FUNC(nwb_512_device::rop_config_w)); // rop configuration TODO: is the end addr correct here?
+	map(0x20000, 0x27fff).w(FUNC(nwb_512_device::source_w));
+	map(0x40000, 0x55fff).w(FUNC(nwb_512_device::limit_w));
+	map(0x60000, 0x60fff).w(FUNC(nwb_512_device::rop_config_w));
 	map(0x70000, 0x70fff).rw(FUNC(nwb_512_device::fifo_r), FUNC(nwb_512_device::fifo_w));
 	map(0x80000, 0x80001).rw(FUNC(nwb_512_device::status_r), FUNC(nwb_512_device::ctrl_w));
-	map(0xa0000, 0xa0000).w(FUNC(nwb_512_device::planemask_w));
 
 	map(0xc0000, 0xfffff).rom().region("krom", 0);
 }
@@ -187,17 +189,6 @@ void nwb_512_device::reset_state()
 
 void nwb_512_device::check_operation_start(offs_t offset)
 {
-	logerror("op arm: %-7s func=0x%x %s %s src=(0x%x,0x%x) dst=(0x%x,0x%x) lim=(0x%x,0x%x)\n",
-			 (m_state.fb_read && m_state.fb_write) ? "FB->FB" : (!m_state.fb_read && m_state.fb_write) ? "host->FB"
-															: (m_state.fb_read && !m_state.fb_write)   ? "FB->host"
-																									   : "??",
-			 m_state.rop_function,
-			 m_state.x_direction ? "xfwd" : "xrev",
-			 m_state.y_direction ? "yfwd" : "yrev",
-			 m_state.source_x, m_state.source_y,
-			 m_state.destination_x, m_state.destination_y,
-			 m_state.limit_x, m_state.limit_y);
-
 	if (!execution_requested(offset))
 	{
 		return;
@@ -220,7 +211,7 @@ void nwb_512_device::check_operation_start(offs_t offset)
 		while (m_state.busy)
 		{
 			const uint16_t source_data = coordinate_to_data(m_state.current_source_x, m_state.source_y);
-			LOGMASKED(LOG_ROP, "fb->fb: sx = 0x%x sy = 0x%x data = 0x%x\n", m_state.current_source_x, m_state.source_y, source_data);
+			LOGMASKED(LOG_DATA, "fb->fb: sx = 0x%x sy = 0x%x data = 0x%x\n", m_state.current_source_x, m_state.source_y, source_data);
 			rop_cycle(source_data); // When the ROP is done, this will clear m_state.busy
 		}
 	}
@@ -232,7 +223,7 @@ void nwb_512_device::destination_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 	m_state.destination_x = x_address(data);
 	m_state.destination_y = y_address(offset);
-	LOG("Destination set to (0x%x, 0x%x) x word offset = 0x%x\n", m_state.destination_x, m_state.destination_y, (m_state.destination_x - 1) >> 4);
+	LOGMASKED(LOG_ROP, "%s destination_w(0x%x, 0x%x) x word offset = 0x%x\n", machine().describe_context(), m_state.destination_x, m_state.destination_y, (m_state.destination_x - 1) >> 4);
 
 	if (shift_load_requested(offset))
 	{
@@ -244,7 +235,7 @@ void nwb_512_device::destination_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 void nwb_512_device::source_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	LOG("source_w(0x%x, 0x%x, 0x%x)\n", offset, data, mem_mask);
+	LOGMASKED(LOG_ROP, "%s source_w(0x%x, 0x%x, 0x%x)\n", machine().describe_context(), offset, data, mem_mask);
 	check_mem_mask(mem_mask);
 
 	m_state.source_x = x_address(data);
@@ -255,40 +246,33 @@ void nwb_512_device::source_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		m_state.load_shift_count();
 	}
 
-	LOG("Source set to (0x%x, 0x%x)\n", m_state.source_x, m_state.source_y);
+	LOGMASKED(LOG_ROP, "Source set to (0x%x, 0x%x)\n", m_state.source_x, m_state.source_y);
 	check_operation_start(offset);
 }
 
 void nwb_512_device::limit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	check_mem_mask(mem_mask);
-	LOG("limit_w(0x%x, 0x%x, 0x%x)\n", offset, data, mem_mask);
+	LOGMASKED(LOG_ROP, "%s limit_w(0x%x, 0x%x, 0x%x)\n", machine().describe_context(), offset, data, mem_mask);
 
-	// TODO: this feels like a hack
+	// The read/write bits seem to be set here, and in a slightly different way from the DSC-008.
+	// This behavior is an educated guess based on what iopboot, mrx, the NWS-800 monitor, and NWS-3800 monitor expect.
 	const bool op_start = execution_requested(offset);
-	const bool fb_read = op_start ? offset & (0x10000 >> 1) : true;
-	const bool fb_write = op_start;
-
-	if (fb_read != m_state.fb_read || fb_write != m_state.fb_write)
-	{
-		LOG("limit_w: override arm=%d%d -> limit=%d%d\n", m_state.fb_read, m_state.fb_write, fb_read, fb_write);
-	}
-	m_state.fb_read = fb_read;
-	m_state.fb_write = fb_write;
+	m_state.fb_write = op_start; // A14 = start write op
+	m_state.fb_read = op_start ? offset & (0x10000 >> 1) : true; // A14 clear = read only, otherwise read source type from A16 if writing
 
 	m_state.limit_x = x_address(data);
 	m_state.limit_y = y_address(offset);
 
-	LOG("Limit set to (0x%x, 0x%x) x word offset = 0x%x\n", m_state.limit_x, m_state.limit_y, (m_state.limit_x - 1) >> 4);
+	LOGMASKED(LOG_ROP, "Limit set to (0x%x, 0x%x) x word offset = 0x%x, source=%s destination=%s\n", m_state.limit_x, m_state.limit_y, (m_state.limit_x - 1) >> 4, m_state.fb_read ? "fb" : "host", m_state.fb_write ? "fb" : "host");
 	check_operation_start(offset);
 }
 
 void nwb_512_device::shift_w(offs_t, uint16_t data, uint16_t mem_mask)
 {
 	check_mem_mask(mem_mask);
-
+	LOGMASKED(LOG_ROP, "%s shift_w %x\n", machine().describe_context(), data);
 	m_state.shift = data;
-	LOG("Shift set to 0x%x\n", m_state.shift);
 }
 
 void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -296,42 +280,31 @@ void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	check_mem_mask(mem_mask);
 	m_state.check_enabled();
 
-	LOGMASKED(LOG_ROP_CONFIG, "(%s) rop_config_w(0x%x, 0x%x) = ", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_ROP, "(%s) rop_config_w(0x%x, 0x%x) = ", machine().describe_context(), offset, data);
 
 	// These mappings are an educated guess based on NWS-1500 service manual and iopboot/mrx behavior
+	// I used to set fbread/write here as the DSC-008 does, but to make all ops work as iopboot/mrx expects,
+	// the address bits of limit_w would appear to override the settings if they disagreed.
+	// Experimentation on hardware or an NWB-512/DSC-001 service manual would be required to determine the function of the
+	// other bits, since the DSC-008 might differ from this card.
 	offset <<= 1; // use byte offset
-	m_state.suppress_advance = offset & 0x4;
 	m_state.x_direction = offset & 0x10;
 	m_state.y_direction = offset & 0x20;
 	m_state.row_fill = offset & 0x80;
-	m_state.fb_read = offset & 0x100;
-	m_state.fb_write = offset & 0x200;
 	m_state.pixel_mode = offset & 0x800;
 
-	if (offset & 0x400) // If set, load ROP function
+	const bool load_rop_function = offset & 0x400;
+	if (load_rop_function)
 	{
 		m_state.rop_function = data & 0xf;
 	}
 
-	LOGMASKED(LOG_ROP_CONFIG, "%s%s%s%s%s%s%s%s\n",
-			  m_state.fb_write ? "fbwrite " : "",
-			  m_state.fb_read ? "fbread " : "",
+	LOGMASKED(LOG_ROP, "%s%s%s%s%s\n",
 			  m_state.row_fill ? "rowfill " : "",
 			  m_state.y_direction ? "yfwd " : "yrev ",
 			  m_state.x_direction ? "xfwd " : "xrev ",
-			  m_state.suppress_advance ? "supadv " : "",
 			  m_state.pixel_mode ? "pixel " : "word ",
-			  offset & 0x400 ? util::string_format("func=0x%x", m_state.rop_function) : "");
-
-	// TODO: this check causes issues, maybe the ROP engine can be configured on the fly?
-	//       Should also check with not resetting everything when the card is disabled,
-	//       and see if that means this check can come back
-	if (m_state.busy)
-	{
-		LOG("IOP tried to reconfigure while op was in progress\n");
-		LOG("limit_y = 0x%x dest_words_left = 0x%x source_words_left = 0x%x destination_y = 0x%x\n", m_state.limit_y, m_state.dest_words_left, m_state.source_words_left, m_state.destination_y);
-		// fatalerror("IOP tried to reconfigure while op was in progress!");
-	}
+			  load_rop_function ? util::string_format("func=0x%x/%s", m_state.rop_function, raster_ops[m_state.rop_function]) : "");
 }
 
 void nwb_512_device::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -352,15 +325,12 @@ void nwb_512_device::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	// Use the result of the ROP engine before setting the pixel
 	// TODO: consolidate set_pixel into this function, it is only used here.
 	const bool new_state = execute_rop(m_state.rop_function, 1, destination) & 1;
-	LOG("pixel_w(0x%x, 0x%x) => Change (0x%x, 0x%x) from %u to %u\n", offset, data, x, y, destination, new_state ? 1u : 0u);
+	LOGMASKED(LOG_DATA, "pixel_w(0x%x, 0x%x) => Change (0x%x, 0x%x) from %u to %u\n", offset, data, x, y, destination, new_state ? 1u : 0u);
 	set_pixel(x, y, new_state);
 }
 
 uint16_t nwb_512_device::execute_rop(const uint8_t opcode, const uint16_t source, const uint16_t destination)
 {
-	static constexpr std::array ops = {
-		"~S", "~(S | D)", "~S & D", "0", "~(S & D)", "~D", "S ^ D", "S & ~D", "~S | D", "~(S ^ D)", "D", "S & D", "1", "S | ~D", "S | D", "S"};
-
 	uint16_t result;
 
 	switch (opcode)
@@ -417,7 +387,7 @@ uint16_t nwb_512_device::execute_rop(const uint8_t opcode, const uint16_t source
 		fatalerror("nwb_512: invalid ROP function code 0x%x", opcode);
 	}
 
-	LOGMASKED(LOG_ROP, "execute_rop(0x%x/%s, 0x%x, 0x%x) = 0x%x\n", opcode, ops[opcode], source, destination, result);
+	LOGMASKED(LOG_DATA, "execute_rop(0x%x/%s, 0x%x, 0x%x) = 0x%x\n", opcode, raster_ops[opcode], source, destination, result);
 	return result;
 }
 
@@ -448,10 +418,10 @@ void nwb_512_device::rop(uint16_t source)
 	// Execute raster operation with the appropriate source and destination data
 	uint16_t result = execute_rop(m_state.rop_function, source, destination);
 
-	LOG("rop_cycle:\n");
-	LOG("\tx,y(0x%x, 0x%x) => offs 0x%x\n", m_state.current_destination_x, m_state.destination_y, byte_offset);
-	LOG("\tshift = 0x%x, source = 0x%x, carry = 0x%x, destination = 0x%x\n", m_state.shift, source, m_state.carry, destination);
-	LOG("\trop result = 0x%x\n", result);
+	LOGMASKED(LOG_DATA, "rop_cycle:\n");
+	LOGMASKED(LOG_DATA, "\tx,y(0x%x, 0x%x) => offs 0x%x\n", m_state.current_destination_x, m_state.destination_y, byte_offset);
+	LOGMASKED(LOG_DATA, "\tshift = 0x%x, source = 0x%x, carry = 0x%x, destination = 0x%x\n", m_state.shift, source, m_state.carry, destination);
+	LOGMASKED(LOG_DATA, "\trop result = 0x%x\n", result);
 	const bool first_word = m_state.dest_words_left == m_state.dest_words_per_row;
 	const bool last_word = m_state.dest_words_left == 1;
 
@@ -468,7 +438,6 @@ void nwb_512_device::rop(uint16_t source)
 	}
 
 	// Write result back to VRAM
-	// LOG("\tdestination (0x%x, 0x%x) => 0x%x = 0x%x 0x%x\n", m_state.current_destination_x, m_state.destination_y, byte_offset, result >> 8 & 0xff, result & 0xff);
 	m_vram->write(byte_offset, result >> 8 & 0xff);
 	m_vram->write(byte_offset + 1, result & 0xff);
 
@@ -479,7 +448,6 @@ void nwb_512_device::rop(uint16_t source)
 
 void nwb_512_device::end_row()
 {
-	// LOG("\tdone with row, advancing y\n");
 	m_state.current_destination_x = m_state.destination_x;
 	m_state.current_source_x = m_state.source_x;
 	m_state.advance_dya();
@@ -488,7 +456,7 @@ void nwb_512_device::end_row()
 
 	if (!m_state.limit_y)
 	{
-		LOG("\tROP done!\n");
+		LOGMASKED(LOG_ROP, "end_row: ROP done!\n");
 		m_state.busy = false;
 
 		// The DSC-008 instruction manual mentions that SRXA/DRXA[3:0] are cleared independently (see: /CLRDEST and /SFH).
@@ -502,7 +470,6 @@ void nwb_512_device::end_row()
 		m_state.source_words_left = m_state.source_words_per_row;
 		m_state.prime_pending = m_state.prime;
 		--m_state.limit_y;
-		// LOG("\tdecremented limit to 0x%x\n", m_state.limit_y);
 	}
 }
 
@@ -539,7 +506,6 @@ void nwb_512_device::rop_cycle(uint16_t data)
 		rop(m_state.carry); // shifter remainder as the transaction is complete, nothing further from the source
 	}
 
-	// LOG("dest words left = 0x%x\n", m_state.dest_words_left);
 	if (m_state.dest_words_left == 0)
 	{
 		end_row(); // reset X, step Y, rearm mask1, clear carry, maybe finish op
@@ -553,7 +519,7 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 		return 0; // TODO: figure out what makes sense for debugging. Can't use the normal functions due to side effects
 	}
 
-	LOG("(%s) fifo_r(0x%x, 0x%x)\n", machine().describe_context(), offset, mem_mask);
+	LOGMASKED(LOG_DATA, "(%s) fifo_r(0x%x, 0x%x)\n", machine().describe_context(), offset, mem_mask);
 	check_mem_mask(mem_mask);
 	if (!m_state.is_fb_to_host())
 	{
@@ -571,7 +537,6 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 	{
 		// If the source row's coordinate is greater (or less when reverse), prime the shifter,
 		// because two initial reads are needed. After this, the source and destination counts will be aligned.
-		logerror("Applying primed extra read!\n");
 		word = coordinate_to_data(m_state.current_source_x, m_state.source_y);
 		shift(word);
 		m_state.prime_pending = false;
@@ -579,19 +544,14 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 	}
 
 	word = coordinate_to_data(m_state.current_source_x, m_state.source_y);
-	LOG("  fifo_r: word before shift = 0x%x\n", word);
 	word = shift(word);
-	LOG("  fifo_r: word after shift = 0x%x\n", word);
 
 	// Advance ROCC state
 	m_state.advance_sxa();
 	m_state.advance_dxa();
 
-	LOG("  fifo_r: advanced source to %d, destination to %d, and there are %d words left\n", m_state.current_source_x, m_state.current_destination_x, m_state.dest_words_left);
-
 	if (m_state.dest_words_left == 0)
 	{
-		LOG("  fifo_r: calling end row\n");
 		end_row();
 	}
 
@@ -600,7 +560,7 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 
 void nwb_512_device::start_operation()
 {
-	LOGMASKED(LOG_OP, "start_operation()\n");
+	LOGMASKED(LOG_ROP, "start_operation()\n");
 	m_state.busy = true; // TODO: use the granular status bits
 
 	// The DSC-008 section of the NWS-15xx service manual implies that the direction bit is not
@@ -642,7 +602,7 @@ void nwb_512_device::start_operation()
 
 	m_state.source_words_left = m_state.source_words_per_row;
 	m_state.dest_words_left = m_state.dest_words_per_row;
-	LOGMASKED(LOG_OP, "start_operation: Source words per row: %d, Destination words per row: %d, priming required = %s\n", m_state.source_words_per_row, m_state.dest_words_per_row, m_state.prime ? "yes" : "no");
+	LOGMASKED(LOG_DATA, "start_operation: Source words per row: %d, Destination words per row: %d, priming required = %s\n", m_state.source_words_per_row, m_state.dest_words_per_row, m_state.prime ? "yes" : "no");
 
 	// If writing to the framebuffer, update masks to preserve bits that shouldn't be modified
 	if (m_state.fb_write)
@@ -665,13 +625,13 @@ void nwb_512_device::start_operation()
 
 void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	LOG("(%s) fifo_w(0x%x, 0x%x, 0x%x)\n", machine().describe_context(), offset, data, mem_mask);
+	LOGMASKED(LOG_DATA, "(%s) fifo_w(0x%x, 0x%x, 0x%x)\n", machine().describe_context(), offset, data, mem_mask);
 	check_mem_mask(mem_mask);
 
 	// One write kickstarts the reading process when triggered op is a read
 	if (m_state.is_fb_to_host())
 	{
-		LOG("%s fifo_w: start read operation\n", machine().describe_context());
+		LOGMASKED(LOG_DATA, "%s fifo_w: start read operation\n", machine().describe_context());
 		start_operation();
 		return;
 	}
@@ -690,7 +650,6 @@ void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	if (!m_state.row_fill)
 	{
-		// LOG("fb_fifo_w: pushing unpacked word 0x%x!\n", data);
 		rop_cycle(data);
 	}
 	else
@@ -743,11 +702,6 @@ void nwb_512_device::ctrl_w(uint16_t data)
 	}
 
 	m_state.ctrl = data;
-}
-
-void nwb_512_device::planemask_w(uint8_t data)
-{
-	LOG("Write plane mask = 0x%x\n", data);
 }
 
 uint16_t nwb_512_device::coordinate_to_data(uint16_t x, uint16_t y)
