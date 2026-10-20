@@ -101,8 +101,8 @@ f108_device::f108_device(const machine_config &mconfig, const char *tag, device_
 
 void f108_device::device_start()
 {
-	m_rom_ptr = &m_rom[0];
-	m_rom_size = m_rom.length() << 2;
+	m_rom_ptr = m_rom ? &m_rom[0] : nullptr;
+	m_rom_size = m_rom ? m_rom.length() << 2 : 0;
 
 	m_ata_active = 0;
 	m_ata_recovery = 0;
@@ -118,8 +118,14 @@ void f108_device::device_reset()
 {
 	m_overlay = true;
 
-	// put ROM mirror at 0
 	address_space &space = m_maincpu->space(AS_PROGRAM);
+	if (!m_rom_ptr)
+	{
+		space.unmap_readwrite(0x00000000, 0x003fffff);
+		return;
+	}
+
+	// put ROM mirror at 0
 	const u32 memory_size = std::min((u32)0x400000, m_rom_size);
 	const u32 memory_end = memory_size - 1;
 	offs_t memory_mirror = memory_end & ~(memory_size - 1);
@@ -142,7 +148,7 @@ u32 f108_device::rom_switch_r(offs_t offset)
 		m_overlay = false;
 	}
 
-	return m_rom_ptr[offset & ((m_rom_size - 1) >> 2)];
+	return m_rom_ptr ? m_rom_ptr[offset & ((m_rom_size - 1) >> 2)] : 0;
 }
 
 void f108_device::set_ram_info(u32 *ram, u32 size)

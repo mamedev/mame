@@ -194,7 +194,6 @@ void pmac6200_state::pmac6200(machine_config &config)
 	F108(config, m_f108, 75_MHz_XTAL / 2); // 68040 bus speed is 37.5 MHz, same as the FSB
 	m_f108->set_maincpu_tag("maincpu");
 	m_f108->set_primetimeii_tag("primetimeii");
-	m_f108->set_rom_tag("bootrom");
 	m_f108->write_ata_irq().set(m_primetimeii, FUNC(primetimeii_device::ata_irq_w));
 
 	NSCSI_CONNECTOR(config, "f108:scsi:0", mac_scsi_devices, nullptr);
@@ -280,11 +279,6 @@ ROM_START( pmac6200 )
 	// bootrom is on the 64-bit PowerPC bus, so it should be loaded in a 64-bit space
 	ROM_REGION64_BE(0x400000, "bootrom64", 0)
 	ROM_LOAD( "63abfd3f.bin", 0x000000, 0x400000, CRC(2f47a6ea) SHA1(0b34d7c692594695b39719c3bf21808985f89f2c) )
-
-	// this is here to keep the F108 happy
-	// TODO: confirm on real hardware if the 68k side can see the bootrom
-	ROM_REGION32_BE(0x400000, "bootrom", 0)
-	ROM_FILL(0, 0x400000, 0)
 ROM_END
 
 } // anonymous namespace

@@ -63,7 +63,7 @@ private:
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr53c96_device> m_ncr1;
 	required_device<z80scc_device> m_scc;
-	required_region_ptr<u32> m_rom;
+	optional_region_ptr<u32> m_rom;
 
 	devcb_write_line m_ata_irq;
 
