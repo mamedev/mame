@@ -652,9 +652,10 @@ uint32_t punchout_state::screen_update_bottom(screen_device &screen, bitmap_ind1
 {
 	copy_bot_palette(BIT(*m_palettebank, 0));
 
-	// copy the character mapped graphics
+	// CHP1-BAK loads the column counter with the row's scroll value while HWD0 is low (horizontal blank
+	// counts 186-191) and the pixels come out 4 dots after they are fetched, so x shows column v + 60 + x
 	for (int offs = 0; offs < 32; offs++)
-		m_bg_bot_tilemap->set_scrollx(offs, 58 + m_bg_bot_videoram[2 * offs] + 256 * (m_bg_bot_videoram[2 * offs + 1] & 0x01));
+		m_bg_bot_tilemap->set_scrollx(offs, 60 + m_bg_bot_videoram[2 * offs] + 256 * (m_bg_bot_videoram[2 * offs + 1] & 0x01));
 
 	m_bg_bot_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
