@@ -524,8 +524,11 @@ void punchout_state::draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap
 		int incxx = zoom << 6;
 		int const incyy = zoom << 6;
 
+		// The X accumulator (F283 2J/3J/4J) starts each line at the X position's fraction, adds the zoom four
+		// times per dot, the pixel counter (F161 4F) follows its carry 16 quarter dots later, and the BAK
+		// board latches the pixel on T0, so x shows source column xpos / 4 + (x + 59.5) * zoom / 1024
 		uint32_t startx = -sx * 0x4000;
-		startx += 3740 * zoom;  // adjustment to match the screen shots
+		startx += 3808 * zoom;  // 59.5 * 64
 
 		if (m_spr1_ctrlram[6] & 1)   // flip x
 		{
@@ -553,7 +556,7 @@ void armwrest_state::draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap
 		int const incyy = zoom << 6;
 
 		uint32_t startx = -sx * 0x4000;
-		startx += 3740 * zoom;  // adjustment to match the screen shots
+		startx += 3808 * zoom;  // same circuit as on CHP1-VIDEO
 
 		tilemap_t *spr1_tilemap;
 
