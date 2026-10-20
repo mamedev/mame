@@ -28,7 +28,8 @@
 enum
 {
 	STREAM_NONE = 0,
-	STREAM_RPTN
+	STREAM_RPTN,
+	STREAM_DRD
 };
 
 //-------------------------------------------------
@@ -538,6 +539,31 @@ void hd63484_device::stream_fill()
 				if (m_dma_d0 >= m_dn)
 					m_stream = STREAM_NONE;
 				break;
+
+			case STREAM_DRD:
+			{
+				int16_t const ax = (int16_t)m_pr[0];
+				int16_t const ay = (int16_t)m_pr[1];
+
+				data = readword((m_rwp[m_rwp_dn] - m_dma_d1 * m_mwr[m_rwp_dn] + m_dma_d0) & 0xfffff);
+
+				if (m_dma_d0 != ax)
+					m_dma_d0 += (ax < 0) ? -1 : 1;
+				else
+				{
+					m_dma_d0 = 0;
+					if (m_dma_d1 != ay)
+						m_dma_d1 += (ay < 0) ? -1 : 1;
+					else
+					{
+						int const d1_inc = (ay < 0) ? -1 : 1;
+						m_rwp[m_rwp_dn] -= (ay + d1_inc) * m_mwr[m_rwp_dn];
+						m_rwp[m_rwp_dn] &= 0xfffff;
+						m_stream = STREAM_NONE;
+					}
+				}
+				break;
+			}
 		}
 
 		queue_r((data >> 8) & 0xff);
@@ -1637,9 +1663,10 @@ void hd63484_device::process_fifo()
 		case COMMAND_DRD:
 			if (m_param_ptr == 2)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': DRD %d, %d\n", tag(), m_pr[0], m_pr[1]);
-				command_end_seq();
-				fatalerror("HD63484 COMMAND_DRD!\n");
+				if (CMD_LOG)    logerror("HD63484 '%s': DRD %d, %d\n", tag(), (int16_t)m_pr[0], (int16_t)m_pr[1]);
+				m_dma_d0 = m_dma_d1 = 0;
+				m_stream = STREAM_DRD;
+				stream_fill();
 			}
 			break;
 
