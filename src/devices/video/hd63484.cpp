@@ -788,8 +788,8 @@ bool hd63484_device::set_dot(int16_t x, int16_t y, int16_t px, int16_t py)
 	int ys = m_pey - m_psy + 1;
 	int zx = m_pzx + 1;
 	int zy = m_pzy + 1;
-	int xp = m_psx + ((((m_ppx - m_psx) * zx + px) % (xs * zx)) / zx);
-	int yp = m_psy + ((((m_ppy - m_psy) * zy + py) % (ys * zy)) / zy);
+	int xp = m_psx + ((((m_ppx - m_psx) * zx + m_pzcx + px) % (xs * zx)) / zx);
+	int yp = m_psy + ((((m_ppy - m_psy) * zy + m_pzcy + py) % (ys * zy)) / zy);
 
 	if (xp < m_psx)
 		xp = (m_pex + 1) - (m_psx - xp);
