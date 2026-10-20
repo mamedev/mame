@@ -41,10 +41,12 @@ hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, d
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_display_cb(*this),
+	m_irq_cb(*this),
 	m_auto_configure_screen(true),
 	m_external_skew(0),
 	m_ar(0),
 	m_sr(0),
+	m_irq_state(CLEAR_LINE),
 	m_fifo_ptr(-1),
 	m_fifo_r_ptr(-1),
 	m_cr(0),
@@ -407,6 +409,16 @@ inline void hd63484_device::inc_ar(int value)
 	}
 }
 
+inline void hd63484_device::update_irq()
+{
+	int const state = (m_sr & m_ccr & 0xff) ? ASSERT_LINE : CLEAR_LINE;
+	if (state != m_irq_state)
+	{
+		m_irq_state = state;
+		m_irq_cb(state);
+	}
+}
+
 inline void hd63484_device::fifo_w_clear()
 {
 	int i;
@@ -418,6 +430,8 @@ inline void hd63484_device::fifo_w_clear()
 
 	m_sr |= HD63484_SR_WFR;
 	m_sr |= HD63484_SR_WFE;
+
+	update_irq();
 }
 
 inline void hd63484_device::queue_w(uint8_t data)
@@ -433,6 +447,8 @@ inline void hd63484_device::queue_w(uint8_t data)
 			m_sr &= ~HD63484_SR_WFR;
 
 		m_sr &= ~HD63484_SR_WFE;
+
+		update_irq();
 	}
 	else
 	{
@@ -462,6 +478,7 @@ inline void hd63484_device::dequeue_w(uint8_t *data)
 		if (m_fifo_ptr == -1)
 			m_sr |= HD63484_SR_WFE;
 
+		update_irq();
 	}
 }
 
@@ -476,6 +493,8 @@ inline void hd63484_device::fifo_r_clear()
 
 	m_sr &= ~HD63484_SR_RFR;
 	m_sr &= ~HD63484_SR_RFF;
+
+	update_irq();
 }
 
 inline void hd63484_device::queue_r(uint8_t data)
@@ -490,6 +509,8 @@ inline void hd63484_device::queue_r(uint8_t data)
 			m_sr |= HD63484_SR_RFF;
 
 		m_sr |= HD63484_SR_RFR;
+
+		update_irq();
 	}
 	else
 	{
@@ -520,6 +541,8 @@ inline void hd63484_device::dequeue_r(uint8_t *data)
 
 		if (m_stream != STREAM_NONE)
 			stream_fill();
+
+		update_irq();
 	}
 }
 
@@ -706,6 +729,8 @@ inline void hd63484_device::command_end_seq()
 {
 	//hd63484->param_ptr = 0;
 	m_sr |= HD63484_SR_CED;
+
+	update_irq();
 
 	/* TODO: we might need to be more aggressive and clear the params in there */
 }
@@ -1569,6 +1594,7 @@ void hd63484_device::process_fifo()
 		m_cr |= data & 0xff;
 		m_param_ptr = 0;
 		m_sr &= ~HD63484_SR_CED;
+		update_irq();
 	}
 	else
 	{
@@ -1951,6 +1977,8 @@ void hd63484_device::exec_abort_sequence()
 	fifo_w_clear();
 	fifo_r_clear();
 	m_sr = HD63484_SR_WFR | HD63484_SR_WFE | HD63484_SR_CED; // hard-set to 0x23
+
+	update_irq();
 }
 
 uint16_t hd63484_device::video_registers_r(int offset)
@@ -2003,6 +2031,7 @@ void hd63484_device::video_registers_w(int offset)
 			---- ---- xxxx xxxx irq mask, directly correlated to sr
 			*/
 			m_ccr = vreg_data;
+			update_irq();
 			break;
 
 		case 0x04:
@@ -2224,6 +2253,7 @@ void hd63484_device::device_reset()
 	m_dn = 0;
 	m_dma_d0 = m_dma_d1 = 0;
 	m_stream = STREAM_NONE;
+	m_irq_state = CLEAR_LINE;
 
 	memset(m_vreg, 0, sizeof(m_vreg));
 	memset(m_fifo, 0, sizeof(m_fifo));
@@ -2355,6 +2385,7 @@ void hd63484_device::register_save_state()
 	save_item(NAME(m_pram));
 	save_item(NAME(m_dn));
 	save_item(NAME(m_stream));
+	save_item(NAME(m_irq_state));
 	save_item(NAME(m_ccr));
 	save_item(NAME(m_omr));
 	save_item(NAME(m_edg));

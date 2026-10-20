@@ -26,6 +26,7 @@ public:
 	hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
+	auto irq_callback() { return m_irq_cb.bind(); }
 	void set_auto_configure_screen(bool auto_configure_screen) { m_auto_configure_screen = auto_configure_screen; }
 	void set_external_skew(int skew) { m_external_skew = skew; }
 
@@ -51,6 +52,7 @@ protected:
 
 private:
 	inline void inc_ar(int value);
+	inline void update_irq();
 	inline void fifo_w_clear();
 	inline void queue_w(uint8_t data);
 	inline void dequeue_w(uint8_t *data);
@@ -94,12 +96,14 @@ private:
 	void register_save_state();
 
 	display_delegate  m_display_cb;
+	devcb_write_line m_irq_cb;
 	bool m_auto_configure_screen;
 	int m_external_skew;
 
 	uint8_t m_ar;
 	uint8_t m_vreg[0x100];
 	uint8_t m_sr;
+	int m_irq_state;
 
 	uint8_t m_fifo[16];                   /* FIFO W data queue */
 	int m_fifo_ptr;                 /* FIFO W pointer */
