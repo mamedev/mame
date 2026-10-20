@@ -2060,6 +2060,50 @@ void hd63484_device::exec_abort_sequence()
 	update_irq();
 }
 
+void hd63484_device::lpstb_w(int state)
+{
+	if (state && !m_lpstb_state)
+	{
+		// latch the display refresh address of the background screen under the
+		// beam (approximation: reconstructed from the beam coordinates)
+		int const ppmc = get_ppmc();
+		int col = screen().hpos() / ppmc - (m_hsw + m_hds + m_external_skew);
+		if (col < 0)
+			col = 0;
+
+		int const y = screen().vpos();
+		int const l0 = m_vds + (BIT(m_dcr, 13) ? m_sp[0] : 0);
+		int const l1 = l0 + m_sp[1];
+		int const l2 = l1 + (BIT(m_dcr, 11) ? m_sp[2] : 0);
+
+		int layer = 1;
+		int row = 0;
+		if (BIT(m_dcr, 13) && y >= m_vds && y < l0)
+		{
+			layer = 0;
+			row = y - m_vds;
+		}
+		else if (y >= l0 && y < l1)
+		{
+			layer = 1;
+			row = (y - l0) / (m_vzf + 1);
+		}
+		else if (BIT(m_dcr, 11) && y >= l1 && y < l2)
+		{
+			layer = 2;
+			row = y - l1;
+		}
+
+		m_lpar = (m_sar[layer] + row * m_mwr[layer] + col) & 0xfffff;
+		m_lpar_chr = m_mwr_chr[layer];
+
+		m_sr |= HD63484_SR_LPD;
+		update_irq();
+	}
+
+	m_lpstb_state = state;
+}
+
 uint16_t hd63484_device::video_registers_r(int offset)
 {
 	uint16_t res = (m_vreg[offset] << 8) | (m_vreg[offset+1] & 0xff);
@@ -2072,6 +2116,16 @@ uint16_t hd63484_device::video_registers_r(int offset)
 
 		case 0x80:
 			res = screen().vpos() & 0xfff; // Raster Count
+			break;
+
+		case 0xec: // Light Pen Address high
+			res = (m_lpar_chr << 7) | ((m_lpar >> 16) & 0x0f);
+			break;
+
+		case 0xee: // Light Pen Address low; reading it ends the latch sequence
+			res = m_lpar & 0xffff;
+			m_sr &= ~HD63484_SR_LPD;
+			update_irq();
 			break;
 
 		default:
@@ -2348,6 +2402,9 @@ void hd63484_device::device_reset()
 	m_stream = STREAM_NONE;
 	m_irq_state = CLEAR_LINE;
 	m_hzf = m_vzf = 0;
+	m_lpstb_state = 0;
+	m_lpar = 0;
+	m_lpar_chr = 0;
 
 	memset(m_vreg, 0, sizeof(m_vreg));
 	memset(m_fifo, 0, sizeof(m_fifo));
@@ -2491,6 +2548,9 @@ void hd63484_device::register_save_state()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_hzf));
 	save_item(NAME(m_vzf));
+	save_item(NAME(m_lpstb_state));
+	save_item(NAME(m_lpar));
+	save_item(NAME(m_lpar_chr));
 	save_item(NAME(m_ccr));
 	save_item(NAME(m_omr));
 	save_item(NAME(m_edg));
