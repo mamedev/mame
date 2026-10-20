@@ -9,8 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
 #include "balsente.h"
+
+#include "cpu/m6809/m6809.h"
 
 
 /*************************************
@@ -194,6 +195,14 @@ void balsente_state::rombank2_select_w(uint8_t data)
 		m_bankcd->set_entry(bank);
 		m_bankef->set_entry(BIT(bank, 3));
 	}
+}
+
+
+void triviamb_state::rombank_w(uint8_t data)
+{
+	// bits 4-7 are decoded by a game-specific PAL, and both windows are banked
+	m_bankab->set_entry(data >> 4);
+	m_bankcd->set_entry(data >> 4);
 }
 
 
@@ -446,6 +455,13 @@ uint8_t balsente_state::grudge_steering_r()
 	logerror("%s:grudge_steering_r(@%d)\n", machine().describe_context(), m_screen->vpos());
 	m_grudge_steering_result |= 0x80;
 	return m_grudge_steering_result;
+}
+
+
+void triviamb_state::sound_strobe_w(uint8_t data)
+{
+	// the strobe latches the PIA port A outputs on the sound board
+	m_zsu->sound_command_w(m_pia->a_output());
 }
 
 

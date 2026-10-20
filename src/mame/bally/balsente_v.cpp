@@ -197,3 +197,87 @@ uint32_t balsente_state::screen_update_balsente(screen_device &screen, bitmap_in
 
 	return 0;
 }
+
+
+
+/*************************************
+ *
+ *  Maibesa hardware
+ *
+ *************************************/
+
+void triviamb_state::video_start()
+{
+	balsente_state::video_start();
+
+	save_item(NAME(m_flip_screen));
+}
+
+
+void triviamb_state::video_control_w(uint8_t data)
+{
+	// bit 7 flips the screen for cocktail mode (the game also moves the CRTC start address to match)
+	if (m_flip_screen != BIT(data, 7))
+	{
+		m_screen->update_partial(m_screen->vpos());
+		m_flip_screen = BIT(data, 7);
+	}
+
+	palette_select_w(data);
+}
+
+
+void triviamb_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *sprite)
+{
+	// 16x16 sprites with each bitplane in a separate EPROM, using palette entries 0x10-0x1f
+	int const image = sprite[1] | (BIT(sprite[0], 0) << 8);
+	int const ypos = 242 - sprite[2]; // Y position is inverted, and doesn't wrap (hidden sprites use 0xf3)
+	int const xpos = sprite[3];
+
+	pen_t const *const pens = &m_palette->pen(m_palettebank_vis * 256);
+	for (int y = 0; y < 16; y++)
+	{
+		int const desty = m_flip_screen ? (BALSENTE_VBEND + BALSENTE_VBSTART - 1 - (ypos + y)) : (ypos + y);
+		if (desty < cliprect.min_y || desty > cliprect.max_y)
+			continue;
+
+		for (int x = 0; x < 16 && (xpos + x) < 256; x++)
+		{
+			int const destx = m_flip_screen ? (255 - (xpos + x)) : (xpos + x);
+			if (destx < cliprect.min_x || destx > cliprect.max_x)
+				continue;
+
+			// each plane has the left half of rows 0-7, the right half of rows 0-7, then the same for rows 8-15
+			offs_t const offs = (image << 5) | ((y & 8) << 1) | (x & 8) | (y & 7);
+			int const bit = ~x & 7;
+			int const pixel =
+					BIT(m_sprite_gfx[offs | 0x0000], bit) |
+					(BIT(m_sprite_gfx[offs | 0x4000], bit) << 1) |
+					(BIT(m_sprite_gfx[offs | 0x8000], bit) << 2) |
+					(BIT(m_sprite_gfx[offs | 0xc000], bit) << 3);
+			if (pixel)
+				bitmap.pix(desty, destx) = pens[0x10 | pixel];
+		}
+	}
+}
+
+
+uint32_t triviamb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	pen_t const *const pens = &m_palette->pen(m_palettebank_vis * 256);
+
+	// draw scanlines from the VRAM directly
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint8_t const *const src = &m_expanded_videoram[(m_flip_screen ? (BALSENTE_VBSTART - 1 - y) : (y - BALSENTE_VBEND)) * 256];
+		uint16_t *const dest = &bitmap.pix(y);
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			dest[x] = pens[src[m_flip_screen ? (255 - x) : x]];
+	}
+
+	// draw the sprite images
+	for (int i = 0; i < 64; i++)
+		draw_sprite(bitmap, cliprect, &m_spriteram[i * 4]);
+
+	return 0;
+}
