@@ -31,6 +31,8 @@ public:
 		set_port_tags<First + 1>(std::forward<U>(other_tags)...);
 	}
 
+	void set_analog_bits(uint8_t bits) { m_analog_bits = bits; }
+
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	void jvs13551_coin_1_w(int state);
@@ -64,6 +66,8 @@ protected:
 private:
 	optional_ioport_array<12> port;
 	uint16_t coin_counter[2];
+
+	uint8_t m_analog_bits;
 };
 
 DECLARE_DEVICE_TYPE(SEGA_837_13551, sega_837_13551_device)

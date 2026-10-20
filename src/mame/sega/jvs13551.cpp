@@ -58,7 +58,8 @@ ioport_constructor sega_837_13551_device::device_input_ports() const
 }
 
 sega_837_13551_device::sega_837_13551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : jvs_device(mconfig, SEGA_837_13551, tag, owner, clock)
-, port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
+	, port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
+	, m_analog_bits(8)
 {
 }
 
@@ -117,8 +118,12 @@ void sega_837_13551_device::function_list(uint8_t *&buf)
 	// Coin input - 2 slots
 	*buf++ = 0x02; *buf++ = 2; *buf++ = 0; *buf++ = 0;
 
-	// Analog input - 8 channels
-	*buf++ = 0x03; *buf++ = 8; *buf++ = 16; *buf++ = 0;
+	// Analog input - 8 channels, 16 bits
+	// TODO: investigate otrigger
+	// Wants no analog bits set for the trackball on the other node to work, different part name?
+	if (m_analog_bits) {
+		*buf++ = 0x03; *buf++ = m_analog_bits; *buf++ = 16; *buf++ = 0;
+	}
 
 	// Driver out - 6 channels
 	*buf++ = 0x12; *buf++ = 6; *buf++ = 0; *buf++ = 0;
@@ -183,8 +188,7 @@ bool sega_837_13551_device::swoutputs(uint8_t count, const uint8_t *vals)
 		return false;
 	jvs_outputs = vals[0] & 0xfc;
 	logerror("837-13551: output %02x\n", jvs_outputs);
-	if (port[11])
-	{
+	if (port[11]) {
 		port[11]->write(jvs_outputs, 0xfc);
 	}
 	return true;
@@ -226,8 +230,7 @@ void sega_837_13844_device::function_list(uint8_t *&buf)
 	// Analog input - 8 channels
 	*buf++ = 0x03; *buf++ = 8; *buf++ = 16; *buf++ = 0;
 
-	if (m_encoder_bits)
-	{
+	if (m_encoder_bits) {
 		// rotary encoders - 4 channels (inunoos)
 		*buf++ = 0x04; *buf++ = m_encoder_bits; *buf++ = 0; *buf++ = 0;
 	}

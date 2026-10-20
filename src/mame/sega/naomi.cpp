@@ -2185,6 +2185,34 @@ static INPUT_PORTS_START( inunoos )
 	PORT_DIPSETTING(    0x00, "15 kHz" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( otrigger )
+	PORT_INCLUDE( naomi_mie )
+
+	PORT_START("TILT")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x407f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("R0")
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
+
+	PORT_START("R1")
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(50)
+INPUT_PORTS_END
+
 // TODO: deambiguate IPT_COINs (each player has one)
 static INPUT_PORTS_START( ringout )
 	PORT_INCLUDE( naomi_mie )
@@ -3059,6 +3087,24 @@ void naomi_state::naomim2_smarinef(machine_config &config)
 	sega_837_13938_device &sega938(SEGA_837_13938(config, "837_13938", "mie"));
 	sega938.set_rotary_tags("R0", "R1", "R2", "R3");
 }
+
+/*
+ * Naomi M2 Out Trigger
+ */
+
+ void naomi_state::naomim2_otrigger(machine_config &config)
+{
+	naomim2(config);
+
+	config.device_remove("837_13551");
+	sega_837_13551_device &sega837(SEGA_837_13551(config, "837_13551", "mie"));
+	sega837.set_port_tags("TILT", "P1", "P2", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "OUTPUT");
+	sega837.set_analog_bits(0);
+
+	sega_837_13938_device &sega938(SEGA_837_13938(config, "837_13938", "mie"));
+	sega938.set_rotary_tags("R0", "R1", "R2", "R3");
+}
+
 
 /*
  * Naomi 2
@@ -11444,7 +11490,7 @@ void naomi_state::init_hotd2()
 /* 0013    */ GAME( 1999, jambo,     naomi,    naomim2, jambo,   naomi_state, init_naomi,   ROT0, "Sega", "Jambo! Safari (Rev A)", GAME_FLAGS )
 /* 0015    */ GAME( 1999, vtennis,   naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua Tennis / Power Smash", GAME_FLAGS )
 /* 0016    */ GAME( 1999, derbyoc,   naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Derby Owners Club (Japan, Rev B)", GAME_FLAGS )
-/* 0017    */ GAME( 1999, otrigger,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "OutTrigger", GAME_FLAGS )
+/* 0017    */ GAME( 1999, otrigger,  naomi,    naomim2_otrigger, otrigger,   naomi_state, init_naomi,   ROT0, "Sega", "OutTrigger", GAME_FLAGS )
 /* 0018    */ GAME( 1999, sgtetris,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Sega Tetris", GAME_FLAGS )
 /* 0019    */ GAME( 1999, dybb99,    naomi,    naomim2, dybbnao, naomi_state, init_naomi,   ROT0, "Sega", "Dynamite Baseball '99 (Japan, Rev B)", GAME_FLAGS )
 /* 0020    */ GAME( 1999, sambaa,    samba,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Samba De Amigo (Rev A)", GAME_FLAGS )
