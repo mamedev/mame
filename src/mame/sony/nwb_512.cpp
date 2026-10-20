@@ -673,19 +673,19 @@ void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	// One write kickstarts the reading process when triggered op is a read
 	if (m_state.is_fb_to_host())
 	{
-		LOG("Start fbread op\n");
+		LOG("%s fifo_w: start read operation\n", machine().describe_context());
 		start_operation();
 		return;
 	}
 
 	if (m_state.pixel_mode)
 	{
-		fatalerror("word write in pixel mode");
+		fatalerror("fifo_w: word write in pixel mode");
 	}
 
 	if (!m_state.busy)
 	{
-		fatalerror("IOP tried to push data without starting an op!");
+		fatalerror("fifo_w: IOP tried to push data without starting an op!");
 	}
 
 	// TODO: validate offset versus the setup in the ROP reg
@@ -697,13 +697,14 @@ void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 	else
 	{
-		const uint16_t word_count = ((m_state.limit_x + 0xf) >> 4) - (m_state.destination_x >> 4); // +0xf is ceiling to prevent off-by-ones for unaligned ops
-		// LOG("fb_fifo_w: pushing 0x%x %d times to row 0x%x vs limit 0x%x\n", data, word_count, m_state.destination_y, m_state.limit_y);
-
-		for (uint16_t i = 0; i < word_count; i++)
+		// Assume row fill always populates the rest of the destination after running input data through the shifter
+		// I haven't found any evidence to the contrary.
+		const uint16_t shifted_data = shift(data);
+		while (m_state.dest_words_left > 0)
 		{
-			rop_cycle(data);
+			rop(shifted_data);
 		}
+		end_row();
 	}
 }
 
