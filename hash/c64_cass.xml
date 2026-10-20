@@ -1142,6 +1142,26 @@ Fails [tape] loading, light blue screen
 			</dataarea>
 		</part>
 	</software>
+	
+	<!-- origin: Ultimate Tape Archive V3.0 id=7353 -->
+	<software name="barbarian">
+		<description>Barbarian - The Ultimate Warrior</description>
+		<year>1987</year>
+		<publisher>Palace Software</publisher>
+		
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="702135">
+				<rom name="Barbarian-_The_Ultimate_Warrior_Side_1.tap" size="702135" crc="f8732fc3" sha1="ff0f85ce13ee8876a2efcfab9f6b962f74b0ab91"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="702135">
+				<rom name="Barbarian-_The_Ultimate_Warrior_Side_2.tap" size="702135" crc="8f02e0f6" sha1="294946143d83eb3deea335b92d7120bfbff81626"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="baskmast">
 		<description>Basket Master</description>
