@@ -249,7 +249,7 @@ void mcd251_device::dram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void mcd251_device::write_data(uint8_t data)
 {
 	const bool was_body = m_demux.packet_body;
-	m_demux.byte(data, m_fmv_stream);
+	m_demux.byte(data, 0xe0 | m_fmv_stream);
 
 	if (was_body)
 	{
