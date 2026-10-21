@@ -7,6 +7,7 @@
 #include "corefloat.h"
 
 #include <algorithm>
+#include <cfenv>
 #include <cmath>
 #include <limits>
 
@@ -525,10 +526,10 @@ void i960_cpu_device::test(uint32_t opcode, int mask)
 double i960_cpu_device::round_to_int(double val)
 {
 	// apply rounding mode
+	std::fesetround(FE_TONEAREST);
 	switch ((m_AC >> 30) & 3)
 	{
-	case 0: // round to nearest, ties to even (round() would take ties away from zero)
-		return std::isfinite(val) ? std::copysign(val - std::remainder(val, 1.0), val) : val;
+	case 0: return std::rint(val); // round to nearest, ties to even
 	case 1: return floor(val);
 	case 2: return ceil(val);
 	default: return trunc(val);
