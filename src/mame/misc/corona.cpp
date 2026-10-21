@@ -2188,7 +2188,8 @@ ROM_START(monte)
 ROM_END
 
 /*
-  Rula (roulette)
+  Rula
+  LEDs roulette
   Miki SRL.
   1991.
 
@@ -2197,7 +2198,8 @@ ROM_END
   Program is encrypted.
 
   Notes:
-  blitter and inputs seems mapped as winner81.
+  This game was designed to be installed horizontally,
+  with 3 controls sets for each side of the table.
 
 */
 ROM_START(rula)
