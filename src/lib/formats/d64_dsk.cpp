@@ -20,6 +20,13 @@
 #include <cstring>
 
 
+namespace {
+
+constexpr uint32_t END_GAP_BITS = 0x5555;
+
+} // anonymous namespace
+
+
 d64_format::d64_format()
 {
 	formats = file_formats;
@@ -187,9 +194,14 @@ floppy_image_format_t::desc_e* d64_format::get_sector_desc(const format &f, int 
 		/* 19 */ {   RAWBYTE, 0x55, gap_2 },
 		/* 20 */ { SECTOR_LOOP_END },
 		/* 21 */ { RAWBYTE, 0x55, 0 },
-		/* 22 */ { RAWBITS, 0x5555, 0 },
+		/* 22 */ { RAWBITS, END_GAP_BITS, 0 },
 		/* 23 */ { END }
 	};
+
+	desc[7].p1 = id2;
+	desc[8].p1 = id1;
+	desc[11].p2 = f.gap_1;
+	desc[19].p2 = gap_2;
 
 	current_size = 40 + (1+1+4+2)*10 + (f.gap_1)*8 + 40 + (1+f.sector_base_size+1+2)*10 + gap_2*8;
 
@@ -223,7 +235,12 @@ void d64_format::fix_end_gap(floppy_image_format_t::desc_e* desc, int remaining_
 {
 	desc[21].p2 = remaining_size / 8;
 	desc[22].p2 = remaining_size & 7;
-	desc[22].p1 >>= remaining_size & 0x01;
+	desc[22].p1 = END_GAP_BITS >> (remaining_size & 0x01);
+}
+
+uint32_t d64_format::get_track_skew(const format &f, int head, int track, uint32_t skew, int current_size, int gap2, int total_size) const
+{
+	return (skew + uint64_t(200000000) * (current_size - gap2 * 8) / total_size + uint64_t(200000000) * 100 / 270) % 200000000;
 }
 
 bool d64_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
@@ -252,7 +269,7 @@ bool d64_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	int track_offset = 0, error_offset = f.sector_count*f.sector_base_size;
 
 	uint8_t id1 = 0, id2 = 0;
-	uint64_t skew = 0;
+	uint32_t skew = 0;
 	get_disk_id(f, io, id1, id2);
 
 	for (int head = 0; head < f.head_count; head++) {
@@ -279,7 +296,7 @@ bool d64_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			build_sector_description(f, &img[0], track_offset, error_offset, sectors, sector_count);
 			generate_track(desc, physical_track, head, sectors, sector_count, total_size, image);
 
-			skew = (skew + uint64_t(200000000) * (current_size - gap2 * 8) / total_size + uint64_t(200000000) * 100 / 270) % 200000000;
+			skew = this->get_track_skew(f, head, track, skew, current_size, gap2, total_size);
 			rotate_track(image, physical_track, head, skew);
 
 			track_offset += track_size;
