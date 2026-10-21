@@ -1477,6 +1477,7 @@ struct namcos23_render_entry
 struct namcos23_render_data
 {
 	u32 rgb;
+	float intensity_base;
 	const pen_t *pens;
 	bitmap_rgb32 *bitmap;
 	bitmap_ind8 *primap;
@@ -3633,10 +3634,11 @@ void namcos23_renderer::render_scanline(s32 scanline, const extent_t& extent, co
 
 			if (Shade)
 			{
-				const s32 shade = std::clamp<s32>(i * ooz, 0, 63);
-				r = (r * shade) >> 6;
-				g = (g * shade) >> 6;
-				b = (b * shade) >> 6;
+				// Six fractional bits: 0x40 is unity, and larger intensities brighten the texel.
+				const s32 shade = std::clamp<s32>(rd.intensity_base + i * ooz, 0, 255);
+				r = std::min((r * shade) >> 6, 255);
+				g = std::min((g * shade) >> 6, 255);
+				b = std::min((b * shade) >> 6, 255);
 			}
 
 			if (PolyFade)
@@ -3735,6 +3737,7 @@ void namcos23_state::render_direct_poly(const namcos23_render_entry *re)
 	{
 		namcos23_poly_entry *p = render.polys + render.poly_count;
 		p->vertex_count = 3;
+		p->rd.intensity_base = re->direct.d[8 + indices[i][0] * 6] >> 8;
 
 		for (int j = 0; j < 3; j++)
 		{
@@ -3758,7 +3761,7 @@ void namcos23_state::render_direct_poly(const namcos23_render_entry *re)
 
 			p->pv[j].p[1] = ((src[0] >> 4) + 0.5) * p->pv[j].p[0];
 			p->pv[j].p[2] = ((src[1] >> 4) + 0.5) * p->pv[j].p[0];
-			p->pv[j].p[3] = (src[4] >> 8) * p->pv[j].p[0];
+			p->pv[j].p[3] = ((src[4] >> 8) - p->rd.intensity_base) * p->pv[j].p[0];
 			p->pv[j].x = ((s16)src[2] + 320);
 			p->pv[j].y = ((s16)src[3] + 240);
 		}
@@ -3814,8 +3817,8 @@ void namcos23_state::render_direct_poly(const namcos23_render_entry *re)
 			p->rd.fadecolor_b = re->screen_fade_b;
 		}
 
-		// poly fade
-		p->rd.pfade_enabled = re->poly_fade_r != 0 || re->poly_fade_g != 0 || re->poly_fade_b != 0;
+		// poly fade (0xff is neutral)
+		p->rd.pfade_enabled = re->poly_fade_r != 0xff || re->poly_fade_g != 0xff || re->poly_fade_b != 0xff;
 		p->rd.polycolor_r = re->poly_fade_r;
 		p->rd.polycolor_g = re->poly_fade_g;
 		p->rd.polycolor_b = re->poly_fade_b;
@@ -3958,6 +3961,8 @@ void namcos23_state::render_immediate(const namcos23_render_entry *re)
 	// Project if you don't clip on the near plane
 	if (p->vertex_count >= 3)
 	{
+		// Interpolate intensity relative to a vertex so constant lighting stays exact.
+		p->rd.intensity_base = p->pv[0].p[3];
 		for (int i = 0; i < p->vertex_count; i++)
 		{
 			float z = p->pv[i].p[0] != 0 ? p->pv[i].p[0] : 1.f;
@@ -3975,7 +3980,7 @@ void namcos23_state::render_immediate(const namcos23_render_entry *re)
 			float w = p->pv[i].p[0];
 			p->pv[i].p[1] *= w;
 			p->pv[i].p[2] *= w;
-			p->pv[i].p[3] *= w;
+			p->pv[i].p[3] = (p->pv[i].p[3] - p->rd.intensity_base) * w;
 		}
 
 		// Compute an odd sorta'-Z thing that can situate the polygon wherever you want in Z-depth
@@ -4019,8 +4024,8 @@ void namcos23_state::render_immediate(const namcos23_render_entry *re)
 			p->rd.fadecolor_b = re->screen_fade_b;
 		}
 
-		// poly fade
-		p->rd.pfade_enabled = re->poly_fade_r != 0 || re->poly_fade_g != 0 || re->poly_fade_b != 0;
+		// poly fade (0xff is neutral)
+		p->rd.pfade_enabled = re->poly_fade_r != 0xff || re->poly_fade_g != 0xff || re->poly_fade_b != 0xff;
 		p->rd.polycolor_r = re->poly_fade_r;
 		p->rd.polycolor_g = re->poly_fade_g;
 		p->rd.polycolor_b = re->poly_fade_b;
@@ -4179,7 +4184,7 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 				if (lsi < 0)
 					lsi = 0;
 
-				pv[i].p[3] = std::clamp(re->light_ambient + re->light_power * lsi, 0.f, 64.f);
+				pv[i].p[3] = std::clamp(re->light_ambient + re->light_power * lsi, 0.f, 255.f);
 			}   break;
 			}
 		}
@@ -4234,6 +4239,8 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 		// Project if you don't clip on the near plane
 		if (p->vertex_count >= 3)
 		{
+			// Interpolate intensity relative to a vertex so constant lighting stays exact.
+			p->rd.intensity_base = p->pv[0].p[3];
 			// This is our bad excuse for a projection matrix
 			for (int i = 0; i < p->vertex_count; i++)
 			{
@@ -4252,7 +4259,7 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 				float w = p->pv[i].p[0];
 				p->pv[i].p[1] *= w;
 				p->pv[i].p[2] *= w;
-				p->pv[i].p[3] *= w;
+				p->pv[i].p[3] = (p->pv[i].p[3] - p->rd.intensity_base) * w;
 			}
 
 			if (maxz < 0)
@@ -4325,8 +4332,8 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 				p->rd.fadecolor_b = re->screen_fade_b;
 			}
 
-			// poly fade
-			p->rd.pfade_enabled = re->poly_fade_r != 0 || re->poly_fade_g != 0 || re->poly_fade_b != 0;
+			// poly fade (0xff is neutral)
+			p->rd.pfade_enabled = re->poly_fade_r != 0xff || re->poly_fade_g != 0xff || re->poly_fade_b != 0xff;
 			p->rd.polycolor_r = re->poly_fade_r;
 			p->rd.polycolor_g = re->poly_fade_g;
 			p->rd.polycolor_b = re->poly_fade_b;
@@ -5026,6 +5033,20 @@ u32 namcos23_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	if (m_c404.layer_flags & 4)
 	{
 		mix_text_layer(screen, bitmap, cliprect, 6);
+	}
+
+	// C404 gamma correction follows lighting, fading and layer blending.
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		u32 *const dest = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		{
+			const rgb_t color = dest[x];
+			const u8 r = m_c404.ram[0x100 + color.r()];
+			const u8 g = m_c404.ram[0x200 + color.g()];
+			const u8 b = m_c404.ram[0x300 + color.b()];
+			dest[x] = rgb_t(r, g, b);
+		}
 	}
 
 	return 0;
@@ -8378,8 +8399,49 @@ ROM_START( panicprkj )
 	ROM_LOAD( "nvram",        0x000000, 0x010000, CRC(22362b2a) SHA1(144956188e3cba78015e78cdcb52142b72a5aa1e) )
 ROM_END
 
-
 ROM_START( gunwars )
+	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
+	ROM_LOAD16_BYTE( "gm2verb.ic2",  0x000000, 0x200000, CRC(e413b643) SHA1(3a792629dd5fd825c2e602b9b8ecebede6c2ea02) )
+	ROM_LOAD16_BYTE( "gm2verb.ic1",  0x000001, 0x200000, CRC(ec00bcf9) SHA1(b44344f0e01552821475886a110f0d560943e4ef) )
+
+	ROM_REGION( 0x80000, "subcpu", 0 )  /* Hitachi H8/3002 MCU code */
+	ROM_LOAD16_WORD_SWAP( "gm1vera.ic3",  0x000000, 0x080000, CRC(5582fdd4) SHA1(8aae8bc6688d531888f2de509c07502ee355b3ab) )
+
+	ROM_REGION32_BE( 0x2000000, "data", 0 ) /* data ROMs */
+	ROM_LOAD16_BYTE( "gm1mtah.2j",   0x000000, 0x800000, CRC(3cea9094) SHA1(497395425e409de47e1114de9aeeaf05e4f6a9a1) )
+	ROM_LOAD16_BYTE( "gm1mtal.2h",   0x000001, 0x800000, CRC(d531dfcd) SHA1(9f7cbe9a03c1f7649bf05a7a30d47511573b50ba) )
+
+	ROM_REGION( 0x2000000, "textile", 0 )   /* texture tiles */
+	ROM_LOAD( "gm1cgll.4m",   0x0000000, 0x800000, CRC(936c0079) SHA1(3aec8caada35b7ed790bb3a8bcf6e01cad068fcd) )
+	ROM_LOAD( "gm1cglm.4k",   0x0800000, 0x800000, CRC(e2ee5493) SHA1(1ffd74646796ad554d7967ba9fc18deab4fedadf) )
+	ROM_LOAD( "gm1cgum.4j",   0x1000000, 0x800000, CRC(a7728944) SHA1(c187c6d66128554fcecc96e81d4f5396197e8280) )
+	ROM_LOAD( "gm1cguu.5f",   0x1800000, 0x800000, CRC(26a74698) SHA1(3f07d273abb3f2552dc6a29300f5dc2f2744c852) )
+
+	ROM_REGION16_LE( 0x400000, "textilemapl", 0 )   /* texture tilemap 0-15 */
+	ROM_LOAD( "gm1ccrl.7f",   0x000000, 0x400000, CRC(2c54c182) SHA1(538dfb04653f8d86f976e702456bf4da97e3fda9) )
+
+	ROM_REGION( 0x200000, "textilemaph", 0 )        /* texture tilemap 16-17 + attr */
+	ROM_LOAD( "gm1ccrh.7e",   0x000000, 0x200000, CRC(8563ef01) SHA1(59f09a08008a71a4bb12bd43a1b5dbe633d3061d) )
+
+	ROM_REGION32_BE( 0x2000000, "pointrom", 0 ) /* 3D model data */
+	ROM_LOAD32_WORD_SWAP( "gm1pt0h.7a",   0x000000, 0x400000, CRC(5ebd658c) SHA1(9e7b89a726b11b6da3327d72ec6adcc30fbb384d) )
+	ROM_LOAD32_WORD_SWAP( "gm1pt0l.7c",   0x000002, 0x400000, CRC(62e9bedb) SHA1(7043c5e6f26139c9e6e18d4f35fac6a16d4dabd1) )
+	ROM_LOAD32_WORD_SWAP( "gm1pt1h.5a",   0x800000, 0x400000, CRC(5f6cebab) SHA1(95bd30d30ea25509b66a107fb255d0af1e6a357e) )
+	ROM_LOAD32_WORD_SWAP( "gm1pt1l.5c",   0x800002, 0x400000, CRC(f44c149f) SHA1(9f995de02ea6ac35ccbabbba5bb473a10e1ec667) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
+	ROM_LOAD( "gm1wave.2c",   0x000000, 0x800000, CRC(7d5c79a4) SHA1(b800a46bcca10cb0d0d9e0acfa68af63ae64dcaf) )
+
+	ROM_REGION( 0x800000, "dups", 0 )   /* duplicate ROMs */
+	ROM_LOAD( "gm1cguu.4f",   0x000000, 0x800000, CRC(26a74698) SHA1(3f07d273abb3f2552dc6a29300f5dc2f2744c852) )
+	ROM_LOAD( "gm1cgum.5j",   0x000000, 0x800000, CRC(a7728944) SHA1(c187c6d66128554fcecc96e81d4f5396197e8280) )
+	ROM_LOAD( "gm1cgll.5m",   0x000000, 0x800000, CRC(936c0079) SHA1(3aec8caada35b7ed790bb3a8bcf6e01cad068fcd) )
+	ROM_LOAD( "gm1cglm.5k",   0x000000, 0x800000, CRC(e2ee5493) SHA1(1ffd74646796ad554d7967ba9fc18deab4fedadf) )
+	ROM_LOAD( "gm1ccrl.7m",   0x000000, 0x400000, CRC(2c54c182) SHA1(538dfb04653f8d86f976e702456bf4da97e3fda9) )
+	ROM_LOAD( "gm1ccrh.7k",   0x000000, 0x200000, CRC(8563ef01) SHA1(59f09a08008a71a4bb12bd43a1b5dbe633d3061d) )
+ROM_END
+
+ROM_START( gunwarsj )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_BYTE( "gm1verb.ic2",  0x000000, 0x200000, CRC(401f8264) SHA1(281f245ae0fbc2b82248c7aacaa5dfcdb114e2ee) )
 	ROM_LOAD16_BYTE( "gm1verb.ic1",  0x000001, 0x200000, CRC(f9fd0f2b) SHA1(53dadd49d0d43f0693c84853ba3de1b5faa9e1d8) )
@@ -8463,7 +8525,6 @@ ROM_START( gunwarsa )
 	ROM_LOAD( "gm1ccrl.7m",   0x000000, 0x400000, CRC(2c54c182) SHA1(538dfb04653f8d86f976e702456bf4da97e3fda9) )
 	ROM_LOAD( "gm1ccrh.7k",   0x000000, 0x200000, CRC(8563ef01) SHA1(59f09a08008a71a4bb12bd43a1b5dbe633d3061d) )
 ROM_END
-
 
 ROM_START( downhill ) // Dump has been reprogrammed on blank flash ROMs and tested working on real PCB
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
@@ -8926,7 +8987,8 @@ GAME( 1997, timecrs2v4a, timecrs2, timecrs2v4a, timecrs2,  namcoss23_state,     
 GAME( 1997, timecrs2v5a, timecrs2, timecrs2v4a, timecrs2,  namcoss23_state,      empty_init,  ROT0, "Namco", "Time Crisis II (US, TSS5 Ver. A)",      GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1997, panicprk,    0,        panicprk,    panicprk,  namcos23_state,       empty_init,  ROT0, "Namco", "Panic Park (World, PNP2 Ver. A)",       GAME_FLAGS )
 GAME( 1997, panicprkj,   panicprk, panicprk,    panicprk,  namcos23_state,       empty_init,  ROT0, "Namco", "Panic Park (Japan, PNP1 Ver. B)",       GAME_FLAGS )
-GAME( 1998, gunwars,     0,        gunwars,     gunwars,   namcoss23_gmen_state, empty_init,  ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. B)",       GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1998, gunwars,     0,        gunwars,     gunwars,   namcoss23_gmen_state, empty_init,  ROT0, "Namco", "Gunmen Wars (World, GM2 Ver. B)",       GAME_FLAGS | MACHINE_NODEVICE_LAN )
+GAME( 1998, gunwarsj,    gunwars,  gunwars,     gunwars,   namcoss23_gmen_state, empty_init,  ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. B)",       GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, gunwarsa,    gunwars,  gunwars,     gunwars,   namcoss23_gmen_state, empty_init,  ROT0, "Namco", "Gunmen Wars (Japan, GM1 Ver. A)",       GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, raceon,      0,        raceon,      raceon,    namcoss23_gmen_state, empty_init,  ROT0, "Namco", "Race On! (World, RO2 Ver. A)",          GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, raceonj,     raceon,   raceon,      raceon,    namcoss23_gmen_state, empty_init,  ROT0, "Namco", "Race On! (Japan, RO1 Ver. B)",          GAME_FLAGS | MACHINE_NODEVICE_LAN )
