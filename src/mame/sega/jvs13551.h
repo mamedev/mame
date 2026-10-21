@@ -90,6 +90,7 @@ public:
 
 	void set_digital_bits(uint8_t bits) { m_digital_bits = bits; }
 	void set_encoder_bits(uint8_t bits) { m_encoder_bits = bits; }
+	void set_lightgun_count(uint8_t count) { m_lightgun_count = count; }
 
 	template <uint8_t Which, typename T>
 	void set_rotary_tag(T &&port_tag) { rotary_port[Which].set_tag(std::forward<T>(port_tag)); }
@@ -100,18 +101,32 @@ public:
 		set_rotary_tags<First + 1>(std::forward<U>(other_tags)...);
 	}
 
+	template <uint8_t Which, typename T>
+	void set_lightgun_tag(T &&port_tag) { lightgun_port[Which].set_tag(std::forward<T>(port_tag)); }
+	template <uint8_t First = 0U, typename T, typename... U>
+	void set_lightgun_tags(T &&first_tag, U &&... other_tags)
+	{
+		set_lightgun_tag<First>(std::forward<T>(first_tag));
+		set_lightgun_tags<First + 1>(std::forward<U>(other_tags)...);
+	}
+
+
 protected:
 	template <uint8_t First> void set_rotary_tags() { }
+	template <uint8_t First> void set_lightgun_tags() { }
 
 	virtual const char *device_id() override;
 	virtual void function_list(uint8_t *&buf) override;
 	virtual bool rotary(uint8_t *&buf, uint8_t count) override;
+	virtual bool lightgun(uint8_t *&buf, uint8_t count) override;
 
 private:
 	optional_ioport_array<4> rotary_port;
+	optional_ioport_array<3> lightgun_port;
 
 	uint8_t m_digital_bits;
 	uint8_t m_encoder_bits;
+	uint8_t m_lightgun_count;
 };
 
 class sega_837_13938_device : public sega_837_13551_device
