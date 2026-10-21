@@ -47,6 +47,13 @@ public:
 	// light pen strobe input
 	void lpstb_w(int state);
 
+	// CUD1 (bit 0) / CUD2 (bit 1) graphic/crosshair cursor state at a
+	// bitmap position, for boards that mix the cursor outputs into video
+	int cursor_dot(int x, int y);
+
+	// BLINK1/BLINK2 video attribute state (BCR)
+	bool blink_state(int which);
+
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
@@ -103,6 +110,8 @@ private:
 	int translate_command(uint16_t data);
 	void draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int vs, int y, int layer_n, bool active, bool ins_window);
 	void draw_char_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int vs, int y, int layer_n);
+	bool cursor_phase(int which);
+	bool cursor_raster(int which, int layer_n, int raster);
 
 	void register_save_state();
 
@@ -147,6 +156,18 @@ private:
 
 	uint8_t m_fra[4];
 	uint8_t m_lra[4];
+
+	uint16_t m_bca[2];
+	uint8_t m_bcw[2];
+	uint8_t m_bcsr[2];
+	uint8_t m_bcer[2];
+	uint8_t m_cm;
+	uint8_t m_con[2];
+	uint8_t m_coff[2];
+	uint8_t m_bon[2];
+	uint8_t m_boff[2];
+	uint8_t m_cxs, m_cxe;
+	uint16_t m_cys, m_cye;
 
 	uint32_t m_sar[4];
 	uint8_t m_sda[4];

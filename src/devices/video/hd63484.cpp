@@ -2322,6 +2322,43 @@ void hd63484_device::video_registers_w(int offset)
 			recompute_parameters();
 			break;
 
+		case 0x90: // Blink Control Register
+			m_bon[0] = (vreg_data >> 12) & 0x0f;
+			m_boff[0] = (vreg_data >> 8) & 0x0f;
+			m_bon[1] = (vreg_data >> 4) & 0x0f;
+			m_boff[1] = vreg_data & 0x0f;
+			break;
+
+		case 0x98: // Graphic Cursor: X end / X start (memory cycles from HSYNC)
+			m_cxe = (vreg_data >> 8) & 0xff;
+			m_cxs = vreg_data & 0xff;
+			break;
+		case 0x9a: // Graphic Cursor: Y start (rasters from VSYNC)
+			m_cys = vreg_data & 0xfff;
+			break;
+		case 0x9c: // Graphic Cursor: Y end
+			m_cye = vreg_data & 0xfff;
+			break;
+
+		case 0xe0: // Block Cursor address
+		case 0xe4:
+			m_bca[(offset >> 2) & 1] = vreg_data;
+			break;
+		case 0xe2: // Block Cursor width / start / end raster
+		case 0xe6:
+			m_bcw[(offset >> 2) & 1] = (vreg_data >> 13) & 0x07;
+			m_bcsr[(offset >> 2) & 1] = (vreg_data >> 8) & 0x1f;
+			m_bcer[(offset >> 2) & 1] = vreg_data & 0x1f;
+			break;
+
+		case 0xe8: // Cursor Definition Register
+			m_cm = (vreg_data >> 14) & 0x03;
+			m_con[0] = (vreg_data >> 11) & 0x07;
+			m_coff[0] = (vreg_data >> 8) & 0x07;
+			m_con[1] = (vreg_data >> 3) & 0x07;
+			m_coff[1] = vreg_data & 0x07;
+			break;
+
 		case 0xc0: // Raster Address Register
 		case 0xc8:
 		case 0xd0:
@@ -2516,6 +2553,15 @@ void hd63484_device::device_reset()
 	memset(m_mwr_chr, 0, sizeof(m_mwr_chr));
 	memset(m_fra, 0, sizeof(m_fra));
 	memset(m_lra, 0, sizeof(m_lra));
+	memset(m_bca, 0, sizeof(m_bca));
+	memset(m_bcw, 0, sizeof(m_bcw));
+	memset(m_bcsr, 0, sizeof(m_bcsr));
+	memset(m_bcer, 0, sizeof(m_bcer));
+	m_cm = 0;
+	m_con[0] = m_con[1] = m_coff[0] = m_coff[1] = 0;
+	m_bon[0] = m_bon[1] = m_boff[0] = m_boff[1] = 0;
+	m_cxs = m_cxe = 0;
+	m_cys = m_cye = 0;
 	memset(m_sar, 0, sizeof(m_sar));
 	memset(m_sda, 0, sizeof(m_sda));
 	memset(m_pram, 0, sizeof(m_pram));
@@ -2589,6 +2635,73 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 	}
 }
 
+// cursor blink phase from the CDR on/off times (units of 4 field periods;
+// on time 0 means steady off, otherwise off time 0 means steady on)
+bool hd63484_device::cursor_phase(int which)
+{
+	if (m_con[which] == 0)
+		return false;
+	if (m_coff[which] == 0)
+		return true;
+
+	uint32_t const on = 4 * m_con[which] + 4;
+	uint32_t const off = 4 * m_coff[which] + 4;
+	return (screen().frame_number() % (on + off)) < on;
+}
+
+// BLINK1/BLINK2 video attribute phase from the BCR (same encoding, 4-bit)
+bool hd63484_device::blink_state(int which)
+{
+	which &= 1;
+	if (m_bon[which] == 0)
+		return false;
+	if (m_boff[which] == 0)
+		return true;
+
+	uint32_t const on = 4 * m_bon[which] + 4;
+	uint32_t const off = 4 * m_boff[which] + 4;
+	return (screen().frame_number() % (on + off)) < on;
+}
+
+// block cursor raster range, evaluated in character row sequence order so
+// that it follows the FRA..LRA wraparound
+bool hd63484_device::cursor_raster(int which, int layer_n, int raster)
+{
+	uint8_t const idx = (raster - m_fra[layer_n]) & 0x1f;
+	uint8_t const s = (m_bcsr[which] - m_fra[layer_n]) & 0x1f;
+	uint8_t const e = (m_bcer[which] - m_fra[layer_n]) & 0x1f;
+
+	return (s <= e) ? (idx >= s && idx <= e) : (idx >= s || idx <= e);
+}
+
+// graphic (CM=10, CUD1) and crosshair (CM=11, CUD1 horizontal / CUD2
+// vertical element) cursor state at a bitmap position; coordinates are
+// memory cycles from HSYNC and rasters from VSYNC, which match the
+// full-screen bitmap coordinates this device configures
+int hd63484_device::cursor_dot(int x, int y)
+{
+	int const ppmc = get_ppmc();
+	int res = 0;
+
+	if (m_cm == 2)
+	{
+		if (cursor_phase(0) && y >= m_cys && y <= m_cye && x >= m_cxs * ppmc && x < (m_cxe + 1) * ppmc)
+			res |= 1;
+	}
+	else if (m_cm == 3)
+	{
+		if (cursor_phase(0))
+		{
+			if (y >= m_cys && y <= m_cye)
+				res |= 1;
+			if (x >= m_cxs * ppmc && x < (m_cxe + 1) * ppmc)
+				res |= 2;
+		}
+	}
+
+	return res;
+}
+
 //-------------------------------------------------
 //  draw_char_line - character screen scanline:
 //  one character code per memory cycle, rendered
@@ -2625,7 +2738,22 @@ void hd63484_device::draw_char_line(bitmap_ind16 &bitmap, const rectangle &clipr
 	for (int x = cliprect.left(); x <= cliprect.right(); x += cellw)
 	{
 		uint16_t const code = readword(addr, layer_n);
-		m_character_cb(bitmap, cliprect, y, x, cellw, code, raster, layer_n, 0);
+
+		// the block cursors exist only on character screens: in block mode
+		// they drive CUD1/CUD2 separately, in graphic cursor mode both are
+		// combined onto CUD2, in crosshair mode they are unused
+		int cursor = 0;
+		if (m_cm < 3)
+		{
+			for (int c = 0; c < 2; c++)
+			{
+				uint16_t const span = uint16_t(addr - m_bca[c]);
+				if (span <= m_bcw[c] && cursor_raster(c, layer_n, raster) && cursor_phase((m_cm == 2) ? 1 : c))
+					cursor |= (m_cm == 2) ? 2 : (1 << c);
+			}
+		}
+
+		m_character_cb(bitmap, cliprect, y, x, cellw, code, raster, layer_n, cursor);
 		addr = (addr + 1) & 0xffff;
 	}
 }
@@ -2701,6 +2829,19 @@ void hd63484_device::register_save_state()
 	save_item(NAME(m_mwr_chr));
 	save_item(NAME(m_fra));
 	save_item(NAME(m_lra));
+	save_item(NAME(m_bca));
+	save_item(NAME(m_bcw));
+	save_item(NAME(m_bcsr));
+	save_item(NAME(m_bcer));
+	save_item(NAME(m_cm));
+	save_item(NAME(m_con));
+	save_item(NAME(m_coff));
+	save_item(NAME(m_bon));
+	save_item(NAME(m_boff));
+	save_item(NAME(m_cxs));
+	save_item(NAME(m_cxe));
+	save_item(NAME(m_cys));
+	save_item(NAME(m_cye));
 	save_item(NAME(m_sar));
 	save_item(NAME(m_sda));
 	save_item(NAME(m_pram));
