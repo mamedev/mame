@@ -13,21 +13,35 @@
 *  27-0883 1732-8277 (Video Painter and Socrates PAL)
 *
 TODO (socrates):
-    * The speech chip is a Toshiba tc8802AF (which is pin and speech
-      compatible with the older Toshiba t6803, but adds vsm rom read mode and
-      apparently does away with the melody mode); the chip is running at
-      800khz clock/10khz output with between 1 and 4 t6684F vsm roms
-      attached; create a sound driver for this!
-    * hook up mouse
     * add waitstates for ram access (lack of this causes the system to run
       way too fast)
       This will require some probing with the LA and the fluke to figure out
       how many cycles the waitstates are for for rom/ram/etc access.
     * figure out what bit 6 of the status register actually does; is this an
       ir mcu busy flag?
-    * keyboard IR decoder MCU is HLE'd for now, needs decap and cpu core
-    * iqunlimz keyboard MCU simulation does not handle key repeats
+    * port 0x30 was believed to reset the keyboard MCU, but all three
+      machines write it at the end (or start) of their vblank IRQ handler,
+      so it is treated as IRQ acknowledge; verify on hardware
+    * figure out what port 0x60 really does (the BIOS writes 1 there before
+      every access to the speech chip status, it is NOT a speech reset)
+    * keyboard IR decoder MCU (TMP42C40) and the Video Painter / IQ Unlimited
+      input MCUs are HLE'd, they need to be decapped and dumped
+    * the speech chip (Toshiba TC8802AF) is emulated in sound/tc8802.cpp, but
+      its quantizer tables are estimates (see there)
+    * the Socrates touch pad accessory protocol is unknown
+    * Video Painter: the function of button 10 is unknown, buttons 40 and 80
+      both clear the picture (one of them may be undo)
+    * IQ Unlimited: the BIOS probes ports 0x40/0x6c/0x6d once at boot
+      (expansion?), they are left unmapped; LCD output (0x80/0x81) and
+      battery backed RAM are not emulated
 
+  Keyboard / IR MCU interface (all three machines)
+    The ASIC holds one 16-bit word shifted in serially by the input MCU:
+    port 0x50 returns the high byte, port 0x51 the low byte.  Bit 7 of port
+    0x51 is set when the word is valid.  Any write to 0x50/0x51 acknowledges
+    the word, the ASIC then reads 0x0001 and the MCU shifts in the next word
+    a short time later.  See the "MCU simulation" sections below for the
+    word formats of each machine.
 
   Socrates Educational Video System
         FFFF|----------------|
@@ -88,6 +102,7 @@ TODO (socrates):
 #include "socrates_a.h"
 
 #include "cpu/z80/z80.h"
+#include "sound/tc8802.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
@@ -100,6 +115,18 @@ TODO (socrates):
 
 #include "corefloat.h"
 
+#include <algorithm>
+#include <bit>
+
+#define LOG_KBMCU (1U << 1)
+#define LOG_IO    (1U << 2)
+
+//#define VERBOSE (LOG_GENERAL | LOG_KBMCU | LOG_IO)
+#include "logmacro.h"
+
+#define LOGKBMCU(...) LOGMASKED(LOG_KBMCU, __VA_ARGS__)
+#define LOGIO(...)    LOGMASKED(LOG_IO, __VA_ARGS__)
+
 
 namespace {
 
@@ -110,6 +137,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "soc_snd"),
+		m_speech(*this, "speech"),
 		m_screen(*this, "screen"),
 		m_cart(*this, "cartslot"),
 		m_bios_reg(*this, "maincpu"),
@@ -118,16 +146,16 @@ public:
 		m_rombank2(*this, "rombank2"),
 		m_rambank1(*this, "rambank1"),
 		m_rambank2(*this, "rambank2"),
-		m_kbdrow(*this, "IN%u", 0)
+		m_kbdrow(*this, "IN%u", 0U),
+		m_mouse_x(*this, "MOUSEX"),
+		m_mouse_y(*this, "MOUSEY"),
+		m_mouse_buttons(*this, "MOUSEB")
 	{ }
 
-	void socrates(machine_config &config);
-	void socrates_pal(machine_config &config);
-	void vpainter_pal(machine_config &config);
+	void socrates(machine_config &config) ATTR_COLD;
+	void socrates_pal(machine_config &config) ATTR_COLD;
 
-	void init_socrates();
-	void init_iqunlimz();
-	void init_vpainter();
+	void init_socrates() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -141,6 +169,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<socrates_snd_device> m_sound;
+	optional_device<tc8802_device> m_speech;
 	required_device<screen_device> m_screen;
 	optional_device<generic_slot_device> m_cart;
 	memory_region *m_cart_reg;
@@ -150,35 +179,25 @@ protected:
 	optional_device<address_map_bank_device> m_rombank2; // iqunlimz only
 	required_device<address_map_bank_device> m_rambank1;
 	required_device<address_map_bank_device> m_rambank2;
-	optional_ioport_array<0xC> m_kbdrow;
+	optional_ioport_array<0xb> m_kbdrow;
+	optional_ioport m_mouse_x;
+	optional_ioport m_mouse_y;
+	optional_ioport m_mouse_buttons;
 
 	uint8_t m_rom_bank[2];
 	uint8_t m_ram_bank;
 	uint16_t m_scroll_offset;
-	uint16_t m_kb_spi_buffer;
-	bool m_kb_spi_request;
-	uint8_t m_kbmcu_type; // 0 for socrates, 1 for iqunlimz, 2 for vpainter
-	uint16_t m_oldkeyvalue; // previous key pressed
-	uint16_t m_keyrepeat_holdoffcounter; // keyrepeat holdoff countdown
-	uint8_t m_io40_latch; // what was last written to speech reg (for open bus)?
-	uint8_t m_speech_running; // is speech synth talking?
-	uint32_t m_speech_address; // address in speech space
-	uint8_t m_speech_settings; // speech settings (nybble 0: ? externrom ? ?; nybble 1: ? ? ? ?)
-	uint8_t m_speech_dummy_read; // have we done a dummy read yet?
-	uint8_t m_speech_load_address_count; // number of times load address has happened
-	uint8_t m_speech_load_settings_count; // number of times load settings has happened
 
-	emu_timer *m_kbmcu_sim_timer;
-	emu_timer *m_clear_speech_timer;
-	emu_timer *m_clear_irq_timer;
+	// input MCU HLE (common part)
+	uint16_t m_kb_latch;          // word in the ASIC shift register (port 0x50 = high byte, port 0x51 = low byte)
+	emu_timer *m_kbmcu_timer;
 
-	struct
-	{
-		uint16_t   buffer[8];
-		uint8_t    head;
-		uint8_t    tail;
-		uint8_t    count;
-	} m_kb_queue;
+	// Socrates keyboard MCU HLE
+	uint16_t m_kb_held;           // code currently reported for the held key
+	attotime m_kb_repeat_time;    // when the next typematic break is due
+	uint8_t m_mouse_last[2];      // last mouse counter values that were reported
+	int16_t m_mouse_pending[2];   // mouse movement not yet reported (vertical, horizontal)
+	bool m_mouse_click_sent;
 
 	void palette_init(palette_device &palete) const;
 
@@ -188,27 +207,55 @@ protected:
 	void common_ram_bank_w(uint8_t data);
 	uint8_t cart_r(offs_t offset);
 	uint8_t read_f3();
-	void kbmcu_reset(uint8_t data);
+	void irq_ack_w(uint8_t data);
 	uint8_t status_r();
-	void speech_command(uint8_t data);
-	uint8_t keyboard_buffer_read(offs_t offset);
-	void keyboard_buffer_update(uint8_t data);
-	void kbmcu_sim_reset();
-	void kbmcu_sim_fifo_enqueue(uint16_t data);
-	uint16_t kbmcu_sim_fifo_dequeue();
-	uint16_t kbmcu_sim_fifo_peek();
-	void kbmcu_sim_fifo_head_clear();
-	void reset_speech(uint8_t data);
+	void speech_w(uint8_t data);
+	void speech_enable_w(uint8_t data);
+	uint8_t kbmcu_r(offs_t offset);
+	void kbmcu_ack_w(offs_t offset, uint8_t data);
 	void scroll_w(offs_t offset, uint8_t data);
 	void sound_w(offs_t offset, uint8_t data);
+
+	virtual uint16_t kbmcu_word();
+	uint16_t socrates_mouse_word();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(assert_irq);
-	TIMER_CALLBACK_MEMBER(kbmcu_sim_cb);
-	TIMER_CALLBACK_MEMBER(clear_speech_cb);
-	TIMER_CALLBACK_MEMBER(clear_irq_cb);
+	TIMER_CALLBACK_MEMBER(kbmcu_shift_cb);
 	static rgb_t create_color(uint8_t color);
+};
+
+
+class vpainter_state : public socrates_state
+{
+public:
+	vpainter_state(const machine_config &mconfig, device_type type, const char *tag) :
+		socrates_state(mconfig, type, tag),
+		m_buttons(*this, "BUTTONS%u", 0U),
+		m_pen_x(*this, "PENX"),
+		m_pen_y(*this, "PENY"),
+		m_pen_down(*this, "PEN")
+	{ }
+
+	void vpainter_pal(machine_config &config) ATTR_COLD;
+
+	void init_vpainter() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	virtual uint16_t kbmcu_word() override;
+
+private:
+	required_ioport_array<4> m_buttons;
+	required_ioport m_pen_x;
+	required_ioport m_pen_y;
+	required_ioport m_pen_down;
+
+	uint32_t m_buttons_last;
+	bool m_pen_y_next;
 };
 
 
@@ -219,12 +266,15 @@ public:
 		socrates_state(mconfig, type, tag)
 	{ }
 
-	void iqunlimz(machine_config &config);
+	void iqunlimz(machine_config &config) ATTR_COLD;
 
-	DECLARE_INPUT_CHANGED_MEMBER( send_input );
+	void init_iqunlimz() ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	virtual uint16_t kbmcu_word() override;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -242,142 +292,313 @@ private:
 
 	uint8_t   m_colors[8];
 	uint8_t   m_video_regs[4];
-
 };
 
-/* Defines */
-
-// number of mcu "full cycles" before key repeat
-#define KEYREPEAT_HOLDOFF 0x1f
-// number of mcu "full cycles" between key repeats
-#define KEYREPEAT_REPEAT 1
-
-/* Components */
-
-/* Devices */
 
 /******************************************************************************
 
-Socrates Keyboard MCU simulation
+Input MCU HLE, common part
 
 *******************************************************************************
-the tmp50c40 MCU seems to have an 8? word, 12 bit wide internal fifo, which is fed by IR decoded from the
-remote keyboard. The socrates reads this data out via SPI? by asserting a /cs? bit when keyboard_buffer_update
-is written to.
-the bits are returned in two registers, handled by keyboard_buffer_read
-bits are read out in the following order:
-offset0  offset1
-76543210 76543210
-HHHHMMMM F000LLLL
-where HHHH is the high nybble, MMMM is the middle nybble, LLLL is the low nybble
-and F is the fifo status, 1 if the fifo had any data in it at all, and 0 if not
-if the fifo is empty, the mcu shifts out nothing, and the spi reg holds 00000000 00000001
+All three machines receive their input through a small MCU which shifts 16-bit
+words serially into a register inside the ASIC:
+
+    port 0x50 (read)  : bits 15-8 of the word
+    port 0x51 (read)  : bits 7-0 of the word, bit 7 is set in every word the
+                        MCU sends, so it doubles as the "word valid" flag
+    port 0x50/0x51 (write, any value): acknowledge.  The register then reads
+                        0x0001 until the MCU has shifted in its next word.
+
+The MCU keeps reporting its *current* input state, the host software does the
+edge detection, de-bouncing and (on the IQ Unlimited) the typematic repeat
+itself.  All MCUs are undumped, so this is HLE; the response time is a guess.
 ******************************************************************************/
 
-/******************************************************************************
-
-IQUnlimited Keyboard MCU simulation
-
-*******************************************************************************
-iq unlimited has a different mcu than socrates, which has an 8-word 8-bit wide
-fifo instead.
-As in socrates, the bits are returned in two registers, handled by keyboard_buffer_read
-bits are read out in the following order:
-offset0  offset1
-76543210 76543210
-HHHHLLLL F000KACS
-where HHHH is the high nybble, LLLL is the low nybble, KACS is capslock, alt, ctrl and shift,
-and F is the fifo status, 1 if the fifo had any data in it at all, and 0 if not.
-KACS are NOT from the fifo, but a live status of the key states.
-F is also binary ORed with the vblank state???
-if the fifo is empty, the mcu shifts out nothing, and the spi reg holds 00000000 F000KACS
-******************************************************************************/
-
-void socrates_state::kbmcu_sim_reset()
+void socrates_state::kbmcu_ack_w(offs_t offset, uint8_t data)
 {
-	m_kb_queue.head = m_kb_queue.tail = m_kb_queue.count = 0;
-	for (uint8_t i = 0; i < (sizeof(m_kb_queue.buffer)/sizeof(m_kb_queue.buffer[0])); i++)
-		m_kb_queue.buffer[i]=0;
+	LOGKBMCU("%s: ack (word was %04X)\n", machine().describe_context(), m_kb_latch);
+	m_kb_latch = 0x0001;
+	// the MCU notices the request on its next pass through the main loop
+	m_kbmcu_timer->adjust(attotime::from_usec(1500));
 }
 
-
-void socrates_state::kbmcu_sim_fifo_enqueue(uint16_t data)
+uint8_t socrates_state::kbmcu_r(offs_t offset)
 {
-	//logerror("kbmcu_sim_fifo_enqueue called with %02x, fifo count was %d\n", data, m_kb_queue.count);
-	if (m_kb_queue.count < 8)
+	return offset ? (m_kb_latch & 0xff) : (m_kb_latch >> 8);
+}
+
+TIMER_CALLBACK_MEMBER(socrates_state::kbmcu_shift_cb)
+{
+	m_kb_latch = kbmcu_word() | 0x0080;
+	LOGKBMCU("MCU word %04X\n", m_kb_latch);
+}
+
+void socrates_state::irq_ack_w(uint8_t data)
+{
+	// All three machines write this port in their vblank IRQ handler
+	// (the IQ Unlimited with an incrementing count, the others with
+	// whatever is in A); it releases the IRQ line.  It was once thought
+	// to reset the keyboard MCU.
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+/******************************************************************************
+
+Socrates keyboard MCU simulation
+
+*******************************************************************************
+The TMP42C40 decodes the infrared stream of the wireless keyboard (and of the
+mouse/touch pad accessories) and reports the current state each time it is
+asked for a word.  Word formats (port 0x50 port 0x51):
+
+    00     80      nothing pressed
+    0R     8L      D-pads/red buttons, all pressed bits at once:
+                   L = left pad  (bit 0 right, 1 up, 2 left, 3 down)
+                   R = right pad (bit 0 down, 1 left, 2 up, 3 right),
+                       bit 4 = left red button, bit 5 = right red button
+    4r     8c      keyboard key at row r (0-4), column c (0-9), see the
+                   input port definition for the matrix
+    5r     8c      same, with SHIFT held
+    50     80      SHIFT alone
+    8v     8h      mouse movement: v = vertical (1-7 down, 8-F up, small to
+                   large), h = horizontal (1-7 right, 8-F left)
+    90/A0/B0 80    right/left/both mouse buttons (81 if movement is pending)
+
+The BIOS ignores a word that is identical to the previous one, so a held key
+is only seen once.  The keyboard has a typematic repeat, which is simulated by
+inserting a single "nothing pressed" word after the initial delay and then at
+the repeat rate (times are guesses).
+******************************************************************************/
+
+static constexpr attotime KB_TYPEMATIC_DELAY = attotime::from_msec(500);
+static constexpr attotime KB_TYPEMATIC_RATE = attotime::from_msec(100);
+
+uint16_t socrates_state::socrates_mouse_word()
+{
+	if (!m_mouse_x.found())
+		return 0;
+
+	// accumulate movement since the last word
+	uint8_t const pos[2] = { uint8_t(m_mouse_y->read()), uint8_t(m_mouse_x->read()) };
+	for (int i = 0; i < 2; i++)
 	{
-		m_kb_queue.buffer[m_kb_queue.tail] = data;
-		m_kb_queue.tail = (m_kb_queue.tail + 1) % (sizeof(m_kb_queue.buffer)/sizeof(m_kb_queue.buffer[0]));
-		m_kb_queue.count++;
+		m_mouse_pending[i] += int8_t(pos[i] - m_mouse_last[i]);
+		m_mouse_last[i] = pos[i];
 	}
+	bool const moving = m_mouse_pending[0] || m_mouse_pending[1];
+	uint8_t const buttons = m_mouse_buttons->read() & 0x03;
+
+	// alternate between button and movement words while dragging
+	if (buttons && (!moving || !m_mouse_click_sent))
+	{
+		m_mouse_click_sent = true;
+		return (uint16_t(0x80 | (buttons << 4)) << 8) | (moving ? 0x01 : 0x00);
+	}
+	m_mouse_click_sent = false;
+	if (!moving)
+		return 0;
+
+	uint8_t nibble[2];
+	for (int i = 0; i < 2; i++)
+	{
+		int16_t const delta = std::clamp<int16_t>(m_mouse_pending[i], -8, 7);
+		m_mouse_pending[i] -= delta;
+		nibble[i] = (delta >= 0) ? delta : (7 - delta); // -1..-8 -> 8..F
+	}
+	return (uint16_t(0x80 | nibble[0]) << 8) | nibble[1];
 }
 
-uint16_t socrates_state::kbmcu_sim_fifo_dequeue()
+uint16_t socrates_state::kbmcu_word()
 {
-	if (m_kb_queue.count == 0) fatalerror("kbmcu_sim_fifo_dequeue called with queue count of zero. This should never happen, contact MAMEDEV!");
-	uint16_t retval = m_kb_queue.buffer[m_kb_queue.head];
-	m_kb_queue.count--;
-	m_kb_queue.head = (m_kb_queue.head + 1) % (sizeof(m_kb_queue.buffer)/sizeof(m_kb_queue.buffer[0]));
-	//logerror("kbmcu_sim_fifo_dequeue was called, returning %02x, fifo count is now %d\n", retval, m_kb_queue.count);
-	return retval;
+	// D-pads and red buttons have priority and are reported as a bitfield
+	uint16_t const pads = m_kbdrow[5]->read();
+	if (pads)
+	{
+		m_kb_held = 0;
+		return ((pads & 0x3f0) << 4) | (pads & 0x0f);
+	}
+
+	// mouse accessory
+	uint16_t const mouse = socrates_mouse_word();
+	if (mouse)
+		return mouse;
+
+	// keyboard, the first key found wins
+	uint16_t key = 0;
+	for (int row = 4; (row >= 0) && !key; row--)
+	{
+		uint16_t const bits = m_kbdrow[row]->read();
+		for (int col = 9; col >= 0; col--)
+		{
+			if (BIT(bits, col))
+			{
+				key = 0x4000 | (row << 8) | col;
+				break;
+			}
+		}
+	}
+	if (m_kbdrow[6]->read())
+		key = key ? (key | 0x1000) : 0x5000;
+
+	// typematic repeat: send a single break once the delay has expired
+	attotime const now = machine().time();
+	if (key != m_kb_held)
+	{
+		m_kb_held = key;
+		m_kb_repeat_time = now + KB_TYPEMATIC_DELAY;
+	}
+	else if (key && (key != 0x5000) && (now >= m_kb_repeat_time))
+	{
+		m_kb_repeat_time = now + KB_TYPEMATIC_RATE;
+		return 0x0000;
+	}
+	return key;
 }
 
-uint16_t socrates_state::kbmcu_sim_fifo_peek()
+
+/******************************************************************************
+
+Video Painter touch pad / button MCU simulation
+
+*******************************************************************************
+The TMP47C241 scans the button matrix and the pen tablet.  Word formats:
+
+    00     80      nothing
+    xy     81      button pressed: x = row bit (1,2,4,8), y = column (0-5),
+                   sent once per press
+    XX     8f      pen on the pad, X coordinate (valid 0C-F7), f = 2 + flags:
+                   bit 2 or bit 3 must be set for the pen to draw (bit 2:
+                   pen tip, bit 3: unknown, maybe a second pressure level);
+                   without them only the cursor moves
+    YY     83      Y coordinate - 2, always follows an 8x word
+******************************************************************************/
+
+uint16_t vpainter_state::kbmcu_word()
 {
-	if (m_kb_queue.count == 0) fatalerror("kbmcu_sim_fifo_peek called with queue count of zero. This should never happen, contact MAMEDEV!");
-	uint16_t retval = m_kb_queue.buffer[m_kb_queue.head];
-	//logerror("kbmcu_sim_fifo_peek was called, returning %02x, fifo count is now %d\n", retval, m_kb_queue.count);
-	return retval;
+	// buttons: report each new press once
+	uint32_t const buttons = m_buttons[0]->read() | (m_buttons[1]->read() << 8) | (m_buttons[2]->read() << 16) | (m_buttons[3]->read() << 24);
+	uint32_t const pressed = buttons & ~m_buttons_last;
+	m_buttons_last = buttons;
+	if (pressed && !m_pen_y_next)
+	{
+		int const bit = std::countr_zero(pressed);
+		m_buttons_last &= ~(pressed & ~(1U << bit)); // other new presses are reported next time
+		// BUTTONS0-3 are the matrix rows 1/2/4/8, bits 0-5 the columns
+		return (uint16_t((0x10 << (bit >> 3)) | (bit & 7)) << 8) | 0x01;
+	}
+
+	if ((m_pen_down->read() & 0x0c) || m_pen_y_next)
+	{
+		m_pen_y_next = !m_pen_y_next;
+		if (m_pen_y_next)
+			return (uint16_t(m_pen_x->read()) << 8) | 0x02 | (m_pen_down->read() & 0x0c);
+		else
+			return (uint16_t(m_pen_y->read()) << 8) | 0x03;
+	}
+	return 0x0000;
 }
 
-void socrates_state::kbmcu_sim_fifo_head_clear()
+
+/******************************************************************************
+
+IQ Unlimited keyboard MCU simulation
+
+*******************************************************************************
+The IQ Unlimited has a wired keyboard with an 8-bit scan code per key.
+
+    port 0x50 : scan code of the held key (00 = none), see input ports
+    port 0x51 : bit 7    word valid
+                bit 6    another word follows (several keys, unused here)
+                bit 5,4  (unknown, select special handling in the BIOS)
+                bit 3-0  live state of CAPS LOCK, ALT, CTRL, SHIFT
+
+The BIOS polls the keyboard in every IRQ and does the typematic repeat
+itself, so the held key is simply reported continuously.
+******************************************************************************/
+
+uint16_t iqunlimz_state::kbmcu_word()
 {
-	m_kb_queue.buffer[m_kb_queue.head] = 0;
+	uint8_t code = 0;
+	for (int row = 1; (row <= 0xa) && !code; row++)
+	{
+		uint8_t const bits = m_kbdrow[row]->read();
+		if (bits)
+			code = (row << 4) | std::countr_zero(bits);
+	}
+	return (uint16_t(code) << 8) | (m_kbdrow[0]->read() & 0x0f);
 }
+
 
 void socrates_state::machine_start()
 {
-	m_kbmcu_sim_timer = timer_alloc(FUNC(socrates_state::kbmcu_sim_cb), this);
-	m_kbmcu_sim_timer->adjust(attotime::from_hz((XTAL(21'477'272)/6)/3000)); // timer rate is a massive guess, depends on instructions per loop of mcu
-	m_clear_speech_timer = timer_alloc(FUNC(socrates_state::clear_speech_cb), this);
-	m_clear_irq_timer = timer_alloc(FUNC(socrates_state::clear_irq_cb), this);
-	save_item(NAME(m_rom_bank));
-	save_item(NAME(m_ram_bank));
-	save_item(NAME(m_scroll_offset));
-	save_item(NAME(m_kb_spi_request));
-	save_item(NAME(m_kb_spi_buffer));
-	save_item(NAME(m_oldkeyvalue));
-	save_item(NAME(m_keyrepeat_holdoffcounter));
-	save_item(NAME(m_io40_latch));
-	save_item(NAME(m_speech_running));
-	save_item(NAME(m_speech_address));
-	save_item(NAME(m_speech_settings));
-	save_item(NAME(m_speech_dummy_read));
-	save_item(NAME(m_speech_load_address_count));
-	save_item(NAME(m_speech_load_settings_count));
+	m_kbmcu_timer = timer_alloc(FUNC(socrates_state::kbmcu_shift_cb), this);
+
 	m_rom_bank[0] = m_rom_bank[1] = 0x0;
 	m_rombank1->set_bank(0x0); // actually set semi-randomly on real console but we need to initialize it somewhere...
 	m_ram_bank = 0;
 	m_rambank1->set_bank(0x0);// the actual console sets it semi randomly on power up, and the bios cleans it up.
 	m_rambank2->set_bank(0x0);
 	// ASIC SPI buffer starts with garbage in it for one word, simulate this
-	m_kb_spi_buffer = 0xFF8F;
+	m_kb_latch = 0xff8f;
+	m_kb_held = 0;
+	m_kb_repeat_time = attotime::zero;
+	m_mouse_last[0] = m_mouse_last[1] = 0;
+	m_mouse_pending[0] = m_mouse_pending[1] = 0;
+	m_mouse_click_sent = false;
+
+	save_item(NAME(m_rom_bank));
+	save_item(NAME(m_ram_bank));
+	save_item(NAME(m_scroll_offset));
+	save_item(NAME(m_kb_latch));
+	save_item(NAME(m_kb_held));
+	save_item(NAME(m_kb_repeat_time));
+	save_item(NAME(m_mouse_last));
+	save_item(NAME(m_mouse_pending));
+	save_item(NAME(m_mouse_click_sent));
 }
 
 void socrates_state::machine_reset()
 {
 	m_cart_reg = m_cart ? memregion(util::string_format("%s%s", m_cart->tag(), GENERIC_ROM_REGION_TAG).c_str()) : nullptr;
-	kbmcu_sim_reset();
-	m_kb_spi_request = true;
-	m_oldkeyvalue = 0;
-	m_keyrepeat_holdoffcounter = KEYREPEAT_HOLDOFF;
-	m_io40_latch = 0;
-	m_speech_running = 0;
-	m_speech_address = 0;
-	m_speech_settings = 0;
-	m_speech_dummy_read = 0;
-	m_speech_load_address_count = 0;
-	m_speech_load_settings_count = 0;
+	m_kb_held = 0;
+	m_kbmcu_timer->adjust(attotime::never);
+	if (m_mouse_x.found())
+	{
+		m_mouse_last[0] = m_mouse_y->read();
+		m_mouse_last[1] = m_mouse_x->read();
+	}
+	m_mouse_pending[0] = m_mouse_pending[1] = 0;
+}
+
+void vpainter_state::machine_start()
+{
+	socrates_state::machine_start();
+
+	m_buttons_last = 0;
+	m_pen_y_next = false;
+
+	save_item(NAME(m_buttons_last));
+	save_item(NAME(m_pen_y_next));
+}
+
+void vpainter_state::machine_reset()
+{
+	socrates_state::machine_reset();
+
+	m_buttons_last = 0;
+	m_pen_y_next = false;
+}
+
+void iqunlimz_state::machine_start()
+{
+	socrates_state::machine_start();
+
+	m_kb_latch = 0x0001;
+	std::fill(std::begin(m_colors), std::end(m_colors), 0);
+	std::fill(std::begin(m_video_regs), std::end(m_video_regs), 0);
+
+	save_item(NAME(m_colors));
+	save_item(NAME(m_video_regs));
 }
 
 void socrates_state::init_socrates()
@@ -386,25 +607,22 @@ void socrates_state::init_socrates()
 	for (int i = 0; i < 0x10000; i++)
 		m_vram_reg[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
 	m_maincpu->set_clock_scale(0.45); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
-	m_kbmcu_type = 0;
 }
 
-void socrates_state::init_iqunlimz()
+void iqunlimz_state::init_iqunlimz()
 {
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen... is this even right for the iqunlimz? */
 	for (int i = 0; i < 0x20000; i++)
 		m_vram_reg[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
 	//m_maincpu->set_clock_scale(0.45); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
-	m_kbmcu_type = 1;
 }
 
-void socrates_state::init_vpainter()
+void vpainter_state::init_vpainter()
 {
 	/* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
 	for (int i = 0; i < 0x10000; i++)
 		m_vram_reg[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
 	m_maincpu->set_clock_scale(0.45); /// TODO: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
-	m_kbmcu_type = 2;
 }
 
 uint8_t socrates_state::common_rom_bank_r(offs_t offset)
@@ -454,203 +672,49 @@ uint8_t socrates_state::read_f3()// used for read-only i/o ports as mame/mess do
 	return 0xF3;
 }
 
-void socrates_state::kbmcu_reset(uint8_t data) // reset the keyboard MCU, clear its fifo
-{
-	//logerror("0x%04X: kbmcu written with %02X!\n", m_maincpu->pc(), data); //if (m_maincpu->pc() != 0x31D)
-	kbmcu_sim_reset();
-}
-
 uint8_t socrates_state::status_r()// read 0x4x, some sort of status reg
 {
 // bit 7 - speech status: high when speech is playing, low when it is not (or when speech cart is not present)
 // bit 6 - unknown, usually set, possibly mcu ready state?
 // bit 5 - vblank status, high when not in vblank
 // bit 4 - hblank status, high when not in hblank
-// bit 3 - speech chip bit 3
-// bit 2 - speech chip bit 2
-// bit 1 - speech chip bit 1
-// bit 0 - speech chip bit 0
-	uint8_t *speechromint = memregion("speechint")->base();
-	uint8_t *speechromext = memregion("speechext")->base();
-	int temp = 0;
-	temp |= (m_speech_running)?0x80:0;
-	temp |= (1)?0x40:0; // unknown, possibly IR mcu ready?
-	temp |= (m_screen->vblank())?0:0x20;
-	temp |= (m_screen->hblank())?0:0x10;
-	switch(m_io40_latch&0xF0) // what was last opcode sent?
+// bit 3-0 - speech chip D3-D0 (nibble latched by the last DTRD command)
+	uint8_t data = 0x40; // unknown, possibly IR mcu ready?
+	if (m_speech)
 	{
-		case 0x60: case 0xE0:// speech status 'read' register
-			if(m_speech_settings&0x04) // external speech roms (outside of speech ic but still in cart) enabled
-			{
-			logerror("reading external speech rom nybble from nybble address %x (byte address %x)\n",m_speech_address, m_speech_address>>1);
-			temp |= ((speechromext[((m_speech_address>>1)&0xffff)]>>((m_speech_address&1)*4))&0xF);
-			}
-			else
-			{
-			logerror("reading internal speech rom nybble from nybble address %x (byte address %x)\n",m_speech_address, m_speech_address>>1);
-			temp |= ((speechromint[((m_speech_address>>1)&0x1fff)]>>((m_speech_address&1)*4))&0xF);
-			}
-			if (m_speech_dummy_read == 0) // if we havent done the dummy read yet, do so now
-			{
-				m_speech_dummy_read++;
-			}
-			else
-			{
-				m_speech_address++;
-			}
-			break;
-		default:
-			temp |= m_io40_latch&0xF; // read open bus
-			break;
+		if (m_speech->busy_r())
+			data |= 0x80;
+		data |= m_speech->data_r() & 0x0f;
 	}
-	logerror("read from i/o 0x4x of %x\n", temp);
-	return temp;
+	if (!m_screen->vblank())
+		data |= 0x20;
+	if (!m_screen->hblank())
+		data |= 0x10;
+	return data;
 }
 
-TIMER_CALLBACK_MEMBER(socrates_state::clear_speech_cb)
-{
-	m_speech_running = 0;
-	m_speech_load_address_count = 0; // should this be here or in the write functuon subpart which is speak command?
-	m_speech_load_settings_count = 0;
-}
-
-void socrates_state::speech_command(uint8_t data) // write 0x4x
+void socrates_state::speech_w(uint8_t data) // write 0x4x
 {
 	/*
 	 * 76543210
-	 * |||||||\-- SEL0
-	 * ||||||\--- SEL1
-	 * |||||\---- SEL2
-	 * ||||\----- SEL3
-	 * |||\------ SEL4
-	 * ||\------- SEL5
-	 * |\-------- 64UP (if LOW the chip is in 'dumb' mode and can only play 64 fixed phrases; if HIGH the chip is in 'cpu controlled' mode and commands work) (not 100% sure about this but suspect it is correct)
-	 * \--------- START (in cpu mode must be toggled from low->high for a cpu command to 'take'; in 'dumb' mode must be toggled low->high to start that 'word')
+	 * ||\\\\\\-- SEL0-SEL5: command and data nibble, see sound/tc8802.cpp
+	 * |\-------- 64UP: high for CPU controlled mode (always set by the BIOS)
+	 * \--------- START: commands are taken on the rising edge
+	 *
+	 * The BIOS writes every command as  cmd & 0x7f, cmd | 0xc0, cmd & 0x7f
+	 * and reads DTRD data from the status register while START is high.
 	 */
-	logerror("write to i/o 0x4x of %x\n", data);
-/*
-// old readback test, probably get rid of this junk:
-// 00-0f: readback: 70-7f
-// 10-1f: readback: 70-7f
-// 20-2f: readback: 70-7f
-// 30-3f: readback: 70-7f
-// 40-5f: readback: 70-7f
-// 50-5f: readback: 70-7f
-// 60-6f: readback: ALL 7f
-// 70-7f: readback: 50, 71-7f (force vblank?)
-// 80-8f: 80 starts speech reads as f0, rest read as 71-7f
-// 90-9f: all 70-7f
-// a0-af: 70-7f
-// b0-bf: 70-7f
-// c0-cf: 70-7f
-// d0-df: 70-7f
-// e0-ef: readback ALL 76
-// f0-ff: 70-7f
-*/
-/* The speech chip is a toshiba tc8802, it is NOT a t6803 since the t6803
-   does not have the rom read mode, which the socrates definitely uses! */
-/* Commands (tc8802):
-SEL 5 4 3 2 1 0
-    0 0 n n n n -  ADLD - ADdress LoaD - writes one nybble to the address
-                          of vsm rom selected (internal or external) starting
-                          from the low 4 bits; each subsequent write writes to
-                          the next higher 4 bits; resetting the chip resets
-                          the position
-    0 1 n n n n -  CNDT - CoNDiTion (aka 'setup') - writes one nybble to the
-                          setting register, starting from the low 4 bits; the
-                          subsequent write will be to the high 4 bits;
-                          resetting the chip will reset the position
-
-                          CNDT bits (? are from T6803 datasheet, which could be wrong on the tc8802AF here):
-                           * 76543210
-                           * |||||||\-- ?bits/frame bit 1 (0 = see bit 2; 1 = 98bits/frame (these may be backwards))
-                           * ||||||\--- ?melody mode select if high
-                           * |||||\---- speech rom select; 0 is internal 8k mask, 1 is external vsm bus
-                           * ||||\----- ?voiced source select (0 = A; 1 = B)
-                           * |||\------ ?filter stages (0 = lpc-10; 1 = lpc-8)
-                           * ||\------- ?always 0
-                           * |\-------- ?frame length (0 = 20ms; 1 = 10ms)
-                           * \--------- ?bits/frame bit 2 (if bit 1 is not set: 0 = 56 bits/frame; 1 = 50 bits/frame)
-                           *
-    1 0 x x x x -  DTRD - DaTa ReaD - reads a nybble from the address as loaded
-                          and increments the address by one nybble. The first
-                          DTRD command after any other commands is a 'dummy
-                          read' which serves to reset the bus direction of the
-                          low 4 SEL lines, identical to the way the TMS5100
-                          does things. it doesn't affect the bus direction of
-                          the high two SEL lines.
-    1 1 0 x x x - START - Starts speech at the address as loaded.
-    1 1 1 x x x - RESET - Resets the internal chip state (clears shifters and
-                          counters) and forces speech to end/silence
-                          immediately.
-*/
-	switch(data&0xF8)
-	{
-		case 0x80: case 0x88: case 0x90: case 0x98: case 0xA0: case 0xA8: case 0xB0: case 0xB8:
-			/* 'dumb' mode speech command: write me: start talking */
-			m_speech_running = 1;
-			m_clear_speech_timer->adjust(attotime::from_seconds(4)); // hack
-			break;
-		case 0xC0: case 0xC8: // ADLD: load address to vsm
-			m_speech_address |= (((int)data&0xF)<<(m_speech_load_address_count*4))<<1;
-			m_speech_load_address_count++;
-			logerror("loaded address nybble %X, byte address is currently %5X with %d nybbles loaded\n", data&0xF, m_speech_address>>1, m_speech_load_address_count);
-			break;
-		case 0xD0: case 0xD8: // CNDT: load settings
-			m_speech_settings |= ((data&0xF)<<(m_speech_load_settings_count*4));
-			m_speech_load_settings_count++;
-			break;
-		case 0xE0: case 0xE8: // DTRD: read byte, handled elsewhere
-			break;
-		case 0xF0: // SPEAK
-			m_speech_running = 1;
-			m_clear_speech_timer->adjust(attotime::from_seconds(4)); // hack
-			break;
-		case 0xF8: // RESET
-			m_speech_running = 0;
-			m_speech_address = 0;
-			m_speech_settings = 0;
-			m_speech_dummy_read = 0;
-			m_speech_load_address_count = 0;
-			m_speech_load_settings_count = 0;
-			m_io40_latch &= 0x0f; // set last command to 0 to prevent problems
-			break;
-		default: // 00 through 70 are packets without the write bit set, ignore them
-			break;
-	}
-	m_io40_latch = data;
+	LOGIO("%s: speech write %02X\n", machine().describe_context(), data);
+	if (m_speech)
+		m_speech->write(data);
 }
 
-uint8_t socrates_state::keyboard_buffer_read(offs_t offset)
+void socrates_state::speech_enable_w(uint8_t data) // write 0x6x
 {
-	if (m_kbmcu_type == 0)
-	{
-		if (offset == 1) return m_kb_spi_buffer&0xFF;
-		else return (m_kb_spi_buffer&0xFF00)>>8;
-	}
-	else // if ( (m_kbmcu_type == 1) || (m_kbmcu_type == 2) ) // iqunlimz hack, the system won't work without this?!?!
-	{
-		if (offset == 1) return (m_screen->vblank()?0x80:0)|(m_kbdrow[0]->read()&0xf);
-		else return (m_kb_spi_buffer&0xFF00)>>8;
-	}
-}
-
-void socrates_state::keyboard_buffer_update(uint8_t data)
-{
-	m_kb_spi_request = true;
-	m_kb_spi_buffer = 0x0001;
-}
-
-void socrates_state::reset_speech(uint8_t data)// i/o 60: reset speech synth
-{
-	m_speech_running = 0;
-	m_speech_address = 0;
-	m_speech_settings = 0;
-	m_speech_dummy_read = 0;
-	m_speech_load_address_count = 0;
-	m_speech_load_settings_count = 0;
-	m_io40_latch &= 0x0f; // set last command to 0 to prevent problems
-logerror("write to i/o 0x60 of %x\n",data);
+	// The BIOS writes 1 here before every check of the speech status (also
+	// while speech is playing), so this cannot be a speech reset as was once
+	// assumed.  Possibly a speech module enable/select; no visible effect.
+	LOGIO("%s: write to i/o 0x60 of %02X\n", machine().describe_context(), data);
 }
 
 /* stuff below belongs in video/socrates.c */
@@ -661,6 +725,7 @@ logerror("write to i/o 0x60 of %x\n",data);
     */
 void socrates_state::scroll_w(offs_t offset, uint8_t data)
 {
+	LOGIO("%s: scroll %d = %02X (vpos %d)\n", machine().describe_context(), offset, data, m_screen->vpos());
 	if (offset == 0)
 	m_scroll_offset = (m_scroll_offset&0x100) | data;
 	else
@@ -936,9 +1001,8 @@ void iqunlimz_state::machine_reset()
 {
 	socrates_state::machine_reset();
 
-	memset(m_colors, 0, 8);
-	memset(m_video_regs, 0, 4);
-	kbmcu_sim_reset();
+	std::fill(std::begin(m_colors), std::end(m_colors), 0);
+	std::fill(std::begin(m_video_regs), std::end(m_video_regs), 0);
 }
 
 void iqunlimz_state::colors_w(offs_t offset, uint8_t data)
@@ -946,18 +1010,6 @@ void iqunlimz_state::colors_w(offs_t offset, uint8_t data)
 	m_colors[offset] = data;
 }
 
-
-// IQ Unlimited keyboard MCU simulation
-
-INPUT_CHANGED_MEMBER( iqunlimz_state::send_input )
-{
-	uint8_t data = (uint8_t)param;
-
-	if (newval)
-	{
-		kbmcu_sim_fifo_enqueue(data<<4);
-	}
-}
 
 /******************************************************************************
  Address Maps
@@ -1005,10 +1057,10 @@ void socrates_state::socrates_io(address_map &map)
 	<todo: test the others, maybe take samples?>
 	*/
 	map(0x20, 0x21).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::scroll_w)).mirror(0xE);
-	map(0x30, 0x30).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::kbmcu_reset)).mirror(0xF); /* resets the keyboard IR decoder MCU */
-	map(0x40, 0x40).rw(FUNC(socrates_state::status_r), FUNC(socrates_state::speech_command)).mirror(0xF); /* reads status register for vblank/hblank/speech, also reads and writes speech module */
-	map(0x50, 0x51).rw(FUNC(socrates_state::keyboard_buffer_read), FUNC(socrates_state::keyboard_buffer_update)).mirror(0xE); /* Keyboard fifo read, pop fifo on write */
-	map(0x60, 0x60).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::reset_speech)).mirror(0xF); /* reset the speech module, or perhaps fire an NMI?  */
+	map(0x30, 0x30).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::irq_ack_w)).mirror(0xF); /* vblank IRQ acknowledge */
+	map(0x40, 0x40).rw(FUNC(socrates_state::status_r), FUNC(socrates_state::speech_w)).mirror(0xF); /* reads status register for vblank/hblank/speech, also reads and writes speech module */
+	map(0x50, 0x51).rw(FUNC(socrates_state::kbmcu_r), FUNC(socrates_state::kbmcu_ack_w)).mirror(0xE); /* keyboard MCU word read, acknowledge on write */
+	map(0x60, 0x60).rw(FUNC(socrates_state::read_f3), FUNC(socrates_state::speech_enable_w)).mirror(0xF); /* unknown, written before speech status reads */
 	map(0x70, 0xFF).r(FUNC(socrates_state::read_f3)); // nothing mapped here afaik
 }
 
@@ -1043,9 +1095,9 @@ void iqunlimz_state::iqunlimz_io(address_map &map)
 	map(0x08, 0x08).rw(FUNC(iqunlimz_state::common_ram_bank_r), FUNC(iqunlimz_state::common_ram_bank_w)).mirror(0x07);
 	map(0x10, 0x17).w(FUNC(iqunlimz_state::sound_w)).mirror(0x08);
 	map(0x20, 0x21).w(FUNC(iqunlimz_state::scroll_w)).mirror(0x0E);
-	// 30: writes an incrementing value here, once per keypress?
+	map(0x30, 0x30).w(FUNC(iqunlimz_state::irq_ack_w)).mirror(0x0F); // vblank IRQ acknowledge, written with an incrementing count
 	// 40: some sort of serial select/reset or enable, related to 0x60
-	map(0x50, 0x51).rw(FUNC(iqunlimz_state::keyboard_buffer_read), FUNC(iqunlimz_state::keyboard_buffer_update)).mirror(0xE);
+	map(0x50, 0x51).rw(FUNC(iqunlimz_state::kbmcu_r), FUNC(iqunlimz_state::kbmcu_ack_w)).mirror(0xE);
 	// 60: some sort of serial read/write port, related to 0x40
 	map(0x70, 0x73).rw(FUNC(iqunlimz_state::video_regs_r), FUNC(iqunlimz_state::video_regs_w)).mirror(0x0C);
 	map(0x80, 0x81).nopw(); // LCD
@@ -1226,226 +1278,210 @@ static INPUT_PORTS_START( socrates )
 	PORT_BIT(0xfc00, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN4") // 1st row
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('+') PORT_NAME("+") // 44 80
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR('+') PORT_NAME("+") // 44 80
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_UNUSED) // 44 81
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13) PORT_NAME("ENTER") // 44 82
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME)) PORT_NAME("MENU") // 44 83
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGUP) PORT_CHAR(UCHAR_MAMEKEY(PGUP)) PORT_NAME("ANSWER") // 44 84
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGDN) PORT_CHAR(UCHAR_MAMEKEY(PGDN)) PORT_NAME("HELP") // 44 85
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_NAME("ERASE") // 44 86
-	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_NAME("/") // 44 87
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHAR('/') PORT_NAME("/") // 44 87
 	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('*') PORT_NAME("*") // 44 88
-	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_NAME("-") // 44 89
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHAR('-') PORT_NAME("-") // 44 89
 	PORT_BIT(0xfc00, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	// mouse goes here
+	// mouse accessory
+	PORT_START("MOUSEX")
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(4)
+
+	PORT_START("MOUSEY")
+	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(4)
+
+	PORT_START("MOUSEB")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Right Button") // 90 80
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Left Button") // A0 80
+	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
+
+/* Video Painter buttons (MCU code = row bit in the high nibble, column in
+   the low nibble).  Functions identified by pressing each button in the
+   drawing screen:
+     10 no visible function     20 puzzle (tangram)     40 clear picture
+     11 pink                    21 grey                 41 white
+     12 purple (default)        22 brown                42 drawing tools menu
+     13 red                     23 blue                 43 fill pattern menu
+     14 orange                  24 turquoise            44 eraser menu
+     15 yellow                  25 green                45 copy / zoom menu
+     80 clear picture (maybe undo, both erase a whole picture in tests)
+     81 black   82/83 frame menus   84 stamps (clip art)
+*/
+static INPUT_PORTS_START( vpainter )
+	PORT_START("BUTTONS0") // codes 10-15
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Unknown (no visible function)") PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Colour: Pink") PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Colour: Purple") PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Colour: Red") PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Colour: Orange") PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Colour: Yellow") PORT_CODE(KEYCODE_6)
+	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("BUTTONS1") // codes 20-25
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Puzzle") PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Colour: Grey") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Colour: Brown") PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Colour: Blue") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Colour: Turquoise") PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Colour: Green") PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("BUTTONS2") // codes 40-45
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear Picture") PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Colour: White") PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Drawing Tools") PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Fill Patterns") PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Erasers") PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Copy / Zoom") PORT_CODE(KEYCODE_H)
+	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("BUTTONS3") // codes 80-84
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clear Picture 2") PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Colour: Black") PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Frames 1") PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Frames 2") PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Stamps") PORT_CODE(KEYCODE_B)
+	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("PENX")
+	PORT_BIT(0xff, 0x80, IPT_LIGHTGUN_X) PORT_NAME("Pen X") PORT_MINMAX(0x0c, 0xf7) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(4)
+
+	PORT_START("PENY")
+	PORT_BIT(0xff, 0x80, IPT_LIGHTGUN_Y) PORT_NAME("Pen Y") PORT_MINMAX(0x06, 0xf5) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(4)
+
+	PORT_START("PEN")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Pen Down")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Pen Button") // unknown function, also draws
+	PORT_BIT(0xf3, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( iqunlimz )
-	PORT_START( "IN0" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_LSHIFT )  PORT_CODE( KEYCODE_RSHIFT )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_LCONTROL )  PORT_CODE( KEYCODE_RCONTROL )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_LALT )  PORT_CODE( KEYCODE_RALT )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_CAPSLOCK )
+	// the scan code of a key is (row << 4) | bit, e.g. IN4 bit 5 = 0x45 = A
+	PORT_START( "IN0" ) // live modifier state, reported in every word
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Shift" ) PORT_CODE( KEYCODE_LSHIFT ) PORT_CODE( KEYCODE_RSHIFT ) PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Ctrl" ) PORT_CODE( KEYCODE_LCONTROL ) PORT_CODE( KEYCODE_RCONTROL ) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Alt" ) PORT_CODE( KEYCODE_LALT ) PORT_CODE( KEYCODE_RALT ) PORT_CHAR(UCHAR_MAMEKEY(LALT))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Caps Lock" ) PORT_CODE( KEYCODE_CAPSLOCK ) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START( "IN1" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_N ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x10)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_M ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x11)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_COMMA ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x12)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_B ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x13)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_C ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x14)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Z ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x15)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_V ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x16)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_X ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x17)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "N" ) PORT_CODE( KEYCODE_N ) PORT_CHAR('n') PORT_CHAR('N') // 10
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "M" ) PORT_CODE( KEYCODE_M ) PORT_CHAR('m') PORT_CHAR('M') // 11
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "," ) PORT_CODE( KEYCODE_COMMA ) PORT_CHAR(',') PORT_CHAR('<') // 12
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "B" ) PORT_CODE( KEYCODE_B ) PORT_CHAR('b') PORT_CHAR('B') // 13
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "C" ) PORT_CODE( KEYCODE_C ) PORT_CHAR('c') PORT_CHAR('C') // 14
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Z" ) PORT_CODE( KEYCODE_Z ) PORT_CHAR('z') PORT_CHAR('Z') // 15
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "V" ) PORT_CODE( KEYCODE_V ) PORT_CHAR('v') PORT_CHAR('V') // 16
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "X" ) PORT_CODE( KEYCODE_X ) PORT_CHAR('x') PORT_CHAR('X') // 17
 
 	PORT_START( "IN2" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x20)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_2_PAD ) PORT_CODE( KEYCODE_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x21)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_5_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x22)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_DEL_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x23)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_SLASH_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x24)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_8_PAD ) PORT_CODE( KEYCODE_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x25)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_ASTERISK ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x26)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_7_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x27)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // 20
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Keypad 2 / Down" ) PORT_CODE( KEYCODE_2_PAD ) PORT_CODE( KEYCODE_DOWN ) PORT_CHAR(UCHAR_MAMEKEY(2_PAD)) // 21
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Keypad 5" ) PORT_CODE( KEYCODE_5_PAD ) PORT_CHAR(UCHAR_MAMEKEY(5_PAD)) // 22
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Keypad ." ) PORT_CODE( KEYCODE_DEL_PAD ) PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD)) // 23
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Keypad /" ) PORT_CODE( KEYCODE_SLASH_PAD ) PORT_CHAR(UCHAR_MAMEKEY(SLASH_PAD)) // 24
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Keypad 8 / Up" ) PORT_CODE( KEYCODE_8_PAD ) PORT_CODE( KEYCODE_UP ) PORT_CHAR(UCHAR_MAMEKEY(8_PAD)) // 25
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Keypad *" ) PORT_CODE( KEYCODE_ASTERISK ) PORT_CHAR(UCHAR_MAMEKEY(ASTERISK)) // 26
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Keypad 7" ) PORT_CODE( KEYCODE_7_PAD ) PORT_CHAR(UCHAR_MAMEKEY(7_PAD)) // 27
 
 	PORT_START( "IN3" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x30)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x31)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x32)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x33)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F1 ) PORT_NAME( "Help" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x34)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_9 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x35)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_BACKSPACE ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x36)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_0 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x37)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // 30
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // 31
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // 32
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // 33
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Help" ) PORT_CODE( KEYCODE_F1 ) PORT_CHAR(UCHAR_MAMEKEY(F1)) // 34
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "9" ) PORT_CODE( KEYCODE_9 ) PORT_CHAR('9') PORT_CHAR('(') // 35
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Backspace" ) PORT_CODE( KEYCODE_BACKSPACE ) PORT_CHAR(8) // 36
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "0" ) PORT_CODE( KEYCODE_0 ) PORT_CHAR('0') PORT_CHAR(')') // 37
 
 	PORT_START( "IN4" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_H ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x40)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_J ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x41)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_K ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x42)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_G ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x43)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_D ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x44)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_A ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x45)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x46)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_S ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x47)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "H" ) PORT_CODE( KEYCODE_H ) PORT_CHAR('h') PORT_CHAR('H') // 40
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "J" ) PORT_CODE( KEYCODE_J ) PORT_CHAR('j') PORT_CHAR('J') // 41
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "K" ) PORT_CODE( KEYCODE_K ) PORT_CHAR('k') PORT_CHAR('K') // 42
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "G" ) PORT_CODE( KEYCODE_G ) PORT_CHAR('g') PORT_CHAR('G') // 43
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "D" ) PORT_CODE( KEYCODE_D ) PORT_CHAR('d') PORT_CHAR('D') // 44
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "A" ) PORT_CODE( KEYCODE_A ) PORT_CHAR('a') PORT_CHAR('A') // 45
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "F" ) PORT_CODE( KEYCODE_F ) PORT_CHAR('f') PORT_CHAR('F') // 46
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "S" ) PORT_CODE( KEYCODE_S ) PORT_CHAR('s') PORT_CHAR('S') // 47
 
 	PORT_START( "IN5" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x50)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x51)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x52)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x53)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_EQUALS ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x54)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_O ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x55)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_NUMLOCK ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x56)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_P ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x57)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // 50
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // 51
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // 52
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // 53
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "=" ) PORT_CODE( KEYCODE_EQUALS ) PORT_CHAR('=') PORT_CHAR('+') // 54
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "O" ) PORT_CODE( KEYCODE_O ) PORT_CHAR('o') PORT_CHAR('O') // 55
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Num Lock" ) PORT_CODE( KEYCODE_NUMLOCK ) PORT_CHAR(UCHAR_MAMEKEY(NUMLOCK)) // 56
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "P" ) PORT_CODE( KEYCODE_P ) PORT_CHAR('p') PORT_CHAR('P') // 57
 
 	PORT_START( "IN6" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Y ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x60)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_U ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x61)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_I ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x62)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_T ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x63)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_E ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x64)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Q ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x65)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_R ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x66)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_W ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x67)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Y" ) PORT_CODE( KEYCODE_Y ) PORT_CHAR('y') PORT_CHAR('Y') // 60
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "U" ) PORT_CODE( KEYCODE_U ) PORT_CHAR('u') PORT_CHAR('U') // 61
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "I" ) PORT_CODE( KEYCODE_I ) PORT_CHAR('i') PORT_CHAR('I') // 62
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "T" ) PORT_CODE( KEYCODE_T ) PORT_CHAR('t') PORT_CHAR('T') // 63
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "E" ) PORT_CODE( KEYCODE_E ) PORT_CHAR('e') PORT_CHAR('E') // 64
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Q" ) PORT_CODE( KEYCODE_Q ) PORT_CHAR('q') PORT_CHAR('Q') // 65
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "R" ) PORT_CODE( KEYCODE_R ) PORT_CHAR('r') PORT_CHAR('R') // 66
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "W" ) PORT_CODE( KEYCODE_W ) PORT_CHAR('w') PORT_CHAR('W') // 67
 
 	PORT_START( "IN7" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_MINUS ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x70)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_SLASH ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x71)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x72)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_STOP ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x73)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_QUOTE ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x74)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_L ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x75)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_ENTER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x76)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_COLON ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x77)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "-" ) PORT_CODE( KEYCODE_MINUS ) PORT_CHAR('-') PORT_CHAR('_') // 70
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "/" ) PORT_CODE( KEYCODE_SLASH ) PORT_CHAR('/') PORT_CHAR('?') // 71
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // 72
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "." ) PORT_CODE( KEYCODE_STOP ) PORT_CHAR('.') PORT_CHAR('>') // 73
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "'" ) PORT_CODE( KEYCODE_QUOTE ) PORT_CHAR('\'') PORT_CHAR('"') // 74
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "L" ) PORT_CODE( KEYCODE_L ) PORT_CHAR('l') PORT_CHAR('L') // 75
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Enter" ) PORT_CODE( KEYCODE_ENTER ) PORT_CHAR(13) // 76
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( ";" ) PORT_CODE( KEYCODE_COLON ) PORT_CHAR(';') PORT_CHAR(':') // 77
 
 	PORT_START( "IN8" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_6 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x80)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_7 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x81)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_8 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x82)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_5 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x83)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x84)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x85)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x86)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x87)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "6" ) PORT_CODE( KEYCODE_6 ) PORT_CHAR('6') PORT_CHAR('^') // 80
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "7" ) PORT_CODE( KEYCODE_7 ) PORT_CHAR('7') PORT_CHAR('&') // 81
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "8" ) PORT_CODE( KEYCODE_8 ) PORT_CHAR('8') PORT_CHAR('*') // 82
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "5" ) PORT_CODE( KEYCODE_5 ) PORT_CHAR('5') PORT_CHAR('%') // 83
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "3" ) PORT_CODE( KEYCODE_3 ) PORT_CHAR('3') PORT_CHAR('#') // 84
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "1" ) PORT_CODE( KEYCODE_1 ) PORT_CHAR('1') PORT_CHAR('!') // 85
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "4" ) PORT_CODE( KEYCODE_4 ) PORT_CHAR('4') PORT_CHAR('$') // 86
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "2" ) PORT_CODE( KEYCODE_2 ) PORT_CHAR('2') PORT_CHAR('@') // 87
 
 	PORT_START( "IN9" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_4_PAD ) PORT_CODE( KEYCODE_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x90)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_3_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x91)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_6_PAD ) PORT_CODE( KEYCODE_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x92)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_PLUS_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x93)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_0_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x94)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_9_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x95)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_MINUS_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x96)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_1_PAD ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0x97)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Keypad 4 / Left" ) PORT_CODE( KEYCODE_4_PAD ) PORT_CODE( KEYCODE_LEFT ) PORT_CHAR(UCHAR_MAMEKEY(4_PAD)) // 90
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Keypad 3" ) PORT_CODE( KEYCODE_3_PAD ) PORT_CHAR(UCHAR_MAMEKEY(3_PAD)) // 91
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Keypad 6 / Right" ) PORT_CODE( KEYCODE_6_PAD ) PORT_CODE( KEYCODE_RIGHT ) PORT_CHAR(UCHAR_MAMEKEY(6_PAD)) // 92
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Keypad +" ) PORT_CODE( KEYCODE_PLUS_PAD ) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD)) // 93
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Keypad 0" ) PORT_CODE( KEYCODE_0_PAD ) PORT_CHAR(UCHAR_MAMEKEY(0_PAD)) // 94
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Keypad 9" ) PORT_CODE( KEYCODE_9_PAD ) PORT_CHAR(UCHAR_MAMEKEY(9_PAD)) // 95
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Keypad -" ) PORT_CODE( KEYCODE_MINUS_PAD ) PORT_CHAR(UCHAR_MAMEKEY(MINUS_PAD)) // 96
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Keypad 1" ) PORT_CODE( KEYCODE_1_PAD ) PORT_CHAR(UCHAR_MAMEKEY(1_PAD)) // 97
 
-	PORT_START( "INA" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0xa0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0xa1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0xa2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0xa3)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F2 ) PORT_NAME("Answer") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0xa4)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_ESC ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0xa5)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_SPACE ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0xa6)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_TAB ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(iqunlimz_state::send_input), 0xa7)
+	PORT_START( "IN10" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // A0
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // A1
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // A2
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // A3
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Answer" ) PORT_CODE( KEYCODE_F2 ) PORT_CHAR(UCHAR_MAMEKEY(F2)) // A4
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Esc" ) PORT_CODE( KEYCODE_ESC ) PORT_CHAR(UCHAR_MAMEKEY(ESC)) // A5
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Space" ) PORT_CODE( KEYCODE_SPACE ) PORT_CHAR(' ') // A6
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME( "Tab" ) PORT_CODE( KEYCODE_TAB ) PORT_CHAR(9) // A7
 INPUT_PORTS_END
 
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-TIMER_CALLBACK_MEMBER(socrates_state::clear_irq_cb)
-{
-	m_maincpu->set_input_line(0, CLEAR_LINE);
-}
-
 INTERRUPT_GEN_MEMBER(socrates_state::assert_irq)
 {
+	// held until the handler acknowledges it through port 0x30
 	device.execute().set_input_line(0, ASSERT_LINE);
-	m_clear_irq_timer->adjust(m_maincpu->cycles_to_attotime(44));
-	// 44 is a complete and total guess, need to properly measure how many clocks/microseconds the int line is high for.
-}
-
-TIMER_CALLBACK_MEMBER(socrates_state::kbmcu_sim_cb)
-{
-	// timer rate is a massive guess; we're assuming the mcu runs at the same speed as the cpu does,
-	// and the refresh rate depends on instructions per loop of mcu, which we've randomly guessed is 60 cycles.
-	m_kbmcu_sim_timer->adjust(m_maincpu->cycles_to_attotime(3000));
-	/// TODO: dump the mcus and get rid of this...
-	if (m_kbmcu_type == 0)
-	{
-		// socrates keyboard MCU simulation: if a keyboard key is pressed, enqueue it into the fifo as needed
-		uint16_t keyvalue = 0;
-		// check for joypad buttons
-		keyvalue = m_kbdrow[5]->read();
-		if (keyvalue == 0) // if joypad wasn't pushed...
-		{
-			// next check for mouse movement.
-			/// TODO: this isn't written yet
-			// next check for basic keyboard "4x xx" stuff
-			// check if shift is down
-			keyvalue = (m_kbdrow[6]->read())?0x500:0;
-			bool keyfound = false;
-			// find what row and bit we're on...
-			for (int8_t row = 4; row>=0; row--)
-			{
-				uint16_t tempkey = m_kbdrow[row]->read();
-				if (tempkey != 0)
-				{
-					for (int8_t powerof2 = 9; ((powerof2 >= 0) && (keyfound == false)); powerof2--) // continue until we find the first key only
-					{
-						if ((tempkey&(1<<powerof2)) == (1<<powerof2))
-						{
-							keyvalue |= (0x400 | (row<<4) | powerof2);
-							keyfound = true;
-						}
-					}
-				}
-			}
-		}
-		if (keyvalue != 0) // if a key is down...
-		{
-			if (keyvalue == m_oldkeyvalue) // and its the same key as it was the last run...
-			{
-				if (m_keyrepeat_holdoffcounter > 0) // and the key repeat holdoff counter is > 0...
-				{
-					m_keyrepeat_holdoffcounter--; // decrement the holdoff counter
-				}
-				else // the key repeat holdoff counter is zero
-				{
-					kbmcu_sim_fifo_enqueue(0x1000|keyvalue); // queue the key with bit 12 set as a flag that this is a repeat
-					m_keyrepeat_holdoffcounter += KEYREPEAT_REPEAT; // increment the holdoff counter by the repeat value
-				}
-			}
-			else // it isn't the same key as it was the last run
-			{
-				kbmcu_sim_fifo_enqueue(keyvalue); // queue the key
-				m_keyrepeat_holdoffcounter = KEYREPEAT_HOLDOFF; // reset the holdoff counter
-				m_oldkeyvalue = keyvalue; // set this new key to be the 'previous key'
-			}
-		}
-		else // keyvalue is zero, reset the holdoff counter
-		{
-			m_keyrepeat_holdoffcounter = KEYREPEAT_HOLDOFF;
-			m_oldkeyvalue = keyvalue; // set this new key to be the 'previous key'
-		}
-	}
-	//else if (m_kbmcu_type == 1) // this is currently hacked around by the input system so no code here
-	//{
-	//}
-
-	if ((m_kb_spi_request) && (m_kb_queue.count > 0)) // if the console requested data from the MCU AND the MCU has data to send...
-	{
-		uint16_t tempbuffer = 0;
-		m_kb_spi_request = false;
-		tempbuffer = kbmcu_sim_fifo_peek();
-		if (tempbuffer&0x1000) // repeat bit was set
-		{
-			kbmcu_sim_fifo_head_clear(); // clear the head byte of the fifo, but leave it enqueued so it is returned next time. socrates wants this...
-		}
-		else tempbuffer = kbmcu_sim_fifo_dequeue();
-		m_kb_spi_buffer = ((tempbuffer&0xFF0)<<4)|(tempbuffer&0xF)|0x80;
-	}
 }
 
 void socrates_state::socrates(machine_config &config)
@@ -1474,7 +1510,16 @@ void socrates_state::socrates(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SOCRATES_SOUND(config, m_sound, XTAL(21'477'272)/(512+256)).add_route(ALL_OUTPUTS, "mono", 0.25); // this is correct, as strange as it sounds.
+	// The mix of tone generator and speech is set from a recording of a real
+	// NTSC Socrates with the English speech module: speech is about 3.5 times
+	// (11 dB) louder than the tones (RMS, 90th percentile of active frames).
+	SOCRATES_SOUND(config, m_sound, XTAL(21'477'272)/(512+256)).add_route(ALL_OUTPUTS, "mono", 0.075); // this is correct, as strange as it sounds.
+
+	// speech module: Toshiba TC8802AF with 8 KiB internal mask ROM and up to four T6684F VSMs
+	TC8802(config, m_speech, 800'000); // 800 kHz, 10 kHz sample rate
+	m_speech->set_internal_rom_tag("speechint");
+	m_speech->set_device_rom_tag("speechext");
+	m_speech->add_route(ALL_OUTPUTS, "mono", 1.25);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "socrates_cart");
 
@@ -1499,12 +1544,16 @@ void socrates_state::socrates_pal(machine_config &config)
 	m_sound->set_clock(XTAL(26'601'712)/(512+256)); // this is correct, as strange as it sounds.
 }
 
-void socrates_state::vpainter_pal(machine_config &config)
+void vpainter_state::vpainter_pal(machine_config &config)
 {
 	socrates_pal(config);
 
 	config.device_remove("cartslot");
 	config.device_remove("cart_list");
+	config.device_remove("speech");
+
+	// no speech module, keep the tone generator at the usual level
+	m_sound->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void iqunlimz_state::iqunlimz(machine_config &config)
@@ -1644,9 +1693,6 @@ ROM_START( vpainter )
 	ROM_REGION(0x1000, "kbmcu", ROMREGION_ERASEFF)
 	ROM_LOAD("tmp47c241nj408.u6", 0x0000, 0x1000, NO_DUMP) /* key/touchpad reader MCU */
 
-	///TODO: get rid of these regions in the status_read function or make it socrates-specific
-	ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // doesn't exist? on vpainter, presumably reads as all zeroes
-	ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // doesn't exist? on vpainter, presumably reads as all zeroes
 ROM_END
 
 } // anonymous namespace
@@ -1657,13 +1703,13 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE       INPUT     STATE           INIT           COMPANY                    FULLNAME                             FLAGS
-COMP( 1988, socrates, 0,        0,      socrates,     socrates, socrates_state, init_socrates, "Video Technology",        "Socrates Educational Video System", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // English, no title copyright, same ROM for NTSC and PAL
-COMP( 1988, socratfc, socrates, 0,      socrates,     socrates, socrates_state, init_socrates, "Video Technology",        "Socrates SAITOUT",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // French Canandian NTSC, 1988 title copyright
+COMP( 1988, socrates, 0,        0,      socrates,     socrates, socrates_state, init_socrates, "Video Technology",        "Socrates Educational Video System", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE ) // English, no title copyright, same ROM for NTSC and PAL
+COMP( 1988, socratfc, socrates, 0,      socrates,     socrates, socrates_state, init_socrates, "Video Technology",        "Socrates SAITOUT",                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE ) // French Canandian NTSC, 1988 title copyright
 // Yeno Professeur Saitout (French SECAM) matches the Socrates SAITOUT dump (same ROM 27-00884-001-000)
-COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, init_socrates, "Video Technology / Yeno", "Professor Weiss-Alles",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // German PAL, 1988 title copyright
+COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, init_socrates, "Video Technology / Yeno", "Professor Weiss-Alles",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE ) // German PAL, 1988 title copyright
 // ? goes here (Spanish PAL)
 
-COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlimz_state, init_iqunlimz, "Video Technology",        "IQ Unlimited (Z80)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlimz_state, init_iqunlimz, "Video Technology",        "IQ Unlimited (Z80)",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
 
-COMP( 1991, vpainter, 0,        0,      vpainter_pal, socrates, socrates_state, init_vpainter, "Video Technology",        "Video Painter (PAL)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1991, vpainter, 0,        0,      vpainter_pal, vpainter, vpainter_state, init_vpainter, "Video Technology",        "Video Painter (PAL)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
 // Master Video Painter goes here
