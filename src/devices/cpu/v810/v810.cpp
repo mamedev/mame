@@ -977,35 +977,25 @@ uint32_t v810_device::opOUTW(uint32_t op)    // out.w reg2, disp16[reg1]
 
 uint32_t v810_device::opMULr(uint32_t op)    // mul r1,r2
 {
-	uint32_t op1=GETREG(GET1);
-	uint32_t op2=GETREG(GET2);
-	uint64_t tmp;
-	tmp=(int64_t)(int32_t)op1*(int64_t)(int32_t)op2;
-	op2=tmp&0xffffffff;
-	tmp>>=32;
-	CHECK_ZS(tmp);//z = bad!
-	SET_Z( (tmp|op2)==0 );
-	SET_OV((tmp!=0));
-	SET_CY((tmp!=0));
-	SETREG(GET2,op2);
-	SETREG(30,tmp);
+	const int64_t result = int64_t(int32_t(GETREG(GET1))) * int64_t(int32_t(GETREG(GET2)));
+	const uint32_t low = uint32_t(result);
+	// high word to r30 first: when reg2 is r30 it gets the low word; CY is not affected
+	SETREG(30, uint32_t(uint64_t(result) >> 32));
+	SETREG(GET2, low);
+	SET_OV(result != int64_t(int32_t(low)));
+	CHECK_ZS(low);
 	return 13;
 }
 
 uint32_t v810_device::opMULUr(uint32_t op)   // mulu r1,r2
 {
-	uint32_t op1=GETREG(GET1);
-	uint32_t op2=GETREG(GET2);
-	uint64_t tmp;
-	tmp=(uint64_t)op1*(uint64_t)op2;
-	op2=tmp&0xffffffff;
-	tmp>>=32;
-	CHECK_ZS(tmp);//z = bad!
-	SET_Z( (tmp|op2)==0 );
-	SET_OV((tmp!=0));
-	SET_CY((tmp!=0));
-	SETREG(GET2,op2);
-	SETREG(30,tmp);
+	const uint64_t result = uint64_t(GETREG(GET1)) * uint64_t(GETREG(GET2));
+	const uint32_t low = uint32_t(result);
+	// high word to r30 first: when reg2 is r30 it gets the low word; CY is not affected
+	SETREG(30, uint32_t(result >> 32));
+	SETREG(GET2, low);
+	SET_OV((result >> 32) != 0);
+	CHECK_ZS(low);
 	return 13;
 }
 
