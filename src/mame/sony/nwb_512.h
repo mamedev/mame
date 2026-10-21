@@ -145,6 +145,7 @@ private:
 	void ctrl_w(uint16_t data);
 
 	void reset_state();
+	void check_mem_mask(uint16_t mem_mask);
 	void check_operation_start(offs_t offset);
 	void set_pixel(uint16_t x, uint16_t y, bool on);
 	uint16_t execute_rop(uint8_t opcode, uint16_t source, uint16_t destination);

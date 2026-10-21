@@ -72,16 +72,6 @@ namespace
 		return 7 - (x & 7); // pixel 0 = bit 7
 	}
 
-	// Most registers on this card require word alignment.
-	// This helper enforces as such to make it easier to validate assumptions made about this fact.
-	void check_mem_mask(uint16_t mem_mask)
-	{
-		if (mem_mask != 0xffff)
-		{
-			fatalerror("fb: non-word write!");
-		}
-	}
-
 	// Extracts the X address from the data provided to an FB write
 	uint16_t x_address(uint16_t data)
 	{
@@ -153,7 +143,7 @@ void nwb_512_device::map(address_map &map)
 	map(0x60000, 0x60fff).w(FUNC(nwb_512_device::rop_config_w));
 	map(0x70000, 0x70fff).rw(FUNC(nwb_512_device::fifo_r), FUNC(nwb_512_device::fifo_w));
 	map(0x80000, 0x80001).rw(FUNC(nwb_512_device::status_r), FUNC(nwb_512_device::ctrl_w));
-	map(0xa0000, 0xa0001).noprw(); // Unknown, possibly planemask on multiplanar graphics cards with the same ROP engine
+	map(0xa0000, 0xa0003).noprw(); // Unknown, possibly planemask on multiplanar graphics cards with the same ROP engine
 
 	map(0xc0000, 0xfffff).rom().region("krom", 0);
 }
@@ -184,6 +174,15 @@ void nwb_512_device::reset_state()
 	// The DSC-008 service manual does not elaborate on what is or isn't cleared on disable
 	// (and system behavior doesn't seem to care).
 	m_state = {};
+}
+
+void nwb_512_device::check_mem_mask(uint16_t mem_mask)
+{
+	if (mem_mask != 0xffff)
+	{
+		// Registers are 16-bit. Log this just in case to chase down issues later.
+		LOG("%s unexpected non-word write!", machine().describe_context());
+	}
 }
 
 void nwb_512_device::check_operation_start(offs_t offset)
