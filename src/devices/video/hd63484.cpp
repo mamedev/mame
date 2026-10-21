@@ -42,6 +42,7 @@ hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, d
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_display_cb(*this),
+	m_character_cb(*this),
 	m_irq_cb(*this),
 	m_auto_configure_screen(true),
 	m_external_skew(0),
@@ -2321,6 +2322,14 @@ void hd63484_device::video_registers_w(int offset)
 			recompute_parameters();
 			break;
 
+		case 0xc0: // Raster Address Register
+		case 0xc8:
+		case 0xd0:
+		case 0xd8:
+			m_lra[(offset & 0x18) >> 3] = (vreg_data >> 8) & 0x1f;
+			m_fra[(offset & 0x18) >> 3] = vreg_data & 0x1f;
+			break;
+
 		case 0xc2: // Memory Width Register
 		case 0xca:
 		case 0xd2:
@@ -2453,6 +2462,7 @@ void hd63484_device::write8(offs_t offset, uint8_t data)
 void hd63484_device::device_start()
 {
 	m_display_cb.resolve();
+	m_character_cb.resolve();
 
 	m_char_space = has_configured_map(AS_CHARACTER) ? &space(AS_CHARACTER) : nullptr;
 
@@ -2504,6 +2514,8 @@ void hd63484_device::device_reset()
 	memset(m_rwp, 0, sizeof(m_rwp));
 	memset(m_mwr, 0, sizeof(m_mwr));
 	memset(m_mwr_chr, 0, sizeof(m_mwr_chr));
+	memset(m_fra, 0, sizeof(m_fra));
+	memset(m_lra, 0, sizeof(m_lra));
 	memset(m_sar, 0, sizeof(m_sar));
 	memset(m_sda, 0, sizeof(m_sda));
 	memset(m_pram, 0, sizeof(m_pram));
@@ -2578,6 +2590,47 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 }
 
 //-------------------------------------------------
+//  draw_char_line - character screen scanline:
+//  one character code per memory cycle, rendered
+//  by the board's character generator callback
+//-------------------------------------------------
+
+void hd63484_device::draw_char_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int vs, int y, int layer_n)
+{
+	if (m_character_cb.isnull())
+		return;
+
+	uint8_t const fra = m_fra[layer_n];
+	uint8_t const lra = m_lra[layer_n];
+	uint8_t const sra = m_sda[layer_n] & 0x1f; // SAR low: start raster address for character screens
+	int const height = ((lra - fra) & 0x1f) + 1;        // full row: FRA..LRA with 5-bit wrap
+	int const first = ((lra - sra) & 0x1f) + 1;         // first displayed (partial) row: SRA..LRA
+
+	int const n = y - vs;
+	int row, raster;
+	if (n < first)
+	{
+		row = 0;
+		raster = (sra + n) & 0x1f;
+	}
+	else
+	{
+		row = 1 + (n - first) / height;
+		raster = (fra + (n - first) % height) & 0x1f;
+	}
+
+	int const cellw = get_ppmc();
+	uint32_t addr = (m_sar[layer_n] + row * m_mwr[layer_n]) & 0xffff;
+
+	for (int x = cliprect.left(); x <= cliprect.right(); x += cellw)
+	{
+		uint16_t const code = readword(addr, layer_n);
+		m_character_cb(bitmap, cliprect, y, x, cellw, code, raster, layer_n, 0);
+		addr = (addr + 1) & 0xffff;
+	}
+}
+
+//-------------------------------------------------
 //  update_screen -
 //-------------------------------------------------
 
@@ -2594,11 +2647,26 @@ uint32_t hd63484_device::update_screen(screen_device &screen, bitmap_ind16 &bitm
 			bool ins_window = BIT(m_dcr, 9) && y >= m_vws && y < m_vws+m_vww;
 
 			if (BIT(m_dcr, 13) && y >= cliprect.top() && y < l0)
-				draw_graphics_line(bitmap, cliprect, cliprect.top(), y, 0, BIT(m_dcr, 12), ins_window);
+			{
+				if (m_mwr_chr[0])
+					draw_char_line(bitmap, cliprect, cliprect.top(), y, 0);
+				else
+					draw_graphics_line(bitmap, cliprect, cliprect.top(), y, 0, BIT(m_dcr, 12), ins_window);
+			}
 			else if (y >= l0 && y < l1)
-				draw_graphics_line(bitmap, cliprect, l0, y, 1, BIT(m_dcr, 14), ins_window);
+			{
+				if (m_mwr_chr[1])
+					draw_char_line(bitmap, cliprect, l0, y, 1);
+				else
+					draw_graphics_line(bitmap, cliprect, l0, y, 1, BIT(m_dcr, 14), ins_window);
+			}
 			else if (BIT(m_dcr, 11) && y >= l1 && y < l2)
-				draw_graphics_line(bitmap, cliprect, l1, y, 2, BIT(m_dcr, 10), ins_window);
+			{
+				if (m_mwr_chr[2])
+					draw_char_line(bitmap, cliprect, l1, y, 2);
+				else
+					draw_graphics_line(bitmap, cliprect, l1, y, 2, BIT(m_dcr, 10), ins_window);
+			}
 		}
 	}
 	return 0;
@@ -2631,6 +2699,8 @@ void hd63484_device::register_save_state()
 	save_item(NAME(m_cpy));
 	save_item(NAME(m_mwr));
 	save_item(NAME(m_mwr_chr));
+	save_item(NAME(m_fra));
+	save_item(NAME(m_lra));
 	save_item(NAME(m_sar));
 	save_item(NAME(m_sda));
 	save_item(NAME(m_pram));

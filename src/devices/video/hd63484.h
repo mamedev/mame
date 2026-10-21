@@ -25,11 +25,13 @@ public:
 	static constexpr int AS_CHARACTER = 1;
 
 	typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data, int screen_n)> display_delegate;
+	typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, int width, uint16_t code, int raster, int screen_n, int cursor)> character_delegate;
 
 	// construction/destruction
 	hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_character_callback(T &&... args) { m_character_cb.set(std::forward<T>(args)...); }
 	auto irq_callback() { return m_irq_cb.bind(); }
 	void set_auto_configure_screen(bool auto_configure_screen) { m_auto_configure_screen = auto_configure_screen; }
 	void set_external_skew(int skew) { m_external_skew = skew; }
@@ -100,10 +102,12 @@ private:
 	void video_registers_w(int offset);
 	int translate_command(uint16_t data);
 	void draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int vs, int y, int layer_n, bool active, bool ins_window);
+	void draw_char_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int vs, int y, int layer_n);
 
 	void register_save_state();
 
 	display_delegate  m_display_cb;
+	character_delegate m_character_cb;
 	devcb_write_line m_irq_cb;
 	bool m_auto_configure_screen;
 	int m_external_skew;
@@ -140,6 +144,9 @@ private:
 
 	uint16_t m_mwr[4];
 	uint8_t  m_mwr_chr[4];
+
+	uint8_t m_fra[4];
+	uint8_t m_lra[4];
 
 	uint32_t m_sar[4];
 	uint8_t m_sda[4];
