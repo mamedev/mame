@@ -458,59 +458,63 @@ ROM_END
 
 static INPUT_PORTS_START( saltcrdi ) // dipswitches are on the REVERSE side of the PCB (!)
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) // pedal
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) // green
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) // red
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN ) // DATAIN, serial link to I/O board (brake level)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN ) // CLOCKIN, serial link to I/O board (brake level)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN ) // DATAIN2, serial link for linked play
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // CLOCKIN2, serial link for linked play
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) // pedal (SEN-VEL)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) // green (PUL-NEGRO in schematics)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) // red (PUL-ROJO)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )  // auxiliary button (PUL-AUX), not read by the game
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
 	PORT_SERVICE_DIPLOC(0x01, IP_ACTIVE_LOW, "SW1:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
-	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:6,7,8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Spanish ) )
+	PORT_DIPUNUSED_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "SW1:4")
+	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:6,7,8")
+	PORT_DIPSETTING(    0xe0, DEF_STR( Spanish ) )
+	PORT_DIPSETTING(    0x60, "Catalan" )
+	PORT_DIPSETTING(    0xa0, "Portuguese" )
 	PORT_DIPSETTING(    0x20, DEF_STR( English ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( German ) )
-	PORT_DIPSETTING(    0x60, "Catalan" ) // ?
-	PORT_DIPSETTING(    0x80, DEF_STR( Spanish ) ) // double?
-	PORT_DIPSETTING(    0xa0, "Portuguese" ) // ?
 	PORT_DIPSETTING(    0xc0, DEF_STR( French ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( Spanish ) ) // triple?
+	PORT_DIPSETTING(    0x40, DEF_STR( German ) )
+	PORT_DIPSETTING(    0x80, "Spanish (duplicate 1)" )
+	PORT_DIPSETTING(    0x00, "Spanish (duplicate 2)" )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("COIN")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("PULSE")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Heart Rate Sensor") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(saltcrdi_state::heart_rate_pulse), 0)
 INPUT_PORTS_END
 
-// just a copy of maniac square for now
-void gaelco2_state::saltcrdi_map(address_map &map)
+void saltcrdi_state::saltcrdi_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x200000, 0x20ffff).ram().w(FUNC(gaelco2_state::vram_w)).share("spriteram");
-	map(0x202890, 0x2028ff).rw("gaelco", FUNC(gaelco_gae1_device::gaelcosnd_r), FUNC(gaelco_gae1_device::gaelcosnd_w));
-	map(0x210000, 0x211fff).ram().w(FUNC(gaelco2_state::palette_w)).share(m_paletteram);
-	map(0x218004, 0x218009).ram().w(FUNC(gaelco2_state::vregs_w)).share(m_vregs);
-	map(0x300000, 0x300001).portr("IN0");
-	map(0x310000, 0x310001).portr("DSW");
-	map(0x320000, 0x320001).portr("COIN");
+	map(0x200000, 0x20ffff).ram().w(FUNC(saltcrdi_state::vram_w)).share("spriteram");
+	map(0x210000, 0x211fff).ram().w(FUNC(saltcrdi_state::palette_w)).share(m_paletteram);
+	map(0x218004, 0x218009).ram().w(FUNC(saltcrdi_state::vregs_w)).share(m_vregs);
+	map(0x300000, 0x300001).mirror(0x00fffe).portr("IN0");
+	map(0x310000, 0x310001).mirror(0x00fffe).portr("DSW");
+	// 0x320000-0x32ffff is decoded by the PAL, but nothing is connected
+	map(0x500001, 0x500001).mirror(0x00ff8e).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_mainlatch->write_d0(offset >> 4, data); }));
 	map(0xfe0000, 0xfe7fff).ram();
 	map(0xfe8000, 0xfeffff).ram().share(m_shareram);
 }
 
 // 34'000'000 XTAL for the video?
-void gaelco2_state::saltcrdi(machine_config &config)
+void saltcrdi_state::saltcrdi(machine_config &config)
 {
 	// basic machine hardware
 	M68000(config, m_maincpu, XTAL(24'000'000) / 2); // 12 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco2_state::saltcrdi_map);
-	m_maincpu->set_vblank_int("screen", FUNC(gaelco2_state::irq6_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &saltcrdi_state::saltcrdi_map);
+	m_maincpu->set_vblank_int("screen", FUNC(saltcrdi_state::irq6_line_hold));
+
+	LS259(config, m_mainlatch); // U1
+	// Q0-Q3: DATAOUT, CLOCKOUT, DATAOUT2 and CLOCKOUT2 through an inverting driver (serial links, not emulated)
+	// Q4-Q6: not connected
+	m_mainlatch->q_out_cb<7>().set(FUNC(saltcrdi_state::heart_rate_irq_clear_w)); // /RESINT
 
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
@@ -520,22 +524,14 @@ void gaelco2_state::saltcrdi(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(64*16, 32*16);
 	screen.set_visarea(0, 384-1, 16, 256-1);
-	screen.set_screen_update(FUNC(gaelco2_state::screen_update));
+	screen.set_screen_update(FUNC(saltcrdi_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
 	PALETTE(config, m_palette).set_entries(0x10000);
 
-	// sound hardware
-	SPEAKER(config, "speaker", 2).front();
-
-	// unused? ROMs contain no sound data
-	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(24'000'000) / 24)); // TODO : Correct OSC?
-	gaelco.set_device_rom_tag("gfx");
-	gaelco.set_bank_offsets(0 * 0x0080000, 1 * 0x0080000, 0, 0);
-	gaelco.add_route(0, "speaker", 1.0, 0);
-	gaelco.add_route(1, "speaker", 1.0, 1);
+	// no sound hardware: the custom's sound generator isn't used, and there's no audio circuitry
 }
 
 
@@ -579,13 +575,18 @@ void gaelco2_state::saltcrdi(machine_config &config)
 
   There is also a Salter I/O PCB with a MCU (undumped) labeled as "2".
   The I/O PCB layout is slightly different than the one found on the Pro Stepper machine.
+
+  The schematics (BICICLETA REF. 970410, April 1997) show a 30 MHz XTAL2, TLP504-A optocouplers
+  and an ULM2064 driver.  The custom's interrupt drives IPL1 and IPL2 (IRQ 6), and the heart rate
+  input clocks a 74F74 that also pulls IPL2 low (IRQ 4) until output latch Q7 presets it.  There's
+  no audio circuitry.
 */
 ROM_START( sltpcycl ) // REF 970410
 	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "bi-n-21-27c512.u21", 0x000000, 0x010000, CRC(1d2e9a68) SHA1(b9bb4eeefe90850b648dc45689a08f3c28147856) )
 	ROM_LOAD16_BYTE( "bi-n-23-27c512.u23", 0x000001, 0x010000, CRC(5865351d) SHA1(a62b8ec88ef41d96b65a03ccaeadbec21803df34) )
 
-	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX, no sound, machine has none?
+	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX only, the machine has no sound hardware
 	ROM_LOAD( "bi-40-bank0-27c1001.u40", 0x0000000, 0x0020000, CRC(56822524) SHA1(aae133e9fb85ba8995c095cc540aa35b65c27777) )
 	ROM_LOAD( "bi-39-bank0-27c1001.u39", 0x0080000, 0x0020000, CRC(30dfcde1) SHA1(caf4429d0e1185c157eca436e9bb3a8513781a97) )
 	ROM_LOAD( "bi-38-bank0-27c1001.u38", 0x0100000, 0x0020000, CRC(84ec4b34) SHA1(01376f2534c4bc51d0a357d80db28b24c3fd71f6) )
@@ -610,7 +611,7 @@ ROM_START( sltpcycla )
 	ROM_LOAD16_BYTE( "bici_freno_n._u21_20-11-99_fdfc_27c512.u21", 0x000000, 0x010000, CRC(04fa879b) SHA1(d1c6e3328b1a1520d13db467d6fc42d5138af91c) )
 	ROM_LOAD16_BYTE( "step_freno_n._u23_e2ca_20-11-99_27c512.u23", 0x000001, 0x010000, CRC(d23801b7) SHA1(34890686076f53974dc633a4f8111c1ff1fb1aa9) ) // Labeled 'step', but it's bike?
 
-	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX, no sound, machine has none?
+	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX only, the machine has no sound hardware
 	ROM_LOAD( "bici_u40_779a_0l_7-4-97_27c010.u40", 0x0000000, 0x0020000, CRC(56822524) SHA1(aae133e9fb85ba8995c095cc540aa35b65c27777) )
 	ROM_LOAD( "bici_u39_3fae_1l_7-4-97_27c010.u39", 0x0080000, 0x0020000, CRC(30dfcde1) SHA1(caf4429d0e1185c157eca436e9bb3a8513781a97) )
 	ROM_LOAD( "bici_u38_1391_3l_7-4-97_27c010.u38", 0x0100000, 0x0020000, CRC(84ec4b34) SHA1(01376f2534c4bc51d0a357d80db28b24c3fd71f6) )
@@ -634,7 +635,7 @@ ROM_START( sltpcyclb )
 	ROM_LOAD16_BYTE( "bici_u21_fd53_7-4-97_27c512.u21", 0x000000, 0x010000, CRC(cc3e71c6) SHA1(e4862c8a2f0f6bdfb10447fdb3310cb59bab3482) )
 	ROM_LOAD16_BYTE( "bici_u23_e223_7-4-97_27c512.u23", 0x000001, 0x010000, CRC(b86f0b78) SHA1(1b943e14553c041796b8f19db91afff988813b35) )
 
-	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX, no sound, machine has none?
+	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX only, the machine has no sound hardware
 	ROM_LOAD( "bici_u40_779a_0l_7-4-97_27c010.u40", 0x0000000, 0x0020000, CRC(56822524) SHA1(aae133e9fb85ba8995c095cc540aa35b65c27777) )
 	ROM_LOAD( "bici_u39_3fae_1l_7-4-97_27c010.u39", 0x0080000, 0x0020000, CRC(30dfcde1) SHA1(caf4429d0e1185c157eca436e9bb3a8513781a97) )
 	ROM_LOAD( "bici_u38_1391_3l_7-4-97_27c010.u38", 0x0100000, 0x0020000, CRC(84ec4b34) SHA1(01376f2534c4bc51d0a357d80db28b24c3fd71f6) )
@@ -658,7 +659,7 @@ ROM_START( sltpcyclc )
 	ROM_LOAD16_BYTE( "tachado_bici_0_u21_27c512.u21", 0x000000, 0x010000, CRC(7a9105e4) SHA1(c0af6984943032e0e08d575e6c84a6e788c6f6ac) )
 	ROM_LOAD16_BYTE( "tachado_bici_1_u23_27c512.u23", 0x000001, 0x010000, CRC(bde3015e) SHA1(32afa4b53b4a480737eb4ccbf160533d27c5c7ea) )
 
-	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX, no sound, machine has none?
+	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX only, the machine has no sound hardware
 	ROM_LOAD( "u40", 0x0000000, 0x0020000, NO_DUMP )
 	ROM_LOAD( "u39", 0x0080000, 0x0020000, NO_DUMP )
 	ROM_LOAD( "u38", 0x0100000, 0x0020000, NO_DUMP)
@@ -742,7 +743,7 @@ ROM_START( sltpstep )
 	ROM_LOAD16_BYTE( "step_0_23.01.98_21_88e6_27c512.bin", 0x000000, 0x010000, CRC(c62a9d36) SHA1(674de3248b490c25620267e643540f05e2d2abac) )
 	ROM_LOAD16_BYTE( "step_1_23.01.98_23_4583_27c512.bin", 0x000001, 0x010000, CRC(b5467467) SHA1(0d111f92c84873175e44a65515efb7c8af607a63) )
 
-	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX, no sound, machine has none?
+	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX only, the machine has no sound hardware
 	ROM_LOAD( "st_u_40.u40", 0x0000000, 0x0080000, CRC(813270de) SHA1(9a6ce7679bd5c6ecf0c3328d6ff9dc2240a95328) ) // 27C4000DC
 	ROM_LOAD( "st_u_39.u39", 0x0080000, 0x0080000, CRC(1d42e124) SHA1(add866310511f4f406b80ed0d3983b79b80c701c) ) // 27C4000DC
 	ROM_LOAD( "st_u_38.u38", 0x0100000, 0x0080000, CRC(9d0d795c) SHA1(ef7cf61f8c687ecc68678a634f65386cc25d8a8f) ) // 27C4000DC
@@ -761,7 +762,7 @@ ROM_START( sltpstepa )
 	ROM_LOAD16_BYTE( "st_u_21.u21", 0x000000, 0x010000, CRC(2274f931) SHA1(c7b32bbb46e349769376bfaffe663170873bd083) ) // 27C512
 	ROM_LOAD16_BYTE( "st_u_23.u23", 0x000001, 0x010000, CRC(07c69f55) SHA1(886bef76b2aff046fd1c9a4837f359cb59095125) ) // 27C512
 
-	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX, no sound, machine has none?
+	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX only, the machine has no sound hardware
 	ROM_LOAD( "st_u_40.u40", 0x0000000, 0x0080000, CRC(813270de) SHA1(9a6ce7679bd5c6ecf0c3328d6ff9dc2240a95328) ) // 27C4000DC
 	ROM_LOAD( "st_u_39.u39", 0x0080000, 0x0080000, CRC(1d42e124) SHA1(add866310511f4f406b80ed0d3983b79b80c701c) ) // 27C4000DC
 	ROM_LOAD( "st_u_38.u38", 0x0100000, 0x0080000, CRC(9d0d795c) SHA1(ef7cf61f8c687ecc68678a634f65386cc25d8a8f) ) // 27C4000DC
@@ -3383,10 +3384,10 @@ GAME( 1999, jungleani,   0,         srollnd,          play2000, gaelco2_state,  
    Pro Reclimber Tele Cardioline has the same PCB and ROMs as Pro Cycle Tele Cardioline.
    There are other devices in Cardioline series but they don't use displays and aren't on Gaelco hardware. */
 
-GAME( 2000, sltpcycl,   0,          saltcrdi,         saltcrdi, gaelco2_state,      init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 02AB)",      0 ) // 18/Jan/2000
-GAME( 1999, sltpcycla,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,      init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum DECA)",      0 ) // 20/Nov/1999
-GAME( 1997, sltpcyclb,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,      init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 3523)",      0 ) // 07/Apr/1997
-GAME( 199?, sltpcyclc,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,      init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, unknown version)",           MACHINE_NOT_WORKING ) // missing GFX ROMs
+GAME( 2000, sltpcycl,   0,          saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 02AB)",      MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN ) // 18/Jan/2000
+GAME( 1999, sltpcycla,  sltpcycl,   saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum DECA)",      MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN ) // 20/Nov/1999
+GAME( 1997, sltpcyclb,  sltpcycl,   saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 3523)",      MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN ) // 07/Apr/1997
+GAME( 199?, sltpcyclc,  sltpcycl,   saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, unknown version)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN ) // missing GFX ROMs
 
-GAME( 1998, sltpstep,   0,          saltcrdi,         saltcrdi, gaelco2_state,      init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, V.1.0, checksum 2B83)", 0 ) // 23/Jan/1998
-GAME( 1997, sltpstepa,  sltpstep,   saltcrdi,         saltcrdi, gaelco2_state,      init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, V.1.0, checksum F208)", 0 ) // 07/Apr/1997
+GAME( 1998, sltpstep,   0,          saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, V.1.0, checksum 2B83)", MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN ) // 23/Jan/1998
+GAME( 1997, sltpstepa,  sltpstep,   saltcrdi,         saltcrdi, saltcrdi_state,     init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, V.1.0, checksum F208)", MACHINE_NO_SOUND_HW | MACHINE_NODEVICE_LAN ) // 07/Apr/1997
