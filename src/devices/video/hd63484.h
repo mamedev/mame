@@ -20,6 +20,10 @@ class hd63484_device :  public device_t,
 						public device_video_interface
 {
 public:
+	// address spaces: 0 = graphic frame buffer (1M x 16), 1 = character frame buffer (64K x 16)
+	static constexpr int AS_GRAPHIC = 0;
+	static constexpr int AS_CHARACTER = 1;
+
 	typedef device_delegate<void (bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data, int screen_n)> display_delegate;
 
 	// construction/destruction
@@ -50,8 +54,8 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	inline uint16_t readword(offs_t address);
-	inline void writeword(offs_t address, uint16_t data);
+	inline uint16_t readword(offs_t address, int screen);
+	inline void writeword(offs_t address, uint16_t data, int screen);
 
 private:
 	inline void inc_ar(int value);
@@ -184,6 +188,8 @@ private:
 	uint16_t m_ymax;
 
 	const address_space_config      m_space_config;
+	const address_space_config      m_char_space_config;
+	address_space *m_char_space;
 };
 
 // device type definition

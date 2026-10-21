@@ -60,7 +60,9 @@ hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, d
 	m_cl1(0), m_ccmp(0), m_mask(0), m_cpx(0),
 	m_stream(STREAM_NONE),
 	m_dcr(0),
-	m_space_config("videoram", ENDIANNESS_BIG, 16, 20, -1)
+	m_space_config("videoram", ENDIANNESS_BIG, 16, 20, -1),
+	m_char_space_config("charram", ENDIANNESS_BIG, 16, 16, -1),
+	m_char_space(nullptr)
 {
 }
 
@@ -364,9 +366,11 @@ ROM_END
 
 device_memory_interface::space_config_vector hd63484_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(0, &m_space_config)
-	};
+	// the character frame buffer space only exists when the machine maps it
+	space_config_vector v { std::make_pair(AS_GRAPHIC, &m_space_config) };
+	if (has_configured_map(AS_CHARACTER))
+		v.emplace_back(AS_CHARACTER, &m_char_space_config);
+	return v;
 }
 
 
@@ -383,9 +387,14 @@ const tiny_rom_entry *hd63484_device::device_rom_region() const
 //  readword - read a word at the given address
 //-------------------------------------------------
 
-inline uint16_t hd63484_device::readword(offs_t address)
+inline uint16_t hd63484_device::readword(offs_t address, int screen)
 {
-	return space().read_word(address);
+	// each screen's CHR bit selects which of the two frame buffers it
+	// resides in; addresses wrap at the space limit (1M/64K words)
+	if (m_char_space != nullptr && m_mwr_chr[screen & 3])
+		return m_char_space->read_word(address & 0xffff);
+
+	return space().read_word(address & 0xfffff);
 }
 
 
@@ -393,9 +402,12 @@ inline uint16_t hd63484_device::readword(offs_t address)
 //  writeword - write a word at the given address
 //-------------------------------------------------
 
-inline void hd63484_device::writeword(offs_t address, uint16_t data)
+inline void hd63484_device::writeword(offs_t address, uint16_t data, int screen)
 {
-	space().write_word(address, data);
+	if (m_char_space != nullptr && m_mwr_chr[screen & 3])
+		m_char_space->write_word(address & 0xffff, data);
+	else
+		space().write_word(address & 0xfffff, data);
 }
 
 
@@ -569,7 +581,7 @@ void hd63484_device::stream_fill()
 				int16_t const ax = (int16_t)m_pr[0];
 				int16_t const ay = (int16_t)m_pr[1];
 
-				data = readword((m_rwp[m_rwp_dn] - m_dma_d1 * m_mwr[m_rwp_dn] + m_dma_d0) & 0xfffff);
+				data = readword((m_rwp[m_rwp_dn] - m_dma_d1 * m_mwr[m_rwp_dn] + m_dma_d0) & 0xfffff, m_rwp_dn);
 
 				if (m_dma_d0 != ax)
 					m_dma_d0 += (ax < 0) ? -1 : 1;
@@ -809,7 +821,7 @@ uint16_t hd63484_device::get_dot(int16_t x, int16_t y)
 
 	calc_offset(x, y, offset, bit_pos);
 
-	return (readword(offset) >> bit_pos) & ((1 << bpp) - 1);
+	return (readword(offset, m_org_dn) >> bit_pos) & ((1 << bpp) - 1);
 }
 
 bool hd63484_device::set_dot(int16_t x, int16_t y, int16_t px, int16_t py)
@@ -921,7 +933,7 @@ bool hd63484_device::set_dot(int16_t x, int16_t y, uint16_t color)
 	uint16_t mask = ((1 << bpp) - 1) << bit_pos;
 	uint16_t color_shifted = (color << bit_pos) & mask;
 
-	uint16_t data = readword(offset);
+	uint16_t data = readword(offset, m_org_dn);
 	uint16_t res = data;
 
 	switch (opm)
@@ -956,7 +968,7 @@ bool hd63484_device::set_dot(int16_t x, int16_t y, uint16_t color)
 			break;
 	}
 
-	writeword(offset, res);
+	writeword(offset, res, m_org_dn);
 
 	return false;
 }
@@ -1236,7 +1248,7 @@ void hd63484_device::command_clr_exec()
 		for(int16_t d0=0; d0!=ax+d0_inc; d0+=d0_inc)
 		{
 			uint32_t offset = m_rwp[m_rwp_dn] - d1 * m_mwr[m_rwp_dn] + d0;
-			uint16_t data = readword(offset);
+			uint16_t data = readword(offset, m_rwp_dn);
 			uint16_t res = 0;
 
 			if (BIT(m_cr, 10))
@@ -1260,7 +1272,7 @@ void hd63484_device::command_clr_exec()
 			else
 				res = d;
 
-			writeword(offset, res);
+			writeword(offset, res, m_rwp_dn);
 		}
 	}
 
@@ -1278,7 +1290,7 @@ bool hd63484_device::command_dma_write_exec(uint16_t data, bool modify)
 
 	if (modify)
 	{
-		uint16_t const fb = readword(offset);
+		uint16_t const fb = readword(offset, m_rwp_dn);
 		switch (m_cr & 0x03)
 		{
 			case 0: // replace
@@ -1296,7 +1308,7 @@ bool hd63484_device::command_dma_write_exec(uint16_t data, bool modify)
 		}
 	}
 
-	writeword(offset, data);
+	writeword(offset, data, m_rwp_dn);
 
 	if (m_dma_d0 != ax)
 	{
@@ -1355,8 +1367,8 @@ void hd63484_device::command_cpy_exec()
 			else
 				dst_offset = m_rwp[m_rwp_dn] + dd0 - dd1 * m_mwr[m_rwp_dn];
 
-			uint16_t src_data = readword(src_offset);
-			uint16_t dst_data = readword(dst_offset);
+			uint16_t src_data = readword(src_offset, m_rwp_dn);
+			uint16_t dst_data = readword(dst_offset, m_rwp_dn);
 
 			if (BIT(m_cr, 12))
 			{
@@ -1379,7 +1391,7 @@ void hd63484_device::command_cpy_exec()
 			else
 				dst_data = src_data;
 
-			writeword(dst_offset, dst_data);
+			writeword(dst_offset, dst_data, m_rwp_dn);
 		}
 	}
 
@@ -1859,7 +1871,7 @@ void hd63484_device::process_fifo()
 			if (m_param_ptr == 0)
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': RD\n", tag());
-				uint16_t data = readword(m_rwp[m_rwp_dn]);
+				uint16_t data = readword(m_rwp[m_rwp_dn], m_rwp_dn);
 				queue_r((data >> 8) & 0xff);
 				queue_r((data >> 0) & 0xff);
 				m_rwp[m_rwp_dn]+=1;
@@ -1872,7 +1884,7 @@ void hd63484_device::process_fifo()
 			if (m_param_ptr == 1)
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': WT 0x%04x\n", tag(), m_pr[0]);
-				writeword(m_rwp[m_rwp_dn], m_pr[0]);
+				writeword(m_rwp[m_rwp_dn], m_pr[0], m_rwp_dn);
 				m_rwp[m_rwp_dn]+=1;
 				m_rwp[m_rwp_dn]&=0xfffff;
 				command_end_seq(8);
@@ -1884,7 +1896,7 @@ void hd63484_device::process_fifo()
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': MOD (%d) 0x%04x\n", tag(), m_cr & 0x03, m_pr[0]);
 				uint16_t d = m_pr[0];
-				uint16_t data = readword(m_rwp[m_rwp_dn]);
+				uint16_t data = readword(m_rwp[m_rwp_dn], m_rwp_dn);
 				uint16_t res = 0;
 
 				switch(m_cr & 0x03)
@@ -1903,7 +1915,7 @@ void hd63484_device::process_fifo()
 						break;
 				}
 
-				writeword(m_rwp[m_rwp_dn], res);
+				writeword(m_rwp[m_rwp_dn], res, m_rwp_dn);
 				command_end_seq(8);
 			}
 			break;
@@ -2442,6 +2454,8 @@ void hd63484_device::device_start()
 {
 	m_display_cb.resolve();
 
+	m_char_space = has_configured_map(AS_CHARACTER) ? &space(AS_CHARACTER) : nullptr;
+
 	m_cmd_timer = timer_alloc(FUNC(hd63484_device::cmd_exec_tick), this);
 
 	register_save_state();
@@ -2537,12 +2551,12 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 
 		if (ins_window && x >= ws * ppmc && x < (ws + m_hww) * ppmc)
 		{
-			data = readword(wind_offs);
+			data = readword(wind_offs, 3);
 			wind_offs++;
 			screen_n = 3;
 		}
 		else if (active)
-			data = readword(base_offs);
+			data = readword(base_offs, layer_n);
 
 		for (int b=0; b<ppw; b++)
 		{
