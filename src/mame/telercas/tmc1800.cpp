@@ -159,7 +159,6 @@ Demo tape contents:
 
     TODO:
 
-    - tape input/output
     - tmc2000: add missing keys
     - tmc2000: TOOL-2000 rom banking
     - nano: correct time constant for EF4 RC circuit
