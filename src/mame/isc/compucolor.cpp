@@ -12,8 +12,6 @@
 
     TODO:
 
-    - interlaced video
-    - blinking
     - add-on ROM
     - add-on RAM
     - add-on unit
@@ -50,6 +48,7 @@ public:
 		m_mioc(*this, TMS5501_TAG),
 		m_vtac(*this, CRT5027_TAG),
 		m_palette(*this, "palette"),
+		m_blink(*this, "blink"),
 		m_rs232(*this, RS232_TAG),
 		m_floppy0(*this, "cd0"),
 		m_floppy1(*this, "cd1"),
@@ -63,6 +62,7 @@ public:
 	required_device<tms5501_device> m_mioc;
 	required_device<crt5027_device> m_vtac;
 	required_device<palette_device> m_palette;
+	required_device<ripple_counter_device> m_blink;
 	required_device<rs232_port_device> m_rs232;
 	required_device<compucolor_floppy_port_device> m_floppy0;
 	required_device<compucolor_floppy_port_device> m_floppy1;
@@ -274,9 +274,14 @@ INPUT_PORTS_END
 
 uint32_t compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	rectangle cursor;
+	bool const cursor_on = !BIT(m_blink->count(), 4) && m_vtac->cursor_bounds(cursor);
+
 	for (int y = 0; y < 32*8; y++)
 	{
-		offs_t offset = (y / 8) * 128;
+		int const row = ((y / 8) + m_vtac->upscroll_offset()) & 0x1f;
+		offs_t offset = row * 128;
+		bool const cursor_line = cursor_on && (y == cursor.min_y || y == cursor.max_y);
 
 		for (int sx = 0; sx < 64; sx++)
 		{
@@ -284,12 +289,18 @@ uint32_t compucolor2_state::screen_update(screen_device &screen, bitmap_rgb32 &b
 			uint8_t attr = m_video_ram[offset++];
 
 			offs_t char_offs = ((code & 0x7f) << 3) | (y & 0x07);
-			if (BIT(code, 7)) char_offs = ((code & 0x7f) << 3) | ((y >> 1) & 0x07);
+			if (BIT(code, 7)) char_offs = ((code & 0x7f) << 3) | (BIT(row, 0) << 2) | ((y >> 1) & 0x03);
 
 			uint8_t data = m_char_rom->base()[char_offs];
 
-			rgb_t const fg = m_palette->pen_color(attr & 0x07);
+			rgb_t fg = m_palette->pen_color(attr & 0x07);
 			rgb_t const bg = m_palette->pen_color((attr >> 3) & 0x07);
+
+			if (cursor_line && (sx * 6) == cursor.min_x)
+			{
+				fg = m_palette->pen_color(7);
+				data = 0xff;
+			}
 
 			for (int x = 0; x < 6; x++)
 			{
