@@ -209,8 +209,10 @@ bool sega_837_13551_device::swoutputs(uint8_t id, uint8_t val)
 
 sega_837_13844_device::sega_837_13844_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : sega_837_13551_device(mconfig, SEGA_837_13844, tag, owner, clock)
 	, rotary_port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
+	, lightgun_port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
 	, m_digital_bits(12)
 	, m_encoder_bits(0)
+	, m_lightgun_count(0)
 {
 }
 
@@ -235,6 +237,11 @@ void sega_837_13844_device::function_list(uint8_t *&buf)
 		*buf++ = 0x04; *buf++ = m_encoder_bits; *buf++ = 0; *buf++ = 0;
 	}
 
+	if (m_lightgun_count) {
+		// lightgun - 16 bits of X/Y then count (tduno, tduno2, ntvmys)
+		*buf++ = 0x06; *buf++ = 16; *buf++ = 16; *buf++ = m_lightgun_count;
+	}
+
 	// Driver out - 22 channels
 	*buf++ = 0x12; *buf++ = 22; *buf++ = 0; *buf++ = 0;
 }
@@ -245,7 +252,23 @@ bool sega_837_13844_device::rotary(uint8_t *&buf, uint8_t count)
 		return false;
 	for(int i=0; i<count; i++) {
 		uint16_t val = rotary_port[i] ? rotary_port[i]->read() : 0x8000;
-		// TODO: pass a delta
+		// TODO: calculate a delta where necessary (crackndj)
+		*buf++ = val >> 8;
+		*buf++ = val;
+	}
+	return true;
+}
+
+bool sega_837_13844_device::lightgun(uint8_t *&buf, uint8_t count)
+{
+	if(count > 1)
+		return false;
+	const bool hit = lightgun_port[2] ? lightgun_port[2]->read() : 0;
+	for(int i=0; i<count * 2; i++) {
+		uint16_t val = lightgun_port[i] ? lightgun_port[i]->read() : 0x0800;
+		// unknown value, needs to be non-zero for touch to actually work
+		if (hit)
+			val |= 0xf000;
 		*buf++ = val >> 8;
 		*buf++ = val;
 	}

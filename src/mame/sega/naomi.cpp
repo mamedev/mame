@@ -2386,6 +2386,37 @@ static INPUT_PORTS_START( smarinef )
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tduno )
+	PORT_INCLUDE( naomi_mie )
+
+	PORT_START("TILT")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("LX")
+	// TODO: somehow mirrored by default in ntvmys
+	PORT_BIT( 0x0fff, 0x0800, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("LY")
+	PORT_BIT( 0x0fff, 0x0800, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("LHIT")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
+	// 31 kHz is optional in tduno, mandatory in tduno2/ntvmys
+	PORT_MODIFY("MIE.5")
+	PORT_DIPNAME( 0x01, 0x01, "Monitor" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "31 kHz" )
+	PORT_DIPSETTING(    0x00, "15 kHz" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( initd )
 	PORT_INCLUDE( naomi_mie )
 
@@ -3222,6 +3253,32 @@ void naomi_state::naomim2_smarinef(machine_config &config)
 
 	sega_837_13938_device &sega938(SEGA_837_13938(config, "837_13938", "mie"));
 	sega938.set_rotary_tags("R0", "R1", "R2", "R3");
+}
+
+/*
+ * Naomi M2 Touch de Uno
+ */
+
+void naomi_state::naomim2_tduno(machine_config &config)
+{
+	naomim2(config);
+
+	sega_837_13844_device &sega844(SEGA_837_13844(config, "837_13844", "mie"));
+	sega844.set_lightgun_tags("LX", "LY", "LHIT");
+	sega844.set_lightgun_count(1);
+}
+
+/*
+ * Naomi M1 Touch de Uno 2
+ */
+
+void naomi_state::naomim1_tduno2(machine_config &config)
+{
+	naomim1(config);
+
+	sega_837_13844_device &sega844(SEGA_837_13844(config, "837_13844", "mie"));
+	sega844.set_lightgun_tags("LX", "LY", "LHIT");
+	sega844.set_lightgun_count(1);
 }
 
 /*
@@ -5057,7 +5114,8 @@ ROM_START( ntvmys )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x9800000, "rom_board", ROMREGION_ERASEFF )
+	// NOTE: would crash in service mode (sh34_base_device::sh4_dma_ddt) if we don't extend the range
+	ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASEFF )
 	ROM_LOAD( "epr-23419a.ic22", 0x000000, 0x200000, CRC(8639d1e5) SHA1(bdc062c3ccf4282f9d7dc2ba07e3b52befb955a4) )
 	ROM_RELOAD(                  0x200000, 0x200000 )
 	ROM_LOAD( "rom1.ic1s",    0x0800000, 0x800000, CRC(5f11a3ec) SHA1(2a0059ed852b3d70ec3ddf4e9800b7ce90225a69) )
@@ -8060,6 +8118,8 @@ ROM_END
 
 ROM_START( kick4csh )
 	NAOMI_BIOS
+	ROM_DEFAULT_BIOS("bios8")
+	// TODO: needs 1p set
 	NAOMI_DEFAULT_EEPROM
 
 	ROM_REGION( 0x9000000, "rom_board", ROMREGION_ERASEFF)
@@ -11625,7 +11685,7 @@ void naomi_state::init_hotd2()
 /* 0004    */ GAME( 1999, ringout,   naomi,    naomim2_ringout, ringout,   naomi_state, init_naomi,   ROT0, "Sega", "Ring Out 4x4 (Rev A)", GAME_FLAGS )
 /* 0005    */ GAME( 1999, alpilotj,  naomi,    naomim2, alpilota,naomi_state, init_naomi,   ROT0, "Sega", "Airline Pilots (Japan, Rev A)", GAME_FLAGS ) // have "Japan Airlines" (JAL) logos and texts on airplanes, deluxe/multiboard setup uses specific BIOS "airlbios"
 /* 0007    */ GAME( 1999, ggram2,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Giant Gram: All Japan Pro Wrestling 2 (Japan)", GAME_FLAGS )
-/* 0008    */ GAME( 1999, tduno,     naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Touch de Uno! / Unou Nouryoku Check Machine (Japan)", GAME_FLAGS )
+/* 0008    */ GAME( 1999, tduno,     naomi,    naomim2_tduno, tduno,   naomi_state, init_naomi,   ROT0, "Sega", "Touch de Uno! / Unou Nouryoku Check Machine (Japan)", GAME_FLAGS )
 /* 0010    */ GAME( 1999, vs2_2ko,   vs2_2k,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua Striker 2 Ver. 2000", GAME_FLAGS ) // revision is not known, might be Rev A or B instead of no Rev
 /* 0010    */ GAME( 1999, vs2_2k,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua Striker 2 Ver. 2000 (Rev C)", GAME_FLAGS )
 /* 0011    */ GAME( 1999, toyfight,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega / Anchor Inc.", "Toy Fighter", GAME_FLAGS )
@@ -11643,7 +11703,7 @@ void naomi_state::init_hotd2()
 /* none    */ GAME( 1999, virnbapa,  virnba,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua NBA (prototype, 15.11)", GAME_FLAGS )
 /* 0021    */ GAME( 2000, virnbao,   virnba,   naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua NBA", GAME_FLAGS )
 /* 0021-01 */ GAME( 2000, virnba,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtua NBA (USA)", GAME_FLAGS )
-/* 0022    */ GAME( 2000, tduno2,    naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Touch de Uno! 2 (Japan)", GAME_FLAGS )
+/* 0022    */ GAME( 2000, tduno2,    naomi,    naomim1_tduno2, tduno,   naomi_state, init_naomi,   ROT0, "Sega", "Touch de Uno! 2 (Japan)", GAME_FLAGS )
 /* 0023    */ GAME( 2000, 18wheelro, 18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler: American Pro Trucker (deluxe)", GAME_FLAGS )
 /* 0023    */ GAME( 2000, 18wheelr,  naomi,    naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler: American Pro Trucker (deluxe, Rev A)", GAME_FLAGS )
 /* 0023    */ GAME( 2000, 18wheelrt, 18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler: American Pro Trucker (deluxe, Rev T)", GAME_FLAGS )
@@ -11659,7 +11719,7 @@ void naomi_state::init_hotd2()
 /* 0035    */ GAME( 2000, sstrkfgta, sstrkfgt, naomim2, sstrkfgt,naomi_state, init_naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A, no training mode)", GAME_FLAGS )
 /* 0036    */ GAME( 2000, 18wheels,  18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler: American Pro Trucker (standard)", GAME_FLAGS )
 /* 0037    */ GAME( 2000, 18wheelu,  18wheelr, naomim2, 18wheelr,naomi_state, init_naomi,   ROT0, "Sega", "18 Wheeler: American Pro Trucker (upright)", GAME_FLAGS )
-/* 0038    */ GAME( 2000, ntvmys,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega / NTV", "Nittere Shiki! Mirai Yosou Studio / NTV Future Forecast Studio (Japan, Rev A)", GAME_FLAGS) // 日テレ式未来予想スタジオ
+/* 0038    */ GAME( 2000, ntvmys,    naomi,    naomim2_tduno, tduno,   naomi_state, init_naomi,   ROT0, "Sega / NTV", "Nittere Shiki! Mirai Yosou Studio / NTV Future Forecast Studio (Japan, Rev A)", GAME_FLAGS) // 日テレ式未来予想スタジオ
 /* 0039    */ GAME( 2000, gram2000,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Giant Gram 2000", GAME_FLAGS )
 /* 0040    */ GAME( 2000, wwfroyal,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "WWF Royal Rumble", GAME_FLAGS )
 /* 0041    */ GAME( 2000, slasho,    naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Slashout", GAME_FLAGS )

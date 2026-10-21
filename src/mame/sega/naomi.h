@@ -50,6 +50,7 @@ public:
 	void naomim1_hop(machine_config &config) ATTR_COLD;
 	void naomim1_anpanman2(machine_config &config) ATTR_COLD;
 	void naomim1_shootpl(machine_config &config) ATTR_COLD;
+	void naomim1_tduno2(machine_config &config) ATTR_COLD;
 
 	void naomim2(machine_config &config) ATTR_COLD;
 	void naomim2_kb(machine_config &config) ATTR_COLD;
@@ -60,6 +61,7 @@ public:
 	void naomim2_otrigger(machine_config &config) ATTR_COLD;
 	void naomim2_ringout(machine_config &config) ATTR_COLD;
 	void naomim2_smarinef(machine_config &config) ATTR_COLD;
+	void naomim2_tduno(machine_config &config) ATTR_COLD;
 
 	void naomigd(machine_config &config) ATTR_COLD;
 	void naomigd_kb(machine_config &config) ATTR_COLD;

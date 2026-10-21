@@ -158,6 +158,12 @@ int jvs_device::handle_message(const uint8_t *send_buffer, uint32_t send_size, u
 		*recv_buffer++ = 0x01;
 		return rotary(recv_buffer, send_buffer[1]) ? 2 : 0;
 
+	case 0x25:
+		if(send_size < 2)
+			return 0;
+		*recv_buffer++ = 0x01;
+		return lightgun(recv_buffer, send_buffer[1]) ? 4 : 0;
+
 	case 0x30:
 		if(send_size < 4)
 			return 0;
@@ -236,6 +242,11 @@ bool jvs_device::analogs(uint8_t *&buf, uint8_t count)
 }
 
 bool jvs_device::rotary(uint8_t *&buf, uint8_t count)
+{
+	return false;
+}
+
+bool jvs_device::lightgun(uint8_t *&buf, uint8_t count)
 {
 	return false;
 }
