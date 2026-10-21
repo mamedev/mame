@@ -1227,23 +1227,23 @@ ROM_END
 
 } // anonymous namespace
 
-GAMEL(1995, c3_telly,    0,          c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95400021, Bellfruit, Cobra 3)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
-GAMEL(1995, c3_tellya,   c3_telly,   c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95401021, Bellfruit, Cobra 3)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
-GAMEL(1995, c3_tellyb,   c3_telly,   c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95400005, Bellfruit, Cobra 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_c3_telly) // fails to boot
-GAMEL(1995, c3_tellyc,   c3_telly,   c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95400013, Bellfruit, Cobra 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_c3_telly) // checksum error
+GAMEL(1995, c3_telly,    0,          c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95400021)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
+GAMEL(1995, c3_tellya,   c3_telly,   c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95401021)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
+GAMEL(1995, c3_tellyb,   c3_telly,   c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95400005)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_c3_telly) // fails to boot
+GAMEL(1995, c3_tellyc,   c3_telly,   c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts (Game Number 95400013)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_c3_telly) // checksum error
 
-GAMEL(1995, c3_tellyns,  0,          c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts - The New Series (Game Number 95400023, Bellfruit, Cobra 3)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
-GAMEL(1995, c3_tellynsa, c3_tellyns, c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts - The New Series (Game Number 95401023, Bellfruit, Cobra 3)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
-GAMEL(1995, c3_tellynsb, c3_tellyns, c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts - The New Series (Game Number 95400007, Bellfruit, Cobra 3)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
+GAMEL(1995, c3_tellyns,  0,          c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts - The New Series (Game Number 95400023)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
+GAMEL(1995, c3_tellynsa, c3_tellyns, c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts - The New Series (Game Number 95401023)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
+GAMEL(1995, c3_tellynsb, c3_tellyns, c3_telly,   c3_telly, bfm_cobra3_state, empty_init, ROT0, "BFM", "Telly Addicts - The New Series (Game Number 95400007)", MACHINE_SUPPORTS_SAVE, layout_c3_telly)
 
-GAMEL(1996, c3_rtime,    0,          bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400009, Bellfruit, Cobra 3)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
-GAMEL(1996, c3_rtimea,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400063, Bellfruit, Cobra 3)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
-GAMEL(1996, c3_rtimeb,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95401063, Bellfruit, Cobra 3)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
-GAMEL(1996, c3_rtimec,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400047, Bellfruit, Cobra 3)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
-GAMEL(1996, c3_rtimed,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "bootleg", "Radio Times (Game Number radtimes, Bellfruit, Cobra 3) (bootleg)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime ) // hack/bootleg?
-GAMEL(1996, c3_rtimee,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400017, Bellfruit, Cobra 3)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_c3_rtime ) // checksum error
+GAMEL(1996, c3_rtime,    0,          bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400009)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
+GAMEL(1996, c3_rtimea,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400063)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
+GAMEL(1996, c3_rtimeb,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95401063)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
+GAMEL(1996, c3_rtimec,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400047)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime )
+GAMEL(1996, c3_rtimed,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "bootleg", "Radio Times (Game Number radtimes, bootleg)", MACHINE_SUPPORTS_SAVE, layout_c3_rtime ) // hack/bootleg?
+GAMEL(1996, c3_rtimee,   c3_rtime,   bfm_cobra3, c3_rtime, bfm_cobra3_state, empty_init, ROT0, "BFM", "Radio Times (Game Number 95400017)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE, layout_c3_rtime ) // checksum error
 
-GAMEL(1997, c3_totp,     0,          bfm_cobra3, c3_totp,  bfm_cobra3_state, empty_init, ROT0, "BFM", "Top of the Pops (Game Number 95400101, Bellfruit, Cobra 3)", MACHINE_SUPPORTS_SAVE, layout_c3_totp )
-GAMEL(1997, c3_totpa,    c3_totp,    bfm_cobra3, c3_totp,  bfm_cobra3_state, empty_init, ROT0, "BFM", "Top of the Pops (Game Number 95401101, Bellfruit, Cobra 3)", MACHINE_SUPPORTS_SAVE, layout_c3_totp )
+GAMEL(1997, c3_totp,     0,          bfm_cobra3, c3_totp,  bfm_cobra3_state, empty_init, ROT0, "BFM", "Top of the Pops (Game Number 95400101)", MACHINE_SUPPORTS_SAVE, layout_c3_totp )
+GAMEL(1997, c3_totpa,    c3_totp,    bfm_cobra3, c3_totp,  bfm_cobra3_state, empty_init, ROT0, "BFM", "Top of the Pops (Game Number 95401101)", MACHINE_SUPPORTS_SAVE, layout_c3_totp )
 
-GAMEL(1998, c3_ppays,    0,          c3_ppays,   c3_ppays, bfm_cobra3_state, empty_init, ROT0, "BFM", "The Phrase That Pays (Game Number 95400687, Bellfruit, Cobra 3)", MACHINE_SUPPORTS_SAVE, layout_c3_ppays )
+GAMEL(1998, c3_ppays,    0,          c3_ppays,   c3_ppays, bfm_cobra3_state, empty_init, ROT0, "BFM", "The Phrase That Pays (Game Number 95400687)", MACHINE_SUPPORTS_SAVE, layout_c3_ppays )
