@@ -28,6 +28,11 @@ public:
 		m_xoffset = xoffset;
 		m_yoffset = yoffset;
 	}
+	void set_flipy_location(u8 _byte, u8 _bit)
+	{
+		m_flipy_byte = _byte;
+		m_flipy_bit = _bit;
+	}
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle cliprect, u16* spriteram, u16 size);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle cliprect, u16* spriteram, u16 size);
@@ -53,6 +58,8 @@ private:
 	bool m_alt_format;
 	s32 m_xoffset;
 	s32 m_yoffset;
+	u8 m_flipy_byte;
+	u8 m_flipy_bit;
 };
 
 class sei0211_device : public sei0210_device

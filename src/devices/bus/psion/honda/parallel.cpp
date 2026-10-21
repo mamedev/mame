@@ -13,7 +13,7 @@
 #include "parallel.h"
 
 #include "bus/centronics/ctronics.h"
-#include "cpu/pic16c62x/pic16c62x.h"
+#include "cpu/pic16_mid/pic16_mid.h"
 
 
 namespace {
@@ -48,8 +48,8 @@ protected:
 //-------------------------------------------------
 
 ROM_START(psion_parallel)
-	ROM_REGION(0x0400, "mcu", ROMREGION_ERASEFF)
-	ROM_LOAD("pic16c620.bin", 0x0000, 0x0400, NO_DUMP)
+	ROM_REGION16_LE(0x4010, "mcu", ROMREGION_ERASEFF)
+	ROM_LOAD("pic16c620.bin", 0x0000, 0x4010, NO_DUMP)
 ROM_END
 
 //-------------------------------------------------

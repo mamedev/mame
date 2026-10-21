@@ -172,8 +172,11 @@ ROM_START( mg_gbr ) // 2.0.1 SW7-235 SW7-240 13:00:00 APR 09 1997 MAB
 
 	ROM_REGION( 0x100000, "sound_16c55", 0 )    // PIC dump?
 	ROM_LOAD( "16c55.u5", 0x0000, 0x0023ff, CRC(0bd92c3e) SHA1(596f4d0a83ebc879ec64ba3038d2e9448d2f8901) )
-	ROM_REGION( 0x100000, "io_16c64", 0 )   // PIC dump?
-	ROM_LOAD( "16c64.u6", 0x0000, 0x008fff, CRC(6ae364a2) SHA1(56dde3d270c2cf81d9592c7c2284767188409b56) )
+
+	// the first 0x1000 bytes contain valid PIC16 code, the rest looks like garbage data
+	// should probably be replaced with the one from mg_risk (identical code, no garbage data)
+	ROM_REGION16_LE( 0x10000, "io_16c64", 0 )
+	ROM_LOAD( "16c64.u6", 0x0000, 0x8fff, CRC(6ae364a2) SHA1(56dde3d270c2cf81d9592c7c2284767188409b56) )
 ROM_END
 
 ROM_START( mg_gbra ) // 2.0 SW8-146 SW7-360 12:26:00 JUL 21 1998 MJC
@@ -201,8 +204,9 @@ ROM_START( mg_gbra ) // 2.0 SW8-146 SW7-360 12:26:00 JUL 21 1998 MJC
 
 	ROM_REGION( 0x100000, "sound_16c55", 0 )    // PIC dump?
 	ROM_LOAD( "16c55.u5", 0x0000, 0x0023ff, CRC(0bd92c3e) SHA1(596f4d0a83ebc879ec64ba3038d2e9448d2f8901) )
-	ROM_REGION( 0x100000, "io_16c64", 0 )   // PIC dump?
-	ROM_LOAD( "16c64.u6", 0x0000, 0x008fff, CRC(6ae364a2) SHA1(56dde3d270c2cf81d9592c7c2284767188409b56) )
+
+	ROM_REGION16_LE( 0x10000, "io_16c64", 0 ) // see note for mg_gbr
+	ROM_LOAD( "16c64.u6", 0x0000, 0x8fff, CRC(6ae364a2) SHA1(56dde3d270c2cf81d9592c7c2284767188409b56) )
 ROM_END
 
 ROM_START( mg_gbrb )  // 2.0 SW8-147 SW7-361 12:26:00 JUL 21 1998 MJC
@@ -230,8 +234,9 @@ ROM_START( mg_gbrb )  // 2.0 SW8-147 SW7-361 12:26:00 JUL 21 1998 MJC
 
 	ROM_REGION( 0x100000, "sound_16c55", 0 )    // PIC dump?
 	ROM_LOAD( "16c55.u5", 0x0000, 0x0023ff, CRC(0bd92c3e) SHA1(596f4d0a83ebc879ec64ba3038d2e9448d2f8901) )
-	ROM_REGION( 0x100000, "io_16c64", 0 )   // PIC dump?
-	ROM_LOAD( "16c64.u6", 0x0000, 0x008fff, CRC(6ae364a2) SHA1(56dde3d270c2cf81d9592c7c2284767188409b56) )
+
+	ROM_REGION16_LE( 0x10000, "io_16c64", 0 ) // see note for mg_gbr
+	ROM_LOAD( "16c64.u6", 0x0000, 0x8fff, CRC(6ae364a2) SHA1(56dde3d270c2cf81d9592c7c2284767188409b56) )
 ROM_END
 
 
@@ -259,8 +264,10 @@ ROM_START( mg_risk ) // 1.0 SW7-614 SW7-461 09:45:00 SEP 25 1997 MJC
 
 	ROM_REGION( 0x100000, "sound_16c55", 0 )    // PIC dump?
 	ROM_LOAD( "pic16c55.u5", 0x0000, 0x00040a, CRC(c1c0bd5b) SHA1(a1364de27f747d5531cb57757852f75cbb0cd520) )
-	ROM_REGION( 0x100000, "io_16c64", 0 )   // PIC dump?
-	ROM_LOAD( "pic16c64.u6", 0x0000, 0x004010, CRC(64eca658) SHA1(77e9aa586a16cf1e88da4bb53866242ab1ece3cd) )
+
+	// valid code, but unprogrammed bits are 0 here instead of 1
+	ROM_REGION16_LE( 0x4010, "io_16c64", 0 )
+	ROM_LOAD( "pic16c64.u6", 0x0000, 0x4010, CRC(64eca658) SHA1(77e9aa586a16cf1e88da4bb53866242ab1ece3cd) )
 ROM_END
 
 ROM_START( mg_riska )  // 1.3 SW9-025 SW9-023 14:23:21 SEP 14 1999 MAB
@@ -287,8 +294,9 @@ ROM_START( mg_riska )  // 1.3 SW9-025 SW9-023 14:23:21 SEP 14 1999 MAB
 
 	ROM_REGION( 0x100000, "sound_16c55", 0 )    // PIC dump?
 	ROM_LOAD( "pic16c55.u5", 0x0000, 0x00040a, CRC(c1c0bd5b) SHA1(a1364de27f747d5531cb57757852f75cbb0cd520) )
-	ROM_REGION( 0x100000, "io_16c64", 0 )   // PIC dump?
-	ROM_LOAD( "pic16c64.u6", 0x0000, 0x004010, CRC(64eca658) SHA1(77e9aa586a16cf1e88da4bb53866242ab1ece3cd) )
+
+	ROM_REGION16_LE( 0x4010, "io_16c64", 0 )
+	ROM_LOAD( "pic16c64.u6", 0x0000, 0x4010, CRC(64eca658) SHA1(77e9aa586a16cf1e88da4bb53866242ab1ece3cd) )
 ROM_END
 
 ROM_START( mg_riskb ) // 1.3 SW9-024 SW9-026 14:24:54 SEP 14 1999 MAB
@@ -315,8 +323,9 @@ ROM_START( mg_riskb ) // 1.3 SW9-024 SW9-026 14:24:54 SEP 14 1999 MAB
 
 	ROM_REGION( 0x100000, "sound_16c55", 0 )    // PIC dump?
 	ROM_LOAD( "pic16c55.u5", 0x0000, 0x00040a, CRC(c1c0bd5b) SHA1(a1364de27f747d5531cb57757852f75cbb0cd520) )
-	ROM_REGION( 0x100000, "io_16c64", 0 )   // PIC dump?
-	ROM_LOAD( "pic16c64.u6", 0x0000, 0x004010, CRC(64eca658) SHA1(77e9aa586a16cf1e88da4bb53866242ab1ece3cd) )
+
+	ROM_REGION16_LE( 0x4010, "io_16c64", 0 )
+	ROM_LOAD( "pic16c64.u6", 0x0000, 0x4010, CRC(64eca658) SHA1(77e9aa586a16cf1e88da4bb53866242ab1ece3cd) )
 ROM_END
 
 
@@ -343,8 +352,9 @@ ROM_START( mg_bb ) // SW6-618 SW6-601 11:35:00 NOV 14 1996 DMC 1.3
 
 	ROM_REGION( 0x100000, "sound_16c55", 0 )    // PIC dump?
 	ROM_LOAD( "pic16c55.u5", 0x0000, 0x00040a, NO_DUMP )
-	ROM_REGION( 0x100000, "io_16c64", 0 )   // PIC dump?
-	ROM_LOAD( "pic16c64.u6", 0x0000, 0x004010, NO_DUMP )
+
+	ROM_REGION16_LE( 0x4010, "io_16c64", 0 )
+	ROM_LOAD( "pic16c64.u6", 0x0000, 0x4010, NO_DUMP )
 ROM_END
 
 ROM_START( mg_bba ) // SW6-656 SW6-635 10:41:45 NOV 29 1996 MAB 1.5
@@ -370,8 +380,9 @@ ROM_START( mg_bba ) // SW6-656 SW6-635 10:41:45 NOV 29 1996 MAB 1.5
 
 	ROM_REGION( 0x100000, "sound_16c55", 0 )    // PIC dump?
 	ROM_LOAD( "pic16c55.u5", 0x0000, 0x00040a, NO_DUMP )
-	ROM_REGION( 0x100000, "io_16c64", 0 )   // PIC dump?
-	ROM_LOAD( "pic16c64.u6", 0x0000, 0x004010, NO_DUMP )
+
+	ROM_REGION16_LE( 0x4010, "io_16c64", 0 )
+	ROM_LOAD( "pic16c64.u6", 0x0000, 0x4010, NO_DUMP )
 ROM_END
 
 ROM_START( mg_bbb ) // SW6-657 SW6-636 10:39:22 NOV 29 1996 MAB 1.5
@@ -397,8 +408,9 @@ ROM_START( mg_bbb ) // SW6-657 SW6-636 10:39:22 NOV 29 1996 MAB 1.5
 
 	ROM_REGION( 0x100000, "sound_16c55", 0 )    // PIC dump?
 	ROM_LOAD( "pic16c55.u5", 0x0000, 0x00040a, NO_DUMP )
-	ROM_REGION( 0x100000, "io_16c64", 0 )   // PIC dump?
-	ROM_LOAD( "pic16c64.u6", 0x0000, 0x004010, NO_DUMP )
+
+	ROM_REGION16_LE( 0x4010, "io_16c64", 0 )
+	ROM_LOAD( "pic16c64.u6", 0x0000, 0x4010, NO_DUMP )
 ROM_END
 
 
@@ -418,8 +430,9 @@ ROM_START( mg_alad ) // 1.0 SW7-536 SW7-465 09:14:00 AUG 27 1997 SAR
 
 	ROM_REGION( 0x100000, "sound_16c55", 0 )
 	ROM_LOAD( "sound_16c55.u5", 0x0000, 0x080000, NO_DUMP )
-	ROM_REGION( 0x100000, "io_16c64", 0 )
-	ROM_LOAD( "io_16c64.u6", 0x0000, 0x080000, NO_DUMP )
+
+	ROM_REGION16_LE( 0x4010, "io_16c64", 0 )
+	ROM_LOAD( "pic16c64.u6", 0x0000, 0x4010, NO_DUMP )
 ROM_END
 
 ROM_START( mg_alada ) // 1.2 SW8-323 SW8-299 12:15:00 DEC 22 1998 PAC
@@ -438,8 +451,9 @@ ROM_START( mg_alada ) // 1.2 SW8-323 SW8-299 12:15:00 DEC 22 1998 PAC
 
 	ROM_REGION( 0x100000, "sound_16c55", 0 )
 	ROM_LOAD( "sound_16c55.u5", 0x0000, 0x080000, NO_DUMP )
-	ROM_REGION( 0x100000, "io_16c64", 0 )
-	ROM_LOAD( "io_16c64.u6", 0x0000, 0x080000, NO_DUMP )
+
+	ROM_REGION16_LE( 0x4010, "io_16c64", 0 )
+	ROM_LOAD( "pic16c64.u6", 0x0000, 0x4010, NO_DUMP )
 ROM_END
 
 ROM_START( mg_aladb ) // 1.2 SW8-322 SW8-298 12:15:00 DEC 22 1998 PAC
@@ -458,8 +472,9 @@ ROM_START( mg_aladb ) // 1.2 SW8-322 SW8-298 12:15:00 DEC 22 1998 PAC
 
 	ROM_REGION( 0x100000, "sound_16c55", 0 )
 	ROM_LOAD( "sound_16c55.u5", 0x0000, 0x080000, NO_DUMP )
-	ROM_REGION( 0x100000, "io_16c64", 0 )
-	ROM_LOAD( "io_16c64.u6", 0x0000, 0x080000, NO_DUMP )
+
+	ROM_REGION16_LE( 0x4010, "io_16c64", 0 )
+	ROM_LOAD( "pic16c64.u6", 0x0000, 0x4010, NO_DUMP )
 ROM_END
 
 ROM_START( mg_aladc ) // 1.1 SW8-298 SW8-144 15:28:00 NOV 18 1998 MAB
@@ -478,8 +493,9 @@ ROM_START( mg_aladc ) // 1.1 SW8-298 SW8-144 15:28:00 NOV 18 1998 MAB
 
 	ROM_REGION( 0x100000, "sound_16c55", 0 )
 	ROM_LOAD( "sound_16c55.u5", 0x0000, 0x080000, NO_DUMP )
-	ROM_REGION( 0x100000, "io_16c64", 0 )
-	ROM_LOAD( "io_16c64.u6", 0x0000, 0x080000, NO_DUMP )
+
+	ROM_REGION16_LE( 0x4010, "io_16c64", 0 )
+	ROM_LOAD( "pic16c64.u6", 0x0000, 0x4010, NO_DUMP )
 ROM_END
 
 
@@ -564,7 +580,11 @@ ROM_START( mg_lug ) // 1.2 SW8-232 SW8-154 11:53:23 Sep 16 1998 MJC
 
 	ROM_REGION( 0x100000, "sound_16c55", 0 )    // PIC dump?
 	ROM_LOAD( "msb.u5", 0x0000, 0x080000, CRC(e0335ce9) SHA1(a4a6d7cc79eaceab8949767860c7849d8b24d7d5) )
-	ROM_REGION( 0x100000, "io_16c64", 0 )   // PIC dump?
+
+	// identical PIC16 code to the other dumped IO CPUs
+	// configuration word is slightly different, could point to PIC16C64A instead of PIC16C64
+	// rest of the file filled with (presumely) garbage data like mg_gbr
+	ROM_REGION16_LE( 0x100000, "io_16c64", 0 )
 	ROM_LOAD( "cpu.u6", 0x0000, 0x080000, CRC(24e25be1) SHA1(241f9c217e73586ab590f33ae4c8ec554e312f8c) )
 ROM_END
 
@@ -595,7 +615,8 @@ ROM_START( mg_luga ) // 1.2 SW8-233 SW8-155 11:56:19 Sep 16 1998 MJC
 
 	ROM_REGION( 0x100000, "sound_16c55", 0 )    // PIC dump?
 	ROM_LOAD( "msb.u5", 0x0000, 0x080000, CRC(e0335ce9) SHA1(a4a6d7cc79eaceab8949767860c7849d8b24d7d5) )
-	ROM_REGION( 0x100000, "io_16c64", 0 )   // PIC dump?
+
+	ROM_REGION16_LE( 0x100000, "io_16c64", 0 ) // see note for mg_lug
 	ROM_LOAD( "cpu.u6", 0x0000, 0x080000, CRC(24e25be1) SHA1(241f9c217e73586ab590f33ae4c8ec554e312f8c) )
 ROM_END
 

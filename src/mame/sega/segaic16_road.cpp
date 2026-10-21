@@ -89,7 +89,7 @@ static void segaic16_road_hangon_draw(segaic16_road_device::road_info *info, bit
 	const u16 *roadram = info->roadram;
 
 	/* loop over scanlines */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u16 *const dest = &bitmap.pix(y);
 		const u16 control = roadram[0x000 + y];
@@ -124,7 +124,7 @@ static void segaic16_road_hangon_draw(segaic16_road_device::road_info *info, bit
 		int ss8j = 0;
 
 		/* draw this scanline from the beginning */
-		for (int x = -24; x <= cliprect.max_x; x++)
+		for (int x = -24; x <= cliprect.right(); x++)
 		{
 			int color;
 
@@ -197,7 +197,7 @@ static void segaic16_road_hangon_draw(segaic16_road_device::road_info *info, bit
 			}
 
 			/* write the pixel if we're past the minimum clip */
-			if (x >= cliprect.min_x)
+			if (x >= cliprect.left())
 				dest[x] = color;
 
 			/* ---- the following logic all happens on the 6M clock ---- */
@@ -353,7 +353,7 @@ static void segaic16_road_outrun_draw(segaic16_road_device::road_info *info, bit
 	const u16 *roadram = info->buffer.get();
 
 	/* loop over scanlines */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		static const u8 priority_map[2][8] =
 		{
@@ -405,7 +405,7 @@ static void segaic16_road_outrun_draw(segaic16_road_device::road_info *info, bit
 			if (color != -1)
 			{
 				color |= info->colorbase3;
-				for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				for (int x = cliprect.left(); x <= cliprect.right(); x++)
 					dest[x] = color;
 			}
 		}
@@ -453,7 +453,7 @@ static void segaic16_road_outrun_draw(segaic16_road_device::road_info *info, bit
 					if (data0 & 0x800)
 						continue;
 					hpos0 = (hpos0 - (0x5f8 + info->xoffs)) & 0xfff;
-					for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+					for (int x = cliprect.left(); x <= cliprect.right(); x++)
 					{
 						const int pix0 = (hpos0 < 0x200) ? src0[hpos0] : 3;
 						dest[x] = color_table[0x00 + pix0];
@@ -464,7 +464,7 @@ static void segaic16_road_outrun_draw(segaic16_road_device::road_info *info, bit
 				case 1:
 					hpos0 = (hpos0 - (0x5f8 + info->xoffs)) & 0xfff;
 					hpos1 = (hpos1 - (0x5f8 + info->xoffs)) & 0xfff;
-					for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+					for (int x = cliprect.left(); x <= cliprect.right(); x++)
 					{
 						const int pix0 = (hpos0 < 0x200) ? src0[hpos0] : 3;
 						const int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
@@ -480,7 +480,7 @@ static void segaic16_road_outrun_draw(segaic16_road_device::road_info *info, bit
 				case 2:
 					hpos0 = (hpos0 - (0x5f8 + info->xoffs)) & 0xfff;
 					hpos1 = (hpos1 - (0x5f8 + info->xoffs)) & 0xfff;
-					for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+					for (int x = cliprect.left(); x <= cliprect.right(); x++)
 					{
 						const int pix0 = (hpos0 < 0x200) ? src0[hpos0] : 3;
 						const int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
@@ -497,7 +497,7 @@ static void segaic16_road_outrun_draw(segaic16_road_device::road_info *info, bit
 					if (data1 & 0x800)
 						continue;
 					hpos1 = (hpos1 - (0x5f8 + info->xoffs)) & 0xfff;
-					for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+					for (int x = cliprect.left(); x <= cliprect.right(); x++)
 					{
 						const int pix1 = (hpos1 < 0x200) ? src1[hpos1] : 3;
 						dest[x] = color_table[0x10 + pix1];

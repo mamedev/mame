@@ -302,7 +302,7 @@ void segas18_astormbl_state::draw_tile(screen_device& screen, bitmap_ind16& bitm
 		{
 			int realxpos = xpos + x;
 
-			if ((realypos >= cliprect.min_y) && (realypos <= cliprect.max_y) && (realxpos >= cliprect.min_x) && (realxpos <= cliprect.max_x))
+			if (cliprect.contains(realxpos, realypos))
 			{
 				uint16_t* dst = &bitmap.pix(realypos);
 				uint8_t* pridst = &priority_bitmap.pix(realypos);
@@ -405,12 +405,12 @@ uint32_t segas18_astormbl_state::screen_update(screen_device &screen, bitmap_ind
 			cliprect,
 			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
 			{
-				for (int y = rect.min_y; y <= rect.max_y; y++)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
 					uint16_t *const dest = &bitmap.pix(y);
 					uint16_t const *const src = &sprites.pix(y);
 					uint8_t *const pri = &screen.priority().pix(y);
-					for (int x = rect.min_x; x <= rect.max_x; x++)
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
 						// only process written pixels
 						uint16_t const pix = src[x];

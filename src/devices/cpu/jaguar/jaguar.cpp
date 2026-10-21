@@ -990,8 +990,12 @@ void jaguar_cpu_device::moveta_rn_rn(u16 op)
 
 void jaguar_cpu_device::mtoi_rn_rn(u16 op)
 {
+	// Convert the IEEE sign and 24-bit significand to a two's complement integer
 	const u32 r1 = m_r[(op >> 5) & 31];
-	m_r[op & 31] = (((s32)r1 >> 8) & 0xff800000) | (r1 & 0x007fffff);
+	const s32 mant = (r1 & 0x007fffff) | 0x00800000;
+	const u32 res = BIT(r1, 31) ? u32(-mant) : u32(mant);
+	m_r[op & 31] = res;
+	CLR_ZN(); SET_ZN(res);
 }
 
 void jaguar_cpu_device::mult_rn_rn(u16 op)
@@ -1021,14 +1025,15 @@ void jaguar_cpu_device::normi_rn_rn(u16 op)
 {
 	u32 r1 = m_r[(op >> 5) & 31];
 	u32 res = 0;
+	// right shift count that lands the most significant set bit on bit 23, the IEEE implicit one
 	if (r1 != 0)
 	{
-		while ((r1 & 0xffc00000) == 0)
+		while ((r1 & 0xff800000) == 0)
 		{
 			r1 <<= 1;
 			res--;
 		}
-		while ((r1 & 0xff800000) != 0)
+		while ((r1 & 0xff000000) != 0)
 		{
 			r1 >>= 1;
 			res++;
@@ -1470,7 +1475,8 @@ void jaguar_cpu_device::endian_w(offs_t offset, u32 data, u32 mem_mask)
 	if (ACCESSING_BITS_0_7)
 	{
 		// sburnout sets bit 1 == 0
-		if ((m_io_end & 0x7) != 0x7)
+		logerror("%s: endian setup %08x\n", this->tag(), m_io_end);
+		if ((m_io_end & 0x5) != 0x5)
 			throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
 	}
 }

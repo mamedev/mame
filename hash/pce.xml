@@ -3114,7 +3114,7 @@ Verify sound mixing (stage 1 BGM starts with a left-right effect)
 		</part>
 	</software>
 
-	<software name="ptennis" supported="partial">
+	<software name="ptennis">
 		<description>Power Tennis</description>
 		<year>1993</year>
 		<publisher>Hudson</publisher>

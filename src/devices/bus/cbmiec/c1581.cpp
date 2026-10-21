@@ -87,7 +87,7 @@ const tiny_rom_entry *c1563_device::device_rom_region() const
 void c1581_device::c1581_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).mirror(0x2000).ram();
-	map(0x4000, 0x400f).mirror(0x1ff0).rw(m_cia, FUNC(mos8520_device::read), FUNC(mos8520_device::write));
+	map(0x4000, 0x400f).mirror(0x1ff0).r(FUNC(c1581_device::cia_r)).w(m_cia, FUNC(mos8520_device::write));
 	map(0x6000, 0x6003).mirror(0x1ffc).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write));
 	map(0x8000, 0xffff).rom().region(M6502_TAG, 0);
 }
@@ -101,14 +101,22 @@ void c1581_device::cnt_w(int state)
 {
 	m_cnt_out = state;
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 void c1581_device::sp_w(int state)
 {
 	m_sp_out = state;
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
+}
+
+uint8_t c1581_device::cia_r(offs_t offset)
+{
+	if ((offset == 1) && !m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
+	return m_cia->read(offset);
 }
 
 uint8_t c1581_device::cia_pa_r()
@@ -160,7 +168,7 @@ void c1581_device::cia_pa_w(uint8_t data)
 	*/
 
 	// side select
-	m_floppy->ss_w(BIT(data, 0));
+	m_floppy->ss_w(!BIT(data, 0));
 
 	// motor
 	m_floppy->mon_w(BIT(data, 2));
@@ -235,7 +243,7 @@ void c1581_device::cia_pb_w(uint8_t data)
 	// fast serial direction
 	m_ser_dir = BIT(data, 5);
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 
@@ -353,8 +361,6 @@ c1563_device::c1563_device(const machine_config &mconfig, const char *tag, devic
 
 void c1581_device::device_start()
 {
-	m_iec_sync_timer = timer_alloc(FUNC(c1581_device::iec_sync_tick), this);
-
 	// state saving
 	save_item(NAME(m_data_out));
 	save_item(NAME(m_atn_ack));
@@ -378,7 +384,7 @@ void c1581_device::device_reset()
 	m_cnt_out = 1;
 	m_iec_clk = 1;
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 
@@ -388,7 +394,7 @@ void c1581_device::device_reset()
 
 void c1581_device::cbm_iec_srq(int state)
 {
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 
@@ -398,7 +404,7 @@ void c1581_device::cbm_iec_srq(int state)
 
 void c1581_device::cbm_iec_atn(int state)
 {
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 
@@ -408,7 +414,7 @@ void c1581_device::cbm_iec_atn(int state)
 
 void c1581_device::cbm_iec_data(int state)
 {
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 
@@ -426,10 +432,10 @@ void c1581_device::cbm_iec_reset(int state)
 
 
 //-------------------------------------------------
-//  iec_sync_tick - 
+//  update_iec -
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(c1581_device::iec_sync_tick)
+void c1581_device::update_iec()
 {
 	m_cia->cnt_w(m_ser_dir || m_bus->srq_r());
 	m_cia->sp_w(m_ser_dir || m_bus->data_r());

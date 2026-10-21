@@ -627,6 +627,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/clipper_dsk.h,FORMATS["CLIPPER_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "CLIPPER_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/clipper_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/clipper_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/coco_cas.h,FORMATS["COCO_CAS"] = true
 --------------------------------------------------
 

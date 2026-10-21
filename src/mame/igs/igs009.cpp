@@ -251,12 +251,12 @@ uint32_t igs009_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		m_reel_tilemap[3]->set_scrolly(i, m_bg_scroll[0][i + 0x180] * 2);
 	}
 
-	for (int zz = (cliprect.min_y >> 1), startclipmin = (cliprect.min_y & ~1); zz < ((cliprect.max_y + 1) >> 1); zz++, startclipmin += 2)
+	for (int zz = (cliprect.top() >> 1), startclipmin = (cliprect.top() & ~1); zz < ((cliprect.bottom() + 1) >> 1); zz++, startclipmin += 2)
 	{
 		int const rowenable = m_bg_scroll[1][zz];
 
 		// draw top of screen
-		rectangle const clip(cliprect.min_x, cliprect.max_x, startclipmin, startclipmin + 1);
+		rectangle const clip(cliprect.left(), cliprect.right(), startclipmin, startclipmin + 1);
 
 		bitmap.fill(m_palette->pen(rowenable), clip);
 

@@ -472,6 +472,7 @@ const double XTAL::known_xtals[] = {
 	 39'710'000, // 39.71_MHz_XTAL         Wyse WY-60 132-column display clock
 	 40'000'000, // 40_MHz_XTAL            -
 	 40'210'000, // 40.21_MHz_XTAL         Fairlight CMI IIx
+	 40'960'000, // 40.96_MHz_XTAL         Roland DEP-5 / RE-3 reverb DSP
 	 41'539'000, // 41.539_MHz_XTAL        IBM PS/2 132-column text mode
 	 42'000'000, // 42_MHz_XTAL            BMC A-00211 - Popo Bear
 	 42'105'200, // 42.1052_MHz_XTAL       NEC PC-88xx

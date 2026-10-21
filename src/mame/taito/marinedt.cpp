@@ -235,9 +235,9 @@ void marinedt_state::init_seabitmap()
 	m_seabitmap[0]->fill(64, clip);
 	m_seabitmap[1]->fill(64 + 32, clip);
 
-	for (int y = clip.min_y; y <= clip.max_y; y++)
+	for (int y = clip.top(); y <= clip.bottom(); y++)
 	{
-		for (int x = clip.min_x; x <= clip.max_x; x++)
+		for (int x = clip.left(); x <= clip.right(); x++)
 		{
 			// TODO: exact formula (related to total h size?)
 			uint8_t blue_pen = 0x48 + ((x - 32) / 8);

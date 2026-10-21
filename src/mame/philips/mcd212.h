@@ -227,23 +227,14 @@ protected:
 
 	// DYUV color limit arrays.
 	uint32_t m_dyuv_limit_lut[0x300];
+	uint32_t m_dyuv_rgb_lut[3][0x300];
 
-	// DYUV delta-Y decoding array
+	// DYUV decoding array
 	uint8_t m_delta_y_lut[0x100];
-
-	// DYUV delta-UV decoding array
 	uint8_t m_delta_uv_lut[0x100];
-
-	// DYUV U-to-B decoding array
 	int16_t m_dyuv_u_to_b[0x100];
-
-	// U-to-G decoding array
 	int16_t m_dyuv_u_to_g[0x100];
-
-	// V-to-G decoding array
 	int16_t m_dyuv_v_to_g[0x100];
-
-	// V-to-R decoding array
 	int16_t m_dyuv_v_to_r[0x100];
 
 	// interrupt callbacks
@@ -268,13 +259,17 @@ protected:
 	bool m_blink_active = false;
 
 	static const uint32_t s_4bpp_color[16];
+	static const uint32_t s_4bpp_display_color[16];
 
 	uint8_t get_weight_factor(const uint32_t Matte_idx);
 	uint8_t get_matte_op(const uint32_t Matte_idx);
 	void update_matte_arrays();
 
+	uint32_t dyuv_to_rgb(uint8_t y, uint8_t u, uint8_t v) const;
 	int get_screen_width();
 	int get_border_width();
+	bool ica_enabled(int channel) const { return BIT(m_dcr[0], DCR_DE_BIT) && BIT(m_dcr[channel], DCR_ICA_BIT); }
+	bool dca_enabled(int channel) const { return ica_enabled(channel) && BIT(m_dcr[channel], DCR_DCA_BIT); }
 	uint32_t get_backdrop_plane(int x, int y);
 
 	template <int Path> void set_vsr(uint32_t value);

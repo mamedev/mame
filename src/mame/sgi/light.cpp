@@ -141,9 +141,12 @@ u32 sgi_lg1_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 {
 	u8 const *src = &m_vram[0];
 
-	for (unsigned y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
-		for (unsigned x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x++)
-			bitmap.pix(y, x) = m_lut1->palette_lookup(*src++);
+	for (unsigned y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
+	{
+		auto *const dst = &bitmap.pix(y);
+		for (unsigned x = screen.visible_area().left(); x <= screen.visible_area().right(); x++)
+			dst[x] = m_lut1->palette_lookup(*src++);
+	}
 
 	return 0;
 }

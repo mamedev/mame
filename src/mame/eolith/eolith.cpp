@@ -76,7 +76,12 @@
   - racooon (Raccoon World)
 
       Game animation & timers seem too fast? demoted to NOT WORKING as a
-      result
+      result.  The game sets BCR to 0xFA1501C4: MEM3 (ROM and I/O) accesses
+      take 11 cycles plus 1 hold cycle, where the other games in this
+      driver use 8.  The Hyperstone core does not emulate memory access
+      latency.  An FPGA implementation that adds these access times runs
+      the game at a speed that looks right, but it has not been compared
+      with a PCB.
 
 -----------------------------------------------------------------------------
  Game Issues (unknown):

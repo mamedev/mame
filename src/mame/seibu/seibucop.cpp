@@ -128,13 +128,13 @@
 DEFINE_DEVICE_TYPE(RAIDEN2COP, raiden2cop_device, "raiden2cop", "Seibu COP (Raiden 2)")
 DEFINE_DEVICE_TYPE(SEIBUCOP_V1, seibucop_v1_device, "seibucop_v1", "Seibu COP (Seibu Cup Soccer)")
 
-raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: raiden2cop_device(mconfig, RAIDEN2COP, tag, owner, clock, false)
+raiden2cop_device::raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	raiden2cop_device(mconfig, RAIDEN2COP, tag, owner, clock, false)
 {
 }
 
-raiden2cop_device::raiden2cop_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool cupsoc)
-	: device_t(mconfig, type, tag, owner, clock),
+raiden2cop_device::raiden2cop_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool cupsoc) :
+	device_t(mconfig, type, tag, owner, clock),
 	cop_latch_addr(0),
 	cop_latch_trigger(0),
 	cop_latch_value(0),
@@ -201,8 +201,8 @@ raiden2cop_device::raiden2cop_device(const machine_config &mconfig, device_type 
 	memset(cop_regs, 0, sizeof(uint32_t)*8);
 }
 
-seibucop_v1_device::seibucop_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: raiden2cop_device(mconfig, SEIBUCOP_V1, tag, owner, clock, true)
+seibucop_v1_device::seibucop_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	raiden2cop_device(mconfig, SEIBUCOP_V1, tag, owner, clock, true)
 {
 }
 

@@ -422,8 +422,8 @@ ROM_START( perlacrb )
 	ROM_IGNORE(                                                                         0x0000100 )
 
 	// Reels PCB 2000401-3
-	ROM_REGION( 0x2000, "reels", 0 )
-	ROM_LOAD( "pic16f76.u11", 0x0000, 0x2000, NO_DUMP ) // 8KB internal ROM, undumped
+	ROM_REGION16_LE( 0x4010, "reels", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16f76.u11", 0x0000, 0x4010, NO_DUMP )
 
 	ROM_REGION( 0x800, "eeprom", 0 )
 	ROM_LOAD( "24lc16b.u10", 0x000, 0x800, CRC(554805fa) SHA1(a79a1617c70e02d8100e6f38062a9aa15141c73c) )
@@ -558,13 +558,15 @@ ROM_START( gladiador )
 	ROM_LOAD( "pat_063-1.u6", 0x000, 0x117, BAD_DUMP CRC(39e107c6) SHA1(bb151d9085d81233854a91b1a95c4abae9bd597b) ) // "PAT-063/1", protected, dump from "eurbingo7"
 
 	// Two reels PCBs 615092000401-3
-	ROM_REGION( 0x2000, "reels", 0)
-	ROM_LOAD( "pic16f76_lower.u11", 0x000, 0x2000, NO_DUMP ) // 8KB internal ROM, undumped
-	ROM_LOAD( "pic16f76_upper.u11", 0x000, 0x2000, NO_DUMP ) // 8KB internal ROM, undumped
+	ROM_REGION16_LE( 0x4010, "reels1", ROMREGION_ERASEFF )
+	ROM_LOAD( "reels1_pic16f76.u11", 0x0000, 0x4010, NO_DUMP )
+
+	ROM_REGION16_LE( 0x4010, "reels2", ROMREGION_ERASEFF )
+	ROM_LOAD( "reels2_pic16f76.u11", 0x0000, 0x4010, NO_DUMP )
 
 	// "Lower Additional Game" PCB 615032060623-2
-	ROM_REGION( 0x4000, "lower", 0)
-	ROM_LOAD( "pic16f630.u11", 0x000, 0x4000, NO_DUMP ) // 16KB internal ROM, undumped
+	ROM_REGION16_LE( 0x4300, "lower", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16f630.u11", 0x000, 0x4300, NO_DUMP )
 ROM_END
 
 /* '61509960606-5 PCB (exactly the same as '960606-5', but with better quality connectors) and 'CB1 (CS4)' security counters module.

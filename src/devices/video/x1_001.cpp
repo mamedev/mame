@@ -398,7 +398,7 @@ void x1_001_device::draw_foreground( screen_device &screen, bitmap_ind16 &bitmap
 		if (screenflip)
 		{
 			sy = max_y - sy
-				+(screen.height() - (screen.visible_area().max_y + 1));
+				+(screen.height() - (screen.visible_area().bottom() + 1));
 			flipx = !flipx;
 			flipy = !flipy;
 		}

@@ -56,6 +56,7 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_config_complete() override;
 
@@ -81,6 +82,7 @@ private:
 	int calc_cs(offs_t address) const;
 	int get_timer_index(mc68340_timer_module_device *timer) { return (timer == m_timer[0].target()) ? 0 : 1; }
 	bool is_mbar_access(offs_t address) const;
+	void remap_internal_modules();
 
 	int m_currentcs;
 	uint32_t m_clock_mode;
@@ -112,6 +114,7 @@ private:
 	m68340_sim*    m_m68340SIM;
 
 	uint32_t m_m68340_base;
+	uint32_t m_mapped_base;
 
 	emu_timer *m_irq_timer;
 

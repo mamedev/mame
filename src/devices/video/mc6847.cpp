@@ -660,7 +660,33 @@ mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_typ
 	set_palette(s_palette);
 }
 
+void mc6847_base_device::change_mode(uint8_t mode, int state)
+{
+	// sanity check, to ensure that we're not changing fixed modes
+	// i.e. client shouldn't use set_fixed_mode bits on live setups
+	assert((mode & m_fixed_mode_mask) == 0);
 
+	// calculate new mode
+	uint8_t new_mode;
+	if (state)
+		new_mode = m_mode | mode;
+	else
+		new_mode = m_mode & ~mode;
+
+	// has the mode changed?
+	if (new_mode != m_mode)
+	{
+		// it has!  check dirty flag
+		video_flush();
+		if (!m_dirty)
+		{
+			m_dirty = true;
+		}
+
+		// and set the new mode
+		m_mode = new_mode;
+	}
+}
 
 //-------------------------------------------------
 //  setup_fixed_mode - sets up fixed mode mask
@@ -987,10 +1013,10 @@ uint32_t mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &
 {
 	int base_x = BMP_L_OR_R_BORDER;
 	int base_y = m_lines_top_border;
-	int min_x = USE_HORIZONTAL_CLIP ? cliprect.min_x : 0;
-	int max_x = USE_HORIZONTAL_CLIP ? cliprect.max_x : (base_x * 2 + BMP_ACTIVE_VIDEO - 1);
-	int min_y = cliprect.min_y;
-	int max_y = cliprect.max_y;
+	int min_x = USE_HORIZONTAL_CLIP ? cliprect.left() : 0;
+	int max_x = USE_HORIZONTAL_CLIP ? cliprect.right() : (base_x * 2 + BMP_ACTIVE_VIDEO - 1);
+	int min_y = cliprect.top();
+	int max_y = cliprect.bottom();
 	const pixel_t *palette = m_palette;
 
 	/* if the video didn't change, indicate as much */

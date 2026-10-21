@@ -284,7 +284,7 @@ void ngp_state::io_w(offs_t offset, uint8_t data)
 		break;
 	case 0x20:  // t6w28 "right"
 	case 0x21:  // t6w28 "left"
-		if (m_io_reg[0x38] == 0x55 && m_io_reg[0x39] == 0xAA)
+		if (m_io_reg[0x38] == 0x55 && m_io_reg[0x39] == 0xaa)
 			m_t6w28->write(0, data);
 		break;
 
@@ -304,7 +304,7 @@ void ngp_state::io_w(offs_t offset, uint8_t data)
 		case 0x55:  // Enabled sound
 			m_t6w28->set_enable(true);
 			break;
-		case 0xAA:  // Disable sound
+		case 0xaa:  // Disable sound
 			m_t6w28->set_enable(false);
 			break;
 		}
@@ -318,7 +318,7 @@ void ngp_state::io_w(offs_t offset, uint8_t data)
 			m_z80->reset();
 			m_z80->set_input_line(0, CLEAR_LINE);
 			break;
-		case 0xAA:  // Disable Z80
+		case 0xaa:  // Disable Z80
 			m_z80->suspend(SUSPEND_REASON_HALT, 1);
 			break;
 		}
@@ -437,7 +437,7 @@ template <int Which> void ngp_state::flash_w(offs_t offset, uint8_t data)
 					}
 					break;
 				}
-				memset(block, 0xFF, size);
+				memset(block, 0xff, size);
 			}
 			else
 				m_flash_chip[Which].state = F_READ;
@@ -737,7 +737,7 @@ void ngp_state::machine_reset()
 
 	if (m_nvram_loaded)
 	{
-		m_maincpu->set_state_int(TLCS900_PC, 0xFF1800);
+		m_maincpu->set_state_int(tlcs900_device::TLCS900_PC, 0xff1800);
 	}
 }
 

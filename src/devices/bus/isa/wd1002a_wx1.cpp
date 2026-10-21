@@ -101,8 +101,8 @@ void isa8_wd1002a_wx1_device::device_add_mconfig(machine_config &config)
 	m_hdc->in_data_callback().set(m_mcu, FUNC(wd1015_device::hdc_data_r));
 	m_hdc->out_data_callback().set(m_mcu, FUNC(wd1015_device::hdc_data_w));
 
-	HARDDISK(config, "hdc:0", 0);
-	HARDDISK(config, "hdc:1", 0);
+	HARDDISK(config, "hdc:0", "st_hdd");
+	HARDDISK(config, "hdc:1", "st_hdd");
 
 	WD1015(config, m_mcu, 0);
 	m_mcu->set_host(*m_host);

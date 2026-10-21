@@ -6192,14 +6192,12 @@ void m68000_musashi_device::xebd0_bfexts_l_ai_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6235,14 +6233,12 @@ void m68000_musashi_device::xebe8_bfexts_l_di_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6278,14 +6274,12 @@ void m68000_musashi_device::xebf0_bfexts_l_ix_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6321,14 +6315,12 @@ void m68000_musashi_device::xebf8_bfexts_l_aw_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6364,14 +6356,12 @@ void m68000_musashi_device::xebf9_bfexts_l_al_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6407,14 +6397,12 @@ void m68000_musashi_device::xebfa_bfexts_l_pcdi_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6450,14 +6438,12 @@ void m68000_musashi_device::xebfb_bfexts_l_pcix_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6520,14 +6506,12 @@ void m68000_musashi_device::xe9d0_bfextu_l_ai_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6562,14 +6546,12 @@ void m68000_musashi_device::xe9e8_bfextu_l_di_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6604,14 +6586,12 @@ void m68000_musashi_device::xe9f0_bfextu_l_ix_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6646,14 +6626,12 @@ void m68000_musashi_device::xe9f8_bfextu_l_aw_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6688,14 +6666,12 @@ void m68000_musashi_device::xe9f9_bfextu_l_al_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6730,14 +6706,12 @@ void m68000_musashi_device::xe9fa_bfextu_l_pcdi_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6772,14 +6746,12 @@ void m68000_musashi_device::xe9fb_bfextu_l_pcix_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -6856,8 +6828,8 @@ void m68000_musashi_device::xedd0_bfffo_l_ai_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (local_offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(local_offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -6901,8 +6873,8 @@ void m68000_musashi_device::xede8_bfffo_l_di_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (local_offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(local_offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -6946,8 +6918,8 @@ void m68000_musashi_device::xedf0_bfffo_l_ix_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (local_offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(local_offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -6991,8 +6963,8 @@ void m68000_musashi_device::xedf8_bfffo_l_aw_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (local_offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(local_offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -7036,8 +7008,8 @@ void m68000_musashi_device::xedf9_bfffo_l_al_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (local_offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(local_offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -7081,8 +7053,8 @@ void m68000_musashi_device::xedfa_bfffo_l_pcdi_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (local_offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(local_offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -7126,8 +7098,8 @@ void m68000_musashi_device::xedfb_bfffo_l_pcix_234fc()
 	}
 	width = ((width-1) & 31) + 1;
 
-	data = (offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
-			(offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
+	data = (local_offset+width) <= 8 ? (m68ki_read_8(ea) << 24) :
+			(local_offset+width) <= 16 ? (m68ki_read_16(ea) << 16) : m68ki_read_32(ea);
 	data = MASK_OUT_ABOVE_32(data<<local_offset);
 
 	if((local_offset+width) > 32)
@@ -7200,14 +7172,12 @@ void m68000_musashi_device::xefd0_bfins_l_ai_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -7262,14 +7232,12 @@ void m68000_musashi_device::xefe8_bfins_l_di_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -7324,14 +7292,12 @@ void m68000_musashi_device::xeff0_bfins_l_ix_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -7386,14 +7352,12 @@ void m68000_musashi_device::xeff8_bfins_l_aw_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -7448,14 +7412,12 @@ void m68000_musashi_device::xeff9_bfins_l_al_234fc()
 	if(BIT_5(word2))
 		width = REG_D()[width&7];
 
-	if(BIT_B(word2)) {
-		/* Offset is signed so we have to use ugly math =( */
-		ea += offset / 8;
-		offset %= 8;
-		if(offset < 0) {
-			offset += 8;
-			ea--;
-		}
+	/* Offset is signed so we have to use ugly math =( */
+	ea += offset / 8;
+	offset %= 8;
+	if(offset < 0) {
+		offset += 8;
+		ea--;
 	}
 	width = ((width-1) & 31) + 1;
 
@@ -27291,7 +27253,32 @@ void m68000_musashi_device::x4e73_rte_l_71()
 	}
 
 }
-void m68000_musashi_device::x4e73_rte_l_234fc()
+void m68000_musashi_device::x4e73_rte_l_c()
+{
+	if (m_s_flag)
+	{
+		u32 const frame = m68ki_read_32(REG_A()[7]);
+		if ((frame >> 28) >= 4 && (frame >> 28) <= 7)
+		{
+			u32 const new_pc = m68ki_read_32(REG_A()[7] + 4);
+			REG_A()[7] += 8 + ((frame >> 28) & 3);
+			m68ki_jump(new_pc);
+			m68ki_set_sr(frame & 0xffff);
+			m_instr_mode = INSTRUCTION_YES;
+			m_run_mode = RUN_MODE_NORMAL;
+		}
+		else
+		{
+			m68ki_exception_format_error();
+		}
+	}
+	else
+	{
+		m68ki_exception_privilege_violation();
+	}
+
+}
+void m68000_musashi_device::x4e73_rte_l_234f()
 {
 	if(m_s_flag) {
 		u32 new_sr;
@@ -33746,7 +33733,8 @@ const m68000_musashi_device::opcode_handler_ptr m68000_musashi_device::m68k_hand
 	&m68000_musashi_device::x4e72_stop_071234fc,
 	&m68000_musashi_device::x4e73_rte_l_0,
 	&m68000_musashi_device::x4e73_rte_l_71,
-	&m68000_musashi_device::x4e73_rte_l_234fc,
+	&m68000_musashi_device::x4e73_rte_l_c,
+	&m68000_musashi_device::x4e73_rte_l_234f,
 	&m68000_musashi_device::x4e74_rtd_l_1234fc,
 	&m68000_musashi_device::x4e75_rts_l_071234fc,
 	&m68000_musashi_device::x4e76_trapv_071234fc,
@@ -35346,7 +35334,7 @@ const m68000_musashi_device::opcode_handler_struct m68000_musashi_device::m68k_o
 	{ 0x50e8, 0xfff8, { 16,  22,  16,  11,  10,  11,  11,   6}},
 	{ 0x50f0, 0xfff8, { 18,  24,  18,  13,  12,  13,  13,   6}},
 	{ 0x51c0, 0xfff8, {  4,  13,   4,   4,   4,   4,   4,   4}},
-	{ 0x51c8, 0xfff8, { 12,  14,  10,   6,   4,   4,   4,   4}},
+	{ 0x51c8, 0xfff8, { 12,  14,  10,   6,   6,   4,   4,   4}},
 	{ 0x51d0, 0xfff8, { 12,  18,  12,  10,   9,  10,  10,   6}},
 	{ 0x51d8, 0xfff8, { 12,  18,  12,  10,   9,  10,  10,   6}},
 	{ 0x51e0, 0xfff8, { 14,  20,  14,  11,  10,  11,  11,   6}},
@@ -35834,7 +35822,8 @@ const m68000_musashi_device::opcode_handler_struct m68000_musashi_device::m68k_o
 	{ 0x4e72, 0xffff, {  4,  13,   4,   8,   8,   8,   8,   8}},
 	{ 0x4e73, 0xffff, { 20, 255, 255, 255, 255, 255, 255, 255}},
 	{ 0x4e73, 0xffff, {255,  39,  24, 255, 255, 255, 255, 255}},
-	{ 0x4e73, 0xffff, {255, 255, 255,  20,  20,  20,  20,  20}},
+	{ 0x4e73, 0xffff, {255, 255, 255, 255, 255, 255, 255,  14}},
+	{ 0x4e73, 0xffff, {255, 255, 255,  20,  20,  20,  20, 255}},
 	{ 0x4e74, 0xffff, {255, 255,  16,  10,  10,  10,  10,  10}},
 	{ 0x4e75, 0xffff, { 16,  15,  16,  10,  10,  10,  10,  10}},
 	{ 0x4e76, 0xffff, {  4,  10,   4,   4,   4,   4,   4,   4}},

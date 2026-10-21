@@ -9,6 +9,7 @@ license:CC0-1.0
 		<description>SD2IEC</description>
 		<year>2013</year>
 		<publisher>NBLA000</publisher>
+		<sharedfeat name="iec8_default" value="sd2iec"/>
 
 		<!-- 16GB FAT32 disk with CBM-FileBrowser v1.6 -->
 		<part name="card" interface="sdcard">

@@ -78,9 +78,9 @@ void cmd_hd_device::mem_map(address_map &map)
 	m_ram_view[0](0x4000, 0x7fff).lr8(NAME([this](offs_t offset) { return m_ram[0xc000 | offset]; })).lw8(NAME([this](offs_t offset, uint8_t data) { m_ram[0xc000 + offset] = data; }));
 	m_ram_view[1](0x4000, 0x7fff).lr8(NAME([this](offs_t offset) { return m_ram[0x4000 | offset]; })).lw8(NAME([this](offs_t offset, uint8_t data) { m_ram[0x4000 + offset] = data; }));
 	map(0x8000, 0xffff).lr8(NAME([this](offs_t offset) { return m_ram[0x8000 + offset]; })).lw8(NAME([this](offs_t offset, uint8_t data) { if (m_wpram) m_ram[0x8000 + offset] = data; }));
-	map(0x8000, 0x800f).mirror(0x1f0).m(m_via0, FUNC(via6522_device::map));
+	map(0x8000, 0x800f).mirror(0x1f0).r(FUNC(cmd_hd_device::via0_r)).w(m_via0, FUNC(via6522_device::write));
 	map(0x8400, 0x840f).mirror(0x1f0).m(m_via1, FUNC(via6522_device::map));
-	map(0x8800, 0x8803).mirror(0x1fc).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x8800, 0x8803).mirror(0x1fc).rw(FUNC(cmd_hd_device::ppi_r), FUNC(cmd_hd_device::ppi_w));
 	map(0x8c00, 0x8c0f).mirror(0x1f0).rw(m_rtc, FUNC(rtc72421_device::read), FUNC(rtc72421_device::write));
 	map(0x8e00, 0x8eff).lw8(NAME([this](offs_t offset, uint8_t data) { m_ram[0x8e00 + offset] = data; }));
 	map(0x8f00, 0x8fff).lw8(NAME([this](offs_t offset, uint8_t data) { ttl_w(data); m_ram[0x8f00 + offset] = data; }));
@@ -129,6 +129,14 @@ void cmd_hd_device::via0_pa_w(uint8_t data)
 	*/
 
 	m_sb_reset_ena = BIT(data, 5);
+}
+
+uint8_t cmd_hd_device::via0_r(offs_t offset)
+{
+	if (!offset && !m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
+	return m_via0->read(offset);
 }
 
 uint8_t cmd_hd_device::via0_pb_r()
@@ -180,24 +188,24 @@ void cmd_hd_device::via0_pb_w(uint8_t data)
 	m_fst_dir = BIT(data, 5);
 	m_iec_atn = BIT(data, 6);
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 void cmd_hd_device::via0_cb1_w(int state)
 {
 	m_fst_clk = state;
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 void cmd_hd_device::via0_cb2_w(int state)
 {
 	m_fst_data = state;
 
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
-TIMER_CALLBACK_MEMBER(cmd_hd_device::iec_sync_tick)
+void cmd_hd_device::update_iec()
 {
 	bool const atn = m_bus->atn_r();
 	m_via0->write_ca1(atn);
@@ -306,15 +314,30 @@ void cmd_hd_device::via1_cb2_w(int state)
 	// FORCE
 }
 
+uint8_t cmd_hd_device::ppi_r(offs_t offset)
+{
+	if (!cmdpar_sample_ready())
+		return 0xff;
+
+	return m_ppi->read(offset);
+}
+
+void cmd_hd_device::ppi_w(offs_t offset, uint8_t data)
+{
+	if (!cmdpar_sample_ready())
+		return;
+
+	m_ppi->write(offset, data);
+}
+
 uint8_t cmd_hd_device::ppi_pa_r()
 {
-	// RamLink parallel data PD0-7
-	return 0xff;
+	return cmdpar_data_r();
 }
 
 void cmd_hd_device::ppi_pa_w(uint8_t data)
 {
-	// RamLink parallel data PD0-7
+	cmdpar_data_w(data);
 }
 
 uint8_t cmd_hd_device::ppi_pb_r()
@@ -334,11 +357,16 @@ uint8_t cmd_hd_device::ppi_pb_r()
 	*/
 
 	u32 const ctrl = m_scsi_bus->ctrl_r();
+	u8 const lines = cmdpar_lines_r();
 	u8 data = 0;
 
+	if (!(lines & PRDY)) data |= 1 << 0;
 	data |= (m_pb->read() & 0x07) << 1;
 
 	if (ctrl & S_SEL) data |= 1 << 4;
+	if (!(lines & PEXT)) data |= 1 << 5;
+	if (!(lines & PCLK)) data |= 1 << 6;
+	if (!(lines & PATN)) data |= 1 << 7;
 
 	return data;
 }
@@ -364,6 +392,30 @@ void cmd_hd_device::ppi_pc_w(uint8_t data)
 	m_ram_view.select(BIT(data, 1));
 
 	m_scsi_bus->ctrl_w(m_scsi_refid, (BIT(data, 2) ? S_ATN : 0) | (BIT(data, 3) ? S_RST : 0) | (BIT(data, 4) ? S_BSY : 0), S_ATN|S_RST|S_BSY);
+
+	m_ppi_pc = data;
+
+	update_prdy(!(cmdpar_lines_r() & PATN));
+}
+
+void cmd_hd_device::cmdpar_lines_changed(u8 lines, u8 old)
+{
+	int const patn = !(lines & PATN);
+
+	if (patn && (old & PATN) && BIT(m_ppi_pc, 7))
+		m_prdy_ff = 1;
+
+	update_prdy(patn);
+}
+
+void cmd_hd_device::update_prdy(int patn)
+{
+	if (!BIT(m_ppi_pc, 7))
+		m_prdy_ff = 0;
+
+	bool const prdy = !BIT(m_ppi_pc, 7) || (patn && m_prdy_ff);
+
+	cmdpar_lines_w((prdy ? 0 : PRDY) | (BIT(m_ppi_pc, 6) ? PCLK : 0) | (BIT(m_ppi_pc, 5) ? PEXT : 0) | PATN);
 }
 
 void cmd_hd_device::ttl_w(uint8_t data)
@@ -475,6 +527,7 @@ ioport_constructor cmd_hd_device::device_input_ports() const
 cmd_hd_device::cmd_hd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CMD_HD, tag, owner, clock),
 	device_cbm_iec_interface(mconfig, *this),
+	device_cmd_parallel_interface(mconfig, *this),
 	nscsi_device_interface(mconfig, *this),
 	m_maincpu(*this, M6502_TAG),
 	m_via0(*this, M6522_1_TAG),
@@ -496,7 +549,6 @@ cmd_hd_device::cmd_hd_device(const machine_config &mconfig, const char *tag, dev
 
 void cmd_hd_device::device_start()
 {
-	m_iec_sync_timer = timer_alloc(FUNC(cmd_hd_device::iec_sync_tick), this);
 	m_ack_clear_timer = timer_alloc(FUNC(cmd_hd_device::clear_ack_tick), this);
 	
 	m_leds[LED_PWR] = 1;
@@ -515,6 +567,8 @@ void cmd_hd_device::device_start()
 	save_item(NAME(m_ack_ff));
 	save_item(NAME(m_romos));
 	save_item(NAME(m_wpram));
+	save_item(NAME(m_ppi_pc));
+	save_item(NAME(m_prdy_ff));
 }
 
 
@@ -539,7 +593,7 @@ void cmd_hd_device::device_reset()
 
 void cmd_hd_device::cbm_iec_srq(int state)
 {
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 
@@ -549,7 +603,7 @@ void cmd_hd_device::cbm_iec_srq(int state)
 
 void cmd_hd_device::cbm_iec_atn(int state)
 {
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 
@@ -559,7 +613,7 @@ void cmd_hd_device::cbm_iec_atn(int state)
 
 void cmd_hd_device::cbm_iec_data(int state)
 {
-	m_iec_sync_timer->adjust(attotime::zero);
+	update_iec();
 }
 
 

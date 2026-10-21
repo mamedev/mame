@@ -18,6 +18,8 @@
 #include "emu.h"
 #include "fdc.h"
 
+#include "softlist_dev.h"
+
 
 
 //**************************************************************************
@@ -119,6 +121,8 @@ void newbrain_fdc_device::device_add_mconfig(machine_config &config)
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":3", newbrain_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	NEWBRAIN_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/8, newbrain_expansion_cards, nullptr);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("newbrain_flop");
 }
 
 

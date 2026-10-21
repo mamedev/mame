@@ -17,7 +17,7 @@
     - a1200xl: requires reading TRIG3 high for detecting a cart inserted,
       depends on above;
     - a600xl, a1200xl: crashes on MMU test in Acid800;
-    - slot support for PBI/ECI bus;
+    - slot support for ECI bus;
     - slot support for overlay DIY HW mods:
       \- PokeyMAX
          (with stereo support via second Pokey alias accessed to $d280-$d2ff,
@@ -69,9 +69,11 @@
 #include "sound/dac.h"
 #include "sound/pokey.h"
 
-#include "bus/a800/a800_slot.h"
-#include "bus/a800/a800_carts.h"
-#include "bus/a800/a8sio.h"
+#include "bus/a800/cart/a800_slot.h"
+#include "bus/a800/cart/a800_carts.h"
+#include "bus/a800/pbi/options.h"
+#include "bus/a800/pbi/slot.h"
+#include "bus/a800/sio/a8sio.h"
 #include "bus/vcs_ctrl/ctrl.h"
 
 #include "screen.h"
@@ -287,6 +289,8 @@ public:
 	void a400(machine_config &config);
 	void a400pal(machine_config &config);
 
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_changed);
+
 protected:
 	void atari_common_nodac(machine_config &config);
 	void atari_common(machine_config &config);
@@ -381,6 +385,9 @@ public:
 
 	void a1200xl(machine_config &config);
 
+	// reset key behaviour changed in a1200xl onward
+	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_changed) override;
+
 protected:
 	void atari_xl_common(machine_config &config);
 
@@ -410,6 +417,7 @@ public:
 	a800xl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: a1200xl_state(mconfig, type, tag)
 		, m_basic_view(*this, "basic_view")
+		, m_pbi_view(*this, "pbi_view")
 	{ }
 
 	void a800xl(machine_config &config);
@@ -425,6 +433,7 @@ protected:
 	virtual void area_a000_map(address_map &map) override ATTR_COLD;
 
 	memory_view m_basic_view;
+	memory_view m_pbi_view;
 };
 
 class a600xl_state : public a800xl_state
@@ -447,6 +456,7 @@ public:
 	{ }
 
 	void a130xe(machine_config &config);
+	void a65xe(machine_config &config);
 
 private:
 	virtual void machine_reset() override ATTR_COLD;
@@ -602,6 +612,7 @@ void a800xl_state::area_a000_map(address_map &map)
 void a800xl_state::a800xl_mem(address_map &map)
 {
 	map.unmap_value_high();
+	map(0x0000, 0xffff).rw("pbi", FUNC(atari_pbi_slot_device::read), FUNC(atari_pbi_slot_device::write));
 	map(0x0000, 0x3fff).rw(FUNC(a800xl_state::ram_r<0x0000>), FUNC(a800xl_state::ram_w<0x0000>));
 	map(0x4000, 0x7fff).view(m_selftest_view);
 	selftest_map(m_selftest_view[0], false);
@@ -610,8 +621,12 @@ void a800xl_state::a800xl_mem(address_map &map)
 	area_a000_map(map);
 	map(0xc000, 0xffff).view(m_kernel_view);
 	m_kernel_view[0](0xc000, 0xffff).rw(FUNC(a800xl_state::ram_r<0xc000>), FUNC(a800xl_state::ram_w<0xc000>));
-	m_kernel_view[1](0xc000, 0xffff).rom().region("maincpu", 0xc000);
+	m_kernel_view[1](0xc000, 0xcfff).rom().region("maincpu", 0xc000);
+	m_kernel_view[1](0xd800, 0xffff).rom().region("maincpu", 0xd800);
 	map(0xd000, 0xd7ff).m(*this, FUNC(a800xl_state::hw_iomap));
+	map(0xd1ff, 0xd1ff).rw("pbi", FUNC(atari_pbi_slot_device::pdvi_r), FUNC(atari_pbi_slot_device::pdvs_w));
+	map(0xd800, 0xdfff).view(m_pbi_view);
+	m_pbi_view[0](0xd800, 0xdfff).rw("pbi", FUNC(atari_pbi_slot_device::read_d8xx), FUNC(atari_pbi_slot_device::write_d8xx));
 }
 
 // selftest ROM has still priority over regular a130xe extended RAM
@@ -713,6 +728,11 @@ Small note about natural keyboard support: currently,
 - "Clear" is mapped to 'F2'
 - "Atari" is mapped to 'F3'                         */
 
+INPUT_CHANGED_MEMBER(a400_state::reset_changed)
+{
+	// TODO: on original a400/a800 reset is tied to Antic RNMI line
+}
+
 static INPUT_PORTS_START( atari_keyboard )
 	PORT_START("keyboard.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
@@ -721,8 +741,8 @@ static INPUT_PORTS_START( atari_keyboard )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Break") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('+') PORT_CHAR('\\')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('*') PORT_CHAR('^')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('+') PORT_CHAR('\\') PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('*') PORT_CHAR('^') PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
 	PORT_START("keyboard.1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
@@ -731,8 +751,8 @@ static INPUT_PORTS_START( atari_keyboard )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('=') PORT_CHAR('|')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('-') PORT_CHAR('_') PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('=') PORT_CHAR('|') PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 
 	PORT_START("keyboard.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
@@ -797,9 +817,9 @@ static INPUT_PORTS_START( atari_keyboard )
 	PORT_START("fake")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("System Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(a400_state::reset_changed), 0)
 INPUT_PORTS_END
-
-
 
 static INPUT_PORTS_START( a800 )
 	PORT_INCLUDE( atari_artifacting )
@@ -807,8 +827,43 @@ static INPUT_PORTS_START( a800 )
 	PORT_INCLUDE( atari_keyboard )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( a1200xl )
+INPUT_CHANGED_MEMBER(a1200xl_state::reset_changed)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+
+	if (newval)
+	{
+		m_antic->reset();
+		//m_freddie->reset();
+		m_pia->reset();
+	}
+}
+
+// all models after a1200xl have an extra help key, with variable position
+// i.e. to the right on a1200xl after the Fn keys, to the left of console keys on a130xe
+static INPUT_PORTS_START( a800xl )
 	PORT_INCLUDE( a800 )
+
+	PORT_MODIFY("keyboard.2")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("HELP") PORT_CODE(KEYCODE_F8)
+
+	PORT_MODIFY("fake")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(a800xl_state::reset_changed), 0)
+INPUT_PORTS_END
+
+// function keys are exclusive to this model
+static INPUT_PORTS_START( a1200xl )
+	PORT_INCLUDE( a800xl )
+
+	// TODO: figure out how to trigger F1 (same path as break key)
+	// press help key on Atari logo to access self-test like later models
+
+	PORT_MODIFY("keyboard.0")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F5)
+
+	PORT_MODIFY("keyboard.2")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F6)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F7)
 
 	// option jumpers, available on a1200xl only
 	// J1 causes a self-test if installed
@@ -2182,6 +2237,14 @@ void a800xl_state::a800xl(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &a800xl_state::a800xl_mem);
 
+	atari_pbi_slot_device &slot(ATARI_PBI_SLOT(config, "pbi", atari_pbi_options, nullptr));
+	slot.mpd_handler().set([this] (int state) {
+		if (state)
+			m_pbi_view.select(0);
+		else
+			m_pbi_view.disable();
+	});
+
 	m_ram->set_default_size("64K");
 }
 
@@ -2209,7 +2272,7 @@ void a800xl_state::a800xlpal(machine_config &config)
 // memory map A130XE
 void a130xe_state::a130xe(machine_config &config)
 {
-	a800xl(config);
+	atari_xl_common(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &a130xe_state::a130xe_mem);
 
@@ -2219,10 +2282,17 @@ void a130xe_state::a130xe(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_ext_bank).set_map(&a130xe_state::extram_map).set_options(ENDIANNESS_LITTLE, 8, 16 + 1, 0x4000);
 }
 
+void a130xe_state::a65xe(machine_config &config)
+{
+	a130xe(config);
+
+	m_ram->set_default_size("64K");
+}
+
 // memory map XEGS
 void xegs_state::xegs(machine_config &config)
 {
-	a800xl(config);
+	atari_xl_common(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &xegs_state::xegs_mem);
 
@@ -2427,19 +2497,22 @@ ROM_END
  **************************************************************/
 
 /*     YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   CLASS       INIT        COMPANY  FULLNAME */
-COMP( 1979, a400,    0,      0,      a400,      a800,   a400_state,   empty_init, "Atari", "Atari 400 (NTSC)",     0)
-COMP( 1979, a400pal, a400,   0,      a400pal,   a800,   a400_state,   empty_init, "Atari", "Atari 400 (PAL)",      0)
-COMP( 1979, a800,    0,      0,      a800,      a800,   a800_state,   empty_init, "Atari", "Atari 800 (NTSC)",     0)
-COMP( 1979, a800pal, a800,   0,      a800pal,   a800,   a800_state,   empty_init, "Atari", "Atari 800 (PAL)",      0)
-COMP( 1982, a1200xl, a800,   0,      a1200xl,   a1200xl,a1200xl_state, empty_init, "Atari", "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
-COMP( 1983, a600xl,  a800xl, 0,      a600xl,    a800,   a600xl_state, empty_init, "Atari", "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM
-COMP( 1983, a800xl,  0,      0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1983, a800xlp, a800xl, 0,      a800xlpal, a800,   a800xl_state, empty_init, "Atari", "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1986, a65xe,   a800xl, 0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 65XE",           MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1986, a65xea,  a800xl, 0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 65XE (Arabic)",  MACHINE_NOT_WORKING )
-COMP( 1986, a130xe,  a800xl, 0,      a130xe,    a800,   a130xe_state, empty_init, "Atari", "Atari 130XE",          MACHINE_NOT_WORKING )      // 128k RAM
-COMP( 1986, a800xe,  a800xl, 0,      a800xl,    a800,   a800xl_state, empty_init, "Atari", "Atari 800XE",          MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP( 1987, xegs,    0,      0,      xegs,      a800,   xegs_state,   empty_init, "Atari", "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS )  // 64k RAM
+COMP( 1979, a400,    0,      0,      a400,      a800,    a400_state,   empty_init, "Atari", "Atari 400 (NTSC)",     0)
+COMP( 1979, a400pal, a400,   0,      a400pal,   a800,    a400_state,   empty_init, "Atari", "Atari 400 (PAL)",      0)
+COMP( 1979, a800,    0,      0,      a800,      a800,    a800_state,   empty_init, "Atari", "Atari 800 (NTSC)",     0)
+COMP( 1979, a800pal, a800,   0,      a800pal,   a800,    a800_state,   empty_init, "Atari", "Atari 800 (PAL)",      0)
+COMP( 1982, a1200xl, a800,   0,      a1200xl,   a1200xl, a1200xl_state,empty_init, "Atari", "Atari 1200XL",         MACHINE_NOT_WORKING ) // 64k RAM, no PBI slot
 
-CONS( 1982, a5200,   0,      0,      a5200,     a5200,  a5200_state,  empty_init, "Atari", "Atari 5200",           0)
-CONS( 1983, a5200a,  a5200,  0,      a5200a,    a5200a, a5200_state,  empty_init, "Atari", "Atari 5200 (2-port)",  0)
+COMP( 1983, a800xl,  0,      0,      a800xl,    a800xl,  a800xl_state, empty_init, "Atari", "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS ) // 64k RAM, 1 PBI slot
+COMP( 1983, a800xlp, a800xl, 0,      a800xlpal, a800xl,  a800xl_state, empty_init, "Atari", "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS ) // 64k RAM, 1 PBI slot
+COMP( 1983, a600xl,  a800xl, 0,      a600xl,    a800xl,  a600xl_state, empty_init, "Atari", "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS ) // 16k RAM, 1 PBI slot
+
+COMP( 1985, a130xe,  0,      0,      a130xe,    a800xl,  a130xe_state, empty_init, "Atari", "Atari 130XE",          MACHINE_NOT_WORKING ) // 128k RAM, 1 ECI slot
+COMP( 1985, a65xe,   a130xe, 0,      a65xe,     a800xl,  a130xe_state, empty_init, "Atari", "Atari 65XE",           MACHINE_IMPERFECT_GRAPHICS ) // 64k RAM, 0 or 1 ECI slot (NTSC/PAL?)
+COMP( 1985, a65xea,  a130xe, 0,      a65xe,     a800xl,  a130xe_state, empty_init, "Atari", "Atari 65XE (Arabic)",  MACHINE_NOT_WORKING ) // ^ 1 ECI slot
+COMP( 1987, a800xe,  a130xe, 0,      a65xe,     a800xl,  a130xe_state, empty_init, "Atari", "Atari 800XE",          MACHINE_IMPERFECT_GRAPHICS ) // 64k RAM, 0 or 1 ECI slot, rebranded 65XE for Central Europe market
+
+COMP( 1987, xegs,    0,      0,      xegs,      a800xl,  xegs_state,   empty_init, "Atari", "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS ) // 64k RAM, no ECI slot
+
+CONS( 1982, a5200,   0,      0,      a5200,     a5200,   a5200_state,  empty_init, "Atari", "Atari 5200",           0)
+CONS( 1983, a5200a,  a5200,  0,      a5200a,    a5200a,  a5200_state,  empty_init, "Atari", "Atari 5200 (2-port)",  0)

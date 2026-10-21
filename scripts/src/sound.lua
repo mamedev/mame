@@ -79,6 +79,20 @@ end
 
 
 ---------------------------------------------------
+-- Zero-crossing comparator for line-level audio
+--@src/devices/sound/zcross.h,SOUNDS["ZCROSS"] = true
+---------------------------------------------------
+
+if SOUNDS["ZCROSS"] then
+	files {
+		MAME_DIR .. "src/devices/sound/zcross.cpp",
+		MAME_DIR .. "src/devices/sound/zcross.h",
+	}
+end
+
+
+
+---------------------------------------------------
 -- Discrete component audio
 --@src/devices/sound/discrete.h,SOUNDS["DISCRETE"] = true
 ---------------------------------------------------
@@ -242,6 +256,18 @@ if SOUNDS["CEM3360"] then
 	files {
 		MAME_DIR .. "src/devices/sound/cem3360.cpp",
 		MAME_DIR .. "src/devices/sound/cem3360.h",
+	}
+end
+
+---------------------------------------------------
+-- CEM 3372 uP-controllable signal processor chip
+--@src/devices/sound/cem3372.h,SOUNDS["CEM3372"] = true
+---------------------------------------------------
+
+if SOUNDS["CEM3372"] then
+	files {
+		MAME_DIR .. "src/devices/sound/cem3372.cpp",
+		MAME_DIR .. "src/devices/sound/cem3372.h",
 	}
 end
 
@@ -656,6 +682,32 @@ if SOUNDS["MB87077"] then
 end
 
 
+---------------------------------------------------
+-- Fujitsu MB87126 reverb DSP
+--@src/devices/sound/mb87126.h,SOUNDS["MB87126"] = true
+---------------------------------------------------
+
+if SOUNDS["MB87126"] then
+	files {
+		MAME_DIR .. "src/devices/sound/mb87126.cpp",
+		MAME_DIR .. "src/devices/sound/mb87126.h",
+	}
+end
+
+
+
+---------------------------------------------------
+-- Fujitsu MB654119 chorus gate array
+--@src/devices/sound/mb654119.h,SOUNDS["MB654119"] = true
+---------------------------------------------------
+
+if SOUNDS["MB654119"] then
+	files {
+		MAME_DIR .. "src/devices/sound/mb654119.cpp",
+		MAME_DIR .. "src/devices/sound/mb654119.h",
+	}
+end
+
 
 ---------------------------------------------------
 -- Micronas DAC 3550A Stereo Audio DAC
@@ -1027,15 +1079,6 @@ if SOUNDS["SID6581"]~=null or SOUNDS["SID8580"] then
 	files {
 		MAME_DIR .. "src/devices/sound/mos6581.cpp",
 		MAME_DIR .. "src/devices/sound/mos6581.h",
-		MAME_DIR .. "src/devices/sound/sid.cpp",
-		MAME_DIR .. "src/devices/sound/sid.h",
-		MAME_DIR .. "src/devices/sound/sidenvel.cpp",
-		MAME_DIR .. "src/devices/sound/sidenvel.h",
-		MAME_DIR .. "src/devices/sound/sidvoice.cpp",
-		MAME_DIR .. "src/devices/sound/sidvoice.h",
-		MAME_DIR .. "src/devices/sound/side6581.h",
-		MAME_DIR .. "src/devices/sound/sidw6581.h",
-		MAME_DIR .. "src/devices/sound/sidw8580.h",
 	}
 end
 
@@ -1842,6 +1885,19 @@ if SOUNDS["ROLANDLP"] then
 	files {
 		MAME_DIR .. "src/devices/sound/roland_lp.cpp",
 		MAME_DIR .. "src/devices/sound/roland_lp.h",
+	}
+end
+
+---------------------------------------------------
+-- Roland RPP-324 RDAC phrase player
+--@src/devices/sound/roland_rpp324.h,SOUNDS["ROLANDRPP324"] = true
+---------------------------------------------------
+
+if SOUNDS["ROLANDRPP324"] then
+	files {
+		MAME_DIR .. "src/devices/sound/roland_rpp324.cpp",
+		MAME_DIR .. "src/devices/sound/roland_rpp324.h",
+		MAME_DIR .. "src/devices/sound/roland_rpp324_codec.h",
 	}
 end
 
