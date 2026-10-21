@@ -183,6 +183,9 @@ void hardbox_device::hardbox_io(address_map &map)
 
 uint8_t hardbox_device::ppi0_pa_r()
 {
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
 	return m_bus->dio_r() ^ 0xff;
 }
 
@@ -208,6 +211,9 @@ uint8_t hardbox_device::ppi0_pc_r()
 
 uint8_t hardbox_device::ppi1_pa_r()
 {
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
 	/*
 
 	  bit     description

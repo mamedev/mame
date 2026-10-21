@@ -157,6 +157,9 @@ void softbox_device::softbox_io(address_map &map)
 
 uint8_t softbox_device::ppi0_pa_r()
 {
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
 	return m_bus->dio_r() ^ 0xff;
 }
 
@@ -171,6 +174,9 @@ void softbox_device::ppi0_pb_w(uint8_t data)
 
 uint8_t softbox_device::ppi1_pa_r()
 {
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
 	/*
 
 	  bit     description
