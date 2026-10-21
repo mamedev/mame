@@ -27,6 +27,8 @@
 #include "video/i8275.h"
 #include "screen.h"
 
+#include <iterator>
+
 
 namespace {
 
@@ -130,8 +132,10 @@ void z29_state::machine_reset()
 {
 	// with nothing connected, pull-ups R404 and R401 hold the handshake inputs asserted
 	for (int i = 0; i < 2; i++)
+	{
 		if (!m_serial[i]->get_card_device())
 			m_cts[i] = false;
+	}
 
 	// p1_w only passes on changes, so bring the outputs in line with the latch
 	m_keyboard->keyout_w(!BIT(m_p1, 0));
@@ -218,8 +222,13 @@ void z29_state::update_txd()
  * The CRTC is programmed for one character per buffer load with no delay, so
  * BRDY drops for a moment after each character written. The firmware fills a
  * row with two characters per machine cycle, and the 8031 only samples /INT0
- * once a cycle, so it sees a single request per row. Hold INT0 for the whole
- * row so the glitches don't latch extra interrupts.
+ * once a cycle, so it sees a single request per row.
+ *
+ * HACK: the MCS-51 core latches every falling edge on INT0 instead of
+ * sampling the pin once per machine cycle, so INT0 is held for the whole row
+ * (ROW_CHARS fetches) to keep the glitches from latching extra interrupts. If
+ * a row is cut short, crtc_irq_w releases the hold at the frame interrupt.
+ * This can go once the CPU core models INT0 sampling.
  */
 void z29_state::brdy_w(int state)
 {
@@ -316,10 +325,12 @@ I8275_DRAW_CHARACTER_MEMBER(z29_state::draw_character)
 	using namespace i8275_attributes;
 
 	// P1.2 blanks everything, for the screen saver and the unused rows at 50 Hz
+	u32 *const pix = &bitmap.pix(y, x);
+
 	if (BIT(m_p1, 2))
 	{
 		for (int i = 0; i < 8; i++)
-			bitmap.pix(y, x + i) = rgb_t::black();
+			pix[i] = rgb_t::black();
 		return;
 	}
 
@@ -344,7 +355,7 @@ I8275_DRAW_CHARACTER_MEMBER(z29_state::draw_character)
 	rgb_t const on = BIT(attr, 3) ? rgb_t(0x00, 0x80, 0x00) : rgb_t(0x00, 0xff, 0x00);
 
 	for (int i = 0; i < 8; i++)
-		bitmap.pix(y, x + i) = BIT(gfx, 7 - i) ? on : rgb_t::black();
+		pix[i] = BIT(gfx, 7 - i) ? on : rgb_t::black();
 }
 
 void z29_state::prg_map(address_map &map)
@@ -435,7 +446,7 @@ ROM_END
  */
 void z29_state::init_z29()
 {
-	static constexpr u8 setup[15] = {
+	static constexpr u8 SETUP[15] = {
 		0xc8,   // 25h: full duplex, on line, auto wrap, space parity
 		0x9c,   // 26h: status line, auto repeat, key click, underline cursor
 		0x0a,   // 27h: software handshake, main port, screen saver, 60 Hz, blinking cursor
@@ -445,11 +456,11 @@ void z29_state::init_z29()
 
 	u8 *const nvram = memregion("nvram")->base();
 	u8 sum = 0;
-	for (unsigned i = 0; i < std::size(setup); i++)
+	for (unsigned i = 0; i < std::size(SETUP); i++)
 	{
-		nvram[i * 2] = setup[i] >> 4;
-		nvram[i * 2 + 1] = setup[i] & 0x0f;
-		sum += setup[i];
+		nvram[i * 2] = SETUP[i] >> 4;
+		nvram[i * 2 + 1] = SETUP[i] & 0x0f;
+		sum += SETUP[i];
 	}
 	nvram[30] = sum >> 4;
 	nvram[31] = sum & 0x0f;
