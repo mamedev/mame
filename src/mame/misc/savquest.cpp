@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Peter Ferrie
+// copyright-holders:R. Belmont, Peter Ferrie, Matt Munroe
 /***************************************************************************
 
     savquest.cpp
