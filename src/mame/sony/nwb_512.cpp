@@ -181,7 +181,7 @@ void nwb_512_device::check_mem_mask(uint16_t mem_mask)
 	if (mem_mask != 0xffff)
 	{
 		// Registers are 16-bit. Log this just in case to chase down issues later.
-		LOG("%s unexpected non-word write!", machine().describe_context());
+		logerror("%s unexpected non-word access with mem mask 0x%x!\n", machine().describe_context(), mem_mask);
 	}
 }
 
