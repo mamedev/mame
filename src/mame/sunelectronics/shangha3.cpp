@@ -1092,9 +1092,6 @@ void shangha3_state::init_shangha3()
 void heberpop_state::init_heberpop()
 {
 	m_do_shadows = 0;
-
-	// sound CPU runs in IM 0
-	m_audiocpu->set_input_line_vector(0, 0xff);  // Z80 - RST 38h
 }
 
 void blocken_state::init_blocken()

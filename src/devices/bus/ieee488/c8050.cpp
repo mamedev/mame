@@ -830,6 +830,7 @@ void c8050_device::device_start()
 	save_item(NAME(m_rfdo));
 	save_item(NAME(m_daco));
 	save_item(NAME(m_atna));
+	save_item(NAME(m_ifc));
 }
 
 

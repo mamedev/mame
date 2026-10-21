@@ -22,11 +22,9 @@ public:
 	// construction/destruction
 	iq151_video32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-
 protected:
-	// device-level overrides
+	// device_t implementation
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -36,12 +34,12 @@ protected:
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:
-	required_region_ptr<uint8_t> m_videoram;
+	memory_share_creator<uint8_t> m_videoram;
 	required_region_ptr<uint8_t> m_chargen;
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(IQ151_VIDEO32, iq151_video32_device)
 
 #endif // MAME_BUS_IQ151_VIDEO32_H

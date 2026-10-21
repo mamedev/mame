@@ -232,13 +232,14 @@ uint32_t dfs500_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		double stepx = double (input_bitmap.width()) / VIDEO_WIDTH;
 		double stepy = double (input_bitmap.height()) / VIDEO_HEIGHT;
 
-		for (unsigned screen_y = screen.visible_area().min_y; screen_y <= screen.visible_area().max_y; screen_y++)
+		for (unsigned screen_y = screen.visible_area().top(); screen_y <= screen.visible_area().bottom(); screen_y++)
 		{
-			for (unsigned screen_x = screen.visible_area().min_x; screen_x <= screen.visible_area().max_x; screen_x++)
+			auto *const dst = &bitmap.pix(screen_y);
+			for (unsigned screen_x = screen.visible_area().left(); screen_x <= screen.visible_area().right(); screen_x++)
 			{
-				bitmap.pix(screen_y, screen_x) = input_bitmap.pix(
-					int(double (screen_y % VIDEO_HEIGHT) * stepy),
-					int(double (screen_x % VIDEO_WIDTH) * stepx));
+				dst[screen_x] = input_bitmap.pix(
+						int(double(screen_y % VIDEO_HEIGHT) * stepy),
+						int(double(screen_x % VIDEO_WIDTH) * stepx));
 			}
 		}
 	}

@@ -5,6 +5,19 @@ license:CC0-1.0
 -->
 <softwarelist name="rtpc" description="IBM RT PC software">
 
+	<software name="sautil">
+		<description>4.3 BSD UNIX Standalone Maintenance Program Revision 12.0</description>
+		<year>1988</year>
+		<publisher>IBM</publisher>
+		<info name="usage" value="Use this utility to create/update hard disk configuration records, required before VRM/AIX will recognize a blank hard disk. When the main menu is displayed, use option 2 (format), enter &quot;hd(0,2)&quot; for the device, and respond &quot;y&quot; at the &quot;Change defaults?&quot; prompt."/>
+		<part name="sautil" interface="floppy_5_25">
+			<feature name="part_id" value="Standalone Maintenance Program"/>
+			<dataarea name="flop" size="368640">
+				<rom name="sautil.dd" size="368640" crc="f6e9c64d" sha1="42dfbe158277bcd55455f79ef188ed23c571fa4d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aix100">
 		<description>IBM RT PC Advanced Interactive Executive Operating System Version 1.00</description>
 		<year>1986</year>

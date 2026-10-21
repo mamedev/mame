@@ -10,7 +10,7 @@
         * Cheese Chase
         * Ultimate Tennis
         * Stone Ball
-        * Shooting Star (not emulated)
+        * Western Shooting (preliminary)
 
     Known bugs:
         * measured against a real PCB, the games run slightly too fast
@@ -82,6 +82,12 @@ void artmagic_state::machine_start()
 	save_item(NAME(m_prot_save));
 	save_item(NAME(m_prot_input));
 	save_item(NAME(m_prot_output));
+	save_item(NAME(m_gun_rxd));
+}
+
+uint8_t artmagic_state::westerns_gun_p3_r()
+{
+	return 0xfe | m_gun_rxd;
 }
 
 void artmagic_state::machine_reset()
@@ -438,14 +444,16 @@ void artmagic_state::stonebal_map(address_map &map)
 	map(0x380000, 0x380007).rw(m_tms, FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 }
 
-// TODO: jumps to undefined area at PC=33a0 -> 230000, presumably protection device provides a code snippet
-void artmagic_state::shtstar_map(address_map &map)
+// with SWB:8 on, the boot ROM downloads a program over DUART channel B and jumps to it at 230000
+void artmagic_state::westerns_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x27ffff).ram();
 	map(0x280000, 0x280fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 
-	map(0x300000, 0x300001).nopr(); //.portr("300000");
+	map(0x300000, 0x300001).portr("300000");
+	map(0x300004, 0x300005).portr("300004");
+	map(0x300006, 0x300007).portr("300006");
 	map(0x300000, 0x300003).w(FUNC(artmagic_state::control_w)).share("control");
 	map(0x300004, 0x300007).w(FUNC(artmagic_state::protection_bit_w));
 	map(0x340001, 0x340001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -481,34 +489,32 @@ void artmagic_state::stonebal_tms_map(address_map &map)
 
 /*************************************
  *
- *  Extra CPU memory handlers
- *   (Shooting Star)
+ *  Extra CPU memory handlers (Western Shooting)
  *
  *************************************/
 
 /* see adp.c */
-void artmagic_state::shtstar_subcpu_map(address_map &map)
+void artmagic_state::westerns_subcpu_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x8000c0, 0x8000c1).nopw(); // ?
-	map(0x800100, 0x800101).noprw(); // ?
-	map(0x800141, 0x800141).w("aysnd", FUNC(ym2149_device::address_w));
-	map(0x800143, 0x800143).rw("aysnd", FUNC(ym2149_device::data_r), FUNC(ym2149_device::data_w));
+	map(0x8000c0, 0x8000c1).nopw(); // I/O board shift register control
+	map(0x800100, 0x800101).portr("IOBOARD").nopw(); // I/O board shift register data (inputs in, lamps out)
+	map(0x800140, 0x800143).rw("aysnd", FUNC(ym2149_device::data_r), FUNC(ym2149_device::address_data_w)).umask16(0x00ff);
 	map(0x800180, 0x80019f).rw("subduart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xffc000, 0xffffff).ram();
 }
 
-void artmagic_state::shtstar_subcpu_vector_map(address_map &map)
+void artmagic_state::westerns_subcpu_vector_map(address_map &map)
 {
 	map(0xfffff9, 0xfffff9).r("subduart", FUNC(mc68681_device::get_irq_vector));
 }
 
-void artmagic_state::shtstar_guncpu_map(address_map &map)
+void artmagic_state::westerns_guncpu_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 }
 
-void artmagic_state::shtstar_guncpu_data_map(address_map &map)
+void artmagic_state::westerns_guncpu_data_map(address_map &map)
 {
 	map(0xc000, 0xcfff).ram();
 }
@@ -619,7 +625,7 @@ static INPUT_PORTS_START( ultennis )
 	PORT_DIPNAME( 0x0004, 0x0004, "Sets Per Match" )        PORT_DIPLOCATION("SWB:6")
 	PORT_DIPSETTING(      0x0004, "1" )
 	PORT_DIPSETTING(      0x0000, "3" )
-	PORT_DIPNAME( 0x0018, 0x0008, "Game Duratiob" )         PORT_DIPLOCATION("SWB:4,5")
+	PORT_DIPNAME( 0x0018, 0x0008, "Game Duration" )         PORT_DIPLOCATION("SWB:4,5")
 	PORT_DIPSETTING(      0x0018, "5 Lost Points" )
 	PORT_DIPSETTING(      0x0008, "6 Lost Points" )
 	PORT_DIPSETTING(      0x0010, "7 Lost Points" )
@@ -711,89 +717,48 @@ static INPUT_PORTS_START( stoneba2 )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( shtstar )
+static INPUT_PORTS_START( westerns )
 
-	PORT_START("3c0000")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("3c0002")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("3c0004")
-	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SWB:8" )        /* Listed as "Unused" */
-	PORT_DIPNAME( 0x0006, 0x0004, DEF_STR( Language ) )     PORT_DIPLOCATION("SWB:6,7")
-	PORT_DIPSETTING(      0x0000, DEF_STR( French ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Italian ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( English ) )
-	PORT_DIPSETTING(      0x0006, DEF_STR( German ) )
-	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Lives ))         PORT_DIPLOCATION("SWB:4,5")
-	PORT_DIPSETTING(      0x0008, "3" )
-	PORT_DIPSETTING(      0x0018, "4" )
-	PORT_DIPSETTING(      0x0000, "5" )
-	PORT_DIPSETTING(      0x0010, "6" )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Demo_Sounds ))   PORT_DIPLOCATION("SWB:3")
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_DIPNAME( 0x00c0, 0x0040, DEF_STR( Difficulty ))    PORT_DIPLOCATION("SWB:1,2")
-	PORT_DIPSETTING(      0x00c0, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("3c0006")
-	PORT_DIPNAME( 0x0007, 0x0007, "Right Coinage" )     PORT_DIPLOCATION("SWA:6,7,8")
-	PORT_DIPSETTING(      0x0002, DEF_STR( 6C_1C ))
-	PORT_DIPSETTING(      0x0006, DEF_STR( 5C_1C ))
-	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ))
-	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ))
-	PORT_DIPSETTING(      0x0003, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_4C ))
-	PORT_DIPNAME( 0x0038, 0x0038, "Left Coinage"  )     PORT_DIPLOCATION("SWA:3,4,5")
-	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ))
-	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(      0x0028, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_6C ))
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play )) PORT_DIPLOCATION("SWA:2")
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
-	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SWA:1" )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("3c0008")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN4 )
-	PORT_BIT( 0x00f0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("3c000a")
+	PORT_START("300000")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(artmagic_state::prot_r))    // protection data
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_CUSTOM )     // protection ready
-	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("300004")
+	// not sure if this is really a DIP switch, I don't know why you'd ever change it from the default
+	PORT_DIPNAME( 0x0001, 0x0001, "Serial Program Download" )  PORT_DIPLOCATION("SWB:8")
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SWB:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SWB:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SWB:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SWB:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SWB:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SWB:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SWB:1" )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("300006")
+	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SWA:8" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SWA:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SWA:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SWA:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SWA:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SWA:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SWA:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SWA:1" )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("PA")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("SUBIN")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IOBOARD")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -859,33 +824,42 @@ void artmagic_state::stonebal(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.45);
 }
 
-void artmagic_state::shtstar(machine_config &config)
+void artmagic_state::westerns(machine_config &config)
 {
 	artmagic(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &artmagic_state::shtstar_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &artmagic_state::westerns_map);
 
 	m_tms->output_int().set_inputline("maincpu", M68K_IRQ_4);
 
 	mc68681_device &mainduart(MC68681(config, "mainduart", 3686400));
 	mainduart.irq_cb().set_inputline("maincpu", M68K_IRQ_5);
-	mainduart.set_clocks(500000, 500000, 500000, 500000); // external clocking required for self-test; values probably wrong
+	mainduart.set_clocks(1000000, 1000000, 1000000, 1000000); // external 16x clocks; 62500 baud matches the gun board
+	mainduart.a_tx_cb().set([this] (int state) { m_gun_rxd = state; });
+	mainduart.b_tx_cb().set("subduart", FUNC(mc68681_device::rx_b_w));
 
 	/* sub cpu*/
 	m68000_device &subcpu(M68000(config, "subcpu", MASTER_CLOCK_25MHz/2));
-	subcpu.set_addrmap(AS_PROGRAM, &artmagic_state::shtstar_subcpu_map);
-	subcpu.set_addrmap(m68000_device::AS_CPU_SPACE, &artmagic_state::shtstar_subcpu_vector_map);
+	subcpu.set_addrmap(AS_PROGRAM, &artmagic_state::westerns_subcpu_map);
+	subcpu.set_addrmap(m68000_device::AS_CPU_SPACE, &artmagic_state::westerns_subcpu_vector_map);
 
 	mc68681_device &subduart(MC68681(config, "subduart", 3686400));
 	subduart.irq_cb().set_inputline("subcpu", M68K_IRQ_4);
+	subduart.set_clocks(0, 0, 1000000, 1000000);
+	subduart.inport_cb().set_ioport("SUBIN");
+	subduart.b_tx_cb().set("mainduart", FUNC(mc68681_device::rx_b_w));
 
-	YM2149(config, "aysnd", 3686400/2).add_route(ALL_OUTPUTS, "mono", 0.10);
+	ym2149_device &aysnd(YM2149(config, "aysnd", 3686400/2));
+	aysnd.port_a_read_callback().set_ioport("PA");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.10);
 
 	/*gun board cpu*/
-	i80c31_device &guncpu(I80C31(config, "guncpu", 6000000));
-	guncpu.set_addrmap(AS_PROGRAM, &artmagic_state::shtstar_guncpu_map);
-	guncpu.set_addrmap(AS_DATA, &artmagic_state::shtstar_guncpu_data_map);
+	i80c31_device &guncpu(I80C31(config, "guncpu", 12_MHz_XTAL));
+	guncpu.set_addrmap(AS_PROGRAM, &artmagic_state::westerns_guncpu_map);
+	guncpu.set_addrmap(AS_DATA, &artmagic_state::westerns_guncpu_data_map);
 	guncpu.port_in_cb<1>().set_constant(0); // ?
+	guncpu.port_in_cb<3>().set(FUNC(artmagic_state::westerns_gun_p3_r));
+	guncpu.port_out_cb<3>().set("mainduart", FUNC(mc68681_device::rx_a_w)).bit(1);
 }
 
 
@@ -1083,7 +1057,7 @@ OSC   : 40.000MHz, 25.000MHz
 */
 
 
-ROM_START( shtstar )
+ROM_START( westerns )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rom.u102", 0x00000, 0x20000, CRC(cce9877e) SHA1(3e2b3b29d5dd73bfe0c7faf84309b50adbcded3b) )
 	ROM_LOAD16_BYTE( "rom.u101", 0x00001, 0x20000, CRC(3a330d9d) SHA1(0f3cd75e9e5483e3cf51f0c4eb4f15b6c3b33b67) )
@@ -1097,8 +1071,8 @@ ROM_START( shtstar )
 	ROM_LOAD( "2207_7b42c5.u6", 0x00000, 0x8000, CRC(6dd4b4ed) SHA1(b37e9e5ddfb5d88c5412dc79643adfc4362fbb46) )
 
 	ROM_REGION16_LE( 0x100000, "gfx", 0 )
-	ROM_LOAD( "a+m005c0494_13a.u134", 0x00000, 0x80000, CRC(f101136a) SHA1(9ff7275e0c1fc41f3d97ae0bd628581e2803910a) )
-	ROM_LOAD( "a+m005c0494_14a.u135", 0x80000, 0x80000, CRC(3e847f8f) SHA1(c99159951303b7f752305fa8e7e6d4bfb4fc54ba) )
+	ROM_LOAD16_BYTE( "a+m005c0494_13a.u134", 0x00000, 0x80000, CRC(f101136a) SHA1(9ff7275e0c1fc41f3d97ae0bd628581e2803910a) )
+	ROM_LOAD16_BYTE( "a+m005c0494_14a.u135", 0x00001, 0x80000, CRC(3e847f8f) SHA1(c99159951303b7f752305fa8e7e6d4bfb4fc54ba) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "a+m005c0494_12a.u151", 0x00000, 0x40000, CRC(2df3db1e) SHA1(d2e588db577de6fd527cd496f5eae9964d557da3) )
@@ -1182,12 +1156,11 @@ void artmagic_state::init_stonebal()
 	m_protection_handler = &artmagic_state::stonebal_protection;
 }
 
-void artmagic_state::init_shtstar()
+void artmagic_state::init_westerns()
 {
-	/* wrong */
 	decrypt_ultennis();
-	m_is_stoneball =0;
-	m_protection_handler = &artmagic_state::stonebal_protection;
+	m_is_stoneball = 0;
+	m_protection_handler = &artmagic_state::ultennis_protection;
 }
 
 
@@ -1204,4 +1177,4 @@ GAME( 1994, cheesech,   0,        cheesech, cheesech, artmagic_state, init_chees
 GAME( 1994, stonebal,   0,        stonebal, stonebal, artmagic_state, init_stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players, v1-20 13/12/1994)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, stonebal2,  stonebal, stonebal, stoneba2, artmagic_state, init_stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 7/11/1994)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, stonebal2o, stonebal, stonebal, stoneba2, artmagic_state, init_stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 21/10/1994)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, shtstar,    0,        shtstar,  shtstar,  artmagic_state, init_shtstar,  ROT0, "Nova", "Shooting Star", MACHINE_NOT_WORKING )
+GAME( 1994, westerns,   0,        westerns, westerns, artmagic_state, init_westerns, ROT0, "Art & Magic", "Western Shooting", MACHINE_NOT_WORKING )

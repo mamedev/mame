@@ -115,7 +115,7 @@ void balsente_state::draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &clip
 	/* loop over y */
 	for (int y = 0; y < 16; y++, ypos = (ypos + 1) & 255)
 	{
-		if (ypos >= (16 + BALSENTE_VBEND) && ypos >= cliprect.min_y && ypos <= cliprect.max_y)
+		if (ypos >= (16 + BALSENTE_VBEND) && cliprect.containsy(ypos))
 		{
 			pen_t const *const pens = &m_palette->pen(m_palettebank_vis * 256);
 			const uint8_t *old = &m_expanded_videoram[(ypos - BALSENTE_VBEND) * 256 + xpos];
@@ -188,7 +188,7 @@ uint32_t balsente_state::screen_update_balsente(screen_device &screen, bitmap_in
 	int y, i;
 
 	/* draw scanlines from the VRAM directly */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 		draw_scanline8(bitmap, 0, y, 256, &m_expanded_videoram[(y - BALSENTE_VBEND) * 256], pens);
 
 	/* draw the sprite images */

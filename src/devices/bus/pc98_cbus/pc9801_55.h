@@ -12,7 +12,6 @@
 #pragma once
 
 #include "slot.h"
-#include "bus/nscsi/pc98_hd.h"
 #include "machine/nscsi_bus.h"
 #include "machine/wd33c9x.h"
 
@@ -57,7 +56,7 @@ protected:
 
 	required_device<nscsi_bus_device> m_scsi_bus;
 	required_device<wd33c9x_base_device> m_wdc;
-	required_memory_region m_bios;
+	optional_memory_region m_bios;
 	required_ioport m_dsw1;
 	required_ioport m_dsw2;
 
@@ -77,6 +76,9 @@ class pc9801_55u_device : public pc9801_55_device
 public:
 	pc9801_55u_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	pc9801_55u_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 private:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
@@ -92,9 +94,21 @@ private:
 
 };
 
+class scsi1_pc98_device  : public pc9801_55u_device
+{
+public:
+	scsi1_pc98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+private:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+//	virtual void device_start() override ATTR_COLD;
+//	virtual void device_reset() override ATTR_COLD;
+};
+
 // device type definition
 //DECLARE_DEVICE_TYPE(PC9801_55, pc9801_55_device)
 DECLARE_DEVICE_TYPE(PC9801_55U, pc9801_55u_device)
 DECLARE_DEVICE_TYPE(PC9801_55L, pc9801_55l_device)
+DECLARE_DEVICE_TYPE(SCSI1_PC98, scsi1_pc98_device)
 
 #endif // MAME_BUS_PC98_CBUS_PC9801_55_H

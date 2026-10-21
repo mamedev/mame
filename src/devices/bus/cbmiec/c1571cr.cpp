@@ -58,7 +58,7 @@ const tiny_rom_entry *c1571cr_device::device_rom_region() const
 void c1571cr_device::c1571cr_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x0800).ram().share("ram");
-	map(0x1800, 0x180f).mirror(0x03f0).m(m_via0, FUNC(via6522_device::map));
+	map(0x1800, 0x180f).mirror(0x03f0).r(FUNC(c1571_device::via0_r)).w(m_via0, FUNC(via6522_device::write));
 	map(0x1c00, 0x1c0f).mirror(0x03f0).rw(FUNC(c1571cr_device::via1_r), FUNC(c1571cr_device::via1_w));
 	map(0x2000, 0x2007).mirror(0x1fe0).rw(m_5710, FUNC(mos5710_device::fdc_r), FUNC(mos5710_device::fdc_w));
 	map(0x4000, 0x400f).mirror(0x1fe0).rw(m_5710, FUNC(mos5710_device::cia_r), FUNC(mos5710_device::cia_w));

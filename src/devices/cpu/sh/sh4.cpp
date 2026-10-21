@@ -30,6 +30,7 @@
 #include "sh3comn.h"
 #include "sh4fe.h"
 #include "sh4comn.h"
+#include "sh4fpu.h"
 #include "sh4regs.h"
 #include "sh4tmu.h"
 #include "sh_dasm.h"
@@ -39,7 +40,6 @@
 #include "endianness.h"
 
 #include <cfenv>
-#include <numbers>
 
 #if defined(__clang_major__) && (__clang_major__ < 12)
 // can't guarantee floating point environment control works
@@ -52,6 +52,14 @@ static const uint8_t fpmode_source[4] = { uml::ROUND_ROUND, uml::ROUND_TRUNC, um
 static const int feround_source[4] = { FE_TONEAREST, FE_TOWARDZERO, FE_TONEAREST, FE_TONEAREST };
 
 namespace {
+
+// the FPSCR cause field, and what an exception sets in it and in the flag field (which has no FPU error bit)
+constexpr uint32_t FPSCR_CAUSE = 0x0003f000;
+
+constexpr uint32_t fpscr_exception_bits(uint32_t cause)
+{
+	return (cause << 12) | ((cause & 0x1f) << 2);
+}
 
 // For convenience, we run in the host's rounding mode most of the time and only switch during actual FPU ops.
 // That shields read/write handlers and the debugger hook from seeing unexpected rounding mode changes.
@@ -899,16 +907,9 @@ void sh3_base_device::irda_7709_map(address_map& map)
 	map(0x0400014e, 0x0400014f).rw(FUNC(sh3_base_device::scfdr1_r), FUNC(sh3_base_device::scfdr1_w));
 }
 
-void sh3_base_device::scif_7709_map(address_map& map)
+void sh7709_base_device::scif_7709_map(address_map& map)
 {
-	map(0x04000150, 0x04000150).rw(FUNC(sh3_base_device::scsmr2_r), FUNC(sh3_base_device::scsmr2_w));
-	map(0x04000152, 0x04000152).rw(FUNC(sh3_base_device::scbrr2_r), FUNC(sh3_base_device::scbrr2_w));
-	map(0x04000154, 0x04000154).rw(FUNC(sh3_base_device::scscr2_r), FUNC(sh3_base_device::scscr2_w));
-	map(0x04000156, 0x04000156).rw(FUNC(sh3_base_device::scftdr2_r), FUNC(sh3_base_device::scftdr2_w));
-	map(0x04000158, 0x04000159).rw(FUNC(sh3_base_device::scssr2_r), FUNC(sh3_base_device::scssr2_w));
-	map(0x0400015a, 0x0400015a).rw(FUNC(sh3_base_device::scfrdr2_r), FUNC(sh3_base_device::scfrdr2_w));
-	map(0x0400015c, 0x0400015c).rw(FUNC(sh3_base_device::scfcr2_r), FUNC(sh3_base_device::scfcr2_w));
-	map(0x0400015e, 0x0400015f).rw(FUNC(sh3_base_device::scfdr2_r), FUNC(sh3_base_device::scfdr2_w));
+	map(0x04000150, 0x0400015f).m(m_scif, FUNC(sh7709_scif_device::map));
 }
 
 void sh3_base_device::udi_7709s_map(address_map& map)
@@ -974,6 +975,22 @@ sh3_base_device::~sh3_base_device()
 }
 
 
+sh7709_base_device::sh7709_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
+	: sh3_base_device(mconfig, type, tag, owner, clock, endianness)
+	, m_scif(*this, "scif")
+{
+}
+
+void sh7709_base_device::device_add_mconfig(machine_config &config)
+{
+	sh3_base_device::device_add_mconfig(config);
+
+	// Clocked from the peripheral clock, which is CPU clock / 4 with the
+	// reset FRQCR setting.
+	SH7709_SCIF(config, m_scif, DERIVED_CLOCK(1, 4));
+}
+
+
 sh4_base_device::sh4_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
 	: sh34_base_device(mconfig, type, tag, owner, clock, endianness, address_map_constructor(FUNC(sh4_base_device::sh4_internal_map), this))
 {
@@ -987,7 +1004,7 @@ sh4_base_device::~sh4_base_device()
 
 
 sh3_device::sh3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
-	: sh3_base_device(mconfig, SH3, tag, owner, clock, endianness)
+	: sh7709_base_device(mconfig, SH3, tag, owner, clock, endianness)
 {
 }
 
@@ -997,7 +1014,7 @@ sh7708s_device::sh7708s_device(const machine_config& mconfig, const char* tag, d
 }
 
 sh7709_device::sh7709_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
-	: sh3_base_device(mconfig, SH7709, tag, owner, clock, endianness)
+	: sh7709_base_device(mconfig, SH7709, tag, owner, clock, endianness)
 {
 }
 
@@ -2430,67 +2447,69 @@ inline void sh34_base_device::FSQRT(const uint16_t opcode)
 	}
 }
 
+// FSRRA, FSCA, FIPR and FTRV aren't IEEE-754 operations, so the host's floating point is no use for them.
+// They all replace the FPSCR cause field and add to the flag field, and do nothing at all while PR is set.
+// TODO: FPU exception traps, which the enables cause in ways the manual doesn't describe (see sh4fpu.cpp)
+inline void sh34_base_device::fpu_raise(uint32_t cause)
+{
+	m_sh2_state->m_fpscr = (m_sh2_state->m_fpscr & ~FPSCR_CAUSE) | fpscr_exception_bits(cause);
+}
+
 /* FSRRA FRn PR=0 1111nnnn01111101 */
 inline void sh34_base_device::FSRRA(const uint16_t opcode)
 {
-	uint32_t n = REG_N;
+	if (m_sh2_state->m_fpu_pr)
+		return;
 
-	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+	const uint32_t n = REG_N;
+	const uint32_t fpscr = m_sh2_state->m_fpscr;
 
-	FP_RFS(n) = 1.0f / sqrtf(FP_RFS(n));
+	// an FPU error leaves the operand as it was
+	uint32_t cause;
+	m_sh2_state->m_fr[n] = sh4fpu::fsrra(m_sh2_state->m_fr[n], (fpscr & RM) == 1, (fpscr & DN) != 0, cause);
+	fpu_raise(cause);
 }
 
-/*  FSSCA FPUL,FRn PR=0 1111nnn011111101 */
-// sinf/cosf are libm calls so we *don't* override the rounding mode here.
+/*  FSCA FPUL,DRn PR=0 1111nnn011111101 */
 void sh34_base_device::FSSCA(const uint16_t opcode)
 {
-	uint32_t n = REG_N;
+	if (m_sh2_state->m_fpu_pr)
+		return;
 
-	float angle = (((float)(m_sh2_state->m_fpul & 0xFFFF)) / 65536.0f) * 2.0f * std::numbers::pi_v<float>;
-	FP_RFS(n) = sinf(angle);
-	FP_RFS(n + 1) = cosf(angle);
+	const uint32_t n = REG_N & 14;
+	const bool rz = (m_sh2_state->m_fpscr & RM) == 1;
+
+	// the cosine is the sine a quarter of a turn on
+	m_sh2_state->m_fr[n] = sh4fpu::fsca_round(sh4fpu::fsca(m_sh2_state->m_fpul), rz);
+	m_sh2_state->m_fr[n + 1] = sh4fpu::fsca_round(sh4fpu::fsca(m_sh2_state->m_fpul + 0x4000), rz);
+	fpu_raise(sh4fpu::CAUSE_I);
 }
 
 /* FIPR FVm,FVn PR=0 1111nnmm11101101 */
 inline void sh34_base_device::FIPR(const uint16_t opcode)
 {
-	uint32_t n = REG_N;
-	uint32_t m = (n & 3) << 2;
-	n = n & 12;
+	if (m_sh2_state->m_fpu_pr)
+		return;
 
-	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+	const uint32_t n = REG_N & 12;
+	const uint32_t m = (REG_N & 3) << 2;
+	const uint32_t fpscr = m_sh2_state->m_fpscr;
 
-	float ml[4];
-	for (int a = 0; a < 4; a++)
-		ml[a] = FP_RFS(n + a) * FP_RFS(m + a);
-	FP_RFS(n + 3) = ml[0] + ml[1] + ml[2] + ml[3];
+	uint32_t cause;
+	m_sh2_state->m_fr[n + 3] = sh4fpu::fipr(&m_sh2_state->m_fr[m], &m_sh2_state->m_fr[n], (fpscr & RM) == 1, (fpscr & DN) != 0, cause);
+	fpu_raise(cause);
 }
 
 /* FTRV XMTRX,FVn PR=0 1111nn0111111101 */
 void sh34_base_device::FTRV(const uint16_t opcode)
 {
-	uint32_t n = REG_N;
-	n = n & 12;
+	if (m_sh2_state->m_fpu_pr)
+		return;
 
-	const host_rounding_scope round(m_sh2_state->m_fpscr, m_host_round);
+	const uint32_t n = REG_N & 12;
+	const uint32_t fpscr = m_sh2_state->m_fpscr;
 
-	float sum[4];
-	for (int i = 0; i < 4; i++)
-	{
-		sum[i] = 0;
-		for (int j = 0; j < 4; j++)
-		{
-			// The product is rounded to single before it is accumulated.
-			// When it's written as one expression the compiler may generate
-			// a fused multiply-add, which isn't correct.
-			const float p = FP_XFS((j << 2) + i) * FP_RFS(n + j);
-			sum[i] += p;
-		}
-	}
-	for (int i = 0; i < 4; i++)
-	{
-		FP_RFS(n + i) = sum[i];
-	}
+	fpu_raise(sh4fpu::ftrv(m_sh2_state->m_xf, &m_sh2_state->m_fr[n], (fpscr & RM) == 1, (fpscr & DN) != 0));
 }
 
 inline void sh34_base_device::op1111_0xf13(const uint16_t opcode)
@@ -2778,16 +2797,6 @@ void sh3_base_device::device_reset()
 	m_scfrdr1 = 0;
 	m_scfcr1 = 0;
 	m_scfdr1 = 0;
-
-	// SCIF 7709
-	m_scsmr2 = 0;
-	m_scbrr2 = 0xff;
-	m_scscr2 = 0;
-	m_scftdr2 = 0;
-	m_scssr2 = 0x60;
-	m_scfrdr2 = 0;
-	m_scfcr2 = 0;
-	m_scfdr2 = 0;
 
 	// UDI 7709S
 	m_sdir = 0xffff;
@@ -3351,16 +3360,6 @@ void sh3_base_device::device_start()
 	save_item(NAME(m_scfrdr1));
 	save_item(NAME(m_scfcr1));
 	save_item(NAME(m_scfdr1));
-
-	// SCIF 7709
-	save_item(NAME(m_scsmr2));
-	save_item(NAME(m_scbrr2));
-	save_item(NAME(m_scscr2));
-	save_item(NAME(m_scftdr2));
-	save_item(NAME(m_scssr2));
-	save_item(NAME(m_scfrdr2));
-	save_item(NAME(m_scfcr2));
-	save_item(NAME(m_scfdr2));
 
 	// UDI 7709S
 	save_item(NAME(m_sdir));
@@ -3992,8 +3991,7 @@ void sh34_base_device::device_start()
 	memcpy(m_sh2_state->m_fpmode, fpmode_source, sizeof(fpmode_source));
 	m_host_round = FE_TONEAREST;
 
-	m_sh2_state->m_fzero = 0.0f;
-	m_sh2_state->m_fone = 1.0f;
+	m_sh2_state->m_fsca_unit = 1.0f / float(1 << 26);
 	m_sh2_state->m_ftrc_smin = -2147483648.0f;
 	m_sh2_state->m_ftrc_smax = 2147483648.0f;
 	m_sh2_state->m_ftrc_dmin = -2147483648.0;
@@ -4012,6 +4010,13 @@ void sh34_base_device::device_start()
 	drc_start();
 
 	m_drcuml->symbol_add(&m_sh2_state->m_fpmode, sizeof(m_sh2_state->m_fpmode), "fpmode");
+
+	if (m_isdrc)
+	{
+		m_fsca_table = std::make_unique<int32_t []>(0x10000);
+		for (uint32_t angle = 0; angle < 0x10000; angle++)
+			m_fsca_table[angle] = sh4fpu::fsca(angle);
+	}
 }
 
 void sh34_base_device::state_import(const device_state_entry &entry)
@@ -5801,12 +5806,15 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FSQRT(drcuml_block &block, 
 	return true;
 }
 
-// FRSQRT is an estimate on some hosts, so the reciprocal square root is built from an
-// exact square root instead
+// FSRRA, FIPR and FTRV are between four and sixteen truncated multiplications each, all of it
+// integer work.  None of them touches an integer register, so there's nothing to save around the call.
+void sh34_base_device::func_FSRRA() { FSRRA(m_sh2_state->arg0); }
+static void cfunc_FSRRA(void *param) { static_cast<sh34_base_device *>(param)->func_FSRRA(); }
+
 bool sh34_base_device::generate_group_15_op1111_0x13_FSRRA(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	UML_FSSQRT(block, F0, FPS32(REG_N));
-	UML_FSDIV(block, FPS32(REG_N), uml::mem(&m_sh2_state->m_fone), F0);
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
+	UML_CALLC(block, cfunc_FSRRA, this);
 	return true;
 }
 
@@ -5867,20 +5875,13 @@ bool sh34_base_device::generate_group_15_op1111_0x13_FCNVDS(drcuml_block &block,
 	return true;
 }
 
+void sh34_base_device::func_FIPR() { FIPR(m_sh2_state->arg0); }
+static void cfunc_FIPR(void *param) { static_cast<sh34_base_device *>(param)->func_FIPR(); }
+
 bool sh34_base_device::generate_group_15_op1111_0x13_FIPR(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	const uint32_t n = REG_N & 12;
-	const uint32_t m = (REG_N & 3) << 2;
-
-	UML_FSMUL(block, F0, FPS32(n + 0), FPS32(m + 0));
-	UML_FSMUL(block, F1, FPS32(n + 1), FPS32(m + 1));
-	UML_FSMUL(block, F2, FPS32(n + 2), FPS32(m + 2));
-	UML_FSMUL(block, F3, FPS32(n + 3), FPS32(m + 3));
-
-	UML_FSADD(block, F0, F0, F1);
-	UML_FSADD(block, F0, F0, F2);
-	UML_FSADD(block, F0, F0, F3);
-	UML_FSMOV(block, FPS32(n + 3), F0);
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
+	UML_CALLC(block, cfunc_FIPR, this);
 	return true;
 }
 
@@ -5943,40 +5944,40 @@ bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FRCHG(drcuml_b
 	return true;
 }
 
+void sh34_base_device::func_FTRV() { FTRV(m_sh2_state->arg0); }
+static void cfunc_FTRV(void *param) { static_cast<sh34_base_device *>(param)->func_FTRV(); }
+
 bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FTRV(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	const uint32_t n = REG_N & 12;
-
-	// the whole vector is read before any of it is written back
-	for (int i = 0; i < 4; i++)
-	{
-		UML_FSMOV(block, uml::freg(i), uml::mem(&m_sh2_state->m_fzero));
-		for (int j = 0; j < 4; j++)
-		{
-			UML_FSMUL(block, F4, uml::mem((float *)(m_sh2_state->m_xf + (j << 2) + i)), FPS32(n + j));
-			UML_FSADD(block, uml::freg(i), uml::freg(i), F4);
-		}
-	}
-
-	for (int i = 0; i < 4; i++)
-	{
-		UML_FSMOV(block, FPS32(n + i), uml::freg(i));
-	}
+	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
+	UML_CALLC(block, cfunc_FTRV, this);
 	return true;
 }
 
-void sh34_base_device::func_FSSCA()
-{
-	FSSCA(m_sh2_state->arg0);
-}
-static void cfunc_FSSCA(void *param) { ((sh34_base_device *)param)->func_FSSCA(); };
-
+// FSCA only has 65536 operands, so the multiplications are done ahead of time.  What is left of the
+// instruction is rounding a 27-bit integer in the current rounding mode, which the host can do.
 bool sh34_base_device::generate_group_15_op1111_0x13_op1111_0xf13_FSSCA(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint16_t opcode, int in_delay_slot, uint32_t ovrpc)
 {
-	save_fast_iregs(block);
-	UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
-	UML_CALLC(block, cfunc_FSSCA, this);
-	load_fast_iregs(block);
+	const uint32_t n = REG_N & 14;
+	const uml::code_label done = compiler.labelnum++;
+
+	UML_TEST(block, uml::mem(&m_sh2_state->m_fpu_pr), 1);
+	UML_JMPc(block, COND_NZ, done);
+
+	UML_AND(block, I0, uml::mem(&m_sh2_state->m_fpscr), ~FPSCR_CAUSE);
+	UML_OR(block, uml::mem(&m_sh2_state->m_fpscr), I0, fpscr_exception_bits(sh4fpu::CAUSE_I));
+
+	UML_AND(block, I0, uml::mem(&m_sh2_state->m_fpul), 0xffff);
+	UML_LOAD(block, I1, m_fsca_table.get(), I0, SIZE_DWORD, SCALE_x4);
+	UML_FSFRINT(block, F0, I1, SIZE_DWORD);
+	UML_FSMUL(block, FPS32(n), F0, uml::mem(&m_sh2_state->m_fsca_unit));
+
+	UML_ADD(block, I0, I0, 0x4000);
+	UML_AND(block, I0, I0, 0xffff);
+	UML_LOAD(block, I1, m_fsca_table.get(), I0, SIZE_DWORD, SCALE_x4);
+	UML_FSFRINT(block, F0, I1, SIZE_DWORD);
+	UML_FSMUL(block, FPS32(n + 1), F0, uml::mem(&m_sh2_state->m_fsca_unit));
+
+	UML_LABEL(block, done);
 	return true;
 }
-

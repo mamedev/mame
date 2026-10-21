@@ -337,6 +337,7 @@ protected:
 	memory_access<32, 3, 0, ENDIANNESS_BIG>::cache m_cache64;
 	uint32_t c_bus_frequency;
 	uint32_t c_serial_clock;
+	uint32_t c_rtc_clock;
 
 	struct internal_ppc_state
 	{
@@ -736,6 +737,7 @@ protected:
 	void set_xer(uint32_t value);
 	uint64_t get_timebase();
 	void set_timebase(uint64_t newtb);
+	uint64_t get_rtc();
 	virtual uint32_t get_decrementer();
 	virtual void set_decrementer(uint32_t newdec);
 	uint32_t ppccom_translate_address_internal(int intention, bool debug, offs_t &address);
@@ -835,6 +837,9 @@ class ppc601_device : public ppc_device
 {
 public:
 	ppc601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void set_rtc_clock(uint32_t rtc_clock) { c_rtc_clock = rtc_clock; }
+	void set_rtc_clock(const XTAL &xtal) { set_rtc_clock(xtal.value()); }
 
 protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

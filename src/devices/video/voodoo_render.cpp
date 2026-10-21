@@ -835,51 +835,43 @@ void rasterizer_texture::recompute(voodoo_regs const &regs, u8 *ram, u32 mask, r
 	u32 base = regs.texture_baseaddr();
 	if (addrshift == 0 && BIT(base, 0) != 0)
 		fatalerror("Unsupported tiled texture in Voodoo device");
-	base = (base & addrmask) << addrshift;
-	m_lodoffset[0] = base & mask;
 
-	// LODs 1-3 are different depending on whether we are in multitex mode
+	// offset of each LOD from the start of the mipmap chain: the sum of the sizes
+	// of the LODs present before it (the small LODs take at least 4 texels)
+	u32 lodstart[9];
+	u32 offset = 0;
+	for (int lod = 0; lod <= 8; lod++)
+	{
+		lodstart[lod] = offset;
+		if (BIT(m_lodmask, lod))
+		{
+			u32 size = ((m_wmask >> lod) + 1) * ((m_hmask >> lod) + 1);
+			if (lod >= 3 && size < 4) size = 4;
+			offset += size << bppscale;
+		}
+	}
+
+	// LODs 1, 2 and 3-8 have their own base register in multibase mode, but the
+	// hardware still adds the LOD's offset within the chain: Glide's
+	// _grTexCalcBaseAddress subtracts it when it computes the base registers.
+	// This is why konami/viper.cpp games appear to set negative base addresses
+	// (e.g. 0xff0000, 0xffc000, 0xfff000 ...).
 	// Several Voodoo 2 games leave the upper bits of TLOD == 0xff, meaning we think
 	// they want multitex mode when they really don't -- disable for now
 	// Enable for Voodoo 3 or Viper breaks - VL.
 	// Add check for upper nibble not equal to zero to fix funkball -- TG
+	u32 lodbase[9];
+	for (int lod = 0; lod <= 8; lod++)
+		lodbase[lod] = base;
 	if (texlod.tmultibaseaddr() && texlod.magic() == 0)
 	{
-		// TODO: konami/viper.cpp still don't work right here
-		// it seems to expect relative offsets in every game,
-		// where the base addresses are actually set with negative numbers
-		// (i.e. 0xff0000, 0xffc000, 0xfff000 ...)
-		base = (regs.texture_baseaddr_1() & addrmask) << addrshift;
-		m_lodoffset[1] = base & mask;
-		base = (regs.texture_baseaddr_2() & addrmask) << addrshift;
-		m_lodoffset[2] = base & mask;
-		base = (regs.texture_baseaddr_3_8() & addrmask) << addrshift;
-		m_lodoffset[3] = base & mask;
+		lodbase[1] = regs.texture_baseaddr_1();
+		lodbase[2] = regs.texture_baseaddr_2();
+		for (int lod = 3; lod <= 8; lod++)
+			lodbase[lod] = regs.texture_baseaddr_3_8();
 	}
-	else
-	{
-		if (m_lodmask & (1 << 0))
-			base += (((m_wmask >> 0) + 1) * ((m_hmask >> 0) + 1)) << bppscale;
-		m_lodoffset[1] = base & mask;
-		if (m_lodmask & (1 << 1))
-			base += (((m_wmask >> 1) + 1) * ((m_hmask >> 1) + 1)) << bppscale;
-		m_lodoffset[2] = base & mask;
-		if (m_lodmask & (1 << 2))
-			base += (((m_wmask >> 2) + 1) * ((m_hmask >> 2) + 1)) << bppscale;
-		m_lodoffset[3] = base & mask;
-	}
-
-	// remaining LODs make sense
-	for (int lod = 4; lod <= 8; lod++)
-	{
-		if (m_lodmask & (1 << (lod - 1)))
-		{
-			u32 size = ((m_wmask >> (lod - 1)) + 1) * ((m_hmask >> (lod - 1)) + 1);
-			if (size < 4) size = 4;
-			base += size << bppscale;
-		}
-		m_lodoffset[lod] = base & mask;
-	}
+	for (int lod = 0; lod <= 8; lod++)
+		m_lodoffset[lod] = (((lodbase[lod] & addrmask) << addrshift) + lodstart[lod]) & mask;
 
 	// compute the detail parameters
 	auto const texdetail = regs.texture_detail();
@@ -2895,6 +2887,72 @@ static_rasterizer_info s_predef_raster_table[] =
 
 	// gtfore06
 	RASTERIZER( 0x05, 0x00482405, 0x00045119, 0x000000C1, 0x00010FF9, 0x00000ACD, 0xFFFFFFFF ) //    51144    2582597
+
+	// thrild2
+	RASTERIZER( 0x05, 0x11022401, 0x00000000, 0x00000000, 0x0002172B, 0x00000A07, 0xFFFFFFFF ) //    43623    3739836
+	RASTERIZER( 0x05, 0x11022401, 0x00045110, 0x00000000, 0x0002132B, 0x00000006, 0xFFFFFFFF ) //   137454    3092083
+	RASTERIZER( 0x0B, 0x10482405, 0x00000009, 0x00000000, 0x0002173B, 0x00000007, 0x00000007 ) //   106440    2033850
+	RASTERIZER( 0x05, 0x10482405, 0x00000009, 0x00000041, 0x0002173B, 0x00000007, 0xFFFFFFFF ) //   228278    1996644
+	RASTERIZER( 0x05, 0x10484104, 0x00041219, 0x00000000, 0x0002133B, 0x00000007, 0xFFFFFFFF ) //    25228    1613916
+	RASTERIZER( 0x05, 0x10482405, 0x00000009, 0x00000000, 0x0002173B, 0x00000007, 0xFFFFFFFF ) //   123461    1559194
+	RASTERIZER( 0x05, 0x11022401, 0x00000000, 0x00000000, 0x0002176B, 0x00000A07, 0xFFFFFFFF ) //    15736    1527114
+	RASTERIZER( 0x0B, 0x10482405, 0x00045110, 0x00000000, 0x0002132B, 0x000000C0, 0x000000C0 ) //    78532    1212047
+	RASTERIZER( 0x05, 0x10482405, 0x00045119, 0x00000041, 0x0002173B, 0x00000A07, 0xFFFFFFFF ) //   186677    1144757
+	RASTERIZER( 0x05, 0x10482405, 0x00000009, 0x00000041, 0x0002173B, 0x00000A07, 0xFFFFFFFF ) //    91440     821512
+	RASTERIZER( 0x0B, 0x10484104, 0x00044110, 0x00000000, 0x0002132B, 0x00000007, 0x00000007 ) //     2216     775639
+	RASTERIZER( 0x05, 0x10482405, 0x00045110, 0x00000000, 0x0002132B, 0x00000A06, 0xFFFFFFFF ) //    11290     773450
+	RASTERIZER( 0x05, 0x11022401, 0x00000009, 0x00000041, 0x0002173B, 0x00000A07, 0xFFFFFFFF ) //    78451     721321
+	RASTERIZER( 0x05, 0x10482405, 0x00045119, 0x00000041, 0x0002177B, 0x00000A07, 0xFFFFFFFF ) //    97071     662807
+	RASTERIZER( 0x0B, 0x10482405, 0x00000009, 0x00000041, 0x0002173B, 0x00000007, 0x00000007 ) //    51124     567994
+	RASTERIZER( 0x0B, 0x10482405, 0x00045119, 0x00000041, 0x0002173B, 0x00000A07, 0x00000A07 ) //    40823     424190
+	RASTERIZER( 0x05, 0x11022401, 0x00045110, 0x00000000, 0x00021369, 0x00000AC7, 0xFFFFFFFF ) //     2160     403271
+	RASTERIZER( 0x05, 0x10484104, 0x00041219, 0x00000000, 0x0002137B, 0x00000007, 0xFFFFFFFF ) //     6000     388697
+	RASTERIZER( 0x05, 0x10484104, 0x00045119, 0x00000041, 0x0002133B, 0x00000007, 0xFFFFFFFF ) //     8500     293600
+	RASTERIZER( 0x05, 0x11022401, 0x00045110, 0x00000000, 0x0002136B, 0x00000006, 0xFFFFFFFF ) //     9282     256411
+	RASTERIZER( 0x05, 0x11022401, 0x00000009, 0x00000000, 0x0000172B, 0x00000A07, 0xFFFFFFFF ) //     6864     154727
+	// thrild2, Europe demo (later in attract mode; counts from 400 seconds)
+	RASTERIZER( 0x05, 0x11022401, 0x00000009, 0x00000000, 0x0002172B, 0x00000A07, 0xFFFFFFFF ) //     9975     848093
+	RASTERIZER( 0x0B, 0x11022401, 0x00046410, 0x00000000, 0x0002133B, 0x00000AC7, 0x00000AC7 ) //     2351     259407
+	// thrild2, races only (not drawn in attract mode)
+	RASTERIZER( 0x0B, 0x11022401, 0x00046410, 0x00000000, 0x0002137B, 0x00000AC7, 0x00000AC7 )
+	RASTERIZER( 0x05, 0x11022401, 0x00000009, 0x00000000, 0x0002176B, 0x00000A07, 0xFFFFFFFF )
+	RASTERIZER( 0x0B, 0x10484104, 0x00044110, 0x00000000, 0x0002136B, 0x00000007, 0x00000007 )
+	RASTERIZER( 0x05, 0x10482405, 0x00045110, 0x00000000, 0x0002136B, 0x00000A06, 0xFFFFFFFF )
+
+	// gticlub2, gticlub2ea
+	RASTERIZER( 0x05, 0x10482405, 0x00045119, 0x00000041, 0x0002173B, 0x00000AC7, 0xFFFFFFFF ) //   327396    2888432
+	RASTERIZER( 0x00, 0x11024100, 0x00045119, 0x00000000, 0x0002132B, 0xFFFFFFFF, 0xFFFFFFFF ) //    99000    2261306
+	RASTERIZER( 0x05, 0x11022401, 0x0000000F, 0x00000000, 0x0002176B, 0x00000A87, 0xFFFFFFFF ) //    15134    2119223
+	RASTERIZER( 0x0B, 0x11022401, 0x00045119, 0x00000041, 0x0002173B, 0x00000AC7, 0x00000AC7 ) //   136017    1743133
+	RASTERIZER( 0x0B, 0x11022401, 0x00045119, 0x00000041, 0x0002173B, 0x00000A87, 0x00000A87 ) //    40753    1560607
+	RASTERIZER( 0x05, 0x10482405, 0x0004411F, 0x00000041, 0x00021359, 0x00000A07, 0xFFFFFFFF ) //   300470    1332777
+	RASTERIZER( 0x05, 0x10484104, 0x0004511F, 0x00000000, 0x0002136B, 0x00000006, 0xFFFFFFFF ) //    38826    1207631
+	RASTERIZER( 0x0B, 0x10482405, 0x00045119, 0x00000000, 0x0002132B, 0x000000C0, 0x000000C0 ) //    79100    1147303
+	RASTERIZER( 0x0B, 0x10482405, 0x0004511F, 0x00000041, 0x0002137B, 0x00000AC7, 0x00000AC7 ) //    69621    1046847
+	RASTERIZER( 0x0B, 0x11022401, 0x00045119, 0x00000041, 0x0002173B, 0x000000C7, 0x000000C7 ) //    43722     997641
+	RASTERIZER( 0x05, 0x11022401, 0x00045119, 0x00000041, 0x0002173B, 0x00000087, 0xFFFFFFFF ) //    73937     941386
+	RASTERIZER( 0x05, 0x10482405, 0x00045119, 0x00000000, 0x0002173B, 0x00000AC7, 0xFFFFFFFF ) //    28710     757819
+	RASTERIZER( 0x05, 0x11022401, 0x00045119, 0x00000041, 0x0002173B, 0x000000C7, 0xFFFFFFFF ) //    53087     694671
+	RASTERIZER( 0x0B, 0x10482405, 0x0004511F, 0x00000000, 0x0002136B, 0x000000C0, 0x000000C0 ) //    42600     656556
+	RASTERIZER( 0x05, 0x10482405, 0x0004511F, 0x00000041, 0x0002137B, 0x00000AC7, 0xFFFFFFFF ) //    40175     633138
+	RASTERIZER( 0x05, 0x11022401, 0x00045119, 0x00000041, 0x0002173B, 0x00000AC7, 0xFFFFFFFF ) //   140908     601976
+	RASTERIZER( 0x0B, 0x11022401, 0x00045119, 0x00000041, 0x0002173B, 0x00000087, 0x00000087 ) //    34664     570298
+	RASTERIZER( 0x0B, 0x11022401, 0x00045119, 0x00000041, 0x0002173B, 0x00000007, 0x00000007 ) //    25354     551426
+	RASTERIZER( 0x05, 0x11022401, 0x00045119, 0x00000041, 0x0002173B, 0x00000A87, 0xFFFFFFFF ) //    29986     521680
+	RASTERIZER( 0x05, 0x10482405, 0x0004411F, 0x00000000, 0x0002137B, 0x00000A07, 0xFFFFFFFF ) //     2016     475589
+	RASTERIZER( 0x0B, 0x11022401, 0x00045119, 0x00000041, 0x0002173B, 0x00000047, 0x00000047 ) //    29937     465507
+	RASTERIZER( 0x0B, 0x10482405, 0x00045119, 0x00000041, 0x0002173B, 0x00000AC7, 0x00000AC7 ) //    36691     456257
+	RASTERIZER( 0x05, 0x11022401, 0x00045119, 0x00000041, 0x0002173B, 0x00000047, 0xFFFFFFFF ) //    34409     420871
+	RASTERIZER( 0x05, 0x10482405, 0x0004411F, 0x00000000, 0x0002175B, 0x00000A07, 0xFFFFFFFF ) //    15805     382883
+	RASTERIZER( 0x05, 0x10482405, 0x0004411F, 0x00000041, 0x0002137B, 0x00000A07, 0xFFFFFFFF ) //     1476     348811
+	RASTERIZER( 0x0B, 0x10482405, 0x00045119, 0x00000041, 0x0002173B, 0x00000A87, 0x00000A87 ) //    44850     326533
+	RASTERIZER( 0x05, 0x11022401, 0x0000000F, 0x00000000, 0x0002176B, 0x00000AC7, 0xFFFFFFFF ) //     3184     318208
+	RASTERIZER( 0x05, 0x10482405, 0x0004421F, 0x00000041, 0x000213FB, 0x00000AC7, 0xFFFFFFFF ) //      791     245665
+	RASTERIZER( 0x05, 0x10482405, 0x00045119, 0x00000000, 0x0002132B, 0x00000A06, 0xFFFFFFFF ) //     1458     194946
+	RASTERIZER( 0x05, 0x11022401, 0x00045119, 0x00000041, 0x0002173B, 0x00000007, 0xFFFFFFFF ) //     8065      43186
+	RASTERIZER( 0x05, 0x10482405, 0x0004511F, 0x00000000, 0x0002136B, 0x00000A06, 0xFFFFFFFF ) //     1420      33500
+	// gticlub2, races only (not drawn in attract mode)
+	RASTERIZER( 0x05, 0x10484104, 0x0004511F, 0x00000000, 0x0002136B, 0x000000C6, 0xFFFFFFFF )
 
 	{ nullptr, rasterizer_params(0xffffffff) }
 };

@@ -200,17 +200,17 @@ INPUT_PORTS_END
 
 void vet3000_state::vet3000(machine_config &config)
 {
-	constexpr XTAL VDP_CLOCK = 10.738635_MHz_XTAL; /* PLL, 3 x 3.579545 MHz */
+	constexpr XTAL VDP_CLOCK = 3.579545_MHz_XTAL * 3; // chroma clock multiplied with a PLL
 
 	/* basic machine hardware */
-	MC6809(config, m_maincpu, VDP_CLOCK / 3); /* VDP CPUCLK output */
+	MC6809(config, m_maincpu, VDP_CLOCK / 3); // VDP CPUCLK output
 	m_maincpu->set_addrmap(AS_PROGRAM, &vet3000_state::program_map);
 
 	/* video hardware */
-	tms9128_device &vdp(TMS9128(config, "tms9128", VDP_CLOCK)); /* TMS9128NL on the board */
+	tms9128_device &vdp(TMS9128(config, "tms9128", VDP_CLOCK)); // TMS9128NL on the board
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	/* /INT is not connected */
+	// /INT is not connected
 	SCREEN(config, "screen");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);

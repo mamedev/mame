@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.15" blue="0.08" />
+		</led7seg>
+	</element>
+
+	<element name="bezel">
+		<rect><color red="0.08" green="0.08" blue="0.08" /></rect>
+	</element>
+
+	<element name="text_credits"><text string="CREDITOS"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="text_time"><text string="TIEMPO"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+
+	<view name="Displays">
+		<bounds x="0" y="0" width="400" height="364" />
+
+		<!-- credits (digit0-1) on the left, time units (digit2-4) to its right -->
+		<element ref="text_credits"><bounds x="20" y="2" width="60" height="11" /></element>
+		<element ref="bezel"><bounds x="24" y="15" width="52" height="40" /></element>
+		<repeat count="2">
+			<param name="n" start="0" increment="1" />
+			<param name="x" start="29" increment="22" />
+			<element name="digit~n~" ref="digit"><bounds x="~x~" y="20" width="20" height="30" /></element>
+		</repeat>
+
+		<element ref="text_time"><bounds x="94" y="2" width="74" height="11" /></element>
+		<element ref="bezel"><bounds x="94" y="15" width="74" height="40" /></element>
+		<repeat count="3">
+			<param name="n" start="2" increment="1" />
+			<param name="x" start="99" increment="22" />
+			<element name="digit~n~" ref="digit"><bounds x="~x~" y="20" width="20" height="30" /></element>
+		</repeat>
+
+		<screen index="0"><bounds x="0" y="64" width="400" height="300" /></screen>
+	</view>
+</mamelayout>

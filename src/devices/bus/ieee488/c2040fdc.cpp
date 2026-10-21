@@ -108,6 +108,49 @@ void c2040_fdc_device::device_start()
 	save_item(NAME(m_drv_sel));
 	save_item(NAME(m_mode_sel));
 	save_item(NAME(m_rw_sel));
+	save_item(NAME(m_pi));
+
+	save_item(NAME(cur_live.tm));
+	save_item(NAME(cur_live.state));
+	save_item(NAME(cur_live.next_state));
+	save_item(NAME(cur_live.sync));
+	save_item(NAME(cur_live.ready));
+	save_item(NAME(cur_live.error));
+	save_item(NAME(cur_live.ds));
+	save_item(NAME(cur_live.drv_sel));
+	save_item(NAME(cur_live.mode_sel));
+	save_item(NAME(cur_live.rw_sel));
+	save_item(NAME(cur_live.odd_hd));
+	save_item(NAME(cur_live.edge));
+	save_item(NAME(cur_live.shift_reg));
+	save_item(NAME(cur_live.cycle_counter));
+	save_item(NAME(cur_live.cell_counter));
+	save_item(NAME(cur_live.bit_counter));
+	save_item(NAME(cur_live.e));
+	save_item(NAME(cur_live.i));
+	save_item(NAME(cur_live.pi));
+	save_item(NAME(cur_live.shift_reg_write));
+
+	save_item(NAME(checkpoint_live.tm));
+	save_item(NAME(checkpoint_live.state));
+	save_item(NAME(checkpoint_live.next_state));
+	save_item(NAME(checkpoint_live.sync));
+	save_item(NAME(checkpoint_live.ready));
+	save_item(NAME(checkpoint_live.error));
+	save_item(NAME(checkpoint_live.ds));
+	save_item(NAME(checkpoint_live.drv_sel));
+	save_item(NAME(checkpoint_live.mode_sel));
+	save_item(NAME(checkpoint_live.rw_sel));
+	save_item(NAME(checkpoint_live.odd_hd));
+	save_item(NAME(checkpoint_live.edge));
+	save_item(NAME(checkpoint_live.shift_reg));
+	save_item(NAME(checkpoint_live.cycle_counter));
+	save_item(NAME(checkpoint_live.cell_counter));
+	save_item(NAME(checkpoint_live.bit_counter));
+	save_item(NAME(checkpoint_live.e));
+	save_item(NAME(checkpoint_live.i));
+	save_item(NAME(checkpoint_live.pi));
+	save_item(NAME(checkpoint_live.shift_reg_write));
 }
 
 

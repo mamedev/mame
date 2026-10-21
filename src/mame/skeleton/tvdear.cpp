@@ -23,7 +23,7 @@ public:
 	{
 	}
 
-	void tvdear(machine_config &config);
+	void tvdear(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -33,8 +33,8 @@ private:
 	void p0_w(u8 data);
 	u8 pt_r();
 
-	void mem_map(address_map &map);
-	void io_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 

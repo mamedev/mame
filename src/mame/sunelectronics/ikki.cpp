@@ -162,14 +162,15 @@ void ikki_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 
 	// copy the sprite bitmap into the main bitmap, skipping the transparent pixels
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint16_t const pen = m_sprite_bitmap.pix(y, x);
 
 			if (m_palette->pen_indirect(pen) != 0x100)
-				bitmap.pix(y, x) = pen;
+				dst[x] = pen;
 		}
 	}
 }

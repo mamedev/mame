@@ -2111,8 +2111,8 @@ ROM_START( fantstry )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "system_rom", 0x00000, 0x80000, CRC(3d7f19ce) SHA1(eb163489adda25a0ece1a21292bfe5818b52cddc) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // PIC16F84A-04/P Code
-	ROM_LOAD( "pic16f84a", 0x00000, 0x10000, NO_DUMP )
+	ROM_REGION16_LE( 0x4280, "audiocpu", 0 ) // PIC16F84A-04/P Code
+	ROM_LOAD( "pic16f84a.bin", 0x0000, 0x4280, NO_DUMP )
 
 	ROM_REGION( 0x040000, "okisfx", 0 )
 	ROM_LOAD( "voice_rom", 0x00000, 0x040000, CRC(3353e8df) SHA1(22998100e0afa14927ab219dfdbf21c1fd7e27c6) ) // single bank
@@ -2135,8 +2135,8 @@ ROM_START( fantstrya ) // PCB marked: PNXND-MULTI 2002 01 01 - Only EPROMs dumpe
 	ROM_REGION( 0x80000, "maincpu", 0 ) // only difference from the above set seems to be they moved the RAM base from 0x100000 to 0x900000
 	ROM_LOAD16_WORD_SWAP( "system_rom", 0x00000, 0x80000, CRC(38471eed) SHA1(02f311ea5bdea41092e6754ed120e5e3e6994623) ) // 27c040, sldh
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "pic16f84a", 0x00000, 0x10000, NO_DUMP ) // did they change the program to take into account the one less OKI?
+	ROM_REGION16_LE( 0x4280, "audiocpu", 0 )
+	ROM_LOAD( "pic16f84a.bin", 0x0000, 0x4280, NO_DUMP ) // did they change the program to take into account the one less OKI?
 
 	ROM_REGION( 0x80000, "okimusic", 0 )
 	ROM_LOAD( "sound_rom", 0x00000, 0x80000, CRC(44424914) SHA1(5bbe296d2c8de89b9271914164ef178239fa3e05) ) // 27c4000, sldh

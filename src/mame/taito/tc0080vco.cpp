@@ -533,10 +533,10 @@ void tc0080vco_device::bg0_tilemap_draw(screen_device &screen, bitmap_ind16 &bit
 
 		const bool flip = m_flipscreen;
 
-		const int min_x = cliprect.min_x;
-		const int max_x = cliprect.max_x;
-		const int min_y = cliprect.min_y;
-		const int max_y = cliprect.max_y;
+		const int min_x = cliprect.left();
+		const int max_x = cliprect.right();
+		const int min_y = cliprect.top();
+		const int max_y = cliprect.bottom();
 		const int screen_width = max_x + 1;
 		const int width_mask = 0x3ff; /* underlying tilemap */
 
@@ -649,10 +649,10 @@ void tc0080vco_device::bg1_tilemap_draw(screen_device &screen, bitmap_ind16 &bit
 {
 	u8 layer = 1;
 	const u16 zoom = m_scroll_ram[6 + layer];
-	const int min_x = cliprect.min_x;
-	const int max_x = cliprect.max_x;
-	const int min_y = cliprect.min_y;
-	const int max_y = cliprect.max_y;
+	const int min_x = cliprect.left();
+	const int max_x = cliprect.right();
+	const int min_y = cliprect.top();
+	const int max_y = cliprect.bottom();
 
 	int zoomx = (zoom & 0xff00) >> 8;
 	int zoomy =  zoom & 0x00ff;

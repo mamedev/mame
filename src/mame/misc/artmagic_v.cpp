@@ -21,15 +21,16 @@
  *
  *************************************/
 
-inline uint16_t *artmagic_state::address_to_vram(offs_t *address)
+inline uint16_t *artmagic_state::address_to_vram(offs_t &address)
 {
-	offs_t original = *address;
-	*address = (original & 0x001fffff) >> 4;
+	const offs_t original = address;
+	address = (original & 0x001fffff) >> 4;
 	if (original < 0x001fffff)
 		return m_vram[0];
 	else if (original >= 0x00400000 && original < 0x005fffff)
 		return m_vram[1];
-	return nullptr;
+	else
+		return nullptr;
 }
 
 
@@ -61,7 +62,7 @@ void artmagic_state::video_start()
 
 TMS340X0_TO_SHIFTREG_CB_MEMBER(artmagic_state::to_shiftreg)
 {
-	uint16_t *vram = address_to_vram(&address);
+	uint16_t *vram = address_to_vram(address);
 	if (vram)
 		memcpy(shiftreg, &vram[address], 0x400);
 }
@@ -69,7 +70,7 @@ TMS340X0_TO_SHIFTREG_CB_MEMBER(artmagic_state::to_shiftreg)
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(artmagic_state::from_shiftreg)
 {
-	uint16_t *vram = address_to_vram(&address);
+	uint16_t *vram = address_to_vram(address);
 	if (vram)
 		memcpy(&vram[address], shiftreg, 0x400);
 }
@@ -335,7 +336,7 @@ void artmagic_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 TMS340X0_SCANLINE_RGB32_CB_MEMBER(artmagic_state::scanline)
 {
 	offs_t offset = (params->rowaddr << 12) & 0x7ff000;
-	uint16_t const *vram = address_to_vram(&offset);
+	uint16_t const *vram = address_to_vram(offset);
 	uint32_t *const dest = &bitmap.pix(scanline);
 	pen_t const *const pens = m_tlc34076->pens();
 	int coladdr = params->coladdr << 1;

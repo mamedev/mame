@@ -1119,7 +1119,7 @@ void i386_device::i386_mov_rm32_r32()      // Opcode 0x89
 		STORE_RM32(modrm, src);
 		CYCLES(CYCLES_MOV_REG_REG);
 	} else {
-		uint32_t ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1,4);
 		src = LOAD_REG32(modrm);
 		WRITE32(ea, src);
 		CYCLES(CYCLES_MOV_REG_MEM);
@@ -1135,7 +1135,7 @@ void i386_device::i386_mov_r32_rm32()      // Opcode 0x8b
 		STORE_REG32(modrm, src);
 		CYCLES(CYCLES_MOV_REG_REG);
 	} else {
-		uint32_t ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0,4);
 		src = READ32(ea);
 		STORE_REG32(modrm, src);
 		CYCLES(CYCLES_MOV_MEM_REG);
@@ -1150,7 +1150,7 @@ void i386_device::i386_mov_rm32_i32()      // Opcode 0xc7
 		STORE_RM32(modrm, value);
 		CYCLES(CYCLES_MOV_IMM_REG);
 	} else {
-		uint32_t ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1,4);
 		uint32_t value = FETCH32();
 		WRITE32(ea, value);
 		CYCLES(CYCLES_MOV_IMM_MEM);
@@ -1166,9 +1166,9 @@ void i386_device::i386_mov_eax_m32()       // Opcode 0xa1
 		offset = FETCH16();
 	}
 	if( m_segment_prefix ) {
-		ea = i386_translate(m_segment_override, offset, 0 );
+		ea = i386_translate(m_segment_override, offset, 0, 4 );
 	} else {
-		ea = i386_translate(DS, offset, 0 );
+		ea = i386_translate(DS, offset, 0, 4 );
 	}
 	REG32(EAX) = READ32(ea);
 	CYCLES(CYCLES_MOV_MEM_ACC);
@@ -1183,9 +1183,9 @@ void i386_device::i386_mov_m32_eax()       // Opcode 0xa3
 		offset = FETCH16();
 	}
 	if( m_segment_prefix ) {
-		ea = i386_translate(m_segment_override, offset, 1 );
+		ea = i386_translate(m_segment_override, offset, 1, 4 );
 	} else {
-		ea = i386_translate(DS, offset, 1 );
+		ea = i386_translate(DS, offset, 1, 4 );
 	}
 	WRITE32(ea, REG32(EAX) );
 	CYCLES(CYCLES_MOV_ACC_MEM);
@@ -1278,7 +1278,7 @@ void i386_device::i386_movsx_r32_rm16()    // Opcode 0x0f bf
 		STORE_REG32(modrm, src);
 		CYCLES(CYCLES_MOVSX_REG_REG);
 	} else {
-		uint32_t ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0,2);
 		int32_t src = (int16_t)READ16(ea);
 		STORE_REG32(modrm, src);
 		CYCLES(CYCLES_MOVSX_MEM_REG);
@@ -1308,7 +1308,7 @@ void i386_device::i386_movzx_r32_rm16()    // Opcode 0x0f b7
 		STORE_REG32(modrm, src);
 		CYCLES(CYCLES_MOVZX_REG_REG);
 	} else {
-		uint32_t ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0,2);
 		uint32_t src = (uint16_t)READ16(ea);
 		STORE_REG32(modrm, src);
 		CYCLES(CYCLES_MOVZX_MEM_REG);
