@@ -2602,35 +2602,87 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 			wind_offs++;
 	}
 
-	for(int x=cliprect.left(); x<=cliprect.right(); x+=ppw)
+	// start dot address: the screen's display is shifted left by SDA dots for
+	// horizontal smooth scroll (on hardware SDA is output as the HSD video
+	// attribute to condition the external shift register load). WSS in the
+	// OMR selects whether the shift applies to the window or the background
+	// screens on this raster.
+	bool const wss = BIT(m_omr, 12);
+	int const sda_bg = wss ? 0 : (m_sda[layer_n] & (ppw - 1));
+	int const sda_win = wss ? (m_sda[3] & (ppw - 1)) : 0;
+
+	if (!sda_bg && !sda_win)
 	{
-		uint16_t data = 0;
-		int screen_n = layer_n;
-
-		if (ins_window && x >= ws * ppmc && x < (ws + m_hww) * ppmc)
+		for(int x=cliprect.left(); x<=cliprect.right(); x+=ppw)
 		{
-			data = readword(wind_offs, 3);
-			wind_offs++;
-			screen_n = 3;
+			uint16_t data = 0;
+			int screen_n = layer_n;
+
+			if (ins_window && x >= ws * ppmc && x < (ws + m_hww) * ppmc)
+			{
+				data = readword(wind_offs, 3);
+				wind_offs++;
+				screen_n = 3;
+			}
+			else if (active)
+				data = readword(base_offs, layer_n);
+
+			for (int b=0; b<ppw; b++)
+			{
+				int px = x + b;
+				if (!m_display_cb.isnull())
+					m_display_cb(bitmap, cliprect, y, px, data & mask, screen_n);
+				else if (cliprect.contains(px, y))
+					bitmap.pix(y, px) = data & mask;
+
+				data >>= bpp;
+			}
+
+			if (++hcnt >= hzoom)
+			{
+				hcnt = 0;
+				base_offs++;
+			}
 		}
-		else if (active)
-			data = readword(base_offs, layer_n);
-
-		for (int b=0; b<ppw; b++)
+	}
+	else
+	{
+		// one extra word feeds the dots shifted in from the right
+		for(int x=cliprect.left(); x<=cliprect.right() + ppw; x+=ppw)
 		{
-			int px = x + b;
-			if (!m_display_cb.isnull())
-				m_display_cb(bitmap, cliprect, y, px, data & mask, screen_n);
-			else if (cliprect.contains(px, y))
-				bitmap.pix(y, px) = data & mask;
+			uint16_t data = 0;
+			int screen_n = layer_n;
+			int sda = sda_bg;
 
-			data >>= bpp;
-		}
+			if (ins_window && x >= ws * ppmc && x < (ws + m_hww) * ppmc)
+			{
+				data = readword(wind_offs, 3);
+				wind_offs++;
+				screen_n = 3;
+				sda = sda_win;
+			}
+			else if (active)
+				data = readword(base_offs, layer_n);
 
-		if (++hcnt >= hzoom)
-		{
-			hcnt = 0;
-			base_offs++;
+			for (int b=0; b<ppw; b++)
+			{
+				int px = x + b - sda;
+				if (px >= cliprect.left() && px <= cliprect.right())
+				{
+					if (!m_display_cb.isnull())
+						m_display_cb(bitmap, cliprect, y, px, data & mask, screen_n);
+					else if (cliprect.contains(px, y))
+						bitmap.pix(y, px) = data & mask;
+				}
+
+				data >>= bpp;
+			}
+
+			if (++hcnt >= hzoom)
+			{
+				hcnt = 0;
+				base_offs++;
+			}
 		}
 	}
 }
