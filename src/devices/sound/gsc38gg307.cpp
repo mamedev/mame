@@ -145,7 +145,7 @@ uint32_t gsc38gg307_device::fma_dclk() const
 void gsc38gg307_device::write_data(uint8_t data)
 {
 	const bool was_body = m_demux.packet_body;
-	m_demux.byte(data, m_fma_stream);
+	m_demux.byte(data, 0xc0 | m_fma_stream);
 
 	if (was_body)
 	{
