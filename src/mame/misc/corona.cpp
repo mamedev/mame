@@ -377,6 +377,8 @@ private:
 	uint8_t mux_port_r();
 	void mux_port_w(uint8_t data);
 	void rula_mux_w(uint8_t data);
+	void rula_led_col_w(uint8_t data);
+	void rula_led_row_w(uint8_t data);
 	void wc_meters_w(uint8_t data);
 	void blitter_execute(int x, int y, int color, int width, int flag);
 	void corona_palette(palette_device &palette) const;
@@ -410,6 +412,8 @@ private:
 	uint8_t m_lamp = 0;
 	uint8_t m_lamp_old = 0;
 	uint8_t m_input_selector = 0;
+	uint8_t m_led_col = 0;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;
@@ -642,6 +646,51 @@ void corona_state::rula_mux_w(uint8_t data)
     x--- ----   Credits Out counter pulse (active high).
 */
 	mux_port_w(data ^ 0xff);
+}
+
+
+void corona_state::rula_led_col_w(uint8_t data)
+{
+/*  Roulette LEDs matrix (37 LEDs, 6 columns x 7 rows).
+
+    Port $E9: column strobe (active low, one column at a time).
+    Port $EF: row data (active high, one row at a time).
+
+    The program at $1E12 lights a single LED at a time, with
+    LED = (column * 7) + row, in the 0-36 range. The index
+    follows the position in the wheel (the number table at $B294
+    is the european wheel order).
+
+    HEX: 00 20 0F 13 04 15 02 19 11 22 06 1B 0D 24 0B 1E 08 17 0A 05 18 10 21 01 14 0E 1F 09 16 12 1D 07 1C 0C 23 03 1A
+    DEC: 00 32 15 19 04 21 02 25 17 34 06 27 13 36 11 30 08 23 10 05 24 16 33 01 20 14 31 09 22 18 29 07 28 12 35 03 26
+*/
+	m_led_col = ~data & 0x3f;
+}
+
+void corona_state::rula_led_row_w(uint8_t data)
+{
+	int col = -1;
+	int row = -1;
+
+	for (int i = 0; i < 6; i++)
+		if (BIT(m_led_col, i))
+			col = i;
+
+	for (int i = 0; i < 7; i++)
+		if (BIT(data, i))
+			row = i;
+
+	if (col >= 0 && row >= 0)
+	{
+		const uint8_t led = (col * 7) + row;
+
+		m_lamps[m_lamp_old] = 0;
+		m_lamps[led] = 1;
+		m_lamp_old = led;
+        popmessage("LED: %02d", led);
+	}
+	else
+		m_lamps[m_lamp_old] = 0;
 }
 
 
@@ -960,11 +1009,11 @@ void corona_state::rula_cpu_io_map(address_map &map)
 
 	map(0xd8, 0xd8).w(FUNC(corona_state::rula_mux_w));          // mux selector & meters
 	map(0xdf, 0xdf).w(FUNC(corona_state::sound_latch_w));
-//	map(0xe9, 0xe9).nopw();                                     // related to ball. still not understood
+	map(0xe9, 0xe9).w(FUNC(corona_state::rula_led_col_w));      // roulette LEDs matrix column
 	map(0xeb, 0xeb).r(FUNC(corona_state::mux_port_r));
 	map(0xed, 0xed).portr("DSW2");
 	map(0xee, 0xee).portr("DSW1");
-//	map(0xef, 0xef).nopw();                                     // related to ball. still not understood
+	map(0xef, 0xef).w(FUNC(corona_state::rula_led_row_w));      // roulette LEDs matrix row
 }
 
 
