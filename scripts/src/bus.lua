@@ -5520,6 +5520,8 @@ if BUSES["SEGA8"] then
 		MAME_DIR .. "src/devices/bus/sega8/ccatch.h",
 		MAME_DIR .. "src/devices/bus/sega8/mgear.cpp",
 		MAME_DIR .. "src/devices/bus/sega8/mgear.h",
+		MAME_DIR .. "src/devices/bus/sega8/sf7000.cpp",
+		MAME_DIR .. "src/devices/bus/sega8/sf7000.h",
 	}
 end
 
