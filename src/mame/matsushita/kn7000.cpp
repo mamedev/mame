@@ -38,11 +38,13 @@
     manuals do not give the frequency of X1, so their core clocks are inferred
     from the KN6000 and KN6500 rather than documented.
 
-    The KN7000's program and table ROMs are not chip reads. They are payloads
-    from Panasonic's own firmware update disks, and they validate against the
-    checksums that Panasonic ships alongside them: the update descriptor files
-    carry a 32-bit sum over the whole payload plus 16-bit sums of each 256 KiB
-    block, and every block matches.
+    Except for v1.3, the KN7000's program and table ROMs are not chip reads.
+    They are payloads from Panasonic's own firmware update disks, and they
+    validate against the checksums that Panasonic ships alongside them: the
+    update descriptor files carry a 32-bit sum over the whole payload plus
+    16-bit sums of each 256 KiB block, and every block matches. No update disk
+    for v1.3 is known; that set was read from an instrument's flash by its own
+    CPU.
 
     A note on the KN7000's IC16/IC17: these are one pair of 4 MiB flash devices
     on CPU address lines A2-A22, so together they span 8 MiB. Address line A22
@@ -1091,7 +1093,8 @@ void kn_sd_state::kn2600(machine_config &config)
 ROM_START(kn7000)
 	// The program (IC16/IC17) and table (same pair, A22 selects) flash are
 	// reconstructed from Panasonic's system-update floppies and verified against
-	// the checksums shipped on them (SMCK*.INF), except the SP7001 set (see below).
+	// the checksums shipped on them (SMCK*.INF), except the SP7001 set (see below)
+	// and v13, which was read from an instrument's flash.
 	//
 	// Each version carries the PROGRAM and TABLE build numbers the instrument
 	// prints on its hidden SOFT VERSION screen:
@@ -1099,6 +1102,7 @@ ROM_START(kn7000)
 	//     v16     PROGRAM 941 / TABLE 84   fully SMCK-verified
 	//     v15     PROGRAM 935 / TABLE 84   fully SMCK-verified
 	//     v14     PROGRAM 929 / TABLE 84   only update floppy 2 survives (floppy 1 NO_DUMP)
+	//     v13     PROGRAM 893 / TABLE 80   read from an instrument's flash
 	ROM_REGION32_LE(0x400000, "program", 0)
 	ROM_DEFAULT_BIOS("v16")
 
@@ -1122,6 +1126,10 @@ ROM_START(kn7000)
 	ROMX_LOAD("kn7000_program_even_v1.4_b929_upper.ic17", 0x200000, 0x100000, CRC(787d3781) SHA1(86c0dc56e7b7671e83bf59ff6b88feebe2f55b5c), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
 	ROMX_LOAD("kn7000_program_odd_v1.4_b929_upper.ic16",  0x200002, 0x100000, CRC(5f951af4) SHA1(1752a82e75b064fba8facf3c159ac0d8f827b944), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
 
+	ROM_SYSTEM_BIOS(4, "v13", "Program v1.3 (build 893) / Table (build 80)")
+	ROMX_LOAD("kn7000_program_even_v1.3_b893.ic17", 0x000000, 0x200000, CRC(e30502d3) SHA1(3c4e91c8473ca5ca7170fdb00bb45972255c1f85), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(4))
+	ROMX_LOAD("kn7000_program_odd_v1.3_b893.ic16", 0x000002, 0x200000, CRC(4233c444) SHA1(276fe9c7bf8f5eabdbec66895e87d7dee928af8c), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(4))
+
 	ROM_REGION32_LE(0x400000, "table_data", 0)
 	ROMX_LOAD("kn7000_table_even_sp7001_b83.ic17", 0x000000, 0x200000, CRC(ce5abecd) SHA1(1557acfbe5e887a661be9269050b1d14031a8afa), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROMX_LOAD("kn7000_table_odd_sp7001_b83.ic16", 0x000002, 0x200000, CRC(7c953378) SHA1(f535d3c2e4d3dd2aa9ef854636b582795b1df821), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
@@ -1131,6 +1139,8 @@ ROM_START(kn7000)
 	ROMX_LOAD("kn7000_table_odd_b84.ic16", 0x000002, 0x200000, CRC(7e1a312e) SHA1(435b597b926ebac56d4710bcae25b635a59a9ce5), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(2))
 	ROMX_LOAD("kn7000_table_even_b84.ic17", 0x000000, 0x200000, CRC(005a6db2) SHA1(2f4112ea9b039b17b5ada6952b7646adae8d9dd6), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
 	ROMX_LOAD("kn7000_table_odd_b84.ic16", 0x000002, 0x200000, CRC(7e1a312e) SHA1(435b597b926ebac56d4710bcae25b635a59a9ce5), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
+	ROMX_LOAD("kn7000_table_even_b80.ic17", 0x000000, 0x200000, CRC(d09d32a5) SHA1(2d7e02370fbcdf79c64f7f5720f412d28d05174f), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(4))
+	ROMX_LOAD("kn7000_table_odd_b80.ic16", 0x000002, 0x200000, CRC(946dac36) SHA1(c86abfc6880523414facafe21f8f4ab32cae1c7d), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(4))
 
 	ROM_REGION(0x1000000, "waveform_main_y", 0)
 	ROM_LOAD("c3cbqd000002.ic203", 0x000000, 0x1000000, NO_DUMP)
