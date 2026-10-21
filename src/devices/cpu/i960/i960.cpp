@@ -529,7 +529,7 @@ double i960_cpu_device::round_to_int(double val)
 	std::fesetround(FE_TONEAREST);
 	switch ((m_AC >> 30) & 3)
 	{
-	case 0: return std::rint(val); // round to nearest, ties to even
+	case 0: return std::rint(val);
 	case 1: return floor(val);
 	case 2: return ceil(val);
 	default: return trunc(val);
