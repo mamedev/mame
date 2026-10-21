@@ -133,7 +133,7 @@ attotime nscsi_cdrom_pcfx_device::next_sector_wait()
 }
 
 // sectors go over the bus as a burst at the bus rate; at the end of a sector, the
-// wait for the next one instead
+// period is the wait for the next one instead
 attotime nscsi_cdrom_pcfx_device::scsi_data_byte_period()
 {
 	const attotime wait = m_sector_wait;
@@ -212,7 +212,7 @@ void nscsi_cdrom_pcfx_device::scsi_command()
 	{
 		case SC_INQUIRY:
 		{
-			// games check for this drive by its INQUIRY data (Battle Heat)
+			// games check for this drive by its INQUIRY data (batlheat)
 			static const u8 inquiry[36] =
 			{
 				0x05, 0x80, 0x02, 0x00, 0x1f, 0x00, 0x00, 0x00,
