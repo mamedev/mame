@@ -84,6 +84,8 @@ private:
 		bool dma_send = false;
 		bool irq = false;
 		u8 subchannel_ctrl = 0;
+		u8 subchannel_data = 0;      // SCOR Q R S T U V W
+		bool subchannel_irq = false; // SBCODE.I
 		u8 bus = 0;            // bus control lines as last seen, scsi_bus_signals() layout
 		bool req_last = false; // REQ as of the last req_callback, for edge detection
 		bool req_rose = false; // REQ rose since scsi_lines_changed last ran (sticky)
@@ -190,6 +192,7 @@ private:
 	u32 scsi_irq_ack_r(offs_t offset);
 	void scsi_dma_start_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 scsi_subchannel_r(offs_t offset);
+	void scsi_subcode_w(u8 data);
 	void scsi_subchannel_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 dma_address_r(offs_t offset);
 	void dma_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);

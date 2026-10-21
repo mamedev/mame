@@ -5,7 +5,6 @@
 Hudson/NEC HuC6272 "King" device
 
 TODO:
-- SCSI sub-channel register ($08) is a stub;
 - Convert base mapping to address_map;
 - Convert I/O to space address, and make it honor mem_mask;
 - CD-ROM DRIVE:FX is bus/nscsi/pcfxcd.cpp (KING is SCSI ID 7, the drive ID 2);
@@ -15,7 +14,6 @@ TODO:
 - Microprogram only selects which CG/BAT words are fetched, no cycle timing;
 - Rotation mode ignores the microprogram;
 - Extended dot modes (64K/16M "extdot") are not drawn;
-- Sub-channel interrupt;
 - (check Photo CD, Audio CD & backup RAM screens);
 - Verify ADPCM transfers;
 - Verify CD-DA hookup;
@@ -79,11 +77,13 @@ void huc6272_device::device_add_mconfig(machine_config &config)
 {
 	NSCSI_BUS(config, m_scsibus);
 	NSCSI_CONNECTOR(config, "scsi:2").option_set("cdrom", NSCSI_CDROM_PCFX).machine_config(
-		[](device_t *device)
+		[this](device_t *device)
 		{
 			// the drive's audio passes through the KING mixer (this device's two outputs)
 			device->subdevice<cdda_device>("cdda")->add_route(0, "^^", 1.0, 0);
 			device->subdevice<cdda_device>("cdda")->add_route(1, "^^", 1.0, 1);
+			// sub-code goes to KING directly, not over SCSI
+			downcast<nscsi_cdrom_pcfx_device &>(*device).subcode_cb().set(*this, FUNC(huc6272_device::scsi_subcode_w));
 		});
 	NSCSI_CONNECTOR(config, "scsi:7", default_scsi_devices, "scsicb", true)
 		.option_add_internal("scsicb", NSCSI_CB)
@@ -125,6 +125,8 @@ void huc6272_device::device_start()
 	save_item(STRUCT_MEMBER(m_scsi, dma_send));
 	save_item(STRUCT_MEMBER(m_scsi, irq));
 	save_item(STRUCT_MEMBER(m_scsi, subchannel_ctrl));
+	save_item(STRUCT_MEMBER(m_scsi, subchannel_data));
+	save_item(STRUCT_MEMBER(m_scsi, subchannel_irq));
 	save_item(STRUCT_MEMBER(m_scsi, bus));
 	save_item(STRUCT_MEMBER(m_scsi, req_last));
 	save_item(STRUCT_MEMBER(m_scsi, req_rose));
@@ -329,7 +331,8 @@ u16 huc6272_device::status_r(offs_t offset)
 {
 	u16 res = m_register & 0x7f;
 	res |= (m_adpcm.interrupt << 10);
-	// TODO: sub-channel IRQ
+	if (m_scsi.subchannel_irq)
+		res |= 0x1000;
 	// only one of DMA/SCSI is reported at a time (Anime Freak FX Vol. 4 gets confused otherwise)
 	if (m_dma.irq && BIT(m_dma.ctrl, 1))
 		res |= 0x2000;
@@ -360,8 +363,14 @@ u16 huc6272_device::status_r(offs_t offset)
  */
 u16 huc6272_device::status2_r(offs_t offset)
 {
-	u16 res = scsi_bus_signals();
-	// TODO: sub-code data
+	u16 res = scsi_bus_signals() | (m_scsi.subchannel_data << 8);
+
+	// reading the sub-code byte acknowledges the sub-code interrupt
+	if (m_scsi.subchannel_irq && !machine().side_effects_disabled())
+	{
+		m_scsi.subchannel_irq = false;
+		interrupt_update();
+	}
 	return res;
 }
 
@@ -756,16 +765,39 @@ void huc6272_device::scsi_dma_start_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 }
 
-// TODO: CD sub-channel data, needs a hookup to the drive's Q/P-W stream
+// sub-code symbol latched from the drive at 7.35 kHz; reading it acknowledges the interrupt
 u32 huc6272_device::scsi_subchannel_r(offs_t offset)
 {
-	return 0;
+	if (m_scsi.subchannel_irq && !machine().side_effects_disabled())
+	{
+		m_scsi.subchannel_irq = false;
+		interrupt_update();
+	}
+	return m_scsi.subchannel_data;
 }
 
+// bit 0 = SUBC EBL (latch sub-code), bit 1 = SUB INT (interrupt on each symbol)
 void huc6272_device::scsi_subchannel_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
+	{
 		m_scsi.subchannel_ctrl = data & 3;
+		m_scsi.subchannel_irq = false;
+		interrupt_update();
+	}
+}
+
+void huc6272_device::scsi_subcode_w(u8 data)
+{
+	if (!BIT(m_scsi.subchannel_ctrl, 0))
+		return;
+
+	m_scsi.subchannel_data = data;
+	if (BIT(m_scsi.subchannel_ctrl, 1))
+	{
+		m_scsi.subchannel_irq = true;
+		interrupt_update();
+	}
 }
 
 u32 huc6272_device::dma_address_r(offs_t offset)
@@ -1558,6 +1590,6 @@ u8 huc6272_device::adpcm_update_1()
 
 void huc6272_device::interrupt_update()
 {
-	const bool state = m_adpcm.interrupt || m_scsi.irq || (m_dma.irq && BIT(m_dma.ctrl, 1)) || m_rainbow.raster_irq;
+	const bool state = m_adpcm.interrupt || m_scsi.irq || m_scsi.subchannel_irq || (m_dma.irq && BIT(m_dma.ctrl, 1)) || m_rainbow.raster_irq;
 	m_irq_changed_cb(state ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -17,7 +17,8 @@
     - MESSAGE OUT accepts only ABORT
     - Scan (d2h)
     - Seek times
-    - Real sub-channel data, Q is synthesized from the play position
+    - Real sub-channel data, Q is synthesized from the play position and
+      R-W are zero; no sub-code while paused, stopped or reading data
 
 ***************************************************************************/
 
@@ -56,6 +57,9 @@ nscsi_cdrom_pcfx_device::nscsi_cdrom_pcfx_device(const machine_config &mconfig, 
 	, m_cdda_loop(false)
 	, m_cdda_start(0)
 	, m_cdda_end(0)
+	, m_subcode_cb(*this)
+	, m_subcode_timer(nullptr)
+	, m_subcode_symbol(0)
 	, m_command(0)
 	, m_read_left(0)
 	, m_read_buffered(0)
@@ -74,10 +78,15 @@ void nscsi_cdrom_pcfx_device::device_start()
 {
 	nscsi_cdrom_device::device_start();
 
+	m_subcode_timer = timer_alloc(FUNC(nscsi_cdrom_pcfx_device::subcode_tick), this);
+	std::fill(std::begin(m_subq), std::end(m_subq), 0);
+
 	save_item(NAME(m_cdda_status));
 	save_item(NAME(m_cdda_loop));
 	save_item(NAME(m_cdda_start));
 	save_item(NAME(m_cdda_end));
+	save_item(NAME(m_subcode_symbol));
+	save_item(NAME(m_subq));
 	save_item(NAME(m_command));
 	save_item(NAME(m_read_left));
 	save_item(NAME(m_read_buffered));
@@ -90,7 +99,7 @@ void nscsi_cdrom_pcfx_device::device_reset()
 	nscsi_cdrom_device::device_reset();
 
 	// a machine reset: nscsi_full_device::device_reset() does not call scsi_abort()
-	m_cdda_status = CDDA_STOPPED;
+	set_cdda_status(CDDA_STOPPED);
 	m_cdda_loop = false;
 	m_cdda_start = m_cdda_end = 0;
 	m_command = 0;
@@ -177,7 +186,7 @@ void nscsi_cdrom_pcfx_device::scsi_abort()
 
 	LOGCDDA("Abort: audio stop\n");
 	cdda->stop_audio();
-	m_cdda_status = CDDA_STOPPED;
+	set_cdda_status(CDDA_STOPPED);
 
 	m_read_left = m_read_buffered = 0;
 	m_sector_wait = attotime::zero;
@@ -229,14 +238,14 @@ void nscsi_cdrom_pcfx_device::scsi_command()
 
 		case SC_READ_6:
 			cdda->stop_audio();
-			m_cdda_status = CDDA_STOPPED;
+			set_cdda_status(CDDA_STOPPED);
 			start_read(m_scsi_cmdbuf[4] ? m_scsi_cmdbuf[4] : 256);
 			nscsi_cdrom_device::scsi_command();
 			break;
 
 		case SC_READ_10:
 			cdda->stop_audio();
-			m_cdda_status = CDDA_STOPPED;
+			set_cdda_status(CDDA_STOPPED);
 			start_read(get_u16be(&m_scsi_cmdbuf[7]));
 			nscsi_cdrom_device::scsi_command();
 			break;
@@ -244,7 +253,7 @@ void nscsi_cdrom_pcfx_device::scsi_command()
 		case SC_READ_12:
 		{
 			cdda->stop_audio();
-			m_cdda_status = CDDA_STOPPED;
+			set_cdda_status(CDDA_STOPPED);
 			const u32 blocks = get_u32be(&m_scsi_cmdbuf[6]);
 			// same path as the base READ(10): the LBA is already at the same offset, just
 			// narrow the block count to 16 bits (clamped, not truncated) and relabel the CDB
@@ -341,7 +350,7 @@ void nscsi_cdrom_pcfx_device::nec_audio_end(int state)
 	else
 	{
 		LOGCDDA("Audio end: stop\n");
-		m_cdda_status = CDDA_STOPPED;
+		set_cdda_status(CDDA_STOPPED);
 	}
 }
 
@@ -409,11 +418,11 @@ void nscsi_cdrom_pcfx_device::nec_set_audio_start_position()
 	cdda->set_output_gain(ALL_OUTPUTS, 1.0);
 	nec_play(lba, image->get_track_start(0xaa));
 	if (BIT(cdb[1], 0))
-		m_cdda_status = CDDA_PLAYING;
+		set_cdda_status(CDDA_PLAYING);
 	else
 	{
 		cdda->pause_audio(1);
-		m_cdda_status = CDDA_PAUSED;
+		set_cdda_status(CDDA_PAUSED);
 	}
 
 	scsi_status_complete(SS_GOOD);
@@ -448,7 +457,7 @@ void nscsi_cdrom_pcfx_device::nec_set_audio_end_position()
 	cdda->pause_audio(0);
 	nec_play(start, lba);
 	m_cdda_start = start;
-	m_cdda_status = CDDA_PLAYING;
+	set_cdda_status(CDDA_PLAYING);
 
 	scsi_status_complete(SS_GOOD);
 }
@@ -470,7 +479,7 @@ void nscsi_cdrom_pcfx_device::nec_pause()
 
 	LOGCMD("0xda PAUSE (NEC)\n");
 	cdda->pause_audio(1);
-	m_cdda_status = CDDA_STILL;
+	set_cdda_status(CDDA_STILL);
 
 	scsi_status_complete(SS_GOOD);
 }
@@ -487,20 +496,80 @@ void nscsi_cdrom_pcfx_device::nec_read_subq()
 		return;
 	}
 
-	const u32 lba = (m_cdda_status == CDDA_STOPPED) ? m_cdda_start : cdda->get_audio_lba();
-	const u32 track = image->get_track(lba);
+	u8 q[12];
+	make_subq((m_cdda_status == CDDA_STOPPED) ? m_cdda_start : cdda->get_audio_lba(), q);
 
+	// status, then Q without its zero byte and CRC
 	m_scsi_cmdbuf[0] = m_cdda_status;
-	// get_adr_control() is ADR in the high nibble, as for READ TOC, Q has the control field first
-	const u8 adr_control = image->get_adr_control(track);
-	m_scsi_cmdbuf[1] = ((adr_control & 0x0f) << 4) | (adr_control >> 4);
-	m_scsi_cmdbuf[2] = to_bcd(track + 1);
-	m_scsi_cmdbuf[3] = 1;
-	put_msf(&m_scsi_cmdbuf[4], s32(lba - image->get_track_start(track)) - 150);
-	put_msf(&m_scsi_cmdbuf[7], lba);
+	std::copy_n(&q[0], 6, &m_scsi_cmdbuf[1]);
+	std::copy_n(&q[7], 3, &m_scsi_cmdbuf[7]);
 
 	scsi_data_in(SBUF_MAIN, std::min<int>(cdb[1], 10));
 	scsi_status_complete(SS_GOOD);
+}
+
+// Q for an LBA: control/ADR 1, track, index, relative M:S:F (counting down in the pregap), 0,
+// absolute M:S:F, CRC-16 (CCITT, inverted)
+void nscsi_cdrom_pcfx_device::make_subq(u32 lba, u8 *q)
+{
+	const u32 track = image->get_track(lba);
+	const u32 start = image->get_track_start(track);
+	const bool pregap = lba < start;
+
+	// get_adr_control() is ADR in the high nibble, as for READ TOC, Q has the control field first
+	const u8 adr_control = image->get_adr_control(track);
+	q[0] = ((adr_control & 0x0f) << 4) | (adr_control >> 4);
+	q[1] = to_bcd(track + 1);
+	q[2] = pregap ? 0 : to_bcd(image->get_track_index(lba));
+	put_msf(&q[3], s32(pregap ? (start - lba) : (lba - start)) - 150);
+	q[6] = 0;
+	put_msf(&q[7], lba);
+
+	u16 crc = 0;
+	for (int i = 0; i < 10; i++)
+	{
+		crc ^= u16(q[i]) << 8;
+		for (int bit = 0; bit < 8; bit++)
+			crc = (crc << 1) ^ (BIT(crc, 15) ? 0x1021 : 0);
+	}
+	put_u16be(&q[10], ~crc);
+}
+
+void nscsi_cdrom_pcfx_device::set_cdda_status(u8 status)
+{
+	m_cdda_status = status;
+	if (status != CDDA_PLAYING)
+		m_subcode_timer->adjust(attotime::never);
+	else if (m_subcode_timer->expire().is_never())
+	{
+		// 98 symbols per sector
+		const attotime period = attotime::from_hz(75 * 98);
+		m_subcode_symbol = 0;
+		m_subcode_timer->adjust(period, 0, period);
+	}
+}
+
+// one sub-code symbol: S0, S1 (SCOR set), then the 96 P-W symbols of the block; P is not
+// passed on, Q comes from the play position at the start of the block, R-W are zero
+TIMER_CALLBACK_MEMBER(nscsi_cdrom_pcfx_device::subcode_tick)
+{
+	u8 symbol;
+	if (m_subcode_symbol == 0)
+	{
+		make_subq(cdda->get_audio_lba(), m_subq);
+		symbol = 0x00;
+	}
+	else if (m_subcode_symbol == 1)
+		symbol = 0x80;
+	else
+	{
+		const int n = m_subcode_symbol - 2;
+		symbol = BIT(m_subq[n >> 3], 7 - (n & 7)) << 6;
+	}
+	m_subcode_cb(symbol);
+
+	if (++m_subcode_symbol == 98)
+		m_subcode_symbol = 0;
 }
 
 // deh: get directory (TOC) information, byte 1 = type

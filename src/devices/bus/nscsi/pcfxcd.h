@@ -20,6 +20,9 @@ class nscsi_cdrom_pcfx_device : public nscsi_cdrom_device
 public:
 	nscsi_cdrom_pcfx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
+	// sub-code symbols at 7.35 kHz during audio play: bit 7 = SCOR (block sync, set on S1), bits 6-0 = Q-W
+	auto subcode_cb() { return m_subcode_cb.bind(); }
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -49,6 +52,10 @@ private:
 	static u8 from_bcd(u8 v);
 	static void put_msf(u8 *dest, s32 lba);
 
+	void make_subq(u32 lba, u8 *q);        // 12 bytes of Q (mode 1, current position) with CRC
+	void set_cdda_status(u8 status);       // the sub-code stream runs while playing
+	TIMER_CALLBACK_MEMBER(subcode_tick);
+
 	// read sub-channel Q status codes
 	enum : u8 { CDDA_PLAYING = 0, CDDA_STILL = 1, CDDA_PAUSED = 2, CDDA_STOPPED = 3 };
 
@@ -56,6 +63,11 @@ private:
 	bool m_cdda_loop;
 	u32 m_cdda_start;
 	u32 m_cdda_end;
+
+	devcb_write8 m_subcode_cb;
+	emu_timer *m_subcode_timer;
+	u8 m_subcode_symbol;   // 0-97 within the sub-code block, 0 and 1 are the S0/S1 sync symbols
+	u8 m_subq[12];
 
 	// m_scsi_cmdbuf[0] as of the last scsi_command() dispatch: scsi_data_command_delay() runs
 	// after scsi_command() has returned, by which point a data-in command has overwritten the
