@@ -118,8 +118,7 @@ private:
 	u8 m_uart_int_state[2]{};
 	u8 m_uart_irq_out[2]{};
 	bool m_uart_irq_driven[2]{};
-	// windows this session's I/O space holds; not saved, since the space itself is not
-	u16 m_uart_installed_address[2]{};
+	u16 m_uart_cached_address[2]{};
 	bool m_uart_installed[2]{};
 	u16 m_gpio1_address;
 
