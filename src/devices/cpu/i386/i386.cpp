@@ -2058,12 +2058,8 @@ void i386_device::i386_common_init()
 	save_item(NAME(m_smbase));
 	save_item(NAME(m_lock));
 
-	// Only scaled instances save the counter, leaving default save states unchanged.
-	if (m_tsc_num != 1 || m_tsc_den != 1)
-	{
-		save_item(NAME(m_tsc));
-		save_item(NAME(m_tsc_rem));
-	}
+	save_item(NAME(m_tsc));
+	save_item(NAME(m_tsc_rem));
 
 	save_item(NAME(m_x87_cw));
 	save_item(NAME(m_x87_tw));
