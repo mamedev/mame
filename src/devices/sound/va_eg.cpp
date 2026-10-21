@@ -18,6 +18,8 @@
 static constexpr const float TIME_CONSTANTS_TO_END = 10;
 
 
+// *** VA_RC_EG ***
+
 va_rc_eg_device::va_rc_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VA_RC_EG, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
@@ -168,7 +170,7 @@ void va_rc_eg_device::snapshot()
 }
 
 
-// *****************************************************************************
+// *** VA_OTA_EG ***
 
 va_ota_eg_device::va_ota_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, ota_type ota, float c)
 	: device_t(mconfig, VA_OTA_EG, tag, owner, 0)
@@ -360,28 +362,37 @@ void va_ota_eg_device::sound_stream_update(sound_stream &stream)
 }
 
 
-// *****************************************************************************
+// *** VA_SMOOTH_SH ***
 
-va_smoothing_sh_device::va_smoothing_sh_device(const machine_config &mconfig, const char *tag, device_t *owner, float r, float c_large, float c_small)
-	: device_t(mconfig, VA_SMOOTHING_SH, tag, owner, 0)
+va_smooth_sh_device::va_smooth_sh_device(const machine_config &mconfig, const char *tag, device_t *owner, float r, float c_large, float c_small)
+	: device_t(mconfig, VA_SMOOTH_SH, tag, owner, 0)
 	, device_sound_interface(mconfig, *this)
 	, m_r(r)
 	, m_c_large(c_large)
 	, m_c_small(c_small)
 	, m_c_series((m_c_large * m_c_small) / (m_c_large + m_c_small))
-	, m_stream(nullptr)
 	, m_rc(*this, "rc")
 	, m_sampling(false)
 {
 }
 
-va_smoothing_sh_device::va_smoothing_sh_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: va_smoothing_sh_device(mconfig, tag, owner, RES_M(1), CAP_U(0.01), CAP_U(0.001))
+va_smooth_sh_device::va_smooth_sh_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: va_smooth_sh_device(mconfig, tag, owner, RES_M(1), CAP_U(0.01), CAP_U(0.001))
 {
 }
 
-void va_smoothing_sh_device::sample(float v_in)
+void va_smooth_sh_device::sample(float v_in)
 {
+	// When Vin is being sampled, Cl (Clarge) reaches the target voltage
+	// immediately, while Cs (Csmall) (dis)charges towards Vin via R. The
+	// voltage at Vout is that of an RC circuit with C = Cs.
+	//
+	// Vin ---+--- R ---+--- Vout
+	//        |         |
+	//        Cl        Cs
+	//        |         |
+	//       GND       GND
+
 	if (!m_sampling)
 	{
 		m_rc->set_c(m_c_small);
@@ -390,28 +401,49 @@ void va_smoothing_sh_device::sample(float v_in)
 	m_rc->set_target_v(v_in);
 }
 
-void va_smoothing_sh_device::hold()
+void va_smooth_sh_device::hold()
 {
+	// The calculations below need to happen at the instant sampling is disabled.
+	// If sampling was disabled earlier, they must be skipped.
 	if (!m_sampling)
 		return;
 
-	m_rc->set_target_v((m_c_large * m_rc->get_target_v() + m_c_small * m_rc->get_v()) / (m_c_large + m_c_small));
-	m_rc->set_c(m_c_series);
 	m_sampling = false;
+
+	// When not sampling:
+	//
+	//  Vl        Vs
+	//  |         |
+	//  +--- R ---+--- Vout
+	//  |         |
+	//  Cl        Cs
+	//  |         |
+	// GND       GND
+
+	// At the instant sampling is disabled, we have:
+	const float vl = m_rc->get_target_v();
+	const float vs = m_rc->get_v();
+
+	// The two capacitors will (dis)charge towards the same target voltage.
+	m_rc->set_target_v((m_c_large * vl + m_c_small * vs) / (m_c_large + m_c_small));
+
+	// The (dis)charge rate will be that of an RC circuit with C equal to the
+	// series combination of Cs and Cl:
+	m_rc->set_c(m_c_series);
 }
 
-void va_smoothing_sh_device::device_add_mconfig(machine_config &config)
+void va_smooth_sh_device::device_add_mconfig(machine_config &config)
 {
 	VA_RC_EG(config, m_rc).set_r(m_r).set_c(m_c_series).add_route(0, *this, 1.0);
 }
 
-void va_smoothing_sh_device::device_start()
+void va_smooth_sh_device::device_start()
 {
-	m_stream = stream_alloc(1, 1, machine().sample_rate());
+	stream_alloc(1, 1, machine().sample_rate());
 	save_item(NAME(m_sampling));
 }
 
-void va_smoothing_sh_device::sound_stream_update(sound_stream &stream)
+void va_smooth_sh_device::sound_stream_update(sound_stream &stream)
 {
 	stream.copy(0, 0);
 }
@@ -419,4 +451,4 @@ void va_smoothing_sh_device::sound_stream_update(sound_stream &stream)
 
 DEFINE_DEVICE_TYPE(VA_RC_EG, va_rc_eg_device, "va_rc_eg", "RC-based Envelope Generator")
 DEFINE_DEVICE_TYPE(VA_OTA_EG, va_ota_eg_device, "va_ota_eg", "OTA-based Envelope Generator")
-DEFINE_DEVICE_TYPE(VA_SMOOTHING_SH, va_smoothing_sh_device, "va_smoothing_sh", "Smoothing Sample & Hold")
+DEFINE_DEVICE_TYPE(VA_SMOOTH_SH, va_smooth_sh_device, "va_smooth_sh", "Smoothing Sample & Hold")

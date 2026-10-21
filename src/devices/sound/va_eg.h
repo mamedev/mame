@@ -8,7 +8,7 @@
 
 DECLARE_DEVICE_TYPE(VA_RC_EG, va_rc_eg_device)
 DECLARE_DEVICE_TYPE(VA_OTA_EG, va_ota_eg_device)
-DECLARE_DEVICE_TYPE(VA_SMOOTHING_SH, va_smoothing_sh_device)
+DECLARE_DEVICE_TYPE(VA_SMOOTH_SH, va_smooth_sh_device)
 
 
 // Building block for emulating envelope generators (EGs) based on a single RC
@@ -196,7 +196,7 @@ private:
 // voltages (CV) updates from the firmware.
 //
 // When Vin is being sampled, Cl (Clarge) reaches the target voltage immediately,
-// while Cs (Csmall) (dis)charges towards Vin via R:
+// while Cs (Csmall) (dis)charges towards Vin via R. See sample().
 //
 // Vin ---+--- R ---+--- Vout
 //        |         |
@@ -205,8 +205,7 @@ private:
 //       GND       GND
 //
 // When Vin is not being sampled, Cs and Cl will (dis)charge towards the same
-// target voltage. The (dis)charge rate will be that of an RC circuit where C
-// is the series combination of Cs and Cl:
+// target voltage. See hold().
 //
 //       +--- R ---+--- Vout
 //       |         |
@@ -216,11 +215,11 @@ private:
 //
 // Vout gets published on the output stream of this device.
 //
-class va_smoothing_sh_device : public device_t, public device_sound_interface
+class va_smooth_sh_device : public device_t, public device_sound_interface
 {
 public:
-	va_smoothing_sh_device(const machine_config &mconfig, const char *tag, device_t *owner, float r, float c_large, float c_small) ATTR_COLD;
-	va_smoothing_sh_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
+	va_smooth_sh_device(const machine_config &mconfig, const char *tag, device_t *owner, float r, float c_large, float c_small) ATTR_COLD;
+	va_smooth_sh_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
 
 	void sample(float v_in);
 	void hold();
@@ -237,7 +236,6 @@ private:
 	const float m_c_small;
 	const float m_c_series;
 
-	sound_stream *m_stream;
 	required_device<va_rc_eg_device> m_rc;
 	bool m_sampling;
 };

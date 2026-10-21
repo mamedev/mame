@@ -167,8 +167,8 @@ private:
 	required_device<ttl7474_device> m_tuning_ff;  // U146A
 	required_device<output_latch_device> m_tune_control;  // U148 (CD40174)
 	required_device_array<cem3394_device, 6> m_voices;
-	required_device_array<va_smoothing_sh_device, 6> m_gain_sh;
-	required_device_array<va_smoothing_sh_device, 6> m_freq_sh;
+	required_device_array<va_smooth_sh_device, 6> m_gain_sh;
+	required_device_array<va_smooth_sh_device, 6> m_freq_sh;
 	required_device<filter_volume_device> m_mute;  // U147 (CD4049)
 	required_device<filter_volume_device> m_master_vol;  // R197
 	required_device_array<va_rc_eg_device, 2> m_wheel_rc;
@@ -765,8 +765,8 @@ void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interfac
 
 	for (int i = 0; i < 6; ++i)
 	{
-		VA_SMOOTHING_SH(config, m_gain_sh[i], RES_M(1), CAP_U(0.01), CAP_U(0.001));
-		VA_SMOOTHING_SH(config, m_freq_sh[i], RES_M(1), CAP_U(0.01), CAP_U(0.001));
+		VA_SMOOTH_SH(config, m_gain_sh[i], RES_M(1), CAP_U(0.01), CAP_U(0.001));
+		VA_SMOOTH_SH(config, m_freq_sh[i], RES_M(1), CAP_U(0.01), CAP_U(0.001));
 
 		const cem3394_device::components comps =
 		{
