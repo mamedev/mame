@@ -66,7 +66,7 @@ protected:
 	virtual uint32_t get_cell_size(const format &f, int track) const;
 	virtual int get_sectors_per_track(const format &f, int track) const;
 	virtual int get_disk_id_offset(const format &f) const;
-	void get_disk_id(const format &f, util::random_read &io, uint8_t &id1, uint8_t &id2) const;
+	void get_disk_id(const format &f, const uint8_t *img, uint8_t &id1, uint8_t &id2) const;
 	virtual int get_image_offset(const format &f, int head, int track) const;
 	int compute_track_size(const format &f, int track) const;
 	virtual int get_gap2(const format &f, int head, int track) const { return f.gap_2; }
