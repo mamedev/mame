@@ -235,7 +235,7 @@ directory::ptr directory::open(std::string const &dirname)
 
 std::string osd_subst_env(std::string_view src)
 {
-	std::string result, var;
+	std::string result;
 	auto start = src.begin();
 
 	// a leading tilde expands as $HOME
@@ -262,6 +262,8 @@ std::string osd_subst_env(std::string_view src)
 
 		if (src.end() != start)
 		{
+			std::string var;
+
 			start = ++it;
 			if ((src.end() != start) && ('{' == *start))
 			{
@@ -276,11 +278,6 @@ std::string osd_subst_env(std::string_view src)
 				{
 					var.assign(start, it);
 					start = ++it;
-					const char *const exp = std::getenv(var.c_str());
-					if (exp)
-						result.append(exp);
-					else
-						fprintf(stderr, "Warning: osd_subst_env variable %s not found.\n", var.c_str());
 				}
 			}
 			else if ((src.end() != start) && (('_' == *start) || std::isalnum(*start)))
@@ -288,15 +285,43 @@ std::string osd_subst_env(std::string_view src)
 				for (++it; (src.end() != it) && (('_' == *it) || std::isalnum(*it)); ++it) { }
 				var.assign(start, it);
 				start = it;
-				const char *const exp = std::getenv(var.c_str());
-				if (exp)
-					result.append(exp);
-				else
-					fprintf(stderr, "Warning: osd_subst_env variable %s not found.\n", var.c_str());
 			}
 			else
-			{
 				result.push_back('$');
+
+			if (!var.empty())
+			{
+				bool env_found = false, is_xdg_env = false;
+				const char* const xdg_envs[4][2] = {
+					{"XDG_CONFIG_HOME", "/.config"},
+					{"XDG_DATA_HOME",   "/.local/share"},
+					{"XDG_STATE_HOME",  "/.local/state"},
+					{"XDG_CACHE_HOME",  "/.cache"}};
+
+				for (const char* const* xdg_env: xdg_envs)
+					if (var == xdg_env[0])
+					{
+						is_xdg_env = true;
+						break;
+					}
+
+				if (const char* const exp = std::getenv(var.c_str()); exp && !(is_xdg_env && std::string_view(exp).empty()))
+				{
+					result.append(exp);
+					env_found = true;
+				}
+
+				if (const char* const home = std::getenv("HOME"); !env_found && is_xdg_env && home)
+					for (const char* const* xdg_env: xdg_envs)
+						if (var == xdg_env[0])
+						{
+							result.append(home).append(xdg_env[1]);
+							env_found = true;
+							break;
+						}
+
+				if (!env_found)
+					fprintf(stderr, "Warning: osd_subst_env variable %s not found.\n", var.c_str());
 			}
 		}
 	}
