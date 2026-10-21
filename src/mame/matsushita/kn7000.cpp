@@ -7,8 +7,8 @@
     All five machines are built around a Panasonic MN103002A (MN1030 series),
     running Panasonic's "MILK" object framework. LCD, control panel, floppy, SD
     and MIDI are emulated. The tone generators' registers are decoded, but they
-    produce no sound: the wave ROMs are undumped and the ADSP-21065L effects
-    DSP is not emulated.
+    produce no sound: neither their voices nor the ADSP-21065L effects DSP is
+    emulated.
 
     Design notes: https://arqueologiadigital.github.io/technics-docs/kn7000-driver-internals/
 
@@ -50,7 +50,7 @@
     the half where A22 is low, and the program the half where it is high.
 
     TODO:
-      - dump the wave, rhythm and picture ROMs listed as NO_DUMP below
+      - dump the rhythm and picture ROMs listed as NO_DUMP below
 
 ***************************************************************************/
 
@@ -422,8 +422,10 @@ void kn_sd_state::sd_map(address_map &map)
 void kn_sd_state::kn7000_map(address_map &map)
 {
 	table_map(map);
-	tg_map<0>(map, 0x98040000);
-	tg_map<1>(map, 0x98050000);
+	// The firmware's wave ROM test calls the tone generator at 0x98050000 the
+	// main one (IC203/IC204), as on the single tone generator models
+	tg_map<0>(map, 0x98050000);
+	tg_map<1>(map, 0x98040000);
 	fdc_map(map);
 	// IC19, the picture ROM: the Slide Show's 100 PRESET pictures. Its top
 	// address pin is grounded through JP10, and the half the CPU can reach
@@ -1132,17 +1134,20 @@ ROM_START(kn7000)
 	ROMX_LOAD("kn7000_table_even_b84.ic17", 0x000000, 0x200000, CRC(005a6db2) SHA1(2f4112ea9b039b17b5ada6952b7646adae8d9dd6), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
 	ROMX_LOAD("kn7000_table_odd_b84.ic16", 0x000002, 0x200000, CRC(7e1a312e) SHA1(435b597b926ebac56d4710bcae25b635a59a9ce5), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(3))
 
+	// Read through the tone generators' wave ROM test port, as the firmware's
+	// own test reads them: byte 2n and 2n+1 are the low and high byte of word n.
+	// Each byte sum matches the one that test expects.
 	ROM_REGION(0x1000000, "waveform_main_y", 0)
-	ROM_LOAD("c3cbqd000002.ic203", 0x000000, 0x1000000, NO_DUMP)
+	ROM_LOAD("c3cbqd000002.ic203", 0x000000, 0x1000000, CRC(77211876) SHA1(f2d01ffd020c39a3f5b9d6c3275b1855c5a3d1a6))
 
 	ROM_REGION(0x1000000, "waveform_main_x", 0)
-	ROM_LOAD("c3cbqd000001.ic204", 0x000000, 0x1000000, NO_DUMP)
+	ROM_LOAD("c3cbqd000001.ic204", 0x000000, 0x1000000, CRC(e8c00b73) SHA1(f6da330c14cd3bdfc7c19092bd20d188e3ef0600))
 
 	ROM_REGION(0x1000000, "waveform_sub_y", 0)
-	ROM_LOAD("c3cbqd000004.ic207", 0x000000, 0x1000000, NO_DUMP)
+	ROM_LOAD("c3cbqd000004.ic207", 0x000000, 0x1000000, CRC(bc2cb635) SHA1(729bb2dd6aebd2932de6960363a554b89ffc171a))
 
 	ROM_REGION(0x1000000, "waveform_sub_x", 0)
-	ROM_LOAD("c3cbqd000003.ic208", 0x000000, 0x1000000, NO_DUMP)
+	ROM_LOAD("c3cbqd000003.ic208", 0x000000, 0x1000000, CRC(9ac58de0) SHA1(fb48cbc5334f5221ea882d63a58a22f9466e78c7))
 
 	// The half of the chip that JP7 selects, as the CPU reads it. The dumped
 	// instrument was not opened, so the part is assumed: early units fit the
