@@ -47,6 +47,10 @@ const attotime BUS_BYTE_TIME = attotime::from_hz(1'500'000);
 constexpr u32 READ_AHEAD_SECTORS = 32;
 constexpr u32 SECTOR_BYTES = 2048;
 
+// NEC additional sense code for audio commands while no audio is playing (the BIOS CD
+// player expects it from pause/resume when stopped, and retries the command on any other)
+constexpr u16 NEC_SKC_AUDIO_NOT_PLAYING = 0x2c00;
+
 } // anonymous namespace
 
 DEFINE_DEVICE_TYPE(NSCSI_CDROM_PCFX, nscsi_cdrom_pcfx_device, "nscsi_cdrom_pcfx", "NEC CD-ROM DRIVE:FX")
@@ -293,6 +297,45 @@ void nscsi_cdrom_pcfx_device::scsi_command()
 			break;
 		}
 
+		// the SCSI-2 audio commands go through the NEC play state, so read sub-channel Q and
+		// the sub-code interface see them (Photo CD viewer music uses 47h)
+		case SC_PLAY_AUDIO_MSF:
+		{
+			// binary M:S:F
+			const s32 start = (m_scsi_cmdbuf[3] * 60 + m_scsi_cmdbuf[4]) * 75 + m_scsi_cmdbuf[5] - 150;
+			const s32 end = (m_scsi_cmdbuf[6] * 60 + m_scsi_cmdbuf[7]) * 75 + m_scsi_cmdbuf[8] - 150;
+			if (start < 0 || end < start || u32(start) >= image->get_track_start(0xaa))
+				report_bad_cdb_field();
+			else
+				scsi_play_audio(start, end);
+			break;
+		}
+
+		case SC_PLAY_AUDIO_TRACK_INDEX:
+		{
+			// plays up to the start of the end track (games play one track with n/01 to
+			// n+1/01 and wait for it to stop); TODO: the index fields are ignored
+			const int last_track = image->get_last_track();
+			const int start_track = m_scsi_cmdbuf[4];
+			const int end_track = m_scsi_cmdbuf[7];
+			if (!start_track || start_track > last_track || end_track < start_track)
+				report_bad_cdb_field();
+			else
+				scsi_play_audio(image->get_track_start(start_track - 1), image->get_track_start((end_track > last_track) ? 0xaa : (end_track - 1)));
+			break;
+		}
+
+		case SC_PAUSE_RESUME:
+			if (m_cdda_status == CDDA_STOPPED)
+			{
+				report_condition(SK_ILLEGAL_REQUEST, NEC_SKC_AUDIO_NOT_PLAYING);
+				break;
+			}
+			cdda->pause_audio(BIT(m_scsi_cmdbuf[8], 0) ^ 1);
+			set_cdda_status(BIT(m_scsi_cmdbuf[8], 0) ? CDDA_PLAYING : CDDA_PAUSED);
+			scsi_status_complete(SS_GOOD);
+			break;
+
 		case 0x0d:  // NEC: no operation
 		case 0xdb:  // NEC: set stop time
 			scsi_status_complete(SS_GOOD);
@@ -393,6 +436,27 @@ void nscsi_cdrom_pcfx_device::nec_play(u32 start, u32 end)
 		cdda->stop_audio();
 }
 
+// play from start up to end (exclusive) for the SCSI-2 audio commands
+void nscsi_cdrom_pcfx_device::scsi_play_audio(u32 start, u32 end)
+{
+	if (start != end)
+	{
+		if (image->get_track_type(image->get_track(start)) != cdrom_file::CD_TRACK_AUDIO)
+		{
+			report_condition(SK_ILLEGAL_REQUEST, SKC_ILLEGAL_MODE_FOR_THIS_TRACK);
+			return;
+		}
+
+		LOGCMD("SCSI audio play %d-%d\n", start, end);
+		m_cdda_loop = false;
+		cdda->set_output_gain(ALL_OUTPUTS, 1.0);
+		cdda->pause_audio(0);
+		nec_play(start, end);
+		set_cdda_status(CDDA_PLAYING);
+	}
+	scsi_status_complete(SS_GOOD);
+}
+
 // d8h: set audio playback start position, then play to the end of the disc (byte 1 bit 0) or pause there
 void nscsi_cdrom_pcfx_device::nec_set_audio_start_position()
 {
@@ -442,8 +506,14 @@ void nscsi_cdrom_pcfx_device::nec_set_audio_end_position()
 		return;
 	}
 
+	if (m_cdda_status == CDDA_STOPPED)
+	{
+		report_condition(SK_ILLEGAL_REQUEST, NEC_SKC_AUDIO_NOT_PLAYING);
+		return;
+	}
+
 	u32 lba;
-	if (m_cdda_status == CDDA_STOPPED || !nec_address(cdb, lba))
+	if (!nec_address(cdb, lba))
 	{
 		report_bad_cdb_field();
 		return;
@@ -473,7 +543,7 @@ void nscsi_cdrom_pcfx_device::nec_pause()
 
 	if (m_cdda_status == CDDA_STOPPED)
 	{
-		report_bad_cdb_field();
+		report_condition(SK_ILLEGAL_REQUEST, NEC_SKC_AUDIO_NOT_PLAYING);
 		return;
 	}
 

@@ -47,6 +47,7 @@ private:
 
 	bool nec_address(const u8 *cdb, u32 &lba);     // byte 9 bits 7-6: LBA / BCD MSF / BCD track
 	void nec_play(u32 start, u32 end);
+	void scsi_play_audio(u32 start, u32 end);   // 47h, 48h
 
 	static u8 to_bcd(u32 v);
 	static u8 from_bcd(u8 v);
