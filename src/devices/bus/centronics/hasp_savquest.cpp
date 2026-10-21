@@ -317,44 +317,15 @@ void hasp_savquest_device::process_byte(uint8_t data8)
 			return;
 		}
 
-		switch (data8)
-		{
 		/* in passmode 0, some values remain unknown: 8a, 8e (inconclusive), 94, 96, 9a, a4, b2, be, c4, d2, d4 (inconclusive), e2, ec, f8, fc
 		   this is less of a concern since the contents seem to decrypt correctly
 		*/
-		case 0x88:
-		case 0x94:
-		case 0x98:
-		case 0x9c:
-		case 0x9e:
-		case 0xa0:
-		case 0xa4:
-		case 0xaa:
-		case 0xae:
-		case 0xb0:
-		case 0xb2:
-		case 0xbc:
-		case 0xbe:
-		case 0xc2:
-		case 0xc6:
-		case 0xc8:
-		case 0xce:
-		case 0xd0:
-		case 0xd6:
-		case 0xd8:
-		case 0xdc:
-		case 0xe0:
-		case 0xe6:
-		case 0xea:
-		case 0xee:
-		case 0xf2:
-		case 0xf6:
+		static constexpr uint8_t s_passmode0_bit5[] = {
+			0x88, 0x94, 0x98, 0x9c, 0x9e, 0xa0, 0xa4, 0xaa, 0xae, 0xb0, 0xb2, 0xbc, 0xbe, 0xc2, 0xc6, 0xc8,
+			0xce, 0xd0, 0xd6, 0xd8, 0xdc, 0xe0, 0xe6, 0xea, 0xee, 0xf2, 0xf6
+		};
+		if (std::find(std::begin(s_passmode0_bit5), std::end(s_passmode0_bit5), data8) != std::end(s_passmode0_bit5))
 			m_port379_bit5 = 1;
-			break;
-
-		default:
-			break;
-		}
 	}
 	else if (m_haspstate == HASPSTATE_PASSEND)
 	{
