@@ -56,6 +56,7 @@ v810_device::v810_device(const machine_config &mconfig, const char *tag, device_
 	: cpu_device(mconfig, V810, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 32, 32, 0)
+	, m_halted(false)
 	, m_bus_wait(*this)
 {
 }
@@ -703,8 +704,14 @@ void v810_device::take_exception(u32 handler, u16 code)
 {
 	if (GET_NP)
 	{
-		// fatal exception
-		logerror("V810: fatal exception %04X @ %X\n", code, m_PPC);
+		// fatal exception: the exception code, PSW and PC are written to 00000000h,
+		// 00000004h and 00000008h, and the CPU halts until reset
+		logerror("V810: fatal exception %04X @ %X, halted\n", code, m_PPC);
+		W_W(0x00000000, 0xffff0000 | code);
+		W_W(0x00000004, PSW);
+		W_W(0x00000008, PC);
+		m_halted = true;
+		m_icount = 0;
 		return;
 	}
 	else if (GET_EP)
@@ -1412,6 +1419,7 @@ void v810_device::device_start()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_nmi_line));
 	save_item(NAME(m_PPC));
+	save_item(NAME(m_halted));
 
 	state_add( V810_PC,    "PC",    PC).formatstr("%08X");
 	state_add( V810_R0,    "R0",    R0).formatstr("%08X");
@@ -1499,6 +1507,7 @@ void v810_device::device_reset()
 	PSW = 0x00008000;
 	ECR = 0x0000fff0;
 	CHCW = 0;
+	m_halted = false;
 	m_lastop = LAST_OTHER;
 	icache_clear(0, 128);
 }
@@ -1542,6 +1551,13 @@ void v810_device::check_interrupts()
 
 void v810_device::execute_run()
 {
+	if (m_halted)
+	{
+		// fatal exception: nothing runs until reset
+		m_icount = 0;
+		return;
+	}
+
 	// TODO: move in execution body
 	// (breaks pcfx boot)
 	check_interrupts();

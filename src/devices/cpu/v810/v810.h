@@ -126,6 +126,8 @@ private:
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_io;
 	uint32_t m_PPC;
 	int m_icount;
+	// set by a fatal exception: halted until reset (the HALT instruction is not modelled yet)
+	bool m_halted;
 
 	enum : u8 { LAST_OTHER, LAST_LD, LAST_ST, LAST_OUT };
 
