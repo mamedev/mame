@@ -100,7 +100,11 @@ void pcfx_intc_device::write(offs_t offset, u16 data)
 		// -------xxx------ Priority level interrupt 13
 		// ----------xxx--- Priority level interrupt 14
 		// -------------xxx Priority level interrupt 15
+		// priorities can only be changed while all sources are masked (GMAKER), other
+		// writes are ignored (the BIOS Photo CD viewer writes them unmasked)
 		case 0x80/4:
+			if ((m_irq_mask & 0x7f) != 0x7f)
+				break;
 			m_irq_priority[7] = (data >> 0) & 0x07;
 			m_irq_priority[6] = (data >> 3) & 0x07;
 			m_irq_priority[5] = (data >> 6) & 0x07;
@@ -114,6 +118,8 @@ void pcfx_intc_device::write(offs_t offset, u16 data)
 		// ----------xxx--- Priority level interrupt 10
 		// -------------xxx Priority level interrupt 11
 		case 0xc0/4:
+			if ((m_irq_mask & 0x7f) != 0x7f)
+				break;
 			m_irq_priority[3] = (data >> 0) & 0x07;
 			m_irq_priority[2] = (data >> 3) & 0x07;
 			m_irq_priority[1] = (data >> 6) & 0x07;
