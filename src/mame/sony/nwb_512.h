@@ -59,7 +59,6 @@ private:
 		bool busy = false; // operation in progress
 
 		// Configuration flags
-		bool suppress_advance = false; // false = auto-increment after rop
 		bool x_direction = false;	   // true = left -> right
 		bool y_direction = false;	   // true = top -> bottom
 		bool row_fill = false;		   // true = write data fifo word across whole line

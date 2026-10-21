@@ -35,14 +35,12 @@
 #include "emu.h"
 #include "nwb_512.h"
 
-#define LOG_CTRL 1 << 1
-#define LOG_ROP 1 << 2
-#define LOG_DATA 1 << 3
+#define LOG_CTRL (1 << 1)
+#define LOG_ROP (1 << 2)
+#define LOG_DATA (1 << 3)
 
 #define VERBOSE (LOG_ROP | LOG_CTRL)
 #include "logmacro.h"
-
-#include <format>
 
 DEFINE_DEVICE_TYPE(NWB_512, nwb_512_device, "nwb_512", "Sony NWB-512 monochrome framebuffer")
 
@@ -155,6 +153,7 @@ void nwb_512_device::map(address_map &map)
 	map(0x60000, 0x60fff).w(FUNC(nwb_512_device::rop_config_w));
 	map(0x70000, 0x70fff).rw(FUNC(nwb_512_device::fifo_r), FUNC(nwb_512_device::fifo_w));
 	map(0x80000, 0x80001).rw(FUNC(nwb_512_device::status_r), FUNC(nwb_512_device::ctrl_w));
+	map(0xa0000, 0xa0001).noprw(); // Unknown, possibly planemask on multiplanar graphics cards with the same ROP engine
 
 	map(0xc0000, 0xfffff).rom().region("krom", 0);
 }
@@ -223,7 +222,7 @@ void nwb_512_device::destination_w(offs_t offset, uint16_t data, uint16_t mem_ma
 
 	m_state.destination_x = x_address(data);
 	m_state.destination_y = y_address(offset);
-	LOGMASKED(LOG_ROP, "%s destination_w(0x%x, 0x%x) x word offset = 0x%x\n", machine().describe_context(), m_state.destination_x, m_state.destination_y, (m_state.destination_x - 1) >> 4);
+	LOGMASKED(LOG_ROP, "%s destination_w(0x%x, 0x%x) x word offset = 0x%x\n", machine().describe_context(), m_state.destination_x, m_state.destination_y, m_state.destination_x >> 4);
 
 	if (shift_load_requested(offset))
 	{
