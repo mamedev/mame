@@ -583,6 +583,7 @@ public:
 
 	void xavix_ekara(machine_config &config) ATTR_COLD;
 	void xavix_isinger(machine_config &config) ATTR_COLD;
+	void xavix_epitch(machine_config &config) ATTR_COLD;
 
 	template <unsigned Column> int matrix_column_r() { return matrix_column_r(Column); }
 
@@ -721,16 +722,20 @@ public:
 	xavix_evio_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_cart_state(mconfig,type,tag)
 		, m_bow(*this, "bow%u", 1U)
+		, m_digit(*this, "digit")
 	{ }
 
 	void xavix_evio(machine_config &config) ATTR_COLD;
 
 protected:
+	virtual void machine_reset() override ATTR_COLD;
 	virtual u8 io1_input_r(u8 direction) override;
+	virtual void io0_output_w(u8 data, u8 direction) override;
 	virtual void io1_output_w(u8 data, u8 direction) override;
 
 private:
 	required_device_array<xavix_evio_bow_device, 2> m_bow;
+	output_finder<> m_digit;
 };
 
 class xavix_tak_daig_state : public xavix_cart_state

@@ -69,6 +69,7 @@
 #include <cmath>
 
 #include "ekara.lh"
+#include "evio.lh"
 #include "hikara.lh"
 #include "multiplt.lh"
 
@@ -2937,14 +2938,24 @@ static INPUT_PORTS_START( epitch )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )       PORT_NAME("Confirm")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )       PORT_NAME("Cancel")
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 )       PORT_NAME("BGM Down")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 )       PORT_NAME("BGM Up")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Select / Key Down")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )   PORT_NAME("Select / Key Up")
+	// Four independent direction buttons also adjust the background music and key.
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Left / BGM Down") PORT_16WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Right / BGM Up") PORT_16WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Down / Select / Key Down") PORT_16WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )   PORT_NAME("Up / Select / Key Up") PORT_16WAY
 
 	PORT_MODIFY("EXTRA1")
 	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+void xavix_ekara_state::xavix_epitch(machine_config &config)
+{
+	xavix_cart(config);
+	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("EKARA");
+	configure_microphone(config);
+	configure_power_hold(config);
+	// The e-pitch panel has six buttons and no numeric display.
+}
 
 
 // Hi-kara
@@ -3607,11 +3618,25 @@ void xavix_evio_state::xavix_evio(machine_config &config)
 	XAVIX_EVIO_BOW(config, m_bow[1]).set_player(1);
 
 	configure_power_hold(config);
+	config.set_default_layout(layout_evio);
+}
+
+void xavix_evio_state::machine_reset()
+{
+	xavix_cart_state::machine_reset();
+	m_digit = 0;
 }
 
 u8 xavix_evio_state::io1_input_r(u8)
 {
 	return (m_in1->read() & 0xf0) | m_bow[0]->quadrature_r() | (m_bow[1]->quadrature_r() << 2);
+}
+
+void xavix_evio_state::io0_output_w(u8 data, u8 direction)
+{
+	// The segment pins are shared with the control-panel inputs.
+	if ((direction & 0x7f) == 0x7f)
+		m_digit = data & 0x7f;
 }
 
 void xavix_evio_state::io1_output_w(u8 data, u8 direction)
@@ -5863,7 +5888,7 @@ CONS( 2000,  isinger,   ekara,    0, xavix_isinger,       ekara,     xavix_ekara
 // the 'e-kara pro headset' has 3 songs built in for the US release.  The Japanese release of this appears to be called 'e-kara H.S.' and it is unclear if it also has built in songs.  The Canadian box says 'cartridge contains' instead of 'songs included' but is likely a printing error.
 CONS( 2002,  ekaraphs,  ekara,    0, xavix_ekara,         ekara,     xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd.", "e-kara Pro Headset (US, includes 3 songs)", MACHINE_NOT_WORKING )
 // e-pitch uses the Japanese e-kara BIOS but ties its panel-layout strap high for the reduced six-button matrix.
-CONS( 2003,  epitch,    0,        0, xavix_ekara,         epitch,    xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd.", "e-pitch (Japan)", MACHINE_NOT_WORKING ) // shows Japanese message without cart
+CONS( 2003,  epitch,    0,        0, xavix_epitch,        epitch,    xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd.", "e-pitch (Japan)", MACHINE_NOT_WORKING ) // shows Japanese message without cart
 // e-kara mix was another unit that allowed you to connect to a PC, unlike e-kara web it also functions as a regular device
 CONS( 200?,  ekaramix,  0,        0, xavix_ekara,         ekara,     xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd.", "e-kara Mix (Japan)", MACHINE_NOT_WORKING )
 
