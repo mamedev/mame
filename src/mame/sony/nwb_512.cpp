@@ -181,7 +181,7 @@ void nwb_512_device::check_mem_mask(uint16_t mem_mask)
 	if (mem_mask != 0xffff)
 	{
 		// Registers are 16-bit. Log this just in case to chase down issues later.
-		logerror("%s unexpected non-word access with mem mask 0x%x!\n", machine().describe_context(), mem_mask);
+		logerror("%s NWB-512: unexpected non-word access with mem mask 0x%x!\n", machine().describe_context(), mem_mask);
 	}
 }
 
@@ -218,6 +218,11 @@ void nwb_512_device::check_operation_start(offs_t offset)
 void nwb_512_device::destination_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	check_mem_mask(mem_mask);
+	if (!m_state.enabled())
+	{
+		logerror("%s NWB-512 destination_w: framebuffer not enabled\n", machine().describe_context());
+		return;
+	}
 
 	m_state.destination_x = x_address(data);
 	m_state.destination_y = y_address(offset);
@@ -235,6 +240,11 @@ void nwb_512_device::source_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_ROP, "%s source_w(0x%x, 0x%x, 0x%x)\n", machine().describe_context(), offset, data, mem_mask);
 	check_mem_mask(mem_mask);
+	if (!m_state.enabled())
+	{
+		logerror("%s NWB-512 source_w: framebuffer not enabled\n", machine().describe_context());
+		return;
+	}
 
 	m_state.source_x = x_address(data);
 	m_state.source_y = y_address(offset);
@@ -250,14 +260,19 @@ void nwb_512_device::source_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void nwb_512_device::limit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	check_mem_mask(mem_mask);
 	LOGMASKED(LOG_ROP, "%s limit_w(0x%x, 0x%x, 0x%x)\n", machine().describe_context(), offset, data, mem_mask);
+	check_mem_mask(mem_mask);
+	if (!m_state.enabled())
+	{
+		logerror("%s NWB-512 limit_w: framebuffer not enabled\n", machine().describe_context());
+		return;
+	}
 
 	// The read/write bits seem to be set here, and in a slightly different way from the DSC-008.
 	// This behavior is an educated guess based on what iopboot, mrx, the NWS-800 monitor, and NWS-3800 monitor expect.
-	const bool op_start = execution_requested(offset);
-	m_state.fb_write = op_start; // A14 = start write op
-	m_state.fb_read = op_start ? offset & (0x10000 >> 1) : true; // A14 clear = read only, otherwise read source type from A16 if writing
+	const bool write_op_start = execution_requested(offset);
+	m_state.fb_write = write_op_start;								   // A14 = start write op
+	m_state.fb_read = write_op_start ? offset & (0x10000 >> 1) : true; // A14 clear = read only, otherwise read source type from A16 if writing
 
 	m_state.limit_x = x_address(data);
 	m_state.limit_y = y_address(offset);
@@ -268,17 +283,26 @@ void nwb_512_device::limit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void nwb_512_device::shift_w(offs_t, uint16_t data, uint16_t mem_mask)
 {
-	check_mem_mask(mem_mask);
 	LOGMASKED(LOG_ROP, "%s shift_w %x\n", machine().describe_context(), data);
+	check_mem_mask(mem_mask);
+	if (!m_state.enabled())
+	{
+		logerror("%s NWB-512 shift_w: framebuffer not enabled\n", machine().describe_context());
+		return;
+	}
+
 	m_state.shift = data;
 }
 
 void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	LOGMASKED(LOG_ROP, "(%s) rop_config_w(0x%x, 0x%x)\n", machine().describe_context(), offset, data);
 	check_mem_mask(mem_mask);
-	m_state.check_enabled();
-
-	LOGMASKED(LOG_ROP, "(%s) rop_config_w(0x%x, 0x%x) = ", machine().describe_context(), offset, data);
+	if (!m_state.enabled())
+	{
+		logerror("%s NWB-512 rop_config_w: framebuffer not enabled\n", machine().describe_context());
+		return;
+	}
 
 	// These mappings are an educated guess based on NWS-1500 service manual and iopboot/mrx behavior
 	// I used to set fbread/write here as the DSC-008 does, but to make all ops work as iopboot/mrx expects,
@@ -297,7 +321,7 @@ void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mas
 		m_state.rop_function = data & 0xf;
 	}
 
-	LOGMASKED(LOG_ROP, "%s%s%s%s%s\n",
+	LOGMASKED(LOG_ROP, "\t%s%s%s%s%s\n",
 			  m_state.row_fill ? "rowfill " : "",
 			  m_state.y_direction ? "yfwd " : "yrev ",
 			  m_state.x_direction ? "xfwd " : "xrev ",
@@ -307,13 +331,20 @@ void nwb_512_device::rop_config_w(offs_t offset, uint16_t data, uint16_t mem_mas
 
 void nwb_512_device::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	// Set pixel to 1 at X (data), Y (offset[12:1])
+	LOGMASKED(LOG_ROP, "(%s) pixel_w(0x%x, 0x%x)\n", machine().describe_context(), offset, data);
 	check_mem_mask(mem_mask);
-	if (!m_state.pixel_mode)
+	if (!m_state.enabled())
 	{
-		fatalerror("Pixel write in word mode");
+		logerror("%s NWB-512 pixel_w: framebuffer not enabled\n", machine().describe_context());
+		return;
 	}
 
+	if (!m_state.pixel_mode)
+	{
+		logerror("%s NWB-512: Pixel write in word mode\n", machine().describe_context());
+	}
+
+	// Set pixel to 1 at X (data), Y (offset[12:1])
 	const uint16_t x = x_address(data);
 	const uint16_t y = y_address(offset);
 	const uint32_t byte_offset = coordinate_to_byte_offset(x, y);
@@ -454,13 +485,7 @@ void nwb_512_device::end_row()
 
 	if (!m_state.limit_y)
 	{
-		LOGMASKED(LOG_ROP, "end_row: ROP done!\n");
-		m_state.busy = false;
-
-		// The DSC-008 instruction manual mentions that SRXA/DRXA[3:0] are cleared independently (see: /CLRDEST and /SFH).
-		// This may not be accurate. Hardware confirmation is needed.
-		m_state.source_x &= ~0xf;
-		m_state.destination_x &= ~0xf;
+		end_operation();
 	}
 	else
 	{
@@ -469,6 +494,17 @@ void nwb_512_device::end_row()
 		m_state.prime_pending = m_state.prime;
 		--m_state.limit_y;
 	}
+}
+
+void nwb_512_device::end_operation()
+{
+	LOGMASKED(LOG_ROP, "ROP completed!\n");
+	m_state.busy = false;
+
+	// The DSC-008 instruction manual mentions that SRXA/DRXA[3:0] are cleared independently (see: /CLRDEST and /SFH).
+	// This may not be accurate. Hardware confirmation is needed.
+	m_state.source_x &= ~0xf;
+	m_state.destination_x &= ~0xf;
 }
 
 void nwb_512_device::rop_cycle(uint16_t data)
@@ -519,14 +555,15 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 
 	LOGMASKED(LOG_DATA, "(%s) fifo_r(0x%x, 0x%x)\n", machine().describe_context(), offset, mem_mask);
 	check_mem_mask(mem_mask);
-	if (!m_state.is_fb_to_host())
+	if (!m_state.enabled())
 	{
-		fatalerror("nwb_512: fifo_r when read op is not executing");
+		logerror("%s NWB-512 fifo_r: framebuffer not enabled\n", machine().describe_context());
+		return 0;
 	}
-
-	if (!m_state.busy)
+	if (!m_state.is_fb_to_host() || !m_state.busy)
 	{
-		fatalerror("No words left in op!\n");
+		logerror("%s NWB-512: fifo_r when read op is not executing\n", machine().describe_context());
+		return 0;
 	}
 
 	uint16_t word = 0;
@@ -593,11 +630,6 @@ void nwb_512_device::start_operation()
 		m_state.source_words_per_row = m_state.dest_words_per_row; // not used for reads
 	}
 
-	if (std::abs(m_state.dest_words_per_row - m_state.source_words_per_row) > 1)
-	{
-		fatalerror("nwb512: source (0x%x) and destination (0x%x) words per row not aligned!", m_state.dest_words_per_row, m_state.source_words_per_row);
-	}
-
 	m_state.source_words_left = m_state.source_words_per_row;
 	m_state.dest_words_left = m_state.dest_words_per_row;
 	LOGMASKED(LOG_DATA, "start_operation: Source words per row: %d, Destination words per row: %d, priming required = %s\n", m_state.source_words_per_row, m_state.dest_words_per_row, m_state.prime ? "yes" : "no");
@@ -619,12 +651,30 @@ void nwb_512_device::start_operation()
 		m_state.mask1 = ~(0xffff >> (x_lo & 0xf));
 		m_state.mask2 = 0xffff >> ((x_hi & 0xf) + 1);
 	}
+
+	// Sanity-check to avoid causing unexpected member variable wrapping issues in the driver.
+	// I never saw these cases while testing, and I am not sure yet what real hardware would do here.
+	if (m_state.dest_words_per_row == 0)
+	{
+		logerror("%s NWB-512: unexpected empty operation detected, skipping\n", machine().describe_context());
+		end_operation();
+	}
+	else if ((m_state.x_direction && m_state.destination_x > m_state.limit_x) || (!m_state.x_direction && m_state.limit_x > m_state.destination_x))
+	{
+		logerror("%s NWB-512: invalid destination/limit configuration, skipping\n", machine().describe_context());
+		end_operation();
+	}
 }
 
 void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_DATA, "(%s) fifo_w(0x%x, 0x%x, 0x%x)\n", machine().describe_context(), offset, data, mem_mask);
 	check_mem_mask(mem_mask);
+	if (!m_state.enabled())
+	{
+		logerror("%s NWB-512 fifo_w: framebuffer not enabled\n", machine().describe_context());
+		return;
+	}
 
 	// One write kickstarts the reading process when triggered op is a read
 	if (m_state.is_fb_to_host())
@@ -634,14 +684,10 @@ void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		return;
 	}
 
-	if (m_state.pixel_mode)
+	if (m_state.pixel_mode || !m_state.busy)
 	{
-		fatalerror("fifo_w: word write in pixel mode");
-	}
-
-	if (!m_state.busy)
-	{
-		fatalerror("fifo_w: IOP tried to push data without starting an op!");
+		logerror("%s NWB-512: word write in pixel mode or not active, ignoring\n", machine().describe_context());
+		return;
 	}
 
 	// TODO: validate offset versus the setup in the ROP reg

@@ -93,12 +93,9 @@ private:
 			return fb_read && fb_write;
 		}
 
-		void check_enabled() const
+		bool enabled() const
 		{
-			if (!(ctrl & 0x1))
-			{
-				fatalerror("nwb_512: framebuffer not enabled when interaction started");
-			}
+			return ctrl & 0x1;
 		}
 
 		void advance_sxa()
@@ -154,6 +151,7 @@ private:
 	void rop(uint16_t source);
 	void end_row();
 	void start_operation();
+	void end_operation();
 	uint16_t coordinate_to_data(uint16_t x, uint16_t y);
 	rgb_t current_dim_color();
 };
