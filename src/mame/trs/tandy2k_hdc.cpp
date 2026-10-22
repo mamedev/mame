@@ -49,6 +49,7 @@ void tandy2k_hdc_device::device_add_mconfig(machine_config &config)
 {
 	WD1010(config, m_hdc, 10_MHz_XTAL / 2);
 	m_hdc->out_intrq_callback().set(FUNC(tandy2k_hdc_device::intrq_w));
+	m_hdc->out_bdrq_callback().set([this] (int state) { m_write_bdrq(state); });
 	m_hdc->out_bcr_callback().set(FUNC(tandy2k_hdc_device::bcr_w));
 	m_hdc->in_data_callback().set(FUNC(tandy2k_hdc_device::buf_in));
 	m_hdc->out_data_callback().set(FUNC(tandy2k_hdc_device::buf_out));
@@ -71,6 +72,7 @@ tandy2k_hdc_device::tandy2k_hdc_device(const machine_config &mconfig, const char
 	m_hdc(*this, "hdc"),
 	m_hdd(*this, "hdc:0"),
 	m_write_intrq(*this),
+	m_write_bdrq(*this),
 	m_ptr(0)
 {
 	std::fill(std::begin(m_buf), std::end(m_buf), 0);
