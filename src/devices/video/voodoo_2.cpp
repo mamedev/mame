@@ -1109,7 +1109,7 @@ u32 voodoo_2_device::reg_fbiinit5_7_w(u32 chipmask, u32 regnum, u32 data)
 
 u32 voodoo_2_device::reg_blt_fill_w(u32 chipmask, u32 regnum, u32 data)
 {
-	// Other operations/modifiers and deferred launches are not implemented here.
+	// TODO: Other operations/modifiers and deferred launches are not implemented here.
 	if (!BIT(chipmask, 0) || data != 0x80000003U)
 		return reg_unimplemented_w(chipmask, regnum, data);
 
@@ -1132,7 +1132,8 @@ u32 voodoo_2_device::reg_blt_fill_w(u32 chipmask, u32 regnum, u32 data)
 	u32 const dstxy = m_reg.read(voodoo_regs::reg_bltDstXY);
 	u32 const size = m_reg.read(voodoo_regs::reg_bltSize);
 	// SGRAM row/column fields are nine bits. Reject unsupported bits, not aliases.
-	if ((dstxy & ~0x01ff01ffU) || (size & ~0x01ff01ffU))
+	if ((dstxy & ~0x01ff01ffU) || (size & ~0x01ff01ffU) ||
+		BIT(dstxy, 0, 9) != 0 || BIT(size, 0, 9) != 511)
 		return reg_unimplemented_w(chipmask, regnum, data);
 
 	u32 const rowpixels = m_renderer->rowpixels();
@@ -1141,15 +1142,16 @@ u32 voodoo_2_device::reg_blt_fill_w(u32 chipmask, u32 regnum, u32 data)
 	// Full 9-bit intervals within one logical buffer follow Glide's 4 MiB layout.
 	// Physical SGRAM counter carry across page 511 has not been measured.
 	u64 const capacity = u64(m_fbmask) + 1;
-	if (BIT(dstxy, 0, 9) != 0 || BIT(size, 0, 9) != 511 ||
-		rowpixels == 0 || rowpixels % 64 != 0 || pages % (rowpixels / 64) != 0 ||
+	if (rowpixels == 0 || rowpixels % 64 != 0 || pages % (rowpixels / 64) != 0 ||
 		capacity % 4096 != 0 || m_frontbuf > 2 || m_backbuf > 2)
 		return reg_unimplemented_w(chipmask, regnum, data);
 
 	std::array<u32, 4> const buffers = { m_rgboffs[0], m_rgboffs[1], m_rgboffs[2], m_auxoffs };
 	for (u32 const base : buffers)
+	{
 		if (base != ~u32(0) && base > m_fbmask)
 			return reg_unimplemented_w(chipmask, regnum, data);
+	}
 
 	u64 const begin = u64(page) * 4096;
 	u64 const end = u64(page + pages) * 4096;
@@ -1163,15 +1165,19 @@ u32 voodoo_2_device::reg_blt_fill_w(u32 chipmask, u32 regnum, u32 data)
 
 		u64 limit = capacity;
 		for (u32 const other : buffers)
+		{
 			if (other != ~u32(0) && other > base)
 				limit = std::min<u64>(limit, other);
+		}
 
 		// Only complete tile rows contained in one non-aliased buffer are supported.
 		if (begin < base || (begin - base) % tile_bytes != 0 || end > limit)
 			continue;
 		for (unsigned j = 0; j < buffers.size(); ++j)
+		{
 			if (j != i && buffers[j] == base)
 				return reg_unimplemented_w(chipmask, regnum, data);
+		}
 		// Front-buffer writes need scanout timing that this subset does not model.
 		if (i == m_frontbuf)
 			return reg_unimplemented_w(chipmask, regnum, data);
