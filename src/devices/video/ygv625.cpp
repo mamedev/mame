@@ -218,7 +218,7 @@ ygv625_device::ygv625_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, YGV625, tag, owner, clock),
 	device_video_interface(mconfig, *this),
 	m_cg(*this, finder_base::DUMMY_TAG),
-	m_ram(*this, "ram", 0x2000 * 2, ENDIANNESS_BIG),
+	m_ram(*this, "ram"),
 	m_cache(4096),
 	m_cg_read_data(0),
 	m_cg_read_ready(false)
@@ -267,6 +267,93 @@ void ygv625_device::device_reset()
 {
 	m_cg_read_ready = false;
 	m_cg_read_data = 0;
+}
+
+
+//-------------------------------------------------
+//  map - CPU interface
+//-------------------------------------------------
+
+void ygv625_device::map(address_map &map)
+{
+	map(0x0000, 0x3bff).ram().share(m_ram); // attribute table, corner table, colour table
+	map(0x3c00, 0x3fff).rw(FUNC(ygv625_device::reg_r), FUNC(ygv625_device::reg_w));
+	map(0x3c4c, 0x3c4d).r(FUNC(ygv625_device::status_r));
+	map(0x3c4e, 0x3c4f).rw(FUNC(ygv625_device::control_r), FUNC(ygv625_device::control_w));
+	map(0x3c50, 0x3c51).r(FUNC(ygv625_device::busy_r));
+	map(0x3c6c, 0x3c6d).rw(FUNC(ygv625_device::cg_read_addr_r), FUNC(ygv625_device::cg_read_addr_w));
+	map(0x3c70, 0x3c71).r(FUNC(ygv625_device::cg_read_data_r)); // TODO: CG memory writes (flash programming through the chip)
+}
+
+
+//-------------------------------------------------
+//  register handlers
+//-------------------------------------------------
+
+u16 ygv625_device::reg_r(offs_t offset)
+{
+	return m_regs[offset];
+}
+
+void ygv625_device::reg_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_regs[offset]);
+	LOGMASKED(LOG_REGS, "%s: reg %04x = %04x\n", machine().describe_context(), 0x3c00 + offset * 2, m_regs[offset]);
+}
+
+// 0x3c4c status
+u16 ygv625_device::status_r()
+{
+	return (m_regs[0x26] & ~0x4109) | (screen().vblank() ? 1 : 0) | (m_cg_read_ready ? 0x4000 : 0);
+}
+
+// 0x3c4e control, bit 5 self clears
+u16 ygv625_device::control_r()
+{
+	return m_regs[0x27] & ~0x0020;
+}
+
+void ygv625_device::control_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	reg_w(0x27, data, mem_mask);
+
+	if (data & mem_mask & 0x0020)
+	{
+		screen().update_partial(screen().vpos());
+		render_frame();
+	}
+}
+
+// 0x3c50
+u16 ygv625_device::busy_r()
+{
+	return m_regs[0x28] & 0x7fff;
+}
+
+// 0x3c6c CG read address high / start, bit 15 reads back clear once done
+u16 ygv625_device::cg_read_addr_r()
+{
+	return m_regs[0x36] & 0x7fff;
+}
+
+void ygv625_device::cg_read_addr_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	reg_w(0x36, data, mem_mask);
+
+	// bit 15 starts the access
+	if (data & mem_mask & 0x8000)
+	{
+		const u32 addr = (u32(m_regs[0x36] & 0x07ff) << 16) | m_regs[0x37];
+		m_cg_read_data = cg_word(addr);
+		m_cg_read_ready = true;
+		m_regs[0x36] &= 0x7fff;
+	}
+}
+
+// 0x3c70 CG read data
+u16 ygv625_device::cg_read_data_r()
+{
+	return m_cg_read_data;
 }
 
 
@@ -844,92 +931,6 @@ void ygv625_device::render_frame()
 		}
 		if (flags & 0x4000)
 			break;
-	}
-}
-
-
-//-------------------------------------------------
-//  read
-//-------------------------------------------------
-
-u16 ygv625_device::read(offs_t offset)
-{
-	if (offset < 0x1e00)
-		return m_ram[offset];
-
-	const u32 reg = offset & 0x1ff;
-	u16 data = m_regs[reg];
-	switch (reg)
-	{
-	case 0x26: // 0x3c4c status
-		data = (m_regs[reg] & ~0x4109) | (screen().vblank() ? 1 : 0) | (m_cg_read_ready ? 0x4000 : 0);
-		break;
-
-	case 0x27: // 0x3c4e control, bit 5 self clears
-		data = m_regs[reg] & ~0x0020;
-		break;
-
-	case 0x28: // 0x3c50
-		data = m_regs[reg] & 0x7fff;
-		break;
-
-	case 0x36: // 0x3c6c CG read address high / start, bit 15 reads back clear once done
-		data = m_regs[reg] & 0x7fff;
-		break;
-
-	case 0x38: // 0x3c70 CG read data
-		data = m_cg_read_data;
-		break;
-
-	default:
-		break;
-	}
-	return data;
-}
-
-
-//-------------------------------------------------
-//  write
-//-------------------------------------------------
-
-void ygv625_device::write(offs_t offset, u16 data, u16 mem_mask)
-{
-	if (offset < 0x1e00)
-	{
-		COMBINE_DATA(&m_ram[offset]);
-		return;
-	}
-
-	const u32 reg = offset & 0x1ff;
-	COMBINE_DATA(&m_regs[reg]);
-	LOGMASKED(LOG_REGS, "%s: reg %04x = %04x\n", machine().describe_context(), 0x3c00 + reg * 2, m_regs[reg]);
-
-	switch (reg)
-	{
-	case 0x27: // 0x3c4e control
-		if (data & mem_mask & 0x0020)
-		{
-			screen().update_partial(screen().vpos());
-			render_frame();
-		}
-		break;
-
-	case 0x36: // 0x3c6c CG read: bit 15 starts the access
-		if (data & mem_mask & 0x8000)
-		{
-			const u32 addr = (u32(m_regs[0x36] & 0x07ff) << 16) | m_regs[0x37];
-			m_cg_read_data = cg_word(addr);
-			m_cg_read_ready = true;
-			m_regs[0x36] &= 0x7fff;
-		}
-		break;
-
-	case 0x38:
-		// TODO: CG memory writes (flash programming through the chip)
-		break;
-
-	default:
-		break;
 	}
 }
 

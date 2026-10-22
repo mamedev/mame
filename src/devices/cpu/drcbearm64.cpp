@@ -606,6 +606,7 @@ private:
 	void op_fcmp(a64::Assembler &a, const uml::instruction &inst);
 	void op_fcopyi(a64::Assembler &a, const uml::instruction &inst);
 	void op_icopyf(a64::Assembler &a, const uml::instruction &inst);
+	void op_frecip(a64::Assembler &a, const uml::instruction &inst);
 
 	template <a64::Inst::Id Opcode> void op_float_alu(a64::Assembler &a, const uml::instruction &inst);
 	template <a64::Inst::Id Opcode> void op_float_alu2(a64::Assembler &a, const uml::instruction &inst);
@@ -778,7 +779,7 @@ inline void drcbe_arm64::generate_one(a64::Assembler &a, const uml::instruction 
 	case uml::OP_FNEG:    op_float_alu2<a64::Inst::kIdFneg_v>(a, inst);     break; // FNEG    dst,src1
 	case uml::OP_FABS:    op_float_alu2<a64::Inst::kIdFabs_v>(a, inst);     break; // FABS    dst,src1
 	case uml::OP_FSQRT:   op_float_alu2<a64::Inst::kIdFsqrt_v>(a, inst);    break; // FSQRT   dst,src1
-	case uml::OP_FRECIP:  op_float_alu2<a64::Inst::kIdFrecpe_v>(a, inst);   break; // FRECIP  dst,src1
+	case uml::OP_FRECIP:  op_frecip(a, inst);                                break; // FRECIP  dst,src1
 	case uml::OP_FRSQRT:  op_float_alu2<a64::Inst::kIdFrsqrte_v>(a, inst);  break; // FRSQRT  dst,src1
 	case uml::OP_FCOPYI:  op_fcopyi(a, inst);                               break; // FCOPYI  dst,src
 	case uml::OP_ICOPYF:  op_icopyf(a, inst);                               break; // ICOPYF  dst,src
@@ -5693,6 +5694,32 @@ template <a64::Inst::Id Opcode> void drcbe_arm64::op_float_alu2(a64::Assembler &
 		mov_float_reg_param(a, inst.size(), srcreg, srcp);
 
 	a.emit(Opcode, dstreg, srcreg);
+
+	if (!dstp.is_float_register())
+		mov_float_param_reg(a, inst.size(), dstp, dstreg);
+}
+
+void drcbe_arm64::op_frecip(a64::Assembler &a, const uml::instruction &inst)
+{
+	assert(inst.size() == 4 || inst.size() == 8);
+	assert_no_condition(inst);
+	assert_no_flags(inst);
+
+	be_parameter dstp(*this, inst.param(0), PTYPE_MF);
+	be_parameter srcp(*this, inst.param(1), PTYPE_MF);
+
+	const a64::Vec dstreg = dstp.select_register(TEMPF_REG2, inst.size());
+	const a64::Vec srcreg = srcp.select_register(TEMPF_REG1, inst.size());
+	const a64::Vec numerator = select_register(TEMPF_REG2, inst.size());
+
+	if (!srcp.is_float_register())
+		mov_float_reg_param(a, inst.size(), srcreg, srcp);
+
+	// Use division like the x64 and C backends.  The AArch64 hardware estimate
+	// is too imprecise for PowerPC fres and caused problems (e.g. Scud Race's
+	// camera matrix jumping around)
+	a.fmov(numerator, 1.0);
+	a.fdiv(dstreg, numerator, srcreg);
 
 	if (!dstp.is_float_register())
 		mov_float_param_reg(a, inst.size(), dstp, dstreg);

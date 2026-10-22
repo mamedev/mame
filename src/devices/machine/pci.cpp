@@ -942,6 +942,8 @@ void pci_host_device::device_start()
 
 	save_item(NAME(config_address));
 
+	// the BARs come back from a saved state, the address maps built from them don't
+	machine().save().register_postload(save_prepost_delegate(FUNC(pci_host_device::regenerate_mapping), this));
 }
 
 void pci_host_device::device_reset()

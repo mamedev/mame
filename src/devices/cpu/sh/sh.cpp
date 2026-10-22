@@ -1958,6 +1958,7 @@ void sh_common_execution::execute_one(const uint16_t opcode)
 
 // DRC / UML related
 void cfunc_unimplemented(void *param) { ((sh_common_execution *)param)->func_unimplemented(); }
+static void cfunc_slot_illegal(void *param) { static_cast<sh_common_execution *>(param)->func_slot_illegal(); }
 void cfunc_MAC_W(void *param) { ((sh_common_execution *)param)->func_MAC_W(); }
 void cfunc_MAC_L(void *param) { ((sh_common_execution *)param)->func_MAC_L(); }
 void cfunc_DIV1(void *param) { ((sh_common_execution *)param)->func_DIV1(); }
@@ -2487,12 +2488,16 @@ void sh_common_execution::generate_sequence_instruction(drcuml_block &block, com
 	{
 		// otherwise, unless this is a virtual no-op, it's a regular instruction
 		// compile the instruction
-		if (!generate_opcode(block, compiler, desc, ovrpc))
+		// on the SH-1/SH-2 a branch in a delay slot raises a slot illegal instruction exception,
+		// which stacks the destination of the delayed branch instead of its own address
+		const bool slot_illegal = (m_cpu_type <= CPU_TYPE_SH2) && desc->in_delay_slot() && is_slot_illegal(desc->opptr);
+		assert(!slot_illegal || (ovrpc != SH_OVRPC_NONE));
+		if (slot_illegal || !generate_opcode(block, compiler, desc, ovrpc))
 		{
 			// take the illegal instruction exception immediately
 			UML_MOV(block, mem(&m_sh2_state->pc), desc->pc);                            // mov     [pc],desc->pc
 			UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);                  // mov     [arg0],opcode
-			UML_CALLC(block, cfunc_unimplemented, this);                             // callc   cfunc_unimplemented
+			UML_CALLC(block, slot_illegal ? cfunc_slot_illegal : cfunc_unimplemented, this); // callc   cfunc_unimplemented
 
 			UML_SUB(block, R32(15), R32(15), 4);                    // sub     R15, R15, #4
 			UML_MOV(block, I0, R32(15));                            // mov     r0, R15
@@ -2501,7 +2506,12 @@ void sh_common_execution::generate_sequence_instruction(drcuml_block &block, com
 
 			UML_SUB(block, R32(15), R32(15), 4);                    // sub     R15, R15, #4
 			UML_MOV(block, I0, R32(15));                            // mov     r0, R15
-			UML_MOV(block, I1, desc->pc);                           // mov     r1, desc->pc
+			if (!slot_illegal)
+				UML_MOV(block, I1, desc->pc);                       // mov     r1, desc->pc
+			else if (ovrpc == SH_OVRPC_DYNAMIC)
+				UML_MOV(block, I1, mem(&m_sh2_state->target));      // mov     r1, target
+			else
+				UML_MOV(block, I1, ovrpc + 2);                      // mov     r1, ovrpc + 2
 			UML_CALLH(block, *m_write32);                           // call    write32
 
 			// evec is clobbered by the interrupt check inside generate_update_cycles
@@ -2534,6 +2544,14 @@ void sh_common_execution::func_unimplemented()
 {
 	// set up an invalid opcode exception
 	m_sh2_state->evec = read_long(m_sh2_state->vbr + 4 * 4);
+	m_sh2_state->evec &= m_am;
+	m_sh2_state->irqsr = m_sh2_state->sr;
+}
+
+void sh_common_execution::func_slot_illegal()
+{
+	// set up a slot illegal instruction exception
+	m_sh2_state->evec = read_long(m_sh2_state->vbr + 6 * 4);
 	m_sh2_state->evec &= m_am;
 	m_sh2_state->irqsr = m_sh2_state->sr;
 }
@@ -3287,9 +3305,13 @@ bool sh_common_execution::generate_group_8(drcuml_block &block, compiler_state &
 		UML_MOV(block, mem(&m_sh2_state->sr), I0);      // mov m_sh2_state->sr, r0
 		return true;
 
+	// The taken path of a conditional branch counts off its cycles in a copy of the
+	// compiler state; the fall-through path still owes everything up to the branch.
 	case  9: // BT(opcode & 0xff);
+	{
+		templabel = compiler.labelnum++;                   // reserve the fall-through label
 		UML_TEST(block, mem(&m_sh2_state->sr), SH_T);      // test m_sh2_state->sr, T
-		UML_JMPc(block, COND_Z, compiler.labelnum);    // jz compiler.labelnum
+		UML_JMPc(block, COND_Z, templabel);                // jz templabel
 
 		disp = util::sext(opcode, 8);
 		m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;
@@ -3297,15 +3319,21 @@ bool sh_common_execution::generate_group_8(drcuml_block &block, compiler_state &
 		// a taken branch eats two more cycles
 		UML_SUB(block, mem(&m_sh2_state->icount), mem(&m_sh2_state->icount), 2);    // m_sh2_state->ea = destination
 
-		generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
+		compiler_state compiler_temp(compiler);
+		generate_update_cycles(block, compiler_temp, m_sh2_state->ea, true);    // <subtract cycles>
 		UML_HASHJMP(block, 0, m_sh2_state->ea, *m_nocode);   // jmp m_sh2_state->ea
+		compiler.labelnum = compiler_temp.labelnum;
 
-		UML_LABEL(block, compiler.labelnum++);         // labelnum:
+		UML_LABEL(block, templabel);                       // templabel:
+		UML_MAPVAR(block, MAPVAR_CYCLES, compiler.cycles); // mapvar CYCLES,compiler.cycles
 		return true;
+	}
 
 	case 11: // BF(opcode & 0xff);
+	{
+		templabel = compiler.labelnum++;                   // reserve the fall-through label
 		UML_TEST(block, mem(&m_sh2_state->sr), SH_T);      // test m_sh2_state->sr, T
-		UML_JMPc(block, COND_NZ, compiler.labelnum);   // jnz compiler.labelnum
+		UML_JMPc(block, COND_NZ, templabel);               // jnz templabel
 
 		disp = util::sext(opcode, 8);
 		m_sh2_state->ea = (desc->pc + 2) + disp * 2 + 2;
@@ -3313,11 +3341,15 @@ bool sh_common_execution::generate_group_8(drcuml_block &block, compiler_state &
 		// a taken branch eats two more cycles
 		UML_SUB(block, mem(&m_sh2_state->icount), mem(&m_sh2_state->icount), 2);        // m_sh2_state->ea = destination
 
-		generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
+		compiler_state compiler_temp(compiler);
+		generate_update_cycles(block, compiler_temp, m_sh2_state->ea, true);    // <subtract cycles>
 		UML_HASHJMP(block, 0, m_sh2_state->ea, *m_nocode);   // jmp m_sh2_state->ea
+		compiler.labelnum = compiler_temp.labelnum;
 
-		UML_LABEL(block, compiler.labelnum++);         // labelnum:
+		UML_LABEL(block, templabel);                       // templabel:
+		UML_MAPVAR(block, MAPVAR_CYCLES, compiler.cycles); // mapvar CYCLES,compiler.cycles
 		return true;
+	}
 
 	case 13: // BTS(opcode & 0xff);
 		if (m_cpu_type > CPU_TYPE_SH1)
@@ -3333,12 +3365,15 @@ bool sh_common_execution::generate_group_8(drcuml_block &block, compiler_state &
 
 			templabel = compiler.labelnum;         // save our label
 			compiler.labelnum++;               // make sure the delay slot doesn't use it
-			generate_delay_slot(block, compiler, desc, m_sh2_state->ea-2);
+			compiler_state compiler_temp(compiler);
+			generate_delay_slot(block, compiler_temp, desc, m_sh2_state->ea-2);
 
-			generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
+			generate_update_cycles(block, compiler_temp, m_sh2_state->ea, true);    // <subtract cycles>
 			UML_HASHJMP(block, 0, m_sh2_state->ea, *m_nocode);   // jmp m_sh2_state->ea
+			compiler.labelnum = compiler_temp.labelnum;
 
 			UML_LABEL(block, templabel);            // labelnum:
+			UML_MAPVAR(block, MAPVAR_CYCLES, compiler.cycles); // mapvar CYCLES,compiler.cycles
 			return true;
 		}
 		break;
@@ -3357,12 +3392,15 @@ bool sh_common_execution::generate_group_8(drcuml_block &block, compiler_state &
 
 			templabel = compiler.labelnum;         // save our label
 			compiler.labelnum++;               // make sure the delay slot doesn't use it
-			generate_delay_slot(block, compiler, desc, m_sh2_state->ea-2); // delay slot only if the branch is taken
+			compiler_state compiler_temp(compiler);
+			generate_delay_slot(block, compiler_temp, desc, m_sh2_state->ea-2); // delay slot only if the branch is taken
 
-			generate_update_cycles(block, compiler, m_sh2_state->ea, true);    // <subtract cycles>
+			generate_update_cycles(block, compiler_temp, m_sh2_state->ea, true);    // <subtract cycles>
 			UML_HASHJMP(block, 0, m_sh2_state->ea, *m_nocode);   // jmp m_sh2_state->ea
+			compiler.labelnum = compiler_temp.labelnum;
 
 			UML_LABEL(block, templabel);            // labelnum:
+			UML_MAPVAR(block, MAPVAR_CYCLES, compiler.cycles); // mapvar CYCLES,compiler.cycles
 			return true;
 		}
 		break;
@@ -3752,20 +3790,26 @@ bool sh_common_execution::generate_group_0(drcuml_block &block, compiler_state &
 		return true;
 
 	case 0x1b: // SLEEP();
+	{
+		const uml::code_label wake = compiler.labelnum++;
 		UML_MOV(block, I0, mem(&m_sh2_state->sleep_mode));                 // mov i0, sleep_mode
 		UML_CMP(block, I0, 0x2);                                           // cmp i0, #2
-		UML_JMPc(block, COND_E, compiler.labelnum);                        // beq labelnum
+		UML_JMPc(block, COND_E, wake);                                     // beq wake
 		// sleep mode != 2: stay asleep by re-executing this instruction until an
 		// exception wakes us (same behavior as the SH interpreter)
 		UML_MOV(block, mem(&m_sh2_state->sleep_mode), 0x1);                // mov sleep_mode, #1
-		generate_update_cycles(block, compiler, desc->pc, true);           // repeat this insn
+		compiler_state compiler_temp(compiler);
+		generate_update_cycles(block, compiler_temp, desc->pc, true);      // repeat this insn
 		UML_HASHJMP(block, 0, desc->pc, *m_nocode);                        // jmp desc->pc
+		compiler.labelnum = compiler_temp.labelnum;
 
-		UML_LABEL(block, compiler.labelnum++);                             // labelnum:
+		UML_LABEL(block, wake);                                            // wake:
+		UML_MAPVAR(block, MAPVAR_CYCLES, compiler.cycles);                 // mapvar CYCLES,compiler.cycles
 		// sleep_mode == 2
 		UML_MOV(block, mem(&m_sh2_state->sleep_mode), 0x0);                // sleep_mode = 0
 		generate_update_cycles(block, compiler, desc->pc+2, true);         // go to next insn
 		return true;
+	}
 
 	case 0x22: // STCVBR(Rn);
 		UML_MOV(block, R32(REG_N), mem(&m_sh2_state->vbr));        // mov Rn, vbr

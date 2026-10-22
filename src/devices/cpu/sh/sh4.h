@@ -16,6 +16,7 @@
 #pragma once
 
 #include "sh.h"
+#include "sh7709_scif.h"
 
 #define SH4_INT_NONE    -1
 enum
@@ -187,7 +188,9 @@ public:
 	void generate_pop(drcuml_block &block, uint32_t reg, const uml::parameter &dst);
 	void generate_fmov_single(drcuml_block &block, uint32_t reg, bool load);
 	void generate_fmov_pair(drcuml_block &block, uint32_t reg, bool load);
-	void func_FSSCA();
+	void func_FSRRA();
+	void func_FIPR();
+	void func_FTRV();
 	void func_LDTLB();
 
 protected:
@@ -223,6 +226,7 @@ protected:
 	address_space_config m_io_config;
 
 	int m_host_round;      // host rounding mode the interpreter has to leave in place
+	std::unique_ptr<int32_t []> m_fsca_table; // what the recompiler makes FSCA results from: sines in units of 2^-26
 	uml::parameter m_fs_regmap[16];
 	uml::parameter m_fd_regmap[16];
 
@@ -517,6 +521,7 @@ protected:
 	void FDIV(const uint16_t opcode);
 	void FMAC(const uint16_t opcode);
 	void FSQRT(const uint16_t opcode);
+	void fpu_raise(uint32_t cause);
 	void FSRRA(const uint16_t opcode);
 	void FSSCA(const uint16_t opcode);
 	void FIPR(const uint16_t opcode);
@@ -662,7 +667,6 @@ protected:
 	void da_7709_map(address_map& map) ATTR_COLD;
 	void port_7709_map(address_map& map) ATTR_COLD;
 	void irda_7709_map(address_map& map) ATTR_COLD;
-	void scif_7709_map(address_map& map) ATTR_COLD;
 	void udi_7709s_map(address_map& map) ATTR_COLD;
 
 	// CCN
@@ -977,24 +981,6 @@ protected:
 	uint16_t scfdr1_r(offs_t offset, uint16_t mem_mask);
 	void scfdr1_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
-	// SCIF 7709
-	uint8_t scsmr2_r(offs_t offset, uint8_t mem_mask);
-	void scsmr2_w(offs_t offset, uint8_t data, uint8_t mem_mask);
-	uint8_t scbrr2_r(offs_t offset, uint8_t mem_mask);
-	void scbrr2_w(offs_t offset, uint8_t data, uint8_t mem_mask);
-	uint8_t scscr2_r(offs_t offset, uint8_t mem_mask);
-	void scscr2_w(offs_t offset, uint8_t data, uint8_t mem_mask);
-	uint8_t scftdr2_r(offs_t offset, uint8_t mem_mask);
-	void scftdr2_w(offs_t offset, uint8_t data, uint8_t mem_mask);
-	uint16_t scssr2_r(offs_t offset, uint16_t mem_mask);
-	void scssr2_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	uint8_t scfrdr2_r(offs_t offset, uint8_t mem_mask);
-	void scfrdr2_w(offs_t offset, uint8_t data, uint8_t mem_mask);
-	uint8_t scfcr2_r(offs_t offset, uint8_t mem_mask);
-	void scfcr2_w(offs_t offset, uint8_t data, uint8_t mem_mask);
-	uint16_t scfdr2_r(offs_t offset, uint16_t mem_mask);
-	void scfdr2_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-
 	// UDI 7709S
 	uint16_t sdir_r(offs_t offset, uint16_t mem_mask);
 	void sdir_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -1160,16 +1146,6 @@ protected:
 	uint8_t m_scfrdr1;
 	uint8_t m_scfcr1;
 	uint16_t m_scfdr1;
-
-	// SCIF 7709
-	uint8_t m_scsmr2;
-	uint8_t m_scbrr2;
-	uint8_t m_scscr2;
-	uint8_t m_scftdr2;
-	uint16_t m_scssr2;
-	uint16_t m_scfrdr2;
-	uint8_t m_scfcr2;
-	uint8_t m_scfdr2;
 
 	// UDI 7709S
 	uint16_t m_sdir;
@@ -1821,7 +1797,26 @@ protected:
 };
 
 
-class sh3_device : public sh3_base_device
+// SH7709/SH7709S family, which adds a FIFO equipped SCIF (channel 2)
+class sh7709_base_device : public sh3_base_device
+{
+public:
+	auto scif_txd_handler() { return m_scif.lookup()->write_txd(); }
+	void scif_rxd_w(int state) { m_scif->rxd_w(state); }
+
+protected:
+	sh7709_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
+
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void scif_7709_map(address_map& map) ATTR_COLD;
+
+private:
+	required_device<sh7709_scif_device> m_scif;
+};
+
+// Note that sh3_device register map is modeled after SH7709.
+class sh3_device : public sh7709_base_device
 {
 public:
 	sh3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness = ENDIANNESS_LITTLE);
@@ -1837,7 +1832,7 @@ public:
 	virtual void sh3_register_map(address_map& map) override ATTR_COLD;
 };
 
-class sh7709_device : public sh3_base_device
+class sh7709_device : public sh7709_base_device
 {
 public:
 	sh7709_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock, endianness_t endianness = ENDIANNESS_LITTLE);

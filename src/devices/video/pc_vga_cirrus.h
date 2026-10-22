@@ -77,6 +77,7 @@ protected:
 	uint8_t m_blt_status = 0;
 	uint8_t m_blt_rop = 0;
 	uint8_t m_blt_mode = 0;
+	uint8_t m_blt_write_mask = 0;
 	uint32_t m_blt_source = 0;
 	uint32_t m_blt_dest = 0;
 	uint16_t m_blt_source_pitch = 0;
@@ -118,7 +119,7 @@ private:
 	void start_system_bitblt();
 	void blit_dword();
 	void blit_byte();  // used for colour expanded system-to-vram bitblts
-	void copy_pixel(uint8_t src, uint8_t dst);
+	void copy_pixel(uint8_t src, uint8_t dst, bool foreground = true, unsigned dst_byte_offset = 0);
 };
 
 class cirrus_gd5430_vga_device :  public cirrus_gd5428_vga_device
@@ -126,16 +127,25 @@ class cirrus_gd5430_vga_device :  public cirrus_gd5428_vga_device
 public:
 	cirrus_gd5430_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	virtual uint8_t mem_r(offs_t offset) override;
+	virtual void mem_w(offs_t offset, uint8_t data) override;
+
 protected:
 	cirrus_gd5430_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	virtual void crtc_map(address_map &map) override ATTR_COLD;
 	virtual void gc_map(address_map &map) override ATTR_COLD;
 	virtual void sequencer_map(address_map &map) override ATTR_COLD;
 private:
+	static u8 mmio_register(offs_t offset);
+	u8 mmio_r(offs_t offset);
+	void mmio_w(offs_t offset, u8 data);
+
 	uint8_t m_cr1d = 0;
+	uint8_t m_sr17 = 1;
 };
 
 class cirrus_gd5446_vga_device :  public cirrus_gd5430_vga_device

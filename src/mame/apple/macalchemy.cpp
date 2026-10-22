@@ -96,11 +96,8 @@ private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void cuda_reset_w(int state)
-	{
-		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
-		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
-	}
+	void cuda_power_w(int state);
+	void cuda_reset_w(int state);
 
 	u32 machine_id_r(offs_t offset, u32 mem_mask);
 
@@ -127,6 +124,20 @@ void pmac6400_state::machine_reset()
 
 void pmac6400_state::init_pmac6400()
 {
+}
+
+void pmac6400_state::cuda_power_w(int state)
+{
+	if (state)
+	{
+		machine().schedule_exit();
+	}
+}
+
+void pmac6400_state::cuda_reset_w(int state)
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 }
 
 u32 pmac6400_state::machine_id_r(offs_t offset, u32 mem_mask)
@@ -225,6 +236,7 @@ void pmac6400_state::pmac6400(machine_config &config)
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(pmac6400_state::cuda_reset_w));
+	m_cuda->poweroff_callback().set(FUNC(pmac6400_state::cuda_power_w));
 	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(m_ohare, FUNC(ohare_device::cb1_w));
 	m_cuda->via_data_callback().set(m_ohare, FUNC(ohare_device::cb2_w));

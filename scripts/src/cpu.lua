@@ -957,6 +957,8 @@ if CPUS["SH"] then
 		MAME_DIR .. "src/devices/cpu/sh/sh4dmac.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh4fe.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh4fe.h",
+		MAME_DIR .. "src/devices/cpu/sh/sh4fpu.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh4fpu.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh4regs.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh4tmu.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh4tmu.h",
@@ -1008,6 +1010,8 @@ if CPUS["SH"] then
 		MAME_DIR .. "src/devices/cpu/sh/sh7604_wdt.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7604.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh7604.h",
+		MAME_DIR .. "src/devices/cpu/sh/sh7709_scif.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh7709_scif.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7709s.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh7709s.cpp",
 	}
@@ -1402,6 +1406,23 @@ if CPUS["I386"] then
 		MAME_DIR .. "src/devices/cpu/i386/x87priv.h",
 		MAME_DIR .. "src/devices/cpu/i386/cpuidmsrs.hxx",
 	}
+end
+
+--------------------------------------------------
+-- Intel 82750PB
+--@src/devices/cpu/i750/i750.h,CPUS["I750"] = true
+--------------------------------------------------
+
+if CPUS["I750"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/i750/i750.cpp",
+		MAME_DIR .. "src/devices/cpu/i750/i750.h",
+	}
+end
+
+if opt_tool(CPUS, "I750") then
+	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/i750/i750d.cpp")
+	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/i750/i750d.h")
 end
 
 --------------------------------------------------
@@ -4154,6 +4175,23 @@ end
 if opt_tool(CPUS, "ROMP") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/romp/rompdasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/romp/rompdasm.h")
+end
+
+--------------------------------------------------
+-- Konami 056734 (ESC)
+--@src/devices/cpu/k056734/k056734.h,CPUS["K056734"] = true
+--------------------------------------------------
+
+if CPUS["K056734"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/k056734/k056734.cpp",
+		MAME_DIR .. "src/devices/cpu/k056734/k056734.h",
+	}
+end
+
+if opt_tool(CPUS, "K056734") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/k056734/k056734d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/k056734/k056734d.h")
 end
 
 --------------------------------------------------

@@ -66,13 +66,14 @@ protected:
 	virtual uint32_t get_cell_size(const format &f, int track) const;
 	virtual int get_sectors_per_track(const format &f, int track) const;
 	virtual int get_disk_id_offset(const format &f) const;
-	void get_disk_id(const format &f, util::random_read &io, uint8_t &id1, uint8_t &id2) const;
+	void get_disk_id(const format &f, const uint8_t *img, uint8_t &id1, uint8_t &id2) const;
 	virtual int get_image_offset(const format &f, int head, int track) const;
 	int compute_track_size(const format &f, int track) const;
 	virtual int get_gap2(const format &f, int head, int track) const { return f.gap_2; }
 	virtual floppy_image_format_t::desc_e* get_sector_desc(const format &f, int &current_size, int sector_count, uint8_t id1, uint8_t id2, int gap_2) const;
 	void build_sector_description(const format &f, uint8_t *sectdata, uint32_t sect_offs, uint32_t error_offs, desc_s *sectors, int sector_count) const;
 	virtual void fix_end_gap(floppy_image_format_t::desc_e* desc, int remaining_size) const;
+	virtual uint32_t get_track_skew(const format &f, int head, int track, uint32_t skew, int current_size, int gap2, int total_size) const;
 	static void rotate_track(floppy_image &image, int track, int head, uint32_t skew);
 	void extract_sectors(const floppy_image &image, const format &f, desc_s *sdesc, int track, int head, int sector_count) const;
 

@@ -21,6 +21,14 @@ sh2_device::sh2_frontend::sh2_frontend(sh_common_execution *device, uint32_t win
 {
 }
 
+uint16_t sh2_device::sh2_frontend::read_word(opcode_desc &desc)
+{
+	// fetch through the cache-through window the same way the interpreter does
+	if (desc.physpc < 0x40000000)
+		desc.physpc &= m_sh->m_am;
+	return m_sh->m_pr16(desc.physpc);
+}
+
 
 
 bool sh2_device::sh2_frontend::describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)

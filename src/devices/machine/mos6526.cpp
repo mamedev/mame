@@ -4,22 +4,22 @@
 
     MOS 6526/8521/8520 Complex Interface Adapter emulation
 
-	Nearly cycle accurate emulation. Verified with the following:
+    Nearly cycle accurate emulation. Verified with the following:
 
-	- C64 Emulator Test Suite 2.15 (100%)
-	- VICE testprogs CIA tests (100%)
-	- vAmigaTS on a500 (100% of non-deprecated usable tests)
-	- reDIP-CIA gate-level model (62/72), differs on:
-		all models
-		- ser_receive (matches vAmigaTS ser1)
-		6526
-		- irq_timing (matches VICE)
-		6526A/8521
-		- icr_ack_underflow (matches VICE)
-		8520
-		- tod_mask (matches vAmigaTS showcia1)
-		- cra_todin (matches vAmigaTS timer3b/timer3c)
-		- tod_alarm (hypothetical)
+    - C64 Emulator Test Suite 2.15 (100%)
+    - VICE testprogs CIA tests (100%)
+    - vAmigaTS on a500 (100% of non-deprecated usable tests)
+    - reDIP-CIA gate-level model (62/72), differs on:
+        all models
+        - ser_receive (matches vAmigaTS ser1)
+        6526
+        - irq_timing (matches VICE)
+        6526A/8521
+        - icr_ack_underflow (matches VICE)
+        8520
+        - tod_mask (matches vAmigaTS showcia1)
+        - cra_todin (matches vAmigaTS timer3b/timer3c)
+        - tod_alarm (hypothetical)
 
 **********************************************************************/
 
@@ -255,7 +255,7 @@ void mos6526_device::set_cra(uint8_t data)
 		}
 	}
 
-	m_cra = data & cra_mask();
+	m_cra = data & m_cra_mask;
 
 	m_feed_a0 = (data & 0x21) == CRA_START;
 	m_count_a1 = m_count_a0 = m_feed_a0;
@@ -435,20 +435,12 @@ uint8_t mos6526_device::read_tod(int offset)
 //  write_tod - time-of-day write
 //-------------------------------------------------
 
-uint8_t mos6526_device::tod_mask(int offset) const
-{
-	static const uint8_t mask[4] = { 0x0f, 0x7f, 0x7f, 0x9f };
-
-	return mask[offset];
-}
-
-
 void mos6526_device::write_tod(int offset, uint8_t data)
 {
 	int shift = 8 * offset;
 
 	// the unused high bits of each register don't exist on the chip
-	data &= tod_mask(offset);
+	data &= m_tod_mask >> shift;
 
 	if (CRB_ALARM)
 	{
@@ -725,7 +717,7 @@ void mos6526_device::update_interrupt()
 		icr |= ICR_TB;
 	}
 
-	if (irq_sources_delayed())
+	if (m_irq_sources_delayed)
 	{
 		std::swap(icr, m_icr_delay);
 	}
@@ -734,7 +726,7 @@ void mos6526_device::update_interrupt()
 	// still sets its flag, and is only swallowed the next cycle
 	uint8_t clear = m_icr_read ? 0x1f : 0x00;
 
-	if (icr_read_loses_tb() && m_icr_read_prev)
+	if (m_icr_read_loses_tb && m_icr_read_prev)
 		clear |= ICR_TB;
 
 	m_icr &= ~clear;
@@ -778,25 +770,25 @@ void mos6526_device::clock_pipeline()
 	// a source forming in the cycle an ICR read acknowledges the reported flags
 	// is a new interrupt, and must not inherit the old one's set history, or
 	// /IRQ never releases and an edge-triggered NMI is lost for good
-	if (m_icr_read && !irq_one_cycle_early() && (m_icr_new & m_imr))
+	if (m_icr_read && !m_irq_one_cycle_early && (m_icr_new & m_imr))
 	{
 		m_ir_set_prev = 0;
 		m_ir_set_prev2 = 0;
 	}
 
 	int const ir_set = (m_icr & m_imr) ? 1 : 0;
-	int const ir_set_model = irq_one_cycle_early() ? ir_set : m_ir_set_prev;
-	int const ir_clr_model = (m_icr_read || (icr_read_loses_tb() && m_icr_read_prev)) ? 1 : 0;
+	int const ir_set_model = m_irq_one_cycle_early ? ir_set : m_ir_set_prev;
+	int const ir_clr_model = (m_icr_read || (m_icr_read_loses_tb && m_icr_read_prev)) ? 1 : 0;
 
 	// the pad's set term is sampled a cycle later than the IR flag's, except on
 	// the 8520, which has already spent that cycle delaying its sources. It sits
 	// on the latch's set input, so the reset term still reaches the pad at once.
-	int const pad_set = irq_sources_delayed() ? ir_set_model :
-			irq_one_cycle_early() ? m_ir_set_prev : m_ir_set_prev2;
+	int const pad_set = m_irq_sources_delayed ? ir_set_model :
+			m_irq_one_cycle_early ? m_ir_set_prev : m_ir_set_prev2;
 
 	// the 6526 sees the term a cycle after it formed, by which point it has
 	// committed and the read cannot take the flag back
-	int const ir_clr_wins = ir_clr_model && (irq_one_cycle_early() || !ir_set_model);
+	int const ir_clr_wins = ir_clr_model && (m_irq_one_cycle_early || !ir_set_model);
 
 	if (ir_clr_wins)
 		m_icr7 = 0;
@@ -808,7 +800,7 @@ void mos6526_device::clock_pipeline()
 	// pulses for that cycle. Clearing it here instead would swallow an interrupt
 	// the same read has already reported as bit 7 set. Only chips whose pad set
 	// term lags the flag's can reach that state.
-	if (irq_one_cycle_early() && !irq_sources_delayed() && pad_set && !m_ir_latch)
+	if (m_irq_one_cycle_early && !m_irq_sources_delayed && pad_set && !m_ir_latch)
 	{
 		m_ir_latch = 1;
 		m_ir_clr_pending = ir_clr_model;
@@ -892,9 +884,17 @@ void mos6526_device::synchronize()
 //  mos6526_device - constructor
 //-------------------------------------------------
 
-mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, model variant) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_execute_interface(mconfig, *this),
+	m_icr_read_loses_tb(variant == model::CIA6526),
+	m_icr_read_sticky(variant != model::CIA6526),
+	m_irq_one_cycle_early(variant != model::CIA6526),
+	m_timer_hi_starts_oneshot(variant == model::CIA8520),
+	m_irq_sources_delayed(variant == model::CIA8520),
+	m_tod_mask((variant == model::CIA8520) ? 0xffff'ffff : 0x9f7f'7f0f),
+	m_tod_reset_value((variant == model::CIA8520) ? 0 : 0x0100'0000),
+	m_cra_mask((variant == model::CIA8520) ? 0x6f : 0xef),
 	m_icount(0),
 	m_tod_clock(0),
 	m_write_irq(*this),
@@ -909,17 +909,17 @@ mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, 
 }
 
 mos6526_device::mos6526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6526_device(mconfig, MOS6526, tag, owner, clock)
+	: mos6526_device(mconfig, MOS6526, tag, owner, clock, model::CIA6526)
 { }
 
 mos6526a_device::mos6526a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6526_device(mconfig, MOS6526A, tag, owner, clock) { }
+	: mos6526_device(mconfig, MOS6526A, tag, owner, clock, model::CIA6526A) { }
 
 mos8521_device::mos8521_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6526_device(mconfig, MOS8521, tag, owner, clock) { }
+	: mos6526_device(mconfig, MOS8521, tag, owner, clock, model::CIA6526A) { }
 
 mos8520_device::mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6526_device(mconfig, MOS8520, tag, owner, clock) { }
+	: mos6526_device(mconfig, MOS8520, tag, owner, clock, model::CIA8520) { }
 
 
 //-------------------------------------------------
@@ -1111,7 +1111,7 @@ void mos6526_device::device_reset()
 	m_tod_div = 0;
 	m_alarm_pending = 0;
 	m_tod_count = 0;
-	m_tod = tod_reset_value();
+	m_tod = m_tod_reset_value;
 	m_tod_latch = 0;
 	m_alarm = 0;
 	m_tod_stopped = true;
@@ -1275,7 +1275,7 @@ uint8_t mos6526_device::read(offs_t offset)
 		}
 
 		// the previous cycle's read only drives its flags to zero now
-		if (icr_read_sticky())
+		if (m_icr_read_sticky)
 			data |= m_icr_sticky;
 
 		break;
@@ -1375,7 +1375,7 @@ void mos6526_device::write(offs_t offset, uint8_t data)
 
 		// on the 8520 the write also force-loads and starts a one-shot timer,
 		// whatever the start bit says - Amiga Kickstart boots off this
-		if (timer_hi_starts_oneshot() && CRA_RUNMODE)
+		if (m_timer_hi_starts_oneshot && CRA_RUNMODE)
 		{
 			m_load_a0 = 1;
 			m_cra |= CRA_START;
@@ -1406,7 +1406,7 @@ void mos6526_device::write(offs_t offset, uint8_t data)
 			m_load_b0 = 1;
 		}
 
-		if (timer_hi_starts_oneshot() && CRB_RUNMODE)
+		if (m_timer_hi_starts_oneshot && CRB_RUNMODE)
 		{
 			m_load_b0 = 1;
 			m_crb |= CRB_START;

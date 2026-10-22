@@ -405,7 +405,8 @@ ROM_END
 
 ROM_START( class200 )
 	ROM_REGION( 0x4000, "internal", ROMREGION_ERASEFF )
-	ROM_LOAD( "internal.rom", 0x000000, 0x4000, NO_DUMP ) // unsure of exact size for this model
+	ROM_LOAD( "internal.rom", 0x0000, 0x2000, CRC(024fa502) SHA1(0aca4bbd6b98eb156187a144a274c8d3ead27d40) )
+	ROM_RELOAD( 0x2000, 0x2000 )
 
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "m29w320eb.bin", 0x000000, 0x400000, CRC(3067b5f6) SHA1(9a159b16898054a74cfb32b5c597b505132f004e) )

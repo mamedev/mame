@@ -9,6 +9,7 @@ license:CC0-1.0
 		<description>Action Soundware</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="rs232_default" value="soundware"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162822">
 				<rom name="action_soundware.ccvf" size="162822" crc="6ffabe32" sha1="87b9c5842ca4a8236374f6c236d6d9c3135a2606"/>
@@ -62,8 +63,8 @@ license:CC0-1.0
 
 	<software name="altronic">
 		<description>Alltronics</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980</year>
+		<publisher>Alltronics</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162831">
 				<rom name="alltronics.ccvf" size="162831" crc="b35c5bb8" sha1="7ce89d3ac445814452e97a9b6d44ba6b47f158a4"/>
@@ -142,6 +143,7 @@ license:CC0-1.0
 		<description>ASM Tutorial</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="rs232_default" value="soundware"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162858">
 				<rom name="asmtut_disk1.ccvf" size="162858" crc="d1304e27" sha1="e54605117e1a024c18c3a19e278397dd71b637ab"/>
@@ -175,8 +177,8 @@ license:CC0-1.0
 
 	<software name="asteroid">
 		<description>Asteroids</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980</year>
+		<publisher>Tom Hudson</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163637">
 				<rom name="asteroids.ccvf" size="163637" crc="8836f1f3" sha1="57d6266d179fa1fef305460f6cf10792bf754be0"/>
@@ -193,8 +195,8 @@ license:CC0-1.0
 
 	<software name="asteroida" cloneof="asteroid">
 		<description>Asteroids (alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980</year>
+		<publisher>Tom Hudson</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162935">
 				<rom name="asteroids (alt).ccvf" size="162935" crc="b51497b3" sha1="4944301634059ba51b35b2b9f6c021967c5fee26" />
@@ -211,8 +213,9 @@ license:CC0-1.0
 
 	<software name="ay8910">
 		<description>AY-3-8910 Programs</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1981</year>
+		<publisher>Intelligent Systems Corp.</publisher>
+		<sharedfeat name="exp_default" value="joysnd"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162830">
 				<rom name="ay-3-8910_programs.ccvf" size="162830" crc="a7f468c8" sha1="0e89e48f2704a6686d4b38c67afc8e50316ff9d8"/>
@@ -307,8 +310,8 @@ license:CC0-1.0
 
 	<software name="bship">
 		<description>Battleship</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1979</year>
+		<publisher>A.W. Grogono</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163637">
 				<rom name="battleship.ccvf" size="163637" crc="94ca6a2b" sha1="92e4b8303ec4acd3113d35c6e04639892af8ab23"/>
@@ -318,8 +321,8 @@ license:CC0-1.0
 
 	<software name="bshipa" cloneof="bship">
 		<description>Battleship (alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1979</year>
+		<publisher>A.W. Grogono</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162916">
 				<rom name="battleship (alt).ccvf" size="162916" crc="e0b169cc" sha1="265ccb3f19ebe1e35da1cda7f5c5ba3106df8313" />
@@ -1073,8 +1076,8 @@ license:CC0-1.0
 
 	<software name="clrgraph">
 		<description>ColorGraph v1.01</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1982</year>
+		<publisher>Compuworld, Inc.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162852">
 				<rom name="colorgraph.ccvf" size="162852" crc="d6d99c50" sha1="83e3b1ca5e77ad4daefbf9f3ceecbf27a13c1b57"/>
@@ -1096,7 +1099,7 @@ license:CC0-1.0
 	<software name="colcave">
 		<description>Colossal Cave</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Garry Epps</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162865">
 				<rom name="colossal_cave_epps.ccvf" size="162865" crc="3e7b98b3" sha1="109fcf8b94b866cb34f32e5aa46d6c3bb1946bbf" />
@@ -1152,7 +1155,7 @@ license:CC0-1.0
 	<software name="comtron">
 		<description>Comtronics</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>COM-TRONICS</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162816">
 				<rom name="comtronics.ccvf" size="162816" crc="fd41cb38" sha1="10cb00b18e18c2e0892608657cbbd9ba1e28a52e"/>
@@ -1163,7 +1166,7 @@ license:CC0-1.0
 	<software name="comtron2">
 		<description>Comtronics Software</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>COM-TRONICS</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162875">
 				<rom name="comtronics_sw.ccvf" size="162875" crc="d25cc3a1" sha1="eaa14502e527db92055a7fe9f9dfbf06c9f2f111"/>
@@ -1174,7 +1177,7 @@ license:CC0-1.0
 	<software name="cooltool">
 		<description>Cool Tools</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Garry Epps</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163041">
 				<rom name="cooltools.ccvf" size="163041" crc="cffc2cb4" sha1="79fff8725c3d7e277ae31cb54c55ce243aaecec8" />
@@ -1259,7 +1262,7 @@ license:CC0-1.0
 	<software name="dogfight">
 		<description>Dogfight</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Trevor Taylor</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162841">
 				<rom name="dogfight.ccvf" size="162841" crc="6e3f4b0c" sha1="e87b87388ff669f2e7e5737522c3bf1f9abff9e3"/>
@@ -1392,8 +1395,8 @@ license:CC0-1.0
 
 	<software name="fortran">
 		<description>FORTRAN</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980</year>
+		<publisher>Intelligent Systems Corp.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162837">
 				<rom name="fortran.ccvf" size="162837" crc="7869e193" sha1="0ea74e003d2600407da23f9d33a789888c82218e"/>
@@ -1459,8 +1462,8 @@ license:CC0-1.0
 
 	<software name="galaxian">
 		<description>Galaxian</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1981</year>
+		<publisher>Intelligent Systems Corp.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163637">
 				<rom name="galaxian.ccvf" size="163637" crc="70ce732b" sha1="5f0052d13031d279dcc547691d57b3bdf959ccb3"/>
@@ -1470,8 +1473,8 @@ license:CC0-1.0
 
 	<software name="galaxiana" cloneof="galaxian">
 		<description>Galaxian (alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1981</year>
+		<publisher>Intelligent Systems Corp.</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163112">
 				<rom name="galaxian (alt).ccvf" size="163112" crc="47fffa68" sha1="0bee0f0b3fda9733be42bed86769b90cb2c4748f" />
@@ -1482,7 +1485,7 @@ license:CC0-1.0
 	<software name="ghostcr">
 		<description>Ghost Crunchers</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Guy Larri</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162874">
 				<rom name="ghost_crunchers.ccvf" size="162874" crc="126abdf4" sha1="80bc317041591391193c2c734030bd41c150ee12" />
@@ -1593,7 +1596,7 @@ license:CC0-1.0
 	<software name="ida">
 		<description>IDA (v2.6)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Bill Greene</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162890">
 				<rom name="ida_v2.6.ccvf" size="162890" crc="e15f4d66" sha1="4cb14073f3c6934c31b0a5af62cd3028def552d5"/>
@@ -1610,7 +1613,9 @@ license:CC0-1.0
 	<software name="ifsoft">
 		<description>Interface Software / Joystick Games</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Trevor Taylor</publisher>
+		<sharedfeat name="exp_default" value="joysnd"/>
+		<sharedfeat name="rs232_default" value="soundware"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162836">
 				<rom name="interface_software.ccvf" size="162836" crc="6a5c441a" sha1="b749fc92478bf45c586dce92ff3850493146d582"/>
@@ -1622,6 +1627,7 @@ license:CC0-1.0
 		<description>Intro to Soundware</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="rs232_default" value="soundware"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162892">
 				<rom name="intro_to_soundware.ccvf" size="162892" crc="cf7ca2b7" sha1="2b1ae9a70d034f842ea5a4920097ae682762a2c4"/>
@@ -1688,6 +1694,7 @@ license:CC0-1.0
 		<description>Joystick Games</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="exp_default" value="joysnd"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162814">
 				<rom name="joystick-sidea.ccvf" size="162814" crc="9530ed91" sha1="36052d74ec3fe9dd6a6497aa45ee6cafec8ef489"/>
@@ -1703,8 +1710,10 @@ license:CC0-1.0
 
 	<software name="joysound">
 		<description>Joystick Games with Sound</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980</year>
+		<publisher>Trevor Taylor</publisher>
+		<sharedfeat name="exp_default" value="joysnd"/>
+		<sharedfeat name="rs232_default" value="soundware"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162843">
 				<rom name="joystick_sound.ccvf" size="162843" crc="a2377bd8" sha1="d3f1ab4a72437f2b6590e64647d90cc4dba7efba"/>
@@ -1714,8 +1723,9 @@ license:CC0-1.0
 
 	<software name="lasergun">
 		<description>Laser Gun (Joystick)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980</year>
+		<publisher>Trevor Taylor</publisher>
+		<sharedfeat name="exp_default" value="joysnd"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162826">
 				<rom name="laser_gun_joystick.ccvf" size="162826" crc="d2319830" sha1="6427909124e398faff920432c996c478bb9cf7f6"/>
@@ -1725,8 +1735,8 @@ license:CC0-1.0
 
 	<software name="lasergunk" cloneof="lasergun">
 		<description>Laser Gun (Keyboard)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980</year>
+		<publisher>Trevor Taylor</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162826">
 				<rom name="laser_gun_keyboard.ccvf" size="162826" crc="26cdf32e" sha1="e8f3e2d1772c399753f7179f455820ba2c87a3a3"/>
@@ -1736,8 +1746,8 @@ license:CC0-1.0
 
 	<software name="life">
 		<description>Life</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980</year>
+		<publisher>B. Barlow</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162845">
 				<rom name="life.ccvf" size="162845" crc="62b0e5a0" sha1="b5cbb4512f8af18d545c45d657434674f98d3fff"/>
@@ -1747,8 +1757,8 @@ license:CC0-1.0
 
 	<software name="lifea" cloneof="life">
 		<description>Life (alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980</year>
+		<publisher>B. Barlow</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162810">
 				<rom name="life2.ccvf" size="162810" crc="21ecd246" sha1="8f3f7897d33e577b9034d484ba426c1add0bc604"/>
@@ -2189,7 +2199,7 @@ license:CC0-1.0
 	<software name="printdrv">
 		<description>Printer Drivers</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>J.L. Helms</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162925">
 				<rom name="driver_lister.ccvf" size="162925" crc="504740f6" sha1="f38611fb908e9986407309d7fb5eec769169c9cd"/>
@@ -2298,8 +2308,9 @@ license:CC0-1.0
 
 	<software name="snakelad">
 		<description>Snakes and Ladders</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1979</year>
+		<publisher>Compucolor Corporation</publisher>
+		<sharedfeat name="rs232_default" value="soundware"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162822">
 				<rom name="snakes_and_ladders.ccvf" size="162822" crc="00f4b547" sha1="07e3cb41d1642f9bd25f3a8037da1f1cc3328aeb"/>
@@ -2322,6 +2333,7 @@ license:CC0-1.0
 		<description>Sound Light Pen</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="exp_default" value="joysnd"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162830">
 				<rom name="sound_light_pen.ccvf" size="162830" crc="42051eb3" sha1="5b13e1f2022d6b68d7e7500ec81e4744b82069e7"/>
@@ -2333,6 +2345,7 @@ license:CC0-1.0
 		<description>Soundware II</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="rs232_default" value="soundware"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162818">
 				<rom name="soundware_ii.ccvf" size="162818" crc="c265ab41" sha1="bd01b5c97a01d8ecacf61c6b03b733e593856cb6"/>
@@ -2408,8 +2421,9 @@ license:CC0-1.0
 
 	<software name="strekge">
 		<description>Star Trek (Graham Epps, v30.8.80)</description>
-		<year>19??</year>
+		<year>1980</year>
 		<publisher>Graham Epps</publisher>
+		<sharedfeat name="rs232_default" value="soundware"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163637">
 				<rom name="epps_trek.ccvf" size="163637" crc="0dad1114" sha1="4f4496c14c65d7b46640cecbdfefa8116de44b78"/>
@@ -2419,8 +2433,9 @@ license:CC0-1.0
 
 	<software name="strekgea" cloneof="strekge">
 		<description>Star Trek (Graham Epps, v30.8.80, alt)</description>
-		<year>19??</year>
+		<year>1980</year>
 		<publisher>Graham Epps</publisher>
+		<sharedfeat name="rs232_default" value="soundware"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162842">
 				<rom name="epps_trek (alt).ccvf" size="162842" crc="600fb885" sha1="1fdeaeb61f3fb1c08e803cdeb02f36c392713c7c" />
@@ -2485,8 +2500,8 @@ license:CC0-1.0
 
 	<software name="tabltenn">
 		<description>Table Tennis for Two</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980</year>
+		<publisher>Trevor Taylor</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162841">
 				<rom name="table_tennis_for_two.ccvf" size="162841" crc="e0fabda5" sha1="e15e60dd6a0661ea6e1d520d40c270dcb76ca196"/>
@@ -2678,8 +2693,8 @@ license:CC0-1.0
 
 	<software name="tinypasc">
 		<description>Tiny Pascal</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1980</year>
+		<publisher>T.G. Price</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162862">
 				<rom name="tiny_pascal.ccvf" size="162862" crc="e0a855cf" sha1="44c10b524c7129d92d3ac6d22dc0f6b3fdd3679c"/>
@@ -2777,8 +2792,8 @@ license:CC0-1.0
 
 	<software name="wordy">
 		<description>Wordy</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1982</year>
+		<publisher>Gary A. Dinsmore</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="162894">
 				<rom name="wordy_disk_1.ccvf" size="162894" crc="cb96b2ce" sha1="b0e0727c7f3c09ccc83e7dfb744c877aeeee1681"/>

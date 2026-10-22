@@ -70,7 +70,9 @@ public:
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
 		m_portswap(*this, "JOYSWAP"),
-		m_addr(0)
+		m_addr(0),
+		m_kb(0),
+		m_cst_rd(1)
 	{ }
 
 	void plus4(machine_config &config);
@@ -127,6 +129,7 @@ protected:
 	void vslsi_w(offs_t offset, uint8_t data);
 	void addr_w(offs_t offset, uint8_t data);
 	void ted_rom_w(offs_t offset, uint8_t data);
+	void cst_rd_w(int state) { m_cst_rd = state; }
 
 	uint8_t cpu_r();
 
@@ -159,6 +162,8 @@ protected:
 
 	// keyboard state
 	uint8_t m_kb;
+
+	uint8_t m_cst_rd;
 
 	template <offs_t RamSize> void plus4_mem(address_map &map) ATTR_COLD;
 	template <offs_t RamSize> void ted_videoram_map(address_map &map) ATTR_COLD;
@@ -614,7 +619,7 @@ uint8_t plus4_state::cpu_r()
 	uint8_t data = 0x2f;
 
 	// cassette read
-	data |= m_cassette->read() << 4;
+	data |= m_cst_rd << 4;
 
 	// serial clock
 	data |= m_iec->clk_r() << 6;
@@ -648,7 +653,7 @@ uint8_t c16_state::cpu_r()
 	uint8_t data = 0;
 
 	// cassette read
-	data |= m_cassette->read() << 4;
+	data |= m_cst_rd << 4;
 
 	// serial clock
 	data |= m_iec->clk_r() << 6;
@@ -791,6 +796,7 @@ void plus4_state::machine_start()
 	// state saving
 	save_item(NAME(m_addr));
 	save_item(NAME(m_kb));
+	save_item(NAME(m_cst_rd));
 
 	if (m_acia)
 	{
@@ -844,7 +850,8 @@ void plus4_state::plus4(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &plus4_state::plus4_mem<0x10000>);
 	m_maincpu->read_callback().set(FUNC(plus4_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(plus4_state::cpu_w));
-	config.set_perfect_quantum(m_maincpu);
+	// limits how far the 1551 drive can run past a sync point
+	config.set_maximum_quantum(attotime::from_usec(16));
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, m7501_device::IRQ_LINE);
 
@@ -867,7 +874,7 @@ void plus4_state::plus4(machine_config &config)
 	PLS100(config, PLA_TAG);
 
 	PET_USER_PORT(config, m_user, plus4_user_port_cards, nullptr);
-	m_user->p4_handler().set(m_spi_user, FUNC(mos6529_device::write_p2)); // cassette sense
+	m_user->p4_handler().set(m_spi_user, FUNC(mos6529_device::write_p2));
 	m_user->p5_handler().set(m_spi_user, FUNC(mos6529_device::write_p3));
 	m_user->p6_handler().set(m_spi_user, FUNC(mos6529_device::write_p4));
 	m_user->p7_handler().set(m_spi_user, FUNC(mos6529_device::write_p5));
@@ -875,10 +882,10 @@ void plus4_state::plus4(machine_config &config)
 	m_user->pb_handler().set(m_spi_user, FUNC(mos6529_device::write_p0));
 	m_user->pc_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
 	m_user->pf_handler().set(m_spi_user, FUNC(mos6529_device::write_p7));
-	m_user->ph_handler().set(m_acia, FUNC(mos6551_device::write_dcd)).invert(); // TODO: add missing pull up before inverter
+	m_user->ph_handler().set(m_acia, FUNC(mos6551_device::write_dcd)).invert();
 	m_user->pj_handler().set(m_spi_user, FUNC(mos6529_device::write_p6));
 	m_user->pk_handler().set(m_spi_user, FUNC(mos6529_device::write_p1));
-	m_user->pl_handler().set(m_acia, FUNC(mos6551_device::write_dsr)).invert(); // TODO: add missing pull up before inverter
+	m_user->pl_handler().set(m_acia, FUNC(mos6551_device::write_dsr)).invert();
 
 	MOS6551(config, m_acia);
 	m_acia->set_xtal(1.8432_MHz_XTAL);
@@ -909,7 +916,7 @@ void plus4_state::plus4(machine_config &config)
 	m_spi_kb->p_handler<7>().set(FUNC(plus4_state::write_kb7));
 
 	PET_DATASSETTE_PORT(config, m_cassette, plus4_datassette_devices, "c1531");
-	m_cassette->read_handler().set_nop();
+	m_cassette->read_handler().set(FUNC(plus4_state::cst_rd_w));
 
 	cbm_iec_slot_device::add(config, m_iec, nullptr);
 	m_iec->atn_callback().set(m_user, FUNC(pet_user_port_device::write_9));
@@ -918,6 +925,7 @@ void plus4_state::plus4(machine_config &config)
 	VCS_CONTROL_PORT(config, m_joy2, vcs_control_port_devices, "joy");
 
 	PLUS4_EXPANSION_SLOT(config, m_exp, XTAL(14'318'181)/16, plus4_expansion_cards, "c1551");
+	m_exp->set_cpu(m_maincpu);
 	m_exp->irq_wr_callback().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_exp->aec_wr_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 

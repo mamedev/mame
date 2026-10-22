@@ -10,16 +10,17 @@
 #include "emu.h"
 #include "ieee488.h"
 
+#define VERBOSE 0
+#include "logmacro.h"
+
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
 
-
-static const char *const SIGNAL_NAME[] = { "EOI", "DAV", "NRFD", "NDAC", "IFC", "SRQ", "ATN", "REN" };
+static const char *const SIGNAL_NAME[] = { "EOI", "DAV", "NRFD", "NDAC", "IFC", "SRQ", "ATN", "REN", "DIO" };
 
 
 
@@ -120,12 +121,11 @@ ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, d
 	m_write_atn(*this),
 	m_write_ren(*this),
 	m_write_dio(*this),
-	m_dio(0xff)
+	m_update_timer(nullptr)
 {
-	for (auto & elem : m_line)
-	{
-		elem = 1;
-	}
+	m_lines.reset();
+	std::fill(std::begin(m_line), std::end(m_line), 1);
+	m_line[DIO] = 0xff;
 }
 
 
@@ -135,8 +135,16 @@ ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, d
 
 void ieee488_device::device_start()
 {
+	m_update_timer = timer_alloc(FUNC(ieee488_device::update_tick), this);
+
+	// a bus hosted by a cartridge has its host CPU outside the bus owner
+	for (device_execute_interface &exec : execute_interface_enumerator(machine().root_device()))
+		m_execs.push_back(&exec);
+
+	save_item(NAME(m_lines.m_time));
+	save_item(NAME(m_lines.m_state));
+	save_item(NAME(m_lines.m_count));
 	save_item(NAME(m_line));
-	save_item(NAME(m_dio));
 }
 
 
@@ -162,8 +170,9 @@ void ieee488_device::add_device(ieee488_slot_device *slot, device_t *target)
 	entry->m_interface->m_slot = slot;
 
 	m_device_list.append(*entry);
-	save_item(NAME(entry->m_line), m_device_list.count());
-	save_item(NAME(entry->m_dio), m_device_list.count());
+	save_item(NAME(entry->m_lines.m_time), m_device_list.count());
+	save_item(NAME(entry->m_lines.m_state), m_device_list.count());
+	save_item(NAME(entry->m_lines.m_count), m_device_list.count());
 }
 
 
@@ -174,15 +183,26 @@ void ieee488_device::add_device(ieee488_slot_device *slot, device_t *target)
 ieee488_device::daisy_entry::daisy_entry(device_t *device)
 	: m_next(nullptr),
 		m_device(device),
-		m_interface(nullptr),
-		m_dio(0xff)
+		m_interface(nullptr)
 {
-	for (auto & elem : m_line)
-	{
-		elem = 1;
-	}
+	m_lines.reset();
 
 	device->interface(m_interface);
+}
+
+
+//-------------------------------------------------
+//  source_lines::reset -
+//-------------------------------------------------
+
+void ieee488_device::source_lines::reset()
+{
+	for (int signal = 0; signal < SIGNAL_COUNT; signal++)
+	{
+		std::fill(std::begin(m_time[signal]), std::end(m_time[signal]), attotime::zero);
+		std::fill(std::begin(m_state[signal]), std::end(m_state[signal]), (signal == DIO) ? 0xff : 1);
+		m_count[signal] = 1;
+	}
 }
 
 
@@ -190,47 +210,86 @@ ieee488_device::daisy_entry::daisy_entry(device_t *device)
 //  set_signal -
 //-------------------------------------------------
 
-void ieee488_device::set_signal(device_t *device, int signal, int state)
+void ieee488_device::set_signal(device_t *device, int signal, u8 state)
 {
-	bool changed = false;
-	int old_state = get_signal(signal);
+	source_lines *lines = &m_lines;
 
-	if (device == this)
+	if (device != this)
 	{
-		if (m_line[signal] != state)
-		{
-			if (LOG) logerror("%s IEEE488: '%s' %s %u\n", machine().describe_context(), tag(), SIGNAL_NAME[signal], state);
-			m_line[signal] = state;
-			changed = true;
-		}
+		daisy_entry *entry = m_device_list.first();
+		while (entry && entry->m_device != device)
+			entry = entry->next();
+		if (!entry)
+			return;
+		lines = &entry->m_lines;
+	}
+
+	if (signal != DIO)
+		state = state ? 1 : 0;
+	u8 &count = lines->m_count[signal];
+	attotime *const times = lines->m_time[signal];
+	u8 *const states = lines->m_state[signal];
+	if (states[count - 1] == state)
+		return;
+
+	// port outputs change after the write cycle, half a cycle after reads sample their inputs
+	attotime const now = machine().time();
+	attotime time = now;
+	device_execute_interface *const exec = machine().scheduler().currently_executing();
+	if (exec)
+	{
+		attotime const cycle = exec->cycles_to_attotime(1);
+		if (!cycle.is_never())
+			time += cycle / 2;
+	}
+	time = std::max(time, times[count - 1]);
+
+	LOG("%s '%s' %s %02x at %s\n", machine().describe_context(), device->tag(), SIGNAL_NAME[signal], state, time.as_string());
+
+	if (times[count - 1] == time)
+	{
+		if (count > 1 && states[count - 2] == state)
+			count--;
+		else
+			states[count - 1] = state;
 	}
 	else
 	{
-		daisy_entry *entry = m_device_list.first();
-
-		while (entry)
+		if (count == EDGE_COUNT)
 		{
-			if (!strcmp(entry->m_device->tag(), device->tag()))
-			{
-				if (entry->m_line[signal] != state)
-				{
-					if (LOG) logerror("%s IEEE488: '%s' %s %u\n", machine().describe_context(), device->tag(), SIGNAL_NAME[signal], state);
-					entry->m_line[signal] = state;
-					changed = true;
-				}
-			}
-
-			entry = entry->next();
+			std::copy(times + 1, times + count, times);
+			std::copy(states + 1, states + count, states);
+			count--;
 		}
+		times[count] = time;
+		states[count] = state;
+		count++;
 	}
 
-	if (!changed) {
-		return;
-	}
+	if (time <= now)
+		update_lines();
+	else if (!m_update_timer->enabled() || m_update_timer->expire() > time)
+		m_update_timer->adjust(time - now);
+}
 
-	state = get_signal(signal);
 
-	if (old_state != state) {
+//-------------------------------------------------
+//  update_lines - notify devices of resolved
+//  line changes up to the current time
+//-------------------------------------------------
+
+void ieee488_device::update_lines()
+{
+	attotime const now = machine().time();
+
+	for (int signal = 0; signal < SIGNAL_COUNT; signal++)
+	{
+		u8 const state = get_signal(signal, now);
+		if (m_line[signal] == state)
+			continue;
+
+		m_line[signal] = state;
+
 		switch (signal)
 		{
 		case EOI:   m_write_eoi(state);  break;
@@ -241,54 +300,103 @@ void ieee488_device::set_signal(device_t *device, int signal, int state)
 		case SRQ:   m_write_srq(state);  break;
 		case ATN:   m_write_atn(state);  break;
 		case REN:   m_write_ren(state);  break;
+		case DIO:   m_write_dio(state);  break;
 		}
 
-		daisy_entry *entry = m_device_list.first();
-
-		while (entry)
+		for (daisy_entry *entry = m_device_list.first(); (signal != DIO) && entry; entry = entry->next())
 		{
 			switch (signal)
 			{
-			case EOI:
-				entry->m_interface->ieee488_eoi(state);
-				break;
-
-			case DAV:
-				entry->m_interface->ieee488_dav(state);
-				break;
-
-			case NRFD:
-				entry->m_interface->ieee488_nrfd(state);
-				break;
-
-			case NDAC:
-				entry->m_interface->ieee488_ndac(state);
-				break;
-
-			case IFC:
-				entry->m_interface->ieee488_ifc(state);
-				break;
-
-			case SRQ:
-				entry->m_interface->ieee488_srq(state);
-				break;
-
-			case ATN:
-				entry->m_interface->ieee488_atn(state);
-				break;
-
-			case REN:
-				entry->m_interface->ieee488_ren(state);
-				break;
+			case EOI:   entry->m_interface->ieee488_eoi(state);  break;
+			case DAV:   entry->m_interface->ieee488_dav(state);  break;
+			case NRFD:  entry->m_interface->ieee488_nrfd(state); break;
+			case NDAC:  entry->m_interface->ieee488_ndac(state); break;
+			case IFC:   entry->m_interface->ieee488_ifc(state);  break;
+			case SRQ:   entry->m_interface->ieee488_srq(state);  break;
+			case ATN:   entry->m_interface->ieee488_atn(state);  break;
+			case REN:   entry->m_interface->ieee488_ren(state);  break;
 			}
-
-			entry = entry->next();
 		}
 
-		if (LOG) logerror("IEEE488: EOI %u DAV %u NRFD %u NDAC %u IFC %u SRQ %u ATN %u REN %u DIO %02x\n",
-			get_signal(EOI), get_signal(DAV), get_signal(NRFD), get_signal(NDAC),
-			get_signal(IFC), get_signal(SRQ), get_signal(ATN), get_signal(REN), get_data());
+		LOG("EOI %u DAV %u NRFD %u NDAC %u IFC %u SRQ %u ATN %u REN %u DIO %02x\n",
+			m_line[EOI], m_line[DAV], m_line[NRFD], m_line[NDAC],
+			m_line[IFC], m_line[SRQ], m_line[ATN], m_line[REN], m_line[DIO]);
 	}
+}
+
+
+//-------------------------------------------------
+//  update_tick -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(ieee488_device::update_tick)
+{
+	update_lines();
+
+	attotime const now = machine().time();
+	attotime next = attotime::never;
+	auto const find_next = [&now, &next] (source_lines const &lines)
+	{
+		for (int signal = 0; signal < SIGNAL_COUNT; signal++)
+			for (int i = lines.m_count[signal] - 1; (i >= 0) && (lines.m_time[signal][i] > now); i--)
+				next = std::min(next, lines.m_time[signal][i]);
+	};
+
+	find_next(m_lines);
+	for (daisy_entry *entry = m_device_list.first(); entry; entry = entry->next())
+		find_next(entry->m_lines);
+
+	if (next.is_never())
+		m_update_timer->reset();
+	else
+		m_update_timer->adjust(next - now);
+}
+
+
+//-------------------------------------------------
+//  sample_ready - hold a CPU's bus sample until
+//  every other device has passed the point where
+//  its outputs could still change the result
+//-------------------------------------------------
+
+bool ieee488_device::sample_ready(cpu_device &cpu)
+{
+	if (!cpu.executing() || machine().side_effects_disabled())
+		return true;
+
+	attotime const time = cpu.local_time();
+	bool ready = !m_update_timer->enabled() || (m_update_timer->expire() > time);
+	attotime stalled = attotime::never;
+
+	for (device_execute_interface *const exec : m_execs)
+	{
+		if (!ready)
+			break;
+
+		if ((&exec->device() == &cpu) || exec->suspended(SUSPEND_ANY_REASON & ~SUSPEND_REASON_TIMESLICE))
+			continue;
+
+		attotime const cycle = exec->cycles_to_attotime(1);
+		if (!cycle.is_never())
+		{
+			ready = (exec->local_time() + (cycle / 2)) > time;
+			if (!ready && ((exec->local_time() + cycle) > time))
+				stalled = cycle;
+		}
+	}
+
+	if (!ready)
+	{
+		// a device less than a cycle behind can only run once this slice ends
+		if (!stalled.is_never())
+		{
+			cpu.yield();
+			machine().scheduler().perfect_quantum(stalled);
+		}
+		cpu.retry_access();
+	}
+
+	return ready;
 }
 
 
@@ -296,93 +404,22 @@ void ieee488_device::set_signal(device_t *device, int signal, int state)
 //  get_signal -
 //-------------------------------------------------
 
-int ieee488_device::get_signal(int signal)
+u8 ieee488_device::get_signal(int signal, const attotime &time)
 {
-	int state = m_line[signal];
+	auto const source_state = [signal, &time] (source_lines const &lines)
+	{
+		int i = lines.m_count[signal] - 1;
+		while ((i > 0) && (lines.m_time[signal][i] > time))
+			i--;
+		return lines.m_state[signal][i];
+	};
 
-	daisy_entry *entry = m_device_list.first();
+	u8 state = source_state(m_lines);
 
-	while (state && entry)
-		{
-			if (!entry->m_line[signal])
-				{
-					state = 0;
-					break;
-				}
-
-			entry = entry->next();
-		}
+	for (daisy_entry *entry = m_device_list.first(); state && entry; entry = entry->next())
+		state &= source_state(entry->m_lines);
 
 	return state;
-}
-
-
-//-------------------------------------------------
-//  set_data -
-//-------------------------------------------------
-
-void ieee488_device::set_data(device_t *device, uint8_t data)
-{
-	bool changed = false;
-	uint8_t old_state = get_data();
-
-	if (device == this)
-	{
-		if (LOG) logerror("%s IEEE488: '%s' DIO %02x\n", machine().describe_context(), tag(), data);
-		if (m_dio != data) {
-			m_dio = data;
-			changed = true;
-		}
-	}
-	else
-	{
-		daisy_entry *entry = m_device_list.first();
-
-		while (entry)
-		{
-			if (!strcmp(entry->m_device->tag(), device->tag()))
-			{
-				if (entry->m_dio != data)
-				{
-					if (LOG) logerror("%s IEEE488: '%s' DIO %02x\n", machine().describe_context(), device->tag(), data);
-					entry->m_dio = data;
-					changed = true;
-				}
-			}
-
-			entry = entry->next();
-		}
-	}
-
-	if (!changed) {
-		return;
-	}
-
-	uint8_t new_state = get_data();
-	if (old_state != new_state) {
-		m_write_dio(new_state);
-	}
-}
-
-
-//-------------------------------------------------
-//  get_data -
-//-------------------------------------------------
-
-uint8_t ieee488_device::get_data()
-{
-	uint8_t data = m_dio;
-
-	daisy_entry *entry = m_device_list.first();
-
-	while (data && entry)
-	{
-		data &= entry->m_dio;
-
-		entry = entry->next();
-	}
-
-	return data;
 }
 
 

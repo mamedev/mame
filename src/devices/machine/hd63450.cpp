@@ -303,7 +303,10 @@ void hd63450_device::dma_transfer_start(int channel)
 	{
 		if((m_reg[channel].ocr & 3) == 1 && m_cpu) // TODO: proper cycle stealing
 			m_cpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		m_timer[channel]->adjust(attotime::zero, channel, m_burst_clock[channel]);
+		if (((m_reg[channel].ocr & 3) == 2) && !m_drq_state[channel])
+			m_timer[channel]->adjust(attotime::never);
+		else
+			m_timer[channel]->adjust(attotime::zero, channel, m_burst_clock[channel]);
 	}
 	else if (!(m_reg[channel].ocr & 2))
 		m_timer[channel]->adjust(attotime::from_usec(500), channel, m_our_clock[channel]);

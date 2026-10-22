@@ -35,6 +35,7 @@ public:
 		, m_sprites_raw(*this, "sprites_raw", 64U * 64 * 8 * 8, ENDIANNESS_LITTLE)
 		, m_keyboard(*this, "pc_keyboard")
 		, m_io_mouse(*this, "mouse_input%u", 1U)
+		, m_io_layers(*this, "LYRS")
 		, m_beta(*this, "beta")
 		, m_dma(*this, "dma")
 		, m_sdcard(*this, "sdcard")
@@ -164,6 +165,7 @@ private:
 	IRQ_CALLBACK_MEMBER(irq_vector);
 	u8 m_int_mask;
 	bool m_update_on_m1;
+	void uart_int_w(int state);
 
 	TILE_GET_INFO_MEMBER(get_tile_info_txt);
 	template <u8 Layer>
@@ -230,6 +232,7 @@ private:
 
 	required_device<at_keyboard_device> m_keyboard;
 	required_ioport_array<4> m_io_mouse;
+	optional_ioport m_io_layers;
 
 	required_device<tsconf_beta_device> m_beta;
 	required_device<tsconfdma_device> m_dma;

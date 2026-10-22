@@ -11,13 +11,15 @@
     TODO:
 
     - FT245 USB
-    - ShortBus (ETH64, DUART, DigiMAX, ETFE)
-    - clock port (ETH64 II, RR-Net, SilverSurfer, MP3@64)
 
 */
 
 #include "emu.h"
 #include "ide64.h"
+
+#include "shortbus/cards.h"
+
+#include "bus/amiga/clockport/cards.h"
 
 
 
@@ -66,6 +68,14 @@ void c64_ide64_cartridge_device::device_add_mconfig(machine_config &config)
 	m_ata1->default_data(0xff7f);
 	m_ata1->slot(0).set_option_machine_config("cdrom", cdrom_config);
 	m_ata1->slot(1).set_option_machine_config("cdrom", cdrom_config);
+
+	INPUT_MERGER_ANY_HIGH(config, m_nmi).output_handler().set([this] (int state) { m_slot->nmi_w(state); });
+
+	AMIGA_CLOCKPORT(config, m_clockport, amiga_clockport_cards, nullptr).int6_handler().set(m_nmi, FUNC(input_merger_any_high_device::in_w<0>));
+
+	IDE64_SHORTBUS(config, m_shortbus, ide64_shortbus_cards, nullptr);
+	m_shortbus->irq_handler().set([this] (int state) { m_slot->irq_w(state); });
+	m_shortbus->nmi_handler().set(m_nmi, FUNC(input_merger_any_high_device::in_w<1>));
 }
 
 
@@ -101,6 +111,11 @@ static INPUT_PORTS_START( c64_ide64 )
 	PORT_DIPNAME( 0x01, 0x01, "Flash ROM Write Protect" )
 	PORT_DIPSETTING(    0x00, "Disabled" )
 	PORT_DIPSETTING(    0x01, "Enabled" )
+
+	PORT_START("JP2")
+	PORT_CONFNAME( 0x01, 0x00, "ShortBus/Clock Port Address Swap (JP2)" )
+	PORT_CONFSETTING(    0x00, "Open ($DE00-$DE0F)" )
+	PORT_CONFSETTING(    0x01, "Closed ($DE10-$DE1F)" )
 INPUT_PORTS_END
 
 
@@ -131,6 +146,10 @@ c64_ide64_cartridge_device::c64_ide64_cartridge_device(const machine_config &mco
 	m_ata0(*this, ATA0_TAG),
 	m_ata1(*this, ATA1_TAG),
 	m_jp1(*this, "JP1"),
+	m_jp2(*this, "JP2"),
+	m_clockport(*this, "clockport"),
+	m_shortbus(*this, "shortbus"),
+	m_nmi(*this, "nmi"),
 	m_ram(*this, "ram", 0x8000, ENDIANNESS_LITTLE),
 	m_bank(0), m_ata_data(0), m_ata_selected(0), m_wp(0), m_enable(0)
 {
@@ -169,11 +188,49 @@ void c64_ide64_cartridge_device::device_reset()
 
 
 //-------------------------------------------------
+//  csel - ShortBus chip select decode
+//-------------------------------------------------
+
+int c64_ide64_cartridge_device::csel(uint8_t io1_offset)
+{
+	const bool swap = BIT(m_jp2->read(), 0);
+	int result = 0;
+
+	if (io1_offset < 0x10)
+		result |= swap ? ide64_shortbus_device::CSEL1 : ide64_shortbus_device::CSEL0;
+	else if (io1_offset < 0x20)
+		result |= swap ? ide64_shortbus_device::CSEL0 : ide64_shortbus_device::CSEL1;
+	else if (io1_offset >= 0x38 && io1_offset < 0x48)
+		result |= ide64_shortbus_device::CSEL2;
+	else if (io1_offset >= 0x48 && io1_offset < 0x58)
+		result |= ide64_shortbus_device::CSEL3;
+	else if (io1_offset >= 0x58 && io1_offset < 0x5a)
+		result |= ide64_shortbus_device::CSEL4;
+
+	return result;
+}
+
+
+//-------------------------------------------------
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
 uint8_t c64_ide64_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
+	if (!io1 && sphi2 && ba)
+	{
+		const int cs = csel(offset & 0xff);
+
+		if ((cs & ide64_shortbus_device::CSEL0) && m_clockport->has_card())
+			data = m_clockport->spare_r(offset & 0x0f);
+
+		data = m_shortbus->cd_r(offset & 0xff, data, io1, io2, cs);
+	}
+	else if (!io2 && sphi2 && ba)
+	{
+		data = m_shortbus->cd_r(offset & 0xff, data, io1, io2, 0);
+	}
+
 	if (!m_enable) return data;
 
 	int rom_oe = 1, ram_oe = 1;
@@ -201,6 +258,7 @@ uint8_t c64_ide64_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sp
 
 	if (!io1 && sphi2 && ba)
 	{
+		// 0x00-0x0f    CSEL0 (clock port), swapped with 0x10-0x1f by JP2
 		// 0x20-0x2f    IDE
 		// 0x30-0x37    I/O
 		// 0x5d-0x5e    FT245
@@ -280,6 +338,20 @@ uint8_t c64_ide64_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sp
 
 void c64_ide64_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
+	if (!io1)
+	{
+		const int cs = csel(offset & 0xff);
+
+		if (cs & ide64_shortbus_device::CSEL0)
+			m_clockport->spare_w(offset & 0x0f, data);
+
+		m_shortbus->cd_w(offset & 0xff, data, io1, io2, cs);
+	}
+	else if (!io2)
+	{
+		m_shortbus->cd_w(offset & 0xff, data, io1, io2, 0);
+	}
+
 	if (!m_enable) return;
 
 	if (!m_game && m_exrom)

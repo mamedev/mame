@@ -90,13 +90,19 @@ license:CC0-1.0
 	</software>
 
 	<software name="geos1581de" cloneof="geos1581">
-		<description>GEOS 128 v2.0 (1581) (Ger)</description>
+		<description>GEOS 128 v2.0 (Germany, 1581)</description>
 		<year>1999</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<sharedfeat name="iec8_default" value="c1581"/>
 		<part name="rom" interface="c128_rom">
 			<dataarea name="rom" size="0x8000">
 				<rom name="geos128ge1581.bin" size="0x8000" crc="1a60e07c" sha1="588bab588ad793b758cff26e68758065a42f15ea"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Boot"/>
+			<dataarea name="flop" size="819200">
+				<rom name="geos128ge1581_boot.d81" size="819200" crc="a5f06d19" sha1="cd1c0f00ce1125212cfddda544a8d4a23ccb917c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -108,6 +114,23 @@ license:CC0-1.0
 		<part name="rom" interface="c128_rom">
 			<dataarea name="rom" size="0x8000">
 				<rom name="geos128am1571.bin" size="0x8000" crc="e438e085" sha1="23e0d7aa7f5c73d91c8759e21008044808f61496"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="geos128de" cloneof="geos128">
+		<description>GEOS 128 v2.0 (Germany, 1571)</description>
+		<year>2021</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="rom" interface="c128_rom">
+			<dataarea name="rom" size="0x8000">
+				<rom name="geos128de1571.bin" size="0x8000" crc="23beb5f0" sha1="5704c46d9b8ed97726879dae462890cd525e39f5"/>
+			</dataarea>
+		</part>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Boot"/>
+			<dataarea name="flop" size="278234">
+				<rom name="geos128de1571_boot.g64" size="278234" crc="18bc0c28" sha1="09f4095a57c05d0b8bcd9294a437a7df966f1159"/>
 			</dataarea>
 		</part>
 	</software>

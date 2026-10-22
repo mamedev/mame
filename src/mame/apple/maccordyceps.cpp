@@ -107,6 +107,12 @@ private:
 		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 	}
 
+	void cuda_power_w(int state)
+	{
+		if (state)
+			machine().schedule_exit();
+	}
+
 	void nmi_irq(int state)
 	{
 		m_capella->nmi_w(state);
@@ -134,13 +140,6 @@ void pmac6200_state::init_pmac6200()
 
 uint32_t pmac6200_state::id_r(offs_t offset, uint32_t mem_mask)
 {
-	// same behavior as in macpdm.cpp
-	// FIXME: Apple System Profiler only reports half the desired CPU speed
-	if (mem_mask == 0xffff'ffff)
-	{
-		return m_model_id & 0xffff;
-	}
-
 	return m_model_id;
 }
 
@@ -180,7 +179,7 @@ INPUT_PORTS_END
 
 void pmac6200_state::pmac6200(machine_config &config)
 {
-	m_model_id = 0xa55a3250;
+	m_model_id = 0xa55a2250;
 
 	PPC603(config, m_maincpu, 75_MHz_XTAL);
 	// BUS_RETRY: TurboSCSI stalls the CPU until DRQ
@@ -195,7 +194,6 @@ void pmac6200_state::pmac6200(machine_config &config)
 	F108(config, m_f108, 75_MHz_XTAL / 2); // 68040 bus speed is 37.5 MHz, same as the FSB
 	m_f108->set_maincpu_tag("maincpu");
 	m_f108->set_primetimeii_tag("primetimeii");
-	m_f108->set_rom_tag("bootrom");
 	m_f108->write_ata_irq().set(m_primetimeii, FUNC(primetimeii_device::ata_irq_w));
 
 	NSCSI_CONNECTOR(config, "f108:scsi:0", mac_scsi_devices, nullptr);
@@ -229,6 +227,7 @@ void pmac6200_state::pmac6200(machine_config &config)
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->zero_default_pram();
 	m_cuda->set_default_bios_tag("341s0060");
+	m_cuda->poweroff_callback().set(FUNC(pmac6200_state::cuda_power_w));
 	m_cuda->reset_callback().set(FUNC(pmac6200_state::cuda_reset_w));
 	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(m_primetimeii, FUNC(primetime_device::cb1_w));
@@ -276,34 +275,10 @@ void pmac6200_state::pmac5200(machine_config &config)
 	m_model_id = 0xa55a3258;
 }
 
-#define PPC_MAKE_BRANCH_ALWAYS(x) \
-	ROM_FILL(x,   1, 0x48) \
-	ROM_FILL(x+1, 1, 0x00) \
-	// .
-
-#define PPC_ASSEMBLE_NOP(x) \
-	ROM_FILL(x,   1, 0x7f) \
-	ROM_FILL(x+1, 1, 0xff) \
-	ROM_FILL(x+2, 1, 0xfb) \
-	ROM_FILL(x+3, 1, 0x78) \
-	// .
-
 ROM_START( pmac6200 )
 	// bootrom is on the 64-bit PowerPC bus, so it should be loaded in a 64-bit space
 	ROM_REGION64_BE(0x400000, "bootrom64", 0)
 	ROM_LOAD( "63abfd3f.bin", 0x000000, 0x400000, CRC(2f47a6ea) SHA1(0b34d7c692594695b39719c3bf21808985f89f2c) )
-
-	// HACK: the bootrom tells the Capella to map in cache/tag RAMs and then tests them, failing if they're bad.
-	// we skip these tests for now; if it turns out these are never touched again,
-	// then these hacks can probably stay here...
-	PPC_MAKE_BRANCH_ALWAYS(0x3051b0) // skip checksum mismatch panic
-	PPC_ASSEMBLE_NOP(0x30529c)       // NOP out call to cache/tag RAM tests
-	PPC_MAKE_BRANCH_ALWAYS(0x3052a4) // avoid panic case after patched-out routine
-
-	// this is here to keep the F108 happy
-	// TODO: confirm on real hardware if the 68k side can see the bootrom
-	ROM_REGION32_BE(0x400000, "bootrom", 0)
-	ROM_FILL(0, 0x400000, 0)
 ROM_END
 
 } // anonymous namespace

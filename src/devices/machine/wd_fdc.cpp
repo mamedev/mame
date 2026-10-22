@@ -2198,7 +2198,10 @@ void wd_fdc_device_base::live_run(attotime limit)
 					break;
 				}
 			}
-			set_drq();
+			if(!drq) {
+				drq = true;
+				drq_cb(true);
+			}
 			cur_live.state = WRITE_BYTE;
 			cur_live.bit_counter = 16;
 			checkpoint();

@@ -1149,6 +1149,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/com20020.h,MACHINES["COM20020"] = true
+---------------------------------------------------
+
+if MACHINES["COM20020"] then
+	files {
+		MAME_DIR .. "src/devices/machine/com20020.cpp",
+		MAME_DIR .. "src/devices/machine/com20020.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/com52c50.h,MACHINES["COM52C50"] = true
 ---------------------------------------------------
 

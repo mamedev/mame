@@ -185,4 +185,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=CLFFfJekgXU -->
+	<software name="impo3">
+		<description>Impossiblator 3</description>
+		<year>2007</year>
+		<publisher>PWP</publisher>
+		<sharedfeat name="iec8_default" value="c1541"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="impo3.d64" size="174848" crc="11a5519d" sha1="a07ee122091507ee8f59658d73d1b28ee272d693"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

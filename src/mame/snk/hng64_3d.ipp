@@ -69,7 +69,8 @@ void hng64_state::dl_upload_w(u32 data)
 	// Data is:
 	// 00000b50 for the sams64 games
 	// 00000f00 for everything else
-	// TODO: different param for the two sams64 games, less FIFO to process?
+	// bit 10 assumed to enable the camera matrix; bits 4 and 6 are also set only by sams64
+	m_dl_upload = data;
 
 	// This is written after the game uploads 16 packets, each 16 words long
 	// We're assuming it to be a 'send to 3d hardware' trigger.
@@ -809,13 +810,9 @@ void hng64_state::recoverPolygonBlock(const u16* packet, int& numPolys)
 			// TODO: We can eliminate this step with a matrix stack (maybe necessary?)
 			// Note: fatfurwa's helicopter tracking in scene 3 of its intro shows one of these matrices isn't quite correct
 			setIdentity(m_modelViewMatrix);
-			if (!m_samsho64_3d_hack)
+			// sams64 games bake the camera into their object matrices
+			if (BIT(m_dl_upload, 10))
 			{
-				// The sams64 games transform the geometry in front of a stationary camera.
-				// This is fine in sams64_2, since it never calls the 'camera transformation' function
-				// (thus using the identity matrix for this transform), but sams64 calls the
-				// camera transformation function with rotation values.
-				// It remains to be seen what those might do...
 				matmul4(m_modelViewMatrix, m_modelViewMatrix, m_cameraMatrix);
 			}
 			matmul4(m_modelViewMatrix, m_modelViewMatrix, objectMatrix);
@@ -1078,7 +1075,7 @@ void hng64_state::clear3d()
  * -------+ 7654-3210-+----------------
  *      0 | ---- --xy | x = Reads in Fatal Fury WA, if on then there isn't a 3d refresh (busy flag?).  y = set at POST/service modes, almost likely fb disable
  *      1 | ---- ---- |
- *      2 | ccc- b--- | c = framebuffer color base, 0x311800 in Fatal Fury WA, 0x313800 in Buriki One (or not?)  b = don't clear buffer
+ *      2 | ccc- b--- | c = unknown, 0x311800 in Fatal Fury WA, 0x313800 in Buriki One  b = don't clear buffer
  *      3 | ---- ---- |
 */
 
@@ -1103,9 +1100,7 @@ void hng64_state::fbcontrol_w(offs_t offset, u8 data)
 	   ':maincpu' (800C13D0): fbcontrol_w (002) 18
 
 	   other games use either mix of 0x18 and 0x38.  bit 0x08 must prevent the framebuffer clear tho
-	   according to above table bit 0x20 is color base, but implementation for it is a hack
-	   roadedge ends up leaving 0x20 set after the car selection, which breaks ingame 3D palette if
-	   we use it as a palette base? see hack
+	   bit 0x20 isn't the 3D palette half, roadedge and xrally both set it in game
 
 	   (3d car currently not visible on roadedge select screen due to priority issue, disable sprites to see it)
 

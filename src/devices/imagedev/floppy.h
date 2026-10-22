@@ -237,8 +237,6 @@ protected:
 	/* Current floppy zone cache */
 	attotime m_cache_start_time, m_cache_end_time, m_cache_weak_start;
 	attotime m_amplifier_freakout_time;
-	// Read-chain bounce filter threshold; zero disables it
-	attotime m_glitch_threshold;
 	int m_cache_index;
 	u32 m_cache_entry;
 	bool m_cache_weak;
@@ -284,7 +282,7 @@ protected:
 	void cache_clear();
 	void cache_fill_index(const std::vector<uint32_t> &buf, int &index, attotime &base);
 	void cache_fill(const attotime &when);
-	void cache_weakness_setup(const std::vector<uint32_t> &buf, attotime base);
+	void cache_weakness_setup();
 
 	// Sound support
 	bool m_make_sound;
@@ -316,6 +314,7 @@ DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_ED,        floppy_35_ed,        "floppy_3_
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSSD_35T, floppy_525_sssd_35t, "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SD_35T,   floppy_525_sd_35t,   "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_VTECH,    floppy_525_vtech,    "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_COMPUCOLOR, floppy_525_compucolor, "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSSD,     floppy_525_sssd,     "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SD,       floppy_525_sd,       "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_525_SSDD,     floppy_525_ssdd,     "floppy_5_25")
