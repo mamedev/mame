@@ -135,8 +135,8 @@ private:
 	uint8_t m_ar;
 	uint8_t m_vreg[0x100];
 	uint8_t m_sr;
-	int m_irq_state;
-	int m_dreq_state;
+	uint8_t m_irq_state;
+	uint8_t m_dreq_state;
 
 	uint8_t m_fifo[16];                   /* FIFO W data queue */
 	int m_fifo_ptr;                 /* FIFO W pointer */

@@ -51,8 +51,8 @@ hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, d
 	m_external_skew(0),
 	m_ar(0),
 	m_sr(0),
-	m_irq_state(CLEAR_LINE),
-	m_dreq_state(CLEAR_LINE),
+	m_irq_state(0),
+	m_dreq_state(0),
 	m_fifo_ptr(-1),
 	m_fifo_r_ptr(-1),
 	m_cr(0),
@@ -429,7 +429,7 @@ inline void hd63484_device::inc_ar(int value)
 
 inline void hd63484_device::update_irq()
 {
-	int const state = (m_sr & m_ccr & 0xff) ? ASSERT_LINE : CLEAR_LINE;
+	uint8_t const state = (m_sr & m_ccr & 0xff) ? 1 : 0;
 	if (state != m_irq_state)
 	{
 		m_irq_state = state;
@@ -1777,22 +1777,22 @@ void hd63484_device::command_earc_exec()
 // the DREQ pulses on the pin, which a level callback abstracts.
 void hd63484_device::update_dreq()
 {
-	int state = CLEAR_LINE;
+	uint8_t state = 0;
 
 	if (BIT(m_ccr, 12)) // CDM
 	{
 		if (m_fifo_ptr <= 13)
-			state = ASSERT_LINE;
+			state = 1;
 	}
 	else if (BIT(m_ccr, 13)) // DDM
 	{
 		if (m_fifo_r_ptr >= 1)
-			state = ASSERT_LINE;
+			state = 1;
 		else if (!(m_sr & HD63484_SR_CED) && !m_busy)
 		{
 			int const cmd = translate_command(m_cr);
 			if ((cmd == COMMAND_DWT || cmd == COMMAND_DMOD) && m_fifo_ptr <= 13)
-				state = ASSERT_LINE;
+				state = 1;
 		}
 	}
 
@@ -1942,8 +1942,8 @@ void hd63484_device::process_fifo()
 
 					if (BIT(m_ccr, 13)) // data DMA transfer complete
 					{
-						m_done_cb(ASSERT_LINE);
-						m_done_cb(CLEAR_LINE);
+						m_done_cb(1);
+						m_done_cb(0);
 					}
 				}
 			}
@@ -1967,8 +1967,8 @@ void hd63484_device::process_fifo()
 
 					if (BIT(m_ccr, 13)) // data DMA transfer complete
 					{
-						m_done_cb(ASSERT_LINE);
-						m_done_cb(CLEAR_LINE);
+						m_done_cb(1);
+						m_done_cb(0);
 					}
 				}
 			}
@@ -2698,7 +2698,7 @@ void hd63484_device::device_reset()
 	m_dn = 0;
 	m_dma_d0 = m_dma_d1 = 0;
 	m_stream = STREAM_NONE;
-	m_irq_state = CLEAR_LINE;
+	m_irq_state = 0;
 	m_hzf = m_vzf = 0;
 	m_lpstb_state = 0;
 	m_lpar = 0;
@@ -2706,7 +2706,7 @@ void hd63484_device::device_reset()
 	m_busy = false;
 	m_dot_count = 0;
 	m_cmd_timer->adjust(attotime::never);
-	m_dreq_state = CLEAR_LINE;
+	m_dreq_state = 0;
 
 	memset(m_vreg, 0, sizeof(m_vreg));
 	memset(m_fifo, 0, sizeof(m_fifo));
