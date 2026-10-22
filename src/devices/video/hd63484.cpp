@@ -1157,18 +1157,53 @@ uint32_t hd63484_device::paint(int16_t sx, int16_t sy)
 
 			if (!stuck)
 			{
-				if (paintable(px, y + 1)) { if (!up) { seeds.emplace_back(px, y + 1); up = true; } }
-				else up = false;
-				if (paintable(px, y - 1)) { if (!dn) { seeds.emplace_back(px, y - 1); dn = true; } }
-				else dn = false;
+				if (paintable(px, y + 1))
+				{
+					if (!up)
+					{
+						seeds.emplace_back(px, y + 1);
+						up = true;
+					}
+				}
+				else
+					up = false;
+
+				if (paintable(px, y - 1))
+				{
+					if (!dn)
+					{
+						seeds.emplace_back(px, y - 1);
+						dn = true;
+					}
+				}
+				else
+					dn = false;
+
 				continue;
 			}
 
 			// drop one seed per paintable run of the adjacent rows
-			if (paintable(px, y + 1)) { if (!up) { seeds.emplace_back(px, y + 1); up = true; } }
-			else up = false;
-			if (paintable(px, y - 1)) { if (!dn) { seeds.emplace_back(px, y - 1); dn = true; } }
-			else dn = false;
+			if (paintable(px, y + 1))
+			{
+				if (!up)
+				{
+					seeds.emplace_back(px, y + 1);
+					up = true;
+				}
+			}
+			else
+				up = false;
+
+			if (paintable(px, y - 1))
+			{
+				if (!dn)
+				{
+					seeds.emplace_back(px, y - 1);
+					dn = true;
+				}
+			}
+			else
+				dn = false;
 		}
 	}
 
