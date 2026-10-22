@@ -3325,7 +3325,7 @@ CONS( 2005, mrangbat,   0,        0, superxavix_mrangbat,              mrangbat,
 CONS( 2004, epo_tfit,   0,        0, superxavix_epo_tfit,              epo_tfit,              superxavix_epo_tfit_state,   empty_init, "Epoch / SSD Company Ltd.", "Excite Sports Tennis x Fitness (Japan)", MACHINE_NOT_WORKING )
 
 // 石川遼 エキサイトゴルフ
-CONS( 2010, epo_rgfj,   0,        0, superxavix_epo_rgfj,              epo_rgfj,              superxavix_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "Ishikawa Ryou Excite Golf (Japan)", 0 )
+CONS( 2010, epo_rgfj,   0,        0, superxavix_epo_rgfj,              epo_rgfj,              superxavix_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "Ryo Ishikawa Excite Golf (Japan)", 0 )
 
 // Let's!TVプレイ ふたりはプリキュアMax Heart マットでダンス Max Heartにおどっちゃおう
 CONS( 2004, maxheart,   0,        0, superxavix_i2c_24c04_4mb,         maxheart,              superxavix_i2c_state,        empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Futari wa PreCure Max Heart: Mat de Dance Max Heart ni Odotchaou (Japan)", MACHINE_NOT_WORKING )
@@ -3376,7 +3376,7 @@ CONS( 2011, anpanmdx,   0,        0, superxavix_anpanmdx,              anpanmdx,
 CONS( 2009, apmj2009,   0,        0, superxavix_i2c_24c16,             apmj2009,              superxavix_i2c_power_state,  empty_init, "Toho / SSD Company Ltd.", "Anpanman Pyon-Pyon Ikunou Mat (Japan)", MACHINE_NOT_WORKING )
 
 // has HT24LC16
-CONS( 2008, udance,     0,        0, superxavix_udance,                udance,                superxavix_udance_state,     empty_init, "Hasbro / Tiger Electronics / Creativity / Medialink / SSD Company Ltd.", "U-Dance", 0 )
+CONS( 2008, udance,     0,        0, superxavix_udance,                udance,                superxavix_udance_state,     empty_init, "Hasbro / Tiger Electronics / Creativity / Medialink Technology / SSD Company Ltd.", "U-Dance", 0 )
 
 // these have RAM in the usual ROM space & also have an Atmel 24LC64,
 CONS( 2004, suprtvpc,   0,        0, superxavix_suprtvpc,              suprtvpc,              superxavix_suprtvpc_state,   empty_init, "Epoch / SSD Company Ltd.", "Super TV-PC (Japan)", MACHINE_NOT_WORKING )

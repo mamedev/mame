@@ -5883,7 +5883,7 @@ CONS( 2001,  epo_hamd,  0,        0, xavix_ir,            epo_hamd,  xavix_ir_st
 // 卓球やろうぜ！ エキサイトピンポン
 CONS( 2000,  epo_epp,   0,        0, xavix_epo_epp,       epo_epp1,  xavix_ir_power_state,         empty_init,  "Epoch / SSD Company Ltd.", "Takkyuu Yarouze! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING )
 // 리얼핑퐁
-CONS( 2000,  epo_eppk,  epo_epp,  0, xavix_epo_epp,       epo_epp1,  xavix_ir_power_state,         empty_init,  "Epoch / SSD Company Ltd. / D-Gate / Sonokong", "Real Ping Pong (Korea)", MACHINE_NOT_WORKING )
+CONS( 2000,  epo_eppk,  epo_epp,  0, xavix_epo_epp,       epo_epp1,  xavix_ir_power_state,         empty_init,  "Sonokong / SSD Company Ltd. / D-Gate", "Real Ping Pong (Korea)", MACHINE_NOT_WORKING )
 
 // しゃもじdeピンポン
 // This special version of Excite Ping Pong was a competition prize, not a retail product. The competition was sponsored by ミツカン (Mizkan)
