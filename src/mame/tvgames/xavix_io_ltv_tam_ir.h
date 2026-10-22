@@ -7,13 +7,14 @@
 #pragma once
 
 #include <array>
+#include <utility>
 
 class xavix_tamagotchi_ir_device : public device_t
 {
 public:
 	xavix_tamagotchi_ir_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	auto event_callback() { return m_event_out_cb.bind(); }
+	template <typename... T> void set_event_callback(T &&... args) { m_event_out_cb.set(std::forward<T>(args)...); }
 
 	int data_r() const { return m_rx_data; }
 	void send_request(int state);
@@ -71,7 +72,7 @@ private:
 	void finish_transmit_packet();
 	bool validate_acknowledgement() const;
 
-	devcb_write_line m_event_out_cb;
+	device_delegate<void ()> m_event_out_cb;
 	emu_timer *m_receive_timer;
 	emu_timer *m_transmit_timer;
 

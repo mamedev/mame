@@ -7,6 +7,7 @@
 #pragma once
 
 #include <array>
+#include <utility>
 
 class picture_image_device;
 
@@ -39,7 +40,7 @@ public:
 	void set_frame_gap_pixel_high(bool high) { m_frame_gap_pixel_high = high; }
 	void set_exposure_period(attotime period) { m_exposure_period = period; }
 	void set_event_source(event_source source) { m_event_source = source; }
-	auto event_callback() { return m_event_cb.bind(); }
+	template <typename... T> void set_event_callback(T &&... args) { m_event_cb.set(std::forward<T>(args)...); }
 
 	void setup_w(u8 data, u8 direction);
 	void control_w(u8 data, u8 direction);
@@ -65,7 +66,7 @@ private:
 	attotime m_exposure_period;
 	bool m_frame_gap_pixel_high;
 	event_source m_event_source;
-	devcb_write_line m_event_cb;
+	device_delegate<void ()> m_event_cb;
 	emu_timer *m_scan_timer;
 	std::array<u8, 16> m_registers;
 	u8 m_setup_bus;

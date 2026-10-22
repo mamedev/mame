@@ -10,6 +10,7 @@
 
 #include <array>
 #include <cstddef>
+#include <utility>
 
 class xavix_ir_report_device : public device_t
 {
@@ -34,7 +35,7 @@ public:
 	template <unsigned N> auto report_enable_callback() { return m_report_enable_cb[N].bind(); }
 	template <unsigned N> auto sequence_callback() { return m_sequence_cb[N].bind(); }
 	auto enable_callback() { return m_enable_cb.bind(); }
-	auto event_callback() { return m_event_out_cb.bind(); }
+	template <typename... T> void set_event_callback(T &&... args) { m_event_out_cb.set(std::forward<T>(args)...); }
 	void set_bit_ticks(u32 bit_ticks) { m_bit_ticks = bit_ticks; }
 	void set_start_ticks(u32 start_ticks) { m_start_ticks.fill(start_ticks); }
 	template <unsigned N> void set_start_ticks(u32 start_ticks) { static_assert(N < 8); m_start_ticks[N] = start_ticks; }
@@ -81,7 +82,7 @@ private:
 	devcb_read_line::array<8> m_report_enable_cb;
 	devcb_read32::array<8> m_sequence_cb;
 	devcb_read_line m_enable_cb;
-	devcb_write_line m_event_out_cb;
+	device_delegate<void ()> m_event_out_cb;
 	emu_timer *m_frame_timer;
 	emu_timer *m_bit_timer;
 

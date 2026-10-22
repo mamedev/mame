@@ -31,6 +31,8 @@ void xavix_piano_controller_device::device_add_mconfig(machine_config &config)
 
 void xavix_piano_controller_device::device_start()
 {
+	m_event_out_cb.resolve_safe();
+
 	m_event_timer = timer_alloc(FUNC(xavix_piano_controller_device::event_timer), this);
 
 	save_item(NAME(m_shift));
@@ -109,5 +111,5 @@ void xavix_piano_controller_device::light_w(offs_t offset, u8 data)
 
 TIMER_CALLBACK_MEMBER(xavix_piano_controller_device::event_timer)
 {
-	m_event_out_cb(1);
+	m_event_out_cb();
 }

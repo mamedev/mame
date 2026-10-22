@@ -9,6 +9,7 @@
 #include "dirtc.h"
 
 #include <array>
+#include <utility>
 
 class xavix_tvpc_controller_device : public device_t, public device_rtc_interface
 {
@@ -18,7 +19,7 @@ public:
 	template <unsigned Row> auto key_callback() { return m_keys_cb[Row].bind(); }
 	auto right_shift_callback() { return m_right_shift_cb.bind(); }
 	template <unsigned Player> auto player_callback() { return m_players_cb[Player].bind(); }
-	auto event_callback() { return m_event_out_cb.bind(); }
+	template <typename... T> void set_event_callback(T &&... args) { m_event_out_cb.set(std::forward<T>(args)...); }
 
 	u8 data_r() const { return m_data; }
 	void host_w(u8 data, u8 direction);
@@ -53,7 +54,7 @@ private:
 	void start_report();
 	void schedule_event();
 
-	devcb_write_line m_event_out_cb;
+	device_delegate<void ()> m_event_out_cb;
 	devcb_read8::array<8> m_keys_cb;
 	devcb_read_line m_right_shift_cb;
 	devcb_read8::array<2> m_players_cb;

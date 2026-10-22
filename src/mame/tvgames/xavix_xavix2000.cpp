@@ -474,7 +474,7 @@ void xavix2000_epo_ebox_state::xavix2000_epo_ebox(machine_config &config)
 	xavix2000_nv_4mb(config);
 
 	XAVIX_EBOX_GLOVES(config, m_gloves, peripheral_clock());
-	m_gloves->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
+	m_gloves->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
 	m_screen->screen_vblank().append(m_gloves, FUNC(xavix_ebox_gloves_device::vblank_w));
 }
 
@@ -611,7 +611,7 @@ void xavix2000_epo_es2j_state::xavix2000_epo_es2j(machine_config &config)
 	xavix2000_4mb(config);
 
 	XAVIX_EPO_ES2J_CARD_READER(config, m_card_reader, peripheral_clock());
-	m_card_reader->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<2>));
+	m_card_reader->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<2>));
 }
 
 u8 xavix2000_epo_es2j_state::io0_input_r(u8 direction)

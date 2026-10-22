@@ -9,13 +9,14 @@
 #include "xavix_io_ir.h"
 
 #include <array>
+#include <utility>
 
 class xavix_anpanman_sticks_device : public device_t
 {
 public:
 	xavix_anpanman_sticks_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	auto event_callback() { return m_ir.lookup()->event_callback(); }
+	template <typename... T> void set_event_callback(T &&... args) { m_ir.lookup()->set_event_callback(std::forward<T>(args)...); }
 	int data_r() { return m_ir->data_r(); }
 	void vblank_w(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(stick_activate);

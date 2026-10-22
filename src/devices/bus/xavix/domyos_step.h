@@ -7,6 +7,7 @@
 #pragma once
 
 #include <array>
+#include <utility>
 
 class device_domyos_step_interface;
 
@@ -15,18 +16,18 @@ class domyos_step_port_device : public device_t, public device_single_card_slot_
 public:
 	domyos_step_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	auto event_callback() { return m_event_cb.bind(); }
+	template <typename... T> void set_event_callback(T &&... args) { m_event_cb.set(std::forward<T>(args)...); }
 	u16 report_r();
 	u8 pio_r();
 	void pio_w(offs_t offset, u8 data, u8 direction);
-	void event_w(int state);
+	void trigger_event();
 
 protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 private:
-	devcb_write_line m_event_cb;
+	device_delegate<void ()> m_event_cb;
 	device_domyos_step_interface *m_peripheral;
 };
 
@@ -40,7 +41,7 @@ public:
 protected:
 	device_domyos_step_interface(const machine_config &mconfig, device_t &device);
 
-	void event_w(int state);
+	void trigger_event();
 
 private:
 	domyos_step_port_device *const m_port;

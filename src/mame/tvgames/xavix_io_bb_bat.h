@@ -16,7 +16,7 @@ public:
 	xavix_baseball_bat_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
-	auto event_callback() { return m_event_out_cb.bind(); }
+	template <typename... T> void set_event_callback(T &&... args) { m_event_out_cb.set(std::forward<T>(args)...); }
 	void vblank_w(int state);
 
 protected:
@@ -29,7 +29,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(event_timer);
 
-	devcb_write_line m_event_out_cb;
+	device_delegate<void ()> m_event_out_cb;
 	required_device<screen_device> m_screen;
 	required_ioport m_strength;
 	emu_timer *m_event_timer;

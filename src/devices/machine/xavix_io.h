@@ -27,8 +27,7 @@ public:
 	void map(address_map &map) ATTR_COLD;
 	void event_map(address_map &map) ATTR_COLD;
 
-	// Each call represents an event token, irrespective of the callback's line level.
-	template <unsigned Event> void event_w(int)
+	template <unsigned Event> void trigger_event()
 	{
 		static_assert(Event < 4);
 		if (BIT(m_event_enable, Event))

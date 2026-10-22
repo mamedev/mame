@@ -8,6 +8,8 @@
 
 #include "machine/timer.h"
 
+#include <utility>
+
 DECLARE_DEVICE_TYPE(XAVIX_MADFB_BALL, xavix_madfb_ball_device)
 
 
@@ -17,7 +19,7 @@ public:
 	// construction/destruction
 	xavix_madfb_ball_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	auto event_callback() { return m_event_out_cb.bind(); }
+	template <typename... T> void set_event_callback(T &&... args) { m_event_out_cb.set(std::forward<T>(args)...); }
 
 	DECLARE_INPUT_CHANGED_MEMBER(changed);
 
@@ -33,7 +35,7 @@ private:
 	TIMER_CALLBACK_MEMBER(event_timer);
 	void update_event_rate();
 
-	devcb_write_line m_event_out_cb;
+	device_delegate<void ()> m_event_out_cb;
 	required_ioport m_in;
 	emu_timer *m_event_timer;
 };

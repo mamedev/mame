@@ -7,12 +7,13 @@
 #pragma once
 
 #include <array>
+#include <utility>
 
 // Shared timed event-token transport; derived readers retain their distinct physical encodings.
 class xavix_card_reader_device : public device_t
 {
 public:
-	auto event_callback() { return m_event_out_cb.bind(); }
+	template <typename... T> void set_event_callback(T &&... args) { m_event_out_cb.set(std::forward<T>(args)...); }
 	void scan_card(int state);
 
 protected:
@@ -32,7 +33,7 @@ protected:
 private:
 	TIMER_CALLBACK_MEMBER(event_timer);
 
-	devcb_write_line m_event_out_cb;
+	device_delegate<void ()> m_event_out_cb;
 	emu_timer *m_event_timer;
 	u8 m_event_count;
 	u8 m_event_index;

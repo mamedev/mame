@@ -57,8 +57,8 @@ public:
 	void scl_w(int state) { if (m_cart) m_cart->scl_w(state); }
 	int sda_r() { return m_cart ? m_cart->sda_r() : 1; }
 	void ir_tx_w(int state) { if (m_cart) m_cart->ir_tx_w(state); }
-	auto ir_rx_callback() { return m_ir_rx_cb.bind(); }
-	void ir_rx_pulse() { m_ir_rx_cb(1); }
+	template <typename... T> void set_ir_rx_callback(T &&... args) { m_ir_rx_cb.set(std::forward<T>(args)...); }
+	void ir_rx_pulse() { m_ir_rx_cb(); }
 
 	static void cart_devices(device_slot_interface &device) ATTR_COLD;
 
@@ -77,7 +77,7 @@ protected:
 
 private:
 	device_suprtvpc_cart_interface *m_cart;
-	devcb_write_line m_ir_rx_cb;
+	device_delegate<void ()> m_ir_rx_cb;
 };
 
 class suprtvpc_rom_device : public device_t, public device_suprtvpc_cart_interface

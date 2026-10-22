@@ -8,13 +8,15 @@
 
 #include "video/pwm.h"
 
+#include <utility>
+
 class xavix_piano_controller_device : public device_t
 {
 public:
 	xavix_piano_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	template <unsigned Row> auto key_callback() { return m_keys_cb[Row].bind(); }
-	auto event_callback() { return m_event_out_cb.bind(); }
+	template <typename... T> void set_event_callback(T &&... args) { m_event_out_cb.set(std::forward<T>(args)...); }
 
 	u8 data_r() const { return m_data; }
 	void host_w(u8 data, u8 direction);
@@ -37,7 +39,7 @@ private:
 	TIMER_CALLBACK_MEMBER(event_timer);
 	void light_w(offs_t offset, u8 data);
 
-	devcb_write_line m_event_out_cb;
+	device_delegate<void ()> m_event_out_cb;
 	devcb_read8::array<3> m_keys_cb;
 	required_device<pwm_display_device> m_led_pwm;
 	output_finder<14> m_key_lights;

@@ -39,6 +39,8 @@ ioport_constructor xavix_baseball_bat_device::device_input_ports() const
 
 void xavix_baseball_bat_device::device_start()
 {
+	m_event_out_cb.resolve_safe();
+
 	m_event_timer = timer_alloc(FUNC(xavix_baseball_bat_device::event_timer), this);
 
 	save_item(NAME(m_events_remaining));
@@ -75,7 +77,7 @@ void xavix_baseball_bat_device::vblank_w(int state)
 
 TIMER_CALLBACK_MEMBER(xavix_baseball_bat_device::event_timer)
 {
-	m_event_out_cb(1);
+	m_event_out_cb();
 	if (!--m_events_remaining)
 		m_event_timer->adjust(attotime::never);
 }

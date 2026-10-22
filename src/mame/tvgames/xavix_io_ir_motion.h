@@ -8,6 +8,8 @@
 
 #include "xavix_io_ir.h"
 
+#include <utility>
+
 class xavix_ir_motion_device : public device_t
 {
 public:
@@ -26,7 +28,7 @@ public:
 	xavix_ir_motion_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void set_controller_type(controller_type type) { m_controller_type = type; }
-	auto event_callback() { return m_ir.lookup()->event_callback(); }
+	template <typename... T> void set_event_callback(T &&... args) { m_ir.lookup()->set_event_callback(std::forward<T>(args)...); }
 	int data_r() { return m_ir->data_r(); }
 	void vblank_w(int state);
 

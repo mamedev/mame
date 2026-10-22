@@ -374,6 +374,8 @@ void xavix_analog_image_sensor_device::device_validity_check(validity_checker &v
 
 void xavix_analog_image_sensor_device_base::device_start()
 {
+	m_event_cb.resolve_safe();
+
 	assert(clock() && m_pixel_low_clocks && m_pixel_high_clocks);
 	if (m_exposure_period < attotime::zero || m_exposure_period.is_never()
 			|| (m_exposure_period.is_zero() && m_event_source == event_source::EXPOSURE_START)
@@ -580,8 +582,8 @@ void xavix_analog_image_sensor_device_base::begin_exposure()
 	m_exposing = true;
 	sample_exposure_scene();
 	m_scan_timer->adjust(m_exposure_period);
-	if (m_event_source == event_source::EXPOSURE_START && !m_event_cb.isunset())
-		m_event_cb(1);
+	if (m_event_source == event_source::EXPOSURE_START)
+		m_event_cb();
 }
 
 void xavix_analog_image_sensor_device_base::sample_exposure_scene()
@@ -649,16 +651,16 @@ TIMER_CALLBACK_MEMBER(xavix_analog_image_sensor_device_base::scan_tick)
 					m_status = m_frame_gap_pixel_high ? 0x04 : 0;
 					m_scan_timer->adjust(clocks_to_attotime(FRAME_GAP_CLOCKS));
 				}
-				if (m_event_source == event_source::FRAME_END && !m_event_cb.isunset())
-					m_event_cb(1);
+				if (m_event_source == event_source::FRAME_END)
+					m_event_cb();
 				return;
 			}
 			event = m_event_source == event_source::ROW_START;
 		}
 	}
 	m_scan_timer->adjust(clocks_to_attotime(BIT(m_status, 2) ? m_pixel_high_clocks : m_pixel_low_clocks));
-	if (event && !m_event_cb.isunset())
-		m_event_cb(1);
+	if (event)
+		m_event_cb();
 }
 
 //-------------------------------------------------

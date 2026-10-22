@@ -34,6 +34,8 @@ xavix_tvpc_controller_device::xavix_tvpc_controller_device(const machine_config 
 
 void xavix_tvpc_controller_device::device_start()
 {
+	m_event_out_cb.resolve_safe();
+
 	m_event_timer = timer_alloc(FUNC(xavix_tvpc_controller_device::event_timer), this);
 	m_clock_timer = timer_alloc(FUNC(xavix_tvpc_controller_device::clock_timer), this);
 	m_clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
@@ -307,7 +309,7 @@ void xavix_tvpc_controller_device::vblank_w(int state)
 
 TIMER_CALLBACK_MEMBER(xavix_tvpc_controller_device::event_timer)
 {
-	m_event_out_cb(1);
+	m_event_out_cb();
 }
 
 TIMER_CALLBACK_MEMBER(xavix_tvpc_controller_device::clock_timer)

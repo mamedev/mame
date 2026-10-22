@@ -623,7 +623,7 @@ void xavix_i2c_cart_state::io1_output_w(u8 data, u8 direction)
 void xavix_state::configure_ir(machine_config &config, required_device<xavix_ir_motion_device> &controllers, xavix_ir_motion_device::controller_type type)
 {
 	XAVIX_IR_MOTION(config, controllers, peripheral_clock()).set_controller_type(type);
-	controllers->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
+	controllers->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
 	m_screen->screen_vblank().append(controllers, FUNC(xavix_ir_motion_device::vblank_w));
 }
 
@@ -1461,13 +1461,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(xavix_state::lightgun_scanline_cb)
 	if ((line >= 40) && (line <= 110) && ((line % 10) == 0))
 	{
 		if (BIT(m_lightgun_event_mask, 0))
-			m_soc->io().event_w<0>(1);
+			m_soc->io().trigger_event<0>();
 		if (BIT(m_lightgun_event_mask, 1))
-			m_soc->io().event_w<1>(1);
+			m_soc->io().trigger_event<1>();
 		if (BIT(m_lightgun_event_mask, 2))
-			m_soc->io().event_w<2>(1);
+			m_soc->io().trigger_event<2>();
 		if (BIT(m_lightgun_event_mask, 3))
-			m_soc->io().event_w<3>(1);
+			m_soc->io().trigger_event<3>();
 	}
 }
 
@@ -1639,7 +1639,7 @@ void xavix_rad_hnt_state::xavix_rad_hnt2(machine_config &config)
 void xavix_rad_hnt_state::vblank_extra()
 {
 	// The hunting rifle supplies one accepted optical capture on event 3 per field.
-	m_soc->io().event_w<3>(1);
+	m_soc->io().trigger_event<3>();
 }
 
 u8 xavix_rad_hnt_state::lightgun_r(offs_t offset)
@@ -1682,8 +1682,8 @@ INPUT_PORTS_END
 void xavix_tomshoot_state::vblank_extra()
 {
 	// Approximate each controller's beam-timed optical capture with one event token per field.
-	m_soc->io().event_w<0>(1);
-	m_soc->io().event_w<1>(1);
+	m_soc->io().trigger_event<0>();
+	m_soc->io().trigger_event<1>();
 }
 
 u8 xavix_tomshoot_state::lightgun_r(offs_t offset)
@@ -1735,8 +1735,8 @@ void xavix_epo_dmon_state::xavix_epo_dmon(machine_config &config)
 void xavix_epo_dmon_state::vblank_extra()
 {
 	// Approximate each controller's beam-timed optical capture with one event token per field.
-	m_soc->io().event_w<0>(1);
-	m_soc->io().event_w<1>(1);
+	m_soc->io().trigger_event<0>();
+	m_soc->io().trigger_event<1>();
 }
 
 u8 xavix_epo_dmon_state::lightgun_r(offs_t offset)
@@ -1909,7 +1909,7 @@ INPUT_PORTS_END
 void xavix_epo_baseball_state::configure_controllers(machine_config &config)
 {
 	XAVIX_ESDX_CONTROLLERS(config, m_controllers, peripheral_clock());
-	m_controllers->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
+	m_controllers->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
 	m_screen->screen_vblank().append(m_controllers, FUNC(xavix_esdx_controllers_device::vblank_w));
 }
 
@@ -1947,7 +1947,7 @@ void xavix_epo_stad_state::xavix_epo_stad(machine_config &config)
 	xavix_2mb(config);
 
 	XAVIX_STADIUM_BAT(config, m_controllers, peripheral_clock());
-	m_controllers->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
+	m_controllers->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
 	m_screen->screen_vblank().append(m_controllers, FUNC(xavix_stadium_bat_device::vblank_w));
 }
 
@@ -1980,7 +1980,7 @@ void xavix_tak_comt_state::xavix_tak_comt(machine_config &config)
 	MICROPHONE(config, "station_microphone", 1).map_on_request_only().add_route(0, m_soc->adc(), 1.0);
 
 	XAVIX_COMET_BATON(config, m_baton_controller, peripheral_clock());
-	m_baton_controller->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
+	m_baton_controller->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
 	m_soc->io().output_callback<1>().append(m_baton_controller, FUNC(xavix_comet_baton_device::station_w));
 	m_screen->screen_vblank().append(m_baton_controller, FUNC(xavix_comet_baton_device::vblank_w));
 }
@@ -2032,12 +2032,12 @@ void xavix_tak_wdg_state::xavix_tak_wdg(machine_config &config)
 	xavix_nv_2mb(config);
 
 	XAVIX_GRANBLADE(config, m_granblade, peripheral_clock());
-	m_granblade->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
+	m_granblade->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
 	m_screen->screen_vblank().append(m_granblade, FUNC(xavix_granblade_device::vblank_w));
 
 	XAVIX_WEBKNIGHT(config, m_webknight, peripheral_clock());
 	// These callbacks deliver receiver-edge events, not maintained signal levels.
-	m_webknight->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
+	m_webknight->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
 	m_screen->screen_vblank().append(m_webknight, FUNC(xavix_webknight_device::vblank_w));
 }
 
@@ -2222,7 +2222,7 @@ void xavix_epo_crok_state::xavix_epo_crok(machine_config &config)
 	xavix_i2c_24c04_4mb(config);
 
 	XAVIX_CROKET_CONTROLLERS(config, m_controllers, peripheral_clock());
-	m_controllers->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
+	m_controllers->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
 	m_screen->screen_vblank().append(m_controllers, FUNC(xavix_croket_controllers_device::vblank_w));
 }
 
@@ -2290,7 +2290,7 @@ xavix_baseball_ball_device &xavix_state::configure_baseball(machine_config &conf
 
 	xavix_baseball_bat_device &bat(XAVIX_BASEBALL_BAT(config, "bat"));
 	bat.set_screen(m_screen);
-	bat.event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
+	bat.set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
 	m_screen->screen_vblank().append(bat, FUNC(xavix_baseball_bat_device::vblank_w));
 	return ball;
 }
@@ -3376,7 +3376,7 @@ void xavix_tak_daig_state::xavix_tak_daig(machine_config &config)
 
 	XAVIX_DAIGUNDER_ROBOTS(config, m_robots, peripheral_clock());
 	m_robots->set_screen(m_screen);
-	m_robots->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<2>));
+	m_robots->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<2>));
 	m_screen->screen_vblank().append(m_robots, FUNC(xavix_daigunder_robots_device::vblank_w));
 
 	SOFTWARE_LIST(config, "cart_list_daig").set_original("daig_cart");
@@ -4109,7 +4109,7 @@ void xavix_state::xavix_rad_mtrk(machine_config &config)
 	xavix_4mb(config);
 
 	xavix_mtrk_wheel_device &wheel(XAVIX_MTRK_WHEEL(config, "wheel"));
-	wheel.event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<3>));
+	wheel.set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<3>));
 }
 
 
@@ -4123,7 +4123,7 @@ void xavix_state::xavix_rad_mtrkp(machine_config &config)
 	xavixp_4mb(config);
 
 	xavix_mtrk_wheel_device &wheel(XAVIX_MTRK_WHEEL(config, "wheel"));
-	wheel.event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<3>));
+	wheel.set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<3>));
 }
 
 
@@ -4154,7 +4154,7 @@ void xavix_state::xavix_rad_madf(machine_config &config)
 	xavix_4mb(config);
 
 	xavix_madfb_ball_device &ball(XAVIX_MADFB_BALL(config, "ball", peripheral_clock()));
-	ball.event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
+	ball.set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
 }
 
 
@@ -4297,7 +4297,7 @@ void xavix_state::xavix_tak_beyu(machine_config &config)
 
 	xavix_beyblade_ripcord_device &ripcord(XAVIX_BEYBLADE_RIPCORD(config, "ripcord"));
 	ripcord.set_screen(m_screen);
-	ripcord.event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<0>));
+	ripcord.set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
 	m_screen->screen_vblank().append(ripcord, FUNC(xavix_beyblade_ripcord_device::vblank_w));
 }
 
@@ -4358,13 +4358,13 @@ void xavix_jarajal_state::machine_reset()
 INPUT_CHANGED_MEMBER(xavix_jarajal_state::coin_inserted)
 {
 	if (newval)
-		m_soc->io().event_w<1>(1);
+		m_soc->io().trigger_event<1>();
 }
 
 void xavix_jarajal_state::hopper_sensor_w(int state)
 {
 	if (state)
-		m_soc->io().event_w<0>(1);
+		m_soc->io().trigger_event<0>();
 }
 
 void xavix_jarajal_state::io0_output_w(u8 data, u8 direction)
@@ -4471,7 +4471,7 @@ void xavix_ltv_tam_state::xavix_ltv_tam(machine_config &config)
 	m_soc->anport().set_counter_mode(3, true);
 
 	XAVIX_TAMAGOTCHI_IR(config, m_tamagotchi, peripheral_clock());
-	m_tamagotchi->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<1>));
+	m_tamagotchi->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<1>));
 }
 
 void xavix_ltv_tam_state::io0_output_w(u8 data, u8 direction)

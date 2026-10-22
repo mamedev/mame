@@ -18,7 +18,7 @@ public:
 	xavix_daigunder_robots_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
-	auto event_callback() { return m_ir.lookup()->event_callback(); }
+	template <typename... T> void set_event_callback(T &&... args) { m_ir.lookup()->set_event_callback(std::forward<T>(args)...); }
 	int data_r() { return m_ir->data_r(); }
 	void vblank_w(int state);
 

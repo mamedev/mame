@@ -8,12 +8,14 @@
 
 #include "xavix_io_ir.h"
 
+#include <utility>
+
 class xavix_webknight_device : public device_t
 {
 public:
 	xavix_webknight_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	auto event_callback() { return m_ir.lookup()->event_callback(); }
+	template <typename... T> void set_event_callback(T &&... args) { m_ir.lookup()->set_event_callback(std::forward<T>(args)...); }
 	void vblank_w(int state);
 
 protected:

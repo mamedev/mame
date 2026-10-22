@@ -88,6 +88,8 @@ ioport_constructor xavix_epo_es2j_card_reader_device::device_input_ports() const
 
 void xavix_card_reader_device::device_start()
 {
+	m_event_out_cb.resolve_safe();
+
 	m_event_timer = timer_alloc(FUNC(xavix_card_reader_device::event_timer), this);
 
 	save_item(NAME(m_event_count));
@@ -132,7 +134,7 @@ void xavix_card_reader_device::scan_card(int state)
 
 TIMER_CALLBACK_MEMBER(xavix_card_reader_device::event_timer)
 {
-	m_event_out_cb(1);
+	m_event_out_cb();
 	if (++m_event_index == m_event_count)
 	{
 		m_event_timer->adjust(attotime::never);

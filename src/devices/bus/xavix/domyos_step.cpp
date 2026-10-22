@@ -101,6 +101,8 @@ void domyos_step_hub_device::device_add_mconfig(machine_config &config)
 
 void domyos_step_port_device::device_start()
 {
+	m_event_cb.resolve_safe();
+
 	m_peripheral = get_card_device();
 }
 
@@ -156,10 +158,10 @@ void device_domyos_step_interface::pio_w(u8, u8)
 {
 }
 
-void device_domyos_step_interface::event_w(int state)
+void device_domyos_step_interface::trigger_event()
 {
 	if (m_port)
-		m_port->event_w(state);
+		m_port->trigger_event();
 }
 
 u16 domyos_step_port_device::report_r()
@@ -178,9 +180,9 @@ void domyos_step_port_device::pio_w(offs_t, u8 data, u8 direction)
 		m_peripheral->pio_w(data, direction);
 }
 
-void domyos_step_port_device::event_w(int state)
+void domyos_step_port_device::trigger_event()
 {
-	m_event_cb(state);
+	m_event_cb();
 }
 
 u8 domyos_step_mat_device::contacts_r()
@@ -197,7 +199,7 @@ u16 domyos_step_mat_device::report_r()
 TIMER_CALLBACK_MEMBER(domyos_step_hub_device::event_timer)
 {
 	m_transfer = true;
-	event_w(1);
+	trigger_event();
 }
 
 void domyos_step_hub_device::latch_report()

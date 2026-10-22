@@ -41,6 +41,8 @@ xavix_ir_report_device::xavix_ir_report_device(const machine_config &mconfig, co
 
 void xavix_ir_report_device::device_start()
 {
+	m_event_out_cb.resolve_safe();
+
 	assert(m_bit_ticks);
 	assert(m_mode != mode::PULSE_DISTANCE || (m_pulse_one_ticks && m_pulse_zero_ticks));
 	assert(m_report_count && m_report_count <= m_latched_report.size());
@@ -124,7 +126,7 @@ void xavix_ir_report_device::start_report(unsigned report)
 		m_data = m_mode == mode::FRAMED_LSB ? 0 : BIT(m_shift, m_bits_remaining - 1);
 
 	// The first event marks framing; pulse-distance reports encode every bit before the next event.
-	m_event_out_cb(1);
+	m_event_out_cb();
 	if (m_mode == mode::PULSE_DISTANCE)
 		m_bit_timer->adjust(clocks_to_attotime(current_pulse_ticks() + m_first_pulse_extension));
 	else
@@ -164,7 +166,7 @@ TIMER_CALLBACK_MEMBER(xavix_ir_report_device::bit_tick)
 {
 	if (m_mode == mode::PULSE_DISTANCE)
 	{
-		m_event_out_cb(1);
+		m_event_out_cb();
 		if (--m_bits_remaining)
 		{
 			m_shift >>= 1;

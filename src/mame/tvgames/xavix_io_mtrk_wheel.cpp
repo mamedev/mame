@@ -42,6 +42,8 @@ ioport_constructor xavix_mtrk_wheel_device::device_input_ports() const
 
 void xavix_mtrk_wheel_device::device_start()
 {
+	m_event_out_cb.resolve_safe();
+
 	m_event_timer = timer_alloc(FUNC(xavix_mtrk_wheel_device::event_timer), this);
 
 	save_item(NAME(m_direction));
@@ -57,7 +59,7 @@ void xavix_mtrk_wheel_device::device_reset()
 
 TIMER_CALLBACK_MEMBER(xavix_mtrk_wheel_device::event_timer)
 {
-	m_event_out_cb(1);
+	m_event_out_cb();
 }
 
 void xavix_mtrk_wheel_device::update_event_rate()

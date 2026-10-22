@@ -49,6 +49,8 @@ ioport_constructor xavix_tamagotchi_ir_device::device_input_ports() const
 
 void xavix_tamagotchi_ir_device::device_start()
 {
+	m_event_out_cb.resolve_safe();
+
 	assert(clock());
 	m_receive_timer = timer_alloc(FUNC(xavix_tamagotchi_ir_device::receive_tick), this);
 	m_transmit_timer = timer_alloc(FUNC(xavix_tamagotchi_ir_device::transmit_timeout), this);
@@ -110,7 +112,7 @@ void xavix_tamagotchi_ir_device::start_receive_mark(receive_phase phase, u32 tic
 	m_receive_phase = phase;
 	m_rx_data = 0;
 	// The demodulator is idle high; event 1 records only each carrier-burst falling edge.
-	m_event_out_cb(1);
+	m_event_out_cb();
 	m_receive_timer->adjust(attotime::from_ticks(ticks, clock()));
 }
 

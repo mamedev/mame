@@ -119,6 +119,8 @@ void suprtvpc_cart_slot_device::cart_devices(device_slot_interface &device)
 
 void suprtvpc_cart_slot_device::device_start()
 {
+	m_ir_rx_cb.resolve_safe();
+
 	m_cart = get_card_device();
 }
 
