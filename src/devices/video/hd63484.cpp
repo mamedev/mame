@@ -2256,11 +2256,16 @@ void hd63484_device::exec_abort_sequence()
 // address register contents
 uint16_t hd63484_device::dack_r()
 {
-	uint8_t hi = 0, lo = 0;
-	dequeue_r(&hi);
-	dequeue_r(&lo);
-	update_dreq();
-	return (hi << 8) | lo;
+	uint16_t const res = (m_fifo_r[0] << 8) | m_fifo_r[1];
+	if (!machine().side_effects_disabled())
+	{
+		uint8_t data;
+
+		dequeue_r(&data);
+		dequeue_r(&data);
+		update_dreq();
+	}
+	return res;
 }
 
 void hd63484_device::dack_w(uint16_t data)
@@ -2346,8 +2351,11 @@ uint16_t hd63484_device::video_registers_r(int offset)
 
 		case 0xee: // Light Pen Address low; reading it ends the latch sequence
 			res = m_lpar & 0xffff;
-			m_sr &= ~HD63484_SR_LPD;
-			update_irq();
+			if (!machine().side_effects_disabled())
+			{
+				m_sr &= ~HD63484_SR_LPD;
+				update_irq();
+			}
 			break;
 
 		default:
@@ -2545,18 +2553,21 @@ uint16_t hd63484_device::read16(offs_t offset)
 
 		if(m_ar == 0) // FIFO read
 		{
-			uint8_t data;
+			res = (m_fifo_r[0] << 8) | m_fifo_r[1];
+			if (!machine().side_effects_disabled())
+			{
+				uint8_t data;
 
-			dequeue_r(&data);
-			res = (data & 0xff) << 8;
-			dequeue_r(&data);
-			res |= data & 0xff;
-			update_dreq();
+				dequeue_r(&data);
+				dequeue_r(&data);
+				update_dreq();
+			}
 		}
 		else
 			res = video_registers_r(m_ar);
 
-		inc_ar(2);
+		if (!machine().side_effects_disabled())
+			inc_ar(2);
 
 		return res;
 	}
@@ -2596,13 +2607,18 @@ uint8_t hd63484_device::read8(offs_t offset)
 
 		if(m_ar < 2) // FIFO read
 		{
-			dequeue_r(&res);
-			update_dreq();
+			res = m_fifo_r[0];
+			if (!machine().side_effects_disabled())
+			{
+				dequeue_r(&res);
+				update_dreq();
+			}
 		}
 		else
 			res = video_registers_r(m_ar & 0xfe) >> (m_ar & 1 ? 0 : 8);
 
-		inc_ar(1);
+		if (!machine().side_effects_disabled())
+			inc_ar(1);
 
 		return res;
 	}
