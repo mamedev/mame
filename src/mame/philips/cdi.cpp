@@ -208,6 +208,9 @@ void cdi_state::machine_reset()
 	// when a DVC is fitted it feeds the MCD212's external video plane
 	m_mcd212->set_ext_video_source(m_dvc_slot);
 
+	if (m_serial_port && !m_serial_port->get_card_device())
+		m_maincpu->uart_ctsn(0);
+
 	m_cdic_intreq = false;
 	m_dvc_intreq = false;
 	m_in4_owner = IN4_IDLE;
