@@ -1117,7 +1117,7 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 
 void *powervr2_device::render_thread_callback(void *param, int threadid)
 {
-	powervr2_device *const pvr = static_cast<powervr2_device *>(param);
+	powervr2_device *const pvr = reinterpret_cast<powervr2_device *>(param);
 	const rectangle clip(0, 1023, 0, 1023);
 
 	pvr->render_to_accumulation_buffer(*pvr->fake_accumulationbuffer_bitmap, clip);

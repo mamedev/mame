@@ -52039,6 +52039,19 @@ stick to CPC-Power disks, when available)
 		</part>
 	</software>
 
+	<!-- https://www.youtube.com/watch?v=22wSm4y27Wk -->
+	<software name="logonrun" supported="no">
+		<description>Logon's Run: 3D Meets the Aging Bits</description>
+		<year>2017</year>
+		<publisher>Logon System</publisher>
+		<info name="usage" value="Requires 128K RAM. RUN&quot;LOGON'S" />
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="194816">
+				<rom name="logon's run - 3d meets the aging bits.dsk" size="194816" crc="780abbd9" sha1="c9e54c2eeb8be7f6cf967d4e23009b8ab03a6c4b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Identifying Lokomotive (G) (1986) [CPC Schneider International].zip... --> <!-- CPC Power -->
 	<software name="lokomoti" supported="no">
 		<description>Lokomotive (Ger) [CPC Schneider International]</description>
@@ -70121,6 +70134,26 @@ stick to CPC-Power disks, when available)
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="194816">
 				<rom name="screwball (uk) (1985).dsk" size="194816" crc="e953f63f" sha1="ab8139880c312dfb593d0625a30768e9aa305dea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- https://www.youtube.com/watch?v=LRiWzqBwAzo -->
+	<software name="scrollf" supported="no">
+		<description>Scroll Factory</description>
+		<year>2018</year>
+		<publisher>Impact &amp; Praline &amp; GPA</publisher>
+		<info name="usage" value="Requires 128K RAM. RUN&quot;SCROLLF for the complete version, RUN&quot;SCROLLFL for the light version" />
+		<part name="flop1" interface="floppy_3">
+			<feature name="part_id" value="Complete version"/>
+			<dataarea name="flop" size="194816">
+				<rom name="scroll factory complete (tom&amp;jerry+barjack+ast).dsk" size="194816" crc="daafd242" sha1="a0c2ff9cb74289a21dfdf03d60a8f13069acbec6"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3">
+			<feature name="part_id" value="Light version"/>
+			<dataarea name="flop" size="194816">
+				<rom name="scroll factory light (tom&amp;jerry+barjack+ast).dsk" size="194816" crc="65b11f7c" sha1="b03b16fa845c758e86ea0b0bb735374ff7630300"/>
 			</dataarea>
 		</part>
 	</software>

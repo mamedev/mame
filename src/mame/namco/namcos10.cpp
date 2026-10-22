@@ -15,7 +15,7 @@ Note! This document is a Work-In-Progress and will be updated from time to time 
 This document covers all the known Namco System 10 games, including....
 *Aim For Cash (AFC2 Ver.A)                                                    (C) Namco, 2004
 Ball Pom Line  (no sticker, ROM VER. B0 FEB 09 2005 15:29:02)                 (C) Namco, 2005
-*Dice ROM                                                                     (C) Namco, 2004
+Dice ROM (DCR 1 Ver.A)                                                        (C) Namco, 2004
 ***Drum Master                                                                (C) Namco, 2001
 ***Drum Master 2                                                              (C) Namco, 2001
 ***Drum Master 3                                                              (C) Namco, 2002
@@ -53,7 +53,7 @@ Puzz Ball (PZB1 Ver. C)                                                       (C
 *Puzz Cube                                                                    (C) Namco, 2005
 Seishun-Quiz Colorful High School (CHS1 Ver.A)                                (C) Namco, 2002
 Sekai Kaseki Hakken (Japan, SKH1 Ver.A)                                       (C) Namco, 2004
-Shamisen Brothers (KT-SB2 Ver.A + CDROM)                                      (C) Kato/Konami, 2003
+Shamisen Brothers (KT-SB2 Ver.A + CDROM)                                      (C) Kato, 2003
 Slot no Oujisama / Slot Prince (SLO1 Ver.A)                                   (C) Namco, 2003
 Slot no Oujisama / Slot Prince (SLO1 Ver.B)                                   (C) Namco, 2003
 Star Trigon (STT1 Ver.A)                                                      (C) Namco, 2002
@@ -854,6 +854,7 @@ public:
 
 	void ns10_ballpom(machine_config &config) ATTR_COLD;
 	void ns10_chocovdr(machine_config &config) ATTR_COLD;
+	void ns10_dicerom(machine_config &config) ATTR_COLD;
 	void ns10_gahaha(machine_config &config) ATTR_COLD;
 	void ns10_gahaha2(machine_config &config) ATTR_COLD;
 	void ns10_gamshara(machine_config &config) ATTR_COLD;
@@ -1438,7 +1439,9 @@ void namcos10_state::namcos10_mgexio(machine_config &config)
 		r |= m_mgexio_hopper[0]->line_r() << 4; // hopper (l)
 		r |= m_mgexio_hopper[1]->line_r() << 5; // hopper (r)
 		r |= m_mgexio_hopper[2]->line_r() << 6; // hopper (c)
-		r |= 1 << 7; // TODO: pusher motor, how does this work?
+		// pusher motor. Pulsing it at 2 Hz makes games boot
+		// to attract mode. Without it, games give a IO error.
+		r |= (int(machine().time().as_double() * 4) & 1) << 7;
 		return r;
 	});
 
@@ -1938,6 +1941,43 @@ void namcos10_memn_state::ns10_chocovdr(machine_config &config)
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
 			return ((previous_masks >> 9) & (gf2_reduce(0x0000000010065810ULL & previous_cipherwords) ^ gf2_reduce(0x0000000021005810ULL & previous_plainwords)) & 1) << 10;
 		}
+	});
+}
+
+void namcos10_memn_state::ns10_dicerom(machine_config &config)
+{
+	namcos10_memn_base(config);
+	namcos10_mgexio(config);
+	namcos10_nand_k9f2808u0b(config, 2);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xc, 0xd, 0xf, 0xe, 0xa, 0xb, 0x8, 0x9, 0x5, 0x4, 0x6, 0x7, 0x1, 0x0, 0x2, 0x3); };
+
+	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
+		{
+			0x0000e3ba00f87c20ULL, 0x000021d71e8a44b8ULL, 0x00006cc4a20e1580ULL, 0x0000bb2afe22b420ULL,
+			0x0000726dda34af00ULL, 0x0000f7deee753fa0ULL, 0x00007028a79ec770ULL, 0x00003fd3fc384c80ULL,
+			0x0000e63b34b08860ULL, 0x0000086abb18f330ULL, 0x0000d9dd7d26f320ULL, 0x0000525a903d6eb0ULL,
+			0x0000594266e1bbf0ULL, 0x0000b45432da8be0ULL, 0x0000789546492748ULL, 0x00000d46f8fb79a0ULL,
+		}, {
+			0x0000e3bf2db87c10ULL, 0x00004650327a44bbULL, 0x0000849045bd1586ULL, 0x00005d7f9304b42cULL,
+			0x0000bcafbc95af00ULL, 0x000079df653333a0ULL, 0x00007d9376fedf70ULL, 0x0000fef0dcf8cc80ULL,
+			0x0000017810d18860ULL, 0x0000a0cf7638f530ULL, 0x0000711f76c69320ULL, 0x0000358fb6fd6eb0ULL,
+			0x0000d6376dc1ba70ULL, 0x0000ba60d8b98b20ULL, 0x00009067e089e748ULL, 0x0000c297be3b79c0ULL,
+		},
+		0xa312,
+		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
+		{
+			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
+			return ((previous_masks >> 8) & (gf2_reduce(previous_cipherwords & 0x0000fb52a823b460ULL) ^ gf2_reduce(previous_plainwords & 0x0000dd07ed03b460ULL) ^ 1) & 1) << 3;
+		},
+		[] (int iv) -> uint64_t
+		{
+			constexpr uint64_t values[16]{
+				0xa7409cc4, 0x9ce04a6c, 0x78a4971c, 0xd064ca6c, 0x2a205184, 0x0f80c1b4, 0x5d04072c, 0x66a4d184,
+				0xebc41cc4, 0xce648cf4, 0xb940da5c, 0x82e00cf4, 0x430441b4, 0x1180872c, 0x3420171c, 0xf5c45a5c,
+			};
+			return values[iv];
+		},
 	});
 }
 
@@ -2568,26 +2608,21 @@ void namcos10_memn_state::ns10_shamisen(machine_config &config)
 
 	NS10_TYPE2_DECRYPTER(config, m_decrypter, 0, ns10_type2_decrypter_device::ns10_crypto_logic{
 		{
-			0x0000b125bf5e61f1ULL, 0x000001e6f58e6f70ULL, 0x00001952ccf2adf4ULL, 0x000012508b5fc664ULL,
-			0x0000c1d200d2c7d5ULL, 0x00007017c046a564ULL, 0x000007af4ccaa184ULL, 0x0000fd243c75c158ULL,
-			0x00002e15e09eeb48ULL, 0x0000c2d43d5dab88ULL, 0x0000bc0b344d8b39ULL, 0x000033b7ce04ea59ULL,
-			0x0000a5641f152800ULL, 0x00007feabe9f9778ULL, 0x0000c1f7e64561d5ULL, 0x00005dd93026fbd1ULL,
+			0x0000dd7ca8800000ULL, 0x00000cc3e8884000ULL, 0x000056118a880000ULL, 0x0000ee587a000000ULL,
+			0x0000838832804000ULL, 0x0000480720800000ULL, 0x0000d85600800000ULL, 0x0000450620884000ULL,
+			0x000004c242080000ULL, 0x00001d3ff0804000ULL, 0x00001fe98a080000ULL, 0x0000c08d42004000ULL,
+			0x0000520580880000ULL, 0x00008602e0885000ULL, 0x0000692f32884000ULL, 0x0000988932801000ULL,
 		}, {
-			0x0000fad5dca36161ULL, 0x0000d4129a026f70ULL, 0x0000da5d0df3adf0ULL, 0x00000211fddb4664ULL,
-			0x00009e88fcddc7f1ULL, 0x0000f1493202a564ULL, 0x000040a4ffa3e184ULL, 0x0000ad9f4061c151ULL,
-			0x0000642dd736ea68ULL, 0x0000cf8ff2f5af08ULL, 0x000067c6a1358b39ULL, 0x0000343c383aea11ULL,
-			0x00006d0a1d140c00ULL, 0x000079d22b1b9538ULL, 0x00004e0187d441d5ULL, 0x000081e6e7216bd1ULL,
+			0x0000d44fa8a00090ULL, 0x00008846c0884000ULL, 0x0000c6ac98880004ULL, 0x0000e49af8008000ULL,
+			0x0000942b1b964024ULL, 0x0000080601a00000ULL, 0x0000c01720844000ULL, 0x00001e4c0d984009ULL,
+			0x0000804602080120ULL, 0x000014f408894480ULL, 0x000080370a2c0000ULL, 0x00004461e2024048ULL,
+			0x0000c22880882400ULL, 0x0000140700885240ULL, 0x0000206610c06000ULL, 0x00009e4812928000ULL,
 		},
-		0x1e35,
+		0x651b,
 		[] (uint64_t previous_cipherwords, uint64_t previous_plainwords) -> uint16_t
 		{
 			uint64_t previous_masks = previous_cipherwords ^ previous_plainwords;
-			return ((previous_masks >> 7) & (gf2_reduce(previous_cipherwords & 0x0000820bb9dc2800ULL) ^ gf2_reduce(previous_plainwords & 0x000091d0bbd52800ULL) ^ 1) & 1) << 12;
-		},
-		[] (int iv) -> uint64_t
-		{
-			// the loader only ever initialises the decrypter once, with IV 0
-			return iv == 0 ? 0x0000000008256754ULL : 0;
+			return ((previous_masks >> 7) & (gf2_reduce(previous_cipherwords & 0x0000041408000000ULL) ^ gf2_reduce(previous_plainwords & 0x0000048408010000ULL) ^ 1) & 1) << 12;
 		},
 	});
 }
@@ -3845,6 +3880,19 @@ ROM_START( chocovdr )
 	ROM_LOAD( "4.6e", 0x0000000, 0x1080000, CRC(1ed957dd) SHA1(bc8ce9f249fe496c130c6fe67b2260c4d0734ab9) )
 ROM_END
 
+ROM_START( dicerom )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "k9f2808u0c.8e", 0x0000000, 0x1080000, CRC(fbf25cb9) SHA1(20388b71508d60333dc4bd64ec03c255cc48f1cc) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	// The chip holds no game data and the game never selects it.
+	// Every block is the previous one shifted by one 16-bit word.
+	ROM_LOAD( "k9f2808u0c.8d", 0x0000000, 0x1080000, CRC(cd50578f) SHA1(6bba539f978edd629bcfb5ef8332ab5d3aed3d26) ) 
+ROM_END
+
 ROM_START( gahaha )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
@@ -4522,9 +4570,10 @@ GAME( 2002, sugorotca, sugorotc, ns10_sugorotic, mgexio_medal, namcos10_memn_sta
 GAME( 2003, konotako,  0,        ns10_konotako,  konotako,     namcos10_memn_state,  memn_driver_init, ROT0, "Mitchell",          "Kono e Tako (10021 Ver.A)", MACHINE_IMPERFECT_SOUND )
 GAME( 2003, nflclsfb,  0,        ns10_nflclsfb,  nflclsfb,     namcos10_memn_state,  memn_driver_init, ROT0, "Namco / Metro",     "NFL Classic Football (US, NCF3 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2003, pacmball,  0,        ns10_pacmball,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Pacman BALL (PMB2 Ver.A.)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 2003, shamisen,  0,        ns10_shamisen,  shamisen,     namcos10_memn_state,  memn_driver_init, ROT0, "Kato / Konami",     "Shamisen Brothers (KT-SB2 Ver.A)", MACHINE_IMPERFECT_SOUND ) // PROGRAM 1.01K / Ver2.0 in test mode
+GAME( 2003, shamisen,  0,        ns10_shamisen,  shamisen,     namcos10_memn_state,  memn_driver_init, ROT0, "Kato",              "Shamisen Brothers (KT-SB2 Ver.A)", MACHINE_IMPERFECT_SOUND ) // PROGRAM 1.01K / Ver2.0 in test mode
 GAME( 2003, slotouji,  0,        ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // May 2 2003
 GAME( 2003, slotoujia, slotouji, ns10_slotouji,  mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Slot no Oujisama / Slot Prince (Japan, SLO1 Ver. A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
+GAME( 2004, dicerom,   0,        ns10_dicerom,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Dice ROM (Japan, Ver.A2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER.A2 WED SEP 8 2004 10:01:23 in test mode, boots but requires MGEXIO to proceed
 GAME( 2004, sekaikh,   0,        ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2004, sekaikha,  sekaikh,  ns10_sekaikh,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Sekai Kaseki Hakken (Japan, SKH1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND )
 GAME( 2005, ballpom,   0,        ns10_ballpom,   mgexio_medal, namcos10_memn_state,  memn_driver_init, ROT0, "Namco",             "Ball Pom Line", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND ) // ROM VER. B0 FEB 09 2005 15:29:02 in test mode, boots but requires MGEXIO to proceed

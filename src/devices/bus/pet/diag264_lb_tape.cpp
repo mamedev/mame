@@ -64,6 +64,7 @@ int diag264_cassette_loopback_device::datassette_read()
 void diag264_cassette_loopback_device::datassette_write(int state)
 {
 	m_read = state;
+	m_slot->read_w(m_read);
 }
 
 

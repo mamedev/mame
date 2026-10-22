@@ -481,7 +481,7 @@ protected:
 	std::unique_ptr<uint32_t []> m_dcache_line_tag;    /* physical address of each line */
 	std::unique_ptr<uint8_t []>  m_dcache_line_state;  /* DCACHE_xxx for each line, the ways of a set adjacent */
 	std::unique_ptr<uint8_t []>  m_dcache_lru;         /* way to replace next in each set */
-	std::unique_ptr<uint8_t []>  m_dcache_code_pages;  /* DRC only: a bit for each physical 4K page holding translated code */
+	std::unique_ptr<uint8_t []>  m_dcache_code_pages;  /* DRC only: a bit for each physical 4K page holding translated code, for cache operations that reach it */
 
 	/* MMU */
 	mips3_tlb_entry m_tlb[MIPS3_MAX_TLB_ENTRIES];
@@ -620,7 +620,9 @@ private:
 	bool dcache_line_write(offs_t address, offs_t physical, unsigned size, uint64_t data, uint64_t mask);
 	void dcache_line_writeback(unsigned line);
 	void dcache_op(unsigned operation, offs_t address, offs_t physical);
+	void icache_op(offs_t address);
 	static void cfunc_dcache_op(void *param);
+	static void cfunc_icache_op(void *param);
 	static void cfunc_dcache_memory(void *param);
 	void static_generate_dcache_memory(drcuml_block &block, int &label, int tlbmiss, int size, bool iswrite, bool ismasked);
 
@@ -677,6 +679,7 @@ private:
 
 	bool generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	void generate_dcache_op(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_icache_op(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	bool generate_special(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	bool generate_regimm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	bool generate_idt(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);

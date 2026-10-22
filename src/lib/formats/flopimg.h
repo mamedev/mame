@@ -432,6 +432,8 @@ protected:
 	enum { DUMP_THRESHOLD = 2 };
 
 private:
+	static bool find_gcr5_data_block(const uint32_t *hblk, uint32_t hblk_count, const uint32_t *dblk, uint32_t dblk_count, uint32_t index, uint32_t track_size, uint32_t &pos);
+
 	enum { CRC_NONE, CRC_AMIGA, CRC_CBM, CRC_CCITT, CRC_CCITT_FM, CRC_MACHEAD, CRC_FCS, CRC_VICTOR_HDR, CRC_VICTOR_DATA };
 	enum { MAX_CRC_COUNT = 64 };
 

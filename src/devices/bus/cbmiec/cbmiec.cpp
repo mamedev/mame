@@ -533,6 +533,7 @@ bool cbm_iec_device::sample_ready(cpu_device &cpu)
 
 	attotime const time = cpu.local_time();
 	bool ready = !m_update_timer->enabled() || (m_update_timer->expire() > time);
+	attotime stalled = attotime::never;
 
 	for (device_execute_interface *const exec : m_execs)
 	{
@@ -544,12 +545,21 @@ bool cbm_iec_device::sample_ready(cpu_device &cpu)
 
 		attotime const cycle = exec->cycles_to_attotime(1);
 		if (!cycle.is_never())
+		{
 			ready = (exec->local_time() + (cycle / 2)) > time;
+			if (!ready && ((exec->local_time() + cycle) > time))
+				stalled = cycle;
+		}
 	}
 
 	if (!ready)
 	{
-		cpu.yield();
+		// a device less than a cycle behind can only run once this slice ends
+		if (!stalled.is_never())
+		{
+			cpu.yield();
+			machine().scheduler().perfect_quantum(stalled);
+		}
 		cpu.retry_access();
 	}
 

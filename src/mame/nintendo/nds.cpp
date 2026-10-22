@@ -1888,8 +1888,8 @@ void nds_state::update_vram_mapping()
 		const int ofs = (cnt[bank] >> 3) & 3;
 		const uint32_t base = bank_off[bank];
 
-		// F and G are 16K, and both their BG/OBJ offsets skip in a 4K/64K pattern
-		const int fg_page = (ofs & 1) + ((ofs & 2) * 4);
+		// F and G are 16K; OFS.0 steps their BG/OBJ base by 16K and OFS.1 by 64K
+		const int fg_page = (ofs & 1) + ((ofs & 2) * 2);
 
 		switch (bank)
 		{

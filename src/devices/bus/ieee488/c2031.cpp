@@ -65,6 +65,7 @@ private:
 	inline int get_device_number();
 
 	void via0_irq_w(int state);
+	uint8_t via0_r(offs_t offset);
 	uint8_t via0_pa_r();
 	void via0_pa_w(uint8_t data);
 	uint8_t via0_pb_r();
@@ -126,7 +127,7 @@ const tiny_rom_entry *c2031_device::device_rom_region() const
 void c2031_device::c2031_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x6000).ram();
-	map(0x1800, 0x180f).mirror(0x63f0).m(m_via0, FUNC(via6522_device::map));
+	map(0x1800, 0x180f).mirror(0x63f0).r(FUNC(c2031_device::via0_r)).w(m_via0, FUNC(via6522_device::write));
 	map(0x1c00, 0x1c0f).mirror(0x63f0).m(m_via1, FUNC(via6522_device::map));
 	map(0x8000, 0xbfff).mirror(0x4000).rom().region(M6502_TAG, 0);
 }
@@ -137,6 +138,14 @@ void c2031_device::via0_irq_w(int state)
 	m_via0_irq = state;
 
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+uint8_t c2031_device::via0_r(offs_t offset)
+{
+	if ((offset == 0 || offset == 1 || offset == 15) && !m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
+	return m_via0->read(offset);
 }
 
 uint8_t c2031_device::via0_pa_r()

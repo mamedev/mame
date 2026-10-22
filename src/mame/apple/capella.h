@@ -38,6 +38,11 @@ public:
 	u64 irq_ack_r(offs_t offset);
 	void irq_ack_w(offs_t offset, u64 data);
 
+	u64 l2_data_r(offs_t offset);
+	void l2_data_w(offs_t offset, u64 data, u64 mem_mask);
+	u64 l2_tag_r(offs_t offset);
+	void l2_tag_w(offs_t offset, u64 data, u64 mem_mask);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -54,6 +59,8 @@ private:
 	u8 m_nmi;           // NMI input state
 	u8 m_ipl;           // level currently presented to the CPU (0 = none)
 	bool m_irq_pending; // IPL change latched, CPU interrupt asserted
+	u64 m_l2_data[0x8000];
+	u8 m_l2_tag[0x8000];
 };
 
 // device type definition

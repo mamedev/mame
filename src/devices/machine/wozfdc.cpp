@@ -82,6 +82,8 @@ void wozfdc_device::device_start()
 	timer = timer_alloc(FUNC(wozfdc_device::generic_tick), this);
 	delay_timer = timer_alloc(FUNC(wozfdc_device::delayed_tick), this);
 
+	floppy = nullptr;
+
 	save_item(NAME(last_6502_write));
 	save_item(NAME(mode_write));
 	save_item(NAME(mode_load));
@@ -97,6 +99,8 @@ void wozfdc_device::device_start()
 
 void wozfdc_device::device_reset()
 {
+	if(floppy)
+		floppy->mon_w(true);
 	floppy = nullptr;
 	active = MODE_IDLE;
 	mode_write = false;
@@ -228,7 +232,10 @@ void wozfdc_device::write(offs_t offset, uint8_t data)
 void wozfdc_device::set_phase(uint8_t data)
 {
 	if (floppy && active)
-		floppy->seek_phase_w(data);
+	{
+		//logerror("%s: Seek phase %d%d%d%d\n", machine().time().to_string(), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
+		floppy->seek_phase_w(data & 0xf);
+	}
 }
 
 void wozfdc_device::control(int offset)
@@ -260,10 +267,10 @@ void wozfdc_device::control(int offset)
 			}
 			break;
 		case 0xa:
-				external_io_select = false;
-				if(floppy != floppy0->get_device()) {
-					if(active)
-						floppy->mon_w(true);
+			external_io_select = false;
+			if(floppy != floppy0->get_device()) {
+				if(active)
+					floppy->mon_w(true);
 				floppy = floppy0->get_device();
 				if(active)
 					floppy->mon_w(false);

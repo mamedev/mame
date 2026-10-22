@@ -23,6 +23,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -32,6 +33,8 @@ protected:
 	// derived helpers
 	uint32_t read_full(uint32_t offset);
 	void write_full(uint32_t offset, uint32_t data);
+	void page_load_start();
+	void complete_page_write();
 
 	TIMER_CALLBACK_MEMBER(delay_tick);
 
@@ -51,6 +54,10 @@ protected:
 	bool                     m_top_boot_sector_is_8k;
 	bool                     m_bot_boot_sector;
 	uint16_t                 m_page_size;
+	uint32_t                 m_page_timeout_usec;
+
+	// whether the device has a hardware reset pin
+	bool                     m_has_reset_pin;
 
 	// internal state
 	std::unique_ptr<uint8_t[]> m_data;
@@ -66,6 +73,8 @@ protected:
 	uint8_t                  m_write_buffer[32];
 	uint32_t                 m_write_buffer_start_address;
 	uint32_t                 m_write_buffer_count;
+	uint32_t                 m_page_address;
+	std::unique_ptr<uint8_t[]> m_page_buffer;
 
 	bool                     m_fast_mode;
 };

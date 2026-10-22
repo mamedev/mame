@@ -47,7 +47,7 @@ void mpeg_demux::register_save_state(device_t &device, int index)
 // One byte through the state machine.  packet_body says whether the *next*
 // byte belongs to an elementary stream payload, exactly as the registered
 // output of the hardware does.
-void mpeg_demux::byte(u8 data, u8 stream_filter)
+void mpeg_demux::byte(u8 data, u8 stream_id)
 {
 	scr_updated = false;
 	pts_updated = false;
@@ -264,7 +264,7 @@ void mpeg_demux::byte(u8 data, u8 stream_filter)
 		else if ((data & 0xf0) == 0xc0 || (data & 0xf0) == 0xe0)
 		{
 			// audio (0xc0) or video (0xe0) elementary stream
-			state = ((data & 0x0f) == stream_filter) ? DEMUX_PES0 : DEMUX_IDLE;
+			state = (data == stream_id) ? DEMUX_PES0 : DEMUX_IDLE;
 		}
 		else if (data == 0xb9)
 		{

@@ -10,6 +10,15 @@
 
 #include "formats/c3040_dsk.h"
 
+
+namespace {
+
+constexpr uint32_t GCR5_ZERO = 0x14a;
+
+constexpr uint32_t STEP_SKEW[] = { 26'345'000, 105'333'000, 96'652'000, 151'616'000 };
+
+} // anonymous namespace
+
 c3040_format::c3040_format() : d64_format(file_formats)
 {
 }
@@ -77,11 +86,14 @@ floppy_image_format_t::desc_e* c3040_format::get_sector_desc(const format &f, in
 		/* 17 */ {   GCR5, 0x00, gap_2 },
 		/* 18 */ { SECTOR_LOOP_END },
 		/* 19 */ { GCR5, 0x00, 0 },
-		/* 20 */ { RAWBITS, 0x14a, 0 },
+		/* 20 */ { RAWBITS, GCR5_ZERO, 0 },
 		/* 21 */ { END }
 	};
 
-	desc[17].p2 = gap_2; // TODO why?!?
+	desc[7].p1 = id2;
+	desc[8].p1 = id1;
+	desc[10].p2 = f.gap_1;
+	desc[17].p2 = gap_2;
 
 	current_size = 20 + (1+1+4)*10 + f.gap_1*10 + 20 + (1+f.sector_base_size+1)*10 + gap_2*10;
 
@@ -93,7 +105,12 @@ void c3040_format::fix_end_gap(floppy_image_format_t::desc_e* desc, int remainin
 {
 	desc[19].p2 = remaining_size / 10;
 	desc[20].p2 = remaining_size % 10;
-	desc[20].p1 >>= remaining_size & 0x01;
+	desc[20].p1 = GCR5_ZERO >> (10 - desc[20].p2);
+}
+
+uint32_t c3040_format::get_track_skew(const format &f, int head, int track, uint32_t skew, int current_size, int gap2, int total_size) const
+{
+	return track ? (skew + STEP_SKEW[speed_zone[track]]) % 200000000 : 0;
 }
 
 const c3040_format FLOPPY_C3040_FORMAT;

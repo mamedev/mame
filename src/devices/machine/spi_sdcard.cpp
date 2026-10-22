@@ -157,7 +157,9 @@ enum spi_sdcard_device::sd_state : u8
 
 	//FIXME Existing states which must be revisited
 	SD_STATE_WRITE_WAITFE,
-	SD_STATE_WRITE_DATA
+	SD_STATE_WRITE_DATA,
+	SD_STATE_WRITE_MULTI_WAITFE, // synthetical states for this implementation
+	SD_STATE_WRITE_MULTI_DATA
 };
 
 ALLOW_SAVE_TYPE(spi_sdcard_device::sd_state);
@@ -422,7 +424,21 @@ void spi_sdcard_device::latch_in()
 				m_write_ptr = 0;
 			}
 		}
-		else if (m_state == SD_STATE_WRITE_DATA)
+		else if (m_state == SD_STATE_WRITE_MULTI_WAITFE)
+		{
+			if (m_in_latch == 0xfc) // start block token
+			{
+				m_state = SD_STATE_WRITE_MULTI_DATA;
+				m_out_latch = 0xff;
+				m_write_ptr = 0;
+			}
+			else if (m_in_latch == 0xfd) // stop tran token
+			{
+				m_out_latch = 0xff;
+				change_state(SD_STATE_TRAN);
+			}
+		}
+		else if ((m_state == SD_STATE_WRITE_DATA) || (m_state == SD_STATE_WRITE_MULTI_DATA))
 		{
 			m_data[m_write_ptr++] = m_in_latch;
 			if (m_write_ptr == (m_xferblk + 2))
@@ -437,9 +453,11 @@ void spi_sdcard_device::latch_in()
 				{
 					m_data[0] = DATA_RESPONSE_IO_ERROR;
 				}
+				if (m_state == SD_STATE_WRITE_MULTI_DATA)
+					m_blknext++;
 				m_data[1] = 0x01;
 
-				send_data(2, SD_STATE_IDLE, 0); // zero delay - must immediately follow the data
+				send_data(2, (m_state == SD_STATE_WRITE_MULTI_DATA) ? SD_STATE_WRITE_MULTI_WAITFE : SD_STATE_IDLE, 0); // zero delay - must immediately follow the data
 			}
 		}
 		else // receive CMD
@@ -534,8 +552,13 @@ void spi_sdcard_device::do_command()
 			m_data[1] = 0xff;
 			m_data[2] = 0xfe;
 			std::copy(std::begin(m_csd), std::end(m_csd), &m_data[3]);
-
-			send_data(3 + std::size(m_csd), SD_STATE_STBY);
+			{
+				// the CSD is a data block and carries a CRC16 like any other (CMD10
+				// below does the same); a host that keeps CRC on rejects it otherwise
+				util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], std::size(m_csd), 0);
+				put_u16be(&m_data[3 + std::size(m_csd)], crc16);
+			}
+			send_data(3 + std::size(m_csd) + 2, SD_STATE_STBY);
 			break;
 
 		case 10: // CMD10 - SEND_CID
@@ -670,6 +693,34 @@ void spi_sdcard_device::do_command()
 			{
 				m_data[0] = 0xff; // show an error
 				send_data(1, SD_STATE_TRAN);
+			}
+			break;
+
+		case 25: // CMD25 - WRITE_MULTIPLE_BLOCK
+			if (m_xferblk != m_blksize)
+			{
+				LOG("rejecting write of %u bytes that is not a full %u-byte block\n", m_xferblk, m_blksize);
+				m_data[0] = 0x40; // parameter error
+				send_data(1, SD_STATE_TRAN);
+			}
+			else
+			{
+				m_blknext = get_u32be(&m_cmd[1]);
+				if ((m_type == SD_TYPE_V2) && (m_blknext % m_blksize))
+				{
+					LOG("rejecting write of %u bytes at %u that crosses %u-byte block boundary\n", m_xferblk, m_blknext, m_blksize);
+					m_data[0] = 0x40; // parameter error
+					send_data(1, SD_STATE_TRAN);
+				}
+				else
+				{
+					if (m_type == SD_TYPE_V2)
+					{
+						m_blknext /= m_xferblk;
+					}
+					m_data[0] = 0;
+					send_data(1, SD_STATE_WRITE_MULTI_WAITFE);
+				}
 			}
 			break;
 

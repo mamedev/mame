@@ -61,7 +61,7 @@ CPU #    Game                      Notes              Seed   Upper Limit
 -------- ------------------------- ------------------ ------ -----
 317-0029 Block Gal                 NEC MC-8123B 651   091755  1800?
 317-0030 Perfect Billiard                             9451EC  1C00
-317-0040 Toki no Senshi - Chrono Soldier              068713  1c00
+317-0040 Toki no Senshi - Chrono Soldier              068713  1C00
 317-0042 Opa Opa                                      B31FD0  1C00
 317-0043 Wonder Boy Monster Land                      640708  1C00
 317-0054 Shinobi (sound CPU)       NEC MC-8123B 652   088992  1800
@@ -77,6 +77,7 @@ CPU #    Game                      Notes              Seed   Upper Limit
 317-5??? Ninja Kid II (sound CPU)  NEC MC-8123A 646   27998D  1800
 317-???? Center Court (sound CPU)  NEC MC-8123B 703   640506  1800
 317-???? Omega                                        861226  1C00?
+no nr.   Fever Chance (Wing)       NEC MC-8123 643    437437  1800?
 
 ***************************************************************************/
 

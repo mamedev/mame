@@ -25,9 +25,6 @@ Hardware notes:
 - SC-01-A speech chip
 - module slot
 
-TODO:
-- plosive consonants are very difficult to hear, it's an issue in votrax.cpp
-
 *******************************************************************************/
 
 #include "emu.h"

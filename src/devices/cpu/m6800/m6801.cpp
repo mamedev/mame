@@ -9,7 +9,7 @@ TODO:
   and will start reading 1.5 'bits' after the start bit
 - improve RAM control register
 - improve STBY pin? RES pin (reset) should be ineffective while STBY is low
-- IS3 interrupt for 6801 port 3 handshake (already implemented for 6301Y)
+- every IS3 strobe should set the IS3 flag, not only one that latches port 3
 - address TRAP (at the moment, only illegal opcode TRAP is emulated)
   if PC directed these areas:
   'mode' is selected by the sense of p2.0,p2.1,and p2.3 at reset timing.
@@ -551,6 +551,12 @@ hd6303y_cpu_device::hd6303y_cpu_device(const machine_config &mconfig, const char
 }
 
 
+bool m6801_cpu_device::check_irq2_is3()
+{
+	// IS3 FLAG with IS3 IRQ1 ENABLE set requests IRQ1 (the flag is cleared by reading P3CSR, then reading or writing port 3)
+	return (m_p3csr & (M6801_P3CSR_IS3_ENABLE|M6801_P3CSR_IS3_FLAG)) == (M6801_P3CSR_IS3_ENABLE|M6801_P3CSR_IS3_FLAG);
+}
+
 bool m6801_cpu_device::check_irq2_ici()
 {
 	return (m_tcsr & (TCSR_EICI|TCSR_ICF)) == (TCSR_EICI|TCSR_ICF);
@@ -583,7 +589,13 @@ void m6801_cpu_device::take_irq2(const char *message, u16 irq_vector)
 
 void m6801_cpu_device::check_irq2()
 {
-	if (check_irq2_ici())
+	if (check_irq2_is3())
+	{
+		if (!(m_cc & 0x10))
+			standard_irq_callback(M6801_IS3_LINE, m_pc.w.l);
+		take_irq2("IS3", 0xfff8);
+	}
+	else if (check_irq2_ici())
 	{
 		if (!(m_cc & 0x10))
 			standard_irq_callback(M6801_TIN_LINE, m_pc.w.l);
@@ -605,7 +617,13 @@ void m6801_cpu_device::check_irq2()
 
 void m6801u4_cpu_device::check_irq2()
 {
-	if (check_irq2_ici() || (m_tcr[1] & m_tsr & TSR_ICF2))
+	if (check_irq2_is3())
+	{
+		if (!(m_cc & 0x10))
+			standard_irq_callback(M6801_IS3_LINE, m_pc.w.l);
+		take_irq2("IS3", 0xfff8);
+	}
+	else if (check_irq2_ici() || (m_tcr[1] & m_tsr & TSR_ICF2))
 	{
 		if (!(m_cc & 0x10))
 			standard_irq_callback(M6801_TIN_LINE, m_pc.w.l);
@@ -1947,7 +1965,9 @@ void m6801_cpu_device::p3_csr_w(u8 data)
 {
 	LOGPORT("Port 3 Control and Status Register: %02x\n", data);
 
-	m_p3csr = data;
+	// the IS3 flag is read-only
+	m_p3csr = (m_p3csr & M6801_P3CSR_IS3_FLAG) | (data & ~M6801_P3CSR_IS3_FLAG);
+	check_irq2();
 }
 
 

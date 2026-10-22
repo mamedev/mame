@@ -64,12 +64,33 @@ public:
 
 	newbrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto int_callback() { return m_write_int.bind(); }
+	auto m1_wait_callback() { return m_write_m1_wait.bind(); }
+	auto host_mreq_r_callback() { return m_read_host.bind(); }
+	auto host_mreq_w_callback() { return m_write_host.bind(); }
+	auto host_main_r_callback() { return m_read_main.bind(); }
+	auto host_main_w_callback() { return m_write_main.bind(); }
+	auto host_paged_r_callback() { return m_read_paged.bind(); }
+	auto host_paged_w_callback() { return m_write_paged.bind(); }
+
 	// computer interface
 	uint8_t mreq_r(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh);
 	void mreq_w(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh);
 
 	uint8_t iorq_r(offs_t offset, uint8_t data, bool &prtov);
 	void iorq_w(offs_t offset, uint8_t data, bool &prtov);
+	uint8_t page_r(int page, offs_t offset, uint8_t data);
+	void page_w(int page, offs_t offset, uint8_t data);
+
+	// card interface
+	void int_w(int state) { m_write_int(state); }
+	void m1_wait_w(int state) { m_write_m1_wait(state); }
+	uint8_t host_mreq_r(offs_t offset) { return m_read_host(offset); }
+	void host_mreq_w(offs_t offset, uint8_t data) { m_write_host(offset, data); }
+	uint8_t host_main_r(offs_t offset) { return m_read_main(offset); }
+	void host_main_w(offs_t offset, uint8_t data) { m_write_main(offset, data); }
+	uint8_t host_paged_r(offs_t offset) { return m_read_paged.isunset() ? m_read_host(offset & 0xffff) : m_read_paged(offset); }
+	void host_paged_w(offs_t offset, uint8_t data);
 
 protected:
 	// device_t implementation
@@ -77,6 +98,15 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	device_newbrain_expansion_slot_interface *m_card;
+
+	devcb_write_line m_write_int;
+	devcb_write_line m_write_m1_wait;
+	devcb_read8 m_read_host;
+	devcb_write8 m_write_host;
+	devcb_read8 m_read_main;
+	devcb_write8 m_write_main;
+	devcb_read8 m_read_paged;
+	devcb_write8 m_write_paged;
 };
 
 
@@ -93,6 +123,10 @@ public:
 	// I/O access
 	virtual uint8_t iorq_r(offs_t offset, uint8_t data, bool &prtov) { return data; }
 	virtual void iorq_w(offs_t offset, uint8_t data, bool &prtov) { }
+
+	// paged memory access from the expansion interface module
+	virtual uint8_t page_r(int page, offs_t offset, uint8_t data) { return data; }
+	virtual void page_w(int page, offs_t offset, uint8_t data) { }
 
 protected:
 	// construction/destruction

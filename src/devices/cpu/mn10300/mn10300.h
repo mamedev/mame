@@ -34,6 +34,12 @@ public:
 	// A byte received on a channel's RXD
 	template <unsigned Ch> void sio_rx_w(u8 data);
 
+	// The on-chip DMA controller's channel 0 is driven by an external request
+	// (the floppy controller's DRQ); when its byte count runs out the channel
+	// pulses terminal count back to the requesting device.
+	auto dma_tc_cb() { return m_dma_tc_cb.bind(); }
+	void dma_req_w(int state);
+
 protected:
 	mn10300_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor program);
 
@@ -113,6 +119,18 @@ private:
 	u16 m_tm_base[2];
 	emu_timer *m_tm_timer[2];
 
+	// DMA controller channel 0 (registers at 0x32000800)
+	devcb_write_line m_dma_tc_cb;
+	emu_timer *m_dma_timer;
+	u32 m_dma_ctrl;
+	u32 m_dma_src;
+	u32 m_dma_dst;
+	u16 m_dma_count;
+	u32 m_dma_remain;
+	bool m_dma_active;
+	bool m_dma_started;
+	bool m_dma_drq;
+
 	// serial channels
 	devcb_write8::array<NUM_SIO> m_sio_tx_cb;
 	devcb_write_line::array<NUM_SIO> m_sio_rx_enable_cb;
@@ -148,6 +166,10 @@ private:
 	template <unsigned N> u16 tm_count_r();
 	void tm_rearm(unsigned n, bool restart_phase);
 	TIMER_CALLBACK_MEMBER(tm_underflow);
+
+	u32 dmac_r(offs_t offset);
+	void dmac_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	TIMER_CALLBACK_MEMBER(dma_transfer);
 
 	template <unsigned Ch> u16 sio_config_r();
 	template <unsigned Ch> void sio_config_w(offs_t offset, u16 data, u16 mem_mask = ~0);

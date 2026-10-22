@@ -20,9 +20,9 @@ To Do:
   Hook up inputs and EEPROM in Kick for the Goal / World PK Soccer
 
 2008-08
-Dip locations have been added assuming that the layout is the same as the
-m92 boards (and earlier Irem boards). However, it would be nice to have them
-confirmed for m107 games as well.
+DIP switch locations have been added assuming that the layout is the same as
+the m92 boards (and earlier Irem boards). However, it would be nice to have
+them confirmed for m107 games as well.
 
 *******************************************************************************/
 
@@ -68,14 +68,14 @@ public:
 	{
 	}
 
-	void airass(machine_config &config);
-	void firebarr(machine_config &config);
-	void dsoccr94(machine_config &config);
-	void wpksoc(machine_config &config);
+	void airass(machine_config &config) ATTR_COLD;
+	void firebarr(machine_config &config) ATTR_COLD;
+	void dsoccr94(machine_config &config) ATTR_COLD;
+	void wpksoc(machine_config &config) ATTR_COLD;
 
-	void init_dsoccr94();
-	void init_firebarr();
-	void init_wpksoc();
+	void init_dsoccr94() ATTR_COLD;
+	void init_firebarr() ATTR_COLD;
+	void init_wpksoc() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -126,14 +126,15 @@ private:
 	void update_scroll_positions();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int laynum, int category, int opaque);
 	void screen_refresh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void dsoccr94_io_map(address_map &map) ATTR_COLD;
-	void dsoccr94_map(address_map &map) ATTR_COLD;
-	void firebarr_map(address_map &map) ATTR_COLD;
+
 	void main_map(address_map &map) ATTR_COLD;
+	void firebarr_map(address_map &map) ATTR_COLD;
+	void dsoccr94_map(address_map &map) ATTR_COLD;
 	void main_portmap(address_map &map) ATTR_COLD;
-	void sound_map(address_map &map) ATTR_COLD;
-	void wpksoc_io_map(address_map &map) ATTR_COLD;
+	void dsoccr94_io_map(address_map &map) ATTR_COLD;
 	void wpksoc_map(address_map &map) ATTR_COLD;
+	void wpksoc_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
 };
 
 

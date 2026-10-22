@@ -113,9 +113,6 @@ FLOPPY_CONSTRUCT(dsk_dsk_construct);
 FLOPPY_IDENTIFY(d88_dsk_identify);
 FLOPPY_CONSTRUCT(d88_dsk_construct);
 
-FLOPPY_IDENTIFY(fdi_dsk_identify);
-FLOPPY_CONSTRUCT(fdi_dsk_construct);
-
 #define LEGACY_FLOPPY_OPTIONS_NAME(name)    floppyoptions_##name
 
 #define LEGACY_FLOPPY_OPTIONS_START(name)                                               \
@@ -130,7 +127,6 @@ FLOPPY_CONSTRUCT(fdi_dsk_construct);
 #define LEGACY_FLOPPY_OPTION(name, extensions_, description_, identify_, construct_, destruct_, ranges_)\
 	{ #name, extensions_, description_, identify_, construct_, destruct_, ranges_ },
 #define LEGACY_FLOPPY_OPTIONS_END                                                       \
-		LEGACY_FLOPPY_OPTION( fdi, "fdi", "Formatted Disk Image", fdi_dsk_identify, fdi_dsk_construct, nullptr, nullptr) \
 		LEGACY_FLOPPY_OPTION( td0, "td0", "Teledisk floppy disk image", td0_dsk_identify, td0_dsk_construct, td0_dsk_destruct, nullptr) \
 		LEGACY_FLOPPY_OPTION( imd, "imd", "IMD floppy disk image",  imd_dsk_identify, imd_dsk_construct, nullptr, nullptr) \
 		LEGACY_FLOPPY_OPTION( cqm, "cqm,dsk", "CopyQM floppy disk image",   cqm_dsk_identify, cqm_dsk_construct, nullptr, nullptr) \

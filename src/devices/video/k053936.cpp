@@ -440,13 +440,15 @@ static inline void K053936GP_copyroz32clip(running_machine &machine,
 		bitmap_rgb32 &dst_bitmap, bitmap_ind16 &src_bitmap,
 		const rectangle &dst_cliprect, const rectangle &src_cliprect,
 		uint32_t _startx,uint32_t _starty,int _incxx,int _incxy,int _incyx,int _incyy,
-		int tilebpp, int blend, int alpha, int clip, int pixeldouble_output, palette_device &palette)
+		int tilebpp, int blend, int alpha, int clip, int wrap, int pixeldouble_output, palette_device &palette)
 {
 	static const int colormask[8]={1,3,7,0xf,0x1f,0x3f,0x7f,0xff};
 	int cy, cx;
 	int ecx;
 	int src_pitch, incxy, incxx;
 	int src_minx, src_maxx, src_miny, src_maxy, cmask;
+	int const maskx = wrap ? src_bitmap.width() - 1 : 0x1fff;
+	int const masky = wrap ? src_bitmap.height() - 1 : 0x1fff;
 	uint16_t *src_base;
 	size_t src_size;
 
@@ -505,8 +507,8 @@ static inline void K053936GP_copyroz32clip(running_machine &machine,
 
 	do {
 		do {
-			int srcx = (cx >> 16) & 0x1fff;
-			int srcy = (cy >> 16) & 0x1fff;
+			int srcx = (cx >> 16) & maskx;
+			int srcy = (cy >> 16) & masky;
 			int pixel;
 			uint32_t offs;
 			offs = srcy * src_pitch + srcx;
@@ -584,7 +586,7 @@ static void K053936GP_zoom_draw(running_machine &machine,
 			K053936GP_copyroz32clip(machine,
 					bitmap, src_bitmap, my_clip, src_cliprect,
 					startx<<5, starty<<5, incxx<<5, incxy<<5, 0, 0,
-					tilebpp, blend, alpha, clip, pixeldouble_output, palette);
+					tilebpp, blend, alpha, clip, K053936_wraparound[chip], pixeldouble_output, palette);
 			y++;
 		}
 	}
@@ -609,7 +611,7 @@ static void K053936GP_zoom_draw(running_machine &machine,
 		K053936GP_copyroz32clip(machine,
 				bitmap, src_bitmap, cliprect, src_cliprect,
 				startx<<5, starty<<5, incxx<<5, incxy<<5, incyx<<5, incyy<<5,
-				tilebpp, blend, alpha, clip, pixeldouble_output, palette);
+				tilebpp, blend, alpha, clip, K053936_wraparound[chip], pixeldouble_output, palette);
 	}
 }
 
@@ -653,7 +655,7 @@ static void K053936GP_zoom_draw(running_machine &machine,
 			K053936GP_copyroz32clip(machine,
 					bitmap, src_bitmap, my_clip, src_cliprect,
 					startx<<5, starty<<5, incxx<<5, incxy<<5, 0, 0,
-					tilebpp, blend, alpha, clip, pixeldouble_output, palette);
+					tilebpp, blend, alpha, clip, K053936_wraparound[chip], pixeldouble_output, palette);
 			y++;
 		}
 	}
@@ -678,7 +680,7 @@ static void K053936GP_zoom_draw(running_machine &machine,
 		K053936GP_copyroz32clip(machine,
 				bitmap, src_bitmap, cliprect, src_cliprect,
 				startx<<5, starty<<5, incxx<<5, incxy<<5, incyx<<5, incyy<<5,
-				tilebpp, blend, alpha, clip, pixeldouble_output, palette);
+				tilebpp, blend, alpha, clip, K053936_wraparound[chip], pixeldouble_output, palette);
 	}
 }
 

@@ -63,6 +63,7 @@ public:
 	// the SC3000 has I/OR, I/OW lines connected
 	virtual uint8_t read_io(offs_t offset) { return 0xff; }
 	virtual void write_io(offs_t offset, uint8_t data) { }
+	virtual bool dsram() const { return false; }
 
 	void rom_alloc(uint32_t size);
 	void ram_alloc(uint32_t size);
@@ -145,6 +146,7 @@ public:
 	void write_ram(offs_t offset, uint8_t data);
 	uint8_t read_io(offs_t offset);
 	void write_io(offs_t offset, uint8_t data);
+	bool dsram() const { return m_cart && m_cart->dsram(); }
 
 	int get_lphaser_xoffs() { return m_cart ? m_cart->get_lphaser_xoffs() : -1; }
 	int get_sms_mode() { return m_cart->get_sms_mode(); }
@@ -325,6 +327,7 @@ DECLARE_DEVICE_TYPE(SG1000_CARD_SLOT,    sg1000_card_slot_device)
 
 // slot interfaces
 void sg1000_cart(device_slot_interface &device);
+void sc3000_cart(device_slot_interface &device);
 void sg1000mk3_cart(device_slot_interface &device);
 void sms_cart(device_slot_interface &device);
 void gg_cart(device_slot_interface &device);

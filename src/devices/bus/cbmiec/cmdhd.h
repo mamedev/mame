@@ -12,6 +12,7 @@
 #pragma once
 
 #include "cbmiec.h"
+#include "cmdpar.h"
 #include "bus/nscsi/devices.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/harddriv.h"
@@ -31,6 +32,7 @@
 
 class cmd_hd_device : public device_t, 
 					  public device_cbm_iec_interface,
+					  public device_cmd_parallel_interface,
 					  public nscsi_device_interface
 {
 public:
@@ -54,6 +56,9 @@ protected:
 	void cbm_iec_atn(int state) override;
 	void cbm_iec_data(int state) override;
 	void cbm_iec_reset(int state) override;
+
+	// device_cmd_parallel_interface overrides
+	virtual void cmdpar_lines_changed(u8 lines, u8 old) override;
 
 	// nscsi_device_interface overrides
 	virtual void scsi_ctrl_changed() override;
@@ -100,6 +105,9 @@ private:
 	void ppi_pa_w(uint8_t data);
 	uint8_t ppi_pb_r();
 	void ppi_pc_w(uint8_t data);
+	uint8_t ppi_r(offs_t offset);
+	void ppi_w(offs_t offset, uint8_t data);
+	void update_prdy(int patn);
 
 	void ttl_w(uint8_t data);
 
@@ -126,6 +134,9 @@ private:
 
 	bool m_romos = 1;
 	bool m_wpram = 1;
+
+	u8 m_ppi_pc = 0xff;
+	bool m_prdy_ff = false;
 };
 
 
