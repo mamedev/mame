@@ -16,6 +16,7 @@
 #include "screen.h"
 
 #include <numbers>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -830,7 +831,9 @@ uint16_t hd63484_device::get_dot(int16_t x, int16_t y)
 	return (readword(offset, m_org_dn) >> bit_pos) & ((1 << bpp) - 1);
 }
 
-bool hd63484_device::set_dot(int16_t x, int16_t y, int16_t px, int16_t py)
+// pattern RAM scan position for a drawing-relative coordinate; returns the
+// pattern cell in the low byte (x | y<<4) and the pattern bit in bit 8
+int hd63484_device::pattern_bit(int16_t px, int16_t py)
 {
 	int xs = m_pex - m_psx + 1;
 	int ys = m_pey - m_psy + 1;
@@ -845,7 +848,16 @@ bool hd63484_device::set_dot(int16_t x, int16_t y, int16_t px, int16_t py)
 	if (yp < m_psy)
 		yp = (m_pey + 1) - (m_psy - yp);
 
-	int pix = (m_pram[yp & 0x0f] >> (xp & 0x0f)) & 0x01;
+	int const pix = (m_pram[yp & 0x0f] >> (xp & 0x0f)) & 0x01;
+	return (pix << 8) | ((yp & 0x0f) << 4) | (xp & 0x0f);
+}
+
+bool hd63484_device::set_dot(int16_t x, int16_t y, int16_t px, int16_t py)
+{
+	int const pat = pattern_bit(px, py);
+	int const pix = BIT(pat, 8);
+	int const xp = pat & 0x0f;
+	int const yp = (pat >> 4) & 0x0f;
 
 	uint8_t col = (m_cr >> 3) & 0x03;
 	uint8_t bpp = get_bpp();
@@ -1067,7 +1079,20 @@ uint32_t hd63484_device::paint(int16_t sx, int16_t sy)
 		return !((e && dot != edg) || (!e && dot == edg) || dot == cl0 || dot == cl1);
 	};
 
+	// In replace operation mode a painted dot reads back as the written
+	// value; one that does not, although the pattern selected an actual
+	// write, sits in unwritable space (ROM or unpopulated memory, reachable
+	// since large y coordinates wrap the 20 bit address). Such dots are
+	// scanned over without counting as painted work or seeding, and a span
+	// start is never queued twice, so a fill that strays outside the frame
+	// buffer RAM visits the region once and terminates instead of
+	// re-scanning it until the budget is gone - and a fill seeded entirely
+	// in unwritable space leaves CP at its seed.
+	uint8_t const colm = (m_cr >> 3) & 0x03;
+	bool const scanover = (m_cr & 0x07) == 0;
+
 	std::vector<std::pair<int16_t, int16_t>> seeds;
+	std::unordered_set<uint32_t> seen;
 	seeds.emplace_back(sx, sy);
 
 	// CP ends up at the end point of the bottom-most painted line
@@ -1088,6 +1113,9 @@ uint32_t hd63484_device::paint(int16_t sx, int16_t sy)
 		if (!paintable(x, y))
 			continue;
 
+		if (!seen.emplace((uint32_t(uint16_t(y)) << 16) | uint16_t(x)).second)
+			continue;
+
 		rows++;
 
 		int32_t xl = x;
@@ -1103,10 +1131,32 @@ uint32_t hd63484_device::paint(int16_t sx, int16_t sy)
 			if (set_dot(px, y, px - m_cpx, y - m_cpy))
 				return rows;
 
+			bool stuck = true;
+			if (scanover && paintable(px, y))
+			{
+				// distinguish unwritable memory from a pattern-suppressed dot
+				int const pix = BIT(pattern_bit(px - m_cpx, y - m_cpy), 8);
+				if (colm == 0 || colm == 3 || (colm == 1 && pix) || (colm == 2 && !pix))
+					stuck = false; // write attempted and did not stick
+			}
+
+			// the end point tracks every visited dot and the sweep continues
+			// through unwritable territory, as the hardware does not verify
+			// its writes - only the span start dedup keeps the traversal
+			// finite there; an unwritable dot just is not painted work
 			if (y < pe_y || (y == pe_y && px > pe_x))
 			{
 				pe_x = px;
 				pe_y = y;
+			}
+
+			if (!stuck)
+			{
+				if (paintable(px, y + 1)) { if (!up) { seeds.emplace_back(px, y + 1); up = true; } }
+				else up = false;
+				if (paintable(px, y - 1)) { if (!dn) { seeds.emplace_back(px, y - 1); dn = true; } }
+				else dn = false;
+				continue;
 			}
 
 			// drop one seed per paintable run of the adjacent rows

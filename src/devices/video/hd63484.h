@@ -91,6 +91,7 @@ private:
 	int get_bpp();
 	int get_ppmc();
 	uint16_t get_dot(int16_t x, int16_t y);
+	int pattern_bit(int16_t px, int16_t py);
 	bool set_dot(int16_t x, int16_t y, int16_t px, int16_t py);
 	bool set_dot(int16_t x, int16_t y, uint16_t color);
 	bool draw_line(int16_t sx, int16_t sy, int16_t ex, int16_t ey);
