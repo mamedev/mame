@@ -24,6 +24,9 @@
     Tracking reports have their own interface and do not use the 32x32 renderer.
 
     TODO:
+    - Measure the sensor oscillator and exposure-time units. Analogue pixel
+      periods and frame gaps are compatibility estimates; exposure registers
+      are stored but do not yet control the exposure duration.
     - Measure lens geometry, exposure response and target brightness.
     - Identify ndpbj's setup registers, exposure commands and frame latch.
     - Measure udance's sensor-side tracking, including overlapping reflectors.
@@ -297,7 +300,7 @@ xavix_analog_image_sensor_device_base::xavix_analog_image_sensor_device_base(con
 }
 
 xavix_analog_image_sensor_device::xavix_analog_image_sensor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	// Representative cadence allows initial edge polling and paired capture between video interrupts.
+	// Empirical cadence for edge polling and paired capture; the physical sensor clock is unmeasured.
 	: xavix_analog_image_sensor_device_base(mconfig, XAVIX_ANALOG_IMAGE_SENSOR, tag, owner, clock, 48)
 	, m_ambient(*this, "AMBIENT")
 	, m_target_x(*this, { "TARGET_X", "TARGET2_X", "TARGET3_X", "TARGET4_X" })
@@ -543,6 +546,8 @@ void xavix_analog_image_sensor_device_base::command_w(u8 command)
 		m_register_data = command & 0x0f;
 		break;
 	case 0x30:
+		// Registers 1/2 hold the exposure time's low/high nibbles (ff is maximum).
+		// TODO: Derive exposure duration from these registers once their time units are known.
 		m_registers[m_register_select] = m_register_data;
 		break;
 	case 0x40:

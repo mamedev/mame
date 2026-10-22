@@ -503,7 +503,7 @@ void xavix2000_ban_omt_state::xavix2000_ban_omt(machine_config &config)
 	configure_camera(config, xavix_analog_image_sensor_device::target_shape::DISK);
 	// A compact starting target avoids continually requesting the ROM's near-camera action.
 	m_camera->set_target_size_small(true);
-	// Representative timing leaves time to rebuild the sprite list before the next field.
+	// Empirical timing leaves time to rebuild the sprite list before the next field; the sensor clock is unmeasured.
 	m_camera->set_half_pixel_clocks(40);
 }
 
@@ -527,7 +527,7 @@ void xavix2000_i2c_camera_state::xavix2000_tom_dpgm(machine_config &config)
 	xavix2000_i2c_24c08_4mb(config);
 	configure_camera(config, xavix_analog_image_sensor_device::target_shape::DISK);
 	m_camera->set_target_size_small(true);
-	// Provisional pixel timing keeps paired capture and game updates within one field.
+	// Empirical timing keeps paired capture and game updates within one field; the sensor clock is unmeasured.
 	m_camera->set_half_pixel_clocks(40);
 }
 
@@ -579,11 +579,11 @@ static INPUT_PORTS_START( epo_sdb )
 	// Relative scaling is provisional because the original counts per distance have not been measured.
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_NAME("P1 Trackball X") PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1) PORT_CODE(MOUSECODE_X_INDEXED(0)) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID)
 	PORT_MODIFY("MOUSE0Y")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_NAME("P1 Trackball Y") PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1) PORT_CODE(MOUSECODE_Y_INDEXED(0)) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_NAME("P1 Trackball Y") PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1) PORT_CODE(MOUSECODE_Y_INDEXED(0)) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID)
 	PORT_MODIFY("MOUSE1X")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_NAME("P2 Trackball X") PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(2) PORT_CODE(MOUSECODE_X_INDEXED(1)) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID)
 	PORT_MODIFY("MOUSE1Y")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_NAME("P2 Trackball Y") PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(2) PORT_CODE(MOUSECODE_Y_INDEXED(1)) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID)
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_NAME("P2 Trackball Y") PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(2) PORT_CODE(MOUSECODE_Y_INDEXED(1)) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Factory-test chord with no identified public controls
@@ -612,15 +612,15 @@ void xavix_state::xavix2000_epo_sdb(machine_config &config)
 {
 	xavix2000_nv_4mb(config);
 
-	// Each ball-and-roller controller feeds two writable wrapping counters; both Y channels have reversed polarity.
+	// Each ball-and-roller controller feeds two writable signed counters.
 	m_soc->anport_input_callback<0>().set_ioport("MOUSE0X");
 	m_soc->anport_input_callback<1>().set_ioport("MOUSE0Y");
 	m_soc->anport_input_callback<2>().set_ioport("MOUSE1X");
 	m_soc->anport_input_callback<3>().set_ioport("MOUSE1Y");
 	m_soc->set_anport_counter_mode(0);
-	m_soc->set_anport_counter_mode(1, true);
+	m_soc->set_anport_counter_mode(1);
 	m_soc->set_anport_counter_mode(2);
-	m_soc->set_anport_counter_mode(3, true);
+	m_soc->set_anport_counter_mode(3);
 }
 
 

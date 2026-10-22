@@ -55,7 +55,7 @@ public:
 	void set_adc_audio_channel(u8 channel) { m_adc.lookup()->set_audio_channel(channel); }
 	void set_adc_audio_input(unsigned input, u8 channel) { m_adc.lookup()->set_audio_input(input, channel); }
 	void add_adc_route(device_sound_interface &source, u32 output, double gain, u32 input = 0) { source.add_route(output, *m_adc.lookup(), gain, input); }
-	void set_anport_counter_mode(unsigned port, bool reverse = false) { m_anport.lookup()->set_counter_mode(port, reverse); }
+	void set_anport_counter_mode(unsigned port) { m_anport.lookup()->set_counter_mode(port); }
 	void set_anport_counter_saturation(unsigned port) { m_anport.lookup()->set_counter_saturation(port); }
 
 	auto lightgun_read_callback() { return m_lightgun_read_cb.bind(); }

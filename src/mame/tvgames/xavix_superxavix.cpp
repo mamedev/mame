@@ -172,13 +172,6 @@ void superxavix_state::configure_mapped_memory()
 
 u8 superxavix_state::read_graphics_byte(u32 address)
 {
-	// anpanmdx uses this address form for its title-screen bitmap scroller.
-	if (m_extra && BIT(address, 25))
-	{
-		address &= 0x1ffffff;
-		address ^= 0x0600000;
-	}
-
 	// The next address bit selects the additional ROM for video fetches.
 	if ((address & 0x1000000) && m_extra)
 		return m_extra[address & 0x7fffff];
@@ -219,6 +212,7 @@ u8 superxavix_state::pio_input_r(offs_t offset, u8 mem_mask)
 
 u8 superxavix_state::connected_inputs(ioport_port &port)
 {
+	// TODO: Describe physical connections independently of input field declarations.
 	u8 mask = 0;
 	for (ioport_field const &field : port.fields())
 		if (field.type() != IPT_UNUSED && field.type() != IPT_UNKNOWN)
@@ -855,7 +849,7 @@ void superxavix_i2c_camera_state::superxavix_xavbowl(machine_config &config)
 	superxavix_i2c_24c08(config);
 	configure_xavixport_io(config);
 	XAVIX_ANALOG_IMAGE_SENSOR(config, m_camera, peripheral_clock());
-	// Representative timing lets paired capture finish before the split-screen update.
+	// Empirical timing lets paired capture finish before the split-screen update; the sensor clock is unmeasured.
 	m_camera->set_half_pixel_clocks(43);
 	// The ROM derives the throw from successive images of the passive ball reflector.
 	m_soc->adc_input_callback<0>().set(m_camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
@@ -887,7 +881,7 @@ void superxavix_xavbox_state::superxavix_xavbox(machine_config &config)
 	m_super_soc->set_pio_legacy_output_mask<1>(0x21);
 	XAVIX_ANALOG_IMAGE_SENSOR(config, m_camera, peripheral_clock()).set_target_count(2);
 	m_camera->set_frame_gap_pixel_high(true);
-	// Representative pixel pulses must be shorter than the ROM's five-poll gap detector.
+	// Empirical pixel pulses are shorter than the ROM's five-poll gap detector; the sensor clock is unmeasured.
 	m_camera->set_half_pixel_clocks(40);
 	m_soc->adc_input_callback<0>().set(m_camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
 }
@@ -1557,7 +1551,7 @@ void superxavix_i2c_camera_state::superxavix_epo_rgfj(machine_config &config)
 	superxavix_i2c_24c08(config);
 	m_soc->io_output_callback<1>().append(*this, FUNC(superxavix_i2c_camera_state::io1_power_off_w));
 	auto &camera = XAVIX_ANALOG_IMAGE_SENSOR(config, m_camera, peripheral_clock());
-	// Representative pixel timing separates the ROM's five-poll frame test from ordinary pixels.
+	// Empirical timing separates the ROM's five-poll frame test from ordinary pixels; the sensor clock is unmeasured.
 	camera.set_half_pixel_clocks(40);
 	camera.set_frame_gap_pixel_high(true);
 	// TODO: Verify the club's optical geometry and the physical event source.
@@ -1632,7 +1626,7 @@ void superxavix_i2c_camera_state::superxavix_ban_ult(machine_config &config)
 	superxavix_i2c_24c02(config);
 	auto &camera = XAVIX_ANALOG_IMAGE_SENSOR(config, m_camera, peripheral_clock());
 	camera.set_target_count(3);
-	// Representative pixel timing separates the ROM's five-poll frame test from ordinary pixels.
+	// Empirical timing separates the ROM's five-poll frame test from ordinary pixels; the sensor clock is unmeasured.
 	camera.set_half_pixel_clocks(40);
 	camera.set_frame_gap_pixel_high(true);
 	m_soc->adc_input_callback<0>().set(camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
@@ -2221,7 +2215,7 @@ static INPUT_PORTS_START( doradraw )
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(80) PORT_KEYDELTA(40) PORT_PLAYER(1)
 
 	PORT_MODIFY("MOUSE1Y")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(80) PORT_KEYDELTA(40) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(80) PORT_KEYDELTA(40) PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_INCLUDE(superxavix_battery_status)
 	PORT_INCLUDE(xavix_hard_power_control)
@@ -2242,11 +2236,11 @@ void superxavix_doradraw_state::superxavix_doradraw(machine_config &config)
 {
 	superxavix(config);
 	configure_mapped_memory();
-	// The optical pen uses writable signed counters, with vertical polarity opposite MAME's mouse Y.
+	// The optical pen uses writable signed counters.
 	m_soc->anport_input_callback<2>().set_ioport("MOUSE1X");
 	m_soc->anport_input_callback<3>().set_ioport("MOUSE1Y");
 	m_soc->set_anport_counter_mode(2);
-	m_soc->set_anport_counter_mode(3, true);
+	m_soc->set_anport_counter_mode(3);
 	m_soc->set_data_address_mask(0xffffff);
 	// U7 is a 2 MiB, 16-bit flash using AMD/Fujitsu commands and the
 	// MBM29DL161TE sector layout. TODO: Verify the exact part from hardware.
@@ -2560,15 +2554,15 @@ void superxavix_suprtvpc_state::superxavix_suprtvpc(machine_config &config)
 	m_super_soc->pio_input_callback<2>().set(*this, FUNC(superxavix_suprtvpc_state::pio2_input_r));
 	m_super_soc->pio_output_callback<2>().set(*this, FUNC(superxavix_suprtvpc_state::pio2_output_w));
 
-	// Both one-button mice use writable relative counters; vertical polarity is opposite MAME's mouse Y.
+	// Both one-button mice use writable relative counters.
 	m_soc->anport_input_callback<0>().set(m_mouse[0], FUNC(tvpc_mouse_port_device::x_r));
 	m_soc->anport_input_callback<1>().set(m_mouse[0], FUNC(tvpc_mouse_port_device::y_r));
 	m_soc->anport_input_callback<2>().set(m_mouse[1], FUNC(tvpc_mouse_port_device::x_r));
 	m_soc->anport_input_callback<3>().set(m_mouse[1], FUNC(tvpc_mouse_port_device::y_r));
 	m_soc->set_anport_counter_mode(0);
-	m_soc->set_anport_counter_mode(1, true);
+	m_soc->set_anport_counter_mode(1);
 	m_soc->set_anport_counter_mode(2);
-	m_soc->set_anport_counter_mode(3, true);
+	m_soc->set_anport_counter_mode(3);
 
 	SUPRTVPC_CART_SLOT(config, m_cart, [this, &config] (device_slot_interface &slot)
 	{
@@ -2790,7 +2784,7 @@ void superxavix_epo_ntpj_state::superxavix_epo_ntpj(machine_config &config)
 	m_soc->anport_input_callback<2>().set(m_mouse, FUNC(tvpc_mouse_port_device::x_r));
 	m_soc->anport_input_callback<3>().set(m_mouse, FUNC(tvpc_mouse_port_device::y_r));
 	m_soc->set_anport_counter_mode(2);
-	m_soc->set_anport_counter_mode(3, true);
+	m_soc->set_anport_counter_mode(3);
 
 	m_super_soc->pio_input_callback<0>().set(*this, FUNC(superxavix_epo_ntpj_state::tvpc_pio0_input_r));
 	m_super_soc->pio_input_callback<1>().set(*this, FUNC(superxavix_epo_ntpj_state::pio1_input_r));

@@ -17,11 +17,10 @@ public:
 
 	void map(address_map &map) ATTR_COLD;
 
-	void set_counter_mode(unsigned channel, bool reverse = false)
+	void set_counter_mode(unsigned channel)
 	{
 		assert(channel < m_counter_mode.size());
 		m_counter_mode[channel] = true;
-		m_counter_reverse[channel] = reverse;
 	}
 
 	void set_counter_saturation(unsigned channel)
@@ -55,7 +54,6 @@ private:
 	devcb_read8::array<4> m_input_cb;
 
 	std::array<bool, 4> m_counter_mode;
-	std::array<bool, 4> m_counter_reverse;
 	std::array<bool, 4> m_counter_saturation;
 	std::array<u8, 4> m_counter_value;
 	std::array<u8, 4> m_counter_last_input;

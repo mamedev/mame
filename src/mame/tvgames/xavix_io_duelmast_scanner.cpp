@@ -17,9 +17,12 @@
     Card images: https://dm.takaratomy.co.jp/card (use the complete upright
     front, not an artwork crop).
 
-    Scanner Input defaults to the image sensor. The optional calibration and
-    named-card settings synthesize pixels without bypassing ROM recognition;
-    cards marked Ver.1 require the expansion cartridge.
+    Scanner Input defaults to the image sensor. The optional named-card
+    settings are a hack that synthesizes pixels from the ROM's recognition
+    signatures, allowing testing and use without scans of the full card
+    catalogue. Loaded card pictures use the image-sensor path instead.
+    The calibration setting supplies synthetic cover marks; cards marked
+    Ver.1 require the expansion cartridge.
 
     Suspected BTANB, not confirmed on hardware: the BIOS matcher at 00:f135
     triggers multiplication at 7ff4 before selecting signed mode at 7ff2.
@@ -508,7 +511,8 @@ bool xavix_duelmast_scanner_device::capture_manual_card(unsigned card)
 	if (!card || card > (expanded ? 366 : 120))
 		return false;
 
-	// This optional input aid expands a ROM signature into pixels; the ROM still performs acquisition and recognition.
+	// HACK: Reconstruct pixels from the ROM's recognition signatures for optional named-card selection.
+	// The ROM still acquires the pixels and performs recognition through the normal sensor interface.
 	std::array<int, 64> signature;
 	for (unsigned pixel = 0; pixel < signature.size(); ++pixel)
 	{

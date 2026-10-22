@@ -8,8 +8,8 @@
     lengths, framing and bit timing.
 
     TODO:
-    - Verify physical transmitter timing and repetition for the
-      configured controllers.
+    - Replace vblank-synchronised bursts with measured controller clocks,
+      repetition periods and independently phased transmitters.
 
 ***************************************************************************/
 
@@ -103,7 +103,8 @@ void xavix_ir_report_device::vblank_w(int state)
 				? (m_mode == mode::SAMPLE_SEQUENCE ? m_sequence_cb[report]() : m_report_cb[report]())
 				: NO_SEQUENCE;
 
-		// Defer the burst until the video interrupt has returned, avoiding serial-edge latency at vblank.
+		// Compatibility approximation: avoid receive latency and packets the ROM rejects across its video handler.
+		// Physical controllers transmit independently of console vblank; their repetition timing is unmeasured.
 		m_frame_pending = true;
 		m_frame_timer->adjust(attotime::from_msec(2));
 	}

@@ -1605,7 +1605,8 @@ void xavix_gungunrv_state::io1_output_w(u8 data, u8 direction)
 	xavix_i2c_state::io1_output_w(data, direction);
 	if (BIT(data & direction, 7) && !machine().side_effects_disabled())
 	{
-		// Startup tests each output with an $ff data latch; any other IO1.7 assertion requests shutdown.
+		// TODO: Startup drives IO1.7 high for about 0.19 us with an $ff latch; shutdown holds it high.
+		// The latch exemption is provisional until the board's pulse qualification is known.
 		if (m_soc->io_data_latch<1>() != 0xff)
 			machine().schedule_exit();
 	}
@@ -3899,13 +3900,13 @@ void xavix_tvpc_state::xavix_tvpc(machine_config &config)
 		port.option_add("mic_mouse", TVPC_HK_MOUSE);
 	}, "mouse", false);
 
-	// The mouse uses writable counters 2 and 3; vertical polarity is opposite MAME's mouse Y.
+	// The mouse uses writable counters 2 and 3.
 	m_soc->anport_input_callback<2>().set(m_mouse, FUNC(tvpc_mouse_port_device::x_r));
 	m_soc->anport_input_callback<3>().set(m_mouse, FUNC(tvpc_mouse_port_device::y_r));
 	m_soc->set_anport_counter_mode(2);
-	m_soc->set_anport_counter_mode(3, true);
+	m_soc->set_anport_counter_mode(3);
 	// These ROMs retain signed cursor positions in the counters, including the positive endpoint.
-	// The counters saturate at -128 and +127, discarding motion beyond either endpoint.
+	// Saturation is enabled here for compatibility; the production-revision differences are unverified.
 	m_soc->set_anport_counter_saturation(2);
 	m_soc->set_anport_counter_saturation(3);
 }
@@ -4569,11 +4570,11 @@ static INPUT_PORTS_START( tom_tvho )
 	// Relative scaling is provisional because the original counts per distance have not been measured.
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_NAME("P1 Controller X") PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1) PORT_CODE(MOUSECODE_X_INDEXED(0)) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID)
 	PORT_MODIFY("MOUSE0Y")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_NAME("P1 Controller Y") PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(1) PORT_CODE(MOUSECODE_Y_INDEXED(0)) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_NAME("P1 Controller Y") PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1) PORT_CODE(MOUSECODE_Y_INDEXED(0)) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID)
 	PORT_MODIFY("MOUSE1X")
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_NAME("P2 Controller X") PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(2) PORT_CODE(MOUSECODE_X_INDEXED(1)) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID)
 	PORT_MODIFY("MOUSE1Y")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_NAME("P2 Controller Y") PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_PLAYER(2) PORT_CODE(MOUSECODE_Y_INDEXED(1)) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_NAME("P2 Controller Y") PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(2) PORT_CODE(MOUSECODE_Y_INDEXED(1)) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID)
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Controller Button / Confirm") PORT_PLAYER(2) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(1))
@@ -4590,15 +4591,15 @@ void xavix_state::xavix_tom_tvho(machine_config &config)
 {
 	xavix_2mb(config);
 
-	// Each controller is a mechanical ball mouse connected to wrapping hardware counters.
+	// Each controller is a mechanical ball mouse connected to writable signed counters.
 	m_soc->anport_input_callback<0>().set_ioport("MOUSE0X");
 	m_soc->anport_input_callback<1>().set_ioport("MOUSE0Y");
 	m_soc->anport_input_callback<2>().set_ioport("MOUSE1X");
 	m_soc->anport_input_callback<3>().set_ioport("MOUSE1Y");
 	m_soc->set_anport_counter_mode(0);
-	m_soc->set_anport_counter_mode(1, true);
+	m_soc->set_anport_counter_mode(1);
 	m_soc->set_anport_counter_mode(2);
-	m_soc->set_anport_counter_mode(3, true);
+	m_soc->set_anport_counter_mode(3);
 }
 
 
@@ -4701,7 +4702,7 @@ void xavix_jarajal_state::xavix_jarajal(machine_config &config)
 {
 	xavix_nv_2mb(config);
 
-	// The lever is read through writable signed counter 0 and cleared by software.
+	// The lever uses writable signed counter 0; some paths retain its accumulated position.
 	m_soc->anport_input_callback<0>().set_ioport("DIAL");
 	m_soc->set_anport_counter_mode(0);
 
@@ -4792,11 +4793,11 @@ static INPUT_PORTS_START( ltv_tam )
 	// Relative scaling is provisional because the original counts per distance have not been measured.
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_NAME("P1 Trackball X") PORT_SENSITIVITY(50) PORT_KEYDELTA(32) PORT_PLAYER(1) PORT_CODE(MOUSECODE_X_INDEXED(0))
 	PORT_MODIFY("MOUSE0Y")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_NAME("P1 Trackball Y") PORT_SENSITIVITY(50) PORT_KEYDELTA(32) PORT_PLAYER(1) PORT_CODE(MOUSECODE_Y_INDEXED(0))
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_NAME("P1 Trackball Y") PORT_SENSITIVITY(50) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(1) PORT_CODE(MOUSECODE_Y_INDEXED(0))
 	PORT_MODIFY("MOUSE1X")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_NAME("P2 Trackball X") PORT_SENSITIVITY(50) PORT_KEYDELTA(32) PORT_PLAYER(2) PORT_CODE(MOUSECODE_X_INDEXED(1))
 	PORT_MODIFY("MOUSE1Y")
-	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_NAME("P2 Trackball Y") PORT_SENSITIVITY(50) PORT_KEYDELTA(32) PORT_PLAYER(2) PORT_CODE(MOUSECODE_Y_INDEXED(1))
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_NAME("P2 Trackball Y") PORT_SENSITIVITY(50) PORT_KEYDELTA(32) PORT_REVERSE PORT_PLAYER(2) PORT_CODE(MOUSECODE_Y_INDEXED(1))
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Push Button / Confirm") PORT_PLAYER(2) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(1))
@@ -4830,9 +4831,9 @@ void xavix_ltv_tam_state::xavix_ltv_tam(machine_config &config)
 	m_soc->anport_input_callback<2>().set_ioport("MOUSE1X");
 	m_soc->anport_input_callback<3>().set_ioport("MOUSE1Y");
 	m_soc->set_anport_counter_mode(0);
-	m_soc->set_anport_counter_mode(1, true);
+	m_soc->set_anport_counter_mode(1);
 	m_soc->set_anport_counter_mode(2);
-	m_soc->set_anport_counter_mode(3, true);
+	m_soc->set_anport_counter_mode(3);
 
 	XAVIX_TAMAGOTCHI_IR(config, m_tamagotchi, peripheral_clock());
 	m_tamagotchi->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<1>));
