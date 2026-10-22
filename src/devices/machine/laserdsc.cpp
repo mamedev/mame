@@ -803,6 +803,10 @@ void laserdisc_device::init_video()
 		frame.m_bitmap.set_palette(m_videopalette);
 		fillbitmap_yuy16(frame.m_bitmap, 40, 109, 240);
 
+		// no fields have been read into it yet
+		frame.m_numfields = 0;
+		frame.m_lastfield = 0;
+
 		// make a copy of the bitmap that clips out the VBI and horizontal blanking areas
 		frame.m_visbitmap.wrap(&frame.m_bitmap.pix(
 					44, frame.m_bitmap.width() * 8 / 720),
