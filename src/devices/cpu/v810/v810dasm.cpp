@@ -75,7 +75,7 @@ offs_t v810_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		case 0x13: util::stream_format(stream,"CMP %X,%s",I5(opc),GET2s(opc)); size=2; break;
 		case 0x14: util::stream_format(stream,"SHL %X,%s",UI5(opc),GET2s(opc)); size=2; break;
 		case 0x15: util::stream_format(stream,"SHR %X,%s",UI5(opc),GET2s(opc)); size=2; break;
-		case 0x16: util::stream_format(stream,"EI"); size=2; break;
+		case 0x16: util::stream_format(stream,"CLI"); size=2; break;
 		case 0x17: util::stream_format(stream,"SAR %X,%s",UI5(opc),GET2s(opc)); size=2; break;
 		case 0x18: util::stream_format(stream,"TRAP %X",I5(opc)); size=2; break;
 		case 0x19: util::stream_format(stream,"RETI"); size=2; flags = STEP_OUT; break;
@@ -83,7 +83,7 @@ offs_t v810_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 		case 0x1b: util::stream_format(stream,"Unk 0x1B"); size=2; break;
 		case 0x1c: util::stream_format(stream,"LDSR %s,%s",GET2s(opc),GETRs(opc));size=2; break;
 		case 0x1d: util::stream_format(stream,"STSR %s,%s",GETRs(opc),GET2s(opc));size=2; break;
-		case 0x1e: util::stream_format(stream,"DI"); size=2; break;
+		case 0x1e: util::stream_format(stream,"SEI"); size=2; break;
 		case 0x1f:
 					switch(opc&0x1f)
 						{
@@ -169,6 +169,11 @@ offs_t v810_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 									case 0x6: util::stream_format(stream,"MULF.S %s, %s",GET1s(opc),GET2s(opc)); break;
 									case 0x7: util::stream_format(stream,"DIVF.S %s, %s",GET1s(opc),GET2s(opc)); break;
 									case 0xb: util::stream_format(stream,"TRNC.SW %s, %s",GET1s(opc),GET2s(opc)); break;
+									// NVC (Virtual Boy) only
+									case 0x8: util::stream_format(stream,"XB %s",GET2s(opc)); break;
+									case 0x9: util::stream_format(stream,"XH %s",GET2s(opc)); break;
+									case 0xa: util::stream_format(stream,"REV %s, %s",GET1s(opc),GET2s(opc)); break;
+									case 0xc: util::stream_format(stream,"MPYHW %s, %s",GET1s(opc),GET2s(opc)); break;
 									default : util::stream_format(stream,"Unkf 0x%X",(opc2&0xfc00)>>10); break;
 								}
 							size=4;

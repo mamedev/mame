@@ -1234,7 +1234,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::vboy_scanlineR)
 void vboy_state::vboy(machine_config &config)
 {
 	/* basic machine hardware */
-	V810(config, m_maincpu, XTAL(20'000'000));
+	NVC(config, m_maincpu, XTAL(20'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &vboy_state::vboy_map);
 	// no AS_IO, and some games relies on r/w the program map with INH/OUTH
 	// cfr. vforce, nesterfb, panicbom (sound)
