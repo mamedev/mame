@@ -4286,8 +4286,8 @@ void xavix_state::xavix_tak_beyu(machine_config &config)
 	xavix_nv_2mb(config);
 
 	xavix_beyblade_link_device &link(XAVIX_BEYBLADE_LINK(config, "link"));
-	link.set_input_source(*this);
 	link.controls_callback().set_ioport("IN0");
+	link.host_reset_callback().set_ioport("RESET").bit(0);
 	m_soc->io().input_callback<0>().set(link, FUNC(xavix_beyblade_link_device::io_r));
 	m_soc->io().output_callback<0>().set(link, FUNC(xavix_beyblade_link_device::io_w));
 	m_screen->screen_vblank().append(link, FUNC(xavix_beyblade_link_device::vblank_w));

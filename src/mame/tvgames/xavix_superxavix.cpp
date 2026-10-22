@@ -2399,7 +2399,17 @@ void superxavix_tvpc_state::configure_tvpc_controller(machine_config &config)
 	m_super_soc->pio().set_legacy_output_mask<0>(0);
 	m_super_soc->pio().set_legacy_output_mask<1>(0);
 	XAVIX_TVPC_CONTROLLER(config, m_tvpc);
-	m_tvpc->set_input_source(*this);
+	m_tvpc->key_callback<0>().set_ioport("KEY0");
+	m_tvpc->key_callback<1>().set_ioport("KEY1");
+	m_tvpc->key_callback<2>().set_ioport("KEY2");
+	m_tvpc->key_callback<3>().set_ioport("KEY3");
+	m_tvpc->key_callback<4>().set_ioport("KEY4");
+	m_tvpc->key_callback<5>().set_ioport("KEY5");
+	m_tvpc->key_callback<6>().set_ioport("KEY6");
+	m_tvpc->key_callback<7>().set_ioport("KEY7");
+	m_tvpc->right_shift_callback().set_ioport("RIGHT_SHIFT").bit(0);
+	m_tvpc->player_callback<0>().set_ioport("P1");
+	m_tvpc->player_callback<1>().set_ioport("P2");
 	m_tvpc->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<2>));
 	m_screen->screen_vblank().append(m_tvpc, FUNC(xavix_tvpc_controller_device::vblank_w));
 }
@@ -2663,7 +2673,9 @@ void superxavix_epo_ntpj_state::superxavix_epo_ntpj(machine_config &config)
 	I2C_24C64(config, m_i2cmem);
 	configure_tvpc_controller(config);
 	XAVIX_PIANO_CONTROLLER(config, m_piano);
-	m_piano->set_input_source(*this);
+	m_piano->key_callback<0>().set_ioport("PIANO0");
+	m_piano->key_callback<1>().set_ioport("PIANO1");
+	m_piano->key_callback<2>().set_ioport("PIANO2");
 	m_piano->event_callback().set(m_soc->io(), FUNC(xavix_io_device::event_w<1>));
 
 	TVPC_MOUSE_PORT(config, m_mouse).set_default_option("mic_mouse");

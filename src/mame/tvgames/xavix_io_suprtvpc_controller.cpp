@@ -25,20 +25,11 @@ xavix_tvpc_controller_device::xavix_tvpc_controller_device(const machine_config 
 	: device_t(mconfig, XAVIX_TVPC_CONTROLLER, tag, owner, clock)
 	, device_rtc_interface(mconfig, *this)
 	, m_event_out_cb(*this)
-	, m_keys(*this, "KEY%u", 0U)
-	, m_right_shift(*this, "RIGHT_SHIFT")
-	, m_players(*this, "P%u", 1U)
+	, m_keys_cb(*this, 0)
+	, m_right_shift_cb(*this, 0)
+	, m_players_cb(*this, 0)
 	, m_queue{}
 {
-}
-
-void xavix_tvpc_controller_device::set_input_source(device_t &source)
-{
-	for (auto &port : m_keys)
-		port.set_tag(source, port.finder_tag());
-	m_right_shift.set_tag(source, m_right_shift.finder_tag());
-	for (auto &port : m_players)
-		port.set_tag(source, port.finder_tag());
 }
 
 void xavix_tvpc_controller_device::device_start()
@@ -104,11 +95,11 @@ u8 xavix_tvpc_controller_device::day_of_week(u8 year, u8 month, u8 day)
 u64 xavix_tvpc_controller_device::read_keyboard()
 {
 	u64 result = 0;
-	for (unsigned row = 0; row < m_keys.size(); row++)
-		result |= u64(m_keys[row]->read()) << (row * 8);
+	for (unsigned row = 0; row < m_keys_cb.size(); row++)
+		result |= u64(m_keys_cb[row]()) << (row * 8);
 
 	// Both physical Shift keys generate the same controller key code.
-	if (BIT(m_right_shift.read_safe(0), 0))
+	if (m_right_shift_cb())
 		result |= u64(1) << 2;
 
 	return result;
@@ -189,12 +180,12 @@ void xavix_tvpc_controller_device::scan_inputs()
 		changed &= changed - 1;
 	}
 
-	for (unsigned player = 0; player < m_players.size(); player++)
+	for (unsigned player = 0; player < m_players_cb.size(); player++)
 	{
-		if (!m_players[player].found())
+		if (m_players_cb[player].isunset())
 			continue;
 
-		u8 const controls = m_players[player].read_safe(0) & 0x1f;
+		u8 const controls = m_players_cb[player]() & 0x1f;
 		if (controls != m_player_state[player] && queue_report(4 + player, controls))
 			m_player_state[player] = controls;
 	}

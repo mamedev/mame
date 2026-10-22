@@ -51,22 +51,17 @@ xavix_beyblade_link_device::xavix_beyblade_link_device(
 		u32 clock)
 	: device_t(mconfig, XAVIX_BEYBLADE_LINK, tag, owner, clock)
 	, m_controls_cb(*this, 0)
+	, m_host_reset_cb(*this, 0)
 	, m_peer_config(*this, "PEER")
 	, m_peer_buttons(*this, "BUTTONS")
 	, m_peer_dial(*this, "DIAL")
 	, m_peer_ripcord(*this, "RIPCORD")
-	, m_host_reset(*this, "RESET")
 {
 }
 
 ioport_constructor xavix_beyblade_link_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( xavix_beyblade_link );
-}
-
-void xavix_beyblade_link_device::set_input_source(device_t &source)
-{
-	m_host_reset.set_tag(source, m_host_reset.finder_tag());
 }
 
 void xavix_beyblade_link_device::device_start()
@@ -156,7 +151,7 @@ void xavix_beyblade_link_device::vblank_w(int state)
 {
 	if (!state || !sync_peer())
 		return;
-	if (BIT(m_host_reset->read(), 0))
+	if (m_host_reset_cb())
 	{
 		// Re-arm the cable protocol while the local processor is held in physical reset.
 		reset_protocol();

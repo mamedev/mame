@@ -13,7 +13,7 @@ class xavix_piano_controller_device : public device_t
 public:
 	xavix_piano_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	void set_input_source(device_t &source) ATTR_COLD;
+	template <unsigned Row> auto key_callback() { return m_keys_cb[Row].bind(); }
 	auto event_callback() { return m_event_out_cb.bind(); }
 
 	u8 data_r() const { return m_data; }
@@ -38,7 +38,7 @@ private:
 	void light_w(offs_t offset, u8 data);
 
 	devcb_write_line m_event_out_cb;
-	required_ioport_array<3> m_keys;
+	devcb_read8::array<3> m_keys_cb;
 	required_device<pwm_display_device> m_led_pwm;
 	output_finder<14> m_key_lights;
 	emu_timer *m_event_timer;

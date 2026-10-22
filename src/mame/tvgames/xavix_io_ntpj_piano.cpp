@@ -17,7 +17,7 @@ DEFINE_DEVICE_TYPE(XAVIX_PIANO_CONTROLLER, xavix_piano_controller_device, "xavix
 xavix_piano_controller_device::xavix_piano_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, XAVIX_PIANO_CONTROLLER, tag, owner, clock)
 	, m_event_out_cb(*this)
-	, m_keys(*this, "PIANO%u", 0U)
+	, m_keys_cb(*this, 0)
 	, m_led_pwm(*this, "led_pwm")
 	, m_key_lights(*this, "piano_key_light%u", 0U)
 {
@@ -27,12 +27,6 @@ void xavix_piano_controller_device::device_add_mconfig(machine_config &config)
 {
 	PWM_DISPLAY(config, m_led_pwm).set_size(3, 5);
 	m_led_pwm->output_x().set(FUNC(xavix_piano_controller_device::light_w));
-}
-
-void xavix_piano_controller_device::set_input_source(device_t &source)
-{
-	for (auto &port : m_keys)
-		port.set_tag(source, port.finder_tag());
 }
 
 void xavix_piano_controller_device::device_start()
@@ -74,7 +68,7 @@ void xavix_piano_controller_device::host_w(u8 data, u8 direction)
 
 	if (!m_scanning)
 	{
-		m_shift = u32(m_keys[0]->read()) | (u32(m_keys[1]->read()) << 8) | (u32(m_keys[2]->read()) << 16);
+		m_shift = u32(m_keys_cb[0]()) | (u32(m_keys_cb[1]()) << 8) | (u32(m_keys_cb[2]()) << 16);
 		m_bit = 0;
 		m_data = BIT(m_shift, m_bit);
 		m_scanning = true;

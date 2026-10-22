@@ -15,7 +15,9 @@ class xavix_tvpc_controller_device : public device_t, public device_rtc_interfac
 public:
 	xavix_tvpc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	void set_input_source(device_t &source) ATTR_COLD;
+	template <unsigned Row> auto key_callback() { return m_keys_cb[Row].bind(); }
+	auto right_shift_callback() { return m_right_shift_cb.bind(); }
+	template <unsigned Player> auto player_callback() { return m_players_cb[Player].bind(); }
 	auto event_callback() { return m_event_out_cb.bind(); }
 
 	u8 data_r() const { return m_data; }
@@ -52,9 +54,9 @@ private:
 	void schedule_event();
 
 	devcb_write_line m_event_out_cb;
-	required_ioport_array<8> m_keys;
-	optional_ioport m_right_shift;
-	optional_ioport_array<2> m_players;
+	devcb_read8::array<8> m_keys_cb;
+	devcb_read_line m_right_shift_cb;
+	devcb_read8::array<2> m_players_cb;
 	emu_timer *m_event_timer;
 	emu_timer *m_clock_timer;
 

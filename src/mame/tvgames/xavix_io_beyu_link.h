@@ -13,8 +13,8 @@ class xavix_beyblade_link_device : public device_t
 public:
 	xavix_beyblade_link_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	void set_input_source(device_t &source) ATTR_COLD;
 	auto controls_callback() { return m_controls_cb.bind(); }
+	auto host_reset_callback() { return m_host_reset_cb.bind(); }
 	u8 io_r(offs_t offset, u8 direction);
 	void io_w(offs_t offset, u8 levels, u8 direction);
 	void vblank_w(int state);
@@ -54,11 +54,11 @@ private:
 	void advance_transmit();
 
 	devcb_read8 m_controls_cb;
+	devcb_read_line m_host_reset_cb;
 	required_ioport m_peer_config;
 	required_ioport m_peer_buttons;
 	required_ioport m_peer_dial;
 	required_ioport m_peer_ripcord;
-	required_ioport m_host_reset;
 	emu_timer *m_transmit_timer;
 	emu_timer *m_idle_timer;
 
