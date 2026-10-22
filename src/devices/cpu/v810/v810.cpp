@@ -21,7 +21,7 @@
  TODO:
   - Verify floating point opcodes (single precision IEEE-754 standard)
   - CY flag in floating point opcodes that supports them;
-  - Subclass NVC (vboy CPU), few extra opcodes plus onchip peripherals ($0200'0000 area);
+  - NVC (vboy CPU) onchip peripherals ($0200'0000 area);
   - implement trap opcode;
   - implement halt opcode;
   - implement double exception behaviour;
@@ -52,14 +52,27 @@
 #define clkIRQ 14
 
 DEFINE_DEVICE_TYPE(V810, v810_device, "v810", "NEC V810")
+DEFINE_DEVICE_TYPE(NINTENDO_NVC, nintendo_nvc_device, "nintendo_nvc", "Nintendo NVC")
 
 
 v810_device::v810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, V810, tag, owner, clock)
+	: v810_device(mconfig, V810, tag, owner, clock, false)
+{
+}
+
+v810_device::v810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool nvc)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 32, 32, 0)
+	, m_nvc(nvc)
 	, m_halted(false)
 	, m_bus_wait(*this)
+{
+}
+
+// V810 with the Virtual Boy instructions
+nintendo_nvc_device::nintendo_nvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: v810_device(mconfig, NINTENDO_NVC, tag, owner, clock, true)
 {
 }
 
@@ -250,11 +263,13 @@ void v810_device::icache_clear(u32 start, u32 count)
 	}
 }
 
+// invalid instruction exception, restarts the instruction
 uint32_t v810_device::opUNDEF(uint32_t op)
 {
-	logerror("V810: Unknown opcode %x @ %x",op,PC-2);
-	machine().debug_break();
-	return clkIF;
+	logerror("V810: invalid opcode %04x @ %08x\n", op, m_PPC);
+	PC = m_PPC;
+	take_exception(0xffffff90, 0xff90);
+	return 1;
 }
 
 uint32_t v810_device::opMOVr(uint32_t op) // mov reg1, reg2
@@ -680,16 +695,20 @@ uint32_t v810_device::opJAL(uint32_t op)
 	return 3;
 }
 
-// TODO: specific to NVC
-uint32_t v810_device::opEI(uint32_t op)
+// NVC only: CLI, clear PSW.ID (Virtual Boy Development Manual 4-6-3)
+uint32_t v810_device::opCLI(uint32_t op)
 {
+	if (!m_nvc)
+		return opUNDEF(op);
 	SET_ID(0);
 	return 1;
 }
 
-// TODO: specific to NVC
-uint32_t v810_device::opDI(uint32_t op)
+// NVC only: SEI, set PSW.ID (Virtual Boy Development Manual 4-6-4)
+uint32_t v810_device::opSEI(uint32_t op)
 {
+	if (!m_nvc)
+		return opUNDEF(op);
 	SET_ID(1);
 	return 1;
 }
@@ -1188,33 +1207,53 @@ uint32_t v810_device::opMPYHW(uint32_t op)
 	return 9;
 }
 
+uint32_t v810_device::opREV(uint32_t op)
+{
+	uint32_t val = GETREG(GET1);
+	val = ((val >> 1) & 0x55555555) | ((val & 0x55555555) << 1);
+	val = ((val >> 2) & 0x33333333) | ((val & 0x33333333) << 2);
+	val = ((val >> 4) & 0x0f0f0f0f) | ((val & 0x0f0f0f0f) << 4);
+	val = swapendian_int32(val);
+	SETREG(GET2, val);
+	return 1;
+}
+
 uint32_t v810_device::opFpoint(uint32_t op)
 {
-	uint32_t tmp=R_OP(PC);
-	uint32_t op_cycles = 0;
-	const u8 op_type = (tmp&0xfc00)>>10;
+	const u8 op_type = (R_OP(PC) & 0xfc00) >> 10;
 	PC += 2;
-	switch(op_type)
+	switch (op_type)
 	{
-		// TODO: (*) denotes Virtual Boy specific opcodes
-		// likely needs co-processor override
-		case 0x0: op_cycles = opCMPF(op);break;
-		case 0x2: op_cycles = opCVTW(op);break;
-		case 0x3: op_cycles = opCVTS(op);break;
-		case 0x4: op_cycles = opADDF(op);break;
-		case 0x5: op_cycles = opSUBF(op);break;
-		case 0x6: op_cycles = opMULF(op);break;
-		case 0x7: op_cycles = opDIVF(op);break;
-		case 0x8: op_cycles = opXB(op);  break; // (*)
-		case 0x9: op_cycles = opXH(op);  break; // (*)
-		//case 0xa: REV (*)
-		case 0xb: op_cycles = opTRNC(op);break;
-		case 0xc: op_cycles = opMPYHW(op); break; // (*)
+		case 0x0:
+			return opCMPF(op);
+		case 0x2:
+			return opCVTW(op);
+		case 0x3:
+			return opCVTS(op);
+		case 0x4:
+			return opADDF(op);
+		case 0x5:
+			return opSUBF(op);
+		case 0x6:
+			return opMULF(op);
+		case 0x7:
+			return opDIVF(op);
+		case 0xb:
+			return opTRNC(op);
+
+		// NVC only
+		case 0x8:
+			return m_nvc ? opXB(op) : opUNDEF(op);
+		case 0x9:
+			return m_nvc ? opXH(op) : opUNDEF(op);
+		case 0xa:
+			return m_nvc ? opREV(op) : opUNDEF(op);
+		case 0xc:
+			return m_nvc ? opMPYHW(op) : opUNDEF(op);
+
 		default:
-			throw emu_fatalerror("Floating point unknown type %02x\n", op_type);
-			break;
+			return opUNDEF(op);
 	}
-	return op_cycles;
 }
 
 // TODO: makes host performance to dip
@@ -1222,6 +1261,9 @@ uint32_t v810_device::opFpoint(uint32_t op)
 // Use scenario: pcfx reading from CD data port with no increment of source address.
 uint32_t v810_device::opBSU(uint32_t op)
 {
+	// sub-opcodes 04h-07h and 10h-1Fh are invalid
+	if ((op & 0x10) || (op & 0x0c) == 0x04)
+		return opUNDEF(op);
 	if(!(op & 8))
 		throw emu_fatalerror("V810: unknown BSU opcode %04x\n",op);
 
@@ -1360,7 +1402,7 @@ const v810_device::opcode_func v810_device::s_OpCodeTable[64] =
 	/* 0x13 */ &v810_device::opCMPi,      // cmp imm5,r2          2
 	/* 0x14 */ &v810_device::opSHLi,      // shl imm5,r2          2
 	/* 0x15 */ &v810_device::opSHRi,      // shr imm5,r2          2
-	/* 0x16 */ &v810_device::opEI,        // ei               2
+	/* 0x16 */ &v810_device::opCLI,       // cli              2
 	/* 0x17 */ &v810_device::opSARi,      // sar imm5,r2          2
 	/* 0x18 */ &v810_device::opTRAP,
 	/* 0x19 */ &v810_device::opRETI,
@@ -1368,7 +1410,7 @@ const v810_device::opcode_func v810_device::s_OpCodeTable[64] =
 	/* 0x1b */ &v810_device::opUNDEF,
 	/* 0x1c */ &v810_device::opLDSR,      // ldsr reg2,regID          2
 	/* 0x1d */ &v810_device::opSTSR,      // stsr regID,reg2          2
-	/* 0x1e */ &v810_device::opDI,    // DI               2
+	/* 0x1e */ &v810_device::opSEI,       // sei              2
 	/* 0x1f */ &v810_device::opBSU,
 	/* 0x20 */ &v810_device::opB,     // Branch (7 bit opcode)
 	/* 0x21 */ &v810_device::opB,     // Branch (7 bit opcode)

@@ -93,6 +93,8 @@ public:
 	template <typename... T> void set_bus_wait_callback(T &&... args) { m_bus_wait.set(std::forward<T>(args)...); }
 
 protected:
+	v810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool nvc);
+
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -120,6 +122,9 @@ private:
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
+
+	// Nintendo NVC (Virtual Boy): adds CLI/SEI and the XB/XH/REV/MPYHW sub-opcodes, invalid on a V810
+	const bool m_nvc;
 
 	uint32_t m_reg[65]{};
 	uint16_t m_irq_state;
@@ -176,8 +181,8 @@ private:
 	uint32_t opJMPr(uint32_t op);
 	uint32_t opJR(uint32_t op);
 	uint32_t opJAL(uint32_t op);
-	uint32_t opEI(uint32_t op);
-	uint32_t opDI(uint32_t op);
+	uint32_t opCLI(uint32_t op);
+	uint32_t opSEI(uint32_t op);
 	void take_exception(u32 handler, u16 code);
 	uint32_t opTRAP(uint32_t op);
 	uint32_t opRETI(uint32_t op);
@@ -211,12 +216,21 @@ private:
 	uint32_t opMPYHW(uint32_t op);
 	uint32_t opXB(uint32_t op);
 	uint32_t opXH(uint32_t op);
+	uint32_t opREV(uint32_t op);
 	uint32_t opFpoint(uint32_t op);
 	uint32_t opBSU(uint32_t op);
 	void check_interrupts();
 };
 
 
+class nintendo_nvc_device : public v810_device
+{
+public:
+	nintendo_nvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 DECLARE_DEVICE_TYPE(V810, v810_device)
+DECLARE_DEVICE_TYPE(NINTENDO_NVC, nintendo_nvc_device)
 
 #endif // MAME_CPU_V810_V810_H
