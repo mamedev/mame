@@ -1884,6 +1884,7 @@ end
 --@src/devices/cpu/m6502/w65c02s.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/xavix.h,CPUS["XAVIX"] = true
 --@src/devices/cpu/m6502/xavix.h,CPUS["XAVIX2000"] = true
+--@src/devices/cpu/m6502/superxavix.h,CPUS["XAVIX2000"] = true
 
 --------------------------------------------------
 
@@ -2029,6 +2030,8 @@ if CPUS["XAVIX2000"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/m6502/xavix2000.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/xavix2000.h",
+		MAME_DIR .. "src/devices/cpu/m6502/superxavix.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/superxavix.h",
 	}
 
 	custombuildtask {
@@ -2038,7 +2041,7 @@ if CPUS["XAVIX2000"] then
 
 	dependency {
 		{ MAME_DIR .. "src/devices/cpu/m6502/xavix2000.cpp",    GEN_DIR .. "emu/cpu/m6502/xavix2000.hxx" },
-		{ MAME_DIR .. "src/devices/cpu/m6502/xavix2000.cpp",    GEN_DIR .. "emu/cpu/m6502/superxavix.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/m6502/superxavix.cpp",   GEN_DIR .. "emu/cpu/m6502/superxavix.hxx" },
 	}
 end
 

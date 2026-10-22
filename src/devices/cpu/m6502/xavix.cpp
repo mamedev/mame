@@ -82,7 +82,8 @@ device_memory_interface::space_config_vector xavix_device::memory_space_config()
 
 void xavix_device::device_start()
 {
-	m_mintf = std::make_unique<mi_xavix>(this);
+	if (!m_mintf)
+		m_mintf = std::make_unique<mi_xavix>(this);
 
 	// bind delegates
 	m_interrupt_vector_callback.resolve();
@@ -176,10 +177,20 @@ uint8_t xavix_device::read_codebank_stack(uint32_t addr)
 
 uint8_t xavix_device::read_banked_data(uint32_t addr)
 {
-	return read_banked_data((addr & 0xff0000)>>16, addr & 0xffff);
+	return downcast<mi_xavix &>(*m_mintf).read_banked(addr);
 }
 
-inline uint8_t xavix_device::read_banked_data(uint8_t databank, uint16_t adr)
+uint8_t xavix_device::read_banked_data(uint8_t databank, uint16_t adr)
+{
+	return read_banked_data((uint32_t(databank) << 16) | adr);
+}
+
+uint8_t xavix_device::read_banked_data_raw(uint32_t addr)
+{
+	return read_banked_data_raw((addr & 0xff0000)>>16, addr & 0xffff);
+}
+
+inline uint8_t xavix_device::read_banked_data_raw(uint8_t databank, uint16_t adr)
 {
 	if (databank < 0x80)
 	{
@@ -211,7 +222,12 @@ inline uint8_t xavix_device::read_banked_data(uint8_t databank, uint16_t adr)
 inline uint8_t xavix_device::mi_xavix::read(uint16_t adr)
 {
 	uint8_t databank = m_base->databank();
-	return m_base->read_banked_data(databank, adr);
+	return read_banked((uint32_t(databank) << 16) | adr);
+}
+
+uint8_t xavix_device::mi_xavix::read_banked(uint32_t adr)
+{
+	return m_base->read_banked_data_raw(adr);
 }
 
 // opcode reads
@@ -235,60 +251,46 @@ uint8_t xavix_device::mi_xavix::read_arg(uint16_t adr)
 // data writes
 void xavix_device::write_banked_data(uint32_t addr, uint8_t val)
 {
-	write_banked_data((addr & 0xff0000)>>16, addr & 0xffff, val);
+	downcast<mi_xavix &>(*m_mintf).write_banked(addr, val);
+}
+
+void xavix_device::write_banked_data(uint8_t databank, uint16_t adr, uint8_t val)
+{
+	write_banked_data((uint32_t(databank) << 16) | adr, val);
+}
+
+void xavix_device::write_banked_data_raw(uint32_t addr, uint8_t val)
+{
+	write_banked_data_raw((addr & 0xff0000)>>16, addr & 0xffff, val);
 }
 
 uint8_t xavix_device::read_stack(uint32_t addr)
 {
 	// address is always 0x100-0x1ff
-	return m_lowbus.read_interruptible((addr & 0xff) + 0x100);
+	return read_banked_data((addr & 0xff) + 0x100);
 }
 
 void xavix_device::write_stack(uint32_t addr, uint8_t val)
 {
 	// address is always 0x100-0x1ff
-	m_lowbus.write_interruptible((addr & 0xff) + 0x100, val);
+	write_banked_data((addr & 0xff) + 0x100, val);
 }
 
 uint8_t xavix_device::read_zeropage(uint32_t addr)
 {
 	// address is always 0x00-0xff
-	addr &= 0xff;
-
-	if (addr == 0xfe)
-	{
-		return m_codebank;
-	}
-	else if (addr == 0xff)
-	{
-		return m_databank;
-	}
-
-	return m_lowbus.read_interruptible(addr);
+	return read_banked_data(addr & 0xff);
 }
 
 void xavix_device::write_zeropage(uint32_t addr, uint8_t val)
 {
 	// address is always 0x00-0xff
-	addr &= 0xff;
-
-	if (addr == 0xfe)
-	{
-		m_codebank = val;
-		return;
-	}
-	else if (addr == 0xff)
-	{
-		m_databank = val;
-		return;
-	}
-
-	m_lowbus.write_interruptible(addr, val);
+	write_banked_data(addr & 0xff, val);
 }
 
 
 // data writes
-inline void xavix_device::write_banked_data(uint8_t databank, uint16_t adr, uint8_t val)
+inline void xavix_device::write_banked_data_raw(uint8_t databank, uint16_t adr, uint8_t val)
 {
 	if (databank < 0x80)
 	{
@@ -321,7 +323,12 @@ inline void xavix_device::write_banked_data(uint8_t databank, uint16_t adr, uint
 void xavix_device::mi_xavix::write(uint16_t adr, uint8_t val)
 {
 	uint8_t databank = m_base->databank();
-	m_base->write_banked_data(databank, adr, val);
+	write_banked((uint32_t(databank) << 16) | adr, val);
+}
+
+void xavix_device::mi_xavix::write_banked(uint32_t adr, uint8_t val)
+{
+	m_base->write_banked_data_raw(adr, val);
 }
 
 void xavix_device::set_codebank(uint8_t bank)

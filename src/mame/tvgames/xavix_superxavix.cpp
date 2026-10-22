@@ -90,7 +90,7 @@
 #include "xavix_io_step_mat.h"
 
 #include "bus/xavix/domyos_step.h"
-#include "cpu/m6502/xavix2000.h"
+#include "cpu/m6502/superxavix.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"

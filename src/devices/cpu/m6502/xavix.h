@@ -155,6 +155,8 @@ public:
 	uint8_t read_banked_data(uint32_t addr);
 	void write_banked_data(uint8_t databank, uint16_t adr, uint8_t val);
 	void write_banked_data(uint32_t addr, uint8_t val);
+	// Other bus masters bypass CPU buffering and wait states.
+	void write_banked_data_raw(uint32_t addr, uint8_t val);
 
 protected:
 	enum {
@@ -173,7 +175,13 @@ protected:
 		virtual uint8_t read_sync(uint16_t adr) override;
 		virtual uint8_t read_arg(uint16_t adr) override;
 		virtual void write(uint16_t adr, uint8_t val) override;
+		virtual uint8_t read_banked(uint32_t adr);
+		virtual void write_banked(uint32_t adr, uint8_t val);
 	};
+
+	uint8_t read_banked_data_raw(uint32_t addr);
+	uint8_t read_banked_data_raw(uint8_t databank, uint16_t addr);
+	void write_banked_data_raw(uint8_t databank, uint16_t addr, uint8_t val);
 
 	uint8_t m_databank;
 	uint8_t m_codebank;
@@ -182,7 +190,7 @@ protected:
 
 	xavix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool full_bank_register_decode, bool use_separate_codebank_stack);
 
-	uint32_t code_address(uint16_t adr) { return adr | (codebank() << 16); }
+	uint32_t code_address(uint16_t adr) { return adr | (m_codebank << 16); }
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

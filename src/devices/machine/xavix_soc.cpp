@@ -31,7 +31,7 @@
 #include "xavix_sound.h"
 #include "xavix_timer.h"
 
-#include "cpu/m6502/xavix2000.h"
+#include "cpu/m6502/superxavix.h"
 
 #include <algorithm>
 #include <random>
@@ -254,7 +254,7 @@ void xavix_soc_device::configure_common(machine_config &config)
 
 	XAVIX_DMA(config, m_dma, DERIVED_CLOCK(1, 2));
 	m_dma->source_read_callback().set(*this, FUNC(xavix_soc_device::read_banked_data_bypass));
-	m_dma->destination_write_callback().set([this](offs_t address, u8 data) { m_maincpu->write_banked_data(address, data); });
+	m_dma->destination_write_callback().set([this](offs_t address, u8 data) { m_maincpu->write_banked_data_raw(address, data); });
 	m_dma->irq_callback().set(m_intc, FUNC(xavix_intc_device::irq_w<xavix_intc_device::IRQ_DMA>));
 
 	XAVIX_SOUND(config, m_sound, DERIVED_CLOCK(1, 2));
