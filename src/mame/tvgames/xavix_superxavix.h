@@ -5,9 +5,10 @@
 
 #pragma once
 
-#include "xavix.h"
+#include "xavix_base.h"
 #include "xavix_io_anpanmdx_sticks.h"
 #include "xavix_io_bkgj_survi_buster.h"
+#include "xavix_io_card.h"
 #include "xavix_io_image_sensor.h"
 #include "xavix_io_ir_step_mat.h"
 #include "xavix_io_ntpj_piano.h"
@@ -22,6 +23,7 @@
 
 #include "bus/xavix/suprtvpc_cart.h"
 #include "bus/xavix/suprtvpc_exp.h"
+#include "bus/xavix/tvpc_mouse.h"
 #include "machine/intelfsh.h"
 #include "machine/s35390a.h"
 #include "sound/m61545.h"

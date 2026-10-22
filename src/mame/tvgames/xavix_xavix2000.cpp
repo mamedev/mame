@@ -34,7 +34,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "xavix.h"
+#include "xavix_xavix2000.h"
 
 #include "cpu/m6502/xavix2000.h"
 #include "machine/i2cmem.h"

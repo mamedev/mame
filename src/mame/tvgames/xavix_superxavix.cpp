@@ -93,6 +93,7 @@
 #include "cpu/m6502/xavix2000.h"
 
 #include "softlist_dev.h"
+#include "speaker.h"
 
 #include <algorithm>
 #include <cmath>
