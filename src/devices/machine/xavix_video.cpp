@@ -47,6 +47,7 @@ xavix_video_device::xavix_video_device(const machine_config &mconfig, device_typ
 	, m_video_read_cb(*this)
 	, m_irq_cb(*this)
 	, m_nmi_cb(*this)
+	, m_vblank_cb(*this)
 	, m_sprite_dma_source_cb(*this, 0xff)
 	, m_spriteram(*this, "spriteram")
 	, m_tilemap1_regs(*this, "tilemap1_regs")
@@ -199,6 +200,15 @@ void xavix_video_device::device_start()
 	m_arena_irq_timer = timer_alloc(FUNC(xavix_video_device::arena_irq_gen), this);
 	m_sprite_dma_timer = timer_alloc(FUNC(xavix_video_device::sprite_dma_tick), this);
 	m_video_counter_timer = timer_alloc(FUNC(xavix_video_device::counter_field_start), this);
+	m_raster_visible = screen().visible_area();
+	m_vblank_start_timer = timer_alloc(FUNC(xavix_video_device::raster_vblank), this);
+	m_vblank_end_timer = timer_alloc(FUNC(xavix_video_device::raster_vblank), this);
+	m_vblank_start_timer->adjust(screen().time_until_pos(0), 1);
+
+	save_item(NAME(m_raster_visible.min_x));
+	save_item(NAME(m_raster_visible.max_x));
+	save_item(NAME(m_raster_visible.min_y));
+	save_item(NAME(m_raster_visible.max_y));
 
 	save_item(NAME(m_text_array));
 	save_item(NAME(m_sprite_read_latch));
@@ -236,7 +246,6 @@ void superxavix_video_device::device_start()
 	m_graphics_read_cb.resolve();
 	m_bitmap_read_cb.resolve();
 	screen().register_screen_bitmap(m_output_bitmap);
-	screen().register_vblank_callback(vblank_state_delegate(&superxavix_video_device::bitmap_vblank, this));
 	m_video_field_timer = timer_alloc(FUNC(superxavix_video_device::video_field_start), this);
 	m_picture_nmi_timer = timer_alloc(FUNC(superxavix_video_device::picture_nmi), this);
 
@@ -248,6 +257,7 @@ void superxavix_video_device::device_start()
 	save_item(NAME(m_bitmap_position));
 	save_item(NAME(m_bitmap_source_offset));
 	save_item(NAME(m_bitmap_vertical_gate));
+	save_item(NAME(m_bitmap_rendered));
 	save_item(STRUCT_MEMBER(m_bitmap_rows, offset));
 	save_item(STRUCT_MEMBER(m_bitmap_rows, enabled));
 	save_item(NAME(m_video_timing.horizontal_total));
@@ -318,6 +328,7 @@ void superxavix_video_device::device_reset()
 	m_bitmap_position = 0;
 	m_bitmap_source_offset = 0;
 	m_bitmap_vertical_gate = false;
+	m_bitmap_rendered = false;
 	m_bitmap_rows = {};
 	m_picture_nmi_timer->adjust(attotime::never);
 	m_video_field_timer->adjust(attotime::never);

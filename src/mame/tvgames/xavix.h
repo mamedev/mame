@@ -318,8 +318,7 @@ protected:
 	virtual u8 io1_input_r(u8 direction) override;
 	virtual void io0_output_w(u8 data, u8 direction) override;
 	virtual void io1_output_w(u8 data, u8 direction) override;
-	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
-	virtual void device_stop() override ATTR_COLD;
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 	struct lcd_state
@@ -340,7 +339,6 @@ private:
 	void lcd_serial_w(bool select, bool clock, bool data);
 	void lcd_register_w(unsigned address, u16 data);
 	void lcd_vblank(int state);
-	void lcd_screen_vblank(int state);
 	u32 screen_update_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_volume();
 
@@ -354,7 +352,6 @@ private:
 	required_ioport_array<2> m_microphone_volume;
 	required_device_array<filter_volume_device, 2> m_volume_filter;
 	bitmap_rgb32 m_lcd_source_bitmap;
-	screen_output m_lcd_output;
 	lcd_state m_lcd;
 	u8 m_volume_step;
 	bool m_volume_clock;

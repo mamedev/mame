@@ -61,7 +61,6 @@
 #include "bus/xavix/beyblade_link.h"
 #include "sound/beep.h"
 
-#include "render.h"
 #include "softlist_dev.h"
 
 #include <algorithm>
@@ -141,9 +140,7 @@ void xavix_state::configure_board(machine_config &config)
 			NTSC_RASTER_WIDTH, NTSC_HBLANK_END, NTSC_RASTER_WIDTH, NTSC_RASTER_HEIGHT, NTSC_VBLANK_END, NTSC_RASTER_HEIGHT);
 	m_screen->set_refresh(attotime::from_ticks(
 			u64(NTSC_LINE_CLOCKS) * xavix_video_device::NTSC_FIELD_HALF_LINES, m_soc->clock() * 2));
-	m_screen->set_video_attributes(VIDEO_SELF_RENDER);
-	m_screen->set_screen_update(FUNC(xavix_state::screen_update));
-	m_screen->screen_vblank().append(FUNC(xavix_state::screen_vblank));
+	m_screen->set_screen_update(m_soc, FUNC(xavix_soc_device::screen_update));
 
 	m_soc->add_route(0, "speaker", 1.0, 0);
 	m_soc->add_route(1, "speaker", 1.0, 1);
@@ -269,18 +266,11 @@ void xavix_state::machine_start()
 	for (beep_device &beeper : device_type_enumerator<beep_device>(*this))
 		beeper.output_to_stream_output(0).first->set_sample_rate(machine().sample_rate());
 
-	m_screen_output.start(machine());
 	if (m_nvram)
 	{
 		auto const ram = m_soc->backup_ram();
 		m_nvram->set_base(ram.data(), ram.size());
 	}
-}
-
-void xavix_state::device_stop()
-{
-	m_screen_output.stop(machine());
-	driver_device::device_stop();
 }
 
 //-------------------------------------------------
@@ -295,66 +285,6 @@ u8 xavix_state::external_code_r(offs_t offset)
 u8 xavix_state::external_data_r(offs_t offset)
 {
 	return external_code_r(offset);
-}
-
-//-------------------------------------------------
-//  Screen Output
-//-------------------------------------------------
-
-void xavix_state::screen_output::start(running_machine &machine)
-{
-	m_texture = machine.render().texture_alloc();
-}
-
-void xavix_state::screen_output::stop(running_machine &machine)
-{
-	machine.render().texture_free(m_texture);
-}
-
-void xavix_state::screen_output::update(screen_device &screen, bitmap_rgb32 const &bitmap, rectangle const &cliprect, rectangle area)
-{
-	if ((cliprect.bottom() != screen.visible_area().bottom()) || (cliprect.right() != screen.visible_area().right()))
-		return;
-
-	// Publish the completed picture before post-processing, not a zoomed electrical raster.
-	area &= screen.visible_area();
-	area &= bitmap.cliprect();
-	bitmap_rgb32 &display = m_bitmap[m_index];
-	if (area.empty())
-	{
-		display.resize(1, 1);
-		display.fill(rgb_t::black());
-	}
-	else
-	{
-		display.resize(area.width(), area.height());
-		copybitmap(display, bitmap, 0, 0, -area.left(), -area.top(), display.cliprect());
-	}
-	m_texture->set_bitmap(display, display.cliprect(), TEXFORMAT_RGB32);
-	m_index ^= 1;
-	restore(screen);
-}
-
-void xavix_state::screen_output::restore(screen_device &screen)
-{
-	screen.container().empty();
-	if (m_bitmap[m_index ^ 1].valid())
-		screen.container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, rgb_t::white(), m_texture,
-				PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
-}
-
-u32 xavix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	u32 const result = m_soc->screen_update(screen, bitmap, cliprect);
-	m_screen_output.update(screen, bitmap, cliprect, m_soc->picture_area());
-	return result;
-}
-
-void xavix_state::screen_vblank(int state)
-{
-	// Discard transient overlays even when the next field is skipped.
-	if (!state)
-		m_screen_output.restore(*m_screen);
 }
 
 //-------------------------------------------------
@@ -601,7 +531,7 @@ void xavix_state::configure_ir(machine_config &config, required_device<xavix_ir_
 {
 	XAVIX_IR_MOTION(config, controllers, peripheral_clock()).set_controller_type(type);
 	controllers->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
-	m_screen->screen_vblank().append(controllers, FUNC(xavix_ir_motion_device::vblank_w));
+	m_soc->raster_vblank_callback().append(controllers, FUNC(xavix_ir_motion_device::vblank_w));
 }
 
 void xavix_ir_state::xavix_ir(machine_config &config)
@@ -1831,7 +1761,7 @@ void xavix_rad_crdn_state::configure_remote(machine_config &config)
 	XAVIX_CARDNIGHT_REMOTE(config, m_remote, peripheral_clock());
 	m_remote->dock_callback().set_ioport("ROW1").bit(4);
 	m_remote->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
-	m_screen->screen_vblank().append(m_remote, FUNC(xavix_cardnight_remote_device::vblank_w));
+	m_soc->raster_vblank_callback().append(m_remote, FUNC(xavix_cardnight_remote_device::vblank_w));
 }
 
 INPUT_CHANGED_MEMBER(xavix_rad_crdn_state::remote_reset)
@@ -1962,7 +1892,7 @@ void xavix_epo_baseball_state::configure_controllers(machine_config &config)
 	XAVIX_BASEBALL_CONTROLLERS(config, m_controllers, peripheral_clock());
 	m_controllers->set_controller_type(xavix_baseball_controllers_device::controller_type::STADIUM_DX);
 	m_controllers->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
-	m_screen->screen_vblank().append(m_controllers, FUNC(xavix_baseball_controllers_device::vblank_w));
+	m_soc->raster_vblank_callback().append(m_controllers, FUNC(xavix_baseball_controllers_device::vblank_w));
 }
 
 void xavix_epo_baseball_state::xavix_epo_esdx(machine_config &config)
@@ -2059,7 +1989,7 @@ void xavix_epo_stad_state::xavix_epo_stad(machine_config &config)
 
 	XAVIX_STADIUM_BAT(config, m_controllers, peripheral_clock());
 	m_controllers->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
-	m_screen->screen_vblank().append(m_controllers, FUNC(xavix_stadium_bat_device::vblank_w));
+	m_soc->raster_vblank_callback().append(m_controllers, FUNC(xavix_stadium_bat_device::vblank_w));
 }
 
 
@@ -2097,7 +2027,7 @@ void xavix_tak_comt_state::xavix_tak_comt(machine_config &config)
 	XAVIX_COMET_BATON(config, m_baton_controller, peripheral_clock());
 	m_baton_controller->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_soc->io_output_callback<1>().append(m_baton_controller, FUNC(xavix_comet_baton_device::station_w));
-	m_screen->screen_vblank().append(m_baton_controller, FUNC(xavix_comet_baton_device::vblank_w));
+	m_soc->raster_vblank_callback().append(m_baton_controller, FUNC(xavix_comet_baton_device::vblank_w));
 }
 
 u8 xavix_tak_comt_state::io1_input_r(u8 direction)
@@ -2148,12 +2078,12 @@ void xavix_tak_wdg_state::xavix_tak_wdg(machine_config &config)
 
 	XAVIX_GRANBLADE(config, m_granblade, peripheral_clock());
 	m_granblade->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
-	m_screen->screen_vblank().append(m_granblade, FUNC(xavix_granblade_device::vblank_w));
+	m_soc->raster_vblank_callback().append(m_granblade, FUNC(xavix_granblade_device::vblank_w));
 
 	XAVIX_WEBKNIGHT(config, m_webknight, peripheral_clock());
 	// These callbacks deliver receiver-edge events, not maintained signal levels.
 	m_webknight->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
-	m_screen->screen_vblank().append(m_webknight, FUNC(xavix_webknight_device::vblank_w));
+	m_soc->raster_vblank_callback().append(m_webknight, FUNC(xavix_webknight_device::vblank_w));
 }
 
 
@@ -2357,7 +2287,7 @@ void xavix_epo_crok_state::xavix_epo_crok(machine_config &config)
 
 	XAVIX_CROKET_CONTROLLERS(config, m_controllers, peripheral_clock());
 	m_controllers->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
-	m_screen->screen_vblank().append(m_controllers, FUNC(xavix_croket_controllers_device::vblank_w));
+	m_soc->raster_vblank_callback().append(m_controllers, FUNC(xavix_croket_controllers_device::vblank_w));
 }
 
 void xavix_epo_crok_state::machine_start()
@@ -2478,13 +2408,13 @@ xavix_baseball_ball_device &xavix_state::configure_baseball(machine_config &conf
 	m_soc->adc_input_callback<0>().set(ball, FUNC(xavix_baseball_ball_device::vertical_buttons_r));
 	m_soc->adc_input_callback<1>().set(ball, FUNC(xavix_baseball_ball_device::horizontal_buttons_r));
 	m_soc->adc_input_callback<4>().set(ball, FUNC(xavix_baseball_ball_device::motion_r));
-	m_screen->screen_vblank().append(ball, FUNC(xavix_baseball_ball_device::vblank_w));
+	m_soc->raster_vblank_callback().append(ball, FUNC(xavix_baseball_ball_device::vblank_w));
 	// AN5 and AN7 are equal at the normal setting; their difference is the low-battery monitor, not a motion axis.
 
 	xavix_baseball_bat_device &bat(XAVIX_BASEBALL_BAT(config, "bat"));
 	bat.set_screen(m_screen);
 	bat.set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
-	m_screen->screen_vblank().append(bat, FUNC(xavix_baseball_bat_device::vblank_w));
+	m_soc->raster_vblank_callback().append(bat, FUNC(xavix_baseball_bat_device::vblank_w));
 	return ball;
 }
 
@@ -2940,9 +2870,9 @@ void xavix_hikara_state::xavix_hikara(machine_config &config)
 
 	// The serial framing and boot registers match an OTA5182-compatible LCD controller.
 	// TODO: Verify the fitted controller/panel and CT675 scaling and colour processing.
-	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE | VIDEO_SELF_RENDER);
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_screen_update(FUNC(xavix_hikara_state::screen_update));
-	m_screen->screen_vblank().append(FUNC(xavix_hikara_state::lcd_vblank));
+	m_soc->raster_vblank_callback().append(FUNC(xavix_hikara_state::lcd_vblank));
 
 	// Retain the source geometry while presenting it at the panel's 5:4 aspect ratio.
 	SCREEN(config, m_lcd_screen).set_lcd();
@@ -2951,9 +2881,8 @@ void xavix_hikara_state::xavix_hikara(machine_config &config)
 			m_screen->height(), visible.top(), visible.bottom() + 1);
 	m_lcd_screen->set_refresh(m_screen->frame_period());
 	m_lcd_screen->set_physical_aspect(5, 4);
-	m_lcd_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE | VIDEO_SELF_RENDER);
+	m_lcd_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_lcd_screen->set_screen_update(FUNC(xavix_hikara_state::screen_update_lcd));
-	m_lcd_screen->screen_vblank().append(FUNC(xavix_hikara_state::lcd_screen_vblank));
 	config.set_default_layout(layout_hikara);
 
 	// U7 is marked Cheertek CT675A-F; TODO: verify its A-revision address selection and register reset values on hardware.
@@ -2982,7 +2911,6 @@ void xavix_hikara_state::machine_start()
 {
 	xavix_ekara_state::machine_start();
 
-	m_lcd_output.start(machine());
 	m_screen->register_screen_bitmap(m_lcd_source_bitmap);
 	save_item(NAME(m_lcd_source_bitmap));
 	save_item(NAME(m_ct675_i2c_sda));
@@ -2997,12 +2925,6 @@ void xavix_hikara_state::machine_start()
 	save_item(NAME(m_lcd.brightness));
 	save_item(NAME(m_volume_step));
 	save_item(NAME(m_volume_clock));
-}
-
-void xavix_hikara_state::device_stop()
-{
-	m_lcd_output.stop(machine());
-	xavix_ekara_state::device_stop();
 }
 
 void xavix_hikara_state::machine_reset()
@@ -3148,7 +3070,7 @@ void xavix_hikara_state::lcd_register_w(unsigned address, u16 data)
 
 u32 xavix_hikara_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	xavix_state::screen_update(screen, bitmap, cliprect);
+	m_soc->screen_update(screen, bitmap, cliprect);
 	copybitmap(m_lcd_source_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
@@ -3156,13 +3078,15 @@ u32 xavix_hikara_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 void xavix_hikara_state::lcd_vblank(int state)
 {
 	if (state)
+	{
 		m_lcd.brightness = (int(m_lcd.regs[7] & 0x7f) - 0x40) * 4;
-}
-
-void xavix_hikara_state::lcd_screen_vblank(int state)
-{
-	if (!state)
-		m_lcd_output.restore(*m_lcd_screen);
+		if (m_lcd_screen->visible_area() != m_screen->visible_area())
+		{
+			m_lcd_screen->configure(m_screen->width(), m_screen->height(), m_screen->visible_area(), m_screen->frame_period());
+			m_lcd_screen->reset_origin(-m_screen->visible_area().top(), 0);
+			m_lcd_screen->reset_partial_updates();
+		}
+	}
 }
 
 u32 xavix_hikara_state::screen_update_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -3190,7 +3114,6 @@ u32 xavix_hikara_state::screen_update_lcd(screen_device &screen, bitmap_rgb32 &b
 			}
 		}
 	}
-	m_lcd_output.update(screen, bitmap, cliprect, m_soc->picture_area());
 	return 0;
 }
 
@@ -3594,7 +3517,7 @@ void xavix_tak_daig_state::xavix_tak_daig(machine_config &config)
 	XAVIX_DAIGUNDER_ROBOTS(config, m_robots, peripheral_clock());
 	m_robots->set_screen(m_screen);
 	m_robots->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<2>));
-	m_screen->screen_vblank().append(m_robots, FUNC(xavix_daigunder_robots_device::vblank_w));
+	m_soc->raster_vblank_callback().append(m_robots, FUNC(xavix_daigunder_robots_device::vblank_w));
 
 	SOFTWARE_LIST(config, "cart_list_daig").set_original("daig_cart");
 }
@@ -4455,7 +4378,7 @@ void xavix_has_wamg_state::xavix_has_wamg(machine_config &config)
 
 	XAVIX_WAMG_SENSOR(config, m_sensor, peripheral_clock());
 	m_soc->adc_input_callback<0>().set(m_sensor, FUNC(xavix_wamg_sensor_device::adc_r));
-	m_screen->screen_vblank().append(m_sensor, FUNC(xavix_wamg_sensor_device::vblank_w));
+	m_soc->raster_vblank_callback().append(m_sensor, FUNC(xavix_wamg_sensor_device::vblank_w));
 }
 
 void xavix_has_wamg_state::io0_output_w(u8 data, u8 direction)
@@ -4555,7 +4478,7 @@ void xavix_state::xavix_tak_beyu(machine_config &config)
 	link.host_reset_callback().set_ioport("RESET").bit(0);
 	m_soc->io_input_callback<0>().set(link, FUNC(xavix_beyblade_link_port_device::io_r));
 	m_soc->io_output_callback<0>().set(link, FUNC(xavix_beyblade_link_port_device::io_w));
-	m_screen->screen_vblank().append(link, FUNC(xavix_beyblade_link_port_device::vblank_w));
+	m_soc->raster_vblank_callback().append(link, FUNC(xavix_beyblade_link_port_device::vblank_w));
 
 	m_soc->anport_input_callback<0>().set_ioport("DIAL");
 	m_soc->set_anport_counter_mode(0);
@@ -4563,7 +4486,7 @@ void xavix_state::xavix_tak_beyu(machine_config &config)
 	xavix_beyblade_ripcord_device &ripcord(XAVIX_BEYBLADE_RIPCORD(config, "ripcord"));
 	ripcord.set_screen(m_screen);
 	ripcord.set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
-	m_screen->screen_vblank().append(ripcord, FUNC(xavix_beyblade_ripcord_device::vblank_w));
+	m_soc->raster_vblank_callback().append(ripcord, FUNC(xavix_beyblade_ripcord_device::vblank_w));
 }
 
 

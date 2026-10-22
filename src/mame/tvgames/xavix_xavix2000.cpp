@@ -567,7 +567,7 @@ void xavix2000_epo_ebox_state::xavix2000_epo_ebox(machine_config &config)
 
 	XAVIX_EBOX_GLOVES(config, m_gloves, peripheral_clock());
 	m_gloves->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
-	m_screen->screen_vblank().append(m_gloves, FUNC(xavix_ebox_gloves_device::vblank_w));
+	m_soc->raster_vblank_callback().append(m_gloves, FUNC(xavix_ebox_gloves_device::vblank_w));
 }
 
 

@@ -87,21 +87,6 @@ public:
 protected:
 	using video_standard = xavix_video_device::video_standard;
 
-	class screen_output
-	{
-	public:
-		void start(running_machine &machine) ATTR_COLD;
-		void stop(running_machine &machine) ATTR_COLD;
-		void update(screen_device &screen, bitmap_rgb32 const &bitmap, rectangle const &cliprect, rectangle area);
-		void restore(screen_device &screen);
-
-	private:
-		// Keep the published picture stable across partial updates and raster-size changes.
-		bitmap_rgb32 m_bitmap[2];
-		render_texture *m_texture = nullptr;
-		unsigned m_index = 0;
-	};
-
 	static constexpr u32 NTSC_MASTER_CLOCK = 42'954'540;
 	static constexpr u32 PAL_MASTER_CLOCK = 42'562'740;
 	static constexpr u32 NTSC_LINE_CLOCKS = xavix_video_device::NTSC_LINE_CLOCKS;
@@ -118,7 +103,6 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_start() override ATTR_COLD;
-	virtual void device_stop() override ATTR_COLD;
 
 	u32 peripheral_clock() const { return m_soc->clock() / 2; }
 	void configure_microphone(machine_config &config) ATTR_COLD;
@@ -163,11 +147,6 @@ protected:
 	void xavix_4mb_extbus_map(address_map &map) ATTR_COLD;
 	void xavix_2mb_extbus_map(address_map &map) ATTR_COLD;
 	void xavix_1mb_extbus_map(address_map &map) ATTR_COLD;
-
-	// screen updates
-	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_vblank(int state);
-	screen_output m_screen_output;
 
 	virtual u8 external_code_r(offs_t offset);
 	virtual u8 external_data_r(offs_t offset);

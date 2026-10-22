@@ -60,6 +60,45 @@ constexpr std::array<u8, 0x1a> superxavix_video_device::TIMING_PAL_DEFAULT =
 	0x14, 0x35
 };
 
+void xavix_video_device::configure_raster(int width, int height, rectangle const &visible, attotime period)
+{
+	m_raster_visible = visible;
+	rectangle picture = picture_area() & visible;
+	if (picture.empty())
+		picture = rectangle(0, 0, 0, 0);
+	if ((screen().width() != width) || (screen().height() != height)
+			|| (screen().visible_area() != picture) || (screen().frame_period() != period))
+	{
+		// Changing the visible bottom shifts the screen's beam coordinates.
+		// Retain the beam position while selecting the displayed picture.
+		int const row = screen().vpos();
+		int const pixel = screen().hpos();
+		screen().configure(width, height, picture, period);
+		screen().reset_origin(row - picture.top(), pixel);
+	}
+	m_vblank_start_timer->adjust(screen().time_until_pos(0), 1);
+	m_vblank_end_timer->adjust(screen().time_until_pos(m_raster_visible.top()), 0);
+}
+
+void xavix_video_device::reset_raster_origin(int row)
+{
+	screen().reset_origin(row - screen().visible_area().top(), 0);
+	m_vblank_start_timer->adjust(screen().time_until_pos(0), 1);
+	m_vblank_end_timer->adjust(screen().time_until_pos(m_raster_visible.top()), 0);
+}
+
+TIMER_CALLBACK_MEMBER(xavix_video_device::raster_vblank)
+{
+	if (param)
+	{
+		raster_end();
+		configure_raster(screen().width(), screen().height(), m_raster_visible, screen().frame_period());
+		// A full-height field has coincident electrical blanking edges.
+		m_vblank_end_timer->adjust(m_raster_visible.top() ? screen().time_until_pos(m_raster_visible.top()) : attotime::zero, 0);
+	}
+	m_vblank_cb(param);
+}
+
 void superxavix_video_device::configure_screen(screen_device &screen, u32 master_clock, video_standard standard)
 {
 	auto const &defaults = (standard == video_standard::PAL) ? TIMING_PAL_DEFAULT : TIMING_NTSC_DEFAULT;
@@ -111,8 +150,7 @@ void superxavix_video_device::reset_video_timing()
 	m_video_timing = calculate_video_timing();
 	apply_video_timing();
 	xavix_video_device::reset_video_timing();
-	// Screen reset offsets are relative to blanking end, not raster row zero.
-	screen().reset_origin(screen().height() - m_video_timing.vertical_origin - screen().visible_area().min_y, 0);
+	reset_raster_origin(screen().height() - m_video_timing.vertical_origin);
 }
 
 superxavix_video_device::video_timing superxavix_video_device::calculate_video_timing() const
@@ -167,7 +205,7 @@ void superxavix_video_device::apply_video_timing()
 			u64(m_video_timing.horizontal_total) * m_video_timing.half_lines,
 			clock() * 2);
 
-	screen().configure(m_video_timing.width(), m_video_timing.height(), m_video_timing.visible_area(), period);
+	configure_raster(m_video_timing.width(), m_video_timing.height(), m_video_timing.visible_area(), period);
 	if (m_arena_irq_timer && (m_arena_ctrl & ARENA_IRQ_ENABLE))
 		schedule_arena_irq();
 }
@@ -358,7 +396,7 @@ xavix_video_device::picture_event_delays xavix_video_device::predict_picture_del
 
 void xavix_video_device::schedule_picture_irqs()
 {
-	// Earlier chips still use screen timing for raster IRQ/NMI and partial updates.
+	// Earlier chips retain raster-based IRQ/NMI timing and partial updates.
 	// Only the arena has been moved to the retained picture counters here.
 	unsigned const arena = ((m_arena_ctrl & ARENA_IRQ_ENABLE) && !m_arena_irq_pending) ? PREDICT_ARENA : 0;
 	picture_event_delays const next = predict_picture_delays(PREDICT_FIELD | arena);
@@ -395,8 +433,12 @@ TIMER_CALLBACK_MEMBER(superxavix_video_device::picture_nmi)
 {
 	sync_video_counters();
 	// Finish this native field before software replaces its picture data.
-	// TODO: Align partial updates with the picture counters rather than the screen's approximate scanline origin.
+	// TODO: Align partial updates with the picture counters rather than the approximate raster origin.
 	screen().update_partial(screen().visible_area().max_y);
+	// Retain the full-raster tail of a rendered field, including after its
+	// cropped picture was published. Skipped fields advance at blanking.
+	if (m_bitmap_rendered)
+		update_bitmap_rows(screen().height() - 1);
 	xavix_video_device::vblank();
 	m_picture_nmi_timer->adjust(predict_picture_delays(PREDICT_NMI).nmi);
 }

@@ -64,6 +64,7 @@ public:
 	auto external_bus_ctrl_callback() { return m_external_bus_ctrl_cb.bind(); }
 	template <typename... T> void set_video_read_callback(T &&... args) { m_video.lookup()->set_video_read_callback(std::forward<T>(args)...); }
 	template <typename... T> void set_vblank_callback(T &&... args) { m_vblank_cb.set(std::forward<T>(args)...); }
+	auto raster_vblank_callback() { return m_video.lookup()->vblank_callback(); }
 
 	template <unsigned Event> void trigger_io_event() { m_io->trigger_event<Event>(); }
 	template <unsigned Port> u8 io_direction() const { return m_io->direction<Port>(); }
@@ -76,7 +77,6 @@ public:
 	void reset_w(int state);
 	void cpu_reset_w(int state);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	rectangle picture_area() const { return m_video->picture_area(); }
 
 protected:
 	xavix_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -113,7 +113,7 @@ private:
 	void program_ram_w(offs_t offset, u8 data);
 	u8 read_low_bus_bypass(u32 address);
 	TIMER_CALLBACK_MEMBER(reset_changed);
-	INTERRUPT_GEN_MEMBER(vblank);
+	void vblank_w(int state);
 	u8 lightgun_r(offs_t offset);
 	u8 lightgun2_r(offs_t offset);
 	u8 rom_access_ctrl_r();
@@ -154,7 +154,6 @@ private:
 	memory_access<15, 0, 0, ENDIANNESS_LITTLE>::specific m_lowbus;
 	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::specific m_external;
-	std::string m_screen_tag;
 	device_t *m_external_map_device;
 	address_map_constructor m_external_map;
 

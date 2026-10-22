@@ -619,7 +619,7 @@ std::pair<int, int> superxavix_video_device::render_offset() const
 	// Picture Y reloads at the end of the preceding raster row.
 	int const row = defaults.vertical_reference - util::sext(defaults.top, 9) + 1
 			- int(pal && BIT(m_video_timing.half_lines, 0));
-	return { screen().visible_area().min_x, row - m_video_timing.vertical_origin };
+	return { m_video_timing.visible_area().min_x, row - m_video_timing.vertical_origin };
 }
 
 //-------------------------------------------------
@@ -801,6 +801,7 @@ rectangle superxavix_video_device::picture_area() const
 
 u32 superxavix_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	m_bitmap_rendered = true;
 	update_bitmap_rows(cliprect.max_y);
 	bitmap.fill(rgb_t::black(), cliprect);
 	auto const [xoffset, yoffset] = render_offset();
@@ -852,18 +853,15 @@ void superxavix_video_device::advance_bitmap_row()
 	m_bitmap_rows[m_bitmap_scanline] = { m_bitmap_source_offset, m_bitmap_vertical_gate };
 }
 
-void superxavix_video_device::bitmap_vblank(screen_device &screen, bool state)
+void superxavix_video_device::raster_end()
 {
-	if (state)
-	{
-		// Blanking starts at raster row zero, after the screen finishes the old field.
-		// Only the cache cursor restarts; the gate, position and source remain live.
-		update_bitmap_rows(screen.height() - 1);
-		m_bitmap_scanline = -1;
-		int const origin = (m_video_standard == video_standard::PAL) ? BITMAP_VERTICAL_ORIGIN_PAL : BITMAP_VERTICAL_ORIGIN_NTSC;
-		// The position becomes zero at this reference and compares zero on the next row.
-		m_bitmap_reference = PICTURE_FIRST_ROW - origin + render_offset().second - 1;
-	}
+	// Only the cache cursor restarts; the gate, position and source remain live.
+	update_bitmap_rows(screen().height() - 1);
+	m_bitmap_scanline = -1;
+	m_bitmap_rendered = false;
+	int const origin = (m_video_standard == video_standard::PAL) ? BITMAP_VERTICAL_ORIGIN_PAL : BITMAP_VERTICAL_ORIGIN_NTSC;
+	// The position becomes zero at this reference and compares zero on the next row.
+	m_bitmap_reference = PICTURE_FIRST_ROW - origin + render_offset().second - 1;
 }
 
 void superxavix_video_device::update_bitmap_rows(int scanline)

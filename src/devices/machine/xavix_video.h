@@ -32,11 +32,11 @@ public:
 	template <typename... T> void set_video_read_callback(T &&... args) { m_video_read_cb.set(std::forward<T>(args)...); }
 	auto irq_callback() { return m_irq_cb.bind(); }
 	auto nmi_callback() { return m_nmi_cb.bind(); }
+	auto vblank_callback() { return m_vblank_cb.bind(); }
 	auto sprite_dma_source_callback() { return m_sprite_dma_source_cb.bind(); }
 
 	virtual void map(address_map &map) ATTR_COLD;
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	virtual rectangle picture_area() const;
 	u8 read_low_bus_bypass(u32 address);
 	virtual void vblank();
 
@@ -249,6 +249,10 @@ protected:
 	void sync_video_counters();
 	virtual counter_config counter_parameters() const;
 	virtual void reset_video_timing();
+	void configure_raster(int width, int height, rectangle const &visible, attotime period);
+	void reset_raster_origin(int row);
+	virtual rectangle picture_area() const;
+	virtual void raster_end() { }
 	static u32 counter_interval(counter_config const &config, video_counters const &counters);
 	static void advance_counters(counter_config const &config, video_counters &counters, u64 ticks);
 	u32 arena_interval(counter_config const &config, video_counters const &counters, arena_state const &arena) const;
@@ -260,6 +264,7 @@ protected:
 	device_delegate<u8 (u32)> m_video_read_cb;
 	devcb_write_line m_irq_cb;
 	devcb_write_line m_nmi_cb;
+	devcb_write_line m_vblank_cb;
 	devcb_read8 m_sprite_dma_source_cb;
 	required_shared_ptr<u8> m_spriteram;
 	required_shared_ptr<u8> m_tilemap1_regs;
@@ -301,6 +306,10 @@ protected:
 	int m_video_hres_scale;
 
 private:
+	rectangle m_raster_visible;
+	TIMER_CALLBACK_MEMBER(raster_vblank);
+	emu_timer *m_vblank_start_timer;
+	emu_timer *m_vblank_end_timer;
 	static constexpr int ORIGINAL_PICTURE_DELAY_CLOCKS = 24;
 	// Uncontended master clocks per byte; earlier-chip timing remains unmeasured.
 	static constexpr unsigned SPRITE_DMA_BYTE_CLOCKS = 2;
@@ -365,7 +374,6 @@ public:
 
 	virtual void map(address_map &map) override ATTR_COLD;
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
-	virtual rectangle picture_area() const override;
 	// The picture NMI is timed independently of the presentation screen.
 	virtual void vblank() override { }
 
@@ -378,6 +386,8 @@ protected:
 	virtual u16 palette_data(int pen) const override;
 	virtual void set_palette_data(int pen, u16 data) override;
 	virtual void reset_video_timing() override;
+	virtual rectangle picture_area() const override;
+	virtual void raster_end() override;
 	virtual counter_config counter_parameters() const override;
 	virtual void schedule_picture_irqs() override;
 	virtual void schedule_raster_irq() override;
@@ -470,7 +480,6 @@ private:
 	TIMER_CALLBACK_MEMBER(picture_nmi);
 	TIMER_CALLBACK_MEMBER(video_field_start);
 	void bitmap_params_w(offs_t offset, u8 data);
-	void bitmap_vblank(screen_device &screen, bool state);
 	void update_bitmap_rows(int scanline);
 	void advance_bitmap_row();
 	bool horizontal_reload_in_blanking(counter_config const &config) const;
@@ -498,6 +507,7 @@ private:
 	u16 m_bitmap_position;
 	u32 m_bitmap_source_offset;
 	bool m_bitmap_vertical_gate;
+	bool m_bitmap_rendered;
 	std::array<bitmap_row, 0x200> m_bitmap_rows;
 	video_timing m_video_timing;
 	bitmap_rgb32 m_output_bitmap;

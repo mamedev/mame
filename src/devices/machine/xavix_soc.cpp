@@ -285,10 +285,8 @@ void xavix_soc_device::set_data_address_mask(u32 mask)
 
 void xavix_soc_device::configure_screen()
 {
-	auto const [base, tag] = m_screen.finder_target();
-	m_screen_tag = base.subtag(tag);
-	m_maincpu.lookup()->set_vblank_int(m_screen_tag.c_str(), *this, FUNC(xavix_soc_device::vblank));
 	m_video.lookup()->set_screen(m_screen);
+	m_video.lookup()->vblank_callback().set(*this, FUNC(xavix_soc_device::vblank_w));
 }
 
 void xavix_soc_device::device_start()
@@ -419,10 +417,13 @@ u8 xavix_soc_device::lightgun2_r(offs_t offset)
 	return m_lightgun_read_cb(offset + 4);
 }
 
-INTERRUPT_GEN_MEMBER(xavix_soc_device::vblank)
+void xavix_soc_device::vblank_w(int state)
 {
-	m_video->vblank();
-	m_vblank_cb();
+	if (state && !m_maincpu->suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE | SUSPEND_REASON_CLOCK))
+	{
+		m_video->vblank();
+		m_vblank_cb();
+	}
 }
 
 u32 xavix_soc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
