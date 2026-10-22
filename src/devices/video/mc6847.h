@@ -176,6 +176,7 @@ protected:
 		bool poll_config();
 		void set_pal_artifacting(bool palartifacting) { m_palartifacting = palartifacting; }
 		bool get_pal_artifacting() { return m_palartifacting; }
+		bool get_ntsc_artifacting() const { return m_artifacting != 0 && !m_palartifacting; }
 		void create_color_blend_table(const pixel_t *palette);
 
 		// artifacting application
