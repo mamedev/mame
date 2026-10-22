@@ -499,60 +499,47 @@ void duart_base_device::start_ct(int count)
 
 TIMER_CALLBACK_MEMBER(duart_base_device::duart_timer_callback)
 {
+	// OP3 can be the counter/timer output, selected by the OPCR
+	bool const op3_counter_output = (OPCR & 0xc) == 0x4;
+
+	// the timer output can clock either channel
+	auto clock_from_timer = [](duart_channel &chan, bool half_period)
+	{
+		uint8_t const csr = chan.get_chan_CSR();
+		if ((csr & 0x0f) == 0x0d)   // tx is timer driven
+			chan.tx_16x_clock_w(half_period);
+		if ((csr & 0xf0) == 0xd0)   // rx is timer driven
+			chan.rx_16x_clock_w(half_period);
+	};
+
 	if (ACR & 0x40)
 	{
-		// Timer mode
+		// Timer mode: OP3 toggles with the timer output
 		half_period ^= 1;
 
-		// timer output to bit 3?
-		if ((OPCR & 0xc) == 0x4)
-		{
+		if (op3_counter_output)
 			OPR ^= 0x8;
-			write_outport(OPR ^ 0xff);
-		}
 
-		// timer driving any serial channels?
-		uint8_t csr = m_chanA->get_chan_CSR();
-
-		if ((csr & 0x0f) == 0x0d)   // tx is timer driven
-		{
-			m_chanA->tx_16x_clock_w(half_period);
-		}
-		if ((csr & 0xf0) == 0xd0)   // rx is timer driven
-		{
-			m_chanA->rx_16x_clock_w(half_period);
-		}
-
-		csr = m_chanB->get_chan_CSR();
-		if ((csr & 0x0f) == 0x0d)   // tx is timer driven
-		{
-			m_chanB->tx_16x_clock_w(half_period);
-		}
-		if ((csr & 0xf0) == 0xd0)   // rx is timer driven
-		{
-			m_chanB->rx_16x_clock_w(half_period);
-		}
+		clock_from_timer(*m_chanA, half_period);
+		clock_from_timer(*m_chanB, half_period);
 
 		if (!half_period)
 			set_ISR_bits(INT_COUNTER_READY);
 
-		int count = std::max(CTR.w.l, uint16_t(1));
-		start_ct(count);
+		start_ct(std::max(CTR.w.l, uint16_t(1)));
 	}
 	else
 	{
-		// assert OP3 counter ready
-		if ((OPCR & 0xc) == 0x4)
-		{
+		// Counter mode: assert OP3 until the counter is read
+		if (op3_counter_output)
 			OPR |= 0x8;
-			write_outport(OPR ^ 0xff);
-		}
 
-		// Counter mode
 		set_ISR_bits(INT_COUNTER_READY);
 		start_ct(0xffff);
 	}
 
+	if (op3_counter_output)
+		write_outport(OPR ^ 0xff);
 }
 
 uint8_t mc68681_device::read(offs_t offset)
