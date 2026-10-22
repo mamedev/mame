@@ -17,28 +17,6 @@
     - The sensor dies are labeled CU5501 for Lord of the Rings and CU5501A
       for Star Wars and Dragon Quest, apparently from ETOMS.
 
-    Test-mode entry:
-    - ban_omt, ban_onep, epo_hamc: Hold Select Up and Select Down from startup,
-      then soft reset and release. Press and release Select Up at INTERNAL
-      RAM TEST to enter CIS TEST. Use O / Confirm for the automatic checks.
-    - epo_bowl, epo_golf, epo_mini: Hold Up and Down from startup, then soft
-      reset and release. Press and release Up at INTERNAL RAM TEST to enter
-      CIS TEST. Use O / Confirm for the automatic checks.
-    - ttv_mx: Hold Motion Up, Brake and Accelerator from startup, then soft
-      reset and release. Press and release Accelerator at INTERNAL RAM TEST
-      to start automatic checks.
-    - tom_jump: Hold Motion Up, Dash and Brake from startup, then soft reset
-      and release. Press and release Dash at INTERNAL RAM TEST to start
-      automatic checks.
-    - epo_ebox: Hold Up and Down from startup, then soft reset after about
-      one second and release. The automatic checks start directly.
-    - tak_chq: Hold P1 Brake, P1 Accelerator and P1 Command from startup,
-      then soft reset after about one second and release. The automatic
-      checks start directly.
-    - tom_dpgm: Hold Power from startup and soft reset after about one
-      second. Keep Power held for another seven seconds, then release.
-      At CIS TEST, press and release Power to start the automatic checks.
-
     BTANB:
     - tak_chq: Two red road-tile pixels remain visible at the right border at
       race start, also seen in hardware footage: https://www.youtube.com/watch?v=vTAt31e7X7Q
@@ -47,7 +25,9 @@
     - duelmast: Verify sensor timing and physical image alignment.
     - epo_sdb: Measure physical trackball scaling.
     - epo_sdb, epo_es2j and duelmast: Measure physical battery-voltage scaling.
-    - epo_ebox and epo_sdb: Identify remaining status inputs and factory-test contacts.
+    - epo_ebox: Identify remaining status inputs and factory-test contacts.
+    - ttv_lotr: Identify the four GPIO contacts in the final factory I/O page.
+    - epo_sdb: Identify factory-contact wiring and the NORMAL/DEMO line source.
     - Shared CPU identification: Confirm chip generations where extended
       opcodes are the only evidence; epo_ebox has independent hardware identification.
 
@@ -339,13 +319,72 @@ static INPUT_PORTS_START( drgqst )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) // Pointing, slashing, guarding and near-camera magic use the sword image.
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0xf7, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x77, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The test page identifies demo mode; its physical source is unknown.
+	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
+
+	// The factory contacts share the EEPROM pins; their physical fixture is unidentified.
+	PORT_START("FACTORY")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test L (EEPROM Data)") PORT_CODE(KEYCODE_9) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix2000_drgqst_state::factory_contact_changed), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test R (EEPROM Clock)") PORT_CODE(KEYCODE_0) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix2000_drgqst_state::factory_contact_changed), 0)
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void xavix2000_i2c_camera_state::xavix2000_drgqst(machine_config &config)
+void xavix2000_drgqst_state::xavix2000_drgqst(machine_config &config)
 {
 	xavix2000_i2c_24c08(config);
 	configure_camera(config, xavix_analog_image_sensor_device::target_shape::ROD);
+}
+
+void xavix2000_drgqst_state::machine_start()
+{
+	xavix2000_i2c_camera_state::machine_start();
+	save_item(NAME(m_io1_data));
+	save_item(NAME(m_io1_direction));
+}
+
+void xavix2000_drgqst_state::machine_reset()
+{
+	xavix2000_i2c_camera_state::machine_reset();
+	m_io1_data = 0;
+	m_io1_direction = 0;
+	update_eeprom_bus();
+}
+
+u8 xavix2000_drgqst_state::io1_input_r(u8 direction)
+{
+	u8 data = xavix2000_i2c_camera_state::io1_input_r(direction);
+	u8 const contacts = m_factory_contacts->read();
+	if (BIT(contacts, 0))
+		data &= ~0x08;
+	if (BIT(contacts, 1))
+		data |= 0x10;
+	return data;
+}
+
+void xavix2000_drgqst_state::io1_output_w(u8 data, u8 direction)
+{
+	m_io1_data = data;
+	m_io1_direction = direction;
+	update_eeprom_bus();
+	m_camera->control_w(data, direction);
+}
+
+void xavix2000_drgqst_state::update_eeprom_bus()
+{
+	u8 const contacts = m_factory_contacts->read();
+	bool const data = (!BIT(m_io1_direction, 3) || BIT(m_io1_data, 3)) && !BIT(contacts, 0);
+	bool const clock = BIT(m_io1_direction, 4) ? BIT(m_io1_data, 4) : BIT(contacts, 1);
+	m_i2cmem->write_sda(data);
+	m_i2cmem->write_scl(clock);
+}
+
+INPUT_CHANGED_MEMBER(xavix2000_drgqst_state::factory_contact_changed)
+{
+	if (machine().phase() == machine_phase::RUNNING)
+		update_eeprom_bus();
 }
 
 
@@ -427,12 +466,18 @@ static INPUT_PORTS_START( ban_omt )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0xf7, IP_ACTIVE_HIGH, IPT_UNUSED ) // Frame and pixel status come from the camera.
+	PORT_BIT( 0x37, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("drive", FUNC(xavix_omt_drive_device::data_r))
 INPUT_PORTS_END
 
-void xavix2000_i2c_camera_state::xavix2000_ban_omt(machine_config &config)
+void xavix2000_ban_omt_state::xavix2000_ban_omt(machine_config &config)
 {
 	xavix2000_i2c_24c04_4mb(config);
+	XAVIX_OMT_DRIVE(config, m_drive);
 	configure_camera(config, xavix_analog_image_sensor_device::target_shape::DISK);
 	// A compact starting target avoids continually requesting the ROM's near-camera action.
 	m_camera->set_target_size_small(true);
@@ -856,7 +901,7 @@ CONS( 2005, ttv_mx,   0,      0, xavix2000_i2c_24c04,        ttv_mx,   xavix_i2c
 CONS( 2005, tom_jump, 0,      0, xavix2000_i2c_24c04,        tom_jump, xavix_i2c_state,            empty_init, "Tomy / SSD Company Ltd.", "TV de Asobitai IDATEN Jump: Gekisou IDATEN Battle (Japan)", 0 )
 
 // 剣神ドラゴンクエスト 甦りし伝説の剣
-CONS( 2003, drgqst,   0,      0, xavix2000_drgqst,           drgqst,   xavix2000_i2c_camera_state, empty_init, "Square Enix / SSD Company Ltd.", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken (Japan)", 0 )
+CONS( 2003, drgqst,   0,      0, xavix2000_drgqst,           drgqst,   xavix2000_drgqst_state,     empty_init, "Square Enix / SSD Company Ltd.", "Kenshin Dragon Quest: Yomigaerishi Densetsu no Ken (Japan)", 0 )
 
 // チョロＱビュンビュンレーサー
 CONS( 2003, tak_chq,  0,      0, xavix2000_tak_chq,          tak_chq,  xavix_i2c_state,            empty_init, "Takara / SSD Company Ltd.", "Choro-Q Byun Byun Racer (Japan)", 0 )
@@ -865,7 +910,7 @@ CONS( 2003, tak_chq,  0,      0, xavix2000_tak_chq,          tak_chq,  xavix_i2c
 CONS( 2004, ban_onep, 0,      0, xavix2000_ban_onep,         ban_onep, xavix2000_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Taikan Kakutou One Piece Punch Battle: Kaizoku Ou ni Kimi ga Naru! (Japan)", MACHINE_NOT_WORKING )
 
 // Let’s！TV プレイ　闘印奥義　陰陽大戦記　～目指せ最強闘神士～ - 2004 date on PCB, 2005 in-game
-CONS( 2005, ban_omt,  0,      0, xavix2000_ban_omt,          ban_omt,  xavix2000_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Touin Ougi Onmyou Taisenki: Mezase Saikyou Toushinshi (Japan)", MACHINE_NOT_WORKING )
+CONS( 2005, ban_omt,  0,      0, xavix2000_ban_omt,          ban_omt,  xavix2000_ban_omt_state,    empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Touin Ougi Onmyou Taisenki: Mezase Saikyou Toushinshi (Japan)", MACHINE_NOT_WORKING )
 
 // テレビで遊び隊 ディズニープリンセス　キラキラ魔法のレッスン
 CONS( 2004, tom_dpgm, 0,      0, xavix2000_tom_dpgm,         tom_dpgm, xavix2000_i2c_camera_state, empty_init, "Tomy / SSD Company Ltd.", "TV de Asobitai Disney Princess: Kirakira Mahou no Lesson (Japan)", MACHINE_NOT_WORKING )

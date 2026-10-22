@@ -45,6 +45,7 @@ public:
 
 	void superxavix(machine_config &config) ATTR_COLD;
 	void superxavix_4mb(machine_config &config) ATTR_COLD;
+	void superxavix_nv_4mb(machine_config &config) ATTR_COLD;
 
 	ioport_value primary_controls_r() { return m_in0->read(); }
 	DECLARE_INPUT_CHANGED_MEMBER(xavixport_reset_button);
@@ -587,6 +588,7 @@ public:
 		, m_mouse(*this, "mouse%u", 1U)
 		, m_cart(*this, "cartslot")
 		, m_rombank(*this, "rombank")
+		, m_factory_loopbacks(*this, "TEST_LOOPBACKS")
 	{ }
 
 	void superxavix_suprtvpc(machine_config &config) ATTR_COLD;
@@ -601,6 +603,9 @@ protected:
 
 private:
 	u8 cartridge_rom_r(offs_t offset);
+	u8 pio0_input_r(offs_t offset, u8 mem_mask);
+	u8 pio0_input_mask_r();
+	u8 factory_loopback_mask() const;
 	u8 pio1_input_r(offs_t offset, u8 mem_mask);
 	void pio0_output_w(offs_t offset, u8 data, u8 mem_mask);
 	void pio1_output_w(offs_t offset, u8 data, u8 mem_mask);
@@ -612,6 +617,9 @@ private:
 	required_device_array<tvpc_mouse_port_device, 2> m_mouse;
 	required_device<suprtvpc_cart_slot_device> m_cart;
 	required_memory_bank m_rombank;
+	required_ioport m_factory_loopbacks;
+	u8 m_loopback_data = 0;
+	u8 m_loopback_drive = 0;
 };
 
 class superxavix_epo_ntpj_state : public superxavix_tvpc_state

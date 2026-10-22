@@ -18,118 +18,6 @@
     copyright. It is the only XaviX-based game so far to not show these
     details anywhere in the game.
 
-    Test-mode entry:
-    - rad_bb2: Reset while holding Console X and Console O (works every other
-      reset), then release. Use Console X to cycle through modes until reaching
-      the input test.
-    - rad_mtrk, rad_mtrkp: Hold Horn and Nitro on startup, then release.
-    - rad_rh: Hold Joystick Right and Menu on startup, then release.
-    - ltv_tam: Hold both Push Button / Confirm buttons from startup and soft
-      reset during the Bandai logo (about five seconds after startup), then
-      release. A cold start alone does not enter the test. At INTERNAL RAM
-      TEST, press and release P1 Push Button / Confirm to start automatic checks.
-    - ban_krrj: Hold Right Arrow and X from startup and soft reset about
-      four seconds later, then release. Press and release O at INTERNAL RAM TEST.
-    - tak_wdg: Hold Left and Right on startup, then release.
-    - tomplc: Hold Push-to-Talk and Headlights / Left from startup, then soft
-      reset and release. Press and release Doors / Right at INTERNAL RAM TEST.
-    - epo_tp2s: Hold Blue Mat Right and Red Mat Confirm / Orange from startup,
-      then soft reset and release. Press and release Red Mat Left at INTERNAL
-      RAM TEST.
-    - epo_tp2p: Hold Right Side Right and Left Side Confirm from startup and
-      soft reset about three seconds later, then release. Press and release Left
-      Side Left at INTERNAL RAM TEST.
-    - pl1000: Hold P1 Trigger, P1 Start and P2 Start on startup, then release.
-    - bistro: Hold both Hand Buttons, all four Selection directions and the
-      Faucet Lever on startup, then release. The automatic checks start directly.
-    - has_wamg: Hold Dial Push / Select from startup. After about one second,
-      soft reset twice in quick succession, keeping the button held.
-      Release, then press and release Dial Push / Select at INTERNAL RAM TEST.
-    - namcons1, namcons2, taitons1, taitons2: Hold Up, Button 2 and Button 3
-      from startup, then soft reset after about five seconds and release.
-      Press and release Button 4 at INTERNAL RAM TEST for automatic checks.
-    - epo_guru: Hold Left from startup and soft reset after about one second.
-      Keep Left held for another second, switch to Jump / Confirm, then soft
-      reset again and release. Use Jump / Confirm at INTERNAL RAM TEST.
-    - rad_opus, rad_opusa, rad_opusp: Hold Trigger Button L, Trigger Button R
-      and Start / Smart Bomb on cold startup, then release.
-    - rad_bb: Hold Console Enter and Restart from startup, then soft reset
-      after about one second and release.
-    - rad_hnt, rad_hnt2: Hold Menu Next and Menu Previous from startup, then
-      soft reset after about one second and release.
-    - rad_sbw, rad_ssx, rad_ssxp: Hold Tilt Left / Left Button and Tilt Right /
-      Right Button from startup, then soft reset after about one second and
-      release.
-    - epo_epp, epo_eppk, epo_epps, epo_epp2, epo_epp3, epo_strk, epo_strkp,
-      rad_socr, epo_tenn, epo_esdx, epo_esht, epo_hamd: Hold Up and Down from
-      startup, then soft reset after about one second and release.
-    - epo_efdx: Hold Left, Confirm and Cancel from startup, then soft reset
-      after about one second and release.
-    - epo_mj: Hold OK and Chi from startup, then soft reset after about one
-      second and release. The automatic checks start directly.
-    - popira: Hold Pad 1, Pad 4 and Start from startup, then soft reset after
-      about one second and release. The automatic checks start directly.
-    - tak_gin: Hold Tilt Forward / Cancel and Tilt Back / OK from startup,
-      then soft reset after about one second and release. The automatic
-      checks start directly.
-    - tomcpin: Hold both Left Flippers and Power from startup for about two
-      seconds, then release all three. The automatic checks start directly.
-    - tomshoot: Hold P1 Push / Shoot, P2 Push / Shoot and Power from startup
-      for about two seconds, then release all three. The automatic checks
-      start directly.
-    - tak_hamr: Hold Player 2 Yellow / Select, Player 2 Red / Cancel, Tempo
-      Slower and Tempo Faster from startup, then soft reset after about one
-      second and release. The automatic checks start directly.
-    - epo_dmon: Hold both Air Cannon Triggers from startup, then soft reset
-      after about one second and release. The automatic checks start directly.
-    - epo_tfp2: Hold P1 Left / Red and P2 Right / Pink from startup, then soft
-      reset after about one second and release. The automatic checks start
-      directly.
-    - epo_mms, epo_mmsp: Boot with all buttons released for about ten seconds.
-      Hold P1 Pink / Select and P2 Orange / Confirm, soft reset and release.
-      The automatic checks start directly.
-    - rad_bdp: Hold Purple / Up and Red / Down from startup, then soft reset
-      after about four seconds and release. The automatic checks start directly.
-    - tcarnavi: Hold Accelerator Lever Up / Drive and Brake, and toggle
-      Ignition On / Run once. Soft reset after about one second. Keep Drive
-      and Brake held; toggle On / Run again, press and release Ignition Start,
-      then toggle On / Run once more, leaving about one second between changes.
-      Release Drive and Brake when the automatic checks start.
-    - epo_mail: Hold Text Cursor Up and Text Cursor Down from startup, then
-      soft reset after about one second and release. Press and release Enter
-      at INTERNAL RAM TEST to start the automatic checks.
-    - tvpc_dor, tvpc_ham, tvpc_hk, tvpc_tom: Hold Left Cursor Up and Left
-      Cursor Down from startup, then soft reset after about one second and
-      release. tvpc_tom needs Enter at INTERNAL RAM TEST; the other three
-      start the automatic checks directly.
-    - epo_fish: Hold Left, Confirm and Cancel from startup, then soft reset
-      after about one second and release. The automatic checks start directly.
-    - epo_quiz: Hold P1 B / Blue / Confirm, P1 D / Green / Right and P3 A /
-      Red / Back from startup, then soft reset after about one second and
-      release. Press and release P1 B / Blue / Confirm at INTERNAL RAM TEST.
-    - tomthr: Hold Steer Left, Map and Headlights from startup, then soft
-      reset after about one second and release. Press and release Horn /
-      Select at INTERNAL RAM TEST to start the automatic checks.
-    - tak_geig: Hold P1 Bomb, P1 Up, P2 Main Gun / Confirm and P2 Down from
-      startup for about two seconds, then release. The automatic checks
-      start directly.
-    - tak_town: Hold Cancel / Back, Shovel Lever Up, Crane Lever Down and
-      Wheel Right from startup, then soft reset after about one second and
-      release. The automatic checks start directly.
-    - rad_jcon: Hold Cancel / Back, Wheel Right and Gear Shift from startup,
-      then soft reset after about one second and release. The automatic
-      checks start directly.
-    - jarajal: Hold Main Button from startup, then soft reset after about one
-      second. Keep Main Button held while turning Rotating Lever from centre
-      to about halfway right, then release Main Button with the lever still
-      turned. The automatic checks start directly.
-
-    The initial INTERNAL RAM TEST page waits for a press/release before the
-    automatic checks. rad_bb2, rad_mtrk/rad_mtrkp, rad_rh, tak_wdg and pl1000
-    run their initial checks without an advance press. The rad_opus, rad_bb,
-    rad_hnt, rad_sbw, rad_ssx, epo_epp, epo_strk, epo_tenn, epo_esdx and
-    epo_efdx groups above also run their checks directly.
-
     Undumped Software (preliminary; some titles may still be missing):
     Compiled from various sources; thanks to Sean Riddle.
 
@@ -378,6 +266,18 @@ void xavix_state::xavixp_nv_1mb(machine_config &config)
 {
 	xavixp_nv(config);
 	m_soc->set_external_map(*this, &xavix_state::xavix_1mb_extbus_map);
+}
+
+void xavix_state::xavixp_nv_2mb(machine_config &config)
+{
+	xavixp_nv(config);
+	m_soc->set_external_map(*this, &xavix_state::xavix_2mb_extbus_map);
+}
+
+void xavix_state::xavixp_nv_4mb(machine_config &config)
+{
+	xavixp_nv(config);
+	m_soc->set_external_map(*this, &xavix_state::xavix_4mb_extbus_map);
 }
 
 //-------------------------------------------------
@@ -926,8 +826,9 @@ static INPUT_PORTS_START( rad_box )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Right Jab")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Right Hook")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Right Uppercut")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Left Console Button")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Right Console Button")
+	// The two console buttons are independent; the firmware also checks them together.
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Left Console Button") PORT_16WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Right Console Button") PORT_16WAY
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Block")
@@ -1552,13 +1453,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(xavix_state::lightgun_scanline_cb)
 	// Spread eight optical samples across the field so each event can be acknowledged before the next arrives.
 	if ((line >= 40) && (line <= 110) && ((line % 10) == 0))
 	{
-		if (BIT(m_lightgun_event_mask, 0))
+		u8 const mask = lightgun_event_mask();
+		if (BIT(mask, 0))
 			m_soc->trigger_io_event<0>();
-		if (BIT(m_lightgun_event_mask, 1))
+		if (BIT(mask, 1))
 			m_soc->trigger_io_event<1>();
-		if (BIT(m_lightgun_event_mask, 2))
+		if (BIT(mask, 2))
 			m_soc->trigger_io_event<2>();
-		if (BIT(m_lightgun_event_mask, 3))
+		if (BIT(mask, 3))
 			m_soc->trigger_io_event<3>();
 	}
 }
@@ -1577,6 +1479,8 @@ static INPUT_PORTS_START( gungunad )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Trigger") PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Trigger") PORT_PLAYER(2) PORT_CONDITION("IN0", 0x40, EQUALS, 0x40)
+	// Startup tests this contact with the second gun absent; its physical source is unidentified.
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_HIGH ) PORT_NAME("Factory Test") PORT_CODE(KEYCODE_F1) PORT_CONDITION("IN0", 0x40, EQUALS, 0x00)
 	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED )
 	// This debounced line gates P2 activity; its identity as the detachable gun-present contact is inferred.
 	PORT_CONFNAME( 0x40, 0x00, "P2 Gun" )
@@ -1627,8 +1531,8 @@ static INPUT_PORTS_START( gungunrv )
 	PORT_CONFNAME( 0x08, 0x08, "Vibration" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
-	// Startup treats IO0.6 low as a factory-test strap when the Support Gun is absent.
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	// Startup selects the factory tests with IO0.6 low and no Support Gun; its physical source is unidentified.
+	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW ) PORT_NAME("Factory Test") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0xb4, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
@@ -2120,7 +2024,7 @@ void xavix_epo_baseball_state::configure_controllers(machine_config &config)
 
 void xavix_epo_baseball_state::xavix_epo_esdx(machine_config &config)
 {
-	xavix_4mb(config);
+	xavix_nv_4mb(config);
 	configure_controllers(config);
 }
 
@@ -2143,7 +2047,8 @@ static INPUT_PORTS_START( epo_stad )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_stadium_bat_device::data_r))
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED ) // This changes timeout pacing, but its physical source is unknown.
+	// The seventh factory contact also selects normal bat timing; its physical connection is unidentified.
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Unknown Contact (Test)") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0xbe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -2352,11 +2257,12 @@ static INPUT_PORTS_START( rad_ping )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Pause")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Restart")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x3e, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x1e, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The normal input word merges this contact with IO0.6; diagnostics test IO1.5 directly.
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Restart")
 	// The momentary button is debounced on release before the firmware drives IO1.7 high to cut power.
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2584,7 +2490,7 @@ static INPUT_PORTS_START( rad_bb )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Console Enter")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Restart")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Pause")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Pause") PORT_CODE(KEYCODE_1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Console Up") PORT_2WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Console Down") PORT_2WAY
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -3921,7 +3827,7 @@ INPUT_PORTS_END
 
 void xavix_epo_quiz_state::xavix_epo_quiz(machine_config &config)
 {
-	xavix_4mb(config);
+	xavix_nv_4mb(config);
 	m_soc->adc_input_callback<6>().set(FUNC(xavix_epo_quiz_state::an6_r));
 }
 
@@ -3955,6 +3861,8 @@ static INPUT_PORTS_START( bistro )
 	PORT_CONFSETTING(    0x00, DEF_STR(None) )
 	PORT_CONFSETTING(    0x04, "Pot" )
 	PORT_CONFSETTING(    0x0c, "Frying Pan" )
+	// The controller check also requires each burner contact separately.
+	PORT_CONFSETTING(    0x08, "Second Burner Contact Only (Test)" )
 	// Independent contacts permit the all-directions test-mode chord.
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("Selection Up")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("Selection Down")
@@ -4091,8 +3999,8 @@ void xavix_epo_mail_state::xavix_extbus_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom().region("bios", 0x000000);
 	map(0x400000, 0x5fffff).rom().region("bios", 0x000000);
-	map(0x600000, 0x600000).r(FUNC(xavix_epo_mail_state::keyboard_r));
-	map(0x600001, 0x7fffff).rom().region("bios", 0x200001);
+	// The keyboard buffer is selected throughout this region and has no address inputs.
+	map(0x600000, 0x7fffff).r(FUNC(xavix_epo_mail_state::keyboard_r));
 }
 
 void xavix_epo_mail_state::xavix_epo_mail(machine_config &config)
@@ -4179,7 +4087,6 @@ static INPUT_PORTS_START( hippofr )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Repeat") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Off")
-		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_state::power_off), 0)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Demo / Options") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -4256,6 +4163,13 @@ u8 xavix_hippofr_state::io1_input_r(u8 direction)
 
 	u8 const selector_levels = propagate_passive_levels<u8>(m_soc->io_data_latch<1>() & direction, contacts);
 	return m_in1->read() | u8(panel_levels_r() >> 8) | selector_levels;
+}
+
+void xavix_hippofr_state::io1_output_w(u8 data, u8 direction)
+{
+	// Off is a scanned key; the program drives IO1.3 high to shut down.
+	if (BIT(data & direction, 3))
+		machine().schedule_exit();
 }
 
 
@@ -4439,7 +4353,7 @@ void xavix_state::xavix_rad_madf(machine_config &config)
 
 // TV Wild Adventure Mini Golf
 static INPUT_PORTS_START( has_wamg )
-	PORT_INCLUDE(xavix)
+	PORT_INCLUDE(xavix_i2c)
 	// The maintained switch removes supply directly; the ROM also has a separate IO1.7 auto-off path.
 	PORT_INCLUDE(xavix_hard_power_control)
 
@@ -4449,10 +4363,10 @@ static INPUT_PORTS_START( has_wamg )
 	PORT_BIT( 0xfb, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	// Bit 0 selects the sensor threshold margin, but its board-level source is unknown.
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// Bit 3 must idle high for normal operation; its hardware source is unknown.
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	// The test page identifies NORMAL/LOW sensor levels; the physical source is unknown.
+	PORT_CONFNAME( 0x01, 0x00, "Putter Sensor Mode" )
+	PORT_CONFSETTING(    0x00, "Normal" )
+	PORT_CONFSETTING(    0x01, "Low" )
 	PORT_BIT( 0xf6, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DIAL")
@@ -4461,7 +4375,8 @@ INPUT_PORTS_END
 
 void xavix_has_wamg_state::xavix_has_wamg(machine_config &config)
 {
-	xavix_4mb(config);
+	// The firmware uses two 256-byte banks in 16-byte pages; TODO: identify the fitted part.
+	xavix_i2c_24c04_4mb(config);
 
 	// The dial is a writable signed counter that the firmware clears after every sample.
 	m_soc->anport_input_callback<2>().set_ioport("DIAL");
@@ -4794,6 +4709,16 @@ static INPUT_PORTS_START( tomplc )
 	PORT_START("MIC_SIMULATE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Simulate Announcement") PORT_CODE(KEYCODE_N) PORT_WRITE_LINE_DEVICE_MEMBER("microphone_tone", FUNC(beep_device::set_state))
 
+	// The factory check also tests both contacts closed, beyond the three marked settings.
+	PORT_START("LEVER_TEST")
+	PORT_CONFNAME( 0x01, 0x00, "Power Contacts Both Closed (Test)" )
+	PORT_CONFSETTING(    0x00, DEF_STR(Off) )
+	PORT_CONFSETTING(    0x01, DEF_STR(On) )
+	PORT_CONFNAME( 0x02, 0x00, "Brake Contacts Both Closed (Test)" )
+	PORT_CONFSETTING(    0x00, DEF_STR(Off) )
+	PORT_CONFSETTING(    0x02, DEF_STR(On) )
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 	PORT_MODIFY("AN7")
 	// Representative differences select the ROM's states; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
@@ -4804,11 +4729,24 @@ static INPUT_PORTS_START( tomplc )
 	PORT_INCLUDE(xavix_hard_power_control)
 INPUT_PORTS_END
 
-void xavix_i2c_power_state::xavix_tomplc(machine_config &config)
+void xavix_tomplc_state::xavix_tomplc(machine_config &config)
 {
-	xavix_i2c_24c02_4mb(config);
+	// The factory check writes four 256-byte banks using 16-byte pages; chip marking unverified.
+	xavix_i2c_24c08_4mb(config);
 	configure_microphone(config);
 	m_soc->add_adc_route(BEEP(config, "microphone_tone", 1000), 0, 0.5);
+}
+
+u8 xavix_tomplc_state::io0_input_r(u8 direction)
+{
+	u8 const data = xavix_i2c_power_state::io0_input_r(direction);
+	return BIT(m_lever_test->read(), 0) ? (data | 0x30) : data;
+}
+
+u8 xavix_tomplc_state::io1_input_r(u8 direction)
+{
+	u8 const data = xavix_i2c_power_state::io1_input_r(direction);
+	return BIT(m_lever_test->read(), 1) ? (data | 0x03) : data;
 }
 
 
@@ -5599,8 +5537,8 @@ CONS( 2003,  rad_hnt2,  0,        0, xavix_rad_hnt2,      rad_hnt,   xavix_rad_h
 CONS( 2003,  rad_mtrk,  0,        0, xavix_rad_mtrk,      rad_mtrk,  xavix_power_state,            empty_init,  "Radica / Sennari Interactive / SSD Company Ltd.", "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING )
 CONS( 2003,  rad_mtrkp, rad_mtrk, 0, xavix_rad_mtrkp,     rad_mtrkp, xavix_power_state,            empty_init,  "Radica / Sennari Interactive / SSD Company Ltd.", "Connectv Monster Truck (PAL)", MACHINE_NOT_WORKING )
 
-CONS( 200?,  rad_box,   0,        0, xavix_2mb,           rad_box,   xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Play TV Boxin' (NTSC)", MACHINE_NOT_WORKING )
-CONS( 200?,  rad_boxp,  rad_box,  0, xavixp_2mb,          rad_boxp,  xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Connectv Boxin' (PAL)", MACHINE_NOT_WORKING )
+CONS( 200?,  rad_box,   0,        0, xavix_nv_2mb,        rad_box,   xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Play TV Boxin' (NTSC)", MACHINE_NOT_WORKING )
+CONS( 200?,  rad_boxp,  rad_box,  0, xavixp_nv_2mb,       rad_boxp,  xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Connectv Boxin' (PAL)", MACHINE_NOT_WORKING )
 
 CONS( 200?,  rad_crdn,  0,        0, xavix_rad_crdn,      rad_crdn,  xavix_rad_crdn_state,         empty_init,  "Radica / SSD Company Ltd.", "Play TV Card Night (NTSC)", 0 )
 CONS( 200?,  rad_crdnp, rad_crdn, 0, xavix_rad_crdnp,     rad_crdnp, xavix_rad_crdn_state,         empty_init,  "Radica / SSD Company Ltd.", "Connectv Card Night (PAL)", 0 )
@@ -5621,11 +5559,11 @@ CONS( 2005,  rad_fb,    0,        0, xavix_rad_madf,      rad_fb,    xavix_power
 // fails to display any kind of XaviX logo or SSD Copyright, it is the only XaviX based game so far to not show these details anywhere in the game.
 CONS( 2003,  rad_rh,    0,        0, xavix_2mb,           rad_rh,    xavix_rad_rh_state,           empty_init,  "Radica / Fisher-Price / Pronto Games / SSD Company Ltd.", "Play TV Rescue Heroes (NTSC)", MACHINE_NOT_WORKING )
 
-CONS( 2004,  rad_ssx,   0,        0, xavix_4mb,           rad_ssx,   xavix_power_state,            empty_init,  "Radica / Electronic Arts / SSD Company Ltd.", "Play TV SSX Snowboarder (NTSC)", 0 )
-CONS( 2004,  rad_ssxp,  rad_ssx,  0, xavixp_4mb,          rad_ssxp,  xavix_power_state,            empty_init,  "Radica / Electronic Arts / SSD Company Ltd.", "Connectv SSX Snowboarder (PAL)", 0 )
+CONS( 2004,  rad_ssx,   0,        0, xavix_nv_4mb,        rad_ssx,   xavix_power_state,            empty_init,  "Radica / Electronic Arts / SSD Company Ltd.", "Play TV SSX Snowboarder (NTSC)", 0 )
+CONS( 2004,  rad_ssxp,  rad_ssx,  0, xavixp_nv_4mb,       rad_ssxp,  xavix_power_state,            empty_init,  "Radica / Electronic Arts / SSD Company Ltd.", "Connectv SSX Snowboarder (PAL)", 0 )
 
 // basically a reissue of SSX but without the license - doesn't exist with Connectv branding?
-CONS( 2006,  rad_sbw,   0,        0, xavix_4mb,           rad_sbw,   xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Play TV Snowboarder (White) (NTSC)", 0 )
+CONS( 2006,  rad_sbw,   0,        0, xavix_nv_4mb,        rad_sbw,   xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Play TV Snowboarder (White) (NTSC)", 0 )
 
 CONS( 2002,  rad_bdp,   0,        0, xavix_2mb,           rad_bdp,   xavix_power_state,            empty_init,  "Radica / Mattel / SSD Company Ltd.", "Barbie Dance Party", 0 )
 
@@ -5744,7 +5682,7 @@ CONS( 2003,  tcarnavi,  0,        0, xavix_nv_4mb,        tcarnavi,  xavix_power
 CONS( 2003,  tomcpin,   0,        0, xavix_i2c_24c08_4mb, tomcpin,   xavix_i2c_state,              empty_init,  "Tomy / SSD Company Ltd.", "TV de Asobitai Tsuukai! Goraku Katsugeki: Champiyon Pinball (Japan)", 0 )
 
 // テレビで遊び隊 日本一周 僕はプラレール運転士
-CONS( 2004,  tomplc,    0,        0, xavix_tomplc,        tomplc,    xavix_i2c_power_state,        empty_init,  "Tomy / SSD Company Ltd.", "TV de Asobitai Nihon Isshuu: Boku wa Plarail Untenshi (Japan)", 0 )
+CONS( 2004,  tomplc,    0,        0, xavix_tomplc,        tomplc,    xavix_tomplc_state,           empty_init,  "Tomy / SSD Company Ltd.", "TV de Asobitai Nihon Isshuu: Boku wa Plarail Untenshi (Japan)", 0 )
 
 // テレビで遊び隊 ハイパーレスキュー ぼくは救助隊！
 CONS( 2006,  tomthr,    0,        0, xavix_tomthr,        tomthr,    xavix_power_state,            empty_init,  "Takara Tomy / SSD Company Ltd.", "TV de Asobitai Hyper Rescue: Boku wa Kyuujotai! (Japan)", 0 )
@@ -5810,10 +5748,10 @@ CONS( 2008,  hikara,    0,        0, xavix_hikara,        hikara,    xavix_hikar
 CONS( 2003,  epo_tfp2,  0,        0, xavix_i2c_24c08_4mb, epo_tfp2,  xavix_i2c_power_state,        empty_init,  "Epoch / SSD Company Ltd.", "Tokyo Friend Park II (Japan)", 0 ) // uses in24lc08b
 
 // 東京フレンドパーク2スペシャル
-CONS( 2005,  epo_tp2s,  0,        0, xavix_4mb,           epo_tp2s,  xavix_state,                  empty_init,  "Epoch / SSD Company Ltd.", "Tokyo Friend Park II Special! (Japan)", 0 )
+CONS( 2005,  epo_tp2s,  0,        0, xavix_nv_4mb,        epo_tp2s,  xavix_state,                  empty_init,  "Epoch / SSD Company Ltd.", "Tokyo Friend Park II Special! (Japan)", 0 )
 
 // 東京フレンドパークⅡ パーフェクト!めざせ!グランドスラム‼︎
-CONS( 2007,  epo_tp2p,  0,        0, xavix,               epo_tp2p,  xavix_power_state,            empty_init,  "Epoch / SSD Company Ltd.", "Tokyo Friend Park II Perfect! Mezase! Grand Slam!! (Japan)", 0 )
+CONS( 2007,  epo_tp2p,  0,        0, xavix_nv,            epo_tp2p,  xavix_power_state,            empty_init,  "Epoch / SSD Company Ltd.", "Tokyo Friend Park II Perfect! Mezase! Grand Slam!! (Japan)", 0 )
 
 // TV-PC Series
 // きかんしゃトーマス テレビパソコン

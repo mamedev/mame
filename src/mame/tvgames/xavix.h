@@ -20,6 +20,7 @@
 #include "xavix_io_ir_motion.h"
 #include "xavix_io_ltv_tam_ir.h"
 #include "xavix_io_mail_mascot.h"
+#include "xavix_io_omt_drive.h"
 #include "xavix_io_stad_bat.h"
 #include "xavix_io_wamg_sensor.h"
 #include "xavix_io_wdg_granblade.h"
@@ -90,6 +91,8 @@ public:
 	void xavixp_4mb(machine_config &config) ATTR_COLD;
 	void xavixp_nv(machine_config &config) ATTR_COLD;
 	void xavixp_nv_1mb(machine_config &config) ATTR_COLD;
+	void xavixp_nv_2mb(machine_config &config) ATTR_COLD;
+	void xavixp_nv_4mb(machine_config &config) ATTR_COLD;
 
 	// Original XaviX product configurations
 	void xavix_rad_bb(machine_config &config) ATTR_COLD;
@@ -218,6 +221,7 @@ protected:
 	u8 power_status_r();
 
 	virtual u8 lightgun_r(offs_t offset);
+	virtual u8 lightgun_event_mask() { return m_lightgun_event_mask; }
 	TIMER_DEVICE_CALLBACK_MEMBER(lightgun_scanline_cb);
 
 	required_region_ptr<u8> m_rom;
@@ -377,10 +381,26 @@ public:
 		: xavix_i2c_state(mconfig, type, tag)
 	{ }
 
+protected:
+	virtual void configure_board(machine_config &config) override ATTR_COLD;
+};
+
+class xavix_tomplc_state : public xavix_i2c_power_state
+{
+public:
+	xavix_tomplc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_power_state(mconfig, type, tag)
+		, m_lever_test(*this, "LEVER_TEST")
+	{ }
+
 	void xavix_tomplc(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void configure_board(machine_config &config) override ATTR_COLD;
+	virtual u8 io0_input_r(u8 direction) override;
+	virtual u8 io1_input_r(u8 direction) override;
+
+private:
+	required_ioport m_lever_test;
 };
 
 class xavix_ir_state : public xavix_state
@@ -727,11 +747,11 @@ protected:
 	virtual void xavix_extbus_map(address_map &map) override ATTR_COLD;
 };
 
-class xavix_has_wamg_state : public xavix_power_state
+class xavix_has_wamg_state : public xavix_i2c_power_state
 {
 public:
 	xavix_has_wamg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_power_state(mconfig, type, tag)
+		: xavix_i2c_power_state(mconfig, type, tag)
 		, m_sensor(*this, "putter")
 	{ }
 
@@ -769,6 +789,7 @@ public:
 
 private:
 	virtual u8 lightgun_r(offs_t offset) override;
+	virtual u8 lightgun_event_mask() override { return m_lightgun_event_mask & (BIT(m_in0->read(), 6) ? 0xff : 0xfd); }
 };
 
 class xavix_gungunrv_state : public xavix_i2c_state
@@ -788,6 +809,7 @@ private:
 	virtual void io0_output_w(u8 data, u8 direction) override;
 	virtual void io1_output_w(u8 data, u8 direction) override;
 	virtual u8 lightgun_r(offs_t offset) override;
+	virtual u8 lightgun_event_mask() override { return m_lightgun_event_mask & (BIT(m_in1->read(), 1) ? 0xff : 0xfd); }
 
 	output_finder<> m_gun_recoil;
 };
@@ -1040,6 +1062,7 @@ public:
 protected:
 	virtual u8 io0_input_r(u8 direction) override;
 	virtual u8 io1_input_r(u8 direction) override;
+	virtual void io1_output_w(u8 data, u8 direction) override;
 
 private:
 	// Each scanned button passively joins one pair of ten bidirectional GPIO lines.
@@ -1171,8 +1194,6 @@ public:
 	void xavix2000_epo_mini(machine_config &config) ATTR_COLD;
 	void xavix2000_ttv_sw(machine_config &config) ATTR_COLD;
 	void xavix2000_i2c_24c02_camera(machine_config &config) ATTR_COLD;
-	void xavix2000_drgqst(machine_config &config) ATTR_COLD;
-	void xavix2000_ban_omt(machine_config &config) ATTR_COLD;
 	void xavix2000_ban_onep(machine_config &config) ATTR_COLD;
 	void xavix2000_tom_dpgm(machine_config &config) ATTR_COLD;
 
@@ -1181,10 +1202,48 @@ protected:
 	virtual void io0_output_w(u8 data, u8 direction) override;
 	virtual void io1_output_w(u8 data, u8 direction) override;
 
-private:
 	required_device<xavix_analog_image_sensor_device> m_camera;
 
 	void configure_camera(machine_config &config, xavix_analog_image_sensor_device::target_shape shape) ATTR_COLD;
+};
+
+class xavix2000_drgqst_state : public xavix2000_i2c_camera_state
+{
+public:
+	xavix2000_drgqst_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix2000_i2c_camera_state(mconfig, type, tag)
+		, m_factory_contacts(*this, "FACTORY")
+	{ }
+
+	void xavix2000_drgqst(machine_config &config) ATTR_COLD;
+	DECLARE_INPUT_CHANGED_MEMBER(factory_contact_changed);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual u8 io1_input_r(u8 direction) override;
+	virtual void io1_output_w(u8 data, u8 direction) override;
+
+private:
+	void update_eeprom_bus();
+
+	required_ioport m_factory_contacts;
+	u8 m_io1_data;
+	u8 m_io1_direction;
+};
+
+class xavix2000_ban_omt_state : public xavix2000_i2c_camera_state
+{
+public:
+	xavix2000_ban_omt_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix2000_i2c_camera_state(mconfig, type, tag)
+		, m_drive(*this, "drive")
+	{ }
+
+	void xavix2000_ban_omt(machine_config &config) ATTR_COLD;
+
+private:
+	required_device<xavix_omt_drive_device> m_drive;
 };
 
 #endif // MAME_TVGAMES_XAVIX_H

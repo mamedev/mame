@@ -43,86 +43,10 @@
       CIS and connect to the main PCB with an 18-20 wire ribbon cable.
     - Bowling and Boxing look identical; both sensor dies are labeled CU5501A.
 
-    Test-mode entry:
-    - xavtenni, xavtennij, xavbaseb, xavbasebj, xavgolf, xavgolfj, xavbowl,
-      xavbowlj, xavbassf, xavbox, xavboxj, xavjmat, xavaero, epo_tfit: Hold
-      Console Up and Console Down from startup, then soft reset and release.
-    - domfitex, domdance, domfitch: Hold Console Up and Console Down from
-      startup, then soft reset about 13 seconds later and release.
-    - domstepc: Hold Console Up and Console Down from startup, then soft
-      reset about seven seconds later and release.
-    - xavmusic, xavmusicj, xavcheck: Hold Console Up and Console Down from
-      startup, then soft reset about eight seconds later and release.
-    - xavpowrk, xavpkjr: Hold Console Up and Console Down on cold startup,
-      then release; no reset is needed.
-    - anpanmdx: Hold Blue Rock / Shokupanman, Left Footprint / Baikinman and
-      Green Paper / Cream Panda from startup and soft reset about six seconds
-      later, then release.
-    - apmj2009: Hold Baikinman / Left Footprint, Melonpanna / Pink Triangle and
-      Shokupanman / Red Square from startup and soft reset about eight seconds
-      later, then release.
-    - ban_ordj: Hold Triangle Up and Triangle Down from startup, then soft
-      reset and release.
-    - epo_doka: Hold Back and Pad 1 / Secret Gadget from startup, then soft
-      reset and release.
-    - ban_bkgj: Hold Rock / Confirm and Paper / Previous from startup and soft
-      reset about seven seconds later, then release. Leave Scissors / Next
-      unpressed.
-    - ban_dn1j: Start without holding any buttons and wait about ten seconds.
-      Hold Blue and Yellow, soft reset and release. Press and release Blue at
-      INTERNAL RAM TEST for automatic checks.
-    - maxheart: Hold P1 Confirm and P1 Left from startup, then soft reset
-      about six seconds later and release.
-    - tmy_thom: Hold Talk and Whistle from startup and soft reset after about
-      one second. Switch to Talk and Camera / Viewpoint, soft reset again
-      about one second later, then release.
-    - epo_rgfj: Hold Up and Down from startup, then soft reset after about
-      seven seconds and release. Use Circle / Confirm for automatic checks.
-    - doradraw, hkdraw: Hold Menu and Up from startup, then soft reset after
-      about five seconds and release. Use Action (A) for automatic checks.
-    - ndpmj: Hold Far Left / Back and Centre Right / Select / Next from startup,
-      then soft reset after about seven seconds and release. Use Far Right /
-      Confirm for automatic checks, including the clock test.
-    - mrangbat: Hold P1 Red Circle and P1 Yellow Triangle from startup, then
-      soft reset after about six seconds and release. Use P1 Red Circle for
-      automatic checks.
-    - epo_ntpj: Start with all controls released and wait about six seconds.
-      Hold Red Ribbon Down and Blue Ribbon Up, soft reset and release. Press
-      and release Red Ribbon Button at INTERNAL RAM TEST for automatic checks.
-    - ban_gkrj, ban_um2j, ban_ult: Start with all controls released. Soft reset
-      after about six seconds, then again about six seconds later. At INTERNAL
-      RAM TEST, centre Glove 1 (ban_gkrj) or Reflector 1, increase its size to
-      maximum for about two seconds, then reduce it again for the light/dark
-      calibration. Automatic checks follow.
-    - ban_utmj: Use the same two six-second reset intervals with all controls
-      released. At INTERNAL RAM TEST, leave the reflector positions at their
-      defaults, increase Reflector 1 size to maximum and Reflector 2 size to
-      about halfway for two seconds, then reduce both. Automatic checks follow.
-    - ban_kksj: Start with all controls released. Soft reset after about six
-      seconds, then again about six seconds later. At INTERNAL RAM TEST, set
-      Ambient Light to 112 for about two seconds, then restore it to 16.
-      The automatic checks start after this bright/dark calibration.
-    - epo_kabj: Hold Strawberry Left and Strawberry Right from startup, then
-      soft reset after about nine seconds and release to enter CARD SCAN TEST.
-      Cancel / Delete (Pink) advances to the automatic checks. To exercise the
-      card reader first, use Confirm (Red), scan a card, then use Cancel.
-
-    At INTERNAL RAM TEST, press and release Console Enter to start automatic
-    checks on the XaviXPORT/Domyos titles above. epo_tfit uses Console Select /
-    Confirm instead. The other advance buttons are Blue Rock / Shokupanman
-    (anpanmdx), Anpanman / Center (apmj2009), Circle / Confirm (ban_ordj),
-    Pad 2 / Roulette (epo_doka), Rock / Confirm (ban_bkgj), P1 Confirm
-    (maxheart) and Talk (tmy_thom). In xavbowl/xavbowlj and xavbox/xavboxj,
-    Console Up instead enters CIS TEST from the initial RAM page.
-
-    Reset times are observed emulated startup times; some entries depend on
-    retained RAM signatures. The initial RAM page alone is not a completed
-    automatic test result.
-
     TODO:
-    - ban_pr2j: Holding Up and Cross / Cancel from startup, soft resetting
-      after about six seconds and releasing enters IR Transmission Test.
-      Navigation from there to the automatic checks remains unconfirmed.
+    - tmy_rkmj: Verify the original ROM-checksum mismatch against another dump
+      or hardware; identify input-test advance controls.
+    - ban_pr2j: Emulate the optional Pinkycatchu and Dreamcollet IR link.
     - Shared IR controllers (e.g. xavtenni/xavtennij, xavbaseb/xavbasebj,
       epo_tfit and anpanmdx): Measure transmitter timing, repetition and
       physical motion thresholds.
@@ -226,6 +150,12 @@ void superxavix_state::superxavix_4mb(machine_config &config)
 {
 	superxavix(config);
 	m_soc->set_external_map(*this, &superxavix_state::xavix_4mb_extbus_map);
+}
+
+void superxavix_state::superxavix_nv_4mb(machine_config &config)
+{
+	superxavix_4mb(config);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 }
 
 //-------------------------------------------------
@@ -1446,9 +1376,9 @@ static INPUT_PORTS_START( ban_ordj )
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Circle / Confirm")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Cross / Cancel")
-	// The two triangular buttons are proven opposites; their individual up/down orientation is inferred.
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_2WAY PORT_NAME("Triangle Up")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_2WAY PORT_NAME("Triangle Down")
+	// Both independent triangle contacts are held for test entry; their up/down orientation is inferred.
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("Triangle Up")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("Triangle Down")
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
@@ -1912,7 +1842,8 @@ void superxavix_i2c_state::superxavix_mrangbat(machine_config &config)
 
 	m_soc->set_external_map(*this, &superxavix_i2c_state::xavix_4mb_extbus_map);
 
-	I2C_24C02(config, "i2cmem"); // 24C02?
+	// The factory test uses 512 bytes in 16-byte pages; TODO: identify the physical part.
+	I2C_24C04(config, "i2cmem");
 
 	m_super_soc->pio_input_callback<0>().set_ioport("PIO0");
 	m_super_soc->pio_input_callback<1>().set_ioport("PIO1");
@@ -2498,6 +2429,15 @@ static INPUT_PORTS_START( suprtvpc )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Attack") PORT_CODE(JOYCODE_BUTTON1_INDEXED(1)) PORT_PLAYER(2)
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
+	PORT_START("TEST_LOOPBACKS")
+	// The startup test probes PIO0.0 -> PIO0.5 and PIO1.1 -> PIO0.1.
+	PORT_CONFNAME( 0x03, 0x00, "Factory Test Loopbacks" )
+	PORT_CONFSETTING(    0x00, "Disconnected" )
+	PORT_CONFSETTING(    0x03, "Both Connected" )
+	PORT_CONFSETTING(    0x01, "First Pair Only (Test)" )
+	PORT_CONFSETTING(    0x02, "Second Pair Only (Test)" )
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 	PORT_MODIFY("PIO2")
 	// PIO2.1 selects the firmware's battery or AC-adapter inactivity timeout.
 	PORT_CONFNAME( 0x02, 0x00, "Power Source" )
@@ -2536,7 +2476,8 @@ void superxavix_suprtvpc_state::superxavix_suprtvpc(machine_config &config)
 	TVPC_MOUSE_PORT(config, m_mouse[1]).set_mouse_index(1);
 	configure_tvpc_controller(config);
 
-	m_super_soc->pio_input_callback<0>().set(*this, FUNC(superxavix_suprtvpc_state::tvpc_pio0_input_r));
+	m_super_soc->pio_input_callback<0>().set(*this, FUNC(superxavix_suprtvpc_state::pio0_input_r));
+	m_super_soc->pio_input_mask_callback<0>().set(*this, FUNC(superxavix_suprtvpc_state::pio0_input_mask_r));
 	m_super_soc->pio_output_callback<0>().set(*this, FUNC(superxavix_suprtvpc_state::pio0_output_w));
 	m_super_soc->pio_input_callback<1>().set(*this, FUNC(superxavix_suprtvpc_state::pio1_input_r));
 	m_super_soc->pio_output_callback<1>().set(*this, FUNC(superxavix_suprtvpc_state::pio1_output_w));
@@ -2563,6 +2504,9 @@ void superxavix_suprtvpc_state::machine_start()
 {
 	superxavix_state::machine_start();
 
+	save_item(NAME(m_loopback_data));
+	save_item(NAME(m_loopback_drive));
+
 	m_rombank->configure_entries(0, 2, &m_rom[0x400000], 0x200000);
 	if (memory_region *const cart_region = m_cart->rom_region())
 		m_super_soc->decode_cartridge_graphics(*cart_region);
@@ -2573,12 +2517,34 @@ void superxavix_suprtvpc_state::machine_reset()
 	superxavix_state::machine_reset();
 
 	m_rombank->set_entry(0);
+	m_loopback_data = 0;
+	m_loopback_drive = 0;
+}
+
+u8 superxavix_suprtvpc_state::factory_loopback_mask() const
+{
+	u8 const connections = m_factory_loopbacks->read();
+	return m_loopback_drive & ((BIT(connections, 0) ? 0x20 : 0) | (BIT(connections, 1) ? 0x02 : 0));
+}
+
+u8 superxavix_suprtvpc_state::pio0_input_r(offs_t offset, u8 mem_mask)
+{
+	u8 const inputs = superxavix_tvpc_state::tvpc_pio0_input_r(offset, mem_mask);
+	u8 const loopbacks = factory_loopback_mask();
+	return (inputs & ~loopbacks) | (m_loopback_data & loopbacks);
+}
+
+u8 superxavix_suprtvpc_state::pio0_input_mask_r()
+{
+	return m_pio_connected_inputs[0] | factory_loopback_mask();
 }
 
 void superxavix_suprtvpc_state::pio0_output_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	tvpc_pio0_output_w(offset, data, mem_mask);
 	m_exp->data_w(BIT(data & mem_mask, 5));
+	m_loopback_data = (m_loopback_data & ~0x20) | (BIT(data, 0) << 5);
+	m_loopback_drive = (m_loopback_drive & ~0x20) | (BIT(mem_mask, 0) << 5);
 }
 
 u8 superxavix_suprtvpc_state::cartridge_rom_r(offs_t offset)
@@ -2612,6 +2578,8 @@ void superxavix_suprtvpc_state::pio1_output_w(offs_t offset, u8 data, u8 mem_mas
 {
 	LOGMASKED(LOG_PIO, "%s: pio1_output_w %02x\n", machine().describe_context(), data);
 	m_exp->clock_w(BIT(data & mem_mask, 1));
+	m_loopback_data = (m_loopback_data & ~0x02) | (data & 0x02);
+	m_loopback_drive = (m_loopback_drive & ~0x02) | (mem_mask & 0x02);
 }
 
 u8 superxavix_suprtvpc_state::pio2_input_r(offs_t offset, u8 mem_mask)
@@ -3217,7 +3185,7 @@ CONS( 2010, epo_rgfj,   0,        0, superxavix_epo_rgfj,              epo_rgfj,
 CONS( 2004, maxheart,   0,        0, superxavix_i2c_24c04_4mb,         maxheart,              superxavix_i2c_state,        empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Futari wa PreCure Max Heart: Mat de Dance Max Heart ni Odotchaou (Japan)", MACHINE_NOT_WORKING )
 
 // どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！
-CONS( 2004, epo_doka,   0,        0, superxavix_4mb,                   epo_doka,              superxavix_state,            empty_init, "Epoch / SSD Company Ltd.", "Doko Demo Doraemon Nihon Ryokou Game DX Taikan! Doko Dora Grand Prix! (Japan)", MACHINE_NOT_WORKING )
+CONS( 2004, epo_doka,   0,        0, superxavix_nv_4mb,                epo_doka,              superxavix_state,            empty_init, "Epoch / SSD Company Ltd.", "Doko Demo Doraemon Nihon Ryokou Game DX Taikan! Doko Dora Grand Prix! (Japan)", MACHINE_NOT_WORKING )
 
 // Hello Kitty テレビであそぼう!まなぼう! カードでおままごと あいうえお図鑑
 CONS( 2006, epo_kabj,   0,        0, superxavix_epo_kabj,              epo_kabj,              superxavix_epo_kabj_state,   empty_init, "Epoch / SSD Company Ltd.", "Hello Kitty: TV de Asobou! Manabou! Card de Omamagoto AIUEO Zukan (Japan)", MACHINE_NOT_WORKING )

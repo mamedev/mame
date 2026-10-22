@@ -174,10 +174,12 @@ u8 xavix_epo_es2j_card_reader_device::begin_scan()
 attotime xavix_epo_es2j_card_reader_device::interval_after_event(u8 events_emitted) const
 {
 	if (events_emitted == 1)
-		return attotime::from_msec(1);
+		return attotime::from_msec(16);
+	if (events_emitted == 2)
+		return attotime::from_ticks(0x1800 * 34, clock());
 
-	// Representative 2:1 stripe widths lie safely inside the firmware's adaptive timing windows.
+	// Allow the interrupt-driven width counter to run between representative 2:1 stripes.
 	u8 const bit = events_emitted - 1;
-	u32 const counts = bit < 24 && BIT(m_pattern, bit) ? 0x100 : 0x80;
+	u32 const counts = bit < 24 && BIT(m_pattern, bit) ? 0x2000 : 0x1000;
 	return attotime::from_ticks(counts * 34, clock());
 }
