@@ -1413,17 +1413,14 @@ void i386_device::sib_byte(uint8_t mod, uint32_t* out_ea, uint8_t* out_segment)
 	i = (sib >> 3) & 0x7;
 	base = sib & 0x7;
 
-	if (base == EBP && mod == 0)
-	{
+	if( base == EBP && mod == 0 ) {
 		ea = FETCH32();
 		segment = DS;
-	}
-	else
-	{
+	} else {
 		ea = REG32(base);
 		segment = (base == ESP || base == EBP) ? SS : DS;
 	}
-	if (i != ESP)
+	if( i != ESP )
 		ea += REG32(i) << scale;
 	*out_ea = ea;
 	*out_segment = segment;
@@ -1444,15 +1441,12 @@ void i386_device::modrm_to_EA(uint8_t mod_rm, uint32_t* out_ea, uint8_t* out_seg
 
 
 	if( m_address_size ) {
-		if (rm == ESP)
+		if( rm == ESP )
 			sib_byte(mod, &ea, &segment);
-		else if (rm == EBP && mod == 0)
-		{
+		else if( rm == EBP && mod == 0 ) {
 			ea = FETCH32();
 			segment = DS;
-		}
-		else
-		{
+		} else {
 			ea = REG32(rm);
 			segment = (rm == EBP) ? SS : DS;
 		}
