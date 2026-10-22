@@ -35,7 +35,6 @@
   \- 2 cycles for RAM
   \- 1 cycle for cache
   - pipeline;
-  - implement caxi opcode;
 
 ******************************************************************/
 
@@ -904,12 +903,21 @@ uint32_t v810_device::opINB(uint32_t op) // in.b disp16[reg1],reg2
 	return m_bus_timing ? mem_cycles(addr, BUS_IO_READ, 1, 3, 0, LAST_OTHER) : 2+clkMEM;
 }
 
+// compare and exchange interlocked: the flags are those of reg2 - lock word; the lock word is
+// replaced by r30 if they are equal (otherwise written back unchanged), and reg2 gets the lock word
 uint32_t v810_device::opCAXI(uint32_t op)    // caxi disp16[reg1],reg2
 {
-	printf("V810 CAXI execute\n");
-	PC+=2;
-	// TODO: check me
-	return 1;
+	const uint32_t addr = (GETREG(GET1) + D16(R_OP(PC))) & ~3;
+	PC += 2;
+	const uint32_t lock = R_W(addr);
+	const uint32_t op2 = GETREG(GET2);
+	const uint64_t res = uint64_t(op2) - uint64_t(lock);
+	CHECK_CY(res);
+	CHECK_OVSUB(lock, op2, res);
+	CHECK_ZS(res);
+	W_W(addr, uint32_t(res) ? lock : GETREG(30));
+	SETREG(GET2, lock);
+	return m_bus_timing ? (22 + m_bus_wait(addr, BUS_READ, 4) + m_bus_wait(addr, BUS_WRITE, 4)) : 22;
 }
 
 uint32_t v810_device::opINH(uint32_t op) // in.h disp16[reg1],reg2
