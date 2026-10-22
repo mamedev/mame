@@ -12,21 +12,18 @@
 
 #include <utility>
 
-class xavix_daigunder_robots_device : public device_t
+class xavix_daigunder_robots_device : public xavix_ir_framed_device
 {
 public:
 	xavix_daigunder_robots_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
-	template <typename... T> void set_event_callback(T &&... args) { m_ir.lookup()->set_event_callback(std::forward<T>(args)...); }
-	int data_r() { return m_ir->data_r(); }
-	void vblank_w(int state);
 
 protected:
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual void device_start() override ATTR_COLD;
+
+	virtual u32 read_report(unsigned report) override;
 
 private:
 	static constexpr u8 CONTROL_REPORTS[2][8] =
@@ -48,11 +45,9 @@ private:
 	};
 
 	u16 control_report_r(unsigned player);
-	template <unsigned Player> u16 control_report_r() { return control_report_r(Player); }
 	u16 accessory_report_r();
-	template <unsigned Part> u16 identity_report_r();
+	u16 identity_report_r(unsigned part);
 
-	required_device<xavix_ir_report_device> m_ir;
 	required_device<screen_device> m_screen;
 	required_ioport_array<2> m_robot_controls;
 	required_ioport_array<2> m_robot_id;

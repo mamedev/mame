@@ -17,10 +17,12 @@
 DEFINE_DEVICE_TYPE(XAVIX_STADIUM_BAT, xavix_stadium_bat_device, "xavix_stadium_bat", "Excite Stadium Infrared Bat")
 
 xavix_stadium_bat_device::xavix_stadium_bat_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, XAVIX_STADIUM_BAT, tag, owner, clock)
-	, m_ir(*this, "ir")
+	: xavix_ir_msb_device(mconfig, XAVIX_STADIUM_BAT, tag, owner, clock)
 	, m_swing(*this, "SWING")
 {
+	set_report_count(1);
+	set_report_bits<0>(9);
+	set_bit_ticks((0x0a + 1) << (0x07 + 1));
 }
 
 static INPUT_PORTS_START( xavix_stadium_bat )
@@ -29,32 +31,12 @@ static INPUT_PORTS_START( xavix_stadium_bat )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void xavix_stadium_bat_device::device_add_mconfig(machine_config &config)
-{
-	XAVIX_IR_REPORT(config, m_ir, DERIVED_CLOCK(1, 1));
-	m_ir->set_report_count(1);
-	m_ir->set_report_bits<0>(9);
-	m_ir->set_bit_ticks((0x0a + 1) << (0x07 + 1));
-	// The original bat sends an undifferentiated active-low infrared envelope rather than a data word.
-	m_ir->report_callback<0>().set_constant(0);
-	m_ir->enable_callback().set(*this, FUNC(xavix_stadium_bat_device::bat_active_r));
-}
-
 ioport_constructor xavix_stadium_bat_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(xavix_stadium_bat);
 }
 
-void xavix_stadium_bat_device::device_start()
-{
-}
-
-void xavix_stadium_bat_device::vblank_w(int state)
-{
-	m_ir->vblank_w(state);
-}
-
-int xavix_stadium_bat_device::bat_active_r()
+bool xavix_stadium_bat_device::reports_enabled()
 {
 	return BIT(m_swing->read(), 0);
 }

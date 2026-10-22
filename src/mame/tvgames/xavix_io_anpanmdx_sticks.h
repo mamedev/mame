@@ -9,24 +9,22 @@
 #include "xavix_io_ir.h"
 
 #include <array>
-#include <utility>
 
-class xavix_anpanman_sticks_device : public device_t
+class xavix_anpanman_sticks_device : public xavix_ir_msb_device
 {
 public:
 	xavix_anpanman_sticks_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <typename... T> void set_event_callback(T &&... args) { m_ir.lookup()->set_event_callback(std::forward<T>(args)...); }
-	int data_r() { return m_ir->data_r(); }
-	void vblank_w(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(stick_activate);
 
 protected:
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
+	virtual u32 read_report(unsigned report) override;
+	virtual bool reports_enabled() override;
 
 private:
 	static constexpr u32 STICK_SEQUENCES[2][4] =
@@ -35,10 +33,6 @@ private:
 		{ 0x03d92, 0x03c98, 0x03d37, 0x03c3d }
 	};
 
-	int ir_enable_r();
-	template <unsigned Player> u32 stick_sequence_r();
-
-	required_device<xavix_ir_report_device> m_ir;
 	required_ioport_array<2> m_motion_level;
 	required_ioport m_stick_batteries;
 

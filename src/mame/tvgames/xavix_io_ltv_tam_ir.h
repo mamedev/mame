@@ -6,10 +6,12 @@
 
 #pragma once
 
+#include "xavix_io_ir.h"
+
 #include <array>
 #include <utility>
 
-class xavix_tamagotchi_ir_device : public device_t
+class xavix_tamagotchi_ir_device : public device_t, public xavix_ir_receiver_interface
 {
 public:
 	xavix_tamagotchi_ir_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -63,18 +65,17 @@ private:
 	};
 
 	TIMER_CALLBACK_MEMBER(receive_tick);
-	TIMER_CALLBACK_MEMBER(transmit_timeout);
 	void start_receive_mark(receive_phase phase, u32 ticks);
 	u32 receive_space_ticks() const;
-	void begin_transmit_burst();
-	void finish_transmit_burst();
+	virtual void ir_burst_started(u64 gap_ticks) override;
+	virtual void ir_burst_finished(u64 width_ticks) override;
+	virtual void ir_idle_timeout() override;
 	void append_transmit_bit(bool bit);
 	void finish_transmit_packet();
 	bool validate_acknowledgement() const;
 
 	device_delegate<void ()> m_event_out_cb;
 	emu_timer *m_receive_timer;
-	emu_timer *m_transmit_timer;
 
 	std::array<u8, PACKET_BYTES> m_receive_packet;
 	std::array<u8, PACKET_BYTES> m_transmit_packet;
@@ -84,14 +85,9 @@ private:
 	u8 m_transmit_bit;
 	u8 m_transmit_bytes;
 	u8 m_rx_data;
-	u8 m_tx_pin;
-	bool m_transmit_burst;
 	bool m_transmit_frame;
 	bool m_transmit_mark_pending;
 	bool m_acknowledgement_valid;
-	attotime m_transmit_burst_start;
-	attotime m_transmit_last_edge;
-	attotime m_transmit_mark_end;
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_TAMAGOTCHI_IR, xavix_tamagotchi_ir_device)

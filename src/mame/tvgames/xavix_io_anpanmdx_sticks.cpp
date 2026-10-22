@@ -17,11 +17,20 @@
 DEFINE_DEVICE_TYPE(XAVIX_ANPANMAN_STICKS, xavix_anpanman_sticks_device, "xavix_anpanman_sticks", "Anpanman Mat DX Infrared Sticks")
 
 xavix_anpanman_sticks_device::xavix_anpanman_sticks_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, XAVIX_ANPANMAN_STICKS, tag, owner, clock)
-	, m_ir(*this, "ir")
+	: xavix_ir_msb_device(mconfig, XAVIX_ANPANMAN_STICKS, tag, owner, clock)
 	, m_motion_level(*this, "STICK%u", 1U)
 	, m_stick_batteries(*this, "STICK_BATTERIES")
 {
+	set_report_count(2);
+	set_report_bits<0>(17);
+	set_report_bits<1>(17);
+	// These transitions target the ROM's 17 sampling windows; transmitter edge timing remains unmeasured.
+	set_sample_ticks(std::array<u32, 17>
+	{
+		10'414, 7'164, 5'564, 3'804, 4'380, 8'060, 9'084, 9'084, 9'084,
+		9'084, 9'084, 9'084, 9'084, 9'084, 9'084, 9'084, 9'084
+	});
+	set_bit_ticks(9'084);
 }
 
 static INPUT_PORTS_START( xavix_anpanman_sticks )
@@ -52,25 +61,6 @@ static INPUT_PORTS_START( xavix_anpanman_sticks )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void xavix_anpanman_sticks_device::device_add_mconfig(machine_config &config)
-{
-	XAVIX_IR_REPORT(config, m_ir, DERIVED_CLOCK(1, 1));
-	m_ir->set_report_count(2);
-	m_ir->set_mode(xavix_ir_report_device::mode::SAMPLE_SEQUENCE);
-	m_ir->set_report_bits<0>(17);
-	m_ir->set_report_bits<1>(17);
-	// These transitions target the ROM's 17 sampling windows; transmitter edge timing remains unmeasured.
-	m_ir->set_sample_ticks(std::array<u32, 17>
-	{
-		10'414, 7'164, 5'564, 3'804, 4'380, 8'060, 9'084, 9'084, 9'084,
-		9'084, 9'084, 9'084, 9'084, 9'084, 9'084, 9'084, 9'084
-	});
-	m_ir->set_bit_ticks(9'084);
-	m_ir->sequence_callback<0>().set(*this, FUNC(xavix_anpanman_sticks_device::stick_sequence_r<0>));
-	m_ir->sequence_callback<1>().set(*this, FUNC(xavix_anpanman_sticks_device::stick_sequence_r<1>));
-	m_ir->enable_callback().set(*this, FUNC(xavix_anpanman_sticks_device::ir_enable_r));
-}
-
 ioport_constructor xavix_anpanman_sticks_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(xavix_anpanman_sticks);
@@ -78,18 +68,16 @@ ioport_constructor xavix_anpanman_sticks_device::device_input_ports() const
 
 void xavix_anpanman_sticks_device::device_start()
 {
+	xavix_ir_msb_device::device_start();
+
 	save_item(NAME(m_stick_awake));
 }
 
 void xavix_anpanman_sticks_device::device_reset()
 {
-	m_stick_awake.fill(false);
-}
+	xavix_ir_msb_device::device_reset();
 
-void xavix_anpanman_sticks_device::vblank_w(int state)
-{
-	// Continuous once-per-frame reports reproduce the observed post-wake operation; the physical sleep cadence is unknown.
-	m_ir->vblank_w(state);
+	m_stick_awake.fill(false);
 }
 
 INPUT_CHANGED_MEMBER(xavix_anpanman_sticks_device::stick_activate)
@@ -100,7 +88,7 @@ INPUT_CHANGED_MEMBER(xavix_anpanman_sticks_device::stick_activate)
 		m_stick_awake[player] = true;
 }
 
-int xavix_anpanman_sticks_device::ir_enable_r()
+bool xavix_anpanman_sticks_device::reports_enabled()
 {
 	u8 const batteries = m_stick_batteries->read();
 	for (unsigned player = 0; player != m_stick_awake.size(); ++player)
@@ -112,12 +100,11 @@ int xavix_anpanman_sticks_device::ir_enable_r()
 	return m_stick_awake[0] || m_stick_awake[1];
 }
 
-template <unsigned Player>
-u32 xavix_anpanman_sticks_device::stick_sequence_r()
+u32 xavix_anpanman_sticks_device::read_report(unsigned report)
 {
-	if (!m_stick_awake[Player] || !BIT(m_stick_batteries->read(), Player))
+	if (!m_stick_awake[report] || !BIT(m_stick_batteries->read(), report))
 		return xavix_ir_report_device::NO_SEQUENCE;
 
 	// Stick-number polarity follows the decoder's two report destinations; a physical IR capture is still needed to verify it.
-	return STICK_SEQUENCES[Player][m_motion_level[Player]->read() & 3];
+	return STICK_SEQUENCES[report][m_motion_level[report]->read() & 3];
 }

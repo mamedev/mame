@@ -1839,33 +1839,21 @@ static INPUT_PORTS_START( rad_crdn )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("ROW0")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Enter")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("New Game")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Sound")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("ROW1")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Dock Remote / Power Off") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_rad_crdn_state::remote_reset), 0)
 	PORT_BIT( 0xef, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("REMOTE_RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Remote Reset") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_rad_crdn_state::remote_reset), 0)
-
-	PORT_START("FACTORY_TX")
-	// The physical control or fixture sending this additional wireless command is unidentified.
-	// PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Transmission") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-
 	// The base Reset restarts the game; Remote Reset only restarts its transmitter.
 	PORT_INCLUDE(xavix_reset_control)
+	PORT_MODIFY("RESET")
+	// This console button must not reserve a player number ahead of the handheld controls.
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Reset") PORT_CODE(input_seq::end_code)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_state::reset_button), 0)
 INPUT_PORTS_END
 
 
@@ -1888,38 +1876,10 @@ void xavix_rad_crdn_state::xavix_rad_crdnp(machine_config &config)
 
 void xavix_rad_crdn_state::configure_remote(machine_config &config)
 {
-	// The receiver checks three copies; physical timing and simultaneous-key priority need measurement.
-	XAVIX_IR_REPORT(config, m_remote, peripheral_clock());
-	m_remote->set_mode(xavix_ir_report_device::mode::PULSE_RUN_LENGTH);
-	m_remote->set_bit_ticks(0x15 * 512);
-	m_remote->set_report_gap_ticks(64 * 512);
-	m_remote->set_report_count(3);
-	m_remote->report_callback<0>().set(FUNC(xavix_rad_crdn_state::remote_report_r));
-	m_remote->report_callback<1>().set(FUNC(xavix_rad_crdn_state::remote_report_r));
-	m_remote->report_callback<2>().set(FUNC(xavix_rad_crdn_state::remote_report_r));
-	m_remote->enable_callback().set(FUNC(xavix_rad_crdn_state::remote_enabled_r));
+	XAVIX_CARDNIGHT_REMOTE(config, m_remote, peripheral_clock());
+	m_remote->dock_callback().set_ioport("ROW1").bit(4);
 	m_remote->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
-	m_screen->screen_vblank().append(m_remote, FUNC(xavix_ir_report_device::vblank_w));
-}
-
-u16 xavix_rad_crdn_state::remote_report_r()
-{
-	if (BIT(m_factory_test->read(), 0))
-		return 0x55;
-
-	u8 const buttons = m_buttons->read();
-	if (BIT(buttons, 5))
-		return 0xa5;
-	if (BIT(buttons, 6))
-		return 0x95;
-	if (BIT(buttons, 7))
-		return 0x45;
-	return DIRECTION_REPORTS[BIT(m_directions->read(), 2, 4)];
-}
-
-int xavix_rad_crdn_state::remote_enabled_r()
-{
-	return !BIT(m_dock->read(), 4) && !BIT(m_remote_reset->read(), 0) && remote_report_r();
+	m_screen->screen_vblank().append(m_remote, FUNC(xavix_cardnight_remote_device::vblank_w));
 }
 
 INPUT_CHANGED_MEMBER(xavix_rad_crdn_state::remote_reset)
@@ -2011,7 +1971,7 @@ static INPUT_PORTS_START( epo_esdx )
 	PORT_INCLUDE(xavix_excite_panel)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_esdx_controllers_device::data_r))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_baseball_controllers_device::data_r))
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
@@ -2026,7 +1986,7 @@ static INPUT_PORTS_START( epo_esht )
 	PORT_INCLUDE(xavix_excite_panel)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_esdx_controllers_device::data_r))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_baseball_controllers_device::data_r))
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
@@ -2037,7 +1997,7 @@ static INPUT_PORTS_START( epo_esht )
 	PORT_CONFSETTING(    0x24, "Very Low" )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_esdx_controllers_device::data_r))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_baseball_controllers_device::data_r))
 	// The documented adapter and this line's verified auto-off behaviour identify the source selector.
 	PORT_CONFNAME( 0x02, 0x00, "Power Source" )
 	PORT_CONFSETTING(    0x00, "Batteries" )
@@ -2047,9 +2007,10 @@ INPUT_PORTS_END
 
 void xavix_epo_baseball_state::configure_controllers(machine_config &config)
 {
-	XAVIX_ESDX_CONTROLLERS(config, m_controllers, peripheral_clock());
+	XAVIX_BASEBALL_CONTROLLERS(config, m_controllers, peripheral_clock());
+	m_controllers->set_controller_type(xavix_baseball_controllers_device::controller_type::STADIUM_DX);
 	m_controllers->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
-	m_screen->screen_vblank().append(m_controllers, FUNC(xavix_esdx_controllers_device::vblank_w));
+	m_screen->screen_vblank().append(m_controllers, FUNC(xavix_baseball_controllers_device::vblank_w));
 }
 
 void xavix_epo_baseball_state::xavix_epo_esdx(machine_config &config)

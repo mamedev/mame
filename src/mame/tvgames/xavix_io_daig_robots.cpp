@@ -18,13 +18,14 @@
 DEFINE_DEVICE_TYPE(XAVIX_DAIGUNDER_ROBOTS, xavix_daigunder_robots_device, "xavix_daigunder_robots", "Daigunder Robot Infrared Controllers")
 
 xavix_daigunder_robots_device::xavix_daigunder_robots_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, XAVIX_DAIGUNDER_ROBOTS, tag, owner, clock)
-	, m_ir(*this, "ir")
+	: xavix_ir_framed_device(mconfig, XAVIX_DAIGUNDER_ROBOTS, tag, owner, clock)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_robot_controls(*this, "P%u_ROBOT", 1U)
 	, m_robot_id(*this, "P%u_ID", 1U)
 	, m_accessory_controls(*this, "ACCESSORY")
 {
+	set_report_count(5);
+	set_bit_ticks(0x50 * 64);
 }
 
 static INPUT_PORTS_START( xavix_daigunder_robots )
@@ -78,31 +79,9 @@ static INPUT_PORTS_START( xavix_daigunder_robots )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void xavix_daigunder_robots_device::device_add_mconfig(machine_config &config)
-{
-	XAVIX_IR_REPORT(config, m_ir, DERIVED_CLOCK(1, 1));
-	m_ir->set_report_count(5);
-	m_ir->set_mode(xavix_ir_report_device::mode::FRAMED_LSB);
-	m_ir->set_bit_ticks(0x50 * 64);
-	m_ir->report_callback<0>().set(*this, FUNC(xavix_daigunder_robots_device::control_report_r<0>));
-	m_ir->report_callback<1>().set(*this, FUNC(xavix_daigunder_robots_device::control_report_r<1>));
-	m_ir->report_callback<2>().set(*this, FUNC(xavix_daigunder_robots_device::accessory_report_r));
-	m_ir->report_callback<3>().set(*this, FUNC(xavix_daigunder_robots_device::identity_report_r<0>));
-	m_ir->report_callback<4>().set(*this, FUNC(xavix_daigunder_robots_device::identity_report_r<1>));
-}
-
 ioport_constructor xavix_daigunder_robots_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(xavix_daigunder_robots);
-}
-
-void xavix_daigunder_robots_device::device_start()
-{
-}
-
-void xavix_daigunder_robots_device::vblank_w(int state)
-{
-	m_ir->vblank_w(state);
 }
 
 u16 xavix_daigunder_robots_device::control_report_r(unsigned player)
@@ -115,10 +94,18 @@ u16 xavix_daigunder_robots_device::accessory_report_r()
 	return ACCESSORY_REPORTS[m_accessory_controls->read() & 7];
 }
 
-template <unsigned Part>
-u16 xavix_daigunder_robots_device::identity_report_r()
+u16 xavix_daigunder_robots_device::identity_report_r(unsigned part)
 {
 	unsigned const player = BIT(m_screen->frame_number(), 0);
 	u8 const identity = m_robot_id[player]->read() & 0x0f;
-	return identity <= 10 ? IDENTITY_REPORTS[player][identity][Part] : control_report_r(player);
+	return identity <= 10 ? IDENTITY_REPORTS[player][identity][part] : control_report_r(player);
+}
+
+u32 xavix_daigunder_robots_device::read_report(unsigned report)
+{
+	if (report < 2)
+		return control_report_r(report);
+	if (report == 2)
+		return accessory_report_r();
+	return identity_report_r(report - 3);
 }

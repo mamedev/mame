@@ -9,9 +9,8 @@
 #include "xavix_io_ir.h"
 
 #include <array>
-#include <utility>
 
-class xavix_ir_step_mat_device : public device_t
+class xavix_ir_step_mat_device : public xavix_ir_msb_device
 {
 public:
 	enum class protocol
@@ -23,16 +22,13 @@ public:
 	xavix_ir_step_mat_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void set_protocol(protocol type) { m_protocol = type; }
-	template <typename... T> void set_event_callback(T &&... args) { m_ir.lookup()->set_event_callback(std::forward<T>(args)...); }
-	int data_r() { return m_ir->data_r(); }
-	void vblank_w(int state);
 
 protected:
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_config_complete() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-	virtual void device_start() override ATTR_COLD;
+
+	virtual u32 read_report(unsigned report) override;
 
 private:
 	static constexpr std::array<u32, 16> JMAT_SAMPLE_TICKS =
@@ -56,9 +52,7 @@ private:
 	};
 
 	static u16 jmat_report(u8 pads);
-	u32 mat_report_r();
 
-	required_device<xavix_ir_report_device> m_ir;
 	required_ioport m_pads;
 	required_ioport m_power;
 	protocol m_protocol;

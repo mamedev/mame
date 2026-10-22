@@ -8,23 +8,19 @@
 
 #include "xavix_io_ir.h"
 
-#include <utility>
-
-class xavix_rockman_arm_device : public device_t
+class xavix_rockman_arm_device : public xavix_ir_framed_device
 {
 public:
 	xavix_rockman_arm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <typename... T> void set_event_callback(T &&... args) { m_ir.lookup()->set_event_callback(std::forward<T>(args)...); }
-	int data_r() { return m_ir->data_r(); }
-	void vblank_w(int state);
-
 protected:
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
+	virtual u32 read_report(unsigned report) override;
+	virtual bool report_enabled(unsigned report) override;
 
 private:
 	static constexpr u16 CONTROLLER_REPORTS[3][3] =
@@ -36,10 +32,6 @@ private:
 	static constexpr u16 FACTORY_REPORTS[2] = { 0x0d73, 0x1645 };
 	static constexpr u8 SHAKE_PHASE_FRAMES = 12;
 
-	int controller_enabled_r();
-	u16 controller_report_r();
-
-	required_device<xavix_ir_report_device> m_ir;
 	required_ioport m_arm;
 	required_ioport m_controller_buttons;
 	required_ioport m_controller_power;

@@ -8,27 +8,20 @@
 
 #include "xavix_io_ir.h"
 
-#include <utility>
-
-class xavix_stadium_bat_device : public device_t
+class xavix_stadium_bat_device : public xavix_ir_msb_device
 {
 public:
 	xavix_stadium_bat_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <typename... T> void set_event_callback(T &&... args) { m_ir.lookup()->set_event_callback(std::forward<T>(args)...); }
-	int data_r() { return m_ir->data_r(); }
-	void vblank_w(int state);
-
 protected:
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual void device_start() override ATTR_COLD;
+
+	// The original bat sends an undifferentiated active-low envelope.
+	virtual u32 read_report(unsigned report) override { return 0; }
+	virtual bool reports_enabled() override;
 
 private:
-	int bat_active_r();
-
-	required_device<xavix_ir_report_device> m_ir;
 	required_ioport m_swing;
 };
 

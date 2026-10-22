@@ -2,10 +2,11 @@
 // copyright-holders:MagikalUnicorn
 /***************************************************************************
 
-    Shared infrared report generator for XaviX controllers. Latches input
-    reports and emits timed receiver events and data levels using framed
-    serial, sampled data or pulse interval formats, with configurable report
-    lengths, framing and bit timing.
+    Shared infrared transmission and carrier reception for XaviX controllers.
+    Controllers own their inputs and report contents; encoder bases emit
+    receiver events and data levels with the appropriate framing and bit timing.
+    The receiver interface collects carrier edges and measures marks and spaces
+    using the controller clock; packet framing remains controller-owned.
 
     TODO:
     - Replace vblank-synchronised bursts with measured controller clocks,
@@ -18,41 +19,23 @@
 
 #include <bit>
 
-DEFINE_DEVICE_TYPE(XAVIX_IR_REPORT, xavix_ir_report_device, "xavix_ir_report", "XaviX Infrared Controller Reports")
-
-xavix_ir_report_device::xavix_ir_report_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, XAVIX_IR_REPORT, tag, owner, clock)
-	, m_report_cb(*this, 0xffff)
-	, m_report_enable_cb(*this, 1)
-	, m_sequence_cb(*this, NO_SEQUENCE)
-	, m_enable_cb(*this, 1)
-	, m_event_out_cb(*this)
-	, m_report_bits{ 8, 8, 8, 8, 8, 8, 8, 8 }
-	, m_sample_ticks{}
+xavix_ir_report_device::xavix_ir_report_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_data(1)
 	, m_bit_ticks(0x47 * 64)
-	, m_pulse_one_ticks(0)
-	, m_pulse_zero_ticks(0)
-	, m_first_pulse_extension(0)
-	, m_report_gap_ticks(0)
-	, m_start_ticks{}
+	, m_event_out_cb(*this)
+	, m_report_bits{ 8, 8, 8, 8, 8, 8, 8, 8 }
 	, m_report_count(2)
-	, m_sample_tick_count(0)
-	, m_mode(mode::MSB_FIRST)
 {
 }
 
 void xavix_ir_report_device::device_start()
 {
 	m_event_out_cb.resolve_safe();
-
 	assert(m_bit_ticks);
-	assert(m_mode != mode::PULSE_DISTANCE || (m_pulse_one_ticks && m_pulse_zero_ticks));
 	assert(m_report_count && m_report_count <= m_latched_report.size());
 	for (unsigned report = 0; report != m_report_count; ++report)
-		assert(m_report_bits[report] && m_report_bits[report] <= (m_mode == mode::SAMPLE_SEQUENCE ? 32 : 16));
-	for (unsigned bit = 0; bit != m_sample_tick_count; ++bit)
-		assert(m_sample_ticks[bit]);
+		assert(m_report_bits[report] && m_report_bits[report] <= 32);
 
 	m_frame_timer = timer_alloc(FUNC(xavix_ir_report_device::frame_start), this);
 	m_bit_timer = timer_alloc(FUNC(xavix_ir_report_device::bit_tick), this);
@@ -64,7 +47,6 @@ void xavix_ir_report_device::device_start()
 	save_item(NAME(m_data));
 	save_item(NAME(m_frame_pending));
 	save_item(NAME(m_between_reports));
-	save_item(NAME(m_start_cell));
 }
 
 void xavix_ir_report_device::device_reset()
@@ -78,30 +60,39 @@ void xavix_ir_report_device::device_reset()
 	m_data = 1;
 	m_frame_pending = false;
 	m_between_reports = false;
+}
+
+void xavix_ir_msb_device::device_start()
+{
+	xavix_ir_report_device::device_start();
+	for (unsigned bit = 0; bit != m_sample_tick_count; ++bit)
+		assert(m_sample_ticks[bit]);
+}
+
+void xavix_ir_framed_device::device_start()
+{
+	xavix_ir_report_device::device_start();
+	save_item(NAME(m_start_cell));
+}
+
+void xavix_ir_framed_device::device_reset()
+{
+	xavix_ir_report_device::device_reset();
 	m_start_cell = false;
 }
 
-u8 xavix_ir_report_device::motion_report(unsigned player, bool button, u8 strength)
+void xavix_ir_pulse_distance_device::device_start()
 {
-	assert(player < 2);
-	return MOTION_REPORTS[player][button][strength & 3];
-}
-
-u16 xavix_ir_report_device::baseball_bat_report(bool bunt, bool swing)
-{
-	// Accepted state 3 has no known physical meaning; a swing temporarily takes priority over a held bunt button.
-	u8 const state = swing ? 2 : bunt;
-	return 1 | (u16(BASEBALL_BAT_PAYLOADS[state]) << 1);
+	xavix_ir_report_device::device_start();
+	assert(m_pulse_one_ticks && m_pulse_zero_ticks);
 }
 
 void xavix_ir_report_device::vblank_w(int state)
 {
-	if (state && m_enable_cb() && !m_frame_pending && !m_bits_remaining && !m_between_reports)
+	if (state && reports_enabled() && !m_frame_pending && !m_bits_remaining && !m_between_reports)
 	{
 		for (unsigned report = 0; report != m_report_count; ++report)
-			m_latched_report[report] = m_report_enable_cb[report]()
-				? (m_mode == mode::SAMPLE_SEQUENCE ? m_sequence_cb[report]() : m_report_cb[report]())
-				: NO_SEQUENCE;
+			m_latched_report[report] = report_enabled(report) ? read_report(report) : NO_SEQUENCE;
 
 		// Compatibility approximation: avoid receive latency and packets the ROM rejects across its video handler.
 		// Physical controllers transmit independently of console vblank; their repetition timing is unmeasured.
@@ -123,28 +114,7 @@ void xavix_ir_report_device::start_report(unsigned report)
 	m_report_index = report;
 	m_shift = m_latched_report[report];
 	m_bits_remaining = m_report_bits[report];
-	m_start_cell = m_mode == mode::FRAMED_LSB;
-	if (m_mode == mode::PULSE_DISTANCE || m_mode == mode::PULSE_RUN_LENGTH)
-		m_data = 1;
-	else
-		m_data = m_mode == mode::FRAMED_LSB ? 0 : BIT(m_shift, m_bits_remaining - 1);
-
-	// The first event marks framing; pulse-distance reports encode every bit before the next event.
-	m_event_out_cb();
-	if (m_mode == mode::PULSE_DISTANCE)
-		m_bit_timer->adjust(clocks_to_attotime(current_pulse_ticks() + m_first_pulse_extension));
-	else if (m_mode == mode::PULSE_RUN_LENGTH)
-	{
-		assert(BIT(m_shift, 0));
-		m_bit_timer->adjust(clocks_to_attotime(current_run_bits() * m_bit_ticks));
-	}
-	else
-	{
-		u32 ticks = current_bit_ticks();
-		if (m_start_cell && m_start_ticks[report])
-			ticks = m_start_ticks[report];
-		m_bit_timer->adjust(clocks_to_attotime(ticks));
-	}
+	begin_report();
 }
 
 unsigned xavix_ir_report_device::next_report(unsigned report) const
@@ -154,63 +124,21 @@ unsigned xavix_ir_report_device::next_report(unsigned report) const
 	return report;
 }
 
-u32 xavix_ir_report_device::current_bit_ticks() const
+void xavix_ir_report_device::finish_report(bool stop_cell, u32 gap_ticks)
 {
-	if (m_mode == mode::SAMPLE_SEQUENCE)
+	m_data = 1;
+	if (stop_cell || next_report(m_report_index + 1) < m_report_count)
 	{
-		unsigned const bit = m_report_bits[m_report_index] - m_bits_remaining;
-		if (bit < m_sample_tick_count)
-			return m_sample_ticks[bit];
+		m_between_reports = true;
+		schedule_bit(gap_ticks ? gap_ticks : m_bit_ticks);
 	}
-
-	return m_bit_ticks;
-}
-
-u32 xavix_ir_report_device::current_pulse_ticks() const
-{
-	return BIT(m_shift, 0) ? m_pulse_one_ticks : m_pulse_zero_ticks;
-}
-
-unsigned xavix_ir_report_device::current_run_bits() const
-{
-	return std::min<unsigned>(m_bits_remaining, 1 + std::countr_zero(m_shift >> 1));
+	else
+		m_bit_timer->adjust(attotime::never);
 }
 
 TIMER_CALLBACK_MEMBER(xavix_ir_report_device::bit_tick)
 {
-	if (m_mode == mode::PULSE_DISTANCE)
-	{
-		m_event_out_cb();
-		if (--m_bits_remaining)
-		{
-			m_shift >>= 1;
-			m_bit_timer->adjust(clocks_to_attotime(current_pulse_ticks()));
-		}
-		else
-		{
-			m_bit_timer->adjust(attotime::never);
-		}
-	}
-	else if (m_mode == mode::PULSE_RUN_LENGTH && !m_between_reports)
-	{
-		unsigned const bits = current_run_bits();
-		m_shift >>= bits;
-		m_bits_remaining -= bits;
-		if (m_bits_remaining)
-		{
-			m_event_out_cb();
-			m_bit_timer->adjust(clocks_to_attotime(current_run_bits() * m_bit_ticks));
-		}
-		// The final zero run ends by timeout, without another receiver event.
-		else if (next_report(m_report_index + 1) < m_report_count)
-		{
-			m_between_reports = true;
-			m_bit_timer->adjust(clocks_to_attotime(m_report_gap_ticks ? m_report_gap_ticks : m_bit_ticks));
-		}
-		else
-			m_bit_timer->adjust(attotime::never);
-	}
-	else if (m_between_reports)
+	if (m_between_reports)
 	{
 		m_between_reports = false;
 		unsigned const report = next_report(m_report_index + 1);
@@ -219,34 +147,177 @@ TIMER_CALLBACK_MEMBER(xavix_ir_report_device::bit_tick)
 		else
 			m_bit_timer->adjust(attotime::never);
 	}
-	else if (m_start_cell)
+	else
+		advance_report();
+}
+
+void xavix_ir_msb_device::begin_report()
+{
+	m_data = BIT(m_shift, m_bits_remaining - 1);
+	receiver_event();
+	schedule_bit(current_bit_ticks());
+}
+
+u32 xavix_ir_msb_device::current_bit_ticks() const
+{
+	unsigned const bit = report_bits() - m_bits_remaining;
+	return bit < m_sample_tick_count ? m_sample_ticks[bit] : m_bit_ticks;
+}
+
+void xavix_ir_msb_device::advance_report()
+{
+	if (--m_bits_remaining)
+	{
+		m_data = BIT(m_shift, m_bits_remaining - 1);
+		schedule_bit(current_bit_ticks());
+	}
+	else
+		finish_report();
+}
+
+void xavix_ir_framed_device::begin_report()
+{
+	m_start_cell = true;
+	m_data = 0;
+	receiver_event();
+	schedule_bit(m_start_ticks[m_report_index] ? m_start_ticks[m_report_index] : m_bit_ticks);
+}
+
+void xavix_ir_framed_device::advance_report()
+{
+	if (m_start_cell)
 	{
 		m_start_cell = false;
 		m_data = BIT(m_shift, 0);
-		m_bit_timer->adjust(clocks_to_attotime(current_bit_ticks()));
+		schedule_bit(m_bit_ticks);
 	}
 	else if (--m_bits_remaining)
 	{
-		if (m_mode == mode::FRAMED_LSB)
-		{
-			m_shift >>= 1;
-			m_data = BIT(m_shift, 0);
-		}
-		else
-		{
-			m_data = BIT(m_shift, m_bits_remaining - 1);
-		}
-		m_bit_timer->adjust(clocks_to_attotime(current_bit_ticks()));
-	}
-	else if ((next_report(m_report_index + 1) < m_report_count) || m_mode == mode::FRAMED_LSB)
-	{
-		m_data = 1;
-		m_between_reports = true;
-		m_bit_timer->adjust(clocks_to_attotime(m_bit_ticks));
+		m_shift >>= 1;
+		m_data = BIT(m_shift, 0);
+		schedule_bit(m_bit_ticks);
 	}
 	else
+		finish_report(true);
+}
+
+void xavix_ir_pulse_distance_device::set_pulse_distance_ticks(u32 one_ticks, u32 zero_ticks, u32 first_extension)
+{
+	m_pulse_one_ticks = one_ticks;
+	m_pulse_zero_ticks = zero_ticks;
+	m_first_pulse_extension = first_extension;
+}
+
+u32 xavix_ir_pulse_distance_device::current_pulse_ticks() const
+{
+	return BIT(m_shift, 0) ? m_pulse_one_ticks : m_pulse_zero_ticks;
+}
+
+void xavix_ir_pulse_distance_device::begin_report()
+{
+	m_data = 1;
+	receiver_event();
+	schedule_bit(current_pulse_ticks() + m_first_pulse_extension);
+}
+
+void xavix_ir_pulse_distance_device::advance_report()
+{
+	receiver_event();
+	if (--m_bits_remaining)
 	{
-		m_data = 1;
-		m_bit_timer->adjust(attotime::never);
+		m_shift >>= 1;
+		schedule_bit(current_pulse_ticks());
 	}
+	else
+		finish_report();
+}
+
+void xavix_ir_run_length_device::begin_report()
+{
+	assert(BIT(m_shift, 0));
+	m_data = 1;
+	receiver_event();
+	schedule_bit(current_run_bits() * m_bit_ticks);
+}
+
+unsigned xavix_ir_run_length_device::current_run_bits() const
+{
+	return std::min<unsigned>(m_bits_remaining, 1 + std::countr_zero(m_shift >> 1));
+}
+
+void xavix_ir_run_length_device::advance_report()
+{
+	unsigned const bits = current_run_bits();
+	m_shift = bits < 32 ? m_shift >> bits : 0;
+	m_bits_remaining -= bits;
+	if (m_bits_remaining)
+	{
+		receiver_event();
+		schedule_bit(current_run_bits() * m_bit_ticks);
+	}
+	else
+		finish_report(false, m_report_gap_ticks);
+}
+
+xavix_ir_receiver_interface::xavix_ir_receiver_interface(device_t &device, u32 quiet_ticks, bool rising_start)
+	: device_interface(device, "xavix_ir_receiver")
+	, m_quiet_ticks(quiet_ticks)
+	, m_rising_start(rising_start)
+	, m_ir_level(false)
+{
+}
+
+void xavix_ir_receiver_interface::interface_post_start()
+{
+	assert(device().clock() && m_quiet_ticks);
+	m_ir_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xavix_ir_receiver_interface::quiet_tick), this));
+	device().save_item(NAME(m_ir_burst_start));
+	device().save_item(NAME(m_ir_last_edge));
+	device().save_item(NAME(m_ir_level));
+	device().save_item(NAME(m_ir_carrier));
+}
+
+void xavix_ir_receiver_interface::ir_receiver_reset(bool reset_level)
+{
+	m_ir_timer->adjust(attotime::never);
+	m_ir_burst_start = attotime::zero;
+	m_ir_last_edge = attotime::zero;
+	m_ir_carrier = false;
+	if (reset_level)
+		m_ir_level = false;
+}
+
+void xavix_ir_receiver_interface::ir_receiver_wait(u32 ticks)
+{
+	m_ir_timer->adjust(device().clocks_to_attotime(ticks));
+}
+
+void xavix_ir_receiver_interface::ir_receiver_w(int state)
+{
+	bool const level = bool(state);
+	if (level == m_ir_level)
+		return;
+
+	m_ir_level = level;
+	attotime const now = device().machine().time();
+	if (!m_ir_carrier && (level || !m_rising_start))
+	{
+		m_ir_carrier = true;
+		m_ir_burst_start = now;
+		ir_burst_started((now - m_ir_last_edge).as_ticks(device().clock()));
+	}
+	m_ir_last_edge = now;
+	// Join carrier cycles without joining successive data marks.
+	ir_receiver_wait(m_quiet_ticks);
+}
+
+TIMER_CALLBACK_MEMBER(xavix_ir_receiver_interface::quiet_tick)
+{
+	if (m_ir_carrier)
+	{
+		m_ir_carrier = false;
+		ir_burst_finished((m_ir_last_edge - m_ir_burst_start).as_ticks(device().clock()));
+	}
+	else
+		ir_idle_timeout();
 }

@@ -17,14 +17,19 @@
 DEFINE_DEVICE_TYPE(XAVIX_GOLF_SWING, xavix_golf_swing_device, "xavix_golf_swing", "XaviX Golf Swing Sensor")
 
 xavix_golf_swing_device::xavix_golf_swing_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, XAVIX_GOLF_SWING, tag, owner, clock)
-	, m_ir(*this, "ir")
+	: xavix_ir_framed_device(mconfig, XAVIX_GOLF_SWING, tag, owner, clock)
 	, m_swing_active(*this, "SWING_ACTIVE")
 	, m_swing_axis(*this, "SWING_%c", 'X')
 	, m_swing_buttons(*this, "SWING_BUTTONS")
 	, m_swing_power(*this, "SWING_POWER")
 	, m_swing_phase(0)
 {
+	set_report_count(2);
+	// The receiver's alternating timer phases sample each 0x80-cell twice.
+	set_bit_ticks(0x80 * 64);
+	set_start_ticks(0x80 * 64);
+	set_report_bits<0>(11);
+	set_report_bits<1>(9);
 }
 
 static INPUT_PORTS_START( xavix_golf_swing )
@@ -65,21 +70,6 @@ static INPUT_PORTS_START( xavix_golf_swing )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
-void xavix_golf_swing_device::device_add_mconfig(machine_config &config)
-{
-	XAVIX_IR_REPORT(config, m_ir, DERIVED_CLOCK(1, 1));
-	m_ir->set_report_count(2);
-	m_ir->set_mode(xavix_ir_report_device::mode::FRAMED_LSB);
-	// The receiver's alternating timer phases sample each 0x80-cell twice.
-	m_ir->set_bit_ticks(0x80 * 64);
-	m_ir->set_start_ticks(0x80 * 64);
-	m_ir->set_report_bits<0>(11);
-	m_ir->set_report_bits<1>(9);
-	m_ir->report_callback<0>().set(*this, FUNC(xavix_golf_swing_device::swing_report_r<0>));
-	m_ir->report_callback<1>().set(*this, FUNC(xavix_golf_swing_device::swing_report_r<1>));
-	m_ir->enable_callback().set(*this, FUNC(xavix_golf_swing_device::ir_enable_r));
-}
-
 ioport_constructor xavix_golf_swing_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(xavix_golf_swing);
@@ -87,19 +77,18 @@ ioport_constructor xavix_golf_swing_device::device_input_ports() const
 
 void xavix_golf_swing_device::device_start()
 {
+	xavix_ir_framed_device::device_start();
+
 	save_item(NAME(m_swing_phase));
 	save_item(NAME(m_swing_reverse));
 }
 
 void xavix_golf_swing_device::device_reset()
 {
+	xavix_ir_framed_device::device_reset();
+
 	m_swing_phase = 0;
 	m_swing_reverse = false;
-}
-
-void xavix_golf_swing_device::vblank_w(int state)
-{
-	m_ir->vblank_w(state);
 }
 
 INPUT_CHANGED_MEMBER(xavix_golf_swing_device::swing_action)
@@ -111,7 +100,7 @@ INPUT_CHANGED_MEMBER(xavix_golf_swing_device::swing_action)
 	}
 }
 
-int xavix_golf_swing_device::ir_enable_r()
+bool xavix_golf_swing_device::reports_enabled()
 {
 	if (!BIT(m_swing_power->read(), 0))
 	{
@@ -122,8 +111,7 @@ int xavix_golf_swing_device::ir_enable_r()
 	return 1;
 }
 
-template <unsigned Part>
-u16 xavix_golf_swing_device::swing_report_r()
+u32 xavix_golf_swing_device::read_report(unsigned report)
 {
 	bool const generated = m_swing_phase != 0;
 	bool const sentinel = !generated && !BIT(m_swing_active->read(), 0);
@@ -131,7 +119,7 @@ u16 xavix_golf_swing_device::swing_report_r()
 		: sentinel ? 0x3f : m_swing_axis[0]->read() & 0x3f;
 	u8 const coord1 = generated ? 0x20 : sentinel ? 0x3f : m_swing_axis[1]->read() & 0x3f;
 
-	if (!Part)
+	if (!report)
 	{
 		bool const bit2 = BIT(coord0, 1);
 		bool const bit3 = BIT(coord1, 1);

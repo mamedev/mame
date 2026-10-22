@@ -8,12 +8,12 @@
 #include "xavix_io_bb_ball.h"
 #include "xavix_io_bistro_sensor.h"
 #include "xavix_io_card.h"
+#include "xavix_io_cardnight.h"
 #include "xavix_io_comt_baton.h"
 #include "xavix_io_crok_controllers.h"
 #include "xavix_io_daig_robots.h"
 #include "xavix_io_duelmast_scanner.h"
 #include "xavix_io_ebox_gloves.h"
-#include "xavix_io_esdx_controllers.h"
 #include "xavix_io_evio_bow.h"
 #include "xavix_io_image_sensor.h"
 #include "xavix_io_ir.h"
@@ -25,6 +25,7 @@
 #include "xavix_io_wamg_sensor.h"
 #include "xavix_io_wdg_granblade.h"
 #include "xavix_io_wdg_webknight.h"
+#include "xavix_io_xavbaseb_controllers.h"
 
 #include "bus/xavix/cart.h"
 #include "bus/xavix/tvpc_mouse.h"
@@ -270,11 +271,6 @@ public:
 	xavix_rad_crdn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_io0_matrix_power_state(mconfig, type, tag)
 		, m_remote(*this, "remote")
-		, m_directions(*this, "IN1")
-		, m_buttons(*this, "ROW0")
-		, m_dock(*this, "ROW1")
-		, m_remote_reset(*this, "REMOTE_RESET")
-		, m_factory_test(*this, "FACTORY_TX")
 	{ }
 
 	void xavix_rad_crdn(machine_config &config) ATTR_COLD;
@@ -286,22 +282,8 @@ protected:
 	virtual u8 io1_input_r(u8 direction) override;
 
 private:
-	static constexpr u8 DIRECTION_REPORTS[16] =
-	{
-		0x00, 0x11, 0x91, 0x00, 0x51, 0xa9, 0x15, 0x00,
-		0x29, 0x49, 0x89, 0x00, 0x00, 0x00, 0x00, 0x00
-	};
-
 	void configure_remote(machine_config &config) ATTR_COLD;
-	u16 remote_report_r();
-	int remote_enabled_r();
-
-	required_device<xavix_ir_report_device> m_remote;
-	required_ioport m_directions;
-	required_ioport m_buttons;
-	required_ioport m_dock;
-	required_ioport m_remote_reset;
-	required_ioport m_factory_test;
+	required_device<xavix_cardnight_remote_device> m_remote;
 };
 
 class xavix_power_state : public xavix_state
@@ -459,7 +441,7 @@ private:
 	void configure_controllers(machine_config &config) ATTR_COLD;
 	TIMER_CALLBACK_MEMBER(ir_receiver_quiet);
 
-	required_device<xavix_esdx_controllers_device> m_controllers;
+	required_device<xavix_baseball_controllers_device> m_controllers;
 	emu_timer *m_ir_receiver_timer;
 	attotime m_ir_last_carrier_edge;
 	u8 m_ir_carrier_pulses = 0;

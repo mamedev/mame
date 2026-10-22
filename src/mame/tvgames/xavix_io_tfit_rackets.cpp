@@ -17,12 +17,15 @@
 DEFINE_DEVICE_TYPE(XAVIX_TFIT_RACKETS, xavix_tfit_rackets_device, "xavix_tfit_rackets", "Tennis x Fitness Infrared Rackets")
 
 xavix_tfit_rackets_device::xavix_tfit_rackets_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, XAVIX_TFIT_RACKETS, tag, owner, clock)
-	, m_ir(*this, "ir")
+	: xavix_ir_msb_device(mconfig, XAVIX_TFIT_RACKETS, tag, owner, clock)
 	, m_racket_strength(*this, "RACKET%u_STRENGTH", 1U)
 	, m_racket_buttons(*this, "RACKET%u_BUTTONS", 1U)
 	, m_racket_power(*this, "RACKET_POWER")
 {
+	set_report_count(2);
+	set_report_bits<0>(13);
+	set_report_bits<1>(13);
+	set_bit_ticks(0x8d * 64);
 }
 
 static INPUT_PORTS_START( xavix_tfit_rackets )
@@ -55,41 +58,18 @@ static INPUT_PORTS_START( xavix_tfit_rackets )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void xavix_tfit_rackets_device::device_add_mconfig(machine_config &config)
-{
-	XAVIX_IR_REPORT(config, m_ir, DERIVED_CLOCK(1, 1));
-	m_ir->set_report_count(2);
-	m_ir->set_mode(xavix_ir_report_device::mode::SAMPLE_SEQUENCE);
-	m_ir->set_report_bits<0>(13);
-	m_ir->set_report_bits<1>(13);
-	m_ir->set_bit_ticks(0x8d * 64);
-	m_ir->sequence_callback<0>().set(*this, FUNC(xavix_tfit_rackets_device::racket_report_r<0>));
-	m_ir->sequence_callback<1>().set(*this, FUNC(xavix_tfit_rackets_device::racket_report_r<1>));
-}
-
 ioport_constructor xavix_tfit_rackets_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(xavix_tfit_rackets);
 }
 
-void xavix_tfit_rackets_device::device_start()
+u32 xavix_tfit_rackets_device::read_report(unsigned report)
 {
-}
-
-void xavix_tfit_rackets_device::vblank_w(int state)
-{
-	// Once-per-frame report pairs satisfy the receiver; physical transmitter repetition is unmeasured.
-	m_ir->vblank_w(state);
-}
-
-template <unsigned Player>
-u32 xavix_tfit_rackets_device::racket_report_r()
-{
-	if (!BIT(m_racket_power->read(), Player))
+	if (!BIT(m_racket_power->read(), report))
 		return xavix_ir_report_device::NO_SEQUENCE;
 
-	u8 data = 0x80 | Player | ((m_racket_strength[Player]->read() & 3) << 1);
-	u8 const buttons = m_racket_buttons[Player]->read();
+	u8 data = 0x80 | report | ((m_racket_strength[report]->read() & 3) << 1);
+	u8 const buttons = m_racket_buttons[report]->read();
 	if (BIT(buttons, 0))
 		data |= 0x40;
 	if (BIT(buttons, 1))

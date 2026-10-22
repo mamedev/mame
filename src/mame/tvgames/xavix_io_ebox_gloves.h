@@ -6,31 +6,22 @@
 
 #pragma once
 
-#include "xavix_io_ir.h"
+#include "xavix_io_ir_motion.h"
 
-#include <utility>
-
-class xavix_ebox_gloves_device : public device_t
+class xavix_ebox_gloves_device : public xavix_ir_motion_base_device
 {
 public:
 	xavix_ebox_gloves_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <typename... T> void set_event_callback(T &&... args) { m_ir.lookup()->set_event_callback(std::forward<T>(args)...); }
-	int data_r() { return m_ir->data_r(); }
-	void vblank_w(int state);
-
 protected:
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual void device_start() override ATTR_COLD;
+
+	virtual u32 read_report(unsigned report) override;
+	virtual bool reports_enabled() override;
+	virtual bool report_enabled(unsigned report) override;
 
 private:
-	template <unsigned Glove> u16 glove_report_r();
-	template <unsigned Glove> int glove_enabled_r();
-	int ir_enable_r();
-
-	required_device<xavix_ir_report_device> m_ir;
 	required_ioport m_punch;
 	required_ioport m_guard;
 	required_ioport m_glove_power;

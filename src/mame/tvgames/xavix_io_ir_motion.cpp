@@ -5,7 +5,7 @@
     Paired XaviX infrared motion controllers. Paddles, rackets, kick sensors,
     shakers and swords share an eight-bit player/button/strength report table.
     The configured controls feed the report encoder; the selected profile
-    sets original or later receiver timing. The child report generator
+    sets original or later receiver timing. The common transmitter base
     owns timed transmission and its saved state.
 
     TODO:
@@ -18,9 +18,21 @@
 
 DEFINE_DEVICE_TYPE(XAVIX_IR_MOTION, xavix_ir_motion_device, "xavix_ir_motion", "XaviX Infrared Motion Controllers")
 
+xavix_ir_motion_base_device::xavix_ir_motion_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: xavix_ir_msb_device(mconfig, type, tag, owner, clock)
+{
+	set_report_count(2);
+	set_bit_ticks(0xe5 * 32);
+}
+
+u8 xavix_ir_motion_base_device::motion_report(unsigned player, bool button, u8 strength)
+{
+	assert(player < 2);
+	return MOTION_REPORTS[player][button][strength & 3];
+}
+
 xavix_ir_motion_device::xavix_ir_motion_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, XAVIX_IR_MOTION, tag, owner, clock)
-	, m_ir(*this, "ir")
+	: xavix_ir_motion_base_device(mconfig, XAVIX_IR_MOTION, tag, owner, clock)
 	, m_ir_strength(*this, "IR%u", 1U)
 	, m_ir_button(*this, "IR%u_BUTTON", 1U)
 	, m_ir_power(*this, "IR_POWER")
@@ -220,22 +232,13 @@ static INPUT_PORTS_START( xavix_ir_motion_xavix_rackets )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void xavix_ir_motion_device::device_add_mconfig(machine_config &config)
-{
-	XAVIX_IR_REPORT(config, m_ir, DERIVED_CLOCK(1, 1));
-	m_ir->report_callback<0>().set(*this, FUNC(xavix_ir_motion_device::ir_report_r<0>));
-	m_ir->report_callback<1>().set(*this, FUNC(xavix_ir_motion_device::ir_report_r<1>));
-	m_ir->report_enable_callback<0>().set(*this, FUNC(xavix_ir_motion_device::ir_report_enabled_r<0>));
-	m_ir->report_enable_callback<1>().set(*this, FUNC(xavix_ir_motion_device::ir_report_enabled_r<1>));
-}
-
 void xavix_ir_motion_device::device_config_complete()
 {
 	bool const original = (m_controller_type == controller_type::PADDLES)
 		|| (m_controller_type == controller_type::PING_PONG_RACKETS)
 		|| (m_controller_type == controller_type::SHAKERS);
 	// Both receivers sample within the first cell, then at uniform timer intervals.
-	m_ir.lookup()->set_bit_ticks(original ? 0x47 * 64 : 0xe5 * 32);
+	set_bit_ticks(original ? 0x47 * 64 : 0xe5 * 32);
 }
 
 ioport_constructor xavix_ir_motion_device::device_input_ports() const
@@ -262,27 +265,16 @@ ioport_constructor xavix_ir_motion_device::device_input_ports() const
 	throw emu_fatalerror("Unsupported infrared controller type");
 }
 
-void xavix_ir_motion_device::device_start()
+u32 xavix_ir_motion_device::read_report(unsigned report)
 {
-}
-
-void xavix_ir_motion_device::vblank_w(int state)
-{
-	m_ir->vblank_w(state);
-}
-
-template <unsigned Player>
-u16 xavix_ir_motion_device::ir_report_r()
-{
-	u8 const level = m_ir_strength[Player]->read() & 3;
-	u8 const buttons = m_ir_button[Player]->read();
+	u8 const level = m_ir_strength[report]->read() & 3;
+	u8 const buttons = m_ir_button[report]->read();
 	if (m_controller_type == controller_type::SWORDS && BIT(buttons, 1))
-		return SWORD_FACTORY_REPORTS[Player];
-	return xavix_ir_report_device::motion_report(Player, BIT(buttons, 0), level);
+		return SWORD_FACTORY_REPORTS[report];
+	return motion_report(report, BIT(buttons, 0), level);
 }
 
-template <unsigned Player>
-int xavix_ir_motion_device::ir_report_enabled_r()
+bool xavix_ir_motion_device::report_enabled(unsigned report)
 {
-	return BIT(m_ir_power.read_safe(3), Player);
+	return BIT(m_ir_power.read_safe(3), report);
 }

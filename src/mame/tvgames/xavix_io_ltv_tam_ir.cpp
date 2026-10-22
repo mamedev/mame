@@ -36,10 +36,10 @@ xavix_tamagotchi_ir_device::xavix_tamagotchi_ir_device(
 		device_t *owner,
 		u32 clock)
 	: device_t(mconfig, XAVIX_TAMAGOTCHI_IR, tag, owner, clock)
+	, xavix_ir_receiver_interface(*this, TX_SILENCE_TICKS, false)
 	, m_event_out_cb(*this)
 	, m_receive_phase(receive_phase::IDLE)
 	, m_rx_data(1)
-	, m_transmit_burst(false)
 	, m_transmit_frame(false)
 {
 }
@@ -55,7 +55,6 @@ void xavix_tamagotchi_ir_device::device_start()
 
 	assert(clock());
 	m_receive_timer = timer_alloc(FUNC(xavix_tamagotchi_ir_device::receive_tick), this);
-	m_transmit_timer = timer_alloc(FUNC(xavix_tamagotchi_ir_device::transmit_timeout), this);
 
 	save_item(NAME(m_receive_packet));
 	save_item(NAME(m_transmit_packet));
@@ -65,20 +64,15 @@ void xavix_tamagotchi_ir_device::device_start()
 	save_item(NAME(m_transmit_bit));
 	save_item(NAME(m_transmit_bytes));
 	save_item(NAME(m_rx_data));
-	save_item(NAME(m_tx_pin));
-	save_item(NAME(m_transmit_burst));
 	save_item(NAME(m_transmit_frame));
 	save_item(NAME(m_transmit_mark_pending));
 	save_item(NAME(m_acknowledgement_valid));
-	save_item(NAME(m_transmit_burst_start));
-	save_item(NAME(m_transmit_last_edge));
-	save_item(NAME(m_transmit_mark_end));
 }
 
 void xavix_tamagotchi_ir_device::device_reset()
 {
 	m_receive_timer->adjust(attotime::never);
-	m_transmit_timer->adjust(attotime::never);
+	ir_receiver_reset(true);
 	m_receive_packet.fill(0);
 	m_transmit_packet.fill(0);
 	m_receive_phase = receive_phase::IDLE;
@@ -87,20 +81,15 @@ void xavix_tamagotchi_ir_device::device_reset()
 	m_transmit_bit = 0;
 	m_transmit_bytes = 0;
 	m_rx_data = 1;
-	m_tx_pin = 0;
-	m_transmit_burst = false;
 	m_transmit_frame = false;
 	m_transmit_mark_pending = false;
 	m_acknowledgement_valid = false;
-	m_transmit_burst_start = attotime::zero;
-	m_transmit_last_edge = attotime::zero;
-	m_transmit_mark_end = attotime::zero;
 }
 
 void xavix_tamagotchi_ir_device::send_request(int state)
 {
 	// The optical link has no framing for queued or overlapping exchanges.
-	if (!state || m_receive_phase != receive_phase::IDLE || m_transmit_burst || m_transmit_frame)
+	if (!state || m_receive_phase != receive_phase::IDLE || ir_receiver_active() || m_transmit_frame)
 		return;
 
 	m_receive_packet = REQUEST_PACKET;
@@ -164,29 +153,13 @@ TIMER_CALLBACK_MEMBER(xavix_tamagotchi_ir_device::receive_tick)
 
 void xavix_tamagotchi_ir_device::tx_w(int state)
 {
-	state = bool(state);
-	if (state == m_tx_pin)
-		return;
-
-	m_tx_pin = state;
-	attotime const now = machine().time();
-	if (!m_transmit_burst)
-	{
-		begin_transmit_burst();
-	}
-	else
-	{
-		m_transmit_last_edge = now;
-	}
-
-	m_transmit_timer->adjust(attotime::from_ticks(TX_SILENCE_TICKS, clock()));
+	ir_receiver_w(state);
 }
 
-void xavix_tamagotchi_ir_device::begin_transmit_burst()
+void xavix_tamagotchi_ir_device::ir_burst_started(u64 gap_ticks)
 {
-	attotime const now = machine().time();
 	// Abandon a partial response after more than the longest valid inter-burst gap.
-	if (m_transmit_frame && (now - m_transmit_mark_end).as_ticks(clock()) > TX_FRAME_GAP_MAX_TICKS)
+	if (m_transmit_frame && gap_ticks > TX_FRAME_GAP_MAX_TICKS)
 	{
 		LOGMASKED(LOG_PROTOCOL, "%s: discarded truncated Tamagotchi IR response\n", machine().describe_context());
 		m_transmit_frame = false;
@@ -195,23 +168,14 @@ void xavix_tamagotchi_ir_device::begin_transmit_burst()
 
 	if (m_transmit_frame && m_transmit_mark_pending)
 	{
-		u64 const space_ticks = (now - m_transmit_mark_end).as_ticks(clock());
-		append_transmit_bit(space_ticks >= TX_BIT_THRESHOLD_TICKS);
+		append_transmit_bit(gap_ticks >= TX_BIT_THRESHOLD_TICKS);
 		m_transmit_mark_pending = false;
 	}
-
-	m_transmit_burst = true;
-	m_transmit_burst_start = now;
-	m_transmit_last_edge = now;
 }
 
-TIMER_CALLBACK_MEMBER(xavix_tamagotchi_ir_device::transmit_timeout)
+void xavix_tamagotchi_ir_device::ir_idle_timeout()
 {
-	if (m_transmit_burst)
-	{
-		finish_transmit_burst();
-	}
-	else if (m_transmit_frame)
+	if (m_transmit_frame)
 	{
 		LOGMASKED(LOG_PROTOCOL, "%s: discarded truncated Tamagotchi IR response\n", machine().describe_context());
 		m_transmit_frame = false;
@@ -219,16 +183,10 @@ TIMER_CALLBACK_MEMBER(xavix_tamagotchi_ir_device::transmit_timeout)
 	}
 }
 
-void xavix_tamagotchi_ir_device::finish_transmit_burst()
+void xavix_tamagotchi_ir_device::ir_burst_finished(u64 width_ticks)
 {
-	if (!m_transmit_burst)
-		return;
-
-	m_transmit_burst = false;
-	m_transmit_timer->adjust(attotime::never);
-
 	// External transistor polarity and the timer terminal half-cycle have not been measured.
-	u64 const mark_ticks = (m_transmit_last_edge - m_transmit_burst_start).as_ticks(clock()) + CARRIER_HALF_TICKS;
+	u64 const mark_ticks = width_ticks + CARRIER_HALF_TICKS;
 	if (!m_transmit_frame)
 	{
 		if (mark_ticks >= TX_LEADER_MIN_TICKS && mark_ticks <= TX_LEADER_MAX_TICKS)
@@ -238,8 +196,7 @@ void xavix_tamagotchi_ir_device::finish_transmit_burst()
 			m_transmit_bit = 0;
 			m_transmit_bytes = 0;
 			m_transmit_frame = true;
-			m_transmit_mark_end = m_transmit_last_edge;
-			m_transmit_timer->adjust(attotime::from_ticks(TX_FRAME_GAP_MAX_TICKS, clock()));
+			ir_receiver_wait(TX_FRAME_GAP_MAX_TICKS);
 		}
 		return;
 	}
@@ -253,8 +210,7 @@ void xavix_tamagotchi_ir_device::finish_transmit_burst()
 	if (mark_ticks >= TX_DATA_MARK_MIN_TICKS && mark_ticks <= TX_DATA_MARK_MAX_TICKS)
 	{
 		m_transmit_mark_pending = true;
-		m_transmit_mark_end = m_transmit_last_edge;
-		m_transmit_timer->adjust(attotime::from_ticks(TX_FRAME_GAP_MAX_TICKS, clock()));
+		ir_receiver_wait(TX_FRAME_GAP_MAX_TICKS);
 		return;
 	}
 

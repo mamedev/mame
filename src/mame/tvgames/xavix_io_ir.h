@@ -6,110 +6,157 @@
 
 #pragma once
 
-#include "machine/timer.h"
-
+#include <algorithm>
 #include <array>
-#include <cstddef>
 #include <utility>
 
+// Controllers supply reports; encoder bases own transmission and saved state.
 class xavix_ir_report_device : public device_t
 {
 public:
-	enum class mode
-	{
-		MSB_FIRST,
-		FRAMED_LSB,
-		PULSE_DISTANCE,
-		SAMPLE_SEQUENCE,
-		PULSE_RUN_LENGTH
-	};
-
-	// Sequence callbacks may return NO_SEQUENCE; per-report enable callbacks also use it internally.
-	// Ordinary all-ones report payloads are still transmitted.
+	// Ordinary all-ones payloads are transmitted; this value suppresses a report.
 	static constexpr u32 NO_SEQUENCE = 0xffffffff;
-	static u8 motion_report(unsigned player, bool button, u8 strength);
-	static u16 baseball_bat_report(bool bunt, bool swing);
-
-	xavix_ir_report_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	template <unsigned N> auto report_callback() { return m_report_cb[N].bind(); }
-	template <unsigned N> auto report_enable_callback() { return m_report_enable_cb[N].bind(); }
-	template <unsigned N> auto sequence_callback() { return m_sequence_cb[N].bind(); }
-	auto enable_callback() { return m_enable_cb.bind(); }
 	template <typename... T> void set_event_callback(T &&... args) { m_event_out_cb.set(std::forward<T>(args)...); }
-	void set_bit_ticks(u32 bit_ticks) { m_bit_ticks = bit_ticks; }
-	void set_start_ticks(u32 start_ticks) { m_start_ticks.fill(start_ticks); }
-	template <unsigned N> void set_start_ticks(u32 start_ticks) { static_assert(N < 8); m_start_ticks[N] = start_ticks; }
-	void set_report_count(u8 report_count) { m_report_count = report_count; }
-	void set_report_gap_ticks(u32 ticks) { m_report_gap_ticks = ticks; }
-	template <unsigned N> void set_report_bits(u8 bits) { static_assert(N < 8); m_report_bits[N] = bits; }
-	void set_mode(mode report_mode) { m_mode = report_mode; }
-	void set_pulse_distance_ticks(u32 one_ticks, u32 zero_ticks, u32 first_extension)
-	{
-		m_pulse_one_ticks = one_ticks;
-		m_pulse_zero_ticks = zero_ticks;
-		m_first_pulse_extension = first_extension;
-	}
-	template <std::size_t N> void set_sample_ticks(std::array<u32, N> const &ticks)
-	{
-		static_assert(N <= 32);
-		for (std::size_t index = 0; index != N; ++index)
-			m_sample_ticks[index] = ticks[index];
-		m_sample_tick_count = N;
-	}
-
-	int data_r() { return m_data; }
+	int data_r() const { return m_data; }
 	void vblank_w(int state);
 
 protected:
+	xavix_ir_report_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual u32 read_report(unsigned report) = 0;
+	virtual bool reports_enabled() { return true; }
+	virtual bool report_enabled(unsigned report) { return true; }
+	virtual void begin_report() = 0;
+	virtual void advance_report() = 0;
 
-private:
-	static constexpr u8 MOTION_REPORTS[2][2][4] =
-	{
-		{ { 0x75, 0x5d, 0x4b, 0x2d }, { 0x69, 0x57, 0x37, 0x15 } },
-		{ { 0x73, 0x59, 0x45, 0x2b }, { 0x65, 0x51, 0x31, 0x13 } }
-	};
-	static constexpr u8 BASEBALL_BAT_PAYLOADS[3] = { 0x43, 0x4a, 0x51 };
+	void set_bit_ticks(u32 ticks) { m_bit_ticks = ticks; }
+	void set_report_count(u8 count) { m_report_count = count; }
+	template <unsigned N> void set_report_bits(u8 bits) { static_assert(N < 8); m_report_bits[N] = bits; }
+	void receiver_event() { m_event_out_cb(); }
+	void schedule_bit(u32 ticks) { m_bit_timer->adjust(clocks_to_attotime(ticks)); }
+	void finish_report(bool stop_cell = false, u32 gap_ticks = 0);
+	unsigned report_bits() const { return m_report_bits[m_report_index]; }
 
-	TIMER_CALLBACK_MEMBER(frame_start);
-	void start_report(unsigned report);
-	TIMER_CALLBACK_MEMBER(bit_tick);
-	unsigned next_report(unsigned report) const;
-	u32 current_bit_ticks() const;
-	u32 current_pulse_ticks() const;
-	unsigned current_run_bits() const;
-
-	devcb_read16::array<8> m_report_cb;
-	devcb_read_line::array<8> m_report_enable_cb;
-	devcb_read32::array<8> m_sequence_cb;
-	devcb_read_line m_enable_cb;
-	device_delegate<void ()> m_event_out_cb;
-	emu_timer *m_frame_timer;
-	emu_timer *m_bit_timer;
-
-	std::array<u32, 8> m_latched_report;
-	std::array<u8, 8> m_report_bits;
-	std::array<u32, 32> m_sample_ticks;
 	u32 m_shift;
 	u8 m_report_index;
 	u8 m_bits_remaining;
 	u8 m_data;
+	u32 m_bit_ticks;
+
+private:
+	TIMER_CALLBACK_MEMBER(frame_start);
+	TIMER_CALLBACK_MEMBER(bit_tick);
+	void start_report(unsigned report);
+	unsigned next_report(unsigned report) const;
+
+	device_delegate<void ()> m_event_out_cb;
+	emu_timer *m_frame_timer;
+	emu_timer *m_bit_timer;
+	std::array<u32, 8> m_latched_report;
+	std::array<u8, 8> m_report_bits;
+	u8 m_report_count;
 	bool m_frame_pending;
 	bool m_between_reports;
-	bool m_start_cell;
-	u32 m_bit_ticks;
-	u32 m_pulse_one_ticks;
-	u32 m_pulse_zero_ticks;
-	u32 m_first_pulse_extension;
-	u32 m_report_gap_ticks;
-	std::array<u32, 8> m_start_ticks;
-	u8 m_report_count;
-	u8 m_sample_tick_count;
-	mode m_mode;
 };
 
-DECLARE_DEVICE_TYPE(XAVIX_IR_REPORT, xavix_ir_report_device)
+// MSB-first data, optionally with a distinct duration for each sample.
+class xavix_ir_msb_device : public xavix_ir_report_device
+{
+protected:
+	using xavix_ir_report_device::xavix_ir_report_device;
+	virtual void device_start() override ATTR_COLD;
+	virtual void begin_report() override;
+	virtual void advance_report() override;
+	template <std::size_t N> void set_sample_ticks(std::array<u32, N> const &ticks)
+	{
+		static_assert(N <= 32);
+		std::copy(ticks.begin(), ticks.end(), m_sample_ticks.begin());
+		m_sample_tick_count = N;
+	}
+
+private:
+	u32 current_bit_ticks() const;
+	std::array<u32, 32> m_sample_ticks{};
+	u8 m_sample_tick_count = 0;
+};
+
+// Start cell, LSB-first data and one idle stop cell.
+class xavix_ir_framed_device : public xavix_ir_report_device
+{
+protected:
+	using xavix_ir_report_device::xavix_ir_report_device;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void begin_report() override;
+	virtual void advance_report() override;
+	void set_start_ticks(u32 ticks) { m_start_ticks.fill(ticks); }
+	template <unsigned N> void set_start_ticks(u32 ticks) { static_assert(N < 8); m_start_ticks[N] = ticks; }
+
+private:
+	std::array<u32, 8> m_start_ticks{};
+	bool m_start_cell;
+};
+
+// Each receiver event terminates a bit encoded by its interval.
+class xavix_ir_pulse_distance_device : public xavix_ir_report_device
+{
+protected:
+	using xavix_ir_report_device::xavix_ir_report_device;
+	virtual void device_start() override ATTR_COLD;
+	virtual void begin_report() override;
+	virtual void advance_report() override;
+	void set_pulse_distance_ticks(u32 one_ticks, u32 zero_ticks, u32 first_extension);
+	static u16 complemented_report(u8 code) { return code | (u16(code ^ 0x1f) << 5); }
+
+private:
+	u32 current_pulse_ticks() const;
+	u32 m_pulse_one_ticks = 0;
+	u32 m_pulse_zero_ticks = 0;
+	u32 m_first_pulse_extension = 0;
+};
+
+// Events delimit runs beginning with a one; the final zero run ends in silence.
+class xavix_ir_run_length_device : public xavix_ir_report_device
+{
+protected:
+	using xavix_ir_report_device::xavix_ir_report_device;
+	virtual void begin_report() override;
+	virtual void advance_report() override;
+	void set_report_gap_ticks(u32 ticks) { m_report_gap_ticks = ticks; }
+
+private:
+	unsigned current_run_bits() const;
+	u32 m_report_gap_ticks = 0;
+};
+
+// Carrier envelope reception; each controller owns its packet framing.
+class xavix_ir_receiver_interface : public device_interface
+{
+protected:
+	xavix_ir_receiver_interface(device_t &device, u32 quiet_ticks, bool rising_start);
+
+	void ir_receiver_w(int state);
+	void ir_receiver_reset(bool reset_level) ATTR_COLD;
+	void ir_receiver_wait(u32 ticks);
+	bool ir_receiver_active() const { return m_ir_carrier; }
+	bool ir_receiver_level() const { return m_ir_level; }
+
+	virtual void ir_burst_started(u64 gap_ticks) = 0;
+	virtual void ir_burst_finished(u64 width_ticks) = 0;
+	virtual void ir_idle_timeout() = 0;
+	virtual void interface_post_start() override ATTR_COLD;
+
+private:
+	TIMER_CALLBACK_MEMBER(quiet_tick);
+
+	const u32 m_quiet_ticks;
+	const bool m_rising_start;
+	emu_timer *m_ir_timer;
+	attotime m_ir_burst_start;
+	attotime m_ir_last_edge;
+	bool m_ir_level;
+	bool m_ir_carrier;
+};
 
 #endif // MAME_TVGAMES_XAVIX_IO_IR_H

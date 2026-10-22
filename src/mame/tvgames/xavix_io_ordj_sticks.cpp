@@ -17,8 +17,7 @@
 DEFINE_DEVICE_TYPE(XAVIX_HIBIKI_STICKS, xavix_hibiki_sticks_device, "xavix_hibiki_sticks", "Kamen Rider Hibiki Infrared Sticks")
 
 xavix_hibiki_sticks_device::xavix_hibiki_sticks_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, XAVIX_HIBIKI_STICKS, tag, owner, clock)
-	, m_ir(*this, "ir")
+	: xavix_ir_motion_base_device(mconfig, XAVIX_HIBIKI_STICKS, tag, owner, clock)
 	, m_swing_strength(*this, "STICK%u", 1U)
 	, m_stick_power(*this, "STICK_POWER")
 {
@@ -51,16 +50,6 @@ static INPUT_PORTS_START( xavix_hibiki_sticks )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void xavix_hibiki_sticks_device::device_add_mconfig(machine_config &config)
-{
-	XAVIX_IR_REPORT(config, m_ir, DERIVED_CLOCK(1, 1));
-	m_ir->set_report_count(2);
-	m_ir->set_bit_ticks(0xe5 * 32);
-	m_ir->report_callback<0>().set(*this, FUNC(xavix_hibiki_sticks_device::stick_report_r<0>));
-	m_ir->report_callback<1>().set(*this, FUNC(xavix_hibiki_sticks_device::stick_report_r<1>));
-	m_ir->enable_callback().set(*this, FUNC(xavix_hibiki_sticks_device::ir_enable_r));
-}
-
 ioport_constructor xavix_hibiki_sticks_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(xavix_hibiki_sticks);
@@ -68,20 +57,18 @@ ioport_constructor xavix_hibiki_sticks_device::device_input_ports() const
 
 void xavix_hibiki_sticks_device::device_start()
 {
+	xavix_ir_motion_base_device::device_start();
+
 	save_item(NAME(m_latched_strength));
 	save_item(NAME(m_reports_remaining));
 }
 
 void xavix_hibiki_sticks_device::device_reset()
 {
+	xavix_ir_motion_base_device::device_reset();
+
 	m_latched_strength.fill(0);
 	m_reports_remaining.fill(0);
-}
-
-void xavix_hibiki_sticks_device::vblank_w(int state)
-{
-	// Physical repetition cadence is unknown; two identical reports per stick across successive frames satisfy the receiver's duplicate filter.
-	m_ir->vblank_w(state);
 }
 
 INPUT_CHANGED_MEMBER(xavix_hibiki_sticks_device::stick_swing)
@@ -92,7 +79,7 @@ INPUT_CHANGED_MEMBER(xavix_hibiki_sticks_device::stick_swing)
 		m_reports_remaining[player] = 2;
 }
 
-int xavix_hibiki_sticks_device::ir_enable_r()
+bool xavix_hibiki_sticks_device::reports_enabled()
 {
 	u8 const power = m_stick_power->read();
 	int active = 0;
@@ -110,13 +97,12 @@ int xavix_hibiki_sticks_device::ir_enable_r()
 	return active;
 }
 
-template <unsigned Player>
-u16 xavix_hibiki_sticks_device::stick_report_r()
+u32 xavix_hibiki_sticks_device::read_report(unsigned report)
 {
-	if (!m_reports_remaining[Player] || !BIT(m_stick_power->read(), Player))
+	if (!m_reports_remaining[report] || !BIT(m_stick_power->read(), report))
 		return 0xff;
 
-	--m_reports_remaining[Player];
+	--m_reports_remaining[report];
 	// The sticks have no gameplay switch; the transmitter's alternate report-family polarity is unknown.
-	return xavix_ir_report_device::motion_report(Player, false, m_latched_strength[Player]);
+	return motion_report(report, false, m_latched_strength[report]);
 }

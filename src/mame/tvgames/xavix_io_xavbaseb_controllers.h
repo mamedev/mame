@@ -8,31 +8,35 @@
 
 #include "xavix_io_ir.h"
 
-#include <utility>
-
-class xavix_baseball_controllers_device : public device_t
+class xavix_baseball_controllers_device : public xavix_ir_framed_device
 {
 public:
+	enum class controller_type
+	{
+		BASEBALL,
+		STADIUM_DX
+	};
+
 	xavix_baseball_controllers_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <typename... T> void set_event_callback(T &&... args) { m_ir.lookup()->set_event_callback(std::forward<T>(args)...); }
-	int data_r() { return m_ir->data_r(); }
-	void vblank_w(int state);
+	void set_controller_type(controller_type type) { m_controller_type = type; }
 
 protected:
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual void device_start() override ATTR_COLD;
+
+	virtual u32 read_report(unsigned report) override;
+	virtual bool report_enabled(unsigned report) override;
 
 private:
-	u16 ball_report_r();
-	u16 bat_report_r();
+	static constexpr u8 BAT_PAYLOADS[3] = { 0x43, 0x4a, 0x51 };
+	static u16 baseball_bat_report(bool bunt, bool swing);
 
-	required_device<xavix_ir_report_device> m_ir;
 	required_ioport m_ball_throw;
 	required_ioport m_ball_buttons;
 	required_ioport m_bat;
+	optional_ioport m_controller_power;
+	controller_type m_controller_type;
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_BASEBALL_CONTROLLERS, xavix_baseball_controllers_device)

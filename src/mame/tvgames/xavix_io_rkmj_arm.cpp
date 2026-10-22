@@ -17,13 +17,17 @@
 DEFINE_DEVICE_TYPE(XAVIX_ROCKMAN_ARM, xavix_rockman_arm_device, "xavix_rockman_arm", "Rockman Infrared Arm Controller")
 
 xavix_rockman_arm_device::xavix_rockman_arm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, XAVIX_ROCKMAN_ARM, tag, owner, clock)
-	, m_ir(*this, "ir")
+	: xavix_ir_framed_device(mconfig, XAVIX_ROCKMAN_ARM, tag, owner, clock)
 	, m_arm(*this, "ARM")
 	, m_controller_buttons(*this, "CONTROL")
 	, m_controller_power(*this, "CONTROLLER_POWER")
 	, m_factory_code(*this, "FACTORY_CODE")
 {
+	set_report_count(1);
+	set_report_bits<0>(13);
+	// Timings centre transitions in the firmware sample windows; physical transmitter timing and repetition remain unmeasured.
+	set_start_ticks<0>(0x162 * 64);
+	set_bit_ticks(0x89 * 64);
 }
 
 static INPUT_PORTS_START( xavix_rockman_arm )
@@ -58,19 +62,6 @@ static INPUT_PORTS_START( xavix_rockman_arm )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void xavix_rockman_arm_device::device_add_mconfig(machine_config &config)
-{
-	XAVIX_IR_REPORT(config, m_ir, DERIVED_CLOCK(1, 1));
-	m_ir->set_report_count(1);
-	m_ir->set_mode(xavix_ir_report_device::mode::FRAMED_LSB);
-	m_ir->set_report_bits<0>(13);
-	// Timings centre transitions in the firmware sample windows; physical transmitter timing and repetition remain unmeasured.
-	m_ir->set_start_ticks<0>(0x162 * 64);
-	m_ir->set_bit_ticks(0x89 * 64);
-	m_ir->report_callback<0>().set(*this, FUNC(xavix_rockman_arm_device::controller_report_r));
-	m_ir->report_enable_callback<0>().set(*this, FUNC(xavix_rockman_arm_device::controller_enabled_r));
-}
-
 ioport_constructor xavix_rockman_arm_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(xavix_rockman_arm);
@@ -78,22 +69,21 @@ ioport_constructor xavix_rockman_arm_device::device_input_ports() const
 
 void xavix_rockman_arm_device::device_start()
 {
+	xavix_ir_framed_device::device_start();
+
 	save_item(NAME(m_shake_frames));
 	save_item(NAME(m_shake_lowered));
 }
 
 void xavix_rockman_arm_device::device_reset()
 {
+	xavix_ir_framed_device::device_reset();
+
 	m_shake_frames = 0;
 	m_shake_lowered = false;
 }
 
-void xavix_rockman_arm_device::vblank_w(int state)
-{
-	m_ir->vblank_w(state);
-}
-
-int xavix_rockman_arm_device::controller_enabled_r()
+bool xavix_rockman_arm_device::report_enabled(unsigned)
 {
 	if (BIT(m_controller_power->read(), 0))
 		return 1;
@@ -103,7 +93,7 @@ int xavix_rockman_arm_device::controller_enabled_r()
 	return 0;
 }
 
-u16 xavix_rockman_arm_device::controller_report_r()
+u32 xavix_rockman_arm_device::read_report(unsigned)
 {
 	u8 const controls = m_controller_buttons->read();
 	u8 const arm = m_arm->read() & 3;

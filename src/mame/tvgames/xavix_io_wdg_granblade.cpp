@@ -17,12 +17,15 @@
 DEFINE_DEVICE_TYPE(XAVIX_GRANBLADE, xavix_granblade_device, "xavix_granblade", "Webdiver Granblade Infrared Controller")
 
 xavix_granblade_device::xavix_granblade_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, XAVIX_GRANBLADE, tag, owner, clock)
-	, m_ir(*this, "ir")
+	: xavix_ir_pulse_distance_device(mconfig, XAVIX_GRANBLADE, tag, owner, clock)
 	, m_granblade_action(*this, "GRANBLADE_ACTION")
 	, m_granblade_mode(*this, "GRANBLADE_MODE")
 	, m_granblade_power(*this, "GRANBLADE_POWER")
 {
+	set_report_count(1);
+	set_report_bits<0>(10);
+	// Representative IR intervals are centred in the ROM's acceptance windows; no hardware capture is available.
+	set_pulse_distance_ticks(0x28 * 256, 0x48 * 256, 0x2c * 256);
 }
 
 static INPUT_PORTS_START( xavix_granblade )
@@ -43,18 +46,6 @@ static INPUT_PORTS_START( xavix_granblade )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void xavix_granblade_device::device_add_mconfig(machine_config &config)
-{
-	XAVIX_IR_REPORT(config, m_ir, DERIVED_CLOCK(1, 1));
-	m_ir->set_report_count(1);
-	m_ir->set_mode(xavix_ir_report_device::mode::PULSE_DISTANCE);
-	m_ir->set_report_bits<0>(10);
-	// Representative IR intervals are centred in the ROM's acceptance windows; no hardware capture is available.
-	m_ir->set_pulse_distance_ticks(0x28 * 256, 0x48 * 256, 0x2c * 256);
-	m_ir->report_callback<0>().set(*this, FUNC(xavix_granblade_device::granblade_report_r));
-	m_ir->report_enable_callback<0>().set(*this, FUNC(xavix_granblade_device::granblade_report_enabled_r));
-}
-
 ioport_constructor xavix_granblade_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(xavix_granblade);
@@ -62,30 +53,29 @@ ioport_constructor xavix_granblade_device::device_input_ports() const
 
 void xavix_granblade_device::device_start()
 {
+	xavix_ir_pulse_distance_device::device_start();
+
 	save_item(NAME(m_granblade_last_mode));
 }
 
 void xavix_granblade_device::device_reset()
 {
+	xavix_ir_pulse_distance_device::device_reset();
+
 	m_granblade_last_mode = BIT(m_granblade_mode->read(), 0);
 }
 
-void xavix_granblade_device::vblank_w(int state)
-{
-	m_ir->vblank_w(state);
-}
-
-u16 xavix_granblade_device::granblade_report_r()
+u32 xavix_granblade_device::read_report(unsigned)
 {
 	unsigned const mode = BIT(m_granblade_mode->read(), 0);
 	bool const transform = mode != m_granblade_last_mode;
 	m_granblade_last_mode = mode;
 	// Report identities follow the ROM's paired mode/action handling and mode-specific tutorial prompts.
 	u8 const code = GRANBLADE_REPORTS[mode][transform ? 0 : 1];
-	return code | (u16(code ^ 0x1f) << 5);
+	return complemented_report(code);
 }
 
-int xavix_granblade_device::granblade_report_enabled_r()
+bool xavix_granblade_device::report_enabled(unsigned)
 {
 	unsigned const mode = BIT(m_granblade_mode->read(), 0);
 	return BIT(m_granblade_power->read(), 0)

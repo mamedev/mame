@@ -8,9 +8,22 @@
 
 #include "xavix_io_ir.h"
 
-#include <utility>
+class xavix_ir_motion_base_device : public xavix_ir_msb_device
+{
+protected:
+	xavix_ir_motion_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-class xavix_ir_motion_device : public device_t
+	static u8 motion_report(unsigned player, bool button, u8 strength);
+
+private:
+	static constexpr u8 MOTION_REPORTS[2][2][4] =
+	{
+		{ { 0x75, 0x5d, 0x4b, 0x2d }, { 0x69, 0x57, 0x37, 0x15 } },
+		{ { 0x73, 0x59, 0x45, 0x2b }, { 0x65, 0x51, 0x31, 0x13 } }
+	};
+};
+
+class xavix_ir_motion_device : public xavix_ir_motion_base_device
 {
 public:
 	enum class controller_type
@@ -28,24 +41,18 @@ public:
 	xavix_ir_motion_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void set_controller_type(controller_type type) { m_controller_type = type; }
-	template <typename... T> void set_event_callback(T &&... args) { m_ir.lookup()->set_event_callback(std::forward<T>(args)...); }
-	int data_r() { return m_ir->data_r(); }
-	void vblank_w(int state);
 
 protected:
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_config_complete() override ATTR_COLD;
-	virtual void device_start() override ATTR_COLD;
+
+	virtual u32 read_report(unsigned report) override;
+	virtual bool report_enabled(unsigned report) override;
 
 private:
 	static constexpr u8 SWORD_FACTORY_REPORTS[2] = { 0x11, 0x7b };
 
-	template <unsigned Player> u16 ir_report_r();
-	template <unsigned Player> int ir_report_enabled_r();
-
-	required_device<xavix_ir_report_device> m_ir;
 	required_ioport_array<2> m_ir_strength;
 	required_ioport_array<2> m_ir_button;
 	optional_ioport m_ir_power;

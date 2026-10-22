@@ -17,11 +17,15 @@
 DEFINE_DEVICE_TYPE(XAVIX_SURVI_BUSTER, xavix_survi_buster_device, "xavix_survi_buster", "Boukenger Survi Buster Infrared Controller")
 
 xavix_survi_buster_device::xavix_survi_buster_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, XAVIX_SURVI_BUSTER, tag, owner, clock)
-	, m_ir(*this, "ir")
+	: xavix_ir_msb_device(mconfig, XAVIX_SURVI_BUSTER, tag, owner, clock)
 	, m_survi_buster(*this, "SURVI_BUSTER")
 	, m_survi_buster_power(*this, "SURVI_BUSTER_POWER")
 {
+	set_report_count(1);
+	set_report_bits<0>(28);
+	// These transitions target the ROM's 28 sampling windows; physical transmitter edge timing remains unmeasured.
+	set_sample_ticks(SURVI_BUSTER_SAMPLE_TICKS);
+	set_bit_ticks(SURVI_BUSTER_SAMPLE_TICKS.back());
 }
 
 static INPUT_PORTS_START( xavix_survi_buster )
@@ -37,33 +41,12 @@ static INPUT_PORTS_START( xavix_survi_buster )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void xavix_survi_buster_device::device_add_mconfig(machine_config &config)
-{
-	XAVIX_IR_REPORT(config, m_ir, DERIVED_CLOCK(1, 1));
-	m_ir->set_report_count(1);
-	m_ir->set_mode(xavix_ir_report_device::mode::SAMPLE_SEQUENCE);
-	m_ir->set_report_bits<0>(28);
-	// These transitions target the ROM's 28 sampling windows; physical transmitter edge timing remains unmeasured.
-	m_ir->set_sample_ticks(SURVI_BUSTER_SAMPLE_TICKS);
-	m_ir->set_bit_ticks(SURVI_BUSTER_SAMPLE_TICKS.back());
-	m_ir->sequence_callback<0>().set(*this, FUNC(xavix_survi_buster_device::survi_buster_report_r));
-}
-
 ioport_constructor xavix_survi_buster_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(xavix_survi_buster);
 }
 
-void xavix_survi_buster_device::device_start()
-{
-}
-
-void xavix_survi_buster_device::vblank_w(int state)
-{
-	m_ir->vblank_w(state);
-}
-
-u32 xavix_survi_buster_device::survi_buster_report_r() const
+u32 xavix_survi_buster_device::read_report(unsigned)
 {
 	return BIT(m_survi_buster_power->read(), 0) && BIT(m_survi_buster->read(), 0)
 		? SURVI_BUSTER_TRIGGER_REPORT
