@@ -2048,8 +2048,14 @@ end
 ---------------------------------------------------
 if BUSES["COMPUCOLOR"] then
 	files {
+		MAME_DIR .. "src/devices/bus/compucolor/exp.cpp",
+		MAME_DIR .. "src/devices/bus/compucolor/exp.h",
 		MAME_DIR .. "src/devices/bus/compucolor/floppy.cpp",
 		MAME_DIR .. "src/devices/bus/compucolor/floppy.h",
+		MAME_DIR .. "src/devices/bus/compucolor/joysnd.cpp",
+		MAME_DIR .. "src/devices/bus/compucolor/joysnd.h",
+		MAME_DIR .. "src/devices/bus/compucolor/soundware.cpp",
+		MAME_DIR .. "src/devices/bus/compucolor/soundware.h",
 	}
 end
 
