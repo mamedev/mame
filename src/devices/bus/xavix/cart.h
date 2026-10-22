@@ -16,14 +16,14 @@ class device_xavix_cart_interface : public device_interface
 public:
 	virtual ~device_xavix_cart_interface();
 
-	virtual uint8_t read_cart(offs_t offset);
-	virtual void write_cart(offs_t offset, uint8_t data);
+	virtual uint8_t read_cart(offs_t offset) { return 0xff; }
+	virtual void write_cart(offs_t offset, uint8_t data) { }
 
-	virtual void write_sda(int state);
-	virtual void write_scl(int state);
-	virtual int read_sda();
+	virtual void write_sda(int state) { }
+	virtual void write_scl(int state) { }
+	virtual int read_sda() { return 0; }
 
-	virtual void write_bus_control(offs_t offset, uint8_t data);
+	virtual void write_bus_control(offs_t offset, uint8_t data) { }
 
 	void rom_alloc(uint32_t size);
 	uint8_t *get_rom_base() { return m_rom; }

@@ -8,22 +8,22 @@
 
 #include "xavix_adc.h"
 #include "xavix_anport.h"
-#include "xavix_dma.h"
-#include "xavix_intc.h"
 #include "xavix_io.h"
-#include "xavix_math.h"
 #include "xavix_pio.h"
 #include "xavix_plotter.h"
-#include "xavix_sound.h"
-#include "xavix_timer.h"
 #include "xavix_video.h"
-
-#include "cpu/m6502/xavix2000.h"
 
 #include <array>
 #include <span>
 #include <string>
 #include <utility>
+
+class xavix_device;
+class xavix_dma_device;
+class xavix_intc_device;
+class xavix_math_device;
+class xavix_sound_device;
+class xavix_timer_device;
 
 class xavix_soc_device : public device_t, public device_mixer_interface
 {
@@ -43,7 +43,7 @@ public:
 	template <typename T> void set_palette(T &&tag) { m_video.lookup()->set_palette(std::forward<T>(tag)); }
 	template <typename T> void set_gfx_region(T &&tag) { m_video.lookup()->set_gfx_region(std::forward<T>(tag)); }
 	void set_video_standard(xavix_video_device::video_standard standard) { m_video.lookup()->set_video_standard(standard); }
-	void set_data_address_mask(u32 mask) { m_maincpu.lookup()->set_data_address_mask(mask); }
+	void set_data_address_mask(u32 mask) ATTR_COLD;
 	template <typename... T> void set_external_code_read_callback(T &&... args) { m_external_code_read_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_external_data_read_callback(T &&... args) { m_external_data_read_cb.set(std::forward<T>(args)...); }
 	void use_mapped_code() { m_external_code_read_cb.set(*this, FUNC(xavix_soc_device::external_r)); }
@@ -74,7 +74,7 @@ public:
 	u8 external_r(offs_t address) { return m_external.read_byte(address); }
 	void external_w(offs_t address, u8 data) { m_external.write_byte(address, data); }
 	void reset_w(int state);
-	void cpu_reset_w(int state) { m_maincpu->set_input_line(INPUT_LINE_RESET, state); }
+	void cpu_reset_w(int state);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	rectangle picture_area() const { return m_video->picture_area(); }
 

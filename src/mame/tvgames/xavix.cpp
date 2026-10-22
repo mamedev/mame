@@ -1827,6 +1827,11 @@ void xavix_pl1000_state::machine_reset()
 	m_io1_out = 0x00;
 }
 
+void xavix_pl1000_state::io1_output_w(u8 data, u8 direction)
+{
+	m_io1_out = data;
+}
+
 u8 xavix_pl1000_state::lightgun_r(offs_t offset)
 {
 	// IO1.7 multiplexes the two tethered guns on alternate capture passes.

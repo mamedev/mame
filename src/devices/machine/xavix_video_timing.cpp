@@ -464,10 +464,6 @@ void xavix_video_device::vblank()
 
 }
 
-void superxavix_video_device::vblank()
-{
-}
-
 u8 xavix_video_device::video_ctrl_r()
 {
 	// Bits 7 and 6 report pending vertical and raster interrupts;

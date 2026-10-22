@@ -17,10 +17,10 @@ class device_suprtvpc_cart_interface : public device_interface
 public:
 	virtual ~device_suprtvpc_cart_interface();
 
-	virtual void sda_w(int state);
-	virtual void scl_w(int state);
-	virtual int sda_r();
-	virtual void ir_tx_w(int state);
+	virtual void sda_w(int state) { }
+	virtual void scl_w(int state) { }
+	virtual int sda_r() { return 1; }
+	virtual void ir_tx_w(int state) { }
 
 	void rom_alloc(u32 size);
 	u8 *rom_base() const { return m_rom; }

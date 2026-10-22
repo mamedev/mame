@@ -635,7 +635,6 @@ private:
 	u8 pio1_input_r(offs_t offset, u8 mem_mask);
 	u8 pio2_input_r(offs_t offset, u8 mem_mask);
 	void pio0_output_w(offs_t offset, u8 data, u8 mem_mask);
-	void pio1_output_w(offs_t offset, u8 data, u8 mem_mask) { m_piano->pio1_w(data, mem_mask); }
 	void pio2_output_w(offs_t offset, u8 data, u8 mem_mask);
 
 	required_device<i2cmem_device> m_i2cmem;

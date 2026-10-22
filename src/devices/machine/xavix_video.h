@@ -218,7 +218,7 @@ protected:
 	virtual u32 graphics_segment_base(unsigned segment) const;
 	virtual u32 extended_graphics_segment_base(unsigned segment) const;
 	void decode_graphics(memory_region *extra_region = nullptr) ATTR_COLD;
-	virtual void mix_bitmap_layer(screen_device &screen, const rectangle &cliprect);
+	virtual void mix_bitmap_layer(screen_device &screen, const rectangle &cliprect) { }
 	void sprite_dma_ctrl_w(u8 data);
 	TIMER_CALLBACK_MEMBER(sprite_dma_tick);
 	virtual u8 video_status_r();
@@ -367,7 +367,7 @@ public:
 	virtual u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 	virtual rectangle picture_area() const override;
 	// The picture NMI is timed independently of the presentation screen.
-	virtual void vblank() override;
+	virtual void vblank() override { }
 
 protected:
 	// device_t implementation

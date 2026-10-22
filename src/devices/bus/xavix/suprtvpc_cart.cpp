@@ -128,23 +128,6 @@ void suprtvpc_rom_device::device_start()
 {
 }
 
-void device_suprtvpc_cart_interface::sda_w(int state)
-{
-}
-
-void device_suprtvpc_cart_interface::scl_w(int state)
-{
-}
-
-int device_suprtvpc_cart_interface::sda_r()
-{
-	return 1;
-}
-
-void device_suprtvpc_cart_interface::ir_tx_w(int state)
-{
-}
-
 void suprtvpc_rom_i2c_device::sda_w(int state)
 {
 	m_eeprom->write_sda(state);

@@ -77,10 +77,6 @@ void xavix_tvpc_controller_device::device_reset()
 	m_host_word = 0;
 }
 
-void xavix_tvpc_controller_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
-{
-}
-
 u8 xavix_tvpc_controller_device::days_in_month(u8 year, u8 month)
 {
 	return month >= 1 && month <= 12 ? ((month == 2 && !(year & 3)) ? 29 : DAYS_PER_MONTH[month - 1]) : 0;

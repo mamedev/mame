@@ -31,7 +31,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// device_rtc_interface implementation
-	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override { }
 
 private:
 	static constexpr unsigned QUEUE_SIZE = 128;

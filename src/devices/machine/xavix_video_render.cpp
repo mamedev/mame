@@ -826,10 +826,6 @@ device_delegate<u8 (u32)> &superxavix_video_device::tile_read_callback()
 	return m_graphics_read_cb;
 }
 
-void xavix_video_device::mix_bitmap_layer(screen_device &screen, const rectangle &cliprect)
-{
-}
-
 void superxavix_video_device::mix_bitmap_layer(screen_device &screen, const rectangle &cliprect)
 {
 	auto const parameter = [this](unsigned offset) { return get_u16le(&m_bitmap_params[offset]); };

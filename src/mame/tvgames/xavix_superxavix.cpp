@@ -2663,7 +2663,7 @@ void superxavix_epo_ntpj_state::superxavix_epo_ntpj(machine_config &config)
 	m_super_soc->pio_input_callback<1>().set(*this, FUNC(superxavix_epo_ntpj_state::pio1_input_r));
 	m_super_soc->pio_input_callback<2>().set(*this, FUNC(superxavix_epo_ntpj_state::pio2_input_r));
 	m_super_soc->pio_output_callback<0>().set(*this, FUNC(superxavix_epo_ntpj_state::pio0_output_w));
-	m_super_soc->pio_output_callback<1>().set(*this, FUNC(superxavix_epo_ntpj_state::pio1_output_w));
+	m_super_soc->pio_output_callback<1>().set(m_piano, FUNC(xavix_piano_controller_device::pio1_w));
 	m_super_soc->pio_output_callback<2>().set(*this, FUNC(superxavix_epo_ntpj_state::pio2_output_w));
 
 	config.set_default_layout(layout_epo_ntpj);

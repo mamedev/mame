@@ -26,7 +26,6 @@
 
 #include "bus/xavix/cart.h"
 #include "bus/xavix/tvpc_mouse.h"
-#include "cpu/m6502/xavix.h"
 #include "machine/i2chle.h"
 #include "machine/i2cmem.h"
 #include "machine/nvram.h"
@@ -767,13 +766,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-
-	virtual void io1_output_w(u8 data, u8 direction) override
-	{
-		m_io1_out = data;
-	}
-
-
+	virtual void io1_output_w(u8 data, u8 direction) override;
 	virtual u8 lightgun_r(offs_t offset) override;
 	u8 m_io1_out;
 };

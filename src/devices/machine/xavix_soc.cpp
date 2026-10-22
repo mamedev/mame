@@ -25,6 +25,14 @@
 #include "emu.h"
 #include "xavix_soc.h"
 
+#include "xavix_dma.h"
+#include "xavix_intc.h"
+#include "xavix_math.h"
+#include "xavix_sound.h"
+#include "xavix_timer.h"
+
+#include "cpu/m6502/xavix2000.h"
+
 #include <algorithm>
 #include <random>
 
@@ -267,6 +275,11 @@ void superxavix_soc_device::configure_io(machine_config &config)
 	SUPERXAVIX_IO(config, m_io).set_pio(m_pio);
 }
 
+void xavix_soc_device::set_data_address_mask(u32 mask)
+{
+	m_maincpu.lookup()->set_data_address_mask(mask);
+}
+
 void xavix_soc_device::configure_screen()
 {
 	auto const [base, tag] = m_screen.finder_target();
@@ -353,6 +366,11 @@ void superxavix_soc_device::device_reset()
 void xavix_soc_device::reset_w(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(xavix_soc_device::reset_changed), this), state);
+}
+
+void xavix_soc_device::cpu_reset_w(int state)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 }
 
 TIMER_CALLBACK_MEMBER(xavix_soc_device::reset_changed)

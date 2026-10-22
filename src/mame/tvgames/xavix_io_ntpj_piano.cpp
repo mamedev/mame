@@ -90,7 +90,7 @@ void xavix_piano_controller_device::host_w(u8 data, u8 direction)
 	m_clock = clock;
 }
 
-void xavix_piano_controller_device::pio1_w(u8 data, u8 direction)
+void xavix_piano_controller_device::pio1_w(offs_t offset, u8 data, u8 direction)
 {
 	// The five column lines sink current; released pins leave their LEDs off.
 	m_led_pwm->write_mx(BIT(~data & direction, 3, 5));

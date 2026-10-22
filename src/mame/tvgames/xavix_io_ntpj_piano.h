@@ -20,7 +20,7 @@ public:
 
 	u8 data_r() const { return m_data; }
 	void host_w(u8 data, u8 direction);
-	void pio1_w(u8 data, u8 direction);
+	void pio1_w(offs_t offset, u8 data, u8 direction);
 	void pio2_w(u8 data, u8 direction);
 
 protected:

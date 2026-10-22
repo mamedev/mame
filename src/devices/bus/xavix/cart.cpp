@@ -97,32 +97,6 @@ std::pair<std::error_condition, std::string> xavix_cart_slot_device::call_load()
 	return std::make_pair(std::error_condition(), std::string());
 }
 
-uint8_t device_xavix_cart_interface::read_cart(offs_t offset)
-{
-	return 0xff;
-}
-
-void device_xavix_cart_interface::write_cart(offs_t offset, uint8_t data)
-{
-}
-
-void device_xavix_cart_interface::write_sda(int state)
-{
-}
-
-void device_xavix_cart_interface::write_scl(int state)
-{
-}
-
-int device_xavix_cart_interface::read_sda()
-{
-	return 0;
-}
-
-void device_xavix_cart_interface::write_bus_control(offs_t offset, uint8_t data)
-{
-}
-
 uint8_t xavix_cart_slot_device::read_cart(offs_t offset)
 {
 	return m_cart->read_cart(offset);
