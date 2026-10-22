@@ -446,10 +446,25 @@ public:
 	void xavix_epo_esdx(machine_config &config) ATTR_COLD;
 	void xavix_epo_esht(machine_config &config) ATTR_COLD;
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual u8 io1_input_r(u8 direction) override;
+	virtual void io0_output_w(u8 data, u8 direction) override;
+
 private:
+	static constexpr unsigned IR_CARRIER_GAP_US = 60;
+	static constexpr u8 IR_CARRIER_MIN_PULSES = 3;
+
 	void configure_controllers(machine_config &config) ATTR_COLD;
+	TIMER_CALLBACK_MEMBER(ir_receiver_quiet);
 
 	required_device<xavix_esdx_controllers_device> m_controllers;
+	emu_timer *m_ir_receiver_timer;
+	attotime m_ir_last_carrier_edge;
+	u8 m_ir_carrier_pulses = 0;
+	bool m_ir_tx_level = false;
+	bool m_ir_receiver_active = false;
 };
 
 class xavix_epo_stad_state : public xavix_power_state
@@ -742,9 +757,21 @@ public:
 	{ }
 
 	void xavix_gcslottv(machine_config &config) ATTR_COLD;
+	int payout_home_r() { return m_payout_home; }
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void xavix_extbus_map(address_map &map) override ATTR_COLD;
+	virtual void io1_output_w(u8 data, u8 direction) override;
+
+private:
+	static constexpr unsigned PAYOUT_PHASE_MS = 100; // TODO: Measure dispenser feedback timing.
+	TIMER_CALLBACK_MEMBER(payout_position_changed);
+
+	emu_timer *m_payout_timer;
+	bool m_payout_motor = false;
+	bool m_payout_home = true;
 };
 
 class xavix_has_wamg_state : public xavix_i2c_power_state

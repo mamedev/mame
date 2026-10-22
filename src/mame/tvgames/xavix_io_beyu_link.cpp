@@ -30,7 +30,7 @@ static INPUT_PORTS_START( xavix_beyblade_link )
 	PORT_CONFSETTING(    0x01, "A-55 Dragoon / Tyson" )
 	PORT_CONFSETTING(    0x02, "A-62 Dranzer / Kai" )
 	// The native link accepts a factory request from an active peer; its physical fixture is unidentified.
-	PORT_CONFSETTING(    0x03, "Factory Test Peer" )
+	// PORT_CONFSETTING(    0x03, "Factory Test Peer" )
 
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Enter / Trigger") PORT_PLAYER(2)

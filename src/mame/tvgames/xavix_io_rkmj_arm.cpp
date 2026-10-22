@@ -22,6 +22,7 @@ xavix_rockman_arm_device::xavix_rockman_arm_device(const machine_config &mconfig
 	, m_arm(*this, "ARM")
 	, m_controller_buttons(*this, "CONTROL")
 	, m_controller_power(*this, "CONTROLLER_POWER")
+	, m_factory_code(*this, "FACTORY_CODE")
 {
 }
 
@@ -37,13 +38,23 @@ static INPUT_PORTS_START( xavix_rockman_arm )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Turn Controller and Press Shot / Back")
 	// Holding this high-level control generates the alternating tilt phases scored as a shake.
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Shake Arm")
-	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// Additional reports complete the factory checks; physical transmitter controls/fixture are unidentified.
+	// PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Factory Test Transmission") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("CONTROLLER_POWER")
 	// The battery-powered arm controller has its own slide switch and no battery-level field in its report.
 	PORT_CONFNAME( 0x01, 0x01, "Controller Power" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("FACTORY_CODE")
+	// PORT_CONFNAME( 0x01, 0x00, "Factory Test Transmission Code" )
+	// PORT_CONFSETTING(    0x00, "0D73" )
+	// PORT_CONFSETTING(    0x01, "1645" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -112,6 +123,9 @@ u16 xavix_rockman_arm_device::controller_report_r()
 		m_shake_frames = 0;
 		m_shake_lowered = false;
 	}
+
+	if (BIT(controls, 3))
+		return FACTORY_REPORTS[BIT(m_factory_code->read(), 0)];
 
 	// Normal Shot takes priority if both high-level button gestures are mapped to one host control.
 	unsigned const button = BIT(controls, 0) ? 1 : BIT(controls, 1) ? 2 : 0;

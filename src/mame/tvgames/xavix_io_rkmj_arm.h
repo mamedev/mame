@@ -33,6 +33,7 @@ private:
 		{ 0x0157, 0x0755, 0x1a57 }, // raised
 		{ 0x1f67, 0x1965, 0x0467 }  // lowered
 	};
+	static constexpr u16 FACTORY_REPORTS[2] = { 0x0d73, 0x1645 };
 	static constexpr u8 SHAKE_PHASE_FRAMES = 12;
 
 	int controller_enabled_r();
@@ -42,6 +43,7 @@ private:
 	required_ioport m_arm;
 	required_ioport m_controller_buttons;
 	required_ioport m_controller_power;
+	required_ioport m_factory_code;
 	u8 m_shake_frames;
 	bool m_shake_lowered;
 };

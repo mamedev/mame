@@ -85,6 +85,9 @@ static INPUT_PORTS_START( domyos_step_mat )
 	{
 		PORT_CODE(MOUSECODE_BUTTON1_INDEXED(1)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(1))
 	}
+	// The factory test checks these report states separately; their physical source is unidentified.
+	// PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Input 1") PORT_CODE(INPUT_CODE_INVALID)
+	// PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Input 2") PORT_CODE(INPUT_CODE_INVALID)
 	PORT_BIT( 0x50, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 

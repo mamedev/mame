@@ -24,8 +24,10 @@ DEFINE_DEVICE_TYPE(XAVIX_TAMAGOTCHI_IR, xavix_tamagotchi_ir_device, "xavix_tamag
 
 static INPUT_PORTS_START( xavix_tamagotchi_ir )
 	PORT_START("SEND")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Send Tamagotchi Data") PORT_CODE(KEYCODE_T)
-		PORT_WRITE_LINE_MEMBER(FUNC(xavix_tamagotchi_ir_device::send_request))
+	// The implemented packet is a factory request with no identified retail profile.
+	// PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Send Tamagotchi Data") PORT_CODE(KEYCODE_T)
+	//     PORT_WRITE_LINE_MEMBER(FUNC(xavix_tamagotchi_ir_device::send_request))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 xavix_tamagotchi_ir_device::xavix_tamagotchi_ir_device(

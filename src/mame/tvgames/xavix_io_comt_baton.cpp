@@ -30,6 +30,7 @@ xavix_comet_baton_device::xavix_comet_baton_device(const machine_config &mconfig
 	, m_ir(*this, "ir")
 	, m_baton(*this, "BATON")
 	, m_baton_mode(*this, "BATON_MODE")
+	, m_factory_code(*this, "FACTORY_CODE")
 	, m_command(*this, "baton_command")
 	, m_station_level(false)
 {
@@ -41,13 +42,53 @@ static INPUT_PORTS_START( xavix_comet_baton )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Baton Shake / Confirm") PORT_CODE(KEYCODE_X) PORT_IMPULSE(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Baton Big Shake") PORT_CODE(KEYCODE_C) PORT_IMPULSE(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Baton Twirl") PORT_CODE(KEYCODE_V) PORT_IMPULSE(1)
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// Code zero selects station diagnostics; the physical transmitter control/fixture is unidentified.
+	// PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Factory Test Transmission") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("BATON_MODE")
 	PORT_CONFNAME( 0x01, 0x01, "Baton Switch" )
-	PORT_CONFSETTING(    0x00, "TV" )
 	PORT_CONFSETTING(    0x01, "Game" )
+	PORT_CONFSETTING(    0x00, "TV" )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	// The receiver check requests each code; the physical factory transmitter controls are unidentified.
+	PORT_START("FACTORY_CODE")
+	// PORT_CONFNAME( 0x1f, 0x00, "Factory Test Transmission Code" )
+	// PORT_CONFSETTING(    0x00, "00" )
+	// PORT_CONFSETTING(    0x01, "01" )
+	// PORT_CONFSETTING(    0x02, "02" )
+	// PORT_CONFSETTING(    0x03, "03" )
+	// PORT_CONFSETTING(    0x04, "04" )
+	// PORT_CONFSETTING(    0x05, "05" )
+	// PORT_CONFSETTING(    0x06, "06" )
+	// PORT_CONFSETTING(    0x07, "07" )
+	// PORT_CONFSETTING(    0x08, "08" )
+	// PORT_CONFSETTING(    0x09, "09" )
+	// PORT_CONFSETTING(    0x0a, "0A" )
+	// PORT_CONFSETTING(    0x0b, "0B" )
+	// PORT_CONFSETTING(    0x0c, "0C" )
+	// PORT_CONFSETTING(    0x0d, "0D" )
+	// PORT_CONFSETTING(    0x0e, "0E" )
+	// PORT_CONFSETTING(    0x0f, "0F" )
+	// PORT_CONFSETTING(    0x10, "10" )
+	// PORT_CONFSETTING(    0x11, "11" )
+	// PORT_CONFSETTING(    0x12, "12" )
+	// PORT_CONFSETTING(    0x13, "13" )
+	// PORT_CONFSETTING(    0x14, "14" )
+	// PORT_CONFSETTING(    0x15, "15" )
+	// PORT_CONFSETTING(    0x16, "16" )
+	// PORT_CONFSETTING(    0x17, "17" )
+	// PORT_CONFSETTING(    0x18, "18" )
+	// PORT_CONFSETTING(    0x19, "19" )
+	// PORT_CONFSETTING(    0x1a, "1A" )
+	// PORT_CONFSETTING(    0x1b, "1B" )
+	// PORT_CONFSETTING(    0x1c, "1C" )
+	// PORT_CONFSETTING(    0x1d, "1D" )
+	// PORT_CONFSETTING(    0x1e, "1E" )
+	// PORT_CONFSETTING(    0x1f, "1F" )
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void xavix_comet_baton_device::device_add_mconfig(machine_config &config)
@@ -101,13 +142,13 @@ u16 xavix_comet_baton_device::baton_report_r()
 {
 	u8 const controls = m_baton->read();
 	// The ROM also accepts combined Shake+Big Shake and Big Shake+Twirl reports.
-	u8 const code = MOTION_REPORTS[BIT(controls, 1, 3)];
+	u8 const code = BIT(controls, 4) ? (m_factory_code->read() & 0x1f) : MOTION_REPORTS[BIT(controls, 1, 3)];
 	return code | (u16(code ^ 0x1f) << 5);
 }
 
 int xavix_comet_baton_device::baton_active_r()
 {
-	return BIT(m_baton_mode->read(), 0) && bool(m_baton->read() & 0x0f);
+	return BIT(m_baton_mode->read(), 0) && bool(m_baton->read() & 0x1f);
 }
 
 bool xavix_comet_baton_device::burst_length(u64 ticks, unsigned units)

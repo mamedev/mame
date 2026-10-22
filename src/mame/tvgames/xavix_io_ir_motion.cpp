@@ -162,20 +162,34 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( xavix_ir_motion_swords )
 	PORT_START("IR1")
-	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("P1 Blue Sword Swing Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(1) PORT_PLAYER(1)
+	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("P1 Blue Sword Swing Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(1) PORT_PLAYER(1) PORT_CONDITION("IR_POWER", 0x01, EQUALS, 0x01)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IR1_BUTTON")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Blue Sword Trigger") PORT_PLAYER(1)
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Blue Sword Trigger") PORT_PLAYER(1) PORT_CONDITION("IR_POWER", 0x01, EQUALS, 0x01)
+	// The station reserves this report for factory entry; its physical control/fixture is unidentified.
+	// PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("P1 Blue Sword Factory Test Transmission") PORT_CODE(KEYCODE_F1) PORT_CONDITION("IR_POWER", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IR2")
-	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("P2 Red Sword Swing Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(1) PORT_PLAYER(2)
+	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("P2 Red Sword Swing Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(1) PORT_PLAYER(2) PORT_CONDITION("IR_POWER", 0x02, EQUALS, 0x02)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IR2_BUTTON")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Red Sword Trigger") PORT_PLAYER(2)
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Red Sword Trigger") PORT_PLAYER(2) PORT_CONDITION("IR_POWER", 0x02, EQUALS, 0x02)
+	// PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("P2 Red Sword Factory Test Transmission") PORT_CODE(KEYCODE_F1) PORT_CONDITION("IR_POWER", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IR_POWER")
+	PORT_CONFNAME( 0x01, 0x01, "P1 Blue Sword Batteries" )
+	PORT_CONFSETTING(    0x00, "Removed" )
+	PORT_CONFSETTING(    0x01, "Installed" )
+	PORT_CONFNAME( 0x02, 0x02, "P2 Red Sword Batteries" )
+	PORT_CONFSETTING(    0x00, "Removed" )
+	PORT_CONFSETTING(    0x02, "Installed" )
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( xavix_ir_motion_xavix_rackets )
@@ -261,7 +275,10 @@ template <unsigned Player>
 u16 xavix_ir_motion_device::ir_report_r()
 {
 	u8 const level = m_ir_strength[Player]->read() & 3;
-	return xavix_ir_report_device::motion_report(Player, BIT(m_ir_button[Player]->read(), 0), level);
+	u8 const buttons = m_ir_button[Player]->read();
+	if (m_controller_type == controller_type::SWORDS && BIT(buttons, 1))
+		return SWORD_FACTORY_REPORTS[Player];
+	return xavix_ir_report_device::motion_report(Player, BIT(buttons, 0), level);
 }
 
 template <unsigned Player>

@@ -2505,11 +2505,12 @@ static INPUT_PORTS_START( suprtvpc )
 
 	PORT_START("TEST_LOOPBACKS")
 	// The startup test probes PIO0.0 -> PIO0.5 and PIO1.1 -> PIO0.1.
-	PORT_CONFNAME( 0x03, 0x00, "Factory Test Loopbacks" )
-	PORT_CONFSETTING(    0x00, "Disconnected" )
-	PORT_CONFSETTING(    0x03, "Both Connected" )
-	PORT_CONFSETTING(    0x01, "First Pair Only (Test)" )
-	PORT_CONFSETTING(    0x02, "Second Pair Only (Test)" )
+	// PORT_CONFNAME( 0x03, 0x00, "Factory Test Loopbacks" )
+	// PORT_CONFSETTING(    0x00, "Disconnected" )
+	// PORT_CONFSETTING(    0x03, "Both Connected" )
+	// PORT_CONFSETTING(    0x01, "First Pair Only (Test)" )
+	// PORT_CONFSETTING(    0x02, "Second Pair Only (Test)" )
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("PIO2")

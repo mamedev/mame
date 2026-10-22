@@ -38,6 +38,7 @@ private:
 	required_device<xavix_ir_report_device> m_ir;
 	required_ioport m_baton;
 	required_ioport m_baton_mode;
+	required_ioport m_factory_code;
 	output_finder<> m_command;
 
 	emu_timer *m_burst_timer;

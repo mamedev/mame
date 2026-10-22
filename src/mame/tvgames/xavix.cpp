@@ -1497,7 +1497,8 @@ static INPUT_PORTS_START( gungunad )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Trigger") PORT_PLAYER(2) PORT_CONDITION("IN0", 0x40, EQUALS, 0x40)
 	// Startup tests this contact with the second gun absent; its physical source is unidentified.
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_HIGH ) PORT_NAME("Factory Test") PORT_CODE(KEYCODE_F1) PORT_CONDITION("IN0", 0x40, EQUALS, 0x00)
+	// PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_HIGH ) PORT_NAME("Factory Test") PORT_CODE(KEYCODE_F1) PORT_CONDITION("IN0", 0x40, EQUALS, 0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CONDITION("IN0", 0x40, EQUALS, 0x00)
 	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED )
 	// This debounced line gates P2 activity; its identity as the detachable gun-present contact is inferred.
 	PORT_CONFNAME( 0x40, 0x00, "P2 Gun" )
@@ -1549,7 +1550,8 @@ static INPUT_PORTS_START( gungunrv )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 	// Startup selects the factory tests with IO0.6 low and no Support Gun; its physical source is unidentified.
-	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW ) PORT_NAME("Factory Test") PORT_CODE(KEYCODE_F1)
+	// PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW ) PORT_NAME("Factory Test") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xb4, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
@@ -1857,7 +1859,8 @@ static INPUT_PORTS_START( rad_crdn )
 
 	PORT_START("FACTORY_TX")
 	// The physical control or fixture sending this additional wireless command is unidentified.
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Transmission") PORT_CODE(KEYCODE_F1)
+	// PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Transmission") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	// The base Reset restarts the game; Remote Reset only restarts its transmitter.
 	PORT_INCLUDE(xavix_reset_control)
@@ -2059,6 +2062,63 @@ void xavix_epo_baseball_state::xavix_epo_esht(machine_config &config)
 	configure_controllers(config);
 }
 
+void xavix_epo_baseball_state::machine_start()
+{
+	xavix_state::machine_start();
+	m_ir_receiver_timer = timer_alloc(FUNC(xavix_epo_baseball_state::ir_receiver_quiet), this);
+	save_item(NAME(m_ir_last_carrier_edge));
+	save_item(NAME(m_ir_carrier_pulses));
+	save_item(NAME(m_ir_tx_level));
+	save_item(NAME(m_ir_receiver_active));
+}
+
+void xavix_epo_baseball_state::machine_reset()
+{
+	xavix_state::machine_reset();
+	m_ir_receiver_timer->adjust(attotime::never);
+	m_ir_last_carrier_edge = attotime::zero;
+	m_ir_carrier_pulses = 0;
+	m_ir_tx_level = false;
+	m_ir_receiver_active = false;
+}
+
+u8 xavix_epo_baseball_state::io1_input_r(u8 direction)
+{
+	u8 const data = xavix_state::io1_input_r(direction);
+	return m_ir_receiver_active ? (data & ~0x01) : data;
+}
+
+void xavix_epo_baseball_state::io0_output_w(u8 data, u8 direction)
+{
+	bool const level = BIT(data & direction, 2);
+	if (level && !m_ir_tx_level)
+	{
+		// The factory check samples the receiver after emitting a ten-pulse carrier burst.
+		// TODO: Measure optical coupling, carrier qualification and receiver release time.
+		attotime const now = machine().time();
+		attotime const gap = attotime::from_usec(IR_CARRIER_GAP_US);
+		m_ir_carrier_pulses = now - m_ir_last_carrier_edge < gap
+			? std::min<u8>(m_ir_carrier_pulses + 1, IR_CARRIER_MIN_PULSES) : 1;
+		m_ir_last_carrier_edge = now;
+		if (m_ir_carrier_pulses >= IR_CARRIER_MIN_PULSES)
+		{
+			if (!m_ir_receiver_active)
+			{
+				m_ir_receiver_active = true;
+				m_soc->trigger_io_event<0>();
+			}
+			m_ir_receiver_timer->adjust(gap);
+		}
+	}
+	m_ir_tx_level = level;
+}
+
+TIMER_CALLBACK_MEMBER(xavix_epo_baseball_state::ir_receiver_quiet)
+{
+	m_ir_receiver_active = false;
+	m_ir_carrier_pulses = 0;
+}
+
 
 // Home Run Datouze! Excite Stadium
 static INPUT_PORTS_START( epo_stad )
@@ -2073,7 +2133,8 @@ static INPUT_PORTS_START( epo_stad )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_stadium_bat_device::data_r))
 	// The seventh factory contact also selects normal bat timing; its physical connection is unidentified.
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Unknown Contact (Test)") PORT_CODE(KEYCODE_F1)
+	// PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Unknown Contact (Test)") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0xbe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -2095,7 +2156,11 @@ static INPUT_PORTS_START( tak_comt )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED ) // Bit 2 enables demonstration mode; its physical connection is unconfirmed.
+	PORT_BIT( 0x1b, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The physical connection of the demonstration selector is unconfirmed.
+	PORT_CONFNAME( 0x04, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 	// Split the single slider's mode and Off contacts so a saved Off setting cannot prevent the next boot.
 	PORT_CONFNAME( 0x20, 0x20, "Station Switch / Mode" )
 	PORT_CONFSETTING(    0x20, "Game" )
@@ -2338,11 +2403,12 @@ static INPUT_PORTS_START( epo_crok )
 	// The enclosure button is unlabelled; this name follows its confirmed title/menu role.
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Main Unit Button")
 	// The factory gate uses contacts 1 and 2; their physical fixture is unidentified.
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 3") PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 1") PORT_CODE(KEYCODE_9)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 2") PORT_CODE(KEYCODE_0)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 4") PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 5") PORT_CODE(KEYCODE_7)
+	// PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 3") PORT_CODE(KEYCODE_5)
+	// PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 1") PORT_CODE(KEYCODE_9)
+	// PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 2") PORT_CODE(KEYCODE_0)
+	// PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 4") PORT_CODE(KEYCODE_6)
+	// PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 5") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0xf2, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_epo_crok_state::factory_link_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // Guard contacts are reported by the wireless controllers.
 
@@ -2355,7 +2421,8 @@ static INPUT_PORTS_START( epo_crok )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 
 	PORT_START("FACTORY_LINK")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Link Test Packet") PORT_CODE(KEYCODE_8) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_epo_crok_state::factory_link_send), 0)
+	// PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Link Test Packet") PORT_CODE(KEYCODE_8) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_epo_crok_state::factory_link_send), 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("BANKER")
@@ -3252,10 +3319,14 @@ static INPUT_PORTS_START( popira )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start") PORT_PLAYER(1)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// Some cartridges use these contacts to enter and navigate a register/memory monitor.
+	// The physical test contacts are unidentified.
+	// Viewer entry: F1 for gc0001; 0 for gc0005, pc0001, pc0002, pc0002a, pc0003.
+	// PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_NAME("Debug Viewer (Alternate Test)") PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // halts execution and enables a memory viewer if used with cartridge gc0001 (debug leftover?)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Debug Viewer / Previous Page (Test)") PORT_CODE(KEYCODE_F1)
+	// PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Debug Next Page (Test)") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power")
@@ -3419,7 +3490,11 @@ static INPUT_PORTS_START( taikodp )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0xf7, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xf3, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// Startup enables unattended demonstrations; the physical selector is unidentified.
+	PORT_CONFNAME( 0x04, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 
 	// The ROM thresholds each ADC transient to one hit bit; a one-frame impulse avoids repeat hits.
 	PORT_MODIFY("AN0")
@@ -3615,7 +3690,8 @@ static INPUT_PORTS_START( gcslottv )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Medal")
-	PORT_BIT( 0x1e, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_gcslottv_state::payout_home_r))
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_UNUSED )
 	// IO1.5 inhibits automatic power-off and changes cartridge idle handling; its physical source is unknown.
 	PORT_CONFNAME( 0x20, 0x00, "Continuous Operation" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -3641,6 +3717,41 @@ void xavix_gcslottv_state::xavix_gcslottv(machine_config &config)
 
 	// A recurring IO1.7 pulse maintains the external power hold until firmware shutdown.
 	configure_power_hold(config);
+}
+
+void xavix_gcslottv_state::machine_start()
+{
+	xavix_cart_state::machine_start();
+	m_payout_timer = timer_alloc(FUNC(xavix_gcslottv_state::payout_position_changed), this);
+	save_item(NAME(m_payout_motor));
+	save_item(NAME(m_payout_home));
+}
+
+void xavix_gcslottv_state::machine_reset()
+{
+	xavix_cart_state::machine_reset();
+	// Preserve the dispenser position so firmware can return it home after reset.
+	m_payout_motor = false;
+	m_payout_timer->adjust(attotime::never);
+}
+
+void xavix_gcslottv_state::io1_output_w(u8 data, u8 direction)
+{
+	xavix_cart_state::io1_output_w(data, direction);
+	bool const motor = BIT(data & direction, 2);
+	if (motor != m_payout_motor)
+	{
+		m_payout_motor = motor;
+		m_payout_timer->adjust(motor ? attotime::from_msec(PAYOUT_PHASE_MS) : attotime::never);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(xavix_gcslottv_state::payout_position_changed)
+{
+	// The firmware runs the motor until this feedback goes low and returns high.
+	// The mechanism releases a batch of medals rather than counting individual coins.
+	m_payout_home = !m_payout_home;
+	m_payout_timer->adjust(attotime::from_msec(PAYOUT_PHASE_MS));
 }
 
 //-------------------------------------------------
@@ -3892,7 +4003,7 @@ static INPUT_PORTS_START( bistro )
 	PORT_CONFSETTING(    0x04, "Pot" )
 	PORT_CONFSETTING(    0x0c, "Frying Pan" )
 	// The controller check also requires each burner contact separately.
-	PORT_CONFSETTING(    0x08, "Second Burner Contact Only (Test)" )
+	// PORT_CONFSETTING(    0x08, "Second Burner Contact Only (Test)" )
 	// Independent contacts permit the all-directions test-mode chord.
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("Selection Up")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("Selection Down")
@@ -4750,12 +4861,13 @@ static INPUT_PORTS_START( tomplc )
 
 	// The factory check also tests both contacts closed, beyond the three marked settings.
 	PORT_START("LEVER_TEST")
-	PORT_CONFNAME( 0x01, 0x00, "Power Contacts Both Closed (Test)" )
-	PORT_CONFSETTING(    0x00, DEF_STR(Off) )
-	PORT_CONFSETTING(    0x01, DEF_STR(On) )
-	PORT_CONFNAME( 0x02, 0x00, "Brake Contacts Both Closed (Test)" )
-	PORT_CONFSETTING(    0x00, DEF_STR(Off) )
-	PORT_CONFSETTING(    0x02, DEF_STR(On) )
+	// PORT_CONFNAME( 0x01, 0x00, "Power Contacts Both Closed (Test)" )
+	// PORT_CONFSETTING(    0x00, DEF_STR(Off) )
+	// PORT_CONFSETTING(    0x01, DEF_STR(On) )
+	// PORT_CONFNAME( 0x02, 0x00, "Brake Contacts Both Closed (Test)" )
+	// PORT_CONFSETTING(    0x00, DEF_STR(Off) )
+	// PORT_CONFSETTING(    0x02, DEF_STR(On) )
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")

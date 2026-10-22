@@ -40,6 +40,8 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 private:
+	static constexpr u8 SWORD_FACTORY_REPORTS[2] = { 0x11, 0x7b };
+
 	template <unsigned Player> u16 ir_report_r();
 	template <unsigned Player> int ir_report_enabled_r();
 

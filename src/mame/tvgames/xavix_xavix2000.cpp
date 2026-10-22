@@ -26,7 +26,7 @@
     - epo_sdb: Measure physical trackball scaling.
     - epo_sdb, epo_es2j and duelmast: Measure physical battery-voltage scaling.
     - epo_ebox: Identify remaining status inputs and factory-test contacts.
-    - ttv_lotr: Identify the four GPIO contacts in the final factory I/O page.
+    - ttv_lotr: Verify whether the hidden GPIO test paths connect to physical contacts.
     - epo_sdb: Identify factory-contact wiring and the NORMAL/DEMO line source.
     - Shared CPU identification: Confirm chip generations where extended
       opcodes are the only evidence; epo_ebox has independent hardware identification.
@@ -315,7 +315,7 @@ static INPUT_PORTS_START( ttv_lotr )
 	PORT_INCLUDE(xavix_hard_power_control)
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) // Retail controls use the reflective sword, not the factory-test contacts.
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED ) // Retail controls use the reflective sword; GPIO test indicators are left off screen.
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0xf7, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -339,8 +339,9 @@ static INPUT_PORTS_START( drgqst )
 
 	// The factory contacts share the EEPROM pins; their physical fixture is unidentified.
 	PORT_START("FACTORY")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test L (EEPROM Data)") PORT_CODE(KEYCODE_9) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix2000_drgqst_state::factory_contact_changed), 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test R (EEPROM Clock)") PORT_CODE(KEYCODE_0) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix2000_drgqst_state::factory_contact_changed), 0)
+	// PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test L (EEPROM Data)") PORT_CODE(KEYCODE_9) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix2000_drgqst_state::factory_contact_changed), 0)
+	// PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test R (EEPROM Clock)") PORT_CODE(KEYCODE_0) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix2000_drgqst_state::factory_contact_changed), 0)
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
