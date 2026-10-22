@@ -914,7 +914,7 @@ ROM_END
 CONS( 2002, epo_ebox, 0,      0, xavix2000_epo_ebox,         epo_ebox, xavix2000_epo_ebox_state,   empty_init, "Epoch / SSD Company Ltd.", "K.O. Shiyouze! Excite Boxing (Japan)", MACHINE_NOT_WORKING ) // doesn't use XaviX2000 extra opcodes, but had that type of CPU
 
 // ストライクきめるぜ！ エキサイトボウリング
-CONS( 2002, epo_bowl, 0,      0, xavix2000_epo_bowl,         epo_bowl, xavix2000_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "Strike Kimeruze! Excite Bowling (Japan)", MACHINE_NOT_WORKING )
+CONS( 2002, epo_bowl, 0,      0, xavix2000_epo_bowl,         epo_bowl, xavix2000_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "Strike Kimeruze! Excite Bowling (Japan)", 0 )
 
 // スーパーショット！ エキサイトゴルフ
 // 2002 date on PCB, 2003 in-game.

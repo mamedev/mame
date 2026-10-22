@@ -3293,9 +3293,9 @@ CONS( 2007, xavmusicj,  xavmusic, 0, superxavix_xavmusicj,             xavix_ste
 // ザビックスエアロ チェック&バランス
 CONS( 2006, xavcheck,   0,        0, superxavix_xavcheck,              xavix_check,           superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "XaviX Aero Check & Balance (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
 // XaviX パワーキッズ ジュニア カラダでのばす才能開発
-CONS( 2007, xavpkjr,    0,        0, superxavix_xavpowrk,              xavix_step,            superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "PowerKIDS Jr. (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
+CONS( 2007, xavpkjr,    0,        0, superxavix_xavpowrk,              xavix_step,            superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "PowerKIDS Jr. (XaviXPORT, Japan)", 0 )
 // XaviX パワーキッズ カラダでのばす才能開発
-CONS( 2007, xavpowrk,   0,        0, superxavix_xavpowrk,              xavix_step,            superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "PowerKIDS (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
+CONS( 2007, xavpowrk,   0,        0, superxavix_xavpowrk,              xavix_step,            superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "PowerKIDS (XaviXPORT, Japan)", 0 )
 
 // https://arnaudmeyer.wordpress.com/domyos-interactive-system/
 // Domyos Fitness Adventure
@@ -3337,7 +3337,7 @@ CONS( 2004, epo_doka,   0,        0, superxavix_nv_4mb,                epo_doka,
 CONS( 2006, epo_kabj,   0,        0, superxavix_epo_kabj,              epo_kabj,              superxavix_epo_kabj_state,   empty_init, "Epoch / SSD Company Ltd.", "Hello Kitty: TV de Asobou! Manabou! Card de Omamagoto AIUEO Zukan (Japan)", MACHINE_NOT_WORKING )
 
 // Let's!TVプレイ なりきり体感 ボウケンジャー 走れ！撃て！ミッションスタート！！
-CONS( 2006, ban_bkgj,   0,        0, superxavix_ban_bkgj,              ban_bkgj,              superxavix_ban_bkgj_state,   empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Narikiri Taikan Boukenger: Hashire! Ute! Mission Start!! (Japan)", MACHINE_NOT_WORKING )
+CONS( 2006, ban_bkgj,   0,        0, superxavix_ban_bkgj,              ban_bkgj,              superxavix_ban_bkgj_state,   empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Narikiri Taikan Boukenger: Hashire! Ute! Mission Start!! (Japan)", 0 )
 
 // Let's!TV プレイ 体感キャストオフ 仮面ライダーカブト クロックアップ＆ライダーキック!!
 CONS( 2006, ban_utmj,   0,        0, superxavix_ban_utmj,              ban_reflective_camera, superxavix_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Taikan Cast Off: Kamen Rider Kabuto Clock Up & Rider Kick!! (Japan)", MACHINE_NOT_WORKING )
