@@ -206,6 +206,9 @@ void xavix2000_soc_device::device_add_mconfig(machine_config &config)
 	XAVIX2000_VIDEO(config, m_video, DERIVED_CLOCK(1, 1));
 	m_maincpu->set_addrmap(xavix_device::AS_LOW_BUS, *this, &xavix2000_soc_device::xavix_lowbus_map);
 	configure_common(config);
+	// XaviX2000 CIS firmware restarts mode-0 measurements with Run alone.
+	// TODO: distinguish Start from preset/divider-write effects on hardware.
+	m_timer->set_restart_on_run(true);
 }
 
 void superxavix_soc_device::device_add_mconfig(machine_config &config)

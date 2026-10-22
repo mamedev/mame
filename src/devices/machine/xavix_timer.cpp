@@ -21,6 +21,7 @@ DEFINE_DEVICE_TYPE(XAVIX_TIMER, xavix_timer_device, "xavix_timer", "XaviX Genera
 xavix_timer_device::xavix_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, XAVIX_TIMER, tag, owner, clock)
 	, m_irq_cb(*this)
+	, m_restart_on_run(false)
 {
 }
 
@@ -169,7 +170,8 @@ void xavix_timer_device::ctrl_w(u8 data)
 	synchronize();
 
 	bool const start = !BIT(m_ctrl, 0) && BIT(data, 0);
-	bool const reload = m_mode == 1 ? BIT(data, 0) : (start || BIT(data, 1));
+	bool const retrigger = m_restart_on_run && m_mode == 0 && BIT(data, 0);
+	bool const reload = m_mode == 1 ? BIT(data, 0) : (start || retrigger || BIT(data, 1));
 	bool const reset_prescaler = m_mode == 1 ? BIT(data, 0) : (BIT(data, 1) || (start && m_mode >= 2));
 	if (reload)
 		m_count = m_mode < 2 ? m_reload : 1;

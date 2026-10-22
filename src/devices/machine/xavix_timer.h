@@ -11,6 +11,7 @@ class xavix_timer_device : public device_t
 public:
 	xavix_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	void set_restart_on_run(bool restart) { m_restart_on_run = restart; }
 	auto irq_callback() { return m_irq_cb.bind(); }
 	void map(address_map &map) ATTR_COLD;
 
@@ -46,6 +47,7 @@ private:
 	TIMER_CALLBACK_MEMBER(timer_expired);
 
 	devcb_write_line m_irq_cb;
+	bool m_restart_on_run;
 	emu_timer *m_timer;
 	u8 m_ctrl;
 	u8 m_reload;
