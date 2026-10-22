@@ -219,6 +219,7 @@ private:
 	uint32_t opREV(uint32_t op);
 	uint32_t opFpoint(uint32_t op);
 	uint32_t opBSU(uint32_t op);
+	uint32_t opBSU_search(uint32_t op);
 	void check_interrupts();
 };
 

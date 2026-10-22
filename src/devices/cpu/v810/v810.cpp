@@ -28,7 +28,7 @@
   - implement NP fatal exception;
   - implement NMI;
   - implement floating point exceptions;
-  - verify and improve bitstring opcodes;
+  - bitstring opcodes access memory a bit at a time, timing is approximate;
   - cache handling;
   - external bus timing (on load/store opcodes):
   \- 3 cycles for ROM
@@ -1256,6 +1256,77 @@ uint32_t v810_device::opFpoint(uint32_t op)
 	}
 }
 
+// SCH0BSU/SCH0BSD/SCH1BSU/SCH1BSD (sub-opcodes 0-3): search the string at r30/r27, length r28,
+// upward or downward (bit 0) for a 0 or a 1 (bit 1), one bit per execution like the other bit
+// string instructions. r29 counts the bits skipped. When the bit is found, r30/r27 point to the bit
+// before it (in the search direction) and Z is cleared; when it is not found, r28 is 0 and Z is set.
+uint32_t v810_device::opBSU_search(uint32_t op)
+{
+	const bool down = BIT(op, 0);
+	const uint32_t match = BIT(op, 1);
+	uint32_t bit = R27 & 0x1f;
+	uint32_t src = R30 & ~3;
+
+	// a zero length sets Z and leaves r27-r30 unchanged
+	if (!R28)
+	{
+		SET_Z(1);
+		return 14;
+	}
+
+	if (BIT(R_W(src), bit) == match)
+	{
+		// found: step back one bit
+		if (down)
+		{
+			if (++bit == 32)
+			{
+				bit = 0;
+				src += 4;
+			}
+		}
+		else
+		{
+			if (bit-- == 0)
+			{
+				bit = 31;
+				src -= 4;
+			}
+		}
+		R27 = bit;
+		R30 = src;
+		SET_Z(0);
+		return 1;
+	}
+
+	// skipped
+	if (down)
+	{
+		if (bit-- == 0)
+		{
+			bit = 31;
+			src -= 4;
+		}
+	}
+	else
+	{
+		if (++bit == 32)
+		{
+			bit = 0;
+			src += 4;
+		}
+	}
+	R27 = bit;
+	R28--;
+	R29++;
+	R30 = src;
+	if (R28)
+		PC -= 2;
+	else
+		SET_Z(1);
+	return 1;
+}
+
 // TODO: makes host performance to dip
 // TODO: verify atomicity wrt interrupts & DRQ
 // Use scenario: pcfx reading from CD data port with no increment of source address.
@@ -1264,8 +1335,18 @@ uint32_t v810_device::opBSU(uint32_t op)
 	// sub-opcodes 04h-07h and 10h-1Fh are invalid
 	if ((op & 0x10) || (op & 0x0c) == 0x04)
 		return opUNDEF(op);
-	if(!(op & 8))
-		throw emu_fatalerror("V810: unknown BSU opcode %04x\n",op);
+	if (!(op & 8))
+		return opBSU_search(op);
+
+	if (!R28)
+	{
+		// zero length: nothing is transferred, the offsets and addresses are only masked
+		R26 &= 0x1f;
+		R27 &= 0x1f;
+		R29 &= ~3;
+		R30 &= ~3;
+		return 14;
+	}
 
 	{
 		uint32_t dsttmp, tmp;
@@ -1374,7 +1455,6 @@ uint32_t v810_device::opBSU(uint32_t op)
 	}
 
 	// TODO: all bitstring timings implied for vboy 16-bit ext bus
-	// TODO: search type BSU takes 4 cycles
 	return 12;
 }
 
