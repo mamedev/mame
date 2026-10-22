@@ -134,8 +134,10 @@ private:
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_io;
 	uint32_t m_PPC;
 	int m_icount;
-	// set by a fatal exception: halted until reset (the HALT instruction is not modelled yet)
+	// set by a fatal exception: halted until reset
 	bool m_halted;
+	// set by the HALT instruction: halted until an interrupt is accepted
+	bool m_halt;
 
 	bus_wait_delegate m_bus_wait;
 	bool m_bus_timing;

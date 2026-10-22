@@ -23,7 +23,6 @@
   - CY flag in floating point opcodes that supports them;
   - NVC (vboy CPU) onchip peripherals ($0200'0000 area);
   - implement trap opcode;
-  - implement halt opcode;
   - implement double exception behaviour;
   - implement NP fatal exception;
   - implement NMI;
@@ -44,6 +43,7 @@
 
 #include "corefloat.h"
 
+#include <algorithm>
 #include <limits>
 
 #define clkIF 3
@@ -799,10 +799,10 @@ uint32_t v810_device::opRETI(uint32_t op)
 	return 10;
 }
 
+// stops until an interrupt is accepted (or reset); the interrupt saves the address of the next instruction
 uint32_t v810_device::opHALT(uint32_t op)
 {
-	logerror("V810: HALT @ %X\n",PC-2);
-	machine().debug_break();
+	m_halt = true;
 	return 1;
 }
 
@@ -1580,6 +1580,7 @@ void v810_device::device_start()
 	save_item(NAME(m_nmi_line));
 	save_item(NAME(m_PPC));
 	save_item(NAME(m_halted));
+	save_item(NAME(m_halt));
 
 	state_add( V810_PC,    "PC",    PC).formatstr("%08X");
 	state_add( V810_R0,    "R0",    R0).formatstr("%08X");
@@ -1670,23 +1671,21 @@ void v810_device::device_reset()
 	TKCW = 0x000000e0;                     // fixed: traps on invalid operation, zero division and overflow
 	CHCW = 0;
 	m_halted = false;
+	m_halt = false;
 	m_lastop = LAST_OTHER;
 	icache_clear(0, 128);
 }
 
 // TODO: remaining exception types
+// called with an interrupt requested and accepted by NP, EP and ID: takes the highest one above the PSW level
 void v810_device::check_interrupts()
 {
-	if (m_irq_state == 0)
-		return;
-
-	if (GET_NP || GET_EP || GET_ID)
-		return;
-
-	for (u16 irq_line = 15; irq_line >= (PSW & 0xF0000) >> 16; irq_line --)
+	for (int irq_line = 15; irq_line >= int(BIT(PSW, 16, 4)); irq_line--)
 	{
 		if (!((1 << irq_line) & m_irq_state))
 			continue;
+
+		m_halt = false;
 
 		standard_irq_callback(irq_line, PC);
 
@@ -1696,8 +1695,7 @@ void v810_device::check_interrupts()
 		PC = 0xfffffe00 | (irq_line << 4);
 		ECR = (ECR & 0xffff0000) | 0xfe00 | (irq_line << 4); // EICC only
 
-		uint8_t num = irq_line + 1;
-		if (num == 0x10) num = 0x0f;
+		const uint8_t num = std::min(irq_line + 1, 15);
 
 		// clear interrupt level
 		PSW &= 0xfff0ffff;
@@ -1720,12 +1718,18 @@ void v810_device::execute_run()
 		return;
 	}
 
-	// TODO: move in execution body
-	// (breaks pcfx boot)
-	check_interrupts();
-
 	do
 	{
+		// interrupts are sampled at the end of every instruction, and while halted
+		if (m_irq_state && !(GET_NP || GET_EP || GET_ID))
+			check_interrupts();
+		if (m_halt)
+		{
+			debugger_wait_hook();
+			m_icount = 0;
+			break;
+		}
+
 		m_PPC = PC;
 		debugger_instruction_hook(PC);
 		m_curop = LAST_OTHER;
