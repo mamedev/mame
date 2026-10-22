@@ -8,7 +8,7 @@ license:CC0-1.0
 
 	<!-- Compiled in 2011 by Michael Fog from the files described in "NewBrain - Handbook for disk users" -->
 
-	<software name="cpm22" supported="no">
+	<software name="cpm22">
 		<description>CP/M 2.2 (DSDD 400K, single drive)</description>
 		<year>198?</year>
 		<publisher>Grundy Business Systems</publisher>
@@ -19,7 +19,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cpm22d" cloneof="cpm22" supported="no">
+	<software name="cpm22d" cloneof="cpm22">
 		<description>CP/M 2.2 (DSDD 400K, dual drive)</description>
 		<year>198?</year>
 		<publisher>Grundy Business Systems</publisher>
@@ -30,7 +30,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cpm22ss" cloneof="cpm22" supported="no">
+	<software name="cpm22ss" cloneof="cpm22">
 		<description>CP/M 2.2 (SSDD 200K, single drive)</description>
 		<year>198?</year>
 		<publisher>Grundy Business Systems</publisher>
@@ -41,7 +41,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cpm22ssd" cloneof="cpm22" supported="no">
+	<software name="cpm22ssd" cloneof="cpm22">
 		<description>CP/M 2.2 (SSDD 200K, dual drive)</description>
 		<year>198?</year>
 		<publisher>Grundy Business Systems</publisher>
@@ -52,7 +52,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cpm22qd" cloneof="cpm22" supported="no">
+	<software name="cpm22qd" cloneof="cpm22">
 		<description>CP/M 2.2 (DSDD 800K, single drive)</description>
 		<year>198?</year>
 		<publisher>Grundy Business Systems</publisher>
@@ -63,7 +63,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cpm22qdd" cloneof="cpm22" supported="no">
+	<software name="cpm22qdd" cloneof="cpm22">
 		<description>CP/M 2.2 (DSDD 800K, dual drive)</description>
 		<year>198?</year>
 		<publisher>Grundy Business Systems</publisher>
