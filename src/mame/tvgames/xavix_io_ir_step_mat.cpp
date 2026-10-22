@@ -2,10 +2,10 @@
 // copyright-holders:MagikalUnicorn
 /***************************************************************************
 
-    Infrared step mat used by xavjmat and xavaero. The four independent
-    contacts share their input layout, but transmit different packet formats:
-    xavjmat validates a preamble, pad bits and parity; xavaero matches one
-    of sixteen codewords. The console panel uses a separate serial interface.
+    Infrared step mats transmit either a preamble, pad bits and parity, or
+    one of sixteen codewords. Later step-sensor software accepts the latter
+    format alongside its separate serial receiver. The console panel uses
+    a separate serial interface.
 
     The shared infrared generator owns transmission timing and saved state.
 

@@ -909,7 +909,7 @@ static INPUT_PORTS_START( xavix_jmat )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mat", FUNC(xavix_ir_step_mat_device::data_r))
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ir_mat", FUNC(xavix_ir_step_mat_device::data_r))
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_INCLUDE(xavixport_panel)
@@ -942,6 +942,10 @@ void superxavix_xavjmat_state::superxavix_xavaero(machine_config &config)
 static INPUT_PORTS_START( xavix_step )
 	PORT_INCLUDE(superxavix)
 	PORT_INCLUDE(xavixport_panel)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ir_mat", FUNC(xavix_ir_step_mat_device::data_r))
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 microphone_device &superxavix_i2c_pio1_state::configure_stereo_music_input(machine_config &config)
@@ -954,8 +958,15 @@ microphone_device &superxavix_i2c_pio1_state::configure_stereo_music_input(machi
 xavixport_io_device &superxavix_i2c_pio1_state::configure_xavix_step_mat(machine_config &config)
 {
 	xavixport_io_device &xavixport_io(configure_xavixport_io(config));
-	xavix_step_mat_device &mat(XAVIX_STEP_MAT(config, "mat"));
-	xavixport_io.accessory_callback().set(mat, FUNC(xavix_step_mat_device::report_r));
+	xavix_ir_step_mat_device &ir_mat(XAVIX_IR_STEP_MAT(config, "ir_mat", peripheral_clock()));
+	ir_mat.set_protocol(xavix_ir_step_mat_device::protocol::AEROSTEP);
+	ir_mat.set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
+	m_screen->screen_vblank().append(ir_mat, FUNC(xavix_ir_step_mat_device::vblank_w));
+
+	xavix_step_mat_device &wired_mat(XAVIX_STEP_MAT(config, "wired_mat"));
+	wired_mat.set_input_default(WIRED_MAT_DEFAULTS);
+	xavixport_io.accessory_callback().set(wired_mat, FUNC(xavix_step_mat_device::report_r));
+
 	return xavixport_io;
 }
 
@@ -1029,7 +1040,8 @@ static INPUT_PORTS_START( xavix_check )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ir_mat", FUNC(xavix_ir_step_mat_device::data_r))
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void superxavix_i2c_pio1_state::superxavix_xavcheck(machine_config &config)
@@ -2480,6 +2492,7 @@ void superxavix_suprtvpc_state::superxavix_suprtvpc(machine_config &config)
 	m_super_soc->pio_input_mask_callback<0>().set(*this, FUNC(superxavix_suprtvpc_state::pio0_input_mask_r));
 	m_super_soc->pio_output_callback<0>().set(*this, FUNC(superxavix_suprtvpc_state::pio0_output_w));
 	m_super_soc->pio_input_callback<1>().set(*this, FUNC(superxavix_suprtvpc_state::pio1_input_r));
+	m_super_soc->pio_input_mask_callback<1>().set(*this, FUNC(superxavix_suprtvpc_state::pio1_input_mask_r));
 	m_super_soc->pio_output_callback<1>().set(*this, FUNC(superxavix_suprtvpc_state::pio1_output_w));
 	m_super_soc->pio_input_callback<2>().set(*this, FUNC(superxavix_suprtvpc_state::pio2_input_r));
 	m_super_soc->pio_output_callback<2>().set(*this, FUNC(superxavix_suprtvpc_state::pio2_output_w));
@@ -2494,7 +2507,18 @@ void superxavix_suprtvpc_state::superxavix_suprtvpc(machine_config &config)
 	m_soc->set_anport_counter_mode(2);
 	m_soc->set_anport_counter_mode(3, true);
 
-	SUPRTVPC_CART_SLOT(config, m_cart, suprtvpc_cart_slot_device::cart_devices, "rom");
+	SUPRTVPC_CART_SLOT(config, m_cart, [this, &config] (device_slot_interface &slot)
+	{
+		suprtvpc_cart_slot_device::cart_devices(slot);
+		slot.option_add_internal("rom_ir", SUPRTVPC_ROM).clock(peripheral_clock()).machine_config([this, &config] (device_t *)
+		{
+			// The cartridge receiver accepts the later Excite racket reports.
+			xavix_ir_motion_device &rackets(XAVIX_IR_MOTION(config, "rom_ir:controllers", DERIVED_CLOCK(1, 1)));
+			rackets.set_controller_type(xavix_ir_motion_device::controller_type::POWERED_PING_PONG_RACKETS);
+			rackets.set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
+			m_screen.lookup()->screen_vblank().append(rackets, FUNC(xavix_ir_motion_device::vblank_w));
+		});
+	}, "rom");
 	m_cart->set_ir_rx_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("suprtvpc_cart");
@@ -2568,10 +2592,18 @@ u8 superxavix_suprtvpc_state::pio1_input_r(offs_t offset, u8 mem_mask)
 {
 	u8 result = m_tvpc_pio[1]->read() & ~0x08;
 
+	if (m_rackets)
+		result = (result & ~0x01) | m_rackets->data_r();
+
 	if (BIT(mouse_buttons_r(), 1))
 		result |= 0x08;
 
 	return result;
+}
+
+u8 superxavix_suprtvpc_state::pio1_input_mask_r()
+{
+	return m_pio_connected_inputs[1] | (m_rackets ? 0x01 : 0);
 }
 
 void superxavix_suprtvpc_state::pio1_output_w(offs_t offset, u8 data, u8 mem_mask)

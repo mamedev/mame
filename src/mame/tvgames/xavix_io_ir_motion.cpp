@@ -194,6 +194,16 @@ static INPUT_PORTS_START( xavix_ir_motion_xavix_rackets )
 	PORT_START("IR2_BUTTON")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Racket Button") PORT_CODE(KEYCODE_M) PORT_PLAYER(2)
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IR_POWER")
+	// Removing a racket's batteries silences its transmitter during the EEPROM test.
+	PORT_CONFNAME( 0x01, 0x01, "P1 Racket Batteries" )
+	PORT_CONFSETTING(    0x00, "Removed" )
+	PORT_CONFSETTING(    0x01, "Installed" )
+	PORT_CONFNAME( 0x02, 0x02, "P2 Racket Batteries" )
+	PORT_CONFSETTING(    0x00, "Removed" )
+	PORT_CONFSETTING(    0x02, "Installed" )
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void xavix_ir_motion_device::device_add_mconfig(machine_config &config)

@@ -194,6 +194,12 @@ protected:
 	void configure_xavix_step_sensor(machine_config &config) ATTR_COLD;
 
 private:
+	static constexpr input_device_default WIRED_MAT_DEFAULTS[] =
+	{
+		{ "STEP_POWER", 0x01, 0x00 },
+		{ nullptr, 0, 0 }
+	};
+
 	xavixport_io_device &configure_xavix_step_mat(machine_config &config) ATTR_COLD;
 	void configure_pio() ATTR_COLD;
 
@@ -214,7 +220,7 @@ class superxavix_xavjmat_state : public superxavix_i2c_pio1_state
 public:
 	superxavix_xavjmat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: superxavix_i2c_pio1_state(mconfig, type, tag)
-		, m_mat(*this, "mat")
+		, m_mat(*this, "ir_mat")
 	{ }
 
 	void superxavix_xavjmat(machine_config &config) ATTR_COLD;
@@ -587,6 +593,7 @@ public:
 		, m_exp(*this, "exp")
 		, m_mouse(*this, "mouse%u", 1U)
 		, m_cart(*this, "cartslot")
+		, m_rackets(*this, "cartslot:rom_ir:controllers")
 		, m_rombank(*this, "rombank")
 		, m_factory_loopbacks(*this, "TEST_LOOPBACKS")
 	{ }
@@ -607,6 +614,7 @@ private:
 	u8 pio0_input_mask_r();
 	u8 factory_loopback_mask() const;
 	u8 pio1_input_r(offs_t offset, u8 mem_mask);
+	u8 pio1_input_mask_r();
 	void pio0_output_w(offs_t offset, u8 data, u8 mem_mask);
 	void pio1_output_w(offs_t offset, u8 data, u8 mem_mask);
 	u8 pio2_input_r(offs_t offset, u8 mem_mask);
@@ -616,6 +624,7 @@ private:
 	required_device<suprtvpc_exp_port_device> m_exp;
 	required_device_array<tvpc_mouse_port_device, 2> m_mouse;
 	required_device<suprtvpc_cart_slot_device> m_cart;
+	optional_device<xavix_ir_motion_device> m_rackets;
 	required_memory_bank m_rombank;
 	required_ioport m_factory_loopbacks;
 	u8 m_loopback_data = 0;
