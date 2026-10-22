@@ -19,14 +19,11 @@
 
 
  TODO:
-  - Verify floating point opcodes (single precision IEEE-754 standard)
-  - CY flag in floating point opcodes that supports them;
   - NVC (vboy CPU) onchip peripherals ($0200'0000 area);
   - implement trap opcode;
   - implement double exception behaviour;
   - implement NP fatal exception;
   - implement NMI;
-  - implement floating point exceptions;
   - bitstring opcodes access memory a bit at a time, timing is approximate;
   - cache handling;
   - external bus timing (on load/store opcodes):
@@ -42,8 +39,10 @@
 #include "v810dasm.h"
 
 #include "corefloat.h"
+#include "softfloat3/source/include/softfloat.h"
 
 #include <algorithm>
+#include <cmath>
 #include <limits>
 
 #define clkIF 3
@@ -1104,106 +1103,186 @@ uint32_t v810_device::opDIVUr(uint32_t op)   // divu r1,r2
 	return 36;
 }
 
+// floating point operand that raises the reserved operand exception: denormal, NaN or infinity
+static inline bool fp_reserved(uint32_t v)
+{
+	const uint32_t exp = BIT(v, 23, 8);
+	return (v & 0x7fffffff) && (exp == 0 || exp == 0xff);
+}
+
+// floating point exception: the PSW flag is set before PSW is saved; the instruction is restarted
+void v810_device::fp_exception(uint32_t psw_bit, u16 code)
+{
+	PSW |= psw_bit;
+	PC = m_PPC;
+	take_exception(0xffffff60, code);
+}
+
+// CY, OV, S and Z of a floating point result: CY and S are the sign, both clear for zero
+void v810_device::fp_set_flags(uint32_t result)
+{
+	const bool zero = !(result & 0x7fffffff);
+	const bool negative = !zero && BIT(result, 31);
+	SET_OV(0);
+	SET_Z(zero ? 1 : 0);
+	SET_S(negative ? 1 : 0);
+	SET_CY(negative ? 1 : 0);
+}
+
+// ADDF.S, SUBF.S, MULF.S, DIVF.S: reg2 = reg2 op reg1, rounded to nearest
+void v810_device::fp_arith(uint32_t op, fp_op kind)
+{
+	const uint32_t op1 = GETREG(GET1);
+	const uint32_t op2 = GETREG(GET2);
+	if (fp_reserved(op1) || fp_reserved(op2))
+	{
+		fp_exception(PSW_FRO, 0xff60);
+		return;
+	}
+	if (kind == FP_DIV && !(op1 & 0x7fffffff))
+	{
+		if (!(op2 & 0x7fffffff))
+			fp_exception(PSW_FIV, 0xff70); // 0 / 0
+		else
+			fp_exception(PSW_FZD, 0xff68);
+		return;
+	}
+
+	softfloat_roundingMode = softfloat_round_near_even;
+	softfloat_detectTininess = softfloat_tininess_afterRounding; // the SoftFloat state is shared with other cores
+	softfloat_exceptionFlags = 0;
+	float32_t result;
+	switch (kind)
+	{
+		case FP_ADD:
+			result = f32_add(float32_t{ op2 }, float32_t{ op1 });
+			break;
+		case FP_SUB:
+			result = f32_sub(float32_t{ op2 }, float32_t{ op1 });
+			break;
+		case FP_MUL:
+			result = f32_mul(float32_t{ op2 }, float32_t{ op1 });
+			break;
+		default:
+			result = f32_div(float32_t{ op2 }, float32_t{ op1 });
+			break;
+	}
+	uint32_t res = result.v;
+	const uint8_t flags = softfloat_exceptionFlags;
+	if (flags & softfloat_flag_inexact)
+		PSW |= PSW_FPR;
+
+	if (flags & softfloat_flag_overflow)
+	{
+		// the result is stored with its exponent corrected (divided by 2^192), then the exception is raised
+		const double x = u2f(op2), y = u2f(op1);
+		const double exact = (kind == FP_ADD) ? (x + y) : (kind == FP_SUB) ? (x - y) : (kind == FP_MUL) ? (x * y) : (x / y);
+		res = f2u(float(std::ldexp(exact, -192)));
+		SETREG(GET2, res);
+		fp_set_flags(res);
+		fp_exception(PSW_FOV, 0xff64);
+		return;
+	}
+	if ((flags & softfloat_flag_underflow) || (!(res & 0x7f800000) && (res & 0x7fffffff)))
+	{
+		// underflow: no exception, zero is stored
+		res &= 0x80000000;
+		PSW |= PSW_FUD | PSW_FPR;
+	}
+	SETREG(GET2, res);
+	fp_set_flags(res);
+}
+
+// CVT.SW (rounded to nearest) and TRNC.SW (truncated): CY is not affected, S and Z come from the integer
+void v810_device::fp_to_int(uint32_t op, bool truncate)
+{
+	const uint32_t op1 = GETREG(GET1);
+	if (fp_reserved(op1))
+	{
+		fp_exception(PSW_FRO, 0xff60);
+		return;
+	}
+
+	softfloat_exceptionFlags = 0;
+	const int32_t res = f32_to_i32(float32_t{ op1 }, truncate ? softfloat_round_minMag : softfloat_round_near_even, true);
+	if (softfloat_exceptionFlags & softfloat_flag_invalid)
+	{
+		// out of range: reg2 is unchanged
+		fp_exception(PSW_FIV, 0xff70);
+		return;
+	}
+	if (softfloat_exceptionFlags & softfloat_flag_inexact)
+		PSW |= PSW_FPR;
+	SETREG(GET2, res);
+	SET_OV(0);
+	CHECK_ZS(res);
+}
+
 uint32_t v810_device::opADDF(uint32_t op)
 {
-	//TODO: CY
-	float val1=u2f(GETREG(GET1));
-	float val2=u2f(GETREG(GET2));
-	SET_OV(0);
-	val2+=val1;
-	SET_Z((val2==0.0f)?1:0);
-	SET_S((val2<0.0f)?1:0);
-	SETREG(GET2,f2u(val2));
+	fp_arith(op, FP_ADD);
 	return 24;
 }
 
 uint32_t v810_device::opSUBF(uint32_t op)
 {
-	float val1=u2f(GETREG(GET1));
-	float val2=u2f(GETREG(GET2));
-	SET_OV(0);
-	SET_CY((val2<val1)?1:0);
-	val2-=val1;
-	SET_Z((val2==0.0f)?1:0);
-	SET_S((val2<0.0f)?1:0);
-	SETREG(GET2,f2u(val2));
+	fp_arith(op, FP_SUB);
 	return 26;
 }
 
 uint32_t v810_device::opMULF(uint32_t op)
 {
-	//TODO: CY
-	float val1=u2f(GETREG(GET1));
-	float val2=u2f(GETREG(GET2));
-	SET_OV(0);
-	val2*=val1;
-	SET_Z((val2==0.0f)?1:0);
-	SET_S((val2<0.0f)?1:0);
-	SETREG(GET2,f2u(val2));
+	fp_arith(op, FP_MUL);
 	return 27;
 }
 
 uint32_t v810_device::opDIVF(uint32_t op)
 {
-	//TODO: CY
-	float val1=u2f(GETREG(GET1));
-	float val2=u2f(GETREG(GET2));
-	SET_OV(0);
-	if(val1!=0)
-		val2/=val1;
-	else
-		throw emu_fatalerror("DIVF divide by zero\n");
-	SET_Z((val2==0.0f)?1:0);
-	SET_S((val2<0.0f)?1:0);
-	SETREG(GET2,f2u(val2));
+	fp_arith(op, FP_DIV);
 	return 44;
 }
 
 uint32_t v810_device::opTRNC(uint32_t op)
 {
-	float val1=u2f(GETREG(GET1));
-	SET_OV(0);
-	SET_Z((val1==0.0f)?1:0);
-	SET_S((val1<0.0f)?1:0);
-	SETREG(GET2,(int32_t)val1);
-	// TODO: unknown
-	return 18;
+	fp_to_int(op, true);
+	return 14;
+}
+
+uint32_t v810_device::opCVTS(uint32_t op) // CVT.SW
+{
+	fp_to_int(op, false);
+	return 14;
 }
 
 uint32_t v810_device::opCMPF(uint32_t op)
 {
-	float val1=u2f(GETREG(GET1));
-	float val2=u2f(GETREG(GET2));
+	const uint32_t op1 = GETREG(GET1);
+	const uint32_t op2 = GETREG(GET2);
+	if (fp_reserved(op1) || fp_reserved(op2))
+	{
+		fp_exception(PSW_FRO, 0xff60);
+		return 10;
+	}
+	const float val1 = u2f(op1);
+	const float val2 = u2f(op2);
 	SET_OV(0);
-	SET_CY((val2<val1)?1:0);
-	val2-=val1;
-	SET_Z((val2==0.0f)?1:0);
-	SET_S((val2<0.0f)?1:0);
-	// TODO: unknown
-	return 18;
+	SET_Z((val2 == val1) ? 1 : 0);
+	SET_S((val2 < val1) ? 1 : 0);
+	SET_CY((val2 < val1) ? 1 : 0);
+	return 10;
 }
 
-uint32_t v810_device::opCVTS(uint32_t op)
+uint32_t v810_device::opCVTW(uint32_t op) // CVT.WS
 {
-	float val1=u2f(GETREG(GET1));
-	SET_OV(0);
-	SET_Z((val1==0.0f)?1:0);
-	SET_S((val1<0.0f)?1:0);
-	SETREG(GET2,(int32_t)val1);
-	// TODO: unknown
-	return 18;
-}
-
-uint32_t v810_device::opCVTW(uint32_t op)
-{
-	//TODO: CY
-	float val1=(int32_t)GETREG(GET1);
-	SET_OV(0);
-	SET_Z((val1==0.0f)?1:0);
-	SET_S((val1<0.0f)?1:0);
-	SETREG(GET2,f2u(val1));
-	// TODO: unknown
-	return 18;
+	softfloat_roundingMode = softfloat_round_near_even;
+	softfloat_detectTininess = softfloat_tininess_afterRounding; // the SoftFloat state is shared with other cores
+	softfloat_exceptionFlags = 0;
+	const uint32_t res = i32_to_f32(int32_t(GETREG(GET1))).v;
+	if (softfloat_exceptionFlags & softfloat_flag_inexact)
+		PSW |= PSW_FPR;
+	SETREG(GET2, res);
+	fp_set_flags(res);
+	return 16;
 }
 
 uint32_t v810_device::opXB(uint32_t op)

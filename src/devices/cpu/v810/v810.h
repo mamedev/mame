@@ -117,6 +117,10 @@ protected:
 private:
 	enum : u8 { LAST_OTHER, LAST_LD, LAST_ST, LAST_OUT };
 
+	// PSW floating point flags
+	enum : uint32_t { PSW_FPR = 0x010, PSW_FUD = 0x020, PSW_FOV = 0x040, PSW_FZD = 0x080, PSW_FIV = 0x100, PSW_FRO = 0x200 };
+	enum fp_op { FP_ADD, FP_SUB, FP_MUL, FP_DIV };
+
 	typedef uint32_t (v810_device::*opcode_func)(uint32_t op);
 	static const opcode_func s_OpCodeTable[64];
 
@@ -207,6 +211,10 @@ private:
 	uint32_t opMULUr(uint32_t op);
 	uint32_t opDIVr(uint32_t op);
 	uint32_t opDIVUr(uint32_t op);
+	void fp_exception(uint32_t psw_bit, u16 code);
+	void fp_set_flags(uint32_t result);
+	void fp_arith(uint32_t op, fp_op kind);
+	void fp_to_int(uint32_t op, bool truncate);
 	uint32_t opADDF(uint32_t op);
 	uint32_t opSUBF(uint32_t op);
 	uint32_t opMULF(uint32_t op);
