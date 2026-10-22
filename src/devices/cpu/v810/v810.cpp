@@ -516,11 +516,43 @@ uint32_t v810_device::opXORr(uint32_t op)    // xor r1,r2
 
 uint32_t v810_device::opLDSR(uint32_t op) // ldsr reg2,regID
 {
-	uint32_t op1=UI5(op);
-	SETREG(32+op1,GETREG(GET2));
-	// CHCW ICC: clear CEC entries starting at CEN
-	if (op1 == 24 && BIT(CHCW, 0))
-		icache_clear(CHCW >> 20, (CHCW >> 8) & 0xfff);
+	const uint32_t val = GETREG(GET2);
+	switch (UI5(op))
+	{
+		case 4: // ECR
+		case 6: // PIR
+		case 7: // TKCW
+			// read only
+			break;
+
+		case 1: // EIPSW
+		case 3: // FEPSW
+		case 5: // PSW
+			// bits 31-20, 11 and 10 are fixed to 0
+			m_reg[32 + UI5(op)] = val & 0x000ff3ff;
+			break;
+
+		case 0:  // EIPC
+		case 2:  // FEPC
+		case 25: // ADTRE
+			// bit 0 is fixed to 0
+			m_reg[32 + UI5(op)] = val & ~1;
+			break;
+
+		case 24: // CHCW
+			// only ICE reads back, the other fields are commands
+			CHCW = val & 0x00000002;
+			// ICC: clear CEC entries starting at CEN
+			if (BIT(val, 0))
+				icache_clear(val >> 20, (val >> 8) & 0xfff);
+			if (val & 0x00000030)
+				logerror("V810: unimplemented instruction cache %s, CHCW %08x\n", BIT(val, 4) ? "dump" : "restore", val);
+			break;
+
+		default:
+			m_reg[32 + UI5(op)] = val;
+			break;
+	}
 	return 2;
 }
 
@@ -764,7 +796,7 @@ uint32_t v810_device::opRETI(uint32_t op)
 		PC = EIPC;
 		PSW = EIPSW;
 	}
-	return 1;
+	return 10;
 }
 
 uint32_t v810_device::opHALT(uint32_t op)
@@ -1634,6 +1666,8 @@ void v810_device::device_reset()
 	PC = 0xfffffff0;
 	PSW = 0x00008000;
 	ECR = 0x0000fff0;
+	PIR = m_nvc ? 0x00005346 : 0x00008100; // the V810 family is 0000810xh, the NVC reports 00005346h
+	TKCW = 0x000000e0;                     // fixed: traps on invalid operation, zero division and overflow
 	CHCW = 0;
 	m_halted = false;
 	m_lastop = LAST_OTHER;
@@ -1660,7 +1694,7 @@ void v810_device::check_interrupts()
 		EIPSW = PSW;
 
 		PC = 0xfffffe00 | (irq_line << 4);
-		ECR = 0xfe00 | (irq_line << 4);
+		ECR = (ECR & 0xffff0000) | 0xfe00 | (irq_line << 4); // EICC only
 
 		uint8_t num = irq_line + 1;
 		if (num == 0x10) num = 0x0f;
