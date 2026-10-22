@@ -321,10 +321,11 @@ u8 superxavix_i2c_pio1_state::pio_input_r(offs_t offset, u8 mem_mask)
 	if (!machine().side_effects_disabled())
 		LOGMASKED(LOG_PIO, "%s: pio%u_input_r\n", machine().describe_context(), Port);
 
-	u8 ret = 0x00;
+	u8 ret = superxavix_state::pio_input_r<Port>(offset, mem_mask);
 
 	if constexpr (Port == 1)
 	{
+		ret &= ~0x08;
 		// reads this by reading the byte, then shifting right 4 times to place value into carry flag
 		if (!(mem_mask & 0x08))
 			ret |= m_i2cmem->read_sda() << 3;
@@ -510,6 +511,8 @@ static INPUT_PORTS_START( maxheart )
 	// The game reads the same mat switches through PIO0 for inactivity tracking.
 	// The legacy and PIO input registers read the same physical port.
 	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(superxavix_state::primary_controls_r))
+
+	PORT_INCLUDE(superxavix_demo_mode)
 INPUT_PORTS_END
 
 
@@ -563,7 +566,11 @@ static INPUT_PORTS_START( epo_doka )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("PIO2")
-	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
 	PORT_CONFNAME( 0x80, 0x00, "Power Source" )
 	PORT_CONFSETTING(    0x00, "Batteries" )
 	PORT_CONFSETTING(    0x80, "AC Adapter" )
@@ -1062,6 +1069,23 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( domyos_step )
 	PORT_INCLUDE(xavixp)
 	PORT_INCLUDE(xavixport_panel)
+
+	PORT_MODIFY("PIO2")
+	// The test page identifies demo mode; its physical source is unknown.
+	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( domyos_dance )
+	PORT_INCLUDE(xavixp)
+	PORT_INCLUDE(xavixport_panel)
+
+	PORT_MODIFY("PIO1")
+	// Fitness Dance uses a different input for the same test-page mode label.
+	PORT_CONFNAME( 0x20, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
 INPUT_PORTS_END
 
 void superxavix_i2c_pio1_state::superxavix_domfitex(machine_config &config)
@@ -1075,7 +1099,10 @@ void superxavix_i2c_pio1_state::superxavix_domfitex(machine_config &config)
 	xavixport_io_device &xavixport_io(configure_xavixport_io(config));
 	domyos_step_port_device &step_port(DOMYOS_STEP_PORT(config, "step"));
 	xavixport_io.accessory_callback().set(step_port, FUNC(domyos_step_port_device::report_r));
+	// The mode input is separate from the serial receiver's data line.
+	m_super_soc->pio_input_callback<2>().set(xavixport_io, FUNC(xavixport_io_device::pio_r)).mask(0x20);
 	m_super_soc->pio_input_callback<2>().append(step_port, FUNC(domyos_step_port_device::pio_r)).mask(0x04);
+	m_super_soc->pio_input_callback<2>().append_ioport("PIO2").mask(0x80);
 	m_super_soc->pio_output_callback<2>().append(step_port, FUNC(domyos_step_port_device::pio_w));
 	step_port.set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<1>));
 }
@@ -1249,8 +1276,10 @@ static INPUT_PORTS_START( tmy_rkmj )
 
 	PORT_MODIFY("PIO2")
 	PORT_BIT( 0xbf, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// PIO2.6 is polled by an otherwise unidentified factory/service path.
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	// The firmware labels this line as demo mode; its physical source is unknown.
+	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
 
 	PORT_INCLUDE(xavix_soft_power_control)
 INPUT_PORTS_END
@@ -1282,10 +1311,10 @@ static INPUT_PORTS_START( epo_tfit )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rackets", FUNC(xavix_tfit_rackets_device::data_r))
 	PORT_BIT( 0xd6, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The physical identity follows from the documented AC option and the ROM's battery/long-runtime selection.
-	PORT_CONFNAME( 0x20, 0x00, "Power Source" )
-	PORT_CONFSETTING(    0x00, "Batteries" )
-	PORT_CONFSETTING(    0x20, "AC Adapter" )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x20, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
 
 	PORT_MODIFY("PIO0")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1333,8 +1362,11 @@ static INPUT_PORTS_START( ban_bkgj )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("PIO2")
-	// Bit 6 selects unidentified factory/setup behaviour rather than a public control.
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xbf, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
 
 	// The optional AC adapter is documented, but no firmware-visible source selector has been identified.
 	PORT_INCLUDE(superxavix_battery_status)
@@ -1404,7 +1436,11 @@ static INPUT_PORTS_START( ban_ordj )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("PIO1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xdf, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x20, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
 
 	PORT_MODIFY("PIO2")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1444,6 +1480,8 @@ static INPUT_PORTS_START( anpanmdx )
 	PORT_BIT( 0xf6, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_INCLUDE(xavix_hard_power_control)
+
+	PORT_INCLUDE(superxavix_demo_mode)
 INPUT_PORTS_END
 
 void superxavix_anpanmdx_state::superxavix_anpanmdx(machine_config &config)
@@ -1541,6 +1579,8 @@ static INPUT_PORTS_START( ban_reflective_camera )
 	// Both consoles accept an optional AC adapter, but no firmware-visible source selector has been identified.
 	PORT_INCLUDE(superxavix_battery_status)
 	PORT_INCLUDE(xavix_hard_power_control)
+
+	PORT_INCLUDE(superxavix_demo_mode)
 INPUT_PORTS_END
 
 
@@ -1697,6 +1737,12 @@ static INPUT_PORTS_START( udance )
 	PORT_INCLUDE(superxavix_i2c)
 	PORT_INCLUDE(superxavix_battery_status)
 	PORT_INCLUDE(xavix_hard_power_control)
+
+	PORT_MODIFY("PIO2")
+	// The test menu identifies this line; its physical source is unknown.
+	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 void superxavix_udance_state::xavix_extbus_map(address_map &map)
@@ -1791,7 +1837,11 @@ static INPUT_PORTS_START( tmy_thom )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0xf7, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xd7, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x20, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
 
 	PORT_MODIFY("PIO0")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1925,7 +1975,11 @@ static INPUT_PORTS_START( ndpmj )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("PIO1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xfb, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x04, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 
 	// The optional AC adapter is documented, but no firmware-visible source selector has been identified.
 	PORT_INCLUDE(superxavix_battery_status)
@@ -1950,7 +2004,7 @@ void superxavix_ndpmj_state::superxavix_ndpmj(machine_config &config)
 
 u8 superxavix_ndpmj_state::pio1_rtc_input_r(offs_t offset, u8 mem_mask)
 {
-	u8 ret = 0x00;
+	u8 ret = superxavix_state::pio_input_r<1>(offset, mem_mask) & ~0x80;
 
 	if (!(mem_mask & 0x80))
 		ret |= m_rtc->sda_r() << 7;
@@ -2066,7 +2120,11 @@ static INPUT_PORTS_START( epo_kabj )
 
 	PORT_MODIFY("PIO2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Strawberry Left") PORT_16WAY
-	PORT_BIT( 0x7e, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x3e, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
 	PORT_CONFNAME( 0x80, 0x00, "Power Source" )
 	PORT_CONFSETTING(    0x00, "Batteries" )
 	PORT_CONFSETTING(    0x80, "AC Adapter" )
@@ -2150,7 +2208,11 @@ static INPUT_PORTS_START( doradraw )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("PIO2")
-	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
 	PORT_CONFNAME( 0x80, 0x00, "Power Source" )
 	PORT_CONFSETTING(    0x00, "Batteries" )
 	PORT_CONFSETTING(    0x80, "AC Adapter" )
@@ -3199,7 +3261,7 @@ CONS( 2007, xavpowrk,   0,        0, superxavix_xavpowrk,              xavix_ste
 // Exercises has some leftover PC buffer stuff.  Exercises and Challenge use identical PCBs.
 CONS( 2008, domfitex,   0,        0, superxavix_domfitex,              domyos_step,           superxavix_i2c_pio1_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Exercises (Domyos Interactive System)", MACHINE_NOT_WORKING )
 CONS( 2008, domfitch,   0,        0, superxavix_domfitex,              domyos_step,           superxavix_i2c_pio1_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Challenge (Domyos Interactive System)", MACHINE_NOT_WORKING )
-CONS( 2007, domdance,   0,        0, superxavix_domdance,              domyos_step,           superxavix_domdance_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Dance (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, domdance,   0,        0, superxavix_domdance,              domyos_dance,          superxavix_domdance_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Dance (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2007, domstepc,   0,        0, superxavix_domfitex,              domyos_step,           superxavix_i2c_pio1_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Step Concept (Domyos Interactive System)", MACHINE_NOT_WORKING )
 
 // some DIS games run on XaviX 2 instead, see xavix2.cpp for Domyos Fitness Adventure and Domyos Bike Concept

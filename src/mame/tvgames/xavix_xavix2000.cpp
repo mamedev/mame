@@ -210,7 +210,11 @@ static INPUT_PORTS_START( epo_golf )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0xf7, IP_ACTIVE_HIGH, IPT_UNUSED ) // Frame and pixel status come from the camera.
+	PORT_BIT( 0x77, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The test page identifies demo mode; its physical source is unknown.
+	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 void xavix2000_i2c_camera_state::xavix2000_epo_golf(machine_config &config)
@@ -236,6 +240,10 @@ static INPUT_PORTS_START( epo_bowl )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_UNUSED ) // Frame and pixel status come from the camera.
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
+	// The test page identifies demo mode; its physical source is unknown.
+	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_INCLUDE(xavix_hard_power_control)
 	PORT_INCLUDE(xavix_reset_control)
@@ -265,6 +273,10 @@ static INPUT_PORTS_START( epo_mini )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_UNUSED ) // Frame and pixel status come from the camera.
+	// The test page identifies demo mode; its physical source is unknown.
+	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_INCLUDE(xavix_hard_power_control)
 	PORT_INCLUDE(xavix_reset_control)
@@ -404,6 +416,11 @@ static INPUT_PORTS_START( epo_hamc )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_UNUSED ) // Frame and pixel status come from the camera.
+	// The test page identifies demo mode; its physical source is unknown.
+	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
+
 INPUT_PORTS_END
 
 void xavix2000_camera_state::xavix2000_epo_hamc(machine_config &config)
@@ -442,7 +459,11 @@ static INPUT_PORTS_START( ban_onep )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0xf7, IP_ACTIVE_HIGH, IPT_UNUSED ) // Frame and pixel status come from the camera.
+	PORT_BIT( 0x77, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 void xavix2000_i2c_camera_state::xavix2000_ban_onep(machine_config &config)
@@ -492,6 +513,10 @@ static INPUT_PORTS_START( tom_dpgm )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_UNUSED ) // Frame and pixel status come from the camera.
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_INCLUDE(xavix_soft_power_control) // The physical POWER button is known; its electrical wiring remains unverified.
 INPUT_PORTS_END
@@ -523,7 +548,10 @@ static INPUT_PORTS_START( epo_ebox )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("gloves", FUNC(xavix_ebox_gloves_device::data_r))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Auto-off policy input; physical source unknown.
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Used as a rising-edge control; physical identity unknown.
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -559,10 +587,10 @@ static INPUT_PORTS_START( epo_sdb )
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Factory-test chord with no identified public controls
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Jump / Confirm") PORT_CODE(MOUSECODE_BUTTON1_INDEXED(1)) PORT_PLAYER(2)
-	// The documented adapter and proven idle-policy split support this identity, but a factory strap cannot be excluded.
-	PORT_CONFNAME( 0x20, 0x00, "Power Source" )
-	PORT_CONFSETTING(    0x00, "Batteries" )
-	PORT_CONFSETTING(    0x20, "AC Adapter" )
+	// The factory input page labels this line NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x20, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
@@ -635,9 +663,10 @@ static INPUT_PORTS_START( epo_es2j )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x80, 0x00, "Power Source" )
-	PORT_CONFSETTING(    0x00, "Batteries" )
-	PORT_CONFSETTING(    0x80, "AC Adapter" )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)

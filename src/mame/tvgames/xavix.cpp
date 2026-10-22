@@ -1044,8 +1044,10 @@ static INPUT_PORTS_START( epo_mms )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Purple / Select") PORT_CODE(KEYCODE_D) PORT_CODE(MOUSECODE_BUTTON3_INDEXED(1)) PORT_CODE(GUNCODE_BUTTON2_INDEXED(1))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Orange / Confirm") PORT_CODE(KEYCODE_F) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(1)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(1))
 	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// This unknown boot strap reaches display/factory paths and overlaps some internal effects of the auto-off-disable chord.
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	// The test page identifies demo mode; its physical source is unknown.
+	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_MODIFY("AN7")
 	// Representative differences select the ROM's three warning states; physical voltage scaling is unknown.
@@ -1083,6 +1085,12 @@ static INPUT_PORTS_START( tak_hamr )
 	PORT_CONFSETTING(    0x24, "Very Low" )
 
 	PORT_INCLUDE(xavix_reset_control)
+
+	PORT_MODIFY("IN1")
+	// The test page identifies demo mode; its physical source is unknown.
+	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1104,9 +1112,10 @@ static INPUT_PORTS_START( tomcpin )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0xf5, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_CONFNAME( 0x02, 0x00, "Power Source" )
-	PORT_CONFSETTING(    0x00, "Batteries" )
-	PORT_CONFSETTING(    0x02, "AC Adapter" )
+	// The test page identifies demo mode; its physical source is unknown.
+	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 
 	PORT_MODIFY("AN7")
 	// Representative ADC differences select the ROM's warning rates; physical battery-voltage scaling is unknown.
@@ -1163,8 +1172,10 @@ static INPUT_PORTS_START( epo_tp2s )
 	PORT_CONFNAME( 0x01, 0x00, "Power Source" )
 	PORT_CONFSETTING(    0x00, "Batteries" )
 	PORT_CONFSETTING(    0x01, "AC Adapter" )
-	// This boot strap reaches an otherwise dormant internal path; its physical function is unknown.
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x10, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x10, DEF_STR( On ) )
 	PORT_BIT( 0xee, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
@@ -1195,8 +1206,10 @@ static INPUT_PORTS_START( epo_tp2p )
 	PORT_CONFNAME( 0x01, 0x00, "Power Source" )
 	PORT_CONFSETTING(    0x00, "Batteries" )
 	PORT_CONFSETTING(    0x01, "AC Adapter" )
-	// This boot strap reaches an otherwise dormant internal path; its physical function is unknown.
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
 	PORT_BIT( 0xbe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
@@ -1282,10 +1295,10 @@ static INPUT_PORTS_START( tcarnavi )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Wipers")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Car Navi")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The adapter documentation and distinct inactivity period identify this line as the power-source sense.
-	PORT_CONFNAME( 0x20, 0x00, "Power Source" )
-	PORT_CONFSETTING(    0x00, "Batteries" )
-	PORT_CONFSETTING(    0x20, "AC Adapter" )
+	// The test page labels this line NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x20, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -1311,6 +1324,10 @@ static INPUT_PORTS_START( nostalgia )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x20, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
 
 	PORT_INCLUDE(xavix_hard_power_control)
 INPUT_PORTS_END
@@ -1386,10 +1403,10 @@ static INPUT_PORTS_START( ban_krrj )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	// The documented battery/AC alternatives select the ROM's distinct inactivity timeouts.
-	PORT_CONFNAME( 0x40, 0x00, "Power Source" )
-	PORT_CONFSETTING(    0x00, "Batteries" )
-	PORT_CONFSETTING(    0x40, "AC Adapter" )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
 	PORT_BIT( 0xbf, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
@@ -1540,9 +1557,10 @@ static INPUT_PORTS_START( gungunrv )
 	PORT_CONFNAME( 0x02, 0x00, "P2 Gun" )
 	PORT_CONFSETTING(    0x00, "Disconnected" )
 	PORT_CONFSETTING(    0x02, "Connected" )
-	PORT_CONFNAME( 0x04, 0x00, "Power Source" )
-	PORT_CONFSETTING(    0x00, "Batteries" )
-	PORT_CONFSETTING(    0x04, "AC Adapter" )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x04, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 	// IO1.6 selects grenade shots; the Support Gun has a separate single-shot path.
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Weapon Select (Machine Gun / Grenade)") PORT_PLAYER(1) PORT_TOGGLE PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT( 0xb1, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1713,6 +1731,12 @@ static INPUT_PORTS_START( epo_dmon )
 	PORT_CONFSETTING(    0x20, "Very Low" )
 
 	PORT_INCLUDE(xavix_lightgun_2p)
+
+	PORT_MODIFY("IN1")
+	// The test page identifies demo mode; its physical source is unknown.
+	PORT_CONFNAME( 0x04, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 INPUT_PORTS_END
 
 void xavix_epo_dmon_state::xavix_epo_dmon(machine_config &config)
@@ -1917,8 +1941,10 @@ static INPUT_PORTS_START( epo_strk )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_ir_motion_device::data_r))
-	// Shared firmware tests this auto-off qualifier, but documented Japanese and US hardware is battery-only.
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -1927,12 +1953,11 @@ static INPUT_PORTS_START( epo_strkp )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_ir_motion_device::data_r))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_MODIFY("IN1")
-	// The UK supply options are undocumented, so retain the auto-off qualifier without naming its source.
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 void xavix_ir_state::xavix_epo_strk(machine_config &config)
@@ -2192,10 +2217,10 @@ static INPUT_PORTS_START( epo_epp2 )
 	PORT_INCLUDE(epo_epp_ir)
 
 	PORT_MODIFY("IN1")
-	// IN1.1 bypasses battery auto-off; its identification as AC-adapter sense is inferred.
-	PORT_CONFNAME( 0x02, 0x00, "Power Source" )
-	PORT_CONFSETTING(    0x00, "Batteries" )
-	PORT_CONFSETTING(    0x02, "AC Adapter" )
+	// The test page labels this line NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 
 	PORT_MODIFY("AN7")
 	// Representative differences select the ROM's warning rates; physical battery-voltage scaling is unknown.
@@ -2621,10 +2646,10 @@ static INPUT_PORTS_START( epo_efdx )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0xf5, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// IN1.1 bypasses battery auto-off; its identification as AC-adapter sense is inferred.
-	PORT_CONFNAME( 0x02, 0x00, "Power Source" )
-	PORT_CONFSETTING(    0x00, "Batteries" )
-	PORT_CONFSETTING(    0x02, "AC Adapter" )
+	// The test page identifies demo mode; its physical source is unknown.
+	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 
 	PORT_INCLUDE(xavix_battery_status)
@@ -3590,7 +3615,11 @@ static INPUT_PORTS_START( gcslottv )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Medal")
-	PORT_BIT( 0x3e, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x1e, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// IO1.5 inhibits automatic power-off and changes cartridge idle handling; its physical source is unknown.
+	PORT_CONFNAME( 0x20, 0x00, "Continuous Operation" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -3795,9 +3824,10 @@ static INPUT_PORTS_START( epo_quiz )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 D / 4 / Green / Right") PORT_CODE(KEYCODE_C)
 
 	PORT_MODIFY("IN1")
-	PORT_CONFNAME( 0x01, 0x00, "Power Source" )
-	PORT_CONFSETTING(    0x00, "Batteries" )
-	PORT_CONFSETTING(    0x01, "AC Adapter" )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x01, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("P3 A / 1 / Red / Back") PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("P3 B / 2 / Blue / Confirm") PORT_CODE(KEYCODE_U)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("P3 C / 3 / Yellow / Left") PORT_CODE(KEYCODE_B)
@@ -4586,7 +4616,11 @@ static INPUT_PORTS_START( epo_mj )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xf4, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x08, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 
 	PORT_START("DIAL")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_NAME("Jog Dial") PORT_SENSITIVITY(10) PORT_KEYDELTA(4)
@@ -4630,10 +4664,10 @@ static INPUT_PORTS_START( ltv_tam )
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Push Button / Confirm") PORT_PLAYER(2) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(1))
-	// The documented adapter and high-level idle policy support this identity, but a factory strap cannot be excluded.
-	PORT_CONFNAME( 0x20, 0x00, "Power Source" )
-	PORT_CONFSETTING(    0x00, "Batteries" )
-	PORT_CONFSETTING(    0x20, "AC Adapter" )
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x20, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
 	PORT_BIT( 0xcf, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
@@ -4705,6 +4739,11 @@ static INPUT_PORTS_START( tomplc )
 	// The handheld switch pulls this line low while enabling ADC0 microphone sampling.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Push-to-Talk")
 
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
+
 	// Usability hack for users without a host microphone; hold with Push-to-Talk.
 	PORT_START("MIC_SIMULATE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Simulate Announcement") PORT_CODE(KEYCODE_N) PORT_WRITE_LINE_DEVICE_MEMBER("microphone_tone", FUNC(beep_device::set_state))
@@ -4769,6 +4808,10 @@ static INPUT_PORTS_START( tomthr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Headlights")
 	// The radio-handset switch is electrically active low and gates ADC0 sampling.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Push-to-Talk")
+	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 
 	PORT_MODIFY("AN7")
 	// Representative differences select the ROM's states; physical battery-voltage scaling is unknown.
@@ -4799,9 +4842,10 @@ static INPUT_PORTS_START( epo_guru )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	PORT_CONFNAME( 0x40, 0x00, "Power Source" )
-	PORT_CONFSETTING(    0x00, "Batteries" )
-	PORT_CONFSETTING(    0x40, "AC Adapter" )
+	// The test page labels this line NORMAL/DEMO; its physical source is unknown.
+	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
 	PORT_BIT( 0xbf, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
