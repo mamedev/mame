@@ -543,7 +543,10 @@ TIMER_CALLBACK_MEMBER(duart_base_device::duart_timer_callback)
 	{
 		// assert OP3 counter ready
 		if ((OPCR & 0xc) == 0x4)
+		{
 			OPR |= 0x8;
+			write_outport(OPR ^ 0xff);
+		}
 
 		// Counter mode
 		set_ISR_bits(INT_COUNTER_READY);
@@ -754,7 +757,10 @@ uint8_t duart_base_device::read(offs_t offset)
 
 			// clear OP3 counter ready
 			if ((OPCR & 0xc) == 0x4)
+			{
 				OPR &= ~0x8;
+				write_outport(OPR ^ 0xff);
+			}
 		}
 
 		clear_ISR_bits(INT_COUNTER_READY);
