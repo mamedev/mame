@@ -53,12 +53,12 @@
 #include "xavix.h"
 #include "xavix_io_bb_ball.h"
 #include "xavix_io_bb_bat.h"
-#include "xavix_io_beyu_link.h"
 #include "xavix_io_beyu_ripcord.h"
 #include "xavix_io_madf_ball.h"
 #include "xavix_io_mtrk_wheel.h"
 #include "xavix_power.h"
 
+#include "bus/xavix/beyblade_link.h"
 #include "sound/beep.h"
 
 #include "render.h"
@@ -4077,7 +4077,7 @@ void xavix_epo_mail_state::xavix_extbus_map(address_map &map)
 void xavix_epo_mail_state::xavix_epo_mail(machine_config &config)
 {
 	xavix_i2c_24c16(config);
-	XAVIX_MAILCOT_MASCOT(config, m_mascot);
+	MAILCOT_MASCOT_SLOT(config, m_mascot);
 }
 
 u8 xavix_epo_mail_state::io1_input_r(u8 direction)
@@ -4550,12 +4550,12 @@ void xavix_state::xavix_tak_beyu(machine_config &config)
 {
 	xavix_nv_2mb(config);
 
-	xavix_beyblade_link_device &link(XAVIX_BEYBLADE_LINK(config, "link"));
+	xavix_beyblade_link_port_device &link(XAVIX_BEYBLADE_LINK_PORT(config, "link"));
 	link.controls_callback().set_ioport("IN0");
 	link.host_reset_callback().set_ioport("RESET").bit(0);
-	m_soc->io_input_callback<0>().set(link, FUNC(xavix_beyblade_link_device::io_r));
-	m_soc->io_output_callback<0>().set(link, FUNC(xavix_beyblade_link_device::io_w));
-	m_screen->screen_vblank().append(link, FUNC(xavix_beyblade_link_device::vblank_w));
+	m_soc->io_input_callback<0>().set(link, FUNC(xavix_beyblade_link_port_device::io_r));
+	m_soc->io_output_callback<0>().set(link, FUNC(xavix_beyblade_link_port_device::io_w));
+	m_screen->screen_vblank().append(link, FUNC(xavix_beyblade_link_port_device::vblank_w));
 
 	m_soc->anport_input_callback<0>().set_ioport("DIAL");
 	m_soc->set_anport_counter_mode(0);

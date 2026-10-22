@@ -7,9 +7,9 @@
 #pragma once
 
 #include <array>
+#include <string>
+#include <system_error>
 #include <utility>
-
-class picture_image_device;
 
 class xavix_image_sensor_device_base : public device_t
 {
@@ -131,13 +131,23 @@ private:
 	bool m_target_y_clipped;
 };
 
-class xavix_digital_image_sensor_device : public xavix_image_sensor_device_base
+class xavix_digital_image_sensor_device : public xavix_image_sensor_device_base, public device_image_interface
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::CAMERA; }
 
 	xavix_digital_image_sensor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-	virtual ~xavix_digital_image_sensor_device() override;
+
+	// device_image_interface implementation
+	virtual std::pair<std::error_condition, std::string> call_load() override ATTR_COLD;
+	virtual void call_unload() override ATTR_COLD;
+	virtual bool is_readable() const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "png,jpg,jpeg,jfif,bmp,dib"; }
+	virtual const char *image_type_name() const noexcept override { return "picture"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "pic"; }
 
 	u8 data_r() const;
 	void data_w(offs_t offset, u8 data, u8 mem_mask);
@@ -145,24 +155,21 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_post_load() override ATTR_COLD;
 
 private:
 	static constexpr u8 WRITE_STROBE = 0x80;
 	static constexpr u8 READ_STROBE = 0x40;
 
 	required_ioport m_ambient;
-	required_device<picture_image_device> m_picture;
 	required_ioport_array<2> m_glove_x;
 	required_ioport_array<2> m_glove_y;
 	required_ioport_array<2> m_glove_size;
 	required_ioport_array<2> m_glove_hidden;
-	util::notifier_subscription m_media_notifier;
-	bool m_source_valid;
+	// Mounted media is external; save states retain the separately held sensor image.
+	std::array<u8, IMAGE_WIDTH * IMAGE_HEIGHT> m_source{};
 
 	std::array<u8, 4> m_setup;
 	u8 m_data;
@@ -175,7 +182,6 @@ private:
 	bool m_row_active;
 	bool m_read_active;
 
-	bool validate_picture();
 	void capture_image();
 	void command_w(u8 data);
 };

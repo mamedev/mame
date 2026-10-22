@@ -13,13 +13,13 @@
 #include "xavix_io_daig_robots.h"
 #include "xavix_io_evio_bow.h"
 #include "xavix_io_ltv_tam_ir.h"
-#include "xavix_io_mail_mascot.h"
 #include "xavix_io_stad_bat.h"
 #include "xavix_io_wamg_sensor.h"
 #include "xavix_io_wdg_granblade.h"
 #include "xavix_io_wdg_webknight.h"
 #include "xavix_io_xavbaseb_controllers.h"
 
+#include "bus/xavix/mailcot_mascot.h"
 #include "bus/xavix/tvpc_mouse.h"
 #include "machine/i2chle.h"
 #include "machine/ticket.h"
@@ -765,7 +765,7 @@ private:
 	u8 keyboard_r();
 
 	required_ioport_array<9> m_keyboard;
-	required_device<xavix_mailcot_mascot_device> m_mascot;
+	required_device<mailcot_mascot_slot_device> m_mascot;
 };
 
 class xavix_hippofr_state : public xavix_state

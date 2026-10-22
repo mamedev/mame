@@ -36,7 +36,7 @@
 #include "emu.h"
 #include "xavix_io_image_sensor.h"
 
-#include "imagedev/picture.h"
+#include "rendutil.h"
 
 #include <algorithm>
 #include <cmath>
@@ -318,20 +318,17 @@ xavix_analog_image_sensor_device::xavix_analog_image_sensor_device(const machine
 
 xavix_digital_image_sensor_device::xavix_digital_image_sensor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: xavix_image_sensor_device_base(mconfig, XAVIX_DIGITAL_IMAGE_SENSOR, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 	, m_ambient(*this, "AMBIENT")
-	, m_picture(*this, "picture")
 	, m_glove_x(*this, { "TARGET_X", "TARGET2_X" })
 	, m_glove_y(*this, { "TARGET_Y", "TARGET2_Y" })
 	, m_glove_size(*this, { "TARGET_SIZE", "TARGET2_SIZE" })
 	, m_glove_hidden(*this, { "TARGET_HIDDEN", "TARGET2_HIDDEN" })
-	, m_source_valid(false)
 	, m_data(0)
 	, m_data_mask(0)
 	, m_strobes(WRITE_STROBE | READ_STROBE)
 {
 }
-
-xavix_digital_image_sensor_device::~xavix_digital_image_sensor_device() = default;
 
 xavix_serial_tracking_sensor_device::xavix_serial_tracking_sensor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, XAVIX_SERIAL_TRACKING_SENSOR, tag, owner, clock)
@@ -340,11 +337,6 @@ xavix_serial_tracking_sensor_device::xavix_serial_tracking_sensor_device(const m
 	, m_target_size(*this, { "LEFT_SIZE", "RIGHT_SIZE" })
 	, m_target_hidden(*this, "TAG_HIDE")
 {
-}
-
-void xavix_digital_image_sensor_device::device_add_mconfig(machine_config &config)
-{
-	IMAGE_PICTURE(config, m_picture);
 }
 
 ioport_constructor xavix_analog_image_sensor_device::device_input_ports() const
@@ -451,12 +443,6 @@ void xavix_digital_image_sensor_device::device_start()
 	save_item(NAME(m_frame_active));
 	save_item(NAME(m_row_active));
 	save_item(NAME(m_read_active));
-
-	m_media_notifier = m_picture->add_media_change_notifier(
-			[this] (device_image_interface::media_change_event)
-			{
-				m_source_valid = validate_picture();
-			});
 }
 
 void xavix_digital_image_sensor_device::device_reset()
@@ -469,12 +455,6 @@ void xavix_digital_image_sensor_device::device_reset()
 	m_frame_active = false;
 	m_row_active = false;
 	m_read_active = false;
-}
-
-void xavix_digital_image_sensor_device::device_post_load()
-{
-	// Media validation is a cache; restoring it must not recapture the held image.
-	m_source_valid = validate_picture();
 }
 
 void xavix_serial_tracking_sensor_device::device_start()
@@ -727,36 +707,52 @@ void xavix_image_sensor_device_base::render_target(u8 x_position, u8 y_position,
 //  Digital Image Interface
 //-------------------------------------------------
 
-bool xavix_digital_image_sensor_device::validate_picture()
+std::pair<std::error_condition, std::string> xavix_digital_image_sensor_device::call_load()
 {
-	if (!m_picture->exists())
-		return false;
-
-	bitmap_argb32 const &picture = m_picture->get_bitmap();
-	if (!picture.valid() || picture.width() != int(IMAGE_WIDTH) || picture.height() != int(IMAGE_HEIGHT))
+	bitmap_argb32 picture;
+	switch (render_detect_image(image_core_file()))
 	{
-		popmessage("Raw camera input rejected: use a 32x32 opaque monochrome picture.");
-		return false;
+	case RENDUTIL_IMGFORMAT_PNG:
+		render_load_png(picture, image_core_file());
+		break;
+	case RENDUTIL_IMGFORMAT_JPEG:
+		render_load_jpeg(picture, image_core_file());
+		break;
+	case RENDUTIL_IMGFORMAT_MSDIB:
+		render_load_msdib(picture, image_core_file());
+		break;
+	default:
+		return std::make_pair(image_error::INVALIDIMAGE, "Unsupported image file format");
 	}
 
+	if (!picture.valid())
+		return std::make_pair(image_error::INVALIDIMAGE, "Invalid or unsupported picture");
+	if (picture.width() != int(IMAGE_WIDTH) || picture.height() != int(IMAGE_HEIGHT))
+		return std::make_pair(image_error::INVALIDIMAGE, "Raw camera input requires a 32x32 opaque monochrome picture");
+
+	std::array<u8, IMAGE_WIDTH * IMAGE_HEIGHT> source;
 	for (unsigned y = 0; y < IMAGE_HEIGHT; ++y)
 	{
 		for (unsigned x = 0; x < IMAGE_WIDTH; ++x)
 		{
 			rgb_t const colour(picture.pix(y, x));
 			if (colour.a() != 0xff || colour.r() != colour.g() || colour.r() != colour.b())
-			{
-				popmessage("Raw camera input rejected: use a 32x32 opaque monochrome picture.");
-				return false;
-			}
+				return std::make_pair(image_error::INVALIDIMAGE, "Raw camera input requires a 32x32 opaque monochrome picture");
+			source[y * IMAGE_WIDTH + x] = colour.r();
 		}
 	}
-	return true;
+	m_source = source;
+	return std::make_pair(std::error_condition(), std::string());
+}
+
+void xavix_digital_image_sensor_device::call_unload()
+{
+	m_source.fill(0);
 }
 
 void xavix_digital_image_sensor_device::capture_image()
 {
-	if (!m_picture->exists())
+	if (!exists())
 	{
 		// Representative levels straddle the ROM's threshold; actual camera brightness is unmeasured.
 		m_image.fill(m_ambient->read());
@@ -768,16 +764,7 @@ void xavix_digital_image_sensor_device::capture_image()
 		return;
 	}
 
-	m_image.fill(0);
-	if (!m_source_valid)
-		return;
-
-	bitmap_argb32 const &picture = m_picture->get_bitmap();
-	for (unsigned y = 0; y < IMAGE_HEIGHT; ++y)
-	{
-		for (unsigned x = 0; x < IMAGE_WIDTH; ++x)
-			m_image[y * IMAGE_WIDTH + x] = rgb_t(picture.pix(y, x)).r();
-	}
+	m_image = m_source;
 }
 
 u8 xavix_digital_image_sensor_device::data_r() const

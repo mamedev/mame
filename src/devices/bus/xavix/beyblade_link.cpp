@@ -2,10 +2,13 @@
 // copyright-holders:MagikalUnicorn
 /***************************************************************************
 
-    HLE peer for the Beyblade Ultimate launcher link. Implements the two-line
-    handshake and exchanges launcher identity, buttons, dial movement and
-    filtered ripcord speed with the emulated console. Player 2 is simulated
-    locally.
+    Beyblade Ultimate battle cable port and a local HLE second console.
+    The optional peer exchanges its identity, buttons, dial movement and
+    filtered ripcord speed through the two-line handshake. This is a local
+    approximation of another complete console, not a link between emulators.
+
+    The diagnostic profile represents unidentified factory equipment and is
+    not available in the slot menu.
 
     TODO:
     - Measure physical link turnaround, dial detent scale/polarity and
@@ -15,23 +18,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "xavix_io_beyu_link.h"
+#include "beyblade_link.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(XAVIX_BEYBLADE_LINK, xavix_beyblade_link_device, "xavix_beyblade_link", "XaviX Beyblade Link Peer")
+DEFINE_DEVICE_TYPE(XAVIX_BEYBLADE_LINK_PORT, xavix_beyblade_link_port_device, "xavix_beyblade_link_port", "XaviX Beyblade Link Port")
+DEFINE_DEVICE_TYPE(XAVIX_BEYBLADE_A55, xavix_beyblade_a55_device, "xavix_beyblade_a55", "Beyblade A-55 Dragoon / Tyson Second Console (HLE)")
+DEFINE_DEVICE_TYPE(XAVIX_BEYBLADE_A62, xavix_beyblade_a62_device, "xavix_beyblade_a62", "Beyblade A-62 Dranzer / Kai Second Console (HLE)")
 
-static INPUT_PORTS_START( xavix_beyblade_link )
-	PORT_START("PEER")
-	// This simulates the linked second unit; raw two-console transport remains unemulated.
-	PORT_CONFNAME( 0x03, 0x00, "Player 2 Launcher" )
-	PORT_CONFSETTING(    0x00, "Not Connected" )
-	PORT_CONFSETTING(    0x01, "A-55 Dragoon / Tyson" )
-	PORT_CONFSETTING(    0x02, "A-62 Dranzer / Kai" )
-	// The native link accepts a factory request from an active peer; its physical fixture is unidentified.
-	// PORT_CONFSETTING(    0x03, "Factory Test Peer" )
-
+static INPUT_PORTS_START( xavix_beyblade_peer )
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Enter / Trigger") PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Cancel / Signature Move") PORT_PLAYER(2)
@@ -46,35 +42,92 @@ static INPUT_PORTS_START( xavix_beyblade_link )
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_NAME("P2 Ripcord") PORT_SENSITIVITY(100) PORT_KEYDELTA(12) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(KEYCODE_Q) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-xavix_beyblade_link_device::xavix_beyblade_link_device(
-		const machine_config &mconfig,
-		const char *tag,
-		device_t *owner,
-		u32 clock)
-	: device_t(mconfig, XAVIX_BEYBLADE_LINK, tag, owner, clock)
+xavix_beyblade_link_port_device::xavix_beyblade_link_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, XAVIX_BEYBLADE_LINK_PORT, tag, owner, clock)
+	, device_single_card_slot_interface<device_xavix_beyblade_link_interface>(mconfig, *this)
 	, m_controls_cb(*this, 0)
 	, m_host_reset_cb(*this, 0)
-	, m_peer_config(*this, "PEER")
+	, m_peer(nullptr)
+{
+	set_options([] (device_slot_interface &port)
+	{
+		port.option_add("a55", XAVIX_BEYBLADE_A55);
+		port.option_add("a62", XAVIX_BEYBLADE_A62);
+		// The factory protocol is known, but its physical test equipment is unidentified.
+		// port.option_add("factory", XAVIX_BEYBLADE_A55).machine_config([] (device_t *device)
+		// {
+		//  downcast<xavix_beyblade_peer_device &>(*device).set_model(xavix_beyblade_peer_device::model::FACTORY);
+		// });
+	}, nullptr, false);
+}
+
+device_xavix_beyblade_link_interface::device_xavix_beyblade_link_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "xavixbeybladelink")
+	, m_port(dynamic_cast<xavix_beyblade_link_port_device *>(device.owner()))
+{
+}
+
+void xavix_beyblade_link_port_device::device_start()
+{
+	m_peer = get_card_device();
+}
+
+u8 xavix_beyblade_link_port_device::io_r(offs_t, u8)
+{
+	return (m_controls_cb() & 0x3f) | (m_peer ? m_peer->lines_r() : 0);
+}
+
+void xavix_beyblade_link_port_device::io_w(offs_t, u8 levels, u8 direction)
+{
+	if (m_peer)
+		m_peer->lines_w(levels, direction);
+}
+
+void xavix_beyblade_link_port_device::vblank_w(int state)
+{
+	if (m_peer)
+		m_peer->vblank_w(state);
+}
+
+xavix_beyblade_peer_device::xavix_beyblade_peer_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		u32 clock,
+		model variant)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_xavix_beyblade_link_interface(mconfig, *this)
+	, m_model(variant)
 	, m_peer_buttons(*this, "BUTTONS")
 	, m_peer_dial(*this, "DIAL")
 	, m_peer_ripcord(*this, "RIPCORD")
 {
 }
 
-ioport_constructor xavix_beyblade_link_device::device_input_ports() const
+xavix_beyblade_a55_device::xavix_beyblade_a55_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: xavix_beyblade_peer_device(mconfig, XAVIX_BEYBLADE_A55, tag, owner, clock, model::A55)
 {
-	return INPUT_PORTS_NAME( xavix_beyblade_link );
 }
 
-void xavix_beyblade_link_device::device_start()
+xavix_beyblade_a62_device::xavix_beyblade_a62_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: xavix_beyblade_peer_device(mconfig, XAVIX_BEYBLADE_A62, tag, owner, clock, model::A62)
 {
-	m_transmit_timer = timer_alloc(FUNC(xavix_beyblade_link_device::transmit_timer), this);
-	m_idle_timer = timer_alloc(FUNC(xavix_beyblade_link_device::idle_timer), this);
+}
+
+ioport_constructor xavix_beyblade_peer_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( xavix_beyblade_peer );
+}
+
+void xavix_beyblade_peer_device::device_start()
+{
+	m_transmit_timer = timer_alloc(FUNC(xavix_beyblade_peer_device::transmit_timer), this);
+	m_idle_timer = timer_alloc(FUNC(xavix_beyblade_peer_device::idle_timer), this);
 
 	save_item(NAME(m_response));
 	save_item(NAME(m_peer_rpm));
 	save_item(NAME(m_phase));
-	save_item(NAME(m_peer_selection));
 	save_item(NAME(m_host_lines));
 	save_item(NAME(m_host_direction));
 	save_item(NAME(m_peer_lines));
@@ -96,9 +149,8 @@ void xavix_beyblade_link_device::device_start()
 	save_item(NAME(m_factory_stage));
 }
 
-void xavix_beyblade_link_device::device_reset()
+void xavix_beyblade_peer_device::device_reset()
 {
-	m_peer_selection = m_peer_config->read() & 0x03;
 	m_peer_rpm = 0;
 	m_peer_button_levels = 0;
 	m_peer_button_edges = 0;
@@ -114,32 +166,11 @@ void xavix_beyblade_link_device::device_reset()
 	reset_protocol();
 }
 
-bool xavix_beyblade_link_device::sync_peer()
-{
-	u8 const selection = m_peer_config->read() & 0x03;
-	if (selection != m_peer_selection)
-	{
-		m_peer_selection = selection;
-		m_peer_rpm = 0;
-		m_peer_button_levels = 0;
-		m_peer_button_edges = 0;
-		m_peer_dial_delta = 0;
-		m_peer_ripcord_history.fill(0);
-		m_peer_ripcord_history_position = 0;
-		m_peer_inputs_valid = false;
-		m_expect_diagnostic_token = false;
-		m_factory_stage = FACTORY_ENTRY;
-		reset_protocol();
-	}
-
-	return m_peer_selection != 0;
-}
-
-void xavix_beyblade_link_device::reset_protocol()
+void xavix_beyblade_peer_device::reset_protocol()
 {
 	m_transmit_timer->adjust(attotime::never);
 	m_idle_timer->adjust(attotime::never);
-	m_phase = m_peer_selection ? WAIT_CONNECT : DISCONNECTED;
+	m_phase = WAIT_CONNECT;
 	m_host_lines = 0;
 	m_host_direction = 0;
 	m_peer_lines = 0;
@@ -150,18 +181,18 @@ void xavix_beyblade_link_device::reset_protocol()
 	m_response_byte = 0;
 	m_response_bit = 0;
 	m_expect_diagnostic_token = false;
-	if (m_peer_selection == FACTORY_PEER && m_factory_stage != FACTORY_READY)
+	if (m_model == model::FACTORY && m_factory_stage != FACTORY_READY)
 	{
 		m_phase = TEST_CONNECT;
 		m_peer_lines = 0x80;
 	}
 }
 
-void xavix_beyblade_link_device::vblank_w(int state)
+void xavix_beyblade_peer_device::vblank_w(int state)
 {
-	if (!state || !sync_peer())
+	if (!state)
 		return;
-	if (m_host_reset_cb())
+	if (host_reset_r())
 	{
 		// Re-arm the cable protocol while the local processor is held in physical reset.
 		m_factory_stage = FACTORY_ENTRY;
@@ -202,12 +233,7 @@ void xavix_beyblade_link_device::vblank_w(int state)
 	m_peer_rpm = rpm;
 }
 
-u8 xavix_beyblade_link_device::io_r(offs_t, u8)
-{
-	return (m_controls_cb() & 0x3f) | m_peer_lines;
-}
-
-void xavix_beyblade_link_device::prepare_response(u8 command)
+void xavix_beyblade_peer_device::prepare_response(u8 command)
 {
 	m_response.fill(0);
 	m_response_byte = 0;
@@ -226,14 +252,14 @@ void xavix_beyblade_link_device::prepare_response(u8 command)
 	switch (command)
 	{
 	case 0x01:
-		if (m_peer_selection == FACTORY_PEER)
+		if (m_model == model::FACTORY)
 		{
 			m_response_bytes = 0;
 			break;
 		}
 		// A fresh linked launcher exposes only its matching lead character.
-		m_response[0] = 1U << (m_peer_selection - 1);
-		m_response[4] = m_peer_selection - 1;
+		m_response[0] = 1U << (u8(m_model) - 1);
+		m_response[4] = u8(m_model) - 1;
 		m_response_bytes = 5;
 		break;
 
@@ -264,9 +290,9 @@ void xavix_beyblade_link_device::prepare_response(u8 command)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(xavix_beyblade_link_device::transmit_timer)
+TIMER_CALLBACK_MEMBER(xavix_beyblade_peer_device::transmit_timer)
 {
-	if (m_phase == TRANSMIT_DELAY && sync_peer())
+	if (m_phase == TRANSMIT_DELAY)
 	{
 		bool const bit = BIT(m_response[m_response_byte], 7 - m_response_bit);
 		m_peer_lines = bit ? 0x80 : 0x40;
@@ -274,21 +300,18 @@ TIMER_CALLBACK_MEMBER(xavix_beyblade_link_device::transmit_timer)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(xavix_beyblade_link_device::idle_timer)
+TIMER_CALLBACK_MEMBER(xavix_beyblade_peer_device::idle_timer)
 {
-	if (m_peer_selection)
-	{
-		// With no disconnect token, an idle timeout lets a local HLE peer accept a later reconnection.
-		reset_protocol();
-	}
+	// With no disconnect token, an idle timeout lets a local HLE peer accept a later reconnection.
+	reset_protocol();
 }
 
-void xavix_beyblade_link_device::begin_transmit_turnaround()
+void xavix_beyblade_peer_device::begin_transmit_turnaround()
 {
 	m_phase = TRANSMIT_TURNAROUND;
 }
 
-void xavix_beyblade_link_device::advance_transmit()
+void xavix_beyblade_peer_device::advance_transmit()
 {
 	if (++m_response_bit == 8)
 	{
@@ -299,7 +322,7 @@ void xavix_beyblade_link_device::advance_transmit()
 	if (m_response_byte == m_response_bytes)
 	{
 		m_peer_lines = 0;
-		if (m_peer_selection == FACTORY_PEER && m_factory_stage != FACTORY_READY)
+		if (m_model == model::FACTORY && m_factory_stage != FACTORY_READY)
 		{
 			if (m_factory_stage == FACTORY_ENTRY)
 			{
@@ -323,11 +346,8 @@ void xavix_beyblade_link_device::advance_transmit()
 	}
 }
 
-void xavix_beyblade_link_device::io_w(offs_t, u8 levels, u8 direction)
+void xavix_beyblade_peer_device::lines_w(u8 levels, u8 direction)
 {
-	if (!sync_peer())
-		return;
-
 	u8 const host_direction = direction & 0xc0;
 	u8 const host_lines = levels & host_direction;
 	if (host_lines == m_host_lines && host_direction == m_host_direction)
@@ -389,7 +409,7 @@ void xavix_beyblade_link_device::io_w(offs_t, u8 levels, u8 direction)
 			m_peer_lines = 0;
 			if (++m_receive_bits == 8)
 			{
-				bool const factory_reply = m_peer_selection == FACTORY_PEER && m_factory_stage == FACTORY_REPLY && m_receive_byte == 0x4b;
+				bool const factory_reply = m_model == model::FACTORY && m_factory_stage == FACTORY_REPLY && m_receive_byte == 0x4b;
 				if (factory_reply)
 				{
 					m_factory_stage = FACTORY_READY;
@@ -445,6 +465,6 @@ void xavix_beyblade_link_device::io_w(offs_t, u8 levels, u8 direction)
 		m_transmit_timer->adjust(attotime::from_usec(1));
 	}
 
-	if (m_phase != DISCONNECTED && m_phase != WAIT_CONNECT)
+	if (m_phase != WAIT_CONNECT)
 		m_idle_timer->adjust(attotime::from_seconds(1));
 }
