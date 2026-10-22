@@ -45,6 +45,8 @@
 
 #include "corefloat.h"
 
+#include <limits>
+
 #define clkIF 3
 #define clkMEM 3
 #define clkIRQ 14
@@ -1001,40 +1003,47 @@ uint32_t v810_device::opMULUr(uint32_t op)   // mulu r1,r2
 
 uint32_t v810_device::opDIVr(uint32_t op)    // div r1,r2
 {
-	uint32_t op1=GETREG(GET1);
-	uint32_t op2=GETREG(GET2);
-	if(op1)
+	const int32_t op1 = GETREG(GET1);
+	const int32_t op2 = GETREG(GET2);
+	if (!op1)
 	{
-		SETREG(30,(int32_t)((int32_t)op2%(int32_t)op1));
-		SETREG(GET2,(int32_t)((int32_t)op2/(int32_t)op1));
-		SET_OV((op1^op2^GETREG(GET2)) == 0x80000000);
-		CHECK_ZS(GETREG(GET2));
+		// zero division exception, restarts the instruction; registers and flags are unchanged
+		PC = m_PPC;
+		take_exception(0xffffff80, 0xff80);
+		return 38;
 	}
-	else
-	{
-		//machine().debug_break();
-		throw emu_fatalerror("DIVr divide by zero\n");
-	}
+
+	// the only overflow is 80000000h / -1: quotient 80000000h, remainder 0
+	const bool overflow = (op2 == std::numeric_limits<int32_t>::min()) && (op1 == -1);
+	const uint32_t quotient = overflow ? op2 : (op2 / op1);
+	const uint32_t remainder = overflow ? 0 : (op2 % op1);
+	// remainder to r30 first: when reg2 is r30 it gets the quotient
+	SETREG(30, remainder);
+	SETREG(GET2, quotient);
+	SET_OV(overflow);
+	CHECK_ZS(quotient);
 	return 38;
 }
 
 uint32_t v810_device::opDIVUr(uint32_t op)   // divu r1,r2
 {
-	uint32_t op1=GETREG(GET1);
-	uint32_t op2=GETREG(GET2);
-	if(op1)
+	const uint32_t op1 = GETREG(GET1);
+	const uint32_t op2 = GETREG(GET2);
+	if (!op1)
 	{
-		SETREG(30,(int32_t)(op2%op1));
-		SETREG(GET2,(int32_t)(op2/op1));
-		SET_OV((op1^op2^GETREG(GET2)) == 0x80000000);
-		CHECK_ZS(GETREG(GET2));
+		// zero division exception, restarts the instruction; registers and flags are unchanged
+		PC = m_PPC;
+		take_exception(0xffffff80, 0xff80);
+		return 36;
 	}
-	else
-	{
-		//machine().debug_break();
-		throw emu_fatalerror("DIVUr divide by zero\n");
-	}
-	return 38;
+
+	const uint32_t quotient = op2 / op1;
+	// remainder to r30 first: when reg2 is r30 it gets the quotient
+	SETREG(30, op2 % op1);
+	SETREG(GET2, quotient);
+	SET_OV(0);
+	CHECK_ZS(quotient);
+	return 36;
 }
 
 uint32_t v810_device::opADDF(uint32_t op)
