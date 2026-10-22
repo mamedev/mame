@@ -84,4 +84,6 @@ jobs:
           ${{ matrix.executable }}.exe
           chdman.exe
           unidasm.exe
+          libmame_srcdbg_shared.dll
+          libmame_srcdbg_static.a
         if-no-files-found: error

@@ -3956,6 +3956,106 @@ Core Communication Options
 
             mame arescue -comm_remotehost 192.168.1.3 -comm_remoteport 30100 -comm_framesync
 
+.. _mame-commandline-srcdbginfo:
+
+**-src_debug_info** *<paths>*
+
+    Enable :ref:`source-level debugging <srcdbg>`.  *<paths>* is a
+    semicolon-separated list of one or more
+    paths to :ref:`MAME Debugging Information Files <srcdbg_mdi>`.  Typically only
+    one path is needed, but if the debugged application employs bank-switching on
+    an emulated memory management unit to swap code in and out of the logical address
+    space, specifying multiple paths here can make debugging that scenario more
+    convenient.  See :ref:`Bank switching and MMU-aware debugging <srcdbg_mmuaware>`
+    for more information.
+
+    By default, source-level debugging is disabled.
+
+    Example:
+        .. code-block:: bash
+
+            mame coco2 -src_debug_info c:\MyProject\MyProject.mdi
+
+.. _mame-commandline-srcdbgsearchpath:
+
+**-src_debug_search_path** *<path-list>*
+
+    If :ref:`source-level debugging <srcdbg>` is enabled, and
+    relative paths are present in the
+    :ref:`MAME Debugging Information File <srcdbg_mdi>`, this
+    specifies where MAME should look for those source files.
+
+    *<path-list>* is a semicolon-separated list of full paths
+    to directories on the MAME host system.
+    
+    By default, MAME expects to find full paths to source files in the
+    MAME Debugging Information File.
+
+    Example:
+        .. code-block:: bash
+
+            mame coco2 -src_debug_info c:\MyProject\MyProject.mdi -src_debug_search_path c:\MyProject\SourceDir1;c:\MyProject\SourceDir2
+
+.. _mame-commandline-srcdbgprefixmap:
+
+**-src_debug_prefix_map** *<prefix-map>*
+
+    If :ref:`source-level debugging <srcdbg>` is enabled, and the sources originally used
+    to build the debugged program are in a different location on the MAME
+    host system, this specifies how to map path prefixes from the originally
+    built source files to the source files currently present on the MAME
+    host system.  This is useful in cases where the debugged program was
+    built on a machine different from the MAME host system, or if the
+    build *environment* is different from the MAME run-time environment (such
+    as the use of cygwin while running the build tool).
+
+    *<prefix-map>* is a semicolon-separated list of semicolon-separated pairs of
+    paths, where each pair consists of a build environment's path prefix followed
+    by the MAME host system's path prefix it should be replaced with, of the form:
+
+        *build-path-prefix1*\ ;\ *runtime-path-prefix1*\ ;\ *build-path-prefix2*\ ;\ *runtime-path-prefix2*\ ;\ *etc.*
+
+    By default, source files are expected to be located at the same paths
+    present in the :ref:`MAME Debugging Information File <srcdbg_mdi>`
+
+    Example:
+        .. code-block:: bash
+
+            mame coco2 -src_debug_info c:\MyProject\MyProject.mdi -src_debug_prefix_map /cygdrive/c/;c:\;/cygdrive/d/;d:\
+
+.. _mame-commandline-srcdbgoffset:
+
+**-src_debug_offset** *<offset>*
+
+    If :ref:`source-level debugging <srcdbg>` is enabled, this causes *<offset>*
+    to be applied to all addresses encountered in the
+    :ref:`MAME Debugging Information File <srcdbg_mdi>`.  For more information,
+    see :ref:`srcdbg_offsets`.
+
+    The default is 0.
+
+    Example:
+        .. code-block:: bash
+
+            mame coco2 -src_debug_info c:\MyProject\MyProject.mdi -src_debug_offset 57344
+
+.. _mame-commandline-srcdbgtabs:
+
+**-src_debug_spaces_per_tab** *<value>*
+
+    If :ref:`source-level debugging <srcdbg>` is enabled, tab characters
+    from the source file are replaced with spaces to form equally-spaced
+    tab stops when the
+    source file is displayed in the source-level debugging view, and when lines
+    from the source file are printed to the trace file.  This option customizes
+    the number of spaces per tab stop.
+
+    The default is 4.
+
+    Example:
+        .. code-block:: bash
+
+            mame coco2 -src_debug_info c:\MyProject\MyProject.mdi -src_debug_spaces_per_tab 8
 
 .. _mame-commandline-miscoptions:
 
