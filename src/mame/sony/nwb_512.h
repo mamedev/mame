@@ -130,6 +130,7 @@ private:
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
+	// Register read/write ports
 	void destination_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void source_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void limit_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -141,18 +142,19 @@ private:
 	uint16_t status_r();
 	void ctrl_w(uint16_t data);
 
+	// Helper functions
 	void reset_state();
 	void check_mem_mask(uint16_t mem_mask);
 	void check_operation_start(offs_t offset);
-	void set_pixel(uint16_t x, uint16_t y, bool on);
+	uint16_t coordinate_to_data(uint16_t x, uint16_t y);
 	uint16_t execute_rop(uint8_t opcode, uint16_t source, uint16_t destination);
 	uint16_t shift(uint16_t data);
-	void rop_cycle(uint16_t data);
 	void rop(uint16_t source);
+	void rop_cycle(uint16_t data);
 	void end_row();
 	void start_operation();
 	void end_operation();
-	uint16_t coordinate_to_data(uint16_t x, uint16_t y);
+	void set_pixel(uint16_t x, uint16_t y, bool on);
 	rgb_t current_dim_color();
 };
 

@@ -104,9 +104,58 @@ nwb_512_device::nwb_512_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+void nwb_512_device::map(address_map &map)
+{
+	map(0x00000, 0x0ffff).w(FUNC(nwb_512_device::destination_w));
+	map(0x1a000, 0x1bfff).w(FUNC(nwb_512_device::pixel_w));
+	map(0x20000, 0x27fff).w(FUNC(nwb_512_device::source_w));
+	map(0x40000, 0x55fff).w(FUNC(nwb_512_device::limit_w));
+	map(0x60000, 0x60fff).w(FUNC(nwb_512_device::rop_config_w));
+	map(0x70000, 0x70fff).rw(FUNC(nwb_512_device::fifo_r), FUNC(nwb_512_device::fifo_w));
+	map(0x80000, 0x80001).rw(FUNC(nwb_512_device::status_r), FUNC(nwb_512_device::ctrl_w));
+	map(0xa0000, 0xa0003).noprw(); // Unknown, possibly planemask on multiplanar graphics cards with the same ROP engine
+
+	map(0xc0000, 0xfffff).rom().region("krom", 0);
+}
+
 void nwb_512_device::device_start()
 {
-	// TODO: save state support
+	save_item(NAME(m_state.ctrl));
+
+	save_item(NAME(m_state.destination_x));
+	save_item(NAME(m_state.current_destination_x));
+	save_item(NAME(m_state.destination_y));
+
+	save_item(NAME(m_state.source_x));
+	save_item(NAME(m_state.current_source_x));
+	save_item(NAME(m_state.source_y));
+
+	save_item(NAME(m_state.limit_x));
+	save_item(NAME(m_state.limit_y));
+	save_item(NAME(m_state.rop_function));
+
+	// Status
+	save_item(NAME(m_state.busy));
+
+	// Configuration flags
+	save_item(NAME(m_state.x_direction));
+	save_item(NAME(m_state.y_direction));
+	save_item(NAME(m_state.row_fill));
+	save_item(NAME(m_state.fb_read));
+	save_item(NAME(m_state.fb_write));
+	save_item(NAME(m_state.pixel_mode));
+
+	// Internal state
+	save_item(NAME(m_state.shift));
+	save_item(NAME(m_state.carry));
+	save_item(NAME(m_state.source_words_per_row));
+	save_item(NAME(m_state.dest_words_per_row));
+	save_item(NAME(m_state.source_words_left));
+	save_item(NAME(m_state.dest_words_left));
+	save_item(NAME(m_state.mask1));
+	save_item(NAME(m_state.mask2));
+	save_item(NAME(m_state.prime));
+	save_item(NAME(m_state.prime_pending));
 }
 
 void nwb_512_device::device_reset()
@@ -134,20 +183,6 @@ void nwb_512_device::device_add_mconfig(machine_config &config)
 	m_vram->set_default_size("512KiB");
 }
 
-void nwb_512_device::map(address_map &map)
-{
-	map(0x00000, 0x0ffff).w(FUNC(nwb_512_device::destination_w));
-	map(0x1a000, 0x1bfff).w(FUNC(nwb_512_device::pixel_w));
-	map(0x20000, 0x27fff).w(FUNC(nwb_512_device::source_w));
-	map(0x40000, 0x55fff).w(FUNC(nwb_512_device::limit_w));
-	map(0x60000, 0x60fff).w(FUNC(nwb_512_device::rop_config_w));
-	map(0x70000, 0x70fff).rw(FUNC(nwb_512_device::fifo_r), FUNC(nwb_512_device::fifo_w));
-	map(0x80000, 0x80001).rw(FUNC(nwb_512_device::status_r), FUNC(nwb_512_device::ctrl_w));
-	map(0xa0000, 0xa0003).noprw(); // Unknown, possibly planemask on multiplanar graphics cards with the same ROP engine
-
-	map(0xc0000, 0xfffff).rom().region("krom", 0);
-}
-
 u32 nwb_512_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, [[maybe_unused]] const rectangle &cliprect)
 {
 	const rgb_t white = current_dim_color();
@@ -167,52 +202,6 @@ u32 nwb_512_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, [
 	}
 
 	return 0;
-}
-
-void nwb_512_device::reset_state()
-{
-	// The DSC-008 service manual does not elaborate on what is or isn't cleared on disable
-	// (and system behavior doesn't seem to care).
-	m_state = {};
-}
-
-void nwb_512_device::check_mem_mask(uint16_t mem_mask)
-{
-	if (mem_mask != 0xffff)
-	{
-		// Registers are 16-bit. Log this just in case to chase down issues later.
-		logerror("%s NWB-512: unexpected non-word access with mem mask 0x%x!\n", machine().describe_context(), mem_mask);
-	}
-}
-
-void nwb_512_device::check_operation_start(offs_t offset)
-{
-	if (!execution_requested(offset))
-	{
-		return;
-	}
-
-	// Adjust source and destination coordinates for the reverse direction if necessary,
-	// because the left edge is always inclusive (right edge exclusive).
-	if (!m_state.x_direction)
-	{
-		--m_state.destination_x;
-		--m_state.source_x;
-		--m_state.limit_x;
-	}
-
-	start_operation();
-
-	// TODO: This executes copies immediately, faster than real hardware
-	if (m_state.is_fb_to_fb())
-	{
-		while (m_state.busy)
-		{
-			const uint16_t source_data = coordinate_to_data(m_state.current_source_x, m_state.source_y);
-			LOGMASKED(LOG_DATA, "fb->fb: sx = 0x%x sy = 0x%x data = 0x%x\n", m_state.current_source_x, m_state.source_y, source_data);
-			rop_cycle(source_data); // When the ROP is done, this will clear m_state.busy
-		}
-	}
 }
 
 void nwb_512_device::destination_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -268,7 +257,7 @@ void nwb_512_device::limit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		return;
 	}
 
-	// The read/write bits seem to be set here, and in a slightly different way from the DSC-008.
+	// The read/write bits seem to be set here in a slightly different way from the DSC-008.
 	// This behavior is an educated guess based on what iopboot, mrx, the NWS-800 monitor, and NWS-3800 monitor expect.
 	const bool write_op_start = execution_requested(offset);
 	m_state.fb_write = write_op_start;								   // A14 = start write op
@@ -356,6 +345,173 @@ void nwb_512_device::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	const bool new_state = execute_rop(m_state.rop_function, 1, destination) & 1;
 	LOGMASKED(LOG_DATA, "pixel_w(0x%x, 0x%x) => Change (0x%x, 0x%x) from %u to %u\n", offset, data, x, y, destination, new_state ? 1u : 0u);
 	set_pixel(x, y, new_state);
+}
+
+uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
+{
+	if (machine().side_effects_disabled())
+	{
+		return 0; // TODO: figure out what makes sense for debugging. Can't use the normal functions due to side effects
+	}
+
+	LOGMASKED(LOG_DATA, "(%s) fifo_r(0x%x, 0x%x)\n", machine().describe_context(), offset, mem_mask);
+	check_mem_mask(mem_mask);
+	if (!m_state.enabled())
+	{
+		logerror("%s NWB-512 fifo_r: framebuffer not enabled\n", machine().describe_context());
+		return 0;
+	}
+	if (!m_state.is_fb_to_host() || !m_state.busy)
+	{
+		logerror("%s NWB-512: fifo_r when read op is not executing\n", machine().describe_context());
+		return 0;
+	}
+
+	uint16_t word = 0;
+
+	if (m_state.prime_pending)
+	{
+		// If the source row's coordinate is greater (or less when reverse), prime the shifter,
+		// because two initial reads are needed. After this, the source and destination counts will be aligned.
+		word = coordinate_to_data(m_state.current_source_x, m_state.source_y);
+		shift(word);
+		m_state.prime_pending = false;
+		m_state.advance_sxa();
+	}
+
+	word = coordinate_to_data(m_state.current_source_x, m_state.source_y);
+	word = shift(word);
+
+	// Advance ROCC state
+	m_state.advance_sxa();
+	m_state.advance_dxa();
+
+	if (m_state.dest_words_left == 0)
+	{
+		end_row();
+	}
+
+	return word;
+}
+
+void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	LOGMASKED(LOG_DATA, "(%s) fifo_w(0x%x, 0x%x, 0x%x)\n", machine().describe_context(), offset, data, mem_mask);
+	check_mem_mask(mem_mask);
+	if (!m_state.enabled())
+	{
+		logerror("%s NWB-512 fifo_w: framebuffer not enabled\n", machine().describe_context());
+		return;
+	}
+
+	// One write kickstarts the reading process when triggered op is a read
+	if (m_state.is_fb_to_host())
+	{
+		LOGMASKED(LOG_DATA, "%s fifo_w: start read operation\n", machine().describe_context());
+		start_operation();
+		return;
+	}
+
+	if (m_state.pixel_mode || !m_state.busy)
+	{
+		logerror("%s NWB-512: word write in pixel mode or not active, ignoring\n", machine().describe_context());
+		return;
+	}
+
+	if (!m_state.row_fill)
+	{
+		rop_cycle(data);
+	}
+	else
+	{
+		// Assume row fill always populates the rest of the destination after running input data through the shifter
+		// I haven't found any evidence to the contrary.
+		const uint16_t shifted_data = shift(data);
+		while (m_state.dest_words_left > 0)
+		{
+			rop(shifted_data);
+		}
+		end_row();
+	}
+}
+
+uint16_t nwb_512_device::status_r()
+{
+	// TODO: some ops wait for 0b11 -> 0b10/0b01 transition instead of 0b11->0b00,
+	// so the driver always returns 0b10 to ensure all known cases are covered.
+	// The specifics of the internal state should be used to determine this value instead.
+	constexpr uint8_t BUSY = 0b10;
+
+	// The framebuffer font is only rendered properly if bit 5 is set.
+	// This might be some kind of ID or revision flag for the Kanji ROM (or the framebuffer as a whole).
+	return 0x20 | (m_state.busy ? BUSY : 0);
+}
+
+void nwb_512_device::ctrl_w(uint16_t data)
+{
+	LOGMASKED(LOG_CTRL, "%s ctrl_w 0x%x\n", machine().describe_context(), data);
+
+	// NWS-1580 uses a newer version of the framebuffer that uses a similar ROP engine, these definitions
+	// can be found in the NWS-1580 service manual.
+	const bool enabled = data & 0x1;
+	if (!enabled)
+	{
+		reset_state();
+	}
+
+	m_state.ctrl = data;
+}
+
+void nwb_512_device::reset_state()
+{
+	// The DSC-008 service manual does not elaborate on what is or isn't cleared on disable
+	// (and system behavior doesn't seem to care).
+	m_state = {};
+}
+
+void nwb_512_device::check_mem_mask(uint16_t mem_mask)
+{
+	if (mem_mask != 0xffff)
+	{
+		// Registers are 16-bit. Log this just in case to chase down issues later.
+		logerror("%s NWB-512: unexpected non-word access with mem mask 0x%x!\n", machine().describe_context(), mem_mask);
+	}
+}
+
+void nwb_512_device::check_operation_start(offs_t offset)
+{
+	if (!execution_requested(offset))
+	{
+		return;
+	}
+
+	// Adjust source and destination coordinates for the reverse direction if necessary,
+	// because the left edge is always inclusive (right edge exclusive).
+	if (!m_state.x_direction)
+	{
+		--m_state.destination_x;
+		--m_state.source_x;
+		--m_state.limit_x;
+	}
+
+	start_operation();
+
+	// TODO: This executes copies immediately, faster than real hardware
+	if (m_state.is_fb_to_fb())
+	{
+		while (m_state.busy)
+		{
+			const uint16_t source_data = coordinate_to_data(m_state.current_source_x, m_state.source_y);
+			LOGMASKED(LOG_DATA, "fb->fb: sx = 0x%x sy = 0x%x data = 0x%x\n", m_state.current_source_x, m_state.source_y, source_data);
+			rop_cycle(source_data); // When the ROP is done, this will clear m_state.busy
+		}
+	}
+}
+
+uint16_t nwb_512_device::coordinate_to_data(uint16_t x, uint16_t y)
+{
+	const uint32_t byte_offset = coordinate_to_byte_offset_aligned(x, y);
+	return (m_vram->read(byte_offset) << 8) | m_vram->read(byte_offset + 1);
 }
 
 uint16_t nwb_512_device::execute_rop(const uint8_t opcode, const uint16_t source, const uint16_t destination)
@@ -475,38 +631,6 @@ void nwb_512_device::rop(uint16_t source)
 	m_state.advance_sxa();
 }
 
-void nwb_512_device::end_row()
-{
-	m_state.current_destination_x = m_state.destination_x;
-	m_state.current_source_x = m_state.source_x;
-	m_state.advance_dya();
-	m_state.advance_sya();
-	m_state.carry = 0;
-
-	if (!m_state.limit_y)
-	{
-		end_operation();
-	}
-	else
-	{
-		m_state.dest_words_left = m_state.dest_words_per_row;
-		m_state.source_words_left = m_state.source_words_per_row;
-		m_state.prime_pending = m_state.prime;
-		--m_state.limit_y;
-	}
-}
-
-void nwb_512_device::end_operation()
-{
-	LOGMASKED(LOG_ROP, "ROP completed!\n");
-	m_state.busy = false;
-
-	// The DSC-008 instruction manual mentions that SRXA/DRXA[3:0] are cleared independently (see: /CLRDEST and /SFH).
-	// This may not be accurate. Hardware confirmation is needed.
-	m_state.source_x &= ~0xf;
-	m_state.destination_x &= ~0xf;
-}
-
 void nwb_512_device::rop_cycle(uint16_t data)
 {
 	if (m_state.prime_pending)
@@ -546,51 +670,25 @@ void nwb_512_device::rop_cycle(uint16_t data)
 	}
 }
 
-uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
+void nwb_512_device::end_row()
 {
-	if (machine().side_effects_disabled())
+	m_state.current_destination_x = m_state.destination_x;
+	m_state.current_source_x = m_state.source_x;
+	m_state.advance_dya();
+	m_state.advance_sya();
+	m_state.carry = 0;
+
+	if (!m_state.limit_y)
 	{
-		return 0; // TODO: figure out what makes sense for debugging. Can't use the normal functions due to side effects
+		end_operation();
 	}
-
-	LOGMASKED(LOG_DATA, "(%s) fifo_r(0x%x, 0x%x)\n", machine().describe_context(), offset, mem_mask);
-	check_mem_mask(mem_mask);
-	if (!m_state.enabled())
+	else
 	{
-		logerror("%s NWB-512 fifo_r: framebuffer not enabled\n", machine().describe_context());
-		return 0;
+		m_state.dest_words_left = m_state.dest_words_per_row;
+		m_state.source_words_left = m_state.source_words_per_row;
+		m_state.prime_pending = m_state.prime;
+		--m_state.limit_y;
 	}
-	if (!m_state.is_fb_to_host() || !m_state.busy)
-	{
-		logerror("%s NWB-512: fifo_r when read op is not executing\n", machine().describe_context());
-		return 0;
-	}
-
-	uint16_t word = 0;
-
-	if (m_state.prime_pending)
-	{
-		// If the source row's coordinate is greater (or less when reverse), prime the shifter,
-		// because two initial reads are needed. After this, the source and destination counts will be aligned.
-		word = coordinate_to_data(m_state.current_source_x, m_state.source_y);
-		shift(word);
-		m_state.prime_pending = false;
-		m_state.advance_sxa();
-	}
-
-	word = coordinate_to_data(m_state.current_source_x, m_state.source_y);
-	word = shift(word);
-
-	// Advance ROCC state
-	m_state.advance_sxa();
-	m_state.advance_dxa();
-
-	if (m_state.dest_words_left == 0)
-	{
-		end_row();
-	}
-
-	return word;
 }
 
 void nwb_512_device::start_operation()
@@ -666,47 +764,15 @@ void nwb_512_device::start_operation()
 	}
 }
 
-void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void nwb_512_device::end_operation()
 {
-	LOGMASKED(LOG_DATA, "(%s) fifo_w(0x%x, 0x%x, 0x%x)\n", machine().describe_context(), offset, data, mem_mask);
-	check_mem_mask(mem_mask);
-	if (!m_state.enabled())
-	{
-		logerror("%s NWB-512 fifo_w: framebuffer not enabled\n", machine().describe_context());
-		return;
-	}
+	LOGMASKED(LOG_ROP, "ROP completed!\n");
+	m_state.busy = false;
 
-	// One write kickstarts the reading process when triggered op is a read
-	if (m_state.is_fb_to_host())
-	{
-		LOGMASKED(LOG_DATA, "%s fifo_w: start read operation\n", machine().describe_context());
-		start_operation();
-		return;
-	}
-
-	if (m_state.pixel_mode || !m_state.busy)
-	{
-		logerror("%s NWB-512: word write in pixel mode or not active, ignoring\n", machine().describe_context());
-		return;
-	}
-
-	// TODO: validate offset versus the setup in the ROP reg
-
-	if (!m_state.row_fill)
-	{
-		rop_cycle(data);
-	}
-	else
-	{
-		// Assume row fill always populates the rest of the destination after running input data through the shifter
-		// I haven't found any evidence to the contrary.
-		const uint16_t shifted_data = shift(data);
-		while (m_state.dest_words_left > 0)
-		{
-			rop(shifted_data);
-		}
-		end_row();
-	}
+	// The DSC-008 instruction manual mentions that SRXA/DRXA[3:0] are cleared independently (see: /CLRDEST and /SFH).
+	// This may not be accurate. Hardware confirmation is needed.
+	m_state.source_x &= ~0xf;
+	m_state.destination_x &= ~0xf;
 }
 
 void nwb_512_device::set_pixel(uint16_t x, uint16_t y, bool on)
@@ -719,39 +785,6 @@ void nwb_512_device::set_pixel(uint16_t x, uint16_t y, bool on)
 	uint8_t pixel = m_vram->read(byte_offset);
 	pixel = (pixel & ~(1u << x_bit)) | ((on ? 1u : 0u) << x_bit);
 	m_vram->write(byte_offset, pixel);
-}
-
-uint16_t nwb_512_device::status_r()
-{
-	// TODO: some ops wait for 0b11 -> 0b10/0b01 transition instead of 0b11->0b00,
-	// so the driver always returns 0b10 to ensure all known cases are covered.
-	// The specifics of the internal state should be used to determine this value instead.
-	constexpr uint8_t BUSY = 0b10;
-
-	// The framebuffer font is only rendered properly if bit 5 is set.
-	// This might be some kind of ID or revision flag for the Kanji ROM (or the framebuffer as a whole).
-	return 0x20 | (m_state.busy ? BUSY : 0);
-}
-
-void nwb_512_device::ctrl_w(uint16_t data)
-{
-	LOGMASKED(LOG_CTRL, "%s ctrl_w 0x%x\n", machine().describe_context(), data);
-
-	// NWS-1580 uses a newer version of the framebuffer that uses a similar ROP engine, these definitions
-	// can be found in the NWS-1580 service manual.
-	const bool enabled = data & 0x1;
-	if (!enabled)
-	{
-		reset_state();
-	}
-
-	m_state.ctrl = data;
-}
-
-uint16_t nwb_512_device::coordinate_to_data(uint16_t x, uint16_t y)
-{
-	const uint32_t byte_offset = coordinate_to_byte_offset_aligned(x, y);
-	return (m_vram->read(byte_offset) << 8) | m_vram->read(byte_offset + 1);
 }
 
 rgb_t nwb_512_device::current_dim_color()
