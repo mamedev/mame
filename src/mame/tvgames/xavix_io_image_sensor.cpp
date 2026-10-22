@@ -8,7 +8,8 @@
     The ROM performs image subtraction and recognition.
 
     Reflective-controller inputs describe the target in the camera's field,
-    not recognised gestures.
+    not recognised gestures. Ambient light sets the generated background even
+    when the console's illumination is off; it does not modify a mounted image.
 
     ndpbj reads commands/pixels on PIO0 with active-low write/read strobes
     on PIO2 bits 7/6. Its white gloves use the shared target renderer; a mounted
@@ -63,6 +64,9 @@ static INPUT_PORTS_START(xavix_analog_image_sensor)
 
 	PORT_START("TARGET_ANGLE")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("AMBIENT")
+	PORT_ADJUSTER( 16, "Ambient Light" ) PORT_MINMAX(0, 255)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(xavix_analog_image_sensor_small)
@@ -117,6 +121,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START(xavix_digital_image_sensor)
 	PORT_INCLUDE(xavix_analog_image_sensor_dual)
+
+	PORT_MODIFY("AMBIENT")
+	PORT_ADJUSTER( 63, "Ambient Light" ) PORT_MINMAX(0, 255)
 
 	// The descending image store and glove projection reverse both camera axes.
 	PORT_MODIFY("TARGET_Y")
@@ -292,6 +299,7 @@ xavix_analog_image_sensor_device_base::xavix_analog_image_sensor_device_base(con
 xavix_analog_image_sensor_device::xavix_analog_image_sensor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	// Representative cadence allows initial edge polling and paired capture between video interrupts.
 	: xavix_analog_image_sensor_device_base(mconfig, XAVIX_ANALOG_IMAGE_SENSOR, tag, owner, clock, 48)
+	, m_ambient(*this, "AMBIENT")
 	, m_target_x(*this, { "TARGET_X", "TARGET2_X", "TARGET3_X", "TARGET4_X" })
 	, m_target_y(*this, { "TARGET_Y", "TARGET2_Y", "TARGET3_Y", "TARGET4_Y" })
 	, m_target_size(*this, { "TARGET_SIZE", "TARGET2_SIZE", "TARGET3_SIZE", "TARGET4_SIZE" })
@@ -307,6 +315,7 @@ xavix_analog_image_sensor_device::xavix_analog_image_sensor_device(const machine
 
 xavix_digital_image_sensor_device::xavix_digital_image_sensor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: xavix_image_sensor_device_base(mconfig, XAVIX_DIGITAL_IMAGE_SENSOR, tag, owner, clock)
+	, m_ambient(*this, "AMBIENT")
 	, m_picture(*this, "picture")
 	, m_glove_x(*this, { "TARGET_X", "TARGET2_X" })
 	, m_glove_y(*this, { "TARGET_Y", "TARGET2_Y" })
@@ -670,7 +679,7 @@ TIMER_CALLBACK_MEMBER(xavix_analog_image_sensor_device_base::scan_tick)
 
 void xavix_analog_image_sensor_device::capture_image()
 {
-	m_image.fill(16);
+	m_image.fill(m_ambient->read());
 	if (!illuminated())
 		return;
 
@@ -745,7 +754,7 @@ void xavix_digital_image_sensor_device::capture_image()
 	if (!m_picture->exists())
 	{
 		// Representative levels straddle the ROM's threshold; actual camera brightness is unmeasured.
-		m_image.fill(0x3f);
+		m_image.fill(m_ambient->read());
 		for (unsigned glove = 0; glove < m_glove_x.size(); ++glove)
 		{
 			if (!m_glove_hidden[glove]->read())

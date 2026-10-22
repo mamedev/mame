@@ -118,6 +118,7 @@ protected:
 private:
 	static constexpr unsigned MAX_TARGETS = 4;
 
+	required_ioport m_ambient;
 	optional_ioport_array<MAX_TARGETS> m_target_x;
 	optional_ioport_array<MAX_TARGETS> m_target_y;
 	optional_ioport_array<MAX_TARGETS> m_target_size;
@@ -154,6 +155,7 @@ private:
 	static constexpr u8 WRITE_STROBE = 0x80;
 	static constexpr u8 READ_STROBE = 0x40;
 
+	required_ioport m_ambient;
 	required_device<picture_image_device> m_picture;
 	required_ioport_array<2> m_glove_x;
 	required_ioport_array<2> m_glove_y;

@@ -98,6 +98,10 @@
       released. At INTERNAL RAM TEST, leave the reflector positions at their
       defaults, increase Reflector 1 size to maximum and Reflector 2 size to
       about halfway for two seconds, then reduce both. Automatic checks follow.
+    - ban_kksj: Start with all controls released. Soft reset after about six
+      seconds, then again about six seconds later. At INTERNAL RAM TEST, set
+      Ambient Light to 112 for about two seconds, then restore it to 16.
+      The automatic checks start after this bright/dark calibration.
     - epo_kabj: Hold Strawberry Left and Strawberry Right from startup, then
       soft reset after about nine seconds and release to enter CARD SCAN TEST.
       Cancel / Delete (Pink) advances to the automatic checks. To exercise the
@@ -116,9 +120,6 @@
     automatic test result.
 
     TODO:
-    - ban_kksj: Two soft resets six seconds apart enter INTERNAL RAM TEST.
-      Calibration still reads a dark image; verify paired capture timing and
-      the image selected by the test before the automatic checks.
     - ban_pr2j: Holding Up and Cross / Cancel from startup, soft resetting
       after about six seconds and releasing enters IR Transmission Test.
       Navigation from there to the automatic checks remains unconfirmed.
@@ -568,10 +569,10 @@ static INPUT_PORTS_START( maxheart )
 
 	PORT_MODIFY("IN0")
 	// The 16-way inputs allow independent Left/Right floor switches to be pressed together.
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Confirm") PORT_CODE(KEYCODE_W) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(0)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(0))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Confirm") PORT_CODE(KEYCODE_E) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(1)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(1))
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_16WAY PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_16WAY PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Confirm") PORT_CODE(KEYCODE_D) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(0)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(0))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Confirm") PORT_CODE(KEYCODE_L) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(1)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(1))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_16WAY PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_16WAY PORT_CODE(KEYCODE_J)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_16WAY PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_16WAY PORT_CODE(KEYCODE_A)
 
