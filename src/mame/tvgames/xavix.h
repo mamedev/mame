@@ -193,7 +193,6 @@ protected:
 	optional_ioport_array<2> m_lightgun2;
 	u8 m_lightgun_event_mask = 0;
 	required_device<xavix_soc_device> m_soc;
-	memory_access<15, 0, 0, ENDIANNESS_LITTLE>::specific m_code_lowbus;
 	optional_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
 	virtual void xavix_extbus_map(address_map &map) ATTR_COLD;
@@ -207,52 +206,8 @@ protected:
 	void screen_vblank(int state);
 	screen_output m_screen_output;
 
-	void xavix_map(address_map &map) ATTR_COLD;
-
-	void debug_mem_w(offs_t offset, u8 data)
-	{
-		m_soc->mainram()[offset] = data;
-	};
-
-	virtual u8 code_low_bank_r(offs_t offset)
-	{
-		if (offset & 0x8000)
-		{
-			return m_rom[(offset) & (m_rom.bytes() - 1)];
-		}
-		else
-		{
-			return m_code_lowbus.read_byte(offset & 0x7fff);
-		}
-	}
-
-	virtual u8 code_high_bank_r(offs_t offset)
-	{
-		// High code banks fetch externally throughout the 64 KiB window.
-		return m_rom[(offset) & (m_rom.bytes() - 1)];
-	}
-
-	// Full-address fetches use bank bit 7 to bypass low bus for the entire 64 KiB window.
-	virtual inline u8 read_banked_data_bypass(u32 adr)
-	{
-		u8 databank = adr >> 16;
-
-		if (databank >= 0x80)
-		{
-			return m_rom[adr & (m_rom.bytes() - 1)];
-		}
-		else
-		{
-			if ((adr&0xffff) >= 0x8000)
-			{
-				return m_rom[adr & (m_rom.bytes() - 1)];
-			}
-			else
-			{
-				return m_soc->read_low_bus_bypass(adr);
-			}
-		}
-	}
+	virtual u8 external_code_r(offs_t offset);
+	virtual u8 external_data_r(offs_t offset);
 
 	// Selected boards alternate IO1 bit 7 to maintain an external RC power hold.
 	optional_device<timer_device> m_power_hold_timer;
@@ -507,104 +462,12 @@ protected:
 
 	virtual void xavix_extbus_map(address_map &map) override ATTR_COLD;
 
-	u8 cart_r(offs_t offset)
-	{
-		if (m_cartslot->has_cart())
-		{
-			return m_cartslot->read_cart(offset);
-		}
-		else
-		{
-			return m_rom[(offset) & (m_rom.bytes() - 1)];
-		}
-	}
+	u8 cart_r(offs_t offset);
+	void cart_w(offs_t offset, u8 data);
 
-	void cart_w(offs_t offset, u8 data)
-	{
-		if (m_cartslot->has_cart())
-		{
-			m_cartslot->write_cart(offset, data);
-		}
-		else
-		{
-			logerror("%s: unhandled write access to cart area with no cart installed %08x %02x\n", machine().describe_context(), offset, data);
-		}
-	}
+	virtual u8 external_code_r(offs_t offset) override;
 
-	// for Cart cases this memory bypass becomes more complex
-
-	virtual u8 code_low_bank_r(offs_t offset) override
-	{
-		if (offset & 0x8000)
-		{
-			if ((offset & 0x7fffff) >= m_cart_limit)
-			{
-				return m_rom[(offset) & (m_rom.bytes() - 1)];
-			}
-			else
-			{
-				return cart_r(offset);
-			}
-		}
-		else
-		{
-			return m_code_lowbus.read_byte(offset & 0x7fff);
-		}
-	}
-
-	virtual u8 code_high_bank_r(offs_t offset) override
-	{
-		if ((offset & 0x7fffff) >= m_cart_limit)
-		{
-			return m_rom[(offset) & (m_rom.bytes() - 1)];
-		}
-		else
-		{
-			return cart_r(offset);
-		}
-	}
-
-	virtual void external_bus_ctrl_changed(unsigned index, u8 data) override
-	{
-		if (m_cartslot->has_cart())
-			m_cartslot->write_bus_control(index, data);
-	}
-
-
-	virtual inline u8 read_banked_data_bypass(u32 offset) override
-	{
-		u8 databank = offset >> 16;
-
-		if (databank >= 0x80)
-		{
-			if ((offset & 0x7fffff) >= m_cart_limit)
-			{
-				return m_rom[(offset) & (m_rom.bytes() - 1)];
-			}
-			else
-			{
-				return cart_r(offset);
-			}
-		}
-		else
-		{
-			if ((offset & 0xffff) >= 0x8000)
-			{
-				if ((offset & 0x7fffff) >= m_cart_limit)
-				{
-					return m_rom[(offset) & (m_rom.bytes() - 1)];
-				}
-				else
-				{
-					return cart_r(offset);
-				}
-			}
-			else
-			{
-				return m_soc->read_low_bus_bypass(offset);
-			}
-		}
-	}
+	virtual void external_bus_ctrl_changed(unsigned index, u8 data) override;
 
 	// The default cartridge window covers 0x000000-0x5fffff, even for 4 MiB cartridges.
 	offs_t m_cart_limit; // exclusive external-bus byte address limit

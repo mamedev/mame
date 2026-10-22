@@ -123,22 +123,16 @@
 //  Shared Hardware
 //**************************************************************************
 
-void superxavix_state::mapped_program_map(address_map &map)
-{
-	map(0x000000, 0xffffff).r(FUNC(superxavix_state::mapped_code_r));
-	map(0x000000, 0x003fff).w(FUNC(superxavix_state::debug_mem_w));
-}
-
 void superxavix_power_state::configure_board(machine_config &config)
 {
 	superxavix_state::configure_board(config);
-	m_soc->io().output_callback<1>().append(*this, FUNC(superxavix_power_state::io1_power_off_w));
+	m_soc->io_output_callback<1>().append(*this, FUNC(superxavix_power_state::io1_power_off_w));
 }
 
 void superxavix_i2c_power_state::configure_board(machine_config &config)
 {
 	superxavix_i2c_state::configure_board(config);
-	m_soc->io().output_callback<1>().append(*this, FUNC(superxavix_i2c_power_state::io1_power_off_w));
+	m_soc->io_output_callback<1>().append(*this, FUNC(superxavix_i2c_power_state::io1_power_off_w));
 }
 
 void superxavix_state::superxavix(machine_config &config)
@@ -152,19 +146,19 @@ void superxavix_state::superxavix(machine_config &config)
 
 	superxavix_video_device::configure_screen(*m_screen, m_soc->clock(), video_standard::NTSC);
 
-	m_super_soc->plotter().memory_read_callback().set(*this, FUNC(superxavix_state::read_plotter_byte));
-	m_super_soc->plotter().memory_write_callback().set(*this, FUNC(superxavix_state::write_plotter_byte));
+	m_super_soc->plotter_read_callback().set(*this, FUNC(superxavix_state::read_plotter_byte));
+	m_super_soc->plotter_write_callback().set(*this, FUNC(superxavix_state::write_plotter_byte));
 
-	m_super_soc->pio().input_callback<0>().set(*this, FUNC(superxavix_state::pio_input_r<0>));
-	m_super_soc->pio().output_callback<0>().set(*this, FUNC(superxavix_state::pio_output_w<0>));
-	m_super_soc->pio().input_callback<1>().set(*this, FUNC(superxavix_state::pio_input_r<1>));
-	m_super_soc->pio().output_callback<1>().set(*this, FUNC(superxavix_state::pio_output_w<1>));
-	m_super_soc->pio().input_callback<2>().set(*this, FUNC(superxavix_state::pio_input_r<2>));
-	m_super_soc->pio().output_callback<2>().set(*this, FUNC(superxavix_state::pio_output_w<2>));
-	m_super_soc->pio().input_mask_callback<0>().set(*this, FUNC(superxavix_state::pio_input_mask_r<0>));
-	m_super_soc->pio().input_mask_callback<1>().set(*this, FUNC(superxavix_state::pio_input_mask_r<1>));
-	m_super_soc->pio().input_mask_callback<2>().set(*this, FUNC(superxavix_state::pio_input_mask_r<2>));
-	m_super_soc->pio().legacy_input_mask_callback().set(*this, FUNC(superxavix_state::legacy_input_mask_r));
+	m_super_soc->pio_input_callback<0>().set(*this, FUNC(superxavix_state::pio_input_r<0>));
+	m_super_soc->pio_output_callback<0>().set(*this, FUNC(superxavix_state::pio_output_w<0>));
+	m_super_soc->pio_input_callback<1>().set(*this, FUNC(superxavix_state::pio_input_r<1>));
+	m_super_soc->pio_output_callback<1>().set(*this, FUNC(superxavix_state::pio_output_w<1>));
+	m_super_soc->pio_input_callback<2>().set(*this, FUNC(superxavix_state::pio_input_r<2>));
+	m_super_soc->pio_output_callback<2>().set(*this, FUNC(superxavix_state::pio_output_w<2>));
+	m_super_soc->pio_input_mask_callback<0>().set(*this, FUNC(superxavix_state::pio_input_mask_r<0>));
+	m_super_soc->pio_input_mask_callback<1>().set(*this, FUNC(superxavix_state::pio_input_mask_r<1>));
+	m_super_soc->pio_input_mask_callback<2>().set(*this, FUNC(superxavix_state::pio_input_mask_r<2>));
+	m_super_soc->pio_legacy_input_mask_callback().set(*this, FUNC(superxavix_state::legacy_input_mask_r));
 }
 
 void superxavix_state::superxavix_4mb(machine_config &config)
@@ -179,24 +173,10 @@ void superxavix_state::superxavix_4mb(machine_config &config)
 
 void superxavix_state::configure_mapped_memory()
 {
-	m_soc->set_program_map(*this, &superxavix_state::mapped_program_map);
+	m_soc->use_mapped_code();
 	// Tile planes, bitstreams and bitmaps use the program view; sound and DMA retain their data view.
-	m_soc->set_video_read_callback(*this, FUNC(superxavix_state::read_program_byte));
-	m_super_soc->set_bitmap_read_callback(*this, FUNC(superxavix_state::read_program_byte));
-}
-
-u8 superxavix_state::mapped_code_r(offs_t offset)
-{
-	// High banks fetch externally throughout the window; low banks retain internal RAM/registers.
-	if ((offset & 0x800000) || (offset & 0x8000))
-		return m_soc->cpu().space(xavix_device::AS_EXTERNAL_BUS).read_byte(offset & 0x7fffff);
-	else
-		return m_code_lowbus.read_byte(offset & 0x7fff);
-}
-
-u8 superxavix_state::read_program_byte(u32 address)
-{
-	return m_soc->cpu().space(AS_PROGRAM).read_byte(address);
+	m_soc->set_video_read_callback(m_soc, FUNC(xavix_soc_device::read_program_byte));
+	m_super_soc->set_bitmap_read_callback(m_soc, FUNC(xavix_soc_device::read_program_byte));
 }
 
 u8 superxavix_state::read_graphics_byte(u32 address)
@@ -212,12 +192,12 @@ u8 superxavix_state::read_graphics_byte(u32 address)
 	if ((address & 0x1000000) && m_extra)
 		return m_extra[address & 0x7fffff];
 
-	return read_banked_data_bypass(address);
+	return m_soc->read_banked_data_bypass(address);
 }
 
 u8 superxavix_state::read_bitmap_byte(u32 address)
 {
-	return m_extra ? read_graphics_byte(address) : read_banked_data_bypass(address);
+	return m_extra ? read_graphics_byte(address) : m_soc->read_banked_data_bypass(address);
 }
 
 u8 superxavix_state::read_plotter_byte(u32 address)
@@ -225,12 +205,12 @@ u8 superxavix_state::read_plotter_byte(u32 address)
 	if (m_extra && BIT(address, 24))
 		return m_extra[address & 0x7fffff];
 
-	return m_soc->cpu().space(xavix_device::AS_EXTERNAL_BUS).read_byte(address & 0x7fffff);
+	return m_soc->external_r(address & 0x7fffff);
 }
 
 void superxavix_state::write_plotter_byte(u32 address, u8 data)
 {
-	m_soc->cpu().space(xavix_device::AS_EXTERNAL_BUS).write_byte(address & 0x7fffff, data);
+	m_soc->external_w(address & 0x7fffff, data);
 }
 
 //-------------------------------------------------
@@ -334,13 +314,13 @@ void superxavix_i2c_pio1_state::superxavix_i2c_24c64(machine_config &config)
 void superxavix_i2c_pio1_state::configure_pio()
 {
 	m_pio_connected_inputs[1] |= 0x08;
-	m_super_soc->pio().set_legacy_output_mask<1>(0);
-	m_super_soc->pio().input_callback<0>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_input_r<0>));
-	m_super_soc->pio().output_callback<0>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_output_w<0>));
-	m_super_soc->pio().input_callback<1>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_input_r<1>));
-	m_super_soc->pio().output_callback<1>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_output_w<1>));
-	m_super_soc->pio().input_callback<2>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_input_r<2>));
-	m_super_soc->pio().output_callback<2>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_output_w<2>));
+	m_super_soc->set_pio_legacy_output_mask<1>(0);
+	m_super_soc->pio_input_callback<0>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_input_r<0>));
+	m_super_soc->pio_output_callback<0>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_output_w<0>));
+	m_super_soc->pio_input_callback<1>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_input_r<1>));
+	m_super_soc->pio_output_callback<1>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_output_w<1>));
+	m_super_soc->pio_input_callback<2>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_input_r<2>));
+	m_super_soc->pio_output_callback<2>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_output_w<2>));
 }
 
 template <unsigned Port>
@@ -384,10 +364,10 @@ void superxavix_i2c_pio1_state::configure_rtc_pio(machine_config &config)
 {
 	static_assert(Port < 2);
 	m_pio_connected_inputs[Port] |= Port ? 0x80 : 0x08;
-	m_super_soc->pio().set_legacy_output_mask<Port>(0);
+	m_super_soc->set_pio_legacy_output_mask<Port>(0);
 	S35390A(config, m_rtc, 32.768_kHz_XTAL);
-	m_super_soc->pio().input_callback<Port>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_rtc_input_r<Port>));
-	m_super_soc->pio().output_callback<Port>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_rtc_output_w<Port>));
+	m_super_soc->pio_input_callback<Port>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_rtc_input_r<Port>));
+	m_super_soc->pio_output_callback<Port>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_rtc_output_w<Port>));
 }
 
 template <unsigned Port>
@@ -426,7 +406,7 @@ xavix_analog_image_sensor_device &superxavix_i2c_camera_state::configure_dual_re
 	// Representative LOW time allows ADC priming; HIGH is shorter than the ROM's four-poll frame-gap test.
 	camera.set_pixel_clocks(64, 32);
 	camera.set_frame_gap_pixel_high(true);
-	m_soc->adc().input_callback<0>().set(camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
+	m_soc->adc_input_callback<0>().set(camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
 	return camera;
 }
 
@@ -618,8 +598,8 @@ xavixport_io_device &superxavix_state::configure_xavixport_io(machine_config &co
 	m_pio_connected_inputs[2] |= 0xa4;
 	xavixport_io_device &xavixport_io(XAVIXPORT_IO(config, "xavixport_io", 0));
 	xavixport_io.panel_callback().set_ioport("PANEL");
-	m_super_soc->pio().input_callback<2>().set(xavixport_io, FUNC(xavixport_io_device::pio_r)).mask(0xa0);
-	m_super_soc->pio().output_callback<2>().set(xavixport_io, FUNC(xavixport_io_device::pio_w));
+	m_super_soc->pio_input_callback<2>().set(xavixport_io, FUNC(xavixport_io_device::pio_r)).mask(0xa0);
+	m_super_soc->pio_output_callback<2>().set(xavixport_io, FUNC(xavixport_io_device::pio_w));
 
 	return xavixport_io;
 }
@@ -719,7 +699,7 @@ void superxavix_xavbaseb_state::superxavix_xavbaseb(machine_config &config)
 	superxavix_i2c_24c08(config);
 
 	XAVIX_BASEBALL_CONTROLLERS(config, m_controllers, peripheral_clock());
-	m_controllers->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	m_controllers->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_screen->screen_vblank().append(m_controllers, FUNC(xavix_baseball_controllers_device::vblank_w));
 }
 
@@ -746,7 +726,7 @@ void superxavix_xavgolf_state::superxavix_xavgolf(machine_config &config)
 	configure_xavixport_io(config);
 
 	XAVIX_GOLF_SWING(config, m_swing_sensor, peripheral_clock());
-	m_swing_sensor->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	m_swing_sensor->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_screen->screen_vblank().append(m_swing_sensor, FUNC(xavix_golf_swing_device::vblank_w));
 }
 
@@ -856,7 +836,7 @@ TIMER_CALLBACK_MEMBER(superxavix_xavbassf_state::fishing_host_sync)
 TIMER_CALLBACK_MEMBER(superxavix_xavbassf_state::fishing_cart_mcu_sync)
 {
 	if (BIT(m_fishing_cart_mcu_pins, 2) && !BIT(param, 2))
-		m_soc->io().trigger_event<2>();
+		m_soc->trigger_io_event<2>();
 	m_fishing_cart_mcu_pins = param;
 }
 
@@ -878,7 +858,7 @@ void superxavix_i2c_camera_state::superxavix_xavbowl(machine_config &config)
 	configure_xavixport_io(config);
 	XAVIX_ANALOG_IMAGE_SENSOR(config, m_camera, peripheral_clock());
 	// The ROM derives the throw from successive images of the passive ball reflector.
-	m_soc->adc().input_callback<0>().set(m_camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
+	m_soc->adc_input_callback<0>().set(m_camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
 }
 
 
@@ -904,12 +884,12 @@ void superxavix_xavbox_state::superxavix_xavbox(machine_config &config)
 {
 	superxavix_i2c_pio1_state::superxavix_xavbox(config);
 	// The sensor uses legacy GPIO while the EEPROM remains on PIO1 bits 3/4.
-	m_super_soc->pio().set_legacy_output_mask<1>(0x21);
+	m_super_soc->set_pio_legacy_output_mask<1>(0x21);
 	XAVIX_ANALOG_IMAGE_SENSOR(config, m_camera, peripheral_clock()).set_target_count(2);
 	m_camera->set_frame_gap_pixel_high(true);
 	// Representative pixel pulses must be shorter than the ROM's five-poll gap detector.
 	m_camera->set_half_pixel_clocks(40);
-	m_soc->adc().input_callback<0>().set(m_camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
+	m_soc->adc_input_callback<0>().set(m_camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
 }
 
 u8 superxavix_xavbox_state::io1_input_r(u8 direction)
@@ -949,7 +929,7 @@ void superxavix_xavjmat_state::configure_mat(machine_config &config, xavix_ir_st
 	configure_xavixport_io(config);
 
 	XAVIX_IR_STEP_MAT(config, m_mat, peripheral_clock()).set_protocol(type);
-	m_mat->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	m_mat->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_screen->screen_vblank().append(m_mat, FUNC(xavix_ir_step_mat_device::vblank_w));
 }
 
@@ -999,9 +979,9 @@ microphone_device &superxavix_i2c_pio1_state::configure_xavix_music_input(machin
 	microphone_device &music_input(configure_stereo_music_input(config));
 
 	// The mono ADC0 tap ahead of music attenuation is inferred; the board routing needs confirmation.
-	m_soc->adc().set_audio_channel(0);
-	music_input.add_route(0, m_soc->adc(), 0.5);
-	music_input.add_route(1, m_soc->adc(), 0.5);
+	m_soc->set_adc_audio_channel(0);
+	m_soc->add_adc_route(music_input, 0, 0.5);
+	m_soc->add_adc_route(music_input, 1, 0.5);
 	return music_input;
 }
 
@@ -1013,8 +993,8 @@ void superxavix_xavmusic_state::superxavix_xavmusic(machine_config &config)
 	music_input.add_route(1, m_music_volume, 1.0, 1);
 	m_music_volume->add_route(0, "speaker", 1.0, 0);
 	m_music_volume->add_route(1, "speaker", 1.0, 1);
-	m_super_soc->pio().set_legacy_output_mask<0>(0);
-	m_super_soc->pio().output_callback<0>().append(*this, FUNC(superxavix_xavmusic_state::pio0_volume_w));
+	m_super_soc->set_pio_legacy_output_mask<0>(0);
+	m_super_soc->pio_output_callback<0>().append(*this, FUNC(superxavix_xavmusic_state::pio0_volume_w));
 }
 
 void superxavix_xavmusicj_state::superxavix_xavmusicj(machine_config &config)
@@ -1026,8 +1006,8 @@ void superxavix_xavmusicj_state::superxavix_xavmusicj(machine_config &config)
 	music_input.add_route(1, m_music_volume, 1.0, 1);
 	m_music_volume->add_route(0, "speaker", 1.0, 0);
 	m_music_volume->add_route(1, "speaker", 1.0, 1);
-	m_super_soc->pio().set_legacy_output_mask<0>(0);
-	m_super_soc->pio().output_callback<0>().append(*this, FUNC(superxavix_xavmusicj_state::pio0_volume_w));
+	m_super_soc->set_pio_legacy_output_mask<0>(0);
+	m_super_soc->pio_output_callback<0>().append(*this, FUNC(superxavix_xavmusicj_state::pio0_volume_w));
 }
 
 void superxavix_xavmusic_state::pio0_volume_w(offs_t offset, u8 data, u8 mem_mask)
@@ -1090,9 +1070,9 @@ void superxavix_i2c_pio1_state::superxavix_domfitex(machine_config &config)
 	xavixport_io_device &xavixport_io(configure_xavixport_io(config));
 	domyos_step_port_device &step_port(DOMYOS_STEP_PORT(config, "step"));
 	xavixport_io.accessory_callback().set(step_port, FUNC(domyos_step_port_device::report_r));
-	m_super_soc->pio().input_callback<2>().append(step_port, FUNC(domyos_step_port_device::pio_r)).mask(0x04);
-	m_super_soc->pio().output_callback<2>().append(step_port, FUNC(domyos_step_port_device::pio_w));
-	step_port.set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<1>));
+	m_super_soc->pio_input_callback<2>().append(step_port, FUNC(domyos_step_port_device::pio_r)).mask(0x04);
+	m_super_soc->pio_output_callback<2>().append(step_port, FUNC(domyos_step_port_device::pio_w));
+	step_port.set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<1>));
 }
 
 // Stand-in for domdance's undumped dsPIC33FJ12GP202, based on the I/O protocol
@@ -1106,10 +1086,10 @@ void superxavix_domdance_state::superxavix_domdance(machine_config &config)
 	music_input.add_route(0, *this, 1.0, 0);
 	music_input.add_route(1, *this, 1.0, 1);
 	m_pio_connected_inputs[0] |= 0x80;
-	m_super_soc->pio().set_legacy_output_mask<0>(0);
-	m_super_soc->pio().input_callback<0>().set(FUNC(superxavix_domdance_state::analyser_data_r));
-	m_super_soc->pio().output_callback<0>().set(FUNC(superxavix_domdance_state::analyser_clock_w));
-	m_super_soc->pio().output_callback<2>().append(FUNC(superxavix_domdance_state::analyser_select_w));
+	m_super_soc->set_pio_legacy_output_mask<0>(0);
+	m_super_soc->pio_input_callback<0>().set(FUNC(superxavix_domdance_state::analyser_data_r));
+	m_super_soc->pio_output_callback<0>().set(FUNC(superxavix_domdance_state::analyser_clock_w));
+	m_super_soc->pio_output_callback<2>().append(FUNC(superxavix_domdance_state::analyser_select_w));
 }
 
 void superxavix_domdance_state::machine_start()
@@ -1275,7 +1255,7 @@ void superxavix_tmy_rkmj_state::superxavix_tmy_rkmj(machine_config &config)
 	superxavix_i2c_24c04(config);
 
 	XAVIX_ROCKMAN_ARM(config, m_arm_controller, peripheral_clock());
-	m_arm_controller->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	m_arm_controller->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_screen->screen_vblank().append(m_arm_controller, FUNC(xavix_rockman_arm_device::vblank_w));
 }
 
@@ -1320,7 +1300,7 @@ void superxavix_epo_tfit_state::superxavix_epo_tfit(machine_config &config)
 	superxavix_i2c_24c04_4mb(config);
 
 	XAVIX_TFIT_RACKETS(config, m_rackets, peripheral_clock());
-	m_rackets->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	m_rackets->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_screen->screen_vblank().append(m_rackets, FUNC(xavix_tfit_rackets_device::vblank_w));
 }
 
@@ -1360,7 +1340,7 @@ void superxavix_ban_bkgj_state::superxavix_ban_bkgj(machine_config &config)
 	superxavix_i2c_24c04_4mb(config);
 
 	XAVIX_SURVI_BUSTER(config, m_survi_buster, peripheral_clock());
-	m_survi_buster->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	m_survi_buster->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_screen->screen_vblank().append(m_survi_buster, FUNC(xavix_survi_buster_device::vblank_w));
 }
 
@@ -1433,7 +1413,7 @@ void superxavix_ban_ordj_state::superxavix_ban_ordj(machine_config &config)
 	superxavix_i2c_24c04(config);
 
 	XAVIX_HIBIKI_STICKS(config, m_sticks, peripheral_clock());
-	m_sticks->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	m_sticks->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_screen->screen_vblank().append(m_sticks, FUNC(xavix_hibiki_sticks_device::vblank_w));
 }
 
@@ -1465,7 +1445,7 @@ void superxavix_anpanmdx_state::superxavix_anpanmdx(machine_config &config)
 	superxavix_i2c_24c08(config);
 
 	XAVIX_ANPANMAN_STICKS(config, m_sticks, peripheral_clock());
-	m_sticks->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	m_sticks->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_screen->screen_vblank().append(m_sticks, FUNC(xavix_anpanman_sticks_device::vblank_w));
 }
 
@@ -1530,7 +1510,7 @@ INPUT_PORTS_END
 void superxavix_i2c_camera_state::superxavix_epo_rgfj(machine_config &config)
 {
 	superxavix_i2c_24c08(config);
-	m_soc->io().output_callback<1>().append(*this, FUNC(superxavix_i2c_camera_state::io1_power_off_w));
+	m_soc->io_output_callback<1>().append(*this, FUNC(superxavix_i2c_camera_state::io1_power_off_w));
 	auto &camera = XAVIX_ANALOG_IMAGE_SENSOR(config, m_camera, peripheral_clock());
 	// Representative pixel timing separates the ROM's five-poll frame test from ordinary pixels.
 	camera.set_half_pixel_clocks(40);
@@ -1539,8 +1519,8 @@ void superxavix_i2c_camera_state::superxavix_epo_rgfj(machine_config &config)
 	camera.set_target_shape(xavix_analog_image_sensor_device::target_shape::ROD);
 	// Acquisition starts in the frame gap, before the ROM masks video interrupts to read the next images.
 	camera.set_event_source(xavix_analog_image_sensor_device_base::event_source::FRAME_END);
-	camera.set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<1>));
-	m_soc->adc().input_callback<0>().set(camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
+	camera.set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<1>));
+	m_soc->adc_input_callback<0>().set(camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
 }
 
 
@@ -1560,7 +1540,7 @@ INPUT_PORTS_END
 void superxavix_i2c_camera_state::superxavix_ban_reflective_camera(machine_config &config)
 {
 	superxavix_i2c_24c02(config);
-	m_soc->io().output_callback<1>().append(*this, FUNC(superxavix_i2c_camera_state::io1_power_off_w));
+	m_soc->io_output_callback<1>().append(*this, FUNC(superxavix_i2c_camera_state::io1_power_off_w));
 	auto &camera = XAVIX_ANALOG_IMAGE_SENSOR(config, m_camera, peripheral_clock());
 	camera.set_target_count(2);
 	camera.set_controller_type(xavix_analog_image_sensor_device::controller_type::REFLECTORS);
@@ -1568,8 +1548,8 @@ void superxavix_i2c_camera_state::superxavix_ban_reflective_camera(machine_confi
 	camera.set_exposure_period(attotime::from_usec(REFLECTIVE_EXPOSURE_USEC));
 	camera.set_pixel_clocks(41, 15);
 	camera.set_event_source(xavix_analog_image_sensor_device_base::event_source::EXPOSURE_START);
-	camera.set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<1>));
-	m_soc->adc().input_callback<0>().set(camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
+	camera.set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<1>));
+	m_soc->adc_input_callback<0>().set(camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
 }
 
 
@@ -1608,7 +1588,7 @@ void superxavix_i2c_camera_state::superxavix_ban_ult(machine_config &config)
 	// Representative pixel timing separates the ROM's five-poll frame test from ordinary pixels.
 	camera.set_half_pixel_clocks(40);
 	camera.set_frame_gap_pixel_high(true);
-	m_soc->adc().input_callback<0>().set(camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
+	m_soc->adc_input_callback<0>().set(camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
 }
 
 
@@ -1634,7 +1614,7 @@ INPUT_PORTS_END
 void superxavix_i2c_camera_state::superxavix_ban_um2j(machine_config &config)
 {
 	superxavix_i2c_24c04(config);
-	m_soc->io().output_callback<1>().append(*this, FUNC(superxavix_i2c_camera_state::io1_power_off_w));
+	m_soc->io_output_callback<1>().append(*this, FUNC(superxavix_i2c_camera_state::io1_power_off_w));
 	configure_dual_reflector_camera(config).set_controller_type(xavix_analog_image_sensor_device::controller_type::REFLECTORS);
 }
 
@@ -1660,7 +1640,7 @@ INPUT_PORTS_END
 void superxavix_i2c_camera_state::superxavix_ban_gkrj(machine_config &config)
 {
 	superxavix_i2c_24c02_4mb(config);
-	m_soc->io().output_callback<1>().append(*this, FUNC(superxavix_i2c_camera_state::io1_power_off_w));
+	m_soc->io_output_callback<1>().append(*this, FUNC(superxavix_i2c_camera_state::io1_power_off_w));
 	configure_dual_reflector_camera(config);
 }
 
@@ -1722,14 +1702,14 @@ void superxavix_udance_state::superxavix_udance(machine_config &config)
 {
 	superxavix_i2c_24c16(config);
 	m_pio_connected_inputs[0] |= 0x10;
-	m_super_soc->pio().set_legacy_output_mask<0>(0xbf);
+	m_super_soc->set_pio_legacy_output_mask<0>(0xbf);
 
 	XAVIX_SERIAL_TRACKING_SENSOR(config, m_camera);
 
 	m_soc->set_external_map(*this, &superxavix_udance_state::xavix_extbus_map);
-	m_super_soc->pio().input_callback<0>().set(*this, FUNC(superxavix_udance_state::pio0_input_r));
-	m_super_soc->pio().output_callback<0>().set(*this, FUNC(superxavix_udance_state::pio0_output_w));
-	m_super_soc->pio().output_callback<2>().set(*this, FUNC(superxavix_udance_state::rom_bank_w));
+	m_super_soc->pio_input_callback<0>().set(*this, FUNC(superxavix_udance_state::pio0_input_r));
+	m_super_soc->pio_output_callback<0>().set(*this, FUNC(superxavix_udance_state::pio0_output_w));
+	m_super_soc->pio_output_callback<2>().set(*this, FUNC(superxavix_udance_state::rom_bank_w));
 }
 
 void superxavix_udance_state::machine_start()
@@ -1764,15 +1744,10 @@ u8 superxavix_udance_state::rom_window_r(offs_t offset)
 	}
 }
 
-u8 superxavix_udance_state::read_banked_data_bypass(u32 address)
+u8 superxavix_udance_state::external_data_r(offs_t address)
 {
-	if ((address >> 16) >= 0x80 || (address & 0xffff) >= 0x8000)
-	{
-		address &= 0x7fffff;
-		return address < 0x400000 ? m_rom[address] : rom_window_r(address - 0x400000);
-	}
-
-	return m_soc->read_low_bus_bypass(address);
+	address &= 0x7fffff;
+	return address < 0x400000 ? m_rom[address] : rom_window_r(address - 0x400000);
 }
 
 u8 superxavix_udance_state::pio0_input_r(offs_t offset, u8 mem_mask)
@@ -1874,9 +1849,9 @@ void superxavix_i2c_state::superxavix_mrangbat(machine_config &config)
 
 	I2C_24C02(config, "i2cmem"); // 24C02?
 
-	m_super_soc->pio().input_callback<0>().set_ioport("PIO0");
-	m_super_soc->pio().input_callback<1>().set_ioport("PIO1");
-	m_super_soc->pio().input_callback<2>().set_ioport("PIO2");
+	m_super_soc->pio_input_callback<0>().set_ioport("PIO0");
+	m_super_soc->pio_input_callback<1>().set_ioport("PIO1");
+	m_super_soc->pio_input_callback<2>().set_ioport("PIO2");
 }
 
 
@@ -1906,15 +1881,15 @@ void superxavix_ndpbj_state::superxavix_ndpbj(machine_config &config)
 	XAVIXPORT_IO(config, m_panel_io, 0);
 	m_panel_io->panel_callback().set_ioport("PANEL");
 	m_pio_connected_inputs[2] |= 0x20;
-	m_super_soc->pio().input_callback<2>().set(*this, FUNC(superxavix_ndpbj_state::pio2_input_r));
-	m_super_soc->pio().output_callback<2>().append(m_panel_io, FUNC(xavixport_io_device::pio_w));
+	m_super_soc->pio_input_callback<2>().set(*this, FUNC(superxavix_ndpbj_state::pio2_input_r));
+	m_super_soc->pio_output_callback<2>().append(m_panel_io, FUNC(xavixport_io_device::pio_w));
 
 	XAVIX_DIGITAL_IMAGE_SENSOR(config, m_camera);
 	m_pio_connected_inputs[0] |= 0xff;
-	m_super_soc->pio().set_legacy_output_mask<0>(0);
-	m_super_soc->pio().input_callback<0>().set(m_camera, FUNC(xavix_digital_image_sensor_device::data_r));
-	m_super_soc->pio().output_callback<0>().set(m_camera, FUNC(xavix_digital_image_sensor_device::data_w));
-	m_super_soc->pio().output_callback<2>().append(m_camera, FUNC(xavix_digital_image_sensor_device::strobe_w));
+	m_super_soc->set_pio_legacy_output_mask<0>(0);
+	m_super_soc->pio_input_callback<0>().set(m_camera, FUNC(xavix_digital_image_sensor_device::data_r));
+	m_super_soc->pio_output_callback<0>().set(m_camera, FUNC(xavix_digital_image_sensor_device::data_w));
+	m_super_soc->pio_output_callback<2>().append(m_camera, FUNC(xavix_digital_image_sensor_device::strobe_w));
 }
 
 u8 superxavix_ndpbj_state::pio2_input_r(offs_t offset, u8 mem_mask)
@@ -1953,16 +1928,16 @@ void superxavix_ndpmj_state::superxavix_ndpmj(machine_config &config)
 {
 	superxavix_i2c_24c16(config);
 	m_pio_connected_inputs[1] |= 0x80;
-	m_super_soc->pio().set_legacy_output_mask<1>(0x3f);
+	m_super_soc->set_pio_legacy_output_mask<1>(0x3f);
 
 	S35390A(config, m_rtc, 32.768_kHz_XTAL); // U6
 
-	m_super_soc->pio().input_callback<0>().set(*this, FUNC(superxavix_ndpmj_state::pio_input_r<0>));
-	m_super_soc->pio().output_callback<0>().set(*this, FUNC(superxavix_ndpmj_state::pio_output_w<0>));
-	m_super_soc->pio().input_callback<1>().set(*this, FUNC(superxavix_ndpmj_state::pio1_rtc_input_r));
-	m_super_soc->pio().output_callback<1>().set(*this, FUNC(superxavix_ndpmj_state::pio1_rtc_output_w));
-	m_super_soc->pio().input_callback<2>().set(*this, FUNC(superxavix_ndpmj_state::pio_input_r<2>));
-	m_super_soc->pio().output_callback<2>().set(*this, FUNC(superxavix_ndpmj_state::pio_output_w<2>));
+	m_super_soc->pio_input_callback<0>().set(*this, FUNC(superxavix_ndpmj_state::pio_input_r<0>));
+	m_super_soc->pio_output_callback<0>().set(*this, FUNC(superxavix_ndpmj_state::pio_output_w<0>));
+	m_super_soc->pio_input_callback<1>().set(*this, FUNC(superxavix_ndpmj_state::pio1_rtc_input_r));
+	m_super_soc->pio_output_callback<1>().set(*this, FUNC(superxavix_ndpmj_state::pio1_rtc_output_w));
+	m_super_soc->pio_input_callback<2>().set(*this, FUNC(superxavix_ndpmj_state::pio_input_r<2>));
+	m_super_soc->pio_output_callback<2>().set(*this, FUNC(superxavix_ndpmj_state::pio_output_w<2>));
 }
 
 u8 superxavix_ndpmj_state::pio1_rtc_input_r(offs_t offset, u8 mem_mask)
@@ -2104,7 +2079,7 @@ void superxavix_epo_kabj_state::superxavix_epo_kabj(machine_config &config)
 	m_legacy_connected_inputs[1] = 0xf7;
 
 	XAVIX_EPO_KABJ_CARD_READER(config, m_card_reader);
-	m_card_reader->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<3>));
+	m_card_reader->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<3>));
 }
 
 u16 superxavix_epo_kabj_state::keyboard_levels_r()
@@ -2120,8 +2095,8 @@ u16 superxavix_epo_kabj_state::keyboard_levels_r()
 		}
 	}
 
-	u16 levels = m_soc->io().data_latch<0>() & m_soc->io().direction<0>();
-	u8 const io1_drive = m_soc->io().data_latch<1>() & m_soc->io().direction<1>();
+	u16 levels = m_soc->io_data_latch<0>() & m_soc->io_direction<0>();
+	u8 const io1_drive = m_soc->io_data_latch<1>() & m_soc->io_direction<1>();
 	levels |= u16(io1_drive & 0x07) << 8;
 	levels |= u16(BIT(io1_drive, 4)) << 11;
 	return propagate_passive_levels<u16>(levels, contacts);
@@ -2197,15 +2172,15 @@ void superxavix_doradraw_state::superxavix_doradraw(machine_config &config)
 	superxavix(config);
 	configure_mapped_memory();
 	// The optical pen uses writable signed counters, with vertical polarity opposite MAME's mouse Y.
-	m_soc->anport().input_callback<2>().set_ioport("MOUSE1X");
-	m_soc->anport().input_callback<3>().set_ioport("MOUSE1Y");
-	m_soc->anport().set_counter_mode(2);
-	m_soc->anport().set_counter_mode(3, true);
+	m_soc->anport_input_callback<2>().set_ioport("MOUSE1X");
+	m_soc->anport_input_callback<3>().set_ioport("MOUSE1Y");
+	m_soc->set_anport_counter_mode(2);
+	m_soc->set_anport_counter_mode(3, true);
 	m_soc->set_data_address_mask(0xffffff);
 	// U7 is a 2 MiB, 16-bit flash using AMD/Fujitsu commands and the
 	// MBM29DL161TE sector layout. TODO: Verify the exact part from hardware.
 	FUJITSU_29DL161TE_16BIT(config, m_data_flash);
-	m_super_soc->plotter().set_flush_callback(FUNC(superxavix_doradraw_state::flush_plotter_write));
+	m_super_soc->set_plotter_flush_callback(FUNC(superxavix_doradraw_state::flush_plotter_write));
 }
 
 void superxavix_doradraw_state::machine_start()
@@ -2234,13 +2209,13 @@ u8 superxavix_doradraw_state::read_plotter_byte(u32 address)
 	return superxavix_state::read_plotter_byte(address);
 }
 
-u8 superxavix_doradraw_state::read_banked_data_bypass(u32 address)
+u8 superxavix_doradraw_state::external_data_r(offs_t address)
 {
 	// U7 and drawing RAM remain on the external bus for full-address fetches.
 	if ((address - DATA_FLASH_BASE) < 0x300000)
-		return m_soc->cpu().space(xavix_device::AS_EXTERNAL_BUS).read_byte(address);
+		return m_soc->external_r(address);
 
-	return superxavix_state::read_banked_data_bypass(address);
+	return superxavix_state::external_data_r(address);
 }
 
 u8 superxavix_doradraw_state::read_graphics_byte(u32 address)
@@ -2396,8 +2371,8 @@ void superxavix_tvpc_state::configure_tvpc_controller(machine_config &config)
 {
 	// PIO mouse-button inputs also serve cartridge reads through the legacy GPIO aliases.
 	m_pio_connected_inputs[0] |= 0x90;
-	m_super_soc->pio().set_legacy_output_mask<0>(0);
-	m_super_soc->pio().set_legacy_output_mask<1>(0);
+	m_super_soc->set_pio_legacy_output_mask<0>(0);
+	m_super_soc->set_pio_legacy_output_mask<1>(0);
 	XAVIX_TVPC_CONTROLLER(config, m_tvpc);
 	m_tvpc->key_callback<0>().set_ioport("KEY0");
 	m_tvpc->key_callback<1>().set_ioport("KEY1");
@@ -2410,7 +2385,7 @@ void superxavix_tvpc_state::configure_tvpc_controller(machine_config &config)
 	m_tvpc->right_shift_callback().set_ioport("RIGHT_SHIFT").bit(0);
 	m_tvpc->player_callback<0>().set_ioport("P1");
 	m_tvpc->player_callback<1>().set_ioport("P2");
-	m_tvpc->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<2>));
+	m_tvpc->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<2>));
 	m_screen->screen_vblank().append(m_tvpc, FUNC(xavix_tvpc_controller_device::vblank_w));
 }
 
@@ -2491,25 +2466,25 @@ void superxavix_suprtvpc_state::superxavix_suprtvpc(machine_config &config)
 	TVPC_MOUSE_PORT(config, m_mouse[1]).set_mouse_index(1);
 	configure_tvpc_controller(config);
 
-	m_super_soc->pio().input_callback<0>().set(*this, FUNC(superxavix_suprtvpc_state::tvpc_pio0_input_r));
-	m_super_soc->pio().output_callback<0>().set(*this, FUNC(superxavix_suprtvpc_state::pio0_output_w));
-	m_super_soc->pio().input_callback<1>().set(*this, FUNC(superxavix_suprtvpc_state::pio1_input_r));
-	m_super_soc->pio().output_callback<1>().set(*this, FUNC(superxavix_suprtvpc_state::pio1_output_w));
-	m_super_soc->pio().input_callback<2>().set(*this, FUNC(superxavix_suprtvpc_state::pio2_input_r));
-	m_super_soc->pio().output_callback<2>().set(*this, FUNC(superxavix_suprtvpc_state::pio2_output_w));
+	m_super_soc->pio_input_callback<0>().set(*this, FUNC(superxavix_suprtvpc_state::tvpc_pio0_input_r));
+	m_super_soc->pio_output_callback<0>().set(*this, FUNC(superxavix_suprtvpc_state::pio0_output_w));
+	m_super_soc->pio_input_callback<1>().set(*this, FUNC(superxavix_suprtvpc_state::pio1_input_r));
+	m_super_soc->pio_output_callback<1>().set(*this, FUNC(superxavix_suprtvpc_state::pio1_output_w));
+	m_super_soc->pio_input_callback<2>().set(*this, FUNC(superxavix_suprtvpc_state::pio2_input_r));
+	m_super_soc->pio_output_callback<2>().set(*this, FUNC(superxavix_suprtvpc_state::pio2_output_w));
 
 	// Both one-button mice use writable relative counters; vertical polarity is opposite MAME's mouse Y.
-	m_soc->anport().input_callback<0>().set(m_mouse[0], FUNC(tvpc_mouse_port_device::x_r));
-	m_soc->anport().input_callback<1>().set(m_mouse[0], FUNC(tvpc_mouse_port_device::y_r));
-	m_soc->anport().input_callback<2>().set(m_mouse[1], FUNC(tvpc_mouse_port_device::x_r));
-	m_soc->anport().input_callback<3>().set(m_mouse[1], FUNC(tvpc_mouse_port_device::y_r));
-	m_soc->anport().set_counter_mode(0);
-	m_soc->anport().set_counter_mode(1, true);
-	m_soc->anport().set_counter_mode(2);
-	m_soc->anport().set_counter_mode(3, true);
+	m_soc->anport_input_callback<0>().set(m_mouse[0], FUNC(tvpc_mouse_port_device::x_r));
+	m_soc->anport_input_callback<1>().set(m_mouse[0], FUNC(tvpc_mouse_port_device::y_r));
+	m_soc->anport_input_callback<2>().set(m_mouse[1], FUNC(tvpc_mouse_port_device::x_r));
+	m_soc->anport_input_callback<3>().set(m_mouse[1], FUNC(tvpc_mouse_port_device::y_r));
+	m_soc->set_anport_counter_mode(0);
+	m_soc->set_anport_counter_mode(1, true);
+	m_soc->set_anport_counter_mode(2);
+	m_soc->set_anport_counter_mode(3, true);
 
 	SUPRTVPC_CART_SLOT(config, m_cart, suprtvpc_cart_slot_device::cart_devices, "rom");
-	m_cart->set_ir_rx_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	m_cart->set_ir_rx_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("suprtvpc_cart");
 }
@@ -2542,14 +2517,10 @@ u8 superxavix_suprtvpc_state::cartridge_rom_r(offs_t offset)
 	return size ? m_cart->rom_base()[offset & (size - 1)] : m_rom[offset];
 }
 
-u8 superxavix_suprtvpc_state::read_banked_data_bypass(u32 address)
+u8 superxavix_suprtvpc_state::external_data_r(offs_t address)
 {
-	if ((address & 0x800000) || ((address & 0xffff) >= 0x8000))
-	{
-		offs_t const offset = address & (m_rom.bytes() - 1);
-		return offset < 0x400000 ? cartridge_rom_r(offset) : m_rom[offset];
-	}
-	return m_soc->read_low_bus_bypass(address);
+	offs_t const offset = address & (m_rom.bytes() - 1);
+	return offset < 0x400000 ? cartridge_rom_r(offset) : m_rom[offset];
 }
 
 u8 superxavix_suprtvpc_state::mouse_buttons_r()
@@ -2661,7 +2632,7 @@ INPUT_PORTS_END
 void superxavix_epo_ntpj_state::configure_board(machine_config &config)
 {
 	superxavix_tvpc_state::configure_board(config);
-	m_soc->io().output_callback<1>().append(*this, FUNC(superxavix_epo_ntpj_state::io1_power_off_w));
+	m_soc->io_output_callback<1>().append(*this, FUNC(superxavix_epo_ntpj_state::io1_power_off_w));
 }
 
 void superxavix_epo_ntpj_state::superxavix_epo_ntpj(machine_config &config)
@@ -2676,24 +2647,24 @@ void superxavix_epo_ntpj_state::superxavix_epo_ntpj(machine_config &config)
 	m_piano->key_callback<0>().set_ioport("PIANO0");
 	m_piano->key_callback<1>().set_ioport("PIANO1");
 	m_piano->key_callback<2>().set_ioport("PIANO2");
-	m_piano->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<1>));
+	m_piano->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<1>));
 
 	TVPC_MOUSE_PORT(config, m_mouse).set_default_option("mic_mouse");
-	m_soc->adc().set_audio_channel(0);
-	m_mouse->add_route(0, m_soc->adc(), 1.0);
+	m_soc->set_adc_audio_channel(0);
+	m_soc->add_adc_route(*m_mouse, 0, 1.0);
 
 	// The Piano PC's only mouse is wired to the second writable counter pair.
-	m_soc->anport().input_callback<2>().set(m_mouse, FUNC(tvpc_mouse_port_device::x_r));
-	m_soc->anport().input_callback<3>().set(m_mouse, FUNC(tvpc_mouse_port_device::y_r));
-	m_soc->anport().set_counter_mode(2);
-	m_soc->anport().set_counter_mode(3, true);
+	m_soc->anport_input_callback<2>().set(m_mouse, FUNC(tvpc_mouse_port_device::x_r));
+	m_soc->anport_input_callback<3>().set(m_mouse, FUNC(tvpc_mouse_port_device::y_r));
+	m_soc->set_anport_counter_mode(2);
+	m_soc->set_anport_counter_mode(3, true);
 
-	m_super_soc->pio().input_callback<0>().set(*this, FUNC(superxavix_epo_ntpj_state::tvpc_pio0_input_r));
-	m_super_soc->pio().input_callback<1>().set(*this, FUNC(superxavix_epo_ntpj_state::pio1_input_r));
-	m_super_soc->pio().input_callback<2>().set(*this, FUNC(superxavix_epo_ntpj_state::pio2_input_r));
-	m_super_soc->pio().output_callback<0>().set(*this, FUNC(superxavix_epo_ntpj_state::pio0_output_w));
-	m_super_soc->pio().output_callback<1>().set(*this, FUNC(superxavix_epo_ntpj_state::pio1_output_w));
-	m_super_soc->pio().output_callback<2>().set(*this, FUNC(superxavix_epo_ntpj_state::pio2_output_w));
+	m_super_soc->pio_input_callback<0>().set(*this, FUNC(superxavix_epo_ntpj_state::tvpc_pio0_input_r));
+	m_super_soc->pio_input_callback<1>().set(*this, FUNC(superxavix_epo_ntpj_state::pio1_input_r));
+	m_super_soc->pio_input_callback<2>().set(*this, FUNC(superxavix_epo_ntpj_state::pio2_input_r));
+	m_super_soc->pio_output_callback<0>().set(*this, FUNC(superxavix_epo_ntpj_state::pio0_output_w));
+	m_super_soc->pio_output_callback<1>().set(*this, FUNC(superxavix_epo_ntpj_state::pio1_output_w));
+	m_super_soc->pio_output_callback<2>().set(*this, FUNC(superxavix_epo_ntpj_state::pio2_output_w));
 
 	config.set_default_layout(layout_epo_ntpj);
 }

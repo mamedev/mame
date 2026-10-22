@@ -30,11 +30,6 @@ class xavix_soc_device : public device_t, public device_mixer_interface
 public:
 	xavix_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <typename T, typename U> void set_program_map(T &object, void (U::*map)(address_map &))
-	{
-		m_program_map_device = &object;
-		m_program_map = address_map_constructor(map, object.tag(), &downcast<U &>(object));
-	}
 	template <typename T, typename U> void set_external_map(T &object, void (U::*map)(address_map &))
 	{
 		m_external_map_device = &object;
@@ -49,9 +44,20 @@ public:
 	template <typename T> void set_gfx_region(T &&tag) { m_video.lookup()->set_gfx_region(std::forward<T>(tag)); }
 	void set_video_standard(xavix_video_device::video_standard standard) { m_video.lookup()->set_video_standard(standard); }
 	void set_data_address_mask(u32 mask) { m_maincpu.lookup()->set_data_address_mask(mask); }
+	template <typename... T> void set_external_code_read_callback(T &&... args) { m_external_code_read_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_external_data_read_callback(T &&... args) { m_external_data_read_cb.set(std::forward<T>(args)...); }
+	void use_mapped_code() { m_external_code_read_cb.set(*this, FUNC(xavix_soc_device::external_r)); }
 
-	auto sound_sample_read_callback() { return m_sound.lookup()->sample_read_callback(); }
-	auto dma_source_read_callback() { return m_dma.lookup()->source_read_callback(); }
+	template <unsigned Port> auto io_input_callback() { return m_io.lookup()->input_callback<Port>(); }
+	template <unsigned Port> auto io_output_callback() { return m_io.lookup()->output_callback<Port>(); }
+	template <unsigned Channel> auto adc_input_callback() { return m_adc.lookup()->input_callback<Channel>(); }
+	template <unsigned Port> auto anport_input_callback() { return m_anport.lookup()->input_callback<Port>(); }
+	void set_adc_audio_channel(u8 channel) { m_adc.lookup()->set_audio_channel(channel); }
+	void set_adc_audio_input(unsigned input, u8 channel) { m_adc.lookup()->set_audio_input(input, channel); }
+	void add_adc_route(device_sound_interface &source, u32 output, double gain, u32 input = 0) { source.add_route(output, *m_adc.lookup(), gain, input); }
+	void set_anport_counter_mode(unsigned port, bool reverse = false) { m_anport.lookup()->set_counter_mode(port, reverse); }
+	void set_anport_counter_saturation(unsigned port) { m_anport.lookup()->set_counter_saturation(port); }
+
 	auto lightgun_read_callback() { return m_lightgun_read_cb.bind(); }
 	auto power_read_callback() { return m_power_read_cb.bind(); }
 	auto power_off_callback() { return m_power_off_cb.bind(); }
@@ -59,28 +65,30 @@ public:
 	template <typename... T> void set_video_read_callback(T &&... args) { m_video.lookup()->set_video_read_callback(std::forward<T>(args)...); }
 	template <typename... T> void set_vblank_callback(T &&... args) { m_vblank_cb.set(std::forward<T>(args)...); }
 
-	xavix_device &cpu() { return *m_maincpu; }
-	xavix_io_device &io() { return m_io ? *m_io : *m_io.lookup(); }
-	xavix_adc_device &adc() { return m_adc ? *m_adc : *m_adc.lookup(); }
-	xavix_anport_device &anport() { return m_anport ? *m_anport : *m_anport.lookup(); }
-	u8 *mainram() { return &m_mainram[0]; }
+	template <unsigned Event> void trigger_io_event() { m_io->trigger_event<Event>(); }
+	template <unsigned Port> u8 io_direction() const { return m_io->direction<Port>(); }
+	template <unsigned Port> u8 io_data_latch() { return m_io->data_latch<Port>(); }
 	std::span<u8> backup_ram() { return { m_mainram.end() - BACKUP_RAM_SIZE, BACKUP_RAM_SIZE }; }
-	u8 read_low_bus_bypass(u32 address);
+	u8 read_banked_data_bypass(u32 address);
+	u8 read_program_byte(offs_t address) { return m_program.read_byte(address); }
+	u8 external_r(offs_t address) { return m_external.read_byte(address); }
+	void external_w(offs_t address, u8 data) { m_external.write_byte(address, data); }
 	void reset_w(int state);
 	void cpu_reset_w(int state) { m_maincpu->set_input_line(INPUT_LINE_RESET, state); }
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	rectangle picture_area() const { return m_video->picture_area(); }
 
-	void xavix_lowbus_map(address_map &map) ATTR_COLD;
-
 protected:
-	enum class generation { XAVIX, XAVIX2000, SUPERXAVIX };
-	xavix_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, generation model);
+	xavix_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
+	void xavix_lowbus_map(address_map &map) ATTR_COLD;
+	void configure_common(machine_config &config) ATTR_COLD;
+	virtual void configure_io(machine_config &config) ATTR_COLD;
 
 	required_device<xavix_device> m_maincpu;
 	required_device<xavix_intc_device> m_intc;
@@ -99,6 +107,11 @@ private:
 	void configure_screen() ATTR_COLD;
 	void xavix_map(address_map &map) ATTR_COLD;
 	void xavix_extbus_map(address_map &map) ATTR_COLD;
+	// High banks are external throughout the 64 KiB window; low banks split at 0x8000.
+	static bool external_access(u32 address) { return BIT(address, 23) || BIT(address, 15); }
+	u8 code_r(offs_t address);
+	void program_ram_w(offs_t offset, u8 data);
+	u8 read_low_bus_bypass(u32 address);
 	TIMER_CALLBACK_MEMBER(reset_changed);
 	INTERRUPT_GEN_MEMBER(vblank);
 	u8 lightgun_r(offs_t offset);
@@ -136,12 +149,14 @@ private:
 	devcb_write_line m_power_off_cb;
 	devcb_write8 m_external_bus_ctrl_cb;
 	device_delegate<void ()> m_vblank_cb;
+	device_delegate<u8 (offs_t)> m_external_code_read_cb;
+	device_delegate<u8 (offs_t)> m_external_data_read_cb;
+	memory_access<15, 0, 0, ENDIANNESS_LITTLE>::specific m_lowbus;
+	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::specific m_external;
 	std::string m_screen_tag;
-	device_t *m_program_map_device;
 	device_t *m_external_map_device;
-	address_map_constructor m_program_map;
 	address_map_constructor m_external_map;
-	generation const m_generation;
 
 	u8 m_rom_access_ctrl;
 	u8 m_ram_access_ctrl;
@@ -166,22 +181,30 @@ public:
 	xavix2000_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	xavix2000_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, generation model);
+	xavix2000_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 class superxavix_soc_device : public xavix2000_soc_device
 {
 public:
 	superxavix_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	superxavix_pio_device &pio() { return m_pio ? *m_pio : *m_pio.lookup(); }
-	superxavix_plotter_device &plotter() { return m_plotter ? *m_plotter : *m_plotter.lookup(); }
+	template <unsigned Port> auto pio_input_callback() { return m_pio.lookup()->input_callback<Port>(); }
+	template <unsigned Port> auto pio_input_mask_callback() { return m_pio.lookup()->input_mask_callback<Port>(); }
+	template <unsigned Port> auto pio_output_callback() { return m_pio.lookup()->output_callback<Port>(); }
+	auto pio_legacy_input_mask_callback() { return m_pio.lookup()->legacy_input_mask_callback(); }
+	template <unsigned Port> void set_pio_legacy_output_mask(u8 mask) { m_pio.lookup()->set_legacy_output_mask<Port>(mask); }
+	auto plotter_read_callback() { return m_plotter.lookup()->memory_read_callback(); }
+	auto plotter_write_callback() { return m_plotter.lookup()->memory_write_callback(); }
+	template <typename... T> void set_plotter_flush_callback(T &&... args) { m_plotter.lookup()->set_flush_callback(std::forward<T>(args)...); }
 	template <typename... T> void set_graphics_read_callback(T &&... args)
 	{ downcast<superxavix_video_device &>(*m_video.lookup()).set_graphics_read_callback(std::forward<T>(args)...); }
 	template <typename... T> void set_bitmap_read_callback(T &&... args)
 	{ downcast<superxavix_video_device &>(*m_video.lookup()).set_bitmap_read_callback(std::forward<T>(args)...); }
 	void decode_cartridge_graphics(memory_region &region)
 	{ downcast<superxavix_video_device &>(*m_video).decode_cartridge_graphics(region); }
-	void superxavix_lowbus_map(address_map &map) ATTR_COLD;
 
 protected:
 	// device_t implementation
@@ -189,7 +212,11 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	virtual void configure_io(machine_config &config) override ATTR_COLD;
+
 private:
+	void superxavix_lowbus_map(address_map &map) ATTR_COLD;
+	u8 version_r();
 	u8 cpu_memory_control_r(offs_t offset);
 	u8 instruction_burst_ctrl_r();
 	void instruction_burst_ctrl_w(u8 data);

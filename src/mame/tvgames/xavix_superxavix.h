@@ -67,10 +67,6 @@ protected:
 	std::array<u8, 2> m_legacy_connected_inputs{};
 
 private:
-	void mapped_program_map(address_map &map) ATTR_COLD;
-	u8 mapped_code_r(offs_t offset);
-	u8 read_program_byte(u32 address);
-
 	static u8 connected_inputs(ioport_port &port);
 	template <unsigned Port> u8 pio_input_mask_r();
 	u8 legacy_input_mask_r(offs_t port);
@@ -500,7 +496,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void xavix_extbus_map(address_map &map) override ATTR_COLD;
-	virtual u8 read_banked_data_bypass(u32 address) override;
+	virtual u8 external_data_r(offs_t address) override;
 
 private:
 	u8 rom_window_r(offs_t offset);
@@ -600,7 +596,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	virtual u8 mouse_buttons_r() override;
-	virtual u8 read_banked_data_bypass(u32 address) override;
+	virtual u8 external_data_r(offs_t address) override;
 	virtual void xavix_extbus_map(address_map &map) override ATTR_COLD;
 
 private:
@@ -697,7 +693,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void xavix_extbus_map(address_map &map) override ATTR_COLD;
-	virtual u8 read_banked_data_bypass(u32 address) override;
+	virtual u8 external_data_r(offs_t address) override;
 	virtual u8 read_graphics_byte(u32 address) override;
 	virtual u8 read_plotter_byte(u32 address) override;
 	virtual void write_plotter_byte(u32 address, u8 data) override;

@@ -37,11 +37,11 @@ DEFINE_DEVICE_TYPE(XAVIX2000_SOC, xavix2000_soc_device, "xavix2000_soc", "XaviX2
 DEFINE_DEVICE_TYPE(SUPERXAVIX_SOC, superxavix_soc_device, "superxavix_soc", "SuperXaviX SoC")
 
 xavix_soc_device::xavix_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_soc_device(mconfig, XAVIX_SOC, tag, owner, clock, generation::XAVIX)
+	: xavix_soc_device(mconfig, XAVIX_SOC, tag, owner, clock)
 {
 }
 
-xavix_soc_device::xavix_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, generation model)
+xavix_soc_device::xavix_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
@@ -61,24 +61,24 @@ xavix_soc_device::xavix_soc_device(const machine_config &mconfig, device_type ty
 	, m_power_off_cb(*this)
 	, m_external_bus_ctrl_cb(*this)
 	, m_vblank_cb(*this)
-	, m_program_map_device(nullptr)
+	, m_external_code_read_cb(*this)
+	, m_external_data_read_cb(*this)
 	, m_external_map_device(nullptr)
-	, m_generation(model)
 {
 }
 
 xavix2000_soc_device::xavix2000_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix2000_soc_device(mconfig, XAVIX2000_SOC, tag, owner, clock, generation::XAVIX2000)
+	: xavix2000_soc_device(mconfig, XAVIX2000_SOC, tag, owner, clock)
 {
 }
 
-xavix2000_soc_device::xavix2000_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, generation model)
-	: xavix_soc_device(mconfig, type, tag, owner, clock, model)
+xavix2000_soc_device::xavix2000_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: xavix_soc_device(mconfig, type, tag, owner, clock)
 {
 }
 
 superxavix_soc_device::superxavix_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix2000_soc_device(mconfig, SUPERXAVIX_SOC, tag, owner, clock, generation::SUPERXAVIX)
+	: xavix2000_soc_device(mconfig, SUPERXAVIX_SOC, tag, owner, clock)
 	, m_pio(*this, "pio")
 	, m_plotter(*this, "plotter")
 {
@@ -86,8 +86,9 @@ superxavix_soc_device::superxavix_soc_device(const machine_config &mconfig, cons
 
 void xavix_soc_device::xavix_map(address_map &map)
 {
-	if (!m_program_map.isnull())
-		map(0x000000, 0xffffff).m(m_program_map_device, m_program_map);
+	// Separate instruction/data views retain disassembly when executing from low-bus RAM.
+	map(0x000000, 0xffffff).r(FUNC(xavix_soc_device::code_r));
+	map(0x000000, 0x003fff).w(FUNC(xavix_soc_device::program_ram_w));
 }
 
 void xavix_soc_device::xavix_extbus_map(address_map &map)
@@ -178,50 +179,59 @@ void superxavix_soc_device::superxavix_lowbus_map(address_map &map)
 
 	// Reserved byte following the 16-bit arithmetic result.
 	map(0x7ff7, 0x7ff7).lr8(NAME([] () -> u8 { return 0; }));
+	map(0x7ffd, 0x7ffd).r(FUNC(superxavix_soc_device::version_r));
 }
 
 void xavix_soc_device::device_add_mconfig(machine_config &config)
 {
-	switch (m_generation)
-	{
-	case generation::XAVIX:
-		XAVIX(config, m_maincpu, DERIVED_CLOCK(1, 2));
-		XAVIX_VIDEO(config, m_video, DERIVED_CLOCK(1, 1));
-		break;
-	case generation::XAVIX2000:
-		XAVIX2000(config, m_maincpu, DERIVED_CLOCK(1, 2));
-		XAVIX2000_VIDEO(config, m_video, DERIVED_CLOCK(1, 1));
-		break;
-	case generation::SUPERXAVIX:
-		SUPERXAVIX(config, m_maincpu, DERIVED_CLOCK(1, 1));
-		SUPERXAVIX_VIDEO(config, m_video, DERIVED_CLOCK(1, 1));
-		break;
-	}
+	XAVIX(config, m_maincpu, DERIVED_CLOCK(1, 2));
+	XAVIX_VIDEO(config, m_video, DERIVED_CLOCK(1, 1));
+	m_maincpu->set_addrmap(xavix_device::AS_LOW_BUS, *this, &xavix_soc_device::xavix_lowbus_map);
+	configure_common(config);
+	// Earlier firmware retains Start readback and acknowledges completion on Start.
+	m_adc->set_legacy_control(true);
+}
 
+void xavix2000_soc_device::device_add_mconfig(machine_config &config)
+{
+	XAVIX2000(config, m_maincpu, DERIVED_CLOCK(1, 2));
+	XAVIX2000_VIDEO(config, m_video, DERIVED_CLOCK(1, 1));
+	m_maincpu->set_addrmap(xavix_device::AS_LOW_BUS, *this, &xavix2000_soc_device::xavix_lowbus_map);
+	configure_common(config);
+}
+
+void superxavix_soc_device::device_add_mconfig(machine_config &config)
+{
+	superxavix_device &cpu(SUPERXAVIX(config, m_maincpu, DERIVED_CLOCK(1, 1)));
+	SUPERXAVIX_VIDEO(config, m_video, DERIVED_CLOCK(1, 1));
+	cpu.set_addrmap(xavix_device::AS_LOW_BUS, *this, &superxavix_soc_device::superxavix_lowbus_map);
+	configure_common(config);
+
+	SUPERXAVIX_PIO(config, m_pio);
+	SUPERXAVIX_PLOTTER(config, m_plotter);
+	m_pio->legacy_input_callback().set(m_io, FUNC(xavix_io_device::external_input_r));
+	m_pio->legacy_output_callback().set(m_io, FUNC(xavix_io_device::external_output_w));
+	cpu.memory_control_callback().set(FUNC(superxavix_soc_device::cpu_memory_control_r));
+}
+
+void xavix_soc_device::configure_common(machine_config &config)
+{
 	m_maincpu->set_addrmap(AS_PROGRAM, *this, &xavix_soc_device::xavix_map);
 	m_maincpu->set_addrmap(xavix_device::AS_EXTERNAL_BUS, *this, &xavix_soc_device::xavix_extbus_map);
-	if (m_generation == generation::SUPERXAVIX)
-		m_maincpu->set_addrmap(xavix_device::AS_LOW_BUS, downcast<superxavix_soc_device &>(*this), &superxavix_soc_device::superxavix_lowbus_map);
-	else
-		m_maincpu->set_addrmap(xavix_device::AS_LOW_BUS, *this, &xavix_soc_device::xavix_lowbus_map);
 
 	XAVIX_INTC(config, m_intc);
 	m_intc->irq_callback().set_inputline(m_maincpu, xavix_device::IRQ_LINE);
 	m_maincpu->set_interrupt_vector_callback(m_intc, FUNC(xavix_intc_device::interrupt_vector_r));
 
 	m_video->irq_callback().set(m_intc, FUNC(xavix_intc_device::irq_w<xavix_intc_device::IRQ_VIDEO>));
+	m_video->set_video_read_callback(*this, FUNC(xavix_soc_device::read_banked_data_bypass));
 	m_video->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_video->sprite_dma_source_callback().set([this](offs_t offset) { return m_maincpu->space(xavix_device::AS_LOW_BUS).read_byte(offset); });
 
-	if (m_generation == generation::SUPERXAVIX)
-		SUPERXAVIX_IO(config, m_io);
-	else
-		XAVIX_IO(config, m_io);
+	configure_io(config);
 	m_io->irq_callback().set(m_intc, FUNC(xavix_intc_device::irq_w<xavix_intc_device::IRQ_IO>));
 
 	XAVIX_ADC(config, m_adc, DERIVED_CLOCK(1, 2));
-	// Earlier firmware retains Start readback and acknowledges completion on Start.
-	m_adc->set_legacy_control(m_generation == generation::XAVIX);
 	m_adc->irq_callback().set(m_intc, FUNC(xavix_intc_device::irq_w<xavix_intc_device::IRQ_ADC>));
 
 	XAVIX_ANPORT(config, m_anport);
@@ -232,10 +242,12 @@ void xavix_soc_device::device_add_mconfig(machine_config &config)
 	m_timer->irq_callback().set(m_intc, FUNC(xavix_intc_device::irq_w<xavix_intc_device::IRQ_TIMER>));
 
 	XAVIX_DMA(config, m_dma, DERIVED_CLOCK(1, 2));
+	m_dma->source_read_callback().set(*this, FUNC(xavix_soc_device::read_banked_data_bypass));
 	m_dma->destination_write_callback().set([this](offs_t address, u8 data) { m_maincpu->write_banked_data(address, data); });
 	m_dma->irq_callback().set(m_intc, FUNC(xavix_intc_device::irq_w<xavix_intc_device::IRQ_DMA>));
 
 	XAVIX_SOUND(config, m_sound, DERIVED_CLOCK(1, 2));
+	m_sound->sample_read_callback().set(*this, FUNC(xavix_soc_device::read_banked_data_bypass));
 	m_sound->set_addrmap(AS_PROGRAM, address_map_constructor(
 		[this](address_map &map) { map(0x0000, 0x3fff).ram().share(m_mainram); },
 		"sound_descriptors"));
@@ -245,18 +257,14 @@ void xavix_soc_device::device_add_mconfig(machine_config &config)
 	m_sound->add_route(1, *this, 1.0, 1);
 }
 
-void superxavix_soc_device::device_add_mconfig(machine_config &config)
+void xavix_soc_device::configure_io(machine_config &config)
 {
-	xavix2000_soc_device::device_add_mconfig(config);
+	XAVIX_IO(config, m_io);
+}
 
-	SUPERXAVIX_PIO(config, m_pio);
-	SUPERXAVIX_PLOTTER(config, m_plotter);
-
-	downcast<superxavix_io_device &>(*m_io).set_pio(m_pio);
-	m_pio->legacy_input_callback().set(m_io, FUNC(xavix_io_device::external_input_r));
-	m_pio->legacy_output_callback().set(m_io, FUNC(xavix_io_device::external_output_w));
-
-	downcast<superxavix_device &>(*m_maincpu).memory_control_callback().set(FUNC(superxavix_soc_device::cpu_memory_control_r));
+void superxavix_soc_device::configure_io(machine_config &config)
+{
+	SUPERXAVIX_IO(config, m_io).set_pio(m_pio);
 }
 
 void xavix_soc_device::configure_screen()
@@ -269,6 +277,12 @@ void xavix_soc_device::configure_screen()
 
 void xavix_soc_device::device_start()
 {
+	m_maincpu->space(xavix_device::AS_LOW_BUS).specific(m_lowbus);
+	m_maincpu->space(AS_PROGRAM).specific(m_program);
+	m_maincpu->space(xavix_device::AS_EXTERNAL_BUS).specific(m_external);
+	m_external_code_read_cb.resolve_safe(0xff);
+	m_external_data_read_cb.resolve_safe(0xff);
+
 	// Zero-filled RAM gives rad_crdn/rad_crdnp a false Continue option.
 	// A uniform 0xff fill gives tak_hamr a fixed seed for its title background.
 	std::ranges::generate(m_mainram, [rng = std::mt19937(std::random_device{}())] () mutable { return u8(rng()); });
@@ -347,6 +361,23 @@ TIMER_CALLBACK_MEMBER(xavix_soc_device::reset_changed)
 	reset();
 
 	m_maincpu->set_input_line(INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
+}
+
+u8 xavix_soc_device::code_r(offs_t address)
+{
+	return external_access(address) ? m_external_code_read_cb(address & 0x7fffff) : m_lowbus.read_byte(address & 0x7fff);
+}
+
+void xavix_soc_device::program_ram_w(offs_t offset, u8 data)
+{
+	// Program-space writes share RAM without generating a low-bus transaction.
+	m_mainram[offset] = data;
+}
+
+u8 xavix_soc_device::read_banked_data_bypass(u32 address)
+{
+	// Code sees the 23-bit external address; data retains board-specific bank qualifiers.
+	return external_access(address) ? m_external_data_read_cb(address) : read_low_bus_bypass(address);
 }
 
 u8 xavix_soc_device::read_low_bus_bypass(u32 address)
@@ -519,8 +550,13 @@ u8 xavix_soc_device::version_r()
 	// Software uses this to select generation-dependent peripheral paths.
 	// Currently returns 0x10 for XaviX/XaviX2000 and 0x20 for SuperXaviX.
 	// maxheart also checks 0x21/0x22; anpanmdx accepts the 0x20-0x23 range.
-	// Hi-kara checks 0x7f. The corresponding physical chip revisions are unconfirmed.
-	return m_generation == generation::SUPERXAVIX ? 0x20 : 0x10;
+	// hikara checks 0x7f. The corresponding physical chip revisions are unconfirmed.
+	return 0x10;
+}
+
+u8 superxavix_soc_device::version_r()
+{
+	return 0x20;
 }
 
 //-------------------------------------------------

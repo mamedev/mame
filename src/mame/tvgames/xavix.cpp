@@ -101,16 +101,6 @@
 //  Shared Hardware
 //**************************************************************************
 
-// Instruction fetches use a code-bank view separate from data accesses.  Keeping this in program
-// space also preserves disassembly when executing from low-bus RAM.
-void xavix_state::xavix_map(address_map &map)
-{
-	map(0x000000, 0x7fffff).r(FUNC(xavix_state::code_low_bank_r));
-	map(0x800000, 0xffffff).r(FUNC(xavix_state::code_high_bank_r));
-
-	map(0x000000, 0x003fff).w(FUNC(xavix_state::debug_mem_w));
-}
-
 // Mapped external accesses arrive here after the CPU has selected the appropriate view.
 void xavix_state::xavix_extbus_map(address_map &map)
 {
@@ -134,33 +124,31 @@ void xavix_state::xavix_4mb_extbus_map(address_map &map)
 
 void xavix_state::configure_board(machine_config &config)
 {
-	m_soc->set_program_map(*this, &xavix_state::xavix_map);
+	m_soc->set_external_code_read_callback(*this, FUNC(xavix_state::external_code_r));
+	m_soc->set_external_data_read_callback(*this, FUNC(xavix_state::external_data_r));
 	m_soc->set_external_map(*this, &xavix_state::xavix_extbus_map);
 	m_soc->set_screen(m_screen);
 	m_soc->set_palette(m_palette);
 	m_soc->set_gfx_region(m_rom);
-	m_soc->set_video_read_callback(*this, FUNC(xavix_state::read_banked_data_bypass));
 	m_soc->set_vblank_callback(*this, FUNC(xavix_state::vblank_extra));
 	m_soc->lightgun_read_callback().set(*this, FUNC(xavix_state::lightgun_r));
 	m_soc->power_read_callback().set(*this, FUNC(xavix_state::power_status_r));
 	m_soc->power_off_callback().set(*this, FUNC(xavix_state::power_off_w));
 	m_soc->external_bus_ctrl_callback().set(*this, FUNC(xavix_state::external_bus_ctrl_changed));
 
-	m_soc->io().input_callback<0>().set(*this, FUNC(xavix_state::io0_input_cb));
-	m_soc->io().input_callback<1>().set(*this, FUNC(xavix_state::io1_input_cb));
-	m_soc->io().output_callback<0>().set(*this, FUNC(xavix_state::io0_output_cb));
-	m_soc->io().output_callback<1>().set(*this, FUNC(xavix_state::io1_output_cb));
+	m_soc->io_input_callback<0>().set(*this, FUNC(xavix_state::io0_input_cb));
+	m_soc->io_input_callback<1>().set(*this, FUNC(xavix_state::io1_input_cb));
+	m_soc->io_output_callback<0>().set(*this, FUNC(xavix_state::io0_output_cb));
+	m_soc->io_output_callback<1>().set(*this, FUNC(xavix_state::io1_output_cb));
 
-	m_soc->adc().input_callback<0>().set_ioport("AN0");
-	m_soc->adc().input_callback<1>().set_ioport("AN1");
-	m_soc->adc().input_callback<2>().set_ioport("AN2");
-	m_soc->adc().input_callback<3>().set_ioport("AN3");
-	m_soc->adc().input_callback<4>().set_ioport("AN4");
-	m_soc->adc().input_callback<5>().set_ioport("AN5");
-	m_soc->adc().input_callback<6>().set_ioport("AN6");
-	m_soc->adc().input_callback<7>().set_ioport("AN7");
-
-	m_soc->dma_source_read_callback().set(*this, FUNC(xavix_state::read_banked_data_bypass));
+	m_soc->adc_input_callback<0>().set_ioport("AN0");
+	m_soc->adc_input_callback<1>().set_ioport("AN1");
+	m_soc->adc_input_callback<2>().set_ioport("AN2");
+	m_soc->adc_input_callback<3>().set_ioport("AN3");
+	m_soc->adc_input_callback<4>().set_ioport("AN4");
+	m_soc->adc_input_callback<5>().set_ioport("AN5");
+	m_soc->adc_input_callback<6>().set_ioport("AN6");
+	m_soc->adc_input_callback<7>().set_ioport("AN7");
 
 	PALETTE(config, m_palette, palette_device::BLACK, 256);
 
@@ -175,7 +163,6 @@ void xavix_state::configure_board(machine_config &config)
 	m_screen->set_screen_update(FUNC(xavix_state::screen_update));
 	m_screen->screen_vblank().append(FUNC(xavix_state::screen_vblank));
 
-	m_soc->sound_sample_read_callback().set(*this, FUNC(xavix_state::read_banked_data_bypass));
 	m_soc->add_route(0, "speaker", 1.0, 0);
 	m_soc->add_route(1, "speaker", 1.0, 1);
 
@@ -185,31 +172,31 @@ void xavix_state::configure_board(machine_config &config)
 void xavix_state::configure_power_hold(machine_config &config)
 {
 	TIMER(config, m_power_hold_timer).configure_generic(FUNC(xavix_state::power_hold_expired));
-	m_soc->io().output_callback<1>().append(*this, FUNC(xavix_state::io1_power_hold_w));
+	m_soc->io_output_callback<1>().append(*this, FUNC(xavix_state::io1_power_hold_w));
 }
 
 void xavix_power_state::configure_board(machine_config &config)
 {
 	xavix_state::configure_board(config);
-	m_soc->io().output_callback<1>().append(*this, FUNC(xavix_power_state::io1_power_off_w));
+	m_soc->io_output_callback<1>().append(*this, FUNC(xavix_power_state::io1_power_off_w));
 }
 
 void xavix_i2c_power_state::configure_board(machine_config &config)
 {
 	xavix_i2c_state::configure_board(config);
-	m_soc->io().output_callback<1>().append(*this, FUNC(xavix_i2c_power_state::io1_power_off_w));
+	m_soc->io_output_callback<1>().append(*this, FUNC(xavix_i2c_power_state::io1_power_off_w));
 }
 
 void xavix_io0_matrix_power_state::configure_board(machine_config &config)
 {
 	xavix_io0_matrix_state::configure_board(config);
-	m_soc->io().output_callback<1>().append(*this, FUNC(xavix_io0_matrix_power_state::io1_power_off_w));
+	m_soc->io_output_callback<1>().append(*this, FUNC(xavix_io0_matrix_power_state::io1_power_off_w));
 }
 
 void xavix_ir_power_state::configure_board(machine_config &config)
 {
 	xavix_ir_state::configure_board(config);
-	m_soc->io().output_callback<1>().append(*this, FUNC(xavix_ir_power_state::io1_power_off_w));
+	m_soc->io_output_callback<1>().append(*this, FUNC(xavix_ir_power_state::io1_power_off_w));
 }
 
 void xavix_state::xavix(machine_config &config)
@@ -311,7 +298,6 @@ void xavix_state::machine_start()
 	for (beep_device &beeper : device_type_enumerator<beep_device>(*this))
 		beeper.output_to_stream_output(0).first->set_sample_rate(machine().sample_rate());
 
-	m_soc->cpu().space(xavix_device::AS_LOW_BUS).specific(m_code_lowbus);
 	m_screen_output.start(machine());
 	if (m_nvram)
 	{
@@ -332,6 +318,20 @@ void xavix_state::machine_reset()
 	m_power_hold_level = 0xff;
 	if (m_power_hold_timer)
 		m_power_hold_timer->adjust(attotime::never);
+}
+
+//-------------------------------------------------
+//  Memory Access
+//-------------------------------------------------
+
+u8 xavix_state::external_code_r(offs_t offset)
+{
+	return m_rom[offset & (m_rom.bytes() - 1)];
+}
+
+u8 xavix_state::external_data_r(offs_t offset)
+{
+	return external_code_r(offset);
 }
 
 //-------------------------------------------------
@@ -506,7 +506,7 @@ u8 xavix_io0_matrix_state::io0_input_r(u8 direction)
 {
 	// IO0 bits 2 and 3 select two active-high rows sharing the upper-nibble columns.
 	u8 data = 0;
-	u8 const active_rows = m_soc->io().data_latch<0>() & direction;
+	u8 const active_rows = m_soc->io_data_latch<0>() & direction;
 	if (BIT(active_rows, 2))
 		data |= m_matrix[0]->read();
 	if (BIT(active_rows, 3))
@@ -602,6 +602,41 @@ void xavix_cart_state::xavix_cart(machine_config &config)
 	XAVIX_CART_SLOT(config, m_cartslot, xavix_cart_slot_device::cart_devices, nullptr);
 }
 
+u8 xavix_cart_state::cart_r(offs_t offset)
+{
+	if (m_cartslot->has_cart())
+	{
+		return m_cartslot->read_cart(offset);
+	}
+	else
+	{
+		return m_rom[(offset) & (m_rom.bytes() - 1)];
+	}
+}
+
+void xavix_cart_state::cart_w(offs_t offset, u8 data)
+{
+	if (m_cartslot->has_cart())
+	{
+		m_cartslot->write_cart(offset, data);
+	}
+	else
+	{
+		logerror("%s: unhandled write access to cart area with no cart installed %08x %02x\n", machine().describe_context(), offset, data);
+	}
+}
+
+u8 xavix_cart_state::external_code_r(offs_t offset)
+{
+	return (offset & 0x7fffff) < m_cart_limit ? cart_r(offset) : xavix_state::external_code_r(offset);
+}
+
+void xavix_cart_state::external_bus_ctrl_changed(unsigned index, u8 data)
+{
+	if (m_cartslot->has_cart())
+		m_cartslot->write_bus_control(index, data);
+}
+
 int xavix_cart_state::cart_sda_r()
 {
 	if (m_cartslot->has_cart())
@@ -623,7 +658,7 @@ void xavix_i2c_cart_state::io1_output_w(u8 data, u8 direction)
 void xavix_state::configure_ir(machine_config &config, required_device<xavix_ir_motion_device> &controllers, xavix_ir_motion_device::controller_type type)
 {
 	XAVIX_IR_MOTION(config, controllers, peripheral_clock()).set_controller_type(type);
-	controllers->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	controllers->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_screen->screen_vblank().append(controllers, FUNC(xavix_ir_motion_device::vblank_w));
 }
 
@@ -652,8 +687,8 @@ void xavix_ir_state::xavixp_ir_1mb(machine_config &config)
 void xavix_state::configure_microphone(machine_config &config)
 {
 	// Software samples ADC channel 0 and implements microphone monitoring and effects through PCM voices.
-	m_soc->adc().set_audio_channel(0);
-	MICROPHONE(config, "microphone", 1).front_center().add_route(0, m_soc->adc(), 1.0);
+	m_soc->set_adc_audio_channel(0);
+	m_soc->add_adc_route(MICROPHONE(config, "microphone", 1).front_center(), 0, 1.0);
 }
 
 
@@ -1461,13 +1496,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(xavix_state::lightgun_scanline_cb)
 	if ((line >= 40) && (line <= 110) && ((line % 10) == 0))
 	{
 		if (BIT(m_lightgun_event_mask, 0))
-			m_soc->io().trigger_event<0>();
+			m_soc->trigger_io_event<0>();
 		if (BIT(m_lightgun_event_mask, 1))
-			m_soc->io().trigger_event<1>();
+			m_soc->trigger_io_event<1>();
 		if (BIT(m_lightgun_event_mask, 2))
-			m_soc->io().trigger_event<2>();
+			m_soc->trigger_io_event<2>();
 		if (BIT(m_lightgun_event_mask, 3))
-			m_soc->io().trigger_event<3>();
+			m_soc->trigger_io_event<3>();
 	}
 }
 
@@ -1589,7 +1624,7 @@ void xavix_gungunrv_state::io1_output_w(u8 data, u8 direction)
 	if (BIT(data & direction, 7) && !machine().side_effects_disabled())
 	{
 		// Startup tests each output with an $ff data latch; any other IO1.7 assertion requests shutdown.
-		if (m_soc->io().data_latch<1>() != 0xff)
+		if (m_soc->io_data_latch<1>() != 0xff)
 			machine().schedule_exit();
 	}
 }
@@ -1639,7 +1674,7 @@ void xavix_rad_hnt_state::xavix_rad_hnt2(machine_config &config)
 void xavix_rad_hnt_state::vblank_extra()
 {
 	// The hunting rifle supplies one accepted optical capture on event 3 per field.
-	m_soc->io().trigger_event<3>();
+	m_soc->trigger_io_event<3>();
 }
 
 u8 xavix_rad_hnt_state::lightgun_r(offs_t offset)
@@ -1682,8 +1717,8 @@ INPUT_PORTS_END
 void xavix_tomshoot_state::vblank_extra()
 {
 	// Approximate each controller's beam-timed optical capture with one event token per field.
-	m_soc->io().trigger_event<0>();
-	m_soc->io().trigger_event<1>();
+	m_soc->trigger_io_event<0>();
+	m_soc->trigger_io_event<1>();
 }
 
 u8 xavix_tomshoot_state::lightgun_r(offs_t offset)
@@ -1724,19 +1759,19 @@ void xavix_epo_dmon_state::xavix_epo_dmon(machine_config &config)
 	xavix_i2c_24c02_4mb(config);
 
 	// Each tethered air cannon has its own microphone: P1 uses AN0 and P2 uses AN1.
-	m_soc->adc().set_audio_input(0, 0);
-	m_soc->adc().set_audio_input(1, 1);
-	MICROPHONE(config, "microphone1", 1).front_center().add_route(0, m_soc->adc(), 1.0, 0);
-	MICROPHONE(config, "microphone2", 1).front_center().add_route(0, m_soc->adc(), 1.0, 1);
-	BEEP(config, "microphone_tone1", 1000).add_route(0, m_soc->adc(), 0.5, 0);
-	BEEP(config, "microphone_tone2", 1000).add_route(0, m_soc->adc(), 0.5, 1);
+	m_soc->set_adc_audio_input(0, 0);
+	m_soc->set_adc_audio_input(1, 1);
+	m_soc->add_adc_route(MICROPHONE(config, "microphone1", 1).front_center(), 0, 1.0, 0);
+	m_soc->add_adc_route(MICROPHONE(config, "microphone2", 1).front_center(), 0, 1.0, 1);
+	m_soc->add_adc_route(BEEP(config, "microphone_tone1", 1000), 0, 0.5, 0);
+	m_soc->add_adc_route(BEEP(config, "microphone_tone2", 1000), 0, 0.5, 1);
 }
 
 void xavix_epo_dmon_state::vblank_extra()
 {
 	// Approximate each controller's beam-timed optical capture with one event token per field.
-	m_soc->io().trigger_event<0>();
-	m_soc->io().trigger_event<1>();
+	m_soc->trigger_io_event<0>();
+	m_soc->trigger_io_event<1>();
 }
 
 u8 xavix_epo_dmon_state::lightgun_r(offs_t offset)
@@ -1909,7 +1944,7 @@ INPUT_PORTS_END
 void xavix_epo_baseball_state::configure_controllers(machine_config &config)
 {
 	XAVIX_ESDX_CONTROLLERS(config, m_controllers, peripheral_clock());
-	m_controllers->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	m_controllers->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_screen->screen_vblank().append(m_controllers, FUNC(xavix_esdx_controllers_device::vblank_w));
 }
 
@@ -1947,7 +1982,7 @@ void xavix_epo_stad_state::xavix_epo_stad(machine_config &config)
 	xavix_2mb(config);
 
 	XAVIX_STADIUM_BAT(config, m_controllers, peripheral_clock());
-	m_controllers->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	m_controllers->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_screen->screen_vblank().append(m_controllers, FUNC(xavix_stadium_bat_device::vblank_w));
 }
 
@@ -1976,12 +2011,12 @@ void xavix_tak_comt_state::xavix_tak_comt(machine_config &config)
 	xavix_nv_2mb(config);
 
 	// The station recognises TV musical cues through AN0; see Takara patent JP2003019364A.
-	m_soc->adc().set_audio_channel(0);
-	MICROPHONE(config, "station_microphone", 1).map_on_request_only().add_route(0, m_soc->adc(), 1.0);
+	m_soc->set_adc_audio_channel(0);
+	m_soc->add_adc_route(MICROPHONE(config, "station_microphone", 1).map_on_request_only(), 0, 1.0);
 
 	XAVIX_COMET_BATON(config, m_baton_controller, peripheral_clock());
-	m_baton_controller->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
-	m_soc->io().output_callback<1>().append(m_baton_controller, FUNC(xavix_comet_baton_device::station_w));
+	m_baton_controller->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
+	m_soc->io_output_callback<1>().append(m_baton_controller, FUNC(xavix_comet_baton_device::station_w));
 	m_screen->screen_vblank().append(m_baton_controller, FUNC(xavix_comet_baton_device::vblank_w));
 }
 
@@ -2032,12 +2067,12 @@ void xavix_tak_wdg_state::xavix_tak_wdg(machine_config &config)
 	xavix_nv_2mb(config);
 
 	XAVIX_GRANBLADE(config, m_granblade, peripheral_clock());
-	m_granblade->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	m_granblade->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_screen->screen_vblank().append(m_granblade, FUNC(xavix_granblade_device::vblank_w));
 
 	XAVIX_WEBKNIGHT(config, m_webknight, peripheral_clock());
 	// These callbacks deliver receiver-edge events, not maintained signal levels.
-	m_webknight->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	m_webknight->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_screen->screen_vblank().append(m_webknight, FUNC(xavix_webknight_device::vblank_w));
 }
 
@@ -2222,7 +2257,7 @@ void xavix_epo_crok_state::xavix_epo_crok(machine_config &config)
 	xavix_i2c_24c04_4mb(config);
 
 	XAVIX_CROKET_CONTROLLERS(config, m_controllers, peripheral_clock());
-	m_controllers->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	m_controllers->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_screen->screen_vblank().append(m_controllers, FUNC(xavix_croket_controllers_device::vblank_w));
 }
 
@@ -2282,15 +2317,15 @@ void xavix_tak_zuba_state::xavix_tak_zuba(machine_config &config)
 xavix_baseball_ball_device &xavix_state::configure_baseball(machine_config &config)
 {
 	xavix_baseball_ball_device &ball(XAVIX_BASEBALL_BALL(config, "pitch_ball"));
-	m_soc->adc().input_callback<0>().set(ball, FUNC(xavix_baseball_ball_device::vertical_buttons_r));
-	m_soc->adc().input_callback<1>().set(ball, FUNC(xavix_baseball_ball_device::horizontal_buttons_r));
-	m_soc->adc().input_callback<4>().set(ball, FUNC(xavix_baseball_ball_device::motion_r));
+	m_soc->adc_input_callback<0>().set(ball, FUNC(xavix_baseball_ball_device::vertical_buttons_r));
+	m_soc->adc_input_callback<1>().set(ball, FUNC(xavix_baseball_ball_device::horizontal_buttons_r));
+	m_soc->adc_input_callback<4>().set(ball, FUNC(xavix_baseball_ball_device::motion_r));
 	m_screen->screen_vblank().append(ball, FUNC(xavix_baseball_ball_device::vblank_w));
 	// AN5 and AN7 are equal at the normal setting; their difference is the low-battery monitor, not a motion axis.
 
 	xavix_baseball_bat_device &bat(XAVIX_BASEBALL_BAT(config, "bat"));
 	bat.set_screen(m_screen);
-	bat.set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	bat.set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_screen->screen_vblank().append(bat, FUNC(xavix_baseball_bat_device::vblank_w));
 	return ball;
 }
@@ -2736,12 +2771,10 @@ void xavix_hikara_state::xavix_hikara(machine_config &config)
 {
 	xavix_cart(config);
 	// JP2010019869A shows analogue dry monitoring; omit that route until its slow host playback is resolved.
-	m_soc->adc().set_audio_channel(0);
-	MICROPHONE(config, m_microphone[0], 1).front_center()
-		.add_route(0, m_soc->adc(), 1.0);
+	m_soc->set_adc_audio_channel(0);
+	m_soc->add_adc_route(MICROPHONE(config, m_microphone[0], 1).front_center(), 0, 1.0);
 	// The second headset microphone only mixes after an explicit Audio Mixer channel route is selected.
-	MICROPHONE(config, m_microphone[1], 1).map_on_request_only()
-		.add_route(0, m_soc->adc(), 1.0);
+	m_soc->add_adc_route(MICROPHONE(config, m_microphone[1], 1).map_on_request_only(), 0, 1.0);
 
 	// The serial framing and boot registers match an OTA5182-compatible LCD controller.
 	// TODO: Verify the fitted controller/panel and CT675 scaling and colour processing.
@@ -3004,9 +3037,9 @@ void xavix_hikara_state::io0_output_w(u8 data, u8 direction)
 	xavix_ekara_state::io0_output_w(data, direction);
 
 	bool const clock = BIT(data & direction, 6);
-	if (clock && !m_volume_clock && BIT(m_soc->io().direction<1>(), 5))
+	if (clock && !m_volume_clock && BIT(m_soc->io_direction<1>(), 5))
 	{
-		if (BIT(m_soc->io().data_latch<1>(), 5))
+		if (BIT(m_soc->io_data_latch<1>(), 5))
 			m_volume_step = std::min<u8>(m_volume_step + 1, 15);
 		else
 			m_volume_step = m_volume_step ? m_volume_step - 1 : 0;
@@ -3119,8 +3152,8 @@ void xavix_popira2_state::xavix_popira2(machine_config &config)
 {
 	xavix_popira(config);
 
-	m_soc->adc().input_callback<0>().set(*this, FUNC(xavix_popira2_state::player2_adc0_r));
-	m_soc->adc().input_callback<1>().set(*this, FUNC(xavix_popira2_state::player2_adc1_r));
+	m_soc->adc_input_callback<0>().set(*this, FUNC(xavix_popira2_state::player2_adc0_r));
+	m_soc->adc_input_callback<1>().set(*this, FUNC(xavix_popira2_state::player2_adc1_r));
 }
 
 // see code at 028060, using table from 00eb6d for conversion
@@ -3376,7 +3409,7 @@ void xavix_tak_daig_state::xavix_tak_daig(machine_config &config)
 
 	XAVIX_DAIGUNDER_ROBOTS(config, m_robots, peripheral_clock());
 	m_robots->set_screen(m_screen);
-	m_robots->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<2>));
+	m_robots->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<2>));
 	m_screen->screen_vblank().append(m_robots, FUNC(xavix_daigunder_robots_device::vblank_w));
 
 	SOFTWARE_LIST(config, "cart_list_daig").set_original("daig_cart");
@@ -3551,22 +3584,22 @@ void xavix_tvpc_state::xavix_tvpc(machine_config &config)
 	}, "mouse", false);
 
 	// The mouse uses writable counters 2 and 3; vertical polarity is opposite MAME's mouse Y.
-	m_soc->anport().input_callback<2>().set(m_mouse, FUNC(tvpc_mouse_port_device::x_r));
-	m_soc->anport().input_callback<3>().set(m_mouse, FUNC(tvpc_mouse_port_device::y_r));
-	m_soc->anport().set_counter_mode(2);
-	m_soc->anport().set_counter_mode(3, true);
+	m_soc->anport_input_callback<2>().set(m_mouse, FUNC(tvpc_mouse_port_device::x_r));
+	m_soc->anport_input_callback<3>().set(m_mouse, FUNC(tvpc_mouse_port_device::y_r));
+	m_soc->set_anport_counter_mode(2);
+	m_soc->set_anport_counter_mode(3, true);
 	// These ROMs retain signed cursor positions in the counters, including the positive endpoint.
 	// The counters saturate at -128 and +127, discarding motion beyond either endpoint.
-	m_soc->anport().set_counter_saturation(2);
-	m_soc->anport().set_counter_saturation(3);
+	m_soc->set_anport_counter_saturation(2);
+	m_soc->set_anport_counter_saturation(3);
 }
 
 void xavix_tvpc_state::xavix_tvpc_hk(machine_config &config)
 {
 	xavix_tvpc(config);
 	m_mouse->set_default_option("mic_mouse");
-	m_soc->adc().set_audio_channel(0);
-	m_mouse->add_route(0, m_soc->adc(), 1.0);
+	m_soc->set_adc_audio_channel(0);
+	m_soc->add_adc_route(*m_mouse, 0, 1.0);
 }
 
 u8 xavix_tvpc_state::io0_input_r(u8 direction)
@@ -3644,7 +3677,7 @@ INPUT_PORTS_END
 void xavix_epo_quiz_state::xavix_epo_quiz(machine_config &config)
 {
 	xavix_4mb(config);
-	m_soc->adc().input_callback<6>().set(FUNC(xavix_epo_quiz_state::an6_r));
+	m_soc->adc_input_callback<6>().set(FUNC(xavix_epo_quiz_state::an6_r));
 }
 
 u8 xavix_epo_quiz_state::io0_input_r(u8 direction)
@@ -3837,12 +3870,12 @@ u8 xavix_epo_mail_state::keyboard_r()
 {
 	// Patent US7555105 shows eight IO0-selected rows and a ninth selected by IO1.0 feeding one 74HC541.
 	u8 data = 0;
-	u8 const io0_rows = m_soc->io().data_latch<0>() & m_soc->io().direction<0>();
+	u8 const io0_rows = m_soc->io_data_latch<0>() & m_soc->io_direction<0>();
 	for (unsigned row = 0; row != 8; row++)
 		if (BIT(io0_rows, row))
 			data |= m_keyboard[row]->read();
 
-	if (BIT(m_soc->io().data_latch<1>() & m_soc->io().direction<1>(), 0))
+	if (BIT(m_soc->io_data_latch<1>() & m_soc->io_direction<1>(), 0))
 		data |= m_keyboard[8]->read();
 
 	return data;
@@ -3946,8 +3979,8 @@ u16 xavix_hippofr_state::panel_levels_r()
 	if (BIT(directions, 2)) close_contact(3, 8); // Left
 	if (BIT(directions, 3)) close_contact(2, 9); // Right
 
-	u16 levels = m_soc->io().data_latch<0>() & m_soc->io().direction<0>();
-	levels |= u16(m_soc->io().data_latch<1>() & m_soc->io().direction<1>() & 0x03) << 8;
+	u16 levels = m_soc->io_data_latch<0>() & m_soc->io_direction<0>();
+	levels |= u16(m_soc->io_data_latch<1>() & m_soc->io_direction<1>() & 0x03) << 8;
 	return propagate_passive_levels<u16>(levels, contacts);
 }
 
@@ -3975,7 +4008,7 @@ u8 xavix_hippofr_state::io1_input_r(u8 direction)
 	case 4: close_contact(4, 5); break;
 	}
 
-	u8 const selector_levels = propagate_passive_levels<u8>(m_soc->io().data_latch<1>() & direction, contacts);
+	u8 const selector_levels = propagate_passive_levels<u8>(m_soc->io_data_latch<1>() & direction, contacts);
 	return m_in1->read() | u8(panel_levels_r() >> 8) | selector_levels;
 }
 
@@ -4061,7 +4094,7 @@ u8 xavix_multiplt_state::io0_input_r(u8 direction)
 	}
 
 	// Passive contacts propagate a driven-high level through every closed path.
-	u8 const levels = propagate_passive_levels<u8>(m_soc->io().data_latch<0>() & direction, contacts);
+	u8 const levels = propagate_passive_levels<u8>(m_soc->io_data_latch<0>() & direction, contacts);
 	return levels & ~direction;
 }
 
@@ -4109,7 +4142,7 @@ void xavix_state::xavix_rad_mtrk(machine_config &config)
 	xavix_4mb(config);
 
 	xavix_mtrk_wheel_device &wheel(XAVIX_MTRK_WHEEL(config, "wheel"));
-	wheel.set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<3>));
+	wheel.set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<3>));
 }
 
 
@@ -4123,7 +4156,7 @@ void xavix_state::xavix_rad_mtrkp(machine_config &config)
 	xavixp_4mb(config);
 
 	xavix_mtrk_wheel_device &wheel(XAVIX_MTRK_WHEEL(config, "wheel"));
-	wheel.set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<3>));
+	wheel.set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<3>));
 }
 
 
@@ -4154,7 +4187,7 @@ void xavix_state::xavix_rad_madf(machine_config &config)
 	xavix_4mb(config);
 
 	xavix_madfb_ball_device &ball(XAVIX_MADFB_BALL(config, "ball", peripheral_clock()));
-	ball.set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	ball.set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 }
 
 
@@ -4185,11 +4218,11 @@ void xavix_has_wamg_state::xavix_has_wamg(machine_config &config)
 	xavix_4mb(config);
 
 	// The dial is a writable signed counter that the firmware clears after every sample.
-	m_soc->anport().input_callback<2>().set_ioport("DIAL");
-	m_soc->anport().set_counter_mode(2);
+	m_soc->anport_input_callback<2>().set_ioport("DIAL");
+	m_soc->set_anport_counter_mode(2);
 
 	XAVIX_WAMG_SENSOR(config, m_sensor, peripheral_clock());
-	m_soc->adc().input_callback<0>().set(m_sensor, FUNC(xavix_wamg_sensor_device::adc_r));
+	m_soc->adc_input_callback<0>().set(m_sensor, FUNC(xavix_wamg_sensor_device::adc_r));
 	m_screen->screen_vblank().append(m_sensor, FUNC(xavix_wamg_sensor_device::vblank_w));
 }
 
@@ -4231,14 +4264,14 @@ void xavix_state::xavix_tom_tvho(machine_config &config)
 	xavix_2mb(config);
 
 	// Each controller is a mechanical ball mouse connected to wrapping hardware counters.
-	m_soc->anport().input_callback<0>().set_ioport("MOUSE0X");
-	m_soc->anport().input_callback<1>().set_ioport("MOUSE0Y");
-	m_soc->anport().input_callback<2>().set_ioport("MOUSE1X");
-	m_soc->anport().input_callback<3>().set_ioport("MOUSE1Y");
-	m_soc->anport().set_counter_mode(0);
-	m_soc->anport().set_counter_mode(1, true);
-	m_soc->anport().set_counter_mode(2);
-	m_soc->anport().set_counter_mode(3, true);
+	m_soc->anport_input_callback<0>().set_ioport("MOUSE0X");
+	m_soc->anport_input_callback<1>().set_ioport("MOUSE0Y");
+	m_soc->anport_input_callback<2>().set_ioport("MOUSE1X");
+	m_soc->anport_input_callback<3>().set_ioport("MOUSE1Y");
+	m_soc->set_anport_counter_mode(0);
+	m_soc->set_anport_counter_mode(1, true);
+	m_soc->set_anport_counter_mode(2);
+	m_soc->set_anport_counter_mode(3, true);
 }
 
 
@@ -4288,16 +4321,16 @@ void xavix_state::xavix_tak_beyu(machine_config &config)
 	xavix_beyblade_link_device &link(XAVIX_BEYBLADE_LINK(config, "link"));
 	link.controls_callback().set_ioport("IN0");
 	link.host_reset_callback().set_ioport("RESET").bit(0);
-	m_soc->io().input_callback<0>().set(link, FUNC(xavix_beyblade_link_device::io_r));
-	m_soc->io().output_callback<0>().set(link, FUNC(xavix_beyblade_link_device::io_w));
+	m_soc->io_input_callback<0>().set(link, FUNC(xavix_beyblade_link_device::io_r));
+	m_soc->io_output_callback<0>().set(link, FUNC(xavix_beyblade_link_device::io_w));
 	m_screen->screen_vblank().append(link, FUNC(xavix_beyblade_link_device::vblank_w));
 
-	m_soc->anport().input_callback<0>().set_ioport("DIAL");
-	m_soc->anport().set_counter_mode(0);
+	m_soc->anport_input_callback<0>().set_ioport("DIAL");
+	m_soc->set_anport_counter_mode(0);
 
 	xavix_beyblade_ripcord_device &ripcord(XAVIX_BEYBLADE_RIPCORD(config, "ripcord"));
 	ripcord.set_screen(m_screen);
-	ripcord.set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	ripcord.set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_screen->screen_vblank().append(ripcord, FUNC(xavix_beyblade_ripcord_device::vblank_w));
 }
 
@@ -4342,8 +4375,8 @@ void xavix_jarajal_state::xavix_jarajal(machine_config &config)
 	xavix_nv_2mb(config);
 
 	// The lever is read through writable signed counter 0 and cleared by software.
-	m_soc->anport().input_callback<0>().set_ioport("DIAL");
-	m_soc->anport().set_counter_mode(0);
+	m_soc->anport_input_callback<0>().set_ioport("DIAL");
+	m_soc->set_anport_counter_mode(0);
 
 	HOPPER(config, m_hopper, attotime::from_msec(100)); // TODO: Measure the real hopper pulse interval.
 	m_hopper->dispense_handler().set(*this, FUNC(xavix_jarajal_state::hopper_sensor_w));
@@ -4358,13 +4391,13 @@ void xavix_jarajal_state::machine_reset()
 INPUT_CHANGED_MEMBER(xavix_jarajal_state::coin_inserted)
 {
 	if (newval)
-		m_soc->io().trigger_event<1>();
+		m_soc->trigger_io_event<1>();
 }
 
 void xavix_jarajal_state::hopper_sensor_w(int state)
 {
 	if (state)
-		m_soc->io().trigger_event<0>();
+		m_soc->trigger_io_event<0>();
 }
 
 void xavix_jarajal_state::io0_output_w(u8 data, u8 direction)
@@ -4409,8 +4442,8 @@ void xavix_epo_mj_state::xavix_epo_mj(machine_config &config)
 	m_soc->set_external_map(*this, &xavix_epo_mj_state::xavix_2mb_extbus_map);
 
 	// The jog dial is a writable signed counter; the game consumes one selection step per four counts.
-	m_soc->anport().input_callback<0>().set_ioport("DIAL");
-	m_soc->anport().set_counter_mode(0);
+	m_soc->anport_input_callback<0>().set_ioport("DIAL");
+	m_soc->set_anport_counter_mode(0);
 }
 
 void xavix_epo_mj_state::io1_output_w(u8 data, u8 direction)
@@ -4461,17 +4494,17 @@ void xavix_ltv_tam_state::xavix_ltv_tam(machine_config &config)
 {
 	xavix_i2c_24c04_4mb(config);
 
-	m_soc->anport().input_callback<0>().set_ioport("MOUSE0X");
-	m_soc->anport().input_callback<1>().set_ioport("MOUSE0Y");
-	m_soc->anport().input_callback<2>().set_ioport("MOUSE1X");
-	m_soc->anport().input_callback<3>().set_ioport("MOUSE1Y");
-	m_soc->anport().set_counter_mode(0);
-	m_soc->anport().set_counter_mode(1, true);
-	m_soc->anport().set_counter_mode(2);
-	m_soc->anport().set_counter_mode(3, true);
+	m_soc->anport_input_callback<0>().set_ioport("MOUSE0X");
+	m_soc->anport_input_callback<1>().set_ioport("MOUSE0Y");
+	m_soc->anport_input_callback<2>().set_ioport("MOUSE1X");
+	m_soc->anport_input_callback<3>().set_ioport("MOUSE1Y");
+	m_soc->set_anport_counter_mode(0);
+	m_soc->set_anport_counter_mode(1, true);
+	m_soc->set_anport_counter_mode(2);
+	m_soc->set_anport_counter_mode(3, true);
 
 	XAVIX_TAMAGOTCHI_IR(config, m_tamagotchi, peripheral_clock());
-	m_tamagotchi->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<1>));
+	m_tamagotchi->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<1>));
 }
 
 void xavix_ltv_tam_state::io0_output_w(u8 data, u8 direction)
@@ -4529,7 +4562,7 @@ void xavix_i2c_power_state::xavix_tomplc(machine_config &config)
 {
 	xavix_i2c_24c02_4mb(config);
 	configure_microphone(config);
-	BEEP(config, "microphone_tone", 1000).add_route(0, m_soc->adc(), 0.5);
+	m_soc->add_adc_route(BEEP(config, "microphone_tone", 1000), 0, 0.5);
 }
 
 
@@ -4603,8 +4636,8 @@ void xavix_epo_guru_state::xavix_epo_guru(machine_config &config)
 {
 	xavix_nv_4mb(config);
 
-	m_soc->anport().input_callback<2>().set_ioport("MOUSE1X");
-	m_soc->anport().set_counter_mode(2);
+	m_soc->anport_input_callback<2>().set_ioport("MOUSE1X");
+	m_soc->set_anport_counter_mode(2);
 
 	// A field-rate IO1.7 heartbeat maintains the external RC power hold.
 	configure_power_hold(config);
@@ -4667,8 +4700,8 @@ INPUT_PORTS_END
 u8 xavix_rad_rh_state::io0_input_r(u8 direction)
 {
 	// IO0 bit 7 and IO1 bit 5 alternately select two active-high control rows.
-	bool const row0 = BIT(m_soc->io().data_latch<0>() & direction, 7);
-	bool const row1 = BIT(m_soc->io().data_latch<1>(), 5);
+	bool const row0 = BIT(m_soc->io_data_latch<0>() & direction, 7);
+	bool const row1 = BIT(m_soc->io_data_latch<1>(), 5);
 
 	if (row0 && !row1)
 		return m_matrix[0]->read();

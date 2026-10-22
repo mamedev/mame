@@ -131,7 +131,7 @@ void xavix2000_i2c_camera_state::configure_camera(machine_config &config, xavix_
 {
 	XAVIX_ANALOG_IMAGE_SENSOR(config, m_camera, peripheral_clock());
 	m_camera->set_target_shape(shape);
-	m_soc->adc().input_callback<0>().set(m_camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
+	m_soc->adc_input_callback<0>().set(m_camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
 }
 
 void xavix2000_i2c_camera_state::xavix2000_i2c_24c02_camera(machine_config &config)
@@ -277,7 +277,7 @@ void xavix2000_i2c_camera_state::xavix2000_epo_mini(machine_config &config)
 {
 	xavix2000_i2c_24c08_4mb(config);
 	XAVIX_ANALOG_IMAGE_SENSOR(config, m_camera, peripheral_clock()).set_target_count(4);
-	m_soc->adc().input_callback<0>().set(m_camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
+	m_soc->adc_input_callback<0>().set(m_camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
 }
 
 
@@ -354,7 +354,7 @@ void xavix2000_camera_state::xavix2000_epo_hamc(machine_config &config)
 {
 	xavix2000_4mb(config);
 	XAVIX_ANALOG_IMAGE_SENSOR(config, m_camera, peripheral_clock()).set_target_count(2);
-	m_soc->adc().input_callback<0>().set(m_camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
+	m_soc->adc_input_callback<0>().set(m_camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
 }
 
 u8 xavix2000_camera_state::io1_input_r(u8 direction)
@@ -393,7 +393,7 @@ void xavix2000_i2c_camera_state::xavix2000_ban_onep(machine_config &config)
 {
 	xavix2000_i2c_24c04(config);
 	XAVIX_ANALOG_IMAGE_SENSOR(config, m_camera, peripheral_clock()).set_target_count(2);
-	m_soc->adc().input_callback<0>().set(m_camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
+	m_soc->adc_input_callback<0>().set(m_camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
 }
 
 
@@ -474,7 +474,7 @@ void xavix2000_epo_ebox_state::xavix2000_epo_ebox(machine_config &config)
 	xavix2000_nv_4mb(config);
 
 	XAVIX_EBOX_GLOVES(config, m_gloves, peripheral_clock());
-	m_gloves->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<0>));
+	m_gloves->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_screen->screen_vblank().append(m_gloves, FUNC(xavix_ebox_gloves_device::vblank_w));
 }
 
@@ -521,14 +521,14 @@ void xavix_state::xavix2000_epo_sdb(machine_config &config)
 	xavix2000_nv_4mb(config);
 
 	// Each ball-and-roller controller feeds two writable wrapping counters; both Y channels have reversed polarity.
-	m_soc->anport().input_callback<0>().set_ioport("MOUSE0X");
-	m_soc->anport().input_callback<1>().set_ioport("MOUSE0Y");
-	m_soc->anport().input_callback<2>().set_ioport("MOUSE1X");
-	m_soc->anport().input_callback<3>().set_ioport("MOUSE1Y");
-	m_soc->anport().set_counter_mode(0);
-	m_soc->anport().set_counter_mode(1, true);
-	m_soc->anport().set_counter_mode(2);
-	m_soc->anport().set_counter_mode(3, true);
+	m_soc->anport_input_callback<0>().set_ioport("MOUSE0X");
+	m_soc->anport_input_callback<1>().set_ioport("MOUSE0Y");
+	m_soc->anport_input_callback<2>().set_ioport("MOUSE1X");
+	m_soc->anport_input_callback<3>().set_ioport("MOUSE1Y");
+	m_soc->set_anport_counter_mode(0);
+	m_soc->set_anport_counter_mode(1, true);
+	m_soc->set_anport_counter_mode(2);
+	m_soc->set_anport_counter_mode(3, true);
 }
 
 
@@ -558,8 +558,8 @@ void xavix_i2c_state::xavix2000_tak_chq(machine_config &config)
 {
 	xavix2000_i2c_24c04_4mb(config);
 
-	m_soc->anport().input_callback<2>().set_ioport("MOUSE1X");
-	m_soc->anport().input_callback<3>().set_ioport("MOUSE1Y");
+	m_soc->anport_input_callback<2>().set_ioport("MOUSE1X");
+	m_soc->anport_input_callback<3>().set_ioport("MOUSE1Y");
 }
 
 
@@ -611,13 +611,13 @@ void xavix2000_epo_es2j_state::xavix2000_epo_es2j(machine_config &config)
 	xavix2000_4mb(config);
 
 	XAVIX_EPO_ES2J_CARD_READER(config, m_card_reader, peripheral_clock());
-	m_card_reader->set_event_callback(m_soc->io(), FUNC(xavix_io_device::trigger_event<2>));
+	m_card_reader->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<2>));
 }
 
 u8 xavix2000_epo_es2j_state::io0_input_r(u8 direction)
 {
 	u8 result = 0;
-	u8 const select = m_soc->io().data_latch<1>() & m_soc->io().direction<1>();
+	u8 const select = m_soc->io_data_latch<1>() & m_soc->io_direction<1>();
 	if (BIT(select, 0))
 		result |= m_controllers[0]->read();
 	if (BIT(select, 1))
@@ -669,7 +669,7 @@ void xavix2000_duelmast_state::xavix2000_duelmast(machine_config &config)
 	I2C_24C04(config, "i2cmem");
 
 	XAVIX_DUELMAST_SCANNER(config, m_scanner, peripheral_clock());
-	m_soc->adc().input_callback<0>().set(m_scanner, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
+	m_soc->adc_input_callback<0>().set(m_scanner, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
 
 	XAVIX_CART_SLOT(config, m_cartslot, xavix_cart_slot_device::cart_devices, nullptr);
 	// Reference data is used only by the optional manual card-selection aid.
