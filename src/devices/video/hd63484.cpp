@@ -1118,16 +1118,20 @@ uint32_t hd63484_device::paint(int16_t sx, int16_t sy)
 
 		rows++;
 
-		int32_t xl = x;
-		while (x - xl < 0x8000 && paintable(xl - 1, y))
-			xl--;
-		int32_t xr = x;
-		while (xr - x < 0x8000 && paintable(xr + 1, y))
-			xr++;
+		// coordinates live on the hardware's 16 bit two's complement ring,
+		// so the span scan wraps there instead of walking an int32 line into
+		// aliased reads of the same dots
+		uint32_t dl = 0;
+		while (dl < 0x8000 && paintable(int16_t(x - dl - 1), y))
+			dl++;
+		uint32_t dr = 0;
+		while (dl + dr < 0xffff && paintable(int16_t(x + dr + 1), y))
+			dr++;
 
 		bool up = false, dn = false;
-		for (int32_t px = xl; px <= xr && budget; px++, budget--)
+		for (uint32_t d = 0; d <= dl + dr && budget; d++, budget--)
 		{
+			int16_t const px = int16_t(x - dl + d);
 			if (set_dot(px, y, px - m_cpx, y - m_cpy))
 				return rows;
 
