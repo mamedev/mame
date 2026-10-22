@@ -3253,6 +3253,8 @@ if BUSES["ISBX"] then
 		MAME_DIR .. "src/devices/bus/isbx/isbx.h",
 		MAME_DIR .. "src/devices/bus/isbx/compis_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/isbx/compis_fdc.h",
+		MAME_DIR .. "src/devices/bus/isbx/compis_hdc.cpp",
+		MAME_DIR .. "src/devices/bus/isbx/compis_hdc.h",
 		MAME_DIR .. "src/devices/bus/isbx/isbc_218a.cpp",
 		MAME_DIR .. "src/devices/bus/isbx/isbc_218a.h",
 	}
