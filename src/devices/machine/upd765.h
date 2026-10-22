@@ -210,7 +210,7 @@ protected:
 		int main_state, sub_state;
 		int dir, counter;
 		uint8_t pcn, st0;
-		bool st0_filled;
+		bool st0_filled, st0_seek;
 		bool live, index, ready;
 	};
 
