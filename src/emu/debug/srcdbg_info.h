@@ -25,7 +25,7 @@
 // When multiple source-file-level debugging information files are loaded
 // (e.g., to support MMU-aware debugging), this aggregates all those
 // infos, and keeps track of which are enabled / disabled.
-class srcdbg_info : public srcdbg_provider_base
+class srcdbg_info
 {
 public:
 	// A single info aggregated by srcdbg_info
@@ -73,14 +73,18 @@ public:
 	void get_srcdbg_symbols(
 		symbol_table * symtable_srcdbg_globals,
 		symbol_table * symtable_srcdbg_locals,
-		const device_state_interface * state) const;
+		const device_state_interface * state);
+	// u64 get_global_fixed_sym_value(const srcdbg_provider_entry & sp, const srcdbg_provider_base::global_fixed_symbol & sym) const;
+	bool is_global_fixed_sym_in_scope(const char * name) const;
+	u64 get_global_fixed_sym_value(const char * name) const;
+	bool is_local_sym_in_scope(const char * name) const;
+	u64 get_local_sym_value(const char * name, symbol_table & symtable) const;
 
-	virtual void complete_local_relative_initialization() override;
-	virtual u32 num_files() const override { return m_agg_file_to_provider_files.size(); }
-	virtual bool file_index_to_path(u32 file_index, const source_file_path ** path) const override;
-	virtual std::optional<u32> file_path_to_index(const char * file_path) const override;
-	virtual void file_line_to_address_ranges(u32 file_index, u32 line_number, std::vector<address_range> & ranges) const override;
-	virtual bool address_to_file_line (offs_t address, file_line & loc) const override;
+	u32 num_files() const { return m_agg_file_to_provider_files.size(); }
+	bool file_index_to_path(u32 file_index, const srcdbg_provider_base::source_file_path ** path) const;
+	std::optional<u32> file_path_to_index(const char * file_path) const;
+	void file_line_to_address_ranges(u32 file_index, u32 line_number, std::vector<srcdbg_provider_base::address_range> & ranges) const;
+	bool address_to_file_line (offs_t address, file_line & loc) const;
 
 	void set_offset(s32 offset) { m_offset = offset; }
 	s32 get_offset() const { return m_offset; }
@@ -104,6 +108,35 @@ private:
 		u32				m_file_idx;
 	};
 
+	// Pairs a provider with an index into its list of global syms
+	struct provider_global
+	{
+		provider_global(const srcdbg_provider_entry & sp, u32 global_idx)
+			: m_sp(sp)
+			, m_global_idx(global_idx)
+		{
+		}
+
+		const srcdbg_provider_entry & m_sp;
+		u32                           m_global_idx;
+	};
+
+	// Associates a provider with two indices: one into its list of local fixed
+	// syms, and one into its list of local-relative syms
+	struct provider_local
+	{
+		provider_local(const srcdbg_provider_entry & sp)
+			: m_sp(sp)
+			, m_local_fixed_idx()
+			, m_local_relative_idx()
+		{
+		}
+
+		const srcdbg_provider_entry & m_sp;
+		std::optional<u32>            m_local_fixed_idx;
+		std::optional<u32>            m_local_relative_idx;
+	};
+
 	void coalesce();
 	bool file_index_to_provider_files(u32 file_index, std::vector<provider_file> & ret) const;
 
@@ -113,10 +146,15 @@ private:
 	
 	// provider index + local file index to agg file index
 	// [provider_idx[local_file_idx]] = agg_file
-	std::vector<std::vector<u32>>             m_provider_file_to_agg_file;
-	std::vector<srcdbg_provider_entry>        m_providers;
-	s32                                       m_offset;
-	bool                                      m_view_needs_full_refresh;
+	std::vector<std::vector<u32>>                                 m_provider_file_to_agg_file;
+
+	// these map a symbol name to a list of provider symbols with that name
+	std::unordered_map<std::string, std::vector<provider_global>> m_provider_globals;
+	std::unordered_map<std::string, std::vector<provider_local>>  m_provider_locals;
+	
+	std::vector<srcdbg_provider_entry>                            m_providers;
+	s32                                                           m_offset;
+	bool                                                          m_view_needs_full_refresh;
 };
 
 

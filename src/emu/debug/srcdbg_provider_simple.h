@@ -16,7 +16,7 @@
 #pragma once
 
 #include "srcdbg_provider.h"
-#include "srcdbg_format.h"
+#include "../../lib/srcdbg/srcdbg_format.h"
 #include "srcdbg_format_reader.h"
 
 class srcdbg_import;
@@ -30,12 +30,17 @@ class srcdbg_provider_simple : public srcdbg_provider_base
 public:
 	srcdbg_provider_simple(const running_machine& machine);
 	~srcdbg_provider_simple() { }
-	virtual void complete_local_relative_initialization() override;
 	virtual u32 num_files() const override { return m_source_file_paths.size(); }
 	virtual bool file_index_to_path(u32 file_index, const source_file_path ** path) const override { *path = m_source_file_paths.data()+file_index; return true;};
 	virtual std::optional<u32> file_path_to_index(const char * file_path) const override;
 	virtual void file_line_to_address_ranges(u32 file_index, u32 line_number, std::vector<address_range> & ranges) const override;
 	virtual bool address_to_file_line (offs_t address, file_line & loc) const override;
+	virtual bool is_global_fixed_sym_in_scope(u32 global_idx) const override { return true; }
+	virtual u64 get_global_fixed_sym_value(u32 global_idx) const override;
+	virtual bool is_local_fixed_sym_in_scope(u32 local_fixed_idx) const override;
+	virtual u64 get_local_fixed_sym_value(u32 local_fixed_idx) const override;
+	virtual bool is_local_relative_sym_in_scope(u32 m_local_relative_idx) const override;
+	virtual u64 get_local_relative_sym_value(u32 local_relative_idx, symbol_table & symtable) const override;
 
 private:
 	struct address_line
@@ -45,37 +50,14 @@ private:
 		u32 line_number;
 	};
 
-	class local_relative_eval_rule_internal
-	{
-	public:
-		local_relative_eval_rule_internal(std::pair<offs_t,offs_t> && range, char reg, s32 reg_offset)
-			: m_range(std::move(range))
-			, m_reg(reg)
-			, m_reg_offset(reg_offset)
-		{}
-		std::pair<offs_t,offs_t> m_range;
-		char m_reg;
-		s32 m_reg_offset;
-	};
-
-	class local_relative_symbol_internal
-	{
-	public:
-		local_relative_symbol_internal(const std::string & name, std::vector<local_relative_eval_rule_internal> eval_rules)
-			: m_name(name)
-			, m_eval_rules(eval_rules)
-		{
-		}
-		std::string m_name;
-		std::vector<local_relative_eval_rule_internal> m_eval_rules;
-	};
+	s32 get_offset() const;
+	u64 evaluate_local_relative_rule(const device_state_interface * state, const char * name, const local_relative_eval_rule & val, symbol_table & symtable) const;
 
 	const running_machine& m_machine;
 	std::vector<source_file_path>               m_source_file_paths;      // Starting points for source file path strings
 	std::vector<srcdbg_line_mapping>            m_linemaps_by_address;    // a list of srcdbg_line_mappings, sorted by address
 	std::vector<std::vector<address_line>>      m_linemaps_by_line;       // m_linemaps_by_line[i] is a list of address/line pairs,
 																		  // sorted by line, from file #i
-	std::vector<local_relative_symbol_internal> m_local_relative_symbols_internal;
 };
 
 

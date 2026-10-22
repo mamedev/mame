@@ -188,22 +188,6 @@ public:
 						   // (also used for tables outside debugger: lua scripts, cheat engine)
 	};
 
-	// local_range_expression pairs an expression with an address range
-	class local_range_expression
-	{
-	public:
-		local_range_expression(std::pair<offs_t,offs_t> && address_range, std::string && expression)
-			: m_address_range(std::move(address_range))
-			, m_expression(std::move(expression))
-		{}
-		const std::pair<offs_t,offs_t> & address_range() const { return m_address_range; };
-		const std::string & expression() const { return m_expression; };
-
-	private:
-		std::pair<offs_t,offs_t> m_address_range;
-		std::string m_expression;
-	};
-
 	// construction/destruction
 	symbol_table(running_machine &machine, table_type type, symbol_table *parent = nullptr, device_t *device = nullptr);
 
@@ -221,8 +205,7 @@ public:
 	symbol_entry &add(const char *name, u64 constvalue);
 	symbol_entry &add(const char *name, getter_func getter, setter_func setter = nullptr, const std::string &format_string = "");
 	symbol_entry &add(const char *name, int minparams, int maxparams, execute_func execute);
-	symbol_entry &add(const char *name, symbol_table::getter_func get_pc, const std::vector<std::pair<offs_t,offs_t>> & scope_ranges, u64 value);
-	symbol_entry &add(const char *name, symbol_table::getter_func get_pc, const std::vector<local_range_expression> & scoped_values);
+	symbol_entry &add(const char *name, std::function<bool()> is_in_scope_fcn, std::function<u64(symbol_table &)> value_fcn);
 	symbol_entry *find(const char *name) const { if (name) { auto search = m_symlist.find(name); if (search != m_symlist.end()) return search->second.get(); else return nullptr; } else return nullptr; }
 	symbol_entry *find_deep(const char *name, bool skip_srcdbg = false);
 

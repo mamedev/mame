@@ -330,7 +330,6 @@ bool srcdbg_format_simp_read(const char * srcdbg_path, srcdbg_format_reader_call
 		}
 
 		value->symbol_name_index = from_little_endian32(value->symbol_name_index);
-		value->symbol_value = from_little_endian32(value->symbol_value);
 		value->num_address_ranges = from_little_endian32(value->num_address_ranges);
 
 		if (value->symbol_name_index >= symbol_index)
@@ -341,13 +340,15 @@ bool srcdbg_format_simp_read(const char * srcdbg_path, srcdbg_format_reader_call
 
 		for (u32 idx = 0; idx < value->num_address_ranges; idx++)
 		{
-			address_range * range;
-			if (!read_field<address_range>(range, data, i, error))
+			local_fixed_address_range * range;
+			if (!read_field<local_fixed_address_range>(range, data, i, error))
 			{
 				return false;
 			}
-			range->address_first = from_little_endian16(range->address_first);
-			range->address_last = from_little_endian16(range->address_last);
+			range->range.address_first = from_little_endian16(range->range.address_first);
+			range->range.address_last = from_little_endian16(range->range.address_last);
+			range->symbol_value = from_little_endian32(range->symbol_value);
+			range->symbol_flags = from_little_endian32(range->symbol_flags);
 		}
 
 		if (!callback.on_read_local_fixed_symbol_value(*(const local_fixed_symbol_value *) &data[value_start_idx]))

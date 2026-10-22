@@ -245,18 +245,16 @@ bool srcdbg_import::on_read_global_fixed_symbol_value(const global_fixed_symbol_
 
 bool srcdbg_import::on_read_local_fixed_symbol_value(const local_fixed_symbol_value & value)
 {
-	std::vector<std::pair<offs_t,offs_t>> ranges;
+	std::vector<local_fixed_address_range> ranges;
 	for (u32 i = 0; i < value.num_address_ranges; i++)
 	{
-		ranges.push_back(
-			std::pair<offs_t,offs_t>(value.ranges[i].address_first, value.ranges[i].address_last));
+		ranges.push_back(std::move(value.local_fixed_address_ranges[i]));
 	}
 
 	srcdbg_provider_base::local_fixed_symbol sym(
 		m_symbol_names[value.symbol_name_index],
-		std::move(ranges),
-		value.symbol_value);
-
+		std::move(ranges));
+	
 	m_srcdbg_simple.m_local_fixed_symbols.push_back(std::move(sym));
 
 	return true;
@@ -265,20 +263,14 @@ bool srcdbg_import::on_read_local_fixed_symbol_value(const local_fixed_symbol_va
 
 bool srcdbg_import::on_read_local_relative_symbol_value(const local_relative_symbol_value & value)
 {
-	std::vector<srcdbg_provider_simple::local_relative_eval_rule_internal> eval_rules_internal;
+	std::vector<local_relative_eval_rule> eval_rules;
 	for (u32 i = 0; i < value.num_local_relative_eval_rules; i++)
 	{
-		const local_relative_eval_rule & eval_rule = value.local_relative_eval_rules[i];
-		srcdbg_provider_simple::local_relative_eval_rule_internal eval_rule_internal(
-			std::pair<offs_t,offs_t>(eval_rule.range.address_first, eval_rule.range.address_last),
-			eval_rule.reg,
-			eval_rule.reg_offset);
-
-		eval_rules_internal.push_back(std::move(eval_rule_internal));
+		eval_rules.push_back(std::move(value.local_relative_eval_rules[i]));
 	}
 
-	srcdbg_provider_simple::local_relative_symbol_internal sym(m_symbol_names[value.symbol_name_index], eval_rules_internal);
-	m_srcdbg_simple.m_local_relative_symbols_internal.push_back(std::move(sym));
+	srcdbg_provider_base::local_relative_symbol sym(m_symbol_names[value.symbol_name_index], eval_rules);
+	m_srcdbg_simple.m_local_relative_symbols.push_back(std::move(sym));
 
 	return true;
 }
@@ -368,67 +360,11 @@ srcdbg_provider_simple::srcdbg_provider_simple(const running_machine& machine)
 {
 }
 
-
-// Called later during startup, after device_state_interfaces are available.
-// Generates expressions required to implement local relative symbol evaluation rules.
-void srcdbg_provider_simple::complete_local_relative_initialization()
+// Simple helper to get address offset (sdoffset) from srcdbg_info
+s32 srcdbg_provider_simple::get_offset() const
 {
-	assert (m_local_relative_symbols.empty());
-
-	const device_state_interface * state = device_interface_enumerator<device_state_interface>(m_machine.root_device()).first();
-
-	for (local_relative_symbol_internal sym_internal : m_local_relative_symbols_internal)
-	{
-		std::vector<symbol_table::local_range_expression> values;
-		for (local_relative_eval_rule_internal & eval_rule_internal : sym_internal.m_eval_rules)
-		{
-			// Create expression string that adds the register to the offset.
-			// - 'ns\' forces interpretation of register name to use the built-in
-			//   symbol, and not any conflicting source-level debugging symbols
-			//   of the same name.
-			// - Expression evaluator does not support negative numbers, so take
-			//   cases on whether we need to subtract abs(reg offset) or just
-			//   add it.
-			// - Expression evaluator defaults to hex, so explicitly use # for decimal
-			const char * symbol;
-			if (symbol_from_reg_id(state, eval_rule_internal.m_reg, symbol))
-			{
-				std::string expr = util::string_format(
-					"(ns\\%s %s #%d)",
-					symbol,
-					(eval_rule_internal.m_reg_offset < 0 ? "-" : "+"),
-					abs(eval_rule_internal.m_reg_offset));
-				symbol_table::local_range_expression value(std::move(eval_rule_internal.m_range), std::move(expr));
-				values.push_back(std::move(value));
-			}
-			else
-			{
-				LOGMASKED(
-					LOG_WARNING,
-					"Local relative '%s' warning: cannot find register ID %d\n",
-					sym_internal.m_name,
-					eval_rule_internal.m_reg);
-			}
-		}
-
-		// Add the symbol if at least one eval rule was successfully generated
-		if (!values.empty())
-		{
-			srcdbg_provider_base::local_relative_symbol sym(sym_internal.m_name, std::move(values));
-			m_local_relative_symbols.push_back(std::move(sym));
-		}
-		else
-		{
-			LOGMASKED(
-				LOG_WARNING,
-				"Local relative '%s' warning: symbol will be omitted; no scopes with a valid register ID found\n",
-				sym_internal.m_name);
-		}
-	}
-
-	m_local_relative_symbols_internal.clear();
+	return m_machine.debugger().get_srcdbg_info()->get_offset();
 }
-
 
 // Called during expression evaluation to convert a user-specified path to
 // the corresponding source-file-path index.  Uses heuristics to allow
@@ -511,7 +447,7 @@ void srcdbg_provider_simple::file_line_to_address_ranges(u32 file_index, u32 lin
 		return;
 	}
 
-	s32 offset = m_machine.debugger().get_srcdbg_info()->get_offset();
+	s32 offset = get_offset();
 
 	auto answer = std::lower_bound(
 		list.cbegin(),
@@ -534,10 +470,13 @@ void srcdbg_provider_simple::file_line_to_address_ranges(u32 file_index, u32 lin
 // range of addresses that includes the specified address
 bool srcdbg_provider_simple::address_to_file_line (offs_t address, file_line & loc) const
 {
-	assert(m_linemaps_by_address.size() > 0);
+	if (m_linemaps_by_address.size() == 0)
+	{
+		return false;
+	}
 
 	// Undo offset so lookup uses addresses originally present in debugging information file
-	s32 offset = m_machine.debugger().get_srcdbg_info()->get_offset();
+	s32 offset = get_offset();
 	address -= offset;
 
 	auto guess = std::lower_bound(
@@ -568,4 +507,141 @@ bool srcdbg_provider_simple::address_to_file_line (offs_t address, file_line & l
 	}
 
 	return false;
+}
+
+
+// Called by value() for srcdbg global symbols.  Applies offset as necessary.
+u64 srcdbg_provider_simple::get_global_fixed_sym_value(u32 global_idx) const
+{
+	offs_t value = m_global_fixed_symbols[global_idx].value();
+
+	// Apply offset to symbol when appropriate
+	if ((m_global_fixed_symbols[global_idx].flags() & MAME_SRCDBG_SYMFLAG_CONSTANT) == 0)
+	{
+		value += get_offset();
+	}
+
+	return value;
+}
+
+
+// Called by is_in_scope() for srcdbg local-fixed symbols.
+bool srcdbg_provider_simple::is_local_fixed_sym_in_scope(u32 local_fixed_idx) const
+{
+	const device_state_interface * state = 
+		device_interface_enumerator<device_state_interface>(m_machine.root_device()).first();
+
+	u64 pc = state->state_find_entry(STATE_GENPC)->value();
+	for (const local_fixed_address_range & val : m_local_fixed_symbols[local_fixed_idx].ranges())
+	{
+		if (val.range.address_first <= pc && pc <= val.range.address_last)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+// Called by value() for srcdbg local-fixed symbols.  Applies offset as necessary.
+u64 srcdbg_provider_simple::get_local_fixed_sym_value(u32 local_fixed_idx) const
+{
+	const device_state_interface * state = 
+		device_interface_enumerator<device_state_interface>(m_machine.root_device()).first();
+
+	u64 pc = state->state_find_entry(STATE_GENPC)->value();
+	for (const local_fixed_address_range & val : m_local_fixed_symbols[local_fixed_idx].ranges())
+	{
+		if (val.range.address_first <= pc && pc <= val.range.address_last)
+		{
+			// Apply offset to symbol when appropriate
+			offs_t value = val.symbol_value;
+			if ((val.symbol_flags & MAME_SRCDBG_SYMFLAG_CONSTANT) == 0)
+			{
+				value += get_offset();
+			}
+
+			return value;
+		}
+	}
+
+	// is_in_scope gates the calling of this function
+	assert (false && "get_local_fixed_sym_value called when out of scope");
+	return 0;
+}
+
+// Called by is_in_scope() for srcdbg local-relative symbols.
+bool srcdbg_provider_simple::is_local_relative_sym_in_scope(u32 m_local_relative_idx) const
+{
+	const device_state_interface * state = 
+		device_interface_enumerator<device_state_interface>(m_machine.root_device()).first();
+
+	u64 pc = state->state_find_entry(STATE_GENPC)->value();
+	for (const local_relative_eval_rule & val : m_local_relative_symbols[m_local_relative_idx].eval_rules())
+	{
+		if (val.range.address_first <= pc && pc <= val.range.address_last)
+		{
+			return true;
+		}
+	}
+
+	return false;	
+}
+
+// Called by value() for srcdbg local-relative symbols.
+u64 srcdbg_provider_simple::get_local_relative_sym_value(u32 local_relative_idx, symbol_table & symtable) const
+{
+	const device_state_interface * state = 
+		device_interface_enumerator<device_state_interface>(m_machine.root_device()).first();
+
+	u64 pc = state->state_find_entry(STATE_GENPC)->value();
+	for (const local_relative_eval_rule & val : m_local_relative_symbols[local_relative_idx].eval_rules())
+	{
+		if (val.range.address_first <= pc && pc <= val.range.address_last)
+		{
+			return evaluate_local_relative_rule(
+				state,
+				m_local_relative_symbols[local_relative_idx].name(),
+				val,
+				symtable);
+		}
+	}
+
+	// is_in_scope gates the calling of this function
+	assert (false && "get_local_relative_sym_value called when out of scope");
+	return 0;	
+}
+
+// Helper used by get_local_relative_sym_value() to generate a string
+// expression (a register + an offset) to be evaluated to determine the
+// local relative symbol's value
+u64 srcdbg_provider_simple::evaluate_local_relative_rule(const device_state_interface * state, const char * name, const local_relative_eval_rule & val, symbol_table & symtable) const
+{
+	// Create expression string that adds the register to the offset.
+	// - 'ns\' forces interpretation of register name to use the built-in
+	//   symbol, and not any conflicting source-level debugging symbols
+	//   of the same name.
+	// - Expression evaluator does not support negative numbers, so take
+	//   cases on whether we need to subtract abs(reg offset) or just
+	//   add it.
+	// - Expression evaluator defaults to hex, so explicitly use # for decimal
+	const char * symbol;
+	if (symbol_from_reg_id(state, val.reg, symbol))
+	{
+		std::string expr = util::string_format(
+			"(ns\\%s %s #%d)",
+			symbol,
+			(val.reg_offset < 0 ? "-" : "+"),
+			abs(val.reg_offset));
+		return parsed_expression(symtable, expr).execute();
+	}
+
+	LOGMASKED(
+		LOG_WARNING,
+		"Local relative '%s' warning: cannot find register ID %d\n",
+		name,
+		val.reg);
+
+	return 0;
 }

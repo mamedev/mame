@@ -15,6 +15,7 @@
 #pragma once
 
 #include "express.h"
+#include "../../lib/srcdbg/srcdbg_format.h"
 
 // Simple file index / line number pair
 class file_line
@@ -66,6 +67,8 @@ private:
 class srcdbg_provider_base
 {
 public:
+	typedef std::pair<offs_t,offs_t> address_range;
+
 	// Represents a single source file to be debugged.  Includes the original
 	// "built" path (as output by the assembler / compiler that generated the
 	// source-debugging information file), and a "local" path as it appears on
@@ -113,55 +116,55 @@ public:
 	};
 
 
-	// Represents a local fixed symbol to the rest of the debugger.  Such symbols
-	// are limited to ranges of addresses (scopes), and represent a single value
+	// These represent a local fixed symbol to the rest of the debugger.  Such symbols
+	// are limited to ranges of addresses (scopes), and represent a fixed value
 	// (such as a single variable address).
 	class local_fixed_symbol
 	{
 	public:
-		local_fixed_symbol(const std::string & name, std::vector<std::pair<offs_t,offs_t>> && ranges, offs_t value)
+		local_fixed_symbol(const std::string & name, std::vector<local_fixed_address_range> && ranges)
 			: m_name(name)
 			, m_ranges(std::move(ranges))
-			, m_value_integer(value)
 		{
 		}
 
 		const char * name() const { return m_name.c_str(); };
-		const std::vector<std::pair<offs_t,offs_t>> & ranges() const { return m_ranges; };
-		offs_t value() const { return m_value_integer; };
+		const std::vector<local_fixed_address_range> & ranges() const { return m_ranges; };
 
 	private:
 		std::string m_name;
-		std::vector<std::pair<offs_t,offs_t>> m_ranges;
-		offs_t m_value_integer;
+		std::vector<local_fixed_address_range> m_ranges;
 	};
 
 
-	// Represents a local relative symbol to the rest of the debugger.  Such symbols
+	// These represent a local relative symbol to the rest of the debugger.  Such symbols
 	// are limited to ranges of addresses (scopes), and represent a value calculated
 	// as an offset to a register (such as an offset to a stack or frame register).
 	// Each scope has its own, potentially different, register-offset calculation
 	// to determine the symbol's value.
+	// local_range_expression pairs an expression with an address range
+
 	class local_relative_symbol
 	{
 	public:
-		local_relative_symbol(const std::string & name, std::vector<symbol_table::local_range_expression> && ranges)
+		local_relative_symbol(const std::string & name, std::vector<local_relative_eval_rule> eval_rules)
 			: m_name(name)
-			, m_ranges(std::move(ranges))
+			, m_eval_rules(eval_rules)
 		{
 		}
+
 		const char * name() const { return m_name.c_str(); };
-		const std::vector<symbol_table::local_range_expression> & ranges() const { return m_ranges; };
+		const std::vector<local_relative_eval_rule> & eval_rules() const { return m_eval_rules; };
 
 	private:
 		std::string m_name;
-		std::vector<symbol_table::local_range_expression> m_ranges;
+		std::vector<local_relative_eval_rule> m_eval_rules;
 	};
 
+
+
+
 	
-	typedef std::pair<offs_t,offs_t> address_range;
-
-
 	// ------------------------------------------------------------------------
 	// Base implementation
 	// ------------------------------------------------------------------------
@@ -179,10 +182,6 @@ public:
 	// Interface implemented by derived classes
 	// ------------------------------------------------------------------------
 
-	// Called later during startup, after device_state_interfaces are available.
-	// Generates expressions required to implement local relative symbol evaluation rules.
-	virtual void complete_local_relative_initialization() = 0;
-
 	// Returns the number of source file paths
 	virtual u32 num_files() const = 0;
 
@@ -198,6 +197,16 @@ public:
 	// Returns true and populates loc with the source file / line number pair corresponding
 	// to the specified address, or returns false if no such pair exists
 	virtual bool address_to_file_line (offs_t address, file_line & loc) const = 0;
+
+	// These are called by symbol table entries' is_in_scope() and value()
+	// for the different kinds of srcdbg symbols.  Index parameters correspond
+	// to the symbol vector fields on this class.
+	virtual bool is_global_fixed_sym_in_scope(u32 global_idx) const = 0;
+	virtual u64 get_global_fixed_sym_value(u32 global_idx) const = 0;
+	virtual bool is_local_fixed_sym_in_scope(u32 local_fixed_idx) const = 0;
+	virtual u64 get_local_fixed_sym_value(u32 local_fixed_idx) const = 0;
+	virtual bool is_local_relative_sym_in_scope(u32 m_local_relative_idx) const = 0;
+	virtual u64 get_local_relative_sym_value(u32 local_relative_idx, symbol_table & symtable) const = 0;
 
 	// Return lists of various types of symbols
 	const std::vector<global_fixed_symbol> & global_fixed_symbols() const { return m_global_fixed_symbols; }

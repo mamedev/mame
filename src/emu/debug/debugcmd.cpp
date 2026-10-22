@@ -1328,7 +1328,6 @@ void debugger_commands::execute_srcdbg_set_offset(const std::vector<std::string_
 		return;
 
 	srcdbg->set_offset(s32(offset));
-	m_console.get_visible_cpu()->debug()->update_symbols_from_srcdbg(*srcdbg);
 	m_console.printf("Offset successfully applied\n");
 }
 

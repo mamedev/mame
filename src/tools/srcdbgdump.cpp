@@ -125,10 +125,15 @@ bool srcdbg_dump::on_read_local_fixed_symbol_value(const local_fixed_symbol_valu
 		printf("\n**** Local fixed symbol values: ****\n");
 		m_printed_local_fixed_symbol_value_title = true;
 	}
-	printf("Symbol name index: %u, symbol value: $%08X\n", value.symbol_name_index, value.symbol_value);
+	printf("Symbol name index: %u\n", value.symbol_name_index);
 	for (u32 i = 0; i < value.num_address_ranges; i++)
 	{
-		printf("\taddress range: $%04X-$%04X\n", value.ranges[i].address_first, value.ranges[i].address_last);
+		printf(
+			"value: $%08X, flags: $%08X\taddress range: $%04X-$%04X\n", 
+			value.local_fixed_address_ranges[i].symbol_value,
+			value.local_fixed_address_ranges[i].symbol_flags,
+			value.local_fixed_address_ranges[i].range.address_first, 
+			value.local_fixed_address_ranges[i].range.address_last);
 	}
 	return true;
 }

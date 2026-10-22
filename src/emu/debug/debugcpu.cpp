@@ -596,7 +596,6 @@ device_debug::device_debug(device_t &device)
 				(m_device.machine().debugger().get_srcdbg_info() != nullptr))
 			{
 				srcdbg_info & srcdbg_info = *m_device.machine().debugger().get_srcdbg_info();
-				srcdbg_info.complete_local_relative_initialization();
 				update_symbols_from_srcdbg(srcdbg_info);
 			}
 		}
@@ -654,15 +653,11 @@ device_debug::~device_debug()
 //-------------------------------------------------
 //  update_symbols_from_srcdbg - called to intialize
 //  symbol table chain to include symbols from
-//  source-level debugging AND to update source-
-//  level debugging symbols when the offset changes
+//  source-level debugging
 //-------------------------------------------------
 
-void device_debug::update_symbols_from_srcdbg(const srcdbg_info & srcdbg_info)
+void device_debug::update_symbols_from_srcdbg(srcdbg_info & srcdbg_info)
 {
-	m_symtable_srcdbg_globals.reset();
-	m_symtable_srcdbg_locals.reset();
-
 	// Establish the following symbol table parent chain:
 	// m_symtable (new) = m_symtable_srcdbg_locals -> m_symtable_srcdbg_globals -> m_symtable (old) = m_symtable_device
 	m_symtable_srcdbg_globals = std::make_unique<symbol_table>(

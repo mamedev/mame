@@ -142,20 +142,38 @@ typedef struct
 } global_fixed_symbol_value;
 
 
-/* Value of a local fixed symbol */
+/* A local fixed symbol consists of multiple address ranges, with each range
+ * corresponding to a (potentially distinct) value.  For example, multiple
+ * C "static" variables, in different scopes, with the same name, would
+ * be considered the "same" local fixed symbol, though each variable would
+ * have its own value (i.e., address).
+ */
+
+/* One address range (scope) of a local fixed symbol */
+typedef struct
+{
+	/* Address range that defines this scope */
+	address_range range;
+
+	/* Fixed value of symbol, such as its address, applicable to this scope */
+	int symbol_value;
+
+	/* Bitmask of flags to customize symbol behavior.  See list
+	   of MAME_SRCDBG_SYMFLAG_* values from srcdbg_api.h */
+	unsigned int symbol_flags;
+} local_fixed_address_range;
+
+/* Values for a single local fixed symbol */
 typedef struct
 {
 	/* 0-based index of symbol (from symbol_names) */
 	unsigned int symbol_name_index;
 
-	/* Fixed value of symbol, such as its address */
-	int symbol_value;
-
 	/* Number of address ranges, or scopes, for which this symbol is valid */
 	unsigned int num_address_ranges;
 
-	/* Address ranges, or scopes, for which this symbol is valid */
-	address_range ranges[0];                                   /* Actual array length should be num_address_ranges */
+	/* PC address ranges (scopes), with the corresponding values, for this symbol */
+	local_fixed_address_range local_fixed_address_ranges[0];   /* Actual array length should be num_address_ranges */
 } local_fixed_symbol_value;
 
 

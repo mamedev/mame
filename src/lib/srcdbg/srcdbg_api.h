@@ -106,8 +106,7 @@ extern "C" {
 /*********************************************************************
   Symbol flags
 
-  Flags passed to mame_srcdbg_simp_add_global_fixed_symbol to
-  customize symbol behavior
+  Flags to customize symbol behavior
 **********************************************************************/
 
 /* Default symbol behavior */
@@ -180,8 +179,9 @@ LIB_PUBLIC int mame_srcdbg_simp_add_global_fixed_symbol(void * srcdbg_simp_state
     [in] address_last - High address of the scope (inclusive), representing address of first byte
         of last instruction
     [in] symbol_value - Value of symbol (such as an address)
+    [in] symbol_flags - Bitmask from MAME_SRCDBG_SYMFLAG_* values above
 */
-LIB_PUBLIC int mame_srcdbg_simp_add_local_fixed_symbol(void * srcdbg_simp_state, const char * symbol_name, unsigned short address_first, unsigned short address_last, int symbol_value);
+LIB_PUBLIC int mame_srcdbg_simp_add_local_fixed_symbol(void * srcdbg_simp_state, const char * symbol_name, unsigned short address_first, unsigned short address_last, int symbol_value, unsigned int symbol_flags);
 
 /*
     mame_srcdbg_simp_add_local_relative_symbol - Adds a new local relative symbol.  Such symbols

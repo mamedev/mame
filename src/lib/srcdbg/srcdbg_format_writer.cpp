@@ -145,9 +145,10 @@ bool writer_importer::on_read_local_fixed_symbol_value(const local_fixed_symbol_
 	{
 		m_gen.add_local_fixed_symbol(
 			sym_name,
-			value.ranges[i].address_first + m_offset,
-			value.ranges[i].address_last + m_offset,
-			value.symbol_value + m_offset);
+			value.local_fixed_address_ranges[i].range.address_first + m_offset,
+			value.local_fixed_address_ranges[i].range.address_last + m_offset,
+			value.local_fixed_address_ranges[i].symbol_value + m_offset,
+			value.local_fixed_address_ranges[i].symbol_flags);
 	}
 	return true;
 }
@@ -250,7 +251,7 @@ int srcdbg_simple_generator::add_global_fixed_symbol(const char * symbol_name, i
 	return MAME_SRCDBG_E_SUCCESS;
 }
 
-int srcdbg_simple_generator::add_local_fixed_symbol(const char * symbol_name, unsigned short address_first, unsigned short address_last, int symbol_value)
+int srcdbg_simple_generator::add_local_fixed_symbol(const char * symbol_name, unsigned short address_first, unsigned short address_last, int symbol_value, unsigned int symbol_flags)
 {
 	local_fixed * entry_ptr;
 	local_fixed local;
@@ -261,7 +262,6 @@ int srcdbg_simple_generator::add_local_fixed_symbol(const char * symbol_name, un
 		[&](const local_fixed_symbol_value & elem) { return elem.symbol_name_index == local.symbol_name_index;});
 	if (entry == m_local_fixed_symbol_values.end())
 	{
-		local.symbol_value = symbol_value;
 		local.num_address_ranges = 0;
 		m_local_fixed_symbol_values.push_back(local);
 		entry_ptr = &m_local_fixed_symbol_values[m_local_fixed_symbol_values.size() - 1];
@@ -272,9 +272,11 @@ int srcdbg_simple_generator::add_local_fixed_symbol(const char * symbol_name, un
 		entry_ptr = &(*entry);
 	}
 
-	address_range range;
-	range.address_first = address_first;
-	range.address_last = address_last;
+	local_fixed_address_range range;
+	range.range.address_first = address_first;
+	range.range.address_last = address_last;
+	range.symbol_value = symbol_value;
+	range.symbol_flags = symbol_flags;
 	entry_ptr->m_ranges.push_back(range);
 	m_header.local_fixed_symbol_values_size += sizeof(range);
 	entry_ptr->num_address_ranges++;
@@ -417,15 +419,16 @@ int srcdbg_simple_generator::close()
 
 		// Write the fixed length portion first
 		sym.symbol_name_index = little_endianize_int32(sym.symbol_name_index);
-		sym.symbol_value = little_endianize_int32(sym.symbol_value);
 		sym.num_address_ranges = little_endianize_int32(sym.num_address_ranges);
 		FWRITE_OR_RETURN(&sym, sizeof(local_fixed_symbol_value), 1, m_output);
 
 		// Write the var length portion next (address ranges)
-		for (address_range & range : sym.m_ranges)
+		for (local_fixed_address_range & range : sym.m_ranges)
 		{
-			range.address_first = little_endianize_int16(range.address_first);
-			range.address_last = little_endianize_int16(range.address_last);
+			range.range.address_first = little_endianize_int16(range.range.address_first);
+			range.range.address_last = little_endianize_int16(range.range.address_last);
+			range.symbol_value = little_endianize_int32(range.symbol_value);
+			range.symbol_flags = little_endianize_int32(range.symbol_flags);
 			FWRITE_OR_RETURN(&range, sizeof(range), 1, m_output);
 		}
 	}

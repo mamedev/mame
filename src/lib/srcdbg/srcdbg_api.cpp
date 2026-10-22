@@ -90,10 +90,10 @@ LIB_PUBLIC int mame_srcdbg_simp_add_global_fixed_symbol(void * srcdbg_simp_state
 	END_EXCEPTION_BOUNDARY
 }
 
-LIB_PUBLIC int mame_srcdbg_simp_add_local_fixed_symbol(void * srcdbg_simp_state, const char * symbol_name, unsigned short address_first, unsigned short address_last, int symbol_value)
+LIB_PUBLIC int mame_srcdbg_simp_add_local_fixed_symbol(void * srcdbg_simp_state, const char * symbol_name, unsigned short address_first, unsigned short address_last, int symbol_value, unsigned int symbol_flags)
 {
 	BEGIN_EXCEPTION_BOUNDARY
-	return ((srcdbg_simple_generator *) srcdbg_simp_state)->add_local_fixed_symbol(symbol_name, address_first, address_last, symbol_value);
+	return ((srcdbg_simple_generator *) srcdbg_simp_state)->add_local_fixed_symbol(symbol_name, address_first, address_last, symbol_value, symbol_flags);
 	END_EXCEPTION_BOUNDARY
 }
 

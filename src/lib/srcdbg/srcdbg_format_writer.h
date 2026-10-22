@@ -49,7 +49,7 @@ class local_fixed : public local_fixed_symbol_value
 {
 public:
 	local_fixed() : m_ranges() {}
-	std::vector<address_range> m_ranges;
+	std::vector<local_fixed_address_range> m_ranges;
 };
 
 
@@ -71,7 +71,7 @@ public:
 	int add_source_file_path(const char * source_file_path, unsigned int & index);
 	int add_line_mapping(unsigned short address_first, unsigned short address_last, unsigned int source_file_index, unsigned int line_number);
 	int add_global_fixed_symbol(const char * symbol_name, int symbol_value, unsigned int symbol_flags);
-	int add_local_fixed_symbol(const char * symbol_name, unsigned short address_first, unsigned short address_last, int symbol_value);
+	int add_local_fixed_symbol(const char * symbol_name, unsigned short address_first, unsigned short address_last, int symbol_value, unsigned int symbol_flags);
 	int add_local_relative_symbol(const char * symbol_name, unsigned short address_first, unsigned short address_last, unsigned char reg, int reg_offset);
 	int import(const char * srcdbg_file_path_to_import, short offset, char * error_details, unsigned int num_bytes_error_details);
 	int close();
