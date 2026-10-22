@@ -4,7 +4,7 @@
 
     XaviX and Radica baseball pitching-ball inputs. Converts directional
     controls and face buttons to shared analogue input levels, and represents
-    pitch gestures with representative two-field motion pulses.
+    pitch strength with representative motion voltages.
 
     TODO:
     - Measure motion voltage levels, waveform and pulse shape on an
@@ -56,15 +56,11 @@ ioport_constructor xavix_baseball_ball_device::device_input_ports() const
 void xavix_baseball_ball_device::device_start()
 {
 	save_item(NAME(m_motion_level));
-	save_item(NAME(m_motion_fields_remaining));
-	save_item(NAME(m_motion_armed));
 }
 
 void xavix_baseball_ball_device::device_reset()
 {
 	m_motion_level = 0;
-	m_motion_fields_remaining = 0;
-	m_motion_armed = !(m_motion->read() & 3);
 }
 
 u8 xavix_baseball_ball_device::vertical_buttons_r()
@@ -105,19 +101,5 @@ void xavix_baseball_ball_device::vblank_w(int state)
 	if (!state)
 		return;
 
-	if (m_motion_fields_remaining && !--m_motion_fields_remaining)
-		m_motion_level = 0;
-
-	u8 const motion = m_motion->read() & 3;
-	if (!motion)
-	{
-		m_motion_armed = true;
-	}
-	else if (m_motion_armed)
-	{
-		// Approximate each throw with one two-field pulse; returning to rest rearms the next gesture.
-		m_motion_level = motion;
-		m_motion_fields_remaining = 2;
-		m_motion_armed = false;
-	}
+	m_motion_level = m_motion->read() & 3;
 }

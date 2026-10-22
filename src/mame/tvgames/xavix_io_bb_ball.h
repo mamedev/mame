@@ -35,8 +35,6 @@ private:
 	required_ioport m_motion;
 	model m_model;
 	u8 m_motion_level;
-	u8 m_motion_fields_remaining;
-	bool m_motion_armed;
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_BASEBALL_BALL, xavix_baseball_ball_device)

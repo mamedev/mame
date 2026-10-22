@@ -34,7 +34,6 @@ private:
 	required_ioport m_strength;
 	emu_timer *m_event_timer;
 	u8 m_events_remaining;
-	bool m_swing_armed;
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_BASEBALL_BAT, xavix_baseball_bat_device)

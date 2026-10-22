@@ -21,6 +21,7 @@ xavix_croket_controllers_device::xavix_croket_controllers_device(const machine_c
 	: device_t(mconfig, XAVIX_CROKET_CONTROLLERS, tag, owner, clock)
 	, m_ir(*this, "ir")
 	, m_motion(*this, "MOTION")
+	, m_motion_strength(*this, "STRENGTH%u", 1U)
 	, m_guard(*this, "GUARD")
 	, m_controller_power(*this, "CONTROLLER_POWER")
 {
@@ -32,6 +33,12 @@ static INPUT_PORTS_START( xavix_croket_controllers )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Hammer Swing") PORT_PLAYER(1) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Wristband Punch") PORT_PLAYER(2) PORT_IMPULSE(2)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("STRENGTH1")
+	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("P1 Hammer Swing Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(1) PORT_PLAYER(1) PORT_CODE_INC(KEYCODE_Z)
+
+	PORT_START("STRENGTH2")
+	PORT_BIT( 0x03, 0x00, IPT_PEDAL ) PORT_NAME("P2 Wristband Punch Strength") PORT_MINMAX(0, 3) PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(1) PORT_PLAYER(2) PORT_CODE_INC(KEYCODE_X)
 
 	PORT_START("GUARD")
 	// The controller button selects a report family and repeats while held.
@@ -80,14 +87,19 @@ u16 xavix_croket_controllers_device::controller_report_r()
 	u8 const mask = 1U << Player;
 	u8 const motion = m_motion->read();
 	u8 const guard = m_guard->read();
-	if (!(m_controller_power->read() & mask) || !((motion | guard) & mask))
+	u8 const strength = (motion | guard) & mask ? 3 : m_motion_strength[Player]->read();
+	if (!(m_controller_power->read() & mask) || !strength)
 		return 0xff;
 
-	// Strengths 1-3 have the same game action, so use the strongest valid report.
-	return xavix_ir_report_device::motion_report(Player, BIT(guard, Player), 3);
+	return xavix_ir_report_device::motion_report(Player, BIT(guard, Player), strength);
 }
 
 int xavix_croket_controllers_device::ir_enable_r()
 {
-	return bool((m_motion->read() | m_guard->read()) & m_controller_power->read());
+	u8 const buttons = m_motion->read() | m_guard->read();
+	u8 const power = m_controller_power->read();
+	for (unsigned player = 0; player < 2; player++)
+		if (BIT(power, player) && (BIT(buttons, player) || m_motion_strength[player]->read()))
+			return 1;
+	return 0;
 }

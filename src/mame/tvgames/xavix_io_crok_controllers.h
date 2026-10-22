@@ -31,6 +31,7 @@ private:
 
 	required_device<xavix_ir_report_device> m_ir;
 	required_ioport m_motion;
+	required_ioport_array<2> m_motion_strength;
 	required_ioport m_guard;
 	required_ioport m_controller_power;
 };

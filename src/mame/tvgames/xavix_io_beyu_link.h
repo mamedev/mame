@@ -28,6 +28,8 @@ private:
 	enum : u8
 	{
 		DISCONNECTED,
+		TEST_CONNECT,
+		TEST_CONNECT_RELEASE,
 		WAIT_CONNECT,
 		CONNECT_RELEASE,
 		RECEIVE_ASSERT,
@@ -36,6 +38,15 @@ private:
 		TRANSMIT_DELAY,
 		TRANSMIT_ACK,
 		TRANSMIT_RELEASE
+	};
+
+	static constexpr u8 FACTORY_PEER = 3;
+	enum : u8
+	{
+		FACTORY_ENTRY,
+		FACTORY_LINK_CHECK,
+		FACTORY_REPLY,
+		FACTORY_READY
 	};
 
 	static constexpr std::array<u8, 35> RPM_FILTER =
@@ -84,6 +95,7 @@ private:
 	u8 m_peer_ripcord_history_position;
 	bool m_peer_inputs_valid;
 	bool m_expect_diagnostic_token;
+	u8 m_factory_stage;
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_BEYBLADE_LINK, xavix_beyblade_link_device)

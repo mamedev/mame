@@ -28,9 +28,9 @@ xavix_ebox_gloves_device::xavix_ebox_gloves_device(const machine_config &mconfig
 
 static INPUT_PORTS_START( xavix_ebox_gloves )
 	PORT_START("PUNCH")
-	// The receiver filters the first changed report, so each swing occupies two frames.
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Left Punch") PORT_PLAYER(1) PORT_IMPULSE(2) PORT_CODE(KEYCODE_SPACE) PORT_CODE(MOUSECODE_BUTTON2_INDEXED(0))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Right Punch") PORT_PLAYER(1) PORT_IMPULSE(2) PORT_CODE(KEYCODE_LSHIFT)
+	// Holding a Punch control represents continued glove motion.
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Left Punch") PORT_PLAYER(1) PORT_CODE(KEYCODE_SPACE) PORT_CODE(MOUSECODE_BUTTON2_INDEXED(0))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Right Punch") PORT_PLAYER(1) PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("GUARD")
@@ -79,8 +79,8 @@ template <unsigned Glove>
 u16 xavix_ebox_gloves_device::glove_report_r()
 {
 	u8 const guard = m_guard->read();
-	// All four strength codes select the same game action; use the strongest valid report.
-	return xavix_ir_report_device::motion_report(Glove, BIT(guard, Glove), 3);
+	u8 const motion = BIT(m_punch->read(), Glove);
+	return xavix_ir_report_device::motion_report(Glove, BIT(guard, Glove), motion);
 }
 
 template <unsigned Glove>

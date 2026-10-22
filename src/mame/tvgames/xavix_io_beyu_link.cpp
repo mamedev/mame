@@ -29,6 +29,8 @@ static INPUT_PORTS_START( xavix_beyblade_link )
 	PORT_CONFSETTING(    0x00, "Not Connected" )
 	PORT_CONFSETTING(    0x01, "A-55 Dragoon / Tyson" )
 	PORT_CONFSETTING(    0x02, "A-62 Dranzer / Kai" )
+	// The native link accepts a factory request from an active peer; its physical fixture is unidentified.
+	PORT_CONFSETTING(    0x03, "Factory Test Peer" )
 
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Enter / Trigger") PORT_PLAYER(2)
@@ -91,6 +93,7 @@ void xavix_beyblade_link_device::device_start()
 	save_item(NAME(m_peer_ripcord_history_position));
 	save_item(NAME(m_peer_inputs_valid));
 	save_item(NAME(m_expect_diagnostic_token));
+	save_item(NAME(m_factory_stage));
 }
 
 void xavix_beyblade_link_device::device_reset()
@@ -107,6 +110,7 @@ void xavix_beyblade_link_device::device_reset()
 	m_peer_ripcord_history_position = 0;
 	m_peer_inputs_valid = false;
 	m_expect_diagnostic_token = false;
+	m_factory_stage = FACTORY_ENTRY;
 	reset_protocol();
 }
 
@@ -124,6 +128,7 @@ bool xavix_beyblade_link_device::sync_peer()
 		m_peer_ripcord_history_position = 0;
 		m_peer_inputs_valid = false;
 		m_expect_diagnostic_token = false;
+		m_factory_stage = FACTORY_ENTRY;
 		reset_protocol();
 	}
 
@@ -145,6 +150,11 @@ void xavix_beyblade_link_device::reset_protocol()
 	m_response_byte = 0;
 	m_response_bit = 0;
 	m_expect_diagnostic_token = false;
+	if (m_peer_selection == FACTORY_PEER && m_factory_stage != FACTORY_READY)
+	{
+		m_phase = TEST_CONNECT;
+		m_peer_lines = 0x80;
+	}
 }
 
 void xavix_beyblade_link_device::vblank_w(int state)
@@ -154,6 +164,7 @@ void xavix_beyblade_link_device::vblank_w(int state)
 	if (m_host_reset_cb())
 	{
 		// Re-arm the cable protocol while the local processor is held in physical reset.
+		m_factory_stage = FACTORY_ENTRY;
 		reset_protocol();
 	}
 
@@ -215,6 +226,11 @@ void xavix_beyblade_link_device::prepare_response(u8 command)
 	switch (command)
 	{
 	case 0x01:
+		if (m_peer_selection == FACTORY_PEER)
+		{
+			m_response_bytes = 0;
+			break;
+		}
 		// A fresh linked launcher exposes only its matching lead character.
 		m_response[0] = 1U << (m_peer_selection - 1);
 		m_response[4] = m_peer_selection - 1;
@@ -283,7 +299,23 @@ void xavix_beyblade_link_device::advance_transmit()
 	if (m_response_byte == m_response_bytes)
 	{
 		m_peer_lines = 0;
-		m_phase = RECEIVE_ASSERT;
+		if (m_peer_selection == FACTORY_PEER && m_factory_stage != FACTORY_READY)
+		{
+			if (m_factory_stage == FACTORY_ENTRY)
+			{
+				m_factory_stage = FACTORY_LINK_CHECK;
+				m_phase = WAIT_CONNECT;
+			}
+			else
+			{
+				m_factory_stage = FACTORY_REPLY;
+				m_phase = RECEIVE_ASSERT;
+			}
+		}
+		else
+		{
+			m_phase = RECEIVE_ASSERT;
+		}
 	}
 	else
 	{
@@ -305,6 +337,27 @@ void xavix_beyblade_link_device::io_w(offs_t, u8 levels, u8 direction)
 
 	switch (m_phase)
 	{
+	case TEST_CONNECT:
+		if (host_lines == 0x40)
+		{
+			m_peer_lines = 0;
+			m_phase = TEST_CONNECT_RELEASE;
+		}
+		break;
+
+	case TEST_CONNECT_RELEASE:
+		if (!host_lines)
+		{
+			// Request entry first, then exchange the factory link-check challenge.
+			m_response[0] = m_factory_stage == FACTORY_ENTRY ? 0xf0 : 0x0f;
+			m_response[1] = 0x5a;
+			m_response_bytes = m_factory_stage == FACTORY_ENTRY ? 1 : 2;
+			m_response_byte = 0;
+			m_response_bit = 0;
+			begin_transmit_turnaround();
+		}
+		break;
+
 	case WAIT_CONNECT:
 		if (host_lines == 0x80)
 		{
@@ -336,10 +389,21 @@ void xavix_beyblade_link_device::io_w(offs_t, u8 levels, u8 direction)
 			m_peer_lines = 0;
 			if (++m_receive_bits == 8)
 			{
-				prepare_response(m_receive_byte);
+				bool const factory_reply = m_peer_selection == FACTORY_PEER && m_factory_stage == FACTORY_REPLY && m_receive_byte == 0x4b;
+				if (factory_reply)
+				{
+					m_factory_stage = FACTORY_READY;
+					m_response_bytes = 0;
+				}
+				else
+				{
+					prepare_response(m_receive_byte);
+				}
 				m_receive_byte = 0;
 				m_receive_bits = 0;
-				if (m_response_bytes)
+				if (factory_reply)
+					m_phase = WAIT_CONNECT;
+				else if (m_response_bytes)
 					begin_transmit_turnaround();
 				else
 					m_phase = RECEIVE_ASSERT;

@@ -16,6 +16,7 @@
 #include "xavix_io_esdx_controllers.h"
 #include "xavix_io_evio_bow.h"
 #include "xavix_io_image_sensor.h"
+#include "xavix_io_ir.h"
 #include "xavix_io_ir_motion.h"
 #include "xavix_io_ltv_tam_ir.h"
 #include "xavix_io_mail_mascot.h"
@@ -257,6 +258,46 @@ public:
 
 protected:
 	virtual void configure_board(machine_config &config) override ATTR_COLD;
+};
+
+class xavix_rad_crdn_state : public xavix_io0_matrix_power_state
+{
+public:
+	xavix_rad_crdn_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_io0_matrix_power_state(mconfig, type, tag)
+		, m_remote(*this, "remote")
+		, m_directions(*this, "IN1")
+		, m_buttons(*this, "ROW0")
+		, m_dock(*this, "ROW1")
+		, m_remote_reset(*this, "REMOTE_RESET")
+		, m_factory_test(*this, "FACTORY_TX")
+	{ }
+
+	void xavix_rad_crdn(machine_config &config) ATTR_COLD;
+	void xavix_rad_crdnp(machine_config &config) ATTR_COLD;
+	DECLARE_INPUT_CHANGED_MEMBER(remote_reset);
+
+protected:
+	virtual u8 io0_input_r(u8 direction) override;
+	virtual u8 io1_input_r(u8 direction) override;
+
+private:
+	static constexpr u8 DIRECTION_REPORTS[16] =
+	{
+		0x00, 0x11, 0x91, 0x00, 0x51, 0xa9, 0x15, 0x00,
+		0x29, 0x49, 0x89, 0x00, 0x00, 0x00, 0x00, 0x00
+	};
+
+	void configure_remote(machine_config &config) ATTR_COLD;
+	u16 remote_report_r();
+	int remote_enabled_r();
+
+	required_device<xavix_ir_report_device> m_remote;
+	required_ioport m_directions;
+	required_ioport m_buttons;
+	required_ioport m_dock;
+	required_ioport m_remote_reset;
+	required_ioport m_factory_test;
 };
 
 class xavix_power_state : public xavix_state
@@ -807,6 +848,12 @@ public:
 	{ }
 
 	void xavix_epo_crok(machine_config &config) ATTR_COLD;
+	DECLARE_INPUT_CHANGED_MEMBER(factory_link_send);
+	int factory_link_r() { return m_factory_link_line; }
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	virtual u8 io1_input_r(u8 direction) override;
@@ -814,6 +861,12 @@ private:
 
 	required_device<xavix_croket_controllers_device> m_controllers;
 	required_ioport m_banker;
+
+	TIMER_CALLBACK_MEMBER(factory_link_tick);
+	emu_timer *m_factory_link_timer;
+	u8 m_factory_link_phase;
+	u8 m_factory_link_bit;
+	u8 m_factory_link_line = 0;
 };
 
 class xavix_jarajal_state : public xavix_power_state

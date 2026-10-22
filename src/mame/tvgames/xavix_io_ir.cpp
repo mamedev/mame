@@ -4,7 +4,7 @@
 
     Shared infrared report generator for XaviX controllers. Latches input
     reports and emits timed receiver events and data levels using framed
-    serial, sampled data or pulse-distance formats, with configurable report
+    serial, sampled data or pulse interval formats, with configurable report
     lengths, framing and bit timing.
 
     TODO:
@@ -15,6 +15,8 @@
 
 #include "emu.h"
 #include "xavix_io_ir.h"
+
+#include <bit>
 
 DEFINE_DEVICE_TYPE(XAVIX_IR_REPORT, xavix_ir_report_device, "xavix_ir_report", "XaviX Infrared Controller Reports")
 
@@ -32,6 +34,7 @@ xavix_ir_report_device::xavix_ir_report_device(const machine_config &mconfig, co
 	, m_pulse_one_ticks(0)
 	, m_pulse_zero_ticks(0)
 	, m_first_pulse_extension(0)
+	, m_report_gap_ticks(0)
 	, m_start_ticks{}
 	, m_report_count(2)
 	, m_sample_tick_count(0)
@@ -120,7 +123,7 @@ void xavix_ir_report_device::start_report(unsigned report)
 	m_shift = m_latched_report[report];
 	m_bits_remaining = m_report_bits[report];
 	m_start_cell = m_mode == mode::FRAMED_LSB;
-	if (m_mode == mode::PULSE_DISTANCE)
+	if (m_mode == mode::PULSE_DISTANCE || m_mode == mode::PULSE_RUN_LENGTH)
 		m_data = 1;
 	else
 		m_data = m_mode == mode::FRAMED_LSB ? 0 : BIT(m_shift, m_bits_remaining - 1);
@@ -129,6 +132,11 @@ void xavix_ir_report_device::start_report(unsigned report)
 	m_event_out_cb();
 	if (m_mode == mode::PULSE_DISTANCE)
 		m_bit_timer->adjust(clocks_to_attotime(current_pulse_ticks() + m_first_pulse_extension));
+	else if (m_mode == mode::PULSE_RUN_LENGTH)
+	{
+		assert(BIT(m_shift, 0));
+		m_bit_timer->adjust(clocks_to_attotime(current_run_bits() * m_bit_ticks));
+	}
 	else
 	{
 		u32 ticks = current_bit_ticks();
@@ -162,6 +170,11 @@ u32 xavix_ir_report_device::current_pulse_ticks() const
 	return BIT(m_shift, 0) ? m_pulse_one_ticks : m_pulse_zero_ticks;
 }
 
+unsigned xavix_ir_report_device::current_run_bits() const
+{
+	return std::min<unsigned>(m_bits_remaining, 1 + std::countr_zero(m_shift >> 1));
+}
+
 TIMER_CALLBACK_MEMBER(xavix_ir_report_device::bit_tick)
 {
 	if (m_mode == mode::PULSE_DISTANCE)
@@ -176,6 +189,25 @@ TIMER_CALLBACK_MEMBER(xavix_ir_report_device::bit_tick)
 		{
 			m_bit_timer->adjust(attotime::never);
 		}
+	}
+	else if (m_mode == mode::PULSE_RUN_LENGTH && !m_between_reports)
+	{
+		unsigned const bits = current_run_bits();
+		m_shift >>= bits;
+		m_bits_remaining -= bits;
+		if (m_bits_remaining)
+		{
+			m_event_out_cb();
+			m_bit_timer->adjust(clocks_to_attotime(current_run_bits() * m_bit_ticks));
+		}
+		// The final zero run ends by timeout, without another receiver event.
+		else if (next_report(m_report_index + 1) < m_report_count)
+		{
+			m_between_reports = true;
+			m_bit_timer->adjust(clocks_to_attotime(m_report_gap_ticks ? m_report_gap_ticks : m_bit_ticks));
+		}
+		else
+			m_bit_timer->adjust(attotime::never);
 	}
 	else if (m_between_reports)
 	{

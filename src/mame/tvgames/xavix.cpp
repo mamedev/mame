@@ -1442,42 +1442,6 @@ static INPUT_PORTS_START( rad_bdp )
 INPUT_PORTS_END
 
 
-// Play TV Card Night
-static INPUT_PORTS_START( rad_crdn )
-	PORT_INCLUDE(xavix)
-
-	PORT_MODIFY("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("ROW0")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Enter")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("New Game")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Sound")
-
-	PORT_START("ROW1")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Dock Remote / Power Off")
-	PORT_BIT( 0xef, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	// The base Reset restarts the game; the remote's separate recessed Reset only restarts its transmitter.
-	PORT_INCLUDE(xavix_reset_control)
-INPUT_PORTS_END
-
-
-// Connectv Card Night
-static INPUT_PORTS_START( rad_crdnp )
-	PORT_INCLUDE(rad_crdn)
-INPUT_PORTS_END
-
-
 // Play TV Opus / Plug & Play Opus
 static INPUT_PORTS_START( rad_opus )
 	PORT_INCLUDE(xavix)
@@ -1935,6 +1899,114 @@ u8 xavix_pl1000_state::lightgun_r(offs_t offset)
 //  Systems Sharing IR Reports
 //-------------------------------------------------
 
+// Play TV Card Night
+static INPUT_PORTS_START( rad_crdn )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ROW0")
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Enter")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("New Game")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Sound")
+
+	PORT_START("ROW1")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Dock Remote / Power Off") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_rad_crdn_state::remote_reset), 0)
+	PORT_BIT( 0xef, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("REMOTE_RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Remote Reset") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_rad_crdn_state::remote_reset), 0)
+
+	PORT_START("FACTORY_TX")
+	// The physical control or fixture sending this additional wireless command is unidentified.
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Transmission") PORT_CODE(KEYCODE_F1)
+
+	// The base Reset restarts the game; Remote Reset only restarts its transmitter.
+	PORT_INCLUDE(xavix_reset_control)
+INPUT_PORTS_END
+
+
+// Connectv Card Night
+static INPUT_PORTS_START( rad_crdnp )
+	PORT_INCLUDE(rad_crdn)
+INPUT_PORTS_END
+
+void xavix_rad_crdn_state::xavix_rad_crdn(machine_config &config)
+{
+	xavix_1mb(config);
+	configure_remote(config);
+}
+
+void xavix_rad_crdn_state::xavix_rad_crdnp(machine_config &config)
+{
+	xavixp_1mb(config);
+	configure_remote(config);
+}
+
+void xavix_rad_crdn_state::configure_remote(machine_config &config)
+{
+	// The receiver checks three copies; physical timing and simultaneous-key priority need measurement.
+	XAVIX_IR_REPORT(config, m_remote, peripheral_clock());
+	m_remote->set_mode(xavix_ir_report_device::mode::PULSE_RUN_LENGTH);
+	m_remote->set_bit_ticks(0x15 * 512);
+	m_remote->set_report_gap_ticks(64 * 512);
+	m_remote->set_report_count(3);
+	m_remote->report_callback<0>().set(FUNC(xavix_rad_crdn_state::remote_report_r));
+	m_remote->report_callback<1>().set(FUNC(xavix_rad_crdn_state::remote_report_r));
+	m_remote->report_callback<2>().set(FUNC(xavix_rad_crdn_state::remote_report_r));
+	m_remote->enable_callback().set(FUNC(xavix_rad_crdn_state::remote_enabled_r));
+	m_remote->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
+	m_screen->screen_vblank().append(m_remote, FUNC(xavix_ir_report_device::vblank_w));
+}
+
+u16 xavix_rad_crdn_state::remote_report_r()
+{
+	if (BIT(m_factory_test->read(), 0))
+		return 0x55;
+
+	u8 const buttons = m_buttons->read();
+	if (BIT(buttons, 5))
+		return 0xa5;
+	if (BIT(buttons, 6))
+		return 0x95;
+	if (BIT(buttons, 7))
+		return 0x45;
+	return DIRECTION_REPORTS[BIT(m_directions->read(), 2, 4)];
+}
+
+int xavix_rad_crdn_state::remote_enabled_r()
+{
+	return !BIT(m_dock->read(), 4) && !BIT(m_remote_reset->read(), 0) && remote_report_r();
+}
+
+INPUT_CHANGED_MEMBER(xavix_rad_crdn_state::remote_reset)
+{
+	if (newval && machine().phase() == machine_phase::RUNNING)
+		m_remote->reset();
+}
+
+u8 xavix_rad_crdn_state::io0_input_r(u8 direction)
+{
+	// The docking contact is wired; the handheld buttons arrive through the wireless receiver.
+	return xavix_io0_matrix_power_state::io0_input_r(direction) & ~0xe0;
+}
+
+u8 xavix_rad_crdn_state::io1_input_r(u8 direction)
+{
+	return xavix_io0_matrix_power_state::io1_input_r(direction) & ~0x3c;
+}
+
+
 // Goal Kimeruze! Excite Striker / Let's Play Excite Striker / Play TV Soccer
 static INPUT_PORTS_START( epo_strk )
 	PORT_INCLUDE(xavix_excite_ir_sports)
@@ -2334,12 +2406,26 @@ static INPUT_PORTS_START( epo_crok )
 	PORT_MODIFY("IN0")
 	// The enclosure button is unlabelled; this name follows its confirmed title/menu role.
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Main Unit Button")
-	// IN0.4 and IN1.1 enter unresolved power/test paths but are not fitted user controls.
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The factory gate uses contacts 1 and 2; their physical fixture is unidentified.
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 3") PORT_CODE(KEYCODE_5)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 1") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 2") PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 4") PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 5") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_epo_crok_state::factory_link_r))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // Guard contacts are reported by the wireless controllers.
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_croket_controllers_device::data_r))
-	PORT_BIT( 0xf6, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xf4, IP_ACTIVE_HIGH, IPT_UNUSED )
+	// The test page identifies demo mode; its physical source is unknown.
+	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+
+	PORT_START("FACTORY_LINK")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Link Test Packet") PORT_CODE(KEYCODE_8) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_epo_crok_state::factory_link_send), 0)
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("BANKER")
 	PORT_CONFNAME( 0x01, 0x00, "Battle Code Banker Connection" )
@@ -2361,6 +2447,24 @@ void xavix_epo_crok_state::xavix_epo_crok(machine_config &config)
 	m_screen->screen_vblank().append(m_controllers, FUNC(xavix_croket_controllers_device::vblank_w));
 }
 
+void xavix_epo_crok_state::machine_start()
+{
+	xavix_i2c_power_state::machine_start();
+	m_factory_link_timer = timer_alloc(FUNC(xavix_epo_crok_state::factory_link_tick), this);
+	save_item(NAME(m_factory_link_phase));
+	save_item(NAME(m_factory_link_bit));
+	save_item(NAME(m_factory_link_line));
+}
+
+void xavix_epo_crok_state::machine_reset()
+{
+	xavix_i2c_power_state::machine_reset();
+	m_factory_link_timer->adjust(attotime::never);
+	m_factory_link_phase = 0;
+	m_factory_link_bit = 0;
+	m_factory_link_line = 0;
+}
+
 u8 xavix_epo_crok_state::io1_input_r(u8 direction)
 {
 	u8 const data = xavix_i2c_power_state::io1_input_r(direction);
@@ -2374,6 +2478,47 @@ void xavix_epo_crok_state::io1_output_w(u8 data, u8 direction)
 		xavix_i2c_power_state::io1_output_w(data, direction);
 	else
 		m_i2cmem->reset_bus();
+}
+
+INPUT_CHANGED_MEMBER(xavix_epo_crok_state::factory_link_send)
+{
+	if (machine().phase() == machine_phase::RUNNING && newval && !m_factory_link_phase)
+	{
+		m_factory_link_phase = 1;
+		m_factory_link_bit = 0;
+		m_factory_link_line = 1;
+		m_factory_link_timer->adjust(attotime::from_msec(1));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(xavix_epo_crok_state::factory_link_tick)
+{
+	// The diagnostic receives 88 followed by eight zero bytes, including their checksum.
+	// Pulse intervals straddle its discriminator; the physical fixture and timing are unknown.
+	if (m_factory_link_phase == 1)
+	{
+		m_factory_link_line = 0;
+		m_factory_link_phase = 2;
+		m_factory_link_timer->adjust(attotime::from_msec(1));
+	}
+	else if (m_factory_link_phase == 2)
+	{
+		m_factory_link_line = 1;
+		m_factory_link_phase = 3;
+		m_factory_link_timer->adjust(attotime::from_msec(1));
+	}
+	else
+	{
+		m_factory_link_line = 0;
+		if (++m_factory_link_bit == 9 * 8)
+			m_factory_link_phase = 0;
+		else
+		{
+			bool const one = m_factory_link_bit < 8 && BIT(0x88, m_factory_link_bit);
+			m_factory_link_phase = 2;
+			m_factory_link_timer->adjust(attotime::from_msec(one ? 7 : 1));
+		}
+	}
 }
 
 
@@ -5457,8 +5602,8 @@ CONS( 2003,  rad_mtrkp, rad_mtrk, 0, xavix_rad_mtrkp,     rad_mtrkp, xavix_power
 CONS( 200?,  rad_box,   0,        0, xavix_2mb,           rad_box,   xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Play TV Boxin' (NTSC)", MACHINE_NOT_WORKING )
 CONS( 200?,  rad_boxp,  rad_box,  0, xavixp_2mb,          rad_boxp,  xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Connectv Boxin' (PAL)", MACHINE_NOT_WORKING )
 
-CONS( 200?,  rad_crdn,  0,        0, xavix_1mb,           rad_crdn,  xavix_io0_matrix_power_state, empty_init,  "Radica / SSD Company Ltd.", "Play TV Card Night (NTSC)", 0 )
-CONS( 200?,  rad_crdnp, rad_crdn, 0, xavixp_1mb,          rad_crdnp, xavix_io0_matrix_power_state, empty_init,  "Radica / SSD Company Ltd.", "Connectv Card Night (PAL)", 0 )
+CONS( 200?,  rad_crdn,  0,        0, xavix_rad_crdn,      rad_crdn,  xavix_rad_crdn_state,         empty_init,  "Radica / SSD Company Ltd.", "Play TV Card Night (NTSC)", 0 )
+CONS( 200?,  rad_crdnp, rad_crdn, 0, xavix_rad_crdnp,     rad_crdnp, xavix_rad_crdn_state,         empty_init,  "Radica / SSD Company Ltd.", "Connectv Card Night (PAL)", 0 )
 
 CONS( 2000,  rad_bb,    0,        0, xavix_rad_bb,        rad_bb,    xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Play TV Baseball (NTSC)", MACHINE_NOT_WORKING ) // Play TV branding used on box, not ingame
 

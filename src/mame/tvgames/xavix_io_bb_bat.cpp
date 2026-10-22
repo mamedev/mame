@@ -5,7 +5,7 @@
     XaviX and Radica baseball infrared bat input. Turns swing-strength
     selections into timed I/O events for the console's infrared receiver.
     The event counts represent weak, medium and strong swings; each swing
-    is approximated as one burst.
+    remains active while the swing-strength input is held.
 
     TODO:
     - Measure the infrared swing envelope and repetition on an original
@@ -44,14 +44,12 @@ void xavix_baseball_bat_device::device_start()
 	m_event_timer = timer_alloc(FUNC(xavix_baseball_bat_device::event_timer), this);
 
 	save_item(NAME(m_events_remaining));
-	save_item(NAME(m_swing_armed));
 }
 
 void xavix_baseball_bat_device::device_reset()
 {
 	m_event_timer->adjust(attotime::never);
 	m_events_remaining = 0;
-	m_swing_armed = !(m_strength->read() & 3);
 }
 
 void xavix_baseball_bat_device::vblank_w(int state)
@@ -61,15 +59,9 @@ void xavix_baseball_bat_device::vblank_w(int state)
 
 	u8 const strength = m_strength->read() & 3;
 	if (!strength)
-	{
-		m_swing_armed = true;
 		return;
-	}
-	if (!m_swing_armed)
-		return;
-	m_swing_armed = false;
 
-	// Emulate one envelope per swing; 2/4/8 events reach the ROM's weak/medium/strong buckets.
+	// The receiver's event rate selects the ROM's weak, medium or strong swing bucket.
 	m_events_remaining = EVENT_COUNTS[strength];
 	attotime const interval = m_screen->frame_period() / (m_events_remaining + 1);
 	m_event_timer->adjust(interval, 0, interval);

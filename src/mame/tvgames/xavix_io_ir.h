@@ -20,7 +20,8 @@ public:
 		MSB_FIRST,
 		FRAMED_LSB,
 		PULSE_DISTANCE,
-		SAMPLE_SEQUENCE
+		SAMPLE_SEQUENCE,
+		PULSE_RUN_LENGTH
 	};
 
 	// Sequence callbacks may return NO_SEQUENCE; per-report enable callbacks also use it internally.
@@ -40,6 +41,7 @@ public:
 	void set_start_ticks(u32 start_ticks) { m_start_ticks.fill(start_ticks); }
 	template <unsigned N> void set_start_ticks(u32 start_ticks) { static_assert(N < 8); m_start_ticks[N] = start_ticks; }
 	void set_report_count(u8 report_count) { m_report_count = report_count; }
+	void set_report_gap_ticks(u32 ticks) { m_report_gap_ticks = ticks; }
 	template <unsigned N> void set_report_bits(u8 bits) { static_assert(N < 8); m_report_bits[N] = bits; }
 	void set_mode(mode report_mode) { m_mode = report_mode; }
 	void set_pulse_distance_ticks(u32 one_ticks, u32 zero_ticks, u32 first_extension)
@@ -77,6 +79,7 @@ private:
 	unsigned next_report(unsigned report) const;
 	u32 current_bit_ticks() const;
 	u32 current_pulse_ticks() const;
+	unsigned current_run_bits() const;
 
 	devcb_read16::array<8> m_report_cb;
 	devcb_read_line::array<8> m_report_enable_cb;
@@ -100,6 +103,7 @@ private:
 	u32 m_pulse_one_ticks;
 	u32 m_pulse_zero_ticks;
 	u32 m_first_pulse_extension;
+	u32 m_report_gap_ticks;
 	std::array<u32, 8> m_start_ticks;
 	u8 m_report_count;
 	u8 m_sample_tick_count;
