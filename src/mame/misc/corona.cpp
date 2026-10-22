@@ -926,11 +926,11 @@ void corona_state::re800_sound_cpu_io_map(address_map &map)
 }
 
 
-/* Lucky Roulette
+/* Lucky Roulette Plus
 
   Blitter: F0-F4
   Status:  F5
-  Ball:    F9
+  Ball:    F9   (inverted LED-matrix)
 
   F8       R-   DIP switches?
   FA       R-   DIP switches?
