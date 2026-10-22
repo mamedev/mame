@@ -341,7 +341,7 @@
 
 #include "re800.lh"
 #include "luckyrlt.lh"
-#include "rula.lh"
+#include "rula_v.lh"
 
 
 namespace {
@@ -2267,4 +2267,4 @@ GAMEL( 1991, luckyrlta, luckyrlt, luckyrlta, luckyrlt, corona_state, empty_init,
 
 // Miky SRL games
 GAME(  1989, monte,     0,        monte,     monte,    corona_state, init_monte, ROT0,   "Miky SRL",                 "Monte (4-players Spanish cards game. Prototype, encrypted)", 0 )
-GAMEL( 1991, rula,      0,        rula,      rula,     corona_state, init_monte, ROT90,  "Miky SRL",                 "Rula (6-players roulette, encrypted)",            0,                        layout_rula )
+GAMEL( 1991, rula,      0,        rula,      rula,     corona_state, init_monte, ROT90,  "Miky SRL",                 "Rula (6-players roulette, encrypted)",            0,                        layout_rula_v )
