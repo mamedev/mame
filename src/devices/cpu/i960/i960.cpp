@@ -526,7 +526,8 @@ void i960_cpu_device::test(uint32_t opcode, int mask)
 double i960_cpu_device::round_to_int(double val)
 {
 	// apply rounding mode
-	std::fesetround(FE_TONEAREST);
+	if (std::fegetround() != FE_TONEAREST)
+		std::fesetround(FE_TONEAREST);
 	switch ((m_AC >> 30) & 3)
 	{
 	case 0: return std::rint(val);
