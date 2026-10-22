@@ -2766,6 +2766,7 @@ void superxavix_epo_ntpj_state::superxavix_epo_ntpj(machine_config &config)
 	m_piano->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<1>));
 
 	TVPC_MOUSE_PORT(config, m_mouse).set_default_option("mic_mouse");
+	m_mouse->option_add("mic_mouse", TVPC_HK_MOUSE);
 	m_soc->set_adc_audio_channel(0);
 	m_soc->add_adc_route(*m_mouse, 0, 1.0);
 

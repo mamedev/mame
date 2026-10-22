@@ -41,6 +41,8 @@ void suprtvpc_printer_device::device_start()
 {
 	m_busy_timer = timer_alloc(FUNC(suprtvpc_printer_device::ready), this);
 	m_idle_timer = timer_alloc(FUNC(suprtvpc_printer_device::abort_page), this);
+	// Job heights are 16-bit.  Packed monochrome rows preserve unfinished jobs
+	// in saves without the fixed RGB32 paper buffer used by bitmap_printer_device.
 	m_page = std::make_unique<u8[]>(ROW_BYTES * MAX_ROWS);
 
 	save_pointer(NAME(m_page), ROW_BYTES * MAX_ROWS);
@@ -57,6 +59,7 @@ void suprtvpc_printer_device::device_reset()
 {
 	m_busy_timer->adjust(attotime::never);
 	m_idle_timer->adjust(attotime::never);
+	std::fill_n(m_page.get(), ROW_BYTES * MAX_ROWS, 0);
 	std::fill(std::begin(m_packet), std::end(m_packet), 0);
 	m_bit_count = 0;
 	m_height = 0;
@@ -106,6 +109,7 @@ TIMER_CALLBACK_MEMBER(suprtvpc_printer_device::abort_page)
 {
 	// The host ends cancelled transfers with data held low, including midway through
 	// a byte.  Normal inter-row gaps are under 2 ms; the actual timeout is unknown.
+	clear_rows();
 	std::fill(std::begin(m_packet), std::end(m_packet), 0);
 	m_bit_count = 0;
 	m_height = 0;
@@ -132,14 +136,21 @@ void suprtvpc_printer_device::receive_packet()
 		if (++m_row == m_height)
 		{
 			print_page();
+			clear_rows();
 			m_height = 0;
 		}
 	}
 	else
 	{
 		LOG("Unknown raster command %02x\n", m_packet[0]);
+		clear_rows();
 		m_height = 0;
 	}
+}
+
+void suprtvpc_printer_device::clear_rows()
+{
+	std::fill_n(m_page.get(), m_row * ROW_BYTES, 0);
 }
 
 void suprtvpc_printer_device::print_page()

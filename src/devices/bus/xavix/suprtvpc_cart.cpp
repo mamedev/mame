@@ -128,6 +128,8 @@ void suprtvpc_rom_device::device_start()
 {
 }
 
+// These are Super TV-PC slot adapters; EEPROM protocol and storage are shared
+// with other XaviX cartridges through i2cmem_device.
 void suprtvpc_rom_i2c_device::sda_w(int state)
 {
 	m_eeprom->write_sda(state);

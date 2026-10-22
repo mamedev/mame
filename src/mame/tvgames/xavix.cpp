@@ -3801,11 +3801,7 @@ void xavix_tvpc_state::xavix_extbus_map(address_map &map)
 void xavix_tvpc_state::xavix_tvpc(machine_config &config)
 {
 	xavix_i2c_24c16(config);
-	TVPC_MOUSE_PORT(config, m_mouse).set_options([] (device_slot_interface &port)
-	{
-		port.option_add("mouse", TVPC_MOUSE);
-		port.option_add("mic_mouse", TVPC_HK_MOUSE);
-	}, "mouse", false);
+	TVPC_MOUSE_PORT(config, m_mouse).set_default_option("mouse");
 
 	// The mouse uses writable counters 2 and 3.
 	m_soc->anport_input_callback<2>().set(m_mouse, FUNC(tvpc_mouse_port_device::x_r));
@@ -3821,6 +3817,7 @@ void xavix_tvpc_state::xavix_tvpc(machine_config &config)
 void xavix_tvpc_state::xavix_tvpc_hk(machine_config &config)
 {
 	xavix_tvpc(config);
+	m_mouse->option_add("mic_mouse", TVPC_HK_MOUSE);
 	m_mouse->set_default_option("mic_mouse");
 	m_soc->set_adc_audio_channel(0);
 	m_soc->add_adc_route(*m_mouse, 0, 1.0);

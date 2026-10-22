@@ -6,12 +6,10 @@
 #pragma once
 
 #include "suprtvpc_cart.h"
-
-#include "bus/rs232/rs232.h"
+#include "imagedev/bitbngr.h"
 #include "diserial.h"
 
-class suprtvpc_rom_24c64_ir_device : public suprtvpc_rom_i2c_device,
-		public device_serial_interface
+class suprtvpc_rom_24c64_ir_device : public suprtvpc_rom_i2c_device, public device_serial_interface
 {
 public:
 	suprtvpc_rom_24c64_ir_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
@@ -23,19 +21,22 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	virtual void rcv_callback() override;
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
 	virtual void rcv_complete() override;
 
 private:
-	void rxd_w(int state);
-	TIMER_CALLBACK_MEMBER(start_bit);
-	TIMER_CALLBACK_MEMBER(pulse_end);
+	static constexpr unsigned BAUD = 9600;
 
-	required_device<rs232_port_device> m_serial;
-	emu_timer *m_start_timer;
-	emu_timer *m_pulse_timer;
+	TIMER_CALLBACK_MEMBER(poll_stream);
+	TIMER_CALLBACK_MEMBER(transmit_pulse_end);
+	TIMER_CALLBACK_MEMBER(receive_pulse);
+
+	required_device<bitbanger_device> m_stream;
+	emu_timer *m_poll_timer;
+	emu_timer *m_transmit_timer;
+	emu_timer *m_receive_timer;
 	bool m_tx_level;
-	bool m_rxd;
 };
 
 DECLARE_DEVICE_TYPE(SUPRTVPC_ROM_24C64_IR, suprtvpc_rom_24c64_ir_device)

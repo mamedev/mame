@@ -187,6 +187,8 @@ void xavix_rom_i2c_base_device::write_i2c(offs_t offset, uint8_t data)
 	m_i2cmem->write_scl(BIT(data, 1));
 }
 
+// The cartridge bus exposes the shared I2C memory device's pins directly.
+// Super TV-PC uses a separate slot interface and EEPROM child tag.
 void xavix_rom_i2c_direct_device::write_sda(int state)
 {
 	m_i2cmem->write_sda(state);

@@ -70,37 +70,14 @@ class tvpc_hk_mouse_device : public tvpc_mouse_device
 {
 public:
 	tvpc_hk_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: tvpc_hk_mouse_device(mconfig, TVPC_HK_MOUSE, tag, owner, clock)
+		: tvpc_mouse_device(mconfig, TVPC_HK_MOUSE, tag, owner, clock)
 	{
 	}
 
 protected:
-	tvpc_hk_mouse_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-		: tvpc_mouse_device(mconfig, type, tag, owner, clock)
-	{
-	}
-
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD
 	{
 		MICROPHONE(config, "microphone", 1).front_center().add_route(0, DEVICE_SELF_OWNER, 1.0);
-	}
-};
-
-class suprtvpc_mouse_device : public tvpc_mouse_device
-{
-public:
-	suprtvpc_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: tvpc_mouse_device(mconfig, SUPRTVPC_MOUSE, tag, owner, clock)
-	{
-	}
-};
-
-class epo_ntpj_mouse_device : public tvpc_hk_mouse_device
-{
-public:
-	epo_ntpj_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: tvpc_hk_mouse_device(mconfig, EPO_NTPJ_MOUSE, tag, owner, clock)
-	{
 	}
 };
 
@@ -108,8 +85,6 @@ public:
 
 DEFINE_DEVICE_TYPE_PRIVATE(TVPC_MOUSE, device_tvpc_mouse_interface, tvpc_mouse_device, "tvpc_mouse", "TV-PC Mouse")
 DEFINE_DEVICE_TYPE_PRIVATE(TVPC_HK_MOUSE, device_tvpc_mouse_interface, tvpc_hk_mouse_device, "tvpc_hk_mouse", "Hello Kitty TV-PC Mouse with Flower Microphone")
-DEFINE_DEVICE_TYPE_PRIVATE(SUPRTVPC_MOUSE, device_tvpc_mouse_interface, suprtvpc_mouse_device, "suprtvpc_mouse", "Super TV-PC Mouse")
-DEFINE_DEVICE_TYPE_PRIVATE(EPO_NTPJ_MOUSE, device_tvpc_mouse_interface, epo_ntpj_mouse_device, "epo_ntpj_mouse", "Hello Kitty Piano PC Mouse with Flower Microphone")
 DEFINE_DEVICE_TYPE(TVPC_MOUSE_PORT, tvpc_mouse_port_device, "tvpc_mouse_port", "TV-PC Mouse Port")
 
 tvpc_mouse_port_device::tvpc_mouse_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -118,10 +93,10 @@ tvpc_mouse_port_device::tvpc_mouse_port_device(const machine_config &mconfig, co
 	, device_single_card_slot_interface<device_tvpc_mouse_interface>(mconfig, *this)
 	, m_mouse_index(0)
 {
+	// Microphone mice are added by boards with a connected audio input.
 	set_options([] (device_slot_interface &port)
 	{
-		port.option_add("mouse", SUPRTVPC_MOUSE);
-		port.option_add("mic_mouse", EPO_NTPJ_MOUSE);
+		port.option_add("mouse", TVPC_MOUSE);
 	}, nullptr, false);
 }
 

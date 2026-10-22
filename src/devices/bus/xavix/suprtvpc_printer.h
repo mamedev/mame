@@ -34,6 +34,7 @@ private:
 	TIMER_CALLBACK_MEMBER(ready);
 	TIMER_CALLBACK_MEMBER(abort_page);
 	void receive_packet();
+	void clear_rows();
 	void print_page();
 
 	emu_timer *m_busy_timer;

@@ -45,7 +45,5 @@ protected:
 DECLARE_DEVICE_TYPE(TVPC_MOUSE_PORT, tvpc_mouse_port_device)
 DECLARE_DEVICE_TYPE(TVPC_MOUSE, device_tvpc_mouse_interface)
 DECLARE_DEVICE_TYPE(TVPC_HK_MOUSE, device_tvpc_mouse_interface)
-DECLARE_DEVICE_TYPE(SUPRTVPC_MOUSE, device_tvpc_mouse_interface)
-DECLARE_DEVICE_TYPE(EPO_NTPJ_MOUSE, device_tvpc_mouse_interface)
 
 #endif // MAME_BUS_XAVIX_TVPC_MOUSE_H
