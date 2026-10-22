@@ -11,7 +11,6 @@
 #include "bus/xavix/cart.h"
 #include "machine/i2cmem.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
 #include "machine/xavix_soc.h"
 
 #include "emupal.h"
@@ -36,13 +35,9 @@ public:
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
 		m_power(*this, "POWER"),
-		m_reel(*this, "REEL"),
-		m_lightgun1(*this, "GUN1_%u", 0U),
-		m_lightgun2(*this, "GUN2_%u", 0U),
 		m_soc(*this, "soc"),
 		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
-		m_power_hold_timer(*this, "power_hold"),
 		m_rom(*this, "bios"),
 		m_palette(*this, "palette")
 	{ }
@@ -74,6 +69,7 @@ public:
 	void xavix_rad_mtrkp(machine_config &config) ATTR_COLD;
 	void xavix_rad_madf(machine_config &config) ATTR_COLD;
 	void xavix_tom_tvho(machine_config &config) ATTR_COLD;
+	void xavix_tomthr(machine_config &config) ATTR_COLD;
 	void xavix_tak_beyu(machine_config &config) ATTR_COLD;
 
 	// XaviX2000 configurations (xavix_xavix2000.cpp)
@@ -82,8 +78,6 @@ public:
 	void xavix2000_nv(machine_config &config) ATTR_COLD;
 	void xavix2000_nv_4mb(machine_config &config) ATTR_COLD;
 	void xavix2000_epo_sdb(machine_config &config) ATTR_COLD;
-
-	int fishing_reel_r();
 
 	DECLARE_INPUT_CHANGED_MEMBER(power_off);
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
@@ -124,7 +118,6 @@ protected:
 
 	// driver_device overrides
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_stop() override ATTR_COLD;
 
 	u32 peripheral_clock() const { return m_soc->clock() / 2; }
@@ -132,8 +125,6 @@ protected:
 	virtual void configure_board(machine_config &config) ATTR_COLD;
 	void configure_power_hold(machine_config &config) ATTR_COLD;
 	void configure_ir(machine_config &config, required_device<xavix_ir_motion_device> &controllers, xavix_ir_motion_device::controller_type type) ATTR_COLD;
-	void configure_lightgun_scanlines(machine_config &config, u8 event_mask) ATTR_COLD;
-	u8 lightgun_position_r(unsigned player, offs_t offset, u16 x_offset = 0, u16 y_scale = 0x100, u16 y_offset = 0, u16 x_scale = 0x100);
 	void power_off_w(int state);
 
 	virtual u8 io0_input_r(u8 direction);
@@ -164,10 +155,6 @@ protected:
 	required_ioport m_in0;
 	required_ioport m_in1;
 	optional_ioport m_power;
-	optional_ioport m_reel;
-	optional_ioport_array<2> m_lightgun1;
-	optional_ioport_array<2> m_lightgun2;
-	u8 m_lightgun_event_mask = 0;
 	required_device<xavix_soc_device> m_soc;
 	optional_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
@@ -185,17 +172,9 @@ protected:
 	virtual u8 external_code_r(offs_t offset);
 	virtual u8 external_data_r(offs_t offset);
 
-	// Selected boards alternate IO1 bit 7 to maintain an external RC power hold.
-	optional_device<timer_device> m_power_hold_timer;
-	u8 m_power_hold_level;
-	void io1_power_hold_w(offs_t offset, u8 data, u8 mem_mask);
-	TIMER_DEVICE_CALLBACK_MEMBER(power_hold_expired);
-
 	u8 power_status_r();
 
 	virtual u8 lightgun_r(offs_t offset);
-	virtual u8 lightgun_event_mask() { return m_lightgun_event_mask; }
-	TIMER_DEVICE_CALLBACK_MEMBER(lightgun_scanline_cb);
 
 	required_region_ptr<u8> m_rom;
 
@@ -205,6 +184,23 @@ protected:
 
 private:
 	xavix_baseball_ball_device &configure_baseball(machine_config &config) ATTR_COLD;
+};
+
+// Boards whose firmware drives IO1.7 high to switch off the supply.
+template <typename Base>
+class xavix_power_state_base : public Base
+{
+public:
+	xavix_power_state_base(const machine_config &mconfig, device_type type, const char *tag)
+		: Base(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void configure_board(machine_config &config) override ATTR_COLD
+	{
+		Base::configure_board(config);
+		this->m_soc->template io_output_callback<1>().append(*this, FUNC(xavix_power_state_base::io1_power_off_w));
+	}
 };
 
 class xavix_i2c_state : public xavix_state

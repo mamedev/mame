@@ -23,6 +23,7 @@
 #include "bus/xavix/tvpc_mouse.h"
 #include "machine/i2chle.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "sound/flt_vol.h"
 
 #include "speaker.h"
@@ -45,16 +46,7 @@ private:
 	required_ioport_array<2> m_matrix;
 };
 
-class xavix_io0_matrix_power_state : public xavix_io0_matrix_state
-{
-public:
-	xavix_io0_matrix_power_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_io0_matrix_state(mconfig, type, tag)
-	{ }
-
-protected:
-	virtual void configure_board(machine_config &config) override ATTR_COLD;
-};
+using xavix_io0_matrix_power_state = xavix_power_state_base<xavix_io0_matrix_state>;
 
 class xavix_rad_crdn_state : public xavix_io0_matrix_power_state
 {
@@ -77,18 +69,7 @@ private:
 	required_device<xavix_cardnight_remote_device> m_remote;
 };
 
-class xavix_power_state : public xavix_state
-{
-public:
-	xavix_power_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_state(mconfig, type, tag)
-	{ }
-
-	void xavix_tomthr(machine_config &config) ATTR_COLD;
-
-protected:
-	virtual void configure_board(machine_config &config) override ATTR_COLD;
-};
+using xavix_power_state = xavix_power_state_base<xavix_state>;
 
 class xavix_epo_quiz_state : public xavix_power_state
 {
@@ -112,16 +93,7 @@ private:
 	required_ioport m_an6;
 };
 
-class xavix_i2c_power_state : public xavix_i2c_state
-{
-public:
-	xavix_i2c_power_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig, type, tag)
-	{ }
-
-protected:
-	virtual void configure_board(machine_config &config) override ATTR_COLD;
-};
+using xavix_i2c_power_state = xavix_power_state_base<xavix_i2c_state>;
 
 class xavix_tomplc_state : public xavix_i2c_power_state
 {
@@ -162,16 +134,26 @@ private:
 	required_device<xavix_ir_motion_device> m_controllers;
 };
 
-class xavix_ir_power_state : public xavix_ir_state
+using xavix_ir_power_state = xavix_power_state_base<xavix_ir_state>;
+
+template <typename Base>
+class xavix_reel_state : public Base
 {
 public:
-	xavix_ir_power_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_ir_state(mconfig, type, tag)
+	xavix_reel_state(const machine_config &mconfig, device_type type, const char *tag)
+		: Base(mconfig, type, tag)
+		, m_reel(*this, "REEL")
 	{ }
 
-protected:
-	virtual void configure_board(machine_config &config) override ATTR_COLD;
+	int fishing_reel_r() { return BIT(m_reel->read(), 0); }
+
+private:
+	required_ioport m_reel;
 };
+
+using xavix_epo_fish_state = xavix_reel_state<xavix_power_state>;
+using xavix_epo_efdx_state = xavix_reel_state<xavix_i2c_power_state>;
+using xavix_rad_bass_state = xavix_reel_state<xavix_io0_matrix_power_state>;
 
 class xavix_epo_baseball_state : public xavix_state
 {
@@ -420,11 +402,34 @@ private:
 	output_finder<> m_digit;
 };
 
-class xavix_tak_daig_state : public xavix_cart_state
+template <typename Base, unsigned Players>
+class xavix_lightgun_state : public Base
+{
+public:
+	xavix_lightgun_state(const machine_config &mconfig, device_type type, const char *tag)
+		: Base(mconfig, type, tag)
+		, m_lightgun_x(*this, "GUN%u_0", 1U)
+		, m_lightgun_y(*this, "GUN%u_1", 1U)
+	{ }
+
+protected:
+	void configure_lightgun_scanlines(machine_config &config, u8 event_mask) ATTR_COLD;
+	u8 lightgun_position_r(unsigned player, offs_t offset, u16 x_offset = 0, u16 y_scale = 0x100, u16 y_offset = 0, u16 x_scale = 0x100);
+	virtual u8 lightgun_event_mask() { return m_lightgun_event_mask; }
+	u8 m_lightgun_event_mask = 0;
+
+private:
+	TIMER_DEVICE_CALLBACK_MEMBER(lightgun_scanline_cb);
+
+	required_ioport_array<Players> m_lightgun_x;
+	required_ioport_array<Players> m_lightgun_y;
+};
+
+class xavix_tak_daig_state : public xavix_lightgun_state<xavix_cart_state, 1>
 {
 public:
 	xavix_tak_daig_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_cart_state(mconfig, type, tag)
+		: xavix_lightgun_state(mconfig, type, tag)
 		, m_robots(*this, "robots")
 	{ }
 
@@ -477,11 +482,11 @@ private:
 	required_device<xavix_wamg_sensor_device> m_sensor;
 };
 
-class xavix_rad_hnt_state : public xavix_power_state
+class xavix_rad_hnt_state : public xavix_lightgun_state<xavix_power_state, 1>
 {
 public:
 	xavix_rad_hnt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_power_state(mconfig, type, tag)
+		: xavix_lightgun_state(mconfig, type, tag)
 	{ }
 
 	void xavix_rad_hnt(machine_config &config) ATTR_COLD;
@@ -492,11 +497,11 @@ private:
 	virtual u8 lightgun_r(offs_t offset) override;
 };
 
-class xavix_gungunad_state : public xavix_power_state
+class xavix_gungunad_state : public xavix_lightgun_state<xavix_power_state, 2>
 {
 public:
 	xavix_gungunad_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_power_state(mconfig, type, tag)
+		: xavix_lightgun_state(mconfig, type, tag)
 	{ }
 
 	void xavix_gungunad(machine_config &config) ATTR_COLD;
@@ -506,11 +511,11 @@ private:
 	virtual u8 lightgun_event_mask() override { return m_lightgun_event_mask & (BIT(m_in0->read(), 6) ? 0xff : 0xfd); }
 };
 
-class xavix_gungunrv_state : public xavix_i2c_state
+class xavix_gungunrv_state : public xavix_lightgun_state<xavix_i2c_state, 2>
 {
 public:
 	xavix_gungunrv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig, type, tag)
+		: xavix_lightgun_state(mconfig, type, tag)
 		, m_gun_recoil(*this, "Player1_Gun_Recoil")
 	{ }
 
@@ -528,11 +533,11 @@ private:
 	output_finder<> m_gun_recoil;
 };
 
-class xavix_pl1000_state : public xavix_state
+class xavix_pl1000_state : public xavix_lightgun_state<xavix_state, 2>
 {
 public:
 	xavix_pl1000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_state(mconfig, type, tag)
+		: xavix_lightgun_state(mconfig, type, tag)
 	{ }
 
 	void init_pl1000();
@@ -548,11 +553,11 @@ private:
 	u8 m_io1_out;
 };
 
-class xavix_tomshoot_state : public xavix_i2c_power_state
+class xavix_tomshoot_state : public xavix_lightgun_state<xavix_i2c_power_state, 2>
 {
 public:
 	xavix_tomshoot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_power_state(mconfig, type, tag)
+		: xavix_lightgun_state(mconfig, type, tag)
 	{ }
 
 private:
@@ -560,11 +565,11 @@ private:
 	virtual u8 lightgun_r(offs_t offset) override;
 };
 
-class xavix_epo_dmon_state : public xavix_i2c_state
+class xavix_epo_dmon_state : public xavix_lightgun_state<xavix_i2c_state, 2>
 {
 public:
 	xavix_epo_dmon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig, type, tag)
+		: xavix_lightgun_state(mconfig, type, tag)
 	{ }
 
 	void xavix_epo_dmon(machine_config &config) ATTR_COLD;

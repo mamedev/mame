@@ -109,18 +109,6 @@
 //  Shared Hardware
 //**************************************************************************
 
-void superxavix_power_state::configure_board(machine_config &config)
-{
-	superxavix_state::configure_board(config);
-	m_soc->io_output_callback<1>().append(*this, FUNC(superxavix_power_state::io1_power_off_w));
-}
-
-void superxavix_i2c_power_state::configure_board(machine_config &config)
-{
-	superxavix_i2c_state::configure_board(config);
-	m_soc->io_output_callback<1>().append(*this, FUNC(superxavix_i2c_power_state::io1_power_off_w));
-}
-
 void superxavix_state::superxavix(machine_config &config)
 {
 	m_soc = SUPERXAVIX_SOC(config, m_super_soc, NTSC_MASTER_CLOCK);

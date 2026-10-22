@@ -131,27 +131,9 @@ private:
 	static constexpr u32 REFLECTIVE_EXPOSURE_USEC = 500;
 };
 
-class superxavix_power_state : public superxavix_state
-{
-public:
-	superxavix_power_state(const machine_config &mconfig, device_type type, const char *tag)
-		: superxavix_state(mconfig, type, tag)
-	{ }
+using superxavix_power_state = xavix_power_state_base<superxavix_state>;
 
-protected:
-	virtual void configure_board(machine_config &config) override ATTR_COLD;
-};
-
-class superxavix_i2c_power_state : public superxavix_i2c_state
-{
-public:
-	superxavix_i2c_power_state(const machine_config &mconfig, device_type type, const char *tag)
-		: superxavix_i2c_state(mconfig, type, tag)
-	{ }
-
-protected:
-	virtual void configure_board(machine_config &config) override ATTR_COLD;
-};
+using superxavix_i2c_power_state = xavix_power_state_base<superxavix_i2c_state>;
 
 class superxavix_io0_panel_state : public superxavix_i2c_state
 {

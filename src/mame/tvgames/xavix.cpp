@@ -57,6 +57,7 @@
 #include "xavix_io_beyu_ripcord.h"
 #include "xavix_io_madf_ball.h"
 #include "xavix_io_mtrk_wheel.h"
+#include "xavix_power.h"
 
 #include "sound/beep.h"
 
@@ -152,32 +153,9 @@ void xavix_state::configure_board(machine_config &config)
 
 void xavix_state::configure_power_hold(machine_config &config)
 {
-	TIMER(config, m_power_hold_timer).configure_generic(FUNC(xavix_state::power_hold_expired));
-	m_soc->io_output_callback<1>().append(*this, FUNC(xavix_state::io1_power_hold_w));
-}
-
-void xavix_power_state::configure_board(machine_config &config)
-{
-	xavix_state::configure_board(config);
-	m_soc->io_output_callback<1>().append(*this, FUNC(xavix_power_state::io1_power_off_w));
-}
-
-void xavix_i2c_power_state::configure_board(machine_config &config)
-{
-	xavix_i2c_state::configure_board(config);
-	m_soc->io_output_callback<1>().append(*this, FUNC(xavix_i2c_power_state::io1_power_off_w));
-}
-
-void xavix_io0_matrix_power_state::configure_board(machine_config &config)
-{
-	xavix_io0_matrix_state::configure_board(config);
-	m_soc->io_output_callback<1>().append(*this, FUNC(xavix_io0_matrix_power_state::io1_power_off_w));
-}
-
-void xavix_ir_power_state::configure_board(machine_config &config)
-{
-	xavix_ir_state::configure_board(config);
-	m_soc->io_output_callback<1>().append(*this, FUNC(xavix_ir_power_state::io1_power_off_w));
+	xavix_power_hold_device &power_hold(XAVIX_POWER_HOLD(config, "power_hold"));
+	power_hold.power_off_callback().set(*this, FUNC(xavix_state::power_off_w));
+	m_soc->io_output_callback<1>().append(power_hold, FUNC(xavix_power_hold_device::write));
 }
 
 void xavix_state::xavix(machine_config &config)
@@ -297,20 +275,12 @@ void xavix_state::machine_start()
 		auto const ram = m_soc->backup_ram();
 		m_nvram->set_base(ram.data(), ram.size());
 	}
-	save_item(NAME(m_power_hold_level));
 }
 
 void xavix_state::device_stop()
 {
 	m_screen_output.stop(machine());
 	driver_device::device_stop();
-}
-
-void xavix_state::machine_reset()
-{
-	m_power_hold_level = 0xff;
-	if (m_power_hold_timer)
-		m_power_hold_timer->adjust(attotime::never);
 }
 
 //-------------------------------------------------
@@ -409,11 +379,6 @@ INPUT_CHANGED_MEMBER(xavix_state::power_off)
 		machine().schedule_exit();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(xavix_state::power_hold_expired)
-{
-	machine().schedule_exit();
-}
-
 void xavix_state::power_off_w(int state)
 {
 	if (state)
@@ -470,22 +435,6 @@ void xavix_state::io0_output_cb(offs_t, u8 data, u8 mem_mask)
 void xavix_state::io1_output_cb(offs_t, u8 data, u8 mem_mask)
 {
 	io1_output_w(data, mem_mask);
-}
-
-void xavix_state::io1_power_hold_w(offs_t, u8 data, u8 mem_mask)
-{
-	if (BIT(mem_mask, 7))
-	{
-		u8 const level = BIT(data, 7);
-		if (m_power_hold_level == 0xff)
-			m_power_hold_level = level;
-		else if (level != m_power_hold_level)
-		{
-			m_power_hold_level = level;
-			// Patents US7093164 and WO2004093053A1 identify IO1.7 as the RC power-hold pulse; decay time is unmeasured.
-			m_power_hold_timer->adjust(attotime::from_seconds(2));
-		}
-	}
 }
 
 void xavix_state::io1_power_off_w(offs_t, u8 data, u8 mem_mask)
@@ -1429,10 +1378,11 @@ INPUT_PORTS_END
 //  Systems Sharing Lightgun Inputs
 //-------------------------------------------------
 
-void xavix_state::configure_lightgun_scanlines(machine_config &config, u8 event_mask)
+template <typename Base, unsigned Players>
+void xavix_lightgun_state<Base, Players>::configure_lightgun_scanlines(machine_config &config, u8 event_mask)
 {
 	m_lightgun_event_mask = event_mask;
-	TIMER(config, "lightgun_timer").configure_scanline(FUNC(xavix_state::lightgun_scanline_cb), "screen", 53, 10);
+	TIMER(config, "lightgun_timer").configure_scanline(FUNC(xavix_lightgun_state::lightgun_scanline_cb), "screen", 53, 10);
 }
 
 u8 xavix_state::lightgun_r(offs_t offset)
@@ -1442,14 +1392,15 @@ u8 xavix_state::lightgun_r(offs_t offset)
 	return 0xff;
 }
 
-u8 xavix_state::lightgun_position_r(unsigned player, offs_t offset, u16 x_offset, u16 y_scale, u16 y_offset, u16 x_scale)
+template <typename Base, unsigned Players>
+u8 xavix_lightgun_state<Base, Players>::lightgun_position_r(unsigned player, offs_t offset, u16 x_offset, u16 y_scale, u16 y_offset, u16 x_scale)
 {
-	if (player > 1)
+	if (player >= Players)
 		return 0xff;
 
-	u16 const rawx = player ? m_lightgun2[0].read_safe(0x80) : m_lightgun1[0].read_safe(0x80);
+	u16 const rawx = m_lightgun_x[player]->read();
 	u16 const gunx = ((rawx * x_scale) >> 8) + x_offset;
-	u16 const rawy = player ? m_lightgun2[1].read_safe(0x80) : m_lightgun1[1].read_safe(0x80);
+	u16 const rawy = m_lightgun_y[player]->read();
 	u16 const guny = ((rawy * y_scale) >> 8) + y_offset;
 	switch (offset & 3)
 	{
@@ -1464,7 +1415,8 @@ u8 xavix_state::lightgun_position_r(unsigned player, offs_t offset, u16 x_offset
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(xavix_state::lightgun_scanline_cb)
+template <typename Base, unsigned Players>
+void xavix_lightgun_state<Base, Players>::lightgun_scanline_cb(timer_device &timer, s32 param)
 {
 	// These NTSC boards place picture row zero at raster row 13.
 	int const line = param - 13;
@@ -1473,13 +1425,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(xavix_state::lightgun_scanline_cb)
 	{
 		u8 const mask = lightgun_event_mask();
 		if (BIT(mask, 0))
-			m_soc->trigger_io_event<0>();
+			this->m_soc->template trigger_io_event<0>();
 		if (BIT(mask, 1))
-			m_soc->trigger_io_event<1>();
+			this->m_soc->template trigger_io_event<1>();
 		if (BIT(mask, 2))
-			m_soc->trigger_io_event<2>();
+			this->m_soc->template trigger_io_event<2>();
 		if (BIT(mask, 3))
-			m_soc->trigger_io_event<3>();
+			this->m_soc->template trigger_io_event<3>();
 	}
 }
 
@@ -2608,12 +2560,6 @@ void xavix_state::xavix_rad_bb2(machine_config &config)
 //  Systems Sharing the Reel Input
 //-------------------------------------------------
 
-int xavix_state::fishing_reel_r()
-{
-	return BIT(m_reel->read(), 0);
-}
-
-
 // Black Bass Tsurouze: Excite Fishing
 static INPUT_PORTS_START( epo_fish )
 	PORT_INCLUDE(xavix)
@@ -2622,7 +2568,7 @@ static INPUT_PORTS_START( epo_fish )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Confirm")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Cancel")
 	// Fishing controllers expose one reel phase here; their ROMs count its transitions.
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_state::fishing_reel_r))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_epo_fish_state::fishing_reel_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -2653,7 +2599,7 @@ static INPUT_PORTS_START( epo_efdx )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Confirm")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Cancel")
 	// Fishing controllers expose one reel phase here; their ROMs count its transitions.
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_state::fishing_reel_r))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_epo_efdx_state::fishing_reel_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
@@ -2695,7 +2641,7 @@ static INPUT_PORTS_START( rad_bass )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_state::fishing_reel_r))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_rad_bass_state::fishing_reel_r))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
@@ -4922,7 +4868,7 @@ static INPUT_PORTS_START( tomthr )
 	PORT_INCLUDE(xavix_reset_control)
 INPUT_PORTS_END
 
-void xavix_power_state::xavix_tomthr(machine_config &config)
+void xavix_state::xavix_tomthr(machine_config &config)
 {
 	xavix_4mb(config);
 	configure_microphone(config);
@@ -5793,8 +5739,8 @@ CONS( 200?,  rad_crdnp, rad_crdn, 0, xavix_rad_crdnp,     rad_crdnp, xavix_rad_c
 
 CONS( 2000,  rad_bb,    0,        0, xavix_rad_bb,        rad_bb,    xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Play TV Baseball (NTSC)", MACHINE_NOT_WORKING ) // Play TV branding used on box, not ingame
 
-CONS( 2001,  rad_bass,  0,        0, xavix_1mb,           rad_bass,  xavix_io0_matrix_power_state, empty_init,  "Radica / Human Code Presage Studios / SSD Company Ltd.", "Play TV Bass Fishin' (NTSC)", MACHINE_NOT_WORKING )
-CONS( 2001,  rad_bassp, rad_bass, 0, xavixp_1mb,          rad_bassp, xavix_io0_matrix_power_state, empty_init,  "Radica / Human Code Presage Studios / SSD Company Ltd.", "Connectv Bass Fishin' (PAL)", MACHINE_NOT_WORKING )
+CONS( 2001,  rad_bass,  0,        0, xavix_1mb,           rad_bass,  xavix_rad_bass_state,         empty_init,  "Radica / Human Code Presage Studios / SSD Company Ltd.", "Play TV Bass Fishin' (NTSC)", MACHINE_NOT_WORKING )
+CONS( 2001,  rad_bassp, rad_bass, 0, xavixp_1mb,          rad_bassp, xavix_rad_bass_state,         empty_init,  "Radica / Human Code Presage Studios / SSD Company Ltd.", "Connectv Bass Fishin' (PAL)", MACHINE_NOT_WORKING )
 
 // there is another 'Snowboarder' with a white coloured board, it appears to be a newer game closer to 'SSX Snowboarder' but without the SSX license.
 CONS( 2001,  rad_snow,  0,        0, xavix_nv_1mb,        rad_snow,  xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Play TV Snowboarder (Blue) (NTSC)", 0 )
@@ -5861,10 +5807,10 @@ CONS( 2006,  epo_epp3,  0,        0, xavix_epo_epp2,      epo_epp3,  xavix_ir_po
 CONS( 2003,  epo_mj,    0,        0, xavix_epo_mj,        epo_mj,    xavix_epo_mj_state,           empty_init,  "Epoch / SSD Company Ltd.", "TV Mahjong Shoudan Taikyoku: 4-nin Uchi (Japan)", MACHINE_NOT_WORKING )
 
 // ブラックバス釣ろうぜ エキサイトフィッシング
-CONS( 2001,  epo_fish,  0,        0, xavix_2mb,           epo_fish,  xavix_power_state,            empty_init,  "Epoch / SSD Company Ltd.", "Black Bass Tsurouze: Excite Fishing (Japan)", MACHINE_NOT_WORKING )
+CONS( 2001,  epo_fish,  0,        0, xavix_2mb,           epo_fish,  xavix_epo_fish_state,         empty_init,  "Epoch / SSD Company Ltd.", "Black Bass Tsurouze: Excite Fishing (Japan)", MACHINE_NOT_WORKING )
 
 // 大モノ釣ろうぜ！ エキサイトフィッシングＤＸ
-CONS( 2003,  epo_efdx,  0,        0, xavix_i2c_24c08_4mb, epo_efdx,  xavix_i2c_power_state,        empty_init,  "Epoch / SSD Company Ltd.", "Dai Mono Tsurouze! Excite Fishing DX (Japan)", MACHINE_NOT_WORKING )
+CONS( 2003,  epo_efdx,  0,        0, xavix_i2c_24c08_4mb, epo_efdx,  xavix_epo_efdx_state,         empty_init,  "Epoch / SSD Company Ltd.", "Dai Mono Tsurouze! Excite Fishing DX (Japan)", MACHINE_NOT_WORKING )
 
 // ぐるりんワールド
 CONS( 2005,  epo_guru,  0,        0, xavix_epo_guru,      epo_guru,  xavix_epo_guru_state,         empty_init,  "Epoch / SSD Company Ltd.", "Gururin World (Japan)", 0 )
