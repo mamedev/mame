@@ -230,6 +230,7 @@ public:
 	tmc1800_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tmc1800_base_state(mconfig, type, tag)
 		, m_vdc(*this, CDP1861_TAG)
+		, m_key_row(*this, {"Y0", "Y1"})
 	{ }
 
 	void keylatch_w(uint8_t data);
@@ -249,6 +250,8 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	required_device<cdp1861_device> m_vdc;
+	required_ioport_array<2> m_key_row;
+
 	/* keyboard state */
 	int m_keylatch = 0;
 };
@@ -258,6 +261,7 @@ class osc1000b_state : public tmc1800_base_state
 public:
 	osc1000b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tmc1800_base_state(mconfig, type, tag)
+		, m_key_row(*this, {"Y0", "Y1"})
 	{ }
 
 
@@ -276,6 +280,8 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	required_ioport_array<2> m_key_row;
 
 	/* keyboard state */
 	int m_keylatch = 0;
@@ -405,12 +411,12 @@ uint32_t osc1000b_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 void tmc1800_state::keylatch_w(uint8_t data)
 {
-	m_keylatch = data;
+	m_keylatch = data & 0x0f;
 }
 
 void osc1000b_state::keylatch_w(uint8_t data)
 {
-	m_keylatch = data;
+	m_keylatch = data & 0x0f;
 }
 
 void tmc2000_state::keylatch_w(uint8_t data)
@@ -536,7 +542,6 @@ void tmc1800_state::dispoff_w(uint8_t data)
 
 void tmc1800_state::tmc1800_map(address_map &map)
 {
-	map(0x0000, 0x07ff).mirror(0x7800).ram();
 	map(0x8000, 0x81ff).mirror(0x7e00).rom().region(CDP1802_TAG, 0);
 }
 
@@ -550,7 +555,6 @@ void tmc1800_state::tmc1800_io_map(address_map &map)
 
 void osc1000b_state::osc1000b_map(address_map &map)
 {
-	map(0x0000, 0x07ff).mirror(0x7800).ram();
 	map(0x8000, 0x81ff).mirror(0x7e00).rom().region(CDP1802_TAG, 0);
 }
 
@@ -779,7 +783,9 @@ int tmc1800_state::ef2_r()
 
 int tmc1800_state::ef3_r()
 {
-	return CLEAR_LINE; // TODO
+	uint8_t data = ~m_key_row[m_keylatch / 8]->read();
+
+	return BIT(data, m_keylatch % 8);
 }
 
 void tmc1800_state::q_w(int state)
@@ -801,7 +807,9 @@ int osc1000b_state::ef2_r()
 
 int osc1000b_state::ef3_r()
 {
-	return CLEAR_LINE; // TODO
+	uint8_t data = ~m_key_row[m_keylatch / 8]->read();
+
+	return BIT(data, m_keylatch % 8);
 }
 
 void osc1000b_state::q_w(int state)
@@ -891,6 +899,8 @@ void nano_state::q_w(int state)
 
 void tmc1800_state::machine_start()
 {
+	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, m_ram->mask(), 0x7fff & ~m_ram->mask(), m_ram->pointer());
+
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 }
@@ -909,6 +919,8 @@ void tmc1800_state::machine_reset()
 
 void osc1000b_state::machine_start()
 {
+	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, m_ram->mask(), 0x7fff & ~m_ram->mask(), m_ram->pointer());
+
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 }
@@ -980,13 +992,12 @@ QUICKLOAD_LOAD_MEMBER(tmc1800_base_state::quickload_cb)
 {
 	int const size = image.length();
 
-	if (size > m_ram->size()) // FIXME: comparing size to RAM size, but loading to ROM - seems incorrect
+	if (size > m_ram->size())
 	{
 		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 	}
 
-	uint8_t *const ptr = m_rom->base();
-	image.fread(ptr, size);
+	image.fread(m_ram->pointer(), size);
 
 	return std::make_pair(std::error_condition(), std::string());
 }
