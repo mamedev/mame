@@ -348,6 +348,9 @@ void laserdisc_device::device_reset()
 	m_curtrack = 1;
 	m_attospertrack = 0;
 	m_sliderupdate = machine().time();
+
+	// player_vsync() and player_update() get this before the first field has been read
+	m_metadata[0] = m_metadata[1] = vbi_metadata();
 }
 
 
