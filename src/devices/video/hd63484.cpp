@@ -1095,7 +1095,8 @@ uint32_t hd63484_device::paint(int16_t sx, int16_t sy)
 	std::unordered_set<uint32_t> seen;
 	seeds.emplace_back(sx, sy);
 
-	// CP ends up at the end point of the bottom-most painted line
+	// CP ends at Pe, the end of the last line of the sweep, which finishes
+	// on the top-most painted line (the sweep runs down first, then up)
 	int32_t pe_x = sx;
 	int32_t pe_y = sy;
 
@@ -1148,7 +1149,7 @@ uint32_t hd63484_device::paint(int16_t sx, int16_t sy)
 			// through unwritable territory, as the hardware does not verify
 			// its writes - only the span start dedup keeps the traversal
 			// finite there; an unwritable dot just is not painted work
-			if (y < pe_y || (y == pe_y && px > pe_x))
+			if (y > pe_y || (y == pe_y && px > pe_x))
 			{
 				pe_x = px;
 				pe_y = y;
