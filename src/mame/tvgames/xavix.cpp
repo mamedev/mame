@@ -4368,8 +4368,8 @@ static INPUT_PORTS_START( jarajal )
 	PORT_CONFSETTING(    0x18, "Very Low" )
 
 	PORT_START("DIAL")
-	// Route default controls through the digital sequences so relative axes cannot retain an off-centre position.
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Rotating Lever") PORT_SENSITIVITY(100) PORT_KEYDELTA(12) PORT_CENTERDELTA(128) PORT_CODE(INPUT_CODE_INVALID) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
+	// Coin Adventure needs slow keyboard movement and centring; the mouse is useful for rotating platforms.
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Rotating Lever") PORT_SENSITIVITY(100) PORT_KEYDELTA(1) PORT_CENTERDELTA(6) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
 
 	PORT_INCLUDE(xavix_reset_control)
 	PORT_INCLUDE(xavix_hard_power_control)
@@ -5490,8 +5490,8 @@ CONS( 2003,  tak_beyu,  0,        0, xavix_tak_beyu,      tak_bey,   xavix_state
 CONS( 2002,  tak_beyb,  tak_beyu, 0, xavix_tak_beyu,      tak_bey,   xavix_state,                  empty_init,  "Takara / SSD Company Ltd.", "Bakuten Shoot Beyblade 2002: Bey Ultimate Shooter (Japan)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 
 // ジャラジャランド
-// was also distributed by Atlus as an arcade cabinet in 2005, ROM almost certainly different (this one will auto-power off after inactivity, an arcade wouldn't do that)
-CONS( 2003,  jarajal,   0,        0, xavix_jarajal,       jarajal,   xavix_jarajal_state,          empty_init,  "Takara / SSD Company Ltd.", "Jyarajyaland (Japan, PlugIt! version)", MACHINE_NOT_WORKING )
+// Also distributed by Atlus as an arcade cabinet in 2005; whether it used this PlugIt! ROM is unconfirmed.
+CONS( 2003,  jarajal,   0,        0, xavix_jarajal,       jarajal,   xavix_jarajal_state,          empty_init,  "Takara / SSD Company Ltd.", "Jyarajyaland (Japan, PlugIt! version)", 0 )
 
 // テレビで遊び隊 近代撃ちまくりバラエティ 射的王(シャテキング)
 CONS( 2002,  tomshoot,  0,        0, xavix_i2c_24c02_2mb, tomshoot,  xavix_tomshoot_state,         empty_init,  "Tomy / SSD Company Ltd.", "TV de Asobitai Kindai Uchimakuri Variety Shateking (Japan)", MACHINE_NOT_WORKING )
