@@ -2841,26 +2841,31 @@ void superxavix_epo_ntpj_state::pio2_output_w(offs_t offset, u8 data, u8 mem_mas
 
 // XaviXPORT
 ROM_START( xavtenni )
+	// Internal ROM checksum: B6D7, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xavixtennis.bin", 0x000000, 0x800000, CRC(23a1d918) SHA1(2241c59e8ea8328013e55952ebf9060ea0a4675b) )
 ROM_END
 
 ROM_START( xavtennij )
+	// Internal ROM checksum: 971D, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xav_tennis_j.bin", 0x000000, 0x800000, CRC(a8d1fa9a) SHA1(abfa32b2a17e01a4fe7944151efb1898f1867107) )
 ROM_END
 
 ROM_START( xavbaseb )
+	// Internal ROM checksum: 829C, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xpbaseball.bin", 0x000000, 0x800000, CRC(e9ed692d) SHA1(537e390e972156dc7da66ee127ae4c8052038ee5) )
 ROM_END
 
 ROM_START( xavbasebj )
+	// Internal ROM checksum: 3DB5, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xav_baseball_j.u1", 0x000000, 0x800000, CRC(792a2798) SHA1(9f0d4693dc6c3b062893d9badfcadc1f272d2817) )
 ROM_END
 
 ROM_START( xavgolf )
+	// Internal ROM checksum: 5242, matches expected value.
 	ROM_REGION( 0x800000, "temp", ROMREGION_ERASE00 )
 	ROM_LOAD( "pglfa.u5", 0x000000, 0x800000, CRC(781399d6) SHA1(4797a978f00fc10a34a79a9a09a8355eb92283f2) )
 
@@ -2873,6 +2878,7 @@ ROM_START( xavgolf )
 ROM_END
 
 ROM_START( xavgolfj )
+	// Internal ROM checksum: 0AEB, matches expected value.
 	ROM_REGION( 0x800000, "temp", ROMREGION_ERASE00 )
 	ROM_LOAD( "pglfj.u5", 0x000000, 0x800000, CRC(d3f23cfd) SHA1(ce2d204e9abeb82a5793a613429ead009989ecd4) )
 
@@ -2885,6 +2891,7 @@ ROM_START( xavgolfj )
 ROM_END
 
 ROM_START( xavbowl )
+	// Internal ROM checksum: 0680, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xpbowling.bin", 0x000000, 0x800000, CRC(2873460b) SHA1(ea8e2392f5a12961a23eb66dca8e07dec81ce8c8) )
 ROM_END
@@ -2895,6 +2902,7 @@ ROM_START( xavbowlj )
 ROM_END
 
 ROM_START( xavbassf )
+	// Internal ROM checksum: 3AAA, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xpbassfishing.bin", 0x000000, 0x800000, CRC(09ab2f29) SHA1(616254176315d0947002e9ae5a6371a3ffa2e8eb) )
 
@@ -2910,11 +2918,13 @@ ROM_START( xavbassf )
 ROM_END
 
 ROM_START( xavbox )
+	// Internal ROM checksum: BA68, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "xpboxing.bin", 0x000000, 0x800000, CRC(b61e7717) SHA1(162b9c53ac8c9d7b6972db44f7bc1cb0a7837b70) )
 ROM_END
 
 ROM_START( xavboxj )
+	// Internal ROM checksum: 4218, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "jboxj.u2", 0x000000, 0x800000, CRC(4545c35e) SHA1(ac3245d704b5bb6200808798d9d5711c336d68b3) )
 ROM_END
@@ -2922,6 +2932,7 @@ ROM_END
 // Several of the XaviXport and DiS games are 2 glob setups (and must have some kind of banking)
 
 ROM_START( xavjmat )
+	// Internal ROM checksum: 2D1A/7376, matches expected values.
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "u2", 0x0000000, 0x0800000, CRC(1420640d) SHA1(dd714cd57cff885293688f74f69b5c1726e20ec0) )
 
@@ -2933,6 +2944,7 @@ ROM_START( xavjmat )
 ROM_END
 
 ROM_START( xavaero )
+	// Internal ROM checksum: C2E7/988A, matches expected values.
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "aerostep.u2", 0x0000000, 0x0800000, CRC(7fce9cc1) SHA1(460bcef8a23d792941108e5da8c0d669a546b94c) )
 
@@ -2944,6 +2956,7 @@ ROM_START( xavaero )
 ROM_END
 
 ROM_START( xavmusic )
+	// Internal ROM checksum: 025D/869C, matches expected values.
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "u2", 0x0000000, 0x0800000, CRC(e7c8ad59) SHA1(d47fac8b480de4db88a1b306ff8830a65d1738a3) )
 
@@ -2952,6 +2965,7 @@ ROM_START( xavmusic )
 ROM_END
 
 ROM_START( xavmusicj )
+	// Internal ROM checksum: FEDB/9112, matches expected values.
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "pascj.u2", 0x0000000, 0x0800000, CRC(d483fbf2) SHA1(b347eac56ee182d3c72a362d2cb16985ca3caa15) )
 
@@ -2960,6 +2974,7 @@ ROM_START( xavmusicj )
 ROM_END
 
 ROM_START( xavcheck )
+	// Internal ROM checksum: C3A2/C79E, matches expected values.
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "jmscj_1.u2", 0x0000000, 0x0800000, CRC(65c62d04) SHA1(eb3616576b5523b337b58b72514508bb484f9d41) )
 
@@ -2968,6 +2983,7 @@ ROM_START( xavcheck )
 ROM_END
 
 ROM_START( xavpkjr )
+	// Internal ROM checksum: 2B04/7FC6, matches expected values.
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "tc58fvm6b5b.u2", 0x0000000, 0x0800000, CRC(82a32ede) SHA1(a555662b05925126ebc94ae6e4e13c1cfc3c86e0) )
 
@@ -2979,6 +2995,7 @@ ROM_START( xavpkjr )
 ROM_END
 
 ROM_START( xavpowrk )
+	// Internal ROM checksum: FDAE/C8E4, matches expected values.
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "tc58fvm6b5b.u2", 0x0000000, 0x0800000, CRC(5fb55dba) SHA1(0c4d370d258a15712dd323739fe23106d00bc04a) )
 
@@ -2992,6 +3009,7 @@ ROM_END
 
 // Domyos DiS (Super XaviX titles)
 ROM_START( domfitex )
+	// Internal ROM checksum: F1D3/7A8E, matches expected values.
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "u2", 0x0000000, 0x0800000,  CRC(841fe3cd) SHA1(8678b8a0c5198b24169a84dbe3ae979bb0838f23) )
 
@@ -3000,6 +3018,7 @@ ROM_START( domfitex )
 ROM_END
 
 ROM_START( domfitch )
+	// Internal ROM checksum: 29B3/C932, matches expected values.
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "u2", 0x0000000, 0x0800000, CRC(0ff2a7a6) SHA1(9b924cc4330e3f8d9204390854048fe2325bfdf7) )
 
@@ -3008,6 +3027,7 @@ ROM_START( domfitch )
 ROM_END
 
 ROM_START( domdance )
+	// Internal ROM checksum: 3710/4533, matches expected values.
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "u2", 0x0000000, 0x0800000, CRC(74f9499d) SHA1(a64235075e32567cd6d2ab7b1284efcb8e7538e2) )
 
@@ -3016,6 +3036,7 @@ ROM_START( domdance )
 ROM_END
 
 ROM_START( domstepc )
+	// Internal ROM checksum: FB37/558D, matches expected values.
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "u2", 0x0000000, 0x0800000, CRC(cb37b5e9) SHA1(b742e3db98f36720adf5af9096c6bc235279de12) )
 
@@ -3024,6 +3045,7 @@ ROM_START( domstepc )
 ROM_END
 
 ROM_START( anpanmdx )
+	// Internal ROM checksum: B210/C8C2, matches expected values.
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "apmj.u3", 0x0000000, 0x0800000, CRC(41348086) SHA1(63bbf6128901c1518f537766a40e162b2616d00c) )
 
@@ -3032,21 +3054,25 @@ ROM_START( anpanmdx )
 ROM_END
 
 ROM_START( apmj2009 )
+	// Internal ROM checksum: D412, matches expected value.
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "apmj.u3", 0x0000000, 0x0800000, CRC(5fab9492) SHA1(aa588e5333bdf81daf3b5868e00783d76a42e80e) )
 ROM_END
 
 ROM_START( mrangbat )
+	// Internal ROM checksum: 8022, matches expected value.
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("powerrangerspad.bin", 0x000000, 0x400000, CRC(d3a98775) SHA1(485c66242dd0ee436a278d23005aece48d606431) )
 ROM_END
 
 ROM_START( tmy_thom )
+	// Internal ROM checksum: 1109, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "thomastank.bin", 0x000000, 0x800000, CRC(a52a23be) SHA1(e5b3500239d9e56eb5405f7585982959e5a162da) )
 ROM_END
 
 ROM_START( ban_kksj )
+	// Internal ROM checksum: 7835, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "kksj.u1", 0x000000, 0x800000, CRC(8071dc36) SHA1(46f41d4185a115b27c685d1eabcd554b3c5a64b7) )
 ROM_END
@@ -3057,11 +3083,13 @@ ROM_START( tmy_rkmj )
 ROM_END
 
 ROM_START( ban_ordj )
+	// Internal ROM checksum: 8746, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ordj.u2", 0x000000, 0x800000, CRC(78fbb00f) SHA1(797b5495e292c36c003300ed18547e5643056149) )
 ROM_END
 
 ROM_START( ban_um2j )
+	// Internal ROM checksum: 099A, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "um2j.u1", 0x000000, 0x800000, CRC(88ea8e50) SHA1(b7507985a05335b6c07584bbb9ec2bd7f65ffe19) )
 ROM_END
@@ -3072,26 +3100,31 @@ ROM_START( ban_dn1j )
 ROM_END
 
 ROM_START( epo_kabj )
+	// Internal ROM checksum: FC98, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "kabj.u2", 0x000000, 0x800000, CRC(264655ec) SHA1(11a25c7b7e3ffd3c4bc0476c64d5d68754757f40) )
 ROM_END
 
 ROM_START( epo_tfit )
+	// Internal ROM checksum: 7DDB, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("tennisfitness.bin", 0x000000, 0x400000, CRC(cbf65bd2) SHA1(30b3da6f061b2dd91679db42a050f715901beb87) )
 ROM_END
 
 ROM_START( maxheart )
+	// Internal ROM checksum: 4987, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("mgrj.u2", 0x000000, 0x400000, CRC(447c25e6) SHA1(9cc65088512218f43d66b332de7a862d95c1c353) )
 ROM_END
 
 ROM_START( epo_doka )
+	// Internal ROM checksum: 181C, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("doka.u1", 0x000000, 0x400000, CRC(853266d2) SHA1(d4121b89ee464088951898282404e5a2b788dd69) )
 ROM_END
 
 ROM_START( ban_utmj )
+	// Internal ROM checksum: 6E0E, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("utmj.u7", 0x000000, 0x800000, CRC(0ac2bcd9) SHA1(ca7c82e2015c86bb37bd66016c33343d174e9965) )
 
@@ -3099,22 +3132,26 @@ ROM_START( ban_utmj )
 ROM_END
 
 ROM_START( ban_ult )
+	// Internal ROM checksum: B3BC, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("ultraman.u1", 0x000000, 0x800000,CRC(bc2a94fb) SHA1(4dc81089ac2afc1c9496a49ffd778213bb4a12bd) )
 ROM_END
 
 ROM_START( ban_gkrj )
+	// Internal ROM checksum: 8F0D, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("gkrj.u2", 0x000000, 0x400000, CRC(d9ffe41a) SHA1(18583e1b5d9eb89e0364bd84b14f89bbe9640b19) )
 ROM_END
 
 ROM_START( ban_pr2j )
+	// Internal ROM checksum: B8E9, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("pr2j.u2", 0x000000, 0x800000, CRC(e46bf811) SHA1(4b88a7a7001e99be526e889d0b81a43be0b1e464)  )
 ROM_END
 
 
 ROM_START( ban_bkgj )
+	// Internal ROM checksum: F9CB, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("bkgj.u2", 0x000000, 0x400000, CRC(a59ce23c) SHA1(d2a6be9e46f3cfc3cf798bf1f76732eee909c93b) )
 
@@ -3122,12 +3159,14 @@ ROM_START( ban_bkgj )
 ROM_END
 
 ROM_START( epo_rgfj )
+	// Internal ROM checksum: 706A, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
 	// gave consistent reads 5 times, then started not, should be good, but there is the potential for the ROM to have already been failing
 	ROM_LOAD("rgfj.u1", 0x000000, 0x800000, CRC(96c9563a) SHA1(36b9dd3e5dcc8099787b25d28143997f61273234) )
 ROM_END
 
 ROM_START( udance )
+	// Internal ROM checksum: 23DA/3A1C, matches expected values.
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("udancerom0.bin", 0x000000, 0x800000, CRC(3066580a) SHA1(545257c75a892894faf386f4ab9a31967cdbe8ae) )
 
@@ -3136,6 +3175,7 @@ ROM_START( udance )
 ROM_END
 
 ROM_START( suprtvpc )
+	// Internal ROM checksum: 2DD0, matches expected value.
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00) // inverted line?
 	ROM_LOAD("supertvpc_dogs.u4", 0x200000, 0x200000, CRC(ab326e6d) SHA1(e22205f6ff4c8cc46538d78e27535be63acea42a) )
 	ROM_CONTINUE(0x000000, 0x200000)
@@ -3144,6 +3184,7 @@ ROM_START( suprtvpc )
 ROM_END
 
 ROM_START( suprtvpchk )
+	// Internal ROM checksum: 67CD, matches expected value.
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00) // inverted line?
 	ROM_LOAD("superpctv.bin", 0x200000, 0x200000, CRC(4a55a81c) SHA1(178b4b595a3aefc6d1c176031b436fc3312009e7) )
 	ROM_CONTINUE(0x000000, 0x200000)
@@ -3152,6 +3193,7 @@ ROM_START( suprtvpchk )
 ROM_END
 
 ROM_START( suprtvpcdo )
+	// Internal ROM checksum: 7229, matches expected value.
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00) // inverted line?
 	ROM_LOAD("supertvpc_doreamon.u4", 0x200000, 0x200000, CRC(8e7039dc) SHA1(44ffecc8195614e56c289a028c2140c24ad74171) )
 	ROM_CONTINUE(0x000000, 0x200000)
@@ -3160,6 +3202,7 @@ ROM_START( suprtvpcdo )
 ROM_END
 
 ROM_START( suprtvpcln ) // from the 'Super TV-PC Link' branded unit which was bundled with a link card, updated copyright date compared to suprtvpc set at least
+	// Internal ROM checksum: C4BD, matches expected value.
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00) // inverted line?
 	ROM_LOAD("stvpc.u3", 0x200000, 0x200000, CRC(55d872ca) SHA1(7d0b4b527e95f65df5d70dcc303c81c7d893c638) )
 	ROM_CONTINUE(0x000000, 0x200000)
@@ -3185,6 +3228,7 @@ ROM_START( doradraw )
 ROM_END
 
 ROM_START( hkdraw )
+	// Internal ROM checksum: 3879, matches expected value.
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("dmdj.u2", 0x000000, 0x800000, CRC(aa9dcbed) SHA1(153bc2bf99f68f40ff342859f323d2071e7979dc) )
 
@@ -3193,6 +3237,7 @@ ROM_START( hkdraw )
 ROM_END
 
 ROM_START( ndpbj )
+	// Internal ROM checksum: C9C6, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("ndpbj.u2", 0x000000, 0x800000, CRC(80cb5cbb) SHA1(cd424c4fbea8e9e47d165c4c8be52755fc7c2d98) )
 
@@ -3201,6 +3246,7 @@ ROM_START( ndpbj )
 ROM_END
 
 ROM_START( ndpmj )
+	// Internal ROM checksum: CF78, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("ndpmj.u3", 0x000000, 0x800000, CRC(a8132d93) SHA1(2bcbf497e3fa7c7f44569f337cb8babff80c9338) )
 

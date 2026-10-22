@@ -792,83 +792,99 @@ void xavix2000_duelmast_state::io1_output_w(u8 data, u8 direction)
 //**************************************************************************
 
 ROM_START( epo_sdb )
+	// Internal ROM checksum: 3659, matches expected value.
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("superdashball.bin", 0x000000, 0x400000, CRC(a004a764) SHA1(47a96822d4d7d6a0f6be5cd729c3747dbab65979) )
 ROM_END
 
 ROM_START( epo_ebox )
+	// Internal ROM checksum: 099D, matches expected value.
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("exciteboxing.bin", 0x000000, 0x400000, CRC(e25ae4f5) SHA1(7f7b613f0ab8f43f5cad0d13de538921e77cae9c) )
 ROM_END
 
 ROM_START( epo_bowl )
+	// Internal ROM checksum: 1CF6, matches expected value.
 	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("bowling.bin", 0x000000, 0x200000, CRC(d34f8d9e) SHA1(ebe3792172dc43904b9226beb27f1da89d2388cc) )
 ROM_END
 
 ROM_START( epo_golf ) // GLFJ MAIN-03
+	// Internal ROM checksum: 8134, matches expected value.
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("golf.bin", 0x000000, 0x400000, CRC(d1f231cf) SHA1(9421836a6bc4af9ee1fc7a402d62b2fb4dbcdefc) )
 ROM_END
 
 ROM_START( epo_hamc ) // ET158 MB REV.0
+	// Internal ROM checksum: 9B9C, matches expected value.
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD( "hamster.u1", 0x000000, 0x400000, CRC(b1177813) SHA1(ed01096ebb63b72267ad7e0b2115224bbab64011) )
 ROM_END
 
 ROM_START( ban_omt ) // OMTJ MAIN-07
+	// Internal ROM checksum: C754, matches expected value.
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("otmj.bin", 0x000000, 0x400000, CRC(1c1dc6fb) SHA1(d0cf1345b765d66ca9a0870ee6d0e3ccd84a8c0b) )
 ROM_END
 
 ROM_START( ttv_sw )
+	// Internal ROM checksum: D57C, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "jedi.bin", 0x000000, 0x800000, CRC(51cae5fd) SHA1(1ed8d556f31b4182259ca8c766d60c824d8d9744) )
 ROM_END
 
 ROM_START( ttv_swj )
+	// Internal ROM checksum: 723A, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "lightsaber.bin", 0x000000, 0x800000, CRC(a5c22ed0) SHA1(406f0bccb01cd4a26fe4a5675d7ebecc78c58147) )
 ROM_END
 
 
 ROM_START( ttv_lotr )
+	// Internal ROM checksum: 237C, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "lotr.bin", 0x000000, 0x800000, CRC(a034ecd5) SHA1(264a9d4327af0a075841ad6129db67d82cf741f1) )
 ROM_END
 
 ROM_START( ttv_mx )
+	// Internal ROM checksum: EC8C, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "mxdirtrebel.bin", 0x000000, 0x800000, CRC(e64bf1a1) SHA1(137f97d7d857697a13e0c8984509994dc7bc5fc5) )
 ROM_END
 
 ROM_START( tom_jump )
+	// Internal ROM checksum: 76FE, matches expected value.
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "tom_jump.bin", 0x000000, 0x800000, CRC(20bf5c17) SHA1(bca7535baa6a54ad3ee0929bd3b74a22cb5139da) )
 ROM_END
 
 
 ROM_START( drgqst )
+	// Internal ROM checksum: 5472, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "dragonquest.bin", 0x000000, 0x800000, CRC(3d24413f) SHA1(1677e81cedcf349de7bf091a232dc82c6424efba) )
 ROM_END
 
 ROM_START( epo_mini )
+	// Internal ROM checksum: 5F74, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "minimoni.u1", 0x000000, 0x400000, CRC(2adb01ee) SHA1(987218b6799195ba15adf39885c1d177c381ec26) )
 ROM_END
 
 ROM_START( tak_chq )
+	// Internal ROM checksum: 3F57, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "choroq.u2", 0x000000, 0x400000, CRC(ffd2eb95) SHA1(a30884da5554483ebfd0009cf5dd1768be8a99cb) )
 ROM_END
 
 ROM_START( ban_onep )
+	// Internal ROM checksum: 46C0, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("onepiece.bin", 0x000000, 0x800000, CRC(c5cb5a5f) SHA1(db85f6cc48d77c5a4967b9b8e2999167e3dfc8c8) )
 ROM_END
 
 ROM_START( duelmast )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("duelmasters.u4", 0x000000, 0x200000, CRC(2f11fcd7) SHA1(d8849c74833e77b8b309e845523f2cdc7ac68054) )
 	ROM_RELOAD(0x200000,0x200000)
@@ -877,11 +893,13 @@ ROM_START( duelmast )
 ROM_END
 
 ROM_START( tom_dpgm )
+	// Internal ROM checksum: E3BD, matches expected value.
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("disney.bin", 0x000000, 0x400000, CRC(1dc181b3) SHA1(fa30069d17705f27e4ff45e7f6ccf06986e138f3) )
 ROM_END
 
 ROM_START( epo_es2j ) // ES2J MAIN-01  2005 date on PCB, 2006 ingame
+	// Internal ROM checksum: 41B6, matches expected value.
 	ROM_REGION(0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("es2j.u3", 0x000000, 0x400000, CRC(840aecb1) SHA1(ad52449ffc13af5f4c67b2c3cf438e7ecd80b9fb) )
 ROM_END

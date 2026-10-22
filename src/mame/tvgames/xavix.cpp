@@ -5082,220 +5082,263 @@ u8 xavix_rad_rh_state::io0_input_r(u8 direction)
 //**************************************************************************
 
 ROM_START( taitons1 )
+	// Internal ROM checksum: 9674, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "taitonostalgia1.u3", 0x000000, 0x200000, CRC(25bd8c67) SHA1(a109cd2da6aa4596e3ca3abd1afce2d0001a473f) )
 ROM_END
 
 ROM_START( taitons2 )
+	// Internal ROM checksum: 7588, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "taitonostalgia2.bin", 0x000000, 0x200000, CRC(d7dbd93d) SHA1(ad96f80d317e7fd64682a1fe406c5ee9dd5eabf9) )
 ROM_END
 
 ROM_START( namcons1 )
+	// Internal ROM checksum: 1756, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "namconostalgia1.bin", 0x000000, 0x100000, CRC(9bcccccd) SHA1(cf8fe6de76fbd23974f999299db6f558f79c8f22) )
 ROM_END
 
 ROM_START( namcons2 )
+	// Internal ROM checksum: C1E0, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "nostalgia.bin", 0x000000, 0x100000, CRC(03f7f755) SHA1(bdf1b10ab0104ed580951b0c428c4e93e7373afe) )
 ROM_END
 
 ROM_START( rad_box )
+	// Internal ROM checksum: 5AAD, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("boxing.bin", 0x000000, 0x200000, CRC(5cd40714) SHA1(165260228c029a9502ca0598c84c24fd9bdeaebe) )
 ROM_END
 
 ROM_START( rad_boxp )
+	// Internal ROM checksum: 5AAD, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("boxing.bin", 0x000000, 0x200000, CRC(5cd40714) SHA1(165260228c029a9502ca0598c84c24fd9bdeaebe) )
 ROM_END
 
 ROM_START( rad_bass )
+	// Internal ROM checksum: B3D3, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("bassfishin.bin", 0x000000, 0x100000, CRC(b54eb1c5) SHA1(084faa9349369f2b8846950765f9c8f758db3e9e) )
 ROM_END
 
 ROM_START( rad_bassp )
+	// Internal ROM checksum: B3D3, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("bassfishin.bin", 0x000000, 0x100000, CRC(b54eb1c5) SHA1(084faa9349369f2b8846950765f9c8f758db3e9e) )
 ROM_END
 
 ROM_START( rad_opus )
+	// Internal ROM checksum: DEE8, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("opus.bin", 0x000000, 0x100000, CRC(f84c11c5) SHA1(6e34129d0ca9c52b7c342fc94860629d81705523) )
 ROM_END
 
 ROM_START( rad_opusp )
+	// Internal ROM checksum: DEE8, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("opus.bin", 0x000000, 0x100000, CRC(f84c11c5) SHA1(6e34129d0ca9c52b7c342fc94860629d81705523) )
 ROM_END
 
 ROM_START( rad_opusa )
+	// Internal ROM checksum: B51A, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("opus_alt.bin", 0x000000, 0x100000, CRC(509df402) SHA1(c5b863670eac8498ddda9dfde91387634cf7aa9f) )
 ROM_END
 
 ROM_START( rad_hnt )
+	// Internal ROM checksum: D32F, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("huntin1.bin", 0x000000, 0x100000, CRC(e51e250f) SHA1(d72199096d466cd344bb243ef1228e0df9501d00) )
 ROM_END
 
 ROM_START( rad_hnt2 )
+	// Internal ROM checksum: A22F, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("huntin2.bin", 0x000000, 0x200000, CRC(fb6846df) SHA1(267632790ed42eba7ef1517b86b024799a78839d) )
 ROM_END
 
 
 ROM_START( rad_snow )
+	// Internal ROM checksum: AC4A, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("snoblu.bin", 0x000000, 0x100000, CRC(593e40b3) SHA1(03483ac39eddd7746470fb60018e704382b0da59) )
 ROM_END
 
 ROM_START( rad_snowp )
+	// Internal ROM checksum: AC4A, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("snoblu.bin", 0x000000, 0x100000, CRC(593e40b3) SHA1(03483ac39eddd7746470fb60018e704382b0da59) )
 ROM_END
 
 
 ROM_START( rad_ping )
+	// Internal ROM checksum: D30F, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "pingpong.bin", 0x000000, 0x100000, CRC(629f7f47) SHA1(2bb19fd202f1e6c319d2f7d18adbfed8a7669235) )
 ROM_END
 
 ROM_START( rad_pingp )
+	// Internal ROM checksum: D30F, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "pingpong.bin", 0x000000, 0x100000, CRC(629f7f47) SHA1(2bb19fd202f1e6c319d2f7d18adbfed8a7669235) )
 ROM_END
 
 ROM_START( rad_crdn )
+	// Internal ROM checksum: 94E3, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "cardnight.bin", 0x000000, 0x100000, CRC(d19eba08) SHA1(cedb9fe785f2a559f518a1d8ecf80d500ddc63c7) )
 ROM_END
 
 ROM_START( rad_crdnp )
+	// Internal ROM checksum: 94E3, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "cardnight.bin", 0x000000, 0x100000, CRC(d19eba08) SHA1(cedb9fe785f2a559f518a1d8ecf80d500ddc63c7) )
 ROM_END
 
 ROM_START( rad_bb )
+	// Internal ROM checksum: F282, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "radicabaseball.bin", 0x000000, 0x100000, CRC(3fa6f490) SHA1(0772156a67a22d06f5ffd6d1a77f6dc867d0a6d2) )
 ROM_END
 
 ROM_START( rad_bb2 )
+	// Internal ROM checksum: 9853, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "baseball2.bin", 0x000000, 0x200000, CRC(bdbf6202) SHA1(18d5cc2d77cbb734629a7a5b6e0f419d21beedbd) )
 ROM_END
 
 ROM_START( rad_mtrk )
+	// Internal ROM checksum: 6EA0, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "monstertruck.bin", 0x000000, 0x400000, CRC(dccda0a7) SHA1(7953cf29643672f8367639555b797c20bb533eab) )
 ROM_END
 
 ROM_START( rad_mtrkp ) // rom was dumped from NTSC unit, assuming to be the same
+	// Internal ROM checksum: 6EA0, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "monstertruck.bin", 0x000000, 0x400000, CRC(dccda0a7) SHA1(7953cf29643672f8367639555b797c20bb533eab) )
 ROM_END
 
 ROM_START( rad_ssx )
+	// Internal ROM checksum: 2CB7, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("snowssx.bin", 0x000000, 0x400000, CRC(108e19a6) SHA1(3dfb18efb6331b96a53138a5ba29dae9cd966e90) )
 ROM_END
 
 ROM_START( rad_ssxp )
+	// Internal ROM checksum: 2CB7, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("snowssx.bin", 0x000000, 0x400000, CRC(108e19a6) SHA1(3dfb18efb6331b96a53138a5ba29dae9cd966e90) )
 ROM_END
 
 ROM_START( rad_sbw )
+	// Internal ROM checksum: D2BD, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("snowbwhite.bin", 0x000000, 0x400000, CRC(640c1473) SHA1(d37d1484a5b14735b35afbca305dad7d178b08a2) )
 ROM_END
 
 ROM_START( rad_bdp )
+	// Internal ROM checksum: 43AD, matches expected value.
 	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("barbiepad.bin", 0x000000, 0x200000, CRC(48731512) SHA1(377d4e1c98cafcd9d5e1ee27943289d250a6e7a9) )
 ROM_END
 
 ROM_START( rad_madf )
+	// Internal ROM checksum: 2C5B, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("madden.bin", 0x000000, 0x400000, CRC(e972fdcf) SHA1(52001316254880755da959c3441d232fd2c72c7a) )
 ROM_END
 
 ROM_START( rad_fb )
+	// Internal ROM checksum: 687B, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("rfootball.bin", 0x000000, 0x400000, CRC(025e0cb4) SHA1(60ce363de236d5119d078e346ad5d2ae50dbc7e1) )
 ROM_END
 
 ROM_START( epo_fish )
+	// Internal ROM checksum: 9045, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("fish.bin", 0x000000, 0x200000, CRC(72392caf) SHA1(16a65c79ff7e3b5f5f514a024bd652412ed38b74) )
 ROM_END
 
 ROM_START( epo_efdx )
+	// Internal ROM checksum: 5809, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitefishing.bin", 0x000000, 0x400000, CRC(9c85b261) SHA1(6a363faed2ec89c5176e46554a98ca1e20132579) )
 ROM_END
 
 ROM_START( epo_esdx )
+	// Internal ROM checksum: 2F63, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("baseballdx.bin", 0x000000, 0x400000, CRC(fe2e832e) SHA1(e6343f5e5f52316538d918d0d67c15764aa40f65) )
 ROM_END
 
 ROM_START( epo_stad )
+	// Internal ROM checksum: 261F, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitestadium.bin", 0x000000, 0x200000, CRC(b58035b9) SHA1(1382a9e42ff932e7ec2186b210917bcf5c571b86) )
 ROM_END
 
 ROM_START( epo_esht ) // ESTJ-MAIN REV:0 PCB
+	// Internal ROM checksum: 615B, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("tigers.u3", 0x000000, 0x400000, CRC(51a17ef3) SHA1(864190e91775716218be3ac0699570844d67d3e7) )
 ROM_END
 
 ROM_START( epo_epp )
+	// Internal ROM checksum: E09F, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitepingpong.bin", 0x000000, 0x100000, CRC(1fdb9cbd) SHA1(8ed0c1f6d2708ab6e79f0b9553e587c6446e8338) )
 ROM_END
 
 ROM_START( epo_epps )
+	// Internal ROM checksum: AA12, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitepingpong_special.bin", 0x000000, 0x100000, CRC(d59c4b44) SHA1(5a48b9046a1d1beb10972fc1d41d6d63fe829465) )
 ROM_END
 
 ROM_START( epo_eppk )
+	// Internal ROM checksum: 6A78, matches expected value.
 	ROM_REGION( 0x100000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("sonokongpingpong.bin", 0x000000, 0x100000, CRC(ea81ced6) SHA1(ef8961d3670148501a478c17cd09f5088e32ad41) )
 ROM_END
 
 ROM_START( epo_epp2 )
+	// Internal ROM checksum: 2B8C, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitepingpong2.u3", 0x000000, 0x200000, CRC(4b70012a) SHA1(4dd80472067027be5a416ec953f4ed6e7df5fc25) )
 ROM_END
 
 ROM_START( epo_epp3 )
+	// Internal ROM checksum: 5419, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitepingpong3.bin", 0x000000, 0x200000, CRC(a2ee8bff) SHA1(6e16dbaac9680e1f311c08e3f573d0cf8708b446))
 ROM_END
 
 ROM_START( epo_mj ) // MARJ MAIN-11A
+	// Internal ROM checksum: F5CD, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("marj.u4", 0x000000, 0x200000, CRC(4e496424) SHA1(9661130ad8315082bd211b3817e5830b576907a8) )
 ROM_END
 
 ROM_START( rad_socr )
+	// Internal ROM checksum: ROM1 CFE4; ROM2 5231, matches expected values.
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("soccer.u5", 0x000000, 0x100000, CRC(0564a766) SHA1(bded4f2e0d059731164c35de7df62ef411402901) )
 	ROM_LOAD("soccer.u4", 0x400000, 0x200000, CRC(e0e2c488) SHA1(907511d945dec51782af268a94b372dfeb7517c5) )
 ROM_END
 
 ROM_START( epo_strk )
+	// Internal ROM checksum: ROM1 8198; ROM2 F17A, matches expected values.
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitestriker.u5", 0x000000, 0x100000, CRC(fa3f95fd) SHA1(d3bc7f2f321b81a7783887b29218bf711c0d5518) )
 	ROM_LOAD("excitestriker.u4", 0x400000, 0x200000, CRC(0f37ca15) SHA1(b35aaf7f5adddba57c898538f157146bb4d1f9b4) )
 ROM_END
 
 ROM_START( epo_strkp )
+	// Internal ROM checksum: ROM1 4A6D; ROM2 75B2, matches expected values.
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("excitestriker_uk.u5", 0x000000, 0x100000, CRC(201e150e) SHA1(f11405a4b7349e4bdfeb04110b1b6f67e0b63f64) )
 	ROM_LOAD("excitestriker_uk.u4", 0x400000, 0x200000, CRC(efd648aa) SHA1(59358b9a9df27dadc33ed4c3da9083f739b68340) )
@@ -5303,118 +5346,141 @@ ROM_END
 
 // Startup object 04:aa62 appears to have six extra bytes before its graphics fields; firmware consequently attempts ROM writes.
 ROM_START( rad_jcon )
+	// Internal ROM checksum: M0 3D82; M1 6F82, matches expected values.
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("jrconstr_u5.bin", 0x000000, 0x200000, CRC(306699d2) SHA1(121b04bb598d4531db53e497be9270449bb8ffe4) )
 	ROM_LOAD("jrconstr_u4.bin", 0x400000, 0x100000, CRC(4cfb6193) SHA1(0f56dfc91db3cc066836daf37ff46f9ff5ec5f94) )
 ROM_END
 
 ROM_START( tak_town )
+	// Internal ROM checksum: M0 3C72; M1 62DA, matches expected values.
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("rom.u5", 0x000000, 0x200000, CRC(46587e78) SHA1(f163492139087f7aaeea6448b652f58afcb4dd5c) )
 	ROM_LOAD("rom.u4", 0x400000, 0x100000, CRC(642e7e6a) SHA1(d8ff88ad20a60d2eb702dd353f307aa3fcfbbdd5) )
 ROM_END
 
 ROM_START( epo_guru )
+	// Internal ROM checksum: 4465, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("gururinworld.bin", 0x000000, 0x400000, CRC(e5ae4523) SHA1(0e39ef8f94203d34e49422081667805f50a339a1) )
 ROM_END
 
 ROM_START( epo_dmon ) // Doraemon has a phototransistor, microphone and 24LC02, PCB says XaviX 2002
+	// Internal ROM checksum: 76AA, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("doraemon.bin", 0x000000, 0x400000, CRC(d8f5412f) SHA1(11a4c017ed400f7aa585be744d9693efe734c192) )
 ROM_END
 
 ROM_START( rad_rh )
+	// Internal ROM checksum: 4278, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("rescueheroes.bin", 0x000000, 0x200000, CRC(38c391a7) SHA1(120334d4ce89d98438c2a35bf7e53af5096cc878) )
 ROM_END
 
 ROM_START( has_wamg )
+	// Internal ROM checksum: A07D, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "minigolf.bin", 0x000000, 0x400000, CRC(35cee2ad) SHA1(c7344e8ba336bc329638485ea571cd731ebf7649) )
 ROM_END
 
 ROM_START( ltv_tam )
+	// Internal ROM checksum: C10E, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("letstvtamagotchi.bin", 0x000000, 0x400000, CRC(e3723272) SHA1(e72e128a7a24afb96baafe5f13e13a0d74db4033) )
 ROM_END
 
 ROM_START( epo_crok )
+	// Internal ROM checksum: 8830, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("sgm3244.u2", 0x000000, 0x400000, CRC(a801779b) SHA1(e6e4235dc7c7db3073737b10ba4bc5b00deca2c3) )
 ROM_END
 
 ROM_START( epo_mms )
+	// Internal ROM checksum: 779F, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("mmnj-main-4.u4", 0x000000, 0x400000, CRC(22f14ca2) SHA1(122e735eb7c54a22de16f65cd43d2cae788e0102) )
 ROM_END
 
 ROM_START( tak_zuba ) // CHBJ MAIN REV:01
+	// Internal ROM checksum: 6FB7, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("chbj.u2", 0x000000, 0x400000, CRC(6d60c8d2) SHA1(ba687fc95503223dd484ed9533dcb097ecfea00d) )
 ROM_END
 
 ROM_START( epo_mmsp )
+	// Internal ROM checksum: 492B, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("mm1j main-00.u1", 0x000000, 0x400000, CRC(65b40a27) SHA1(8f88973122277fe8f31bacb3a070609fde062946) )
 ROM_END
 
 ROM_START( ban_krrj ) // KRRJ MAIN PCB 01
+	// Internal ROM checksum: 7D01, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("krrj.u2", 0x000000, 0x400000, CRC(16f0fe78) SHA1(2b18cf6336e5adc64d4db0914788c159e60d91a2) )
 ROM_END
 
 ROM_START( tak_geig )
+	// Internal ROM checksum: D91B, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("geigeki.bin", 0x000000, 0x400000, CRC(bd0c3576) SHA1(06f614dbec0225ce4ed866b98450912986d72faf) )
 ROM_END
 
 ROM_START( tak_wdg )
+	// Internal ROM checksum: 448D, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("wdgrobot.bin", 0x000000, 0x200000, CRC(7ffc6386) SHA1(e33de5f8e6686e4160d1b90d59167418e87f5a47) )
 ROM_END
 
 ROM_START( tom_tvho ) // ET105 REV 0.0
+	// Internal ROM checksum: 27A1, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("tvhockey.u4", 0x000000, 0x200000, CRC(9cd72ae2) SHA1(0530851123b607ddb85f9513405ce97c493f5fd6) )
 ROM_END
 
 ROM_START( tak_comt )
+	// Internal ROM checksum: C85A, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("comet.u3", 0x000000, 0x200000, CRC(407c5566) SHA1(41d73c34af8cc3d07a34fcac0bc1856442c94200) )
 ROM_END
 
 ROM_START( jarajal )
+	// Internal ROM checksum: 3D56, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("takaraslots.bin", 0x000000, 0x200000, CRC(afae0b72) SHA1(b1c5d80a8dc8466982efd79d54cd82a58f0ff997) )
 ROM_END
 
 ROM_START( tomshoot )
+	// Internal ROM checksum: 4790, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("airgun.u4", 0x000000, 0x200000, CRC(3e4f7b65) SHA1(4e1660d4952c498e250526c2c3f027253e1fcbe1) )
 ROM_END
 
 ROM_START( tcarnavi )
+	// Internal ROM checksum: D69E, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("navi.bin", 0x000000, 0x400000, CRC(f4e693fb) SHA1(be37b35f1e1e661e10187253c2c3aa9858a90812) )
 ROM_END
 
 ROM_START( tomcpin )
+	// Internal ROM checksum: B723, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("championpinball.bin", 0x000000, 0x400000, CRC(24f6d753) SHA1(3d3b39692bef8156da9e350b456c4e2f0af74484) )
 ROM_END
 
 ROM_START( tomplc )
+	// Internal ROM checksum: B609, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("imaplayrailconductor.bin", 0x000000, 0x400000, CRC(b775d0ed) SHA1(33142509b11bbe45b0b9222232033dd64ef01ff2) )
 ROM_END
 
 ROM_START( tomthr ) // THRJ MAIN PCB   REV 0.6
+	// Internal ROM checksum: 7788, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("thrj.u4", 0x000000, 0x400000, CRC(a7e8dc74) SHA1(676b2a905b757356c6c1dfe3f10148484caa44c5) )
 ROM_END
 
 ROM_START( gungunad )
+	// Internal ROM checksum: 567A, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	// some lines were swapped going into the die, but it is unclear if they're swapped back inside it
 	ROM_LOAD("gga.bin", 0x000000, 0x40000, CRC(5252b6bb) SHA1(8a9f920e4bccabbd337f37a838af574e2b16746f) )
@@ -5430,11 +5496,13 @@ ROM_END
 
 
 ROM_START( gungunrv )
+	// Internal ROM checksum: 9BB3, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("gungunrevolution.u1", 0x000000, 0x400000, CRC(4e34f624) SHA1(7acdd0991df78ecffd156381817ed4f85f6aef09) )
 ROM_END
 
 ROM_START( bistro )
+	// Internal ROM checksum: FBC9, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("bistro.u2", 0x000000, 0x200000, CRC(40865e05) SHA1(597a615c61f29c6f6e7ce997a229175cb151242f) )
 ROM_END
@@ -5445,54 +5513,63 @@ ROM_END
 */
 
 ROM_START( ekara )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekara.bin", 0x600000, 0x100000, CRC(9b27c4a2) SHA1(d75dda7434933135d2f7e353840a9384e9a0d586) )
 	ROM_RELOAD(0x000000, 0x100000)
 ROM_END
 
 ROM_START( ekaraa )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekara2.bin", 0x600000, 0x100000, CRC(3c92d48d) SHA1(450fbe53826cdb87ec797f84b9757987afcc1ec5) )
 	ROM_RELOAD(0x000000, 0x100000)
 ROM_END
 
 ROM_START( ekaraj )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekarajapan.bin", 0x600000, 0x100000, CRC(e459e43b) SHA1(58b7f36a81571a2df5e812c118fdf68812a05abc) )
 	ROM_RELOAD(0x000000, 0x100000)
 ROM_END
 
 ROM_START( ekaraphs )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekaraheadset.bin", 0x600000, 0x200000, CRC(dd9b3cd7) SHA1(baaf35d56fa45b6f995b8466331bb30f0035f734) )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
 ROM_START( ekarag )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekaragermany.bin", 0x600000, 0x200000, CRC(644f06b0) SHA1(433e65a6ea029b67ee62b4b3de52ff3504cfdf16) )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
 ROM_START( ekaras )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekaraspanish.bin", 0x600000, 0x200000, CRC(77925ab0) SHA1(402053e22e371c5f5e8069a4bf3b33841e742375) )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
 ROM_START( isinger )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "kr_isinger.bin", 0x600000, 0x100000, CRC(6ad588fe) SHA1(879da069ca8c126232a1b2dfcce25c8615540e48) )
 	ROM_RELOAD(0x000000, 0x100000)
 ROM_END
 
 ROM_START( epitch )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekarajapan.bin", 0x600000, 0x100000, CRC(e459e43b) SHA1(58b7f36a81571a2df5e812c118fdf68812a05abc) )
 	ROM_RELOAD(0x000000, 0x100000)
 ROM_END
 
 ROM_START( ekaramix )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	// also has a MX87L100C 28-pin chip in the unit, possibly the USB controller.  Part of the ROM contains a FAT filesystem that could possibly appear as a USB drive on the PC?
 	ROM_LOAD( "ekaramix.bin", 0x600000, 0x200000, CRC(ee71576e) SHA1(26f8c9edcbbed77e86a1cb5a0b91c92a16fef433) )
@@ -5500,42 +5577,49 @@ ROM_START( ekaramix )
 ROM_END
 
 ROM_START( hikara )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "hikara.u3", 0x000000, 0x100000, CRC(6b91102a) SHA1(684dcfeaa8ac2888da2055617603494ce5fed93c) )
 	ROM_RELOAD(0x600000, 0x100000)
 ROM_END
 
 ROM_START( ddrfammt )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "ekara_ddr_ha010_81947.bin", 0x600000, 0x200000, CRC(737d5d1a) SHA1(a1043047056dd27bca69767ee2044461ec549465) )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
 ROM_START( popira )
+	// Internal ROM checksum: B586, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "popira.bin", 0x600000, 0x100000, CRC(71d20afc) SHA1(fb2ae023fc8a188c79b2d6550f737e06c05e12da) )
 	ROM_RELOAD(0x000000, 0x100000)
 ROM_END
 
 ROM_START( popirak )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "kr_main.u2", 0x600000, 0x100000, CRC(785d8e21) SHA1(7877ac33b57bdd8ceac6bda3b0006a3274ad4dce) )
 	ROM_RELOAD(0x000000, 0x100000)
 ROM_END
 
 ROM_START( popira2 )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "popira2.bin", 0x600000, 0x200000, CRC(6acd8be0) SHA1(8b6c812d37e2dc2f2531b0e47d84ad8485729dc5) )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
 ROM_START( taikodp )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "taikodepopira.bin", 0x600000, 0x200000, CRC(037a8472) SHA1(03cae465965935fc084fb906f8f5de7679f42dd1) )
 	ROM_RELOAD(0x000000, 0x200000)
 ROM_END
 
 ROM_START( jpopira )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "jumpingpopira.bin", 0x600000, 0x200000, CRC(a7bedbd2) SHA1(d62d4ca660c8df14891217fb7b7a2b4a931ff35f) )
 	ROM_RELOAD(0x000000, 0x200000)
@@ -5545,6 +5629,7 @@ ROM_START( jpopira )
 ROM_END
 
 ROM_START( evio )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "evio.bin", 0x600000, 0x200000, CRC(ee22c764) SHA1(f2b7e213eb78065a63ef484a619bcfc61299e30e))
 	ROM_RELOAD(0x000000, 0x200000)
@@ -5552,6 +5637,7 @@ ROM_END
 
 // 爆闘宣言ダイガンダー
 ROM_START( tak_daig )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "robottransformer_unit.bin", 0x600000, 0x200000, CRC(02deddaa) SHA1(7d7b54684f8b0b92daf02738560779c7df627b91) )
 	ROM_RELOAD(0x000000, 0x200000)
@@ -5559,6 +5645,7 @@ ROM_END
 
 // ASKJ MAIN-09 PCB
 ROM_START( epo_quiz )
+	// Internal ROM checksum: 319B, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "quizmaster.u1", 0x000000, 0x400000, CRC(e91868b8) SHA1(0128603d755731dafe328b142292dc6e5fe00d78) )
 ROM_END
@@ -5566,58 +5653,69 @@ ROM_END
 
 // ガチンコ勝負！ パチスロTV
 ROM_START( gcslottv )
+	// No internal ROM checksum test is currently known.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "sammyslotunit.bin", 0x000000, 0x200000, CRC(2ba6f3ab) SHA1(1c7fc0c85d817db1550d40c0258f424770e0bd81) )
 ROM_END
 
 ROM_START( epo_tfp2 )
+	// Internal ROM checksum: 4100, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "funpark2.u1", 0x000000, 0x400000, CRC(97ad5183) SHA1(77310b42d0a015838a1cef4eb5e74cc8335284d1) )
 ROM_END
 
 ROM_START( epo_tp2s ) // TF2J MAIN_01 REV:05
+	// Internal ROM checksum: CC8A, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "tf2j.u3", 0x000000, 0x400000, CRC(db2f124c) SHA1(fd60d4560ed53c63f95cf70a7d1ef13d1ecd1f42) )
 ROM_END
 
 ROM_START( epo_tp2p ) // TF3J MAIN PCB 01
+	// Internal ROM checksum: E5B6, matches expected value.
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "grandslam.u3", 0x000000, 0x800000, CRC(d458ee01) SHA1(dd1a85d822121c46f89ca013fa56c482ab411c6e) )
 ROM_END
 
 ROM_START( epo_tenn )
+	// Internal ROM checksum: ROM1 F991; ROM2 1299, matches expected values.
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD( "excitetennis.u4", 0x000000, 0x100000, CRC(10b0e1dd) SHA1(ba438201434f2b51792b119a3e3d07cc3e53b89a) )
 	ROM_LOAD( "excitetennis.u2", 0x400000, 0x200000, CRC(6c2cdc90) SHA1(3c5b391e5e7b4a9a73038ef619df564143724437) )
 ROM_END
 
 ROM_START( epo_hamd )
+	// Internal ROM checksum: ROM1 F972; ROM2 8CF9, matches expected values.
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD( "hamster.u2", 0x000000, 0x100000, CRC(6c2d9d98) SHA1(89a8e6d236ea3dadb882e3ecf12e41bd50222710) )
 	ROM_LOAD( "hamster.u3", 0x400000, 0x200000, CRC(e437c8d0) SHA1(f57c54a73ed38826f4b98610a0aa1f15cf95614d) )
 ROM_END
 
 ROM_START( tvpc_tom )
+	// Internal ROM checksum: 72BD, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "tvpc_thomas.u1", 0x000000, 0x400000, CRC(507f334e) SHA1(d66efd13f166fcd2a66133dc981c8a67b2a26d5f) )
 ROM_END
 
 ROM_START( tvpc_dor )
+	// Internal ROM checksum: 6A69, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "tvpc_doreamon.u3", 0x000000, 0x400000, CRC(6f2edbb2) SHA1(98fa86f85e00aa40e7a585ff0bc930cb5ca88362) )
 ROM_END
 
 ROM_START( tvpc_ham )
+	// Internal ROM checksum: A777, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "hpcj.u3", 0x000000, 0x400000, CRC(76e8c854) SHA1(5998c03292a16107d0d7ae00f77677582680f323) )
 ROM_END
 
 ROM_START( tvpc_hk )
+	// Internal ROM checksum: 4A18, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "kpcj.u2", 0x000000, 0x400000, CRC(87fc2f73) SHA1(29a284b907abec175d4289d290490af17a2a963f) )
 ROM_END
 
 ROM_START( epo_mail )
+	// Internal ROM checksum: A742, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "mailcot.u3", 0x000000, 0x400000, CRC(87f13ce7) SHA1(97326257210df411ac8b47e8513bb0da7b02dbde) )
 
@@ -5628,36 +5726,43 @@ ROM_END
 
 
 ROM_START( tak_gin )
+	// Internal ROM checksum: A206, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "snowboard.bin", 0x000000, 0x200000, CRC(79fdeae3) SHA1(ab08790e95cdccf3541ecbddb87ebf0dedb3718b) )
 ROM_END
 
 ROM_START( tak_hamr ) // HAMJ MAIN on PCB
+	// Internal ROM checksum: 23BA, matches expected value.
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "hamj.u4", 0x000000, 0x400000, CRC(2f4f5270) SHA1(dfb75f0d20247cf1c886840149c7cf91780ae1b9) )
 ROM_END
 
 ROM_START( tak_beyb )
+	// Internal ROM checksum: 0B2B, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "beyblade.u2", 0x000000, 0x200000, CRC(bcf6b3a7) SHA1(1c80f1241138b9d7816f1e5285ff8f3c61739c95) )
 ROM_END
 
 ROM_START( tak_beyu )
+	// Internal ROM checksum: 816B, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "beybladeus.u2", 0x000000, 0x200000, CRC(f72eb949) SHA1(20ef0411610d490d07a0924ba111ddfadcbaf407) )
 ROM_END
 
 ROM_START( hippofr )
+	// Test mode displays a fixed 2701; it does not calculate or compare a ROM checksum.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "54-6447-010.u3", 0x000000, 0x200000, CRC(1fb15364) SHA1(ff2bb54f7d6ccd3c83e722599c6f2b213bf35df8) )
 ROM_END
 
 ROM_START( multiplt )
+	// Test mode calculates and displays ROM checksum BF57, without comparing an expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "2en1multipilotefr.u2", 0x000000, 0x200000, CRC(77f2ebf6) SHA1(0181bc7d3b6ea5a4a247ffe02fee2cb4942c1623) )
 ROM_END
 
 ROM_START( pl1000 )
+	// Internal ROM checksum: 8B81, matches expected value.
 	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
 	// code is expanded from 'plainrom' region below
 
