@@ -105,6 +105,7 @@ TODO:
 #include "speaker.h"
 
 #include <algorithm>
+#include <bit>
 #include <utility>
 
 #include "wheelfir.lh"
@@ -385,9 +386,10 @@ void wheelfir_state::do_blit()
 
 	if (erase)
 	{
-		std::swap(dst_x0, dst_y0);
-		std::swap(dst_x1, dst_y1);
-		std::swap(x_dst_step, y_dst_step);
+		using std::swap;
+		swap(dst_x0, dst_y0);
+		swap(dst_x1, dst_y1);
+		swap(x_dst_step, y_dst_step);
 	}
 
 	// each axis's stall and repeat fields and its two clock bits (register map in blit_w)
@@ -423,7 +425,7 @@ void wheelfir_state::do_blit()
 	bitmap_ind16 &plane = m_tmp_bitmap[vpage];
 
 	int step_y = 0;
-	do
+	while (true)
 	{
 		int x = dst_x0;
 		int step_x = 0;
@@ -433,7 +435,7 @@ void wheelfir_state::do_blit()
 		const int yy = src_v0 + v_src_step * (ident_v ? (step_y + 1) : src_v[step_y]);
 		uint16_t *const row = &plane.pix(y & 0x1ff);
 
-		do
+		while (true)
 		{
 			const int xx = src_u0 + u_src_step * (ident_u ? step_x : src_u[step_x]);
 
@@ -451,14 +453,14 @@ void wheelfir_state::do_blit()
 			step_x++;
 
 			x += x_dst_step;
-		} while (true);
+		}
 
 		if (step_y >= steps_y + (inclusive ? 0 : -1))
 			break;
 		step_y++;
 
 		y += y_dst_step;
-	} while (true);
+	}
 }
 
 void wheelfir_state::do_direct_write(uint8_t sixdat)
@@ -750,9 +752,9 @@ static INPUT_PORTS_START( wheelfir )
 	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_INVERT PORT_SENSITIVITY(100) PORT_KEYDELTA(255) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00, 0xff) PORT_REVERSE
 
 	PORT_START("CABINET")
-	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Controls ) )
 	PORT_CONFSETTING( 0x00, "Steering wheel" )
-	PORT_CONFSETTING( 0x01, "Joystick" )
+	PORT_CONFSETTING( 0x01, DEF_STR( Joystick ) )
 INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
@@ -792,7 +794,7 @@ void wheelfir_state::machine_start()
 {
 	// the source wraps inside the gfx region with a mask, so the region has to be a power of two
 	const uint32_t gfx_bytes = uint32_t(m_tilepages.length());
-	assert(!(gfx_bytes & (gfx_bytes - 1)));
+	assert(std::has_single_bit(gfx_bytes));
 	m_gfx_mask = gfx_bytes - 1;
 
 	m_current_yscroll = 0;
@@ -834,6 +836,7 @@ void wheelfir_state::machine_reset()
 	m_direct_write_idx = 0;
 	m_direct_write_layer = LAYER_BG;
 }
+
 
 static const uint32_t texlayout_xoffset[512] = { STEP512(0,8) };
 static const uint32_t texlayout_yoffset[512] = { STEP512(0,4096) };
@@ -899,6 +902,7 @@ void wheelfir_state::board(machine_config &config)
 void wheelfir_state::wheelfir(machine_config &config)
 {
 	board(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &wheelfir_state::main_map);
 	m_subcpu->set_addrmap(AS_PROGRAM, &wheelfir_state::sub_map);
 }
@@ -907,6 +911,7 @@ void wheelfir_state::wheelfir(machine_config &config)
 void wheelfir_state::kongball(machine_config& config)
 {
 	wheelfir(config);
+
 	m_subcpu->set_disable(); // sound ROMS were not present, so don't run sound CPU
 }
 
@@ -1056,6 +1061,7 @@ ROM_START( kongball )
 	// There's no PLD at U73 on Kong Ball
 ROM_END
 
+
 ROM_START( radendur )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "endu.u19", 0x00001, 0x80000, CRC(d24ca61c) SHA1(64d2648959579d35fbf4c8479c0ff75781d28146) )
@@ -1087,7 +1093,6 @@ ROM_START( radendur )
 	ROM_LOAD( "3_pal16v8.u40",  0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "4_pal16v8.u73",  0x000, 0x117, NO_DUMP )
 ROM_END
-
 
 } // anonymous namespace
 
