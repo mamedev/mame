@@ -498,7 +498,6 @@ uint32_t v810_device::opORI(uint32_t op) // ori imm16,r1,r2
 	op2|=op1;
 	CHECK_ZS(op2);
 	SET_OV(0);
-	SET_S(0);
 	SETREG(GET2,op2);
 	return 1;
 }
@@ -542,7 +541,6 @@ uint32_t v810_device::opXORI(uint32_t op)    // xori imm16,r1,r2
 	op2^=op1;
 	CHECK_ZS(op2);
 	SET_OV(0);
-	SET_S(0);
 	SETREG(GET2,op2);
 	return 1;
 }
@@ -572,8 +570,8 @@ uint32_t v810_device::opSHLr(uint32_t op)    // shl r1,r2
 		tmp<<=count;
 		CHECK_CY(tmp);
 		SETREG(GET2,tmp&0xffffffff);
-		CHECK_ZS(GETREG(GET2));
 	}
+	CHECK_ZS(GETREG(GET2));
 	return 1;
 }
 
