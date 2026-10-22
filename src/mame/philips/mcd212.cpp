@@ -303,6 +303,14 @@ int mcd212_device::get_border_width()
 	return width;
 }
 
+int mcd212_device::get_border_height()
+{
+	int height = 0;
+	if (!BIT(m_dcr[0], DCR_FD_BIT) && BIT(m_csrw[0], CSR1W_ST_BIT))
+		height = 20;
+	return height;
+}
+
 uint32_t mcd212_device::get_backdrop_plane(int x, int y)
 {
 	if (BIT(m_image_coding_method, ICM_EV_BIT))
@@ -785,10 +793,11 @@ void mcd212_device::draw_cursor(uint32_t *scanline)
 			color_index = color_index ^ 0x7; // Inverted Color Blink. MCD212 Section 7.5
 	}
 
-	const uint16_t cursor_x = m_cursor_position & 0x3ff;
-	const uint16_t cursor_y = ((m_cursor_position >> 12) & 0x3ff) + m_ica_height;
+	const int border_width = get_border_width();
+	const uint16_t cursor_x = (m_cursor_position & 0x3ff) + border_width;
+	const uint16_t cursor_y = ((m_cursor_position >> 12) & 0x3ff) + m_ica_height + get_border_height();
 	const int32_t y = screen().vpos() / 2 - cursor_y;
-	const int width = get_screen_width();
+	const int width = get_screen_width() + border_width;
 
 	if ((0 <= y) && (y < 16))
 	{
@@ -1012,15 +1021,21 @@ TIMER_CALLBACK_MEMBER(mcd212_device::ica_tick)
 
 TIMER_CALLBACK_MEMBER(mcd212_device::dca_tick)
 {
-	// Process DCA
-	if (dca_enabled(1))
-		process_dca<1>();
-	if (dca_enabled(0))
-		process_dca<0>();
+	const int first_line = m_ica_height + get_border_height();
+	const int last_line = m_total_height - get_border_height() - 1;
+	const int scanline = screen().vpos() / 2;
 
-	int scanline = screen().vpos() / 2;
-	if (scanline == m_total_height - 1)
-		m_dca_timer->adjust(screen().time_until_pos(m_ica_height * 2, 784));
+	// Process DCA
+	if (scanline >= first_line && scanline <= last_line)
+	{
+		if (dca_enabled(1))
+			process_dca<1>();
+		if (dca_enabled(0))
+			process_dca<0>();
+	}
+
+	if (scanline >= last_line)
+		m_dca_timer->adjust(screen().time_until_pos(first_line * 2, 784));
 	else
 		m_dca_timer->adjust(screen().time_until_pos((scanline + 1) * 2, 784));
 }
@@ -1049,13 +1064,10 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		uint32_t *const out2 = &bitmap.pix(scanline * 2 + BIT(m_csrr[0], CSR1R_PA_BIT));
 
 		bool draw_line = true;
-		if (!BIT(m_dcr[0], DCR_FD_BIT) && BIT(m_csrw[0], CSR1W_ST_BIT))
+		const int border_height = get_border_height();
+		if ((scanline - m_ica_height < border_height) || (scanline >= (m_total_height - border_height)))
 		{
-			// If PAL and 'Standard' bit set, insert a 20-line border on the top/bottom
-			if ((scanline - m_ica_height < 20) || (scanline >= (m_total_height - 20)))
-			{
-				draw_line = false;
-			}
+			draw_line = false;
 		}
 
 		m_csrr[0] |= CSR1R_DA;

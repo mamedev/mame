@@ -268,6 +268,7 @@ protected:
 	uint32_t dyuv_to_rgb(uint8_t y, uint8_t u, uint8_t v) const;
 	int get_screen_width();
 	int get_border_width();
+	int get_border_height();
 	bool ica_enabled(int channel) const { return BIT(m_dcr[0], DCR_DE_BIT) && BIT(m_dcr[channel], DCR_ICA_BIT); }
 	bool dca_enabled(int channel) const { return ica_enabled(channel) && BIT(m_dcr[channel], DCR_DCA_BIT); }
 	uint32_t get_backdrop_plane(int x, int y);
