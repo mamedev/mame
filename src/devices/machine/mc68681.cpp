@@ -284,6 +284,7 @@ void duart_base_device::device_reset()
 	IPCR = 0;
 
 	m_irq_state = false;
+	m_ip2_clock_warned = false;
 	write_irq(CLEAR_LINE);
 	write_outport(OPR ^ 0xff);
 }
@@ -439,9 +440,28 @@ uint8_t mcf5206e_uart_device::get_irq_vector()
 	return IVR;
 }
 
+void duart_base_device::warn_ip2_clock()
+{
+	if (!m_ip2_clock_warned)
+	{
+		m_ip2_clock_warned = true;
+		logerror("68681 (%s): IP2 clock source not modelled, using X1 instead\n", tag());
+	}
+}
+
 uint32_t duart_base_device::get_ct_rate()
 {
-	uint32_t rate = 0;
+	// ACR[6] selects the mode and ACR[5:4] the clock source:
+	//
+	//   ACR[5:4]  counter mode        timer mode
+	//   00        IP2                 IP2
+	//   01        TxCA (channel A)    IP2 / 16
+	//   10        TxCB (channel B)    X1
+	//   11        X1 / 16             X1 / 16
+	//
+	// TODO: IP2 is not modelled, so X1 stands in for it below.
+	// The timer-mode IP2 input is divided by 16, the counter-mode one is not.
+	uint32_t const x1_rate = clock();
 
 	if (ACR & 0x40)
 	{
@@ -449,16 +469,17 @@ uint32_t duart_base_device::get_ct_rate()
 		switch ((ACR >> 4) & 3)
 		{
 		case 0: // IP2
+			// TODO: use IP2 instead of X1
+			warn_ip2_clock();
+			return x1_rate;
 		case 1: // IP2 / 16
-			//logerror( "68681 (%s): Unhandled timer/counter mode %d\n", duart68681->tag(), (duart68681->ACR >> 4) & 3);
-			rate = clock();
-			break;
+			// TODO: use IP2 / 16 instead of X1 / 16
+			warn_ip2_clock();
+			return x1_rate / 16;
 		case 2: // X1/CLK
-			rate = clock();
-			break;
+			return x1_rate;
 		case 3: // X1/CLK / 16
-			rate = clock() / 16;
-			break;
+			return x1_rate / 16;
 		}
 	}
 	else
@@ -467,22 +488,19 @@ uint32_t duart_base_device::get_ct_rate()
 		switch ((ACR >> 4) & 3)
 		{
 		case 0: // IP2
-			//logerror( "68681 (%s): Unhandled timer/counter mode %d\n", device->tag(), (duart68681->ACR >> 4) & 3);
-			rate = clock();
-			break;
-		case 1: // TxCA
-			rate = m_chanA->get_tx_rate();
-			break;
-		case 2: // TxCB
-			rate = m_chanB->get_tx_rate();
-			break;
+			// TODO: use IP2 instead of X1
+			warn_ip2_clock();
+			return x1_rate;
+		case 1: // TxCA (channel A 1x transmitter clock)
+			return m_chanA->get_tx_rate();
+		case 2: // TxCB (channel B 1x transmitter clock)
+			return m_chanB->get_tx_rate();
 		case 3: // X1/CLK / 16
-			rate = clock() / 16;
-			break;
+			return x1_rate / 16;
 		}
 	}
 
-	return rate;
+	return 0;
 }
 
 uint16_t duart_base_device::get_ct_count()
@@ -954,6 +972,7 @@ void duart_base_device::write(offs_t offset, uint8_t data)
 	{
 		uint8_t old_acr = ACR;
 		ACR = data;
+		m_ip2_clock_warned = false;
 
 		//       bits 6-4: Counter/Timer Mode And Clock Source Select
 		//       bits 3-0: IP3-0 Change-Of-State Interrupt Enable
