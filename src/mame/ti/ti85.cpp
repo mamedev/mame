@@ -744,7 +744,7 @@ void ti85_state::ti82(machine_config &config)
 
 	subdevice<screen_device>("screen")->set_screen_update("t6a04", FUNC(t6a04_device::screen_update));
 
-	subdevice<palette_device>("palette")->set_entries(2).set_init(FUNC(ti85_state::ti82_palette));
+	subdevice<palette_device>("palette")->set_entries(128).set_init(FUNC(ti85_state::ti82_palette));
 
 	T6A04(config, "t6a04").set_size(96, 64);
 
@@ -771,7 +771,7 @@ void ti85_state::ti83(machine_config &config)
 
 	subdevice<screen_device>("screen")->set_screen_update("t6a04", FUNC(t6a04_device::screen_update));
 
-	subdevice<palette_device>("palette")->set_entries(2).set_init(FUNC(ti85_state::ti82_palette));
+	subdevice<palette_device>("palette")->set_entries(128).set_init(FUNC(ti85_state::ti82_palette));
 
 	T6A04(config, "t6a04").set_size(96, 64);
 
@@ -802,7 +802,7 @@ void ti85_state::ti83p(machine_config &config)
 
 	subdevice<screen_device>("screen")->set_screen_update("t6a04", FUNC(t6a04_device::screen_update));
 
-	subdevice<palette_device>("palette")->set_entries(2).set_init(FUNC(ti85_state::ti82_palette));
+	subdevice<palette_device>("palette")->set_entries(128).set_init(FUNC(ti85_state::ti82_palette));
 
 	ADDRESS_MAP_BANK(config, m_membank[0]).set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 	ADDRESS_MAP_BANK(config, m_membank[1]).set_map(&ti85_state::ti83p_banked_mem).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);

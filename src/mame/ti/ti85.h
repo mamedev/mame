@@ -141,7 +141,7 @@ private:
 	int m_lcdwidth = 0;
 	int m_lcdheight = 0;
     uint8_t m_lcdrow = 0;
-	uint8_t m_frames[(160 * 64 / 8) * 7]{};
+	uint8_t m_frame[160 * 64 / 8]{};
 	uint8_t * m_bios = nullptr;
     emu_timer *m_lcd_dma_timer = nullptr;
 	emu_timer *m_ti83_1st_timer = nullptr;

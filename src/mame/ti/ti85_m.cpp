@@ -465,7 +465,7 @@ void ti85_state::ti8x_init_common()
     save_item(NAME(m_LCD_contrast));
 	save_item(NAME(m_LCD_status));
 	save_item(NAME(m_LCD_mask));
-    save_item(NAME(m_frames));
+    save_item(NAME(m_frame));
 	save_item(NAME(m_power_mode));
 	save_item(NAME(m_keypad_mask));
 	save_item(NAME(m_video_buffer_width));

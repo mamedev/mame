@@ -6,7 +6,6 @@
 
         TODO:
         - busy flag
-        - contrast
         - slave mode
 
 ***************************************************************************/
@@ -98,26 +97,23 @@ void t6a04_device::device_reset()
 
 uint32_t t6a04_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t ypages = m_width>>3;
+	uint8_t ypages = m_width >> 3;
 	uint8_t last_line = m_zpos + m_height;
 
 	if (m_display_on)
 	{
-		for (int y=0; y<ypages; y++)
-			for (int x=m_zpos; x<last_line; x++)
+		for (int y = 0; y < ypages; y++)
+			for (int x = m_zpos; x < last_line; x++)
 			{
-				uint8_t data = m_lcd_ram[(x&0x3f)*15 + y];
+				uint8_t data = m_lcd_ram[(x & 0x3f) * 15 + y];
 
-				for (int b=7; b>=0; b--)
-				{
-					bitmap.pix(x&0x3f, y*8+b) = data & 1;
-					data>>=1;
-				}
+				for (int b = 0; b < 8; b++)
+					bitmap.pix(x & 0x3f, y * 8 + b) = (m_contrast << 1) | BIT(data, 7 - b);
 			}
 	}
 	else
 	{
-		bitmap.fill(0, cliprect);
+		bitmap.fill(0x7f, cliprect);
 	}
 
 	return 0;
