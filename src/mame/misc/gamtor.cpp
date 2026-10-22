@@ -24,7 +24,7 @@
      * 2 x Maxim MAX1488ECPD.
      * 3 x ULN2803A, 3 x ULN2064B.
     - One or two VGA boards (Novomatic P378-1 D9701).
-     * 4 x IS41C16256-35K RAM chips (1MB total).
+     * 4 x IS41C16256-35K RAM chips (256K x 16 each, 2MB total).
      * 14.3181 MHz xtal.
      * ATF16V8C PLD.
      * Chips & Technologies 65550 B.
@@ -50,10 +50,18 @@
 
 #include "emu.h"
 #include "cpu/m68000/mcf5206e.h"
+#include "machine/i2cmem.h"
+#include "machine/input_merger.h"
+#include "machine/ins8250.h"
+#include "machine/jcm_wba.h"
 #include "machine/msm6242.h"
+#include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "video/pc_vga.h"
 #include "speaker.h"
+
+#include <algorithm>
+#include <vector>
 
 
 // TODO: Chips & Technologies 65550 with swapped address lines?
@@ -61,23 +69,69 @@
 // 65550 is used by Apple PowerBook 2400c
 // 65535 is used by IBM PC-110
 
+// Chips & Technologies 65550 (HiQV) on the Novomatic P378-1 VGA board, from the 65550 data sheet rev 1.5:
+// - Bus: the ColdFire (big endian) data bus is wired straight to the little-endian chip, so a CPU byte at lane l
+//   reaches chip byte l ^ 3. That is why the I/O ports appear with A0/A1 inverted; for memory space accesses the
+//   software uses the XR0A endian swap (0x20 = byte 0<>3, 1<>2) to undo it.
+// - Memory space (8MB, VL-bus layout, 3-5): linear frame buffer at 0, BitBLT registers at 0x400000, BitBLT data port
+//   at 0x410000.
+// - Extended modes (XR09 bit 0): CR30-CR33 vertical bits 11-8, CR40 start address bits 19-16 + update on VSYNC,
+//   CR41 offset bits 11-8. XR81 3-0 = display colour mode, XR80 bit 7 = 8-bit DAC.
+// - Video clocks (A-2): Fvco = Fref / RDS / NTSC * VLD * (M+2) / (N+2), Fout = Fvco / PD, Fref 14.31818 MHz.
+// - BitBLT engine (chapter 12 and appendix E).
 class gamtor_vga_device : public svga_device
 {
 public:
 	// construction/destruction
 	gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-//  virtual uint8_t mem_r(offs_t offset) override;
-//  virtual void mem_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t mem_linear_r(offs_t offset) override;
 	virtual void mem_linear_w(offs_t offset,uint8_t data) override;
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+
+	u32 space_r(offs_t offset);
+	void space_w(offs_t offset, u32 data, u32 mem_mask);
 
 protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void io_3cx_map(address_map &map) override ATTR_COLD;
 	virtual void io_3bx_3dx_map(address_map &map) override ATTR_COLD;
+	virtual void crtc_map(address_map &map) override ATTR_COLD;
+	virtual void recompute_params() override;
 
 	virtual uint16_t offset() override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	bool extended() const { return BIT(m_xr[0x09], 0); }
+	int swap_xor() const { static constexpr int s[4] = { 0, 1, 3, 0 }; return s[(m_xr[0x0a] >> 4) & 3]; }
+	u32 vclk() const;
+	void vblank_cb(screen_device &screen, bool state);
+	void xr_w(u8 data);
+
+	// BitBLT
+	int blt_bpp() const { return ((m_xr[0x20] >> 4) & 3) + 1; }
+	u32 vram_pixel(u32 addr, int bpp) const;
+	void blt_start();
+	void blt_line(int i);
+	void blt_host_push(u8 data);
+	void blt_host_run();
+	static u8 rop3(u8 rop, u8 p, u8 s, u8 d);
+
+	u8 m_xr[0x100], m_fr[0x100], m_mr[0x100];
+	u8 m_xr_idx, m_fr_idx, m_mr_idx;
+	u8 m_cr3x[4], m_cr40, m_cr41;
+	u32 m_ext_start;
+
+	u32 m_br[11];
+	bool m_blt_busy;
+	int m_blt_line;
+	std::vector<u8> m_hostq;
+	u32 m_host_bit;       // mono host stream bit cursor
+	u32 m_host_end;       // end bit of the previous mono line
+	const u8 *m_hline;    // colour host data of the line being drawn
+	u32 m_hline_skip;
 };
 
 DEFINE_DEVICE_TYPE(GAMTOR_VGA, gamtor_vga_device, "gamtor_vga", "CT-65550 SVGA")
@@ -86,13 +140,67 @@ gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, const char *
 	: svga_device(mconfig, GAMTOR_VGA, tag, owner, clock)
 {
 	m_main_if_space_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(gamtor_vga_device::io_3bx_3dx_map), this));
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(gamtor_vga_device::crtc_map), this));
 }
 
-// A0/A1 are inverted (protection or ct55550 feature?)
+void gamtor_vga_device::device_start()
+{
+	svga_device::device_start();
+	screen().register_vblank_callback(vblank_state_delegate(&gamtor_vga_device::vblank_cb, this));
+	save_item(NAME(m_xr)); save_item(NAME(m_fr)); save_item(NAME(m_mr));
+	save_item(NAME(m_xr_idx)); save_item(NAME(m_fr_idx)); save_item(NAME(m_mr_idx));
+	save_item(NAME(m_cr3x)); save_item(NAME(m_cr40)); save_item(NAME(m_cr41)); save_item(NAME(m_ext_start));
+	save_item(NAME(m_br)); save_item(NAME(m_blt_busy)); save_item(NAME(m_blt_line));
+	save_item(NAME(m_host_bit)); save_item(NAME(m_host_end));
+}
+
+void gamtor_vga_device::device_reset()
+{
+	svga_device::device_reset();
+	std::fill(std::begin(m_xr), std::end(m_xr), 0);
+	std::fill(std::begin(m_fr), std::end(m_fr), 0);
+	std::fill(std::begin(m_mr), std::end(m_mr), 0);
+	m_xr_idx = m_fr_idx = m_mr_idx = 0;
+	std::fill(std::begin(m_cr3x), std::end(m_cr3x), 0);
+	m_cr40 = m_cr41 = 0;
+	m_ext_start = 0;
+	std::fill(std::begin(m_br), std::end(m_br), 0);
+	m_blt_busy = false;
+	m_blt_line = 0;
+	m_hostq.clear();
+	m_host_bit = m_host_end = 0;
+	m_hline = nullptr;
+	m_hline_skip = 0;
+}
+
+// A0/A1 inverted: straight data bus to a little-endian chip (see above)
 void gamtor_vga_device::io_3bx_3dx_map(address_map &map)
 {
+	map(0x00 ^ 3, 0x00 ^ 3).lrw8(NAME([this] () { return m_fr_idx; }), NAME([this] (u8 data) { m_fr_idx = data; }));
+	map(0x01 ^ 3, 0x01 ^ 3).lrw8(NAME([this] () { return m_fr[m_fr_idx]; }), NAME([this] (u8 data) { m_fr[m_fr_idx] = data; }));
+	map(0x02 ^ 3, 0x02 ^ 3).lrw8(NAME([this] () { return m_mr_idx; }), NAME([this] (u8 data) { m_mr_idx = data; }));
+	map(0x03 ^ 3, 0x03 ^ 3).lrw8(NAME([this] () { return m_mr[m_mr_idx]; }), NAME([this] (u8 data) { m_mr[m_mr_idx] = data; }));
 	map(0x04 ^ 3, 0x04 ^ 3).rw(FUNC(gamtor_vga_device::crtc_address_r), FUNC(gamtor_vga_device::crtc_address_w));
 	map(0x05 ^ 3, 0x05 ^ 3).rw(FUNC(gamtor_vga_device::crtc_data_r), FUNC(gamtor_vga_device::crtc_data_w));
+	map(0x06 ^ 3, 0x06 ^ 3).lrw8(NAME([this] () { return m_xr_idx; }), NAME([this] (u8 data) { m_xr_idx = data; }));
+	map(0x07 ^ 3, 0x07 ^ 3).lrw8(
+		NAME([this] () -> u8 {
+			switch (m_xr_idx)
+			{
+			case 0x00: return 0x2c; // vendor ID 102Ch (13-1)
+			case 0x01: return 0x10;
+			case 0x02: return 0xe4; // device ID 00E4h
+			case 0x03: return 0x00;
+			case 0x04: // revision ID: "??h" in the data sheet
+				if (!machine().side_effects_disabled())
+					logerror("XR04 revision ID read\n");
+				return 0x00;
+			case 0x08: return 0x00; // configuration: VL-bus
+			case 0x20: return (m_xr[0x20] & ~1) | (m_blt_busy ? 1 : 0);
+			default: return m_xr[m_xr_idx];
+			}
+		}),
+		NAME([this] (u8 data) { xr_w(data); }));
 	map(0x0a ^ 3, 0x0a ^ 3).rw(FUNC(gamtor_vga_device::input_status_1_r), FUNC(gamtor_vga_device::feature_control_w));
 }
 
@@ -113,6 +221,130 @@ void gamtor_vga_device::io_3cx_map(address_map &map)
 	map(0x0f ^ 3, 0x0f ^ 3).rw(FUNC(gamtor_vga_device::gc_data_r), FUNC(gamtor_vga_device::gc_data_w));
 }
 
+void gamtor_vga_device::crtc_map(address_map &map)
+{
+	svga_device::crtc_map(map);
+	map(0x30, 0x33).lrw8(
+		NAME([this] (offs_t offset) { return m_cr3x[offset]; }),
+		NAME([this] (offs_t offset, u8 data) { m_cr3x[offset] = data & 0x0f; recompute_params(); }));
+	map(0x40, 0x40).lrw8(NAME([this] () { return m_cr40; }), NAME([this] (u8 data) { m_cr40 = data & 0x8f; }));
+	map(0x41, 0x41).lrw8(NAME([this] () { return m_cr41; }), NAME([this] (u8 data) { m_cr41 = data & 0x0f; }));
+}
+
+void gamtor_vga_device::xr_w(u8 data)
+{
+	const u8 idx = m_xr_idx;
+	if (idx == 0x20)
+	{
+		// XR20 bit 1: BitBLT reset; bit 0 is the read-only status
+		if (BIT(data, 1))
+		{
+			m_blt_busy = false;
+			m_hostq.clear();
+		}
+		m_xr[0x20] = data & 0x32;
+		return;
+	}
+	m_xr[idx] = data;
+	if (idx == 0x09 || idx == 0x81 || (idx >= 0xc0 && idx <= 0xcf))
+		recompute_params();
+}
+
+u32 gamtor_vga_device::vclk() const
+{
+	// MISC 3-2 selects VCLK0/1/2 (XRC0-C3, XRC4-C7, XRC8-CB)
+	const int sel = (vga.miscellaneous_output >> 2) & 3;
+	if (sel == 3)
+		return 0;
+	const u8 *r = &m_xr[0xc0 + sel * 4];
+	const u32 m = r[0] | ((r[2] & 3) << 8);
+	const u32 n = r[1] | (((r[2] >> 4) & 3) << 8);
+	const u8 div = r[3];
+	if (m == 0 && n == 0 && div == 0)
+		return sel ? 28'322'000 : 25'175'000; // VGA compatible defaults (13-36)
+	double f = 14'318'180.0;
+	if (!BIT(div, 0)) f /= 4.0;          // reference divisor select
+	if (BIT(div, 1)) f /= 5.0;           // NTSC reference divide
+	f *= BIT(div, 2) ? 16.0 : 4.0;       // VCO loop divide
+	f = f * (m + 2) / (n + 2);
+	f /= double(1 << ((div >> 4) & 7));  // post divisor
+	return u32(f);
+}
+
+void gamtor_vga_device::recompute_params()
+{
+	if (!extended())
+	{
+		svga_device::recompute_params();
+		return;
+	}
+	vga.crtc.vert_total = (vga.crtc.vert_total & 0xff) | (m_cr3x[0] << 8);
+	vga.crtc.vert_disp_end = (vga.crtc.vert_disp_end & 0xff) | (m_cr3x[1] << 8);
+	vga.crtc.vert_retrace_start = (vga.crtc.vert_retrace_start & 0xff) | (m_cr3x[2] << 8);
+	vga.crtc.vert_blank_start = (vga.crtc.vert_blank_start & 0xff) | (m_cr3x[3] << 8);
+	const u32 clk = vclk();
+	if (clk)
+		recompute_params_clock(1, clk);
+}
+
+void gamtor_vga_device::vblank_cb(screen_device &screen, bool state)
+{
+	// CR40 bit 7: the extended start address is taken on VSYNC, then the bit clears (10-34)
+	if (state && BIT(m_cr40, 7))
+	{
+		m_ext_start = ((m_cr40 & 0x0f) << 16) | (vga.crtc.start_addr_latch & 0xffff); // CR0C/CR0D as written
+		m_cr40 &= 0x7f;
+	}
+}
+
+uint16_t gamtor_vga_device::offset()
+{
+	// TODO: pinpoint whatever extra register that wants this shifted by 1
+	return vga_device::offset() << 1;
+}
+
+uint32_t gamtor_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	const int mode = m_xr[0x81] & 0x0f;
+	if (!extended() || (mode != 2 && mode != 4 && mode != 5))
+		return svga_device::screen_update(screen, bitmap, cliprect);
+
+	// Offset in quadwords: the game programs CR13 = 0x50 for its 640 byte lines (BitBLT pitch BR00 = 0x280)
+	const u32 pitch = (((m_cr41 & 0x0f) << 8) | (vga.crtc.offset & 0xff)) * 8;
+	const u32 vmask = vga.svga_intf.vram_size - 1;
+	const u8 *mem = vga.memory.get();
+	const bool dac8 = BIT(m_xr[0x80], 7);
+	pen_t pens[256];
+	for (int i = 0; i < 256; i++)
+	{
+		const u8 *c = &vga.dac.color[3 * (i & vga.dac.mask)];
+		pens[i] = dac8 ? rgb_t(c[0], c[1], c[2]) : rgb_t(pal6bit(c[0] & 0x3f), pal6bit(c[1] & 0x3f), pal6bit(c[2] & 0x3f));
+	}
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		u32 *dst = &bitmap.pix(y, cliprect.left());
+		u32 a = m_ext_start * 4 + y * pitch; // start address in dwords: the game flips to 0x12c00 = 0x4b000 = one 640x480 page
+		if (mode == 2)
+		{
+			a += cliprect.left();
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
+				*dst++ = pens[mem[a++ & vmask]];
+		}
+		else
+		{
+			a += cliprect.left() * 2;
+			for (int x = cliprect.left(); x <= cliprect.right(); x++, a += 2)
+			{
+				const u16 p = mem[a & vmask] | (mem[(a + 1) & vmask] << 8);
+				*dst++ = (mode == 4) ? rgb_t(pal5bit(p >> 10), pal5bit(p >> 5), pal5bit(p)) : rgb_t(pal5bit(p >> 11), pal6bit(p >> 5), pal5bit(p));
+			}
+		}
+	}
+	return 0;
+}
+
+// Text-mode window kept from the original driver: the kernel writes its text at the bottom of the memory space
+// (planes 0/1 interleaved, plane 2 = font in MAME's VGA memory layout).
 uint8_t gamtor_vga_device::mem_linear_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
@@ -128,10 +360,255 @@ void gamtor_vga_device::mem_linear_w(offs_t offset, uint8_t data)
 		vga.memory[(offset & 1) | (offset >> 1)] = data;
 }
 
-uint16_t gamtor_vga_device::offset()
+u32 gamtor_vga_device::space_r(offs_t offset)
 {
-	// TODO: pinpoint whatever extra register that wants this shifted by 1
-	return vga_device::offset() << 1;
+	const u32 a = offset << 2;
+	const int sx = swap_xor();
+	u32 chip = 0;
+	if (a < 0x200000)
+	{
+		for (int k = 0; k < 4; k++)
+		{
+			u8 b = 0;
+			if (extended())
+				b = vga.memory[(a + k) & (vga.svga_intf.vram_size - 1)];
+			else if (a + k < 0x20000)
+				b = vga.memory[a + k];
+			else if (a + k >= 0xa0000 && a + k < 0xc0000)
+				b = mem_r(a + k - 0xa0000); // VGA window, as the original driver mapped it (beetlem)
+			chip |= u32(b) << (8 * k);
+		}
+	}
+	else if (a >= 0x400000 && a < 0x400040)
+	{
+		const int r = (a >> 2) & 0x0f;
+		chip = r < 11 ? m_br[r] : 0;
+		if (r == 4)
+			chip = (chip & 0x7fffffff) | (m_blt_busy ? 0x80000000 : 0);
+		return chip; // the XR0A endian swap does not apply to the BitBLT registers (see space_w)
+	}
+	else
+		return 0;
+	// chip byte k leaves on CPU lane bits 8*(k ^ swap)
+	u32 data = 0;
+	for (int k = 0; k < 4; k++)
+		data |= ((chip >> (8 * k)) & 0xff) << (8 * (k ^ sx));
+	return data;
+}
+
+void gamtor_vga_device::space_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	const u32 a = offset << 2;
+	const int sx = swap_xor();
+	u32 chip = 0, cmask = 0;
+	for (int k = 0; k < 4; k++)
+	{
+		chip |= ((data >> (8 * (k ^ sx))) & 0xff) << (8 * k);
+		cmask |= ((mem_mask >> (8 * (k ^ sx))) & 0xff) << (8 * k);
+	}
+
+	if (a < 0x200000)
+	{
+		for (int k = 0; k < 4; k++)
+		{
+			if (!(cmask & (0xff << (8 * k))))
+				continue;
+			const u8 b = chip >> (8 * k);
+			if (extended())
+				vga.memory[(a + k) & (vga.svga_intf.vram_size - 1)] = b;
+			else if (a + k < 0x20000)
+				mem_linear_w(a + k, b);
+			else if (a + k >= 0xa0000 && a + k < 0xc0000)
+				mem_w(a + k - 0xa0000, b); // VGA window, as the original driver mapped it (beetlem)
+		}
+	}
+	else if (a >= 0x400000 && a < 0x400040)
+	{
+		// The XR0A endian swap does not apply here: the game's first BitBLT (0x2e954f4, BR04 = 0x000c00aa) is
+		// programmed while XR0A = 0x20, and its long values only make sense unswapped.
+		chip = data;
+		cmask = mem_mask;
+		const int r = (a >> 2) & 0x0f;
+		if (r >= 11)
+			return;
+		if (m_blt_busy)
+			logerror("BitBLT BR%02X write while busy: line %d of %d, %d bytes queued, BR00 %08x BR03 %08x BR04 %08x BR06 %08x BR08 %08x\n",
+					r, m_blt_line, (m_br[8] >> 16) & 0x1fff, int(m_hostq.size()), m_br[0], m_br[3], m_br[4], m_br[6], m_br[8]);
+		m_br[r] = (m_br[r] & ~cmask) | (chip & cmask);
+		// reserved bits read as 0 (BR04 12-7, BR05 12-10, BR06 12-11, BR07 12-12); BR04 bit 31 is the read-only status
+		static constexpr u32 br_mask[11] = { ~0U, ~0U, ~0U, ~0U, 0x007ff7ff, 0x007ffff8, 0x007fffff, 0x007fffff, ~0U, ~0U, ~0U };
+		m_br[r] &= br_mask[r];
+		if (r == 8 && (m_br[8] >> 16) & 0x1fff)
+			blt_start(); // a non-zero height starts the operation (E-2)
+	}
+	else if (a >= 0x410000 && a < 0x420000)
+	{
+		for (int k = 0; k < 4; k++)
+			if (cmask & (0xff << (8 * k)))
+				blt_host_push(chip >> (8 * k));
+		blt_host_run();
+	}
+	else
+		logerror("unmapped 65550 memory space write %06x = %08x & %08x\n", a, data, mem_mask);
+}
+
+u8 gamtor_vga_device::rop3(u8 rop, u8 p, u8 s, u8 d)
+{
+	u8 r = 0;
+	for (int k = 0; k < 8; k++)
+		if (BIT(rop, k))
+			r |= (BIT(k, 2) ? p : ~p) & (BIT(k, 1) ? s : ~s) & (BIT(k, 0) ? d : ~d);
+	return r;
+}
+
+u32 gamtor_vga_device::vram_pixel(u32 addr, int bpp) const
+{
+	u32 v = 0;
+	for (int k = 0; k < bpp; k++)
+		v |= u32(vga.memory[(addr + k) & (vga.svga_intf.vram_size - 1)]) << (8 * k);
+	return v;
+}
+
+void gamtor_vga_device::blt_start()
+{
+	const u32 ctl = m_br[4];
+	const int h = (m_br[8] >> 16) & 0x1fff;
+	m_blt_line = 0;
+	m_hostq.clear();
+	m_host_bit = BIT(ctl, 12) ? (m_br[3] >> 16) & 0x3f : 0; // mono: initial discard
+	m_host_end = m_host_bit;
+	if (BIT(ctl, 10))
+	{
+		m_blt_busy = true; // waits for the host CPU on the data port
+		return;
+	}
+	if (BIT(ctl, 12))
+		logerror("BitBLT: monochrome source in the frame buffer not supported (BR04 %08x)\n", ctl);
+	for (int i = 0; i < h; i++)
+		blt_line(i);
+	m_blt_busy = false;
+}
+
+void gamtor_vga_device::blt_host_push(u8 data)
+{
+	if (m_blt_busy)
+		m_hostq.push_back(data);
+}
+
+void gamtor_vga_device::blt_host_run()
+{
+	const u32 ctl = m_br[4];
+	const int h = (m_br[8] >> 16) & 0x1fff;
+	const u32 wbytes = m_br[8] & 0x1fff;
+	while (m_blt_busy && m_blt_line < h)
+	{
+		if (!BIT(ctl, 12))
+		{
+			// colour host data: the game sends each line in whole quadwords (8x12 glyph, BR00 source offset 0x5a0,
+			// 96 bytes sent), so a line is BR06 2-0 skipped bytes + the line, padded to a quadword
+			const u32 skip = m_br[6] & 7;
+			const u32 len = (skip + wbytes + 7) & ~7;
+			if (m_hostq.size() < len)
+				return;
+			m_hline = m_hostq.data();
+			m_hline_skip = skip;
+			blt_line(m_blt_line++);
+			m_hostq.erase(m_hostq.begin(), m_hostq.begin() + len);
+		}
+		else
+		{
+			// monochrome host data: BR03 alignment, initial discard, left/right clipping (BR03, E.3.3)
+			static constexpr int align_bits[8] = { 1, 1, 8, 16, 32, 64, 1, 1 };
+			const int al = align_bits[(m_br[3] >> 24) & 7];
+			const u32 wpix = wbytes / blt_bpp();
+			u32 start = m_blt_line ? (m_host_end + al - 1) / al * al : m_host_bit;
+			const u32 end = start + (m_br[3] & 0x3f) + wpix + ((m_br[3] >> 8) & 0x3f);
+			if (m_hostq.size() * 8 < end)
+				return;
+			m_host_bit = start + (m_br[3] & 0x3f);
+			m_hline = nullptr;
+			blt_line(m_blt_line++);
+			m_host_end = end;
+		}
+	}
+	if (m_blt_line >= h)
+	{
+		m_blt_busy = false;
+		m_hostq.clear();
+	}
+}
+
+void gamtor_vga_device::blt_line(int i)
+{
+	const u32 ctl = m_br[4];
+	const u8 rop = ctl & 0xff;
+	const int bpp = blt_bpp();
+	const u32 cmask = bpp == 3 ? 0xffffff : bpp == 2 ? 0xffff : 0xff;
+	const int wpix = (m_br[8] & 0x1fff) / bpp;
+	const bool rl = BIT(ctl, 8), bu = BIT(ctl, 9);
+	const u32 dstoff = (m_br[0] >> 16) & 0x1fff, srcoff = m_br[0] & 0x1fff;
+	const u32 dline = m_br[7] + (bu ? -i : i) * dstoff;
+	const u32 sline = m_br[6] + (bu ? -i : i) * srcoff;
+	const bool mono_src = BIT(ctl, 12), host = BIT(ctl, 10);
+	const bool mono_pat = BIT(ctl, 18), solid = BIT(ctl, 19);
+	const u32 src_fg = (BIT(m_br[3], 27) ? m_br[10] : m_br[2]) & cmask;
+	const u32 src_bg = (BIT(m_br[3], 27) ? m_br[9] : m_br[1]) & cmask;
+	const int py = (((ctl >> 20) & 7) + (bu ? -i : i)) & 7;
+	const u32 pat = m_br[5] & 0x7ffff8;
+	const u32 vmask = vga.svga_intf.vram_size - 1;
+
+	for (int j = 0; j < wpix; j++)
+	{
+		const u32 da = (rl ? dline - j * bpp : dline + j * bpp) & vmask;
+		const int px = (da / bpp) & 7;
+
+		int pbit = 1;
+		u32 p;
+		if (mono_pat)
+		{
+			pbit = solid ? 0 : BIT(vga.memory[(pat + py) & vmask], 7 - px);
+			p = (pbit ? m_br[2] : m_br[1]) & cmask;
+		}
+		else
+			p = vram_pixel(pat + (bpp == 3 ? py * 32 + px * 3 : (py * 8 + px) * bpp), bpp);
+
+		int sbit = 1;
+		u32 s;
+		if (mono_src)
+		{
+			const u32 b = m_host_bit + j;
+			sbit = (host && (b >> 3) < m_hostq.size()) ? BIT(m_hostq[b >> 3], 7 - (b & 7)) : 0;
+			s = sbit ? src_fg : src_bg;
+		}
+		else if (host)
+		{
+			s = 0;
+			for (int k = 0; k < bpp; k++)
+				s |= u32(m_hline[m_hline_skip + j * bpp + k]) << (8 * k);
+		}
+		else
+			s = vram_pixel(rl ? sline - j * bpp : sline + j * bpp, bpp);
+
+		const u32 d = vram_pixel(da, bpp);
+		u32 r = 0;
+		for (int k = 0; k < bpp; k++)
+			r |= u32(rop3(rop, p >> (8 * k), s >> (8 * k), d >> (8 * k))) << (8 * k);
+
+		// per-pixel write masking (BR04 17, 13, 16-14). A solid pattern counts as all pattern bits 0 (12-7 bit 19),
+		// so with pattern write masking nothing is written
+		if (BIT(ctl, 17) && mono_pat && !pbit)
+			continue;
+		if (BIT(ctl, 13) && mono_src && !sbit)
+			continue;
+		if (BIT(ctl, 14))
+		{
+			const bool eq = (BIT(ctl, 15) ? d : r) == src_bg;
+			if (BIT(ctl, 16) ? !eq : eq)
+				continue;
+		}
+		for (int k = 0; k < bpp; k++)
+			vga.memory[(da + k) & vmask] = r >> (8 * k);
+	}
 }
 
 ROM_START(gamtor_vga)
@@ -152,6 +629,10 @@ class mc_mk4_hopper_device : public device_t
 public:
 	mc_mk4_hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	void mc_mk4_hopper(machine_config &mconfig) ATTR_COLD;
+
+	// parallel interface: motor drive in, coin exit sensor out (high while a coin passes)
+	void motor_w(int state) { m_hopper->motor_w(state); }
+	int exit_r() { return m_hopper->line_r(); }
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -206,6 +687,294 @@ const tiny_rom_entry *mc_mk4_hopper_device::device_rom_region() const
 }
 
 
+// AGI custom sound chip at 0x1e040000 (CoolFire I "Gaminator" audio path), modelled from the firmware only
+// (no chip documentation exists in the collected manuals):
+// - The kernel registers a level 4 handler (0x2e7e874, pea'd at 0x2e7e940) that reads bit 6 of the base register and,
+//   when set, feeds the chip: $4(reg) <- obj->$6c (next CPU address), (reg) <- obj->$20 >> 2 + 0xb0000000.
+// - The programming path (0x2e7ea92 block, runs when the strap at 0x8003464 != 1; the log shows the writes) writes
+//   $4(reg) <- obj->$24 (buffer start in CPU RAM) and (reg) <- (obj->$20 >> 2) + 0xb0000000.
+//   Interpretation: bit 31 set = DMA armed/active (the sound self-test at 0x2e8a880 writes the descriptor then polls
+//   bit 31 of the base register), the low bits carry the buffer size in words, and +4 is the source address register
+//   the chip's DMA reads from. A write of 0 to the base register stops the DMA (boot: "unmapped write to 1E040000 = 00000000").
+// - The buffer content is 32-bit packed stereo (the mixer at 0x2e7e254 accumulates L<<16 | R, 16-bit signed per channel,
+//   with a /4 gain: asr.l #2 on both channels), so the chip streams 16-bit stereo samples from CPU RAM.
+// - $8(reg) is written by the kernel input driver with the strap/test masks (0xfffffeff / 0x7ffffeff); function unknown,
+//   stored and returned as-is (it reads back in the self-test poll).
+// - The sample rate is a hardware constant the firmware never programs. CoolFire sound is commonly 44100 Hz; the
+//   rate here is an assumption until it is checked on real hardware.
+class gamtor_snd_device : public device_t, public device_sound_interface
+{
+public:
+	gamtor_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// map helpers for the driver. This device serves 0x1e040004-0x1e04000b: offset 0 (+4) is the DMA
+	// source address the L4 handler writes (obj->$6c), offset 1 (+8) is the kernel's input-strap/test
+	// register (written by the input driver 0x6ef30). The base register (+0) is handled by the driver
+	// state (it shares the SYS input view) and reaches this device through arm_w()/status_r().
+	u32 reg_r(offs_t offset);
+	void reg_w(offs_t offset, u32 data);
+	// base register (+0): descriptor write - 0 = stop, else frames-per-block in the low bits
+	void arm_w(u32 data);
+	// status bits for the combined base-register read. The kernel accesses these as BYTE reads at
+	// 0x1e040000 on the big-endian 32-bit bus: bit 7 of that byte = dword bit 31 (armed - the
+	// self-test's tst.l/bpl), bit 6 of that byte = dword bit 30 (block request - the L4 handler's
+	// btst #6).
+	u32 status_r() { return (m_armed ? 0x80000000u : 0u) | (m_block_pending ? 0x40000000u : 0u); }
+	auto irq_cb() { return m_irq_cb.bind(); }
+	// the ColdFire program space the chip's DMA reads, set from the machine config
+	template <typename T> void set_dma_space(T &&tag, int spacenum) { m_dspace.set_tag(std::forward<T>(tag), spacenum); }
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void sound_stream_update(sound_stream &stream) override;
+
+private:
+	// Output FIFO depth in frames. The chip's DMA fetches a block ahead of the DAC; the request (bit 30)
+	// rises when the last frame of the current block has been FETCHED, while the FIFO still plays it out, so the
+	// kernel's re-arm chains the next block without a gap. The real depth is undocumented; any depth longer than
+	// the request->re-arm latency (up to ~2 ms while the kernel masks level 4) gives the same output.
+	static constexpr u32 FIFO_FRAMES = 256;
+
+	TIMER_CALLBACK_MEMBER(req_timer);
+	void schedule_req();
+	void start_block(u32 addr, u32 size);
+
+	devcb_write_line m_irq_cb;
+
+	required_address_space m_dspace;
+
+	sound_stream *m_stream;
+	emu_timer *m_req_timer;
+
+	bool m_armed;       // descriptor armed (bit 31 view) - set by the first arm, cleared by the stop write
+	bool m_block_pending; // bit 30: current block fully fetched, the kernel must feed the next one
+	bool m_active;      // the DAC is playing a block (false = stopped or underrun)
+	bool m_next_valid;  // a re-arm latched the next block while the current one plays out
+	u32 m_size;             // current block length in frames (descriptor low 24 bits)
+	u32 m_cur;              // current block start address (latched from +4 at arm)
+	u32 m_next_size;        // queued block
+	u32 m_next_addr;
+	u32 m_sar;              // +4 register as written
+	u32 m_played;           // frames of the current block played out
+	u32 m_fifo[FIFO_FRAMES];    // the fetched-ahead tail of the current block (copied when the fetch completes)
+	u32 m_fifo_base;        // frame index of m_fifo[0] within the current block
+	bool m_fifo_valid;
+	u32 m_reg8;             // last written +8 value
+};
+
+DEFINE_DEVICE_TYPE(GAMTOR_SND, gamtor_snd_device, "gamtor_snd", "AGI CoolFire sound chip")
+
+gamtor_snd_device::gamtor_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, GAMTOR_SND, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_irq_cb(*this)
+	, m_dspace(*this, finder_base::DUMMY_TAG, -1)
+{
+}
+
+void gamtor_snd_device::device_start()
+{
+	// The chip streams from CPU RAM through its own DMA; sample rate is fixed by the board crystal.
+	// 44100 Hz assumed pending a real-hardware measurement (the firmware never programs a rate).
+	m_stream = stream_alloc(0, 2, clock());
+	m_req_timer = timer_alloc(FUNC(gamtor_snd_device::req_timer), this);
+
+	save_item(NAME(m_armed));
+	save_item(NAME(m_active));
+	save_item(NAME(m_next_valid));
+	save_item(NAME(m_size));
+	save_item(NAME(m_cur));
+	save_item(NAME(m_next_size));
+	save_item(NAME(m_next_addr));
+	save_item(NAME(m_sar));
+	save_item(NAME(m_played));
+	save_item(NAME(m_fifo));
+	save_item(NAME(m_fifo_base));
+	save_item(NAME(m_fifo_valid));
+	save_item(NAME(m_block_pending));
+	save_item(NAME(m_reg8));
+}
+
+void gamtor_snd_device::device_reset()
+{
+	m_armed = false;
+	m_block_pending = false;
+	m_active = false;
+	m_next_valid = false;
+	m_fifo_valid = false;
+	m_size = 0;
+	m_cur = 0;
+	m_next_size = 0;
+	m_next_addr = 0;
+	m_sar = 0;
+	m_played = 0;
+	m_fifo_base = 0;
+	m_reg8 = 0;
+	m_req_timer->adjust(attotime::never);
+}
+
+// the next moment the request line rises, in frames from the current stream position
+void gamtor_snd_device::schedule_req()
+{
+	u32 frames = 0;
+	if (!m_active)
+		frames = 0;
+	else if (!m_block_pending && !m_fifo_valid)
+	{
+		const u32 fetch_end = (m_size > FIFO_FRAMES) ? (m_size - FIFO_FRAMES) : 0;
+		frames = (fetch_end > m_played) ? (fetch_end - m_played) : 1;
+	}
+	else if (m_next_valid)
+	{
+		const u32 fetch_end = (m_next_size > FIFO_FRAMES) ? (m_next_size - FIFO_FRAMES) : 0;
+		frames = (m_size - m_played) + fetch_end;
+		if (frames == 0)
+			frames = 1;
+	}
+	if (frames)
+		m_req_timer->adjust(attotime::from_hz(clock()) * frames);
+	else
+		m_req_timer->adjust(attotime::never);
+}
+
+TIMER_CALLBACK_MEMBER(gamtor_snd_device::req_timer)
+{
+	// render up to now: the fetch-complete point is crossed inside the update and raises the request
+	m_stream->update();
+	schedule_req();
+}
+
+void gamtor_snd_device::start_block(u32 addr, u32 size)
+{
+	m_cur = addr;
+	m_size = size;
+	m_played = 0;
+	m_fifo_valid = false;
+	m_active = true;
+}
+
+u32 gamtor_snd_device::reg_r(offs_t offset)
+{
+	switch (offset)
+	{
+	case 0: return m_sar;  // +4: DMA source address
+	case 1: return m_reg8; // +8: kernel input-strap/test register
+	}
+	return 0;
+}
+
+void gamtor_snd_device::reg_w(offs_t offset, u32 data)
+{
+	switch (offset)
+	{
+	case 0: // +4: the L4 ISR writes the next block address here (obj->$6c)
+		m_stream->update();
+		m_sar = data;
+		break;
+	case 1: // +8: the input driver's strap/test values - stored verbatim, semantics unknown
+		m_reg8 = data;
+		break;
+	}
+}
+
+void gamtor_snd_device::arm_w(u32 data)
+{
+	// bring the output up to the write's time first, so the change lands on the right sample
+	m_stream->update();
+	if (data == 0)
+	{
+		// stop (boot does this)
+		m_armed = false;
+		m_active = false;
+		m_next_valid = false;
+		m_fifo_valid = false;
+		m_block_pending = false;
+		m_played = 0;
+		m_irq_cb(0);
+	}
+	else
+	{
+		// descriptor (arm/re-arm): frames per block in the low bits (the firmware writes
+		// (size>>2)+0xb0000000, e.g. B0000400 = 1024 frames).
+		// The re-arm also acknowledges the block request: bit 30 clears and the level 4 line drops.
+		// Double-buffered: while a block still plays out of the FIFO the descriptor and the
+		// +4 address are latched as the NEXT block and chained without a gap; from stop/underrun the
+		// block starts at once.
+		const u32 size = data & 0x00ffffff;
+		m_armed = true;
+		m_block_pending = false;
+		m_irq_cb(0);
+		if (size != 0)
+		{
+			if (m_active)
+			{
+				m_next_addr = m_sar;
+				m_next_size = size;
+				m_next_valid = true;
+			}
+			else
+				start_block(m_sar, size);
+		}
+	}
+	schedule_req();
+}
+
+void gamtor_snd_device::sound_stream_update(sound_stream &stream)
+{
+	const int samples = stream.samples();
+	for (int i = 0; i < samples; i++)
+	{
+		u32 w = 0;
+		if (m_active)
+		{
+			if (m_fifo_valid)
+				w = m_fifo[m_played - m_fifo_base];
+			else
+				w = m_dspace->read_dword(m_cur + m_played * 4);
+			m_played++;
+
+			// fetch complete: the DMA has read the whole block, the tail sits in the FIFO;
+			// bit 30 latches and the level 4 line is HELD until the kernel re-arms
+			const u32 fetch_end = (m_size > FIFO_FRAMES) ? (m_size - FIFO_FRAMES) : 0;
+			if (!m_fifo_valid && !m_block_pending && m_played >= fetch_end && m_played < m_size)
+			{
+				m_fifo_base = m_played;
+				for (u32 f = m_played; f < m_size; f++)
+					m_fifo[f - m_fifo_base] = m_dspace->read_dword(m_cur + f * 4);
+				m_fifo_valid = true;
+				m_block_pending = true;
+				m_irq_cb(1);
+			}
+
+			if (m_played >= m_size)
+			{
+				if (m_next_valid)
+				{
+					m_next_valid = false;
+					start_block(m_next_addr, m_next_size);
+				}
+				else
+				{
+					// underrun: nothing latched - the DAC goes silent until the next arm
+					m_active = false;
+					m_fifo_valid = false;
+					if (!m_block_pending)
+					{
+						m_block_pending = true;
+						m_irq_cb(1);
+					}
+					logerror("underrun at %s\n", machine().time().as_string());
+				}
+			}
+		}
+		stream.put_int_clamp(0, i, s16(w >> 16), 32768);
+		stream.put_int_clamp(1, i, s16(w), 32768);
+	}
+}
+
+
+
 namespace {
 
 class gaminator_state : public driver_device
@@ -214,21 +983,79 @@ public:
 	gaminator_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_seeprom(*this, "seeprom")
+		, m_in(*this, "IN%u", 0U)
+		, m_uart(*this, "uart%c", 'a')
+		, m_out(*this, "out%u", 0U)
+		, m_door(*this, "DOOR")
+		, m_hopper(*this, "hopper")
+		, m_snd(*this, "snd")
+		, m_sys(*this, "SYS")
 	{ }
 
 	void init_gaminator();
 	void gaminator(machine_config &config);
 
+	// in 16: receiver of the main door optical sensor. The kernel toggles out 0c periodically (pulse slot 0x0c, door
+	// table 0x4bc9e entry A01/16/0c) and expects in 16 to follow it (scanner 0x5bab4): while the door is closed the
+	// receiver line follows the emitter (the scanner compares the line level itself with the pulse level, so a lit
+	// receiver reads high; the opposite polarity gives "E 63 5"); with the door open the beam is broken, the line stays low.
+	// Power fail: the level 7 handler registered by the kernel (0x48bec) saves state and enters system state 9
+	// ("System shutdown", stamps the power-off time); without it the SRAM may be left mid-update ("Error 61: RAM
+	// error" or spurious door errors).
+	INPUT_CHANGED_MEMBER(power_fail) { m_maincpu->set_input_line(7, newval ? ASSERT_LINE : CLEAR_LINE); }
+
+	// in 1e: hopper coin exit sensor, low while a coin passes
+	ioport_value hopper_exit_r() { return m_hopper->exit_r() ? 0 : 1; }
+	// in 2b: meter current sense, high while a meter coil draws current. The meter task (table 0x2e98ddc: 8 meters on
+	// out 18-1f) waits for no current before and for current after energising a coil (0x2ef8aa4, 5 tries of 4 s, else
+	// "E E7 1: Contadores desconectados").
+	ioport_value meter_sense_r() { return (!BIT(m_door->read(), 1) && (m_outlatch[1] & 0xff00)) ? 1 : 0; }
+	ioport_value main_door_optic_r() { return (!BIT(m_door->read(), 0) && BIT(m_outlatch[0], 12)) ? 1 : 0; }
+
 private:
 	void gaminator_map(address_map &map) ATTR_COLD;
 
-	void gamtor_unk_w(uint32_t data);
+	// base register of the AGI sound chip. Read: the SYS input port with the chip status bits OR-ed in
+	// (bit 31 DMA active, bit 6 FIFO refill request - the kernel reads inputs 0x40-0x5f from here XOR 0x60, and the
+	// L4 handler polls bit 6 directly). Write: descriptor (0 = stop, else size in words in the low bits = re-arm).
+	u32 snd_base_r();
+	uint32_t inputs_r(offs_t offset) { return m_in[offset]->read(); }
+	void outputs_w(offs_t offset, u32 data, u32 mem_mask)
+	{
+		for (int b = 0; b < 16; b++)
+			if (BIT(mem_mask, 16 + b))
+				m_out[offset * 16 + b] = BIT(data, 16 + b);
+		m_outlatch[offset] = (m_outlatch[offset] & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
+		if (offset == 2)
+			m_hopper->motor_w(BIT(m_outlatch[2], 4)); // out 24: hopper 0 motor
+	}
 
-	required_device<cpu_device> m_maincpu;
+	virtual void machine_start() override ATTR_COLD
+	{
+		std::fill(std::begin(m_outlatch), std::end(m_outlatch), 0);
+		save_item(NAME(m_outlatch));
+	}
+
+	required_device<mcf5206e_device> m_maincpu;
+	required_device<i2cmem_device> m_seeprom;
+	required_ioport_array<4> m_in;
+	required_device_array<ns16550_device, 4> m_uart;
+	output_finder<64> m_out;
+	required_ioport m_door;
+	required_device<mc_mk4_hopper_device> m_hopper;
+	required_device<gamtor_snd_device> m_snd;
+	required_ioport m_sys;
+	u16 m_outlatch[4];
 };
 
-void gaminator_state::gamtor_unk_w(uint32_t data)
+u32 gaminator_state::snd_base_r()
 {
+	// the SYS port bits (logical inputs 0x40-0x5f read this register XOR 0x60), combined with the
+	// chip status bits the kernel tests directly (L4 handler: bit 6; self-test 0x2e8a880: bit 31).
+	u32 data = m_sys->read();
+	data |= m_snd->status_r();
+	return data;
 }
 
 
@@ -237,24 +1064,122 @@ void gaminator_state::gaminator_map(address_map &map)
 {
 	map(0x00000000, 0x07ffffff).rom();
 	map(0x08000000, 0x0bffffff).ram();
-	map(0x1e040008, 0x1e04000b).w(FUNC(gaminator_state::gamtor_unk_w));
+	// Epson RTC72423, 16 four-bit registers on D7-D0, one per long word. The kernel (0x2e8aaec) sets and
+	// clears bits of CD/CE/CF at 0x18070034/38/3c and reads the time digits from 0x18070000-0x30.
+	map(0x18070000, 0x1807003f).rw("rtc", FUNC(rtc72423_device::read), FUNC(rtc72423_device::write)).umask32(0x000000ff);
+	// TL16C554 quad UART, channels A-D at 0x20 apart, registers on D7-D0 one per long word. The kernel
+	// (0x2e83156) clears IER, MCR and SCR of the four channels at 0x1a070004/10/1c + n * 0x20.
+	map(0x1a070000, 0x1a07001f).rw(m_uart[0], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff);
+	map(0x1a070020, 0x1a07003f).rw(m_uart[1], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff);
+	map(0x1a070040, 0x1a07005f).rw(m_uart[2], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff);
+	map(0x1a070060, 0x1a07007f).rw(m_uart[3], FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff);
+	map(0x1c070000, 0x1c07000f).r(FUNC(gaminator_state::inputs_r));
+	// the kernel's output driver (0x6ee54 set, 0x6eebc clear) keeps one 16-bit shadow word per group and
+	// writes it with move.w to 0x1c070000 + ((n >> 2) & 0x0c), i.e. on D31-D16, 1 = output n on
+	map(0x1c070000, 0x1c07000f).w(FUNC(gaminator_state::outputs_w));
+	// the AGI sound chip. +0: W descriptor (0=stop, else frames/block in the low bits),
+	// R status (byte view on the BE bus: byte bit 7 = armed, byte bit 6 = block request = dword bit 30);
+	// +4 SAR (CPU RAM address the chip's DMA reads), +8 strap/test mask register.
+	// The 0x40-0x5f logical inputs read the base register XOR 0x60 (kernel 0x6ef80), so the input view and the
+	// chip status share the register; the state combines them (chip status on the tested bits, SYS port on the rest).
+	map(0x1e040000, 0x1e040003).r(FUNC(gaminator_state::snd_base_r)).w(m_snd, FUNC(gamtor_snd_device::arm_w));
+	map(0x1e040004, 0x1e04000b).rw(m_snd, FUNC(gamtor_snd_device::reg_r), FUNC(gamtor_snd_device::reg_w));
 
-	map(0x20000000, 0x2003ffff).ram();
+	// CS2 (CSAR2 0x2000, CSMR2 0x0fff0000, CSCR2 0x0d5b = 3 WS, AA, 8-bit port) holds the two battery-backed
+	// CS18LV10245 128K x 8 SRAMs (main PCB, see the header), 256KB in all. The kernel tests 0x40000 bytes from
+	// 0x20000000 ("256KB RAM test", 0x4bb26), so they are contiguous there. The game's RAM init (0x2e85e78) writes the
+	// same data at 0x20000000 and 0x20800000 and requires them to read back equal: A23 is not decoded and 0x20800000
+	// is the same SRAM. The other undecoded lines (A18-A22, A24-A27) are not proven and are left unmapped.
+	map(0x20000000, 0x2003ffff).mirror(0x00800000).ram().share("sram");
 
 	// standard VGA
 	//map(0x40000000, 0x40000fff).ram(); // regs
 	map(0x400003b0, 0x400003df).m("vga", FUNC(gamtor_vga_device::io_map));
 
-	// TODO: revisit mapping in VGA core once it enters non-text mode
-	map(0x44000000, 0x4401ffff).rw("vga", FUNC(gamtor_vga_device::mem_linear_r), FUNC(gamtor_vga_device::mem_linear_w));
+	// the 65550 memory space (frame buffer, BitBLT registers, BitBLT data port), see gamtor_vga_device
+	map(0x44000000, 0x447fffff).rw("vga", FUNC(gamtor_vga_device::space_r), FUNC(gamtor_vga_device::space_w));
 
-	// beetlem accesses here, standard layout unlike later games
-	map(0x440a0000, 0x440bffff).rw("vga", FUNC(gamtor_vga_device::mem_r), FUNC(gamtor_vga_device::mem_w));
+	// second VGA board
+	map(0x480003b0, 0x480003df).m("vga2", FUNC(gamtor_vga_device::io_map));
+	map(0x4c000000, 0x4c7fffff).rw("vga2", FUNC(gamtor_vga_device::space_r), FUNC(gamtor_vga_device::space_w));
 
 	map(0xe0000000, 0xe00001ff).ram(); // NVRAM?
 }
 
+// the kernel's input driver (0x6ef30/0x6ee06) reads logical inputs 0x00-0x3f as bit (n & 15) of the 32-bit
+// word at 0x1c070000 + ((n >> 2) & 0x0c), inverted (active low), and inputs 0x40-0x5f as bit (n - 0x40) of
+// 0x1e040000 XOR 0x60. Lines without a known function stay IPT_UNKNOWN at their idle (high) level.
+// The panel keys come from the kernel's key table (bookra ROM 0x6371c, 24-byte entries: key id, input line, lamp
+// output, ...). Names from the DIAGNOSTICO > PRUEBA TECLAS Y LAMPARAS test, keys 1A-16 are also the
+// five buttons under the screen labels of the configuration menu (Mas, Menos, Previo item, Proximo item, Proxima pag.).
 static INPUT_PORTS_START(  gaminator )
+	PORT_START("IN0")
+	PORT_BIT( 0x0000000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Pago / Payout (key 0A, in 04)")
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON6 )  PORT_NAME("Info (key 0D, in 05)")
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON7 )  PORT_NAME("Llamada servicio / Service call (key 0C, in 06)")
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON8 )  PORT_NAME("Arranque automatico / Autostart (key 10, in 07)")
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_NAME("Linea 1 / Line 1 (key 1A, in 08)")
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_NAME("Linea 2 / Line 2 (key 19, in 09)")
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Linea 3 / Line 3 (key 18, in 0a)")
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_NAME("Linea 4 / Line 4 (key 17, in 0b)")
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON5 )  PORT_NAME("Linea 5 / Line 5 (key 16, in 0c)")
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Apuesta 1 / Bet 1 (key 08, in 0d)")
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON9 )  PORT_NAME("Apuesta maxima / Max bet (key 09, in 0e)")
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_START1 )   PORT_NAME("Arranque / Start (key 01, in 0f)")
+	PORT_START("IN1")
+	PORT_BIT( 0x00000007, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	// Door switches: the kernel door objects (table at 0x4bc9e: type A0x, input; scan at 0x4d0f0) take logic state 1 as
+	// closed (no action) and 0 as open. The 1c07 inputs are inverted by the driver, so a closed door pulls the line low.
+	// in 13 open: "E 63 2: Puerta del cajon abierta"
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Drop door (in 13)")
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Stacker door 1 (in 14)") // open: E 63 4
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Logic door 1 (in 15)") // open: E 63 1
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(gaminator_state::main_door_optic_r)) // in 16, main door optical sensor (E 63 5)
+	// key 0F: with "E E0 ... Girar la llave del operador" on screen, turning it opens "Configuracion maquina"
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_TOGGLE PORT_NAME("Attendant key (key 0F, in 17)")
+	PORT_BIT( 0x00000f00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	// Hopper 0 ("UNIVERSIAL MK3/MK4" driver 0x981a0, I/O table 0x99618: in 1c 1d 1e 1f, motor out 24, out 29).
+	// Status 0x985dc: 1f = 0 not connected (E 34 0), 1d = 0 low (E 34 2), 1c = 1 full. Coin exit 0x98ec4: 1e = 1 while
+	// a coin is in the sensor; a coin seen with the motor off gives "E 34 1: Hopper defectuoso".
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Hopper full (in 1c)")
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Hopper low (in 1d)")
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(gaminator_state::hopper_exit_r)) // in 1e
+	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Hopper disconnected (in 1f)")
+	PORT_START("IN2")
+	PORT_BIT( 0x000007ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(gaminator_state::meter_sense_r)) // in 2b
+	// in 2c: NRI G-13.6000 coin selector connection sense, 0 = "E 21 4: Selector de monedas desconectado" (driver
+	// 0xa0dee, I/O table 0xa0fac: in 2e 2c 2d, out 23 38 39)
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Coin selector disconnected (in 2c)")
+	PORT_BIT( 0x0000e000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("IN3")
+	PORT_BIT( 0x000000ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	// in 38/39: coin diverter light barriers (top/bottom), low while lit; dark for a while gives "E 21 6/7: Sensores de
+	// desviacion arriba/abajo desconectados" (coin selector task 0xa0370)
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Diverter top light barrier blocked (in 38)")
+	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Diverter bottom light barrier blocked (in 39)")
+	PORT_BIT( 0x0000fc00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DOOR") // main door (seen through the optical sensor on in 16) and the meter harness
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Main door")
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Meters disconnected")
+
+	PORT_START("PWR")
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Power failure (IRQ7)") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(gaminator_state::power_fail), 0)
+
+	PORT_START("SYS")
+	// logical input 0x40: when it reads 0 at boot (0x496ec) the kernel enters "*** Borrar el RAM ***" and asks to
+	// restart "con la tecla RAMCLEAR en posicion OFF" -> the RAMCLEAR key switch, a toggle
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE PORT_NAME("RAMCLEAR key")
+	// in 41: battery monitor, low = "E 12 3: Bateria del RAM debil"
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RAM battery low (in 41)")
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Logic door 2 (in 45)") // open: E 63 1 (XOR 0x60 in the driver)
+	// in 46 open (line high, logic 0 after the XOR): "E 63 4: Puerta de la caja del apilador abierta"
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_TOGGLE PORT_NAME("Stacker door 2 (in 46)")
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 43, polled in the E0 screen
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 44, polled in the E0 screen
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // in 47, polled in the E0 screen
 INPUT_PORTS_END
 
 
@@ -263,20 +1188,63 @@ void gaminator_state::gaminator(machine_config &config)
 	MCF5206E(config, m_maincpu, 33.333_MHz_XTAL); // ColdFire MCF5406ECAB40
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaminator_state::gaminator_map);
 
+	// 24C04 SEEPROM on the ColdFire M-Bus (main PCB P379-6, see the header); its contents are the
+	// "seeprom" ROM region. SDA is open drain: the CPU's M-Bus reads the line the EEPROM drives.
+	I2C_24C04(config, m_seeprom);
+	m_maincpu->sda_w_cb().set(m_seeprom, FUNC(i2cmem_device::write_sda));
+	m_maincpu->scl_w_cb().set(m_seeprom, FUNC(i2cmem_device::write_scl));
+	m_maincpu->sda_r_cb().set(m_seeprom, FUNC(i2cmem_device::read_sda));
+
+	// both SRAMs are kept by the 3.6V battery
+	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
+
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
 	screen.set_screen_update("vga", FUNC(gamtor_vga_device::screen_update));
 
 	gamtor_vga_device &vga(GAMTOR_VGA(config, "vga"));
 	vga.set_screen("screen");
-	vga.set_vram_size(0x100000);
+	vga.set_vram_size(0x200000); // 4 x IS41C16256 (256K x 16) = 2MB
+
+	// second P378-1 VGA board (top monitor). The video module (0x2e96b0e) puts board 0 I/O at 0x40000000 and
+	// board 1 at 0x48000000, memory space at I/O + 0x4000000, and stops with "Soporte fisico no existe" (VI/3/1127)
+	// when the board 1 DAC mask does not read back (0x2e95a48).
+	screen_device &screen2(SCREEN(config, "screen2"));
+	screen2.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
+	screen2.set_screen_update("vga2", FUNC(gamtor_vga_device::screen_update));
+
+	gamtor_vga_device &vga2(GAMTOR_VGA(config, "vga2"));
+	vga2.set_screen("screen2");
+	vga2.set_vram_size(0x200000);
 
 	SPEAKER(config, "speaker", 2).front();
-	// unknown sound
+	// AGI custom sound chip at 0x1e040000. The kernel's level 4 handler (0x2e7e874) is registered for the
+	// chip's refill request (bit 6 of the base register), so the IRQ line reaches the ColdFire on level 4.
+	GAMTOR_SND(config, m_snd, 44100);         // the rate the firmware mixer assumes; not measured on hardware
+	m_snd->irq_cb().set_inputline(m_maincpu, 4);
+	m_snd->set_dma_space(m_maincpu, AS_PROGRAM);
+	m_snd->add_route(0, "speaker", 1.0, 0);
+	m_snd->add_route(1, "speaker", 1.0, 1);
 
 	RTC72423(config, "rtc", XTAL(32'768)); // Fake crystal value, the 72423 uses its own internal crystal
 
-	MC_MK4_HOPPER(config, "hopper");
+	// TL16C554 (four 16550 channels) near an 8 MHz xtal (the kernel's divisor 52 gives 9600 baud). The
+	// level 1 ISR registered by the kernel (0x2e80518) scans IIR of all four channels: INT A-D reach IRQ1.
+	input_merger_device &uart_irq(INPUT_MERGER_ANY_HIGH(config, "uart_irq"));
+	uart_irq.output_handler().set_inputline(m_maincpu, 1);
+	for (int i = 0; i < 4; i++)
+		NS16550(config, m_uart[i], 8_MHz_XTAL);
+	m_uart[0]->out_int_callback().set(uart_irq, FUNC(input_merger_device::in_w<0>));
+	m_uart[1]->out_int_callback().set(uart_irq, FUNC(input_merger_device::in_w<1>));
+	m_uart[2]->out_int_callback().set(uart_irq, FUNC(input_merger_device::in_w<2>));
+	m_uart[3]->out_int_callback().set(uart_irq, FUNC(input_merger_device::in_w<3>));
+
+	// channel A talks ID-003 (the kernel polls FC 05 11 27 56 there at 9600 8E1)
+	jcm_wba_device &wba(JCM_WBA(config, "wba"));
+	m_uart[0]->out_tx_callback().set(wba, FUNC(jcm_wba_device::rx_w));
+	wba.tx_cb().set(m_uart[0], FUNC(ns16550_device::rx_w));
+
+	MC_MK4_HOPPER(config, m_hopper);
 }
 
 // Base ROMs for genuine Novomatic CoolFire PCB. Bootleg sets may use a different Russian bootleg hardware.
@@ -1713,7 +2681,7 @@ void gaminator_state::init_gaminator()
 } // anonymous namespace
 
 
-#define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_NO_SOUND
+#define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND
 
 GAME( 2002?, g4u2,        0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Games 4 U 2 (94 5.6-0)", GAME_FLAGS )
 
