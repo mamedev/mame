@@ -18,12 +18,26 @@
       for Star Wars and Dragon Quest, apparently from ETOMS.
 
     Test-mode entry:
-    - ban_omt, ban_onep: Hold Select Up and Select Down from startup, then
-      soft reset and release.
+    - ban_omt, ban_onep, epo_hamc: Hold Select Up and Select Down from startup,
+      then soft reset and release. Press and release Select Up at INTERNAL
+      RAM TEST to enter CIS TEST. Use O / Confirm for the automatic checks.
+    - epo_bowl, epo_golf, epo_mini: Hold Up and Down from startup, then soft
+      reset and release. Press and release Up at INTERNAL RAM TEST to enter
+      CIS TEST. Use O / Confirm for the automatic checks.
     - ttv_mx: Hold Motion Up, Brake and Accelerator from startup, then soft
-      reset and release.
+      reset and release. Press and release Accelerator at INTERNAL RAM TEST
+      to start automatic checks.
     - tom_jump: Hold Motion Up, Dash and Brake from startup, then soft reset
-      and release.
+      and release. Press and release Dash at INTERNAL RAM TEST to start
+      automatic checks.
+    - epo_ebox: Hold Up and Down from startup, then soft reset after about
+      one second and release. The automatic checks start directly.
+    - tak_chq: Hold P1 Brake, P1 Accelerator and P1 Command from startup,
+      then soft reset after about one second and release. The automatic
+      checks start directly.
+    - tom_dpgm: Hold Power from startup and soft reset after about one
+      second. Keep Power held for another seven seconds, then release.
+      At CIS TEST, press and release Power to start the automatic checks.
 
     BTANB:
     - tak_chq: Two red road-tile pixels remain visible at the right border at
@@ -208,10 +222,11 @@ static INPUT_PORTS_START( epo_golf )
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("O / Confirm")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("X / Cancel")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	// Independent contacts permit the opposing Up+Down test-mode chord.
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
@@ -232,10 +247,11 @@ static INPUT_PORTS_START( epo_bowl )
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("O / Confirm") PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("X / Cancel") PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	// Independent contacts permit the opposing Up+Down test-mode chord.
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_16WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_16WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_16WAY
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_UNUSED ) // Frame and pixel status come from the camera.
@@ -260,10 +276,11 @@ static INPUT_PORTS_START( epo_mini )
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("O / Confirm")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("X / Cancel")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	// Independent contacts permit the opposing Up+Down test-mode chord.
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 	// During gameplay, the ROM also accepts O + Right to return directly to the title screen.
 
 	PORT_MODIFY("IN1")
@@ -453,10 +470,11 @@ static INPUT_PORTS_START( epo_ebox )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("X / Cancel")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Used by service and boot paths; physical identity unknown.
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	// Independent contacts permit the opposing Up+Down test-mode chord.
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("gloves", FUNC(xavix_ebox_gloves_device::data_r))
@@ -807,7 +825,7 @@ CONS( 2002, epo_bowl, 0,      0, xavix2000_epo_bowl,         epo_bowl, xavix2000
 
 // スーパーショット！ エキサイトゴルフ
 // 2002 date on PCB, 2003 in-game.
-CONS( 2003, epo_golf, 0,      0, xavix2000_epo_golf,         epo_golf, xavix2000_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "Super Shot! Excite Golf (Japan)", MACHINE_NOT_WORKING )
+CONS( 2003, epo_golf, 0,      0, xavix2000_epo_golf,         epo_golf, xavix2000_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "Super Shot! Excite Golf (Japan)", 0 )
 
 // とっとこハム太郎 ハムハム大サーカス！
 CONS( 2002, epo_hamc, 0,      0, xavix2000_epo_hamc,         epo_hamc, xavix2000_camera_state,     empty_init, "Epoch / SSD Company Ltd.", "Tottoko Hamtaro: Ham-Ham Dai Circus! (Japan)", 0 )

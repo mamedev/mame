@@ -45,23 +45,83 @@
 
     Test-mode entry:
     - xavtenni, xavtennij, xavbaseb, xavbasebj, xavgolf, xavgolfj, xavbowl,
-      xavbowlj, xavbassf, xavbox, xavboxj, epo_tfit: Hold Console Up and
-      Console Down from startup, then soft reset and release.
+      xavbowlj, xavbassf, xavbox, xavboxj, xavjmat, xavaero, epo_tfit: Hold
+      Console Up and Console Down from startup, then soft reset and release.
+    - domfitex, domdance, domfitch: Hold Console Up and Console Down from
+      startup, then soft reset about 13 seconds later and release.
+    - domstepc: Hold Console Up and Console Down from startup, then soft
+      reset about seven seconds later and release.
+    - xavmusic, xavmusicj, xavcheck: Hold Console Up and Console Down from
+      startup, then soft reset about eight seconds later and release.
+    - xavpowrk, xavpkjr: Hold Console Up and Console Down on cold startup,
+      then release; no reset is needed.
     - anpanmdx: Hold Blue Rock / Shokupanman, Left Footprint / Baikinman and
-      Green Paper / Cream Panda from startup and soft reset about 5.7 seconds
+      Green Paper / Cream Panda from startup and soft reset about six seconds
       later, then release.
     - apmj2009: Hold Baikinman / Left Footprint, Melonpanna / Pink Triangle and
-      Shokupanman / Red Square from startup and soft reset about 7.7 seconds
+      Shokupanman / Red Square from startup and soft reset about eight seconds
       later, then release.
     - ban_ordj: Hold Triangle Up and Triangle Down from startup, then soft
       reset and release.
     - epo_doka: Hold Back and Pad 1 / Secret Gadget from startup, then soft
       reset and release.
     - ban_bkgj: Hold Rock / Confirm and Paper / Previous from startup and soft
-      reset about 6.5 seconds later, then release. Leave Scissors / Next
+      reset about seven seconds later, then release. Leave Scissors / Next
       unpressed.
+    - ban_dn1j: Start without holding any buttons and wait about ten seconds.
+      Hold Blue and Yellow, soft reset and release. Press and release Blue at
+      INTERNAL RAM TEST for automatic checks.
+    - maxheart: Hold P1 Confirm and P1 Left from startup, then soft reset
+      about six seconds later and release.
+    - tmy_thom: Hold Talk and Whistle from startup and soft reset after about
+      one second. Switch to Talk and Camera / Viewpoint, soft reset again
+      about one second later, then release.
+    - epo_rgfj: Hold Up and Down from startup, then soft reset after about
+      seven seconds and release. Use Circle / Confirm for automatic checks.
+    - doradraw, hkdraw: Hold Menu and Up from startup, then soft reset after
+      about five seconds and release. Use Action (A) for automatic checks.
+    - ndpmj: Hold Far Left / Back and Centre Right / Select / Next from startup,
+      then soft reset after about seven seconds and release. Use Far Right /
+      Confirm for automatic checks, including the clock test.
+    - mrangbat: Hold P1 Red Circle and P1 Yellow Triangle from startup, then
+      soft reset after about six seconds and release. Use P1 Red Circle for
+      automatic checks.
+    - epo_ntpj: Start with all controls released and wait about six seconds.
+      Hold Red Ribbon Down and Blue Ribbon Up, soft reset and release. Press
+      and release Red Ribbon Button at INTERNAL RAM TEST for automatic checks.
+    - ban_gkrj, ban_um2j, ban_ult: Start with all controls released. Soft reset
+      after about six seconds, then again about six seconds later. At INTERNAL
+      RAM TEST, centre Glove 1 (ban_gkrj) or Reflector 1, increase its size to
+      maximum for about two seconds, then reduce it again for the light/dark
+      calibration. Automatic checks follow.
+    - ban_utmj: Use the same two six-second reset intervals with all controls
+      released. At INTERNAL RAM TEST, leave the reflector positions at their
+      defaults, increase Reflector 1 size to maximum and Reflector 2 size to
+      about halfway for two seconds, then reduce both. Automatic checks follow.
+    - epo_kabj: Hold Strawberry Left and Strawberry Right from startup, then
+      soft reset after about nine seconds and release to enter CARD SCAN TEST.
+      Cancel / Delete (Pink) advances to the automatic checks. To exercise the
+      card reader first, use Confirm (Red), scan a card, then use Cancel.
+
+    At INTERNAL RAM TEST, press and release Console Enter to start automatic
+    checks on the XaviXPORT/Domyos titles above. epo_tfit uses Console Select /
+    Confirm instead. The other advance buttons are Blue Rock / Shokupanman
+    (anpanmdx), Anpanman / Center (apmj2009), Circle / Confirm (ban_ordj),
+    Pad 2 / Roulette (epo_doka), Rock / Confirm (ban_bkgj), P1 Confirm
+    (maxheart) and Talk (tmy_thom). In xavbowl/xavbowlj and xavbox/xavboxj,
+    Console Up instead enters CIS TEST from the initial RAM page.
+
+    Reset times are observed emulated startup times; some entries depend on
+    retained RAM signatures. The initial RAM page alone is not a completed
+    automatic test result.
 
     TODO:
+    - ban_kksj: Two soft resets six seconds apart enter INTERNAL RAM TEST.
+      Calibration still reads a dark image; verify paired capture timing and
+      the image selected by the test before the automatic checks.
+    - ban_pr2j: Holding Up and Cross / Cancel from startup, soft resetting
+      after about six seconds and releasing enters IR Transmission Test.
+      Navigation from there to the automatic checks remains unconfirmed.
     - Shared IR controllers (e.g. xavtenni/xavtennij, xavbaseb/xavbasebj,
       epo_tfit and anpanmdx): Measure transmitter timing, repetition and
       physical motion thresholds.
@@ -1268,10 +1328,11 @@ static INPUT_PORTS_START( epo_tfit )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Console Select / Confirm")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Console Back / Cancel")
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Console Up")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Console Down")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Console Left")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Console Right")
+	// Independent contacts permit the opposing Up+Down test-mode chord.
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("Console Up")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("Console Down")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("Console Left")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("Console Right")
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rackets", FUNC(xavix_tfit_rackets_device::data_r))
@@ -1494,10 +1555,11 @@ static INPUT_PORTS_START( epo_rgfj )
 	PORT_MODIFY("PIO2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Circle / Confirm") PORT_CODE(KEYCODE_ENTER)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Cross / Cancel") PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	// Independent contacts permit the opposing Up+Down test-mode chord.
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 	// The documented power sources select 15-minute or 17-hour inactivity limits.
 	PORT_CONFNAME( 0x80, 0x00, "Power Source" )
 	PORT_CONFSETTING(    0x00, "Batteries" )
@@ -2053,10 +2115,11 @@ static INPUT_PORTS_START( epo_kabj )
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Confirm (Red)")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Cancel / Delete (Pink)")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Strawberry Right") PORT_2WAY
+	// Independent contacts permit the opposing Left+Right test-mode chord.
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Strawberry Right") PORT_16WAY
 
 	PORT_MODIFY("PIO2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Strawberry Left") PORT_2WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Strawberry Left") PORT_16WAY
 	PORT_BIT( 0x7e, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_CONFNAME( 0x80, 0x00, "Power Source" )
 	PORT_CONFSETTING(    0x00, "Batteries" )
@@ -3141,7 +3204,7 @@ CONS( 2005, mrangbat,   0,        0, superxavix_mrangbat,              mrangbat,
 CONS( 2004, epo_tfit,   0,        0, superxavix_epo_tfit,              epo_tfit,              superxavix_epo_tfit_state,   empty_init, "Epoch / SSD Company Ltd.", "Excite Sports Tennis x Fitness (Japan)", MACHINE_NOT_WORKING )
 
 // 石川遼 エキサイトゴルフ
-CONS( 2010, epo_rgfj,   0,        0, superxavix_epo_rgfj,              epo_rgfj,              superxavix_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "Ishikawa Ryou Excite Golf (Japan)", MACHINE_NOT_WORKING )
+CONS( 2010, epo_rgfj,   0,        0, superxavix_epo_rgfj,              epo_rgfj,              superxavix_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "Ishikawa Ryou Excite Golf (Japan)", 0 )
 
 // Let's!TVプレイ ふたりはプリキュアMax Heart マットでダンス Max Heartにおどっちゃおう
 CONS( 2004, maxheart,   0,        0, superxavix_i2c_24c04_4mb,         maxheart,              superxavix_i2c_state,        empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Futari wa PreCure Max Heart: Mat de Dance Max Heart ni Odotchaou (Japan)", MACHINE_NOT_WORKING )

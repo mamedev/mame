@@ -26,17 +26,109 @@
     - rad_rh: Hold Joystick Right and Menu on startup, then release.
     - ltv_tam: Hold both Push Button / Confirm buttons from startup and soft
       reset during the Bandai logo (about five seconds after startup), then
-      release. A cold start alone does not enter the test.
+      release. A cold start alone does not enter the test. At INTERNAL RAM
+      TEST, press and release P1 Push Button / Confirm to start automatic checks.
     - ban_krrj: Hold Right Arrow and X from startup and soft reset about
-      3.1 seconds later, then release.
+      four seconds later, then release. Press and release O at INTERNAL RAM TEST.
     - tak_wdg: Hold Left and Right on startup, then release.
     - tomplc: Hold Push-to-Talk and Headlights / Left from startup, then soft
-      reset and release.
+      reset and release. Press and release Doors / Right at INTERNAL RAM TEST.
     - epo_tp2s: Hold Blue Mat Right and Red Mat Confirm / Orange from startup,
-      then soft reset and release.
+      then soft reset and release. Press and release Red Mat Left at INTERNAL
+      RAM TEST.
     - epo_tp2p: Hold Right Side Right and Left Side Confirm from startup and
-      soft reset about 2.7 seconds later, then release.
+      soft reset about three seconds later, then release. Press and release Left
+      Side Left at INTERNAL RAM TEST.
     - pl1000: Hold P1 Trigger, P1 Start and P2 Start on startup, then release.
+    - bistro: Hold both Hand Buttons, all four Selection directions and the
+      Faucet Lever on startup, then release. The automatic checks start directly.
+    - has_wamg: Hold Dial Push / Select from startup. After about one second,
+      soft reset twice in quick succession, keeping the button held.
+      Release, then press and release Dial Push / Select at INTERNAL RAM TEST.
+    - namcons1, namcons2, taitons1, taitons2: Hold Up, Button 2 and Button 3
+      from startup, then soft reset after about five seconds and release.
+      Press and release Button 4 at INTERNAL RAM TEST for automatic checks.
+    - epo_guru: Hold Left from startup and soft reset after about one second.
+      Keep Left held for another second, switch to Jump / Confirm, then soft
+      reset again and release. Use Jump / Confirm at INTERNAL RAM TEST.
+    - rad_opus, rad_opusa, rad_opusp: Hold Trigger Button L, Trigger Button R
+      and Start / Smart Bomb on cold startup, then release.
+    - rad_bb: Hold Console Enter and Restart from startup, then soft reset
+      after about one second and release.
+    - rad_hnt, rad_hnt2: Hold Menu Next and Menu Previous from startup, then
+      soft reset after about one second and release.
+    - rad_sbw, rad_ssx, rad_ssxp: Hold Tilt Left / Left Button and Tilt Right /
+      Right Button from startup, then soft reset after about one second and
+      release.
+    - epo_epp, epo_eppk, epo_epps, epo_epp2, epo_epp3, epo_strk, epo_strkp,
+      rad_socr, epo_tenn, epo_esdx, epo_esht, epo_hamd: Hold Up and Down from
+      startup, then soft reset after about one second and release.
+    - epo_efdx: Hold Left, Confirm and Cancel from startup, then soft reset
+      after about one second and release.
+    - epo_mj: Hold OK and Chi from startup, then soft reset after about one
+      second and release. The automatic checks start directly.
+    - popira: Hold Pad 1, Pad 4 and Start from startup, then soft reset after
+      about one second and release. The automatic checks start directly.
+    - tak_gin: Hold Tilt Forward / Cancel and Tilt Back / OK from startup,
+      then soft reset after about one second and release. The automatic
+      checks start directly.
+    - tomcpin: Hold both Left Flippers and Power from startup for about two
+      seconds, then release all three. The automatic checks start directly.
+    - tomshoot: Hold P1 Push / Shoot, P2 Push / Shoot and Power from startup
+      for about two seconds, then release all three. The automatic checks
+      start directly.
+    - tak_hamr: Hold Player 2 Yellow / Select, Player 2 Red / Cancel, Tempo
+      Slower and Tempo Faster from startup, then soft reset after about one
+      second and release. The automatic checks start directly.
+    - epo_dmon: Hold both Air Cannon Triggers from startup, then soft reset
+      after about one second and release. The automatic checks start directly.
+    - epo_tfp2: Hold P1 Left / Red and P2 Right / Pink from startup, then soft
+      reset after about one second and release. The automatic checks start
+      directly.
+    - epo_mms, epo_mmsp: Boot with all buttons released for about ten seconds.
+      Hold P1 Pink / Select and P2 Orange / Confirm, soft reset and release.
+      The automatic checks start directly.
+    - rad_bdp: Hold Purple / Up and Red / Down from startup, then soft reset
+      after about four seconds and release. The automatic checks start directly.
+    - tcarnavi: Hold Accelerator Lever Up / Drive and Brake, and toggle
+      Ignition On / Run once. Soft reset after about one second. Keep Drive
+      and Brake held; toggle On / Run again, press and release Ignition Start,
+      then toggle On / Run once more, leaving about one second between changes.
+      Release Drive and Brake when the automatic checks start.
+    - epo_mail: Hold Text Cursor Up and Text Cursor Down from startup, then
+      soft reset after about one second and release. Press and release Enter
+      at INTERNAL RAM TEST to start the automatic checks.
+    - tvpc_dor, tvpc_ham, tvpc_hk, tvpc_tom: Hold Left Cursor Up and Left
+      Cursor Down from startup, then soft reset after about one second and
+      release. tvpc_tom needs Enter at INTERNAL RAM TEST; the other three
+      start the automatic checks directly.
+    - epo_fish: Hold Left, Confirm and Cancel from startup, then soft reset
+      after about one second and release. The automatic checks start directly.
+    - epo_quiz: Hold P1 B / Blue / Confirm, P1 D / Green / Right and P3 A /
+      Red / Back from startup, then soft reset after about one second and
+      release. Press and release P1 B / Blue / Confirm at INTERNAL RAM TEST.
+    - tomthr: Hold Steer Left, Map and Headlights from startup, then soft
+      reset after about one second and release. Press and release Horn /
+      Select at INTERNAL RAM TEST to start the automatic checks.
+    - tak_geig: Hold P1 Bomb, P1 Up, P2 Main Gun / Confirm and P2 Down from
+      startup for about two seconds, then release. The automatic checks
+      start directly.
+    - tak_town: Hold Cancel / Back, Shovel Lever Up, Crane Lever Down and
+      Wheel Right from startup, then soft reset after about one second and
+      release. The automatic checks start directly.
+    - rad_jcon: Hold Cancel / Back, Wheel Right and Gear Shift from startup,
+      then soft reset after about one second and release. The automatic
+      checks start directly.
+    - jarajal: Hold Main Button from startup, then soft reset after about one
+      second. Keep Main Button held while turning Rotating Lever from centre
+      to about halfway right, then release Main Button with the lever still
+      turned. The automatic checks start directly.
+
+    The initial INTERNAL RAM TEST page waits for a press/release before the
+    automatic checks. rad_bb2, rad_mtrk/rad_mtrkp, rad_rh, tak_wdg and pl1000
+    run their initial checks without an advance press. The rad_opus, rad_bb,
+    rad_hnt, rad_sbw, rad_ssx, epo_epp, epo_strk, epo_tenn, epo_esdx and
+    epo_efdx groups above also run their checks directly.
 
     Undumped Software (preliminary; some titles may still be missing):
     Compiled from various sources; thanks to Sean Riddle.
@@ -796,10 +888,11 @@ static INPUT_PORTS_START( xavix_excite_controls )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Confirm (O)")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Cancel (X)")
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	// Independent contacts permit the opposing Up+Down test-mode chord.
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 
 INPUT_PORTS_END
 
@@ -2089,10 +2182,11 @@ static INPUT_PORTS_START( epo_epp_ir )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("O")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("X")
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	// Independent contacts permit the opposing Up+Down test-mode chord.
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2219,10 +2313,11 @@ static INPUT_PORTS_START( epo_hamd )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("O")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("X")
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	// Independent contacts permit the opposing Up+Down test-mode chord.
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -3715,10 +3810,11 @@ static INPUT_PORTS_START( bistro )
 	PORT_CONFSETTING(    0x00, DEF_STR(None) )
 	PORT_CONFSETTING(    0x04, "Pot" )
 	PORT_CONFSETTING(    0x0c, "Frying Pan" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Selection Up")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Selection Down")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Selection Left")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Selection Right")
+	// Independent contacts permit the all-directions test-mode chord.
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("Selection Up")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("Selection Down")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("Selection Left")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("Selection Right")
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
