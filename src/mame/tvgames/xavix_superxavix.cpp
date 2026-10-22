@@ -856,7 +856,7 @@ void superxavix_i2c_camera_state::superxavix_xavbowl(machine_config &config)
 	configure_xavixport_io(config);
 	XAVIX_ANALOG_IMAGE_SENSOR(config, m_camera, peripheral_clock());
 	// Representative timing lets paired capture finish before the split-screen update.
-	m_camera->set_half_pixel_clocks(44);
+	m_camera->set_half_pixel_clocks(43);
 	// The ROM derives the throw from successive images of the passive ball reflector.
 	m_soc->adc_input_callback<0>().set(m_camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
 }
