@@ -22,6 +22,8 @@
   * Lucky Roulette Plus (6-players, Spanish, set 1),            1990, unknown manufacturer.
   * Lucky Roulette Plus (6-players, Spanish, set 2),            1990, unknown manufacturer.
   * Monte (4-players Spanish cards game. Prototype, encrypted), 1989, Miky SRL.
+  * Rula (6-players roulette, encrypted),                       1991, Miky SRL.
+
 
   Special thanks to Rob Ragon for his invaluable cooperation.
 
@@ -49,6 +51,19 @@
   (note that this one has 6 horses instead of 7).
 
   It has four independent coin slots of 10-francs each.
+
+
+  * Rula
+  Miky SRL
+
+  6-players spanish roulette. Encrypted.
+
+  This game was designed to be presented in horizontal way, with a LEDs
+  roulette at the top of the playfield.
+
+  The first boot always shows a blue screen with "Falso Arranque". This
+  is related to a fail check against the NVRAM. Just reset and the game
+  will generate a new one and start normally.
 
 
 **************************************************************************
@@ -326,6 +341,7 @@
 
 #include "re800.lh"
 #include "luckyrlt.lh"
+#include "rula.lh"
 
 
 namespace {
@@ -687,7 +703,7 @@ void corona_state::rula_led_row_w(uint8_t data)
 		m_lamps[m_lamp_old] = 0;
 		m_lamps[led] = 1;
 		m_lamp_old = led;
-        popmessage("LED: %02d", led);
+//      popmessage("LED: %02d", led);
 	}
 	else
 		m_lamps[m_lamp_old] = 0;
@@ -2251,4 +2267,4 @@ GAMEL( 1991, luckyrlta, luckyrlt, luckyrlta, luckyrlt, corona_state, empty_init,
 
 // Miky SRL games
 GAME(  1989, monte,     0,        monte,     monte,    corona_state, init_monte, ROT0,   "Miky SRL",                 "Monte (4-players Spanish cards game. Prototype, encrypted)", 0 )
-GAME(  1991, rula,      0,        rula,      rula,     corona_state, init_monte, ROT90,  "Miky SRL",                 "Rula (6-players roulette, encrypted)",            MACHINE_NOT_WORKING )
+GAMEL( 1991, rula,      0,        rula,      rula,     corona_state, init_monte, ROT90,  "Miky SRL",                 "Rula (6-players roulette, encrypted)",            0,                        layout_rula )

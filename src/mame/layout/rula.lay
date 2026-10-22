@@ -1,0 +1,214 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders: Roberto Fresca
+
+**********************************************
+
+  Rula layout.
+  Background, field, and 37 LEDs roulette.
+
+  Vertical design.
+
+**********************************************
+-->
+<mamelayout version="2">
+
+	<!-- Background 4:3, 1600x1200 -->
+	<element name="bg_adjust">
+		<rect>
+			<bounds x="0" y="0" width="1600" height="1200" />
+			<color red="0.0" green="0.1" blue="0.0" />
+		</rect>
+	</element>
+
+	<!-- Static element to simulate physically the roulette -->
+	<element name="roulette">
+		<!-- 1. External plate -->
+		<disk>
+			<bounds x="0" y="0" width="100" height="100" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+		<!-- 2. Intermediate channel, where the LEDs will be placed -->
+		<disk>
+			<bounds x="6" y="6" width="88" height="88" />
+			<color red="0.05" green="0.05" blue="0.05" />
+		</disk>
+		<!-- 3. Center plate of the roulette -->
+		<disk>
+			<bounds x="16" y="16" width="68" height="68" />
+			<color red="0.10" green="0.10" blue="0.10" />
+		</disk>
+		<!-- 4. Intermediate disk for the cone -->
+		<disk>
+			<bounds x="36" y="36" width="28" height="28" />
+			<color red="0.20" green="0.20" blue="0.20" />
+		</disk>
+		<!-- 5. Spindle of the turret -->
+		<disk>
+			<bounds x="44" y="44" width="12" height="12" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+		<!-- 6. Roulette turret (horizontal piece) -->
+		<rect>
+			<bounds x="30" y="48" width="40" height="4" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<!-- 7. Roulette turret (verticalal piece) -->
+		<rect>
+			<bounds x="48" y="30" width="4" height="40" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<!-- Dynamic elements for green/red LEDs -->
+	<element name="BALL0">
+		<disk state = "0">
+			<color red="0.0" green="0.3" blue="0" />
+		</disk>
+		<disk state = "1">
+			<color red="0" green="1" blue="0" />
+		</disk>
+	</element>
+
+	<element name="BALL">
+		<disk state = "0">
+			<color red="0.3" green="0" blue="0" />
+		</disk>
+		<disk state = "1">
+			<color red="1" green="0" blue="0" />
+		</disk>
+	</element>
+
+	<view name="Lamps">
+
+		<!-- Forced BG 4:3 (real layout margins) -->
+		<element ref="bg_adjust">
+			<bounds x="0" y="0" width="1600" height="1200" />
+		</element>
+
+		<!-- Game screen -->
+		<screen index="0">
+			<bounds left="28" top="32" right="880" bottom="1168" />
+		</screen>
+
+		<!-- Roulette structure -->
+		<element ref="roulette">
+			<bounds x="1031.50" y="190.50" width="417" height="417" />
+		</element>
+
+		<!-- Roulette LEDs -->
+		<element name="lamp0" ref="BALL0">
+			<bounds x="1366.86330" y="279.26824" width="24" height="24" />
+		</element>
+		<element name="lamp1" ref="BALL">
+			<bounds x="1383.34769" y="304.05396" width="24" height="24" />
+		</element>
+		<element name="lamp2" ref="BALL">
+			<bounds x="1395.40620" y="331.26901" width="24" height="24" />
+		</element>
+		<element name="lamp3" ref="BALL">
+			<bounds x="1402.69186" y="360.13052" width="24" height="24" />
+		</element>
+		<element name="lamp4" ref="BALL">
+			<bounds x="1404.99512" y="389.80815" width="24" height="24" />
+		</element>
+		<element name="lamp5" ref="BALL">
+			<bounds x="1402.24970" y="419.44817" width="24" height="24" />
+		</element>
+		<element name="lamp6" ref="BALL">
+			<bounds x="1394.53459" y="448.19784" width="24" height="24" />
+		</element>
+		<element name="lamp7" ref="BALL">
+			<bounds x="1382.07173" y="475.23012" width="24" height="24" />
+		</element>
+		<element name="lamp8" ref="BALL">
+			<bounds x="1365.21967" y="499.76734" width="24" height="24" />
+		</element>
+		<element name="lamp9" ref="BALL">
+			<bounds x="1344.46319" y="521.10360" width="24" height="24" />
+		</element>
+		<element name="lamp10" ref="BALL">
+			<bounds x="1320.39945" y="538.62509" width="24" height="24" />
+		</element>
+		<element name="lamp11" ref="BALL">
+			<bounds x="1293.72067" y="551.82776" width="24" height="24" />
+		</element>
+		<element name="lamp12" ref="BALL">
+			<bounds x="1265.19439" y="560.33178" width="24" height="24" />
+		</element>
+		<element name="lamp13" ref="BALL">
+			<bounds x="1235.64124" y="563.89251" width="24" height="24" />
+		</element>
+		<element name="lamp14" ref="BALL">
+			<bounds x="1205.91143" y="562.40753" width="24" height="24" />
+		</element>
+		<element name="lamp15" ref="BALL">
+			<bounds x="1176.86021" y="555.91954" width="24" height="24" />
+		</element>
+		<element name="lamp16" ref="BALL">
+			<bounds x="1149.32335" y="544.61520" width="24" height="24" />
+		</element>
+		<element name="lamp17" ref="BALL">
+			<bounds x="1124.09302" y="528.81970" width="24" height="24" />
+		</element>
+		<element name="lamp18" ref="BALL">
+			<bounds x="1101.89506" y="508.98747" width="24" height="24" />
+		</element>
+		<element name="lamp19" ref="BALL">
+			<bounds x="1083.36807" y="485.68902" width="24" height="24" />
+		</element>
+		<element name="lamp20" ref="BALL">
+			<bounds x="1069.04501" y="459.59463" width="24" height="24" />
+		</element>
+		<element name="lamp21" ref="BALL">
+			<bounds x="1059.33796" y="431.45497" width="24" height="24" />
+		</element>
+		<element name="lamp22" ref="BALL">
+			<bounds x="1054.52616" y="402.07957" width="24" height="24" />
+		</element>
+		<element name="lamp23" ref="BALL">
+			<bounds x="1054.74803" y="372.31353" width="24" height="24" />
+		</element>
+		<element name="lamp24" ref="BALL">
+			<bounds x="1059.99721" y="343.01313" width="24" height="24" />
+		</element>
+		<element name="lamp25" ref="BALL">
+			<bounds x="1070.12268" y="315.02131" width="24" height="24" />
+		</element>
+		<element name="lamp26" ref="BALL">
+			<bounds x="1084.83313" y="289.14333" width="24" height="24" />
+		</element>
+		<element name="lamp27" ref="BALL">
+			<bounds x="1103.70539" y="266.12367" width="24" height="24" />
+		</element>
+		<element name="lamp28" ref="BALL">
+			<bounds x="1126.19653" y="246.62455" width="24" height="24" />
+		</element>
+		<element name="lamp29" ref="BALL">
+			<bounds x="1151.65953" y="231.20692" width="24" height="24" />
+		</element>
+		<element name="lamp30" ref="BALL">
+			<bounds x="1179.36184" y="220.31435" width="24" height="24" />
+		</element>
+		<element name="lamp31" ref="BALL">
+			<bounds x="1208.50656" y="214.26015" width="24" height="24" />
+		</element>
+		<element name="lamp32" ref="BALL">
+			<bounds x="1238.25520" y="213.21852" width="24" height="24" />
+		</element>
+		<element name="lamp33" ref="BALL">
+			<bounds x="1267.75198" y="217.21943" width="24" height="24" />
+		</element>
+		<element name="lamp34" ref="BALL">
+			<bounds x="1296.14831" y="226.14776" width="24" height="24" />
+		</element>
+		<element name="lamp35" ref="BALL">
+			<bounds x="1322.62730" y="239.74667" width="24" height="24" />
+		</element>
+		<element name="lamp36" ref="BALL">
+			<bounds x="1346.42719" y="257.62494" width="24" height="24" />
+		</element>
+
+	</view>
+</mamelayout>
