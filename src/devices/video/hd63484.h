@@ -33,6 +33,8 @@ public:
 	template <typename... T> void set_display_callback(T &&... args) { m_display_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_character_callback(T &&... args) { m_character_cb.set(std::forward<T>(args)...); }
 	auto irq_callback() { return m_irq_cb.bind(); }
+	auto dreq_callback() { return m_dreq_cb.bind(); }
+	auto done_callback() { return m_done_cb.bind(); }
 	void set_auto_configure_screen(bool auto_configure_screen) { m_auto_configure_screen = auto_configure_screen; }
 	void set_external_skew(int skew) { m_external_skew = skew; }
 
@@ -46,6 +48,11 @@ public:
 
 	// light pen strobe input
 	void lpstb_w(int state);
+
+	// DMA interface: acknowledged data port and DONE input
+	uint16_t dack_r();
+	void dack_w(uint16_t data);
+	void done_w(int state);
 
 	// CUD1 (bit 0) / CUD2 (bit 1) graphic/crosshair cursor state at a
 	// bitmap position, for boards that mix the cursor outputs into video
@@ -69,6 +76,7 @@ protected:
 private:
 	inline void inc_ar(int value);
 	inline void update_irq();
+	void update_dreq();
 	inline void fifo_w_clear();
 	inline void queue_w(uint8_t data);
 	inline void dequeue_w(uint8_t *data);
@@ -118,6 +126,8 @@ private:
 	display_delegate  m_display_cb;
 	character_delegate m_character_cb;
 	devcb_write_line m_irq_cb;
+	devcb_write_line m_dreq_cb;
+	devcb_write_line m_done_cb;
 	bool m_auto_configure_screen;
 	int m_external_skew;
 
@@ -125,6 +135,7 @@ private:
 	uint8_t m_vreg[0x100];
 	uint8_t m_sr;
 	int m_irq_state;
+	int m_dreq_state;
 
 	uint8_t m_fifo[16];                   /* FIFO W data queue */
 	int m_fifo_ptr;                 /* FIFO W pointer */

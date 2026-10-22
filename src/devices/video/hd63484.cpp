@@ -44,11 +44,14 @@ hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, d
 	m_display_cb(*this),
 	m_character_cb(*this),
 	m_irq_cb(*this),
+	m_dreq_cb(*this),
+	m_done_cb(*this),
 	m_auto_configure_screen(true),
 	m_external_skew(0),
 	m_ar(0),
 	m_sr(0),
 	m_irq_state(CLEAR_LINE),
+	m_dreq_state(CLEAR_LINE),
 	m_fifo_ptr(-1),
 	m_fifo_r_ptr(-1),
 	m_cr(0),
@@ -775,6 +778,8 @@ TIMER_CALLBACK_MEMBER(hd63484_device::cmd_exec_tick)
 	// resume processing of anything queued behind the finished command
 	while (!m_busy && !BIT(m_ccr, 14) && m_fifo_ptr >= 1)
 		process_fifo();
+
+	update_dreq();
 }
 
 int hd63484_device::get_bpp()
@@ -1709,6 +1714,40 @@ void hd63484_device::command_earc_exec()
 	m_cpy = ye;
 }
 
+// DREQ is re-evaluated only at bus-level boundaries, where no command decode
+// is in flight: with CDM set (command/parameter DMA) it requests while the
+// write FIFO has word space; with DDM set (data DMA) it requests while a DMA
+// read has data in the read FIFO, or while an in-progress DWT/DMOD can take
+// a data word. With neither mode enabled it never asserts. DRC only shapes
+// the DREQ pulses on the pin, which a level callback abstracts.
+void hd63484_device::update_dreq()
+{
+	int state = CLEAR_LINE;
+
+	if (BIT(m_ccr, 12)) // CDM
+	{
+		if (m_fifo_ptr <= 13)
+			state = ASSERT_LINE;
+	}
+	else if (BIT(m_ccr, 13)) // DDM
+	{
+		if (m_fifo_r_ptr >= 1)
+			state = ASSERT_LINE;
+		else if (!(m_sr & HD63484_SR_CED) && !m_busy)
+		{
+			int const cmd = translate_command(m_cr);
+			if ((cmd == COMMAND_DWT || cmd == COMMAND_DMOD) && m_fifo_ptr <= 13)
+				state = ASSERT_LINE;
+		}
+	}
+
+	if (state != m_dreq_state)
+	{
+		m_dreq_state = state;
+		m_dreq_cb(state);
+	}
+}
+
 void hd63484_device::process_fifo()
 {
 	uint8_t data;
@@ -1845,6 +1884,12 @@ void hd63484_device::process_fifo()
 					uint32_t const x = abs((int16_t)m_pr[0]) + 1;
 					uint32_t const yc = abs((int16_t)m_pr[1]) + 1;
 					command_end_seq((4 * x + 8) * yc + 16 * ((x * yc + 7) / 8) + 34);
+
+					if (BIT(m_ccr, 13)) // data DMA transfer complete
+					{
+						m_done_cb(ASSERT_LINE);
+						m_done_cb(CLEAR_LINE);
+					}
 				}
 			}
 			break;
@@ -1864,6 +1909,12 @@ void hd63484_device::process_fifo()
 					uint32_t const x = abs((int16_t)m_pr[0]) + 1;
 					uint32_t const yc = abs((int16_t)m_pr[1]) + 1;
 					command_end_seq((4 * x + 8) * yc + 16 * ((x * yc + 7) / 8) + 34);
+
+					if (BIT(m_ccr, 13)) // data DMA transfer complete
+					{
+						m_done_cb(ASSERT_LINE);
+						m_done_cb(CLEAR_LINE);
+					}
 				}
 			}
 			break;
@@ -2143,6 +2194,37 @@ void hd63484_device::exec_abort_sequence()
 	m_sr = HD63484_SR_WFR | HD63484_SR_WFE | HD63484_SR_CED; // hard-set to 0x23
 
 	update_irq();
+	update_dreq();
+}
+
+// DMA acknowledged data port: the FIFOs are selected regardless of the
+// address register contents
+uint16_t hd63484_device::dack_r()
+{
+	uint8_t hi = 0, lo = 0;
+	dequeue_r(&hi);
+	dequeue_r(&lo);
+	update_dreq();
+	return (hi << 8) | lo;
+}
+
+void hd63484_device::dack_w(uint16_t data)
+{
+	queue_w((data >> 8) & 0xff);
+	queue_w(data & 0xff);
+	if (!BIT(m_ccr, 14) && !m_busy)
+		process_fifo();
+	update_dreq();
+}
+
+// DONE input: terminates DMA transfer, resetting CDM (and data DMA mode)
+void hd63484_device::done_w(int state)
+{
+	if (state)
+	{
+		m_ccr &= ~0x3000;
+		update_dreq();
+	}
 }
 
 void hd63484_device::lpstb_w(int state)
@@ -2235,6 +2317,7 @@ void hd63484_device::video_registers_w(int offset)
 			if(FIFO_LOG) logerror("%s -> %04x\n",acrtc_regnames[m_ar/2],vreg_data);
 			if (!BIT(m_ccr, 14) && !m_busy)
 				process_fifo();
+			update_dreq();
 			break;
 
 		case 0x02: // Command Entry
@@ -2258,6 +2341,8 @@ void hd63484_device::video_registers_w(int offset)
 				if (resume)
 					while (!m_busy && m_fifo_ptr >= 1)
 						process_fifo();
+
+				update_dreq();
 			}
 			break;
 
@@ -2411,6 +2496,7 @@ uint16_t hd63484_device::read16(offs_t offset)
 			res = (data & 0xff) << 8;
 			dequeue_r(&data);
 			res |= data & 0xff;
+			update_dreq();
 		}
 		else
 			res = video_registers_r(m_ar);
@@ -2454,7 +2540,10 @@ uint8_t hd63484_device::read8(offs_t offset)
 		uint8_t res = 0xff;
 
 		if(m_ar < 2) // FIFO read
+		{
 			dequeue_r(&res);
+			update_dreq();
+		}
 		else
 			res = video_registers_r(m_ar & 0xfe) >> (m_ar & 1 ? 0 : 8);
 
@@ -2480,7 +2569,10 @@ void hd63484_device::write8(offs_t offset, uint8_t data)
 		{
 			queue_w(data);
 			if ((m_ar & 1) && !BIT(m_ccr, 14) && !m_busy)
+			{
 				process_fifo();
+				update_dreq();
+			}
 
 			m_ar ^= 1;
 		}
@@ -2543,6 +2635,7 @@ void hd63484_device::device_reset()
 	m_busy = false;
 	m_dot_count = 0;
 	m_cmd_timer->adjust(attotime::never);
+	m_dreq_state = CLEAR_LINE;
 
 	memset(m_vreg, 0, sizeof(m_vreg));
 	memset(m_fifo, 0, sizeof(m_fifo));
@@ -2907,6 +3000,7 @@ void hd63484_device::register_save_state()
 	save_item(NAME(m_lpar_chr));
 	save_item(NAME(m_busy));
 	save_item(NAME(m_dot_count));
+	save_item(NAME(m_dreq_state));
 	save_item(NAME(m_ccr));
 	save_item(NAME(m_omr));
 	save_item(NAME(m_edg));
