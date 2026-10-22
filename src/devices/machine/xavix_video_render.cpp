@@ -801,6 +801,7 @@ rectangle superxavix_video_device::picture_area() const
 
 u32 superxavix_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	update_bitmap_rows(cliprect.max_y);
 	bitmap.fill(rgb_t::black(), cliprect);
 	auto const [xoffset, yoffset] = render_offset();
 	rectangle source_clip = cliprect & picture_area();
@@ -826,6 +827,56 @@ device_delegate<u8 (u32)> &superxavix_video_device::tile_read_callback()
 	return m_graphics_read_cb;
 }
 
+void superxavix_video_device::advance_bitmap_row()
+{
+	u16 const position = m_bitmap_position;
+	if (m_bitmap_scanline == m_bitmap_reference)
+	{
+		m_bitmap_source_offset = u32(get_u16le(&m_bitmap_params[BITMAP_ADDRESS_TOP])) << 3;
+		m_bitmap_position = 0;
+	}
+	else
+	{
+		if (m_bitmap_vertical_gate)
+			m_bitmap_source_offset = (m_bitmap_source_offset + (u32(m_bitmap_params[BITMAP_STRIDE]) << 3)) & 0x7ffff;
+		m_bitmap_position = (position + 1) & 0x01ff;
+	}
+
+	// Compare the previous position, including on the source-reference row.
+	// Closing wins when the programmed endpoints coincide.
+	if (position == (get_u16le(&m_bitmap_params[BITMAP_BOTTOM]) & 0x01ff))
+		m_bitmap_vertical_gate = false;
+	else if (position == (get_u16le(&m_bitmap_params[BITMAP_TOP]) & 0x01ff))
+		m_bitmap_vertical_gate = true;
+
+	m_bitmap_rows[m_bitmap_scanline] = { m_bitmap_source_offset, m_bitmap_vertical_gate };
+}
+
+void superxavix_video_device::bitmap_vblank(screen_device &screen, bool state)
+{
+	if (state)
+	{
+		// Blanking starts at raster row zero, after the screen finishes the old field.
+		// Only the cache cursor restarts; the gate, position and source remain live.
+		update_bitmap_rows(screen.height() - 1);
+		m_bitmap_scanline = -1;
+		int const origin = (m_video_standard == video_standard::PAL) ? BITMAP_VERTICAL_ORIGIN_PAL : BITMAP_VERTICAL_ORIGIN_NTSC;
+		// The position becomes zero at this reference and compares zero on the next row.
+		m_bitmap_reference = PICTURE_FIRST_ROW - origin + render_offset().second - 1;
+	}
+}
+
+void superxavix_video_device::update_bitmap_rows(int scanline)
+{
+	// Advance through clipped and disabled rows as well as the rendered picture.
+	scanline = std::min(scanline, screen().height() - 1);
+	while (m_bitmap_scanline < scanline)
+	{
+		++m_bitmap_scanline;
+		advance_bitmap_row();
+	}
+}
+
 void superxavix_video_device::mix_bitmap_layer(screen_device &screen, const rectangle &cliprect)
 {
 	auto const parameter = [this](unsigned offset) { return get_u16le(&m_bitmap_params[offset]); };
@@ -834,26 +885,15 @@ void superxavix_video_device::mix_bitmap_layer(screen_device &screen, const rect
 	if (!BIT(mode, 0))
 		return;
 
-	// Full-frame software uses different vertical counter origins for 525- and
-	// 625-line output.  TODO: Verify these standard-dependent origins on hardware.
-	int const vertical_origin = (m_video_standard == video_standard::PAL) ? BITMAP_VERTICAL_ORIGIN_PAL : BITMAP_VERTICAL_ORIGIN_NTSC;
-	// Keep the source origin independent of the presentation crop.
-	int const vertical_offset = PICTURE_FIRST_ROW - vertical_origin;
-	// X bounds are bitmap samples; Y bounds are screen rows. Register ends are exclusive.
-	rectangle const window(
-			parameter(BITMAP_LEFT) & 0x03ff,
-			(parameter(BITMAP_RIGHT) & 0x03ff) - 1,
-			(parameter(BITMAP_TOP) & 0x01ff) + vertical_offset,
-			(parameter(BITMAP_BOTTOM) & 0x01ff) + vertical_offset - 1);
-	if (window.empty())
+	int const left = parameter(BITMAP_LEFT) & 0x03ff;
+	int const right = parameter(BITMAP_RIGHT) & 0x03ff;
+	if (right <= left)
 		return;
 
-	u32 const address_top = u32(parameter(BITMAP_ADDRESS_TOP)) << 3;
 	u32 const address_left = parameter(BITMAP_ADDRESS_LEFT) & 0x03ff;
 	u32 const address_right = parameter(BITMAP_ADDRESS_RIGHT) & 0x03ff;
 	// xavgolf and anpanmdx use bitmap bases beyond the normal 24-bit data window.
 	u32 const base = u32(parameter(BITMAP_BASE)) << 11;
-	u32 const stride = u32(m_bitmap_params[BITMAP_STRIDE]) << 3;
 	u8 const resolution = m_bitmap_params[BITMAP_RESOLUTION];
 	int const bits_per_pixel = ((mode & 0x0e) >> 1) + 1;
 	int const priority = mode >> 4;
@@ -862,7 +902,7 @@ void superxavix_video_device::mix_bitmap_layer(screen_device &screen, const rect
 	int const fine_clocks = resolution & 0x0f;
 	// The horizontal gate and colour latch add two bitmap pixel periods.
 	int const delay_clocks = BITMAP_OUTPUT_DELAY_PIXELS * pixel_clocks;
-	int const first_clock = fine_clocks + window.min_x * pixel_clocks + delay_clocks - horizontal_origin;
+	int const first_clock = fine_clocks + left * pixel_clocks + delay_clocks - horizontal_origin;
 	int const origin_x = aligned_output_position(first_clock, STREAM_ORIGIN_ALIGNMENT_CLOCKS, OUTPUT_PIXEL_CLOCKS);
 	// Pixel edges use the finer mode-dependent grid; the stream origin uses
 	// the same eight-clock boundary in both modes.
@@ -873,20 +913,20 @@ void superxavix_video_device::mix_bitmap_layer(screen_device &screen, const rect
 	};
 	int const origin_delta = origin_x - output_position(first_clock);
 
-	int source_width = window.width();
+	int source_width = right - left;
 	// The source window can be shorter than the display window.
 	if (address_right > address_left)
 		source_width = std::min(source_width, int((address_right - address_left) * 8 / bits_per_pixel));
 	if (!source_width)
 		return;
 
-	int const first_y = std::max(window.min_y, cliprect.min_y);
-	int const last_y = std::min(window.max_y, cliprect.max_y);
-	for (int y = first_y; y <= last_y; y++)
+	int const yoffset = render_offset().second;
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int const line = y - window.min_y;
-		u32 const row_offset = (address_top + line * stride) & 0x7ffff;
-		packed_reader pixels(m_bitmap_read_cb, base + row_offset + address_left);
+		bitmap_row const &row = m_bitmap_rows[y + yoffset];
+		if (!row.enabled)
+			continue;
+		packed_reader pixels(m_bitmap_read_cb, base + row.offset + address_left);
 
 		u8 const *const priorities = &screen.priority().pix(y);
 		u16 *const pens = &m_pen_bitmap.pix(y);

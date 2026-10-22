@@ -236,12 +236,20 @@ void superxavix_video_device::device_start()
 	m_graphics_read_cb.resolve();
 	m_bitmap_read_cb.resolve();
 	screen().register_screen_bitmap(m_output_bitmap);
+	screen().register_vblank_callback(vblank_state_delegate(&superxavix_video_device::bitmap_vblank, this));
 	m_video_field_timer = timer_alloc(FUNC(superxavix_video_device::video_field_start), this);
 	m_picture_nmi_timer = timer_alloc(FUNC(superxavix_video_device::picture_nmi), this);
 
 	save_item(STRUCT_MEMBER(m_palette_ports, index));
 	save_item(STRUCT_MEMBER(m_palette_ports, color_latch));
 	save_item(NAME(m_bitmap_palette_read_latch));
+	save_item(NAME(m_bitmap_scanline));
+	save_item(NAME(m_bitmap_reference));
+	save_item(NAME(m_bitmap_position));
+	save_item(NAME(m_bitmap_source_offset));
+	save_item(NAME(m_bitmap_vertical_gate));
+	save_item(STRUCT_MEMBER(m_bitmap_rows, offset));
+	save_item(STRUCT_MEMBER(m_bitmap_rows, enabled));
 	save_item(NAME(m_video_timing.horizontal_total));
 	save_item(NAME(m_video_timing.half_lines));
 	save_item(NAME(m_video_timing.active_width));
@@ -305,6 +313,12 @@ void superxavix_video_device::device_reset()
 	m_graphics_mode = 0;
 	m_palette_ports = {};
 	m_bitmap_palette_read_latch = 0;
+	m_bitmap_scanline = -1;
+	m_bitmap_reference = 0;
+	m_bitmap_position = 0;
+	m_bitmap_source_offset = 0;
+	m_bitmap_vertical_gate = false;
+	m_bitmap_rows = {};
 	m_picture_nmi_timer->adjust(attotime::never);
 	m_video_field_timer->adjust(attotime::never);
 	// Preserve the source-bottom pair at 0x6fba/0x6fbb until its reset behaviour is known.
@@ -312,6 +326,9 @@ void superxavix_video_device::device_reset()
 	std::fill(&m_bitmap_params[BITMAP_ADDRESS_LEFT], &m_bitmap_params[BITMAP_CTRL] + 1, 0x00);
 	m_bitmap_params[BITMAP_RESOLUTION] = 0xf0;
 	xavix_video_device::device_reset();
+	m_bitmap_scanline = screen().vpos() - 1;
+	int const origin = (m_video_standard == video_standard::PAL) ? BITMAP_VERTICAL_ORIGIN_PAL : BITMAP_VERTICAL_ORIGIN_NTSC;
+	m_bitmap_reference = PICTURE_FIRST_ROW - origin + render_offset().second - 1;
 }
 
 void xavix_video_device::device_post_load()
@@ -516,10 +533,10 @@ void superxavix_video_device::bitmap_params_w(offs_t offset, u8 data)
 	}
 
 	if (data != m_bitmap_params[offset])
-	{
 		screen().update_partial(screen().vpos());
-		m_bitmap_params[offset] = data;
-	}
+	// Register writes also advance the counter during blanking or disabled output.
+	update_bitmap_rows(screen().vpos());
+	m_bitmap_params[offset] = data;
 }
 
 void superxavix_video_device::extended_segment_regs_w(offs_t offset, u8 data)

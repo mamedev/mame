@@ -397,6 +397,7 @@ private:
 	static constexpr int PAIRED_PIXEL_CLOCKS = PICTURE_PIXEL_CLOCKS / 2;
 	static constexpr int MAX_ACTIVE_WIDTH = TILEMAP_WRAP_WIDTH * PICTURE_PIXEL_CLOCKS / OUTPUT_PIXEL_CLOCKS;
 	static constexpr int BITMAP_OUTPUT_DELAY_PIXELS = 2;
+	// TODO: Verify the standard-dependent bitmap counter origins on hardware.
 	static constexpr int BITMAP_VERTICAL_ORIGIN_NTSC = 12;
 	static constexpr int BITMAP_VERTICAL_ORIGIN_PAL = 39;
 	static const std::array<u8, 0x1a> TIMING_MASK;
@@ -411,6 +412,12 @@ private:
 	{
 		u8 index = 0;
 		u16 color_latch = 0;
+	};
+
+	struct bitmap_row
+	{
+		u32 offset = 0;
+		bool enabled = false;
 	};
 
 	enum bitmap_register : unsigned
@@ -463,6 +470,9 @@ private:
 	TIMER_CALLBACK_MEMBER(picture_nmi);
 	TIMER_CALLBACK_MEMBER(video_field_start);
 	void bitmap_params_w(offs_t offset, u8 data);
+	void bitmap_vblank(screen_device &screen, bool state);
+	void update_bitmap_rows(int scanline);
+	void advance_bitmap_row();
 	bool horizontal_reload_in_blanking(counter_config const &config) const;
 	int output_sample_phase_clocks() const;
 	void video_position_regs_w(offs_t offset, u8 data);
@@ -483,6 +493,12 @@ private:
 
 	std::array<palette_port_state, 2> m_palette_ports;
 	u8 m_bitmap_palette_read_latch;
+	s16 m_bitmap_scanline;
+	s16 m_bitmap_reference;
+	u16 m_bitmap_position;
+	u32 m_bitmap_source_offset;
+	bool m_bitmap_vertical_gate;
+	std::array<bitmap_row, 0x200> m_bitmap_rows;
 	video_timing m_video_timing;
 	bitmap_rgb32 m_output_bitmap;
 	emu_timer *m_picture_nmi_timer;

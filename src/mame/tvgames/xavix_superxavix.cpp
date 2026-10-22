@@ -917,6 +917,8 @@ void superxavix_i2c_camera_state::superxavix_xavbowl(machine_config &config)
 	superxavix_i2c_24c08(config);
 	configure_xavixport_io(config);
 	XAVIX_ANALOG_IMAGE_SENSOR(config, m_camera, peripheral_clock());
+	// Representative timing lets paired capture finish before the split-screen update.
+	m_camera->set_half_pixel_clocks(44);
 	// The ROM derives the throw from successive images of the passive ball reflector.
 	m_soc->adc_input_callback<0>().set(m_camera, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
 }
@@ -2268,6 +2270,10 @@ u8 superxavix_doradraw_state::read_plotter_byte(u32 address)
 {
 	if ((address - DATA_FLASH_BASE) < DATA_FLASH_SIZE)
 		return data_flash_r(address - DATA_FLASH_BASE);
+
+	// The upper half of U2 has the same selection on graphics and plotter reads.
+	if (BIT(address, 24))
+		return m_rom[(address & 0x3fffff) | 0x400000];
 
 	return superxavix_state::read_plotter_byte(address);
 }
