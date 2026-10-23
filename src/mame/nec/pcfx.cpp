@@ -432,7 +432,6 @@ void pcfx_state::pcfx(machine_config &config)
 	HUC6261(config, m_huc6261, XTAL(21'477'272));
 	m_huc6261->set_vdc1_tag("huc6270_a");
 	m_huc6261->set_vdc2_tag("huc6270_b");
-	m_huc6261->set_rainbow_tag("huc6271");
 	m_huc6261->set_king_tag("huc6272");
 
 	huc6272_device &huc6272(HUC6272(config, "huc6272", XTAL(21'477'272)));

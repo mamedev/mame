@@ -38,7 +38,6 @@ huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, HUC6261, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_huc6270{*this, { finder_base::DUMMY_TAG, finder_base::DUMMY_TAG }}
-	, m_huc6271(*this, finder_base::DUMMY_TAG)
 	, m_huc6272(*this, finder_base::DUMMY_TAG)
 	, m_last_h(0)
 	, m_last_v(0)
@@ -142,12 +141,16 @@ void huc6261_device::update_layer_ranks()
 	value[LAYER_RAINBOW] = BIT(m_control, 14) ? m_priority[6] + 1 : 0;
 
 	std::fill(std::begin(m_layer_rank), std::end(m_layer_rank), 0);
-	static const u8 tie_order[LAYER_COUNT] = { LAYER_RAINBOW, LAYER_KING_BG0, LAYER_KING_BG0 + 1, LAYER_KING_BG0 + 2, LAYER_KING_BG0 + 3, LAYER_VDC_BG, LAYER_VDC_SPR };
+	static constexpr u8 TIE_ORDER[LAYER_COUNT] = { LAYER_RAINBOW, LAYER_KING_BG0, LAYER_KING_BG0 + 1, LAYER_KING_BG0 + 2, LAYER_KING_BG0 + 3, LAYER_VDC_BG, LAYER_VDC_SPR };
 	u8 rank = 1;
 	for (int prio = 1; prio <= 8; prio++)
-		for (u8 layer : tie_order)
+	{
+		for (u8 layer : TIE_ORDER)
+		{
 			if (value[layer] == prio)
 				m_layer_rank[layer] = rank++;
+		}
+	}
 }
 
 /*
@@ -184,7 +187,9 @@ u32 huc6261_device::mix_pixel(u16 vdc0, u16 vdc1, u32 king, u32 rainbow) const
 		layer[1].id = LAYER_KING_BG0 + n;
 		layer[1].rank = m_layer_rank[layer[1].id];
 		if (BIT(king, 27))
+		{
 			layer[1].yuv = king & 0xffffff;
+		}
 		else
 		{
 			const u16 offset = ((m_palette_offset[1 + (n >> 1)] >> (BIT(n, 0) ? 8 : 0)) & 0xff) << 1;
@@ -203,9 +208,12 @@ u32 huc6261_device::mix_pixel(u16 vdc0, u16 vdc1, u32 king, u32 rainbow) const
 	}
 
 	// draw back to front
-	if (layer[0].rank > layer[1].rank) std::swap(layer[0], layer[1]);
-	if (layer[1].rank > layer[2].rank) std::swap(layer[1], layer[2]);
-	if (layer[0].rank > layer[1].rank) std::swap(layer[0], layer[1]);
+	if (layer[0].rank > layer[1].rank)
+		std::swap(layer[0], layer[1]);
+	if (layer[1].rank > layer[2].rank)
+		std::swap(layer[1], layer[2]);
+	if (layer[0].rank > layer[1].rank)
+		std::swap(layer[0], layer[1]);
 
 	// no cellophane with the 7MHz dot clock
 	const bool cello = !BIT(m_control, 3);
@@ -403,14 +411,14 @@ void huc6261_device::start_line(int v)
 			const bool all_zero = !(m_chroma_key[0] | m_chroma_key[1] | m_chroma_key[2]);
 			for (auto &pix : m_rainbow_line)
 			{
-				const u8 y = pix >> 16, u = pix >> 8, v = pix;
+				const u8 py = pix >> 16, pu = pix >> 8, pv = pix;
 				bool key = false;
 				if (!BIT(m_control, 3))
 				{
 					if (all_zero)
 						key = !(pix & 0xffffff);
 					else
-						key = y >= ymin && y <= ymax && u >= umin && u <= umax && v >= vmin && v <= vmax;
+						key = py >= ymin && py <= ymax && pu >= umin && pu <= umax && pv >= vmin && pv <= vmax;
 				}
 				pix = key ? 0 : (pix | (1 << 27));
 			}
