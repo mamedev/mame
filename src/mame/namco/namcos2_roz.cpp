@@ -4,9 +4,37 @@
 /*
     Namco System 2 ROZ Tilemap - found on Namco System 2 video board (standard type)
 
-    based on namcoic.txt this probably consists of the following
-    C102 - Controls CPU access to ROZ Memory Area.
-    (anything else?)
+    C102 - ROZ address generator, also controls CPU access to the ROZ memory.
+    80 pin QFP, implemented after furrtek's reverse engineered RTL.
+
+    Registers, write only (A3-A1):
+    0   X delta per pixel       12 bits plus sign in bit 15, 0x100 is one pixel,
+    1   Y delta per pixel       bits 12-14 are not stored
+    2   X delta per line
+    3   Y delta per line
+    4   X start                 1/16 pixel
+    5   Y start
+    6   -
+    7   xxxx---- --------       X chip select bits
+        ----xxxx --------       Y chip select bits
+        -------- xxxx----       X mask bits
+        -------- ----xxxx       Y mask bits
+
+    The chip is two identical units, one per axis, each with a 20-bit accumulator:
+    - while RESTART is set (vertical blanking) it is reloaded from the start register << 4,
+      so the first visible line starts there
+    - on every other line the per line delta is added once, when horizontal sync ends
+    - during the line the per pixel delta is added on every I6M clock
+    Bits 19-8 are the position in the plane. Bits 9-3 go out as MAx (ROZ RAM address) and
+    bits 2-0 as RAx (pixel inside the 8x8 tile, low bits of the ROM address). Bits 11-8 are
+    ANDed with the register 7 nibbles: any chip select bit set pulls nCSx low, any mask bit
+    set pulls nMASK low. nCSx is taken here as the upper half of the RAM on that axis, which
+    gives the 2048x2048 plane the games expect.
+    Games use chip select 4 with mask 0 (wraps at 2048), 8 (2048x2048, no wrap),
+    c (1024x1024) or e (512x512).
+
+    The CPU side (DTACK, RAM output enables, read latch) needs no emulation. The chip does not
+    drive the bus on register reads; the written values are still returned as before.
 
     used by the following drivers
     namcos2.cpp (all games EXCEPT Final Lap 1,2,3 , Lucky & Wild , Steel Gunner 1,2 , Suzuka 8 Hours 1,2 , Metal Hawk)
@@ -17,197 +45,28 @@
 #include "emu.h"
 #include "namcos2_roz.h"
 
+#include <algorithm>
+
+
 namespace {
 
-struct roz_param
+// pixel clocks from the end of horizontal sync to the first visible pixel
+constexpr int XOFFSET = 38;
+
+constexpr int ROZ_BLOCK_SIZE = 8;
+
+constexpr s32 roz_delta(u16 data)
 {
-	uint32_t size;
-	uint32_t startx, starty;
-	int incxx, incxy, incyx, incyy;
-	int color;
-	int wrap;
-};
-
-inline void draw_roz_helper_block(
-		const roz_param &rozInfo, int destx, int desty,
-		int srcx, int srcy, int width, int height,
-		bitmap_ind16 &destbitmap, bitmap_ind8 &destprimap, bitmap_ind8 &flagsbitmap,
-		bitmap_ind16 &srcbitmap, uint32_t size_mask, uint8_t prival, uint8_t primask)
-{
-	const int desty_end = desty + height;
-
-	const int end_incrx = rozInfo.incyx - (width * rozInfo.incxx);
-	const int end_incry = rozInfo.incyy - (width * rozInfo.incxy);
-
-	uint16_t *dest = &destbitmap.pix(desty, destx);
-	uint8_t *destpri = &destprimap.pix(desty, destx);
-	const int dest_rowinc = destbitmap.rowpixels() - width;
-	const int destpri_rowinc = destprimap.rowpixels() - width;
-
-	while (desty < desty_end)
-	{
-		uint16_t *dest_end = dest + width;
-		while (dest < dest_end)
-		{
-			uint32_t xpos = (srcx >> 16);
-			uint32_t ypos = (srcy >> 16);
-
-			if (rozInfo.wrap)
-			{
-				xpos &= size_mask;
-				ypos &= size_mask;
-			}
-			else if ((xpos > rozInfo.size) || (ypos >= rozInfo.size))
-			{
-				goto L_SkipPixel;
-			}
-
-			if (flagsbitmap.pix(ypos, xpos) & TILEMAP_PIXEL_LAYER0)
-			{
-				*dest = srcbitmap.pix(ypos, xpos) + rozInfo.color;
-				*destpri = (*destpri & primask) | prival;
-			}
-
-		L_SkipPixel:
-
-			srcx += rozInfo.incxx;
-			srcy += rozInfo.incxy;
-			dest++;
-			destpri++;
-		}
-		srcx += end_incrx;
-		srcy += end_incry;
-		dest += dest_rowinc;
-		destpri += destpri_rowinc;
-		desty++;
-	}
+	return s32(data & 0x0fff) - (BIT(data, 15) ? 0x1000 : 0);
 }
 
-void draw_roz_helper(
-		screen_device &screen,
-		bitmap_ind16 &bitmap,
-		tilemap_t *tmap,
-		const rectangle &clip,
-		const roz_param &rozInfo,
-		uint8_t prival, uint8_t primask)
+// one C102 unit: MAx/RAx on bits 9-0, nCSx asserted on bit 10, and bit 11 set
+// when the unit pulls nMASK low
+constexpr u32 roz_unit_out(u32 acc, u32 cs, u32 mask)
 {
-	tmap->set_palette_offset(rozInfo.color);
-
-	if (bitmap.bpp() == 16)
-	{
-		/* On many processors, the simple approach of an outer loop over the
-		    rows of the destination bitmap with an inner loop over the columns
-		    of the destination bitmap has poor performance due to the order
-		    that memory in the source bitmap is referenced when rotation
-		    approaches 90 or 270 degrees.  The reason is that the inner loop
-		    ends up reading pixels not sequentially in the source bitmap, but
-		    instead at rozInfo.incxx increments, which is at its maximum at 90
-		    degrees of rotation.  This means that only a few (or as few as
-		    one) source pixels are in each cache line at a time.
-
-		    Instead of the above, this code iterates in NxN blocks through the
-		    destination bitmap.  This has more overhead when there is little or
-		    no rotation, but much better performance when there is closer to 90
-		    degrees of rotation (as long as the chunk of the source bitmap that
-		    corresponds to an NxN destination block fits in cache!).
-
-		    N is defined by ROZ_BLOCK_SIZE below; the best N is one that is as
-		    big as possible but at the same time not too big to prevent all of
-		    the source bitmap pixels from fitting into cache at the same time.
-		    Keep in mind that the block of source pixels used can be somewhat
-		    scattered in memory.  8x8 works well on the few processors that
-		    were tested; 16x16 seems to work even better for more modern
-		    processors with larger caches, but since 8x8 works well enough and
-		    is less likely to result in cache misses on processors with smaller
-		    caches, it is used.
-		*/
-
-		constexpr int ROZ_BLOCK_SIZE = 8;
-
-		const uint32_t size_mask = rozInfo.size - 1;
-		bitmap_ind8 &destprimap = screen.priority();
-		bitmap_ind16 &srcbitmap = tmap->pixmap();
-		bitmap_ind8 &flagsbitmap = tmap->flagsmap();
-		uint32_t srcx = (rozInfo.startx + (clip.min_x * rozInfo.incxx) +
-			(clip.min_y * rozInfo.incyx));
-		uint32_t srcy = (rozInfo.starty + (clip.min_x * rozInfo.incxy) +
-			(clip.min_y * rozInfo.incyy));
-		int destx = clip.min_x;
-		int desty = clip.min_y;
-
-		const int row_count = (clip.max_y - desty) + 1;
-		const int row_block_count = row_count / ROZ_BLOCK_SIZE;
-		const int row_extra_count = row_count % ROZ_BLOCK_SIZE;
-
-		const int column_count = (clip.max_x - destx) + 1;
-		const int column_block_count = column_count / ROZ_BLOCK_SIZE;
-		const int column_extra_count = column_count % ROZ_BLOCK_SIZE;
-
-		const int row_block_size_incxx = ROZ_BLOCK_SIZE * rozInfo.incxx;
-		const int row_block_size_incxy = ROZ_BLOCK_SIZE * rozInfo.incxy;
-		const int row_block_size_incyx = ROZ_BLOCK_SIZE * rozInfo.incyx;
-		const int row_block_size_incyy = ROZ_BLOCK_SIZE * rozInfo.incyy;
-
-		// Do the block rows
-		for (int i = 0; i < row_block_count; i++)
-		{
-			int sx = srcx;
-			int sy = srcy;
-			int dx = destx;
-			// Do the block columns
-			for (int j = 0; j < column_block_count; j++)
-			{
-				draw_roz_helper_block(rozInfo, dx, desty, sx, sy, ROZ_BLOCK_SIZE,
-						ROZ_BLOCK_SIZE, bitmap, destprimap, flagsbitmap, srcbitmap, size_mask,
-						prival, primask);
-				// Increment to the next block column
-				sx += row_block_size_incxx;
-				sy += row_block_size_incxy;
-				dx += ROZ_BLOCK_SIZE;
-			}
-			// Do the extra columns
-			if (column_extra_count)
-			{
-				draw_roz_helper_block(rozInfo, dx, desty, sx, sy, column_extra_count,
-						ROZ_BLOCK_SIZE, bitmap, destprimap, flagsbitmap, srcbitmap, size_mask,
-						prival, primask);
-			}
-			// Increment to the next row block
-			srcx += row_block_size_incyx;
-			srcy += row_block_size_incyy;
-			desty += ROZ_BLOCK_SIZE;
-		}
-		// Do the extra rows
-		if (row_extra_count)
-		{
-			// Do the block columns
-			for (int i = 0; i < column_block_count; i++)
-			{
-				draw_roz_helper_block(rozInfo, destx, desty, srcx, srcy, ROZ_BLOCK_SIZE,
-						row_extra_count, bitmap, destprimap, flagsbitmap, srcbitmap, size_mask,
-						prival, primask);
-				srcx += row_block_size_incxx;
-				srcy += row_block_size_incxy;
-				destx += ROZ_BLOCK_SIZE;
-			}
-			// Do the extra columns
-			if (column_extra_count)
-			{
-				draw_roz_helper_block(rozInfo, destx, desty, srcx, srcy, column_extra_count,
-						row_extra_count, bitmap, destprimap, flagsbitmap, srcbitmap, size_mask,
-						prival, primask);
-			}
-		}
-	}
-	else
-	{
-		tmap->draw_roz(screen,
-				bitmap, clip,
-				rozInfo.startx, rozInfo.starty,
-				rozInfo.incxx, rozInfo.incxy,
-				rozInfo.incyx, rozInfo.incyy,
-				rozInfo.wrap, 0, prival, primask); // wrap, flags, pri
-	}
+	const u32 pos = (acc >> 8) & 0xfff;
+	const u32 top = pos >> 8;
+	return ((top & mask) ? 0x800 : 0) | ((top & cs) ? 0x400 : 0) | (pos & 0x3ff);
 }
 
 } // anonymous namespace
@@ -221,8 +80,12 @@ DEFINE_DEVICE_TYPE(NAMCOS2_ROZ, namcos2_roz_device, "namcos2_roz", "Namco System
 namcos2_roz_device::namcos2_roz_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, NAMCOS2_ROZ, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
+	device_video_interface(mconfig, *this),
 	m_rozram(*this, finder_base::DUMMY_TAG),
-	m_roz_ctrl(*this, finder_base::DUMMY_TAG)
+	m_roz_ctrl{ 0, 0, 0, 0, 0, 0, 0, 0 },
+	m_accx(0),
+	m_accy(0),
+	m_line_timer(nullptr)
 {
 }
 
@@ -230,6 +93,21 @@ void namcos2_roz_device::device_start()
 {
 	m_tilemap_roz = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(namcos2_roz_device::roz_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 256, 256);
 	m_tilemap_roz->set_transparent_pen(0xff);
+
+	const int lines = screen().height();
+	m_lines = std::make_unique<line_state []>(lines);
+
+	m_line_timer = timer_alloc(FUNC(namcos2_roz_device::line_start), this);
+	m_line_timer->adjust(screen().time_until_pos(0, screen().width() - XOFFSET), 1);
+
+	save_item(NAME(m_roz_ctrl));
+	save_item(NAME(m_accx));
+	save_item(NAME(m_accy));
+	save_pointer(STRUCT_MEMBER(m_lines, startx), lines);
+	save_pointer(STRUCT_MEMBER(m_lines, starty), lines);
+	save_pointer(STRUCT_MEMBER(m_lines, incxx), lines);
+	save_pointer(STRUCT_MEMBER(m_lines, incxy), lines);
+	save_pointer(STRUCT_MEMBER(m_lines, ctrl), lines);
 }
 
 
@@ -239,54 +117,93 @@ TILE_GET_INFO_MEMBER(namcos2_roz_device::roz_tile_info)
 }
 
 
-void namcos2_roz_device::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t gfx_ctrl, uint8_t prival, uint8_t primask)
+TIMER_CALLBACK_MEMBER(namcos2_roz_device::line_start)
 {
-	const int xoffset = 38, yoffset = 0;
-	roz_param rozParam;
+	const rectangle visarea = screen().visible_area();
+	const int line = param;
+	const int prev = line ? (line - 1) : (screen().height() - 1);
 
-	rozParam.color = gfx_ctrl & 0x0f00;
-	rozParam.incxx = int16_t(m_roz_ctrl[0]);
-	rozParam.incxy = int16_t(m_roz_ctrl[1]);
-	rozParam.incyx = int16_t(m_roz_ctrl[2]);
-	rozParam.incyy = int16_t(m_roz_ctrl[3]);
-	rozParam.startx = int16_t(m_roz_ctrl[4]);
-	rozParam.starty = int16_t(m_roz_ctrl[5]);
-	rozParam.size = 2048;
-	rozParam.wrap = 1;
-
-
-	switch (m_roz_ctrl[7])
+	if ((prev < visarea.min_y) || (prev > visarea.max_y))
 	{
-	case 0x4400: /* (2048x2048) */
-		break;
-
-	case 0x4488: /* attract mode */
-		rozParam.wrap = 0;
-		break;
-
-	case 0x44cc: /* stage1 demo */
-		rozParam.wrap = 0;
-		break;
-
-	case 0x44ee: /* (256x256) used in Dragon Saber */
-		rozParam.wrap = 0;
-		rozParam.size = 256;
-		break;
+		// RESTART
+		m_accx = u32(m_roz_ctrl[4]) << 4;
+		m_accy = u32(m_roz_ctrl[5]) << 4;
+	}
+	else
+	{
+		m_accx = (m_accx + roz_delta(m_roz_ctrl[2])) & 0xfffff;
+		m_accy = (m_accy + roz_delta(m_roz_ctrl[3])) & 0xfffff;
 	}
 
-	rozParam.startx <<= 4;
-	rozParam.starty <<= 4;
-	rozParam.startx += xoffset * rozParam.incxx + yoffset * rozParam.incyx;
-	rozParam.starty += xoffset * rozParam.incxy + yoffset * rozParam.incyy;
+	// snapshot for draw_roz; later writes to the per pixel deltas and to
+	// register 7 are only seen from the next line
+	line_state &ls = m_lines[line];
+	ls.startx = m_accx;
+	ls.starty = m_accy;
+	ls.incxx = roz_delta(m_roz_ctrl[0]);
+	ls.incxy = roz_delta(m_roz_ctrl[1]);
+	ls.ctrl = m_roz_ctrl[7];
 
-	rozParam.startx <<= 8;
-	rozParam.starty <<= 8;
-	rozParam.incxx <<= 8;
-	rozParam.incxy <<= 8;
-	rozParam.incyx <<= 8;
-	rozParam.incyy <<= 8;
+	// the next line starts where the horizontal sync of this one ends
+	m_line_timer->adjust(screen().time_until_pos(line, screen().width() - XOFFSET), (line + 1) % screen().height());
+}
 
-	draw_roz_helper(screen, bitmap, m_tilemap_roz, cliprect, rozParam, prival, primask);
+
+void namcos2_roz_device::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t gfx_ctrl, uint8_t prival, uint8_t primask)
+{
+	const u16 color = gfx_ctrl & 0x0f00;
+
+	bitmap_ind8 &destprimap = screen.priority();
+	bitmap_ind16 &srcbitmap = m_tilemap_roz->pixmap();
+	bitmap_ind8 &flagsbitmap = m_tilemap_roz->flagsmap();
+
+	/* The screen is walked in small blocks rather than row by row. Close to
+	    90 or 270 degrees of rotation a row of the screen goes down a column of
+	    the plane, and a straight row by row walk would touch a different cache
+	    line for nearly every pixel. The source pixels of a small screen block
+	    stay close together at any angle. Each line still uses its own C102 state.
+	*/
+	for (int y0 = cliprect.min_y; y0 <= cliprect.max_y; y0 += ROZ_BLOCK_SIZE)
+	{
+		const int y1 = std::min(y0 + ROZ_BLOCK_SIZE - 1, cliprect.max_y);
+
+		for (int x0 = cliprect.min_x; x0 <= cliprect.max_x; x0 += ROZ_BLOCK_SIZE)
+		{
+			const int x1 = std::min(x0 + ROZ_BLOCK_SIZE - 1, cliprect.max_x);
+
+			for (int y = y0; y <= y1; y++)
+			{
+				const line_state &ls = m_lines[y];
+				const u32 csx = BIT(ls.ctrl, 12, 4);
+				const u32 csy = BIT(ls.ctrl, 8, 4);
+				const u32 maskx = BIT(ls.ctrl, 4, 4);
+				const u32 masky = BIT(ls.ctrl, 0, 4);
+
+				u32 accx = ls.startx + ((x0 + XOFFSET) * ls.incxx);
+				u32 accy = ls.starty + ((x0 + XOFFSET) * ls.incxy);
+				u16 *dest = &bitmap.pix(y, x0);
+				u8 *destpri = &destprimap.pix(y, x0);
+
+				for (int x = x0; x <= x1; x++)
+				{
+					const u32 posx = roz_unit_out(accx, csx, maskx);
+					const u32 posy = roz_unit_out(accy, csy, masky);
+
+					// nothing where nMASK is low
+					if (!((posx | posy) & 0x800) && (flagsbitmap.pix(posy, posx) & TILEMAP_PIXEL_LAYER0))
+					{
+						*dest = srcbitmap.pix(posy, posx) + color;
+						*destpri = (*destpri & primask) | prival;
+					}
+
+					accx += ls.incxx;
+					accy += ls.incxy;
+					dest++;
+					destpri++;
+				}
+			}
+		}
+	}
 }
 
 void namcos2_roz_device::rozram_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -295,3 +212,12 @@ void namcos2_roz_device::rozram_word_w(offs_t offset, uint16_t data, uint16_t me
 	m_tilemap_roz->mark_tile_dirty(offset);
 }
 
+uint16_t namcos2_roz_device::control_r(offs_t offset)
+{
+	return m_roz_ctrl[offset];
+}
+
+void namcos2_roz_device::control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_roz_ctrl[offset]);
+}
