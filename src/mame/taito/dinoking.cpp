@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:Peter Wilhelmsen
 
 /*
 
@@ -67,11 +67,12 @@ TODO:
 #include "sound/okim9810.h"
 #include "video/axell_ag1.h"
 
+#include "dirtc.h"
 #include "diserial.h"
 #include "screen.h"
 #include "speaker.h"
 
-#include <algorithm>
+#include <iterator>
 
 
 namespace {
@@ -110,10 +111,10 @@ private:
 	void send(u8 data);
 
 	devcb_write_line m_tx_cb;
-	u8 m_rx_state = 0;
-	u8 m_tx_queue[8]{};
-	u8 m_tx_head = 0;
-	u8 m_tx_tail = 0;
+	u8 m_rx_state;
+	u8 m_tx_queue[8];
+	u8 m_tx_head;
+	u8 m_tx_tail;
 };
 
 DEFINE_DEVICE_TYPE_PRIVATE(HKURANAI_PRINTER, hkuranai_printer_device, hkuranai_printer_device, "hkuranai_printer", "Hello Kitty Uranai thermal printer")
@@ -122,11 +123,15 @@ hkuranai_printer_device::hkuranai_printer_device(const machine_config &mconfig, 
 	: device_t(mconfig, HKURANAI_PRINTER, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
 	, m_tx_cb(*this)
+	, m_tx_queue{ }
 {
 }
 
 void hkuranai_printer_device::device_start()
 {
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
+	set_rate(38400);
+
 	save_item(NAME(m_rx_state));
 	save_item(NAME(m_tx_queue));
 	save_item(NAME(m_tx_head));
@@ -135,8 +140,6 @@ void hkuranai_printer_device::device_start()
 
 void hkuranai_printer_device::device_reset()
 {
-	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rate(38400);
 	receive_register_reset();
 	transmit_register_reset();
 	m_tx_cb(1);
@@ -157,9 +160,13 @@ void hkuranai_printer_device::rcv_complete()
 		m_rx_state = 0;
 	}
 	else if (m_rx_state == 1)
+	{
 		m_rx_state = (data == 0x04) ? 2 : (data == 0x10) ? 1 : 0;
+	}
 	else if (data == 0x10)
+	{
 		m_rx_state = 1;
+	}
 }
 
 void hkuranai_printer_device::tra_callback()
@@ -179,7 +186,9 @@ void hkuranai_printer_device::tra_complete()
 void hkuranai_printer_device::send(u8 data)
 {
 	if (is_transmit_register_empty())
+	{
 		transmit_register_setup(data);
+	}
 	else
 	{
 		m_tx_queue[m_tx_head] = data;
@@ -199,7 +208,7 @@ void hkuranai_printer_device::send(u8 data)
     registers which the game only ever clears.  The exact chip has not
     been identified.
 */
-class hkuranai_rtc_device : public device_t
+class hkuranai_rtc_device : public device_t, public device_rtc_interface
 {
 public:
 	hkuranai_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -212,42 +221,53 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 
+	virtual bool rtc_feature_leap_year() const override { return true; }
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
+
 private:
 	TIMER_CALLBACK_MEMBER(tick);
-	void set_time(const system_time &systime);
 	void ce_falling();
 	void clk_rising();
 	void clk_falling();
 
-	emu_timer *m_timer = nullptr;
+	emu_timer *m_timer;
 
-	u8 m_regs[16]{};
-	u8 m_ce = 0;
-	u8 m_clk = 0;
-	u8 m_data_in = 0;
-	u8 m_shift = 0;
-	u8 m_bits = 0;
-	u8 m_addr = 0;
-	bool m_have_cmd = false;
-	bool m_reading = false;
-	bool m_started = false;
-	u8 m_data_out = 1;
+	u8 m_regs[16];
+	u8 m_ce;
+	u8 m_clk;
+	u8 m_data_in;
+	u8 m_shift;
+	u8 m_bits;
+	u8 m_addr;
+	bool m_have_cmd;
+	bool m_reading;
+	bool m_started;
+	u8 m_data_out;
 };
 
 DEFINE_DEVICE_TYPE_PRIVATE(HKURANAI_RTC, hkuranai_rtc_device, hkuranai_rtc_device, "hkuranai_rtc", "Hello Kitty Uranai serial RTC")
 
 hkuranai_rtc_device::hkuranai_rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, HKURANAI_RTC, tag, owner, clock)
+	, device_rtc_interface(mconfig, *this)
+	, m_timer(nullptr)
+	, m_regs{ }
+	, m_ce(0)
+	, m_clk(0)
+	, m_data_in(0)
+	, m_shift(0)
+	, m_bits(0)
+	, m_addr(0)
+	, m_have_cmd(false)
+	, m_reading(false)
+	, m_started(false)
+	, m_data_out(1)
 {
 }
 
 void hkuranai_rtc_device::device_start()
 {
 	m_timer = timer_alloc(FUNC(hkuranai_rtc_device::tick), this);
-
-	system_time systime;
-	machine().base_datetime(systime);
-	set_time(systime);
 	m_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 
 	save_item(NAME(m_regs));
@@ -289,49 +309,20 @@ int hkuranai_rtc_device::data_r()
 	return (m_reading && m_ce) ? m_data_out : 1;
 }
 
-void hkuranai_rtc_device::set_time(const system_time &systime)
+void hkuranai_rtc_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	const system_time::full_time &t = systime.local_time;
-	m_regs[0] = ((t.second / 10) << 4) | (t.second % 10);
-	m_regs[1] = ((t.minute / 10) << 4) | (t.minute % 10);
-	m_regs[2] = ((t.hour / 10) << 4) | (t.hour % 10);
-	m_regs[3] = t.weekday;
-	m_regs[4] = ((t.mday / 10) << 4) | (t.mday % 10);
-	m_regs[5] = (((t.month + 1) / 10) << 4) | ((t.month + 1) % 10);
-	m_regs[6] = (((t.year % 100) / 10) << 4) | (t.year % 10);
+	m_regs[0] = convert_to_bcd(second);
+	m_regs[1] = convert_to_bcd(minute);
+	m_regs[2] = convert_to_bcd(hour);
+	m_regs[3] = day_of_week - 1;
+	m_regs[4] = convert_to_bcd(day);
+	m_regs[5] = convert_to_bcd(month);
+	m_regs[6] = convert_to_bcd(year);
 }
 
 TIMER_CALLBACK_MEMBER(hkuranai_rtc_device::tick)
 {
-	// advance the BCD time by one second
-	static constexpr u8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
-	auto bump = [](u8 &reg, u8 max, u8 min) -> bool
-	{
-		if (reg >= max)
-		{
-			reg = min;
-			return true;
-		}
-		reg = ((reg & 0x0f) == 9) ? (reg + 7) : (reg + 1);
-		return false;
-	};
-
-	if (!bump(m_regs[0], 0x59, 0))
-		return;
-	if (!bump(m_regs[1], 0x59, 0))
-		return;
-	if (!bump(m_regs[2], 0x23, 0))
-		return;
-	m_regs[3] = (m_regs[3] + 1) % 7;
-	const int month = std::clamp(((m_regs[5] >> 4) * 10 + (m_regs[5] & 0x0f)) - 1, 0, 11);
-	u8 days = dpm[month];
-	if (month == 1 && ((m_regs[6] >> 4) * 10 + (m_regs[6] & 0x0f)) % 4 == 0)
-		days = 0x29;
-	if (!bump(m_regs[4], days, 1))
-		return;
-	if (!bump(m_regs[5], 0x12, 1))
-		return;
-	bump(m_regs[6], 0x99, 0);
+	advance_seconds();
 }
 
 void hkuranai_rtc_device::ce_falling()
@@ -383,6 +374,8 @@ void hkuranai_rtc_device::clk_rising()
 	else
 	{
 		m_regs[m_addr] = m_shift;
+		if (m_addr < 7)
+			set_time(false, bcd_to_integer(m_regs[6]), bcd_to_integer(m_regs[5]), bcd_to_integer(m_regs[4]), m_regs[3] + 1, bcd_to_integer(m_regs[2]), bcd_to_integer(m_regs[1]), bcd_to_integer(m_regs[0]));
 		m_addr = (m_addr + 1) & 0x0f;
 	}
 }
@@ -426,7 +419,7 @@ public:
 		, m_hopper(*this, "hopper")
 		, m_nvram(*this, "nvram")
 		, m_selector(*this, "selector%u", 0U)
-		, m_lamps(*this, "lamp%u", 0U)
+		, m_lamps(*this, "lamp%u", 3U)
 	{
 	}
 
@@ -439,7 +432,7 @@ private:
 	required_device<hopper_device> m_hopper;
 	required_device<nvram_device> m_nvram;
 	output_finder<2> m_selector;
-	output_finder<8> m_lamps;
+	output_finder<4> m_lamps;
 
 	u8 m_port6 = 0;
 
@@ -460,7 +453,6 @@ public:
 		: dinoking_base_state(mconfig, type, tag)
 		, m_printer(*this, "printer")
 		, m_rtc(*this, "rtc")
-		, m_io_pf(*this, "PF")
 	{
 	}
 
@@ -472,16 +464,12 @@ protected:
 private:
 	required_device<hkuranai_printer_device> m_printer;
 	required_device<hkuranai_rtc_device> m_rtc;
-	required_ioport m_io_pf;
 
 	u8 m_portg = 0;
 
-	u8 portf_r();
-	void port1_w(offs_t offset, u8 data, u8 ddr);
+	void port1_w(u8 data);
+	void port6_w(u8 data);
 	void portg_w(u8 data);
-
-	u8 sprram_r(offs_t offset);
-	void sprram_w(offs_t offset, u8 data);
 
 	void hk_ag1_map(address_map &map) ATTR_COLD;
 	void hk_mem_map(address_map &map) ATTR_COLD;
@@ -490,6 +478,8 @@ private:
 
 void dinoking_state::machine_start()
 {
+	dinoking_base_state::machine_start();
+
 	// the H8S is kept alive by a backup battery: its on-chip RAM holds the
 	// settings and the bookkeeping (the external RAM is DRAM and is wiped by
 	// the test the games run on a cold boot)
@@ -526,9 +516,11 @@ void dinoking_state::port1_w(u8 data)
 
 void dinoking_state::port2_w(u8 data)
 {
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	m_hopper->motor_w(BIT(data, 2));
-	for (unsigned i = 0; i < 8; i++)
-		m_lamps[i] = BIT(data, i);
+	for (u32 i = 0; i < 4; i++)
+		m_lamps[i] = BIT(data, 3 + i);
 }
 
 // bit 2 is toggled on every main loop iteration to kick an external watchdog, the
@@ -547,7 +539,7 @@ void dinoking_state::mem_map(address_map &map)
 	map(0x400000, 0x4fffff).ram(); // DRAM, refreshed by the H8S bus controller
 
 	map(0x600000, 0x60ffff).ram().share("ag1ram");
-	map(0x61f000, 0x61f7ff).ram().share("ag1sprram");
+	map(0x61f000, 0x61f7ff).rw(m_ag1, FUNC(ax51102_device::sprram_r), FUNC(ax51102_device::sprram_w));
 	map(0x61fc00, 0x61fcff).rw(m_ag1, FUNC(ax51102_device::read), FUNC(ax51102_device::write));
 
 	map(0x800001, 0x800001).w(m_oki, FUNC(okim9810_device::tmp_register_w));
@@ -555,11 +547,10 @@ void dinoking_state::mem_map(address_map &map)
 	map(0x800002, 0x800002).r(m_oki, FUNC(okim9810_device::read));
 }
 
-// AG-1 sprite control memory: external SRAM, with the chip's built-in 2KB at 0x8000
+// AG-1 sprite control memory: external SRAM
 void dinoking_state::ag1_map(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("ag1ram");
-	map(0x8000, 0x87ff).ram().share("ag1sprram");
 }
 
 
@@ -579,8 +570,8 @@ void hkuranai_state::hk_mem_map(address_map &map)
 	map(0x000000, 0x1fffff).rom().region("maincpu", 0);
 
 	map(0x400000, 0x41ffff).rw(m_ag1, FUNC(ax51102_device::list_r), FUNC(ax51102_device::list_w)).umask16(0xff00);
-	map(0x43e000, 0x43efff).rw(FUNC(hkuranai_state::sprram_r), FUNC(hkuranai_state::sprram_w)).umask16(0xff00);
-	map(0x43f800, 0x43f9ff).rw(m_ag1, FUNC(ax51102_device::read8), FUNC(ax51102_device::write8)).umask16(0xff00);
+	map(0x43e000, 0x43efff).rw(m_ag1, FUNC(ax51102_device::sprram_r), FUNC(ax51102_device::sprram_w)).umask16(0xff00);
+	map(0x43f800, 0x43f9ff).rw(m_ag1, FUNC(ax51102_device::read), FUNC(ax51102_device::write)).umask16(0xff00);
 
 	map(0x600001, 0x600001).w(m_oki, FUNC(okim9810_device::tmp_register_w));
 	map(0x600000, 0x600000).w(m_oki, FUNC(okim9810_device::write));
@@ -592,26 +583,18 @@ void hkuranai_state::hk_ag1_map(address_map &map)
 	map(0x0000, 0xffff).ram();
 }
 
-u8 hkuranai_state::sprram_r(offs_t offset)
-{
-	return m_ag1->list_r(0x8000 | offset);
-}
-
-void hkuranai_state::sprram_w(offs_t offset, u8 data)
-{
-	m_ag1->list_w(0x8000 | offset, data);
-}
 
 
 void hkuranai_state::machine_start()
 {
+	dinoking_base_state::machine_start();
+
 	save_item(NAME(m_portg));
 }
 
-// bit 1 = printer busy, bit 7 = printer connected
-u8 hkuranai_state::portf_r()
+void hkuranai_state::port6_w(u8 data)
 {
-	return (m_io_pf->read() & 0xfd) | (m_printer->busy_r() << 1);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
 }
 
 // the external watchdog is kicked from port G bit 0 on this board
@@ -623,7 +606,7 @@ void hkuranai_state::portg_w(u8 data)
 }
 
 // bit 2 = RTC chip select, bit 1 = RTC clock, bit 0 = RTC data
-void hkuranai_state::port1_w(offs_t offset, u8 data, u8 ddr)
+void hkuranai_state::port1_w(u8 data)
 {
 	m_rtc->data_w(BIT(data, 0));
 	m_rtc->ce_w(BIT(data, 2));
@@ -698,7 +681,10 @@ static INPUT_PORTS_START( hkuranai )
 	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PF")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) // bit 1 = printer busy, bit 7 = printer connected / paper present
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("printer", FUNC(hkuranai_printer_device::busy_r))
+	PORT_BIT( 0x7c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) // printer connected / paper present
 INPUT_PORTS_END
 
 
@@ -721,7 +707,7 @@ void dinoking_base_state::base(machine_config &config)
 
 	SPEAKER(config, "speaker", 2).front();
 
-	OKIM9810(config, m_oki, XTAL(4'096'000));
+	OKIM9810(config, m_oki, 4'096'000); // TODO: clock not verified, the PCB only has 20 MHz and 25 MHz crystals
 	m_oki->add_route(0, "speaker", 0.80, 0);
 	m_oki->add_route(1, "speaker", 0.80, 1);
 }
@@ -745,13 +731,14 @@ void dinoking_state::dinoking(machine_config &config)
 
 	m_ag1->set_addrmap(0, &dinoking_state::ag1_map);
 	// the frame interrupt has its own CPU input, the other interrupt outputs are tied together
+	input_merger_device &ag1irq1(INPUT_MERGER_ANY_HIGH(config, "ag1irq1"));
+	ag1irq1.output_handler().set_inputline(m_maincpu, 1);
 	m_ag1->irq_callback<6>().set_inputline(m_maincpu, 0);
-	m_ag1->irq_callback<1>().set("ag1irq1", FUNC(input_merger_device::in_w<1>));
-	m_ag1->irq_callback<2>().set("ag1irq1", FUNC(input_merger_device::in_w<2>)); // blitter done
-	m_ag1->irq_callback<3>().set("ag1irq1", FUNC(input_merger_device::in_w<3>));
-	m_ag1->irq_callback<4>().set("ag1irq1", FUNC(input_merger_device::in_w<4>)); // display list transferred
-	m_ag1->irq_callback<5>().set("ag1irq1", FUNC(input_merger_device::in_w<5>)); // second frame interrupt
-	INPUT_MERGER_ANY_HIGH(config, "ag1irq1").output_handler().set_inputline(m_maincpu, 1);
+	m_ag1->irq_callback<1>().set(ag1irq1, FUNC(input_merger_device::in_w<1>));
+	m_ag1->irq_callback<2>().set(ag1irq1, FUNC(input_merger_device::in_w<2>)); // blitter done
+	m_ag1->irq_callback<3>().set(ag1irq1, FUNC(input_merger_device::in_w<3>));
+	m_ag1->irq_callback<4>().set(ag1irq1, FUNC(input_merger_device::in_w<4>)); // display list transferred
+	m_ag1->irq_callback<5>().set(ag1irq1, FUNC(input_merger_device::in_w<5>)); // second frame interrupt
 }
 
 
@@ -762,7 +749,8 @@ void hkuranai_state::hkuranai(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hkuranai_state::hk_mem_map);
 	m_maincpu->read_port1().set_ioport("P1");
 	m_maincpu->write_port1().set(FUNC(hkuranai_state::port1_w));
-	m_maincpu->read_portf().set(FUNC(hkuranai_state::portf_r));
+	m_maincpu->write_port6().set(FUNC(hkuranai_state::port6_w));
+	m_maincpu->read_portf().set_ioport("PF");
 	m_maincpu->write_portg().set(FUNC(hkuranai_state::portg_w));
 	// ALPS thermal printer on SCI0
 	m_maincpu->write_sci_tx<0>().set(m_printer, FUNC(hkuranai_printer_device::rx_w));
@@ -825,6 +813,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2003, hkuranai, 0, hkuranai, hkuranai, hkuranai_state, empty_init, ROT0, "Taito", "Hello Kitty Koi no Shugoshin Uranai", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER )
+GAME( 2003, hkuranai, 0, hkuranai, hkuranai, hkuranai_state, empty_init, ROT0, "Taito", "Hello Kitty Koi no Shugoshin Uranai", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER )
 GAME( 2004, dkkids,   0, dinoking, dinoking, dinoking_state, empty_init, ROT0, "Taito", "Dinoking Kids",                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 2005, dkbattle, 0, dinoking, dinoking, dinoking_state, empty_init, ROT0, "Taito", "Dinoking Battle",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

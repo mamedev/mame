@@ -95,6 +95,9 @@ private:
 	void output_w(u8 data);
 
 	void ag1_irq_w(int state);
+	void ag1_irq_regs_w(offs_t offset, u8 data);
+	void vblank_w(int state);
+	void ag1_irq_retrigger();
 	IRQ_CALLBACK_MEMBER(vector_r);
 
 	void ag1_map(address_map &map) ATTR_COLD;
@@ -108,12 +111,32 @@ IRQ_CALLBACK_MEMBER(gunpey_state::vector_r)
 	return 0x200 / 4;
 }
 
-// The AG-1 output is retriggered on every cause / mask update and the V30
-// takes one interrupt per trigger.  Driving the input as a level
-// leaves the game on a black screen.
+// HACK: with the AG-1 interrupt output driven to the V30 as a level the game
+// stays on a black screen.  The V30 takes one interrupt per trigger instead,
+// and the interrupt is triggered again on every write to the AG-1 interrupt
+// mask / acknowledge registers and at the start of every frame while an
+// enabled cause is still pending.
 void gunpey_state::ag1_irq_w(int state)
 {
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+}
+
+void gunpey_state::ag1_irq_retrigger()
+{
+	if (m_ag1->read(0x08) & m_ag1->read(0x09))
+		m_maincpu->set_input_line(0, HOLD_LINE);
+}
+
+void gunpey_state::ag1_irq_regs_w(offs_t offset, u8 data)
+{
+	m_ag1->write(0x08 + offset, data);
+	ag1_irq_retrigger();
+}
+
+void gunpey_state::vblank_w(int state)
+{
+	if (state)
+		ag1_irq_retrigger();
 }
 
 u8 gunpey_state::inputs_r(offs_t offset)
@@ -149,6 +172,7 @@ void gunpey_state::io_map(address_map &map)
 	map(0x7f80, 0x7f81).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
 	map(0x7f88, 0x7f88).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x7fc0, 0x7fff).rw(m_ag1, FUNC(ax51101_device::read), FUNC(ax51101_device::write));
+	map(0x7fc8, 0x7fc9).w(FUNC(gunpey_state::ag1_irq_regs_w)); // HACK, see ag1_irq_w()
 }
 
 // the AG-1 fetches its sheet and cell tables from the V30 work RAM
@@ -255,6 +279,7 @@ void gunpey_state::gunpey(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(57.2424_MHz_XTAL / 8, 442, 0, 320, 264, 0, 240); // just to get ~60 Hz
 	screen.set_screen_update(m_ag1, FUNC(ax51101_device::screen_update));
+	screen.screen_vblank().set(FUNC(gunpey_state::vblank_w));
 
 	AX51101(config, m_ag1, 57.2424_MHz_XTAL);
 	m_ag1->set_screen("screen");

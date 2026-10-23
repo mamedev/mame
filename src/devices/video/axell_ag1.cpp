@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Peter Wilhelmsen
+// copyright-holders:Peter Wilhelmsen, Morten Shearman Kirkegaard
 /**********************************************************************
 
     Axell AG-1 sprite / graphics display controller family
@@ -128,13 +128,25 @@ DEFINE_DEVICE_TYPE(AX51102, ax51102_device, "ax51102", "Axell AG-1 AX51102 graph
 
 
 //**************************************************************************
-//  DECOMPRESSOR STATE
+//  DECOMPRESSOR
 //**************************************************************************
 
-struct axell_ag1_device::state_s
+namespace {
+
+u8 cgrom_read(const u8 *rom, u32 mask, u32 x, u32 y)
 {
+	return rom[((x & 0x7ff) | (y << 11)) & mask];
+}
+
+
+struct huffman_node_s;
+
+struct state_s
+{
+	const u8 *rom;
+	u32 rom_mask;
 	u8 *buf;
-	unsigned xbits;
+	u32 xbits;
 	u32 xmask;
 	u32 ymask;
 	u8 bits;
@@ -148,6 +160,9 @@ struct axell_ag1_device::state_s
 
 	u32 addr(int x, int y) const { return (x & xmask) | ((y & ymask) << xbits); }
 
+	int get_next_bit();
+	bool next_node(const huffman_node_s **res);
+
 	void set_o(u8 v);
 	u8 get_o(int x, int y) const;
 
@@ -159,7 +174,7 @@ struct axell_ag1_device::state_s
 };
 
 
-struct axell_ag1_device::huffman_node_s
+struct huffman_node_s
 {
 	const char *bits;
 	void (*func)(state_s &, u8, int);
@@ -168,7 +183,7 @@ struct axell_ag1_device::huffman_node_s
 };
 
 
-const axell_ag1_device::huffman_node_s axell_ag1_device::s_huffman_nodes[] = {
+constexpr huffman_node_s HUFFMAN_NODES[] = {
 	{ "11",                 state_s::hn_bytes_new_colour,   8,  1 },
 	{ "10111",              state_s::hn_bytes_new_colour,   8,  2 },
 	{ "10110011",           state_s::hn_bytes_new_colour,   8,  3 },
@@ -228,7 +243,61 @@ const axell_ag1_device::huffman_node_s axell_ag1_device::s_huffman_nodes[] = {
 };
 
 
-void axell_ag1_device::state_s::set_o(u8 v)
+inline int state_s::get_next_bit()
+{
+	if (num_bits == 0)
+	{
+		if (ix >= basex + iw)
+		{
+			ix = basex;
+			iy++;
+		}
+		bits = cgrom_read(rom, rom_mask, ix, iy);
+		ix++;
+		num_bits = 8;
+	}
+
+	const int res = 1 & bits;
+
+	bits >>= 1;
+	num_bits--;
+
+	return res;
+}
+
+
+bool state_s::next_node(const huffman_node_s **res)
+{
+	char code[128];
+
+	std::fill(std::begin(code), std::end(code), 0);
+
+	for (int i = 0; i < sizeof(code) - 1; i++)
+	{
+		code[i] = '0' + get_next_bit();
+
+		for (int j = 0;; j++)
+		{
+			if (!HUFFMAN_NODES[j].bits)
+				return true;
+
+			if (strncmp(code, HUFFMAN_NODES[j].bits, i + 1) == 0)
+			{
+				if (!HUFFMAN_NODES[j].bits[i + 1])
+				{
+					*res = &HUFFMAN_NODES[j];
+					return false;
+				}
+				break;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+void state_s::set_o(u8 v)
 {
 	u8 a = v;
 	for (int i = 0; i < std::size(colour); i++)
@@ -246,7 +315,7 @@ void axell_ag1_device::state_s::set_o(u8 v)
 }
 
 
-u8 axell_ag1_device::state_s::get_o(int x, int y) const
+u8 state_s::get_o(int x, int y) const
 {
 	if (x < 0 || x >= ow || y < 0 || y >= oh)
 		return 0;
@@ -255,14 +324,14 @@ u8 axell_ag1_device::state_s::get_o(int x, int y) const
 }
 
 
-void axell_ag1_device::state_s::hn_bytes_new_colour(state_s &s, u8 v, int n)
+void state_s::hn_bytes_new_colour(state_s &s, u8 v, int n)
 {
 	for (int i = 0; i < n; i++)
 		s.set_o(v);
 }
 
 
-void axell_ag1_device::state_s::hn_bytes_prev_colour(state_s &s, u8 v, int n)
+void state_s::hn_bytes_prev_colour(state_s &s, u8 v, int n)
 {
 	const u8 c = s.colour[v];
 
@@ -271,7 +340,7 @@ void axell_ag1_device::state_s::hn_bytes_prev_colour(state_s &s, u8 v, int n)
 }
 
 
-void axell_ag1_device::state_s::hn_copy_directly(state_s &s, u8 v, int n)
+void state_s::hn_copy_directly(state_s &s, u8 v, int n)
 {
 	for (int i = 0; i < n; i++)
 	{
@@ -283,7 +352,7 @@ void axell_ag1_device::state_s::hn_copy_directly(state_s &s, u8 v, int n)
 }
 
 
-void axell_ag1_device::state_s::hn_copy_plus_one(state_s &s, u8 v, int n)
+void state_s::hn_copy_plus_one(state_s &s, u8 v, int n)
 {
 	for (int i = 0; i < n; i++)
 	{
@@ -295,7 +364,7 @@ void axell_ag1_device::state_s::hn_copy_plus_one(state_s &s, u8 v, int n)
 }
 
 
-void axell_ag1_device::state_s::hn_copy_minus_one(state_s &s, u8 v, int n)
+void state_s::hn_copy_minus_one(state_s &s, u8 v, int n)
 {
 	for (int i = 0; i < n; i++)
 	{
@@ -306,19 +375,21 @@ void axell_ag1_device::state_s::hn_copy_minus_one(state_s &s, u8 v, int n)
 	}
 }
 
+} // anonymous namespace
+
 
 //**************************************************************************
 //  BASE DEVICE
 //**************************************************************************
 
-axell_ag1_device::axell_ag1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, endianness_t host_endianness, unsigned cgram_x_bits, unsigned cgram_y_bits, u8 cgram_fill)
+axell_ag1_device_base::axell_ag1_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, endianness_t host_endianness, address_map_constructor list_map, u32 cgram_x_bits, u32 cgram_y_bits, u8 cgram_fill)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, m_irq_cb(*this)
 	, m_irq_lines(0)
 	, m_cgrom(*this, finder_base::DUMMY_TAG)
-	, m_list_config("list", host_endianness, 16, 16, 0)
+	, m_list_config("list", host_endianness, 16, 16, 0, list_map)
 	, m_cgram_config("cgram", ENDIANNESS_LITTLE, 8, cgram_x_bits + cgram_y_bits, 0)
 	, m_list(nullptr)
 	, m_cgram_x_bits(cgram_x_bits)
@@ -326,14 +397,11 @@ axell_ag1_device::axell_ag1_device(const machine_config &mconfig, device_type ty
 	, m_cgram_y_mask((1U << cgram_y_bits) - 1)
 	, m_cgram_fill(cgram_fill)
 	, m_irq_timer{ nullptr, nullptr }
-	, m_irq_cause(0)
-	, m_irq_mask(0)
 {
-	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }
 
 
-device_memory_interface::space_config_vector axell_ag1_device::memory_space_config() const
+device_memory_interface::space_config_vector axell_ag1_device_base::memory_space_config() const
 {
 	return space_config_vector {
 		std::make_pair(0, &m_list_config),
@@ -342,7 +410,7 @@ device_memory_interface::space_config_vector axell_ag1_device::memory_space_conf
 }
 
 
-void axell_ag1_device::device_start()
+void axell_ag1_device_base::device_start()
 {
 	// the CG-ROM size is used as an address mask
 	if (m_cgrom.length() & (m_cgrom.length() - 1))
@@ -363,9 +431,9 @@ void axell_ag1_device::device_start()
 		m_rgb555_lut[i] = rgb_t(pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i));
 
 	for (auto &timer : m_irq_timer)
-		timer = timer_alloc(FUNC(axell_ag1_device::irq_timer), this);
+		timer = timer_alloc(FUNC(axell_ag1_device_base::irq_timer), this);
 
-	screen().register_vblank_callback(vblank_state_delegate(&axell_ag1_device::vblank, this));
+	screen().register_vblank_callback(vblank_state_delegate(&axell_ag1_device_base::vblank, this));
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_irq_cause));
@@ -375,7 +443,7 @@ void axell_ag1_device::device_start()
 }
 
 
-void axell_ag1_device::device_reset()
+void axell_ag1_device_base::device_reset()
 {
 	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 	for (auto &timer : m_irq_timer)
@@ -390,28 +458,28 @@ void axell_ag1_device::device_reset()
 //  interrupts
 //-------------------------------------------------
 
-void axell_ag1_device::raise_irq(u8 causes)
+void axell_ag1_device_base::raise_irq(u8 causes)
 {
 	m_irq_cause |= causes;
 	update_irq();
 }
 
 
-void axell_ag1_device::ack_irq(u8 causes)
+void axell_ag1_device_base::ack_irq(u8 causes)
 {
 	m_irq_cause &= ~causes;
 	update_irq();
 }
 
 
-void axell_ag1_device::set_irq_mask(u8 mask)
+void axell_ag1_device_base::set_irq_mask(u8 mask)
 {
 	m_irq_mask = mask;
 	update_irq();
 }
 
 
-void axell_ag1_device::schedule_irq(u8 cause, const attotime &delay)
+void axell_ag1_device_base::schedule_irq(u8 cause, const attotime &delay)
 {
 	// one timer per interrupt source (blitter, list transfer)
 	const int index = (cause == IRQ_BLITTER) ? 0 : 1;
@@ -419,9 +487,15 @@ void axell_ag1_device::schedule_irq(u8 cause, const attotime &delay)
 }
 
 
-TIMER_CALLBACK_MEMBER(axell_ag1_device::irq_timer)
+TIMER_CALLBACK_MEMBER(axell_ag1_device_base::irq_timer)
 {
 	raise_irq(u8(param));
+}
+
+
+u8 axell_ag1_device_base::get_cgrom_byte(u32 x, u32 y) const
+{
+	return cgrom_read(&m_cgrom[0], m_cgrom.length() - 1, x, y);
 }
 
 
@@ -430,7 +504,7 @@ TIMER_CALLBACK_MEMBER(axell_ag1_device::irq_timer)
 //  character data from CG-ROM to CGRAM
 //-------------------------------------------------
 
-void axell_ag1_device::start_blit(u16 src_x, u16 src_y, u16 dst_x, u16 dst_y, u16 xsize, u16 ysize, u8 mode, u8 irq_on_completion)
+void axell_ag1_device_base::start_blit(u16 src_x, u16 src_y, u16 dst_x, u16 dst_y, u16 xsize, u16 ysize, u8 mode, u8 irq_on_completion)
 {
 	// horizontal destination position and size are in 16-bit words
 	const u32 dstx = u32(dst_x) << 1;
@@ -468,66 +542,12 @@ void axell_ag1_device::start_blit(u16 src_x, u16 src_y, u16 dst_x, u16 dst_y, u1
 }
 
 
-inline int axell_ag1_device::get_next_bit(state_s *s)
+bool axell_ag1_device_base::decompress_sprite(int ix, int iy, int ow, int oh, int dx, int dy)
 {
-	if (s->num_bits == 0)
-	{
-		if (s->ix >= s->basex + s->iw)
-		{
-			s->ix = s->basex;
-			s->iy++;
-		}
-		s->bits = get_cgrom_byte(s->ix, s->iy);
-		s->ix++;
-		s->num_bits = 8;
-	}
-
-	const int res = 1 & s->bits;
-
-	s->bits >>= 1;
-	s->num_bits--;
-
-	return res;
-}
-
-
-bool axell_ag1_device::next_node(const huffman_node_s **res, state_s *s)
-{
-	char bits[128];
-
-	std::fill(std::begin(bits), std::end(bits), 0);
-
-	for (int i = 0; i < sizeof(bits) - 1; i++)
-	{
-		bits[i] = '0' + get_next_bit(s);
-
-		for (int j = 0;; j++)
-		{
-			if (!s_huffman_nodes[j].bits)
-				return true;
-
-			if (strncmp(bits, s_huffman_nodes[j].bits, i + 1) == 0)
-			{
-				if (!s_huffman_nodes[j].bits[i + 1])
-				{
-					*res = &s_huffman_nodes[j];
-					return false;
-				}
-				break;
-			}
-		}
-	}
-
-	return true;
-}
-
-
-bool axell_ag1_device::decompress_sprite(int ix, int iy, int ow, int oh, int dx, int dy)
-{
-	const huffman_node_s *n;
 	state_s s;
-	int eol;
 
+	s.rom = &m_cgrom[0];
+	s.rom_mask = m_cgrom.length() - 1;
 	s.buf = m_cgram.get();
 	s.xbits = m_cgram_x_bits;
 	s.xmask = m_cgram_x_mask;
@@ -552,24 +572,26 @@ bool axell_ag1_device::decompress_sprite(int ix, int iy, int ow, int oh, int dx,
 	// the first byte of the data gives the width of the compressed block
 	// in the CG-ROM minus one, the first three bits of the bit stream hold
 	// bits 8-10 of it (large pictures in the Taito games)
-	int temp = get_next_bit(&s);
-	temp |= get_next_bit(&s) << 1;
-	temp |= get_next_bit(&s) << 2;
+	int temp = s.get_next_bit();
+	temp |= s.get_next_bit() << 1;
+	temp |= s.get_next_bit() << 2;
 	s.iw += temp << 8;
 
 	// the output is produced in vertical strips of 12 pixels, going
 	// down in even strips and up in odd ones
 	while (s.ox < s.ow)
 	{
-		if (next_node(&n, &s))
+		const huffman_node_s *n;
+		if (s.next_node(&n))
 			return true;
 
 		u8 v = 0;
 		for (int i = 0; i < n->arg0_bits; i++)
-			v |= get_next_bit(&s) << i;
+			v |= s.get_next_bit() << i;
 
 		n->func(s, v, n->arg1_val);
 
+		bool eol;
 		if ((s.ox % 12) == 0)
 		{
 			s.ox -= 12;
@@ -578,7 +600,7 @@ bool axell_ag1_device::decompress_sprite(int ix, int iy, int ow, int oh, int dx,
 			else
 				s.oy += 1;
 
-			eol = 1;
+			eol = true;
 		}
 		else if (s.ox == s.ow)
 		{
@@ -588,10 +610,12 @@ bool axell_ag1_device::decompress_sprite(int ix, int iy, int ow, int oh, int dx,
 			else
 				s.oy += 1;
 
-			eol = 1;
+			eol = true;
 		}
 		else
-			eol = 0;
+		{
+			eol = false;
+		}
 
 		if (eol)
 		{
@@ -617,7 +641,7 @@ bool axell_ag1_device::decompress_sprite(int ix, int iy, int ow, int oh, int dx,
 // pixel sink drawing straight into a screen bitmap (AX51101: the frame
 // buffers are not emulated, the display list is rendered at screen update
 // time)
-struct axell_ag1_device::bitmap_target
+struct axell_ag1_device_base::bitmap_target
 {
 	bitmap_rgb32 &bitmap;
 	const rectangle &clip;
@@ -633,9 +657,9 @@ struct axell_ag1_device::bitmap_target
 };
 
 // pixel sink rendering into an RGB555 frame buffer in CGRAM (AX51102)
-struct axell_ag1_device::cgram_target
+struct axell_ag1_device_base::cgram_target
 {
-	axell_ag1_device &dev;
+	axell_ag1_device_base &dev;
 	rectangle clip;    // in virtual screen coordinates
 	s32 offset_x;      // destination - window origin
 	s32 offset_y;
@@ -646,7 +670,7 @@ struct axell_ag1_device::cgram_target
 };
 
 
-u32 axell_ag1_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 axell_ag1_device_base::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(rgb_t::black(), cliprect);
 	draw_display_list(bitmap, cliprect);
@@ -655,7 +679,7 @@ u32 axell_ag1_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 
 template <typename Target>
-inline void axell_ag1_device::draw_pixel(Target &target, int x, int y, u16 color_data, int alpha, int darken)
+inline void axell_ag1_device_base::draw_pixel(Target &target, int x, int y, u16 color_data, int alpha, int darken)
 {
 	// bit 15 set means transparent
 	if (color_data & 0x8000)
@@ -695,7 +719,7 @@ inline void axell_ag1_device::draw_pixel(Target &target, int x, int y, u16 color
     rotated cells are honoured.
 */
 template <typename Target>
-void axell_ag1_device::draw_cell(Target &target, const cell_params &cell, s32 x, s32 y, int darken)
+void axell_ag1_device_base::draw_cell(Target &target, const cell_params &cell, s32 x, s32 y, int darken)
 {
 	constexpr int ZOOM_SHIFT = 15;
 
@@ -711,14 +735,14 @@ void axell_ag1_device::draw_cell(Target &target, const cell_params &cell, s32 x,
 	}
 
 	// pixel size in bits: 4, 8 or 16
-	const unsigned pixel_shift = (cell.bpp_sel == 3) ? 4 : (cell.bpp_sel == 2) ? 3 : 2;
+	const u32 pixel_shift = (cell.bpp_sel == 3) ? 4 : (cell.bpp_sel == 2) ? 3 : 2;
 
 	// signs of the cosine and sine for the four quadrants
 	const bool neg_cos = (cell.quadrant == 1) || (cell.quadrant == 2);
 	const bool neg_sin = (cell.quadrant >= 2);
 
 	// source steps per destination pixel, in 1/32768 source pixel
-	auto step = [](u32 extent, s32 size, bool negative) -> s32
+	auto step = [] (u32 extent, s32 size, bool negative) -> s32
 	{
 		const s32 v = s32((extent << ZOOM_SHIFT) / size);
 		return negative ? -v : v;
@@ -773,9 +797,6 @@ void axell_ag1_device::draw_cell(Target &target, const cell_params &cell, s32 x,
 	}
 }
 
-template void axell_ag1_device::draw_cell(bitmap_target &target, const cell_params &cell, s32 x, s32 y, int darken);
-template void axell_ag1_device::draw_cell(cgram_target &target, const cell_params &cell, s32 x, s32 y, int darken);
-
 
 //**************************************************************************
 //  AX51101
@@ -812,18 +833,20 @@ template void axell_ag1_device::draw_cell(cgram_target &target, const cell_param
 */
 
 ax51101_device::ax51101_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: axell_ag1_device(mconfig, AX51101, tag, owner, clock, ENDIANNESS_LITTLE, 11, 11, 0xff)
+	: axell_ag1_device_base(mconfig, AX51101, tag, owner, clock, ENDIANNESS_LITTLE, address_map_constructor(), 11, 11, 0xff)
 {
 }
 
 
 void ax51101_device::update_irq()
 {
-	// single interrupt output; the callback is invoked on every update of
-	// the cause / mask registers, not only when the line changes, because
-	// Gunpey needs its interrupt retriggered while other causes are still
-	// pending (see ag1_irq_w() in gunpey.cpp)
-	m_irq_cb[0](active_irqs() ? 1 : 0);
+	// single interrupt output
+	const u8 active = active_irqs() ? 1 : 0;
+	if (active != m_irq_lines)
+	{
+		m_irq_lines = active;
+		m_irq_cb[0](active);
+	}
 }
 
 
@@ -950,9 +973,6 @@ void ax51101_device::draw_display_list(bitmap_rgb32 &bitmap, const rectangle &cl
 
 		if (BIT(flags, 0))
 		{
-			// per-sheet modulation (see the AX51102 version for the details):
-			// Gunpey only uses the intensity mode, bit 6 set with the level in
-			// bits 0-4, and 0x80 / 0xc0 for the sheets drawn normally
 			const u8 modulation = list_read_byte(sheet + 2);
 			const int level = BIT(modulation, 7) ? 0 : (modulation & 0x1f);
 			const int darken = BIT(modulation, 6) ? level : 0;
@@ -1056,8 +1076,15 @@ void ax51101_device::draw_display_list(bitmap_rgb32 &bitmap, const rectangle &cl
 */
 
 ax51102_device::ax51102_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: axell_ag1_device(mconfig, AX51102, tag, owner, clock, ENDIANNESS_BIG, 12, 12, 0x00)
+	: axell_ag1_device_base(mconfig, AX51102, tag, owner, clock, ENDIANNESS_BIG, address_map_constructor(FUNC(ax51102_device::list_map), this), 12, 12, 0x00)
 {
+}
+
+
+// built-in sprite control RAM, the board supplies the external SRAM
+void ax51102_device::list_map(address_map &map)
+{
+	map(0x8000, 0x87ff).ram();
 }
 
 
@@ -1067,28 +1094,16 @@ void ax51102_device::update_irq()
 	const u8 active = active_irqs();
 	const u8 changed = active ^ m_irq_lines;
 	m_irq_lines = active;
-	for (unsigned i = 0; i < 8; i++)
+	for (u32 i = 0; i < 8; i++)
 		if (BIT(changed, i))
 			m_irq_cb[i](BIT(active, i));
 }
 
 
-u16 ax51102_device::read(offs_t offset, u16 mem_mask)
+u8 ax51102_device::read(offs_t offset)
 {
-	const unsigned address = (offset << 1) & 0xfe;
-	u16 result = 0;
+	offset &= 0xff;
 
-	if (ACCESSING_BITS_8_15)
-		result |= reg_r(address) << 8;
-	if (ACCESSING_BITS_0_7)
-		result |= reg_r(address + 1);
-
-	return result;
-}
-
-
-u8 ax51102_device::reg_r(unsigned offset)
-{
 	switch (offset)
 	{
 	case 0xb8: return irq_mask();
@@ -1098,19 +1113,10 @@ u8 ax51102_device::reg_r(unsigned offset)
 }
 
 
-void ax51102_device::write(offs_t offset, u16 data, u16 mem_mask)
+void ax51102_device::write(offs_t offset, u8 data)
 {
-	const unsigned address = (offset << 1) & 0xfe;
+	offset &= 0xff;
 
-	if (ACCESSING_BITS_8_15)
-		reg_w(address, data >> 8);
-	if (ACCESSING_BITS_0_7)
-		reg_w(address + 1, data & 0xff);
-}
-
-
-void ax51102_device::reg_w(unsigned offset, u8 data)
-{
 	LOGREGS("%s: register %02x = %02x\n", machine().describe_context(), offset, data);
 
 	switch (offset)
@@ -1137,12 +1143,8 @@ void ax51102_device::reg_w(unsigned offset, u8 data)
 	case 0xe7:
 		// bit 1 selects the frame buffer to display; the other one becomes
 		// the back buffer and is cleared (to transparent) for the next
-		// frame.  The games render a frame in several passes without any
-		// clearing of their own, and a frame that is skipped (e.g. while a
-		// sprite is rendered to a texture for the knock-out effect) leaves
-		// the picture on screen, so the clearing has to be tied to the flip
-		// rather than to the display scan-out.  Render targets elsewhere in
-		// CGRAM persist (hkuranai clears its text canvas by hand).
+		// frame.  Render targets elsewhere in CGRAM persist (hkuranai clears
+		// its text canvas by hand).
 		if (BIT(m_regs[offset] ^ data, 1))
 			clear_frame_buffer(!BIT(data, 1));
 		m_regs[offset] = data;
@@ -1272,8 +1274,7 @@ void ax51102_device::decode_cell(offs_t address, cell_params &cell)
 	cell.quadrant = BIT(b[3], 6, 2);
 	cell.src_x = (b[4] << 8) | b[5];
 	cell.src_y = (b[6] << 8) | b[7];
-	// positions are sign-magnitude; the games leave stale data in the upper
-	// four bits of these words, so the hardware must ignore them
+	// positions are sign-magnitude, bits 15-12 are not used
 	const u16 dx = (b[8] << 8) | b[9];
 	const u16 dy = (b[10] << 8) | b[11];
 	cell.dst_x = BIT(dx, 11) ? -(dx & 0x7ff) : (dx & 0x7ff);
@@ -1374,14 +1375,6 @@ void ax51102_device::render_display_list()
 */
 void ax51102_device::draw_sheet(cgram_target &target, offs_t sheet, u16 cell_base)
 {
-	// per-sheet modulation, bits 0-4 are the level: with bit 6 set the sheet
-	// is darkened (intensity modulation, as on the AX51101), with bit 6 clear
-	// it is blended with the background (dkkids fades its hit effects out
-	// this way, hkuranai twinkles the sparkles on its title screen - the
-	// reference footage shows them turning translucent, not dark).  Bit 7 is
-	// set on the sheets dkkids draws normally (level 0 anyway) and is taken
-	// to disable the modulation; bit 5 toggles with the frame parity on some
-	// dkkids sheets and does not affect the picture
 	const u8 modulation = list_read_byte(sheet + 2);
 	const int level = BIT(modulation, 7) ? 0 : (modulation & 0x1f);
 	const int darken = BIT(modulation, 6) ? level : 0;
@@ -1411,7 +1404,7 @@ void ax51102_device::draw_sheet(cgram_target &target, offs_t sheet, u16 cell_bas
 			// the sheet scale applies to the cell positions and sizes; both
 			// edges are scaled the same way so that adjoining cells stay
 			// seamless (the backgrounds are tiled from small cells)
-			auto scaled = [](s32 v, int scale) { return (v * scale) >> 6; };
+			auto scaled = [] (s32 v, int scale) { return (v * scale) >> 6; };
 			s32 x = sheet_x + cell.dst_x;
 			s32 y = sheet_y + cell.dst_y;
 			if (scale_x != 0x40)

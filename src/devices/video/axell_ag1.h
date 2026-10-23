@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Peter Wilhelmsen
+// copyright-holders:Peter Wilhelmsen, Morten Shearman Kirkegaard
 /**********************************************************************
 
     Axell AG-1 sprite / graphics display controller family
@@ -34,7 +34,7 @@
 #include <utility>
 
 
-class axell_ag1_device : public device_t, public device_memory_interface, public device_video_interface
+class axell_ag1_device_base : public device_t, public device_memory_interface, public device_video_interface
 {
 public:
 	// configuration
@@ -43,7 +43,7 @@ public:
 	// interrupt outputs: the AX51101 has a single INT output (line 0, any
 	// enabled cause), the AX51102 has one output per interrupt cause bit
 	// (line N = cause bit N) so boards can route them to separate CPU inputs
-	template <unsigned N> auto irq_callback() { return m_irq_cb[N].bind(); }
+	template <u32 N> auto irq_callback() { return m_irq_cb[N].bind(); }
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -86,7 +86,11 @@ protected:
 		u32 h_cos;
 	};
 
-	axell_ag1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, endianness_t host_endianness, unsigned cgram_x_bits, unsigned cgram_y_bits, u8 cgram_fill);
+	// drawing targets
+	struct bitmap_target;
+	struct cgram_target;
+
+	axell_ag1_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, endianness_t host_endianness, address_map_constructor list_map, u32 cgram_x_bits, u32 cgram_y_bits, u8 cgram_fill);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -117,8 +121,6 @@ protected:
 	u16 list_read_word(offs_t address) { return m_list->read_word(address); }
 
 	// drawing
-	struct bitmap_target;
-	struct cgram_target;
 	template <typename Target> void draw_cell(Target &target, const cell_params &cell, s32 x, s32 y, int darken);
 
 	// CGRAM access
@@ -145,19 +147,12 @@ protected:
 	u8 m_irq_lines;
 
 private:
-	struct state_s;
-	struct huffman_node_s;
-
-	static const huffman_node_s s_huffman_nodes[];
-
-	u8 get_cgrom_byte(u32 x, u32 y) const { return m_cgrom[((x & 0x7ff) | (y << 11)) & (m_cgrom.length() - 1)]; }
+	u8 get_cgrom_byte(u32 x, u32 y) const;
 
 	template <typename Target> void draw_pixel(Target &target, int x, int y, u16 color_data, int alpha, int darken);
 
 	// decompressor
 	bool decompress_sprite(int ix, int iy, int ow, int oh, int dx, int dy);
-	bool next_node(const huffman_node_s **res, state_s *s);
-	int get_next_bit(state_s *s);
 
 	TIMER_CALLBACK_MEMBER(irq_timer);
 
@@ -166,7 +161,7 @@ private:
 	address_space_config m_cgram_config;
 	address_space *m_list;
 
-	const unsigned m_cgram_x_bits;
+	const u32 m_cgram_x_bits;
 	const u32 m_cgram_x_mask;
 	const u32 m_cgram_y_mask;
 	const u8 m_cgram_fill;
@@ -180,7 +175,7 @@ private:
 
 // ======================> ax51101_device
 
-class ax51101_device : public axell_ag1_device
+class ax51101_device : public axell_ag1_device_base
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
@@ -197,27 +192,27 @@ protected:
 	virtual void vblank(screen_device &screen, bool state) override;
 
 private:
-	u16 reg16(unsigned offset) const { return m_regs[offset] | (m_regs[offset + 1] << 8); }
+	u16 reg16(u32 offset) const { return m_regs[offset] | (m_regs[offset + 1] << 8); }
 	void decode_cell(offs_t address, cell_params &cell);
 };
 
 
 // ======================> ax51102_device
 
-class ax51102_device : public axell_ag1_device
+class ax51102_device : public axell_ag1_device_base
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	ax51102_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// 128 word-wide registers (big-endian byte lanes)
-	u16 read(offs_t offset, u16 mem_mask = ~0);
-	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
+	// 256 byte-wide registers
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
-	// 8-bit host bus: one byte-wide register per address
-	u8 read8(offs_t offset) { return reg_r(offset & 0xff); }
-	void write8(offs_t offset, u8 data) { reg_w(offset & 0xff, data); }
+	// host access to the built-in 2KB sprite control RAM
+	u8 sprram_r(offs_t offset) { return list_r(0x8000 + (offset & 0x7ff)); }
+	void sprram_w(offs_t offset, u8 data) { list_w(0x8000 + (offset & 0x7ff), data); }
 
 protected:
 	virtual void draw_display_list(bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
@@ -225,9 +220,8 @@ protected:
 	virtual void vblank(screen_device &screen, bool state) override;
 
 private:
-	u16 reg16(unsigned offset) const { return (m_regs[offset] << 8) | m_regs[offset + 1]; }
-	u8 reg_r(unsigned offset);
-	void reg_w(unsigned offset, u8 data);
+	u16 reg16(u32 offset) const { return (m_regs[offset] << 8) | m_regs[offset + 1]; }
+	void list_map(address_map &map) ATTR_COLD;
 	void command_w(u8 data);
 	void decode_cell(offs_t address, cell_params &cell);
 	void render_display_list();
