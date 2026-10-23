@@ -23,6 +23,8 @@
 
 #include "speaker.h"
 
+#include "endianness.h"
+
 
 namespace {
 
@@ -34,6 +36,8 @@ public:
 		, m_soundlatch(*this, "soundlatch")
 		, m_qs1000(*this, "qs1000")
 		, m_system_io(*this, "SYSTEM")
+		, m_vram(*this, "vram", 0x14000 * 2, ENDIANNESS_BIG)
+		, m_vram_bank(*this, "vram_bank")
 		, m_qs1000_bank(*this, "qs1000_bank")
 	{
 	}
@@ -49,13 +53,13 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<qs1000_device> m_qs1000;
 	required_ioport m_system_io;
+	memory_share_creator<uint32_t> m_vram;
+	required_memory_bank m_vram_bank;
 	memory_bank_creator m_qs1000_bank;
 
-	std::unique_ptr<uint8_t[]> m_vram;
-	int m_vbuffer;
+	uint8_t m_vbuffer;
 
-	void vram_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
-	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
 	void vega_misc_w(uint32_t data);
 	uint32_t vegaeo_custom_read();
 	void qs1000_p1_w(uint8_t data);
@@ -86,23 +90,19 @@ void vegaeo_state::qs1000_p3_w(uint8_t data)
 		m_soundlatch->acknowledge_w();
 }
 
-void vegaeo_state::vram_w(offs_t offset, uint8_t data, uint8_t mem_mask)
+void vegaeo_state::vram_w(offs_t offset, uint8_t data)
 {
 	// don't write transparent pen
 	if (data != 0xff)
-		COMBINE_DATA(&m_vram[offset + m_vbuffer * 0x14000]);
-}
-
-uint8_t vegaeo_state::vram_r(offs_t offset)
-{
-	return m_vram[offset + 0x14000 * m_vbuffer];
+		util::big_endian_cast<uint8_t>(reinterpret_cast<uint32_t *>(m_vram_bank->base()))[offset] = data;
 }
 
 void vegaeo_state::vega_misc_w(uint32_t data)
 {
 	// other bits ???
 
-	m_vbuffer = data & 1;
+	m_vbuffer = BIT(data, 0);
+	m_vram_bank->set_entry(m_vbuffer);
 }
 
 
@@ -116,11 +116,11 @@ uint32_t vegaeo_state::vegaeo_custom_read()
 void vegaeo_state::vega_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram();
-	map(0x80000000, 0x80013fff).rw(FUNC(vegaeo_state::vram_r), FUNC(vegaeo_state::vram_w));
-	map(0xfc000000, 0xfc0000ff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write)).umask32(0x000000ff);
-	map(0xfc200000, 0xfc2003ff).rw("palette", FUNC(palette_device::read16), FUNC(palette_device::write16)).umask32(0x0000ffff).share("palette");
-	map(0xfc400000, 0xfc40005b).nopw(); // crt registers ?
-	map(0xfc600000, 0xfc600003).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask32(0x000000ff).cswidth(32);
+	map(0x80000000, 0x80013fff).bankr(m_vram_bank).w(FUNC(vegaeo_state::vram_w));
+	map(0xfc000000, 0xfc0000ff).umask32(0x000000ff).rw("at28c16", FUNC(at28c16_device::read), FUNC(at28c16_device::write));
+	map(0xfc200000, 0xfc2003ff).umask32(0x0000ffff).rw("palette", FUNC(palette_device::read16), FUNC(palette_device::write16)).share("palette");
+	map(0xfc400000, 0xfc40005b).nopw(); // CRT registers?
+	map(0xfc600000, 0xfc600003).umask32(0x000000ff).cswidth(32).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xfca00000, 0xfca00003).w(FUNC(vegaeo_state::vega_misc_w));
 	map(0xfcc00000, 0xfcc00003).r(FUNC(vegaeo_state::vegaeo_custom_read));
 	map(0xfce00000, 0xfce00003).portr("P1_P2");
@@ -141,20 +141,20 @@ static INPUT_PORTS_START( crazywar )
 	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1_P2")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 )                  PORT_PLAYER(1)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 )                  PORT_PLAYER(1)
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON1 )                  PORT_PLAYER(2)
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON2 )                  PORT_PLAYER(2)
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -165,18 +165,23 @@ void vegaeo_state::video_start()
 {
 	eolith_e1_speedup_state_base::video_start();
 
-	m_vram = std::make_unique<uint8_t[]>(0x14000*2);
-	save_pointer(NAME(m_vram), 0x14000*2);
+	m_vbuffer = 0;
+
+	m_vram_bank->configure_entries(0, 2, &m_vram[0], 0x14000);
+	m_vram_bank->set_entry(m_vbuffer);
+
 	save_item(NAME(m_vbuffer));
 }
 
 uint32_t vegaeo_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.top(); y <= std::min(cliprect.bottom(), 239); y++)
+	uint32_t const *base = &m_vram[((0x14000 / 4) * (m_vbuffer ^ 1)) + ((320 / 4) * cliprect.top())];
+	for (int y = cliprect.top(); y <= std::min(cliprect.bottom(), 239); y++, base += 320 / 4)
 	{
-		auto *pix = &bitmap.pix(y);
-		for (int x = 0; x < 320; x++)
-			*pix++ = m_vram[0x14000 * (m_vbuffer ^ 1) + (y * 320) + x] & 0xff;
+		auto *pix = &bitmap.pix(y, cliprect.left());
+		auto const src = util::big_endian_cast<uint8_t const>(base);
+		for (int x = cliprect.left(); x <= std::min(cliprect.right(), 319); x++)
+			*pix++ = src[x];
 	}
 
 	return 0;
@@ -206,12 +211,12 @@ void vegaeo_state::vega(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set("qs1000", FUNC(qs1000_device::set_irq));
+	m_soundlatch->data_pending_callback().set(m_qs1000, FUNC(qs1000_device::set_irq));
 	m_soundlatch->set_separate_acknowledge(true);
 
 	QS1000(config, m_qs1000, XTAL(24'000'000));
 	m_qs1000->set_external_rom(true);
-	m_qs1000->p1_in().set("soundlatch", FUNC(generic_latch_8_device::read));
+	m_qs1000->p1_in().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	m_qs1000->p1_out().set(FUNC(vegaeo_state::qs1000_p1_w));
 	m_qs1000->p2_out().set(FUNC(vegaeo_state::qs1000_p2_w));
 	m_qs1000->p3_out().set(FUNC(vegaeo_state::qs1000_p3_w));
