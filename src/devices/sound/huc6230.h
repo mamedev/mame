@@ -39,6 +39,12 @@ private:
 		uint8_t         m_rvol;
 	};
 
+	static int32_t vca_step_time(int32_t level);
+	void vca_set(int ch, u8 data);
+	void vca_run(int ch, int32_t clocks);
+
+	TIMER_CALLBACK_MEMBER(adpcm_timer);
+
 	// internal state
 	sound_stream *m_stream;
 	emu_timer *m_adpcm_timer;
@@ -53,12 +59,6 @@ private:
 	int32_t m_vca_level[2];
 	int32_t m_vca_target[2];
 	int32_t m_vca_wait[2];
-
-	static int32_t vca_step_time(int32_t level);
-	void vca_set(int ch, u8 data);
-	void vca_run(int ch, int32_t clocks);
-
-	TIMER_CALLBACK_MEMBER(adpcm_timer);
 
 	devcb_read8::array<2> m_adpcm_update_cb;
 };

@@ -103,12 +103,18 @@ void huc6230_device::write(offs_t offset, uint8_t data)
 int32_t huc6230_device::vca_step_time(int32_t level)
 {
 	// 1.49us per step at 512 and up, doubling for each lower octave; the last step to/from 0 takes 2956.16us
-	if (level >= 512) return 32;
-	if (level >= 256) return 64;
-	if (level >= 128) return 128;
-	if (level >= 64) return 256;
-	if (level >= 32) return 512;
-	if (level >= 16) return 1024;
+	if (level >= 512)
+		return 32;
+	if (level >= 256)
+		return 64;
+	if (level >= 128)
+		return 128;
+	if (level >= 64)
+		return 256;
+	if (level >= 32)
+		return 512;
+	if (level >= 16)
+		return 1024;
 	return 63490;
 }
 
@@ -151,14 +157,14 @@ void huc6230_device::vca_run(int ch, int32_t clocks)
 */
 TIMER_CALLBACK_MEMBER(huc6230_device::adpcm_timer)
 {
-	static const int step_sizes[49] =
+	static constexpr int STEP_SIZES[49] =
 	{
 		16, 17, 19, 21, 23, 25, 28, 31, 34, 37, 41, 45, 50,
 		55, 60, 66, 73, 80, 88, 97, 107, 118, 130, 143, 157,
 		173, 190, 209, 230, 253, 279, 307, 337, 371, 408, 449,
 		494, 544, 598, 658, 724, 796, 876, 963, 1060, 1166, 1282, 1411, 1552
 	};
-	static const int step_index_deltas[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
+	static constexpr int STEP_INDEX_DELTAS[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
 
 	for (int adpcm = 0; adpcm < 2; adpcm++)
 	{
@@ -174,12 +180,12 @@ TIMER_CALLBACK_MEMBER(huc6230_device::adpcm_timer)
 			else
 			{
 				const u8 nibble = input & 0xf;
-				channel->m_delta = step_sizes[channel->m_step_index] * ((nibble & 7) + 1);
+				channel->m_delta = STEP_SIZES[channel->m_step_index] * ((nibble & 7) + 1);
 				if (interpolate)
 					channel->m_delta >>= rate;
 				if (BIT(nibble, 3))
 					channel->m_delta = -channel->m_delta;
-				channel->m_step_index = std::clamp(channel->m_step_index + step_index_deltas[nibble & 7], 0, 48);
+				channel->m_step_index = std::clamp(channel->m_step_index + STEP_INDEX_DELTAS[nibble & 7], 0, 48);
 			}
 			channel->m_delta_count = interpolate ? (1 << rate) : 1;
 		}
