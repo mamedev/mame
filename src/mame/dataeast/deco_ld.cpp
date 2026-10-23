@@ -114,6 +114,7 @@ Sound processor - 6502
 #include "machine/gen_latch.h"
 #include "machine/ldp1000.h"
 #include "sound/ay8910.h"
+#include "sound/flt_biquad.h"
 
 #include "emupal.h"
 #include "speaker.h"
@@ -629,7 +630,12 @@ void deco_ld_state::rblaster(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 0x40);
 
 	/* sound hardware */
-	// TODO: mixing with laserdisc
+	// VDO-2 sheets 9 and 10: channel A of both chips goes through a 1k/3k bridge to a 4558 bandpass per side
+	// (left: C98 1u, R21 1k, R19 10k, R20 47k, C34/C35 0.068u; right: the same values), channels B and C through
+	// a 1k/3k ring whose ends (ay1 C, ay2 B) feed the summing amplifiers. The routes and filters fit a nodal
+	// analysis of the network (AY outputs as current sources): the bridge and the 1u coupling capacitor load
+	// each bandpass, giving 240 Hz and Q 1.74 rather than about 360 Hz and Q 3.6. The laserdisc audio comes in
+	// through trimmers, so its level against the AYs isn't fixed by the circuit.
 	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -637,9 +643,24 @@ void deco_ld_state::rblaster(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	AY8910(config, "ay1", 12_MHz_XTAL / 4 / 2).add_route(ALL_OUTPUTS, "speaker", 0.25, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
+	FILTER_BIQUAD(config, "bandpass_l").setup(filter_biquad_device::biquad_type::BANDPASS, 240, 1.74, 1.0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_BIQUAD(config, "bandpass_r").setup(filter_biquad_device::biquad_type::BANDPASS, 240, 1.74, 1.0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	AY8910(config, "ay2", 12_MHz_XTAL / 4 / 2).add_route(ALL_OUTPUTS, "speaker", 0.25, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
+	ay8910_device &ay1(AY8910(config, "ay1", 12_MHz_XTAL / 4 / 2));
+	ay1.add_route(0, "bandpass_l", 1.6);
+	ay1.add_route(0, "bandpass_r", 0.81);
+	ay1.add_route(1, "speaker", 0.099, 0);
+	ay1.add_route(1, "speaker", 0.034, 1);
+	ay1.add_route(2, "speaker", 0.22, 0);
+	ay1.add_route(2, "speaker", 0.046, 1);
+
+	ay8910_device &ay2(AY8910(config, "ay2", 12_MHz_XTAL / 4 / 2));
+	ay2.add_route(0, "bandpass_l", 0.81);
+	ay2.add_route(0, "bandpass_r", 1.6);
+	ay2.add_route(1, "speaker", 0.046, 0);
+	ay2.add_route(1, "speaker", 0.22, 1);
+	ay2.add_route(2, "speaker", 0.034, 0);
+	ay2.add_route(2, "speaker", 0.099, 1);
 }
 
 void deco_ld_state::cobraa(machine_config &config)
