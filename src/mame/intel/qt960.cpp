@@ -363,7 +363,13 @@ void qt960_state::qt960(machine_config &config)
 
 ROM_START(qt960)
 	ROM_REGION32_LE(0x20000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("nindy.bin", 0x00000, 0x20000, CRC(325251fe) SHA1(eda16ca24366b95d857bb3442fdb41f500f805a8))
+	// NINDY 3.01, Intel's QT0.HEX-QT3.HEX images from the QT960 v2.1 kit disk. The EPROMs
+	// are 16-bit 27C202s in two interleaved banks: bank 0 (U33 DB0-15, U34 DB16-31) holds
+	// the words at A2=0 and bank 1 (U43, U44) the words at A2=1.
+	ROMX_LOAD("qt0.u33", 0x00000, 0x8000, CRC(c2c5a74f) SHA1(be10fa38e1c13dd89ff4586d3e03495bc22a73a6), ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD("qt1.u34", 0x00002, 0x8000, CRC(7323aebb) SHA1(3f436a0e9860548fd137503d40e026bcdc7aeeaa), ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD("qt2.u43", 0x00004, 0x8000, CRC(6f7fcc7a) SHA1(401836cc6f5e9604e30a94514b77d3635babdeb7), ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD("qt3.u44", 0x00006, 0x8000, CRC(9dbcab8d) SHA1(98af1bb7897fb82b1360e48ebe8998e3a4103a7c), ROM_GROUPWORD | ROM_SKIP(6))
 ROM_END
 
 } // anonymous namespace
