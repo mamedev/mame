@@ -14,7 +14,6 @@
     PC Engine host path (mamedev/mame#11078).
 
     TODO:
-    - MESSAGE OUT accepts only ABORT
     - Scan (d2h)
     - Seek times
     - Real sub-channel data, Q is synthesized from the play position and
@@ -26,6 +25,8 @@
 #include "pcfxcd.h"
 
 #include "multibyte.h"
+
+#include <algorithm>
 
 #define LOG_CMD            (1U << 1)
 #define LOG_CDDA           (1U << 2)
@@ -226,15 +227,15 @@ void nscsi_cdrom_pcfx_device::scsi_command()
 		case SC_INQUIRY:
 		{
 			// games check for this drive by its INQUIRY data (batlheat)
-			static const u8 inquiry[36] =
+			static constexpr u8 INQUIRY[36] =
 			{
 				0x05, 0x80, 0x02, 0x00, 0x1f, 0x00, 0x00, 0x00,
 				'N', 'E', 'C', ' ', ' ', ' ', ' ', ' ',
 				'C', 'D', '-', 'R', 'O', 'M', ' ', 'D', 'R', 'I', 'V', 'E', ':', 'F', 'X', ' ',
 				'1', '.', '0', ' '
 			};
-			const int size = std::min<int>(m_scsi_cmdbuf[4], sizeof(inquiry));
-			std::copy_n(inquiry, size, m_scsi_cmdbuf);
+			const int size = std::min<int>(m_scsi_cmdbuf[4], sizeof(INQUIRY));
+			std::copy_n(INQUIRY, size, m_scsi_cmdbuf);
 			scsi_data_in(SBUF_MAIN, size);
 			scsi_status_complete(SS_GOOD);
 			break;
@@ -463,12 +464,6 @@ void nscsi_cdrom_pcfx_device::nec_set_audio_start_position()
 	u8 cdb[10];
 	std::copy_n(m_scsi_cmdbuf, 10, cdb);
 
-	if (!image->exists())
-	{
-		return_no_cd();
-		return;
-	}
-
 	u32 lba;
 	if (!nec_address(cdb, lba) || lba > image->get_track_start(0xaa))
 	{
@@ -482,7 +477,9 @@ void nscsi_cdrom_pcfx_device::nec_set_audio_start_position()
 	cdda->set_output_gain(ALL_OUTPUTS, 1.0);
 	nec_play(lba, image->get_track_start(0xaa));
 	if (BIT(cdb[1], 0))
+	{
 		set_cdda_status(CDDA_PLAYING);
+	}
 	else
 	{
 		cdda->pause_audio(1);
@@ -499,12 +496,6 @@ void nscsi_cdrom_pcfx_device::nec_set_audio_end_position()
 {
 	u8 cdb[10];
 	std::copy_n(m_scsi_cmdbuf, 10, cdb);
-
-	if (!image->exists())
-	{
-		return_no_cd();
-		return;
-	}
 
 	if (m_cdda_status == CDDA_STOPPED)
 	{
@@ -535,12 +526,6 @@ void nscsi_cdrom_pcfx_device::nec_set_audio_end_position()
 // dah: still (pause during play)
 void nscsi_cdrom_pcfx_device::nec_pause()
 {
-	if (!image->exists())
-	{
-		return_no_cd();
-		return;
-	}
-
 	if (m_cdda_status == CDDA_STOPPED)
 	{
 		report_condition(SK_ILLEGAL_REQUEST, NEC_SKC_AUDIO_NOT_PLAYING);
@@ -559,12 +544,6 @@ void nscsi_cdrom_pcfx_device::nec_read_subq()
 {
 	u8 cdb[10];
 	std::copy_n(m_scsi_cmdbuf, 10, cdb);
-
-	if (!image->exists())
-	{
-		return_no_cd();
-		return;
-	}
 
 	u8 q[12];
 	make_subq((m_cdda_status == CDDA_STOPPED) ? m_cdda_start : cdda->get_audio_lba(), q);
@@ -648,12 +627,6 @@ void nscsi_cdrom_pcfx_device::nec_get_dir_info()
 	u8 cdb[10];
 	std::copy_n(m_scsi_cmdbuf, 10, cdb);
 
-	if (!image->exists())
-	{
-		return_no_cd();
-		return;
-	}
-
 	LOGCMD("0xde GET DIR INFO (NEC): type %d track %02x\n", cdb[1] & 3, cdb[2]);
 
 	const int last_track = image->get_last_track();
@@ -718,8 +691,10 @@ void nscsi_cdrom_pcfx_device::nec_get_dir_info()
 			if (!match || match == 0xa2)
 				entry(0xa2, image->get_track_start(0xaa), control(last_track - 1));
 			if (!match)
+			{
 				for (int track = 1; track <= last_track; track++)
 					entry(to_bcd(track), image->get_track_start(track - 1), control(track - 1));
+			}
 			if (match == 0xb0)
 				offset += 0x14;
 

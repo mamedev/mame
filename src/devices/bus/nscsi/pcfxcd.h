@@ -37,6 +37,9 @@ protected:
 	virtual attotime scsi_data_command_delay() override;   // READ: wait for the first sector
 
 private:
+	// read sub-channel Q status codes
+	enum : u8 { CDDA_PLAYING = 0, CDDA_STILL = 1, CDDA_PAUSED = 2, CDDA_STOPPED = 3 };
+
 	// NEC audio commands
 	void nec_set_audio_start_position();   // d8h
 	void nec_set_audio_end_position();     // d9h
@@ -57,8 +60,8 @@ private:
 	void set_cdda_status(u8 status);       // the sub-code stream runs while playing
 	TIMER_CALLBACK_MEMBER(subcode_tick);
 
-	// read sub-channel Q status codes
-	enum : u8 { CDDA_PLAYING = 0, CDDA_STILL = 1, CDDA_PAUSED = 2, CDDA_STOPPED = 3 };
+	void start_read(u32 blocks);
+	attotime next_sector_wait();
 
 	u8 m_cdda_status;
 	bool m_cdda_loop;
@@ -74,9 +77,6 @@ private:
 	// after scsi_command() has returned, by which point a data-in command has overwritten the
 	// buffer with its response
 	u8 m_command;
-
-	void start_read(u32 blocks);
-	attotime next_sector_wait();
 
 	// data reads: sectors still to be read from the disc, sectors waiting in the
 	// read-ahead buffer, when the sector being read is done, and the wait to apply
