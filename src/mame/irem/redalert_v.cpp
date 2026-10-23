@@ -389,10 +389,10 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rg
 			else
 				pen = pens[((charmap_code & 0xfe) << 1) | color_prom_a0_a1];
 
-			if (*m_video_control & 0x04)
-				bitmap.pix(y ^ 0xff, x ^ 0xff) = pen;
-			else
-				bitmap.pix(y, x) = pen;
+			int const x_dst = (*m_video_control & 0x04) ? (x ^ 0xff) : x;
+			int const y_dst = (*m_video_control & 0x04) ? (y ^ 0xff) : y;
+			if (cliprect.contains(x_dst, y_dst))
+				bitmap.pix(y_dst, x_dst) = pen;
 
 			/* next pixel */
 			x++;
@@ -411,7 +411,6 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rg
 	if(control&1)
 	{
 		// TODO: pinpoint what the unknown bits are for (more zooming? color offset?)
-		// TODO: layer is offset wrt bullets collision
 		// Note: boss second form has even more offsetted collision (hence bigger?)
 		int width = (control&2)?8:4;
 		int base = 0x1400;
@@ -438,9 +437,10 @@ uint32_t redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rg
 								// cfr. boss first form (when opens the eye)
 								// or second form (follows player position)
 								int y_dst = 8*width - (y_block*8+iy);
-								int x_dst = 8*width - (x_block*8+7-ix);
+								int x_dst = -(x_block*8+7-ix);
 								ccc=pens[NUM_CHARMAP_PENS+ccc];
-								bitmap.pix(y+y_dst, x+x_dst) = ccc;
+								if (cliprect.contains(x+x_dst, y+y_dst))
+									bitmap.pix(y+y_dst, x+x_dst) = ccc;
 							}
 
 							l0<<=1;
