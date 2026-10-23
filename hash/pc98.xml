@@ -25351,7 +25351,7 @@ Optional [AMD-98] support, doesn't really use AY3
 	</software>
 
 	<software name="okhotsk">
-		<description>Hokkaidou Rensa Satsujin - Okhotsk ni Shoyu (Jpn)</description>
+		<description>Hokkaidou Rensa Satsujin - Okhotsk ni Shoyu</description>
 		<year>1985</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="北海道連鎖殺人 オホーツクに消ゆ" />
@@ -61229,7 +61229,7 @@ Untested on [HDD] install
 	</software>
 
 	<software name="picarrot" supported="no">
-		<description>Pia Carrot e Youkoso!! - We've Been Waiting for You (Jpn)</description>
+		<description>Pia Carrot e Youkoso!! - We've Been Waiting for You</description>
 		<year>1996</year>
 		<publisher>カクテル・ソフト (Cocktail Soft)</publisher>
 		<info name="alt_title" value="Ｐｉａキャロットへようこそ！！ ～Ｗｅ＇ｖｅ ｂｅｅｎ Ｗａｉｔｉｎｇ ｆｏｒ ｙｏｕ～" />
