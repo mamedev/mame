@@ -1,13 +1,16 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// copyright-holders:Angelo Salese, bugjosh
 /***************************************************************************
 
 Bega's Battle (c) 1983 Data East Corporation
 
 preliminary driver by Angelo Salese
 
+In begas, cobra and rblaster, the main CPU controls a Sony LDP-1000 or
+LDP-1000A player through the 6850 ACIA, whose receive interrupt is its only
+IRQ (the coins are on NMI). The player is emulated as the LDP-1000A.
+
 TODO:
-- laserdisc hook-up and 6850 comms;
 - "SOUND TEST READ ERROR";
 - video color offsets are a mystery, where it gets calculated from?
 - Bega's Battle VBLANK hack;
@@ -108,11 +111,14 @@ Sound processor - 6502
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
-#include "sound/ay8910.h"
-#include "machine/ldp1000.h"
-#include "machine/gen_latch.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
+#include "machine/gen_latch.h"
+#include "machine/ldp1000hle.h"
+#include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "speaker.h"
 #include "tilemap.h"
@@ -127,7 +133,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_laserdisc(*this, "laserdisc")
-		//, m_acia(*this, "acia")
+		, m_acia(*this, "acia")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -137,7 +143,8 @@ public:
 		, m_attr(*this, "attr%u", 0U)
 	{ }
 
-	void rblaster(machine_config &config);
+	void rblaster(machine_config &config) ATTR_COLD;
+	void cobraa(machine_config &config) ATTR_COLD;
 
 	int begas_vblank_r();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
@@ -149,8 +156,8 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
-	required_device<sony_ldp1000_device> m_laserdisc;
-	//required_device<acia6850_device> m_acia;
+	required_device<sony_ldp1000hle_device> m_laserdisc;
+	required_device<acia6850_device> m_acia;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -165,7 +172,6 @@ private:
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 
-	uint8_t acia_status_hack_r();
 	uint8_t sound_status_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -274,12 +280,6 @@ uint8_t deco_ld_state::sound_status_r()
 	return 0xff ^ 0x40;
 }
 
-// TODO: needs LD BIOS dumped
-uint8_t deco_ld_state::acia_status_hack_r()
-{
-	return 0xff;
-}
-
 void deco_ld_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
@@ -289,9 +289,7 @@ void deco_ld_state::main_map(address_map &map)
 	map(0x1003, 0x1003).portr("IN1");
 	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1005, 0x1005).r(FUNC(deco_ld_state::sound_status_r));
-	//map(0x1006, 0x1007).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0x1006, 0x1006).r(FUNC(deco_ld_state::acia_status_hack_r));
-	map(0x1007, 0x1007).rw(m_laserdisc, FUNC(sony_ldp1000_device::status_r), FUNC(sony_ldp1000_device::command_w));
+	map(0x1006, 0x1007).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x1800, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2000, 0x23ff).mirror(0x800).ram().w(FUNC(deco_ld_state::vram_w<0>)).share(m_vram[0]);
 	map(0x2400, 0x27ff).mirror(0x800).ram().w(FUNC(deco_ld_state::attr_w<0>)).share(m_attr[0]);
@@ -473,7 +471,6 @@ void deco_ld_state::rblaster(machine_config &config)
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 8000000/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_ld_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(deco_ld_state::irq0_line_hold));
 
 	M6502(config, m_audiocpu, 8000000/2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &deco_ld_state::sound_map);
@@ -481,7 +478,20 @@ void deco_ld_state::rblaster(machine_config &config)
 
 //  config.set_maximum_quantum(attotime::from_hz(6000));
 
-	SONY_LDP1000(config, m_laserdisc);
+	// the games talk to the player through the ACIA, whose receive interrupt is the only IRQ source
+	ACIA6850(config, m_acia);
+	m_acia->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
+	m_acia->txd_handler().set(m_laserdisc, FUNC(sony_ldp1000hle_device::rx_w));
+
+	// 9.8304 MHz divided by 128 by the LS163s at 15D and 16D on VDO-2; the games program the ACIA for
+	// divide-by-64, giving the player's factory setting of 1200 baud
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 9.8304_MHz_XTAL / 128));
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
+
+	SONY_LDP1000HLE(config, m_laserdisc);
+	m_laserdisc->set_baud(1200);
+	m_laserdisc->serial_tx().set(m_acia, FUNC(acia6850_device::write_rxd));
 	m_laserdisc->set_overlay(256, 256, FUNC(deco_ld_state::screen_update));
 	//m_laserdisc->set_overlay_clip(0, 256-1, 8, 240-1);
 	m_laserdisc->add_route(0, "speaker", 1.0, 0);
@@ -491,10 +501,6 @@ void deco_ld_state::rblaster(machine_config &config)
 	m_laserdisc->add_ntsc_screen(config, "screen");
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rblaster);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 0x800);
-
-	//ACIA6850(config, m_acia);
-	//m_acia->txd_handler().set("laserdisc", FUNC(sony_ldp1000_device::write));
-	//m_acia->rxd_handler().set("laserdisc", FUNC(sony_ldp1000_device::read));
 
 	/* sound hardware */
 	// TODO: mixing with laserdisc
@@ -508,6 +514,18 @@ void deco_ld_state::rblaster(machine_config &config)
 	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.25, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 
 	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.25, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
+}
+
+void deco_ld_state::cobraa(machine_config &config)
+{
+	rblaster(config);
+
+	// TODO: cobraa drives a Pioneer LD-V1000 and has its own PROMs and PALs (VD0-C, VD0-T, LP4-1, LP4-2): it
+	// never touches the ACIA, sends LD-V1000 commands to 0x1004 with a handshake on bits 5 and 6 of 0x1001
+	// (0xe50b-0xe527), and checks for LD-V1000 status codes (0xe53d-0xe5f1)
+	// keep the vblank IRQ it had, as its IRQ handler doesn't use the ACIA
+	m_acia->irq_handler().set_nop();
+	m_maincpu->set_vblank_int("screen", FUNC(deco_ld_state::irq0_line_hold));
 }
 
 /***************************************************************************
@@ -669,6 +687,6 @@ ROM_END
 GAME( 1983, begas,    0,     rblaster, begas,    deco_ld_state, empty_init, ROT0, "Data East", "Bega's Battle (Revision 3)", MACHINE_NOT_WORKING )
 GAME( 1983, begas1,   begas, rblaster, begas,    deco_ld_state, empty_init, ROT0, "Data East", "Bega's Battle (Revision 1)", MACHINE_NOT_WORKING )
 GAME( 1984, cobra,    0,     rblaster, cobra,    deco_ld_state, empty_init, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", MACHINE_NOT_WORKING )
-GAME( 1984, cobraa,   cobra, rblaster, cobra,    deco_ld_state, empty_init, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", MACHINE_NOT_WORKING ) // might be a prototype
+GAME( 1984, cobraa,   cobra, cobraa,   cobra,    deco_ld_state, empty_init, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", MACHINE_NOT_WORKING ) // might be a prototype
 // Thunder Storm (Cobra Command Japanese version)
 GAME( 1985, rblaster, 0,     rblaster, rblaster, deco_ld_state, empty_init, ROT0, "Data East", "Road Blaster (Data East LD)", MACHINE_NOT_WORKING )
