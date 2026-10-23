@@ -23491,6 +23491,9 @@ vigilanto
 compclr2
 compclr2a
 
+@source:itautec/i7000.cpp
+i7000
+
 @source:itech/capbowl.cpp
 bowlrama
 capbowl
@@ -44206,9 +44209,6 @@ poemgolf
 poemspoo
 poemzet
 poemzet2
-
-@source:skeleton/i7000.cpp
-i7000
 
 @source:skeleton/iam2.cpp
 szjl
