@@ -1280,8 +1280,9 @@ void upd765_family_device::live_run(attotime limit)
 			break;
 
 		case WRITE_TRACK_PRE_SECTORS:
+			// C, H, R and N for every sector, requested as a single transfer
 			if(!cur_live.byte_counter && command[3])
-				fifo_expect(4, true);
+				fifo_expect(4 * command[3], true);
 			if(mfm) {
 				if(cur_live.byte_counter < 80)
 					live_write_mfm(0x4e);
@@ -1319,10 +1320,8 @@ void upd765_family_device::live_run(attotime limit)
 			break;
 
 		case WRITE_TRACK_SECTOR:
-			if(!cur_live.byte_counter) {
+			if(!cur_live.byte_counter)
 				command[3]--;
-				fifo_expect(4, true);
-			}
 			if(mfm) {
 				if(cur_live.byte_counter < 12)
 					live_write_mfm(0x00);
