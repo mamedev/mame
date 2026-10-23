@@ -82,13 +82,14 @@ enum
 class v810_device : public cpu_device
 {
 public:
-	// construction/destruction
-	v810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	// optional bus timing: when set, the core charges opcode fetches (and models the
 	// instruction cache) and asks the callback for the wait states of every bus access
 	enum : int { BUS_FETCH, BUS_READ, BUS_WRITE, BUS_IO_READ, BUS_IO_WRITE };
 	using bus_wait_delegate = device_delegate<int (offs_t address, int access, int size)>;
+
+	// construction/destruction
+	v810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	template <typename... T> void set_bus_wait_callback(T &&... args) { m_bus_wait.set(std::forward<T>(args)...); }
 
 protected:
@@ -112,6 +113,8 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
+	enum : u8 { LAST_OTHER, LAST_LD, LAST_ST, LAST_OUT };
+
 	typedef uint32_t (v810_device::*opcode_func)(uint32_t op);
 	static const opcode_func s_OpCodeTable[64];
 
@@ -129,8 +132,6 @@ private:
 	// set by a fatal exception: halted until reset (the HALT instruction is not modelled yet)
 	bool m_halted;
 
-	enum : u8 { LAST_OTHER, LAST_LD, LAST_ST, LAST_OUT };
-
 	bus_wait_delegate m_bus_wait;
 	bool m_bus_timing;
 	u8 m_lastop;
@@ -141,7 +142,7 @@ private:
 
 	inline uint16_t fetch_op(offs_t addr, int cycles);
 	inline uint32_t mem_cycles(offs_t addr, int access, int size, int base, int pair, u8 kind);
-	void icache_clear(unsigned start, unsigned count);
+	void icache_clear(u32 start, u32 count);
 
 	inline void SETREG(uint32_t reg,uint32_t val);
 	inline uint32_t GETREG(uint32_t reg);

@@ -210,8 +210,8 @@ inline uint16_t v810_device::fetch_op(offs_t addr, int cycles)
 	{
 		if (BIT(CHCW, 1))
 		{
-			const unsigned index = (addr >> 3) & 0x7f;
-			const unsigned sub = BIT(addr, 2);
+			const u32 index = (addr >> 3) & 0x7f;
+			const u32 sub = BIT(addr, 2);
 			if (m_icache_tag[index] != (addr >> 10))
 			{
 				m_icache_tag[index] = addr >> 10;
@@ -239,9 +239,9 @@ inline uint32_t v810_device::mem_cycles(offs_t addr, int access, int size, int b
 	return cycles;
 }
 
-void v810_device::icache_clear(unsigned start, unsigned count)
+void v810_device::icache_clear(u32 start, u32 count)
 {
-	for (unsigned i = start; i < start + count && i < 128; i++)
+	for (u32 i = start; i < start + count && i < 128; i++)
 	{
 		m_icache_tag[i] = ~0U;
 		m_icache_valid[i][0] = m_icache_valid[i][1] = false;
