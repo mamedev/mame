@@ -631,7 +631,7 @@ private:
 	void alp_irq_w(unsigned channel, int state);
 	void serial_ready_w(offs_t offset, u8 data);
 	void serial_rts_w(unsigned channel, int state);
-	void update_serial_rts();
+	void update_serial_rts(unsigned channel);
 	void timer_w(int state);
 	void ss2_scc_irq_w(int state);
 	void dma_hrq_w(unsigned dma, int state);
@@ -690,7 +690,7 @@ private:
 };
 
 
-static INPUT_PORTS_START( secoinsa20 )
+INPUT_PORTS_START( secoinsa20 )
 	PORT_START("CONFIG")
 	PORT_DIPNAME(0x01, 0x00, "Diagnostic language")
 	PORT_DIPSETTING(0x00, "Spanish")
@@ -710,7 +710,7 @@ static INPUT_PORTS_START( secoinsa20 )
 	PORT_DIPUNKNOWN(0x80, 0x00)
 INPUT_PORTS_END
 
-static DEVICE_INPUT_DEFAULTS_START(terminal)
+DEVICE_INPUT_DEFAULTS_START(terminal)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_19200)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_19200)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_7)
@@ -718,7 +718,7 @@ static DEVICE_INPUT_DEFAULTS_START(terminal)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
 DEVICE_INPUT_DEFAULTS_END
 
-static DEVICE_INPUT_DEFAULTS_START(null_modem)
+DEVICE_INPUT_DEFAULTS_START(null_modem)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_19200)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_19200)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_7)
@@ -728,14 +728,14 @@ static DEVICE_INPUT_DEFAULTS_START(null_modem)
 DEVICE_INPUT_DEFAULTS_END
 
 // as set up by the DIS22 printer driver
-static DEVICE_INPUT_DEFAULTS_START(printer)
+DEVICE_INPUT_DEFAULTS_START(printer)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_9600)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_ODD)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
 DEVICE_INPUT_DEFAULTS_END
 
-static void secoinsa20_terminals(device_slot_interface &device)
+void secoinsa20_terminals(device_slot_interface &device)
 {
 	default_rs232_devices(device);
 	device.option_add("secoinsa", SECOINSA20_TERMINAL);
@@ -806,19 +806,18 @@ void secoinsa20_state::alp_irq_w(unsigned channel, int state)
 void secoinsa20_state::serial_ready_w(offs_t offset, u8 data)
 {
 	m_serial_ready = (m_serial_ready & ~(1U << offset)) | (BIT(data, 0) << offset);
-	update_serial_rts();
+	update_serial_rts(offset);
 }
 
 void secoinsa20_state::serial_rts_w(unsigned channel, int state)
 {
 	m_serial_rts = (m_serial_rts & ~(1U << channel)) | ((state ? 1U : 0U) << channel);
-	update_serial_rts();
+	update_serial_rts(channel);
 }
 
-void secoinsa20_state::update_serial_rts()
+void secoinsa20_state::update_serial_rts(unsigned channel)
 {
-	for (unsigned i = 0; i < 4; i++)
-		m_alp_ports[i]->write_rts(BIT(m_serial_rts, i) || !BIT(m_serial_ready, i));
+	m_alp_ports[channel]->write_rts(BIT(m_serial_rts, channel) || !BIT(m_serial_ready, channel));
 }
 
 void secoinsa20_state::dma_hrq_w(unsigned dma, int state)
@@ -854,7 +853,7 @@ u8 *secoinsa20_state::dma_ram(u8 page, offs_t offset)
 {
 	if (offset < 0x4000)
 		return &m_common_ram[offset];
-	unsigned const bank = page & 0x0f;
+	u8 const bank = page & 0x0f;
 	return (bank < 5) ? &m_bank_ram[(bank * 0xc000) + offset - 0x4000] : nullptr;
 }
 
@@ -942,7 +941,7 @@ void secoinsa20_state::ss2_scc_irq_w(int state)
 u8 secoinsa20_state::ss2_status_r()
 {
 	// TODO: other sources (power, temperature) and their priority
-	return m_ss2_scc_irq ? 0xe0 : m_timer_irq ? 0xc0 : 0x00;
+	return m_ss2_scc_irq ? 0xe0 : (m_timer_irq ? 0xc0 : 0x00);
 }
 
 void secoinsa20_state::ss2_control_w(u8 data)
@@ -959,10 +958,10 @@ void secoinsa20_state::io_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x000f).mirror(0xff00).rw(m_dma[0], FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0010, 0x001f).mirror(0xff00).rw(m_dma[1], FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-	map(0x0020, 0x0023).mirror(0xff00).lw8(NAME([this](offs_t offset, u8 data) { m_dma_page[offset] = data; }));
+	map(0x0020, 0x0023).mirror(0xff00).lw8(NAME([this] (offs_t offset, u8 data) { m_dma_page[offset] = data; }));
 	map(0x0024, 0x0027).mirror(0xff00).w(FUNC(secoinsa20_state::serial_ready_w));
-	map(0x002e, 0x002f).mirror(0xff00).lw8(NAME([this](offs_t offset, u8 data) { alp_irq_w(2 + offset, 0); }));
-	map(0x002c, 0x002c).mirror(0xff00).lr8(NAME([this]() -> u8 { return m_alp_irq; }));
+	map(0x002e, 0x002f).mirror(0xff00).lw8(NAME([this] (offs_t offset, u8 data) { alp_irq_w(2 + offset, 0); }));
+	map(0x002c, 0x002c).mirror(0xff00).lr8(NAME([this] () -> u8 { return m_alp_irq; }));
 	map(0x0030, 0x0033).mirror(0xff00).rw(m_scc[0], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
 	map(0x0034, 0x0037).mirror(0xff00).rw(m_scc[1], FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
 	map(0x0060, 0x0060).mirror(0xff00).rw(FUNC(secoinsa20_state::ss2_status_r), FUNC(secoinsa20_state::ss2_control_w));
@@ -986,7 +985,8 @@ void secoinsa20_state::machine_reset()
 	m_boot_view.select(0);
 
 	m_serial_ready = 0x0f;
-	update_serial_rts();
+	for (unsigned i = 0; i < 4; i++)
+		update_serial_rts(i);
 
 	// timer and DMA end-of-process latches
 	m_timer_irq = false;
@@ -1033,7 +1033,7 @@ void secoinsa20_state::machine_start()
 	save_item(NAME(m_fdc_drq));
 }
 
-static void secoinsa20_floppies(device_slot_interface &device)
+void secoinsa20_floppies(device_slot_interface &device)
 {
 	device.option_add("525hd", FLOPPY_525_HD);
 	device.option_add("525qd", FLOPPY_525_QD);
@@ -1054,14 +1054,14 @@ void secoinsa20_state::secoinsa20(machine_config &config)
 	{
 		AM9517A(config, m_dma[i], 4_MHz_XTAL);
 		m_dma[i]->dreq_active_low();
-		m_dma[i]->out_hreq_callback().set([this, i](int state) { dma_hrq_w(i, state); });
-		m_dma[i]->out_eop_callback().set([this, i](int state) { if (state) alp_irq_w(2 + i, 1); });
-		m_dma[i]->in_memr_callback().set([this, i](offs_t offset) { return dma_memory_r(i, offset); });
-		m_dma[i]->out_memw_callback().set([this, i](offs_t offset, u8 data) { dma_memory_w(i, offset, data); });
-		m_dma[i]->out_dack_callback<0>().set([this, i](int state) { if (!state) m_dma_channel[i] = 0; });
-		m_dma[i]->out_dack_callback<1>().set([this, i](int state) { if (!state) m_dma_channel[i] = 1; });
-		m_dma[i]->out_dack_callback<2>().set([this, i](int state) { if (!state) m_dma_channel[i] = 2; });
-		m_dma[i]->out_dack_callback<3>().set([this, i](int state) { if (!state) m_dma_channel[i] = 3; });
+		m_dma[i]->out_hreq_callback().set([this, i] (int state) { dma_hrq_w(i, state); });
+		m_dma[i]->out_eop_callback().set([this, i] (int state) { if (state) alp_irq_w(2 + i, 1); });
+		m_dma[i]->in_memr_callback().set([this, i] (offs_t offset) { return dma_memory_r(i, offset); });
+		m_dma[i]->out_memw_callback().set([this, i] (offs_t offset, u8 data) { dma_memory_w(i, offset, data); });
+		m_dma[i]->out_dack_callback<0>().set([this, i] (int state) { if (!state) m_dma_channel[i] = 0; });
+		m_dma[i]->out_dack_callback<1>().set([this, i] (int state) { if (!state) m_dma_channel[i] = 1; });
+		m_dma[i]->out_dack_callback<2>().set([this, i] (int state) { if (!state) m_dma_channel[i] = 2; });
+		m_dma[i]->out_dack_callback<3>().set([this, i] (int state) { if (!state) m_dma_channel[i] = 3; });
 		m_dma[i]->out_iow_callback<0>().set(m_scc[i], FUNC(z80scc_device::da_w));
 		m_dma[i]->in_ior_callback<1>().set(m_scc[i], FUNC(z80scc_device::da_r));
 		m_dma[i]->out_iow_callback<2>().set(m_scc[i], FUNC(z80scc_device::db_w));
@@ -1070,15 +1070,15 @@ void secoinsa20_state::secoinsa20(machine_config &config)
 		SCC8530(config, m_scc[i], 4_MHz_XTAL);
 		// RTxC (SS2 oscillator / 2) inferred from the terminal drivers' baud rate tables
 		m_scc[i]->configure_channels((4.9152_MHz_XTAL / 2).value(), 0, (4.9152_MHz_XTAL / 2).value(), 0);
-		m_scc[i]->out_int_callback().set([this, i](int state) { alp_irq_w(i, state); });
+		m_scc[i]->out_int_callback().set([this, i] (int state) { alp_irq_w(i, state); });
 		m_scc[i]->out_txda_callback().set(m_alp_ports[i * 2], FUNC(rs232_port_device::write_txd));
 		m_scc[i]->out_dtra_callback().set(m_dma[i], FUNC(am9517a_device::dreq0_w));
 		m_scc[i]->out_wreqa_callback().set(m_dma[i], FUNC(am9517a_device::dreq1_w));
-		m_scc[i]->out_rtsa_callback().set([this, i](int state) { serial_rts_w(i * 2, state); });
+		m_scc[i]->out_rtsa_callback().set([this, i] (int state) { serial_rts_w(i * 2, state); });
 		m_scc[i]->out_txdb_callback().set(m_alp_ports[i * 2 + 1], FUNC(rs232_port_device::write_txd));
 		m_scc[i]->out_dtrb_callback().set(m_dma[i], FUNC(am9517a_device::dreq2_w));
 		m_scc[i]->out_wreqb_callback().set(m_dma[i], FUNC(am9517a_device::dreq3_w));
-		m_scc[i]->out_rtsb_callback().set([this, i](int state) { serial_rts_w(i * 2 + 1, state); });
+		m_scc[i]->out_rtsb_callback().set([this, i] (int state) { serial_rts_w(i * 2 + 1, state); });
 
 		RS232_PORT(config, m_alp_ports[i * 2], secoinsa20_terminals, i ? nullptr : "secoinsa");
 		m_alp_ports[i * 2]->rxd_handler().set(m_scc[i], FUNC(z80scc_device::rxa_w));
@@ -1141,13 +1141,13 @@ void secoinsa20_state::secoinsa20(machine_config &config)
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, true, true);
 	m_fdc->drq_wr_callback().set(FUNC(secoinsa20_state::fdc_drq_w));
 	// FLOPPY2 in the OS is unit 1
-	FLOPPY_CONNECTOR(config, "fdc:0", secoinsa20_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", secoinsa20_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], secoinsa20_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], secoinsa20_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
 
 	// WD1001-05 board
 	WD1000(config, m_hdc, 8_MHz_XTAL);
 	m_hdc->set_sector_base(0);
-	m_hdc->intrq_wr_callback().set([this](int state) { irq_w(4, state); });
+	m_hdc->intrq_wr_callback().set([this] (int state) { irq_w(4, state); });
 	HARDDISK(config, "hdc:0", "secoinsa20_hdd");
 	SOFTWARE_LIST(config, "hdd_list").set_original("secoinsa20");
 }
@@ -1155,7 +1155,7 @@ void secoinsa20_state::secoinsa20(machine_config &config)
 
 
 ROM_START( secoinsa20 )
-	ROM_REGION(0x20000, "maincpu", 0)
+	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD( "secoinsa_iras_3f_vo2.2_2732a.bin", 0x0000, 0x1000, CRC(50b09416) SHA1(9a799e2e6ebad484226778f41b292a66ebe45849) )
 
 	ROM_REGION(0x10000, "wd_mfm_controller", 0)
@@ -1184,4 +1184,4 @@ ROM_END
 } // Anonymous namespace
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY     FULLNAME    FLAGS
-COMP( 1981, secoinsa20, 0,      0,      secoinsa20, secoinsa20, secoinsa20_state, empty_init, "Secoinsa", "Serie 20", MACHINE_NO_SOUND_HW )
+COMP( 1981, secoinsa20, 0,      0,      secoinsa20, secoinsa20, secoinsa20_state, empty_init, "Secoinsa", "Serie 20", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

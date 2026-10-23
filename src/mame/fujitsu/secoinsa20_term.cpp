@@ -13,23 +13,23 @@
     - original character generator
     - double size lines (ESC # n is accepted but ignored)
     - blink rate
-    - Dump the keyboard ROM and implement as LLE
+    - dump the keyboard ROM and implement as LLE
 
-Keyboard layout:
+    Keyboard layout:
 
-⌈CHK ⌉⌈CYCL⌉  ⌈PF1‾⌉⌈PF2‾⌉⌈PF3‾⌉⌈PF4‾⌉⌈PF5‾⌉⌈PF6‾⌉⌈PF7‾⌉⌈PF8‾⌉⌈PF9‾⌉⌈PF10⌉⌈PF11⌉⌈PF12⌉⌈PF13⌉⌈PF14⌉⌈PF15⌉⌈PF16⌉
-⌊____⌋⌊E___⌋  ⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋
-----------------------------------------------------------------------------------------------------------
-⌈CAN‾⌉⌈CMD‾⌉⌈MOD‾⌉ ⌈‾1‾⌉⌈‾2‾⌉⌈‾3‾⌉⌈‾4‾⌉⌈‾5‾⌉⌈‾6‾⌉⌈‾7‾⌉⌈‾8‾⌉⌈‾9‾⌉⌈‾0‾⌉⌈‾'‾⌉⌈‾[‾⌉⌈‾]‾⌉   ⌈BOR‾‾⌉⌈BOR‾‾⌉⌈PAUSA⌉
-⌊____⌋⌊____⌋⌊____⌋ ⌊___⌋⌊_=_⌋⌊_#_⌋⌊_$_⌋⌊_%_⌋⌊_&_⌋⌊_-_⌋⌊_(_⌋⌊_)_⌋⌊ _ ⌋⌊_?_⌋⌊_!_⌋⌊_|_⌋   ⌊LINEA⌋⌊PANT_⌋⌊_____⌋
-⌈BOR‾⌉⌈SIG‾⌉⌈GRAB⌉ ⌈ESC⌉⌈‾Q‾⌉⌈‾W‾⌉⌈‾E‾⌉⌈‾R‾⌉⌈‾T‾⌉⌈‾Y‾⌉⌈‾U‾⌉⌈‾I‾⌉⌈‾O‾⌉⌈‾P‾⌉⌈‾@‾⌉⌈‾⇥‾⌉   ⌈‾‾7‾‾⌉⌈‾‾8‾‾⌉⌈‾‾9‾‾⌉
-⌊REG_⌋⌊REG_⌋⌊REG_⌋ ⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋   ⌊_____⌋⌊_____⌋⌊_____⌋
-⌈FIN‾⌉⌈BOR‾⌉⌈DUPL⌉ ⌈LOC⌉⌈ A ⌉⌈ S ⌉⌈ D ⌉⌈ F ⌉⌈ G ⌉⌈ H ⌉⌈ J ⌉⌈ K ⌉⌈ L ⌉⌈ Ñ ⌉⌈ * ⌉⌈RC ⌉   ⌈‾‾4‾‾⌉⌈‾‾5‾‾⌉⌈‾‾6‾‾⌉
-⌊____⌋⌊CAR_⌋⌊____⌋ ⌊K__⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋   ⌊_____⌋⌊_____⌋⌊_____⌋
-⌈PAG‾⌉⌈‾↑‾‾⌉⌈‾↓‾‾⌉ ⌈SHI⌉⌈‾Z‾⌉⌈‾X‾⌉⌈‾C‾⌉⌈‾V‾⌉⌈‾B‾⌉⌈‾N‾⌉⌈‾M‾⌉⌈‾+‾⌉⌈‾<‾⌉⌈‾?‾⌉⌈‾SHIFT‾‾⌉   ⌈‾‾1‾‾⌉⌈‾‾2‾‾⌉⌈‾‾3‾‾⌉
-⌊____⌋⌊____⌋⌊____⌋ ⌊FT_⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊________⌋   ⌊_____⌋⌊_____⌋⌊_____⌋
-⌈‾‾‾‾⌉⌈‾←‾‾⌉⌈‾→‾‾⌉      ⌈‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾SPACE BAR‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾⌉                 ⌈‾‾,‾‾⌉⌈‾‾0‾‾⌉⌈‾‾.‾‾⌉
-⌊____⌋⌊____⌋⌊____⌋      ⌊____________________________________________⌋                 ⌊_____⌋⌊_____⌋⌊_____⌋
+    ⌈CHK ⌉⌈CYCL⌉  ⌈PF1‾⌉⌈PF2‾⌉⌈PF3‾⌉⌈PF4‾⌉⌈PF5‾⌉⌈PF6‾⌉⌈PF7‾⌉⌈PF8‾⌉⌈PF9‾⌉⌈PF10⌉⌈PF11⌉⌈PF12⌉⌈PF13⌉⌈PF14⌉⌈PF15⌉⌈PF16⌉
+    ⌊____⌋⌊E___⌋  ⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋⌊____⌋
+    ----------------------------------------------------------------------------------------------------------
+    ⌈CAN‾⌉⌈CMD‾⌉⌈MOD‾⌉ ⌈‾1‾⌉⌈‾2‾⌉⌈‾3‾⌉⌈‾4‾⌉⌈‾5‾⌉⌈‾6‾⌉⌈‾7‾⌉⌈‾8‾⌉⌈‾9‾⌉⌈‾0‾⌉⌈‾'‾⌉⌈‾[‾⌉⌈‾]‾⌉   ⌈BOR‾‾⌉⌈BOR‾‾⌉⌈PAUSA⌉
+    ⌊____⌋⌊____⌋⌊____⌋ ⌊___⌋⌊_=_⌋⌊_#_⌋⌊_$_⌋⌊_%_⌋⌊_&_⌋⌊_-_⌋⌊_(_⌋⌊_)_⌋⌊ _ ⌋⌊_?_⌋⌊_!_⌋⌊_|_⌋   ⌊LINEA⌋⌊PANT_⌋⌊_____⌋
+    ⌈BOR‾⌉⌈SIG‾⌉⌈GRAB⌉ ⌈ESC⌉⌈‾Q‾⌉⌈‾W‾⌉⌈‾E‾⌉⌈‾R‾⌉⌈‾T‾⌉⌈‾Y‾⌉⌈‾U‾⌉⌈‾I‾⌉⌈‾O‾⌉⌈‾P‾⌉⌈‾@‾⌉⌈‾⇥‾⌉   ⌈‾‾7‾‾⌉⌈‾‾8‾‾⌉⌈‾‾9‾‾⌉
+    ⌊REG_⌋⌊REG_⌋⌊REG_⌋ ⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋   ⌊_____⌋⌊_____⌋⌊_____⌋
+    ⌈FIN‾⌉⌈BOR‾⌉⌈DUPL⌉ ⌈LOC⌉⌈ A ⌉⌈ S ⌉⌈ D ⌉⌈ F ⌉⌈ G ⌉⌈ H ⌉⌈ J ⌉⌈ K ⌉⌈ L ⌉⌈ Ñ ⌉⌈ * ⌉⌈RC ⌉   ⌈‾‾4‾‾⌉⌈‾‾5‾‾⌉⌈‾‾6‾‾⌉
+    ⌊____⌋⌊CAR_⌋⌊____⌋ ⌊K__⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋   ⌊_____⌋⌊_____⌋⌊_____⌋
+    ⌈PAG‾⌉⌈‾↑‾‾⌉⌈‾↓‾‾⌉ ⌈SHI⌉⌈‾Z‾⌉⌈‾X‾⌉⌈‾C‾⌉⌈‾V‾⌉⌈‾B‾⌉⌈‾N‾⌉⌈‾M‾⌉⌈‾+‾⌉⌈‾<‾⌉⌈‾?‾⌉⌈‾SHIFT‾‾⌉   ⌈‾‾1‾‾⌉⌈‾‾2‾‾⌉⌈‾‾3‾‾⌉
+    ⌊____⌋⌊____⌋⌊____⌋ ⌊FT_⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊___⌋⌊________⌋   ⌊_____⌋⌊_____⌋⌊_____⌋
+    ⌈‾‾‾‾⌉⌈‾←‾‾⌉⌈‾→‾‾⌉      ⌈‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾SPACE BAR‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾⌉                 ⌈‾‾,‾‾⌉⌈‾‾0‾‾⌉⌈‾‾.‾‾⌉
+    ⌊____⌋⌊____⌋⌊____⌋      ⌊____________________________________________⌋                 ⌊_____⌋⌊_____⌋⌊_____⌋
 
 ***************************************************************************/
 
@@ -51,6 +51,7 @@ class secoinsa20_terminal_device : public generic_terminal_device, public device
 public:
 	secoinsa20_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	// device_rs232_port_interface implementation
 	virtual void input_txd(int state) override { device_serial_interface::rx_w(state); }
 	virtual void input_rts(int state) override;
 
@@ -124,15 +125,10 @@ secoinsa20_terminal_device::secoinsa20_terminal_device(const machine_config &mco
 	, m_rs232_databits(*this, "RS232_DATABITS")
 	, m_rs232_parity(*this, "RS232_PARITY")
 	, m_rs232_stopbits(*this, "RS232_STOPBITS")
-	, m_attributes()
-	, m_attribute(0)
-	, m_sequence(SEQ_NONE)
 	, m_column(0)
 	, m_parameters()
 	, m_parameter(0)
 	, m_keys()
-	, m_key_head(0)
-	, m_key_count(0)
 	, m_rts(true)
 {
 }
@@ -394,8 +390,8 @@ void secoinsa20_terminal_device::term_write(u8 data)
 
 void secoinsa20_terminal_device::control_sequence(u8 command)
 {
-	unsigned const n = m_parameters[0];
-	unsigned const count = n ? n : 1;
+	u16 const n = m_parameters[0];
+	u16 const count = n ? n : 1;
 	unsigned const cursor = (m_y_pos * m_width) + m_x_pos;
 
 	switch (command)
