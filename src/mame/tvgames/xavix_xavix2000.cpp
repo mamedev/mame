@@ -66,7 +66,7 @@ void xavix_state::xavix2000_4mb(machine_config &config)
 void xavix_state::xavix2000_nv(machine_config &config)
 {
 	xavix2000(config);
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 }
 
 void xavix_state::xavix2000_nv_4mb(machine_config &config)
@@ -83,14 +83,14 @@ void xavix_i2c_state::xavix2000_i2c_24c02(machine_config &config)
 {
 	xavix2000(config);
 
-	I2C_24C02(config, "i2cmem");
+	I2C_24C02(config, m_i2cmem);
 }
 
 void xavix_i2c_state::xavix2000_i2c_24c04(machine_config &config)
 {
 	xavix2000(config);
 
-	I2C_24C04(config, "i2cmem");
+	I2C_24C04(config, m_i2cmem);
 }
 
 void xavix_i2c_state::xavix2000_i2c_24c04_2mb(machine_config &config)
@@ -108,7 +108,7 @@ void xavix_i2c_state::xavix2000_i2c_24c04_4mb(machine_config &config)
 void xavix_i2c_state::xavix2000_i2c_24c08(machine_config &config)
 {
 	xavix2000(config);
-	I2C_24C08(config, "i2cmem");
+	I2C_24C08(config, m_i2cmem);
 }
 
 void xavix_i2c_state::xavix2000_i2c_24c08_4mb(machine_config &config)
@@ -759,15 +759,15 @@ void xavix2000_duelmast_state::xavix2000_duelmast(machine_config &config)
 {
 	xavix2000(config);
 
-	I2C_24C04(config, "i2cmem");
+	I2C_24C04(config, m_i2cmem);
 
 	XAVIX_DUELMAST_SCANNER(config, m_scanner, peripheral_clock());
 	m_soc->adc_input_callback<0>().set(m_scanner, FUNC(xavix_analog_image_sensor_device_base::pixel_r));
 
 	XAVIX_CART_SLOT(config, m_cartslot, xavix_cart_slot_device::cart_devices, nullptr);
 	// Reference data is used only by the optional manual card-selection aid.
-	m_scanner->card_data_callback().set([this](offs_t offset) { return m_cartslot->has_cart() ? m_cartslot->read_cart(0x0c8000 + offset) : m_rom[0x020000 + offset]; });
-	m_scanner->expanded_cards_callback().set([this]() -> int { return m_cartslot->has_cart(); });
+	m_scanner->card_data_callback().set([this] (offs_t offset) { return m_cartslot->has_cart() ? m_cartslot->read_cart(0x0c8000 + offset) : m_rom[0x020000 + offset]; });
+	m_scanner->expanded_cards_callback().set([this] () -> int { return m_cartslot->has_cart(); });
 	SOFTWARE_LIST(config, "cart_list_duelmast").set_original("duelmast_cart");
 }
 

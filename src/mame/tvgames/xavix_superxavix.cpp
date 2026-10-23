@@ -144,7 +144,7 @@ void superxavix_state::superxavix_4mb(machine_config &config)
 void superxavix_state::superxavix_nv_4mb(machine_config &config)
 {
 	superxavix_4mb(config);
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 }
 
 //-------------------------------------------------
@@ -235,7 +235,7 @@ void superxavix_i2c_state::superxavix_i2c_24c02(machine_config &config)
 {
 	superxavix(config);
 
-	I2C_24C02(config, "i2cmem");
+	I2C_24C02(config, m_i2cmem);
 }
 
 void superxavix_i2c_state::superxavix_i2c_24c02_4mb(machine_config &config)
@@ -248,7 +248,7 @@ void superxavix_i2c_state::superxavix_i2c_24c04(machine_config &config)
 {
 	superxavix(config);
 
-	I2C_24C04(config, "i2cmem");
+	I2C_24C04(config, m_i2cmem);
 }
 
 void superxavix_i2c_state::superxavix_i2c_24c04_4mb(machine_config &config)
@@ -261,14 +261,14 @@ void superxavix_i2c_state::superxavix_i2c_24c08(machine_config &config)
 {
 	superxavix(config);
 
-	I2C_24C08(config, "i2cmem");
+	I2C_24C08(config, m_i2cmem);
 }
 
 void superxavix_i2c_state::superxavix_i2c_24c16(machine_config &config)
 {
 	superxavix(config);
 
-	I2C_24C16(config, "i2cmem");
+	I2C_24C16(config, m_i2cmem);
 }
 
 void superxavix_i2c_state::io1_output_w(u8 data, u8 direction)
@@ -281,7 +281,7 @@ void superxavix_i2c_pio1_state::superxavix_i2c_24c64(machine_config &config)
 {
 	superxavix(config);
 
-	I2C_24C64(config, "i2cmem");
+	I2C_24C64(config, m_i2cmem);
 	configure_pio();
 }
 
@@ -1888,7 +1888,7 @@ void superxavix_i2c_state::superxavix_mrangbat(machine_config &config)
 	m_soc->set_external_map(*this, &superxavix_i2c_state::xavix_4mb_extbus_map);
 
 	// The factory test uses 512 bytes in 16-byte pages; TODO: identify the physical part.
-	I2C_24C04(config, "i2cmem");
+	I2C_24C04(config, m_i2cmem);
 
 	m_super_soc->pio_input_callback<0>().set_ioport("PIO0");
 	m_super_soc->pio_input_callback<1>().set_ioport("PIO1");

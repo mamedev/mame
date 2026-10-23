@@ -22,9 +22,67 @@ public:
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 
+	using xavix_interrupt_vector_delegate = device_delegate<int16_t (int source, int low_byte)>;
+
+	template <typename... T> void set_interrupt_vector_callback(T &&... args) { m_interrupt_vector_callback.set(std::forward<T>(args)...); }
+	void set_data_address_mask(u32 mask) { m_data_address_mask = mask; }
+
+	uint8_t read_banked_data(uint8_t databank, uint16_t addr);
+	uint8_t read_banked_data(uint32_t addr);
+	void write_banked_data(uint8_t databank, uint16_t adr, uint8_t val);
+	void write_banked_data(uint32_t addr, uint8_t val);
+	// Other bus masters bypass CPU buffering and wait states.
+	void write_banked_data_raw(uint32_t addr, uint8_t val);
+
+protected:
+	enum {
+		XAVIX_DATABANK = M6502_IR+1,
+		XAVIX_CODEBANK,
+	};
+
+	class mi_xavix : public memory_interface {
+	public:
+		xavix_device *m_base;
+
+		mi_xavix(xavix_device *base);
+
+		virtual uint8_t read(uint16_t adr) override;
+		virtual uint8_t read_sync(uint16_t adr) override;
+		virtual uint8_t read_arg(uint16_t adr) override;
+		virtual void write(uint16_t adr, uint8_t val) override;
+		virtual uint8_t read_banked(uint32_t adr);
+		virtual void write_banked(uint32_t adr, uint8_t val);
+	};
+
+	uint8_t read_banked_data_raw(uint32_t addr);
+	uint8_t read_banked_data_raw(uint8_t databank, uint16_t addr);
+	void write_banked_data_raw(uint8_t databank, uint16_t addr, uint8_t val);
+
+	uint8_t m_databank;
+	uint8_t m_codebank;
+	u32 m_data_address_mask;
+	bool m_full_bank_register_decode;
+
+	xavix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool full_bank_register_decode, bool use_separate_codebank_stack);
+
+	uint32_t code_address(uint16_t adr) { return adr | (m_codebank << 16); }
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual offs_t pc_to_external(u16 pc) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
+	// device_memory_interface overrides
+	virtual space_config_vector memory_space_config() const override;
+
+	address_space_config m_lowbus_config;
+	address_space_config m_extbus_config;
+	memory_access<15, 0, 0, ENDIANNESS_LITTLE>::specific m_lowbus;
+	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::specific m_extbus;
+
 #define O(o) void o ## _full(); void o ## _partial()
 
-	// xaviv opcodes
+	// XaviX opcodes
 	O(callf_xa3);
 	O(jmp_xa3);
 	O(retf_imp);
@@ -146,66 +204,6 @@ public:
 
 #undef O
 
-	using xavix_interrupt_vector_delegate = device_delegate<int16_t (int source, int low_byte)>;
-
-	template <typename... T> void set_interrupt_vector_callback(T &&... args) { m_interrupt_vector_callback.set(std::forward<T>(args)...); }
-	void set_data_address_mask(u32 mask) { m_data_address_mask = mask; }
-
-	uint8_t read_banked_data(uint8_t databank, uint16_t addr);
-	uint8_t read_banked_data(uint32_t addr);
-	void write_banked_data(uint8_t databank, uint16_t adr, uint8_t val);
-	void write_banked_data(uint32_t addr, uint8_t val);
-	// Other bus masters bypass CPU buffering and wait states.
-	void write_banked_data_raw(uint32_t addr, uint8_t val);
-
-protected:
-	enum {
-		XAVIX_DATABANK = M6502_IR+1,
-		XAVIX_CODEBANK,
-	};
-
-	class mi_xavix : public memory_interface {
-	public:
-		xavix_device *m_base;
-
-		mi_xavix(xavix_device *base);
-		virtual ~mi_xavix() {}
-
-		virtual uint8_t read(uint16_t adr) override;
-		virtual uint8_t read_sync(uint16_t adr) override;
-		virtual uint8_t read_arg(uint16_t adr) override;
-		virtual void write(uint16_t adr, uint8_t val) override;
-		virtual uint8_t read_banked(uint32_t adr);
-		virtual void write_banked(uint32_t adr, uint8_t val);
-	};
-
-	uint8_t read_banked_data_raw(uint32_t addr);
-	uint8_t read_banked_data_raw(uint8_t databank, uint16_t addr);
-	void write_banked_data_raw(uint8_t databank, uint16_t addr, uint8_t val);
-
-	uint8_t m_databank;
-	uint8_t m_codebank;
-	u32 m_data_address_mask;
-	bool m_full_bank_register_decode;
-
-	xavix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool full_bank_register_decode, bool use_separate_codebank_stack);
-
-	uint32_t code_address(uint16_t adr) { return adr | (m_codebank << 16); }
-
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-	virtual offs_t pc_to_external(u16 pc) override;
-	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
-
-	// device_memory_interface overrides
-	virtual space_config_vector memory_space_config() const override;
-
-	address_space_config m_lowbus_config;
-	address_space_config m_extbus_config;
-	memory_access<15, 0, 0, ENDIANNESS_LITTLE>::specific m_lowbus;
-	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::specific m_extbus;
-
-protected:
 	xavix_interrupt_vector_delegate m_interrupt_vector_callback;
 
 	// XaviX retains the decimal flag, but arithmetic is always binary.

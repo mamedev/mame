@@ -87,7 +87,7 @@ public:
 protected:
 	using video_standard = xavix_video_device::video_standard;
 
-	static constexpr u32 NTSC_MASTER_CLOCK = 42'954'540;
+	static constexpr XTAL NTSC_MASTER_CLOCK = 3.579545_MHz_XTAL * 12;
 	static constexpr u32 PAL_MASTER_CLOCK = 42'562'740;
 	static constexpr u32 NTSC_LINE_CLOCKS = xavix_video_device::NTSC_LINE_CLOCKS;
 	static constexpr u32 PAL_LINE_CLOCKS = xavix_video_device::PAL_LINE_CLOCKS;

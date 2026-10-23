@@ -93,8 +93,8 @@ void xavix_device::device_start()
 	space(AS_LOW_BUS).specific(m_lowbus);
 	space(AS_EXTERNAL_BUS).specific(m_extbus);
 
-	state_add(XAVIX_DATABANK, "DATBNK", m_databank).callimport().formatstr("%2s");
-	state_add(XAVIX_CODEBANK, "CODBNK", m_codebank).callimport().formatstr("%2s");
+	state_add(XAVIX_DATABANK, "DATBNK", m_databank).formatstr("%2s");
+	state_add(XAVIX_CODEBANK, "CODBNK", m_codebank).formatstr("%2s");
 
 	save_item(NAME(m_databank));
 	save_item(NAME(m_codebank));
@@ -187,7 +187,7 @@ uint8_t xavix_device::read_banked_data(uint8_t databank, uint16_t adr)
 
 uint8_t xavix_device::read_banked_data_raw(uint32_t addr)
 {
-	return read_banked_data_raw((addr & 0xff0000)>>16, addr & 0xffff);
+	return read_banked_data_raw(BIT(addr, 16, 8), addr & 0xffff);
 }
 
 inline uint8_t xavix_device::read_banked_data_raw(uint8_t databank, uint16_t adr)
@@ -261,7 +261,7 @@ void xavix_device::write_banked_data(uint8_t databank, uint16_t adr, uint8_t val
 
 void xavix_device::write_banked_data_raw(uint32_t addr, uint8_t val)
 {
-	write_banked_data_raw((addr & 0xff0000)>>16, addr & 0xffff, val);
+	write_banked_data_raw(BIT(addr, 16, 8), addr & 0xffff, val);
 }
 
 uint8_t xavix_device::read_stack(uint32_t addr)
@@ -333,25 +333,21 @@ void xavix_device::mi_xavix::write_banked(uint32_t adr, uint8_t val)
 
 void xavix_device::set_codebank(uint8_t bank)
 {
-//  space().write_byte(0xfe, bank);
 	m_codebank = bank;
 }
 
 inline uint8_t xavix_device::codebank()
 {
-//  return space().read_byte(0xfe);
 	return m_codebank;
 }
 
 inline void xavix_device::set_databank(uint8_t bank)
 {
-//  space().write_byte(0xff, bank);
 	m_databank = bank;
 }
 
 inline uint8_t xavix_device::databank()
 {
-//  return space().read_byte(0xff);
 	return m_databank;
 }
 

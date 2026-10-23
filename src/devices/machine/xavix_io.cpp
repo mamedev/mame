@@ -101,7 +101,7 @@ void xavix_io_device::event_ack_w(u8 data)
 
 void xavix_io_device::update_irq()
 {
-	m_irq_cb((m_event_pending & 0x0f) ? ASSERT_LINE : CLEAR_LINE);
+	m_irq_cb((m_event_pending & 0x0f) != 0);
 }
 
 u8 xavix_io_device::external_input_r(offs_t port, u8 mem_mask)

@@ -14,7 +14,7 @@ class xavix_bassfishing_device : public device_t
 public:
 	xavix_bassfishing_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	nrf2401_device &radio() { return subdevice<nrf24e1_device>("mcu")->radio(); }
+	nrf2401_device &radio() { return m_mcu.lookup()->radio(); }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;

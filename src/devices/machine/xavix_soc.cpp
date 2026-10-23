@@ -237,7 +237,7 @@ void xavix_soc_device::configure_common(machine_config &config)
 	m_video->irq_callback().set(m_intc, FUNC(xavix_intc_device::irq_w<xavix_intc_device::IRQ_VIDEO>));
 	m_video->set_video_read_callback(*this, FUNC(xavix_soc_device::read_banked_data_bypass));
 	m_video->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_video->sprite_dma_source_callback().set([this](offs_t offset) { return m_maincpu->space(xavix_device::AS_LOW_BUS).read_byte(offset); });
+	m_video->sprite_dma_source_callback().set([this] (offs_t offset) { return m_maincpu->space(xavix_device::AS_LOW_BUS).read_byte(offset); });
 
 	configure_io(config);
 	m_io->irq_callback().set(m_intc, FUNC(xavix_intc_device::irq_w<xavix_intc_device::IRQ_IO>));
@@ -254,13 +254,13 @@ void xavix_soc_device::configure_common(machine_config &config)
 
 	XAVIX_DMA(config, m_dma, DERIVED_CLOCK(1, 2));
 	m_dma->source_read_callback().set(*this, FUNC(xavix_soc_device::read_banked_data_bypass));
-	m_dma->destination_write_callback().set([this](offs_t address, u8 data) { m_maincpu->write_banked_data_raw(address, data); });
+	m_dma->destination_write_callback().set([this] (offs_t address, u8 data) { m_maincpu->write_banked_data_raw(address, data); });
 	m_dma->irq_callback().set(m_intc, FUNC(xavix_intc_device::irq_w<xavix_intc_device::IRQ_DMA>));
 
 	XAVIX_SOUND(config, m_sound, DERIVED_CLOCK(1, 2));
 	m_sound->sample_read_callback().set(*this, FUNC(xavix_soc_device::read_banked_data_bypass));
 	m_sound->set_addrmap(AS_PROGRAM, address_map_constructor(
-		[this](address_map &map) { map(0x0000, 0x3fff).ram().share(m_mainram); },
+		[this] (address_map &map) { map(0x0000, 0x3fff).ram().share(m_mainram); },
 		"sound_descriptors"));
 	m_sound->set_host_space(m_maincpu, xavix_device::AS_LOW_BUS);
 	m_sound->irq_callback().set(m_intc, FUNC(xavix_intc_device::irq_w<xavix_intc_device::IRQ_SOUND>));
@@ -303,7 +303,7 @@ void xavix_soc_device::device_start()
 
 	m_vblank_cb.resolve_safe();
 	m_watchdog_timer = timer_alloc(FUNC(xavix_soc_device::watchdog_expired), this);
-	auto const service = [this](offs_t offset, u8 &data, u8 mem_mask)
+	auto const service = [this] (offs_t offset, u8 &data, u8 mem_mask)
 	{
 		if (m_watchdog_port_mode && !machine().side_effects_disabled())
 			service_watchdog();

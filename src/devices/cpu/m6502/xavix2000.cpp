@@ -34,12 +34,12 @@ void xavix2000_device::device_start()
 	xavix_device::device_start();
 	m_P &= ~F_B;
 
-	state_add(XAVIX2000_J, "J", m_j).callimport().formatstr("%8s");
-	state_add(XAVIX2000_K, "K", m_k).callimport().formatstr("%8s");
-	state_add(XAVIX2000_L, "L", m_l).callimport().formatstr("%8s");
-	state_add(XAVIX2000_M, "M", m_m).callimport().formatstr("%8s");
-	state_add(XAVIX2000_PA, "PA", m_pa).callimport().formatstr("%8s");
-	state_add(XAVIX2000_PB, "PB", m_pb).callimport().formatstr("%8s");
+	state_add(XAVIX2000_J, "J", m_j).formatstr("%8s");
+	state_add(XAVIX2000_K, "K", m_k).formatstr("%8s");
+	state_add(XAVIX2000_L, "L", m_l).formatstr("%8s");
+	state_add(XAVIX2000_M, "M", m_m).formatstr("%8s");
+	state_add(XAVIX2000_PA, "PA", m_pa).formatstr("%8s");
+	state_add(XAVIX2000_PB, "PB", m_pb).formatstr("%8s");
 
 	save_item(NAME(m_j));
 	save_item(NAME(m_k));

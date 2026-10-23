@@ -182,7 +182,7 @@ void xavix_state::xavix_4mb(machine_config &config)
 void xavix_state::xavix_nv(machine_config &config)
 {
 	xavix(config);
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 }
 
 void xavix_state::xavix_nv_1mb(machine_config &config)
@@ -235,7 +235,7 @@ void xavix_state::xavixp_4mb(machine_config &config)
 void xavix_state::xavixp_nv(machine_config &config)
 {
 	xavixp(config);
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 }
 
 void xavix_state::xavixp_nv_1mb(machine_config &config)
@@ -394,7 +394,7 @@ u8 xavix_io0_matrix_state::io0_input_r(u8 direction)
 void xavix_i2c_state::xavix_i2c_24c02(machine_config &config)
 {
 	xavix(config);
-	I2C_24C02(config, "i2cmem");
+	I2C_24C02(config, m_i2cmem);
 }
 
 void xavix_i2c_state::xavix_i2c_24c02_2mb(machine_config &config)
@@ -412,7 +412,7 @@ void xavix_i2c_state::xavix_i2c_24c02_4mb(machine_config &config)
 void xavix_i2c_state::xavix_i2c_24c04(machine_config &config)
 {
 	xavix(config);
-	I2C_24C04(config, "i2cmem"); // 24LC04 on Nostalgia games, 24C04 on others
+	I2C_24C04(config, m_i2cmem); // 24LC04 on Nostalgia games, 24C04 on others
 }
 
 void xavix_i2c_state::xavix_i2c_24c04_1mb(machine_config &config)
@@ -436,7 +436,7 @@ void xavix_i2c_state::xavix_i2c_24c04_4mb(machine_config &config)
 void xavix_i2c_state::xavix_i2c_24c08(machine_config &config)
 {
 	xavix(config);
-	I2C_24C08(config, "i2cmem");
+	I2C_24C08(config, m_i2cmem);
 }
 
 void xavix_i2c_state::xavix_i2c_24c08_4mb(machine_config &config)
@@ -448,7 +448,7 @@ void xavix_i2c_state::xavix_i2c_24c08_4mb(machine_config &config)
 void xavix_i2c_state::xavix_i2c_24c16(machine_config &config)
 {
 	xavix(config);
-	I2C_24C16(config, "i2cmem");
+	I2C_24C16(config, m_i2cmem);
 }
 
 void xavix_i2c_state::io1_output_w(u8 data, u8 direction)
@@ -3175,7 +3175,7 @@ void xavix_cart_state::xavix_popira(machine_config &config)
 
 	// is a battery / power source required to store NVRAM in the CPU?  Popira definitely needs NVRAM storing on power-of
 	// XaviX Tennis won't boot if you do (but that could be an unrelated SEEPROM issue?) & DDR Family Mat gets stuck in 2 Player mode with no obvious way of changing back
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 
 	// A recurring IO1.7 pulse maintains the external power hold until firmware shutdown.
 	configure_power_hold(config);
@@ -3187,7 +3187,7 @@ void xavix_cart_state::xavix_popirak(machine_config &config)
 {
 	xavix_cart(config);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 
 	// A recurring IO1.7 pulse maintains the external power hold until firmware shutdown.
 	configure_power_hold(config);
@@ -3309,9 +3309,9 @@ void xavix_i2c_cart_state::xavix_jpopira(machine_config &config)
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("JPOPIRA");
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 
-	I2C_24C02(config, "i2cmem"); // 24LC02
+	I2C_24C02(config, m_i2cmem); // 24LC02
 
 	configure_power_hold(config);
 }
@@ -3348,7 +3348,7 @@ void xavix_i2c_cart_state::xavix_taikodp(machine_config &config)
 
 	SOFTWARE_LIST(config, "cart_list").set_original("ekara_cart").set_filter("TAIKO");
 
-	I2C_24C02(config, "i2cmem"); // 24LC02
+	I2C_24C02(config, m_i2cmem); // 24LC02
 }
 
 
@@ -3437,7 +3437,7 @@ void xavix_evio_state::xavix_evio(machine_config &config)
 
 	SOFTWARE_LIST(config, "cart_list_evio").set_original("evio_cart");
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 
 	XAVIX_EVIO_BOW(config, m_bow[0]);
 	XAVIX_EVIO_BOW(config, m_bow[1]).set_player(1);
@@ -3506,7 +3506,7 @@ void xavix_tak_daig_state::xavix_tak_daig(machine_config &config)
 	// Eight event-0 samples satisfy the Dragon Cannon accumulator; the physical sensor cadence is unmeasured.
 	configure_lightgun_scanlines(config, 0x01);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 
 	XAVIX_DAIGUNDER_ROBOTS(config, m_robots, peripheral_clock());
 	m_robots->set_screen(m_screen);
@@ -3561,7 +3561,7 @@ void xavix_gcslottv_state::xavix_gcslottv(machine_config &config)
 {
 	xavix_cart(config);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 
 	SOFTWARE_LIST(config, "cart_list_gcslottv").set_original("gcslottv_cart");
 

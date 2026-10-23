@@ -170,7 +170,7 @@ bool superxavix_device::advance_external_bus(u64 cycle)
 		else
 		{
 			unsigned const page = BIT(m_bus_control, 4, 2);
-			unsigned const mask = page ? (2U << page) - 1 : 0;
+			unsigned const mask = page ? util::make_bitmask<unsigned>(page + 1) : 0;
 			u32 const next = m_bus_address + count;
 			unsigned const cycles = mask && !((m_bus_address ^ next) & ~mask)
 				? page_cycles(m_bus_control) : access_cycles(m_bus_control);

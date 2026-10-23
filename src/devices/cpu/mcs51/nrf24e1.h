@@ -19,7 +19,7 @@ public:
 	auto spi_clock_cb() { return m_spi_clock_cb.bind(); }
 	auto spi_mosi_cb() { return m_spi_mosi_cb.bind(); }
 	auto spi_miso_cb() { return m_spi_miso_cb.bind(); }
-	nrf2401_device &radio() { return *subdevice<nrf2401_device>("radio"); }
+	nrf2401_device &radio() { return *m_radio.lookup(); }
 	void power_w(int state);
 
 protected:

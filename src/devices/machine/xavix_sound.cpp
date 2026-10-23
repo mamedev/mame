@@ -161,7 +161,7 @@ void xavix_sound_device::update_descriptor_tap()
 	m_descriptor_write_tap.remove();
 	offs_t const base = offs_t(m_work_page) << 8;
 	m_descriptor_write_tap = m_host_space->install_write_tap(base, base | 0xff, "sound_descriptors",
-		[this](offs_t offset, u8 &data, u8 mem_mask) { synchronize(); });
+		[this] (offs_t offset, u8 &data, u8 mem_mask) { synchronize(); });
 }
 
 u16 &xavix_sound_device::voice_register(unsigned voice, unsigned index)
