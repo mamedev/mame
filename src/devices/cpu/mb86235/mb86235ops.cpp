@@ -1364,7 +1364,12 @@ void mb86235_device::do_alu_control(uint64_t op)
 			else
 				m_core->rpc = ef2;
 
-			FSET(RP); // set repeat flag
+			// A count of one executes the next instruction normally. Entering
+			// repeat mode would decrement the count past its termination value.
+			if (m_core->rpc == 1)
+				FCLR(RP);
+			else
+				FSET(RP);
 			break;
 		case 0x02: // SETL
 			if(ef1 == 0x3f)
