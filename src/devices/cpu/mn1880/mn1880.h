@@ -29,7 +29,7 @@ public:
 	};
 
 protected:
-	mn1880_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool has_mmu, address_map_constructor data_map);
+	mn1880_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool has_mmu, u16 internal_io_end, address_map_constructor data_map);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -37,6 +37,8 @@ protected:
 
 	// device_execute_interface overrides
 	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum >= 0 && inputnum < 12; }
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 4); }
 
@@ -51,6 +53,10 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	void internal_data_map(address_map &map) ATTR_COLD;
+
+	// on-chip peripheral interrupt requests
+	void request_interrupt(int irq) { m_if |= 1U << irq; }
+	void clear_interrupt_requests(u16 mask) { m_if &= ~mask; }
 
 private:
 	struct cpu_registers
@@ -83,7 +89,7 @@ private:
 		NEXT,
 		NOP_1,
 		REP_1,
-		CLRSET_1,
+		CLRSET_1, CLRSET_2,
 		T1B_1,
 		MOVL31_1, MOVL31_2,
 		MOVL34_1, MOVL34_2, MOVL34_3, MOVL34_4,
@@ -212,6 +218,7 @@ private:
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 	const bool m_has_mmu;
+	const u16 m_internal_io_end;
 
 	// execution state
 	cpu_registers m_cpu[2];
@@ -224,6 +231,7 @@ private:
 	s32 m_icount;
 
 	// interrupt state
+	u16 m_input_state;
 	u16 m_if;
 	u16 m_irq;
 
@@ -232,13 +240,146 @@ private:
 	u8 m_mmu_enable;
 };
 
+class mn1880023_device : public mn1880_device
+{
+public:
+	mn1880023_device(const machine_config &config, const char *tag, device_t *owner, u32 clock);
+
+	template <int Port> auto port_in_cb() { return m_port_in_cb[Port].bind(); }
+	template <int Port> auto port_out_cb() { return m_port_out_cb[Port].bind(); }
+	template <int Channel> auto ad_in_cb() { return m_ad_in_cb[Channel].bind(); }
+	template <int N> auto sio_in_cb() { return m_sio_in_cb[N].bind(); }
+	template <int N> auto sio_out_cb() { return m_sio_out_cb[N].bind(); }
+	auto pwm_out_cb() { return m_pwm_out_cb.bind(); }
+
+	// port direction registers are unknown, so the board names its input pins
+	void set_port_input_mask(int port, u8 mask) { m_port_input_mask[port] = mask; }
+
+	void timer2_capture_w(int state);
+	void timer4_count_w(int state);
+
+	u16 pwm_reload() const;
+	u16 pwm_compare() const;
+	bool pwm_output_enabled() const { return BIT(m_regs[0x54], 2); }
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+private:
+	enum
+	{
+		IRQ_TIMER0 = 3,
+		IRQ_PWM = 4,
+		IRQ_TIMER3 = 6,
+		IRQ_TIMER4 = 8
+	};
+
+	void internal_map(address_map &map) ATTR_COLD;
+
+	u8 reg_r(offs_t offset);
+	void reg_w(offs_t offset, u8 data);
+	u8 port_r(offs_t offset);
+	void port_w(offs_t offset, u8 data);
+	void irq_flags_w(u8 data);
+	void sio0_data_w(u8 data);
+	void sio1_data_w(u8 data);
+	void adc_control_w(u8 data);
+	u8 timer0_r(offs_t offset);
+	void timer0_w(offs_t offset, u8 data);
+	u8 timer2_r(offs_t offset);
+	void timer2_w(offs_t offset, u8 data);
+	void timer3_w(offs_t offset, u8 data);
+	void timer_run_w(u8 data);
+	void timer_control_w(u8 data);
+	u8 timer4_r(offs_t offset);
+	void pwm_reload_w(offs_t offset, u8 data);
+	void pwm_control_w(u8 data);
+
+	void update_timer0();
+	void update_timer3();
+	void update_pwm();
+	u16 timer2_count() const;
+
+	TIMER_CALLBACK_MEMBER(timer0_tick);
+	TIMER_CALLBACK_MEMBER(timer3_tick);
+	TIMER_CALLBACK_MEMBER(sio0_tick);
+	TIMER_CALLBACK_MEMBER(sio1_tick);
+	TIMER_CALLBACK_MEMBER(adc_tick);
+	TIMER_CALLBACK_MEMBER(pwm_tick);
+
+	devcb_read8::array<10> m_port_in_cb;
+	devcb_write8::array<10> m_port_out_cb;
+	devcb_read8::array<8> m_ad_in_cb;
+	devcb_read8::array<2> m_sio_in_cb;
+	devcb_write8::array<2> m_sio_out_cb;
+	devcb_write_line m_pwm_out_cb;
+
+	emu_timer *m_timer0;
+	emu_timer *m_timer3;
+	emu_timer *m_sio_timer[2];
+	emu_timer *m_adc_timer;
+	emu_timer *m_pwm_timer;
+
+	u8 m_port_input_mask[10];
+	u8 m_regs[0x60];
+	attotime m_timer2_start;
+	u16 m_timer4_count;
+	u8 m_timer4_prescale;
+	bool m_timer2_capture_input;
+	bool m_timer4_count_input;
+};
+
 class mn18801a_device : public mn1880_device
 {
 public:
 	mn18801a_device(const machine_config &config, const char *tag, device_t *owner, u32 clock);
+
+	auto so_out_cb() { return m_so_out_cb.bind(); }
+	auto hs_out_cb() { return m_hs_out_cb.bind(); }
+	auto to_out_cb() { return m_to_out_cb.bind(); }
+	auto tcio_in_cb() { return m_tcio_in_cb.bind(); }
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+private:
+	static constexpr int IRQ_TIMER = 3;
+
+	void internal_map(address_map &map) ATTR_COLD;
+
+	void timer_reload_w(offs_t offset, u8 data);
+	void timer_enable_w(u8 data);
+	void timer_restart_w(u8 data);
+	void timer_status_w(u8 data);
+	void timer_adjust(int timer);
+	void so_w(u8 data);
+	void hs_w(u8 data);
+	void to_w(u8 data);
+
+	TIMER_CALLBACK_MEMBER(timer_tick);
+
+	devcb_write8 m_so_out_cb;
+	devcb_write8 m_hs_out_cb;
+	devcb_write8 m_to_out_cb;
+	devcb_read8 m_tcio_in_cb;
+
+	emu_timer *m_timer[3];
+
+	u16 m_timer_reload[3];
+	u8 m_timer_enable;
+	u8 m_timer_mask;
+	u8 m_timer_status;
+	u8 m_so;
+	u8 m_hs;
+	u8 m_to;
 };
 
 DECLARE_DEVICE_TYPE(MN1880, mn1880_device)
+DECLARE_DEVICE_TYPE(MN1880023, mn1880023_device)
 DECLARE_DEVICE_TYPE(MN18801A, mn18801a_device)
 
 #endif // MAME_CPU_MN1880_MN1880_H
