@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ville Linde
+// copyright-holders:Ville Linde, Eduardo Cruz
 // TMS320C82 Master Processor core execution
 
 #include "emu.h"
@@ -7,12 +7,89 @@
 
 #include "corefloat.h"
 
+#include <bit>
+#include <cmath>
+#include <limits>
+
+
+namespace {
+
+// SPRU109, FRND and appendix C.5.6, without touching the host rounding mode
+float round_single(double source, unsigned mode)
+{
+	constexpr float largest = std::numeric_limits<float>::max();
+	constexpr float infinity = std::numeric_limits<float>::infinity();
+	float result;
+	if (std::isfinite(source) && std::abs(source) > double(largest))
+		result = std::copysign(std::abs(source) < 0x1.ffffffp127 ? largest : infinity, source);
+	else
+		result = float(source);
+
+	if (mode == 1) // toward zero
+	{
+		if (source > 0.0 && double(result) > source)
+			result = std::nextafter(result, -infinity);
+		else if (source < 0.0 && double(result) < source)
+			result = std::nextafter(result, infinity);
+	}
+	else if (mode == 2 && double(result) < source) // toward +infinity
+	{
+		result = std::nextafter(result, infinity);
+	}
+	else if (mode == 3 && double(result) > source) // toward -infinity
+	{
+		result = std::nextafter(result, -infinity);
+	}
+	return result;
+}
+
+uint32_t round_integer(double source, unsigned mode, bool unsigned_result)
+{
+	if (std::isnan(source))
+		return unsigned_result ? 0xffffffffU : 0x7fffffffU;
+
+	double result;
+	switch (mode)
+	{
+	case 0: // nearest, ties to even, independent of the host rounding mode
+	{
+		double const lower = std::floor(source);
+		double const fraction = source - lower;
+		result = lower;
+		if (fraction > 0.5 || (fraction == 0.5 && std::fmod(lower, 2.0) != 0.0))
+			result += 1.0;
+		break;
+	}
+	case 1: result = std::trunc(source); break;
+	case 2: result = std::ceil(source); break;
+	default: result = std::floor(source); break;
+	}
+
+	// Saturate before casting, including infinities: an out-of-range host
+	// float-to-integer cast has undefined behaviour.
+	if (unsigned_result)
+	{
+		if (result <= 0.0)
+			return 0;
+		if (result >= 4294967295.0)
+			return 0xffffffffU;
+		return uint32_t(result);
+	}
+	if (result <= -2147483648.0)
+		return 0x80000000U;
+	if (result >= 2147483647.0)
+		return 0x7fffffffU;
+	return uint32_t(int32_t(result));
+}
+
+} // anonymous namespace
+
 
 #define OP_LINK() ((m_ir >> 27) & 0x1f)
 #define OP_RD() ((m_ir >> 27) & 0x1f)
 #define OP_RS() ((m_ir >> 22) & 0x1f)
 #define OP_BASE() ((m_ir >> 22) & 0x1f)
-#define OP_SIMM15() ((m_ir & 0x4000) ? (0xffffe000 | (m_ir & 0x7fff)) : (m_ir & 0x7fff))
+#define OP_SIMM15() util::sext(m_ir, 15)
 #define OP_UIMM15() (m_ir & 0x7fff)
 #define OP_BITNUM() ((m_ir >> 27) & 0x1f)
 #define OP_ROTATE() (m_ir & 0x1f)
@@ -130,38 +207,46 @@ void tms320c82_mp_device::vector_loadstore()
 	{
 		case 0x01:          // vst.s
 		{
-			m_program.write_dword(m_outp, m_reg[rd]);
+			m_program.write_dword(m_outp & ~3U, m_reg[rd]);
 			m_outp += 4;
 			break;
 		}
 		case 0x03:          // vst.d
 		{
 			uint64_t data = m_fpair[rd >> 1];
-			m_program.write_qword(m_outp, data);
+			m_program.write_qword(m_outp & ~7U, data);
 			m_outp += 8;
 			break;
 		}
 		case 0x04:          // vld0.s
 		{
-			m_reg[rd] = m_program.read_dword(m_in0p);
+			uint32_t const data = m_program.read_dword(m_in0p & ~3U);
+			if (rd)
+				m_reg[rd] = data;
 			m_in0p += 4;
 			break;
 		}
 		case 0x05:          // vld1.s
 		{
-			m_reg[rd] = m_program.read_dword(m_in1p);
+			uint32_t const data = m_program.read_dword(m_in1p & ~3U);
+			if (rd)
+				m_reg[rd] = data;
 			m_in1p += 4;
 			break;
 		}
 		case 0x06:          // vld0.d
 		{
-			m_fpair[rd >> 1] = m_program.read_qword(m_in0p);
+			uint64_t const data = m_program.read_qword(m_in0p & ~7U);
+			if (rd)
+				m_fpair[rd >> 1] = data;
 			m_in0p += 8;
 			break;
 		}
 		case 0x07:          // vld1.d
 		{
-			m_fpair[rd >> 1] = m_program.read_qword(m_in1p);
+			uint64_t const data = m_program.read_qword(m_in1p & ~7U);
+			if (rd)
+				m_fpair[rd >> 1] = data;
 			m_in1p += 8;
 			break;
 		}
@@ -499,6 +584,9 @@ void tms320c82_mp_device::execute_short_imm()
 			break;
 		}
 
+		// LD/LD.U: base modification precedes the destination load, which
+		// wins if they overlap (SPRU109 MP10-114/117). Memory alignment
+		// discards low address bits without changing the modified base.
 		case 0x24:
 		case 0x20:          // ld.b
 		{
@@ -508,13 +596,14 @@ void tms320c82_mp_device::execute_short_imm()
 			int32_t offset = OP_SIMM15();
 
 			uint32_t address = m_reg[base] + offset;
+			if (m && base)
+				m_reg[base] = address;
+
 			uint32_t data = (uint8_t)m_program.read_byte(address);
 			if (data & 0x80) data |= 0xffffff00;
 			if (rd)
 				m_reg[rd] = data;
 
-			if (m && base)
-				m_reg[base] = address;
 			break;
 		}
 
@@ -527,13 +616,14 @@ void tms320c82_mp_device::execute_short_imm()
 			int32_t offset = OP_SIMM15();
 
 			uint32_t address = m_reg[base] + offset;
-			uint32_t data = (uint16_t)m_program.read_word(address);
+			if (m && base)
+				m_reg[base] = address;
+
+			uint32_t data = uint16_t(m_program.read_word(address & ~1U));
 			if (data & 0x8000) data |= 0xffff0000;
 			if (rd)
 				m_reg[rd] = data;
 
-			if (m && base)
-				m_reg[base] = address;
 			break;
 		}
 
@@ -546,12 +636,13 @@ void tms320c82_mp_device::execute_short_imm()
 			int32_t offset = OP_SIMM15();
 
 			uint32_t address = m_reg[base] + offset;
-			uint32_t data = m_program.read_dword(address);
+			if (m && base)
+				m_reg[base] = address;
+
+			uint32_t data = m_program.read_dword(address & ~3U);
 			if (rd)
 				m_reg[rd] = data;
 
-			if (m && base)
-				m_reg[base] = address;
 			break;
 		}
 
@@ -564,16 +655,17 @@ void tms320c82_mp_device::execute_short_imm()
 			int32_t offset = OP_SIMM15();
 
 			uint32_t address = m_reg[base] + offset;
-			uint32_t data1 = m_program.read_dword(address);
-			uint32_t data2 = m_program.read_dword(address+4);
+			if (m && base)
+				m_reg[base] = address;
+
+			uint32_t data1 = m_program.read_dword(address & ~7U);
+			uint32_t data2 = m_program.read_dword((address & ~7U) + 4);
 			if (rd)
 			{
 				m_reg[(rd & ~1)+1] = data1;
 				m_reg[(rd & ~1)] = data2;
 			}
 
-			if (m && base)
-				m_reg[base] = address;
 			break;
 		}
 
@@ -586,12 +678,13 @@ void tms320c82_mp_device::execute_short_imm()
 			int32_t offset = OP_SIMM15();
 
 			uint32_t address = m_reg[base] + offset;
+			if (m && base)
+				m_reg[base] = address;
+
 			uint32_t data = (uint8_t)(m_program.read_byte(address));
 			if (rd)
 				m_reg[rd] = data;
 
-			if (m && base)
-				m_reg[base] = address;
 			break;
 		}
 
@@ -604,12 +697,13 @@ void tms320c82_mp_device::execute_short_imm()
 			int32_t offset = OP_SIMM15();
 
 			uint32_t address = m_reg[base] + offset;
-			uint32_t data = (uint16_t)(m_program.read_word(address));
+			if (m && base)
+				m_reg[base] = address;
+
+			uint32_t data = uint16_t(m_program.read_word(address & ~1U));
 			if (rd)
 				m_reg[rd] = data;
 
-			if (m && base)
-				m_reg[base] = address;
 			break;
 		}
 
@@ -640,7 +734,7 @@ void tms320c82_mp_device::execute_short_imm()
 
 			uint32_t address = m_reg[base] + offset;
 
-			m_program.write_word(address, (uint16_t)(m_reg[rd]));
+			m_program.write_word(address & ~1U, uint16_t(m_reg[rd]));
 
 			if (m && base)
 				m_reg[base] = address;
@@ -657,7 +751,7 @@ void tms320c82_mp_device::execute_short_imm()
 
 			uint32_t address = m_reg[base] + offset;
 
-			m_program.write_dword(address, m_reg[rd]);
+			m_program.write_dword(address & ~3U, m_reg[rd]);
 
 			if (m && base)
 				m_reg[base] = address;
@@ -674,24 +768,30 @@ void tms320c82_mp_device::execute_short_imm()
 
 			uint32_t address = m_reg[base] + offset;
 
-			m_program.write_dword(address+0, m_reg[(rd & ~1) + 1]);
-			m_program.write_dword(address+4, m_reg[rd & ~1]);
+			m_program.write_dword(address & ~7U, m_reg[(rd & ~1) + 1]);
+			m_program.write_dword((address & ~7U) + 4, m_reg[rd & ~1]);
 
 			if (m && base)
 				m_reg[base] = address;
 			break;
 		}
 
+		case 0x44:          // jsr
 		case 0x45:          // jsr.a
 		{
-			int link = OP_LINK();
-			int base = OP_BASE();
-			int32_t offset = OP_SIMM15();
-
+			int const link = OP_LINK();
+			bool const annul = BIT(m_ir, 15);
+			// Read both address operands before writing an overlapping link.
+			uint32_t const address = m_reg[OP_BASE()] + OP_SIMM15();
 			if (link)
-				m_reg[link] = m_fetchpc;
+				m_reg[link] = m_fetchpc + (annul ? 0 : 4);
 
-			m_fetchpc = m_reg[base] + offset;
+			if (!annul)
+			{
+				m_pc = m_fetchpc;
+				delay_slot();
+			}
+			m_fetchpc = address;
 			break;
 		}
 
@@ -1032,14 +1132,15 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			int rd = OP_RD();
 
 			uint32_t address = m_reg[base] + (has_imm ? imm32 : m_reg[OP_SRC1()]);
+			if (m && base)
+				m_reg[base] = address;
+
 			uint32_t r = m_program.read_byte(address);
 			if (r & 0x80) r |= 0xffffff00;
 
 			if (rd)
 				m_reg[rd] = r;
 
-			if (m && base)
-				m_reg[base] = address;
 			break;
 		}
 
@@ -1055,14 +1156,15 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			int rd = OP_RD();
 
 			uint32_t address = m_reg[base] + ((has_imm ? imm32 : m_reg[OP_SRC1()]) << shift);
-			uint32_t r = m_program.read_word(address);
+			if (m && base)
+				m_reg[base] = address;
+
+			uint32_t r = m_program.read_word(address & ~1U);
 			if (r & 0x8000) r |= 0xffff0000;
 
 			if (rd)
 				m_reg[rd] = r;
 
-			if (m && base)
-				m_reg[base] = address;
 			break;
 		}
 
@@ -1077,13 +1179,14 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			int rd = OP_RD();
 
 			uint32_t address = m_reg[base] + ((has_imm ? imm32 : m_reg[OP_SRC1()]) << shift);
-			uint32_t r = m_program.read_dword(address);
+			if (m && base)
+				m_reg[base] = address;
+
+			uint32_t r = m_program.read_dword(address & ~3U);
 
 			if (rd)
 				m_reg[rd] = r;
 
-			if (m && base)
-				m_reg[base] = address;
 			break;
 		}
 
@@ -1098,13 +1201,14 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			int rd = OP_RD();
 
 			uint32_t address = m_reg[base] + ((has_imm ? imm32 : m_reg[OP_SRC1()]) << shift);
-			uint64_t r = m_program.read_qword(address);
+			if (m && base)
+				m_reg[base] = address;
+
+			uint64_t r = m_program.read_qword(address & ~7U);
 
 			if (rd)
 				m_fpair[rd >> 1] = r;
 
-			if (m && base)
-				m_reg[base] = address;
 			break;
 		}
 
@@ -1118,13 +1222,14 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			int rd = OP_RD();
 
 			uint32_t address = m_reg[base] + (has_imm ? imm32 : m_reg[OP_SRC1()]);
+			if (m && base)
+				m_reg[base] = address;
+
 			uint32_t r = (uint8_t)(m_program.read_byte(address));
 
 			if (rd)
 				m_reg[rd] = r;
 
-			if (m && base)
-				m_reg[base] = address;
 			break;
 		}
 
@@ -1139,13 +1244,14 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			int rd = OP_RD();
 
 			uint32_t address = m_reg[base] + ((has_imm ? imm32 : m_reg[OP_SRC1()]) << shift);
-			uint32_t r = (uint16_t)(m_program.read_word(address));
+			if (m && base)
+				m_reg[base] = address;
+
+			uint32_t r = uint16_t(m_program.read_word(address & ~1U));
 
 			if (rd)
 				m_reg[rd] = r;
 
-			if (m && base)
-				m_reg[base] = address;
 			break;
 		}
 
@@ -1177,7 +1283,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			int base = OP_BASE();
 
 			uint32_t address = m_reg[base] + ((has_imm ? imm32 : m_reg[OP_SRC1()]) << shift);
-			m_program.write_word(address, (uint16_t)(m_reg[OP_RD()]));
+			m_program.write_word(address & ~1U, uint16_t(m_reg[OP_RD()]));
 
 			if (m && base)
 				m_reg[base] = address;
@@ -1195,41 +1301,46 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			int base = OP_BASE();
 
 			uint32_t address = m_reg[base] + ((has_imm ? imm32 : m_reg[OP_SRC1()]) << shift);
-			m_program.write_dword(address, m_reg[OP_RD()]);
+			m_program.write_dword(address & ~3U, m_reg[OP_RD()]);
 
 			if (m && base)
 				m_reg[base] = address;
 			break;
 		}
 
-		case 0x88:
-		case 0x89:          // jsr
+		case 0x66:
+		case 0x67:
+		case 0x6e:
+		case 0x6f:          // st.d
 		{
-			int link = OP_LINK();
-			int base = OP_BASE();
-
-			if (link)
-				m_reg[link] = m_fetchpc + 4;
-
-			uint32_t address = m_reg[base] + (has_imm ? imm32 : m_reg[OP_SRC1()]);
-
-			m_pc = m_fetchpc;
-			delay_slot();
-
-			m_fetchpc = address;
+			int const shift = BIT(m_ir, 11) ? 3 : 0;
+			int const base = OP_BASE();
+			uint32_t const address = m_reg[base] + ((has_imm ? imm32 : m_reg[OP_SRC1()]) << shift);
+			m_program.write_qword(address & ~7U, m_fpair[OP_RD() >> 1]);
+			if (BIT(m_ir, 15) && base)
+				m_reg[base] = address;
 			break;
 		}
 
+		case 0x88:
+		case 0x89:          // jsr
 		case 0x8a:
 		case 0x8b:          // jsr.a
 		{
-			int link = OP_LINK();
-			int base = OP_BASE();
-
+			int const link = OP_LINK();
+			bool const annul = BIT(m_ir, 13);
+			// Source registers are read before any destination is written
+			// (SPRU109 4.1.2); the delay slot sees the new return address.
+			uint32_t const address = m_reg[OP_BASE()] + (has_imm ? imm32 : m_reg[OP_SRC1()]);
 			if (link)
-				m_reg[link] = m_fetchpc;
+				m_reg[link] = m_fetchpc + (annul ? 0 : 4);
 
-			m_fetchpc = m_reg[base] + (has_imm ? imm32 : m_reg[OP_SRC1()]);
+			if (!annul)
+			{
+				m_pc = m_fetchpc;
+				delay_slot();
+			}
+			m_fetchpc = address;
 			break;
 		}
 
@@ -1320,51 +1431,49 @@ void tms320c82_mp_device::execute_reg_long_imm()
 		case 0xc8:
 		case 0xd8:
 		case 0xc9:
-		case 0xd9:          // vrnd
+		case 0xd9:          // vrnd, floating-point input
+		case 0xca:
+		case 0xcb:          // vrnd, integer input
 		{
-			int acc = OP_ACC();
-			int p1 = m_ir & (1 << 5);
-			int pd = (m_ir >> 7) & 3;
-			int ls_bit1 = m_ir & (1 << 10);
-			int ls_bit2 = m_ir & (1 << 6);
-			int rd = OP_RS();
-			int rs1 = OP_SRC1();
-
-			double source = has_imm ? (double)u2f(imm32) : (p1 ? u2d(m_fpair[rs1 >> 1]) : (double)u2f(m_reg[rs1]));
-
-			// parallel load/store op
-			if (!(ls_bit1 == 0 && ls_bit2 == 0))
+			bool const integer_input = BIT(m_ir, 13);
+			unsigned const mode = (m_fpst >> 17) & 3;
+			unsigned const pd = (m_ir >> 7) & (integer_input ? 1 : 3);
+			int const rd = OP_RS();
+			int const rs = OP_SRC1();
+			double source;
+			if (integer_input)
 			{
-				vector_loadstore();
-			}
-
-			if (rd)
-			{
-				// destination register
-				switch (pd)
-				{
-					case 0:
-						m_reg[rd] = f2u((float)source);
-						break;
-					case 1:
-						m_fpair[rd >> 1] = d2u(source);
-						break;
-					case 2:
-						m_reg[rd] = (int32_t)(source);
-						break;
-					case 3:
-						m_reg[rd] = (uint32_t)(source);
-						break;
-				}
+				uint32_t const data = has_imm ? imm32 : m_reg[rs];
+				source = BIT(m_ir, 5) ? double(data) : double(int32_t(data));
 			}
 			else
 			{
-				// destination accumulator
+				source = has_imm ? double(u2f(imm32)) : (BIT(m_ir, 5) ? u2d(m_fpair[rs >> 1]) : double(u2f(m_reg[rs])));
+			}
+
+			// Capture operands before the independent memory operation changes
+			// registers. VRND uses FPST.DRM (SPRU109 MP:10-171..174).
+			if (BIT(m_ir, 10) || BIT(m_ir, 6))
+				vector_loadstore();
+
+			if (rd)
+			{
+				switch (pd)
+				{
+				case 0: m_reg[rd] = f2u(round_single(source, mode)); break;
+				case 1: m_fpair[rd >> 1] = d2u(source); break;
+				case 2: m_reg[rd] = round_integer(source, mode, false); break;
+				case 3: m_reg[rd] = round_integer(source, mode, true); break;
+				}
+			}
+			else if (!integer_input)
+			{
 				if (pd != 1)
 					fatalerror("tms320c82_mp_device: vrnd pd = %d at %08X\n", pd, m_pc);
-
-				m_facc[acc] = source;
+				m_facc[OP_ACC()] = source;
 			}
+			// Integer-input VRND cannot target an accumulator; R0 discards
+			// the result, including the high word (SPRU109 10.9.2).
 			break;
 		}
 
@@ -1383,7 +1492,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			float src1 = has_imm ? u2f(imm32) : u2f(m_reg[OP_SRC1()]);
 			float src2 = u2f(m_reg[OP_RS()]);
 
-			float res = (src1 * src2) + (z ? 0.0f : m_facc[acc]);
+			double const res = (double(src1) * double(src2)) + (z ? 0.0 : m_facc[acc]);
 
 			// parallel load/store op
 			if (!(ls_bit1 == 0 && ls_bit2 == 0))
@@ -1391,7 +1500,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 				vector_loadstore();
 
 				// if the opcode has load/store, dest is always accumulator
-				m_facc[acc] = (double)res;
+				m_facc[acc] = res;
 			}
 			else
 			{
@@ -1400,12 +1509,12 @@ void tms320c82_mp_device::execute_reg_long_imm()
 					if (pd)
 						m_fpair[rd >> 1] = d2u(res);
 					else
-						m_reg[rd] = f2u((float)res);
+						m_reg[rd] = f2u(round_single(res, 1));
 				}
 				else if (pd)
 				{
 					// write to accumulator
-					m_facc[acc] = (double)res;
+					m_facc[acc] = res;
 				}
 			}
 			break;
@@ -1426,7 +1535,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 			float src1 = has_imm ? u2f(imm32) : u2f(m_reg[OP_SRC1()]);
 			float src2 = u2f(m_reg[OP_RS()]);
 
-			float res = (z ? 0.0f : m_facc[acc]) - (src1 * src2);
+			double const res = (z ? 0.0 : m_facc[acc]) - (double(src1) * double(src2));
 
 			// parallel load/store op
 			if (!(ls_bit1 == 0 && ls_bit2 == 0))
@@ -1434,7 +1543,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 				vector_loadstore();
 
 				// if the opcode has load/store, dest is always accumulator
-				m_facc[acc] = (double)res;
+				m_facc[acc] = res;
 			}
 			else
 			{
@@ -1443,12 +1552,12 @@ void tms320c82_mp_device::execute_reg_long_imm()
 					if (pd)
 						m_fpair[rd >> 1] = d2u(res);
 					else
-						m_reg[rd] = f2u((float)res);
+						m_reg[rd] = f2u(round_single(res, 1));
 				}
 				else if (pd)
 				{
 					// write to accumulator
-					m_facc[acc] = (double)res;
+					m_facc[acc] = res;
 				}
 			}
 			break;
@@ -1477,7 +1586,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 					{
 						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
 						float s2 = u2f(m_reg[rs]);
-						uint64_t res = d2u((double)(s1 + s2));
+						uint64_t res = d2u(double(s1) + double(s2));
 						m_fpair[rd >> 1] = res;
 						break;
 					}
@@ -1501,7 +1610,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 					{
 						double s1 = has_imm ? u2f(imm32) : u2d(m_fpair[src1 >> 1]);
 						double s2 = u2d(m_fpair[rs >> 1]);
-						uint64_t res = d2u((double)(s1 + s2));
+						uint64_t res = d2u(double(s1) + double(s2));
 						m_fpair[rd >> 1] = res;
 						break;
 					}
@@ -1535,7 +1644,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 					{
 						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
 						float s2 = u2f(m_reg[rs]);
-						uint64_t res = d2u((double)(s1 - s2));
+						uint64_t res = d2u(double(s1) - double(s2));
 						m_fpair[rd >> 1] = res;
 						break;
 					}
@@ -1559,7 +1668,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 					{
 						double s1 = has_imm ? u2f(imm32) : u2d(m_fpair[src1 >> 1]);
 						double s2 = u2d(m_fpair[rs >> 1]);
-						uint64_t res = d2u((double)(s1 - s2));
+						uint64_t res = d2u(double(s1) - double(s2));
 						m_fpair[rd >> 1] = res;
 						break;
 					}
@@ -1593,7 +1702,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 					{
 						float s1 = u2f(has_imm ? imm32 : m_reg[src1]);
 						float s2 = u2f(m_reg[rs]);
-						uint64_t res = d2u((double)(s1 * s2));
+						uint64_t res = d2u(double(s1) * double(s2));
 						m_fpair[rd >> 1] = res;
 						break;
 					}
@@ -1623,7 +1732,8 @@ void tms320c82_mp_device::execute_reg_long_imm()
 					}
 					case 0x2a:          // I x I -> I
 					{
-						m_reg[rd] = (int32_t)(m_reg[rs]) * (int32_t)(has_imm ? imm32 : m_reg[OP_SRC1()]);
+						// Both signed and unsigned multiplies return the low 32 bits.
+						m_reg[rd] = m_reg[rs] * (has_imm ? imm32 : m_reg[OP_SRC1()]);
 						break;
 					}
 					case 0x3f:          // U x U -> U
@@ -1670,7 +1780,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 		case 0xe8:
 		case 0xe9:          // frnd
 		{
-			//int mode = (m_ir >> 7) & 3;
+			unsigned const mode = (m_ir >> 7) & 3;
 			int p1 = (m_ir >> 5) & 3;
 			int pd = (m_ir >> 9) & 3;
 			int src1 = OP_SRC1();
@@ -1694,23 +1804,23 @@ void tms320c82_mp_device::execute_reg_long_imm()
 					break;
 			}
 
-			// TODO: round
+			// TODO: FPST status and enabled floating-point exceptions.
 
 			if (rd)
 			{
 				switch (pd)
 				{
 					case 0:
-						m_reg[rd] = f2u((float)(s));
+						m_reg[rd] = f2u(round_single(s, mode));
 						break;
 					case 1:
 						m_fpair[rd >> 1] = d2u(s);
 						break;
 					case 2:
-						m_reg[rd] = (int32_t)(s);
+						m_reg[rd] = round_integer(s, mode, false);
 						break;
 					case 3:
-						m_reg[rd] = (uint32_t)(s);
+						m_reg[rd] = round_integer(s, mode, true);
 						break;
 				}
 			}
@@ -1731,19 +1841,25 @@ void tms320c82_mp_device::execute_reg_long_imm()
 
 			if (rd)
 			{
-				uint32_t flags = 0;
-				flags |= (src1 == src2) ? (1 << 20) : 0;
-				flags |= (src1 != src2) ? (1 << 21) : 0;
-				flags |= (src1 >  src2) ? (1 << 22) : 0;
-				flags |= (src1 <= src2) ? (1 << 23) : 0;
-				flags |= (src1 <  src2) ? (1 << 24) : 0;
-				flags |= (src1 >= src2) ? (1 << 25) : 0;
-				flags |= (src1 < 0 || src1 > src2) ? (1 << 26) : 0;
-				flags |= (src1 > 0 && src1 < src2) ? (1 << 27) : 0;
-				flags |= (src1 >= 0 && src1 <= src2) ? (1 << 28) : 0;
-				flags |= (src1 <= 0 || src1 >= src2) ? (1 << 29) : 0;
-				// TODO: src1 or src2 unordered
-				// TODO: src1 and src2 ordered
+				uint32_t flags = 1U << 30; // unordered suppresses all other conditions
+				if (!std::isnan(src1) && !std::isnan(src2))
+				{
+					flags = 1U << 31;
+					flags |= (src1 == src2) ? (1U << 20) : 0;
+					flags |= (src1 != src2) ? (1U << 21) : 0;
+					flags |= (src1 >  src2) ? (1U << 22) : 0;
+					flags |= (src1 <= src2) ? (1U << 23) : 0;
+					flags |= (src1 <  src2) ? (1U << 24) : 0;
+					flags |= (src1 >= src2) ? (1U << 25) : 0;
+					// SPRU109 table 10-18: negative bounds clear all range bits.
+					if (src2 >= 0.0)
+					{
+						flags |= (src1 < 0 || src1 > src2) ? (1U << 26) : 0;
+						flags |= (src1 > 0 && src1 < src2) ? (1U << 27) : 0;
+						flags |= (src1 >= 0 && src1 <= src2) ? (1U << 28) : 0;
+						flags |= (src1 <= 0 || src1 >= src2) ? (1U << 29) : 0;
+					}
+				}
 
 				m_reg[rd] = flags;
 			}
