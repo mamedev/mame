@@ -41,6 +41,8 @@ s35390a_device::s35390a_device(const machine_config &mconfig, const char *tag, d
 	, device_rtc_interface(mconfig, *this)
 	, m_data{}
 	, m_transfer{}
+	, m_scl(1)
+	, m_sda_in(1)
 {
 }
 
@@ -73,8 +75,7 @@ void s35390a_device::device_reset()
 	m_bit_count = 0;
 	m_byte_count = 0;
 	m_expected = 0;
-	m_scl = 1;
-	m_sda_in = 1;
+	// The host retains control of SCL and SDA during a device reset.
 	m_sda_out = 1;
 	m_master_ack = 0;
 }
@@ -230,7 +231,7 @@ void s35390a_device::falling_edge()
 		{
 			if ((m_shift & 0xf0) == 0x60)
 			{
-				m_command = (m_shift >> 1) & 0x07;
+				m_command = BIT(m_shift, 1, 3);
 				m_expected = command_length();
 				m_sda_out = 0;
 				m_state = STATE_COMMAND_ACK;
@@ -483,7 +484,7 @@ void s35390a_device::reset_registers(u8 status)
 
 void s35390a_device::write_time(bool full)
 {
-	auto const decode_bcd = [](u8 bcd, int minimum, int maximum, int fallback)
+	auto const decode_bcd = [] (u8 bcd, int minimum, int maximum, int fallback)
 	{
 		int const value = ((bcd >> 4) * 10) + (bcd & 0x0f);
 		return ((bcd & 0x0f) <= 9) && ((bcd >> 4) <= 9) &&

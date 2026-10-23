@@ -50,7 +50,7 @@ void xavix_intc_device::device_start()
 
 void xavix_intc_device::device_reset()
 {
-	m_irq_source = 0;
+	// Source devices retain ownership of their input levels across reset.
 	m_vector_enable = 0;
 	m_nmi_vector_lo = 0;
 	m_nmi_vector_hi = 0;
@@ -61,7 +61,7 @@ void xavix_intc_device::device_reset()
 
 void xavix_intc_device::update_irq_line()
 {
-	m_irq_cb(m_irq_source ? ASSERT_LINE : CLEAR_LINE);
+	m_irq_cb(m_irq_source != 0);
 }
 
 u8 xavix_intc_device::irq_source_r()

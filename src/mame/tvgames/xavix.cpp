@@ -2684,19 +2684,12 @@ void xavix_ekara_state::machine_reset()
 
 int xavix_ekara_state::matrix_column_r(unsigned column)
 {
-	switch (m_matrix_select & 0x7f)
-	{
-	case 0x01: return BIT(m_extra0->read(), column);
-	case 0x02: return BIT(m_extra0->read(), 2 + column);
-	case 0x04: return BIT(m_extra0->read(), 4 + column);
-	case 0x08: return BIT(m_extra0->read(), 6 + column);
-	case 0x10: return BIT(m_extra1->read(), column);
-	case 0x20: return BIT(m_extra1->read(), 2 + column);
-	case 0x40: return BIT(m_extra1->read(), 4 + column);
-	default:
-		LOG("latching inputs with invalid matrix select value of %02x\n", m_matrix_select);
-		return 0;
-	}
+	u16 const contacts = m_extra0->read() | (u16(m_extra1->read()) << 8);
+	int data = 0;
+	for (unsigned row = 0; row < 7; row++)
+		if (BIT(m_matrix_select, row))
+			data |= BIT(contacts, row * 2 + column);
+	return data;
 }
 
 void xavix_ekara_state::io0_output_w(u8 data, u8 direction)
@@ -3753,18 +3746,11 @@ u8 xavix_tvpc_state::io0_input_r(u8 direction)
 
 u8 xavix_tvpc_state::keyboard_r(offs_t offset)
 {
-	switch (offset & 0xff)
-	{
-	case 0x01: return m_keyboard[0]->read();
-	case 0x02: return m_keyboard[1]->read();
-	case 0x04: return m_keyboard[2]->read();
-	case 0x08: return m_keyboard[3]->read();
-	case 0x10: return m_keyboard[4]->read();
-	case 0x20: return m_keyboard[5]->read();
-	case 0x40: return m_keyboard[6]->read();
-	case 0x80: return m_keyboard[7]->read();
-	default:   return 0;
-	}
+	u8 data = 0;
+	for (unsigned row = 0; row < m_keyboard.size(); row++)
+		if (BIT(offset, row))
+			data |= m_keyboard[row]->read();
+	return data;
 }
 
 //-------------------------------------------------
@@ -4892,16 +4878,12 @@ INPUT_PORTS_END
 
 u8 xavix_rad_rh_state::io0_input_r(u8 direction)
 {
-	// IO0 bit 7 and IO1 bit 5 alternately select two active-high control rows.
-	bool const row0 = BIT(m_soc->io_data_latch<0>() & direction, 7);
-	bool const row1 = BIT(m_soc->io_data_latch<1>(), 5);
-
-	if (row0 && !row1)
-		return m_matrix[0]->read();
-	if (!row0 && row1)
-		return m_matrix[1]->read();
-
-	return 0;
+	u8 data = 0;
+	if (BIT(m_soc->io_data_latch<0>() & direction, 7))
+		data |= m_matrix[0]->read();
+	if (BIT(m_soc->io_data_latch<1>(), 5))
+		data |= m_matrix[1]->read();
+	return data;
 }
 
 
