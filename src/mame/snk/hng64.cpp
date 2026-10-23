@@ -2697,6 +2697,8 @@ void hng64_state::hng64_shoot(machine_config &config)
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps));
 	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::shoot_lamps6_w)); // start lamps (some missing?!)
 	lamps.lamps_out_cb<7>().set(FUNC(hng64_state::shoot_lamps7_w)); // gun lamps
+
+	m_comm->set_disable(); // just disable the network CPU, bbust2 doesn't use it
 }
 
 void hng64_state::hng64_fight(machine_config &config)
@@ -2706,6 +2708,8 @@ void hng64_state::hng64_fight(machine_config &config)
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps));
 	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::fight_lamps6_w)); // coin counters
+
+	m_comm->set_disable(); // just disable the network CPU, none of the fighting games use it
 }
 
 

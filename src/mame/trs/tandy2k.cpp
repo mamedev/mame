@@ -22,8 +22,6 @@
           The head unload time is already parsed into spec by C_SPECIFY but
           unused; it should drop HDL after command_end() with data_completion
     - keyboard ROM, same as earlier tandy 1000
-    - 2000HD hard disk controller DMA acknowledge at 0x0e0-0x0ff, not used by
-      Tandy MS-DOS 2.11, which moves sectors through the buffer with the CPU
     - clock/mouse 8042 mcu ROM, probably same as tandy 1000 isa clock/mouse adapter
     - sab3019 rtc
 
@@ -390,7 +388,7 @@ void tandy2k_state::tandy2k_io(address_map &map)
 	map(0x00052, 0x00052).mirror(0x8).r(FUNC(tandy2k_state::kbint_clr_r));
 	map(0x00060, 0x00063).mirror(0xc).rw(m_pic0, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x00070, 0x00073).mirror(0xc).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x00080, 0x00080).mirror(0xe).rw(m_fdc, FUNC(i8272a_device::dma_r), FUNC(i8272a_device::dma_w));
+	map(0x00080, 0x00080).mirror(0x1e).rw(m_fdc, FUNC(i8272a_device::dma_r), FUNC(i8272a_device::dma_w));
 	map(0x00100, 0x0017f).rw(m_vpac, FUNC(crt9007_device::read), FUNC(crt9007_device::write)).umask16(0x00ff);
 	map(0x00100, 0x0017f).w(FUNC(tandy2k_state::addr_ctrl_w)).umask16(0xff00);
 	map(0x00180, 0x00180).r(FUNC(tandy2k_state::hires_status_r)).umask16(0x00ff);
@@ -1028,6 +1026,13 @@ void tandy2k_state::fdc_hdl_w(int state)
 	m_floppy1->mon_w(!state);
 }
 
+// Hard disk controller
+
+void tandy2k_hd_state::hdc_bdrq_w(int state)
+{
+	dma_request(3, state);
+}
+
 void tandy2k_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
@@ -1315,8 +1320,9 @@ void tandy2k_hd_state::tandy2k_hd(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tandy2k_hd_state::tandy2k_hd_io);
 
 	// WD1010 (u18) and WD1100-11 (u12) hard disk controller with a Tandon TM502 drive
-	// INTRQ is not connected, the MS-DOS driver polls the status register
 	TANDY2K_HDC(config, m_hdc);
+	m_hdc->intrq_wr_callback().set(m_pic0, FUNC(pic8259_device::ir6_w));
+	m_hdc->bdrq_wr_callback().set(FUNC(tandy2k_hd_state::hdc_bdrq_w));
 
 	// software lists
 	SOFTWARE_LIST(config, "hdd_list").set_original("tandy2k_hdd");

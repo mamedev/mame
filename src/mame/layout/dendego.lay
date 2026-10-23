@@ -1,73 +1,13 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
-authors:hap
 -->
 <mamelayout version="2">
-
-<!-- define elements -->
-
-	<element name="black">
-		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
-	</element>
-	<element name="darkgray">
-		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
-	</element>
-	<element name="lightgray">
-		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
-	</element>
-	<element name="yellow">
-		<rect><color red="0.8" green="0.8" blue="0.1" /></rect>
-	</element>
-	<element name="blue">
-		<rect><color red="0.2" green="0.5" blue="0.8" /></rect>
-	</element>
-
-
-<!-- throttle -->
-
-	<element name="text_throttle">
-		<text string="THROTTLE:" align="1"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_throttle_j">
-		<text string="マスコン:" align="1"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-
-	<element name="text_dot">
-		<text string="." align="0"><color red="1.0" green="1.0" blue="0.0" /></text>
-	</element>
-	<element name="text_speed">
-		<text string="km/h" align="1"><color red="1.0" green="1.0" blue="0.0" /></text>
-	</element>
 
 	<element name="counter_throttle" defstate="0">
 		<simplecounter maxstate="9" digits="1" align="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</simplecounter>
-	</element>
-	<element name="counter_speed1" defstate="0">
-		<simplecounter maxstate="999" digits="3" align="2">
-			<color red="1.0" green="1.0" blue="0.0" />
-		</simplecounter>
-	</element>
-	<element name="counter_speed2" defstate="0">
-		<simplecounter maxstate="9" digits="1" align="1">
-			<color red="1.0" green="1.0" blue="0.0" />
-		</simplecounter>
-	</element>
-
-
-<!-- brake -->
-
-	<element name="text_brake">
-		<text string="BRAKE:" align="1"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-	<element name="text_brake_j">
-		<text string="ブレーキ:" align="1"><color red="0.8" green="0.8" blue="0.8" /></text>
-	</element>
-
-	<element name="text_pressure">
-		<text string="kg/cm²" align="1"><color red="1.0" green="1.0" blue="0.0" /></text>
 	</element>
 
 	<element name="counter_brake" defstate="0">
@@ -75,74 +15,107 @@ authors:hap
 			<color red="1.0" green="1.0" blue="1.0" />
 		</simplecounter>
 	</element>
-	<element name="counter_pressure1" defstate="0">
-		<simplecounter maxstate="99" digits="2" align="2">
-			<color red="1.0" green="1.0" blue="0.0" />
-		</simplecounter>
-	</element>
-	<element name="counter_pressure2" defstate="0">
-		<simplecounter maxstate="9" digits="1" align="1">
-			<color red="1.0" green="1.0" blue="0.0" />
-		</simplecounter>
-	</element>
-
-
-<!-- lamps -->
 
 	<element name="lamp_white" defstate="0">
-		<rect state="1"><color red="1.0" green="0.85" blue="0.65" /></rect>
-		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect state="1">
+			<color red="1.0" green="0.85" blue="0.65" />
+		</rect>
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
 	</element>
 
 	<element name="lamp_red" defstate="0">
-		<rect state="1"><color red="1.0" green="0.1" blue="0.1" /></rect>
-		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
+		<rect state="1">
+			<color red="1.0" green="0.1" blue="0.1" />
+		</rect>
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
 	</element>
 
 	<element name="text_pwr">
-		<text string="PWR"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text string="PWR">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
 	</element>
+
 	<element name="text_ok">
-		<text string="OK"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text string="OK">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
 	</element>
+
 	<element name="text_eme">
-		<text string="EME"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text string="EME">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
 	</element>
+
 	<element name="text_door">
-		<text string="doors"><color red="0.9" green="0.1" blue="0.1" /></text>
+		<text string="doors">
+			<color red="0.9" green="0.1" blue="0.1" />
+		</text>
 	</element>
 
 	<element name="text_pwr_j">
-		<text string="三相"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text string="三相">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
 	</element>
+
 	<element name="text_ok_j">
-		<text string="常用"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text string="常用">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
 	</element>
+
 	<element name="text_eme_j">
-		<text string="非常"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text string="非常">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
 	</element>
+
 	<element name="text_door_j">
-		<text string="車内信号"><color red="0.9" green="0.1" blue="0.1" /></text>
+		<text string="車内信号">
+			<color red="0.9" green="0.1" blue="0.1" />
+		</text>
 	</element>
 
 	<element name="text_1">
-		<text string="1"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text string="1">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
 	</element>
+
 	<element name="text_2">
-		<text string="2"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text string="2">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
 	</element>
+
 	<element name="text_3">
-		<text string="3"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text string="3">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
 	</element>
 
 	<element name="lamp_door" defstate="0">
-		<disk state="1"><color red="1.0" green="0.85" blue="0.65" /></disk>
-		<disk state="0"><color red="0.2" green="0.2" blue="0.2" /></disk>
+		<disk state="1">
+			<color red="1.0" green="0.85" blue="0.65" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</disk>
 	</element>
 
 	<element name="lamp_start" defstate="0">
-		<disk state="1"><color red="1.0" green="1.0" blue="0.3" /></disk>
-		<disk state="0"><color red="0.2" green="0.2" blue="0.0" /></disk>
+		<disk state="1">
+			<color red="1.0" green="1.0" blue="0.3" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.2" blue="0.0" />
+		</disk>
 	</element>
 
 	<element name="lamp_redd" defstate="0">
@@ -159,190 +132,449 @@ authors:hap
 		</disk>
 	</element>
 
+	<element name="analog_panel">
+		<rect>
+			<color red="0.085" green="0.105" blue="0.105" alpha="1" />
+		</rect>
+	</element>
 
-<!-- build screen -->
+	<element name="analog_speed_face">
+		<image>
+			<bounds x="0" y="0" width="100" height="100" />
+			<data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+				<circle cx="50" cy="50" r="50" fill="#0e1111" />
+				<circle cx="50" cy="50" r="48" fill="#7d8582" />
+				<circle cx="50" cy="50" r="45.8" fill="white" />
+				<g stroke="#0e1111" stroke-linecap="round">
+					<path d="M 89 50 H 94" stroke-width="1" transform="rotate(135 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(139.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(144 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(148.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(153 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(157.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(162 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(166.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(171 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(175.5 50 50)" />
+					<path d="M 89 50 H 94" stroke-width="1" transform="rotate(180 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(184.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(189 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(193.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(198 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(202.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(207 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(211.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(216 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(220.5 50 50)" />
+					<path d="M 89 50 H 94" stroke-width="1" transform="rotate(225 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(229.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(234 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(238.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(243 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(247.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(252 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(256.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(261 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(265.5 50 50)" />
+					<path d="M 89 50 H 94" stroke-width="1" transform="rotate(270 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(274.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(279 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(283.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(288 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(292.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(297 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(301.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(306 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(310.5 50 50)" />
+					<path d="M 89 50 H 94" stroke-width="1" transform="rotate(315 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(319.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(324 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(328.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(333 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(337.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(342 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(346.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(351 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(355.5 50 50)" />
+					<path d="M 89 50 H 94" stroke-width="1" transform="rotate(360 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(364.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(369 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(373.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(378 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(382.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(387 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(391.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(396 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(400.5 50 50)" />
+					<path d="M 89 50 H 94" stroke-width="1" transform="rotate(405 50 50)" />
+				</g>
+			</svg>
+		]]></data></image>
+		<text string="0">
+			<bounds x="22.01903" y="69.88097" width="10.0" height="6.2" />
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text string="20">
+			<bounds x="12.5" y="46.9" width="10.0" height="6.2" />
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text string="40">
+			<bounds x="22.01903" y="23.91903" width="10.0" height="6.2" />
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text string="60">
+			<bounds x="45.0" y="14.4" width="10.0" height="6.2" />
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text string="80">
+			<bounds x="67.98097" y="23.91903" width="10.0" height="6.2" />
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text string="100">
+			<bounds x="77.5" y="46.9" width="10.0" height="6.2" />
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text string="120">
+			<bounds x="67.98097" y="69.88097" width="10.0" height="6.2" />
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text string="km/h">
+			<bounds x="39.0" y="66.0" width="22.0" height="5.5" />
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="analog_speed_needle" defstate="0">
+		<rect>
+			<color state="0" alpha="0" />
+			<color state="1300" alpha="0" />
+		</rect>
+	</element>
 
-	<group name="shared">
-		<bounds left="0" right="400" top="0" bottom="330" />
+	<element name="analog_voltage_face">
+		<image>
+			<bounds x="0" y="0" width="100" height="100" />
+			<data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+				<circle cx="50" cy="50" r="50" fill="#0e1111" />
+				<circle cx="50" cy="50" r="48" fill="#7d8582" />
+				<circle cx="50" cy="50" r="45.8" fill="white" />
+				<g stroke="#0e1111" stroke-linecap="round">
+					<path d="M 89 50 H 94" stroke-width="1" transform="rotate(135 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(148.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(162 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(175.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(189 50 50)" />
+					<path d="M 89 50 H 94" stroke-width="1" transform="rotate(202.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(216 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(229.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(243 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(256.5 50 50)" />
+					<path d="M 89 50 H 94" stroke-width="1" transform="rotate(270 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(283.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(297 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(310.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(324 50 50)" />
+					<path d="M 89 50 H 94" stroke-width="1" transform="rotate(337.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(351 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(364.5 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(378 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(391.5 50 50)" />
+					<path d="M 89 50 H 94" stroke-width="1" transform="rotate(405 50 50)" />
+				</g>
+			</svg>
+		]]></data></image>
+		<text string="0">
+			<bounds x="21.01903" y="69.48097" width="12.0" height="7.0" />
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text string=".5">
+			<bounds x="13.97392" y="34.06279" width="12.0" height="7.0" />
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text string="1">
+			<bounds x="44.0" y="14.0" width="12.0" height="7.0" />
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text string="1.5">
+			<bounds x="74.02608" y="34.06279" width="12.0" height="7.0" />
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text string="2">
+			<bounds x="66.98097" y="69.48097" width="12.0" height="7.0" />
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text string="kV">
+			<bounds x="28.0" y="63.0" width="44.0" height="12.0" />
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="analog_voltage_needle">
+		<image><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M 45 50 H 90" fill="none" stroke="black" stroke-width="1.2" stroke-linecap="round" transform="rotate(337.5 50 50)" /></svg>]]></data></image>
+	</element>
+
+	<element name="analog_speed_hub">
+		<image><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="3.2" fill="black" /></svg>]]></data></image>
+	</element>
+
+	<element name="analog_throttle_en">
+		<text string="THROTTLE">
+			<color red="0.91" green="0.9" blue="0.81" alpha="1" />
+		</text>
+	</element>
+
+	<element name="analog_brake_en">
+		<text string="BRAKE">
+			<color red="0.91" green="0.9" blue="0.81" alpha="1" />
+		</text>
+	</element>
+
+	<element name="analog_throttle_j">
+		<text string="マスコン">
+			<color red="0.91" green="0.9" blue="0.81" alpha="1" />
+		</text>
+	</element>
+
+	<element name="analog_brake_j">
+		<text string="ブレーキ">
+			<color red="0.91" green="0.9" blue="0.81" alpha="1" />
+		</text>
+	</element>
+
+	<element name="analog_pressure_face">
+		<image>
+			<bounds x="0" y="0" width="100" height="100" />
+			<data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+				<circle cx="50" cy="50" r="50" fill="#0e1111" />
+				<circle cx="50" cy="50" r="48" fill="#7d8582" />
+				<circle cx="50" cy="50" r="45.8" fill="white" />
+				<g stroke="#0e1111" stroke-linecap="round">
+					<path d="M 89 50 H 94" stroke-width="1" transform="rotate(135 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(144 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(153 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(162 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(171 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(180 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(189 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(198 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(207 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(216 50 50)" />
+					<path d="M 89 50 H 94" stroke-width="1" transform="rotate(225 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(234 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(243 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(252 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(261 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(270 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(279 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(288 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(297 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(306 50 50)" />
+					<path d="M 89 50 H 94" stroke-width="1" transform="rotate(315 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(324 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(333 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(342 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(351 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(360 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(369 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(378 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(387 50 50)" />
+					<path d="M 92 50 H 94" stroke-width="0.5" transform="rotate(396 50 50)" />
+					<path d="M 89 50 H 94" stroke-width="1" transform="rotate(405 50 50)" />
+				</g>
+			</svg>
+		]]></data></image>
+		<text string="0">
+			<bounds x="21.37258" y="68.62742" width="12.0" height="8.0" />
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text string="5">
+			<bounds x="21.37258" y="23.37258" width="12.0" height="8.0" />
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text string="10">
+			<bounds x="66.62742" y="23.37258" width="12.0" height="8.0" />
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text string="15">
+			<bounds x="66.62742" y="68.62742" width="12.0" height="8.0" />
+			<color red="0" green="0" blue="0" />
+		</text>
+		<text string="kg/cm²">
+			<bounds x="29.0" y="67.0" width="42.0" height="7.0" />
+			<color red="0" green="0" blue="0" />
+		</text>
+	</element>
+	<element name="analog_pressure_needle" defstate="0">
+		<rect>
+			<color state="0" alpha="0" />
+			<color state="1600" alpha="0" />
+		</rect>
+	</element>
+
+	<group name="dashboard">
+		<bounds x="0" y="0" width="533.33333" height="300" />
 		<screen index="0">
-			<bounds left="0" right="400" top="0" bottom="300" />
+			<bounds x="0" y="0" width="400" height="300" />
 		</screen>
-
-		<!-- static background -->
-		<element ref="black">
-			<bounds left="0" right="400" top="300" bottom="330" />
+		<element ref="analog_panel">
+			<bounds x="400" y="0" width="133.33333" height="300" />
 		</element>
-		<element ref="lightgray">
-			<bounds left="0" right="113" top="302" bottom="330" />
+		<element ref="analog_speed_face">
+			<bounds x="414.66666" y="28" width="104" height="104" />
 		</element>
-		<element ref="yellow">
-			<bounds left="113" right="400" top="302" bottom="330" />
+		<element ref="analog_speed_needle" name="counter2">
+			<bounds x="414.66666" y="28" width="104" height="104" />
 		</element>
-		<element ref="darkgray">
-			<bounds left="115" right="227" top="304" bottom="328" />
+		<element ref="analog_speed_hub">
+			<bounds x="414.66666" y="28" width="104" height="104" />
 		</element>
-		<element ref="lightgray">
-			<bounds left="245" right="380" top="302" bottom="330" />
+		<element ref="lamp_white" name="lamp7">
+			<bounds x="407.0" y="230" width="24.0" height="16" />
 		</element>
-		<element ref="black">
-			<bounds left="244.75" right="245.5" top="302" bottom="330" />
+		<element ref="lamp_white" name="lamp2">
+			<bounds x="437.0" y="230" width="24.0" height="16" />
 		</element>
-		<element ref="black">
-			<bounds left="379.25" right="380.5" top="302" bottom="330" />
+		<element ref="lamp_red" name="lamp3">
+			<bounds x="467.0" y="230" width="24.0" height="16" />
 		</element>
-		<element ref="blue">
-			<bounds left="360" right="380" top="302" bottom="330" />
+		<element ref="lamp_door" name="lamp1">
+			<bounds x="507.0" y="237" width="14.0" height="14.0" />
 		</element>
-
-		<!-- lamps -->
-		<element name="lamp7" ref="lamp_white">
-			<bounds x="8" y="304" width="17" height="24" />
+		<element ref="lamp_start" name="lamp0">
+			<bounds x="514.0" y="260" width="10.0" height="10.0" />
 		</element>
-		<element name="lamp2" ref="lamp_white">
-			<bounds x="31" y="304" width="17" height="24" />
+		<element ref="lamp_white" name="lamp4">
+			<bounds x="407" y="260" width="20" height="15" />
 		</element>
-		<element name="lamp3" ref="lamp_red">
-			<bounds x="54" y="304" width="17" height="24" />
+		<element ref="lamp_white" name="lamp4">
+			<bounds x="433" y="260" width="20" height="15" />
 		</element>
-
-		<element name="lamp1" ref="lamp_door">
-			<bounds x="86" y="314" width="14" height="14" />
-		</element>
-		<element name="lamp0" ref="lamp_start">
-			<bounds x="231.5" y="317" width="9" height="9" />
-		</element>
-
-		<element name="lamp4" ref="lamp_white">
-			<bounds x="258.5" y="304" width="17" height="24" />
-		</element>
-		<element name="lamp4" ref="lamp_white">
-			<bounds x="281.5" y="304" width="17" height="24" />
-		</element>
-		<element name="lamp4" ref="lamp_white">
-			<bounds x="304.5" y="304" width="17" height="24" />
+		<element ref="lamp_white" name="lamp4">
+			<bounds x="459" y="260" width="20" height="15" />
 		</element>
 		<element ref="lamp_white">
-			<bounds x="327.5" y="304" width="17" height="24" />
+			<bounds x="485" y="260" width="20" height="15" />
 		</element>
-
 		<element ref="text_1">
-			<bounds xc="267" yc="316" width="14" height="10" />
+			<bounds x="410" y="262.5" width="14" height="10" />
 		</element>
 		<element ref="text_2">
-			<bounds xc="290" yc="316" width="14" height="10" />
+			<bounds x="436" y="262.5" width="14" height="10" />
 		</element>
 		<element ref="text_3">
-			<bounds xc="313" yc="316" width="14" height="10" />
+			<bounds x="462" y="262.5" width="14" height="10" />
 		</element>
-
-		<element name="lamp5" ref="lamp_redd">
-			<bounds x="352" y="300" width="20" height="20" />
+		<element ref="lamp_redd" name="lamp5">
+			<bounds x="442.66666" y="1" width="24" height="24" />
 		</element>
-		<element name="lamp6" ref="lamp_redd">
-			<bounds x="370" y="300" width="20" height="20" />
+		<element ref="lamp_redd" name="lamp6">
+			<bounds x="466.66666" y="1" width="24" height="24" />
 		</element>
-
-		<!-- meters -->
-		<element name="counter2" ref="counter_speed1">
-			<bounds x="120" y="316" width="13.5" height="10" />
+		<element ref="counter_throttle" name="counter0">
+			<bounds x="451" y="284" width="10" height="13" />
 		</element>
-		<element ref="text_dot">
-			<bounds x="133" y="316" width="3" height="10" />
+		<element ref="counter_brake" name="counter1">
+			<bounds x="508" y="284" width="15" height="13" />
 		</element>
-		<element name="counter3" ref="counter_speed2">
-			<bounds x="136" y="316" width="4.25" height="10" />
+		<element ref="analog_pressure_face">
+			<bounds x="452.66666" y="140" width="78" height="78" />
 		</element>
-		<element ref="text_speed">
-			<bounds x="144" y="316" width="30" height="10" />
+		<element ref="analog_pressure_needle" name="counter3" id="pressure_needle">
+			<bounds x="452.66666" y="140" width="78" height="78" />
 		</element>
-
-		<element name="counter4" ref="counter_pressure1">
-			<bounds x="179" y="316" width="9" height="10" />
+		<element ref="analog_speed_hub">
+			<bounds x="452.66666" y="140" width="78" height="78" />
 		</element>
-		<element ref="text_dot">
-			<bounds x="187.5" y="316" width="3" height="10" />
+		<element ref="analog_voltage_face">
+			<bounds x="404" y="156" width="46" height="46" />
 		</element>
-		<element name="counter5" ref="counter_pressure2">
-			<bounds x="190.5" y="316" width="4.25" height="10" />
+		<element ref="analog_voltage_needle">
+			<bounds x="404" y="156" width="46" height="46" />
 		</element>
-
-		<element ref="text_pressure">
-			<bounds x="198.5" y="316" width="25" height="10" />
+		<element ref="analog_speed_hub">
+			<bounds x="404" y="156" width="46" height="46" />
 		</element>
 	</group>
 
-	<view name="Internal Layout (English)"> <!-- translated labels -->
-		<bounds left="0" right="400" top="0" bottom="330" />
-		<group ref="shared"><bounds left="0" right="400" top="0" bottom="330" /></group>
-
-		<!-- lamp labels -->
-		<element ref="text_pwr">
-			<bounds xc="16.5" yc="316" width="14" height="8" />
-		</element>
-
-		<element ref="text_ok">
-			<bounds xc="39.5" yc="316" width="14" height="8" />
-		</element>
-
-		<element ref="text_eme">
-			<bounds xc="62.5" yc="316" width="14" height="8" />
-		</element>
-
-		<element ref="text_door">
-			<bounds x="81" y="304" width="24" height="9" />
-		</element>
-
-		<!-- meters -->
-		<element ref="text_throttle">
-			<bounds x="120" y="306" width="40" height="10" />
-		</element>
-		<element name="counter0" ref="counter_throttle">
-			<bounds x="163" y="306" width="10" height="10" />
-		</element>
-
-		<element ref="text_brake">
-			<bounds x="179" y="306" width="27" height="10" />
-		</element>
-		<element name="counter1" ref="counter_brake">
-			<bounds x="208" y="306" width="12" height="10" />
-		</element>
-	</view>
-
-	<view name="Internal Layout (Japanese)"> <!-- original labels -->
-		<bounds left="0" right="400" top="0" bottom="330" />
-		<group ref="shared"><bounds left="0" right="400" top="0" bottom="330" /></group>
-
-		<!-- lamp labels -->
+	<view name="Lamps and Dials (Japanese)">
+		<bounds x="0" y="0" width="533.333333" height="300" />
+		<group ref="dashboard">
+			<bounds x="0" y="0" width="533.333333" height="300" />
+		</group>
 		<element ref="text_pwr_j">
-			<bounds xc="16.5" yc="316" width="14" height="8" />
+			<bounds x="409" y="233.5" width="20" height="9" />
 		</element>
-
 		<element ref="text_ok_j">
-			<bounds xc="39.5" yc="316" width="14" height="8" />
+			<bounds x="439" y="233.5" width="20" height="9" />
 		</element>
-
 		<element ref="text_eme_j">
-			<bounds xc="62.5" yc="316" width="14" height="8" />
+			<bounds x="469" y="233.5" width="20" height="9" />
 		</element>
-
 		<element ref="text_door_j">
-			<bounds x="81" y="304" width="24" height="9" />
+			<bounds x="501" y="225" width="26" height="9" />
 		</element>
-
-		<!-- meters -->
-		<element ref="text_throttle_j">
-			<bounds x="120" y="306" width="27" height="10" />
+		<element ref="analog_throttle_j">
+			<bounds x="406" y="285" width="43" height="9" />
 		</element>
-		<element name="counter0" ref="counter_throttle">
-			<bounds x="150" y="306" width="10" height="10" />
-		</element>
-
-		<element ref="text_brake_j">
-			<bounds x="179" y="306" width="27" height="10" />
-		</element>
-		<element name="counter1" ref="counter_brake">
-			<bounds x="208" y="306" width="12" height="10" />
+		<element ref="analog_brake_j">
+			<bounds x="467" y="285" width="38" height="9" />
 		</element>
 	</view>
 
+	<view name="Lamps and Dials (English)">
+		<bounds x="0" y="0" width="533.333333" height="300" />
+		<group ref="dashboard">
+			<bounds x="0" y="0" width="533.333333" height="300" />
+		</group>
+		<element ref="text_pwr">
+			<bounds x="409" y="233.5" width="20" height="9" />
+		</element>
+		<element ref="text_ok">
+			<bounds x="439" y="233.5" width="20" height="9" />
+		</element>
+		<element ref="text_eme">
+			<bounds x="469" y="233.5" width="20" height="9" />
+		</element>
+		<element ref="text_door">
+			<bounds x="501" y="225" width="26" height="9" />
+		</element>
+		<element ref="analog_throttle_en">
+			<bounds x="406" y="285" width="43" height="9" />
+		</element>
+		<element ref="analog_brake_en">
+			<bounds x="467" y="285" width="38" height="9" />
+		</element>
+	</view>
+
+	<script><![CDATA[
+		local function needle(name, scale, maximum)
+			file.elements[name]:set_draw_callback(function (state, bitmap)
+				local angle = math.rad(135 + 270 * math.min(state, maximum or state) / scale)
+				local dx, dy = math.cos(angle), math.sin(angle)
+				local w, h = bitmap.width, bitmap.height
+				local edge = 50 / math.min(w, h)
+				local radius = 0.6 + edge
+				local x0, y0 = 50 - 5 * dx, 50 - 5 * dy
+				local x1, y1 = 50 + 40 * dx, 50 + 40 * dy
+				local left = math.max(0, math.floor((math.min(x0, x1) - radius) * w / 100))
+				local right = math.min(w - 1, math.ceil((math.max(x0, x1) + radius) * w / 100))
+				local top = math.max(0, math.floor((math.min(y0, y1) - radius) * h / 100))
+				local bottom = math.min(h - 1, math.ceil((math.max(y0, y1) + radius) * h / 100))
+				for y = top, bottom do
+					for x = left, right do
+						local px, py = (x + 0.5) * 100 / w - 50, (y + 0.5) * 100 / h - 50
+						local along = px * dx + py * dy
+						local across = px * dy - py * dx
+						local cap = math.max(-5 - along, 0, along - 40)
+						local distance = math.sqrt(across * across + cap * cap)
+						local alpha = math.floor(255 * math.min(1, math.max(0, (radius - distance) / (2 * edge))))
+						if alpha > 0 then bitmap:plot(x, y, alpha << 24) end
+					end
+				end
+			end)
+		end
+		needle('analog_speed_needle', 1200, 1200)
+		needle('analog_pressure_needle', 1500)
+	]]></script>
 </mamelayout>

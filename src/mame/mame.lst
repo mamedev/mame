@@ -15830,9 +15830,20 @@ sc6dndemc
 @source:bfm/bfm_cobra3.cpp
 c3_ppays
 c3_rtime
+c3_rtimea
+c3_rtimeb
+c3_rtimec
+c3_rtimed
+c3_rtimee
 c3_telly
+c3_tellya
+c3_tellyb
+c3_tellyc
 c3_tellyns
+c3_tellynsa
+c3_tellynsb
 c3_totp
+c3_totpa
 
 @source:bfm/bfmsys83.cpp
 b83catms
@@ -20982,6 +20993,7 @@ hds200
 
 @source:heathzenith/et3400.cpp
 et3400
+et3400a
 
 @source:heathzenith/h8.cpp
 h8
@@ -21288,6 +21300,9 @@ sc112
 sc116
 sc133
 sc203
+
+@source:homebrew/sbc6120.cpp
+sbc6120
 
 @source:homebrew/sbc6510.cpp
 sbc6510
@@ -23475,6 +23490,7 @@ vigilanto
 
 @source:isc/compucolor.cpp
 compclr2
+compclr2a
 
 @source:itech/capbowl.cpp
 bowlrama
@@ -34699,6 +34715,7 @@ valkyrie
 @source:namco/namcos10.cpp
 ballpom
 chocovdr
+dicerom
 g13jnr
 gahaha
 gahaha2
@@ -34920,6 +34937,7 @@ finfurl
 finfurl2
 finfurl2j
 gunwars
+gunwarsj
 gunwarsa
 motoxgo
 motoxgov1a
@@ -36281,6 +36299,7 @@ fatfurspb
 kinstsnes
 mk3snes
 snes4sl
+snes4sl94
 snes4sln
 
 @source:nintendo/spacefb.cpp
@@ -37473,6 +37492,9 @@ ecssi5pi
 @source:pc/champ2.cpp
 champ2
 
+@source:pc/cmltgame.cpp
+cmltgame
+
 @source:pc/compc.cpp
 compc10
 pc10iii
@@ -37540,6 +37562,9 @@ megapcpl
 
 @source:pc/nforcepc.cpp
 nforcepc
+
+@source:pc/octavian_g650.cpp
+sweetstr
 
 @source:pc/pangofun.cpp
 pangofun
@@ -40810,6 +40835,9 @@ lucky168
 pljh
 wakenz80
 
+@source:sealy/sealy_z80_8bpp.cpp
+clonekng
+
 @source:seequa/chameleon.cpp
 chameleon
 champroto
@@ -42373,7 +42401,6 @@ omv1000
 omv2000
 sc3000
 sc3000pal
-sf7000
 sg1000
 sg1000m2
 

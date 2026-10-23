@@ -184,7 +184,7 @@ public:
 	int grabsel;
 	int grabsellast;
 	uint32_t paracontrol,paratype,endofstrip,listtype,global_paratype,parameterconfig;
-	uint32_t groupcontrol,groupen,striplen,userclip;
+	uint32_t groupcontrol,groupen,striplen;
 	uint32_t objcontrol,shadow,volume,coltype,texture,offset_color_enable,gouraud,uv16bit;
 	uint32_t texturesizes,textureaddress,scanorder,pixelformat;
 	uint32_t blend_mode, srcselect,dstselect,fogcontrol,colorclamp, use_alpha;
@@ -277,6 +277,8 @@ public:
 	void ta_isp_limit_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t ta_next_opb_r();
 	uint32_t ta_itp_current_r();
+	uint32_t ta_glob_tile_clip_r();
+	void ta_glob_tile_clip_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t ta_alloc_ctrl_r();
 	void ta_alloc_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t ta_list_init_r();
@@ -379,7 +381,7 @@ private:
 
 	// TA registers
 	uint32_t ta_ol_base, ta_ol_limit, ta_isp_base, ta_isp_limit;
-	uint32_t ta_next_opb, ta_itp_current, ta_alloc_ctrl, ta_next_opb_init;
+	uint32_t ta_next_opb, ta_itp_current, ta_alloc_ctrl, ta_next_opb_init, ta_glob_tile_clip;
 	uint32_t ta_yuv_tex_base, ta_yuv_tex_ctrl, ta_yuv_tex_cnt;
 	uint32_t ta_yuv_index;
 	int ta_yuv_u_ptr, ta_yuv_v_ptr;
@@ -389,6 +391,8 @@ private:
 	// Other registers
 	uint32_t fog_table[0x80];
 	uint32_t palette[0x400];
+	rectangle user_tile_clip;
+	uint8_t user_tile_mode;
 
 	// PD DMA registers
 	uint32_t sb_pdstap, sb_pdstar, sb_pdlen, sb_pddir, sb_pdtsel, sb_pden, sb_pdst, sb_pdapro;

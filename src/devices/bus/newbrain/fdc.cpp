@@ -10,8 +10,7 @@
 
     TODO:
 
-    - map d413 ROM to computer space
-    - paging
+    - bus request/acknowledge arbitration with the computer
 
 */
 
@@ -46,7 +45,7 @@ DEFINE_DEVICE_TYPE(NEWBRAIN_FDC, newbrain_fdc_device, "newbrain_fdc", "NewBrain 
 
 ROM_START( newbrain_fdc )
 	ROM_REGION( 0x2000, "d413", 0 )
-	ROM_LOAD( "d413-2.rom", 0x0000, 0x2000, CRC(097591f1) SHA1(c2aa1d27d4f3a24ab0c8135df746a4a44201a7f4) )
+	ROM_LOAD( "d413-2.rom", 0x0000, 0x2000, CRC(29cab1e7) SHA1(9b994db05e79b70e283bb379972778ce39b3c2e1) )
 
 	ROM_REGION( 0x2000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS("issue2")
@@ -74,7 +73,8 @@ const tiny_rom_entry *newbrain_fdc_device::device_rom_region() const
 void newbrain_fdc_device::newbrain_fdc_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).rom();
+	map(0x0000, 0x1fff).mirror(0x6000).rom().region(Z80_TAG, 0);
+	map(0x8000, 0xffff).rw(FUNC(newbrain_fdc_device::window_r), FUNC(newbrain_fdc_device::window_w));
 }
 
 
@@ -99,6 +99,7 @@ void newbrain_fdc_device::newbrain_fdc_io(address_map &map)
 static void newbrain_floppies(device_slot_interface &device)
 {
 	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
 }
 
 
@@ -115,8 +116,8 @@ void newbrain_fdc_device::device_add_mconfig(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, false, true);
 	m_fdc->intrq_wr_callback().set(FUNC(newbrain_fdc_device::fdc_int_w));
 
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", newbrain_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", newbrain_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", newbrain_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", newbrain_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":2", newbrain_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, UPD765_TAG ":3", newbrain_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
@@ -140,7 +141,15 @@ newbrain_fdc_device::newbrain_fdc_device(const machine_config &mconfig, const ch
 	m_maincpu(*this, Z80_TAG),
 	m_fdc(*this, UPD765_TAG),
 	m_floppy(*this, UPD765_TAG ":%u", 0U),
-	m_exp(*this, "exp")
+	m_exp(*this, "exp"),
+	m_rom(*this, "d413"),
+	m_ram(*this, "ram", 0x400, ENDIANNESS_LITTLE),
+	m_paging(0),
+	m_ma16(0),
+	m_mpm(0),
+	m_fdc_att(0),
+	m_fdc_int(0),
+	m_pa15(0)
 {
 }
 
@@ -166,11 +175,7 @@ void newbrain_fdc_device::device_start()
 
 void newbrain_fdc_device::device_reset()
 {
-	m_maincpu->reset();
-
-	moton(0);
-	m_fdc->tc_w(0);
-	m_pa15 = 0;
+	io_dec_w(0);
 }
 
 
@@ -180,7 +185,20 @@ void newbrain_fdc_device::device_reset()
 
 uint8_t newbrain_fdc_device::mreq_r(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
 {
-	return m_exp->mreq_r(offset, data, romov, exrm, raminh);
+	data = m_exp->mreq_r(offset, data, romov, exrm, raminh);
+
+	int block = romov ? (offset >> 13) : exrm;
+	offs_t addr = offset & 0x1fff;
+
+	if (block == 4 && !raminh)
+	{
+		if (addr >= 0x1c00)
+			data = m_ram[addr & 0x3ff];
+		else
+			data = m_rom->base()[addr];
+	}
+
+	return data;
 }
 
 
@@ -191,6 +209,57 @@ uint8_t newbrain_fdc_device::mreq_r(offs_t offset, uint8_t data, bool &romov, in
 void newbrain_fdc_device::mreq_w(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh)
 {
 	m_exp->mreq_w(offset, data, romov, exrm, raminh);
+
+	int block = romov ? (offset >> 13) : exrm;
+	offs_t addr = offset & 0x1fff;
+
+	if (block == 4 && !raminh && addr >= 0x1c00)
+		m_ram[addr & 0x3ff] = data;
+}
+
+
+//-------------------------------------------------
+//  window_r - controller access to the computer bus
+//-------------------------------------------------
+
+uint8_t newbrain_fdc_device::window_r(offs_t offset)
+{
+	offs_t addr = (m_pa15 << 15) | offset;
+
+	if (m_paging)
+		return m_slot->host_paged_r((m_ma16 << 16) | addr);
+
+	return m_slot->host_mreq_r(addr);
+}
+
+
+//-------------------------------------------------
+//  window_w - controller access to the computer bus
+//-------------------------------------------------
+
+void newbrain_fdc_device::window_w(offs_t offset, uint8_t data)
+{
+	offs_t addr = (m_pa15 << 15) | offset;
+
+	if (m_paging)
+		m_slot->host_paged_w((m_ma16 << 16) | addr, data);
+	else
+		m_slot->host_mreq_w(addr, data);
+}
+
+
+//-------------------------------------------------
+//  page_r - paged memory read
+//-------------------------------------------------
+
+uint8_t newbrain_fdc_device::page_r(int page, offs_t offset, uint8_t data)
+{
+	data = m_exp->page_r(page, offset, data);
+
+	if (page == 0x08)
+		data = m_rom->base()[offset];
+
+	return data;
 }
 
 
@@ -212,7 +281,7 @@ void newbrain_fdc_device::iorq_w(offs_t offset, uint8_t data, bool &prtov)
 {
 	m_exp->iorq_w(offset, data, prtov);
 
-	if ((offset & 0x20f) == 0x20f)
+	if ((offset & 0xff) == 0xff && BIT(offset, 9))
 	{
 		io_dec_w(data);
 	}
@@ -264,11 +333,7 @@ void newbrain_fdc_device::fdc_auxiliary_w(uint8_t data)
 
 	moton(BIT(data, 0));
 
-	if (BIT(data, 1))
-	{
-		m_fdc->reset();
-	}
-
+	m_fdc->reset_w(BIT(data, 1));
 	m_fdc->tc_w(BIT(data, 2));
 
 	m_pa15 = BIT(data, 5);
@@ -301,7 +366,7 @@ uint8_t newbrain_fdc_device::fdc_control_r()
 
 
 //-------------------------------------------------
-//  io_dec_w - 0x20f
+//  io_dec_w -
 //-------------------------------------------------
 
 void newbrain_fdc_device::io_dec_w(uint8_t data)
@@ -327,8 +392,10 @@ void newbrain_fdc_device::io_dec_w(uint8_t data)
 
 	if (!BIT(data, 5))
 	{
-		device_reset();
+		fdc_auxiliary_w(0);
 	}
+
+	m_maincpu->set_input_line(INPUT_LINE_RESET, BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_fdc_att = BIT(data, 7);
 }

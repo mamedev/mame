@@ -20,7 +20,7 @@ StatEtt (enanvändare) [24-34792-2]
 StatEtt (nät/skollicens) [24-34791-4]
 Svenska i datasalen
 -->
-<softwarelist name="compis" description="Telenova Compis disk images">
+<softwarelist name="compis_flop" description="Telenova Compis disk images">
 
 	<software name="abcenkat">
 		<description>ABC/Enkät/Etikett/Klockan</description>

@@ -139,6 +139,14 @@ void mpc106_host_device::device_reset()
 	pci_host_device::device_reset();
 }
 
+// The RAM banks and the CONFIG_ADDR/CONFIG_DATA window live in the CPU's space and are only
+// installed when the firmware programs them, so put them back after a state load.
+void mpc106_host_device::device_post_load()
+{
+	install_ram();
+	install_config_access_map();
+}
+
 // The CONFIG_ADDR/CONFIG_DATA window follows the host's byte order, so it has to be reinstalled
 // when the firmware flips PICR1[LE_MODE] (MaciNTosh ARC firmware needs this).
 void mpc106_host_device::install_config_access_map()
@@ -345,7 +353,11 @@ void mpc106_host_device::memory_enable_w(offs_t offset, u8 data)
 {
 	LOGMASKED(LOG_RAM, "%s: %02x to memory_enable\n", tag(), data);
 	m_memory_bank_enable = data;
+	install_ram();
+}
 
+void mpc106_host_device::install_ram()
+{
 	// unmap all RAM
 	m_cpu_space->unmap_readwrite(0x00000000, 0x0fffffff);
 

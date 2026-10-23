@@ -868,7 +868,7 @@ void victor9k_state::victor9k(machine_config &config)
 
 	VICTOR_9000_FDC(config, m_fdc);
 	m_fdc->irq_wr_callback().set(FUNC(victor9k_state::fdc_irq_w));
-	m_fdc->syn_wr_callback().set(I8259A_TAG, FUNC(pic8259_device::ir0_w)).invert();
+	m_fdc->syn_wr_callback().set(I8259A_TAG, FUNC(pic8259_device::ir0_w));
 	m_fdc->lbrdy_wr_callback().set_inputline(I8088_TAG, INPUT_LINE_TEST).invert();
 
 	NSCSI_BUS(config, m_scsibus);

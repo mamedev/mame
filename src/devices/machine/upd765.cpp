@@ -251,6 +251,7 @@ void upd765_family_device::device_start()
 	save_item(STRUCT_MEMBER(flopi, pcn));
 	save_item(STRUCT_MEMBER(flopi, st0));
 	save_item(STRUCT_MEMBER(flopi, st0_filled));
+	save_item(STRUCT_MEMBER(flopi, st0_seek));
 	save_item(STRUCT_MEMBER(flopi, live));
 	save_item(STRUCT_MEMBER(flopi, index));
 	save_item(STRUCT_MEMBER(flopi, ready));
@@ -337,6 +338,7 @@ void upd765_family_device::device_start()
 		flopi[i].pcn = 0;
 		flopi[i].st0 = 0;
 		flopi[i].st0_filled = false;
+		flopi[i].st0_seek = false;
 		flopi[i].live = false;
 		flopi[i].index = false;
 		flopi[i].ready = false;
@@ -385,6 +387,7 @@ void upd765_family_device::soft_reset()
 		flopi[i].ready = !ready_polled;
 		flopi[i].st0 = i;
 		flopi[i].st0_filled = false;
+		flopi[i].st0_seek = false;
 	}
 	clr_drive_busy();
 	irq = false;
@@ -678,9 +681,13 @@ uint8_t upd765_family_device::fifo_r()
 		if(!machine().side_effects_disabled()) {
 			result_pos--;
 			memmove(result, result+1, result_pos);
-			if(!result_pos)
+			if(!result_pos) {
 				main_phase = PHASE_CMD;
-			else if(result_pos == 1) {
+				for(floppy_info &fi : flopi)
+					if(fi.st0_filled && fi.st0_seek)
+						irq = true;
+				check_irq();
+			} else if(result_pos == 1) {
 				// clear drive busy bit after the first sense interrupt status result byte is read
 				for(floppy_info &fi : flopi)
 					if((fi.main_state == RECALIBRATE || fi.main_state == SEEK) && fi.sub_state == IDLE && fi.st0_filled == false)
@@ -1742,6 +1749,7 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 	irq = true;
 	if(!data_completion) {
 		fi.st0_filled = true;
+		fi.st0_seek = true;
 		drive_busy |= (1 << fi.id);
 	}
 	check_irq();
@@ -2755,6 +2763,7 @@ TIMER_CALLBACK_MEMBER(upd765_family_device::run_drive_ready_polling)
 			if(!flopi[fid].st0_filled) {
 				flopi[fid].st0 = ST0_ABRT | fid | (ready ? 0 : ST0_NR);
 				flopi[fid].st0_filled = true;
+				flopi[fid].st0_seek = false;
 				irq = true;
 			}
 		}

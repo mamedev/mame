@@ -1019,8 +1019,6 @@ void pcw_state::machine_reset()
 
 void pcw_state::init_pcw()
 {
-	m_maincpu->set_input_line_vector(0, 0x0ff); // Z80
-
 	/* lower 4 bits are interrupt counter */
 	m_system_status = 0x000;
 	m_system_status &= ~((1<<6) | (1<<5) | (1<<4));

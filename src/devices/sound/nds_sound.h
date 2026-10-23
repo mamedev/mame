@@ -18,7 +18,10 @@ public:
 	nds_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// we DMA from the ARM7's address space
-	void set_hostspace(address_space &space) { m_space = &space; }
+	void set_hostspace(address_space &space)
+	{
+		m_space = &space;
+	}
 
 	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -46,10 +49,13 @@ private:
 
 	struct channel_t
 	{
+		bool active;           // source clock running, including the final sample period
+
 		// latched from the registers at key-on
-		bool active;
 		uint8_t format;
 		uint8_t repeat;         // 1 = loop, otherwise one-shot
+
+		// live channel controls
 		uint8_t volume;         // 0-127
 		uint8_t vol_shift;      // 0, 1, 2 or 4
 		uint8_t pan;            // 0 (left) - 127 (right)
@@ -64,6 +70,7 @@ private:
 		uint32_t frac;          // 16.16 resampling accumulator
 		uint32_t step;          // 16.16 source samples per output sample
 		int16_t sample;         // current source sample
+		uint8_t startup_delay;  // source periods before ADPCM decoding begins
 
 		// ADPCM state
 		int32_t adpcm_val;
@@ -79,6 +86,7 @@ private:
 	};
 
 	uint32_t chan_freq(int ch) const;
+	void update_controls(int ch);
 	void key_on(int ch);
 	void advance_sample(channel_t &c, int ch);
 

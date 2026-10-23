@@ -96,8 +96,8 @@ private:
 	static inline constexpr uint16_t LCD_W = 120;
 	static inline constexpr uint16_t LCD_H = 64;
 
-	static inline constexpr uint8_t RST1 = 0x08;
-	static inline constexpr uint8_t RST3 = 0x18;
+	static inline constexpr uint8_t RST1 = 0xcf;
+	static inline constexpr uint8_t RST3 = 0xdf;
 
 	static inline constexpr uint8_t HIGH_BATTERY = 0x40;
 
@@ -193,6 +193,8 @@ private:
 	uint8_t stack_r(offs_t offset);
 	void stack_w(offs_t offset, uint8_t data);
 	uint8_t get_page_data(uint32_t address);
+
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	void tablet_ctrl_w(uint8_t data);
 	uint8_t tablet_data_r();
@@ -374,7 +376,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(sega_ferie_state::irq)
 		m_button_state = INPUT_RELEASE;
 	}
 
-	m_maincpu->set_input_line_vector(0, 0xc7 | m_irq_vector);
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_irq_status ? ASSERT_LINE : CLEAR_LINE);
 	m_irq_status ^= 1;
 }
@@ -425,6 +426,11 @@ uint8_t sega_ferie_state::get_page_data(uint32_t address)
 	LOGMASKED(LOG_MEM, "get_page_data [%06x] = %02x\n", address, data);
 
 	return data;
+}
+
+IRQ_CALLBACK_MEMBER(sega_ferie_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 uint8_t sega_ferie_state::tablet_data_r()
@@ -656,6 +662,7 @@ void sega_ferie_state::sega_ferie(machine_config &config)
 {
 	T6A84(config, m_maincpu, XTAL(4'000'000)); // High frequency external crystal, connected to HXIN/HXOUT pins
 	m_maincpu->set_addrmap(AS_IO, &sega_ferie_state::ferie_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(sega_ferie_state::cpu_acknowledge_irq));
 
 	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0x00);
 

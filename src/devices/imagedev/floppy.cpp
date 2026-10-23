@@ -66,6 +66,7 @@ DEFINE_DEVICE_TYPE(FLOPPY_35_ED,   floppy_35_ed,   "floppy_35_ed",   "3.5\" exte
 DEFINE_DEVICE_TYPE(FLOPPY_525_SSSD_35T, floppy_525_sssd_35t, "floppy_525_sssd_35t", "5.25\" single-sided single density 35-track floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_SD_35T,   floppy_525_sd_35t,   "floppy_525_sd_35t",   "5.25\" double-sided single density 35-track floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_VTECH,    floppy_525_vtech,    "floppy_525_vtech",    "5.25\" single-sided single density VTECH floppy drive")
+DEFINE_DEVICE_TYPE(FLOPPY_525_COMPUCOLOR, floppy_525_compucolor, "floppy_525_compucolor", "5.25\" single-sided single density Compucolor floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_SSSD,     floppy_525_sssd,     "floppy_525_sssd",     "5.25\" single-sided single density floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_SD,       floppy_525_sd,       "floppy_525_sd",       "5.25\" single density floppy drive")
 DEFINE_DEVICE_TYPE(FLOPPY_525_SSDD,     floppy_525_ssdd,     "floppy_525_ssdd",     "5.25\" single-sided double density floppy drive")
@@ -1813,6 +1814,30 @@ void floppy_525_vtech::setup_characteristics()
 	m_tracks = 40;
 	m_sides = 1;
 	set_rpm(85);
+
+	add_variant(floppy_image::SSSD);
+}
+
+//-------------------------------------------------
+//  5.25" single-sided single density, Compucolor edition
+//-------------------------------------------------
+
+floppy_525_compucolor::floppy_525_compucolor(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_525_COMPUCOLOR, tag, owner, clock)
+{
+	m_amplifier_freakout_time = attotime::never;
+}
+
+floppy_525_compucolor::~floppy_525_compucolor()
+{
+}
+
+void floppy_525_compucolor::setup_characteristics()
+{
+	m_form_factor = floppy_image::FF_525;
+	m_tracks = 42;
+	m_sides = 1;
+	set_rpm(300);
 
 	add_variant(floppy_image::SSSD);
 }

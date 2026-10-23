@@ -1600,25 +1600,30 @@ void namcos22_state::namcos22_keycus_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 /**
- * Some port values are read serially one bit at a time via word reads at
- * 0x50000008 and 0x5000000a
- *
- * Writes to 0x50000008 and 0x5000000a reset the state of the input buffer.
- * It appears to be meant for debugging, not all games use it.
+ * There are two disconnected 5 pin headers on the board that appear to be
+ * Super Famicom-compatible developer controller ports. They are not used in
+ * standard gameplay but all retail games read them and most have (disconnected)
+ * developer tools that use them. They are mapped to 0x50000008 / 0x5000000A on
+ * the System 22 board and 0x45000 / 0x45000A opn Super System 22
+ * A write to the port is the latch strobe and each word read clocks out the
+ * next line in the standard order (B, Y, Select, Start, Up, Down, Left, Right,
+ * A, X, L, R, 4 ID bits).
+ * They are exposed as "devpad0" / "devpad1" control port slots, empty by
+ * default.
  */
-u16 namcos22_state::namcos22_portbit_r(offs_t offset)
+u16 namcos22_state::namcos22_devpad_r(offs_t offset)
 {
-	const u16 ret = m_portbits[offset] & 1;
-
-	if (!machine().side_effects_disabled())
-		m_portbits[offset] = m_portbits[offset] >> 1 | 0x8000;
-
-	return ret;
+	// each word read clocks one bit out of the pad; the lines are active low
+	if (machine().side_effects_disabled())
+		return 1;
+	return m_devpad[offset]->read_pin4() ^ 1;
 }
 
-void namcos22_state::namcos22_portbit_w(offs_t offset, u16 data)
+void namcos22_state::namcos22_devpad_w(offs_t offset, u16 data)
 {
-	m_portbits[offset] = m_custom[offset].read_safe(0xffff);
+	// a word write latches the pad (strobe pulse)
+	m_devpad[offset]->write_strobe(1);
+	m_devpad[offset]->write_strobe(0);
 }
 
 void namcos22_state::namcos22_cpuleds_w(offs_t offset, u32 data, u32 mem_mask)
@@ -1740,7 +1745,7 @@ void namcos22_state::namcos22_am(address_map &map)
 	 *     0x50000001 - DIPSW2
 	 */
 	map(0x50000000, 0x50000003).portr("DSW").w(FUNC(namcos22_state::namcos22_cpuleds_w));
-	map(0x50000008, 0x5000000b).rw(FUNC(namcos22_state::namcos22_portbit_r), FUNC(namcos22_state::namcos22_portbit_w));
+	map(0x50000008, 0x5000000b).rw(FUNC(namcos22_state::namcos22_devpad_r), FUNC(namcos22_state::namcos22_devpad_w));
 
 	/**
 	 * EEPROM
@@ -1863,7 +1868,7 @@ void namcos22s_state::namcos22s_am(address_map &map)
 	map(0x420000, 0x42000f).rw(FUNC(namcos22s_state::namcos22_sci_r), FUNC(namcos22s_state::namcos22_sci_w)); // C139 SCI registers
 	map(0x430000, 0x430003).w(FUNC(namcos22s_state::namcos22_cpuleds_w));
 	map(0x440000, 0x440003).portr("DSW");
-	map(0x450008, 0x45000b).rw(FUNC(namcos22s_state::namcos22_portbit_r), FUNC(namcos22s_state::namcos22_portbit_w));
+	map(0x450008, 0x45000b).rw(FUNC(namcos22s_state::namcos22_devpad_r), FUNC(namcos22s_state::namcos22_devpad_w));
 	map(0x460000, 0x463fff).rw(m_eeprom, FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask32(0xff00ff00);
 	map(0x700000, 0x70001f).rw(FUNC(namcos22s_state::syscon_r), FUNC(namcos22s_state::ss22_syscon_w));
 	map(0x800000, 0x800003).w(FUNC(namcos22s_state::namcos22s_chipselect_w)); // C304, C399
@@ -2983,6 +2988,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(adillor_state::trackball_update)
 /*********************************************************************************************/
 
 static INPUT_PORTS_START( ridgera )
+	// Serial dev pad (SNES-type controller, bit order B Y Sel St U D L R). Bytes at A6-$77e4 (ridgerac). Port bits 0-3,6,7 are the
+	// same bits the game builds from the cabinet controls, so the pad drives every screen; bits 4,5 and all of CUSTOM.1 are pad-only.
+	// Readers: 0xad0 (MONITOR TEST / display test library, ungated); 0xa21a game code, ridgerac*: skipped because ROM byte 0 bit 5 is set,
+	// ridgerac3m / ridgeracf / ridgera2: gated by DIP SW3:6.
 	PORT_START("INPUTS")
 	/*  1 3 5   When the cabinet is set to Deluxe, the stick shift is basically
 	    |-|-|   an 8-way joystick that locks into place.
@@ -3046,6 +3055,11 @@ static INPUT_PORTS_START( ridgerac3m )
 	PORT_DIPSETTING(          0x00010000, "Center/Main (PCB 2)")
 	PORT_DIPSETTING(          0x00020000, "Left (PCB 1)")        // shows black screen due to lack C139 and full 3 screen implementation
 	PORT_DIPSETTING(          0x00030000, "Right (PCB 3)")       // shows black screen due to lack C139 and full 3 screen implementation
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x20000000, 0x20000000, "Dev Pad Select" ) PORT_DIPLOCATION("SW3:6") // on: game code reads the dev pad (reader 0xa314 3m, 0xa2de f, 0xd4b6 ridgera2) instead of the cabinet control byte
+	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ridgeracf )
@@ -3066,6 +3080,11 @@ static INPUT_PORTS_START( ridgeracf )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80000000, 0x80000000, "Test Mode 2" ) PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x20000000, 0x20000000, "Dev Pad Select" ) PORT_DIPLOCATION("SW3:6") // on: game code reads the dev pad (reader 0xa314 3m, 0xa2de f, 0xd4b6 ridgera2) instead of the cabinet control byte
+	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
 
@@ -3090,6 +3109,11 @@ static INPUT_PORTS_START( ridgera2 )
 	PORT_DIPNAME( 0x80000000, 0x80000000, "Test Mode 2" ) PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x20000000, 0x20000000, "Dev Pad Select" ) PORT_DIPLOCATION("SW3:6") // on: game code reads the dev pad (reader 0xa314 3m, 0xa2de f, 0xd4b6 ridgera2) instead of the cabinet control byte
+	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( raverace )
@@ -3102,6 +3126,11 @@ static INPUT_PORTS_START( raverace )
 	PORT_CONFSETTING(      0x0100, "Twin" )
 	PORT_CONFSETTING(      0x2000, DEF_STR( Standard ) )
 	PORT_CONFSETTING(      0x2100, "Deluxe" )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x20000000, 0x20000000, "Dev Pad Select" ) PORT_DIPLOCATION("SW3:6") // on: dev menu and test program read the dev pad instead of the cabinet buttons
+	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -3157,6 +3186,9 @@ static INPUT_PORTS_START( cybrcomm )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40000000, 0x40000000, "SW3:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80000000, 0x80000000, "SW3:8" )
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// Dev pad (reader 0x4d84, live). Only the disconnected dev TESTMODE (modes 22-43 of table 0x662c) tests it: restore with
+	// ROM word 0x6270 03bc -> 0414 (dev table 0x6684) plus DIP SW3:8 on, then enter test mode.
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( acedrive )
@@ -3209,41 +3241,6 @@ static INPUT_PORTS_START( acedrive )
 	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DEV")
-	PORT_CONFNAME( 0x01, 0x00, "Enable Dev Inputs" )
-	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
-
-	PORT_START("CUSTOM.0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Enter") // also "REC" start
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Exit") // also "REC" stop
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Unknown 1") // enters free camera view while in attract mode
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Unknown 2") // resets game?
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Left")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Right")
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Up")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Down")
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x00)
-
-	PORT_START("CUSTOM.1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) // pauses game?
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x00)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( victlap )
-	PORT_INCLUDE( acedrive )
-
-	PORT_MODIFY("CUSTOM.0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Exit")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Enter")
-	PORT_BIT( 0xfe0e, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x00)
 INPUT_PORTS_END
 
 /*********************************************************************************************/
@@ -3278,11 +3275,16 @@ static INPUT_PORTS_START( alpiner )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00020000, 0x00020000, "SW4:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00040000, 0x00040000, "SW4:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00080000, 0x00080000, "SW4:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00100000, 0x00100000, "SW4:5" )
+	PORT_DIPNAME( 0x00100000, 0x00100000, "Dev Pad Select" ) PORT_DIPLOCATION("SW4:5") // on: display-test library reads the dev pad (0x1dd9e2 alpinerd, 0x47110 alpinr2b)
+	PORT_DIPSETTING(          0x00100000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00200000, 0x00200000, "SW4:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW4:8" )
 	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// Dev pad. alpinerd/c/jc: game reader 0xabc4 is neutered (stores #0 to 0xe00098/0xe0009e), so only the display-test
+	// library reader works. alpinr2a/b: display-test library only.
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( alpines )
@@ -3290,6 +3292,8 @@ static INPUT_PORTS_START( alpines )
 
 	PORT_MODIFY("ADC.0")
 	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_MINMAX(0x080, 0x380) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_REVERSE PORT_NAME("Steps Swing")
+
+	// Dev pad: both readers are dead here (0x71f4 overwrites the shifted value with #$ffff; display-test library skipped by bra 0x19ad8c)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( airco22 )
@@ -3318,11 +3322,18 @@ static INPUT_PORTS_START( airco22 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00020000, 0x00020000, "SW4:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00040000, 0x00040000, "SW4:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00080000, 0x00080000, "SW4:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00100000, 0x00100000, "SW4:5" )
+	PORT_DIPNAME( 0x00100000, 0x00100000, "Dev Pad Select" ) PORT_DIPLOCATION("SW4:5") // on: display-test library reads the dev pad (0xeb38a)
+	PORT_DIPSETTING(          0x00100000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00200000, 0x00200000, "SW4:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
+	PORT_DIPNAME( 0x00400000, 0x00400000, "Dev Pause Enable" ) PORT_DIPLOCATION("SW4:7") // on: dev pad Y / service toggles pause (0x5602)
+	PORT_DIPSETTING(          0x00400000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW4:8" )
 	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// Dev pad. Library 0x6fd2 reads 12 bits and remaps them to an NES-order word (A=0x80 B=0x40 Sel=0x20 St=0x10 U D L R=8 4 2 1,
+	// Y=0x100 X=0x200 L=0x400 R=0x800) at A6-$79ca; the display-test library 0xeca70 has its own reader.
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cybrcycc )
@@ -3358,6 +3369,8 @@ static INPUT_PORTS_START( cybrcycc )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW4:8" )
 	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// Dev pad, reader 0x1956 (live): port 0 is cleared and skipped (bra 0x1986), port 1 is read. Word bit 11-i = port bit i.
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dirtdash )
@@ -3395,6 +3408,8 @@ static INPUT_PORTS_START( dirtdash )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW4:8" )
 	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// Dev pad: display-test library reader 0x51580 only; its SW4:5 gate was replaced by bra 0x4fea2, so the pad is never read.
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tokyowar )
@@ -3430,8 +3445,12 @@ static INPUT_PORTS_START( tokyowar )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00100000, 0x00100000, "SW4:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00200000, 0x00200000, "SW4:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW4:8" )
+	PORT_DIPNAME( 0x00800000, 0x00800000, "Pause Enable" ) PORT_DIPLOCATION("SW4:8") // on: SERVICE toggles pause (0x45a6); dev pad Up advances one frame
+	PORT_DIPSETTING(          0x00800000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// Dev pad: reader 0xfdea (live, 8-bit). The display-test library reader 0x7400 is not called.
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( aquajet )
@@ -3467,6 +3486,9 @@ static INPUT_PORTS_START( aquajet )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW4:8" )
 	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// Dev pad: reader 0x2500 (word bit 11-i = port bit i), called from the pause loop 0x18d10 and SCSI MODE 0x2df4.
+	// The display-test library reader 0x39cf2 is skipped (bra 0x38604).
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( adillor )
@@ -3513,21 +3535,6 @@ static INPUT_PORTS_START( adillor )
 	PORT_CONFNAME( 0x02, 0x02, "Trackball Orientation" )
 	PORT_CONFSETTING(    0x00, "Direct" )
 	PORT_CONFSETTING(    0x02, "Natural" )
-
-	PORT_START("CUSTOM.0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Enter")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Exit")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Left")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Right") // when in normal testmode, press this to enter the extra testmode
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Up")
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Down")
-	// left/right above are the coarse step; these two are the fine step
-	// without them most fields cannot reach every value
-	// eg. in SPRITE CG TEST the CHR NO index moves by 8 with Right and by 1 with Fine Inc.
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Fine Dec")
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01) PORT_PLAYER(2) PORT_NAME("Dev Service Fine Inc")
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x01)
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DEV", 0x01, EQUALS, 0x00)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( propcycl )
@@ -3562,6 +3569,9 @@ static INPUT_PORTS_START( propcycl )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW4:8" )
 	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// Dev pad: table-driven reader 0x2241e (ports at 0x3abaa), word bit 11-i = port bit i. Neutered: the cur words are cleared
+	// right after they are read, so nothing reaches the consumers.
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( timecris )
@@ -3586,7 +3596,9 @@ static INPUT_PORTS_START( timecris )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00010000, 0x00010000, "SW4:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00020000, 0x00020000, "SW4:2" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00040000, 0x00040000, "SW4:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00080000, 0x00080000, "SW4:4" )
+	PORT_DIPNAME( 0x00080000, 0x00080000, "Dev Pad Select" ) PORT_DIPLOCATION("SW4:4") // on: display-test library reads the dev pad (0xb4bd2)
+	PORT_DIPSETTING(          0x00080000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00100000, 0x00100000, "SW4:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00200000, 0x00200000, "SW4:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW4:7" )
@@ -3594,6 +3606,8 @@ static INPUT_PORTS_START( timecris )
 	PORT_DIPSETTING(          0x00800000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 	PORT_BIT( 0xff00ffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	// Dev pad: display-test library reader 0xb4bf6 only (called from 0xb34e6 through the SW4:4 check at 0xb4bd2).
 INPUT_PORTS_END
 
 
@@ -3648,8 +3662,6 @@ ALLOW_SAVE_TYPE(namcos22_dsp_upload_state);
 
 void namcos22_state::machine_start()
 {
-	m_portbits[0] = 0xffff;
-	m_portbits[1] = 0xffff;
 	m_dsp_upload_state = NAMCOS22_DSP_UPLOAD_READY;
 
 	// register for savestates, stuff that isn't done in video_start()
@@ -3683,7 +3695,6 @@ void namcos22_state::machine_start()
 	save_item(NAME(m_SerialDataSlaveToMasterCurrent));
 	save_item(NAME(m_RenderBufSize));
 	save_item(NAME(m_RenderBufData));
-	save_item(NAME(m_portbits));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_dsp_upload_state));
@@ -3769,6 +3780,10 @@ void namcos22_state::namcos22(machine_config &config)
 	M68020(config, m_maincpu, 49.152_MHz_XTAL/2); // MC68020RP25E
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcos22_state::namcos22_am);
 	m_maincpu->set_vblank_int("screen", FUNC(namcos22_state::namcos22_interrupt));
+
+	// serial developer pad connectors (SNES-type controllers), empty by default
+	SNES_CONTROL_PORT(config, m_devpad[0], snes_control_port_devices, nullptr);
+	SNES_CONTROL_PORT(config, m_devpad[1], snes_control_port_devices, nullptr);
 
 	namco_c71_device& master(NAMCO_C71(config, m_master, 40_MHz_XTAL));
 	master.set_addrmap(AS_PROGRAM, &namcos22_state::master_dsp_program);
@@ -6406,11 +6421,11 @@ void namcos22s_state::init_dirtdash()
 
 /*    YEAR,  NAME,      PARENT,   MACHINE,   INPUT,      CLASS,           INIT,           MNTR, COMPANY, FULLNAME, FLAGS */
 // System22 games
-GAME( 1993, ridgerac,   0,        namcos22,  ridgera,    namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (World, RR2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17
-GAME( 1993, ridgeraca,  ridgerac, namcos22,  ridgera,    namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (World, RR2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28
-GAME( 1993, ridgeracb,  ridgerac, namcos22,  ridgera,    namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (US, RR3 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17, reports as "-Foreign B-" RR3 means USA?
-GAME( 1993, ridgeracc,  ridgerac, namcos22,  ridgera,    namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (US, RR3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28, reports as "-Foreign B-"
-GAME( 1993, ridgeracj,  ridgerac, namcos22,  ridgera,    namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (Japan, RR1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
+GAME( 1993, ridgerac,   0,        namcos22,  ridgera,   namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (World, RR2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17
+GAME( 1993, ridgeraca,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (World, RR2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28
+GAME( 1993, ridgeracb,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (US, RR3 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1994-01-17, reports as "-Foreign B-" RR3 means USA?
+GAME( 1993, ridgeracc,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (US, RR3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-28, reports as "-Foreign B-"
+GAME( 1993, ridgeracj,  ridgerac, namcos22,  ridgera,   namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (Japan, RR1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 1993-10-07
 GAME( 1994, ridgerac3m, ridgerac, namcos22,  ridgerac3m, namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer (World, RRC, three monitor version)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 1994-07-01, Standard game with 3 monitor linkup
 GAME( 1993, ridgeracf,  0,        namcos22,  ridgeracf,  namcos22_state,  init_ridgerac,  ROT0, "Namco", "Ridge Racer Full Scale (World, RRF2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 1993-12-13, very different version, incomplete dump.
 GAME( 1994, ridgera2,   0,        namcos22,  ridgera2,   namcos22_state,  init_ridgera2,  ROT0, "Namco", "Ridge Racer 2 (World, RRS2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 1994-06-21 - NOT labeled "B" but based off Japan Rev.B
@@ -6422,9 +6437,9 @@ GAME( 1995, raverace,   0,        namcos22,  raverace,   namcos22_state,  init_r
 GAME( 1995, raveracej,  raverace, namcos22,  raverace,   namcos22_state,  init_raverace,  ROT0, "Namco", "Rave Racer (Japan, RV1 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 07/16/95
 GAME( 1995, raveraceja, raverace, namcos22,  raverace,   namcos22_state,  init_raverace,  ROT0, "Namco", "Rave Racer (Japan, RV1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 06/29/95
 GAME( 1994, acedrive,   0,        namcos22,  acedrive,   namcos22_state,  init_acedrive,  ROT0, "Namco", "Ace Driver (World, AD2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 94/10/20 16:22:25
-GAME( 1996, victlap,    0,        namcos22,  victlap,    namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (World, ADV2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/05/21 19:39:59
-GAME( 1996, victlapa,   victlap,  namcos22,  victlap,    namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (World, ADV2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
-GAME( 1996, victlapj,   victlap,  namcos22,  victlap,    namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (Japan, ADV1 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
+GAME( 1996, victlap,    0,        namcos22,  acedrive,    namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (World, ADV2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/05/21 19:39:59
+GAME( 1996, victlapa,   victlap,  namcos22,  acedrive,    namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (World, ADV2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
+GAME( 1996, victlapj,   victlap,  namcos22,  acedrive,    namcos22_state,  init_victlap,   ROT0, "Namco", "Ace Driver: Victory Lap (Japan, ADV1 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/02/13 17:29:10
 
 // System Super22 games
 GAME( 1994, alpinerd,   0,        alpine,    alpiner,   alpine_state,     init_alpiner,   ROT0, "Namco", "Alpine Racer (World, AR2 Ver.D)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

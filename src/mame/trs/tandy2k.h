@@ -312,6 +312,8 @@ protected:
 
 private:
 	void tandy2k_hd_io(address_map &map) ATTR_COLD;
+
+	void hdc_bdrq_w(int state);
 };
 
 #endif // MAME_TRS_TANDY2K_H

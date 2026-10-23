@@ -5,18 +5,17 @@
 
 #pragma once
 
-#include "sound/okiadpcm.h"
 #include "sound/c6280.h"
 
 class huc6230_device : public device_t, public device_sound_interface
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::SOUND; } // Incorrect ADPCM
+	static constexpr feature_type imperfect_features() { return feature::SOUND; } // anti-click, analog output stage not emulated
 
 	huc6230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// sound inputs 0-1: unused (PSG), 2-3: line (CD-DA) left/right
 	template <unsigned N> auto adpcm_update_cb() { return m_adpcm_update_cb[N].bind(); }
-	auto vca_callback() { return m_vca_cb.bind(); }
 
 	// write only
 	void write(offs_t offset, uint8_t data);
@@ -32,31 +31,36 @@ protected:
 
 private:
 	struct adpcm_channel {
-		oki_adpcm_state m_adpcm;
+		int32_t         m_predictor;
+		int32_t         m_step_index;
+		int32_t         m_delta;
+		uint8_t         m_delta_count;
 		uint8_t         m_lvol;
 		uint8_t         m_rvol;
-		uint8_t         m_interpolate;
-		uint8_t         m_playing;
-		int32_t         m_prev_sample;
-		int32_t         m_curr_sample;
-		int32_t         m_output;
-		uint32_t        m_pos;
-		uint8_t         m_input;
 	};
+
+	static int32_t vca_step_time(int32_t level);
+	void vca_set(int ch, u8 data);
+	void vca_run(int ch, int32_t clocks);
+
+	TIMER_CALLBACK_MEMBER(adpcm_timer);
 
 	// internal state
 	sound_stream *m_stream;
 	emu_timer *m_adpcm_timer;
 	required_device<c6280_device> m_psg;
 	adpcm_channel m_adpcm_channel[2];
-	uint32_t m_adpcm_freq;
+	uint8_t m_adpcm_control;
+	float m_volume[0x40];
 	uint32_t m_pcm_lvol;
 	uint32_t m_pcm_rvol;
 
-	TIMER_CALLBACK_MEMBER(adpcm_timer);
+	// line input VCA: level 0-1023, the level it ramps towards, master clocks to the next step
+	int32_t m_vca_level[2];
+	int32_t m_vca_target[2];
+	int32_t m_vca_wait[2];
 
 	devcb_read8::array<2> m_adpcm_update_cb;
-	devcb_write8 m_vca_cb;
 };
 
 DECLARE_DEVICE_TYPE(HuC6230, huc6230_device)

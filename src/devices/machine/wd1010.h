@@ -100,7 +100,7 @@ private:
 	attotime get_stepping_rate();
 	void start_command();
 	void end_command();
-	int get_lbasector();
+	int get_lbasector(uint8_t sector);
 
 	// extract values from sdh
 	int head() { return m_head; }

@@ -824,6 +824,7 @@ void ppc_device::device_start()
 	save_item(NAME(m_core->irq_pending));
 	save_item(NAME(m_tb_zero_cycles));
 	save_item(NAME(m_dec_zero_cycles));
+	save_item(NAME(m_rtc_zero_cycles));
 
 	save_item(NAME(m_core->reserve));
 	save_item(NAME(m_core->reserve_address));
@@ -1251,6 +1252,10 @@ void ppc_device::device_reset()
 		// PC to the reset vector; MSR has IP set to start
 		m_core->pc = 0xfff00100;
 		m_core->msr = MSROEA_IP;
+		m_core->spr[SPROEA_SRR0] = 0;
+		m_core->spr[SPROEA_SRR1] = 0;
+		if (m_flavor != PPC_MODEL_601)
+			m_core->spr[SPR603_HID0] = 0;
 
 		// reset the decrementer
 		m_dec_zero_cycles = total_cycles();

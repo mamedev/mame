@@ -524,6 +524,9 @@ namespace
 
 		// CPU doesn't run until the IOP tells it to
 		m_cpu->set_input_line(INPUT_LINE_HALT, 1);
+		m_cpu->set_emmu_enable(false);
+		m_mmu->set_mmu_enable(false);
+		m_mmu->set_rom_enable(true);
 	}
 
 	void news_iop_state::init_common()

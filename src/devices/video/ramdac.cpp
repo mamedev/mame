@@ -1,17 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
-    Generic Palette RAMDAC device
+Generic Palette RAMDAC device
 
-    Written by Angelo Salese
+This is intended as a placeholder over unknown or unimplemented RAMDAC types, belonging to the huge
+VGA Inmos G171 family.
 
-    TODO:
-    - masking register, almost likely it controls rollback on incrementing
-      r/w palette access;
-    - needs information about different models and what exactly they do
-
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "ramdac.h"
