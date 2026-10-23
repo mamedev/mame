@@ -2931,6 +2931,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/nrf2401.h,MACHINES["NRF2401"] = true
+---------------------------------------------------
+
+if MACHINES["NRF2401"] then
+	files {
+		MAME_DIR .. "src/devices/machine/nrf2401.cpp",
+		MAME_DIR .. "src/devices/machine/nrf2401.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/nscsi_bus.h,MACHINES["NSCSI"] = true
 --@src/devices/machine/nscsi_cb.h,MACHINES["NSCSI"] = true
 --@src/devices/machine/nscsi_hle.h,MACHINES["NSCSI"] = true
@@ -3730,43 +3742,6 @@ end
 
 
 ---------------------------------------------------
--- XaviX System-on-Chip Family
---@src/devices/machine/xavix_soc.h,MACHINES["XAVIX_SOC"] = true
----------------------------------------------------
-
-if MACHINES["XAVIX_SOC"] then
-	files {
-		MAME_DIR .. "src/devices/machine/xavix_soc.cpp",
-		MAME_DIR .. "src/devices/machine/xavix_soc.h",
-		MAME_DIR .. "src/devices/machine/xavix_intc.cpp",
-		MAME_DIR .. "src/devices/machine/xavix_intc.h",
-		MAME_DIR .. "src/devices/machine/xavix_video.cpp",
-		MAME_DIR .. "src/devices/machine/xavix_video_render.cpp",
-		MAME_DIR .. "src/devices/machine/xavix_video_timing.cpp",
-		MAME_DIR .. "src/devices/machine/xavix_video.h",
-		MAME_DIR .. "src/devices/machine/xavix_plotter.cpp",
-		MAME_DIR .. "src/devices/machine/xavix_plotter.h",
-		MAME_DIR .. "src/devices/machine/xavix_timer.cpp",
-		MAME_DIR .. "src/devices/machine/xavix_timer.h",
-		MAME_DIR .. "src/devices/machine/xavix_dma.cpp",
-		MAME_DIR .. "src/devices/machine/xavix_dma.h",
-		MAME_DIR .. "src/devices/machine/xavix_sound.cpp",
-		MAME_DIR .. "src/devices/machine/xavix_sound.h",
-		MAME_DIR .. "src/devices/machine/xavix_adc.cpp",
-		MAME_DIR .. "src/devices/machine/xavix_adc.h",
-		MAME_DIR .. "src/devices/machine/xavix_anport.cpp",
-		MAME_DIR .. "src/devices/machine/xavix_anport.h",
-		MAME_DIR .. "src/devices/machine/xavix_math.cpp",
-		MAME_DIR .. "src/devices/machine/xavix_math.h",
-		MAME_DIR .. "src/devices/machine/xavix_io.cpp",
-		MAME_DIR .. "src/devices/machine/xavix_io.h",
-		MAME_DIR .. "src/devices/machine/xavix_pio.cpp",
-		MAME_DIR .. "src/devices/machine/xavix_pio.h",
-	}
-end
-
-
----------------------------------------------------
 --
 --@src/devices/machine/spg2xx.h,MACHINES["SPG2XX"] = true
 --@src/devices/machine/spg110.h,MACHINES["SPG2XX"] = true
@@ -4462,6 +4437,42 @@ if MACHINES["X76F100"] then
 end
 
 ---------------------------------------------------
+-- XaviX System-on-Chip Family
+--@src/devices/machine/xavix_soc.h,MACHINES["XAVIX_SOC"] = true
+---------------------------------------------------
+
+if MACHINES["XAVIX_SOC"] then
+	files {
+		MAME_DIR .. "src/devices/machine/xavix_soc.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_soc.h",
+		MAME_DIR .. "src/devices/machine/xavix_intc.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_intc.h",
+		MAME_DIR .. "src/devices/machine/xavix_video.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_video_render.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_video_timing.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_video.h",
+		MAME_DIR .. "src/devices/machine/xavix_plotter.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_plotter.h",
+		MAME_DIR .. "src/devices/machine/xavix_timer.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_timer.h",
+		MAME_DIR .. "src/devices/machine/xavix_dma.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_dma.h",
+		MAME_DIR .. "src/devices/machine/xavix_sound.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_sound.h",
+		MAME_DIR .. "src/devices/machine/xavix_adc.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_adc.h",
+		MAME_DIR .. "src/devices/machine/xavix_anport.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_anport.h",
+		MAME_DIR .. "src/devices/machine/xavix_math.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_math.h",
+		MAME_DIR .. "src/devices/machine/xavix_io.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_io.h",
+		MAME_DIR .. "src/devices/machine/xavix_pio.cpp",
+		MAME_DIR .. "src/devices/machine/xavix_pio.h",
+	}
+end
+
+---------------------------------------------------
 --
 --@src/devices/machine/xn297l.h,MACHINES["XN297L"] = true
 ---------------------------------------------------
@@ -4640,18 +4651,6 @@ if MACHINES["NCR53C90"] then
 	files {
 		MAME_DIR .. "src/devices/machine/ncr53c90.cpp",
 		MAME_DIR .. "src/devices/machine/ncr53c90.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/nrf2401.h,MACHINES["NRF2401"] = true
----------------------------------------------------
-
-if MACHINES["NRF2401"] then
-	files {
-		MAME_DIR .. "src/devices/machine/nrf2401.cpp",
-		MAME_DIR .. "src/devices/machine/nrf2401.h",
 	}
 end
 

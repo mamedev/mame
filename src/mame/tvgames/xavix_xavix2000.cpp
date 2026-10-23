@@ -21,6 +21,10 @@
     - tak_chq: Two red road-tile pixels remain visible at the right border at
       race start, also seen in hardware footage: https://www.youtube.com/watch?v=vTAt31e7X7Q
 
+    Input settings use representative battery ADC levels; physical voltage
+    scaling is unmeasured. Demo Mode follows firmware test labels; its
+    physical source is unknown unless noted below.
+
     TODO:
     - duelmast: Verify sensor timing and physical image alignment.
     - epo_sdb: Measure physical trackball scaling.
@@ -202,7 +206,6 @@ static INPUT_PORTS_START( epo_golf )
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("O / Confirm")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("X / Cancel")
-	// Independent contacts permit the opposing Up+Down test-mode chord.
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
@@ -211,7 +214,6 @@ static INPUT_PORTS_START( epo_golf )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x77, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page identifies demo mode; its physical source is unknown.
 	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
@@ -231,7 +233,6 @@ static INPUT_PORTS_START( epo_bowl )
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("O / Confirm") PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("X / Cancel") PORT_PLAYER(1)
-	// Independent contacts permit the opposing Up+Down test-mode chord.
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_16WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_16WAY
@@ -240,7 +241,6 @@ static INPUT_PORTS_START( epo_bowl )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_UNUSED ) // Frame and pixel status come from the camera.
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
-	// The test page identifies demo mode; its physical source is unknown.
 	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
@@ -264,7 +264,6 @@ static INPUT_PORTS_START( epo_mini )
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("O / Confirm")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("X / Cancel")
-	// Independent contacts permit the opposing Up+Down test-mode chord.
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
@@ -273,7 +272,6 @@ static INPUT_PORTS_START( epo_mini )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_UNUSED ) // Frame and pixel status come from the camera.
-	// The test page identifies demo mode; its physical source is unknown.
 	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
@@ -332,7 +330,6 @@ static INPUT_PORTS_START( drgqst )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x77, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page identifies demo mode; its physical source is unknown.
 	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
@@ -417,7 +414,6 @@ static INPUT_PORTS_START( epo_hamc )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_UNUSED ) // Frame and pixel status come from the camera.
-	// The test page identifies demo mode; its physical source is unknown.
 	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
@@ -461,7 +457,6 @@ static INPUT_PORTS_START( ban_onep )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x77, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
@@ -489,7 +484,6 @@ static INPUT_PORTS_START( ban_omt )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x37, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
@@ -514,7 +508,6 @@ static INPUT_PORTS_START( tom_dpgm )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_UNUSED ) // Frame and pixel status come from the camera.
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
@@ -541,7 +534,6 @@ static INPUT_PORTS_START( epo_ebox )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("X / Cancel")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Used by service and boot paths; physical identity unknown.
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// Independent contacts permit the opposing Up+Down test-mode chord.
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
@@ -549,7 +541,6 @@ static INPUT_PORTS_START( epo_ebox )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("gloves", FUNC(xavix_ebox_gloves_device::data_r))
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
@@ -588,7 +579,6 @@ static INPUT_PORTS_START( epo_sdb )
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Factory-test chord with no identified public controls
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Jump / Confirm") PORT_CODE(MOUSECODE_BUTTON1_INDEXED(1)) PORT_PLAYER(2)
-	// The factory input page labels this line NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x20, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
@@ -599,7 +589,6 @@ static INPUT_PORTS_START( epo_sdb )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
-	// Representative differences select the ROM's three threshold bands; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x1c, "Low" )
@@ -664,7 +653,6 @@ static INPUT_PORTS_START( epo_es2j )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
@@ -690,7 +678,6 @@ static INPUT_PORTS_START( epo_es2j )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 L / Long Kick") PORT_PLAYER(2)
 
 	PORT_MODIFY("AN7")
-	// Representative values select all three native states; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x1c, "Low" )

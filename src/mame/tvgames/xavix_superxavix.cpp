@@ -43,6 +43,10 @@
       CIS and connect to the main PCB with an 18-20 wire ribbon cable.
     - Bowling and Boxing look identical; both sensor dies are labeled CU5501A.
 
+    Input settings use representative battery ADC levels; physical voltage
+    scaling is unmeasured. Demo Mode follows firmware test labels; its
+    physical source is unknown unless noted below.
+
     TODO:
     - tmy_rkmj: Verify the original ROM-checksum mismatch against another dump
       or hardware; identify input-test advance controls.
@@ -428,7 +432,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( superxavix_battery_status )
 	PORT_MODIFY("AN7")
-	// Representative AN5-AN7 differences select the ROM's warning rates; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x1a, "Low" )
@@ -445,7 +448,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( xavixport_panel )
 	PORT_START("PANEL")
-	// Independent panel buttons permit opposing directions, including the Up+Down test-mode chord.
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY PORT_NAME("Console Right")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_16WAY PORT_NAME("Console Left")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_16WAY PORT_NAME("Console Down")
@@ -550,7 +552,6 @@ static INPUT_PORTS_START( epo_doka )
 
 	PORT_MODIFY("PIO2")
 	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
@@ -559,7 +560,6 @@ static INPUT_PORTS_START( epo_doka )
 	PORT_CONFSETTING(    0x80, "AC Adapter" )
 
 	PORT_MODIFY("AN5")
-	// Representative differences select the ROM's warning rates; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x1b, "Low" )
@@ -1054,7 +1054,6 @@ static INPUT_PORTS_START( domyos_step )
 	PORT_INCLUDE(xavixport_panel)
 
 	PORT_MODIFY("PIO2")
-	// The test page identifies demo mode; its physical source is unknown.
 	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
@@ -1259,7 +1258,6 @@ static INPUT_PORTS_START( tmy_rkmj )
 
 	PORT_MODIFY("PIO2")
 	PORT_BIT( 0xbf, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The firmware labels this line as demo mode; its physical source is unknown.
 	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
@@ -1285,7 +1283,6 @@ static INPUT_PORTS_START( epo_tfit )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Console Select / Confirm")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Console Back / Cancel")
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// Independent contacts permit the opposing Up+Down test-mode chord.
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("Console Up")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("Console Down")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("Console Left")
@@ -1294,7 +1291,6 @@ static INPUT_PORTS_START( epo_tfit )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("rackets", FUNC(xavix_tfit_rackets_device::data_r))
 	PORT_BIT( 0xd6, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x20, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
@@ -1346,7 +1342,6 @@ static INPUT_PORTS_START( ban_bkgj )
 
 	PORT_MODIFY("PIO2")
 	PORT_BIT( 0xbf, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
@@ -1420,7 +1415,6 @@ static INPUT_PORTS_START( ban_ordj )
 
 	PORT_MODIFY("PIO1")
 	PORT_BIT( 0xdf, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x20, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
@@ -1521,7 +1515,6 @@ static INPUT_PORTS_START( epo_rgfj )
 	PORT_MODIFY("PIO2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Circle / Confirm") PORT_CODE(KEYCODE_ENTER)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Cross / Cancel") PORT_CODE(KEYCODE_BACKSPACE)
-	// Independent contacts permit the opposing Up+Down test-mode chord.
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
@@ -1722,7 +1715,6 @@ static INPUT_PORTS_START( udance )
 	PORT_INCLUDE(xavix_hard_power_control)
 
 	PORT_MODIFY("PIO2")
-	// The test menu identifies this line; its physical source is unknown.
 	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
@@ -1821,7 +1813,6 @@ static INPUT_PORTS_START( tmy_thom )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0xd7, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x20, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
@@ -1959,7 +1950,6 @@ static INPUT_PORTS_START( ndpmj )
 
 	PORT_MODIFY("PIO1")
 	PORT_BIT( 0xfb, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x04, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
@@ -2098,13 +2088,11 @@ static INPUT_PORTS_START( epo_kabj )
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Confirm (Red)")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Cancel / Delete (Pink)")
-	// Independent contacts permit the opposing Left+Right test-mode chord.
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Strawberry Right") PORT_16WAY
 
 	PORT_MODIFY("PIO2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Strawberry Left") PORT_16WAY
 	PORT_BIT( 0x3e, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
@@ -2113,7 +2101,6 @@ static INPUT_PORTS_START( epo_kabj )
 	PORT_CONFSETTING(    0x80, "AC Adapter" )
 
 	PORT_MODIFY("AN7")
-	// Representative AN5-AN7 differences select the ROM's slowly updated warning levels.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x1a, "Low" )
@@ -2192,7 +2179,6 @@ static INPUT_PORTS_START( doradraw )
 
 	PORT_MODIFY("PIO2")
 	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
@@ -2503,7 +2489,6 @@ static INPUT_PORTS_START( suprtvpc )
 	PORT_CONFSETTING(    0x02, "AC Adapter" )
 
 	PORT_MODIFY("AN0")
-	// Representative differences select the ROM's hysteretic battery classifier.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x1a, "Low" )
@@ -2892,7 +2877,8 @@ ROM_START( xavbassf )
 	ROM_LOAD( "xpbassfishing.bin", 0x000000, 0x800000, CRC(09ab2f29) SHA1(616254176315d0947002e9ae5a6371a3ffa2e8eb) )
 
 	// nRF24E1 firmware stored in the cartridge and tackle SPI EEPROMs.
-	// Each dump contains an unexplained extra byte after the 4 KiB EEPROM.
+	// Each dump includes one trailing 00 byte beyond the 4 KiB EEPROM; hashes include it.
+	// The cartridge firmware bridges the console and radio; the tackle firmware scans the controls.
 	ROM_REGION( 0x1000, "fishing_cart_eeprom", 0 )
 	ROM_LOAD( "xpbassfishingnrf24e1cart.bin", 0x0000, 0x1000, CRC(cfbb19ae) SHA1(32464e4e4be33fdbc7768311f93ce437a316c616) )
 	ROM_IGNORE( 1 )
@@ -3217,6 +3203,7 @@ ROM_START( doradraw )
 ROM_END
 
 ROM_START( hkdraw )
+	// Physical chip labels are unverified; filenames are retained from the original dump.
 	// Internal ROM checksum: 3879, matches expected value.
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("dmdj.u2", 0x000000, 0x800000, CRC(aa9dcbed) SHA1(153bc2bf99f68f40ff342859f323d2071e7979dc) )

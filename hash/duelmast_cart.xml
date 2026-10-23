@@ -12,7 +12,8 @@ license:CC0-1.0
 
 	<!-- only the single known cart exists for this system -->
 
-	<software name="ver1">
+	<!-- Native duel/result/restart checks pass; a player victory remains unverified. -->
+	<software name="ver1" supported="partial">
 		<description>Duel Masters: Duel Station Senyō Cartridge Ver.1</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>

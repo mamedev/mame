@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "xavix_io_madf_ball.h"
+#include "xavix_io_madfb_ball.h"
 
 DEFINE_DEVICE_TYPE(XAVIX_MADFB_BALL, xavix_madfb_ball_device, "xavix_madfb_ball", "XaviX / Radica Football Ball")
 

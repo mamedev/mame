@@ -6,10 +6,6 @@
     producing ten-bit code/complement reports through the shared infrared
     report generator and decoding the station's outgoing carrier bursts.
 
-    For TV command tracing, set both station and baton to TV and route playback
-    into the station microphone. This episode contains recognised musical cues:
-    https://www.youtube.com/watch?v=X0zhL21-fTQ
-
     TODO:
     - Measure physical transmitter timing and repetition.
     - Identify the station commands' light, sound and vibration effects; an IR return channel is inferred.

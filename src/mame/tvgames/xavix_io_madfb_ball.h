@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, MagikalUnicorn
 
-#ifndef MAME_TVGAMES_XAVIX_IO_MADF_BALL_H
-#define MAME_TVGAMES_XAVIX_IO_MADF_BALL_H
+#ifndef MAME_TVGAMES_XAVIX_IO_MADFB_BALL_H
+#define MAME_TVGAMES_XAVIX_IO_MADFB_BALL_H
 
 #pragma once
 
@@ -40,4 +40,4 @@ private:
 	emu_timer *m_event_timer;
 };
 
-#endif // MAME_TVGAMES_XAVIX_IO_MADF_BALL_H
+#endif // MAME_TVGAMES_XAVIX_IO_MADFB_BALL_H

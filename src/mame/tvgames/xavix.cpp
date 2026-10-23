@@ -30,6 +30,10 @@
               Baseball Korean version /SONOKONG/Korea                                                         -           -               -           -               -                   -                       -
     1999      ABC Jungle Fun Hippo VTech/HK (USA and UK versions only, FR is dumped)                          -           -               -           -               -                   -                       -
 
+    Input settings use representative battery ADC levels; physical voltage
+    scaling is unmeasured. Demo Mode follows firmware test labels; its
+    physical source is unknown unless noted below.
+
     TODO:
     - hikara: Verify CT675A-F video processing, reset values, panel
       scaling and colour processing.
@@ -54,7 +58,7 @@
 #include "xavix_io_bb_ball.h"
 #include "xavix_io_bb_bat.h"
 #include "xavix_io_beyu_ripcord.h"
-#include "xavix_io_madf_ball.h"
+#include "xavix_io_madfb_ball.h"
 #include "xavix_io_mtrk_wheel.h"
 #include "xavix_power.h"
 
@@ -619,7 +623,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( xavix_battery_status )
 	PORT_MODIFY("AN7")
-	// Representative differences select the ROM's warning rates; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x2c, "Low" )
@@ -668,7 +671,6 @@ static INPUT_PORTS_START( xavix_excite_controls )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Confirm (O)")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Cancel (X)")
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// Independent contacts permit the opposing Up+Down test-mode chord.
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
@@ -718,7 +720,6 @@ static INPUT_PORTS_START( rad_box )
 	PORT_BIT( 0xa7, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
-	// Representative differences select the ROM's three threshold bands; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x14, "Low" )
@@ -773,7 +774,6 @@ static INPUT_PORTS_START( rad_ssx )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Tilt Right / Right Button") PORT_16WAY
 
 	PORT_MODIFY("AN7")
-	// Representative differences select the ROM's warning rates; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x28, "Low" )
@@ -807,7 +807,6 @@ static INPUT_PORTS_START( rad_ssxp )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Tilt Right / Right Button") PORT_16WAY
 
 	PORT_MODIFY("AN7")
-	// Representative differences select the ROM's warning rates; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x28, "Low" )
@@ -841,7 +840,6 @@ static INPUT_PORTS_START( rad_sbw )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Tilt Right / Right Button") PORT_16WAY
 
 	PORT_MODIFY("AN7")
-	// Representative differences select the ROM's warning rates; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x28, "Low" )
@@ -904,7 +902,6 @@ static INPUT_PORTS_START( tak_geig )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_MODIFY("AN7")
-	// Representative values select the ROM's three threshold bands; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x18, "Low" )
@@ -924,13 +921,11 @@ static INPUT_PORTS_START( epo_mms )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Purple / Select") PORT_CODE(KEYCODE_D) PORT_CODE(MOUSECODE_BUTTON3_INDEXED(1)) PORT_CODE(GUNCODE_BUTTON2_INDEXED(1))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Orange / Confirm") PORT_CODE(KEYCODE_F) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(1)) PORT_CODE(GUNCODE_BUTTON1_INDEXED(1))
 	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page identifies demo mode; its physical source is unknown.
 	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_MODIFY("AN7")
-	// Representative differences select the ROM's three warning states; physical voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x20, "Low" )
@@ -958,7 +953,6 @@ static INPUT_PORTS_START( tak_hamr )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Tempo Faster")
 
 	PORT_MODIFY("AN7")
-	// Representative values select the ROM's three threshold bands; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x20, "Low" )
@@ -967,7 +961,6 @@ static INPUT_PORTS_START( tak_hamr )
 	PORT_INCLUDE(xavix_reset_control)
 
 	PORT_MODIFY("IN1")
-	// The test page identifies demo mode; its physical source is unknown.
 	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
@@ -992,13 +985,11 @@ static INPUT_PORTS_START( tomcpin )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0xf5, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page identifies demo mode; its physical source is unknown.
 	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 
 	PORT_MODIFY("AN7")
-	// Representative ADC differences select the ROM's warning rates; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x1c, "Low" )
@@ -1025,7 +1016,6 @@ static INPUT_PORTS_START( epo_tfp2 )
 	PORT_BIT( 0xf7, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
-	// Representative values select the ROM's three warning states; physical voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x10, "Low" )
@@ -1052,14 +1042,12 @@ static INPUT_PORTS_START( epo_tp2s )
 	PORT_CONFNAME( 0x01, 0x00, "Power Source" )
 	PORT_CONFSETTING(    0x00, "Batteries" )
 	PORT_CONFSETTING(    0x01, "AC Adapter" )
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x10, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x10, DEF_STR( On ) )
 	PORT_BIT( 0xee, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
-	// Representative values select the ROM's three warning states; physical voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x10, "Low" )
@@ -1086,14 +1074,12 @@ static INPUT_PORTS_START( epo_tp2p )
 	PORT_CONFNAME( 0x01, 0x00, "Power Source" )
 	PORT_CONFSETTING(    0x00, "Batteries" )
 	PORT_CONFSETTING(    0x01, "AC Adapter" )
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
 	PORT_BIT( 0xbe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
-	// Representative values select the ROM's three warning states; physical voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x1c, "Low" )
@@ -1175,7 +1161,6 @@ static INPUT_PORTS_START( tcarnavi )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Wipers")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Car Navi")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page labels this line NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x20, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
@@ -1204,7 +1189,6 @@ static INPUT_PORTS_START( nostalgia )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x20, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
@@ -1230,7 +1214,6 @@ static INPUT_PORTS_START( rad_bdp )
 	PORT_BIT( 0xbf, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
-	// Representative differences select the ROM's three threshold bands; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x14, "Low" )
@@ -1283,14 +1266,12 @@ static INPUT_PORTS_START( ban_krrj )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
 	PORT_BIT( 0xbf, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
-	// Representative values select the ROM's three supply states; physical voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x1c, "Low" )
@@ -1442,7 +1423,6 @@ static INPUT_PORTS_START( gungunrv )
 	PORT_CONFNAME( 0x02, 0x00, "P2 Gun" )
 	PORT_CONFSETTING(    0x00, "Disconnected" )
 	PORT_CONFSETTING(    0x02, "Connected" )
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x04, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
@@ -1451,7 +1431,6 @@ static INPUT_PORTS_START( gungunrv )
 	PORT_BIT( 0xb1, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
-	// Representative differences select the ROM's narrow three-state battery classifier.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x28, "Low" )
@@ -1570,7 +1549,6 @@ static INPUT_PORTS_START( tomshoot )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_MODIFY("AN7")
-	// Representative values select the ROM's three threshold bands; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x1f, "Low" )
@@ -1610,7 +1588,6 @@ static INPUT_PORTS_START( epo_dmon )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Simulate Voice") PORT_PLAYER(2) PORT_CODE(KEYCODE_M) PORT_WRITE_LINE_DEVICE_MEMBER("microphone_tone2", FUNC(beep_device::set_state))
 
 	PORT_MODIFY("AN7")
-	// Representative values select the ROM's three threshold bands; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x1a, "Low" )
@@ -1619,7 +1596,6 @@ static INPUT_PORTS_START( epo_dmon )
 	PORT_INCLUDE(xavix_lightgun_2p)
 
 	PORT_MODIFY("IN1")
-	// The test page identifies demo mode; its physical source is unknown.
 	PORT_CONFNAME( 0x04, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
@@ -1788,7 +1764,6 @@ static INPUT_PORTS_START( epo_strk )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_ir_motion_device::data_r))
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
@@ -1800,7 +1775,6 @@ static INPUT_PORTS_START( epo_strkp )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_ir_motion_device::data_r))
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
@@ -2048,7 +2022,6 @@ static INPUT_PORTS_START( tak_wdg )
 	// The attachment contact cannot identify the Web Knight; its IR report supplies the identity.
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Web Knight Attached") PORT_TOGGLE PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // output
-	// Independent contacts allow the opposing Left+Right factory chord.
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_16WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_16WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_16WAY
@@ -2065,7 +2038,6 @@ static INPUT_PORTS_START( tak_wdg )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // shutdown output
 
 	PORT_MODIFY("AN7")
-	// Representative ADC values select the ROM's bands; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x12, "Low" )
@@ -2094,7 +2066,6 @@ static INPUT_PORTS_START( epo_epp_ir )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("O")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("X")
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// Independent contacts permit the opposing Up+Down test-mode chord.
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
@@ -2127,13 +2098,11 @@ static INPUT_PORTS_START( epo_epp2 )
 	PORT_INCLUDE(epo_epp_ir)
 
 	PORT_MODIFY("IN1")
-	// The test page labels this line NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 
 	PORT_MODIFY("AN7")
-	// Representative differences select the ROM's warning rates; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x28, "Low" )
@@ -2161,7 +2130,6 @@ static INPUT_PORTS_START( epo_epp3 )
 	PORT_CONFSETTING(    0x02, "AC Adapter" )
 
 	PORT_MODIFY("AN7")
-	// Representative differences select the ROM's warning rates; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x28, "Low" )
@@ -2203,7 +2171,6 @@ static INPUT_PORTS_START( rad_ping )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
-	// Representative values select the ROM's warning threshold; physical voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x80, "Low" )
@@ -2226,7 +2193,6 @@ static INPUT_PORTS_START( epo_hamd )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("O")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("X")
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// Independent contacts permit the opposing Up+Down test-mode chord.
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
@@ -2260,7 +2226,6 @@ static INPUT_PORTS_START( epo_crok )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("controllers", FUNC(xavix_croket_controllers_device::data_r))
 	PORT_BIT( 0xf4, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page identifies demo mode; its physical source is unknown.
 	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
@@ -2383,7 +2348,6 @@ static INPUT_PORTS_START( tak_zuba )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
-	// Representative differences select the ROM's three classifier states; physical voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x16, "Low" )
@@ -2471,7 +2435,6 @@ static INPUT_PORTS_START( rad_bb2 )
 	PORT_BIT( 0x87, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
-	// Representative differences select the ROM's warning rates; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x16, "Low" )
@@ -2552,7 +2515,6 @@ static INPUT_PORTS_START( epo_efdx )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0xf5, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page identifies demo mode; its physical source is unknown.
 	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
@@ -2794,7 +2756,6 @@ static INPUT_PORTS_START( hikara )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("AN7")
-	// Representative differences select the version 0x10 warning rates; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x12, "Low" )
@@ -3422,7 +3383,6 @@ static INPUT_PORTS_START( evio )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P2 Vibrato") PORT_PLAYER(2)
 
 	PORT_MODIFY("AN7")
-	// Representative values select eVio's unusually narrow three-state battery classifier.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x11, "Low" )
@@ -3775,7 +3735,6 @@ static INPUT_PORTS_START( epo_quiz )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 D / 4 / Green / Right") PORT_CODE(KEYCODE_C)
 
 	PORT_MODIFY("IN1")
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x01, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
@@ -3844,7 +3803,6 @@ static INPUT_PORTS_START( bistro )
 	PORT_CONFSETTING(    0x0c, "Frying Pan" )
 	// The controller check also requires each burner contact separately.
 	// PORT_CONFSETTING(    0x08, "Second Burner Contact Only (Test)" )
-	// Independent contacts permit the all-directions test-mode chord.
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY PORT_NAME("Selection Up")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY PORT_NAME("Selection Down")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_NAME("Selection Left")
@@ -4092,7 +4050,7 @@ INPUT_PORTS_END
 u16 xavix_hippofr_state::panel_levels_r()
 {
 	std::array<u16, 10> contacts{};
-	auto const close_contact = [&contacts](unsigned first, unsigned second)
+	auto const close_contact = [&contacts] (unsigned first, unsigned second)
 	{
 		contacts[first] |= u16(1) << second;
 		contacts[second] |= u16(1) << first;
@@ -4126,7 +4084,7 @@ u8 xavix_hippofr_state::io0_input_r(u8)
 u8 xavix_hippofr_state::io1_input_r(u8 direction)
 {
 	std::array<u8, 8> contacts{};
-	auto const close_contact = [&contacts](unsigned first, unsigned second)
+	auto const close_contact = [&contacts] (unsigned first, unsigned second)
 	{
 		contacts[first] |= 1U << second;
 		contacts[second] |= 1U << first;
@@ -4205,7 +4163,7 @@ void xavix_multiplt_state::machine_reset()
 u8 xavix_multiplt_state::io0_input_r(u8 direction)
 {
 	std::array<u8, 8> contacts{};
-	auto const close_contact = [&contacts](unsigned first, unsigned second)
+	auto const close_contact = [&contacts] (unsigned first, unsigned second)
 	{
 		contacts[first] |= 1U << second;
 		contacts[second] |= 1U << first;
@@ -4270,7 +4228,6 @@ static INPUT_PORTS_START( rad_mtrk )
 	PORT_BIT( 0xbd, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN0")
-	// Representative values select the ROM's warning threshold; physical voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x30, "Low" )
@@ -4439,7 +4396,6 @@ static INPUT_PORTS_START( tak_bey )
 	PORT_BIT( 0xf3, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
-	// Representative differences select this ROM's states; physical voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x20, "Low" )
@@ -4498,7 +4454,6 @@ static INPUT_PORTS_START( jarajal )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
-	// Representative differences select this ROM's states; physical voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x13, "Low" )
@@ -4568,7 +4523,6 @@ static INPUT_PORTS_START( epo_mj )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 	PORT_BIT( 0xf4, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x08, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
@@ -4615,7 +4569,6 @@ static INPUT_PORTS_START( ltv_tam )
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Push Button / Confirm") PORT_PLAYER(2) PORT_CODE(MOUSECODE_BUTTON1_INDEXED(1))
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x20, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x20, DEF_STR( On ) )
@@ -4627,7 +4580,6 @@ static INPUT_PORTS_START( ltv_tam )
 	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
-	// Representative differences select the ROM's three threshold bands; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x10, "Low" )
@@ -4690,7 +4642,6 @@ static INPUT_PORTS_START( tomplc )
 	// The handheld switch pulls this line low while enabling ADC0 microphone sampling.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Push-to-Talk")
 
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
@@ -4711,7 +4662,6 @@ static INPUT_PORTS_START( tomplc )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
-	// Representative differences select the ROM's states; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x30, "Low" )
@@ -4760,13 +4710,11 @@ static INPUT_PORTS_START( tomthr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Headlights")
 	// The radio-handset switch is electrically active low and gates ADC0 sampling.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Push-to-Talk")
-	// The test page labels this input NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 
 	PORT_MODIFY("AN7")
-	// Representative differences select the ROM's states; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x10, "Low" )
@@ -4794,14 +4742,12 @@ static INPUT_PORTS_START( epo_guru )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("IN1")
-	// The test page labels this line NORMAL/DEMO; its physical source is unknown.
 	PORT_CONFNAME( 0x40, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x40, DEF_STR( On ) )
 	PORT_BIT( 0xbf, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_MODIFY("AN7")
-	// Representative differences select the ROM's states; physical battery-voltage scaling is unknown.
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
 	PORT_CONFSETTING(    0x28, "Low" )
