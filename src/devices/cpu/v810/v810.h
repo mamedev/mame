@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <array>
+
 
 enum
 {
@@ -93,7 +95,11 @@ public:
 	template <typename... T> void set_bus_wait_callback(T &&... args) { m_bus_wait.set(std::forward<T>(args)...); }
 
 protected:
-	v810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool nvc);
+	using opcode_func = uint32_t (v810_device::*)(uint32_t op);
+	using opcode_table = std::array<opcode_func, 64>;
+
+	// a derived CPU supplies its own opcode table to add instructions
+	v810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const opcode_table &opcodes, uint32_t pir);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -115,6 +121,16 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	inline uint16_t fetch_op(offs_t addr, int cycles);
+	inline void SETREG(uint32_t reg, uint32_t val);
+	inline uint32_t GETREG(uint32_t reg);
+	uint32_t opUNDEF(uint32_t op);
+	uint32_t fp_execute(uint32_t op, u8 sub);
+
+	static const opcode_table s_opcodes;
+
+	uint32_t m_reg[65];
+
 private:
 	enum : u8 { LAST_OTHER, LAST_LD, LAST_ST, LAST_OUT };
 
@@ -122,16 +138,11 @@ private:
 	enum : uint32_t { PSW_FPR = 0x010, PSW_FUD = 0x020, PSW_FOV = 0x040, PSW_FZD = 0x080, PSW_FIV = 0x100, PSW_FRO = 0x200 };
 	enum fp_op { FP_ADD, FP_SUB, FP_MUL, FP_DIV };
 
-	typedef uint32_t (v810_device::*opcode_func)(uint32_t op);
-	static const opcode_func s_OpCodeTable[64];
-
 	address_space_config m_program_config;
 	address_space_config m_io_config;
+	const opcode_table &m_opcodes;
+	const uint32_t m_pir;
 
-	// Nintendo NVC (Virtual Boy): adds CLI/SEI and the XB/XH/REV/MPYHW sub-opcodes, invalid on a V810
-	const bool m_nvc;
-
-	uint32_t m_reg[65]{};
 	uint16_t m_irq_state;
 	uint8_t m_nmi_line;
 	bool m_nmi_pending;
@@ -153,13 +164,9 @@ private:
 	uint32_t m_icache_tag[128];
 	bool m_icache_valid[128][2];
 
-	inline uint16_t fetch_op(offs_t addr, int cycles);
 	inline uint32_t mem_cycles(offs_t addr, int access, int size, int base, int pair, u8 kind);
 	void icache_clear(u32 start, u32 count);
 
-	inline void SETREG(uint32_t reg,uint32_t val);
-	inline uint32_t GETREG(uint32_t reg);
-	uint32_t opUNDEF(uint32_t op);
 	uint32_t opMOVr(uint32_t op);
 	uint32_t opMOVEA(uint32_t op);
 	uint32_t opMOVHI(uint32_t op);
@@ -189,8 +196,6 @@ private:
 	uint32_t opJMPr(uint32_t op);
 	uint32_t opJR(uint32_t op);
 	uint32_t opJAL(uint32_t op);
-	uint32_t opCLI(uint32_t op);
-	uint32_t opSEI(uint32_t op);
 	void take_exception(u32 handler, u16 code);
 	uint32_t opTRAP(uint32_t op);
 	uint32_t opRETI(uint32_t op);
@@ -225,10 +230,6 @@ private:
 	uint32_t opCMPF(uint32_t op);
 	uint32_t opCVTS(uint32_t op);
 	uint32_t opCVTW(uint32_t op);
-	uint32_t opMPYHW(uint32_t op);
-	uint32_t opXB(uint32_t op);
-	uint32_t opXH(uint32_t op);
-	uint32_t opREV(uint32_t op);
 	uint32_t opFpoint(uint32_t op);
 	uint32_t opBSU(uint32_t op);
 	uint32_t opBSU_search(uint32_t op);
@@ -240,10 +241,27 @@ private:
 };
 
 
+// Nintendo NVC (Virtual Boy): a V810 with six added instructions (Virtual Boy Development Manual chapter 6)
 class nintendo_nvc_device : public v810_device
 {
 public:
 	nintendo_nvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_disasm_interface overrides
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+private:
+	static constexpr opcode_table make_opcodes();
+	uint32_t opCLI(uint32_t op);
+	uint32_t opSEI(uint32_t op);
+	uint32_t opFpoint(uint32_t op);
+	uint32_t opXB(uint32_t op);
+	uint32_t opXH(uint32_t op);
+	uint32_t opREV(uint32_t op);
+	uint32_t opMPYHW(uint32_t op);
+
+	static const opcode_table s_nvc_opcodes;
 };
 
 
