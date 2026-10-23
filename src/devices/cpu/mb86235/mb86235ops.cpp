@@ -926,8 +926,8 @@ void mb86235_device::do_alu2_trans2_1(uint64_t op)
 	case 0:
 	case 2:
 	{
-		uint8_t ad = (op >> 20) & 0x1f;
-		uint8_t bd = (op >> 10) & 0xf;
+		uint8_t ad = (op >> (sd == 0 ? 15 : 20)) & 0x1f;
+		uint8_t bd = (op >> (sd == 0 ? 5 : 10)) & 0xf;
 		set_transfer_reg(ad, ares);
 		set_transfer_reg(bd | 0x20, bres);
 		break;
@@ -1097,7 +1097,7 @@ void mb86235_device::do_alu1_trans2_2(uint64_t op)
 	case 0:
 	case 2:
 	{
-		uint8_t ad = (op >> 28) & 0x1f;
+		uint8_t ad = (op >> (sda == 0 ? 28 : 33)) & 0x1f;
 		set_transfer_reg(ad, ares);
 		break;
 	}
@@ -1115,7 +1115,7 @@ void mb86235_device::do_alu1_trans2_2(uint64_t op)
 	case 0:
 	case 2:
 	{
-		uint8_t bd = (op >> 8) & 0x1f;
+		uint8_t bd = (op >> (sdb == 0 ? 8 : 13)) & 0x1f;
 		set_transfer_reg(bd | 0x20, bres);
 		break;
 	}
