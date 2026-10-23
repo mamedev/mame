@@ -31,8 +31,6 @@ public:
 	u8 adpcm_update_0();
 	u8 adpcm_update_1();
 
-	// CD-DA operations
-
 	// video output, for the '6261
 	void render_bg_line(int raster, u32 *dest);
 	int rainbow_line(int raster, u32 *dest);
@@ -60,12 +58,12 @@ private:
 		u16 xscroll = 0;
 		u16 yscroll = 0;
 	} m_bg[4];
-	u16 m_bg_mode = 0;
-	u16 m_bg_priority = 0;
-	u8 m_bg_scroll_mode = 0;
-	u16 m_bg0sub_bat = 0;
-	u16 m_bg0sub_cg = 0;
-	u16 m_bg_affine[6]{};
+	u16 m_bg_mode;
+	u16 m_bg_priority;
+	u8 m_bg_scroll_mode;
+	u16 m_bg0sub_bat;
+	u16 m_bg0sub_cg;
+	u16 m_bg_affine[6];
 
 	struct{
 		u8 index = 0;
@@ -100,8 +98,8 @@ private:
 		bool irq = false;
 	} m_dma;
 
-	bool m_in_scsi_update = false;
-	emu_timer *m_scsi_line_timer = nullptr;
+	bool m_in_scsi_update;
+	emu_timer *m_scsi_line_timer;
 
 	struct rainbow_t {
 		u8 control = 0;
@@ -143,6 +141,7 @@ private:
 
 	/* Callback for when the irq line may have changed (mandatory) */
 	devcb_write_line    m_irq_changed_cb;
+	bool                m_irq_state;
 
 	void write_microprg_data(offs_t address, u16 data);
 

@@ -36,10 +36,6 @@ ADPCM related patents:
 
 #include <algorithm>
 
-#define VERBOSE (LOG_GENERAL)
-
-#include "logmacro.h"
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -70,6 +66,7 @@ huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, d
 	, m_scsibus(*this, "scsi")
 	, m_scsicb(*this, "scsi:7:scsicb")
 	, m_irq_changed_cb(*this)
+	, m_irq_state(false)
 {
 }
 
@@ -112,7 +109,10 @@ void huc6272_device::device_start()
 	save_item(NAME(m_kram_addr_w));
 	save_item(NAME(m_kram_inc_w));
 	save_item(NAME(m_kram_page_w));
+	save_item(NAME(m_kram_load_reg));
+	save_item(NAME(m_kram_write_reg));
 	save_item(NAME(m_page_setting));
+	save_item(NAME(m_irq_state));
 
 	save_item(STRUCT_MEMBER(m_scsi, data));
 	save_item(STRUCT_MEMBER(m_scsi, ctrl));
@@ -333,7 +333,9 @@ u16 huc6272_device::status_r(offs_t offset)
 	res |= (m_adpcm.interrupt << 10);
 	if (m_scsi.subchannel_irq)
 		res |= 0x1000;
-	// only one of DMA/SCSI is reported at a time (Anime Freak FX Vol. 4 gets confused otherwise)
+	// HACK: the GMAKER manual latches SCDMA.I and SCSIBK.I independently, but reporting both
+	// at once confuses Anime Freak FX Vol. 4, so SCSIBK.I is held back while SCDMA.I is set
+	// (here and in the bus status register)
 	if (m_dma.irq && BIT(m_dma.ctrl, 1))
 		res |= 0x2000;
 	else if (m_scsi.irq)
@@ -456,7 +458,7 @@ bool huc6272_device::scsi_phase_match()
 void huc6272_device::scsi_set_ack(bool state)
 {
 	m_scsi.ack = state;
-	m_scsicb->ack_w(state ? 1 : 0);
+	m_scsicb->ack_w(state);
 }
 
 // the data bus is only driven when "assert data bus" is set, or by a DMA send
@@ -483,7 +485,9 @@ void huc6272_device::scsi_req_w(int state)
 void huc6272_device::dma_write_byte(u8 data)
 {
 	if (!m_dma.flipflop)
+	{
 		m_dma.latch = data;
+	}
 	else
 	{
 		const u32 page = BIT(m_page_setting, 0);
@@ -532,7 +536,9 @@ void huc6272_device::scsi_dma_update()
 				}
 			}
 			else if (m_scsi.ack && !req)
+			{
 				scsi_set_ack(false);
+			}
 		}
 	}
 	else if (m_scsi.dma_send)
@@ -549,7 +555,9 @@ void huc6272_device::scsi_dma_update()
 				}
 			}
 			else if (m_scsi.ack && !req)
+			{
 				scsi_set_ack(false);
+			}
 		}
 	}
 
@@ -1144,10 +1152,10 @@ void huc6272_device::bg_decode_8(u8 mode, const u16 *cg, u32 pbn, u32 layer_or, 
 void huc6272_device::draw_bg_layer(int n, int raster, u32 *line)
 {
 	// out of range sizes behave as the minimum size
-	static const u8 size_shift[16] = { 3, 3, 3, 3, 4, 5, 6, 7, 8, 9, 10, 3, 3, 3, 3, 3 };
-	static const bool size_invalid[16] = { true, true, true, false, false, false, false, false, false, false, false, true, true, true, true, true };
+	static constexpr u8 SIZE_SHIFT[16] = { 3, 3, 3, 3, 4, 5, 6, 7, 8, 9, 10, 3, 3, 3, 3, 3 };
+	static constexpr bool SIZE_INVALID[16] = { true, true, true, false, false, false, false, false, false, false, false, true, true, true, true, true };
 	// CG words fetched per 8 dots for each mode
-	static const u8 cg_words[8] = { 0, 1, 2, 4, 8, 8, 0, 0 };
+	static constexpr u8 CG_WORDS[8] = { 0, 1, 2, 4, 8, 8, 0, 0 };
 
 	const u8 bgmode = (m_bg_mode >> (n * 4)) & 0xf;
 	const u8 mode = bgmode & 7;
@@ -1170,12 +1178,12 @@ void huc6272_device::draw_bg_layer(int n, int raster, u32 *line)
 
 	const u16 size = m_bg[n].size;
 	const u16 sub_size = n ? (size << 8) : size;
-	const u8 width_shift = size_shift[(size >> 4) & 0xf];
-	const u8 height_shift = size_shift[size & 0xf];
-	const bool width_invalid = size_invalid[(size >> 4) & 0xf];
-	const u8 sub_width_shift = size_shift[(sub_size >> 12) & 0xf];
-	const u8 sub_height_shift = size_shift[(sub_size >> 8) & 0xf];
-	const bool sub_width_invalid = size_invalid[(sub_size >> 12) & 0xf];
+	const u8 width_shift = SIZE_SHIFT[(size >> 4) & 0xf];
+	const u8 height_shift = SIZE_SHIFT[size & 0xf];
+	const bool width_invalid = SIZE_INVALID[(size >> 4) & 0xf];
+	const u8 sub_width_shift = SIZE_SHIFT[(sub_size >> 12) & 0xf];
+	const u8 sub_height_shift = SIZE_SHIFT[(sub_size >> 8) & 0xf];
+	const bool sub_width_invalid = SIZE_INVALID[(sub_size >> 12) & 0xf];
 	const u32 bat_width = (1 << width_shift) >> 3;
 	const u32 bat_height = (1 << height_shift) >> 3;
 	const u32 bat_sub_width = (1 << sub_width_shift) >> 3;
@@ -1226,7 +1234,7 @@ void huc6272_device::draw_bg_layer(int n, int raster, u32 *line)
 		const s32 cy = s16(m_bg_affine[5]);
 		const u32 bat_width_mask = endless ? (bat_width - 1) : 0xffff;
 		const u32 bat_height_mask = endless ? (bat_height - 1) : 0xffff;
-		const u32 bitmap_ymask = (1 << height_shift) - 1;
+		const u32 bitmap_ymask = util::make_bitmask<u32>(height_shift);
 		const s32 raw_x = s32(util::sext(m_bg[n].xscroll, 11)) - cx;
 		const s32 raw_y = raster + s32(util::sext(m_bg[n].yscroll, 11)) - cy;
 		s32 xaccum = raw_x * a + raw_y * b + (cx << 8);
@@ -1242,7 +1250,7 @@ void huc6272_device::draw_bg_layer(int n, int raster, u32 *line)
 			if (!endless && (bx >= bat_width || by >= bat_height))
 				continue;
 
-			const u32 words = cg_words[mode];
+			const u32 words = CG_WORDS[mode];
 			u32 pbn = 0;
 			u32 cg_addr;
 			if (block_mode)
@@ -1253,14 +1261,26 @@ void huc6272_device::draw_bg_layer(int n, int raster, u32 *line)
 				cg_addr = bat * 8 * words + (ty & 7) * words;
 			}
 			else
+			{
 				cg_addr = bx * words + (((ty & bitmap_ymask) << width_shift) >> 3) * words;
+			}
 
 			u32 pix = 0;
 			switch (mode)
 			{
-				case 1: pix = (kram_word(page, cg_offset, cg_addr) >> ((7 - (tx & 7)) * 2)) & 3; if (pix) pix = (pbn << 2) + pix; break;
-				case 2: pix = (kram_word(page, cg_offset, cg_addr + ((tx >> 2) & 1)) >> ((3 - (tx & 3)) * 4)) & 0xf; if (pix) pix = (pbn << 4) + pix; break;
-				case 3: pix = (kram_word(page, cg_offset, cg_addr + ((tx >> 1) & 3)) >> (BIT(tx, 0) ? 0 : 8)) & 0xff; break;
+				case 1:
+					pix = (kram_word(page, cg_offset, cg_addr) >> ((7 - (tx & 7)) * 2)) & 3;
+					if (pix)
+						pix = (pbn << 2) + pix;
+					break;
+				case 2:
+					pix = (kram_word(page, cg_offset, cg_addr + ((tx >> 2) & 1)) >> ((3 - (tx & 3)) * 4)) & 0xf;
+					if (pix)
+						pix = (pbn << 4) + pix;
+					break;
+				case 3:
+					pix = (kram_word(page, cg_offset, cg_addr + ((tx >> 1) & 3)) >> (BIT(tx, 0) ? 0 : 8)) & 0xff;
+					break;
 				case 4:
 				{
 					const u16 w = kram_word(page, cg_offset, cg_addr + (tx & 7));
@@ -1275,13 +1295,13 @@ void huc6272_device::draw_bg_layer(int n, int raster, u32 *line)
 		return;
 	}
 
-	const u32 words = cg_words[mode];
+	const u32 words = CG_WORDS[mode];
 	u32 bat_x = (xscroll >> 3) & bat_mask;
 	const u32 bat_y = (yoffset >> 3) & bat_mask;
 	const u32 ysmall = yoffset & 7;
 	// linear (bitmap) addressing: CG words from the start of the bitmap to this line
-	const u32 bitmap_y = ((yoffset & (width_invalid ? 0 : ((1 << height_shift) - 1))) << width_shift) * words / 8;
-	const u32 bitmap_sub_y = ((yoffset & (sub_width_invalid ? 0 : ((1 << sub_height_shift) - 1))) << sub_width_shift) * words / 8;
+	const u32 bitmap_y = ((yoffset & (width_invalid ? 0 : util::make_bitmask<u32>(height_shift))) << width_shift) * words / 8;
+	const u32 bitmap_sub_y = ((yoffset & (sub_width_invalid ? 0 : util::make_bitmask<u32>(sub_height_shift))) << sub_width_shift) * words / 8;
 	u32 *target = line + 8 - (xscroll & 7);
 
 	for (int x = 0; x < 256 + 8; x += 8)
@@ -1437,9 +1457,13 @@ void huc6272_device::render_bg_line(int raster, u32 *dest)
 	if (BIT(m_micro_prg.ctrl, 0))
 	{
 		for (int prio = 1; prio <= 7; prio++)
+		{
 			for (int n = 0; n < 4; n++)
+			{
 				if (((m_bg_priority >> (n * 3)) & 7) == prio)
 					draw_bg_layer(n, raster, line);
+			}
+		}
 	}
 
 	std::copy_n(&line[8], 256, dest);
@@ -1591,5 +1615,9 @@ u8 huc6272_device::adpcm_update_1()
 void huc6272_device::interrupt_update()
 {
 	const bool state = m_adpcm.interrupt || m_scsi.irq || m_scsi.subchannel_irq || (m_dma.irq && BIT(m_dma.ctrl, 1)) || m_rainbow.raster_irq;
-	m_irq_changed_cb(state ? ASSERT_LINE : CLEAR_LINE);
+	if (state != m_irq_state)
+	{
+		m_irq_state = state;
+		m_irq_changed_cb(state);
+	}
 }
