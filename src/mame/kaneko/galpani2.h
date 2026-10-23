@@ -80,14 +80,11 @@ private:
 	uint16_t m_mask_nongirl_pen = 0x00a0;
 	uint8_t  m_mask_captured_lo = 0xa0;  // SE writes 0x60 to plane 0 on capture
 
-	// Deferred girl-bitmap HLE: the bitmap is generated after the
-	// sub CPU's photo decode completes, not at MCU command time when
-	// BG15 may still contain stale data from the previous round.
+	// Girl bitmap: the MCU decompresses the image from ROM to extract
+	// coverage (skip = background, non-skip = girl), then writes the
+	// result to main CPU shared RAM for the field mask system.
 	static constexpr uint32_t GIRL_BITMAP_OFFSET = 0xe000;
 	static constexpr uint32_t GIRL_BITMAP_ADDR   = 0x10e000;
-	uint32_t m_girl_bitmap_pending_addr = 0;
-	uint32_t m_girl_bitmap_script_state = 0;
-	uint32_t m_girl_bitmap_pending_param = 0;
 
 	void galpani2_mcu_init_w(uint8_t data);
 	void galpani2_mcu_nmi1_w(uint8_t data);
@@ -108,8 +105,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani2_interrupt2);
 	void galpani2_mcu_nmi1();
 	void galpani2_mcu_nmi2();
-	uint16_t generate_girl_bitmap(address_space &mspace);
-	void update_girl_bitmap();
+	uint16_t generate_girl_bitmap(uint32_t image_offset);
 	void galpani2_mem1(address_map &map) ATTR_COLD;
 	void galpani2_mem2(address_map &map) ATTR_COLD;
 };

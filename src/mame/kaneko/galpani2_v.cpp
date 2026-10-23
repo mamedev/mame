@@ -205,33 +205,31 @@ void galpani2_state::copybg15(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap
 				if (layer == 3)
 				{
 					uint16_t const mask = m_bg8[1][((y + mask_scrolly) & 0xff) * 512 + ((x + mask_scrollx) & 0x1ff)];
-					// SE composites its background and girl into both RGB planes.
-					// Its plane-1 covered palette applies across the whole field;
-					// plane 0's 8050/4050 flags supply the remaining girl shape.
-					// Restrict color substitution to those flags, preserving the
-					// background and revealed cells outside the covered silhouette.
 					uint16_t const shape = m_bg8[0][((y + shape_scrolly) & 0xff) * 512 + ((x + shape_scrollx) & 0x1ff)];
+					// BG8 plane 0 carries the girl mask: the girl pen
+					// (0x80A0 base / 0x8050 SE) has bits 14-15 set.
+					// TODO: use girl_shape once the MCU bitmap is correct.
+					// For now, fall back to treating all field pixels as
+					// girl so the cycling mask covers the full silhouette.
 					bool const girl_shape = !m_bg_image_prefix_count
 						|| ((shape & 0xc000) && (shape & 0xff) == (m_mask_girl_pen & 0xff));
-					bool const color_field = !BIT(mask, 11) && BIT(m_bg8_palette_ram[mask & 0xff], 15);
+					// BG8 plane 1 palette bit 15 marks covered field cells.
+					bool const color_field = !BIT(mask, 11)
+						&& BIT(m_bg8_palette_ram[mask & 0xff], 15);
 					if (color_field)
 					{
 						uint16_t const cycle_color = regs[0xc06 / 2] & 0x7fff;
 						if (bg8_captured_field(mask))
 						{
-							// SE reveals the photo through the cycling color. Its
-							// lower RGB plane contains the same photo, so blending
-							// over that plane would eliminate the capture tint.
-							if (m_bg_image_prefix_count)
-								backdrop = clut[cycle_color];
+							// Uncovered by player: photo visible, blended
+							// with cycling player color as backdrop.
+							backdrop = clut[cycle_color];
 						}
 						else if (girl_shape)
 						{
+							// Covered girl: solid cycling color, fully opaque.
 							color = cycle_color;
-							// Covered SE girl pixels are solid, even while C10
-							// supplies the partial-photo mix used after capture.
-							if (m_bg_image_prefix_count)
-								opacity = 0xff;
+							opacity = 0xff;
 						}
 					}
 				}

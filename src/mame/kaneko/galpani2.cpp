@@ -134,30 +134,13 @@ void galpani2_state::machine_start()
 	membank("subdatabank")->configure_entries(0, 0x2000000/0x0800000, ROM, 0x0800000);
 	membank("subdatabank")->set_entry(0);
 
-	// Native image-script task 12 begins with LEA <four script records>,A0.
-	// The records move between program revisions; read the dispatch entry
-	// rather than assuming one region's work-RAM addresses in the mask HLE.
-	address_space &sub = m_subcpu->space(AS_PROGRAM);
-	uint32_t const script_handler = sub.read_dword(0x400 + 0x12 + 2);
-	if (script_handler < 0x3fffa && sub.read_word(script_handler) == 0x41f9)
-	{
-		uint32_t const records = sub.read_dword(script_handler + 2);
-		if (records >= 0x100000 && records < 0x13ff40)
-			m_girl_bitmap_script_state = records + 3 * 0x30;
-	}
-
 	save_item(NAME(m_eeprom_word));
 	save_item(NAME(m_old_mcu_nmi1));
 	save_item(NAME(m_old_mcu_nmi2));
-	save_item(NAME(m_girl_bitmap_pending_addr));
-	// Preserve the original sets' saved-item key and 32-bit layout.
-	save_item(m_girl_bitmap_pending_param, "m_girl_bitmap_delay");
 }
 
 void galpani2_state::machine_reset()
 {
-	m_girl_bitmap_pending_addr = 0;
-	m_girl_bitmap_pending_param = 0;
 	machine().scheduler().perfect_quantum(attotime::from_usec(50)); //initial mcu xchk
 }
 
@@ -238,117 +221,102 @@ void galpani2_state::galpani2_mcu_init_w(uint8_t data)
 	m_subcpu->set_input_line(INPUT_LINE_IRQ7, HOLD_LINE); //MCU Initialised
 }
 
-// Generate a girl-area bitmap from BG15 plane 3's decoded photo.
-// The MCU firmware is undumped and its original mask source is unknown.
-// This HLE approximation treats nonblack photo pixels as "girl".
-// The bitmap is 256x224 bits (7,168 bytes), MSB first, 8 longwords
-// per row. The consumer at main ROM 13578 expands each bit into
-// BG8 plane 0 as 0x80A0 (girl) or 0x00A0 (non-girl), then the
-// edge removal at 13600 trims the borders and adjusts the count.
-// Returns the popcount before edge removal.
+// Generate a girl-area bitmap by scanning the compressed image stream
+// from the background ROMs. The MCU walks the RLE data and checks the
+// skip bit in each control byte: skip runs are background (not girl),
+// non-skip runs are girl pixels. This produces a 256x224-bit coverage
+// bitmap (7,168 bytes) that the main CPU expands into BG8 pen values.
 static constexpr int      FIELD_COLS         = 256;
 static constexpr int      FIELD_ROWS         = 224;
 
-uint16_t galpani2_state::generate_girl_bitmap(address_space &mspace)
+uint16_t galpani2_state::generate_girl_bitmap(uint32_t image_offset)
 {
-	// BG15 plane 3 framebuffer and registers
-	uint16_t const *const ram  = &m_bg15[3 * 0x20000];
-	uint16_t const *const regs = &m_bg15[0x80000 + 3 * 0x20000];
+	memory_region &rom = *memregion("subdata");
+	if (!image_offset || image_offset + 6 > rom.bytes())
+		return 0;
 
-	// If plane 3 is not enabled, return a minimal count to avoid
-	// division by zero in the game's percentage computation.
-	if (!(regs[0xc02 / 2] & 1))
+	// ROM_REGION16_BE stores host-order words. Read logical big-endian bytes.
+	auto byte = [&rom](uint32_t offset) -> uint8_t {
+		return rom.as_u16(offset / 2) >> ((offset & 1) ? 0 : 8);
+	};
+	auto word = [&byte](uint32_t offset) -> uint16_t {
+		return (uint16_t(byte(offset)) << 8) | byte(offset + 1);
+	};
+
+	uint16_t const kind = word(image_offset);
+	uint32_t position = image_offset + 2;
+	uint32_t total_pixels = 256 * 256;
+
+	if (kind == 0x20)
 	{
-		for (int i = 0; i < FIELD_ROWS * FIELD_COLS / 8; i++)
-			mspace.write_byte(GIRL_BITMAP_ADDR + i, 0x00);
-		return 1;
+		uint16_t const h = word(position);
+		uint16_t const w = word(position + 2);
+		position += 4;
+		total_pixels = (h + 1) * (w + 1);
 	}
+	else if (kind != 0x30 && kind != 0x50)
+		return 0;
 
-	// Compute the offset between BG8 plane 0 and BG15 plane 3.
-	// BG8 plane 0 uses scrollx+0x43; BG15 plane 3 uses scrollx+0x42.
-	int const bg8_sx  = *m_bg8_scrollx[0] + 0x43;
-	int const bg8_sy  = int(*m_bg8_scrolly[0]) + 0x200 - 0x0f5;
-	int const bg15_sx = regs[0x400 / 2] + 0x42;
-	int const bg15_sy = regs[0xc00 / 2] + 0x0b;
-	int const dx = bg15_sx - bg8_sx;
-	int const dy = bg15_sy - bg8_sy;
-
-	uint16_t popcount = 0;
-	int byte_idx = 0;
-
-	for (int row = 0; row < FIELD_ROWS; row++)
+	std::array<uint8_t, FIELD_COLS * FIELD_ROWS / 8> bitmap{};
+	uint32_t pixel = 0;
+	uint16_t total = 0;
+	while (pixel < total_pixels)
 	{
-		for (int longword = 0; longword < 8; longword++)
+		if (position >= rom.bytes())
+			break;
+		uint8_t const control = byte(position++);
+		uint32_t count;
+		if (kind == 0x50)
 		{
-			uint32_t bits = 0;
-			for (int bit = 31; bit >= 0; bit--)
+			count = control & 0x3f;
+			if (control & 0x40)
 			{
-				int const bx = longword * 32 + (31 - bit);
-				int const by = row;
-				// Map field position to BG15 coordinates
-				int const bg15_col = (m_field_origin_x + bx + dx) & 0x1ff;
-				int const bg15_row = (8 + by + dy) & 0xff;
-				uint16_t const pen = ram[bg15_row * 0x200 + bg15_col];
+				if (position >= rom.bytes())
+					break;
+				count = (count << 8) | byte(position++);
+			}
+		}
+		else
+			count = control & 0x7f;
+		count = std::min(count + 1, total_pixels - pixel);
 
-				// A girl pixel has bit 15 set and a meaningful color.
-				// GRB555 0x0001 is near-black decoder padding; exclude it.
-				// Matching the inactive half does not imply stale data:
-				// complete native decodes can write the same color in both.
-				bool const girl = BIT(pen, 15) && (pen & 0x7fff) > 1;
-				if (girl)
+		bool const skip = (kind != 0x20) ? BIT(control, 7) : false;
+		bool const repeat = (kind == 0x20) && BIT(control, 7);
+		uint32_t const data_bytes = skip ? 0 : (repeat ? 2 : count * 2);
+		if (position + data_bytes > rom.bytes())
+			break;
+
+		if (!skip)
+		{
+			// Non-skip pixels are girl content. Mark them in the bitmap.
+			// The field covers rows 16..239 of the 256-row image.
+			for (uint32_t i = 0; i < count; ++i)
+			{
+				uint32_t const p = pixel + i;
+				if (p >= 16 * 256 && p < 240 * 256)
 				{
-					bits |= (1u << bit);
-					popcount++;
+					uint32_t const bit = p - 16 * 256;
+					if (bit < FIELD_COLS * FIELD_ROWS)
+					{
+						bitmap[bit / 8] |= 0x80 >> (bit & 7);
+						++total;
+					}
 				}
 			}
-			// Write as big-endian longword (MSB first per the consumer)
-			mspace.write_byte(GIRL_BITMAP_ADDR + byte_idx + 0, (bits >> 24) & 0xff);
-			mspace.write_byte(GIRL_BITMAP_ADDR + byte_idx + 1, (bits >> 16) & 0xff);
-			mspace.write_byte(GIRL_BITMAP_ADDR + byte_idx + 2, (bits >> 8) & 0xff);
-			mspace.write_byte(GIRL_BITMAP_ADDR + byte_idx + 3, bits & 0xff);
-			byte_idx += 4;
 		}
+		position += data_bytes;
+		pixel += count;
 	}
 
-	// Ensure a nonzero count to avoid division by zero.
-	if (!popcount)
-		popcount = 1;
+	if (!total)
+		return 0;
 
-	logerror("MCU girl bitmap: %d girl pixels out of %d field cells\n",
-		popcount, FIELD_COLS * FIELD_ROWS);
-	return popcount;
-}
+	address_space &mspace = m_maincpu->space(AS_PROGRAM);
+	for (unsigned i = 0; i < bitmap.size(); ++i)
+		mspace.write_byte(GIRL_BITMAP_ADDR + i, bitmap[i]);
 
-void galpani2_state::update_girl_bitmap()
-{
-	if (!m_girl_bitmap_pending_addr || !m_girl_bitmap_pending_param)
-		return;
-
-	address_space &sub = m_subcpu->space(AS_PROGRAM);
-	// The native RGB3 script record's +4 becomes FFFF only after
-	// the final decoder has completed. This includes the sparse overlay,
-	// which can add coverage after the primary 256x256 picture is decoded.
-	uint32_t const state = m_girl_bitmap_script_state;
-	if (!state || sub.read_word(state + 4) != 0xffff || BIT(sub.read_byte(state + 0x1e), 3))
-		return;
-
-	// Script completion precedes the interrupt's display-register update.
-	// Wait until the visible field samples the half that was just decoded;
-	// otherwise the old half can supply part or all of this round's mask.
-	uint32_t const destination = sub.read_dword(m_girl_bitmap_pending_param + 4);
-	uint16_t const *const regs = &m_bg15[0x80000 + 3 * 0x20000];
-	if (destination < 0x4c0000 || destination >= 0x500000
-		|| ((regs[0x400 / 2] + 0x42 + m_field_origin_x) & 0x1ff) != ((destination / 2) & 0x1ff))
-		return;
-
-	address_space &main = m_maincpu->space(AS_PROGRAM);
-	uint16_t const total = generate_girl_bitmap(main);
-	main.write_word(m_girl_bitmap_pending_addr + 2, GIRL_BITMAP_OFFSET);
-	main.write_word(m_girl_bitmap_pending_addr, total);
-	logerror("MCU girl bitmap: native RGB3 script complete at %06x, reply %u pixels\n",
-		unsigned(destination), unsigned(total));
-	m_girl_bitmap_pending_addr = 0;
-	m_girl_bitmap_pending_param = 0;
+	logerror("MCU girl bitmap: image at %08x, %u girl pixels\n", image_offset, unsigned(total));
+	return total;
 }
 
 void galpani2_state::galpani2_mcu_nmi1()
@@ -394,33 +362,39 @@ void galpani2_state::galpani2_mcu_nmi1()
 		}
 
 		case 0x10:
-			// Separate command with its own parameter layout at 0x137B8.
-			// Its result contract is not yet understood; acknowledge only.
-			logerror("MCU master %02x:%06x: command 10 acknowledged\n", slot, address);
-			mspace.write_word(address, 0xffff);
-			continue;
-
-		case 0x6b: // Unknown, observed during init
-			logerror("MCU master %02x:%06x: command %02x acknowledged\n", slot, address, command);
+			// image_index=0 (clear/init, no specific girl image).
+			// No decode will follow, so acknowledge immediately.
+			logerror("MCU master %02x:%06x: girl clear (cmd 10)\n", slot, address);
 			mspace.write_word(address, 0xffff);
 			continue;
 
 		default: {
 			// Girl-area bitmap request. The command byte encodes
 			// girl_image_index + 0x10 (from tables at main ROM 0x196A).
-			// The consumer at main ROM 134f0 waits for a nonzero word
-			// at the parameter address, reads it as girl_total, then
-			// reads the next word as a RAM pointer for the packed bitmap.
-			//
-			// Keep the reply pending until the sub CPU's native RGB3
-			// script finishes decoding. The next RGB3 image lookup in
-			// galpani2_mcu_nmi2 binds this request to its script, then
-			// update_girl_bitmap samples the BG15 framebuffer result.
-			logerror("MCU master %02x:%06x: girl bitmap cmd %02x pending\n",
-				slot, address, command);
-			mspace.write_word(address, 0);
-			m_girl_bitmap_pending_addr = address;
-			m_girl_bitmap_pending_param = 0;
+			// Look up the ROM offset and decompress the image stream to
+			// extract coverage (skip = background, non-skip = girl).
+			uint16_t const img = command - 0x10;
+			uint32_t iadr = 0;
+			if (img < m_bg_image_prefix_count)
+				iadr = m_bg_image_prefix_offsets[img];
+			else if (uint32_t(img) - m_bg_image_prefix_count < (m_bg_image_count ? m_bg_image_count : uint32_t(std::size(asia_image_offsets))))
+				iadr = (m_bg_image_offsets ? m_bg_image_offsets : asia_image_offsets)[img - m_bg_image_prefix_count];
+
+			logerror("MCU master %02x:%06x: girl bitmap cmd %02x (image %02x -> offset %08x)\n",
+				slot, address, command, img, iadr);
+
+			uint16_t const total = iadr ? generate_girl_bitmap(iadr) : 0;
+			if (total)
+			{
+				mspace.write_word(address + 2, GIRL_BITMAP_OFFSET);
+				mspace.write_word(address, total);
+			}
+			else
+			{
+				// No valid image — acknowledge immediately so the
+				// main CPU doesn't hang polling for a response.
+				mspace.write_word(address, 0xffff);
+			}
 			continue;  // skip the generic FFFF write below
 		}
 
@@ -460,18 +434,6 @@ void galpani2_state::galpani2_mcu_nmi2()
 			// It then queues the appropriate native decompressor with this raw offset.
 			logerror("MCU slave %02x:%06x: image lookup %04x -> %08x\n", slot, address, img, iadr);
 			sspace.write_dword(address + 2, iadr);
-			if (m_girl_bitmap_pending_addr && !m_girl_bitmap_pending_param
-				&& m_girl_bitmap_script_state && iadr && address >= 0x100090 && address < 0x13ff00)
-			{
-				// The native interpreter saves D0-D7/A0-A3/A5 at its work
-				// area's +100 while awaiting lookup. RGB3's parameter block
-				// is at +90. Verify saved D5/A5 so an unrelated RGB lookup
-				// cannot bind this mask request, even if its image ID matches.
-				uint32_t const work = address - 0x90;
-				if (sspace.read_dword(work + 0x114) == 0x90
-					&& sspace.read_dword(work + 0x130) == m_girl_bitmap_script_state)
-					m_girl_bitmap_pending_param = address + 2;
-			}
 			break;
 		}
 
@@ -783,7 +745,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt2)
 
 	if(scanline == 240)
 	{
-		update_girl_bitmap();
+		// Girl bitmap is now generated immediately in the NMI1 handler.
 		m_subcpu->set_input_line(5, HOLD_LINE);
 	}
 
