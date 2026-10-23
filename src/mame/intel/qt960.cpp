@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:Rob Krum
 /***************************************************************************
 
     Intel QT960 - i960KB Evaluation Board
