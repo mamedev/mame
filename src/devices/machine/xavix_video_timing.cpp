@@ -348,7 +348,7 @@ xavix_video_device::picture_event_delays xavix_video_device::predict_picture_del
 	while (true)
 	{
 		u32 const interval = (events & PREDICT_ARENA) ? arena_interval(config, counters, arena) : counter_interval(config, counters);
-		auto const compare = [this, &events, &counters, interval, now, &elapsed](unsigned event, unsigned x, unsigned y, attotime &delay)
+		auto const compare = [this, &events, &counters, interval, now, &elapsed] (unsigned event, unsigned x, unsigned y, attotime &delay)
 		{
 			if (events & event)
 			{
@@ -434,7 +434,7 @@ TIMER_CALLBACK_MEMBER(superxavix_video_device::picture_nmi)
 	sync_video_counters();
 	// Finish this native field before software replaces its picture data.
 	// TODO: Align partial updates with the picture counters rather than the approximate raster origin.
-	screen().update_partial(screen().visible_area().max_y);
+	screen().update_partial(screen().visible_area().bottom());
 	// Retain the full-raster tail of a rendered field, including after its
 	// cropped picture was published. Skipped fields advance at blanking.
 	if (m_bitmap_rendered)

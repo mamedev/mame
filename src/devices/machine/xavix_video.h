@@ -192,22 +192,15 @@ protected:
 	virtual void device_post_load() override ATTR_COLD;
 
 	template <palette_plane Plane> u8 graphics_palram_r(offs_t offset);
-	template <palette_plane Plane> void graphics_palram_w(offs_t offset, u8 data);
 	virtual u16 palette_data(int pen) const;
 	virtual void set_palette_data(int pen, u16 data);
-	u8 spriteram_r(offs_t offset);
-	void spriteram_cpu_w(offs_t offset, u8 data);
-	void spriteram_w(offs_t offset, u8 data);
 	static u16 replace_pen_lightness(u16 palette_data, u16 lightness);
 	static u16 replace_pen_saturation(u16 palette_data, u16 saturation);
 	static u16 replace_pen_hue(u16 palette_data, u16 hue);
 	static u8 pen_lightness(u16 palette_data);
 	static u8 pen_saturation(u16 palette_data);
 	static u8 pen_hue(u16 palette_data);
-	static rgb_t pen_color(u16 palette_data);
 	void update_pen(int pen, u16 data);
-	rectangle arena_effect_area() const;
-	u16 apply_color_effect(u16 data, u8 noise) const;
 	static int aligned_output_position(int clocks, int alignment_clocks, int sample_clocks);
 	virtual std::pair<int, int> counter_offset() const;
 	virtual std::pair<int, int> picture_offset() const;
@@ -219,32 +212,9 @@ protected:
 	virtual u32 extended_graphics_segment_base(unsigned segment) const;
 	void decode_graphics(memory_region *extra_region = nullptr) ATTR_COLD;
 	virtual void mix_bitmap_layer(screen_device &screen, const rectangle &cliprect) { }
-	void sprite_dma_ctrl_w(u8 data);
-	TIMER_CALLBACK_MEMBER(sprite_dma_tick);
 	virtual u8 video_status_r();
-	template <unsigned Layer> void tilemap_regs_w(offs_t offset, u8 data, u8 mem_mask);
-	void sprite_address_mode_w(u8 data);
-	u8 text_array_r(offs_t offset);
-	void text_array_w(offs_t offset, u8 data);
-	u32 advance_video_noise_state(u32 state, u64 clocks) const;
-	void sync_video_noise();
-	void video_noise_feedback_w(offs_t offset, u8 data);
-	void color_effect_w(offs_t offset, u8 data);
-	u8 video_noise_state_r(offs_t offset);
-	u8 video_ctrl_r();
-	void video_ctrl_w(u8 data);
 	void update_video_irq_source();
-	TIMER_CALLBACK_MEMBER(raster_irq_gen);
 	virtual void schedule_raster_irq();
-	void raster_irq_x_w(u8 data);
-	void raster_irq_y_w(u8 data);
-	u8 arena_start_r();
-	void arena_start_w(u8 data);
-	u8 arena_end_r();
-	void arena_end_w(u8 data);
-	u8 arena_ctrl_r();
-	void arena_ctrl_w(u8 data);
-	TIMER_CALLBACK_MEMBER(arena_irq_gen);
 	void schedule_arena_irq();
 	void sync_video_counters();
 	virtual counter_config counter_parameters() const;
@@ -253,13 +223,8 @@ protected:
 	void reset_raster_origin(int row);
 	virtual rectangle picture_area() const;
 	virtual void raster_end() { }
-	static u32 counter_interval(counter_config const &config, video_counters const &counters);
-	static void advance_counters(counter_config const &config, video_counters &counters, u64 ticks);
-	u32 arena_interval(counter_config const &config, video_counters const &counters, arena_state const &arena) const;
-	bool advance_arena(counter_config const &config, video_counters &counters, arena_state &arena, u64 ticks) const;
 	picture_event_delays predict_picture_delays(unsigned events) const;
 	virtual void schedule_picture_irqs();
-	TIMER_CALLBACK_MEMBER(counter_field_start);
 
 	device_delegate<u8 (u32)> m_video_read_cb;
 	devcb_write_line m_irq_cb;
@@ -306,6 +271,43 @@ protected:
 	int m_video_hres_scale;
 
 private:
+	template <palette_plane Plane> void graphics_palram_w(offs_t offset, u8 data);
+	u8 spriteram_r(offs_t offset);
+	void spriteram_cpu_w(offs_t offset, u8 data);
+	void spriteram_w(offs_t offset, u8 data);
+	static rgb_t pen_color(u16 palette_data);
+	rectangle arena_effect_area() const;
+	u16 apply_color_effect(u16 data, u8 noise) const;
+	void sprite_dma_ctrl_w(u8 data);
+	TIMER_CALLBACK_MEMBER(sprite_dma_tick);
+	template <unsigned Layer> void tilemap_regs_w(offs_t offset, u8 data, u8 mem_mask);
+	void sprite_address_mode_w(u8 data);
+	u8 text_array_r(offs_t offset);
+	void text_array_w(offs_t offset, u8 data);
+	u32 advance_video_noise_state(u32 state, u64 clocks) const;
+	void sync_video_noise();
+	void video_noise_feedback_w(offs_t offset, u8 data);
+	void color_effect_w(offs_t offset, u8 data);
+	u8 video_noise_state_r(offs_t offset);
+	u8 video_ctrl_r();
+	void video_ctrl_w(u8 data);
+	TIMER_CALLBACK_MEMBER(raster_irq_gen);
+	void raster_irq_x_w(u8 data);
+	void raster_irq_y_w(u8 data);
+	u8 arena_start_r();
+	void arena_start_w(u8 data);
+	u8 arena_end_r();
+	void arena_end_w(u8 data);
+	u8 arena_ctrl_r();
+	void arena_ctrl_w(u8 data);
+	TIMER_CALLBACK_MEMBER(arena_irq_gen);
+	static u32 counter_interval(counter_config const &config, video_counters const &counters);
+	static void advance_counters(counter_config const &config, video_counters &counters, u64 ticks);
+	u32 arena_interval(counter_config const &config, video_counters const &counters, arena_state const &arena) const;
+	bool advance_arena(counter_config const &config, video_counters &counters, arena_state &arena, u64 ticks) const;
+	TIMER_CALLBACK_MEMBER(counter_field_start);
+	u32 video_noise_state() const;
+
 	rectangle m_raster_visible;
 	TIMER_CALLBACK_MEMBER(raster_vblank);
 	emu_timer *m_vblank_start_timer;

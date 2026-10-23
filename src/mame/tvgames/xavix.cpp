@@ -3091,18 +3091,19 @@ u32 xavix_hikara_state::screen_update_lcd(screen_device &screen, bitmap_rgb32 &b
 	else
 	{
 		// Both displays share the decoded picture, including any partial updates.
-		m_screen->update_partial(cliprect.max_y, cliprect.max_x + 1);
+		m_screen->update_partial(cliprect.bottom(), cliprect.right() + 1);
 		copybitmap(bitmap, m_lcd_source_bitmap, 0, 0, 0, 0, cliprect);
 		if (m_lcd.brightness)
 		{
 			// Approximate the documented brightness offset in RGB; panel response is unknown.
-			auto const adjust = [this](u8 value) { return std::clamp(value + m_lcd.brightness, 0, 255); };
-			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+			auto const adjust = [this] (u8 value) { return std::clamp(value + m_lcd.brightness, 0, 255); };
+			for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			{
-				for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				u32 *const pixels = &bitmap.pix(y);
+				for (int x = cliprect.left(); x <= cliprect.right(); x++)
 				{
-					rgb_t const color = bitmap.pix(y, x);
-					bitmap.pix(y, x) = rgb_t(adjust(color.r()), adjust(color.g()), adjust(color.b()));
+					rgb_t const color = pixels[x];
+					pixels[x] = rgb_t(adjust(color.r()), adjust(color.g()), adjust(color.b()));
 				}
 			}
 		}

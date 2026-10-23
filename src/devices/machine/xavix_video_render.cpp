@@ -51,7 +51,7 @@ u8 xavix_video_device::packed_reader::read(unsigned bits)
 		m_data |= u32(m_read(m_address++ & 0x07ffffff)) << m_bits;
 		m_bits += 8;
 	}
-	u8 const data = m_data & ((1U << bits) - 1);
+	u8 const data = BIT(m_data, 0, bits);
 	m_data >>= bits;
 	m_bits -= bits;
 	return data;
@@ -138,15 +138,10 @@ rgb_t xavix_video_device::pen_color(u16 palette_data)
 
 rectangle xavix_video_device::arena_effect_area() const
 {
-	/* All generations gate post-composition colour effects, not individual layers.
-	   Black replacement supplies rad_mtrk/rad_snow borders, taitons2 Slap Fight
-	   transitions and taitons1 Gladiator portrait masks. Hardware footage shows
-	   asymmetric rad_mtrk borders and partly cut taitons1 Gladiator portraits.
-	   With settled blanking, the comparisons delimit the inverted gate within
-	   picture Y16-239. A missed trailing comparison retains the interval to blanking.
-	   Equal endpoints have zero width here; their fractional output pulse is not
-	   modelled in RGB.
-	   TODO: Retain intra-line gate history for live writes and active-display counter reloads. */
+	// The colour-effects gate applies after composition within picture Y16-239.
+	// A missed trailing comparison extends it to blanking. Equal endpoints have
+	// no full RGB pixel between them.
+	// TODO: Retain intra-line gate history for live writes and active-display counter reloads.
 
 	bool const side = bool(m_arena_ctrl & ARENA_SIDE);
 	int const first = side ? m_arena_end : m_arena_start;
@@ -182,7 +177,7 @@ u16 xavix_video_device::apply_color_effect(u16 data, u8 noise) const
 	if (control & COLOR_EFFECT_LIGHTNESS)
 		lightness = ((m_color_effect[1] & 0x1f) << 1) | BIT(m_color_effect[1], 7);
 	if (control & COLOR_EFFECT_DIM)
-		lightness = (lightness >> 1) & 0x0f;
+		lightness = BIT(lightness, 1, 4);
 	if (control & COLOR_EFFECT_INVERT)
 		lightness = (~lightness - 16) & 0x3f;
 	lightness ^= noise & (control >> 5);
@@ -202,23 +197,23 @@ void xavix_video_device::draw_output(screen_device &screen, bitmap_rgb32 &bitmap
 	rectangle const area = arena_effect_area() & cliprect;
 	if (!m_color_effect[2] || (!side && area.empty()))
 	{
-		for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
-			draw_scanline16(bitmap, cliprect.min_x, y, cliprect.width(), &m_pen_bitmap.pix(y, cliprect.min_x), palette);
+		for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
+			draw_scanline16(bitmap, cliprect.left(), y, cliprect.width(), &m_pen_bitmap.pix(y, cliprect.left()), palette);
 		return;
 	}
 
 	// Each row has at most three palette spans; outside the rectangle the gate is preset.
 	std::array<int, 4> const edges{
-		cliprect.min_x,
-		area.empty() ? cliprect.min_x : area.min_x,
-		area.empty() ? cliprect.min_x : area.max_x + 1,
-		cliprect.max_x + 1
+		cliprect.left(),
+		area.empty() ? cliprect.left() : area.left(),
+		area.empty() ? cliprect.left() : area.right() + 1,
+		cliprect.right() + 1
 	};
 	pen_t const *const outside = side ? m_color_effect_palette.get() : palette;
 	pen_t const *const inside = side ? palette : m_color_effect_palette.get();
-	auto const span_palette = [&area, inside, outside](unsigned span, int y)
+	auto const span_palette = [&area, inside, outside] (unsigned span, int y)
 	{
-		return ((span == 1) && (y >= area.min_y) && (y <= area.max_y)) ? inside : outside;
+		return ((span == 1) && (y >= area.top()) && (y <= area.bottom())) ? inside : outside;
 	};
 
 	unsigned const entries = this->palette().entries();
@@ -233,25 +228,24 @@ void xavix_video_device::draw_output(screen_device &screen, bitmap_rgb32 &bitmap
 		m_color_effect_palette_valid = true;
 	}
 
-	sync_video_noise();
 	if (!(m_color_effect[2] >> 5))
 	{
 		for (unsigned span = 0; span < edges.size() - 1; ++span)
 		{
 			if (edges[span] == edges[span + 1])
 				continue;
-			for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
+			for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
 				draw_scanline16(bitmap, edges[span], y, edges[span + 1] - edges[span], &m_pen_bitmap.pix(y, edges[span]), span_palette(span, y));
 		}
 		return;
 	}
 
-	u32 state = m_video_noise_state;
+	u32 state = video_noise_state();
 	// Retain fractional master clocks scaled by ATTOSECONDS_PER_SECOND.
 	u64 clock_phase = 0;
 	u64 const scaled_clocks_per_pixel = u64(screen.pixel_period().as_attoseconds()) * clock();
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
 		u32 *const pixels = &bitmap.pix(y);
 		u16 const *const pens = &m_pen_bitmap.pix(y);
@@ -325,9 +319,9 @@ u32 xavix_video_device::graphics_address(graphics_source source, u8 mode, u32 en
 		unsigned const shift = (mode == 0x02) ? 16 : 12;
 		if (mode == 0x02)
 			entry *= 8;
-		unsigned const segment = (entry >> shift) & 0x0f;
+		unsigned const segment = BIT(entry, shift, 4);
 		// Segmented sprites use the classic table; tilemaps also allow the extended fallback.
-		return (entry & ((1U << shift) - 1)) + (sprite ? classic_segment_base(segment) : graphics_segment_base(segment));
+		return BIT(entry, 0, shift) + (sprite ? classic_segment_base(segment) : graphics_segment_base(segment));
 	}
 
 	case 0x04: // 24-bit byte address
@@ -398,7 +392,7 @@ void xavix_video_device::draw_tilemap(const rectangle &cliprect, int layer)
 			layer, regs[TILEMAP_PLANE_LOW], regs[TILEMAP_PLANE_MIDDLE], regs[TILEMAP_PLANE_HIGH], format,
 			regs[TILEMAP_SCROLL_X], regs[TILEMAP_SCROLL_Y], regs[TILEMAP_PALETTE_PRIORITY], regs[TILEMAP_CTRL]);
 
-	for (int line = cliprect.min_y; line <= cliprect.max_y; ++line)
+	for (int line = cliprect.top(); line <= cliprect.bottom(); ++line)
 	{
 		int const source_line = (line + yoffset) & 0x01ff;
 		int const source_y = (source_line + scroll_y) & (TILEMAP_WRAP_HEIGHT - 1);
@@ -414,7 +408,7 @@ void xavix_video_device::draw_tilemap(const rectangle &cliprect, int layer)
 		for (int tile_column = 0; tile_column < map_columns; tile_column++)
 		{
 			int const tile_index = (tile_row * map_columns) + tile_column;
-			auto const read_plane = [this, tile_index](u8 page)
+			auto const read_plane = [this, tile_index] (u8 page)
 			{
 				offs_t const address = ((u16(page) << 8) + tile_index) & 0x7fff;
 				return m_video_read_cb(address);
@@ -465,7 +459,7 @@ void xavix_video_device::draw_tilemap(const rectangle &cliprect, int layer)
 				else
 				{
 					// rad_mtrk uses 16-bit segmented inline packets.
-					unsigned const segment = (tile >> 12) & 0x0f;
+					unsigned const segment = BIT(tile, 12, 4);
 					data.address = (tile & 0x0fff)
 							+ (u32(get_u16le(&m_segment_regs[segment * 2])) << 8);
 				}
@@ -619,7 +613,7 @@ std::pair<int, int> superxavix_video_device::render_offset() const
 	// Picture Y reloads at the end of the preceding raster row.
 	int const row = defaults.vertical_reference - util::sext(defaults.top, 9) + 1
 			- int(pal && BIT(m_video_timing.half_lines, 0));
-	return { m_video_timing.visible_area().min_x, row - m_video_timing.vertical_origin };
+	return { m_video_timing.visible_area().left(), row - m_video_timing.vertical_origin };
 }
 
 //-------------------------------------------------
@@ -678,7 +672,7 @@ void xavix_video_device::draw_sprites(const rectangle &cliprect)
 	}
 
 	// Keep pixel fetches in scanline order: graphics can come from mapped memory.
-	for (int line = cliprect.min_y; line <= cliprect.max_y; ++line)
+	for (int line = cliprect.top(); line <= cliprect.bottom(); ++line)
 	{
 		int const source_line = (line + yoffset) & 0x01ff;
 		// Sprite evaluation is limited to picture rows 16-239, independently of
@@ -710,17 +704,17 @@ void xavix_video_device::draw_sprites(const rectangle &cliprect)
 
 void xavix_video_device::draw_tile_line(const rectangle &cliprect, const tile_data &tile, int xpos, int ypos, int line, int xoffset)
 {
-	if ((ypos > cliprect.max_y) || (ypos < cliprect.min_y))
+	if ((ypos > cliprect.bottom()) || (ypos < cliprect.top()))
 		return;
 
 	int const first_x = xpos * m_video_hres_scale + tile.layout.pixel_phase - xoffset;
 	int const last_x = first_x + (tile.width - 1) * m_video_hres_scale + tile.layout.pixel_width - 1;
-	if ((first_x > cliprect.max_x) || (last_x < cliprect.min_x))
+	if ((first_x > cliprect.right()) || (last_x < cliprect.left()))
 		return;
 
 	// Palette selectors name 16-colour blocks; wider formats ignore unaligned low bits.
 	// ttv_lotr selects 0x0f for 5-bpp data and expects the aligned 0x0e block.
-	int const palette_base = (tile.palette << 4) & ~((1 << tile.bpp) - 1);
+	int const palette_base = (tile.palette << 4) & ~make_bitmask<int>(tile.bpp);
 	int const bits_per_tileline = tile.width * tile.bpp;
 	int const source_line = tile.layout.flip_y ? (tile.height - 1) - line : line;
 	int const bit_offset = source_line * bits_per_tileline;
@@ -742,8 +736,8 @@ void xavix_video_device::draw_tile_line(const rectangle &cliprect, const tile_da
 		if (m_transparent_pens[pen >> 4] == pen)
 			continue;
 
-		int const first = std::max(output_x, cliprect.min_x);
-		int const end = std::min(output_x + tile.layout.pixel_width, cliprect.max_x + 1);
+		int const first = std::max(output_x, cliprect.left());
+		int const end = std::min(output_x + tile.layout.pixel_width, cliprect.right() + 1);
 		for (int destination = first; destination < end; ++destination)
 		{
 			if (tile.priority >= priority_line[destination])
@@ -767,7 +761,7 @@ u32 xavix_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	// Picture-domain clipping precedes placement: shifting the origin must not
 	// reveal sprite pixels that lie outside the picture's horizontal range.
 	int const xoffset = picture_offset().first;
-	rectangle const picture_clip = cliprect & rectangle(-xoffset, TILEMAP_WRAP_WIDTH * m_video_hres_scale - 1 - xoffset, cliprect.min_y, cliprect.max_y);
+	rectangle const picture_clip = cliprect & rectangle(-xoffset, TILEMAP_WRAP_WIDTH * m_video_hres_scale - 1 - xoffset, cliprect.top(), cliprect.bottom());
 	if (!picture_clip.empty())
 	{
 		draw_tilemap(picture_clip, 0);
@@ -802,7 +796,7 @@ rectangle superxavix_video_device::picture_area() const
 u32 superxavix_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bitmap_rendered = true;
-	update_bitmap_rows(cliprect.max_y);
+	update_bitmap_rows(cliprect.bottom());
 	bitmap.fill(rgb_t::black(), cliprect);
 	auto const [xoffset, yoffset] = render_offset();
 	rectangle source_clip = cliprect & picture_area();
@@ -877,7 +871,7 @@ void superxavix_video_device::update_bitmap_rows(int scanline)
 
 void superxavix_video_device::mix_bitmap_layer(screen_device &screen, const rectangle &cliprect)
 {
-	auto const parameter = [this](unsigned offset) { return get_u16le(&m_bitmap_params[offset]); };
+	auto const parameter = [this] (unsigned offset) { return get_u16le(&m_bitmap_params[offset]); };
 
 	u8 const mode = m_bitmap_params[BITMAP_CTRL];
 	if (!BIT(mode, 0))
@@ -919,7 +913,7 @@ void superxavix_video_device::mix_bitmap_layer(screen_device &screen, const rect
 		return;
 
 	int const yoffset = render_offset().second;
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		bitmap_row const &row = m_bitmap_rows[y + yoffset];
 		if (!row.enabled)
@@ -938,8 +932,8 @@ void superxavix_video_device::mix_bitmap_layer(screen_device &screen, const rect
 			if ((m_bitmap_palram_sh[pen] & 0x1f) >= TRANSPARENT_HUE_MIN)
 				continue;
 
-			int const first_x = std::max(output_position(source_clock) + origin_delta, cliprect.min_x);
-			int const end_x = std::min(output_position(source_clock + pixel_clocks) + origin_delta, cliprect.max_x + 1);
+			int const first_x = std::max(output_position(source_clock) + origin_delta, cliprect.left());
+			int const end_x = std::min(output_position(source_clock + pixel_clocks) + origin_delta, cliprect.right() + 1);
 			for (int x = first_x; x < end_x; ++x)
 			{
 				// Picture wins equal depths, unless its final colour is transparent.
@@ -1009,6 +1003,14 @@ u32 xavix_video_device::advance_video_noise_state(u32 state, u64 clocks) const
 	return state;
 }
 
+u32 xavix_video_device::video_noise_state() const
+{
+	u64 const ticks = machine().time().as_ticks(clock());
+	return ticks > m_video_noise_ticks
+		? advance_video_noise_state(m_video_noise_state, ticks - m_video_noise_ticks)
+		: m_video_noise_state;
+}
+
 void xavix_video_device::sync_video_noise()
 {
 	u64 const ticks = machine().time().as_ticks(clock());
@@ -1042,18 +1044,8 @@ void xavix_video_device::color_effect_w(offs_t offset, u8 data)
 
 u8 xavix_video_device::video_noise_state_r(offs_t offset)
 {
-	u32 state = m_video_noise_state;
-	if (machine().side_effects_disabled())
-	{
-		u64 const ticks = machine().time().as_ticks(clock());
-		if (ticks > m_video_noise_ticks)
-			state = advance_video_noise_state(state, ticks - m_video_noise_ticks);
-	}
-	else
-	{
+	if (!machine().side_effects_disabled())
 		sync_video_noise();
-		state = m_video_noise_state;
-	}
 
-	return BIT(state, offset * 8, 8);
+	return BIT(video_noise_state(), offset * 8, 8);
 }

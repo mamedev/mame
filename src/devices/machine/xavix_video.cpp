@@ -492,7 +492,7 @@ void xavix_video_device::spriteram_cpu_w(offs_t offset, u8 data)
 
 void xavix_video_device::spriteram_w(offs_t offset, u8 data)
 {
-	auto const set_sprite_x_high = [this, offset](bool high)
+	auto const set_sprite_x_high = [this, offset] (bool high)
 	{
 		offs_t const index = offset & (SPRITE_COUNT - 1);
 		m_spriteram[SPRITE_ATTR0 + index] = (m_spriteram[SPRITE_ATTR0 + index] & 0xfe) | high;
