@@ -315,16 +315,18 @@ void deco_ld_state::video_control_w(uint8_t data)
 void deco_ld_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
+	// the address decoders (LP1-1 at 14K on VDO-1, LP2-2 at 9H on VDO-2) select 0x1000-0x17ff for I/O, and the
+	// LS138s and LS139 under them only look at A0-A2 (the games' delay loops read all over the range)
 	// writes to 0x1000 latch bits 0 and 1 into the LS273 at 3H on VDO-2, which drives the coin blockers; begas and
 	// cobra set them once booted and clear them at 9 credits, while rblaster's one store there (0xe484) only clears
 	// them at 9 credits, so no single polarity of the blockers fits all three games and they aren't emulated
-	map(0x1000, 0x1000).portr("IN0").nopw();
-	map(0x1001, 0x1001).portr("DSW1").w(FUNC(deco_ld_state::nmi_ack_w));
-	map(0x1002, 0x1002).portr("DSW2");
-	map(0x1003, 0x1003).portr("IN1").w(FUNC(deco_ld_state::video_control_w));
-	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x1005, 0x1005).r(FUNC(deco_ld_state::sound_status_r));
-	map(0x1006, 0x1007).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x1000, 0x1000).mirror(0x7f8).portr("IN0").nopw();
+	map(0x1001, 0x1001).mirror(0x7f8).portr("DSW1").w(FUNC(deco_ld_state::nmi_ack_w));
+	map(0x1002, 0x1002).mirror(0x7f8).portr("DSW2");
+	map(0x1003, 0x1003).mirror(0x7f8).portr("IN1").w(FUNC(deco_ld_state::video_control_w));
+	map(0x1004, 0x1004).mirror(0x7f8).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x1005, 0x1005).mirror(0x7f8).r(FUNC(deco_ld_state::sound_status_r));
+	map(0x1006, 0x1007).mirror(0x7f8).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x1800, 0x183f).mirror(0x7c0).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // 93419 64x9 RAM at 5J on VDO-1
 	map(0x2000, 0x23ff).rw(FUNC(deco_ld_state::vram_column_r<0>), FUNC(deco_ld_state::vram_column_w<0>));
 	map(0x2400, 0x27ff).rw(FUNC(deco_ld_state::attr_column_r<0>), FUNC(deco_ld_state::attr_column_w<0>));
