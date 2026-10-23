@@ -21,13 +21,13 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(XAVIX_ROM_PLAIN,                xavix_rom_plain_device,                "xavix_rom_plain",          "XaviX ROM Cartridge")
-DEFINE_DEVICE_TYPE(XAVIX_ROM_I2C_24C04_CONTROL1,   xavix_rom_i2c_24c04_control1_device,   "xavix_rom_24c04_control1", "XaviX ROM Cartridge with 24C04-Compatible I2C EEPROM (Control 1)")
-DEFINE_DEVICE_TYPE(XAVIX_ROM_I2C_24C08_CONTROL1,   xavix_rom_i2c_24c08_control1_device,   "xavix_rom_24c08_control1", "XaviX ROM Cartridge with 24C08-Compatible I2C EEPROM")
-DEFINE_DEVICE_TYPE(XAVIX_ROM_I2C_24C04_CONTROL0,   xavix_rom_i2c_24c04_control0_device,   "xavix_rom_24c04_control0", "XaviX ROM Cartridge with 24C04-Compatible I2C EEPROM (Control 0)")
-DEFINE_DEVICE_TYPE(XAVIX_ROM_I2C_24C02_CONTROL0,   xavix_rom_i2c_24c02_control0_device,   "xavix_rom_24c02_control0", "XaviX ROM Cartridge with 24C02-Compatible I2C EEPROM")
-DEFINE_DEVICE_TYPE(XAVIX_ROM_I2C_24C02_DIRECT,     xavix_rom_i2c_24c02_direct_device,     "xavix_rom_24c02_direct",   "XaviX ROM Cartridge with 24C02-Compatible I2C EEPROM (Direct I/O)")
-DEFINE_DEVICE_TYPE(XAVIX_ROM_I2C_24C08_DIRECT,     xavix_rom_i2c_24c08_direct_device,     "xavix_rom_24c08_direct",   "XaviX ROM Cartridge with 24C08-Compatible I2C EEPROM (Direct I/O)")
+DEFINE_DEVICE_TYPE(XAVIX_ROM_PLAIN,              xavix_rom_plain_device,             "xavix_rom_plain",         "XaviX ROM Cartridge")
+DEFINE_DEVICE_TYPE(XAVIX_ROM_24C04_CONTROL1,     xavix_rom_24c04_control1_device,    "xavix_rom_24c04_control1", "XaviX ROM Cartridge with 24C04-Compatible I2C EEPROM (Control 1)")
+DEFINE_DEVICE_TYPE(XAVIX_ROM_24C08_CONTROL1,     xavix_rom_24c08_control1_device,    "xavix_rom_24c08_control1", "XaviX ROM Cartridge with 24C08-Compatible I2C EEPROM")
+DEFINE_DEVICE_TYPE(XAVIX_ROM_24C04_CONTROL0,     xavix_rom_24c04_control0_device,    "xavix_rom_24c04_control0", "XaviX ROM Cartridge with 24C04-Compatible I2C EEPROM (Control 0)")
+DEFINE_DEVICE_TYPE(XAVIX_ROM_24C02_CONTROL0,     xavix_rom_24c02_control0_device,    "xavix_rom_24c02_control0", "XaviX ROM Cartridge with 24C02-Compatible I2C EEPROM")
+DEFINE_DEVICE_TYPE(XAVIX_ROM_24C02_DIRECT,       xavix_rom_24c02_direct_device,      "xavix_rom_24c02_direct",  "XaviX ROM Cartridge with 24C02-Compatible I2C EEPROM (Direct I/O)")
+DEFINE_DEVICE_TYPE(XAVIX_ROM_24C08_DIRECT,       xavix_rom_24c08_direct_device,      "xavix_rom_24c08_direct",  "XaviX ROM Cartridge with 24C08-Compatible I2C EEPROM (Direct I/O)")
 
 
 xavix_rom_plain_device::xavix_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
@@ -48,23 +48,23 @@ xavix_rom_i2c_base_device::xavix_rom_i2c_base_device(const machine_config &mconf
 {
 }
 
-xavix_rom_i2c_24c04_control1_device::xavix_rom_i2c_24c04_control1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	xavix_rom_i2c_base_device(mconfig, XAVIX_ROM_I2C_24C04_CONTROL1, tag, owner, clock, 1, 0x04)
+xavix_rom_24c04_control1_device::xavix_rom_24c04_control1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	xavix_rom_i2c_base_device(mconfig, XAVIX_ROM_24C04_CONTROL1, tag, owner, clock, 1, 0x04)
 {
 }
 
-xavix_rom_i2c_24c08_control1_device::xavix_rom_i2c_24c08_control1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	xavix_rom_i2c_base_device(mconfig, XAVIX_ROM_I2C_24C08_CONTROL1, tag, owner, clock, 1, 0x04)
+xavix_rom_24c08_control1_device::xavix_rom_24c08_control1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	xavix_rom_i2c_base_device(mconfig, XAVIX_ROM_24C08_CONTROL1, tag, owner, clock, 1, 0x04)
 {
 }
 
-xavix_rom_i2c_24c04_control0_device::xavix_rom_i2c_24c04_control0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	xavix_rom_i2c_base_device(mconfig, XAVIX_ROM_I2C_24C04_CONTROL0, tag, owner, clock, 0, 0x04)
+xavix_rom_24c04_control0_device::xavix_rom_24c04_control0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	xavix_rom_i2c_base_device(mconfig, XAVIX_ROM_24C04_CONTROL0, tag, owner, clock, 0, 0x04)
 {
 }
 
-xavix_rom_i2c_24c02_control0_device::xavix_rom_i2c_24c02_control0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	xavix_rom_i2c_base_device(mconfig, XAVIX_ROM_I2C_24C02_CONTROL0, tag, owner, clock)
+xavix_rom_24c02_control0_device::xavix_rom_24c02_control0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	xavix_rom_i2c_base_device(mconfig, XAVIX_ROM_24C02_CONTROL0, tag, owner, clock)
 {
 }
 
@@ -74,42 +74,42 @@ xavix_rom_i2c_direct_device::xavix_rom_i2c_direct_device(const machine_config &m
 {
 }
 
-xavix_rom_i2c_24c02_direct_device::xavix_rom_i2c_24c02_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	xavix_rom_i2c_direct_device(mconfig, XAVIX_ROM_I2C_24C02_DIRECT, tag, owner, clock)
+xavix_rom_24c02_direct_device::xavix_rom_24c02_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	xavix_rom_i2c_direct_device(mconfig, XAVIX_ROM_24C02_DIRECT, tag, owner, clock)
 {
 }
 
-xavix_rom_i2c_24c08_direct_device::xavix_rom_i2c_24c08_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	xavix_rom_i2c_direct_device(mconfig, XAVIX_ROM_I2C_24C08_DIRECT, tag, owner, clock)
+xavix_rom_24c08_direct_device::xavix_rom_24c08_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	xavix_rom_i2c_direct_device(mconfig, XAVIX_ROM_24C08_DIRECT, tag, owner, clock)
 {
 }
 
-void xavix_rom_i2c_24c04_control1_device::device_add_mconfig(machine_config &config)
+void xavix_rom_24c04_control1_device::device_add_mconfig(machine_config &config)
 {
 	I2C_24C04(config, m_i2cmem);
 }
 
-void xavix_rom_i2c_24c08_control1_device::device_add_mconfig(machine_config &config)
+void xavix_rom_24c08_control1_device::device_add_mconfig(machine_config &config)
 {
 	I2C_24C08(config, m_i2cmem);
 }
 
-void xavix_rom_i2c_24c04_control0_device::device_add_mconfig(machine_config &config)
+void xavix_rom_24c04_control0_device::device_add_mconfig(machine_config &config)
 {
 	I2C_24C04(config, m_i2cmem);
 }
 
-void xavix_rom_i2c_24c02_control0_device::device_add_mconfig(machine_config &config)
+void xavix_rom_24c02_control0_device::device_add_mconfig(machine_config &config)
 {
 	I2C_24C02(config, m_i2cmem);
 }
 
-void xavix_rom_i2c_24c02_direct_device::device_add_mconfig(machine_config &config)
+void xavix_rom_24c02_direct_device::device_add_mconfig(machine_config &config)
 {
 	I2C_24C02(config, m_i2cmem);
 }
 
-void xavix_rom_i2c_24c08_direct_device::device_add_mconfig(machine_config &config)
+void xavix_rom_24c08_direct_device::device_add_mconfig(machine_config &config)
 {
 	I2C_24C08(config, m_i2cmem);
 }
@@ -117,21 +117,17 @@ void xavix_rom_i2c_24c08_direct_device::device_add_mconfig(machine_config &confi
 void xavix_cart_slot_device::cart_devices(device_slot_interface &device)
 {
 	device.option_add_internal("plain",                XAVIX_ROM_PLAIN);
-	device.option_add_internal("rom_24c04_control1",   XAVIX_ROM_I2C_24C04_CONTROL1);
-	device.option_add_internal("rom_24c08_control1",   XAVIX_ROM_I2C_24C08_CONTROL1);
-	device.option_add_internal("rom_24c04_control0",   XAVIX_ROM_I2C_24C04_CONTROL0);
-	device.option_add_internal("rom_24c02_control0",   XAVIX_ROM_I2C_24C02_CONTROL0);
-	device.option_add_internal("rom_24c02_direct",     XAVIX_ROM_I2C_24C02_DIRECT);
-	device.option_add_internal("rom_24c08_direct",     XAVIX_ROM_I2C_24C08_DIRECT);
+	device.option_add_internal("rom_24c04_control1",   XAVIX_ROM_24C04_CONTROL1);
+	device.option_add_internal("rom_24c08_control1",   XAVIX_ROM_24C08_CONTROL1);
+	device.option_add_internal("rom_24c04_control0",   XAVIX_ROM_24C04_CONTROL0);
+	device.option_add_internal("rom_24c02_control0",   XAVIX_ROM_24C02_CONTROL0);
+	device.option_add_internal("rom_24c02_direct",     XAVIX_ROM_24C02_DIRECT);
+	device.option_add_internal("rom_24c08_direct",     XAVIX_ROM_24C08_DIRECT);
 }
 
 void xavix_rom_i2c_base_device::device_start()
 {
 	save_item(NAME(m_buscontrol));
-}
-
-void xavix_rom_plain_device::device_start()
-{
 }
 
 void xavix_rom_i2c_base_device::device_reset()
@@ -141,7 +137,7 @@ void xavix_rom_i2c_base_device::device_reset()
 
 uint8_t xavix_rom_plain_device::read_cart(offs_t offset)
 {
-	return m_rom[offset & (m_rom_size - 1)];
+	return m_rom ? m_rom[offset & (m_rom_size - 1)] : 0xff;
 }
 
 void xavix_rom_plain_device::write_cart(offs_t offset, uint8_t data)

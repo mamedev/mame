@@ -89,7 +89,7 @@ protected:
 	suprtvpc_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
-	virtual void device_start() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD { }
 };
 
 class suprtvpc_rom_i2c_device : public suprtvpc_rom_device

@@ -15,6 +15,7 @@
 #include "suprtvpc_cart_ir.h"
 
 #include <algorithm>
+#include <bit>
 
 DEFINE_DEVICE_TYPE(SUPRTVPC_CART_SLOT, suprtvpc_cart_slot_device, "suprtvpc_cart", "Super TV-PC Cartridge Slot")
 DEFINE_DEVICE_TYPE(SUPRTVPC_ROM, suprtvpc_rom_device, "suprtvpc_rom", "Super TV-PC Cartridge")
@@ -124,10 +125,6 @@ void suprtvpc_cart_slot_device::device_start()
 	m_cart = get_card_device();
 }
 
-void suprtvpc_rom_device::device_start()
-{
-}
-
 // These are Super TV-PC slot adapters; EEPROM protocol and storage are shared
 // with other XaviX cartridges through i2cmem_device.
 void suprtvpc_rom_i2c_device::sda_w(int state)
@@ -161,23 +158,23 @@ void device_suprtvpc_cart_interface::rom_alloc(u32 size)
 
 std::pair<std::error_condition, std::string> suprtvpc_cart_slot_device::call_load()
 {
-	u64 const size = loaded_through_softlist() ? get_software_region_length("prg") : length();
+	bool const softlist = loaded_through_softlist();
+	u8 const *const source = softlist ? get_software_region("prg") : nullptr;
+	if (softlist && !source)
+		return std::make_pair(image_error::BADSOFTWARE, "Software list item is missing 'prg' region");
+
+	u64 const size = softlist ? get_software_region_length("prg") : length();
 	if (!size)
 		return std::make_pair(image_error::INVALIDLENGTH, "Cartridges must not be empty");
 	if (size > 0x40'0000)
 		return std::make_pair(image_error::INVALIDLENGTH, "Cartridges must be no larger than 4 MiB (0x400000 bytes)");
-	if (size & (size - 1))
+	if (!std::has_single_bit(size))
 		return std::make_pair(image_error::INVALIDLENGTH, "Cartridge size must be a power of two");
 
 	u32 const size_bytes = u32(size);
 	m_cart->rom_alloc(size_bytes);
-	if (loaded_through_softlist())
-	{
-		u8 const *const source = get_software_region("prg");
-		if (!source)
-			return std::make_pair(image_error::BADSOFTWARE, "Software list item is missing 'prg' region");
+	if (softlist)
 		std::copy_n(source, size_bytes, m_cart->rom_base());
-	}
 	else if (fread(m_cart->rom_base(), size_bytes) != size_bytes)
 	{
 		return std::make_pair(std::errc::io_error, "Error reading cartridge file");

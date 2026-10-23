@@ -33,7 +33,6 @@ void suprtvpc_rom_24c64_ir_device::device_add_mconfig(machine_config &config)
 
 void suprtvpc_rom_24c64_ir_device::device_start()
 {
-	suprtvpc_rom_i2c_device::device_start();
 	m_poll_timer = timer_alloc(FUNC(suprtvpc_rom_24c64_ir_device::poll_stream), this);
 	m_transmit_timer = timer_alloc(FUNC(suprtvpc_rom_24c64_ir_device::transmit_pulse_end), this);
 	m_receive_timer = timer_alloc(FUNC(suprtvpc_rom_24c64_ir_device::receive_pulse), this);

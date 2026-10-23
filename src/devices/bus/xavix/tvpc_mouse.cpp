@@ -47,7 +47,7 @@ public:
 
 	virtual u8 x_r() override { return m_axes[0]->read(); }
 	virtual u8 y_r() override { return m_axes[1]->read(); }
-	virtual int button_r() override { return m_button->read() & 0x01; }
+	virtual int button_r() override { return BIT(m_button->read(), 0); }
 
 protected:
 	tvpc_mouse_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
