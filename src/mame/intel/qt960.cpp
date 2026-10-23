@@ -9,10 +9,11 @@
     - Intel 82380 Integrated System Peripheral (DMA, Timers, Interrupts)
     - Intel 82510 Asynchronous Serial Controller
 
-    Memory Map (from PLD source 2U8A.PDS - address decode on A27-A31):
+    Memory Map (74F138 U27 on A27-A29, sheet 12, and PLD source 2U8A.PDS):
     0x00000000  EPROM       NINDY monitor ROM (A31-27 = 00000)
-    0x08000000  Flash       Flash EPROM (A31-27 = 00001)
-    0x10000000  SRAM        Static RAM (A31-27 = 00010)
+    0x08000000  SRAM        Static RAM (A31-27 = 00001)
+    0x10000000  Flash       Flash EPROM (A31-27 = 00010; jumpers J22-J26 can swap
+                            it with the EPROM, NINDY's FLASH_ADDR is 0x10000000)
     0x18000000  82380       DMA Controller (A31-27 = 00011)
     0x20000000  82510       Serial I/O (A31-27 = 00100)
     0x28000000  CSR         Control/Status (A31-27 = 00101)
@@ -30,13 +31,30 @@
       A4=1,A3=0,A2=1 (0x28000014): RSTFLG0, RSTFLG1 (Reset flags)
       A4=1,A3=1,A2=0 (0x28000018): TESTPT (Test point, read-only)
 
-    After reset: LEDs=0, wait states=3, write stretch=1
+    After reset: user LEDs lit, wait states=3, write stretch=1
+
+    LEDs (sheet 20, csr.sch; D1-D11 left to right along the board's front edge),
+    each lit while its signal is low:
+      D1  red     CPU Failure       FAILURE# from the 80960KB (its self-test at reset)
+      D2  red     Out of Bounds     OOBA# from 2U8A: User Space 1 and A31/A30 set; the
+                                    board has no ready there, so the CPU hangs lit
+      D3  yellow  SRAM activity     RAMSEL#
+      D4  yellow  Flash activity    FSHSEL#
+      D5  yellow  EPROM activity    EPRSEL#
+      D6  green   Serial activity   IOSEL#
+      D7  green   DMA activity      HLDA#
+      D8  green   user LED 3        USR3 } 5C060 outputs, driven low by writing 1
+      D9  green   user LED 2        USR2 } to the CSR bit; RESET clears the outputs,
+      D10 yellow  user LED 1        USR1 } so all four light at reset
+      D11 yellow  user LED 0        USR0 }
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/i960/i960.h"
 #include "machine/terminal.h"
+
+#include "qt960.lh"
 
 
 namespace {
@@ -49,6 +67,10 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_terminal(*this, "terminal")
 		, m_ram(*this, "ram")
+		, m_led_fail(*this, "led_fail")
+		, m_led_ooba(*this, "led_ooba")
+		, m_led_act(*this, "led_act%u", 0U)
+		, m_led_usr(*this, "led_usr%u", 0U)
 	{ }
 
 	void qt960(machine_config &config);
@@ -75,12 +97,27 @@ private:
 	// Terminal callback
 	void kbd_put(u8 data);
 
+	// Out of bounds access (User Space 1, A31/A30 set)
+	uint32_t ooba_r(offs_t offset);
+	void ooba_w(offs_t offset, uint32_t data);
+
+	// Activity LEDs: a region accessed since the last tick lights its LED
+	enum { ACT_SRAM, ACT_FLASH, ACT_EPROM, ACT_SIO, ACT_DMA };
+	TIMER_CALLBACK_MEMBER(led_tick);
+
 	required_device<i960_cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_shared_ptr<uint32_t> m_ram;
+	output_finder<> m_led_fail;
+	output_finder<> m_led_ooba;
+	output_finder<5> m_led_act;
+	output_finder<4> m_led_usr;
+	emu_timer *m_led_timer;
+	uint8_t m_act;          // ACT_* bits seen since the last tick
+	bool m_ooba;            // latched: on the board the CPU stays hung in the access
 
 	// CSR state (directly from PLD: only 2 bits each)
-	uint8_t m_usr[4];       // User LEDs (active high)
+	uint8_t m_usr[4];       // User LEDs (1 = lit: the PLD drives USRn low)
 	uint8_t m_sbwait;       // Burst wait states (2 bits)
 	uint8_t m_s1wait;       // First cycle wait states (2 bits)
 	uint8_t m_wrstr;        // Write stretch (1 bit)
@@ -99,11 +136,29 @@ void qt960_state::machine_start()
 {
 	m_dma_regs = std::make_unique<uint8_t[]>(0x200);
 
+	// Taps see every access, instruction fetches too, without changing what it reads
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	auto tap = [this, &space] (int bit, offs_t start, offs_t end, const char *name)
+	{
+		space.install_readwrite_tap(start, end, name,
+				[this, bit] (offs_t, uint32_t &, uint32_t) { m_act |= 1 << bit; },
+				[this, bit] (offs_t, uint32_t &, uint32_t) { m_act |= 1 << bit; });
+	};
+	tap(ACT_EPROM, 0x00000000, 0x0001ffff, "eprom_act");
+	tap(ACT_SRAM,  0x08000000, 0x0801ffff, "sram_act");
+	tap(ACT_FLASH, 0x10000000, 0x101fffff, "flash_act");
+	tap(ACT_SIO,   0x20000000, 0x2000001f, "sio_act");
+
+	m_led_timer = timer_alloc(FUNC(qt960_state::led_tick), this);
+	m_led_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+	m_act = 0;
+
 	save_item(NAME(m_usr));
 	save_item(NAME(m_sbwait));
 	save_item(NAME(m_s1wait));
 	save_item(NAME(m_wrstr));
 	save_item(NAME(m_rstflg));
+	save_item(NAME(m_ooba));
 	save_item(NAME(m_serial_rx_data));
 	save_item(NAME(m_serial_rx_ready));
 	save_pointer(NAME(m_dma_regs), 0x200);
@@ -115,15 +170,15 @@ void qt960_state::machine_start()
 void qt960_state::machine_reset()
 {
 	// CSR reset values from PLD (2U6B.ADF):
-	// - USR0-3: cleared by RESET
 	// - SBWAIT/S1WAIT: set to 3 (inverted logic in PLD, /SBWAITx# resets high)
 	// - WRSTR: set to 1 (inverted logic, /WRSTR# resets high)
 	// - RSTFLG0: NOT affected by RESET (persists!)
 	// - RSTFLG1: cleared by RESET
-	m_usr[0] = 0;
-	m_usr[1] = 0;
-	m_usr[2] = 0;
-	m_usr[3] = 0;
+	// - USR0-3: RESET clears the outputs, which lights the LEDs (reads back 1)
+	m_usr[0] = 1;
+	m_usr[1] = 1;
+	m_usr[2] = 1;
+	m_usr[3] = 1;
 	m_sbwait = 3;    // Default 3 wait states
 	m_s1wait = 3;    // Default 3 wait states
 	m_wrstr = 1;     // Write stretch enabled after reset
@@ -139,6 +194,22 @@ void qt960_state::machine_reset()
 
 	// 82380 reset
 	std::fill_n(m_dma_regs.get(), 0x200, 0);
+
+	// FAILURE# is low from reset until the CPU's self-test passes: lit until the next tick
+	m_ooba = false;
+	m_led_fail = 1;
+	m_led_ooba = 0;
+	for (int i = 0; i < 4; i++)
+		m_led_usr[i] = m_usr[i];
+}
+
+TIMER_CALLBACK_MEMBER(qt960_state::led_tick)
+{
+	// An access lights its LED for at least one tick, so a short burst still shows
+	for (int i = 0; i < 5; i++)
+		m_led_act[i] = BIT(m_act, i);
+	m_act = 0;
+	m_led_fail = 0;
 }
 
 
@@ -208,12 +279,16 @@ void qt960_state::csr_w(offs_t offset, uint32_t data)
 		// 0x28000000: USR0 from DB0, USR1 from DB1
 		m_usr[0] = (data >> 0) & 1;
 		m_usr[1] = (data >> 1) & 1;
+		m_led_usr[0] = m_usr[0];
+		m_led_usr[1] = m_usr[1];
 	}
 	else if (a4 == 0 && a3 == 0 && a2 == 1)
 	{
 		// 0x28000004: USR2 from DB0, USR3 from DB1
 		m_usr[2] = (data >> 0) & 1;
 		m_usr[3] = (data >> 1) & 1;
+		m_led_usr[2] = m_usr[2];
+		m_led_usr[3] = m_usr[3];
 	}
 	else if (a4 == 0 && a3 == 1 && a2 == 0)
 	{
@@ -284,6 +359,34 @@ void qt960_state::kbd_put(u8 data)
 
 
 //**************************************************************************
+//  Out of bounds access (2U8A OOBA#)
+//  The board has no ready generator here, so the real CPU hangs in the access
+//  with the LED lit until reset. MAME carries on, and the LED stays lit.
+//**************************************************************************
+
+uint32_t qt960_state::ooba_r(offs_t offset)
+{
+	if (!m_ooba && !machine().side_effects_disabled())
+	{
+		logerror("Out of bounds read %08x\n", offset << 2);
+		m_ooba = true;
+		m_led_ooba = 1;
+	}
+	return 0;
+}
+
+void qt960_state::ooba_w(offs_t offset, uint32_t data)
+{
+	if (!m_ooba)
+	{
+		logerror("Out of bounds write %08x\n", offset << 2);
+		m_ooba = true;
+		m_led_ooba = 1;
+	}
+}
+
+
+//**************************************************************************
 //  82380 DMA/Timer Controller
 //  From qtcommon.h: RESET_ADDR = 0x18000064, RESET_DATA = 0xf0
 //**************************************************************************
@@ -323,10 +426,10 @@ void qt960_state::mem_map(address_map &map)
 	// EPROM at 0x00000000 (A31-27 = 00000)
 	map(0x00000000, 0x0001ffff).rom().region("maincpu", 0).flags(i960_cpu_device::BURST);
 
-	// Flash at 0x08000000 (A31-27 = 00001) - writable for downloads
+	// SRAM at 0x08000000 (A31-27 = 00001)
 	map(0x08000000, 0x0801ffff).ram().flags(i960_cpu_device::BURST);
 
-	// SRAM at 0x10000000 (A31-27 = 00010)
+	// Flash at 0x10000000 (A31-27 = 00010) - RAM here, so downloads to it work
 	map(0x10000000, 0x101fffff).ram().share("ram").flags(i960_cpu_device::BURST);
 
 	// 82380 at 0x18000000 (A31-27 = 00011)
@@ -340,6 +443,9 @@ void qt960_state::mem_map(address_map &map)
 
 	// User Space 0 at 0x30000000 (A31-27 = 00110) - stub as RAM
 	map(0x30000000, 0x3001ffff).ram().flags(i960_cpu_device::BURST);
+
+	// User Space 1 at 0x38000000 and everything with A31 or A30 set: OOBA#
+	map(0x38000000, 0xffffffff).rw(FUNC(qt960_state::ooba_r), FUNC(qt960_state::ooba_w)).flags(i960_cpu_device::BURST);
 }
 
 
@@ -354,6 +460,8 @@ void qt960_state::qt960(machine_config &config)
 
 	GENERIC_TERMINAL(config, m_terminal, 0);
 	m_terminal->set_keyboard_callback(FUNC(qt960_state::kbd_put));
+
+	config.set_default_layout(layout_qt960);
 }
 
 
