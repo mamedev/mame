@@ -659,6 +659,7 @@ void model2b_state::copro_sharc_map(address_map &map)
 
 void model2b_state::copro_halt()
 {
+	m_copro_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 void model2b_state::copro_boot()
