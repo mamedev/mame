@@ -249,8 +249,8 @@ void model2b_state::machine_start()
 							[this]() { m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE); },
 							[    ]() { },
 							[    ]() { },
-							[this]() { m_copro_adsp->set_flag_input(1, m_copro_fifo_in->is_full()); },
-							[this]() { m_copro_adsp->set_flag_input(1, m_copro_fifo_in->is_full()); });
+							[this]() { m_copro_adsp->set_flag_input(1, m_copro_fifo_out->is_full()); },
+							[this]() { m_copro_adsp->set_flag_input(1, m_copro_fifo_out->is_full()); });
 }
 
 void model2c_state::machine_start()
