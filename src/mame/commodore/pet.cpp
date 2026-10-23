@@ -244,6 +244,7 @@ public:
 	void pet2001n32(machine_config &config);
 
 	uint8_t cart_r(offs_t offset);
+	bool ieee_ready(offs_t offset);
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);
 	void video_ram_w(offs_t offset, uint8_t data);
@@ -492,8 +493,18 @@ uint8_t pet_state::cart_r(offs_t offset)
 	return cart && cart->exists() ? cart->read_rom(offset & 0xfff) : m_rom->base()[offset];
 }
 
+bool pet_state::ieee_ready(offs_t offset)
+{
+	bool const pia_pa = (BIT(offset, 4) || BIT(offset, 5)) && !(offset & 0x03);
+	bool const via_pb = BIT(offset, 6) && !(offset & 0x0f);
+	return !(pia_pa || via_pb) || m_ieee->sample_ready(*m_maincpu);
+}
+
 uint8_t pet_state::io_r(offs_t offset)
 {
+	if (!ieee_ready(offset))
+		return 0xff;
+
 	uint8_t data = 0xff;
 	if (BIT(offset, 4))
 		data &= m_pia1->read(offset & 0x03);
@@ -688,6 +699,9 @@ uint8_t cbm8296_state::read(offs_t offset)
 	}
 	if (!csio)
 	{
+		if (!ieee_ready(offset))
+			return 0xff;
+
 		data = 0xff;
 
 		if (BIT(offset, 4))

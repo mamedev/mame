@@ -444,7 +444,7 @@ void softbox_state::ieee488_ifc(int state)
 {
 	if (!m_ifc && state)
 	{
-		device_reset();
+		reset();
 	}
 
 	m_ifc = state;

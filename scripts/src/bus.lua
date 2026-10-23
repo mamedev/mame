@@ -2048,8 +2048,14 @@ end
 ---------------------------------------------------
 if BUSES["COMPUCOLOR"] then
 	files {
+		MAME_DIR .. "src/devices/bus/compucolor/exp.cpp",
+		MAME_DIR .. "src/devices/bus/compucolor/exp.h",
 		MAME_DIR .. "src/devices/bus/compucolor/floppy.cpp",
 		MAME_DIR .. "src/devices/bus/compucolor/floppy.h",
+		MAME_DIR .. "src/devices/bus/compucolor/joysnd.cpp",
+		MAME_DIR .. "src/devices/bus/compucolor/joysnd.h",
+		MAME_DIR .. "src/devices/bus/compucolor/soundware.cpp",
+		MAME_DIR .. "src/devices/bus/compucolor/soundware.h",
 	}
 end
 
@@ -3253,6 +3259,8 @@ if BUSES["ISBX"] then
 		MAME_DIR .. "src/devices/bus/isbx/isbx.h",
 		MAME_DIR .. "src/devices/bus/isbx/compis_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/isbx/compis_fdc.h",
+		MAME_DIR .. "src/devices/bus/isbx/compis_hdc.cpp",
+		MAME_DIR .. "src/devices/bus/isbx/compis_hdc.h",
 		MAME_DIR .. "src/devices/bus/isbx/isbc_218a.cpp",
 		MAME_DIR .. "src/devices/bus/isbx/isbc_218a.h",
 	}
@@ -5161,6 +5169,21 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/roland/extport.h,BUSES["ROLAND_EXT"] = true
+---------------------------------------------------
+
+if BUSES["ROLAND_EXT"] then
+	files {
+		MAME_DIR .. "src/devices/bus/roland/extport.cpp",
+		MAME_DIR .. "src/devices/bus/roland/extport.h",
+		MAME_DIR .. "src/devices/bus/roland/mouse.cpp",
+		MAME_DIR .. "src/devices/bus/roland/mouse.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/rs232/rs232.h,BUSES["RS232"] = true
 ---------------------------------------------------
 
@@ -5505,6 +5528,8 @@ if BUSES["SEGA8"] then
 		MAME_DIR .. "src/devices/bus/sega8/ccatch.h",
 		MAME_DIR .. "src/devices/bus/sega8/mgear.cpp",
 		MAME_DIR .. "src/devices/bus/sega8/mgear.h",
+		MAME_DIR .. "src/devices/bus/sega8/sf7000.cpp",
+		MAME_DIR .. "src/devices/bus/sega8/sf7000.h",
 	}
 end
 
@@ -6444,8 +6469,12 @@ end
 
 if BUSES["VIDBRAIN"] then
 	files {
+		MAME_DIR .. "src/devices/bus/vidbrain/accessory.cpp",
+		MAME_DIR .. "src/devices/bus/vidbrain/accessory.h",
 		MAME_DIR .. "src/devices/bus/vidbrain/exp.cpp",
 		MAME_DIR .. "src/devices/bus/vidbrain/exp.h",
+		MAME_DIR .. "src/devices/bus/vidbrain/expander1.cpp",
+		MAME_DIR .. "src/devices/bus/vidbrain/expander1.h",
 		MAME_DIR .. "src/devices/bus/vidbrain/std.cpp",
 		MAME_DIR .. "src/devices/bus/vidbrain/std.h",
 		MAME_DIR .. "src/devices/bus/vidbrain/comp_language.cpp",

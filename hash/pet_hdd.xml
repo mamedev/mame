@@ -9,6 +9,7 @@ license:CC0-1.0
 		<description>Commodore D9060</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
+		<sharedfeat name="ieee9_default" value="d9060"/>
 
 		<!-- Tandon TM602S -->
 		<part name="hdd" interface="scsi_hdd">
@@ -22,6 +23,7 @@ license:CC0-1.0
 		<description>Commodore D9090</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
+		<sharedfeat name="ieee9_default" value="d9090"/>
 
 		<!-- Tandon TM603S -->
 		<part name="hdd" interface="scsi_hdd">
@@ -31,10 +33,25 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="hardbox">
+		<description>HardBox</description>
+		<year>1981</year>
+		<publisher>Small Systems Engineering</publisher>
+		<sharedfeat name="ieee9_default" value="hardbox"/>
+
+		<!-- Corvus B-Series 20MB: IMI 7720 -->
+		<part name="hdd" interface="corvus_hdd">
+			<diskarea name="harddriv">
+				<disk name="corvus20mb" sha1="5cbcd2ac6e1548a5756eae435daaade18a38975b" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="softbox">
 		<description>SoftBox CP/M 2.2</description>
 		<year>1981</year>
 		<publisher>Small Systems Engineering</publisher>
+		<sharedfeat name="ieee9_default" value="softbox"/>
 
 		<!-- Corvus Model 11 (10 MB): IMI 5012H -->
 		<part name="hdd" interface="corvus_hdd">

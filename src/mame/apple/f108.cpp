@@ -39,7 +39,7 @@ void f108_device::map(address_map &map)
 	map(0x5001a000, 0x5001a01f).rw(m_ata, FUNC(ata_interface_device::cs0_swap_r), FUNC(ata_interface_device::cs0_swap_w)).umask32(0xffff0000).mirror(0x00fc0000);
 	map(0x5001a000, 0x5001a003).rw(FUNC(f108_device::ata_data_r), FUNC(f108_device::ata_data_w)).mirror(0x00fc0000);
 	map(0x5001a020, 0x5001a03f).rw(m_ata, FUNC(ata_interface_device::cs1_swap_r), FUNC(ata_interface_device::cs1_swap_w)).umask32(0xffff0000).mirror(0x00fc0000);
-	// a040 is probably a configuration register based on later Apple ATA implementations, but the values written don't make sense
+	map(0x5001a040, 0x5001a04b).rw(FUNC(f108_device::ata_timing_r), FUNC(f108_device::ata_timing_w)).mirror(0x00fc0000);
 	map(0xf9000000, 0xf90fffff).ram();  // VRAM
 }
 
@@ -101,8 +101,13 @@ f108_device::f108_device(const machine_config &mconfig, const char *tag, device_
 
 void f108_device::device_start()
 {
-	m_rom_ptr = &m_rom[0];
-	m_rom_size = m_rom.length() << 2;
+	m_rom_ptr = m_rom ? &m_rom[0] : nullptr;
+	m_rom_size = m_rom ? m_rom.length() << 2 : 0;
+
+	m_ata_active = 0;
+	m_ata_recovery = 0;
+	save_item(NAME(m_ata_active));
+	save_item(NAME(m_ata_recovery));
 }
 
 //-------------------------------------------------
@@ -113,8 +118,14 @@ void f108_device::device_reset()
 {
 	m_overlay = true;
 
-	// put ROM mirror at 0
 	address_space &space = m_maincpu->space(AS_PROGRAM);
+	if (!m_rom_ptr)
+	{
+		space.unmap_readwrite(0x00000000, 0x003fffff);
+		return;
+	}
+
+	// put ROM mirror at 0
 	const u32 memory_size = std::min((u32)0x400000, m_rom_size);
 	const u32 memory_end = memory_size - 1;
 	offs_t memory_mirror = memory_end & ~(memory_size - 1);
@@ -137,7 +148,7 @@ u32 f108_device::rom_switch_r(offs_t offset)
 		m_overlay = false;
 	}
 
-	return m_rom_ptr[offset & ((m_rom_size - 1) >> 2)];
+	return m_rom_ptr ? m_rom_ptr[offset & ((m_rom_size - 1) >> 2)] : 0;
 }
 
 void f108_device::set_ram_info(u32 *ram, u32 size)
@@ -149,6 +160,37 @@ void f108_device::set_ram_info(u32 *ram, u32 size)
 void f108_device::ata_irq_w(int state)
 {
 	m_ata_irq(state);
+}
+
+u8 f108_device::ata_timing_r(offs_t offset)
+{
+	switch (offset & ~2)
+	{
+		case 1:
+			return 0x20;
+
+		case 5:
+			return m_ata_active;
+
+		case 9:
+			return m_ata_recovery;
+	}
+
+	return 0xff;
+}
+
+void f108_device::ata_timing_w(offs_t offset, u8 data)
+{
+	switch (offset & ~2)
+	{
+		case 5:
+			m_ata_active = data & 0x3f;
+			break;
+
+		case 9:
+			m_ata_recovery = data & 0x0f;
+			break;
+	}
 }
 
 u32 f108_device::ata_data_r(offs_t offset, u32 mem_mask)

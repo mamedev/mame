@@ -489,7 +489,7 @@ class mc6847_base_device : public mc6847_friend_device
 public:
 	auto input_callback() { return m_input_cb.bind(); }
 
-	void set_get_fixed_mode(uint8_t mode) { m_fixed_mode = mode; }
+	void set_fixed_mode(uint8_t mode) { m_fixed_mode = mode; }
 	void set_black_and_white(bool bw) { m_black_and_white = bw; }
 
 	/* updates the screen -- this will call begin_update(),
@@ -569,32 +569,7 @@ private:
 	bool m_dirty;
 	video_scanline m_data[192];
 
-	void change_mode(uint8_t mode, int state)
-	{
-		// sanity check, to ensure that we're not changing fixed modes
-		assert((mode & m_fixed_mode_mask) == 0);
-
-		// calculate new mode
-		uint8_t new_mode;
-		if (state)
-			new_mode = m_mode | mode;
-		else
-			new_mode = m_mode & ~mode;
-
-		// has the mode changed?
-		if (new_mode != m_mode)
-		{
-			// it has!  check dirty flag
-			video_flush();
-			if (!m_dirty)
-			{
-				m_dirty = true;
-			}
-
-			// and set the new mode
-			m_mode = new_mode;
-		}
-	}
+	void change_mode(uint8_t mode, int state);
 
 	// setup functions
 	void setup_fixed_mode();

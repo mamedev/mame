@@ -112,6 +112,8 @@ bits is deduced from this code, not verified.
       0x0271df18 fails), see the note about unaligned accesses above
     - Key matrix labels (MAH-JONG connector), set as MIC for now
     - 0x01548000 (read once at boot by btlfront and baibians, used as a seed)
+    - kxddz's sound is too fast. The game sets the PLL at roughly 55 MHz, but it's currently
+      bypassed by the HLE
     - Serial security memory: password, access rights, configuration zone
 
 ****************************************************************************/
@@ -1133,7 +1135,7 @@ void ddz_state::init_btlfront()
 } // anonymous namespace
 
 
-GAME( 200?, kxddz,    0, ddz,      ddz,      ddz_state, init_ddz,      ROT0, "TJF",  "Kaixin Dou Dizhu",    MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+GAME( 200?, kxddz,    0, ddz,      ddz,      ddz_state, init_ddz,      ROT0, "TJF",  "Kaixin Dou Dizhu",    MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 200?, crzclass, 0, tjf,      ddz,      ddz_state, init_crzclass, ROT0, "TJF",  "Chaoji Fengdou",      MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
 GAME( 200?, baibians, 0, tjf,      ddz,      ddz_state, init_baibians, ROT0, "TJF",  "Baibian Shuangkou",   MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
 GAME( 200?, cjmx,     0, tjf,      ddz,      ddz_state, init_cjmx,     ROT0, "TJF",  "Chaoji Mingxing",     MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )

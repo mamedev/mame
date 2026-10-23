@@ -102,9 +102,9 @@ void w83977tf_device::uart_unmap_installed()
 	for (int i = 0; i < 2; i++)
 	{
 		if (m_uart_installed[i])
-			m_isa->unmap_device(m_uart_installed_address[i], m_uart_installed_address[i] + 7);
+			m_isa->unmap_device(m_uart_cached_address[i], m_uart_cached_address[i] + 7);
 		m_uart_installed[i] = false;
-		m_uart_installed_address[i] = 0;
+		m_uart_cached_address[i] = 0;
 	}
 }
 
@@ -228,11 +228,11 @@ void w83977tf_device::remap(int space_id, offs_t start, offs_t end)
 		for (int i = 0; i < 2; i++)
 		{
 			bool const should_install = (m_activate[2 + i] & 1) && (m_uart_address[i] & 0xf00);
-			if (m_uart_installed[i] && (!should_install || (m_uart_installed_address[i] != m_uart_address[i])))
+			if (m_uart_installed[i] && (!should_install || (m_uart_cached_address[i] != m_uart_address[i])))
 			{
-				m_isa->unmap_device(m_uart_installed_address[i], m_uart_installed_address[i] + 7);
+				m_isa->unmap_device(m_uart_cached_address[i], m_uart_cached_address[i] + 7);
 				m_uart_installed[i] = false;
-				m_uart_installed_address[i] = 0;
+				m_uart_cached_address[i] = 0;
 			}
 		}
 
@@ -259,7 +259,7 @@ void w83977tf_device::remap(int space_id, offs_t start, offs_t end)
 					read8sm_delegate(*m_uart[i], FUNC(ns16450_device::ins8250_r)),
 					write8sm_delegate(*m_uart[i], FUNC(ns16450_device::ins8250_w)));
 				m_uart_installed[i] = true;
-				m_uart_installed_address[i] = m_uart_address[i];
+				m_uart_cached_address[i] = m_uart_address[i];
 			}
 		}
 
@@ -505,13 +505,12 @@ void w83977tf_device::config_map(address_map &map)
 	);
 	// UART1, UART2
 	m_logical_view[2](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<2>), FUNC(w83977tf_device::activate_w<2>));
-	m_logical_view[3](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<3>), FUNC(w83977tf_device::activate_w<3>));
 	m_logical_view[2](0x60, 0x61).rw(FUNC(w83977tf_device::uart_address_r<0>), FUNC(w83977tf_device::uart_address_w<0>));
-	m_logical_view[3](0x60, 0x61).rw(FUNC(w83977tf_device::uart_address_r<1>), FUNC(w83977tf_device::uart_address_w<1>));
 	m_logical_view[2](0x70, 0x70).rw(FUNC(w83977tf_device::uart_irq_r<0>), FUNC(w83977tf_device::uart_irq_w<0>));
-	m_logical_view[3](0x70, 0x70).rw(FUNC(w83977tf_device::uart_irq_r<1>), FUNC(w83977tf_device::uart_irq_w<1>));
-	// CRF0: clock source select and IR modes, stored only
 	m_logical_view[2](0xf0, 0xf0).rw(FUNC(w83977tf_device::uart_mode_r<0>), FUNC(w83977tf_device::uart_mode_w<0>));
+	m_logical_view[3](0x30, 0x30).rw(FUNC(w83977tf_device::activate_r<3>), FUNC(w83977tf_device::activate_w<3>));
+	m_logical_view[3](0x60, 0x61).rw(FUNC(w83977tf_device::uart_address_r<1>), FUNC(w83977tf_device::uart_address_w<1>));
+	m_logical_view[3](0x70, 0x70).rw(FUNC(w83977tf_device::uart_irq_r<1>), FUNC(w83977tf_device::uart_irq_w<1>));
 	m_logical_view[3](0xf0, 0xf0).rw(FUNC(w83977tf_device::uart_mode_r<1>), FUNC(w83977tf_device::uart_mode_w<1>));
 	// <reserved>
 	// RTC on W83977F
@@ -595,7 +594,7 @@ template <unsigned N> void w83977tf_device::activate_w(offs_t offset, u8 data)
 {
 	m_activate[N] = data & 1;
 	LOG("%d Device %s\n", N, data & 1 ? "enabled" : "disabled");
-	if (N >= 2 && N <= 3)
+	if (N == 2 || N == 3)
 		uart_reconcile_irq(N - 2);
 	remap(AS_IO, 0, 0x400);
 }
@@ -742,6 +741,7 @@ template <unsigned N> u8 w83977tf_device::uart_mode_r(offs_t offset)
 
 template <unsigned N> void w83977tf_device::uart_mode_w(offs_t offset, u8 data)
 {
+	// TODO: CRF0 clock source select and IR modes are stored only
 	m_uart_mode[N] = data;
 	LOG("LD%d (UART%d): CRF0 mode write %02x\n", 2 + N, 1 + N, data);
 }

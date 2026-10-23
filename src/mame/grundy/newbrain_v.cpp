@@ -4,7 +4,7 @@
 
     TODO:
 
-    - GR is always 0
+    - accurate video timing
 
 */
 
@@ -79,19 +79,47 @@ void newbrain_state::video_start()
 void newbrain_state::do_screen_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int columns = m_80l ? 80 : 40;
-	int excess = m_32_40 ? 4 : 24;
-	int gr = 0;
+	int border = m_32_40 ? (columns / 10) : 0;
 
+	uint16_t row_addr = m_tvl;
 	uint16_t videoram_addr = m_tvl;
 	int rc = 0;
 	uint8_t vsr = 0;
 	uint8_t grsr = 0;
 
-	for (int y = 0; y < 240; y++) {
+	// 461 shifts in a flag for each 00 byte: one ends the row, two end the frame, three start graphics
+	bool qa = true, qb = true, qc = true;
+
+	for (int y = 0; y < 250; y++) {
+		if (!qc) {
+			qc = qb;
+		}
+
+		bool gr_line = !qa && !qc;
+
+		if (!gr_line) {
+			videoram_addr = row_addr;
+		}
+
 		int x = 0;
 
 		for (int sx = 0; sx < columns; sx++) {
-			uint8_t rd = m_ram->pointer()[(videoram_addr + sx) & 0x7fff];
+			bool window = (sx >= border) && (sx < columns - border);
+			bool count = gr_line ? window : (qa || qc || (sx < columns - border));
+			uint8_t rd = count ? m_ram->pointer()[videoram_addr & 0x7fff] : 0;
+
+			if (count) {
+				videoram_addr++;
+			}
+
+			if (qc) {
+				qc = qb;
+				qb = qa;
+				qa = (rd != 0);
+			}
+
+			bool gr = !qa && !qc;
+			bool en = gr ? window : qc;
 
 			bool rc3 = BIT(rc, 3);
 			bool txt = !(BIT(rd, 6) || BIT(rd, 5));
@@ -112,13 +140,12 @@ void newbrain_state::do_screen_update(bitmap_rgb32 &bitmap, const rectangle &cli
 				vsr = (crd & 0xfe) | (crd0 && txtq);
 			}
 
-			if (!ldvsr && gr) {
+			if (gr) {
 				grsr = rd;
 			}
 
 			for (int i = 0; i < 8; i++) {
-				uint8_t sr = gr ? grsr : vsr;
-				int color = BIT(sr, 7) ^ m_rv;
+				int color = en && ((gr ? BIT(grsr, 0) : BIT(vsr, 7)) ^ m_rv);
 
 				bitmap.pix(y, x++) = m_palette->pen(color);
 
@@ -126,27 +153,18 @@ void newbrain_state::do_screen_update(bitmap_rgb32 &bitmap, const rectangle &cli
 					bitmap.pix(y, x++) = m_palette->pen(color);
 				}
 
-				grsr <<= 1;
+				grsr >>= 1;
 				vsr <<= 1;
 			}
 		}
 
-		if (gr)
-		{
-			// get new data for each line
-			videoram_addr += columns;
-			videoram_addr += excess;
-		}
-		else
-		{
+		if (!gr_line) {
 			rc++;
 
 			if (rc == (m_ucr ? 8 : 10)) {
 				rc = 0;
 
-				// get new data after each character row
-				videoram_addr += columns;
-				videoram_addr += excess;
+				row_addr += m_80l ? 128 : 64;
 			}
 		}
 	}

@@ -44,6 +44,7 @@ protected:
 	virtual void mreq_w(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh) override;
 	virtual uint8_t iorq_r(offs_t offset, uint8_t data, bool &prtov) override;
 	virtual void iorq_w(offs_t offset, uint8_t data, bool &prtov) override;
+	virtual uint8_t page_r(int page, offs_t offset, uint8_t data) override;
 
 private:
 	void fdc_int_w(int state);
@@ -51,6 +52,8 @@ private:
 	void fdc_auxiliary_w(uint8_t data);
 	uint8_t fdc_control_r();
 	void io_dec_w(uint8_t data);
+	uint8_t window_r(offs_t offset);
+	void window_w(offs_t offset, uint8_t data);
 
 	void newbrain_fdc_io(address_map &map) ATTR_COLD;
 	void newbrain_fdc_mem(address_map &map) ATTR_COLD;
@@ -59,6 +62,8 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;
 	required_device<newbrain_expansion_slot_device> m_exp;
+	required_memory_region m_rom;
+	memory_share_creator<uint8_t> m_ram;
 
 	void moton(int state);
 

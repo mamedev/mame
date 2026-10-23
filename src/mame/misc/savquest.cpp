@@ -582,4 +582,4 @@ ROM_END
 
 DEFINE_DEVICE_TYPE_PRIVATE(SAVQUEST_GCI, device_rs232_port_interface, savquest_gci_device, "savquest_gci", "Immersia GCI controls board (simulated)")
 
-GAME(1999, savquest, 0, savquest, savquest, savquest_state, empty_init, ROT0, "Interactive Light", "Savage Quest", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME(1999, savquest, 0, savquest, savquest, savquest_state, empty_init, ROT0, "Interactive Light", "Savage Quest (USA)", MACHINE_NOT_WORKING )

@@ -54965,7 +54965,8 @@ Doesn't boot on vanilla class (verify), notes use VM class
 
 	<software name="gc3035" cloneof="gc30" supported="no">
 		<description>Game Collection 30 (3.5&quot; disk)</description>
-		<year>19??</year>
+		<!-- from DOS timestamps -->
+		<year>1992?</year>
 		<publisher>Shuwa System Trading</publisher>
 		<notes><![CDATA[
 "Unable to identify image file format"
@@ -55030,7 +55031,7 @@ Doesn't boot on vanilla class (verify), notes use VM class
 
 	<software name="gamblave" supported="no">
 		<description>Gambling Avenue</description>
-		<year>19??</year>
+		<year>1994?</year>
 		<publisher>Shuwa System Trading</publisher>
 		<info name="alt_title" value="ぎゃんぶら一ずアベニュー" />
 		<part name="flop1" interface="floppy_5_25">

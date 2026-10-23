@@ -29,8 +29,8 @@ public:
 	auto smiact() { return m_smiact.bind(); }
 	auto ferr() { return m_ferr_handler.bind(); }
 
-	// Advance the timestamp counter by num/den per executed cycle.  For CPU
-	// instances a driver deliberately runs below their real core clock.
+	// HACK: Advance the timestamp counter by num/den per executed cycle.
+	// For CPU instances a driver deliberately runs below their real core clock.
 	void set_tsc_cycle_ratio(uint32_t num, uint32_t den);
 
 	uint64_t debug_segbase(int params, const uint64_t *param);
