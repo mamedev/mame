@@ -24,7 +24,7 @@
   - implement double exception behaviour;
   - implement NP fatal exception;
   - implement NMI;
-  - bitstring opcodes access memory a bit at a time, timing is approximate;
+  - bit string cycle counts are approximate: the fixed part does not depend on the alignment case;
   - cache handling;
   - external bus timing (on load/store opcodes):
   \- 3 cycles for ROM
@@ -42,6 +42,7 @@
 #include "softfloat3/source/include/softfloat.h"
 
 #include <algorithm>
+#include <bit>
 #include <cmath>
 #include <limits>
 
@@ -1374,10 +1375,25 @@ uint32_t v810_device::opFpoint(uint32_t op)
 	}
 }
 
+// cycles of one memory access by a bit string instruction: a 2 cycle bus cycle, plus the wait states with bus timing
+inline uint32_t v810_device::bs_access(offs_t addr, int access)
+{
+	return m_bus_timing ? (2 + m_bus_wait(addr, access, 4)) : 2;
+}
+
+// the bit string instructions stop between words when an interrupt can be accepted or the timeslice
+// is used up: the registers then hold the resume state and the instruction is executed again
+inline bool v810_device::bs_suspend(uint32_t cycles) const
+{
+	return irq_acceptable() || (m_icount <= int(cycles));
+}
+
 // SCH0BSU/SCH0BSD/SCH1BSU/SCH1BSD (sub-opcodes 0-3): search the string at r30/r27, length r28,
-// upward or downward (bit 0) for a 0 or a 1 (bit 1), one bit per execution like the other bit
-// string instructions. r29 counts the bits skipped. When the bit is found, r30/r27 point to the bit
-// before it (in the search direction) and Z is cleared; when it is not found, r28 is 0 and Z is set.
+// upward or downward (bit 0) for a 0 or a 1 (bit 1). Each word is read once. r29 counts the bits
+// skipped. When the bit is found, r30/r27 point to the bit before it (in the search direction) and
+// Z is cleared; when it is not found, r28 is 0 and Z is set.
+// Cycles follow Table 5-12 of the architecture manual (32-bit bus): 3 per word, plus a fixed part
+// that matches the one word cases and lies within the range given for longer strings.
 uint32_t v810_device::opBSU_search(uint32_t op)
 {
 	const bool down = BIT(op, 0);
@@ -1390,65 +1406,89 @@ uint32_t v810_device::opBSU_search(uint32_t op)
 		R27 = bit;
 		R30 = src;
 		SET_Z(1);
-		return 14;
+		return down ? 15 : 13;
 	}
 
-	if (BIT(R_W(src), bit) == match)
+	uint32_t cycles = 0;
+	uint32_t words = 0;
+	while (true)
 	{
-		// found: step back one bit
-		if (down)
+		const uint32_t data = R_W(src);
+		cycles += bs_access(src, BUS_READ) + 1;
+		words++;
+
+		bool next_word = false;
+		while (R28 && !next_word)
 		{
-			if (++bit == 32)
+			if (BIT(data, bit) == match)
 			{
-				bit = 0;
-				src += 4;
+				// found: step back one bit
+				if (down)
+				{
+					if (++bit == 32)
+					{
+						bit = 0;
+						src += 4;
+					}
+				}
+				else
+				{
+					if (bit-- == 0)
+					{
+						bit = 31;
+						src -= 4;
+					}
+				}
+				R27 = bit;
+				R30 = src;
+				SET_Z(0);
+				return cycles + (down ? 23 : 26) + ((words > 1) ? (down ? 17 : 9) : 0);
 			}
-		}
-		else
-		{
-			if (bit-- == 0)
+
+			// skipped
+			if (down)
 			{
-				bit = 31;
-				src -= 4;
+				if (bit-- == 0)
+				{
+					bit = 31;
+					src -= 4;
+					next_word = true;
+				}
 			}
+			else
+			{
+				if (++bit == 32)
+				{
+					bit = 0;
+					src += 4;
+					next_word = true;
+				}
+			}
+			R28--;
+			R29++;
 		}
+
 		R27 = bit;
 		R30 = src;
-		SET_Z(0);
-		return 1;
-	}
-
-	// skipped
-	if (down)
-	{
-		if (bit-- == 0)
+		if (!R28)
 		{
-			bit = 31;
-			src -= 4;
+			// not found
+			SET_Z(1);
+			return cycles + (down ? 25 : 26) + ((words > 1) ? (down ? 17 : 9) : 0);
+		}
+		if (bs_suspend(cycles))
+		{
+			PC -= 2;
+			return cycles;
 		}
 	}
-	else
-	{
-		if (++bit == 32)
-		{
-			bit = 0;
-			src += 4;
-		}
-	}
-	R27 = bit;
-	R28--;
-	R29++;
-	R30 = src;
-	if (R28)
-		PC -= 2;
-	else
-		SET_Z(1);
-	return 1;
 }
 
-// TODO: makes host performance to dip
-// TODO: verify atomicity wrt interrupts & DRQ
-// Use scenario: pcfx reading from CD data port with no increment of source address.
+// arithmetic bit string instructions (sub-opcodes 8-Fh): ORBSU, ANDBSU, XORBSU, MOVBSU and their
+// NOT source forms. The source (r30/r27) is combined into the destination (r29/r26) upward, r28
+// bits; each destination word is read and written once, and each source word read once.
+// Cycles follow Table 5-13 of the architecture manual (32-bit bus): 6 per word (three accesses),
+// plus a fixed part that matches the one word cases and lies within the range given for longer strings.
 uint32_t v810_device::opBSU(uint32_t op)
 {
 	// sub-opcodes 04h-07h and 10h-1Fh are invalid
@@ -1467,114 +1507,85 @@ uint32_t v810_device::opBSU(uint32_t op)
 		return 14;
 	}
 
+	const uint32_t invert = BIT(op, 2);
+	uint32_t dstbit = R26 & 0x1f;
+	uint32_t srcbit = R27 & 0x1f;
+	uint32_t dst = R29 & ~3;
+	uint32_t src = R30 & ~3;
+	uint32_t srcword = 0;
+	bool src_loaded = false;
+	uint32_t cycles = 0;
+	uint32_t words = 0;
+
+	while (true)
 	{
-		uint32_t dsttmp, tmp;
-		uint8_t srctmp;
-
-//      printf("BDST %08x BSRC %08x SIZE %08x DST %08x SRC %08x\n",R26,R27,R28,R29,R30);
-
-		uint32_t dstbit = R26 & 0x1f;
-		uint32_t srcbit = R27 & 0x1f;
-		uint32_t size =  R28;
-		uint32_t dst = R29 & ~3;
-		uint32_t src = R30 & ~3;
-
-		switch(op & 0xf)
+		if (!src_loaded)
 		{
-			case 0x8: // ORBSU
-				srctmp = (R_W(src) >> srcbit) & 1;
-				dsttmp = R_W(dst);
-
-				tmp = dsttmp | (srctmp << dstbit);
-
-				W_W(dst,tmp);
-				break;
-			case 0x9: // ANDBSU
-				srctmp = ((R_W(src) >> srcbit) & 1) ^ 1;
-				dsttmp = R_W(dst);
-
-				tmp = dsttmp & (~(srctmp << dstbit));
-
-				W_W(dst,tmp);
-				break;
-			case 0xa: // XORBSU
-				srctmp = (R_W(src) >> srcbit) & 1;
-				dsttmp = R_W(dst);
-
-				tmp = dsttmp ^ (srctmp << dstbit);
-
-				W_W(dst,tmp);
-				break;
-			case 0xb: // MOVBSU
-				srctmp = (R_W(src) >> srcbit) & 1;
-				dsttmp = (R_W(dst) & ~(1 << dstbit));
-
-				tmp = (srctmp << dstbit) | dsttmp;
-
-				W_W(dst,tmp);
-				break;
-			case 0xc: // ORNBSU
-				srctmp = ((R_W(src) >> srcbit) & 1) ^ 1;
-				dsttmp = R_W(dst);
-
-				tmp = dsttmp | (srctmp << dstbit);
-
-				W_W(dst,tmp);
-				break;
-			case 0xd: // ANDNBSU
-				srctmp = (R_W(src) >> srcbit) & 1;
-				dsttmp = R_W(dst);
-
-				tmp = dsttmp & (~(srctmp << dstbit));
-
-				W_W(dst,tmp);
-				break;
-			case 0xe: // XORNBSU
-				srctmp = ((R_W(src) >> srcbit) & 1) ^ 1;
-				dsttmp = R_W(dst);
-
-				tmp = dsttmp ^ (srctmp << dstbit);
-
-				W_W(dst,tmp);
-				break;
-			case 0xf: // NOTBSU
-				srctmp = ((R_W(src) >> srcbit) & 1) ^ 1;
-				dsttmp = (R_W(dst) & ~(1 << dstbit));
-
-				tmp = (srctmp << dstbit) | dsttmp;
-
-				W_W(dst,tmp);
-				break;
-			default:
-				throw emu_fatalerror("V810: unemulated BSU opcode %04x\n",op);
+			srcword = R_W(src);
+			cycles += bs_access(src, BUS_READ);
+			src_loaded = true;
 		}
+		uint32_t dstword = R_W(dst);
+		cycles += bs_access(dst, BUS_READ);
 
-		srcbit++;
-		dstbit++;
+		do
+		{
+			if (!src_loaded)
+			{
+				// the source moves into the next word part way through the destination word
+				srcword = (src == dst) ? dstword : R_W(src);
+				cycles += bs_access(src, BUS_READ);
+				src_loaded = true;
+			}
 
-		srcbit&=0x1f;
-		dstbit&=0x1f;
+			const uint32_t s = BIT(srcword, srcbit) ^ invert;
+			switch (op & 3)
+			{
+				case 0: // OR
+					dstword |= s << dstbit;
+					break;
+				case 1: // AND
+					dstword &= ~((s ^ 1) << dstbit);
+					break;
+				case 2: // XOR
+					dstword ^= s << dstbit;
+					break;
+				case 3: // MOV
+					dstword = (dstword & ~(1U << dstbit)) | (s << dstbit);
+					break;
+			}
+			// source and destination in the same word: the source sees the bits already written
+			if (src == dst)
+				srcword = dstword;
 
-		if(srcbit == 0)
-			src+=4;
+			R28--;
+			dstbit = (dstbit + 1) & 0x1f;
+			srcbit = (srcbit + 1) & 0x1f;
+			if (!srcbit)
+			{
+				src += 4;
+				src_loaded = false;
+			}
+		} while (R28 && dstbit);
 
-		if(dstbit == 0)
-			dst+=4;
-
-		size --;
+		W_W(dst, dstword);
+		cycles += bs_access(dst, BUS_WRITE);
+		words++;
+		if (!dstbit)
+			dst += 4;
 
 		R26 = dstbit;
 		R27 = srcbit;
-		R28 = size;
 		R29 = dst;
 		R30 = src;
-
-		if(size != 0)
+		if (!R28)
+			return cycles + 26 + ((words > 1) ? 3 : 0);
+		if (bs_suspend(cycles))
+		{
 			PC -= 2;
+			return cycles;
+		}
 	}
-
-	// TODO: all bitstring timings implied for vboy 16-bit ext bus
-	return 12;
 }
 
 const v810_device::opcode_func v810_device::s_OpCodeTable[64] =
@@ -1756,6 +1767,14 @@ void v810_device::device_reset()
 	icache_clear(0, 128);
 }
 
+// an interrupt that would be accepted now: requested, not masked by NP, EP or ID, and at or above the PSW level
+inline bool v810_device::irq_acceptable() const
+{
+	if (!m_irq_state || GET_NP || GET_EP || GET_ID)
+		return false;
+	return (31 - std::countl_zero(uint32_t(m_irq_state))) >= int((PSW >> 16) & 0xf);
+}
+
 // TODO: remaining exception types
 // called with an interrupt requested and accepted by NP, EP and ID: takes the highest one above the PSW level
 void v810_device::check_interrupts()
@@ -1801,7 +1820,7 @@ void v810_device::execute_run()
 	do
 	{
 		// interrupts are sampled at the end of every instruction, and while halted
-		if (m_irq_state && !(GET_NP || GET_EP || GET_ID))
+		if (irq_acceptable())
 			check_interrupts();
 		if (m_halt)
 		{

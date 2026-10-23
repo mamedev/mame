@@ -230,6 +230,9 @@ private:
 	uint32_t opFpoint(uint32_t op);
 	uint32_t opBSU(uint32_t op);
 	uint32_t opBSU_search(uint32_t op);
+	inline uint32_t bs_access(offs_t addr, int access);
+	inline bool bs_suspend(uint32_t cycles) const;
+	inline bool irq_acceptable() const;
 	void check_interrupts();
 };
 
