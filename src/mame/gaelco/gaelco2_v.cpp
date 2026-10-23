@@ -60,7 +60,7 @@
                   1  | -------- --x----- | tilemaps x flip (GAE1 FLIP, not emulated)
                   1  | -------- ---x---- | sprite bank select
                   1  | -------- ----xxxx | not used?
-        0x018008-0x018009   Clear video int?
+        0x018008-0x018009   Clear video interrupt
 
 Notes:
     (1) See sprite format in the sprite section
@@ -192,9 +192,15 @@ void gaelco2_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 
 }
 
+void gaelco2_state::vblank_irq(int state)
+{
+	if (state)
+		m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
+}
+
 void gaelco2_state::vregs_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	u16 old = m_vregs[offset];
+	const u16 old = m_vregs[offset];
 	if ((offset == 0) && !m_dual_monitor && ((old ^ data) & mem_mask & 0x0080))
 	{
 		for (screen_device &screen : screen_device_enumerator(*this))
@@ -209,6 +215,9 @@ void gaelco2_state::vregs_w(offs_t offset, u16 data, u16 mem_mask)
 			{
 				m_pant[offset]->mark_all_dirty();
 			}
+			break;
+		case 2: // clear video interrupt
+			m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
 			break;
 	}
 }
@@ -234,10 +243,10 @@ void gaelco2_state::vregs_w(offs_t offset, u16 data, u16 mem_mask)
 ***************************************************************************/
 
 static constexpr u8 RGB_CHG = 0x08;
-static constexpr u8 ADJUST_COLOR(s16 c) { return std::clamp<s16>(c, 0, 255); }
+static constexpr u8 adjust_color(s16 c) { return std::clamp<s16>(c, 0, 255); }
 
 // table used for color adjustment
-static const s8 pen_color_adjust[16] = {
+static constexpr s8 pen_color_adjust[16] = {
 	+RGB_CHG * 0, -RGB_CHG * 1, -RGB_CHG * 2, -RGB_CHG * 3, -RGB_CHG * 4, -RGB_CHG * 5, -RGB_CHG * 6, -RGB_CHG * 7,
 	+RGB_CHG * 8, +RGB_CHG * 7, +RGB_CHG * 6, +RGB_CHG * 5, +RGB_CHG * 4, +RGB_CHG * 3, +RGB_CHG * 2, +RGB_CHG * 1
 };
@@ -259,9 +268,9 @@ void gaelco2_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 	// update shadow/highlight palettes
 	for (int i = 1; i < 16; i++)
 	{
-		const u8 auxr = ADJUST_COLOR(r + pen_color_adjust[i]);
-		const u8 auxg = ADJUST_COLOR(g + pen_color_adjust[i]);
-		const u8 auxb = ADJUST_COLOR(b + pen_color_adjust[i]);
+		const u8 auxr = adjust_color(r + pen_color_adjust[i]);
+		const u8 auxg = adjust_color(g + pen_color_adjust[i]);
+		const u8 auxb = adjust_color(b + pen_color_adjust[i]);
 
 		m_palette->set_pen_color(4096*i + offset, rgb_t(auxr, auxg, auxb));
 	}
@@ -342,7 +351,7 @@ void gaelco2_dual_state::video_start()
 void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask)
 {
 	u16 const *const buffered_spriteram16 = m_spriteram->buffer();
-	gfx_element *gfx = m_gfxdecode->gfx(0);
+	gfx_element *const gfx = m_gfxdecode->gfx(0);
 
 	// get sprite ram start and end offsets
 	const u32 start_offset = (m_vregs[1] & 0x10) * 0x100;
@@ -453,6 +462,7 @@ void gaelco2_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, co
 	const bool step_up = BIT(m_vregs[layer], 14);
 	const u16 scrollx = m_videoram[(0x2802 / 2) + (layer * 2)];
 
+	// TODO: the chip loads the line counter in vblank, but each partial update restarts it from the current registers
 	// tilemap line for the first scanline, stepped once from the y scroll register
 	int line = m_videoram[(0x2800 / 2) + (layer * 2)] + (step_up ? -1 : 1);
 
@@ -465,13 +475,13 @@ void gaelco2_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, co
 		return;
 	}
 
-	for (int y = 0; y <= cliprect.max_y; y++)
+	for (int y = 0; y <= cliprect.bottom(); y++)
 	{
 		line &= 0x1ff;
 		const u16 entry = linescroll_en ? linescroll[line] : scrollx;
-		if (y >= cliprect.min_y)
+		if (y >= cliprect.top())
 		{
-			const rectangle clip(cliprect.min_x, cliprect.max_x, y, y);
+			const rectangle clip(cliprect.left(), cliprect.right(), y, y);
 			m_pant[layer]->set_scrollx(0, (entry + xoff) & 0x3ff);
 			m_pant[layer]->set_scrolly(0, (line - y) & 0x1ff);
 			m_pant[layer]->draw(screen, bitmap, clip, 0, 0);

@@ -47,6 +47,7 @@ public:
 protected:
 	virtual void video_start() override ATTR_COLD;
 
+	void vblank_irq(int state);
 	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void vregs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void palette_w(offs_t offset, u16 data, u16 mem_mask = ~0);
