@@ -66,9 +66,11 @@ private:
 	uint16_t m_old_mcu_nmi1 = 0U;
 	uint16_t m_old_mcu_nmi2 = 0U;
 
-	// Regional background image offset table (set per game in init)
-	const uint32_t *m_bg_image_offsets = nullptr;
-	uint32_t m_bg_image_count = 0;
+	// Background image offset table, built by scanning the ROM at init.
+	// Each entry is a raw byte offset into the "subdata" ROM region.
+	std::vector<uint32_t> m_bg_image_offsets;
+
+	// SE prepends extra images before the shared set.
 	const uint32_t *m_bg_image_prefix_offsets = nullptr;
 	uint32_t m_bg_image_prefix_count = 0;
 
@@ -106,6 +108,7 @@ private:
 	void galpani2_mcu_nmi1();
 	void galpani2_mcu_nmi2();
 	uint16_t generate_girl_bitmap(uint32_t image_offset);
+	void scan_background_images();
 	void galpani2_mem1(address_map &map) ATTR_COLD;
 	void galpani2_mem2(address_map &map) ATTR_COLD;
 };
