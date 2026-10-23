@@ -240,7 +240,7 @@ public:
 	};
 
 	// construction/destruction
-	tms320c82_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, unsigned number);
+	tms320c82_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint8_t number);
 	tms320c82_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -267,18 +267,20 @@ private:
 
 	struct transfer
 	{
-		int mode = 0, reg = 0, ar = 0, size = 0, le = 0, scale = 0;
+		uint8_t mode = 0, reg = 0, ar = 0, size = 0, le = 0;
+		bool scale = false;
 		uint32_t index = 0;
-		int relative = 0;
+		uint8_t relative = 0;
 		bool indexed = false, conditional = false;
 	};
 	struct decoded
 	{
 		transfer tr[2];
-		int srcbank = 4, dstbank = 4, condition = 0;
+		uint8_t srcbank = 4, dstbank = 4, condition = 0;
 		bool conditional_src = false, conditional_dst = false;
 		uint32_t protect = 0;
-		int move_src = -1, move_dst = -1, field_size = -1, field_item = 0;
+		int8_t move_src = -1, move_dst = -1, field_size = -1;
+		uint8_t field_item = 0;
 		bool move_conditional = false, field_signed = false, replicate = false;
 	};
 	struct decode_entry
@@ -291,7 +293,7 @@ private:
 	address_space_config m_program_config;
 
 	required_device<tms320c82_mp_device> m_master;
-	unsigned const m_pp_number;
+	uint8_t const m_pp_number;
 	uint32_t m_regs[128];
 	uint32_t m_pipe_pc[3];
 	uint64_t m_pipe_op[3];
@@ -325,9 +327,9 @@ private:
 	void signal_interrupt(uint32_t flags) { m_regs[0x3d] |= flags; }
 	decoded decode(uint64_t op) const;
 	const decoded &decode_cached(uint32_t pc, uint64_t op);
-	uint32_t reg_r(unsigned reg) const;
-	void reg_w(unsigned reg, uint32_t data);
-	bool condition(int cond) const;
+	uint32_t reg_r(uint8_t reg) const;
+	void reg_w(uint8_t reg, uint32_t data);
+	bool condition(uint8_t cond) const;
 	void start_task();
 	bool complete_halt_transfers();
 	bool execute_one(uint64_t op, const decoded &d);

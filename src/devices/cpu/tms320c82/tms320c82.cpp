@@ -257,7 +257,7 @@ int tms320c82_mp_device::tc_select() const
 				return i;
 		}
 	}
-	static constexpr unsigned ORDER[3] = {16, 17, 15};
+	static constexpr uint8_t ORDER[3] = {16, 17, 15};
 	for (unsigned priority = 3; priority; priority--)
 	{
 		for (unsigned n = 0; n < 3; n++)
@@ -293,7 +293,7 @@ int tms320c82_mp_device::tc_prepare(unsigned channel, unsigned side)
 {
 	auto &t = m_tc[channel];
 	auto &c = t.cursor[side];
-	unsigned const mode = (t.words[1] >> (side ? 4 : 12)) & 7;
+	uint8_t const mode = (t.words[1] >> (side ? 4 : 12)) & 7;
 	uint64_t const size = uint64_t(c[1] & 0xffff) * ((c[1] >> 16) + 1);
 	if ((c[3] || t.cursor_wrap[side]) && c[2] < size)
 		return 1;
@@ -314,7 +314,7 @@ int tms320c82_mp_device::tc_prepare(unsigned channel, unsigned side)
 		if (mode == 3)
 		{
 			// LUT scale is the leftmost set bit in A count's low nibble.
-			unsigned const low = t.words[4 + side] & 15;
+			uint8_t const low = t.words[4 + side] & 15;
 			offset <<= (low & 8) ? 3 : (low & 4) ? 2 : (low & 2) ? 1 : 0;
 		}
 		c[0] = ((mode == 4 || mode == 6) ? c[0] : t.words[2 + side]) + offset;
@@ -335,7 +335,7 @@ uint64_t tms320c82_mp_device::tc_length(tc_channel const &t, unsigned side)
 {
 	if (BIT(t.words[1], 20))
 		return t.words[1] & 0xffff;
-	unsigned const mode = (t.words[1] >> (side ? 4 : 12)) & 7;
+	uint8_t const mode = (t.words[1] >> (side ? 4 : 12)) & 7;
 	if (mode == 4 || mode == 5)
 		return ~uint64_t(0); // counts are fetched from each guide entry
 	return uint64_t(t.words[4 + side] & 0xffff) * ((t.words[4 + side] >> 16) + 1) * (uint64_t(t.words[6 + side]) + (mode < 3));
@@ -353,7 +353,7 @@ uint32_t tms320c82_mp_device::tc_address(tc_channel const &t, unsigned side, uin
 	{
 		// VRAM read requests repeat a serial-register load at the same tap.
 		// Count is a repetition count (or a post-update), not a byte copy.
-		unsigned const pam = (options >> 16) & 7;
+		uint8_t const pam = (options >> 16) & 7;
 		if (pam == 2 || pam == 3)
 			return start;
 		return reverse ? start - uint32_t(n) : start + uint32_t(n);
@@ -366,7 +366,7 @@ uint32_t tms320c82_mp_device::tc_address(tc_channel const &t, unsigned side, uin
 	uint32_t const patch = guided ? 0 : (n / (uint64_t(a) * b)) * t.words[10 + side];
 	// Both A counts count mask bytes for block-write (one byte selects eight
 	// destination bytes). B/C pitches remain byte addresses, not scaled counts.
-	unsigned const expand = ((options >> 16) & 7) == 2 && side == (BIT(options, 19) ^ 1) ? 8 : 1;
+	unsigned const expand = ((options >> 16) & 7) == 2 && side == BIT(~options, 19) ? 8 : 1;
 	uint32_t const column = uint32_t(n % a) * expand;
 	return start + (reverse ? -column : column)
 			+ (BIT(options, side ? 24 : 21) ? -row : row)
@@ -397,7 +397,7 @@ void tms320c82_mp_device::tc_suspend(unsigned channel, bool software, unsigned f
 			if (tc_guided(t))
 			{
 				uint64_t const completed = tc_completed_patches(t, side);
-				unsigned const mode = (t.words[1] >> (side ? 4 : 12)) & 7;
+				uint8_t const mode = (t.words[1] >> (side ? 4 : 12)) & 7;
 				uint32_t const remaining = t.words[6 + side] - std::min<uint64_t>(completed, t.words[6 + side]);
 				m_program.write_dword(base + 24 + side * 4, remaining);
 				if (mode >= 3)
@@ -541,7 +541,7 @@ bool tms320c82_mp_device::tc_load(unsigned channel)
 			t.cursor_wrap[1] = BIT(m_program.read_dword(address + 0x7c), 1);
 			for (unsigned side = 0; side < 2; side++)
 			{
-				unsigned const mode = (t.words[1] >> (side ? 4 : 12)) & 7;
+				uint8_t const mode = (t.words[1] >> (side ? 4 : 12)) & 7;
 				if (mode >= 3)
 				{
 					// Recover the guide origin from its exported current pointer.
@@ -563,9 +563,9 @@ bool tms320c82_mp_device::tc_load(unsigned channel)
 		return true;
 	}
 	unsigned const source = BIT(t.words[1], 19), destination = source ^ 1;
-	unsigned const pam = (t.words[1] >> 16) & 7;
+	uint8_t const pam = (t.words[1] >> 16) & 7;
 	bool const short_form = BIT(t.words[1], 20);
-	unsigned const stm = short_form ? 0 : (t.words[1] >> 12) & 7, dtm = short_form ? 0 : (t.words[1] >> 4) & 7;
+	uint8_t const stm = short_form ? 0 : (t.words[1] >> 12) & 7, dtm = short_form ? 0 : (t.words[1] >> 4) & 7;
 	if ((short_form && pam >= 4) || (!short_form && pam == 3))
 	{
 		tc_error(channel, true);
@@ -591,7 +591,7 @@ bool tms320c82_mp_device::tc_load(unsigned channel)
 		tc_error(channel, true);
 		return false;
 	}
-	unsigned const src_mode = source ? dtm : stm, dst_mode = source ? stm : dtm;
+	uint8_t const src_mode = source ? dtm : stm, dst_mode = source ? stm : dtm;
 	if (src_mode == 2 || (dst_mode && dst_mode < 4) || (source && (src_mode == 1 || src_mode == 3)))
 	{
 		tc_error(channel, true);
@@ -601,7 +601,7 @@ bool tms320c82_mp_device::tc_load(unsigned channel)
 	{
 		for (unsigned side = 0; side < 2; side++)
 		{
-			unsigned const mode = side ? dtm : stm;
+			uint8_t const mode = side ? dtm : stm;
 			if (mode >= 3)
 			{
 				unsigned const stride = (mode == 4 || mode == 5) ? 8 : 4;
@@ -667,7 +667,7 @@ void tms320c82_mp_device::tc_transparency_flush(tc_channel &t)
 {
 	if (!t.transparent_mask)
 		return;
-	unsigned const destination = BIT(t.words[1], 19) ^ 1;
+	unsigned const destination = BIT(~t.words[1], 19);
 	auto previous = t;
 	if (tc_guided(t))
 		--previous.cursor[destination][2];
@@ -705,7 +705,7 @@ unsigned tms320c82_mp_device::tc_step(unsigned channel)
 	}
 	uint32_t const options = t.words[1];
 	unsigned const source = BIT(options, 19), destination = source ^ 1;
-	unsigned const pam = (options >> 16) & 7;
+	uint8_t const pam = (options >> 16) & 7;
 	if (BIT(options, 20) && (pam == 2 || pam == 3))
 	{
 		m_vram_read_cb(t.words[2 + source], pam == 2);
@@ -786,12 +786,12 @@ unsigned tms320c82_mp_device::tc_step(unsigned channel)
 		// Simulated block-write, also used for 4x/8x VRAM block cycles (SPRU261
 		// 8.1.5): each mask bit, MSB first, enables the write strobe of one
 		// destination byte. Color bytes stay aligned to the 64-bit bus.
-		unsigned const lane = (da >> 3) & 7;
+		uint8_t const lane = (da >> 3) & 7;
 		uint8_t mask;
 		if (fill)
-			mask = t.words[(lane & 4) ? 8 : 10] >> (8 * (3 - (lane & 3)));
+			mask = t.words[(lane & 4) ? 8 : 10] >> (8 * (~lane & 3));
 		else
-			mask = m_program.read_dword(sa & ~3U, 0xff000000U >> (8 * (sa & 3))) >> (8 * (3 - (sa & 3)));
+			mask = m_program.read_dword(sa & ~3U, 0xff000000U >> (8 * (sa & 3))) >> (8 * (~sa & 3));
 		for (unsigned word = 0; word < 3; word++)
 		{
 			uint32_t const address = (da & ~3U) + word * 4;
@@ -914,7 +914,7 @@ void tms320c82_mp_device::tc_finish(unsigned channel)
 		}
 		else
 		{
-			unsigned const mode = (options >> (side ? 0 : 8)) & 3;
+			uint8_t const mode = (options >> (side ? 0 : 8)) & 3;
 			if (!mode)
 				continue;
 			if (tc_guided(t))
@@ -1450,7 +1450,7 @@ void tms320c82_mp_device::execute_run()
 		debugger_instruction_hook(m_pc);
 		m_ir = fetch();
 		previous_safe = true;
-		unsigned const op = (m_ir >> 15) & 0x7f;
+		uint8_t const op = (m_ir >> 15) & 0x7f;
 		if (((m_ir >> 20) & 3) == 3)
 		{
 			previous_safe = false;
@@ -1493,7 +1493,7 @@ void tms320c82_pp_device::bus_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	m_program.write_dword(offset * 4, data, mem_mask);
 }
 
-tms320c82_pp_device::tms320c82_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, unsigned number)
+tms320c82_pp_device::tms320c82_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint8_t number)
 	: cpu_device(mconfig, TMS320C82_PP, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(tms320c82_pp_device::pp_internal_map), this))
 	, m_master(*this, DEVICE_SELF_OWNER)

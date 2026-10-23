@@ -599,7 +599,7 @@ private:
 
 	bitmap_ind32 m_zb;
 
-	uint32_t m_fb_current;
+	uint8_t m_fb_current;
 	rectangle m_clip = rectangle(0, 511, 0, 383);
 
 	uint8_t *m_texture_ram = nullptr;
@@ -722,7 +722,7 @@ void rollext_renderer::process_packet(const uint32_t *packet)
 	// 01 = ordinary triangle, 10 = setup, 11 = quad.
 	// Low bits still hold the MP's original vertex count, even when PP0
 	// splits a five-vertex polygon into a quad followed by a triangle.
-	unsigned const primitive = packet[0] >> 30;
+	uint8_t const primitive = packet[0] >> 30;
 	if (primitive == 2)
 	{
 		// MP routine 40040e4c packs signed nine-bit clip limits. X grows
@@ -914,7 +914,7 @@ private:
 	uint32_t m_link_retry = 0;
 
 	uint32_t m_graphics_packet[24]{};
-	uint32_t m_graphics_words = 0;
+	uint8_t m_graphics_words = 0;
 	std::unique_ptr<uint8_t []> m_texture;
 	std::unique_ptr<rollext_renderer> m_renderer;
 	uint8_t m_adc_reg;
