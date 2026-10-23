@@ -11,7 +11,6 @@ LDP-1000A player through the 6850 ACIA, whose receive interrupt is its only
 IRQ (the coins are on NMI). The player is emulated as the LDP-1000A.
 
 TODO:
-- video color offsets are a mystery, where it gets calculated from?
 - Bega's Battle VBLANK hack;
 - dip-switches;
 - clean-ups;
@@ -176,10 +175,17 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void sound_nmi_enable_w(uint8_t data);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *spriteram, uint16_t tile_bank, uint32_t color);
 
 	template <unsigned N> void vram_w(offs_t offset, u8 data);
 	template <unsigned N> void attr_w(offs_t offset, u8 data);
+	// the lower half of each layer's range accesses the same RAM by column (the low address bits select the row);
+	// cobra draws the left and right sides of a frame and its cockpit struts through it
+	template <unsigned N> u8 vram_column_r(offs_t offset) { return m_vram[N][column_offset(offset)]; }
+	template <unsigned N> void vram_column_w(offs_t offset, u8 data) { vram_w<N>(column_offset(offset), data); }
+	template <unsigned N> u8 attr_column_r(offs_t offset) { return m_attr[N][column_offset(offset)]; }
+	template <unsigned N> void attr_column_w(offs_t offset, u8 data) { attr_w<N>(column_offset(offset), data); }
+	static offs_t column_offset(offs_t offset) { return BIT(offset, 0, 5) << 5 | BIT(offset, 5, 5); }
 	template <unsigned N> TILE_GET_INFO_MEMBER(get_tile_info);
 
 	TIMER_CALLBACK_MEMBER(sound_timing);
@@ -197,11 +203,15 @@ template <unsigned N> void deco_ld_state::attr_w(offs_t offset, u8 data)
 	m_tilemap[N]->mark_tile_dirty(offset);
 }
 
+// each layer has its own character set: layer 0 uses the second half of the graphics ROMs (which
+// starts with solid blocks the games fill it with) like its sprites, layer 1 the first half (the font)
+// the palette is the priority encoder's code for the layer's tiles (see screen_update): 2 for layer 0 (group A),
+// 5 for layer 1 (group B)
 template <unsigned N> TILE_GET_INFO_MEMBER(deco_ld_state::get_tile_info)
 {
 	u8 attr = m_attr[N][tile_index];
-	u16 tile = m_vram[N][tile_index] | (attr & 3) << 8;
-	tileinfo.set(0, tile, 5, 0);
+	u16 tile = m_vram[N][tile_index] | BIT(attr, 0, 2) << 8 | (N ? 0x000 : 0x400);
+	tileinfo.set(0, tile, N ? 5 : 2, 0);
 }
 
 
@@ -213,7 +223,7 @@ void deco_ld_state::video_start()
 	m_tilemap[1]->set_transparent_pen(0);
 
 	// flush palette to all black: ends up using a very similar pattern than the MAME default one ...
-	for (int i = 0; i < 0x800; i++)
+	for (int i = 0; i < 0x40; i++)
 		m_palette->set_pen_color(i, 0, 0, 0);
 }
 
@@ -225,38 +235,18 @@ void deco_ld_state::video_start()
 [+2] y coord
 [+3] x coord
 */
-void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank )
+void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *spriteram, uint16_t tile_bank, uint32_t color)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 
-	for (int i = 0; i < 0x20; i += 4)
+	// the first and last rows of tile RAM
+	for (int list : { 0x000, 0x3e0 })
 	{
-		if (~spriteram[i] & 1)
-			continue;
-
-		int spr_offs = spriteram[i + 1] | tile_bank;
-		int x = spriteram[i + 3];
-		int y = spriteram[i + 2];
-		int col = 6;
-		int fx = (spriteram[i] & 0x04) ? 1 : 0;
-		int fy = (spriteram[i] & 0x02) ? 1 : 0;
-
-		gfx->transpen(bitmap, cliprect, spr_offs, col, fx, fy, x, y, 0);
-	}
-
-	for (int i = 0x3e0; i < 0x400; i += 4)
-	{
-		if (~spriteram[i] & 1)
-			continue;
-
-		int spr_offs = spriteram[i + 1] | tile_bank;
-		int x = spriteram[i + 3];
-		int y = spriteram[i + 2];
-		int col = 6;
-		int fx = (spriteram[i] & 0x04) ? 1 : 0;
-		int fy = (spriteram[i] & 0x02) ? 1 : 0;
-
-		gfx->transpen(bitmap, cliprect, spr_offs, col, fx, fy, x, y, 0);
+		for (int i = list; i < list + 0x20; i += 4)
+		{
+			if (BIT(spriteram[i], 0))
+				gfx->transpen(bitmap, cliprect, spriteram[i + 1] | tile_bank, color, BIT(spriteram[i], 2), BIT(spriteram[i], 1), spriteram[i + 3], spriteram[i + 2], 0);
+		}
 	}
 }
 
@@ -264,10 +254,17 @@ uint32_t deco_ld_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 {
 	bitmap.fill(0, cliprect);
 
-	draw_sprites(bitmap, cliprect, m_vram[1], 0x000);
-	draw_sprites(bitmap, cliprect, m_vram[0], 0x100);
-
+	// a priority encoder (LS148 at 16H on VDO-1) picks the topmost source for each pixel, and its code is also
+	// the palette number: group B "MIX" (6), group B tiles (5), group B "SOFT2" (4), group A "MIX" (3),
+	// group A tiles (2), group A "SOFT2" (1); the games fill palettes 1, 2 and 3 with the same colours, and
+	// 4, 5 and 6 likewise
+	// TODO: tiles and "MIX" come out of one line buffer on VDO-1 (93422 at 11H for group A, through PAL LP1-6)
+	// and "SOFT2" out of another (7F, through PAL LP1-7); neither PAL is dumped, so it isn't known which sprite
+	// list, if either, is "MIX". Both lists stay below their group's tiles: with either above them, garbage
+	// shows when rblaster and cobra fill the whole tile RAM (rows 0 and 31 too) with one tile
+	draw_sprites(bitmap, cliprect, m_vram[0], 0x100, 3);
 	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect, m_vram[1], 0x000, 6);
 	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -291,11 +288,15 @@ void deco_ld_state::main_map(address_map &map)
 	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1005, 0x1005).r(FUNC(deco_ld_state::sound_status_r));
 	map(0x1006, 0x1007).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0x1800, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x2000, 0x23ff).mirror(0x800).ram().w(FUNC(deco_ld_state::vram_w<0>)).share(m_vram[0]);
-	map(0x2400, 0x27ff).mirror(0x800).ram().w(FUNC(deco_ld_state::attr_w<0>)).share(m_attr[0]);
-	map(0x3000, 0x33ff).mirror(0x800).ram().w(FUNC(deco_ld_state::vram_w<1>)).share(m_vram[1]);
-	map(0x3400, 0x37ff).mirror(0x800).ram().w(FUNC(deco_ld_state::attr_w<1>)).share(m_attr[1]);
+	map(0x1800, 0x183f).mirror(0x7c0).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // 93419 64x9 RAM at 5J on VDO-1
+	map(0x2000, 0x23ff).rw(FUNC(deco_ld_state::vram_column_r<0>), FUNC(deco_ld_state::vram_column_w<0>));
+	map(0x2400, 0x27ff).rw(FUNC(deco_ld_state::attr_column_r<0>), FUNC(deco_ld_state::attr_column_w<0>));
+	map(0x2800, 0x2bff).ram().w(FUNC(deco_ld_state::vram_w<0>)).share(m_vram[0]);
+	map(0x2c00, 0x2fff).ram().w(FUNC(deco_ld_state::attr_w<0>)).share(m_attr[0]);
+	map(0x3000, 0x33ff).rw(FUNC(deco_ld_state::vram_column_r<1>), FUNC(deco_ld_state::vram_column_w<1>));
+	map(0x3400, 0x37ff).rw(FUNC(deco_ld_state::attr_column_r<1>), FUNC(deco_ld_state::attr_column_w<1>));
+	map(0x3800, 0x3bff).ram().w(FUNC(deco_ld_state::vram_w<1>)).share(m_vram[1]);
+	map(0x3c00, 0x3fff).ram().w(FUNC(deco_ld_state::attr_w<1>)).share(m_attr[1]);
 	map(0x4000, 0xffff).rom();
 }
 
@@ -513,14 +514,15 @@ void deco_ld_state::rblaster(machine_config &config)
 	m_laserdisc->set_baud(1200);
 	m_laserdisc->serial_tx().set(m_acia, FUNC(acia6850_device::write_rxd));
 	m_laserdisc->set_overlay(256, 256, FUNC(deco_ld_state::screen_update));
-	//m_laserdisc->set_overlay_clip(0, 256-1, 8, 240-1);
+	// the first and last rows of tile RAM hold the sprite lists
+	m_laserdisc->set_overlay_clip(0, 256-1, 8, 248-1);
 	m_laserdisc->add_route(0, "speaker", 1.0, 0);
 	m_laserdisc->add_route(1, "speaker", 1.0, 1);
 
 	/* video hardware */
 	m_laserdisc->add_ntsc_screen(config, "screen");
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rblaster);
-	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 0x800);
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 0x40);
 
 	/* sound hardware */
 	// TODO: mixing with laserdisc
