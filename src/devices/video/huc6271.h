@@ -11,8 +11,8 @@
 
 #pragma once
 
+#include <array>
 #include <functional>
-#include <vector>
 
 
 //**************************************************************************
@@ -56,7 +56,7 @@ private:
 	u16 m_back_y, m_back_u, m_back_v;
 	u16 m_hsync;
 
-	// two 256x16 buffers, YUV888 or (as bytes) palette indices
+	// two 256x16 buffers, YUV888 or palette indices
 	u32 m_buffer[2][256 * 16];
 	s32 m_format[2];
 	u8 m_read_buffer;
@@ -70,18 +70,20 @@ private:
 	u32 m_bit_buffer;
 	int m_bit_count;
 
-	std::vector<lut_entry> m_dc_y_lut, m_dc_uv_lut, m_ac_y_lut, m_ac_uv_lut;
+	// Huffman decoding tables, indexed by the next 9/8/12/12 bits of the stream
+	std::array<lut_entry, 512> m_dc_y_lut;
+	std::array<lut_entry, 256> m_dc_uv_lut;
+	std::array<lut_entry, 4096> m_ac_y_lut, m_ac_uv_lut;
 	double m_idct_cos[8][8];
 
-	static void build_lut(const void *codes, size_t count, int bits, std::vector<lut_entry> &lut);
 	u8 stream_byte();
 	u32 peek_bits(int count);
 	s32 get_signed(int count);
-	u8 get_code(const std::vector<lut_entry> &lut, int bits);
-	s32 get_ac(const std::vector<lut_entry> &lut, int &zeroes);
+	u8 get_code(const lut_entry *lut, int bits);
+	s32 get_ac(const lut_entry *lut, int &zeroes);
 	s32 get_dc_y(int &null_run);
 	s32 get_dc_uv();
-	void decode_coefficients(s32 *dct, const u8 *quant, s32 dc, const std::vector<lut_entry> &lut);
+	void decode_coefficients(s32 *dct, const u8 *quant, s32 dc, const lut_entry *lut);
 	void idct(const s32 *in, u8 *out);
 	void decode_jpeg(int buffer, int size);
 	void decode_rle(int buffer, int type, int size);

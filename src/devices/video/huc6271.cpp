@@ -27,6 +27,7 @@
 #include "huc6271.h"
 
 #include <algorithm>
+#include <bit>
 #include <cmath>
 #include <numbers>
 
@@ -44,7 +45,7 @@ namespace {
 struct huffman_code { u8 length; u16 code; u8 value; };
 
 // DC luminance: 0-e = number of difference bits, f = run of null macroblocks follows, 10+ = new quantization scale
-const huffman_code dc_y_codes[] =
+constexpr huffman_code DC_Y_CODES[] =
 {
 	{ 3, 0x000, 0x00 }, { 3, 0x001, 0x02 }, { 3, 0x002, 0x03 }, { 3, 0x003, 0x04 }, { 3, 0x004, 0x05 },
 	{ 3, 0x005, 0x06 }, { 3, 0x006, 0x07 }, { 4, 0x00e, 0x01 }, { 6, 0x03c, 0x08 }, { 7, 0x07a, 0x09 },
@@ -55,14 +56,14 @@ const huffman_code dc_y_codes[] =
 };
 
 // DC chrominance: number of difference bits
-const huffman_code dc_uv_codes[] =
+constexpr huffman_code DC_UV_CODES[] =
 {
 	{ 2, 0x000, 0x00 }, { 2, 0x001, 0x01 }, { 2, 0x002, 0x02 }, { 3, 0x006, 0x03 }, { 4, 0x00e, 0x04 },
 	{ 5, 0x01e, 0x05 }, { 6, 0x03e, 0x06 }, { 7, 0x07e, 0x07 }, { 8, 0x0fe, 0x08 }, { 8, 0x0ff, 0x09 }
 };
 
 // AC: upper nibble = zero run, lower nibble = number of coefficient bits
-const huffman_code ac_y_codes[] =
+constexpr huffman_code AC_Y_CODES[] =
 {
 	{ 2, 0x000, 0x01 }, { 2, 0x001, 0x02 }, { 3, 0x004, 0x03 }, { 4, 0x00a, 0x04 }, { 4, 0x00b, 0x11 },
 	{ 5, 0x018, 0x05 }, { 5, 0x019, 0x12 }, { 5, 0x01a, 0x21 }, { 5, 0x01f, 0x00 }, { 6, 0x036, 0x06 },
@@ -96,7 +97,7 @@ const huffman_code ac_y_codes[] =
 	{ 12, 0xf7f, 0x10 }
 };
 
-const huffman_code ac_uv_codes[] =
+constexpr huffman_code AC_UV_CODES[] =
 {
 	{ 2, 0x000, 0x01 }, { 2, 0x001, 0x02 }, { 3, 0x004, 0x11 }, { 4, 0x00a, 0x03 }, { 4, 0x00b, 0x21 },
 	{ 5, 0x018, 0x04 }, { 5, 0x019, 0x12 }, { 5, 0x01a, 0x31 }, { 5, 0x01b, 0x41 }, { 5, 0x01f, 0x00 },
@@ -130,7 +131,7 @@ const huffman_code ac_uv_codes[] =
 	{ 12, 0xf7f, 0x10 }
 };
 
-const u8 zigzag[63] =
+constexpr u8 ZIGZAG[63] =
 {
 	0x01, 0x08, 0x10, 0x09, 0x02, 0x03, 0x0a, 0x11,
 	0x18, 0x20, 0x19, 0x12, 0x0b, 0x04, 0x05, 0x0c,
@@ -141,6 +142,21 @@ const u8 zigzag[63] =
 	0x3b, 0x34, 0x2d, 0x26, 0x1f, 0x27, 0x2e, 0x35,
 	0x3c, 0x3d, 0x36, 0x2f, 0x37, 0x3e, 0x3f
 };
+
+// fill a decoding table indexed by the next log2(N) bits of the stream
+template <typename T, size_t N, size_t M>
+void build_lut(const huffman_code (&codes)[M], std::array<T, N> &lut)
+{
+	static_assert(std::has_single_bit(N));
+	constexpr int BITS = std::bit_width(N) - 1;
+	lut.fill(T{ 0, 0 });
+	for (const huffman_code &c : codes)
+	{
+		const int span = BITS - c.length;
+		for (int j = 0; j < (1 << span); j++)
+			lut[(c.code << span) | j] = T{ c.value, c.length };
+	}
+}
 
 } // anonymous namespace
 
@@ -181,32 +197,22 @@ void huc6271_device::amap(address_map &map)
 	map(0x14, 0x15).lw16(NAME([this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_hsync); }));
 }
 
-void huc6271_device::build_lut(const void *codes, size_t count, int bits, std::vector<lut_entry> &lut)
-{
-	const huffman_code *const c = reinterpret_cast<const huffman_code *>(codes);
-	lut.assign(1 << bits, lut_entry{ 0, 0 });
-	for (size_t i = 0; i < count; i++)
-	{
-		const int span = bits - c[i].length;
-		for (int j = 0; j < (1 << span); j++)
-			lut[(c[i].code << span) | j] = lut_entry{ c[i].value, c[i].length };
-	}
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void huc6271_device::device_start()
 {
-	build_lut(dc_y_codes, std::size(dc_y_codes), 9, m_dc_y_lut);
-	build_lut(dc_uv_codes, std::size(dc_uv_codes), 8, m_dc_uv_lut);
-	build_lut(ac_y_codes, std::size(ac_y_codes), 12, m_ac_y_lut);
-	build_lut(ac_uv_codes, std::size(ac_uv_codes), 12, m_ac_uv_lut);
+	build_lut(DC_Y_CODES, m_dc_y_lut);
+	build_lut(DC_UV_CODES, m_dc_uv_lut);
+	build_lut(AC_Y_CODES, m_ac_y_lut);
+	build_lut(AC_UV_CODES, m_ac_uv_lut);
 
 	for (int x = 0; x < 8; x++)
+	{
 		for (int u = 0; u < 8; u++)
 			m_idct_cos[x][u] = (u ? 1.0 : 1.0 / std::numbers::sqrt2) * std::cos((2 * x + 1) * u * std::numbers::pi / 16);
+	}
 
 	save_item(NAME(m_control));
 	save_item(NAME(m_hscroll));
@@ -247,6 +253,7 @@ void huc6271_device::device_reset()
 //  DECODER
 //**************************************************************************
 
+// the block size counts the stuffing byte after an FF too
 u8 huc6271_device::stream_byte()
 {
 	if (m_bytes_left <= 0)
@@ -268,7 +275,7 @@ u32 huc6271_device::peek_bits(int count)
 		m_bit_buffer = (m_bit_buffer << 8) | stream_byte();
 		m_bit_count += 8;
 	}
-	return (m_bit_buffer >> (m_bit_count - count)) & ((1 << count) - 1);
+	return (m_bit_buffer >> (m_bit_count - count)) & util::make_bitmask<u32>(count);
 }
 
 // read a JPEG style magnitude: values below half the range are negative
@@ -283,14 +290,14 @@ s32 huc6271_device::get_signed(int count)
 	return value;
 }
 
-u8 huc6271_device::get_code(const std::vector<lut_entry> &lut, int bits)
+u8 huc6271_device::get_code(const lut_entry *lut, int bits)
 {
 	const lut_entry &entry = lut[peek_bits(bits)];
 	m_bit_count -= entry.length;
 	return entry.value;
 }
 
-s32 huc6271_device::get_ac(const std::vector<lut_entry> &lut, int &zeroes)
+s32 huc6271_device::get_ac(const lut_entry *lut, int &zeroes)
 {
 	const u8 code = get_code(lut, 12);
 	zeroes = code >> 4;
@@ -303,12 +310,14 @@ s32 huc6271_device::get_dc_y(int &null_run)
 	null_run = 0;
 	for (;;)
 	{
-		const u8 code = get_code(m_dc_y_lut, 9);
+		const u8 code = get_code(m_dc_y_lut.data(), 9);
 		if (code < 0xf)
+		{
 			return get_signed(code);
+		}
 		else if (code == 0xf)
 		{
-			get_ac(m_ac_y_lut, null_run);
+			get_ac(m_ac_y_lut.data(), null_run);
 			null_run++;
 			return 0;
 		}
@@ -327,10 +336,10 @@ s32 huc6271_device::get_dc_y(int &null_run)
 
 s32 huc6271_device::get_dc_uv()
 {
-	return get_signed(get_code(m_dc_uv_lut, 8));
+	return get_signed(get_code(m_dc_uv_lut.data(), 8));
 }
 
-void huc6271_device::decode_coefficients(s32 *dct, const u8 *quant, s32 dc, const std::vector<lut_entry> &lut)
+void huc6271_device::decode_coefficients(s32 *dct, const u8 *quant, s32 dc, const lut_entry *lut)
 {
 	dct[0] = s16(quant[0] * dc);
 	int count = 0;
@@ -344,17 +353,19 @@ void huc6271_device::decode_coefficients(s32 *dct, const u8 *quant, s32 dc, cons
 			{
 				// end of block
 				while (count < 63)
-					dct[zigzag[count++]] = 0;
+					dct[ZIGZAG[count++]] = 0;
 				break;
 			}
 			else if (zeroes == 1)
+			{
 				zeroes = 0xf;
+			}
 		}
 		while (zeroes-- && count < 63)
-			dct[zigzag[count++]] = 0;
+			dct[ZIGZAG[count++]] = 0;
 		if (count < 63)
 		{
-			const int index = zigzag[count++];
+			const int index = ZIGZAG[count++];
 			dct[index] = s16(quant[index] * coeff);
 		}
 	}
@@ -365,6 +376,7 @@ void huc6271_device::idct(const s32 *in, u8 *out)
 {
 	double tmp[64];
 	for (int y = 0; y < 8; y++)
+	{
 		for (int u = 0; u < 8; u++)
 		{
 			double sum = 0;
@@ -372,7 +384,9 @@ void huc6271_device::idct(const s32 *in, u8 *out)
 				sum += m_idct_cos[y][v] * in[v * 8 + u];
 			tmp[y * 8 + u] = sum;
 		}
+	}
 	for (int y = 0; y < 8; y++)
+	{
 		for (int x = 0; x < 8; x++)
 		{
 			double sum = 0;
@@ -380,6 +394,7 @@ void huc6271_device::idct(const s32 *in, u8 *out)
 				sum += m_idct_cos[x][u] * tmp[y * 8 + u];
 			out[y * 8 + x] = std::clamp<int>(int(std::lround(sum)) + 0x80, 0, 255);
 		}
+	}
 }
 
 void huc6271_device::decode_jpeg(int buffer, int size)
@@ -399,25 +414,27 @@ void huc6271_device::decode_jpeg(int buffer, int size)
 		if (null_run)
 		{
 			for ( ; null_run && column < 16; null_run--, column++)
+			{
 				for (int y = 0; y < 16; y++)
 					std::fill_n(&dest[y * 256 + column * 16], 16, null_colour);
+			}
 			column--;
 			dc_y = dc_u = dc_v = 0;
 			continue;
 		}
 
 		s32 dct[6][64];
-		decode_coefficients(dct[0], m_quant[0], dc_y, m_ac_y_lut);
+		decode_coefficients(dct[0], m_quant[0], dc_y, m_ac_y_lut.data());
 		dc_y += get_dc_y(null_run);
-		decode_coefficients(dct[1], m_quant[0], dc_y, m_ac_y_lut);
+		decode_coefficients(dct[1], m_quant[0], dc_y, m_ac_y_lut.data());
 		dc_y += get_dc_y(null_run);
-		decode_coefficients(dct[2], m_quant[0], dc_y, m_ac_y_lut);
+		decode_coefficients(dct[2], m_quant[0], dc_y, m_ac_y_lut.data());
 		dc_y += get_dc_y(null_run);
-		decode_coefficients(dct[3], m_quant[0], dc_y, m_ac_y_lut);
+		decode_coefficients(dct[3], m_quant[0], dc_y, m_ac_y_lut.data());
 		dc_u += get_dc_uv();
-		decode_coefficients(dct[4], m_quant[1], dc_u, m_ac_uv_lut);
+		decode_coefficients(dct[4], m_quant[1], dc_u, m_ac_uv_lut.data());
 		dc_v += get_dc_uv();
-		decode_coefficients(dct[5], m_quant[1], dc_v, m_ac_uv_lut);
+		decode_coefficients(dct[5], m_quant[1], dc_v, m_ac_uv_lut.data());
 
 		u8 pix[6][64];
 		for (int i = 0; i < 6; i++)
@@ -425,12 +442,14 @@ void huc6271_device::decode_jpeg(int buffer, int size)
 
 		// luminance blocks: top left, bottom left, top right, bottom right
 		for (int y = 0; y < 16; y++)
+		{
 			for (int x = 0; x < 16; x++)
 			{
 				const int block = ((x >> 3) << 1) | (y >> 3);
 				const int cy = y >> 1, cx = x >> 1;
 				dest[y * 256 + column * 16 + x] = (pix[block][(y & 7) * 8 + (x & 7)] << 16) | (pix[4][cy * 8 + cx] << 8) | pix[5][cy * 8 + cx];
 			}
+		}
 	}
 }
 
@@ -438,8 +457,8 @@ void huc6271_device::decode_rle(int buffer, int type, int size)
 {
 	// F0-F3 = 4-1 bits of colour, the rest of the byte is the run length (0 = in the next byte)
 	const int colour_shift = 4 - (type & 3);
-	const u8 run_mask = (1 << colour_shift) - 1;
-	u8 *const dest = reinterpret_cast<u8 *>(&m_buffer[buffer][0]);
+	const u8 run_mask = util::make_bitmask<u8>(colour_shift);
+	u32 *const dest = &m_buffer[buffer][0];
 	int x = 0;
 
 	while (size > 0)
@@ -500,8 +519,10 @@ void huc6271_device::decode_block(bool first, const fetch_delegate &fetch)
 		size = s16((size_high << 8) | m_fetch()) - 2;
 
 		if (type == 0xff && size <= 0)
+		{
 			for (int i = 0; i < 128; i++, budget--)
 				m_fetch();
+		}
 	} while (size <= 0 && budget > 0);
 
 	if (budget <= 0)
@@ -518,8 +539,10 @@ void huc6271_device::decode_block(bool first, const fetch_delegate &fetch)
 		if (type == 0xff)
 		{
 			for (int q = 0; q < 2; q++)
+			{
 				for (int i = 0; i < 64; i++)
 					m_quant[q][i] = m_quant_base[q][i] = m_fetch();
+			}
 			size -= 128;
 		}
 		decode_jpeg(buffer, size);
@@ -544,7 +567,9 @@ int huc6271_device::fetch_line(u32 *dest)
 	const bool endless = BIT(m_control, 1);
 
 	if (format == FORMAT_NONE)
+	{
 		std::fill_n(dest, 256, 0);
+	}
 	else if (format == FORMAT_YUV)
 	{
 		u32 *const src = &m_buffer[m_read_buffer][m_read_line * 256];
@@ -557,7 +582,7 @@ int huc6271_device::fetch_line(u32 *dest)
 	}
 	else
 	{
-		const u8 *const src = reinterpret_cast<const u8 *>(&m_buffer[m_read_buffer][0]) + m_read_line * 256;
+		const u32 *const src = &m_buffer[m_read_buffer][m_read_line * 256];
 		for (int x = 0; x < 256; x++)
 		{
 			const u16 pos = endless ? ((m_hscroll + x) & 0xff) : ((m_hscroll + x) & 0x1ff);
