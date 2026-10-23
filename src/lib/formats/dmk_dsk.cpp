@@ -8,6 +8,7 @@
 
 TODO:
 - Add write/format support.
+- Honor header write protection and density-independent access (needs core support).
 - Check support on other drivers besides MSX.
 
 *********************************************************************/
@@ -18,12 +19,94 @@ TODO:
 #include "ioprocs.h"
 #include "multibyte.h"
 
-#include <tuple>
+#include <algorithm>
 
 
 namespace {
 
 constexpr int HEADER_SIZE = 16;
+constexpr int TRACK_HEADER_SIZE = 0x80;
+constexpr int MAX_IDAMS = TRACK_HEADER_SIZE / 2;
+
+struct disk_header
+{
+	int tracks;
+	int heads;
+	int track_size;
+	uint8_t flags;
+
+	// Both compact SD images and legacy ignore-density images store FM once.
+	int fm_stride() const { return (flags & 0xc0) ? 1 : 2; }
+};
+
+bool read_header(util::random_read &io, disk_header &disk)
+{
+	uint64_t size;
+	if (io.length(size))
+		return false;
+
+	uint8_t header[HEADER_SIZE];
+	auto const [err, actual] = read_at(io, 0, header, HEADER_SIZE);
+	if (err || actual != HEADER_SIZE)
+		return false;
+
+	if (header[0] != 0x00 && header[0] != 0xff)
+		return false;
+
+	// Native images only; REAL disk specification files are not track dumps.
+	for (int i = 5; i < HEADER_SIZE; i++)
+		if (header[i])
+			return false;
+
+	disk.tracks = header[1];
+	disk.heads = util::BIT(header[4], 4) ? 1 : 2;
+	disk.track_size = get_u16le(&header[2]);
+	disk.flags = header[4];
+	// Retain support for extended track lengths fitting the 14-bit offsets.
+	if (disk.track_size <= TRACK_HEADER_SIZE || disk.track_size > 0x3fff)
+		return false;
+
+	return size == HEADER_SIZE + uint64_t(disk.tracks) * disk.heads * disk.track_size;
+}
+
+bool valid_track(const std::vector<uint8_t> &data)
+{
+	int previous_offset = TRACK_HEADER_SIZE - 1;
+	bool terminated = false;
+	for (int i = 0; i < MAX_IDAMS; i++)
+	{
+		uint16_t const entry = get_u16le(&data[i * 2]);
+		if (!entry)
+		{
+			terminated = true;
+			continue;
+		}
+		int const offset = entry & 0x3fff;
+		if (terminated || offset <= previous_offset || offset >= data.size() || data[offset] != 0xfe)
+			return false;
+		previous_offset = offset;
+	}
+	return true;
+}
+
+// Wrap within the track data, never into the IDAM pointer table.
+int track_offset(const std::vector<uint8_t> &data, int offset)
+{
+	int const length = int(data.size()) - TRACK_HEADER_SIZE;
+	int const relative = (offset - TRACK_HEADER_SIZE) % length;
+	return TRACK_HEADER_SIZE + (relative < 0 ? relative + length : relative);
+}
+
+// DMK retains data bytes, not individual clock bits.  Only change the clocks
+// of sync bytes actually present, including preambles crossing index.
+int sync_count(const std::vector<uint8_t> &data, int offset, uint8_t value)
+{
+	int count = 0;
+	int const limit = std::min(3, int(data.size()) - TRACK_HEADER_SIZE - 1);
+	while (count < limit && data[track_offset(data, offset - count - 1)] == value)
+		count++;
+	return count;
+}
 
 uint32_t wide_fm(uint16_t val)
 {
@@ -72,276 +155,231 @@ const char *dmk_format::extensions() const noexcept
 
 int dmk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	uint64_t size;
-	if (io.length(size))
+	disk_header disk;
+	if (!read_header(io, disk))
 		return 0;
 
-	std::error_condition err;
-	size_t actual;
-
-	uint8_t header[HEADER_SIZE];
-	std::tie(err, actual) = read_at(io, 0, header, HEADER_SIZE);
-	if (err || (HEADER_SIZE != actual))
-		return 0;
-
-	const int tracks_from_header = header[1];
-	const int track_size = get_u16le(&header[2]);
-	const int heads = util::BIT(header[4], 4) ? 1 : 2;
-
-	// The first header byte must be 00 or FF
-	if (header[0] != 0x00 && header[0] != 0xff)
+	std::vector<uint8_t> track_data(disk.track_size);
+	for (int track = 0; track < disk.tracks; track++)
 	{
-		return 0;
-	}
-
-	// Verify reserved/unsupported header bytes
-	for (int i = 5; i < 0x10; i++)
-	{
-		if (header[i] != 0x00)
-			return 0;
-	}
-
-	// Check track size within limits
-	if (track_size < 0x80 || track_size > 0x3fff)
-		return 0;
-
-	const int tracks_in_file = (size - HEADER_SIZE) / (heads * track_size);
-	for (int track = 0; track < tracks_in_file; track++)
-	{
-		for (int head = 0; head < heads; head++)
+		for (int head = 0; head < disk.heads; head++)
 		{
-			// Read track
-			std::vector<uint8_t> track_data(track_size);
-			std::tie(err, actual) = read_at(io, HEADER_SIZE + (heads * track + head) * track_size, &track_data[0], track_size);
-			if (err || track_size != actual)
+			auto const [err, actual] = read_at(io, HEADER_SIZE + (disk.heads * track + head) * disk.track_size, track_data.data(), disk.track_size);
+			if (err || actual != disk.track_size || !valid_track(track_data))
 				return 0;
-
-			// Verify idam entries
-			for (int idam_index = 0; idam_index < 64; idam_index++)
-			{
-				const uint16_t idam_entry = get_u16le(&track_data[2 * idam_index]);
-				if (idam_entry == 0x0000)
-					continue;
-				const uint16_t idam_offset = idam_entry & 0x3fff;
-				if (idam_offset >= track_size)
-					return 0;
-				if (track_data[idam_offset] != 0xfe)
-					return 0;
-			}
 		}
 	}
-	if (size == HEADER_SIZE + heads * tracks_from_header * track_size)
-		return FIFID_HINT|FIFID_SIZE;
-	else
-		return FIFID_HINT;
+	return FIFID_HINT | FIFID_SIZE;
 }
 
 
 bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
 {
-	std::error_condition err;
-	size_t actual;
-
-	uint64_t size;
-	if (io.length(size))
+	disk_header disk;
+	if (!read_header(io, disk))
 		return false;
 
-	uint8_t header[HEADER_SIZE];
-	std::tie(err, actual) = read_at(io, 0, header, HEADER_SIZE);
-	if (err || (HEADER_SIZE != actual))
+	int max_tracks, max_heads;
+	image.get_maximal_geometry(max_tracks, max_heads);
+	if (disk.tracks > max_tracks || disk.heads > max_heads)
 		return false;
 
-	const int track_size = get_u16le(&header[2]);
-	const int heads = util::BIT(header[4], 4) ? 1 : 2;
-	const bool is_sd = util::BIT(header[4], 6);
-	const int tracks = (size - HEADER_SIZE) / (heads * track_size);
+	int const fm_stride = disk.fm_stride();
+	bool has_idam = false;
+	bool has_mfm = false;
 
-	const auto variant = is_sd ? (heads == 2 ? floppy_image::DSSD : floppy_image::SSSD)
-		: (heads == 2 ? floppy_image::DSDD : floppy_image::SSDD);
-	image.set_variant(variant);
-
-	const int fm_stride = is_sd ? 1 : 2;
-
-	for (int track = 0; track < tracks; track++)
+	for (int track = 0; track < disk.tracks; track++)
 	{
-		for (int head = 0; head < heads; head++)
+		for (int head = 0; head < disk.heads; head++)
 		{
-			int fm_loss = 0;
-			std::vector<uint8_t> track_data(track_size);
+			std::vector<uint8_t> track_data(disk.track_size);
 			std::vector<uint32_t> raw_track_data;
-			int mark_location[64 * 2 + 1];
-			uint8_t mark_value[64 * 2 + 1];
-			bool mark_is_mfm[64 * 2 + 1];
-			int iam_location = -1;
 
-			// Read track
-			std::tie(err, actual) = read_at(io, HEADER_SIZE + (heads * track + head) * track_size, &track_data[0], track_size);
-			if (err || track_size != actual)
+			auto const [err, actual] = read_at(io, HEADER_SIZE + (disk.heads * track + head) * disk.track_size, track_data.data(), disk.track_size);
+			if (err || actual != disk.track_size || !valid_track(track_data))
 				return false;
 
-			for (int i = 0; i < 64 * 2 + 1; i++)
+			std::vector<int> idams;
+			for (int i = 0; i < MAX_IDAMS && get_u16le(&track_data[i * 2]); i++)
+				idams.push_back(get_u16le(&track_data[i * 2]) & 0x3fff);
+
+			bool const initial_mfm = idams.empty() ? !util::BIT(disk.flags, 6) : util::BIT(track_data[1], 7);
+			std::vector<bool> encoding(disk.track_size, initial_mfm);
+			std::vector<uint16_t> special(disk.track_size, 0);
+			int const length = disk.track_size - TRACK_HEADER_SIZE;
+			int first_sync = idams.empty() ? TRACK_HEADER_SIZE : idams.front();
+			std::vector<int> encoding_start;
+			int const last_stride = idams.empty() || util::BIT(track_data[(idams.size() - 1) * 2 + 1], 7) ? 1 : fm_stride;
+			int iam_begin = idams.empty() ? TRACK_HEADER_SIZE : idams.back() - length + 7 * last_stride;
+
+			// Use unwrapped offsets to describe density regions through index.
+			for (unsigned index = 0; index < idams.size(); index++)
 			{
-				mark_location[i] = -1;
-				mark_value[i] = 0xfe;
-				mark_is_mfm[i] = !is_sd;    // Use default encoding
+				int const offset = idams[index];
+				bool const mfm = util::BIT(track_data[index * 2 + 1], 7);
+				int const sync = mfm ? sync_count(track_data, offset, 0xa1) : 0;
+				int const previous = index ? idams[index - 1] : idams.back() - length;
+				// Exact density-change positions are not recorded in DMK.  Switch
+				// in the gap before the next ID's sync, without crossing the last ID.
+				encoding_start.push_back(std::max(previous + 1, offset - sync - 8));
+				if (!index)
+					first_sync = offset - sync;
 			}
-			int mark_count = 0;
 
-			// Find IDAM/DAM locations
-			uint16_t track_header_offset = 0;
-			uint16_t track_offset = get_u16le(&track_data[track_header_offset]) & 0x3fff;
-			bool idam_is_mfm = util::BIT(track_data[track_header_offset + 1], 7);
-			track_header_offset += 2;
-
-			while (track_offset != 0 && track_offset >= 0x83 && track_offset < track_size && track_header_offset < 0x80)
+			for (unsigned index = 0; index < idams.size(); index++)
 			{
-				// Assume 3 bytes before IDAM pointers are the start of IDAM indicators
-				int mark_offset = idam_is_mfm ? 3 : 0;
-				mark_location[mark_count] = track_offset - mark_offset;
-				mark_value[mark_count] = 0xfe;
-				mark_is_mfm[mark_count] = idam_is_mfm;
-				mark_count++;
+				int const offset = idams[index];
+				bool const mfm = util::BIT(track_data[index * 2 + 1], 7);
+				int const sync = mfm ? sync_count(track_data, offset, 0xa1) : 0;
+				int const next_idam = index + 1 < idams.size() ? idams[index + 1] : idams.front() + length;
+				int const stride = mfm ? 1 : fm_stride;
+				has_idam = true;
+				has_mfm |= mfm;
 
-				int stride = idam_is_mfm ? 1 : fm_stride;
-				// Scan for DAM location
-				for (int i = track_offset + 10 * stride; i < track_offset + 53 * stride; i++)
+				int const end = index + 1 < idams.size() ? encoding_start[index + 1] : encoding_start.front() + length;
+				for (int i = encoding_start[index]; i < end; i++)
+					encoding[track_offset(track_data, i)] = mfm;
+
+				if (mfm)
 				{
-					if ((track_data[i] >= 0xf8 && track_data[i] <= 0xfb))
-					{
-						if (!idam_is_mfm || get_u16le(&track_data[i - 2]) == 0xa1a1)
-						{
-							mark_location[mark_count] = i - mark_offset;
-							mark_value[mark_count] = track_data[i];
-							mark_is_mfm[mark_count] = idam_is_mfm;
-							mark_count++;
-
-							break;
-						}
-					}
+					for (int i = offset - sync; i < offset; i++)
+						special[track_offset(track_data, i)] = 0x4489;
 				}
+				else
+					special[offset] = 0xf57e; // FE clocked with C7
 
-				idam_is_mfm = util::BIT(track_data[track_header_offset + 1], 7);
-				track_offset = get_u16le(&track_data[track_header_offset]) & 0x3fff;
-				track_header_offset += 2;
-			}
-
-			// Prevent encoding from switching after last sector
-			if (mark_count > 0)
-			{
-				mark_is_mfm[mark_count] = mark_is_mfm[mark_count - 1];
-			}
-
-			// Find IAM location
-			for (int i = mark_location[0] - 1; i >= 3; i--)
-			{
-				// It's usually 3 bytes but several dumped tracks seem to contain only 2 bytes
-				if (track_data[i] == 0xfc && (is_sd || get_u16le(&track_data[i - 2]) == 0xc2c2))
+				// The ID occupies seven bytes including CRC.  DAM locations are
+				// implicit, so search the following gap up to the next ID, not a
+				// fixed gap length.  Do not test the second copy of an FM byte.
+				for (int i = offset + 7 * stride; i < next_idam; i += stride)
 				{
-					iam_location = i - (is_sd ? 0 : 3);
+					int const dam = track_offset(track_data, i);
+					if (track_data[dam] < 0xf8 || track_data[dam] > 0xfb)
+						continue;
+					int const dam_sync = mfm ? sync_count(track_data, dam, 0xa1) : 0;
+					if (mfm && dam_sync < 2)
+						continue;
+					if (mfm)
+					{
+						for (int j = i - dam_sync; j < i; j++)
+							special[track_offset(track_data, j)] = 0x4489;
+					}
+					else
+					{
+						static constexpr uint16_t marks[] = { 0xf56a, 0xf56b, 0xf56e, 0xf56f };
+						special[dam] = marks[track_data[dam] - 0xf8];
+					}
+					if (index + 1 == idams.size())
+					{
+						// The leading gap may follow a data field crossing index.
+						// Keep the IAM search past its standard WD data field/CRC.
+						int const size_code = track_data[track_offset(track_data, offset + 4 * stride)];
+						int const sector_size = 128 << (size_code & 3);
+						iam_begin = i + (sector_size + 3) * stride - length;
+					}
 					break;
 				}
 			}
 
-			int curr_mark = 0;
-			bool enc_mfm = mark_is_mfm[curr_mark];
-			for (int offset = 0x80; offset < track_size; offset++)
+			// IAM encoding follows the first sector, not the FM storage flags.
+			// Step backwards in logical bytes so doubled FM selects the first FC.
+			int const iam_stride = initial_mfm ? 1 : fm_stride;
+			int const iam_end = idams.empty() ? TRACK_HEADER_SIZE + length - (length % iam_stride) : first_sync;
+			for (int i = iam_end - iam_stride; i >= iam_begin; i -= iam_stride)
 			{
-				if (offset == iam_location)
+				int const iam = track_offset(track_data, i);
+				if (track_data[iam] != 0xfc)
+					continue;
+				int iam_sync = 0;
+				if (initial_mfm)
 				{
-					if (!is_sd)
-					{
-						// Write IAM
-						raw_w(raw_track_data, 16, 0x5224);
-						raw_w(raw_track_data, 16, 0x5224);
-						raw_w(raw_track_data, 16, 0x5224);
-						offset += 3;
-					}
-					else
-					{
-						raw_w(raw_track_data, 32, wide_fm(0xf77a)); // FC clocked with D7
-						offset += fm_stride;
-					}
-				}
-
-				// If close to mark, switch encoding
-				if (offset + 8 >= mark_location[curr_mark])
-				{
-					bool new_enc = mark_is_mfm[curr_mark];
-					if (new_enc != enc_mfm)
-					{
-						enc_mfm = new_enc;
-					}
-				}
-				if (offset == mark_location[curr_mark]
-					|| (!enc_mfm && offset - fm_stride + 1 == mark_location[curr_mark])
-					)
-				{
-					if (enc_mfm)
-					{
-						raw_w(raw_track_data, 16, 0x4489);
-						raw_w(raw_track_data, 16, 0x4489);
-						raw_w(raw_track_data, 16, 0x4489);
-						offset += 3;
-						if (fm_stride == 1)
-						{
-							fm_loss += 3;
-						}
-					}
-					else
-					{
-						uint16_t mark;
-						switch (mark_value[curr_mark])
-						{
-							default:
-							case 0xfb: mark = 0xf56f; break;
-							case 0xfa: mark = 0xf56e; break;
-							case 0xf9: mark = 0xf56b; break;
-							case 0xf8: mark = 0xf56a; break;
-							case 0xfe: mark = 0xf57e; break;
-						}
-						raw_w(raw_track_data, 32, wide_fm(mark));
-						offset += fm_stride;
-					}
-					curr_mark++;
-				}
-
-				if (enc_mfm)
-				{
-					if (fm_stride == 1)
-					{
-						fm_loss++;
-					}
-					mfm_w(raw_track_data, 8, track_data[offset]);
+					iam_sync = sync_count(track_data, iam, 0xc2);
+					if (iam_sync < 2)
+						continue;
+					for (int j = i - iam_sync; j < i; j++)
+						special[track_offset(track_data, j)] = 0x5224;
 				}
 				else
-					raw_w(raw_track_data, 32, data_to_wide_fm(track_data[offset]));
-
-
-				if (!enc_mfm)
-					offset += fm_stride - 1;
+					special[iam] = 0xf77a; // FC clocked with D7
+				// The leading gap can belong to the last sector's density until
+				// the IAM establishes the first sector's encoding across index.
+				for (int j = i - iam_sync; j < iam_end; j++)
+					encoding[track_offset(track_data, j)] = initial_mfm;
+				break;
 			}
 
-			if (fm_loss != 0)
+			// Start at a known byte boundary.  An FM byte split by index must be
+			// encoded once in full, then split into its two halves when rotating.
+			int const origin = track_offset(track_data, first_sync);
+			int index_cell = 0;
+			for (int position = 0; position < length; )
 			{
-				if (enc_mfm)
+				int const offset = track_offset(track_data, origin + position);
+				if (offset == TRACK_HEADER_SIZE)
+					index_cell = int(raw_track_data.size());
+				if (encoding[offset])
 				{
-					for (int jj = 0; jj < fm_loss; jj++)
+					if (special[offset])
+						raw_w(raw_track_data, 16, special[offset]);
+					else
+						mfm_w(raw_track_data, 8, track_data[offset]);
+					position++;
+				}
+				else
+				{
+					int count = std::min(fm_stride, length - position);
+					int const next = track_offset(track_data, offset + 1);
+					// A mark or density change can realign doubled FM bytes.
+					if (count == 2 && (encoding[next] || special[next]))
+						count = 1;
+					if (count == 2 && next == TRACK_HEADER_SIZE)
+						index_cell = int(raw_track_data.size()) + 16;
+					uint32_t const word = special[offset] ? wide_fm(special[offset]) : data_to_wide_fm(track_data[offset]);
+					int const bits = count == fm_stride ? 32 : 16;
+					raw_w(raw_track_data, bits, word >> (32 - bits));
+					position += count;
+				}
+			}
+
+			// Only bit 6 selects compact-SD track timing.  Bit 7 also changes FM
+			// storage stride, but must not stretch a normal MFM track to SD size.
+			// Put compact storage's unused time in the gap before the first ID,
+			// rather than inserting it into a field which may cross index.
+			if (util::BIT(disk.flags, 6))
+			{
+				int remaining = (disk.track_size - TRACK_HEADER_SIZE) * 32 - int(raw_track_data.size());
+				while (remaining > 0)
+				{
+					if (encoding[track_offset(track_data, origin - 1)])
 					{
 						mfm_w(raw_track_data, 8, 0x4e);
+						remaining -= 16;
 					}
-				}
-				else
-				{
-					for (int jj = 0; jj < fm_loss/2; jj++)
+					else
 					{
-						raw_w(raw_track_data, 32, data_to_wide_fm(0xff));
+						int const bits = std::min(remaining, 32);
+						raw_w(raw_track_data, bits, data_to_wide_fm(0xff) >> (32 - bits));
+						remaining -= bits;
 					}
 				}
 			}
 
+			// Ordinary MFM clocks at the encoding origin depend on the final
+			// data bit of the revolution, not an implicit preceding zero.
+			if (encoding[origin] && !special[origin])
+			{
+				bool const clock = !(util::BIT(track_data[origin], 7) || (raw_track_data.back() & floppy_image::MG_MASK) == MG_1);
+				raw_track_data[0] = (clock ? MG_1 : MG_0) | (raw_track_data[0] & floppy_image::TIME_MASK);
+			}
+			std::rotate(raw_track_data.begin(), raw_track_data.begin() + index_cell, raw_track_data.end());
 			generate_track_from_levels(track, head, raw_track_data, 0, image);
 		}
 	}
+
+	// Storage size is independent of the encoding actually present on disk.
+	bool const single_density = has_idam ? !has_mfm : util::BIT(disk.flags, 6);
+	image.set_variant(single_density ? (disk.heads == 2 ? floppy_image::DSSD : floppy_image::SSSD)
+		: (disk.heads == 2 ? floppy_image::DSDD : floppy_image::SSDD));
 
 	return true;
 }
