@@ -256,6 +256,8 @@ void galpani2_state::machine_start()
 
 void galpani2_state::machine_reset()
 {
+	m_girl_bitmap_pending_addr = 0;
+	m_girl_bitmap_pending_param = 0;
 	machine().scheduler().perfect_quantum(attotime::from_usec(50)); //initial mcu xchk
 }
 
@@ -273,6 +275,9 @@ void galpani2_state::init_korea()
 
 void galpani2_state::init_special()
 {
+	// SE's scripts place 34 extra images before the shared Japan set.
+	m_bg_image_prefix_count = 34;
+
 	// SE uses field origin x=32 and mask pens 0050/8050.
 	m_field_origin_x = 32;
 	m_mask_girl_pen = 0x8050;
@@ -323,102 +328,89 @@ void galpani2_state::galpani2_mcu_init_w(uint8_t data)
 	m_subcpu->set_input_line(INPUT_LINE_IRQ7, HOLD_LINE); //MCU Initialised
 }
 
-// Generate a girl-area bitmap by scanning the compressed image stream
-// from the background ROMs. The MCU walks the RLE data and checks the
-// skip bit in each control byte: skip runs are background (not girl),
-// non-skip runs are girl pixels. This produces a 256x224-bit coverage
-// bitmap (7,168 bytes) that the main CPU expands into BG8 pen values.
+// Generate a girl-area bitmap by sampling the BG15 framebuffer after
+// the sub CPU finishes decoding. Decoded pixels have bit 15 set;
+// background/padding pixels do not. The destination address from the
+// sub CPU's parameter block tells us which BG15 plane to read.
 static constexpr int      FIELD_COLS         = 256;
 static constexpr int      FIELD_ROWS         = 224;
 
-uint16_t galpani2_state::generate_girl_bitmap(uint32_t image_offset)
+uint16_t galpani2_state::generate_girl_bitmap(uint32_t dest_addr)
 {
-	memory_region &rom = *memregion("subdata");
-	if (!image_offset || image_offset + 6 > rom.bytes())
+	// Derive BG15 plane from the sub CPU framebuffer destination.
+	if (dest_addr < 0x400000 || dest_addr >= 0x600000)
+		return 0;
+	int const plane = (dest_addr - 0x400000) / 0x40000;
+
+	uint16_t const *const ram  = &m_bg15[plane * 0x20000];
+	uint16_t const *const regs = &m_bg15[0x80000 + plane * 0x20000];
+	if (!(regs[0xc02 / 2] & 1))
 		return 0;
 
-	// ROM_REGION16_BE stores host-order words. Read logical big-endian bytes.
-	auto byte = [&rom](uint32_t offset) -> uint8_t {
-		return rom.as_u16(offset / 2) >> ((offset & 1) ? 0 : 8);
-	};
-	auto word = [&byte](uint32_t offset) -> uint16_t {
-		return (uint16_t(byte(offset)) << 8) | byte(offset + 1);
-	};
+	int const scrollx = regs[0x400 / 2] + 0x42;
+	int const scrolly = regs[0xc00 / 2] + 0x0b;
 
-	uint16_t const kind = word(image_offset);
-	uint32_t position = image_offset + 2;
-	uint32_t total_pixels = 256 * 256;
+	uint16_t popcount = 0;
+	int byte_idx = 0;
+	address_space &mspace = m_maincpu->space(AS_PROGRAM);
 
-	if (kind == 0x20)
+	for (int row = 0; row < FIELD_ROWS; row++)
 	{
-		uint16_t const h = word(position);
-		uint16_t const w = word(position + 2);
-		position += 4;
-		total_pixels = (h + 1) * (w + 1);
-	}
-	else if (kind != 0x30 && kind != 0x50)
-		return 0;
-
-	std::array<uint8_t, FIELD_COLS * FIELD_ROWS / 8> bitmap{};
-	uint32_t pixel = 0;
-	uint16_t total = 0;
-	while (pixel < total_pixels)
-	{
-		if (position >= rom.bytes())
-			break;
-		uint8_t const control = byte(position++);
-		uint32_t count;
-		if (kind == 0x50)
+		for (int longword = 0; longword < 8; longword++)
 		{
-			count = control & 0x3f;
-			if (control & 0x40)
+			uint32_t bits = 0;
+			for (int bit = 31; bit >= 0; bit--)
 			{
-				if (position >= rom.bytes())
-					break;
-				count = (count << 8) | byte(position++);
-			}
-		}
-		else
-			count = control & 0x7f;
-		count = std::min(count + 1, total_pixels - pixel);
-
-		bool const skip = (kind != 0x20) ? BIT(control, 7) : false;
-		bool const repeat = (kind == 0x20) && BIT(control, 7);
-		uint32_t const data_bytes = skip ? 0 : (repeat ? 2 : count * 2);
-		if (position + data_bytes > rom.bytes())
-			break;
-
-		if (!skip)
-		{
-			// Non-skip pixels are girl content. Mark them in the bitmap.
-			// The field covers rows 16..239 of the 256-row image.
-			for (uint32_t i = 0; i < count; ++i)
-			{
-				uint32_t const p = pixel + i;
-				if (p >= 16 * 256 && p < 240 * 256)
+				int const bx = longword * 32 + (31 - bit);
+				int const bg15_col = (m_field_origin_x + bx + scrollx) & 0x1ff;
+				int const bg15_row = (8 + row + scrolly) & 0xff;
+				uint16_t const pen = ram[bg15_row * 0x200 + bg15_col];
+				if (BIT(pen, 15) && (pen & 0x7fff) > 1)
 				{
-					uint32_t const bit = p - 16 * 256;
-					if (bit < FIELD_COLS * FIELD_ROWS)
-					{
-						bitmap[bit / 8] |= 0x80 >> (bit & 7);
-						++total;
-					}
+					bits |= (1u << bit);
+					popcount++;
 				}
 			}
+			mspace.write_byte(GIRL_BITMAP_ADDR + byte_idx + 0, (bits >> 24) & 0xff);
+			mspace.write_byte(GIRL_BITMAP_ADDR + byte_idx + 1, (bits >> 16) & 0xff);
+			mspace.write_byte(GIRL_BITMAP_ADDR + byte_idx + 2, (bits >> 8) & 0xff);
+			mspace.write_byte(GIRL_BITMAP_ADDR + byte_idx + 3, bits & 0xff);
+			byte_idx += 4;
 		}
-		position += data_bytes;
-		pixel += count;
 	}
+	if (!popcount)
+		popcount = 1;
 
-	if (!total)
-		return 0;
+	logerror("MCU girl bitmap: plane %d dest %06x, %d pixels\n", plane, dest_addr, popcount);
+	return popcount;
+}
 
-	address_space &mspace = m_maincpu->space(AS_PROGRAM);
-	for (unsigned i = 0; i < bitmap.size(); ++i)
-		mspace.write_byte(GIRL_BITMAP_ADDR + i, bitmap[i]);
+void galpani2_state::update_girl_bitmap()
+{
+	if (!m_girl_bitmap_pending_addr || !m_girl_bitmap_pending_param)
+		return;
 
-	logerror("MCU girl bitmap: image at %08x, %u girl pixels\n", image_offset, unsigned(total));
-	return total;
+	// The sub CPU writes the BG15 destination at param+4 after decode setup.
+	address_space &sub = m_subcpu->space(AS_PROGRAM);
+	uint32_t const dest = sub.read_dword(m_girl_bitmap_pending_param + 4);
+	if (dest < 0x400000 || dest >= 0x600000)
+		return;
+
+	// Wait for the scroll register to flip to the decoded half.
+	int const plane = (dest - 0x400000) / 0x40000;
+	uint16_t const *const regs = &m_bg15[0x80000 + plane * 0x20000];
+	uint32_t const scroll_col = (regs[0x400 / 2] + 0x42 + m_field_origin_x) & 0x1ff;
+	uint32_t const dest_col = (dest / 2) & 0x1ff;
+	if (scroll_col != dest_col)
+		return;
+
+	uint16_t const total = generate_girl_bitmap(dest);
+	address_space &main = m_maincpu->space(AS_PROGRAM);
+	main.write_word(m_girl_bitmap_pending_addr + 2, GIRL_BITMAP_OFFSET);
+	main.write_word(m_girl_bitmap_pending_addr, total);
+	logerror("MCU girl bitmap: reply %u pixels\n", unsigned(total));
+	m_girl_bitmap_pending_addr = 0;
+	m_girl_bitmap_pending_param = 0;
 }
 
 void galpani2_state::galpani2_mcu_nmi1()
@@ -471,33 +463,15 @@ void galpani2_state::galpani2_mcu_nmi1()
 			continue;
 
 		default: {
-			// Girl-area bitmap request. The command byte encodes
-			// girl_image_index + 0x10 (from tables at main ROM 0x196A).
-			// Look up the ROM offset and decompress the image stream to
-			// extract coverage (skip = background, non-skip = girl).
-			uint16_t const img = command - 0x10;
-			uint32_t iadr = 0;
-			if (img < m_bg_image_prefix_count)
-				iadr = m_bg_image_prefix_offsets[img];
-			else if (uint32_t(img) - m_bg_image_prefix_count < m_bg_image_offsets.size())
-				iadr = m_bg_image_offsets[img - m_bg_image_prefix_count];
-
-			logerror("MCU master %02x:%06x: girl bitmap cmd %02x (image %02x -> offset %08x)\n",
-				slot, address, command, img, iadr);
-
-			uint16_t const total = iadr ? generate_girl_bitmap(iadr) : 0;
-			if (total)
-			{
-				mspace.write_word(address + 2, GIRL_BITMAP_OFFSET);
-				mspace.write_word(address, total);
-			}
-			else
-			{
-				// No valid image — acknowledge immediately so the
-				// main CPU doesn't hang polling for a response.
-				mspace.write_word(address, 0xffff);
-			}
-			continue;  // skip the generic FFFF write below
+			// Girl-area bitmap request. Defer the response until
+			// the sub CPU finishes decoding the image to BG15.
+			// update_girl_bitmap samples the framebuffer each frame.
+			logerror("MCU master %02x:%06x: girl bitmap cmd %02x pending\n",
+				slot, address, command);
+			mspace.write_word(address, 0);
+			m_girl_bitmap_pending_addr = address;
+			m_girl_bitmap_pending_param = 0;
+			continue;
 		}
 
 		}
@@ -527,14 +501,30 @@ void galpani2_state::galpani2_mcu_nmi2()
 		case 0x0c: { // Resolve an image ID to a raw offset in the background ROMs.
 			uint16_t const img = sspace.read_word(address);
 			uint32_t iadr = 0;
-			if (img < m_bg_image_prefix_count)
-				iadr = m_bg_image_prefix_offsets[img];
-			else if (uint32_t(img) - m_bg_image_prefix_count < imlist_count)
-				iadr = m_bg_image_offsets[img - m_bg_image_prefix_count];
+			{
+				// SE's sub CPU scripts place 34 extra images before the
+				// shared set: IDs 0-33 map to the end of the ROM table,
+				// IDs 34+ map to the beginning. Other sets use direct indexing.
+				uint16_t rom_idx = img;
+				if (m_bg_image_prefix_count)
+				{
+					if (img < m_bg_image_prefix_count)
+						rom_idx = imlist_count - m_bg_image_prefix_count + img;
+					else
+						rom_idx = img - m_bg_image_prefix_count;
+				}
+				if (rom_idx < imlist_count)
+					iadr = m_bg_image_offsets[rom_idx];
+			}
 			// The ROM script interpreter selects the bank and reads the header.
 			// It then queues the appropriate native decompressor with this raw offset.
 			logerror("MCU slave %02x:%06x: image lookup %04x -> %08x\n", slot, address, img, iadr);
 			sspace.write_dword(address + 2, iadr);
+			// Bind this lookup to a pending girl bitmap request.
+			// The sub CPU will write the BG15 destination at address+6
+			// after setting up the decode. update_girl_bitmap reads it.
+			if (m_girl_bitmap_pending_addr && !m_girl_bitmap_pending_param && iadr)
+				m_girl_bitmap_pending_param = address + 2;
 			break;
 		}
 
@@ -846,7 +836,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt2)
 
 	if(scanline == 240)
 	{
-		// Girl bitmap is now generated immediately in the NMI1 handler.
+		update_girl_bitmap();
 		m_subcpu->set_input_line(5, HOLD_LINE);
 	}
 
