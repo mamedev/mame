@@ -757,9 +757,6 @@ void model2_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &clipr
 			int r = m_colorxlat[0x0080 / 2 + ((fbvram[offset] >> 5) & 0x1f) * 0x100];
 			int g = m_colorxlat[0x4080 / 2 + ((fbvram[offset] >> 10) & 0x1f) * 0x100];
 			int b = m_colorxlat[0x8080 / 2 + ((fbvram[offset] >> 0) & 0x1f) * 0x100];
-			r = m_gamma_table[r];
-			g = m_gamma_table[g];
-			b = m_gamma_table[b];
 			bitmap.pix(y, x) = r << 16 | g << 8 | b;
 		}
 	}
@@ -2384,16 +2381,6 @@ void model2_state::video_start()
 	m_fbvramA = make_unique_clear<u16[]>(0x80000/2);
 	m_fbvramB = make_unique_clear<u16[]>(0x80000/2);
 
-	// convert color space; this works OK for most games
-	// real cabinets probably have their monitors calibrated depending on the game
-	// optimal settings for vf2, fvipers and schamp are bias 64, gain 51
-	for (int i = 0; i < 256; i++)
-	{
-		double raw_value = std::max(((double)i - 64.0) * 255.0 / 191.0, 0.0);
-		m_gamma_table[i] = (u8)raw_value;
-//      printf("%02x: %02x %lf\n",i,m_gamma_table[i],raw_value);
-	}
-
 	save_item(NAME(m_render_test_mode));
 	save_item(NAME(m_render_unk));
 	save_item(NAME(m_render_mode));
@@ -2401,7 +2388,6 @@ void model2_state::video_start()
 	save_pointer(NAME(m_palram), 0x4000/2);
 	save_pointer(NAME(m_colorxlat), 0xc000/2);
 	save_pointer(NAME(m_lumaram), 0x8000);
-	save_pointer(NAME(m_gamma_table), 256);
 }
 
 u32 model2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -2415,9 +2401,6 @@ u32 model2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 			u8 r = m_colorxlat[0x0080 / 2 + ((palcolor >> 0) & 0x1f) * 0x100];
 			u8 g = m_colorxlat[0x4080 / 2 + ((palcolor >> 5) & 0x1f) * 0x100];
 			u8 b = m_colorxlat[0x8080 / 2 + ((palcolor >> 10) & 0x1f) * 0x100];
-			r = m_gamma_table[r];
-			g = m_gamma_table[g];
-			b = m_gamma_table[b];
 			m_palette->set_pen_color(i, r, g, b);
 		}
 	}

@@ -48,7 +48,6 @@ void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& exte
 	model2_state *state = object.state;
 	u32 *const p = &m_destmap.pix(scanline);
 	u8 *const fill = &m_fillmap.pix(scanline);
-	u8  *gamma_value = &state->m_gamma_table[0];
 
 	// extract color information
 	const u16 *colortable_r = &state->m_colorxlat[0x0000/2];
@@ -77,9 +76,6 @@ void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& exte
 	tr = colortable_r[(luma)] & 0xff;
 	tg = colortable_g[(luma)] & 0xff;
 	tb = colortable_b[(luma)] & 0xff;
-	tr = gamma_value[tr];
-	tg = gamma_value[tg];
-	tb = gamma_value[tb];
 
 	// build the final color
 	color = rgb_t(tr, tg, tb);
@@ -256,7 +252,6 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 	u32  colorbase = object.colorbase;
 	u32  lumabase = object.lumabase;
 	u8   checker = object.checker;
-	u8  *gamma_value = &state->m_gamma_table[0];
 	float ooz = extent.param[0].start;
 	float uoz = extent.param[1].start;
 	float voz = extent.param[2].start;
@@ -344,9 +339,6 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 		u32 tr = colortable_r[luma] & 0xff;
 		u32 tg = colortable_g[luma] & 0xff;
 		u32 tb = colortable_b[luma] & 0xff;
-		tr = gamma_value[tr];
-		tg = gamma_value[tg];
-		tb = gamma_value[tb];
 
 		p[x] = rgb_t(tr, tg, tb);
 		fill[x] = 0xff;

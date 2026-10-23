@@ -370,9 +370,6 @@ void model2_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 	u8 r = m_colorxlat[(0x0080 >> 1) + (((palcolor >> 0) & 0x1f) << 8)];
 	u8 g = m_colorxlat[(0x4080 >> 1) + (((palcolor >> 5) & 0x1f) << 8)];
 	u8 b = m_colorxlat[(0x8080 >> 1) + (((palcolor >> 10) & 0x1f) << 8)];
-	r = m_gamma_table[r];
-	g = m_gamma_table[g];
-	b = m_gamma_table[b];
 	m_palette->set_pen_color(offset, r, g, b);
 }
 
