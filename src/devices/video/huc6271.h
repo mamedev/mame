@@ -66,7 +66,7 @@ private:
 
 	// bit reader state, only used while decoding
 	fetch_delegate m_fetch;
-	s32 m_bits_left;
+	s32 m_bytes_left;
 	u32 m_bit_buffer;
 	int m_bit_count;
 

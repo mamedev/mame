@@ -11,7 +11,8 @@
     - F0-F3: run-length encoded palette indices, 4/3/2/1 bits of colour per byte;
     - F8: JPEG-like 16x16 macroblocks (Y 4x 8x8, U and V 8x8 at half resolution);
     - FF: as F8, preceded by 2x 64 byte Y/UV quantization tables.
-    An FF byte inside the data is followed by a stuffing byte.
+    An FF byte inside the data is followed by a stuffing byte, which the
+    block size counts.
 
     The Huffman codes are the encoder tables of Hudson's MPCONV2.EXE (GMAKER PC-FXGA
     SDK, 1995).
@@ -248,12 +249,15 @@ void huc6271_device::device_reset()
 
 u8 huc6271_device::stream_byte()
 {
-	if (m_bits_left <= 0)
+	if (m_bytes_left <= 0)
 		return 0;
 	const u8 data = m_fetch();
+	m_bytes_left--;
 	if (data == 0xff)
+	{
 		m_fetch();
-	m_bits_left--;
+		m_bytes_left--;
+	}
 	return data;
 }
 
@@ -380,7 +384,7 @@ void huc6271_device::idct(const s32 *in, u8 *out)
 
 void huc6271_device::decode_jpeg(int buffer, int size)
 {
-	m_bits_left = size;
+	m_bytes_left = size;
 	m_bit_buffer = 0;
 	m_bit_count = 0;
 
