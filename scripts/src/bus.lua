@@ -2596,6 +2596,28 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/heathzenith/et3400/exp.h,BUSES["HEATHZENITH_ET3400"] = true
+---------------------------------------------------
+
+if BUSES["HEATHZENITH_ET3400"] then
+	files {
+		MAME_DIR .. "src/devices/bus/heathzenith/et3400/eta3400.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/et3400/eta3400.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/et3400/exp.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/et3400/exp.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/heathzenith/et3400/eta3400.cpp", GEN_DIR .. "emu/layout/eta3400.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "eta3400"),
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/heathzenith/h19/tlb.h,BUSES["HEATHZENITH_H19"] = true
 ---------------------------------------------------
 
