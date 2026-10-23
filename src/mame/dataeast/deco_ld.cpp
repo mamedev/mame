@@ -11,10 +11,8 @@ LDP-1000A player through the 6850 ACIA, whose receive interrupt is its only
 IRQ (the coins are on NMI). The player is emulated as the LDP-1000A.
 
 TODO:
-- "SOUND TEST READ ERROR";
 - video color offsets are a mystery, where it gets calculated from?
 - Bega's Battle VBLANK hack;
-- CPU clocks;
 - dip-switches;
 - clean-ups;
 
@@ -151,11 +149,12 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
+	required_device<cpu_device> m_audiocpu;
 	required_device<sony_ldp1000_device> m_laserdisc;
 	required_device<acia6850_device> m_acia;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -166,7 +165,8 @@ private:
 	required_shared_ptr_array<uint8_t, 2> m_vram;
 	required_shared_ptr_array<uint8_t, 2> m_attr;
 
-	int m_nmimask = 0;
+	uint8_t m_sound_nmi_enable = 0;
+	emu_timer *m_sound_timer = nullptr;
 	tilemap_t *m_tilemap[2];
 
 	void main_map(address_map &map) ATTR_COLD;
@@ -175,14 +175,14 @@ private:
 	uint8_t sound_status_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	[[maybe_unused]] void nmimask_w(uint8_t data);
+	void sound_nmi_enable_w(uint8_t data);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
 
 	template <unsigned N> void vram_w(offs_t offset, u8 data);
 	template <unsigned N> void attr_w(offs_t offset, u8 data);
 	template <unsigned N> TILE_GET_INFO_MEMBER(get_tile_info);
 
-	INTERRUPT_GEN_MEMBER(sound_interrupt);
+	TIMER_CALLBACK_MEMBER(sound_timing);
 };
 
 template <unsigned N> void deco_ld_state::vram_w(offs_t offset, u8 data)
@@ -274,10 +274,11 @@ uint32_t deco_ld_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 }
 
 
-/* unknown, but certainly related to audiocpu somehow */
 uint8_t deco_ld_state::sound_status_r()
 {
-	return 0xff ^ 0x40;
+	// bit 7: the sound CPU has written a reply, bit 6: the sound CPU hasn't read the last command yet
+	// (cobra's sound test waits for these and checks that the sound CPU echoes the command)
+	return (m_soundlatch2->pending_r() << 7) | (m_soundlatch->pending_r() << 6) | 0x3f;
 }
 
 void deco_ld_state::main_map(address_map &map)
@@ -301,26 +302,34 @@ void deco_ld_state::main_map(address_map &map)
 
 /* sound arrangement is practically identical to Zero Target. */
 
-void deco_ld_state::nmimask_w(uint8_t data)
+void deco_ld_state::sound_nmi_enable_w(uint8_t data)
 {
-	m_nmimask = data & 0x80;
+	// LS74 at 10D on VDO-2 latches data bit 0 (cobra keeps it clear while it initialises)
+	m_sound_nmi_enable = BIT(data, 0);
 }
 
-INTERRUPT_GEN_MEMBER(deco_ld_state::sound_interrupt)
+TIMER_CALLBACK_MEMBER(deco_ld_state::sound_timing)
 {
-	if (!m_nmimask) device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	// "SOUND TIMING" is bit 4 of the vertical counter (inverted by 11C on VDO-1), gated by the enable: eight
+	// pulses per field (the screen counts every line twice; the counter's phase in the field isn't verified)
+	if (m_sound_nmi_enable)
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	const int next = (param + 64) % 512;
+	m_sound_timer->adjust(m_screen->time_until_pos(next), next);
 }
 
 
 void deco_ld_state::sound_map(address_map &map)
 {
-	map(0x0000, 0x01ff).ram();
+	map(0x0000, 0x07ff).ram(); // 58725 at 14C on VDO-2
 	map(0x2000, 0x2000).w("ay1", FUNC(ay8910_device::data_w));
 	map(0x4000, 0x4000).w("ay1", FUNC(ay8910_device::address_w));
 	map(0x6000, 0x6000).w("ay2", FUNC(ay8910_device::data_w));
 	map(0x8000, 0x8000).w("ay2", FUNC(ay8910_device::address_w));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
-	map(0xe000, 0xffff).rom();
+	map(0xc000, 0xc000).w(FUNC(deco_ld_state::sound_nmi_enable_w));
+	// TODO: 0xb000 reads a status port (LP2-4), unused by the games
+	map(0xe000, 0xffff).rom().nopw(); // rblaster writes to 0xe600 once, which doesn't select anything
 }
 
 int deco_ld_state::begas_vblank_r()
@@ -464,17 +473,28 @@ GFXDECODE_END
 
 void deco_ld_state::machine_start()
 {
+	m_sound_timer = timer_alloc(FUNC(deco_ld_state::sound_timing), this);
+
+	save_item(NAME(m_sound_nmi_enable));
+}
+
+void deco_ld_state::machine_reset()
+{
+	// reset clears the latch at 10D on VDO-2
+	m_sound_nmi_enable = 0;
+	m_sound_timer->adjust(m_screen->time_until_pos(32), 32);
 }
 
 void deco_ld_state::rblaster(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 8000000/2);
+	// the AF-8 PROM at 2F on VDO-1, which also times DSP SEL, shapes the CPU clock from the 12 MHz clock
+	M6502(config, m_maincpu, 12_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_ld_state::main_map);
 
-	M6502(config, m_audiocpu, 8000000/2);
+	// 3 MHz from VDO-1 divided by 2 by the LS161 at 8D on VDO-2 (jumpers J1 and J2)
+	M6502(config, m_audiocpu, 12_MHz_XTAL / 4 / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &deco_ld_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(deco_ld_state::sound_interrupt), attotime::from_hz(640));
 
 //  config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -511,9 +531,9 @@ void deco_ld_state::rblaster(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.25, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
+	AY8910(config, "ay1", 12_MHz_XTAL / 4 / 2).add_route(ALL_OUTPUTS, "speaker", 0.25, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 
-	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.25, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
+	AY8910(config, "ay2", 12_MHz_XTAL / 4 / 2).add_route(ALL_OUTPUTS, "speaker", 0.25, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 }
 
 void deco_ld_state::cobraa(machine_config &config)
