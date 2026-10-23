@@ -42,7 +42,6 @@ public:
 
 	void init_alighunt() ATTR_COLD;
 	void init_luckyclrs() ATTR_COLD;
-	void init_play2000() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;

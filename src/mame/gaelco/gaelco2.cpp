@@ -41,7 +41,6 @@
 #include "gaelco_ds5002fp.h"
 
 #include "cpu/mcs51/ds5002fp.h"
-#include "machine/eepromser.h"
 #include "sound/gaelco.h"
 
 #include "layout/generic.h"
@@ -520,6 +519,7 @@ void gaelco2_state::saltcrdi(machine_config &config)
 
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
+	m_global_spritexoff = 1; // aligns flashing sprites with backgrounds
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
@@ -925,11 +925,6 @@ static INPUT_PORTS_START( play2000 )
 INPUT_PORTS_END
 
 
-void gaelco2_state::init_play2000()
-{
-	m_global_spritexoff = 1; // aligns flashing sprites with backgrounds
-}
-
 ROM_START( play2000 )
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "tms27c010a.2", 0x000000, 0x020000, CRC(598102f9) SHA1(66fb6d321c886099b99d048d1f9f13cf016b9c43) )
@@ -1185,6 +1180,7 @@ void gaelco2_state::play2000(machine_config &config)
 
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
+	m_global_spritexoff = 1; // aligns flashing sprites with backgrounds
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
@@ -1221,6 +1217,7 @@ void gaelco2_state::srollnd(machine_config& config)
 
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
+	m_global_spritexoff = 1; // aligns flashing sprites with backgrounds
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(59.1);
@@ -3367,27 +3364,27 @@ GAME( 1999, bangjb,      bang,      bang,             bang,     bang_state,     
 // Hardware manufactured by Gaelco for Nova Desitec but without any Gaelco branding.
 
 // 2-in-1 gambling game, these are Italian versions, English versions also exist
-GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state,      init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v7.0i) (Italy)", 0 )
+GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state,      empty_init,     ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v7.0i) (Italy)", 0 )
 GAME( 1999, play2000_50i,play2000,  play2000,         play2000, gaelco2_state,      empty_init,     ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.0i) (Italy)", MACHINE_NOT_WORKING ) // bad dump
-GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state,      init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)", 0 )
+GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state,      empty_init,     ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)", 0 )
 
 GAME( 1999, luckyclrs,   0,         play2000,         play2000, gaelco2_state,      init_luckyclrs, ROT0, "Nova Desitec", "Lucky Colors (v1.1i) (Italy)", MACHINE_NOT_WORKING ) // missing ds5002fp dump
 
-GAME( 1998, srollnd,     0,         srollnd,          play2000, gaelco2_state,      init_play2000,  ROT0, "Nova Desitec", "Super Roller (v7.0)",  MACHINE_NOT_WORKING ) // missing ds5002fp dump
+GAME( 1998, srollnd,     0,         srollnd,          play2000, gaelco2_state,      empty_init,     ROT0, "Nova Desitec", "Super Roller (v7.0)",  MACHINE_NOT_WORKING ) // missing ds5002fp dump
 
-GAME( 1999, chmppool,    0,         srollnd,          play2000, gaelco2_state,      init_play2000,  ROT0, "Nova Desitec", "Champion Pool (v1.0)", MACHINE_NOT_WORKING ) // missing ds5002fp dump
+GAME( 1999, chmppool,    0,         srollnd,          play2000, gaelco2_state,      empty_init,     ROT0, "Nova Desitec", "Champion Pool (v1.0)", MACHINE_NOT_WORKING ) // missing ds5002fp dump
 
-GAME( 1999, jungleani,   0,         srollnd,          play2000, gaelco2_state,      init_play2000,  ROT0, "New Impeuropex Corp. / New Chitarrina", "Jungle's Animals (v3.0)", MACHINE_NOT_WORKING ) // Developed by Nova Desitec, missing ds5002fp dump
+GAME( 1999, jungleani,   0,         srollnd,          play2000, gaelco2_state,      empty_init,     ROT0, "New Impeuropex Corp. / New Chitarrina", "Jungle's Animals (v3.0)", MACHINE_NOT_WORKING ) // Developed by Nova Desitec, missing ds5002fp dump
 
 
 /* Gym equipment.
    Pro Reclimber Tele Cardioline has the same PCB and ROMs as Pro Cycle Tele Cardioline.
    There are other devices in Cardioline series but they don't use displays and aren't on Gaelco hardware. */
 
-GAME( 2000, sltpcycl,   0,          saltcrdi,         saltcrdi, gaelco2_state,      init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 02AB)",      0 ) // 18/Jan/2000
-GAME( 1999, sltpcycla,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,      init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum DECA)",      0 ) // 20/Nov/1999
-GAME( 1997, sltpcyclb,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,      init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 3523)",      0 ) // 07/Apr/1997
-GAME( 199?, sltpcyclc,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,      init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, unknown version)",           MACHINE_NOT_WORKING ) // missing GFX ROMs
+GAME( 2000, sltpcycl,   0,          saltcrdi,         saltcrdi, gaelco2_state,      empty_init,     ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 02AB)",      0 ) // 18/Jan/2000
+GAME( 1999, sltpcycla,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,      empty_init,     ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum DECA)",      0 ) // 20/Nov/1999
+GAME( 1997, sltpcyclb,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,      empty_init,     ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 3523)",      0 ) // 07/Apr/1997
+GAME( 199?, sltpcyclc,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,      empty_init,     ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, unknown version)",           MACHINE_NOT_WORKING ) // missing GFX ROMs
 
-GAME( 1998, sltpstep,   0,          saltcrdi,         saltcrdi, gaelco2_state,      init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, V.1.0, checksum 2B83)", 0 ) // 23/Jan/1998
-GAME( 1997, sltpstepa,  sltpstep,   saltcrdi,         saltcrdi, gaelco2_state,      init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, V.1.0, checksum F208)", 0 ) // 07/Apr/1997
+GAME( 1998, sltpstep,   0,          saltcrdi,         saltcrdi, gaelco2_state,      empty_init,     ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, V.1.0, checksum 2B83)", 0 ) // 23/Jan/1998
+GAME( 1997, sltpstepa,  sltpstep,   saltcrdi,         saltcrdi, gaelco2_state,      empty_init,     ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, V.1.0, checksum F208)", 0 ) // 07/Apr/1997
