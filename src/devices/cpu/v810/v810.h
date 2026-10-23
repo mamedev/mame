@@ -103,6 +103,7 @@ protected:
 	virtual uint32_t execute_min_cycles() const noexcept override { return 3; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 6; }
 	virtual void execute_run() override;
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == INPUT_LINE_NMI; }
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
@@ -133,6 +134,7 @@ private:
 	uint32_t m_reg[65]{};
 	uint16_t m_irq_state;
 	uint8_t m_nmi_line;
+	bool m_nmi_pending;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_program;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_io;
@@ -233,6 +235,7 @@ private:
 	inline uint32_t bs_access(offs_t addr, int access);
 	inline bool bs_suspend(uint32_t cycles) const;
 	inline bool irq_acceptable() const;
+	void take_nmi();
 	void check_interrupts();
 };
 
