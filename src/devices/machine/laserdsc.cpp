@@ -348,6 +348,9 @@ void laserdisc_device::device_reset()
 	m_curtrack = 1;
 	m_attospertrack = 0;
 	m_sliderupdate = machine().time();
+
+	// player_vsync() and player_update() get this before the first field has been read
+	m_metadata[0] = m_metadata[1] = vbi_metadata();
 }
 
 
@@ -799,6 +802,10 @@ void laserdisc_device::init_video()
 		frame.m_bitmap.allocate(m_width, m_height * 2);
 		frame.m_bitmap.set_palette(m_videopalette);
 		fillbitmap_yuy16(frame.m_bitmap, 40, 109, 240);
+
+		// no fields have been read into it yet
+		frame.m_numfields = 0;
+		frame.m_lastfield = 0;
 
 		// make a copy of the bitmap that clips out the VBI and horizontal blanking areas
 		frame.m_visbitmap.wrap(&frame.m_bitmap.pix(
