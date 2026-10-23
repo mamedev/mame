@@ -46,7 +46,15 @@ device_newbrain_expansion_slot_interface::device_newbrain_expansion_slot_interfa
 newbrain_expansion_slot_device::newbrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NEWBRAIN_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_newbrain_expansion_slot_interface>(mconfig, *this),
-	m_card(nullptr)
+	m_card(nullptr),
+	m_write_int(*this),
+	m_write_m1_wait(*this),
+	m_read_host(*this, 0xff),
+	m_write_host(*this),
+	m_read_main(*this, 0xff),
+	m_write_main(*this),
+	m_read_paged(*this, 0xff),
+	m_write_paged(*this)
 {
 }
 
@@ -127,6 +135,47 @@ void newbrain_expansion_slot_device::iorq_w(offs_t offset, uint8_t data, bool &p
 	{
 		m_card->iorq_w(offset, data, prtov);
 	}
+}
+
+
+//-------------------------------------------------
+//  page_r - paged memory read
+//-------------------------------------------------
+
+uint8_t newbrain_expansion_slot_device::page_r(int page, offs_t offset, uint8_t data)
+{
+	if (m_card != nullptr)
+	{
+		data = m_card->page_r(page, offset, data);
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  page_w - paged memory write
+//-------------------------------------------------
+
+void newbrain_expansion_slot_device::page_w(int page, offs_t offset, uint8_t data)
+{
+	if (m_card != nullptr)
+	{
+		m_card->page_w(page, offset, data);
+	}
+}
+
+
+//-------------------------------------------------
+//  host_paged_w - paged write from a card
+//-------------------------------------------------
+
+void newbrain_expansion_slot_device::host_paged_w(offs_t offset, uint8_t data)
+{
+	if (m_write_paged.isunset())
+		m_write_host(offset & 0xffff, data);
+	else
+		m_write_paged(offset, data);
 }
 
 

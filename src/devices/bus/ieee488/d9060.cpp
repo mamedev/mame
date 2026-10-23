@@ -228,6 +228,9 @@ void d9060_device_base::hdc_mem(address_map &map)
 
 uint8_t d9060_device_base::dio_r()
 {
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
 	/*
 
 	    bit     description
@@ -274,6 +277,9 @@ void d9060_device_base::dio_w(uint8_t data)
 
 uint8_t d9060_device_base::riot1_pa_r()
 {
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
 	/*
 
 	    bit     description
@@ -340,6 +346,9 @@ void d9060_device_base::riot1_pa_w(uint8_t data)
 
 uint8_t d9060_device_base::riot1_pb_r()
 {
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
 	/*
 
 	    bit     description
@@ -632,7 +641,7 @@ void d9060_device_base::device_reset()
 
 	m_hdccpu->set_input_line(M6502_SET_OVERFLOW, ASSERT_LINE);
 
-	m_riot1->pa_bit_w<7>(1);
+	m_riot1->pa_bit_w<7>(0);
 }
 
 
@@ -644,7 +653,7 @@ void d9060_device_base::ieee488_atn(int state)
 {
 	update_ieee_signals();
 
-	m_riot1->pa_bit_w<7>(state);
+	m_riot1->pa_bit_w<7>(!state);
 }
 
 

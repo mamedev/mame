@@ -496,7 +496,7 @@ void tmp94c241_device::change_timer_flipflop(uint8_t flipflop, uint8_t operation
 		case 0x8:
 			if (!BIT(m_port_function[PORT_E], 0)) return;
 			break;
-		case 0xA:
+		case 0xa:
 			if (!BIT(m_port_function[PORT_E], 4)) return;
 			break;
 		default:

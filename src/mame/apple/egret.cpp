@@ -88,10 +88,6 @@ void egret_device::device_add_mconfig(machine_config &config)
 	m_maincpu->write_p<1>().set(FUNC(egret_device::pb_w));
 	m_maincpu->write_p<2>().set(FUNC(egret_device::pc_w));
 	m_maincpu->set_pullups<1>(0x40);    // pull-up on port B bit 6
-
-#if USE_BUS_ADB
-	ADB_CONNECTOR(config, "adb1", adb_device::default_devices, "a9m0330", false);
-	#endif
 }
 
 const tiny_rom_entry *egret_device::device_rom_region() const
@@ -114,28 +110,12 @@ egret_device::egret_device(const machine_config &mconfig, const char *tag, devic
 	  m_xcvr_session(0), m_via_full(0), m_sys_session(0), m_via_data(0), m_last_adb(0),
 	  m_last_adb_time(0), m_egret_controls_power(false), m_adb_in(false),
 	  m_reset_line(0), m_adb_dtime(0), m_pram_loaded(false)
-#if USE_BUS_ADB
-	  ,
-	  m_adb_connector{{*this, "adb1"}, {*this, finder_base::DUMMY_TAG}}
-#endif
 {
 	std::fill(std::begin(m_disk_pram), std::end(m_disk_pram), 0);
 }
 
 void egret_device::device_start()
 {
-#if USE_BUS_ADB
-	for (int i = 0; i < 2; i++)
-	{
-		m_adb_device[i] = m_adb_connector[i] ? m_adb_connector[i]->get_device() : nullptr;
-		if (m_adb_device[i])
-		{
-			m_adb_device[i]->adb_r().set([this, i](int state) { adb_w(i, state); });
-			m_adb_device[i]->poweron_r().set([this, i](int state) { adb_poweron_w(i, state); });
-		}
-	}
-#endif
-
 	save_item(NAME(m_xcvr_session));
 	save_item(NAME(m_via_full));
 	save_item(NAME(m_sys_session));
@@ -145,56 +125,26 @@ void egret_device::device_start()
 	save_item(NAME(m_adb_dtime));
 	save_item(NAME(m_pram_loaded));
 	save_item(NAME(m_disk_pram));
-#if USE_BUS_ADB
-	save_item(NAME(m_adb_out));
-	save_item(NAME(m_adb_device_out));
-	save_item(NAME(m_adb_device_poweron));
-#endif
 }
 
 void egret_device::device_reset()
 {
-#if USE_BUS_ADB
-	m_adb_device_out[0] = m_adb_device_out[1] = true;
-	m_adb_device_poweron[0] = m_adb_device_poweron[1] = true;
-#endif
+	if (m_pram_loaded)
+	{
+		for (int byte = 0; byte < 256; byte++)
+		{
+			m_disk_pram[byte] = m_maincpu->read_internal_ram(0x70 + byte);
+		}
+		m_pram_loaded = false;
+	}
 
 	m_last_adb_time = m_maincpu->total_cycles();
 }
-
-#if USE_BUS_ADB
-void egret_device::adb_w(int id, int state)
-{
-	m_adb_device_out[id] = state;
-	adb_change();
-}
-
-void egret_device::adb_poweron_w(int id, int state)
-{
-	m_adb_device_poweron[id] = state;
-}
-
-void egret_device::adb_change()
-{
-	bool adb = m_adb_out & m_adb_device_out[0] & m_adb_device_out[1];
-	LOG("adb c:%d 1:%d 2:%d -> %d (%02x %02x)\n", m_adb_out, m_adb_device_out[0], m_adb_device_out[1], adb, ddrs[0], ports[0]);
-	for (int i = 0; i != 2; i++)
-		if (m_adb_device[i])
-		{
-			m_adb_device[i]->adb_w(adb);
-		}
-}
-#endif
 
 void egret_device::pa_w(u8 data)
 {
 	write_dfac_latch(BIT(data, 4));
 
-#if USE_BUS_ADB
-	// the line goes to a mosfet pulling the adb data line to ground, hence the inversion
-	m_adb_out = !(data & 0x80);
-	adb_change();
-#else
 	if ((data & 0x80) != m_last_adb)
 	{
 		m_adb_dtime = (int)(machine().time().as_ticks(1000000) - m_last_adb_time);
@@ -216,7 +166,6 @@ void egret_device::pa_w(u8 data)
 		m_last_adb = data & 0x80;
 		m_last_adb_time = machine().time().as_ticks(1000000);
 	}
-#endif
 }
 
 void egret_device::pb_w(u8 data)
@@ -275,12 +224,7 @@ u8 egret_device::pa_r()
 {
 	u8 rv = 0;
 
-#if USE_BUS_ADB
-	rv |= (m_adb_out & m_adb_device_out[0] & m_adb_device_out[1]) ? 0x40 : 0;
-	rv |= (m_adb_device_poweron[0] & m_adb_device_poweron[1]) ? 0x04 : 0;
-#else
 	rv |= m_adb_in ? 0x40 : 0;
-#endif
 	if (m_egret_controls_power)
 	{
 		rv |= 0x02;   // indicate soft power, indicate chassis switch on

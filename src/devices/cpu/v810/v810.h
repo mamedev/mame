@@ -82,8 +82,15 @@ enum
 class v810_device : public cpu_device
 {
 public:
+	// optional bus timing: when set, the core charges opcode fetches (and models the
+	// instruction cache) and asks the callback for the wait states of every bus access
+	enum : int { BUS_FETCH, BUS_READ, BUS_WRITE, BUS_IO_READ, BUS_IO_WRITE };
+	using bus_wait_delegate = device_delegate<int (offs_t address, int access, int size)>;
+
 	// construction/destruction
 	v810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename... T> void set_bus_wait_callback(T &&... args) { m_bus_wait.set(std::forward<T>(args)...); }
 
 protected:
 	// device-level overrides
@@ -106,6 +113,8 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
+	enum : u8 { LAST_OTHER, LAST_LD, LAST_ST, LAST_OUT };
+
 	typedef uint32_t (v810_device::*opcode_func)(uint32_t op);
 	static const opcode_func s_OpCodeTable[64];
 
@@ -120,6 +129,20 @@ private:
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_io;
 	uint32_t m_PPC;
 	int m_icount;
+	// set by a fatal exception: halted until reset (the HALT instruction is not modelled yet)
+	bool m_halted;
+
+	bus_wait_delegate m_bus_wait;
+	bool m_bus_timing;
+	u8 m_lastop;
+	u8 m_curop;
+	// instruction cache, only modelled for its timing: 128 entries of two 4-byte sub-blocks
+	uint32_t m_icache_tag[128];
+	bool m_icache_valid[128][2];
+
+	inline uint16_t fetch_op(offs_t addr, int cycles);
+	inline uint32_t mem_cycles(offs_t addr, int access, int size, int base, int pair, u8 kind);
+	void icache_clear(u32 start, u32 count);
 
 	inline void SETREG(uint32_t reg,uint32_t val);
 	inline uint32_t GETREG(uint32_t reg);
@@ -155,6 +178,7 @@ private:
 	uint32_t opJAL(uint32_t op);
 	uint32_t opEI(uint32_t op);
 	uint32_t opDI(uint32_t op);
+	void take_exception(u32 handler, u16 code);
 	uint32_t opTRAP(uint32_t op);
 	uint32_t opRETI(uint32_t op);
 	uint32_t opHALT(uint32_t op);

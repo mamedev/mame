@@ -85,7 +85,7 @@ protected:
 	void add_common_devices(machine_config &config);
 	inline void update_ieee_signals();
 
-	uint8_t dio_r() { return m_bus->dio_r(); };
+	uint8_t dio_r();
 	void dio_w(uint8_t data) { m_bus->dio_w(this, data); };
 	uint8_t riot1_pa_r();
 	void riot1_pa_w(uint8_t data);
@@ -378,11 +378,27 @@ void c8050_device::sfd1001_fdc_mem(address_map &map)
 }
 
 //-------------------------------------------------
+//  riot6532 uc1
+//-------------------------------------------------
+
+uint8_t c8050_device::dio_r()
+{
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
+	return m_bus->dio_r();
+}
+
+
+//-------------------------------------------------
 //  riot6532 ue1
 //-------------------------------------------------
 
 uint8_t c8050_device::riot1_pa_r()
 {
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
 	/*
 
 	    bit     description
@@ -449,6 +465,9 @@ void c8050_device::riot1_pa_w(uint8_t data)
 
 uint8_t c8050_device::riot1_pb_r()
 {
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
 	/*
 
 	    bit     description

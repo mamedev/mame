@@ -17,6 +17,7 @@ pcfx_intc_device::pcfx_intc_device(const machine_config &mconfig, const char *ta
 	, m_irq_mask(0)
 	, m_irq_pending(0)
 	, m_irq_priority{0}
+	, m_int_level(-1)
 {
 }
 
@@ -25,6 +26,7 @@ void pcfx_intc_device::device_start()
 	save_item(NAME(m_irq_mask));
 	save_item(NAME(m_irq_pending));
 	save_item(NAME(m_irq_priority));
+	save_item(NAME(m_int_level));
 }
 
 void pcfx_intc_device::device_reset()
@@ -32,7 +34,9 @@ void pcfx_intc_device::device_reset()
 	m_irq_mask = 0xffff;
 	m_irq_pending = 0;
 	std::fill_n(m_irq_priority, 8, 0);
-	m_int_w(0, CLEAR_LINE);
+	if (m_int_level >= 0)
+		m_int_w(m_int_level, CLEAR_LINE);
+	m_int_level = -1;
 }
 
 u16 pcfx_intc_device::read(offs_t offset)
@@ -54,12 +58,12 @@ u16 pcfx_intc_device::read(offs_t offset)
 
 		// Interrupt priority 0
 		case 0x80/4:
-			data = m_irq_priority[4] | (m_irq_priority[5] << 3) | (m_irq_priority[6] << 6) | (m_irq_priority[7] << 9);
+			data = m_irq_priority[7] | (m_irq_priority[6] << 3) | (m_irq_priority[5] << 6) | (m_irq_priority[4] << 9);
 			break;
 
 		// Interrupt priority 1
 		case 0xc0/4:
-			data = m_irq_priority[0] | (m_irq_priority[1] << 3) | (m_irq_priority[2] << 6) | (m_irq_priority[3] << 9);
+			data = m_irq_priority[3] | (m_irq_priority[2] << 3) | (m_irq_priority[1] << 6) | (m_irq_priority[0] << 9);
 			break;
 	}
 
@@ -96,7 +100,11 @@ void pcfx_intc_device::write(offs_t offset, u16 data)
 		// -------xxx------ Priority level interrupt 13
 		// ----------xxx--- Priority level interrupt 14
 		// -------------xxx Priority level interrupt 15
+		// priorities can only be changed while all sources are masked (GMAKER), other
+		// writes are ignored (the BIOS Photo CD viewer writes them unmasked)
 		case 0x80/4:
+			if ((m_irq_mask & 0x7f) != 0x7f)
+				break;
 			m_irq_priority[7] = (data >> 0) & 0x07;
 			m_irq_priority[6] = (data >> 3) & 0x07;
 			m_irq_priority[5] = (data >> 6) & 0x07;
@@ -110,6 +118,8 @@ void pcfx_intc_device::write(offs_t offset, u16 data)
 		// ----------xxx--- Priority level interrupt 10
 		// -------------xxx Priority level interrupt 11
 		case 0xc0/4:
+			if ((m_irq_mask & 0x7f) != 0x7f)
+				break;
 			m_irq_priority[3] = (data >> 0) & 0x07;
 			m_irq_priority[2] = (data >> 3) & 0x07;
 			m_irq_priority[1] = (data >> 6) & 0x07;
@@ -136,13 +146,15 @@ inline void pcfx_intc_device::check_irqs()
 		active_irqs <<= 1;
 	}
 
-	if (highest_prio >= 0)
+	// only one CPU interrupt level is presented at a time
+	const s8 level = (highest_prio >= 0) ? (8 + highest_prio) : -1;
+	if (level != m_int_level)
 	{
-		m_int_w(8 + highest_prio, ASSERT_LINE);
-	}
-	else
-	{
-		m_int_w(0, CLEAR_LINE);
+		if (m_int_level >= 0)
+			m_int_w(m_int_level, CLEAR_LINE);
+		if (level >= 0)
+			m_int_w(level, ASSERT_LINE);
+		m_int_level = level;
 	}
 }
 
