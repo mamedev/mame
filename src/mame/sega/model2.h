@@ -208,8 +208,8 @@ protected:
 	u16 sega_0229_source_r(offs_t offset);
 	u32 doa_unk_r();
 
-	void raster_init(memory_region *texture_rom);
-	void geo_init(memory_region *polygon_rom);
+	void raster_init(memory_region &texture_rom);
+	void geo_init(memory_region &polygon_rom);
 	u32 render_mode_r();
 	void render_mode_w(u32 data);
 	u8 lumaram_r(offs_t offset);
@@ -281,37 +281,37 @@ private:
 	int16_t m_crtc_xoffset = 0, m_crtc_yoffset = 0;
 	bool m_palette_dirty = false;
 
-	u32 *geo_process_command( geo_state *geo, u32 opcode, u32 *input, bool *end_code );
+	const u32 *geo_process_command(geo_state &geo, u32 opcode, const u32 *input, bool *end_code);
 	// geo commands
-	u32 *geo_nop( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_object_data( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_direct_data( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_window_data( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_texture_data( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_polygon_data( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_texture_parameters( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_mode( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_zsort_mode( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_focal_distance( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_light_source( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_matrix_write( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_mesh_mode( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_mesh_draw( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_mesh_flush( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_translate_write( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_data_mem_push( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_test( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_end( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_dummy( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_log_data( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_lod( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_code_upload( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_code_jump( geo_state *geo, u32 opcode, u32 *input );
+	const u32 *geo_nop(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_object_data(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_direct_data(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_window_data(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_texture_data(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_polygon_data(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_texture_parameters(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_mode(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_zsort_mode(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_focal_distance(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_light_source(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_matrix_write(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_mesh_mode(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_mesh_draw(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_mesh_flush(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_translate_write(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_data_mem_push(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_test(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_end(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_dummy(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_log_data(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_lod(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_code_upload(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_code_jump(geo_state &geo, u32 opcode, const u32 *input);
 	// geo code drawing paths
-	void geo_parse_np_ns( geo_state *geo, u32 *input, u32 count );
-	void geo_parse_np_s( geo_state *geo, u32 *input, u32 count );
-	void geo_parse_nn_ns( geo_state *geo, u32 *input, u32 count );
-	void geo_parse_nn_s( geo_state *geo, u32 *input, u32 count );
+	void geo_parse_np_ns(geo_state &geo, const u32 *input, u32 count);
+	void geo_parse_np_s(geo_state &geo, const u32 *input, u32 count);
+	void geo_parse_nn_ns(geo_state &geo, const u32 *input, u32 count);
+	void geo_parse_nn_s(geo_state &geo, const u32 *input, u32 count);
 
 	// raster functions
 	// main data input port
