@@ -165,6 +165,7 @@ private:
 	required_shared_ptr_array<uint8_t, 2> m_attr;
 
 	uint8_t m_sound_nmi_enable = 0;
+	uint8_t m_video_control = 0;
 	emu_timer *m_sound_timer = nullptr;
 	tilemap_t *m_tilemap[2];
 
@@ -172,6 +173,8 @@ private:
 	void sound_map(address_map &map) ATTR_COLD;
 
 	uint8_t sound_status_r();
+	void video_control_w(uint8_t data);
+	bool laserdisc_shown() const { return BIT(m_video_control, 3) && !BIT(m_video_control, 0); }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void sound_nmi_enable_w(uint8_t data);
@@ -252,7 +255,15 @@ void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect
 
 uint32_t deco_ld_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0, cliprect);
+	// with the colour output latch held clear, only the laserdisc picture (or black) is left
+	if (BIT(m_video_control, 1))
+	{
+		bitmap.fill(rgb_t::transparent(), cliprect);
+		return 0;
+	}
+
+	// with the laserdisc picture off, the board's background colour (palette 0, colour 0) shows instead
+	bitmap.fill(laserdisc_shown() ? rgb_t::transparent() : rgb_t(m_palette->pen(0)), cliprect);
 
 	// a priority encoder (LS148 at 16H on VDO-1) picks the topmost source for each pixel, and its code is also
 	// the palette number: group B "MIX" (6), group B tiles (5), group B "SOFT2" (4), group A "MIX" (3),
@@ -278,13 +289,32 @@ uint8_t deco_ld_state::sound_status_r()
 	return (m_soundlatch2->pending_r() << 7) | (m_soundlatch->pending_r() << 6) | 0x3f;
 }
 
+void deco_ld_state::video_control_w(uint8_t data)
+{
+	// LS175 at 11K on VDO-1, cleared at reset
+	// bit 0: hide the laserdisc picture (forces the DSP SEL output low); the games set it while showing TILT
+	//        and the power-on countdown, and rblaster while it sends a search to the player
+	// bit 1: blank the board's own picture (holds the colour output latch, LS273 at 2J, clear) and make DSP SEL
+	//        ignore the overlay, so only the laserdisc picture is left if bits 0 and 3 let it through; the games
+	//        only set it with bit 0, which leaves the screen black
+	// bit 2: drives *MAIG ENB low (through the latch's inverted output), which takes group A's tiles out of the
+	//        priority encoder and lets them cut holes in the laserdisc picture instead
+	// bit 3: EXT SYNC, sync the screen to the player (LS157 at 8K) and allow DSP SEL high; the games set it
+	//        in normal operation and clear it in the service mode's RAM tests
+	// TODO: bit 2 (the games only set it together with bit 1)
+	if (BIT(data, 2) && !BIT(data, 1))
+		logerror("%s: video control %02x\n", machine().describe_context(), data);
+	m_video_control = data & 0x0f;
+	m_laserdisc->video_enable(laserdisc_shown());
+}
+
 void deco_ld_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1000).portr("IN0").nopw(); // (w) coin lockout
 	map(0x1001, 0x1001).portr("DSW1");
 	map(0x1002, 0x1002).portr("DSW2");
-	map(0x1003, 0x1003).portr("IN1");
+	map(0x1003, 0x1003).portr("IN1").w(FUNC(deco_ld_state::video_control_w));
 	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1005, 0x1005).r(FUNC(deco_ld_state::sound_status_r));
 	map(0x1006, 0x1007).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
@@ -477,12 +507,15 @@ void deco_ld_state::machine_start()
 	m_sound_timer = timer_alloc(FUNC(deco_ld_state::sound_timing), this);
 
 	save_item(NAME(m_sound_nmi_enable));
+	save_item(NAME(m_video_control));
 }
 
 void deco_ld_state::machine_reset()
 {
-	// reset clears the latch at 10D on VDO-2
+	// reset clears the latches at 10D on VDO-2 and 11K on VDO-1
 	m_sound_nmi_enable = 0;
+	m_video_control = 0;
+	m_laserdisc->video_enable(false);
 	m_sound_timer->adjust(m_screen->time_until_pos(32), 32);
 }
 
@@ -544,7 +577,8 @@ void deco_ld_state::cobraa(machine_config &config)
 
 	// TODO: cobraa drives a Pioneer LD-V1000 and has its own PROMs and PALs (VD0-C, VD0-T, LP4-1, LP4-2): it
 	// never touches the ACIA, sends LD-V1000 commands to 0x1004 with a handshake on bits 5 and 6 of 0x1001
-	// (0xe50b-0xe527), and checks for LD-V1000 status codes (0xe53d-0xe5f1)
+	// (0xe50b-0xe527), and checks for LD-V1000 status codes (0xe53d-0xe5f1); its 0x1003 writes (0xff, 0x00,
+	// and an inverted value at 0xf63f) don't fit the VDO-1 video latch either
 	// keep the vblank IRQ it had, as its IRQ handler doesn't use the ACIA
 	m_acia->irq_handler().set_nop();
 	m_maincpu->set_vblank_int("screen", FUNC(deco_ld_state::irq0_line_hold));
