@@ -120,7 +120,7 @@ private:
 		uint16_t latch = 0;
 	};
 
-	required_device<cpu_device> m_maincpu;
+	required_device<v810_device> m_maincpu;
 	required_device<vboy_cart_slot_device> m_cart;
 	required_device<timer_device> m_maintimer;
 	required_device<palette_device> m_palette;
@@ -186,6 +186,7 @@ private:
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_main_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_pad_tick);
+	int bus_wait(offs_t address, int access, int size);
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
 
 	void vboy_map(address_map &map) ATTR_COLD;
@@ -1139,6 +1140,38 @@ TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::timer_main_tick)
 	}
 }
 
+// wait states of one 16-bit bus cycle per area (Development Manual Table 4-4-3, Internal Wait Control);
+// the external data bus is 16 bits wide (4-3-1), so a word access takes a second bus cycle
+int vboy_state::bus_wait(offs_t address, int access, int size)
+{
+	int wait;
+	switch (BIT(address, 24, 3))
+	{
+		case 0: // VIP: 2 waits for registers and VRAM writes, 5 for VRAM reads
+		{
+			const offs_t offset = address & 0x7ffff;
+			const bool regs = (offset >= 0x40000) && (offset < 0x60000);
+			const bool write = (access == v810_device::BUS_WRITE) || (access == v810_device::BUS_IO_WRITE);
+			wait = (regs || write) ? 2 : 5;
+			break;
+		}
+		case 4: // game pak expansion: 2 waits, 1 with EXP1W
+			wait = BIT(m_regs.wcr, 1) ? 1 : 2;
+			break;
+		case 7: // game pak ROM: 2 waits, 1 with ROM1W
+			wait = BIT(m_regs.wcr, 0) ? 1 : 2;
+			break;
+		default: // sound, internal registers, work RAM, game pak RAM
+			wait = 1;
+			break;
+	}
+
+	// the second bus cycle of a word access: 2 clocks plus its waits
+	if (size == 4)
+		wait = (wait * 2) + 2;
+	return wait;
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::timer_pad_tick)
 {
 	if((m_regs.kcr & 0x80) == 0)
@@ -1236,6 +1269,7 @@ void vboy_state::vboy(machine_config &config)
 	/* basic machine hardware */
 	NVC(config, m_maincpu, XTAL(20'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &vboy_state::vboy_map);
+	m_maincpu->set_bus_wait_callback(FUNC(vboy_state::bus_wait));
 	// no AS_IO, and some games relies on r/w the program map with INH/OUTH
 	// cfr. vforce, nesterfb, panicbom (sound)
 
