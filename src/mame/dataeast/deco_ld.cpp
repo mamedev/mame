@@ -12,7 +12,6 @@ IRQ (the coins are on NMI). The player is emulated as the LDP-1000A.
 
 TODO:
 - Bega's Battle VBLANK hack;
-- dip-switches;
 - clean-ups;
 
 ***************************************************************************
@@ -138,12 +137,14 @@ public:
 		, m_soundlatch2(*this, "soundlatch2")
 		, m_vram(*this, "vram%u", 0U)
 		, m_attr(*this, "attr%u", 0U)
+		, m_coin2(*this, "COIN2")
 	{ }
 
 	void rblaster(machine_config &config) ATTR_COLD;
 	void cobraa(machine_config &config) ATTR_COLD;
 
 	int begas_vblank_r();
+	int coin2_r() { return m_coin2->read() ? 1 : 0; }
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
@@ -163,6 +164,7 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch2;
 	required_shared_ptr_array<uint8_t, 2> m_vram;
 	required_shared_ptr_array<uint8_t, 2> m_attr;
+	required_ioport m_coin2;
 
 	uint8_t m_sound_nmi_enable = 0;
 	uint8_t m_video_control = 0;
@@ -178,6 +180,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void sound_nmi_enable_w(uint8_t data);
+	void nmi_ack_w(uint8_t data);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *spriteram, uint16_t tile_bank, uint32_t color);
 
 	template <unsigned N> void vram_w(offs_t offset, u8 data);
@@ -311,8 +314,11 @@ void deco_ld_state::video_control_w(uint8_t data)
 void deco_ld_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1000).portr("IN0").nopw(); // (w) coin lockout
-	map(0x1001, 0x1001).portr("DSW1");
+	// writes to 0x1000 latch bits 0 and 1 into the LS273 at 3H on VDO-2, which drives the coin blockers; begas and
+	// cobra set them once booted and clear them at 9 credits, while rblaster's one store there (0xe484) only clears
+	// them at 9 credits, so no single polarity of the blockers fits all three games and they aren't emulated
+	map(0x1000, 0x1000).portr("IN0").nopw();
+	map(0x1001, 0x1001).portr("DSW1").w(FUNC(deco_ld_state::nmi_ack_w));
 	map(0x1002, 0x1002).portr("DSW2");
 	map(0x1003, 0x1003).portr("IN1").w(FUNC(deco_ld_state::video_control_w));
 	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -370,10 +376,21 @@ int deco_ld_state::begas_vblank_r()
 
 INPUT_CHANGED_MEMBER(deco_ld_state::coin_inserted)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	// the coin counters are driven by the coin switches; a coin also sets its flip-flop (one of the two in the
+	// LS74 at 8J on VDO-2), which pulls NMI until the game acknowledges it
+	if (param < 2)
+		machine().bookkeeping().coin_counter_w(param, newval);
+	if (newval)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static INPUT_PORTS_START( begas )
+void deco_ld_state::nmi_ack_w(uint8_t data)
+{
+	// the NMI handlers end with a write here
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+static INPUT_PORTS_START( deco_ld )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -408,69 +425,122 @@ static INPUT_PORTS_START( begas )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(deco_ld_state::begas_vblank_r)) // TODO: IPT_VBLANK a.k.a. screen_device::vblank doesn't seem to work fine?
 
+	// switches 5-8 aren't connected, the start buttons and coins are read in their place
 	PORT_START("DSW1")
-	// should be coinage
-	PORT_DIPNAME( 0x01, 0x01, "DSW1" ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(deco_ld_state::coin_inserted), 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(deco_ld_state::coin_inserted), 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(deco_ld_state::coin_inserted), 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(deco_ld_state::coin2_r))
 
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSW2" ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// the service switch is wired to the second coin's input, past the coin counter
+	PORT_START("COIN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(deco_ld_state::coin_inserted), 1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(deco_ld_state::coin_inserted), 2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( begas )
+	PORT_INCLUDE( deco_ld )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "20000" )
+	PORT_DIPSETTING(    0x08, "30000" )
+	PORT_DIPSETTING(    0x10, "50000" )
+	PORT_DIPSETTING(    0x00, "None (continuous fire)" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	// also selects the diagnostics: the factory ones (with the monitor adjustment patterns) for cockpit
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, "Cockpit" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( cobra )
-	PORT_INCLUDE( begas )
+	PORT_INCLUDE( deco_ld )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
-	// TODO: different dips
+	// the conversion manual has lives, bonus, difficulty and region on switches 1-5; of those, this program only
+	// reads difficulty in play, from switches 4 and 5, and its coinage (DSW1) follows the Bega's Battle manual
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" ) // only read by the disc test
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	// must be off for the diagnostics
+	PORT_DIPNAME( 0x40, 0x40, "Random First Mission" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rblaster )
-	PORT_INCLUDE( begas )
+	PORT_INCLUDE( deco_ld )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
-	// TODO: different dips
+	// the coin handler (0xe444) uses switches 3 and 4 instead of 1 and 2 when the carry is set after shifting
+	// the coin bits right twice, but the coins are bits 6 and 7, so the carry is always clear and both coins
+	// use switches 1 and 2
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPUNUSED_DIPLOC( 0x0c, 0x0c, "SW1:3,4" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, "20000 only" )
+	PORT_DIPSETTING(    0x02, "15000, every 30000" )
+	PORT_DIPSETTING(    0x04, "20000, every 40000" )
+	PORT_DIPSETTING(    0x00, "30000, every 50000" )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
+	// skips the checks of the player's moves, and turns on the player's frame number display (INDEX ON)
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -512,7 +582,8 @@ void deco_ld_state::machine_start()
 
 void deco_ld_state::machine_reset()
 {
-	// reset clears the latches at 10D on VDO-2 and 11K on VDO-1
+	// reset clears the coin flip-flops (8J) and the latches at 10D on VDO-2 and 11K on VDO-1
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	m_sound_nmi_enable = 0;
 	m_video_control = 0;
 	m_laserdisc->video_enable(false);
