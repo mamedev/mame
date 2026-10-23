@@ -51,24 +51,23 @@ DEFINE_DEVICE_TYPE(NVC,  nvc_device,  "nvc",  "Nintendo NVC")
 
 
 v810_device::v810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: v810_device(mconfig, V810, tag, owner, clock, false)
+	: v810_device(mconfig, V810, tag, owner, clock, s_opcodes)
 {
 }
 
-v810_device::v810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool nvc)
+v810_device::v810_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const opcode_table &opcodes)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 32, 32, 0)
-	, m_nvc(nvc)
+	, m_opcodes(opcodes)
 	, m_halted(false)
 	, m_halt(false)
 	, m_bus_wait(*this)
 {
 }
 
-// V810 with the Virtual Boy instructions
 nvc_device::nvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: v810_device(mconfig, NVC, tag, owner, clock, true)
+	: v810_device(mconfig, NVC, tag, owner, clock, s_nvc_opcodes)
 {
 }
 
@@ -93,6 +92,11 @@ device_memory_interface::space_config_vector v810_device::memory_space_config() 
 std::unique_ptr<util::disasm_interface> v810_device::create_disassembler()
 {
 	return std::make_unique<v810_disassembler>();
+}
+
+std::unique_ptr<util::disasm_interface> nvc_device::create_disassembler()
+{
+	return std::make_unique<nvc_disassembler>();
 }
 
 
@@ -721,20 +725,16 @@ uint32_t v810_device::opJAL(uint32_t op)
 	return 3;
 }
 
-// NVC only: CLI, clear PSW.ID (Virtual Boy Development Manual 4-6-3)
-uint32_t v810_device::opCLI(uint32_t op)
+// CLI: clear PSW.ID (Virtual Boy Development Manual 4-6-3)
+uint32_t nvc_device::opCLI(uint32_t op)
 {
-	if (!m_nvc)
-		return opUNDEF(op);
 	SET_ID(0);
 	return 1;
 }
 
-// NVC only: SEI, set PSW.ID (Virtual Boy Development Manual 4-6-4)
-uint32_t v810_device::opSEI(uint32_t op)
+// SEI: set PSW.ID (Virtual Boy Development Manual 4-6-4)
+uint32_t nvc_device::opSEI(uint32_t op)
 {
-	if (!m_nvc)
-		return opUNDEF(op);
 	SET_ID(1);
 	return 1;
 }
@@ -1282,7 +1282,27 @@ uint32_t v810_device::opCVTW(uint32_t op) // CVT.WS
 	return 16;
 }
 
-uint32_t v810_device::opXB(uint32_t op)
+// format VII with the NVC's sub-opcodes XB, XH, REV and MPYHW (Virtual Boy Development Manual 4-6-1)
+uint32_t nvc_device::opFpoint(uint32_t op)
+{
+	const u8 sub = BIT(R_OP(PC), 10, 6);
+	PC += 2;
+	switch (sub)
+	{
+		case 0x8:
+			return opXB(op);
+		case 0x9:
+			return opXH(op);
+		case 0xa:
+			return opREV(op);
+		case 0xc:
+			return opMPYHW(op);
+		default:
+			return fp_execute(op, sub);
+	}
+}
+
+uint32_t nvc_device::opXB(uint32_t op)
 {
 	int val=GETREG(GET2);
 	val = (val & 0xffff0000) | swapendian_int16(val & 0xffff);
@@ -1296,7 +1316,7 @@ uint32_t v810_device::opXB(uint32_t op)
 }
 
 
-uint32_t v810_device::opXH(uint32_t op)
+uint32_t nvc_device::opXH(uint32_t op)
 {
 	int val=GETREG(GET2);
 	val = ((val & 0xffff0000)>>16) | ((val & 0xffff)<<16);
@@ -1309,7 +1329,7 @@ uint32_t v810_device::opXH(uint32_t op)
 	return 1;
 }
 
-uint32_t v810_device::opMPYHW(uint32_t op)
+uint32_t nvc_device::opMPYHW(uint32_t op)
 {
 	s16 val1 = (s16)GETREG(GET1);
 	s16 val2 = (s16)GETREG(GET2);
@@ -1322,7 +1342,7 @@ uint32_t v810_device::opMPYHW(uint32_t op)
 	return 9;
 }
 
-uint32_t v810_device::opREV(uint32_t op)
+uint32_t nvc_device::opREV(uint32_t op)
 {
 	uint32_t val = GETREG(GET1);
 	val = ((val >> 1) & 0x55555555) | ((val & 0x55555555) << 1);
@@ -1333,11 +1353,17 @@ uint32_t v810_device::opREV(uint32_t op)
 	return 1;
 }
 
+// format VII: the sub-opcode is in bits 15-10 of the second halfword
 uint32_t v810_device::opFpoint(uint32_t op)
 {
-	const u8 op_type = (R_OP(PC) & 0xfc00) >> 10;
+	const u8 sub = BIT(R_OP(PC), 10, 6);
 	PC += 2;
-	switch (op_type)
+	return fp_execute(op, sub);
+}
+
+uint32_t v810_device::fp_execute(uint32_t op, u8 sub)
+{
+	switch (sub)
 	{
 		case 0x0:
 			return opCMPF(op);
@@ -1355,17 +1381,6 @@ uint32_t v810_device::opFpoint(uint32_t op)
 			return opDIVF(op);
 		case 0xb:
 			return opTRNC(op);
-
-		// NVC only
-		case 0x8:
-			return m_nvc ? opXB(op) : opUNDEF(op);
-		case 0x9:
-			return m_nvc ? opXH(op) : opUNDEF(op);
-		case 0xa:
-			return m_nvc ? opREV(op) : opUNDEF(op);
-		case 0xc:
-			return m_nvc ? opMPYHW(op) : opUNDEF(op);
-
 		default:
 			return opUNDEF(op);
 	}
@@ -1584,7 +1599,7 @@ uint32_t v810_device::opBSU(uint32_t op)
 	}
 }
 
-const v810_device::opcode_func v810_device::s_OpCodeTable[64] =
+constexpr v810_device::opcode_table v810_device::s_opcodes =
 {
 	/* 0x00 */ &v810_device::opMOVr,      // mov r1,r2            1
 	/* 0x01 */ &v810_device::opADDr,      // add r1,r2            1
@@ -1608,7 +1623,7 @@ const v810_device::opcode_func v810_device::s_OpCodeTable[64] =
 	/* 0x13 */ &v810_device::opCMPi,      // cmp imm5,r2          2
 	/* 0x14 */ &v810_device::opSHLi,      // shl imm5,r2          2
 	/* 0x15 */ &v810_device::opSHRi,      // shr imm5,r2          2
-	/* 0x16 */ &v810_device::opCLI,       // cli              2
+	/* 0x16 */ &v810_device::opUNDEF,
 	/* 0x17 */ &v810_device::opSARi,      // sar imm5,r2          2
 	/* 0x18 */ &v810_device::opTRAP,
 	/* 0x19 */ &v810_device::opRETI,
@@ -1616,7 +1631,7 @@ const v810_device::opcode_func v810_device::s_OpCodeTable[64] =
 	/* 0x1b */ &v810_device::opUNDEF,
 	/* 0x1c */ &v810_device::opLDSR,      // ldsr reg2,regID          2
 	/* 0x1d */ &v810_device::opSTSR,      // stsr regID,reg2          2
-	/* 0x1e */ &v810_device::opSEI,       // sei              2
+	/* 0x1e */ &v810_device::opUNDEF,
 	/* 0x1f */ &v810_device::opBSU,
 	/* 0x20 */ &v810_device::opB,     // Branch (7 bit opcode)
 	/* 0x21 */ &v810_device::opB,     // Branch (7 bit opcode)
@@ -1651,6 +1666,18 @@ const v810_device::opcode_func v810_device::s_OpCodeTable[64] =
 	/* 0x3e */ &v810_device::opFpoint, //floating point opcodes
 	/* 0x3f */ &v810_device::opOUTW   // out.w reg2, disp16[reg1]     6b
 };
+
+// the V810 table with the NVC's CLI and SEI, and its format VII sub-opcodes
+constexpr nvc_device::opcode_table nvc_device::make_opcodes()
+{
+	opcode_table opcodes = s_opcodes;
+	opcodes[0x16] = static_cast<opcode_func>(&nvc_device::opCLI);
+	opcodes[0x1e] = static_cast<opcode_func>(&nvc_device::opSEI);
+	opcodes[0x3e] = static_cast<opcode_func>(&nvc_device::opFpoint);
+	return opcodes;
+}
+
+constexpr nvc_device::opcode_table nvc_device::s_nvc_opcodes = make_opcodes();
 
 void v810_device::device_start()
 {
@@ -1756,7 +1783,7 @@ void v810_device::device_reset()
 	PC = 0xfffffff0;
 	PSW = 0x00008000;
 	ECR = 0x0000fff0;
-	PIR = m_nvc ? 0x00005346 : 0x00008100; // the V810 family is 0000810xh, the NVC reports 00005346h
+	PIR = 0x00008100;                      // V810 family: 0000810xh
 	TKCW = 0x000000e0;                     // fixed: traps on invalid operation, zero division and overflow
 	CHCW = 0;
 	m_halted = false;
@@ -1764,6 +1791,12 @@ void v810_device::device_reset()
 	m_nmi_pending = false;
 	m_lastop = LAST_OTHER;
 	icache_clear(0, 128);
+}
+
+void nvc_device::device_reset()
+{
+	v810_device::device_reset();
+	PIR = 0x00005346; // Virtual Boy Development Manual 4-7-1
 }
 
 // an interrupt that would be accepted now: requested, not masked by NP, EP or ID, and at or above the PSW level
@@ -1861,7 +1894,7 @@ void v810_device::execute_run()
 		uint32_t op = fetch_op(PC, 0);
 		PC += 2;
 
-		int cnt = (this->*s_OpCodeTable[op>>10])(op);
+		int cnt = (this->*m_opcodes[op >> 10])(op);
 		m_icount -= cnt;
 		m_lastop = m_curop;
 
