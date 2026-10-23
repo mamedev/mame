@@ -2109,17 +2109,19 @@ u32 *model2_state::geo_test(geo_state *geo, u32 opcode, u32 *input)
 		sum_even = 0;
 		sum_odd = 0;
 
-		for (j = 0; j < count; j++)
+		if (geo->polygon_rom)
 		{
-			data = geo->polygon_rom[address++];
+			for (j = 0; j < count; j++)
+			{
+				data = geo->polygon_rom[address & geo->polygon_rom_mask];
+				address = (address + 1) & geo->polygon_rom_mask;
 
-			address &= geo->polygon_rom_mask;
+				sum_even += data >> 16;
+				sum_even &= 0xffff;
 
-			sum_even += data >> 16;
-			sum_even &= 0xffff;
-
-			sum_odd += data & 0xffff;
-			sum_odd &= 0xffff;
+				sum_odd += data & 0xffff;
+				sum_odd &= 0xffff;
+			}
 		}
 
 		sum_even += checksum >> 16;
