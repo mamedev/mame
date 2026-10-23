@@ -56,6 +56,8 @@ v810_device::v810_device(const machine_config &mconfig, const char *tag, device_
 	: cpu_device(mconfig, V810, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 32, 32, 0)
+	, m_halted(false)
+	, m_bus_wait(*this)
 {
 }
 
@@ -167,7 +169,7 @@ std::unique_ptr<util::disasm_interface> v810_device::create_disassembler()
 #define WIO_H(addr, val) (m_io.write_word(addr,val))
 #define WIO_W(addr, val) (m_io.write_dword(addr,val))
 
-#define R_OP(addr)  (m_cache.read_word(addr))
+#define R_OP(addr)  (fetch_op(addr, 2))
 
 #define GET1 (op&0x1f)
 #define GET2 ((op>>5)&0x1f)
@@ -199,6 +201,51 @@ uint32_t v810_device::GETREG(uint32_t reg)
 		return m_reg[reg];
 	else
 		return 0;
+}
+
+// opcode fetch: with the cache off the second halfword of a 32-bit instruction costs 2 cycles more
+inline uint16_t v810_device::fetch_op(offs_t addr, int cycles)
+{
+	if (m_bus_timing)
+	{
+		if (BIT(CHCW, 1))
+		{
+			const u32 index = (addr >> 3) & 0x7f;
+			const u32 sub = BIT(addr, 2);
+			if (m_icache_tag[index] != (addr >> 10))
+			{
+				m_icache_tag[index] = addr >> 10;
+				m_icache_valid[index][0] = m_icache_valid[index][1] = false;
+			}
+			if (!m_icache_valid[index][sub])
+			{
+				m_icache_valid[index][sub] = true;
+				m_icount -= 2 + m_bus_wait(addr & ~3, BUS_FETCH, 4);
+			}
+		}
+		else
+		{
+			m_icount -= cycles + m_bus_wait(addr, BUS_FETCH, 2);
+		}
+	}
+	return m_cache.read_word(addr);
+}
+
+// cycles for a load/store/in/out with bus timing: base cost, adjusted when it follows the same kind of access
+inline uint32_t v810_device::mem_cycles(offs_t addr, int access, int size, int base, int pair, u8 kind)
+{
+	const int cycles = base + ((m_lastop == kind) ? pair : 0) + m_bus_wait(addr, access, size);
+	m_curop = kind;
+	return cycles;
+}
+
+void v810_device::icache_clear(u32 start, u32 count)
+{
+	for (u32 i = start; i < start + count && i < 128; i++)
+	{
+		m_icache_tag[i] = ~0U;
+		m_icache_valid[i][0] = m_icache_valid[i][1] = false;
+	}
 }
 
 uint32_t v810_device::opUNDEF(uint32_t op)
@@ -456,6 +503,9 @@ uint32_t v810_device::opLDSR(uint32_t op) // ldsr reg2,regID
 {
 	uint32_t op1=UI5(op);
 	SETREG(32+op1,GETREG(GET2));
+	// CHCW ICC: clear CEC entries starting at CEN
+	if (op1 == 24 && BIT(CHCW, 0))
+		icache_clear(CHCW >> 20, (CHCW >> 8) & 0xfff);
 	return 2;
 }
 
@@ -642,12 +692,49 @@ uint32_t v810_device::opDI(uint32_t op)
 	return 1;
 }
 
+// software exception, vectors 0-15 at 0xffffffa0, 16-31 at 0xffffffb0; returns to the next instruction
 uint32_t v810_device::opTRAP(uint32_t op)
 {
-	logerror("V810: TRAP @ %X\n", PC - 2);
-	machine().debug_break();
-	// TODO: assume same as irq time
-	return clkIRQ;
+	const u8 vector = op & 0x1f;
+	take_exception(0xffffffa0 | (vector & 0x10), 0xffa0 | vector);
+	return 15;
+}
+
+void v810_device::take_exception(u32 handler, u16 code)
+{
+	if (GET_NP)
+	{
+		// fatal exception: the exception code, PSW and PC are written to 00000000h,
+		// 00000004h and 00000008h, and the CPU halts until reset
+		logerror("V810: fatal exception %04X @ %X, halted\n", code, m_PPC);
+		W_W(0x00000000, 0xffff0000 | code);
+		W_W(0x00000004, PSW);
+		W_W(0x00000008, PC);
+		m_halted = true;
+		m_icount = 0;
+		return;
+	}
+	else if (GET_EP)
+	{
+		// duplexed exception
+		FEPC = PC;
+		FEPSW = PSW;
+		ECR = (ECR & 0xffff) | (code << 16);
+		SET_NP(1);
+		SET_ID(1);
+		SET_AE(0);
+		PC = 0xffffffd0;
+	}
+	else
+	{
+		EIPC = PC;
+		EIPSW = PSW;
+		ECR = (ECR & 0xffff0000) | code;
+		SET_EP(1);
+		SET_ID(1);
+		SET_AE(0);
+		PC = handler;
+	}
 }
 
 uint32_t v810_device::opRETI(uint32_t op)
@@ -752,10 +839,11 @@ uint32_t v810_device::opLDB(uint32_t op) // ld.b disp16[reg1],reg2
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
+	const uint32_t addr=tmp;
 	tmp=R_B(tmp);
 	tmp|=(tmp&0x80)?0xffffff00:0;
 	SETREG(GET2,tmp);
-	return 2+clkMEM;
+	return m_bus_timing ? mem_cycles(addr, BUS_READ, 1, 3, -1, LAST_LD) : 2+clkMEM;
 }
 
 uint32_t v810_device::opLDH(uint32_t op) // ld.h disp16[reg1],reg2
@@ -764,10 +852,11 @@ uint32_t v810_device::opLDH(uint32_t op) // ld.h disp16[reg1],reg2
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
+	const uint32_t addr=tmp&~1;
 	tmp=R_H(tmp&~1);
 	tmp|=(tmp&0x8000)?0xffff0000:0;
 	SETREG(GET2,tmp);
-	return 2+clkMEM;
+	return m_bus_timing ? mem_cycles(addr, BUS_READ, 2, 3, -1, LAST_LD) : 2+clkMEM;
 }
 
 uint32_t v810_device::opLDW(uint32_t op) // ld.w disp16[reg1],reg2
@@ -776,9 +865,10 @@ uint32_t v810_device::opLDW(uint32_t op) // ld.w disp16[reg1],reg2
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
+	const uint32_t addr=tmp&~3;
 	tmp=R_W(tmp&~3);
 	SETREG(GET2,tmp);
-	return 2+clkMEM;
+	return m_bus_timing ? mem_cycles(addr, BUS_READ, 4, 3, -1, LAST_LD) : 2+clkMEM;
 }
 
 uint32_t v810_device::opINB(uint32_t op) // in.b disp16[reg1],reg2
@@ -787,9 +877,10 @@ uint32_t v810_device::opINB(uint32_t op) // in.b disp16[reg1],reg2
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
+	const uint32_t addr=tmp;
 	tmp=RIO_B(tmp);
 	SETREG(GET2,tmp);
-	return 2+clkMEM;
+	return m_bus_timing ? mem_cycles(addr, BUS_IO_READ, 1, 3, 0, LAST_OTHER) : 2+clkMEM;
 }
 
 uint32_t v810_device::opCAXI(uint32_t op)    // caxi disp16[reg1],reg2
@@ -806,9 +897,10 @@ uint32_t v810_device::opINH(uint32_t op) // in.h disp16[reg1],reg2
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
+	const uint32_t addr=tmp&~1;
 	tmp=RIO_H(tmp&~1);
 	SETREG(GET2,tmp);
-	return 2+clkMEM;
+	return m_bus_timing ? mem_cycles(addr, BUS_IO_READ, 2, 3, 0, LAST_OTHER) : 2+clkMEM;
 }
 
 uint32_t v810_device::opINW(uint32_t op) // in.w disp16[reg1],reg2
@@ -817,9 +909,10 @@ uint32_t v810_device::opINW(uint32_t op) // in.w disp16[reg1],reg2
 	PC+=2;
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
+	const uint32_t addr=tmp&~3;
 	tmp=RIO_W(tmp&~3);
 	SETREG(GET2,tmp);
-	return 2+clkMEM;
+	return m_bus_timing ? mem_cycles(addr, BUS_IO_READ, 4, 3, 0, LAST_OTHER) : 2+clkMEM;
 }
 
 uint32_t v810_device::opSTB(uint32_t op) // st.b reg2, disp16[reg1]
@@ -829,7 +922,7 @@ uint32_t v810_device::opSTB(uint32_t op) // st.b reg2, disp16[reg1]
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
 	W_B(tmp,GETREG(GET2)&0xff);
-	return 1+clkMEM;
+	return m_bus_timing ? mem_cycles(tmp, BUS_WRITE, 1, 1, 1, LAST_ST) : 1+clkMEM;
 }
 
 uint32_t v810_device::opSTH(uint32_t op) // st.h reg2, disp16[reg1]
@@ -839,7 +932,7 @@ uint32_t v810_device::opSTH(uint32_t op) // st.h reg2, disp16[reg1]
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
 	W_H(tmp&~1,GETREG(GET2)&0xffff);
-	return 1+clkMEM;
+	return m_bus_timing ? mem_cycles(tmp&~1, BUS_WRITE, 2, 1, 1, LAST_ST) : 1+clkMEM;
 }
 
 uint32_t v810_device::opSTW(uint32_t op) // st.w reg2, disp16[reg1]
@@ -849,7 +942,7 @@ uint32_t v810_device::opSTW(uint32_t op) // st.w reg2, disp16[reg1]
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
 	W_W(tmp&~3,GETREG(GET2));
-	return 1+clkMEM;
+	return m_bus_timing ? mem_cycles(tmp&~3, BUS_WRITE, 4, 1, 1, LAST_ST) : 1+clkMEM;
 }
 
 uint32_t v810_device::opOUTB(uint32_t op)    // out.b reg2, disp16[reg1]
@@ -859,7 +952,7 @@ uint32_t v810_device::opOUTB(uint32_t op)    // out.b reg2, disp16[reg1]
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
 	WIO_B(tmp,GETREG(GET2)&0xff);
-	return 1+clkMEM;
+	return m_bus_timing ? mem_cycles(tmp, BUS_IO_WRITE, 1, 1, 1, LAST_OUT) : 1+clkMEM;
 }
 
 uint32_t v810_device::opOUTH(uint32_t op)    // out.h reg2, disp16[reg1]
@@ -869,7 +962,7 @@ uint32_t v810_device::opOUTH(uint32_t op)    // out.h reg2, disp16[reg1]
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
 	WIO_H(tmp&~1,GETREG(GET2)&0xffff);
-	return 1+clkMEM;
+	return m_bus_timing ? mem_cycles(tmp&~1, BUS_IO_WRITE, 2, 1, 1, LAST_OUT) : 1+clkMEM;
 }
 
 uint32_t v810_device::opOUTW(uint32_t op)    // out.w reg2, disp16[reg1]
@@ -879,40 +972,30 @@ uint32_t v810_device::opOUTW(uint32_t op)    // out.w reg2, disp16[reg1]
 	tmp=D16(tmp);
 	tmp+=GETREG(GET1);
 	WIO_W(tmp&~3,GETREG(GET2));
-	return 1+clkMEM;
+	return m_bus_timing ? mem_cycles(tmp&~3, BUS_IO_WRITE, 4, 1, 1, LAST_OUT) : 1+clkMEM;
 }
 
 uint32_t v810_device::opMULr(uint32_t op)    // mul r1,r2
 {
-	uint32_t op1=GETREG(GET1);
-	uint32_t op2=GETREG(GET2);
-	uint64_t tmp;
-	tmp=(int64_t)(int32_t)op1*(int64_t)(int32_t)op2;
-	op2=tmp&0xffffffff;
-	tmp>>=32;
-	CHECK_ZS(tmp);//z = bad!
-	SET_Z( (tmp|op2)==0 );
-	SET_OV((tmp!=0));
-	SET_CY((tmp!=0));
-	SETREG(GET2,op2);
-	SETREG(30,tmp);
+	const int64_t result = int64_t(int32_t(GETREG(GET1))) * int64_t(int32_t(GETREG(GET2)));
+	const uint32_t low = uint32_t(result);
+	// high word to r30 first: when reg2 is r30 it gets the low word; CY is not affected
+	SETREG(30, uint32_t(uint64_t(result) >> 32));
+	SETREG(GET2, low);
+	SET_OV(result != int64_t(int32_t(low)));
+	CHECK_ZS(low);
 	return 13;
 }
 
 uint32_t v810_device::opMULUr(uint32_t op)   // mulu r1,r2
 {
-	uint32_t op1=GETREG(GET1);
-	uint32_t op2=GETREG(GET2);
-	uint64_t tmp;
-	tmp=(uint64_t)op1*(uint64_t)op2;
-	op2=tmp&0xffffffff;
-	tmp>>=32;
-	CHECK_ZS(tmp);//z = bad!
-	SET_Z( (tmp|op2)==0 );
-	SET_OV((tmp!=0));
-	SET_CY((tmp!=0));
-	SETREG(GET2,op2);
-	SETREG(30,tmp);
+	const uint64_t result = uint64_t(GETREG(GET1)) * uint64_t(GETREG(GET2));
+	const uint32_t low = uint32_t(result);
+	// high word to r30 first: when reg2 is r30 it gets the low word; CY is not affected
+	SETREG(30, uint32_t(result >> 32));
+	SETREG(GET2, low);
+	SET_OV((result >> 32) != 0);
+	CHECK_ZS(low);
 	return 13;
 }
 
@@ -1326,6 +1409,7 @@ void v810_device::device_start()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_nmi_line));
 	save_item(NAME(m_PPC));
+	save_item(NAME(m_halted));
 
 	state_add( V810_PC,    "PC",    PC).formatstr("%08X");
 	state_add( V810_R0,    "R0",    R0).formatstr("%08X");
@@ -1375,6 +1459,14 @@ void v810_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_PPC).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", PSW).formatstr("%8s").noshow();
 
+	m_bus_wait.resolve();
+	m_bus_timing = !m_bus_wait.isnull();
+	m_lastop = m_curop = LAST_OTHER;
+	icache_clear(0, 128);
+	save_item(NAME(m_lastop));
+	save_item(NAME(m_icache_tag));
+	save_item(NAME(m_icache_valid));
+
 	set_icountptr(m_icount);
 }
 
@@ -1404,6 +1496,10 @@ void v810_device::device_reset()
 	PC = 0xfffffff0;
 	PSW = 0x00008000;
 	ECR = 0x0000fff0;
+	CHCW = 0;
+	m_halted = false;
+	m_lastop = LAST_OTHER;
+	icache_clear(0, 128);
 }
 
 // TODO: remaining exception types
@@ -1445,6 +1541,13 @@ void v810_device::check_interrupts()
 
 void v810_device::execute_run()
 {
+	if (m_halted)
+	{
+		// fatal exception: nothing runs until reset
+		m_icount = 0;
+		return;
+	}
+
 	// TODO: move in execution body
 	// (breaks pcfx boot)
 	check_interrupts();
@@ -1453,11 +1556,13 @@ void v810_device::execute_run()
 	{
 		m_PPC = PC;
 		debugger_instruction_hook(PC);
-		uint32_t op = R_OP(PC);
+		m_curop = LAST_OTHER;
+		uint32_t op = fetch_op(PC, 0);
 		PC += 2;
 
 		int cnt = (this->*s_OpCodeTable[op>>10])(op);
 		m_icount -= cnt;
+		m_lastop = m_curop;
 
 	} while(m_icount > 0);
 }

@@ -31,7 +31,6 @@ public:
 
 	template <typename T> void set_vdc1_tag(T &&tag) { m_huc6270[0].set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_vdc2_tag(T &&tag) { m_huc6270[1].set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_rainbow_tag(T &&tag) { m_huc6271.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_king_tag(T &&tag) { m_huc6272.set_tag(std::forward<T>(tag)); }
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -46,8 +45,31 @@ protected:
 	TIMER_CALLBACK_MEMBER(update_events);
 
 private:
+	// layers as ordered by the priority logic
+	enum
+	{
+		LAYER_KING_BG0 = 0,
+		LAYER_VDC_BG = 4,
+		LAYER_VDC_SPR,
+		LAYER_RAINBOW,
+		LAYER_COUNT
+	};
+
+	// start of the 256 dot KING/RAINBOW window, in master clocks after the end of HSync
+	// TODO: 7MHz value is unverified
+	static constexpr int KING_START_5MHZ = 96;
+	static constexpr int KING_START_7MHZ = 106;
+
+	u32 yuv888_to_rgb(u32 yuv) const;
+	static u32 palette_yuv888_entry(u16 entry);
+	u32 palette_yuv888(u16 index) const;
+	u8 cello_set(u8 layer) const;
+	static u32 cello_blend(u16 front_coeff, u32 front, u16 back_coeff, u32 back);
+	void update_layer_ranks();
+	u32 mix_pixel(u16 vdc0, u16 vdc1, u32 king, u32 rainbow) const;
+	void start_line(int v);
+
 	required_device_array<huc6270_device, 2> m_huc6270;
-	required_device<huc6271_device> m_huc6271;
 	required_device<huc6272_device> m_huc6272;
 	s32  m_last_h;
 	s32  m_last_v;
@@ -69,8 +91,15 @@ private:
 	bitmap_rgb32  m_bmp;
 	s32   m_uv_lookup[65536][3];
 
-	u32 yuv2rgb(u32 yuv) const;
-	void apply_pal_offs(u16 &pix_data) const;
+	u32  m_pixel_rgb;
+	u32  m_king_line[256];
+	u32  m_rainbow_line[256];
+	u16  m_chroma_key[3];
+	u16  m_cello_colour;
+	u16  m_cello_enable;
+	u16  m_cello_sprite_mask;
+	u16  m_cello_coeff[6];
+	u8   m_layer_rank[LAYER_COUNT];
 };
 
 
