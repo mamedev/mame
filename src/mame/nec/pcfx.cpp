@@ -24,6 +24,8 @@
 #include "speaker.h"
 #include "softlist_dev.h"
 
+#include <algorithm>
+
 
 namespace {
 
@@ -60,8 +62,11 @@ private:
 
 	template <int Pad> TIMER_CALLBACK_MEMBER(pad_func);
 
-	u16 timer_r(offs_t offset);
-	void timer_w(offs_t offset, u16 data);
+	u16 timer_control_r();
+	void timer_control_w(u16 data);
+	u16 timer_period_r();
+	void timer_period_w(u16 data);
+	u16 timer_counter_r();
 	TIMER_CALLBACK_MEMBER(timer_expired);
 	u32 timer_effective_period() const { return (m_timer_period ? m_timer_period : 0x10000) * 15; }
 
@@ -187,41 +192,37 @@ void pcfx_state::pad_w(offs_t offset, u16 data)
  * $f80 period (0 = 65536)
  * $fc0 counter (read only)
  */
-u16 pcfx_state::timer_r(offs_t offset)
+u16 pcfx_state::timer_control_r()
 {
-	switch (offset & 0x30)
-	{
-		case 0x00:
-			return m_timer_control;
-		case 0x20:
-			return m_timer_period;
-		case 0x30:
-		{
-			if (!BIT(m_timer_control, 1))
-				return 0;
-			const u64 clocks = m_maincpu->attotime_to_clocks(m_timer->remaining());
-			return (clocks + 14) / 15;
-		}
-	}
-	return 0;
+	return m_timer_control;
 }
 
-void pcfx_state::timer_w(offs_t offset, u16 data)
+void pcfx_state::timer_control_w(u16 data)
 {
-	switch (offset & 0x30)
-	{
-		case 0x00:
-			if (!BIT(m_timer_control, 1) && BIT(data, 1))
-				m_timer->adjust(m_maincpu->clocks_to_attotime(timer_effective_period()));
-			else if (!BIT(data, 1))
-				m_timer->adjust(attotime::never);
-			m_timer_control = data & 7;
-			m_intc->irq_w<9>(BIT(m_timer_control, 2) ? ASSERT_LINE : CLEAR_LINE);
-			break;
-		case 0x20:
-			m_timer_period = data;
-			break;
-	}
+	if (!BIT(m_timer_control, 1) && BIT(data, 1))
+		m_timer->adjust(m_maincpu->clocks_to_attotime(timer_effective_period()));
+	else if (!BIT(data, 1))
+		m_timer->adjust(attotime::never);
+	m_timer_control = data & 7;
+	m_intc->irq_w<9>(BIT(m_timer_control, 2));
+}
+
+u16 pcfx_state::timer_period_r()
+{
+	return m_timer_period;
+}
+
+void pcfx_state::timer_period_w(u16 data)
+{
+	m_timer_period = data;
+}
+
+u16 pcfx_state::timer_counter_r()
+{
+	if (!BIT(m_timer_control, 1))
+		return 0;
+	const u64 clocks = m_maincpu->attotime_to_clocks(m_timer->remaining());
+	return (clocks + 14) / 15;
 }
 
 TIMER_CALLBACK_MEMBER(pcfx_state::timer_expired)
@@ -277,7 +278,9 @@ void pcfx_state::pcfx_io(address_map &map)
 		})
 	);
 	map(0x00000e00, 0x00000eff).rw(m_intc, FUNC(pcfx_intc_device::read), FUNC(pcfx_intc_device::write)).umask32(0x0000ffff);
-	map(0x00000f00, 0x00000fff).rw(FUNC(pcfx_state::timer_r), FUNC(pcfx_state::timer_w)).umask32(0x0000ffff);
+	map(0x00000f00, 0x00000f03).mirror(0x3c).rw(FUNC(pcfx_state::timer_control_r), FUNC(pcfx_state::timer_control_w)).umask32(0x0000ffff);
+	map(0x00000f80, 0x00000f83).mirror(0x3c).rw(FUNC(pcfx_state::timer_period_r), FUNC(pcfx_state::timer_period_w)).umask32(0x0000ffff);
+	map(0x00000fc0, 0x00000fc3).mirror(0x3c).r(FUNC(pcfx_state::timer_counter_r)).umask32(0x0000ffff);
 //  map(0x00500000, 0x005000ff) Aurora mirror
 //  map(0x00600000, 0x006fffff).r(FUNC(pcfx_state::scsi_ctrl_r)); // SCSI control for EXTIO
 //  map(0x00700000, 0x007fffff).rom().region("scsi_rom", 0); // EXTIO ROM area
@@ -346,20 +349,22 @@ void pcfx_state::machine_reset()
 	m_intc->irq_w<9>(CLEAR_LINE);
 }
 
-// default backup RAM contents: an empty, formatted "PCFXSram" volume
+// default backup RAM contents: an empty, formatted volume, as games refuse an unformatted one.
+// The header and FAT bytes are the ones mednafen writes; the signature "\x24\x8a\xdfPCFXSram"
+// is the one in the BIOS (v1.00, FFF5C9E4).
 void pcfx_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
-	static const u8 header[] =
+	static constexpr u8 HEADER[] =
 	{
 		0x24, 0x8a, 0xdf, 0x50, 0x43, 0x46, 0x58, 0x53, 0x72, 0x61, 0x6d, 0x80, 0x00, 0x01, 0x01, 0x00,
 		0x01, 0x40, 0x00, 0x00, 0x01, 0xf9, 0x03, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00
 	};
-	static const u8 fat[] = { 0xf9, 0xff, 0xff };
+	static constexpr u8 FAT[] = { 0xf9, 0xff, 0xff };
 
-	u8 *const bram = reinterpret_cast<u8 *>(data);
+	u8 *const bram = static_cast<u8 *>(data);
 	std::fill_n(bram, size, 0);
-	std::copy(std::begin(header), std::end(header), &bram[0x00]);
-	std::copy(std::begin(fat), std::end(fat), &bram[0x80]);
+	std::copy(std::begin(HEADER), std::end(HEADER), &bram[0x00]);
+	std::copy(std::begin(FAT), std::end(FAT), &bram[0x80]);
 }
 
 // bus wait states: the DRAM charges 3 cycles when an access (opcode
