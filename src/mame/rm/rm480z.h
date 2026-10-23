@@ -92,6 +92,9 @@ private:
 
 	memory_view m_view;
 
+	int m_nmi_counter = 0;          // counter for NMI front panel single step debugging logic
+	bool m_nmi_en = false;          // set when NMI single step debugging logic is active
+
 	bool m_kbd_reset = true;        // cleared by firmware when it is ready to receive keyboard interrupts
 	bool m_kbd_ready = false;       // set when new key code is available (on key press or release)
 	uint8_t m_kbd_code = 0;         // scan code of last keyboard event (bit 7 set on key release)
@@ -130,6 +133,8 @@ private:
 	void rm480z_io(address_map &map) ATTR_COLD;
 	void rm480z_MK1_mem(address_map &map) ATTR_COLD;
 	void rm480z_MK2_mem(address_map &map) ATTR_COLD;
+
+	void z80_m1_w(uint8_t data);
 
 	uint8_t status_port_read(offs_t offset);
 	void control_port_write(offs_t offset, uint8_t data);
