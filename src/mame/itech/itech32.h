@@ -219,8 +219,9 @@ public:
 		m_tms2_ram(*this, "tms2_ram"),
 		m_leds(*this, "led%u", 0U),
 		m_steer(*this, "STEER"),
-		m_gas(*this, "GAS")
-	{ }
+		m_gas(*this, "GAS"),
+		m_wheel_motor(*this, "wheel_motor")
+	{}
 
 	void drivedge(machine_config &config) ATTR_COLD;
 
@@ -231,6 +232,11 @@ protected:
 private:
 	u16 steering_r();
 	u16 gas_r();
+
+	void wheel_motor_control_w(u16 data);
+	void wheel_motor_data_a_w(u16 data);
+	void wheel_motor_data_b_w(u16 data);
+	void update_wheel_motor();
 
 #if LOG_DRIVEDGE_UNINIT_RAM
 	u32 test1_r(offs_t offset, u32 mem_mask);
@@ -272,6 +278,12 @@ private:
 	output_finder<4> m_leds;
 	required_ioport m_steer;
 	required_ioport m_gas;
+
+	output_finder<> m_wheel_motor;
+
+	u16 m_wheel_motor_control = 2;
+	u16 m_wheel_motor_data_a = 0;
+	u16 m_wheel_motor_data_b = 0;
 
 	u8 m_tms_spinning[2];
 #if LOG_DRIVEDGE_UNINIT_RAM
