@@ -13,6 +13,7 @@
 #include "cpu/m6502/m6510.h"
 #include "imagedev/snapquik.h"
 #include "machine/6522via.h"
+#include "sound/flt_rc.h"
 #include "sound/mos6560.h"
 
 #include "screen.h"
@@ -59,7 +60,7 @@ public:
 
 protected:
 	void vic20(machine_config &config, const char* softlist_filter);
-	void add_clocked_devices(machine_config &config, uint32_t clock);
+	void add_clocked_devices(machine_config &config, const XTAL &clock) ATTR_COLD;
 
 private:
 	required_device<m6502_device> m_maincpu;
@@ -102,7 +103,8 @@ private:
 
 	void exp_reset_w(int state);
 
-	TIMER_CALLBACK_MEMBER(iec_sync_tick);
+	bool iec_ready(offs_t offset);
+	uint8_t via1_r(offs_t offset);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_vc20);
 
@@ -115,12 +117,6 @@ private:
 	int m_user_joy2;
 	int m_user_light_pen;
 	int m_user_cassette_switch;
-
-	emu_timer *m_iec_sync_timer;
-
-	int m_iec_atn = 0;
-	int m_iec_clk = 0;
-	int m_iec_data = 0;
 
 	void vic20_mem(address_map &map) ATTR_COLD;
 	void vic_colorram_map(address_map &map) ATTR_COLD;
@@ -148,12 +144,14 @@ void vic20_state::vic20_mem(address_map &map)
 	map(0x1000, 0x1fff).ram().share("ram");
 	map(0x8000, 0x8fff).rom().region("charom", 0);
 	map(0x9000, 0x900f).rw(m_vic, FUNC(mos6560_device::read), FUNC(mos6560_device::write));
-	map(0x9010, 0x901f).mirror(0x3c0).m(m_via1, FUNC(via6522_device::map));
+	map(0x9010, 0x901f).mirror(0x3c0).r(FUNC(vic20_state::via1_r)).w(m_via1, FUNC(via6522_device::write));
 	map(0x9020, 0x902f).mirror(0x3c0).m(m_via2, FUNC(via6522_device::map));
 	map(0x9030, 0x903f).mirror(0x3c0).lrw8(
-			NAME([this] (offs_t offset) { return m_via1->read(offset) & m_via2->read(offset); }),
+			NAME([this] (offs_t offset) -> u8 { return iec_ready(offset) ? (m_via1->read(offset) & m_via2->read(offset)) : 0xff; }),
 			NAME([this] (offs_t offset, uint8_t data) { m_via1->write(offset, data); m_via2->write(offset, data); }));
-	map(0x9400, 0x97ff).readonly().share("color_ram").lw8(NAME([this] (offs_t offset, uint8_t data) { m_color_ram[offset] = data & 0x0f; }));
+	map(0x9400, 0x97ff).lrw8(
+			NAME([this] (offs_t offset) -> u8 { return m_color_ram[offset] | (m_vic->bus_r() & 0xf0); }),
+			NAME([this] (offs_t offset, uint8_t data) { m_color_ram[offset] = data & 0x0f; }));
 	map(0xc000, 0xdfff).rom().region("basic", 0);
 	map(0xe000, 0xffff).rom().region("kernal", 0);
 }
@@ -165,9 +163,10 @@ void vic20_state::vic20_mem(address_map &map)
 
 void vic20_state::vic_videoram_map(address_map &map)
 {
-	map(0x0000, 0x0fff).mirror(0x1000).rom().region("charom", 0);
+	map(0x0000, 0x3fff).lr8(NAME([this] () -> u8 { return m_vic->fetch_open_bus_r(); }));
+	map(0x0000, 0x0fff).rom().region("charom", 0);
+	map(0x1400, 0x17ff).lr8(NAME([this] (offs_t offset) -> u8 { return (m_vic->fetch_open_bus_r() & 0xf0) | m_color_ram[offset]; }));
 	map(0x2000, 0x23ff).readonly().share("ram0");
-	map(0x2400, 0x2fff).nopr();
 	map(0x3000, 0x3fff).readonly().share("ram");
 }
 
@@ -327,6 +326,16 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
+bool vic20_state::iec_ready(offs_t offset)
+{
+	return ((offset != 1) && (offset != 15)) || m_iec->sample_ready(*m_maincpu);
+}
+
+uint8_t vic20_state::via1_r(offs_t offset)
+{
+	return iec_ready(offset) ? m_via1->read(offset) : 0xff;
+}
+
 uint8_t vic20_state::via1_pa_r()
 {
 	/*
@@ -389,8 +398,7 @@ void vic20_state::via1_pa_w(uint8_t data)
 
 	// serial attention out
 	m_user->write_9(!BIT(data, 7));
-	m_iec_atn = !BIT(data, 7);
-	m_iec_sync_timer->adjust(attotime::zero);
+	m_iec->host_atn_w(!BIT(data, 7));
 }
 
 void vic20_state::via1_pb_w(uint8_t data)
@@ -515,24 +523,14 @@ void vic20_state::via2_pb_w(uint8_t data)
 void vic20_state::via2_ca2_w(int state)
 {
 	// serial clock out
-	m_iec_clk = !state;
-	m_iec_sync_timer->adjust(attotime::zero);
+	m_iec->host_clk_w(!state);
 }
 
 void vic20_state::via2_cb2_w(int state)
 {
 	// serial data out
-	m_iec_data = !state;
-	m_iec_sync_timer->adjust(attotime::zero);
+	m_iec->host_data_w(!state);
 }
-
-TIMER_CALLBACK_MEMBER(vic20_state::iec_sync_tick)
-{
-	m_iec->host_atn_w(m_iec_atn);
-	m_iec->host_clk_w(m_iec_clk);
-	m_iec->host_data_w(m_iec_data);
-}
-
 
 //-------------------------------------------------
 //  VIC20_EXPANSION_INTERFACE( expansion_intf )
@@ -572,7 +570,22 @@ void vic20_state::machine_start()
 	m_key_row = 0xff;
 	m_key_col = 0xff;
 
-	m_iec_sync_timer = timer_alloc(FUNC(vic20_state::iec_sync_tick), this);
+	// the CPU drives the VIC data bus when it accesses memory on it
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	auto const vbus_r = [this] (offs_t offset, uint8_t &data, uint8_t mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+			m_vic->bus_w(data, m_color_ram[offset & 0x3ff]);
+	};
+	auto const vbus_w = [this] (offs_t offset, uint8_t &data, uint8_t mem_mask)
+	{
+		if (!machine().side_effects_disabled())
+			m_vic->bus_w(data);
+	};
+	program.install_readwrite_tap(0x0000, 0x03ff, "vbus_ram0", vbus_r, vbus_w);
+	program.install_readwrite_tap(0x1000, 0x1fff, "vbus_ram", vbus_r, vbus_w);
+	program.install_readwrite_tap(0x8000, 0x8fff, "vbus_chargen", vbus_r, vbus_w);
+	program.install_readwrite_tap(0x9000, 0x97ff, "vbus_io", vbus_w, vbus_w);
 
 	// state saving
 	save_item(NAME(m_key_row));
@@ -583,9 +596,6 @@ void vic20_state::machine_start()
 	save_item(NAME(m_user_joy2));
 	save_item(NAME(m_user_light_pen));
 	save_item(NAME(m_user_cassette_switch));
-	save_item(NAME(m_iec_atn));
-	save_item(NAME(m_iec_clk));
-	save_item(NAME(m_iec_data));
 }
 
 
@@ -634,7 +644,6 @@ void vic20_state::write_user_cassette_switch(int state)
 void vic20_state::vic20(machine_config &config, const char* softlist_filter)
 {
 	SCREEN(config, m_screen);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(VIC_TAG, FUNC(mos6560_device::screen_update));
 
 	m_vic->set_screen(SCREEN_TAG);
@@ -643,7 +652,9 @@ void vic20_state::vic20(machine_config &config, const char* softlist_filter)
 
 	m_vic->potx_rd_callback().set(m_joy, FUNC(vcs_control_port_device::read_pot_x));
 	m_vic->poty_rd_callback().set(m_joy, FUNC(vcs_control_port_device::read_pot_y));
-	m_vic->add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_vic->add_route(ALL_OUTPUTS, "lpf", 1.0);
+	FILTER_RC(config, "lpf").set_lowpass(RES_K(1), CAP_N(100)).add_route(ALL_OUTPUTS, "hpf", 1.0);
+	FILTER_RC(config, "hpf").set_rc(filter_rc_device::HIGHPASS, RES_K(1), 0, 0, CAP_U(1)).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	PET_DATASSETTE_PORT(config, m_cassette, 0);
 	cbm_datassette_devices(*m_cassette);
@@ -685,7 +696,7 @@ void vic20_state::vic20(machine_config &config, const char* softlist_filter)
 }
 
 
-void vic20_state::add_clocked_devices(machine_config &config, uint32_t clock)
+void vic20_state::add_clocked_devices(machine_config &config, const XTAL &clock)
 {
 	// basic machine hardware
 	M6502(config, m_maincpu, clock);
@@ -724,25 +735,21 @@ void vic20_state::add_clocked_devices(machine_config &config, uint32_t clock)
 
 void vic20_state::ntsc(machine_config &config)
 {
-	add_clocked_devices(config, MOS6560_CLOCK);
-	MOS6560(config, m_vic, MOS6560_CLOCK);
+	add_clocked_devices(config, mos6560_device::CLOCK);
+	MOS6560(config, m_vic, mos6560_device::CLOCK);
 	vic20(config, "NTSC");
 
-	m_screen->set_refresh_hz(MOS6560_VRETRACERATE);
-	m_screen->set_size((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE);
-	m_screen->set_visarea(MOS6560_MAME_XPOS, MOS6560_MAME_XPOS + MOS6560_MAME_XSIZE - 1, MOS6560_MAME_YPOS, MOS6560_MAME_YPOS + MOS6560_MAME_YSIZE - 1);
+	m_screen->set_raw(mos6560_device::CLOCK * 4, mos6560_device::HTOTAL, mos6560_device::HBEND, mos6560_device::HBSTART, mos6560_device::LINES, mos6560_device::VBEND, mos6560_device::LINES);
 }
 
 
 void vic20_state::pal(machine_config &config)
 {
-	add_clocked_devices(config, MOS6561_CLOCK);
-	MOS6561(config, m_vic, MOS6561_CLOCK);
+	add_clocked_devices(config, mos6561_device::CLOCK);
+	MOS6561(config, m_vic, mos6561_device::CLOCK);
 	vic20(config, "PAL");
 
-	m_screen->set_refresh_hz(MOS6561_VRETRACERATE);
-	m_screen->set_size((MOS6561_XSIZE + 7) & ~7, MOS6561_YSIZE);
-	m_screen->set_visarea(MOS6561_MAME_XPOS, MOS6561_MAME_XPOS + MOS6561_MAME_XSIZE - 1, MOS6561_MAME_YPOS, MOS6561_MAME_YPOS + MOS6561_MAME_YSIZE - 1);
+	m_screen->set_raw(mos6561_device::CLOCK * 4, mos6561_device::HTOTAL, mos6561_device::HBEND, mos6561_device::HBSTART, mos6561_device::LINES, mos6561_device::VBEND, mos6561_device::LINES);
 }
 
 
@@ -828,7 +835,7 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY                        FULLNAME                   FLAGS
-COMP( 1980, vic1001,  0,       0,      ntsc,    vic1001, vic20_state, empty_init, "Commodore Business Machines", "VIC-1001 (Japan)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, vic20,    vic1001, 0,      ntsc,    vic20,   vic20_state, empty_init, "Commodore Business Machines", "VIC-20 (NTSC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, vic20p,   vic1001, 0,      pal,     vic20,   vic20_state, empty_init, "Commodore Business Machines", "VIC-20 / VC-20 (PAL)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, vic20_se, vic1001, 0,      pal,     vic20s,  vic20_state, empty_init, "Commodore Business Machines", "VIC-20 (Sweden/Finland)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1980, vic1001,  0,       0,      ntsc,    vic1001, vic20_state, empty_init, "Commodore Business Machines", "VIC-1001 (Japan)",        MACHINE_SUPPORTS_SAVE )
+COMP( 1981, vic20,    vic1001, 0,      ntsc,    vic20,   vic20_state, empty_init, "Commodore Business Machines", "VIC-20 (NTSC)",           MACHINE_SUPPORTS_SAVE )
+COMP( 1981, vic20p,   vic1001, 0,      pal,     vic20,   vic20_state, empty_init, "Commodore Business Machines", "VIC-20 / VC-20 (PAL)",    MACHINE_SUPPORTS_SAVE )
+COMP( 1981, vic20_se, vic1001, 0,      pal,     vic20s,  vic20_state, empty_init, "Commodore Business Machines", "VIC-20 (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )

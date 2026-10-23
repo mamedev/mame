@@ -91,9 +91,11 @@ ROM_START(onlinertp)
 	DISK_IMAGE("comatel_onliner_v4.222.493_u4.44.450", 0, SHA1(ece4b51196b0196be83c20696a49fb6b4d720b65)) // Dump contains users and operator data
 
 	// I/O board
-	ROM_REGION(0x4000, "io", 0)
-	ROM_LOAD("pic16f873.ic1", 0x00000, 0x04000, NO_DUMP) // Protected
-	ROM_LOAD("24lc16b.ic4",   0x00000, 0x00800, CRC(78afb692) SHA1(ad511fc3403dbf693ede6413d22d45302776ac85))
+	ROM_REGION16_LE(0x4300, "io_pic", ROMREGION_ERASEFF)
+	ROM_LOAD("pic16f873.ic1", 0x0000, 0x4300, NO_DUMP)
+
+	ROM_REGION(0x800, "io_data", 0)
+	ROM_LOAD("24lc16b.ic4", 0x000, 0x800, CRC(78afb692) SHA1(ad511fc3403dbf693ede6413d22d45302776ac85))
 
 	// VGA BIOS
 	ROM_REGION(0x10000, "vga", 0)

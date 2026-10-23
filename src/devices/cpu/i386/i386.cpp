@@ -1541,12 +1541,12 @@ uint32_t i386_device::GetNonTranslatedEA(uint8_t modrm,uint8_t *seg)
 	return ea;
 }
 
-uint32_t i386_device::GetEA(uint8_t modrm, int rwn)
+uint32_t i386_device::GetEA(uint8_t modrm, int rwn, int size)
 {
 	uint8_t segment;
 	uint32_t ea;
 	modrm_to_EA(modrm, &ea, &segment );
-	return i386_translate(segment, ea, rwn );
+	return i386_translate(segment, ea, rwn, size );
 }
 
 void i386_device::i386_check_irq_line()

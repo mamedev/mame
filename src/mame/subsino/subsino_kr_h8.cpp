@@ -30,6 +30,7 @@ and a good number of capacitors and resistors.
 
 #include "emu.h"
 
+#include "ss9904.h"
 #include "subsino_io.h"
 
 #include "cpu/h8/h83048.h"
@@ -399,7 +400,7 @@ void subsino_kr_h8_state::modcart(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	// SS9804
+	SS9804(config, "ss9804", 32_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 

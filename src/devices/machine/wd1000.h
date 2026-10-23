@@ -36,9 +36,8 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	// declared but not defined?
-	int intrq_r();
-	int drq_r();
+	int intrq_r() const { return m_intrq; }
+	int drq_r() const { return m_drq; }
 
 
 protected:
@@ -86,6 +85,7 @@ private:
 	attotime get_stepping_rate();
 	void start_command();
 	void end_command();
+	bool drive_ready();
 	bool validate_id_field();
 	int get_lbasector();
 

@@ -118,9 +118,9 @@ SED1520_UPDATE_CB(gmaster_state::screen_update_cb)
 	// LCD #0: top half, LCD #1: bottom half
 	rectangle clip = m_screen->visible_area();
 	if (N == 1)
-		clip.min_y = 32;
+		clip.sety(32, clip.bottom());
 	else
-		clip.max_y = 32-1;
+		clip.sety(clip.top(), 32-1);
 	clip &= cliprect;
 
 	for (int c = 0; c < 320; c++)

@@ -94,6 +94,7 @@
 
 #include "corefloat.h"
 
+#include <bit>
 #include <cmath>
 #include <limits>
 
@@ -161,10 +162,10 @@ static inline void vector_cross3(poly_vertex *dst, const poly_vertex *v0, const 
 	dst->pz = (p1.x * p2.y) - (p1.y * p2.x);
 }
 
-static inline void apply_focus(model2_state::geo_state *geo, poly_vertex *p0)
+static inline void apply_focus(model2_state::geo_state &geo, poly_vertex *p0)
 {
-	p0->x *= geo->focus.x;
-	p0->y *= geo->focus.y;
+	p0->x *= geo.focus.x;
+	p0->y *= geo.focus.y;
 }
 
 /* 1.8.23 float to 4.12 float converter, courtesy of Aaron Giles */
@@ -273,12 +274,14 @@ inline bool model2_state::check_culling(raster_state *raster, u32 attr, float mi
  *
  *******************************************/
 
-void model2_state::raster_init(memory_region *texture_rom)
+void model2_state::raster_init(memory_region &texture_rom)
 {
 	m_raster = std::make_unique<raster_state>();
 
-	m_raster->texture_rom = (u16 *)texture_rom->base();
-	m_raster->texture_rom_mask = (texture_rom->bytes() / 2) - 1;
+	assert(std::has_single_bit(texture_rom.bytes()));
+	assert(texture_rom.bitwidth() == 16);
+	m_raster->texture_rom = (u16 *)texture_rom.base();
+	m_raster->texture_rom_mask = (texture_rom.bytes() / 2) - 1;
 
 	save_item(NAME(m_raster->min_z));
 	save_item(NAME(m_raster->max_z));
@@ -979,17 +982,27 @@ void model2_state::model2_3d_push(raster_state *raster, u32 input)
  *
  *******************************************/
 
-void model2_state::geo_init(memory_region *polygon_rom)
+void model2_state::geo_init(memory_region &polygon_rom)
 {
 	m_geo = std::make_unique<geo_state>();
 	m_geo->state = this;
 
+	assert(std::has_single_bit(polygon_rom.bytes()));
+	assert(polygon_rom.bitwidth() == 32);
 	m_geo->raster = m_raster.get();
-	m_geo->polygon_rom = (u32 *)polygon_rom->base();
-	m_geo->polygon_rom_mask = (polygon_rom->bytes() / 4) - 1;
+	m_geo->polygon_rom = (u32 *)polygon_rom.base();
+	m_geo->polygon_rom_mask = (polygon_rom.bytes() / 4) - 1;
 
 	save_item(NAME(m_geo->mode));
 	save_item(NAME(m_geo->matrix));
+	save_item(NAME(m_geo->mesh_begin));
+	save_item(NAME(m_geo->mesh_current));
+	save_item(NAME(m_geo->mesh_texture_start));
+	save_item(NAME(m_geo->mesh_texture_begin));
+	save_item(NAME(m_geo->mesh_texture_next));
+	save_item(NAME(m_geo->mesh_texture_end));
+	save_item(NAME(m_geo->mesh_mode));
+	save_item(NAME(m_geo->mesh_uv));
 	save_item(NAME(m_geo->lod));
 	save_item(NAME(m_geo->coef_table));
 	save_item(NAME(m_geo->polygon_ram0));
@@ -1003,9 +1016,9 @@ void model2_state::geo_init(memory_region *polygon_rom)
  *******************************************/
 
 /* Parse Polygons: Normals Present, No Specular case */
-void model2_state::geo_parse_np_ns(geo_state *geo, u32 *input, u32 count)
+void model2_state::geo_parse_np_ns(geo_state &geo, const u32 *input, u32 count)
 {
-	raster_state *raster = geo->raster;
+	raster_state *raster = geo.raster;
 	poly_vertex point, normal;
 	u32  attr, i;
 
@@ -1015,7 +1028,7 @@ void model2_state::geo_parse_np_ns(geo_state *geo, u32 *input, u32 count)
 	point.pz = u2f(*input++);
 
 	/* transform with the current matrix */
-	transform_point(&point, geo->matrix);
+	transform_point(&point, geo.matrix);
 
 	/* apply focus */
 	apply_focus(geo, &point);
@@ -1031,7 +1044,7 @@ void model2_state::geo_parse_np_ns(geo_state *geo, u32 *input, u32 count)
 	point.pz = u2f(*input++);
 
 	/* transform with the current matrix */
-	transform_point(&point, geo->matrix);
+	transform_point(&point, geo.matrix);
 
 	/* apply focus */
 	apply_focus(geo, &point);
@@ -1056,7 +1069,7 @@ void model2_state::geo_parse_np_ns(geo_state *geo, u32 *input, u32 count)
 		normal.pz = u2f(*input++);
 
 		/* transform with the current matrix */
-		transform_vector(&normal, geo->matrix);
+		transform_vector(&normal, geo.matrix);
 
 		if ((attr & 3) != 0) /* quad or triangle */
 		{
@@ -1071,10 +1084,10 @@ void model2_state::geo_parse_np_ns(geo_state *geo, u32 *input, u32 count)
 			point.pz = u2f(*input++);
 
 			/* transform with the current matrix */
-			transform_point(&point, geo->matrix);
+			transform_point(&point, geo.matrix);
 
 			/* calculate the dot product of the normal and the light vector */
-			dotl = dot_product(normal, geo->light);
+			dotl = dot_product(normal, geo.light);
 
 			/* calculate the dot product of the normal and the point */
 			dotp = dot_product(normal, point);
@@ -1087,7 +1100,7 @@ void model2_state::geo_parse_np_ns(geo_state *geo, u32 *input, u32 count)
 			if (dotp >= 0) face = 0; /* front */
 
 			/* get the texture parameters */
-			texparam = &geo->texture_parameters[(attr>>18) & 0x1f];
+			texparam = &geo.texture_parameters[(attr>>18) & 0x1f];
 
 			/* calculate luminance */
 			if ((dotl * dotp) < 0) luminance = 0;
@@ -1102,10 +1115,10 @@ void model2_state::geo_parse_np_ns(geo_state *geo, u32 *input, u32 count)
 			luma += face;
 
 			/* extract distance coefficient */
-			coef = geo->coef_table[attr>>27];
+			coef = geo.coef_table[attr>>27];
 
 			/* calculate texture level of detail */
-			distance = coef * fabs(dotp) * geo->lod;
+			distance = coef * fabs(dotp) * geo.lod;
 
 			/* push to the 3d rasterizer */
 			model2_3d_push(raster, luma << 15);
@@ -1123,7 +1136,7 @@ void model2_state::geo_parse_np_ns(geo_state *geo, u32 *input, u32 count)
 				point.pz = u2f(*input++);
 
 				/* transform with the current matrix */
-				transform_point(&point, geo->matrix);
+				transform_point(&point, geo.matrix);
 
 				/* apply focus */
 				apply_focus(geo, &point);
@@ -1150,9 +1163,9 @@ void model2_state::geo_parse_np_ns(geo_state *geo, u32 *input, u32 count)
 }
 
 /* Parse Polygons: Normals Present, Specular case */
-void model2_state::geo_parse_np_s(geo_state *geo, u32 *input, u32 count)
+void model2_state::geo_parse_np_s(geo_state &geo, const u32 *input, u32 count)
 {
-	raster_state *raster = geo->raster;
+	raster_state *raster = geo.raster;
 	poly_vertex point, normal;
 	u32  attr, i;
 
@@ -1162,7 +1175,7 @@ void model2_state::geo_parse_np_s(geo_state *geo, u32 *input, u32 count)
 	point.pz = u2f(*input++);
 
 	/* transform with the current matrix */
-	transform_point(&point, geo->matrix);
+	transform_point(&point, geo.matrix);
 
 	/* apply focus */
 	apply_focus(geo, &point);
@@ -1178,7 +1191,7 @@ void model2_state::geo_parse_np_s(geo_state *geo, u32 *input, u32 count)
 	point.pz = u2f(*input++);
 
 	/* transform with the current matrix */
-	transform_point(&point, geo->matrix);
+	transform_point(&point, geo.matrix);
 
 	/* apply focus */
 	apply_focus(geo, &point);
@@ -1203,7 +1216,7 @@ void model2_state::geo_parse_np_s(geo_state *geo, u32 *input, u32 count)
 		normal.pz = u2f(*input++);
 
 		/* transform with the current matrix */
-		transform_vector(&normal, geo->matrix);
+		transform_vector(&normal, geo.matrix);
 
 		if ((attr & 3) != 0) /* quad or triangle */
 		{
@@ -1218,10 +1231,10 @@ void model2_state::geo_parse_np_s(geo_state *geo, u32 *input, u32 count)
 			point.pz = u2f(*input++);
 
 			/* transform with the current matrix */
-			transform_point(&point, geo->matrix);
+			transform_point(&point, geo.matrix);
 
 			/* calculate the dot product of the normal and the light vector */
-			dotl = dot_product(normal, geo->light);
+			dotl = dot_product(normal, geo.light);
 
 			/* calculate the dot product of the normal and the point */
 			dotp = dot_product(normal, point);
@@ -1234,13 +1247,13 @@ void model2_state::geo_parse_np_s(geo_state *geo, u32 *input, u32 count)
 			if (dotp >= 0) face = 0; /* front */
 
 			/* get the texture parameters */
-			texparam = &geo->texture_parameters[(attr>>18) & 0x1f];
+			texparam = &geo.texture_parameters[(attr>>18) & 0x1f];
 
 			/* calculate luminance and specular */
 			if ((dotl * dotp) < 0) luminance = 0;
 			else luminance = fabs(dotl);
 
-			specular = ((2*dotl) * normal.pz) - geo->light.pz;
+			specular = ((2*dotl) * normal.pz) - geo.light.pz;
 			if (specular < 0) specular = 0;
 			if (texparam->specular_control == 0) specular = 0;
 			if ((texparam->specular_control >> 1) != 0) specular *= specular;
@@ -1258,10 +1271,10 @@ void model2_state::geo_parse_np_s(geo_state *geo, u32 *input, u32 count)
 			luma += face;
 
 			/* extract distance coefficient */
-			coef = geo->coef_table[attr>>27];
+			coef = geo.coef_table[attr>>27];
 
 			/* calculate texture level of detail */
-			distance = coef * fabs(dotp) * geo->lod;
+			distance = coef * fabs(dotp) * geo.lod;
 
 			/* push to the 3d rasterizer */
 			model2_3d_push(raster, luma << 15);
@@ -1279,7 +1292,7 @@ void model2_state::geo_parse_np_s(geo_state *geo, u32 *input, u32 count)
 				point.pz = u2f(*input++);
 
 				/* transform with the current matrix */
-				transform_point(&point, geo->matrix);
+				transform_point(&point, geo.matrix);
 
 				/* apply focus */
 				apply_focus(geo, &point);
@@ -1306,9 +1319,9 @@ void model2_state::geo_parse_np_s(geo_state *geo, u32 *input, u32 count)
 }
 
 /* Parse Polygons: No Normals, No Specular case */
-void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count)
+void model2_state::geo_parse_nn_ns(geo_state &geo, const u32 *input, u32 count)
 {
-	raster_state *raster = geo->raster;
+	raster_state *raster = geo.raster;
 	poly_vertex point, normal, p0, p1, p2, p3;
 	u32  attr, i;
 
@@ -1318,7 +1331,7 @@ void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count)
 	point.pz = u2f(*input++);
 
 	/* transform with the current matrix */
-	transform_point(&point, geo->matrix);
+	transform_point(&point, geo.matrix);
 
 	/* save for normal calculation */
 	p0.x = point.x; p0.y = point.y; p0.pz = point.pz;
@@ -1337,7 +1350,7 @@ void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count)
 	point.pz = u2f(*input++);
 
 	/* transform with the current matrix */
-	transform_point(&point, geo->matrix);
+	transform_point(&point, geo.matrix);
 
 	/* save for normal calculation */
 	p1.x = point.x; p1.y = point.y; p1.pz = point.pz;
@@ -1375,7 +1388,7 @@ void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count)
 			point.pz = u2f(*input++);
 
 			/* transform with the current matrix */
-			transform_point(&point, geo->matrix);
+			transform_point(&point, geo.matrix);
 
 			/* save for normal calculation */
 			p2.x = point.x; p2.y = point.y; p2.pz = point.pz;
@@ -1387,7 +1400,7 @@ void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count)
 			normalize_vector(&normal);
 
 			/* calculate the dot product of the normal and the light vector */
-			dotl = dot_product(normal, geo->light);
+			dotl = dot_product(normal, geo.light);
 
 			/* calculate the dot product of the normal and the point */
 			dotp = dot_product(normal, point);
@@ -1400,7 +1413,7 @@ void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count)
 			if (dotp >= 0) face = 0; /* front */
 
 			/* get the texture parameters */
-			texparam = &geo->texture_parameters[(attr>>18) & 0x1f];
+			texparam = &geo.texture_parameters[(attr>>18) & 0x1f];
 
 			/* calculate luminance */
 			if ((dotl * dotp) < 0) luminance = 0;
@@ -1415,10 +1428,10 @@ void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count)
 			luma += face;
 
 			/* extract distance coefficient */
-			coef = geo->coef_table[attr>>27];
+			coef = geo.coef_table[attr>>27];
 
 			/* calculate texture level of detail */
-			distance = coef * fabs(dotp) * geo->lod;
+			distance = coef * fabs(dotp) * geo.lod;
 
 			/* push to the 3d rasterizer */
 			model2_3d_push(raster, luma << 15);
@@ -1436,7 +1449,7 @@ void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count)
 				point.pz = u2f(*input++);
 
 				/* transform with the current matrix */
-				transform_point(&point, geo->matrix);
+				transform_point(&point, geo.matrix);
 
 				/* save for normal calculation */
 				p3.x = point.x; p3.y = point.y; p3.pz = point.pz;
@@ -1496,9 +1509,9 @@ void model2_state::geo_parse_nn_ns(geo_state *geo, u32 *input, u32 count)
 }
 
 /* Parse Polygons: No Normals, Specular case */
-void model2_state::geo_parse_nn_s(geo_state *geo, u32 *input, u32 count)
+void model2_state::geo_parse_nn_s(geo_state &geo, const u32 *input, u32 count)
 {
-	raster_state *raster = geo->raster;
+	raster_state *raster = geo.raster;
 	poly_vertex point, normal, p0, p1, p2, p3;
 	u32  attr, i;
 
@@ -1508,7 +1521,7 @@ void model2_state::geo_parse_nn_s(geo_state *geo, u32 *input, u32 count)
 	point.pz = u2f(*input++);
 
 	/* transform with the current matrix */
-	transform_point(&point, geo->matrix);
+	transform_point(&point, geo.matrix);
 
 	/* save for normal calculation */
 	p0.x = point.x; p0.y = point.y; p0.pz = point.pz;
@@ -1527,7 +1540,7 @@ void model2_state::geo_parse_nn_s(geo_state *geo, u32 *input, u32 count)
 	point.pz = u2f(*input++);
 
 	/* transform with the current matrix */
-	transform_point(&point, geo->matrix);
+	transform_point(&point, geo.matrix);
 
 	/* save for normal calculation */
 	p1.x = point.x; p1.y = point.y; p1.pz = point.pz;
@@ -1565,7 +1578,7 @@ void model2_state::geo_parse_nn_s(geo_state *geo, u32 *input, u32 count)
 			point.pz = u2f(*input++);
 
 			/* transform with the current matrix */
-			transform_point(&point, geo->matrix);
+			transform_point(&point, geo.matrix);
 
 			/* save for normal calculation */
 			p2.x = point.x; p2.y = point.y; p2.pz = point.pz;
@@ -1577,7 +1590,7 @@ void model2_state::geo_parse_nn_s(geo_state *geo, u32 *input, u32 count)
 			normalize_vector(&normal);
 
 			/* calculate the dot product of the normal and the light vector */
-			dotl = dot_product(normal, geo->light);
+			dotl = dot_product(normal, geo.light);
 
 			/* calculate the dot product of the normal and the point */
 			dotp = dot_product(normal, point);
@@ -1590,13 +1603,13 @@ void model2_state::geo_parse_nn_s(geo_state *geo, u32 *input, u32 count)
 			if (dotp >= 0) face = 0; /* front */
 
 			/* get the texture parameters */
-			texparam = &geo->texture_parameters[(attr>>18) & 0x1f];
+			texparam = &geo.texture_parameters[(attr>>18) & 0x1f];
 
 			/* calculate luminance and specular */
 			if ((dotl * dotp) < 0) luminance = 0;
 			else luminance = fabs(dotl);
 
-			specular = ((2*dotl) * normal.pz) - geo->light.pz;
+			specular = ((2*dotl) * normal.pz) - geo.light.pz;
 			if (specular < 0) specular = 0;
 			if (texparam->specular_control == 0) specular = 0;
 			if ((texparam->specular_control >> 1) != 0) specular *= specular;
@@ -1614,10 +1627,10 @@ void model2_state::geo_parse_nn_s(geo_state *geo, u32 *input, u32 count)
 			luma += face;
 
 			/* extract distance coefficient */
-			coef = geo->coef_table[attr>>27];
+			coef = geo.coef_table[attr>>27];
 
 			/* calculate texture level of detail */
-			distance = coef * fabs(dotp) * geo->lod;
+			distance = coef * fabs(dotp) * geo.lod;
 
 			/* push to the 3d rasterizer */
 			model2_3d_push(raster, luma << 15);
@@ -1635,7 +1648,7 @@ void model2_state::geo_parse_nn_s(geo_state *geo, u32 *input, u32 count)
 				point.pz = u2f(*input++);
 
 				/* transform with the current matrix */
-				transform_point(&point, geo->matrix);
+				transform_point(&point, geo.matrix);
 
 				/* save for normal calculation */
 				p3.x = point.x; p3.y = point.y; p3.pz = point.pz;
@@ -1701,9 +1714,9 @@ void model2_state::geo_parse_nn_s(geo_state *geo, u32 *input, u32 count)
  *******************************************/
 
 /* Command 00: NOP */
-u32 *model2_state::geo_nop(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_nop(geo_state &geo, u32 opcode, const u32 *input)
 {
-	raster_state *raster = geo->raster;
+	raster_state *raster = geo.raster;
 
 	/* push the opcode to the 3d rasterizer */
 	model2_3d_push(raster, opcode >> 23);
@@ -1712,9 +1725,9 @@ u32 *model2_state::geo_nop(geo_state *geo, u32 opcode, u32 *input)
 }
 
 /* Command 01: Object Data */
-u32 *model2_state::geo_object_data(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_object_data(geo_state &geo, u32 opcode, const u32 *input)
 {
-	raster_state *raster = geo->raster;
+	raster_state *raster = geo.raster;
 	u32  tpa = *input++;     /* Texture Point Address */
 	u32  tha = *input++;     /* Texture Header Address */
 	u32  oba = *input++;     /* Object Address */
@@ -1731,17 +1744,17 @@ u32 *model2_state::geo_object_data(geo_state *geo, u32 opcode, u32 *input)
 	if (oba & 0x01000000)
 	{
 		/* Fast polygon RAM */
-		obp = &geo->polygon_ram1[oba & 0x7fff];
+		obp = &geo.polygon_ram1[oba & 0x7fff];
 	}
 	else if (oba & 0x00800000)
 	{
 		/* Polygon ROM */
-		obp = &geo->polygon_rom[oba & geo->polygon_rom_mask];
+		obp = &geo.polygon_rom[oba & geo.polygon_rom_mask];
 	}
 	else
 	{
 		/* Slow Polygon RAM */
-		obp = &geo->polygon_ram0[oba & 0x7fff];
+		obp = &geo.polygon_ram0[oba & 0x7fff];
 	}
 
 	// if count == 0 then rolls over to max size
@@ -1749,7 +1762,7 @@ u32 *model2_state::geo_object_data(geo_state *geo, u32 opcode, u32 *input)
 	if (obc == 0)
 		obc = 0xfffff;
 
-	switch (geo->mode & 3)
+	switch (geo.mode & 3)
 	{
 		/* Normals present, No Specular */
 		case 0: geo_parse_np_ns(geo, obp, obc); break;
@@ -1769,9 +1782,9 @@ u32 *model2_state::geo_object_data(geo_state *geo, u32 opcode, u32 *input)
 }
 
 /* Command 02: Direct Data */
-u32 *model2_state::geo_direct_data(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_direct_data(geo_state &geo, u32 opcode, const u32 *input)
 {
-	raster_state *raster = geo->raster;
+	raster_state *raster = geo.raster;
 	u32  tpa = *input++;     /* Texture Point Address */
 	u32  tha = *input++;     /* Texture Header Address */
 
@@ -1823,9 +1836,9 @@ u32 *model2_state::geo_direct_data(geo_state *geo, u32 opcode, u32 *input)
 }
 
 /* Command 03: Window Data */
-u32 *model2_state::geo_window_data(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_window_data(geo_state &geo, u32 opcode, const u32 *input)
 {
-	raster_state *raster = geo->raster;
+	raster_state *raster = geo.raster;
 
 	/* start by pushing the opcode */
 	model2_3d_push(raster, opcode >> 23);
@@ -1859,9 +1872,9 @@ u32 *model2_state::geo_window_data(geo_state *geo, u32 opcode, u32 *input)
 }
 
 /* Command 04: Texture Data Write */
-u32 *model2_state::geo_texture_data(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_texture_data(geo_state &geo, u32 opcode, const u32 *input)
 {
-	raster_state *raster = geo->raster;
+	raster_state *raster = geo.raster;
 
 	/* start by pushing the opcode */
 	model2_3d_push(raster, opcode >> 23);
@@ -1883,12 +1896,10 @@ u32 *model2_state::geo_texture_data(geo_state *geo, u32 opcode, u32 *input)
 }
 
 /* Command 05: Polygon Data */
-u32 *model2_state::geo_polygon_data(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_polygon_data(geo_state &geo, u32 opcode, const u32 *input)
 {
 	u32  address, count, i;
 	u32 *p;
-
-	(void)opcode;
 
 	/* read in the address */
 	address = *input++;
@@ -1897,12 +1908,12 @@ u32 *model2_state::geo_polygon_data(geo_state *geo, u32 opcode, u32 *input)
 	if (address & 0x01000000)
 	{
 		/* Fast polygon RAM */
-		p = &geo->polygon_ram1[address & 0x7fff];
+		p = &geo.polygon_ram1[address & 0x7fff];
 	}
 	else
 	{
 		/* Slow Polygon RAM */
-		p = &geo->polygon_ram0[address & 0x7fff];
+		p = &geo.polygon_ram0[address & 0x7fff];
 	}
 
 	/* read the count */
@@ -1916,30 +1927,28 @@ u32 *model2_state::geo_polygon_data(geo_state *geo, u32 opcode, u32 *input)
 }
 
 /* Command 06: Texture Parameters */
-u32 *model2_state::geo_texture_parameters(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_texture_parameters(geo_state &geo, u32 opcode, const u32 *input)
 {
-	u32  index, count, i, param;
-
-	(void)opcode;
+	u32  index;
 
 	/* read in the index */
 	index = (*input++) >> 2;
 
 	/* read in the conut */
-	count = *input++;
+	u32 const count = *input++;
 
-	for (i = 0; i < count; i++)
+	for (u32 i = 0; i < count; i++)
 	{
 		/* read in the texture parameters */
-		param = *input++;
+		u32 const param = *input++;
 
-		geo->texture_parameters[index].diffuse = float(param & 0xff);
-		geo->texture_parameters[index].ambient = float((param >> 8) & 0xff);
-		geo->texture_parameters[index].specular_control = (param >> 24) & 0xff;
-		geo->texture_parameters[index].specular_scale = float((param >> 16) & 0xff);
+		geo.texture_parameters[index].diffuse = float(param & 0xff);
+		geo.texture_parameters[index].ambient = float((param >> 8) & 0xff);
+		geo.texture_parameters[index].specular_control = (param >> 24) & 0xff;
+		geo.texture_parameters[index].specular_scale = float((param >> 16) & 0xff);
 
 		/* read in the distance coefficient */
-		geo->coef_table[index] = u2f(*input++);
+		geo.coef_table[index] = u2f(*input++);
 
 		index = (index + 1) & 0x1f;
 	}
@@ -1948,20 +1957,18 @@ u32 *model2_state::geo_texture_parameters(geo_state *geo, u32 opcode, u32 *input
 }
 
 /* Command 07: Geo Mode */
-u32 *model2_state::geo_mode(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_mode(geo_state &geo, u32 opcode, const u32 *input)
 {
-	(void)opcode;
-
 	/* read in the mode */
-	geo->mode = *input++;
+	geo.mode = *input++;
 
 	return input;
 }
 
 /* Command 08: ZSort Mode */
-u32 *model2_state::geo_zsort_mode(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_zsort_mode(geo_state &geo, u32 opcode, const u32 *input)
 {
-	raster_state *raster = geo->raster;
+	raster_state *raster = geo.raster;
 
 	/* push the opcode */
 	model2_3d_push(raster, opcode >> 23);
@@ -1973,69 +1980,187 @@ u32 *model2_state::geo_zsort_mode(geo_state *geo, u32 opcode, u32 *input)
 }
 
 /* Command 09: Focal Distance */
-u32 *model2_state::geo_focal_distance(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_focal_distance(geo_state &geo, u32 opcode, const u32 *input)
 {
-	(void)opcode;
-
 	/* read the x focus value */
-	geo->focus.x = u2f(*input++);
+	geo.focus.x = u2f(*input++);
 
 	/* read the y focus value */
-	geo->focus.y = u2f(*input++);
+	geo.focus.y = u2f(*input++);
 
 	return input;
 }
 
 /* Command 0A: Light Source Vector Write */
-u32 *model2_state::geo_light_source(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_light_source(geo_state &geo, u32 opcode, const u32 *input)
 {
-	(void)opcode;
-
 	/* read the x light value */
-	geo->light.x = u2f(*input++);
+	geo.light.x = u2f(*input++);
 
 	/* read the y light value */
-	geo->light.y = u2f(*input++);
+	geo.light.y = u2f(*input++);
 
 	/* read the z light value */
-	geo->light.pz = u2f(*input++);
+	geo.light.pz = u2f(*input++);
 
 	return input;
 }
 
 /* Command 0B: Transformation Matrix Write */
-u32 *model2_state::geo_matrix_write(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_matrix_write(geo_state &geo, u32 opcode, const u32 *input)
 {
-	u32  i;
-
-	(void)opcode;
-
 	/* read in the transformation matrix */
-	for (i = 0; i < 12; i++)
-		geo->matrix[i] = u2f(*input++);
+	for (u32 i = 0; i < 12; i++)
+		geo.matrix[i] = u2f(*input++);
 
 	return input;
 }
 
-/* Command 0C: Parallel Transfer Vector Write */
-u32 *model2_state::geo_translate_write(geo_state *geo, u32 opcode, u32 *input)
+// SHARC Geometrizer environment-coordinate commands, recovered from the
+// uploaded handlers at 0x20c36, 0x20c6c and 0x20c4b respectively.
+const u32 *model2_state::geo_mesh_mode(geo_state &geo, u32 opcode, const u32 *input)
 {
-	u32  i;
+	u32 const previous = geo.mesh_mode;
+	geo.mesh_mode = *input++;
+	if (!geo.mesh_mode)
+	{
+		geo.mesh_begin = 0x30100;
+		geo.mesh_texture_begin = geo.mesh_texture_start;
+	}
+	else if (!previous)
+		geo.mesh_texture_end = geo.mesh_texture_next;
+	return input;
+}
 
-	(void)opcode;
+const u32 *model2_state::geo_mesh_draw(geo_state &geo, u32 opcode, const u32 *input)
+{
+	u32 address = *input++;
+	u32 const header = *input++;
+	u32 const object = *input++;
+	u32 const count = *input++;
+	auto read =
+			[&geo] (u32 address) -> u32
+			{
+				if (address & 0x01000000)
+					return geo.polygon_ram1[address & 0x7fff];
+				else if (address & 0x00800000)
+					return geo.polygon_rom[address & geo.polygon_rom_mask];
+				else
+					return geo.polygon_ram0[address & 0x7fff];
+			};
+	auto coordinates =
+			[&geo, &read, &address] () -> u32
+			{
+				float const x = u2f(read(address++));
+				float const y = u2f(read(address++));
+				float const z = u2f(read(address++));
+				// FIX BY 9 with MODE1.TRUNC set: scale both transformed axes by 512.
+				float u = 1.0f - x * geo.matrix[0];
+				float v = 1.0f + x * geo.matrix[1];
+				u -= y * geo.matrix[3];
+				v += y * geo.matrix[4];
+				u -= z * geo.matrix[6];
+				v += z * geo.matrix[7];
+				return (u32(s32(u * 512.0f)) << 16) | (u32(s32(v * 512.0f)) & 0xffff);
+			};
+	auto store =
+			[&geo] (u32 uv)
+			{
+				// The SHARC's 2-Mbit configuration mirrors this data bank at 0x30000.
+				geo.mesh_uv[geo.mesh_current++ & 0x7fff] = uv;
+			};
 
+	u32 const polygons = count ? count : 0xfffff;
+	if (geo.mesh_mode)
+	{
+		address += 6;
+		for (u32 i = 0; i < polygons; ++i, address += 10)
+		{
+			u32 const attr = read(address);
+			if (!(attr & 3))
+				break;
+			geo.mesh_current += (attr & 1) ? 4 : 3;
+		}
+	}
+	else
+	{
+		u32 first = coordinates();
+		u32 second = coordinates();
+		for (u32 i = 0; i < polygons; ++i)
+		{
+			u32 const attr = read(address++);
+			if (!(attr & 3))
+				break;
+			address += 3; // Per-face normal is not used for environment mapping.
+			u32 const third = coordinates();
+			store(second);
+			store(first);
+			store(third);
+			if (attr & 1)
+			{
+				u32 const fourth = coordinates();
+				store(fourth);
+				if (!(attr & 0x100))
+				{
+					first = third;
+					second = fourth;
+				}
+				else if (!(attr & 0x200))
+					second = third;
+				else
+					first = fourth;
+			}
+			else
+			{
+				address += 3; // Unused fourth vertex remains padded in this format.
+				if ((attr & 0x300) == 0x300)
+					first = third;
+				else
+					second = third;
+			}
+		}
+	}
+
+	u32 packet[] = { geo.mesh_texture_next, header, object, count };
+	geo.mesh_texture_next = geo.mesh_texture_start + 2 * (geo.mesh_current - 0x30100);
+	geo_object_data(geo, 0x00800000, packet);
+	return input;
+}
+
+const u32 *model2_state::geo_mesh_flush(geo_state &geo, u32 opcode, const u32 *input)
+{
+	u32 const count = (geo.mesh_texture_end - geo.mesh_texture_begin) & ~u32(1);
+	if (count)
+	{
+		model2_3d_push(geo.raster, 4);
+		model2_3d_push(geo.raster, geo.mesh_texture_begin);
+		model2_3d_push(geo.raster, count);
+		for (u32 i = 0; i < count; ++i)
+		{
+			u32 const word = geo.mesh_uv[(geo.mesh_begin + i / 2) & 0x7fff];
+			model2_3d_push(geo.raster, s32(s16(word >> (16 * (i & 1)))));
+		}
+	}
+	geo.mesh_begin = geo.mesh_current = 0x30100;
+	geo.mesh_texture_start = geo.mesh_texture_begin = *input++;
+	geo.mesh_texture_next = geo.mesh_texture_end = geo.mesh_texture_start;
+	geo.mesh_mode = 0;
+	return input;
+}
+
+/* Command 0C: Parallel Transfer Vector Write */
+const u32 *model2_state::geo_translate_write(geo_state &geo, u32 opcode, const u32 *input)
+{
 	/* read in the translation vector */
-	for (i = 0; i < 3; i++)
-		geo->matrix[i+9] = u2f(*input++);
+	for (u32 i = 0; i < 3; i++)
+		geo.matrix[i+9] = u2f(*input++);
 
 	return input;
 }
 
 /* Command 0D: Geo Data Memory Push (undocumented, unsupported) */
-u32 *model2_state::geo_data_mem_push(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_data_mem_push(geo_state &geo, u32 opcode, const u32 *input)
 {
-	u32  address, count, i;
-
 	/*
 	    This command pushes data stored in the Geometry DSP's RAM
 	    to the hardware 3D rasterizer. Since we don't emulate the
@@ -2049,19 +2174,16 @@ u32 *model2_state::geo_data_mem_push(geo_state *geo, u32 opcode, u32 *input)
 	*/
 
 
-	(void)opcode;
-
 	/* read in the address */
-	address = *input++;
+	u32 const address = *input++;
 
 	/* read in the count */
-	count = *input++;
+	u32 const count = *input++;
 
 	logerror("SEGA GEO: Executing unsupported geo_data_mem_push (address = %08x, count = %08x)\n", address, count);
 
-	(void)i;
 /*
-    for (i = 0; i < count; i++)
+    for (u32 i = 0; i < count; i++)
         model2_3d_push(0);
 */
 
@@ -2069,16 +2191,14 @@ u32 *model2_state::geo_data_mem_push(geo_state *geo, u32 opcode, u32 *input)
 }
 
 /* Command 0E: Geo Test */
-u32 *model2_state::geo_test(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_test(geo_state &geo, u32 opcode, const u32 *input)
 {
-	u32      data, blocks, address, count, checksum, i;
-
-	(void)opcode;
+	u32      data;
 
 	/* fifo test */
 	data = 1;
 
-	for (i = 0; i < 32; i++)
+	for (u32 i = 0; i < 32; i++)
 	{
 		if (*input++ != data)
 		{
@@ -2090,36 +2210,30 @@ u32 *model2_state::geo_test(geo_state *geo, u32 opcode, u32 *input)
 	}
 
 	/* get the number of checksums we have to run */
-	blocks = *input++;
+	u32 const blocks = *input++;
 
-	for (i = 0; i < blocks; i++)
+	for (u32 i = 0; i < blocks; i++)
 	{
-		u32  sum_even, sum_odd, j;
-
 		/* read in the address */
-		address = (*input++) & 0x7fffff;
+		u32 address = (*input++) & 0x7fffff;
 
 		/* read in the count */
-		count = *input++;
+		u32 const count = *input++;
 
 		/* read in the checksum */
-		checksum = *input++;
+		u32 const checksum = *input++;
 
 		/* reset the checksum counters */
-		sum_even = 0;
-		sum_odd = 0;
+		u32 sum_even = 0;
+		u32 sum_odd = 0;
 
-		for (j = 0; j < count; j++)
+		for (u32 j = 0; j < count; j++)
 		{
-			data = geo->polygon_rom[address++];
-
-			address &= geo->polygon_rom_mask;
+			address &= geo.polygon_rom_mask;
+			data = geo.polygon_rom[address++];
 
 			sum_even += data >> 16;
-			sum_even &= 0xffff;
-
 			sum_odd += data & 0xffff;
-			sum_odd &= 0xffff;
 		}
 
 		sum_even += checksum >> 16;
@@ -2139,11 +2253,9 @@ u32 *model2_state::geo_test(geo_state *geo, u32 opcode, u32 *input)
 }
 
 /* Command 0F: End */
-u32 *model2_state::geo_end(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_end(geo_state &geo, u32 opcode, const u32 *input)
 {
-	raster_state *raster = geo->raster;
-
-	(void)opcode;
+	raster_state *raster = geo.raster;
 
 	/* signal the end of this data block the rasterizer */
 	model2_3d_push(raster, 0xff000000);
@@ -2153,10 +2265,9 @@ u32 *model2_state::geo_end(geo_state *geo, u32 opcode, u32 *input)
 }
 
 /* Command 10: Dummy */
-u32 *model2_state::geo_dummy(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_dummy(geo_state &geo, u32 opcode, const u32 *input)
 {
 //  u32  data;
-	(void)opcode;
 
 	/* do the dummy read cycle */
 //  data = *input++;
@@ -2166,10 +2277,9 @@ u32 *model2_state::geo_dummy(geo_state *geo, u32 opcode, u32 *input)
 }
 
 /* Command 14: Log Data Write */
-u32 *model2_state::geo_log_data(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_log_data(geo_state &geo, u32 opcode, const u32 *input)
 {
-	raster_state *raster = geo->raster;
-	u32  i, count;
+	raster_state *raster = geo.raster;
 
 	/* start by pushing the opcode */
 	model2_3d_push(raster, opcode >> 23);
@@ -2178,15 +2288,15 @@ u32 *model2_state::geo_log_data(geo_state *geo, u32 opcode, u32 *input)
 	model2_3d_push(raster, *input++);
 
 	/* get the count */
-	count = *input++;
+	u32 const count = *input++;
 
 	/* push the count */
 	model2_3d_push(raster, count << 2);
 
 	/* loop and send the data */
-	for (i = 0; i < count; i++)
+	for (u32 i = 0; i < count; i++)
 	{
-		u32  data = *input++;
+		u32 const data = *input++;
 
 		model2_3d_push(raster, data & 0xff);
 		model2_3d_push(raster, (data >> 8) & 0xff);
@@ -2198,21 +2308,17 @@ u32 *model2_state::geo_log_data(geo_state *geo, u32 opcode, u32 *input)
 }
 
 /* Command 16: LOD */
-u32 *model2_state::geo_lod(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_lod(geo_state &geo, u32 opcode, const u32 *input)
 {
-	(void)opcode;
-
 	/* read in the LOD */
-	geo->lod = u2f(*input++);
+	geo.lod = u2f(*input++);
 
 	return input;
 }
 
 /* Command 1D: Code Upload  (undocumented, unsupported) */
-u32 *model2_state::geo_code_upload(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_code_upload(geo_state &geo, u32 opcode, const u32 *input)
 {
-	u32  count, i;
-
 	/*
 	    This command uploads code to program memory and
 	    optionally runs it. Probably used for debugging.
@@ -2222,16 +2328,14 @@ u32 *model2_state::geo_code_upload(geo_state *geo, u32 opcode, u32 *input)
 
 	logerror("SEGA GEO: Uploading debug code (unimplemented)\n");
 
-	(void)opcode;
-
 	/* read in the flags */
 //  flags = *input++;
 	input++;
 
 	/* read in the count */
-	count = *input++;
+	u32 const count = *input++;
 
-	for (i = 0; i < count; i++)
+	for (u32 i = 0; i < count; i++)
 	{
 		[[maybe_unused]] u64  code;
 
@@ -2258,7 +2362,7 @@ u32 *model2_state::geo_code_upload(geo_state *geo, u32 opcode, u32 *input)
 }
 
 /* Command 1E: Code Jump (undocumented, unsupported) */
-u32 *model2_state::geo_code_jump(geo_state *geo, u32 opcode, u32 *input)
+const u32 *model2_state::geo_code_jump(geo_state &geo, u32 opcode, const u32 *input)
 {
 //  u32  address;
 
@@ -2272,8 +2376,6 @@ u32 *model2_state::geo_code_jump(geo_state *geo, u32 opcode, u32 *input)
 
 	logerror("SEGA GEO: Jumping to debug code (unimplemented)\n");
 
-	(void)opcode;
-
 //  address = *input++ & 0x3ff;
 	input++;
 
@@ -2283,7 +2385,7 @@ u32 *model2_state::geo_code_jump(geo_state *geo, u32 opcode, u32 *input)
 	return input;
 }
 
-u32 *model2_state::geo_process_command(geo_state *geo, u32 opcode, u32 *input, bool *end_code)
+const u32 *model2_state::geo_process_command(geo_state &geo, u32 opcode, const u32 *input, bool *end_code)
 {
 	switch ((opcode >> 23) & 0x1f)
 	{
@@ -2313,9 +2415,15 @@ u32 *model2_state::geo_process_command(geo_state *geo, u32 opcode, u32 *input, b
 		case 0x17: input = geo_mode(geo, opcode, input);                  break;
 		case 0x18: input = geo_zsort_mode(geo, opcode, input);            break;
 		case 0x19: input = geo_focal_distance(geo, opcode, input);        break;
-		case 0x1a: input = geo_light_source(geo, opcode, input);          break;
-		case 0x1b: input = geo_matrix_write(geo, opcode, input);          break;
-		case 0x1c: input = geo_translate_write(geo, opcode, input);       break;
+		case 0x1a:
+			input = m_geo_mesh ? geo_mesh_mode(geo, opcode, input) : geo_light_source(geo, opcode, input);
+			break;
+		case 0x1b:
+			input = m_geo_mesh ? geo_mesh_draw(geo, opcode, input) : geo_matrix_write(geo, opcode, input);
+			break;
+		case 0x1c:
+			input = m_geo_mesh ? geo_mesh_flush(geo, opcode, input) : geo_translate_write(geo, opcode, input);
+			break;
 		case 0x1d: input = geo_code_upload(geo, opcode, input);           break;
 		case 0x1e: input = geo_code_jump(geo, opcode, input);             break;
 		case 0x1f: input = geo_end(geo, opcode, input); *end_code = true; break;
@@ -2326,10 +2434,10 @@ u32 *model2_state::geo_process_command(geo_state *geo, u32 opcode, u32 *input, b
 
 void model2_state::geo_parse()
 {
-	u32  address = (m_geo_read_start_address & 0x1ffff)/4;
-	u32 *input = &m_bufferram[address];
-	u32  opcode;
-	u32  op_count = 0;
+	u32 address = (m_geo_read_start_address & 0x1ffff)/4;
+	u32 const *input = &m_bufferram[address];
+	u32 opcode;
+	u32 op_count = 0;
 	bool end_code = false;
 
 	// reset raster frame variables
@@ -2354,7 +2462,7 @@ void model2_state::geo_parse()
 		}
 
 		/* process it */
-		input = geo_process_command(m_geo.get(), opcode, input, &end_code);
+		input = geo_process_command(*m_geo, opcode, input, &end_code);
 	}
 }
 
@@ -2372,10 +2480,10 @@ void model2_state::video_start()
 	m_renderer = std::make_unique<model2_renderer>(*this);
 
 	/* initialize the hardware rasterizer */
-	raster_init(memregion("textures"));
+	raster_init(*memregion("textures"));
 
 	/* initialize the geometry engine */
-	geo_init(memregion("polygons"));
+	geo_init(*memregion("polygons"));
 
 	/* init various video-related pointers */
 	m_palram = make_unique_clear<u16[]>(0x4000/2);

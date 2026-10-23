@@ -268,12 +268,12 @@ void mz80b_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cli
 	const u8 layer1_mask = BIT(m_gvram_mask, 0) * 0xff;
 	const u8 layer2_mask = BIT(m_gvram_mask, 1) * 0xff;
 
-	for (unsigned y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (unsigned y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		const u16 gfx_offset = y * 40;
 		auto *const dst = &bitmap.pix(y);
 
-		for (unsigned x = cliprect.min_x; x <= cliprect.max_x; x += 16)
+		for (unsigned x = cliprect.left(); x <= cliprect.right(); x += 16)
 		{
 			const u8 x_offset = x >> 4;
 			const u8 gfx_1 = m_gvram[gfx_offset + x_offset + 0x0000] & layer1_mask;
@@ -293,12 +293,12 @@ void mz80b_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cli
 
 void mz2000_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (unsigned y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (unsigned y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		const u16 gfx_offset = y * 80;
 		auto *const dst = &bitmap.pix(y);
 
-		for (unsigned x = cliprect.min_x; x <= cliprect.max_x; x += 8)
+		for (unsigned x = cliprect.left(); x <= cliprect.right(); x += 8)
 		{
 			const u8 x_offset = x >> 3;
 			const u8 gfx_b = m_gvram[gfx_offset + x_offset + 0x4000];
@@ -323,12 +323,12 @@ void mz80b_state::draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprec
 	const u8 x_shift = m_width80 ? 0 : 1;
 	u8 *gfx_data = m_region_chargen->base();
 
-	for (unsigned y = cliprect.min_y; y <= cliprect.max_y; y ++)
+	for (unsigned y = cliprect.top(); y <= cliprect.bottom(); y ++)
 	{
 		const u16 tile_offset = (y >> 3) * x_size;
 		auto *const dst = &bitmap.pix(y);
 
-		for (unsigned x = cliprect.min_x; x <= cliprect.max_x; x += x_inc)
+		for (unsigned x = cliprect.left(); x <= cliprect.right(); x += x_inc)
 		{
 			const u8 x_offset = x >> (3 + x_shift);
 			const u8 tile = m_tvram[tile_offset + x_offset];
@@ -350,12 +350,12 @@ void mz80b_state::draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 void mz2200_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (unsigned y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (unsigned y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		const u16 gfx_offset = y * 80;
 		auto *const dst = &bitmap.pix(y);
 
-		for (unsigned x = cliprect.min_x; x <= cliprect.max_x; x += 8)
+		for (unsigned x = cliprect.left(); x <= cliprect.right(); x += 8)
 		{
 			const u8 x_offset = x >> 3;
 			const u8 gfx_b = m_gvram[gfx_offset + x_offset + 0x4000];
@@ -380,12 +380,12 @@ void mz2200_state::draw_text_layer(bitmap_ind16 &bitmap, const rectangle &clipre
 	const u8 x_shift = m_width80 ? 0 : 1;
 	u8 *gfx_data = m_region_chargen->base();
 
-	for (unsigned y = cliprect.min_y; y <= cliprect.max_y; y ++)
+	for (unsigned y = cliprect.top(); y <= cliprect.bottom(); y ++)
 	{
 		const u16 tile_offset = (y >> 3) * x_size;
 		auto *const dst = &bitmap.pix(y);
 
-		for (unsigned x = cliprect.min_x; x <= cliprect.max_x; x += x_inc)
+		for (unsigned x = cliprect.left(); x <= cliprect.right(); x += x_inc)
 		{
 			const u8 x_offset = x >> (3 + x_shift);
 			const u8 tile = m_tvram[tile_offset + x_offset];

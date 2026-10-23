@@ -615,8 +615,9 @@ ROM_START( mil4000 )
 	ROM_REGION( 0x40000, "oki", 0 ) // 6295 samples
 	ROM_LOAD( "1.u54",   0x000000, 0x40000, CRC(e4a89163) SHA1(c0622c4e97b23daf9775137a2754bf9c47a29385) )
 
-	ROM_REGION( 0x4d4c, "mcu", 0 ) // MCU code
-	ROM_LOAD( "pic16c65a.u60.bad.dump", 0x000, 0x4d4c, BAD_DUMP CRC(c5e260ec) SHA1(d6e41de8a7db27382757ed7edfd7985090896e39) )
+	// no code, just the user ids and configuration word
+	ROM_REGION16_LE( 0x4010, "mcu", 0 )
+	ROM_LOAD( "pic16c65a.u60", 0x0000, 0x4010, BAD_DUMP CRC(35af8c19) SHA1(bd72fcef216d978d613ef41a003886f208d56909) )
 
 // palce22v10h.u74.bad.dump= palce22v10h-ch-jin-u27.u27  Jingle Bell (Italy, V133I)
 ROM_END
@@ -636,8 +637,9 @@ ROM_START( mil4000a )
 	ROM_REGION( 0x40000, "oki", 0 ) // 6295 samples
 	ROM_LOAD( "1.u54",   0x000000, 0x40000, CRC(e4a89163) SHA1(c0622c4e97b23daf9775137a2754bf9c47a29385) )
 
-	ROM_REGION( 0x4d4c, "mcu", 0 ) // MCU code
-	ROM_LOAD( "pic16c65b_millennium4000.u60", 0x000, 0x4d4c, BAD_DUMP CRC(4f3f7b90) SHA1(fdf689dda57960820315dcf0138d2ade28248681) )
+	// no code, just the user ids and configuration word
+	ROM_REGION16_LE( 0x4010, "mcu", 0 )
+	ROM_LOAD( "pic16c65b_millennium4000.u60", 0x0000, 0x4010, BAD_DUMP CRC(b5ac8f19) SHA1(a02270ff5e82c91004bf100b75c564108377e3f7) )
 
 // palce22v10h.u74.bad.dump= palce22v10h-ch-jin-u27.u27  Jingle Bell (Italy, V133I)
 ROM_END
@@ -657,8 +659,9 @@ ROM_START( mil4000b )
 	ROM_REGION( 0x40000, "oki", 0 ) // 6295 samples
 	ROM_LOAD( "1.u54",   0x000000, 0x40000, CRC(e4a89163) SHA1(c0622c4e97b23daf9775137a2754bf9c47a29385) )
 
-	ROM_REGION( 0x4d4c, "mcu", 0 ) // MCU code
-	ROM_LOAD( "pic16c65b_millennium4000.u60", 0x000, 0x4d4c, BAD_DUMP CRC(4f3f7b90) SHA1(fdf689dda57960820315dcf0138d2ade28248681) )
+	// no code, just the user ids and configuration word
+	ROM_REGION16_LE( 0x4010, "mcu", 0 )
+	ROM_LOAD( "pic16c65b_millennium4000.u60", 0x0000, 0x4010, BAD_DUMP CRC(b5ac8f19) SHA1(a02270ff5e82c91004bf100b75c564108377e3f7) )
 ROM_END
 
 ROM_START( mil4000c )
@@ -676,8 +679,8 @@ ROM_START( mil4000c )
 	ROM_REGION( 0x40000, "oki", 0 ) // 6295 samples
 	ROM_LOAD( "red.u54",   0x000000, 0x40000, CRC(e4a89163) SHA1(c0622c4e97b23daf9775137a2754bf9c47a29385) )
 
-	ROM_REGION( 0x4d4c, "mcu", 0 ) // MCU code
-	ROM_LOAD( "pic16c74b_ch4000.u60", 0x000, 0x4d4c, NO_DUMP )
+	ROM_REGION16_LE( 0x4010, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16c74b_ch4000.u60", 0x0000, 0x4010, NO_DUMP )
 ROM_END
 
 /*
@@ -722,8 +725,8 @@ ROM_START( top21 )
 	ROM_LOAD( "audio.u64",  0x00000, 0x80000, CRC(4f70a9bc) SHA1(83f0664eadf923ed45e3e18bfcefafb85163c4a0) )
 	ROM_COPY( "oki",        0x40000, 0x00000, 0x40000 ) // copying the second half to the right offset
 
-	ROM_REGION( 0x4000, "mcu", 0 )  // MCU code
-	ROM_LOAD( "pic16c65b_top21.u60", 0x0000, 0x4000, NO_DUMP )
+	ROM_REGION16_LE( 0x4010, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16c65b_top21.u60", 0x0000, 0x4010, NO_DUMP )
 
 	ROM_REGION( 0x10000, "nvram", 0 )   // default NVRAM (2x 62256)
 	ROM_LOAD( "top21_nvram.bin", 0x00000, 0x10000, CRC(638726ce) SHA1(c55c77df5fbddfb19acf50f1b4467c63c818d5e7) )
@@ -769,8 +772,8 @@ ROM_START( chewheel )
 	ROM_REGION( 0x80000, "oki", 0 ) // 6295 samples
 	ROM_LOAD( "v29c51002t.u54",  0x00000, 0x40000, CRC(3c37ec4d) SHA1(11045f9b3f6fb35befdb67c111218750a4f750a7) )
 
-	ROM_REGION( 0x4000, "mcu", 0 )  // MCU code
-	ROM_LOAD( "pic16c65b_chewheel.u60", 0x0000, 0x4000, NO_DUMP )
+	ROM_REGION16_LE( 0x4010, "mcu", ROMREGION_ERASEFF )
+	ROM_LOAD( "pic16c65b_chewheel.u60", 0x0000, 0x4010, NO_DUMP )
 
 	ROM_REGION( 0x4000, "nvram", 0 )   // default NVRAM (1x 6264 storing the odd bytes)
 	ROM_LOAD( "chewheel_nvram.bin", 0x0000, 0x4000, CRC(af73a270) SHA1(3e3e2c0a629bf506830b34d4c5a45ddbece618c3) )

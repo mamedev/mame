@@ -448,7 +448,7 @@ void swp30_device::streaming_block::read_16(memory_access<25, 2, -2, ENDIANNESS_
 		// 32103210 32103210 32103210
 		// bbbbaaaa ddddcccc ........
 		u32 l0 = wave.read_dword(adr);
-		u32 l1 = wave.read_dword(adr);
+		u32 l1 = wave.read_dword(adr+1);
 		val0 = l0;
 		val1 = l0 >> 16;
 		val2 = l1;
@@ -751,7 +751,11 @@ std::pair<s16, bool> swp30_device::streaming_block::step(memory_access<25, 2, -2
 				if(m_pos_dec >= 0x8000)
 					m_pos ++;
 				m_pos_dec &= 0x7fff;
-				m_dpcm_pos = 3;
+				// The loop end is followed by a copy of the first three deltas,
+				// so decoding carries on from where it had got to.  Restarting
+				// at 3 drops a delta whenever the position crossed the loop
+				// point by two samples.
+				m_dpcm_pos -= m_loop_size;
 			} else {
 				m_done = true;
 				m_last = result;
@@ -2762,7 +2766,9 @@ s32 swp30_device::mixer_att(s32 sample, s32 att)
 {
 	if(att >= 0xff)
 		return 0;
-	return (sample - ((sample * (att & 0xf)) >> 4)) >> (att >> 4);
+	// The low nibble is in 1/32 steps: 0x0f reaches 17/32, just short of
+	// the next octave (0x10 = 1/2).
+	return (sample - ((sample * (att & 0xf)) >> 5)) >> (att >> 4);
 }
 
 void swp30_device::mixer_step(const std::array<s32, 0x40> &samples_per_chan)
@@ -3799,7 +3805,12 @@ void swp30_device::meg_state::drc(drcuml_block &block, u16 pc)
 	}
 
 	if(BIT(opcode, 0x3d)) {
-		UML_DSAR(block, I0, mem(&m_p), 15);
+		// m_p / 32768, truncated towards zero
+		UML_DMOV(block, I0, mem(&m_p));
+		UML_DSAR(block, I1, I0, 63);
+		UML_DAND(block, I1, I1, 0x7fff);
+		UML_DADD(block, I0, I0, I1);
+		UML_DSAR(block, I0, I0, 15);
 		UML_MOV(block, mem(&m_memw_value[index2]), I0);
 	}
 
@@ -4003,7 +4014,10 @@ void swp30_device::meg_state::step()
 
 	if(BIT(opcode, 0x3d)) {
 		m_memw_active[m_delay_2] = true;
-		m_memw_value[m_delay_2] = m_p >> 15;
+		// Truncated towards zero, like pack24.  Rounding down keeps
+		// negative values from ever decaying to zero in a feedback loop,
+		// and a reverb goes on ringing after its input has stopped.
+		m_memw_value[m_delay_2] = m_p / 32768;
 	} else
 		m_memw_active[m_delay_2] = false;
 

@@ -1,0 +1,51 @@
+# license:BSD-3-Clause
+# copyright-holders:Curt Coder
+bbr_zpb
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	read(m_TMP);
+	m_TMP = read_pc();
+	m_PC++;
+	if(!(m_TMP2 & (1 << ((m_inst_state >> 4) & 7)))) {
+		read_pc();
+		if(page_changing(m_PC, int8_t(m_TMP))) {
+			read_arg(set_l(m_PC, m_PC+int8_t(m_TMP)));
+		}
+		m_PC += int8_t(m_TMP);
+	}
+	prefetch();
+
+bbs_zpb
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	read(m_TMP);
+	m_TMP = read_pc();
+	m_PC++;
+	if(m_TMP2 & (1 << ((m_inst_state >> 4) & 7))) {
+		read_pc();
+		if(page_changing(m_PC, int8_t(m_TMP))) {
+			read_arg(set_l(m_PC, m_PC+int8_t(m_TMP)));
+		}
+		m_PC += int8_t(m_TMP);
+	}
+	prefetch();
+
+rmb_bzp
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	read(m_TMP);
+	m_TMP2 &= ~(1 << ((m_inst_state >> 4) & 7));
+	write(m_TMP, m_TMP2);
+	prefetch();
+
+smb_bzp
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	read(m_TMP);
+	m_TMP2 |= 1 << ((m_inst_state >> 4) & 7);
+	write(m_TMP, m_TMP2);
+	prefetch();

@@ -35,7 +35,7 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define CRT9021_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int y, int x, uint8_t video, int intout)
+#define CRT9021_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, uint8_t video, int intout)
 
 
 //**************************************************************************
@@ -48,7 +48,7 @@
 class crt9021_device : public device_t, public device_video_interface
 {
 public:
-	typedef device_delegate<void (bitmap_rgb32 &bitmap, int y, int x, uint8_t video, int intout)> draw_character_delegate;
+	typedef device_delegate<void (bitmap_rgb32 &bitmap, uint8_t video, int intout)> draw_character_delegate;
 
 	// construction/destruction
 	crt9021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -65,7 +65,13 @@ public:
 	void atten_w(int state) { m_atten = state; }
 	void cursor_w(int state) { m_cursor = state; }
 	void retbl_w(int state) { m_retbl = state; }
-	void ld_sh_w(int state);
+	void ld_sh_w(int state)
+	{
+		if (!m_ld_sh && state)
+			ld_sh_rise();
+
+		m_ld_sh = state;
+	}
 	void sld_w(int state) { m_sld = state; }
 	void slg_w(int state) { m_slg = state; }
 	void blc_w(int state) { m_blc = state; }
@@ -90,6 +96,8 @@ private:
 		MS_THIN_GRAPHICS,
 		MS_UNDERLINE
 	};
+
+	void ld_sh_rise();
 
 	draw_character_delegate m_display_cb;
 

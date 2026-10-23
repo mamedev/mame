@@ -719,18 +719,6 @@ void abc800_state::cassette_output_tick(int state)
 //  Z80CTC
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK_MEMBER( abc800_state::ctc_tick )
-{
-	m_ctc->trg0(1);
-	m_ctc->trg0(0);
-
-	m_ctc->trg1(1);
-	m_ctc->trg1(0);
-
-	m_ctc->trg2(1);
-	m_ctc->trg2(0);
-}
-
 void abc800_state::ctc_z0_w(int state)
 {
 	if (BIT(m_sb, 2))
@@ -772,11 +760,15 @@ void abc800_state::sio_dtrb_w(int state)
 
 	if (!state)
 	{
+		if (!m_cassette->motor_on())
+			m_cassette_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
+
 		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 	}
 	else
 	{
 		m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		m_cassette_timer->reset();
 	}
 }
 
@@ -1036,12 +1028,14 @@ void abc800_state::common(machine_config &config)
 
 	// peripheral hardware
 	Z80CTC(config, m_ctc, ABC800_X01/2/2);
+	m_ctc->set_clk<0>(ABC800_X01/2/2/2);
+	m_ctc->set_clk<1>(ABC800_X01/2/2/2);
+	m_ctc->set_clk<2>(ABC800_X01/2/2/2);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(FUNC(abc800_state::ctc_z0_w));
 	m_ctc->zc_callback<1>().set(FUNC(abc800_state::ctc_z1_w));
 	m_ctc->zc_callback<2>().set(m_dart, FUNC(z80dart_device::rxca_w));
 	m_ctc->zc_callback<2>().append(m_dart, FUNC(z80dart_device::txca_w));
-	TIMER(config, TIMER_CTC_TAG).configure_periodic(FUNC(abc800_state::ctc_tick), attotime::from_hz(ABC800_X01/2/2/2));
 
 	Z80SIO(config, m_sio, ABC800_X01/2/2);
 	m_sio->out_txda_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
@@ -1116,7 +1110,7 @@ void abc800c_state::abc800c(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("abc800_cass");
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
-	TIMER(config, TIMER_CASSETTE_TAG).configure_periodic(FUNC(abc800_state::cassette_input_tick), attotime::from_hz(44100));
+	TIMER(config, TIMER_CASSETTE_TAG).configure_generic(FUNC(abc800_state::cassette_input_tick));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("32K");
@@ -1152,7 +1146,7 @@ void abc800m_state::abc800m(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("abc800_cass");
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
-	TIMER(config, TIMER_CASSETTE_TAG).configure_periodic(FUNC(abc800_state::cassette_input_tick), attotime::from_hz(44100));
+	TIMER(config, TIMER_CASSETTE_TAG).configure_generic(FUNC(abc800_state::cassette_input_tick));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("32K");
@@ -1189,7 +1183,7 @@ void abc802_state::abc802(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->set_interface("abc800_cass");
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
-	TIMER(config, TIMER_CASSETTE_TAG).configure_periodic(FUNC(abc800_state::cassette_input_tick), attotime::from_hz(44100));
+	TIMER(config, TIMER_CASSETTE_TAG).configure_generic(FUNC(abc800_state::cassette_input_tick));
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("64K");

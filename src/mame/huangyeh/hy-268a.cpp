@@ -21,7 +21,6 @@ ATMEL 93C46 EEPROM
 
 
 TODO:
-- crashes strong with ACRTC, plenty of unsupported features (starting with COMMAND_DWT);
 - EEPROM;
 - sound;
 - I/Os;
@@ -49,14 +48,16 @@ class hy268a_state : public driver_device
 {
 public:
 	hy268a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_acrtc(*this, "acrtc")
 	{ }
 
 	void xycs(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<hd63484_device> m_acrtc;
 
 	void program_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
@@ -84,8 +85,10 @@ void hy268a_state::ramdac_map(address_map &map)
 
 void hy268a_state::hd63484_map(address_map &map)
 {
-	// TODO: likely banked, also writes
-	map(0x00000, 0xfffff).rom().region("tiles", 0);
+	// TODO: Fix banks
+	map(0x00000, 0x3ffff).ram();
+	map(0x40000, 0xbffff).rom().region("tiles", 0x000000);
+	map(0xc0000, 0xfffff).rom().region("tiles", 0x200000); 
 }
 
 
@@ -143,7 +146,8 @@ void hy268a_state::xycs(machine_config &config)
 
 	RAMDAC(config, "ramdac", "palette").set_addrmap(0, &hy268a_state::ramdac_map);
 
-	HD63484(config, "acrtc", 22_MHz_XTAL / 4).set_addrmap(0, &hy268a_state::hd63484_map); // divider not verified
+	HD63484(config, m_acrtc, 22_MHz_XTAL / 4).set_addrmap(0, &hy268a_state::hd63484_map); // divider not verified
+	m_acrtc->set_auto_configure_screen(false);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

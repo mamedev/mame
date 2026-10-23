@@ -87,7 +87,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<ppc_device> m_maincpu;
+	required_device<ppc601_device> m_maincpu;
 	required_device<via6522_device> m_via1;
 	required_device<awacs_device> m_awacs;
 	required_device<cuda_device> m_cuda;
@@ -1634,6 +1634,7 @@ void macpdm_state::pdm_8100map(address_map &map)
 void macpdm_state::pdm_base(machine_config &config)
 {
 	PPC601(config, m_maincpu, 60'000'000);
+	m_maincpu->set_rtc_clock(IO_CLOCK / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpdm_state::pdm_map);
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS | PPCDRC_STRICT_601_SELF_MODIFY);
 
@@ -1856,26 +1857,26 @@ ROM_START( pmac6100 )
 	ROM_LOAD( "9feb69b3.rom", 0x000000, 0x400000, CRC(a43fadbc) SHA1(6fac1c4e920a077c077b03902fef9199d5e8f2c3) )
 ROM_END
 
-ROM_START( pmac6100_66 )
+ROM_START( pmac7100_80 )
 	ROM_REGION64_BE(0x400000, "bootrom", 0)
 	ROM_LOAD( "9b7a3aad.rom", 0x000000, 0x400000, CRC(22ef0260) SHA1(ec58cdb4b7fe3282b2fb76bf9a39f1ec9c9635d7) )
 ROM_END
 
 #define rom_pmac7100 rom_pmac6100
 #define rom_pmac8100 rom_pmac6100
+#define rom_pmac6100_66 rom_pmac6100
 
-#define rom_pmac7100_80 rom_pmac6100_66
-#define rom_pmac8100_100 rom_pmac6100_66
-#define rom_pmac8100_110 rom_pmac6100_66
+#define rom_pmac8100_100 rom_pmac7100_80
+#define rom_pmac8100_110 rom_pmac7100_80
 
 } // anonymous namespace
 
 
-//    YEAR  NAME          PARENT    COMPAT  MACHINE        INPUT   CLASS         INIT         COMPANY           FULLNAME                    FLAGS
-COMP( 1994, pmac6100,     0,        0,      pmac6100,      macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 6100/60",  MACHINE_SUPPORTS_SAVE )
-COMP( 1995, pmac6100_66,  pmac6100, 0,      pmac6100_66,   macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 6100/66",  MACHINE_SUPPORTS_SAVE )
-COMP( 1994, pmac7100,     0,        0,      pmac7100,      macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 7100/66",  MACHINE_SUPPORTS_SAVE )
-COMP( 1995, pmac7100_80,  pmac7100, 0,      pmac7100_80,   macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 7100/80",  MACHINE_SUPPORTS_SAVE )
-COMP( 1994, pmac8100,     0,        0,      pmac8100,      macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 8100/80",  MACHINE_SUPPORTS_SAVE )
-COMP( 1995, pmac8100_100, pmac8100, 0,      pmac8100_100,  macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 8100/100", MACHINE_SUPPORTS_SAVE )
-COMP( 1994, pmac8100_110, pmac8100, 0,      pmac8100_110,  macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 8100/110", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME          PARENT       COMPAT  MACHINE        INPUT   CLASS         INIT         COMPANY           FULLNAME                    FLAGS
+COMP( 1994, pmac6100,     0,           0,      pmac6100,      macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 6100/60",  MACHINE_SUPPORTS_SAVE )
+COMP( 1995, pmac6100_66,  pmac6100,    0,      pmac6100_66,   macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 6100/66",  MACHINE_SUPPORTS_SAVE )
+COMP( 1994, pmac7100,     pmac6100,    0,      pmac7100,      macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 7100/66",  MACHINE_SUPPORTS_SAVE )
+COMP( 1995, pmac7100_80,  0,           0,      pmac7100_80,   macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 7100/80",  MACHINE_SUPPORTS_SAVE )
+COMP( 1994, pmac8100,     pmac6100,    0,      pmac8100,      macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 8100/80",  MACHINE_SUPPORTS_SAVE )
+COMP( 1995, pmac8100_100, pmac7100_80, 0,      pmac8100_100,  macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 8100/100", MACHINE_SUPPORTS_SAVE )
+COMP( 1994, pmac8100_110, pmac7100_80, 0,      pmac8100_110,  macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 8100/110", MACHINE_SUPPORTS_SAVE )

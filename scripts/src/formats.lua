@@ -78,7 +78,6 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/d88_dsk.h",
 		MAME_DIR .. "src/lib/formats/dfi_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/dfi_dsk.h",
-		MAME_DIR .. "src/lib/formats/fdi_dsk.cpp",
 		MAME_DIR .. "src/lib/formats/rpk.cpp",
 		MAME_DIR .. "src/lib/formats/rpk.h",
 		MAME_DIR .. "src/lib/formats/86f_dsk.cpp",

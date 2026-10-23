@@ -84,15 +84,16 @@ void drderby_state::machine_start()
 
 u32 drderby_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
+		auto *const dst = &bitmap.pix(y);
 		for (int x = 0; x < 32; x++)
 		{
-			u8 data = m_vram[y << 5 | x];
-			u8 color = m_colorram[(y << 1 & 0x1e0) | x] >> 4;
+			u8 const data = m_vram[y << 5 | x];
+			u8 const color = m_colorram[(y << 1 & 0x1e0) | x] >> 4;
 
 			for (int i = 0; i < 8; i++)
-				bitmap.pix(y, x << 3 | i) = (data >> i & 1) ? color : 0;
+				dst[x << 3 | i] = BIT(data, i) ? color : 0;
 		}
 	}
 

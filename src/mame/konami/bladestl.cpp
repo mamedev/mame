@@ -492,6 +492,27 @@ ROM_START( bladestl )
 	ROM_LOAD( "797a04.9a",  0x80000, 0x40000, CRC(9ac8ea4e) SHA1(9f81eff970c9e8aea6f67d8a7d89805fae044ae1) )
 ROM_END
 
+ROM_START( bladestlp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "797-p01.19c", 0x00000, 0x10000, CRC(a61884a4) SHA1(8dc3916a79a2316a5d3ae69ce40a3157a7621bd7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "797-c02.12d", 0x08000, 0x08000, CRC(65a331ea) SHA1(f206f6c5f0474542a5b7686b2f4d2cc7077dd5b9) )
+
+	ROM_REGION( 0x40000, "tiles", 0 )
+	ROM_LOAD16_WORD_SWAP( "797a05.19h", 0x00000, 0x40000, CRC(5491ba28) SHA1(c807774827c55c211ab68f548e1e835289cc5744) )
+
+	ROM_REGION( 0x40000, "sprites", 0 )
+	ROM_LOAD( "797a06.13h", 0x00000, 0x40000, CRC(d055f5cc) SHA1(3723b39b2a3e6dd8e7fc66bbfe1eef9f80818774) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "797a07.16i", 0x0000, 0x0100, CRC(7aecad4e) SHA1(05150a8dd25bdd6ab0c5b350e6ffd272f040e46a) ) // sprites lookup table, 63S141N BPROM
+
+	ROM_REGION( 0xc0000, "upd", 0 )
+	ROM_LOAD( "797a03.11a", 0x00000, 0x80000, CRC(9ee1a542) SHA1(c9a142a326875a50f03e49e83a84af8bb423a467) )
+	ROM_LOAD( "797a04.9a",  0x80000, 0x40000, CRC(9ac8ea4e) SHA1(9f81eff970c9e8aea6f67d8a7d89805fae044ae1) )
+ROM_END
+
 ROM_START( bladestll )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "797-l01.19c", 0x00000, 0x10000, CRC(1ab14c40) SHA1(c566e31a666b467d75f5fc9fa427986c3ebc705c) )
@@ -544,5 +565,6 @@ ROM_END
  *************************************/
 
 GAME( 1987, bladestl,  0,        bladestl, bladestl_joy,   bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version T, Joystick)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestlp, bladestl, bladestl, bladestl_track, bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version P, Trackball)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, bladestll, bladestl, bladestl, bladestl_track, bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version L, Trackball)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, bladestle, bladestl, bladestl, bladestl_track, bladestl_state, empty_init, ROT90, "Konami", "Blades of Steel (version E, Trackball)", MACHINE_SUPPORTS_SAVE )

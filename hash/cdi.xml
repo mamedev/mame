@@ -8231,7 +8231,10 @@ license:CC0-1.0
 		-->
 		<description>P.A.W.S. - Personal Automated Wagging System (Europe)</description>
 		<year>1998</year>
+		<!-- co-produced by Domestic Funk productions -->
 		<publisher>Philips</publisher>
+		<info name="barcode" value="8 712581 190040"/>
+		<info name="serial" value="811 9004"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="p.a.w.s. - personal automated wagging system (1998)(philips)(eu)" sha1="bdc0f3eaa6011b6261589eb7d21a6a8fff74904b"/>
