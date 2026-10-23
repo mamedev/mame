@@ -79,6 +79,14 @@ i386_device::i386_device(const machine_config &mconfig, device_type type, const 
 	set_vtlb_dynamic_entries(32);
 }
 
+void i386_device::set_tsc_cycle_ratio(uint32_t num, uint32_t den)
+{
+	if (!num || !den)
+		fatalerror("%s: invalid timestamp counter ratio %u/%u\n", tag(), num, den);
+	m_tsc_num = num;
+	m_tsc_den = den;
+}
+
 i386sx_device::i386sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i386_device(mconfig, I386SX, tag, owner, clock, 16, 24, 16)
 {
@@ -2050,6 +2058,9 @@ void i386_device::i386_common_init()
 	save_item(NAME(m_smbase));
 	save_item(NAME(m_lock));
 
+	save_item(NAME(m_tsc));
+	save_item(NAME(m_tsc_rem));
+
 	save_item(NAME(m_x87_cw));
 	save_item(NAME(m_x87_tw));
 	save_item(NAME(m_x87_sw));
@@ -2488,6 +2499,7 @@ void i386_device::zero_state()
 	m_brand_id = 0; // Pentium III model 8 onward
 	m_feature_flags = 0;
 	m_tsc = 0;
+	m_tsc_rem = 0;
 	m_perfctr[0] = m_perfctr[1] = 0;
 	memset( m_x87_reg, 0, sizeof(m_x87_reg) );
 	m_x87_cw = 0;
@@ -2799,7 +2811,7 @@ void i386_device::execute_run()
 	if (m_halted)
 	{
 		debugger_wait_hook();
-		m_tsc += cycles;
+		tsc_advance(cycles);
 		m_cycles = 0;
 		return;
 	}
@@ -2892,7 +2904,7 @@ void i386_device::execute_run()
 		if(m_RF && m_auto_clear_RF) m_RF = 0;
 		if(!m_auto_clear_RF) m_auto_clear_RF = true;
 	}
-	m_tsc += (cycles - m_cycles);
+	tsc_advance(cycles - m_cycles);
 }
 
 /*************************************************************************/
