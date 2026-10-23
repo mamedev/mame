@@ -263,6 +263,8 @@ protected:
 	void debug_poly_dump_command(const std::vector<std::string_view> &params);
 	void debug_help_command(const std::vector<std::string_view> &params);
 
+	bool m_geo_mesh = false;
+
 	virtual void copro_halt() = 0;
 	virtual void copro_boot() = 0;
 
@@ -293,6 +295,9 @@ private:
 	u32 *geo_focal_distance( geo_state *geo, u32 opcode, u32 *input );
 	u32 *geo_light_source( geo_state *geo, u32 opcode, u32 *input );
 	u32 *geo_matrix_write( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_mesh_mode( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_mesh_draw( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_mesh_flush( geo_state *geo, u32 opcode, u32 *input );
 	u32 *geo_translate_write( geo_state *geo, u32 opcode, u32 *input );
 	u32 *geo_data_mem_push( geo_state *geo, u32 opcode, u32 *input );
 	u32 *geo_test( geo_state *geo, u32 opcode, u32 *input );
@@ -549,6 +554,7 @@ public:
 	void gunblade(machine_config &config) ATTR_COLD;
 	void dynabb(machine_config &config) ATTR_COLD;
 	void zerogun(machine_config &config) ATTR_COLD;
+	void lastbrnx(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -832,6 +838,14 @@ struct model2_state::geo_state
 	u32                 mode = 0;                   // bit 0 = Enable Specular, bit 1 = Calculate Normals
 	u32 *               polygon_rom = nullptr;      // Polygon ROM pointer
 	u32                 polygon_rom_mask = 0;       // Polygon ROM mask
+	u32                 mesh_begin = 0x30100;
+	u32                 mesh_current = 0x30100;
+	u32                 mesh_texture_start = 0x80c000;
+	u32                 mesh_texture_begin = 0x80c000;
+	u32                 mesh_texture_next = 0x80c000;
+	u32                 mesh_texture_end = 0x80c000;
+	u32                 mesh_mode = 0;
+	u32                 mesh_uv[0x8000]{};
 	float               matrix[12];                 // Current Transformation Matrix
 	poly_vertex         focus;                      // Focus (x,y)
 	poly_vertex         light;                      // Light Vector

@@ -990,6 +990,14 @@ void model2_state::geo_init(memory_region *polygon_rom)
 
 	save_item(NAME(m_geo->mode));
 	save_item(NAME(m_geo->matrix));
+	save_item(NAME(m_geo->mesh_begin));
+	save_item(NAME(m_geo->mesh_current));
+	save_item(NAME(m_geo->mesh_texture_start));
+	save_item(NAME(m_geo->mesh_texture_begin));
+	save_item(NAME(m_geo->mesh_texture_next));
+	save_item(NAME(m_geo->mesh_texture_end));
+	save_item(NAME(m_geo->mesh_mode));
+	save_item(NAME(m_geo->mesh_uv));
 	save_item(NAME(m_geo->lod));
 	save_item(NAME(m_geo->coef_table));
 	save_item(NAME(m_geo->polygon_ram0));
@@ -2017,6 +2025,137 @@ u32 *model2_state::geo_matrix_write(geo_state *geo, u32 opcode, u32 *input)
 	return input;
 }
 
+// SHARC Geometrizer environment-coordinate commands, recovered from the
+// uploaded handlers at 0x20c36, 0x20c6c and 0x20c4b respectively.
+u32 *model2_state::geo_mesh_mode(geo_state *geo, u32 opcode, u32 *input)
+{
+	(void)opcode;
+	u32 const previous = geo->mesh_mode;
+	geo->mesh_mode = *input++;
+	if (!geo->mesh_mode)
+	{
+		geo->mesh_begin = 0x30100;
+		geo->mesh_texture_begin = geo->mesh_texture_start;
+	}
+	else if (!previous)
+		geo->mesh_texture_end = geo->mesh_texture_next;
+	return input;
+}
+
+u32 *model2_state::geo_mesh_draw(geo_state *geo, u32 opcode, u32 *input)
+{
+	(void)opcode;
+	u32 address = *input++;
+	u32 const header = *input++;
+	u32 const object = *input++;
+	u32 const count = *input++;
+	auto read = [geo](u32 address) -> u32
+	{
+		if (address & 0x01000000)
+			return geo->polygon_ram1[address & 0x7fff];
+		if (address & 0x00800000)
+			return geo->polygon_rom ? geo->polygon_rom[address & geo->polygon_rom_mask] : 0;
+		return geo->polygon_ram0[address & 0x7fff];
+	};
+	auto coordinates = [&]() -> u32
+	{
+		float const x = u2f(read(address++));
+		float const y = u2f(read(address++));
+		float const z = u2f(read(address++));
+		// FIX BY 9 with MODE1.TRUNC set: scale both transformed axes by 512.
+		float u = 1.0f - x * geo->matrix[0];
+		float v = 1.0f + x * geo->matrix[1];
+		u -= y * geo->matrix[3];
+		v += y * geo->matrix[4];
+		u -= z * geo->matrix[6];
+		v += z * geo->matrix[7];
+		return (u32(s32(u * 512.0f)) << 16) | (u32(s32(v * 512.0f)) & 0xffff);
+	};
+	auto store = [geo](u32 uv)
+	{
+		// The SHARC's 2-Mbit configuration mirrors this data bank at 0x30000.
+		geo->mesh_uv[geo->mesh_current++ & 0x7fff] = uv;
+	};
+
+	u32 const polygons = count ? count : 0xfffff;
+	if (geo->mesh_mode)
+	{
+		address += 6;
+		for (u32 i = 0; i < polygons; ++i, address += 10)
+		{
+			u32 const attr = read(address);
+			if (!(attr & 3))
+				break;
+			geo->mesh_current += (attr & 1) ? 4 : 3;
+		}
+	}
+	else
+	{
+		u32 first = coordinates();
+		u32 second = coordinates();
+		for (u32 i = 0; i < polygons; ++i)
+		{
+			u32 const attr = read(address++);
+			if (!(attr & 3))
+				break;
+			address += 3; // Per-face normal is not used for environment mapping.
+			u32 const third = coordinates();
+			store(second);
+			store(first);
+			store(third);
+			if (attr & 1)
+			{
+				u32 const fourth = coordinates();
+				store(fourth);
+				if (!(attr & 0x100))
+				{
+					first = third;
+					second = fourth;
+				}
+				else if (!(attr & 0x200))
+					second = third;
+				else
+					first = fourth;
+			}
+			else
+			{
+				address += 3; // Unused fourth vertex remains padded in this format.
+				if ((attr & 0x300) == 0x300)
+					first = third;
+				else
+					second = third;
+			}
+		}
+	}
+
+	u32 packet[] = { geo->mesh_texture_next, header, object, count };
+	geo->mesh_texture_next = geo->mesh_texture_start + 2 * (geo->mesh_current - 0x30100);
+	geo_object_data(geo, 0x00800000, packet);
+	return input;
+}
+
+u32 *model2_state::geo_mesh_flush(geo_state *geo, u32 opcode, u32 *input)
+{
+	(void)opcode;
+	u32 const count = (geo->mesh_texture_end - geo->mesh_texture_begin) & ~u32(1);
+	if (count)
+	{
+		model2_3d_push(geo->raster, 4);
+		model2_3d_push(geo->raster, geo->mesh_texture_begin);
+		model2_3d_push(geo->raster, count);
+		for (u32 i = 0; i < count; ++i)
+		{
+			u32 const word = geo->mesh_uv[(geo->mesh_begin + i / 2) & 0x7fff];
+			model2_3d_push(geo->raster, s32(s16(word >> (16 * (i & 1)))));
+		}
+	}
+	geo->mesh_begin = geo->mesh_current = 0x30100;
+	geo->mesh_texture_start = geo->mesh_texture_begin = *input++;
+	geo->mesh_texture_next = geo->mesh_texture_end = geo->mesh_texture_start;
+	geo->mesh_mode = 0;
+	return input;
+}
+
 /* Command 0C: Parallel Transfer Vector Write */
 u32 *model2_state::geo_translate_write(geo_state *geo, u32 opcode, u32 *input)
 {
@@ -2313,9 +2452,15 @@ u32 *model2_state::geo_process_command(geo_state *geo, u32 opcode, u32 *input, b
 		case 0x17: input = geo_mode(geo, opcode, input);                  break;
 		case 0x18: input = geo_zsort_mode(geo, opcode, input);            break;
 		case 0x19: input = geo_focal_distance(geo, opcode, input);        break;
-		case 0x1a: input = geo_light_source(geo, opcode, input);          break;
-		case 0x1b: input = geo_matrix_write(geo, opcode, input);          break;
-		case 0x1c: input = geo_translate_write(geo, opcode, input);       break;
+		case 0x1a:
+			input = m_geo_mesh ? geo_mesh_mode(geo, opcode, input) : geo_light_source(geo, opcode, input);
+			break;
+		case 0x1b:
+			input = m_geo_mesh ? geo_mesh_draw(geo, opcode, input) : geo_matrix_write(geo, opcode, input);
+			break;
+		case 0x1c:
+			input = m_geo_mesh ? geo_mesh_flush(geo, opcode, input) : geo_translate_write(geo, opcode, input);
+			break;
 		case 0x1d: input = geo_code_upload(geo, opcode, input);           break;
 		case 0x1e: input = geo_code_jump(geo, opcode, input);             break;
 		case 0x1f: input = geo_end(geo, opcode, input); *end_code = true; break;
