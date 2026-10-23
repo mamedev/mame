@@ -274,7 +274,7 @@ void xr68c681_device::device_start()
 
 void duart_base_device::device_reset()
 {
-	ACR = 0;  /* Interrupt Vector Register */
+	ACR = 0;  /* Auxiliary Control Register */
 	IMR = 0;  /* Interrupt Mask Register */
 	ISR = 0;  /* Interrupt Status Register */
 	OPCR = 0; /* Output Port Conf. Register */
@@ -282,6 +282,8 @@ void duart_base_device::device_reset()
 	CTR.d = 0;  /* Counter/Timer Preset Value */
 	// "reset clears internal registers (SRA, SRB, IMR, ISR, OPR, OPCR) puts OP0-7 in the high state, stops the counter/timer, and puts channels a/b in the inactive state"
 	IPCR = 0;
+	half_period = 0;
+	duart_timer->adjust(attotime::never);
 
 	m_irq_state = false;
 	m_ip2_clock_warned = false;
