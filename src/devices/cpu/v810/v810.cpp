@@ -20,10 +20,6 @@
 
  TODO:
   - NVC (vboy CPU) onchip peripherals ($0200'0000 area);
-  - implement trap opcode;
-  - implement double exception behaviour;
-  - implement NP fatal exception;
-  - implement NMI;
   - bit string cycle counts are approximate: the fixed part does not depend on the alignment case;
   - cache handling;
   - external bus timing (on load/store opcodes):
@@ -1385,7 +1381,7 @@ inline uint32_t v810_device::bs_access(offs_t addr, int access)
 // is used up: the registers then hold the resume state and the instruction is executed again
 inline bool v810_device::bs_suspend(uint32_t cycles) const
 {
-	return irq_acceptable() || (m_icount <= int(cycles));
+	return (m_nmi_pending && !GET_NP) || irq_acceptable() || (m_icount <= int(cycles));
 }
 
 // SCH0BSU/SCH0BSD/SCH1BSU/SCH1BSD (sub-opcodes 0-3): search the string at r30/r27, length r28,
@@ -1664,11 +1660,13 @@ void v810_device::device_start()
 
 	m_irq_state = 0;
 	m_nmi_line = CLEAR_LINE;
+	m_nmi_pending = false;
 	memset(m_reg, 0x00, sizeof(m_reg));
 
 	save_item(NAME(m_reg));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_nmi_line));
+	save_item(NAME(m_nmi_pending));
 	save_item(NAME(m_PPC));
 	save_item(NAME(m_halted));
 	save_item(NAME(m_halt));
@@ -1763,6 +1761,7 @@ void v810_device::device_reset()
 	CHCW = 0;
 	m_halted = false;
 	m_halt = false;
+	m_nmi_pending = false;
 	m_lastop = LAST_OTHER;
 	icache_clear(0, 128);
 }
@@ -1775,7 +1774,25 @@ inline bool v810_device::irq_acceptable() const
 	return (31 - std::countl_zero(uint32_t(m_irq_state))) >= int((PSW >> 16) & 0xf);
 }
 
-// TODO: remaining exception types
+// NMI: masked only by NP, and saved in FEPC/FEPSW like a duplexed exception
+void v810_device::take_nmi()
+{
+	m_nmi_pending = false;
+	m_halt = false;
+
+	standard_irq_callback(INPUT_LINE_NMI, PC);
+
+	FEPC = PC;
+	FEPSW = PSW;
+	ECR = (ECR & 0x0000ffff) | 0xffd00000;
+	SET_NP(1);
+	SET_ID(1);
+	SET_AE(0);
+	PC = 0xffffffd0;
+
+	m_icount -= clkIRQ;
+}
+
 // called with an interrupt requested and accepted by NP, EP and ID: takes the highest one above the PSW level
 void v810_device::check_interrupts()
 {
@@ -1820,7 +1837,9 @@ void v810_device::execute_run()
 	do
 	{
 		// interrupts are sampled at the end of every instruction, and while halted
-		if (irq_acceptable())
+		if (m_nmi_pending && !GET_NP)
+			take_nmi();
+		else if (irq_acceptable())
 			check_interrupts();
 		if (m_halt)
 		{
@@ -1830,6 +1849,13 @@ void v810_device::execute_run()
 		}
 
 		m_PPC = PC;
+		if (GET_AE && (PC == ADTRE))
+		{
+			// address trap: taken before the instruction executes, which it restores to
+			take_exception(0xffffffc0, 0xffc0);
+			m_icount -= clkIRQ;
+			continue;
+		}
 		debugger_instruction_hook(PC);
 		m_curop = LAST_OTHER;
 		uint32_t op = fetch_op(PC, 0);
@@ -1848,11 +1874,18 @@ void v810_device::execute_run()
 // - on pcfx there's an unknown chip irq priority/mask dispatcher;
 // - on vboy it's implied in the NVC specs with a laconic "Interrupt Encoder".
 //   It's also 5 possible lines, which wouldn't work bitwise;
-void v810_device::execute_set_input( int irqline, int state )
+void v810_device::execute_set_input(int irqline, int state)
 {
-	if (state == HOLD_LINE)
-		throw emu_fatalerror("V810: using HOLD_LINE is unsupported by the core");
-	u16 mask = 1 << irqline;
+	if (irqline == INPUT_LINE_NMI)
+	{
+		// edge triggered: a request is held until it is accepted
+		if (state == ASSERT_LINE && m_nmi_line == CLEAR_LINE)
+			m_nmi_pending = true;
+		m_nmi_line = state;
+		return;
+	}
+
+	const u16 mask = 1 << irqline;
 	if (state == ASSERT_LINE)
 		m_irq_state |= mask;
 	else

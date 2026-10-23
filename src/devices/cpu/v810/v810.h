@@ -133,6 +133,7 @@ private:
 	uint32_t m_reg[65]{};
 	uint16_t m_irq_state;
 	uint8_t m_nmi_line;
+	bool m_nmi_pending;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::cache m_cache;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_program;
 	memory_access<32, 2, 0, ENDIANNESS_LITTLE>::specific m_io;
@@ -233,6 +234,7 @@ private:
 	inline uint32_t bs_access(offs_t addr, int access);
 	inline bool bs_suspend(uint32_t cycles) const;
 	inline bool irq_acceptable() const;
+	void take_nmi();
 	void check_interrupts();
 };
 
