@@ -2215,6 +2215,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ldp1000hle.h,MACHINES["LDP1000HLE"] = true
+---------------------------------------------------
+
+if MACHINES["LDP1000HLE"] then
+	files {
+		MAME_DIR .. "src/devices/machine/ldp1000hle.cpp",
+		MAME_DIR .. "src/devices/machine/ldp1000hle.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/ldp1450.h,MACHINES["LDP1450"] = true
 ---------------------------------------------------
 
