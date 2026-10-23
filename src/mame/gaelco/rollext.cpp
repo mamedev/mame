@@ -1443,4 +1443,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1999, rollext, 0, rollext, rollext, rollext_state, empty_init, ROT0, "Gaelco (Namco America license)", "ROLLing eX.tre.me (US)", MACHINE_NOT_WORKING )
+GAME( 1999, rollext, 0, rollext, rollext, rollext_state, empty_init, ROT0, "Gaelco (Namco America license)", "ROLLing eX.tre.me (US)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
