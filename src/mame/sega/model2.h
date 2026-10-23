@@ -263,6 +263,8 @@ protected:
 	void debug_poly_dump_command(const std::vector<std::string_view> &params);
 	void debug_help_command(const std::vector<std::string_view> &params);
 
+	bool m_geo_dual_matrix = false;
+
 	virtual void copro_halt() = 0;
 	virtual void copro_boot() = 0;
 
@@ -293,6 +295,8 @@ private:
 	u32 *geo_focal_distance( geo_state *geo, u32 opcode, u32 *input );
 	u32 *geo_light_source( geo_state *geo, u32 opcode, u32 *input );
 	u32 *geo_matrix_write( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_matrix2_write( geo_state *geo, u32 opcode, u32 *input );
+	u32 *geo_matrix2_copy( geo_state *geo, u32 opcode, u32 *input );
 	u32 *geo_translate_write( geo_state *geo, u32 opcode, u32 *input );
 	u32 *geo_data_mem_push( geo_state *geo, u32 opcode, u32 *input );
 	u32 *geo_test( geo_state *geo, u32 opcode, u32 *input );
@@ -305,8 +309,8 @@ private:
 	// geo code drawing paths
 	void geo_parse_np_ns( geo_state *geo, u32 *input, u32 count );
 	void geo_parse_np_s( geo_state *geo, u32 *input, u32 count );
-	void geo_parse_nn_ns( geo_state *geo, u32 *input, u32 count );
-	void geo_parse_nn_s( geo_state *geo, u32 *input, u32 count );
+	void geo_parse_nn_ns( geo_state *geo, u32 *input, u32 count, bool palette_mode = false );
+	void geo_parse_nn_s( geo_state *geo, u32 *input, u32 count, bool palette_mode = false );
 
 	// raster functions
 	// main data input port
@@ -821,6 +825,7 @@ struct model2_state::geo_state
 	geo_state() : focus(0, 0), light(0, 0)
 	{
 		std::fill(std::begin(matrix), std::end(matrix), 0);
+		std::fill(std::begin(matrix2), std::end(matrix2), 0);
 		std::fill(std::begin(focus.p), std::end(focus.p), 0);
 		std::fill(std::begin(light.p), std::end(light.p), 0);
 		std::fill(std::begin(coef_table), std::end(coef_table), 0);
@@ -832,6 +837,7 @@ struct model2_state::geo_state
 	u32                 mode = 0;                   // bit 0 = Enable Specular, bit 1 = Calculate Normals
 	u32 *               polygon_rom = nullptr;      // Polygon ROM pointer
 	u32                 polygon_rom_mask = 0;       // Polygon ROM mask
+	float               matrix2[12];                // Secondary transformation matrix
 	float               matrix[12];                 // Current Transformation Matrix
 	poly_vertex         focus;                      // Focus (x,y)
 	poly_vertex         light;                      // Light Vector
