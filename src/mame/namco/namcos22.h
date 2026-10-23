@@ -13,6 +13,8 @@
 
 #include "namcomcu.h"
 
+#include "bus/snes_ctrl/ctrl.h"
+
 #include "machine/eeprompar.h"
 #include "machine/timer.h"
 #include "sound/c352.h"
@@ -225,7 +227,7 @@ public:
 		m_screen(*this, "screen"),
 		m_adc_ports(*this, "ADC.%u", 0),
 		m_inputs(*this, "INPUTS"),
-		m_custom(*this, "CUSTOM.%u", 0),
+		m_devpad(*this, "devpad%u", 0),
 		m_opt(*this, "OPT.%u", 0),
 		m_mcu_out(*this, "mcuout%u", 0U),
 		m_cpuled_out(*this, "cpuled%u", 0U),
@@ -327,8 +329,8 @@ protected:
 	void namcos22_shared_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 namcos22_keycus_r(offs_t offset);
 	void namcos22_keycus_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 namcos22_portbit_r(offs_t offset);
-	void namcos22_portbit_w(offs_t offset, u16 data);
+	u16 namcos22_devpad_r(offs_t offset);
+	void namcos22_devpad_w(offs_t offset, u16 data);
 	void namcos22_cpuleds_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u8 mcu_port4_s22_r();
 	u8 iomcu_port4_s22_r();
@@ -438,7 +440,7 @@ protected:
 	required_device<screen_device> m_screen;
 	optional_ioport_array<8> m_adc_ports;
 	required_ioport m_inputs;
-	optional_ioport_array<2> m_custom;
+	required_device_array<snes_control_port_device, 2> m_devpad;
 	optional_ioport_array<2> m_opt;
 	output_finder<16> m_mcu_out;
 	output_finder<8> m_cpuled_out;
@@ -457,7 +459,6 @@ protected:
 	u16 m_SerialDataSlaveToMasterCurrent = 0;
 	int m_RenderBufSize = 0;
 	u16 m_RenderBufData[NAMCOS22_MAX_RENDER_CMD_SEQ] = { };
-	u16 m_portbits[2] = { };
 	int m_irq_state = 0;
 	int m_irq_enabled = 0;
 	namcos22_dsp_upload_state m_dsp_upload_state;
