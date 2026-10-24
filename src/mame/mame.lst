@@ -21370,6 +21370,9 @@ hp86b_004
 @source:hp/hp95lx.cpp
 hp95lx
 
+@source:hp/hp150.cpp
+hp150
+
 @source:hp/hp620lx.cpp
 hp620lx
 
