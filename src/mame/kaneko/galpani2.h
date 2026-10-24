@@ -81,13 +81,17 @@ private:
 	uint16_t m_mask_girl_pen = 0x80a0;
 	uint16_t m_mask_nongirl_pen = 0x00a0;
 	uint8_t  m_mask_captured_lo = 0xa0;  // SE writes 0x60 to plane 0 on capture
+	uint8_t m_bg_decode_param_offset = 2;
 
-	// Girl bitmap: the MCU samples the BG15 framebuffer after the sub
-	// CPU decodes the girl image. Decoded pixels have bit 15 set.
+	// The MCU substitute records the pending native decoder's coverage,
+	// then publishes the field bitmap/count through the common response.
 	static constexpr uint32_t GIRL_BITMAP_OFFSET = 0xe000;
 	static constexpr uint32_t GIRL_BITMAP_ADDR   = 0x10e000;
 	uint32_t m_girl_bitmap_pending_addr = 0;
 	uint32_t m_girl_bitmap_pending_param = 0;
+	uint32_t m_girl_bitmap_pending_task = 0;
+	std::array<uint8_t, 0x2000> m_bg15_coverage{};
+	memory_passthrough_handler m_bg15_coverage_tap;
 
 	void galpani2_mcu_init_w(uint8_t data);
 	void galpani2_mcu_nmi1_w(uint8_t data);
@@ -110,6 +114,7 @@ private:
 	void galpani2_mcu_nmi2();
 	uint16_t generate_girl_bitmap(uint32_t dest_addr);
 	void update_girl_bitmap();
+	void track_bg15_coverage(offs_t address, uint16_t data, uint16_t mem_mask);
 	void scan_background_images();
 	void galpani2_mem1(address_map &map) ATTR_COLD;
 	void galpani2_mem2(address_map &map) ATTR_COLD;
