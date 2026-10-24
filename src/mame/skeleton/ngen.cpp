@@ -977,11 +977,6 @@ void ngen_state::ngen386_io(address_map &map)
 static INPUT_PORTS_START( ngen )
 INPUT_PORTS_END
 
-static void keyboard(device_slot_interface &device)
-{
-	device.option_add("ngen", NGEN_KEYBOARD);
-}
-
 static void ngen_floppies(device_slot_interface &device)
 {
 	device.option_add("525qd", FLOPPY_525_QD);
@@ -1065,9 +1060,9 @@ void ngen_state::ngen(machine_config &config)
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
 	I8251(config, m_viduart);  // main clock unknown, Rx/Tx clocks are 19.53kHz
 //  m_viduart->txempty_handler().set(m_pic, FUNC(pic8259_device::ir4_w));
-	m_viduart->txd_handler().set("keyboard", FUNC(rs232_port_device::write_txd));
-	rs232_port_device &kbd(RS232_PORT(config, "keyboard", keyboard, "ngen"));
-	kbd.rxd_handler().set(m_viduart, FUNC(i8251_device::write_rxd));
+	ngen_keyboard_device &kbd(NGEN_KEYBOARD(config, "keyboard", 0));
+	m_viduart->txd_handler().set("keyboard", FUNC(ngen_keyboard_device::rx_w));
+	kbd.tx_handler().set(m_viduart, FUNC(i8251_device::write_rxd));
 
 	CLOCK(config, "refresh_clock", 19200*16).signal_handler().set(FUNC(ngen_state::timer_clk_out)); // should be 19530Hz
 
@@ -1178,9 +1173,9 @@ void ngen386_state::ngen386(machine_config &config)
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
 	I8251(config, m_viduart);  // main clock unknown, Rx/Tx clocks are 19.53kHz
 //  m_viduart->txempty_handler().set("pic", FUNC(pic8259_device::ir4_w));
-	m_viduart->txd_handler().set("keyboard", FUNC(rs232_port_device::write_txd));
-	rs232_port_device &kbd(RS232_PORT(config, "keyboard", keyboard, "ngen"));
-	kbd.rxd_handler().set(m_viduart, FUNC(i8251_device::write_rxd));
+	ngen_keyboard_device &kbd(NGEN_KEYBOARD(config, "keyboard", 0));
+	m_viduart->txd_handler().set("keyboard", FUNC(ngen_keyboard_device::rx_w));
+	kbd.tx_handler().set(m_viduart, FUNC(i8251_device::write_rxd));
 
 	CLOCK(config, "refresh_clock", 19200*16).signal_handler().set(FUNC(ngen386_state::timer_clk_out)); // should be 19530Hz
 
