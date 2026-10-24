@@ -22,11 +22,15 @@ public:
 
 	void set_special()
 	{
+		assert(!configured());
 		// SE prepends 34 image IDs and reuses the lookup word for decoding.
 		m_bg_image_prefix_count = 34;
 		m_bg_decode_param_offset = 0;
 		m_field_origin_x = 32;
 	}
+
+	// HLE decoder context: address of the task currently writing BG15.
+	auto decoder_task_callback() { return m_decoder_task_cb.bind(); }
 
 	void init_w(uint8_t data);
 	void main_nmi_w(uint8_t data);
@@ -44,6 +48,7 @@ private:
 	required_device<cpu_device> m_subcpu;
 	required_memory_region m_subdata;
 	required_shared_ptr<uint16_t> m_bg15;
+	devcb_read32 m_decoder_task_cb;
 
 	uint16_t m_old_mcu_nmi1 = 0;
 	uint16_t m_old_mcu_nmi2 = 0;
@@ -60,7 +65,6 @@ private:
 	uint32_t m_girl_bitmap_pending_param = 0;
 	uint32_t m_girl_bitmap_pending_task = 0;
 	std::array<uint8_t, 0x2000> m_bg15_coverage{};
-	memory_passthrough_handler m_bg15_coverage_tap;
 
 	void scan_background_images();
 	void write_kaneko();

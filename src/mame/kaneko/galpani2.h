@@ -40,8 +40,6 @@ public:
 	void galpani2(machine_config &config);
 	void gp2se(machine_config &config);
 
-	void init_special();
-
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -66,7 +64,7 @@ private:
 	uint16_t m_eeprom_word = 0U;
 	bool m_is_special = false;
 
-	// Per-region field/mask layout (set in init functions).
+	// Per-variant video layout (selected by the machine configuration).
 	// English/Asia/Japan/Korea use field x=48, mask pen 00A0/80A0.
 	// SE uses field x=32, mask pen 0050/8050.
 	int      m_field_origin_x = 48;

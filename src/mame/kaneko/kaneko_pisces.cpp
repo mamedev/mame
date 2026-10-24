@@ -18,8 +18,6 @@
 #include "emu.h"
 #include "kaneko_pisces.h"
 
-#include "cpu/m68000/m68000.h"
-
 DEFINE_DEVICE_TYPE(KANEKO_PISCES_HLE, kaneko_pisces_hle_device, "kaneko_pisces_hle", "Kaneko PISCES MCU (HLE)")
 
 kaneko_pisces_hle_device::kaneko_pisces_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -28,6 +26,7 @@ kaneko_pisces_hle_device::kaneko_pisces_hle_device(const machine_config &mconfig
 	, m_subcpu(*this, finder_base::DUMMY_TAG)
 	, m_subdata(*this, finder_base::DUMMY_TAG)
 	, m_bg15(*this, finder_base::DUMMY_TAG)
+	, m_decoder_task_cb(*this, 0)
 {
 }
 
@@ -38,7 +37,9 @@ void kaneko_pisces_hle_device::device_start()
 		throw device_missing_dependencies();
 
 	scan_background_images();
-	m_bg15_coverage_tap = m_subcpu->space(AS_PROGRAM).install_write_tap(
+	// The fixed BG15 mapping retains this tap across save/load. The address
+	// space owns the handler; only the pending job and coverage are saved.
+	m_subcpu->space(AS_PROGRAM).install_write_tap(
 		0x400000, 0x4fffff, "bg15_coverage",
 		[this](offs_t address, uint16_t &data, uint16_t mem_mask)
 		{
@@ -179,30 +180,20 @@ void kaneko_pisces_hle_device::scan_background_images()
 void kaneko_pisces_hle_device::write_kaneko()
 {
 	address_space &dstspace = m_maincpu->space(AS_PROGRAM);
-	int i,x,tpattidx;
-	unsigned char testpattern[] = {0xFF,0x55,0xAA,0xDD,0xBB,0x99};
+	static constexpr uint8_t test_pattern[] = { 0xff, 0x55, 0xaa, 0xdd, 0xbb, 0x99 };
 
-	/* Write "KANEKO" to 100000-100005, but do not clash with ram test */
-
-	x  = 0;
-
-	for (i = 0x100000; i < 0x100007; i++)
+	// Write "KANEKO" to 100000-100005 without clashing with the RAM test.
+	for (offs_t address = 0x100000; address < 0x100007; address++)
 	{
-		for (tpattidx = 0; tpattidx < 6; tpattidx++)
-		{
-			if (dstspace.read_byte(i) == testpattern[tpattidx]) x = 1; //ram test fragment present
-		}
+		uint8_t const value = dstspace.read_byte(address);
+		for (uint8_t const pattern : test_pattern)
+			if (value == pattern)
+				return;
 	}
 
-	if  ( x == 0 )
-	{
-		dstspace.write_byte(0x100000,0x4b); //K
-		dstspace.write_byte(0x100001,0x41); //A
-		dstspace.write_byte(0x100002,0x4e); //N
-		dstspace.write_byte(0x100003,0x45); //E
-		dstspace.write_byte(0x100004,0x4b); //K
-		dstspace.write_byte(0x100005,0x4f); //O
-	}
+	static constexpr char signature[] = "KANEKO";
+	for (unsigned i = 0; i < std::size(signature) - 1; i++)
+		dstspace.write_byte(0x100000 + i, signature[i]);
 }
 
 void kaneko_pisces_hle_device::init_w(uint8_t data)
@@ -227,7 +218,7 @@ void kaneko_pisces_hle_device::track_bg15_coverage(offs_t address, uint16_t data
 	if (!m_girl_bitmap_pending_addr || !m_girl_bitmap_pending_param)
 		return;
 	address_space &sub = m_subcpu->space(AS_PROGRAM);
-	uint32_t const task = m_subcpu->state_int(M68K_A6) & 0xffffff;
+	uint32_t const task = m_decoder_task_cb();
 	if (task < 0x100000 || task > 0x13fff0)
 		return;
 	uint32_t const param = sub.read_dword(task + 8);

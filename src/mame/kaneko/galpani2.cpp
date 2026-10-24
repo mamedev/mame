@@ -129,16 +129,6 @@ void galpani2_state::machine_reset()
 	machine().scheduler().perfect_quantum(attotime::from_usec(50)); //initial mcu xchk
 }
 
-void galpani2_state::init_special()
-{
-	// SE uses field origin x=32 and mask pens 0050/8050.
-	m_is_special = true;
-	m_field_origin_x = 32;
-	m_mask_girl_pen = 0x8050;
-	m_mask_nongirl_pen = 0x0050;
-	m_mask_captured_lo = 0x60;  // SE writes 0060 to plane 0 on capture
-}
-
 
 /***************************************************************************
 
@@ -437,6 +427,8 @@ void galpani2_state::galpani2(machine_config &config)
 	TIMER(config, "s_scantimer").configure_scanline(FUNC(galpani2_state::galpani2_interrupt2), "screen", 0, 1);
 
 	KANEKO_PISCES_HLE(config, m_mcu, m_maincpu, m_subcpu, "subdata", m_bg15);
+	// The native sub CPU decompressor keeps its current task record in A6.
+	m_mcu->decoder_task_callback().set([this]() { return uint32_t(m_subcpu->state_int(M68K_A6)) & 0xffffff; });
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -470,6 +462,13 @@ void galpani2_state::gp2se(machine_config &config)
 {
 	galpani2(config);
 	m_mcu->set_special();
+
+	// SE uses field origin x=32 and mask pens 0050/8050.
+	m_is_special = true;
+	m_field_origin_x = 32;
+	m_mask_girl_pen = 0x8050;
+	m_mask_nongirl_pen = 0x0050;
+	m_mask_captured_lo = 0x60;  // SE writes 0060 to plane 0 on capture
 }
 
 
@@ -1327,4 +1326,4 @@ GAME( 1993, galpani2j,  galpani2, galpani2, galpani2, galpani2_state, empty_init
 
 GAME( 1993, gp2quiz,    0,        galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II - Quiz Version", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // this one has 'quiz edition' on the title screen
 
-GAME( 1994, gp2se,      0,        gp2se,    gp2se,    galpani2_state, init_special, ROT90, "Kaneko", "Gals Panic II' - Special Edition (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gp2se,      0,        gp2se,    gp2se,    galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II' - Special Edition (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
