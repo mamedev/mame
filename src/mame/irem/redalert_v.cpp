@@ -49,7 +49,7 @@ void redalert_state::get_redalert_pens(pen_t *pens)
 
 	offs_t offs;
 	double scaler;
-	double bitmap_weight[2] = {};
+	double bitmap_weight[1] = {};
 	double charmap_rg_weights[3];
 	double charmap_b_weights[2];
 	double back_r_weight[1];
@@ -91,9 +91,9 @@ void redalert_state::get_redalert_pens(pen_t *pens)
 	/* the bitmap layer colors are directly mapped */
 	for (offs = 0; offs < NUM_BITMAP_PENS; offs++)
 	{
-		uint8_t r = bitmap_weight[(offs >> 2) & 0x01];
-		uint8_t g = bitmap_weight[(offs >> 1) & 0x01];
-		uint8_t b = bitmap_weight[(offs >> 0) & 0x01];
+		uint8_t r = combine_weights(bitmap_weight, BIT(offs, 2));
+		uint8_t g = combine_weights(bitmap_weight, BIT(offs, 1));
+		uint8_t b = combine_weights(bitmap_weight, BIT(offs, 0));
 
 		pens[NUM_CHARMAP_PENS + offs] = rgb_t(r, g, b);
 	}
@@ -113,7 +113,7 @@ void redalert_state::get_panther_pens(pen_t *pens)
 
 	offs_t offs;
 	double scaler;
-	double bitmap_weight[2] = {};
+	double bitmap_weight[1] = {};
 	double charmap_rg_weights[3];
 	double charmap_b_weights[2];
 	double back_r_weight[1];
@@ -135,9 +135,9 @@ void redalert_state::get_panther_pens(pen_t *pens)
 	{
 		uint8_t data = prom[offs];
 
-		uint8_t r = bitmap_weight[(~data >> 2) & 0x01];
-		uint8_t g = bitmap_weight[(~data >> 1) & 0x01];
-		uint8_t b = bitmap_weight[(~data >> 0) & 0x01];
+		uint8_t r = combine_weights(bitmap_weight, BIT(~data, 2));
+		uint8_t g = combine_weights(bitmap_weight, BIT(~data, 1));
+		uint8_t b = combine_weights(bitmap_weight, BIT(~data, 0));
 
 		pens[offs] = rgb_t(r, g, b);
 	}
@@ -145,9 +145,9 @@ void redalert_state::get_panther_pens(pen_t *pens)
 	/* the bitmap layer colors are directly mapped */
 	for (offs = 0; offs < NUM_BITMAP_PENS; offs++)
 	{
-		uint8_t r = bitmap_weight[(offs >> 2) & 0x01];
-		uint8_t g = bitmap_weight[(offs >> 1) & 0x01];
-		uint8_t b = bitmap_weight[(offs >> 0) & 0x01];
+		uint8_t r = combine_weights(bitmap_weight, BIT(offs, 2));
+		uint8_t g = combine_weights(bitmap_weight, BIT(offs, 1));
+		uint8_t b = combine_weights(bitmap_weight, BIT(offs, 0));
 
 		pens[NUM_CHARMAP_PENS + offs] = rgb_t(r, g, b);
 	}
@@ -167,7 +167,7 @@ void redalert_state::get_demoneye_pens(pen_t *pens)
 
 	offs_t offs;
 	double scaler;
-	double bitmap_weight[2] = {};
+	double bitmap_weight[1] = {};
 	double charmap_rg_weights[3];
 	double charmap_b_weights[2];
 	double back_r_weight[1];
@@ -209,9 +209,9 @@ void redalert_state::get_demoneye_pens(pen_t *pens)
 	/* the bitmap layer colors are directly mapped */
 	for (offs = 0; offs < NUM_BITMAP_PENS; offs++)
 	{
-		uint8_t r = bitmap_weight[(offs >> 2) & 0x01];
-		uint8_t g = bitmap_weight[(offs >> 1) & 0x01];
-		uint8_t b = bitmap_weight[(offs >> 0) & 0x01];
+		uint8_t r = combine_weights(bitmap_weight, BIT(offs, 2));
+		uint8_t g = combine_weights(bitmap_weight, BIT(offs, 1));
+		uint8_t b = combine_weights(bitmap_weight, BIT(offs, 0));
 
 		pens[NUM_CHARMAP_PENS + offs] = rgb_t(r, g, b);
 	}
