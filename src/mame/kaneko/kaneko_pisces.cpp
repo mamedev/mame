@@ -31,7 +31,6 @@ kaneko_pisces_hle_device::kaneko_pisces_hle_device(const machine_config &mconfig
 	, m_decoder_task_cb(*this, 0)
 	, m_old_mcu_nmi1(0)
 	, m_old_mcu_nmi2(0)
-	, m_bg_image_prefix_count(0)
 	, m_bg_decode_param_offset(2)
 	, m_field_origin_x(48)
 	, m_girl_bitmap_pending_addr(0)
@@ -429,22 +428,7 @@ void kaneko_pisces_hle_device::process_sub_queue()
 		{
 		case 0x0c: { // Resolve an image ID to a raw offset in the background ROMs.
 			uint16_t const img = sspace.read_word(address);
-			uint32_t iadr = 0;
-			{
-				// SE's sub CPU scripts place 34 extra images before the
-				// shared set: IDs 0-33 map to the end of the ROM table,
-				// IDs 34+ map to the beginning. Other sets use direct indexing.
-				uint16_t rom_idx = img;
-				if (m_bg_image_prefix_count)
-				{
-					if (img < m_bg_image_prefix_count)
-						rom_idx = imlist_count - m_bg_image_prefix_count + img;
-					else
-						rom_idx = img - m_bg_image_prefix_count;
-				}
-				if (rom_idx < imlist_count)
-					iadr = m_bg_image_offsets[rom_idx];
-			}
+			uint32_t const iadr = (img < imlist_count) ? m_bg_image_offsets[img] : 0;
 			// The ROM script interpreter selects the bank and reads the header.
 			// It then queues the appropriate native decompressor with this raw offset.
 			logerror("MCU slave %02x:%06x: image lookup %04x -> %08x\n", slot, address, img, iadr);

@@ -23,8 +23,7 @@ public:
 	void set_special()
 	{
 		assert(!configured());
-		// SE prepends 34 image IDs and reuses the lookup word for decoding.
-		m_bg_image_prefix_count = 34;
+		// SE reuses the lookup word for decoding.
 		m_bg_decode_param_offset = 0;
 		m_field_origin_x = 32;
 	}
@@ -55,7 +54,6 @@ private:
 
 	// Immutable ROM lookup metadata and per-variant protocol/layout settings.
 	std::vector<uint32_t> m_bg_image_offsets;
-	uint32_t m_bg_image_prefix_count;
 	uint8_t m_bg_decode_param_offset;
 	int m_field_origin_x;
 
