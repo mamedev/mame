@@ -51,6 +51,7 @@ protected:
 	bool                     m_sector_is_4k;
 	bool                     m_sector_is_16k;
 	bool                     m_top_boot_sector;
+	bool                     m_top_boot_sector_is_8k;
 	bool                     m_bot_boot_sector;
 	uint16_t                 m_page_size;
 	uint32_t                 m_page_timeout_usec;
@@ -330,6 +331,12 @@ public:
 	fujitsu_29f160te_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class fujitsu_29dl161te_16bit_device : public intelfsh16_device
+{
+public:
+	fujitsu_29dl161te_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class sharp_lh28f400_device : public intelfsh16_device
 {
 public:
@@ -463,6 +470,7 @@ DECLARE_DEVICE_TYPE(AMD_29LV160DT,           amd_29lv160dt_device)
 DECLARE_DEVICE_TYPE(AMD_29LV200T,            amd_29lv200t_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29F160TE,        fujitsu_29f160te_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29F160TE_16BIT,  fujitsu_29f160te_16bit_device)
+DECLARE_DEVICE_TYPE(FUJITSU_29DL161TE_16BIT, fujitsu_29dl161te_16bit_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29F016A,         fujitsu_29f016a_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29DL164BD,       fujitsu_29dl164bd_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29LV002TC,       fujitsu_29lv002tc_device)

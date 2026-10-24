@@ -48712,7 +48712,7 @@ epo_pabj
 epo_sskj
 epo_ssk2
 
-@source:tvgames/xavix_2000.cpp
+@source:tvgames/xavix_xavix2000.cpp
 ban_omt
 ban_onep
 drgqst
@@ -48732,7 +48732,7 @@ ttv_mx
 ttv_sw
 ttv_swj
 
-@source:tvgames/xavix_2002.cpp
+@source:tvgames/xavix_superxavix.cpp
 anpanmdx
 apmj2009
 ban_bkgj
@@ -48754,6 +48754,7 @@ epo_kabj
 epo_ntpj
 epo_rgfj
 epo_tfit
+hkdraw
 maxheart
 mrangbat
 ndpbj

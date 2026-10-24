@@ -1709,6 +1709,30 @@ if SOUNDS["TDA7433"] then
 end
 
 ---------------------------------------------------
+-- Mitsubishi M61545AFP dual electronic volume
+--@src/devices/sound/m61545.h,SOUNDS["M61545"] = true
+---------------------------------------------------
+
+if SOUNDS["M61545"] then
+	files {
+		MAME_DIR .. "src/devices/sound/m61545.cpp",
+		MAME_DIR .. "src/devices/sound/m61545.h",
+	}
+end
+
+---------------------------------------------------
+-- Mitsubishi M62429P/FP dual electronic volume
+--@src/devices/sound/m62429.h,SOUNDS["M62429"] = true
+---------------------------------------------------
+
+if SOUNDS["M62429"] then
+	files {
+		MAME_DIR .. "src/devices/sound/m62429.cpp",
+		MAME_DIR .. "src/devices/sound/m62429.h",
+	}
+end
+
+---------------------------------------------------
 -- Sanyo LC7535
 --@src/devices/sound/lc7535.h,SOUNDS["LC7535"] = true
 ---------------------------------------------------
