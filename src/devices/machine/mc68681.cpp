@@ -274,7 +274,7 @@ void xr68c681_device::device_start()
 
 void duart_base_device::device_reset()
 {
-	ACR = 0;  /* Interrupt Vector Register */
+	ACR = 0;  /* Auxiliary Control Register */
 	IMR = 0;  /* Interrupt Mask Register */
 	ISR = 0;  /* Interrupt Status Register */
 	OPCR = 0; /* Output Port Conf. Register */
@@ -282,8 +282,11 @@ void duart_base_device::device_reset()
 	CTR.d = 0;  /* Counter/Timer Preset Value */
 	// "reset clears internal registers (SRA, SRB, IMR, ISR, OPR, OPCR) puts OP0-7 in the high state, stops the counter/timer, and puts channels a/b in the inactive state"
 	IPCR = 0;
+	half_period = 0;
+	duart_timer->adjust(attotime::never);
 
 	m_irq_state = false;
+	m_ip2_clock_warned = false;
 	write_irq(CLEAR_LINE);
 	write_outport(OPR ^ 0xff);
 }
@@ -439,9 +442,28 @@ uint8_t mcf5206e_uart_device::get_irq_vector()
 	return IVR;
 }
 
+void duart_base_device::warn_ip2_clock()
+{
+	if (!m_ip2_clock_warned)
+	{
+		m_ip2_clock_warned = true;
+		logerror("68681 (%s): IP2 clock source not modelled, using X1 instead\n", tag());
+	}
+}
+
 uint32_t duart_base_device::get_ct_rate()
 {
-	uint32_t rate = 0;
+	// ACR[6] selects the mode and ACR[5:4] the clock source:
+	//
+	//   ACR[5:4]  counter mode        timer mode
+	//   00        IP2                 IP2
+	//   01        TxCA (channel A)    IP2 / 16
+	//   10        TxCB (channel B)    X1
+	//   11        X1 / 16             X1 / 16
+	//
+	// TODO: IP2 is not modelled, so X1 stands in for it below.
+	// The timer-mode IP2 input is divided by 16, the counter-mode one is not.
+	uint32_t const x1_rate = clock();
 
 	if (ACR & 0x40)
 	{
@@ -449,16 +471,17 @@ uint32_t duart_base_device::get_ct_rate()
 		switch ((ACR >> 4) & 3)
 		{
 		case 0: // IP2
+			// TODO: use IP2 instead of X1
+			warn_ip2_clock();
+			return x1_rate;
 		case 1: // IP2 / 16
-			//logerror( "68681 (%s): Unhandled timer/counter mode %d\n", duart68681->tag(), (duart68681->ACR >> 4) & 3);
-			rate = clock();
-			break;
+			// TODO: use IP2 / 16 instead of X1 / 16
+			warn_ip2_clock();
+			return x1_rate / 16;
 		case 2: // X1/CLK
-			rate = clock();
-			break;
+			return x1_rate;
 		case 3: // X1/CLK / 16
-			rate = clock() / 16;
-			break;
+			return x1_rate / 16;
 		}
 	}
 	else
@@ -467,22 +490,19 @@ uint32_t duart_base_device::get_ct_rate()
 		switch ((ACR >> 4) & 3)
 		{
 		case 0: // IP2
-			//logerror( "68681 (%s): Unhandled timer/counter mode %d\n", device->tag(), (duart68681->ACR >> 4) & 3);
-			rate = clock();
-			break;
-		case 1: // TxCA
-			rate = m_chanA->get_tx_rate();
-			break;
-		case 2: // TxCB
-			rate = m_chanB->get_tx_rate();
-			break;
+			// TODO: use IP2 instead of X1
+			warn_ip2_clock();
+			return x1_rate;
+		case 1: // TxCA (channel A 1x transmitter clock)
+			return m_chanA->get_tx_rate();
+		case 2: // TxCB (channel B 1x transmitter clock)
+			return m_chanB->get_tx_rate();
 		case 3: // X1/CLK / 16
-			rate = clock() / 16;
-			break;
+			return x1_rate / 16;
 		}
 	}
 
-	return rate;
+	return 0;
 }
 
 uint16_t duart_base_device::get_ct_count()
@@ -499,57 +519,47 @@ void duart_base_device::start_ct(int count)
 
 TIMER_CALLBACK_MEMBER(duart_base_device::duart_timer_callback)
 {
+	// OP3 can be the counter/timer output, selected by the OPCR
+	bool const op3_counter_output = (OPCR & 0xc) == 0x4;
+
+	// the timer output can clock either channel
+	auto clock_from_timer = [](duart_channel &chan, bool half_period)
+	{
+		uint8_t const csr = chan.get_chan_CSR();
+		if ((csr & 0x0f) == 0x0d)   // tx is timer driven
+			chan.tx_16x_clock_w(half_period);
+		if ((csr & 0xf0) == 0xd0)   // rx is timer driven
+			chan.rx_16x_clock_w(half_period);
+	};
+
 	if (ACR & 0x40)
 	{
-		// Timer mode
+		// Timer mode: OP3 toggles with the timer output
 		half_period ^= 1;
 
-		// timer output to bit 3?
-		if ((OPCR & 0xc) == 0x4)
-		{
+		if (op3_counter_output)
 			OPR ^= 0x8;
-			write_outport(OPR ^ 0xff);
-		}
 
-		// timer driving any serial channels?
-		uint8_t csr = m_chanA->get_chan_CSR();
-
-		if ((csr & 0x0f) == 0x0d)   // tx is timer driven
-		{
-			m_chanA->tx_16x_clock_w(half_period);
-		}
-		if ((csr & 0xf0) == 0xd0)   // rx is timer driven
-		{
-			m_chanA->rx_16x_clock_w(half_period);
-		}
-
-		csr = m_chanB->get_chan_CSR();
-		if ((csr & 0x0f) == 0x0d)   // tx is timer driven
-		{
-			m_chanB->tx_16x_clock_w(half_period);
-		}
-		if ((csr & 0xf0) == 0xd0)   // rx is timer driven
-		{
-			m_chanB->rx_16x_clock_w(half_period);
-		}
+		clock_from_timer(*m_chanA, half_period);
+		clock_from_timer(*m_chanB, half_period);
 
 		if (!half_period)
 			set_ISR_bits(INT_COUNTER_READY);
 
-		int count = std::max(CTR.w.l, uint16_t(1));
-		start_ct(count);
+		start_ct(std::max(CTR.w.l, uint16_t(1)));
 	}
 	else
 	{
-		// assert OP3 counter ready
-		if ((OPCR & 0xc) == 0x4)
+		// Counter mode: assert OP3 until the counter is read
+		if (op3_counter_output)
 			OPR |= 0x8;
 
-		// Counter mode
 		set_ISR_bits(INT_COUNTER_READY);
 		start_ct(0xffff);
 	}
 
+	if (op3_counter_output)
+		write_outport(OPR ^ 0xff);
 }
 
 uint8_t mc68681_device::read(offs_t offset)
@@ -754,7 +764,10 @@ uint8_t duart_base_device::read(offs_t offset)
 
 			// clear OP3 counter ready
 			if ((OPCR & 0xc) == 0x4)
+			{
 				OPR &= ~0x8;
+				write_outport(OPR ^ 0xff);
+			}
 		}
 
 		clear_ISR_bits(INT_COUNTER_READY);
@@ -961,6 +974,7 @@ void duart_base_device::write(offs_t offset, uint8_t data)
 	{
 		uint8_t old_acr = ACR;
 		ACR = data;
+		m_ip2_clock_warned = false;
 
 		//       bits 6-4: Counter/Timer Mode And Clock Source Select
 		//       bits 3-0: IP3-0 Change-Of-State Interrupt Enable
