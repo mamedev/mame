@@ -128,6 +128,7 @@ void windermere_device::device_reset()
 	m_rtc = time(nullptr) - 946684800;
 	m_pwrsr = (1 << 7) | (1 << 12); // DCDET, PFFLG
 	m_pwrcnt = 0;
+	m_pumpcon = 0;
 	m_kscan = 0;
 	m_last_ssi_request = 0;
 	m_ssi_read_counter = 0;
