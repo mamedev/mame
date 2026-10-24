@@ -1590,6 +1590,18 @@ if SOUNDS["MPEG_AUDIO"] then
 end
 
 ---------------------------------------------------
+-- LSI Logic L64111 MPEG audio decoder
+--@src/devices/sound/l64111.h,SOUNDS["L64111"] = true
+---------------------------------------------------
+
+if SOUNDS["L64111"] then
+	files {
+		MAME_DIR .. "src/devices/sound/l64111.cpp",
+		MAME_DIR .. "src/devices/sound/l64111.h",
+	}
+end
+
+---------------------------------------------------
 -- Texas Instruments TMS320AV110 MPEG audio decoder
 --@src/devices/sound/tms320av110.h,SOUNDS["TMS320AV110"] = true
 ---------------------------------------------------
