@@ -86,6 +86,8 @@ void galpani2_state::copybg8(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap,
 	// Plane 0's window/mask starts one pixel later in RAM than plane 1's field.
 	int x = *m_bg8_scrollx[layer] + 0x42 + (layer == 0);
 	int y = + ( *m_bg8_scrolly[layer] + 0x200 - 0x0f5 );
+	int const window_scrollx = *m_bg8_scrollx[0] + 0x43;
+	int const window_scrolly = *m_bg8_scrolly[0] + 0x0b;
 	uint16_t* ram = m_bg8[layer];
 
 	pen_t const *const clut = &m_bg8palette->pen(0);
@@ -101,6 +103,7 @@ void galpani2_state::copybg8(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap,
 			// foreground promotion so they draw above stale BG15 photo data.
 			// Japanese scenery 0x0Cxx has bit 11+10 and must stay behind RGB.
 			bool pixel_foreground;
+			bool rgb_window = false;
 			if (layer == 0)
 			{
 				// Plane 0 has field mask cells and window/border graphics.
@@ -116,23 +119,35 @@ void galpani2_state::copybg8(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap,
 			}
 			else
 			{
-				// Plane 1: high palette bank or palette bit 15 → foreground.
+				// Without a plane-0 RGB window, plane 1 is foreground. The
+				// selection menu clears that window and uses plane 1's low
+				// palette bank for the checkerboard around the cards.
+				rgb_window = m_bg8[0][((yy + window_scrolly) & 0xff) * 512
+					+ ((xx + window_scrollx) & 0x1ff)] != 0;
+				// Inside the RGB window: high palette bank or palette bit 15 → foreground.
 				// Bit 11 without bit 10 → UI text (0x28xx, 0x12xx, 0x16xx).
 				// SE uses 12xx (bit 12+11, no bit 10) and 16xx (bit 12+10+11);
 				// 16xx has bit 10 set, so extend the check for SE's upper bytes.
-				pixel_foreground = BIT(pen, 7) || BIT(color, 15)
+				pixel_foreground = !rgb_window || BIT(pen, 7) || BIT(color, 15)
 					|| (BIT(pen, 11) && !BIT(pen, 10))
 					|| (BIT(pen, 12) && BIT(pen, 9));
 			}
 			if (pixel_foreground != foreground)
 				continue;
-			// Palette colors 0x0000 and 0x0001 are transparent, letting the
-			// BG15 photo show through. The game uses 0x0001 for revealed
-			// field cells during gameplay, and 0x0000 (via pen 0x50E5) for
-			// the full-photo reward display after completing a level.
-			// Plane 0's low palette bank window retains its coverage when
-			// the palette fades to 0x0001, or the other framebuffer half leaks.
-			bool const passthrough = ((color <= 0x0001) && (layer || BIT(pen, 7)))
+			// A black palette entry alone does not make foreground cells
+			// transparent. During level preparation, plane 1 first fills the
+			// window with 2800, then the field with 00E0/00E4, all using 0001.
+			// These must cover RGB while plane 0's mask is being prepared.
+			// Keep the other color keys, including the 50E5 full-photo
+			// reward display and the player colors, pending mixer emulation.
+			// Plane 0's mask cells also pass RGB; its window stays opaque.
+			// Plane 1's color key needs the RGB window. With it cleared,
+			// palette 0001 is the dark backdrop between the menu diamonds;
+			// the header photos and cards are sprites above that backdrop.
+			bool const color_key = layer
+				? rgb_window && !BIT(pen, 11) && pen != 0x00e0 && pen != 0x00e4
+				: BIT(pen, 7);
+			bool const passthrough = ((color <= 0x0001) && color_key)
 				|| (layer == 1 && bg8_captured_field(pen));
 			// UI words remain opaque, including flagged black colors.
 			bool const covered_field = BIT(color, 15) && !BIT(pen, 11);
