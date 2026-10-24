@@ -476,12 +476,18 @@ void cbm_ieee488_devices(device_slot_interface &device)
 // slot devices
 #include "hp9122c.h"
 #include "hp9133.h"
+#include "hp9133xv.h"
 #include "hp9895.h"
 
 void hp_ieee488_devices(device_slot_interface &device)
 {
 	device.option_add("hp9122c", GPIB_HP9122C);
 	device.option_add("hp9133", GPIB_HP9133);
+	device.option_add("hp9133v", GPIB_HP9133V);
+	device.option_add("hp9133v004", GPIB_HP9133V_004);
+	device.option_add("hp9133xv", GPIB_HP9133XV);
+	device.option_add("hp9133xv010", GPIB_HP9133XV_010);
+	device.option_add("hp9134xv", GPIB_HP9134XV);
 	device.option_add("hp9895", GPIB_HP9895);
 }
 
