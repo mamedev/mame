@@ -6,6 +6,7 @@ Wheels & Fire
 Power Ball (prototype)
 Kong Ball (prototype, TCH / Digital Dreams Multimedia)
 Radical Enduro (early prototype, TCH / Sator Videogames)
+Radical Enduro (early prototype, bugfix hack)
 
 Original driver by Tomasz Slanina.
 The video model and the blitter rewritten from the games' use of the hardware by Marcos
@@ -1094,6 +1095,42 @@ ROM_START( radendur )
 	ROM_LOAD( "4_pal16v8.u73",  0x000, 0x117, NO_DUMP )
 ROM_END
 
+// The main CPU program is the parent's with the prototype's faults fixed in its code, so that its
+// five tracks play, and its four blitter interrupt handlers opened at mask 4 instead of 7, so that
+// the line counter's interrupt, which streams the sound, gets through them; every other ROM is
+// the parent's.
+ROM_START( radendurh )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "endu-h.u19", 0x00001, 0x80000, CRC(5da366ef) SHA1(a4128e92c8b9060dbfc366e26b622b9341eb39e8) )
+	ROM_LOAD16_BYTE( "endu-h.u21", 0x00000, 0x80000, CRC(44919da0) SHA1(8a5e87eed05299ba157d9b4275931b84edab3d9d) )
+
+	ROM_REGION( 0x100000, "subcpu", 0 ) // 68000 Code + sound samples
+	ROM_LOAD16_BYTE( "endu.u63", 0x00001, 0x80000, CRC(43c35368) SHA1(62167a434bfe00825f2f97ecadd0af3e2d2b63f2) )
+	ROM_LOAD16_BYTE( "endu.u65", 0x00000, 0x80000, CRC(25259894) SHA1(b260324760dba1595ab8bd53e1bbc20c04b640dd) )
+
+	ROM_REGION( 0x1000000, "gfx1", ROMREGION_ERASE00  ) // each ROM contains 2 512x512 8bpp gfx pages
+	ROM_LOAD( "endu.u52", 0x000000, 0x80000, CRC(2b686f81) SHA1(9d9aa0f6e1a3dc7e96f647ddda3214f1f4c6bf1d) )
+	ROM_LOAD( "endu.u53", 0x080000, 0x80000, CRC(1a224c69) SHA1(ed1a8fdd97ea0caa649d3f1238fa13b1fd19376c) )
+	ROM_LOAD( "endu.u54", 0x100000, 0x80000, CRC(217a9725) SHA1(14240e457967c5b23c54d4395fc1ab7394a59fc9) )
+	ROM_LOAD( "endu.u55", 0x180000, 0x80000, CRC(bfce1b17) SHA1(415ab6815836dafb1a0b86464e84f3aaa5d1075d) )
+	ROM_LOAD( "endu.u56", 0x200000, 0x80000, CRC(4b9460a8) SHA1(d2b9484f133d5d9abbe6a163c57d079944b3221f) )
+	ROM_LOAD( "endu.u57", 0x280000, 0x80000, CRC(f17d5752) SHA1(354a76e9e130f10fc103ab83ea15bf1f47fca391) )
+	ROM_LOAD( "endu.u58", 0x300000, 0x80000, CRC(75660aac) SHA1(6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c) )
+	ROM_LOAD( "endu.u59", 0x380000, 0x80000, CRC(037648df) SHA1(19b0cbdb60ac4b14f06dd71ddf4e3b2d2dbdb19d) )
+	ROM_LOAD( "endu.u200",0x400000, 0x80000, CRC(e1417f94) SHA1(dba02ce1f9bbe18e78c67e770fe84184e227799b) )
+	ROM_LOAD( "endu.u201",0x480000, 0x80000, CRC(25d9db1c) SHA1(c61491ae2dc97ea5c9f0f0d58f32edf0a3a94d95) )
+	ROM_LOAD( "endu.u202",0x500000, 0x80000, CRC(15f4fbd4) SHA1(2ad28af1bd0924fc3f1f6e026ca834c7df774b64) )
+	ROM_LOAD( "endu.u203",0x580000, 0x80000, CRC(e6361a27) SHA1(826be3b326e68c3b7c0f5c3d84993a971b32f84e) )
+	ROM_LOAD( "endu.u204",0x600000, 0x80000, CRC(0db97872) SHA1(56e38a9034082c3ceb78c0f3aba6125ce6fabd49) )
+	ROM_LOAD( "endu.u205",0x680000, 0x80000, CRC(75660aac) SHA1(6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c) )
+
+	ROM_REGION(0x2e5, "plds", 0)
+	ROM_LOAD( "radenduro_2_d579_gal22v10.u24", 0x000, 0x2e5, CRC(ebe162d0) SHA1(910e3733df70db4df704f3e105ed27eaa4c32ae6) )
+	ROM_LOAD( "radenduro_gal22v10b.u23",       0x000, 0x2e5, CRC(f1b0b2b7) SHA1(f85c87c7956813fe78f399694dc999877b1dcb60) )
+	ROM_LOAD( "3_pal16v8.u40",  0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "4_pal16v8.u73",  0x000, 0x117, NO_DUMP )
+ROM_END
+
 } // anonymous namespace
 
 GAMEL( 199?, wheelfir,   0, wheelfir,    wheelfir, wheelfir_state, empty_init,    ROT0,  "TCH", "Wheels & Fire", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_wheelfir )
@@ -1104,3 +1141,5 @@ GAME( 1997, kongball,    0, kongball,    pwball,   wheelfir_state, empty_init,  
 
 // crashes (always?) when selecting track on PCB
 GAME( 199?, radendur,    0,        wheelfir,    pwball,   radendur_state, empty_init,    ROT0,  "TCH / Sator Videogames", "Radical Enduro (early prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+// imperfect sound: the prototype's code never triggers its sound effects, which are in the ROMs
+GAME( 2026, radendurh,   radendur, wheelfir,    pwball,   radendur_state, empty_init,    ROT0,  "hack", "Radical Enduro (early prototype, bugfix hack)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
