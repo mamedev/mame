@@ -331,12 +331,6 @@ template <unsigned NumVerts>
 void model2_state::model2_3d_process_polygon(raster_state *raster, u32 attr)
 {
 	quad_m2 object;
-	u16 *th, *tp;
-	int32_t tho;
-	u32 i;
-	bool cull;
-	float zvalue;
-	float min_z, max_z;
 
 	static_assert(NumVerts == 3 || NumVerts == 4, "Polygon must have 3 or 4 vertices");
 
@@ -371,12 +365,12 @@ void model2_state::model2_3d_process_polygon(raster_state *raster, u32 attr)
 	}
 
 	/* always calculate the min z and max z value */
-	min_z = object.v[0].pz;
+	float min_z = object.v[0].pz;
 	if (object.v[1].pz < min_z) min_z = object.v[1].pz;
 	if (object.v[2].pz < min_z) min_z = object.v[2].pz;
 	if (NumVerts == 4 && object.v[3].pz < min_z) min_z = object.v[3].pz;
 
-	max_z = object.v[0].pz;
+	float max_z = object.v[0].pz;
 	if (object.v[1].pz > max_z) max_z = object.v[1].pz;
 	if (object.v[2].pz > max_z) max_z = object.v[2].pz;
 	if (NumVerts == 4 && object.v[3].pz > max_z) max_z = object.v[3].pz;
@@ -384,6 +378,7 @@ void model2_state::model2_3d_process_polygon(raster_state *raster, u32 attr)
 	/* read in the texture information */
 
 	/* texture point data */
+	u16 const *tp;
 	if (raster->command_buffer[0] & 0x800000)
 		tp = &raster->texture_ram[raster->command_buffer[0] & 0xffff];
 	else
@@ -405,6 +400,7 @@ void model2_state::model2_3d_process_polygon(raster_state *raster, u32 attr)
 	raster->command_buffer[0] += NumVerts * 2;
 
 	/* texture header data */
+	u16 const *th;
 	if (raster->command_buffer[1] & 0x800000)
 		th = &raster->texture_ram[raster->command_buffer[1] & 0xffff];
 	else
@@ -416,11 +412,7 @@ void model2_state::model2_3d_process_polygon(raster_state *raster, u32 attr)
 	object.texheader[3] = *th++;
 
 	/* extract the texture header offset */
-	tho = (attr >> 12) & 0x1f;
-
-	/* adjust for sign */
-	if (tho & 0x10)
-		tho |= -16;
+	s32 const tho = util::sext(attr >> 12, 5);
 
 	/* update the address */
 	raster->command_buffer[1] += tho * 4;
@@ -433,9 +425,10 @@ void model2_state::model2_3d_process_polygon(raster_state *raster, u32 attr)
 	object.texlod += raster->log_ram[raster->command_buffer[10] & 0x7fff];
 
 	/* determine whether we can cull this polygon */
-	cull = check_culling(raster,attr,min_z,max_z);
+	bool const cull = check_culling(raster,attr,min_z,max_z);
 
 	/* set the object's z value */
+	float zvalue;
 	switch ((attr >> 10) & 3)
 	{
 		case 0: // old value
@@ -455,7 +448,7 @@ void model2_state::model2_3d_process_polygon(raster_state *raster, u32 attr)
 
 	raster->polygon_z = zvalue;
 
-	if (cull == false)
+	if (!cull)
 	{
 		int32_t clipped_verts;
 		poly_vertex verts_in[8], verts_out[8];
@@ -475,16 +468,14 @@ void model2_state::model2_3d_process_polygon(raster_state *raster, u32 attr)
 
 		if (clipped_verts > 2)
 		{
-			polygon *zpoly;
-
 			/* adjust and set the object z-sort value */
 			object.z = float_to_zval(zvalue, raster->z_adjust);
 
 			/* get our list read to add the polygons */
-			zpoly = raster->poly_sorted_list[object.z];
+			polygon *const zpoly = raster->poly_sorted_list[object.z];
 
 			/* go through the clipped vertex list, adding polygons */
-			polygon *poly = &raster->poly_list[raster->poly_list_index++];
+			polygon &poly = raster->poly_list[raster->poly_list_index++];
 
 			if (raster->poly_list_index >= MAX_POLYGONS)
 			{
@@ -492,36 +483,35 @@ void model2_state::model2_3d_process_polygon(raster_state *raster, u32 attr)
 			}
 
 			/* copy the object information */
-			poly->z = object.z;
-			poly->texheader[0] = object.texheader[0];
-			poly->texheader[1] = object.texheader[1];
-			poly->texheader[2] = object.texheader[2];
-			poly->texheader[3] = object.texheader[3];
-			poly->luma = object.luma;
-			poly->texlod = object.texlod;
+			poly.z = object.z;
+			poly.texheader[0] = object.texheader[0];
+			poly.texheader[1] = object.texheader[1];
+			poly.texheader[2] = object.texheader[2];
+			poly.texheader[3] = object.texheader[3];
+			poly.luma = object.luma;
+			poly.texlod = object.texlod;
 
 			/* set the viewport */
-			poly->viewport[0] = raster->viewport[0];
-			poly->viewport[1] = raster->viewport[1];
-			poly->viewport[2] = raster->viewport[2];
-			poly->viewport[3] = raster->viewport[3];
+			poly.viewport[0] = raster->viewport[0];
+			poly.viewport[1] = raster->viewport[1];
+			poly.viewport[2] = raster->viewport[2];
+			poly.viewport[3] = raster->viewport[3];
 
 			/* set the center */
-			poly->center[0] = raster->center[raster->center_sel][0];
-			poly->center[1] = raster->center[raster->center_sel][1];
+			poly.center[0] = raster->center[raster->center_sel][0];
+			poly.center[1] = raster->center[raster->center_sel][1];
 
 			/* set the window */
-			poly->window = raster->cur_window;
+			poly.window = raster->cur_window;
 
-			poly->num_vertices = clipped_verts;
+			poly.num_vertices = clipped_verts;
 
 			for (int i = 0; i < clipped_verts; i++)
-				poly->v[i] = verts_out[i];
+				poly.v[i] = verts_out[i];
 
 			/* add to our sorted list */
-			raster->poly_sorted_list[object.z] = poly;
-			poly->next = zpoly;
-			zpoly = poly;
+			raster->poly_sorted_list[object.z] = &poly;
+			poly.next = zpoly;
 
 			/* keep around the min and max z values for this frame */
 			if (object.z < raster->min_z) raster->min_z = object.z;
@@ -530,32 +520,26 @@ void model2_state::model2_3d_process_polygon(raster_state *raster, u32 attr)
 	}
 
 	/* update linking */
-	switch (((attr >> 8) & 3))
+	switch ((attr >> 8) & 3)
 	{
 		case 0:
 		case 2:
-		{
 			/* reuse P0(n) and P1(n) */
-			for (i = 0; i < 6; i++)                                        /* P0(n) -> P0(n-1) */
+			for (u32 i = 0; i < 6; i++)                                        /* P0(n) -> P0(n-1) */
 				raster->command_buffer[2+i] = raster->command_buffer[11+i]; /* P1(n) -> P1(n-1) */
-		}
-		break;
+			break;
 
 		case 1:
-		{
 			/* reuse P0(n-1) and P0(n) */
-			for (i = 0; i < 3; i++)
+			for (u32 i = 0; i < 3; i++)
 				raster->command_buffer[5+i] = raster->command_buffer[11+i]; /* P0(n) -> P1(n-1) */
-		}
-		break;
+			break;
 
 		case 3:
-		{
 			/* reuse P1(n-1) and P1(n) */
-			for (i = 0; i < 3; i++)
+			for (u32 i = 0; i < 3; i++)
 				raster->command_buffer[2+i] = raster->command_buffer[14+i]; /* P1(n) -> P1(n-1) */
-		}
-		break;
+			break;
 	}
 }
 
@@ -1733,7 +1717,7 @@ const u32 *model2_state::geo_object_data(geo_state &geo, u32 opcode, const u32 *
 	u32  oba = *input++;     /* Object Address */
 	u32  obc = *input++;     /* Object Count */
 
-	u32 *obp;                /* Object Pointer */
+	u32 const *obp;          /* Object Pointer */
 
 	/* push the initial set of data to the 3d rasterizer */
 	model2_3d_push(raster, opcode >> 23);
