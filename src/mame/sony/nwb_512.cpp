@@ -25,7 +25,7 @@
  *
  * TODO:
  *   - Add NEWS I/O Bus slot and convert this to it instead of regular device
- *   - Cycle-accurate timing
+ *   - Cycle-accurate timing (especially for fb->fb copies and status bits)
  *   - Interrupt support for CPU-only models (iopboot, mrx, and the monitor don't use them because they have the free cycles to poll)
  *   - Refactoring for multiplanar framebuffer support (NWB-225A color framebuffer, etc.). The implementation uses the same raster operation controller,
  *     so the eventual drivers for those (when ROM dumps and board pictures are available) will be able to share code with the NWB-512.
@@ -135,7 +135,8 @@ void nwb_512_device::device_start()
 	save_item(NAME(m_state.rop_function));
 
 	// Status
-	save_item(NAME(m_state.busy));
+	save_item(NAME(m_state.req));
+	save_item(NAME(m_state.exec));
 
 	// Configuration flags
 	save_item(NAME(m_state.x_direction));
@@ -356,7 +357,7 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 {
 	if (machine().side_effects_disabled())
 	{
-		return 0; // TODO: figure out what makes sense for debugging. Can't use the normal functions due to side effects
+		return 0;
 	}
 
 	LOGMASKED(LOG_DATA, "(%s) fifo_r(0x%x, 0x%x)\n", machine().describe_context(), offset, mem_mask);
@@ -366,13 +367,15 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 		logerror("%s NWB-512 fifo_r: framebuffer not enabled\n", machine().describe_context());
 		return 0;
 	}
-	if (!m_state.is_fb_to_host() || !m_state.busy)
+	if (!m_state.is_fb_to_host() || !m_state.exec)
 	{
 		logerror("%s NWB-512: fifo_r when read op is not executing\n", machine().describe_context());
 		return 0;
 	}
 
 	uint16_t word = 0;
+
+	m_state.req = true; // FB executing
 
 	if (m_state.prime_pending)
 	{
@@ -396,6 +399,8 @@ uint16_t nwb_512_device::fifo_r(offs_t offset, uint16_t mem_mask)
 		end_row();
 	}
 
+	m_state.req = false; // Waiting for data from host (or done with op)
+
 	return word;
 }
 
@@ -417,12 +422,13 @@ void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		return;
 	}
 
-	if (m_state.pixel_mode || !m_state.busy)
+	if (m_state.pixel_mode || !m_state.exec)
 	{
 		logerror("%s NWB-512: word write in pixel mode or not active, ignoring\n", machine().describe_context());
 		return;
 	}
 
+	m_state.req = true; // FB executing
 	if (!m_state.row_fill)
 	{
 		rop_cycle(data);
@@ -438,18 +444,14 @@ void nwb_512_device::fifo_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		}
 		end_row();
 	}
+	m_state.req = false; // Waiting for next host read (or op complete)
 }
 
 uint16_t nwb_512_device::status_r()
 {
-	// TODO: some ops wait for 0b11 -> 0b10/0b01 transition instead of 0b11->0b00,
-	// so the driver always returns 0b10 to ensure all known cases are covered.
-	// The specifics of the internal state should be used to determine this value instead.
-	constexpr uint8_t BUSY = 0b10;
-
 	// The framebuffer font is only rendered properly if bit 5 is set.
 	// This might be some kind of ID or revision flag for the Kanji ROM (or the framebuffer as a whole).
-	return 0x20 | (m_state.busy ? BUSY : 0);
+	return 0x20 | (m_state.exec ? 0x2 : 0x0) | (m_state.req ? 0x1 : 0x0);
 }
 
 void nwb_512_device::ctrl_w(uint16_t data)
@@ -504,11 +506,12 @@ void nwb_512_device::check_operation_start(offs_t offset)
 	// TODO: This executes copies immediately, faster than real hardware
 	if (m_state.is_fb_to_fb())
 	{
-		while (m_state.busy)
+		m_state.req = true; // FB executing, no input from host needed, so req will stay high throughout
+		while (m_state.busy())
 		{
 			const uint16_t source_data = coordinate_to_data(m_state.current_source_x, m_state.source_y);
 			LOGMASKED(LOG_DATA, "fb->fb: sx = 0x%x sy = 0x%x data = 0x%x\n", m_state.current_source_x, m_state.source_y, source_data);
-			rop_cycle(source_data); // When the ROP is done, this will clear m_state.busy
+			rop_cycle(source_data); // When the ROP is done, this will clear the status flags
 		}
 	}
 }
@@ -699,7 +702,6 @@ void nwb_512_device::end_row()
 void nwb_512_device::start_operation()
 {
 	LOGMASKED(LOG_ROP, "start_operation()\n");
-	m_state.busy = true; // TODO: use the granular status bits
 
 	// The DSC-008 section of the NWS-15xx service manual implies that the direction bit is not
 	// supported/used for reads. For now, assume the same for the NWB-512.
@@ -707,6 +709,10 @@ void nwb_512_device::start_operation()
 	{
 		fatalerror("Reverse reads are not supported!");
 	}
+
+	// Set exec flag as operation is starting.
+	// req will be set only while the fb is actively doing something
+	m_state.exec = true;
 
 	// Latch SRXA and DRXA into SXA and DXA
 	m_state.current_destination_x = m_state.destination_x;
@@ -772,7 +778,8 @@ void nwb_512_device::start_operation()
 void nwb_512_device::end_operation()
 {
 	LOGMASKED(LOG_ROP, "ROP completed!\n");
-	m_state.busy = false;
+	m_state.req = false;
+	m_state.exec = false;
 
 	// The DSC-008 instruction manual mentions that SRXA/DRXA[3:0] are cleared independently (see: /CLRDEST and /SFH).
 	// This may not be accurate. Hardware confirmation is needed.

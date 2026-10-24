@@ -55,8 +55,13 @@ private:
 		uint16_t limit_y = 0; // YC
 		uint8_t rop_function = 0;
 
-		// Status
-		bool busy = false; // operation in progress
+		// Status flags
+		//  req exec: 00 = idle, 10 = command running, 01 = waiting for host data, 11 = fb busy
+		// While req is set by fifo_w/fifo_r and on fb->fb copies, it is mostly a placeholder
+		// for now because fb ops are executed instantly. Once the timing is emulated, then
+		// req will be more important.
+		bool req = false;  // FB executing op
+		bool exec = false; // FB executing command
 
 		// Configuration flags
 		bool x_direction = false; // true = left -> right
@@ -96,6 +101,11 @@ private:
 		bool enabled() const
 		{
 			return ctrl & 0x1;
+		}
+
+		bool busy() const
+		{
+			return req && exec;
 		}
 
 		void advance_sxa()
