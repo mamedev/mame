@@ -122,6 +122,7 @@ void debugger_osx::exit()
 void debugger_osx::init_debugger(running_machine &machine)
 {
 	m_machine = &machine;
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&debugger_osx::exit, this));
 	machine.configuration().config_register(
 			"debugger",
 			configuration_manager::load_delegate(&debugger_osx::config_load, this),
