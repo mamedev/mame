@@ -85,7 +85,6 @@ public:
 	std::unique_ptr<u16[]> m_palram;
 	std::unique_ptr<u16[]> m_colorxlat;
 	std::unique_ptr<u8[]> m_lumaram;
-	u8 m_gamma_table[256]{};
 	std::unique_ptr<model2_renderer> m_renderer;
 
 	/* Public for access by the ioports */
