@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia
+// copyright-holders:Luca Elia, Andrea Bogazzi
 /***************************************************************************
 
 	Kaneko PISCES MCU high-level simulation for Gals Panic II and II' SE.

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia
+// copyright-holders:Luca Elia, Andrea Bogazzi
 #ifndef MAME_KANEKO_KANEKO_PISCES_H
 #define MAME_KANEKO_KANEKO_PISCES_H
 
