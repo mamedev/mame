@@ -1,18 +1,17 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese
+// copyright-holders:Angelo Salese, bugjosh
 /***************************************************************************
 
 Bega's Battle (c) 1983 Data East Corporation
 
 preliminary driver by Angelo Salese
 
+In begas, cobra and rblaster, the main CPU controls a Sony LDP-1000 or
+LDP-1000A player through the 6850 ACIA, whose receive interrupt is its only
+IRQ (the coins are on NMI). The player is emulated as the LDP-1000A.
+
 TODO:
-- laserdisc hook-up and 6850 comms;
-- "SOUND TEST READ ERROR";
-- video color offsets are a mystery, where it gets calculated from?
 - Bega's Battle VBLANK hack;
-- CPU clocks;
-- dip-switches;
 - clean-ups;
 
 ***************************************************************************
@@ -108,11 +107,15 @@ Sound processor - 6502
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
-#include "sound/ay8910.h"
-#include "machine/ldp1000.h"
-#include "machine/gen_latch.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
+#include "machine/gen_latch.h"
+#include "machine/ldp1000hle.h"
+#include "sound/ay8910.h"
+#include "sound/flt_biquad.h"
+
 #include "emupal.h"
 #include "speaker.h"
 #include "tilemap.h"
@@ -127,7 +130,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_laserdisc(*this, "laserdisc")
-		//, m_acia(*this, "acia")
+		, m_acia(*this, "acia")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
@@ -135,22 +138,26 @@ public:
 		, m_soundlatch2(*this, "soundlatch2")
 		, m_vram(*this, "vram%u", 0U)
 		, m_attr(*this, "attr%u", 0U)
+		, m_coin2(*this, "COIN2")
 	{ }
 
-	void rblaster(machine_config &config);
+	void rblaster(machine_config &config) ATTR_COLD;
+	void cobraa(machine_config &config) ATTR_COLD;
 
 	int begas_vblank_r();
+	int coin2_r() { return m_coin2->read() ? 1 : 0; }
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
-	required_device<sony_ldp1000_device> m_laserdisc;
-	//required_device<acia6850_device> m_acia;
+	required_device<cpu_device> m_audiocpu;
+	required_device<sony_ldp1000hle_device> m_laserdisc;
+	required_device<acia6850_device> m_acia;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -158,25 +165,37 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch2;
 	required_shared_ptr_array<uint8_t, 2> m_vram;
 	required_shared_ptr_array<uint8_t, 2> m_attr;
+	required_ioport m_coin2;
 
-	int m_nmimask = 0;
+	uint8_t m_sound_nmi_enable = 0;
+	uint8_t m_video_control = 0;
+	emu_timer *m_sound_timer = nullptr;
 	tilemap_t *m_tilemap[2];
 
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 
-	uint8_t acia_status_hack_r();
 	uint8_t sound_status_r();
+	void video_control_w(uint8_t data);
+	bool laserdisc_shown() const { return BIT(m_video_control, 3) && !BIT(m_video_control, 0); }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	[[maybe_unused]] void nmimask_w(uint8_t data);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
+	void sound_nmi_enable_w(uint8_t data);
+	void nmi_ack_w(uint8_t data);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *spriteram, uint16_t tile_bank, uint32_t color);
 
 	template <unsigned N> void vram_w(offs_t offset, u8 data);
 	template <unsigned N> void attr_w(offs_t offset, u8 data);
+	// the lower half of each layer's range accesses the same RAM by column (the low address bits select the row);
+	// cobra draws the left and right sides of a frame and its cockpit struts through it
+	template <unsigned N> u8 vram_column_r(offs_t offset) { return m_vram[N][column_offset(offset)]; }
+	template <unsigned N> void vram_column_w(offs_t offset, u8 data) { vram_w<N>(column_offset(offset), data); }
+	template <unsigned N> u8 attr_column_r(offs_t offset) { return m_attr[N][column_offset(offset)]; }
+	template <unsigned N> void attr_column_w(offs_t offset, u8 data) { attr_w<N>(column_offset(offset), data); }
+	static offs_t column_offset(offs_t offset) { return BIT(offset, 0, 5) << 5 | BIT(offset, 5, 5); }
 	template <unsigned N> TILE_GET_INFO_MEMBER(get_tile_info);
 
-	INTERRUPT_GEN_MEMBER(sound_interrupt);
+	TIMER_CALLBACK_MEMBER(sound_timing);
 };
 
 template <unsigned N> void deco_ld_state::vram_w(offs_t offset, u8 data)
@@ -191,11 +210,15 @@ template <unsigned N> void deco_ld_state::attr_w(offs_t offset, u8 data)
 	m_tilemap[N]->mark_tile_dirty(offset);
 }
 
+// each layer has its own character set: layer 0 uses the second half of the graphics ROMs (which
+// starts with solid blocks the games fill it with) like its sprites, layer 1 the first half (the font)
+// the palette is the priority encoder's code for the layer's tiles (see screen_update): 2 for layer 0 (group A),
+// 5 for layer 1 (group B)
 template <unsigned N> TILE_GET_INFO_MEMBER(deco_ld_state::get_tile_info)
 {
 	u8 attr = m_attr[N][tile_index];
-	u16 tile = m_vram[N][tile_index] | (attr & 3) << 8;
-	tileinfo.set(0, tile, 5, 0);
+	u16 tile = m_vram[N][tile_index] | BIT(attr, 0, 2) << 8 | (N ? 0x000 : 0x400);
+	tileinfo.set(0, tile, N ? 5 : 2, 0);
 }
 
 
@@ -207,7 +230,7 @@ void deco_ld_state::video_start()
 	m_tilemap[1]->set_transparent_pen(0);
 
 	// flush palette to all black: ends up using a very similar pattern than the MAME default one ...
-	for (int i = 0; i < 0x800; i++)
+	for (int i = 0; i < 0x40; i++)
 		m_palette->set_pen_color(i, 0, 0, 0);
 }
 
@@ -219,110 +242,134 @@ void deco_ld_state::video_start()
 [+2] y coord
 [+3] x coord
 */
-void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank )
+void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *spriteram, uint16_t tile_bank, uint32_t color)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 
-	for (int i = 0; i < 0x20; i += 4)
+	// the first and last rows of tile RAM
+	for (int list : { 0x000, 0x3e0 })
 	{
-		if (~spriteram[i] & 1)
-			continue;
-
-		int spr_offs = spriteram[i + 1] | tile_bank;
-		int x = spriteram[i + 3];
-		int y = spriteram[i + 2];
-		int col = 6;
-		int fx = (spriteram[i] & 0x04) ? 1 : 0;
-		int fy = (spriteram[i] & 0x02) ? 1 : 0;
-
-		gfx->transpen(bitmap, cliprect, spr_offs, col, fx, fy, x, y, 0);
-	}
-
-	for (int i = 0x3e0; i < 0x400; i += 4)
-	{
-		if (~spriteram[i] & 1)
-			continue;
-
-		int spr_offs = spriteram[i + 1] | tile_bank;
-		int x = spriteram[i + 3];
-		int y = spriteram[i + 2];
-		int col = 6;
-		int fx = (spriteram[i] & 0x04) ? 1 : 0;
-		int fy = (spriteram[i] & 0x02) ? 1 : 0;
-
-		gfx->transpen(bitmap, cliprect, spr_offs, col, fx, fy, x, y, 0);
+		for (int i = list; i < list + 0x20; i += 4)
+		{
+			if (BIT(spriteram[i], 0))
+				gfx->transpen(bitmap, cliprect, spriteram[i + 1] | tile_bank, color, BIT(spriteram[i], 2), BIT(spriteram[i], 1), spriteram[i + 3], spriteram[i + 2], 0);
+		}
 	}
 }
 
 uint32_t deco_ld_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0, cliprect);
+	// with the colour output latch held clear, only the laserdisc picture (or black) is left
+	if (BIT(m_video_control, 1))
+	{
+		bitmap.fill(rgb_t::transparent(), cliprect);
+		return 0;
+	}
 
-	draw_sprites(bitmap, cliprect, m_vram[1], 0x000);
-	draw_sprites(bitmap, cliprect, m_vram[0], 0x100);
+	// with the laserdisc picture off, the board's background colour (palette 0, colour 0) shows instead
+	bitmap.fill(laserdisc_shown() ? rgb_t::transparent() : rgb_t(m_palette->pen(0)), cliprect);
 
+	// a priority encoder (LS148 at 16H on VDO-1) picks the topmost source for each pixel, and its code is also
+	// the palette number: group B "MIX" (6), group B tiles (5), group B "SOFT2" (4), group A "MIX" (3),
+	// group A tiles (2), group A "SOFT2" (1); the games fill palettes 1, 2 and 3 with the same colours, and
+	// 4, 5 and 6 likewise
+	// TODO: tiles and "MIX" come out of one line buffer on VDO-1 (93422 at 11H for group A, through PAL LP1-6)
+	// and "SOFT2" out of another (7F, through PAL LP1-7); neither PAL is dumped, so it isn't known which sprite
+	// list, if either, is "MIX". Both lists stay below their group's tiles: with either above them, garbage
+	// shows when rblaster and cobra fill the whole tile RAM (rows 0 and 31 too) with one tile
+	draw_sprites(bitmap, cliprect, m_vram[0], 0x100, 3);
 	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect, m_vram[1], 0x000, 6);
 	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
 
-/* unknown, but certainly related to audiocpu somehow */
 uint8_t deco_ld_state::sound_status_r()
 {
-	return 0xff ^ 0x40;
+	// bit 7: the sound CPU has written a reply, bit 6: the sound CPU hasn't read the last command yet
+	// (cobra's sound test waits for these and checks that the sound CPU echoes the command)
+	return (m_soundlatch2->pending_r() << 7) | (m_soundlatch->pending_r() << 6) | 0x3f;
 }
 
-// TODO: needs LD BIOS dumped
-uint8_t deco_ld_state::acia_status_hack_r()
+void deco_ld_state::video_control_w(uint8_t data)
 {
-	return 0xff;
+	// LS175 at 11K on VDO-1, cleared at reset
+	// bit 0: hide the laserdisc picture (forces the DSP SEL output low); the games set it while showing TILT
+	//        and the power-on countdown, and rblaster while it sends a search to the player
+	// bit 1: blank the board's own picture (holds the colour output latch, LS273 at 2J, clear) and make DSP SEL
+	//        ignore the overlay, so only the laserdisc picture is left if bits 0 and 3 let it through; the games
+	//        only set it with bit 0, which leaves the screen black
+	// bit 2: drives *MAIG ENB low (through the latch's inverted output), which takes group A's tiles out of the
+	//        priority encoder and lets them cut holes in the laserdisc picture instead
+	// bit 3: EXT SYNC, sync the screen to the player (LS157 at 8K) and allow DSP SEL high; the games set it
+	//        in normal operation and clear it in the service mode's RAM tests
+	// TODO: bit 2 (the games only set it together with bit 1)
+	if (BIT(data, 2) && !BIT(data, 1))
+		logerror("%s: video control %02x\n", machine().describe_context(), data);
+	m_video_control = data & 0x0f;
+	m_laserdisc->video_enable(laserdisc_shown());
 }
 
 void deco_ld_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1000).portr("IN0").nopw(); // (w) coin lockout
-	map(0x1001, 0x1001).portr("DSW1");
-	map(0x1002, 0x1002).portr("DSW2");
-	map(0x1003, 0x1003).portr("IN1");
-	map(0x1004, 0x1004).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x1005, 0x1005).r(FUNC(deco_ld_state::sound_status_r));
-	//map(0x1006, 0x1007).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0x1006, 0x1006).r(FUNC(deco_ld_state::acia_status_hack_r));
-	map(0x1007, 0x1007).rw(m_laserdisc, FUNC(sony_ldp1000_device::status_r), FUNC(sony_ldp1000_device::command_w));
-	map(0x1800, 0x1fff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0x2000, 0x23ff).mirror(0x800).ram().w(FUNC(deco_ld_state::vram_w<0>)).share(m_vram[0]);
-	map(0x2400, 0x27ff).mirror(0x800).ram().w(FUNC(deco_ld_state::attr_w<0>)).share(m_attr[0]);
-	map(0x3000, 0x33ff).mirror(0x800).ram().w(FUNC(deco_ld_state::vram_w<1>)).share(m_vram[1]);
-	map(0x3400, 0x37ff).mirror(0x800).ram().w(FUNC(deco_ld_state::attr_w<1>)).share(m_attr[1]);
+	// the address decoders (LP1-1 at 14K on VDO-1, LP2-2 at 9H on VDO-2) select 0x1000-0x17ff for I/O, and the
+	// LS138s and LS139 under them only look at A0-A2 (the games' delay loops read all over the range)
+	// writes to 0x1000 latch bits 0 and 1 into the LS273 at 3H on VDO-2, which drives the coin blockers; begas and
+	// cobra set them once booted and clear them at 9 credits, while rblaster's one store there (0xe484) only clears
+	// them at 9 credits, so no single polarity of the blockers fits all three games and they aren't emulated
+	map(0x1000, 0x1000).mirror(0x7f8).portr("IN0").nopw();
+	map(0x1001, 0x1001).mirror(0x7f8).portr("DSW1").w(FUNC(deco_ld_state::nmi_ack_w));
+	map(0x1002, 0x1002).mirror(0x7f8).portr("DSW2");
+	map(0x1003, 0x1003).mirror(0x7f8).portr("IN1").w(FUNC(deco_ld_state::video_control_w));
+	map(0x1004, 0x1004).mirror(0x7f8).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x1005, 0x1005).mirror(0x7f8).r(FUNC(deco_ld_state::sound_status_r));
+	map(0x1006, 0x1007).mirror(0x7f8).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x1800, 0x183f).mirror(0x7c0).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // 93419 64x9 RAM at 5J on VDO-1
+	map(0x2000, 0x23ff).rw(FUNC(deco_ld_state::vram_column_r<0>), FUNC(deco_ld_state::vram_column_w<0>));
+	map(0x2400, 0x27ff).rw(FUNC(deco_ld_state::attr_column_r<0>), FUNC(deco_ld_state::attr_column_w<0>));
+	map(0x2800, 0x2bff).ram().w(FUNC(deco_ld_state::vram_w<0>)).share(m_vram[0]);
+	map(0x2c00, 0x2fff).ram().w(FUNC(deco_ld_state::attr_w<0>)).share(m_attr[0]);
+	map(0x3000, 0x33ff).rw(FUNC(deco_ld_state::vram_column_r<1>), FUNC(deco_ld_state::vram_column_w<1>));
+	map(0x3400, 0x37ff).rw(FUNC(deco_ld_state::attr_column_r<1>), FUNC(deco_ld_state::attr_column_w<1>));
+	map(0x3800, 0x3bff).ram().w(FUNC(deco_ld_state::vram_w<1>)).share(m_vram[1]);
+	map(0x3c00, 0x3fff).ram().w(FUNC(deco_ld_state::attr_w<1>)).share(m_attr[1]);
 	map(0x4000, 0xffff).rom();
 }
 
 
 /* sound arrangement is practically identical to Zero Target. */
 
-void deco_ld_state::nmimask_w(uint8_t data)
+void deco_ld_state::sound_nmi_enable_w(uint8_t data)
 {
-	m_nmimask = data & 0x80;
+	// LS74 at 10D on VDO-2 latches data bit 0 (cobra keeps it clear while it initialises)
+	m_sound_nmi_enable = BIT(data, 0);
 }
 
-INTERRUPT_GEN_MEMBER(deco_ld_state::sound_interrupt)
+TIMER_CALLBACK_MEMBER(deco_ld_state::sound_timing)
 {
-	if (!m_nmimask) device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	// "SOUND TIMING" is bit 4 of the vertical counter (inverted by 11C on VDO-1), gated by the enable: eight
+	// pulses per field (the screen counts every line twice; the counter's phase in the field isn't verified)
+	if (m_sound_nmi_enable)
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	const int next = (param + 64) % 512;
+	m_sound_timer->adjust(m_screen->time_until_pos(next), next);
 }
 
 
 void deco_ld_state::sound_map(address_map &map)
 {
-	map(0x0000, 0x01ff).ram();
+	map(0x0000, 0x07ff).ram(); // 58725 at 14C on VDO-2
 	map(0x2000, 0x2000).w("ay1", FUNC(ay8910_device::data_w));
 	map(0x4000, 0x4000).w("ay1", FUNC(ay8910_device::address_w));
 	map(0x6000, 0x6000).w("ay2", FUNC(ay8910_device::data_w));
 	map(0x8000, 0x8000).w("ay2", FUNC(ay8910_device::address_w));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
-	map(0xe000, 0xffff).rom();
+	map(0xc000, 0xc000).w(FUNC(deco_ld_state::sound_nmi_enable_w));
+	// TODO: 0xb000 reads a status port (LP2-4), unused by the games
+	map(0xe000, 0xffff).rom().nopw(); // rblaster writes to 0xe600 once, which doesn't select anything
 }
 
 int deco_ld_state::begas_vblank_r()
@@ -332,10 +379,21 @@ int deco_ld_state::begas_vblank_r()
 
 INPUT_CHANGED_MEMBER(deco_ld_state::coin_inserted)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	// the coin counters are driven by the coin switches; a coin also sets its flip-flop (one of the two in the
+	// LS74 at 8J on VDO-2), which pulls NMI until the game acknowledges it
+	if (param < 2)
+		machine().bookkeeping().coin_counter_w(param, newval);
+	if (newval)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static INPUT_PORTS_START( begas )
+void deco_ld_state::nmi_ack_w(uint8_t data)
+{
+	// the NMI handlers end with a write here
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+static INPUT_PORTS_START( deco_ld )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -346,93 +404,128 @@ static INPUT_PORTS_START( begas )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
+	// LS367 at 12K on VDO-1, which only drives bits 6 (BLK2, the horizontal blank) and 7 (the vertical blank)
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::hblank))
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(deco_ld_state::begas_vblank_r)) // TODO: IPT_VBLANK a.k.a. screen_device::vblank doesn't seem to work fine?
 
+	// switches 5-8 aren't connected, the start buttons and coins are read in their place
 	PORT_START("DSW1")
-	// should be coinage
-	PORT_DIPNAME( 0x01, 0x01, "DSW1" ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(deco_ld_state::coin_inserted), 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(deco_ld_state::coin_inserted), 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(deco_ld_state::coin_inserted), 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(deco_ld_state::coin2_r))
 
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSW2" ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// the service switch is wired to the second coin's input, past the coin counter
+	PORT_START("COIN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(deco_ld_state::coin_inserted), 1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(deco_ld_state::coin_inserted), 2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( begas )
+	PORT_INCLUDE( deco_ld )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, "20000" )
+	PORT_DIPSETTING(    0x08, "30000" )
+	PORT_DIPSETTING(    0x10, "50000" )
+	PORT_DIPSETTING(    0x00, "None (continuous fire)" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	// also selects the diagnostics: the factory ones (with the monitor adjustment patterns) for cockpit
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, "Cockpit" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( cobra )
-	PORT_INCLUDE( begas )
+	PORT_INCLUDE( deco_ld )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
-	// TODO: different dips
+	// the conversion manual has lives, bonus, difficulty and region on switches 1-5; of those, this program only
+	// reads difficulty in play, from switches 4 and 5, and its coinage (DSW1) follows the Bega's Battle manual
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" ) // only read by the disc test
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	// must be off for the diagnostics
+	PORT_DIPNAME( 0x40, 0x40, "Random First Mission" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rblaster )
-	PORT_INCLUDE( begas )
+	PORT_INCLUDE( deco_ld )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
-	// TODO: different dips
+	// the coin handler (0xe444) uses switches 3 and 4 instead of 1 and 2 when the carry is set after shifting
+	// the coin bits right twice, but the coins are bits 6 and 7, so the carry is always clear and both coins
+	// use switches 1 and 2
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPUNUSED_DIPLOC( 0x0c, 0x0c, "SW1:3,4" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:2,3")
+	PORT_DIPSETTING(    0x06, "20000 only" )
+	PORT_DIPSETTING(    0x02, "15000, every 30000" )
+	PORT_DIPSETTING(    0x04, "20000, every 40000" )
+	PORT_DIPSETTING(    0x00, "30000, every 50000" )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
+	// skips the checks of the player's moves, and turns on the player's frame number display (INDEX ON)
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -466,38 +559,67 @@ GFXDECODE_END
 
 void deco_ld_state::machine_start()
 {
+	m_sound_timer = timer_alloc(FUNC(deco_ld_state::sound_timing), this);
+
+	save_item(NAME(m_sound_nmi_enable));
+	save_item(NAME(m_video_control));
+}
+
+void deco_ld_state::machine_reset()
+{
+	// reset clears the coin flip-flops (8J) and the latches at 10D on VDO-2 and 11K on VDO-1
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_sound_nmi_enable = 0;
+	m_video_control = 0;
+	m_laserdisc->video_enable(false);
+	m_sound_timer->adjust(m_screen->time_until_pos(32), 32);
 }
 
 void deco_ld_state::rblaster(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 8000000/2);
+	// the AF-8 PROM at 2F on VDO-1, which also times DSP SEL, shapes the CPU clock from the 12 MHz clock
+	M6502(config, m_maincpu, 12_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_ld_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(deco_ld_state::irq0_line_hold));
 
-	M6502(config, m_audiocpu, 8000000/2);
+	// 3 MHz from VDO-1 divided by 2 by the LS161 at 8D on VDO-2 (jumpers J1 and J2)
+	M6502(config, m_audiocpu, 12_MHz_XTAL / 4 / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &deco_ld_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(deco_ld_state::sound_interrupt), attotime::from_hz(640));
 
 //  config.set_maximum_quantum(attotime::from_hz(6000));
 
-	SONY_LDP1000(config, m_laserdisc);
+	// the games talk to the player through the ACIA, whose receive interrupt is the only IRQ source
+	ACIA6850(config, m_acia);
+	m_acia->irq_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
+	m_acia->txd_handler().set(m_laserdisc, FUNC(sony_ldp1000hle_device::rx_w));
+
+	// 9.8304 MHz divided by 128 by the LS163s at 15D and 16D on VDO-2; the games program the ACIA for
+	// divide-by-64, giving the player's factory setting of 1200 baud
+	clock_device &acia_clock(CLOCK(config, "acia_clock", 9.8304_MHz_XTAL / 128));
+	acia_clock.signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
+	acia_clock.signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
+
+	SONY_LDP1000HLE(config, m_laserdisc);
+	m_laserdisc->set_baud(1200);
+	m_laserdisc->serial_tx().set(m_acia, FUNC(acia6850_device::write_rxd));
 	m_laserdisc->set_overlay(256, 256, FUNC(deco_ld_state::screen_update));
-	//m_laserdisc->set_overlay_clip(0, 256-1, 8, 240-1);
+	// the first and last rows of tile RAM hold the sprite lists
+	m_laserdisc->set_overlay_clip(0, 256-1, 8, 248-1);
 	m_laserdisc->add_route(0, "speaker", 1.0, 0);
 	m_laserdisc->add_route(1, "speaker", 1.0, 1);
 
 	/* video hardware */
 	m_laserdisc->add_ntsc_screen(config, "screen");
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rblaster);
-	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 0x800);
-
-	//ACIA6850(config, m_acia);
-	//m_acia->txd_handler().set("laserdisc", FUNC(sony_ldp1000_device::write));
-	//m_acia->rxd_handler().set("laserdisc", FUNC(sony_ldp1000_device::read));
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 0x40);
 
 	/* sound hardware */
-	// TODO: mixing with laserdisc
+	// VDO-2 sheets 9 and 10: channel A of both chips goes through a 1k/3k bridge to a 4558 bandpass per side
+	// (left: C98 1u, R21 1k, R19 10k, R20 47k, C34/C35 0.068u; right: the same values), channels B and C through
+	// a 1k/3k ring whose ends (ay1 C, ay2 B) feed the summing amplifiers. The routes and filters fit a nodal
+	// analysis of the network (AY outputs as current sources): the bridge and the 1u coupling capacitor load
+	// each bandpass, giving 240 Hz and Q 1.74 rather than about 360 Hz and Q 3.6. The laserdisc audio comes in
+	// through trimmers, so its level against the AYs isn't fixed by the circuit.
 	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
@@ -505,9 +627,37 @@ void deco_ld_state::rblaster(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.25, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
+	FILTER_BIQUAD(config, "bandpass_l").setup(filter_biquad_device::biquad_type::BANDPASS, 240, 1.74, 1.0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_BIQUAD(config, "bandpass_r").setup(filter_biquad_device::biquad_type::BANDPASS, 240, 1.74, 1.0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.25, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
+	ay8910_device &ay1(AY8910(config, "ay1", 12_MHz_XTAL / 4 / 2));
+	ay1.add_route(0, "bandpass_l", 1.6);
+	ay1.add_route(0, "bandpass_r", 0.81);
+	ay1.add_route(1, "speaker", 0.099, 0);
+	ay1.add_route(1, "speaker", 0.034, 1);
+	ay1.add_route(2, "speaker", 0.22, 0);
+	ay1.add_route(2, "speaker", 0.046, 1);
+
+	ay8910_device &ay2(AY8910(config, "ay2", 12_MHz_XTAL / 4 / 2));
+	ay2.add_route(0, "bandpass_l", 0.81);
+	ay2.add_route(0, "bandpass_r", 1.6);
+	ay2.add_route(1, "speaker", 0.046, 0);
+	ay2.add_route(1, "speaker", 0.22, 1);
+	ay2.add_route(2, "speaker", 0.034, 0);
+	ay2.add_route(2, "speaker", 0.099, 1);
+}
+
+void deco_ld_state::cobraa(machine_config &config)
+{
+	rblaster(config);
+
+	// TODO: cobraa drives a Pioneer LD-V1000 and has its own PROMs and PALs (VD0-C, VD0-T, LP4-1, LP4-2): it
+	// never touches the ACIA, sends LD-V1000 commands to 0x1004 with a handshake on bits 5 and 6 of 0x1001
+	// (0xe50b-0xe527), and checks for LD-V1000 status codes (0xe53d-0xe5f1); its 0x1003 writes (0xff, 0x00,
+	// and an inverted value at 0xf63f) don't fit the VDO-1 video latch either
+	// keep the vblank IRQ it had, as its IRQ handler doesn't use the ACIA
+	m_acia->irq_handler().set_nop();
+	m_maincpu->set_vblank_int("screen", FUNC(deco_ld_state::irq0_line_hold));
 }
 
 /***************************************************************************
@@ -668,7 +818,7 @@ ROM_END
 
 GAME( 1983, begas,    0,     rblaster, begas,    deco_ld_state, empty_init, ROT0, "Data East", "Bega's Battle (Revision 3)", MACHINE_NOT_WORKING )
 GAME( 1983, begas1,   begas, rblaster, begas,    deco_ld_state, empty_init, ROT0, "Data East", "Bega's Battle (Revision 1)", MACHINE_NOT_WORKING )
-GAME( 1984, cobra,    0,     rblaster, cobra,    deco_ld_state, empty_init, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", MACHINE_NOT_WORKING )
-GAME( 1984, cobraa,   cobra, rblaster, cobra,    deco_ld_state, empty_init, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", MACHINE_NOT_WORKING ) // might be a prototype
+GAME( 1984, cobra,    0,     rblaster, cobra,    deco_ld_state, empty_init, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", 0 )
+GAME( 1984, cobraa,   cobra, cobraa,   cobra,    deco_ld_state, empty_init, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", MACHINE_NOT_WORKING ) // might be a prototype
 // Thunder Storm (Cobra Command Japanese version)
-GAME( 1985, rblaster, 0,     rblaster, rblaster, deco_ld_state, empty_init, ROT0, "Data East", "Road Blaster (Data East LD)", MACHINE_NOT_WORKING )
+GAME( 1985, rblaster, 0,     rblaster, rblaster, deco_ld_state, empty_init, ROT0, "Data East", "Road Blaster (Data East LD)", 0 )
