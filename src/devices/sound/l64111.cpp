@@ -242,165 +242,260 @@ void l64111_device::parser_reset()
 //  Controller interface
 //**************************************************************************
 
-u8 l64111_device::read(offs_t offset)
+void l64111_device::map(address_map &map)
 {
-	if (m_reset_pin)
-		return 0;
-	const bool side_effects = !machine().side_effects_disabled();
-	if (side_effects)
-		sync();
-
-	switch (offset & 0x1f)
-	{
-	case REG_CR1:
-		return m_cr1;
-	case REG_CR2:
-		return m_cr2 | (m_hdmute_pin ? CR2_SOFT_MUTE : 0x00); // SOFT_MUTE reads as SOFT_MUTE | HDMUTE
-	case REG_CR3:
-		return m_cr3;
-
-	case REG_IMSR1:
-	{
-		const u8 v = (m_anc_count ? S1_ANC_VALID : 0x00) | (m_anc_overflow ? S1_ANC_OVRFL : 0x00)
-				| ((m_anc_count >= ANC_BYTES / 2) ? S1_ANC_HFF : 0x00) | (m_status1 & S1_ERR_BUF_OVFL);
-		if (side_effects)
-		{
-			m_status1 = 0;
-			m_intr_pending = false;
-			update_intr();
-		}
-		return v;
-	}
-	case REG_IMSR2:
-	{
-		const u8 v = m_status2 | ((m_sync_count >= 3) ? S2_SYNC_AUD : 0x00) | ((m_pack_count >= 3) ? S2_SYNC_SYS : 0x00);
-		if (side_effects)
-		{
-			m_status2 = 0;
-			m_intr_pending = false;
-			update_intr();
-		}
-		return v;
-	}
-
-	case REG_TCR:  return m_tcr;
-	case REG_TORH: return m_torh;
-	case REG_TORL: return m_torl;
-	case REG_PD1: case REG_PD2: case REG_PD3:
-		return m_pd[(offset & 0x1f) - REG_PD1];
-	case REG_PTS1: case REG_PTS2: case REG_PTS3: case REG_PTS4: case REG_PTS5:
-		return m_pts[(offset & 0x1f) - REG_PTS1];
-
-	case REG_ANC:
-	{
-		if (!m_anc_count)
-			return 0;
-		const u8 v = m_anc[m_anc_read];
-		if (side_effects)
-		{
-			m_anc_read = (m_anc_read + 1) % ANC_BYTES;
-			m_anc_count--;
-			m_anc_overflow = false; // a later overflow interrupts again
-		}
-		return v;
-	}
-
-	// a 7-bit counter: a full Layer I buffer (128 frames) reads as 127
-	case REG_CB_STATUS: return std::min<u32>(m_cb_count, 0x7f);
-	case REG_CB_WRITE:  return m_cb_write & 0x7f;
-	case REG_CB_READ:   return m_cb_read & 0x7f;
-
-	default: // Data (write-only) and reserved
-		return 0;
-	}
+	map(0x00, 0x1f).rw(FUNC(l64111_device::reserved_r), FUNC(l64111_device::reserved_w));
+	map(0x00, 0x00).w(FUNC(l64111_device::data8_w));
+	map(0x01, 0x01).rw(FUNC(l64111_device::cr1_r), FUNC(l64111_device::cr1_w));
+	map(0x02, 0x02).rw(FUNC(l64111_device::cr2_r), FUNC(l64111_device::cr2_w));
+	map(0x03, 0x03).rw(FUNC(l64111_device::cr3_r), FUNC(l64111_device::cr3_w));
+	map(0x04, 0x04).rw(FUNC(l64111_device::status1_r), FUNC(l64111_device::mask1_w));
+	map(0x05, 0x05).rw(FUNC(l64111_device::status2_r), FUNC(l64111_device::mask2_w));
+	map(0x06, 0x06).rw(FUNC(l64111_device::tcr_r), FUNC(l64111_device::tcr_w));
+	map(0x07, 0x07).rw(FUNC(l64111_device::torh_r), FUNC(l64111_device::torh_w));
+	map(0x08, 0x08).rw(FUNC(l64111_device::torl_r), FUNC(l64111_device::torl_w));
+	map(0x09, 0x0b).r(FUNC(l64111_device::pd_r));
+	map(0x0c, 0x10).r(FUNC(l64111_device::pts_r));
+	map(0x11, 0x11).r(FUNC(l64111_device::anc_r));
+	map(0x12, 0x12).r(FUNC(l64111_device::cb_status_r));
+	map(0x13, 0x13).rw(FUNC(l64111_device::cb_write_r), FUNC(l64111_device::cb_write_w));
+	map(0x14, 0x14).rw(FUNC(l64111_device::cb_read_r), FUNC(l64111_device::cb_read_w));
 }
 
-void l64111_device::write(offs_t offset, u8 data)
+// registers read as 0 and ignore writes while RESET is held; otherwise bring the chip up to date first
+bool l64111_device::reg_read_ready()
 {
 	if (m_reset_pin)
-		return;
-	LOGMASKED(LOG_REGS, "%s: reg %d = %02x\n", machine().describe_context(), offset & 0x1f, data);
+		return false;
+	if (!machine().side_effects_disabled())
+		sync();
+	return true;
+}
+
+bool l64111_device::reg_write_ready(const char *name, u8 data)
+{
+	if (m_reset_pin)
+		return false;
+	LOGMASKED(LOG_REGS, "%s: %s = %02x\n", machine().describe_context(), name, data);
 	sync();
+	return true;
+}
 
-	switch (offset & 0x1f)
+u8 l64111_device::reserved_r(offs_t offset)
+{
+	return 0; // also the Data register, which is write-only
+}
+
+void l64111_device::reserved_w(offs_t offset, u8 data)
+{
+	logerror("write %02x to reserved register %d\n", data, offset);
+}
+
+void l64111_device::data8_w(u8 data)
+{
+	data_w(data);
+}
+
+u8 l64111_device::cr1_r()
+{
+	return reg_read_ready() ? m_cr1 : 0;
+}
+
+void l64111_device::cr1_w(u8 data)
+{
+	if (!reg_write_ready("CR1", data))
+		return;
+	if (data & CR1_SOFT_RST) // self-clearing
 	{
-	case REG_DATA:
-		data_w(data);
-		break;
+		chip_reset();
+		return;
+	}
+	m_cr1 = data; // SOFT_RST is never stored; BUF_RST is not cleared by the chip (manual 4.3)
+	if (data & CR1_ANC_RST) // empty the ancillary FIFO, and hold it empty while set
+	{
+		m_anc_read = m_anc_count = m_anc_acc = m_anc_bits = 0;
+		m_anc_overflow = false;
+	}
+	if (data & CR1_BUF_RST) // empty the channel buffer
+		m_cb_write = m_cb_read = m_cb_count = 0;
+	if (!decoder_enabled())
+		decoder_reset();
+	if (data & (CR1_SER_PAR | CR1_BYPASS))
+		logerror("serial input / bypass selected (CR1 %02x), not emulated\n", data);
+	update_outputs();
+	update_poll();
+}
 
-	case REG_CR1:
-		if (data & CR1_SOFT_RST) // self-clearing
-		{
-			chip_reset();
-			break;
-		}
-		m_cr1 = data; // SOFT_RST is never stored; BUF_RST is not cleared by the chip (manual 4.3)
-		if (data & CR1_ANC_RST) // empty the ancillary FIFO, and hold it empty while set
-		{
-			m_anc_read = m_anc_count = m_anc_acc = m_anc_bits = 0;
-			m_anc_overflow = false;
-		}
-		if (data & CR1_BUF_RST) // empty the channel buffer
-			m_cb_write = m_cb_read = m_cb_count = 0;
-		if (!decoder_enabled())
-			decoder_reset();
-		if (data & (CR1_SER_PAR | CR1_BYPASS))
-			logerror("serial input / bypass selected (CR1 %02x), not emulated\n", data);
-		update_outputs();
-		update_poll();
-		break;
+u8 l64111_device::cr2_r()
+{
+	return reg_read_ready() ? (m_cr2 | (m_hdmute_pin ? CR2_SOFT_MUTE : 0x00)) : 0; // SOFT_MUTE reads as SOFT_MUTE | HDMUTE
+}
 
-	case REG_CR2:
-		if ((m_cr2 ^ data) & CR2_AUDIO_ONLY) // stream type changed: start parsing afresh
-			parser_reset();
-		m_cr2 = data;
-		update_rate();
-		break;
+void l64111_device::cr2_w(u8 data)
+{
+	if (!reg_write_ready("CR2", data))
+		return;
+	if ((m_cr2 ^ data) & CR2_AUDIO_ONLY) // stream type changed: start parsing afresh
+		parser_reset();
+	m_cr2 = data;
+	update_rate();
+}
 
-	case REG_CR3:
-		if ((m_cr3 ^ data) & 0x9f) // a different audio stream: resynchronize
-		{
-			m_frame_len = m_frame_need = 0;
-			m_sync_count = 0;
-		}
-		m_cr3 = data & 0x9f;
-		break;
+u8 l64111_device::cr3_r()
+{
+	return reg_read_ready() ? m_cr3 : 0;
+}
 
-	case REG_IMSR1:
+void l64111_device::cr3_w(u8 data)
+{
+	if (!reg_write_ready("CR3", data))
+		return;
+	if ((m_cr3 ^ data) & 0x9f) // a different audio stream: resynchronize
+	{
+		m_frame_len = m_frame_need = 0;
+		m_sync_count = 0;
+	}
+	m_cr3 = data & 0x9f;
+}
+
+// reading either status register clears the latched events and INTR
+u8 l64111_device::status1_r()
+{
+	if (!reg_read_ready())
+		return 0;
+	const u8 v = (m_anc_count ? S1_ANC_VALID : 0x00) | (m_anc_overflow ? S1_ANC_OVRFL : 0x00)
+			| ((m_anc_count >= ANC_BYTES / 2) ? S1_ANC_HFF : 0x00) | (m_status1 & S1_ERR_BUF_OVFL);
+	if (!machine().side_effects_disabled())
+	{
+		m_status1 = 0;
+		m_intr_pending = false;
+		update_intr();
+	}
+	return v;
+}
+
+void l64111_device::mask1_w(u8 data)
+{
+	if (reg_write_ready("Interrupt Mask 1", data))
 		m_mask1 = data;
-		break;
+}
 
-	case REG_IMSR2:
-		m_mask2 = data;
-		break;
-
-	case REG_TCR:
-		m_tcr = data & 0x0f;
-		update_rate();
-		break;
-	case REG_TORH:
-		m_torh = data;
-		update_rate();
-		break;
-	case REG_TORL:
-		m_torl = data;
-		update_rate();
-		break;
-
-	case REG_CB_WRITE:
-	case REG_CB_READ:
+u8 l64111_device::status2_r()
+{
+	if (!reg_read_ready())
+		return 0;
+	const u8 v = m_status2 | ((m_sync_count >= 3) ? S2_SYNC_AUD : 0x00) | ((m_pack_count >= 3) ? S2_SYNC_SYS : 0x00);
+	if (!machine().side_effects_disabled())
 	{
-		// moving the counters leaves the status counter unreliable (manual 4.9): recompute it
-		const u32 n = cb_frames();
-		((offset & 0x1f) == REG_CB_WRITE ? m_cb_write : m_cb_read) = (data & 0x7f) % n;
-		m_cb_count = (m_cb_write + n - m_cb_read) % n;
-		break;
+		m_status2 = 0;
+		m_intr_pending = false;
+		update_intr();
 	}
+	return v;
+}
 
-	default:
-		logerror("write %02x to read-only/reserved register %d\n", data, offset & 0x1f);
-		break;
+void l64111_device::mask2_w(u8 data)
+{
+	if (reg_write_ready("Interrupt Mask 2", data))
+		m_mask2 = data;
+}
+
+u8 l64111_device::tcr_r()
+{
+	return reg_read_ready() ? m_tcr : 0;
+}
+
+void l64111_device::tcr_w(u8 data)
+{
+	if (!reg_write_ready("TCR", data))
+		return;
+	m_tcr = data & 0x0f;
+	update_rate();
+}
+
+u8 l64111_device::torh_r()
+{
+	return reg_read_ready() ? m_torh : 0;
+}
+
+void l64111_device::torh_w(u8 data)
+{
+	if (!reg_write_ready("TORH", data))
+		return;
+	m_torh = data;
+	update_rate();
+}
+
+u8 l64111_device::torl_r()
+{
+	return reg_read_ready() ? m_torl : 0;
+}
+
+void l64111_device::torl_w(u8 data)
+{
+	if (!reg_write_ready("TORL", data))
+		return;
+	m_torl = data;
+	update_rate();
+}
+
+u8 l64111_device::pd_r(offs_t offset)
+{
+	return reg_read_ready() ? m_pd[offset] : 0;
+}
+
+u8 l64111_device::pts_r(offs_t offset)
+{
+	return reg_read_ready() ? m_pts[offset] : 0;
+}
+
+u8 l64111_device::anc_r()
+{
+	if (!reg_read_ready() || !m_anc_count)
+		return 0;
+	const u8 v = m_anc[m_anc_read];
+	if (!machine().side_effects_disabled())
+	{
+		m_anc_read = (m_anc_read + 1) % ANC_BYTES;
+		m_anc_count--;
+		m_anc_overflow = false; // a later overflow interrupts again
 	}
+	return v;
+}
+
+// 7-bit counters: a full Layer I buffer (128 frames) reads as 127
+u8 l64111_device::cb_status_r()
+{
+	return reg_read_ready() ? std::min<u32>(m_cb_count, 0x7f) : 0;
+}
+
+u8 l64111_device::cb_write_r()
+{
+	return reg_read_ready() ? (m_cb_write & 0x7f) : 0;
+}
+
+u8 l64111_device::cb_read_r()
+{
+	return reg_read_ready() ? (m_cb_read & 0x7f) : 0;
+}
+
+// moving the counters leaves the status counter unreliable (manual 4.9): recompute it
+void l64111_device::cb_write_w(u8 data)
+{
+	if (!reg_write_ready("Channel buffer write counter", data))
+		return;
+	const u32 n = cb_frames();
+	m_cb_write = (data & 0x7f) % n;
+	m_cb_count = (m_cb_write + n - m_cb_read) % n;
+}
+
+void l64111_device::cb_read_w(u8 data)
+{
+	if (!reg_write_ready("Channel buffer read counter", data))
+		return;
+	const u32 n = cb_frames();
+	m_cb_read = (data & 0x7f) % n;
+	m_cb_count = (m_cb_write + n - m_cb_read) % n;
 }
 
 void l64111_device::data_w(u16 data)

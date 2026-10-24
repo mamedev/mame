@@ -27,9 +27,8 @@ public:
 	auto falf() { return m_falf_cb.bind(); }     // input FIFO almost full, active low
 	auto starto() { return m_starto_cb.bind(); } // STARTO: decoding stored frames
 
-	// controller interface: register A[4:0], data D[7:0]
-	u8 read(offs_t offset);
-	void write(offs_t offset, u8 data);
+	// controller interface: registers at A[4:0], data D[7:0]
+	void map(address_map &map) ATTR_COLD;
 	void data_w(u16 data); // Data register (A[4:0] = 0) write with the full D[15:0] bus
 
 	int femty_r();
@@ -48,13 +47,6 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
-	enum : u8
-	{
-		REG_DATA = 0, REG_CR1, REG_CR2, REG_CR3, REG_IMSR1, REG_IMSR2, REG_TCR, REG_TORH, REG_TORL,
-		REG_PD1, REG_PD2, REG_PD3, REG_PTS1, REG_PTS2, REG_PTS3, REG_PTS4, REG_PTS5, REG_ANC,
-		REG_CB_STATUS, REG_CB_WRITE, REG_CB_READ
-	};
-
 	// Control Register 1 and 2 bits
 	static constexpr u8 CR1_ANC_RST = 0x80, CR1_SER_PAR = 0x40, CR1_BYPASS = 0x20, CR1_BUF_RST = 0x04,
 			CR1_SOFT_RST = 0x02, CR1_STARTI = 0x01;
@@ -80,6 +72,37 @@ private:
 	static constexpr u32 CB_SLOTS = 128;         // channel buffer: 128 Layer I or 64 Layer II frames
 	static constexpr u32 SAMPLES_MAX = 1152;
 	static constexpr u32 ANC_BYTES = 16;
+
+	// register handlers
+	bool reg_read_ready();
+	bool reg_write_ready(const char *name, u8 data);
+	u8 reserved_r(offs_t offset);
+	void reserved_w(offs_t offset, u8 data);
+	void data8_w(u8 data);
+	u8 cr1_r();
+	void cr1_w(u8 data);
+	u8 cr2_r();
+	void cr2_w(u8 data);
+	u8 cr3_r();
+	void cr3_w(u8 data);
+	u8 status1_r();
+	void mask1_w(u8 data);
+	u8 status2_r();
+	void mask2_w(u8 data);
+	u8 tcr_r();
+	void tcr_w(u8 data);
+	u8 torh_r();
+	void torh_w(u8 data);
+	u8 torl_r();
+	void torl_w(u8 data);
+	u8 pd_r(offs_t offset);
+	u8 pts_r(offs_t offset);
+	u8 anc_r();
+	u8 cb_status_r();
+	u8 cb_write_r();
+	void cb_write_w(u8 data);
+	u8 cb_read_r();
+	void cb_read_w(u8 data);
 
 	void chip_reset() ATTR_COLD;
 	void decoder_reset();
