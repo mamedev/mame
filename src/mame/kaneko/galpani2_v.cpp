@@ -149,8 +149,11 @@ void galpani2_state::copybg8(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap,
 				: BIT(pen, 7);
 			bool const passthrough = ((color <= 0x0001) && color_key)
 				|| (layer == 1 && bg8_captured_field(pen));
+			// SE trims the girl mask at the field edge, but its E4 border
+			// cells still cover both RGB pictures with their palette color.
+			bool const field_border = layer == 1 && m_bg_image_prefix_count && pen == 0x00e4;
 			// UI words remain opaque, including flagged black colors.
-			bool const covered_field = BIT(color, 15) && !BIT(pen, 11);
+			bool const covered_field = BIT(color, 15) && !BIT(pen, 11) && !field_border;
 			if ((layer || pen) && !passthrough && !covered_field)
 			{
 				bitmap.pix(yy, xx) = clut[pen & 0xff];
