@@ -210,6 +210,7 @@ void galpani2_state::copybg15(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap
 					continue;
 
 				uint16_t color = pen & 0x7fff;
+				pen_t photo = clut[color];
 				int opacity = brightness;
 				pen_t backdrop = bitmap.pix(y, x);
 				// The normal game's foreground photo is plane 3. Covered field
@@ -236,21 +237,28 @@ void galpani2_state::copybg15(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap
 						uint16_t const cycle_color = regs[0xc06 / 2] & 0x7fff;
 						if (bg8_captured_field(mask))
 						{
-							// Uncovered by player: photo visible, blended
-							// with cycling player color as backdrop.
-							backdrop = clut[cycle_color];
+							// Use the native captured-area palette,
+							// which cycles P1 green / P2 red towards neutral gray.
+							// The former C06 backdrop has no effect at full opacity.
+							// Peak-green PCB skin samples suggest about 35% tint.
+							// Blend 3/8 player color with 5/8 photo detail.
+							if (!m_bg_image_prefix_count)
+								photo = alpha_blend_r32(photo, m_bg8palette->pen(mask & 0xff), 0x60);
+							else
+								backdrop = clut[cycle_color];
 						}
 						else if (girl_shape)
 						{
 							// Covered girl: solid cycling color, fully opaque.
 							color = cycle_color;
+							photo = clut[color];
 							opacity = 0xff;
 						}
 					}
 				}
 				bitmap.pix(y, x) = (opacity == 0xff)
-					? clut[color]
-					: alpha_blend_r32(backdrop, clut[color], opacity);
+					? photo
+					: alpha_blend_r32(backdrop, photo, opacity);
 				priority_bitmap.pix(y, x) = priority;
 			}
 		}
