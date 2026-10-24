@@ -164,7 +164,7 @@ void windermere_device::eint1_w(int state)
 
 void windermere_device::eint2_w(int state)
 {
-	// edge triggered, active low
+	// falling edge triggered
 	if (state)
 		m_pending_ints |= (1 << IRQ_EINT2);
 
@@ -178,6 +178,15 @@ void windermere_device::eint3_w(int state)
 		m_pending_ints |= (1 << IRQ_EINT3);
 	else
 		m_pending_ints &= ~(1 << IRQ_EINT3);
+
+	check_interrupts();
+}
+
+void windermere_device::medchg_w(int state)
+{
+	// rising edge triggered
+	if (state)
+		m_pending_ints |= (1 << IRQ_MCINT);
 
 	check_interrupts();
 }
