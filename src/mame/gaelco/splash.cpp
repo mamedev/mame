@@ -36,8 +36,7 @@ TS 2006.12.22:
   There's copyright text at $480. In Ring & Ball the copyright text is at 0x7c7a0.
   Also Rebus and TRoLF are running on it (the same internal code structure - traps, interrupt vectors),
   but copyright messages are removed.
-- Rebus protection patch sits at the end of trap $b (rtos call) and in some cases returns 0 in D0.
-  It's not a real protection check I think.
+- Rebus: opcodes fetched in user mode are encrypted, see rebus_state::machine_start.
 - Ring & Ball needs trackball emulation.
 
 More notes about Funny Strip protection issues at the bottom of source file (init_funystrp)
@@ -193,6 +192,59 @@ void roldfrog_state::roldfrog_sound_io_map(address_map &map)
 	map(0x70, 0x70).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 
 	map(0x20, 0x23).r(FUNC(roldfrog_state::roldfrog_unk_r));
+}
+
+void rebus_state::main_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
+	map(0x800000, 0x83ffff).ram().share(m_pixelram);
+	map(0x840000, 0x840001).portr("DSW1");
+	map(0x840002, 0x840003).portr("DSW2");
+	map(0x840004, 0x840005).portr("P1");
+	map(0x840006, 0x840007).portr("P2");
+	map(0x84000a, 0x84000a).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
+	map(0x84000e, 0x84000e).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x880000, 0x8817ff).ram().w(FUNC(rebus_state::vram_w)).share(m_videoram);
+	map(0x881800, 0x881803).ram().share(m_vregs);
+	map(0x881804, 0x881fff).ram();
+	map(0x8c0000, 0x8c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xd00000, 0xd00fff).ram().share(m_spriteram);
+	map(0xffc000, 0xffffff).ram();
+}
+
+// the decrypted ROM copy is installed in machine_start
+void rebus_state::user_opcodes_map(address_map &map)
+{
+}
+
+// bits 0-1 select the 16K ROM bank at $8000 (the NMI handler sets it only around its sample fetch),
+// bit 3 resets the MSM5205
+void rebus_state::adpcm_control_w(uint8_t data)
+{
+	m_sound_bank->set_entry(data & 0x03);
+	m_msm[0]->reset_w(BIT(data, 3));
+}
+
+// one byte is played as two nibbles, high first; NMI asks for the next byte
+void rebus_state::adpcm_int(int state)
+{
+	m_msm[0]->data_w(m_adpcm_nibble ? (m_adpcm_data & 0x0f) : (m_adpcm_data >> 4));
+	m_adpcm_nibble = !m_adpcm_nibble;
+	if (!m_adpcm_nibble)
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+}
+
+// RAM at $f000 (stack at $f42f), sound command read at $f800 from the IRQ handler
+void rebus_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr(m_sound_bank);
+	map(0xc000, 0xdfff).rom();
+	map(0xe000, 0xe000).w(FUNC(rebus_state::adpcm_control_w));
+	map(0xe400, 0xe400).w(FUNC(rebus_state::splash_adpcm_data_w));
+	map(0xec00, 0xec01).w("ymsnd", FUNC(ym3812_device::write));
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
 uint16_t funystrp_state::spr_read(offs_t offset)
@@ -644,6 +696,82 @@ void roldfrog_state::roldfrog(machine_config &config)
 	ymsnd.add_route(3, "mono", 1.0);
 }
 
+void rebus_state::machine_start()
+{
+	splash_state::machine_start();
+
+	// The custom chip decrypts opcode fetches made in user mode: XOR 0xaaaa, then the odd bits are
+	// rotated among themselves by address bits 8-10. Only the "BUG" task (0x6006-0x67c3) runs in user mode,
+	// and it is the only encrypted code in the ROM. The copy is derived from the ROM, so it is not saved.
+	m_decrypted_opcodes = std::make_unique<uint16_t []>(m_maincpu_rom.length());
+	for (offs_t offset = 0; offset < m_maincpu_rom.length(); offset++)
+	{
+		const uint16_t data = m_maincpu_rom[offset] ^ 0xaaaa;
+		const unsigned rotate = BIT(offset, 7, 3); // word offset: address bits 8-10
+
+		uint16_t decrypted = data & 0x5555;
+		for (unsigned bit = 0; bit < 8; bit++)
+			decrypted |= BIT(data, 2 * ((bit + rotate) & 7) + 1) << (2 * bit + 1);
+
+		m_decrypted_opcodes[offset] = decrypted;
+	}
+	m_maincpu->space(m68000_base_device::AS_USER_OPCODES).install_rom(0x000000, 0x3fffff, m_decrypted_opcodes.get());
+
+	m_sound_bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+
+	save_item(NAME(m_adpcm_nibble));
+}
+
+void rebus_state::machine_reset()
+{
+	splash_state::machine_reset();
+
+	m_adpcm_nibble = false;
+}
+
+void rebus_state::rebus(machine_config &config)
+{
+	// basic machine hardware
+	M68000(config, m_maincpu, XTAL(24'000'000)/2);       // clock not verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &rebus_state::main_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_USER_OPCODES, &rebus_state::user_opcodes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(rebus_state::irq6_line_hold));
+
+	Z80(config, m_audiocpu, XTAL(24'000'000)/8);     // clock not verified
+	m_audiocpu->set_addrmap(AS_PROGRAM, &rebus_state::sound_map);
+
+	LS259(config, m_outlatch); // Q1 is not a coin lockout on this board
+	m_outlatch->q_out_cb<2>().set(FUNC(rebus_state::coin_counter_w<0>));
+	m_outlatch->q_out_cb<3>().set(FUNC(rebus_state::coin_counter_w<1>));
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 48*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(rebus_state::screen_update_rebus));
+	screen.set_palette(m_palette);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_splash);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0); // handler at $0038 reads $f800 into a queue
+
+	// YM3812 at u165; clock not verified
+	YM3812(config, "ymsnd", XTAL(24'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
+
+	// clock and prescaler not verified: S96 gives a 2 kHz NMI, and the music driver ticks every 34 NMIs (58.8 Hz)
+	MSM5205(config, m_msm[0], 384'000);
+	m_msm[0]->vck_legacy_callback().set(FUNC(rebus_state::adpcm_int));
+	m_msm[0]->set_prescaler_selector(msm5205_device::S96_4B);
+	m_msm[0]->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
+
 template <unsigned Which>
 void funystrp_state::adpcm_int(int state)
 {
@@ -663,7 +791,10 @@ void funystrp_state::adpcm_int(int state)
 
 void funystrp_state::machine_start()
 {
+	m_heartbeat_timer = timer_alloc(FUNC(funystrp_state::heartbeat_clear), this);
+
 	save_item(NAME(m_funystrp_val));
+	save_item(NAME(m_heartbeat));
 	save_item(NAME(m_funystrp_ff3cc7_val));
 	save_item(NAME(m_funystrp_ff3cc8_val));
 	save_item(NAME(m_msm_data));
@@ -742,49 +873,20 @@ void roldfrog_state::init_roldfrog()
 	m_sprite_attr2_shift = 8;
 }
 
-void roldfrog_state::init_rebus()
+TIMER_CALLBACK_MEMBER(funystrp_state::heartbeat_clear)
 {
-	init_roldfrog();
-
-	// HACK: unemulated copy protection
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-
-	m_sprite_attr2_shift = 0;
-
-	//d1 clear , regs restore and rte - end of trap $b
-	ROM[0x196c0/2] = 0x7200;
-	ROM[0x196c2/2] = 0x4cdf;
-	ROM[0x196c4/2] = 0x7080;
-	ROM[0x196c6/2] = 0x4e73;
-
-	//jumps to above
-	ROM[0x3ffcac/2] = 0x4ef9;
-	ROM[0x3ffcae/2] = 0x0001;
-	ROM[0x3ffcb0/2] = 0x96c0;
-
-	//rom checksum
-	ROM[0x3ff2fc/2] = 0x4e71;
-	ROM[0x3ff2fe/2] = 0x4e71;
-	ROM[0x3ff300/2] = 0x4e71;
-	ROM[0x3ff302/2] = 0x4e71;
-	ROM[0x3ff304/2] = 0x4e71;
-	ROM[0x3ff306/2] = 0x4e71;
+	m_heartbeat = 0;
 }
 
 uint16_t funystrp_state::protection_r(offs_t offset)
 {
-	const int pc = m_maincpu->pc();
-
 	const int ofst = offset + (0x100000 / 2);
-
-//  logerror ("PROTR: %5.5x, pc: %5.5x\n", ofst*2, pc);
-
-	// don't interfere with ram check.
-	if (pc == 0x04770) return 0x00;
-	if (pc == 0x04788) return 0x55;
 
 	switch (ofst)
 	{
+		case (0x100000 / 2):
+			return m_heartbeat;
+
 		//-----------------------------------------------------------------
 		// sub $7ACC, $C7EE, subtractions, original value from 68k
 
@@ -1075,8 +1177,14 @@ void funystrp_state::protection_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	{
 		switch (ofst)
 		{
+			// The game writes 0x55 here every frame and the chip clears it. At boot the game waits for the
+			// clear, then writes 0x55 again and waits to read it back. The delay is not verified.
 			case (0x100000 / 2):
-				// on boot?
+				if (ACCESSING_BITS_0_7)
+				{
+					m_heartbeat = data & 0xff;
+					m_heartbeat_timer->adjust(attotime::from_usec(50));
+				}
 			return;
 
 			case (0x1007e1 / 2):
@@ -1282,7 +1390,7 @@ Note
 */
 
 ROM_START( rebus ) // there's also a year hack dumped: it has 4 different bytes total, 2 to change 1995 to 1997 in two places and 2 corresponding changes to fix the checksum
-	ROM_REGION( 0x408000, "maincpu", ROMREGION_ERASE00 )    // 68000 code
+	ROM_REGION( 0x400000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "2.u16", 0x000000, 0x080000, CRC(7c8a717f) SHA1(00b1e7986046a7705fc65a5c7d4701a002b2ea6f) )
 	ROM_LOAD16_BYTE( "6.u12", 0x000001, 0x080000, CRC(8f73d548) SHA1(210d95dc0db41da3252a09e598719d98bca41983) )
 	ROM_LOAD16_BYTE( "3.u17", 0x100000, 0x080000, CRC(7495409b) SHA1(b4d75713d31c0b01d7cb7d50a2a89fb3ea4ea42b) )
@@ -1292,15 +1400,14 @@ ROM_START( rebus ) // there's also a year hack dumped: it has 4 different bytes 
 	ROM_LOAD16_BYTE( "5.u19", 0x300000, 0x080000, CRC(2702f341) SHA1(de862cacbb3e8e322128315d87a22c7cdfe4fcb9) )
 	ROM_LOAD16_BYTE( "9.u15", 0x300001, 0x080000, CRC(f5ae3d73) SHA1(6a9d955023c704023b722cf863ba19ccb9b34ee1) )
 
-	ROM_REGION( 0x90000, "audiocpu", 0 )    // Z80 Code
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // Z80 code + ADPCM samples
 	ROM_LOAD( "1.u163", 0x00000, 0x10000,  CRC(88a7b1f8) SHA1(b34fa26dbc613bf3b525d19df90fa3ba4efb6e5d) )
-	ROM_RELOAD(         0x20000, 0x10000 )
 
 	ROM_REGION( 0x80000, "gfx", 0 )
-	ROM_LOAD( "10.u102", 0x00000, 0x20000, CRC(6f75a28b) SHA1(75f0bd6bd8c04ea9f832c22fbe1d17b0351f1102) )
-	ROM_LOAD( "11.u103", 0x20000, 0x20000, CRC(0af65b78) SHA1(9522ad17d26d866e5b11b4fec47781a00a297977) )
-	ROM_LOAD( "12.u104", 0x40000, 0x20000, CRC(3ed6ce19) SHA1(0d574071053157e4ef973a844795e48ec69dc7c4) )
-	ROM_LOAD( "13.u105", 0x60000, 0x20000, CRC(8b54553d) SHA1(5cb776e551527b0e717fe0d76296f5f895523de5) )
+	ROM_LOAD( "13.u105", 0x00000, 0x20000, CRC(8b54553d) SHA1(5cb776e551527b0e717fe0d76296f5f895523de5) )
+	ROM_LOAD( "12.u104", 0x20000, 0x20000, CRC(3ed6ce19) SHA1(0d574071053157e4ef973a844795e48ec69dc7c4) )
+	ROM_LOAD( "11.u103", 0x40000, 0x20000, CRC(0af65b78) SHA1(9522ad17d26d866e5b11b4fec47781a00a297977) )
+	ROM_LOAD( "10.u102", 0x60000, 0x20000, CRC(6f75a28b) SHA1(75f0bd6bd8c04ea9f832c22fbe1d17b0351f1102) )
 
 	ROM_REGION( 0x1200, "plds", 0 ) // all protected
 	ROM_LOAD( "hy18cv8s",   0x0000, 0x200, NO_DUMP ) // not actual size
@@ -1699,7 +1806,7 @@ GAME( 1992, splash10,   splash,   splash,   splash,   splash_state,   init_splas
 
 GAME( 1993, roldfrog,   0,        roldfrog, splash,   roldfrog_state, init_roldfrog, ROT0, "Microhard",              "The Return of Lady Frog (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, roldfroga,  roldfrog, roldfrog, splash,   roldfrog_state, init_roldfrog, ROT0, "Microhard",              "The Return of Lady Frog (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, rebus,      0,        roldfrog, splash,   roldfrog_state, init_rebus,    ROT0, "Microhard",              "Rebus",                           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, rebus,      0,        rebus,    splash,   rebus_state,    empty_init,    ROT0, "Microhard",              "Rebus",                           MACHINE_SUPPORTS_SAVE )
 GAME( 199?, funystrp,   0,        funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard / MagicGames", "Funny Strip",                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, puckpepl,   funystrp, funystrp, funystrp, funystrp_state, init_funystrp, ROT0, "Microhard",              "Puck People",                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ringball,   0,        ringball, ringball, funystrp_state, init_ringball, ROT0, "Microhard",              "Ring & Ball (Italy, Ver. 2.6)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Ring Ball in test mode, may be Ring & Ball, has Italian strings in ROM
