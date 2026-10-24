@@ -73,7 +73,7 @@ void galpani2_state::galpani2_bg8_regs_1_w(offs_t offset, uint16_t data, uint16_
 // Native player color records use F9/FD for captured field cells. Their
 // flashing palette colors also set bit 15, so that bit alone cannot select
 // the covered silhouette. UI words using the same palette remain opaque.
-static bool bg8_captured_field(uint16_t pen)
+constexpr bool bg8_captured_field(uint16_t pen)
 {
 	return !BIT(pen, 11) && ((pen & 0xff) == 0xf9 || (pen & 0xff) == 0xfd);
 }
@@ -91,9 +91,9 @@ void galpani2_state::copybg8(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap,
 	uint16_t* ram = m_bg8[layer];
 
 	pen_t const *const clut = &m_bg8palette->pen(0);
-	for (int xx = cliprect.min_x; xx <= cliprect.max_x; xx++)
+	for (int xx = cliprect.left(); xx <= cliprect.right(); xx++)
 	{
-		for (int yy = cliprect.min_y; yy <= cliprect.max_y; yy++)
+		for (int yy = cliprect.top(); yy <= cliprect.bottom(); yy++)
 		{
 			uint16_t pen = ram[(((y + yy) & 0xff) * 512) + ((x + xx) & 0x1ff)];
 			uint16_t const color = m_bg8_palette_ram[pen & 0xff];
@@ -198,9 +198,9 @@ void galpani2_state::copybg15(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap
 		// The 512-pixel-wide framebuffer wraps around, and stale photo data
 		// from the inactive half appears at the border/HUD positions.
 		// The field spans 256 columns starting at m_field_origin_x.
-		int const field_min_x = (layer == 3) ? m_field_origin_x : cliprect.min_x;
-		int const field_max_x = (layer == 3) ? (m_field_origin_x + 255) : cliprect.max_x;
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		int const field_min_x = (layer == 3) ? m_field_origin_x : cliprect.left();
+		int const field_max_x = (layer == 3) ? (m_field_origin_x + 255) : cliprect.right();
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			int const sy = (y + scrolly) & 0xff;
 			for (int x = field_min_x; x <= field_max_x; x++)

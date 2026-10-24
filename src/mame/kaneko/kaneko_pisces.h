@@ -50,21 +50,22 @@ private:
 	required_shared_ptr<uint16_t> m_bg15;
 	devcb_read32 m_decoder_task_cb;
 
-	uint16_t m_old_mcu_nmi1 = 0;
-	uint16_t m_old_mcu_nmi2 = 0;
+	uint16_t m_old_mcu_nmi1;
+	uint16_t m_old_mcu_nmi2;
 
 	// Immutable ROM lookup metadata and per-variant protocol/layout settings.
 	std::vector<uint32_t> m_bg_image_offsets;
-	uint32_t m_bg_image_prefix_count = 0;
-	uint8_t m_bg_decode_param_offset = 2;
-	int m_field_origin_x = 48;
+	uint32_t m_bg_image_prefix_count;
+	uint8_t m_bg_decode_param_offset;
+	int m_field_origin_x;
 
 	static constexpr uint32_t GIRL_BITMAP_OFFSET = 0xe000;
 	static constexpr uint32_t GIRL_BITMAP_ADDR = 0x10e000;
-	uint32_t m_girl_bitmap_pending_addr = 0;
-	uint32_t m_girl_bitmap_pending_param = 0;
-	uint32_t m_girl_bitmap_pending_task = 0;
-	std::array<uint8_t, 0x2000> m_bg15_coverage{};
+	static constexpr uint32_t BG15_COVERAGE_SIZE = 0x2000;
+	uint32_t m_girl_bitmap_pending_addr;
+	uint32_t m_girl_bitmap_pending_param;
+	uint32_t m_girl_bitmap_pending_task;
+	std::unique_ptr<uint8_t []> m_bg15_coverage;
 
 	void scan_background_images();
 	void write_kaneko();

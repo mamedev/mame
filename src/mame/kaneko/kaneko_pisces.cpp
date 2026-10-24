@@ -2,21 +2,23 @@
 // copyright-holders:Luca Elia, Andrea Bogazzi
 /***************************************************************************
 
-	Kaneko PISCES MCU high-level simulation for Gals Panic II and II' SE.
+    Kaneko PISCES MCU high-level simulation for Gals Panic II and II' SE.
 
-	The NEC uPD78324 internal ROM is undumped. This device substitutes the
-	observed command protocol between the two 68000s. Image decompression
-	still runs on the sub CPU; the coverage buffer is HLE bookkeeping,
-	not a model of the MCU's internal RAM.
+    The NEC uPD78324 internal ROM is undumped. This device substitutes the
+    observed command protocol between the two 68000s. Image decompression
+    still runs on the sub CPU; the coverage buffer is HLE bookkeeping,
+    not a model of the MCU's internal RAM.
 
-	Main RAM 100010.w: software watchdog?
-	Main RAM 100020.b: command queue length
-	Sub RAM  101012.b: command queue length
+    Main RAM 100010.w: software watchdog?
+    Main RAM 100020.b: command queue length
+    Sub RAM  101012.b: command queue length
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "kaneko_pisces.h"
+
+#include "endianness.h"
 
 DEFINE_DEVICE_TYPE(KANEKO_PISCES_HLE, kaneko_pisces_hle_device, "kaneko_pisces_hle", "Kaneko PISCES MCU (HLE)")
 
@@ -27,6 +29,14 @@ kaneko_pisces_hle_device::kaneko_pisces_hle_device(const machine_config &mconfig
 	, m_subdata(*this, finder_base::DUMMY_TAG)
 	, m_bg15(*this, finder_base::DUMMY_TAG)
 	, m_decoder_task_cb(*this, 0)
+	, m_old_mcu_nmi1(0)
+	, m_old_mcu_nmi2(0)
+	, m_bg_image_prefix_count(0)
+	, m_bg_decode_param_offset(2)
+	, m_field_origin_x(48)
+	, m_girl_bitmap_pending_addr(0)
+	, m_girl_bitmap_pending_param(0)
+	, m_girl_bitmap_pending_task(0)
 {
 }
 
@@ -46,12 +56,14 @@ void kaneko_pisces_hle_device::device_start()
 			track_bg15_coverage(address, data, mem_mask);
 		});
 
+	m_bg15_coverage = util::make_unique_clear<uint8_t []>(BG15_COVERAGE_SIZE);
+
 	save_item(NAME(m_old_mcu_nmi1));
 	save_item(NAME(m_old_mcu_nmi2));
 	save_item(NAME(m_girl_bitmap_pending_addr));
 	save_item(NAME(m_girl_bitmap_pending_param));
 	save_item(NAME(m_girl_bitmap_pending_task));
-	save_item(NAME(m_bg15_coverage));
+	save_pointer(NAME(m_bg15_coverage), BG15_COVERAGE_SIZE);
 }
 
 void kaneko_pisces_hle_device::device_reset()
@@ -59,7 +71,7 @@ void kaneko_pisces_hle_device::device_reset()
 	m_girl_bitmap_pending_addr = 0;
 	m_girl_bitmap_pending_param = 0;
 	m_girl_bitmap_pending_task = 0;
-	m_bg15_coverage.fill(0);
+	std::fill_n(&m_bg15_coverage[0], BG15_COVERAGE_SIZE, 0);
 }
 
 // Scan the background ROM data to build the image offset table at init.
@@ -72,16 +84,14 @@ void kaneko_pisces_hle_device::scan_background_images()
 	memory_region &rom = *m_subdata;
 	uint32_t const rom_size = rom.bytes();
 
-	auto byte = [&rom](uint32_t offset) -> uint8_t {
-		return rom.as_u16(offset / 2) >> ((offset & 1) ? 0 : 8);
-	};
+	auto const byte = util::big_endian_cast<uint8_t const>(&rom.as_u16());
 	auto word = [&byte](uint32_t offset) -> uint16_t {
-		return (uint16_t(byte(offset)) << 8) | byte(offset + 1);
+		return (uint16_t(byte[offset]) << 8) | byte[offset + 1];
 	};
 
 	// Parse one image stream starting at pos. Returns the byte offset
 	// just past the last data byte (before word-alignment), or 0 on failure.
-	auto parse_image = [&](uint32_t pos) -> uint32_t {
+	auto parse_image = [&byte, &word, rom_size](uint32_t pos) -> uint32_t {
 		if (pos + 6 > rom_size)
 			return 0;
 		uint16_t const kind = word(pos);
@@ -105,7 +115,7 @@ void kaneko_pisces_hle_device::scan_background_images()
 		uint32_t decoded = 0;
 		while (decoded < total_pixels && p < rom_size)
 		{
-			uint8_t const ctrl = byte(p++);
+			uint8_t const ctrl = byte[p++];
 			uint32_t count;
 			if (kind == 0x0050)
 			{
@@ -113,7 +123,7 @@ void kaneko_pisces_hle_device::scan_background_images()
 				if (ctrl & 0x40)
 				{
 					if (p >= rom_size) return 0;
-					count = (count << 8) | byte(p++);
+					count = (count << 8) | byte[p++];
 				}
 			}
 			else
@@ -130,7 +140,7 @@ void kaneko_pisces_hle_device::scan_background_images()
 			// Strict: real image colors never have bit 15 set in the
 			// compressed stream. The decoder adds it during rendering.
 			for (uint32_t i = 0; i < data_bytes; i += 2)
-				if (byte(p + i) & 0x80)
+				if (byte[p + i] & 0x80)
 					return 0;
 			p += data_bytes;
 			decoded += count;
@@ -200,14 +210,13 @@ void kaneko_pisces_hle_device::init_w(uint8_t data)
 {
 	address_space &srcspace = m_maincpu->space(AS_PROGRAM);
 	address_space &dstspace = m_subcpu->space(AS_PROGRAM);
-	uint32_t mcu_address, mcu_data;
 
-	for ( mcu_address = 0x100010; mcu_address < (0x100010 + 6); mcu_address += 1 )
+	for (uint32_t mcu_address = 0x100010; mcu_address < (0x100010 + 6); mcu_address++)
 	{
-		mcu_data    =   srcspace.read_byte(mcu_address );
-		dstspace.write_byte(mcu_address-0x10, mcu_data);
+		uint8_t const mcu_data = srcspace.read_byte(mcu_address);
+		dstspace.write_byte(mcu_address - 0x10, mcu_data);
 	}
-	m_subcpu->set_input_line(INPUT_LINE_IRQ7, HOLD_LINE); //MCU Initialised
+	m_subcpu->set_input_line(INPUT_LINE_IRQ7, HOLD_LINE); // MCU initialised
 }
 
 // The native decompressor supplies coverage as it writes pixels. Track it
@@ -284,10 +293,7 @@ uint16_t kaneko_pisces_hle_device::generate_girl_bitmap(uint32_t dest_addr)
 					popcount++;
 				}
 			}
-			mspace.write_byte(GIRL_BITMAP_ADDR + byte_idx + 0, (bits >> 24) & 0xff);
-			mspace.write_byte(GIRL_BITMAP_ADDR + byte_idx + 1, (bits >> 16) & 0xff);
-			mspace.write_byte(GIRL_BITMAP_ADDR + byte_idx + 2, (bits >> 8) & 0xff);
-			mspace.write_byte(GIRL_BITMAP_ADDR + byte_idx + 3, bits & 0xff);
+			mspace.write_dword_unaligned(GIRL_BITMAP_ADDR + byte_idx, bits);
 			byte_idx += 4;
 		}
 	}
@@ -335,38 +341,39 @@ void kaneko_pisces_hle_device::process_main_queue()
 	address_space &sspace = m_subcpu->space(AS_PROGRAM);
 
 	uint8_t len = mspace.read_byte(0x100020);
-	for(uint8_t slot = 0; slot < len; slot += 4) {
+	for (uint8_t slot = 0; slot < len; slot += 4)
+	{
 		uint8_t command = mspace.read_byte(0x100021 + slot);
 		uint32_t address = 0x100000 | mspace.read_word(0x100022 + slot);
 
 		switch (command)
 		{
-		case 0x02: { //Copy N bytes from RAM2 to RAM1?, gp2se is the only one to use it, often!
-			uint16_t src  = mspace.read_word(address + 2);
-			uint16_t dst  = mspace.read_word(address + 6);
+		case 0x02: { // Copy N bytes from RAM2 to RAM1?, gp2se is the only one to use it, often!
+			uint16_t src = mspace.read_word(address + 2);
+			uint16_t dst = mspace.read_word(address + 6);
 			uint16_t size = mspace.read_word(address + 8);
 			logerror("MCU master %02x:%06x copy s:%04x, m:%04x, size:%04x\n", slot, address, src, dst, size);
 
-			for(uint16_t i = 0; i != size; i++)
+			for (uint16_t i = 0; i != size; i++)
 			{
 				mspace.write_byte(0x100000 + dst, sspace.read_byte(0x100000 + src));
-				src ++;
-				dst ++;
+				src++;
+				dst++;
 			}
 			break;
 		}
 
 		case 0x0a: { // Copy N bytes from RAM1 to RAM2
-			uint16_t src  = mspace.read_word(address + 2);
-			uint16_t dst  = mspace.read_word(address + 6);
+			uint16_t src = mspace.read_word(address + 2);
+			uint16_t dst = mspace.read_word(address + 6);
 			uint16_t size = mspace.read_word(address + 8);
 			logerror("MCU master %02x:%06x copy m:%04x, s:%04x, size:%04x\n", slot, address, src, dst, size);
 
-			for(uint16_t i = 0; i != size; i++)
+			for (uint16_t i = 0; i != size; i++)
 			{
 				sspace.write_byte(0x100000 + dst, mspace.read_byte(0x100000 + src));
-				src ++;
-				dst ++;
+				src++;
+				dst++;
 			}
 			break;
 		}
@@ -391,7 +398,7 @@ void kaneko_pisces_hle_device::process_main_queue()
 			m_girl_bitmap_pending_addr = address;
 			m_girl_bitmap_pending_param = 0;
 			m_girl_bitmap_pending_task = 0;
-			m_bg15_coverage.fill(0);
+			std::fill_n(&m_bg15_coverage[0], BG15_COVERAGE_SIZE, 0);
 			continue;
 		}
 
@@ -413,7 +420,8 @@ void kaneko_pisces_hle_device::process_sub_queue()
 	address_space &sspace = m_subcpu->space(AS_PROGRAM);
 
 	uint8_t len = sspace.read_byte(0x101012);
-	for(uint8_t slot = 0; slot < len; slot += 4) {
+	for (uint8_t slot = 0; slot < len; slot += 4)
+	{
 		uint8_t command = sspace.read_byte(0x101013 + slot);
 		uint32_t address = 0x100000 | sspace.read_word(0x101014 + slot);
 
@@ -475,13 +483,15 @@ void kaneko_pisces_hle_device::main_nmi_w(uint8_t data) //driven by CPU1's int5 
 //Triggered from 'maincpu' (00007D60),once, with no command, using alternate line, during init
 //Triggered from 'maincpu' (000080BE),once, for unknown command, during init
 //Triggered from 'maincpu' (0000741E),from here on...driven by int5, even if there's no command
-	if ( (data & 1) && !(m_old_mcu_nmi1 & 1) )  process_main_queue();
+	if ((data & 1) && !(m_old_mcu_nmi1 & 1))
+		process_main_queue();
 	// Bit 4 is also pulsed at startup; its function is unknown.
 	m_old_mcu_nmi1 = data;
 }
 
 void kaneko_pisces_hle_device::sub_nmi_w(uint8_t data) //driven by CPU2's int5 ISR
 {
-	if ( (data & 1) && !(m_old_mcu_nmi2 & 1) )  process_sub_queue();
+	if ((data & 1) && !(m_old_mcu_nmi2 & 1))
+		process_sub_queue();
 	m_old_mcu_nmi2 = data;
 }
