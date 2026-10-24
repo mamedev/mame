@@ -25,6 +25,18 @@ ToDo:
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "st_mp100.lh"
+#include "st_mp100_dracula.lh"
+#include "st_mp100_hothand.lh"
+#include "st_mp100_lectrono.lh"
+#include "st_mp100_magic.lh"
+#include "st_mp100_memlane.lh"
+#include "st_mp100_nugent.lh"
+#include "st_mp100_pinball.lh"
+#include "st_mp100_princess.lh"
+#include "st_mp100_stars.lh"
+#include "st_mp100_stingray.lh"
+#include "st_mp100_trident.lh"
+#include "st_mp100_wildfyre.lh"
 
 
 namespace {
@@ -973,21 +985,20 @@ ROM_END
 
 
 // chimes
-GAME( 1977,  pinball,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Pinball",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1977,  stingray,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Stingray",          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1978,  stars,      0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Stars",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME( 1978,  memlane,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Memory Lane",       MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1977,  pinball,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Pinball",           MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_st_mp100_pinball )
+GAMEL( 1977,  stingray,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Stingray",          MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_st_mp100_stingray )
+GAMEL( 1978,  stars,      0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Stars",             MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_st_mp100_stars )
+GAMEL( 1978,  memlane,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Memory Lane",       MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_st_mp100_memlane )
 GAME( 1978,  blkshpsq,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Astro", "Black Sheep Squadron",        MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 
 // sound unit B-521
-GAME( 1978,  lectrono,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Lectronamo",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 1978,  wildfyre,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Wildfyre",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 1978,  nugent,     0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Nugent",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 1979,  dracula,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Dracula (Pinball)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-
+GAMEL( 1978,  lectrono,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Lectronamo",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_st_mp100_lectrono )
+GAMEL( 1978,  wildfyre,   0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Wildfyre",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_st_mp100_wildfyre )
+GAMEL( 1978,  nugent,     0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Nugent",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_st_mp100_nugent )
+GAMEL( 1979,  dracula,    0,      st_mp100,   mp100, st_mp100_state, empty_init, ROT0, "Stern", "Dracula (Pinball)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_st_mp100_dracula )
 // different inputs
-GAME( 1979,  trident,    0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Trident",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 1979,  tridento,   trident, st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Trident (Older set)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 1979,  hothand,    0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Hot Hand",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 1979,  princess,   0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Cosmic Princess",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME( 1979,  magic,      0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Magic",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1979,  trident,    0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Trident",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_st_mp100_trident )
+GAMEL( 1979,  tridento,   trident, st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Trident (Older set)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_st_mp100_trident )
+GAMEL( 1979,  hothand,    0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Hot Hand",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_st_mp100_hothand )
+GAMEL( 1979,  princess,   0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Cosmic Princess",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_st_mp100_princess )
+GAMEL( 1979,  magic,      0,       st_mp100,  mp200, st_mp100_state, empty_init, ROT0, "Stern", "Magic",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_st_mp100_magic )
