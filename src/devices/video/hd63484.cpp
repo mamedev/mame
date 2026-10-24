@@ -5,7 +5,8 @@
     HD63484 ACRTC
 
     TODO:
-    - execution cycles;
+    - DMA handshake (DREQ/DACK/DONE), character screen mode, cursors,
+      blink, video attribute outputs, interlaced rendering;
 
 ***************************************************************************/
 
@@ -15,12 +16,23 @@
 #include "screen.h"
 
 #include <numbers>
+#include <unordered_set>
+#include <utility>
+#include <vector>
 
 
 #define LOG 0
 #define FIFO_LOG 0
 #define CMD_LOG 0
 
+
+
+enum
+{
+	STREAM_NONE = 0,
+	STREAM_RPTN,
+	STREAM_DRD
+};
 
 //-------------------------------------------------
 //  hd63484_device - constructor
@@ -31,10 +43,16 @@ hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, d
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_display_cb(*this),
+	m_character_cb(*this),
+	m_irq_cb(*this),
+	m_dreq_cb(*this),
+	m_done_cb(*this),
 	m_auto_configure_screen(true),
 	m_external_skew(0),
 	m_ar(0),
 	m_sr(0),
+	m_irq_state(0),
+	m_dreq_state(0),
 	m_fifo_ptr(-1),
 	m_fifo_r_ptr(-1),
 	m_cr(0),
@@ -45,8 +63,11 @@ hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, d
 	m_org_dpd(0),
 	m_cl0(0),
 	m_cl1(0), m_ccmp(0), m_mask(0), m_cpx(0),
+	m_stream(STREAM_NONE),
 	m_dcr(0),
-	m_space_config("videoram", ENDIANNESS_BIG, 16, 20, -1)
+	m_space_config("videoram", ENDIANNESS_BIG, 16, 20, -1),
+	m_char_space_config("charram", ENDIANNESS_BIG, 16, 16, -1),
+	m_char_space(nullptr)
 {
 }
 
@@ -350,9 +371,11 @@ ROM_END
 
 device_memory_interface::space_config_vector hd63484_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(0, &m_space_config)
-	};
+	// the character frame buffer space only exists when the machine maps it
+	space_config_vector v { std::make_pair(AS_GRAPHIC, &m_space_config) };
+	if (has_configured_map(AS_CHARACTER))
+		v.emplace_back(AS_CHARACTER, &m_char_space_config);
+	return v;
 }
 
 
@@ -369,9 +392,14 @@ const tiny_rom_entry *hd63484_device::device_rom_region() const
 //  readword - read a word at the given address
 //-------------------------------------------------
 
-inline uint16_t hd63484_device::readword(offs_t address)
+inline uint16_t hd63484_device::readword(offs_t address, int screen)
 {
-	return space().read_word(address);
+	// each screen's CHR bit selects which of the two frame buffers it
+	// resides in; addresses wrap at the space limit (1M/64K words)
+	if (m_char_space != nullptr && m_mwr_chr[screen & 3])
+		return m_char_space->read_word(address & 0xffff);
+
+	return space().read_word(address & 0xfffff);
 }
 
 
@@ -379,9 +407,12 @@ inline uint16_t hd63484_device::readword(offs_t address)
 //  writeword - write a word at the given address
 //-------------------------------------------------
 
-inline void hd63484_device::writeword(offs_t address, uint16_t data)
+inline void hd63484_device::writeword(offs_t address, uint16_t data, int screen)
 {
-	space().write_word(address, data);
+	if (m_char_space != nullptr && m_mwr_chr[screen & 3])
+		m_char_space->write_word(address & 0xffff, data);
+	else
+		space().write_word(address & 0xfffff, data);
 }
 
 
@@ -396,6 +427,16 @@ inline void hd63484_device::inc_ar(int value)
 	}
 }
 
+inline void hd63484_device::update_irq()
+{
+	uint8_t const state = (m_sr & m_ccr & 0xff) ? 1 : 0;
+	if (state != m_irq_state)
+	{
+		m_irq_state = state;
+		m_irq_cb(state);
+	}
+}
+
 inline void hd63484_device::fifo_w_clear()
 {
 	int i;
@@ -407,6 +448,8 @@ inline void hd63484_device::fifo_w_clear()
 
 	m_sr |= HD63484_SR_WFR;
 	m_sr |= HD63484_SR_WFE;
+
+	update_irq();
 }
 
 inline void hd63484_device::queue_w(uint8_t data)
@@ -417,10 +460,13 @@ inline void hd63484_device::queue_w(uint8_t data)
 
 		m_fifo[m_fifo_ptr] = data;
 
-		if (m_fifo_ptr == 16)
+		// ready until the FIFO is completely full (8 words/16 bytes)
+		if (m_fifo_ptr == 15)
 			m_sr &= ~HD63484_SR_WFR;
 
 		m_sr &= ~HD63484_SR_WFE;
+
+		update_irq();
 	}
 	else
 	{
@@ -449,6 +495,7 @@ inline void hd63484_device::dequeue_w(uint8_t *data)
 		if (m_fifo_ptr == -1)
 			m_sr |= HD63484_SR_WFE;
 
+		update_irq();
 	}
 }
 
@@ -463,6 +510,8 @@ inline void hd63484_device::fifo_r_clear()
 
 	m_sr &= ~HD63484_SR_RFR;
 	m_sr &= ~HD63484_SR_RFF;
+
+	update_irq();
 }
 
 inline void hd63484_device::queue_r(uint8_t data)
@@ -473,10 +522,12 @@ inline void hd63484_device::queue_r(uint8_t data)
 
 		m_fifo_r[m_fifo_r_ptr] = data;
 
-		if (m_fifo_r_ptr == 16)
+		if (m_fifo_r_ptr == 15)
 			m_sr |= HD63484_SR_RFF;
 
 		m_sr |= HD63484_SR_RFR;
+
+		update_irq();
 	}
 	else
 	{
@@ -504,6 +555,72 @@ inline void hd63484_device::dequeue_r(uint8_t *data)
 
 		if (m_fifo_r_ptr == -1)
 			m_sr &= ~HD63484_SR_RFR;
+
+		if (m_stream != STREAM_NONE)
+			stream_fill();
+
+		update_irq();
+	}
+}
+
+// resume a data transfer command that is still streaming words into the
+// read FIFO, as far as the available FIFO space allows
+void hd63484_device::stream_fill()
+{
+	while (m_stream != STREAM_NONE && m_fifo_r_ptr < 14)
+	{
+		uint16_t data = 0;
+		bool const was_rptn = m_stream == STREAM_RPTN;
+
+		switch (m_stream)
+		{
+			case STREAM_RPTN:
+				data = m_pram[(m_dma_d0 + (m_cr & 0x0f)) & 0x0f];
+				m_dma_d0++;
+				if (m_dma_d0 >= m_dn)
+					m_stream = STREAM_NONE;
+				break;
+
+			case STREAM_DRD:
+			{
+				int16_t const ax = (int16_t)m_pr[0];
+				int16_t const ay = (int16_t)m_pr[1];
+
+				data = readword((m_rwp[m_rwp_dn] - m_dma_d1 * m_mwr[m_rwp_dn] + m_dma_d0) & 0xfffff, m_rwp_dn);
+
+				if (m_dma_d0 != ax)
+					m_dma_d0 += (ax < 0) ? -1 : 1;
+				else
+				{
+					m_dma_d0 = 0;
+					if (m_dma_d1 != ay)
+						m_dma_d1 += (ay < 0) ? -1 : 1;
+					else
+					{
+						int const d1_inc = (ay < 0) ? -1 : 1;
+						m_rwp[m_rwp_dn] -= (ay + d1_inc) * m_mwr[m_rwp_dn];
+						m_rwp[m_rwp_dn] &= 0xfffff;
+						m_stream = STREAM_NONE;
+					}
+				}
+				break;
+			}
+		}
+
+		queue_r((data >> 8) & 0xff);
+		queue_r((data >> 0) & 0xff);
+
+		if (m_stream == STREAM_NONE)
+		{
+			if (was_rptn)
+				command_end_seq(4 * m_dn + 10);
+			else
+			{
+				uint32_t const x = abs((int16_t)m_pr[0]) + 1;
+				uint32_t const yc = abs((int16_t)m_pr[1]) + 1;
+				command_end_seq((4 * x + 8) * yc + 12 * ((x * yc + 7) / 8) + 65);
+			}
+		}
 	}
 }
 
@@ -517,9 +634,11 @@ int hd63484_device::get_ppmc()
 	{
 		case 0: case 1: case 2: case 3: // address incremented by 1, 2, 4 or 8 words
 			return (ppw << gai) / acm;
-		case 7:                         // address incremented by 1 every two display cycles
+		case 4:                         // address incremented by 16 words
+			return (ppw << 4) / acm;
+		case 6: case 7:                 // address incremented by 1 every two display cycles
 			return std::max(ppw / 2 / acm, 1);
-		default:                        // 4-6: address not incremented
+		default:                        // 5: address not incremented
 			return ppw / acm;
 	}
 }
@@ -633,12 +752,35 @@ int hd63484_device::translate_command(uint16_t data)
 	return COMMAND_INVALID;
 }
 
-inline void hd63484_device::command_end_seq()
+inline void hd63484_device::command_end_seq(uint32_t cycles)
 {
-	//hd63484->param_ptr = 0;
-	m_sr |= HD63484_SR_CED;
+	// command execution is signalled complete after its documented duration
+	// (2CLK cycles); devices instantiated without a clock complete instantly
+	if (cycles && clock() != 0)
+	{
+		m_busy = true;
+		m_cmd_timer->adjust(clocks_to_attotime(cycles));
+	}
+	else
+	{
+		m_sr |= HD63484_SR_CED;
+		update_irq();
+	}
 
 	/* TODO: we might need to be more aggressive and clear the params in there */
+}
+
+TIMER_CALLBACK_MEMBER(hd63484_device::cmd_exec_tick)
+{
+	m_busy = false;
+	m_sr |= HD63484_SR_CED;
+	update_irq();
+
+	// resume processing of anything queued behind the finished command
+	while (!m_busy && !BIT(m_ccr, 14) && m_fifo_ptr >= 1)
+		process_fifo();
+
+	update_dreq();
 }
 
 int hd63484_device::get_bpp()
@@ -686,17 +828,19 @@ uint16_t hd63484_device::get_dot(int16_t x, int16_t y)
 
 	calc_offset(x, y, offset, bit_pos);
 
-	return (readword(offset) >> bit_pos) & ((1 << bpp) - 1);
+	return (readword(offset, m_org_dn) >> bit_pos) & ((1 << bpp) - 1);
 }
 
-bool hd63484_device::set_dot(int16_t x, int16_t y, int16_t px, int16_t py)
+// pattern RAM scan position for a drawing-relative coordinate; returns the
+// pattern cell in the low byte (x | y<<4) and the pattern bit in bit 8
+int hd63484_device::pattern_bit(int16_t px, int16_t py)
 {
 	int xs = m_pex - m_psx + 1;
 	int ys = m_pey - m_psy + 1;
 	int zx = m_pzx + 1;
 	int zy = m_pzy + 1;
-	int xp = m_psx + ((px % (xs * zx)) / zx);
-	int yp = m_psy + ((py % (ys * zy)) / zy);
+	int xp = m_psx + ((((m_ppx - m_psx) * zx + m_pzcx + px) % (xs * zx)) / zx);
+	int yp = m_psy + ((((m_ppy - m_psy) * zy + m_pzcy + py) % (ys * zy)) / zy);
 
 	if (xp < m_psx)
 		xp = (m_pex + 1) - (m_psx - xp);
@@ -704,7 +848,16 @@ bool hd63484_device::set_dot(int16_t x, int16_t y, int16_t px, int16_t py)
 	if (yp < m_psy)
 		yp = (m_pey + 1) - (m_psy - yp);
 
-	int pix = (m_pram[yp & 0x0f] >> (xp & 0x0f)) & 0x01;
+	int const pix = (m_pram[yp & 0x0f] >> (xp & 0x0f)) & 0x01;
+	return (pix << 8) | ((yp & 0x0f) << 4) | (xp & 0x0f);
+}
+
+bool hd63484_device::set_dot(int16_t x, int16_t y, int16_t px, int16_t py)
+{
+	int const pat = pattern_bit(px, py);
+	int const pix = BIT(pat, 8);
+	int const xp = pat & 0x0f;
+	int const yp = (pat >> 4) & 0x0f;
 
 	uint8_t col = (m_cr >> 3) & 0x03;
 	uint8_t bpp = get_bpp();
@@ -726,8 +879,9 @@ bool hd63484_device::set_dot(int16_t x, int16_t y, int16_t px, int16_t py)
 				return set_dot(x, y, cl0);
 			break;
 		case 0x03:
-			fatalerror("HD63484 color modes (Pattern RAM indirect)\n");
-			// TODO
+			// pattern RAM direct: the pattern RAM is remapped as a 4x4 grid of
+			// logical pixel color cells, each cell one 16-bit word of color data
+			return set_dot(x, y, (m_pram[((yp & 0x03) << 2) | (xp & 0x03)] >> ((x & xmask) * bpp)) & mask);
 	}
 
 	return false;
@@ -735,18 +889,69 @@ bool hd63484_device::set_dot(int16_t x, int16_t y, int16_t px, int16_t py)
 
 bool hd63484_device::set_dot(int16_t x, int16_t y, uint16_t color)
 {
+	m_dot_count++;
+
 	uint8_t bpp = get_bpp();
 	uint32_t offset = 0;
 	uint8_t bit_pos = 0;
 	uint8_t opm = m_cr & 0x07;
 	uint8_t area = (m_cr >> 5) & 0x07;
 
+	if (area != 0 && area != 4)
+	{
+		bool const inside = x >= int16_t(m_xmin) && x <= int16_t(m_xmax) && y >= int16_t(m_ymin) && y <= int16_t(m_ymax);
+
+		switch (area)
+		{
+			case 1: // command terminated when attempting to exit the area
+				if (!inside)
+				{
+					m_sr |= HD63484_SR_ARD;
+					update_irq();
+					return true;
+				}
+				break;
+			case 2: // drawing suppressed outside the area
+			case 3: // as 2, with the suppression flagged
+				if (!inside)
+				{
+					if (area == 3)
+					{
+						m_sr |= HD63484_SR_ARD;
+						update_irq();
+					}
+					return false;
+				}
+				break;
+			case 5: // command terminated when attempting to enter the area
+				if (inside)
+				{
+					m_sr |= HD63484_SR_ARD;
+					update_irq();
+					return true;
+				}
+				break;
+			case 6: // drawing suppressed inside the area
+			case 7: // as 6, with the suppression flagged
+				if (inside)
+				{
+					if (area == 7)
+					{
+						m_sr |= HD63484_SR_ARD;
+						update_irq();
+					}
+					return false;
+				}
+				break;
+		}
+	}
+
 	calc_offset(x, y, offset, bit_pos);
 
 	uint16_t mask = ((1 << bpp) - 1) << bit_pos;
 	uint16_t color_shifted = (color << bit_pos) & mask;
 
-	uint16_t data = readword(offset);
+	uint16_t data = readword(offset, m_org_dn);
 	uint16_t res = data;
 
 	switch (opm)
@@ -772,24 +977,21 @@ bool hd63484_device::set_dot(int16_t x, int16_t y, uint16_t color)
 				res = (data & ~mask) | color_shifted;
 			break;
 		case 6:
-			if (get_dot(x, y) < ((m_cl0 & mask) >> bit_pos))
+			if (get_dot(x, y) < (color_shifted >> bit_pos))
 				res = (data & ~mask) | color_shifted;
 			break;
 		case 7:
-			if (get_dot(x, y) > ((m_cl1 & mask) >> bit_pos))
+			if (get_dot(x, y) > (color_shifted >> bit_pos))
 				res = (data & ~mask) | color_shifted;
 			break;
 	}
 
-	writeword(offset, res);
+	writeword(offset, res, m_org_dn);
 
-	if (area)
-		logerror("HD63484 '%s': unsupported area detection %x (%d %d)\n", tag(), area, x, y);
-
-	return false;   // TODO: return area detection status
+	return false;
 }
 
-void hd63484_device::draw_line(int16_t sx, int16_t sy, int16_t ex, int16_t ey)
+bool hd63484_device::draw_line(int16_t sx, int16_t sy, int16_t ex, int16_t ey)
 {
 	uint16_t delta_x = abs(ex - sx) * 2;
 	uint16_t delta_y = abs(ey - sy) * 2;
@@ -802,7 +1004,8 @@ void hd63484_device::draw_line(int16_t sx, int16_t sy, int16_t ex, int16_t ey)
 		int delta = delta_y - delta_x / 2;
 		while(sx != ex)
 		{
-			set_dot(sx, sy, pram_pos, 0);
+			if (set_dot(sx, sy, pram_pos, 0))
+				return true;
 
 			if(delta >= 0)
 			{
@@ -819,7 +1022,8 @@ void hd63484_device::draw_line(int16_t sx, int16_t sy, int16_t ex, int16_t ey)
 		int delta = delta_x - delta_y / 2;
 		while(sy != ey)
 		{
-			set_dot(sx, sy, pram_pos, 0);
+			if (set_dot(sx, sy, pram_pos, 0))
+				return true;
 
 			if(delta >= 0)
 			{
@@ -831,6 +1035,8 @@ void hd63484_device::draw_line(int16_t sx, int16_t sy, int16_t ex, int16_t ey)
 			delta += delta_x;
 		}
 	}
+
+	return false;
 }
 
 void hd63484_device::draw_ellipse(int16_t cx, int16_t cy, double dx, double dy, double s_angol, double e_angol, bool c)
@@ -843,64 +1049,171 @@ void hd63484_device::draw_ellipse(int16_t cx, int16_t cy, double dx, double dy, 
 
 		double px = cos(angol) * dx;
 		double py = sin(angol) * dy;
-		set_dot(cx + round(px), cy + round(py), 0, 0);
+		if (set_dot(cx + round(px), cy + round(py), 0, 0))
+			return;
 	}
 }
 
-void hd63484_device::paint(int16_t sx, int16_t sy)
+uint32_t hd63484_device::paint(int16_t sx, int16_t sy)
 {
 /*
-    This is not accurate since real hardware can only paint 4 'unpaintable' areas,
-    the other 'unpaintable' points are pushed into the read FIFO to be processed
-    later by the program, but currently is impossible suspend/resume the command
-    in case the read FIFO is full, so all 'unpaintable' areas are painted.
-    Also CP is not in the correct position after this command.
+    Complex figure handling is approximated: real hardware holds four
+    unpaintable-area coordinates on an internal stack and pushes further ones
+    into the read FIFO as 3-word records (CPx, CPy, pattern pointer), halting
+    while the FIFO is full so the host can drain it and re-issue PAINT per
+    spilled point. Painting everything in one pass instead keeps such programs
+    working: they see command end with an empty read FIFO, i.e. 'completely
+    painted', which mid-command suspension would be needed to improve on.
 */
 	uint8_t e = BIT(m_cr, 8);
 	uint8_t bpp = get_bpp();
 	uint16_t mask = (1 << bpp) - 1;
 	uint16_t xmask = (16 / bpp) - 1;
 
-	for (int ydir=0; ydir<2; ydir++)
-		for(uint16_t y=0;y<0x7fff; y++)
+	const auto paintable = [this, e, bpp, mask, xmask] (int32_t px, int32_t py)
+	{
+		uint16_t dot = get_dot(px, py);
+		uint16_t edg = (m_edg >> (px & xmask) * bpp) & mask;
+		uint16_t cl0 = (m_cl0 >> (px & xmask) * bpp) & mask;
+		uint16_t cl1 = (m_cl1 >> (px & xmask) * bpp) & mask;
+		return !((e && dot != edg) || (!e && dot == edg) || dot == cl0 || dot == cl1);
+	};
+
+	// In replace operation mode a painted dot reads back as the written
+	// value; one that does not, although the pattern selected an actual
+	// write, sits in unwritable space (ROM or unpopulated memory, reachable
+	// since large y coordinates wrap the 20 bit address). Such dots are
+	// scanned over without counting as painted work or seeding, and a span
+	// start is never queued twice, so a fill that strays outside the frame
+	// buffer RAM visits the region once and terminates instead of
+	// re-scanning it until the budget is gone - and a fill seeded entirely
+	// in unwritable space leaves CP at its seed.
+	uint8_t const colm = (m_cr >> 3) & 0x03;
+	bool const scanover = (m_cr & 0x07) == 0;
+
+	std::vector<std::pair<int16_t, int16_t>> seeds;
+	std::unordered_set<uint32_t> seen;
+	seeds.emplace_back(sx, sy);
+
+	// CP ends at Pe, the end of the last line of the sweep, which finishes
+	// on the top-most painted line (the sweep runs down first, then up)
+	int32_t pe_x = sx;
+	int32_t pe_y = sy;
+
+	uint32_t rows = 0;
+
+	// failsafe for fills whose painted dots stay paintable (conditional
+	// operation modes), which would otherwise never terminate
+	uint32_t budget = 1U << 20;
+
+	while (!seeds.empty() && budget)
+	{
+		auto [x, y] = seeds.back();
+		seeds.pop_back();
+
+		if (!paintable(x, y))
+			continue;
+
+		if (!seen.emplace((uint32_t(uint16_t(y)) << 16) | uint16_t(x)).second)
+			continue;
+
+		rows++;
+
+		// coordinates live on the hardware's 16 bit two's complement ring,
+		// so the span scan wraps there instead of walking an int32 line into
+		// aliased reads of the same dots
+		uint32_t dl = 0;
+		while (dl < 0x8000 && paintable(int16_t(x - dl - 1), y))
+			dl++;
+		uint32_t dr = 0;
+		while (dl + dr < 0xffff && paintable(int16_t(x + dr + 1), y))
+			dr++;
+
+		bool up = false, dn = false;
+		for (uint32_t d = 0; d <= dl + dr && budget; d++, budget--)
 		{
-			bool limit = true;
-			bool unpaintable_up = false;
-			bool unpaintable_dn = false;
+			int16_t const px = int16_t(x - dl + d);
+			if (set_dot(px, y, px - m_cpx, y - m_cpy))
+				return rows;
 
-			for (int xdir=0; xdir<2; xdir++)
-				for(uint16_t x=0; x<0x7fff; x++)
+			bool stuck = true;
+			if (scanover && paintable(px, y))
+			{
+				// distinguish unwritable memory from a pattern-suppressed dot
+				int const pix = BIT(pattern_bit(px - m_cpx, y - m_cpy), 8);
+				if (colm == 0 || colm == 3 || (colm == 1 && pix) || (colm == 2 && !pix))
+					stuck = false; // write attempted and did not stick
+			}
+
+			// the end point tracks every visited dot and the sweep continues
+			// through unwritable territory, as the hardware does not verify
+			// its writes - only the span start dedup keeps the traversal
+			// finite there; an unwritable dot just is not painted work
+			if (y > pe_y || (y == pe_y && px > pe_x))
+			{
+				pe_x = px;
+				pe_y = y;
+			}
+
+			if (!stuck)
+			{
+				if (paintable(px, y + 1))
 				{
-					int16_t px = sx + (xdir ? -x : x);
-					int16_t py = sy + (ydir ? -y : y);
-
-					uint16_t dot = get_dot(px, py);
-					uint16_t edg = (m_edg >> (px & xmask) * bpp) & mask;
-					uint16_t cl0 = (m_cl0 >> (px & xmask) * bpp) & mask;
-					uint16_t cl1 = (m_cl1 >> (px & xmask) * bpp) & mask;
-
-					if ((e && dot != edg) || (!e && dot == edg) || dot == cl0 || dot == cl1)
-						break;
-
-					if ((!ydir && !xdir && x && y) || (xdir && y) || (ydir && x) || (ydir && xdir))
-						set_dot(px, py, px - m_cpx, py - m_cpy);
-
-					dot = get_dot(px, py + 1);
-					if (unpaintable_up && !((e && dot == edg) && (!e && dot != edg) && dot != cl0 && dot != cl1))
-						paint(px, py + 1);
-					else if (!unpaintable_up && ((e && dot != edg) || (!e && dot == edg) || dot == cl0 || dot == cl1))
-						unpaintable_up = true;
-
-					dot = get_dot(px, py - 1);
-					if (unpaintable_dn && !((e && dot == edg) && (!e && dot != edg) && dot != cl0 && dot != cl1))
-						paint(px, py - 1);
-					else if (!unpaintable_dn && ((e && dot != edg) || (!e && dot == edg) || dot == cl0 || dot == cl1))
-						unpaintable_dn = true;
-
-					limit = false;
+					if (!up)
+					{
+						seeds.emplace_back(px, y + 1);
+						up = true;
+					}
 				}
-			if (limit)     break;
+				else
+					up = false;
+
+				if (paintable(px, y - 1))
+				{
+					if (!dn)
+					{
+						seeds.emplace_back(px, y - 1);
+						dn = true;
+					}
+				}
+				else
+					dn = false;
+
+				continue;
+			}
+
+			// drop one seed per paintable run of the adjacent rows
+			if (paintable(px, y + 1))
+			{
+				if (!up)
+				{
+					seeds.emplace_back(px, y + 1);
+					up = true;
+				}
+			}
+			else
+				up = false;
+
+			if (paintable(px, y - 1))
+			{
+				if (!dn)
+				{
+					seeds.emplace_back(px, y - 1);
+					dn = true;
+				}
+			}
+			else
+				dn = false;
 		}
+	}
+
+	if (!budget)
+		logerror("HD63484 '%s': PAINT dot budget exhausted, fill aborted\n", tag());
+
+	m_cpx = pe_x;
+	m_cpy = pe_y;
+
+	return rows;
 }
 
 uint16_t hd63484_device::command_rpr_exec()
@@ -935,6 +1248,21 @@ uint16_t hd63484_device::command_rpr_exec()
 			return (m_rwp_dn << 14) | ((m_rwp[m_rwp_dn] >> 12) & 0xff);
 		case 0x0d: // Read Write Pointer L
 			return (m_rwp[m_rwp_dn] & 0x0fff) << 4;
+		case 0x10: // Drawing Pointer H
+		case 0x11: // Drawing Pointer L
+		{
+			uint32_t offset = 0;
+			uint8_t bit_pos = 0;
+			calc_offset(m_cpx, m_cpy, offset, bit_pos);
+			if ((m_cr & 0x1f) == 0x10)
+				return (m_org_dn << 14) | ((offset >> 12) & 0xff);
+			else
+				return ((offset & 0x0fff) << 4) | ((bit_pos / get_bpp()) & 0x0f);
+		}
+		case 0x12: // Current Pointer X
+			return m_cpx;
+		case 0x13: // Current Pointer Y
+			return m_cpy;
 		default:
 			if(LOG) logerror("Read %sx\n", wpr_regnames[m_cr & 0x1f]);
 			return 0;
@@ -1016,7 +1344,7 @@ void hd63484_device::command_clr_exec()
 		for(int16_t d0=0; d0!=ax+d0_inc; d0+=d0_inc)
 		{
 			uint32_t offset = m_rwp[m_rwp_dn] - d1 * m_mwr[m_rwp_dn] + d0;
-			uint16_t data = readword(offset);
+			uint16_t data = readword(offset, m_rwp_dn);
 			uint16_t res = 0;
 
 			if (BIT(m_cr, 10))
@@ -1040,7 +1368,7 @@ void hd63484_device::command_clr_exec()
 			else
 				res = d;
 
-			writeword(offset, res);
+			writeword(offset, res, m_rwp_dn);
 		}
 	}
 
@@ -1058,7 +1386,7 @@ bool hd63484_device::command_dma_write_exec(uint16_t data, bool modify)
 
 	if (modify)
 	{
-		uint16_t const fb = readword(offset);
+		uint16_t const fb = readword(offset, m_rwp_dn);
 		switch (m_cr & 0x03)
 		{
 			case 0: // replace
@@ -1076,7 +1404,7 @@ bool hd63484_device::command_dma_write_exec(uint16_t data, bool modify)
 		}
 	}
 
-	writeword(offset, data);
+	writeword(offset, data, m_rwp_dn);
 
 	if (m_dma_d0 != ax)
 	{
@@ -1135,8 +1463,8 @@ void hd63484_device::command_cpy_exec()
 			else
 				dst_offset = m_rwp[m_rwp_dn] + dd0 - dd1 * m_mwr[m_rwp_dn];
 
-			uint16_t src_data = readword(src_offset);
-			uint16_t dst_data = readword(dst_offset);
+			uint16_t src_data = readword(src_offset, m_rwp_dn);
+			uint16_t dst_data = readword(dst_offset, m_rwp_dn);
 
 			if (BIT(m_cr, 12))
 			{
@@ -1159,7 +1487,7 @@ void hd63484_device::command_cpy_exec()
 			else
 				dst_data = src_data;
 
-			writeword(dst_offset, dst_data);
+			writeword(dst_offset, dst_data, m_rwp_dn);
 		}
 	}
 
@@ -1203,13 +1531,16 @@ void hd63484_device::command_rct_exec()
 	*/
 
 	/* 0 -> 1 */
-	draw_line(m_cpx, m_cpy, dX, m_cpy);
+	if (draw_line(m_cpx, m_cpy, dX, m_cpy))
+		return;
 
 	/* 1 -> 2 */
-	draw_line(dX, m_cpy, dX, dY);
+	if (draw_line(dX, m_cpy, dX, dY))
+		return;
 
 	/* 2 -> 3 */
-	draw_line(dX, dY, m_cpx, dY);
+	if (draw_line(dX, dY, m_cpx, dY))
+		return;
 
 	/* 3 -> 4 */
 	draw_line(m_cpx, dY, m_cpx, m_cpy);
@@ -1254,10 +1585,13 @@ void hd63484_device::command_gcpy_exec()
 			else
 				color = get_dot(Xs + sd0, Ys + sd1);
 
+			bool stop;
 			if (BIT(dsd, 2))
-				set_dot(m_cpx + dd1, m_cpy + dd0, color);
+				stop = set_dot(m_cpx + dd1, m_cpy + dd0, color);
 			else
-				set_dot(m_cpx + dd0, m_cpy + dd1, color);
+				stop = set_dot(m_cpx + dd0, m_cpy + dd1, color);
+			if (stop)
+				return;
 		}
 	}
 
@@ -1285,7 +1619,10 @@ void hd63484_device::command_frct_exec()
 	for(int16_t d1=0; d1!=Y+d1_inc; d1+=d1_inc)
 	{
 		for(int16_t d0=0; d0!=X+d0_inc; d0+=d0_inc)
-			set_dot(m_cpx + d0, m_cpy + d1, d0, d1);
+		{
+			if (set_dot(m_cpx + d0, m_cpy + d1, d0, d1))
+				return;
+		}
 	}
 
 	m_cpy += (Y + d1_inc);
@@ -1323,7 +1660,8 @@ void hd63484_device::command_ptn_exec()
 
 		for(int16_t d0=0; d0!=szx+1; d0++)
 		{
-			set_dot(m_cpx + px, m_cpy + py, d0, d1);
+			if (set_dot(m_cpx + px, m_cpy + py, d0, d1))
+				return;
 
 			switch (sl_sd)
 			{
@@ -1388,7 +1726,8 @@ void hd63484_device::command_plg_exec()
 			ey = (int16_t)m_pr[1 + i * 2 + 1];
 		}
 
-		draw_line(sx, sy, ex, ey);
+		if (draw_line(sx, sy, ex, ey))
+			break;
 
 		sx = ex;
 		sy = ey;
@@ -1465,6 +1804,40 @@ void hd63484_device::command_earc_exec()
 	m_cpy = ye;
 }
 
+// DREQ is re-evaluated only at bus-level boundaries, where no command decode
+// is in flight: with CDM set (command/parameter DMA) it requests while the
+// write FIFO has word space; with DDM set (data DMA) it requests while a DMA
+// read has data in the read FIFO, or while an in-progress DWT/DMOD can take
+// a data word. With neither mode enabled it never asserts. DRC only shapes
+// the DREQ pulses on the pin, which a level callback abstracts.
+void hd63484_device::update_dreq()
+{
+	uint8_t state = 0;
+
+	if (BIT(m_ccr, 12)) // CDM
+	{
+		if (m_fifo_ptr <= 13)
+			state = 1;
+	}
+	else if (BIT(m_ccr, 13)) // DDM
+	{
+		if (m_fifo_r_ptr >= 1)
+			state = 1;
+		else if (!(m_sr & HD63484_SR_CED) && !m_busy)
+		{
+			int const cmd = translate_command(m_cr);
+			if ((cmd == COMMAND_DWT || cmd == COMMAND_DMOD) && m_fifo_ptr <= 13)
+				state = 1;
+		}
+	}
+
+	if (state != m_dreq_state)
+	{
+		m_dreq_state = state;
+		m_dreq_cb(state);
+	}
+}
+
 void hd63484_device::process_fifo()
 {
 	uint8_t data;
@@ -1478,6 +1851,7 @@ void hd63484_device::process_fifo()
 		m_cr |= data & 0xff;
 		m_param_ptr = 0;
 		m_sr &= ~HD63484_SR_CED;
+		update_irq();
 	}
 	else
 	{
@@ -1487,13 +1861,16 @@ void hd63484_device::process_fifo()
 		m_param_ptr++;
 	}
 
+	m_dot_count = 0;
+	int const opm_p = ((m_cr & 0x07) < 4) ? 4 : 6;
+
 	switch (translate_command(m_cr))
 	{
 		case COMMAND_INVALID:
 			if (CMD_LOG)    logerror("HD63484 '%s': <invalid %04x>\n", tag(), m_cr);
 			logerror("HD63484 '%s' Invalid Command Byte %02x\n", tag(), m_cr);
 			m_sr |= HD63484_SR_CER; // command error
-			command_end_seq();
+			command_end_seq(0);
 			break;
 
 		case COMMAND_ORG:
@@ -1504,7 +1881,7 @@ void hd63484_device::process_fifo()
 				m_org_dpa = ((m_pr[0] & 0xff) << 12) | ((m_pr[1] & 0xfff0) >> 4);
 				m_org_dpd = (m_pr[1] & 0xf);
 				m_cpx = m_cpy = 0;
-				command_end_seq();
+				command_end_seq(8);
 			}
 			break;
 
@@ -1513,7 +1890,7 @@ void hd63484_device::process_fifo()
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': WPR (%d) 0x%04x\n", tag(), m_cr & 0x1f, m_pr[0]);
 				command_wpr_exec();
-				command_end_seq();
+				command_end_seq(6);
 			}
 			break;
 
@@ -1521,10 +1898,12 @@ void hd63484_device::process_fifo()
 			if (m_param_ptr == 0)
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': RPR (%d)\n", tag(), m_cr & 0x1f);
+				m_sr &= ~HD63484_SR_ARD;
+				update_irq();
 				uint16_t data = command_rpr_exec();
 				queue_r((data >> 8) & 0xff);
 				queue_r((data >> 0) & 0xff);
-				command_end_seq();
+				command_end_seq(6);
 			}
 			break;
 
@@ -1549,7 +1928,7 @@ void hd63484_device::process_fifo()
 				}
 
 				if (CMD_LOG)    logerror("\n");
-				command_end_seq();
+				command_end_seq(4 * m_dn + 8);
 			}
 			break;
 
@@ -1557,17 +1936,26 @@ void hd63484_device::process_fifo()
 			if(m_param_ptr == 1)
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': RPTN (%d) %d\n", tag(), m_cr & 0x0f, m_pr[0]);
-				command_end_seq();
-				fatalerror("HD63484 COMMAND_RPTN!\n");
+				m_dn = m_pr[0]; // number of words to read
+				m_dma_d0 = 0;
+
+				if (m_dn)
+				{
+					m_stream = STREAM_RPTN;
+					stream_fill();
+				}
+				else
+					command_end_seq(10);
 			}
 			break;
 
 		case COMMAND_DRD:
 			if (m_param_ptr == 2)
 			{
-				if (CMD_LOG)    logerror("HD63484 '%s': DRD %d, %d\n", tag(), m_pr[0], m_pr[1]);
-				command_end_seq();
-				fatalerror("HD63484 COMMAND_DRD!\n");
+				if (CMD_LOG)    logerror("HD63484 '%s': DRD %d, %d\n", tag(), (int16_t)m_pr[0], (int16_t)m_pr[1]);
+				m_dma_d0 = m_dma_d1 = 0;
+				m_stream = STREAM_DRD;
+				stream_fill();
 			}
 			break;
 
@@ -1582,7 +1970,17 @@ void hd63484_device::process_fifo()
 				// data words follow the parameters, written by CPU
 				m_param_ptr = 2;
 				if (command_dma_write_exec(m_pr[2], false))
-					command_end_seq();
+				{
+					uint32_t const x = abs((int16_t)m_pr[0]) + 1;
+					uint32_t const yc = abs((int16_t)m_pr[1]) + 1;
+					command_end_seq((4 * x + 8) * yc + 16 * ((x * yc + 7) / 8) + 34);
+
+					if (BIT(m_ccr, 13)) // data DMA transfer complete
+					{
+						m_done_cb(1);
+						m_done_cb(0);
+					}
+				}
 			}
 			break;
 
@@ -1597,7 +1995,17 @@ void hd63484_device::process_fifo()
 				// as DWT, each data word is combined with the frame buffer under MASK
 				m_param_ptr = 2;
 				if (command_dma_write_exec(m_pr[2], true))
-					command_end_seq();
+				{
+					uint32_t const x = abs((int16_t)m_pr[0]) + 1;
+					uint32_t const yc = abs((int16_t)m_pr[1]) + 1;
+					command_end_seq((4 * x + 8) * yc + 16 * ((x * yc + 7) / 8) + 34);
+
+					if (BIT(m_ccr, 13)) // data DMA transfer complete
+					{
+						m_done_cb(1);
+						m_done_cb(0);
+					}
+				}
 			}
 			break;
 
@@ -1605,12 +2013,12 @@ void hd63484_device::process_fifo()
 			if (m_param_ptr == 0)
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': RD\n", tag());
-				uint16_t data = readword(m_rwp[m_rwp_dn]);
+				uint16_t data = readword(m_rwp[m_rwp_dn], m_rwp_dn);
 				queue_r((data >> 8) & 0xff);
 				queue_r((data >> 0) & 0xff);
 				m_rwp[m_rwp_dn]+=1;
 				m_rwp[m_rwp_dn]&=0xfffff;
-				command_end_seq();
+				command_end_seq(12);
 			}
 			break;
 
@@ -1618,10 +2026,10 @@ void hd63484_device::process_fifo()
 			if (m_param_ptr == 1)
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': WT 0x%04x\n", tag(), m_pr[0]);
-				writeword(m_rwp[m_rwp_dn], m_pr[0]);
+				writeword(m_rwp[m_rwp_dn], m_pr[0], m_rwp_dn);
 				m_rwp[m_rwp_dn]+=1;
 				m_rwp[m_rwp_dn]&=0xfffff;
-				command_end_seq();
+				command_end_seq(8);
 			}
 			break;
 
@@ -1630,7 +2038,7 @@ void hd63484_device::process_fifo()
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': MOD (%d) 0x%04x\n", tag(), m_cr & 0x03, m_pr[0]);
 				uint16_t d = m_pr[0];
-				uint16_t data = readword(m_rwp[m_rwp_dn]);
+				uint16_t data = readword(m_rwp[m_rwp_dn], m_rwp_dn);
 				uint16_t res = 0;
 
 				switch(m_cr & 0x03)
@@ -1649,8 +2057,8 @@ void hd63484_device::process_fifo()
 						break;
 				}
 
-				writeword(m_rwp[m_rwp_dn], res);
-				command_end_seq();
+				writeword(m_rwp[m_rwp_dn], res, m_rwp_dn);
+				command_end_seq(8);
 			}
 			break;
 
@@ -1666,8 +2074,12 @@ void hd63484_device::process_fifo()
 						logerror("HD63484 '%s': CLR 0x%04x, %d, %d\n", tag(), m_pr[0], (int16_t)m_pr[1], (int16_t)m_pr[2]);
 				}
 
-				command_clr_exec();
-				command_end_seq();
+				{
+					uint32_t const x = abs((int16_t)m_pr[1]) + 1;
+					uint32_t const yc = abs((int16_t)m_pr[2]) + 1;
+					command_clr_exec();
+					command_end_seq(BIT(m_cr, 10) ? ((4 * x + 6) * yc + 12) : ((2 * x + 8) * yc + 12));
+				}
 			}
 			break;
 
@@ -1683,8 +2095,13 @@ void hd63484_device::process_fifo()
 						logerror("HD63484 '%s': CPY (%d, %d) 0x%x, 0x%x, %d, %d\n", tag(), BIT(m_cr, 11), (m_cr >> 8) & 0x07, m_pr[0] & 0xff, (m_pr[1]&0xfff0) >> 4, (int16_t)m_pr[2], (int16_t)m_pr[3]);
 				}
 
-				command_cpy_exec();
-				command_end_seq();
+				{
+					uint8_t const sw = BIT(m_cr, 11);
+					uint32_t const x = abs((int16_t)m_pr[sw ? 3 : 2]) + 1;
+					uint32_t const yc = abs((int16_t)m_pr[sw ? 2 : 3]) + 1;
+					command_cpy_exec();
+					command_end_seq((6 * x + 10) * yc + 12);
+				}
 			}
 			break;
 
@@ -1703,7 +2120,7 @@ void hd63484_device::process_fifo()
 					m_cpx = (int16_t)m_pr[0];
 					m_cpy = (int16_t)m_pr[1];
 				}
-				command_end_seq();
+				command_end_seq(56);
 			}
 			break;
 
@@ -1713,7 +2130,7 @@ void hd63484_device::process_fifo()
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': %cRTC (%d, %d, %d) %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (int16_t)m_pr[0], (int16_t)m_pr[1]);
 				command_rct_exec();
-				command_end_seq();
+				command_end_seq(opm_p * m_dot_count + 54);
 			}
 			break;
 
@@ -1723,7 +2140,7 @@ void hd63484_device::process_fifo()
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': %cLINE (%d, %d, %d) %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (int16_t)m_pr[0], (int16_t)m_pr[1]);
 				command_line_exec();
-				command_end_seq();
+				command_end_seq(opm_p * m_dot_count + 18);
 			}
 			break;
 
@@ -1745,7 +2162,7 @@ void hd63484_device::process_fifo()
 				}
 
 				command_plg_exec();
-				command_end_seq();
+				command_end_seq(opm_p * m_dot_count + 16 * m_dn + ((m_cr & 0x2000) ? 20 : 8));
 			}
 			break;
 
@@ -1755,7 +2172,7 @@ void hd63484_device::process_fifo()
 				if (CMD_LOG)    logerror("HD63484 '%s': CRCL (%d, %d, %d, %d) %d\n", tag(), BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0]);
 				uint16_t r = m_pr[0] & 0x1fff;
 				draw_ellipse(m_cpx, m_cpy, r, r, 0.0, 2.0 * std::numbers::pi, BIT(m_cr, 8));
-				command_end_seq();
+				command_end_seq(8 * m_dot_count + 66);
 			}
 			break;
 
@@ -1763,10 +2180,10 @@ void hd63484_device::process_fifo()
 			if(m_param_ptr == 3)
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': ELPS (%d, %d, %d, %d) %d, %d, %d\n", tag(), BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0], m_pr[1], m_pr[2]);
-				double dx = (double)m_pr[3];
+				double dx = (double)m_pr[2];
 				double dy = sqrt(pow(dx, 2) / ((double)m_pr[0] / m_pr[1]));
 				draw_ellipse(m_cpx, m_cpy, dx, dy, 0.0, 2.0 * std::numbers::pi, BIT(m_cr, 8));
-				command_end_seq();
+				command_end_seq(10 * m_dot_count + 90);
 			}
 			break;
 
@@ -1776,7 +2193,7 @@ void hd63484_device::process_fifo()
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': %cARC (%d, %d, %d, %d) %d, %d, %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (int16_t)m_pr[0], (int16_t)m_pr[1], (int16_t)m_pr[2], (int16_t)m_pr[3]);
 				command_arc_exec();
-				command_end_seq();
+				command_end_seq(8 * m_dot_count + 18);
 			}
 			break;
 
@@ -1786,7 +2203,7 @@ void hd63484_device::process_fifo()
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': %cEARC (%d, %d, %d, %d) %d, %d, %d, %d, %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0], m_pr[1], m_pr[2], m_pr[3], m_pr[4], m_pr[5]);
 				command_earc_exec();
-				command_end_seq();
+				command_end_seq(10 * m_dot_count + 96);
 			}
 			break;
 
@@ -1796,8 +2213,11 @@ void hd63484_device::process_fifo()
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': %cFRCT (%d, %d, %d) %d, %d\n", tag(), BIT(m_cr, 10) ? 'R' : 'A', (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (int16_t)m_pr[0], (int16_t)m_pr[1]);
 
-				command_frct_exec();
-				command_end_seq();
+				{
+					uint32_t const rows = abs(BIT(m_cr, 10) ? (int16_t)m_pr[1] : (int16_t)(m_pr[1] - m_cpy)) + 1;
+					command_frct_exec();
+					command_end_seq(opm_p * m_dot_count + 8 * rows + 18);
+				}
 			}
 			break;
 
@@ -1805,8 +2225,11 @@ void hd63484_device::process_fifo()
 			if (m_param_ptr == 0)
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': PAINT (%d, %d, %d, %d)\n", tag(), BIT(m_cr, 8), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07);
-				paint(m_cpx, m_cpy);
-				command_end_seq();
+				{
+					uint32_t const rows = paint(m_cpx, m_cpy);
+					uint32_t const cycles = 18 * m_dot_count + 102 * rows;
+					command_end_seq(cycles > 58 ? cycles - 58 : cycles);
+				}
 			}
 			break;
 
@@ -1815,7 +2238,7 @@ void hd63484_device::process_fifo()
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': DOT (%d, %d, %d)\n", tag(), (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07);
 				set_dot(m_cpx, m_cpy, 0, 0);
-				command_end_seq();
+				command_end_seq(8);
 			}
 			break;
 
@@ -1823,8 +2246,11 @@ void hd63484_device::process_fifo()
 			if (m_param_ptr == 1)
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': PTN (%d, %d, %d, %d, %d) 0x%04x\n", tag(), (m_cr >> 11) & 0x01, (m_cr >> 8) & 0x07, (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, m_pr[0]);
-				command_ptn_exec();
-				command_end_seq();
+				{
+					uint32_t const rows = ((m_pr[0] >> 8) & 0xff) + 1;
+					command_ptn_exec();
+					command_end_seq(opm_p * m_dot_count + 10 * rows + 20);
+				}
 			}
 			break;
 
@@ -1834,8 +2260,11 @@ void hd63484_device::process_fifo()
 			{
 				if (CMD_LOG)    logerror("HD63484 '%s': %cGCPY (%d, %d, %d, %d, %d) %d, %d, %d, %d\n", tag(), BIT(m_cr, 12) ? 'R' : 'A', (m_cr >> 11) & 0x01, (m_cr >> 8) & 0x07, (m_cr >> 5) & 0x07, (m_cr >> 3) & 0x03, (m_cr >> 0) & 0x07, (int16_t)m_pr[0], (int16_t)m_pr[1], (int16_t)m_pr[2], (int16_t)m_pr[3]);
 
-				command_gcpy_exec();
-				command_end_seq();
+				{
+					uint32_t const rows = abs((int16_t)m_pr[BIT(m_cr, 11) ? 2 : 3]) + 1;
+					command_gcpy_exec();
+					command_end_seq((opm_p + 2) * m_dot_count + 10 * rows + 70);
+				}
 			}
 			break;
 
@@ -1847,9 +2276,94 @@ void hd63484_device::process_fifo()
 
 void hd63484_device::exec_abort_sequence()
 {
+	m_busy = false;
+	m_cmd_timer->adjust(attotime::never);
+	m_stream = STREAM_NONE;
 	fifo_w_clear();
 	fifo_r_clear();
 	m_sr = HD63484_SR_WFR | HD63484_SR_WFE | HD63484_SR_CED; // hard-set to 0x23
+
+	update_irq();
+	update_dreq();
+}
+
+// DMA acknowledged data port: the FIFOs are selected regardless of the
+// address register contents
+uint16_t hd63484_device::dack_r()
+{
+	uint16_t const res = (m_fifo_r[0] << 8) | m_fifo_r[1];
+	if (!machine().side_effects_disabled())
+	{
+		uint8_t data;
+
+		dequeue_r(&data);
+		dequeue_r(&data);
+		update_dreq();
+	}
+	return res;
+}
+
+void hd63484_device::dack_w(uint16_t data)
+{
+	queue_w((data >> 8) & 0xff);
+	queue_w(data & 0xff);
+	if (!BIT(m_ccr, 14) && !m_busy)
+		process_fifo();
+	update_dreq();
+}
+
+// DONE input: terminates DMA transfer, resetting CDM (and data DMA mode)
+void hd63484_device::done_w(int state)
+{
+	if (state)
+	{
+		m_ccr &= ~0x3000;
+		update_dreq();
+	}
+}
+
+void hd63484_device::lpstb_w(int state)
+{
+	if (state && !m_lpstb_state)
+	{
+		// latch the display refresh address of the background screen under the
+		// beam (approximation: reconstructed from the beam coordinates)
+		int const ppmc = get_ppmc();
+		int col = screen().hpos() / ppmc - (m_hsw + m_hds + m_external_skew);
+		if (col < 0)
+			col = 0;
+
+		int const y = screen().vpos();
+		int const l0 = m_vds + (BIT(m_dcr, 13) ? m_sp[0] : 0);
+		int const l1 = l0 + m_sp[1];
+		int const l2 = l1 + (BIT(m_dcr, 11) ? m_sp[2] : 0);
+
+		int layer = 1;
+		int row = 0;
+		if (BIT(m_dcr, 13) && y >= m_vds && y < l0)
+		{
+			layer = 0;
+			row = y - m_vds;
+		}
+		else if (y >= l0 && y < l1)
+		{
+			layer = 1;
+			row = (y - l0) / (m_vzf + 1);
+		}
+		else if (BIT(m_dcr, 11) && y >= l1 && y < l2)
+		{
+			layer = 2;
+			row = y - l1;
+		}
+
+		m_lpar = (m_sar[layer] + row * m_mwr[layer] + col) & 0xfffff;
+		m_lpar_chr = m_mwr_chr[layer];
+
+		m_sr |= HD63484_SR_LPD;
+		update_irq();
+	}
+
+	m_lpstb_state = state;
 }
 
 uint16_t hd63484_device::video_registers_r(int offset)
@@ -1864,6 +2378,19 @@ uint16_t hd63484_device::video_registers_r(int offset)
 
 		case 0x80:
 			res = screen().vpos() & 0xfff; // Raster Count
+			break;
+
+		case 0xec: // Light Pen Address high
+			res = (m_lpar_chr << 7) | ((m_lpar >> 16) & 0x0f);
+			break;
+
+		case 0xee: // Light Pen Address low; reading it ends the latch sequence
+			res = m_lpar & 0xffff;
+			if (!machine().side_effects_disabled())
+			{
+				m_sr &= ~HD63484_SR_LPD;
+				update_irq();
+			}
 			break;
 
 		default:
@@ -1886,7 +2413,9 @@ void hd63484_device::video_registers_w(int offset)
 			queue_w((vreg_data & 0xff00) >> 8);
 			queue_w((vreg_data & 0x00ff) >> 0);
 			if(FIFO_LOG) logerror("%s -> %04x\n",acrtc_regnames[m_ar/2],vreg_data);
-			process_fifo();
+			if (!BIT(m_ccr, 14) && !m_busy)
+				process_fifo();
+			update_dreq();
 			break;
 
 		case 0x02: // Command Entry
@@ -1901,7 +2430,18 @@ void hd63484_device::video_registers_w(int offset)
 			---- -xxx ---- ---- Graphic Bit Mode (bpp)
 			---- ---- xxxx xxxx irq mask, directly correlated to sr
 			*/
-			m_ccr = vreg_data;
+			{
+				bool const resume = BIT(m_ccr, 14) && !BIT(vreg_data, 14) && !(vreg_data & 0x8000);
+				m_ccr = vreg_data;
+				update_irq();
+
+				// leaving pause: process everything accumulated in the write FIFO
+				if (resume)
+					while (!m_busy && m_fifo_ptr >= 1)
+						process_fifo();
+
+				update_dreq();
+			}
 			break;
 
 		case 0x04:
@@ -1951,6 +2491,11 @@ void hd63484_device::video_registers_w(int offset)
 			m_sp[2] = vreg_data & 0x0fff;
 			recompute_parameters();
 			break;
+		case 0xea: // Zoom Factor Register
+			m_hzf = (vreg_data >> 12) & 0x0f;
+			m_vzf = (vreg_data >> 8) & 0x0f;
+			break;
+
 		case 0x94: // Vertical Window Register A
 			m_vws = (vreg_data & 0xfff) + 1;
 			recompute_parameters();
@@ -1958,6 +2503,51 @@ void hd63484_device::video_registers_w(int offset)
 		case 0x96: // Vertical Window Register B
 			m_vww = (vreg_data & 0xfff);
 			recompute_parameters();
+			break;
+
+		case 0x90: // Blink Control Register
+			m_bon[0] = (vreg_data >> 12) & 0x0f;
+			m_boff[0] = (vreg_data >> 8) & 0x0f;
+			m_bon[1] = (vreg_data >> 4) & 0x0f;
+			m_boff[1] = vreg_data & 0x0f;
+			break;
+
+		case 0x98: // Graphic Cursor: X end / X start (memory cycles from HSYNC)
+			m_cxe = (vreg_data >> 8) & 0xff;
+			m_cxs = vreg_data & 0xff;
+			break;
+		case 0x9a: // Graphic Cursor: Y start (rasters from VSYNC)
+			m_cys = vreg_data & 0xfff;
+			break;
+		case 0x9c: // Graphic Cursor: Y end
+			m_cye = vreg_data & 0xfff;
+			break;
+
+		case 0xe0: // Block Cursor address
+		case 0xe4:
+			m_bca[(offset >> 2) & 1] = vreg_data;
+			break;
+		case 0xe2: // Block Cursor width / start / end raster
+		case 0xe6:
+			m_bcw[(offset >> 2) & 1] = (vreg_data >> 13) & 0x07;
+			m_bcsr[(offset >> 2) & 1] = (vreg_data >> 8) & 0x1f;
+			m_bcer[(offset >> 2) & 1] = vreg_data & 0x1f;
+			break;
+
+		case 0xe8: // Cursor Definition Register
+			m_cm = (vreg_data >> 14) & 0x03;
+			m_con[0] = (vreg_data >> 11) & 0x07;
+			m_coff[0] = (vreg_data >> 8) & 0x07;
+			m_con[1] = (vreg_data >> 3) & 0x07;
+			m_coff[1] = vreg_data & 0x07;
+			break;
+
+		case 0xc0: // Raster Address Register
+		case 0xc8:
+		case 0xd0:
+		case 0xd8:
+			m_lra[(offset & 0x18) >> 3] = (vreg_data >> 8) & 0x1f;
+			m_fra[(offset & 0x18) >> 3] = vreg_data & 0x1f;
 			break;
 
 		case 0xc2: // Memory Width Register
@@ -1998,17 +2588,21 @@ uint16_t hd63484_device::read16(offs_t offset)
 
 		if(m_ar == 0) // FIFO read
 		{
-			uint8_t data;
+			res = (m_fifo_r[0] << 8) | m_fifo_r[1];
+			if (!machine().side_effects_disabled())
+			{
+				uint8_t data;
 
-			dequeue_r(&data);
-			res = (data & 0xff) << 8;
-			dequeue_r(&data);
-			res |= data & 0xff;
+				dequeue_r(&data);
+				dequeue_r(&data);
+				update_dreq();
+			}
 		}
 		else
 			res = video_registers_r(m_ar);
 
-		inc_ar(2);
+		if (!machine().side_effects_disabled())
+			inc_ar(2);
 
 		return res;
 	}
@@ -2047,11 +2641,19 @@ uint8_t hd63484_device::read8(offs_t offset)
 		uint8_t res = 0xff;
 
 		if(m_ar < 2) // FIFO read
-			dequeue_r(&res);
+		{
+			res = m_fifo_r[0];
+			if (!machine().side_effects_disabled())
+			{
+				dequeue_r(&res);
+				update_dreq();
+			}
+		}
 		else
 			res = video_registers_r(m_ar & 0xfe) >> (m_ar & 1 ? 0 : 8);
 
-		inc_ar(1);
+		if (!machine().side_effects_disabled())
+			inc_ar(1);
 
 		return res;
 	}
@@ -2072,8 +2674,11 @@ void hd63484_device::write8(offs_t offset, uint8_t data)
 		if(m_ar < 2) // FIFO write
 		{
 			queue_w(data);
-			if (m_ar & 1)
+			if ((m_ar & 1) && !BIT(m_ccr, 14) && !m_busy)
+			{
 				process_fifo();
+				update_dreq();
+			}
 
 			m_ar ^= 1;
 		}
@@ -2092,6 +2697,11 @@ void hd63484_device::write8(offs_t offset, uint8_t data)
 void hd63484_device::device_start()
 {
 	m_display_cb.resolve();
+	m_character_cb.resolve();
+
+	m_char_space = has_configured_map(AS_CHARACTER) ? &space(AS_CHARACTER) : nullptr;
+
+	m_cmd_timer = timer_alloc(FUNC(hd63484_device::cmd_exec_tick), this);
 
 	register_save_state();
 }
@@ -2122,6 +2732,16 @@ void hd63484_device::device_reset()
 	m_cpx = m_cpy = 0;
 	m_dn = 0;
 	m_dma_d0 = m_dma_d1 = 0;
+	m_stream = STREAM_NONE;
+	m_irq_state = 0;
+	m_hzf = m_vzf = 0;
+	m_lpstb_state = 0;
+	m_lpar = 0;
+	m_lpar_chr = 0;
+	m_busy = false;
+	m_dot_count = 0;
+	m_cmd_timer->adjust(attotime::never);
+	m_dreq_state = 0;
 
 	memset(m_vreg, 0, sizeof(m_vreg));
 	memset(m_fifo, 0, sizeof(m_fifo));
@@ -2130,6 +2750,17 @@ void hd63484_device::device_reset()
 	memset(m_rwp, 0, sizeof(m_rwp));
 	memset(m_mwr, 0, sizeof(m_mwr));
 	memset(m_mwr_chr, 0, sizeof(m_mwr_chr));
+	memset(m_fra, 0, sizeof(m_fra));
+	memset(m_lra, 0, sizeof(m_lra));
+	memset(m_bca, 0, sizeof(m_bca));
+	memset(m_bcw, 0, sizeof(m_bcw));
+	memset(m_bcsr, 0, sizeof(m_bcsr));
+	memset(m_bcer, 0, sizeof(m_bcer));
+	m_cm = 0;
+	m_con[0] = m_con[1] = m_coff[0] = m_coff[1] = 0;
+	m_bon[0] = m_bon[1] = m_boff[0] = m_boff[1] = 0;
+	m_cxs = m_cxe = 0;
+	m_cys = m_cye = 0;
 	memset(m_sar, 0, sizeof(m_sar));
 	memset(m_sda, 0, sizeof(m_sda));
 	memset(m_pram, 0, sizeof(m_pram));
@@ -2144,7 +2775,12 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 	int bpp = get_bpp();
 	int ppw = 16 / bpp;
 	uint32_t mask = (1 << bpp) - 1;
-	uint32_t base_offs = m_sar[layer_n] + (y - vs) * m_mwr[layer_n] + m_external_skew;
+	// zooming applies to the base screen only: the same raster is scanned
+	// (VZF+1) times and the same display address is output (HZF+1) times
+	int row = (layer_n == 1) ? (y - vs) / (m_vzf + 1) : (y - vs);
+	int const hzoom = (layer_n == 1) ? m_hzf + 1 : 1;
+	int hcnt = 0;
+	uint32_t base_offs = m_sar[layer_n] + row * m_mwr[layer_n] + m_external_skew;
 	uint32_t wind_offs = m_sar[3] + (y - m_vws) * m_mwr[3] + m_external_skew;
 	int step = (m_omr & 0x08) ? 2 : 1;
 	int ppmc = get_ppmc();
@@ -2165,32 +2801,211 @@ void hd63484_device::draw_graphics_line(bitmap_ind16 &bitmap, const rectangle &c
 			wind_offs++;
 	}
 
-	for(int x=cliprect.left(); x<=cliprect.right(); x+=ppw)
+	// start dot address: the screen's display is shifted left by SDA dots for
+	// horizontal smooth scroll (on hardware SDA is output as the HSD video
+	// attribute to condition the external shift register load). WSS in the
+	// OMR selects whether the shift applies to the window or the background
+	// screens on this raster.
+	bool const wss = BIT(m_omr, 12);
+	int const sda_bg = wss ? 0 : (m_sda[layer_n] & (ppw - 1));
+	int const sda_win = wss ? (m_sda[3] & (ppw - 1)) : 0;
+
+	if (!sda_bg && !sda_win)
 	{
-		uint16_t data = 0;
-		int screen_n = layer_n;
-
-		if (ins_window && x >= ws * ppmc && x < (ws + m_hww) * ppmc)
+		for(int x=cliprect.left(); x<=cliprect.right(); x+=ppw)
 		{
-			data = readword(wind_offs);
-			wind_offs++;
-			screen_n = 3;
-		}
-		else if (active)
-			data = readword(base_offs);
+			uint16_t data = 0;
+			int screen_n = layer_n;
 
-		for (int b=0; b<ppw; b++)
+			if (ins_window && x >= ws * ppmc && x < (ws + m_hww) * ppmc)
+			{
+				data = readword(wind_offs, 3);
+				wind_offs++;
+				screen_n = 3;
+			}
+			else if (active)
+				data = readword(base_offs, layer_n);
+
+			for (int b=0; b<ppw; b++)
+			{
+				int px = x + b;
+				if (!m_display_cb.isnull())
+					m_display_cb(bitmap, cliprect, y, px, data & mask, screen_n);
+				else if (cliprect.contains(px, y))
+					bitmap.pix(y, px) = data & mask;
+
+				data >>= bpp;
+			}
+
+			if (++hcnt >= hzoom)
+			{
+				hcnt = 0;
+				base_offs++;
+			}
+		}
+	}
+	else
+	{
+		// one extra word feeds the dots shifted in from the right
+		for(int x=cliprect.left(); x<=cliprect.right() + ppw; x+=ppw)
 		{
-			int px = x + b;
-			if (!m_display_cb.isnull())
-				m_display_cb(bitmap, cliprect, y, px, data & mask, screen_n);
-			else if (cliprect.contains(px, y))
-				bitmap.pix(y, px) = data & mask;
+			uint16_t data = 0;
+			int screen_n = layer_n;
+			int sda = sda_bg;
 
-			data >>= bpp;
+			if (ins_window && x >= ws * ppmc && x < (ws + m_hww) * ppmc)
+			{
+				data = readword(wind_offs, 3);
+				wind_offs++;
+				screen_n = 3;
+				sda = sda_win;
+			}
+			else if (active)
+				data = readword(base_offs, layer_n);
+
+			for (int b=0; b<ppw; b++)
+			{
+				int px = x + b - sda;
+				if (px >= cliprect.left() && px <= cliprect.right())
+				{
+					if (!m_display_cb.isnull())
+						m_display_cb(bitmap, cliprect, y, px, data & mask, screen_n);
+					else if (cliprect.contains(px, y))
+						bitmap.pix(y, px) = data & mask;
+				}
+
+				data >>= bpp;
+			}
+
+			if (++hcnt >= hzoom)
+			{
+				hcnt = 0;
+				base_offs++;
+			}
+		}
+	}
+}
+
+// cursor blink phase from the CDR on/off times (units of 4 field periods;
+// on time 0 means steady off, otherwise off time 0 means steady on)
+bool hd63484_device::cursor_phase(int which)
+{
+	if (m_con[which] == 0)
+		return false;
+	if (m_coff[which] == 0)
+		return true;
+
+	uint32_t const on = 4 * m_con[which] + 4;
+	uint32_t const off = 4 * m_coff[which] + 4;
+	return (screen().frame_number() % (on + off)) < on;
+}
+
+// BLINK1/BLINK2 video attribute phase from the BCR (same encoding, 4-bit)
+bool hd63484_device::blink_state(int which)
+{
+	which &= 1;
+	if (m_bon[which] == 0)
+		return false;
+	if (m_boff[which] == 0)
+		return true;
+
+	uint32_t const on = 4 * m_bon[which] + 4;
+	uint32_t const off = 4 * m_boff[which] + 4;
+	return (screen().frame_number() % (on + off)) < on;
+}
+
+// block cursor raster range, evaluated in character row sequence order so
+// that it follows the FRA..LRA wraparound
+bool hd63484_device::cursor_raster(int which, int layer_n, int raster)
+{
+	uint8_t const idx = (raster - m_fra[layer_n]) & 0x1f;
+	uint8_t const s = (m_bcsr[which] - m_fra[layer_n]) & 0x1f;
+	uint8_t const e = (m_bcer[which] - m_fra[layer_n]) & 0x1f;
+
+	return (s <= e) ? (idx >= s && idx <= e) : (idx >= s || idx <= e);
+}
+
+// graphic (CM=10, CUD1) and crosshair (CM=11, CUD1 horizontal / CUD2
+// vertical element) cursor state at a bitmap position; coordinates are
+// memory cycles from HSYNC and rasters from VSYNC, which match the
+// full-screen bitmap coordinates this device configures
+int hd63484_device::cursor_dot(int x, int y)
+{
+	int const ppmc = get_ppmc();
+	int res = 0;
+
+	if (m_cm == 2)
+	{
+		if (cursor_phase(0) && y >= m_cys && y <= m_cye && x >= m_cxs * ppmc && x < (m_cxe + 1) * ppmc)
+			res |= 1;
+	}
+	else if (m_cm == 3)
+	{
+		if (cursor_phase(0))
+		{
+			if (y >= m_cys && y <= m_cye)
+				res |= 1;
+			if (x >= m_cxs * ppmc && x < (m_cxe + 1) * ppmc)
+				res |= 2;
+		}
+	}
+
+	return res;
+}
+
+//-------------------------------------------------
+//  draw_char_line - character screen scanline:
+//  one character code per memory cycle, rendered
+//  by the board's character generator callback
+//-------------------------------------------------
+
+void hd63484_device::draw_char_line(bitmap_ind16 &bitmap, const rectangle &cliprect, int vs, int y, int layer_n)
+{
+	if (m_character_cb.isnull())
+		return;
+
+	uint8_t const fra = m_fra[layer_n];
+	uint8_t const lra = m_lra[layer_n];
+	uint8_t const sra = m_sda[layer_n] & 0x1f; // SAR low: start raster address for character screens
+	int const height = ((lra - fra) & 0x1f) + 1;        // full row: FRA..LRA with 5-bit wrap
+	int const first = ((lra - sra) & 0x1f) + 1;         // first displayed (partial) row: SRA..LRA
+
+	int const n = y - vs;
+	int row, raster;
+	if (n < first)
+	{
+		row = 0;
+		raster = (sra + n) & 0x1f;
+	}
+	else
+	{
+		row = 1 + (n - first) / height;
+		raster = (fra + (n - first) % height) & 0x1f;
+	}
+
+	int const cellw = get_ppmc();
+	uint32_t addr = (m_sar[layer_n] + row * m_mwr[layer_n]) & 0xffff;
+
+	for (int x = cliprect.left(); x <= cliprect.right(); x += cellw)
+	{
+		uint16_t const code = readword(addr, layer_n);
+
+		// the block cursors exist only on character screens: in block mode
+		// they drive CUD1/CUD2 separately, in graphic cursor mode both are
+		// combined onto CUD2, in crosshair mode they are unused
+		int cursor = 0;
+		if (m_cm < 3)
+		{
+			for (int c = 0; c < 2; c++)
+			{
+				uint16_t const span = uint16_t(addr - m_bca[c]);
+				if (span <= m_bcw[c] && cursor_raster(c, layer_n, raster) && cursor_phase((m_cm == 2) ? 1 : c))
+					cursor |= (m_cm == 2) ? 2 : (1 << c);
+			}
 		}
 
-		base_offs++;
+		m_character_cb(bitmap, cliprect, y, x, cellw, code, raster, layer_n, cursor);
+		addr = (addr + 1) & 0xffff;
 	}
 }
 
@@ -2211,11 +3026,26 @@ uint32_t hd63484_device::update_screen(screen_device &screen, bitmap_ind16 &bitm
 			bool ins_window = BIT(m_dcr, 9) && y >= m_vws && y < m_vws+m_vww;
 
 			if (BIT(m_dcr, 13) && y >= cliprect.top() && y < l0)
-				draw_graphics_line(bitmap, cliprect, cliprect.top(), y, 0, BIT(m_dcr, 12), ins_window);
+			{
+				if (m_mwr_chr[0])
+					draw_char_line(bitmap, cliprect, cliprect.top(), y, 0);
+				else
+					draw_graphics_line(bitmap, cliprect, cliprect.top(), y, 0, BIT(m_dcr, 12), ins_window);
+			}
 			else if (y >= l0 && y < l1)
-				draw_graphics_line(bitmap, cliprect, l0, y, 1, BIT(m_dcr, 14), ins_window);
+			{
+				if (m_mwr_chr[1])
+					draw_char_line(bitmap, cliprect, l0, y, 1);
+				else
+					draw_graphics_line(bitmap, cliprect, l0, y, 1, BIT(m_dcr, 14), ins_window);
+			}
 			else if (BIT(m_dcr, 11) && y >= l1 && y < l2)
-				draw_graphics_line(bitmap, cliprect, l1, y, 2, BIT(m_dcr, 10), ins_window);
+			{
+				if (m_mwr_chr[2])
+					draw_char_line(bitmap, cliprect, l1, y, 2);
+				else
+					draw_graphics_line(bitmap, cliprect, l1, y, 2, BIT(m_dcr, 10), ins_window);
+			}
 		}
 	}
 	return 0;
@@ -2248,10 +3078,35 @@ void hd63484_device::register_save_state()
 	save_item(NAME(m_cpy));
 	save_item(NAME(m_mwr));
 	save_item(NAME(m_mwr_chr));
+	save_item(NAME(m_fra));
+	save_item(NAME(m_lra));
+	save_item(NAME(m_bca));
+	save_item(NAME(m_bcw));
+	save_item(NAME(m_bcsr));
+	save_item(NAME(m_bcer));
+	save_item(NAME(m_cm));
+	save_item(NAME(m_con));
+	save_item(NAME(m_coff));
+	save_item(NAME(m_bon));
+	save_item(NAME(m_boff));
+	save_item(NAME(m_cxs));
+	save_item(NAME(m_cxe));
+	save_item(NAME(m_cys));
+	save_item(NAME(m_cye));
 	save_item(NAME(m_sar));
 	save_item(NAME(m_sda));
 	save_item(NAME(m_pram));
 	save_item(NAME(m_dn));
+	save_item(NAME(m_stream));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_hzf));
+	save_item(NAME(m_vzf));
+	save_item(NAME(m_lpstb_state));
+	save_item(NAME(m_lpar));
+	save_item(NAME(m_lpar_chr));
+	save_item(NAME(m_busy));
+	save_item(NAME(m_dot_count));
+	save_item(NAME(m_dreq_state));
 	save_item(NAME(m_ccr));
 	save_item(NAME(m_omr));
 	save_item(NAME(m_edg));
