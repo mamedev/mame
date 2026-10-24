@@ -11,8 +11,13 @@
  * channels at 7000 and four horizontal channels at 8000. Aircraft graphics
  * are selected by C000/D000; the other two channels are bullets.
  *
- * TODO: verify oscillator, raster timing, display offsets and fixed scenery
- * against the PCB. Trace the discrete sound circuit and analog game timer.
+ * The tower is physical screen-overlay artwork, not generated video. Its
+ * collision tests are in the program ROM. The internal layout supplies a
+ * simplified tower based on photographs, not the complete original overlay.
+ *
+ * TODO: verify oscillator, raster timing and display offsets against the PCB.
+ * Trace the discrete sound circuit and analog game timer. Refine artwork
+ * alignment and reproduce the full physical overlay.
  */
 
 #include "emu.h"
@@ -21,6 +26,8 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "spitfire.lh"
 
 namespace {
 
@@ -316,15 +323,6 @@ uint32_t spitfire_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	bitmap.fill(0, cliprect);
 
-	// Placeholder scenery, not a recovered PCB circuit or ROM graphic.
-	// Collision checks guide its location; the top, legs and braces are
-	// unverified drawing choices (MACHINE_IMPERFECT_GRAPHICS).
-	for (int y = std::max(192, cliprect.top()); y <= std::min(255, cliprect.bottom()); y++)
-		for (int x = std::max(288, cliprect.left()); x <= std::min(335, cliprect.right()); x++)
-			if (y < 208 || (x >= 296 && x < 300) || (x >= 324 && x < 328) ||
-				(y >= 208 && ((y - 208) % 24 == (x - 300) || (y - 208) % 24 == (323 - x))))
-				bitmap.pix(y, x) = 1;
-
 	// RAM bits are active-low start strobes. A plane's counters run for
 	// sixteen pixels/lines after its strobe. Bullets use the RAM bits directly.
 	for (int object = 0; object < 4; object++)
@@ -486,5 +484,5 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1976, spitfire,  0,        spitfire, spitfire,  spitfire_state, empty_init, ROT0, "Innovative Coin Corporation", "Spitfire (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1976, spitfirea, spitfire, spitfire, spitfire,  spitfire_state, empty_init, ROT0, "Innovative Coin Corporation", "Spitfire (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1976, spitfire,  0,        spitfire, spitfire,  spitfire_state, empty_init, ROT0, "Innovative Coin Corporation", "Spitfire (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_spitfire )
+GAMEL( 1976, spitfirea, spitfire, spitfire, spitfire,  spitfire_state, empty_init, ROT0, "Innovative Coin Corporation", "Spitfire (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_spitfire )
