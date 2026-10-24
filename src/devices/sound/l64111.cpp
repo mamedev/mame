@@ -81,15 +81,16 @@ l64111_device::l64111_device(const machine_config &mconfig, const char *tag, dev
 	m_reset_pin(false), m_starti_pin(true), m_hdmute_pin(false),
 	m_intr_pending(false),
 	m_intr_state(1), m_femty_state(0), m_fale_state(0), m_falf_state(1), m_starto_state(0),
-	m_fifo{}, m_fifo_read(0), m_fifo_count(0), m_overflow_logged(false),
+	m_overflow_logged(false),
 	m_sys_state(SYS_SCAN), m_sys_shift(0), m_sys_shift_count(0), m_sys_code(0), m_sys_left(0), m_sys_length_bytes(0),
 	m_sys_hdr{}, m_sys_hdr_len(0), m_sys_hdr_need(0), m_pack_count(0),
 	m_frame{}, m_frame_len(0), m_frame_need(0), m_sync_count(0),
 	m_cb{}, m_cb_len{}, m_cb_write(0), m_cb_read(0), m_cb_count(0), m_cb_layer(2),
-	m_anc{}, m_anc_read(0), m_anc_count(0), m_anc_acc(0), m_anc_bits(0), m_anc_overflow(false),
+	m_anc_acc(0), m_anc_bits(0), m_anc_overflow(false),
 	m_decode{}, m_pcm{}, m_pcm_pos(0), m_pcm_count(0), m_pcm_channels(1),
 	m_started(false), m_underrun(false),
-	m_ev_last_frame(false), m_ev_new_frame(false), m_ev_anc_valid(false), m_ev_anc_hff(false), m_ev_anc_overflow(false)
+	m_ev1(0), m_ev2(0),
+	m_fifo_save{}, m_anc_save{}, m_fifo_save_count(0), m_anc_save_count(0)
 {
 }
 
@@ -122,9 +123,8 @@ void l64111_device::device_start()
 	save_item(NAME(m_fale_state));
 	save_item(NAME(m_falf_state));
 	save_item(NAME(m_starto_state));
-	save_item(NAME(m_fifo));
-	save_item(NAME(m_fifo_read));
-	save_item(NAME(m_fifo_count));
+	save_item(NAME(m_fifo_save));
+	save_item(NAME(m_fifo_save_count));
 	save_item(NAME(m_fifo_time));
 	save_item(NAME(m_sys_state));
 	save_item(NAME(m_sys_shift));
@@ -146,9 +146,8 @@ void l64111_device::device_start()
 	save_item(NAME(m_cb_read));
 	save_item(NAME(m_cb_count));
 	save_item(NAME(m_cb_layer));
-	save_item(NAME(m_anc));
-	save_item(NAME(m_anc_read));
-	save_item(NAME(m_anc_count));
+	save_item(NAME(m_anc_save));
+	save_item(NAME(m_anc_save_count));
 	save_item(NAME(m_anc_acc));
 	save_item(NAME(m_anc_bits));
 	save_item(NAME(m_anc_overflow));
@@ -159,11 +158,8 @@ void l64111_device::device_start()
 	save_item(NAME(m_pcm_channels));
 	save_item(NAME(m_started));
 	save_item(NAME(m_underrun));
-	save_item(NAME(m_ev_last_frame));
-	save_item(NAME(m_ev_new_frame));
-	save_item(NAME(m_ev_anc_valid));
-	save_item(NAME(m_ev_anc_hff));
-	save_item(NAME(m_ev_anc_overflow));
+	save_item(NAME(m_ev1));
+	save_item(NAME(m_ev2));
 }
 
 void l64111_device::device_reset()
@@ -176,8 +172,31 @@ void l64111_device::device_reset()
 	m_starto_cb(m_starto_state);
 }
 
+// util::fifo has no save state support: copy the FIFOs out and back
+void l64111_device::device_pre_save()
+{
+	m_fifo_save_count = m_fifo.queue_length();
+	for (u32 i = 0; i < m_fifo_save_count; i++)
+	{
+		m_fifo_save[i] = m_fifo.dequeue();
+		m_fifo.enqueue(m_fifo_save[i]);
+	}
+	m_anc_save_count = m_anc.queue_length();
+	for (u32 i = 0; i < m_anc_save_count; i++)
+	{
+		m_anc_save[i] = m_anc.dequeue();
+		m_anc.enqueue(m_anc_save[i]);
+	}
+}
+
 void l64111_device::device_post_load()
 {
+	m_fifo.clear();
+	for (u32 i = 0; i < std::min<u32>(m_fifo_save_count, FIFO_BYTES); i++)
+		m_fifo.enqueue(m_fifo_save[i]);
+	m_anc.clear();
+	for (u32 i = 0; i < std::min<u32>(m_anc_save_count, ANC_BYTES); i++)
+		m_anc.enqueue(m_anc_save[i]);
 	update_rate();
 	update_poll();
 	m_intr_cb(m_intr_state);
@@ -199,19 +218,20 @@ void l64111_device::chip_reset()
 	std::fill(std::begin(m_pd), std::end(m_pd), 0);
 	std::fill(std::begin(m_pts), std::end(m_pts), 0);
 
-	m_fifo_read = m_fifo_count = 0;
+	m_fifo.clear();
 	m_fifo_time = machine().time();
 	m_flags_timer->adjust(attotime::never);
 	parser_reset();
 	m_cb_write = m_cb_read = m_cb_count = 0;
 	m_cb_layer = 2;
-	m_anc_read = m_anc_count = m_anc_acc = m_anc_bits = 0;
+	m_anc.clear();
+	m_anc_acc = m_anc_bits = 0;
 	m_anc_overflow = false;
-	m_ev_anc_valid = m_ev_anc_hff = m_ev_anc_overflow = false;
+	m_ev1 = m_ev2 = 0;
 	decoder_reset();
 
 	m_intr_pending = false;
-	update_intr();
+	update_irq_state(0, 0);
 	update_outputs();
 	update_poll();
 }
@@ -222,7 +242,7 @@ void l64111_device::decoder_reset()
 	m_started = false;
 	m_underrun = false;
 	m_pcm_pos = m_pcm_count = 0;
-	m_ev_last_frame = m_ev_new_frame = false;
+	m_ev2 &= ~(M2_LAST_FRAME | M2_NEW_FRAME);
 	m_decoder->clear();
 }
 
@@ -313,7 +333,8 @@ void l64111_device::cr1_w(u8 data)
 	m_cr1 = data; // SOFT_RST is never stored; BUF_RST is not cleared by the chip (manual 4.3)
 	if (data & CR1_ANC_RST) // empty the ancillary FIFO, and hold it empty while set
 	{
-		m_anc_read = m_anc_count = m_anc_acc = m_anc_bits = 0;
+		m_anc.clear();
+		m_anc_acc = m_anc_bits = 0;
 		m_anc_overflow = false;
 	}
 	if (data & CR1_BUF_RST) // empty the channel buffer
@@ -363,13 +384,13 @@ u8 l64111_device::status1_r()
 {
 	if (!reg_read_ready())
 		return 0;
-	const u8 v = (m_anc_count ? S1_ANC_VALID : 0x00) | (m_anc_overflow ? S1_ANC_OVRFL : 0x00)
-			| ((m_anc_count >= ANC_BYTES / 2) ? S1_ANC_HFF : 0x00) | (m_status1 & S1_ERR_BUF_OVFL);
+	const u8 v = (!m_anc.empty() ? S1_ANC_VALID : 0x00) | (m_anc_overflow ? S1_ANC_OVRFL : 0x00)
+			| ((m_anc.queue_length() >= ANC_BYTES / 2) ? S1_ANC_HFF : 0x00) | (m_status1 & S1_ERR_BUF_OVFL);
 	if (!machine().side_effects_disabled())
 	{
 		m_status1 = 0;
 		m_intr_pending = false;
-		update_intr();
+		update_irq_state(0, 0);
 	}
 	return v;
 }
@@ -389,7 +410,7 @@ u8 l64111_device::status2_r()
 	{
 		m_status2 = 0;
 		m_intr_pending = false;
-		update_intr();
+		update_irq_state(0, 0);
 	}
 	return v;
 }
@@ -451,16 +472,12 @@ u8 l64111_device::pts_r(offs_t offset)
 
 u8 l64111_device::anc_r()
 {
-	if (!reg_read_ready() || !m_anc_count)
+	if (!reg_read_ready() || m_anc.empty())
 		return 0;
-	const u8 v = m_anc[m_anc_read];
-	if (!machine().side_effects_disabled())
-	{
-		m_anc_read = (m_anc_read + 1) % ANC_BYTES;
-		m_anc_count--;
-		m_anc_overflow = false; // a later overflow interrupts again
-	}
-	return v;
+	if (machine().side_effects_disabled())
+		return m_anc.peek();
+	m_anc_overflow = false; // a later overflow interrupts again
+	return m_anc.dequeue();
 }
 
 // 7-bit counters: a full Layer I buffer (128 frames) reads as 127
@@ -505,15 +522,14 @@ void l64111_device::data_w(u16 data)
 	sync_fifo();
 	auto push = [this] (u8 b)
 	{
-		if (m_fifo_count >= FIFO_BYTES)
+		if (m_fifo.full())
 		{
 			if (!m_overflow_logged) // the FIFO keeps acknowledging writes and drops the data
 				logerror("%s: input FIFO overflow\n", machine().describe_context());
 			m_overflow_logged = true;
 			return;
 		}
-		m_fifo[(m_fifo_read + m_fifo_count) % FIFO_BYTES] = b;
-		m_fifo_count++;
+		m_fifo.enqueue(b);
 	};
 	if (m_cr2 & CR2_SEL_16) // 16-bit data: D[15:8] is the earlier byte of the stream
 		push(data >> 8);
@@ -526,21 +542,21 @@ int l64111_device::femty_r()
 {
 	if (!machine().side_effects_disabled())
 		sync_fifo();
-	return m_fifo_count ? 1 : 0;
+	return m_fifo.empty() ? 0 : 1;
 }
 
 int l64111_device::fale_r()
 {
 	if (!machine().side_effects_disabled())
 		sync_fifo();
-	return (m_fifo_count <= FIFO_FLAG_LEVEL) ? 0 : 1;
+	return (m_fifo.queue_length() <= FIFO_FLAG_LEVEL) ? 0 : 1;
 }
 
 int l64111_device::falf_r()
 {
 	if (!machine().side_effects_disabled())
 		sync_fifo();
-	return (FIFO_BYTES - m_fifo_count <= FIFO_FLAG_LEVEL) ? 0 : 1;
+	return (FIFO_BYTES - m_fifo.queue_length() <= FIFO_FLAG_LEVEL) ? 0 : 1;
 }
 
 int l64111_device::starto_r()
@@ -581,18 +597,20 @@ void l64111_device::hdmute_w(int state)
 //  Interrupts, flags and timing
 //**************************************************************************
 
-void l64111_device::interrupt(bool enabled)
+// Interrupt events, given in Interrupt Mask 1 / 2 bit positions: latch the Status bits they set and
+// assert INTR if their mask bit is set. Status 1 shares Mask 1's positions; Status 2 sits one bit
+// lower than Mask 2, with NEW FRAME OUT and LAST FRAME sharing one Status bit. The ancillary FIFO
+// bits and the SYNC bits are levels, read from the state rather than latched. Reading a status
+// register clears INTR and calls this with no events.
+void l64111_device::update_irq_state(u8 events1, u8 events2)
 {
-	if (enabled)
+	m_status1 |= events1 & S1_ERR_BUF_OVFL;
+	m_status2 |= ((events2 >> 1) & ~(S2_SYNC_AUD | S2_SYNC_SYS)) | ((events2 & M2_LAST_FRAME) ? S2_NEW_LAST_FRAME : 0x00);
+	if ((events1 & m_mask1) || (events2 & m_mask2))
 	{
 		LOGMASKED(LOG_INTR, "interrupt, status %02x / %02x\n", m_status1, m_status2);
 		m_intr_pending = true;
-		update_intr();
 	}
-}
-
-void l64111_device::update_intr()
-{
 	const int state = m_intr_pending ? 0 : 1;
 	if (state != m_intr_state)
 	{
@@ -604,25 +622,27 @@ void l64111_device::update_intr()
 void l64111_device::update_outputs()
 {
 	auto out = [] (int &old, int state, devcb_write_line &cb) { if (state != old) { old = state; cb(state); } };
-	out(m_femty_state, m_fifo_count ? 1 : 0, m_femty_cb);
-	out(m_fale_state, (m_fifo_count <= FIFO_FLAG_LEVEL) ? 0 : 1, m_fale_cb);
-	out(m_falf_state, (FIFO_BYTES - m_fifo_count <= FIFO_FLAG_LEVEL) ? 0 : 1, m_falf_cb);
+	const u32 count = m_fifo.queue_length();
+	out(m_femty_state, count ? 1 : 0, m_femty_cb);
+	out(m_fale_state, (count <= FIFO_FLAG_LEVEL) ? 0 : 1, m_fale_cb);
+	out(m_falf_state, (FIFO_BYTES - count <= FIFO_FLAG_LEVEL) ? 0 : 1, m_falf_cb);
 	out(m_starto_state, starto_r(), m_starto_cb);
 }
 
 // wake when the draining FIFO next crosses a flag threshold, so the flag outputs change on time
 void l64111_device::schedule_flags()
 {
-	if (!m_fifo_count)
+	const u32 count = m_fifo.queue_length();
+	if (!count)
 	{
 		m_flags_timer->adjust(attotime::never);
 		return;
 	}
-	u32 bytes = m_fifo_count; // until FEMPTY
-	if (m_fifo_count > FIFO_FLAG_LEVEL)
-		bytes = m_fifo_count - FIFO_FLAG_LEVEL; // until FALE
-	if (FIFO_BYTES - m_fifo_count <= FIFO_FLAG_LEVEL)
-		bytes = m_fifo_count - (FIFO_BYTES - FIFO_FLAG_LEVEL - 1); // until FALF clears
+	u32 bytes = count; // until FEMPTY
+	if (count > FIFO_FLAG_LEVEL)
+		bytes = count - FIFO_FLAG_LEVEL; // until FALE
+	if (FIFO_BYTES - count <= FIFO_FLAG_LEVEL)
+		bytes = count - (FIFO_BYTES - FIFO_FLAG_LEVEL - 1); // until FALF clears
 	const attotime when = m_fifo_time + clocks_to_attotime(PREPARSE_CLOCKS) * bytes;
 	const attotime now = machine().time();
 	m_flags_timer->adjust((when > now) ? (when - now) : attotime::zero);
@@ -678,22 +698,20 @@ void l64111_device::sync()
 void l64111_device::sync_fifo()
 {
 	const attotime now = machine().time();
-	if (m_fifo_count)
+	if (!m_fifo.empty())
 	{
 		const attotime per_byte = clocks_to_attotime(PREPARSE_CLOCKS);
-		while (m_fifo_count && ((m_fifo_time + per_byte) <= now))
+		while (!m_fifo.empty() && ((m_fifo_time + per_byte) <= now))
 		{
 			m_fifo_time += per_byte;
-			const u8 b = m_fifo[m_fifo_read];
-			m_fifo_read = (m_fifo_read + 1) % FIFO_BYTES;
-			m_fifo_count--;
+			const u8 b = m_fifo.dequeue();
 			if (m_cr2 & CR2_AUDIO_ONLY)
 				audio_parse(b);
 			else
 				system_parse(b);
 		}
 	}
-	if (!m_fifo_count)
+	if (m_fifo.empty())
 	{
 		m_fifo_time = now;
 		m_overflow_logged = false;
@@ -705,40 +723,18 @@ void l64111_device::sync_fifo()
 // interrupts for events raised inside the stream update or by the pre-parser
 void l64111_device::deliver_events()
 {
-	if (m_ev_last_frame)
+	if (m_ev1 || m_ev2)
 	{
-		m_ev_last_frame = false;
-		m_status2 |= S2_NEW_LAST_FRAME;
-		interrupt(m_mask2 & M2_LAST_FRAME);
-	}
-	if (m_ev_new_frame)
-	{
-		m_ev_new_frame = false;
-		m_status2 |= S2_NEW_LAST_FRAME;
-		interrupt(m_mask2 & M2_NEW_FRAME);
-	}
-	if (m_ev_anc_valid)
-	{
-		m_ev_anc_valid = false;
-		interrupt(m_mask1 & S1_ANC_VALID);
-	}
-	if (m_ev_anc_hff)
-	{
-		m_ev_anc_hff = false;
-		interrupt(m_mask1 & S1_ANC_HFF);
-	}
-	if (m_ev_anc_overflow)
-	{
-		m_ev_anc_overflow = false;
-		interrupt(m_mask1 & S1_ANC_OVRFL);
+		const u8 e1 = m_ev1, e2 = m_ev2;
+		m_ev1 = m_ev2 = 0;
+		update_irq_state(e1, e2);
 	}
 	update_outputs();
 }
 
 void l64111_device::syntax_error()
 {
-	m_status2 |= S2_SYNTAX_ERR;
-	interrupt(m_mask2 & M2_SYNTAX_ERR);
+	update_irq_state(0, M2_SYNTAX_ERR);
 }
 
 // ISO 11172-1 system layer: packs, system headers and packets; the payload of the selected
@@ -785,7 +781,7 @@ void l64111_device::system_parse(u8 data)
 		{
 			m_sys_state = SYS_SCAN;
 			if (++m_pack_count == 3)
-				interrupt(m_mask2 & M2_SYNC_SYS); // SYNC SYS goes high (a level, read from m_pack_count)
+				update_irq_state(0, M2_SYNC_SYS); // SYNC SYS goes high (a level, read from m_pack_count)
 		}
 		break;
 
@@ -857,10 +853,8 @@ void l64111_device::packet_header(u8 data)
 				for (int i = 0; i < 4; i++)
 					m_pts[i] = u8(pts >> (8 * i));
 				m_pts[4] = BIT(pts, 32);
-				const bool was = m_status2 & S2_PTS;
-				m_status2 |= S2_PTS;
-				if (!was) // interrupts only when PTS AVAILABLE goes high
-					interrupt(m_mask2 & M2_PTS);
+				if (!(m_status2 & S2_PTS)) // interrupts only when PTS AVAILABLE goes high
+					update_irq_state(0, M2_PTS);
 				m_sys_state = SYS_PACKET_DATA;
 			}
 			m_sys_hdr_need = m_sys_hdr_len = 0;
@@ -927,23 +921,20 @@ void l64111_device::store_frame()
 	m_pd[1] = (((h[2] >> 2) & 3) << 6) | (BIT(h[2], 1) << 5) | (BIT(h[2], 0) << 4) | ((h[3] >> 6) << 2) | ((h[3] >> 4) & 3);
 	m_pd[2] = (BIT(h[3], 3) << 7) | (BIT(h[3], 2) << 6) | ((h[3] & 3) << 4);
 	LOGMASKED(LOG_FRAME, "frame %u bytes, channel buffer %u\n", m_frame_len, m_cb_count);
-	m_status2 |= S2_FRAME_DETECT;
-	interrupt(m_mask2 & M2_FRAME_DETECT);
-	if (++m_sync_count == 3)
-		interrupt(m_mask2 & M2_SYNC_AUD); // SYNC AUD goes high (a level, read from m_sync_count)
+	// SYNC AUD goes high on the third frame (a level, read from m_sync_count)
+	update_irq_state(0, M2_FRAME_DETECT | ((++m_sync_count == 3) ? M2_SYNC_AUD : 0x00));
 
 	m_cb_layer = (((h[1] >> 1) & 3) == 3) ? 1 : 2;
 	if (m_cb_count >= cb_frames())
 	{
-		m_status1 |= S1_ERR_BUF_OVFL; // the frame is lost
-		interrupt(m_mask1 & S1_ERR_BUF_OVFL);
+		update_irq_state(S1_ERR_BUF_OVFL, 0); // the frame is lost
 		return;
 	}
 	std::copy_n(m_frame, m_frame_len, m_cb[m_cb_write]);
 	m_cb_len[m_cb_write] = m_frame_len;
 	m_cb_write = (m_cb_write + 1) % cb_frames();
 	if (++m_cb_count == 1)
-		m_ev_last_frame = true; // LAST FRAME: one frame in the channel buffer
+		m_ev2 |= M2_LAST_FRAME; // LAST FRAME: one frame in the channel buffer
 }
 
 
@@ -968,7 +959,7 @@ bool l64111_device::next_frame()
 	std::copy_n(m_cb[m_cb_read], len, m_decode);
 	m_cb_read = (m_cb_read + 1) % cb_frames();
 	if (--m_cb_count == 1)
-		m_ev_last_frame = true;
+		m_ev2 |= M2_LAST_FRAME;
 
 	int pos = 0, samples = 0, rate = 0, channels = 0;
 	if ((len >= 4) && m_decoder->decode_buffer(pos, len * 8, m_pcm, samples, rate, channels) && (samples > 0))
@@ -980,7 +971,7 @@ bool l64111_device::next_frame()
 	else if ((((m_cr2 >> 6) & 3) != 2) || !m_pcm_count)
 		silent_frame(); // MUTE 10 replays the last good frame instead
 	m_pcm_pos = 0;
-	m_ev_new_frame = true; // NEW FRAME OUT
+	m_ev2 |= M2_NEW_FRAME; // NEW FRAME OUT
 	m_started = true;
 	return true;
 }
@@ -995,21 +986,21 @@ void l64111_device::ancillary(u32 bit_pos, u32 bit_end)
 		m_anc_acc = (m_anc_acc << 1) | BIT(m_decode[b >> 3], 7 - (b & 7));
 		if (++m_anc_bits < 8)
 			continue;
-		if (m_anc_count >= ANC_BYTES)
+		if (m_anc.full())
 		{
 			if (!m_anc_overflow)
 			{
 				m_anc_overflow = true;
-				m_ev_anc_overflow = true;
+				m_ev1 |= S1_ANC_OVRFL;
 			}
 		}
 		else
 		{
-			m_anc[(m_anc_read + m_anc_count) % ANC_BYTES] = u8(m_anc_acc);
-			if (++m_anc_count == 1)
-				m_ev_anc_valid = true;
-			else if (m_anc_count == ANC_BYTES / 2)
-				m_ev_anc_hff = true;
+			m_anc.enqueue(u8(m_anc_acc));
+			if (m_anc.queue_length() == 1)
+				m_ev1 |= S1_ANC_VALID;
+			else if (m_anc.queue_length() == ANC_BYTES / 2)
+				m_ev1 |= S1_ANC_HFF;
 		}
 		m_anc_acc = m_anc_bits = 0;
 	}

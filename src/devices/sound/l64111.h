@@ -43,6 +43,7 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_pre_save() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
 	virtual void sound_stream_update(sound_stream &stream) override;
 
@@ -120,8 +121,7 @@ private:
 	bool next_frame();
 	void silent_frame();
 	void ancillary(u32 bit_pos, u32 bit_end);
-	void interrupt(bool enabled);
-	void update_intr();
+	void update_irq_state(u8 events1, u8 events2);
 	void update_rate();
 	void syntax_error();
 	u32 cb_frames() const { return (m_cb_layer == 1) ? CB_SLOTS : CB_SLOTS / 2; }
@@ -145,12 +145,11 @@ private:
 
 	// pins and outputs
 	bool m_reset_pin, m_starti_pin, m_hdmute_pin;
-	bool m_intr_pending;
+	bool m_intr_pending; // an enabled interrupt event since the last status read
 	int m_intr_state, m_femty_state, m_fale_state, m_falf_state, m_starto_state;
 
 	// input data FIFO
-	u8 m_fifo[FIFO_BYTES];
-	u32 m_fifo_read, m_fifo_count;
+	util::fifo<u8, FIFO_BYTES> m_fifo; // the chip's own 128-byte input FIFO
 	attotime m_fifo_time; // time up to which the pre-parser has drained the FIFO
 	bool m_overflow_logged;
 
@@ -175,8 +174,7 @@ private:
 	u8 m_cb_layer;
 
 	// ancillary data FIFO
-	u8 m_anc[ANC_BYTES];
-	u32 m_anc_read, m_anc_count;
+	util::fifo<u8, ANC_BYTES> m_anc;
 	u32 m_anc_acc, m_anc_bits;
 	bool m_anc_overflow;
 
@@ -185,8 +183,13 @@ private:
 	s16 m_pcm[SAMPLES_MAX * 2];
 	u32 m_pcm_pos, m_pcm_count, m_pcm_channels;
 	bool m_started, m_underrun;
-	// events raised during the stream update, delivered from timer or CPU context
-	bool m_ev_last_frame, m_ev_new_frame, m_ev_anc_valid, m_ev_anc_hff, m_ev_anc_overflow;
+	// interrupt events raised during the stream update, in Interrupt Mask 1 / 2 bit positions,
+	// delivered from timer or CPU context
+	u8 m_ev1, m_ev2;
+
+	// FIFO contents for save states
+	u8 m_fifo_save[FIFO_BYTES], m_anc_save[ANC_BYTES];
+	u32 m_fifo_save_count, m_anc_save_count;
 };
 
 DECLARE_DEVICE_TYPE(L64111, l64111_device)
