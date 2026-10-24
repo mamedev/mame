@@ -39,7 +39,7 @@
 #define LOG_ROP (1 << 2)
 #define LOG_DATA (1 << 3)
 
-#define VERBOSE (LOG_ROP | LOG_CTRL)
+#define VERBOSE 0
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(NWB_512, nwb_512_device, "nwb_512", "Sony NWB-512 monochrome framebuffer")
@@ -184,7 +184,7 @@ void nwb_512_device::device_add_mconfig(machine_config &config)
 	m_vram->set_default_size("512KiB");
 }
 
-u32 nwb_512_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, [[maybe_unused]] const rectangle &cliprect)
+u32 nwb_512_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const rgb_t white = current_dim_color();
 	const rgb_t black = rgb_t::black();
@@ -192,18 +192,15 @@ u32 nwb_512_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, [
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
-		{
-			const uint32_t byte_offset = coordinate_to_byte_offset(x, y); // Y: 2048 / 8 = 256 bytes per row, not all visible.
-			const uint8_t byte = vram[byte_offset];
+		const uint8_t *const row = &vram[coordinate_to_byte_offset(0, y)]; // Y: 2048 / 8 = 256 bytes per row, not all visible.
+		uint32_t *dst_pixel = &bitmap.pix(y, cliprect.min_x);
 
-			for (int i = 0; i < 8 && (x + i) <= cliprect.max_x; ++i)
-			{
-				// The NWB-512 is a dimmable pure-monochrome display. Based on pictures of the similar NWS-711 monitor
-				// and the fact that NEWS Desk looks as it does on the laptop displays when assuming black-on-white,
-				// the NWB-512 is most likely also black-on-white (1 = black, 0 = white).
-				bitmap.pix(y, x + i) = byte & (1u << x_to_pixel_offset(x + i)) ? black : white;
-			}
+		for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
+		{
+			// The NWB-512 is a dimmable pure-monochrome display. Based on pictures of the similar NWS-711 monitor
+			// and the fact that NEWS Desk looks as it does on the laptop displays when assuming black-on-white,
+			// the NWB-512 is most likely also black-on-white (1 = black, 0 = white).
+			*dst_pixel++ = BIT(row[x >> 3], x_to_pixel_offset(x)) ? black : white;
 		}
 	}
 
@@ -347,7 +344,6 @@ void nwb_512_device::pixel_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	const uint8_t destination = m_vram->read(byte_offset) & (1u << x_bit) ? 1 : 0;
 
 	// Use the result of the ROP engine before setting the pixel
-	// TODO: consolidate set_pixel into this function, it is only used here.
 	const bool new_state = execute_rop(m_state.rop_function, 1, destination) & 1;
 	LOGMASKED(LOG_DATA, "pixel_w(0x%x, 0x%x) => Change (0x%x, 0x%x) from %u to %u\n", offset, data, x, y, destination, new_state ? 1u : 0u);
 	set_pixel(x, y, new_state);
@@ -504,7 +500,7 @@ void nwb_512_device::check_operation_start(offs_t offset)
 	start_operation();
 
 	// TODO: This executes copies immediately, faster than real hardware
-	if (m_state.is_fb_to_fb())
+	if (m_state.is_fb_to_fb() && m_state.exec)
 	{
 		m_state.req = true; // FB executing, no input from host needed, so req will stay high throughout
 		while (m_state.busy())
@@ -721,23 +717,17 @@ void nwb_512_device::start_operation()
 	// Compute the phase of the source and destination (used to determine how the shifter is loaded)
 	const uint16_t src_phase = m_state.x_direction ? m_state.source_x & 15 : 15 - (m_state.source_x & 15);
 	const uint16_t dest_phase = m_state.x_direction ? m_state.destination_x & 15 : 15 - (m_state.destination_x & 15);
-	const uint16_t width = m_state.x_direction ? m_state.limit_x - m_state.destination_x  // fwd: [dest, limit)
-											   : m_state.destination_x - m_state.limit_x; // rev: [limit, dest)
+	const bool read = !m_state.fb_write;
 
-	m_state.prime = src_phase > dest_phase;
+	// fwd: [dest, limit), rev: [limit, dest), but read is inclusive rather than exclusive and only works in the forward direction.
+	const uint16_t width = (m_state.x_direction ? m_state.limit_x - m_state.destination_x : m_state.destination_x - m_state.limit_x) + (read ? 1 : 0);
+
+	m_state.prime = src_phase > dest_phase; // In this case, we will need to fetch an extra word from the source
 	m_state.prime_pending = m_state.prime;
 
-	// TODO: should be a way to consolidate these formulas
-	if (m_state.fb_write)
-	{
-		m_state.source_words_per_row = (src_phase + width + 15) >> 4;
-		m_state.dest_words_per_row = (dest_phase + width + 15) >> 4;
-	}
-	else
-	{
-		m_state.dest_words_per_row = (m_state.limit_x >> 4) - (m_state.source_x >> 4) + (m_state.prime ? 0 : 1);
-		m_state.source_words_per_row = m_state.dest_words_per_row; // not used for reads
-	}
+	m_state.dest_words_per_row = ((dest_phase + width + 15) >> 4)									  // Round up by adding 15 to ensure all words are captured
+								 - (read && m_state.prime ? 1 : 0);									  // Will read one fewer words per row if we need to prime the shifter to align
+	m_state.source_words_per_row = read ? m_state.dest_words_per_row : (src_phase + width + 15) >> 4; // Not used for reads
 
 	m_state.source_words_left = m_state.source_words_per_row;
 	m_state.dest_words_left = m_state.dest_words_per_row;
