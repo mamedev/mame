@@ -926,8 +926,8 @@ void mb86235_device::do_alu2_trans2_1(uint64_t op)
 	case 0:
 	case 2:
 	{
-		uint8_t ad = (op >> 20) & 0x1f;
-		uint8_t bd = (op >> 10) & 0xf;
+		uint8_t ad = (op >> (sd == 0 ? 15 : 20)) & 0x1f;
+		uint8_t bd = (op >> (sd == 0 ? 5 : 10)) & 0xf;
 		set_transfer_reg(ad, ares);
 		set_transfer_reg(bd | 0x20, bres);
 		break;
@@ -963,7 +963,7 @@ void mb86235_device::do_alu2_trans1_1(uint64_t op)
 			if(dr & 0x40)
 			{
 				bool isbbus = (dr & 0x20) == 0x20;
-				addr = decode_ea(op & 0xf,dr & 7,(op >> 4) & 7, (op >> 7) & 0x1f,isbbus) & 0x3ff;
+				addr = decode_ea(op & 0xf,dr & 7,(op >> 4) & 7, util::sext((op >> 7) & 0x1f, 5),isbbus) & 0x3ff;
 				if (isbbus)
 					write_bbus(addr, res);
 				else
@@ -983,7 +983,7 @@ void mb86235_device::do_alu2_trans1_1(uint64_t op)
 			if (sr & 0x40)
 			{
 				bool isbbus = (sr & 0x20) == 0x20;
-				uint32_t addr = decode_ea(op & 0xf, sr & 7, (op >> 4) & 7, (op >> 7) & 0x1f, isbbus) & 0x3ff;
+				uint32_t addr = decode_ea(op & 0xf, sr & 7, (op >> 4) & 7, util::sext((op >> 7) & 0x1f, 5), isbbus) & 0x3ff;
 				res = isbbus ? read_bbus(addr) : read_abus(addr);
 			}
 			else
@@ -1011,7 +1011,7 @@ void mb86235_device::do_alu2_trans1_1(uint64_t op)
 			else
 			{
 				bool isbbus = (sr & 0x20) == 0x20;
-				uint32_t addr = decode_ea(op & 0xf,sr & 7,(op >> 4) & 7, (op >> 7) & 0x1f,isbbus);
+				uint32_t addr = decode_ea(op & 0xf,sr & 7,(op >> 4) & 7, util::sext((op >> 7) & 0x1f, 5),isbbus);
 				res = isbbus ? read_bbus(addr) : read_abus(addr);
 			}
 		}
@@ -1028,7 +1028,7 @@ void mb86235_device::do_alu2_trans1_1(uint64_t op)
 				fatalerror("TGPx4: illegal do_alu2_trans1_1 dr == 0x58 at pc=%03x\n",m_core->ppc);
 
 			bool isbbus = (dr & 0x20) == 0x20;
-			uint32_t addr = decode_ea(op & 0xf,dr & 7,(op >> 4) & 7, (op >> 7) & 0x1f,isbbus);
+			uint32_t addr = decode_ea(op & 0xf,dr & 7,(op >> 4) & 7, util::sext((op >> 7) & 0x1f, 5),isbbus);
 			if (isbbus)
 				write_bbus(addr, res);
 			else
@@ -1058,7 +1058,7 @@ void mb86235_device::do_alu1_trans2_2(uint64_t op)
 	}
 	case 2:
 	{
-		uint32_t addr = decode_ea((op >> 20) & 0xf, (op >> 30) & 7, (op >> 27) & 7, (op >> 24) & 7, false);
+		uint32_t addr = decode_ea((op >> 20) & 0xf, (op >> 30) & 7, (op >> 27) & 7, util::sext((op >> 24) & 7, 3), false);
 		ares = read_abus(addr);
 		break;
 	}
@@ -1079,7 +1079,7 @@ void mb86235_device::do_alu1_trans2_2(uint64_t op)
 	}
 	case 2:
 	{
-		uint32_t addr = decode_ea(op & 0xf, (op >> 10) & 7, (op >> 7) & 7, (op >> 4) & 7, true);
+		uint32_t addr = decode_ea(op & 0xf, (op >> 10) & 7, (op >> 7) & 7, util::sext((op >> 4) & 7, 3), true);
 		bres = read_bbus(addr);
 		break;
 	}
@@ -1097,13 +1097,13 @@ void mb86235_device::do_alu1_trans2_2(uint64_t op)
 	case 0:
 	case 2:
 	{
-		uint8_t ad = (op >> 28) & 0x1f;
+		uint8_t ad = (op >> (sda == 0 ? 28 : 33)) & 0x1f;
 		set_transfer_reg(ad, ares);
 		break;
 	}
 	case 1:
 	{
-		uint32_t addr = decode_ea((op >> 20) & 0xf, (op >> 30) & 7, (op >> 27) & 7, (op >> 24) & 7, false);
+		uint32_t addr = decode_ea((op >> 20) & 0xf, (op >> 30) & 7, (op >> 27) & 7, util::sext((op >> 24) & 7, 3), false);
 		write_abus(addr, ares);
 		break;
 	}
@@ -1115,13 +1115,13 @@ void mb86235_device::do_alu1_trans2_2(uint64_t op)
 	case 0:
 	case 2:
 	{
-		uint8_t bd = (op >> 8) & 0x1f;
+		uint8_t bd = (op >> (sdb == 0 ? 8 : 13)) & 0x1f;
 		set_transfer_reg(bd | 0x20, bres);
 		break;
 	}
 	case 1:
 	{
-		uint32_t addr = decode_ea(op & 0xf, (op >> 10) & 7, (op >> 7) & 7, (op >> 4) & 7, true);
+		uint32_t addr = decode_ea(op & 0xf, (op >> 10) & 7, (op >> 7) & 7, util::sext((op >> 4) & 7, 3), true);
 		write_bbus(addr, bres);
 		break;
 	}
@@ -1364,7 +1364,12 @@ void mb86235_device::do_alu_control(uint64_t op)
 			else
 				m_core->rpc = ef2;
 
-			FSET(RP); // set repeat flag
+			// A count of one executes the next instruction normally. Entering
+			// repeat mode would decrement the count past its termination value.
+			if (m_core->rpc == 1)
+				FCLR(RP);
+			else
+				FSET(RP);
 			break;
 		case 0x02: // SETL
 			if(ef1 == 0x3f)
