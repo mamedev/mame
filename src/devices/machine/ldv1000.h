@@ -51,6 +51,8 @@ public:
 	virtual int ready_r() override { return BIT(m_portc1, 4); }
 
 protected:
+	pioneer_ldv1000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -66,12 +68,12 @@ protected:
 	TIMER_CALLBACK_MEMBER(multijump_tick);
 	TIMER_CALLBACK_MEMBER(process_vbi_data);
 
-private:
-	// internal helpers
+	// servo state helpers
 	bool focus_on() const { return !(m_portb1 & 0x01); }
 	bool spdl_on() const { return !(m_portb1 & 0x02); }
 	bool laser_on() const { return (m_portb1 & 0x40); }
 
+private:
 	// internal read/write handlers
 	void z80_decoder_display_port_w(offs_t offset, uint8_t data);
 	uint8_t z80_decoder_display_port_r(offs_t offset);
@@ -91,6 +93,7 @@ private:
 	void ldv1000_map(address_map &map) ATTR_COLD;
 	void ldv1000_portmap(address_map &map) ATTR_COLD;
 
+protected:
 	// internal state
 	required_device<z80_device> m_z80_cpu;            /* CPU index of the Z80 */
 	required_device<z80ctc_device> m_z80_ctc;         /* CTC device */
