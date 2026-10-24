@@ -40,9 +40,6 @@ public:
 	void galpani2(machine_config &config);
 	void gp2se(machine_config &config);
 
-	void init_asia();
-	void init_japan();
-	void init_korea();
 	void init_special();
 
 private:

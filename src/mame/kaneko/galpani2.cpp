@@ -129,18 +129,6 @@ void galpani2_state::machine_reset()
 	machine().scheduler().perfect_quantum(attotime::from_usec(50)); //initial mcu xchk
 }
 
-void galpani2_state::init_asia()
-{
-}
-
-void galpani2_state::init_japan()
-{
-}
-
-void galpani2_state::init_korea()
-{
-}
-
 void galpani2_state::init_special()
 {
 	// SE uses field origin x=32 and mask pens 0050/8050.
@@ -1326,17 +1314,17 @@ ROM_START( gp2quiz )
 	ROM_LOAD( "gp2-101-0044.u60",  0x200000, 0x100000, CRC(3c45134f) SHA1(a5362bfcc6beb6e776c1bce4544475f8947fccea) )
 ROM_END
 
-GAME( 1993, galpani2,   0,        galpani2, galpani2, galpani2_state, init_asia, ROT90, "Kaneko", "Gals Panic II (Asia)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2e,  galpani2, galpani2, galpani2, galpani2_state, init_asia, ROT90, "Kaneko", "Gals Panic II (English)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2e2, galpani2, galpani2, galpani2, galpani2_state, init_asia, ROT90, "Kaneko", "Gals Panic II (English, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2g,  galpani2, galpani2, galpani2, galpani2_state, init_asia, ROT90, "Kaneko", "Gals Panic II (Germany, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2i2, galpani2, galpani2, galpani2, galpani2_state, init_asia, ROT90, "Kaneko", "Gals Panic II (Italy, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2i,  galpani2, galpani2, galpani2, galpani2_state, init_asia, ROT90, "Kaneko", "Gals Panic II (Italy, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2gs, galpani2, galpani2, galpani2, galpani2_state, init_asia, ROT90, "Kaneko", "Gals Panic II (Germany, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2t,  galpani2, galpani2, galpani2, galpani2_state, init_asia, ROT90, "Kaneko", "Gals Panic II (Taiwan, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2k,  galpani2, galpani2, galpani2, galpani2_state, init_korea, ROT90, "Kaneko (Karam Trading Co., Ltd. license)", "Gals Panic II (Korea, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2j,  galpani2, galpani2, galpani2, galpani2_state, init_japan, ROT90, "Kaneko", "Gals Panic II (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // it is a 'quiz edition' but the title screen doesn't say, maybe all Japanese versions have the Quiz
+GAME( 1993, galpani2,   0,        galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Asia)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2e,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (English)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2e2, galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (English, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2g,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Germany, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2i2, galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Italy, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2i,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Italy, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2gs, galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Germany, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2t,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Taiwan, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2k,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko (Karam Trading Co., Ltd. license)", "Gals Panic II (Korea, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, galpani2j,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // it is a 'quiz edition' but the title screen doesn't say, maybe all Japanese versions have the Quiz
 
-GAME( 1993, gp2quiz,    0,        galpani2, galpani2, galpani2_state, init_japan, ROT90, "Kaneko", "Gals Panic II - Quiz Version", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // this one has 'quiz edition' on the title screen
+GAME( 1993, gp2quiz,    0,        galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II - Quiz Version", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // this one has 'quiz edition' on the title screen
 
 GAME( 1994, gp2se,      0,        gp2se,    gp2se,    galpani2_state, init_special, ROT90, "Kaneko", "Gals Panic II' - Special Edition (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
