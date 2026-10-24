@@ -151,7 +151,7 @@ void galpani2_state::copybg8(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap,
 				|| (layer == 1 && bg8_captured_field(pen));
 			// SE trims the girl mask at the field edge, but its E4 border
 			// cells still cover both RGB pictures with their palette color.
-			bool const field_border = layer == 1 && m_bg_image_prefix_count && pen == 0x00e4;
+			bool const field_border = layer == 1 && m_is_special && pen == 0x00e4;
 			// UI words remain opaque, including flagged black colors.
 			bool const covered_field = BIT(color, 15) && !BIT(pen, 11) && !field_border;
 			if ((layer || pen) && !passthrough && !covered_field)
@@ -230,7 +230,7 @@ void galpani2_state::copybg15(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap
 					// TODO: use girl_shape once the MCU bitmap is correct.
 					// For now, fall back to treating all field pixels as
 					// girl so the cycling mask covers the full silhouette.
-					bool const girl_shape = !m_bg_image_prefix_count
+					bool const girl_shape = !m_is_special
 						|| ((shape & 0xc000) && (shape & 0xff) == (m_mask_girl_pen & 0xff));
 					// BG8 plane 1 palette bit 15 marks covered field cells.
 					bool const color_field = !BIT(mask, 11)
@@ -245,7 +245,7 @@ void galpani2_state::copybg15(bitmap_rgb32 &bitmap, bitmap_ind8 &priority_bitmap
 							// The former C06 backdrop has no effect at full opacity.
 							// Peak-green PCB skin samples suggest about 35% tint.
 							// Blend 3/8 player color with 5/8 photo detail.
-							if (!m_bg_image_prefix_count)
+							if (!m_is_special)
 								photo = alpha_blend_r32(photo, m_bg8palette->pen(mask & 0xff), 0x60);
 							else
 								backdrop = clut[cycle_color];

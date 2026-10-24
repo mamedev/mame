@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "kaneko_pisces.h"
 #include "kaneko_spr.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
@@ -18,6 +19,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_subcpu(*this,"sub"),
+		m_mcu(*this, "mcu"),
 		m_kaneko_spr(*this, "kan_spr"),
 		m_oki2(*this, "oki2"),
 		m_eeprom(*this, "eeprom"),
@@ -36,6 +38,7 @@ public:
 	{ }
 
 	void galpani2(machine_config &config);
+	void gp2se(machine_config &config);
 
 	void init_asia();
 	void init_japan();
@@ -45,6 +48,7 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	required_device<kaneko_pisces_hle_device> m_mcu;
 	optional_device<kaneko16_sprite_device> m_kaneko_spr;
 	required_device<okim6295_device> m_oki2;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -63,16 +67,7 @@ private:
 	optional_shared_ptr<uint16_t> m_spriteram;
 
 	uint16_t m_eeprom_word = 0U;
-	uint16_t m_old_mcu_nmi1 = 0U;
-	uint16_t m_old_mcu_nmi2 = 0U;
-
-	// Background image offset table, built by scanning the ROM at init.
-	// Each entry is a raw byte offset into the "subdata" ROM region.
-	std::vector<uint32_t> m_bg_image_offsets;
-
-	// SE's scripts prepend 34 extra images before the shared set.
-	// This count drives the ID remapping in cmd 0x0C; no pointer needed.
-	uint32_t m_bg_image_prefix_count = 0;
+	bool m_is_special = false;
 
 	// Per-region field/mask layout (set in init functions).
 	// English/Asia/Japan/Korea use field x=48, mask pen 00A0/80A0.
@@ -81,21 +76,7 @@ private:
 	uint16_t m_mask_girl_pen = 0x80a0;
 	uint16_t m_mask_nongirl_pen = 0x00a0;
 	uint8_t  m_mask_captured_lo = 0xa0;  // SE writes 0x60 to plane 0 on capture
-	uint8_t m_bg_decode_param_offset = 2;
 
-	// The MCU substitute records the pending native decoder's coverage,
-	// then publishes the field bitmap/count through the common response.
-	static constexpr uint32_t GIRL_BITMAP_OFFSET = 0xe000;
-	static constexpr uint32_t GIRL_BITMAP_ADDR   = 0x10e000;
-	uint32_t m_girl_bitmap_pending_addr = 0;
-	uint32_t m_girl_bitmap_pending_param = 0;
-	uint32_t m_girl_bitmap_pending_task = 0;
-	std::array<uint8_t, 0x2000> m_bg15_coverage{};
-	memory_passthrough_handler m_bg15_coverage_tap;
-
-	void galpani2_mcu_init_w(uint8_t data);
-	void galpani2_mcu_nmi1_w(uint8_t data);
-	void galpani2_mcu_nmi2_w(uint8_t data);
 	void galpani2_coin_lockout_w(uint8_t data);
 	uint16_t galpani2_eeprom_r();
 	void galpani2_eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -110,12 +91,6 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani2_interrupt1);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani2_interrupt2);
-	void galpani2_mcu_nmi1();
-	void galpani2_mcu_nmi2();
-	uint16_t generate_girl_bitmap(uint32_t dest_addr);
-	void update_girl_bitmap();
-	void track_bg15_coverage(offs_t address, uint16_t data, uint16_t mem_mask);
-	void scan_background_images();
 	void galpani2_mem1(address_map &map) ATTR_COLD;
 	void galpani2_mem2(address_map &map) ATTR_COLD;
 };
