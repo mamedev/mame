@@ -1095,7 +1095,6 @@ ROM_START( radendur )
 	ROM_LOAD( "4_pal16v8.u73",  0x000, 0x117, NO_DUMP )
 ROM_END
 
-
 // The main CPU program is the parent's with the prototype's faults fixed in its code, so that its
 // five tracks play, and its four blitter interrupt handlers opened at mask 4 instead of 7, so that
 // the line counter's interrupt, which streams the sound, gets through them; every other ROM is
