@@ -77,6 +77,7 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 #include "speaker.h"
 
 #include <algorithm>
+#include <bit>
 #include <iterator>
 
 #define LOG_SCALE (1U << 1)
@@ -434,7 +435,7 @@ void rltennis_state::screen_vblank(int state)
 void rltennis_state::video_start()
 {
 	// assumes it can make an address mask with m_gfx.length() - 1
-	assert(!(m_gfx.length() & (m_gfx.length() - 1)));
+	assert(std::has_single_bit(m_gfx.length()));
 
 	m_tmp_bitmap[BITMAP_BG] = std::make_unique<bitmap_ind16>(512, 256);
 	m_tmp_bitmap[BITMAP_FG_1] = std::make_unique<bitmap_ind16>(512, 256);
