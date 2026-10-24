@@ -186,17 +186,22 @@ void nwb_512_device::device_add_mconfig(machine_config &config)
 u32 nwb_512_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, [[maybe_unused]] const rectangle &cliprect)
 {
 	const rgb_t white = current_dim_color();
+	const rgb_t black = rgb_t::black();
+	const uint8_t *const vram = m_vram->pointer();
 
-	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; ++y)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 8)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 8)
 		{
 			const uint32_t byte_offset = coordinate_to_byte_offset(x, y); // Y: 2048 / 8 = 256 bytes per row, not all visible.
-			const uint8_t byte = m_vram->read(byte_offset);
+			const uint8_t byte = vram[byte_offset];
 
-			for (int i = 0; i < 8 && (x + i) <= screen.visible_area().max_x; ++i)
+			for (int i = 0; i < 8 && (x + i) <= cliprect.max_x; ++i)
 			{
-				bitmap.pix(y, x + i) = byte & (1u << x_to_pixel_offset(x + i)) ? rgb_t::black() : white;
+				// The NWB-512 is a dimmable pure-monochrome display. Based on pictures of the similar NWS-711 monitor
+				// and the fact that NEWS Desk looks as it does on the laptop displays when assuming black-on-white,
+				// the NWB-512 is most likely also black-on-white (1 = black, 0 = white).
+				bitmap.pix(y, x + i) = byte & (1u << x_to_pixel_offset(x + i)) ? black : white;
 			}
 		}
 	}
@@ -449,7 +454,7 @@ uint16_t nwb_512_device::status_r()
 
 void nwb_512_device::ctrl_w(uint16_t data)
 {
-	LOGMASKED(LOG_CTRL, "%s ctrl_w 0x%x\n", machine().describe_context(), data);
+	LOGMASKED(LOG_CTRL, "%s ctrl_w(0x%x)\n", machine().describe_context(), data);
 
 	// NWS-1580 uses a newer version of the framebuffer that uses a similar ROP engine, these definitions
 	// can be found in the NWS-1580 service manual.
@@ -459,7 +464,7 @@ void nwb_512_device::ctrl_w(uint16_t data)
 		reset_state();
 	}
 
-	m_state.ctrl = data;
+	m_state.ctrl = data & 0xff;
 }
 
 void nwb_512_device::reset_state()

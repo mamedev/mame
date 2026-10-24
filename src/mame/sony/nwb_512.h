@@ -59,10 +59,10 @@ private:
 		bool busy = false; // operation in progress
 
 		// Configuration flags
-		bool x_direction = false;	   // true = left -> right
-		bool y_direction = false;	   // true = top -> bottom
-		bool row_fill = false;		   // true = write data fifo word across whole line
-		bool fb_read = false;		   // Tri-state with write - read = fb -> host, write = host -> fb, both = fb -> fb copy
+		bool x_direction = false; // true = left -> right
+		bool y_direction = false; // true = top -> bottom
+		bool row_fill = false;
+		bool fb_read = false;
 		bool fb_write = false;
 		bool pixel_mode = false;
 
