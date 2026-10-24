@@ -31,7 +31,7 @@
 
     The host reads and writes the registers as words, the picture buffers and
     the reconstruction are internal, and the decoded picture is handed to the
-    display through video_pixel() in the chip's own pixel coordinates.
+    display a line at a time through video_line().
 
 *******************************************************************************/
 
@@ -91,9 +91,9 @@ public:
 	// the vsync trailing edge and starts displaying it one frame later
 	void vblank_w(int state);
 
-	// The displayed picture, in the chip's pixel coordinates.  Returns true
-	// and fills argb when the chip is driving this pixel.
-	bool video_pixel(int x, int y, uint32_t &argb) const;
+	// One line of the displayed picture.  line holds count display columns,
+	// two per chip pixel; only the columns the chip drives are overwritten.
+	void video_line(int y, uint32_t *line, int count) const;
 
 protected:
 	// device_t implementation

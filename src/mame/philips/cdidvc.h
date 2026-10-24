@@ -99,7 +99,7 @@ public:
 	void vblank_callback(screen_device &screen, bool state) { screen_vblank(state ? 1 : 0); }
 
 	// mcd212_ext_video_source implementation, from the cartridge
-	virtual bool ext_video_pixel(int x, int y, uint32_t &argb) const override;
+	virtual void ext_video_line(int y, uint32_t *line, int count) const override;
 
 	// the cartridge's side of the connector
 	scc68070_device *scc() const { return m_scc; }
@@ -115,6 +115,8 @@ private:
 	optional_device<screen_device> m_screen;
 	devcb_write_line m_intreq_cb;
 	bool m_pal = true;
+
+	device_cdi_dvc_interface *m_card = nullptr;
 };
 
 // ======================> cdi_dvc_vmpeg_device
@@ -136,7 +138,7 @@ protected:
 	// device_cdi_dvc_interface implementation
 	virtual uint8_t intack_r() override;
 	virtual void screen_vblank(int state) override;
-	virtual bool ext_video_pixel(int x, int y, uint32_t &argb) const override;
+	virtual void ext_video_line(int y, uint32_t *line, int count) const override;
 
 private:
 	// the bus

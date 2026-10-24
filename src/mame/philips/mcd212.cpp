@@ -311,17 +311,18 @@ int mcd212_device::get_border_height()
 	return height;
 }
 
-uint32_t mcd212_device::get_backdrop_plane(int x, int y)
+const uint32_t *mcd212_device::get_backdrop_line(int count, int y)
 {
 	if (BIT(m_image_coding_method, ICM_EV_BIT))
 	{
-		uint32_t argb = 0;
-		if (m_ext_video && m_ext_video->ext_video_pixel(x, y, argb))
-			return argb;
-		return s_4bpp_display_color[0];
+		if (m_ext_video)
+			m_ext_video->ext_video_line(y, m_backdrop_line, count, s_4bpp_display_color[0]);
+		else
+			std::fill_n(m_backdrop_line, count, s_4bpp_display_color[0]);
 	}
 	else
-		return s_4bpp_display_color[m_backdrop_color];
+		std::fill_n(m_backdrop_line, count, s_4bpp_display_color[m_backdrop_color]);
+	return m_backdrop_line;
 }
 
 void mcd212_device::process_ica()
@@ -718,12 +719,13 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 	}
 
 	const uint32_t *limit = m_dyuv_limit_lut + 0x100;
+	const uint32_t *backdrop = get_backdrop_line(width + border_width * 2, m_display_line) + border_width;
 
 	for (int x = 0; x < width; x++)
 	{
 		if (transparent_a[x] && transparent_b[x])
 		{
-			out[x] = get_backdrop_plane(x + border_width, m_display_line);
+			out[x] = backdrop[x];
 			continue;
 		}
 		uint32_t plane_a_cur = MosaicA ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];
