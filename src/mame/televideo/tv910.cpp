@@ -9,6 +9,11 @@
     6545 CRTC
     6551 ACIA
 
+    The printer port (P4) has no UART of its own: in extension mode the
+    host's data is passed straight through to it, gated by a control latch
+    bit, and its pin 20 (printer ready) is read at 8070 D1; while the
+    printer is not ready the firmware sends XOFF to the host.
+
     IRQ = ACIA gated with flip-flop driven by CRTC VBlank (not wire-OR)
     NMI = AY-5-3600 keyboard char present
 
@@ -17,7 +22,8 @@
     TODO:
         - Make 910 keyboard into a device since the similar Model 925 uses
           a 950-compatible serial keyboard instead (with a second ACIA)
-        - Add printer port and remaining DIP switches
+        - Add remaining DIP switches; printer ready to the host's DTR
+          (S2-10, E17-E19)
 
 ****************************************************************************/
 
@@ -40,6 +46,7 @@ namespace {
 #define ACIA_TAG    "acia"
 #define CRTC_TAG    "crtc"
 #define RS232_TAG   "rs232"
+#define PRINTER_TAG "printer"
 #define KBDC_TAG    "ay3600"
 
 #define MASTER_CLOCK 13.608_MHz_XTAL
@@ -52,6 +59,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_mainirq(*this, "mainirq")
 		, m_crtc(*this, CRTC_TAG)
+		, m_printer(*this, PRINTER_TAG)
 		, m_vram(*this, "vram")
 		, m_chrrom(*this, "graphics")
 		, m_ay3600(*this, KBDC_TAG)
@@ -80,6 +88,9 @@ private:
 	void control_w(uint8_t data);
 
 	void vbl_w(int state);
+	void host_rxd_w(int state);
+	void printer_dtr_w(int state);
+	void update_printer_txd();
 
 	int ay3600_shift_r();
 	int ay3600_control_r();
@@ -91,6 +102,7 @@ private:
 	required_device<m6502_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
 	required_device<r6545_1_device> m_crtc;
+	required_device<rs232_port_device> m_printer;
 	required_shared_ptr<uint8_t> m_vram;
 	required_region_ptr<uint8_t> m_chrrom;
 	required_device<ay3600_device> m_ay3600;
@@ -106,6 +118,8 @@ private:
 	int m_repeatdelay;
 
 	uint8_t m_control;
+	int m_rxd;
+	int m_printer_dtr;
 };
 
 void tv910_state::tv910_mem(address_map &map)
@@ -141,6 +155,24 @@ void tv910_state::control_w(uint8_t data)
 	#endif
 
 	m_beep->set_state(BIT(data, 0));
+	update_printer_txd();
+}
+
+void tv910_state::host_rxd_w(int state)
+{
+	m_rxd = state;
+	update_printer_txd();
+}
+
+void tv910_state::update_printer_txd()
+{
+	// extension mode (PRINT, ESC @, ^R) copies the host data to the printer
+	m_printer->write_txd(BIT(m_control, 2) ? m_rxd : 1);
+}
+
+void tv910_state::printer_dtr_w(int state)
+{
+	m_printer_dtr = state;
 }
 
 uint8_t tv910_state::charset_r()
@@ -168,7 +200,9 @@ uint8_t tv910_state::kbd_flags_r()
 	if (m_anykeydown)
 		rv |= 0x01;
 
-	// D1: Printer DTR (pin 20)
+	// D1: Printer DTR (P4 pin 20)
+	if (m_printer_dtr)
+		rv |= 0x02;
 
 	// D6: FUNC key (not ALPHA LOCK as indicated in memory map)
 	if (BIT(kbspecial, 4))
@@ -443,6 +477,11 @@ void tv910_state::machine_start()
 
 	// DSR is tied to GND
 	acia->write_dsr(0);
+
+	m_rxd = 1;
+	m_printer_dtr = 1; // open input reads as not ready
+	save_item(NAME(m_rxd));
+	save_item(NAME(m_printer_dtr));
 }
 
 void tv910_state::machine_reset()
@@ -555,8 +594,12 @@ void tv910_state::tv910(machine_config &config)
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(ACIA_TAG, FUNC(mos6551_device::write_rxd));
+	rs232.rxd_handler().append(FUNC(tv910_state::host_rxd_w));
 	rs232.dcd_handler().set(ACIA_TAG, FUNC(mos6551_device::write_dcd));
 	rs232.cts_handler().set(ACIA_TAG, FUNC(mos6551_device::write_cts));
+
+	RS232_PORT(config, m_printer, default_rs232_devices, nullptr); // P4
+	m_printer->dsr_handler().set(FUNC(tv910_state::printer_dtr_w)); // from pin 20 (DTR)
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, MASTER_CLOCK / 8400); // 1620 Hz (Row 10 signal)
