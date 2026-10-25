@@ -9,14 +9,15 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-18 05:29+1100\n"
-"PO-Revision-Date: 2016-02-20 18:03+0100\n"
-"Last-Translator: Automatically generated\n"
+"PO-Revision-Date: 2023-08-28 13:32+0900\n"
+"Last-Translator: Potmarigold(Nise)\n"
 "Language-Team: MAME Language Team\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.3.2\n"
 
 #: src/frontend/mame/ui/ui.cpp:474 src/frontend/mame/ui/ui.cpp:547
 msgid ""
@@ -26,12 +27,12 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"아무 키를 누르면 진행합니다"
+"계속하려면 아무 키나 누르세요."
 
 #: src/frontend/mame/ui/ui.cpp:559
 msgid ""
 "This system requires media images to be mounted for the following device(s): "
-msgstr ""
+msgstr "현 시스템에서는 다음 장치에 대해 매체 이미지를 마운트해야 함 : "
 
 #: src/frontend/mame/ui/ui.cpp:1275
 #, c-format
@@ -39,6 +40,8 @@ msgid ""
 "UI controls enabled\n"
 "Use %1$s to toggle"
 msgstr ""
+"사용자 인터페이스 조장 활성화\n"
+"전환하려면 %1$s을(를) 사용"
 
 #: src/frontend/mame/ui/ui.cpp:1277
 #, c-format
@@ -46,15 +49,17 @@ msgid ""
 "UI controls disabled\n"
 "Use %1$s to toggle"
 msgstr ""
+"사용자 인터페이스 조작 사용 안 함\n"
+"전환하려면 %1$s를 사용"
 
 #: src/frontend/mame/ui/ui.cpp:1486
 msgid "Master Volume"
-msgstr "마스터 볼륨"
+msgstr "기본 음량"
 
 #: src/frontend/mame/ui/ui.cpp:1495
 #, c-format
 msgid "%1$s Volume"
-msgstr "%1$s 볼륨"
+msgstr "%1$s 음량"
 
 #: src/frontend/mame/ui/ui.cpp:1517
 #, c-format
@@ -84,47 +89,47 @@ msgstr "%1$s 대비"
 #: src/frontend/mame/ui/ui.cpp:1553
 #, c-format
 msgid "%1$s Gamma"
-msgstr "%1$s 감마값"
+msgstr "%1$s 감마"
 
 #: src/frontend/mame/ui/ui.cpp:1557
 #, c-format
 msgid "%1$s Horiz Stretch"
-msgstr "%1$s 가로방향 연장"
+msgstr "%1$s 가로 확대/축소"
 
 #: src/frontend/mame/ui/ui.cpp:1559
 #, c-format
 msgid "%1$s Horiz Position"
-msgstr "%1$s 가로방향 위치"
+msgstr "%1$s 가로 위치"
 
 #: src/frontend/mame/ui/ui.cpp:1561
 #, c-format
 msgid "%1$s Vert Stretch"
-msgstr "%1$s 세로방향 연장"
+msgstr "%1$s 세로 확대/축소"
 
 #: src/frontend/mame/ui/ui.cpp:1563
 #, c-format
 msgid "%1$s Vert Position"
-msgstr "%1$s 세로방향 위치"
+msgstr "%1$s 세로 위치"
 
 #: src/frontend/mame/ui/ui.cpp:1579
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr "레이저디스크 '%1$s' 가로방향 연장"
+msgstr "레이저디스크 '%1$s' 가로 확대/축소"
 
 #: src/frontend/mame/ui/ui.cpp:1582
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
-msgstr "레이저디스크 '%1$s' 가로방향 위치"
+msgstr "레이저디스크 '%1$s' 가로 위치"
 
 #: src/frontend/mame/ui/ui.cpp:1584
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr "레이저디스크 '%1$s' 세로방향 연장"
+msgstr "레이저디스크 '%1$s' 세로 확대/축소"
 
 #: src/frontend/mame/ui/ui.cpp:1587
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
-msgstr "레이저디스크 '%1$s' 세로방향 위치"
+msgstr "레이저디스크 '%1$s' 세로 위치"
 
 #: src/frontend/mame/ui/ui.cpp:1597
 msgid "Vector Flicker"
@@ -140,7 +145,7 @@ msgstr "선 폭 최대량"
 
 #: src/frontend/mame/ui/ui.cpp:1600
 msgid "Beam Dot Size"
-msgstr ""
+msgstr "빔 도트 크기"
 
 #: src/frontend/mame/ui/ui.cpp:1601
 msgid "Beam Intensity Weight"
@@ -231,6 +236,9 @@ msgid ""
 "    Settings saved    \n"
 "\n"
 msgstr ""
+"\n"
+"    설정이 저장됨    \n"
+"\n"
 
 #: src/frontend/mame/ui/selsoft.cpp:510 src/frontend/mame/ui/selgame.cpp:318
 #, c-format
@@ -253,11 +261,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/selsoft.cpp:576
 msgid "[Start empty]"
-msgstr ""
+msgstr "[비워두기 시작]"
 
 #: src/frontend/mame/ui/selsoft.cpp:576
 msgid "[Use file manager]"
-msgstr ""
+msgstr "[파일 관리자 사용]"
 
 #: src/frontend/mame/ui/selsoft.cpp:756
 #, c-format
@@ -267,26 +275,26 @@ msgstr "%1$s %2$s ( %3$d / %4$d 소프트웨어 패키지 )"
 #: src/frontend/mame/ui/selsoft.cpp:757
 #, c-format
 msgid "%1$s - select software"
-msgstr ""
+msgstr "%1$s - 소프트웨어 선택"
 
 #: src/frontend/mame/ui/selsoft.cpp:762 src/frontend/mame/ui/selgame.cpp:1092
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
-msgstr "%1$s: %2$s - 검색: %3$s_"
+msgstr "%1$s : %2$s - 검색 : %3$s_"
 
 #: src/frontend/mame/ui/selsoft.cpp:764 src/frontend/mame/ui/selgame.cpp:1094
 #, c-format
 msgid "Search: %1$s_"
-msgstr "검색: %1$s_"
+msgstr "검색 : %1$s_"
 
 #: src/frontend/mame/ui/selsoft.cpp:771
 #, c-format
 msgid "Software list/item: %1$s:%2$s"
-msgstr ""
+msgstr "소프트웨어 목록/항목 : %1$s:%2$s"
 
 #: src/frontend/mame/ui/optsmenu.cpp:45 src/frontend/mame/ui/selgame.cpp:462
 msgid "General Settings"
-msgstr ""
+msgstr "일반 설정"
 
 #: src/frontend/mame/ui/optsmenu.cpp:77 src/frontend/mame/ui/sndmenu.cpp:30
 msgid "Sound Options"
@@ -294,7 +302,7 @@ msgstr "사운드 설정"
 
 #: src/frontend/mame/ui/optsmenu.cpp:80
 msgid "Input Assignments"
-msgstr ""
+msgstr "입력 할당"
 
 #: src/frontend/mame/ui/optsmenu.cpp:83 src/frontend/mame/ui/miscmenu.cpp:888
 msgid "Plugins"
@@ -302,23 +310,23 @@ msgstr "플러그인"
 
 #: src/frontend/mame/ui/optsmenu.cpp:85
 msgid "Input Devices"
-msgstr ""
+msgstr "입력 장치"
 
 #: src/frontend/mame/ui/optsmenu.cpp:87
 msgid "Save Settings"
-msgstr ""
+msgstr "설정 저장"
 
 #: src/frontend/mame/ui/optsmenu.cpp:183 src/frontend/mame/ui/optsmenu.cpp:225
 msgid "System Filter"
-msgstr ""
+msgstr "시스템 필터"
 
 #: src/frontend/mame/ui/optsmenu.cpp:195 src/frontend/mame/ui/custui.cpp:84
 msgid "Customize UI"
-msgstr "UI 꾸미기"
+msgstr "사용자 인터페이스 꾸미기"
 
 #: src/frontend/mame/ui/optsmenu.cpp:196 src/frontend/mame/ui/dirmenu.cpp:579
 msgid "Configure Folders"
-msgstr ""
+msgstr "폴더 구성"
 
 #: src/frontend/mame/ui/pluginopt.cpp:35
 msgid "Plugin Options"
@@ -364,15 +372,15 @@ msgstr "이 이미지를 읽고 diff에 씁니다"
 
 #: src/frontend/mame/ui/submenu.cpp:33
 msgid "Miscellaneous Options"
-msgstr "기타 선택사항"
+msgstr "기타 옵션"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Skip imperfect emulation warnings"
-msgstr ""
+msgstr "불완전한 에뮬레이션 경고 건너뛰기"
 
 #: src/frontend/mame/ui/submenu.cpp:35
 msgid "Re-select last system launched"
-msgstr ""
+msgstr "마지막으로 실행한 시스템 다시 선택"
 
 #: src/frontend/mame/ui/submenu.cpp:36
 msgid "Enlarge images in the right panel"
@@ -388,11 +396,11 @@ msgstr "마우스 포인터 보이기"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Confirm quit from emulation"
-msgstr ""
+msgstr "에뮬레이션 종료 확인"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Skip system information screen"
-msgstr ""
+msgstr "시스템 정보 화면 건너뛰기"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Force 4:3 aspect for snapshot display"
@@ -404,7 +412,7 @@ msgstr "이미지를 배경으로 사용하기"
 
 #: src/frontend/mame/ui/submenu.cpp:43
 msgid "Skip BIOS selection menu"
-msgstr "BIOS 선택 메뉴 건너뛰기"
+msgstr "바이오스 선택 메뉴 건너뛰기"
 
 #: src/frontend/mame/ui/submenu.cpp:44
 msgid "Skip software part selection menu"
@@ -440,7 +448,7 @@ msgstr "스로틀"
 
 #: src/frontend/mame/ui/submenu.cpp:57
 msgid "Mute when unthrottled"
-msgstr ""
+msgstr "스로틀링 해제 시 음소거"
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Sleep"
@@ -452,11 +460,11 @@ msgstr "속도"
 
 #: src/frontend/mame/ui/submenu.cpp:60
 msgid "Adjust speed to match refresh rate"
-msgstr ""
+msgstr "새로 고침 빈도에 맞게 속도 조정"
 
 #: src/frontend/mame/ui/submenu.cpp:61
 msgid "Low latency"
-msgstr ""
+msgstr "짧은 지연 시간"
 
 #: src/frontend/mame/ui/submenu.cpp:63
 msgid "Rotation Options"
@@ -496,7 +504,7 @@ msgstr "삽화 설정"
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "Zoom to screen area"
-msgstr ""
+msgstr "화면 영역 확대"
 
 #: src/frontend/mame/ui/submenu.cpp:75
 msgid "State/Playback Options"
@@ -508,7 +516,7 @@ msgstr "자동으로 저장/복원"
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "Allow rewind"
-msgstr ""
+msgstr "되감기 허용"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "Rewind capacity"
@@ -516,7 +524,7 @@ msgstr "되감기 영역"
 
 #: src/frontend/mame/ui/submenu.cpp:79
 msgid "Bilinear filtering for snapshots"
-msgstr ""
+msgstr "스냅샷을 위한 쌍선형 필터링"
 
 #: src/frontend/mame/ui/submenu.cpp:80
 msgid "Burn-in"
@@ -556,31 +564,31 @@ msgstr "입력지연"
 
 #: src/frontend/mame/ui/submenu.cpp:90
 msgid "UI active"
-msgstr "UI 활성"
+msgstr "사용자 인터페이스 활성"
 
 #: src/frontend/mame/ui/submenu.cpp:91
 msgid "Off-screen reload"
-msgstr "화면 밖에서 재실행"
+msgstr "화면 밖 다시 불러오기"
 
 #: src/frontend/mame/ui/submenu.cpp:92
 msgid "Joystick deadzone"
-msgstr "조이스틱 내부임계값"
+msgstr "조이스틱 내부 임계"
 
 #: src/frontend/mame/ui/submenu.cpp:93
 msgid "Joystick saturation"
-msgstr "조이스틱 외부임계값"
+msgstr "조이스틱 외부 임계값"
 
 #: src/frontend/mame/ui/submenu.cpp:94
 msgid "Joystick threshold"
-msgstr ""
+msgstr "조이스틱 임계값"
 
 #: src/frontend/mame/ui/submenu.cpp:95
 msgid "Natural keyboard"
-msgstr "실재 키보드"
+msgstr "내추럴 키보드"
 
 #: src/frontend/mame/ui/submenu.cpp:96
 msgid "Allow contradictory joystick inputs"
-msgstr ""
+msgstr "모순되는 조이스틱 입력 허용"
 
 #: src/frontend/mame/ui/submenu.cpp:97
 msgid "Coin impulse"
@@ -588,7 +596,7 @@ msgstr "코인 자극"
 
 #: src/frontend/mame/ui/submenu.cpp:103
 msgid "Input Device Options"
-msgstr ""
+msgstr "입력 장치 옵션"
 
 #: src/frontend/mame/ui/submenu.cpp:104
 msgid "Lightgun Device Assignment"
@@ -624,19 +632,19 @@ msgstr "마우스 장치 조정"
 
 #: src/frontend/mame/ui/submenu.cpp:113
 msgid "Keyboard Input Provider"
-msgstr ""
+msgstr "키보드 입력 공급자"
 
 #: src/frontend/mame/ui/submenu.cpp:114
 msgid "Mouse Input Provider"
-msgstr ""
+msgstr "마우스 입력 공급자"
 
 #: src/frontend/mame/ui/submenu.cpp:115
 msgid "Lightgun Input Provider"
-msgstr ""
+msgstr "광선총 입력 공급자"
 
 #: src/frontend/mame/ui/submenu.cpp:116
 msgid "Joystick Input Provider"
-msgstr ""
+msgstr "조이스틱 입력 공급자"
 
 #: src/frontend/mame/ui/submenu.cpp:122 src/frontend/mame/ui/videoopt.cpp:42
 msgid "Video Options"
@@ -676,7 +684,7 @@ msgstr "창 모드"
 
 #: src/frontend/mame/ui/submenu.cpp:133
 msgid "Enforce Aspect Ratio"
-msgstr "가로세로비 강제 유지"
+msgstr "종횡비 강제 유지"
 
 #: src/frontend/mame/ui/submenu.cpp:134
 msgid "Start Out Maximized"
@@ -684,11 +692,11 @@ msgstr "최대화 상태로 시작"
 
 #: src/frontend/mame/ui/submenu.cpp:135
 msgid "Synchronized Refresh"
-msgstr "새로고침 동기화"
+msgstr "새로 고침 동기화"
 
 #: src/frontend/mame/ui/submenu.cpp:136
 msgid "Wait Vertical Sync"
-msgstr "수직동기화 기다림"
+msgstr "수직 동기화 대기"
 
 #: src/frontend/mame/ui/menu.cpp:372 src/frontend/mame/ui/menu.cpp:738
 #: src/frontend/mame/ui/videoopt.cpp:169
@@ -696,7 +704,7 @@ msgstr "수직동기화 기다림"
 #: src/frontend/mame/ui/analogipt.cpp:527 plugins/cheatfind/init.lua:766
 #: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:679
 msgid "On"
-msgstr "켜기"
+msgstr "켬"
 
 #: src/frontend/mame/ui/menu.cpp:372 src/frontend/mame/ui/menu.cpp:741
 #: src/frontend/mame/ui/videoopt.cpp:185
@@ -705,7 +713,7 @@ msgstr "켜기"
 #: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:682
 #: plugins/cheat/init.lua:691
 msgid "Off"
-msgstr "끄기"
+msgstr "끔"
 
 #: src/frontend/mame/ui/menu.cpp:744
 msgid "Auto"
@@ -728,59 +736,59 @@ msgstr "파일 관리자"
 #: src/frontend/mame/ui/analogipt.cpp:412
 #, c-format
 msgid "[root%1$s]"
-msgstr ""
+msgstr "[root%1$s]"
 
 #: src/frontend/mame/ui/filemngr.cpp:166
 #: src/frontend/mame/ui/confswitch.cpp:170 src/frontend/mame/ui/slotopt.cpp:204
 msgid "Reset System"
-msgstr ""
+msgstr "시스템 초기화"
 
 #: src/frontend/mame/ui/filemngr.cpp:166
 msgid "Start System"
-msgstr ""
+msgstr "시스템 시작"
 
 #: src/frontend/mame/ui/videoopt.cpp:60
 #, c-format
 msgid "Screen #%d"
-msgstr "화면 #%d"
+msgstr "#%d 화면"
 
 #: src/frontend/mame/ui/videoopt.cpp:103
 #, c-format
 msgid "Video Options: %1$s"
-msgstr ""
+msgstr "비디오 옵션 : %1$s"
 
 #: src/frontend/mame/ui/videoopt.cpp:161
 msgid "Zoom to Screen Area"
-msgstr ""
+msgstr "화면 영역 확대/축소"
 
 #: src/frontend/mame/ui/videoopt.cpp:173
 msgid "X Only"
-msgstr ""
+msgstr "X만"
 
 #: src/frontend/mame/ui/videoopt.cpp:177
 msgid "Y Only"
-msgstr ""
+msgstr "Y만"
 
 #: src/frontend/mame/ui/videoopt.cpp:181
 msgid "X or Y (Auto)"
-msgstr ""
+msgstr "X 또는 Y(자동)"
 
 #: src/frontend/mame/ui/videoopt.cpp:188
 msgid "Non-Integer Scaling"
-msgstr ""
+msgstr "비정수 스케일링"
 
 #: src/frontend/mame/ui/videoopt.cpp:191
 msgid "Maintain Aspect Ratio"
-msgstr ""
+msgstr "종횡비 유지"
 
 #: src/frontend/mame/ui/videoopt.cpp:205
 msgid "Cannot change options while recording!"
-msgstr ""
+msgstr "녹화 중에는 옵션을 변경할 수 없습니다!"
 
 #: src/frontend/mame/ui/info.cpp:41
 msgctxt "emulation-feature"
 msgid "protection"
-msgstr "보호처리"
+msgstr "보호 처리"
 
 #: src/frontend/mame/ui/info.cpp:42
 msgctxt "emulation-feature"
@@ -795,7 +803,7 @@ msgstr "그래픽"
 #: src/frontend/mame/ui/info.cpp:44
 msgctxt "emulation-feature"
 msgid "color palette"
-msgstr "컬러 팔레트"
+msgstr "색상표"
 
 #: src/frontend/mame/ui/info.cpp:45
 msgctxt "emulation-feature"
@@ -805,7 +813,7 @@ msgstr "사운드"
 #: src/frontend/mame/ui/info.cpp:46
 msgctxt "emulation-feature"
 msgid "capture hardware"
-msgstr ""
+msgstr "하드웨어 캡처"
 
 #: src/frontend/mame/ui/info.cpp:47
 msgctxt "emulation-feature"
@@ -835,7 +843,7 @@ msgstr "마우스"
 #: src/frontend/mame/ui/info.cpp:52
 msgctxt "emulation-feature"
 msgid "media"
-msgstr ""
+msgstr "매체"
 
 #: src/frontend/mame/ui/info.cpp:53
 msgctxt "emulation-feature"
@@ -855,22 +863,22 @@ msgstr "자기 테이프"
 #: src/frontend/mame/ui/info.cpp:56
 msgctxt "emulation-feature"
 msgid "punch tape"
-msgstr ""
+msgstr "펀치 테이프"
 
 #: src/frontend/mame/ui/info.cpp:57
 msgctxt "emulation-feature"
 msgid "magnetic drum"
-msgstr ""
+msgstr "자기 드럼"
 
 #: src/frontend/mame/ui/info.cpp:58
 msgctxt "emulation-feature"
 msgid "solid state storage"
-msgstr ""
+msgstr "솔리드 스테이트 스토리지"
 
 #: src/frontend/mame/ui/info.cpp:59
 msgctxt "emulation-feature"
 msgid "communications"
-msgstr ""
+msgstr "커뮤니케이션"
 
 #: src/frontend/mame/ui/info.cpp:60
 msgctxt "emulation-feature"
@@ -887,22 +895,28 @@ msgid ""
 "One or more ROMs/disk images for this system are incorrect. The system may "
 "not run correctly.\n"
 msgstr ""
+"현 시스템에 대한 하나 이상의 ROM/디스크 이미지가 올바르지 않습니다. 시스템이 "
+"올바르게 실행되지 않을 수 있습니다.\n"
 
 #: src/frontend/mame/ui/info.cpp:83
 msgid ""
 "There are known problems with this system\n"
 "\n"
 msgstr ""
+"현 시스템에는 다음과 같은 알려진 문제가 있습니다.\n"
+"\n"
 
 #: src/frontend/mame/ui/info.cpp:88
 msgid ""
 "One or more ROMs/disk images for this system have not been correctly "
 "dumped.\n"
 msgstr ""
+"현 시스템에 대한 하나 이상의 ROM/디스크 이미지가 올바르게 덤프되지 않았습니"
+"다.\n"
 
 #: src/frontend/mame/ui/info.cpp:96
 msgid "Completely unemulated features: "
-msgstr "에뮬레이션이 적용 안 된 특성: "
+msgstr "에뮬레이션이 적용 안 된 특성 : "
 
 #: src/frontend/mame/ui/info.cpp:102 src/frontend/mame/ui/info.cpp:118
 #, c-format
@@ -917,7 +931,7 @@ msgstr ", %s"
 
 #: src/frontend/mame/ui/info.cpp:112
 msgid "Imperfectly emulated features: "
-msgstr "에뮬레이션이 불완전한 특성: "
+msgstr "에뮬레이션이 불완전한 특성 : "
 
 #: src/frontend/mame/ui/info.cpp:133
 msgid "Screen flipping in cocktail mode is not supported.\n"
@@ -925,19 +939,23 @@ msgstr "칵테일 모드의 화면 반전이 지원되지 않습니다.\n"
 
 #: src/frontend/mame/ui/info.cpp:135
 msgid "This system requires external artwork files.\n"
-msgstr ""
+msgstr "현 시스템에는 외부 아트웍 파일이 필요합니다.\n"
 
 #: src/frontend/mame/ui/info.cpp:137
 msgid ""
 "This system was never completed. It may exhibit strange behavior or missing "
 "elements that are not bugs in the emulation.\n"
 msgstr ""
+"현 시스템은 완성되지 않았습니다. 에뮬레이션에서 버그가 아닌 이상한 동작이나 "
+"누락된 요소가 나타날 수 있습니다.\n"
 
 #: src/frontend/mame/ui/info.cpp:139
 msgid ""
 "This system has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
 msgstr ""
+"현 시스템에는 사운드 하드웨어가 없으므로 MAME는 소리를 내지 않으며, 이는 예상"
+"되는 동작입니다.\n"
 
 #: src/frontend/mame/ui/info.cpp:143
 msgid ""
@@ -946,6 +964,10 @@ msgid ""
 "There is nothing you can do to fix this problem except wait for the "
 "developers to improve the emulation.\n"
 msgstr ""
+"\n"
+"현 시스템은 작동하지 않습니다. 현 시스템에 대한 에뮬레이션이 아직 완료되지 않"
+"았습니다. 개발자가 에뮬레이션을 개선할 때까지 기다리는 것 외에는 이 문제를 해"
+"결하기 위해 할 수 있는 일이 없습니다.\n"
 
 #: src/frontend/mame/ui/info.cpp:145
 msgid ""
@@ -954,6 +976,10 @@ msgid ""
 "physical interaction or consist of mechanical devices. It is not possible to "
 "fully experience this system.\n"
 msgstr ""
+"\n"
+"현 시스템의 요소는 물리적 상호 작용이 필요하거나 기계 장치로 구성되어 있기 때"
+"문에 정확하게 에뮬레이션할 수 없습니다. 현 시스템을 완전히 경험하는 것은 불가"
+"능합니다.\n"
 
 #: src/frontend/mame/ui/info.cpp:167
 #, c-format
@@ -962,6 +988,9 @@ msgid ""
 "\n"
 "There are working clones of this system: %s"
 msgstr ""
+"\n"
+"\n"
+"현 시스템의 작업 복제본이 있음 : %s"
 
 #: src/frontend/mame/ui/info.cpp:374
 #, c-format
@@ -974,14 +1003,14 @@ msgid ""
 msgstr ""
 "%1$s\n"
 "%2$s %3$s\n"
-"드라이버: %4$s\n"
+"드라이버 : %4$s\n"
 "\n"
-"CPU:\n"
+"CPU :\n"
 
 #: src/frontend/mame/ui/info.cpp:416 src/frontend/mame/ui/info.cpp:459
 #: src/frontend/mame/ui/devopt.cpp:108 src/frontend/mame/ui/devopt.cpp:190
 msgid "GHz"
-msgstr ""
+msgstr "GHz"
 
 #: src/frontend/mame/ui/info.cpp:416 src/frontend/mame/ui/info.cpp:459
 #: src/frontend/mame/ui/devopt.cpp:108 src/frontend/mame/ui/devopt.cpp:190
@@ -996,7 +1025,7 @@ msgstr "kHZ"
 #: src/frontend/mame/ui/info.cpp:416 src/frontend/mame/ui/info.cpp:459
 #: src/frontend/mame/ui/devopt.cpp:108 src/frontend/mame/ui/devopt.cpp:190
 msgid "Hz"
-msgstr ""
+msgstr "Hz"
 
 #: src/frontend/mame/ui/info.cpp:430
 msgid ""
@@ -1025,7 +1054,7 @@ msgstr "벡터"
 #: src/frontend/mame/ui/info.cpp:496
 #, c-format
 msgid "%1$s: %2$s\n"
-msgstr "%1$s: %2$s\n"
+msgstr "%1$s : %2$s\n"
 
 #: src/frontend/mame/ui/info.cpp:496
 msgid "%2$s\n"
@@ -1034,7 +1063,7 @@ msgstr "%2$s\n"
 #: src/frontend/mame/ui/info.cpp:513
 #, c-format
 msgid "Screen '%1$s'"
-msgstr "화면 '%1$s'"
+msgstr "'%1$s' 화면"
 
 #: src/frontend/mame/ui/info.cpp:515
 msgid "Screen"
@@ -1043,11 +1072,11 @@ msgstr "화면"
 #: src/frontend/mame/ui/info.cpp:592 src/frontend/mame/ui/info.cpp:603
 #, c-format
 msgid "%1$s:\n"
-msgstr ""
+msgstr "%1$s :\n"
 
 #: src/frontend/mame/ui/info.cpp:633
 msgid "Media Image Information"
-msgstr ""
+msgstr "매체 이미지 정보"
 
 #: src/frontend/mame/ui/info.cpp:681
 msgid "Not supported"
@@ -1095,11 +1124,11 @@ msgstr "예"
 
 #: src/frontend/mame/ui/filecreate.cpp:189
 msgid "New Image Name:"
-msgstr "새 이미지 이름:"
+msgstr "새 이미지 이름 :"
 
 #: src/frontend/mame/ui/filecreate.cpp:196
 msgid "Image Format:"
-msgstr "이미지 형식:"
+msgstr "이미지 형식 :"
 
 #: src/frontend/mame/ui/filecreate.cpp:202
 msgid "Create"
@@ -1115,12 +1144,12 @@ msgstr "이미지 형식 선택"
 
 #: src/frontend/mame/ui/filecreate.cpp:354
 msgid "Select initial contents"
-msgstr ""
+msgstr "초기 컨텐츠 선택"
 
 #: src/frontend/mame/ui/keyboard.cpp:29
 msgctxt "menu-keyboard"
 msgid "Keyboard Selection"
-msgstr ""
+msgstr "키보드 선택"
 
 #: src/frontend/mame/ui/keyboard.cpp:46
 msgctxt "menu-keyboard"
@@ -1130,7 +1159,7 @@ msgstr "키보드 모드"
 #: src/frontend/mame/ui/keyboard.cpp:47 src/frontend/mame/ui/keyboard.cpp:92
 msgctxt "menu-keyboard"
 msgid "Natural"
-msgstr "실재"
+msgstr "내추럴"
 
 #: src/frontend/mame/ui/keyboard.cpp:47 src/frontend/mame/ui/keyboard.cpp:92
 msgctxt "menu-keyboard"
@@ -1143,99 +1172,99 @@ msgstr "에뮬레이션"
 #: src/frontend/mame/ui/analogipt.cpp:410
 #, c-format
 msgid "%1$s [root%2$s]"
-msgstr ""
+msgstr "%1$s [root%2$s]"
 
 #: src/frontend/mame/ui/keyboard.cpp:60
 msgid "[root%2$s]"
-msgstr ""
+msgstr "[root%2$s]"
 
 #: src/frontend/mame/ui/keyboard.cpp:63 src/frontend/mame/ui/keyboard.cpp:110
 msgid "Enabled"
-msgstr "활성"
+msgstr "활성화"
 
 #: src/frontend/mame/ui/keyboard.cpp:63 src/frontend/mame/ui/keyboard.cpp:110
 msgid "Disabled"
-msgstr "비활성"
+msgstr "비활성화"
 
 #: src/frontend/mame/ui/utils.cpp:63
 msgctxt "swlist-info"
 msgid "Alternate Title"
-msgstr ""
+msgstr "대체 타이틀"
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgctxt "swlist-info"
 msgid "Author"
-msgstr ""
+msgstr "저자"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgctxt "swlist-info"
 msgid "Barcode Number"
-msgstr ""
+msgstr "바코드 번호"
 
 #: src/frontend/mame/ui/utils.cpp:66
 msgctxt "swlist-info"
 msgid "Developer"
-msgstr ""
+msgstr "개발"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgctxt "swlist-info"
 msgid "Distributor"
-msgstr ""
+msgstr "배급"
 
 #: src/frontend/mame/ui/utils.cpp:68
 msgctxt "swlist-info"
 msgid "Installation Instructions"
-msgstr ""
+msgstr "설치 안내"
 
 #: src/frontend/mame/ui/utils.cpp:69
 msgctxt "swlist-info"
 msgid "ISBN"
-msgstr ""
+msgstr "ISBN"
 
 #: src/frontend/mame/ui/utils.cpp:70
 msgctxt "swlist-info"
 msgid "OEM"
-msgstr ""
+msgstr "OEM"
 
 #: src/frontend/mame/ui/utils.cpp:71
 msgctxt "swlist-info"
 msgid "Original Publisher"
-msgstr ""
+msgstr "원본 퍼블리셔"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgctxt "swlist-info"
 msgid "Part Number"
-msgstr ""
+msgstr "파트 번호"
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgctxt "swlist-info"
 msgid "PCB"
-msgstr ""
+msgstr "PCB"
 
 #: src/frontend/mame/ui/utils.cpp:74
 msgctxt "swlist-info"
 msgid "Programmer"
-msgstr ""
+msgstr "프로그래머"
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgctxt "swlist-info"
 msgid "Release Date"
-msgstr ""
+msgstr "출시일"
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgctxt "swlist-info"
 msgid "Serial Number"
-msgstr ""
+msgstr "일련 번호"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgctxt "swlist-info"
 msgid "Usage Instructions"
-msgstr ""
+msgstr "사용 안내"
 
 #: src/frontend/mame/ui/utils.cpp:78
 msgctxt "swlist-info"
 msgid "Version"
-msgstr ""
+msgstr "버전"
 
 #: src/frontend/mame/ui/utils.cpp:84
 msgctxt "machine-filter"
@@ -1255,7 +1284,7 @@ msgstr "사용 불가"
 #: src/frontend/mame/ui/utils.cpp:87
 msgctxt "machine-filter"
 msgid "Working"
-msgstr "작동함"
+msgstr "작동"
 
 #: src/frontend/mame/ui/utils.cpp:88
 msgctxt "machine-filter"
@@ -1285,7 +1314,7 @@ msgstr "즐겨찾기"
 #: src/frontend/mame/ui/utils.cpp:93
 msgctxt "machine-filter"
 msgid "BIOS"
-msgstr ""
+msgstr "바이오스"
 
 #: src/frontend/mame/ui/utils.cpp:94
 msgctxt "machine-filter"
@@ -1390,22 +1419,22 @@ msgstr "배급사"
 #: src/frontend/mame/ui/utils.cpp:117
 msgctxt "software-filter"
 msgid "Developer"
-msgstr ""
+msgstr "개발"
 
 #: src/frontend/mame/ui/utils.cpp:118
 msgctxt "software-filter"
 msgid "Distributor"
-msgstr ""
+msgstr "배급"
 
 #: src/frontend/mame/ui/utils.cpp:119
 msgctxt "software-filter"
 msgid "Author"
-msgstr ""
+msgstr "저자"
 
 #: src/frontend/mame/ui/utils.cpp:120
 msgctxt "software-filter"
 msgid "Programmer"
-msgstr ""
+msgstr "프로그래머"
 
 #: src/frontend/mame/ui/utils.cpp:121
 msgctxt "software-filter"
@@ -1448,11 +1477,11 @@ msgstr "필터"
 
 #: src/frontend/mame/ui/utils.cpp:292
 msgid "<set up filters>"
-msgstr "<필터 결정>"
+msgstr "<필터 설정>"
 
 #: src/frontend/mame/ui/utils.cpp:390
 msgid "Select Filters"
-msgstr ""
+msgstr "필터 선택"
 
 #: src/frontend/mame/ui/utils.cpp:538
 #, c-format
@@ -1497,21 +1526,21 @@ msgstr "복제판 포함"
 
 #: src/frontend/mame/ui/utils.cpp:1131
 msgid "Category File"
-msgstr ""
+msgstr "카테고리 파일"
 
 #: src/frontend/mame/ui/utils.cpp:2026 src/frontend/mame/ui/inifile.cpp:301
 msgctxt "swlist-info"
 msgid "Software list/item"
-msgstr ""
+msgstr "소프트웨어 목록/항목"
 
 #: src/frontend/mame/ui/datmenu.cpp:88 src/frontend/mame/ui/selmenu.cpp:2752
 msgid "Software List Info"
-msgstr ""
+msgstr "소프트웨어 목록 정보"
 
 #: src/frontend/mame/ui/datmenu.cpp:307
 #, c-format
 msgid "Revision: %1$s"
-msgstr "개정: %1$s"
+msgstr "개정 : %1$s"
 
 #: src/frontend/mame/ui/miscmenu.cpp:54
 msgid "BIOS Selection"
@@ -1519,11 +1548,11 @@ msgstr "바이오스 선택"
 
 #: src/frontend/mame/ui/miscmenu.cpp:76 src/frontend/mame/ui/miscmenu.cpp:821
 msgid "System"
-msgstr ""
+msgstr "시스템"
 
 #: src/frontend/mame/ui/miscmenu.cpp:82
 msgid "Reset"
-msgstr "리셋"
+msgstr "초기화"
 
 #: src/frontend/mame/ui/miscmenu.cpp:150
 msgid "Network Devices"
@@ -1535,7 +1564,7 @@ msgid ""
 "Uptime: %1$d:%2$02d:%3$02d\n"
 "\n"
 msgstr ""
-"가동 시간: %1$d:%2$02d:%3$02d\n"
+"가동 시간 : %1$d:%2$02d:%3$02d\n"
 "\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:241
@@ -1544,7 +1573,7 @@ msgid ""
 "Uptime: %1$d:%2$02d\n"
 "\n"
 msgstr ""
-"가동 시간: %1$d:%2$02d\n"
+"가동 시간 : %1$d:%2$02d\n"
 "\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:246
@@ -1552,18 +1581,16 @@ msgstr ""
 msgid ""
 "Tickets dispensed: %1$d\n"
 "\n"
-msgstr ""
-"티켓 발행: %1$d\n"
-"\n"
+msgstr "발행된 티켓: %1$d\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:259
 msgid "Coin %1$c: NA%3$s\n"
-msgstr "코인 %1$c: NA%3$s\n"
+msgstr "코인 %1$c : NA%3$s\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:259
 #, c-format
 msgid "Coin %1$c: %2$d%3$s\n"
-msgstr "코인 %1$c: %2$d%3$s\n"
+msgstr "코인 %1$c : %2$d%3$s\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:262
 msgid " (locked)"
@@ -1572,7 +1599,7 @@ msgstr " (잠김)"
 #: src/frontend/mame/ui/miscmenu.cpp:356 src/frontend/mame/ui/miscmenu.cpp:550
 msgctxt "menu-crosshair"
 msgid "[built-in]"
-msgstr ""
+msgstr "[내장]"
 
 #: src/frontend/mame/ui/miscmenu.cpp:397
 msgctxt "menu-crosshair"
@@ -1582,58 +1609,58 @@ msgstr "조준선 설정"
 #: src/frontend/mame/ui/miscmenu.cpp:465
 msgctxt "menu-crosshair"
 msgid "Never"
-msgstr ""
+msgstr "거부"
 
 #: src/frontend/mame/ui/miscmenu.cpp:466
 msgctxt "menu-crosshair"
 msgid "Always"
-msgstr ""
+msgstr "항상"
 
 #: src/frontend/mame/ui/miscmenu.cpp:467
 msgctxt "menu-crosshair"
 msgid "When moved"
-msgstr ""
+msgstr "이동 시"
 
 #: src/frontend/mame/ui/miscmenu.cpp:491
 #, c-format
 msgctxt "menu-crosshair"
 msgid "P%1$d Visibility"
-msgstr ""
+msgstr "P%1$d 표시 여부"
 
 #: src/frontend/mame/ui/miscmenu.cpp:549
 #, c-format
 msgctxt "menu-crosshair"
 msgid "P%1$d Crosshair"
-msgstr ""
+msgstr "P%1$d 십자선"
 
 #: src/frontend/mame/ui/miscmenu.cpp:571
 msgctxt "menu-crosshair"
 msgid "Auto-Hide Delay"
-msgstr ""
+msgstr "자동 숨김 지연"
 
 #: src/frontend/mame/ui/miscmenu.cpp:572
 #, c-format
 msgctxt "menu-crosshair"
 msgid "%1$d s"
-msgstr ""
+msgstr "%1$d초"
 
 #: src/frontend/mame/ui/miscmenu.cpp:593
 msgid "Export Displayed List to File"
-msgstr ""
+msgstr "표시된 목록을 파일로 내보내기"
 
 #: src/frontend/mame/ui/miscmenu.cpp:653
 #, c-format
 msgid "%s.xml saved in UI settings folder."
-msgstr ""
+msgstr "사용자 인터페이스 설정 폴더에 저장된 %s.xml입니다."
 
 #: src/frontend/mame/ui/miscmenu.cpp:679
 msgid "Name:             Description:\n"
-msgstr "이름:             설명:\n"
+msgstr "이름 :             설명 :\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:690
 #, c-format
 msgid "%s.txt saved in UI settings folder."
-msgstr ""
+msgstr "사용자 인터페이스 설정 폴더에 저장된 %s.txt입니다."
 
 #: src/frontend/mame/ui/miscmenu.cpp:707
 msgid "Export list in XML format (like -listxml)"
@@ -1653,6 +1680,8 @@ msgid ""
 "System Settings:\n"
 "%1$s"
 msgstr ""
+"시스템 설정 :\n"
+"%1$s"
 
 #: src/frontend/mame/ui/miscmenu.cpp:817
 msgid "BIOS"
@@ -1660,7 +1689,7 @@ msgstr "바이오스"
 
 #: src/frontend/mame/ui/miscmenu.cpp:824
 msgid "[this system has no BIOS settings]"
-msgstr ""
+msgstr "[현 시스템에는 바이오스 설정이 없음]"
 
 #: src/frontend/mame/ui/miscmenu.cpp:833
 msgid "Add To Favorites"
@@ -1672,7 +1701,7 @@ msgstr "즐겨찾기에서 삭제"
 
 #: src/frontend/mame/ui/miscmenu.cpp:838
 msgid "Save System Settings"
-msgstr ""
+msgstr "시스템 설정 저장"
 
 #: src/frontend/mame/ui/miscmenu.cpp:871 src/frontend/mame/ui/selmenu.cpp:2698
 msgid " (default)"
@@ -1680,7 +1709,7 @@ msgstr " (기본)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:948
 msgid "No plugins found"
-msgstr ""
+msgstr "플러그인을 찾을 수 없음"
 
 #: src/frontend/mame/ui/quitmenu.cpp:37
 #, c-format
@@ -1690,10 +1719,10 @@ msgid ""
 "Press %1$s to quit\n"
 "Press %2$s to return to emulation"
 msgstr ""
-"정말로 종료하겠습니까?\n"
+"정말 종료하시겠습니까?\n"
 "\n"
-"%1$s를 누르면 종료\n"
-"%2$s를 누르면 원래 화면으로 복귀"
+"종료하려면 %1$s을(를) 누르세요.\n"
+"에뮬레이션으로 돌아가려면 %2$s를 누르세요."
 
 #: src/frontend/mame/ui/info_pty.cpp:22
 msgid "Pseudo Terminals"
@@ -1709,7 +1738,7 @@ msgstr "슬라이더 조작"
 
 #: src/frontend/mame/ui/state.cpp:220
 msgid "[no saved states found]"
-msgstr ""
+msgstr "[저장된 상태를 찾을 수 없음]"
 
 #: src/frontend/mame/ui/state.cpp:225 plugins/cheatfind/init.lua:492
 msgid "Cancel"
@@ -1722,16 +1751,19 @@ msgid ""
 "Press %2$s to delete\n"
 "Press %3$s to cancel"
 msgstr ""
+"저장된 상태 %1$s를 삭제하시겠습니까?\n"
+"삭제하려면 %2$s를 누르세요.\n"
+"취소하려면 %3$s를 누르세요."
 
 #: src/frontend/mame/ui/state.cpp:388
 #, c-format
 msgid "Error removing saved state file %1$s"
-msgstr ""
+msgstr "저장된 상태 파일 %1$s를 제거하는 동안 오류 발생"
 
 #: src/frontend/mame/ui/state.cpp:450
 #, c-format
 msgid "Press %1$s to delete"
-msgstr ""
+msgstr "삭제하려면 %1$s를 누르세요."
 
 #: src/frontend/mame/ui/state.cpp:521
 msgid "Load State"
@@ -1739,7 +1771,7 @@ msgstr "상태 불러오기"
 
 #: src/frontend/mame/ui/state.cpp:521
 msgid "Select state to load"
-msgstr ""
+msgstr "불러올 상태 선택"
 
 #: src/frontend/mame/ui/state.cpp:545
 msgid "Save State"
@@ -1747,7 +1779,7 @@ msgstr "상태 저장하기"
 
 #: src/frontend/mame/ui/state.cpp:545
 msgid "Press a key or joystick button, or select state to overwrite"
-msgstr ""
+msgstr "키 또는 조이스틱 버튼을 누르거나 덮어쓸 상태를 선택"
 
 #: src/frontend/mame/ui/confswitch.cpp:318
 msgid "DIP Switches"
@@ -1768,7 +1800,7 @@ msgstr "%s [내부]"
 
 #: src/frontend/mame/ui/inputmap.cpp:29
 msgid "Input Assignments (general)"
-msgstr ""
+msgstr "입력 할당(일반)"
 
 #: src/frontend/mame/ui/inputmap.cpp:39
 msgid "User Interface"
@@ -1777,7 +1809,7 @@ msgstr "사용자 인터페이스"
 #: src/frontend/mame/ui/inputmap.cpp:42
 #, c-format
 msgid "Player %1$d Controls"
-msgstr ""
+msgstr "플레이어 %1$d 조작"
 
 #: src/frontend/mame/ui/inputmap.cpp:45
 msgid "Other Controls"
@@ -1786,102 +1818,102 @@ msgstr "기타 조작"
 #: src/frontend/mame/ui/inputmap.cpp:58
 #, c-format
 msgid "Input Assignments (%1$s)"
-msgstr ""
+msgstr "입력 할당(%1$s)"
 
 #: src/frontend/mame/ui/inputmap.cpp:152
 msgid "Input Assignments (this system)"
-msgstr ""
+msgstr "입력 할당(현 시스템)"
 
 #: src/frontend/mame/ui/inputmap.cpp:254
 msgid "[no assignable inputs are enabled]"
-msgstr ""
+msgstr "[할당 가능한 입력이 활성화되지 않음]"
 
 #: src/frontend/mame/ui/inputmap.cpp:358
 msgid "Pressed"
-msgstr ""
+msgstr "누름"
 
 #: src/frontend/mame/ui/inputmap.cpp:418
 msgid "Invalid combination entered"
-msgstr ""
+msgstr "잘못된 조합 입력"
 
 #: src/frontend/mame/ui/inputmap.cpp:564
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog"
-msgstr ""
+msgstr "%1$s 아날로그"
 
 #: src/frontend/mame/ui/inputmap.cpp:565
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Inc"
-msgstr ""
+msgstr "%1$s 아날로그 증가"
 
 #: src/frontend/mame/ui/inputmap.cpp:566
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Dec"
-msgstr ""
+msgstr "%1$s 아날로그 감소"
 
 #: src/frontend/mame/ui/inputmap.cpp:608
 #, c-format
 msgid "Press %1$s to set\n"
-msgstr ""
+msgstr "설정하려면 %1$s을(를) 누르세요.\n"
 
 #: src/frontend/mame/ui/inputmap.cpp:609
 #, c-format
 msgid "Press %1$s to append\n"
-msgstr ""
+msgstr "추가하려면 %1$s를 누르세요.\n"
 
 #: src/frontend/mame/ui/inputmap.cpp:610
 #, c-format
 msgid "Press %1$s to clear\n"
-msgstr ""
+msgstr "지우려면 %1$s를 누르세요.\n"
 
 #: src/frontend/mame/ui/inputmap.cpp:611
 #, c-format
 msgid "Press %1$s to restore default\n"
-msgstr ""
+msgstr "기본값으로 복원하려면 %1$s를 누르세요.\n"
 
 #: src/frontend/mame/ui/inputdevices.cpp:33
 #, c-format
 msgctxt "menu-inputdev"
 msgid "%1$s (%2$s %3$d)"
-msgstr ""
+msgstr "%1$s (%2$s %3$d)"
 
 #: src/frontend/mame/ui/inputdevices.cpp:116
 msgctxt "menu-inputdev"
 msgid "Copy Device ID"
-msgstr ""
+msgstr "장치 ID 복사"
 
 #: src/frontend/mame/ui/inputdevices.cpp:148
 msgctxt "menu-inputdev"
 msgid "Copied device ID to clipboard"
-msgstr ""
+msgstr "클립보드에 장치 ID 복사"
 
 #: src/frontend/mame/ui/inputdevices.cpp:150
 msgctxt "menu-inputdev"
 msgid "Error copying device ID to clipboard"
-msgstr ""
+msgstr "장치 ID를 클립보드에 복사하는 동안 오류 발생"
 
 #: src/frontend/mame/ui/inputdevices.cpp:189
 msgctxt "menu-inputdev"
 msgid "Input Devices"
-msgstr ""
+msgstr "장치 입력"
 
 #: src/frontend/mame/ui/inputdevices.cpp:230
 msgctxt "menu-inputdev"
 msgid "[no input devices are enabled]"
-msgstr ""
+msgstr "[입력 장치가 활성화되지 않음]"
 
 #: src/frontend/mame/ui/inputtoggle.cpp:22
 msgctxt "menu-inputtoggle"
 msgid "Toggle Inputs"
-msgstr ""
+msgstr "입력 적용/해제"
 
 #: src/frontend/mame/ui/inputtoggle.cpp:107
 msgctxt "menu-inputtoggle"
 msgid "[no toggle inputs are enabled]"
-msgstr ""
+msgstr "[입력 전환이 활성화되지 않음]"
 
 #: src/frontend/mame/ui/tapectrl.cpp:42
 msgid "Tape Control"
@@ -1925,42 +1957,42 @@ msgstr "되감기"
 
 #: src/frontend/mame/ui/tapectrl.cpp:109
 msgid "Fast Forward"
-msgstr "빨리감기"
+msgstr "빨리 감기"
 
 #: src/frontend/mame/ui/inputopts.cpp:75
 msgctxt "menu-inputopts"
 msgid "Input Settings"
-msgstr ""
+msgstr "입력 설정"
 
 #: src/frontend/mame/ui/inputopts.cpp:97
 msgctxt "menu-inputopts"
 msgid "Input Assignments (this system)"
-msgstr ""
+msgstr "입력 할당(현 시스템)"
 
 #: src/frontend/mame/ui/inputopts.cpp:99
 msgctxt "menu-inputopts"
 msgid "Analog Input Adjustments"
-msgstr ""
+msgstr "아날로그 입력 설정"
 
 #: src/frontend/mame/ui/inputopts.cpp:101
 msgctxt "menu-inputopts"
 msgid "Keyboard Selection"
-msgstr ""
+msgstr "키보드 선택"
 
 #: src/frontend/mame/ui/inputopts.cpp:103
 msgctxt "menu-inputopts"
 msgid "Toggle Inputs"
-msgstr ""
+msgstr "입력 전환"
 
 #: src/frontend/mame/ui/inputopts.cpp:108
 msgctxt "menu-inputopts"
 msgid "Input Assignments (general)"
-msgstr ""
+msgstr "입력 할당(일반)"
 
 #: src/frontend/mame/ui/inputopts.cpp:109
 msgctxt "menu-inputopts"
 msgid "Input Devices"
-msgstr ""
+msgstr "장치 입력"
 
 #: src/frontend/mame/ui/imgcntrl.cpp:132
 msgid "Cannot save over directory"
@@ -1971,6 +2003,8 @@ msgid ""
 "The software selected is missing one or more required ROM or CHD images.\n"
 "Please acquire the correct files or select a different one."
 msgstr ""
+"선택한 소프트웨어에 하나 이상의 필수 ROM 또는 CHD 이미지가 누락되었습니다.\n"
+"올바른 파일을 확보하거나 다른 파일을 선택하세요."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:151
 msgid ""
@@ -1991,7 +2025,7 @@ msgstr "옵션 환경설정"
 #: src/frontend/mame/ui/simpleselgame.cpp:279
 #: src/frontend/mame/ui/selmenu.cpp:1307
 msgid "Exit"
-msgstr "닫기"
+msgstr "종료"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:313
 #, c-format
@@ -2002,15 +2036,20 @@ msgid ""
 "If this is your first time using %2$s, please see the %2$s.pdf file in the "
 "docs folder for information on setting up and using %2$s."
 msgstr ""
+"시스템 ROM을 찾을 수 없습니다. %1$s.ini 파일에 지정된 롬 경로 설정을 확인하십"
+"시오.\n"
+"\n"
+"%2$s를 처음 사용하는 경우 문서 폴더에 있는 %2$s.pdf 파일에서 %2$s 설정 및 사"
+"용에 대한 정보를 참조하세요."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:329
 #, c-format
 msgid "Type name or select: %1$s_"
-msgstr "새 이름을 짓거나 선택하십시오: %1$s_"
+msgstr "새 이름을 짓거나 선택 : %1$s_"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:331
 msgid "Type name or select: (random)"
-msgstr "새 이름을 짓거나 선택하십시오: (무작위)"
+msgstr "새 이름을 짓거나 선택 : (무작위)"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:345
 #, c-format
@@ -2025,57 +2064,57 @@ msgstr "%1$s, %2$-.100s"
 #: src/frontend/mame/ui/simpleselgame.cpp:357
 #, c-format
 msgid "Driver: %1$s"
-msgstr "드라이버: %1$s"
+msgstr "드라이버 : %1$s"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:373
 #: src/frontend/mame/ui/selmenu.cpp:735
 msgid "Overall: NOT WORKING"
-msgstr "종합: 작동 불가"
+msgstr "종합 : 작동 불가"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:375
 #: src/frontend/mame/ui/selmenu.cpp:737
 msgid "Overall: Unemulated Protection"
-msgstr "종합: 보호처리 에뮬레이션 미완"
+msgstr "종합 : 보호 처리 에뮬레이션 미완"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:377
 #: src/frontend/mame/ui/selmenu.cpp:739
 msgid "Overall: Working"
-msgstr "종합: 작동 가능"
+msgstr "종합 : 작동 가능"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:381
 #: src/frontend/mame/ui/selmenu.cpp:743
 msgid "Graphics: Unimplemented, "
-msgstr "그래픽: 적용 안 됨,"
+msgstr "그래픽 : 구현되지 않음, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:383
 #: src/frontend/mame/ui/selmenu.cpp:745
 msgid "Graphics: Imperfect, "
-msgstr "그래픽: 불완전,"
+msgstr "그래픽 : 불완전, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:385
 #: src/frontend/mame/ui/selmenu.cpp:747
 msgid "Graphics: OK, "
-msgstr "그래픽: 양호,"
+msgstr "그래픽 : 양호, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:388
 #: src/frontend/mame/ui/selmenu.cpp:750
 msgid "Sound: None"
-msgstr "사운드: 없음"
+msgstr "사운드 : 없음"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:390
 #: src/frontend/mame/ui/selmenu.cpp:752
 msgid "Sound: Unimplemented"
-msgstr "사운드: 적용 안 됨"
+msgstr "사운드 : 적용 안 됨"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:392
 #: src/frontend/mame/ui/selmenu.cpp:754
 msgid "Sound: Imperfect"
-msgstr "사운드: 불완전"
+msgstr "사운드 : 불완전"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:394
 #: src/frontend/mame/ui/selmenu.cpp:756
 msgid "Sound: OK"
-msgstr "사운드: 양호"
+msgstr "사운드 : 양호"
 
 #: src/frontend/mame/ui/cheatopt.cpp:82 plugins/cheat/init.lua:762
 #, c-format, lua-format
@@ -2083,7 +2122,7 @@ msgid ""
 "Cheat Comment:\n"
 "%s"
 msgstr ""
-"치트 설명:\n"
+"치트 설명 :\n"
 "%s"
 
 #: src/frontend/mame/ui/cheatopt.cpp:95
@@ -2092,26 +2131,26 @@ msgstr "모든 치트 다시 불러오기 완료"
 
 #: src/frontend/mame/ui/cheatopt.cpp:136 plugins/cheat/init.lua:709
 msgid "Reset All"
-msgstr "전부 리셋"
+msgstr "모두 초기화"
 
 #: src/frontend/mame/ui/cheatopt.cpp:139 plugins/cheat/init.lua:710
 msgid "Reload All"
-msgstr "전부 불러오기"
+msgstr "모두 다시 불러오기"
 
 #: src/frontend/mame/ui/dirmenu.cpp:40
 msgctxt "path-option"
 msgid "ROMs"
-msgstr "ROM"
+msgstr "롬"
 
 #: src/frontend/mame/ui/dirmenu.cpp:41
 msgctxt "path-option"
 msgid "Software Media"
-msgstr "소프트웨어 미디어"
+msgstr "소프트웨어 매체"
 
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgctxt "path-option"
 msgid "Sound Samples"
-msgstr ""
+msgstr "사운드 샘플"
 
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgctxt "path-option"
@@ -2126,22 +2165,22 @@ msgstr "조준선"
 #: src/frontend/mame/ui/dirmenu.cpp:45
 msgctxt "path-option"
 msgid "Cheat Files"
-msgstr ""
+msgstr "치트 파일"
 
 #: src/frontend/mame/ui/dirmenu.cpp:46
 msgctxt "path-option"
 msgid "Plugins"
-msgstr ""
+msgstr "플러그인"
 
 #: src/frontend/mame/ui/dirmenu.cpp:47
 msgctxt "path-option"
 msgid "UI Translations"
-msgstr ""
+msgstr "사용자 인터페이스 변환"
 
 #: src/frontend/mame/ui/dirmenu.cpp:48
 msgctxt "path-option"
 msgid "Software Lists"
-msgstr ""
+msgstr "소프트웨어 목록"
 
 #: src/frontend/mame/ui/dirmenu.cpp:49
 msgctxt "path-option"
@@ -2151,12 +2190,12 @@ msgstr "INI"
 #: src/frontend/mame/ui/dirmenu.cpp:50
 msgctxt "path-option"
 msgid "UI Settings"
-msgstr ""
+msgstr "사용자 인터페이스 설정"
 
 #: src/frontend/mame/ui/dirmenu.cpp:51
 msgctxt "path-option"
 msgid "Plugin Data"
-msgstr ""
+msgstr "플러그인 데이터"
 
 #: src/frontend/mame/ui/dirmenu.cpp:52
 msgctxt "path-option"
@@ -2211,7 +2250,7 @@ msgstr "시작화면"
 #: src/frontend/mame/ui/dirmenu.cpp:62
 msgctxt "path-option"
 msgid "Game Endings"
-msgstr ""
+msgstr "게임 엔진"
 
 #: src/frontend/mame/ui/dirmenu.cpp:63
 msgctxt "path-option"
@@ -2226,12 +2265,12 @@ msgstr "삽화 미리보기"
 #: src/frontend/mame/ui/dirmenu.cpp:65
 msgctxt "path-option"
 msgid "Select"
-msgstr ""
+msgstr "선택"
 
 #: src/frontend/mame/ui/dirmenu.cpp:66
 msgctxt "path-option"
 msgid "Game Over Screens"
-msgstr ""
+msgstr "게임 오버 화면"
 
 #: src/frontend/mame/ui/dirmenu.cpp:67
 msgctxt "path-option"
@@ -2280,12 +2319,12 @@ msgstr "TAB을 누르면 결정됩니다"
 #: src/frontend/mame/ui/dirmenu.cpp:438
 #, c-format
 msgid "%1$s Folders"
-msgstr ""
+msgstr "%1$s 폴더"
 
 #: src/frontend/mame/ui/dirmenu.cpp:438
 #, c-format
 msgid "%1$s Folder"
-msgstr ""
+msgstr "%1$s 폴더"
 
 #: src/frontend/mame/ui/dirmenu.cpp:523
 msgid "Add Folder"
@@ -2303,137 +2342,137 @@ msgstr "폴더 변경"
 #, c-format
 msgctxt "gfxview"
 msgid "Zoom = 1/%1$d"
-msgstr ""
+msgstr "축소 = 1/%1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:790 src/frontend/mame/ui/viewgfx.cpp:795
 #, c-format
 msgctxt "gfxview"
 msgid "Zoom = %1$d"
-msgstr ""
+msgstr "확대 = %1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:800
 msgctxt "gfxview"
 msgid "Expand to fit"
-msgstr ""
+msgstr "맞춤 확장"
 
 #: src/frontend/mame/ui/viewgfx.cpp:823
 msgctxt "gfxview"
 msgid "All categories"
-msgstr ""
+msgstr "모든 카테고리"
 
 #: src/frontend/mame/ui/viewgfx.cpp:825 src/frontend/mame/ui/viewgfx.cpp:830
 #, c-format
 msgctxt "gfxview"
 msgid "Category %1$d"
-msgstr ""
+msgstr "카테고리 %1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:927
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s]"
-msgstr ""
+msgstr "[root%1$s]"
 
 #: src/frontend/mame/ui/viewgfx.cpp:927
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s] colors"
-msgstr ""
+msgstr "[root%1$s] 색상"
 
 #: src/frontend/mame/ui/viewgfx.cpp:927
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s] pens"
-msgstr ""
+msgstr "[root%1$s] 펜"
 
 #: src/frontend/mame/ui/viewgfx.cpp:941
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X → %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
-msgstr ""
+msgstr " #%1$X → %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
 
 #: src/frontend/mame/ui/viewgfx.cpp:948
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X = %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
-msgstr ""
+msgstr " #%1$X = %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
 
 #: src/frontend/mame/ui/viewgfx.cpp:955
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X (A:%2$02X R:%3$02X G:%4$02X B:%5$02X)"
-msgstr ""
+msgstr " #%1$X (A:%2$02X R:%3$02X G:%4$02X B:%5$02X)"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1135
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s] %2$d/%3$d"
-msgstr ""
+msgstr "[root%1$s] %2$d/%3$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1158
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X:%2$X (%3$d %4$d) = %5$X"
-msgstr ""
+msgstr " #%1$X:%2$X (%3$d %4$d) = %5$X"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1166
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d color %3$X/%4$X"
-msgstr ""
+msgstr " %1$d×%2$d color %3$X/%4$X"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1306
 #, c-format
 msgctxt "gfxview"
 msgid "Tilemap %1$d/%2$d category %3$u"
-msgstr ""
+msgstr "타일맵 %1$d/%2$d 카테고리 %3$u"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1306
 #, c-format
 msgctxt "gfxview"
 msgid "Tilemap %1$d/%2$d "
-msgstr ""
+msgstr "타일맵 %1$d/%2$d "
 
 #: src/frontend/mame/ui/viewgfx.cpp:1328
 #, c-format
 msgctxt "gfxview"
 msgid " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"
-msgstr ""
+msgstr " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1335
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d origin (%3$d %4$d)"
-msgstr ""
+msgstr " %1$d×%2$d 원점(%3$d %4$d)"
 
 #: src/frontend/mame/ui/selgame.cpp:463
 msgid "System Settings"
-msgstr ""
+msgstr "시스템 설정"
 
 #: src/frontend/mame/ui/selgame.cpp:1076
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d systems (%5$d BIOS) )"
-msgstr ""
+msgstr "%1$s %2$s ( %3$d / %4$d 시스템 (%5$d 바이오스) )"
 
 #: src/frontend/mame/ui/selgame.cpp:1104
 #, c-format
 msgid "System: %1$-.100s"
-msgstr "시스템: %1$-.100s"
+msgstr "시스템 : %1$-.100s"
 
 #: src/frontend/mame/ui/selector.cpp:100
 #, c-format
 msgctxt "menu-selector"
 msgid "%1$s - Search: %2$s_"
-msgstr "%1$s - 검색: %2$s_"
+msgstr "%1$s - 검색 : %2$s_"
 
 #: src/frontend/mame/ui/selector.cpp:110
 msgctxt "menu-selector"
 msgid "[no matches]"
-msgstr ""
+msgstr "[일치하지 않음]"
 
 #: src/frontend/mame/ui/selector.cpp:123
 msgctxt "menu-selector"
 msgid "[no choices]"
-msgstr ""
+msgstr "[선택하지 않음]"
 
 #: src/frontend/mame/ui/selector.cpp:148
 #, c-format
@@ -2443,7 +2482,7 @@ msgstr "더블 클릭 혹은 %1$s 키를 눌러 선택"
 
 #: src/frontend/mame/ui/auditmenu.cpp:60
 msgid "Audit Media"
-msgstr ""
+msgstr "매체 심사"
 
 #: src/frontend/mame/ui/auditmenu.cpp:64
 #, c-format
@@ -2456,6 +2495,8 @@ msgid ""
 "Auditing media for system %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
+"%3$u의 %2$u 시스템에 대한 매체를 심사 중...\n"
+"%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:128
 #, c-format
@@ -2465,21 +2506,25 @@ msgid ""
 "Press %1$s to cancel\n"
 "Press %2$s to continue"
 msgstr ""
+"심사를 취소하시겠습니까?\n"
+"\n"
+"취소하려면 %1$s를 누르세요.\n"
+"계속하려면 %2$s를 누르세요."
 
 #: src/frontend/mame/ui/auditmenu.cpp:148
 #, c-format
 msgid "Audit media for %1$u systems marked unavailable"
-msgstr ""
+msgstr "%1$u 시스템에 대한 심사 매체가 사용 불가능으로 표시됨"
 
 #: src/frontend/mame/ui/auditmenu.cpp:149
 #, c-format
 msgid "Audit media for all %1$u systems"
-msgstr ""
+msgstr "모든 %1$u 시스템의 매체 심사"
 
 #: src/frontend/mame/ui/auditmenu.cpp:165
 #, c-format
 msgid "Press %1$s to cancel\n"
-msgstr ""
+msgstr "취소하려면 %1$s를 누르세요.\n"
 
 #: src/frontend/mame/ui/custui.cpp:54
 msgid "Show All"
@@ -2499,11 +2544,11 @@ msgstr "모두 숨기기"
 
 #: src/frontend/mame/ui/custui.cpp:144
 msgid "UI Language"
-msgstr ""
+msgstr "사용자 인터페이스 언어"
 
 #: src/frontend/mame/ui/custui.cpp:169 src/frontend/mame/ui/custui.cpp:222
 msgid "System Names"
-msgstr ""
+msgstr "시스템 이름"
 
 #: src/frontend/mame/ui/custui.cpp:195 src/frontend/mame/ui/custui.cpp:225
 msgid "Show Side Panels"
@@ -2511,7 +2556,7 @@ msgstr "사이드 패널 보이기"
 
 #: src/frontend/mame/ui/custui.cpp:215
 msgid "Fonts"
-msgstr "문자"
+msgstr "글꼴"
 
 #: src/frontend/mame/ui/custui.cpp:216
 msgid "Colors"
@@ -2523,11 +2568,11 @@ msgstr "언어"
 
 #: src/frontend/mame/ui/custui.cpp:236 src/frontend/mame/ui/custui.cpp:280
 msgid "[built-in]"
-msgstr ""
+msgstr "[내장]"
 
 #: src/frontend/mame/ui/custui.cpp:337
 msgid "UI Fonts"
-msgstr ""
+msgstr "사용자 인터페이스 글꼴"
 
 #: src/frontend/mame/ui/custui.cpp:366
 msgid "default"
@@ -2535,15 +2580,15 @@ msgstr "기본"
 
 #: src/frontend/mame/ui/custui.cpp:465 src/frontend/mame/ui/custui.cpp:507
 msgid "UI Font"
-msgstr "UI 글꼴"
+msgstr "사용자 인터페이스 글꼴"
 
 #: src/frontend/mame/ui/custui.cpp:512
 msgid "Bold"
-msgstr "굵은 글씨"
+msgstr "굵게"
 
 #: src/frontend/mame/ui/custui.cpp:513
 msgid "Italic"
-msgstr "이탤릭체"
+msgstr "기울임꼴"
 
 #: src/frontend/mame/ui/custui.cpp:518
 msgid "Lines"
@@ -2551,7 +2596,7 @@ msgstr "줄"
 
 #: src/frontend/mame/ui/custui.cpp:523
 msgid "Infos text size"
-msgstr "정보표시 글자 크기"
+msgstr "정보 표시 글자 크기"
 
 #: src/frontend/mame/ui/custui.cpp:547
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -2560,7 +2605,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/custui.cpp:563
 msgid "UI Colors"
-msgstr ""
+msgstr "사용자 인터페이스 색상"
 
 #: src/frontend/mame/ui/custui.cpp:626
 msgctxt "color-option"
@@ -2649,7 +2694,7 @@ msgstr "원래 색상으로 복귀"
 #: src/frontend/mame/ui/custui.cpp:666
 #, c-format
 msgid "Double-click or press %1$s to change color"
-msgstr ""
+msgstr "색상을 변경하려면 %1$s를 두 번 클릭하거나 누르세요."
 
 #: src/frontend/mame/ui/custui.cpp:674
 msgid "Menu Preview"
@@ -2663,7 +2708,7 @@ msgstr "일반"
 #: src/frontend/mame/ui/custui.cpp:682
 msgctxt "color-sample"
 msgid "Subitem"
-msgstr "하위항목"
+msgstr "하위 항목"
 
 #: src/frontend/mame/ui/custui.cpp:683
 msgctxt "color-sample"
@@ -2710,7 +2755,7 @@ msgstr "팔레트에서 고르기"
 
 #: src/frontend/mame/ui/custui.cpp:959
 msgid "Color preview:"
-msgstr "색상 미리보기:"
+msgstr "색상 미리 보기 :"
 
 #: src/frontend/mame/ui/custui.cpp:1052
 msgctxt "color-preset"
@@ -2720,22 +2765,22 @@ msgstr "하양"
 #: src/frontend/mame/ui/custui.cpp:1053
 msgctxt "color-preset"
 msgid "Silver"
-msgstr "은색"
+msgstr "은빛"
 
 #: src/frontend/mame/ui/custui.cpp:1054
 msgctxt "color-preset"
 msgid "Gray"
-msgstr "회색"
+msgstr "잿빛"
 
 #: src/frontend/mame/ui/custui.cpp:1055
 msgctxt "color-preset"
 msgid "Black"
-msgstr "검정"
+msgstr "까망"
 
 #: src/frontend/mame/ui/custui.cpp:1056
 msgctxt "color-preset"
 msgid "Red"
-msgstr "적"
+msgstr "빨강"
 
 #: src/frontend/mame/ui/custui.cpp:1057
 msgctxt "color-preset"
@@ -2750,12 +2795,12 @@ msgstr "노랑"
 #: src/frontend/mame/ui/custui.cpp:1059
 msgctxt "color-preset"
 msgid "Green"
-msgstr "녹"
+msgstr "초록"
 
 #: src/frontend/mame/ui/custui.cpp:1060
 msgctxt "color-preset"
 msgid "Blue"
-msgstr "청"
+msgstr "파랑"
 
 #: src/frontend/mame/ui/custui.cpp:1061
 msgctxt "color-preset"
@@ -2766,19 +2811,19 @@ msgstr "보라"
 #, c-format
 msgctxt "about-header"
 msgid "%1$s %2$s (%3$s%4$sP%5$s, debug)"
-msgstr ""
+msgstr "%1$s %2$s (%3$s%4$sP%5$s, 디버그)"
 
 #: src/frontend/mame/ui/about.cpp:44
 #, c-format
 msgctxt "about-header"
 msgid "%1$s %2$s (%3$s%4$sP%5$s)"
-msgstr ""
+msgstr "%1$s %2$s (%3$s%4$sP%5$s)"
 
 #: src/frontend/mame/ui/about.cpp:51
 #, c-format
 msgctxt "about-header"
 msgid "Revision: %1$s"
-msgstr ""
+msgstr "개정 : %1$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:27
 #, c-format
@@ -2792,51 +2837,58 @@ msgid ""
 "Next device  \t\t%6$s\n"
 "Return to previous menu  \t\t%7$s"
 msgstr ""
+"설정 %1$s 표시/숨기기\n"
+"값 %2$s 감소\n"
+"값 %3$s 증가\n"
+"기본값 %4$s 복원\n"
+"이전 장치 %5$s\n"
+"다음 장치 %6$s\n"
+"이전 메뉴로 돌아가기 %7$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:82
 msgctxt "menu-analoginput"
 msgid "Analog Input Adjustments"
-msgstr ""
+msgstr "아날로그 입력 설정"
 
 #: src/frontend/mame/ui/analogipt.cpp:121
 #, c-format
 msgctxt "menu-analoginput"
 msgid "Press %s to show settings"
-msgstr ""
+msgstr "설정을 표시하려면 %s를 누르세요."
 
 #: src/frontend/mame/ui/analogipt.cpp:245
 msgctxt "menu-analoginput"
 msgid "Analog Input Adjustments Help"
-msgstr ""
+msgstr "아날로그 입력 설정 도움말"
 
 #: src/frontend/mame/ui/analogipt.cpp:421
 #, c-format
 msgctxt "menu-analoginput"
 msgid "%1$s Increment/Decrement Speed"
-msgstr ""
+msgstr "%1$s 증가/감소 속도"
 
 #: src/frontend/mame/ui/analogipt.cpp:426
 #, c-format
 msgctxt "menu-analoginput"
 msgid "%1$s Auto-centering Speed"
-msgstr ""
+msgstr "%1$s 자동 센터링 속도"
 
 #: src/frontend/mame/ui/analogipt.cpp:431
 #, c-format
 msgctxt "menu-analoginput"
 msgid "%1$s Reverse"
-msgstr ""
+msgstr "%1$s 반전"
 
 #: src/frontend/mame/ui/analogipt.cpp:436
 #, c-format
 msgctxt "menu-analoginput"
 msgid "%1$s Sensitivity"
-msgstr ""
+msgstr "%1$s 감도"
 
 #: src/frontend/mame/ui/analogipt.cpp:451
 msgctxt "menu-analoginput"
 msgid "[no analog inputs are enabled]"
-msgstr ""
+msgstr "[아날로그 입력이 활성화되지 않음]"
 
 #: src/frontend/mame/ui/barcode.cpp:40
 msgid "Barcode Reader"
@@ -2844,7 +2896,7 @@ msgstr "바코드 인식기"
 
 #: src/frontend/mame/ui/barcode.cpp:65
 msgid "New Barcode:"
-msgstr "새 바코드:"
+msgstr "새 바코드 :"
 
 #: src/frontend/mame/ui/barcode.cpp:68
 msgid "Enter Code"
@@ -2857,7 +2909,7 @@ msgstr "바코드의 길이가 맞지 않습니다!"
 #: src/frontend/mame/ui/mainmenu.cpp:115
 msgctxt "menu-main"
 msgid "Input Settings"
-msgstr ""
+msgstr "입력 설정"
 
 #: src/frontend/mame/ui/mainmenu.cpp:118
 msgctxt "menu-main"
@@ -2877,17 +2929,17 @@ msgstr "부가 정보"
 #: src/frontend/mame/ui/mainmenu.cpp:124
 msgctxt "menu-main"
 msgid "System Information"
-msgstr ""
+msgstr "시스템 정보"
 
 #: src/frontend/mame/ui/mainmenu.cpp:127
 msgctxt "menu-main"
 msgid "Warning Information"
-msgstr ""
+msgstr "경고 정보"
 
 #: src/frontend/mame/ui/mainmenu.cpp:133
 msgctxt "menu-main"
 msgid "Media Image Information"
-msgstr ""
+msgstr "매체 이미지 정보"
 
 #: src/frontend/mame/ui/mainmenu.cpp:135
 msgctxt "menu-main"
@@ -2968,26 +3020,26 @@ msgstr "즐겨찾기에서 삭제"
 #, c-format
 msgctxt "menu-main"
 msgid "About %1$s"
-msgstr ""
+msgstr "%1$s 정보"
 
 #: src/frontend/mame/ui/mainmenu.cpp:195
 msgctxt "menu-main"
 msgid "Start System"
-msgstr ""
+msgstr "시스템 시작"
 
 #: src/frontend/mame/ui/mainmenu.cpp:199
 msgctxt "menu-main"
 msgid "Select New System"
-msgstr ""
+msgstr "새 시스템 선택"
 
 #: src/frontend/mame/ui/mainmenu.cpp:200
 msgctxt "menu-main"
 msgid "Close Menu"
-msgstr ""
+msgstr "메뉴 닫기"
 
 #: src/frontend/mame/ui/selmenu.cpp:55
 msgid "Images"
-msgstr "사진"
+msgstr "이미지"
 
 #: src/frontend/mame/ui/selmenu.cpp:56
 msgid "Info"
@@ -3021,12 +3073,12 @@ msgstr "전단지"
 #: src/frontend/mame/ui/selmenu.cpp:88
 msgctxt "selmenu-artwork"
 msgid "Title Screen"
-msgstr "시작화면"
+msgstr "타이틀 화면"
 
 #: src/frontend/mame/ui/selmenu.cpp:89
 msgctxt "selmenu-artwork"
 msgid "Ending"
-msgstr ""
+msgstr "엔딩"
 
 #: src/frontend/mame/ui/selmenu.cpp:90
 msgctxt "selmenu-artwork"
@@ -3066,7 +3118,7 @@ msgstr "점수"
 #: src/frontend/mame/ui/selmenu.cpp:97
 msgctxt "selmenu-artwork"
 msgid "Select"
-msgstr ""
+msgstr "선택"
 
 #: src/frontend/mame/ui/selmenu.cpp:98
 msgctxt "selmenu-artwork"
@@ -3080,7 +3132,7 @@ msgstr "표지"
 
 #: src/frontend/mame/ui/selmenu.cpp:103
 msgid "Add or remove favorite"
-msgstr ""
+msgstr "즐겨찾기 추가 또는 제거"
 
 #: src/frontend/mame/ui/selmenu.cpp:104
 msgid "Export displayed list to file"
@@ -3088,54 +3140,54 @@ msgstr "표시된 목록을 파일로 보내기"
 
 #: src/frontend/mame/ui/selmenu.cpp:105
 msgid "Audit media"
-msgstr ""
+msgstr "매체 심사"
 
 #: src/frontend/mame/ui/selmenu.cpp:106
 msgid "Show DATs view"
-msgstr "DAT 화면 보이기"
+msgstr "DAT 보기 표시"
 
 #: src/frontend/mame/ui/selmenu.cpp:268
 msgid "Select Software Package Part"
-msgstr ""
+msgstr "소프트웨어 패키지 파트 선택"
 
 #: src/frontend/mame/ui/selmenu.cpp:338
 msgid "Select System BIOS"
-msgstr ""
+msgstr "시스템 바이오스 선택"
 
 #: src/frontend/mame/ui/selmenu.cpp:689 src/frontend/mame/ui/selmenu.cpp:720
 #, c-format
 msgid "%1$s, %2$s"
-msgstr ""
+msgstr "%1$s, %2$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:693
 #, c-format
 msgid "Software is clone of: %1$s"
-msgstr "이 소프트웨어는 다음의 복제입니다: %1$s"
+msgstr "소프트웨어 복제본 : %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:695
 msgid "Software is parent"
-msgstr "이 소프트웨어는 원형입니다"
+msgstr "상위 소프트웨어"
 
 #: src/frontend/mame/ui/selmenu.cpp:700
 msgid "Supported: No"
-msgstr "지원여부: 아니오"
+msgstr "지원 여부 : 아니오"
 
 #: src/frontend/mame/ui/selmenu.cpp:705
 msgid "Supported: Partial"
-msgstr "지원여부: 부분적"
+msgstr "지원 여부 : 부분적"
 
 #: src/frontend/mame/ui/selmenu.cpp:710
 msgid "Supported: Yes"
-msgstr "지원여부: 예"
+msgstr "지원 여부 : 예"
 
 #: src/frontend/mame/ui/selmenu.cpp:726
 msgid "System is parent"
-msgstr ""
+msgstr "상위 시스템"
 
 #: src/frontend/mame/ui/selmenu.cpp:728 src/frontend/mame/ui/selmenu.cpp:730
 #, c-format
 msgid "System is clone of: %1$s"
-msgstr ""
+msgstr "시스템 복제본 : %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:766
 #, c-format
@@ -3148,6 +3200,8 @@ msgid ""
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
+"선택한 시스템에 필요한 ROM/디스크 이미지가 누락되었거나 올바르지 않습니다. 올"
+"바른 파일을 확보하거나 다른 시스템을 선택하세요.\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2627
 msgid ""
@@ -3155,32 +3209,34 @@ msgid ""
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
+"선택한 소프트웨어에 필요한 ROM/디스크 이미지가 누락되었거나 올바르지 않습니"
+"다. 올바른 파일을 확보하거나 다른 소프트웨어 항목을 선택하세요.\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2643
 msgid "incorrect checksum"
-msgstr ""
+msgstr "체크섬 오류"
 
 #: src/frontend/mame/ui/selmenu.cpp:2646
 msgid "incorrect length"
-msgstr ""
+msgstr "길이 오류"
 
 #: src/frontend/mame/ui/selmenu.cpp:2649
 msgid "not found"
-msgstr ""
+msgstr "찾을 수 없음"
 
 #: src/frontend/mame/ui/selmenu.cpp:2660
 #, c-format
 msgid "%1$s (%2$s) - %3$s\n"
-msgstr ""
+msgstr "%1$s (%2$s) - %3$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2662
 #, c-format
 msgid "%1$s - %2$s\n"
-msgstr ""
+msgstr "%1$s - %2$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2666
 msgid "Press any key to continue."
-msgstr "아무 키를 누르면 진행합니다."
+msgstr "계속하려면 아무 키나 누르세요."
 
 #: src/frontend/mame/ui/selmenu.cpp:2789
 msgid "General Info"
@@ -3189,26 +3245,26 @@ msgstr "일반 정보"
 #: src/frontend/mame/ui/selmenu.cpp:2935
 #, c-format
 msgid "Short Name\t%1$s\n"
-msgstr "약칭\t%1$s\n"
+msgstr "단축 이름 %1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2936
 #, c-format
 msgid "Year\t%1$s\n"
-msgstr "연도\t%1$s\n"
+msgstr "년도 %1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2937
 #, c-format
 msgid "Manufacturer\t%1$s\n"
-msgstr "제조사\t%1$s\n"
+msgstr "제조\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2944
 #, c-format
 msgid "System is Clone of\t%1$s\n"
-msgstr ""
+msgstr "시스템이 %1$s의 복제본\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2949
 msgid "System is Parent\t\n"
-msgstr ""
+msgstr "상위 시스템\t\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2953
 msgid "Analog Controls\tYes\n"
@@ -3268,11 +3324,11 @@ msgstr "사운드\t양호\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2985
 msgid "Capture\tUnimplemented\n"
-msgstr ""
+msgstr "캡처\t적용 안 됨\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2987
 msgid "Capture\tImperfect\n"
-msgstr ""
+msgstr "캡쳐\t불완전\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2990
 msgid "Camera\tUnimplemented\n"
@@ -3316,11 +3372,11 @@ msgstr "마우스\t불완전\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3015
 msgid "Media\tUnimplemented\n"
-msgstr ""
+msgstr "매체\t적용 안 됨\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3017
 msgid "Media\tImperfect\n"
-msgstr ""
+msgstr "매체\t불완전\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3020
 msgid "Disk\tUnimplemented\n"
@@ -3340,43 +3396,43 @@ msgstr "프린터\t불완전\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3030
 msgid "Mag. Tape\tUnimplemented\n"
-msgstr ""
+msgstr "Mag. 테이프\t구현 안 됨\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3032
 msgid "Mag. Tape\tImperfect\n"
-msgstr ""
+msgstr "Mag. 테이프\t불완전\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3035
 msgid "Punch Tape\tUnimplemented\n"
-msgstr ""
+msgstr "펀치 테이프\t구현 안 됨\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3037
 msgid "Punch Tape\tImperfect\n"
-msgstr ""
+msgstr "펀치 테이프\t불완전\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3040
 msgid "Mag. Drum\tUnimplemented\n"
-msgstr ""
+msgstr "Mag. 드럼\t구현 안 됨\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3042
 msgid "Mag. Drum\tImperfect\n"
-msgstr ""
+msgstr "Mag. 드럼\t불완전\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3045
 msgid "(EP)ROM\tUnimplemented\n"
-msgstr ""
+msgstr "(EP)롬\t구현 안 됨\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3047
 msgid "(EP)ROM\tImperfect\n"
-msgstr ""
+msgstr "(EP)롬\t불완전\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3050
 msgid "Communications\tUnimplemented\n"
-msgstr ""
+msgstr "커뮤니케이션\t구현 안 됨\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3052
 msgid "Communications\tImperfect\n"
-msgstr ""
+msgstr "커뮤니케이션\t불완전\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3055
 msgid "LAN\tUnimplemented\n"
@@ -3404,11 +3460,11 @@ msgstr "타이밍\t불완전\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3069
 msgid "Mechanical System\tYes\n"
-msgstr ""
+msgstr "기계 시스템\t예\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3069
 msgid "Mechanical System\tNo\n"
-msgstr ""
+msgstr "기계 시스템\t아니오\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3070
 msgid "Requires Artwork\tYes\n"
@@ -3432,11 +3488,11 @@ msgstr "칵테일 지원\t아니오\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3074
 msgid "System is BIOS\tYes\n"
-msgstr ""
+msgstr "시스템이 바이오스\t예\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3074
 msgid "System is BIOS\tNo\n"
-msgstr ""
+msgstr "시스템이 바이오스\t아니오\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3075
 msgid "Support Save\tYes\n"
@@ -3464,11 +3520,11 @@ msgstr "CHD 필요\t아니오\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3099
 msgid "Media Audit Result\tOK\n"
-msgstr ""
+msgstr "매체 심사 확인\t확인\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3101
 msgid "Media Audit Result\tBAD\n"
-msgstr ""
+msgstr "매체 심사 확인\t불량\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3104
 msgid "Samples Audit Result\tNone Needed\n"
@@ -3487,6 +3543,8 @@ msgid ""
 "Media Audit\tDisabled\n"
 "Samples Audit\tDisabled\n"
 msgstr ""
+"매체 심사\t비활성화\n"
+"샘플 심사\t비활성화\n"
 
 #: src/frontend/mame/ui/sndmenu.cpp:114 src/frontend/mame/ui/sndmenu.cpp:150
 msgid "Sample Rate"
@@ -3498,7 +3556,7 @@ msgstr "사운드"
 
 #: src/frontend/mame/ui/sndmenu.cpp:149
 msgid "Compressor"
-msgstr ""
+msgstr "압축"
 
 #: src/frontend/mame/ui/sndmenu.cpp:151
 msgid "Use External Samples"
@@ -3514,12 +3572,12 @@ msgid ""
 "\n"
 "The selected option enables the following items:\n"
 msgstr ""
-"[현재 가동중인 시스템에 다음 옵션이 적용돼있습니다]\n"
+"[현재 가동중인 시스템에 다음 옵션이 적용됨]\n"
 "\n"
-"옵션: %1$s\n"
-"장치: %2$s\n"
+"옵션 : %1$s\n"
+"장치 : %2$s\n"
 "\n"
-"현재 선택된 옵션은 다음 항목을 활성화합니다:\n"
+"현재 선택된 옵션은 다음 항목을 활성화 :\n"
 
 #: src/frontend/mame/ui/devopt.cpp:62
 #, c-format
@@ -3531,39 +3589,39 @@ msgid ""
 "\n"
 "If you select this option, the following items will be enabled:\n"
 msgstr ""
-"[현재 가동중인 시스템에 다음 옵션은 적용되지 않습니다]\n"
+"[현재 가동중인 시스템에 다음 옵션은 적용됨]\n"
 "\n"
-"옵션: %1$s\n"
-"장치: %2$s\n"
+"옵션 : %1$s\n"
+"장치 : %2$s\n"
 "\n"
-"이 옵션을 선택하면 다음 항목을 활성화합니다:\n"
+"이 옵션을 선택하면 다음 항목을 활성화 :\n"
 
 #: src/frontend/mame/ui/devopt.cpp:71
 msgid "* CPU:\n"
-msgstr "* CPU:\n"
+msgstr "* CPU :\n"
 
 #: src/frontend/mame/ui/devopt.cpp:117
 msgid "* Video:\n"
-msgstr "* 비디오:\n"
+msgstr "* 비디오 :\n"
 
 #: src/frontend/mame/ui/devopt.cpp:122
 #, c-format
 msgid "  Screen '%1$s': Vector\n"
-msgstr "  화면 '%1$s': 벡터\n"
+msgstr "  화면 '%1$s' : 벡터\n"
 
 #: src/frontend/mame/ui/devopt.cpp:141
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (V) %4$s Hz\n"
-msgstr "  화면 '%1$s': %2$d × %3$d (V) %4$s Hz\n"
+msgstr "  화면 '%1$s' : %2$d × %3$d (V) %4$s Hz\n"
 
 #: src/frontend/mame/ui/devopt.cpp:142
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (H) %4$s Hz\n"
-msgstr "  화면 '%1$s': %2$d × %3$d (H) %4$s Hz\n"
+msgstr "  화면 '%1$s' : %2$d × %3$d (H) %4$s Hz\n"
 
 #: src/frontend/mame/ui/devopt.cpp:156
 msgid "* Sound:\n"
-msgstr "* 사운드:\n"
+msgstr "* 사운드 :\n"
 
 #: src/frontend/mame/ui/devopt.cpp:220
 #, c-format
@@ -3571,14 +3629,14 @@ msgid ""
 "* BIOS settings:\n"
 "  %1$d options    [default: %2$s]\n"
 msgstr ""
-"* BIOS 설정:\n"
-"  %1$d 옵션    [기본: %2$s]\n"
+"* 바이오스 설정 :\n"
+"  %1$d 옵션    [기본 : %2$s]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:264 src/frontend/mame/ui/devopt.cpp:280
 #: src/frontend/mame/ui/devopt.cpp:341
 #, c-format
 msgid "  %1$s    [default: %2$s]\n"
-msgstr "  %1$s    [기본: %2$s]\n"
+msgstr "  %1$s    [기본 : %2$s]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:269 src/frontend/mame/ui/devopt.cpp:285
 #, c-format
@@ -3587,15 +3645,15 @@ msgstr "  %1$s\n"
 
 #: src/frontend/mame/ui/devopt.cpp:291
 msgid "* DIP switch settings:\n"
-msgstr "* DIP 스위치 설정:\n"
+msgstr "* DIP 스위치 설정 :\n"
 
 #: src/frontend/mame/ui/devopt.cpp:296
 msgid "* Configuration settings:\n"
-msgstr "* 환경 설정:\n"
+msgstr "* 환경 설정 :\n"
 
 #: src/frontend/mame/ui/devopt.cpp:300
 msgid "* Input device(s):\n"
-msgstr "* 입력 장치:\n"
+msgstr "* 입력 장치 :\n"
 
 #: src/frontend/mame/ui/devopt.cpp:302
 #, c-format
@@ -3639,16 +3697,16 @@ msgstr "  키보드 입력    [%1$d 입력]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:321
 msgid "* Media Options:\n"
-msgstr "* 미디어 설정:\n"
+msgstr "* 매체 설정 :\n"
 
 #: src/frontend/mame/ui/devopt.cpp:326
 #, c-format
 msgid "  %1$s    [tag: %2$s]\n"
-msgstr "  %1$s    [태그: %2$s]\n"
+msgstr "  %1$s    [태그 : %2$s]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:336
 msgid "* Slot Options:\n"
-msgstr "* 슬롯 설정:\n"
+msgstr "* 슬롯 설정 :\n"
 
 #: src/frontend/mame/ui/devopt.cpp:350
 msgid "[None]\n"
@@ -3658,73 +3716,73 @@ msgstr "[없음]\n"
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Standard (%2$u:%3$u)"
-msgstr ""
+msgstr "화면 %1$u 표준(%2$u:%3$u)"
 
 #: src/emu/render.cpp:1860
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Pixel Aspect (%2$u:%3$u)"
-msgstr ""
+msgstr "화면 %1$u 픽셀 종횡비(%2$u:%3$u)"
 
 #: src/emu/render.cpp:1882 src/emu/render.cpp:2017
 msgctxt "view-name"
 msgid "Cocktail"
-msgstr ""
+msgstr "칵테일"
 
 #: src/emu/render.cpp:2002
 msgctxt "view-name"
 msgid "Left-to-Right"
-msgstr ""
+msgstr "왼쪽에서 오른쪽으로"
 
 #: src/emu/render.cpp:2003
 msgctxt "view-name"
 msgid "Left-to-Right (Gapless)"
-msgstr ""
+msgstr "왼쪽에서 오른쪽으로(간격 없음)"
 
 #: src/emu/render.cpp:2004
 msgctxt "view-name"
 msgid "Top-to-Bottom"
-msgstr ""
+msgstr "위에서 아래로"
 
 #: src/emu/render.cpp:2005
 msgctxt "view-name"
 msgid "Top-to-Bottom (Gapless)"
-msgstr ""
+msgstr "위에서 아래로(간격 없음)"
 
 #: src/emu/render.cpp:2056
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom"
-msgstr ""
+msgstr "%1$u×%2$u 왼쪽에서 오른쪽으로, 위에서 아래로"
 
 #: src/emu/render.cpp:2065
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom (Gapless)"
-msgstr ""
+msgstr "%1$u×%2$u 왼쪽에서 오른쪽으로, 위에서 아래로(간격 없음)"
 
 #: src/emu/render.cpp:2074
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right"
-msgstr ""
+msgstr "%1$u×%2$u 위에서 아래로, 왼쪽에서 오른쪽으로"
 
 #: src/emu/render.cpp:2083
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right (Gapless)"
-msgstr ""
+msgstr "%1$u×%2$u 위에서 아래로, 왼쪽에서 오른쪽으로(간격 없음)"
 
 #: src/emu/ioport.cpp:271
 #, c-format
 msgctxt "input-name"
 msgid "P%1$u"
-msgstr ""
+msgstr "P%1$u"
 
 #: src/emu/ioport.cpp:1991
 msgctxt "input-name"
 msgid "???"
-msgstr ""
+msgstr "???"
 
 #: src/emu/inpttype.ipp:22 src/emu/inpttype.ipp:140 src/emu/inpttype.ipp:221
 #: src/emu/inpttype.ipp:288 src/emu/inpttype.ipp:355 src/emu/inpttype.ipp:389
@@ -3733,7 +3791,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Up"
-msgstr ""
+msgstr "%p ↑"
 
 #: src/emu/inpttype.ipp:23 src/emu/inpttype.ipp:141 src/emu/inpttype.ipp:222
 #: src/emu/inpttype.ipp:289 src/emu/inpttype.ipp:356 src/emu/inpttype.ipp:390
@@ -3742,7 +3800,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Down"
-msgstr ""
+msgstr "%p ↓"
 
 #: src/emu/inpttype.ipp:24 src/emu/inpttype.ipp:142 src/emu/inpttype.ipp:223
 #: src/emu/inpttype.ipp:290 src/emu/inpttype.ipp:357 src/emu/inpttype.ipp:391
@@ -3751,7 +3809,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Left"
-msgstr ""
+msgstr "%p ←"
 
 #: src/emu/inpttype.ipp:25 src/emu/inpttype.ipp:143 src/emu/inpttype.ipp:224
 #: src/emu/inpttype.ipp:291 src/emu/inpttype.ipp:358 src/emu/inpttype.ipp:392
@@ -3760,7 +3818,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Right"
-msgstr ""
+msgstr "%p →"
 
 #: src/emu/inpttype.ipp:26 src/emu/inpttype.ipp:144 src/emu/inpttype.ipp:225
 #: src/emu/inpttype.ipp:292 src/emu/inpttype.ipp:359 src/emu/inpttype.ipp:393
@@ -3769,7 +3827,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Right Stick/Up"
-msgstr ""
+msgstr "%p 오른쪽 스틱/↑"
 
 #: src/emu/inpttype.ipp:27 src/emu/inpttype.ipp:145 src/emu/inpttype.ipp:226
 #: src/emu/inpttype.ipp:293 src/emu/inpttype.ipp:360 src/emu/inpttype.ipp:394
@@ -3778,7 +3836,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Right Stick/Down"
-msgstr ""
+msgstr "%p 오른쪽 스틱/↓"
 
 #: src/emu/inpttype.ipp:28 src/emu/inpttype.ipp:146 src/emu/inpttype.ipp:227
 #: src/emu/inpttype.ipp:294 src/emu/inpttype.ipp:361 src/emu/inpttype.ipp:395
@@ -3787,7 +3845,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Right Stick/Left"
-msgstr ""
+msgstr "%p 오른쪽 스틱/←"
 
 #: src/emu/inpttype.ipp:29 src/emu/inpttype.ipp:147 src/emu/inpttype.ipp:228
 #: src/emu/inpttype.ipp:295 src/emu/inpttype.ipp:362 src/emu/inpttype.ipp:396
@@ -3796,7 +3854,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Right Stick/Right"
-msgstr ""
+msgstr "%p 오른쪽 스틱/→"
 
 #: src/emu/inpttype.ipp:30 src/emu/inpttype.ipp:148 src/emu/inpttype.ipp:229
 #: src/emu/inpttype.ipp:296 src/emu/inpttype.ipp:363 src/emu/inpttype.ipp:397
@@ -3805,7 +3863,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Left Stick/Up"
-msgstr ""
+msgstr "%p 왼쪽 스틱/↑"
 
 #: src/emu/inpttype.ipp:31 src/emu/inpttype.ipp:149 src/emu/inpttype.ipp:230
 #: src/emu/inpttype.ipp:297 src/emu/inpttype.ipp:364 src/emu/inpttype.ipp:398
@@ -3814,7 +3872,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Left Stick/Down"
-msgstr ""
+msgstr "%p 왼쪽 스틱/↓"
 
 #: src/emu/inpttype.ipp:32 src/emu/inpttype.ipp:150 src/emu/inpttype.ipp:231
 #: src/emu/inpttype.ipp:298 src/emu/inpttype.ipp:365 src/emu/inpttype.ipp:399
@@ -3823,7 +3881,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Left Stick/Left"
-msgstr ""
+msgstr "%p 왼쪽 스틱/←"
 
 #: src/emu/inpttype.ipp:33 src/emu/inpttype.ipp:151 src/emu/inpttype.ipp:232
 #: src/emu/inpttype.ipp:299 src/emu/inpttype.ipp:366 src/emu/inpttype.ipp:400
@@ -3832,7 +3890,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Left Stick/Right"
-msgstr ""
+msgstr "%p 왼쪽 스틱/→"
 
 #: src/emu/inpttype.ipp:34 src/emu/inpttype.ipp:152 src/emu/inpttype.ipp:233
 #: src/emu/inpttype.ipp:300 src/emu/inpttype.ipp:367 src/emu/inpttype.ipp:401
@@ -3841,7 +3899,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 1"
-msgstr ""
+msgstr "%p 버튼 1"
 
 #: src/emu/inpttype.ipp:35 src/emu/inpttype.ipp:153 src/emu/inpttype.ipp:234
 #: src/emu/inpttype.ipp:301 src/emu/inpttype.ipp:368 src/emu/inpttype.ipp:402
@@ -3850,7 +3908,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 2"
-msgstr ""
+msgstr "%p 버튼 2"
 
 #: src/emu/inpttype.ipp:36 src/emu/inpttype.ipp:154 src/emu/inpttype.ipp:235
 #: src/emu/inpttype.ipp:302 src/emu/inpttype.ipp:369 src/emu/inpttype.ipp:403
@@ -3859,7 +3917,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 3"
-msgstr ""
+msgstr "%p 버튼 3"
 
 #: src/emu/inpttype.ipp:37 src/emu/inpttype.ipp:155 src/emu/inpttype.ipp:236
 #: src/emu/inpttype.ipp:303 src/emu/inpttype.ipp:370 src/emu/inpttype.ipp:404
@@ -3868,7 +3926,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 4"
-msgstr ""
+msgstr "%p 버튼 4"
 
 #: src/emu/inpttype.ipp:38 src/emu/inpttype.ipp:156 src/emu/inpttype.ipp:237
 #: src/emu/inpttype.ipp:304 src/emu/inpttype.ipp:371 src/emu/inpttype.ipp:405
@@ -3877,7 +3935,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 5"
-msgstr ""
+msgstr "%p 버튼 5"
 
 #: src/emu/inpttype.ipp:39 src/emu/inpttype.ipp:157 src/emu/inpttype.ipp:238
 #: src/emu/inpttype.ipp:305 src/emu/inpttype.ipp:372 src/emu/inpttype.ipp:406
@@ -3886,7 +3944,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 6"
-msgstr ""
+msgstr "%p 버튼 6"
 
 #: src/emu/inpttype.ipp:40 src/emu/inpttype.ipp:158 src/emu/inpttype.ipp:239
 #: src/emu/inpttype.ipp:306 src/emu/inpttype.ipp:373 src/emu/inpttype.ipp:407
@@ -3895,7 +3953,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 7"
-msgstr ""
+msgstr "%p 버튼 7"
 
 #: src/emu/inpttype.ipp:41 src/emu/inpttype.ipp:159 src/emu/inpttype.ipp:240
 #: src/emu/inpttype.ipp:307 src/emu/inpttype.ipp:374 src/emu/inpttype.ipp:408
@@ -3904,7 +3962,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 8"
-msgstr ""
+msgstr "%p 버튼 8"
 
 #: src/emu/inpttype.ipp:42 src/emu/inpttype.ipp:160 src/emu/inpttype.ipp:241
 #: src/emu/inpttype.ipp:308 src/emu/inpttype.ipp:375 src/emu/inpttype.ipp:409
@@ -3913,7 +3971,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 9"
-msgstr ""
+msgstr "%p 버튼 9"
 
 #: src/emu/inpttype.ipp:43 src/emu/inpttype.ipp:161 src/emu/inpttype.ipp:242
 #: src/emu/inpttype.ipp:309 src/emu/inpttype.ipp:376 src/emu/inpttype.ipp:410
@@ -3922,7 +3980,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 10"
-msgstr ""
+msgstr "%p 버튼 10"
 
 #: src/emu/inpttype.ipp:44 src/emu/inpttype.ipp:162 src/emu/inpttype.ipp:243
 #: src/emu/inpttype.ipp:310 src/emu/inpttype.ipp:377 src/emu/inpttype.ipp:411
@@ -3931,7 +3989,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 11"
-msgstr ""
+msgstr "%p 버튼 11"
 
 #: src/emu/inpttype.ipp:45 src/emu/inpttype.ipp:163 src/emu/inpttype.ipp:244
 #: src/emu/inpttype.ipp:311 src/emu/inpttype.ipp:378 src/emu/inpttype.ipp:412
@@ -3940,7 +3998,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 12"
-msgstr ""
+msgstr "%p 버튼 12"
 
 #: src/emu/inpttype.ipp:46 src/emu/inpttype.ipp:164 src/emu/inpttype.ipp:245
 #: src/emu/inpttype.ipp:312 src/emu/inpttype.ipp:379 src/emu/inpttype.ipp:413
@@ -3949,7 +4007,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 13"
-msgstr ""
+msgstr "%p 버튼 13"
 
 #: src/emu/inpttype.ipp:47 src/emu/inpttype.ipp:165 src/emu/inpttype.ipp:246
 #: src/emu/inpttype.ipp:313 src/emu/inpttype.ipp:380 src/emu/inpttype.ipp:414
@@ -3958,7 +4016,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 14"
-msgstr ""
+msgstr "%p 버튼 14"
 
 #: src/emu/inpttype.ipp:48 src/emu/inpttype.ipp:166 src/emu/inpttype.ipp:247
 #: src/emu/inpttype.ipp:314 src/emu/inpttype.ipp:381 src/emu/inpttype.ipp:415
@@ -3967,7 +4025,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 15"
-msgstr ""
+msgstr "%p 버튼 15"
 
 #: src/emu/inpttype.ipp:49 src/emu/inpttype.ipp:167 src/emu/inpttype.ipp:248
 #: src/emu/inpttype.ipp:315 src/emu/inpttype.ipp:382 src/emu/inpttype.ipp:416
@@ -3976,7 +4034,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Button 16"
-msgstr ""
+msgstr "%p 버튼 16"
 
 #: src/emu/inpttype.ipp:50 src/emu/inpttype.ipp:168 src/emu/inpttype.ipp:249
 #: src/emu/inpttype.ipp:316 src/emu/inpttype.ipp:383 src/emu/inpttype.ipp:417
@@ -3985,7 +4043,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Start"
-msgstr ""
+msgstr "%p 시작"
 
 #: src/emu/inpttype.ipp:51 src/emu/inpttype.ipp:169 src/emu/inpttype.ipp:250
 #: src/emu/inpttype.ipp:317 src/emu/inpttype.ipp:384 src/emu/inpttype.ipp:418
@@ -3994,575 +4052,575 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Select"
-msgstr ""
+msgstr "%p 선택"
 
 #: src/emu/inpttype.ipp:56 src/emu/inpttype.ipp:174 src/emu/inpttype.ipp:255
 #: src/emu/inpttype.ipp:322
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong A"
-msgstr ""
+msgstr "%p 마작 A"
 
 #: src/emu/inpttype.ipp:57 src/emu/inpttype.ipp:175 src/emu/inpttype.ipp:256
 #: src/emu/inpttype.ipp:323
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong B"
-msgstr ""
+msgstr "%p 마작 B"
 
 #: src/emu/inpttype.ipp:58 src/emu/inpttype.ipp:176 src/emu/inpttype.ipp:257
 #: src/emu/inpttype.ipp:324
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong C"
-msgstr ""
+msgstr "%p 마작 C"
 
 #: src/emu/inpttype.ipp:59 src/emu/inpttype.ipp:177 src/emu/inpttype.ipp:258
 #: src/emu/inpttype.ipp:325
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong D"
-msgstr ""
+msgstr "%p 마작 D"
 
 #: src/emu/inpttype.ipp:60 src/emu/inpttype.ipp:178 src/emu/inpttype.ipp:259
 #: src/emu/inpttype.ipp:326
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong E"
-msgstr ""
+msgstr "%p 마작 E"
 
 #: src/emu/inpttype.ipp:61 src/emu/inpttype.ipp:179 src/emu/inpttype.ipp:260
 #: src/emu/inpttype.ipp:327
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong F"
-msgstr ""
+msgstr "%p 마작 F"
 
 #: src/emu/inpttype.ipp:62 src/emu/inpttype.ipp:180 src/emu/inpttype.ipp:261
 #: src/emu/inpttype.ipp:328
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong G"
-msgstr ""
+msgstr "%p 마작 G"
 
 #: src/emu/inpttype.ipp:63 src/emu/inpttype.ipp:181 src/emu/inpttype.ipp:262
 #: src/emu/inpttype.ipp:329
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong H"
-msgstr ""
+msgstr "%p 마작 H"
 
 #: src/emu/inpttype.ipp:64 src/emu/inpttype.ipp:182 src/emu/inpttype.ipp:263
 #: src/emu/inpttype.ipp:330
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong I"
-msgstr ""
+msgstr "%p 마작 I"
 
 #: src/emu/inpttype.ipp:65 src/emu/inpttype.ipp:183 src/emu/inpttype.ipp:264
 #: src/emu/inpttype.ipp:331
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong J"
-msgstr ""
+msgstr "%p 마작 J"
 
 #: src/emu/inpttype.ipp:66 src/emu/inpttype.ipp:184 src/emu/inpttype.ipp:265
 #: src/emu/inpttype.ipp:332
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong K"
-msgstr ""
+msgstr "%p 마작 K"
 
 #: src/emu/inpttype.ipp:67 src/emu/inpttype.ipp:185 src/emu/inpttype.ipp:266
 #: src/emu/inpttype.ipp:333
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong L"
-msgstr ""
+msgstr "%p 마작 L"
 
 #: src/emu/inpttype.ipp:68 src/emu/inpttype.ipp:186 src/emu/inpttype.ipp:267
 #: src/emu/inpttype.ipp:334
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong M"
-msgstr ""
+msgstr "%p 마작 M"
 
 #: src/emu/inpttype.ipp:69 src/emu/inpttype.ipp:187 src/emu/inpttype.ipp:268
 #: src/emu/inpttype.ipp:335
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong N"
-msgstr ""
+msgstr "%p 마작 N"
 
 #: src/emu/inpttype.ipp:70 src/emu/inpttype.ipp:188 src/emu/inpttype.ipp:269
 #: src/emu/inpttype.ipp:336
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong O"
-msgstr ""
+msgstr "%p 마작 O"
 
 #: src/emu/inpttype.ipp:71 src/emu/inpttype.ipp:189 src/emu/inpttype.ipp:270
 #: src/emu/inpttype.ipp:337
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong P"
-msgstr ""
+msgstr "%p 마작 P"
 
 #: src/emu/inpttype.ipp:72 src/emu/inpttype.ipp:190 src/emu/inpttype.ipp:271
 #: src/emu/inpttype.ipp:338
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Q"
-msgstr ""
+msgstr "%p 마작 Q"
 
 #: src/emu/inpttype.ipp:73 src/emu/inpttype.ipp:191 src/emu/inpttype.ipp:272
 #: src/emu/inpttype.ipp:339
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Kan"
-msgstr ""
+msgstr "%p 마작 칸"
 
 #: src/emu/inpttype.ipp:74 src/emu/inpttype.ipp:192 src/emu/inpttype.ipp:273
 #: src/emu/inpttype.ipp:340
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Pon"
-msgstr ""
+msgstr "%p 마작 폰"
 
 #: src/emu/inpttype.ipp:75 src/emu/inpttype.ipp:193 src/emu/inpttype.ipp:274
 #: src/emu/inpttype.ipp:341
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Chi"
-msgstr ""
+msgstr "%p 마작 기"
 
 #: src/emu/inpttype.ipp:76 src/emu/inpttype.ipp:194 src/emu/inpttype.ipp:275
 #: src/emu/inpttype.ipp:342
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Reach"
-msgstr ""
+msgstr "%p 마작 리치"
 
 #: src/emu/inpttype.ipp:77 src/emu/inpttype.ipp:195 src/emu/inpttype.ipp:276
 #: src/emu/inpttype.ipp:343
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Ron"
-msgstr ""
+msgstr "%p 마작 론"
 
 #: src/emu/inpttype.ipp:78 src/emu/inpttype.ipp:196 src/emu/inpttype.ipp:277
 #: src/emu/inpttype.ipp:344
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Flip Flop"
-msgstr ""
+msgstr "%p 마작 플립플롭"
 
 #: src/emu/inpttype.ipp:79 src/emu/inpttype.ipp:197 src/emu/inpttype.ipp:278
 #: src/emu/inpttype.ipp:345
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Bet"
-msgstr ""
+msgstr "%p 마작 베팅"
 
 #: src/emu/inpttype.ipp:80 src/emu/inpttype.ipp:198 src/emu/inpttype.ipp:279
 #: src/emu/inpttype.ipp:346
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Take Score"
-msgstr ""
+msgstr "%p 마작 점수 획득"
 
 #: src/emu/inpttype.ipp:81 src/emu/inpttype.ipp:199 src/emu/inpttype.ipp:280
 #: src/emu/inpttype.ipp:347
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Double Up"
-msgstr ""
+msgstr "%p 마작 더블 업"
 
 #: src/emu/inpttype.ipp:82 src/emu/inpttype.ipp:200 src/emu/inpttype.ipp:281
 #: src/emu/inpttype.ipp:348
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Big"
-msgstr ""
+msgstr "%p 마작 빅"
 
 #: src/emu/inpttype.ipp:83 src/emu/inpttype.ipp:201 src/emu/inpttype.ipp:282
 #: src/emu/inpttype.ipp:349
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Small"
-msgstr ""
+msgstr "%p 마작 스몰"
 
 #: src/emu/inpttype.ipp:84 src/emu/inpttype.ipp:202 src/emu/inpttype.ipp:283
 #: src/emu/inpttype.ipp:350
 #, c-format
 msgctxt "input-name"
 msgid "%p Mahjong Last Chance"
-msgstr ""
+msgstr "%p 마작 라스트 찬스"
 
 #: src/emu/inpttype.ipp:89 src/emu/inpttype.ipp:207
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda A/1"
-msgstr ""
+msgstr "%p 하나후다 A/1"
 
 #: src/emu/inpttype.ipp:90 src/emu/inpttype.ipp:208
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda B/2"
-msgstr ""
+msgstr "%p 하나후다 B/2"
 
 #: src/emu/inpttype.ipp:91 src/emu/inpttype.ipp:209
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda C/3"
-msgstr ""
+msgstr "%p 하나후다 C/3"
 
 #: src/emu/inpttype.ipp:92 src/emu/inpttype.ipp:210
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda D/4"
-msgstr ""
+msgstr "%p 하나후다 D/4"
 
 #: src/emu/inpttype.ipp:93 src/emu/inpttype.ipp:211
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda E/5"
-msgstr ""
+msgstr "%p 하나후다 E/5"
 
 #: src/emu/inpttype.ipp:94 src/emu/inpttype.ipp:212
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda F/6"
-msgstr ""
+msgstr "%p 하나후다 F/6"
 
 #: src/emu/inpttype.ipp:95 src/emu/inpttype.ipp:213
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda G/7"
-msgstr ""
+msgstr "%p 하나후다 G/7"
 
 #: src/emu/inpttype.ipp:96 src/emu/inpttype.ipp:214
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda H/8"
-msgstr ""
+msgstr "%p 하나후다 H/8"
 
 #: src/emu/inpttype.ipp:97 src/emu/inpttype.ipp:215
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda Yes"
-msgstr ""
+msgstr "%p 하나후다 예"
 
 #: src/emu/inpttype.ipp:98 src/emu/inpttype.ipp:216
 #, c-format
 msgctxt "input-name"
 msgid "%p Hanafuda No"
-msgstr ""
+msgstr "%p 하나후다 아니오"
 
 #: src/emu/inpttype.ipp:103
 msgctxt "input-name"
 msgid "Key In"
-msgstr ""
+msgstr "키 입력"
 
 #: src/emu/inpttype.ipp:104
 msgctxt "input-name"
 msgid "Key Out"
-msgstr ""
+msgstr "키 출력"
 
 #: src/emu/inpttype.ipp:105 src/emu/inpttype.ipp:606
 msgctxt "input-name"
 msgid "Service"
-msgstr ""
+msgstr "서비스"
 
 #: src/emu/inpttype.ipp:106
 msgctxt "input-name"
 msgid "Book-Keeping"
-msgstr ""
+msgstr "부기"
 
 #: src/emu/inpttype.ipp:107
 msgctxt "input-name"
 msgid "Door"
-msgstr ""
+msgstr "도어"
 
 #: src/emu/inpttype.ipp:108
 msgctxt "input-name"
 msgid "Payout"
-msgstr ""
+msgstr "레이아웃"
 
 #: src/emu/inpttype.ipp:109
 msgctxt "input-name"
 msgid "Bet"
-msgstr ""
+msgstr "배팅"
 
 #: src/emu/inpttype.ipp:110
 msgctxt "input-name"
 msgid "Deal"
-msgstr ""
+msgstr "딜"
 
 #: src/emu/inpttype.ipp:111
 msgctxt "input-name"
 msgid "Stand"
-msgstr ""
+msgstr "스탠드"
 
 #: src/emu/inpttype.ipp:112
 msgctxt "input-name"
 msgid "Take Score"
-msgstr ""
+msgstr "점수 획득"
 
 #: src/emu/inpttype.ipp:113
 msgctxt "input-name"
 msgid "Double Up"
-msgstr ""
+msgstr "더블 업"
 
 #: src/emu/inpttype.ipp:114
 msgctxt "input-name"
 msgid "Half Gamble"
-msgstr ""
+msgstr "하프 갬블"
 
 #: src/emu/inpttype.ipp:115
 msgctxt "input-name"
 msgid "High"
-msgstr ""
+msgstr "높음"
 
 #: src/emu/inpttype.ipp:116
 msgctxt "input-name"
 msgid "Low"
-msgstr ""
+msgstr "낮음"
 
 #: src/emu/inpttype.ipp:121
 msgctxt "input-name"
 msgid "Hold 1"
-msgstr ""
+msgstr "홀드 1"
 
 #: src/emu/inpttype.ipp:122
 msgctxt "input-name"
 msgid "Hold 2"
-msgstr ""
+msgstr "홀드 2"
 
 #: src/emu/inpttype.ipp:123
 msgctxt "input-name"
 msgid "Hold 3"
-msgstr ""
+msgstr "홀드 3"
 
 #: src/emu/inpttype.ipp:124
 msgctxt "input-name"
 msgid "Hold 4"
-msgstr ""
+msgstr "홀드 4"
 
 #: src/emu/inpttype.ipp:125
 msgctxt "input-name"
 msgid "Hold 5"
-msgstr ""
+msgstr "홀드 5"
 
 #: src/emu/inpttype.ipp:126
 msgctxt "input-name"
 msgid "Cancel"
-msgstr ""
+msgstr "취소"
 
 #: src/emu/inpttype.ipp:131
 msgctxt "input-name"
 msgid "Stop Reel 1"
-msgstr ""
+msgstr "릴 1 중지"
 
 #: src/emu/inpttype.ipp:132
 msgctxt "input-name"
 msgid "Stop Reel 2"
-msgstr ""
+msgstr "릴 2 중지"
 
 #: src/emu/inpttype.ipp:133
 msgctxt "input-name"
 msgid "Stop Reel 3"
-msgstr ""
+msgstr "릴 3 중지"
 
 #: src/emu/inpttype.ipp:134
 msgctxt "input-name"
 msgid "Stop Reel 4"
-msgstr ""
+msgstr "릴 4 중지"
 
 #: src/emu/inpttype.ipp:135
 msgctxt "input-name"
 msgid "Stop All Reels"
-msgstr ""
+msgstr "모든 릴 중지"
 
 #: src/emu/inpttype.ipp:559
 msgctxt "input-name"
 msgid "1 Player Start"
-msgstr ""
+msgstr "1인 플레이 시작"
 
 #: src/emu/inpttype.ipp:560
 msgctxt "input-name"
 msgid "2 Players Start"
-msgstr ""
+msgstr "2인 플레이 시작"
 
 #: src/emu/inpttype.ipp:561
 msgctxt "input-name"
 msgid "3 Players Start"
-msgstr ""
+msgstr "3인 플레이 시작"
 
 #: src/emu/inpttype.ipp:562
 msgctxt "input-name"
 msgid "4 Players Start"
-msgstr ""
+msgstr "4인 플레이 시작"
 
 #: src/emu/inpttype.ipp:563
 msgctxt "input-name"
 msgid "5 Players Start"
-msgstr ""
+msgstr "5인 플레이 시작"
 
 #: src/emu/inpttype.ipp:564
 msgctxt "input-name"
 msgid "6 Players Start"
-msgstr ""
+msgstr "6인 플레이 시작"
 
 #: src/emu/inpttype.ipp:565
 msgctxt "input-name"
 msgid "7 Players Start"
-msgstr ""
+msgstr "7인 플레이 시작"
 
 #: src/emu/inpttype.ipp:566
 msgctxt "input-name"
 msgid "8 Players Start"
-msgstr ""
+msgstr "8인 플레이 시작"
 
 #: src/emu/inpttype.ipp:571
 msgctxt "input-name"
 msgid "Coin 1"
-msgstr ""
+msgstr "코인 1"
 
 #: src/emu/inpttype.ipp:572
 msgctxt "input-name"
 msgid "Coin 2"
-msgstr ""
+msgstr "코인 2"
 
 #: src/emu/inpttype.ipp:573
 msgctxt "input-name"
 msgid "Coin 3"
-msgstr ""
+msgstr "코인 3"
 
 #: src/emu/inpttype.ipp:574
 msgctxt "input-name"
 msgid "Coin 4"
-msgstr ""
+msgstr "코인 4"
 
 #: src/emu/inpttype.ipp:575
 msgctxt "input-name"
 msgid "Coin 5"
-msgstr ""
+msgstr "코인 5"
 
 #: src/emu/inpttype.ipp:576
 msgctxt "input-name"
 msgid "Coin 6"
-msgstr ""
+msgstr "코인 6"
 
 #: src/emu/inpttype.ipp:577
 msgctxt "input-name"
 msgid "Coin 7"
-msgstr ""
+msgstr "코인 7"
 
 #: src/emu/inpttype.ipp:578
 msgctxt "input-name"
 msgid "Coin 8"
-msgstr ""
+msgstr "코인 8"
 
 #: src/emu/inpttype.ipp:579
 msgctxt "input-name"
 msgid "Coin 9"
-msgstr ""
+msgstr "코인 9"
 
 #: src/emu/inpttype.ipp:580
 msgctxt "input-name"
 msgid "Coin 10"
-msgstr ""
+msgstr "코인 10"
 
 #: src/emu/inpttype.ipp:581
 msgctxt "input-name"
 msgid "Coin 11"
-msgstr ""
+msgstr "코인 11"
 
 #: src/emu/inpttype.ipp:582
 msgctxt "input-name"
 msgid "Coin 12"
-msgstr ""
+msgstr "코인 12"
 
 #: src/emu/inpttype.ipp:583
 msgctxt "input-name"
 msgid "Banknote 1"
-msgstr ""
+msgstr "지폐 1"
 
 #: src/emu/inpttype.ipp:588
 msgctxt "input-name"
 msgid "Service 1"
-msgstr ""
+msgstr "서비스 1"
 
 #: src/emu/inpttype.ipp:589
 msgctxt "input-name"
 msgid "Service 2"
-msgstr ""
+msgstr "서비스 2"
 
 #: src/emu/inpttype.ipp:590
 msgctxt "input-name"
 msgid "Service 3"
-msgstr ""
+msgstr "서비스 3"
 
 #: src/emu/inpttype.ipp:591
 msgctxt "input-name"
 msgid "Service 4"
-msgstr ""
+msgstr "서비스 4"
 
 #: src/emu/inpttype.ipp:596
 msgctxt "input-name"
 msgid "Tilt 1"
-msgstr ""
+msgstr "기울기 1"
 
 #: src/emu/inpttype.ipp:597
 msgctxt "input-name"
 msgid "Tilt 2"
-msgstr ""
+msgstr "기울기 2"
 
 #: src/emu/inpttype.ipp:598
 msgctxt "input-name"
 msgid "Tilt 3"
-msgstr ""
+msgstr "기울기 3"
 
 #: src/emu/inpttype.ipp:599
 msgctxt "input-name"
 msgid "Tilt 4"
-msgstr ""
+msgstr "기울기 4"
 
 #: src/emu/inpttype.ipp:604
 msgctxt "input-name"
 msgid "Power On"
-msgstr ""
+msgstr "전원 켬"
 
 #: src/emu/inpttype.ipp:605
 msgctxt "input-name"
 msgid "Power Off"
-msgstr ""
+msgstr "전원 끔"
 
 #: src/emu/inpttype.ipp:607
 msgctxt "input-name"
 msgid "Tilt"
-msgstr ""
+msgstr "기울기"
 
 #: src/emu/inpttype.ipp:608
 msgctxt "input-name"
 msgid "Door Interlock"
-msgstr ""
+msgstr "도어 인터락"
 
 #: src/emu/inpttype.ipp:609
 msgctxt "input-name"
 msgid "Memory Reset"
-msgstr ""
+msgstr "메모리 초기화"
 
 #: src/emu/inpttype.ipp:610
 msgctxt "input-name"
 msgid "Volume Down"
-msgstr ""
+msgstr "음량 줄이기"
 
 #: src/emu/inpttype.ipp:611
 msgctxt "input-name"
 msgid "Volume Up"
-msgstr ""
+msgstr "음량 올리기"
 
 #: src/emu/inpttype.ipp:616 src/emu/inpttype.ipp:617 src/emu/inpttype.ipp:618
 #: src/emu/inpttype.ipp:619 src/emu/inpttype.ipp:620 src/emu/inpttype.ipp:621
@@ -4571,7 +4629,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Pedal 1"
-msgstr ""
+msgstr "%p 페달 1"
 
 #: src/emu/inpttype.ipp:630 src/emu/inpttype.ipp:631 src/emu/inpttype.ipp:632
 #: src/emu/inpttype.ipp:633 src/emu/inpttype.ipp:634 src/emu/inpttype.ipp:635
@@ -4580,7 +4638,7 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Pedal 2"
-msgstr ""
+msgstr "%p 페달 2"
 
 #: src/emu/inpttype.ipp:644 src/emu/inpttype.ipp:645 src/emu/inpttype.ipp:646
 #: src/emu/inpttype.ipp:647 src/emu/inpttype.ipp:648 src/emu/inpttype.ipp:649
@@ -4589,1091 +4647,1091 @@ msgstr ""
 #, c-format
 msgctxt "input-name"
 msgid "%p Pedal 3"
-msgstr ""
+msgstr "%p 페달 3"
 
 #: src/emu/inpttype.ipp:658
 msgctxt "input-name"
 msgid "Paddle"
-msgstr ""
+msgstr "패들"
 
 #: src/emu/inpttype.ipp:659
 msgctxt "input-name"
 msgid "Paddle 2"
-msgstr ""
+msgstr "패들 2"
 
 #: src/emu/inpttype.ipp:660
 msgctxt "input-name"
 msgid "Paddle 3"
-msgstr ""
+msgstr "패들 3"
 
 #: src/emu/inpttype.ipp:661
 msgctxt "input-name"
 msgid "Paddle 4"
-msgstr ""
+msgstr "패들 4"
 
 #: src/emu/inpttype.ipp:662
 msgctxt "input-name"
 msgid "Paddle 5"
-msgstr ""
+msgstr "패들 5"
 
 #: src/emu/inpttype.ipp:663
 msgctxt "input-name"
 msgid "Paddle 6"
-msgstr ""
+msgstr "패들 6"
 
 #: src/emu/inpttype.ipp:664
 msgctxt "input-name"
 msgid "Paddle 7"
-msgstr ""
+msgstr "패들 7"
 
 #: src/emu/inpttype.ipp:665
 msgctxt "input-name"
 msgid "Paddle 8"
-msgstr ""
+msgstr "패들 8"
 
 #: src/emu/inpttype.ipp:666
 msgctxt "input-name"
 msgid "Paddle 9"
-msgstr ""
+msgstr "패들 9"
 
 #: src/emu/inpttype.ipp:667
 msgctxt "input-name"
 msgid "Paddle 10"
-msgstr ""
+msgstr "패들 10"
 
 #: src/emu/inpttype.ipp:672
 msgctxt "input-name"
 msgid "Paddle V"
-msgstr ""
+msgstr "패들 V"
 
 #: src/emu/inpttype.ipp:673
 msgctxt "input-name"
 msgid "Paddle V 2"
-msgstr ""
+msgstr "패들 V 2"
 
 #: src/emu/inpttype.ipp:674
 msgctxt "input-name"
 msgid "Paddle V 3"
-msgstr ""
+msgstr "패들 V 3"
 
 #: src/emu/inpttype.ipp:675
 msgctxt "input-name"
 msgid "Paddle V 4"
-msgstr ""
+msgstr "패들 V 4"
 
 #: src/emu/inpttype.ipp:676
 msgctxt "input-name"
 msgid "Paddle V 5"
-msgstr ""
+msgstr "패들 V 5"
 
 #: src/emu/inpttype.ipp:677
 msgctxt "input-name"
 msgid "Paddle V 6"
-msgstr ""
+msgstr "패들 V 6"
 
 #: src/emu/inpttype.ipp:678
 msgctxt "input-name"
 msgid "Paddle V 7"
-msgstr ""
+msgstr "패들 V 7"
 
 #: src/emu/inpttype.ipp:679
 msgctxt "input-name"
 msgid "Paddle V 8"
-msgstr ""
+msgstr "패들 V 8"
 
 #: src/emu/inpttype.ipp:680
 msgctxt "input-name"
 msgid "Paddle V 9"
-msgstr ""
+msgstr "패들 V 9"
 
 #: src/emu/inpttype.ipp:681
 msgctxt "input-name"
 msgid "Paddle V 10"
-msgstr ""
+msgstr "패들 V 10"
 
 #: src/emu/inpttype.ipp:686
 msgctxt "input-name"
 msgid "Positional"
-msgstr ""
+msgstr "위치"
 
 #: src/emu/inpttype.ipp:687
 msgctxt "input-name"
 msgid "Positional 2"
-msgstr ""
+msgstr "위치 2"
 
 #: src/emu/inpttype.ipp:688
 msgctxt "input-name"
 msgid "Positional 3"
-msgstr ""
+msgstr "위치 3"
 
 #: src/emu/inpttype.ipp:689
 msgctxt "input-name"
 msgid "Positional 4"
-msgstr ""
+msgstr "위치 4"
 
 #: src/emu/inpttype.ipp:690
 msgctxt "input-name"
 msgid "Positional 5"
-msgstr ""
+msgstr "위치 5"
 
 #: src/emu/inpttype.ipp:691
 msgctxt "input-name"
 msgid "Positional 6"
-msgstr ""
+msgstr "위치 6"
 
 #: src/emu/inpttype.ipp:692
 msgctxt "input-name"
 msgid "Positional 7"
-msgstr ""
+msgstr "위치 7"
 
 #: src/emu/inpttype.ipp:693
 msgctxt "input-name"
 msgid "Positional 8"
-msgstr ""
+msgstr "위치 8"
 
 #: src/emu/inpttype.ipp:694
 msgctxt "input-name"
 msgid "Positional 9"
-msgstr ""
+msgstr "위치 9"
 
 #: src/emu/inpttype.ipp:695
 msgctxt "input-name"
 msgid "Positional 10"
-msgstr ""
+msgstr "위치 10"
 
 #: src/emu/inpttype.ipp:700
 msgctxt "input-name"
 msgid "Positional V"
-msgstr ""
+msgstr "위치 V"
 
 #: src/emu/inpttype.ipp:701
 msgctxt "input-name"
 msgid "Positional V 2"
-msgstr ""
+msgstr "위치 V 2"
 
 #: src/emu/inpttype.ipp:702
 msgctxt "input-name"
 msgid "Positional V 3"
-msgstr ""
+msgstr "위치 V 3"
 
 #: src/emu/inpttype.ipp:703
 msgctxt "input-name"
 msgid "Positional V 4"
-msgstr ""
+msgstr "위치 V 4"
 
 #: src/emu/inpttype.ipp:704
 msgctxt "input-name"
 msgid "Positional V 5"
-msgstr ""
+msgstr "위치 V 5"
 
 #: src/emu/inpttype.ipp:705
 msgctxt "input-name"
 msgid "Positional V 6"
-msgstr ""
+msgstr "위치 V 6"
 
 #: src/emu/inpttype.ipp:706
 msgctxt "input-name"
 msgid "Positional V 7"
-msgstr ""
+msgstr "위치 V 7"
 
 #: src/emu/inpttype.ipp:707
 msgctxt "input-name"
 msgid "Positional V 8"
-msgstr ""
+msgstr "위치 V 8"
 
 #: src/emu/inpttype.ipp:708
 msgctxt "input-name"
 msgid "Positional V 9"
-msgstr ""
+msgstr "위치 V 9"
 
 #: src/emu/inpttype.ipp:709
 msgctxt "input-name"
 msgid "Positional V 10"
-msgstr ""
+msgstr "위치 V 10"
 
 #: src/emu/inpttype.ipp:714
 msgctxt "input-name"
 msgid "Dial"
-msgstr ""
+msgstr "다이얼"
 
 #: src/emu/inpttype.ipp:715
 msgctxt "input-name"
 msgid "Dial 2"
-msgstr ""
+msgstr "다이얼 2"
 
 #: src/emu/inpttype.ipp:716
 msgctxt "input-name"
 msgid "Dial 3"
-msgstr ""
+msgstr "다이얼 3"
 
 #: src/emu/inpttype.ipp:717
 msgctxt "input-name"
 msgid "Dial 4"
-msgstr ""
+msgstr "다이얼 4"
 
 #: src/emu/inpttype.ipp:718
 msgctxt "input-name"
 msgid "Dial 5"
-msgstr ""
+msgstr "다이얼 5"
 
 #: src/emu/inpttype.ipp:719
 msgctxt "input-name"
 msgid "Dial 6"
-msgstr ""
+msgstr "다이얼 6"
 
 #: src/emu/inpttype.ipp:720
 msgctxt "input-name"
 msgid "Dial 7"
-msgstr ""
+msgstr "다이얼 7"
 
 #: src/emu/inpttype.ipp:721
 msgctxt "input-name"
 msgid "Dial 8"
-msgstr ""
+msgstr "다이얼 8"
 
 #: src/emu/inpttype.ipp:722
 msgctxt "input-name"
 msgid "Dial 9"
-msgstr ""
+msgstr "다이얼 9"
 
 #: src/emu/inpttype.ipp:723
 msgctxt "input-name"
 msgid "Dial 10"
-msgstr ""
+msgstr "다이얼 10"
 
 #: src/emu/inpttype.ipp:728
 msgctxt "input-name"
 msgid "Dial V"
-msgstr ""
+msgstr "다이얼 V"
 
 #: src/emu/inpttype.ipp:729
 msgctxt "input-name"
 msgid "Dial V 2"
-msgstr ""
+msgstr "다이얼 V 2"
 
 #: src/emu/inpttype.ipp:730
 msgctxt "input-name"
 msgid "Dial V 3"
-msgstr ""
+msgstr "다이얼 V 3"
 
 #: src/emu/inpttype.ipp:731
 msgctxt "input-name"
 msgid "Dial V 4"
-msgstr ""
+msgstr "다이얼 V 4"
 
 #: src/emu/inpttype.ipp:732
 msgctxt "input-name"
 msgid "Dial V 5"
-msgstr ""
+msgstr "다이얼 V 5"
 
 #: src/emu/inpttype.ipp:733
 msgctxt "input-name"
 msgid "Dial V 6"
-msgstr ""
+msgstr "다이얼 V 6"
 
 #: src/emu/inpttype.ipp:734
 msgctxt "input-name"
 msgid "Dial V 7"
-msgstr ""
+msgstr "다이얼 V 7"
 
 #: src/emu/inpttype.ipp:735
 msgctxt "input-name"
 msgid "Dial V 8"
-msgstr ""
+msgstr "다이얼 V 8"
 
 #: src/emu/inpttype.ipp:736
 msgctxt "input-name"
 msgid "Dial V 9"
-msgstr ""
+msgstr "다이얼 V 9"
 
 #: src/emu/inpttype.ipp:737
 msgctxt "input-name"
 msgid "Dial V 10"
-msgstr ""
+msgstr "다이얼 V 10"
 
 #: src/emu/inpttype.ipp:742
 msgctxt "input-name"
 msgid "Trackball X"
-msgstr ""
+msgstr "트랙볼 X"
 
 #: src/emu/inpttype.ipp:743
 msgctxt "input-name"
 msgid "Trackball X 2"
-msgstr ""
+msgstr "트랙볼 X 2"
 
 #: src/emu/inpttype.ipp:744
 msgctxt "input-name"
 msgid "Trackball X 3"
-msgstr ""
+msgstr "트랙볼 X 3"
 
 #: src/emu/inpttype.ipp:745
 msgctxt "input-name"
 msgid "Trackball X 4"
-msgstr ""
+msgstr "트랙볼 X 4"
 
 #: src/emu/inpttype.ipp:746
 msgctxt "input-name"
 msgid "Trackball X 5"
-msgstr ""
+msgstr "트랙볼 X 5"
 
 #: src/emu/inpttype.ipp:747
 msgctxt "input-name"
 msgid "Trackball X 6"
-msgstr ""
+msgstr "트랙볼 X 6"
 
 #: src/emu/inpttype.ipp:748
 msgctxt "input-name"
 msgid "Trackball X 7"
-msgstr ""
+msgstr "트랙볼 X 7"
 
 #: src/emu/inpttype.ipp:749
 msgctxt "input-name"
 msgid "Trackball X 8"
-msgstr ""
+msgstr "트랙볼 X 8"
 
 #: src/emu/inpttype.ipp:750
 msgctxt "input-name"
 msgid "Trackball X 9"
-msgstr ""
+msgstr "트랙볼 X 9"
 
 #: src/emu/inpttype.ipp:751
 msgctxt "input-name"
 msgid "Trackball X 10"
-msgstr ""
+msgstr "트랙볼 X 10"
 
 #: src/emu/inpttype.ipp:756
 msgctxt "input-name"
 msgid "Trackball Y"
-msgstr ""
+msgstr "트랙볼 Y"
 
 #: src/emu/inpttype.ipp:757
 msgctxt "input-name"
 msgid "Trackball Y 2"
-msgstr ""
+msgstr "트랙볼 Y 2"
 
 #: src/emu/inpttype.ipp:758
 msgctxt "input-name"
 msgid "Trackball Y 3"
-msgstr ""
+msgstr "트랙볼 Y 3"
 
 #: src/emu/inpttype.ipp:759
 msgctxt "input-name"
 msgid "Trackball Y 4"
-msgstr ""
+msgstr "트랙볼 Y 4"
 
 #: src/emu/inpttype.ipp:760
 msgctxt "input-name"
 msgid "Trackball Y 5"
-msgstr ""
+msgstr "트랙볼 Y 5"
 
 #: src/emu/inpttype.ipp:761
 msgctxt "input-name"
 msgid "Trackball Y 6"
-msgstr ""
+msgstr "트랙볼 Y 6"
 
 #: src/emu/inpttype.ipp:762
 msgctxt "input-name"
 msgid "Trackball Y 7"
-msgstr ""
+msgstr "트랙볼 Y 7"
 
 #: src/emu/inpttype.ipp:763
 msgctxt "input-name"
 msgid "Trackball Y 8"
-msgstr ""
+msgstr "트랙볼 Y 8"
 
 #: src/emu/inpttype.ipp:764
 msgctxt "input-name"
 msgid "Trackball Y 9"
-msgstr ""
+msgstr "트랙볼 Y 9"
 
 #: src/emu/inpttype.ipp:765
 msgctxt "input-name"
 msgid "Trackball Y 10"
-msgstr ""
+msgstr "트랙볼 Y 10"
 
 #: src/emu/inpttype.ipp:770
 msgctxt "input-name"
 msgid "AD Stick X"
-msgstr ""
+msgstr "AD 스틱 X"
 
 #: src/emu/inpttype.ipp:771
 msgctxt "input-name"
 msgid "AD Stick X 2"
-msgstr ""
+msgstr "AD 스틱 X 2"
 
 #: src/emu/inpttype.ipp:772
 msgctxt "input-name"
 msgid "AD Stick X 3"
-msgstr ""
+msgstr "AD 스틱 X 3"
 
 #: src/emu/inpttype.ipp:773
 msgctxt "input-name"
 msgid "AD Stick X 4"
-msgstr ""
+msgstr "AD 스틱 X 4"
 
 #: src/emu/inpttype.ipp:774
 msgctxt "input-name"
 msgid "AD Stick X 5"
-msgstr ""
+msgstr "AD 스틱 X 5"
 
 #: src/emu/inpttype.ipp:775
 msgctxt "input-name"
 msgid "AD Stick X 6"
-msgstr ""
+msgstr "AD 스틱 X 6"
 
 #: src/emu/inpttype.ipp:776
 msgctxt "input-name"
 msgid "AD Stick X 7"
-msgstr ""
+msgstr "AD 스틱 X 7"
 
 #: src/emu/inpttype.ipp:777
 msgctxt "input-name"
 msgid "AD Stick X 8"
-msgstr ""
+msgstr "AD 스틱 X 8"
 
 #: src/emu/inpttype.ipp:778
 msgctxt "input-name"
 msgid "AD Stick X 9"
-msgstr ""
+msgstr "AD 스틱 X 9"
 
 #: src/emu/inpttype.ipp:779
 msgctxt "input-name"
 msgid "AD Stick X 10"
-msgstr ""
+msgstr "AD 스틱 X 10"
 
 #: src/emu/inpttype.ipp:784
 msgctxt "input-name"
 msgid "AD Stick Y"
-msgstr ""
+msgstr "AD 스틱 Y"
 
 #: src/emu/inpttype.ipp:785
 msgctxt "input-name"
 msgid "AD Stick Y 2"
-msgstr ""
+msgstr "AD 스틱 Y 2"
 
 #: src/emu/inpttype.ipp:786
 msgctxt "input-name"
 msgid "AD Stick Y 3"
-msgstr ""
+msgstr "AD 스틱 Y 3"
 
 #: src/emu/inpttype.ipp:787
 msgctxt "input-name"
 msgid "AD Stick Y 4"
-msgstr ""
+msgstr "AD 스틱 Y 4"
 
 #: src/emu/inpttype.ipp:788
 msgctxt "input-name"
 msgid "AD Stick Y 5"
-msgstr ""
+msgstr "AD 스틱 Y 5"
 
 #: src/emu/inpttype.ipp:789
 msgctxt "input-name"
 msgid "AD Stick Y 6"
-msgstr ""
+msgstr "AD 스틱 Y 6"
 
 #: src/emu/inpttype.ipp:790
 msgctxt "input-name"
 msgid "AD Stick Y 7"
-msgstr ""
+msgstr "AD 스틱 Y 7"
 
 #: src/emu/inpttype.ipp:791
 msgctxt "input-name"
 msgid "AD Stick Y 8"
-msgstr ""
+msgstr "AD 스틱 Y 8"
 
 #: src/emu/inpttype.ipp:792
 msgctxt "input-name"
 msgid "AD Stick Y 9"
-msgstr ""
+msgstr "AD 스틱 Y 9"
 
 #: src/emu/inpttype.ipp:793
 msgctxt "input-name"
 msgid "AD Stick Y 10"
-msgstr ""
+msgstr "AD 스틱 Y 10"
 
 #: src/emu/inpttype.ipp:798
 msgctxt "input-name"
 msgid "AD Stick Z"
-msgstr ""
+msgstr "AD 스틱 Z"
 
 #: src/emu/inpttype.ipp:799
 msgctxt "input-name"
 msgid "AD Stick Z 2"
-msgstr ""
+msgstr "AD 스틱 Z 2"
 
 #: src/emu/inpttype.ipp:800
 msgctxt "input-name"
 msgid "AD Stick Z 3"
-msgstr ""
+msgstr "AD 스틱 Z 3"
 
 #: src/emu/inpttype.ipp:801
 msgctxt "input-name"
 msgid "AD Stick Z 4"
-msgstr ""
+msgstr "AD 스틱 Z 4"
 
 #: src/emu/inpttype.ipp:802
 msgctxt "input-name"
 msgid "AD Stick Z 5"
-msgstr ""
+msgstr "AD 스틱 Z 5"
 
 #: src/emu/inpttype.ipp:803
 msgctxt "input-name"
 msgid "AD Stick Z 6"
-msgstr ""
+msgstr "AD 스틱 Z 6"
 
 #: src/emu/inpttype.ipp:804
 msgctxt "input-name"
 msgid "AD Stick Z 7"
-msgstr ""
+msgstr "AD 스틱 Z 7"
 
 #: src/emu/inpttype.ipp:805
 msgctxt "input-name"
 msgid "AD Stick Z 8"
-msgstr ""
+msgstr "AD 스틱 Z 8"
 
 #: src/emu/inpttype.ipp:806
 msgctxt "input-name"
 msgid "AD Stick Z 9"
-msgstr ""
+msgstr "AD 스틱 Z 9"
 
 #: src/emu/inpttype.ipp:807
 msgctxt "input-name"
 msgid "AD Stick Z 10"
-msgstr ""
+msgstr "AD 스틱 Z 10"
 
 #: src/emu/inpttype.ipp:812
 msgctxt "input-name"
 msgid "Lightgun X"
-msgstr ""
+msgstr "광선총 X"
 
 #: src/emu/inpttype.ipp:813
 msgctxt "input-name"
 msgid "Lightgun X 2"
-msgstr ""
+msgstr "광선총 X 2"
 
 #: src/emu/inpttype.ipp:814
 msgctxt "input-name"
 msgid "Lightgun X 3"
-msgstr ""
+msgstr "광선총 X 3"
 
 #: src/emu/inpttype.ipp:815
 msgctxt "input-name"
 msgid "Lightgun X 4"
-msgstr ""
+msgstr "광선총 X 4"
 
 #: src/emu/inpttype.ipp:816
 msgctxt "input-name"
 msgid "Lightgun X 5"
-msgstr ""
+msgstr "광선총 X 5"
 
 #: src/emu/inpttype.ipp:817
 msgctxt "input-name"
 msgid "Lightgun X 6"
-msgstr ""
+msgstr "광선총 X 6"
 
 #: src/emu/inpttype.ipp:818
 msgctxt "input-name"
 msgid "Lightgun X 7"
-msgstr ""
+msgstr "광선총 X 7"
 
 #: src/emu/inpttype.ipp:819
 msgctxt "input-name"
 msgid "Lightgun X 8"
-msgstr ""
+msgstr "광선총 X 8"
 
 #: src/emu/inpttype.ipp:820
 msgctxt "input-name"
 msgid "Lightgun X 9"
-msgstr ""
+msgstr "광선총 X 9"
 
 #: src/emu/inpttype.ipp:821
 msgctxt "input-name"
 msgid "Lightgun X 10"
-msgstr ""
+msgstr "광선총 X 10"
 
 #: src/emu/inpttype.ipp:826
 msgctxt "input-name"
 msgid "Lightgun Y"
-msgstr ""
+msgstr "광선총 Y"
 
 #: src/emu/inpttype.ipp:827
 msgctxt "input-name"
 msgid "Lightgun Y 2"
-msgstr ""
+msgstr "광선총 Y 2"
 
 #: src/emu/inpttype.ipp:828
 msgctxt "input-name"
 msgid "Lightgun Y 3"
-msgstr ""
+msgstr "광선총 Y 3"
 
 #: src/emu/inpttype.ipp:829
 msgctxt "input-name"
 msgid "Lightgun Y 4"
-msgstr ""
+msgstr "광선총 Y 4"
 
 #: src/emu/inpttype.ipp:830
 msgctxt "input-name"
 msgid "Lightgun Y 5"
-msgstr ""
+msgstr "광선총 Y 5"
 
 #: src/emu/inpttype.ipp:831
 msgctxt "input-name"
 msgid "Lightgun Y 6"
-msgstr ""
+msgstr "광선총 Y 6"
 
 #: src/emu/inpttype.ipp:832
 msgctxt "input-name"
 msgid "Lightgun Y 7"
-msgstr ""
+msgstr "광선총 Y 7"
 
 #: src/emu/inpttype.ipp:833
 msgctxt "input-name"
 msgid "Lightgun Y 8"
-msgstr ""
+msgstr "광선총 Y 8"
 
 #: src/emu/inpttype.ipp:834
 msgctxt "input-name"
 msgid "Lightgun Y 9"
-msgstr ""
+msgstr "광선총 Y 9"
 
 #: src/emu/inpttype.ipp:835
 msgctxt "input-name"
 msgid "Lightgun Y 10"
-msgstr ""
+msgstr "광선총 Y 10"
 
 #: src/emu/inpttype.ipp:840
 msgctxt "input-name"
 msgid "Mouse X"
-msgstr ""
+msgstr "마우스 X"
 
 #: src/emu/inpttype.ipp:841
 msgctxt "input-name"
 msgid "Mouse X 2"
-msgstr ""
+msgstr "마우스 X 2"
 
 #: src/emu/inpttype.ipp:842
 msgctxt "input-name"
 msgid "Mouse X 3"
-msgstr ""
+msgstr "마우스 X 3"
 
 #: src/emu/inpttype.ipp:843
 msgctxt "input-name"
 msgid "Mouse X 4"
-msgstr ""
+msgstr "마우스 X 4"
 
 #: src/emu/inpttype.ipp:844
 msgctxt "input-name"
 msgid "Mouse X 5"
-msgstr ""
+msgstr "마우스 X 5"
 
 #: src/emu/inpttype.ipp:845
 msgctxt "input-name"
 msgid "Mouse X 6"
-msgstr ""
+msgstr "마우스 X 6"
 
 #: src/emu/inpttype.ipp:846
 msgctxt "input-name"
 msgid "Mouse X 7"
-msgstr ""
+msgstr "마우스 X 7"
 
 #: src/emu/inpttype.ipp:847
 msgctxt "input-name"
 msgid "Mouse X 8"
-msgstr ""
+msgstr "마우스 X 8"
 
 #: src/emu/inpttype.ipp:848
 msgctxt "input-name"
 msgid "Mouse X 9"
-msgstr ""
+msgstr "마우스 X 9"
 
 #: src/emu/inpttype.ipp:849
 msgctxt "input-name"
 msgid "Mouse X 10"
-msgstr ""
+msgstr "마우스 X 10"
 
 #: src/emu/inpttype.ipp:854
 msgctxt "input-name"
 msgid "Mouse Y"
-msgstr ""
+msgstr "마우스 Y"
 
 #: src/emu/inpttype.ipp:855
 msgctxt "input-name"
 msgid "Mouse Y 2"
-msgstr ""
+msgstr "마우스 Y 2"
 
 #: src/emu/inpttype.ipp:856
 msgctxt "input-name"
 msgid "Mouse Y 3"
-msgstr ""
+msgstr "마우스 Y 3"
 
 #: src/emu/inpttype.ipp:857
 msgctxt "input-name"
 msgid "Mouse Y 4"
-msgstr ""
+msgstr "마우스 Y 4"
 
 #: src/emu/inpttype.ipp:858
 msgctxt "input-name"
 msgid "Mouse Y 5"
-msgstr ""
+msgstr "마우스 Y 5"
 
 #: src/emu/inpttype.ipp:859
 msgctxt "input-name"
 msgid "Mouse Y 6"
-msgstr ""
+msgstr "마우스 Y 6"
 
 #: src/emu/inpttype.ipp:860
 msgctxt "input-name"
 msgid "Mouse Y 7"
-msgstr ""
+msgstr "마우스 Y 7"
 
 #: src/emu/inpttype.ipp:861
 msgctxt "input-name"
 msgid "Mouse Y 8"
-msgstr ""
+msgstr "마우스 Y 8"
 
 #: src/emu/inpttype.ipp:862
 msgctxt "input-name"
 msgid "Mouse Y 9"
-msgstr ""
+msgstr "마우스 Y 9"
 
 #: src/emu/inpttype.ipp:863
 msgctxt "input-name"
 msgid "Mouse Y 10"
-msgstr ""
+msgstr "마우스 Y 10"
 
 #: src/emu/inpttype.ipp:868
 msgctxt "input-name"
 msgid "Keypad"
-msgstr ""
+msgstr "키패드"
 
 #: src/emu/inpttype.ipp:869
 msgctxt "input-name"
 msgid "Keyboard"
-msgstr ""
+msgstr "키보드"
 
 #: src/emu/inpttype.ipp:874
 msgctxt "input-name"
 msgid "Show/Hide Menu"
-msgstr ""
+msgstr "메뉴 표시/숨기기"
 
 #: src/emu/inpttype.ipp:875
 msgctxt "input-name"
 msgid "UI Select"
-msgstr ""
+msgstr "사용자 인터페이스 선택"
 
 #: src/emu/inpttype.ipp:876
 msgctxt "input-name"
 msgid "UI Back"
-msgstr ""
+msgstr "사용자 인터페이스 뒤로"
 
 #: src/emu/inpttype.ipp:877
 msgctxt "input-name"
 msgid "UI Cancel"
-msgstr ""
+msgstr "사용자 인터페이스 취소"
 
 #: src/emu/inpttype.ipp:878
 msgctxt "input-name"
 msgid "UI Clear"
-msgstr ""
+msgstr "사용자 인터페이스 지우기"
 
 #: src/emu/inpttype.ipp:879
 msgctxt "input-name"
 msgid "UI Help"
-msgstr ""
+msgstr "사용자 인터페이스 도움말"
 
 #: src/emu/inpttype.ipp:880
 msgctxt "input-name"
 msgid "UI Up"
-msgstr ""
+msgstr "사용자 인터페이스 위로"
 
 #: src/emu/inpttype.ipp:881
 msgctxt "input-name"
 msgid "UI Down"
-msgstr ""
+msgstr "사용자 인터페이스 아래로"
 
 #: src/emu/inpttype.ipp:882
 msgctxt "input-name"
 msgid "UI Left"
-msgstr ""
+msgstr "사용자 인터페이스 왼쪽으로"
 
 #: src/emu/inpttype.ipp:883
 msgctxt "input-name"
 msgid "UI Right"
-msgstr ""
+msgstr "사용자 인터페이스 오른쪽으로"
 
 #: src/emu/inpttype.ipp:884
 msgctxt "input-name"
 msgid "UI Home"
-msgstr ""
+msgstr "사용자 인터페이스 홈"
 
 #: src/emu/inpttype.ipp:885
 msgctxt "input-name"
 msgid "UI End"
-msgstr ""
+msgstr "사용자 인터페이스 엔드"
 
 #: src/emu/inpttype.ipp:886
 msgctxt "input-name"
 msgid "UI Page Up"
-msgstr ""
+msgstr "사용자 인터페이스 페이지 위로"
 
 #: src/emu/inpttype.ipp:887
 msgctxt "input-name"
 msgid "UI Page Down"
-msgstr ""
+msgstr "사용자 인터페이스 페이지 아래로"
 
 #: src/emu/inpttype.ipp:888
 msgctxt "input-name"
 msgid "UI Previous Group"
-msgstr ""
+msgstr "사용자 인터페이스 이전 그룹"
 
 #: src/emu/inpttype.ipp:889
 msgctxt "input-name"
 msgid "UI Next Group"
-msgstr ""
+msgstr "사용자 인터페이스 다음 그룹"
 
 #: src/emu/inpttype.ipp:890
 msgctxt "input-name"
 msgid "On Screen Display"
-msgstr ""
+msgstr "화면 표시"
 
 #: src/emu/inpttype.ipp:891
 msgctxt "input-name"
 msgid "Toggle UI Controls"
-msgstr ""
+msgstr "사용자 인터페이스 제어 전환"
 
 #: src/emu/inpttype.ipp:892
 msgctxt "input-name"
 msgid "Break in Debugger"
-msgstr ""
+msgstr "디버거 중단"
 
 #: src/emu/inpttype.ipp:893
 msgctxt "input-name"
 msgid "Pause"
-msgstr ""
+msgstr "일시 중지"
 
 #: src/emu/inpttype.ipp:894
 msgctxt "input-name"
 msgid "Pause - Single Step"
-msgstr ""
+msgstr "일시 중지 - 단일 단계"
 
 #: src/emu/inpttype.ipp:895
 msgctxt "input-name"
 msgid "Rewind - Single Step"
-msgstr ""
+msgstr "되감기 - 단일 단계"
 
 #: src/emu/inpttype.ipp:896
 msgctxt "input-name"
 msgid "Save State"
-msgstr ""
+msgstr "상태 저장"
 
 #: src/emu/inpttype.ipp:897
 msgctxt "input-name"
 msgid "Load State"
-msgstr ""
+msgstr "상태 불러오기"
 
 #: src/emu/inpttype.ipp:898
 msgctxt "input-name"
 msgid "Reset Machine"
-msgstr ""
+msgstr "머신 초기화"
 
 #: src/emu/inpttype.ipp:899
 msgctxt "input-name"
 msgid "Soft Reset"
-msgstr ""
+msgstr "소프트 초기화"
 
 #: src/emu/inpttype.ipp:900
 msgctxt "input-name"
 msgid "Show Decoded Graphics"
-msgstr ""
+msgstr "디코딩된 그래픽 표시"
 
 #: src/emu/inpttype.ipp:901
 msgctxt "input-name"
 msgid "Frameskip Dec"
-msgstr ""
+msgstr "프레임스킵 감소"
 
 #: src/emu/inpttype.ipp:902
 msgctxt "input-name"
 msgid "Frameskip Inc"
-msgstr ""
+msgstr "프레임스킵 증가"
 
 #: src/emu/inpttype.ipp:903
 msgctxt "input-name"
 msgid "Throttle"
-msgstr ""
+msgstr "스로틀"
 
 #: src/emu/inpttype.ipp:904
 msgctxt "input-name"
 msgid "Fast Forward"
-msgstr ""
+msgstr "빨리 감기"
 
 #: src/emu/inpttype.ipp:905
 msgctxt "input-name"
 msgid "Show FPS"
-msgstr ""
+msgstr "FPS 표시"
 
 #: src/emu/inpttype.ipp:906
 msgctxt "input-name"
 msgid "Save Snapshot"
-msgstr ""
+msgstr "스냅샷 저장"
 
 #: src/emu/inpttype.ipp:907
 msgctxt "input-name"
 msgid "Record MNG"
-msgstr ""
+msgstr "MNG 녹화"
 
 #: src/emu/inpttype.ipp:908
 msgctxt "input-name"
 msgid "Record AVI"
-msgstr ""
+msgstr "AVI 녹화"
 
 #: src/emu/inpttype.ipp:909
 msgctxt "input-name"
 msgid "Toggle Cheat"
-msgstr ""
+msgstr "치트 전환"
 
 #: src/emu/inpttype.ipp:910
 msgctxt "input-name"
 msgid "UI Display Comment"
-msgstr ""
+msgstr "사용자 인터페이스 표시 설명"
 
 #: src/emu/inpttype.ipp:911
 msgctxt "input-name"
 msgid "UI Zoom In"
-msgstr ""
+msgstr "사용자 인터페이스 확대"
 
 #: src/emu/inpttype.ipp:912
 msgctxt "input-name"
 msgid "UI Zoom Out"
-msgstr ""
+msgstr "사용자 인터페이스 축소"
 
 #: src/emu/inpttype.ipp:913
 msgctxt "input-name"
 msgid "UI Default Zoom"
-msgstr ""
+msgstr "사용자 인터페이스 기본 크기"
 
 #: src/emu/inpttype.ipp:914
 msgctxt "input-name"
 msgid "UI Rotate"
-msgstr ""
+msgstr "사용자 인터페이스 회전"
 
 #: src/emu/inpttype.ipp:915
 msgctxt "input-name"
 msgid "Show Profiler"
-msgstr ""
+msgstr "프로파일러 표시"
 
 #: src/emu/inpttype.ipp:916
 msgctxt "input-name"
 msgid "UI Release Pointer"
-msgstr ""
+msgstr "사용자 인터페이스 해제 포인터"
 
 #: src/emu/inpttype.ipp:917
 msgctxt "input-name"
 msgid "UI Paste Text"
-msgstr ""
+msgstr "사용자 인터페이스 텍스트 붙여넣기"
 
 #: src/emu/inpttype.ipp:918
 msgctxt "input-name"
 msgid "UI (First) Tape Start"
-msgstr ""
+msgstr "사용자 인터페이스 (첫)테이프 시작"
 
 #: src/emu/inpttype.ipp:919
 msgctxt "input-name"
 msgid "UI (First) Tape Stop"
-msgstr ""
+msgstr "사용자 인터페이스 (첫)테이프 중지"
 
 #: src/emu/inpttype.ipp:920
 msgctxt "input-name"
 msgid "UI Focus Next"
-msgstr ""
+msgstr "사용자 인터페이스 다음 초점"
 
 #: src/emu/inpttype.ipp:921
 msgctxt "input-name"
 msgid "UI Focus Previous"
-msgstr ""
+msgstr "사용자 인터페이스 이전 초점"
 
 #: src/emu/inpttype.ipp:922
 msgctxt "input-name"
 msgid "UI External DAT View"
-msgstr ""
+msgstr "사용자 인터페이스 외부 DAT 보기"
 
 #: src/emu/inpttype.ipp:923
 msgctxt "input-name"
 msgid "UI Add/Remove Favorite"
-msgstr ""
+msgstr "사용자 인터페이스 즐겨찾기 추가/제거"
 
 #: src/emu/inpttype.ipp:924
 msgctxt "input-name"
 msgid "UI Export List"
-msgstr ""
+msgstr "사용자 인터페이스 목록 내보내기"
 
 #: src/emu/inpttype.ipp:925
 msgctxt "input-name"
 msgid "UI Audit Media"
-msgstr ""
+msgstr "사용자 인터페이스 매체 심사"
 
 #: src/osd/modules/input/input_windows.cpp:111 src/osd/sdl/osdsdl.cpp:339
 msgctxt "input-name"
 msgid "Toggle Fullscreen"
-msgstr ""
+msgstr "전체 화면 전환"
 
 #: src/osd/modules/input/input_windows.cpp:117
 msgctxt "input-name"
 msgid "Take Rendered Snapshot"
-msgstr ""
+msgstr "렌더링된 스냅샷 찍기"
 
 #: src/osd/modules/input/input_windows.cpp:128 src/osd/sdl/osdsdl.cpp:388
 msgctxt "input-name"
 msgid "Record Rendered Video"
-msgstr ""
+msgstr "렌더링된 비디오 녹화"
 
 #: src/osd/modules/input/input_windows.cpp:144
 msgctxt "input-name"
 msgid "Toggle Post-Processing"
-msgstr ""
+msgstr "후처리 전환"
 
 #: src/osd/sdl/osdsdl.cpp:365
 msgctxt "input-name"
 msgid "Toggle Filter"
-msgstr ""
+msgstr "필터 전환"
 
 #: src/osd/sdl/osdsdl.cpp:371
 msgctxt "input-name"
 msgid "Decrease Prescaling"
-msgstr ""
+msgstr "사전 스케일링 감소"
 
 #: src/osd/sdl/osdsdl.cpp:382
 msgctxt "input-name"
 msgid "Increase Prescaling"
-msgstr ""
+msgstr "사전 스케일링 증가"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
 msgid "When updated"
-msgstr ""
+msgstr "업데이트 시"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
 msgid "On exit"
-msgstr ""
+msgstr "종료 시"
 
 #: plugins/hiscore/init.lua:86
 msgctxt "plugin-hiscore"
 msgid "Hiscore Support Options"
-msgstr ""
+msgstr "고득점 지원 옵션"
 
 #: plugins/hiscore/init.lua:88
 msgctxt "plugin-hiscore"
 msgid "Save scores"
-msgstr ""
+msgstr "점수 저장"
 
 #: plugins/hiscore/init.lua:372
 msgctxt "plugin-hiscore"
 msgid "Hiscore Support"
-msgstr ""
+msgstr "고득점 지원"
 
 #: plugins/cheatfind/init.lua:387
 msgid "Other: "
-msgstr ""
+msgstr "기타 : "
 
 #: plugins/cheatfind/init.lua:388
 msgid "Save Cheat"
@@ -5706,11 +5764,11 @@ msgstr "유형"
 
 #: plugins/cheatfind/init.lua:411
 msgid "(empty)"
-msgstr ""
+msgstr "(비어 있음)"
 
 #: plugins/cheatfind/init.lua:427
 msgid "You can enter any type name"
-msgstr ""
+msgstr "모든 유형 이름 입력 가능"
 
 #: plugins/cheatfind/init.lua:436
 msgid "Save"
@@ -5718,56 +5776,56 @@ msgstr "저장"
 
 #: plugins/cheatfind/init.lua:444
 msgid "Type name is empty"
-msgstr ""
+msgstr "유형 이름이 비어 있음"
 
 #: plugins/cheatfind/init.lua:468
 #, lua-format
 msgid "Cheat written to %s and added to cheat.simple"
-msgstr "치트를 %s에 쓰고 cheat.simple에 추가합니다"
+msgstr "치트를 %s에 쓰고 cheat.simple에 추가"
 
 #: plugins/cheatfind/init.lua:478
 msgid "Cheat added to cheat.simple"
-msgstr "치트를 cheat.simple에 추가합니다"
+msgstr "치트를 cheat.simple에 추가"
 
 #: plugins/cheatfind/init.lua:483
 msgid ""
 "Unable to write file\n"
 "Ensure that cheatpath folder exists"
 msgstr ""
-"파일을 쓸 수 없습니다\n"
-"cheatpath 폴더가 존재하는지 확인하십시오"
+"파일을 쓸 수 없음\n"
+"cheatpath 폴더가 존재하는지 확인 바람"
 
 #: plugins/cheatfind/init.lua:497
 msgid "CPU or RAM"
-msgstr "CPU 혹은 RAM"
+msgstr "CPU 혹은 램"
 
 #: plugins/cheatfind/init.lua:501
 msgid "Changes to this only take effect when \"Start new search\" is selected"
-msgstr "이 변경은 \"새 검색 시작\"을 선택했을 때부터 적용됩니다"
+msgstr "이 변경은 \"새 검색 시작\"을 선택했을 때부터 적용"
 
 #: plugins/cheatfind/init.lua:511
 msgid "Automatic"
-msgstr ""
+msgstr "자동화"
 
 #: plugins/cheatfind/init.lua:511
 msgid "Manual"
-msgstr ""
+msgstr "수동"
 
 #: plugins/cheatfind/init.lua:512
 msgid "Pause Mode"
-msgstr ""
+msgstr "일시 중지 모드"
 
 #: plugins/cheatfind/init.lua:519
 msgid "Manually toggle pause when needed"
-msgstr ""
+msgstr "필요한 경우 수동으로 일시 중지 전환"
 
 #: plugins/cheatfind/init.lua:522
 msgid "Automatically toggle pause with on-screen menus"
-msgstr ""
+msgstr "화면 메뉴로 일시 중지 자동 전환"
 
 #: plugins/cheatfind/init.lua:543
 msgid "All slots cleared and current state saved to Slot 1"
-msgstr ""
+msgstr "모든 슬롯이 지워지고 현재 상태가 슬롯 1에 저장됨"
 
 #: plugins/cheatfind/init.lua:555
 msgid "Start new search"
@@ -5776,12 +5834,12 @@ msgstr "새 검색 시작"
 #: plugins/cheatfind/init.lua:566
 #, lua-format
 msgid "Memory state saved to Slot %d"
-msgstr ""
+msgstr "슬롯 %d에 저장된 메모리 상태"
 
 #: plugins/cheatfind/init.lua:583
 #, lua-format
 msgid "Save current memory state to Slot %d"
-msgstr ""
+msgstr "현재 메모리 상태를 슬롯 %d에 저장"
 
 #: plugins/cheatfind/init.lua:614
 #, lua-format
@@ -5791,67 +5849,67 @@ msgstr "총 %d개의 값이 일치함"
 #: plugins/cheatfind/init.lua:623
 #, lua-format
 msgid "Perform Compare : Slot %d %s Slot %d"
-msgstr ""
+msgstr "비교 수행 : 슬롯 %d %s 슬롯 %d"
 
 #: plugins/cheatfind/init.lua:624
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s Slot %d %s %d"
-msgstr ""
+msgstr "비교 수행  :  슬롯 %d %s 슬롯 %d %s %d"
 
 #: plugins/cheatfind/init.lua:625
 #, lua-format
 msgid "Perform Compare  :  Slot %d BITWISE%s Slot %d"
-msgstr ""
+msgstr "비교 수행  :  슬롯 %d 비트와이즈%s 슬롯 %d"
 
 #: plugins/cheatfind/init.lua:626
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s %d"
-msgstr ""
+msgstr "비교 수행  :  슬롯 %d %s %d"
 
 #: plugins/cheatfind/init.lua:667 plugins/cheatfind/init.lua:709
 #, lua-format
 msgid "Slot %d"
-msgstr ""
+msgstr "슬롯 %d"
 
 #: plugins/cheatfind/init.lua:678
 msgid "Left less than right"
-msgstr ""
+msgstr "오른쪽보다 왼쪽이 작음"
 
 #: plugins/cheatfind/init.lua:680
 msgid "Left greater than right"
-msgstr ""
+msgstr "오른쪽보다 왼쪽이 더 큼"
 
 #: plugins/cheatfind/init.lua:682
 msgid "Left equal to right"
-msgstr "좌와 우가 같음"
+msgstr "왼쪽이 오른쪽과 같음"
 
 #: plugins/cheatfind/init.lua:684
 msgid "Left not equal to right"
-msgstr ""
+msgstr "왼쪽이 오른쪽과 같지 않음"
 
 #: plugins/cheatfind/init.lua:686
 msgid "Left equal to right with bitmask"
-msgstr "좌와 우의 비트마스크값이 일치"
+msgstr "비트마스크 사용 시, 왼쪽이 오른쪽과 동일"
 
 #: plugins/cheatfind/init.lua:688
 msgid "Left not equal to right with bitmask"
-msgstr "좌와 우의 비트마스크값이 일치하지 않음"
+msgstr "비트마스크로 왼쪽이 오른쪽과 같지 않음"
 
 #: plugins/cheatfind/init.lua:690
 msgid "Left less than value"
-msgstr "좌가 해당 값보다 작음"
+msgstr "왼쪽 값보다 작음"
 
 #: plugins/cheatfind/init.lua:692
 msgid "Left greater than value"
-msgstr "좌가 해당 값보다 큼"
+msgstr "왼쪽 값보다 큼"
 
 #: plugins/cheatfind/init.lua:694
 msgid "Left equal to value"
-msgstr "좌가 해당 값과 같음"
+msgstr "왼쪽 값과 같음"
 
 #: plugins/cheatfind/init.lua:696
 msgid "Left not equal to value"
-msgstr "좌가 해당 값과 같지 않음"
+msgstr "왼쪽 값과 같지 않음"
 
 #: plugins/cheatfind/init.lua:718
 msgid "Value"
@@ -5859,7 +5917,7 @@ msgstr "값"
 
 #: plugins/cheatfind/init.lua:720
 msgid "Difference"
-msgstr ""
+msgstr "차이"
 
 #: plugins/cheatfind/init.lua:725
 msgid "Any"
@@ -5871,36 +5929,40 @@ msgstr "데이터 형식"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Slot 1 Value"
-msgstr ""
+msgstr "슬롯 1 값"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Last Slot Value"
-msgstr ""
+msgstr "최종 슬롯 값"
 
 #: plugins/cheatfind/init.lua:740
 msgid "Test/Write Poke Value"
-msgstr ""
+msgstr "포크 값 테스트/기록"
 
 #: plugins/cheatfind/init.lua:747
 msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
 msgstr ""
+"슬롯 1 값을 찌르고 싶을 때 사용(예 : 무언가를 가지고 시작했지만 잃어버린 경"
+"우)"
 
 #: plugins/cheatfind/init.lua:749
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
 msgstr ""
+"마지막 슬롯 값을 찌르고 싶을 때 사용(예 : 아이템 없이 시작했지만 마침내 아이"
+"템을 획득한 경우)"
 
 #: plugins/cheatfind/init.lua:751
 #, lua-format
 msgid "Use this if you want to poke %s"
-msgstr ""
+msgstr "%s를 찌르려면 이 방법을 사용"
 
 #: plugins/cheatfind/init.lua:774
 msgid "Aligned only"
-msgstr ""
+msgstr "정렬된 것만"
 
 #: plugins/cheatfind/init.lua:791
 msgid "Undo last search -- #"
@@ -5917,7 +5979,7 @@ msgstr "전체"
 #: plugins/cheatfind/init.lua:907
 #, lua-format
 msgid "Test Cheat %08X_%02X"
-msgstr ""
+msgstr "테스트 치트 %08X_%02X"
 
 #: plugins/cheatfind/init.lua:947
 msgid "Cheat engine not available"
@@ -5968,92 +6030,92 @@ msgstr "입력 포트"
 #: plugins/autofire/init.lua:98
 msgctxt "plugin-autofire"
 msgid "Failed to load autofire menu"
-msgstr ""
+msgstr "자동 실행 메뉴 로드 실패"
 
 #: plugins/autofire/init.lua:105
 msgctxt "plugin-autofire"
 msgid "Autofire"
-msgstr ""
+msgstr "자동 실행"
 
 #: plugins/autofire/autofire_menu.lua:74
 msgctxt "plugin-autofire"
 msgid "Autofire buttons"
-msgstr ""
+msgstr "자동 실행 버튼"
 
 #: plugins/autofire/autofire_menu.lua:75
 #, lua-format
 msgctxt "plugin-autofire"
 msgid "Press %s to delete"
-msgstr ""
+msgstr "삭제하려면 %s를 누르세요."
 
 #: plugins/autofire/autofire_menu.lua:93
 #, lua-format
 msgctxt "plugin-autofire"
 msgid "%s [%g Hz]"
-msgstr ""
+msgstr "%s [%g Hz]"
 
 #: plugins/autofire/autofire_menu.lua:95
 #, lua-format
 msgctxt "plugin-autofire"
 msgid "n/a [%g Hz]"
-msgstr ""
+msgstr "n/a [%g Hz]"
 
 #: plugins/autofire/autofire_menu.lua:103
 msgctxt "plugin-autofire"
 msgid "[no autofire buttons]"
-msgstr ""
+msgstr "[자동 실행 버튼 없음]"
 
 #: plugins/autofire/autofire_menu.lua:109
 #: plugins/autofire/autofire_menu.lua:263
 msgctxt "plugin-autofire"
 msgid "Add autofire button"
-msgstr ""
+msgstr "자동 실행 버튼 추가"
 
 #: plugins/autofire/autofire_menu.lua:150
 msgctxt "plugin-autofire"
 msgid "n/a"
-msgstr ""
+msgstr "없음"
 
 #: plugins/autofire/autofire_menu.lua:152
 #: plugins/autofire/autofire_menu.lua:154
 msgctxt "plugin-autofire"
 msgid "[not set]"
-msgstr ""
+msgstr "[설정 안 됨]"
 
 #: plugins/autofire/autofire_menu.lua:155
 msgctxt "plugin-autofire"
 msgid "Input"
-msgstr ""
+msgstr "입력"
 
 #: plugins/autofire/autofire_menu.lua:159
 msgctxt "plugin-autofire"
 msgid "Hotkey"
-msgstr ""
+msgstr "단축키"
 
 #: plugins/autofire/autofire_menu.lua:160
 msgctxt "plugin-autofire"
 msgid "On frames"
-msgstr ""
+msgstr "온 프레임"
 
 #: plugins/autofire/autofire_menu.lua:161
 msgctxt "plugin-autofire"
 msgid "Off frames"
-msgstr ""
+msgstr "오프 프레임"
 
 #: plugins/autofire/autofire_menu.lua:200
 msgctxt "plugin-autofire"
 msgid "Number of frames button will be pressed"
-msgstr ""
+msgstr "프레임 수 버튼 적용"
 
 #: plugins/autofire/autofire_menu.lua:213
 msgctxt "plugin-autofire"
 msgid "Number of frames button will be released"
-msgstr ""
+msgstr "프레임 수 버튼 해제"
 
 #: plugins/autofire/autofire_menu.lua:230
 msgctxt "plugin-autofire"
 msgid "Edit autofire button"
-msgstr ""
+msgstr "자동 실행 버튼 편집"
 
 #: plugins/autofire/autofire_menu.lua:238
 msgctxt "plugin-autofire"
@@ -6073,207 +6135,207 @@ msgstr "취소"
 #: plugins/autofire/autofire_menu.lua:325
 msgctxt "plugin-autofire"
 msgid "Select an input for autofire"
-msgstr ""
+msgstr "자동 실행을 위한 입력 선택"
 
 #: plugins/timecode/init.lua:155
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Intro started at %s"
-msgstr ""
+msgstr "타임코드 : 인트로가 %s에서 시작됨"
 
 #: plugins/timecode/init.lua:160
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Intro duration %s"
-msgstr ""
+msgstr "타임코드 : 인트로 재생 시간 %s"
 
 #: plugins/timecode/init.lua:165
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Gameplay started at %s"
-msgstr ""
+msgstr "타임코드 : 게임 플레이가 %s에서 시작됨"
 
 #: plugins/timecode/init.lua:170
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Gameplay duration %s"
-msgstr ""
+msgstr "타임코드 : 게임 플레이 재생 시간 %s"
 
 #: plugins/timecode/init.lua:176
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Extra %d started at %s"
-msgstr ""
+msgstr "타이코드 : 추가 %d가 %s에서 시작됨"
 
 #: plugins/timecode/init.lua:182
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Extra %d duration %s"
-msgstr ""
+msgstr "타임코드 : 추가 %d 기간 %s"
 
 #: plugins/timecode/init.lua:207
 #, lua-format
 msgctxt "plugin-timecode"
 msgid " %s%s%02d:%02d [paused] "
-msgstr ""
+msgstr "%s%s%02d:%02d [일시 중지]"
 
 #: plugins/timecode/init.lua:207
 #, lua-format
 msgctxt "plugin-timecode"
 msgid " %s%s%02d:%02d "
-msgstr ""
+msgstr " %s%s%02d:%02d "
 
 #: plugins/timecode/init.lua:217
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TOTAL %02d:%02d "
-msgstr ""
+msgstr "총 %02d:%02d"
 
 #: plugins/timecode/init.lua:323 plugins/timecode/init.lua:345
 msgctxt "plugin-timecode"
 msgid "Timecode Recorder"
-msgstr ""
+msgstr "타임코드 레코더"
 
 #: plugins/timecode/init.lua:326
 msgctxt "plugin-timecode"
 msgid "Assume 60 Hz"
-msgstr ""
+msgstr "60Hz 가정"
 
 #: plugins/timecode/init.lua:326
 msgctxt "plugins-timecode"
 msgid "Count emulated frames"
-msgstr ""
+msgstr "에뮬레이트 프레임 수"
 
 #: plugins/timecode/init.lua:327
 msgctxt "plugin-timecode"
 msgid "Frame numbers"
-msgstr ""
+msgstr "프레임 번호"
 
 #: plugins/timecode/init.lua:330
 msgctxt "plugin-timecode"
 msgid "Hotkey"
-msgstr ""
+msgstr "단축키"
 
 #: plugins/inputmacro/init.lua:135 plugins/inputmacro/inputmacro_menu.lua:562
 msgctxt "plugin-inputmacro"
 msgid "Input Macros"
-msgstr ""
+msgstr "매크로 입력"
 
 #: plugins/inputmacro/inputmacro_menu.lua:31
 msgctxt "plugin-inputmacro"
 msgid "New macro"
-msgstr ""
+msgstr "새 매크로"
 
 #: plugins/inputmacro/inputmacro_menu.lua:35
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "New macro %d"
-msgstr ""
+msgstr "새 매크로 %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:84
 msgctxt "plugin-inputmacro"
 msgid "Set Input"
-msgstr ""
+msgstr "입력 설정"
 
 #: plugins/inputmacro/inputmacro_menu.lua:352
 msgctxt "plugin-inputmacro"
 msgid "Name"
-msgstr ""
+msgstr "이름"
 
 #: plugins/inputmacro/inputmacro_menu.lua:360
 #: plugins/inputmacro/inputmacro_menu.lua:402
 msgctxt "plugin-inputmacro"
 msgid "[not set]"
-msgstr ""
+msgstr "[설정 안 됨]"
 
 #: plugins/inputmacro/inputmacro_menu.lua:361
 msgctxt "plugin-inputmacro"
 msgid "Activation combination"
-msgstr ""
+msgstr "활성화 조합"
 
 #: plugins/inputmacro/inputmacro_menu.lua:364
 msgctxt "plugin-inputmacro"
 msgid "Stop immediately"
-msgstr ""
+msgstr "즉시 중지"
 
 #: plugins/inputmacro/inputmacro_menu.lua:364
 msgctxt "plugin-inputmacro"
 msgid "Complete macro"
-msgstr ""
+msgstr "매크로 완성"
 
 #: plugins/inputmacro/inputmacro_menu.lua:365
 msgctxt "plugin-inputmacro"
 msgid "On release"
-msgstr ""
+msgstr "출시 예정"
 
 #: plugins/inputmacro/inputmacro_menu.lua:371
 msgctxt "plugin-inputmacro"
 msgid "Release"
-msgstr ""
+msgstr "출시"
 
 #: plugins/inputmacro/inputmacro_menu.lua:374
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Loop to step %d"
-msgstr ""
+msgstr "단계 %d로 반복"
 
 #: plugins/inputmacro/inputmacro_menu.lua:379
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Prolong step %d"
-msgstr ""
+msgstr "단계 %d 연장"
 
 #: plugins/inputmacro/inputmacro_menu.lua:381
 msgctxt "plugin-inputmacro"
 msgid "When held"
-msgstr ""
+msgstr "보유 시"
 
 #: plugins/inputmacro/inputmacro_menu.lua:385
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Step %d"
-msgstr ""
+msgstr "단계 %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:386
 msgctxt "plugin-inputmacro"
 msgid "Delay (frames)"
-msgstr ""
+msgstr "지연(프레임)"
 
 #: plugins/inputmacro/inputmacro_menu.lua:392
 msgctxt "plugin-inputmacro"
 msgid "Duration (frames)"
-msgstr ""
+msgstr "재생 시간(프레임)"
 
 #: plugins/inputmacro/inputmacro_menu.lua:400
 msgctxt "plugin-inputmacro"
 msgid "n/a"
-msgstr ""
+msgstr "없음"
 
 #: plugins/inputmacro/inputmacro_menu.lua:404
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Input %d"
-msgstr ""
+msgstr "입력 %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:409
 msgctxt "plugin-inputmacro"
 msgid "Add input"
-msgstr ""
+msgstr "입력 추가"
 
 #: plugins/inputmacro/inputmacro_menu.lua:414
 msgctxt "plugin-inputmacro"
 msgid "Delete step"
-msgstr ""
+msgstr "단계 삭제"
 
 #: plugins/inputmacro/inputmacro_menu.lua:430
 msgctxt "plugin-inputmacro"
 msgid "Add step at position"
-msgstr ""
+msgstr "위치에 단계 추가"
 
 #: plugins/inputmacro/inputmacro_menu.lua:476
 msgctxt "plugin-inputmacro"
 msgid "Add Input Macro"
-msgstr ""
+msgstr "입력 매크로 추가"
 
 #: plugins/inputmacro/inputmacro_menu.lua:483
 msgctxt "plugin-inputmacro"
@@ -6288,7 +6350,7 @@ msgstr "취소"
 #: plugins/inputmacro/inputmacro_menu.lua:501
 msgctxt "plugin-inputmacro"
 msgid "Edit Input Macro"
-msgstr ""
+msgstr "입력 매크로 편집"
 
 #: plugins/inputmacro/inputmacro_menu.lua:507
 msgctxt "plugin-inputmacro"
@@ -6299,38 +6361,38 @@ msgstr "완료"
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Press %s to delete"
-msgstr ""
+msgstr "삭제하려면 %s를 누르세요."
 
 #: plugins/inputmacro/inputmacro_menu.lua:575
 msgctxt "plugin-inputmacro"
 msgid "[no macros]"
-msgstr ""
+msgstr "[매크로 없음]"
 
 #: plugins/inputmacro/inputmacro_menu.lua:580
 msgctxt "plugin-inputmacro"
 msgid "Add macro"
-msgstr ""
+msgstr "매크로 추가"
 
 #: plugins/timer/init.lua:27
 #, lua-format
 msgctxt "plugin-timer"
 msgid "%03d:%02d:%02d"
-msgstr ""
+msgstr "%03d:%02d:%02d"
 
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Wall clock"
-msgstr ""
+msgstr "벽시계"
 
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Emulated time"
-msgstr ""
+msgstr "에뮬레이트 시간"
 
 #: plugins/timer/init.lua:37
 msgctxt "plugin-timer"
 msgid "Reference"
-msgstr ""
+msgstr "참조"
 
 #: plugins/timer/init.lua:39
 msgctxt "plugin-timer"
@@ -6354,12 +6416,12 @@ msgstr "타이머"
 
 #: plugins/cheat/init.lua:622
 msgid "Select cheat to set hotkey"
-msgstr "단축키를 지정할 치트를 선택하십시오"
+msgstr "단축키를 지정할 치트 선택"
 
 #: plugins/cheat/init.lua:623
 #, lua-format
 msgid "Press %s to clear hotkey"
-msgstr ""
+msgstr "단축키를 지우려면 %s를 누르세요."
 
 #: plugins/cheat/init.lua:651
 msgid "None"
@@ -6380,12 +6442,12 @@ msgstr "단축키 설정"
 #: plugins/cheat/init.lua:796
 #, lua-format
 msgid "Activated: %s = %s"
-msgstr "활성화: %s = %s"
+msgstr "활성화 : %s = %s"
 
 #: plugins/cheat/init.lua:798 plugins/cheat/init.lua:856
 #, lua-format
 msgid "Activated: %s"
-msgstr "활성화: %s"
+msgstr "활성화 : %s"
 
 #: plugins/cheat/init.lua:810
 msgid "Cheat"
@@ -6394,12 +6456,12 @@ msgstr "치트"
 #: plugins/cheat/init.lua:860
 #, lua-format
 msgid "Enabled: %s"
-msgstr "실행중: %s"
+msgstr "활성화 : %s"
 
 #: plugins/cheat/init.lua:865
 #, lua-format
 msgid "Disabled: %s"
-msgstr "실행중지: %s"
+msgstr "비활성화 : %s"
 
 #: plugins/cheat/init.lua:924
 #, lua-format
@@ -6409,22 +6471,22 @@ msgstr "%s 추가"
 #: plugins/data/data_command.lua:25
 msgctxt "plugin-data"
 msgid "Command"
-msgstr "커맨드"
+msgstr "설명"
 
 #: plugins/data/data_story.lua:24
 msgctxt "plugin-data"
 msgid "Mamescore"
-msgstr "Mamescore"
+msgstr "MAME 점수"
 
 #: plugins/data/data_sysinfo.lua:16
 msgctxt "plugin-data"
 msgid "Sysinfo"
-msgstr "Sysinfo"
+msgstr "시스템 정보"
 
 #: plugins/data/data_hiscore.lua:1220 plugins/data/data_hiscore.lua:1268
 msgctxt "plugin-data"
 msgid "High Scores"
-msgstr "최고 점수"
+msgstr "고득점"
 
 #: plugins/data/data_marp.lua:168
 msgctxt "plugin-data"
@@ -6434,12 +6496,12 @@ msgstr "MARP 점수"
 #: plugins/data/data_gameinit.lua:16
 msgctxt "plugin-data"
 msgid "Gameinit"
-msgstr "Gameinit"
+msgstr "게임인트"
 
 #: plugins/data/data_history.lua:207
 msgctxt "plugin-data"
 msgid "History"
-msgstr "역사"
+msgstr "기록"
 
 #: plugins/data/data_messinfo.lua:22 plugins/data/data_mameinfo.lua:22
 msgctxt "plugin-data"
@@ -6452,29 +6514,29 @@ msgstr ""
 "\n"
 "\n"
 "--- 드라이버 정보 ---\n"
-"드라이버: "
+"드라이버 : "
 
 #: plugins/data/data_messinfo.lua:24
 msgctxt "plugin-data"
 msgid "MESSinfo"
-msgstr "MESSinfo"
+msgstr "MESS 정보"
 
 #: plugins/data/data_mameinfo.lua:24
 msgctxt "plugin-data"
 msgid "MAMEinfo"
-msgstr "MAMEinfo"
+msgstr "MAME 정보"
 
 #: plugins/commonui/init.lua:93
 #, lua-format
 msgctxt "plugin-commonui"
 msgid "%s [root%s]"
-msgstr ""
+msgstr "%s [root%s]"
 
 #: plugins/commonui/init.lua:95
 #, lua-format
 msgctxt "plugin-commonui"
 msgid "[root%s]"
-msgstr ""
+msgstr "[root%s]"
 
 #: plugins/commonui/init.lua:101
 msgctxt "plugin-commonui"
@@ -6484,7 +6546,7 @@ msgstr "취소"
 #: plugins/commonui/init.lua:199
 msgctxt "plugin-commonui"
 msgid "Invalid combination entered"
-msgstr ""
+msgstr "잘못된 조합 입력"
 
 #: plugins/commonui/init.lua:205
 #, lua-format
@@ -6493,6 +6555,8 @@ msgid ""
 "Enter combination or press %s to cancel\n"
 "%s"
 msgstr ""
+"조합을 입력하거나 %s를 눌러 취소\n"
+"%s"
 
 #, c-format
 #~ msgid "System: \"%1$s\" software list "
