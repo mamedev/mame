@@ -314,6 +314,7 @@ public:
 	{ }
 
 	void kn6000(machine_config &config) ATTR_COLD;
+	void kn6500(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -323,6 +324,7 @@ private:
 	required_shared_ptr<u32> m_libram;
 
 	void kn6000_map(address_map &map) ATTR_COLD;
+	void kn6500_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -426,6 +428,13 @@ void kn6000_state::kn6000_map(address_map &map)
 	table_map(map);
 	single_tg_map(map);
 	fdc_map(map);
+}
+
+// The KN6500 firmware reads its table data at 0x40010000, not 0x48000000
+void kn6000_state::kn6500_map(address_map &map)
+{
+	kn6000_map(map);
+	map(0x40010000, 0x4040ffff).rom().region("table_data", 0);
 }
 
 void kn_sd_state::sd_map(address_map &map)
@@ -1115,6 +1124,12 @@ void kn6000_state::kn6000(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("kn6000_flop");
 }
 
+void kn6000_state::kn6500(machine_config &config)
+{
+	kn6000(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kn6000_state::kn6500_map);
+}
+
 void kn_state::kn24_common(machine_config &config)
 {
 	kn_common(config);
@@ -1341,9 +1356,12 @@ ROM_START(kn6500)
 	ROM_LOAD32_WORD("kn6500_program_even.ic12", 0x000000, 0x200000, CRC(f42a2fcf) SHA1(7cebf73bf623fd714ca455ed50b80da1d2186414))
 	ROM_LOAD32_WORD("kn6500_program_odd.ic11",  0x000002, 0x200000, CRC(ca2a733f) SHA1(2484d3b76b62b05ded39e4194cdc74fd3c01bcbe))
 
-	ROM_REGION32_LE(0x400000, "table_data", 0)
+	ROM_REGION32_LE(0x400000, "table_data", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("c3fbmd000069.ic13", 0x000000, 0x200000, NO_DUMP)
 	ROM_LOAD32_WORD("c3fbmd000068.ic14", 0x000002, 0x200000, NO_DUMP)
+	// Hand-made stand-in until IC13/IC14 are dumped: the KN7000's bitmap fonts,
+	// relocated to where the KN6500 firmware looks for them.  Not KN6500 data.
+	ROM_LOAD("kn6500_font_placeholder.bin", 0x000000, 0x040000, BAD_DUMP CRC(55a2bf84) SHA1(d3a235c47316ed23cea7f0bf8f2d7bc276cc5301))
 
 	ROM_REGION(0x1800000, "waveform_main_y", 0)
 	ROM_LOAD("qsigx3c64004.ic205", 0x0000000, 0x800000, NO_DUMP)
@@ -1434,6 +1452,6 @@ ROM_END
 //   YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY     FULLNAME      FLAGS
 SYST(2002, kn7000, 0,      0,      kn7000,  kn_sd, kn_sd_state,  empty_init, "Technics", "SX-KN7000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 SYST(1999, kn6000, 0,      0,      kn6000,  kn,    kn6000_state, empty_init, "Technics", "SX-KN6000", ROT180 | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST(2001, kn6500, 0,      0,      kn6000,  kn,    kn6000_state, empty_init, "Technics", "SX-KN6500", ROT180 | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST(2001, kn6500, 0,      0,      kn6500,  kn,    kn6000_state, empty_init, "Technics", "SX-KN6500", ROT180 | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 SYST(2000, kn2400, 0,      0,      kn2400,  kn,    kn_state,     empty_init, "Technics", "SX-KN2400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 SYST(2000, kn2600, kn2400, 0,      kn2600,  kn_sd, kn_sd_state,  empty_init, "Technics", "SX-KN2600", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
