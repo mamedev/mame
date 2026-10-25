@@ -337,7 +337,10 @@ void news_hid_serial_mouse::device_start()
 	save_item(NAME(m_mouse_x));
 	save_item(NAME(m_mouse_y));
 	save_item(NAME(m_mouse_b));
+}
 
+void news_hid_serial_mouse::device_reset()
+{
 	// Mouse is always 8N1 serial @ 1200 baud
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rate(1200);

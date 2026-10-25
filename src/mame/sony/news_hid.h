@@ -8,7 +8,6 @@
 
 #include "machine/keyboard.h"
 #include "bus/rs232/keyboard.h"
-#include "bus/rs232/hlemouse.h"
 
 class news_hid_hle_device
 	: public device_t
@@ -108,6 +107,7 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void tra_callback() override { m_write_txd(transmit_register_get_data_bit()); }
