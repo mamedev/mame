@@ -258,6 +258,9 @@ void tmp94c241_device::device_reset()
 	m_port_function[PORT_Z] = 0x00;
 
 	std::fill_n(&m_port_control[0], NUM_PORTS, 0x00);
+	// ports A and B have no control register: their pins are outputs, so they read back the output latch
+	m_port_control[PORT_A] = 0xff;
+	m_port_control[PORT_B] = 0xff;
 	std::fill_n(&m_timer_flipflops[0], 12, 0x00);
 	m_t8run = 0x00;
 	m_trdc = 0x00;
