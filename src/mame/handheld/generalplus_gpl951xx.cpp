@@ -750,7 +750,7 @@ CONS(2021, teriermn,  0,        0, puni, base, generalplus_gpl951xx_game_state, 
 CONS(2021, flufflav, 0,        0, flufflav, bubltea, generalplus_gpl951xx_game_state, empty_init, "Happinet", "Fuwatcho Uncho Fuwa Fuwa (lavender, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // available in 2 colours, ROM confirmed to be the same on both
-CONS(2021, pockrmsr,  0,        0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Pocket Room - Sanrio Characters (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, pockrmsr,  0,        0, puni, base, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Pocket Room: Sanrio Characters (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // Pocket Monsters ガチッとゲットだぜ! モンスターボールゴー! - Pocket Monsters is printed on the inner shell, but not the box?
 CONS(2021, pokgoget, 0,        0, poke, bfspyhnt, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Gachitto Get da ze! Monster Ball Go! (210406, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -763,7 +763,7 @@ CONS(2021, pokemech, 0,        0, poke, bfspyhnt, generalplus_gpl951xx_game_stat
 
 // 2020 (device) / 2021 (box) version of Sumikko Gurashi a cloud shaped device
 // Sumikko Gurashi - Sumikko Catch (すみっコぐらし すみっコキャッチ)
-CONS( 2021, smkcatch, 0, 0, puni, bfmpac, generalplus_gpl951xx_game_state, empty_init,  "San-X / Takara Tomy", "Sumikko Gurashi - Sumikko Catch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2021, smkcatch, 0, 0, puni, bfmpac, generalplus_gpl951xx_game_state, empty_init,  "San-X / Takara Tomy", "Sumikko Gurashi: Sumikko Catch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // or Sumikko Gurashi - Sumikko Catch DX (すみっコぐらし すみっコキャッチDX) = Sumikko Catch with pouch and strap
 
 // is there a subtitle for this one? it's different to the others

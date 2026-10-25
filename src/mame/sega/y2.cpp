@@ -2222,8 +2222,8 @@ GAME( 2009, systemy2,   0,       system_board_y2, system_board_y2,  system_board
 
 // The title screen announcer says "The King of Fighters 2002 Unlimited Match" for both versions, but
 // the Chinese set only shows the Chinese title regardless of language setting in service mode
-GAME( 2009, kof2002um,  systemy2,  system_board_y2, system_board_y2,  system_board_y2_state, init_kof2002um,  ROT0, "SNK Playmore / New Channel", "The King of Fighters - Fuchou Zhi Lu (Chinese/English)", 0 )
-GAME( 2009, kof2002umj, kof2002um, system_board_y2, system_board_y2,  system_board_y2_state, init_kof2002umj, ROT0, "SNK Playmore",               "The King of Fighters 2002 - Unlimited Match (Japanese/English)", 0 )
+GAME( 2009, kof2002um,  systemy2,  system_board_y2, system_board_y2,  system_board_y2_state, init_kof2002um,  ROT0, "SNK Playmore / New Channel", "The King of Fighters: Fuchou Zhi Lu (Chinese/English)", 0 )
+GAME( 2009, kof2002umj, kof2002um, system_board_y2, system_board_y2,  system_board_y2_state, init_kof2002umj, ROT0, "SNK Playmore",               "The King of Fighters 2002: Unlimited Match (Japanese/English)", 0 )
 GAME( 2009, higurashi,  systemy2,  system_board_y2, system_board_y2,  system_board_y2_state, init_higurashi,  ROT0, "AQ Interactive",             "Higurashi no Naku Koro ni Jong (Japan)", MACHINE_IMPERFECT_CONTROLS )
 
 //エヌアイン完全世界/En-Eins Perfektewelt
