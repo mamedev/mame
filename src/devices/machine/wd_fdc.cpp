@@ -255,6 +255,7 @@ void wd_fdc_device_base::mr_w(int state)
 		}
 
 		mon_cb(1); // Clear the MON* line
+		set_sso(0); // set to side 0
 
 		intrq_cond = 0;
 		live_abort();
@@ -2464,12 +2465,15 @@ void wd_fdc_device_base::drop_hld()
 
 void wd_fdc_device_base::update_sso()
 {
+	set_sso((command & 0x02) ? 1 : 0);
+}
+
+void wd_fdc_device_base::set_sso(int side)
+{
 	// The 'side_control' flag is interpreted as meaning that the FDC has
 	// a SSO output feature, not that it necessarily controls the floppy.
 	if(!side_control)
 		return;
-
-	uint8_t side = (command & 0x02) ? 1 : 0;
 
 	// If a SSO callback is defined then it is assumed that this callback
 	// will update the floppy side if that is the connection. There are
@@ -2483,7 +2487,7 @@ void wd_fdc_device_base::update_sso()
 	// intended the driver to update the floppy side which appears to be
 	// the case in most cases.
 	if(floppy) {
-		floppy->ss_w((command & 0x02) ? 1 : 0);
+		floppy->ss_w(side);
 	}
 }
 
