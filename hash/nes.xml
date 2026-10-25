@@ -16842,7 +16842,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 	</software>
 
 	<software name="okhotsk">
-		<description>Hokkaidou Rensa Satsujin - Okhotsk ni Shoyu (Japan)</description>
+		<description>Hokkaidou Rensa Satsujin: Okhotsk ni Kiyu (Japan)</description>
 		<year>1987</year>
 		<publisher>Login Soft</publisher>
 		<info name="serial" value="HSP-07"/>

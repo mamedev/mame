@@ -25278,13 +25278,10 @@ ExtractDisk  [02]"DISK_2          " -> "oji binbin monogatari(a)_02.d88"
 		</part>
 	</software>
 
-	<software name="okhotsk" supported="partial">
-		<description>Hokkaidou Rensa Satsujin - Okhotsk ni Shouyu!!</description>
+	<software name="okhotsk">
+		<description>Hokkaidou Rensa Satsujin: Okhotsk ni Kiyu</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
-		<notes><![CDATA[
-Should be supported by [PC8001mkIISR] too
-]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="オホーツクに消ゆ"/>
@@ -25307,13 +25304,10 @@ Should be supported by [PC8001mkIISR] too
 		</part>
 	</software>
 
-	<software name="okhotska" cloneof="okhotsk" supported="partial">
-		<description>Hokkaidou Rensa Satsujin - Okhotsk ni Shouyu!! (alt Disk 1)</description>
+	<software name="okhotska" cloneof="okhotsk">
+		<description>Hokkaidou Rensa Satsujin: Okhotsk ni Kiyu (alt Disk 1)</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
-		<notes><![CDATA[
-Should be supported by [PC8001mkIISR] too
-]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="オホーツクに消ゆ"/>
@@ -25336,13 +25330,10 @@ Should be supported by [PC8001mkIISR] too
 		</part>
 	</software>
 
-	<software name="okhotskb" cloneof="okhotsk" supported="partial">
-		<description>Hokkaidou Rensa Satsujin - Okhotsk ni Shouyu!! (alt 2?)</description>
+	<software name="okhotskb" cloneof="okhotsk">
+		<description>Hokkaidou Rensa Satsujin: Okhotsk ni Kiyu (alt 2?)</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
-		<notes><![CDATA[
-Should be supported by [PC8001mkIISR] too
-]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="オホーツクに消ゆ"/>

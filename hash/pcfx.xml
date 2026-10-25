@@ -7,20 +7,31 @@ TODO:
 - add remaining SWs;
 - filter for PC-FXGA;
 - rename to pcfx_cdrom, assuming that anyone ever released anything workable from FX-BMP interface;
+- Items denoted with (*) are actually from EoceneMiacid thru following commit in 2017 thru redump.
+  Needs to be checked after 10+ years new chdman conversion:
+  https://github.com/mamedev/mame/commit/6e3ae6315c285b6860e8381d84faca5c58b121da
+
+Release dates from https://refuge.tokyo/pcengine/pcfx.html
 
 -->
 <softwarelist name="pcfx" description="NEC PC-FX CD-ROMs">
 
 <!-- !Games -->
 
-	<!-- https://redump.info/disc/35926 -->
+	<!-- (*) https://redump.info/disc/35926 -->
 	<software name="batlheat" supported="no">
-		<description>Battle Heat</description>
+		<description>Battle Heat!</description>
 		<year>1994</year>
 		<publisher>Hudson Soft</publisher>
-		<info name="alt_title" value="バトル・ヒート"/>
+		<notes><![CDATA[
+No [player] 2 inputs
+Has bias towards Dark side in CPU vs. CPU fights i.e. always wins with half HP left (verify)
+Has border color changes towards the end of a fight (verify)
+]]></notes>
+		<info name="alt_title" value="バトルヒート！"/>
 		<!-- no spaces on back cover -->
 		<info name="barcode" value="T4988607305000"/>
+		<info name="release" value="19941223"/>
 		<info name="serial" value="FXHUD401"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -29,13 +40,22 @@ TODO:
 		</part>
 	</software>
 
-	<!-- https://redump.info/disc/37890 -->
+	<!-- NOTE: also bundled in Pia Carrot e Youkoso!! & Can Can Bunny Extra DX Cocktail Pack as a double disc set -->
+	<!-- Same contents, serial FXNKT702 barcode 4 904323 270514 -->
+
+	<!-- (*) https://redump.info/disc/37890 -->
 	<software name="cancandx" supported="no">
 		<description>Can Can Bunny Extra DX</description>
 		<year>1996</year>
 		<publisher>Cocktail Soft</publisher>
+		<notes><![CDATA[
+[player] no inputs accepted from title screen
+]]></notes>
 		<info name="alt_title" value="きゃんきゃんバニー エクストラＤＸ"/>
-		<!-- TODO: two barcodes / disc serials -->
+		<info name="barcode" value="4 904323 270309"/>
+		<info name="serial" value="FXNKT601"/>
+		<!-- TODO: is Ides the developer or the Chara design? -->
+		<info name="release" value="19960927"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="can can bunny extra dx (japan)" sha1="9153147469b2b9ecadebb9990c707f4c3d3f6587"/>
@@ -43,11 +63,15 @@ TODO:
 		</part>
 	</software>
 
-	<!-- https://redump.info/disc/35857 -->
+	<!-- (*) https://redump.info/disc/35857 -->
 	<software name="langriss" supported="no">
 		<description>Der Langrisser FX</description>
 		<year>1996</year>
 		<publisher>NCS</publisher>
+		<notes><![CDATA[
+Randomly pop ups SFXs at the end of dialogues during gameplay (including ones with no speech)
+Not extensively tested
+]]></notes>
 		<info name="alt_title" value="デア ラングリッサーＦＸ"/>
 		<info name="barcode" value="4 904323 270224"/>
 		<info name="serial" value="FXNHE618"/>
@@ -59,14 +83,19 @@ TODO:
 		</part>
 	</software>
 
-	<!-- https://redump.info/disc/37882 -->
+	<!-- (*) https://redump.info/disc/37882 -->
 	<software name="dokyuse2" supported="no">
 		<description>Doukyuusei 2</description>
 		<year>1996</year>
 		<!-- "Licensed by ELF" at best -->
 		<publisher>NEC Avenue</publisher>
+		<notes><![CDATA[
+Optional [mouse] support
+Not extensively tested (unpleasant to play with pad, needs reaching a save point)
+]]></notes>
 		<info name="alt_title" value="同級生２"/>
 		<info name="barcode" value="4 988041 700706"/>
+		<info name="release" value="19960809"/>
 		<info name="serial" value="FXNAV601"/>
 		<!-- NEC ID: NAPR-1503 -->
 		<part name="cdrom" interface="cdrom">
@@ -76,13 +105,17 @@ TODO:
 		</part>
 	</software>
 
-	<!-- https://redump.info/disc/37883 -->
+	<!-- (*) https://redump.info/disc/37883 -->
 	<software name="dknight4" supported="no">
-		<description>Dragon Knight IV</description>
+		<description>Dragon Knight 4</description>
 		<year>1997</year>
 		<publisher>NEC Avenue</publisher>
-		<info name="alt_title" value="ドラゴン・ナイト４"/>
+		<notes><![CDATA[
+Bad color palette in title, intro and gameplay
+]]></notes>
+		<info name="alt_title" value="ドラゴンナイト4"/>
 		<info name="barcode" value="4 988041 700713"/>
+		<info name="release" value="19970328"/>
 		<info name="serial" value="FXNAV603"/>
 		<!-- NEC ID: NAPR-1054 -->
 		<part name="cdrom" interface="cdrom">
@@ -92,14 +125,21 @@ TODO:
 		</part>
 	</software>
 
-	<!-- https://redump.info/disc/37888 -->
+	<!-- (*) https://redump.info/disc/37888 -->
 	<software name="farland" supported="no">
 		<description>Farland Story FX</description>
 		<year>1996</year>
 		<publisher>NEC Home Electronics</publisher>
-		<info name="alt_title" value="ファーランド・ストーリーＦＸ"/>
+		<notes><![CDATA[
+Sound dialogues pop at start/end, akin to langriss
+Sprite wobbling during gameplay on scrolls
+Optional [mouse] support
+Not extensively tested
+]]></notes>
+		<info name="alt_title" value="ファーランドストーリーFX"/>
 		<info name="barcode" value="4 904323 270200"/>
 		<info name="developer" value="TGL"/>
+		<info name="release" value="19961025"/>
 		<info name="serial" value="FXNHE628"/>
 		<!-- alt serial: 78983151 -->
 		<part name="cdrom" interface="cdrom">
@@ -109,13 +149,18 @@ TODO:
 		</part>
 	</software>
 
-	<!-- https://redump.info/disc/37884 -->
+	<!-- (*) https://redump.info/disc/37884 -->
 	<software name="firewomn" supported="no">
 		<description>Fire Woman Matoigumi</description>
 		<year>1996</year>
 		<publisher>Tokuma Shoten</publisher>
-		<info name="alt_title" value="ファイアー・ウーマン纏組"/>
+		<notes><![CDATA[
+Offset screens during gameplay (first school view, transitions)
+Not extensively tested (language barrier)
+]]></notes>
+		<info name="alt_title" value="ファイアーウーマン纏組"/>
 		<info name="barcode" value="4 904323 270378"/>
+		<info name="release" value="19961220"/>
 		<info name="serial" value="FXNHE634"/>
 		<!-- JASRAC ID: V-963098 -->
 		<part name="cdrom" interface="cdrom">
@@ -125,11 +170,15 @@ TODO:
 		</part>
 	</software>
 
-	<!-- https://redump.info/disc/37887 -->
+	<!-- (*) https://redump.info/disc/37887 -->
 	<software name="fushangl" supported="no">
 		<description>Fushigi no Kuni no Angelique</description>
 		<year>1996</year>
 		<publisher>Koei</publisher>
+		<notes><![CDATA[
+Bad colors for dialogue boxes during intro, no text
+[pad] doesn't seem responsive on name entry
+]]></notes>
 		<info name="alt_title" value="ふしぎの国のアンジェリーク"/>
 		<info name="barcode" value="4 904323 270330"/>
 		<info name="serial" value="FXNHE632"/>
@@ -141,13 +190,17 @@ TODO:
 		</part>
 	</software>
 
-	<!-- https://redump.info/disc/37885 -->
+	<!-- (*) https://redump.info/disc/37885 -->
 	<software name="megamip2" supported="no">
 		<description>Megami Paradise II</description>
 		<year>1996</year>
 		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+Not extensively tested (language barrier)
+]]></notes>
 		<info name="alt_title" value="女神天国Ⅱ"/>
 		<info name="barcode" value="4 904323 270255"/>
+		<info name="release" value="19960726"/>
 		<info name="serial" value="FXNHE623"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -156,13 +209,19 @@ TODO:
 		</part>
 	</software>
 
-	<!-- https://redump.info/disc/37889 -->
+	<!-- NOTE: cfr. cancandx for alt joined bundle -->
+	<!-- (*) https://redump.info/disc/37889 -->
 	<software name="picarrot" supported="no">
-		<description>Pia Carrot e Youkoso!! We've Been Waiting for You</description>
+		<description>Pia Carrot e Youkoso!! ~We've Been Waiting for You~</description>
 		<year>1997</year>
 		<publisher>Cocktail Soft</publisher>
+		<notes><![CDATA[
+Not extensively tested (language barrier, has fan translation)
+]]></notes>
 		<info name="alt_title" value="Ｐｉａ キャロットへようこそ！！"/>
-		<!-- TODO: two serials / barcodes -->
+		<info name="barcode" value="4 904323 270408"/>
+		<info name="release" value="19970523"/>
+		<info name="serial" value="FXNKT701"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pia carrot e youkoso weve been waiting for you (japan)" sha1="95a5c2f20d406dcaa0ab5e0ff692e3ee2cd4ad76"/>
@@ -170,14 +229,20 @@ TODO:
 		</part>
 	</software>
 
-	<!-- https://redump.info/disc/35928 -->
+	<!-- (*) https://redump.info/disc/35928 -->
 	<software name="sotsugy2" supported="no">
-		<description>Sotsugyou II FX - Neo Generation</description>
+		<description>Sotsugyou II FX: Neo Generation</description>
 		<year>1994</year>
-		<publisher>Riverhill Soft</publisher>
+		<publisher>NEC Home Electronics / Riverhill Soft</publisher>
+		<notes><![CDATA[
+Lip-sync in intro looks off (verify)
+Not extensively tested
+]]></notes>
 		<info name="alt_title" value="卒業ⅡＦＸ"/>
 		<info name="barcode" value="4 904323 270002"/>
+		<info name="release" value="19941223"/>
 		<info name="serial" value="FXNHE401"/>
+		<!-- TODO: are Headroom/Tenky credited in back cover the devs? -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sotsugyou ii fx - neo generation (japan)" sha1="8a9e5f269c854d1daa4114ba68a3e89598f26e81"/>
@@ -187,7 +252,7 @@ TODO:
 
 <!-- !PC-FXGA software and games -->
 
-	<!-- https://redump.info/disc/20033 -->
+	<!-- (*) https://redump.info/disc/20033 -->
 	<software name="amateur" supported="no">
 		<description>Amateur Teikyou CD-ROM (PC-98 C-Bus)</description>
 		<year>1995</year>
