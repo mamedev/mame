@@ -1110,7 +1110,7 @@ void ngcd_state::neocd_ntsc(machine_config &config)
 	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_controls, "joy", false);
 
 	CDROM(config, "cdrom").set_interface("cdrom");
-	SOFTWARE_LIST(config, "cd_list").set_original("neogeo_cd");
+	SOFTWARE_LIST(config, "cd_list").set_original("neogeocd");
 
 	m_ym->set_addrmap(0, &ngcd_state::neocd_ym_map);
 }
@@ -1168,7 +1168,7 @@ void ngcd_state::init_neocdzj()
 } // anonymous namespace
 
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT   CLASS        INIT          COMPANY FULLNAME               FLAGS */
+//    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT   CLASS        INIT          COMPANY FULLNAME               FLAGS
 CONS( 1996, neocdz,  0,      0,      neocd_ntsc, neocd,  ngcd_state,  init_neocdz,  "SNK",  "Neo-Geo CDZ (US)",    0 ) // the CDZ is the newer model
 CONS( 1996, neocdzj, neocdz, 0,      neocd_ntsc, neocd,  ngcd_state,  init_neocdzj, "SNK",  "Neo-Geo CDZ (Japan)", 0 )
 
