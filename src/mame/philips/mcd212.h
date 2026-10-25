@@ -40,8 +40,8 @@ class mcd212_ext_video_source
 public:
 	virtual ~mcd212_ext_video_source() = default;
 
-	// fills line y with the source's pixels where it drives them, and with fill elsewhere
-	virtual void ext_video_line(int y, uint32_t *line, int count, uint32_t fill) const = 0;
+	// fills line y with the source's pixels, transparent where it shows nothing
+	virtual void ext_video_line(int y, uint32_t *line, int count) const = 0;
 };
 
 
@@ -224,7 +224,7 @@ protected:
 	int m_display_line = 0;
 	uint32_t m_mosaic_hold[2]{};
 	uint8_t m_weight_factor[2][768]{};
-	uint32_t m_backdrop_line[768]{};
+	uint32_t m_ext_video_line[768]{};
 
 	// DYUV color limit arrays.
 	uint32_t m_dyuv_limit_lut[0x300];
@@ -272,8 +272,6 @@ protected:
 	int get_border_height();
 	bool ica_enabled(int channel) const { return BIT(m_dcr[0], DCR_DE_BIT) && BIT(m_dcr[channel], DCR_ICA_BIT); }
 	bool dca_enabled(int channel) const { return ica_enabled(channel) && BIT(m_dcr[channel], DCR_DCA_BIT); }
-	const uint32_t *get_backdrop_line(int count, int y);
-
 	template <int Path> void set_vsr(uint32_t value);
 	template <int Path> uint32_t get_vsr();
 

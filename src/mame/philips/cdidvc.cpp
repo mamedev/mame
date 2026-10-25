@@ -398,6 +398,8 @@ void cdi_dvc_slot_device::ext_video_line(int y, uint32_t *line, int count) const
 {
 	if (m_card)
 		m_card->ext_video_line(y, line, count);
+	else
+		std::fill_n(line, count, 0);
 }
 
 void cdi_dvc_cards(device_slot_interface &device)

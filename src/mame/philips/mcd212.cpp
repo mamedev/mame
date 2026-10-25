@@ -311,20 +311,6 @@ int mcd212_device::get_border_height()
 	return height;
 }
 
-const uint32_t *mcd212_device::get_backdrop_line(int count, int y)
-{
-	if (BIT(m_image_coding_method, ICM_EV_BIT))
-	{
-		if (m_ext_video)
-			m_ext_video->ext_video_line(y, m_backdrop_line, count, s_4bpp_display_color[0]);
-		else
-			std::fill_n(m_backdrop_line, count, s_4bpp_display_color[0]);
-	}
-	else
-		std::fill_n(m_backdrop_line, count, s_4bpp_display_color[m_backdrop_color]);
-	return m_backdrop_line;
-}
-
 void mcd212_device::process_ica()
 {
 	const int max_to_process = m_ica_height * 120;
@@ -719,13 +705,21 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 	}
 
 	const uint32_t *limit = m_dyuv_limit_lut + 0x100;
-	const uint32_t *backdrop = get_backdrop_line(width + border_width * 2, m_display_line) + border_width;
+	// the backdrop is the external video where it has a picture, the backdrop colour elsewhere
+	const bool external = BIT(m_image_coding_method, ICM_EV_BIT);
+	const uint32_t backdrop = s_4bpp_display_color[external ? 0 : m_backdrop_color];
+	const uint32_t *ext_video = nullptr;
+	if (external && m_ext_video)
+	{
+		m_ext_video->ext_video_line(m_display_line, m_ext_video_line, width + border_width * 2);
+		ext_video = m_ext_video_line + border_width;
+	}
 
 	for (int x = 0; x < width; x++)
 	{
 		if (transparent_a[x] && transparent_b[x])
 		{
-			out[x] = backdrop[x];
+			out[x] = (ext_video && (ext_video[x] >> 24)) ? ext_video[x] : backdrop;
 			continue;
 		}
 		uint32_t plane_a_cur = MosaicA ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];

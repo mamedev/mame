@@ -743,24 +743,22 @@ void mcd251_device::vblank_w(int state)
 
 // x and y are the chip's own pixel coordinates, counted from the start of
 // active video.
-void mcd251_device::video_line(int y, uint32_t *line, int count) const
+void mcd251_device::video_line(int y, uint32_t *line, int count, uint32_t fill) const
 {
 	if (!m_show_video || !m_display_valid || m_display_slot < 0)
 	{
+		std::fill_n(line, count, fill);
 		return;
 	}
 	const picture &display = m_pictures[m_display_slot];
 
 	const int sy = y - int(m_latched_display_offset_y);
-	if (sy < 0)
-		return;
-	if (m_latched_window_height && sy >= int(m_latched_window_height))
-		return;
-
-	const int px = sx + int(m_latched_window_offset_x);
 	const int py = sy + int(m_latched_window_offset_y);
-	if (py < 0 || py >= int(display.info.height))
+	if (sy < 0 || (m_latched_window_height && sy >= int(m_latched_window_height)) || py < 0 || py >= int(display.info.height))
+	{
+		std::fill_n(line, count, fill);
 		return;
+	}
 
 	// the chip pixels [first, last) whose window and picture positions are both in range
 	const int offset_x = int(m_latched_display_offset_x);
@@ -769,13 +767,16 @@ void mcd251_device::video_line(int y, uint32_t *line, int count) const
 	int last = std::min(count / 2, int(display.info.width) - shift_x);
 	if (m_latched_window_width)
 		last = std::min(last, offset_x + int(m_latched_window_width));
-	first = std::max(first, 0);
+	first = std::clamp(first, 0, count / 2);
+	last = std::max(last, first);
 
+	std::fill_n(line, first * 2, fill);
 	const uint32_t *const row = &display.rgb[size_t(py) * display.info.width];
 	for (int x = first; x < last; x++)
 	{
 		line[x * 2] = line[x * 2 + 1] = row[x + shift_x];
 	}
+	std::fill(line + last * 2, line + count, fill);
 }
 
 //**************************************************************************

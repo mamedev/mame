@@ -92,7 +92,7 @@ public:
 	void vblank_w(int state);
 
 	// One line of the displayed picture.  line holds count display columns,
-	// two per chip pixel; only the columns the chip drives are overwritten.
+	// two per chip pixel; the columns the chip does not drive are transparent.
 	void video_line(int y, uint32_t *line, int count) const;
 
 protected:
