@@ -13,12 +13,14 @@
 
 #include "mpeg_audio.h"
 
+#include <memory>
+
 class l64111_device : public device_t, public device_sound_interface
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
-	l64111_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) ATTR_COLD;
+	l64111_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) ATTR_COLD;
 
 	// outputs
 	auto intr() { return m_intr_cb.bind(); }     // INTR, active low
@@ -41,11 +43,14 @@ public:
 	void hdmute_w(int state); // HDMUTE, active high
 
 protected:
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_pre_save() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
 	virtual void device_clock_changed() override;
+
+	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
@@ -84,7 +89,7 @@ private:
 	// register handlers
 	bool reg_read_ready();
 	bool reg_write_ready(const char *name, u8 data);
-	u8 reserved_r(offs_t offset);
+	u8 reserved_r();
 	void reserved_w(offs_t offset, u8 data);
 	void read_only_w(offs_t offset, u8 data);
 	void data8_w(u8 data);
@@ -114,10 +119,12 @@ private:
 	void cb_read_w(u8 data);
 
 	void chip_reset() ATTR_COLD;
+	void reset_state() ATTR_COLD;
 	void decoder_reset();
 	void parser_reset();
 	void sync();
 	void sync_fifo();
+	void preparse(const attotime &until);
 	void deliver_events();
 	void schedule_flags();
 	void update_outputs();
@@ -154,7 +161,7 @@ private:
 	// pins and outputs
 	bool m_reset_pin, m_starti_pin, m_hdmute_pin;
 	bool m_intr_pending; // an enabled interrupt event since the last status read
-	int m_intr_state, m_fempty_state, m_fale_state, m_falf_state, m_starto_state;
+	u8 m_intr_state, m_fempty_state, m_fale_state, m_falf_state, m_starto_state;
 
 	// input data FIFO
 	util::fifo<u8, FIFO_BYTES> m_fifo; // the chip's own 128-byte input FIFO
@@ -191,8 +198,8 @@ private:
 	s16 m_pcm[SAMPLES_MAX * 2];
 	u32 m_pcm_pos, m_pcm_count, m_pcm_channels;
 	bool m_started, m_underrun;
-	// interrupt events raised during the stream update, in Interrupt Mask 1 / 2 bit positions,
-	// delivered from timer or CPU context
+	// interrupt events raised by the pre-parser and the decoder, in Interrupt Mask 1 / 2 bit
+	// positions; both can run inside the stream update, so deliver_events() raises them later
 	u8 m_ev1, m_ev2;
 
 	// FIFO contents for save states

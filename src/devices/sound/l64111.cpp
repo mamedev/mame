@@ -48,6 +48,9 @@
 #include "emu.h"
 #include "l64111.h"
 
+#include <algorithm>
+#include <memory>
+
 #define LOG_REGS  (1U << 1)
 #define LOG_INTR  (1U << 2)
 #define LOG_FRAME (1U << 3)
@@ -56,7 +59,7 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(L64111, l64111_device, "l64111", "LSI Logic L64111 MPEG Audio Decoder")
+DEFINE_DEVICE_TYPE(L64111, l64111_device, "l64111", "LSI Logic L64111 MPEG audio decoder")
 
 namespace {
 
@@ -79,20 +82,13 @@ l64111_device::l64111_device(const machine_config &mconfig, const char *tag, dev
 	m_intr_cb(*this), m_fempty_cb(*this), m_fale_cb(*this), m_falf_cb(*this), m_starto_cb(*this),
 	m_stream(nullptr),
 	m_frame_timer(nullptr), m_flags_timer(nullptr),
-	m_cr1(0), m_cr2(0), m_cr3(CR3_ID_IGNORE), m_mask1(0), m_mask2(0), m_status1(0), m_status2(0),
-	m_tcr(0), m_torh(0), m_torl(0), m_pd{}, m_pts{},
 	m_reset_pin(false), m_starti_pin(true), m_hdmute_pin(false),
-	m_intr_pending(false),
 	m_intr_state(1), m_fempty_state(0), m_fale_state(0), m_falf_state(1), m_starto_state(0),
 	m_overflow_logged(false),
-	m_sys_state(SYS_SCAN), m_sys_shift(0), m_sys_shift_count(0), m_sys_code(0), m_sys_left(0), m_sys_length_bytes(0),
-	m_sys_hdr{}, m_sys_hdr_len(0), m_sys_hdr_need(0), m_pack_count(0),
-	m_frame{}, m_frame_len(0), m_frame_need(0), m_sync_count(0),
-	m_cb{}, m_cb_len{}, m_cb_write(0), m_cb_read(0), m_cb_count(0), m_cb_layer(2),
-	m_anc_acc(0), m_anc_bits(0), m_anc_overflow(false),
-	m_decode{}, m_pcm{}, m_pcm_pos(0), m_pcm_count(0), m_pcm_channels(1),
-	m_started(false), m_underrun(false),
-	m_ev1(0), m_ev2(0),
+	m_sys_code(0), m_sys_hdr{},
+	m_frame{},
+	m_cb{}, m_cb_len{},
+	m_decode{}, m_pcm{}, m_pcm_channels(1),
 	m_fifo_save{}, m_anc_save{}, m_fifo_save_count(0), m_anc_save_count(0)
 {
 }
@@ -165,6 +161,9 @@ void l64111_device::device_start()
 	save_item(NAME(m_underrun));
 	save_item(NAME(m_ev1));
 	save_item(NAME(m_ev2));
+
+	// a device configured earlier can drive RESET, STARTI or HDMUTE from its own reset, before ours
+	reset_state();
 }
 
 void l64111_device::device_reset()
@@ -202,13 +201,6 @@ void l64111_device::device_post_load()
 	m_anc.clear();
 	for (u32 i = 0; i < std::min<u32>(m_anc_save_count, ANC_BYTES); i++)
 		m_anc.enqueue(m_anc_save[i]);
-	update_rate();
-	update_frame_timer();
-	m_intr_cb(m_intr_state);
-	m_fempty_cb(m_fempty_state);
-	m_fale_cb(m_fale_state);
-	m_falf_cb(m_falf_state);
-	m_starto_cb(m_starto_state);
 }
 
 void l64111_device::device_clock_changed()
@@ -218,6 +210,14 @@ void l64111_device::device_clock_changed()
 
 // RESET pin or SOFT_RST: registers to their defaults, FIFOs and channel buffer emptied
 void l64111_device::chip_reset()
+{
+	reset_state();
+	update_irq_state(0, 0);
+	update_outputs();
+	update_frame_timer();
+}
+
+void l64111_device::reset_state()
 {
 	m_cr1 = m_starti_pin ? CR1_STARTI : 0x00; // STARTI defaults to the STARTI pin
 	m_cr2 = 0; // AUDIO ONLY defaults to address line A4, which a controller-driven design leaves undefined
@@ -239,11 +239,7 @@ void l64111_device::chip_reset()
 	m_anc_overflow = false;
 	m_ev1 = m_ev2 = 0;
 	decoder_reset();
-
 	m_intr_pending = false;
-	update_irq_state(0, 0);
-	update_outputs();
-	update_frame_timer();
 }
 
 // STARTI low resets the decoder block; the channel buffer keeps its frames
@@ -311,19 +307,19 @@ bool l64111_device::reg_write_ready(const char *name, u8 data)
 	return true;
 }
 
-u8 l64111_device::reserved_r(offs_t offset)
+u8 l64111_device::reserved_r()
 {
 	return 0; // also the Data register, which is write-only
 }
 
 void l64111_device::reserved_w(offs_t offset, u8 data)
 {
-	logerror("%s: write %02x to reserved register %d\n", machine().describe_context(), data, offset);
+	logerror("%s: write %02x to reserved register %02x\n", machine().describe_context(), data, offset);
 }
 
 void l64111_device::read_only_w(offs_t offset, u8 data)
 {
-	logerror("%s: write %02x to read-only register %d\n", machine().describe_context(), data, offset + 9);
+	logerror("%s: write %02x to read-only register %02x\n", machine().describe_context(), data, offset + 9);
 }
 
 void l64111_device::data8_w(u8 data)
@@ -345,14 +341,14 @@ void l64111_device::cr1_w(u8 data)
 		chip_reset();
 		return;
 	}
-	m_cr1 = data; // SOFT_RST is never stored; BUF_RST is not cleared by the chip (manual 4.3)
+	m_cr1 = data; // SOFT_RST is never stored; the chip doesn't clear BUF_RST (manual 4.3)
 	if (data & CR1_ANC_RST) // empty the ancillary FIFO, and hold it empty while set
 	{
 		m_anc.clear();
 		m_anc_acc = m_anc_bits = 0;
 		m_anc_overflow = false;
 	}
-	if (data & CR1_BUF_RST) // empty the channel buffer
+	if (data & CR1_BUF_RST) // empty the channel buffer, and hold it empty while set (see store_frame)
 		m_cb_write = m_cb_read = m_cb_count = 0;
 	if (!decoder_enabled())
 		decoder_reset();
@@ -616,8 +612,9 @@ void l64111_device::hdmute_w(int state)
 // Interrupt events, given in Interrupt Mask 1 / 2 bit positions: latch the Status bits they set and
 // assert INTR if their mask bit is set. Status 1 shares Mask 1's positions; Status 2 sits one bit
 // lower than Mask 2, with NEW FRAME OUT and LAST FRAME sharing one Status bit. The ancillary FIFO
-// bits and the SYNC bits are levels, read from the state rather than latched. Reading a status
-// register clears INTR and calls this with no events.
+// bits and the SYNC bits are levels, read from the state rather than latched. The pre-parser and
+// the decoder collect their events in m_ev1/m_ev2 for deliver_events(). Reading a status register
+// clears INTR and calls this with no events.
 void l64111_device::update_irq_state(u8 events1, u8 events2)
 {
 	m_status1 |= events1 & S1_ERR_BUF_OVFL;
@@ -637,7 +634,14 @@ void l64111_device::update_irq_state(u8 events1, u8 events2)
 
 void l64111_device::update_outputs()
 {
-	auto out = [] (int &old, int state, devcb_write_line &cb) { if (state != old) { old = state; cb(state); } };
+	auto out = [] (u8 &old, int state, devcb_write_line &cb)
+	{
+		if (state != old)
+		{
+			old = state;
+			cb(state);
+		}
+	};
 	const u32 count = m_fifo.queue_length();
 	out(m_fempty_state, count ? 1 : 0, m_fempty_cb);
 	out(m_fale_state, (count <= FIFO_FLAG_LEVEL) ? 0 : 1, m_fale_cb);
@@ -721,19 +725,7 @@ void l64111_device::sync()
 void l64111_device::sync_fifo()
 {
 	const attotime now = machine().time();
-	if (!m_fifo.empty())
-	{
-		const attotime per_byte = clocks_to_attotime(PREPARSE_CLOCKS);
-		while (!m_fifo.empty() && ((m_fifo_time + per_byte) <= now))
-		{
-			m_fifo_time += per_byte;
-			const u8 b = m_fifo.dequeue();
-			if (m_cr2 & CR2_AUDIO_ONLY)
-				audio_parse(b);
-			else
-				system_parse(b);
-		}
-	}
+	preparse(now);
 	if (m_fifo.empty())
 	{
 		m_fifo_time = now;
@@ -744,7 +736,22 @@ void l64111_device::sync_fifo()
 	update_frame_timer(); // a newly stored frame can start the decoder
 }
 
-// interrupts for events raised inside the stream update or by the pre-parser
+// parse the bytes the pre-parser has taken from the input FIFO by the given time
+void l64111_device::preparse(const attotime &until)
+{
+	const attotime per_byte = clocks_to_attotime(PREPARSE_CLOCKS);
+	while (!m_fifo.empty() && ((m_fifo_time + per_byte) <= until))
+	{
+		m_fifo_time += per_byte;
+		const u8 b = m_fifo.dequeue();
+		if (m_cr2 & CR2_AUDIO_ONLY)
+			audio_parse(b);
+		else
+			system_parse(b);
+	}
+}
+
+// interrupts for events raised by the pre-parser or the decoder
 void l64111_device::deliver_events()
 {
 	if (m_ev1 || m_ev2)
@@ -758,7 +765,7 @@ void l64111_device::deliver_events()
 
 void l64111_device::syntax_error()
 {
-	update_irq_state(0, M2_SYNTAX_ERR);
+	m_ev2 |= M2_SYNTAX_ERR;
 }
 
 // ISO 11172-1 system layer: packs, system headers and packets; the payload of the selected
@@ -771,7 +778,7 @@ void l64111_device::system_parse(u8 data)
 		m_sys_shift = (m_sys_shift << 8) | data;
 		if (m_sys_shift_count < 4)
 			m_sys_shift_count++;
-		if ((m_sys_shift_count == 4) && ((m_sys_shift & 0xffffff00) == 0x00000100))
+		if ((m_sys_shift_count == 4) && ((m_sys_shift & 0xffff'ff00) == 0x0000'0100))
 		{
 			m_sys_code = data;
 			m_sys_shift = m_sys_shift_count = 0;
@@ -805,7 +812,7 @@ void l64111_device::system_parse(u8 data)
 		{
 			m_sys_state = SYS_SCAN;
 			if (++m_pack_count == SYNC_FRAMES)
-				update_irq_state(0, M2_SYNC_SYS); // SYNC SYS goes high (a level, read from m_pack_count)
+				m_ev2 |= M2_SYNC_SYS; // SYNC SYS goes high (a level, read from m_pack_count)
 		}
 		break;
 
@@ -816,14 +823,18 @@ void l64111_device::system_parse(u8 data)
 			const bool audio = (m_sys_code >= AUDIO_STREAM_FIRST) && (m_sys_code <= AUDIO_STREAM_LAST);
 			const bool selected = audio && ((m_cr3 & CR3_ID_IGNORE) || ((m_sys_code & CR3_STREAM_ID) == (m_cr3 & CR3_STREAM_ID)));
 			if (!m_sys_left)
+			{
 				m_sys_state = SYS_SCAN;
+			}
 			else if (selected)
 			{
 				m_sys_state = SYS_PACKET_HEADER;
 				m_sys_hdr_len = m_sys_hdr_need = 0;
 			}
 			else
+			{
 				m_sys_state = SYS_SKIP; // system header, padding, private, video and other audio streams
+			}
 		}
 		break;
 
@@ -851,13 +862,21 @@ void l64111_device::packet_header(u8 data)
 	if (!m_sys_hdr_need)
 	{
 		if ((data & 0xc0) == 0x40)
+		{
 			m_sys_hdr_need = 2; // STD_buffer_scale/size
+		}
 		else if ((data & 0xf0) == 0x20)
+		{
 			m_sys_hdr_need = 5; // PTS
+		}
 		else if ((data & 0xf0) == 0x30)
+		{
 			m_sys_hdr_need = 10; // PTS and DTS
+		}
 		else if (data == 0x0f)
+		{
 			m_sys_state = SYS_PACKET_DATA;
+		}
 		else if (data != 0xff) // 0xff is stuffing
 		{
 			syntax_error();
@@ -873,12 +892,12 @@ void l64111_device::packet_header(u8 data)
 			if (m_sys_hdr_need != 2)
 			{
 				const u8 *h = m_sys_hdr;
-				const u64 pts = (u64((h[0] >> 1) & 7) << 30) | (u64(h[1]) << 22) | (u64(h[2] >> 1) << 15) | (u64(h[3]) << 7) | (h[4] >> 1);
+				const u64 pts = (u64(BIT(h[0], 1, 3)) << 30) | (u64(h[1]) << 22) | (u64(BIT(h[2], 1, 7)) << 15) | (u64(h[3]) << 7) | BIT(h[4], 1, 7);
 				for (int i = 0; i < 4; i++)
 					m_pts[i] = u8(pts >> (8 * i));
 				m_pts[4] = BIT(pts, 32);
 				if (!(m_status2 & S2_PTS)) // interrupts only when PTS AVAILABLE goes high
-					update_irq_state(0, M2_PTS);
+					m_ev2 |= M2_PTS;
 				m_sys_state = SYS_PACKET_DATA;
 			}
 			m_sys_hdr_need = m_sys_hdr_len = 0;
@@ -919,11 +938,11 @@ void l64111_device::audio_parse(u8 data)
 		return;
 
 	const u8 id = BIT(m_frame[1], 3);
-	const u8 layer_code = (m_frame[1] >> 1) & 3; // 11 Layer I, 10 Layer II
-	const u8 rate_index = m_frame[2] >> 4;
-	const u8 fs_index = (m_frame[2] >> 2) & 3;
+	const u8 layer_code = BIT(m_frame[1], 1, 2); // 11 Layer I, 10 Layer II
+	const u8 rate_index = BIT(m_frame[2], 4, 4);
+	const u8 fs_index = BIT(m_frame[2], 2, 2);
 	const u8 padding = BIT(m_frame[2], 1);
-	const bool mono = (m_frame[3] >> 6) == 3;
+	const bool mono = BIT(m_frame[3], 6, 2) == 3;
 	const u32 kbps = (layer_code >= 2) ? BITRATE[(layer_code == 3) ? 0 : 1][rate_index] : 0;
 	const u32 fs = SAMPLE_RATE[fs_index];
 	// Layer II: 32, 48, 56 and 80 kbit/s are single channel only, 224 kbit/s and up two channels only
@@ -941,17 +960,21 @@ void l64111_device::audio_parse(u8 data)
 void l64111_device::store_frame()
 {
 	const u8 *h = m_frame;
-	m_pd[0] = (BIT(h[1], 3) << 7) | (((h[1] >> 1) & 3) << 5) | (BIT(h[1], 0) << 4) | (h[2] >> 4);
-	m_pd[1] = (((h[2] >> 2) & 3) << 6) | (BIT(h[2], 1) << 5) | (BIT(h[2], 0) << 4) | ((h[3] >> 6) << 2) | ((h[3] >> 4) & 3);
-	m_pd[2] = (BIT(h[3], 3) << 7) | (BIT(h[3], 2) << 6) | ((h[3] & 3) << 4);
+	m_pd[0] = (BIT(h[1], 3) << 7) | (BIT(h[1], 1, 2) << 5) | (BIT(h[1], 0) << 4) | BIT(h[2], 4, 4);
+	m_pd[1] = (BIT(h[2], 2, 2) << 6) | (BIT(h[2], 1) << 5) | (BIT(h[2], 0) << 4) | (BIT(h[3], 6, 2) << 2) | BIT(h[3], 4, 2);
+	m_pd[2] = (BIT(h[3], 3) << 7) | (BIT(h[3], 2) << 6) | (BIT(h[3], 0, 2) << 4);
 	LOGMASKED(LOG_FRAME, "frame %u bytes, channel buffer %u\n", m_frame_len, m_cb_count);
 	// SYNC AUD goes high on the third frame in sequence (a level, read from m_sync_count)
-	update_irq_state(0, M2_FRAME_DETECT | ((++m_sync_count == SYNC_FRAMES) ? M2_SYNC_AUD : 0x00));
+	m_ev2 |= M2_FRAME_DETECT | ((++m_sync_count == SYNC_FRAMES) ? M2_SYNC_AUD : 0x00);
 
-	m_cb_layer = (((h[1] >> 1) & 3) == 3) ? 1 : 2;
+	// the manual doesn't say whether BUF_RST holds the channel buffer empty; ANC DATA FIFO RST
+	// in the same register holds its FIFO [INFERRED]
+	if (m_cr1 & CR1_BUF_RST)
+		return;
+	m_cb_layer = (BIT(h[1], 1, 2) == 3) ? 1 : 2;
 	if (m_cb_count >= cb_frames())
 	{
-		update_irq_state(S1_ERR_BUF_OVFL, 0); // the frame is lost
+		m_ev1 |= S1_ERR_BUF_OVFL; // the frame is lost
 		return;
 	}
 	std::copy_n(m_frame, m_frame_len, m_cb[m_cb_write]);
@@ -993,7 +1016,9 @@ bool l64111_device::next_frame()
 		ancillary(pos, len * 8);
 	}
 	else if (((m_cr2 & CR2_MUTE) != CR2_MUTE_REPLAY) || !m_pcm_count)
+	{
 		silent_frame(); // MUTE 10 replays the last good frame instead
+	}
 	m_pcm_pos = 0;
 	m_ev2 |= M2_NEW_FRAME; // NEW FRAME OUT
 	m_started = true;
@@ -1007,7 +1032,7 @@ void l64111_device::ancillary(u32 bit_pos, u32 bit_end)
 		return;
 	for (u32 b = bit_pos; b < bit_end; b++)
 	{
-		m_anc_acc = (m_anc_acc << 1) | BIT(m_decode[b >> 3], 7 - (b & 7));
+		m_anc_acc = (m_anc_acc << 1) | BIT(m_decode[b >> 3], ~b & 7);
 		if (++m_anc_bits < 8)
 			continue;
 		if (m_anc.full())
@@ -1042,6 +1067,9 @@ void l64111_device::sound_stream_update(sound_stream &stream)
 	{
 		if (m_pcm_pos >= m_pcm_count)
 		{
+			// the sound manager also updates the stream, without a sync(): store the frames the
+			// pre-parser would have by this sample before taking one
+			preparse(stream.start_time() + stream.sample_period() * sample);
 			if (!next_frame())
 			{
 				// an empty channel buffer after playback started is an underrun: the decoder stays
