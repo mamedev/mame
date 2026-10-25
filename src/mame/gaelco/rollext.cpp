@@ -126,6 +126,7 @@
 #include "cpu/tms320c82/tms320c82.h"
 #include "machine/eepromser.h"
 #include "sound/dac.h"
+#include "sound/flt_biquad.h"
 #include "video/poly.h"
 
 #include "emuopts.h"
@@ -135,6 +136,7 @@
 
 #include "corefloat.h"
 #include "endianness.h"
+#include "multibyte.h"
 
 #include "asio.h"
 
@@ -154,127 +156,6 @@
 #include <vector>
 
 namespace {
-
-// Sheet 6: each TDA1543 current output feeds an I/V amplifier (Rf || 1 nF),
-// then three 56 kohm resistors and a unity-gain TL074 follower. Ca and Cc go
-// to ground at the first and third nodes; Cb joins the second node to the
-// follower OUTPUT. The first RC therefore loads the Sallen-Key section.
-//
-// With R = 56 kohm, the coupled network has unity DC gain and denominator
-// 1 + s R(Ca + 3 Cc) + s^2 2 R^2 Cc(Ca + Cb) + s^3 R^3 Ca Cb Cc.
-// Include the I/V pole, factor into two second-order sections, and apply
-// the bilinear transform at 192 kHz, before MAME's output resampling. This
-// keeps the response independent of the user's output sample rate and avoids
-// folding the 34/48 kHz I/V poles into a 44.1/48 kHz filter. Op-amps are ideal;
-// component tolerances, amplifier coupling/clipping and speaker response are
-// not modelled. The nominal cabinet amplifier gain is applied in the routes.
-class rollext_filter_device : public device_t, public device_sound_interface
-{
-public:
-	rollext_filter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-
-protected:
-	// device_t implementation
-	virtual void device_start() override ATTR_COLD;
-
-	// device_sound_interface implementation
-	virtual void sound_stream_update(sound_stream &stream) override;
-
-private:
-	static constexpr u32 SAMPLE_RATE = 192'000;
-	// Coefficients: b0, b1, b2, a1, a2; two sections per component set.
-	double m_coeff[2][2][5];
-	double m_history[4][2][2];
-};
-
-} // anonymous namespace
-
-DEFINE_DEVICE_TYPE_PRIVATE(ROLLEXT_FILTER, rollext_filter_device, rollext_filter_device, "rollext_filter", "Rolling Extreme output filters")
-
-namespace {
-
-rollext_filter_device::rollext_filter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, ROLLEXT_FILTER, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-{
-}
-
-void rollext_filter_device::device_start()
-{
-	stream_alloc(4, 4, SAMPLE_RATE);
-	for (auto &channel : m_history)
-	{
-		for (auto &stage : channel)
-			std::fill(std::begin(stage), std::end(stage), 0.0);
-	}
-	for (unsigned group = 0; group < 2; group++)
-	{
-		constexpr double r = 56'000.0;
-		double const ca = group ? 8.2e-9 : 330e-12;
-		double const cb = group ? 15e-9 : 680e-12;
-		double const cc = group ? 2.2e-9 : 100e-12;
-		double const tau = (group ? 4700.0 : 3300.0) * 1e-9;
-		double const d1 = r * (ca + 3 * cc);
-		double const d2 = 2 * r * r * cc * (ca + cb);
-		double const d3 = r * r * r * ca * cb * cc;
-		// These two component sets each have one real pole and a complex pair.
-		auto const denominator = [d1, d2, d3] (double p) { return 1 - p * (d1 - p * (d2 - p * d3)); };
-		double lo = 0, hi = 1;
-		while (denominator(hi) > 0)
-			hi *= 2;
-		for (unsigned i = 0; i < 80; i++)
-		{
-			double const mid = (lo + hi) * 0.5;
-			if (denominator(mid) > 0)
-				lo = mid;
-			else
-				hi = mid;
-		}
-		double const pole = (lo + hi) * 0.5;
-		// Complex pair, followed by the real network pole and I/V pole.
-		double const linear[2] = { d1 - 1 / pole, tau + 1 / pole };
-		double const quadratic[2] = { d3 * pole, tau / pole };
-		for (unsigned stage = 0; stage < 2; stage++)
-		{
-			constexpr double k = 2.0 * SAMPLE_RATE;
-			double const a0 = 1 + k * linear[stage] + k * k * quadratic[stage];
-			double *const c = m_coeff[group][stage];
-			c[0] = 1 / a0;
-			c[1] = 2 / a0;
-			c[2] = 1 / a0;
-			c[3] = (2 - 2 * k * k * quadratic[stage]) / a0;
-			c[4] = (1 - k * linear[stage] + k * k * quadratic[stage]) / a0;
-		}
-	}
-	save_item(NAME(m_history));
-}
-
-void rollext_filter_device::sound_stream_update(sound_stream &stream)
-{
-	for (unsigned channel = 0; channel < 4; channel++)
-	{
-		for (int sample = 0; sample < stream.samples(); sample++)
-		{
-			double value = stream.get(channel, sample);
-			for (unsigned stage = 0; stage < 2; stage++)
-			{
-				double const *const c = m_coeff[channel / 2][stage];
-				double *const h = m_history[channel][stage];
-				double const output = c[0] * value + h[0];
-				h[0] = c[1] * value - c[3] * output + h[1];
-				h[1] = c[2] * value - c[4] * output;
-				// Flush inaudible tails before they become subnormal, which makes
-				// silent channels far more costly than active ones.
-				if (std::abs(h[0]) < 1e-30)
-					h[0] = 0;
-				if (std::abs(h[1]) < 1e-30)
-					h[1] = 0;
-				value = output;
-			}
-			stream.put(channel, sample, value);
-		}
-	}
-}
 
 constexpr bool BILINEAR = true;
 
@@ -312,12 +193,13 @@ public:
 			osd_printf_error("Rolling Extreme link: invalid numeric address\n");
 			return;
 		}
-		unsigned const port = std::strtoul(m_server ? options.comm_localport() : options.comm_remoteport(), nullptr, 10);
-		if (!port || port > 65535)
+		unsigned long const value = std::strtoul(m_server ? options.comm_localport() : options.comm_remoteport(), nullptr, 10);
+		if (!value || value > 65535)
 		{
 			osd_printf_error("Rolling Extreme link: invalid port\n");
 			return;
 		}
+		uint16_t const port = value;
 		m_endpoint = asio::ip::tcp::endpoint(address, port);
 		if (m_server)
 		{
@@ -366,7 +248,7 @@ public:
 		// Send this interval's marker, wait for the peer's, then release the
 		// words received in intervals up to this barrier.
 		++m_local_tick;
-		m_pending.insert(m_pending.end(), { 0x53, 2, uint8_t(m_local_tick >> 8), uint8_t(m_local_tick) });
+		queue(0x53, 2, m_local_tick);
 		poll_io();
 		// Give up after two seconds without the peer's marker. Each poll counts
 		// at most 100 ms, so a suspended host doesn't use up the wait.
@@ -423,7 +305,7 @@ public:
 			m_socket.async_connect(m_endpoint, std::move(connected));
 	}
 
-	void send(uint16_t data, unsigned node)
+	void send(uint16_t data, uint8_t node)
 	{
 		if (!m_connected)
 			return; // an unplugged RS-485 cable cannot retain words
@@ -432,7 +314,7 @@ public:
 			close();
 			return;
 		}
-		m_pending.insert(m_pending.end(), { 0x52, uint8_t(node & 3), uint8_t(data >> 8), uint8_t(data) });
+		queue(0x52, node & 3, data);
 	}
 
 private:
@@ -441,6 +323,14 @@ private:
 		uint16_t tick = 0;
 		std::vector<uint16_t> words;
 	};
+
+	// Messages are a type byte, a node or marker byte and a big-endian word.
+	void queue(uint8_t type, uint8_t node, uint16_t data)
+	{
+		uint8_t message[4] = { type, node };
+		put_u16be(&message[2], data);
+		m_pending.insert(m_pending.end(), std::begin(message), std::end(message));
+	}
 
 	void close()
 	{
@@ -461,7 +351,7 @@ private:
 				close();
 				return;
 			}
-			uint16_t const data = (uint16_t(m_input[2]) << 8) | m_input[3];
+			uint16_t const data = get_u16be(&m_input[2]);
 			if (m_input[0] == 0x52 && m_input[1] <= 3)
 			{
 				if (!m_framesync)
@@ -574,14 +464,15 @@ class rollext_renderer : public poly_manager<float, rollext_polydata, 4>
 public:
 	rollext_renderer(screen_device &screen)
 		: poly_manager<float, rollext_polydata, 4>(screen.machine())
+		, m_screen(screen)
 	{
-		m_fb[0].allocate(1024, 1024);
-		m_fb[1].allocate(1024, 1024);
+		m_fb[0].allocate(512, 384);
+		m_fb[1].allocate(512, 384);
 
-		m_zb.allocate(1024, 1024);
+		m_zb.allocate(512, 384);
 
 		m_palette = std::make_unique<rgb_t []>(32768);
-		m_texture_mask = std::make_unique<uint8_t []>(2048 * 16384);
+		m_texture_mask = std::make_unique<uint8_t []>(TEXTURE_MASK_SIZE);
 
 		m_fb_current = 0;
 		m_fb[0].fill(0xff000000);
@@ -594,7 +485,7 @@ public:
 		save.save_item(NAME(m_fb[1]));
 		save.save_item(NAME(m_zb));
 		save.save_pointer(NAME(m_palette), 32768);
-		save.save_pointer(NAME(m_texture_mask), 2048 * 16384);
+		save.save_pointer(NAME(m_texture_mask), TEXTURE_MASK_SIZE);
 		save.save_item(NAME(m_fb_current));
 		save.save_item(NAME(m_clip.min_x));
 		save.save_item(NAME(m_clip.max_x));
@@ -614,6 +505,11 @@ public:
 	void clear_fb();
 	void display(bitmap_rgb32 *bitmap, const rectangle &cliprect);
 private:
+	// One bit per texel, LSB first, for the first 2048 rows of 2048 texels
+	static constexpr uint32_t TEXTURE_MASK_SIZE = 2048 * 2048 / 8;
+
+	bool texel_masked(uint32_t x, uint32_t y) const;
+
 	bitmap_rgb32 m_fb[2];
 	std::unique_ptr<rgb_t []> m_palette;
 	std::unique_ptr<uint8_t []> m_texture_mask;
@@ -624,7 +520,19 @@ private:
 	rectangle m_clip = rectangle(0, 511, 0, 383);
 
 	uint8_t *m_texture_ram = nullptr;
+
+	screen_device &m_screen;
+	uint32_t m_logged_blend[16]{}; // header mode/coefficient pairs already logged
 };
+
+// FIXME: the mask RAM only covers the first 2048 of the 16384 texture rows.
+// The others are drawn unmasked; how the graphics ASIC handles them is unknown.
+inline bool rollext_renderer::texel_masked(uint32_t x, uint32_t y) const
+{
+	x &= 0x7ff;
+	y &= 0x3fff;
+	return y < 2048 && BIT(m_texture_mask[(y * 2048 + x) / 8], x & 7);
+}
 
 template<bool TestZ>
 void rollext_renderer::render_texture_scan(int32_t scanline, const extent_t &extent, const rollext_polydata &extradata, int threadid)
@@ -668,19 +576,21 @@ void rollext_renderer::render_texture_scan(int32_t scanline, const extent_t &ext
 			float v = voz * z;
 
 			// Floor keeps bilinear weights nonnegative at wrapped texture edges.
+			// Texel coordinates wrap, so they're unsigned.
 			float const intu = std::floor(u), intv = std::floor(v);
-			int tx = tex_origin_x + saturate_int32(intu);
-			int ty = tex_origin_y + saturate_int32(intv);
+			uint32_t const tx = tex_origin_x + saturate_int32(intu);
+			uint32_t const ty = tex_origin_y + saturate_int32(intv);
 
 			if (BILINEAR)
 			{
-				int fracu = saturate_int32((u - intu) * 256.0f);
-				int fracv = saturate_int32((v - intv) * 256.0f);
+				// u - floor(u) rounds up to 1.0 just below an integer.
+				uint8_t const fracu = std::min<int32_t>(saturate_int32((u - intu) * 256.0f), 255);
+				uint8_t const fracv = std::min<int32_t>(saturate_int32((v - intv) * 256.0f), 255);
 
 				// The texture mask is a one-bit visibility test, separate from
 				// colour interpolation (as in the related Gaelco 3D renderer).
 				// TODO: Verify this sampling rule on the graphics ASIC.
-				if (!m_texture_mask[((ty & 0x3fff) * 2048) + (tx & 0x7ff)])
+				if (!texel_masked(tx, ty))
 				{
 					uint32_t const tex00 = m_palette[palnum + m_texture_ram[(ty & 0x3fff) * 2048 + (tx & 0x7ff)]];
 					uint32_t const tex01 = m_palette[palnum + m_texture_ram[(ty & 0x3fff) * 2048 + ((tx + 1) & 0x7ff)]];
@@ -695,8 +605,7 @@ void rollext_renderer::render_texture_scan(int32_t scanline, const extent_t &ext
 			}
 			else
 			{
-				uint8_t mask = m_texture_mask[((ty & 0x3fff) * 2048) + (tx & 0x7ff)];
-				if (mask == 0)
+				if (!texel_masked(tx, ty))
 				{
 					uint8_t pen = m_texture_ram[((ty & 0x3fff) * 2048) + (tx & 0x7ff)];
 					uint32_t texel = m_palette[palnum + (pen)];
@@ -734,7 +643,7 @@ void rollext_renderer::process_packet(const uint32_t *packet)
 		m_clip &= rectangle(0, 511, 0, 383);
 		return;
 	}
-	unsigned const num_verts = primitive == 3 ? 4 : 3;
+	uint8_t const num_verts = primitive == 3 ? 4 : 3;
 	rectangle const visarea = m_clip;
 	if (visarea.empty())
 		return;
@@ -851,19 +760,15 @@ void rollext_renderer::texture_mask_write(int index, uint8_t data)
 {
 	wait();
 	int x = index & 0xff;
-	int y = index >> 8;
-
-	// expand to bytes for easier access
-	for (auto j = 0; j < 8; j++)
-	{
-		m_texture_mask[(y * 2048) + (x * 8) + j] = (data & (1 << j)) ? 0xff : 0x00;
-	}
+	m_texture_mask[index] = data;
 }
 
 void rollext_renderer::display(bitmap_rgb32 *bitmap, const rectangle &cliprect)
 {
+	// Each graphics task flips the buffers and draws into the new current one,
+	// so the other buffer holds the last complete frame.
 	wait();
-	copybitmap_trans(*bitmap, m_fb[m_fb_current], 0, 0, 0, 0, cliprect, 0);
+	copybitmap_trans(*bitmap, m_fb[m_fb_current ^ 1], 0, 0, 0, 0, cliprect, 0);
 }
 
 
@@ -944,14 +849,18 @@ private:
 
 	uint32_t a0000000_r(offs_t offset, uint32_t mem_mask = ~0);
 	void a0000000_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint16_t link_r(offs_t offset);
-	void link_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t link_status_r();
+	void link_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template <bool Dma> uint16_t link_data_r();
+	template <bool Dma> void link_data_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t link_ack_r();
 	uint16_t video_timing_r() { return m_video_timing; }
 	void video_timing_w(uint16_t data) { m_video_timing = data; }
 	void link_tx_start();
-	void audio_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0U);
-	void palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void texture_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void audio_w(offs_t offset, uint16_t data) { m_dac[offset]->write(data); }
+	void palette_w(offs_t offset, uint16_t data) { m_renderer->palette_write(offset, data); }
+	// Bytes are swapped within each halfword.
+	void texture_mask_w(offs_t offset, uint8_t data) { m_renderer->texture_mask_write(offset ^ 1, data); }
 	void graphics_transfer(offs_t address, uint32_t data, uint32_t mem_mask);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(audio_tick);
@@ -1089,57 +998,60 @@ void rollext_state::a0000000_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 // bits 15:14. Register/DMA behavior is inferred from the ROM routines at
 // 40041d30..400429a8. Serial word timing and the other control bits remain
 // unverified.
-uint16_t rollext_state::link_r(offs_t offset)
+uint16_t rollext_state::link_status_r()
 {
-	if (!offset)
-		return (m_link_tx_count == m_link_tx_words.size() ? 0 : 0x100) | (m_link_rx_ready ? 1 : 0);
-	if (offset == 2)
-	{
-		if (!machine().side_effects_disabled())
-		{
-			m_maincpu->set_input_line(tms320c82_mp_device::INPUT_X3, CLEAR_LINE);
-			m_link_rx_armed = true;
-		}
-		return 0;
-	}
-	if (offset == 1 || offset == 3)
-	{
-		uint16_t const data = m_link_rx_ready ? m_link_rx_word : 0xffff;
-		if (!machine().side_effects_disabled())
-		{
-			m_link_rx_ready = false;
-			if (m_link_rx_requested && offset == 1)
-			{
-				m_link_rx_armed = false;
-				m_maincpu->set_input_line(tms320c82_mp_device::INPUT_X3, ASSERT_LINE);
-			}
-			m_link_rx_requested = false;
-		}
-		return data;
-	}
-	return 0xffff;
+	return (m_link_tx_count == m_link_tx_words.size() ? 0 : 0x100) | (m_link_rx_ready ? 1 : 0);
 }
 
-void rollext_state::link_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void rollext_state::link_control_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (!offset)
+	COMBINE_DATA(&m_link_control);
+}
+
+// The CPU and XPT (DMA) data registers share the received word.
+template <bool Dma>
+uint16_t rollext_state::link_data_r()
+{
+	uint16_t const data = m_link_rx_ready ? m_link_rx_word : 0xffff;
+	if (!machine().side_effects_disabled())
 	{
-		COMBINE_DATA(&m_link_control);
-		return;
+		m_link_rx_ready = false;
+		if (m_link_rx_requested && !Dma)
+		{
+			m_link_rx_armed = false;
+			m_maincpu->set_input_line(tms320c82_mp_device::INPUT_X3, ASSERT_LINE);
+		}
+		m_link_rx_requested = false;
 	}
+	return data;
+}
+
+template <bool Dma>
+void rollext_state::link_data_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
 	if (mem_mask != 0xffff)
 	{
-		logerror("%s: Unhandled link write at %x data %04x mask %04x\n", machine().describe_context(), offset, data, mem_mask);
+		logerror("%s: Unhandled link write data %04x mask %04x\n", machine().describe_context(), data, mem_mask);
 		return;
 	}
-	if ((offset == 1 || offset == 3) && m_link_tx_count < m_link_tx_words.size())
+	if (m_link_tx_count < m_link_tx_words.size())
 	{
-		unsigned const tail = (m_link_tx_head + m_link_tx_count) % m_link_tx_words.size();
+		uint8_t const tail = (m_link_tx_head + m_link_tx_count) % m_link_tx_words.size();
 		m_link_tx_words[tail] = data;
-		m_link_tx_dma[tail] = offset == 3;
+		m_link_tx_dma[tail] = Dma;
 		++m_link_tx_count;
 		link_tx_start();
 	}
+}
+
+uint16_t rollext_state::link_ack_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_maincpu->set_input_line(tms320c82_mp_device::INPUT_X3, CLEAR_LINE);
+		m_link_rx_armed = true;
+	}
+	return 0;
 }
 
 void rollext_state::link_tx_start()
@@ -1259,41 +1171,6 @@ void rollext_state::graphics_transfer(offs_t address, uint32_t data, uint32_t me
 	}
 }
 
-void rollext_state::palette_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_16_31)
-	{
-		m_renderer->palette_write(offset * 2, data >> 16);
-	}
-	if (ACCESSING_BITS_0_15)
-	{
-		m_renderer->palette_write((offset * 2) + 1, data & 0xffff);
-	}
-}
-
-void rollext_state::texture_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		m_renderer->texture_mask_write((offset * 4) + 1, data >> 24);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		m_renderer->texture_mask_write((offset * 4) + 0, data >> 16);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		m_renderer->texture_mask_write((offset * 4) + 3, data >> 8);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		m_renderer->texture_mask_write((offset * 4) + 2, data & 0xff);
-	}
-}
-
-
-
-
 // Master Processor memory map
 void rollext_state::memmap(address_map &map)
 {
@@ -1303,7 +1180,10 @@ void rollext_state::memmap(address_map &map)
 	map(0x80010000, 0x80010001).rw(FUNC(rollext_state::video_timing_r), FUNC(rollext_state::video_timing_w));
 	map(0x90000000, 0x9007ffff).w(FUNC(rollext_state::texture_mask_w));
 	map(0xa0000000, 0xa00000ff).rw(FUNC(rollext_state::a0000000_r), FUNC(rollext_state::a0000000_w));
-	map(0xb0000000, 0xb0000007).rw(FUNC(rollext_state::link_r), FUNC(rollext_state::link_w));
+	map(0xb0000000, 0xb0000001).rw(FUNC(rollext_state::link_status_r), FUNC(rollext_state::link_control_w));
+	map(0xb0000002, 0xb0000003).rw(FUNC(rollext_state::link_data_r<false>), FUNC(rollext_state::link_data_w<false>));
+	map(0xb0000004, 0xb0000005).r(FUNC(rollext_state::link_ack_r));
+	map(0xb0000006, 0xb0000007).rw(FUNC(rollext_state::link_data_r<true>), FUNC(rollext_state::link_data_w<true>));
 	map(0xc0000000, 0xc03fffff).rom().region("rom1", 0);
 	map(0xff000000, 0xffffffff).rom().region("rom0", 0);
 }
@@ -1340,14 +1220,6 @@ static INPUT_PORTS_START(rollext)
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_NAME("Seat Tilt")
 INPUT_PORTS_END
 
-
-void rollext_state::audio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_16_31)
-		m_dac[offset * 2]->write(data >> 16);
-	if (ACCESSING_BITS_0_15)
-		m_dac[offset * 2 + 1]->write(data & 0xffff);
-}
 
 TIMER_CALLBACK_MEMBER(rollext_state::audio_tick)
 {
@@ -1414,25 +1286,37 @@ void rollext_state::rollext(machine_config &config)
 	EEPROM_93C66_16BIT(config, m_eeprom);
 
 	// IC12/IC11 TDA1543 outputs CANAL1..4 (sheet 6), which the ROM's output
-	// test calls left, right, bass and rear. The DAC's nominal 2.3 mA p-p
-	// current feeds 3.3k/4.7k I/V resistors. Sheet 1 adds a 2.2k/2.2k divider,
-	// loaded by the TDA1552's nominal 60k input, then its fixed 26 dB gain.
-	// Normalize the ideal bridge output to the 12 V supply. This is an output
-	// reference, not an acoustic calibration or a model of amplifier clipping.
-	constexpr double dac_peak_current = 2.3e-3 / 2;
-	constexpr double input_divider = 60'000.0 / (2 * 60'000.0 + 2'200.0);
-	double const output_scale = dac_peak_current * input_divider * std::pow(10.0, 26.0 / 20.0) / 12.0;
+	// test calls left, right, bass and rear. The 3.3k (left/right) and 4.7k
+	// I/V resistors set their relative levels.
 	SPEAKER(config, "speaker", 2).front();
 	SPEAKER(config, "subwoofer").lfe();
 	SPEAKER(config, "rear").rear_center();
 
-	rollext_filter_device &filter(ROLLEXT_FILTER(config, "output_filter"));
-	filter.add_route(0, "speaker", 3'300.0 * output_scale, 0);
-	filter.add_route(1, "speaker", 3'300.0 * output_scale, 1);
-	filter.add_route(2, "subwoofer", 4'700.0 * output_scale);
-	filter.add_route(3, "rear", 4'700.0 * output_scale);
-	for (unsigned i = 0; i < 4; i++)
-		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(ALL_OUTPUTS, filter, 1.0, i);
+	// Each I/V amplifier (Rf || 1 nF) is followed by a third-order low-pass
+	// filter: three 56k resistors, Ca and Cc to ground at the first and third
+	// nodes, and Cb from the second node to the unity-gain TL074 follower
+	// output. Its denominator,
+	//   1 + s R (Ca + 3 Cc) + s^2 2 R^2 Cc (Ca + Cb) + s^3 R^3 Ca Cb Cc,
+	// factors into a complex pair and a real pole:
+	//   left/right (330p, 680p, 100p): 8.25 kHz with Q 0.78, and 15.0 kHz
+	//   bass/rear (8.2n, 15n, 2.2n): 393 Hz with Q 0.75, and 549 Hz
+	// The I/V poles (48 and 34 kHz) are above the audio band.
+	struct output_filter { double fc, q, pole; };
+	constexpr output_filter FILTERS[2] = { { 8'252.7, 0.7813, 15'020.6 }, { 393.2, 0.7513, 548.8 } };
+	for (int i = 0; i < 4; i++)
+	{
+		output_filter const &f = FILTERS[i / 2];
+		filter_biquad_device &pair = FILTER_BIQUAD(config, util::string_format("lpf%d_pair", i).c_str())
+				.setup(filter_biquad_device::biquad_type::LOWPASS, f.fc, f.q, 1.0);
+		filter_biquad_device &pole = FILTER_BIQUAD(config, util::string_format("lpf%d_pole", i).c_str())
+				.setup(filter_biquad_device::biquad_type::LOWPASS1P, f.pole, 1.0, 1.0);
+		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(ALL_OUTPUTS, pair, 1.0);
+		pair.add_route(ALL_OUTPUTS, pole, 1.0);
+		if (i < 2)
+			pole.add_route(ALL_OUTPUTS, "speaker", 3'300.0 / 4'700.0, i);
+		else
+			pole.add_route(ALL_OUTPUTS, (i == 2) ? "subwoofer" : "rear", 1.0);
+	}
 
 	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);

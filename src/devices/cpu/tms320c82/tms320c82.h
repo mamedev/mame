@@ -6,7 +6,6 @@
 #pragma once
 
 #include <array>
-#include <utility>
 
 class tms320c82_pp_device;
 
@@ -72,8 +71,6 @@ public:
 
 	// construction/destruction
 	tms320c82_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	template <typename... T> void set_command_callback(T &&... args) { m_cmd_callback.set(std::forward<T>(args)...); }
 
 	// Peripheral transfers: a read cycle hands memory data to the device instead
 	// of writing it, a write cycle stores data supplied by the device. The
@@ -147,8 +144,6 @@ protected:
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_program;
 
-	write32mo_delegate m_cmd_callback;
-
 	uint32_t m_pp_status;
 
 	void check_interrupts();
@@ -194,32 +189,34 @@ private:
 	emu_timer *m_tc_request_timer[3];
 
 	static bool tc_guided(tc_channel const &t);
-	static uint64_t tc_length(tc_channel const &t, unsigned side);
-	static uint32_t tc_address(tc_channel const &t, unsigned side, uint64_t position);
-	static uint64_t tc_completed_patches(tc_channel const &t, unsigned side);
+	static uint64_t tc_length(tc_channel const &t, uint8_t side);
+	static uint32_t tc_address(tc_channel const &t, uint8_t side, uint64_t position);
+	static uint64_t tc_completed_patches(tc_channel const &t, uint8_t side);
 
 	void tc_start() ATTR_COLD;
 	void tc_reset() ATTR_COLD;
 	uint32_t tc_reg_r(offs_t offset);
 	void tc_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0U);
 	TIMER_CALLBACK_MEMBER(tc_tick);
+	bool tc_streaming() const;
+	uint32_t tc_beat();
 	TIMER_CALLBACK_MEMBER(tc_request_tick);
 	void tc_kick();
-	unsigned tc_priority(unsigned channel) const;
+	uint8_t tc_priority(uint8_t channel) const;
 	int tc_select() const;
-	void tc_signal(unsigned channel, unsigned kind);
-	void tc_suspend(unsigned channel, bool software, unsigned fault = 0);
-	void tc_error(unsigned channel, bool save);
-	bool tc_load(unsigned channel);
-	unsigned tc_step(unsigned channel);
-	void tc_finish(unsigned channel);
+	void tc_signal(uint8_t channel, uint8_t kind);
+	void tc_suspend(uint8_t channel, bool software, uint8_t fault = 0);
+	void tc_error(uint8_t channel, bool save);
+	bool tc_load(uint8_t channel);
+	uint32_t tc_step(uint8_t channel);
+	void tc_finish(uint8_t channel);
 	void tc_transparency_flush(tc_channel &t);
-	int tc_prepare(unsigned channel, unsigned side);
+	int tc_prepare(uint8_t channel, uint8_t side);
 
-	void packet_control(unsigned processor, uint32_t data);
-	void packet_reset(unsigned processor);
-	uint32_t packet_status(unsigned processor) const;
-	void pp_command(unsigned processor, uint32_t command);
+	void packet_control(uint8_t processor, uint32_t data);
+	void packet_reset(uint8_t processor);
+	uint32_t packet_status(uint8_t processor) const;
+	void pp_command(uint8_t processor, uint32_t command);
 	TIMER_CALLBACK_MEMBER(processor_command_sync);
 	TIMER_CALLBACK_MEMBER(pp_command_sync);
 };
@@ -259,6 +256,9 @@ protected:
 
 private:
 	friend class tms320c82_mp_device;
+
+	// Canonical no-operation, also the reset contents of the pipeline
+	static constexpr uint64_t NOP = 0x8800000000104100ULL;
 
 	struct transfer
 	{
@@ -314,17 +314,24 @@ private:
 
 	int m_icount;
 
+	// Data accesses go through the PP's own space, which forwards them to the
+	// crossbar (the MP's space, m_bus). Instructions are fetched from it directly.
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_program;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_bus;
 
 	void pp_internal_map(address_map &map) ATTR_COLD;
 	void command(uint32_t data);
 	void signal_interrupt(uint32_t flags) { m_regs[0x3d] |= flags; }
-	decoded decode(uint64_t op) const;
+	static decoded decode(uint64_t op);
 	const decoded &decode_cached(uint32_t pc, uint64_t op);
 	uint32_t reg_r(uint8_t reg) const;
 	void reg_w(uint8_t reg, uint32_t data);
 	bool condition(uint8_t cond) const;
+	uint64_t fetch(uint32_t address);
+	bool load(transfer const &t, uint32_t address, uint32_t &value);
+	bool store(transfer const &t, uint32_t address, uint32_t value);
+	bool local_diverted(decoded const &d) const;
 	void start_task();
 	bool complete_halt_transfers();
 	bool execute_one(uint64_t op, const decoded &d);

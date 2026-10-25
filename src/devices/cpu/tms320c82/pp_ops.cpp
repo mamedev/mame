@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Eduardo Cruz
 // TMS320C82 PP interpreter. Encoding and pipeline: TI SPRU110, chapters 6-11
-// and appendix A; C82 reset stack layout: SPRU154 section 1.12.
+// and appendix A; C82 reset stack layout: SPRU154 section 1.5.2, figure 1-5.
 #include "emu.h"
 #include "tms320c82.h"
 
@@ -11,14 +11,13 @@
 
 namespace
 {
-constexpr uint64_t NOP = 0x8800000000104100ULL;
-uint32_t rotate(uint32_t v, unsigned n)
+uint32_t rotate(uint32_t v, uint32_t n)
 {
 	return std::rotl(v, int(n & 31));
 }
-uint32_t mask(unsigned n)
+uint32_t mask(uint32_t n)
 {
-	return n & 31 ? (1U << (n & 31)) - 1 : 0;
+	return util::make_bitmask<uint32_t>(n & 31);
 }
 uint32_t boolean(uint8_t f, uint32_t a, uint32_t b, uint32_t c)
 {
@@ -53,7 +52,7 @@ uint32_t boolean(uint8_t f, uint32_t a, uint32_t b, uint32_t c)
 		return a | c;
 	}
 	uint32_t v = 0;
-	for (unsigned i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		if (BIT(f, i))
 			v |= (BIT(i, 0) ? a : ~a) & (BIT(i, 1) ? b : ~b) & (BIT(i, 2) ? c : ~c);
@@ -62,7 +61,7 @@ uint32_t boolean(uint8_t f, uint32_t a, uint32_t b, uint32_t c)
 }
 
 // Split ALU and expander lane width for a size code: 4 = 8 bits, 5 = 16 bits.
-unsigned lane_width(uint8_t size)
+uint8_t lane_width(uint8_t size)
 {
 	return (size == 4) ? 8 : (size == 5) ? 16 : 32;
 }
@@ -83,22 +82,22 @@ struct alu_result
 
 alu_result extended_alu(
 		uint32_t control, bool inverse, c_input mode,
-		uint32_t source, unsigned rotation, uint32_t a, uint32_t c,
+		uint32_t source, uint32_t rotation, uint32_t a, uint32_t c,
 		uint32_t sr, uint32_t mf)
 {
 	uint8_t const modifier = control >> 28;
 	bool const arithmetic = BIT(control, 27), multiple = modifier >= 8;
 	bool const detection = !multiple && BIT(modifier, 1) && mode != c_input::MASK;
-	unsigned const width = detection ? 8 : multiple ? lane_width(sr & 7) : 32;
-	unsigned const parts = 32 / width;
-	unsigned const expand_width = lane_width((sr >> 3) & 7);
-	unsigned const expand_parts = 32 / expand_width;
+	uint8_t const width = detection ? 8 : multiple ? lane_width(sr & 7) : 32;
+	uint8_t const parts = 32 / width;
+	uint8_t const expand_width = lane_width((sr >> 3) & 7);
+	uint8_t const expand_parts = 32 / expand_width;
 	bool const expanded = !detection && (mode == c_input::EXPAND || (mode == c_input::MASK && BIT(control, 13) && !(modifier < 8 && BIT(modifier, 1))));
 	uint32_t const b = rotate(source, rotation);
 	uint8_t function = ((control >> 19) & 255) ^ (inverse ? 255 : 0);
 	bool const cin_modifier = !multiple && !detection && BIT(modifier, 0);
 	bool const explicit_carry = arithmetic && BIT(control, 14) && !cin_modifier;
-	bool carry_start = BIT(control, 18) ^ inverse;
+	bool carry_start = bool(BIT(control, 18)) != inverse;
 	if (!explicit_carry && BIT(control, 16) && BIT(source, 31))
 	{
 		function ^= 15;
@@ -126,23 +125,23 @@ alu_result extended_alu(
 		if (expanded)
 		{
 			c = 0;
-			for (unsigned j = 0; j < expand_parts; j++)
+			for (int j = 0; j < expand_parts; j++)
 			{
 				if (BIT(mf, j + (BIT(sr, 6) ? 32 - expand_parts : 0)))
-					c |= (0xffffffffU >> (32 - expand_width)) << (j * expand_width);
+					c |= util::make_bitmask<uint32_t>(expand_width) << (j * expand_width);
 			}
 		}
 		else if (mode == c_input::MASK)
 		{
-			unsigned const mask_width = (multiple && !BIT(control, 15)) ? width : 32;
-			unsigned const n = c & (mask_width - 1);
+			uint8_t const mask_width = (multiple && !BIT(control, 15)) ? width : 32;
+			uint8_t const n = c & (mask_width - 1);
 			uint32_t lane = 0;
 			if (n)
-				lane = (1U << n) - 1;
+				lane = util::make_bitmask<uint32_t>(n);
 			else if (modifier < 8 && BIT(modifier, 1))
-				lane = 0xffffffffU >> (32 - mask_width);
+				lane = util::make_bitmask<uint32_t>(mask_width);
 			c = 0;
-			for (unsigned j = 0; j < 32; j += mask_width)
+			for (int j = 0; j < 32; j += mask_width)
 				c |= lane << j;
 		}
 	}
@@ -151,17 +150,17 @@ alu_result extended_alu(
 	alu_result out;
 	bool carry = false, last_cin = false, all_carry = true, any_carry = false, any_zero = false;
 	uint32_t mf_bits = 0;
-	for (unsigned part = 0; part < parts; part++)
+	for (int part = 0; part < parts; part++)
 	{
-		unsigned const first = part * width;
-		carry = explicit_carry ? BIT(c, first) ^ BIT(function, 0) : carry_start;
-		for (unsigned bit = first; bit < first + width; bit++)
+		int const first = part * width;
+		carry = explicit_carry ? BIT(c, first) != BIT(function, 0) : carry_start;
+		for (int bit = first; bit < first + width; bit++)
 		{
 			last_cin = carry;
-			out.value |= uint32_t(BIT(propagate, bit) ^ carry) << bit;
+			out.value |= (BIT(propagate, bit) ^ uint32_t(carry)) << bit;
 			carry = BIT(generate, bit) || (BIT(propagate, bit) && carry);
 		}
-		bool const zero = ((out.value >> first) & (0xffffffffU >> (32 - width))) == 0;
+		bool const zero = !BIT(out.value, first, width);
 		any_zero |= zero;
 		any_carry |= carry;
 		all_carry &= carry;
@@ -201,13 +200,13 @@ alu_result extended_alu(
 	else if (expanded && BIT(sr, 6))
 		out.mf = rotate(mf, expand_parts);
 	if (multiple && modifier != 14)
-		out.mf = (out.mf & ~((1U << parts) - 1)) | mf_bits;
+		out.mf = (out.mf & ~util::make_bitmask<uint32_t>(parts)) | mf_bits;
 	return out;
 }
 
 } // anonymous namespace
 
-tms320c82_pp_device::decoded tms320c82_pp_device::decode(uint64_t op) const
+tms320c82_pp_device::decoded tms320c82_pp_device::decode(uint64_t op)
 {
 	decoded d;
 	if (BIT(op, 63) && ((op >> 43) & 3) == 3)
@@ -442,9 +441,69 @@ bool tms320c82_pp_device::condition(uint8_t cond) const
 	return false;
 }
 
+inline uint64_t tms320c82_pp_device::fetch(uint32_t address)
+{
+	address &= ~7U;
+	return (uint64_t(m_cache.read_dword(address)) << 32) | m_cache.read_dword(address + 4);
+}
+
+// Port loads and stores of a byte, halfword or word; doubleword transfers
+// aren't supported.
+inline bool tms320c82_pp_device::load(transfer const &t, uint32_t address, uint32_t &value)
+{
+	switch (t.size)
+	{
+	case 0:
+		value = m_program.read_byte(address);
+		if (t.le == 3)
+			value = util::sext(value, 8);
+		return true;
+	case 1:
+		value = m_program.read_word(address & ~1U);
+		if (t.le == 3)
+			value = util::sext(value, 16);
+		return true;
+	case 2:
+		value = m_program.read_dword(address & ~3U);
+		return true;
+	}
+	return false;
+}
+
+inline bool tms320c82_pp_device::store(transfer const &t, uint32_t address, uint32_t value)
+{
+	switch (t.size)
+	{
+	case 0:
+		m_program.write_byte(address, value);
+		return true;
+	case 1:
+		m_program.write_word(address & ~1U, value);
+		return true;
+	case 2:
+		m_program.write_dword(address & ~3U, value);
+		return true;
+	}
+	return false;
+}
+
+// A local memory access must use the global port if it is not to this PP's
+// RAM. With a parallel global operation it therefore takes a second cycle,
+// after the global access (SPRU110 5.2, 6.3.2). Accesses to the same local
+// RAM bank also contend.
+inline bool tms320c82_pp_device::local_diverted(decoded const &d) const
+{
+	auto const &local = d.tr[0], &global = d.tr[1];
+	uint32_t const local_bank = m_ea[0] & ~0xfffU;
+	uint32_t const pp_base = m_pp_number << 12;
+	bool const local_ram = local_bank == pp_base || local_bank == (0x8000 | pp_base) || local_bank == (0x01000000 | pp_base);
+	bool const same_bank = global.mode && global.le != 1 && local_bank == (m_ea[1] & ~0xfffU);
+	return local.mode && local.le != 1 && (global.mode || d.move_src >= 0) && (!local_ram || same_bank);
+}
+
 bool tms320c82_pp_device::unsupported(uint64_t op, const char *reason)
 {
-	logerror("PP%u unimplemented %s at %08x: %016x\n", m_pp_number, reason, m_pc, op);
+	logerror("unimplemented %s at %08x: %016x\n", reason, m_pipe_pc[0] & ~7U, op);
 	// TODO: implement the remaining instructions and exception behavior.
 	m_halted = true;
 	m_icount = 0;
@@ -458,7 +517,7 @@ bool tms320c82_pp_device::execute_one(uint64_t op, const decoded &d)
 	m_protect = d.protect;
 	// Capture both transfer operands before either unit writes a register.
 	uint32_t transferred[2]{};
-	for (unsigned i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		auto const &t = d.tr[i];
 		if (!t.mode)
@@ -475,13 +534,7 @@ bool tms320c82_pp_device::execute_one(uint64_t op, const decoded &d)
 			transferred[i] = reg_r(src);
 		else if (t.le == 1)
 			transferred[i] = m_ea[i];
-		else if (t.size == 0)
-			transferred[i] = t.le == 3 ? int32_t(int8_t(m_program.read_byte(m_ea[i]))) : m_program.read_byte(m_ea[i]);
-		else if (t.size == 1)
-			transferred[i] = t.le == 3 ? int32_t(int16_t(m_program.read_word(m_ea[i] & ~1))) : m_program.read_word(m_ea[i] & ~1);
-		else if (t.size == 2)
-			transferred[i] = m_program.read_dword(m_ea[i] & ~3);
-		else
+		else if (!load(t, m_ea[i], transferred[i]))
 			return unsupported(op, "transfer size");
 	}
 	uint32_t moved = d.move_src >= 0 ? ((m_halt_transfer_ready || m_transfer_pending) ? m_transfer_value[1] : reg_r(d.move_src)) : 0;
@@ -489,7 +542,7 @@ bool tms320c82_pp_device::execute_one(uint64_t op, const decoded &d)
 	{
 		if (d.field_size > 1)
 			return unsupported(op, "field size");
-		unsigned const bits = 8U << d.field_size;
+		uint8_t const bits = 8 << d.field_size;
 		if (d.replicate)
 		{
 			moved = (bits == 8) ? (moved & 0xff) * 0x01010101U : (moved & 0xffff) * 0x00010001U;
@@ -497,7 +550,7 @@ bool tms320c82_pp_device::execute_one(uint64_t op, const decoded &d)
 		else
 		{
 			moved >>= (d.field_item * bits) & 31;
-			moved = d.field_signed ? util::sext(moved, bits) : moved & ((1U << bits) - 1);
+			moved = d.field_signed ? util::sext(moved, bits) : moved & util::make_bitmask<uint32_t>(bits);
 		}
 	}
 	if (!d.conditional_dst || test)
@@ -540,7 +593,7 @@ bool tms320c82_pp_device::execute_one(uint64_t op, const decoded &d)
 				overflow = BIT(~(a ^ product) & (a ^ result), 31);
 				flags = (uint32_t(quotient) << 31) | (uint32_t(carry) << 30)
 						| (uint32_t(overflow) << 29) | (uint32_t(!result) << 28);
-				m_regs[0x2a] = (m_regs[0x2a] << 1) | quotient;
+				m_regs[0x2a] = (m_regs[0x2a] << 1) | uint32_t(quotient);
 				custom_flags = true;
 				if (dst == mul_dst)
 					mul_dst = -1;
@@ -557,7 +610,7 @@ bool tms320c82_pp_device::execute_one(uint64_t op, const decoded &d)
 							return unsupported(op, "reserved rounded split multiply");
 						uint32_t const lo = uint8_t(s3) * (unsign ? int32_t(uint8_t(s4)) : int32_t(int8_t(s4)));
 						uint32_t const hi = uint8_t(s3 >> 8) * (unsign ? int32_t(uint8_t(s4 >> 8)) : int32_t(int8_t(s4 >> 8)));
-						unsigned const shift = (control >> 8) & 3;
+						uint8_t const shift = BIT(control, 8, 2);
 						product = ((lo << shift) & 0xffff) | (hi << (16 + shift));
 					}
 					else
@@ -597,12 +650,12 @@ bool tms320c82_pp_device::execute_one(uint64_t op, const decoded &d)
 				b = source;
 				if (type >= 12)
 				{
-					unsigned const shift = -control & 31;
+					uint8_t const shift = -control & 31;
 					b = unsign ? source >> shift : uint32_t(int32_t(source) >> shift);
 				}
 				bool const sub = BIT(type, 0);
 				c = sub ? ~b : b;
-				sum = uint64_t(a) + c + sub;
+				sum = uint64_t(a) + c + (sub ? 1 : 0);
 				result = sum;
 				carry = BIT(sum, 32);
 				overflow = BIT((~(a ^ c) & (a ^ result)), 31);
@@ -613,25 +666,19 @@ bool tms320c82_pp_device::execute_one(uint64_t op, const decoded &d)
 		else if (BIT(op, 63))
 		{
 			uint8_t const format = (op >> 43) & 3, cl = (op >> 60) & 7, alu = (op >> 51) & 255;
-			uint32_t src2;
-			if (format == 3)
-				src2 = uint32_t(op);
-			else if (format == 2)
-				src2 = reg_r(0x20 | ((op >> 39) & 7));
-			else
-				src2 = (op >> 39) & 31;
+			uint32_t const src2 = (format == 3) ? uint32_t(op) : (format == 2) ? reg_r(0x20 | BIT(op, 39, 3)) : uint32_t(BIT(op, 39, 5));
 			uint32_t const d0 = reg_r(0x20), companion = reg_r(0x20 | ((op >> 48) & 7));
-			unsigned const shift = ((cl == 1 || cl == 4 || cl == 5) ? d0 : src2) & 31;
+			uint8_t const shift = ((cl == 1 || cl == 4 || cl == 5) ? d0 : src2) & 31;
 			bool const masked = cl == 2 || cl == 3 || cl == 4;
 			uint32_t expanded = 0;
-			unsigned const width = lane_width((old_sr >> 3) & 7);
-			unsigned const count = 32 / width;
+			uint8_t const width = lane_width((old_sr >> 3) & 7);
+			uint8_t const count = 32 / width;
 			if (cl == 0 || cl == 5)
 			{
-				for (unsigned j = 0; j < count; j++)
+				for (int j = 0; j < count; j++)
 				{
 					if (BIT(m_regs[0x2a], j + (BIT(old_sr, 6) ? 32 - count : 0)))
-						expanded |= (0xffffffffU >> (32 - width)) << (j * width);
+						expanded |= util::make_bitmask<uint32_t>(width) << (j * width);
 				}
 			}
 			switch (cl)
@@ -684,8 +731,8 @@ bool tms320c82_pp_device::execute_one(uint64_t op, const decoded &d)
 			}
 			else
 			{
-				uint8_t const modifier = ((alu >> 1) & 1) | ((alu >> 2) & 2) | ((alu >> 3) & 4) | ((alu >> 4) & 8);
-				uint8_t const function = (alu & 1) | ((alu >> 1) & 2) | ((alu >> 2) & 4) | ((alu >> 3) & 8);
+				uint8_t const modifier = bitswap<4>(alu, 7, 5, 3, 1);
+				uint8_t const function = bitswap<4>(alu, 6, 4, 2, 0);
 				if ((modifier & 8) || ((modifier & 2) && !masked))
 				{
 					if (modifier == 15 || (modifier >= 8 && ((old_sr & 7) < 4 || (old_sr & 7) > 6)))
@@ -704,7 +751,7 @@ bool tms320c82_pp_device::execute_one(uint64_t op, const decoded &d)
 						}
 						else
 						{
-							ci = BIT(source, 31) ^ (function == 9);
+							ci = bool(BIT(source, 31)) != (function == 9);
 							fc = ci ? 0x99 : 0x66;
 						}
 					}
@@ -787,7 +834,7 @@ bool tms320c82_pp_device::execute_one(uint64_t op, const decoded &d)
 						return unsupported(op, "arithmetic function");
 					}
 					uint32_t const term = sub ? ~rhs : rhs;
-					sum = uint64_t(a) + term + ((modifier & 1) ? BIT(old_sr, 30) : sub);
+					sum = uint64_t(a) + term + ((modifier & 1) ? BIT(old_sr, 30) : (sub ? 1 : 0));
 					result = sum;
 					carry = BIT(sum, 32);
 					overflow = BIT(~(a ^ term) & (a ^ result), 31);
@@ -809,7 +856,7 @@ bool tms320c82_pp_device::execute_one(uint64_t op, const decoded &d)
 		if (mul_dst >= 0)
 			reg_w(mul_dst, product);
 	}
-	for (unsigned i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		auto const &t = d.tr[i];
 		if (!t.mode)
@@ -818,14 +865,8 @@ bool tms320c82_pp_device::execute_one(uint64_t op, const decoded &d)
 		{
 			if (m_halt_transfer_ready || (m_transfer_pending && i == 1))
 				continue; // memory write already completed
-			if (!t.size)
-				m_program.write_byte(m_ea[i], transferred[i]);
-			else if (t.size == 1)
-				m_program.write_word(m_ea[i] & ~1, transferred[i]);
-			else if (t.size == 2)
-				m_program.write_dword(m_ea[i] & ~3, transferred[i]);
-			else
-				return unsupported(op, "store size");
+			if (!store(t, m_ea[i], transferred[i]))
+				return unsupported(op, "transfer size");
 		}
 		else if (!t.conditional || test)
 		{
@@ -857,7 +898,7 @@ bool tms320c82_pp_device::execute_one(uint64_t op, const decoded &d)
 void tms320c82_pp_device::start_task()
 {
 	uint32_t const base = 0x01000000 + (m_pp_number << 12);
-	m_program.write_dword(base + 0xffc, m_regs[6] << 1);
+	m_program.write_dword(base + 0xffc, m_regs[6]);
 	m_program.write_dword(base + 0xff8, m_pipe_pc[1]);
 	m_program.write_dword(base + 0xff4, m_pipe_pc[0]);
 	m_regs[6] = base + 0xff0;
@@ -867,7 +908,7 @@ void tms320c82_pp_device::start_task()
 	m_pipe_pc[0] = m_pipe_pc[1] = 0;
 	m_pipe_pc[2] = target;
 	m_pipe_op[0] = m_pipe_op[1] = NOP;
-	m_pipe_op[2] = (uint64_t(m_cache.read_dword(target & ~7)) << 32) | m_cache.read_dword((target & ~7) + 4);
+	m_pipe_op[2] = fetch(target);
 	m_fetchpc = target + 8;
 	m_ea[0] = m_ea[1] = 0;
 	m_irq_next = 0;
@@ -886,7 +927,7 @@ bool tms320c82_pp_device::complete_halt_transfers()
 	auto const &d = decode_cached(m_pipe_pc[0], m_pipe_op[0]);
 	bool const test = condition(d.condition);
 	// Capture register operands before either port has memory side effects.
-	for (unsigned i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		auto const &t = d.tr[i];
 		if (!t.mode || (m_transfer_pending && (i == 1 || !t.le)))
@@ -900,45 +941,26 @@ bool tms320c82_pp_device::complete_halt_transfers()
 	if (d.move_src >= 0 && !m_transfer_pending)
 		m_transfer_value[1] = reg_r(d.move_src);
 
-	auto memory = [this, &d] (unsigned i, bool read, bool write)
+	auto memory = [this, &d] (int i, bool read, bool write)
 	{
 		auto const &t = d.tr[i];
 		if (!t.mode || (m_transfer_pending && i == 1))
 			return true;
-		uint32_t &value = m_transfer_value[i];
 		if (read && t.le >= 2)
 		{
-			if (t.size == 0)
-				value = t.le == 3 ? int32_t(int8_t(m_program.read_byte(m_ea[i]))) : m_program.read_byte(m_ea[i]);
-			else if (t.size == 1)
-				value = t.le == 3 ? int32_t(int16_t(m_program.read_word(m_ea[i] & ~1U))) : m_program.read_word(m_ea[i] & ~1U);
-			else if (t.size == 2)
-				value = m_program.read_dword(m_ea[i] & ~3U);
-			else
-				return unsupported(m_pipe_op[0], "halt transfer size");
+			if (!load(t, m_ea[i], m_transfer_value[i]))
+				return unsupported(m_pipe_op[0], "transfer size");
 		}
 		else if (write && !t.le)
 		{
-			if (t.size == 0)
-				m_program.write_byte(m_ea[i], value);
-			else if (t.size == 1)
-				m_program.write_word(m_ea[i] & ~1U, value);
-			else if (t.size == 2)
-				m_program.write_dword(m_ea[i] & ~3U, value);
-			else
-				return unsupported(m_pipe_op[0], "halt store size");
+			if (!store(t, m_ea[i], m_transfer_value[i]))
+				return unsupported(m_pipe_op[0], "transfer size");
 		}
 		return true;
 	};
-	auto const &local = d.tr[0], &global = d.tr[1];
-	uint32_t const local_bank = m_ea[0] & ~0xfffU;
-	uint32_t const pp_base = m_pp_number << 12;
-	bool const local_ram = local_bank == pp_base || local_bank == (0x8000 | pp_base) || local_bank == (0x01000000 | pp_base);
-	bool const same_bank = global.mode && global.le != 1 && local_bank == (m_ea[1] & ~0xfffU);
-	bool const serialized = local.mode && local.le != 1 && (global.mode || d.move_src >= 0) && (!local_ram || same_bank);
-	if (serialized)
+	if (local_diverted(d))
 	{
-		// A diverted local access follows the global access (SPRU110 5.2).
+		// The diverted local access follows the global access.
 		if (!memory(1, true, true) || !memory(0, true, true))
 			return false;
 	}
@@ -954,7 +976,7 @@ bool tms320c82_pp_device::complete_halt_transfers()
 
 void tms320c82_pp_device::command(uint32_t data)
 {
-	if (!(data & (1U << m_pp_number)))
+	if (!BIT(data, m_pp_number))
 		return;
 	if (BIT(data, 31))
 	{
@@ -992,7 +1014,7 @@ void tms320c82_pp_device::execute_run()
 	uint32_t poll_regs[128], poll_pc[3], poll_ea[2], poll_fetch = 0, poll_protect = 0;
 	uint64_t poll_op[3], poll_start = 0;
 	bool candidate = false;
-	// Short slices (between TC beats) aren't worth analysing.
+	// Very short timeslices aren't worth analysing.
 	bool const allow_poll = m_icount > 8;
 	m_poll_safe = false;
 	while (m_icount > 0)
@@ -1003,6 +1025,10 @@ void tms320c82_pp_device::execute_run()
 			return;
 		}
 		m_pc = m_pipe_pc[0] & ~7U;
+		// An instruction with a diverted local access takes two cycles; stop
+		// before the first.
+		if (!m_pipe_irq[0] && !m_transfer_pending)
+			debugger_instruction_hook(m_pc);
 		if (allow_poll && !(machine().debug_flags & DEBUG_FLAG_ENABLED))
 		{
 			if (m_irq_next || m_pipe_irq[0] || m_pipe_irq[1] || m_pipe_irq[2])
@@ -1032,8 +1058,8 @@ void tms320c82_pp_device::execute_run()
 					&& std::equal(std::begin(m_pipe_op), std::end(m_pipe_op), poll_op)
 					&& std::equal(std::begin(m_ea), std::end(m_ea), poll_ea))
 			{
-				unsigned const period = m_executed - poll_start;
-				unsigned const skipped = (m_icount / period) * period;
+				uint32_t const period = m_executed - poll_start;
+				uint32_t const skipped = (m_icount / period) * period;
 				m_executed += skipped;
 				m_icount -= skipped;
 				if (!m_icount)
@@ -1041,67 +1067,36 @@ void tms320c82_pp_device::execute_run()
 				candidate = false;
 			}
 		}
-		// A local memory access must use the global port if it is not to this
-		// PP's RAM. With a parallel global operation it therefore takes a second
-		// cycle (SPRU110 6.3.2). Accesses to the same local RAM bank also contend.
+		// The first cycle of a diverted local access does the global access.
 		// Freeze all pipeline stages; latch global data/store sources only once.
 		if (!m_pipe_irq[0] && m_pipe_op[0] != NOP && !m_transfer_pending && !m_halt_transfer_ready)
 		{
 			auto const &current = decode_cached(m_pipe_pc[0], m_pipe_op[0]);
-			auto const &local = current.tr[0], &global = current.tr[1];
-			uint32_t const local_bank = m_ea[0] & ~0xfffU;
-			uint32_t const pp_base = m_pp_number << 12;
-			bool const local_ram = local_bank == pp_base || local_bank == (0x8000 | pp_base) || local_bank == (0x01000000 | pp_base);
-			bool const same_bank = global.mode && global.le != 1 && local_bank == (m_ea[1] & ~0xfffU);
-			if (local.mode && local.le != 1 && (global.mode || current.move_src >= 0) && (!local_ram || same_bank))
+			if (local_diverted(current))
 			{
+				auto const &local = current.tr[0], &global = current.tr[1];
 				bool const test = condition(current.condition);
 				m_transfer_value[0] = reg_r(local.reg);
-				uint8_t const src = (!global.le && global.conditional && !test) ? (global.reg & ~1) : global.reg;
-				uint32_t const address = m_ea[1];
 				uint32_t &value = m_transfer_value[1];
+				bool supported = true;
 				if (current.move_src >= 0)
 				{
 					value = reg_r(current.move_src);
 				}
 				else if (global.le == 1)
 				{
-					value = address;
+					value = m_ea[1];
 				}
 				else if (!global.le)
 				{
-					value = reg_r(src);
-					if (!global.size)
-					{
-						m_program.write_byte(address, value);
-					}
-					else if (global.size == 1)
-					{
-						m_program.write_word(address & ~1U, value);
-					}
-					else if (global.size == 2)
-					{
-						m_program.write_dword(address & ~3U, value);
-					}
-					else
-					{
-						unsupported(m_pipe_op[0], "store size");
-						return;
-					}
-				}
-				else if (!global.size)
-				{
-					value = (global.le == 3) ? int32_t(int8_t(m_program.read_byte(address))) : m_program.read_byte(address);
-				}
-				else if (global.size == 1)
-				{
-					value = (global.le == 3) ? int32_t(int16_t(m_program.read_word(address & ~1U))) : m_program.read_word(address & ~1U);
-				}
-				else if (global.size == 2)
-				{
-					value = m_program.read_dword(address & ~3U);
+					value = reg_r((global.conditional && !test) ? (global.reg & ~1) : global.reg);
+					supported = store(global, m_ea[1], value);
 				}
 				else
+				{
+					supported = load(global, m_ea[1], value);
+				}
+				if (!supported)
 				{
 					unsupported(m_pipe_op[0], "transfer size");
 					return;
@@ -1113,8 +1108,6 @@ void tms320c82_pp_device::execute_run()
 				continue;
 			}
 		}
-		if (!m_pipe_irq[0])
-			debugger_instruction_hook(m_pc);
 		// EINT/DINT take effect in the fetch stage, before the following
 		// instruction is fetched. A return load in E has priority over this.
 		uint64_t const fetched_op = m_pipe_op[2];
@@ -1134,7 +1127,7 @@ void tms320c82_pp_device::execute_run()
 		if (m_pipe_op[1] != NOP)
 		{
 			decoded const &ahead = decode_cached(m_pipe_pc[1], m_pipe_op[1]);
-			for (unsigned i = 0; i < 2; i++)
+			for (int i = 0; i < 2; i++)
 			{
 				auto const &t = ahead.tr[i];
 				if (!t.mode)
@@ -1157,7 +1150,7 @@ void tms320c82_pp_device::execute_run()
 			// The five interrupt pseudoinstructions drain the old pipeline,
 			// stack its three continuation addresses and SR, and branch in
 			// PS3. The ISR follows PS5 (SPRU110 9.5).
-			unsigned const ps = m_pipe_irq[0];
+			uint8_t const ps = m_pipe_irq[0];
 			if (ps == 1)
 				m_irq_sr = m_regs[0x29];
 			if (ps <= 4)
@@ -1188,7 +1181,7 @@ void tms320c82_pp_device::execute_run()
 		}
 		m_transfer_pending = false;
 		m_halt_transfer_ready = false;
-		for (unsigned i = 0; i < 2; i++)
+		for (int i = 0; i < 2; i++)
 		{
 			if (ar[i] >= 0)
 				reg_w(ar[i], update[i]);
@@ -1207,9 +1200,9 @@ void tms320c82_pp_device::execute_run()
 		m_pipe_op[1] = m_pipe_op[2];
 		m_pipe_irq[0] = m_pipe_irq[1];
 		m_pipe_irq[1] = m_pipe_irq[2];
-		unsigned const ps = m_irq_next && m_irq_next <= 5 ? m_irq_next++ : 0;
+		uint8_t const ps = m_irq_next && m_irq_next <= 5 ? m_irq_next++ : 0;
 		m_pipe_irq[2] = ps;
-		m_pipe_op[2] = ps ? NOP : (uint64_t(m_cache.read_dword(m_fetchpc & ~7U)) << 32) | m_cache.read_dword((m_fetchpc & ~7U) + 4);
+		m_pipe_op[2] = ps ? NOP : fetch(m_fetchpc);
 		uint32_t const fetched = m_fetchpc;
 		if (m_poll_safe && (!m_cache.read_ptr(fetched & ~7U) || !m_cache.read_ptr((fetched & ~7U) + 4)))
 			m_poll_safe = false;
@@ -1221,23 +1214,23 @@ void tms320c82_pp_device::execute_run()
 		// decision must be deferred until then. IPE/IPA replay with L=1.
 		if (ps < 3 && !BIT(fetched, 0))
 		{
-			for (unsigned n = 0; n < 3; n++)
+			// Coincident loop ends have priority from le2 down to le0. Matching
+			// loops with a zero count are reloaded until one with a nonzero
+			// count (or no counter) branches (SPRU110 5.3.2, 11.4.1).
+			for (int n = 2; n >= 0; n--)
 			{
-				if (BIT(m_regs[0x3f], n * 4 + 3) && (fetched & ~7U) == (m_regs[0x74 + n] & ~7U))
+				if (!BIT(m_regs[0x3f], n * 4 + 3) || (fetched & ~7U) != (m_regs[0x74 + n] & ~7U))
+					continue;
+				uint8_t const counter = BIT(m_regs[0x3f], n * 4, 3);
+				if (!counter || (counter <= 3 && m_regs[0x60 + counter - 1]))
 				{
-					uint8_t const counter = (m_regs[0x3f] >> (n * 4)) & 7;
-					if (!counter || (counter <= 3 && m_regs[0x60 + counter - 1]))
-					{
-						m_fetchpc = (m_regs[0x70 + n] & ~7U) | (fetched & 7);
-						if (counter)
-							--m_regs[0x60 + counter - 1];
-					}
-					else if (counter <= 3)
-					{
-						m_regs[0x60 + counter - 1] = m_regs[0x64 + counter - 1];
-					}
+					m_fetchpc = (m_regs[0x70 + n] & ~7U) | (fetched & 7);
+					if (counter)
+						--m_regs[0x60 + counter - 1];
 					break;
 				}
+				if (counter <= 3)
+					m_regs[0x60 + counter - 1] = m_regs[0x64 + counter - 1];
 			}
 		}
 		m_executed++;

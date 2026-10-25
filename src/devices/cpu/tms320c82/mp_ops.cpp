@@ -15,7 +15,7 @@
 namespace {
 
 // SPRU109, FRND and appendix C.5.6, without touching the host rounding mode
-float round_single(double source, unsigned mode)
+float round_single(double source, uint8_t mode)
 {
 	constexpr float largest = std::numeric_limits<float>::max();
 	constexpr float infinity = std::numeric_limits<float>::infinity();
@@ -43,7 +43,7 @@ float round_single(double source, unsigned mode)
 	return result;
 }
 
-uint32_t round_integer(double source, unsigned mode, bool unsigned_result)
+uint32_t round_integer(double source, uint8_t mode, bool unsigned_result)
 {
 	if (std::isnan(source))
 		return unsigned_result ? 0xffffffffU : 0x7fffffffU;
@@ -360,8 +360,8 @@ void tms320c82_mp_device::execute_short_imm()
 			if (r)      // right
 			{
 				res = std::rotr(source, rot) & compmask;
-				// sign extend
-				if (res & (1 << (end - 1)))
+				// sign extend; an end of 0 selects all 32 bits
+				if (end && BIT(res, end - 1))
 					res |= 0xffffffff << end;
 			}
 			else        // left
@@ -1436,8 +1436,8 @@ void tms320c82_mp_device::execute_reg_long_imm()
 		case 0xcb:          // vrnd, integer input
 		{
 			bool const integer_input = BIT(m_ir, 13);
-			unsigned const mode = (m_fpst >> 17) & 3;
-			unsigned const pd = (m_ir >> 7) & (integer_input ? 1 : 3);
+			uint8_t const mode = BIT(m_fpst, 17, 2);
+			uint8_t const pd = (m_ir >> 7) & (integer_input ? 1 : 3);
 			int const rd = OP_RS();
 			int const rs = OP_SRC1();
 			double source;
@@ -1610,7 +1610,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 					{
 						double s1 = has_imm ? u2f(imm32) : u2d(m_fpair[src1 >> 1]);
 						double s2 = u2d(m_fpair[rs >> 1]);
-						uint64_t res = d2u(double(s1) + double(s2));
+						uint64_t res = d2u(s1 + s2);
 						m_fpair[rd >> 1] = res;
 						break;
 					}
@@ -1668,7 +1668,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 					{
 						double s1 = has_imm ? u2f(imm32) : u2d(m_fpair[src1 >> 1]);
 						double s2 = u2d(m_fpair[rs >> 1]);
-						uint64_t res = d2u(double(s1) - double(s2));
+						uint64_t res = d2u(s1 - s2);
 						m_fpair[rd >> 1] = res;
 						break;
 					}
@@ -1731,16 +1731,10 @@ void tms320c82_mp_device::execute_reg_long_imm()
 						break;
 					}
 					case 0x2a:          // I x I -> I
-					{
+					case 0x3f:          // U x U -> U
 						// Both signed and unsigned multiplies return the low 32 bits.
 						m_reg[rd] = m_reg[rs] * (has_imm ? imm32 : m_reg[OP_SRC1()]);
 						break;
-					}
-					case 0x3f:          // U x U -> U
-					{
-						m_reg[rd] = (uint32_t)(m_reg[rs]) * (uint32_t)(has_imm ? imm32 : m_reg[OP_SRC1()]);
-						break;
-					}
 					default:
 						fatalerror("tms320c82_mp_device: fmpy: invalid precision combination %02X\n", precision);
 				}
@@ -1780,7 +1774,7 @@ void tms320c82_mp_device::execute_reg_long_imm()
 		case 0xe8:
 		case 0xe9:          // frnd
 		{
-			unsigned const mode = (m_ir >> 7) & 3;
+			uint8_t const mode = BIT(m_ir, 7, 2);
 			int p1 = (m_ir >> 5) & 3;
 			int pd = (m_ir >> 9) & 3;
 			int src1 = OP_SRC1();
