@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:Tomás García-Merás Capote (ClawGrip)
 /***************************************************************************
 
-Skeleton driver for ICE Cyclone, a redemption game for three players.
+Driver for ICE Cyclone, a redemption game for three players.
 A light runs around a ring of 84 bulbs and each player tries to stop it on
 the jackpot, between the two neon arches of their section.
 
