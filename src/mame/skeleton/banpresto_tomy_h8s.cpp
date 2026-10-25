@@ -26,7 +26,7 @@ The BPSC-2006KG PCB adds a TPA3004D2 audio amplifier.
 
 Banpresto "Chara Medal Island" series:
     BP-01 - Crayon Shin-chan - Arashi o Yobu! Sushitori Daigassen - クレヨンしんちゃん 嵐を呼ぶ！すし取り大合戦
-    BP-02 - Pocket Monster - Sonans ga Koronda! - ポケットモンスター ソーナンスがころんだ！
+    BP-02 - Pocket Monsters - Sonans ga Koronda! - ポケットモンスター ソーナンスがころんだ！
     BP-03 - Dragon Ball Z - Bucchigiri no Chou Kessen - ドラゴンボールZ ぶっちぎりの超決戦
 *** BP-04 - ??? - ??? (possibly Eye Shield 21 - Nerae!! Gyakuten Touchdown - アイシールド21 狙え!!逆転タッチダウン)
     BP-05 - Chibi Maruko-chan - Wanage de Asobo!! - ちびまる子ちゃん輪投げで遊ぼ!!
@@ -289,7 +289,7 @@ ROM_END
 
 
 GAME( 2006, cscaoysd,  0,       base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Crayon Shin-chan - Arashi o Yobu! Sushitori Daigassen",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2006, pmsgk,     0,       base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Pocket Monster - Sonans ga Koronda!",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, pmsgk,     0,       base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Pocket Monsters - Sonans ga Koronda!",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2006, dbzbgck,   0,       base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Dragon Ball Z - Bucchigiri no Chou Kessen (ver. 1.1)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2006, dbzbgck10, dbzbgck, base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Dragon Ball Z - Bucchigiri no Chou Kessen (ver. 1.0)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2007, cmcwa,     0,       base, base, banpresto_tomy_h8s_state, empty_init, ROT0, "Banpresto",     "Chibi Maruko-chan - Wanage de Asobo!!",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
