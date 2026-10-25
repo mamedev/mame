@@ -27,12 +27,13 @@ Games on System 246/256/S256 include.....
 Name from title screen                           System   Media ID            (HDD/CD/DVD)  Cart ID   Revision               Company/Year                  Notes
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Battle Gear 3 (Japan)........................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010   B3900065A              Taito 2002                    \  HDD: Western Digital WD200EB; all require Taito JVS Universal I/O board K91X0951A otherwise no boot-up
-Battle Gear 3 (Export).......................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010  *B3900065B/C(?)         Taito 2002                     | Dongle selects region (J/O) using same HDDs
-Battle Gear 3 (Export, Offline)................. XX34XXX  M900????A VER.2.0xE? HDD (20GB)   NM00010? *B3900071A              Taito 2002                     | No online service (NESYS) support, instead having local leaderboards
-Battle Gear 3 (US).............................. ------X  M9005951A VER.2.00A  HDD (30GB)   NM00010?  B3900068A              Taito 2002                     | 2004 Betson release; contrary to flyer, does *not* remove Honda cars (contrast sidebs2u/batlgear)
+Battle Gear 3 (Export).......................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010  *B3900065B/C(?)         Taito 2002                     | Dongle selects region (J/O) using same HDDs (unclear if "O" region dongle exists)
+Battle Gear 3 (Hong Kong)....................... XX34XXX  M900????A VER.2.0xC  HDD (20GB?)  NM00010? *B3900067A/B/C          Taito 2002                     | Different online server; 67A will boot with JP HDD, 67B/67C requires HK-specific HDD
+Battle Gear 3 (Export, Offline)................. XX34XXX  M9005951A VER.2.00A  HDD (30GB)   NM00010? *B3900071A              Taito 2002                     | Dongle is VER.2.00ES but uses US HDD; no online service (NESYS) support, instead having local leaderboards
+Battle Gear 3 (US).............................. ------X  M9005951A VER.2.00A  HDD (30GB)   NM00010?  B3900068A              Taito 2002                     | 2004 Betson release/server; contrary to flyer, does *not* remove Honda cars (contrast sidebs2u/batlgear)
 Battle Gear 3 Tuned (Japan)..................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015  *B3900074B              Taito 2003                     | HDD: Maxtor Fireball 3 30GB 2F030L0
 Battle Gear 3 Tuned (Export).................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015   B3900074C              Taito 2003                     |
-Battle Gear 3 Tuned (Hong Kong)................. ------X  M9006543A VER.2.00C  HDD (40GB)   NM00015   B3900077A              Taito 2003                    /  HDD: Western Digital WD400EB; different online server (also the case for US version of BG3 on top of Honda issue)
+Battle Gear 3 Tuned (Hong Kong)................. ------X  M9006543A VER.2.00C  HDD (40GB)   NM00015   B3900077A              Taito 2003                    /  HDD: Western Digital WD400EB; different online server
 Bloody Roar 3................................... 1234XXX  BRT1-A               CD           NM00002   BRT1 Ver.A             Namco/8ing/Raizing 2000
 Capcom Fighting Jam/Capcom Fighting Evolution... XXXX56X  JAM1 DVD0            DVD          NM00018   JAM1 Ver.A             Capcom 2004
 Cobra The Arcade................................ XXXX56X  CBR1-HA              HDD (40GB)   NM00021   CBR1 Ver.B             Namco 2004                    Requires RAYS I/O PCB and IR guns and IR sensors. HDD: Maxtor DiamondMax Plus 8 40GB 6E040L0
@@ -67,14 +68,14 @@ Ridge Racer V Arcade Battle..................... 1XXXXXX  RRV1-A               C
    "                       ..................... 1XXXXXX  RRV1-A               CD           NM00001   RRV2 Ver.A             Namco 2000
    "                       ..................... 1XXXXXX  RRV1-A               CD           NM00001  *RRV2 Ver.B             Namco 2000
    "                       ..................... 1XXXXXX  RRV1-A               CD           NM00001   RRV3 Ver.A             Namco 2000
-Sengoku Basara X Cross.......................... 123456X  BAX1 DVD0            DVD          NM00042   BAX1 VER.A             Capcom/ARC System Works 2007  % #
+Sengoku Basara X Cross.......................... 123456X  BAX1 DVD0            DVD          NM00042   BAX1 VER.A             Capcom/Arc System Works 2007  % #
 Smash Court Pro Tournament...................... ------X  SCP1 CD0             CD           NM00006   SCP1 Ver.A             Namco 2001
 Soul Calibur II................................. 123456X  SC21 DVD0            DVD          NM00007   SC21 Ver.A             Namco 2002                    \
    "            Rev. B.......................... 123456X  SC21 DVD0B           DVD          NM00007   SC23 Ver.A             Namco 2002                    | # @ 1st & rev B DVD needs campaign memory card
    "            Rev. D.......................... 123456X  SC21 DVD0D           DVD          NM00007   SC22 Ver.D             Namco 2002                    /     rev D will allow skipping it if not available
 Soul Calibur III Arcade Edition................. 123456X  SC31001-NA-DVD0-A    DVD          NM00031   SC31001-NA-A           Namco 2006                    \
    "                           ................. 123456X  SC31001-NA-DVD0-B    DVD          NM00031   SC31001-NA-A           Namco 2006                    / # % @
-Sukusuku Inufuku 2 / The Dog Luck 2............. 123456X  HM-IN2               CD           NM00037   IN2 Ver.A              Hampster/Video System 2007
+Sukusuku Inufuku 2 / The Dog Luck 2............. 123456X  HM-IN2               CD           NM00037   IN2 Ver.A              Hamster/Video System 2007
 Super Dragon Ball Z / Chou Dragon Ball Z........ XXXX56X  DB1                  DVD          NM00027   DB1 Ver.B              Banpresto 2005
 Taiko no Tatsujin 7............................. ------X  TK71 DVD0            DVD          NM00023   TK71 Ver.A             Namco 2005
 Taiko no Tatsujin 8............................. ------X  TK8100-1-NA-DVD0-A   DVD          NM00033   TK81001-NA-A           Namco 2006
