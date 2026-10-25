@@ -1214,12 +1214,24 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 	extra.transcolor = ((ctrl_word >> 16) & 1) ? 0 : 0x100;
 	extra.palbase = m_state.waveram0_ptr_from_block_addr(m_state.m_zeus_palbase);
 
-	// Note: Before being upgraded to the new polygon rasterizing code, this function call was
-	//       a poly_render_quad_fan.  It appears as though the new code defaults to a fan if
-	//       the template argument is 4, but keep an eye out for missing quads.
-	m_state.m_poly->render_polygon<4, 4>(m_state.m_zeus_cliprect,
-							render_delegate(&midzeus_renderer::render_poly, this),
-							clipvert);
+	// Near-plane clipping can turn a quad into three to six vertices. Submit
+	// exactly that many: a fourth vertex is uninitialized for a clipped triangle.
+	const render_delegate callback(&midzeus_renderer::render_poly, this);
+	switch (numverts)
+	{
+		case 3:
+			m_state.m_poly->render_polygon<3, 4>(m_state.m_zeus_cliprect, callback, clipvert);
+			break;
+		case 4:
+			m_state.m_poly->render_polygon<4, 4>(m_state.m_zeus_cliprect, callback, clipvert);
+			break;
+		case 5:
+			m_state.m_poly->render_polygon<5, 4>(m_state.m_zeus_cliprect, callback, clipvert);
+			break;
+		case 6:
+			m_state.m_poly->render_polygon<6, 4>(m_state.m_zeus_cliprect, callback, clipvert);
+			break;
+	}
 }
 
 void midzeus_renderer::zeus_draw_solid_quad(const rectangle& rect, const vertex_t *vert)
