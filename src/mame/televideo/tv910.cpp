@@ -206,12 +206,10 @@ void tv910_state::update_acia_dcd()
 	// empty host port as asserted (see host_cts_w)
 	if (!ports_readable())
 		return;
-	bool const card = m_rs232->get_card_device();
-	ioport_value const sw = m_dsw1->read();
-	if (m_jumpers->read() & JUMPER_DCD_FROM_DSR)
-		m_acia->write_dcd((sw & DSW1_DSR_OPEN) ? 1 : card ? m_rs232->dsr_r() : 0);
-	else
-		m_acia->write_dcd((sw & DSW1_DCD_OPEN) ? 1 : card ? m_rs232->dcd_r() : 0);
+	bool const from_dsr = m_jumpers->read() & JUMPER_DCD_FROM_DSR;
+	ioport_value const open = from_dsr ? DSW1_DSR_OPEN : DSW1_DCD_OPEN;
+	int const line = !m_rs232->get_card_device() ? 0 : from_dsr ? m_rs232->dsr_r() : m_rs232->dcd_r();
+	m_acia->write_dcd((m_dsw1->read() & open) ? 1 : line);
 }
 
 void tv910_state::update_host_dtr()
