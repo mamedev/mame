@@ -77,6 +77,10 @@ mn10300_device::mn10300_device(const machine_config &mconfig, device_type type, 
 	, m_tm_mode{ 0, 0 }
 	, m_tm_base{ 0, 0 }
 	, m_tm_timer{ nullptr, nullptr }
+	, m_tm6_mode(0)
+	, m_tm6_mda(0)
+	, m_tm6_ca(0)
+	, m_tm6_timer(nullptr)
 	, m_dma_tc_cb(*this)
 	, m_dma_timer(nullptr)
 	, m_dma_ctrl(0)
@@ -135,6 +139,10 @@ void mn10300_device::mn103002a_internal_map(address_map &map)
 	map(0x34001092, 0x34001093).rw(FUNC(mn10300_device::tm_base_r<1>), FUNC(mn10300_device::tm_base_w<1>));
 	map(0x340010a0, 0x340010a1).r(FUNC(mn10300_device::tm_count_r<0>));
 	map(0x340010a2, 0x340010a3).r(FUNC(mn10300_device::tm_count_r<1>));
+	map(0x34001084, 0x34001085).rw(FUNC(mn10300_device::tm6_mode_r), FUNC(mn10300_device::tm6_mode_w));
+	map(0x340010a4, 0x340010a5).r(FUNC(mn10300_device::tm6_count_r));
+	map(0x340010b4, 0x340010b4).rw(FUNC(mn10300_device::tm6_mda_r), FUNC(mn10300_device::tm6_mda_w));
+	map(0x340010c4, 0x340010c5).rw(FUNC(mn10300_device::tm6_ca_r), FUNC(mn10300_device::tm6_ca_w));
 }
 
 device_memory_interface::space_config_vector mn10300_device::memory_space_config() const
@@ -154,6 +162,7 @@ void mn10300_device::device_start()
 
 	for (auto &timer : m_tm_timer)
 		timer = timer_alloc(FUNC(mn10300_device::tm_underflow), this);
+	m_tm6_timer = timer_alloc(FUNC(mn10300_device::tm6_match), this);
 	for (auto &timer : m_sio_tx_timer)
 		timer = timer_alloc(FUNC(mn10300_device::sio_tx_shifted), this);
 
@@ -179,6 +188,9 @@ void mn10300_device::device_start()
 	save_item(NAME(m_irq_level));
 	save_item(NAME(m_tm_mode));
 	save_item(NAME(m_tm_base));
+	save_item(NAME(m_tm6_mode));
+	save_item(NAME(m_tm6_mda));
+	save_item(NAME(m_tm6_ca));
 	save_item(NAME(m_dma_ctrl));
 	save_item(NAME(m_dma_src));
 	save_item(NAME(m_dma_dst));
@@ -239,6 +251,10 @@ void mn10300_device::device_reset()
 		m_tm_base[n] = 0;
 		m_tm_timer[n]->adjust(attotime::never);
 	}
+	m_tm6_mode = 0;
+	m_tm6_mda = 0;
+	m_tm6_ca = 0;
+	m_tm6_timer->adjust(attotime::never);
 
 	for (unsigned ch = 0; ch < NUM_SIO; ch++)
 	{
@@ -512,6 +528,74 @@ void mn10300_device::tm_rearm(unsigned n, bool restart_phase)
 TIMER_CALLBACK_MEMBER(mn10300_device::tm_underflow)
 {
 	intc_assert(TM4_GROUP + param);
+}
+
+// TM6 is a 16-bit up-counter with two compare/capture registers. Only compare A
+// is modelled: bit 15 of the mode word enables counting and bit 14 is a load
+// pulse; the count clears when it matches compare A, which raises group 9. The
+// count clock is taken to be TM4/TM5's (IOCLK / 8), so the clock source in the
+// low mode bits is not decoded. The KN6000 sequencer runs on it: it programs
+// compare A with 1,250,000 / BPM for a 96 PPQN tick.
+u16 mn10300_device::tm6_mode_r()
+{
+	return m_tm6_mode;
+}
+
+void mn10300_device::tm6_mode_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	const u16 old = m_tm6_mode;
+	COMBINE_DATA(&m_tm6_mode);
+	const u16 rising = m_tm6_mode & ~old;
+	if (!BIT(m_tm6_mode, 15))
+		m_tm6_timer->adjust(attotime::never);
+	else if (rising & 0xc000)
+		tm6_rearm(true);
+}
+
+u8 mn10300_device::tm6_mda_r()
+{
+	return m_tm6_mda;
+}
+
+void mn10300_device::tm6_mda_w(u8 data)
+{
+	m_tm6_mda = data;
+}
+
+u16 mn10300_device::tm6_ca_r()
+{
+	return m_tm6_ca;
+}
+
+void mn10300_device::tm6_ca_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_tm6_ca);
+	// a new compare value sets the period from the next match on
+	if (BIT(m_tm6_mode, 15) && !m_tm6_timer->remaining().is_never())
+		tm6_rearm(false);
+}
+
+u16 mn10300_device::tm6_count_r()
+{
+	if (!BIT(m_tm6_mode, 15) || m_tm6_timer->remaining().is_never())
+		return 0;
+	const u64 period = u64(m_tm6_ca + 1) * TM_PRESCALE;
+	const u64 remaining = m_tm6_timer->remaining().as_ticks(clock() / 2);
+	return u16(remaining < period ? ((period - remaining) / TM_PRESCALE) : 0);
+}
+
+void mn10300_device::tm6_rearm(bool restart_phase)
+{
+	const attotime period = attotime::from_ticks(u64(m_tm6_ca + 1) * TM_PRESCALE, clock() / 2);
+	if (restart_phase)
+		m_tm6_timer->adjust(period, 0, period);
+	else
+		m_tm6_timer->adjust(m_tm6_timer->remaining(), 0, period);
+}
+
+TIMER_CALLBACK_MEMBER(mn10300_device::tm6_match)
+{
+	intc_assert(TM6A_GROUP);
 }
 
 // DMA controller channel 0. The control register (0x800) starts the channel when
