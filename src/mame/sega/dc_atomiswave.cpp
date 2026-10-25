@@ -1529,7 +1529,7 @@ GAME( 2003, dolphin,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, 
 GAME( 2003, kov7sprt,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "IGS / Sammy",              "Knights of Valour - The Seven Spirits", GAME_FLAGS ) // Nov 24 2003 16:56:01
 GAME( 2004, ggisuka,   awbios,   aw4c, aw4c, atomiswave_state, init_atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear Isuka", GAME_FLAGS ) // Jan 14 2004 10:04:24
 GAME( 2004, rumblefp,  rumblef,  aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish (prototype)", GAME_FLAGS ) // Feb 20 2004 09:15:34
-GAME( 2004, rangrmsn,  awbios,   aw2c, aw1w, atomiswave_state, init_atomiswave, ROT0,   "RIZ Inc./ Sammy",          "Ranger Mission", GAME_FLAGS ) // Mar 01 2004 19:08:15
+GAME( 2004, rangrmsn,  awbios,   aw2c, aw1w, atomiswave_state, init_atomiswave, ROT0,   "RIZ Inc. / Sammy",         "Ranger Mission", GAME_FLAGS ) // Mar 01 2004 19:08:15
 GAME( 2004, rumblef,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish", GAME_FLAGS ) // Mar 10 2004 19:07:43
 GAME( 2004, salmankt,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Yuki Enterprise / Sammy",  "Net@Select: Salaryman Kintaro", GAME_FLAGS ) // Jun 14 2004 22:50:03
 GAME( 2004, kofnw,     awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters Neowave", GAME_FLAGS ) // Jul 09 2004 15:05:53
