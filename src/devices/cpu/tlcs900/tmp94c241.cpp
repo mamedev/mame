@@ -792,6 +792,9 @@ uint8_t tmp94c241_device::port_r()
 	/* Reading a port returns:
 	   - Output latch value for bits configured as output (PXCR bit = 1)
 	   - External pin level for bits configured as input (PXCR bit = 0) */
+	// ports A and B have no control register: their pins are outputs
+	if constexpr (P == PORT_A || P == PORT_B)
+		return m_port_latch[P];
 	uint8_t dir = m_port_control[P];
 	uint8_t external = m_port_read[P](0);
 	return (m_port_latch[P] & dir) | (external & ~dir);
