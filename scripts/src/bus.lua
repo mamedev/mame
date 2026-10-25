@@ -672,6 +672,8 @@ if BUSES["AMIGA_ZORRO"] then
 		MAME_DIR .. "src/devices/bus/amiga/zorro/merlin.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/oktagon2008.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/oktagon2008.h",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/peggyplus.cpp",
+		MAME_DIR .. "src/devices/bus/amiga/zorro/peggyplus.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/picasso2.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/picasso2.h",
 		MAME_DIR .. "src/devices/bus/amiga/zorro/rainbow2.cpp",
