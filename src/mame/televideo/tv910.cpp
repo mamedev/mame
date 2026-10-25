@@ -9,12 +9,6 @@
     6545 CRTC
     6551 ACIA
 
-    The printer port (P4) has no UART of its own: in extension mode the
-    host's data is passed straight through to it, gated by a control latch
-    bit, and its pin 20 (printer ready) is read at 8070 D1 and passed on
-    as the host port's DTR; while the printer is not ready the firmware
-    also sends XOFF to the host.
-
     IRQ = ACIA gated with flip-flop driven by CRTC VBlank (not wire-OR)
     NMI = AY-5-3600 keyboard char present
 
