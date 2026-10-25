@@ -1142,6 +1142,26 @@ Fails [tape] loading, light blue screen
 			</dataarea>
 		</part>
 	</software>
+	
+	<!-- origin: Ultimate Tape Archive V3.0 id=7353 -->
+	<software name="barbarian">
+		<description>Barbarian - The Ultimate Warrior</description>
+		<year>1987</year>
+		<publisher>Palace Software</publisher>
+		
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="702135">
+				<rom name="Barbarian-_The_Ultimate_Warrior_Side_1.tap" size="702135" crc="f8732fc3" sha1="ff0f85ce13ee8876a2efcfab9f6b962f74b0ab91"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="702135">
+				<rom name="Barbarian-_The_Ultimate_Warrior_Side_2.tap" size="702135" crc="8f02e0f6" sha1="294946143d83eb3deea335b92d7120bfbff81626"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="baskmast">
 		<description>Basket Master</description>
@@ -7187,6 +7207,19 @@ Fails [tape] loading after pressing joy fire on title screen
 			</dataarea>
 		</part>
 	</software>
+	
+	<!-- origin: Ultimate Tape Archive V3.0 id=6113 -->
+	<software name="offroad">
+		<description>Ivan 'Ironman' Stewart's Super Off Road Racer</description>
+		<year>1990</year>
+		<publisher>Virgin Mastertronic</publisher>
+		
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="547742">
+				<rom name="Ivan_'Ironman'_Stewart's_Super_Off_Road.tap" size="547742" crc="63bf1d3c" sha1="a5bfd6f7fd0a3741f4c8c252f582a53aba4a6676" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="jacknipr">
 		<description>Jack the Nipper</description>
@@ -8662,6 +8695,26 @@ Fails [tape] loading side 2
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="710018">
 				<rom name="Micro_Rhythm_+_Side_2.tap" size="710018" crc="d3b0d839" sha1="5acbd97389929fd6f01485dc2041e4538b3f8d8a"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- origin: Ultimate Tape Archive V3.0 id=1321 -->
+	<software name="mpsoccer">
+		<description>Microprose Soccer</description>
+		<year>1988</year>
+		<publisher>Microprose</publisher>
+		
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A" />
+				<dataarea name="cass" size="506939">
+					<rom name="Microprose_Soccer_Side_1_-_6_A_Side.tap" size="506939" crc="63f3a912" sha1="ab706745a548d65b7c5bdec9ca63c12aa8b658a9" />
+				</dataarea>
+		</part>
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="cass" size="535102">
+				<rom name="Microprose_Soccer_Side_2_-_11_A_Side.tap" size="535102" crc="374c35e3" sha1="8635c641611a69f85179a63de24f027009e73811" />
 			</dataarea>
 		</part>
 	</software>
@@ -12954,6 +13007,19 @@ Fails [tape] loading for side 2, light blue screen
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="520497">
 				<rom name="Stunt_Bike_Simulator.tap" size="520497" crc="4fa1d7ff" sha1="881eb18f4483cda4ef163eb900570a9fd7f939ed"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- origin: Ultimate Tape Archive V3.0 id=1411 -->
+	<software name="stuntcar">
+		<description>Stunt Car Racer</description>
+		<year>1992</year>
+		<publisher>Kixx</publisher>
+	
+		<part name="cass1" interface="cbm_cass">	
+			<dataarea name="cass" size="565294">
+				<rom name="Stunt_Car_Racer.tap" size="565294" crc="e8048036" sha1="11930ac582aff076225fc1cdc02f72bf16ec6548" />
 			</dataarea>
 		</part>
 	</software>
