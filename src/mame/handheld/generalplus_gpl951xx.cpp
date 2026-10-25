@@ -763,17 +763,17 @@ CONS(2021, pokemech, 0,        0, poke, bfspyhnt, generalplus_gpl951xx_game_stat
 
 // 2020 (device) / 2021 (box) version of Sumikko Gurashi a cloud shaped device
 // Sumikko Gurashi - Sumikko Catch (すみっコぐらし すみっコキャッチ)
-CONS( 2021, smkcatch, 0, 0, puni, bfmpac, generalplus_gpl951xx_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi - Sumikko Catch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2021, smkcatch, 0, 0, puni, bfmpac, generalplus_gpl951xx_game_state, empty_init,  "San-X / Takara Tomy", "Sumikko Gurashi - Sumikko Catch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // or Sumikko Gurashi - Sumikko Catch DX (すみっコぐらし すみっコキャッチDX) = Sumikko Catch with pouch and strap
 
 // is there a subtitle for this one? it's different to the others
-CONS( 201?, smkguras,  0,        0, puni, bubltea, generalplus_gpl951xx_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi DX (Japan, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS( 201?, smkgurasa, smkguras, 0, puni, bubltea, generalplus_gpl951xx_game_state, empty_init,  "San-X / Tomy", "Sumikko Gurashi DX (Japan, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, smkguras,  0,        0, puni, bubltea, generalplus_gpl951xx_game_state, empty_init,  "San-X / Takara Tomy", "Sumikko Gurashi DX (Japan, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, smkgurasa, smkguras, 0, puni, bubltea, generalplus_gpl951xx_game_state, empty_init,  "San-X / Takara Tomy", "Sumikko Gurashi DX (Japan, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
-CONS( 2021, smkgacha,  0,        0, puni, bubltea, generalplus_gpl951xx_game_state, empty_init,  "San-X / Tomy", "Sumikko Gacha (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2021, smkgacha,  0,        0, puni, bubltea, generalplus_gpl951xx_game_state, empty_init,  "San-X / Takara Tomy", "Sumikko Gacha (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // there seem to be different versions of this available, is the software the same?
-CONS( 201?, dsgnpal, 0, 0, dsgnpal, dsgnpal, generalplus_gpl951xx_game_state, empty_init,  "Tomy", "Kiratto Pri-Chan Design Palette (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | ROT270 )
+CONS( 201?, dsgnpal, 0, 0, dsgnpal, dsgnpal, generalplus_gpl951xx_game_state, empty_init,  "Takara Tomy", "Kiratto Pri-Chan Design Palette (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | ROT270 )
 
 // these have different version numbers (coming from the user/config area?) correlating to the colour of the device, even if the code the same
 CONS( 2018, segapet1,  0,        0, puni, segapet1, generalplus_gpl951xx_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu (180615B P)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -799,6 +799,6 @@ CONS( 201?, bubltea,   0,        0, bubltea, bubltea, generalplus_gpl951xx_game_
 // BL-519-V1.2 20220822 on PCB
 CONS( 2022, pink218,      0,       0,      pink218,   bfspyhnt, generalplus_gpl951xx_game_state, init_pink218, "<unknown>", "218-in-1 Handheld Game (pink)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-CONS( 2022, smkfrnd,      0,       0,      puni,   segapet2, generalplus_gpl951xx_game_state, empty_init, "Tomy", "Sumikko Gurashi: Sumikko Friend", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2022, smkfrnd,      0,       0,      puni,   segapet2, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Sumikko Gurashi: Sumikko Friend", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 CONS( 2022, chiikawa,     0,       0,      puni,   segapet2, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Chiikawa to Issho (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
