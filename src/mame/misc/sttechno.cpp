@@ -2,7 +2,7 @@
 // copyright-holders:windyfairy
 
 /*
-Only known game: Shamisen Brothers Vol 1 (2003)
+Only known game: Shamisen Brothers (2003)
 The game was also ported for Namco System 10
 
 Kato's STV01 MainPCB Rev. C
@@ -621,5 +621,5 @@ ROM_END
 
 } // anonymous namespace
 
-
-GAME( 2003, shambros, 0, shambros, shambros, sttechno_state, empty_init, ROT0, "Kato's", "Shamisen Brothers Vol 1 (V1.01K)", MACHINE_IMPERFECT_TIMING )
+// TODO: Is this a parent or clone of shamisen?
+GAME( 2003, shambros, 0, shambros, shambros, sttechno_state, empty_init, ROT0, "Kato's", "Shamisen Brothers (V1.01K)", MACHINE_IMPERFECT_TIMING )
