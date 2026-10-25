@@ -128,18 +128,21 @@ private:
 	// the raw MPEG audio frame header the registers report
 	uint32_t m_audio_header_shift = 0;
 
-	// decoded samples.  A read head rather than erase(begin()), which would
-	// make the stream callback quadratic in the queue depth.
-	std::vector<int16_t> m_audio_samples[2];
-	size_t m_audio_head = 0;
-	uint32_t m_audio_sample_rate = 44100;
-	size_t audio_available() const { return m_audio_samples[0].size() - m_audio_head; }
-	void audio_clear() { m_audio_samples[0].clear(); m_audio_samples[1].clear(); m_audio_head = 0; }
+	// Decoded samples, a ring of count samples from head.
+	// Decoding stops at a quarter second queued, so it holds that plus one
+	// frame.
+	static constexpr size_t AUDIO_SAMPLES_SIZE = 16 * 1024;
+	int16_t m_audio_samples[2][AUDIO_SAMPLES_SIZE]{};
+	uint32_t m_audio_head = 0, m_audio_count = 0;
+	size_t audio_available() const { return m_audio_count; }
+	void audio_clear() { m_audio_head = m_audio_count = 0; }
 
 	// MPEG audio decoding.  The layer II frames are found here, since the
 	// frame length covers padding and ancillary data the decoder does not
-	// read.
-	std::unique_ptr<uint8_t []> m_audio_es;  // elementary stream not decoded yet
+	// read.  The input FIFO holds the elementary stream not decoded yet; the
+	// driver keeps it far below its size.
+	static constexpr size_t AUDIO_BUFFER_SIZE = 64 * 1024;
+	uint8_t m_audio_es[AUDIO_BUFFER_SIZE]{};
 	size_t m_audio_es_head = 0, m_audio_es_tail = 0;
 	std::unique_ptr<mpeg_audio> m_audio;
 	size_t audio_es_available() const { return m_audio_es_tail - m_audio_es_head; }
