@@ -75,7 +75,6 @@
 #define LOG_CPU (1U << 5)
 #define LOG_PARALLEL (1U << 6)
 
-#define VERBOSE 0
 #include "logmacro.h"
 
 
@@ -117,7 +116,7 @@ public:
 	void init_common() ATTR_COLD;
 
 protected:
-	// Not all IRQs feed into the status register directly.
+	// Not all IRQs feed into the status register directly
 	// Because we have to handle IRQ data being stored everywhere and/or apply filtering to the status register,
 	// apply the same strategy used in news_68k_iop, which also had to deal with this problem.
 	enum class iop_irq : unsigned

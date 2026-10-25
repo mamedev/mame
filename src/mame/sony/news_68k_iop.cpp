@@ -95,10 +95,6 @@
 #define LOG_SCSI (1U << 8)
 #define LOG_AST (1U << 9)
 #define LOG_RTC (1U << 10)
-#define LOG_FB (1U << 11)
-#define LOG_FB_ROP (1U << 12)
-
-#define VERBOSE LOG_FB
 
 #include "logmacro.h"
 
@@ -214,8 +210,8 @@ namespace
 		// 68k bus error handlers
 		void cpu_bus_error(offs_t offset, uint32_t mem_mask, bool write, uint8_t status);
 		void scsi_bus_error(uint8_t data);
-		[[maybe_unused]] uint32_t extio_bus_error_r(offs_t offset, uint32_t mem_mask);
-		[[maybe_unused]] void extio_bus_error_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+		uint32_t extio_bus_error_r(offs_t offset, uint32_t mem_mask);
+		void extio_bus_error_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 		uint32_t vme_bus_error_r(offs_t offset, uint32_t mem_mask);
 		void vme_bus_error_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
@@ -980,7 +976,7 @@ namespace
 		m_scc_peripheral->out_rtsb_callback().set(FUNC(news_iop_state::handle_rts));
 
 		// scc channel A
-		RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);//"terminal");
+		RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
 		m_serial[0]->cts_handler().set(m_scc_external, FUNC(z80scc_device::ctsa_w));
 		m_serial[0]->dcd_handler().set(m_scc_external, FUNC(z80scc_device::dcda_w));
 		m_serial[0]->rxd_handler().set(m_scc_external, FUNC(z80scc_device::rxa_w));
