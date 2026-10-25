@@ -22,7 +22,7 @@ public:
 
 	// outputs
 	auto intr() { return m_intr_cb.bind(); }     // INTR, active low
-	auto femty() { return m_femty_cb.bind(); }   // input FIFO empty, active low
+	auto fempty() { return m_fempty_cb.bind(); }   // input FIFO empty, active low
 	auto fale() { return m_fale_cb.bind(); }     // input FIFO almost empty, active low
 	auto falf() { return m_falf_cb.bind(); }     // input FIFO almost full, active low
 	auto starto() { return m_starto_cb.bind(); } // STARTO: decoding stored frames
@@ -31,7 +31,7 @@ public:
 	void map(address_map &map) ATTR_COLD;
 	void data_w(u16 data); // Data register (A[4:0] = 0) write with the full D[15:0] bus
 
-	int femty_r();
+	int fempty_r();
 	int fale_r();
 	int falf_r();
 	int starto_r();
@@ -45,14 +45,18 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_pre_save() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
+	virtual void device_clock_changed() override;
 	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	// Control Register 1 and 2 bits
 	static constexpr u8 CR1_ANC_RST = 0x80, CR1_SER_PAR = 0x40, CR1_BYPASS = 0x20, CR1_BUF_RST = 0x04,
 			CR1_SOFT_RST = 0x02, CR1_STARTI = 0x01;
-	static constexpr u8 CR2_SOFT_MUTE = 0x20, CR2_SEL_16 = 0x10, CR2_AUDIO_ONLY = 0x08;
-	static constexpr u8 CR3_ID_IGNORE = 0x80;
+	static constexpr u8 CR2_MUTE = 0xc0, CR2_MUTE_REPLAY = 0x80, CR2_SOFT_MUTE = 0x20, CR2_SEL_16 = 0x10,
+			CR2_AUDIO_ONLY = 0x08, CR2_PCM_MODE = 0x03;
+	static constexpr u8 CR3_ID_IGNORE = 0x80, CR3_STREAM_ID = 0x1f;
+	static constexpr u8 TCR_MASK = 0x0f, TCR_MIN = 6; // the PCM timer needs a terminal count of 6 or more
+	static constexpr u8 CB_COUNTER_MASK = 0x7f;
 
 	// Interrupt Mask / Status Register 1 (the same bit positions)
 	static constexpr u8 S1_ANC_VALID = 0x80, S1_ANC_OVRFL = 0x40, S1_ANC_HFF = 0x20, S1_ERR_BUF_OVFL = 0x08;
@@ -71,7 +75,10 @@ private:
 	static constexpr u32 PREPARSE_CLOCKS = 16;   // 15 Mbit/s at SYSCLK 30 MHz
 	static constexpr u32 FRAME_BYTES_MAX = 1792; // largest Layer I/II frame, rounded up
 	static constexpr u32 CB_SLOTS = 128;         // channel buffer: 128 Layer I or 64 Layer II frames
-	static constexpr u32 SAMPLES_MAX = 1152;
+	static constexpr u32 SAMPLES_MAX = 1152;      // a Layer II frame
+	static constexpr u32 LAYER1_SAMPLES = 384;
+	static constexpr u32 SYNC_FRAMES = 3;        // frames (or packs) in sequence before SYNC AUD (SYNC SYS) is set
+	static constexpr u32 DEFAULT_RATE = 44'100;  // stream rate until the PCM timer is programmed
 	static constexpr u32 ANC_BYTES = 16;
 
 	// register handlers
@@ -79,6 +86,7 @@ private:
 	bool reg_write_ready(const char *name, u8 data);
 	u8 reserved_r(offs_t offset);
 	void reserved_w(offs_t offset, u8 data);
+	void read_only_w(offs_t offset, u8 data);
 	void data8_w(u8 data);
 	u8 cr1_r();
 	void cr1_w(u8 data);
@@ -113,7 +121,7 @@ private:
 	void deliver_events();
 	void schedule_flags();
 	void update_outputs();
-	void update_poll();
+	void update_frame_timer();
 	void system_parse(u8 data);
 	void packet_header(u8 data);
 	void audio_parse(u8 data);
@@ -126,13 +134,13 @@ private:
 	void syntax_error();
 	u32 cb_frames() const { return (m_cb_layer == 1) ? CB_SLOTS : CB_SLOTS / 2; }
 	bool decoder_enabled() const { return !m_reset_pin && (m_cr1 & CR1_STARTI) && m_starti_pin; }
-	TIMER_CALLBACK_MEMBER(poll);
+	TIMER_CALLBACK_MEMBER(frame_tick);
 	TIMER_CALLBACK_MEMBER(flags_tick);
 
-	devcb_write_line m_intr_cb, m_femty_cb, m_fale_cb, m_falf_cb, m_starto_cb;
+	devcb_write_line m_intr_cb, m_fempty_cb, m_fale_cb, m_falf_cb, m_starto_cb;
 	sound_stream *m_stream;
 	std::unique_ptr<mpeg_audio> m_decoder;
-	emu_timer *m_poll_timer;
+	emu_timer *m_frame_timer;
 	emu_timer *m_flags_timer;
 
 	// registers
@@ -146,7 +154,7 @@ private:
 	// pins and outputs
 	bool m_reset_pin, m_starti_pin, m_hdmute_pin;
 	bool m_intr_pending; // an enabled interrupt event since the last status read
-	int m_intr_state, m_femty_state, m_fale_state, m_falf_state, m_starto_state;
+	int m_intr_state, m_fempty_state, m_fale_state, m_falf_state, m_starto_state;
 
 	// input data FIFO
 	util::fifo<u8, FIFO_BYTES> m_fifo; // the chip's own 128-byte input FIFO

@@ -67,20 +67,23 @@ constexpr u16 BITRATE[2][16] = {
 };
 constexpr u32 SAMPLE_RATE[4] = { 44'100, 48'000, 32'000, 0 };
 
+// ISO 11172-1 start codes (after 00 00 01)
+constexpr u8 END_CODE = 0xb9, PACK_START = 0xba, SYSTEM_HEADER = 0xbb, AUDIO_STREAM_FIRST = 0xc0, AUDIO_STREAM_LAST = 0xdf;
+
 } // anonymous namespace
 
 
 l64111_device::l64111_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, L64111, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
-	m_intr_cb(*this), m_femty_cb(*this), m_fale_cb(*this), m_falf_cb(*this), m_starto_cb(*this),
+	m_intr_cb(*this), m_fempty_cb(*this), m_fale_cb(*this), m_falf_cb(*this), m_starto_cb(*this),
 	m_stream(nullptr),
-	m_poll_timer(nullptr), m_flags_timer(nullptr),
+	m_frame_timer(nullptr), m_flags_timer(nullptr),
 	m_cr1(0), m_cr2(0), m_cr3(CR3_ID_IGNORE), m_mask1(0), m_mask2(0), m_status1(0), m_status2(0),
 	m_tcr(0), m_torh(0), m_torl(0), m_pd{}, m_pts{},
 	m_reset_pin(false), m_starti_pin(true), m_hdmute_pin(false),
 	m_intr_pending(false),
-	m_intr_state(1), m_femty_state(0), m_fale_state(0), m_falf_state(1), m_starto_state(0),
+	m_intr_state(1), m_fempty_state(0), m_fale_state(0), m_falf_state(1), m_starto_state(0),
 	m_overflow_logged(false),
 	m_sys_state(SYS_SCAN), m_sys_shift(0), m_sys_shift_count(0), m_sys_code(0), m_sys_left(0), m_sys_length_bytes(0),
 	m_sys_hdr{}, m_sys_hdr_len(0), m_sys_hdr_need(0), m_pack_count(0),
@@ -96,10 +99,12 @@ l64111_device::l64111_device(const machine_config &mconfig, const char *tag, dev
 
 void l64111_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, 44'100);
+	if (!clock())
+		logerror("no SYSCLK configured: the input FIFO will not drain and the PCM rate stays at %u Hz\n", DEFAULT_RATE);
+	m_stream = stream_alloc(0, 2, DEFAULT_RATE);
 	m_decoder = std::make_unique<mpeg_audio>(m_decode, mpeg_audio::L1 | mpeg_audio::L2, false, 0);
 	m_decoder->register_save_state(*this);
-	m_poll_timer = timer_alloc(FUNC(l64111_device::poll), this);
+	m_frame_timer = timer_alloc(FUNC(l64111_device::frame_tick), this);
 	m_flags_timer = timer_alloc(FUNC(l64111_device::flags_tick), this);
 
 	save_item(NAME(m_cr1));
@@ -119,7 +124,7 @@ void l64111_device::device_start()
 	save_item(NAME(m_hdmute_pin));
 	save_item(NAME(m_intr_pending));
 	save_item(NAME(m_intr_state));
-	save_item(NAME(m_femty_state));
+	save_item(NAME(m_fempty_state));
 	save_item(NAME(m_fale_state));
 	save_item(NAME(m_falf_state));
 	save_item(NAME(m_starto_state));
@@ -166,7 +171,7 @@ void l64111_device::device_reset()
 {
 	chip_reset();
 	m_intr_cb(m_intr_state);
-	m_femty_cb(m_femty_state);
+	m_fempty_cb(m_fempty_state);
 	m_fale_cb(m_fale_state);
 	m_falf_cb(m_falf_state);
 	m_starto_cb(m_starto_state);
@@ -198,12 +203,17 @@ void l64111_device::device_post_load()
 	for (u32 i = 0; i < std::min<u32>(m_anc_save_count, ANC_BYTES); i++)
 		m_anc.enqueue(m_anc_save[i]);
 	update_rate();
-	update_poll();
+	update_frame_timer();
 	m_intr_cb(m_intr_state);
-	m_femty_cb(m_femty_state);
+	m_fempty_cb(m_fempty_state);
 	m_fale_cb(m_fale_state);
 	m_falf_cb(m_falf_state);
 	m_starto_cb(m_starto_state);
+}
+
+void l64111_device::device_clock_changed()
+{
+	update_rate();
 }
 
 // RESET pin or SOFT_RST: registers to their defaults, FIFOs and channel buffer emptied
@@ -233,7 +243,7 @@ void l64111_device::chip_reset()
 	m_intr_pending = false;
 	update_irq_state(0, 0);
 	update_outputs();
-	update_poll();
+	update_frame_timer();
 }
 
 // STARTI low resets the decoder block; the channel buffer keeps its frames
@@ -242,7 +252,6 @@ void l64111_device::decoder_reset()
 	m_started = false;
 	m_underrun = false;
 	m_pcm_pos = m_pcm_count = 0;
-	m_ev2 &= ~(M2_LAST_FRAME | M2_NEW_FRAME);
 	m_decoder->clear();
 }
 
@@ -280,6 +289,7 @@ void l64111_device::map(address_map &map)
 	map(0x12, 0x12).r(FUNC(l64111_device::cb_status_r));
 	map(0x13, 0x13).rw(FUNC(l64111_device::cb_write_r), FUNC(l64111_device::cb_write_w));
 	map(0x14, 0x14).rw(FUNC(l64111_device::cb_read_r), FUNC(l64111_device::cb_read_w));
+	map(0x09, 0x12).w(FUNC(l64111_device::read_only_w));
 }
 
 // registers read as 0 and ignore writes while RESET is held; otherwise bring the chip up to date first
@@ -308,7 +318,12 @@ u8 l64111_device::reserved_r(offs_t offset)
 
 void l64111_device::reserved_w(offs_t offset, u8 data)
 {
-	logerror("write %02x to reserved register %d\n", data, offset);
+	logerror("%s: write %02x to reserved register %d\n", machine().describe_context(), data, offset);
+}
+
+void l64111_device::read_only_w(offs_t offset, u8 data)
+{
+	logerror("%s: write %02x to read-only register %d\n", machine().describe_context(), data, offset + 9);
 }
 
 void l64111_device::data8_w(u8 data)
@@ -344,7 +359,7 @@ void l64111_device::cr1_w(u8 data)
 	if (data & (CR1_SER_PAR | CR1_BYPASS))
 		logerror("serial input / bypass selected (CR1 %02x), not emulated\n", data);
 	update_outputs();
-	update_poll();
+	update_frame_timer();
 }
 
 u8 l64111_device::cr2_r()
@@ -371,12 +386,12 @@ void l64111_device::cr3_w(u8 data)
 {
 	if (!reg_write_ready("CR3", data))
 		return;
-	if ((m_cr3 ^ data) & 0x9f) // a different audio stream: resynchronize
+	if ((m_cr3 ^ data) & (CR3_ID_IGNORE | CR3_STREAM_ID)) // a different audio stream: resynchronize
 	{
 		m_frame_len = m_frame_need = 0;
 		m_sync_count = 0;
 	}
-	m_cr3 = data & 0x9f;
+	m_cr3 = data & (CR3_ID_IGNORE | CR3_STREAM_ID);
 }
 
 // reading either status register clears the latched events and INTR
@@ -397,6 +412,7 @@ u8 l64111_device::status1_r()
 
 void l64111_device::mask1_w(u8 data)
 {
+	// a newly enabled mask bit doesn't raise INTR for an event that is already latched [INFERRED]
 	if (reg_write_ready("Interrupt Mask 1", data))
 		m_mask1 = data;
 }
@@ -405,7 +421,7 @@ u8 l64111_device::status2_r()
 {
 	if (!reg_read_ready())
 		return 0;
-	const u8 v = m_status2 | ((m_sync_count >= 3) ? S2_SYNC_AUD : 0x00) | ((m_pack_count >= 3) ? S2_SYNC_SYS : 0x00);
+	const u8 v = m_status2 | ((m_sync_count >= SYNC_FRAMES) ? S2_SYNC_AUD : 0x00) | ((m_pack_count >= SYNC_FRAMES) ? S2_SYNC_SYS : 0x00);
 	if (!machine().side_effects_disabled())
 	{
 		m_status2 = 0;
@@ -417,7 +433,7 @@ u8 l64111_device::status2_r()
 
 void l64111_device::mask2_w(u8 data)
 {
-	if (reg_write_ready("Interrupt Mask 2", data))
+	if (reg_write_ready("Interrupt Mask 2", data)) // see mask1_w
 		m_mask2 = data;
 }
 
@@ -430,7 +446,7 @@ void l64111_device::tcr_w(u8 data)
 {
 	if (!reg_write_ready("TCR", data))
 		return;
-	m_tcr = data & 0x0f;
+	m_tcr = data & TCR_MASK;
 	update_rate();
 }
 
@@ -483,17 +499,17 @@ u8 l64111_device::anc_r()
 // 7-bit counters: a full Layer I buffer (128 frames) reads as 127
 u8 l64111_device::cb_status_r()
 {
-	return reg_read_ready() ? std::min<u32>(m_cb_count, 0x7f) : 0;
+	return reg_read_ready() ? std::min<u32>(m_cb_count, CB_COUNTER_MASK) : 0;
 }
 
 u8 l64111_device::cb_write_r()
 {
-	return reg_read_ready() ? (m_cb_write & 0x7f) : 0;
+	return reg_read_ready() ? (m_cb_write & CB_COUNTER_MASK) : 0;
 }
 
 u8 l64111_device::cb_read_r()
 {
-	return reg_read_ready() ? (m_cb_read & 0x7f) : 0;
+	return reg_read_ready() ? (m_cb_read & CB_COUNTER_MASK) : 0;
 }
 
 // moving the counters leaves the status counter unreliable (manual 4.9): recompute it
@@ -502,7 +518,7 @@ void l64111_device::cb_write_w(u8 data)
 	if (!reg_write_ready("Channel buffer write counter", data))
 		return;
 	const u32 n = cb_frames();
-	m_cb_write = (data & 0x7f) % n;
+	m_cb_write = (data & CB_COUNTER_MASK) % n;
 	m_cb_count = (m_cb_write + n - m_cb_read) % n;
 }
 
@@ -511,7 +527,7 @@ void l64111_device::cb_read_w(u8 data)
 	if (!reg_write_ready("Channel buffer read counter", data))
 		return;
 	const u32 n = cb_frames();
-	m_cb_read = (data & 0x7f) % n;
+	m_cb_read = (data & CB_COUNTER_MASK) % n;
 	m_cb_count = (m_cb_write + n - m_cb_read) % n;
 }
 
@@ -538,7 +554,7 @@ void l64111_device::data_w(u16 data)
 	schedule_flags();
 }
 
-int l64111_device::femty_r()
+int l64111_device::fempty_r()
 {
 	if (!machine().side_effects_disabled())
 		sync_fifo();
@@ -573,17 +589,17 @@ void l64111_device::reset_w(int state)
 	m_reset_pin = asserted;
 	if (asserted)
 		chip_reset();
-	update_poll();
+	update_frame_timer();
 }
 
 void l64111_device::starti_w(int state)
 {
-	m_stream->update();
+	sync(); // deliver the frame events up to now before the decoder can be reset
 	m_starti_pin = state != 0;
 	if (!decoder_enabled())
 		decoder_reset();
 	update_outputs();
-	update_poll();
+	update_frame_timer();
 }
 
 void l64111_device::hdmute_w(int state)
@@ -623,7 +639,7 @@ void l64111_device::update_outputs()
 {
 	auto out = [] (int &old, int state, devcb_write_line &cb) { if (state != old) { old = state; cb(state); } };
 	const u32 count = m_fifo.queue_length();
-	out(m_femty_state, count ? 1 : 0, m_femty_cb);
+	out(m_fempty_state, count ? 1 : 0, m_fempty_cb);
 	out(m_fale_state, (count <= FIFO_FLAG_LEVEL) ? 0 : 1, m_fale_cb);
 	out(m_falf_state, (FIFO_BYTES - count <= FIFO_FLAG_LEVEL) ? 0 : 1, m_falf_cb);
 	out(m_starto_state, starto_r(), m_starto_cb);
@@ -648,13 +664,19 @@ void l64111_device::schedule_flags()
 	m_flags_timer->adjust((when > now) ? (when - now) : attotime::zero);
 }
 
-// the channel buffer drains as the stream plays, so look for decoder events while it runs
-void l64111_device::update_poll()
+// wake just after the next frame boundary, where the decoder takes a frame from the channel buffer
+// (NEW FRAME OUT, LAST FRAME, or an underrun), so those events arrive on time
+void l64111_device::update_frame_timer()
 {
-	if (!decoder_enabled())
-		m_poll_timer->adjust(attotime::never);
-	else if (m_poll_timer->expire().is_never()) // adjust() leaves a timer enabled even when it never fires
-		m_poll_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
+	if (!decoder_enabled() || m_underrun || (!m_started && !m_cb_count))
+	{
+		m_frame_timer->adjust(attotime::never);
+		return;
+	}
+	const u32 left = (m_pcm_pos < m_pcm_count) ? (m_pcm_count - m_pcm_pos) : 0;
+	const attotime when = m_stream->end_time() + m_stream->sample_period() * (left + 1);
+	const attotime now = machine().time();
+	m_frame_timer->adjust((when > now) ? (when - now) : attotime::zero);
 }
 
 TIMER_CALLBACK_MEMBER(l64111_device::flags_tick)
@@ -662,7 +684,7 @@ TIMER_CALLBACK_MEMBER(l64111_device::flags_tick)
 	sync_fifo();
 }
 
-TIMER_CALLBACK_MEMBER(l64111_device::poll)
+TIMER_CALLBACK_MEMBER(l64111_device::frame_tick)
 {
 	sync();
 }
@@ -670,12 +692,12 @@ TIMER_CALLBACK_MEMBER(l64111_device::poll)
 // fs = SYSCLK / (2 * (TCR + TOR / 65536) * SCLKO cycles per sample), manual 6.3
 void l64111_device::update_rate()
 {
-	if (!clock() || m_tcr < 6)
+	if (!clock() || m_tcr < TCR_MIN)
 		return;
 	// PCM MODE 00 = 32, 01 = 64, 10 = 48 SCLKO per sample (register description 4.3;
 	// figure 6.3 lists 01 and 10 the other way round)
 	static constexpr u32 SCLK_RATIO[4] = { 32, 64, 48, 32 };
-	const double divisor = 2.0 * (m_tcr + double((m_torh << 8) | m_torl) / 65536.0) * SCLK_RATIO[m_cr2 & 3];
+	const double divisor = 2.0 * (m_tcr + double((m_torh << 8) | m_torl) / 65536.0) * SCLK_RATIO[m_cr2 & CR2_PCM_MODE];
 	const u32 rate = u32(double(clock()) / divisor + 0.5);
 	if (rate != m_stream->sample_rate())
 		m_stream->set_sample_rate(rate);
@@ -692,6 +714,7 @@ void l64111_device::sync()
 	sync_fifo();
 	m_stream->update();
 	deliver_events();
+	update_frame_timer();
 }
 
 // move the bytes the pre-parser has taken by now out of the input FIFO
@@ -718,6 +741,7 @@ void l64111_device::sync_fifo()
 	}
 	deliver_events();
 	schedule_flags();
+	update_frame_timer(); // a newly stored frame can start the decoder
 }
 
 // interrupts for events raised inside the stream update or by the pre-parser
@@ -751,17 +775,17 @@ void l64111_device::system_parse(u8 data)
 		{
 			m_sys_code = data;
 			m_sys_shift = m_sys_shift_count = 0;
-			if (data == 0xba) // pack start
+			if (data == PACK_START)
 			{
 				m_sys_state = SYS_PACK;
 				m_sys_left = 8;
 			}
-			else if (data >= 0xbb) // system header or packet: a 16-bit length follows
+			else if (data >= SYSTEM_HEADER) // system header or packet: a 16-bit length follows
 			{
 				m_sys_state = SYS_LENGTH;
 				m_sys_left = m_sys_length_bytes = 0;
 			}
-			else if (data != 0xb9) // anything but the ISO 11172 end code is out of place here
+			else if (data != END_CODE) // anything else is out of place here
 			{
 				m_pack_count = 0;
 				syntax_error();
@@ -780,7 +804,7 @@ void l64111_device::system_parse(u8 data)
 		if (!--m_sys_left)
 		{
 			m_sys_state = SYS_SCAN;
-			if (++m_pack_count == 3)
+			if (++m_pack_count == SYNC_FRAMES)
 				update_irq_state(0, M2_SYNC_SYS); // SYNC SYS goes high (a level, read from m_pack_count)
 		}
 		break;
@@ -789,8 +813,8 @@ void l64111_device::system_parse(u8 data)
 		m_sys_left = (m_sys_left << 8) | data;
 		if (++m_sys_length_bytes == 2)
 		{
-			const bool audio = (m_sys_code >= 0xc0) && (m_sys_code <= 0xdf);
-			const bool selected = audio && ((m_cr3 & CR3_ID_IGNORE) || ((m_sys_code & 0x1f) == (m_cr3 & 0x1f)));
+			const bool audio = (m_sys_code >= AUDIO_STREAM_FIRST) && (m_sys_code <= AUDIO_STREAM_LAST);
+			const bool selected = audio && ((m_cr3 & CR3_ID_IGNORE) || ((m_sys_code & CR3_STREAM_ID) == (m_cr3 & CR3_STREAM_ID)));
 			if (!m_sys_left)
 				m_sys_state = SYS_SCAN;
 			else if (selected)
@@ -921,8 +945,8 @@ void l64111_device::store_frame()
 	m_pd[1] = (((h[2] >> 2) & 3) << 6) | (BIT(h[2], 1) << 5) | (BIT(h[2], 0) << 4) | ((h[3] >> 6) << 2) | ((h[3] >> 4) & 3);
 	m_pd[2] = (BIT(h[3], 3) << 7) | (BIT(h[3], 2) << 6) | ((h[3] & 3) << 4);
 	LOGMASKED(LOG_FRAME, "frame %u bytes, channel buffer %u\n", m_frame_len, m_cb_count);
-	// SYNC AUD goes high on the third frame (a level, read from m_sync_count)
-	update_irq_state(0, M2_FRAME_DETECT | ((++m_sync_count == 3) ? M2_SYNC_AUD : 0x00));
+	// SYNC AUD goes high on the third frame in sequence (a level, read from m_sync_count)
+	update_irq_state(0, M2_FRAME_DETECT | ((++m_sync_count == SYNC_FRAMES) ? M2_SYNC_AUD : 0x00));
 
 	m_cb_layer = (((h[1] >> 1) & 3) == 3) ? 1 : 2;
 	if (m_cb_count >= cb_frames())
@@ -945,7 +969,7 @@ void l64111_device::store_frame()
 void l64111_device::silent_frame()
 {
 	std::fill(std::begin(m_pcm), std::end(m_pcm), 0);
-	m_pcm_count = (m_cb_layer == 1) ? 384 : SAMPLES_MAX;
+	m_pcm_count = (m_cb_layer == 1) ? LAYER1_SAMPLES : SAMPLES_MAX;
 	m_pcm_channels = 1;
 }
 
@@ -968,7 +992,7 @@ bool l64111_device::next_frame()
 		m_pcm_channels = (channels >= 2) ? 2 : 1;
 		ancillary(pos, len * 8);
 	}
-	else if ((((m_cr2 >> 6) & 3) != 2) || !m_pcm_count)
+	else if (((m_cr2 & CR2_MUTE) != CR2_MUTE_REPLAY) || !m_pcm_count)
 		silent_frame(); // MUTE 10 replays the last good frame instead
 	m_pcm_pos = 0;
 	m_ev2 |= M2_NEW_FRAME; // NEW FRAME OUT
@@ -1032,8 +1056,8 @@ void l64111_device::sound_stream_update(sound_stream &stream)
 			const u32 at = m_pcm_pos * m_pcm_channels;
 			const s16 left = m_pcm[at];
 			const s16 right = (m_pcm_channels == 2) ? m_pcm[at + 1] : left;
-			stream.put(0, sample, float(left) / 32'768.0F);
-			stream.put(1, sample, float(right) / 32'768.0F);
+			stream.put_int(0, sample, left, 32768);
+			stream.put_int(1, sample, right, 32768);
 		}
 		m_pcm_pos++;
 	}
