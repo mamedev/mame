@@ -11,8 +11,9 @@
 
     The printer port (P4) has no UART of its own: in extension mode the
     host's data is passed straight through to it, gated by a control latch
-    bit, and its pin 20 (printer ready) is read at 8070 D1; while the
-    printer is not ready the firmware sends XOFF to the host.
+    bit, and its pin 20 (printer ready) is read at 8070 D1 and passed on
+    as the host port's DTR; while the printer is not ready the firmware
+    also sends XOFF to the host.
 
     IRQ = ACIA gated with flip-flop driven by CRTC VBlank (not wire-OR)
     NMI = AY-5-3600 keyboard char present
@@ -22,8 +23,8 @@
     TODO:
         - Make 910 keyboard into a device since the similar Model 925 uses
           a 950-compatible serial keyboard instead (with a second ACIA)
-        - Add remaining DIP switches; printer ready to the host's DTR
-          (S2-10, E17-E19)
+        - Add remaining DIP switches; DTR EN and the E17-E19 option of
+          RTS on the host's pin 20
 
 ****************************************************************************/
 
@@ -480,6 +481,7 @@ void tv910_state::machine_start()
 
 	m_rxd = 1;
 	m_printer_dtr = 1; // open input reads as not ready
+	rs232->write_dtr(m_printer_dtr);
 	save_item(NAME(m_rxd));
 	save_item(NAME(m_printer_dtr));
 }
@@ -600,6 +602,7 @@ void tv910_state::tv910(machine_config &config)
 
 	RS232_PORT(config, m_printer, default_rs232_devices, nullptr); // P4
 	m_printer->dsr_handler().set(FUNC(tv910_state::printer_dtr_w)); // from pin 20 (DTR)
+	m_printer->dsr_handler().append(RS232_TAG, FUNC(rs232_port_device::write_dtr)); // to the host's pin 20
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, MASTER_CLOCK / 8400); // 1620 Hz (Row 10 signal)
