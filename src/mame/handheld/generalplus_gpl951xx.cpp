@@ -800,6 +800,6 @@ CONS( 201?, bubltea,   0,        0, bubltea, bubltea, generalplus_gpl951xx_game_
 // BL-519-V1.2 20220822 on PCB
 CONS( 2022, pink218,      0,       0,      pink218,   bfspyhnt, generalplus_gpl951xx_game_state, init_pink218, "<unknown>", "218-in-1 Handheld Game (pink)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-CONS( 2022, smkfrnd,      0,       0,      puni,   segapet2, generalplus_gpl951xx_game_state, empty_init, "Takara Tomy", "Sumikko Gurashi: Sumikko Friend", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2022, smkfrnd,      0,       0,      puni,   segapet2, generalplus_gpl951xx_game_state, empty_init, "San-X / Takara Tomy", "Sumikko Gurashi: Sumikko Friend", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 CONS( 2022, chiikawa,     0,       0,      puni,   segapet2, generalplus_gpl951xx_game_state, empty_init, "Bandai", "Chiikawa to Issho (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
