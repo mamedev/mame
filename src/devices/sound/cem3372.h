@@ -43,6 +43,10 @@ public:
 	{
 		device_sound_interface *channel_a = nullptr;  // pin 6, voltage
 		device_sound_interface *channel_b = nullptr;  // pin 7, voltage
+		device_sound_interface *level_a = nullptr;  // pin 5, voltage
+		device_sound_interface *level_b = nullptr;  // pin 8, voltage
+		device_sound_interface *freq_cv = nullptr;  // pin 15, voltage
+		device_sound_interface *res_cv = nullptr;  // pin 10, voltage
 	};
 
 	cem3372_vcf_device(const machine_config &mconfig, const char *tag, device_t *owner, const stream_inputs &inputs) ATTR_COLD;
@@ -56,6 +60,7 @@ public:
 	cem3372_vcf_device &set_c3(float c3) { return set_c(2, c3); }
 	cem3372_vcf_device &set_c4(float c4) { return set_c(3, c4); }
 
+	// These setters can only be used if there is no corresponding stream input.
 	void set_level_a_cv(float cv);  // pin 5, 0-5V
 	void set_level_b_cv(float cv);  // pin 8, 0-5V
 	void set_freq_cv(float cv);  // pin 15, -155mV - 110mV
@@ -69,11 +74,12 @@ protected:
 	void sound_stream_update(sound_stream &stream) override;
 
 private:
-	static float input_gain(float cv);
-
 	cem3372_vcf_device &set_c(int stage, float c);
 
-	void update_freq();
+	float compute_level(float cv, int idx);
+	float compute_freq(float cv);
+	float compute_res(float cv);
+
 	void update_freq_scale();
 
 	const stream_inputs m_inputs;
@@ -84,10 +90,13 @@ private:
 	required_device<va_lpf4_device> m_vcf;
 
 	std::array<float, 4> m_c;
-	float m_level_a_cv;
-	float m_level_b_cv;
+	std::array<float, 2> m_level_cv;
 	float m_freq_cv;
 	float m_res_cv;
+
+	std::array<float, 2> m_level;
+	float m_freq;
+	float m_res;
 };
 
 

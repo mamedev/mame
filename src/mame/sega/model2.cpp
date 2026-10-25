@@ -7698,9 +7698,9 @@ GAME( 1995, vonj,       von,      model2b,      von,       model2b_state, empty_
 GAME( 1995, vonr,       von,      model2b,      von,       model2b_state, empty_init,    ROT0, "Sega",   "Cyber Troopers Virtual-On - Relay (Japan)", MACHINE_NOT_WORKING )
 GAME( 1996, schamp,     0,        model2b,      schamp,    model2b_state, empty_init,    ROT0, "Sega",   "Sonic Championship (USA)", MACHINE_NOT_WORKING )
 GAME( 1996, sfight,     schamp,   model2b,      schamp,    model2b_state, empty_init,    ROT0, "Sega",   "Sonic the Fighters (Japan)", MACHINE_NOT_WORKING )
-GAME( 1996, lastbrnx,   0,        lastbrnx,     vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (Export, Revision A)", MACHINE_NOT_WORKING )
-GAME( 1996, lastbrnxu,  lastbrnx, lastbrnx,     vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (USA, Revision A)", MACHINE_NOT_WORKING )
-GAME( 1996, lastbrnxj,  lastbrnx, lastbrnx,     vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx: Tokyo Bangaichi (Japan, Revision A)", MACHINE_NOT_WORKING )
+GAME( 1996, lastbrnx,   0,        lastbrnx,     vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (Export, Revision A)", 0 )
+GAME( 1996, lastbrnxu,  lastbrnx, lastbrnx,     vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx (USA, Revision A)", 0 )
+GAME( 1996, lastbrnxj,  lastbrnx, lastbrnx,     vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Last Bronx: Tokyo Bangaichi (Japan, Revision A)", 0 )
 GAME( 1996, doa,        0,        model2b_0229, doa,       model2b_state, empty_init,    ROT0, "Tecmo",  "Dead or Alive (Model 2B, Revision C)", 0 ) // Jan 10 1997
 GAME( 1996, doab,       doa,      model2b_0229, doa,       model2b_state, empty_init,    ROT0, "Tecmo",  "Dead or Alive (Model 2B, Revision B)", 0 ) // Dec 4 1996
 GAME( 1996, sgt24h,     0,        indy500,      sgt24h,    model2b_state, init_sgt24h,   ROT0, "Jaleco", "Super GT 24h", MACHINE_NOT_WORKING )

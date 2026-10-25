@@ -21,10 +21,10 @@
   were build in French schools in the 1980's to teach computer science.
 
   TODO:
-  - CRC
   - loop mode
   - status prioritization
-  - NRZI vs. NRZ coding
+  - 01/11 idle
+  - partial last byte of the information field
   - FD output
 
 **********************************************************************/
@@ -53,8 +53,6 @@
 
 #define FLAG 0x7e
 /* flag value, as defined by HDLC protocol: 01111110 */
-
-#define BIT_LENGTH attotime::from_hz( 500000 )
 
 constexpr unsigned mc6854_device::MAX_FRAME_LENGTH;
 
@@ -111,7 +109,7 @@ static const int word_length[4] = { 5, 6, 7, 8 }; /* transmit / receive word len
 
 #define ABT ( m_cr4 & 0x20 ) /* aborts */
 #define ABTEX ( m_cr4 & 0x40 ) /* abort generates 16 '1' bits instead of 8 */
-#define NRZ ( m_cr4 & 0x80 ) /* zero complement / non-zero complement data format */
+#define NRZI ( m_cr4 & 0x80 ) /* NRZI (zero complement) vs. NRZ data format */
 
 
 /* status register 1 */
@@ -132,9 +130,24 @@ static const int word_length[4] = { 5, 6, 7, 8 }; /* transmit / receive word len
 #define RIDLE 0x04  /* receiver idle */
 #define RABT  0x08  /* receiver abort */
 #define ERR   0x10  /* invalid frame error */
-#define DCD   0x20  /* data carrier detect (ignored) */
+#define DCD   0x20  /* data carrier detect */
 #define OVRN  0x40  /* receiver overrun */
 #define RDA2  0x80  /* copy of RDA */
+
+
+/* FIFO entry markers */
+
+#define FIFO_FULL  0x100
+#define FIFO_LAST  0x200
+#define FIFO_ADDR  0x400
+#define FIFO_ERROR 0x800
+
+
+static inline uint16_t crc_bit( uint16_t crc, int bit )
+{
+	/* CRC-CCITT x^16 + x^12 + x^5 + 1, least significant bit first */
+	return ( ( crc ^ bit ) & 1 ) ? ( ( crc >> 1 ) ^ 0x8408 ) : ( crc >> 1 );
+}
 
 
 DEFINE_DEVICE_TYPE(MC6854, mc6854_device, "mc6854", "Motorola MC6854 ADLC")
@@ -158,13 +171,29 @@ mc6854_device::mc6854_device(const machine_config &mconfig, const char *tag, dev
 	m_dcd(0),
 	m_tstate(0),
 	m_tones(0),
-	m_ttimer(nullptr),
+	m_tqueue(0),
+	m_tqlen(0),
+	m_tcrc(0),
+	m_tabort(false),
+	m_tclose(0),
+	m_tflag(0),
+	m_tfc(false),
+	m_cts_stored(false),
+	m_tflen(0),
+	m_txc(false),
+	m_txd(true),
+	m_rts(false),
 	m_rstate(0),
 	m_rreg(0),
 	m_rones(0),
 	m_rsize(0),
-	m_rxd(0),
-	m_rxc(0),
+	m_rcrc(0),
+	m_rdelay(0),
+	m_rdcount(0),
+	m_rbits(0),
+	m_rxd(true),
+	m_rxd_last(true),
+	m_rxc(false),
 	m_flen(0),
 	m_fpos(0)
 {
@@ -188,8 +217,6 @@ void mc6854_device::device_start()
 {
 	m_out_frame_cb.resolve_safe();
 
-	m_ttimer = timer_alloc(FUNC(mc6854_device::tfifo_cb), this);
-
 	save_item(NAME(m_cr1));
 	save_item(NAME(m_cr2));
 	save_item(NAME(m_cr3));
@@ -201,11 +228,30 @@ void mc6854_device::device_start()
 	save_item(NAME(m_tstate));
 	save_item(NAME(m_tfifo));
 	save_item(NAME(m_tones));
+	save_item(NAME(m_tqueue));
+	save_item(NAME(m_tqlen));
+	save_item(NAME(m_tcrc));
+	save_item(NAME(m_tabort));
+	save_item(NAME(m_tclose));
+	save_item(NAME(m_tflag));
+	save_item(NAME(m_tfc));
+	save_item(NAME(m_cts_stored));
+	save_item(NAME(m_tflen));
+	save_item(NAME(m_txc));
+	save_item(NAME(m_txd));
+	save_item(NAME(m_rts));
 	save_item(NAME(m_rstate));
 	save_item(NAME(m_rreg));
 	save_item(NAME(m_rones));
 	save_item(NAME(m_rsize));
 	save_item(NAME(m_rfifo));
+	save_item(NAME(m_rcrc));
+	save_item(NAME(m_rdelay));
+	save_item(NAME(m_rdcount));
+	save_item(NAME(m_rbits));
+	save_item(NAME(m_rxd));
+	save_item(NAME(m_rxd_last));
+	save_item(NAME(m_rxc));
 	save_item(NAME(m_frame));
 	save_item(NAME(m_flen));
 	save_item(NAME(m_fpos));
@@ -224,62 +270,261 @@ void mc6854_device::device_reset()
 	m_cr4 = 0;
 	m_sr1 = 0;
 	m_sr2 = 0;
-	m_cts = 0;
-	m_dcd = 0;
+	m_cts_stored = false;
 	tfifo_clear( );
 	rfifo_clear( );
+	update_sr1( );
+
+	m_txd = true;
+	m_out_txd_cb( 1 );
+	m_rts = false;
+	m_out_rts_cb( 0 );
+	m_out_dtr_cb( 0 );
 }
 
 /*********************** transmit ***********************/
 
 
 
-/* MC6854 fills bit queue */
-void mc6854_device::send_bits( uint32_t data, int len, int zi )
+/* queue serial bits, least significant bit first */
+void mc6854_device::queue_bits( uint32_t data, int len, bool zi )
 {
-	attotime expire;
-	int i;
-	if ( zi )
+	for ( int i = 0; i < len; i++, data >>= 1 )
 	{
-		/* zero-insertion mode */
-		uint32_t d = 0;
-		int l = 0;
-		for ( i = 0; i < len; i++, data >>= 1, l++ )
+		m_tqueue |= uint64_t( data & 1 ) << m_tqlen++;
+
+		if ( zi )
 		{
 			if ( data & 1 )
 			{
-				d |= 1 << l;
-				m_tones++;
-				if ( m_tones == 5 )
+				if ( ++m_tones == 5 )
 				{
-					/* insert a '0' after 5 consecutive '1" */
+					/* insert a '0' after 5 consecutive '1' */
 					m_tones = 0;
-					l++;
+					m_tqlen++;
 				}
 			}
 			else
 				m_tones = 0;
 		}
-		data = d;
-		len = l;
 	}
-	else
+
+	if ( ! zi )
 		m_tones = 0;
-
-	/* send bits */
-	for ( i = 0; i < len; i++, data >>= 1 )
-		m_out_txd_cb( data & 1 );
-
-	/* schedule when to ask the MC6854 for more bits */
-	expire = m_ttimer ->remaining( );
-	if ( expire== attotime::never )
-		expire = attotime::zero;
-	m_ttimer->reset( expire + (BIT_LENGTH * len));
 }
 
 
 
-/* CPU push -> tfifo[0] -> ... -> tfifo[FIFO_SIZE-1] -> pop */
+void mc6854_device::queue_flag( )
+{
+	queue_bits( FLAG, 8, false );
+}
+
+
+
+void mc6854_device::queue_abort( )
+{
+	LOG( "%f mc6854 abort\n", machine().time().as_double() );
+	queue_bits( 0xffff, ABTEX ? 16 : 8, false );
+	m_tabort = false;
+	m_tstate = 0;
+	m_tflag = 0;
+	m_tflen = 0;
+	m_tclose = m_tqlen + 1;
+}
+
+
+
+/* MC6854 fills the transmitter shift register */
+void mc6854_device::tx_refill( )
+{
+	if ( TRESET )
+	{
+		/* transmitter in reset: marks */
+		queue_bits( 1, 1, false );
+		m_tflag = 0;
+		return;
+	}
+
+	if ( m_tabort )
+	{
+		queue_abort( );
+		return;
+	}
+
+	if ( ! m_tstate )
+	{
+		if ( ! ( m_tfifo[ FIFO_SIZE - 1 ] & FIFO_FULL ) )
+		{
+			/* idle */
+			if ( FMIDLE )
+			{
+				queue_flag( );
+				m_tflag = 1;
+			}
+			else
+			{
+				queue_bits( 1, 1, false );
+				m_tflag = 0;
+			}
+			return;
+		}
+
+		/* start frame */
+		LOG( "%f mc6854 start frame\n", machine().time().as_double() );
+		m_tstate = 2;
+		m_tcrc = 0xffff;
+		m_tflen = 0;
+
+		if ( ! m_tflag || ( m_tflag == 2 && TWOINTER ) )
+		{
+			/* opening flag */
+			queue_flag( );
+			m_tflag = 1;
+			return;
+		}
+	}
+
+	/* in frame: take a field from the FIFO */
+	int const data = m_tfifo[ FIFO_SIZE - 1 ];
+
+	for ( int i = FIFO_SIZE - 1; i > 0; i-- )
+		m_tfifo[ i ] = m_tfifo[ i - 1 ];
+	m_tfifo[ 0 ] = 0;
+
+	m_tflag = 0;
+
+	if ( ! ( data & FIFO_FULL ) )
+	{
+		/* data underrun => abort */
+		logerror( "%f mc6854 FIFO underrun\n", machine().time().as_double() );
+		m_sr1 |= TU;
+		queue_abort( );
+		update_sr1( );
+		return;
+	}
+
+	int blen = 8;
+
+	switch ( m_tstate )
+	{
+	case 2: /* 8-bit address field */
+		if ( ( data & 1 ) || ( ! AEX ) )
+			m_tstate = 3;
+		LOG( "%f mc6854 tx address field $%02X\n", machine().time().as_double(), data & 0xff );
+		break;
+
+	case 3: /* 8-bit control field */
+		if ( CEX )
+			m_tstate = 4;
+		else if ( LCF )
+			m_tstate = 5;
+		else
+			m_tstate = 6;
+		LOG( "%f mc6854 tx control field $%02X\n", machine().time().as_double(), data & 0xff );
+		break;
+
+	case 4: /* 8-bit extended control field (optional) */
+		if ( LCF )
+			m_tstate = 5;
+		else
+			m_tstate = 6;
+		LOG( "%f mc6854 tx control field $%02X\n", machine().time().as_double(), data & 0xff );
+		break;
+
+	case 5: /* 8-bit logical control (optional) */
+		if ( ! ( data & 0x80 ) )
+			m_tstate = 6;
+		LOG( "%f mc6854 tx logical control field $%02X\n", machine().time().as_double(), data & 0xff );
+		break;
+
+	case 6: /* variable-length data */
+		blen = TWL;
+		LOG( "%f mc6854 tx data field $%02X, %i bits\n", machine().time().as_double(), data & 0xff, blen );
+		break;
+	}
+
+	for ( int i = 0; i < blen; i++ )
+		m_tcrc = crc_bit( m_tcrc, BIT( data, i ) );
+	queue_bits( data, blen, true );
+
+	if ( !m_out_frame_cb.isnull() )
+	{
+		if ( m_tflen < MAX_FRAME_LENGTH )
+			m_frame[ m_tflen++ ] = data;
+		else
+			logerror( "mc6854 truncated frame, max=%i\n", MAX_FRAME_LENGTH );
+	}
+
+	if ( data & FIFO_LAST )
+	{
+		/* close frame */
+		LOG( "%f mc6854 end frame\n", machine().time().as_double() );
+		queue_bits( ~m_tcrc & 0xffff, 16, true );
+		queue_flag( );
+		m_tflag = 2;
+		m_tstate = 0;
+		m_tclose = m_tqlen + 1;
+
+		if ( m_tflen > 0 )
+		{
+			int const len = m_tflen;
+			m_tflen = 0;
+			m_out_frame_cb( m_frame, len );
+		}
+	}
+
+	update_sr1( );
+}
+
+
+
+void mc6854_device::update_rts( )
+{
+	bool const active = RTS || m_tstate || m_tclose;
+
+	if ( active != m_rts )
+	{
+		m_rts = active;
+		m_out_rts_cb( m_rts ? 1 : 0 );
+	}
+}
+
+
+
+/* shift one bit out on TxD */
+void mc6854_device::tx_bit( )
+{
+	if ( m_tclose && ! --m_tclose )
+	{
+		/* last bit cell of the closing flag or abort has ended */
+		m_tfc = true;
+		update_sr1( );
+	}
+
+	update_rts( );
+
+	if ( ! m_tqlen )
+		tx_refill( );
+
+	int const bit = m_tqueue & 1;
+	m_tqueue >>= 1;
+	m_tqlen--;
+
+	if ( ! NRZI )
+		m_txd = bit;
+	else if ( ! bit )
+		m_txd = ! m_txd;
+
+	m_out_txd_cb( m_txd ? 1 : 0 );
+
+	if ( m_tqlen <= 1 )
+		tx_refill( );
+}
+
+
+
+/* CPU pushes a field */
 void mc6854_device::tfifo_push( uint8_t data )
 {
 	int i;
@@ -290,22 +535,16 @@ void mc6854_device::tfifo_push( uint8_t data )
 	/* push towards the rightmost free entry */
 	for ( i = FIFO_SIZE - 1; i >= 0; i-- )
 	{
-		if ( ! ( m_tfifo[ i ] & 0x100 ) )
+		if ( ! ( m_tfifo[ i ] & FIFO_FULL ) )
 			break;
 	}
 
 	if ( i >= 0 )
-		m_tfifo[ i ] = data | 0x100;
+		m_tfifo[ i ] = data | FIFO_FULL;
 	else
 		logerror( "%f mc6854_tfifo_push: FIFO overrun\n", machine().time().as_double() );
 
-	/* start frame, if needed */
-	if ( ! m_tstate )
-	{
-		LOG( "%f mc6854_tfifo_push: start frame\n", machine().time().as_double() );
-		m_tstate = 2;
-		send_bits( FLAG, 8, 0 );
-	}
+	update_sr1( );
 }
 
 
@@ -314,118 +553,13 @@ void mc6854_device::tfifo_push( uint8_t data )
 void mc6854_device::tfifo_terminate( )
 {
 	/* mark most recently pushed byte as the last one of the frame */
-	int i;
-	for ( i = 0; i < FIFO_SIZE; i++ )
+	for ( int i = 0; i < FIFO_SIZE; i++ )
 	{
-		if ( m_tfifo[ i ] & 0x100 )
+		if ( m_tfifo[ i ] & FIFO_FULL )
 		{
-			m_tfifo[ i ] |= 0x200;
+			m_tfifo[ i ] |= FIFO_LAST;
 			break;
 		}
-	}
-}
-
-
-
-/* call-back to refill the bit-stream from the FIFO */
-TIMER_CALLBACK_MEMBER(mc6854_device::tfifo_cb)
-{
-	int i, data = m_tfifo[ FIFO_SIZE - 1 ];
-
-	if ( ! m_tstate )
-		return;
-
-	/* shift FIFO to the right */
-	for ( i = FIFO_SIZE - 1; i > 0; i-- )
-		m_tfifo[ i ] = m_tfifo[ i - 1 ];
-	m_tfifo[ 0 ] = 0;
-
-	if ( data & 0x100 )
-	{
-		/* got data */
-
-		int blen = 8;
-
-		switch ( m_tstate )
-		{
-		case 2: /* 8-bit address field */
-			if ( ( data & 1 ) || ( ! AEX ) )
-				m_tstate = 3;
-			LOG( "%f mc6854_tfifo_cb: address field $%02X\n", machine().time().as_double(), data & 0xff );
-			break;
-
-		case 3: /* 8-bit control field */
-			if ( CEX )
-				m_tstate = 4;
-			else if ( LCF )
-				m_tstate = 5;
-			else
-				m_tstate = 6;
-			LOG( "%f mc6854_tfifo_cb: control field $%02X\n", machine().time().as_double(), data & 0xff );
-			break;
-
-		case 4: /* 8-bit extended control field (optional) */
-			if ( LCF )
-				m_tstate = 5;
-			else
-				m_tstate = 6;
-			LOG( "%f mc6854_tfifo_cb: control field $%02X\n", machine().time().as_double(), data & 0xff );
-			break;
-
-		case 5: /* 8-bit logical control (optional) */
-			if ( ! ( data & 0x80 ) )
-				m_tstate = 6;
-			LOG( "%f mc6854_tfifo_cb: logical control field $%02X\n", machine().time().as_double(), data & 0xff );
-			break;
-
-		case 6: /* variable-length data */
-			blen = TWL;
-			LOG( "%f mc6854_tfifo_cb: data field $%02X, %i bits\n", machine().time().as_double(), data & 0xff, blen );
-			break;
-
-		default:
-			LOG( "%f mc6854_tfifo_cb: state=%i\n", machine().time().as_double(), m_tstate);
-		}
-
-		if ( m_flen < MAX_FRAME_LENGTH )
-			m_frame[ m_flen++ ] = data;
-		else
-			logerror( "mc6854_tfifo_cb: truncated frame, max=%i\n", MAX_FRAME_LENGTH );
-
-		send_bits( data, blen, 1 );
-	}
-	else
-	{
-		/* data underrun => abort */
-		logerror( "%f mc6854_tfifo_cb: FIFO underrun\n", machine().time().as_double() );
-		m_sr1 |= TU;
-		update_sr1();
-		m_tstate = 0;
-		send_bits( 0xffff, ABTEX ? 16 : 8, 0 );
-		m_flen = 0;
-	}
-
-	/* close frame, if needed */
-	if ( data & 0x200 )
-	{
-		int len = m_flen;
-
-		LOG( "%f mc6854_tfifo_cb: end frame\n", machine().time().as_double() );
-		send_bits( 0xdeadbeef, 16, 1 );  /* send check-sum: TODO */
-		send_bits( FLAG, 8, 0 );         /* send closing flag */
-
-		if ( m_tfifo[ FIFO_SIZE - 1 ] & 0x100 )
-		{
-			/* re-open frame asap */
-			LOG( "%f mc6854_tfifo_cb: start frame\n", machine().time().as_double() );
-			if ( TWOINTER )
-				send_bits( FLAG, 8, 0 );
-		}
-		else
-			m_tstate = 0;
-
-		m_flen = 0;
-		m_out_frame_cb( m_frame, len );
 	}
 }
 
@@ -433,10 +567,25 @@ TIMER_CALLBACK_MEMBER(mc6854_device::tfifo_cb)
 
 void mc6854_device::tfifo_clear( )
 {
-	memset( m_tfifo, 0, sizeof( m_tfifo ) );
+	std::fill( std::begin( m_tfifo ), std::end( m_tfifo ), 0 );
 	m_tstate = 0;
-	m_flen = 0;
-	m_ttimer->reset(  );
+	m_tones = 0;
+	m_tqueue = 0;
+	m_tqlen = 0;
+	m_tabort = false;
+	m_tclose = 0;
+	m_tflag = 0;
+	m_tflen = 0;
+}
+
+
+
+void mc6854_device::txc_w(int state)
+{
+	if ( m_txc && ! state )
+		tx_bit( );
+
+	m_txc = state;
 }
 
 
@@ -461,7 +610,7 @@ void mc6854_device::rfifo_push( uint8_t d )
 		else
 			m_rstate = 2;
 		LOG( "%f mc6854_rfifo_push: address field $%02X\n", machine().time().as_double(), data );
-		data |= 0x400; /* address marker */
+		data |= FIFO_ADDR;
 		break;
 
 	case 3: /* 8-bit control field */
@@ -495,24 +644,26 @@ void mc6854_device::rfifo_push( uint8_t d )
 		break;
 	}
 
+	m_rsize -= blen;
+
 	/* no further FIFO fill until FV is cleared! */
-	if ( m_sr2 & FV )
+	if ( m_sr2 & ( FV | ERR ) )
 	{
 		LOG( "%f mc6854_rfifo_push: field not pushed\n", machine().time().as_double() );
 		return;
 	}
 
-	data |= 0x100; /* entry full marker */
+	data |= FIFO_FULL;
 
 	/* push towards the rightmost free entry */
 	for ( i = FIFO_SIZE - 1; i >= 0; i-- )
 	{
-		if ( ! ( m_rfifo[ i ] & 0x100 ) )
+		if ( ! ( m_rfifo[ i ] & FIFO_FULL ) )
 			break;
 	}
 
 	if ( i >= 0 )
-		m_rfifo[ i ] = data | 0x100;
+		m_rfifo[ i ] = data;
 	else
 	{
 		/* FIFO full */
@@ -521,27 +672,24 @@ void mc6854_device::rfifo_push( uint8_t d )
 		logerror( "%f mc6854_rfifo_push: FIFO overrun\n", machine().time().as_double() );
 	}
 
-	m_rsize -= blen;
 	update_sr1( );
 }
 
 
-void mc6854_device::rfifo_terminate( )
+void mc6854_device::rfifo_terminate( bool error )
 {
 	/* mark most recently pushed byte as the last one of the frame */
-	int i;
-	for ( i = 0; i < FIFO_SIZE; i++ )
+	for ( int i = 0; i < FIFO_SIZE; i++ )
 	{
-		if ( m_rfifo[ i ] & 0x100 )
+		if ( m_rfifo[ i ] & FIFO_FULL )
 		{
-			m_rfifo[ i ] |= 0x200;
+			m_rfifo[ i ] |= FIFO_LAST | ( error ? FIFO_ERROR : 0 );
 			break;
 		}
-
 	}
 
-	m_flen = 0;
 	m_rstate = 1;
+	update_sr1( );
 }
 
 
@@ -555,19 +703,18 @@ uint8_t mc6854_device::rfifo_pop( )
 		m_rfifo[ i ] = m_rfifo[ i - 1 ];
 	m_rfifo[ 0 ] = 0;
 
-	if ( m_rfifo[ FIFO_SIZE - 1 ] & 0x200 )
-	{
-		/* last byte in frame */
-		m_sr2 |= FV; /* TODO: check CRC & set ERR instead of FV if error*/
-	}
-
 	/* auto-refill in frame mode */
 	if ( m_flen > 0 )
 	{
 		rfifo_push( m_frame[ m_fpos++ ] );
 		if ( m_fpos == m_flen )
-			rfifo_terminate( );
+		{
+			m_flen = 0;
+			rfifo_terminate( false );
+		}
 	}
+
+	update_sr1( );
 
 	return data;
 }
@@ -582,11 +729,13 @@ void mc6854_device::set_rx(int state)
 
 void mc6854_device::rfifo_clear( )
 {
-	memset( m_rfifo, 0, sizeof( m_rfifo ) );
+	std::fill( std::begin( m_rfifo ), std::end( m_rfifo ), 0 );
 	m_rstate = 0;
 	m_rreg = 0;
 	m_rsize = 0;
 	m_rones = 0;
+	m_rdcount = 0;
+	m_rbits = 0;
 	m_flen = 0;
 }
 
@@ -618,8 +767,150 @@ int mc6854_device::send_frame( uint8_t* data, int len )
 	rfifo_push( m_frame[ m_fpos++ ] );
 	rfifo_push( m_frame[ m_fpos++ ] );
 	if ( m_fpos == m_flen )
-		rfifo_terminate( );
+	{
+		m_flen = 0;
+		rfifo_terminate( false );
+	}
 	return 0;
+}
+
+
+
+/* a bit enters the receiver shift register */
+void mc6854_device::rx_shift( int bit )
+{
+	if ( ! m_rstate )
+		return;
+
+	m_rreg = ( m_rreg >> 1 ) | ( bit ? 0x80000000 : 0 );
+	m_rsize++;
+
+	/* the last 8 bits may be the closing flag, keep them out of the FCS */
+	if ( m_rdcount == 8 )
+	{
+		m_rcrc = crc_bit( m_rcrc, m_rdelay & 1 );
+		m_rbits++;
+	}
+	else
+		m_rdcount++;
+	m_rdelay = ( m_rdelay >> 1 ) | ( bit ? 0x80 : 0 );
+
+	int const fieldlen = ( m_rstate < 6 ) ? 8 : RWL;
+	if ( m_rsize >= fieldlen + 24 )
+		rfifo_push( m_rreg );
+}
+
+
+
+void mc6854_device::rx_end_frame( )
+{
+	if ( m_rbits < 25 )
+	{
+		/* short frame, ignored */
+		LOG( "%f mc6854 short frame ignored (%u bits)\n", machine().time().as_double(), m_rbits );
+		return;
+	}
+
+	bool const error = ( m_rbits < 32 ) || ( m_rcrc != 0xf0b8 );
+	LOG( "%f mc6854 end of frame (%u bits, FCS %s)\n", machine().time().as_double(), m_rbits, error ? "bad" : "good" );
+	rfifo_terminate( error );
+}
+
+
+
+/* MC6854 makes fields from bits */
+void mc6854_device::rx_bit( int bit )
+{
+	if ( bit )
+	{
+		LOGBITS("I ");
+		if ( m_rones < 0xff )
+			m_rones++;
+
+		if ( m_rones == 7 )
+		{
+			/* abort */
+			if ( m_rstate && ( m_rbits + m_rdcount >= 26 ) )
+			{
+				m_sr2 |= RABT;
+				LOG( "%f mc6854 receive abort\n", machine().time().as_double() );
+			}
+			if ( m_rstate > 1 )
+			{
+				/* discard the aborted frame, keeping the end of the previous one */
+				for ( int i = 0; ( i < FIFO_SIZE ) && ! ( m_rfifo[ i ] & FIFO_LAST ); i++ )
+					m_rfifo[ i ] = 0;
+			}
+			m_rstate = 0;
+			m_rsize = 0;
+			update_sr1( );
+		}
+		else if ( m_rones == 15 )
+		{
+			/* idle */
+			m_sr2 |= RIDLE;
+			update_sr1( );
+		}
+
+		if ( m_rones < 7 )
+			rx_shift( 1 );
+	}
+	else if ( m_rones == 5 )
+	{
+		/* discards '0' inserted after 5 '1' */
+		LOGBITS("A zero is discarded\n");
+		m_rones = 0;
+	}
+	else if ( m_rones == 6 )
+	{
+		/* flag */
+		m_rones = 0;
+
+		if ( FDSE )
+			m_sr1 |= FD;
+
+		if ( m_rstate )
+		{
+			rx_shift( 0 );
+			rx_end_frame( );
+		}
+
+		m_rstate = 1;
+		m_rreg = 0;
+		m_rsize = 0;
+		m_rcrc = 0xffff;
+		m_rdelay = 0;
+		m_rdcount = 0;
+		m_rbits = 0;
+		update_sr1( );
+	}
+	else
+	{
+		LOGBITS("O ");
+		bool const idle = m_rones >= 15;
+		m_rones = 0;
+		rx_shift( 0 );
+		if ( idle )
+			update_sr1( );
+	}
+}
+
+
+
+void mc6854_device::rxc_w(int state)
+{
+	if ( state && ! m_rxc )
+	{
+		int const level = m_rxd ? 1 : 0;
+		int const bit = NRZI ? ( level == ( m_rxd_last ? 1 : 0 ) ) : level;
+		m_rxd_last = m_rxd;
+
+		/* the receiver is held reset while the DCD input or stored DCD is high */
+		if ( ! RRESET && ! ( m_sr2 & DCD ) && ! m_dcd )
+			rx_bit( bit );
+	}
+
+	m_rxc = state;
 }
 
 
@@ -630,14 +921,11 @@ int mc6854_device::send_frame( uint8_t* data, int len )
 
 void mc6854_device::set_cts(int state)
 {
-	if ( ! m_cts && state )
-		m_sr1 |= CTS;
+	/* the stored CTS condition is held reset by Tx reset */
+	if ( ! m_cts && state && ! TRESET )
+		m_cts_stored = true;
 	m_cts = state;
 
-	if ( m_cts )
-		m_sr1 |= CTS;
-	else
-		m_sr1 &= ~CTS;
 	update_sr1();
 }
 
@@ -647,7 +935,10 @@ void mc6854_device::set_dcd(int state)
 {
 	if ( ! m_dcd && state )
 	{
-		m_sr2 |= DCD;
+		/* the stored DCD condition is held reset by Rx reset */
+		if ( ! RRESET )
+			m_sr2 |= DCD;
+
 		/* partial reset */
 		m_rstate = 0;
 		m_rreg = 0;
@@ -655,6 +946,8 @@ void mc6854_device::set_dcd(int state)
 		m_rones = 0;
 	}
 	m_dcd = state;
+
+	update_sr1();
 }
 
 
@@ -663,16 +956,21 @@ void mc6854_device::update_sr2( )
 {
 	/* update RDA */
 	m_sr2 |= RDA2;
-	if ( ! (m_rfifo[ FIFO_SIZE - 1 ] & 0x100) )
+	if ( ! ( m_rfifo[ FIFO_SIZE - 1 ] & FIFO_FULL ) )
 		m_sr2 &= ~RDA2;
-	else if ( TWOBYTES && ! (m_rfifo[ FIFO_SIZE - 2 ] & 0x100) )
+	else if ( TWOBYTES && ! ( m_rfifo[ FIFO_SIZE - 2 ] & FIFO_FULL ) )
 		m_sr2 &= ~RDA2;
 
 	/* update AP */
-	if ( m_rfifo[ FIFO_SIZE - 1 ] & 0x400 )
+	if ( m_rfifo[ FIFO_SIZE - 1 ] & FIFO_ADDR )
 		m_sr2 |= AP;
 	else
 		m_sr2 &= ~AP;
+
+	/* frame boundary reached the last FIFO location */
+	if ( m_rfifo[ FIFO_SIZE - 1 ] & FIFO_LAST )
+		m_sr2 |= ( m_rfifo[ FIFO_SIZE - 1 ] & FIFO_ERROR ) ? ERR : FV;
+
 }
 
 
@@ -687,16 +985,23 @@ void mc6854_device::update_sr1( )
 	else
 		m_sr1 &= ~S2RQ;
 
-	/* update TDRA (always prioritized by CTS) */
-	if ( TRESET || ( m_sr1 & CTS ) )
-		m_sr1 &= ~TDRA;
+	/* update CTS */
+	if ( m_cts_stored || m_cts )
+		m_sr1 |= CTS;
 	else
+		m_sr1 &= ~CTS;
+
+	/* update TDRA/FC (always inhibited by CTS) */
+	m_sr1 &= ~TDRA;
+	if ( FCTDRA )
 	{
-		m_sr1 |= TDRA;
-		if ( m_tfifo[ 0 ] & 0x100 )
-			m_sr1 &= ~TDRA;
-		else if ( TWOBYTES && (m_tfifo[ 1 ] & 0x100) )
-			m_sr1 &= ~TDRA;
+		if ( m_tfc )
+			m_sr1 |= TDRA;
+	}
+	else if ( ! TRESET && ! m_cts )
+	{
+		if ( ! ( m_tfifo[ 0 ] & FIFO_FULL ) && ! ( TWOBYTES && ( m_tfifo[ 1 ] & FIFO_FULL ) ) )
+			m_sr1 |= TDRA;
 	}
 
 	/* update RDA */
@@ -711,18 +1016,18 @@ void mc6854_device::update_sr1( )
 	if ( TIE )
 	{
 		if ( m_sr1 & TU ) m_sr1 |= IRQ;
-		LOGIRQ(" - Update IRQ TU: %d\n", (m_sr1 & IRQ) ? 1 : 0);
+		if ( m_cts_stored ) m_sr1 |= IRQ;
+		LOGIRQ(" - Update IRQ TU/CTS: %d\n", (m_sr1 & IRQ) ? 1 : 0);
 		if ( ( m_sr1 & TDRA ) && !TDSR ) m_sr1 |= IRQ; // TDRA will not cause interrupt if in DMA mode
 		LOGIRQ(" - Update IRQ TDRA: %d\n", (m_sr1 & IRQ) ? 1 : 0);
 	}
 	if ( RIE )
 	{
-		if ( m_sr1 & (S2RQ | CTS) ) m_sr1 |= IRQ;
-		LOGIRQ(" - Update IRQ S2RQ(%02x)|CTS(%d): %d\n", (m_sr2 & 0x7f), (m_sr1 & CTS) ? 1 : 0, (m_sr1 & IRQ) ? 1 : 0);
+		if ( m_sr1 & FD ) m_sr1 |= IRQ;
 		if ( ( m_sr1 & RDA ) && !RDSR ) m_sr1 |= IRQ; // RDA will not cause interrupt if in DMA mode
 		LOGIRQ(" - Update IRQ RDA(%d) && !RDSR(%d): %d\n", (m_sr1 & RDA) ? 1 : 0, RDSR ? 1 : 0, (m_sr1 & IRQ) ? 1 : 0);
 		if ( m_sr2 & (ERR | FV | DCD | OVRN | RABT | RIDLE | AP) ) m_sr1 |= IRQ;
-		LOGIRQ(" - Update IRQ ERR: %d\n", (m_sr1 & IRQ) ? 1 : 0);
+		LOGIRQ(" - Update IRQ SR2: %d\n", (m_sr1 & IRQ) ? 1 : 0);
 	}
 
 	m_out_irq_cb((m_sr1 & IRQ) ? ASSERT_LINE : CLEAR_LINE);
@@ -737,7 +1042,6 @@ uint8_t mc6854_device::read(offs_t offset)
 	switch ( offset )
 	{
 	case 0: /* status register 1 */
-		//update_sr1( );
 		LOG( "%f %s mc6854_r: get SR1=$%02X (rda=%i,s2rq=%i,fd=%i,cts=%i,tu=%i,tdra=%i,irq=%i)\n",
 				machine().time().as_double(), machine().describe_context(), m_sr1,
 				( m_sr1 & RDA) ? 1 : 0, ( m_sr1 & S2RQ) ? 1 : 0,
@@ -747,22 +1051,32 @@ uint8_t mc6854_device::read(offs_t offset)
 		return m_sr1;
 
 	case 1: /* status register 2 */
-		//update_sr2( );
+	{
+		/* DCD and Rx idle are the logical OR of the stored and present conditions */
+		uint8_t sr2 = m_sr2;
+		if ( m_dcd )
+			sr2 |= DCD;
+		if ( m_rones >= 15 )
+			sr2 |= RIDLE;
+
 		LOG( "%f %s mc6854_r: get SR2=$%02X (ap=%i,fv=%i,ridle=%i,rabt=%i,err=%i,dcd=%i,ovrn=%i,rda2=%i)\n",
-				machine().time().as_double(), machine().describe_context(), m_sr2,
-				( m_sr2 & AP   ) ? 1 : 0, ( m_sr2 & FV  ) ? 1 : 0,
-				( m_sr2 & RIDLE) ? 1 : 0, ( m_sr2 & RABT) ? 1 : 0,
-				( m_sr2 & ERR  ) ? 1 : 0, ( m_sr2 & DCD ) ? 1 : 0,
-				( m_sr2 & OVRN ) ? 1 : 0, ( m_sr2 & RDA2) ? 1 : 0 );
-		return m_sr2;
+				machine().time().as_double(), machine().describe_context(), sr2,
+				( sr2 & AP   ) ? 1 : 0, ( sr2 & FV  ) ? 1 : 0,
+				( sr2 & RIDLE) ? 1 : 0, ( sr2 & RABT) ? 1 : 0,
+				( sr2 & ERR  ) ? 1 : 0, ( sr2 & DCD ) ? 1 : 0,
+				( sr2 & OVRN ) ? 1 : 0, ( sr2 & RDA2) ? 1 : 0 );
+		return sr2;
+	}
 
 	case 2: /* receiver data register */
 	case 3:
 	{
+		if ( machine().side_effects_disabled() )
+			return m_rfifo[ FIFO_SIZE - 1 ] & 0xff;
+
 		uint8_t data = rfifo_pop( );
 		LOG( "%f %s mc6854_r: get data $%02X\n",
 				machine().time().as_double(), machine().describe_context(), data );
-		m_out_rdsr_cb(CLEAR_LINE); // Deactive DMA request line regardless of mode
 		return data;
 	}
 
@@ -791,7 +1105,7 @@ void mc6854_device::write(offs_t offset, uint8_t data)
 		{
 			/* abort receive FIFO but keeps shift register & synchro */
 			m_rstate = 0;
-			memset( m_rfifo, 0, sizeof( m_rfifo ) );
+			std::fill( std::begin( m_rfifo ), std::end( m_rfifo ), 0 );
 		}
 		if ( RRESET )
 		{
@@ -799,16 +1113,15 @@ void mc6854_device::write(offs_t offset, uint8_t data)
 			rfifo_clear( );
 			m_sr1 &= ~FD;
 			m_sr2 &= ~(AP | FV | RIDLE | RABT | ERR | OVRN | DCD);
-			if ( m_dcd ) m_sr2 |= DCD;
-			update_sr1( );
 		}
 		if ( TRESET )
 		{
 			tfifo_clear( );
-			m_sr1 &= ~(TU | TDRA | CTS);
-			if ( m_cts ) m_sr1 |= CTS;
-			update_sr1( );
+			m_sr1 &= ~TU;
+			m_tfc = false;
+			m_cts_stored = false;
 		}
+		update_sr1( );
 		break;
 
 	case 1:
@@ -847,21 +1160,17 @@ void mc6854_device::write(offs_t offset, uint8_t data)
 			{
 				/* clear receiver status */
 				m_sr1 &= ~FD;
-				m_sr2 &= ~(AP | FV | RIDLE | RABT | ERR | OVRN | DCD);
-				if ( m_dcd )
-					m_sr2 |= DCD;
-				update_sr1( );
+				m_sr2 &= ~(FV | RIDLE | RABT | ERR | OVRN | DCD);
 			}
 			if ( data & 0x40 )
 			{
 				/* clear transmitter status */
-				m_sr1 &= ~(TU | TDRA | CTS);
-				if ( m_cts )
-					m_sr1 |= CTS;
-				update_sr1( );
+				m_sr1 &= ~TU;
+				m_tfc = false;
+				m_cts_stored = false;
 			}
-
-			m_out_rts_cb( RTS ? 1 : 0 );
+			update_sr1( );
+			update_rts( );
 		}
 		break;
 
@@ -879,12 +1188,14 @@ void mc6854_device::write(offs_t offset, uint8_t data)
 					TWOINTER ? 2 : 1,
 					TWL, RWL,
 					ABT ? ( ABTEX ? "abort-ext," : "abort,") : "",
-					NRZ ? "nrz" : "nrzi" );
+					NRZI ? "nrzi" : "nrz" );
 			if ( ABT )
 			{
-				m_tstate = 0;
-				send_bits( 0xffff, ABTEX ? 16 : 8, 0 );
-				m_flen = 0;
+				/* the Tx FIFO is cleared and an abort is sent */
+				std::fill( std::begin( m_tfifo ), std::end( m_tfifo ), 0 );
+				m_tabort = true;
+				m_cr4 &= ~0x20;
+				update_sr1( );
 			}
 		}
 		else
@@ -899,87 +1210,4 @@ void mc6854_device::write(offs_t offset, uint8_t data)
 	default:
 		logerror( "%s mc6854 invalid write offset %i (data=$%02X)\n", machine().describe_context(), offset, data );
 	}
-}
-
-inline bool mc6854_device::receive_allowed() const
-{
-	return (!RRESET && !(m_sr2 & DCD));
-}
-
-/* MC6854 makes fields from bits */
-void mc6854_device::rxc_w(int state)
-{
-	if (receive_allowed() && state && !m_rxc)
-	{
-		int fieldlen = ( m_rstate < 6 ) ? 8 : RWL;
-
-		if ( m_rxd )
-		{
-			LOGBITS("I ");
-			m_rones++;
-			m_rreg = (m_rreg >> 1) | 0x80000000;
-			if ( m_rones >= 8 )
-			{
-				/* abort */
-				m_rstate = 0;
-				m_rsize = 0;
-				if ( m_rstate > 1 )
-				{
-					/* only in-frame abort */
-					m_sr2 |= RABT;
-					LOG( "%f mc6854_receive_bit: abort\n", machine().time().as_double() );
-				}
-			}
-			else
-			{
-				m_rsize++;
-				if ( m_rstate && m_rsize >= fieldlen + 24 )
-					rfifo_push( m_rreg );
-			}
-		}
-		else if ( m_rones == 5 )
-		{
-			/* discards '0' inserted after 5 '1' */
-		  LOGBITS("A zero is discarded\n");
-			m_rones = 0;
-			return;
-		}
-		else if ( m_rones == 6 )
-		{
-			/* flag */
-			if ( FDSE )
-			{
-				m_sr1 |= FD;
-				update_sr1( );
-			}
-
-			if ( m_rstate > 1 )
-			{
-				/* end of frame */
-				m_rreg >>= 1;
-				m_rsize++;
-				if ( m_rsize >= fieldlen + 24 ) /* last field */
-					rfifo_push( m_rreg );
-				rfifo_terminate( );
-				LOG( "%f mc6854_receive_bit: end of frame\n", machine().time().as_double() );
-			}
-			m_rones = 0;
-			m_rstate = 1;
-			m_rsize = 0;
-		} else
-		{
-		  LOGBITS("O ");
-			m_rones = 0;
-			m_rreg >>= 1;
-			m_rsize++;
-			if ( m_rstate && m_rsize >= fieldlen + 24 )
-				rfifo_push( m_rreg );
-		}
-	}
-	m_rxc = state;
-}
-
-void mc6854_device::txc_w(int state)
-{
-	// TODO
 }

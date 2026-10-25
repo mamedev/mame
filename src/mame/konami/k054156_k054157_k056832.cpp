@@ -167,6 +167,7 @@ ones.  The other 7 words are ignored.  Global scrollx is ignored.
 #include "emu.h"
 #include "k054156_k054157_k056832.h"
 #include "konami_helper.h"
+#include "screen.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -1423,11 +1424,18 @@ void k056832_device::tilemap_draw_common(screen_device &screen, BitmapClass &bit
 	last_active = m_active_layer;
 	new_colorbase = (m_k055555 != nullptr) ? m_k055555->K055555_get_palette_index(layer) : 0;
 
+	// The tilemap core flips each page around the visible area's center.  Use
+	// the same origin for page clipping and scroll-table addressing (fixes glitches
+	// in Martial Champion and Metamorphic Force).
+	const int page_scrolly = flipy
+			? (ay + screen.visible_area().top() + screen.visible_area().bottom() + 1 + height - K056832_PAGE_HEIGHT) % height
+			: ay;
+
 	for (r = 0; r < rowspan; r++)
 	{
 		if (rowspan > 1)
 		{
-			sy = ay;
+			sy = page_scrolly;
 			ty = r * K056832_PAGE_HEIGHT;
 
 			if (!flipy)

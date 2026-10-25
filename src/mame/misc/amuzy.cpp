@@ -455,10 +455,10 @@ ROM_START( wwdash )
 	ROM_LOAD16_WORD_SWAP( "s29al004d70tfi01.u1", 0x000000, 0x080000, CRC(b8984518) SHA1(23f8f2988a44bf0f0a14c39363f97f8e1b12cf62) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
-	ROM_LOAD( "s29al016d70tfi01.u2", 0x000000, 0x200000, BAD_DUMP CRC(c02c4fed) SHA1(e3fd56621fc7ca4558f3044a1b13b6b58dd4c368) ) // image displaced by 0x12a26 bytes
+	ROM_LOAD( "s29al016d70tfi01.u2", 0x000000, 0x200000, CRC(2c6749c7) SHA1(0ab7e1ec7266b8332db505232c773f7cf682ac44) )
 
 	ROM_REGION(0x200000, "ygv", 0 )
-	ROM_LOAD16_WORD_SWAP( "s29al016d70tfi01.u3", 0x000000, 0x200000, BAD_DUMP CRC(cd66dc10) SHA1(76051b248882f7b5c0adfd0ae62283a16d440523) ) // D3/D4 shorted during dumping
+	ROM_LOAD16_WORD_SWAP( "s29al016d70tfi01.u3", 0x000000, 0x200000, CRC(68a45066) SHA1(f8765f99726479b1513152887d7bf7a7a44c0c83) )
 ROM_END
 
 ROM_START( boobood ) // HA9019-0
@@ -469,7 +469,7 @@ ROM_START( boobood ) // HA9019-0
 	ROM_LOAD( "29f016a.u2", 0x000000, 0x200000, CRC(edf8d7e2) SHA1(aee4d70dfd0fcb0d766365722b8712bb3a63efb4) )
 
 	ROM_REGION(0x200000, "ygv", 0 )
-	ROM_LOAD16_WORD_SWAP( "29lv160.u3", 0x000000, 0x200000, BAD_DUMP CRC(684523f0) SHA1(ca96918abde4ec63f33d82cf30b121f2ac05f68d) ) // D3/D4 shorted during dumping
+	ROM_LOAD16_WORD_SWAP( "29lv160.u3", 0x000000, 0x200000, CRC(839a7454) SHA1(58596092d3b32ba71468ae651d36d08f442b5cfe) )
 ROM_END
 
 ROM_START( fishbatl ) // HA9008-0
@@ -502,7 +502,7 @@ ROM_START( wanpunch ) // HA9008-0
 	ROM_LOAD( "u2", 0x000000, 0x200000, CRC(52862706) SHA1(a8ea16bafccad0cddcfa238402268bd8a2d4788b) )
 
 	ROM_REGION(0x200000, "ygv", 0 )
-	ROM_LOAD16_WORD_SWAP( "u3", 0x000000, 0x200000, BAD_DUMP CRC(48c3eee9) SHA1(291aaf0ffd5c46ed84e616508cff7c930790660a) ) // D3/D4 shorted during dumping
+	ROM_LOAD16_WORD_SWAP( "u3", 0x000000, 0x200000, CRC(5e9fc6cf) SHA1(da43df10ab7fe972d090f47e8d2487447264af2e) )
 ROM_END
 
 ROM_START( hhunter ) // HA9008-0
@@ -513,7 +513,7 @@ ROM_START( hhunter ) // HA9008-0
 	ROM_LOAD( "u2", 0x000000, 0x200000, CRC(b95a7b36) SHA1(7604c6df90836656fd1c861748a7a9035d7818c2) )
 
 	ROM_REGION(0x200000, "ygv", 0 )
-	ROM_LOAD16_WORD_SWAP( "u3", 0x000000, 0x200000, BAD_DUMP CRC(766ab340) SHA1(aa0b857ec5da879c33c678aa9f0d4e0d8dca65bf) ) // D3/D4 shorted during dumping
+	ROM_LOAD16_WORD_SWAP( "u3", 0x000000, 0x200000, CRC(c706d811) SHA1(c2be06e17b62cb1e27ea3554f8e2625083d0401a) )
 ROM_END
 
 ROM_START( rodeokng ) // HA9019-0
@@ -524,7 +524,7 @@ ROM_START( rodeokng ) // HA9019-0
 	ROM_LOAD( "u2", 0x000000, 0x200000, CRC(d636a639) SHA1(35aba71c0a10762cd91dda4d08a711768d74679a) )
 
 	ROM_REGION(0x200000, "ygv", 0 )
-	ROM_LOAD16_WORD_SWAP( "u3", 0x000000, 0x200000, BAD_DUMP CRC(3072eeed) SHA1(dab01071f4dc7131f7e78972c9a9042a2e8ac6d6) ) // D3/D4 shorted during dumping
+	ROM_LOAD16_WORD_SWAP( "u3", 0x000000, 0x200000, CRC(befc31ff) SHA1(fef31b59fb70c2d416ff1b205f04da0f5feb5195) )
 ROM_END
 
 ROM_START( dojokkot ) // HA9020-0
@@ -535,19 +535,18 @@ ROM_START( dojokkot ) // HA9020-0
 	ROM_LOAD( "u2", 0x000000, 0x200000, CRC(00756334) SHA1(747c5873f4b8a04b1956b447575a27ae23c57457) )
 
 	ROM_REGION(0x200000, "ygv", 0 )
-	ROM_LOAD16_WORD_SWAP( "u3", 0x000000, 0x200000, BAD_DUMP CRC(1123e2ce) SHA1(b702230d2494ecda9d90c42f87ab2396c316552d) ) // D3/D4 shorted during dumping
+	ROM_LOAD16_WORD_SWAP( "u3", 0x000000, 0x200000, CRC(70635186) SHA1(36d96e02a6871e838ec58cca93874fedec1dc8d0) )
 ROM_END
 
 ROM_START( itazurac ) // HA9022-0
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD16_WORD_SWAP( "u1", 0x000000, 0x080000, CRC(3262a286) SHA1(d5cf6749269e59c54c544ab6a0c324cf4dab176a) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
 
-	// this ROM wouldn't read consistently: most times it gave 0x88 and sometimes 0x00 at offset 0. Here we go with 0x88.
 	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
-	ROM_LOAD( "u2", 0x000000, 0x200000, BAD_DUMP CRC(5103b215) SHA1(5fe42bd0d29d2cfc9e0d35162ee15e3ff55c4bcb) ) // image displaced by 0x16a26 bytes
+	ROM_LOAD( "u2", 0x000000, 0x200000, CRC(bf9576c8) SHA1(4ce1dbbdca554d156c234890e04f5ad611783112) )
 
 	ROM_REGION(0x200000, "ygv", 0 )
-	ROM_LOAD16_WORD_SWAP( "u3", 0x000000, 0x200000, BAD_DUMP CRC(76ce7b79) SHA1(749bc519cf66c0aec615881824e417719af78d2b) ) // D3/D4 shorted during dumping
+	ROM_LOAD16_WORD_SWAP( "u3", 0x000000, 0x200000, CRC(6c229873) SHA1(1b1998185ff3604ac4037b2892184e78c7e50a73) )
 ROM_END
 
 ROM_START( katori ) // HA9020-0
@@ -598,19 +597,19 @@ void amuzy_state::init_amuzy()
 }   // anonymous namespace
 
 
-GAME( 2005, boobood,   0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Boo Boo Donpatchi (Japan, ver 1.01)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics ROM is a bad dump
-GAME( 2005, dojokkot,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Dojokko Tsukami (Japan, ver 1.02)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics ROM is a bad dump
+GAME( 2005, boobood,   0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Boo Boo Donpatchi (Japan, ver 1.01)",      MACHINE_SUPPORTS_SAVE )
+GAME( 2005, dojokkot,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Dojokko Tsukami (Japan, ver 1.02)",        MACHINE_SUPPORTS_SAVE )
 GAME( 2005, fishbatl,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Fisherman Battle (Japan, ver 1.03)",       MACHINE_SUPPORTS_SAVE )
-GAME( 2005, hhunter,   0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Haunted Hunter (Japan, ver 1.00)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics ROM is a bad dump
+GAME( 2005, hhunter,   0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Haunted Hunter (Japan, ver 1.00)",         MACHINE_SUPPORTS_SAVE )
 GAME( 2005, katori,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Katori Attack (Japan, ver 1.03)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics ROM is a bad dump
-GAME( 2005, rodeokng,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Rodeo King (Japan, ver 1.00)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics ROM is a bad dump
-GAME( 2005, wanpunch,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wanikko Punch (Japan, ver 1.20)",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics ROM is a bad dump
+GAME( 2005, rodeokng,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Rodeo King (Japan, ver 1.00)",             MACHINE_SUPPORTS_SAVE )
+GAME( 2005, wanpunch,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wanikko Punch (Japan, ver 1.20)",          MACHINE_SUPPORTS_SAVE )
 GAME( 2005, zenponta,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Zenigata Ponta (Japan, ver 1.02)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics ROM is a bad dump
 GAME( 2006, amhbattl,  0, amuzy, amuzy, amuzy_state, init_amuzy, ROT0, "Amuzy Corporation", "Acchi Muite Hoi Battle (Japan, ver 1.04)", MACHINE_SUPPORTS_SAVE )
 GAME( 2006, wanpakup,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wanpaku Pirates (Japan, ver 1.00)",        MACHINE_SUPPORTS_SAVE )
 GAME( 2007, cbkids,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Chanbara Kids (Japan)",                    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U1 program ROM is a bad dump
 GAME( 2007, docchift,  0, amuzy, amuzy, amuzy_state, init_amuzy, ROT0, "Amuzy Corporation", "Docchi Fighter (Japan, ver 1.02)",         MACHINE_SUPPORTS_SAVE )
-GAME( 2007, itazurac,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Itazura Cockroach (Japan, ver 1.02)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics and U2 sample ROMs are bad dumps
-GAME( 2007, wwdash,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wan Wan Dash (Japan, ver 1.01)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // U3 graphics and U2 sample ROMs are bad dumps
+GAME( 2007, itazurac,  0, amuzy, amuzy, amuzy_state, init_amuzy, ROT0, "Amuzy Corporation", "Itazura Cockroach (Japan, ver 1.02)",      MACHINE_SUPPORTS_SAVE )
+GAME( 2007, wwdash,    0, amuzy, amuzy, amuzy_state, init_amuzy, ROT0, "Amuzy Corporation", "Wan Wan Dash (Japan, ver 1.01)",           MACHINE_SUPPORTS_SAVE )
 GAME( 2008, mmhammer,  0, amuzy, amuzy, amuzy_state, init_amuzy, ROT0, "Amuzy Corporation", "Mogu Mogu Hammer (Japan, ver 1.01)",       MACHINE_SUPPORTS_SAVE )
 GAME( 2008, shpchamp,  0, amuzy, amuzy, amuzy_state, init_amuzy, ROT0, "Amuzy Corporation", "Shippe Champion (Japan, ver 1.02)",        MACHINE_SUPPORTS_SAVE )

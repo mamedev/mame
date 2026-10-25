@@ -304,7 +304,7 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 		m_execution_state = exec_state::RUNNING;
 	}
 	// if we're a new device, stop now
-	else if (m_stop_when_not_device != nullptr && m_stop_when_not_device != device && device->debug()->observing())
+	else if (m_stop_when_not_device != nullptr && m_stop_when_not_device != device && device->debug()->observing() && dynamic_cast<device_state_interface *>(device) != nullptr)
 	{
 		m_stop_when_not_device = nullptr;
 		m_execution_state = exec_state::STOPPED;

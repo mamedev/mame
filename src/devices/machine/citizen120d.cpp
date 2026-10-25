@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Citizen 120D 9-pin dot matrix print mechanism (skeleton)
+    Citizen 120D 9-pin dot matrix print mechanism
 
 **********************************************************************/
 

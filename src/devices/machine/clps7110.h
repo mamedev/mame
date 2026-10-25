@@ -20,6 +20,8 @@ class clps711x_device : public device_t,
 public:
 	void set_screen_origin(uint16_t x_offset, uint16_t y_offset) { m_lcd_x_offset = x_offset; m_lcd_y_offset = y_offset; }
 
+	static constexpr feature_type unemulated_features() { return feature::COMMS; }
+
 	template <typename T> void set_cpu_tag(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 
 	// callbacks
@@ -46,6 +48,7 @@ public:
 	void eint1_w(int state);
 	void eint2_w(int state);
 	void eint3_w(int state);
+	void medchg_w(int state);
 
 	uint32_t periphs_r(offs_t offset, uint32_t mem_mask = ~0);
 	void periphs_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -62,6 +65,7 @@ protected:
 private:
 	TIMER_CALLBACK_MEMBER(update_timer);
 	TIMER_CALLBACK_MEMBER(update_rtc);
+	TIMER_CALLBACK_MEMBER(update_codec);
 
 	void check_interrupts();
 
@@ -178,6 +182,7 @@ private:
 
 	emu_timer *m_timer[2];
 	emu_timer *m_rtc_ticker;
+	emu_timer *m_codec_timer;
 
 	uint8_t  m_id; // 1 for CL-PS7111, 0 for CL-PS7110
 
@@ -207,6 +212,9 @@ private:
 
 	uint8_t m_port_data[5];
 	uint8_t m_port_ddr[5];
+
+	util::fifo<uint8_t, 16> m_codec_rx;
+	util::fifo<uint8_t, 16> m_codec_tx;
 };
 
 
