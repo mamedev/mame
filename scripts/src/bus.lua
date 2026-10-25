@@ -2596,6 +2596,28 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/heathzenith/et3400/exp.h,BUSES["HEATHZENITH_ET3400"] = true
+---------------------------------------------------
+
+if BUSES["HEATHZENITH_ET3400"] then
+	files {
+		MAME_DIR .. "src/devices/bus/heathzenith/et3400/eta3400.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/et3400/eta3400.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/et3400/exp.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/et3400/exp.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/heathzenith/et3400/eta3400.cpp", GEN_DIR .. "emu/layout/eta3400.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "eta3400"),
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/heathzenith/h19/tlb.h,BUSES["HEATHZENITH_H19"] = true
 ---------------------------------------------------
 
@@ -4325,6 +4347,8 @@ if BUSES["NSCSI"] then
 		MAME_DIR .. "src/devices/bus/nscsi/devices.h",
 		MAME_DIR .. "src/devices/bus/nscsi/dtc510.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/dtc510.h",
+		MAME_DIR .. "src/devices/bus/nscsi/e01_hd.cpp",
+		MAME_DIR .. "src/devices/bus/nscsi/e01_hd.h",
 		MAME_DIR .. "src/devices/bus/nscsi/et532.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/et532.h",
 		MAME_DIR .. "src/devices/bus/nscsi/hd.cpp",
@@ -4333,6 +4357,8 @@ if BUSES["NSCSI"] then
 		MAME_DIR .. "src/devices/bus/nscsi/pc8801_30.h",
 		MAME_DIR .. "src/devices/bus/nscsi/pc98_hd.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/pc98_hd.h",
+		MAME_DIR .. "src/devices/bus/nscsi/pcfxcd.cpp",
+		MAME_DIR .. "src/devices/bus/nscsi/pcfxcd.h",
 		MAME_DIR .. "src/devices/bus/nscsi/s1410.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/s1410.h",
 		MAME_DIR .. "src/devices/bus/nscsi/sa1403d.cpp",

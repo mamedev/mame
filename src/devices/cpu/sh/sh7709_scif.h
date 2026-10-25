@@ -144,14 +144,14 @@ private:
 	emu_timer *m_rx_timeout;
 
 	// Receive shift register (SCRSR)
-	int m_rxd;
+	uint8_t m_rxd;
 	bool m_rx_busy;
 	uint16_t m_rx_shift;
 	uint8_t m_rx_bits;              // bits sampled so far
 	uint8_t m_rx_frame_bits;        // start, data, parity and the first stop bit
 
 	// Transmit shift register (SCTSR)
-	int m_txd;
+	uint8_t m_txd;
 	bool m_tx_busy;
 	uint16_t m_tx_shift;
 	uint8_t m_tx_bit;               // bit currently on TxD

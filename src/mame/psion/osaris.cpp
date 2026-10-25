@@ -7,7 +7,6 @@
     TODO:
     - UART support
     - Compact Flash (CLPS6700)
-    - Bezel artwork
 
 ****************************************************************************/
 
@@ -26,6 +25,8 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "osaris.lh"
 
 
 namespace {
@@ -92,27 +93,19 @@ private:
 
 void osaris_state::init_osaris()
 {
-	uint8_t *eeprom = memregion("eeprom")->base();
-
-	// defaults expected by the touchscreen code
-	eeprom[0x0a] = 20;
-	eeprom[0x0b] = 20;
-	eeprom[0x0c] = 20;
-	eeprom[0x0d] = 30;
+	uint16_t *eeprom = &memregion("eeprom")->as_u16();
 
 	// machine unique ID
-	eeprom[0x1b] = 0xde;
-	eeprom[0x1a] = 0xad;
-	eeprom[0x19] = 0xbe;
-	eeprom[0x18] = 0xef;
+	eeprom[0x0c] = 0xbeef;
+	eeprom[0x0d] = 0xdead;
 
 	// calculate the checksum
 	uint8_t chksum = 0;
-	for (int i = 1; i < 0x20; i++)
-		chksum ^= eeprom[i];
+	for (int i = 0; i < 0x0f; i++)
+		chksum ^= (eeprom[i] & 0xff) ^ (eeprom[i] >> 8);
 
 	// EPOC is expecting 0x42
-	eeprom[0x00] = chksum ^ 0x42;
+	eeprom[0x0f] = (chksum ^ 0x42) << 8;
 }
 
 
@@ -174,10 +167,10 @@ uint16_t osaris_state::adc12138_r(offs_t offset)
 	switch (offset & 0xff)
 	{
 	case 0xc1: // Digitiser X
-		data = (uint16_t)(m_touchx->read() * 8) + 305;
+		data = m_touchx->read();
 		break;
 	case 0x81: // Digitiser Y
-		data = (uint16_t)(m_touchy->read() * 13.53) + 680;
+		data = m_touchy->read();
 		break;
 	case 0x91: // Main battery
 		data = 3000;
@@ -221,10 +214,10 @@ INPUT_CHANGED_MEMBER(osaris_state::touch_down)
 
 INPUT_PORTS_START( osaris )
 	PORT_START("TOUCHX")
-	PORT_BIT(0x3ff, 362, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0,439) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
+	PORT_BIT(0xfff, 0x800, IPT_LIGHTGUN_X) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(310,3830) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 
 	PORT_START("TOUCHY")
-	PORT_BIT(0x1ff, 125, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0,199) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
+	PORT_BIT(0xfff, 0x800, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(690,3350) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 
 	PORT_START("TOUCH")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Touch") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(osaris_state::touch_down), 0)
@@ -414,11 +407,14 @@ void osaris_state::osaris(machine_config &config)
 	m_soc->portb_w().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::cs_write)).bit(3);
 	m_soc->portb_w().append(m_eeprom, FUNC(eeprom_serial_93cxx_device::clk_write)).bit(2);
 	m_soc->portd_w().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::di_write)).bit(6);
+	//m_soc->porte_w().set(FUNC(psion5_state::backlight_w)).bit(2);
 	m_soc->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_soc->col_cb().set([this](uint8_t data) { m_kbd_scan = data; });
 	m_soc->adc_r().set(FUNC(osaris_state::adc12138_r)); // TODO: verify ADC type
 	m_soc->set_screen_origin(60, 0);
 	m_soc->set_screen("screen");
+
+	config.set_default_layout(layout_osaris);
 
 	RAM(config, m_ram).set_default_size("8M").set_extra_options("4M");
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
@@ -429,6 +425,7 @@ void osaris_state::osaris(machine_config &config)
 	m_screen->set_screen_update(m_soc, FUNC(clps7111_device::screen_update));
 	m_screen->set_size(440, 200); // PEN 440x200 LCD 320x200
 	m_screen->set_visarea_full();
+	m_screen->set_physical_aspect(132, 50);
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(osaris_state::palette_init), 16);
@@ -443,7 +440,7 @@ void osaris_state::osaris(machine_config &config)
 	CLPS6700(config, m_clps6700).set_pccard(m_pccard);
 	//m_clps6700->pirq_handler().set(m_soc, FUNC(clps7111_device::eint2_w));
 
-	PCCARD_SLOT(config, m_pccard, pcmcia_devices, "cf").set_fixed(true);
+	PCCARD_SLOT(config, m_pccard, pcmcia_devices, "cf");
 	m_pccard->cd1().set(m_clps6700, FUNC(clps6700_device::write_pcm_cd1));
 	m_pccard->cd2().set(m_clps6700, FUNC(clps6700_device::write_pcm_cd2));
 	m_pccard->bvd1().set(m_clps6700, FUNC(clps6700_device::write_pcm_bvd1));

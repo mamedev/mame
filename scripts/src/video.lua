@@ -115,6 +115,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/axell_ag1.h,VIDEOS["AXELL_AG1"] = true
+--------------------------------------------------
+
+if VIDEOS["AXELL_AG1"] then
+	files {
+		MAME_DIR .. "src/devices/video/axell_ag1.cpp",
+		MAME_DIR .. "src/devices/video/axell_ag1.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/bt431.h,VIDEOS["BT431"] = true
 --------------------------------------------------
 

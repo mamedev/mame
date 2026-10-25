@@ -1233,6 +1233,7 @@ It can also be used with Final Furlong when wired correctly.
 #include "emu.h"
 #include "bus/jvs/namcoio.h"
 #include "bus/rs232/rs232.h"
+#include "bus/snes_ctrl/ctrl.h"
 #include "cpu/h8/h83002.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/sh/sh7604.h"
@@ -1683,8 +1684,7 @@ public:
 		m_czattr(*this, "czattr", 0x10, ENDIANNESS_BIG),
 		m_lightx(*this, "LIGHTX"),
 		m_lighty(*this, "LIGHTY"),
-		m_p1(*this, "P1"),
-		m_p2(*this, "P2"),
+		m_devpad(*this, "devpad%u", 0U),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_generic_paletteram_32(*this, "paletteram"),
@@ -1819,10 +1819,8 @@ protected:
 
 	void ctl_leds_w(offs_t offset, u16 data);
 	u16 ctl_status_r();
-	u16 ctl_input1_r();
-	void ctl_input1_w(offs_t offset, u16 data);
-	u16 ctl_input2_r();
-	void ctl_input2_w(offs_t offset, u16 data);
+	u16 ctl_devpad_r(offs_t offset);
+	void ctl_devpad_w(offs_t offset, u16 data);
 	void ctl_vbl_ack_w(offs_t offset, u16 data);
 	void ctl_direct_poly_w(offs_t offset, u16 data);
 
@@ -1931,8 +1929,7 @@ protected:
 	memory_share_creator<u32> m_czattr;
 	optional_ioport m_lightx;
 	optional_ioport m_lighty;
-	required_ioport m_p1;
-	required_ioport m_p2;
+	required_device_array<snes_control_port_device, 2> m_devpad;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<u32> m_generic_paletteram_32;
@@ -1959,7 +1956,6 @@ protected:
 
 	bool m_ctl_vbl_active;
 	u8 m_ctl_led;
-	u16 m_ctl_inp_buffer[2];
 
 	bool m_subcpu_running;
 
@@ -5687,30 +5683,32 @@ u16 namcos23_state::ctl_status_r()
 	return data;
 }
 
-u16 namcos23_state::ctl_input1_r()
+/**
+ * As on System 22, there are two 5 pin headers on the main board (J2 / J3,
+ * next to a PALCE16V8 stamped "PAD23") that are Super Famicom-compatible
+ * developer controller ports. They are not used in standard gameplay, but
+ * every game reads them and most have (disconnected) developer tools that
+ * use them. They are mapped to CTL +4 / +6 (0x0d000004 / 0x0d000006, or
+ * 0x1d000004 / 0x1d000006 on Evolution 2).
+ * A write to the port is the latch strobe and each word read clocks out the
+ * next line in the standard order (B, Y, Select, Start, Up, Down, Left, Right,
+ * A, X, L, R, 4 ID bits). The games read 12 bits, plus a 16-bit presence probe.
+ * They are exposed as "devpad0" / "devpad1" control port slots, empty by
+ * default.
+ */
+u16 namcos23_state::ctl_devpad_r(offs_t offset)
 {
-	const u16 data = m_ctl_inp_buffer[0] & 0x800 ? 0xffff : 0x0000;
-	m_ctl_inp_buffer[0] = (m_ctl_inp_buffer[0] << 1) | 1;
-	return data;
+	// each word read clocks one bit out of the pad; the lines are active low
+	if (machine().side_effects_disabled())
+		return 1;
+	return m_devpad[offset]->read_pin4() ^ 1;
 }
 
-void namcos23_state::ctl_input1_w(offs_t offset, u16 data)
+void namcos23_state::ctl_devpad_w(offs_t offset, u16 data)
 {
-	// These may be coming from another CPU, in particular the I/O one
-	m_ctl_inp_buffer[0] = m_p1->read();
-}
-
-u16 namcos23_state::ctl_input2_r()
-{
-	const u16 data = m_ctl_inp_buffer[1] & 0x800 ? 0xffff : 0x0000;
-	m_ctl_inp_buffer[1] = (m_ctl_inp_buffer[1] << 1) | 1;
-	return data;
-}
-
-void namcos23_state::ctl_input2_w(offs_t offset, u16 data)
-{
-	// These may be coming from another CPU, in particular the I/O one
-	m_ctl_inp_buffer[1] = m_p2->read();
+	// a word write latches the pad (strobe pulse)
+	m_devpad[offset]->write_strobe(1);
+	m_devpad[offset]->write_strobe(0);
 }
 
 void namcos23_state::ctl_vbl_ack_w(offs_t offset, u16 data)
@@ -5924,8 +5922,7 @@ void namcos23_state::mips_base_map(address_map &map)
 
 	map(0x0d000000, 0x0d000001).w(FUNC(namcos23_state::ctl_leds_w));
 	map(0x0d000002, 0x0d000003).r(FUNC(namcos23_state::ctl_status_r));
-	map(0x0d000004, 0x0d000005).rw(FUNC(namcos23_state::ctl_input1_r), FUNC(namcos23_state::ctl_input1_w));
-	map(0x0d000006, 0x0d000007).rw(FUNC(namcos23_state::ctl_input2_r), FUNC(namcos23_state::ctl_input2_w));
+	map(0x0d000004, 0x0d000007).rw(FUNC(namcos23_state::ctl_devpad_r), FUNC(namcos23_state::ctl_devpad_w));
 	map(0x0d00000a, 0x0d00000b).w(FUNC(namcos23_state::ctl_vbl_ack_w));
 	map(0x0d00000c, 0x0d00000d).w(FUNC(namcos23_state::ctl_direct_poly_w));
 
@@ -6057,8 +6054,7 @@ void crszone_state::mips_map(address_map &map)
 
 	map(0x1d000000, 0x1d000001).w(FUNC(crszone_state::ctl_leds_w));
 	map(0x1d000002, 0x1d000003).r(FUNC(crszone_state::ctl_status_r));
-	map(0x1d000004, 0x1d000005).rw(FUNC(crszone_state::ctl_input1_r), FUNC(crszone_state::ctl_input1_w));
-	map(0x1d000006, 0x1d000007).rw(FUNC(crszone_state::ctl_input2_r), FUNC(crszone_state::ctl_input2_w));
+	map(0x1d000004, 0x1d000007).rw(FUNC(crszone_state::ctl_devpad_r), FUNC(crszone_state::ctl_devpad_w));
 	map(0x1d00000a, 0x1d00000b).w(FUNC(crszone_state::ctl_vbl_ack_w));
 	map(0x1d00000c, 0x1d00000d).w(FUNC(crszone_state::ctl_direct_poly_w));
 
@@ -6494,7 +6490,6 @@ void namcos23_state::machine_start()
 
 	save_item(NAME(m_ctl_vbl_active));
 	save_item(NAME(m_ctl_led));
-	save_item(NAME(m_ctl_inp_buffer));
 
 	save_item(NAME(m_subcpu_running));
 
@@ -6694,7 +6689,6 @@ void namcos23_state::machine_reset()
 	m_main_irqcause = 0;
 	m_ctl_vbl_active = false;
 	m_ctl_led = 0;
-	m_ctl_inp_buffer[0] = m_ctl_inp_buffer[1] = 0;
 	m_sub_port8 = 0x02;
 	m_sub_porta = 0;
 	m_sub_portb = 0x50;
@@ -6794,6 +6788,10 @@ void gorgon_state::gorgon(machine_config &config)
 	c352.add_route(2, "speaker", 1.00, 0);
 	c352.add_route(3, "speaker", 1.00, 1);
 
+	// serial developer pad connectors (SFC-type controllers), empty by default
+	SNES_CONTROL_PORT(config, m_devpad[0], snes_control_port_devices, nullptr);
+	SNES_CONTROL_PORT(config, m_devpad[1], snes_control_port_devices, nullptr);
+
 	JVS_PORT(config, m_jvs, jvs_port_devices, nullptr);
 	m_jvs->rxd().set(m_subcpu, FUNC(h8_device::sci_rx_w<0>));
 	m_subcpu->write_sci_tx<0>().set(m_jvs, FUNC(jvs_port_device::txd));
@@ -6867,6 +6865,10 @@ void namcos23_state::s23(machine_config &config)
 	c352.add_route(1, "speaker", 1.00, 1);
 	c352.add_route(2, "speaker", 1.00, 0);
 	c352.add_route(3, "speaker", 1.00, 1);
+
+	// serial developer pad connectors (SFC-type controllers), empty by default
+	SNES_CONTROL_PORT(config, m_devpad[0], snes_control_port_devices, nullptr);
+	SNES_CONTROL_PORT(config, m_devpad[1], snes_control_port_devices, nullptr);
 
 	JVS_PORT(config, m_jvs, jvs_port_devices, nullptr);
 	m_jvs->rxd().set(m_subcpu, FUNC(h8_device::sci_rx_w<0>));
@@ -7003,25 +7005,9 @@ void crszone_state::crszone(machine_config &config)
 ***************************************************************************/
 
 static INPUT_PORTS_START(s23)
-	// You can go to the pcb test mode by pressing P1-A in some games.
-	// Use P1-A to select, P1-Sel+P1-A to exit, up/down to navigate
-	PORT_START("P1")
-	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_PLAYER(2) PORT_NAME("Dev Service P1-D")
-	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_PLAYER(2) PORT_NAME("Dev Service P1-E")
-	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_BUTTON7) PORT_PLAYER(2) PORT_NAME("Dev Service P1-F")
-	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("Dev Service P1-A")
-	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_BUTTON8) PORT_PLAYER(2) PORT_NAME("Dev Service P1-G")
-	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_BUTTON9) PORT_PLAYER(2) PORT_NAME("Dev Service P1-H")
-	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2) PORT_NAME("Dev Service Down")
-	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2) PORT_NAME("Dev Service Up")
-	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_START2) PORT_NAME("Dev Service Start")
-	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("Dev Service P1-Sel")
-	PORT_BIT(0x400, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2) PORT_NAME("Dev Service P1-B")
-	PORT_BIT(0x800, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(2) PORT_NAME("Dev Service P1-C")
-
-	PORT_START("P2")
-	PORT_BIT(0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN)
-
+	// The developer pads are the "devpad0" / "devpad1" control port slots (see ctl_devpad_r). Pad 1 drives the
+	// developer menus and tools of most games; the shared SYSTEM23 test program library also uses it
+	// (Up/Down, A select, Select+A exit).
 	PORT_START("DSW")
 	PORT_DIPNAME(0x01, 0x01, "Service Mode DIP") PORT_DIPLOCATION("DIP:8")
 	PORT_DIPSETTING(0x01, DEF_STR(Off))
@@ -7111,12 +7097,6 @@ INPUT_PORTS_END
 static INPUT_PORTS_START(gorgon)
 	PORT_INCLUDE(s23)
 
-	PORT_MODIFY("P1")
-	PORT_BIT(0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN)
-
-	PORT_MODIFY("P2")
-	PORT_BIT(0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN)
-
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown)) PORT_DIPLOCATION("DIP:8")
 	PORT_DIPSETTING(0x01, DEF_STR(Off))
@@ -7196,6 +7176,10 @@ static INPUT_PORTS_START(500gp)
 
 	PORT_MODIFY("JVS_ANALOG_INPUT3")
 	PORT_BIT(0xffff, 0x8000, IPT_AD_STICK_X) PORT_MINMAX(0x0100, 0xffff) PORT_SENSITIVITY(100) PORT_KEYDELTA(2560) PORT_NAME("Bank")
+
+	// Dev pad: reader 0x80008790 (live). Used by the disconnected developer MENU (game mode 4/5, item table 0x800bd570;
+	// nothing in a retail boot sets mode 4, restore by 0x8001341c 24020036 -> 24020004): thSmenu gamma editor, yhSmenu
+	// kerning test. Pad Select skips the I/F error prompt.
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(aking)
@@ -7220,6 +7204,10 @@ static INPUT_PORTS_START(aking)
 
 	PORT_MODIFY("JVS_ROTARY_INPUT1")
 	PORT_BIT(0xffff, 0, IPT_DIAL_V) PORT_SENSITIVITY(100) PORT_KEYDELTA(8) PORT_NAME("Reel")
+
+	// Dev pad: reader 0x800031b8 (live). The developer root menu (data at 0x800ea6a0) was removed and its game modes
+	// 0x10/0x11 are stubs, but Junn's (0x16), Mizuno's (0x14), SMZ (0x2c) and NYK's (0x44) menus still work when the game
+	// mode word 0x8018a128 is set.
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(downhill)
@@ -7239,6 +7227,15 @@ static INPUT_PORTS_START(downhill)
 
 	PORT_MODIFY("JVS_ROTARY_INPUT1")
 	PORT_BIT(0xffff, 0, IPT_DIAL_V) PORT_SENSITIVITY(100) PORT_KEYDELTA(8) PORT_NAME("Encoder")
+
+	// Dev pad: reader 0x80003b1c (live), zeroes the pad words unless DIP:2 is on. The GAME MENU (GOTO'S / KAKU'S / KAJI'S /
+	// NAKAMURA'S MENU, OBJECT VIEWER) is disconnected: mode 1 init stores 0 instead of -1 at 0x8000f7b0
+	// (restore: 0x8000f7b0 af80c324 -> af9dc324). The "V193" boot select (system mode 0) has no writer.
+	// DIP:1 enables a debug pause (cabinet, or pad 2 Select / Up to step).
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME(0x40, 0x40, "Dev Pad Enable") PORT_DIPLOCATION("DIP:2")
+	PORT_DIPSETTING(0x40, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(finfurl)
@@ -7257,6 +7254,10 @@ static INPUT_PORTS_START(finfurl)
 
 	PORT_MODIFY("JVS_ANALOG_INPUT2")
 	PORT_BIT(0xffff, 0x8000, IPT_AD_STICK_X) PORT_MINMAX(0x5000, 0xb000) PORT_SENSITIVITY(100) PORT_KEYDELTA(2560) PORT_NAME("Handle") PORT_REVERSE
+
+	// Dev pad: reader 0x80001790 (live). L+R held + Start toggles pause; holding A, B or Y at boot selects an alternate
+	// gamma table. The developer MENU runner 0x8001b910 is disconnected (restore: main loop jal at 0x800006f0
+	// 0c006e3c -> 0c006e44).
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(finfurl2)
@@ -7275,6 +7276,9 @@ static INPUT_PORTS_START(finfurl2)
 
 	PORT_MODIFY("JVS_ANALOG_INPUT2")
 	PORT_BIT(0xffff, 0x8000, IPT_AD_STICK_X) PORT_MINMAX(0x5000, 0xb000) PORT_SENSITIVITY(100) PORT_KEYDELTA(2560) PORT_NAME("Handle") PORT_REVERSE
+
+	// Dev pad: reader 0x80001d0c (finfurl2j, live). The developer MENU dispatcher 0x8003b900 is disconnected (restore:
+	// main loop jal at 0x80000634 0c00ee38 -> 0c00ee40). MAIN BOARD TEST item 0 is only selectable with pad Select+A.
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(gunwars)
@@ -7295,6 +7299,10 @@ static INPUT_PORTS_START(gunwars)
 
 	PORT_MODIFY("JVS_ANALOG_INPUT3")
 	PORT_BIT(0xffff, 0x8000, IPT_AD_STICK_Z) PORT_SENSITIVITY(100) PORT_KEYDELTA(2560) PORT_NAME("Gun Yawning Left/Right")
+
+	// Dev pad: readers 0x800256f0 / 0x80025a2c (gunwarsa, live) clock the bits LSB first. The service-loop developer MENU
+	// ("I am Shuji" monitor etc.) is opened by operator sub-state 18, which no menu item uses (restore: word 0x8019f624
+	// 000c0000 -> 00120000, then ADS DATA). PCB TEST only continues while pad A is held.
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(motoxgo)
@@ -7319,6 +7327,8 @@ static INPUT_PORTS_START(motoxgo)
 
 	PORT_MODIFY("JVS_ANALOG_INPUT4")
 	PORT_BIT(0xffff, 0x8000, IPT_AD_STICK_X) PORT_MINMAX(0x0000, 0xffff) PORT_SENSITIVITY(100) PORT_KEYDELTA(2560) PORT_NAME("Bank")
+
+	// Dev pad: only the SYSTEM23 test program library reads it (motoxgov1a 0x8005e6a0); no game code uses the pad.
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(panicprk)
@@ -7337,12 +7347,21 @@ static INPUT_PORTS_START(panicprk)
 
 	PORT_MODIFY("JVS_ANALOG_INPUT2")
 	PORT_BIT(0xffff, 0x8000, IPT_AD_STICK_X) PORT_PLAYER(2) PORT_MINMAX(0x000, 0xffff) PORT_SENSITIVITY(100) PORT_KEYDELTA(2560) PORT_CENTERDELTA(0)
+
+	// Dev pad: the game reader 0x80091df0 (panicprkj) latches the pad but stores 0 instead of reading it, so the DVLP
+	// developer mode (pad 1 Select, game mode 8) is unreachable; a second reader 0x80092114 only serves the test menu.
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(raceon)
 	PORT_INCLUDE(gmen)
 
+	// Dev pad: reader 0x80009388 (raceonj, live). DIP:2 boots into the "V194 MENU" developer mode select (SEQ / DEV / TEST /
+	// RELAY / TOWER MODE); DEV MODE has Kango's, Tamura's, Takenaka's and Izumisawa's menus, OBJECT VIEWER and CHAR VIEWER.
+	// Pad Start+Select returns to V194 MENU from RELAY mode.
 	PORT_MODIFY("DSW")
+	PORT_DIPNAME(0x40, 0x40, "Dev Menu") PORT_DIPLOCATION("DIP:2")
+	PORT_DIPSETTING(0x40, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPNAME(0x10, 0x00, "Activate Wheel Test") PORT_DIPLOCATION("DIP:4")
 	PORT_DIPSETTING(0x10, DEF_STR(On))
 	PORT_DIPSETTING(0x00, DEF_STR(Off))
@@ -7384,27 +7403,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START(rapidrvrp)
 	PORT_INCLUDE(rapidrvr)
 
-	// To fully use test mode, both Service Mode dipswitches need to be enabled.
-	// Some of the developer menus require you to navigate with the Dev keys,
-	// but usually the User keys work fine too.
-	PORT_MODIFY("P1")
-	PORT_BIT(0x0001, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Dev Service D")
-	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Dev Service E") // I/O Unknown Status
-	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Dev Service F") // I/O Air Damper FR
-	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("Dev Service A") // + I/O Air Damper RR
-	PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_BUTTON7) PORT_NAME("Dev Service G")
-	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_BUTTON8) PORT_NAME("Dev Service H")
-	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2) PORT_NAME("Dev Service Down")
-	PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2) PORT_NAME("Dev Service Up")
-	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_START2) PORT_NAME("Dev Start")
-	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x0400, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Dev Service C") // + I/O Air Damper FL
-	PORT_BIT(0x0800, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("Dev Service B") // + I/O Air Damper RL
-	PORT_BIT(0x1000, IP_ACTIVE_LOW, IPT_BUTTON9)
-	PORT_BIT(0x2000, IP_ACTIVE_LOW, IPT_BUTTON10)
-	PORT_BIT(0x4000, IP_ACTIVE_LOW, IPT_BUTTON11)
-	PORT_BIT(0x8000, IP_ACTIVE_LOW, IPT_BUTTON12)
-
+	// Dev pad: reader 0x80000d94 (live), zeroes the pad words unless DIP:2 is on. DEVELOPMENT MENU is item 8 of the
+	// operator test menu (SIMIZU / INAPY / JUNN menus, POLYGON TEST, DEVELOPMENT OPTION switches). With DIP:8 on,
+	// dev pad Select or User Service Enter toggles pause (0x8000085c).
 	PORT_MODIFY("JVS_PLAYER1")
 	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_NAME("User Service Up")
 	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_NAME("User Service Down")
@@ -7413,10 +7414,13 @@ static INPUT_PORTS_START(rapidrvrp)
 	PORT_BIT(0x00e0ff00, IP_ACTIVE_HIGH, IPT_UNUSED) // BUTTON3/BUTTON4/BUTTON5/BUTTON6/BUTTON7/BUTTON8/BUTTON9/BUTTON10/BUTTON11/BUTTON12/BUTTON13
 
 	PORT_MODIFY("DSW")
+	PORT_DIPNAME(0x01, 0x01, "Dev Pause Enable") PORT_DIPLOCATION("DIP:8")
+	PORT_DIPSETTING(0x01, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPNAME(0x08, 0x08, "Debug Messages") PORT_DIPLOCATION("DIP:5")
 	PORT_DIPSETTING(0x08, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x40, 0x40, "Dev Service Mode") PORT_DIPLOCATION("DIP:2")
+	PORT_DIPNAME(0x40, 0x40, "Dev Pad Enable") PORT_DIPLOCATION("DIP:2")
 	PORT_DIPSETTING(0x40, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPNAME(0x80, 0x80, "User Service Mode") PORT_DIPLOCATION("DIP:1")
@@ -7443,6 +7447,10 @@ static INPUT_PORTS_START(timecrs2)
 
 	PORT_MODIFY("JVS_SCREEN_POSITION_INPUT_Y1") // tuned for CRT - can't shoot below the statusbar?
 	PORT_BIT(0xfff, 38 + 247 / 2, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(38, 38 + 247) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
+
+	// Dev pad: reader 0x8000aa50 (timecrs2v1b, live). Pad 2 Start toggles pause, pad 2 Select steps a frame while paused.
+	// The developer menu (game mode 3/4: HANA / KAWAKAMI / HAYAC pages) has no retail entry
+	// (restore: 0x8000a638 2402000a -> 24020004 sends mode 2 to the menu instead of the game).
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(crszone)
@@ -7456,6 +7464,14 @@ static INPUT_PORTS_START(crszone)
 
 	PORT_MODIFY("JVS_SCREEN_POSITION_INPUT_Y1")
 	PORT_BIT(0xfff, 0x08f, IPT_LIGHTGUN_Y) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x020, 0x0ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
+
+	// Dev pad: reader 0x801f2644 (crszonev2b, live). The developer SELECT MODE (game mode 3) and "V221 MENU" have no retail
+	// entry (game mode word 0x803bbaa0 = 1 opens it). On those menus pad 2 Up Up Down Down Left Right Left Right B A shows a
+	// warp screen. DIP:1 enables a debug pause toggled by User Enter.
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME(0x80, 0x80, "Dev Pause Enable") PORT_DIPLOCATION("DIP:1")
+	PORT_DIPSETTING(0x80, DEF_STR(Off))
+	PORT_DIPSETTING(0x00, DEF_STR(On))
 INPUT_PORTS_END
 
 // a note about "user1" ROMs:

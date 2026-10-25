@@ -16,7 +16,10 @@
 #include "bus/bbc/exp/exp.h"
 #include "bus/bbc/joyport/joyport.h"
 #include "cpu/m6502/g65sc02.h"
+#include "machine/74123.h"
 #include "machine/i2cmem.h"
+#include "machine/input_merger.h"
+#include "machine/rescap.h"
 #include "machine/wd_fdc.h"
 
 #include "softlist_dev.h"
@@ -629,12 +632,24 @@ void bbcmc_state::bbcmc(machine_config &config)
 	MC6854(config, m_adlc);
 	m_adlc->out_txd_cb().set("network", FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set(FUNC(bbcmc_state::adlc_irq_w));
+	m_adlc->out_rts_cb().set("network", FUNC(econet_device::host_rts_w));
+
+	// FIXME: Econet module clock detect values unverified, BBC Model B IC87 values used
+	ttl74123_device &clkdet(TTL74123(config, "clkdet", RES_K(39), CAP_N(2.2)));
+	clkdet.set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	clkdet.set_a_pin_value(0);
+	clkdet.set_clear_pin_value(1);
+	clkdet.out_cb().set(m_adlc, FUNC(mc6854_device::set_dcd)).invert();
+	clkdet.out_cb().append("cts", FUNC(input_merger_device::in_w<0>));
+
+	INPUT_MERGER_ALL_HIGH(config, "cts").output_handler().set(m_adlc, FUNC(mc6854_device::set_cts)).invert();
 
 	econet_device &econet(ECONET(config, "network"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
-	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::set_cts)).invert();
+	econet.clk_wr_callback().append(clkdet, FUNC(ttl74123_device::b_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
+	econet.valid_wr_callback().set("cts", FUNC(input_merger_device::in_w<1>));
 	ECONET_SLOT(config, "econet", "network", econet_devices);
 
 	BBC_EXP_SLOT(config, m_exp, 16_MHz_XTAL / 2, bbc_exp_devices, nullptr);
