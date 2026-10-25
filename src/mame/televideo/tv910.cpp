@@ -52,6 +52,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_mainirq(*this, "mainirq")
 		, m_crtc(*this, CRTC_TAG)
+		, m_acia(*this, ACIA_TAG)
+		, m_rs232(*this, RS232_TAG)
 		, m_printer(*this, PRINTER_TAG)
 		, m_vram(*this, "vram")
 		, m_chrrom(*this, "graphics")
@@ -61,9 +63,12 @@ public:
 		, m_beep(*this, "bell")
 		, m_dsw1(*this, "DSW1")
 		, m_charset(*this, "CHARSET")
+		, m_jumpers(*this, "JUMPERS")
 	{ }
 
 	void tv910(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(handshake_changed);
 
 private:
 	virtual void machine_start() override ATTR_COLD;
@@ -84,6 +89,11 @@ private:
 	void host_rxd_w(int state);
 	void printer_dtr_w(int state);
 	void update_printer_txd();
+	void host_dcd_w(int state);
+	void host_dsr_w(int state);
+	void acia_rts_w(int state);
+	void update_acia_dcd();
+	void update_host_dtr();
 
 	int ay3600_shift_r();
 	int ay3600_control_r();
@@ -95,6 +105,8 @@ private:
 	required_device<m6502_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
 	required_device<r6545_1_device> m_crtc;
+	required_device<mos6551_device> m_acia;
+	required_device<rs232_port_device> m_rs232;
 	required_device<rs232_port_device> m_printer;
 	required_shared_ptr<uint8_t> m_vram;
 	required_region_ptr<uint8_t> m_chrrom;
@@ -104,6 +116,7 @@ private:
 	required_device<beep_device> m_beep;
 	required_ioport m_dsw1;
 	required_ioport m_charset;
+	required_ioport m_jumpers;
 
 	uint16_t m_lastchar, m_strobe;
 	uint8_t m_transchar;
@@ -113,6 +126,9 @@ private:
 	uint8_t m_control;
 	int m_rxd;
 	int m_printer_dtr;
+	int m_host_dcd;
+	int m_host_dsr;
+	int m_rts;
 };
 
 void tv910_state::tv910_mem(address_map &map)
@@ -149,6 +165,7 @@ void tv910_state::control_w(uint8_t data)
 
 	m_beep->set_state(BIT(data, 0));
 	update_printer_txd();
+	update_host_dtr();
 }
 
 void tv910_state::host_rxd_w(int state)
@@ -166,6 +183,60 @@ void tv910_state::update_printer_txd()
 void tv910_state::printer_dtr_w(int state)
 {
 	m_printer_dtr = state;
+	update_host_dtr();
+}
+
+void tv910_state::host_dcd_w(int state)
+{
+	m_host_dcd = state;
+	update_acia_dcd();
+}
+
+void tv910_state::host_dsr_w(int state)
+{
+	m_host_dsr = state;
+	update_acia_dcd();
+}
+
+void tv910_state::acia_rts_w(int state)
+{
+	m_rts = state;
+	update_host_dtr();
+}
+
+void tv910_state::update_acia_dcd()
+{
+	// the 6551's DCD comes from pin 8 through S2-9 (E14-E15), or from pin 6
+	// through S2-8 (E15-E16); an open switch reads as deasserted
+	if (machine().phase() < machine_phase::RESET)
+		return; // lines arriving at device start; machine_reset catches up
+	ioport_value const sw = m_dsw1->read();
+	if (BIT(m_jumpers->read(), 0))
+		m_acia->write_dcd(BIT(sw, 9) ? 1 : m_host_dsr);
+	else
+		m_acia->write_dcd(BIT(sw, 10) ? 1 : m_host_dcd);
+}
+
+void tv910_state::update_host_dtr()
+{
+	// pin 20 through S2-10 (DTR EN): the 6551's RTS (E17-E19), or (E18-E19)
+	// printer ready while extending, else asserted
+	if (machine().phase() < machine_phase::RESET)
+		return;
+	int state;
+	if (BIT(m_dsw1->read(), 11))
+		state = 1;
+	else if (BIT(m_jumpers->read(), 1))
+		state = m_rts;
+	else
+		state = BIT(m_control, 2) ? m_printer_dtr : 0;
+	m_rs232->write_dtr(state);
+}
+
+INPUT_CHANGED_MEMBER(tv910_state::handshake_changed)
+{
+	update_acia_dcd();
+	update_host_dtr();
 }
 
 uint8_t tv910_state::charset_r()
@@ -442,11 +513,17 @@ static INPUT_PORTS_START( tv910 )
 	PORT_DIPSETTING( 0x00, "Black characters on green screen" )
 	PORT_DIPSETTING( 0x100, "Green characters on black screen" )
 
-#if 0
-	PORT_DIPNAME( 0x200, 0x200, "Data Set Ready" )
-	PORT_DIPSETTING( 0x00, "DSR connected" )
-	PORT_DIPSETTING( 0x200, "DSR disconnected" )
-#endif
+	PORT_DIPNAME( 0x200, 0x200, "Data Set Ready" ) PORT_DIPLOCATION("S2:8") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv910_state::handshake_changed), 0)
+	PORT_DIPSETTING( 0x000, "Connected" )
+	PORT_DIPSETTING( 0x200, "Disconnected" )
+
+	PORT_DIPNAME( 0x400, 0x000, "Data Carrier Detect" ) PORT_DIPLOCATION("S2:9") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv910_state::handshake_changed), 0)
+	PORT_DIPSETTING( 0x000, "Connected" )
+	PORT_DIPSETTING( 0x400, "Disconnected" )
+
+	PORT_DIPNAME( 0x800, 0x000, "Data Terminal Ready" ) PORT_DIPLOCATION("S2:10") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv910_state::handshake_changed), 0)
+	PORT_DIPSETTING( 0x000, "Connected" )
+	PORT_DIPSETTING( 0x800, "Disconnected" )
 
 	PORT_START("CHARSET") // actually a pair of jumpers: E4-E5 (bit 1), E6-E7 (bit 0)
 	PORT_DIPNAME( 0x03, 0x00, "Character Set" )
@@ -454,33 +531,45 @@ static INPUT_PORTS_START( tv910 )
 	PORT_DIPSETTING( 0x01, "German" )
 	PORT_DIPSETTING( 0x02, "French" )
 	PORT_DIPSETTING( 0x03, "Spanish" )
+
+	PORT_START("JUMPERS")
+	PORT_CONFNAME( 0x01, 0x00, "6551 DCD from" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv910_state::handshake_changed), 0)
+	PORT_CONFSETTING( 0x00, "Pin 8, DCD (E14-E15)" )
+	PORT_CONFSETTING( 0x01, "Pin 6, DSR (E15-E16)" )
+	PORT_CONFNAME( 0x02, 0x00, "Pin 20 from" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv910_state::handshake_changed), 0)
+	PORT_CONFSETTING( 0x00, "Printer ready (E18-E19)" )
+	PORT_CONFSETTING( 0x02, "RTS (E17-E19)" )
 INPUT_PORTS_END
 
 void tv910_state::machine_start()
 {
 	// DCD needs to be driven somehow, or else the terminal will complain
 	// CTS also needs to be driven to prevent hanging caused by buffer overflow
-	auto *acia = subdevice<mos6551_device>(ACIA_TAG);
-	auto *rs232 = subdevice<rs232_port_device>(RS232_TAG);
-	if (rs232->get_card_device() == nullptr)
+	m_host_dcd = m_rs232->dcd_r();
+	m_host_dsr = m_rs232->dsr_r();
+	if (m_rs232->get_card_device() == nullptr)
 	{
-		acia->write_dcd(0);
-		acia->write_cts(0);
+		m_host_dcd = 0;
+		m_acia->write_cts(0);
 	}
 
 	// DSR is tied to GND
-	acia->write_dsr(0);
+	m_acia->write_dsr(0);
 
-	m_rxd = 1;
-	m_printer_dtr = 1; // open input reads as not ready
-	rs232->write_dtr(m_printer_dtr);
+	m_rxd = m_rs232->rxd_r();
+	m_printer_dtr = m_printer->dsr_r(); // an empty port reads as not ready
+	m_rts = 1;
 	save_item(NAME(m_rxd));
 	save_item(NAME(m_printer_dtr));
+	save_item(NAME(m_host_dcd));
+	save_item(NAME(m_host_dsr));
+	save_item(NAME(m_rts));
 }
 
 void tv910_state::machine_reset()
 {
 	control_w(0);
+	update_acia_dcd();
 }
 
 MC6845_ON_UPDATE_ADDR_CHANGED( tv910_state::crtc_update_addr )
@@ -580,21 +669,22 @@ void tv910_state::tv910(machine_config &config)
 	m_ay3600->data_ready().set(FUNC(tv910_state::ay3600_data_ready_w));
 	m_ay3600->ako().set(FUNC(tv910_state::ay3600_ako_w));
 
-	mos6551_device &acia(MOS6551(config, ACIA_TAG));
-	acia.set_xtal(1.8432_MHz_XTAL);
-	acia.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
-	acia.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
-	acia.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	MOS6551(config, m_acia);
+	m_acia->set_xtal(1.8432_MHz_XTAL);
+	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	m_acia->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set(m_rs232, FUNC(rs232_port_device::write_rts));
+	m_acia->rts_handler().append(FUNC(tv910_state::acia_rts_w));
 
-	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(ACIA_TAG, FUNC(mos6551_device::write_rxd));
-	rs232.rxd_handler().append(FUNC(tv910_state::host_rxd_w));
-	rs232.dcd_handler().set(ACIA_TAG, FUNC(mos6551_device::write_dcd));
-	rs232.cts_handler().set(ACIA_TAG, FUNC(mos6551_device::write_cts));
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	m_rs232->rxd_handler().append(FUNC(tv910_state::host_rxd_w));
+	m_rs232->dcd_handler().set(FUNC(tv910_state::host_dcd_w));
+	m_rs232->dsr_handler().set(FUNC(tv910_state::host_dsr_w));
+	m_rs232->cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
 	RS232_PORT(config, m_printer, default_rs232_devices, nullptr); // P4
 	m_printer->dsr_handler().set(FUNC(tv910_state::printer_dtr_w)); // from pin 20 (DTR)
-	m_printer->dsr_handler().append(RS232_TAG, FUNC(rs232_port_device::write_dtr)); // to the host's pin 20
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, MASTER_CLOCK / 8400); // 1620 Hz (Row 10 signal)
