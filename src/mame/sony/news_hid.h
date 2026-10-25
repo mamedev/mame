@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Patrick Mackinlay
+// copyright-holders:Patrick Mackinlay,Brice Onken
 
 #ifndef MAME_SONY_NEWS_HID_H
 #define MAME_SONY_NEWS_HID_H
@@ -8,10 +8,11 @@
 
 #include "machine/keyboard.h"
 #include "bus/rs232/keyboard.h"
+#include "bus/rs232/hlemouse.h"
 
 class news_hid_hle_device
-	: public device_t
-	, public device_matrix_keyboard_interface<8U>
+	: public device_t,
+	  public device_matrix_keyboard_interface<8U>
 {
 public:
 	news_hid_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
@@ -19,9 +20,10 @@ public:
 	enum news_hid_device : unsigned
 	{
 		KEYBOARD = 0,
-		MOUSE    = 1,
+		MOUSE = 1,
 	};
-	template <news_hid_device Device> auto irq_out() { return m_irq_out_cb[Device].bind(); }
+	template <news_hid_device Device>
+	auto irq_out() { return m_irq_out_cb[Device].bind(); }
 
 	void map(address_map &map) ATTR_COLD;
 	void map_68k(address_map &map) ATTR_COLD;
@@ -43,13 +45,19 @@ protected:
 private:
 	void push_key(u8 code);
 
-	template <news_hid_device Device> void out_irq(bool state);
+	template <news_hid_device Device>
+	void out_irq(bool state);
 
-	template <news_hid_device Device> u8 status_r() { return (!m_fifo[Device].empty() ? 2 : 0) | (m_fifo[Device].full() ? 1 : 0); }
-	template <news_hid_device Device> u8 data_r();
-	template <news_hid_device Device> void reset_w(u8 data);
-	template <news_hid_device Device> void init_w(u8 data);
-	template <news_hid_device Device> void ien_w(u8 data);
+	template <news_hid_device Device>
+	u8 status_r() { return (!m_fifo[Device].empty() ? 2 : 0) | (m_fifo[Device].full() ? 1 : 0); }
+	template <news_hid_device Device>
+	u8 data_r();
+	template <news_hid_device Device>
+	void reset_w(u8 data);
+	template <news_hid_device Device>
+	void init_w(u8 data);
+	template <news_hid_device Device>
+	void ien_w(u8 data);
 
 	u8 status_68k_r();
 
@@ -69,24 +77,22 @@ private:
 	u8 m_mouse_b;
 };
 
-class news_hid_hle_serial_device
-	: public device_t
-	, public device_buffered_serial_interface<16U>
-	, protected device_matrix_keyboard_interface<8U>
+class news_hid_serial_keyboard
+	: public device_t,
+	  public device_buffered_serial_interface<16U>,
+	  protected device_matrix_keyboard_interface<8U>
 {
 public:
-	news_hid_hle_serial_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	news_hid_serial_keyboard(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	auto txd_handler() { return m_write_txd.bind(); }
 	void rxd_w(int const state) { rx_w(state); }
 
 protected:
-	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	// device_matrix_keyboard_interface overrides
 	virtual void key_make(u8 row, u8 column) override;
 	virtual void key_break(u8 row, u8 column) override;
 	virtual void tra_callback() override { m_write_txd(transmit_register_get_data_bit()); }
@@ -98,7 +104,40 @@ private:
 	devcb_write_line m_write_txd;
 };
 
+class news_hid_serial_mouse
+	: public device_t,
+	  public device_buffered_serial_interface<8>
+{
+public:
+	news_hid_serial_mouse(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+	auto txd_handler() { return m_write_txd.bind(); }
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	virtual void tra_callback() override { m_write_txd(transmit_register_get_data_bit()); }
+
+private:
+	virtual void received_byte(uint8_t byte) override // Mouse doesn't accept data
+	{
+	}
+	void update_input();
+
+	devcb_write_line m_write_txd;
+
+	required_ioport m_mouse_x_axis;
+	required_ioport m_mouse_y_axis;
+	required_ioport m_mouse_buttons;
+
+	s16 m_mouse_x;
+	s16 m_mouse_y;
+	u8 m_mouse_b;
+};
+
 DECLARE_DEVICE_TYPE(NEWS_HID_HLE, news_hid_hle_device)
-DECLARE_DEVICE_TYPE(NEWS_HID_SERIAL_HLE, news_hid_hle_serial_device)
+DECLARE_DEVICE_TYPE(NEWS_HID_SERIAL_KEYBOARD, news_hid_serial_keyboard)
+DECLARE_DEVICE_TYPE(NEWS_HID_SERIAL_MOUSE, news_hid_serial_mouse)
 
 #endif // MAME_SONY_NEWS_HID_H

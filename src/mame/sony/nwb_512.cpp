@@ -263,7 +263,7 @@ void nwb_512_device::limit_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	// The read/write bits seem to be set here in a slightly different way from the DSC-008.
 	// This behavior is an educated guess based on what iopboot, mrx, the NWS-800 monitor, and NWS-3800 monitor expect.
 	const bool write_op_start = execution_requested(offset);
-	m_state.fb_write = write_op_start;								   // A14 = start write op
+	m_state.fb_write = write_op_start;                                 // A14 = start write op
 	m_state.fb_read = write_op_start ? offset & (0x10000 >> 1) : true; // A14 clear = read only, otherwise read source type from A16 if writing
 
 	m_state.limit_x = x_address(data);
@@ -725,8 +725,8 @@ void nwb_512_device::start_operation()
 	m_state.prime = src_phase > dest_phase; // In this case, we will need to fetch an extra word from the source
 	m_state.prime_pending = m_state.prime;
 
-	m_state.dest_words_per_row = ((dest_phase + width + 15) >> 4)									  // Round up by adding 15 to ensure all words are captured
-								 - (read && m_state.prime ? 1 : 0);									  // Will read one fewer words per row if we need to prime the shifter to align
+	m_state.dest_words_per_row = ((dest_phase + width + 15) >> 4)                                     // Round up by adding 15 to ensure all words are captured
+								 - (read && m_state.prime ? 1 : 0);                                   // Will read one fewer words per row if we need to prime the shifter to align
 	m_state.source_words_per_row = read ? m_state.dest_words_per_row : (src_phase + width + 15) >> 4; // Not used for reads
 
 	m_state.source_words_left = m_state.source_words_per_row;

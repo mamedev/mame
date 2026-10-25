@@ -43,13 +43,13 @@ private:
 		// Registers
 		uint16_t ctrl = 0;
 
-		uint16_t destination_x = 0;			// DRXA
+		uint16_t destination_x = 0;         // DRXA
 		uint16_t current_destination_x = 0; // DXA
-		uint16_t destination_y = 0;			// DYA
+		uint16_t destination_y = 0;         // DYA
 
-		uint16_t source_x = 0;		   // SRXA
+		uint16_t source_x = 0;         // SRXA
 		uint16_t current_source_x = 0; // SXA
-		uint16_t source_y = 0;		   // SYA
+		uint16_t source_y = 0;         // SYA
 
 		uint16_t limit_x = 0; // LXA
 		uint16_t limit_y = 0; // YC
