@@ -44,6 +44,17 @@ namespace {
 
 #define MASTER_CLOCK 13.608_MHz_XTAL
 
+// host port handshake: DSW1 bits only the hardware sees, and the jumpers
+enum : ioport_value
+{
+	DSW1_DSR_OPEN = 0x200,      // S2-8
+	DSW1_DCD_OPEN = 0x400,      // S2-9
+	DSW1_DTR_OPEN = 0x800,      // S2-10, DTR EN
+
+	JUMPER_DCD_FROM_DSR = 0x01, // E15-E16 instead of E14-E15
+	JUMPER_PIN20_RTS = 0x02     // E17-E19 instead of E18-E19
+};
+
 class tv910_state : public driver_device
 {
 public:
@@ -73,6 +84,7 @@ public:
 private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
@@ -86,12 +98,9 @@ private:
 	void control_w(uint8_t data);
 
 	void vbl_w(int state);
-	void host_rxd_w(int state);
-	void printer_dtr_w(int state);
+	void host_cts_w(int state);
+	bool ports_readable() const;
 	void update_printer_txd();
-	void host_dcd_w(int state);
-	void host_dsr_w(int state);
-	void acia_rts_w(int state);
 	void update_acia_dcd();
 	void update_host_dtr();
 
@@ -124,10 +133,6 @@ private:
 	int m_repeatdelay;
 
 	uint8_t m_control;
-	int m_rxd;
-	int m_printer_dtr;
-	int m_host_dcd;
-	int m_host_dsr;
 	int m_rts;
 };
 
@@ -168,68 +173,54 @@ void tv910_state::control_w(uint8_t data)
 	update_host_dtr();
 }
 
-void tv910_state::host_rxd_w(int state)
-{
-	m_rxd = state;
-	update_printer_txd();
-}
-
 void tv910_state::update_printer_txd()
 {
 	// extension mode (PRINT, ESC @, ^R) copies the host data to the printer
-	m_printer->write_txd(BIT(m_control, 2) ? m_rxd : 1);
+	m_printer->write_txd(BIT(m_control, 2) ? m_rs232->rxd_r() : 1);
 }
 
-void tv910_state::printer_dtr_w(int state)
+bool tv910_state::ports_readable() const
 {
-	m_printer_dtr = state;
-	update_host_dtr();
+	// RS-232 cards drive their lines from device start, before input ports
+	// can be read; machine_reset brings the outputs up to date
+	return machine().phase() >= machine_phase::RESET;
 }
 
-void tv910_state::host_dcd_w(int state)
+void tv910_state::host_cts_w(int state)
 {
-	m_host_dcd = state;
-	update_acia_dcd();
-}
-
-void tv910_state::host_dsr_w(int state)
-{
-	m_host_dsr = state;
-	update_acia_dcd();
-}
-
-void tv910_state::acia_rts_w(int state)
-{
-	m_rts = state;
-	update_host_dtr();
+	// with nothing on the host port, CTS and DCD read as asserted, or the
+	// terminal hangs and complains
+	m_acia->write_cts(m_rs232->get_card_device() ? state : 0);
 }
 
 void tv910_state::update_acia_dcd()
 {
 	// the 6551's DCD comes from pin 8 through S2-9 (E14-E15), or from pin 6
 	// through S2-8 (E15-E16); an open switch reads as deasserted
-	if (machine().phase() < machine_phase::RESET)
-		return; // lines arriving at device start; machine_reset catches up
+	if (!ports_readable())
+		return;
 	ioport_value const sw = m_dsw1->read();
-	if (BIT(m_jumpers->read(), 0))
-		m_acia->write_dcd(BIT(sw, 9) ? 1 : m_host_dsr);
+	int state;
+	if (m_jumpers->read() & JUMPER_DCD_FROM_DSR)
+		state = (sw & DSW1_DSR_OPEN) ? 1 : m_rs232->dsr_r();
 	else
-		m_acia->write_dcd(BIT(sw, 10) ? 1 : m_host_dcd);
+		state = (sw & DSW1_DCD_OPEN) ? 1 : m_rs232->dcd_r();
+	m_acia->write_dcd(m_rs232->get_card_device() ? state : 0);
 }
 
 void tv910_state::update_host_dtr()
 {
 	// pin 20 through S2-10 (DTR EN): the 6551's RTS (E17-E19), or (E18-E19)
 	// printer ready while extending, else asserted
-	if (machine().phase() < machine_phase::RESET)
+	if (!ports_readable())
 		return;
 	int state;
-	if (BIT(m_dsw1->read(), 11))
+	if (m_dsw1->read() & DSW1_DTR_OPEN)
 		state = 1;
-	else if (BIT(m_jumpers->read(), 1))
+	else if (m_jumpers->read() & JUMPER_PIN20_RTS)
 		state = m_rts;
 	else
-		state = BIT(m_control, 2) ? m_printer_dtr : 0;
+		state = BIT(m_control, 2) ? m_printer->dsr_r() : 0;
 	m_rs232->write_dtr(state);
 }
 
@@ -265,7 +256,7 @@ uint8_t tv910_state::kbd_flags_r()
 		rv |= 0x01;
 
 	// D1: Printer DTR (P4 pin 20)
-	if (m_printer_dtr)
+	if (m_printer->dsr_r())
 		rv |= 0x02;
 
 	// D6: FUNC key (not ALPHA LOCK as indicated in memory map)
@@ -513,17 +504,17 @@ static INPUT_PORTS_START( tv910 )
 	PORT_DIPSETTING( 0x00, "Black characters on green screen" )
 	PORT_DIPSETTING( 0x100, "Green characters on black screen" )
 
-	PORT_DIPNAME( 0x200, 0x200, "Data Set Ready" ) PORT_DIPLOCATION("S2:8") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv910_state::handshake_changed), 0)
-	PORT_DIPSETTING( 0x000, "Connected" )
-	PORT_DIPSETTING( 0x200, "Disconnected" )
+	PORT_DIPNAME( DSW1_DSR_OPEN, DSW1_DSR_OPEN, "Data Set Ready" ) PORT_DIPLOCATION("S2:8") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv910_state::handshake_changed), 0)
+	PORT_DIPSETTING( 0, "Connected" )
+	PORT_DIPSETTING( DSW1_DSR_OPEN, "Disconnected" )
 
-	PORT_DIPNAME( 0x400, 0x000, "Data Carrier Detect" ) PORT_DIPLOCATION("S2:9") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv910_state::handshake_changed), 0)
-	PORT_DIPSETTING( 0x000, "Connected" )
-	PORT_DIPSETTING( 0x400, "Disconnected" )
+	PORT_DIPNAME( DSW1_DCD_OPEN, 0, "Data Carrier Detect" ) PORT_DIPLOCATION("S2:9") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv910_state::handshake_changed), 0)
+	PORT_DIPSETTING( 0, "Connected" )
+	PORT_DIPSETTING( DSW1_DCD_OPEN, "Disconnected" )
 
-	PORT_DIPNAME( 0x800, 0x000, "Data Terminal Ready" ) PORT_DIPLOCATION("S2:10") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv910_state::handshake_changed), 0)
-	PORT_DIPSETTING( 0x000, "Connected" )
-	PORT_DIPSETTING( 0x800, "Disconnected" )
+	PORT_DIPNAME( DSW1_DTR_OPEN, 0, "Data Terminal Ready" ) PORT_DIPLOCATION("S2:10") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv910_state::handshake_changed), 0)
+	PORT_DIPSETTING( 0, "Connected" )
+	PORT_DIPSETTING( DSW1_DTR_OPEN, "Disconnected" )
 
 	PORT_START("CHARSET") // actually a pair of jumpers: E4-E5 (bit 1), E6-E7 (bit 0)
 	PORT_DIPNAME( 0x03, 0x00, "Character Set" )
@@ -533,43 +524,37 @@ static INPUT_PORTS_START( tv910 )
 	PORT_DIPSETTING( 0x03, "Spanish" )
 
 	PORT_START("JUMPERS")
-	PORT_CONFNAME( 0x01, 0x00, "6551 DCD from" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv910_state::handshake_changed), 0)
-	PORT_CONFSETTING( 0x00, "Pin 8, DCD (E14-E15)" )
-	PORT_CONFSETTING( 0x01, "Pin 6, DSR (E15-E16)" )
-	PORT_CONFNAME( 0x02, 0x00, "Pin 20 from" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv910_state::handshake_changed), 0)
-	PORT_CONFSETTING( 0x00, "Printer ready (E18-E19)" )
-	PORT_CONFSETTING( 0x02, "RTS (E17-E19)" )
+	PORT_CONFNAME( JUMPER_DCD_FROM_DSR, 0, "6551 DCD from" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv910_state::handshake_changed), 0)
+	PORT_CONFSETTING( 0, "Pin 8, DCD (E14-E15)" )
+	PORT_CONFSETTING( JUMPER_DCD_FROM_DSR, "Pin 6, DSR (E15-E16)" )
+	PORT_CONFNAME( JUMPER_PIN20_RTS, 0, "Pin 20 from" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv910_state::handshake_changed), 0)
+	PORT_CONFSETTING( 0, "Printer ready (E18-E19)" )
+	PORT_CONFSETTING( JUMPER_PIN20_RTS, "RTS (E17-E19)" )
 INPUT_PORTS_END
 
 void tv910_state::machine_start()
 {
-	// DCD needs to be driven somehow, or else the terminal will complain
-	// CTS also needs to be driven to prevent hanging caused by buffer overflow
-	m_host_dcd = m_rs232->dcd_r();
-	m_host_dsr = m_rs232->dsr_r();
-	if (m_rs232->get_card_device() == nullptr)
-	{
-		m_host_dcd = 0;
-		m_acia->write_cts(0);
-	}
-
 	// DSR is tied to GND
 	m_acia->write_dsr(0);
 
-	m_rxd = m_rs232->rxd_r();
-	m_printer_dtr = m_printer->dsr_r(); // an empty port reads as not ready
+	m_control = 0;
 	m_rts = 1;
-	save_item(NAME(m_rxd));
-	save_item(NAME(m_printer_dtr));
-	save_item(NAME(m_host_dcd));
-	save_item(NAME(m_host_dsr));
+	save_item(NAME(m_control));
 	save_item(NAME(m_rts));
 }
 
 void tv910_state::machine_reset()
 {
 	control_w(0);
+	host_cts_w(m_rs232->cts_r());
 	update_acia_dcd();
+}
+
+void tv910_state::device_post_load()
+{
+	update_printer_txd();
+	update_acia_dcd();
+	update_host_dtr();
 }
 
 MC6845_ON_UPDATE_ADDR_CHANGED( tv910_state::crtc_update_addr )
@@ -674,17 +659,17 @@ void tv910_state::tv910(machine_config &config)
 	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	m_acia->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_acia->rts_handler().set(m_rs232, FUNC(rs232_port_device::write_rts));
-	m_acia->rts_handler().append(FUNC(tv910_state::acia_rts_w));
+	m_acia->rts_handler().append([this] (int state) { m_rts = state; update_host_dtr(); });
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 	m_rs232->rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
-	m_rs232->rxd_handler().append(FUNC(tv910_state::host_rxd_w));
-	m_rs232->dcd_handler().set(FUNC(tv910_state::host_dcd_w));
-	m_rs232->dsr_handler().set(FUNC(tv910_state::host_dsr_w));
-	m_rs232->cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
+	m_rs232->rxd_handler().append([this] (int state) { update_printer_txd(); });
+	m_rs232->dcd_handler().set([this] (int state) { update_acia_dcd(); });
+	m_rs232->dsr_handler().set([this] (int state) { update_acia_dcd(); });
+	m_rs232->cts_handler().set(FUNC(tv910_state::host_cts_w));
 
 	RS232_PORT(config, m_printer, default_rs232_devices, nullptr); // P4
-	m_printer->dsr_handler().set(FUNC(tv910_state::printer_dtr_w)); // from pin 20 (DTR)
+	m_printer->dsr_handler().set([this] (int state) { update_host_dtr(); }); // from pin 20 (DTR)
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, MASTER_CLOCK / 8400); // 1620 Hz (Row 10 signal)
