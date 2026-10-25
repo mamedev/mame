@@ -15,8 +15,6 @@
     Esc-V (with a capital V) brings up the self-test screen.
 
     TODO:
-        - Reverse attribute handling on the self-test screen doesn't seem
-          to match the picture shown in the Operator's Manual
         - Make 910 keyboard into a device since the similar Model 925 uses
           a 950-compatible serial keyboard instead (with a second ACIA)
         - Add printer port and remaining DIP switches
