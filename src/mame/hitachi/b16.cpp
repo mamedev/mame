@@ -134,6 +134,9 @@ protected:
 
 	void palette_init(palette_device &palette) const ATTR_COLD;
 
+	u8 m_port80_config_mask = 0;
+	u8 m_port80_config = 0;
+
 private:
 	const unsigned m_graphics_planes;
 	u8 m_graphics_mask = 0xff;
@@ -152,8 +155,6 @@ private:
 	u8 m_dma_page = 0;
 	u32 m_fdc_rate = 250'000;
 	u8 m_port80_vblank_mask = 0xb0;
-	u8 m_port80_config_mask = 0;
-	u8 m_port80_config = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
@@ -199,6 +200,10 @@ public:
 	b16ex2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: b16_state(mconfig, type, tag, 4)
 	{ }
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 };
 
 // Text and bitmap colours use BGR components. Intensity levels are provisional.
@@ -569,6 +574,15 @@ void b16_state::machine_start()
 	save_item(NAME(m_dma_page));
 }
 
+void b16ex2_state::machine_start()
+{
+	b16_state::machine_start();
+	// EX-II BIOS reads bit 2 as the colour-display capability input.
+	// Control writes must not turn it into a monochrome configuration.
+	// TODO: confirm its physical source and configuration on other models.
+	m_port80_config_mask = 0x04;
+}
+
 void b16_state::machine_reset()
 {
 	// Keep the selected drive's native speed (300 RPM DD or 360 RPM HD).
@@ -585,6 +599,7 @@ void b16_state::machine_reset()
 	m_dma_page = 0;
 	m_port78 = 0;
 	m_port80 = 0;
+	m_port80_config = 0;
 	m_tvram_attr_latch = 0;
 	m_port84 = 0;
 	m_graphics_mask = 0xff;
@@ -597,6 +612,12 @@ void b16_state::machine_reset()
 		graphics_palette_w(i, i);
 	m_dma->dreq0_w(0);
 	m_fdc->tc_w(false);
+}
+
+void b16ex2_state::machine_reset()
+{
+	b16_state::machine_reset();
+	m_port80_config = 0x04;
 }
 
 void b16_state::b16(machine_config &config)
@@ -675,11 +696,6 @@ void b16_state::b16ex2(machine_config &config)
 	m_fdc->subdevice<floppy_connector>("1")->set_default_option("525hd");
 	m_fdc_rate = 500'000;
 	m_port80_vblank_mask = 0x90;
-	// EX-II BIOS reads bit 2 as the colour-display capability input.
-	// Control writes must not turn it into a monochrome configuration.
-	// TODO: confirm its physical source and configuration on other models.
-	m_port80_config_mask = 0x04;
-	m_port80_config = 0x04;
 	I80286(config.replace(), m_maincpu, XTAL(16'000'000) / 2); // A80286-8 / S
 	m_maincpu->set_addrmap(AS_PROGRAM, &b16_state::b16ex2_map);
 	m_maincpu->set_addrmap(AS_IO, &b16_state::b16_io);
