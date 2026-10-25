@@ -17,8 +17,6 @@
     TODO:
         - Make 910 keyboard into a device since the similar Model 925 uses
           a 950-compatible serial keyboard instead (with a second ACIA)
-        - Add remaining DIP switches; DTR EN and the E17-E19 option of
-          RTS on the host's pin 20
 
 ****************************************************************************/
 
