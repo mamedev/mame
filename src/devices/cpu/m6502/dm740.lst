@@ -29,8 +29,8 @@ bra_rel     sta_m_idx   rrf_zpg     bbs_bar  sty_m_zpg   sta_m_zpg   stx_m_zpg  
 bcc_m_rel   sta_m_idy   kil_non     bbc_bar  sty_m_zpx   sta_m_zpx   stx_m_zpy   bbc_bzr     tya_imp     sta_m_aby   txs_imp     clb_bac     shy_abx     sta_m_abx   shx_aby     clb_biz
 ldy_imm     ldt_idx     ldx_imm     bbs_bar  ldy_zpg     ldt_zpg     ldx_zpg     bbs_bzr     tay_imp     ldt_imm     tax_imp     seb_bac     ldy_aba     ldt_aba     ldx_aba     seb_biz
 bcs_m_rel   ldt_idy     jmp_zpi     bbc_bar  ldy_m_zpx   ldt_zpx     ldx_m_zpy   bbc_bzr     clv_imp     ldt_aby     tsx_imp     clb_bac     ldy_m_abx   ldt_abx     ldx_m_aby   clb_biz
-cpy_imm     cmp_m_idx   wit_imp     bbs_bar  cpy_zpg     cmpt_zpg    dec_m_zpg   bbs_bzr     iny_imp     cmpt_imm    dex_imp     seb_bac     cpy_aba     cmpt_aba    dec_m_aba   seb_biz
-bne_m_rel   cmp_m_idy   kil_non     bbc_bar  nop_zpx     cmpt_zpx    dec_m_zpx   bbc_bzr     cld_imp     cmpt_aby    nop_imp     clb_bac     nop_abx     cmpt_abx    dec_m_abx   clb_biz
-cpx_imm     sbct_idx    nop_imm     bbs_bar  cpx_zpg     sbct_zpg    inc_m_zpg   bbs_bzr     inx_imp     sbc_imm     nop_imp     seb_bac     cpx_aba     sbct_aba    inc_m_aba   seb_biz
-beq_m_rel   sbct_idy    kil_non     bbc_bar  nop_zpx     sbct_zpx    inc_m_zpx   bbc_bzr     sed_imp     sbc_m_aby   nop_imp     clb_bac     nop_abx     sbct_abx    inc_m_abx   clb_biz
+cpy_imm     cmpt_idx    wit_imp     bbs_bar  cpy_zpg     cmpt_zpg    dec_m_zpg   bbs_bzr     iny_imp     cmpt_imm    dex_imp     seb_bac     cpy_aba     cmpt_aba    dec_m_aba   seb_biz
+bne_m_rel   cmpt_idy    kil_non     bbc_bar  nop_zpx     cmpt_zpx    dec_m_zpx   bbc_bzr     cld_imp     cmpt_aby    nop_imp     clb_bac     nop_abx     cmpt_abx    dec_m_abx   clb_biz
+cpx_imm     sbct_idx    nop_imm     bbs_bar  cpx_zpg     sbct_zpg    inc_m_zpg   bbs_bzr     inx_imp     sbct_imm    nop_imp     seb_bac     cpx_aba     sbct_aba    inc_m_aba   seb_biz
+beq_m_rel   sbct_idy    kil_non     bbc_bar  nop_zpx     sbct_zpx    inc_m_zpx   bbc_bzr     sed_imp     sbct_aby    nop_imp     clb_bac     nop_abx     sbct_abx    inc_m_abx   clb_biz
 reset_m
