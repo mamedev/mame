@@ -1544,10 +1544,10 @@ GAME( 2005, waidrive,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, 
 GAME( 2005, vfurlong,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Progress / Sammy",         "Net@Select: Horse Racing - Victory Furlong", GAME_FLAGS ) // Mar 02 2005 22:10:33
 GAME( 2004, mirstad,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "MOSS / Sammy",             "Miracle Stadium", GAME_FLAGS ) // dumped from AM3AHC-01 / WA01-7009-0 board
 GAME( 2005, rumblef2,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish 2", GAME_FLAGS ) // Mar 04 2005 19:26:32
-GAME( 2005, ngbc,      awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / SNK Playmore",     "NeoGeo Battle Coliseum", GAME_FLAGS ) // Jun 25 2005 17:00:38
-GAME( 2005, ngbcj,     ngbc,     aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / SNK Playmore",     "NeoGeo Battle Coliseum (Japan)", GAME_FLAGS ) // Jun 25 2005 17:00:38
-GAME( 2005, samsptk,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / SNK Playmore",     "Samurai Spirits Tenkaichi Kenkakuden", GAME_FLAGS ) // Aug 05 2005 16:43:48
-GAME( 2005, kofxi,     awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters XI", GAME_FLAGS ) // Aug 07 2005 18:11:25
+GAME( 2005, ngbc,      awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sega / SNK Playmore",      "NeoGeo Battle Coliseum", GAME_FLAGS ) // Jun 25 2005 17:00:38
+GAME( 2005, ngbcj,     ngbc,     aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sega / SNK Playmore",      "NeoGeo Battle Coliseum (Japan)", GAME_FLAGS ) // Jun 25 2005 17:00:38
+GAME( 2005, samsptk,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sega / SNK Playmore",      "Samurai Spirits Tenkaichi Kenkakuden", GAME_FLAGS ) // Aug 05 2005 16:43:48
+GAME( 2005, kofxi,     awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sega / SNK Playmore",      "The King of Fighters XI", GAME_FLAGS ) // Aug 07 2005 18:11:25
 GAME( 2005, fotns,     awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Arc System Works / Sega",  "Fist Of The North Star / Hokuto no Ken", GAME_FLAGS ) // Nov 28 2005 21:04:40
 GAME( 2006, mslug6,    awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sega / SNK Playmore",      "Metal Slug 6", GAME_FLAGS ) // Jan 13 2006 00:49:12
 GAME( 2006, xtrmhnt2,  awbios,   aw2c, aw2c, atomiswave_xtrmhnt2_state, init_atomiswave, ROT0, "Sega",              "Extreme Hunting 2", GAME_FLAGS | MACHINE_UNEMULATED_PROTECTION ) // May 26 2006 14:03:22
