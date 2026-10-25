@@ -217,7 +217,6 @@ void b16_state::video_start()
 	m_ig_ram = make_unique_clear<u8[]>(0x2000);
 	m_gfxdecode->gfx(1)->set_source_and_total(m_ig_ram.get(), 0x200);
 	save_pointer(NAME(m_ig_ram), 0x2000);
-	save_item(NAME(m_port84));
 	std::fill(m_gvram.begin(), m_gvram.end(), 0);
 	save_item(NAME(m_graphics_mask));
 	save_item(NAME(m_graphics_palette));
@@ -324,7 +323,7 @@ u8 b16_state::graphics_r(offs_t offset)
 	return data;
 }
 
-void b16_state::graphics_w(offs_t offset, u8 data)
+void b16_state::graphics_w(offs_t offset, u8)
 {
 	// CPU write data is a strobe. Pixel data comes from the plane registers
 	// (or the read latches during CEh/DEh transfers), selected by C0h's mask.
@@ -566,6 +565,7 @@ void b16_state::machine_start()
 {
 	save_item(NAME(m_port78));
 	save_item(NAME(m_port80));
+	save_item(NAME(m_port84));
 	save_item(NAME(m_dma_page));
 }
 
