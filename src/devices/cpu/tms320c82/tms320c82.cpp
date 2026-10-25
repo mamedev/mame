@@ -959,12 +959,21 @@ void tms320c82_mp_device::tc_finish(uint8_t channel)
 
 TIMER_CALLBACK_MEMBER(tms320c82_mp_device::tc_tick)
 {
-	// Consecutive data beats of the active packet run in one callback. The
-	// beat that completes a packet always starts a callback of its own, so
-	// completion is signalled at the same time as with single beats.
+	// Consecutive data beats of the active packet run in one callback, up to
+	// BATCH_CLOCKS, and only while they start before the next scheduled event,
+	// which may bring a new request. The beat that completes a packet always
+	// starts a callback of its own, so completion is signalled at the same time
+	// as with single beats.
 	constexpr uint32_t BATCH_CLOCKS = 64;
+	m_tc_timer->adjust(attotime::never); // so the next event is the first timer
+	attotime const now = machine().time();
+	auto const before_next_event = [this, &now] (uint32_t clocks)
+	{
+		emu_timer const *const next = machine().scheduler().first_timer();
+		return !next || (now + clocks_to_attotime(clocks)) < next->expire();
+	};
 	uint32_t clocks = tc_beat();
-	while (clocks && clocks < BATCH_CLOCKS && tc_streaming())
+	while (clocks && clocks < BATCH_CLOCKS && tc_streaming() && before_next_event(clocks))
 		clocks += tc_beat();
 	if (clocks && (m_tc_active >= 0 || tc_select() >= 0))
 		m_tc_timer->adjust(clocks_to_attotime(clocks));
