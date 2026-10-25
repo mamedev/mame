@@ -1279,9 +1279,13 @@ ROM_START(kn6000)
 	ROM_LOAD32_WORD("kn6000_program_even.ic12", 0x000000, 0x200000, CRC(56c2cfe3) SHA1(e15a4c73440f1dcdf06457f9956c96bf20d68b16))
 	ROM_LOAD32_WORD("kn6000_program_odd.ic11",  0x000002, 0x200000, CRC(9d94da6c) SHA1(d73b4c8ebf0c67b6a2eeb5571d0273fc6efbfe4c))
 
-	ROM_REGION32_LE(0x400000, "table_data", 0)
+	ROM_REGION32_LE(0x400000, "table_data", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("qsigx3c16008.ic13", 0x000000, 0x200000, NO_DUMP)
 	ROM_LOAD32_WORD("qsigx3c16007.ic14", 0x000002, 0x200000, NO_DUMP)
+	// Hand-made stand-in until IC13/IC14 are dumped: the KN7000's bitmap fonts,
+	// relocated to where the KN6000 firmware looks for them, so that its screens
+	// show text.  Not KN6000 data.
+	ROM_LOAD("kn6000_font_placeholder.bin", 0x000000, 0x040000, BAD_DUMP CRC(bb2a0e7f) SHA1(d40fab9b729b0fc6a20b27a00d869fbbe52f54f8))
 
 	ROM_REGION(0x1000000, "waveform_main_y", 0)
 	ROM_LOAD("qsigx3c64004.ic205", 0x000000, 0x800000, NO_DUMP)
