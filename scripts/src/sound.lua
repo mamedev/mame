@@ -873,6 +873,19 @@ end
 
 
 ---------------------------------------------------
+-- Novatek NT3570F sound generator
+--@src/devices/sound/nt3570.h,SOUNDS["NT3570"] = true
+---------------------------------------------------
+
+if SOUNDS["NT3570"] then
+	files {
+		MAME_DIR .. "src/devices/sound/nt3570.cpp",
+		MAME_DIR .. "src/devices/sound/nt3570.h",
+	}
+end
+
+
+---------------------------------------------------
 -- OKI ADPCM sample players
 --@src/devices/sound/okim6258.h,SOUNDS["OKIM6258"] = true
 --@src/devices/sound/msm5205.h,SOUNDS["MSM5205"] = true
