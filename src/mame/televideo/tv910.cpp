@@ -99,6 +99,7 @@ private:
 
 	void vbl_w(int state);
 	void host_cts_w(int state);
+	void host_dcd_dsr_w(int state);
 	bool ports_readable() const;
 	void update_printer_txd();
 	void update_acia_dcd();
@@ -193,25 +194,32 @@ void tv910_state::host_cts_w(int state)
 	m_acia->write_cts(m_rs232->get_card_device() ? state : 0);
 }
 
+void tv910_state::host_dcd_dsr_w(int)
+{
+	update_acia_dcd();
+}
+
 void tv910_state::update_acia_dcd()
 {
 	// the 6551's DCD comes from pin 8 through S2-9 (E14-E15), or from pin 6
-	// through S2-8 (E15-E16); an open switch reads as deasserted
+	// through S2-8 (E15-E16); an open switch reads as deasserted, and an
+	// empty host port as asserted (see host_cts_w)
 	if (!ports_readable())
 		return;
+	bool const card = m_rs232->get_card_device();
 	ioport_value const sw = m_dsw1->read();
-	int state;
 	if (m_jumpers->read() & JUMPER_DCD_FROM_DSR)
-		state = (sw & DSW1_DSR_OPEN) ? 1 : m_rs232->dsr_r();
+		m_acia->write_dcd((sw & DSW1_DSR_OPEN) ? 1 : card ? m_rs232->dsr_r() : 0);
 	else
-		state = (sw & DSW1_DCD_OPEN) ? 1 : m_rs232->dcd_r();
-	m_acia->write_dcd(m_rs232->get_card_device() ? state : 0);
+		m_acia->write_dcd((sw & DSW1_DCD_OPEN) ? 1 : card ? m_rs232->dcd_r() : 0);
 }
 
 void tv910_state::update_host_dtr()
 {
 	// pin 20 through S2-10 (DTR EN): the 6551's RTS (E17-E19), or (E18-E19)
-	// printer ready while extending, else asserted
+	// 75188 gate 2 (A10, sheet 4), which NANDs printer ready from P4-20 (via
+	// the 75189) with extension mode: printer ready while extending, else
+	// asserted
 	if (!ports_readable())
 		return;
 	int state;
@@ -546,8 +554,6 @@ void tv910_state::machine_start()
 void tv910_state::machine_reset()
 {
 	control_w(0);
-	host_cts_w(m_rs232->cts_r());
-	update_acia_dcd();
 }
 
 void tv910_state::device_post_load()
@@ -663,13 +669,13 @@ void tv910_state::tv910(machine_config &config)
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 	m_rs232->rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
-	m_rs232->rxd_handler().append([this] (int state) { update_printer_txd(); });
-	m_rs232->dcd_handler().set([this] (int state) { update_acia_dcd(); });
-	m_rs232->dsr_handler().set([this] (int state) { update_acia_dcd(); });
+	m_rs232->rxd_handler().append([this] (int) { update_printer_txd(); });
+	m_rs232->dcd_handler().set(FUNC(tv910_state::host_dcd_dsr_w));
+	m_rs232->dsr_handler().set(FUNC(tv910_state::host_dcd_dsr_w));
 	m_rs232->cts_handler().set(FUNC(tv910_state::host_cts_w));
 
 	RS232_PORT(config, m_printer, default_rs232_devices, nullptr); // P4
-	m_printer->dsr_handler().set([this] (int state) { update_host_dtr(); }); // from pin 20 (DTR)
+	m_printer->dsr_handler().set([this] (int) { update_host_dtr(); }); // from pin 20 (DTR)
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, MASTER_CLOCK / 8400); // 1620 Hz (Row 10 signal)
