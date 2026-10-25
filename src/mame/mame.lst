@@ -43550,6 +43550,9 @@ pc1403h
 pc1450
 trs80pc3
 
+@source:sharp/upx500.cpp
+upx500
+
 @source:sharp/wizard.cpp
 iq7000
 
