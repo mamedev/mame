@@ -112,7 +112,7 @@
 
     - Complete TMS320C82 PP instruction, interrupt and transfer timing support
     - Verify the inferred audio clock and the assignment of the four DAC outputs
-    - Verify translucency coefficients other than 32 and translucent Z writes
+    - Verify header translucency modes/coefficients and translucent Z writes
     - Minor Z-buffer issues
     - Wrong textures in a few places (could be a CPU core bug)
     - Link word period: the IC44 serial divider isn't dumped
@@ -146,6 +146,7 @@
 #include <deque>
 #include <functional>
 #include <iterator>
+#include <limits>
 #include <memory>
 #include <system_error>
 #include <thread>
@@ -165,7 +166,8 @@ namespace {
 // the bilinear transform at 192 kHz, before MAME's output resampling. This
 // keeps the response independent of the user's output sample rate and avoids
 // folding the 34/48 kHz I/V poles into a 44.1/48 kHz filter. Op-amps are ideal;
-// component tolerances, clipping and the cabinet amplifier are not modelled.
+// component tolerances, amplifier coupling/clipping and speaker response are
+// not modelled. The nominal cabinet amplifier gain is applied in the routes.
 class rollext_filter_device : public device_t, public device_sound_interface
 {
 public:
@@ -261,6 +263,12 @@ void rollext_filter_device::sound_stream_update(sound_stream &stream)
 				double const output = c[0] * value + h[0];
 				h[0] = c[1] * value - c[3] * output + h[1];
 				h[1] = c[2] * value - c[4] * output;
+				// Flush inaudible tails before they become subnormal, which makes
+				// silent channels far more costly than active ones.
+				if (std::abs(h[0]) < 1e-30)
+					h[0] = 0;
+				if (std::abs(h[1]) < 1e-30)
+					h[1] = 0;
 				value = output;
 			}
 			stream.put(channel, sample, value);
@@ -269,6 +277,19 @@ void rollext_filter_device::sound_stream_update(sound_stream &stream)
 }
 
 constexpr bool BILINEAR = true;
+
+// Float-to-integer conversion is undefined for NaN and for values outside the
+// int32_t range, which an infinite 1/Z produces. Saturate, mapping NaN to zero.
+int32_t saturate_int32(float value)
+{
+	if (std::isnan(value))
+		return 0;
+	if (value >= 2147483648.0f)
+		return std::numeric_limits<int32_t>::max();
+	if (value < -2147483648.0f)
+		return std::numeric_limits<int32_t>::min();
+	return int32_t(value);
+}
 
 // Cabinet link over TCP, carrying the words written to the link registers.
 // The socket is polled from the emulation thread. With -comm_framesync, the
@@ -581,7 +602,7 @@ public:
 		save.save_item(NAME(m_clip.max_y));
 	}
 
-	template<bool UseZ>
+	template<bool TestZ>
 	void render_texture_scan(int32_t scanline, const extent_t &extent, const rollext_polydata &extradata, int threadid);
 
 	void set_texture_ram(uint8_t* texture_ram) { m_texture_ram = texture_ram; }
@@ -605,7 +626,7 @@ private:
 	uint8_t *m_texture_ram = nullptr;
 };
 
-template<bool UseZ>
+template<bool TestZ>
 void rollext_renderer::render_texture_scan(int32_t scanline, const extent_t &extent, const rollext_polydata &extradata, int threadid)
 {
 	uint32_t *fb = &m_fb[m_fb_current].pix(scanline);
@@ -635,62 +656,41 @@ void rollext_renderer::render_texture_scan(int32_t scanline, const extent_t &ext
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		// FIXME: Verify the graphics ASIC's reciprocal precision.
+		// Depth truncates, allowing for single-precision roundoff just below an
+		// integer, so coplanar surfaces get the same value.
 		float const z = 1.0f / ooz;
-		uint32_t zbufval = int(z * zmul);
+		float const depth = z * zmul;
+		uint32_t const zbufval = saturate_int32(depth + std::abs(depth) * std::numeric_limits<float>::epsilon());
 
-		if (zbufval <= zb[x] || !UseZ)
+		if (!TestZ || zbufval <= zb[x])
 		{
 			float u = uoz * z;
 			float v = voz * z;
 
 			// Floor keeps bilinear weights nonnegative at wrapped texture edges.
 			float const intu = std::floor(u), intv = std::floor(v);
-			int tx = tex_origin_x + int(intu);
-			int ty = tex_origin_y + int(intv);
+			int tx = tex_origin_x + saturate_int32(intu);
+			int ty = tex_origin_y + saturate_int32(intv);
 
 			if (BILINEAR)
 			{
-				int fracu = (u - intu) * 256.0f;
-				int fracv = (v - intv) * 256.0f;
+				int fracu = saturate_int32((u - intu) * 256.0f);
+				int fracv = saturate_int32((v - intv) * 256.0f);
 
-				uint32_t mask00 = m_texture_mask[((ty & 0x3fff) * 2048) + (tx & 0x7ff)];
-				uint32_t mask01 = m_texture_mask[((ty & 0x3fff) * 2048) + ((tx + 1) & 0x7ff)];
-				uint32_t mask10 = m_texture_mask[(((ty + 1) & 0x3fff) * 2048) + (tx & 0x7ff)];
-				uint32_t mask11 = m_texture_mask[(((ty + 1) & 0x3fff) * 2048) + ((tx + 1) & 0x7ff)];
-				// Most texels are wholly opaque or wholly masked. Filtering a
-				// uniform coverage value cannot change it.
-				uint32_t const mask_level = !(mask00 | mask01 | mask10 | mask11) ? 0
-						: ((mask00 & mask01 & mask10 & mask11) == 0xff) ? 0xff
-						: rgbaint_t::bilinear_filter(mask00, mask01, mask10, mask11, fracu, fracv);
-
-				if (mask_level < 0xff)
+				// The texture mask is a one-bit visibility test, separate from
+				// colour interpolation (as in the related Gaelco 3D renderer).
+				// TODO: Verify this sampling rule on the graphics ASIC.
+				if (!m_texture_mask[((ty & 0x3fff) * 2048) + (tx & 0x7ff)])
 				{
-					uint32_t tex00 = mask00 ? rgb_t(0) : m_palette[palnum + (m_texture_ram[((ty) & 0x3fff) * 2048 + ((tx) & 0x7ff)])];
-					uint32_t tex01 = mask01 ? rgb_t(0) : m_palette[palnum + (m_texture_ram[((ty) & 0x3fff) * 2048 + ((tx + 1) & 0x7ff)])];
-					uint32_t tex10 = mask10 ? rgb_t(0) : m_palette[palnum + (m_texture_ram[((ty + 1) & 0x3fff) * 2048 + ((tx) & 0x7ff)])];
-					uint32_t tex11 = mask11 ? rgb_t(0) : m_palette[palnum + (m_texture_ram[((ty + 1) & 0x3fff) * 2048 + ((tx + 1) & 0x7ff)])];
-
-					const uint32_t texsam = rgbaint_t::bilinear_filter(tex00, tex01, tex10, tex11, fracu, fracv);
-
-					if (!mask_level && extradata.alpha == 256)
-					{
-						fb[x] = texsam;
-					}
-					else
-					{
-						rgbaint_t texel_color(texsam);
-						rgbaint_t fb_color(fb[x]);
-						// Filter colour with coverage already applied. Colours of fully
-						// masked neighbours must not bleed into the visible edge.
-						unsigned const alpha = ((255 - mask_level) * extradata.alpha + 127) / 255;
-						unsigned const inverse = 256 - alpha;
-						texel_color.scale2_add_and_clamp(
-								rgbaint_t(extradata.alpha, extradata.alpha, extradata.alpha, extradata.alpha),
-								fb_color, rgbaint_t(inverse, inverse, inverse, inverse));
-						fb[x] = texel_color.to_rgba_clamp();
-					}
-					if (UseZ)
-						zb[x] = zbufval;
+					uint32_t const tex00 = m_palette[palnum + m_texture_ram[(ty & 0x3fff) * 2048 + (tx & 0x7ff)]];
+					uint32_t const tex01 = m_palette[palnum + m_texture_ram[(ty & 0x3fff) * 2048 + ((tx + 1) & 0x7ff)]];
+					uint32_t const tex10 = m_palette[palnum + m_texture_ram[((ty + 1) & 0x3fff) * 2048 + (tx & 0x7ff)]];
+					uint32_t const tex11 = m_palette[palnum + m_texture_ram[((ty + 1) & 0x3fff) * 2048 + ((tx + 1) & 0x7ff)]];
+					rgbaint_t color(rgbaint_t::bilinear_filter(tex00, tex01, tex10, tex11, fracu, fracv));
+					if (extradata.alpha < 256)
+						color.blend(rgbaint_t(fb[x]), extradata.alpha);
+					fb[x] = color.to_rgba_clamp();
+					zb[x] = zbufval;
 				}
 			}
 			else
@@ -704,8 +704,7 @@ void rollext_renderer::render_texture_scan(int32_t scanline, const extent_t &ext
 					if (extradata.alpha < 256)
 						color.blend(rgbaint_t(fb[x]), extradata.alpha);
 					fb[x] = color.to_rgba_clamp();
-					if (UseZ)
-						zb[x] = zbufval;
+					zb[x] = zbufval;
 				}
 			}
 		}
@@ -744,12 +743,14 @@ void rollext_renderer::process_packet(const uint32_t *packet)
 
 	// Poly data:
 	// Word 0:   xx------ -------- -------- --------   Primitive: 00 special tri, 01 tri, 10 setup, 11 quad
-	//           --x----- -------- -------- --------   ? set to 1 for no perspective
+	//           --x----- -------- -------- --------   Affine/overlay mode (depth compare disabled; inferred)
 	//           ---x---- -------- -------- --------   ? always 1?
 	//           ----x--- -------- -------- --------   ? always 1?
 	//           -----x-- -------- -------- --------   the PP transfer code checks for 1
 	//           ------x- -------- -------- --------   always 0?
 	//           -------x -------- -------- --------   Texture page
+	//           -------- xxxx---- -------- --------   Header mode (inferred)
+	//           -------- ----xxxx x------- --------   Header coefficient (inferred)
 	//           -------- -------- -xxxxxxx --------   Palette
 	//           -------- -------- -------- -----xxx   Original MP vertex count (not the submitted primitive size)
 	// Word 1:   (float) Vertex 1 X
@@ -782,8 +783,10 @@ void rollext_renderer::process_packet(const uint32_t *packet)
 		float fx = u2f(packet[(j * 4) + 1]);
 		float fy = u2f(packet[(j * 4) + 3]);
 
-		vert[j].x = fx + 256.0f;
-		vert[j].y = -fy + 192.0f;
+		// Packet coordinates address integer pixel centres. poly_manager
+		// uses half-integer centres, as in the related Gaelco 3D renderer.
+		vert[j].x = fx + 256.5f;
+		vert[j].y = -fy + 192.5f;
 	}
 
 	rollext_polydata &extra = object_data().next();
@@ -805,15 +808,28 @@ void rollext_renderer::process_packet(const uint32_t *packet)
 	extra.basez = u2f(packet[20]);
 
 	extra.zmul = packet[4] >> 7;
-	// Mode 00 carries a six-bit translucency coefficient in word 21; only 32
-	// (half opacity) has been seen.
-	// FIXME: translucent primitives still test and write Z normally
-	extra.alpha = primitive == 0 ? ((packet[21] >> 16) & 63) * 4 : 256;
-
-	if (num_verts == 4)
-		render_polygon<4, 0>(visarea, render_delegate(&rollext_renderer::render_texture_scan<true>, this), vert);
+	// Primitive 00 carries a six-bit translucency coefficient in word 21 (only
+	// 32, half opacity, has been seen). Header mode 0xe with coefficient 15
+	// (rider shadows, translucent scenery) is drawn at half opacity, as the
+	// reference video suggests.
+	// FIXME: verify the other modes and coefficients, and translucent Z writes
+	uint8_t const mode = BIT(packet[0], 20, 4), coefficient = BIT(packet[0], 15, 5);
+	if (primitive == 0)
+		extra.alpha = BIT(packet[21], 16, 6) * 4;
 	else
-		render_triangle<0>(visarea, render_delegate(&rollext_renderer::render_texture_scan<true>, this), vert[0], vert[1], vert[2]);
+		extra.alpha = (mode == 0xe && coefficient == 15) ? 128 : 256;
+
+	// The MP's affine/2D path sets bit 29. These packets skip the depth test
+	// (the large road titles lie behind the background) but still write depth,
+	// as on gaelco3d.
+	// FIXME: verify the flag and its interaction with translucency
+	render_delegate const callback = BIT(packet[0], 29)
+			? render_delegate(&rollext_renderer::render_texture_scan<false>, this)
+			: render_delegate(&rollext_renderer::render_texture_scan<true>, this);
+	if (num_verts == 4)
+		render_polygon<4, 0>(visarea, callback, vert);
+	else
+		render_triangle<0>(visarea, callback, vert[0], vert[1], vert[2]);
 }
 
 void rollext_renderer::clear_fb()
@@ -1397,18 +1413,24 @@ void rollext_state::rollext(machine_config &config)
 
 	EEPROM_93C66_16BIT(config, m_eeprom);
 
-	// IC12/IC11 TDA1543 outputs CANAL1..4 (schematic sheet 6), which the ROM's
-	// output test calls left, right, bass and rear. Levels follow the I/V
-	// resistors: 3.3k for CANAL1/2, 4.7k for CANAL3/4.
+	// IC12/IC11 TDA1543 outputs CANAL1..4 (sheet 6), which the ROM's output
+	// test calls left, right, bass and rear. The DAC's nominal 2.3 mA p-p
+	// current feeds 3.3k/4.7k I/V resistors. Sheet 1 adds a 2.2k/2.2k divider,
+	// loaded by the TDA1552's nominal 60k input, then its fixed 26 dB gain.
+	// Normalize the ideal bridge output to the 12 V supply. This is an output
+	// reference, not an acoustic calibration or a model of amplifier clipping.
+	constexpr double dac_peak_current = 2.3e-3 / 2;
+	constexpr double input_divider = 60'000.0 / (2 * 60'000.0 + 2'200.0);
+	double const output_scale = dac_peak_current * input_divider * std::pow(10.0, 26.0 / 20.0) / 12.0;
 	SPEAKER(config, "speaker", 2).front();
 	SPEAKER(config, "subwoofer").lfe();
 	SPEAKER(config, "rear").rear_center();
 
 	rollext_filter_device &filter(ROLLEXT_FILTER(config, "output_filter"));
-	filter.add_route(0, "speaker", 3.3 / 8.0, 0);
-	filter.add_route(1, "speaker", 3.3 / 8.0, 1);
-	filter.add_route(2, "subwoofer", 4.7 / 8.0);
-	filter.add_route(3, "rear", 4.7 / 8.0);
+	filter.add_route(0, "speaker", 3'300.0 * output_scale, 0);
+	filter.add_route(1, "speaker", 3'300.0 * output_scale, 1);
+	filter.add_route(2, "subwoofer", 4'700.0 * output_scale);
+	filter.add_route(3, "rear", 4'700.0 * output_scale);
 	for (unsigned i = 0; i < 4; i++)
 		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(ALL_OUTPUTS, filter, 1.0, i);
 

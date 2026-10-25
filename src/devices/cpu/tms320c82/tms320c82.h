@@ -87,9 +87,6 @@ public:
 	// Latches an external packet transfer request (XPT1-15); false if refused.
 	bool external_transfer(int channel);
 
-	uint32_t mp_param_r(offs_t offset, uint32_t mem_mask = ~0);
-	void mp_param_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-
 protected:
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -144,8 +141,6 @@ protected:
 
 	uint32_t m_tcount;
 	uint32_t m_tscale;
-
-	uint32_t m_param_ram[0x1000 / 4];
 
 	int m_icount;
 

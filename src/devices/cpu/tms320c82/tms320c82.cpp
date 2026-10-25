@@ -35,7 +35,7 @@ void tms320c82_mp_device::mp_internal_map(address_map &map)
 	map(0x00009000, 0x00009fff).ram().share("pp1_data1");
 	map(0x01000000, 0x01000fff).ram().share("pp0_param");
 	map(0x01001000, 0x01001fff).ram().share("pp1_param");
-	map(0x01010000, 0x01010fff).rw(FUNC(tms320c82_mp_device::mp_param_r), FUNC(tms320c82_mp_device::mp_param_w));
+	map(0x01010000, 0x01010fff).ram().share("mp_param");
 	map(0x01820000, 0x0182000f).rw(FUNC(tms320c82_mp_device::tc_reg_r), FUNC(tms320c82_mp_device::tc_reg_w));
 }
 
@@ -362,8 +362,9 @@ uint32_t tms320c82_mp_device::tc_address(tc_channel const &t, unsigned side, uin
 	uint32_t const a = counts & 0xffff, b = (counts >> 16) + 1;
 	if (!a)
 		return start;
-	uint32_t const row = ((n / a) % b) * t.words[8 + side];
-	uint32_t const patch = guided ? 0 : (n / (uint64_t(a) * b)) * t.words[10 + side];
+	uint64_t const row_index = n / a;
+	uint32_t const row = (row_index % b) * t.words[8 + side];
+	uint32_t const patch = guided ? 0 : (row_index / b) * t.words[10 + side];
 	// Both A counts count mask bytes for block-write (one byte selects eight
 	// destination bytes). B/C pitches remain byte addresses, not scaled counts.
 	unsigned const expand = ((options >> 16) & 7) == 2 && side == BIT(~options, 19) ? 8 : 1;
@@ -831,8 +832,11 @@ unsigned tms320c82_mp_device::tc_step(unsigned channel)
 		if (!BIT(options, 20))
 		{
 			uint32_t const a = (guided ? t.cursor[side][1] : t.words[4 + side]) & 0xffff;
-			if (a)
-				count = std::min(count, a - uint32_t((guided ? t.cursor[side][2] : t.progress) % a));
+			uint64_t const position = guided ? t.cursor[side][2] : t.progress;
+			// A beat is at most four bytes. If both the row length and its
+			// position are dword-aligned, it cannot cross the row boundary.
+			if (a && ((a | position) & 3))
+				count = std::min(count, a - uint32_t(position % a));
 		}
 	};
 	if (!peripheral_write && !fill)
@@ -1013,24 +1017,9 @@ TIMER_CALLBACK_MEMBER(tms320c82_mp_device::tc_tick)
 	{
 		cycles = tc_step(selected);
 	}
-	if (tc_select() >= 0 || m_tc_active >= 0)
+	if (m_tc_active >= 0 || tc_select() >= 0)
 		m_tc_timer->adjust(clocks_to_attotime(cycles));
 }
-
-uint32_t tms320c82_mp_device::mp_param_r(offs_t offset, uint32_t mem_mask)
-{
-	//printf("mp_param_w: %08X, %08X\n", offset, mem_mask);
-	return m_param_ram[offset];
-}
-
-void tms320c82_mp_device::mp_param_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	//printf("mp_param_w: %08X, %08X, %08X\n", offset, data, mem_mask);
-
-	COMBINE_DATA(&m_param_ram[offset]);
-}
-
-
 
 void tms320c82_mp_device::device_start()
 {
@@ -1048,7 +1037,6 @@ void tms320c82_mp_device::device_start()
 	save_item(NAME(m_ie));
 	save_item(NAME(m_fpst));
 	save_item(NAME(m_config));
-	save_item(NAME(m_param_ram));
 	save_item(NAME(m_intpen));
 	save_item(NAME(m_tcount));
 	save_item(NAME(m_tscale));
@@ -1407,23 +1395,49 @@ void tms320c82_mp_device::execute_run()
 	// periods can be skipped up to the end of the timeslice.
 	uint32_t poll_regs[32], poll_pc = 0;
 	int poll_count = 0;
-	bool candidate = false, previous_safe = false;
+	bool candidate = false, safe = false;
+	// Short slices (between TC beats) aren't worth analysing.
+	bool const allow_poll = m_icount > 8;
 	while (m_icount > 0)
 	{
 		m_pc = m_fetchpc;
 		if ((m_ie & 1) && (m_ie & m_intpen & ~1U))
 			candidate = false;
 		check_interrupts();
-		if (!(machine().debug_flags & DEBUG_FLAG_ENABLED))
+		debugger_instruction_hook(m_pc);
+		uint32_t const previous_ir = m_ir;
+		m_ir = fetch();
+		bool const preceded_by_eligible = safe;
+		if (allow_poll)
 		{
-			if ((!candidate || poll_count - m_icount > 16) && previous_safe)
+			// A snapshot starts at an eligible instruction following another one.
+			uint8_t const op = (m_ir >> 15) & 0x7f;
+			safe = ((m_ir >> 20) & 3) != 3
+					&& (op == 0x22 || op == 0x26 || op == 0x49 || op == 0x4b || op == 0x4d);
+			// Only instructions inside a candidate period need their accesses checked.
+			if (safe && (candidate || preceded_by_eligible))
+			{
+				if (op == 0x22 || op == 0x26)
+				{
+					uint32_t const address = m_reg[(m_ir >> 22) & 31] + util::sext(m_ir, 15);
+					if ((address & 3) || !space(AS_PROGRAM).get_read_ptr(address))
+						safe = false;
+				}
+				if (safe && !m_cache.read_ptr(m_pc))
+					safe = false;
+			}
+			candidate &= safe;
+		}
+		if (allow_poll && safe && !(machine().debug_flags & DEBUG_FLAG_ENABLED))
+		{
+			if ((!candidate || poll_count - m_icount > 16) && preceded_by_eligible)
 			{
 				std::copy(std::begin(m_reg), std::end(m_reg), poll_regs);
-				poll_pc = m_fetchpc;
+				poll_pc = m_pc;
 				poll_count = m_icount;
 				candidate = true;
 			}
-			else if (candidate && m_fetchpc == poll_pc && std::equal(std::begin(m_reg), std::end(m_reg), poll_regs))
+			else if (candidate && m_pc == poll_pc && std::equal(std::begin(m_reg), std::end(m_reg), poll_regs))
 			{
 				unsigned const period = poll_count - m_icount;
 				uint64_t budget = m_icount;
@@ -1443,31 +1457,15 @@ void tms320c82_mp_device::execute_run()
 				}
 				m_icount -= skipped;
 				if (!m_icount)
+				{
+					// The slice ended before this instruction: undo its fetch.
+					m_fetchpc = m_pc;
+					m_ir = previous_ir;
 					return;
+				}
 				candidate = false;
 			}
 		}
-		debugger_instruction_hook(m_pc);
-		m_ir = fetch();
-		previous_safe = true;
-		uint8_t const op = (m_ir >> 15) & 0x7f;
-		if (((m_ir >> 20) & 3) == 3)
-		{
-			previous_safe = false;
-		}
-		else if (op == 0x22 || op == 0x26)
-		{
-			uint32_t const address = m_reg[(m_ir >> 22) & 31] + util::sext(m_ir, 15);
-			if ((address & 3) || !space(AS_PROGRAM).get_read_ptr(address))
-				previous_safe = false;
-		}
-		else if (op != 0x49 && op != 0x4b && op != 0x4d)
-		{
-			previous_safe = false;
-		}
-		if (previous_safe && !space(AS_PROGRAM).get_read_ptr(m_pc))
-			previous_safe = false;
-		candidate &= previous_safe;
 		clock_timer();
 		execute();
 		m_icount--;

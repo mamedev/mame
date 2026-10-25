@@ -626,10 +626,13 @@ bool tms320c82_pp_device::execute_one(uint64_t op, const decoded &d)
 			uint32_t expanded = 0;
 			unsigned const width = lane_width((old_sr >> 3) & 7);
 			unsigned const count = 32 / width;
-			for (unsigned j = 0; j < count; j++)
+			if (cl == 0 || cl == 5)
 			{
-				if (BIT(m_regs[0x2a], j + (BIT(old_sr, 6) ? 32 - count : 0)))
-					expanded |= (0xffffffffU >> (32 - width)) << (j * width);
+				for (unsigned j = 0; j < count; j++)
+				{
+					if (BIT(m_regs[0x2a], j + (BIT(old_sr, 6) ? 32 - count : 0)))
+						expanded |= (0xffffffffU >> (32 - width)) << (j * width);
+				}
 			}
 			switch (cl)
 			{
@@ -989,6 +992,8 @@ void tms320c82_pp_device::execute_run()
 	uint32_t poll_regs[128], poll_pc[3], poll_ea[2], poll_fetch = 0, poll_protect = 0;
 	uint64_t poll_op[3], poll_start = 0;
 	bool candidate = false;
+	// Short slices (between TC beats) aren't worth analysing.
+	bool const allow_poll = m_icount > 8;
 	m_poll_safe = false;
 	while (m_icount > 0)
 	{
@@ -998,7 +1003,7 @@ void tms320c82_pp_device::execute_run()
 			return;
 		}
 		m_pc = m_pipe_pc[0] & ~7U;
-		if (!(machine().debug_flags & DEBUG_FLAG_ENABLED))
+		if (allow_poll && !(machine().debug_flags & DEBUG_FLAG_ENABLED))
 		{
 			if (m_irq_next || m_pipe_irq[0] || m_pipe_irq[1] || m_pipe_irq[2])
 			{
@@ -1040,7 +1045,7 @@ void tms320c82_pp_device::execute_run()
 		// PP's RAM. With a parallel global operation it therefore takes a second
 		// cycle (SPRU110 6.3.2). Accesses to the same local RAM bank also contend.
 		// Freeze all pipeline stages; latch global data/store sources only once.
-		if (!m_pipe_irq[0] && !m_transfer_pending && !m_halt_transfer_ready)
+		if (!m_pipe_irq[0] && m_pipe_op[0] != NOP && !m_transfer_pending && !m_halt_transfer_ready)
 		{
 			auto const &current = decode_cached(m_pipe_pc[0], m_pipe_op[0]);
 			auto const &local = current.tr[0], &global = current.tr[1];
@@ -1123,24 +1128,28 @@ void tms320c82_pp_device::execute_run()
 		}
 		// Address stage runs in parallel with the preceding instruction's
 		// execute stage. Explicit register writes have one address-use delay.
-		decoded const &ahead = decode_cached(m_pipe_pc[1], m_pipe_op[1]);
 		uint32_t next_ea[2]{}, update[2]{};
 		int8_t ar[2] = {-1, -1};
-		for (unsigned i = 0; i < 2; i++)
+		// The canonical NOP has no address-stage or execute-stage work.
+		if (m_pipe_op[1] != NOP)
 		{
-			auto const &t = ahead.tr[i];
-			if (!t.mode)
-				continue;
-			uint32_t const base = t.relative & 2 ? (m_pp_number << 12) | (t.relative == 3 ? 0x01000000 : 0) : reg_r(t.ar);
-			uint32_t index = t.indexed ? reg_r(0x10 | (t.ar & 8) | (t.index & 7)) : t.index;
-			if (t.scale && t.size)
-				index <<= t.size;
-			uint32_t const value = (t.mode & 1) ? base - index : base + index;
-			next_ea[i] = t.mode < 8 ? base : value;
-			if (t.mode < 8 || t.mode >= 12)
+			decoded const &ahead = decode_cached(m_pipe_pc[1], m_pipe_op[1]);
+			for (unsigned i = 0; i < 2; i++)
 			{
-				ar[i] = t.ar;
-				update[i] = value;
+				auto const &t = ahead.tr[i];
+				if (!t.mode)
+					continue;
+				uint32_t const base = t.relative & 2 ? (m_pp_number << 12) | (t.relative == 3 ? 0x01000000 : 0) : reg_r(t.ar);
+				uint32_t index = t.indexed ? reg_r(0x10 | (t.ar & 8) | (t.index & 7)) : t.index;
+				if (t.scale && t.size)
+					index <<= t.size;
+				uint32_t const value = (t.mode & 1) ? base - index : base + index;
+				next_ea[i] = t.mode < 8 ? base : value;
+				if (t.mode < 8 || t.mode >= 12)
+				{
+					ar[i] = t.ar;
+					update[i] = value;
+				}
 			}
 		}
 		if (m_pipe_irq[0])
@@ -1167,6 +1176,10 @@ void tms320c82_pp_device::execute_run()
 				m_fetchpc = m_program.read_dword(m_irq_vector);
 			if (ps == 5)
 				m_irq_next = 0;
+		}
+		else if (m_pipe_op[0] == NOP)
+		{
+			m_protect = 0;
 		}
 		else
 		{
@@ -1198,7 +1211,7 @@ void tms320c82_pp_device::execute_run()
 		m_pipe_irq[2] = ps;
 		m_pipe_op[2] = ps ? NOP : (uint64_t(m_cache.read_dword(m_fetchpc & ~7U)) << 32) | m_cache.read_dword((m_fetchpc & ~7U) + 4);
 		uint32_t const fetched = m_fetchpc;
-		if (m_poll_safe && (!m_master->space(AS_PROGRAM).get_read_ptr(fetched & ~7U) || !m_master->space(AS_PROGRAM).get_read_ptr((fetched & ~7U) + 4)))
+		if (m_poll_safe && (!m_cache.read_ptr(fetched & ~7U) || !m_cache.read_ptr((fetched & ~7U) + 4)))
 			m_poll_safe = false;
 		if (ps && ps <= 3)
 			m_irq_pc[ps - 1] = fetched;
