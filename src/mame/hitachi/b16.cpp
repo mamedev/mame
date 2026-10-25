@@ -249,6 +249,8 @@ MC6845_UPDATE_ROW(b16_state::crtc_update_row)
 		return;
 
 	const pen_t *const palette = m_palette->pens();
+	// TODO: confirm the text attribute blink rate from the video circuitry.
+	const bool blink_off = BIT(m_screen->frame_number(), 4);
 	// Raster rows within each plane are 0800h bytes apart. CC/DC uses
 	// 16 KiB units; the BIOS selects value 2 for the second 640x400 page.
 	const u32 graphics_row = (u32(m_graphics_display_page) << 14) + (u32(ra) << 11) + ma;
@@ -259,8 +261,7 @@ MC6845_UPDATE_ROW(b16_state::crtc_update_row)
 		const u16 hi_vram = m_vram[tile_offset + 0x4000 / 2];
 		const u16 tile = lo_vram & 0x00ff;
 		const u8 fg_color = (lo_vram >> 8) & 0x0f;
-		// TODO: bit 15 may really be blink instead (gets activated on basic COLOR 16/31 issued)
-		const u8 bg_color = (lo_vram >> 12) & 0x0f;
+		const u8 bg_color = (lo_vram >> 12) & 0x07;
 		u8 gfx_data;
 		// Character generators contain sixteen raster rows per glyph.
 		if (BIT(hi_vram, 5))
@@ -274,6 +275,8 @@ MC6845_UPDATE_ROW(b16_state::crtc_update_row)
 		{
 			gfx_data = m_ig_ram[(tile << 4) + (ra & 0x0f)];
 		}
+		if (BIT(lo_vram, 15) && blink_off)
+			gfx_data = 0;
 
 		// CRTC supplies the cursor position, raster shape and blink phase.
 		// Keep it visible even over the black attributes left by BIOS/BASIC.
