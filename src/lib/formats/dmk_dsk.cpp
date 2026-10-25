@@ -1,15 +1,50 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol,tim lindner
 /*********************************************************************
 
     formats/dmk_dsk.cpp
 
     DMK disk images
 
-TODO:
-- Add write/format support.
-- Honor header write protection and density-independent access (needs core support).
-- Check support on other drivers besides MSX.
+Missing features and preservation limits:
+
+- Header write protection (byte 0) is not enforced or retained on save.
+  The format load API supplies a floppy_image, but no way to set the
+  drive's write-protect state.  Enforcing this requires core support;
+  merely preserving the flag would not prevent emulated writes.
+- Density-independent access (option bit 7) is not emulated.  Loading
+  honors its single-copy FM storage convention, but the resulting flux
+  still has a definite encoding.  Making either controller density read
+  the same sector requires support outside this format implementation.
+- Compact FM output (option bit 6) and legacy single-copy FM output are
+  not generated.  The writer normalizes to doubled FM bytes so ordinary
+  FM/MFM tracks share one timing grid.  Compact input remains supported;
+  retaining its storage policy would need additional writer logic.
+- DEC RX02 (extension bit 5) is not implemented.  It needs FM headers,
+  modified-MFM data decoding/encoding, different field lengths, and
+  special handling of FD/F9 DAMs in both reader and writer.  Recognizing
+  ordinary FM/MFM marks alone is insufficient; this is format work,
+  not a requirement for core changes.
+- The writer implements standard IBM/WD fields with 128-1024 byte data
+  lengths (size code masked to two bits).  RX02, non-IBM WD1771 lengths,
+  alternate premarks, extra fields, and damaged-clock phase repair need
+  additional decoder logic.  CRC bytes are preserved, but CRC validity
+  does not guide field state.
+- Exact gap density boundaries, arbitrary missing clocks, weak bits,
+  flux timing variations, and write-splice positions cannot be retained
+  in ordinary DMK byte data and IDAM pointers.  The reader reconstructs
+  clocks and estimates density changes; the writer uses recognizable
+  marks/gaps and replaces ambiguous F8-FB bytes while awaiting a DAM.
+  Saving is consequently not a bit-exact preservation operation.
+- Half/quarter tracks and ED output are rejected: DMK has no subtrack
+  addressing, and a full ED track exceeds the supported 14-bit offsets.
+  More than 64 IDAMs or a track larger than 0x3fff bytes also fails
+  rather than silently discarding sectors or wrapping pointers.
+- Saving does not shrink an existing DMK's allocated geometry or track
+  size.  The stream API has no truncate operation, and trailing bytes
+  would violate the reader's exact file-size check.  A new output file
+  is needed to reclaim space.  REAL disk specification files are also
+  unsupported: they describe host drives rather than track contents.
 
 *********************************************************************/
 
@@ -108,6 +143,24 @@ int sync_count(const std::vector<uint8_t> &data, int offset, uint8_t value)
 	return count;
 }
 
+// Recover the standard six-byte FM zero sync, including both stored copies.
+// A longer zero run may belong to a damaged preceding MFM data field; its
+// bytes must not be reclassified as FM merely because they decode as zero.
+int fm_sync_count(const std::vector<uint8_t> &data, int offset, int stride, int begin)
+{
+	int count = 0;
+	while (count < 6 * stride && offset - count - stride >= begin)
+	{
+		bool zero = true;
+		for (int i = 1; i <= stride; i++)
+			zero &= data[track_offset(data, offset - count - i)] == 0;
+		if (!zero)
+			break;
+		count += stride;
+	}
+	return count;
+}
+
 uint32_t wide_fm(uint16_t val)
 {
 	uint32_t res = 0;
@@ -124,6 +177,149 @@ uint32_t data_to_wide_fm(uint8_t val)
 		res |= (util::BIT(val, i) << i * 2);      // data
 	}
 	return wide_fm(res);
+}
+
+// Decode on the common MFM timing grid.  Looking ahead for
+// missing-clock marks lets us select density and byte phase before emitting
+// the mark.  Never infer FM from transition spacing alone.
+bool decode_track(const std::vector<bool> &bits, bool initial_mfm, std::vector<uint8_t> &data)
+{
+	int const length = bits.size();
+	if (length < 64)
+		return false;
+	auto raw = [&bits, length](int position, int count) -> uint64_t
+	{
+		uint64_t value = 0;
+		for (int i = 0; i < count; i++)
+			value = (value << 1) | bits[((position + i) % length + length) % length];
+		return value;
+	};
+
+	data.assign(TRACK_HEADER_SIZE, 0);
+	std::vector<uint16_t> idams;
+	bool mfm = initial_mfm;
+	int next = -length;
+	int protected_until = -length;
+	int id_byte = -1;
+	int size_code = 0;
+	bool awaiting_dam = false;
+	int splice_until = -length;
+	std::vector<bool> fm_sync(length, false);
+
+	// One warm-up revolution establishes density and field context across
+	// index, and locates FM zero preambles before any bytes are saved.  CRC
+	// bytes are copied verbatim, including deliberately bad CRCs.
+	uint32_t pattern = raw(-length, 32);
+	for (int position = -length; position < length; pattern = (pattern << 1) | raw(position + 32, 1), position++)
+	{
+		bool mark = false;
+		// A mark establishes the phase of the preceding zero bytes as well
+		// as the mark itself.  Select FM at their start on the output pass,
+		// before a previous MFM phase can turn them into AA bytes and emit
+		// part of the address mark as an extra byte.
+		if (fm_sync[position < 0 ? position + length : position]
+			&& position >= protected_until && position >= splice_until)
+		{
+			mfm = false;
+			next = position;
+		}
+		if (position >= splice_until)
+		{
+			if (pattern == 0x44894489 || pattern == 0x52245224 ||
+				(position >= protected_until && pattern == 0x92549254))
+			{
+				mfm = true;
+				next = position;
+			}
+			if ((!mfm || position >= protected_until) && raw(position - 4, 4) == 8)
+			{
+				switch (pattern)
+				{
+				case 0xaa2a2a88: // FC / D7
+				case 0xaa222aa8: // FE / C7
+				case 0xaa222888: // F8 / C7
+				case 0xaa22288a: // F9 / C7
+				case 0xaa2228a8: // FA / C7
+				case 0xaa2228aa: // FB / C7
+					if (position < 0)
+					{
+						int sync = position;
+						int const begin = std::max(protected_until, splice_until);
+						while (sync - 32 >= begin && raw(sync - 32, 32) == 0x88888888)
+							sync -= 32;
+						if (sync < position)
+							fm_sync[sync + length] = true;
+					}
+					mfm = false;
+					next = position;
+					mark = true;
+					break;
+				}
+			}
+		}
+		if (position != next)
+			continue;
+
+		int const width = mfm ? 16 : 32;
+		uint8_t value = 0;
+		for (int bit = 0; bit < 8; bit++)
+			value = (value << 1) | raw(position + (mfm ? 2 * bit + 1 : 4 * bit + 2), 1);
+		if (mfm)
+		{
+			uint64_t const preamble = raw(position - 32, 32);
+			mark = (preamble == 0x44894489 && (value == 0xfe || (value >= 0xf8 && value <= 0xfb))) ||
+				(preamble == 0x52245224 && value == 0xfc);
+		}
+
+		bool const in_id = id_byte >= 0;
+		bool const idam = mark && value == 0xfe;
+		if (idam)
+		{
+			id_byte = 0;
+			awaiting_dam = true;
+			protected_until = position + 19 * width;
+		}
+		else if (mark && awaiting_dam && value >= 0xf8 && value <= 0xfb)
+		{
+			id_byte = -1;
+			awaiting_dam = false;
+			protected_until = position + ((128 << (size_code & 3)) + 3) * width;
+			splice_until = protected_until + 32;
+		}
+		else if (id_byte >= 0)
+		{
+			if (++id_byte == 4)
+				size_code = value;
+			if (id_byte == 6)
+				id_byte = -1;
+		}
+
+		// DMK readers locate DAMs implicitly.  Hide ordinary gap bytes which
+		// could otherwise be mistaken for a missing-clock DAM.
+		if (awaiting_dam && !in_id && !mark && value >= 0xf8 && value <= 0xfb)
+			value = 0xf0;
+
+		// Double FM bytes, including a byte straddling index.  Only its
+		// second half belongs at the start of the saved revolution.
+		if (position >= 0 || (!mfm && position < 0 && position + 16 >= 0))
+		{
+			if (idam && position >= 0)
+			{
+				if (idams.size() == MAX_IDAMS || data.size() > 0x3ffe)
+					return false;
+				idams.push_back(uint16_t(data.size()) | (mfm ? 0x8000 : 0));
+			}
+			data.push_back(value);
+			if (!mfm && position >= 0 && position + 16 < length)
+				data.push_back(value);
+		}
+		next = position + width;
+	}
+	if (data.size() > 0x3fff)
+		return false;
+	for (unsigned i = 0; i < idams.size(); i++)
+		put_u16le(&data[2 * i], idams[i]);
+	return true;
 }
 
 } // anonymous namespace
@@ -217,10 +413,29 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			{
 				int const offset = idams[index];
 				bool const mfm = util::BIT(track_data[index * 2 + 1], 7);
-				int const sync = mfm ? sync_count(track_data, offset, 0xa1) : 0;
 				int const previous = index ? idams[index - 1] : idams.back() - length;
+				bool const previous_mfm = util::BIT(track_data[((index + idams.size() - 1) % idams.size()) * 2 + 1], 7);
+
+				// Early versions of this writer emitted a phase-shifted first
+				// FM sync as twelve AA bytes and a stray F5 before the doubled
+				// FE.  Recover only this specific leading-gap signature at an
+				// MFM-to-FM boundary; do not normalize arbitrary nonzero syncs.
+				if (!index && !mfm && previous_mfm && fm_stride == 2 && offset - 14 > previous + 7)
+				{
+					bool damaged_sync = track_data[track_offset(track_data, offset - 14)] == 0xff
+						&& track_data[track_offset(track_data, offset - 1)] == 0xf5
+						&& track_data[track_offset(track_data, offset + 1)] == 0xfe;
+					for (int i = 2; i <= 13; i++)
+						damaged_sync &= track_data[track_offset(track_data, offset - i)] == 0xaa;
+					if (damaged_sync)
+						for (int i = 1; i <= 12; i++)
+							track_data[track_offset(track_data, offset - i)] = 0;
+				}
+
+				int const sync = mfm ? sync_count(track_data, offset, 0xa1)
+					: fm_sync_count(track_data, offset, fm_stride, previous + 7 * (previous_mfm ? 1 : fm_stride));
 				// Exact density-change positions are not recorded in DMK.  Switch
-				// in the gap before the next ID's sync, without crossing the last ID.
+				// before the entire sync preamble, without crossing the last ID.
 				encoding_start.push_back(std::max(previous + 1, offset - sync - 8));
 				if (!index)
 					first_sync = offset - sync;
@@ -381,6 +596,78 @@ bool dmk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	image.set_variant(single_density ? (disk.heads == 2 ? floppy_image::DSSD : floppy_image::SSSD)
 		: (disk.heads == 2 ? floppy_image::DSDD : floppy_image::SSDD));
 
+	return true;
+}
+
+bool dmk_format::supports_save() const noexcept
+{
+	return true;
+}
+
+bool dmk_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
+{
+	int tracks, heads;
+	image.get_actual_geometry(tracks, heads);
+	if (!tracks || tracks > 255 || !heads || heads > 2 || image.get_resolution())
+		return false;
+
+	bool const initial_mfm = image.get_variant() != floppy_image::SSSD && image.get_variant() != floppy_image::DSSD;
+	int cell_size = image.get_form_factor() == floppy_image::FF_8 ? 1200 : 2000;
+	if (image.get_variant() == floppy_image::DSHD)
+		cell_size = image.get_form_factor() == floppy_image::FF_35 ? 1000 : 1200;
+	if (image.get_variant() == floppy_image::DSED)
+		return false; // A full ED revolution cannot fit DMK's 14-bit offsets.
+
+	// Existing DMK track lengths specify the timing more precisely than the
+	// variant (and cover compact SD storage).  Always save expanded FM.
+	disk_header old_disk;
+	bool const existing = read_header(io, old_disk);
+	if (existing)
+	{
+		int const cells = (old_disk.track_size - TRACK_HEADER_SIZE) * (util::BIT(old_disk.flags, 6) ? 32 : 16);
+		cell_size = (200000000 + cells / 2) / cells;
+	}
+
+	// The stream API cannot truncate.  Retain allocated geometry and track
+	// space so saving never leaves a stale tail that invalidates the file.
+	if (existing)
+	{
+		tracks = std::max(tracks, old_disk.tracks);
+		heads = std::max(heads, old_disk.heads);
+	}
+	int max_tracks, max_heads;
+	image.get_maximal_geometry(max_tracks, max_heads);
+	if (tracks > max_tracks || heads > max_heads)
+		return false;
+	std::vector<std::vector<uint8_t>> data(tracks * heads);
+	size_t track_size = existing ? old_disk.track_size : TRACK_HEADER_SIZE + 1;
+	for (int track = 0; track < tracks; track++)
+		for (int head = 0; head < heads; head++)
+		{
+			auto &buffer = data[track * heads + head];
+			if (!decode_track(generate_bitstream_from_track(track, head, cell_size, image), initial_mfm, buffer))
+				return false;
+			track_size = std::max(track_size, buffer.size());
+		}
+
+	uint64_t old_size;
+	if (io.length(old_size) || old_size > HEADER_SIZE + uint64_t(data.size()) * track_size)
+		return false;
+
+	uint8_t header[HEADER_SIZE] = { 0 };
+	header[1] = tracks;
+	put_u16le(&header[2], track_size);
+	header[4] = heads == 1 ? 0x10 : 0;
+	auto const [header_error, header_actual] = write_at(io, 0, header, sizeof(header));
+	if (header_error || header_actual != sizeof(header))
+		return false;
+	for (unsigned i = 0; i < data.size(); i++)
+	{
+		data[i].resize(track_size, initial_mfm ? 0x4e : 0xff);
+		auto const [err, actual] = write_at(io, HEADER_SIZE + uint64_t(i) * track_size, data[i].data(), track_size);
+		if (err || actual != track_size)
+			return false;
+	}
 	return true;
 }
 
