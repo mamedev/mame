@@ -621,5 +621,5 @@ ROM_END
 
 } // anonymous namespace
 
-// TODO: Is this a parent or clone of shamisen?
+// TODO: Clarify whether this a parent or clone of shamisen
 GAME( 2003, shambros, 0, shambros, shambros, sttechno_state, empty_init, ROT0, "Kato's", "Shamisen Brothers (V1.01K)", MACHINE_IMPERFECT_TIMING )
