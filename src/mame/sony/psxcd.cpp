@@ -105,6 +105,9 @@ void psxcd_device::device_start()
 	status = STATUS_SHELLOPEN;
 	mode = 0;
 
+	m_second_timer = timer_alloc(FUNC(psxcd_device::second_response), this);
+	m_pause_timer = timer_alloc(FUNC(psxcd_device::second_response), this);
+
 	for (int i = 0; i < MAX_PSXCD_TIMERS; i++)
 	{
 		m_timers[i] = timer_alloc(FUNC(psxcd_device::handle_event), this);
@@ -120,6 +123,9 @@ void psxcd_device::device_start()
 	save_item(NAME(lastsechdr));
 	save_item(NAME(status));
 	save_item(NAME(rdp));
+	save_item(NAME(m_lastres));
+	save_item(NAME(m_lastres_count));
+	save_item(NAME(m_second_cmd));
 	save_item(NAME(m_cursec));
 	save_item(NAME(sectail));
 	save_item(NAME(m_transcurr));
@@ -159,9 +165,12 @@ void psxcd_device::device_reset()
 	{
 		if (m_timerinuse[i] && m_results[i])
 			delete m_results[i];
+		m_results[i] = nullptr;
 		m_timers[i]->adjust(attotime::never);
 		m_timerinuse[i] = false;
 	}
+	m_second_timer->adjust(attotime::never);
+	m_pause_timer->adjust(attotime::never);
 	open = true;
 	if (m_cdrom_handle)
 		add_system_event(EVENT_CHANGE_DISK, m_sysclock, nullptr);
@@ -172,6 +181,8 @@ void psxcd_device::device_reset()
 		delete res_queue;
 		res_queue = res;
 	}
+	rdp = 0;
+	m_lastres_count = 0;
 
 	m_param_count = 0;
 	m_regs.sr = 0x18;
@@ -223,11 +234,26 @@ uint8_t psxcd_device::read(offs_t offset)
 		case 1:
 			if ((res_queue) && (rdp < res_queue->sz))
 			{
-				ret = res_queue->data[rdp++];
-				if (rdp == res_queue->sz)
-					m_regs.sr &= ~0x20;
-				else
-					m_regs.sr |= 0x20;
+				ret = res_queue->data[rdp];
+				if (!machine().side_effects_disabled())
+				{
+					rdp++;
+					if (rdp == res_queue->sz)
+						m_regs.sr &= ~0x20;
+					else
+						m_regs.sr |= 0x20;
+				}
+			}
+			else if ((!res_queue) && (rdp < m_lastres_count))
+			{
+				// acknowledging the interrupt does not clear the response fifo
+				ret = m_lastres[rdp];
+				if (!machine().side_effects_disabled())
+				{
+					rdp++;
+					if (rdp == m_lastres_count)
+						m_regs.sr &= ~0x20;
+				}
 			}
 			else
 				ret = 0;
@@ -358,14 +384,21 @@ void psxcd_device::write(offs_t offset, uint8_t data)
 						m_int1 = nullptr;
 
 					res_queue = res->next;
-					delete res;
-					m_regs.sr &= ~0x20;
-					rdp = 0;
 					if (res_queue)
 					{
+						rdp = 0;
 						m_regs.sr |= 0x20;
 						m_regs.ir = res_queue->res;
 					}
+					else
+					{
+						// unread bytes stay in the response fifo until the next response or command
+						std::copy_n(res->data, res->sz, m_lastres);
+						m_lastres_count = res->sz;
+						if (rdp >= m_lastres_count)
+							m_regs.sr &= ~0x20;
+					}
+					delete res;
 					LOGMASKED(LOG_CMD, "%s: nextres\n", machine().describe_context());
 				}
 			}
@@ -391,7 +424,7 @@ const psxcd_device::cdcmd psxcd_device::cmd_table[]=
 	&psxcd_device::cdcmd_forward,
 	&psxcd_device::cdcmd_backward,
 	&psxcd_device::cdcmd_readn,
-	&psxcd_device::cdcmd_standby,
+	&psxcd_device::cdcmd_motoron,
 	&psxcd_device::cdcmd_stop,
 	&psxcd_device::cdcmd_pause,
 	&psxcd_device::cdcmd_init,
@@ -419,6 +452,18 @@ const psxcd_device::cdcmd psxcd_device::cmd_table[]=
 
 void psxcd_device::write_command(uint8_t byte)
 {
+	// a new command clears whatever is left in the response fifo
+	if (!res_queue)
+	{
+		m_lastres_count = 0;
+		rdp = 0;
+		m_regs.sr &= ~0x20;
+	}
+
+	// any new command drops a pending Stop completion
+	if (m_second_timer->enabled() && (m_second_cmd == 0x08))
+		m_second_timer->adjust(attotime::never);
+
 	if (byte > 30)   // coverity 140157
 		illegalcmd(byte);
 	else
@@ -430,8 +475,7 @@ void psxcd_device::cdcmd_sync()
 {
 	LOGMASKED(LOG_CMD, "%s: sync\n", machine().describe_context());
 
-	stop_read();
-	send_result(INTR_ACKNOWLEDGE);
+	illegalcmd(0x00);
 }
 
 void psxcd_device::cdcmd_nop()
@@ -483,11 +527,29 @@ void psxcd_device::cdcmd_play()
 void psxcd_device::cdcmd_forward()
 {
 	LOGMASKED(LOG_CMD, "%s: forward\n", machine().describe_context());
+
+	if (!(status & STATUS_PLAYING))
+	{
+		send_result(INTR_DISKERROR, nullptr, 0, default_irq_delay, 0x80);
+		return;
+	}
+
+	// FIXME: does not fast-forward CD audio
+	send_result(INTR_COMPLETE);
 }
 
 void psxcd_device::cdcmd_backward()
 {
 	LOGMASKED(LOG_CMD, "%s: backward\n", machine().describe_context());
+
+	if (!(status & STATUS_PLAYING))
+	{
+		send_result(INTR_DISKERROR, nullptr, 0, default_irq_delay, 0x80);
+		return;
+	}
+
+	// FIXME: does not rewind CD audio
+	send_result(INTR_COMPLETE);
 }
 
 void psxcd_device::cdcmd_readn()
@@ -503,16 +565,30 @@ void psxcd_device::cdcmd_readn()
 	}
 	else
 	{
-		send_result(INTR_DISKERROR, nullptr, 0, 0x80);
+		send_result(INTR_DISKERROR, nullptr, 0, default_irq_delay, 0x80);
 	}
 }
 
-void psxcd_device::cdcmd_standby()
+void psxcd_device::cdcmd_motoron()
 {
-	LOGMASKED(LOG_CMD, "%s: standby\n", machine().describe_context());
+	LOGMASKED(LOG_CMD, "%s: motor on\n", machine().describe_context());
 
-	stop_read();
-	send_result(INTR_ACKNOWLEDGE);
+	if (open)
+	{
+		send_result(INTR_DISKERROR, nullptr, 0, default_irq_delay, 0x80);
+		return;
+	}
+
+	if (status & STATUS_STANDBY)
+	{
+		// motor already spinning
+		send_result(INTR_DISKERROR, nullptr, 0, default_irq_delay, 0x20);
+		return;
+	}
+
+	send_result(INTR_COMPLETE);
+	status |= STATUS_STANDBY;
+	queue_second_response(0x07, default_irq_delay * 3);
 }
 
 void psxcd_device::cdcmd_stop()
@@ -520,16 +596,21 @@ void psxcd_device::cdcmd_stop()
 	LOGMASKED(LOG_CMD, "%s: stop\n", machine().describe_context());
 
 	stop_read();
-	send_result(INTR_ACKNOWLEDGE);
+	send_result(INTR_COMPLETE);
+	status &= ~STATUS_STANDBY;
+	// FIXME: hardware takes about 0.41 s at single speed
+	queue_second_response(0x08, default_irq_delay * 3);
 }
 
 void psxcd_device::cdcmd_pause()
 {
 	LOGMASKED(LOG_CMD, "%s: pause\n", machine().describe_context());
 
+	// the first response still shows the read in progress
+	send_result(INTR_COMPLETE);
 	stop_read();
-
-	send_result(INTR_ACKNOWLEDGE);
+	// FIXME: hardware takes about 64 ms at single speed
+	m_pause_timer->adjust(attotime::from_hz(m_sysclock / (default_irq_delay * 3)));
 }
 
 void psxcd_device::cdcmd_init()
@@ -540,7 +621,10 @@ void psxcd_device::cdcmd_init()
 	mode=0;
 	m_regs.sr |= 0x10;
 
-	send_result(INTR_ACKNOWLEDGE);
+	send_result(INTR_COMPLETE);
+	if (!open)
+		status |= STATUS_STANDBY;
+	queue_second_response(0x0a, default_irq_delay * 3);
 }
 
 void psxcd_device::cdcmd_mute()
@@ -566,7 +650,7 @@ void psxcd_device::cdcmd_setfilter()
 	filter_file=cmdbuf[0];
 	filter_channel=cmdbuf[1];
 
-	send_result(INTR_ACKNOWLEDGE);
+	send_result(INTR_COMPLETE);
 }
 
 void psxcd_device::cdcmd_setmode()
@@ -579,20 +663,19 @@ void psxcd_device::cdcmd_setmode()
 
 void psxcd_device::cdcmd_getparam()
 {
-	unsigned char data[6]=
+	unsigned char data[5]=
 	{
 		status,
 		mode,
-		filter_file,
-		filter_channel,
 		0,
-		0
+		filter_file,
+		filter_channel
 	};
 
-	LOGMASKED(LOG_CMD, "%s: getparam [%02x %02x %02x %02x %02x %02x]\n", machine().describe_context(),
-								data[0], data[1], data[2], data[3], data[4], data[5]);
+	LOGMASKED(LOG_CMD, "%s: getparam [%02x %02x %02x %02x %02x]\n", machine().describe_context(),
+								data[0], data[1], data[2], data[3], data[4]);
 
-	send_result(INTR_COMPLETE, data, 6);
+	send_result(INTR_COMPLETE, data, 5);
 }
 
 uint32_t psxcd_device::sub_loc(CDPOS src1, CDPOS src2)
@@ -666,7 +749,7 @@ void psxcd_device::cdcmd_gettn()
 	}
 	else
 	{
-		send_result(INTR_DISKERROR, nullptr, 0, 0x80);
+		send_result(INTR_DISKERROR, nullptr, 0, default_irq_delay, 0x80);
 	}
 }
 
@@ -691,11 +774,11 @@ void psxcd_device::cdcmd_gettd()
 
 		LOGMASKED(LOG_CMD, "%s: gettd %02x [%02x %02x %02x]\n", machine().describe_context(), cmdbuf[0], data[0], data[1], data[2]);
 
-		send_result(INTR_ACKNOWLEDGE, data, 3);
+		send_result(INTR_COMPLETE, data, 3);
 	}
 	else
 	{
-		send_result(INTR_DISKERROR, nullptr, 0, 0x80);
+		send_result(INTR_DISKERROR, nullptr, 0, default_irq_delay, 0x10);
 	}
 }
 
@@ -705,7 +788,8 @@ void psxcd_device::cdcmd_seekl()
 
 	curpos.w = loc.w;
 
-	send_result(INTR_ACKNOWLEDGE);
+	send_result(INTR_COMPLETE);
+	queue_second_response(0x15, default_irq_delay * 3);
 }
 
 void psxcd_device::cdcmd_seekp()
@@ -714,7 +798,8 @@ void psxcd_device::cdcmd_seekp()
 
 	curpos.w = loc.w;
 
-	send_result(INTR_ACKNOWLEDGE);
+	send_result(INTR_COMPLETE);
+	queue_second_response(0x16, default_irq_delay * 3);
 }
 
 void psxcd_device::cdcmd_test()
@@ -723,9 +808,24 @@ void psxcd_device::cdcmd_test()
 
 	switch (cmdbuf[0])
 	{
+		case 0x04: // reset SCEx counters, start counting
+			if (!open)
+				status |= STATUS_STANDBY;
+			send_result(INTR_COMPLETE);
+			break;
+
+		case 0x05: // read SCEx counters
+		{
+			// no SCEx strings are read from an emulated disc
+			static constexpr uint8_t data[2] = { 0x00, 0x00 };
+
+			send_result(INTR_COMPLETE, data, 2);
+			break;
+		}
+
 		case 0x20:
 		{
-			static uint8_t data[4] =
+			static constexpr uint8_t data[4] =
 			{
 				0x95,
 				0x07,
@@ -774,7 +874,7 @@ void psxcd_device::cdcmd_id()
 	}
 	else
 	{
-		send_result(INTR_DISKERROR, nullptr, 0, 0x80);
+		send_result(INTR_DISKERROR, nullptr, 0, default_irq_delay, 0x80);
 	}
 }
 
@@ -791,13 +891,16 @@ void psxcd_device::cdcmd_reads()
 	}
 	else
 	{
-		send_result(INTR_DISKERROR, nullptr, 0, 0x80);
+		send_result(INTR_DISKERROR, nullptr, 0, default_irq_delay, 0x80);
 	}
 }
 
 void psxcd_device::cdcmd_reset()
 {
 	LOGMASKED(LOG_CMD, "%s: reset\n", machine().describe_context());
+
+	// FIXME: does not reset the controller
+	send_result(INTR_COMPLETE);
 }
 
 void psxcd_device::cdcmd_readtoc()
@@ -815,7 +918,7 @@ void psxcd_device::cdcmd_unknown12()
 	if (cmdbuf[0] == 1)
 		send_result(INTR_COMPLETE);
 	else
-		send_result(INTR_DISKERROR, nullptr, 0, 0x40);
+		send_result(INTR_DISKERROR, nullptr, 0, default_irq_delay, 0x40);
 }
 
 void psxcd_device::cdcmd_illegal17()
@@ -837,7 +940,7 @@ void psxcd_device::illegalcmd(uint8_t cmd)
 {
 	logerror("%s: unimplemented cd command %02x\n", machine().describe_context(), cmd);
 
-	send_result(INTR_DISKERROR, nullptr, 0, 0x40);
+	send_result(INTR_DISKERROR, nullptr, 0, default_irq_delay, 0x40);
 }
 
 void psxcd_device::cmd_complete(command_result *res)
@@ -854,6 +957,7 @@ void psxcd_device::cmd_complete(command_result *res)
 	else
 	{
 		res_queue = res;
+		rdp = 0;
 		m_regs.ir = res_queue->res;
 		if (m_regs.ir & m_regs.imr)
 			m_irq_handler(1);
@@ -862,15 +966,15 @@ void psxcd_device::cmd_complete(command_result *res)
 	res->next = nullptr;
 }
 
-psxcd_device::command_result *psxcd_device::prepare_result(uint8_t res, uint8_t *data, int sz, uint8_t errcode)
+psxcd_device::command_result *psxcd_device::prepare_result(uint8_t res, const uint8_t *data, int sz, uint8_t errcode)
 {
 	auto cr = new command_result;
 
 	cr->res = res;
 	if (sz)
 	{
-		assert(sz<sizeof(cr->data));
-		memcpy(cr->data, data, sz);
+		assert(sz <= RESULT_SIZE);
+		std::copy_n(data, sz, cr->data);
 		cr->sz = sz;
 	}
 	else
@@ -892,7 +996,7 @@ psxcd_device::command_result *psxcd_device::prepare_result(uint8_t res, uint8_t 
 	return cr;
 }
 
-void psxcd_device::send_result(uint8_t res, uint8_t *data, int sz, int delay, uint8_t errcode)
+void psxcd_device::send_result(uint8_t res, const uint8_t *data, int sz, int delay, uint8_t errcode)
 {
 	// Avoid returning results after sector read results -
 	// delay the sector read slightly if necessary
@@ -912,6 +1016,24 @@ void psxcd_device::send_result(uint8_t res, uint8_t *data, int sz, int delay, ui
 	}
 
 	add_system_event(EVENT_CMD_COMPLETE, delay, prepare_result(res, data, sz, errcode));
+}
+
+// MotorOn, Stop, Pause, Init, SeekL and SeekP acknowledge with INT3 and
+// signal completion with a later INT2.  Any new command drops a pending
+// Stop INT2; a pending Pause INT2 is never dropped and has its own timer.
+// Approximation: a new MotorOn, Stop, Init, SeekL or SeekP replaces a
+// pending INT2 from any of those five.
+// FIXME: completion delays are not measured; hardware timing varies per command
+void psxcd_device::queue_second_response(uint8_t cmd, int delay)
+{
+	m_second_cmd = cmd;
+	m_second_timer->adjust(attotime::from_hz(m_sysclock / delay));
+}
+
+TIMER_CALLBACK_MEMBER(psxcd_device::second_response)
+{
+	LOGMASKED(LOG_CMD, "%s: second response\n", machine().describe_context());
+	cmd_complete(prepare_result(INTR_ACKNOWLEDGE));
 }
 
 void psxcd_device::start_dma(uint8_t *mainram, uint32_t size)
@@ -1204,6 +1326,7 @@ TIMER_CALLBACK_MEMBER(psxcd_device::handle_event)
 		case EVENT_CMD_COMPLETE:
 			LOGMASKED(LOG_CMD, "%s: event cmd complete\n", machine().describe_context());
 			cmd_complete(m_results[tid]);
+			m_results[tid] = nullptr;
 			break;
 
 		case EVENT_READ_SECTOR:

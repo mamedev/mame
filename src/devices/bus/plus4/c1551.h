@@ -45,20 +45,39 @@ protected:
 	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 
 private:
+	enum
+	{
+		TCBM_DATA0 = 0,
+		TCBM_DATA1,
+		TCBM_STATUS,
+		TCBM_HOST_STATUS,
+		TCBM_DAV,
+		TCBM_ACK,
+		TCBM_COUNT
+	};
+
+	static constexpr uint8_t EDGE_COUNT = 16;
+
 	uint8_t port_r();
 	void port_w(uint8_t data);
 
 	uint8_t tcbm_data_r();
-	void tcbm_data_w(uint8_t data);
+	template <int N> void tcbm_data_w(uint8_t data);
 	uint8_t tpi0_pc_r();
 	void tpi0_pc_w(uint8_t data);
 
 	uint8_t tpi1_pb_r();
+	void tpi1_pb_w(uint8_t data);
 	uint8_t tpi1_pc_r();
 	void tpi1_pc_w(uint8_t data);
 
 	uint8_t tpi0_r(offs_t offset);
 	void tpi0_w(offs_t offset, uint8_t data);
+	uint8_t tpi1_r(offs_t offset);
+
+	void tcbm_w(int line, uint8_t state);
+	uint8_t tcbm_r(int line) const;
+	bool tcbm_sample_ready();
 
 	void c1551_mem(address_map &map) ATTR_COLD;
 
@@ -80,10 +99,9 @@ private:
 	output_finder<2> m_leds;
 
 	// TCBM bus
-	uint8_t m_tcbm_data;                      // data
-	int m_status;                           // status
-	int m_dav;                              // data valid
-	int m_ack;                              // acknowledge
+	attotime m_tcbm_time[TCBM_COUNT][EDGE_COUNT];
+	uint8_t m_tcbm_state[TCBM_COUNT][EDGE_COUNT];
+	uint8_t m_tcbm_count[TCBM_COUNT];
 	int m_dev;                              // device number
 
 	// timers

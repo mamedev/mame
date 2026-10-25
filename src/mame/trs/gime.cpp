@@ -1811,15 +1811,13 @@ inline uint32_t gime_device::emit_gime_text_samples(const scanline_record *scanl
 template<int sample_count, gime_device::emit_samples_proc emit_samples>
 inline void gime_device::render_scanline(const scanline_record *scanline, pixel_t *pixels, int min_x, int max_x, palette_resolver *resolver)
 {
-	int left_border, right_border;
-	int x, x2, pixel_position;
 	pixel_t border_color = resolver->lookup(scanline->m_border);
-	const pixel_t *resolved_palette = nullptr;
 
 	/* is this a wide video mode? */
 	bool wide = !m_legacy_video && (scanline->m_ff99_value & 0x04);
 
 	/* size up the borders */
+	int left_border, right_border;
 	if (sample_count > 0)
 	{
 		left_border = wide ? 0 : 64;
@@ -1832,13 +1830,13 @@ inline void gime_device::render_scanline(const scanline_record *scanline, pixel_
 	}
 
 	/* left border */
-	for (x = min_x; x < left_border; x++)
+	for (int x = min_x; x < left_border; x++)
 	{
 		pixels[x] = border_color;
 	}
 
 	/* right border */
-	for (x = right_border; x <= max_x; x++)
+	for (int x = right_border; x <= max_x; x++)
 	{
 		pixels[x] = border_color;
 	}
@@ -1847,13 +1845,13 @@ inline void gime_device::render_scanline(const scanline_record *scanline, pixel_
 	pixels += wide ? 0 : 64;
 
 	/* body */
-	x = 0;
-	pixel_position = 0;
-	while(x < sample_count)
+	const pixel_t *resolved_palette = nullptr;
+	for (int x = 0, pixel_position = 0; x < sample_count; )
 	{
 		/* determine how many bytes exist for which the mode is identical */
-		for (x2 = x + 1; (x2 < sample_count) && (scanline->m_mode[x] == scanline->m_mode[x2]) && (scanline->m_palette[x] == scanline->m_palette[x2]); x2++)
-			;
+		int x2 = x + 1;
+		while ((x2 < sample_count) && (scanline->m_mode[x] == scanline->m_mode[x2]) && (scanline->m_palette[x] == scanline->m_palette[x2]))
+			x2++;
 
 		/* resolve the palette */
 		resolved_palette = resolver->get_palette(scanline->m_palette[x]);
@@ -1881,10 +1879,10 @@ inline void gime_device::render_scanline(const scanline_record *scanline, pixel_
 bool gime_device::update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect, const pixel_t *RESTRICT palette)
 {
 	int base_x = 64;
-	int min_x = USE_HORIZONTAL_CLIP ? cliprect.min_x : 0;
-	int max_x = USE_HORIZONTAL_CLIP ? cliprect.max_x : (base_x * 2 + 512 - 1);
-	int min_y = cliprect.min_y;
-	int max_y = cliprect.max_y;
+	int min_x = USE_HORIZONTAL_CLIP ? cliprect.left() : 0;
+	int max_x = USE_HORIZONTAL_CLIP ? cliprect.right() : (base_x * 2 + 512 - 1);
+	int min_y = cliprect.top();
+	int max_y = cliprect.bottom();
 	palette_resolver resolver(*this, palette);
 
 	/* if the video didn't change, indicate as much */

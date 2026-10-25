@@ -40,7 +40,7 @@ private:
 	void command(u8 cmd, u8 data);
 	void run_frame(s16 in_l, s16 in_r);
 
-	static s16 export_acc(s32 acc, bool shift);
+	static s16 export_acc(s32 acc, u32 shift);
 
 	sound_stream *m_stream;
 	u32 m_ram_words;

@@ -288,12 +288,12 @@ uint32_t panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t const *const srcline = &m_temprender->pix(y);
 		uint16_t *const dstline = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint16_t const dat = srcline[x];
 
@@ -303,12 +303,12 @@ uint32_t panicr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	draw_sprites(bitmap,cliprect);
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t const *const srcline = &m_temprender->pix(y);
 		uint16_t *const dstline = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint16_t const dat = srcline[x];
 			if (dat & 0x10)

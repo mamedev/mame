@@ -18,13 +18,302 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm86">
-		<description>CP/M 86 v1.1-2.4</description>
+		<description>CP/M-86 (v1.1/2.4)</description>
 		<year>1982</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="626688">
 				<rom name="hl(v9k)__cpm86_1.1-2.4_12-22-82.ssdd.img" size="626688" crc="451513e7" sha1="60e7f080d9d099244d7628c532113883bda7ee13"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm86dom" cloneof="cpm86">
+		<description>CP/M-86 (v1.1/2.4, alt)</description>
+		<year>1983</year>
+		<publisher>Victor Technologies</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="cpm86dom.img" size="626688" crc="3c4c52c2" sha1="74c6c4d868e06bfb0e0842646f67f0f03871214d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm86uk" cloneof="cpm86">
+		<description>CP/M-86 (UK, v1.1/2.4)</description>
+		<year>1983</year>
+		<publisher>Victor Technologies</publisher>
+		<info name="serial" value="1104495-02"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="cpm86uk.img" size="626688" crc="91466c35" sha1="2f6d130ce8a1f6aa01e026a70f0d750407e43c8c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm86v10" cloneof="cpm86">
+		<description>CP/M-86 (v1.0)</description>
+		<year>198?</year>
+		<publisher>Victor Technologies</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="cpm86v10.img" size="626688" crc="6709e5f8" sha1="5b78b6f62c256677671105909dbfb57813526b96"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="factoryf">
+		<description>FactoryF Super (v4.4)</description>
+		<year>1985</year>
+		<publisher>Victor Technologies</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1224192">
+				<rom name="factoryf.img" size="1224192" crc="5d52eee9" sha1="0275f94c7e736fcb07126aa753cfbf79502de7af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdca15">
+		<description>HDCA HDDRV Hard Disk Diagnostics (v1.5)</description>
+		<year>1984</year>
+		<publisher>Victor Technologies</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="hdca15.img" size="626688" crc="fbfb6f6c" sha1="6465792f505c8b3c14d2e3f87faaa0125eac7973"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdtoolkit">
+		<description>Hard Disk Tool Kit (v1.0)</description>
+		<year>1983</year>
+		<publisher>Victor Technologies</publisher>
+		<info name="serial" value="103634 Rev A"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="hdtoolkit.img" size="626688" crc="a3eccc19" sha1="3e41adc54934395118fdb173058106832e11b2a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdtoolkitb" cloneof="hdtoolkit">
+		<description>Hard Disk Tool Kit (v1.0, beta)</description>
+		<year>1983</year>
+		<publisher>Victor Technologies</publisher>
+		<info name="serial" value="103634 Rev A"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="hdtoolkitb.img" size="626688" crc="f4f79eef" sha1="3785073c810f25073fb65ae6dc99a6665ffa18f4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hdtoolkit2">
+		<description>Hard Disk Tool Kit II (v2.2)</description>
+		<year>1985</year>
+		<publisher>Victor Technologies</publisher>
+		<info name="serial" value="105530, 105513"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="hdtoolkit2_1.img" size="626688" crc="73ebe381" sha1="ac58cb9f49c272a315bb6c26ef516b4fa0059938"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="hdtoolkit2_2.img" size="626688" crc="2e16f585" sha1="1b94cf02bb77cefe3f71ac3f12088d6b68a8c2b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hstb34">
+		<description>Hard Disk Systems Test and Burn-in (v3.4-DS)</description>
+		<year>1984</year>
+		<publisher>Victor Technologies</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1224192">
+				<rom name="hstb34.img" size="1224192" crc="4113cca0" sha1="5a45cf3190878a60235f0f2ea56b4baf4ceeb208"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos211hd">
+		<description>MS-DOS/MS-BASIC HD (v2.11/2.92)</description>
+		<year>1985</year>
+		<publisher>Victor Technologies</publisher>
+		<info name="serial" value="105495-01, 106780-01"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="msdos211hd_1.img" size="626688" crc="14a59f85" sha1="a83fac4b495c04317ab4776f70b218e8db4db4f4"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="msdos211hd_2.img" size="626688" crc="163ae893" sha1="98ef22bf5a921579cb9d627b5a18fb60b893d03f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos211hd91" cloneof="msdos211hd">
+		<description>MS-DOS/MS-BASIC HD (v2.11/2.91)</description>
+		<year>1984</year>
+		<publisher>Victor Technologies</publisher>
+		<info name="serial" value="105495-01"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 of 2"/>
+			<dataarea name="flop" size="626688">
+				<rom name="msdos211hd91_1.img" size="626688" crc="5dbe6d88" sha1="713711d5414dfca9c836fbc3cc03c9d976c1d653"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 of 2"/>
+			<dataarea name="flop" size="626688">
+				<rom name="msdos211hd91_2.img" size="626688" crc="18d56608" sha1="6840992f0bac44b9bfdc69e2702c476ee4815fea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos211hde" cloneof="msdos211hd">
+		<description>MS-DOS/MS-BASIC HD (Germany, v2.11/2.9)</description>
+		<year>1984</year>
+		<publisher>Victor Technologies</publisher>
+		<info name="serial" value="105507-01"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1224192">
+				<rom name="msdos211hde.img" size="1224192" crc="2df73429" sha1="b94d9c8ca935b9977c3bfb9f17b27cea83b0f1df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos211hduk" cloneof="msdos211hd">
+		<description>MS-DOS/MS-BASIC HD (UK, v2.1)</description>
+		<year>1984</year>
+		<publisher>Victor Technologies</publisher>
+		<info name="serial" value="105499-01 Rev B"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="msdos211hduk.img" size="626688" crc="c2da1cec" sha1="dc7e8922ae504ac14db5cf2bb1fc0ee3864ad600"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos211uk">
+		<description>MS-DOS/MS-BASIC (UK, v2.1)</description>
+		<year>1984</year>
+		<publisher>Victor Technologies</publisher>
+		<info name="serial" value="105409-01 Rev A, 106075-01 Rev A"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 of 2"/>
+			<dataarea name="flop" size="626688">
+				<rom name="msdos211uk_1.img" size="626688" crc="d0be50bf" sha1="dfd3ba838c67af6fd84cd15811ca7937e0a7ad4d"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 of 2"/>
+			<dataarea name="flop" size="626688">
+				<rom name="msdos211uk_2.img" size="626688" crc="86ba9d61" sha1="4ecaca788fc6b93eebd57a317928704e860cfbcd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos293uk" cloneof="msdos211uk">
+		<description>MS-DOS/MS-BASIC (UK, v2.11/2.93)</description>
+		<year>1986</year>
+		<publisher>Victor Technologies</publisher>
+		<info name="serial" value="10549-01"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="msdos293uk.img" size="626688" crc="d96e850d" sha1="1a71b6eb6a6c527e8b439c730bc3f0de12069040"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos31">
+		<description>MS-DOS 3.1 (v3.10/3.02)</description>
+		<year>1986</year>
+		<publisher>Victor Technologies</publisher>
+		<info name="serial" value="108473-01"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 of 2"/>
+			<dataarea name="flop" size="626688">
+				<rom name="msdos31_1.img" size="626688" crc="c36911a1" sha1="eeee038f4d93ab54d128b84532e9332423886cc4"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 of 2"/>
+			<dataarea name="flop" size="626688">
+				<rom name="msdos31_2.img" size="626688" crc="fe242867" sha1="4c64e869d017f0e3cccbafabd4596abe759f703c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdoshd125">
+		<description>MS-DOS Hard Disk System (v1.25a/2.5, beta)</description>
+		<year>1982</year>
+		<publisher>Victor Technologies</publisher>
+		<info name="serial" value="102680-01 Rev C"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="msdoshd125.img" size="626688" crc="a721f5f1" sha1="8d91fd657b28725e77efa2a9dd9fa154e0cea4b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdoshduk" cloneof="msdoshd125">
+		<description>MS-DOS Hard Disk System (UK, v1.25a/2.7)</description>
+		<year>1983</year>
+		<publisher>Victor Technologies</publisher>
+		<info name="serial" value="103817-02 Rev D"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="msdoshduk.img" size="626688" crc="3dc9de73" sha1="5130b05bbca119c16c3e82cd1887361aca620b02"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pulsem110">
+		<description>Victor Pulse M110 Hard Disk Utilities</description>
+		<year>1984</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="pulsem110.img" size="626688" crc="faef14db" sha1="17a2d1596d7135c995ae2dc6fd2ba215cd593bd1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="syselect">
+		<description>CP/M-86 System Configuration Tool Kit</description>
+		<year>198?</year>
+		<publisher>Victor Technologies</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="626688">
+				<rom name="syselect.img" size="626688" crc="d68314bb" sha1="6c59da330935bb6c67847604b5b27cfc9149cd9b"/>
 			</dataarea>
 		</part>
 	</software>

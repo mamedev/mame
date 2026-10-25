@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+license:CC0-1.0
+
+Digitiser overlay for Psion Conan
+-->
+
+<mamelayout version="2">
+
+	<element name="overlay_left">
+		<!-- background -->
+		<rect>
+			<bounds x="0" y="0" width="30" height="260" />
+			<color red="0.73" green="0.83" blue="0.75" />
+		</rect>
+
+		<!-- icons (placeholder) -->
+		<text string="Menu">
+			<bounds x="2.5" y="16" width="25" height="16" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+
+		<text string="Cut">
+			<bounds x="2.5" y="56" width="25" height="16" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="Paste">
+			<bounds x="2.5" y="73" width="25" height="16" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+
+		<text string="IR">
+			<bounds x="2.5" y="116" width="25" height="16" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+
+		<text string="Zoom">
+			<bounds x="2.5" y="156" width="25" height="16" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="+">
+			<bounds x="2.5" y="173" width="25" height="16" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+
+		<text string="Zoom">
+			<bounds x="2.5" y="206" width="25" height="16" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<text string="-">
+			<bounds x="2.5" y="223" width="25" height="16" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="overlay_icons">
+		<!-- background -->
+		<rect>
+			<bounds x="0" y="0" width="47" height="30" />
+			<color red="0.07" green="0.17" blue="0.43" />
+		</rect>
+		<rect>
+			<bounds x="47" y="0" width="480" height="30" />
+			<color red="0.73" green="0.83" blue="0.75" />
+		</rect>
+
+		<!-- icons (placeholder) -->
+		<disk>
+			<bounds x="16" y="7.5" width="15" height="15" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+		<disk>
+			<bounds x="69.5" y="7.5" width="15" height="15" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+		<disk>
+			<bounds x="129.5" y="7.5" width="15" height="15" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+		<disk>
+			<bounds x="189.5" y="7.5" width="15" height="15" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+		<disk>
+			<bounds x="249.5" y="7.5" width="15" height="15" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+		<disk>
+			<bounds x="309.5" y="7.5" width="15" height="15" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+		<disk>
+			<bounds x="369.5" y="7.5" width="15" height="15" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+		<disk>
+			<bounds x="429.5" y="7.5" width="15" height="15" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+		<disk>
+			<bounds x="489.5" y="7.5" width="15" height="15" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="overlay_labels">
+		<!-- backgroud -->
+		<rect>
+			<bounds x="0" y="0" width="527" height="16" />
+			<color red="0.07" green="0.06" blue="0.07" />
+		</rect>
+
+		<!-- labels -->
+		<text string="System">
+			<bounds x="0" y="3" width="47" height="10" />
+			<color red="0.94" green="0.94" blue="0.95" />
+		</text>
+		<text string="Contacts">
+			<bounds x="47" y="3" width="60" height="10" />
+			<color red="0.94" green="0.94" blue="0.95" />
+		</text>
+		<text string="Phone">
+			<bounds x="107" y="3" width="60" height="10" />
+			<color red="0.94" green="0.94" blue="0.95" />
+		</text>
+		<text string="Agenda">
+			<bounds x="167" y="3" width="60" height="10" />
+			<color red="0.94" green="0.94" blue="0.95" />
+		</text>
+		<text string="Email">
+			<bounds x="227" y="3" width="60" height="10" />
+			<color red="0.94" green="0.94" blue="0.95" />
+		</text>
+		<text string="Web">
+			<bounds x="287" y="3" width="60" height="10" />
+			<color red="0.94" green="0.94" blue="0.95" />
+		</text>
+		<text string="Wap">
+			<bounds x="347" y="3" width="60" height="10" />
+			<color red="0.94" green="0.94" blue="0.95" />
+		</text>
+		<text string="Jotter">
+			<bounds x="407" y="3" width="60" height="10" />
+			<color red="0.94" green="0.94" blue="0.95" />
+		</text>
+		<text string="Extras △">
+			<bounds x="467" y="3" width="60" height="10" />
+			<color red="0.94" green="0.94" blue="0.95" />
+		</text>
+	</element>
+
+	<view name="Digitiser Overlay (no icons)">
+		<bounds left="0" right="527" top="0" bottom="224" />
+		<screen index="0">
+			<bounds left="0" right="527" top="0" bottom="208" />
+		</screen>
+
+		<element ref="overlay_left">
+			<bounds x="0" y="0" width="30" height="178" />
+		</element>
+
+		<element ref="overlay_icons">
+			<bounds x="0" y="178" width="527" height="30" />
+		</element>
+
+		<element ref="overlay_labels">
+			<bounds x="0" y="208" width="527" height="16" />
+		</element>
+	</view>
+
+	<view name="LCD Panel">
+		<bounds x="37" width="480" y="5" height="160" />
+		<screen index="0">
+			<bounds left="0" right="527" top="0" bottom="208" />
+		</screen>
+	</view>
+
+</mamelayout>

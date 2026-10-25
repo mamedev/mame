@@ -1518,11 +1518,10 @@ void gfx_viewer::update_gfxset_bitmap(int xcells, int ycells, gfx_element &gfx)
 				for (int x = 0; x < xcells; x++, index++)
 				{
 					// update the bounds for this cell
-					cellbounds.min_x = x * cellxpix;
-					cellbounds.max_x = (x + 1) * cellxpix - 1;
+					cellbounds.setx(x * cellxpix, (x + 1) * cellxpix - 1);
 
 					if (index < gfx.elements()) // only render if there is data
-						gfxset_draw_item(gfx, index, cellbounds.min_x, cellbounds.min_y, set);
+						gfxset_draw_item(gfx, index, cellbounds.left(), cellbounds.top(), set);
 					else // otherwise, fill with transparency
 						m_bitmap.fill(0, cellbounds);
 				}

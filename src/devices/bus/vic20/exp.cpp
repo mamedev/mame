@@ -259,6 +259,7 @@ void vic20_expansion_slot_device::add_passthrough(machine_config &config, const 
 //-------------------------------------------------
 
 // slot devices
+#include "32k.h"
 #include "fe3.h"
 #include "megacart.h"
 #include "std.h"
@@ -277,6 +278,7 @@ void vic20_expansion_cards(device_slot_interface &device)
 	device.option_add("3k", VIC1210);
 	device.option_add("8k", VIC1110);
 	device.option_add("16k", VIC1111);
+	device.option_add("32k", VIC20_32K);
 	device.option_add("fe3", VIC20_FE3);
 	device.option_add("vfp", VIC20_VFP);
 	device.option_add("speakez", VIC20_SPEAKEASY);

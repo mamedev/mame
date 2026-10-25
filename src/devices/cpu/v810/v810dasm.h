@@ -20,8 +20,17 @@ public:
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
-private:
+protected:
 	static const char *const dRegs[];
+};
+
+// Nintendo NVC (Virtual Boy): CLI, SEI, XB, XH, REV and MPYHW
+class nintendo_nvc_disassembler : public v810_disassembler
+{
+public:
+	nintendo_nvc_disassembler() = default;
+
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 };
 
 #endif

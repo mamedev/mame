@@ -30,9 +30,6 @@ TODO:
 - fix MB60553 priority not actually being set internally
   (required by gstriker coin-up menu, where the title should stay above
   the playfield but behind the ball cursor and "human cup" lettering);
-- gstriker: needs MB60553 wraparound disable in attract mode
-  (title screen logo should be concealed until it actually start the zoom
-  transition);
 - vgoalsoc: stray R/Ws at $15'0000-3 come from the sprite table updater at
   $69326 when a slot entry is 0 (the address computed from $140800 runs past
   the end of sprite RAM), harmless and not protection related;
@@ -40,6 +37,12 @@ TODO:
   first round, in team select (verify);
 - twcup94: the order of the MCU-driven attract mode segments is a best guess,
   see the protection notes;
+
+Notes:
+- vgoalsoc: white flashes during attract mode has a right column black border
+  wrt running feet just afterwards (btanb);
+- vgoalsoc: draws insert coin / credit at Y 224-240 of the text layer when not
+  actually displayed. Another left-over btanb;
 
 ******************************************************************************/
 
@@ -428,6 +431,10 @@ void gstriker_state::twcup94_map(address_map &map)
 	map(0x1c0000, 0x1c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette").mirror(0x00f000);
 
 	map(0x200000, 0x20000f).rw(m_bg, FUNC(mb60553_zooming_tilemap_device::regs_r), FUNC(mb60553_zooming_tilemap_device::regs_w));
+	// control MB60553 behaviour?
+	// - 0x0b (during POST) then 0x08 in gstriker, on demand
+	// - 0x12 vgoalsoc, on transitions
+	// - 0x02 twcup94, every frame
 	map(0x200010, 0x200011).nopw();
 	map(0x200020, 0x200021).nopw();
 	map(0x200040, 0x20005f).ram().share(m_mixerregs);

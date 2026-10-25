@@ -11,12 +11,13 @@
     data writes.
 
     Known issues:
-    * Only one generic device type has been provided, with no internal
-      RAM or ROM. Though the broad functional descriptions of many actual
+    * Only a generic device type and two specific models have been
+      provided. Though the broad functional descriptions of many actual
       models are known, more detailed documentation is not easy to find.
-    * Almost no internal special function registers have been emulated,
-      again owing to lack of documentation. It is unknown to what extent
-      their mapping differs between models.
+    * Few internal special function registers have been emulated, again
+      owing to lack of documentation. The MN1880023 and MN18801A
+      peripherals are emulated only as far as CR-504 and PSR-500 firmware
+      uses them, and their register assignments are inferred from it.
     * Instruction timings are based mostly on those documented for the
       MN1870, which lacks a number of MN1880 instructions and differs in
       some other important ways. Many have been guessed at.
@@ -26,9 +27,11 @@
       repeatable.
     * Interrupt behavior, including vectoring, has also been guessed at,
       though the specific sources of each interrupt remain largely
-      unidentified and completely unemulated. Separate interrupt enable
-      registers have been provided for each CPU, though these seem to
-      share the same internal addresses. Repeated instructions are fully
+      unidentified. Logical interrupt request inputs are provided.
+      Separate interrupt enable registers have been provided for each CPU,
+      though these seem to share the same internal addresses. The WAIT
+      operand is treated as a temporary wakeup mask; only 02 00 has been
+      seen. Repeated instructions are fully
       interruptible. Interrupt acknowledgment has been implemented as a
       special invocation of the PI instruction; however, PI usage is
       nonexistent in extant code.
@@ -75,9 +78,9 @@
       which contain neither internal ROM nor RAM, has been emulated only
       to the extent required by psr500, though it likely has a few other
       features and quirks.
-    * In DF mode, MOV (da),(YP) and MOV (XP),(da) apparently need to take
-      the high byte of the direct address from the opposite pointer,
-      despite MN1870 documentation suggesting these use the same pointer.
+    * In DF mode, MOV (XP),(da) apparently takes the high byte of the
+      direct address from YP, unlike the MN1870 documentation. MOV (da),(YP)
+      also uses YP, as documented for the MN1870.
 
 ***************************************************************************/
 
@@ -85,19 +88,25 @@
 #include "mn1880.h"
 #include "mn1880d.h"
 
+#include "multibyte.h"
+
+#include <algorithm>
 #include <bit>
+#include <iterator>
 
 // device type definitions
 DEFINE_DEVICE_TYPE(MN1880, mn1880_device, "mn1880", "Panasonic MN1880")
+DEFINE_DEVICE_TYPE(MN1880023, mn1880023_device, "mn1880023", "Panasonic MN1880023")
 DEFINE_DEVICE_TYPE(MN18801A, mn18801a_device, "mn18801a", "Panasonic MN18801A")
 
 ALLOW_SAVE_TYPE(mn1880_device::microstate)
 
-mn1880_device::mn1880_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool has_mmu, address_map_constructor data_map)
+mn1880_device::mn1880_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool has_mmu, u16 internal_io_end, address_map_constructor data_map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, has_mmu ? 21 : 16, 0, 16, 14)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, has_mmu ? 21 : 16, 0, 16, 14, data_map)
 	, m_has_mmu(has_mmu)
+	, m_internal_io_end(internal_io_end)
 	, m_cpum(0)
 	, m_ustate(microstate::UNKNOWN)
 	, m_da(0)
@@ -105,6 +114,7 @@ mn1880_device::mn1880_device(const machine_config &mconfig, device_type type, co
 	, m_tmp2(0)
 	, m_output_queue_state(0xff)
 	, m_icount(0)
+	, m_input_state(0)
 	, m_if(0)
 	, m_irq(0)
 	, m_mmu_bank{0, 0, 0, 0}
@@ -113,13 +123,27 @@ mn1880_device::mn1880_device(const machine_config &mconfig, device_type type, co
 }
 
 mn1880_device::mn1880_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mn1880_device(mconfig, MN1880, tag, owner, clock, false, address_map_constructor(FUNC(mn1880_device::internal_data_map), this))
+	: mn1880_device(mconfig, MN1880, tag, owner, clock, false, 0x16, address_map_constructor(FUNC(mn1880_device::internal_data_map), this))
 {
 }
 
-mn18801a_device::mn18801a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: mn1880_device(mconfig, MN18801A, tag, owner, clock, true, address_map_constructor(FUNC(mn18801a_device::internal_data_map), this))
+// requests latch on assertion; deasserting the input does not clear them
+void mn1880_device::execute_set_input(int inputnum, int state)
 {
+	if (inputnum >= 0 && inputnum < 12)
+	{
+		const u16 mask = 1U << inputnum;
+		if (state != CLEAR_LINE)
+		{
+			if (!(m_input_state & mask))
+				m_if |= mask;
+			m_input_state |= mask;
+		}
+		else
+		{
+			m_input_state &= ~mask;
+		}
+	}
 }
 
 u8 mn1880_device::ie0_r()
@@ -154,6 +178,13 @@ u8 mn1880_device::cpum_r()
 void mn1880_device::cpum_w(u8 data)
 {
 	m_cpum = (data & 0xef) | (m_cpum & 0x10);
+
+	// clearing a stop bit also ends WAIT
+	for (int i = 0; i < 2; ++i)
+	{
+		if (!BIT(data, i))
+			m_cpu[i].wait = 0;
+	}
 }
 
 u8 mn1880_device::mmu_bank_r(offs_t offset)
@@ -298,8 +329,10 @@ void mn1880_device::device_start()
 	save_item(STRUCT_MEMBER(m_cpu, yp));
 	save_item(STRUCT_MEMBER(m_cpu, sp));
 	save_item(STRUCT_MEMBER(m_cpu, lp));
+	save_item(STRUCT_MEMBER(m_cpu, wait));
 	save_item(STRUCT_MEMBER(m_cpu, ie));
 	save_item(STRUCT_MEMBER(m_cpu, iemask));
+	save_item(NAME(m_input_state));
 	save_item(NAME(m_if));
 	save_item(NAME(m_irq));
 	save_item(NAME(m_cpum));
@@ -530,7 +563,7 @@ void mn1880_device::cpu_registers::branch(u16 label)
 
 void mn1880_device::swap_cpus()
 {
-	if ((m_cpum & 0x03) != (BIT(m_cpum, 4) ? 0x01 : 0x02))
+	if (!BIT(m_cpum, BIT(m_cpum, 4) ^ 1))
 		m_cpum ^= 0x10;
 }
 
@@ -552,26 +585,51 @@ void mn1880_device::next_instruction(u8 input)
 
 void mn1880_device::execute_run()
 {
-	while (m_icount-- > 0)
+	while (m_icount > 0)
 	{
+		--m_icount;
+
+		// retire the queued write before sampling interrupts and CPUM
+		const bool output_cycle = m_ustate == microstate::NEXT && output_queued();
+		if (output_cycle)
+		{
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1 & 0x00ff);
+			m_output_queue_state = 0xff;
+		}
+
+		// an enabled interrupt wakes a stopped context
+		for (int i = 0; i < 2; ++i)
+		{
+			if (!m_cpu[i].iemask && ((m_cpu[i].ie | m_cpu[i].wait) & m_if))
+				m_cpum &= ~(1U << i);
+		}
+
+		if (m_ustate == microstate::NEXT && BIT(m_cpum, BIT(m_cpum, 4)))
+		{
+			swap_cpus();
+			if (BIT(m_cpum, BIT(m_cpum, 4)))
+				continue;
+		}
+
 		cpu_registers &cpu = get_active_cpu();
 
 		if (m_ustate == microstate::NEXT)
 		{
-			m_irq = cpu.iemask ? 0 : cpu.ie & m_if;
+			m_irq = cpu.iemask ? 0 : (cpu.ie | cpu.wait) & m_if;
 			if (m_irq != 0)
 			{
 				cpu.wait = 0;
-				if (!BIT(cpu.fs, 4))
+				// REP has already fetched its opcode, so IP stays on the operand
+				if (!(cpu.fs & 0x1f))
 					--cpu.ip;
-				if (!output_queued())
+				if (!output_cycle)
 					m_ustate = microstate::PI_1;
 			}
 			else if (cpu.wait == 0)
 			{
 				if (!BIT(cpu.fs, 4))
 					debugger_instruction_hook(cpu.irp);
-				if (!output_queued() && !BIT(s_input_queue_map[cpu.ir >> 4], cpu.ir & 0x0f))
+				if (!output_cycle && !BIT(s_input_queue_map[cpu.ir >> 4], cpu.ir & 0x0f))
 					m_ustate = s_decode_map[cpu.ir];
 			}
 		}
@@ -582,16 +640,10 @@ void mn1880_device::execute_run()
 		case microstate::NEXT:
 			if (cpu.wait != 0)
 			{
-				--cpu.wait;
 				swap_cpus();
 			}
 			else
 			{
-				if (output_queued())
-				{
-					m_data.write_byte(mmu_data_translate(m_da), m_tmp1 & 0x00ff);
-					m_output_queue_state = 0xff;
-				}
 				if (m_irq != 0)
 					m_ustate = microstate::PI_1;
 				else
@@ -620,12 +672,21 @@ void mn1880_device::execute_run()
 		case microstate::CLRSET_1:
 			if (BIT(cpu.fs, 5))
 				m_da |= cpu.xp & 0xff00;
-			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da)); // TODO: read latch instead of terminal
+			if (m_da > m_internal_io_end)
+				m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
+			m_ustate = microstate::CLRSET_2;
+			break;
+
+		case microstate::CLRSET_2:
+			// on-chip registers are read and written in the same cycle (inferred)
+			if (m_da <= m_internal_io_end)
+				m_tmp1 = m_data.read_byte(mmu_data_translate(m_da)); // TODO: read latch instead of terminal
 			if (BIT(cpu.ir, 3))
 				m_tmp1 |= 1 << (cpu.ir & 0x07);
 			else
 				m_tmp1 &= ~(1 << (cpu.ir & 0x07));
-			m_ustate = microstate::MOV56_2;
+			m_data.write_byte(mmu_data_translate(m_da), m_tmp1);
+			next_instruction(input);
 			break;
 
 		case microstate::T1B_1:
@@ -726,10 +787,12 @@ void mn1880_device::execute_run()
 		case microstate::MOV37_1:
 			++cpu.ip;
 			m_da = cpu.yp;
+			if ((cpu.fs & 0x1f) != 0)
+				++cpu.yp;
 			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_da = input;
 			if (BIT(cpu.fs, 5))
-				m_da |= cpu.xp & 0xff00;
+				m_da |= cpu.yp & 0xff00;
 			m_ustate = microstate::MOV56_2;
 			break;
 
@@ -1053,6 +1116,7 @@ void mn1880_device::execute_run()
 
 		case microstate::DIV51_10:
 			m_data.write_byte(mmu_data_translate(m_da), m_tmp1 & 0x00ff);
+			m_tmp1 = m_tmp2; // remainder follows the quotient
 			++m_da;
 			cpu.xp = m_da;
 			set_output_queued();
@@ -1237,7 +1301,8 @@ void mn1880_device::execute_run()
 
 		case microstate::MOVL5D_2:
 			m_data.write_byte(mmu_data_translate(cpu.xp), m_tmp1);
-			++cpu.xp;
+			if ((cpu.fs & 0x1f) != 0)
+				++cpu.xp;
 			next_instruction(input);
 			break;
 
@@ -1567,8 +1632,7 @@ void mn1880_device::execute_run()
 
 		case microstate::SUBD_3:
 			m_tmp1 = cpu.subdcz(m_data.read_byte(mmu_data_translate(m_da)), m_tmp1, BIT(cpu.fs, 7)); // TODO: read latch instead of terminal
-			set_output_queued();
-			next_instruction(input);
+			m_ustate = microstate::SUBD_4;
 			break;
 
 		case microstate::SUBD_4:
@@ -2029,18 +2093,10 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::MOVCC_1:
-			if (BIT(cpu.ir, 1))
-			{
-				if (BIT(cpu.ir, 5))
-					m_da |= cpu.yp & 0xff00;
-				setl(cpu.yp, m_data.read_byte(mmu_data_translate(m_da)));
-			}
-			else
-			{
-				if (BIT(cpu.ir, 5))
-					m_da |= cpu.xp & 0xff00;
-				setl(cpu.xp, m_data.read_byte(mmu_data_translate(m_da)));
-			}
+			if (BIT(cpu.fs, 5))
+				m_da |= (BIT(cpu.ir, 1) ? cpu.yp : cpu.xp) & 0xff00;
+			m_tmp1 = (BIT(cpu.ir, 1) ? cpu.yp : cpu.xp) & 0x00ff;
+			set_output_queued();
 			next_instruction(input);
 			break;
 
@@ -2294,12 +2350,14 @@ void mn1880_device::execute_run()
 
 		case microstate::WAIT_1:
 			++cpu.ip;
-			m_tmp1 = (m_da << 8) | input;
+			// TODO: operand treated as a wakeup interrupt mask; byte order and layout unverified
+			m_tmp1 = m_da | (input << 8);
 			m_ustate = microstate::WAIT_2;
 			break;
 
 		case microstate::WAIT_2:
 			cpu.wait = m_tmp1;
+			m_cpum |= 1U << BIT(m_cpum, 4);
 			next_instruction(input);
 			break;
 
@@ -2507,4 +2565,497 @@ void mn1880_device::state_string_export(const device_state_entry &entry, std::st
 		str = string_format("%04X%c", m_cpu[1].ip, BIT(m_cpum, 4) ? '*' : ' ');
 		break;
 	}
+}
+
+
+//**************************************************************************
+//  MN1880023
+//**************************************************************************
+
+mn1880023_device::mn1880023_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: mn1880_device(mconfig, MN1880023, tag, owner, clock, false, 0x5f, address_map_constructor(FUNC(mn1880023_device::internal_map), this))
+	, m_port_in_cb(*this, 0xff)
+	, m_port_out_cb(*this)
+	, m_ad_in_cb(*this, 0)
+	, m_sio_in_cb(*this, 0xff)
+	, m_sio_out_cb(*this)
+	, m_pwm_out_cb(*this)
+	, m_timer0(nullptr)
+	, m_timer3(nullptr)
+	, m_sio_timer{nullptr, nullptr}
+	, m_adc_timer(nullptr)
+	, m_pwm_timer(nullptr)
+	, m_port_input_mask{}
+	, m_regs{}
+	, m_timer2_start(attotime::zero)
+	, m_timer4_count(0)
+	, m_timer4_prescale(0)
+	, m_timer2_capture_input(false)
+	, m_timer4_count_input(false)
+{
+}
+
+void mn1880023_device::internal_map(address_map &map)
+{
+	map(0x0000, 0x005f).rw(FUNC(mn1880023_device::reg_r), FUNC(mn1880023_device::reg_w));
+	map(0x0000, 0x0009).rw(FUNC(mn1880023_device::port_r), FUNC(mn1880023_device::port_w));
+	map(0x0014, 0x0014).w(FUNC(mn1880023_device::irq_flags_w));
+	map(0x001a, 0x001a).w(FUNC(mn1880023_device::sio0_data_w));
+	map(0x001e, 0x001e).w(FUNC(mn1880023_device::adc_control_w));
+	map(0x0020, 0x0021).rw(FUNC(mn1880023_device::timer0_r), FUNC(mn1880023_device::timer0_w));
+	map(0x0024, 0x0025).rw(FUNC(mn1880023_device::timer2_r), FUNC(mn1880023_device::timer2_w));
+	map(0x0026, 0x0027).w(FUNC(mn1880023_device::timer3_w));
+	map(0x0031, 0x0031).w(FUNC(mn1880023_device::timer_run_w));
+	map(0x0033, 0x0033).w(FUNC(mn1880023_device::timer_control_w));
+	map(0x003a, 0x003a).w(FUNC(mn1880023_device::sio1_data_w));
+	map(0x004e, 0x004f).r(FUNC(mn1880023_device::timer4_r));
+	map(0x0050, 0x0051).w(FUNC(mn1880023_device::pwm_reload_w));
+	map(0x0055, 0x0055).w(FUNC(mn1880023_device::pwm_control_w));
+	map(0x0060, 0x031f).ram();
+	mn1880_device::internal_data_map(map);
+}
+
+void mn1880023_device::device_start()
+{
+	mn1880_device::device_start();
+
+	m_timer0 = timer_alloc(FUNC(mn1880023_device::timer0_tick), this);
+	m_timer3 = timer_alloc(FUNC(mn1880023_device::timer3_tick), this);
+	m_sio_timer[0] = timer_alloc(FUNC(mn1880023_device::sio0_tick), this);
+	m_sio_timer[1] = timer_alloc(FUNC(mn1880023_device::sio1_tick), this);
+	m_adc_timer = timer_alloc(FUNC(mn1880023_device::adc_tick), this);
+	m_pwm_timer = timer_alloc(FUNC(mn1880023_device::pwm_tick), this);
+
+	save_item(NAME(m_regs));
+	save_item(NAME(m_timer2_start));
+	save_item(NAME(m_timer4_count));
+	save_item(NAME(m_timer4_prescale));
+	save_item(NAME(m_timer2_capture_input));
+	save_item(NAME(m_timer4_count_input));
+}
+
+void mn1880023_device::device_reset()
+{
+	mn1880_device::device_reset();
+
+	// port pin levels at reset are unknown, so no outputs are driven here
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
+	m_timer0->adjust(attotime::never);
+	m_timer3->adjust(attotime::never);
+	m_sio_timer[0]->adjust(attotime::never);
+	m_sio_timer[1]->adjust(attotime::never);
+	m_adc_timer->adjust(attotime::never);
+	m_pwm_timer->adjust(attotime::never);
+	m_timer2_start = machine().time();
+	m_timer4_count = 0;
+	m_timer4_prescale = 0;
+}
+
+u8 mn1880023_device::reg_r(offs_t offset)
+{
+	return m_regs[offset];
+}
+
+void mn1880023_device::reg_w(offs_t offset, u8 data)
+{
+	m_regs[offset] = data;
+}
+
+u8 mn1880023_device::port_r(offs_t offset)
+{
+	const u8 mask = m_port_input_mask[offset];
+	if (!mask)
+		return m_regs[offset];
+
+	return (m_regs[offset] & ~mask) | (m_port_in_cb[offset]() & mask);
+}
+
+void mn1880023_device::port_w(offs_t offset, u8 data)
+{
+	m_regs[offset] = data;
+	m_port_out_cb[offset](data);
+}
+
+void mn1880023_device::irq_flags_w(u8 data)
+{
+	// writing 0 to flag bit 0, 2 or 4 also clears request 4, 6 or 8
+	m_regs[0x14] = data;
+	clear_interrupt_requests((~data & 0x15) << 4);
+}
+
+void mn1880023_device::sio0_data_w(u8 data)
+{
+	m_regs[0x1a] = data;
+	m_regs[0x18] |= 0x80;
+	m_regs[0x14] &= ~0x20;
+	m_sio_timer[0]->adjust(clocks_to_attotime(64));
+}
+
+TIMER_CALLBACK_MEMBER(mn1880023_device::sio0_tick)
+{
+	m_regs[0x18] &= ~0x80;
+	m_regs[0x14] |= 0x20;
+
+	// only the transmit (a6) and receive (af) modes used by CR-504 firmware are known
+	if (m_regs[0x19] == 0xa6)
+		m_sio_out_cb[0](m_regs[0x1a]);
+	else if (m_regs[0x19] == 0xaf)
+		m_regs[0x1b] = m_sio_in_cb[0]();
+}
+
+void mn1880023_device::sio1_data_w(u8 data)
+{
+	m_regs[0x3a] = data;
+	m_regs[0x37] &= ~0x10;
+	m_sio_timer[1]->adjust(clocks_to_attotime(64));
+}
+
+TIMER_CALLBACK_MEMBER(mn1880023_device::sio1_tick)
+{
+	m_sio_out_cb[1](m_regs[0x3a]);
+	m_regs[0x3b] = m_sio_in_cb[1]();
+	m_regs[0x37] |= 0x10;
+}
+
+void mn1880023_device::adc_control_w(u8 data)
+{
+	m_regs[0x1e] = data;
+	if (BIT(data, 3))
+		m_adc_timer->adjust(clocks_to_attotime(64));
+}
+
+TIMER_CALLBACK_MEMBER(mn1880023_device::adc_tick)
+{
+	m_regs[0x1c] = m_ad_in_cb[m_regs[0x1d] & 7]();
+	m_regs[0x37] |= 0x08;
+}
+
+u8 mn1880023_device::timer0_r(offs_t offset)
+{
+	if (!m_timer0->enabled())
+		return m_regs[0x20 + offset];
+
+	const u16 count = 0x10000 - (m_timer0->remaining().as_ticks(clock()) + 15) / 16;
+	return offset ? (count >> 8) : count;
+}
+
+void mn1880023_device::timer0_w(offs_t offset, u8 data)
+{
+	m_regs[0x20 + offset] = data;
+	update_timer0();
+}
+
+void mn1880023_device::update_timer0()
+{
+	// only the periodic mode (control 8a) used by CR-504 firmware is emulated
+	if (BIT(m_regs[0x31], 4) && (m_regs[0x33] & 0x9f) == 0x8a)
+	{
+		const attotime period = clocks_to_attotime(16 * (0x10000 - get_u16le(&m_regs[0x20])));
+		m_timer0->adjust(period, 0, period);
+	}
+	else
+	{
+		m_timer0->adjust(attotime::never);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(mn1880023_device::timer0_tick)
+{
+	request_interrupt(IRQ_TIMER0);
+}
+
+u16 mn1880023_device::timer2_count() const
+{
+	const u16 count = get_u16le(&m_regs[0x24]);
+	if (!BIT(m_regs[0x31], 6))
+		return count;
+
+	return count + (machine().time() - m_timer2_start).as_ticks(clock() / 16);
+}
+
+u8 mn1880023_device::timer2_r(offs_t offset)
+{
+	const u16 count = timer2_count();
+	return offset ? (count >> 8) : count;
+}
+
+void mn1880023_device::timer2_w(offs_t offset, u8 data)
+{
+	m_regs[0x24 + offset] = data;
+	m_timer2_start = machine().time();
+}
+
+void mn1880023_device::timer2_capture_w(int state)
+{
+	if (state && !m_timer2_capture_input)
+		put_u16le(&m_regs[0x2c], timer2_count());
+	m_timer2_capture_input = state;
+}
+
+void mn1880023_device::timer3_w(offs_t offset, u8 data)
+{
+	m_regs[0x26 + offset] = data;
+	update_timer3();
+}
+
+void mn1880023_device::update_timer3()
+{
+	// TODO: only the first overflow of a programmed delay is emulated
+	if (BIT(m_regs[0x31], 7))
+		m_timer3->adjust(clocks_to_attotime(16 * (0x10000 - get_u16le(&m_regs[0x26]))));
+	else
+		m_timer3->adjust(attotime::never);
+}
+
+TIMER_CALLBACK_MEMBER(mn1880023_device::timer3_tick)
+{
+	m_regs[0x14] |= 0x04;
+	m_regs[0x37] |= 0x02;
+	if (BIT(m_regs[0x36], 1))
+		request_interrupt(IRQ_TIMER3);
+}
+
+void mn1880023_device::timer_run_w(u8 data)
+{
+	const u8 changed = m_regs[0x31] ^ data;
+	m_regs[0x31] = data;
+	if (BIT(changed, 6))
+		m_timer2_start = machine().time();
+	if (BIT(changed, 4))
+		update_timer0();
+	if (BIT(changed, 7))
+		update_timer3();
+}
+
+void mn1880023_device::timer_control_w(u8 data)
+{
+	const u8 changed = m_regs[0x33] ^ data;
+	m_regs[0x33] = data;
+	if (changed & 0x9f)
+		update_timer0();
+	if (BIT(changed & data, 6))
+	{
+		m_timer4_count = get_u16le(&m_regs[0x4c]);
+		m_timer4_prescale = 0;
+	}
+}
+
+u8 mn1880023_device::timer4_r(offs_t offset)
+{
+	return offset ? (m_timer4_count >> 8) : m_timer4_count;
+}
+
+void mn1880023_device::timer4_count_w(int state)
+{
+	// counts every second input edge (inferred)
+	if (state && !m_timer4_count_input && BIT(m_regs[0x33], 6) && ++m_timer4_prescale == 2)
+	{
+		m_timer4_prescale = 0;
+		if (!++m_timer4_count)
+		{
+			m_regs[0x14] |= 0x10;
+			request_interrupt(IRQ_TIMER4);
+		}
+	}
+	m_timer4_count_input = state;
+}
+
+u16 mn1880023_device::pwm_reload() const
+{
+	return get_u16le(&m_regs[0x50]) & 0x3ff;
+}
+
+u16 mn1880023_device::pwm_compare() const
+{
+	return get_u16le(&m_regs[0x52]) & 0x3ff;
+}
+
+void mn1880023_device::pwm_reload_w(offs_t offset, u8 data)
+{
+	m_regs[0x50 + offset] = data;
+	update_pwm();
+}
+
+void mn1880023_device::pwm_control_w(u8 data)
+{
+	const u8 changed = m_regs[0x55] ^ data;
+	m_regs[0x55] = data;
+	if (BIT(changed, 0))
+		update_pwm();
+}
+
+void mn1880023_device::update_pwm()
+{
+	// 10-bit counter clocked at oscillator/4
+	if (BIT(m_regs[0x55], 0))
+	{
+		const attotime period = clocks_to_attotime(4 * (0x400 - pwm_reload()));
+		m_pwm_timer->adjust(period, 0, period);
+	}
+	else
+	{
+		m_pwm_timer->adjust(attotime::never);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(mn1880023_device::pwm_tick)
+{
+	// only the rising edge at the start of each period is emulated
+	m_pwm_out_cb(1);
+	m_pwm_out_cb(0);
+
+	m_regs[0x37] |= 0x04;
+	m_regs[0x14] |= 0x01;
+	if (BIT(m_regs[0x36], 2))
+		request_interrupt(IRQ_PWM);
+}
+
+
+//**************************************************************************
+//  MN18801A
+//**************************************************************************
+
+mn18801a_device::mn18801a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: mn1880_device(mconfig, MN18801A, tag, owner, clock, true, 0x44, address_map_constructor(FUNC(mn18801a_device::internal_map), this))
+	, m_so_out_cb(*this)
+	, m_hs_out_cb(*this)
+	, m_to_out_cb(*this)
+	, m_tcio_in_cb(*this, 0xff)
+	, m_timer{nullptr, nullptr, nullptr}
+	, m_timer_reload{0, 0, 0}
+	, m_timer_enable(0)
+	, m_timer_mask(0)
+	, m_timer_status(0)
+	, m_so(0)
+	, m_hs(0)
+	, m_to(0xff)
+{
+}
+
+void mn18801a_device::internal_map(address_map &map)
+{
+	map(0x005a, 0x005a).lrw8(NAME([this] () -> u8 { return m_timer_mask; }), NAME([this] (u8 data) { m_timer_mask = data; }));
+	map(0x005c, 0x005c).lr8(NAME([this] () -> u8 { return m_timer_enable; })).w(FUNC(mn18801a_device::timer_enable_w));
+	map(0x005d, 0x005d).noprw(); // peripheral mode control?
+	map(0x005e, 0x005e).nopr().w(FUNC(mn18801a_device::timer_restart_w));
+	map(0x0060, 0x0065).w(FUNC(mn18801a_device::timer_reload_w));
+	map(0x3fe3, 0x3fe3).lr8(NAME([this] () -> u8 { return m_so; })).w(FUNC(mn18801a_device::so_w));
+	map(0x3fe7, 0x3fe7).lr8(NAME([this] () -> u8 { return m_to; })).w(FUNC(mn18801a_device::to_w));
+	map(0x3fe9, 0x3fe9).lr8(NAME([this] () -> u8 { return m_tcio_in_cb(); }));
+	map(0x3fee, 0x3fee).lr8(NAME([this] () -> u8 { return m_timer_status; })).w(FUNC(mn18801a_device::timer_status_w));
+	map(0x3ff3, 0x3ff3).lr8(NAME([this] () -> u8 { return m_hs; })).w(FUNC(mn18801a_device::hs_w));
+	mn1880_device::internal_data_map(map);
+}
+
+void mn18801a_device::device_start()
+{
+	mn1880_device::device_start();
+
+	for (auto &timer : m_timer)
+		timer = timer_alloc(FUNC(mn18801a_device::timer_tick), this);
+
+	save_item(NAME(m_timer_reload));
+	save_item(NAME(m_timer_enable));
+	save_item(NAME(m_timer_mask));
+	save_item(NAME(m_timer_status));
+	save_item(NAME(m_so));
+	save_item(NAME(m_hs));
+	save_item(NAME(m_to));
+}
+
+void mn18801a_device::device_reset()
+{
+	mn1880_device::device_reset();
+
+	std::fill(std::begin(m_timer_reload), std::end(m_timer_reload), 0);
+	m_timer_enable = 0;
+	m_timer_mask = 0;
+	m_timer_status = 0;
+	for (auto &timer : m_timer)
+		timer->adjust(attotime::never);
+
+	// port pin levels at reset are unknown, so no outputs are driven here
+	m_so = 0;
+	m_hs = 0;
+	m_to = 0xff;
+}
+
+void mn18801a_device::timer_adjust(int timer)
+{
+	if (BIT(m_timer_enable, timer))
+	{
+		const attotime period = attotime::from_ticks(0x10000 - m_timer_reload[timer], clock() / 16);
+		m_timer[timer]->adjust(period, timer, period);
+	}
+	else
+	{
+		m_timer[timer]->adjust(attotime::never);
+	}
+}
+
+void mn18801a_device::timer_reload_w(offs_t offset, u8 data)
+{
+	const int timer = offset >> 1;
+	if (BIT(offset, 0))
+	{
+		m_timer_reload[timer] = (m_timer_reload[timer] & 0x00ff) | (u16(data) << 8);
+		timer_adjust(timer);
+	}
+	else
+	{
+		m_timer_reload[timer] = (m_timer_reload[timer] & 0xff00) | data;
+	}
+}
+
+void mn18801a_device::timer_enable_w(u8 data)
+{
+	const u8 changed = m_timer_enable ^ data;
+	m_timer_enable = data;
+	for (int timer = 0; timer < 3; ++timer)
+	{
+		if (BIT(changed, timer))
+			timer_adjust(timer);
+	}
+}
+
+void mn18801a_device::timer_restart_w(u8 data)
+{
+	// TODO: other modes, live counter reads and exact reload timing
+	for (int timer = 0; timer < 3; ++timer)
+	{
+		if (BIT(data, timer))
+			timer_adjust(timer);
+	}
+}
+
+void mn18801a_device::timer_status_w(u8 data)
+{
+	m_timer_status &= data;
+	if (!(m_timer_status & m_timer_mask & 7))
+		clear_interrupt_requests(1U << IRQ_TIMER);
+}
+
+TIMER_CALLBACK_MEMBER(mn18801a_device::timer_tick)
+{
+	m_timer_status |= 1 << param;
+	if (BIT(m_timer_mask, param))
+		request_interrupt(IRQ_TIMER);
+}
+
+void mn18801a_device::so_w(u8 data)
+{
+	m_so = data;
+	m_so_out_cb(data);
+}
+
+void mn18801a_device::hs_w(u8 data)
+{
+	m_hs = data;
+	m_hs_out_cb(data);
+}
+
+void mn18801a_device::to_w(u8 data)
+{
+	m_to = data;
+	m_to_out_cb(data);
 }

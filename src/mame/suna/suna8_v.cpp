@@ -462,7 +462,7 @@ void suna8_state::draw_text_sprites(screen_device &screen, bitmap_ind16 &bitmap,
 		int sy = (0xf0 - ypos) & 0xff;
 		if (flip_screen())
 			sy = max_y - sy - 8;
-		rectangle text_clip(cliprect.min_x, cliprect.max_x, sy, sy + 0x10 - 1);
+		rectangle text_clip(cliprect.left(), cliprect.right(), sy, sy + 0x10 - 1);
 		text_clip &= cliprect;
 		screen.priority().fill(1, text_clip);
 	}

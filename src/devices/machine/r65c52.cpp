@@ -32,6 +32,8 @@ r65c52_device::r65c52_device(const machine_config &mconfig, const char *tag, dev
 	m_rdr{0, 0}, m_rdrf{false, false},
 	m_ier{0, 0}, m_isr{0, 0},
 	m_irq{0, 0},
+	m_irq_latch{false, false},
+	m_irq_sources{0, 0},
 	m_overrun{false, false},
 	m_parity_err{false, false},
 	m_parity_err_mode{0, 0},
@@ -99,6 +101,8 @@ void r65c52_device::device_start()
 	save_item(NAME(m_ier));
 	save_item(NAME(m_isr));
 	save_item(NAME(m_irq));
+	save_item(NAME(m_irq_latch));
+	save_item(NAME(m_irq_sources));
 
 	save_item(NAME(m_overrun));
 	save_item(NAME(m_parity_err));
@@ -158,6 +162,10 @@ void r65c52_device::device_reset()
 		m_rdr[i] = 0x00;
 		m_isr[i] = 0x80;
 		m_ier[i] = 0x80;
+
+		m_irq_latch[i] = false;
+		m_irq_sources[i] = 0;
+		update_irq(i);
 
 		m_rts[i] = 1;
 		m_dtr[i] = 1;
@@ -257,10 +265,23 @@ void r65c52_device::output_dtr(int idx, int dtr)
 	}
 }
 
+// IRQ is asserted when an enabled source becomes active and released by reading the ISR
+// (data sheet figures 7, 8 and 12), so a source that stays active doesn't interrupt again
 void r65c52_device::update_irq(int idx)
 {
+	u8 const sources = m_ier[idx] & m_isr[idx] & 0x7f;
+	if (!sources)
+	{
+		m_irq_latch[idx] = false;
+	}
+	else if (sources & ~m_irq_sources[idx])
+	{
+		m_irq_latch[idx] = true;
+	}
+	m_irq_sources[idx] = sources;
+
 	LOG("R65C52: %x  IER  %x ISR %x\n", idx + 1, m_ier[idx], m_isr[idx]);
-	output_irq(idx, (m_ier[idx] & m_isr[idx] & 0x7f) ? 1 : 0);
+	output_irq(idx, m_irq_latch[idx] ? 1 : 0);
 }
 
 void r65c52_device::update_divider(int idx)
@@ -315,13 +336,21 @@ u8 r65c52_device::read_rdr(int idx)
 
 u8 r65c52_device::read_status(int idx)
 {
+	u8 status = m_status[idx];
+
+	// transmitter underrun: TDRE is set and the shift register is empty
+	if (m_tdre[idx] && (m_tx_output[idx] != OUTPUT_TXD))
+	{
+		status |= SR_TUR;
+	}
+
 	if (!machine().side_effects_disabled())
 	{
-		LOG("R65C52: %x  STATUS %x \n", idx + 1, m_status[idx]);
+		LOG("R65C52: %x  STATUS %x \n", idx + 1, status);
 		m_dtr[idx] = false;
 		m_rts[idx] = false;
 	}
-	return m_status[idx];
+	return status;
 }
 
 void r65c52_device::write_ier(int idx, u8 data)
@@ -444,6 +473,7 @@ u8 r65c52_device::read_isr(int idx)
 	{
 		m_isr[idx] = isr;
 		LOG("R65C52: %x  ISR %x \n", idx + 1, m_isr[idx]);
+		m_irq_latch[idx] = false;
 		update_irq(idx);
 	}
 

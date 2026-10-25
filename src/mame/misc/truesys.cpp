@@ -107,9 +107,8 @@ ROM_START( unkts )
 	ROM_LOAD( "am29lv400bt.u23", 0x00000, 0x80000, CRC(455af44a) SHA1(9420259e3b953674318109d6c2bae4b69283996a) ) // external FPGA ROM?
 	// a second dump from a different PCB only has a 2 bytes difference: At 0x70000 0xaa 0x55 instead of 0x00 0x00.
 
-	ROM_REGION( 0x2100, "pic", 0 ) // TODO: sizes may be wrong
-	ROM_LOAD( "pic_flash.bin",  0x0000, 0x2000, NO_DUMP )
-	ROM_LOAD( "pic_eeprom.bin", 0x2000, 0x0100, NO_DUMP )
+	ROM_REGION16_LE( 0x4300, "pic", 0 )
+	ROM_LOAD( "pic16f874.bin", 0x0000, 0x4300, NO_DUMP )
 ROM_END
 
 } // anonymous namespace

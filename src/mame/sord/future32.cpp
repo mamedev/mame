@@ -517,6 +517,9 @@ MC6845_UPDATE_ROW(future32a_state::crtc_update_row)
 
 void future32a_state::machine_start()
 {
+	// the firmware programs the keyboard channel with Auto Enables, so its /CTS and /DCD inputs must be active
+	m_scc1->ctsa_w(0);
+	m_scc1->dcda_w(0);
 }
 
 void future32a_state::machine_reset()

@@ -446,8 +446,9 @@ bool victor9k_format::save(util::random_read_write &io, const std::vector<uint32
 {
 	int type = victor9k_format::identify(image);
 	uint64_t size;
-	io.length(size); // FIXME: check for errors
-	osd_printf_verbose("save type: %01d, size: %d\n", type, size);
+	if (io.length(size))
+		return false;
+	osd_printf_verbose("save type: %01d, size: %u\n", type, size);
 
 	if (type == -1)
 		return false;
@@ -463,12 +464,14 @@ bool victor9k_format::save(util::random_read_write &io, const std::vector<uint32
 			uint8_t sectdata[40*512];
 			desc_s sectors[40];
 			int offset = get_image_offset(f, head, track);
-			osd_printf_verbose(">>type: %s, head: %d, track: %d, sector_count: %d, offset: %d, track_size: %d\n",
+			osd_printf_verbose(">>sector_base_size: %d, head: %d, track: %d, sector_count: %d, offset: %d, track_size: %d\n",
 				f.sector_base_size, head, track, sector_count, offset, track_size);
 
 			build_sector_description(f, sectdata, 0, sectors, sector_count);
 			extract_sectors(image, f, sectors, track, head, sector_count);
-			/*auto const [err, actual] =*/ write_at(io, offset, sectdata, track_size); // FIXME: check for errors
+			auto const [err, actual] = write_at(io, offset, sectdata, track_size);
+			if (err || (actual != size_t(track_size)))
+				return false;
 		}
 	}
 

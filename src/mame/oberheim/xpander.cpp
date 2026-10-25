@@ -18,34 +18,8 @@ presses, drives the VFDs, interprets the digital and analog inputs (MIDI, CVs,
 triggers, etc.), and sends parameters to the voice computer.
 
 The voice board consists of 6 analog voices controlled by the voice computer.
-The main computer communicates with the voice board by accessing its RAM after
-halting its CPU.
-
-Each voice is built around a CEM3374 (dual oscillator) and a CEM3372 (VCF and
-VCA). VCO2 can modulate either VCO1 or the VCF to produce FM effects. There is
-also circuitry to generate pulse waves out of the saw ones, and to mix in noise.
-The noise source is shared for all voices. The CEM3372 is combined with a 4051
-MUX and other support circuitry to implement 16 different filter modes.
-
-The voice computer generates 9 control voltages (CVs) for each voice:
-- VCO pitch (1 and 2).
-- VCO pulse-width (1 and 2).
-- VCO volume (1 and 2).
-- VCA amplitude.
-- VCF cutoff frequency.
-- VCF resonance.
-
-There are no analog LFOs or EGs. Those are implemented digitally, and their
-effect is incorporated in the CV outputs. All 54 (6 x 9) CVs are generated using
-a single 14-bit DAC, whose output is time-multiplexed to 54 Sample and Hold
-(S&H) circuits. The CV generation circuit can operate in a "high resolution"
-mode which surpases 14 bits (see voice_dac_enable_w()). This is used for pitch
-CVs.
-
-The voice computer also selects VCO waveforms, switches between different VCF
-modes, etc., by controlling switch and multiplexer ICs. Finally, it also
-controls the routing and amount of FM by configuring an MDAC (AD7523, one per
-voice).
+See xpander_vb.cpp for more info. The main computer communicates with the voice
+board by accessing its RAM after halting its CPU.
 
 The Matrix-12 is basically an Xpander with a second voice board, a keyboard
 and two pitch/mod levers. It also got rid of the GATE and CV inputs, and the
@@ -67,11 +41,14 @@ intended as an educational tool. There is no attempt to emulate audio.
 
 A note on variable "polarity": many bool variables represent signals in the
 schematic (e.g. HALTREQ). Some of those signals are active low (e.g. HALTREQ*).
-But the variables and functions here (e.g. m_haltreq, haltreq_r()) are always
+But the variables and functions here (e.g. haltreq_r()) are always
 active-high (active == true).
 */
 
 #include "emu.h"
+
+#include "matrixsynth_kbd.h"
+#include "xpander_vb.h"
 
 #include "bus/midi/midi.h"
 #include "cpu/m6809/m6809.h"
@@ -86,6 +63,7 @@ active-high (active == true).
 #include "machine/rescap.h"
 #include "machine/timer.h"
 #include "video/pwm.h"
+#include "corefloat.h"
 
 #include <algorithm>
 #include <array>
@@ -96,14 +74,12 @@ active-high (active == true).
 #define LOG_CV_IN       (1U << 1)
 #define LOG_SWITCHES    (1U << 2)
 #define LOG_ENCODERS    (1U << 3)
-#define LOG_CPU_COMMS   (1U << 4)
-#define LOG_FIRQ_TIMER  (1U << 5)
-#define LOG_VOICE_TIMER (1U << 6)
-#define LOG_DAC         (1U << 7)
-#define LOG_DAC_VERBOSE (1U << 8)
-#define LOG_BANKING     (1U << 9)
+#define LOG_FIRQ_TIMER  (1U << 4)
+#define LOG_BANKING     (1U << 5)
+#define LOG_GATE_IN     (1U << 6)
+#define LOG_LEVER       (1U << 7)
 
-#define VERBOSE (LOG_GENERAL | LOG_ENCODERS | LOG_DAC)
+#define VERBOSE (0)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
@@ -111,512 +87,17 @@ active-high (active == true).
 
 namespace {
 
-// A single voice on the xpander voice board.
-// Note: the X in component designations refers to the voice number. For example,
-// UX03 refers to U103 for voice 1, U203 for voice 2, and so on. Component
-// designations apply to the voice board unless otherwise noted.
-class xpander_voice_device : public device_t
+constexpr double VPLUS = 12;
+constexpr double VMINUS = -12;
+
+// Maps the port's current value to the specified range.
+// It is OK for `new_end` to be smaller than `new_start`.
+double map_port_range(const required_ioport &port, double new_start, double new_end)
 {
-public:
-	xpander_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) ATTR_COLD;
-
-	double cem3374_tempco_v() const;
-
-	void latch0_w(u8 data);
-	void latch1_w(u8 data);
-	void latch2_w(u8 data);
-
-	void set_cv(u8 cv_index, double cv, bool fast);
-	void set_res_cv(double cv);
-
-protected:
-	void device_start() override ATTR_COLD;
-
-private:
-	static inline constexpr int NUM_CVS = 9;
-	static inline constexpr int RES_CV_INDEX = 8;
-	static inline constexpr const char *CV_NAMES[NUM_CVS] =
-	{
-		"VCA", "PW1", "VOLA", "VCOF1", "VOLB", "VCFF", "PW2", "VCOF2", "RES"
-	};
-
-	output_finder<> m_fm_mdac;  // Latch connected to AD7523/MP7523.
-	output_finder<> m_filter_mode;
-	output_finder<> m_noise;
-	output_finder<> m_pan;
-	output_finder<> m_saw1;
-	output_finder<> m_saw2;
-	output_finder<> m_tri1;
-	output_finder<> m_tri2;
-	output_finder<> m_vcofm;
-	output_finder<> m_sync;
-
-	std::array<double, NUM_CVS> m_cv;
-	std::array<bool, NUM_CVS - 1> m_fast;  // `-1` because RES does not support fast updates.
-};
-
-}  // anonymous namespace
-
-DEFINE_DEVICE_TYPE(XPANDER_VOICE, xpander_voice_device, "xpander_voice", "Xpander voice")
-
-xpander_voice_device::xpander_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, XPANDER_VOICE, tag, owner, 0)
-	, m_fm_mdac(*this, "fm_mdac")
-	, m_filter_mode(*this, "filter_mode")
-	, m_noise(*this, "noise")
-	, m_pan(*this, "pan")
-	, m_saw1(*this, "saw1")
-	, m_saw2(*this, "saw2")
-	, m_tri1(*this, "tri1")
-	, m_tri2(*this, "tri2")
-	, m_vcofm(*this, "vcofm")
-	, m_sync(*this, "sync")
-{
-	std::fill(m_cv.begin(), m_cv.end(), 0.0);
-	std::fill(m_fast.begin(), m_fast.end(), false);
+	return fmaprange<double>(
+		port->read(), port->field(1)->minval(), port->field(1)->maxval(), new_start, new_end);
 }
 
-double xpander_voice_device::cem3374_tempco_v() const
-{
-	// The CEM3374 has an on-chip temperature sensor which generates a voltage
-	// on pin 10. This can be used for temperature compensation of the
-	// oscillator frequency CVs. For now, just returning the nominal value
-	// according to the datasheet.
-	return 2.5;
-}
-
-void xpander_voice_device::latch0_w(u8 data)  // UX03, 74LS374.
-{
-	m_fm_mdac = data;
-}
-
-void xpander_voice_device::latch1_w(u8 data)  // UX02, 74HC174.
-{
-	m_vcofm = BIT(data, 0);
-	m_saw2 = BIT(data, 1);
-	m_tri1 = BIT(data, 2);
-	m_sync = BIT(data, 3);
-	m_tri2 = BIT(data, 4);
-	m_saw2 = BIT(data, 5);
-}
-
-void xpander_voice_device::latch2_w(u8 data)  // UX01, 74HC374.
-{
-	m_filter_mode = BIT(data, 0, 4);
-	m_noise = BIT(data, 4);
-	m_pan = BIT(data, 5, 3);
-}
-
-void xpander_voice_device::set_cv(u8 cv_index, double cv, bool fast)
-{
-	if (cv == m_cv[cv_index] && fast == m_fast[cv_index])
-		return;
-
-	m_cv[cv_index] = cv;
-	m_fast[cv_index] = fast;
-	LOGMASKED(LOG_DAC, "Voice %s - CV %s: %f, fast: %d\n", basetag(), CV_NAMES[cv_index], cv, fast);
-}
-
-void xpander_voice_device::set_res_cv(double cv)
-{
-	if (cv == m_cv[RES_CV_INDEX])
-		return;
-
-	m_cv[RES_CV_INDEX] = cv;
-	LOGMASKED(LOG_DAC, "Voice %s - CV %s: %f\n", basetag(), CV_NAMES[RES_CV_INDEX], cv);
-}
-
-void xpander_voice_device::device_start()
-{
-	save_item(NAME(m_cv));
-	save_item(NAME(m_fast));
-}
-
-
-namespace {
-
-// The xpander's voice board. Consists of 6 voices and a Z80-based computer for
-// controlling them. Used by the Xpander and Matrix-12.
-// Component designations apply to the voice board unless otherwise noted.
-class xpander_voiceboard_device : public device_t
-{
-public:
-	xpander_voiceboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) ATTR_COLD;
-
-	// Interface exposed to the main CPU.
-	void reset_w(int state);
-	void haltreq_w(int state);
-	int haltack_r() const { return m_haltack; }
-	auto haltack_cb() { return m_haltack_cb.bind(); }
-
-protected:
-	void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	void device_start() override ATTR_COLD;
-
-private:
-	void voicecpu_map(address_map &map) ATTR_COLD;
-
-	TIMER_CALLBACK_MEMBER(deferred_reset_w);
-	TIMER_CALLBACK_MEMBER(deferred_haltreq_w);
-
-	u8 datain_r();
-	void dataout_w(u8 data);
-	void latch0_w(offs_t offset, u8 data);
-	void latch1_w(offs_t offset, u8 data);
-	void latch2_w(offs_t offset, u8 data);
-
-	double get_dac_v() const;
-	void dac_enable_w(offs_t offset, u8 data);
-	void dac_clear_w(u8 data);
-	void dac_w(offs_t offset, u8 data);
-
-	void pit_out0_changed(int state);
-	void pit_out2_changed(int state);
-
-	void update_line_halt();
-
-	static inline constexpr u16 LOW7_MASK = 0x7f;
-	static inline constexpr u16 HIGH7_MASK = LOW7_MASK << 7;
-
-	// U815A (TL084), R851 and R852 scale the voltage reference selected by U805 (CD4051).
-	static inline constexpr double DAC_VREF_SCALER = 1.0 + RES_K(2.43) / RES_K(1);
-
-	// A 4V reference generated by D805, R856, R857, R854, U815C is then scaled
-	// by R853 and R855. This is the DAC voltage reference used when generating
-	// CVs other than those for oscillator frequencies.
-	static inline constexpr double DEFAULT_DAC_VREF = 4.0 * RES_VOLTAGE_DIVIDER(RES_K(18.2), RES_K(10)) * DAC_VREF_SCALER;
-
-	required_device<mc6809_device> m_voicecpu;
-	required_device<pit8253_device> m_pit;
-	required_device_array<xpander_voice_device, 6> m_voices;
-	devcb_write_line m_haltack_cb;
-
-	bool m_haltdis;  // Halt disable (HALTDS).
-	bool m_haltreq;  // Halt request (HALTREQ).
-	bool m_haltack;  // Halt acknowledge (HALTAKN).
-	bool m_autodone;  // Autotune done (AUTODNE).
-	u16 m_dac_data;
-	double m_dac_fine_v;
-	double m_dac_vref;  // Sampled in C806 and buffered and scaled by U815.
-	bool m_fast;  // Fast CV sampling enabled (FAST).
-};
-
-}  // anonymous namespace
-
-DEFINE_DEVICE_TYPE(XPANDER_VOICEBOARD, xpander_voiceboard_device, "xpander_voiceboard", "Xpander voice board")
-
-xpander_voiceboard_device::xpander_voiceboard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, XPANDER_VOICEBOARD, tag, owner, 0)
-	, m_voicecpu(*this, "voicecpu")
-	, m_pit(*this, "pit")
-	, m_voices(*this, "voice_%u", 1U)
-	, m_haltack_cb(*this)
-	, m_haltdis(false)
-	, m_haltreq(false)
-	, m_haltack(false)
-	, m_autodone(true)
-	, m_dac_data(0.0)
-	, m_dac_fine_v(0.0)
-	, m_dac_vref(DEFAULT_DAC_VREF)
-	, m_fast(false)
-{
-}
-
-void xpander_voiceboard_device::device_add_mconfig(machine_config &config)
-{
-	MC6809(config, m_voicecpu, 16_MHz_XTAL / 2);  // 8 MHz
-	m_voicecpu->set_addrmap(AS_PROGRAM, &xpander_voiceboard_device::voicecpu_map);
-
-	PIT8253(config, m_pit);
-	// TODO: Set clk<0>. Connected to "OSC".
-	// Clock inputs 1 and 2 connected to CPU's Q signal, which is 4 times slower
-	// than the XTAL input to the CPU.
-	m_pit->set_clk<1>(16_MHz_XTAL / 2 / 4);  // 2 MHz
-	m_pit->set_clk<2>(16_MHz_XTAL / 2 / 4);  // 2 MHz
-	m_pit->out_handler<0>().set(FUNC(xpander_voiceboard_device::pit_out0_changed));
-	// Output 1 not connected.
-	m_pit->out_handler<2>().set(FUNC(xpander_voiceboard_device::pit_out2_changed));
-
-	for (int i = 0; i < m_voices.size(); ++i)
-		XPANDER_VOICE(config, m_voices[i]);
-}
-
-void xpander_voiceboard_device::device_start()
-{
-	save_item(NAME(m_haltdis));
-	save_item(NAME(m_haltreq));
-	save_item(NAME(m_haltack));
-	save_item(NAME(m_autodone));
-	save_item(NAME(m_dac_data));
-	save_item(NAME(m_dac_fine_v));
-	save_item(NAME(m_dac_vref));
-	save_item(NAME(m_fast));
-}
-
-void xpander_voiceboard_device::voicecpu_map(address_map &map)
-{
-	// Signal names (e.g. LATCH0*) are from the schematic.
-
-	map.unmap_value_high();  // Data bus pulled high by resistors in Voice Board.
-
-	// RAM's /CS connected to A15.
-	map(0x0000, 0x1fff).mirror(0x6000).ram().share("voiceram");  // 1 x 6264 (U917).
-
-	// ROM and port/peripheral decoding done by 1/2 LS139 (U915A).
-
-	// Ports / peripherals enabled when U915 O0 is low AND one of
-	// READ*, WRITE*, TIMER* is low. Additional decoding done by 74LS42 (U918).
-	map(0x8000, 0x8007).mirror(0x03f8).w(FUNC(xpander_voiceboard_device::latch0_w));  // LATCH0*
-	map(0x8400, 0x8407).mirror(0x03f8).w(FUNC(xpander_voiceboard_device::latch1_w));  // LATCH1*
-	map(0x8800, 0x8807).mirror(0x03f8).w(FUNC(xpander_voiceboard_device::latch2_w));  // LATCH2*
-	map(0x8c00, 0x8dff).mirror(0x0200).w(FUNC(xpander_voiceboard_device::dac_w));  // SDAC (inverted by LS04).
-	map(0x9000, 0x9000).mirror(0x03ff).w(FUNC(xpander_voiceboard_device::dataout_w));  // DATAOUT*
-	map(0x9400, 0x9400).mirror(0x03ff).r(FUNC(xpander_voiceboard_device::datain_r));  // DATAIN*
-	map(0x9800, 0x9803).mirror(0x03fc).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));  // TIMER*
-	map(0x9c00, 0x9c00).mirror(0x03ff).unmaprw();  // Unused. U918 output 7 not connected.
-
-	// ROMs only get enabled if BA* is high. I.e. disabled when main CPU has
-	// control of the voice cpu's bus.
-	map(0xa000, 0xffff).rom().region(":voicecpu", 0);  // 3 x 6264 (U909, U912, U914)
-}
-
-void xpander_voiceboard_device::reset_w(int state)
-{
-	const bool reset_voice = state;
-	const bool voice_resetting = (m_voicecpu->input_line_state(INPUT_LINE_RESET) == ASSERT_LINE);
-	if (reset_voice == voice_resetting)
-		return;
-
-	const auto func = timer_expired_delegate(FUNC(xpander_voiceboard_device::deferred_reset_w), this);
-	machine().scheduler().synchronize(func, reset_voice ? 1 : 0);
-}
-
-TIMER_CALLBACK_MEMBER(xpander_voiceboard_device::deferred_reset_w)
-{
-	m_voicecpu->set_input_line(INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
-	LOGMASKED(LOG_CPU_COMMS, "Voice CPU reset line asserted: %d\n", param);
-}
-
-void xpander_voiceboard_device::haltreq_w(int state)
-{
-	const bool haltreq = state;
-	if (haltreq == m_haltreq)
-		return;
-
-	const auto func = timer_expired_delegate(FUNC(xpander_voiceboard_device::deferred_haltreq_w), this);
-	machine().scheduler().synchronize(func, haltreq ? 1 : 0);
-}
-
-TIMER_CALLBACK_MEMBER(xpander_voiceboard_device::deferred_haltreq_w)
-{
-	m_haltreq = param;
-	update_line_halt();
-	LOGMASKED(LOG_CPU_COMMS, "HALTREQ: %d, HALTDIS: %d\n", m_haltreq, m_haltdis);
-}
-
-u8 xpander_voiceboard_device::datain_r()
-{
-	// D0 - AUTODNE*
-	const u8 d0 = m_autodone ? 0 : 1;
-	// D1 - OSC
-	const u8 d1 = 1;  // TODO: Implement.
-	// D2-D7 - Not connected (pulled up).
-	return 0xfc | (d1 << 1) | d0;
-}
-
-void xpander_voiceboard_device::dataout_w(u8 data)
-{
-	// D0 - HALTDS
-	const u8 d0 = BIT(data, 0);
-	if (m_haltdis != d0)
-	{
-		m_haltdis = d0;
-		update_line_halt();
-	}
-	// D1 - AUTOST
-	m_pit->write_gate0(BIT(data, 1));
-	// D2 - PW*
-	// TODO: pit gate2 is actually: PW* | OSC. For now, setting to PW*.
-	m_pit->write_gate2(BIT(data, 2));
-	// TODO: D3 - AUTO*
-	// D4-D5 - Not Connected.
-}
-
-void xpander_voiceboard_device::latch0_w(offs_t offset, u8 data)
-{
-	m_voices[offset]->latch0_w(data);
-}
-
-void xpander_voiceboard_device::latch1_w(offs_t offset, u8 data)
-{
-	m_voices[offset]->latch1_w(data);
-}
-
-void xpander_voiceboard_device::latch2_w(offs_t offset, u8 data)
-{
-	m_voices[offset]->latch2_w(data);
-}
-
-double xpander_voiceboard_device::get_dac_v() const  // Returns output of U812.
-{
-	constexpr u16 MAX_DAC_DATA = (1U << 14) - 1;
-	return -m_dac_data * m_dac_vref / MAX_DAC_DATA;
-}
-
-void xpander_voiceboard_device::dac_enable_w(offs_t offset, u8 data)
-{
-	LOGMASKED(LOG_DAC_VERBOSE, "DAC: %04x: %02x\n", offset, data);
-
-	// Updating the 7 LSBits for the DAC. Bit 0 is ignored.
-	m_dac_data = (m_dac_data & HIGH7_MASK) | (data  >> 1);
-
-	// Determine the DAC reference voltage. The U805 (CD4051) and U814C (CD4053)
-	// MUXes determine the voltage sampled in C806, which is then buffered,
-	// scaled and routed to the DAC VREF input (m_dac_vref).
-	const bool hres = !BIT(offset, 8);  // HRES*
-	if (hres)
-	{
-		// When in high resolution mode (HRES* signal active), the reference
-		// voltage is determined by U805 ("ref mux").
-		const u8 ref_mux_address = (offset >> 4) & 0x07;  // A4-A6.
-		if (ref_mux_address >= 1 && ref_mux_address <= 6)
-		{
-			// Selects the voiceX temperature compensation voltage.
-			m_dac_vref = m_voices[ref_mux_address - 1]->cem3374_tempco_v() * DAC_VREF_SCALER;
-		}
-		else if (ref_mux_address == 7)
-		{
-			m_dac_vref = DEFAULT_DAC_VREF;
-		}
-		// else: ref_mux_address == 0 disconnects the reference voltage.
-		// In that case, the last value sampled in C806 is maintained. So
-		// maintain the value of m_dac_vref.
-	}
-	else
-	{
-		// When HRES* is inactive, U814C (CD4053) will route a fixed reference
-		// voltage to the DAC.
-		m_dac_vref = DEFAULT_DAC_VREF;
-	}
-
-	if (BIT(offset, 7))  // FTSH (fine-tune sample & hold) active.
-	{
-		// No S&H MUXes are selected, because input D on U803 is high.
-		// U814 is activated by FTSH, and samples the DAC voltage in C805/U815 (
-		// m_dac_fine_v). This "fine" voltage will be added to the coarser
-		// voltage in a future DAC write. This mode is used for generating
-		// voltages at a resolution greater than 14 bits.
-		m_dac_fine_v = get_dac_v();
-		return;
-	}
-
-	// FTSH low enables U803 which controls the CV sample & hold circuit that
-	// will get activated (via A1-A6).
-
-	const u8 selected_sh = (offset >> 4) & 0x07;  // A4-A6.
-	if (selected_sh == 0)  // U803 output 0 is not connected.
-		return;
-
-	double dac_v = -RES_K(10) / RES_K(10) * get_dac_v();
-	if (hres)  // Turns on U814.
-	{
-		dac_v += -RES_K(10) / RES_K(30.1) * m_dac_fine_v
-				 -RES_K(10) / RES_K(17.4) * m_dac_vref;
-	}
-
-	const u8 sh_address = (offset >> 1) & 0x07;  // A1-A3.
-	if (selected_sh == 7)
-	{
-		// Updates resonance (RES). In this case, the voice is selected by
-		// `sh_address` (U816). Note that RES is not affected by the FAST*
-		// signal.
-		m_voices[sh_address]->set_res_cv(dac_v);
-	}
-	else
-	{
-		// Voice is selected by `selected_sh` (output of U803). Need a -1
-		// because the first U803 output is not connected. The CV index for
-		// the given voice is selected by `sh_address`.
-		m_voices[selected_sh - 1]->set_cv(sh_address, dac_v, m_fast);
-	}
-}
-
-void xpander_voiceboard_device::dac_clear_w(u8 data)
-{
-	// (1) Clears latch U806. This results in:
-	// - No S&H mux selected (activates output 0 of U803, which is not
-	//   connected to anything)
-	// - S&H address 0 selected, but this is a no-op since no S&H mux is
-	//   selected (see above).
-	// - FTSH (active high) deactivated (set low).
-	// - HRES* (active low) activated (set low).
-	// - Mux U805 activated (by HRES* low), but address 0 selected.
-	//   input 0 is not connected.
-	//   - No active reference voltage to the DAC. Previously used reference
-	//     sampled in C806.
-	// None of the above affect the emulation. They will be set to valid
-	// values on the next invocation to voice_dac_w().
-
-	// (2) Activates latch for the 7 MSBits of the 14-bit DAC.
-	//     D0-D6 used for the 7 MSBits.
-	//     If D7 is set, it will enable fast mode on the next invocation to
-	//     voice_dac_w().
-	m_dac_data = ((u16(data) & LOW7_MASK) << 7) | (m_dac_data & LOW7_MASK);
-	m_fast = BIT(data, 7);
-
-	LOGMASKED(LOG_DAC_VERBOSE, "DAC clear %02x: %04x - %d\n", data, m_dac_data, m_fast);
-}
-
-void xpander_voiceboard_device::dac_w(offs_t offset, u8 data)
-{
-	if (BIT(offset, 0))  // VOICEN*  (A0 high)
-		dac_enable_w(offset, data);
-	else  // CLEAR* (A0 low)
-		dac_clear_w(data);
-}
-
-void xpander_voiceboard_device::pit_out0_changed(int state)
-{
-	// OUT0 -> AUTODNE* -> 74LS04 (inverted) -> GATE1
-	m_autodone = !state;
-	m_pit->write_gate1(state ? 0 : 1);
-	LOGMASKED(LOG_VOICE_TIMER, "PIT timer 0 out: %d\n", state);
-}
-
-void xpander_voiceboard_device::pit_out2_changed(int state)
-{
-	if (state)  // Interrupt triggered on positive transition of output.
-	{
-		// Using HOLD_LINE because there is circuitry that clears the IRQ* line
-		// when the CPU ACks the IRQ (U919 - 74LS74, U911 - 74LS08, using BS and
-		// BA* as inputs).
-		m_voicecpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
-	}
-}
-
-void xpander_voiceboard_device::update_line_halt()
-{
-	bool haltack = false;
-	if (m_haltreq && !m_haltdis)
-	{
-		m_voicecpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-		haltack = true;
-	}
-	else
-	{
-		m_voicecpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		haltack = false;
-	}
-
-	if (haltack != m_haltack)
-	{
-		m_haltack = haltack;
-		m_haltack_cb(m_haltack ? 1 : 0);
-	}
-}
-
-
-namespace {
 
 // Hardware and functionality that is common to the Xpander and Matrix-12.
 class xpander_state_base : public driver_device
@@ -639,11 +120,15 @@ protected:
 	u8 encoder_sw_r();
 	bool memory_protect_r() const;
 
+	static u8 adc_byte(double v);
 	u8 adc_r(offs_t offset);
 	void adc_w(offs_t offset, u8 data);
 
 	void display_w(offs_t offset, u8 data);
 	void display_clear();
+
+	u8 pedal_cv(int pedal) const;
+	bool pedal_connected(int pedal) const;
 
 	u8 selected_cv_in() const { return m_selected_cv_in; }
 	bool inhibit_cv_in() const { return m_inhibit_cv_in; }
@@ -653,6 +138,8 @@ private:
 	void encoder_moved(int encoder);
 	void display_output_w(int display, offs_t offset, u32 data);
 
+	virtual std::pair<double, double> pedal_pull(int pedal) const = 0;
+	virtual u8 gate_inputs() const = 0;
 	virtual u8 cv_in_r() = 0;
 
 	virtual void maincpu_map(address_map &map) ATTR_COLD = 0;
@@ -664,7 +151,8 @@ private:
 	required_device_array<ttl7474_device, 6> m_encoder_changed_ff;
 	required_ioport_array<8> m_switch_io;
 	required_ioport m_memory_protect_io;
-	required_ioport m_gate_io;
+	required_ioport_array<2> m_pedal_io;
+	required_ioport_array<2> m_pedal_type;
 	required_device_array<pwm_display_device, 3> m_vfd_devices;
 	output_finder<3, 40> m_vfd_chars;
 	output_finder<3, 40> m_vfd_lines;
@@ -683,7 +171,8 @@ xpander_state_base::xpander_state_base(const machine_config &mconfig, device_typ
 	, m_encoder_changed_ff(*this, "encoder_changed_flipflop_%u", 1U)
 	, m_switch_io(*this, "switches_%u", 0U)
 	, m_memory_protect_io(*this, "memory_protect")
-	, m_gate_io(*this, "gate_inputs")
+	, m_pedal_io(*this, "pedal_%u", 1U)
+	, m_pedal_type(*this, "pedal_%u_type", 1U)
 	, m_vfd_devices(*this, "vfd_%u", 1U)
 	, m_vfd_chars(*this, "vfd_%u_char_%u", 1U, 1U)
 	, m_vfd_lines(*this, "vfd_%u_line_%u", 1U, 1U)
@@ -695,12 +184,13 @@ xpander_state_base::xpander_state_base(const machine_config &mconfig, device_typ
 
 u8 xpander_state_base::gate_r()  // U23 (74LS244, pot board)
 {
+	const u8 input = gate_inputs();
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_GATE_IN, "Gate: %02x\n", input);
+
 	// All signals inverted by U22 (CA3081, D1-D7) and Q1 (NPN, D0).
 	// TRIGGER (D7) is smoothed by C17 and inverted again by U2 (74LS02).
-	const u8 value = ~m_gate_io->read() ^ 0x80;
-	if (!machine().side_effects_disabled())
-		LOGMASKED(LOG_CV_IN, "Gate: %02x\n", value);
-	return value;
+	return ~input ^ 0x80;
 }
 
 u8 xpander_state_base::switch_r(offs_t offset)  // U16 (74LS42, pot board)
@@ -771,33 +261,43 @@ bool xpander_state_base::memory_protect_r() const
 	return !BIT(m_memory_protect_io->read(), 0);
 }
 
+// Converts a 0-5V double to the byte produced by the ADC.
+u8 xpander_state_base::adc_byte(double v)
+{
+	const double clamped_v = std::clamp(v, 0.0, 5.0);  // ADC input has clamping diodes.
+	const double mapped = std::round(fmaprange(clamped_v, 0.0, 5.0, 0.0, 255.0));
+	return u8(std::clamp(mapped, 0.0, 255.0));
+}
+
 u8 xpander_state_base::adc_r(offs_t offset)
 {
 	// CV* signal mapped to:
 
-	// a) U18 latch on pot board, controls U17 (4051) mux (
+	// a) U20 on Pot Board (ADC0804).
+	const u8 data = m_adc->read();
+
+	// b) U18 latch on pot board, controls U17 (4051) mux (
 	//    A0-A2 -> A-C, A3 -> INH).
 	if (!machine().side_effects_disabled())
 	{
 		m_selected_cv_in = offset & 0x07;
 		m_inhibit_cv_in = offset & 0x08;
+
+		LOGMASKED(LOG_CV_IN, "ADC Read: %02x - %02x\n", offset, data);
 	}
 
-	// b) U20 on Pot Board (ADC0804).
-	const u8 data = m_adc->read();
-	LOGMASKED(LOG_CV_IN, "ADC Read: %02x - %02x\n", offset, data);
 	return data;
 }
 
 void xpander_state_base::adc_w(offs_t offset, u8 data)
 {
-	LOGMASKED(LOG_CV_IN, "ADC Write: %02x - %02x\n", offset, data);
 	// CV* signal mapped to:
 	// a) U18 latch on pot board, controls U17 (4051) mux (A0-A2 -> A-C, A3 -> INH).
 	m_selected_cv_in = offset & 0x07;
 	m_inhibit_cv_in = offset & 0x08;
 	// b) U20 on Pot Board (ADC0804).
 	m_adc->write(data);
+	LOGMASKED(LOG_CV_IN, "ADC Write: %02x - %02x\n", offset, data);
 }
 
 void xpander_state_base::display_w(offs_t offset, u8 data)
@@ -863,6 +363,92 @@ void xpander_state_base::display_output_w(int display, offs_t offset, u32 data)
 	// Map the 16 segments of the FG405A2 to a `led14seg` and a line.
 	m_vfd_chars[display][offset] = bitswap<15>(data, 1, 3, 6, 5, 4, 2, 7, 12, 11, 10, 13, 15, 14, 9, 8);
 	m_vfd_lines[display][offset] = BIT(data, 0);
+}
+
+// The Xpander and Matrix-12 support multiple types of pedals.
+enum pedal_type
+{
+	PEDAL_TYPE_NC = 0,            // Not connected.
+
+	// Continuous (aka analog) pedals:
+	PEDAL_TYPE_CONT_ACTIVE_NEG,   // Voltage source, negative polarity (0V is max).
+	PEDAL_TYPE_CONT_ACTIVE_POS,   // Voltage source, positive polarity (+5V is max).
+	PEDAL_TYPE_CONT_PASSIVE_NEG,  // 47KOhm potentiometer, negative polarity (pressing decreases resistance).
+	PEDAL_TYPE_CONT_PASSIVE_POS,  // 47KOhm Potentiometer, positive polarity (pressing increase resistance).
+
+	// Switch pedals:
+	PEDAL_TYPE_SW_NEG,            // Powered or unpowered switch, active low. 0/5V if powered.
+	PEDAL_TYPE_SW_ACTIVE_POS,     // Powered switch, active high, 0/5V.
+};
+
+u8 xpander_state_base::pedal_cv(int pedal) const
+{
+	// According to the owner's manual, active pedals should output voltages
+	// between 0 and 5V.
+	constexpr double VMAX_PEDAL = 5;
+	// According to the owner's manual, passive (resistive) pedals should be
+	// 47 KOhm linear potentiometers.
+	constexpr double R_PEDAL = RES_K(47);
+	constexpr double R_VPLUS = RES_K(62);  // R78, R77
+
+	const u8 pedal_type = m_pedal_type[pedal]->read();
+	const double value = map_port_range(m_pedal_io[pedal], 0, 1);
+
+	double cv = 0;
+	switch (pedal_type)
+	{
+		case PEDAL_TYPE_NC:
+		{
+			const auto [v_pull, r_pull] = pedal_pull(pedal);
+			cv = v_pull + (VPLUS - v_pull) * RES_VOLTAGE_DIVIDER(R_VPLUS, r_pull);
+			break;
+		}
+		case PEDAL_TYPE_CONT_ACTIVE_NEG:
+		{
+			cv = VMAX_PEDAL * (1.0 - value);
+			break;
+		}
+		case PEDAL_TYPE_CONT_ACTIVE_POS:
+		{
+			cv = VMAX_PEDAL * value;
+			break;
+		}
+		case PEDAL_TYPE_CONT_PASSIVE_NEG:
+		{
+			cv = VPLUS * RES_VOLTAGE_DIVIDER(R_VPLUS, R_PEDAL * (1.0 - value));
+			break;
+		}
+		case PEDAL_TYPE_CONT_PASSIVE_POS:
+		{
+			cv = VPLUS * RES_VOLTAGE_DIVIDER(R_VPLUS, R_PEDAL * value);
+			break;
+		}
+		case PEDAL_TYPE_SW_NEG:
+		{
+			cv = (value >= 0.5) ? 0.0 : VMAX_PEDAL;
+			break;
+		}
+		case PEDAL_TYPE_SW_ACTIVE_POS:
+		{
+			cv = (value >= 0.5) ? VMAX_PEDAL : 0.0;
+			break;
+		}
+		default:
+		{
+			assert(false);
+			break;
+		}
+	}
+
+	const u8 adc_value = adc_byte(cv);
+	LOGMASKED(LOG_CV_IN, "Pedal %d, type: %d, input: %f, V: %f, ADC value: %u\n",
+			  pedal, pedal_type, value, cv, adc_value);
+	return adc_value;
+}
+
+bool xpander_state_base::pedal_connected(int pedal) const
+{
+	return m_pedal_type[pedal]->read() != PEDAL_TYPE_NC;
 }
 
 void xpander_state_base::machine_start()
@@ -956,22 +542,29 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(firq_timer_elapsed);
 	void firq_timer_preset_w(u8 data);
 
+	std::pair<double, double> pedal_pull(int pedal) const override;
+	u8 gate_inputs() const override;
+
 	u8 cv_in_r() override;
 	u8 datain_r();
+
+	void pull_w(u8 data);
 
 	void update_banking();
 
 	void maincpu_map(address_map &map) override ATTR_COLD;
 
-	required_device<xpander_voiceboard_device> m_voiceboard;
+	required_device<xpandervb_device> m_voiceboard;
 	required_shared_ptr<u8> m_voiceram;
 	required_device<timer_device> m_firq_timer;
 	memory_view m_ram01_view;
 	memory_view m_rom0_view;
+	required_ioport m_gate_io;
+	required_ioport m_gate_config;
 	required_ioport_array<6> m_cv_io;
-	required_ioport_array<2> m_pedal_io;
 
 	u8 m_firq_timer_preset;
+	u8 m_pull;
 };
 
 xpander_state::xpander_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -981,9 +574,11 @@ xpander_state::xpander_state(const machine_config &mconfig, device_type type, co
 	, m_firq_timer(*this, "firq_timer")
 	, m_ram01_view(*this, "ram01_view")
 	, m_rom0_view(*this, "rom0_view")
+	, m_gate_io(*this, "gate_inputs")
+	, m_gate_config(*this, "gate_config")
 	, m_cv_io(*this, "cv_in_%u", 1U)
-	, m_pedal_io(*this, "pedal_%u", 1U)
 	, m_firq_timer_preset(0xff)  // Pulled high.
+	, m_pull(0x00)
 {
 }
 
@@ -1033,19 +628,38 @@ void xpander_state::firq_timer_preset_w(u8 data)
 	LOGMASKED(LOG_FIRQ_TIMER, "FIRQ Timer Preset: %02x\n", data);
 }
 
+std::pair<double, double> xpander_state::pedal_pull(int pedal) const
+{
+	assert(pedal == 0 || pedal == 1);
+	constexpr double R_PULL[2] = { RES_K(47), RES_K(47) };  // R75, R76
+	return std::make_pair(/*GND*/0, R_PULL[pedal]);
+}
+
+u8 xpander_state::gate_inputs() const
+{
+	const u8 connected = (m_gate_config->read() >> 8) & 0xff;
+	const u8 polarity = m_gate_config->read() & 0xff;
+	const u8 active = m_gate_io->read();
+
+	// Connected inputs need their polarity taken into account.
+	// Disconnected inputs will assume the corresponding values in m_pull, which
+	// is configured by the firmware.
+	return (connected & (active ^ ~polarity)) | (~connected & m_pull);
+}
+
 u8 xpander_state::cv_in_r()  // U17 (CD4051, pot board) + U18 (74LS174, pot board)
 {
 	const u8 cv_index = selected_cv_in();
 	assert(cv_index >= 0 && cv_index < 8);
 
 	if (inhibit_cv_in())
-		return 0;
+		return 0;  // Floating ADC input.
 
 	u8 cv = 0;
 	if (cv_index < 6)
-		cv = m_cv_io[cv_index]->read();
+		cv = adc_byte(map_port_range(m_cv_io[cv_index], 0, 5));
 	else
-		cv = m_pedal_io[cv_index - 6]->read();
+		cv = pedal_cv(cv_index - 6);
 
 	LOGMASKED(LOG_CV_IN, "CV in: %02x - %02x\n", cv_index, cv);
 	return cv;
@@ -1069,6 +683,12 @@ u8 xpander_state::datain_r()  // U15 (74LS367, processor board)
 	return d_unused | (d2 << 2) | (d1 << 1) | (d0 << 0);
 }
 
+void xpander_state::pull_w(u8 data)  // U21 (74HC374, pot board), CLK <- PULL*
+{
+	// Chain Advance input (bit 6) is always pulled high.
+	m_pull = (BIT(data, 6) << 7) | (1 << 6) | BIT(data, 0, 6);
+}
+
 void xpander_state::update_banking()
 {
 	m_ram01_view.select(memory_protect_r() ? 1 : 0);
@@ -1083,6 +703,7 @@ void xpander_state::machine_start()
 	xpander_state_base::machine_start();
 	firq_timer_elapsed(*m_firq_timer, m_firq_timer_preset);  // Reset the timer.
 	save_item(NAME(m_firq_timer_preset));
+	save_item(NAME(m_pull));
 }
 
 void xpander_state::machine_reset()
@@ -1125,7 +746,7 @@ void xpander_state::maincpu_map(address_map &map)
 	map(0x7c40, 0x7c40).mirror(0x023f).r(FUNC(xpander_state::encoder_sw_r));  // U15-O1: SW*
 	map(0x7c80, 0x7c80).mirror(0x023f).w("latch_led1", FUNC(output_latch_device::write));  // U15-O2: LED1*
 	map(0x7cc0, 0x7cc0).mirror(0x023f).r(FUNC(xpander_state::gate_r));  // U15-O3: GATE*
-	map(0x7d00, 0x7d00).mirror(0x023f).w("latch_pull", FUNC(output_latch_device::write));  // U15-O4: PULL*
+	map(0x7d00, 0x7d00).mirror(0x023f).w(FUNC(xpander_state::pull_w));  // U15-O4: PULL*
 	map(0x7d40, 0x7d47).mirror(0x0238).r(FUNC(xpander_state::switch_r));  // U15-O5: SWITCH*
 	map(0x7d80, 0x7d8f).mirror(0x0230).rw(FUNC(xpander_state::adc_r), FUNC(xpander_state::adc_w));  // U15-O6: CV*
 	map(0x7dc0, 0x7dc0).mirror(0x023f).unmaprw();  // U15-O7: not connected
@@ -1154,25 +775,14 @@ void xpander_state::xpander(machine_config &config)
 
 	// U25 (74LS374), CLK <- HALTSET*
 	auto &haltset = OUTPUT_LATCH(config, "latch_haltset");
-	haltset.bit_handler<0>().set(m_voiceboard, FUNC(xpander_voiceboard_device::haltreq_w)).invert();  // HALTREQ0*
+	haltset.bit_handler<0>().set(m_voiceboard, FUNC(xpandervb_device::haltreq_w)).invert();  // HALTREQ0*
 	// Bits 1-3: HALTREQ1*-HALTREQ3*, not connected.
 	// HALTREQ[1-3]* are not used in the production Xpander. They are probably
 	// there to support different voice board configurations.
-	haltset.bit_handler<4>().set(m_voiceboard, FUNC(xpander_voiceboard_device::reset_w)).invert();  // RES*
+	haltset.bit_handler<4>().set(m_voiceboard, FUNC(xpandervb_device::reset_w)).invert();  // RES*
 	haltset.bit_handler<5>().set_output("cassmute").invert();  // CASSMUTE*
 	// Bit 6 not connected.
 	haltset.bit_handler<7>().set_output("cassout");  // CASSOUT
-
-	// U21 (74HC374), CLK <- PULL*
-	auto &pull = OUTPUT_LATCH(config, "latch_pull");
-	pull.bit_handler<0>().set_output("pull_1");  // Default for GATE 1
-	pull.bit_handler<1>().set_output("pull_2");  // Default for GATE 2
-	pull.bit_handler<2>().set_output("pull_3");  // Default for GATE 3
-	pull.bit_handler<3>().set_output("pull_4");  // Default for GATE 4
-	pull.bit_handler<4>().set_output("pull_5");  // Default for GATE 5
-	pull.bit_handler<5>().set_output("pull_6");  // Default for GATE 6
-	pull.bit_handler<6>().set_output("pull_7");  // Default for TRIGGER
-	// Bit 7 not connected.
 
 	config.set_default_layout(layout_oberheim_xpander);
 }
@@ -1186,31 +796,47 @@ public:
 
 	void matrix12(machine_config &config) ATTR_COLD;
 
-	template<int Which> int pedal_sw_r() const;
-
 protected:
 	void machine_start() override ATTR_COLD;
 	void machine_reset() override ATTR_COLD;
 
 private:
+	std::pair<double, double> pedal_pull(int pedal) const override;
+	u8 gate_inputs() const override;
+	u8 kbd_pressure_cv() const;
+
 	u8 cv_in_r() override;
 	u8 datain_r();
 
 	void voiceboard_reset_w(int state);
 	void banksel_w(int state);
 
+	void lset_w(u8 data);
+	TIMER_DEVICE_CALLBACK_MEMBER(lever_1_timer_elapsed);
+	TIMER_DEVICE_CALLBACK_MEMBER(lever_2_timer_elapsed);
+
 	void pit_out2_changed(int state);
 	void update_banking();
 
 	void maincpu_map(address_map &map) override ATTR_COLD;
 
-	required_device_array<xpander_voiceboard_device, 2> m_voiceboard;
+	required_device_array<xpandervb_device, 2> m_voiceboard;
 	required_shared_ptr_array<u8, 2> m_voiceram;
 	memory_view m_mem_view;
 	memory_view m_voiceram_view;
-	required_ioport_array<2> m_pedal_io;
+	required_device<matrix12_kbd_device> m_kbd;
+	required_device<pit8253_device> m_pit;
+	required_device_array<timer_device, 2> m_lever_timer;
+	required_ioport_array<2> m_lever;
+	required_ioport m_gate_io;
+	required_ioport m_gate_config;
+	required_ioport m_pressure;
+	required_ioport m_pressure_scale;
+	required_ioport m_pressure_offset;
 
 	bool m_bsel;  // Bank select.
+	bool m_pull_trigger;
+	std::array<bool, 2> m_pull_pedal;
 };
 
 matrix12_state::matrix12_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -1219,22 +845,87 @@ matrix12_state::matrix12_state(const machine_config &mconfig, device_type type, 
 	, m_voiceram(*this, "voiceboard_%u:voiceram", 0U)
 	, m_mem_view(*this, "mem_view")
 	, m_voiceram_view(*this, "voiceram_view")
-	, m_pedal_io(*this, "pedal_%u", 1U)
+	, m_kbd(*this, "kbd")
+	, m_pit(*this, "pit")
+	, m_lever_timer(*this, "lever_%u_timer", 1U)
+	, m_lever(*this, "lever_%u", 1U)
+	, m_gate_io(*this, "gate_inputs")
+	, m_gate_config(*this, "gate_config")
+	, m_pressure(*this, "pressure")
+	, m_pressure_scale(*this, "trimmer_pressure_scale")
+	, m_pressure_offset(*this, "trimmer_pressure_offset")
 	, m_bsel(false)
+	, m_pull_trigger(false)
+	, m_pull_pedal({false, false})
 {
 }
 
-// The Matrix-12 supports multiple types of pedals, and their state is read
-// both: as potentiometer (via the ADC, see cv_in_r()) and as an on/off switch
-// (see pedal_sw_r()). TODO: emulate all pedal types supported by the Matrix-12.
-
-template<int Which> int matrix12_state::pedal_sw_r() const
+std::pair<double, double> matrix12_state::pedal_pull(int pedal) const
 {
-	static_assert(Which == 0 || Which == 1);
-	if (m_pedal_io[Which]->read() > m_pedal_io[Which]->field(1)->maxval() / 2)
-		return 1;
-	else
-		return 0;
+	assert(pedal == 0 || pedal == 1);
+	const double v_pull = m_pull_pedal[pedal] ? 5.0 : 0.0;
+	constexpr double R_PULL[2] = { RES_K(100), RES_K(100) };  // R61, R62
+	return std::make_pair(v_pull, R_PULL[pedal]);
+}
+
+u8 matrix12_state::gate_inputs() const
+{
+	const u8 config = m_gate_config->read();
+	const u8 input = m_gate_io->read();
+
+	// When a pedal is connected, pedalXin will get disconnected from the
+	// ADC input circuit and assume the value of the firmware-configured pull.
+	// When a pedal is disconnected, pedalXin will be connected to the ADC
+	// input circuit, and it will evaluate to a logical 1 regardless of the pull
+	// state.
+	const u8 pedal1in = pedal_connected(0) ? (m_pull_pedal[0] ? 1 : 0) : 1;
+	const u8 pedal2in = pedal_connected(1) ? (m_pull_pedal[1] ? 1 : 0) : 1;
+
+	const u8 chain_adv = BIT(config, 0) ? BIT(input, 0) : 1;
+
+	u8 trigger = m_pull_trigger ? 1 : 0;  // Value when trigger input is disconnected.
+	if (BIT(config, 2))  // Trigger input connected?
+	{
+		trigger = BIT(input, 1);
+		if (!BIT(config, 1))  // Inverse polarity?
+			trigger ^= 1;
+	}
+
+	return (trigger << 7) | (chain_adv << 6) | (pedal2in << 5) | (pedal1in << 4);
+}
+
+u8 matrix12_state::kbd_pressure_cv() const
+{
+	// Schematic: Matrix-12 processor board, sheet 2 of 4.
+
+	// Keyboard pressure (aka aftertouch) is measured by a force-sensitive
+	// resistor (FSR). Pressure is measured for the entire keyboard, not for
+	// each individual key.
+
+	constexpr double T1_MAX = RES_K(1);  // scale trimmer
+	constexpr double T2_MAX = RES_K(100);  // offset trimmer
+
+	const double r_scale = map_port_range(m_pressure_scale, 0, T1_MAX);
+	const double r_offset = map_port_range(m_pressure_offset, 0, T2_MAX);
+
+	// The exact min and max values of the FSR are not known. The values below
+	// were chosen to make the trimmers useful, so hopefully they are not too
+	// far off the real ones.
+	constexpr double R_PRESS_MIN = RES_K(5);
+	constexpr double R_PRESS_MAX = RES_K(500);
+
+	// Applying a bit of pressure should rapidly reduce resistance. Modeling that
+	// with an audio pot response.
+	const double press_response = RES_AUDIO_POT_LAW(map_port_range(m_pressure, 1, 0));
+	const double r_press = fmaprange(press_response, 0.0, 1.0, R_PRESS_MIN, R_PRESS_MAX);
+
+	// See circuit surrounding U23 (TL081).
+	const double i_in = VPLUS / (r_offset + RES_K(470)) + VMINUS / (r_press + RES_R(470));  // R20, R21
+	const double v_out = -(RES_K(1.5) + r_scale) * i_in;  // R17
+	const u8 cv = adc_byte(v_out);
+
+	LOGMASKED(LOG_CV_IN, "Pressure %f, %f, %u\n", r_press, v_out, cv);
+	return cv;
 }
 
 u8 matrix12_state::cv_in_r()  // U17 (CD4051, pot board) + U18 (74LS174, pot board)
@@ -1242,14 +933,15 @@ u8 matrix12_state::cv_in_r()  // U17 (CD4051, pot board) + U18 (74LS174, pot boa
 	const u8 cv_index = selected_cv_in();
 	assert(cv_index >= 0 && cv_index < 8);
 	if (inhibit_cv_in())
-		return 0;
+		return 0;  // Floating ADC input.
 
 	u8 cv = 0;
 	switch (cv_index)
 	{
-		case 0: break;  // Pressure sensor. TODO: implement.
-		case 6: cv = m_pedal_io[0]->read(); break;
-		case 7: cv = m_pedal_io[1]->read(); break;
+		case 0: cv = kbd_pressure_cv(); break;
+		case 6: cv = pedal_cv(0); break;
+		case 7: cv = pedal_cv(1); break;
+		default: cv = 0; break;  // Floating ADC input.
 	}
 
 	LOGMASKED(LOG_CV_IN, "CV in: %02x - %02x\n", cv_index, cv);
@@ -1268,7 +960,7 @@ u8 matrix12_state::datain_r()  // U50 (74LS367, processor board)
 	const u8 d2 = 1;  // TODO: implement.
 
 	// D7 - DOR*
-	const u8 d7 = 1;  // TODO: implement.
+	const u8 d7 = m_kbd->dor_neg_r();
 
 	// Buffer inputs for D3 and D4 not connected. Will likely resolve to 1.
 	// D5 and D6 not connected to buffer. Data bus pulled high.
@@ -1287,6 +979,54 @@ void matrix12_state::banksel_w(int state)
 {
 	m_bsel = state;
 	update_banking();
+}
+
+void matrix12_state::lset_w(u8 data)
+{
+	// Each resistive lever is part of a one-shot RC circuit (74LS221). Strobing
+	// LSET* triggers the two one-shots. Their output pulse time, measured by
+	// an 8253, will depend on the position of the levers.
+
+	for (int i = 0; i < 2; ++i)
+	{
+		if (m_lever_timer[i]->remaining().is_never())  // No timing is in progress.
+		{
+			// The 2 levers are 10KOhm potentiometers, centered at 5K. According
+			// to repair info online, the motion range of the lever is ~2K, so
+			// it takes values of 4K-6K.
+			const double r_lever = map_port_range(m_lever[i], RES_K(6), RES_K(4));
+
+			constexpr double c_ext = CAP_U(0.22);  // C46, C45
+			const double r_ext = r_lever + RES_R(220);  // R39, R40
+			const double t = 0.7 * c_ext * r_ext;  // 74LS221 timing formula.
+			m_lever_timer[i]->adjust(attotime::from_double(t));
+
+			if (i == 0)
+				m_pit->write_gate0(1);
+			else if (i == 1)
+				m_pit->write_gate1(1);
+			else
+				assert(false);
+
+			LOGMASKED(LOG_LEVER, "Lever %d: %f, %f\n", i, r_lever, t);
+		}
+		else
+		{
+			// If a timing is already in progress, the 74LS221 ignores
+			// additional triggers.
+			LOGMASKED(LOG_LEVER, "Lever %d: timing still in progress\n");
+		}
+	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(matrix12_state::lever_1_timer_elapsed)
+{
+	m_pit->write_gate0(0);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(matrix12_state::lever_2_timer_elapsed)
+{
+	m_pit->write_gate1(0);
 }
 
 void matrix12_state::pit_out2_changed(int state)
@@ -1331,6 +1071,8 @@ void matrix12_state::machine_start()
 {
 	xpander_state_base::machine_start();
 	save_item(NAME(m_bsel));
+	save_item(NAME(m_pull_trigger));
+	save_item(NAME(m_pull_pedal));
 }
 
 void matrix12_state::machine_reset()
@@ -1354,17 +1096,18 @@ void matrix12_state::maincpu_map(address_map &map)
 	map(0x0000, 0x3fff).ram().share("ram01");  // U40A-O[0-1]: BRAM0*, BRAM1*
 
 	// U40A-02: I/O* -> U40B (74LS139) when A12=0.
-	map(0x4000, 0x4fff).nopr();  // U40B-O[0, 1]: KBD0*, KBD1*  // TODO: implement.
+	map(0x4000, 0x4001).mirror(0x0ffc).r(m_kbd, FUNC(matrix12_kbd_device::kbd0_r));  // U40B-O0: KBD0*
+	map(0x4002, 0x4003).mirror(0x0ffc).r(m_kbd, FUNC(matrix12_kbd_device::kbd1_r));  // U40B-O1: KBD1*
 
 	// U40A-02: I/O* -> U41 (74LS138) when A12=1.
 	map(0x5000, 0x51ff).w(FUNC(matrix12_state::display_w)); // U41-O0: DISP* and DISPCLR*
-	map(0x5200, 0x5203).mirror(0x01fc).rw("pit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));  // U41-O1: INTSET*
+	map(0x5200, 0x5203).mirror(0x01fc).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));  // U41-O1: INTSET*
 	map(0x5400, 0x5400).mirror(0x01ff).w("latch_haltset", FUNC(output_latch_device::write));  // U41-O2: HALTSET*
 	// ACIA addressing: RS <- A0, CS1 <- A1, CS0 <- A2, /CS2 <- UART*.
 	map(0x5606, 0x5607).mirror(0x01f8).rw("midiacia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));  // U41-O3: UART*
 	map(0x5800, 0x5800).mirror(0x01ff).r(FUNC(matrix12_state::datain_r));  // U41-O4: DATAIN*
 	map(0x5a00, 0x5a00).mirror(0x01ff).w("latch_led2", FUNC(output_latch_device::write));  // U41-O5: LED2*
-	map(0x5c00, 0x5dff).nopw();  // U41-O6: LSET*  // TODO: implement.
+	map(0x5c00, 0x5c00).mirror(0x01ff).w(FUNC(matrix12_state::lset_w));  // U41-O6: LSET*
 
 	// U41-O7: BEN* -> U15 (74LS42, on pot board)
 	map(0x5e00, 0x5e00).mirror(0x003f).r(FUNC(matrix12_state::encoder_dir_r));  // U15-O0: DIR*
@@ -1411,11 +1154,18 @@ void matrix12_state::matrix12(machine_config &config)
 	NVRAM(config, "ram01", nvram_device::DEFAULT_ALL_0);  // U4, U3 (6264)
 	NVRAM(config, "ram23", nvram_device::DEFAULT_ALL_0);  // U2, U1 (6264)
 
-	auto &pit = PIT8253(config, "pit");  // U31
-	pit.set_clk<0>(16_MHz_XTAL / 8);  // 2 MHz
-	pit.set_clk<1>(16_MHz_XTAL / 8);  // 2 MHz
-	pit.set_clk<2>(16_MHz_XTAL / 8);  // 2 MHz
-	pit.out_handler<2>().set(FUNC(matrix12_state::pit_out2_changed));
+	TIMER(config, m_lever_timer[0])  // U49A (74LS221)
+		.configure_generic(FUNC(matrix12_state::lever_1_timer_elapsed));
+	TIMER(config, m_lever_timer[1])  // U49B (74LS221)
+		.configure_generic(FUNC(matrix12_state::lever_2_timer_elapsed));
+
+	PIT8253(config, m_pit);  // U31
+	m_pit->set_clk<0>(16_MHz_XTAL / 8);  // 2 MHz
+	m_pit->set_clk<1>(16_MHz_XTAL / 8);  // 2 MHz
+	m_pit->set_clk<2>(16_MHz_XTAL / 8);  // 2 MHz
+	m_pit->out_handler<2>().set(FUNC(matrix12_state::pit_out2_changed));
+
+	MATRIX12_KBD(config, m_kbd, 16_MHz_XTAL / 16);  // 1 MHz
 
 	for (int i = 0; i < m_voiceboard.size(); ++i)
 	{
@@ -1425,10 +1175,10 @@ void matrix12_state::matrix12(machine_config &config)
 
 	// U33 (74LS374), /CLK <- HALTSET*
 	auto &haltset = OUTPUT_LATCH(config, "latch_haltset");
-	haltset.bit_handler<0>().set(m_voiceboard[0], FUNC(xpander_voiceboard_device::haltreq_w)).invert();  // HALTREQ0*
-	haltset.bit_handler<1>().set(m_voiceboard[1], FUNC(xpander_voiceboard_device::haltreq_w)).invert();  // HALTREQ1*
+	haltset.bit_handler<0>().set(m_voiceboard[0], FUNC(xpandervb_device::haltreq_w)).invert();  // HALTREQ0*
+	haltset.bit_handler<1>().set(m_voiceboard[1], FUNC(xpandervb_device::haltreq_w)).invert();  // HALTREQ1*
 	// Bit 2 not connected.
-	haltset.bit_handler<3>().set_output("kbdclr");  // KBDCLR
+	haltset.bit_handler<3>().set(m_kbd, FUNC(matrix12_kbd_device::kbdclr_w));  // KBDCLR
 	haltset.bit_handler<4>().set(FUNC(matrix12_state::voiceboard_reset_w)).invert();  // RES*
 	haltset.bit_handler<5>().set_output("cassmute").invert();  // CASSMUTE*
 	haltset.bit_handler<6>().set(FUNC(matrix12_state::banksel_w)).invert();  // BSEL*
@@ -1436,12 +1186,12 @@ void matrix12_state::matrix12(machine_config &config)
 
 	// U21 (74LS374, pot board) <- /CLK <- PULL*
 	auto &pull = OUTPUT_LATCH(config, "latch_pull");
-	pull.bit_handler<0>().set_output("led_voices_1_6");
-	pull.bit_handler<1>().set_output("led_voices_7_12");
+	pull.bit_handler<0>().set_output("led_voices_1_6").invert();
+	pull.bit_handler<1>().set_output("led_voices_7_12").invert();
 	// Bits 2 and 3 not connected.
-	pull.bit_handler<4>().set_output("pull_5");  // PULL5, default for PED1IN.
-	pull.bit_handler<5>().set_output("pull_6");  // PULL6, default for PED2IN.
-	pull.bit_handler<6>().set_output("pull_7");  // Default for TRIGGER
+	pull.bit_handler<4>().set([this] (int state) { m_pull_pedal[0] = state; });  // PULL5
+	pull.bit_handler<5>().set([this] (int state) { m_pull_pedal[1] = state; });  // PULL6
+	pull.bit_handler<6>().set([this] (int state) { m_pull_trigger = state; });  // PULL7
 	// Bit 7 not connected.
 
 	config.set_default_layout(layout_oberheim_matrix12);
@@ -1529,10 +1279,35 @@ INPUT_PORTS_START(xpander_base)
 	PORT_ADJUSTER(90, "VOLUME")
 
 	PORT_START("pedal_1")
-	PORT_BIT(0xff, 0x00, IPT_PEDAL1) PORT_SENSITIVITY(30)
+	PORT_BIT(0xff, 0x00, IPT_PEDAL1) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
 
 	PORT_START("pedal_2")
-	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_SENSITIVITY(30)
+	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
+
+	// The Xpander and Matrix-12 support multiple pedal types. Look for
+	// "enum pedal_type" for info on the different types. As with the real synth,
+	// the polarity of the connected pedal should match the polarity configured
+	// in the synth's menu, for things to work correctly.
+
+	PORT_START("pedal_1_type")  // Pedal 1 is normally the volume pedal (continuous).
+	PORT_CONFNAME(0x07, PEDAL_TYPE_CONT_PASSIVE_POS, "PEDAL 1 TYPE")
+	PORT_CONFSETTING(PEDAL_TYPE_NC, "NOT CONNECTED")
+	PORT_CONFSETTING(PEDAL_TYPE_CONT_ACTIVE_NEG, "VOLTAGE -")
+	PORT_CONFSETTING(PEDAL_TYPE_CONT_ACTIVE_POS, "VOLTAGE +")
+	PORT_CONFSETTING(PEDAL_TYPE_CONT_PASSIVE_NEG, "RESISTANCE -")
+	PORT_CONFSETTING(PEDAL_TYPE_CONT_PASSIVE_POS, "RESISTANCE +")
+	PORT_CONFSETTING(PEDAL_TYPE_SW_NEG, "SWITCH -")
+	PORT_CONFSETTING(PEDAL_TYPE_SW_ACTIVE_POS, "SWITCH +")
+
+	PORT_START("pedal_2_type")  // Pedal 2 is normally the sustain pedal (switch).
+	PORT_CONFNAME(0x07, PEDAL_TYPE_SW_NEG, "PEDAL 2 TYPE")
+	PORT_CONFSETTING(PEDAL_TYPE_NC, "NOT CONNECTED")
+	PORT_CONFSETTING(PEDAL_TYPE_CONT_ACTIVE_NEG, "VOLTAGE -")
+	PORT_CONFSETTING(PEDAL_TYPE_CONT_ACTIVE_POS, "VOLTAGE +")
+	PORT_CONFSETTING(PEDAL_TYPE_CONT_PASSIVE_NEG, "RESISTANCE -")
+	PORT_CONFSETTING(PEDAL_TYPE_CONT_PASSIVE_POS, "RESISTANCE +")
+	PORT_CONFSETTING(PEDAL_TYPE_SW_NEG, "SWITCH -")
+	PORT_CONFSETTING(PEDAL_TYPE_SW_ACTIVE_POS, "SWITCH +")
 
 	// All rotary encoders are LA226.
 
@@ -1595,36 +1370,71 @@ INPUT_PORTS_START(xpander)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED)  // No switch. Pulled up.
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)  // No switch. Pulled up.
 
-	// These inputs (except "chain advance") can be configured as active low or
-	// active high. This is controlled by the "PULL" signals (search for
-	// "latch_pull"). Modeling as active low for now.
 	PORT_START("gate_inputs")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("GATE 1")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("GATE 2")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("GATE 3")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("GATE 4")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("GATE 5")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("GATE 6")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("CHAIN ADVANCE")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("TRIGGER")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("GATE 1") PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("GATE 2")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("GATE 3")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("GATE 4")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("GATE 5")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("GATE 6")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("CHAIN ADVANCE")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TRIGGER") PORT_CODE(KEYCODE_T)
+
+	// The polarity of the Gate inputs (except "chain advance") can be specified
+	// via the "master" menu on the synth. The configuration below controls the
+	// polarity of what is actually connected to those inputs. As with the real
+	// synth, the settings on the synth need to match what's actually connected
+	// for things to work correctly.
+	PORT_START("gate_config")
+	PORT_CONFNAME(0x0101, 0x0101, "GATE 1")
+	PORT_CONFSETTING(0x0000, "NOT CONNECTED")
+	PORT_CONFSETTING(0x0100, "- POLARITY")  // active low
+	PORT_CONFSETTING(0x0101, "+ POLARITY")  // active high
+	PORT_CONFNAME(0x0202, 0x0202, "GATE 2")
+	PORT_CONFSETTING(0x0000, "NOT CONNECTED")
+	PORT_CONFSETTING(0x0200, "- POLARITY")
+	PORT_CONFSETTING(0x0202, "+ POLARITY")
+	PORT_CONFNAME(0x0404, 0x0404, "GATE 3")
+	PORT_CONFSETTING(0x0000, "NOT CONNECTED")
+	PORT_CONFSETTING(0x0400, "- POLARITY")
+	PORT_CONFSETTING(0x0404, "+ POLARITY")
+	PORT_CONFNAME(0x0808, 0x0808, "GATE 4")
+	PORT_CONFSETTING(0x0000, "NOT CONNECTED")
+	PORT_CONFSETTING(0x0800, "- POLARITY")
+	PORT_CONFSETTING(0x0808, "+ POLARITY")
+	PORT_CONFNAME(0x1010, 0x1010, "GATE 5")
+	PORT_CONFSETTING(0x0000, "NOT CONNECTED")
+	PORT_CONFSETTING(0x1000, "- POLARITY")
+	PORT_CONFSETTING(0x1010, "+ POLARITY")
+	PORT_CONFNAME(0x2020, 0x2020, "GATE 6")
+	PORT_CONFSETTING(0x0000, "NOT CONNECTED")
+	PORT_CONFSETTING(0x2000, "- POLARITY")
+	PORT_CONFSETTING(0x2020, "+ POLARITY")
+	PORT_CONFNAME(0x4040, 0x4000, "CHAIN ADVANCE")
+	PORT_CONFSETTING(0x0000, "NOT CONNECTED")
+	PORT_CONFSETTING(0x4000, "CONNECTED")  // Chain Advance switch is always active low (- polarity).
+	PORT_CONFNAME(0x8080, 0x8080, "TRIGGER")
+	PORT_CONFSETTING(0x0000, "NOT CONNECTED")
+	PORT_CONFSETTING(0x8000, "- POLARITY")
+	PORT_CONFSETTING(0x8080, "+ POLARITY")
 
 	PORT_START("cv_in_1")
-	PORT_BIT(0xff, 0x00, IPT_DIAL) PORT_SENSITIVITY(30)
+	PORT_ADJUSTER(0, "CV 1")
 
 	PORT_START("cv_in_2")
-	PORT_BIT(0xff, 0x00, IPT_DIAL) PORT_SENSITIVITY(30)
+	PORT_ADJUSTER(0, "CV 2")
 
 	PORT_START("cv_in_3")
-	PORT_BIT(0xff, 0x00, IPT_DIAL) PORT_SENSITIVITY(30)
+	PORT_ADJUSTER(0, "CV 3")
 
 	PORT_START("cv_in_4")
-	PORT_BIT(0xff, 0x00, IPT_DIAL) PORT_SENSITIVITY(30)
+	PORT_ADJUSTER(0, "CV 4")
 
 	PORT_START("cv_in_5")
-	PORT_BIT(0xff, 0x00, IPT_DIAL) PORT_SENSITIVITY(30)
+	PORT_ADJUSTER(0, "CV 5")
 
 	PORT_START("cv_in_6")
-	PORT_BIT(0xff, 0x00, IPT_DIAL) PORT_SENSITIVITY(30)
+	PORT_ADJUSTER(0, "CV 6")
 INPUT_PORTS_END
 
 INPUT_PORTS_START(matrix12)
@@ -1641,25 +1451,40 @@ INPUT_PORTS_START(matrix12)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("VOICES 1-6, 7-12")
 
 	PORT_START("gate_inputs")
-	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_NAME("PED1IN")
-		PORT_READ_LINE_MEMBER(FUNC(matrix12_state::pedal_sw_r<0>));
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_NAME("PED2IN")
-		PORT_READ_LINE_MEMBER(FUNC(matrix12_state::pedal_sw_r<1>));
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("CHAIN ADVANCE")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("TRIGGER")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("CHAIN ADVANCE")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TRIGGER") PORT_CODE(KEYCODE_T)
 
-	PORT_START("lever_1")
+	// The polarity of the trigger input can be specified via the "master" menu
+	// on the synth. The configuration below controls the polarity of the actual
+	// connected input. As with the real synth, the two polarities need to match
+	// for things to work correctly.
+	PORT_START("gate_config")
+	PORT_CONFNAME(0x01, 0x01, "CHAIN ADVANCE")
+	PORT_CONFSETTING(0x00, "NOT CONNECTED")
+	PORT_CONFSETTING(0x01, "CONNECTED")
+	PORT_CONFNAME(0x06, 0x06, "TRIGGER")
+	PORT_CONFSETTING(0x00, "NOT CONNECTED")
+	PORT_CONFSETTING(0x04, "- POLARITY")
+	PORT_CONFSETTING(0x06, "+ POLARITY")
+
+	PORT_START("lever_1")  // 10KOhm pot, center at 5K, usable range: 4K-6K.
 	PORT_BIT(0xff, 50, IPT_PADDLE_V) PORT_NAME("LEVER 1") PORT_MINMAX(0, 100)
 		PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_CENTERDELTA(30)
 		PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT)
 
-	PORT_START("lever_2")
+	PORT_START("lever_2")  // Same specs as lever 1.
 	PORT_BIT(0xff, 50, IPT_PADDLE_V) PORT_NAME("LEVER 1") PORT_MINMAX(0, 100)
 		PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_CENTERDELTA(30)
 		PORT_CODE_DEC(KEYCODE_DOWN) PORT_CODE_INC(KEYCODE_UP)
 
-	// TODO: add keyboard
+	PORT_START("pressure")
+	PORT_BIT(0xff, 0x00, IPT_PEDAL3) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
+
+	PORT_START("trimmer_pressure_scale")  // T1, 1KOhm
+	PORT_ADJUSTER(80, "TRIMMER: PRESSURE SCALE")
+
+	PORT_START("trimmer_pressure_offset")  // T2, 100KOhm
+	PORT_ADJUSTER(30, "TRIMMER: PRESSURE OFFSET")
 INPUT_PORTS_END
 
 ROM_START(xpander)
@@ -1677,11 +1502,6 @@ ROM_START(xpander)
 	ROMX_LOAD("exp1.0-1.u7", 0x002000, 0x002000, CRC(80912a48) SHA1(064e9fff26a4ebf8902c3e085fa631bb5579a160), ROM_BIOS(1))
 	ROMX_LOAD("exp1.0-2.u6", 0x004000, 0x002000, CRC(89e14d6e) SHA1(7aef67db9d78523777af6f1edf04fd6b0d11229b), ROM_BIOS(1))
 	ROMX_LOAD("exp1.0-3.u5", 0x006000, 0x002000, CRC(21794b92) SHA1(e544375c3fc29931497cb6429db7a2812f77c553), ROM_BIOS(1))
-
-	ROM_REGION(0x6000, "voicecpu", 0)  // 3 x 2764 8Kx8bit ROMs. Rev 1.4.
-	ROM_FILL(0x000000, 0x002000, 0xff)  // U909. Spare 2764 ROM slot. Not populated. Data bus pulled high.
-	ROM_LOAD("ca1.4-0.u912", 0x002000, 0x002000, CRC(79f4490a) SHA1(5ab13ccc3b75df313a447520ca54a492102b7e3b))
-	ROM_LOAD("ca1.4-1.u914", 0x004000, 0x002000, CRC(9b7a7914) SHA1(951bbc197a0140a93bb7621a7aedbe0f4037990c))
 ROM_END
 
 ROM_START(matrix12)
@@ -1691,17 +1511,6 @@ ROM_START(matrix12)
 	ROM_LOAD("mat1.1-2.u7", 0x004000, 0x002000, CRC(cb3d0359) SHA1(cd98f0ee46812dfad2aed6f43fcaab0d37679fa8))
 	ROM_LOAD("mat1.1-3.u6", 0x006000, 0x002000, CRC(ce8d0e4d) SHA1(a465fcd1f432a81ee30af91de0fd517aac194726))
 	ROM_LOAD("mat1.1-4.u5", 0x008000, 0x002000, CRC(1eb21a15) SHA1(218f837d500a2c1c19614bc07084a5c85aac7007))
-
-	// The Matrix-12 and Xpander use the same voice board. Using firmware v1.6
-	// here and v1.4 on the Xpander so that both are represented, and since
-	// "-bios" is used for the processor board. The only known difference
-	// between the two is that v1.4 tries to detect the revision of the voice
-	// board, whereas v1.6 skips that check and assumes it is revision D,
-	// apparently because the check became unreliable as components aged.
-	ROM_REGION(0x6000, "voicecpu", 0)  // 3 x 2764 8Kx8bit ROMs. Rev 1.6.
-	ROM_FILL(0x000000, 0x002000, 0xff)  // U909. Spare 2764 ROM slot. Not populated. Data bus pulled high.
-	ROM_LOAD("ca1.6-0.u912", 0x002000, 0x002000, CRC(4e98f114) SHA1(a7babb3d5211b5ef0d03f50540401ae4ae7170f3))
-	ROM_LOAD("ca1.6-1.u914", 0x004000, 0x002000, CRC(9b7a7914) SHA1(951bbc197a0140a93bb7621a7aedbe0f4037990c))
 ROM_END
 
 }  // anonymous namespace

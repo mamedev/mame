@@ -24,6 +24,9 @@
 #include "bbc_kbd.h"
 
 #include "bus/bbc/vsp/slot.h"
+#include "machine/74123.h"
+#include "machine/input_merger.h"
+#include "machine/rescap.h"
 #include "sound/tms5220.h"
 
 #include "formats/uef_cas.h"
@@ -566,12 +569,23 @@ void bbcb_state::bbcb(machine_config &config)
 	MC6854(config, m_adlc);
 	m_adlc->out_txd_cb().set("network", FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set(FUNC(bbcb_state::adlc_irq_w));
-	//m_adlc->out_rts_cb().
+	m_adlc->out_rts_cb().set("network", FUNC(econet_device::host_rts_w));
+
+	ttl74123_device &ic87(TTL74123(config, "ic87", RES_K(39), CAP_N(2.2)));
+	ic87.set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	ic87.set_a_pin_value(0);
+	ic87.set_clear_pin_value(1);
+	ic87.out_cb().set(m_adlc, FUNC(mc6854_device::set_dcd)).invert();
+	ic87.out_cb().append("ic91", FUNC(input_merger_device::in_w<0>));
+
+	INPUT_MERGER_ALL_HIGH(config, "ic91").output_handler().set(m_adlc, FUNC(mc6854_device::set_cts)).invert();
 
 	econet_device &econet(ECONET(config, "network"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
+	econet.clk_wr_callback().append(ic87, FUNC(ttl74123_device::b_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
+	econet.valid_wr_callback().set("ic91", FUNC(input_merger_device::in_w<1>));
 	ECONET_SLOT(config, "econet", "network", econet_devices);
 
 	BBC_1MHZBUS_SLOT(config, m_1mhzbus, 16_MHz_XTAL / 16, bbc_1mhzbus_devices, nullptr);

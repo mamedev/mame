@@ -4,53 +4,22 @@
 
     Happy Fish 2 302-in-1
 
-    Skeleton driver adapted from mini2440.cpp
+    Adapted from mini2440.cpp
 
-    TODO: Linux kernel + initrd loads now but not much happens afterwards.
+    The Linux kernel and initrd boot to the game menu, and the joystick, coin
+    and start inputs work.
 
-    To see bootloader messages, uncomment the UART_PRINTF define in s3c24xx.hxx.
-
-    The primary blocker at this point is a lack of a viable workaround for the
-    FameG FS8806 I2C/SPI authentication key chip.
-
-    The FS8806 provides 96 bytes of on-board EEPROM as well as a 24-byte key,
-    with which it can perform either hashing or Triple DES. The expected
-    response bytes are not yet known, and the key-check routine is hundreds
-    of instructions' worth of assorted bitwise operations.
-
-    To work around the FS8806 initialization and initial challenge/response
-    tests, run MAME with its debugger enabled, and do the following:
-
-    1. bp C002D788 [Enter]
-    2. bp C002D84C [Enter]
-    3. Close the debugger window.
-    4. The debugger will reappear when the first breakpoint is hit.
-    5a. R0=1 [Enter]
-    5b. This will force the FS8806 init function to report success.
-    6. Close the debugger window.
-    7. The debugger will reappear when the second breakpoint is hit.
-    8a. R4=1 [Enter]
-    8b. This will force the first challenge/response test to report success.
-
-    The system will begin its startup sequence, displaying a red fish logo.
-
-    After some time checking the filesystem, it will then boot into the main
-    menu. Currently, inputs are not hooked up.
-
-    It will then watchdog at around 52 seconds remaining on the timer, for
-    reasons not yet known, though the following kernel messages might provide
-    a clue:
-
-    <3>dma2: IRQ with no loaded buffer?
-    <3>dma2: IRQ with no loaded buffer?
-    <0>Restarting system.
-    .
-    arch_reset: attempting watchdog reset
+    Copy protection is a FameG FS8806 on the I2C bus at address 0x62, emulated
+    in machine/fs8806.cpp.  The 8-byte DES key the chip and the host share is
+    stored in the Linux kernel image, which has the FS8806 library linked into
+    it: InitFS8806Lib() passes it in at 0xc0193d02, and the routine that talks
+    to the chip lives around 0xc002d700.
 
 *******************************************************************************/
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
+#include "machine/fs8806.h"
 #include "machine/nandflash.h"
 #include "machine/s3c2440.h"
 #include "sound/dac.h"
@@ -61,10 +30,9 @@
 
 #define LOG_GPIO    (1U << 1)
 #define LOG_ADC     (1U << 2)
-#define LOG_I2C     (1U << 3)
-#define LOG_INPUTS  (1U << 4)
+#define LOG_INPUTS  (1U << 3)
 
-#define VERBOSE     (LOG_GPIO | LOG_ADC | LOG_I2C | LOG_INPUTS)
+#define VERBOSE     (0)
 #include "logmacro.h"
 
 
@@ -77,6 +45,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_s3c2440(*this, "s3c2440"),
+		m_fs8806(*this, "fs8806"),
 		m_nand(*this, "nand"),
 		m_nand2(*this, "nand2"),
 		m_ldac(*this, "ldac"),
@@ -89,37 +58,15 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c2440_device> m_s3c2440;
+	required_device<fs8806_device> m_fs8806;
 	required_device<samsung_k9lag08u0m_device> m_nand, m_nand2;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 	required_ioport_array<6> m_inputs;
 
-	void i2c_scl_write(bool clk);
-	void i2c_sda_write(int data);
-
 	uint32_t m_port[9];
 
-	enum i2c_mode
-	{
-		I2C_IDLE,
-		I2C_ADDR,
-		I2C_TYPE,
-		I2C_READ_ACK,
-		I2C_READ,
-		I2C_WRITE_ACK,
-		I2C_WRITE
-	};
-
-	int m_i2c_sda_in = 0;
-	int m_i2c_sda_out = 0;
-	bool m_i2c_scl = false;
-	bool m_i2c_scl_pulse_started = false;
-	bool m_i2c_started = false;
-	i2c_mode m_i2c_mode{};
-	uint8_t m_i2c_addr = 0;
-	uint8_t m_i2c_addr_bits = 0;
-	uint8_t m_i2c_data = 0;
-	uint8_t m_i2c_data_bits = 0;
+	uint8_t m_i2c_sda_in = 1;
 
 	bool m_nand_select = false;
 
@@ -136,6 +83,7 @@ private:
 	void s3c2440_nand_data_w(uint8_t data);
 	void s3c2440_i2s_data_w(offs_t offset, uint16_t data);
 	uint32_t s3c2440_adc_data_r();
+	void fs8806_sda_w(int state) { m_i2c_sda_in = state; }
 
 	void hapyfish_map(address_map &map) ATTR_COLD;
 };
@@ -143,126 +91,6 @@ private:
 /***************************************************************************
     MACHINE HARDWARE
 ***************************************************************************/
-
-// I2C bus on GPIO port E bits 15 (SDA) and 14 (SCL)
-
-void hapyfish_state::i2c_sda_write(int sda)
-{
-	int old_sda = m_i2c_sda_out;
-	m_i2c_sda_out = sda;
-	if (old_sda && !m_i2c_sda_out && m_i2c_scl)
-	{
-		if (!m_i2c_started)
-		{
-			LOGMASKED(LOG_I2C, "%s: I2C Starting\n", machine().describe_context());
-		}
-		else
-		{
-			LOGMASKED(LOG_I2C, "%s: I2C Repeat-starting\n", machine().describe_context());
-		}
-		m_i2c_started = true;
-		m_i2c_mode = I2C_ADDR;
-		m_i2c_addr_bits = 0;
-		m_i2c_addr = 0x00;
-		m_i2c_scl_pulse_started = false;
-	}
-	else if (!old_sda && m_i2c_sda_out && m_i2c_scl && m_i2c_started)
-	{
-		LOGMASKED(LOG_I2C, "%s: I2C Stopping\n", machine().describe_context());
-		m_i2c_started = false;
-		m_i2c_scl_pulse_started = false;
-		m_i2c_mode = I2C_IDLE;
-	}
-}
-
-void hapyfish_state::i2c_scl_write(bool scl)
-{
-	bool old_scl = m_i2c_scl;
-	m_i2c_scl = scl;
-	if (!old_scl && m_i2c_scl)
-	{
-		LOGMASKED(LOG_I2C, "%s: Received low-high SCL transition\n", machine().describe_context());
-		m_i2c_scl_pulse_started = true;
-		if (m_i2c_mode == I2C_READ_ACK)
-		{
-			LOGMASKED(LOG_I2C, "%s: Sending read acknowledge bit, entering read mode\n", machine().describe_context());
-			m_i2c_sda_in = 0; // ACK
-			m_i2c_mode = I2C_READ;
-		}
-		else if (m_i2c_mode == I2C_READ)
-		{
-			m_i2c_data_bits--;
-			m_i2c_sda_in = BIT(m_i2c_data, m_i2c_data_bits);
-			LOGMASKED(LOG_I2C, "%s: Sending read data bit %d: %d\n", machine().describe_context(), m_i2c_data_bits, m_i2c_sda_in);
-			if (m_i2c_data_bits == 0)
-			{
-				LOGMASKED(LOG_I2C, "%s: Sent I2C data to host, entering read-acknowledge mode: %02x\n", machine().describe_context(), m_i2c_data);
-				m_i2c_mode = I2C_READ_ACK;
-				m_i2c_data_bits = 8;
-				m_i2c_data = 0xff;
-			}
-		}
-	}
-	else if (old_scl && !m_i2c_scl && m_i2c_scl_pulse_started && m_i2c_started)
-	{
-		m_i2c_scl_pulse_started = false;
-		if (m_i2c_mode == I2C_ADDR)
-		{
-			LOGMASKED(LOG_I2C, "%s: Received address bit %d: %d\n", machine().describe_context(), 7 - m_i2c_addr_bits, m_i2c_sda_out);
-			m_i2c_addr <<= 1;
-			m_i2c_addr |= m_i2c_sda_out;
-			m_i2c_addr_bits++;
-			if (m_i2c_addr_bits == 7)
-			{
-				LOGMASKED(LOG_I2C, "%s: Received I2C address: %02x\n", machine().describe_context(), m_i2c_addr);
-				m_i2c_mode = I2C_TYPE;
-			}
-		}
-		else if (m_i2c_mode == I2C_TYPE)
-		{
-			LOGMASKED(LOG_I2C, "%s: Received access type bit: %d\n", machine().describe_context(), m_i2c_sda_out);
-			if (m_i2c_sda_out)
-			{
-				LOGMASKED(LOG_I2C, "%s: Received I2C read request, acknowledging\n", machine().describe_context());
-				m_i2c_sda_in = 0; // ACK
-				m_i2c_mode = I2C_READ_ACK;
-				m_i2c_data_bits = 8;
-				m_i2c_data = 0xff;
-			}
-			else
-			{
-				LOGMASKED(LOG_I2C, "%s: Received I2C write request, acknowledging\n", machine().describe_context());
-				m_i2c_sda_in = 0; // ACK
-				m_i2c_mode = I2C_WRITE;
-				m_i2c_data_bits = 0;
-				m_i2c_data = 0x00;
-			}
-		}
-		else if (m_i2c_mode == I2C_READ_ACK)
-		{
-			// TODO: Actual response from actual device
-			LOGMASKED(LOG_I2C, "%s: Acknowledging I2C read request\n", machine().describe_context());
-		}
-		else if (m_i2c_mode == I2C_WRITE_ACK)
-		{
-			LOGMASKED(LOG_I2C, "%s: Acknowledging I2C write request\n", machine().describe_context());
-		}
-		else if (m_i2c_mode == I2C_WRITE)
-		{
-			LOGMASKED(LOG_I2C, "%s: Received write data bit %d: %d\n", machine().describe_context(), 7 - m_i2c_data_bits, m_i2c_sda_out);
-			m_i2c_data <<= 1;
-			m_i2c_data |= m_i2c_sda_out;
-			m_i2c_data_bits++;
-			if (m_i2c_data_bits == 8)
-			{
-				LOGMASKED(LOG_I2C, "%s: Received I2C data from host, acknowledging: %02x\n", machine().describe_context(), m_i2c_data);
-				m_i2c_sda_in = 0; // ACK
-				m_i2c_data_bits = 0;
-				m_i2c_data = 0x00;
-			}
-		}
-	}
-}
 
 // GPIO
 
@@ -289,7 +117,6 @@ uint32_t hapyfish_state::s3c2440_gpio_port_r(offs_t offset)
 
 		case S3C2440_GPIO_PORT_E:
 			data = m_i2c_sda_in << 15;
-			m_i2c_scl_pulse_started = false;
 			LOGMASKED(LOG_GPIO, "%s: Read GPIO E: %08x\n", machine().describe_context(), data);
 			break;
 
@@ -350,15 +177,17 @@ void hapyfish_state::s3c2440_gpio_port_w(offs_t offset, uint32_t data, uint32_t 
 
 		case S3C2440_GPIO_PORT_E:
 			LOGMASKED(LOG_GPIO, "%s: Write GPIO E: %08x & %08x\n", machine().describe_context(), data, mem_mask);
-			LOGMASKED(LOG_I2C, "%s: I2C SDA/SCL: %d/%d (&%d/&%d)\n", machine().describe_context(), BIT(data, 15), BIT(data, 14), BIT(mem_mask, 15), BIT(mem_mask, 14));
+
+			// FS8806 I2C on bits 15 (SDA) and 14 (SCL)
 			if (BIT(mem_mask, 14))
 			{
-				i2c_scl_write(BIT(data, 14));
+				m_fs8806->scl_write(BIT(data, 14));
 			}
 			if (BIT(mem_mask, 15))
 			{
-				i2c_sda_write(BIT(data, 15));
+				m_fs8806->sda_write(BIT(data, 15));
 			}
+
 			if (mem_mask & 0x7e0)
 			{
 				uint8_t input_row_mask = ~(((data & mem_mask) >> 5) & 0x7f);
@@ -472,6 +301,11 @@ void hapyfish_state::machine_start()
 {
 	m_nand_select = true; // select NAND #1 (S3C2440 bootloader will happen before machine_reset())
 	m_input_select = 7;
+
+	save_item(NAME(m_port));
+	save_item(NAME(m_i2c_sda_in));
+	save_item(NAME(m_nand_select));
+	save_item(NAME(m_input_select));
 }
 
 void hapyfish_state::machine_reset()
@@ -480,15 +314,6 @@ void hapyfish_state::machine_reset()
 	std::fill(std::begin(m_port), std::end(m_port), 0);
 	m_nand_select = true; // select NAND #1
 	m_i2c_sda_in = 1;
-	m_i2c_sda_out = 1;
-	m_i2c_scl = true;
-	m_i2c_scl_pulse_started = false;
-	m_i2c_started = false;
-	m_i2c_mode = I2C_IDLE;
-	m_i2c_addr = 0x00;
-	m_i2c_addr_bits = 0;
-	m_i2c_data = 0x00;
-	m_i2c_data_bits = 0;
 	m_input_select = 7;
 }
 
@@ -535,6 +360,10 @@ void hapyfish_state::hapyfish(machine_config &config)
 	m_s3c2440->nand_address_w_callback().set(FUNC(hapyfish_state::s3c2440_nand_address_w));
 	m_s3c2440->nand_data_r_callback().set(FUNC(hapyfish_state::s3c2440_nand_data_r));
 	m_s3c2440->nand_data_w_callback().set(FUNC(hapyfish_state::s3c2440_nand_data_w));
+
+	FS8806(config, m_fs8806);
+	m_fs8806->set_key(0x05598147'd51583c2ULL); // from InitFS8806Lib() in the kernel
+	m_fs8806->sda_callback().set(FUNC(hapyfish_state::fs8806_sda_w));
 
 	SAMSUNG_K9LAG08U0M(config, m_nand);
 	m_nand->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
@@ -603,6 +432,5 @@ ROM_START( hapyfsh2 )
 ROM_END
 
 } // anonymous namespace
-
 
 GAME( 201?, hapyfsh2, 0, hapyfish, hapyfish, hapyfish_state, empty_init, ROT0, "bootleg", "Happy Fish (V2 PCB, 302-in-1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -307,11 +307,19 @@ void mesh_device::start_sequence(u8 data)
 	case SEQ_MSG_OUT:
 	case SEQ_MSG_IN:
 		m_expected_phase = phase_for_sequence();
-		m_state = sequence_state::XFER_WAIT_REQ;
-		m_scsi_bus->data_w(m_scsi_refid, 0);
+		// A hanging ACK is only released once the target drops REQ
+		if (m_scsi_bus->ctrl_r() & S_ACK)
+		{
+			m_state = sequence_state::XFER_WAIT_REQ_FALSE;
+		}
+		else
+		{
+			m_state = sequence_state::XFER_WAIT_REQ;
+			m_scsi_bus->data_w(m_scsi_refid, 0);
+		}
 		m_scsi_bus->ctrl_wait(m_scsi_refid, S_REQ, S_REQ);
 		// Information transfer commands also control ATN, before releasing ACK.
-		m_scsi_bus->ctrl_w(m_scsi_refid, (m_sequence & SEQ_ATN) ? S_ATN : 0, S_ATN | S_ACK);
+		m_scsi_bus->ctrl_w(m_scsi_refid, (m_sequence & SEQ_ATN) ? S_ATN : 0, S_ATN);
 		step(false);
 		break;
 
@@ -626,7 +634,8 @@ void mesh_device::do_information_transfer()
 		m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
 		update_drq();
 
-		if (xfer_count_done())
+		// Output counts bytes into the FIFO, so it must drain too
+		if (xfer_count_done() && (!transfer_to_scsi() || !m_fifo_count))
 		{
 			if (!data_in_fifo_pending())
 			{
@@ -987,7 +996,9 @@ void mesh_device::update_drq()
 		}
 		else if (transfer_from_scsi())
 		{
-			drq = m_fifo_count >= 2 || (m_fifo_count && m_xfer_count <= 1 && m_xfer_started);
+			// Flush an odd last byte; sync DataIn counts at DMA, async at the handshake
+			drq = m_fifo_count >= 2 || (m_fifo_count && m_xfer_started &&
+					(sync_data_in() ? m_xfer_count == 1 : m_xfer_count == 0));
 		}
 	}
 

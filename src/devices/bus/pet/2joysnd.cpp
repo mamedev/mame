@@ -127,6 +127,12 @@ pet_userport_joystick_and_sound_device::pet_userport_joystick_and_sound_device(c
 
 void pet_userport_joystick_and_sound_device::device_start()
 {
+	save_item(NAME(m_up1));
+	save_item(NAME(m_down1));
+	save_item(NAME(m_fire1));
+	save_item(NAME(m_up2));
+	save_item(NAME(m_down2));
+	save_item(NAME(m_fire2));
 }
 
 

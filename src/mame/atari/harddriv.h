@@ -298,7 +298,7 @@ protected:
 	optional_device<dac_word_interface> m_ldac;
 	optional_device<dac_word_interface> m_rdac;
 	optional_device<harddriv_sound_board_device> m_harddriv_sound;
-	optional_device<atari_jsa_base_device> m_jsa;
+	optional_device<atari_jsa_oki_base_device> m_jsa;
 	optional_device<screen_device> m_screen;
 	optional_device<mc68681_device> m_duartn68681;
 	required_device<adc0808_device> m_adc8;

@@ -32,14 +32,7 @@
     TODO:
 
     - COPINT @ 84Hz instead of 50Hz? (with clock 3240506 is 50Hz)
-    - CLKINT arrives too late and COP reads the VFD data before CPU writes it
-    - VFD does not receive data from main CPU
-    - bitmapped video
     - accurate video timing
-    - cassette motor control seems to have a COP cpu problem
-    - EIM
-    - floppy
-    - CP/M 2.2 ROMs
     - localized ROM sets
     - Micropage ROM/RAM card
     - Z80 PIO board
@@ -54,6 +47,8 @@
 #include "screen.h"
 
 #include "utf8.h"
+
+#include <cmath>
 
 #include "newbrain.lh"
 #include "newbraina.lh"
@@ -81,7 +76,7 @@
 
 void newbrain_state::check_interrupt()
 {
-	int level = ((!m_clk && !m_clkint) || !m_copint) ? ASSERT_LINE : CLEAR_LINE;
+	int level = ((!m_clk && !m_clkint) || !m_copint || m_expint) ? ASSERT_LINE : CLEAR_LINE;
 
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, level);
 }
@@ -97,8 +92,17 @@ uint8_t newbrain_state::mreq_r(offs_t offset)
 	int exrm = 0;
 	uint8_t data = m_exp->mreq_r(offset, 0xff, romov, exrm, raminh);
 
+	return main_mreq_r(offset, data, romov ? (offset >> 13) : exrm, raminh);
+}
+
+
+//-------------------------------------------------
+//  main_mreq_r - main board memory read
+//-------------------------------------------------
+
+uint8_t newbrain_state::main_mreq_r(offs_t offset, uint8_t data, int a15_14_13, bool raminh)
+{
 	int rom0 = 1, rom1 = 1, rom2 = 1;
-	int a15_14_13 = romov ? (offset >> 13) : exrm;
 	if (!m_pwrup) a15_14_13 = 7;
 	int a15g = BIT(a15_14_13, 2);
 
@@ -111,7 +115,7 @@ uint8_t newbrain_state::mreq_r(offs_t offset)
 
 	if (!a15g && !raminh)
 	{
-		data = m_ram->pointer()[offset];
+		data = m_ram->pointer()[(a15_14_13 << 13) | (offset & 0x1fff)];
 	}
 
 	if (!rom0)
@@ -143,13 +147,22 @@ void newbrain_state::mreq_w(offs_t offset, uint8_t data)
 	int exrm = 0;
 	m_exp->mreq_w(offset, data, romov, exrm, raminh);
 
-	int a15_14_13 = romov ? (offset >> 13) : exrm;
+	main_mreq_w(offset, data, romov ? (offset >> 13) : exrm, raminh);
+}
+
+
+//-------------------------------------------------
+//  main_mreq_w - main board memory write
+//-------------------------------------------------
+
+void newbrain_state::main_mreq_w(offs_t offset, uint8_t data, int a15_14_13, bool raminh)
+{
 	if (!m_pwrup) a15_14_13 = 7;
 	int a15g = BIT(a15_14_13, 2);
 
 	if (!a15g && !raminh)
 	{
-		m_ram->pointer()[offset] = data;
+		m_ram->pointer()[(a15_14_13 << 13) | (offset & 0x1fff)] = data;
 	}
 }
 
@@ -187,7 +200,7 @@ uint8_t newbrain_state::iorq_r(offs_t offset)
 			}
 			else
 			{
-				data = ust_a_r();
+				data = ust_a_r(data);
 			}
 			break;
 		}
@@ -204,7 +217,7 @@ uint8_t newbrain_state::iorq_r(offs_t offset)
 void newbrain_state::iorq_w(offs_t offset, uint8_t data)
 {
 	bool prtov = 0;
-	m_exp->iorq_w(offset, 0xff, prtov);
+	m_exp->iorq_w(offset, data, prtov);
 
 	if (!prtov)
 	{
@@ -218,7 +231,7 @@ void newbrain_state::iorq_w(offs_t offset, uint8_t data)
 				break;
 
 			case 2: // COP
-				m_cop->microbus_w(data);
+				machine().scheduler().synchronize(timer_expired_delegate(FUNC(newbrain_state::cop_microbus_w), this), data);
 				break;
 
 			case 3: // ENRG1
@@ -275,6 +288,8 @@ void newbrain_state::enrg_w(uint8_t data)
 
 	LOG("%s %s ENRG %02x\n", machine().time().as_string(), machine().describe_context(), data);
 
+	m_enrg = data;
+
 	// clock enable
 	int clk = BIT(data, 0);
 
@@ -299,14 +314,14 @@ void newbrain_state::enrg_w(uint8_t data)
 //  ust_r -
 //-------------------------------------------------
 
-uint8_t newbrain_state::ust_a_r()
+uint8_t newbrain_state::ust_a_r(uint8_t data)
 {
 	/*
 
 	    bit     signal
 
-	    0       +5V
-	    1       PWRUP
+	    0       ENRG 7-6: 00 EXTEST, 01 40/_80, 10 TPIN, 11 CALLIND
+	    1       ENRG 5-4: 00 POWTEST, 01 _TVCNSL, 10 BEE, 11 _CALLIND
 	    2
 	    3
 	    4
@@ -316,10 +331,16 @@ uint8_t newbrain_state::ust_a_r()
 
 	*/
 
-	uint8_t data = 0x5d;
+	data &= 0x5c;
 
-	// powered up
-	data |= m_pwrup << 1;
+	data |= (BIT(m_enrg, 6, 2) == 2) ? tpin() : 1;
+
+	switch (BIT(m_enrg, 4, 2))
+	{
+	case 0: data |= m_pwrup ? 0x00 : 0x02; break;
+	case 1: break;
+	default: data |= 0x02; break;
+	}
 
 	// interrupts
 	data |= m_clkint << 5;
@@ -404,14 +425,14 @@ uint8_t newbrain_state::cop_g_r()
 
 	    bit     description
 
-	    G0
+	    G0      _COPINT
 	    G1      K9 (CD4076 Q1)
 	    G2      K7 (CD4076 Q0)
 	    G3      K3 (CD4076 Q3)
 
 	*/
 
-	uint8_t data = 0;
+	uint8_t data = !m_copint;
 
 	// keyboard
 	data |= BIT(m_403_q, 1) << 1;
@@ -428,17 +449,38 @@ uint8_t newbrain_state::cop_g_r()
 //  cop_g_w -
 //-------------------------------------------------
 
-// m_cop_g1 and m_cop_g3, when activated, have 20 zeros and a 1 in a continuous sequence.
-// m_cop_k6 randomly alternates between 0 and 1, spending more time at 1.
-// The outcome is the cassette is unreadable.
-// Therefore the motors are left permanently on until the above issues can be fixed.
 void newbrain_state::tm()
 {
-//  cassette_state tm1 = (!m_cop_g1 && !m_cop_k6) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED;
-//  cassette_state tm2 = (!m_cop_g3 && !m_cop_k6) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED;
+	bool const drive[2] = { !m_cop_g1 && !m_cop_k6, !m_cop_g3 && !m_cop_k6 };
 
-//  m_cassette1->change_state(tm1, CASSETTE_MASK_MOTOR);
-//  m_cassette2->change_state(tm2, CASSETTE_MASK_MOTOR);
+	for (int i = 0; i < 2; i++)
+	{
+		if (drive[i] == m_tm_drive[i])
+			continue;
+
+		m_tm_drive[i] = drive[i];
+
+		if (drive[i])
+		{
+			m_tm_timer[i]->reset();
+			m_cassette[i]->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		}
+		else
+		{
+			// relay coil resistance is assumed, dropout at 1/5 of the coil voltage
+			m_tm_timer[i]->adjust(attotime::from_double(RES_R(500) * CAP_U(47) * log(5.0)), i);
+		}
+	}
+}
+
+TIMER_CALLBACK_MEMBER(newbrain_state::cop_microbus_w)
+{
+	m_cop->microbus_w(param);
+}
+
+TIMER_CALLBACK_MEMBER(newbrain_state::tm_off)
+{
+	m_cassette[param]->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
 void newbrain_state::cop_g_w(uint8_t data)
@@ -492,8 +534,8 @@ void newbrain_state::cop_d_w(uint8_t data)
 	LOGMASKED(LOG_COP, "%s %s K4 %u K6 %u\n", machine().time().as_string(), machine().describe_context(), k4, k6);
 
 	m_cop_tdo = BIT(data, 1);
-	m_cassette1->output(m_cop_tdo ? -1.0 : +1.0);
-	m_cassette2->output(m_cop_tdo ? -1.0 : +1.0);
+	m_cassette[0]->output(m_cop_tdo ? -1.0 : +1.0);
+	m_cassette[1]->output(m_cop_tdo ? -1.0 : +1.0);
 
 	if (k4) {
 		m_405_q = 0;
@@ -566,7 +608,7 @@ void newbrain_state::k2_w(int state)
 
 int newbrain_state::tpin()
 {
-	return (m_cassette1->input() > +0.04) || (m_cassette2->input() > +0.04);
+	return (m_cassette[0]->input() > +0.04) || (m_cassette[1]->input() > +0.04);
 }
 
 int newbrain_state::tdi_r()
@@ -735,16 +777,22 @@ void newbrain_state::machine_start()
 	// initialize timers
 	m_reset_timer = timer_alloc(FUNC(newbrain_state::clear_reset), this);
 	m_power_timer = timer_alloc(FUNC(newbrain_state::power_on), this);
+	m_tm_timer[0] = timer_alloc(FUNC(newbrain_state::tm_off), this);
+	m_tm_timer[1] = timer_alloc(FUNC(newbrain_state::tm_off), this);
+
+	m_tm_drive[0] = m_tm_drive[1] = false;
 
 	m_reset_timer->adjust(attotime::never);
 	m_power_timer->adjust(attotime::from_usec(get_pwrup_t()));
 
 	// state saving
+	save_item(NAME(m_enrg));
 	save_item(NAME(m_clk));
 	save_item(NAME(m_tvp));
 	save_item(NAME(m_pwrup));
 	save_item(NAME(m_clkint));
 	save_item(NAME(m_copint));
+	save_item(NAME(m_expint));
 	save_item(NAME(m_cop_so));
 	save_item(NAME(m_cop_tdo));
 	save_item(NAME(m_cop_g1));
@@ -753,9 +801,7 @@ void newbrain_state::machine_start()
 	save_item(NAME(m_405_q));
 	save_item(NAME(m_403_q));
 	save_item(NAME(m_402_q));
-
-	// patch COP ROM to read VFD data
-	//memregion(COP420_TAG)->base()[0x20a] = 0xc6;
+	save_item(NAME(m_tm_drive));
 }
 
 
@@ -792,6 +838,12 @@ TIMER_CALLBACK_MEMBER(newbrain_state::power_on)
 {
 	LOG("%s %s PWRUP 1\n", machine().time().as_string(), machine().describe_context());
 	m_pwrup = 1;
+}
+
+void newbrain_state::exp_int_w(int state)
+{
+	m_expint = state;
+	check_interrupt();
 }
 
 TIMER_CALLBACK_MEMBER(newbrain_state::clear_clkint)
@@ -833,16 +885,22 @@ void newbrain_state::newbrain(machine_config &config)
 
 	// devices
 	NEWBRAIN_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/4, newbrain_expansion_cards, "eim");
+	m_exp->int_callback().set(FUNC(newbrain_state::exp_int_w));
+	m_exp->m1_wait_callback().set([this] (int state) { m_maincpu->z80_set_m1_cycles(state ? 5 : 4); });
+	m_exp->host_mreq_r_callback().set(FUNC(newbrain_state::mreq_r));
+	m_exp->host_mreq_w_callback().set(FUNC(newbrain_state::mreq_w));
+	m_exp->host_main_r_callback().set([this] (offs_t offset) { return main_mreq_r(offset, 0xff, offset >> 13, false); });
+	m_exp->host_main_w_callback().set([this] (offs_t offset, uint8_t data) { main_mreq_w(offset, data, offset >> 13, false); });
 
 	SPEAKER(config, "mono").front_center();
 
-	CASSETTE(config, m_cassette1);
-	m_cassette1->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette1->add_route(ALL_OUTPUTS, "mono", 0.05);
+	CASSETTE(config, m_cassette[0]);
+	m_cassette[0]->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette[0]->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	CASSETTE(config, m_cassette2);
-	m_cassette2->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette2->add_route(ALL_OUTPUTS, "mono", 0.05);
+	CASSETTE(config, m_cassette[1]);
+	m_cassette[1]->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette[1]->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	RS232_PORT(config, RS232_V24_TAG, default_rs232_devices, nullptr);
 	RS232_PORT(config, RS232_PRN_TAG, default_rs232_devices, nullptr);
@@ -896,7 +954,7 @@ void newbrain_state::newbrain_md(machine_config &config)
 
 ROM_START( newbrain )
 	ROM_REGION( 0x6000, Z80_TAG, 0 )
-	ROM_DEFAULT_BIOS( "rom20" )
+	ROM_DEFAULT_BIOS( "issue3" )
 
 	ROM_SYSTEM_BIOS( 0, "issue1", "Issue 1 (v?)" )
 	ROMX_LOAD( "aben.ic6",     0x0000, 0x2000, CRC(308f1f72) SHA1(a6fd9945a3dca47636887da2125fde3f9b1d4e25), ROM_BIOS(0) )
@@ -923,7 +981,9 @@ ROM_START( newbrain )
 	ROMX_LOAD( "cd20tci.rom",  0x2000, 0x4000, CRC(f65b2350) SHA1(1ada7fbf207809537ec1ffb69808524300622ada), ROM_BIOS(4) )
 
 	ROM_REGION( 0x400, COP420_TAG, 0 )
-	ROM_LOAD( "cop420-guw.ic419", 0x000, 0x400, CRC(a1388ee7) SHA1(5822e16aa794545600bf7a9dbee2ef467ca2a3e0) ) // COP420-GUW/N
+	ROM_LOAD( "cop420-guw.ic419", 0x000, 0x400, BAD_DUMP CRC(a1388ee7) SHA1(5822e16aa794545600bf7a9dbee2ef467ca2a3e0) ) // COP420-GUW/N
+	ROM_FILL( 0x20a, 1, 0xc6 ) // bit 2 dropped in the DISPCOM entry of the JID table at 0x200
+	ROM_FILL( 0x231, 1, 0xa6 ) // bit 2 dropped in JSRP 0A6, VFD flash counter carry
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "char eprom iss 1.ic453", 0x0000, 0x1000, CRC(6a38b7a2) SHA1(29f3e672fc41792ac2f2b405e571d79235193561) ) // 8248R7
@@ -947,7 +1007,9 @@ ROM_START( newbrainmd )
 	ROM_LOAD( "efmd.rom", 0x4000, 0x2000, CRC(20dd0b49) SHA1(74b517ca223cefb588e9f49e72ff2d4f1627efc6) )
 
 	ROM_REGION( 0x400, COP420_TAG, 0 )
-	ROM_LOAD( "cop420-guw.ic419", 0x000, 0x400, CRC(a1388ee7) SHA1(5822e16aa794545600bf7a9dbee2ef467ca2a3e0) ) // COP420-GUW/N
+	ROM_LOAD( "cop420-guw.ic419", 0x000, 0x400, BAD_DUMP CRC(a1388ee7) SHA1(5822e16aa794545600bf7a9dbee2ef467ca2a3e0) ) // COP420-GUW/N
+	ROM_FILL( 0x20a, 1, 0xc6 ) // bit 2 dropped in the DISPCOM entry of the JID table at 0x200
+	ROM_FILL( 0x231, 1, 0xa6 ) // bit 2 dropped in JSRP 0A6, VFD flash counter carry
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "char eprom iss 1.ic453", 0x0000, 0x1000, CRC(6a38b7a2) SHA1(29f3e672fc41792ac2f2b405e571d79235193561) ) // 8248R7
@@ -960,6 +1022,6 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT    COMPAT  MACHINE      INPUT     CLASS           INIT        COMPANY                        FULLNAME       FLAGS
-COMP( 1981, newbrain,   0,        0,      newbrain_ad, newbrain, newbrain_state, empty_init, "Grundy Business Systems Ltd", "NewBrain AD", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1981, newbraina,  newbrain, 0,      newbrain_a,  newbrain, newbrain_state, empty_init, "Grundy Business Systems Ltd", "NewBrain A",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
-COMP( 1981, newbrainmd, newbrain, 0,      newbrain_md, newbrain, newbrain_state, empty_init, "Grundy Business Systems Ltd", "NewBrain MD", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND )
+COMP( 1981, newbrain,   0,        0,      newbrain_ad, newbrain, newbrain_state, empty_init, "Grundy Business Systems Ltd", "NewBrain AD", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1981, newbraina,  newbrain, 0,      newbrain_a,  newbrain, newbrain_state, empty_init, "Grundy Business Systems Ltd", "NewBrain A",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1981, newbrainmd, newbrain, 0,      newbrain_md, newbrain, newbrain_state, empty_init, "Grundy Business Systems Ltd", "NewBrain MD", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

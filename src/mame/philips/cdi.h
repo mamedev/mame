@@ -95,7 +95,7 @@ protected:
 
 	bool m_cdic_intreq = false;
 	bool m_dvc_intreq = false;
-	in4_owner m_in4_owner = IN4_IDLE;
+	uint8_t m_in4_owner = IN4_IDLE;
 
 	uint16_t bus_error_r(offs_t offset);
 	void bus_error_w(offs_t offset, uint16_t data);

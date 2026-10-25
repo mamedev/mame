@@ -19,6 +19,7 @@
 #include "midi.h"
 
 #include "bus/midi/midi.h"
+#include "machine/clock.h"
 #include "machine/mc6854.h"
 
 #include "speaker.h"
@@ -98,6 +99,11 @@ void arc_serial_midi_device::device_add_mconfig(machine_config &config)
 	MC6854(config, m_adlc);
 	m_adlc->out_txd_cb().set("mdout", FUNC(midi_port_device::write_txd));
 	m_adlc->out_irq_cb().set(DEVICE_SELF_OWNER, FUNC(archimedes_econet_slot_device::efiq_w));
+
+	// FIXME: ADLC clock source unknown, rate of the old internal MC6854 timer used
+	clock_device &adlc_clock(CLOCK(config, "adlc_clock", 500'000));
+	adlc_clock.signal_handler().set(m_adlc, FUNC(mc6854_device::txc_w));
+	adlc_clock.signal_handler().append(m_adlc, FUNC(mc6854_device::rxc_w));
 
 	midi_port_device &mdin(MIDI_PORT(config, "mdin", midiin_slot, "midiin"));
 	mdin.rxd_handler().set(m_adlc, FUNC(mc6854_device::set_rx));

@@ -185,7 +185,12 @@ protected:
 	uint8_t   m_character_counter;        /* Not used yet */
 	uint8_t   m_hsync_width_counter;  /* Not used yet */
 	uint8_t   m_line_counter;
+	uint8_t   m_line_counter_mask;
+	bool      m_interlace_fields;
+	bool      m_latch_row_end;
+	bool      m_row_end;
 	uint8_t   m_raster_counter;
+	uint8_t   m_field;
 	uint8_t   m_adjust_counter;
 	uint8_t   m_vsync_width_counter;
 
@@ -231,9 +236,10 @@ protected:
 	void update_counters();
 	void set_de(int state);
 	void set_hsync(int state);
-	void set_vsync(int state);
+	virtual void set_vsync(int state);
 	void set_cur(int state);
 	bool match_line();
+	bool is_row_end() const;
 	virtual bool check_cursor_visible(uint16_t ra, uint16_t line_addr);
 	TIMER_CALLBACK_MEMBER(handle_line_timer);
 	TIMER_CALLBACK_MEMBER(de_off_tick);
@@ -246,6 +252,8 @@ protected:
 	TIMER_CALLBACK_MEMBER(transparent_update_tick);
 	virtual void update_cursor_state();
 	virtual uint8_t draw_scanline(int y, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual void configure_screen(int width, int height, const rectangle &visarea, const attotime &refresh);
+	virtual void frame_start();
 
 	/************************
 	 interface CRTC - driver

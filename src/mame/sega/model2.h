@@ -208,8 +208,8 @@ protected:
 	u16 sega_0229_source_r(offs_t offset);
 	u32 doa_unk_r();
 
-	void raster_init(memory_region *texture_rom);
-	void geo_init(memory_region *polygon_rom);
+	void raster_init(memory_region &texture_rom);
+	void geo_init(memory_region &polygon_rom);
 	u32 render_mode_r();
 	void render_mode_w(u32 data);
 	u8 lumaram_r(offs_t offset);
@@ -263,6 +263,8 @@ protected:
 	void debug_poly_dump_command(const std::vector<std::string_view> &params);
 	void debug_help_command(const std::vector<std::string_view> &params);
 
+	bool m_geo_mesh = false;
+
 	virtual void copro_halt() = 0;
 	virtual void copro_boot() = 0;
 
@@ -279,34 +281,37 @@ private:
 	int16_t m_crtc_xoffset = 0, m_crtc_yoffset = 0;
 	bool m_palette_dirty = false;
 
-	u32 *geo_process_command( geo_state *geo, u32 opcode, u32 *input, bool *end_code );
+	const u32 *geo_process_command(geo_state &geo, u32 opcode, const u32 *input, bool *end_code);
 	// geo commands
-	u32 *geo_nop( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_object_data( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_direct_data( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_window_data( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_texture_data( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_polygon_data( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_texture_parameters( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_mode( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_zsort_mode( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_focal_distance( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_light_source( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_matrix_write( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_translate_write( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_data_mem_push( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_test( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_end( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_dummy( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_log_data( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_lod( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_code_upload( geo_state *geo, u32 opcode, u32 *input );
-	u32 *geo_code_jump( geo_state *geo, u32 opcode, u32 *input );
+	const u32 *geo_nop(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_object_data(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_direct_data(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_window_data(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_texture_data(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_polygon_data(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_texture_parameters(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_mode(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_zsort_mode(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_focal_distance(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_light_source(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_matrix_write(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_mesh_mode(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_mesh_draw(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_mesh_flush(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_translate_write(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_data_mem_push(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_test(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_end(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_dummy(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_log_data(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_lod(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_code_upload(geo_state &geo, u32 opcode, const u32 *input);
+	const u32 *geo_code_jump(geo_state &geo, u32 opcode, const u32 *input);
 	// geo code drawing paths
-	void geo_parse_np_ns( geo_state *geo, u32 *input, u32 count );
-	void geo_parse_np_s( geo_state *geo, u32 *input, u32 count );
-	void geo_parse_nn_ns( geo_state *geo, u32 *input, u32 count );
-	void geo_parse_nn_s( geo_state *geo, u32 *input, u32 count );
+	void geo_parse_np_ns(geo_state &geo, const u32 *input, u32 count);
+	void geo_parse_np_s(geo_state &geo, const u32 *input, u32 count);
+	void geo_parse_nn_ns(geo_state &geo, const u32 *input, u32 count);
+	void geo_parse_nn_s(geo_state &geo, const u32 *input, u32 count);
 
 	// raster functions
 	// main data input port
@@ -549,6 +554,7 @@ public:
 	void gunblade(machine_config &config) ATTR_COLD;
 	void dynabb(machine_config &config) ATTR_COLD;
 	void zerogun(machine_config &config) ATTR_COLD;
+	void lastbrnx(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -787,8 +793,8 @@ struct model2_state::raster_state
 	}
 
 //  u32             mode = 0;                       // bit 0 = Test Mode, bit 2 = Switch 60Hz(1)/30Hz(0) operation
-	u16 *           texture_rom = nullptr;          // Texture ROM pointer
-	u32             texture_rom_mask = 0;           // Texture ROM mask
+	u16 const *     texture_rom = nullptr;          // Texture ROM data
+	u32             texture_rom_mask = 0;           // Texture ROM address mask
 	int16_t         viewport[4] = { 0, 0, 0, 0 };   // View port (startx,starty,endx,endy)
 	int16_t         center[4][2] = { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }; // Centers (eye 0[x,y],1[x,y],2[x,y],3[x,y])
 	u16             center_sel = 0;                 // Selected center
@@ -830,8 +836,16 @@ struct model2_state::geo_state
 
 	raster_state *      raster = nullptr;
 	u32                 mode = 0;                   // bit 0 = Enable Specular, bit 1 = Calculate Normals
-	u32 *               polygon_rom = nullptr;      // Polygon ROM pointer
-	u32                 polygon_rom_mask = 0;       // Polygon ROM mask
+	u32 const *         polygon_rom = nullptr;      // Polygon ROM data
+	u32                 polygon_rom_mask = 0;       // Polygon ROM address mask
+	u32                 mesh_begin = 0x30100;
+	u32                 mesh_current = 0x30100;
+	u32                 mesh_texture_start = 0x80c000;
+	u32                 mesh_texture_begin = 0x80c000;
+	u32                 mesh_texture_next = 0x80c000;
+	u32                 mesh_texture_end = 0x80c000;
+	u32                 mesh_mode = 0;
+	u32                 mesh_uv[0x8000]{};
 	float               matrix[12];                 // Current Transformation Matrix
 	poly_vertex         focus;                      // Focus (x,y)
 	poly_vertex         light;                      // Light Vector

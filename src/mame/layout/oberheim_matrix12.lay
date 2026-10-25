@@ -290,20 +290,84 @@ copyright-holders:m1macrophage
 		</rect>
 	</element>
 
-	<group name="keyboard_octave">
+	<group name="octave_var1">
 		<bounds x="0" y="0" width="245" height="210"/>
-		<element ref="whitekey"><bounds x="1" y="0" width="33" height="210"/></element><!-- C -->
-		<element ref="whitekey"><bounds x="36" y="0" width="33" height="210"/></element><!-- D -->
-		<element ref="whitekey"><bounds x="71" y="0" width="33" height="210"/></element><!-- E -->
-		<element ref="whitekey"><bounds x="106" y="0" width="33" height="210"/></element><!-- F -->
-		<element ref="whitekey"><bounds x="141" y="0" width="33" height="210"/></element><!-- G -->
-		<element ref="whitekey"><bounds x="176" y="0" width="33" height="210"/></element><!-- A -->
-		<element ref="whitekey"><bounds x="211" y="0" width="33" height="210"/></element><!-- B -->
-		<element ref="blackkey"><bounds x="21" y="0" width="21" height="135"/></element><!-- C# -->
-		<element ref="blackkey"><bounds x="63" y="0" width="21" height="135"/></element><!-- D# -->
-		<element ref="blackkey"><bounds x="125" y="0" width="21" height="135"/></element><!-- F# -->
-		<element ref="blackkey"><bounds x="164" y="0" width="21" height="135"/></element><!-- G# -->
-		<element ref="blackkey"><bounds x="204" y="0" width="21" height="135"/></element><!-- A# -->
+		<element ref="whitekey" inputtag="~kbd_input_1~" inputmask="0x01"><!-- C -->
+			<bounds x="1" y="0" width="33" height="210"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_1~" inputmask="0x04"><!-- D -->
+			<bounds x="36" y="0" width="33" height="210"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_1~" inputmask="0x10"><!-- E -->
+			<bounds x="71" y="0" width="33" height="210"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_1~" inputmask="0x20"><!-- F -->
+			<bounds x="106" y="0" width="33" height="210"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_1~" inputmask="0x80"><!-- G -->
+			<bounds x="141" y="0" width="33" height="210"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_2~" inputmask="0x02"><!-- A -->
+			<bounds x="176" y="0" width="33" height="210"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_2~" inputmask="0x08"><!-- B -->
+			<bounds x="211" y="0" width="33" height="210"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_1~" inputmask="0x02"><!-- C# -->
+			<bounds x="21" y="0" width="21" height="135"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_1~" inputmask="0x08"><!-- D# -->
+			<bounds x="63" y="0" width="21" height="135"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_1~" inputmask="0x40"><!-- F# -->
+			<bounds x="125" y="0" width="21" height="135"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_2~" inputmask="0x01"><!-- G# -->
+			<bounds x="164" y="0" width="21" height="135"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_2~" inputmask="0x04"><!-- A# -->
+			<bounds x="204" y="0" width="21" height="135"/>
+		</element>
+	</group>
+
+	<group name="octave_var2">
+		<bounds x="0" y="0" width="245" height="210"/>
+		<element ref="whitekey" inputtag="~kbd_input_1~" inputmask="0x10"><!-- C -->
+			<bounds x="1" y="0" width="33" height="210"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_1~" inputmask="0x40"><!-- D -->
+			<bounds x="36" y="0" width="33" height="210"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_2~" inputmask="0x01"><!-- E -->
+			<bounds x="71" y="0" width="33" height="210"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_2~" inputmask="0x02"><!-- F -->
+			<bounds x="106" y="0" width="33" height="210"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_2~" inputmask="0x08"><!-- G -->
+			<bounds x="141" y="0" width="33" height="210"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_2~" inputmask="0x20"><!-- A -->
+			<bounds x="176" y="0" width="33" height="210"/>
+		</element>
+		<element ref="whitekey" inputtag="~kbd_input_2~" inputmask="0x80"><!-- B -->
+			<bounds x="211" y="0" width="33" height="210"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_1~" inputmask="0x20"><!-- C# -->
+			<bounds x="21" y="0" width="21" height="135"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_1~" inputmask="0x80"><!-- D# -->
+			<bounds x="63" y="0" width="21" height="135"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_2~" inputmask="0x04"><!-- F# -->
+			<bounds x="125" y="0" width="21" height="135"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_2~" inputmask="0x10"><!-- G# -->
+			<bounds x="164" y="0" width="21" height="135"/>
+		</element>
+		<element ref="blackkey" inputtag="~kbd_input_2~" inputmask="0x40"><!-- A# -->
+			<bounds x="204" y="0" width="21" height="135"/>
+		</element>
 	</group>
 
 	<group name="case">
@@ -370,11 +434,30 @@ copyright-holders:m1macrophage
 		<element ref="blue_line"><bounds x="54" y="710" width="126" height="3"/></element>
 
 		<!-- Keyboard -->
-		<repeat count="5">
-			<param name="kbd_x" start="194" increment="245"/>
-			<group ref="keyboard_octave"><bounds x="~kbd_x~" y="526" width="245" height="210"/></group>
-		</repeat>
-		<element ref="whitekey"><bounds x="1420" y="526" width="33" height="210"/></element>
+
+		<param name="kbd_input_1" value="kbd:keys_0"/>
+		<param name="kbd_input_2" value="kbd:keys_1"/>
+		<group ref="octave_var1"><bounds x="194" y="526" width="245" height="210"/></group>
+
+		<param name="kbd_input_1" value="kbd:keys_1"/>
+		<param name="kbd_input_2" value="kbd:keys_2"/>
+		<group ref="octave_var2"><bounds x="439" y="526" width="245" height="210"/></group>
+
+		<param name="kbd_input_1" value="kbd:keys_3"/>
+		<param name="kbd_input_2" value="kbd:keys_4"/>
+		<group ref="octave_var1"><bounds x="684" y="526" width="245" height="210"/></group>
+
+		<param name="kbd_input_1" value="kbd:keys_4"/>
+		<param name="kbd_input_2" value="kbd:keys_5"/>
+		<group ref="octave_var2"><bounds x="929" y="526" width="245" height="210"/></group>
+
+		<param name="kbd_input_1" value="kbd:keys_6"/>
+		<param name="kbd_input_2" value="kbd:keys_7"/>
+		<group ref="octave_var1"><bounds x="1174" y="526" width="245" height="210"/></group>
+
+		<element ref="whitekey" inputtag="kbd:keys_7" inputmask="0x10">
+			<bounds x="1420" y="526" width="33" height="210"/>
+		</element>
 	</group>
 
 	<group name="edit_panel">
