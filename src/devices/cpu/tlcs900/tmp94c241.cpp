@@ -1356,7 +1356,7 @@ void tmp94c241_device::tlcs900_check_irqs()
 		// data.
 		if (irq_vector_map[irq].reg == INTE0AD &&
 			irq_vector_map[irq].iff == 0x08 &&
-			!(m_iimc & 0x02) &&
+			BIT(m_iimc, 1) &&
 			m_level[TLCS900_INT0] == ASSERT_LINE)
 		{
 			bool hdma_steals_int0 = false;
@@ -1621,7 +1621,8 @@ void tmp94c241_device::execute_set_input(int input, int level)
 			break;
 
 		case TLCS900_INT0:
-			if (m_iimc & 0x02)
+			// IIMC bit 1 (I0LE) set selects level detection
+			if (!BIT(m_iimc, 1))
 			{
 				// Rising edge detect
 				if (level != m_level[TLCS900_INT0] && level == ASSERT_LINE)
