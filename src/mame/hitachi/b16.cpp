@@ -10,7 +10,6 @@ TODO:
 - confirm keyboard command responses and typematic;
 - Confirm exact $80 video/status signals (bit 4 on EX-II, bit 5 on the earlier ROM);
 - Confirm whether the motor-enable line is shared by both floppy drives;
-- implement the usual 6845 stuff (cursor, start address);
 - b16ex2: improve kanji hookup (needs more use cases);
 
 ===================================================================================================
@@ -134,7 +133,6 @@ protected:
 	void palette_init(palette_device &palette) const ATTR_COLD;
 
 private:
-	uint8_t m_crtc_vreg[0x100]{}, m_crtc_index = 0;
 	u16 m_tvram_attr_latch = 0;
 	u8 m_port84 = 0;
 	uint8_t m_port78 = 0;
@@ -165,12 +163,11 @@ private:
 	u8 kanji_r(offs_t offset);
 	u8 ig_ram_r(offs_t offset);
 	void ig_ram_w(offs_t offset, uint8_t data);
-	void crtc_address_w(uint8_t data);
-	void crtc_data_w(uint8_t data);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	MC6845_UPDATE_ROW(crtc_update_row);
 
 	static void floppy_formats(format_registration &fr);
 };
@@ -186,24 +183,6 @@ void b16_state::palette_init(palette_device &palette) const
 	}
 }
 
-#define mc6845_h_char_total     (m_crtc_vreg[0])
-#define mc6845_h_display        (m_crtc_vreg[1])
-#define mc6845_h_sync_pos       (m_crtc_vreg[2])
-#define mc6845_sync_width       (m_crtc_vreg[3])
-#define mc6845_v_char_total     (m_crtc_vreg[4])
-#define mc6845_v_total_adj      (m_crtc_vreg[5])
-#define mc6845_v_display        (m_crtc_vreg[6])
-#define mc6845_v_sync_pos       (m_crtc_vreg[7])
-#define mc6845_mode_ctrl        (m_crtc_vreg[8])
-#define mc6845_tile_height      (m_crtc_vreg[9]+1)
-#define mc6845_cursor_y_start   (m_crtc_vreg[0x0a])
-#define mc6845_cursor_y_end     (m_crtc_vreg[0x0b])
-#define mc6845_start_addr       (((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))
-#define mc6845_cursor_addr      (((m_crtc_vreg[0x0e]<<8) & 0x3f00) | (m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr   (((m_crtc_vreg[0x10]<<8) & 0x3f00) | (m_crtc_vreg[0x11] & 0xff))
-#define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
-
-
 void b16_state::video_start()
 {
 	m_ig_ram = make_unique_clear<u8[]>(0x2000);
@@ -211,59 +190,59 @@ void b16_state::video_start()
 	save_pointer(NAME(m_ig_ram), 0x2000);
 	save_item(NAME(m_port84));
 
-	save_item(NAME(m_crtc_vreg));
-	save_item(NAME(m_crtc_index));
 	save_item(NAME(m_tvram_attr_latch));
 }
 
 
-uint32_t b16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t b16_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	// TODO: convert to scanline renderer
-	for(int y = 0; y < mc6845_v_display; y++)
+	bitmap.fill(rgb_t::black(), cliprect);
+	return m_crtc->screen_update(screen, bitmap, cliprect);
+}
+
+MC6845_UPDATE_ROW(b16_state::crtc_update_row)
+{
+	if (!de)
+		return;
+
+	const pen_t *const palette = m_palette->pens();
+	for (unsigned x = 0; x < x_count; x++)
 	{
-		for(int x = 0; x < mc6845_h_display; x++)
+		const u32 tile_offset = (ma + x) & 0x1fff;
+		const u16 lo_vram = m_vram[tile_offset];
+		const u16 hi_vram = m_vram[tile_offset + 0x4000 / 2];
+		const u16 tile = lo_vram & 0x00ff;
+		const u8 fg_color = (lo_vram >> 8) & 0x0f;
+		// TODO: bit 15 may really be blink instead (gets activated on basic COLOR 16/31 issued)
+		const u8 bg_color = (lo_vram >> 12) & 0x0f;
+		u8 gfx_data;
+		// Character generators contain sixteen raster rows per glyph.
+		if (BIT(hi_vram, 5))
 		{
-			const u32 tile_offset = x + y * mc6845_h_display;
-			const u16 lo_vram = m_vram[tile_offset];
-			const u16 hi_vram = m_vram[tile_offset + 0x4000 / 2];
-			const u16 tile = lo_vram & 0x00ff;
-			const u8 fg_color = (lo_vram >> 8) & 0xf;
-			// TODO: bit 15 may really be blink instead (gets activated on basic COLOR 16/31 issued)
-			const u8 bg_color = (lo_vram >> 12) & 0xf;
+			const u16 lr = BIT(hi_vram, 7) ^ 1;
+			const u16 kanji_bank = hi_vram & 0x1f;
+			const u32 kanji_offset = bitswap<13>(tile + (kanji_bank << 8), 12, 7, 6, 5, 11, 10, 9, 8, 4, 3, 2, 1, 0) << 4;
+			gfx_data = m_kanji_rom[((kanji_offset + (ra & 0x0f)) << 1) + lr];
+		}
+		else
+		{
+			gfx_data = m_ig_ram[(tile << 4) + (ra & 0x0f)];
+		}
 
-			for(int yi = 0; yi < mc6845_tile_height; yi++)
-			{
-				u8 gfx_data = 0;
-				// TODO: confirm global character/kanji display control.
-				if (BIT(hi_vram, 5))
-				{
-					// TODO: apply bitswap at device_init time, move this calculation out of this inner loop.
-					const u16 lr = BIT(hi_vram, 7) ^ 1;
-					const u16 kanji_bank = (hi_vram & 0x1f);
-					const u32 kanji_offset = bitswap<13>(tile + (kanji_bank << 8), 12, 7, 6, 5, 11, 10, 9, 8, 4, 3, 2, 1, 0) << 4;
-					gfx_data = m_kanji_rom[((kanji_offset + yi) << 1) + lr];
-				}
-				else
-				{
-					gfx_data = m_ig_ram[(tile << 4) + yi];
-				}
+		// CRTC supplies the cursor position, raster shape and blink phase.
+		// Keep it visible even over the black attributes left by BIOS/BASIC.
+		// TODO: confirm the cursor colour from the video circuitry.
+		const bool cursor = int(x) == cursor_x;
+		for (unsigned xi = 0; xi < 8; xi++)
+		{
+			const int res_x = x * 8 + xi;
+			if (!cliprect.contains(res_x, y))
+				continue;
 
-				for(int xi = 0; xi < 8; xi++)
-				{
-					const int res_x = x * 8 + xi;
-					const int res_y = y * mc6845_tile_height + yi;
-					if (!cliprect.contains(res_x, res_y))
-						continue;
-
-					int const pen = BIT(gfx_data, 7 - xi) ? fg_color : bg_color;
-					bitmap.pix(res_y, res_x) = m_palette->pen(pen);
-				}
-			}
+			const int pen = cursor ? 7 : BIT(gfx_data, 7 - xi) ? fg_color : bg_color;
+			bitmap.pix(y, res_x) = palette[pen];
 		}
 	}
-
-	return 0;
 }
 
 u16 b16_state::tvram_r(offs_t offset)
@@ -320,18 +299,6 @@ void b16_state::b16ex2_map(address_map &map)
 	map(0xff8000, 0xffffff).rom().region("ipl", 0);
 }
 
-void b16_state::crtc_address_w(uint8_t data)
-{
-	m_crtc_index = data;
-	m_crtc->address_w(data);
-}
-
-void b16_state::crtc_data_w(uint8_t data)
-{
-	m_crtc_vreg[m_crtc_index] = data;
-	m_crtc->register_w(data);
-}
-
 void b16_state::b16_io(address_map &map)
 {
 	map.unmap_value_high();
@@ -339,8 +306,8 @@ void b16_state::b16_io(address_map &map)
 	map(0x08, 0x0f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x10, 0x13).rw(m_intm, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0x18, 0x1b).rw(m_ints, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x20, 0x20).w(FUNC(b16_state::crtc_address_w));
-	map(0x22, 0x22).w(FUNC(b16_state::crtc_data_w));
+	map(0x20, 0x20).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0x22, 0x22).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 //  map(0x28, 0x2b) keyboard, likely thru USART
 	map(0x28, 0x28).rw(m_keyboard, FUNC(b16_kbd_device::data_r), FUNC(b16_kbd_device::data_w));
 	map(0x2a, 0x2a).r(m_keyboard, FUNC(b16_kbd_device::status_r));
@@ -545,6 +512,7 @@ void b16_state::b16(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(b16_state::crtc_update_row));
 
 	screen_device &screen(SCREEN(config, m_screen));
 	screen.set_refresh_hz(60);
@@ -552,7 +520,6 @@ void b16_state::b16(machine_config &config)
 	screen.set_screen_update(FUNC(b16_state::screen_update));
 	screen.set_size(640, 400);
 	screen.set_visarea_full();
-	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_b16);
 	PALETTE(config, m_palette, FUNC(b16_state::palette_init)).set_entries(16);
